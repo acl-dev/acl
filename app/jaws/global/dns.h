@@ -1,4 +1,4 @@
-
+ï»¿
 #ifndef __DNS_SERVER_INCLUDE_H__
 #define __DNS_SERVER_INCLUDE_H__
 
@@ -8,9 +8,9 @@
 extern "C" {
 #endif
 
-#define USE_THREAD_POOL			/* Íâ¹Ò²éÑ¯DNSÄ£¿é²ÉÓÃÏß³Ì³Ø·½Ê½ */
+#define USE_THREAD_POOL			/* å¤–æŒ‚æŸ¥è¯¢DNSæ¨¡å—é‡‡ç”¨çº¿ç¨‹æ± æ–¹å¼ */
 
-/* ²éÑ¯DNSµÄÏûÏ¢ÀàĞÍ¶¨Òå */
+/* æŸ¥è¯¢DNSçš„æ¶ˆæ¯ç±»å‹å®šä¹‰ */
 #define DNS_MSG_LOOKUP		ACL_MSGIO_USER + 100
 #define DNS_MSG_LOOKUP_RESULT	ACL_MSGIO_USER + 101
 
@@ -24,31 +24,31 @@ typedef void (*DNS_CALLBACK)(const DNS_CTX *);
 
 struct DNS_CTX {
 	/* public */
-	char  domain_key[256];		/* ÓòÃû(Ğ¡Ğ´) */
-	char  ip[DNS_IP_MAX][64];	/* IPµØÖ·Êı×é */
-	int   port[DNS_IP_MAX];		/* port Êı×é */
-	int   ip_cnt;			/* IPµØÖ·Êı×éÖĞµÄÓĞĞ§IPµØÖ·¸öÊı */
-	time_t begin;			/* ¿ªÊ¼²éÑ¯Ê±µÄÊ±¼ä½Ø */
+	char  domain_key[256];		/* åŸŸå(å°å†™) */
+	char  ip[DNS_IP_MAX][64];	/* IPåœ°å€æ•°ç»„ */
+	int   port[DNS_IP_MAX];		/* port æ•°ç»„ */
+	int   ip_cnt;			/* IPåœ°å€æ•°ç»„ä¸­çš„æœ‰æ•ˆIPåœ°å€ä¸ªæ•° */
+	time_t begin;			/* å¼€å§‹æŸ¥è¯¢æ—¶çš„æ—¶é—´æˆª */
 
 	/* public */
-	DNS_CALLBACK callback;		/* ²éÑ¯·µ»Øµ÷ÓÃµÄÓÃ»§µÄ»Øµ÷º¯Êı */
-	void *context;			/* ÓÃ»§´«µİµÄ²ÎÊı */
+	DNS_CALLBACK callback;		/* æŸ¥è¯¢è¿”å›è°ƒç”¨çš„ç”¨æˆ·çš„å›è°ƒå‡½æ•° */
+	void *context;			/* ç”¨æˆ·ä¼ é€’çš„å‚æ•° */
 
 	/* private */
-	DNS_SERVER *dns;		/* DNS¶ÔÏó¾ä±ú£¬ÄÚ²¿±äÁ¿ */
-	ACL_MSGIO  *mio;		/* IOÏûÏ¢¾ä±ú£¬ÄÚ²¿±äÁ¿ */
-	ACL_DNS_DB *dns_db;		/* ÁÙÊ±ÓÃÒÔ´«µİDNS²éÑ¯½á¹û£¬ÄÚ²¿±äÁ¿ */
+	DNS_SERVER *dns;		/* DNSå¯¹è±¡å¥æŸ„ï¼Œå†…éƒ¨å˜é‡ */
+	ACL_MSGIO  *mio;		/* IOæ¶ˆæ¯å¥æŸ„ï¼Œå†…éƒ¨å˜é‡ */
+	ACL_DNS_DB *dns_db;		/* ä¸´æ—¶ç”¨ä»¥ä¼ é€’DNSæŸ¥è¯¢ç»“æœï¼Œå†…éƒ¨å˜é‡ */
 };
 
 struct DNS_SERVER {
-	ACL_AIO *aio;			/* Òì²½Í¨ĞÅ¿ò¼Ü */
-	acl_pthread_pool_t *wq;		/* Ïß³Ì³Ø¾ä±ú */
-	ACL_MSGIO *listener;		/* ÏûÏ¢¼àÌıÕß¾ä±ú */
-	ACL_MSGIO *mio;			/* ÏûÏ¢¾ä±ú */
+	ACL_AIO *aio;			/* å¼‚æ­¥é€šä¿¡æ¡†æ¶ */
+	acl_pthread_pool_t *wq;		/* çº¿ç¨‹æ± å¥æŸ„ */
+	ACL_MSGIO *listener;		/* æ¶ˆæ¯ç›‘å¬è€…å¥æŸ„ */
+	ACL_MSGIO *mio;			/* æ¶ˆæ¯å¥æŸ„ */
 	char  addr[256];
 
-	DNS_CACHE *dns_cache;		/* DNS»º´æ¾ä±ú */
-	acl_pthread_mutex_t lock;	/* Ïß³ÌËø */
+	DNS_CACHE *dns_cache;		/* DNSç¼“å­˜å¥æŸ„ */
+	acl_pthread_mutex_t lock;	/* çº¿ç¨‹é” */
 };
 
 /* in dns_server.c */

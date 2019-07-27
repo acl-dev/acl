@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 extern char* var_cfg_html_path;
 extern acl::master_str_tbl var_conf_str_tab[];

@@ -1,4 +1,4 @@
-#ifndef	ACL_MASTER_TYPE_INCLUDE_H
+﻿#ifndef	ACL_MASTER_TYPE_INCLUDE_H
 #define	ACL_MASTER_TYPE_INCLUDE_H
 
 #include "../stdlib/acl_xinetd_cfg.h"

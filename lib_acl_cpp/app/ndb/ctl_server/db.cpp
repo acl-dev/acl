@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "db.h"
 
 db_idx::db_idx(db_tbl* tbl, const char* name, unsigned int id, idx_type_t type)
@@ -73,7 +73,7 @@ void database::add_tbl(db_tbl* tbl)
 void database::add_idx_host(idx_host* host)
 {
 	lock_->lock();
-	// ĞèÒª¼ì²éÊÇ·ñÊÇÖØ¸´Ìí¼Ó
+	// éœ€è¦æ£€æŸ¥æ˜¯å¦æ˜¯é‡å¤æ·»åŠ 
 	std::vector<idx_host*>::iterator it = idx_hosts_.begin();
 	for (; it != idx_hosts_.end(); it++)
 	{

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file pkcs11.h
  *
  * \brief Wrapper for PKCS#11 library libpkcs11-helper

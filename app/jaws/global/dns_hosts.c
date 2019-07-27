@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+﻿#include "lib_acl.h"
 #include "dns.h"
 
 static void group_add(ACL_DNS *dns_handle, ACL_FILE *fp, char *line)

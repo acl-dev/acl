@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file padlock.h
  *
  * \brief VIA PadLock ACE for HW encryption/decryption supported by some processors

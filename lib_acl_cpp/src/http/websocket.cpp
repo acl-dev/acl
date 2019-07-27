@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -657,8 +657,8 @@ int websocket::peek_frame_data(char* buf, size_t size)
 		size = (size_t) (header_.payload_len - payload_nread_);
 	}
 
-	// Èç¹ûÎ´¶ÁÂúËùÒªÇóµÄÊý¾ÝÇÒ¶Áµ½µÄÊý¾ÝÎª¿Õ£¬Ôò·µ»Ø-1
-	// readn_peek µÚÈý¸ö²ÎÊýÎª true ÒªÇóÄÚ²¿×Ô¶¯Çå¿Õ»º³åÇø
+	// å¦‚æžœæœªè¯»æ»¡æ‰€è¦æ±‚çš„æ•°æ®ä¸”è¯»åˆ°çš„æ•°æ®ä¸ºç©ºï¼Œåˆ™è¿”å›ž-1
+	// readn_peek ç¬¬ä¸‰ä¸ªå‚æ•°ä¸º true è¦æ±‚å†…éƒ¨è‡ªåŠ¨æ¸…ç©ºç¼“å†²åŒº
 	if (!client_.readn_peek(peek_buf_, size, true) && peek_buf_->empty()) {
 		return -1;
 	}

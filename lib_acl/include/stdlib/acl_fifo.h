@@ -1,4 +1,4 @@
-#ifndef ACL_FIFO_INCLUDE_H
+﻿#ifndef ACL_FIFO_INCLUDE_H
 #define ACL_FIFO_INCLUDE_H
 
 #ifdef __cplusplus
@@ -28,28 +28,28 @@ struct ACL_FIFO {
 	ACL_FIFO_INFO *tail;
 	int   cnt;
 
-	/* ���Ӽ����� */
+	/* 添加及弹出 */
 
-	/* �����β�����Ӷ�̬���� */
+	/* 向队列尾部添加动态对象 */
 	void  (*push_back)(struct ACL_FIFO*, void*);
-	/* �����ͷ�����Ӷ�̬���� */
+	/* 向队列头部添加动态对象 */
 	void  (*push_front)(struct ACL_FIFO*, void*);
-	/* ��������β����̬���� */
+	/* 弹出队列尾部动态对象 */
 	void *(*pop_back)(struct ACL_FIFO*);
-	/* ��������ͷ����̬���� */
+	/* 弹出队列头部动态对象 */
 	void *(*pop_front)(struct ACL_FIFO*);
 
 	/* for acl_iterator */
 
-	/* ȡ������ͷ���� */
+	/* 取迭代器头函数 */
 	void *(*iter_head)(ACL_ITER*, struct ACL_FIFO*);
-	/* ȡ��������һ������ */
+	/* 取迭代器下一个函数 */
 	void *(*iter_next)(ACL_ITER*, struct ACL_FIFO*);
-	/* ȡ������β���� */
+	/* 取迭代器尾函数 */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_FIFO*);
-	/* ȡ��������һ������ */
+	/* 取迭代器上一个函数 */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_FIFO*);
-	/* ȡ�����������ĵ�ǰ������Ա�ṹ���� */
+	/* 取迭代器关联的当前容器成员结构对象 */
 	ACL_FIFO_INFO *(*iter_info)(ACL_ITER*, struct ACL_FIFO*);
 
 	/* private */
@@ -57,7 +57,7 @@ struct ACL_FIFO {
 };
 
 /**
- * ��ʼ��һ���������У�Ӧ�ÿ�����ջ�Ϸ�����У�������øú������г�ʼ��
+ * 初始化一个给定队列，应用可以在栈上分配队列，而后调用该函数进行初始化
  * @param fifo {ACL_FIFO *}
  * @example:
  *   void test(void) {
@@ -69,20 +69,20 @@ struct ACL_FIFO {
 ACL_API void acl_fifo_init(ACL_FIFO *fifo);
 
 /**
- * ���ڴ���з���һ�����ж���
+ * 从内存堆中分配一个队列对象
  * @return {ACL_FIFO*}
  */
 ACL_API ACL_FIFO *acl_fifo_new(void);
 
 /**
- * ���ڴ���з���һ�����ж��󲢴��ڴ�ض�����Ϊ������
+ * 从内存堆中分配一个队列对象并传内存池对象做为分配器
  * @param slice {ACL_SLICE_POOL*}
  * @return {ACL_FIFO*}
  */
 ACL_API ACL_FIFO *acl_fifo_new1(ACL_SLICE_POOL *slice);
 
 /**
- * �Ӷ�����ɾ��������ֵ��ͬ�Ķ���
+ * 从队列中删除与所给值相同的对象
  * @param fifo {ACL_FIFO*}
  * @param data {const void*}
  */
@@ -90,19 +90,19 @@ ACL_API int acl_fifo_delete(ACL_FIFO *fifo, const void *data);
 ACL_API void acl_fifo_delete_info(ACL_FIFO *fifo, ACL_FIFO_INFO *info);
 
 /**
- * �ͷ��Զѷ���Ķ��ж���
+ * 释放以堆分配的队列对象
  * @param fifo {ACL_FIFO*}
- * @param free_fn {void (*)(void*)}, ����ú���ָ�벻Ϊ����
- *  �����ͷŶ����ж�̬����Ķ���
+ * @param free_fn {void (*)(void*)}, 如果该函数指针不为空则
+ *  用来释放队列中动态分配的对象
  */
 ACL_API void acl_fifo_free(ACL_FIFO *fifo, void (*free_fn)(void *));
 ACL_API void acl_fifo_free2(ACL_FIFO *fifo, void (*free_fn)(ACL_FIFO_INFO *));
 
 /**
- * �����������һ����̬�Ѷ���
+ * 向队列中添加一个动态堆对象
  * @param fifo {ACL_FIFO*}
- * @param data {void*} ��̬����
- * @return {ACL_FIFO_INFO*} ��� data �ǿ��򷵻ض����е������Ӷ���, ���򷵻� NULL
+ * @param data {void*} 动态对象
+ * @return {ACL_FIFO_INFO*} 如果 data 非空则返回队列中的新添加对象, 否则返回 NULL
  */
 ACL_API ACL_FIFO_INFO *acl_fifo_push_back(ACL_FIFO *fifo, void *data);
 #define acl_fifo_push	acl_fifo_push_back
@@ -111,59 +111,59 @@ ACL_API void acl_fifo_push_info_back(ACL_FIFO *fifo, ACL_FIFO_INFO *info);
 ACL_API ACL_FIFO_INFO *acl_fifo_push_front(ACL_FIFO *fifo, void *data);
 
 /**
- * �Ӷ��������Ƚ��ȳ���ʽ����һ����̬����, ͬʱ���ö���Ӷ�����ɾ��
+ * 从队列中以先进先出方式弹出一个动态对象, 同时将该对象从队列中删除
  * @param fifo {ACL_FIFO*}
- * @return {void*}, ���Ϊ�գ����ʾ����Ϊ��
+ * @return {void*}, 如果为空，则表示队列为空
  */
 ACL_API void *acl_fifo_pop_front(ACL_FIFO *fifo);
 #define acl_fifo_pop	acl_fifo_pop_front
 ACL_API ACL_FIFO_INFO *acl_fifo_pop_info(ACL_FIFO *fifo);
 
 /**
- * �Ӷ������Ժ���ȳ���ʽ����һ����̬���� ͬʱ�ö���Ӷ�����ɾ��
+ * 从队列中以后进先出方式弹出一个动态对象， 同时该对象从队列中删除
  * @param fifo {ACL_FIFO*}
- * @return {void*}, ���Ϊ�գ����ʾ����Ϊ��
+ * @return {void*}, 如果为空，则表示队列为空
  */
 ACL_API void *acl_fifo_pop_back(ACL_FIFO *fifo);
 
 /**
- * ���ض�����ͷ���Ķ�̬����
+ * 返回队列中头部的动态对象
  * @param fifo {ACL_FIFO*}
- * @return {void*}, ���Ϊ�գ����ʾ����Ϊ��
+ * @return {void*}, 如果为空，则表示队列为空
  */
 ACL_API void *acl_fifo_head(ACL_FIFO *fifo);
 ACL_API ACL_FIFO_INFO *acl_fifo_head_info(ACL_FIFO *fifo);
 
 /**
- * ���ض�����β���Ķ�̬����
+ * 返回队列中尾部的动态对象
  * @param fifo {ACL_FIFO*}
- * @return {void*}, ���Ϊ�գ����ʾ����Ϊ��
+ * @return {void*}, 如果为空，则表示队列为空
  */
 ACL_API void *acl_fifo_tail(ACL_FIFO *fifo);
 ACL_API ACL_FIFO_INFO *acl_fifo_tail_info(ACL_FIFO *fifo);
 
 /**
- * ���ض����ж�̬������ܸ���
+ * 返回队列中动态对象的总个数
  * @param fifo {ACL_FIFO*}
  * @return {int}, >= 0
  */
 ACL_API int acl_fifo_size(ACL_FIFO *fifo);
 
-/*--------------------  һЩ�����ݵĺ���� --------------------------------*/
+/*--------------------  一些方便快捷的宏操作 --------------------------------*/
 
 /**
- * ��õ�ǰ iter �������Ķ����ַ
+ * 获得当前 iter 所包含的对象地址
  * @param iter {ACL_FIFO_ITER}
  */
 #define	ACL_FIFO_ITER_VALUE(iter)	((iter).ptr->data)
 #define	acl_fifo_iter_value		ACL_FIFO_ITER_VALUE
 
 /**
- * ���� ACL_FIFO
+ * 遍历 ACL_FIFO
  * @param iter {ACL_FIFO_ITER}
  * @param fifo {ACL_FIFO}
  * @example:
-        -- ���Ǳ�����֧�ֵı�����ʽ
+        -- 仅是本容器支持的遍历方式
 	void test()
 	{
 		ACL_FIFO *fifo_ptr = acl_fifo_new();
@@ -183,7 +183,7 @@ ACL_API int acl_fifo_size(ACL_FIFO *fifo);
 		acl_fifo_free(fifo_ptr, acl_myfree_fn);
 	}
 
-	-- ͨ������������ʽ
+	-- 通用容器遍历方式
 	void test2()
 	{
 		ACL_FIFO *fifo_ptr = acl_fifo_new();
@@ -207,7 +207,7 @@ ACL_API int acl_fifo_size(ACL_FIFO *fifo);
 #define	acl_fifo_foreach	ACL_FIFO_FOREACH
 
 /**
- * ������� ACL_FIFO
+ * 反向遍历 ACL_FIFO
  * @param iter {ACL_FIFO_ITER}
  * @param fifo {ACL_FIFO}
  * @example:

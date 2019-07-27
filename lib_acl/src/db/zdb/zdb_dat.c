@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include <string.h>
@@ -30,8 +30,8 @@ int dat_store_header_sync(ZDB_DAT_STORE *store)
 }
 
 /**
- * ÊÍ·Å ACL_VSTRING »Øµ÷º¯Êı
- * @param arg {void*} »Øµ÷²ÎÊı, ¿É×ª»»³É ACL_VSTRING ¶ÔÏó
+ * é‡Šæ”¾ ACL_VSTRING å›è°ƒå‡½æ•°
+ * @param arg {void*} å›è°ƒå‚æ•°, å¯è½¬æ¢æˆ ACL_VSTRING å¯¹è±¡
  */
 static void free_vstring_fn(void *arg)
 {
@@ -41,16 +41,16 @@ static void free_vstring_fn(void *arg)
 }
 
 /**
- * È·±£ ZDB.dat_ifiles µÄÊı×éÈİÁ¿¹»ÓÃ
+ * ç¡®ä¿ ZDB.dat_ifiles çš„æ•°ç»„å®¹é‡å¤Ÿç”¨
  * @param db {ZDB*}
- * @param size {int} Êı×éÈİÁ¿µÄ´óĞ¡ÒªÇó
+ * @param size {int} æ•°ç»„å®¹é‡çš„å¤§å°è¦æ±‚
  */
 static void dat_ifiles_space(ZDB *db, int idisk, int size)
 {
 	int   i;
 
-	/* xxx: Ö»ËùÒÔ¼Ó1ÊÇÒòÎªÏÂ±êÊÇ´Ó1¿ªÊ¼µÄ, ¶ø C ÓïÑÔÖĞµÄÊı×éÏÂÔØÊÇ´Ó 0 ¿ªÊ¼µÄ,
-	 * ËùÒÔËµ db->dat_disks[0] ÊÇ¸øÀË·ÑµôÁË :( --- zsx
+	/* xxx: åªæ‰€ä»¥åŠ 1æ˜¯å› ä¸ºä¸‹æ ‡æ˜¯ä»1å¼€å§‹çš„, è€Œ C è¯­è¨€ä¸­çš„æ•°ç»„ä¸‹è½½æ˜¯ä» 0 å¼€å§‹çš„,
+	 * æ‰€ä»¥è¯´ db->dat_disks[0] æ˜¯ç»™æµªè´¹æ‰äº† :( --- zsx
 	 */
 	size++;
 
@@ -74,9 +74,9 @@ static void dat_ifiles_space(ZDB *db, int idisk, int size)
 }
 
 /**
- * ¼ÆËãÖµ´æ´¢µÄÏà¶ÔÂ·¾¶ºÅ
+ * è®¡ç®—å€¼å­˜å‚¨çš„ç›¸å¯¹è·¯å¾„å·
  * @param db {ZDB*}
- * @param len {int} Êı¾İµÄ³¤¶È
+ * @param len {int} æ•°æ®çš„é•¿åº¦
  * @return {int} >= 0: ok; -1: error
  */
 static int dat_inode(ZDB *db, int len)
@@ -84,7 +84,7 @@ static int dat_inode(ZDB *db, int len)
 	const char *myname = "dat_inode";
 	int  inode;
 
-	/* Ëù¸øµÄ³¤¶È±ØĞëÎª»ù´¡¿éµÄÕûÊı±¶ */
+	/* æ‰€ç»™çš„é•¿åº¦å¿…é¡»ä¸ºåŸºç¡€å—çš„æ•´æ•°å€ */
 
 	if (len % db->blk_dlen != 0) {
 		acl_msg_error("%s(%d): len(%d) %% db->blk_dlen(%d) != 0, invalid",
@@ -92,7 +92,7 @@ static int dat_inode(ZDB *db, int len)
 		return (-1);
 	}
 
-	/* ¸ù¾İÊı¾İ¿é³¤¶È¼ÆËã³ö»ù´¡¿éµÄ¸öÊı, Í¬Ê±Ò²ÊÇ´æ´¢ÎÄ¼şËùÔÚÄ¿Â¼µÄ±êÊ¶ºÅ */
+	/* æ ¹æ®æ•°æ®å—é•¿åº¦è®¡ç®—å‡ºåŸºç¡€å—çš„ä¸ªæ•°, åŒæ—¶ä¹Ÿæ˜¯å­˜å‚¨æ–‡ä»¶æ‰€åœ¨ç›®å½•çš„æ ‡è¯†å· */
 
 	inode = len / db->blk_dlen;
 	if (inode > DIR_LIMIT) {
@@ -105,12 +105,12 @@ static int dat_inode(ZDB *db, int len)
 }
 
 /**
- * »ñµÃÖµ´æ´¢µÄÎÄ¼şÈ«Â·¾¶
+ * è·å¾—å€¼å­˜å‚¨çš„æ–‡ä»¶å…¨è·¯å¾„
  * @param db {ZDB*}
- * @param buf {ACL_VSTRING*} ´æ´¢½á¹ûµÄ»º³åÇø
- * @param inode {int} Â·¾¶ºÅ
- * @param ifile {int} ÎÄ¼şºÅ
- * @return {ACL_VSTRING*} ½á¹û»º³åÇøµØÖ·
+ * @param buf {ACL_VSTRING*} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒº
+ * @param inode {int} è·¯å¾„å·
+ * @param ifile {int} æ–‡ä»¶å·
+ * @return {ACL_VSTRING*} ç»“æœç¼“å†²åŒºåœ°å€
  **/
 static ACL_VSTRING *dat_filepath(ZDB *db, ACL_VSTRING *buf, int idisk, int inode, int ifile)
 {
@@ -144,11 +144,11 @@ static ACL_VSTRING *dat_filepath(ZDB *db, ACL_VSTRING *buf, int idisk, int inode
 }
 
 /**
- * »ñµÃÎÄ¼şµÄËùÔÚÂ·¾¶
+ * è·å¾—æ–‡ä»¶çš„æ‰€åœ¨è·¯å¾„
  * @param db {ZDB*}
- * @param buf {ACL_VSTRING*} ´æ´¢½á¹ûµÄ»º³åÇø
- * @param inode {int} Â·¾¶ºÅ
- * @return {ACL_VSTRING*} ½á¹û»º³åÇøµØÖ·
+ * @param buf {ACL_VSTRING*} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒº
+ * @param inode {int} è·¯å¾„å·
+ * @return {ACL_VSTRING*} ç»“æœç¼“å†²åŒºåœ°å€
  */
 static ACL_VSTRING *dat_path(ZDB *db, ACL_VSTRING *buf, int idisk, int inode acl_unused)
 {
@@ -183,7 +183,7 @@ static ACL_VSTRING *dat_path(ZDB *db, ACL_VSTRING *buf, int idisk, int inode acl
 #ifdef	ZDB_LINK_BUSY
 
 /**
- * ½«ĞÂµÄÕ¼ÓÃ¿éÁ´½Óµ½Õ¼ÓÃÁ´ÖĞ
+ * å°†æ–°çš„å ç”¨å—é“¾æ¥åˆ°å ç”¨é“¾ä¸­
  * @param store {ZDB_DAT_STORE*}
  * @param blk {ZDB_BLK*}
  * @parem ilnk {zdb_lnk_t}
@@ -248,9 +248,9 @@ static int busy_blk_link(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 	hdr_blk->hdr.iprev_busy = ilnk;
 	blk->hdr.inext_busy = store->hdr.ihead_busy;
 	blk->hdr.iprev_busy = -1;
-	store->hdr.ihead_busy = ilnk;  /* ¸üĞÂÕ¼ÓÃ¿éÁ´Í· */
+	store->hdr.ihead_busy = ilnk;  /* æ›´æ–°å ç”¨å—é“¾å¤´ */
 
-	/* ¸üĞÂÄ³Õ¼ÓÃ¿éµÄÍ·ĞÅÏ¢ */
+	/* æ›´æ–°æŸå ç”¨å—çš„å¤´ä¿¡æ¯ */
 	ret = ZDB_WRITE((ZDB_STORE*) store, hdr_blk, blk_len, off);
 	if (ret == -1) {
 		acl_msg_error("%s(%d): zdb_write to %s error(%s)",
@@ -293,7 +293,7 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 	}
 
 	if (blk->hdr.iprev_busy == -1) {
-		/* ¸ÃÕ¼ÓÃ¿éÓ¦¸ÃÊÇÍ·²¿¿é */
+		/* è¯¥å ç”¨å—åº”è¯¥æ˜¯å¤´éƒ¨å— */
 
 		if (store->hdr.ihead_busy != ilnk) {
 			acl_msg_error("%s(%d): %s, ihead_busy(%d) != ilnk(%d)",
@@ -302,7 +302,7 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 			RETURN (-1);
 		}
 		if (store->hdr.itail_busy == ilnk) {
-			/* ËµÃ÷¸Ã blk ÊÇ×îºóÒ»¸öÕ¼ÓÃ¿éÁË */
+			/* è¯´æ˜è¯¥ blk æ˜¯æœ€åä¸€ä¸ªå ç”¨å—äº† */
 
 			store->hdr.ihead_busy = store->hdr.itail_busy = -1;
 			blk->hdr.inext_busy = blk->hdr.iprev_busy = -1;
@@ -343,7 +343,7 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 	}
 
 	if (blk->hdr.inext_busy == -1) {
-		/* ËµÃ÷¸ÃÕ¼ÓÃ¿éÓ¦¸ÃÎªÎ²²¿¿é */
+		/* è¯´æ˜è¯¥å ç”¨å—åº”è¯¥ä¸ºå°¾éƒ¨å— */
 
 		if (store->hdr.itail_busy != ilnk) {
 			acl_msg_error("%s(%d): %s, itail_busy(%d) != ilnk(%d)",
@@ -354,7 +354,7 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 
 		/* xxx: sanity check */
 		if (store->hdr.ihead_busy == ilnk) {
-			/* ËµÃ÷¸Ã blk ÊÇ×îºóÒ»¸öÕ¼ÓÃ¿éÁË */
+			/* è¯´æ˜è¯¥ blk æ˜¯æœ€åä¸€ä¸ªå ç”¨å—äº† */
 
 			store->hdr.ihead_busy = store->hdr.itail_busy = -1;
 			blk->hdr.inext_busy = blk->hdr.iprev_busy = -1;
@@ -394,9 +394,9 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 		RETURN (0);
 	}
 
-	/* ËµÃ÷¸ÃÕ¼ÓÃ¿éÓ¦¸ÃÎªÖĞ¼ä¿é */
+	/* è¯´æ˜è¯¥å ç”¨å—åº”è¯¥ä¸ºä¸­é—´å— */
 
-	/* ¸üĞÂºóÒ»¸öÕ¼ÓÃ¿éµÄÍ·ĞÅÏ¢ */
+	/* æ›´æ–°åä¸€ä¸ªå ç”¨å—çš„å¤´ä¿¡æ¯ */
 
 	blk_hdr = (ZDB_BLK_HDR*) acl_mymalloc(sizeof(ZDB_BLK_HDR));
 	off = BLK_HDR_OFF(store, blk->hdr.inext_busy);
@@ -422,7 +422,7 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 		RETURN (-1);
 	}
 
-	/* ¸üĞÂÇ°Ò»¸öÕ¼ÓÃ¿éµÄÍ·ĞÅÏ¢ */
+	/* æ›´æ–°å‰ä¸€ä¸ªå ç”¨å—çš„å¤´ä¿¡æ¯ */
 
 	off = BLK_HDR_OFF(store, blk->hdr.iprev_busy);
 	ret = ZDB_READ((ZDB_STORE*)store, blk_hdr, sizeof(ZDB_BLK_HDR), off);
@@ -454,9 +454,9 @@ static int busy_blk_unlink(ZDB_DAT_STORE *store, ZDB_BLK *blk, zdb_lnk_t ilnk)
 #endif  /* ZDB_LINK_BUSY */
 
 /**
- * Ôö¼Ó²¢³õÊ¼»¯Öµ´æ´¢µÄÊı¾İ¿é
- * @param store {ZDB_DAT_STORE*} Öµ´æ´¢¾ä±ú
- * @param count {acl_int64} Ôö¼ÓµÄÊı¾İ¿é¸öÊı
+ * å¢åŠ å¹¶åˆå§‹åŒ–å€¼å­˜å‚¨çš„æ•°æ®å—
+ * @param store {ZDB_DAT_STORE*} å€¼å­˜å‚¨å¥æŸ„
+ * @param count {acl_int64} å¢åŠ çš„æ•°æ®å—ä¸ªæ•°
  * @return {int} 0: ok; -1: error
  */
 static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
@@ -466,14 +466,14 @@ static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
 	acl_int64 i;
 	int   ret;
 
-	/* ¼ì²éÊäÈëÊÇ·ñºÏ·¨ */
+	/* æ£€æŸ¥è¾“å…¥æ˜¯å¦åˆæ³• */
 	if (count <= 0) {
 		acl_msg_error("%s(%d): count(" ACL_FMT_I64D ") invalid",
 			myname, __LINE__, count);
 		return (-1);
 	}
 
-	/* ¼ì²éÊÇ·ñÒÑ¾­´ïµ½·ÖÅäÏŞÖÆ¸öÊı */
+	/* æ£€æŸ¥æ˜¯å¦å·²ç»è¾¾åˆ°åˆ†é…é™åˆ¶ä¸ªæ•° */
 	if (store->hdr.size >= store->hdr.limit) {
 		acl_msg_error("%s(%d): store(%s)'s size(" ACL_FMT_I64D
 			") >= limit(" ACL_FMT_I64D ")",
@@ -482,12 +482,12 @@ static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
 		return (-1);
 	}
 
-	count += store->hdr.size;  /* ½« count ÉèÎª×î´óÖµ */
+	count += store->hdr.size;  /* å°† count è®¾ä¸ºæœ€å¤§å€¼ */
 	if (count > store->hdr.limit)
-		count = store->hdr.limit;  /* ±ØĞë±£Ö¤²»ÄÜ³¬¹ıÏŞÖÆ */
+		count = store->hdr.limit;  /* å¿…é¡»ä¿è¯ä¸èƒ½è¶…è¿‡é™åˆ¶ */
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_DAT) == 0) {
-		/* ½«ÎÄ¼şÖ¸ÕëÖÃÎ² */
+		/* å°†æ–‡ä»¶æŒ‡é’ˆç½®å°¾ */
 		if (acl_vstream_fseek(((ZDB_STORE*) store)->fhandle.fp, 0, SEEK_END) < 0) {
 			acl_msg_error("%s(%d): fseek %s error(%s)",
 				myname, __LINE__, STORE_PATH((ZDB_STORE*) store),
@@ -496,27 +496,27 @@ static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
 		}
 	}
 
-	/* ¼ÆËãÕæÊµµÄ ZDB_BLK µÄ¿Õ¼ä´óĞ¡²¢·ÖÅäÒ»¸öĞÂµÄ ZDB_BLK ¶ÔÏó */
+	/* è®¡ç®—çœŸå®çš„ ZDB_BLK çš„ç©ºé—´å¤§å°å¹¶åˆ†é…ä¸€ä¸ªæ–°çš„ ZDB_BLK å¯¹è±¡ */
 	blk = (ZDB_BLK*) acl_mycalloc(1, (size_t) BLK_LEN(store));
 
-	/* Ë³Ğò³õÊ¼»¯Öµ´æ´¢ÖĞµÄ¸÷¸öÊı¾İ¿é, ²¢ĞÎ³Éµ¥ÏòÁ´ */
+	/* é¡ºåºåˆå§‹åŒ–å€¼å­˜å‚¨ä¸­çš„å„ä¸ªæ•°æ®å—, å¹¶å½¢æˆå•å‘é“¾ */
 	
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_DAT) == 0) {
 		for (i = store->hdr.size; i < count; i++) {
 			blk->hdr.inext_idle = (zdb_lnk_t) i + 1;
-			/* µ±´ïµ½×î´óÖµÊ±±íÊ¾ÏÂÒ»¸öÎ»ÖÃÎŞĞ§ */
+			/* å½“è¾¾åˆ°æœ€å¤§å€¼æ—¶è¡¨ç¤ºä¸‹ä¸€ä¸ªä½ç½®æ— æ•ˆ */
 			if (blk->hdr.inext_idle == count)
 				blk->hdr.inext_idle = -1;
-			blk->hdr.blk_ilnk = (zdb_lnk_t) i;  /* ±êÊ¶×Ô¼ºµÄË÷ÒıÎ»ÖÃºÅ, Ğ£ÑéÓÃ */
-			blk->hdr.inext_idle = store->hdr.ihead_idle;  /* ÓëÁ´Á¬½Ó */
-			blk->hdr.key = -1;  /* ËùÓĞµÄ³õÊ¼¼üÎª -1 */
+			blk->hdr.blk_ilnk = (zdb_lnk_t) i;  /* æ ‡è¯†è‡ªå·±çš„ç´¢å¼•ä½ç½®å·, æ ¡éªŒç”¨ */
+			blk->hdr.inext_idle = store->hdr.ihead_idle;  /* ä¸é“¾è¿æ¥ */
+			blk->hdr.key = -1;  /* æ‰€æœ‰çš„åˆå§‹é”®ä¸º -1 */
 
 #ifdef	ZDB_LINK_BUSY
 			blk->hdr.inext_busy = -1;
 			blk->hdr.iprev_busy = -1;
 #endif
 
-			store->hdr.ihead_idle = (zdb_lnk_t) i;  /* ¸üĞÂÖµ´æ´¢Í·µÄÍ·¿ÕÏĞÖ¸Õë */
+			store->hdr.ihead_idle = (zdb_lnk_t) i;  /* æ›´æ–°å€¼å­˜å‚¨å¤´çš„å¤´ç©ºé—²æŒ‡é’ˆ */
 
 			ret = acl_vstream_buffed_writen(((ZDB_STORE*) store)->fhandle.fp,
 					blk, (size_t) BLK_LEN(store));
@@ -532,22 +532,22 @@ static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
 	} else {
 		for (i = store->hdr.size; i < count; i++) {
 			blk->hdr.inext_idle = (zdb_lnk_t) i + 1;
-			/* µ±´ïµ½×î´óÖµÊ±±íÊ¾ÏÂÒ»¸öÎ»ÖÃÎŞĞ§ */
+			/* å½“è¾¾åˆ°æœ€å¤§å€¼æ—¶è¡¨ç¤ºä¸‹ä¸€ä¸ªä½ç½®æ— æ•ˆ */
 			if (blk->hdr.inext_idle == count)
 				blk->hdr.inext_idle = -1;
-			blk->hdr.blk_ilnk = (zdb_lnk_t) i;  /* ±êÊ¶×Ô¼ºµÄË÷ÒıÎ»ÖÃºÅ, Ğ£ÑéÓÃ */
-			blk->hdr.inext_idle = store->hdr.ihead_idle;  /* ÓëÁ´Á¬½Ó */
-			blk->hdr.key = -1;  /* ËùÓĞµÄ³õÊ¼¼üÎª -1 */
+			blk->hdr.blk_ilnk = (zdb_lnk_t) i;  /* æ ‡è¯†è‡ªå·±çš„ç´¢å¼•ä½ç½®å·, æ ¡éªŒç”¨ */
+			blk->hdr.inext_idle = store->hdr.ihead_idle;  /* ä¸é“¾è¿æ¥ */
+			blk->hdr.key = -1;  /* æ‰€æœ‰çš„åˆå§‹é”®ä¸º -1 */
 
 #ifdef	ZDB_LINK_BUSY
 			blk->hdr.inext_busy = -1;
 			blk->hdr.iprev_busy = -1;
 #endif
 
-			store->hdr.ihead_idle = (zdb_lnk_t) i;  /* ¸üĞÂÖµ´æ´¢Í·µÄÍ·¿ÕÏĞÖ¸Õë */
+			store->hdr.ihead_idle = (zdb_lnk_t) i;  /* æ›´æ–°å€¼å­˜å‚¨å¤´çš„å¤´ç©ºé—²æŒ‡é’ˆ */
 
 			ret = ZDB_WRITE((ZDB_STORE*) store, blk, (size_t) BLK_HDR_LEN(store),
-					BLK_HDR_OFF(store, i));  /* Ö»Ğè³õÊ¼»¯¿éÍ·ĞÅÏ¢ */
+					BLK_HDR_OFF(store, i));  /* åªéœ€åˆå§‹åŒ–å—å¤´ä¿¡æ¯ */
 			if (ret == ACL_VSTREAM_EOF) {
 				acl_myfree(blk);
 				acl_msg_error("%s(%d): write to %s error(%s)", myname,
@@ -561,7 +561,7 @@ static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
 	acl_myfree(blk);
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_DAT) == 0) {
-		/* Ë¢ĞÂĞ´µÄ»º³åÇøÖÁ´ÅÅÌ */
+		/* åˆ·æ–°å†™çš„ç¼“å†²åŒºè‡³ç£ç›˜ */
 		if (acl_vstream_fflush(((ZDB_STORE*)store)->fhandle.fp) == ACL_VSTREAM_EOF) {
 			acl_msg_error("%s(%d): fflush to %s error %s",
 				myname, __LINE__, STORE_PATH((ZDB_STORE*) store),
@@ -570,14 +570,14 @@ static int dat_store_blk_add(ZDB_DAT_STORE *store, acl_int64 count)
 		}
 	}
 
-	store->hdr.size = count;  /* ¸üĞÂÖµ´æ´¢×Ü·ÖÅäµÄÊı¾İ¿é¸öÊı */
+	store->hdr.size = count;  /* æ›´æ–°å€¼å­˜å‚¨æ€»åˆ†é…çš„æ•°æ®å—ä¸ªæ•° */
 	return (0);
 }
 
 /**
- * ³õÊ¼»¯Öµ´æ´¢
- * @param store {ZDB_DAT_STORE*} Öµ´æ´¢¾ä±ú
- * @param db {ZDB*} ZDB ¾ä±ú
+ * åˆå§‹åŒ–å€¼å­˜å‚¨
+ * @param store {ZDB_DAT_STORE*} å€¼å­˜å‚¨å¥æŸ„
+ * @param db {ZDB*} ZDB å¥æŸ„
  * @return {int} 0: ok; -1: error
  */
 static int dat_store_init(ZDB_DAT_STORE *store, ZDB *db)
@@ -585,7 +585,7 @@ static int dat_store_init(ZDB_DAT_STORE *store, ZDB *db)
 	const char *myname = "dat_store_init";
 	int   ret;
 
-	/* ³õÊ¼»¯Öµ´æ´¢µÄÍ·ĞÅÏ¢ */
+	/* åˆå§‹åŒ–å€¼å­˜å‚¨çš„å¤´ä¿¡æ¯ */
 
 	store->hdr.limit = db->dat_limit;
 	store->hdr.nstep = db->dat_nstep > 0 ? db->dat_nstep : (int) db->dat_limit;
@@ -594,11 +594,11 @@ static int dat_store_init(ZDB_DAT_STORE *store, ZDB *db)
 	store->hdr.blk_hdr_dlen = sizeof(ZDB_BLK_HDR);
 	store->hdr.blk_dlen = db->blk_dlen;
 	store->hdr.blk_count = db->blk_count_tmp;
-	store->hdr.ihead_idle = -1;  /* Ö¸ÏòÒ»¸ö¿ÕÎ»ÖÃ */
+	store->hdr.ihead_idle = -1;  /* æŒ‡å‘ä¸€ä¸ªç©ºä½ç½® */
 
 #ifdef	ZDB_LINK_BUSY
-	store->hdr.ihead_busy = -1;  /* Ã»ÓĞÕ¼ÓÃÊı¾İ¿é */
-	store->hdr.itail_busy = -1;  /* Ã»ÓĞÕ¼ÓÃÊı¾İ¿é */
+	store->hdr.ihead_busy = -1;  /* æ²¡æœ‰å ç”¨æ•°æ®å— */
+	store->hdr.itail_busy = -1;  /* æ²¡æœ‰å ç”¨æ•°æ®å— */
 #endif
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_DAT) == 0)
@@ -618,9 +618,9 @@ static int dat_store_init(ZDB_DAT_STORE *store, ZDB *db)
 }
 
 /**
- * ´ò¿ªÖµ´æ´¢ÎÄ¼ş¾ä±úÊ±µÄ»Øµ÷º¯Êı
- * @param fh {ACL_FHANDLE*} ÎÄ¼ş¾ä±ú
- * @param arg {void*} ²ÎÊı
+ * æ‰“å¼€å€¼å­˜å‚¨æ–‡ä»¶å¥æŸ„æ—¶çš„å›è°ƒå‡½æ•°
+ * @param fh {ACL_FHANDLE*} æ–‡ä»¶å¥æŸ„
+ * @param arg {void*} å‚æ•°
  * @return {int} 0: ok; -1: error
  */
 static int dat_store_on_open(ACL_FHANDLE *fh, void *arg)
@@ -638,7 +638,7 @@ static int dat_store_on_open(ACL_FHANDLE *fh, void *arg)
 	if ((db->oflags & ZDB_FLAG_SLICE_DAT))
 		((ZDB_STORE*) store)->flag |= STORE_FLAG_IO_SLICE;
 
-	/* Èç¹ûÊÇĞÂÎÄ¼şÔò³õÊ¼»¯ */
+	/* å¦‚æœæ˜¯æ–°æ–‡ä»¶åˆ™åˆå§‹åŒ– */
 
 	if (fh->fsize == 0) {
 		acl_debug(ZDB_DBG_DAT, 1) ("%s: begin init %s ...",
@@ -658,7 +658,7 @@ static int dat_store_on_open(ACL_FHANDLE *fh, void *arg)
 			zdb_io_cache_open((ZDB_STORE*) store, (size_t) BLK_LEN(store));
 		}
 
-		/* ¿ªÊ¼Ìí¼Ó²¢³õÊ¼»¯Öµ´æ´¢ÖĞµÄÊı¾İ¿é */
+		/* å¼€å§‹æ·»åŠ å¹¶åˆå§‹åŒ–å€¼å­˜å‚¨ä¸­çš„æ•°æ®å— */
 		if (dat_store_blk_add(store, store->hdr.nstep) < 0) {
 			acl_msg_error("%s(%d): dat_store_blk_add error",
 				myname, __LINE__);
@@ -668,7 +668,7 @@ static int dat_store_on_open(ACL_FHANDLE *fh, void *arg)
 		return (0);
 	}
 
-	/* Èç¹ûÊÇ¾ÉÎÄ¼şÔò¶ÁÈ¡ÎÄ¼şÍ·ĞÅÏ¢, ÇÒÓ¦½øĞĞ¼ìÑé */
+	/* å¦‚æœæ˜¯æ—§æ–‡ä»¶åˆ™è¯»å–æ–‡ä»¶å¤´ä¿¡æ¯, ä¸”åº”è¿›è¡Œæ£€éªŒ */
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_DAT) == 0)
 		ret = acl_vstream_readn(((ZDB_STORE*) store)->fhandle.fp,
@@ -694,8 +694,8 @@ static int dat_store_on_open(ACL_FHANDLE *fh, void *arg)
 }
 
 /**
- * ¹Ø±ÕÖµ´æ´¢ÎÄ¼ş¾ä±úÊ±µÄ»Øµ÷º¯Êı
- * @param fh {ACL_FHANDLE*} ÎÄ¼ş¾ä±ú
+ * å…³é—­å€¼å­˜å‚¨æ–‡ä»¶å¥æŸ„æ—¶çš„å›è°ƒå‡½æ•°
+ * @param fh {ACL_FHANDLE*} æ–‡ä»¶å¥æŸ„
  */
 static void dat_store_on_close(ACL_FHANDLE *fh)
 {
@@ -755,14 +755,14 @@ ZDB_BLK *zdb_dat_get(ZDB *db, const ZDB_BLK_OFF *blk_off, zdb_key_t *key, size_t
 		return (NULL);
 	}
 
-	/* ÅĞ¶ÏÔÚÖµ´æ´¢ÖĞµÄÆ«ÒÆÖµ */
+	/* åˆ¤æ–­åœ¨å€¼å­˜å‚¨ä¸­çš„åç§»å€¼ */
 	if (blk_off->offset < 0) {
 		acl_msg_error("%s(%d): blk_off_old(" ACL_FMT_I64D ") invalid",
 			myname, __LINE__, blk_off->offset);
 		return (NULL);
 	}
 
-	ifile = (int) blk_off->offset / (int) db->dat_limit;  /* ÎÄ¼ş½áµãºÅ */
+	ifile = (int) blk_off->offset / (int) db->dat_limit;  /* æ–‡ä»¶ç»“ç‚¹å· */
 
 	path = dat_filepath(db, NULL, idisk, inode, ifile);
 	store = zdb_dat_store_open(db, STR(path));
@@ -772,16 +772,16 @@ ZDB_BLK *zdb_dat_get(ZDB *db, const ZDB_BLK_OFF *blk_off, zdb_key_t *key, size_t
 		return (NULL);
 	}
 
-	/* ¼ÆËãÔÚÎÄ¼şÖĞµÄÕæÊµÎ»ÖÃ */
+	/* è®¡ç®—åœ¨æ–‡ä»¶ä¸­çš„çœŸå®ä½ç½® */
 
-	blk_ilnk = (int) blk_off->offset - (zdb_lnk_t) db->dat_limit * ifile;  /* ÎÄ¼şÎ»ÖÃË÷ÒıÖµ */
+	blk_ilnk = (int) blk_off->offset - (zdb_lnk_t) db->dat_limit * ifile;  /* æ–‡ä»¶ä½ç½®ç´¢å¼•å€¼ */
 	off = BLK_HDR_OFF(store, blk_ilnk);
 
-	/* ¼ÆËãÕæÊµµÄ ZDB_BLK µÄ¿Õ¼ä´óĞ¡ */
+	/* è®¡ç®—çœŸå®çš„ ZDB_BLK çš„ç©ºé—´å¤§å° */
 
 	blk_dlen = (int) BLK_LEN(store);
 
-	/* ·ÖÅäÒ»¸ö ZDB_BLK ¶ÔÏó */
+	/* åˆ†é…ä¸€ä¸ª ZDB_BLK å¯¹è±¡ */
 
 	blk = (ZDB_BLK*) acl_mycalloc(1, blk_dlen);
 
@@ -801,11 +801,11 @@ ZDB_BLK *zdb_dat_get(ZDB *db, const ZDB_BLK_OFF *blk_off, zdb_key_t *key, size_t
 			acl_last_serror(), off, blk_dlen,
 			idisk, inode, ifile);
 		zdb_blk_free(blk);
-		zdb_dat_store_close(store);  /* ¹Ø±ÕÖµ´æ´¢ */
+		zdb_dat_store_close(store);  /* å…³é—­å€¼å­˜å‚¨ */
 		return (NULL);
 	}
 
-	zdb_dat_store_close(store);  /* ¹Ø±ÕÖµ´æ´¢ */
+	zdb_dat_store_close(store);  /* å…³é—­å€¼å­˜å‚¨ */
 
 	if (key)
 		*key = blk->hdr.key;
@@ -845,10 +845,10 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		RETURN (-1);
 	}
 
-	/* xxx: ÒòÎªÃ¿¸öÄ¿Â¼ºÅÖµÓë¸ÃÄ¿Â¼ÏÂÖµ´æ´¢µÄÊı¾İÖĞµÄÊı¾İ¿é¸öÊıÏàµÈ */
-	db->blk_count_tmp = inode;  /* xxx: ÉèÖÃ´ËÁÙÊ±Á¿Ö÷ÒªÎªÁË²ÎÊı´«µİ */
+	/* xxx: å› ä¸ºæ¯ä¸ªç›®å½•å·å€¼ä¸è¯¥ç›®å½•ä¸‹å€¼å­˜å‚¨çš„æ•°æ®ä¸­çš„æ•°æ®å—ä¸ªæ•°ç›¸ç­‰ */
+	db->blk_count_tmp = inode;  /* xxx: è®¾ç½®æ­¤ä¸´æ—¶é‡ä¸»è¦ä¸ºäº†å‚æ•°ä¼ é€’ */
 
-	/* ³¢ÊÔ±éÀú¸Ã´æ´¢Ä¿Â¼ÏÂËùÓĞ¿ÉÓÃµÄ´æ´¢ÎÄ¼ş: ÓĞ¿ÉÄÜÊÇ¾ÉÎÄ¼ş, Ò²ÓĞ¿ÉÄÜÊÇĞÂÎÄ¼ş */
+	/* å°è¯•éå†è¯¥å­˜å‚¨ç›®å½•ä¸‹æ‰€æœ‰å¯ç”¨çš„å­˜å‚¨æ–‡ä»¶: æœ‰å¯èƒ½æ˜¯æ—§æ–‡ä»¶, ä¹Ÿæœ‰å¯èƒ½æ˜¯æ–°æ–‡ä»¶ */
 	
 	idisk = zdb_disk_select(db);
 	if (idisk < 0) {
@@ -856,12 +856,12 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		RETURN (-1);
 	}
 
-	dat_ifiles_space(db, idisk, inode);  /* È·±£ db->dat_ifiles Êı×é¿Õ¼ä¹»ÓÃ */
+	dat_ifiles_space(db, idisk, inode);  /* ç¡®ä¿ db->dat_ifiles æ•°ç»„ç©ºé—´å¤Ÿç”¨ */
 	ifile = db->dat_disks[idisk].dat_ifiles[inode];
 	if (ifile < 0)
 		ifile = 0;
 
-	/* Ñ¡Ôñ¿ÉÓÃµÄÖµ´æ´¢¾ä±ú */
+	/* é€‰æ‹©å¯ç”¨çš„å€¼å­˜å‚¨å¥æŸ„ */
 
 	for (; ifile < ZDB_DAT_FILE_LIMIT; ifile++) {
 		path = dat_filepath(db, NULL, idisk, inode, ifile);
@@ -874,15 +874,15 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 			RETURN (-1);
 		}
 
-		/* ÊÇ·ñÓĞ¿ÉÓÃ¿ÕÏĞ¿é? */
+		/* æ˜¯å¦æœ‰å¯ç”¨ç©ºé—²å—? */
 
 		if (store_tmp->hdr.limit <= store_tmp->hdr.count) {
-			/* ¹Ø±ÕÒÑÂúÁËµÄÖµ´æ´¢ */
+			/* å…³é—­å·²æ»¡äº†çš„å€¼å­˜å‚¨ */
 			zdb_dat_store_close(store_tmp);
 			continue;
 		}
 
-		/* Èç¹ûĞèÒªÔö¼ÓÖµ´æ´¢¿Õ¼äÔòÔö¼Ó */
+		/* å¦‚æœéœ€è¦å¢åŠ å€¼å­˜å‚¨ç©ºé—´åˆ™å¢åŠ  */
 		if (store_tmp->hdr.size <= store_tmp->hdr.count) {
 			n = dat_store_blk_add(store_tmp, store_tmp->hdr.nstep);
 			if (n < 0) {
@@ -895,7 +895,7 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		}
 
 		store = store_tmp;
-		db->dat_disks[idisk].dat_ifiles[inode] = ifile;  /* »º´æ¸ÃÎÄ¼şË÷ÒıºÅ */
+		db->dat_disks[idisk].dat_ifiles[inode] = ifile;  /* ç¼“å­˜è¯¥æ–‡ä»¶ç´¢å¼•å· */
 		break;
 	}
 
@@ -916,13 +916,13 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		RETURN (-1);
 	}
 
-	/* Ê¹ÓÃµÚÒ»¸ö¿ÕÏĞ¿é */
+	/* ä½¿ç”¨ç¬¬ä¸€ä¸ªç©ºé—²å— */
 	ilnk = store->hdr.ihead_idle;
 
-	/* ¼ÆËãÕæÊµµÄ ZDB_BLK µÄ¿Õ¼ä´óĞ¡ */
+	/* è®¡ç®—çœŸå®çš„ ZDB_BLK çš„ç©ºé—´å¤§å° */
 	blk_dlen = (int) BLK_LEN(store);
 
-	/* ¼ÆËãµÚÒ»¸ö¿ÕÏĞ¿éµÄÎïÀíÎ»ÖÃ */
+	/* è®¡ç®—ç¬¬ä¸€ä¸ªç©ºé—²å—çš„ç‰©ç†ä½ç½® */
 	off = BLK_HDR_OFF(store, ilnk);
 
 	acl_debug(ZDB_DBG_ADDD, 2)
@@ -931,13 +931,13 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		 store->hdr.blk_count, store->hdr.blk_dlen,
 		off, store->hdr.blk_hdr_dlen, len);
 
-	/* ·ÖÅäÒ»¸ö ZDB_BLK ¶ÔÏó */
+	/* åˆ†é…ä¸€ä¸ª ZDB_BLK å¯¹è±¡ */
 	blk = (ZDB_BLK*) acl_mymalloc(blk_dlen);
 	if (blk == NULL)
 		acl_msg_fatal("%s(%d): calloc error(%s)",
 			myname, __LINE__, acl_last_serror());
 
-	/* ¶ÁÈ¡¸Ã¿ÕÏĞÊı¾İ¿éÍ·ĞÅÏ¢ */
+	/* è¯»å–è¯¥ç©ºé—²æ•°æ®å—å¤´ä¿¡æ¯ */
 	n = ZDB_READ((ZDB_STORE*) store, blk, (size_t) BLK_HDR_LEN(store), off);
 	if (n == -1) {
 		acl_msg_error("%s(%d): zdb_read %s error(%s), ihead_idle(%d),"
@@ -948,11 +948,11 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		RETURN (-1);
 	}
 
-	/* xxx: ¸Ã blk ÆäÊµ¾ÍÊÇµÚÒ»¸ö¿ÕÏĞ¿é, ²Î¼ûÉÏÃæ ilnk µÄĞÎ³É */
+	/* xxx: è¯¥ blk å…¶å®å°±æ˜¯ç¬¬ä¸€ä¸ªç©ºé—²å—, å‚è§ä¸Šé¢ ilnk çš„å½¢æˆ */
 
 	blk->hdr.key = key;
-	store->hdr.ihead_idle = blk->hdr.inext_idle;  /* ¸üĞÂ¿ÕÏĞ¿éÁ´Í· */
-	blk->hdr.inext_idle = -1;  /* ´Ó¿ÕÏĞ¿éÁ´ÖĞ·ÖÀë */
+	store->hdr.ihead_idle = blk->hdr.inext_idle;  /* æ›´æ–°ç©ºé—²å—é“¾å¤´ */
+	blk->hdr.inext_idle = -1;  /* ä»ç©ºé—²å—é“¾ä¸­åˆ†ç¦» */
 
 #ifdef	ZDB_LINK_BUSY
 	if ((db->oflags & ZDB_FLAG_LINK_BUSY) != 0) {
@@ -965,11 +965,11 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		("%s(%d): blk_off: " ACL_FMT_I64D ", inext: %d, key: "
 		ACL_FMT_I64D, myname, __LINE__, off, ilnk, key);
 
-	/* ¸üĞÂµ±Ç°¿ÕÏĞÊı¾İ¿éĞÅÏ¢ */
+	/* æ›´æ–°å½“å‰ç©ºé—²æ•°æ®å—ä¿¡æ¯ */
 
-	memcpy(blk->dat, dat, len);  /* ¿½±´Ô´Êı¾İÄÚÈİ */
+	memcpy(blk->dat, dat, len);  /* æ‹·è´æºæ•°æ®å†…å®¹ */
 
-	n = ZDB_WRITE((ZDB_STORE*) store, blk, blk_dlen, off);  /* ¸üĞÂÊı¾İ¿éĞÅÏ¢ */
+	n = ZDB_WRITE((ZDB_STORE*) store, blk, blk_dlen, off);  /* æ›´æ–°æ•°æ®å—ä¿¡æ¯ */
 	if (n == -1) {
 		acl_msg_error("%s(%d): zdb_write to %s error(%s)",
 			myname, __LINE__, STORE_PATH((ZDB_STORE*) store),
@@ -977,13 +977,13 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		RETURN (-1);
 	}
 
-	/* ¸üĞÂÖµ´æ´¢Í·ĞÅÏ¢ */
+	/* æ›´æ–°å€¼å­˜å‚¨å¤´ä¿¡æ¯ */
 
 	store->hdr.count++;
 
-	/* ½« blk_off Ó³ÉäÎª¼ü´æ´¢ÖĞµÄÖµ */
+	/* å°† blk_off æ˜ å°„ä¸ºé”®å­˜å‚¨ä¸­çš„å€¼ */
 
-	blk_off.offset = ilnk + db->dat_limit * ifile;  /* ÀÛ¼ÓÖ®Ç°ËùÓĞµÄÎÄ¼şÖĞ¼ÇÂ¼µÄÖµ¸öÊıÖ®ºÍ */
+	blk_off.offset = ilnk + db->dat_limit * ifile;  /* ç´¯åŠ ä¹‹å‰æ‰€æœ‰çš„æ–‡ä»¶ä¸­è®°å½•çš„å€¼ä¸ªæ•°ä¹‹å’Œ */
 	if (blk_off.offset < 0) {
 		acl_msg_error("%s(%d): blk_off.offset(" ACL_FMT_I64D
 			") too large", myname, __LINE__, blk_off.offset);
@@ -996,10 +996,10 @@ int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len)
 		myname, __LINE__, blk_off.offset, store->hdr.ihead_idle,
 		db->dat_limit, inode, ifile);
 
-	/* ½« idisk Óë inode ×éºÏ´æ´¢ */
+	/* å°† idisk ä¸ inode ç»„åˆå­˜å‚¨ */
 	blk_off.inode = (idisk << DIR_BITS) + inode;
 
-	/* ¸üĞÂ¼ü´æ´¢ÖĞÊı¾İË÷ÒıÖµ */
+	/* æ›´æ–°é”®å­˜å‚¨ä¸­æ•°æ®ç´¢å¼•å€¼ */
 	if (db->key_set(db, key, &blk_off) < 0) {
 		acl_msg_error("%s(%d): set key store error(%s)",
 			myname, __LINE__, acl_last_serror());
@@ -1043,14 +1043,14 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 		RETURN (-1);
 	}
 
-	/* ÅĞ¶ÏÔÚÖµ´æ´¢ÖĞµÄÆ«ÒÆÖµ */
+	/* åˆ¤æ–­åœ¨å€¼å­˜å‚¨ä¸­çš„åç§»å€¼ */
 	if (blk_off->offset < 0) {
 		acl_msg_error("%s(%d): blk_off_old(" ACL_FMT_I64D
 			") invalid", myname, __LINE__, blk_off->offset);
 		RETURN (-1);
 	}
 
-	/* ¼ÆËãĞÂµÄ inode Ïà¶ÔÂ·¾¶ºÅ */
+	/* è®¡ç®—æ–°çš„ inode ç›¸å¯¹è·¯å¾„å· */
 	inode_new = dat_inode(db, (int) len);
 	if (inode_new < 0) {
 		acl_msg_error("%s(%d): inode(%d) invalid, dat len(%d)",
@@ -1058,9 +1058,9 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 		RETURN (-1);
 	}
 
-	ifile = (int) blk_off->offset / (int) db->dat_limit;  /* ÎÄ¼ş½áµãºÅ */
+	ifile = (int) blk_off->offset / (int) db->dat_limit;  /* æ–‡ä»¶ç»“ç‚¹å· */
 
-	/* ÎÄ¼şÎ»ÖÃË÷ÒıÖµ */
+	/* æ–‡ä»¶ä½ç½®ç´¢å¼•å€¼ */
 	ilnk = (zdb_lnk_t) (blk_off->offset - db->dat_limit * ifile);
 
 	path = dat_filepath(db, NULL, idisk, inode, ifile);
@@ -1072,12 +1072,12 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 	}
 
 	if (inode_new == inode) {
-		/* ¸üĞÂ¾ÉÎ»ÖÃµÄÊı¾İĞÅÏ¢ */
+		/* æ›´æ–°æ—§ä½ç½®çš„æ•°æ®ä¿¡æ¯ */
 
-		/* ¼ÆËãÕæÊµµÄ´æ´¢Î»ÖÃÖĞÊı¾İÆğÊ¼Î»ÖÃÖµ */
+		/* è®¡ç®—çœŸå®çš„å­˜å‚¨ä½ç½®ä¸­æ•°æ®èµ·å§‹ä½ç½®å€¼ */
 		off = BLK_DAT_OFF(store, ilnk);
 
-		/* Ğ´ÈëĞÂÊı¾İ */
+		/* å†™å…¥æ–°æ•°æ® */
 		ret = ZDB_WRITE((ZDB_STORE*) store, dat, len, off);
 
 		if (ret == -1) {
@@ -1088,9 +1088,9 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 		RETURN (1);
 	}
 
-	/* ĞèÒªÒÆ¶¯Êı¾İ¿éÊı¾İÖÁÆäËüÖµ´æ´¢ÖĞ */
+	/* éœ€è¦ç§»åŠ¨æ•°æ®å—æ•°æ®è‡³å…¶å®ƒå€¼å­˜å‚¨ä¸­ */
 
-	/* ¸ÃÖµ´æ´¢ÖĞ¿Ï¶¨¾ÍÓĞÕ¼ÓÃÊı¾İ¿é */
+	/* è¯¥å€¼å­˜å‚¨ä¸­è‚¯å®šå°±æœ‰å ç”¨æ•°æ®å— */
 
 	if (store->hdr.count <= 0) {
 		acl_msg_error("%s(%d): %s, store->hdr.count(" ACL_FMT_I64D
@@ -1104,14 +1104,14 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 		RETURN (-1);
 	}
 
-	/* ¼ÆËãÕæÊµµÄ´æ´¢Î»ÖÃÖĞÊı¾İ¿éÍ·ÆğÊ¼Î»ÖÃÖµ */
+	/* è®¡ç®—çœŸå®çš„å­˜å‚¨ä½ç½®ä¸­æ•°æ®å—å¤´èµ·å§‹ä½ç½®å€¼ */
 	off = BLK_HDR_OFF(store, ilnk);
 
-	/* ĞèÒªÒÆ¶¯ÖµµÄÎ»ÖÃÇÒÊ¹¾ÉÎ»ÖÃ±äÎª¿ÕÏĞ¿é */
+	/* éœ€è¦ç§»åŠ¨å€¼çš„ä½ç½®ä¸”ä½¿æ—§ä½ç½®å˜ä¸ºç©ºé—²å— */
 
-	blk = (ZDB_BLK*) acl_mymalloc((size_t) BLK_LEN(store));  /* ·ÖÅäÊı¾İ¿é */
+	blk = (ZDB_BLK*) acl_mymalloc((size_t) BLK_LEN(store));  /* åˆ†é…æ•°æ®å— */
 
-	/* ¶ÁÈ¡¸ÃÕ¼ÓÃÊı¾İ¿éµÄÍ·²¿ĞÅÏ¢ */
+	/* è¯»å–è¯¥å ç”¨æ•°æ®å—çš„å¤´éƒ¨ä¿¡æ¯ */
 	ret = ZDB_READ((ZDB_STORE*) store, blk, (size_t) BLK_HDR_LEN(store), off);
 	if (ret == -1) {
 		acl_msg_error("%s(%d): zdb_read %s error(%s),"
@@ -1122,7 +1122,7 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 	}
 
 	blk->hdr.key = -1;
-	blk->hdr.inext_idle = store->hdr.ihead_idle;  /* Óë¿ÕÏĞÊı¾İ¿éÁ´Á¬½Ó */
+	blk->hdr.inext_idle = store->hdr.ihead_idle;  /* ä¸ç©ºé—²æ•°æ®å—é“¾è¿æ¥ */
 
 #ifdef	ZDB_LINK_BUSY
 	if ((db->oflags & ZDB_FLAG_LINK_BUSY) != 0) {
@@ -1134,18 +1134,18 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 	}
 #endif
 
-	/* ¸üĞÂÖµ´æ´¢Í·ĞÅÏ¢ */
+	/* æ›´æ–°å€¼å­˜å‚¨å¤´ä¿¡æ¯ */
 
 	store->hdr.ihead_idle = ilnk;
 	store->hdr.count--;
 
-	/* µ÷Õû»º´æµÄÎÄ¼şË÷ÒıºÅ */
+	/* è°ƒæ•´ç¼“å­˜çš„æ–‡ä»¶ç´¢å¼•å· */
 
 	dat_ifiles_space(db, idisk, inode);
 	if (inode < db->dat_disks[idisk].dat_ifiles[inode])
 		db->dat_disks[idisk].dat_ifiles[inode] = inode;
 
-	/* Ö»Ğ´Êı¾İ¿éµÄÍ·²¿ĞÅÏ¢, ½«¸ÃÊı¾İ¿é±äÎª¿ÕÏĞ¿é */
+	/* åªå†™æ•°æ®å—çš„å¤´éƒ¨ä¿¡æ¯, å°†è¯¥æ•°æ®å—å˜ä¸ºç©ºé—²å— */
 	ret = ZDB_WRITE((ZDB_STORE*) store, blk, (size_t) BLK_HDR_LEN(store), off);
 	if (ret == -1) {
 		acl_msg_error("%s(%d): prwrite %s error(%s), blk_off("
@@ -1155,7 +1155,7 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 		RETURN (-1);
 	}
 
-	db->dat_disks[idisk].count--;  /* ½«ËùÔÚ´ÅÅÌ·ÖÇøµÄ·ÖÅäÊıÁ¿¼õ 1 */
+	db->dat_disks[idisk].count--;  /* å°†æ‰€åœ¨ç£ç›˜åˆ†åŒºçš„åˆ†é…æ•°é‡å‡ 1 */
 	if (db->dat_disks[idisk].count < 0) {
 		acl_msg_error("%s(%d): count(%lld) < 0 in %s",
 			myname, __LINE__, db->dat_disks[idisk].count,
@@ -1163,7 +1163,7 @@ int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 		RETURN (-1);
 	}
 
-	/* ÏòÁíÒ»¸öÖµ´æ´¢ÖĞÌí¼ÓĞÂ¼ÇÂ¼ */
+	/* å‘å¦ä¸€ä¸ªå€¼å­˜å‚¨ä¸­æ·»åŠ æ–°è®°å½• */
 
 	ret = zdb_dat_add(db, key, dat, (int) len);
 	RETURN (ret);
@@ -1214,13 +1214,13 @@ int zdb_dat_check(ZDB_DAT_STORE *store, ZDB_DAT_HDR *dat_hdr)
 	if (dat_hdr)
 		memcpy(dat_hdr, &store->hdr, sizeof(ZDB_DAT_HDR));
 
-	/* É¨ÃèËùÓĞ±»Ê¹ÓÃµÄÊı¾İ¿é½áµã */
+	/* æ‰«ææ‰€æœ‰è¢«ä½¿ç”¨çš„æ•°æ®å—ç»“ç‚¹ */
 
 	acl_msg_info("%s(%d):\tBegin check used blk ......", myname, __LINE__);
 
 	time(&begin);
 
-	/* ½ö¼ì²éÊı¾İ¿éµÄÍ· */
+	/* ä»…æ£€æŸ¥æ•°æ®å—çš„å¤´ */
 	zdb_dat_iter_set(store, 1);
 	acl_foreach(iter, (ZDB_STORE*) store) {
 		nused++;
@@ -1247,10 +1247,10 @@ int zdb_dat_check(ZDB_DAT_STORE *store, ZDB_DAT_HDR *dat_hdr)
 			myname, __LINE__, store->hdr.count, time(NULL) - begin);
 	}
 
-	/* ÔÊĞí±éÀúÊı¾İ¿éµÄÊı¾İÌå */
+	/* å…è®¸éå†æ•°æ®å—çš„æ•°æ®ä½“ */
 	zdb_dat_iter_set(store, 1);
 
-	/* ¿ªÊ¼É¨ÃèËùÓĞµÄ¿ÕÏĞÊı¾İ¿é½áµã */
+	/* å¼€å§‹æ‰«ææ‰€æœ‰çš„ç©ºé—²æ•°æ®å—ç»“ç‚¹ */
 
 	acl_msg_info("%s(%d):\tBegin check idle blk ......", myname, __LINE__);
 

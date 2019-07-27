@@ -1,4 +1,4 @@
-#ifndef	RING_INCLUDE_H
+ï»¿#ifndef	RING_INCLUDE_H
 #define	RING_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -10,7 +10,7 @@ extern "C" {
 typedef struct RING RING;
 
 /**
- * Êı¾İ»·½á¹¹ÀàĞÍ¶¨Òå
+ * æ•°æ®ç¯ç»“æ„ç±»å‹å®šä¹‰
  */
 struct RING {
 	RING   *succ;           /**< successor */
@@ -25,72 +25,72 @@ typedef struct RING_ITER {
 } RING_ITER;
 
 /**
- * ³õÊ¼»¯Êı¾İ»·
- * @param ring {RING*} Êı¾İ»·
+ * åˆå§‹åŒ–æ•°æ®ç¯
+ * @param ring {RING*} æ•°æ®ç¯
  */
 void ring_init(RING *ring);
 
 /**
- * »ñµÃµ±Ç°Êı¾İ»·ÄÚÔªËØ¸öÊı
- * @param ring {RING*} Êı¾İ»·
- * @return {int} Êı¾İ»·ÄÚÔªËØ¸öÊı
+ * è·å¾—å½“å‰æ•°æ®ç¯å†…å…ƒç´ ä¸ªæ•°
+ * @param ring {RING*} æ•°æ®ç¯
+ * @return {int} æ•°æ®ç¯å†…å…ƒç´ ä¸ªæ•°
  */
 int  ring_size(const RING *ring);
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÍ·²¿
- * @param ring {RING*} Êı¾İ»·
- * @param entry {RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å¤´éƒ¨
+ * @param ring {RING*} æ•°æ®ç¯
+ * @param entry {RING*} æ–°çš„å…ƒç´ 
  */
 void ring_prepend(RING *ring, RING *entry);
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÎ²²¿
- * @param ring {RING*} Êı¾İ»·
- * @param entry {RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å°¾éƒ¨
+ * @param ring {RING*} æ•°æ®ç¯
+ * @param entry {RING*} æ–°çš„å…ƒç´ 
  */
 void ring_append(RING *ring, RING *entry);
 
 /**
- * ½«Ò»¸ö»·ÔªËØ´ÓÊı¾İ»·ÖĞÉ¾³ı
- * @param entry {RING*} »·ÔªËØ
+ * å°†ä¸€ä¸ªç¯å…ƒç´ ä»æ•°æ®ç¯ä¸­åˆ é™¤
+ * @param entry {RING*} ç¯å…ƒç´ 
  */
 void ring_detach(RING *entry);
 
 /**
- * ´Ó»·ÖĞµ¯³öÍ·²¿»·ÔªËØ
- * @param ring {RING*} Êı¾İ»·
- * @return {RING*} Í·²¿»·ÔªËØ£¬Èç¹û·µ»Ø¿ÕÔò±íÊ¾¸ÃÊı¾İ»·Îª¿Õ
+ * ä»ç¯ä¸­å¼¹å‡ºå¤´éƒ¨ç¯å…ƒç´ 
+ * @param ring {RING*} æ•°æ®ç¯
+ * @return {RING*} å¤´éƒ¨ç¯å…ƒç´ ï¼Œå¦‚æœè¿”å›ç©ºåˆ™è¡¨ç¤ºè¯¥æ•°æ®ç¯ä¸ºç©º
  */
 RING *ring_pop_head(RING *ring);
 
 /**
- * ´Ó»·ÖĞµ¯³öÎ²²¿»·ÔªËØ
- * @param ring {RING*} Êı¾İ»·
- * @return {RING*} Î²²¿»·ÔªËØ£¬Èç¹û·µ»Ø¿ÕÔò±íÊ¾¸ÃÊı¾İ»·Îª¿Õ
+ * ä»ç¯ä¸­å¼¹å‡ºå°¾éƒ¨ç¯å…ƒç´ 
+ * @param ring {RING*} æ•°æ®ç¯
+ * @return {RING*} å°¾éƒ¨ç¯å…ƒç´ ï¼Œå¦‚æœè¿”å›ç©ºåˆ™è¡¨ç¤ºè¯¥æ•°æ®ç¯ä¸ºç©º
  */
 RING *ring_pop_tail(RING *ring);
 
-/*--------------------  Ò»Ğ©·½±ã¿ì½İµÄºê²Ù×÷ --------------------------------*/
+/*--------------------  ä¸€äº›æ–¹ä¾¿å¿«æ·çš„å®æ“ä½œ --------------------------------*/
 
 /**
- * ·µ»Øµ±Ç°»·ÔªËØµÄÏÂÒ»¸ö»·ÔªËØ
+ * è¿”å›å½“å‰ç¯å…ƒç´ çš„ä¸‹ä¸€ä¸ªç¯å…ƒç´ 
  */
 #define RING_SUCC(c) ((c)->succ)
 #define	ring_succ	RING_SUCC
 
 /**
- * ·µ»Øµ±Ç°»·ÔªËØµÄÇ°Ò»¸ö»·ÔªËØ
+ * è¿”å›å½“å‰ç¯å…ƒç´ çš„å‰ä¸€ä¸ªç¯å…ƒç´ 
  */
 #define RING_PRED(c) ((c)->pred)
 #define	ring_pred	RING_PRED
 
 /**
- * ½«»·ÔªËØÖ¸Õë×ª»»³ÉÓ¦ÓÃµÄ×Ô¶¨ÒåÀàĞÍµÄÖ¸ÕëµØÖ·
- * @param ring_ptr {RING*} »·ÔªËØÖ¸Õë
- * @param app_type Ó¦ÓÃ×Ô¶¨ÒåÀàĞÍ
- * @param ring_member {RING*} »·ÔªËØÔÚÓ¦ÓÃ×Ô¶¨Òå½á¹¹ÖĞµÄ³ÉÔ±Ãû³Æ
- * @return {app_type*} Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
+ * å°†ç¯å…ƒç´ æŒ‡é’ˆè½¬æ¢æˆåº”ç”¨çš„è‡ªå®šä¹‰ç±»å‹çš„æŒ‡é’ˆåœ°å€
+ * @param ring_ptr {RING*} ç¯å…ƒç´ æŒ‡é’ˆ
+ * @param app_type åº”ç”¨è‡ªå®šä¹‰ç±»å‹
+ * @param ring_member {RING*} ç¯å…ƒç´ åœ¨åº”ç”¨è‡ªå®šä¹‰ç»“æ„ä¸­çš„æˆå‘˜åç§°
+ * @return {app_type*} åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
  */
 #define RING_TO_APPL(ring_ptr, app_type, ring_member) \
     ((app_type *) (((char *) (ring_ptr)) - offsetof(app_type,ring_member)))
@@ -98,9 +98,9 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_to_appl	RING_TO_APPL
 
 /**
- * ´ÓÍ·²¿ÖÁÎ²²¿±éÀúÊı¾İ»·ÖĞµÄËùÓĞ»·ÔªËØ
+ * ä»å¤´éƒ¨è‡³å°¾éƒ¨éå†æ•°æ®ç¯ä¸­çš„æ‰€æœ‰ç¯å…ƒç´ 
  * @param iter {RING_ITER}
- * @param head_ptr {RING*} Êı¾İ»·µÄÍ·Ö¸Õë
+ * @param head_ptr {RING*} æ•°æ®ç¯çš„å¤´æŒ‡é’ˆ
  * @example:
  	typedef struct {
 		char  name[32];
@@ -143,9 +143,9 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_foreach		RING_FOREACH
 
 /**
- * ´ÓÎ²²¿ÖÁÍ·²¿±éÀúÊı¾İ»·ÖĞµÄËùÓĞ»·ÔªËØ
+ * ä»å°¾éƒ¨è‡³å¤´éƒ¨éå†æ•°æ®ç¯ä¸­çš„æ‰€æœ‰ç¯å…ƒç´ 
  * @param iter {RING_ITER}
- * @param head_ptr {RING*} Êı¾İ»·µÄÍ·Ö¸Õë
+ * @param head_ptr {RING*} æ•°æ®ç¯çš„å¤´æŒ‡é’ˆ
  */
 #define	RING_FOREACH_REVERSE(iter, head_ptr) \
         for ((iter).ptr = ring_pred((head_ptr)); (iter).ptr != (head_ptr);  \
@@ -154,9 +154,9 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_foreach_reverse	RING_FOREACH_REVERSE
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞµÚÒ»¸ö»·ÔªËØÖ¸Õë
- * @param head {RING*} »·Í·Ö¸Õë
- * @return {RING*} NULL: »·Îª¿Õ
+ * è¿”å›æ•°æ®ç¯ä¸­ç¬¬ä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆ
+ * @param head {RING*} ç¯å¤´æŒ‡é’ˆ
+ * @return {RING*} NULL: ç¯ä¸ºç©º
  */
 #define RING_FIRST(head) \
 	(ring_succ(head) != (head) ? ring_succ(head) : 0)
@@ -164,11 +164,11 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_first		RING_FIRST
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞÍ·µÚÒ»¸ö»·ÔªËØÖ¸ÕëÍ¬Ê±½«Æä×ª»»Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
- * @param head {RING*} »·Í·Ö¸Õë
- * @param app_type Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍ
- * @param ring_member {RING*} »·ÔªËØÔÚÓ¦ÓÃ×Ô¶¨Òå½á¹¹ÖĞµÄ³ÉÔ±Ãû³Æ
- * @return {app_type*} Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
+ * è¿”å›æ•°æ®ç¯ä¸­å¤´ç¬¬ä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆåŒæ—¶å°†å…¶è½¬æ¢åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
+ * @param head {RING*} ç¯å¤´æŒ‡é’ˆ
+ * @param app_type åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹
+ * @param ring_member {RING*} ç¯å…ƒç´ åœ¨åº”ç”¨è‡ªå®šä¹‰ç»“æ„ä¸­çš„æˆå‘˜åç§°
+ * @return {app_type*} åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
  */
 #define RING_FIRST_APPL(head, app_type, ring_member) \
 	(ring_succ(head) != (head) ? \
@@ -177,9 +177,9 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_first_appl	RING_FIRST_APPL
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞ×îºóÒ»¸ö»·ÔªËØÖ¸Õë
- * @param head {RING*} »·Í·Ö¸Õë
- * @return {RING*} NULL: »·Îª¿Õ
+ * è¿”å›æ•°æ®ç¯ä¸­æœ€åä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆ
+ * @param head {RING*} ç¯å¤´æŒ‡é’ˆ
+ * @return {RING*} NULL: ç¯ä¸ºç©º
  */
 #define RING_LAST(head) \
        (ring_pred(head) != (head) ? ring_pred(head) : 0)
@@ -187,11 +187,11 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_last		RING_LAST
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞ×îºóÒ»¸ö»·ÔªËØÖ¸ÕëÍ¬Ê±½«Æä×ª»»Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
- * @param head {RING*} »·Í·Ö¸Õë
- * @param app_type Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍ
- * @param ring_member {RING*} »·ÔªËØÔÚÓ¦ÓÃ×Ô¶¨Òå½á¹¹ÖĞµÄ³ÉÔ±Ãû³Æ
- * @return {app_type*} Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
+ * è¿”å›æ•°æ®ç¯ä¸­æœ€åä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆåŒæ—¶å°†å…¶è½¬æ¢åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
+ * @param head {RING*} ç¯å¤´æŒ‡é’ˆ
+ * @param app_type åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹
+ * @param ring_member {RING*} ç¯å…ƒç´ åœ¨åº”ç”¨è‡ªå®šä¹‰ç»“æ„ä¸­çš„æˆå‘˜åç§°
+ * @return {app_type*} åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
  */
 #define RING_LAST_APPL(head, app_type, ring_member) \
        (ring_pred(head) != (head) ? \
@@ -200,9 +200,9 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_last_appl	RING_LAST_APPL
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÎ²²¿
- * @param ring {RING*} Êı¾İ»·
- * @param entry {RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å°¾éƒ¨
+ * @param ring {RING*} æ•°æ®ç¯
+ * @param entry {RING*} æ–°çš„å…ƒç´ 
  */
 #define	RING_APPEND(ring_in, entry_in) do {  \
 	RING *ring_ptr = (ring_in), *entry_ptr = (entry_in);  \
@@ -215,9 +215,9 @@ RING *ring_pop_tail(RING *ring);
 } while (0)
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÍ·²¿
- * @param ring {RING*} Êı¾İ»·
- * @param entry {RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å¤´éƒ¨
+ * @param ring {RING*} æ•°æ®ç¯
+ * @param entry {RING*} æ–°çš„å…ƒç´ 
  */
 #define	RING_PREPEND(ring_in, entry_in) do {  \
 	RING *ring_ptr = (ring_in), *entry_ptr = (entry_in);  \
@@ -230,8 +230,8 @@ RING *ring_pop_tail(RING *ring);
 } while (0)
 
 /**
- * ½«Ò»¸ö»·ÔªËØ´ÓÊı¾İ»·ÖĞÉ¾³ı
- * @param entry {RING*} »·ÔªËØ
+ * å°†ä¸€ä¸ªç¯å…ƒç´ ä»æ•°æ®ç¯ä¸­åˆ é™¤
+ * @param entry {RING*} ç¯å…ƒç´ 
  */
 #define	RING_DETACH(entry_in) do {  \
 	RING   *succ, *pred, *entry_ptr = (entry_in);  \

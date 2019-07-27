@@ -1,4 +1,4 @@
-/* crypto/ec/ec.h */
+﻿/* crypto/ec/ec.h */
 /*
  * Originally written by Bodo Moeller for the OpenSSL project.
  */

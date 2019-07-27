@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -89,7 +89,7 @@ int acl_proctl_deamon_start_one(const char *progchild, int argc, char *argv[])
 	return (0);
 }
 
-/* ´ò¿ªÓë¿ØÖÆ½ø³ÌµÄ¼àÌıÏß³ÌÖ®¼äµÄÊı¾İÁ¬½Ó */
+/* æ‰“å¼€ä¸æ§åˆ¶è¿›ç¨‹çš„ç›‘å¬çº¿ç¨‹ä¹‹é—´çš„æ•°æ®è¿æ¥ */
 static ACL_VSTREAM *proctl_client_open(const char *progname)
 {
 	const char *myname = "proctl_client_open";
@@ -112,7 +112,7 @@ static ACL_VSTREAM *proctl_client_open(const char *progname)
 	return (client);
 }
 
-/* ¹Ø±ÕÓë¿ØÖÆ½ø³ÌµÄ¼àÌıÏß³ÌÖ®¼äµÄÊı¾İÁ¬½Ó */
+/* å…³é—­ä¸æ§åˆ¶è¿›ç¨‹çš„ç›‘å¬çº¿ç¨‹ä¹‹é—´çš„æ•°æ®è¿æ¥ */
 static void proctl_client_close(ACL_VSTREAM *client)
 {
 	acl_vstream_close(client);
@@ -141,14 +141,14 @@ void acl_proctl_start_one(const char *progname,
 
 	}
 
-	/* ´ò¿ªÓë¿ØÖÆ½ø³ÌÖ®¼äµÄÁ¬½Ó */
+	/* æ‰“å¼€ä¸æ§åˆ¶è¿›ç¨‹ä¹‹é—´çš„è¿æ¥ */
 	client = proctl_client_open(progname);
 	if (child_args) {
-		/* Ïò¿ØÖÆ½ø³Ì·¢ËÍÏûÏ¢£¬´øÓĞ¿ØÖÆ²ÎÊı */
+		/* å‘æ§åˆ¶è¿›ç¨‹å‘é€æ¶ˆæ¯ï¼Œå¸¦æœ‰æ§åˆ¶å‚æ•° */
 		n = acl_vstream_fprintf(client, "%s|-d|START|-f|%s|-a|%s\r\n",
 				progname, progchild, acl_vstring_str(child_args));
 	} else {
-		/* Ïò¿ØÖÆ½ø³Ì·¢ËÍÏûÏ¢£¬²»´ø¿ØÖÆ²ÎÊı */
+		/* å‘æ§åˆ¶è¿›ç¨‹å‘é€æ¶ˆæ¯ï¼Œä¸å¸¦æ§åˆ¶å‚æ•° */
 		n = acl_vstream_fprintf(client, "%s|-d|START|-f|%s\r\n",
 				progname, progchild);
 	}
@@ -160,7 +160,7 @@ void acl_proctl_start_one(const char *progname,
 		acl_msg_fatal("%s(%d): fprintf to acl_proctl error(%s)",
 			myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
 
-	/* ½ÓÊÕËùÓĞÀ´×ÔÓÚ¿ØÖÆ½ø³ÌµÄÏûÏ¢ÏìÓ¦½á¹û */
+	/* æ¥æ”¶æ‰€æœ‰æ¥è‡ªäºæ§åˆ¶è¿›ç¨‹çš„æ¶ˆæ¯å“åº”ç»“æœ */
 	while (1) {
 		n = acl_vstream_gets_nonl(client, buf, sizeof(buf));
 		if (n == ACL_VSTREAM_EOF)

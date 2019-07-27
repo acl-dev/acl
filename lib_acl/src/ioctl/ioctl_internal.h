@@ -1,20 +1,20 @@
-#ifndef	__IOCTL_INTERNAL_INCLUDE_H__
+ï»¿#ifndef	__IOCTL_INTERNAL_INCLUDE_H__
 #define	__IOCTL_INTERNAL_INCLUDE_H__
 
 #include "thread/acl_pthread_pool.h"
 #include "stdlib/acl_vstream.h"
 
-/* ·şÎñÆ÷¿ò¼ÜÓÃ¾ä±ú */
+/* æœåŠ¡å™¨æ¡†æ¶ç”¨å¥æŸ„ */
 struct ACL_IOCTL {
 	int   event_mode;       /* ACL_EVENT_SELECT/ACL_EVENT_KERNEL */
-	int   max_threads;	/* ×î´óÆôÓÃÏß³ÌÊı */
-	size_t stacksize;	/* Ïß³ÌµÄ¶ÑÕ»³ß´ç */
+	int   max_threads;	/* æœ€å¤§å¯ç”¨çº¿ç¨‹æ•° */
+	size_t stacksize;	/* çº¿ç¨‹çš„å †æ ˆå°ºå¯¸ */
 	int   idle_timeout;
 	int   delay_sec;
 	int   delay_usec;
-	acl_pthread_pool_t *tp; /* Ïß³Ì³Ø¾ä±ú */
+	acl_pthread_pool_t *tp; /* çº¿ç¨‹æ± å¥æŸ„ */
 
-	ACL_EVENT *event;	/* ÊÂ¼şÑ­»·¾ä±ú */
+	ACL_EVENT *event;	/* äº‹ä»¶å¾ªç¯å¥æŸ„ */
 	int   enable_dog;
 
 	ACL_IOCTL_THREAD_INIT_FN thread_init_fn;

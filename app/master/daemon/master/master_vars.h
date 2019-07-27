@@ -1,4 +1,4 @@
-#ifndef __MASTER_VARS_INCLUDE_H__
+﻿#ifndef __MASTER_VARS_INCLUDE_H__
 #define __MASTER_VARS_INCLUDE_H__
 
 #ifdef __cplusplus

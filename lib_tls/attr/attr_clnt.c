@@ -1,4 +1,4 @@
-/*++
+﻿/*++
  * NAME
  *	attr_clnt 3
  * SUMMARY

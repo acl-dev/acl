@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "master/master.h"
 
 struct start_req_t;

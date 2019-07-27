@@ -1,4 +1,4 @@
-#ifndef ACL_LISTEN_INCLUDE_H
+ï»¿#ifndef ACL_LISTEN_INCLUDE_H
 #define ACL_LISTEN_INCLUDE_H
 
 #ifdef __cplusplus
@@ -18,24 +18,24 @@ extern "C" {
 #define ACL_INET_FLAG_EXCLUSIVE		1 << 3
 
 /**
- * ¼àÌýÌ×½Ó×Ö½ÓÊÕÍâÀ´¿Í»§¶ËÁ¬½Ó
- * @param sock {ACL_SOCKET} ¼àÌýÌ×½Ó×Ö
- * @param sa {struct sockaddr*} ´æ´¢¿Í»§¶ËµÄÍøÂçµØÖ·£¬²»ÄÜÎª¿Õ
- * @param len {socklen_t*} sa ÄÚ´æ¿Õ¼ä´óÐ¡£¬²»ÄÜÎª¿Õ
- * @return {ACL_SOCKET} Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾½ÓÊÕÊ§°Ü
+ * ç›‘å¬å¥—æŽ¥å­—æŽ¥æ”¶å¤–æ¥å®¢æˆ·ç«¯è¿žæŽ¥
+ * @param sock {ACL_SOCKET} ç›‘å¬å¥—æŽ¥å­—
+ * @param sa {struct sockaddr*} å­˜å‚¨å®¢æˆ·ç«¯çš„ç½‘ç»œåœ°å€ï¼Œä¸èƒ½ä¸ºç©º
+ * @param len {socklen_t*} sa å†…å­˜ç©ºé—´å¤§å°ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {ACL_SOCKET} å¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºæŽ¥æ”¶å¤±è´¥
  */
 ACL_API ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa,
 		socklen_t *len);
 
 /**
- * ·½±ãÍ¨ÓÃµÄ¼àÌýÌ×½Ó×ÖµÄº¯Êý£¬ÓÃÀ´½ÓÊÕ¿Í»§¶ËÁ¬½Ó
- * @param sock {ACL_SOCKET} ¼àÌýÌ×½Ó×Ö
- * @param buf {char*} µ±³É¹¦½ÓÊÕÒ»¸ö¿Í»§¶ËÁ¬½Óºó£¬Èç¹û¸Ã buf ·Ç¿ÕÔò´æ·Å¿Í»§¶Ë
- *  µØÖ·£¬¸ñÊ½£ºip:port (Õë¶Ô TCP Ì×½Ó¿Ú), file_path (Õë¶Ô UNIX ÓòÌ×½Ó¿Ú)
- * @param size {size_t} buf »º³åÇø´óÐ¡
- * @param sock_type {int*} ·Ç¿ÕÊ±ÓÃÀ´´æ·Å¿Í»§¶Ë SOCKET ÀàÐÍ£¬AF_INET/AF_UNIX
- * @return {ACL_SOCKET} ¿Í»§¶ËÁ¬½Ó¾ä±ú, ·µ»ØÖµ != ACL_SOCKET_INVALID Ôò±íÃ÷³É
- *  ¹¦ÊÕµ½Ò»¸ö¿Í»§¶ËÁ¬½Ó
+ * æ–¹ä¾¿é€šç”¨çš„ç›‘å¬å¥—æŽ¥å­—çš„å‡½æ•°ï¼Œç”¨æ¥æŽ¥æ”¶å®¢æˆ·ç«¯è¿žæŽ¥
+ * @param sock {ACL_SOCKET} ç›‘å¬å¥—æŽ¥å­—
+ * @param buf {char*} å½“æˆåŠŸæŽ¥æ”¶ä¸€ä¸ªå®¢æˆ·ç«¯è¿žæŽ¥åŽï¼Œå¦‚æžœè¯¥ buf éžç©ºåˆ™å­˜æ”¾å®¢æˆ·ç«¯
+ *  åœ°å€ï¼Œæ ¼å¼ï¼šip:port (é’ˆå¯¹ TCP å¥—æŽ¥å£), file_path (é’ˆå¯¹ UNIX åŸŸå¥—æŽ¥å£)
+ * @param size {size_t} buf ç¼“å†²åŒºå¤§å°
+ * @param sock_type {int*} éžç©ºæ—¶ç”¨æ¥å­˜æ”¾å®¢æˆ·ç«¯ SOCKET ç±»åž‹ï¼ŒAF_INET/AF_UNIX
+ * @return {ACL_SOCKET} å®¢æˆ·ç«¯è¿žæŽ¥å¥æŸ„, è¿”å›žå€¼ != ACL_SOCKET_INVALID åˆ™è¡¨æ˜Žæˆ
+ *  åŠŸæ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯è¿žæŽ¥
  */
 ACL_API ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size,
 		int* sock_type);
@@ -43,31 +43,31 @@ ACL_API ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size,
 /* in acl_inet_listen.c */
 
 /**
- * ¼àÌýÄ³¸öÍøÂçµØÖ·
- * @param addr {const char*} ÍøÂçµØÖ·, ¸ñÊ½Èç£º127.0.0.1:8080£¬µ±ÊäÈëµØÖ·Îª
- *  ip:0 Ê±ÔòÓÉ²Ù×÷ÏµÍ³×Ô¶¯·ÖÅä¼àÌý¶Ë¿ÚºÅ£¬¼àÌý³É¹¦ºó¿ÉÒÔµ÷ÓÃ acl_getsockname
- *  »ñµÃÕæÕý¼àÌýµÄµØÖ·
- * @param backlog {int} ¼àÌýÌ×½Ó×ÖÏµÍ³½ÓÊÕÇøµÄ¶ÓÁÐ´óÐ¡
- * @param flag {unsigned} ¼àÌý±êÖ¾Î»£¬²Î¼û£ºACL_INET_FLAG_XXX
- * @return {ACL_SOCKET} ·µ»Ø¼àÌýÌ×½Ó×Ö£¬Èç¹ûÎª ACL_SOCKET_INVALID ±íÊ¾ÎÞ·¨¼àÌý
- *  ¸ÃÍøÂçµØÖ·
+ * ç›‘å¬æŸä¸ªç½‘ç»œåœ°å€
+ * @param addr {const char*} ç½‘ç»œåœ°å€, æ ¼å¼å¦‚ï¼š127.0.0.1:8080ï¼Œå½“è¾“å…¥åœ°å€ä¸º
+ *  ip:0 æ—¶åˆ™ç”±æ“ä½œç³»ç»Ÿè‡ªåŠ¨åˆ†é…ç›‘å¬ç«¯å£å·ï¼Œç›‘å¬æˆåŠŸåŽå¯ä»¥è°ƒç”¨ acl_getsockname
+ *  èŽ·å¾—çœŸæ­£ç›‘å¬çš„åœ°å€
+ * @param backlog {int} ç›‘å¬å¥—æŽ¥å­—ç³»ç»ŸæŽ¥æ”¶åŒºçš„é˜Ÿåˆ—å¤§å°
+ * @param flag {unsigned} ç›‘å¬æ ‡å¿—ä½ï¼Œå‚è§ï¼šACL_INET_FLAG_XXX
+ * @return {ACL_SOCKET} è¿”å›žç›‘å¬å¥—æŽ¥å­—ï¼Œå¦‚æžœä¸º ACL_SOCKET_INVALID è¡¨ç¤ºæ— æ³•ç›‘å¬
+ *  è¯¥ç½‘ç»œåœ°å€
  */
 ACL_API ACL_SOCKET acl_inet_listen(const char *addr, int backlog, unsigned flag);
 
 /**
- * ½ÓÊÕÍâÀ´¿Í»§¶ËÍøÂçÁ¬½Ó
- * @param listen_fd {ACL_SOCKET} ¼àÌýÌ×½Ó×Ö
- * @return {ACL_SOCKET} ¿Í»§¶ËÁ¬½Ó£¬Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾½ÓÊÕ¿Í»§¶Ë
- *  Á¬½Ó³ö´í
+ * æŽ¥æ”¶å¤–æ¥å®¢æˆ·ç«¯ç½‘ç»œè¿žæŽ¥
+ * @param listen_fd {ACL_SOCKET} ç›‘å¬å¥—æŽ¥å­—
+ * @return {ACL_SOCKET} å®¢æˆ·ç«¯è¿žæŽ¥ï¼Œå¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºæŽ¥æ”¶å®¢æˆ·ç«¯
+ *  è¿žæŽ¥å‡ºé”™
  */
 ACL_API ACL_SOCKET acl_inet_accept(ACL_SOCKET listen_fd);
 
 /**
- * ½ÓÊÕÍâÀ´¿Í»§¶ËÍøÂçÁ¬½Ó
- * @param listen_fd {ACL_SOCKET} ¼àÌýÌ×½Ó×Ö
- * @param ipbuf {char*} Ö¸Õë·Ç¿ÕÇÒ½ÓÊÕ¿Í»§¶ËÁ¬½Ó³É¹¦£¬ÔòÆä´æ´¢¿Í»§¶ËµÄÍøÂçµØÖ·
- * @param size {size_t} Èç¹û ipbuf ²»Îª¿ÕÔò±íÊ¾ ipbuf µÄÄÚ´æ¿Õ¼ä´óÐ¡
- * @return {ACL_SOCKET} ¿Í»§¶ËÁ¬½Ó£¬ACL_SOCKET_INVALID ±íÊ¾½ÓÊÕ¿Í»§¶ËÁ¬½Ó³ö´í
+ * æŽ¥æ”¶å¤–æ¥å®¢æˆ·ç«¯ç½‘ç»œè¿žæŽ¥
+ * @param listen_fd {ACL_SOCKET} ç›‘å¬å¥—æŽ¥å­—
+ * @param ipbuf {char*} æŒ‡é’ˆéžç©ºä¸”æŽ¥æ”¶å®¢æˆ·ç«¯è¿žæŽ¥æˆåŠŸï¼Œåˆ™å…¶å­˜å‚¨å®¢æˆ·ç«¯çš„ç½‘ç»œåœ°å€
+ * @param size {size_t} å¦‚æžœ ipbuf ä¸ä¸ºç©ºåˆ™è¡¨ç¤º ipbuf çš„å†…å­˜ç©ºé—´å¤§å°
+ * @return {ACL_SOCKET} å®¢æˆ·ç«¯è¿žæŽ¥ï¼ŒACL_SOCKET_INVALID è¡¨ç¤ºæŽ¥æ”¶å®¢æˆ·ç«¯è¿žæŽ¥å‡ºé”™
  */
 ACL_API ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf,
 		size_t size);
@@ -75,10 +75,10 @@ ACL_API ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf,
 /* in acl_sane_bind.c */
 
 /**
- * ÍøÂçµØÖ·°ó¶¨º¯Êý£¬ÊÊÓÃÓÚ TCP/UDP Ì×½Ó¿Ú
- * @param res {const struct addrinfo*} ÓòÃû½âÎöµÃµ½µÄµØÖ·ÐÅÏ¢¶ÔÏó
- * @param flag {unsigned int} ±êÖ¾Î»
- * @return {ACL_SOCKET} ·µ»Ø ACL_SOCKET_INVALID ±íÊ¾°ó¶¨Ê§°Ü
+ * ç½‘ç»œåœ°å€ç»‘å®šå‡½æ•°ï¼Œé€‚ç”¨äºŽ TCP/UDP å¥—æŽ¥å£
+ * @param res {const struct addrinfo*} åŸŸåè§£æžå¾—åˆ°çš„åœ°å€ä¿¡æ¯å¯¹è±¡
+ * @param flag {unsigned int} æ ‡å¿—ä½
+ * @return {ACL_SOCKET} è¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºç»‘å®šå¤±è´¥
  * 
  */
 ACL_API ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag);
@@ -86,23 +86,23 @@ ACL_API ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag);
 #ifdef ACL_UNIX
 
 /**
- * ÒÔ UDP ±¨ÎÄ·½Ê½°ó¶¨±¾µØ UNIX ÓòÌ×½Ó¿Ú
- * @param addr {const char*} UNIX ÓòÌ×½Ó¿ÚµØÖ·Â·¾¶
- * @param flag {unsigned} ±êÖ¾Î»
- * @return {ACL_SOCKET} ·µ»ØÓòÌ×½Ó¿Ú£¬Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾Ê§°Ü
+ * ä»¥ UDP æŠ¥æ–‡æ–¹å¼ç»‘å®šæœ¬åœ° UNIX åŸŸå¥—æŽ¥å£
+ * @param addr {const char*} UNIX åŸŸå¥—æŽ¥å£åœ°å€è·¯å¾„
+ * @param flag {unsigned} æ ‡å¿—ä½
+ * @return {ACL_SOCKET} è¿”å›žåŸŸå¥—æŽ¥å£ï¼Œå¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºå¤±è´¥
  */
 ACL_API ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag);
 #endif
 
 /**
- * °ó¶¨Ö¸ÕëµÄ UDP µØÖ·
- * @param addr {const char*} UDP µØÖ·£¬¸ñÊ½£ºIP:PORT »ò UNIX ÓòÌ×½Ó¿Ú£¬µ±Îª
- *  UNIX ÓòÌ×½Ó¿ÚÊ±µÄ¸ñÊ½Îª£º{domain_path}@udp£¬ÆäÖÐ @udp ±íÊ¾Îª UDP ÓòÌ×½Ó¿Ú
- *  ºó×º£»ÄÚ²¿×Ô¶¯Çø±ðÍøÂçÌ×½Ó¿ÚºÍ UNIX ÓòÌ×½Ó¿Ú£¬ÓòÌ×½Ó¿Ú½öÖ§³Ö UNIX Æ½Ì¨
- * @param flag {unsigned int} ±êÖ¾Î»
- * @param family {int*} Èç¹û°ó¶¨³É¹¦ÇÒ¸ÃµØÖ··Ç¿ÕÔò´æ·ÅµØÖ·ÀàÐÍ£¬ÀàÐÍÓÐ£º
+ * ç»‘å®šæŒ‡é’ˆçš„ UDP åœ°å€
+ * @param addr {const char*} UDP åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORT æˆ– UNIX åŸŸå¥—æŽ¥å£ï¼Œå½“ä¸º
+ *  UNIX åŸŸå¥—æŽ¥å£æ—¶çš„æ ¼å¼ä¸ºï¼š{domain_path}@udpï¼Œå…¶ä¸­ @udp è¡¨ç¤ºä¸º UDP åŸŸå¥—æŽ¥å£
+ *  åŽç¼€ï¼›å†…éƒ¨è‡ªåŠ¨åŒºåˆ«ç½‘ç»œå¥—æŽ¥å£å’Œ UNIX åŸŸå¥—æŽ¥å£ï¼ŒåŸŸå¥—æŽ¥å£ä»…æ”¯æŒ UNIX å¹³å°
+ * @param flag {unsigned int} æ ‡å¿—ä½
+ * @param family {int*} å¦‚æžœç»‘å®šæˆåŠŸä¸”è¯¥åœ°å€éžç©ºåˆ™å­˜æ”¾åœ°å€ç±»åž‹ï¼Œç±»åž‹æœ‰ï¼š
  *  AF_INET, AF_INET6, AF_UNIX
- * @return {ACL_SOCKET} ·µ»Ø ACL_SOCKET_INVALID ±íÊ¾°ó¶¨Ê§°Ü
+ * @return {ACL_SOCKET} è¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºç»‘å®šå¤±è´¥
  */
 ACL_API ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag);
 ACL_API ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family);
@@ -111,18 +111,18 @@ ACL_API ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family);
 
 /* in acl_unix_listen.c */
 /**
- * ¼àÌýÓòÌ×½Ó×Ö
- * @param addr {const char*} ¼àÌýÓòÌ×½Ó×ÖÊ±ËùÓÃµÄÈ«Â·¾¶
- * @param backlog {int} ¼àÌý¶ÓÁÐ´óÐ¡
- * @param flag {unsigned} ¼àÌý±êÖ¾Î»£¬²Î¼û£ºACL_INET_FLAG_XXX
- * @return {ACL_SOCKET} ¼àÌýÌ×½Ó×Ö£¬ACL_SOCKET_INVALID ±íÊ¾ÎÞ·¨¼àÌý¸ÃÍøÂçµØÖ·
+ * ç›‘å¬åŸŸå¥—æŽ¥å­—
+ * @param addr {const char*} ç›‘å¬åŸŸå¥—æŽ¥å­—æ—¶æ‰€ç”¨çš„å…¨è·¯å¾„
+ * @param backlog {int} ç›‘å¬é˜Ÿåˆ—å¤§å°
+ * @param flag {unsigned} ç›‘å¬æ ‡å¿—ä½ï¼Œå‚è§ï¼šACL_INET_FLAG_XXX
+ * @return {ACL_SOCKET} ç›‘å¬å¥—æŽ¥å­—ï¼ŒACL_SOCKET_INVALID è¡¨ç¤ºæ— æ³•ç›‘å¬è¯¥ç½‘ç»œåœ°å€
  */
 ACL_API ACL_SOCKET acl_unix_listen(const char *addr, int backlog, unsigned flag);
 
 /**
- * ´ÓÓòÌ×½Ó×ÖÉÏ½ÓÊÕÒ»¸ö¿Í»§¶ËÁ¬½Ó
- * @param listen_fd {ACL_SOCKET} ¼àÌýÌ×½Ó×Ö
- * @return {ACL_SOCKET} ¿Í»§¶ËÁ¬½Ó£¬ACL_SOCKET_INVALID ±íÊ¾½ÓÊÕ¿Í»§¶ËÁ¬½Ó³ö´í
+ * ä»ŽåŸŸå¥—æŽ¥å­—ä¸ŠæŽ¥æ”¶ä¸€ä¸ªå®¢æˆ·ç«¯è¿žæŽ¥
+ * @param listen_fd {ACL_SOCKET} ç›‘å¬å¥—æŽ¥å­—
+ * @return {ACL_SOCKET} å®¢æˆ·ç«¯è¿žæŽ¥ï¼ŒACL_SOCKET_INVALID è¡¨ç¤ºæŽ¥æ”¶å®¢æˆ·ç«¯è¿žæŽ¥å‡ºé”™
  */
 ACL_API ACL_SOCKET acl_unix_accept(ACL_SOCKET fd);
 

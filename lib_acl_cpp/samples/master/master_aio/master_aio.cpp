@@ -1,4 +1,4 @@
-// master_aio.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// master_aio.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -38,7 +38,7 @@ using namespace acl;
 
 //////////////////////////////////////////////////////////////////////////
 /**
- * ÑÓ³Ù¶Á»Øµ÷´¦ÀíÀà
+ * å»¶è¿Ÿè¯»å›è°ƒå¤„ç†ç±»
  */
 class timer_reader: public aio_timer_reader
 {
@@ -53,19 +53,19 @@ public:
 	{
 	}
 
-	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
+	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
 	void destroy()
 	{
 		format("timer_reader delete, delay: %d\r\n", delay_);
 		delete this;
 	}
 
-	// ÖØÔØ»ùÀà»Øµ÷·½·¨
+	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
 	virtual void timer_callback(unsigned int id)
 	{
 		format("timer_reader(%u): timer_callback, delay: %d\r\n", id, delay_);
 
-		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
+		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
 		aio_timer_reader::timer_callback(id);
 	}
 
@@ -74,7 +74,7 @@ private:
 };
 
 /**
- * ÑÓ³ÙĞ´»Øµ÷´¦ÀíÀà
+ * å»¶è¿Ÿå†™å›è°ƒå¤„ç†ç±»
  */
 class timer_writer: public aio_timer_writer
 {
@@ -89,19 +89,19 @@ public:
 	{
 	}
 
-	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
+	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
 	void destroy()
 	{
 		format("timer_writer delete, delay: %d\r\n", delay_);
 		delete this;
 	}
 
-	// ÖØÔØ»ùÀà»Øµ÷·½·¨
+	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
 	virtual void timer_callback(unsigned int id)
 	{
 		format("timer_writer(%u): timer_callback, delay: %u\r\n", id, delay_);
 
-		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
+		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
 		aio_timer_writer::timer_callback(id);
 	}
 
@@ -115,7 +115,7 @@ public:
 	timer_test() : aio_timer_callback(true) {}
 	~timer_test() {}
 protected:
-	// »ùÀà´¿Ğéº¯Êı
+	// åŸºç±»çº¯è™šå‡½æ•°
 	virtual void timer_callback(unsigned int id)
 	{
 		format("id: %u\r\n", id);
@@ -129,7 +129,7 @@ protected:
 private:
 };
 /**
- * Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_callback : public aio_callback
 {
@@ -146,40 +146,40 @@ public:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ¶Á³É¹¦»Øµ÷¹ı³Ì
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¯»æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	virtual bool read_callback(char* data, int len)
 	{
 		if (++i_ < 10)
 			format(">>gets(i: %d): %s\r\n", i_, data);
 
-		// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£ÍûÍË³ö£¬Ôò¹Ø±ÕÖ®
+		// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›é€€å‡ºï¼Œåˆ™å…³é—­ä¹‹
 		if (strncmp(data, "quit", 4) == 0)
 		{
 			client_->format("Bye!\r\n");
 			client_->close();
 		}
 
-		// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£Íû·şÎñ¶ËÒ²¹Ø±Õ£¬ÔòÖĞÖ¹Òì²½ÊÂ¼ş¹ı³Ì
+		// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›æœåŠ¡ç«¯ä¹Ÿå…³é—­ï¼Œåˆ™ä¸­æ­¢å¼‚æ­¥äº‹ä»¶è¿‡ç¨‹
 		else if (strncmp(data, "stop", 4) == 0)
 		{
 			client_->format("Stop now!\r\n");
-			client_->close();  // ¹Ø±ÕÔ¶³ÌÒì²½Á÷
+			client_->close();  // å…³é—­è¿œç¨‹å¼‚æ­¥æµ
 
-			// Í¨ÖªÒì²½ÒıÇæ¹Ø±ÕÑ­»·¹ı³Ì
+			// é€šçŸ¥å¼‚æ­¥å¼•æ“å…³é—­å¾ªç¯è¿‡ç¨‹
 			client_->get_handle().stop();
 		}
 
-		// ÏòÔ¶³Ì¿Í»§¶Ë»ØĞ´ÊÕµ½µÄÊı¾İ
+		// å‘è¿œç¨‹å®¢æˆ·ç«¯å›å†™æ”¶åˆ°çš„æ•°æ®
 
 		int   delay = 0;
 
 		if (strncmp(data, "write_delay", strlen("write_delay")) == 0)
 		{
-			// ÑÓ³ÙĞ´¹ı³Ì
+			// å»¶è¿Ÿå†™è¿‡ç¨‹
 
 			const char* ptr = data + strlen("write_delay");
 			delay = atoi(ptr);
@@ -194,7 +194,7 @@ public:
 		}
 		else if (strncmp(data, "read_delay", strlen("read_delay")) == 0)
 		{
-			// ÑÓ³Ù¶Á¹ı³Ì
+			// å»¶è¿Ÿè¯»è¿‡ç¨‹
 
 			const char* ptr = data + strlen("read_delay");
 			delay = atoi(ptr);
@@ -214,8 +214,8 @@ public:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄĞ´³É¹¦»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„å†™æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	virtual bool write_callback()
 	{
@@ -223,18 +223,18 @@ public:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 	 */
 	virtual void close_callback()
 	{
-		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		format("Close\r\n");
 		delete this;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	virtual bool timeout_callback()
 	{
@@ -257,54 +257,54 @@ public:
 	~master_aio_test() { }
 
 protected:
-	// »ùÀà´¿Ğéº¯Êı£ºµ±½ÓÊÕµ½Ò»¸öĞÂµÄÁ¬½ÓÊ±µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼šå½“æ¥æ”¶åˆ°ä¸€ä¸ªæ–°çš„è¿æ¥æ—¶è°ƒç”¨æ­¤å‡½æ•°
 	virtual bool on_accept(aio_socket_stream* client)
 	{
-		// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
+		// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
 		io_callback* callback = new io_callback(client);
 
-		// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
 		client->add_read_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
 		client->add_write_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
 		client->add_close_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 		client->add_timeout_callback(callback);
 
-		// Ğ´»¶Ó­ĞÅÏ¢
+		// å†™æ¬¢è¿ä¿¡æ¯
 		if (var_cfg_send_banner)
 			client->format("hello, you're welcome\r\n");
 
-		// ´ÓÒì²½Á÷¶ÁÒ»ĞĞÊı¾İ
+		// ä»å¼‚æ­¥æµè¯»ä¸€è¡Œæ•°æ®
 		client->gets(10, false);
 		//client->read();
 		return true;
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İÇ°µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½å‰è°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_pre_jail()
 	{
 		format("proc_pre_jail\r\n");
-		// Ö»ÓĞµ±³ÌĞòÆô¶¯ºó²ÅÄÜ»ñµÃÒì²½ÒıÇæ¾ä±ú
+		// åªæœ‰å½“ç¨‹åºå¯åŠ¨åæ‰èƒ½è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„
 		handle_ = get_handle();
-		//handle_->keep_timer(true); // ÔÊĞí¶¨Ê±Æ÷±»ÖØ¸´´¥·¢
-		// ÉèÖÃµÚÒ»¸ö¶¨Ê±ÈÎÎñ£¬Ã¿¸ô1Ãë´¥·¢Ò»´Î£¬¶¨Ê±ÈÎÎñIDÎª0
+		//handle_->keep_timer(true); // å…è®¸å®šæ—¶å™¨è¢«é‡å¤è§¦å‘
+		// è®¾ç½®ç¬¬ä¸€ä¸ªå®šæ—¶ä»»åŠ¡ï¼Œæ¯éš”1ç§’è§¦å‘ä¸€æ¬¡ï¼Œå®šæ—¶ä»»åŠ¡IDä¸º0
 		handle_->set_timer(timer_test_, 1000000, 0);
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_on_init()
 	{
 		format("proc init\r\n");
-		// ÉèÖÃµÚ¶ş¸ö¶¨Ê±ÈÎÎñ£¬Ã¿¸ô2Ãë´¥·¢Ò»´Î£¬¶¨Ê±ÈÎÎñIDÎª1
+		// è®¾ç½®ç¬¬äºŒä¸ªå®šæ—¶ä»»åŠ¡ï¼Œæ¯éš”2ç§’è§¦å‘ä¸€æ¬¡ï¼Œå®šæ—¶ä»»åŠ¡IDä¸º1
 		handle_->set_timer(timer_test_, 2000000, 1);
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÍË³öÇ°µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_on_exit()
 	{
 		format("proc exit\r\n");
@@ -326,13 +326,13 @@ int main(int argc, char* argv[])
 
 	master_aio_test ma;
 
-	// ÉèÖÃÅäÖÃ²ÎÊı±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	ma.set_cfg_int(var_conf_int_tab);
 	ma.set_cfg_int64(NULL);
 	ma.set_cfg_str(var_conf_str_tab);
 	ma.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
@@ -349,7 +349,7 @@ int main(int argc, char* argv[])
 
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: %s now\r\n", addr);
-		ma.run_alone(addr, conf);  // µ¥¶ÀÔËĞĞ·½Ê½
+		ma.run_alone(addr, conf);  // å•ç‹¬è¿è¡Œæ–¹å¼
 	}
 	else
 	{
@@ -359,10 +359,10 @@ int main(int argc, char* argv[])
 
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: %s now\r\n", addr);
-		ma.run_alone(addr, conf);  // µ¥¶ÀÔËĞĞ·½Ê½
+		ma.run_alone(addr, conf);  // å•ç‹¬è¿è¡Œæ–¹å¼
 
 #else
-		ma.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		ma.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 #endif
 	}
 	return 0;

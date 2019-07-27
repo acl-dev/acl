@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "http_access.h"
 #include "http_redirect.h"
 #include "http_plugin.h"
@@ -8,7 +8,7 @@ char *var_cfg_http_domain_allow;
 char *var_cfg_http_domain_redirect;
 
 static ACL_CFG_STR_TABLE __conf_str_tab[] = {
-	/* ÅäÖÃÏîÃû³Æ, ÅäÖÃÏîÈ±Ê¡Öµ, ´æ´¢ÅäÖÃÏîÖµµÄµØÖ· */
+	/* é…ç½®é¡¹åç§°, é…ç½®é¡¹ç¼ºçœå€¼, å­˜å‚¨é…ç½®é¡¹å€¼çš„åœ°å€ */
 	{ "logpath", "/tmp/access_filter.log", &var_cfg_log_name },
 	{ "http_domain_allow", "", &var_cfg_http_domain_allow },
 	{ "http_domain_redirect", "", &var_cfg_http_domain_redirect },
@@ -19,7 +19,7 @@ static int   var_cfg_debug_mem;
 int   var_cfg_http_domain_allow_all;
 
 static ACL_CFG_BOOL_TABLE __conf_bool_tab[] = {
-	/* ÅäÖÃÏîÃû³Æ, ÅäÖÃÏîÈ±Ê¡Öµ, ´æ´¢ÅäÖÃÏîÖµµÄµØÖ· */
+	/* é…ç½®é¡¹åç§°, é…ç½®é¡¹ç¼ºçœå€¼, å­˜å‚¨é…ç½®é¡¹å€¼çš„åœ°å€ */
 	{ "debug_mem", 0, &var_cfg_debug_mem },
 	{ "http_domain_allow_all", 1, &var_cfg_http_domain_allow_all },
 	{ 0, 0 , 0 }
@@ -43,7 +43,7 @@ void http_plugin_init(ACL_DLL_ENV *dll_env, const char *cfg_dir)
                         __LINE__, ACL_VSTREAM_PATH(__dll_env.logfp));
 	}
 
-	/* Èç¹û mem_slice ·Ç¿ÕÔòÉèÖÃÄÚ´æ·ÖÅä²ÉÓÃÇĞÆ¬·ÖÅä·½Ê½ */
+	/* å¦‚æœ mem_slice éç©ºåˆ™è®¾ç½®å†…å­˜åˆ†é…é‡‡ç”¨åˆ‡ç‰‡åˆ†é…æ–¹å¼ */
 	if (__dll_env.mem_slice)
 		acl_mem_slice_set(__dll_env.mem_slice);
 
@@ -61,13 +61,13 @@ void http_plugin_init(ACL_DLL_ENV *dll_env, const char *cfg_dir)
 		acl_xinetd_cfg_free(cfg);
 	acl_myfree(filepath);
 
-	/* Õë¶Ô´úÀíÄ£Ê½£¬³õÊ¼»¯·ÃÎÊÁĞ±í */
+	/* é’ˆå¯¹ä»£ç†æ¨¡å¼ï¼Œåˆå§‹åŒ–è®¿é—®åˆ—è¡¨ */
 	http_access_init();
 
-	/* ³õÊ¼»¯ÓĞ¹ØÖØ¶¨ÏòÁĞ±í */
+	/* åˆå§‹åŒ–æœ‰å…³é‡å®šå‘åˆ—è¡¨ */
 	http_redirect_init();
 
-	/* ÊÇ·ñµ÷ÊÔ²å¼şµÄÄÚ´æ·ÖÅäÇé¿ö */
+	/* æ˜¯å¦è°ƒè¯•æ’ä»¶çš„å†…å­˜åˆ†é…æƒ…å†µ */
 	if (var_cfg_debug_mem == 1) {
 		acl_memory_debug_start();
 		acl_memory_debug_stack(1);

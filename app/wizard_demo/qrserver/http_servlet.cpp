@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "qr.h"
 #include "http_servlet.h"
 
@@ -19,7 +19,7 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
 
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	res.write(buf);
@@ -32,7 +32,7 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
 	res.write(buf);
@@ -78,9 +78,9 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		return replyf(req, res, "qrSymbolToPNG error");
 	}
 
-	res.setContentType("image/png")			// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
-		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
+	res.setContentType("image/png")			// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
+		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
 		.setContentLength(size);
 	bool ret = res.write(buffer, size) && res.write(NULL, 0);
 
@@ -99,9 +99,9 @@ bool http_servlet::replyf(acl::HttpServletRequest& req,
 	buf.vformat(fmt, ap);
 	va_end(ap);
 
-	res.setContentType("text/plain; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
-		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
+	res.setContentType("text/plain; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
+		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
 		.setContentLength(buf.size());
 
 	return res.write(buf) && res.write(NULL, 0);

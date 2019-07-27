@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "../acl_cpp_define.hpp"
 
 #if !defined(ACL_MIME_DISABLE)

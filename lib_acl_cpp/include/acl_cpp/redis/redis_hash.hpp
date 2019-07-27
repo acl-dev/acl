@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include <map>
 #include <vector>
@@ -13,7 +13,7 @@ namespace acl
 class redis_client;
 
 /**
- * redis Hash(¹şÏ£±í) Àà£¬±¾ÀàµÄÊµÏÖµÄÖ÷ÒªÃüÁî£º
+ * redis Hash(å“ˆå¸Œè¡¨) ç±»ï¼Œæœ¬ç±»çš„å®ç°çš„ä¸»è¦å‘½ä»¤ï¼š
  * redis Hash class, include commands as below:
  * HDEL/HEXISTS/HGET/HGETALL/HINCRBY/HINCRBYFLOAT/HKEYS/HLEN/HMGET/HMSET
  * HSET/HSETNX/HVALS/HSCAN
@@ -41,12 +41,12 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ½«¶à¸ö"Óò-Öµ"¶ÔÌí¼ÓÖÁ KEY ¶ÔÓ¦µÄ¹şÏ£±íÖĞ
+	 * å°†å¤šä¸ª"åŸŸ-å€¼"å¯¹æ·»åŠ è‡³ KEY å¯¹åº”çš„å“ˆå¸Œè¡¨ä¸­
 	 * HMSET: set the key's multiple fileds in redis-server
-	 * @param key {const char*} ¹şÏ£±í key Öµ
+	 * @param key {const char*} å“ˆå¸Œè¡¨ key å€¼
 	 *  the hash key for Hash class
 	 * @param attrs {const std::map<acl::string, ...>&} the fileds in map
-	 * @return {bool} Ìí¼ÓÊÇ·ñ³É¹¦
+	 * @return {bool} æ·»åŠ æ˜¯å¦æˆåŠŸ
 	 *  if successful for HMSET command
 	 */
 	bool hmset(const char* key, const std::map<string, string>& attrs);
@@ -63,44 +63,44 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ¸ù¾İ KEY Öµ½«¶à¸ö"Óò-Öµ"¶Ô´Ó¹şÏ£±íÖĞÈ¡³ö
+	 * æ ¹æ® KEY å€¼å°†å¤šä¸ª"åŸŸ-å€¼"å¯¹ä»å“ˆå¸Œè¡¨ä¸­å–å‡º
 	 * get the values associated with the specified fields
 	 * in the hash stored at key
-	 * @param key {const char*} ¹şÏ£±í key Öµ
+	 * @param key {const char*} å“ˆå¸Œè¡¨ key å€¼
 	 *  the hash key
-	 * @param names ¶ÔÓ¦ key µÄÓòÖµ¶Ô
+	 * @param names å¯¹åº” key çš„åŸŸå€¼å¯¹
 	 *  the given hash fileds
-	 * @param result {std::vector<acl::string>*} µ±¸Ã¶ÔÏóÖ¸Õë·Ç¿ÕÊ±´æ´¢²éÑ¯½á¹û£»
-	 *  Èç¹û¸Ã²ÎÊıÎª NULL Ê±£¬Ôò¿ÉÒÔÍ¨¹ı»ùÀà result_/get_ »ñµÃÊı¾İ
+	 * @param result {std::vector<acl::string>*} å½“è¯¥å¯¹è±¡æŒ‡é’ˆéç©ºæ—¶å­˜å‚¨æŸ¥è¯¢ç»“æœï¼›
+	 *  å¦‚æœè¯¥å‚æ•°ä¸º NULL æ—¶ï¼Œåˆ™å¯ä»¥é€šè¿‡åŸºç±» result_/get_ è·å¾—æ•°æ®
 	 *  store the result of the given hash files if not NULL.
 	 *  If NULL, the base class's method like result_/get can be used
 	 *  to get the values
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬²Ù×÷³É¹¦ºó¿ÉÒÔÍ¨¹ıÒÔÏÂÈÎÒ»ÖÖ·½Ê½»ñµÃÊı¾İ£º
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œæ“ä½œæˆåŠŸåå¯ä»¥é€šè¿‡ä»¥ä¸‹ä»»ä¸€ç§æ–¹å¼è·å¾—æ•°æ®ï¼š
 	 *  if successul, one of below ways can be used to get the result:
 	 *
-	 *  1¡¢ÔÚµ÷ÓÃ·½·¨ÖĞ´«Èë·Ç¿ÕµÄ´æ´¢½á¹û¶ÔÏóµÄµØÖ·
+	 *  1ã€åœ¨è°ƒç”¨æ–¹æ³•ä¸­ä¼ å…¥éç©ºçš„å­˜å‚¨ç»“æœå¯¹è±¡çš„åœ°å€
 	 *     input the no-NULL result parameter when call hmget, when
 	 *     success, the result will store the values of the given fileds
 	 *
-	 *  2¡¢»ùÀà·½·¨ result_value »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØÊı¾İ
+	 *  2ã€åŸºç±»æ–¹æ³• result_value è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ æ•°æ®
 	 *     call redis_command::result_value with the specified subscript
 	 *
-	 *  3¡¢»ùÀà·½·¨ result_child »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØ¶ÔÏó(redis_result£©£¬È»ºóÔÙÍ¨¹ı
-	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
+	 *  3ã€åŸºç±»æ–¹æ³• result_child è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ å¯¹è±¡(redis_resultï¼‰ï¼Œç„¶åå†é€šè¿‡
+	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
 	 *     call redis_command::result_child with specified subscript to
 	 *     get redis_result object, then call redis_result::argv_to_string
 	 *     with above result to get the values of the give fileds
 	 *
-	 *  4¡¢»ùÀà·½·¨ get_result ·½·¨È¡µÃ×Ü½á¹û¼¯¶ÔÏó redis_result£¬È»ºóÔÙÍ¨¹ı
-	 *     redis_result::get_child »ñµÃÒ»¸öÔªËØ¶ÔÏó£¬È»ºóÔÙÍ¨¹ı·½Ê½ 2 ÖĞÖ¸¶¨
-	 *     µÄ·½·¨»ñµÃ¸ÃÔªËØµÄÊı¾İ
+	 *  4ã€åŸºç±»æ–¹æ³• get_result æ–¹æ³•å–å¾—æ€»ç»“æœé›†å¯¹è±¡ redis_resultï¼Œç„¶åå†é€šè¿‡
+	 *     redis_result::get_child è·å¾—ä¸€ä¸ªå…ƒç´ å¯¹è±¡ï¼Œç„¶åå†é€šè¿‡æ–¹å¼ 2 ä¸­æŒ‡å®š
+	 *     çš„æ–¹æ³•è·å¾—è¯¥å…ƒç´ çš„æ•°æ®
 	 *     call redis_command::get_result with the specified subscript to
 	 *     get redis_result object, and use redis_result::get_child to
 	 *     get one result object, then call redis_result::argv_to_string
 	 *     to get the value of one filed.
 	 *
-	 *  5¡¢»ùÀà·½·¨ get_children »ñµÃ½á¹ûÔªËØÊı×é¶ÔÏó£¬ÔÙÍ¨¹ı redis_result ÖĞ
-	 *     µÄ·½·¨ argv_to_string ´ÓÃ¿Ò»¸öÔªËØ¶ÔÏóÖĞ»ñµÃÔªËØÊı¾İ
+	 *  5ã€åŸºç±»æ–¹æ³• get_children è·å¾—ç»“æœå…ƒç´ æ•°ç»„å¯¹è±¡ï¼Œå†é€šè¿‡ redis_result ä¸­
+	 *     çš„æ–¹æ³• argv_to_string ä»æ¯ä¸€ä¸ªå…ƒç´ å¯¹è±¡ä¸­è·å¾—å…ƒç´ æ•°æ®
 	 *     use redis_command::get_children to get the redis_result array,
 	 *     then use redis_result::argv_to_string to get every value of
 	 *     the given fileds
@@ -118,18 +118,18 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ÉèÖÃ key ¶ÔÏóÖĞÄ³¸öÓò×Ö¶ÎµÄÖµ
+	 * è®¾ç½® key å¯¹è±¡ä¸­æŸä¸ªåŸŸå­—æ®µçš„å€¼
 	 * set one field's value in the hash stored at key.
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓòÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸåç§°
 	 *  the filed name of the hash key
-	 * @param value {const char*} key ¶ÔÏóµÄÓòÖµ
+	 * @param value {const char*} key å¯¹è±¡çš„åŸŸå€¼
 	 *  the filed value of the hash key
-	 * @return {int} ·µ»ØÖµº¬Òå£º
-	 *  1 -- ±íÊ¾ĞÂÌí¼ÓµÄÓò×Ö¶ÎÌí¼Ó³É¹¦
-	 *  0 -- ±íÊ¾¸üĞÂÒÑ¾­´æÔÚµÄÓò×Ö¶Î³É¹¦
-	 * -1 -- ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó»ò´Ó½áµã½ûÖ¹ĞŞ¸Ä
+	 * @return {int} è¿”å›å€¼å«ä¹‰ï¼š
+	 *  1 -- è¡¨ç¤ºæ–°æ·»åŠ çš„åŸŸå­—æ®µæ·»åŠ æˆåŠŸ
+	 *  0 -- è¡¨ç¤ºæ›´æ–°å·²ç»å­˜åœ¨çš„åŸŸå­—æ®µæˆåŠŸ
+	 * -1 -- è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡æˆ–ä»ç»“ç‚¹ç¦æ­¢ä¿®æ”¹
 	 *  return int value as below:
 	 *  1 -- this is a new filed and set ok
 	 *  0 -- thie is a old filed and set ok
@@ -142,19 +142,19 @@ public:
 		const char* value, size_t value_len);
 
 	/**
-	 * µ±ÇÒ½öµ± key ¶ÔÏóÖĞµÄÄ³¸öÓò×Ö¶Î²»´æÔÚÊ±²Å¸üĞÂ¸ÃÓò×Ö¶ÎÖµ
+	 * å½“ä¸”ä»…å½“ key å¯¹è±¡ä¸­çš„æŸä¸ªåŸŸå­—æ®µä¸å­˜åœ¨æ—¶æ‰æ›´æ–°è¯¥åŸŸå­—æ®µå€¼
 	 * set one new field of one key in hash only when the filed isn't
 	 * existing.
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓòÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸåç§°
 	 *  the field name
-	 * @param value {const char*} key ¶ÔÏóµÄÓòÖµ
-	 *¡¡the field value
-	 * @return {int} ·µ»ØÖµº¬Òå£º
-	 *  1 -- ±íÊ¾ĞÂÌí¼ÓµÄÓò×Ö¶ÎÌí¼Ó³É¹¦
-	 *  0 -- ¸ÃÓò×Ö¶Î´æÔÚÇÒÎ´¶ÔÆä½øĞĞ¸üĞÂ
-	 * -1 -- ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó»ò´Ó½áµã½ûÖ¹ĞŞ¸Ä
+	 * @param value {const char*} key å¯¹è±¡çš„åŸŸå€¼
+	 *ã€€the field value
+	 * @return {int} è¿”å›å€¼å«ä¹‰ï¼š
+	 *  1 -- è¡¨ç¤ºæ–°æ·»åŠ çš„åŸŸå­—æ®µæ·»åŠ æˆåŠŸ
+	 *  0 -- è¯¥åŸŸå­—æ®µå­˜åœ¨ä¸”æœªå¯¹å…¶è¿›è¡Œæ›´æ–°
+	 * -1 -- è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡æˆ–ä»ç»“ç‚¹ç¦æ­¢ä¿®æ”¹
 	 *
 	 *  return int value as below:
 	 *  1 -- this is a new filed and set ok
@@ -168,19 +168,19 @@ public:
 		const char* value, size_t value_len);
 
 	/**
-	 * ´Ó redis ¹şÏ£±íÖĞ»ñÈ¡Ä³¸ö key ¶ÔÏóµÄÄ³¸öÓòµÄÖµ
+	 * ä» redis å“ˆå¸Œè¡¨ä¸­è·å–æŸä¸ª key å¯¹è±¡çš„æŸä¸ªåŸŸçš„å€¼
 	 * get the value assosiated with field in the hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓò×Ö¶ÎÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸå­—æ®µåç§°
 	 *  the field's name
-	 * @param result {acl::string&} ´æ´¢²éÑ¯½á¹ûÖµ(ÄÚ²¿¶Ô¸Ã string ½øĞĞÄÚÈİ×·¼Ó)
+	 * @param result {acl::string&} å­˜å‚¨æŸ¥è¯¢ç»“æœå€¼(å†…éƒ¨å¯¹è¯¥ string è¿›è¡Œå†…å®¹è¿½åŠ )
 	 *  store the value result of the given field
-	 * @return {bool} ·µ»ØÖµº¬Òå£º
-	 *  true -- ²Ù×÷³É¹¦£¬µ±resultÎª¿ÕÊ±±íÊ¾ KEY »ò×Ö¶ÎÓò²»´æÔÚ
+	 * @return {bool} è¿”å›å€¼å«ä¹‰ï¼š
+	 *  true -- æ“ä½œæˆåŠŸï¼Œå½“resultä¸ºç©ºæ—¶è¡¨ç¤º KEY æˆ–å­—æ®µåŸŸä¸å­˜åœ¨
 	 *          get the value associated with field; if result is empty then
 	 *          the key or the name field doesn't exist
-	 *  false -- Óò×Ö¶Î²»´æÔÚ»ò²Ù×÷Ê§°Ü»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó
+	 *  false -- åŸŸå­—æ®µä¸å­˜åœ¨æˆ–æ“ä½œå¤±è´¥æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡
 	 *           the field not exists, or error happened,
 	 *           or the key isn't a hash key
 	 */
@@ -189,18 +189,18 @@ public:
 		size_t name_len, string& result);
 
 	/**
-	 * ´Ó redis ¹şÏ£±íÖĞ»ñÈ¡Ä³¸ö key ¶ÔÏóµÄËùÓĞÓò×Ö¶ÎµÄÖµ
+	 * ä» redis å“ˆå¸Œè¡¨ä¸­è·å–æŸä¸ª key å¯¹è±¡çš„æ‰€æœ‰åŸŸå­—æ®µçš„å€¼
 	 * get all the fields and values in hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param result {std::map<string, string>&} ´æ´¢Óò×Ö¶ÎÃû-Öµ²éÑ¯½á¹û¼¯
+	 * @param result {std::map<string, string>&} å­˜å‚¨åŸŸå­—æ®µå-å€¼æŸ¥è¯¢ç»“æœé›†
 	 *  store the result of all the fileds and values
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬º¬Òå£º
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œå«ä¹‰ï¼š
 	 *  if ok, show below:
-	 *  true -- ²Ù×÷³É¹¦£¬µ±¸ÃÓò²»´æÔÚÊ±Ò²·µ»Ø³É¹¦£¬ĞèÒª¼ì²é result ÄÚÈİÊÇ·ñ±ä»¯£¬
-	 *          ±ÈÈç¿ÉÒÔÍ¨¹ı¼ì²é result.size() µÄ±ä»¯À´±íÃ÷ÊÇ·ñ²éÑ¯µ½½á¹û
+	 *  true -- æ“ä½œæˆåŠŸï¼Œå½“è¯¥åŸŸä¸å­˜åœ¨æ—¶ä¹Ÿè¿”å›æˆåŠŸï¼Œéœ€è¦æ£€æŸ¥ result å†…å®¹æ˜¯å¦å˜åŒ–ï¼Œ
+	 *          æ¯”å¦‚å¯ä»¥é€šè¿‡æ£€æŸ¥ result.size() çš„å˜åŒ–æ¥è¡¨æ˜æ˜¯å¦æŸ¥è¯¢åˆ°ç»“æœ
 	 *          successful if the key is a hash key or the key not exists
-	 *  false -- ²Ù×÷Ê§°Ü»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó
+	 *  false -- æ“ä½œå¤±è´¥æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡
 	 *           error happened or the key isn't a hash key
 	 */
 	bool hgetall(const char* key, std::map<string, string>& result);
@@ -210,14 +210,14 @@ public:
 		std::vector<const char*>& values);
 
 	/**
-	 * ´Ó redis ¹şÏ£±íÖĞÉ¾³ıÄ³¸ö key ¶ÔÏóµÄÄ³Ğ©Óò×Ö¶Î
+	 * ä» redis å“ˆå¸Œè¡¨ä¸­åˆ é™¤æŸä¸ª key å¯¹è±¡çš„æŸäº›åŸŸå­—æ®µ
 	 * remove one or more fields from hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param first_name {const char*} µÚÒ»¸öÓò×Ö¶ÎÃû£¬×îºóÒ»¸ö×Ö¶Î±ØĞëÊÇ NULL
+	 * @param first_name {const char*} ç¬¬ä¸€ä¸ªåŸŸå­—æ®µåï¼Œæœ€åä¸€ä¸ªå­—æ®µå¿…é¡»æ˜¯ NULL
 	 *  the first field of the fields list, the last field must be NULL
 	 *  indicating the end of vary parameters
-	 * @return {int} ³É¹¦É¾³ıµÄÓò×Ö¶Î¸öÊı£¬·µ»Ø -1 ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó
+	 * @return {int} æˆåŠŸåˆ é™¤çš„åŸŸå­—æ®µä¸ªæ•°ï¼Œè¿”å› -1 è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡
 	 *  return the number of fields be removed successfully, or -1 when
 	 *  error happened or operating on a no hash key
 	 */
@@ -235,18 +235,18 @@ public:
 	int hdel_fields(const char* key, const char* first_name, ...);
 
 	/**
-	 * µ±Ä³¸ö key ¶ÔÏóÖĞµÄÄ³¸öÓò×Ö¶ÎÎªÕûÊıÊ±£¬¶ÔÆä½øĞĞ¼Ó¼õ²Ù×÷
+	 * å½“æŸä¸ª key å¯¹è±¡ä¸­çš„æŸä¸ªåŸŸå­—æ®µä¸ºæ•´æ•°æ—¶ï¼Œå¯¹å…¶è¿›è¡ŒåŠ å‡æ“ä½œ
 	 * inc(+n) or dec(-n) on a integer filed in hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓò×Ö¶ÎÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸå­—æ®µåç§°
 	 *  the filed name of integer type
-	 * @param inc {long long int} Ôö¼ÓµÄÖµ£¬¿ÉÒÔÎª¸ºÖµ
+	 * @param inc {long long int} å¢åŠ çš„å€¼ï¼Œå¯ä»¥ä¸ºè´Ÿå€¼
 	 *  the integer value to be inc or dec on the field's value
-	 * @param result {long long int*} ·Ç NULL Ê±´æ´¢½á¹ûÖµ
+	 * @param result {long long int*} é NULL æ—¶å­˜å‚¨ç»“æœå€¼
 	 *  store the result if non-NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬µ±·µ»Ø false Ê±±íÃ÷³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£
-	 *  ¶ÔÏó»ò¸ÃÓò×Ö¶Î·ÇÕûÊıÀàĞÍ
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œå½“è¿”å› false æ—¶è¡¨æ˜å‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œ
+	 *  å¯¹è±¡æˆ–è¯¥åŸŸå­—æ®µéæ•´æ•°ç±»å‹
 	 *  if successful: false when error, not a hash, or the field isn't
 	 *  integer type
 	 */
@@ -254,18 +254,18 @@ public:
 		long long int inc, long long int* result = NULL);
 
 	/**
-	 * µ±Ä³¸ö key ¶ÔÏóÖĞµÄÄ³¸öÓò×Ö¶ÎÎª¸¡µãÊıÊ±£¬¶ÔÆä½øĞĞ¼Ó¼õ²Ù×÷
+	 * å½“æŸä¸ª key å¯¹è±¡ä¸­çš„æŸä¸ªåŸŸå­—æ®µä¸ºæµ®ç‚¹æ•°æ—¶ï¼Œå¯¹å…¶è¿›è¡ŒåŠ å‡æ“ä½œ
 	 * inc(+n) or dec(-n) on a float filed in hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓò×Ö¶ÎÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸå­—æ®µåç§°
 	 *  the filed name of float type
-	 * @param inc {double} Ôö¼ÓµÄÖµ£¬¿ÉÒÔÎª¸ºÖµ
+	 * @param inc {double} å¢åŠ çš„å€¼ï¼Œå¯ä»¥ä¸ºè´Ÿå€¼
 	 *  the float value to be inc or dec on the field's value
-	 * @param result {double*} ·Ç NULL Ê±´æ´¢½á¹ûÖµ
+	 * @param result {double*} é NULL æ—¶å­˜å‚¨ç»“æœå€¼
 	 *  store the result if non-NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬µ±·µ»Ø false Ê±±íÃ÷³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£
-	 *  ¶ÔÏó»ò¸ÃÓò×Ö¶Î·Ç¸¡µãÊıÀàĞÍ
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œå½“è¿”å› false æ—¶è¡¨æ˜å‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œ
+	 *  å¯¹è±¡æˆ–è¯¥åŸŸå­—æ®µéæµ®ç‚¹æ•°ç±»å‹
 	 *  if successful: false when error, not a hash, or the field isn't
 	 *  float type
 	 */
@@ -273,27 +273,27 @@ public:
 		double inc, double* result = NULL);
 
 	/**
-	 * ·µ»Ø key ¶ÔÏóÖĞËùÓĞÓò×Ö¶ÎÃû³Æ
+	 * è¿”å› key å¯¹è±¡ä¸­æ‰€æœ‰åŸŸå­—æ®µåç§°
 	 * get all the fields in hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param names {std::vector<string>&} ´æ´¢¸Ã key ¶ÔÏóËùÓĞÓò×Ö¶ÎÃû³Æ
+	 * @param names {std::vector<string>&} å­˜å‚¨è¯¥ key å¯¹è±¡æ‰€æœ‰åŸŸå­—æ®µåç§°
 	 *  store all the names of all fileds
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÃ÷³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨æ˜å‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡
 	 *  return true on success, false if error happened or the
 	 *  key wasn't a hash key
 	 */
 	bool hkeys(const char* key, std::vector<string>& names);
 
 	/**
-	 * ¼ì²é key ¶ÔÏóÖĞÄ³¸öÓò×Ö¶ÎÊÇ·ñ´æÔÚ
+	 * æ£€æŸ¥ key å¯¹è±¡ä¸­æŸä¸ªåŸŸå­—æ®µæ˜¯å¦å­˜åœ¨
 	 * check if the field exists in hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓò×Ö¶ÎÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸå­—æ®µåç§°
 	 *  the filed's name of the key
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÃ÷³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó
-	 *  »ò¸ÃÓò×Ö¶Î²»´æÔÚ
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨æ˜å‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡
+	 *  æˆ–è¯¥åŸŸå­—æ®µä¸å­˜åœ¨
 	 *  return true on success, false if error happened or the
 	 *  key wasn't a hash key
 	 */
@@ -301,31 +301,31 @@ public:
 	bool hexists(const char* key, const char* name, size_t name_len);
 
 	/**
-	 * »ñµÃÄ³¸ö key ¶ÔÏóÖĞËùÓĞÓò×Ö¶ÎµÄÊıÁ¿
+	 * è·å¾—æŸä¸ª key å¯¹è±¡ä¸­æ‰€æœ‰åŸŸå­—æ®µçš„æ•°é‡
 	 * get the count of fields in hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @return {int} ·µ»ØÖµº¬Òå£º
+	 * @return {int} è¿”å›å€¼å«ä¹‰ï¼š
 	 *  return int value as below:
-	 *  -1 -- ³ö´í»ò¸Ã key ¶ÔÏó·Ç¹şÏ£¶ÔÏó
+	 *  -1 -- å‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå“ˆå¸Œå¯¹è±¡
 	 *        error or not a hash key
-	 *  >0 -- Óò×Ö¶ÎÊıÁ¿
+	 *  >0 -- åŸŸå­—æ®µæ•°é‡
 	 *        the count of fields
-	 *   0 -- ¸Ã key ²»´æÔÚ»òÓò×Ö¶ÎÊıÁ¿Îª 0
+	 *   0 -- è¯¥ key ä¸å­˜åœ¨æˆ–åŸŸå­—æ®µæ•°é‡ä¸º 0
 	 *        key not exists or no fields in hash stored at key 
 	 */
 	int hlen(const char* key);
 
 	/**
-	 * »ñµÃÄ³¸ö key ÖĞµÄÖ¸¶¨ÓòµÄÊı¾İ³¤¶È
+	 * è·å¾—æŸä¸ª key ä¸­çš„æŒ‡å®šåŸŸçš„æ•°æ®é•¿åº¦
 	 * Returns the string length of the value associated with field
 	 * in the hash stored at key
-	 * @param key {const char*} key ¼üÖµ
+	 * @param key {const char*} key é”®å€¼
 	 *  the hash key
-	 * @param name {const char*} key ¶ÔÏóµÄÓò×Ö¶ÎÃû³Æ
+	 * @param name {const char*} key å¯¹è±¡çš„åŸŸå­—æ®µåç§°
 	 *  the field's name
-	 * @return {int} Èç¹û key »ò name ²»´æÔÚ£¬Ôò·µ»Ø 0£¬Èç¹û key ·Ç¹şÏ£
-	 *  ¼ü»ò³ö´í£¬Ôò·µ»Ø -1
+	 * @return {int} å¦‚æœ key æˆ– name ä¸å­˜åœ¨ï¼Œåˆ™è¿”å› 0ï¼Œå¦‚æœ key éå“ˆå¸Œ
+	 *  é”®æˆ–å‡ºé”™ï¼Œåˆ™è¿”å› -1
 	 *  If the key or the field do not exist, 0 is returned; If the key is
 	 *  not the hash key or error happened, -1 is returned.
 	 */
@@ -333,27 +333,27 @@ public:
 	int hstrlen(const char* key, const char *name);
 	
 	/**
-	 * ÃüÁîÓÃÓÚµü´ú¹şÏ£¼üÖĞµÄ¼üÖµ¶Ô
+	 * å‘½ä»¤ç”¨äºè¿­ä»£å“ˆå¸Œé”®ä¸­çš„é”®å€¼å¯¹
 	 * scan the name and value of all fields in hash stored at key
-	 * @param key {const char*} ¹şÏ£¼üÖµ
+	 * @param key {const char*} å“ˆå¸Œé”®å€¼
 	 *  the hash key
-	 * @param cursor {int} ÓÎ±êÖµ£¬¿ªÊ¼±éÀúÊ±¸ÃÖµĞ´ 0
+	 * @param cursor {int} æ¸¸æ ‡å€¼ï¼Œå¼€å§‹éå†æ—¶è¯¥å€¼å†™ 0
 	 *  the cursor value, which is 0 at begin
-	 * @param out {std::map<acl::string>&} ´æ´¢½á¹û¼¯£¬ÄÚ²¿ÒÔ×·¼Ó·½Ê½½«±¾´Î
-	 *  ±éÀú½á¹ûÌí¼Ó½ø¸Ã¶ÔÏóÖĞ£¬Îª·ÀÖ¹Òò×Ü½á¹û¼¯¹ı´óµ¼ÖÂ¸ÃÊı×éÒç³ö£¬ÓÃ»§¿ÉÔÚ
-	 *  µ÷ÓÃ±¾º¯ÊıÇ°ºóÇåÀí¸Ã¶ÔÏó
+	 * @param out {std::map<acl::string>&} å­˜å‚¨ç»“æœé›†ï¼Œå†…éƒ¨ä»¥è¿½åŠ æ–¹å¼å°†æœ¬æ¬¡
+	 *  éå†ç»“æœæ·»åŠ è¿›è¯¥å¯¹è±¡ä¸­ï¼Œä¸ºé˜²æ­¢å› æ€»ç»“æœé›†è¿‡å¤§å¯¼è‡´è¯¥æ•°ç»„æº¢å‡ºï¼Œç”¨æˆ·å¯åœ¨
+	 *  è°ƒç”¨æœ¬å‡½æ•°å‰åæ¸…ç†è¯¥å¯¹è±¡
 	 *  store scaning result in appending mode
-	 * @param pattern {const char*} Æ¥ÅäÄ£Ê½£¬glob ·ç¸ñ£¬·Ç¿ÕÊ±ÓĞĞ§
+	 * @param pattern {const char*} åŒ¹é…æ¨¡å¼ï¼Œglob é£æ ¼ï¼Œéç©ºæ—¶æœ‰æ•ˆ
 	 *  match pattern, effective only on no-NULL
-	 * @param count {const size_t*} ÏŞ¶¨µÄ½á¹û¼¯ÊıÁ¿£¬·Ç¿ÕÖ¸ÕëÊ±ÓĞĞ§
+	 * @param count {const size_t*} é™å®šçš„ç»“æœé›†æ•°é‡ï¼Œéç©ºæŒ‡é’ˆæ—¶æœ‰æ•ˆ
 	 *  the max count of one scan process, effective only on no-NULL
-	 * @return {int} ÏÂÒ»¸öÓÎ±êÎ»ÖÃ£¬º¬ÒåÈçÏÂ£º
+	 * @return {int} ä¸‹ä¸€ä¸ªæ¸¸æ ‡ä½ç½®ï¼Œå«ä¹‰å¦‚ä¸‹ï¼š
 	 *  return the next cursor position, as below:
-	 *   0£º±éÀú½áÊø
+	 *   0ï¼šéå†ç»“æŸ
 	 *     scan finish
-	 *  -1: ³ö´í
+	 *  -1: å‡ºé”™
 	 *     some error happened
-	 *  >0: ÓÎ±êµÄÏÂÒ»¸öÎ»ÖÃ£¬¼´Ê¹ÕâÑù£¬¾ßÌåÓĞ¶àÉÙ½á¹û»¹ĞèÒª¼ì²é out£¬ÒòÎªÓĞ¿ÉÄÜÎª¿Õ
+	 *  >0: æ¸¸æ ‡çš„ä¸‹ä¸€ä¸ªä½ç½®ï¼Œå³ä½¿è¿™æ ·ï¼Œå…·ä½“æœ‰å¤šå°‘ç»“æœè¿˜éœ€è¦æ£€æŸ¥ outï¼Œå› ä¸ºæœ‰å¯èƒ½ä¸ºç©º
 	 *     the next cursor postion to scan
 	 */
 	int hscan(const char* key, int cursor, std::map<string, string>& out,

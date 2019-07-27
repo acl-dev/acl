@@ -1,4 +1,4 @@
-/*++
+﻿/*++
  * NAME
  *	quote_flags 3h
  * SUMMARY

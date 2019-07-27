@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -209,7 +209,7 @@ static void gc_timer(int event_type acl_unused, ACL_EVENT *event acl_unused,
 	ACL_AIO *aio = (ACL_AIO *) context;
 
 	acl_mem_slice_delay_destroy();
-	/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
+	/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
 	acl_aio_request_timer(aio, gc_timer, aio, 2, 0);
 }
 
@@ -217,12 +217,12 @@ void echo_client_start(int use_slice)
 {
 	time_t begin;
 
-	/* ½¨Á¢Á¬½Ó³Ø */
+	/* å»ºç«‹è¿æ¥æ±  */
 	connect_pool();
 
 	begin = time(NULL);
 
-	/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
+	/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
 	if (use_slice)
 		acl_aio_request_timer(__aio, gc_timer, __aio, 2, 0);
 

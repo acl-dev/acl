@@ -1,9 +1,9 @@
-#pragma once
+ï»¿#pragma once
 #include "acl_cpp/stream/aio_listen_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 
 /**
-* Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+* å¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒç±»çš„å­ç±»
 */
 class CAcceptedClientCallback : public acl::aio_callback
 {
@@ -13,27 +13,27 @@ public:
 	~CAcceptedClientCallback();
 
 	/**
-	* ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ¶Á³É¹¦»Øµ÷¹ı³Ì
-	* @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	* @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È
-	* @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	* å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¯»æˆåŠŸå›è°ƒè¿‡ç¨‹
+	* @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	* @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	* @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	*/
 	bool read_callback(char* data, int len);
 
 	/**
-	* ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄĞ´³É¹¦»Øµ÷¹ı³Ì
-	* @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	* å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„å†™æˆåŠŸå›è°ƒè¿‡ç¨‹
+	* @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	*/
 	bool write_callback();
 
 	/**
-	* ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	* å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 	*/
 	void close_callback();
 
 	/**
-	* ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
-	* @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	* å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	* @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	*/
 	bool timeout_callback();
 
@@ -43,7 +43,7 @@ private:
 };
 
 /**
-* Òì²½¼àÌıÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+* å¼‚æ­¥ç›‘å¬æµçš„å›è°ƒç±»çš„å­ç±»
 */
 class CServerCallback : public acl::aio_accept_callback
 {
@@ -52,9 +52,9 @@ public:
 	~CServerCallback();
 
 	/**
-	* »ùÀàĞéº¯Êı£¬µ±ÓĞĞÂÁ¬½Óµ½´ïºóµ÷ÓÃ´Ë»Øµ÷¹ı³Ì
-	* @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
-	* @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌıÁ÷¼ÌĞø¼àÌı
+	* åŸºç±»è™šå‡½æ•°ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾åè°ƒç”¨æ­¤å›è°ƒè¿‡ç¨‹
+	* @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
+	* @return {bool} è¿”å› true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
 	*/
 	bool accept_callback(acl::aio_socket_stream* client);
 };

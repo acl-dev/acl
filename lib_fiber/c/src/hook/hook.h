@@ -1,4 +1,4 @@
-#ifndef __HOOK_HEAD_H__
+﻿#ifndef __HOOK_HEAD_H__
 #define __HOOK_HEAD_H__
 
 extern struct dns_resolv_conf *var_dns_conf;

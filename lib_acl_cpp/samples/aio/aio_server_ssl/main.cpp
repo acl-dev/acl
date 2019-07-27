@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/acl_cpp_init.hpp"
@@ -15,11 +15,11 @@ static int   __timeout = 0;
 static int   __max_used = 0;
 static int   __cur_used = 0;
 
-// SSL Ä£Ê½ÏÂµÄ SSL ÅäÖÃ¶ÔÏó
+// SSL æ¨¡å¼ä¸‹çš„ SSL é…ç½®å¯¹è±¡
 static acl::polarssl_conf* __ssl_conf;
 
 /**
- * ÑÓ³Ù¶Á»Øµ÷´¦ÀíÀà
+ * å»¶è¿Ÿè¯»å›è°ƒå¤„ç†ç±»
  */
 class timer_reader: public acl::aio_timer_reader
 {
@@ -33,7 +33,7 @@ public:
 protected:
 	~timer_reader(void) {}
 
-	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
+	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
 	// @override
 	void destroy(void)
 	{
@@ -41,13 +41,13 @@ protected:
 		delete this;
 	}
 
-	// ÖØÔØ»ùÀà»Øµ÷·½·¨
+	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
 	// @override
 	void timer_callback(unsigned int id)
 	{
 		printf("timer_reader(%d): delay: %d\r\n", id, delay_);
 
-		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
+		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
 		aio_timer_reader::timer_callback(id);
 	}
 
@@ -56,7 +56,7 @@ private:
 };
 
 /**
- * ÑÓ³ÙĞ´»Øµ÷´¦ÀíÀà
+ * å»¶è¿Ÿå†™å›è°ƒå¤„ç†ç±»
  */
 class timer_writer: public acl::aio_timer_writer
 {
@@ -70,7 +70,7 @@ public:
 protected:
 	~timer_writer(void) {}
 
-	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
+	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
 	// @override
 	void destroy(void)
 	{
@@ -78,14 +78,14 @@ protected:
 		delete this;
 	}
 
-	// ÖØÔØ»ùÀà»Øµ÷·½·¨
+	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
 	// @override
 	void timer_callback(unsigned int id)
 	{
 		printf("timer_writer(%d): timer_callback, delay: %d\r\n",
 			id, delay_);
 
-		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
+		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
 		aio_timer_writer::timer_callback(id);
 	}
 
@@ -94,7 +94,7 @@ private:
 };
 
 /**
- * Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_callback : public acl::aio_callback
 {
@@ -111,48 +111,48 @@ protected:
 	}
 
 	/**
-	 * ¶Á»Øµ÷Ğéº¯Êı£¬¸Ã»Øµ÷º¯Êıµ±Âú×ãÁËÀà aio_istream ÊµÀıÖĞµÄ
-	 * gets/read µÄ¿É¶ÁÌõ¼şºó±»µ÷ÓÃ£¬ÓÉÒì²½¿ò¼ÜÄÚ²¿½«·ûºÏÌõ¼şµÄÊı
-	 * ¾İ¶Á³ö£¬Ö±½Ó´«µİ¸øÓÃ»§µÄ×ÓÀà
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµÄÖ¸ÕëµØÖ·
-	 * @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È(> 0)
-	 * @return {bool} ¸Ãº¯Êı·µ»Ø false Í¨ÖªÒì²½ÒıÇæ¹Ø±Õ¸ÃÒì²½Á÷
+	 * è¯»å›è°ƒè™šå‡½æ•°ï¼Œè¯¥å›è°ƒå‡½æ•°å½“æ»¡è¶³äº†ç±» aio_istream å®ä¾‹ä¸­çš„
+	 * gets/read çš„å¯è¯»æ¡ä»¶åè¢«è°ƒç”¨ï¼Œç”±å¼‚æ­¥æ¡†æ¶å†…éƒ¨å°†ç¬¦åˆæ¡ä»¶çš„æ•°
+	 * æ®è¯»å‡ºï¼Œç›´æ¥ä¼ é€’ç»™ç”¨æˆ·çš„å­ç±»
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®çš„æŒ‡é’ˆåœ°å€
+	 * @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦(> 0)
+	 * @return {bool} è¯¥å‡½æ•°è¿”å› false é€šçŸ¥å¼‚æ­¥å¼•æ“å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool read_wakeup(void)
 	{
 		acl::polarssl_io* hook = (acl::polarssl_io*) client_->get_hook();
 		if (hook == NULL) {
-			// ·Ç SSL Ä£Ê½£¬Òì²½¶ÁÈ¡Ò»ĞĞÊı¾İ
+			// é SSL æ¨¡å¼ï¼Œå¼‚æ­¥è¯»å–ä¸€è¡Œæ•°æ®
 			client_->gets(__timeout, false);
 			return true;
 		}
 
-		// ³¢ÊÔ½øĞĞ SSL ÎÕÊÖ
+		// å°è¯•è¿›è¡Œ SSL æ¡æ‰‹
 		if (!hook->handshake()) {
 			printf("ssl handshake failed\r\n");
 			return false;
 		}
 
-		// Èç¹û SSL ÎÕÊÖÒÑ¾­³É¹¦£¬Ôò¿ªÊ¼°´ĞĞ¶ÁÊı¾İ
+		// å¦‚æœ SSL æ¡æ‰‹å·²ç»æˆåŠŸï¼Œåˆ™å¼€å§‹æŒ‰è¡Œè¯»æ•°æ®
 		if (hook->handshake_ok()) {
-			// ÓÉ reactor Ä£Ê½×ªÎª proactor Ä£Ê½£¬´Ó¶øÈ¡Ïû
-			// read_wakeup »Øµ÷¹ı³Ì
+			// ç”± reactor æ¨¡å¼è½¬ä¸º proactor æ¨¡å¼ï¼Œä»è€Œå–æ¶ˆ
+			// read_wakeup å›è°ƒè¿‡ç¨‹
 			client_->disable_read();
 
-			// Òì²½¶ÁÈ¡Ò»ĞĞ
+			// å¼‚æ­¥è¯»å–ä¸€è¡Œ
 			client_->gets(__timeout, false);
 			return true;
 		}
 
-		// SSL ÎÕÊÖ»¹Î´Íê³É£¬µÈ´ı±¾º¯ÊıÔÙ´Î±»´¥·¢
+		// SSL æ¡æ‰‹è¿˜æœªå®Œæˆï¼Œç­‰å¾…æœ¬å‡½æ•°å†æ¬¡è¢«è§¦å‘
 		return true;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ¶Á³É¹¦»Øµ÷¹ı³Ì
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¯»æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool read_callback(char* data, int len)
 	{
@@ -161,28 +161,28 @@ protected:
 		//	std::cout << ">>gets(i:" << i_ << "): "
 		//		<< data << std::endl;
 
-		// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£ÍûÍË³ö£¬Ôò¹Ø±ÕÖ®
+		// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›é€€å‡ºï¼Œåˆ™å…³é—­ä¹‹
 		if (!strncasecmp(data, "quit", 4)) {
 			client_->format("Bye!\r\n");
 			client_->close();
 			return true;
 		}
 
-		// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£Íû·şÎñ¶ËÒ²¹Ø±Õ£¬ÔòÖĞÖ¹Òì²½ÊÂ¼ş¹ı³Ì
+		// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›æœåŠ¡ç«¯ä¹Ÿå…³é—­ï¼Œåˆ™ä¸­æ­¢å¼‚æ­¥äº‹ä»¶è¿‡ç¨‹
 		else if (!strncasecmp(data, "stop", 4)) {
 			client_->format("Stop now!\r\n");
-			client_->close();  // ¹Ø±ÕÔ¶³ÌÒì²½Á÷
+			client_->close();  // å…³é—­è¿œç¨‹å¼‚æ­¥æµ
 
-			// Í¨ÖªÒì²½ÒıÇæ¹Ø±ÕÑ­»·¹ı³Ì
+			// é€šçŸ¥å¼‚æ­¥å¼•æ“å…³é—­å¾ªç¯è¿‡ç¨‹
 			client_->get_handle().stop();
 		}
 
-		// ÏòÔ¶³Ì¿Í»§¶Ë»ØĞ´ÊÕµ½µÄÊı¾İ
+		// å‘è¿œç¨‹å®¢æˆ·ç«¯å›å†™æ”¶åˆ°çš„æ•°æ®
 
 		int   delay = 0;
 
 		if (!strncasecmp(data, "write_delay", strlen("write_delay"))) {
-			// ÑÓ³ÙĞ´¹ı³Ì
+			// å»¶è¿Ÿå†™è¿‡ç¨‹
 
 			const char* ptr = data + strlen("write_delay");
 			delay = atoi(ptr);
@@ -195,7 +195,7 @@ protected:
 				return true;
 			}
 		} else if (!strncasecmp(data, "read_delay", strlen("read_delay"))) {
-			// ÑÓ³Ù¶Á¹ı³Ì
+			// å»¶è¿Ÿè¯»è¿‡ç¨‹
 
 			const char* ptr = data + strlen("read_delay");
 			delay = atoi(ptr);
@@ -215,8 +215,8 @@ protected:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄĞ´³É¹¦»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„å†™æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool write_callback(void)
 	{
@@ -224,17 +224,17 @@ protected:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 	 */
 	void close_callback(void)
 	{
-		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		delete this;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool timeout_callback(void)
 	{
@@ -248,7 +248,7 @@ private:
 };
 
 /**
- * Òì²½¼àÌıÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥ç›‘å¬æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_accept_callback : public acl::aio_accept_callback
 {
@@ -260,35 +260,35 @@ public:
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±ÓĞĞÂÁ¬½Óµ½´ïºóµ÷ÓÃ´Ë»Øµ÷¹ı³Ì
-	 * @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
-	 * @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌıÁ÷¼ÌĞø¼àÌı
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾åè°ƒç”¨æ­¤å›è°ƒè¿‡ç¨‹
+	 * @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
+	 * @return {bool} è¿”å› true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
 	 */
 	bool accept_callback(acl::aio_socket_stream* client)
 	{
-		// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
+		// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
 		io_callback* callback = new io_callback(client);
 
-		// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
 		client->add_read_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
 		client->add_write_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
 		client->add_close_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 		client->add_timeout_callback(callback);
 
-		// µ±ÏŞ¶¨ÁËĞĞÊı¾İ×î´ó³¤¶ÈÊ±
+		// å½“é™å®šäº†è¡Œæ•°æ®æœ€å¤§é•¿åº¦æ—¶
 		if (__max > 0) {
 			client->set_buf_max(__max);
 		}
 
-		// SSL Ä£Ê½ÏÂ£¬µÈ´ı¿Í»§¶Ë·¢ËÍÎÕÊÖĞÅÏ¢
+		// SSL æ¨¡å¼ä¸‹ï¼Œç­‰å¾…å®¢æˆ·ç«¯å‘é€æ¡æ‰‹ä¿¡æ¯
 		if (__ssl_conf != NULL) {
-			// ×¢²á SSL IO ¹ı³ÌµÄ¹³×Ó
+			// æ³¨å†Œ SSL IO è¿‡ç¨‹çš„é’©å­
 			acl::polarssl_io* ssl = new
 				acl::polarssl_io(*__ssl_conf, true, true);
 
@@ -298,12 +298,12 @@ public:
 				return false;
 			}
 
-			// ½«¿Í»§¶ËÖÃÓÚ¶Á¼àÌı×´Ì¬ÒÔ´¥·¢ read_wakeup »Øµ÷¹ı³Ì£¬
-			// SSL ÎÕÊÖ¹ı³Ì½«ÔÚ read_wakeup ÖĞÍê³É
+			// å°†å®¢æˆ·ç«¯ç½®äºè¯»ç›‘å¬çŠ¶æ€ä»¥è§¦å‘ read_wakeup å›è°ƒè¿‡ç¨‹ï¼Œ
+			// SSL æ¡æ‰‹è¿‡ç¨‹å°†åœ¨ read_wakeup ä¸­å®Œæˆ
 			client->read_wait(__timeout);
 		}
 
-		// ·Ç SSL Ä£Ê½ÏÂ£¬´ÓÒì²½Á÷¶ÁÒ»ĞĞÊı¾İ
+		// é SSL æ¨¡å¼ä¸‹ï¼Œä»å¼‚æ­¥æµè¯»ä¸€è¡Œæ•°æ®
 		else {
 			client->gets(__timeout, false);
 		}
@@ -326,7 +326,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	// ÊÂ¼şÒıÇæÊÇ·ñ²ÉÓÃÄÚºËÖĞµÄ¸ßĞ§Ä£Ê½
+	// äº‹ä»¶å¼•æ“æ˜¯å¦é‡‡ç”¨å†…æ ¸ä¸­çš„é«˜æ•ˆæ¨¡å¼
 	bool use_kernel = false;
 	acl::string key_file, cert_file;
 	acl::string addr("127.0.0.1:9001"), libssl_path;
@@ -366,27 +366,27 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ³õÊ¼»¯ACL¿â(ÓÈÆäÊÇÔÚWIN32ÏÂÒ»¶¨Òªµ÷ÓÃ´Ëº¯Êı£¬ÔÚUNIXÆ½Ì¨ÏÂ¿É²»µ÷ÓÃ)
+	// åˆå§‹åŒ–ACLåº“(å°¤å…¶æ˜¯åœ¨WIN32ä¸‹ä¸€å®šè¦è°ƒç”¨æ­¤å‡½æ•°ï¼Œåœ¨UNIXå¹³å°ä¸‹å¯ä¸è°ƒç”¨)
 	acl::acl_cpp_init();
 
 	acl::log::stdout_open(true);
 
 	if (!libssl_path.empty()) {
-		// ÉèÖÃ libpolarssl.so ¿âÈ«Â·¾¶
+		// è®¾ç½® libpolarssl.so åº“å…¨è·¯å¾„
 		acl::polarssl_conf::set_libpath(libssl_path);
 
-		// ¶¯Ì¬¼ÓÔØ libpolarssl.so ¿â
+		// åŠ¨æ€åŠ è½½ libpolarssl.so åº“
 		acl::polarssl_conf::load();
 	}
 
-	// µ±Ë½Ô¿¼°Ö¤Êé¶¼´æÔÚÊ±²Å²ÉÓÃ SSL Í¨ĞÅ·½Ê½
+	// å½“ç§é’¥åŠè¯ä¹¦éƒ½å­˜åœ¨æ—¶æ‰é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
 	if (!key_file.empty() && !cert_file.empty()) {
 		__ssl_conf = new acl::polarssl_conf();
 
-		// ÔÊĞí·şÎñ¶ËµÄ SSL »á»°»º´æ¹¦ÄÜ
+		// å…è®¸æœåŠ¡ç«¯çš„ SSL ä¼šè¯ç¼“å­˜åŠŸèƒ½
 		__ssl_conf->enable_cache(true);
 
-		// Ìí¼Ó±¾µØ·şÎñµÄÖ¤Êé
+		// æ·»åŠ æœ¬åœ°æœåŠ¡çš„è¯ä¹¦
 		if (!__ssl_conf->add_cert(cert_file.c_str())) {
 			delete __ssl_conf;
 			__ssl_conf = NULL;
@@ -394,7 +394,7 @@ int main(int argc, char* argv[])
 				<< std::endl;
 		}
 
-		// Ìí¼Ó±¾µØ·şÎñÃÜÔ¿
+		// æ·»åŠ æœ¬åœ°æœåŠ¡å¯†é’¥
 		else if (!__ssl_conf->set_key(key_file.c_str())) {
 			delete __ssl_conf;
 			__ssl_conf = NULL;
@@ -405,30 +405,30 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ¹¹½¨Òì²½ÒıÇæÀà¶ÔÏó
+	// æ„å»ºå¼‚æ­¥å¼•æ“ç±»å¯¹è±¡
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
 
-	// ´´½¨¼àÌıÒì²½Á÷
+	// åˆ›å»ºç›‘å¬å¼‚æ­¥æµ
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
 
-	// ¼àÌıÖ¸¶¨µÄµØÖ·
+	// ç›‘å¬æŒ‡å®šçš„åœ°å€
 	if (!sstream->open(addr.c_str())) {
 		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
-		// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+		// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 		handle.check();
 
 		getchar();
 		return 1;
 	}
 
-	// ´´½¨»Øµ÷Àà¶ÔÏó£¬µ±ÓĞĞÂÁ¬½Óµ½´ïÊ±×Ô¶¯µ÷ÓÃ´ËÀà¶ÔÏóµÄ»Øµ÷¹ı³Ì
+	// åˆ›å»ºå›è°ƒç±»å¯¹è±¡ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾æ—¶è‡ªåŠ¨è°ƒç”¨æ­¤ç±»å¯¹è±¡çš„å›è°ƒè¿‡ç¨‹
 	io_accept_callback callback;
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			std::cout << "aio_server stop now ..." << std::endl;
 			break;
@@ -439,13 +439,13 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ¹Ø±Õ¼àÌıÁ÷²¢ÊÍ·ÅÁ÷¶ÔÏó
+	// å…³é—­ç›‘å¬æµå¹¶é‡Šæ”¾æµå¯¹è±¡
 	sstream->close();
 
-	// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+	// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 	handle.check();
 
-	// É¾³ı acl::polarssl_conf ¶¯Ì¬¶ÔÏó
+	// åˆ é™¤ acl::polarssl_conf åŠ¨æ€å¯¹è±¡
 	delete __ssl_conf;
 
 	return 0;

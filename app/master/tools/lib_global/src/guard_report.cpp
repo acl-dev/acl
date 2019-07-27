@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "guard_report.h"
 
 #define SET_TIME(x) do { \

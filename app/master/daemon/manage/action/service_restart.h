@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 struct restart_req_t;
 struct restart_res_t;

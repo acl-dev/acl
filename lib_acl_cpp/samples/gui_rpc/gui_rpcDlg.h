@@ -1,30 +1,30 @@
-// gui_rpcDlg.h : Í·ÎÄ¼ş
+ï»¿// gui_rpcDlg.h : å¤´æ–‡ä»¶
 //
 
 #pragma once
 #include "MeterBar.h"
 #include "rpc/http_download.h"
 
-// Cgui_rpcDlg ¶Ô»°¿ò
+// Cgui_rpcDlg å¯¹è¯æ¡†
 class Cgui_rpcDlg : public CDialog
 	, public rpc_callback
 {
-// ¹¹Ôì
+// æ„é€ 
 public:
-	Cgui_rpcDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
+	Cgui_rpcDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
 	~Cgui_rpcDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_GUI_RPC_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	HICON m_hIcon;
 
-	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
+	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
@@ -36,7 +36,7 @@ protected:
 
 private:
 	CWndResizer m_resizer;
-	//CRect m_rect;  //ÓÃÓÚ±£´æ¶Ô»°¿ò´óĞ¡±ä»¯Ç°µÄ´óĞ¡
+	//CRect m_rect;  //ç”¨äºä¿å­˜å¯¹è¯æ¡†å¤§å°å˜åŒ–å‰çš„å¤§å°
 
 	CEdit m_reqCtlEdit;
 	CEdit m_resCtlEdit;
@@ -45,16 +45,16 @@ private:
 	CString m_serverPort;
 
 public:
-	// »ùÀà rpc_callback Ğéº¯Êı
+	// åŸºç±» rpc_callback è™šå‡½æ•°
 
-	// ÉèÖÃ HTTP ÇëÇóÍ·Êı¾İĞéº¯Êı
+	// è®¾ç½® HTTP è¯·æ±‚å¤´æ•°æ®è™šå‡½æ•°
 	virtual void SetRequestHdr(const char* hdr);
-	// ÉèÖÃ HTTP ÏìÓ¦Í·Êı¾İĞéº¯Êı
+	// è®¾ç½® HTTP å“åº”å¤´æ•°æ®è™šå‡½æ•°
 	virtual void SetResponseHdr(const char* hdr);
-	// ÏÂÔØ¹ı³ÌÖĞµÄ»Øµ÷º¯ÊıĞéº¯Êı
+	// ä¸‹è½½è¿‡ç¨‹ä¸­çš„å›è°ƒå‡½æ•°è™šå‡½æ•°
 	virtual void OnDownloading(long long int content_length,
 		long long int total_read);
-	// ÏÂÔØÍê³ÉÊ±µÄ»Øµ÷º¯ÊıĞéº¯Êı
+	// ä¸‹è½½å®Œæˆæ—¶çš„å›è°ƒå‡½æ•°è™šå‡½æ•°
 	virtual void OnDownloadOver(long long int total_read,
 		double spent);
 public:

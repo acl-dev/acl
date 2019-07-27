@@ -1,9 +1,9 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <errno.h>
 #include <string.h>
 
 #ifdef WIN32
-//#include "vld.h"  // win32 ÏÂ½øĞĞÄÚ´æĞ¹Â¶¼ì²â
+//#include "vld.h"  // win32 ä¸‹è¿›è¡Œå†…å­˜æ³„éœ²æ£€æµ‹
 #include "lib_acl.h"
 #else
 #include <getopt.h>
@@ -24,7 +24,7 @@ static int isvalidChinese(char c1, char c2)
 		return (0);
 }
 
-// »ñµÃÓĞĞ§µÄºº×Ö×Ö·û
+// è·å¾—æœ‰æ•ˆçš„æ±‰å­—å­—ç¬¦
 static int get_valid_string(char *src, unsigned dlen, char *buffer, unsigned bsize)
 {
 	int n = 0;
@@ -41,14 +41,14 @@ static int get_valid_string(char *src, unsigned dlen, char *buffer, unsigned bsi
 
 	src_ptr = (unsigned char *)src;
 
-	/* Îª×îºóÒ»¸ö '\0' Áô³öÒ»¸ö×Ö½Ú¿Õ¼ä */
+	/* ä¸ºæœ€åä¸€ä¸ª '\0' ç•™å‡ºä¸€ä¸ªå­—èŠ‚ç©ºé—´ */
 	n =  bsize - 1;
 
 	for (ch = src_ptr; *ch; ch++) {
 		if (ch - src_ptr >= n)
 			break;
 
-		/* ÏÈÅĞ¶ÏÇ°Ò»¸ö×Ö½Ú×î¸ßÎ»ÊÇ·ñÎª 1 */
+		/* å…ˆåˆ¤æ–­å‰ä¸€ä¸ªå­—èŠ‚æœ€é«˜ä½æ˜¯å¦ä¸º 1 */
 		if (firstChineseChar) {
 			if (!isvalidChinese(lastChar,*ch))
 				break;
@@ -57,12 +57,12 @@ static int get_valid_string(char *src, unsigned dlen, char *buffer, unsigned bsi
 			//	break;
 
 			firstChineseChar = 0; 
-			/* ÏÈ¿½±´Ç°Ò»¸ö×Ö½Ú */
+			/* å…ˆæ‹·è´å‰ä¸€ä¸ªå­—èŠ‚ */
 			*obj_ptr++ = lastChar;
 			*obj_ptr++ = *ch;
 		}
 		else if ((*ch) & 0x80) {
-			/* ËµÃ÷µ±Ç°×Ö½ÚµÄ×î¸ßÎ»Îª 1, ÇÒÓĞ¿ÉÄÜÊÇºº×ÖµÄµÚÒ»¸ö×Ö½Ú */
+			/* è¯´æ˜å½“å‰å­—èŠ‚çš„æœ€é«˜ä½ä¸º 1, ä¸”æœ‰å¯èƒ½æ˜¯æ±‰å­—çš„ç¬¬ä¸€ä¸ªå­—èŠ‚ */
 			firstChineseChar = 1;
 			lastChar = *ch;
 		}

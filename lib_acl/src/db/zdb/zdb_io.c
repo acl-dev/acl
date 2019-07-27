@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -46,8 +46,8 @@ typedef struct ZDB_IO_BLK {
 } ZDB_IO_BLK;
 
 struct ZDB_IO {
-	avl_tree_t blk_tree;	/* ´æ´¢ËùÓÐÐèÒªÍ¬²½ÖÁ´ÅÅÌµÄ»º´æÊý¾Ý¿é */
-	ACL_CACHE *blk_cache;	/* ´æ´¢ËùÓÐ»º´æÊý¾Ý¿é */
+	avl_tree_t blk_tree;	/* å­˜å‚¨æ‰€æœ‰éœ€è¦åŒæ­¥è‡³ç£ç›˜çš„ç¼“å­˜æ•°æ®å— */
+	ACL_CACHE *blk_cache;	/* å­˜å‚¨æ‰€æœ‰ç¼“å­˜æ•°æ®å— */
 	size_t blk_len;
 	ACL_SLICE *blk_slice;
 	ACL_SLICE *dat_slice;
@@ -216,7 +216,7 @@ int zdb_io_cache_sync(ZDB_STORE *store)
 		blk_iter = blk_first;
 		acl_vstring_memcpy(io->buf, blk_iter->dat, blk_iter->dlen);
 
-		/* ¾¡Á¿½«Á¬ÐøÊý¾Ý×éºÏ³ÉÒ»¿éÊý¾ÝÐ´£¬¿ÉÒÔ¼õÉÙ IO ´ÎÊý */
+		/* å°½é‡å°†è¿žç»­æ•°æ®ç»„åˆæˆä¸€å—æ•°æ®å†™ï¼Œå¯ä»¥å‡å°‘ IO æ¬¡æ•° */
 		n = 0;
 		while (1) {
 			blk_next = (ZDB_IO_BLK*) AVL_NEXT(&io->blk_tree, blk_iter);
@@ -227,7 +227,7 @@ int zdb_io_cache_sync(ZDB_STORE *store)
 
 			avl_remove(&io->blk_tree, blk_iter);
 
-			/* ·ÀÖ¹ÔÚ io_blk_free ÔÙ´Îµ÷ÓÃ avl_remove */
+			/* é˜²æ­¢åœ¨ io_blk_free å†æ¬¡è°ƒç”¨ avl_remove */
 			blk_iter->flag &= ~BLK_F_DIRTY;
 			blk_iter = blk_next;
 			acl_vstring_memcat(io->buf, blk_iter->dat, blk_iter->dlen);
@@ -263,7 +263,7 @@ int zdb_io_cache_sync(ZDB_STORE *store)
 		dlen += (int) LEN(io->buf);
 		if (n == 0) {
 			avl_remove(&io->blk_tree, blk_first);
-			/* ·ÀÖ¹ÔÚ io_blk_free ÔÙ´Îµ÷ÓÃ avl_remove */
+			/* é˜²æ­¢åœ¨ io_blk_free å†æ¬¡è°ƒç”¨ avl_remove */
 			blk_first->flag &= ~BLK_F_DIRTY;
 		}
 	}
@@ -288,16 +288,16 @@ static void zdb_io_cache_add(ZDB_IO *io, const void *buf,
 	blk->dlen = len;
 	if (dirty) {
 		blk->flag |= BLK_F_DIRTY;
-		/* Ìí¼Ó½øÐ´»º´æÖÐ */
+		/* æ·»åŠ è¿›å†™ç¼“å­˜ä¸­ */
 		avl_add(&io->blk_tree, blk);
 
-		/* Í¬²½Ð´»º´æÖÐµÄÊý¾Ý¿éÖÁ´ÅÅÌ */
+		/* åŒæ­¥å†™ç¼“å­˜ä¸­çš„æ•°æ®å—è‡³ç£ç›˜ */
 		if ((int) avl_numnodes(&io->blk_tree) >= io->store->wback_max) {
 			(void) zdb_io_cache_sync(io->store);
 		}
 	}
 
-	/* Ìí¼Ó½ø×Ü»º´æÖÐ */
+	/* æ·»åŠ è¿›æ€»ç¼“å­˜ä¸­ */
 	(void) acl_cache_enter(io->blk_cache, key, blk);
 }
 
@@ -310,7 +310,7 @@ static int zdb_io_cache_write(ZDB_IO *io, const void *buf,
 	if (io->blk_len < len)
 		return (0);
 
-	/* ÏÈ²éÑ¯»º´æÖÐÊÇ·ñ´æÔÚ */
+	/* å…ˆæŸ¥è¯¢ç¼“å­˜ä¸­æ˜¯å¦å­˜åœ¨ */
 
 	acl_i64toa(off, key, sizeof(key));
 
@@ -319,15 +319,15 @@ static int zdb_io_cache_write(ZDB_IO *io, const void *buf,
 		if (len > blk->dlen)
 			blk->dlen = len;
 		memcpy(blk->dat, buf, len);  /* just override */
-		if ((blk->flag & BLK_F_DIRTY))  /* ËµÃ÷ÒÑ¾­ÔÚÐ´»º´æÁË */
+		if ((blk->flag & BLK_F_DIRTY))  /* è¯´æ˜Žå·²ç»åœ¨å†™ç¼“å­˜äº† */
 			return (int) (len);
-		/* ÐèÒªÌí¼Ó½øÐ´»º´æ */
+		/* éœ€è¦æ·»åŠ è¿›å†™ç¼“å­˜ */
 		blk->flag |= BLK_F_DIRTY;
 		avl_add(&io->blk_tree, blk);
 		return (int) (len);
 	}
 
-	/* ËµÃ÷ÊÇÐÂÊý¾Ý */
+	/* è¯´æ˜Žæ˜¯æ–°æ•°æ® */
 
 	zdb_io_cache_add(io, buf, len, off, 1);
 	return (int) (len);
@@ -427,7 +427,7 @@ int zdb_read(ZDB_STORE *store, void *buf, size_t size, zdb_off_t off)
 #endif
 
 	if (store->io != NULL) {
-		/* Ìí¼Ó½ø»º´æÖÐ */
+		/* æ·»åŠ è¿›ç¼“å­˜ä¸­ */
 		zdb_io_cache_add(store->io, buf, size, off, 0);
 	}
 

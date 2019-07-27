@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 #include <stdlib.h>
@@ -17,31 +17,31 @@ struct acl_pthread_mutex_t;
 namespace acl {
 
 /**
- * »¥³âËø£¬¿ÉÒÔÍ¬Ê±´´½¨ÎÄ¼şËøºÍÏß³ÌËø£¬Ò²¿ÉÒÔÖ»´´½¨Ò»ÖÖËø
+ * äº’æ–¥é”ï¼Œå¯ä»¥åŒæ—¶åˆ›å»ºæ–‡ä»¶é”å’Œçº¿ç¨‹é”ï¼Œä¹Ÿå¯ä»¥åªåˆ›å»ºä¸€ç§é”
  */
 class ACL_CPP_API locker : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param use_mutex {bool} ÊÇ·ñ´´½¨Ïß³ÌËø
-	 * @param use_spinlock {bool} ÄÚ²¿µ±Ê¹ÓÃÏß³ÌËøÊ±ÊÇ·ñĞèÒª×ÔĞıËø
+	 * æ„é€ å‡½æ•°
+	 * @param use_mutex {bool} æ˜¯å¦åˆ›å»ºçº¿ç¨‹é”
+	 * @param use_spinlock {bool} å†…éƒ¨å½“ä½¿ç”¨çº¿ç¨‹é”æ—¶æ˜¯å¦éœ€è¦è‡ªæ—‹é”
 	 */
 	locker(bool use_mutex = true, bool use_spinlock = false);
 	virtual ~locker();
 
 	/**
-	 * ¸ù¾İÎÄ¼şÂ·¾¶´´½¨ÎÄ¼şËø
-	 * @param file_path {const char*} ÎÄ¼şÂ·¾¶£¬·Ç¿Õ
-	 * @return {bool} ÊÇ·ñ³É¹¦
-	 * ×¢£º´Ëº¯ÊıÓëÏÂÃæµÄ open º¯Êı½öÄÜÍ¬Ê±µ÷ÓÃÒ»¸ö
+	 * æ ¹æ®æ–‡ä»¶è·¯å¾„åˆ›å»ºæ–‡ä»¶é”
+	 * @param file_path {const char*} æ–‡ä»¶è·¯å¾„ï¼Œéç©º
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * æ³¨ï¼šæ­¤å‡½æ•°ä¸ä¸‹é¢çš„ open å‡½æ•°ä»…èƒ½åŒæ—¶è°ƒç”¨ä¸€ä¸ª
 	 */
 	bool open(const char* file_path);
 
 	/**
-	 * ¸ù¾İÎÄ¼ş¾ä±ú´´½¨ÎÄ¼şËø
-	 * @param fh {int} ÎÄ¼ş¾ä±ú
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * æ ¹æ®æ–‡ä»¶å¥æŸ„åˆ›å»ºæ–‡ä»¶é”
+	 * @param fh {int} æ–‡ä»¶å¥æŸ„
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool open(void* fh);
@@ -50,20 +50,20 @@ public:
 #endif
 
 	/**
-	 * Õë¶ÔÒÑ¾­´ò¿ªµÄËø(°üÀ¨Ïß³ÌËøºÍÎÄ¼şËø)½øĞĞ¼ÓËø
-	 * @return {bool} ¼ÓËøÊÇ·ñ³É¹¦
+	 * é’ˆå¯¹å·²ç»æ‰“å¼€çš„é”(åŒ…æ‹¬çº¿ç¨‹é”å’Œæ–‡ä»¶é”)è¿›è¡ŒåŠ é”
+	 * @return {bool} åŠ é”æ˜¯å¦æˆåŠŸ
 	 */
 	bool lock();
 
 	/**
-	 * ³¢ÊÔ¶ÔÒÑ¾­´ò¿ªµÄËø(°üÀ¨Ïß³ÌËøºÍÎÄ¼şËø)½øĞĞ¼ÓËø
-	 * @return {bool} ¼ÓËøÊÇ·ñ³É¹¦
+	 * å°è¯•å¯¹å·²ç»æ‰“å¼€çš„é”(åŒ…æ‹¬çº¿ç¨‹é”å’Œæ–‡ä»¶é”)è¿›è¡ŒåŠ é”
+	 * @return {bool} åŠ é”æ˜¯å¦æˆåŠŸ
 	 */
 	bool try_lock();
 
 	/**
-	 * Õë¶ÔÒÑ¾­´ò¿ªµÄËø(°üÀ¨Ïß³ÌËøºÍÎÄ¼şËø)½øĞĞ½âËø
-	 * @return {bool} ½âËøÊÇ·ñ³É¹¦
+	 * é’ˆå¯¹å·²ç»æ‰“å¼€çš„é”(åŒ…æ‹¬çº¿ç¨‹é”å’Œæ–‡ä»¶é”)è¿›è¡Œè§£é”
+	 * @return {bool} è§£é”æ˜¯å¦æˆåŠŸ
 	 */
 	bool unlock();
 

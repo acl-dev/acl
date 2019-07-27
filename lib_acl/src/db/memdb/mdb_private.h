@@ -1,4 +1,4 @@
-#ifndef	__MDB_PRIVATE_INCLUDE_H__
+﻿#ifndef	__MDB_PRIVATE_INCLUDE_H__
 #define	__MDB_PRIVATE_INCLUDE_H__
 
 #include "struct.h"

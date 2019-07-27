@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -23,7 +23,7 @@ mail_attach::mail_attach(const char* filepath, const char* content_type,
 	string filename;
 	filename.basename(filename);
 
-	// ÎÄ¼şÃûĞèÒª²ÉÓÃ rfc2047 ±àÂë
+	// æ–‡ä»¶åéœ€è¦é‡‡ç”¨ rfc2047 ç¼–ç 
 	if (!rfc2047_encode(filename.c_str(), charset, filename_)) {
 		filename_ = filename.c_str();
 	}
@@ -40,7 +40,7 @@ bool mail_attach::rfc2047_encode(const char* name, const char* charset,
 		return false;
 	}
 
-	// ÎÄ¼şÃûĞèÒª²ÉÓÃ rfc2047 ±àÂë
+	// æ–‡ä»¶åéœ€è¦é‡‡ç”¨ rfc2047 ç¼–ç 
 	if (!rfc2047::encode(name, (int) strlen(name), &out, charset, 'B', false)) {
 		out = name;
 		return false;

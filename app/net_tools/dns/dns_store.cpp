@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "global/global.h"
 #include "nslookup.h"
 #include "dns_store.h"
@@ -18,7 +18,7 @@ dns_store::~dns_store()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³Ì¹ı³Ì
+// ä¸»çº¿ç¨‹è¿‡ç¨‹
 
 void dns_store::rpc_onover()
 {
@@ -28,7 +28,7 @@ void dns_store::rpc_onover()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³Ì¹ı³Ì
+// å­çº¿ç¨‹è¿‡ç¨‹
 
 static const char* CREATE_TBL =
 "create table dns_tbl\r\n"

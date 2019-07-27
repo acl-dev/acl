@@ -1,4 +1,4 @@
-#ifndef	__SERVICE_IPC_INCLUDE_H__
+﻿#ifndef	__SERVICE_IPC_INCLUDE_H__
 #define	__SERVICE_IPC_INCLUDE_H__
 
 #include "lib_acl.h"

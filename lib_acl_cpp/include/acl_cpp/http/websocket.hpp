@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * Copyright (C) 2015-2018
  * All rights reserved.
  *
@@ -55,25 +55,25 @@ struct frame_header
 class string;
 
 /**
- * websocket »ù´¡Àà
+ * websocket åŸºç¡€ç±»
  */
 class ACL_CPP_API websocket : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôì·½·¨
+	 * æ„é€ æ–¹æ³•
 	 * @param client {socket_stream&}
 	 */
 	websocket(socket_stream& client);
 	~websocket(void);
 
 	/**
-	 * µ±Àà¶ÔÏó±»ÖØ¸´Ê¹ÓÃÊ±£¬ĞèÒªÍ¨¹ı±¾·½·¨½«×´Ì¬ÖØÖØ
+	 * å½“ç±»å¯¹è±¡è¢«é‡å¤ä½¿ç”¨æ—¶ï¼Œéœ€è¦é€šè¿‡æœ¬æ–¹æ³•å°†çŠ¶æ€é‡é‡
 	 */
 	websocket& reset(void);
 
 	/**
-	 * »ñµÃ±¾Àà¶ÔÏóËù°ó¶¨µÄ socket_stream ¶ÔÏó
+	 * è·å¾—æœ¬ç±»å¯¹è±¡æ‰€ç»‘å®šçš„ socket_stream å¯¹è±¡
 	 * @return {socket_stream&}
 	 */
 	socket_stream& get_stream(void) const
@@ -82,61 +82,61 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃÊÇ·ñ½áÊøµÄ±êÖ¾Î»
+	 * è®¾ç½®æ˜¯å¦ç»“æŸçš„æ ‡å¿—ä½
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_fin(bool yes);
 
 	/**
-	 * ÉèÖÃ±£Áô±êÖ¾Î»
+	 * è®¾ç½®ä¿ç•™æ ‡å¿—ä½
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_rsv1(bool yes);
 
 	/**
-	 * ÉèÖÃ±£Áô±êÖ¾Î»
+	 * è®¾ç½®ä¿ç•™æ ‡å¿—ä½
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_rsv2(bool yes);
 
 	/**
-	 * ÉèÖÃ±£Áô±êÖ¾Î»
+	 * è®¾ç½®ä¿ç•™æ ‡å¿—ä½
 	 * @param yes {bool}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_rsv3(bool yes);
 
 	/**
-	 * ÉèÖÃÊı¾İÖ¡ÀàĞÍ£¬²Î¼ûÉÏÃæ¶¨Òå£ºFRAME_XXX
+	 * è®¾ç½®æ•°æ®å¸§ç±»å‹ï¼Œå‚è§ä¸Šé¢å®šä¹‰ï¼šFRAME_XXX
 	 * @param type {unsigned char}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_opcode(unsigned char type);
 
 	/**
-	 * ÉèÖÃ±¾Êı¾İÖ¡Êı¾İÔØÌåµÄ×Ü³¤¶È
+	 * è®¾ç½®æœ¬æ•°æ®å¸§æ•°æ®è½½ä½“çš„æ€»é•¿åº¦
 	 * @param len {unsigned long long}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_payload_len(unsigned long long len);
 
 	/**
-	 * ÉèÖÃÊı¾İÖ¡Êı¾İµÄÑÚÂëÖµ
+	 * è®¾ç½®æ•°æ®å¸§æ•°æ®çš„æ©ç å€¼
 	 * @param mask {unsigned int}
 	 * @return {websocket&}
 	 */
 	websocket& set_frame_masking_key(unsigned int mask);
 
 	/**
-	 * ·¢ËÍÊıÖÆÖ¡ÖĞµÄÊı¾İÌå£¬¿ÉÒÔÑ­»·µ÷ÓÃ±¾·½·¨·¢ËÍ±¾Ö¡µÄÊı¾İ£¬·¢ËÍÊı¾İ
-	 * ×Ü³¤¶È(¼´¶à´Îµ÷ÓÃ±¾·½·¨µÄÊı¾İ³¤¶ÈÖ®ºÍ)Ó¦Óë set_frame_payload_len
-	 * ·½·¨ÉèÖÃµÄÖµÏàÍ¬
+	 * å‘é€æ•°åˆ¶å¸§ä¸­çš„æ•°æ®ä½“ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬æ–¹æ³•å‘é€æœ¬å¸§çš„æ•°æ®ï¼Œå‘é€æ•°æ®
+	 * æ€»é•¿åº¦(å³å¤šæ¬¡è°ƒç”¨æœ¬æ–¹æ³•çš„æ•°æ®é•¿åº¦ä¹‹å’Œ)åº”ä¸ set_frame_payload_len
+	 * æ–¹æ³•è®¾ç½®çš„å€¼ç›¸åŒ
 	 * @param data {const void*}
 	 * @param len {size_t}
-	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦
+	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸ
 	 */
 	bool send_frame_data(const void* data, size_t len);
 	bool send_frame_data(void* data, size_t len);
@@ -144,11 +144,11 @@ public:
 	bool send_frame_data(char* str);
 
 	/**
-	 * ·¢ËÍ PONG Êı¾İÖ¡
-	 * @param data {const void*} PONG Êı¾İÖ¡µÄÊı¾İÔØÌå£¬¿ÉÒÔÎª NULL
-	 * @param len {size_t} data Êı¾İ³¤¶È£¬µ± data Îª NULL »ò len Îª 0 Ê±£¬
-	 *  ±íÊ¾Ã»ÓĞÊı¾İÔØºÉ
-	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦
+	 * å‘é€ PONG æ•°æ®å¸§
+	 * @param data {const void*} PONG æ•°æ®å¸§çš„æ•°æ®è½½ä½“ï¼Œå¯ä»¥ä¸º NULL
+	 * @param len {size_t} data æ•°æ®é•¿åº¦ï¼Œå½“ data ä¸º NULL æˆ– len ä¸º 0 æ—¶ï¼Œ
+	 *  è¡¨ç¤ºæ²¡æœ‰æ•°æ®è½½è·
+	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸ
 	 */
 	bool send_frame_pong(const void* data, size_t len);
 	bool send_frame_pong(void* data, size_t len);
@@ -156,11 +156,11 @@ public:
 	bool send_frame_pong(char* str);
 
 	/**
-	 * ·¢ËÍ PING Êı¾İÖ¡
-	 * @param data {const void*} PING Êı¾İÖ¡µÄÊı¾İÔØÌå£¬¿ÉÒÔÎª NULL
-	 * @param len {size_t} data Êı¾İ³¤¶È£¬µ± data Îª NULL »ò len Îª 0 Ê±£¬
-	 *  ±íÊ¾Ã»ÓĞÊı¾İÔØºÉ
-	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦
+	 * å‘é€ PING æ•°æ®å¸§
+	 * @param data {const void*} PING æ•°æ®å¸§çš„æ•°æ®è½½ä½“ï¼Œå¯ä»¥ä¸º NULL
+	 * @param len {size_t} data æ•°æ®é•¿åº¦ï¼Œå½“ data ä¸º NULL æˆ– len ä¸º 0 æ—¶ï¼Œ
+	 *  è¡¨ç¤ºæ²¡æœ‰æ•°æ®è½½è·
+	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸ
 	 */
 	bool send_frame_ping(const void* data, size_t len);
 	bool send_frame_ping(void* data, size_t len);
@@ -168,18 +168,18 @@ public:
 	bool send_frame_ping(char* str);
 
 	/**
-	 * µ÷ÓÃ·Ç×èÈû·¢ËÍ½Ó¿ÚÒì²½·¢ËÍÊı¾İ£¬µ±·¢ËÍÍêÊı¾İºó£¬Ó¦ÓÃ²ãÓ¦¸Ãµ÷ÓÃ
-	 * reset() ·½·¨ÖØÖÃ×´Ì¬£¬ÔÚ·¢ËÍÒ»¸öÊı¾İ°üÇ°£¬Ó¦ÓÃ²ãĞèÒªµ÷ÓÃÒÔÉÏµÄ
-	 * set_frame_xxx ·½·¨ÓÃÀ´ÉèÖÃÃ¿Ò»¸öÊı¾İ°üµÄÖ¡Í·ĞÅÏ¢
+	 * è°ƒç”¨éé˜»å¡å‘é€æ¥å£å¼‚æ­¥å‘é€æ•°æ®ï¼Œå½“å‘é€å®Œæ•°æ®åï¼Œåº”ç”¨å±‚åº”è¯¥è°ƒç”¨
+	 * reset() æ–¹æ³•é‡ç½®çŠ¶æ€ï¼Œåœ¨å‘é€ä¸€ä¸ªæ•°æ®åŒ…å‰ï¼Œåº”ç”¨å±‚éœ€è¦è°ƒç”¨ä»¥ä¸Šçš„
+	 * set_frame_xxx æ–¹æ³•ç”¨æ¥è®¾ç½®æ¯ä¸€ä¸ªæ•°æ®åŒ…çš„å¸§å¤´ä¿¡æ¯
 	 * @param conn {aio_socket_stream&}
-	 * @param data {void*} Òª·¢ËÍµÄÊı¾İ£¬ÄÚ²¿»á±»ĞŞ¸Ä
-	 * @param len {size_t} data Êı¾İ³¤¶È
-	 * @return {bool} ÊÇ·ñ³ö´í
+	 * @param data {void*} è¦å‘é€çš„æ•°æ®ï¼Œå†…éƒ¨ä¼šè¢«ä¿®æ”¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
+	 * @return {bool} æ˜¯å¦å‡ºé”™
 	 */
 	bool send_frame_data(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_TEXT ÀàĞÍµÄÊı¾İÖ¡
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_TEXT ç±»å‹çš„æ•°æ®å¸§
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -188,7 +188,7 @@ public:
 	bool send_frame_text(aio_socket_stream& conn, char* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_BINARY ÀàĞÍµÄÊı¾İÖ¡
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_BINARY ç±»å‹çš„æ•°æ®å¸§
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -197,7 +197,7 @@ public:
 	bool send_frame_binary(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_PING ÀàĞÍµÄÊı¾İÖ¡
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_PING ç±»å‹çš„æ•°æ®å¸§
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -206,7 +206,7 @@ public:
 	bool send_frame_ping(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_PONG ÀàĞÍµÄÊı¾İÖ¡
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_PONG ç±»å‹çš„æ•°æ®å¸§
 	 * @param conn {aio_socket_stream&}
 	 * @param data {char*}
 	 * @param len {size_t}
@@ -215,56 +215,56 @@ public:
 	bool send_frame_pong(aio_socket_stream& conn, void* data, size_t len);
 
 	/**
-	 * ¶ÁÈ¡Êı¾İÖ¡Ö¡Í·
+	 * è¯»å–æ•°æ®å¸§å¸§å¤´
 	 * @return {bool}
 	 */
 	bool read_frame_head(void);
 
 	/**
-	 * ¶ÁÈ¡Êı¾İÖ¡Êı¾İÌå£¬ĞèÒªÑ­»·µ÷ÓÃ±¾·½·¨Ö±ÖÁÕı³£½áÊø»ò³ö´í
-	 * @param buf {void*} ´æ·ÅÊı¾İµÄ»º³åÇø
-	 * @param size {size_t} buf Êı¾İ»º³åÇø´óĞ¡
-	 * @return {int} ·µ»ØÖµ > 0 ±íÊ¾¶Áµ½µÄÊı¾İ³¤¶ÈĞèÔÙ´Î¶Á£¬== 0 ±íÊ¾¶Á½áÊø£¬
-	 *  < 0 ±íÊ¾¶Á³ö´í
+	 * è¯»å–æ•°æ®å¸§æ•°æ®ä½“ï¼Œéœ€è¦å¾ªç¯è°ƒç”¨æœ¬æ–¹æ³•ç›´è‡³æ­£å¸¸ç»“æŸæˆ–å‡ºé”™
+	 * @param buf {void*} å­˜æ”¾æ•°æ®çš„ç¼“å†²åŒº
+	 * @param size {size_t} buf æ•°æ®ç¼“å†²åŒºå¤§å°
+	 * @return {int} è¿”å›å€¼ > 0 è¡¨ç¤ºè¯»åˆ°çš„æ•°æ®é•¿åº¦éœ€å†æ¬¡è¯»ï¼Œ== 0 è¡¨ç¤ºè¯»ç»“æŸï¼Œ
+	 *  < 0 è¡¨ç¤ºè¯»å‡ºé”™
 	 */
 	int read_frame_data(void* buf, size_t size);
 
 	/**
-	 * ÓÃÔÚ·Ç×èÈûÍøÂçÍ¨ĞÅÖĞ£¬³¢ÊÔ¶ÁÈ¡ websocket Êı¾İÍ·£¬¿ÉÒÔÑ­»·µ÷ÓÃ±¾·½·¨
-	 * ×ßµ½¸Ã·½·¨·µ»Ø true ±íÊ¾¶Áµ½ÁËÍêÕûµÄ websocket Í·£»Èç¹û·µ»Ø false£¬
-	 * ÔòĞèÍ¨¹ı eof() ·½·¨À´ÅĞ¶ÏÍøÂçÁ¬½ÓÊÇ·ñÒÑ¾­¶Ï¿ª£¬Èç eof() ·µ»Ø true£¬
-	 * ÔòÓ¦ÊÍ·Å±¾¶ÔÏó
-	 * @return {bool} ·µ»Ø true ±íÊ¾¶Áµ½ÁËÍêÕûµÄ websocket Í·£¬¿ÉÒÔÍ¨¹ıµ÷ÓÃ
-	 *  read_frame_data() À´¶ÁÈ¡Êı¾İÌå
+	 * ç”¨åœ¨éé˜»å¡ç½‘ç»œé€šä¿¡ä¸­ï¼Œå°è¯•è¯»å– websocket æ•°æ®å¤´ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬æ–¹æ³•
+	 * èµ°åˆ°è¯¥æ–¹æ³•è¿”å› true è¡¨ç¤ºè¯»åˆ°äº†å®Œæ•´çš„ websocket å¤´ï¼›å¦‚æœè¿”å› falseï¼Œ
+	 * åˆ™éœ€é€šè¿‡ eof() æ–¹æ³•æ¥åˆ¤æ–­ç½‘ç»œè¿æ¥æ˜¯å¦å·²ç»æ–­å¼€ï¼Œå¦‚ eof() è¿”å› trueï¼Œ
+	 * åˆ™åº”é‡Šæ”¾æœ¬å¯¹è±¡
+	 * @return {bool} è¿”å› true è¡¨ç¤ºè¯»åˆ°äº†å®Œæ•´çš„ websocket å¤´ï¼Œå¯ä»¥é€šè¿‡è°ƒç”¨
+	 *  read_frame_data() æ¥è¯»å–æ•°æ®ä½“
 	 */
 	bool peek_frame_head(void);
 
 	/**
-	 * ÓÃÔÚ·Ç×èÈûÍøÂçÍ¨ĞÅÖĞ£¬³¢ÊÔ¶ÁÈ¡ websocket Êı¾İÌå£¬¿ÉÒÔÑ­»·µ÷ÓÃ±¾·½·¨
-	 * @param buf {char*} ´æ·Å¶Áµ½µÄÊı¾İ
-	 * @param size {size_t} buf µÄ¿Õ¼ä´óĞ¡
-	 * @return {int} ¶Áµ½µÄÊı¾İ³¤¶È£¬µ±·µ»ØÖµÎª£º
-	 *   0: ±íÊ¾±¾Ö¡µÄÊı¾İÌå¶ÁÍê±Ï
-	 *  -1: ±íÊ¾¶Á³ö´í£¬ĞèÍ¨¹ıµ÷ÓÃ eof() ÅĞ¶ÏÁ¬½ÓÊÇ·ñÒÑ¾­¹Ø±Õ
-	 *  >0: ±íÊ¾±¾´Î¶Áµ½µÄÊı¾İ³¤¶È
+	 * ç”¨åœ¨éé˜»å¡ç½‘ç»œé€šä¿¡ä¸­ï¼Œå°è¯•è¯»å– websocket æ•°æ®ä½“ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬æ–¹æ³•
+	 * @param buf {char*} å­˜æ”¾è¯»åˆ°çš„æ•°æ®
+	 * @param size {size_t} buf çš„ç©ºé—´å¤§å°
+	 * @return {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦ï¼Œå½“è¿”å›å€¼ä¸ºï¼š
+	 *   0: è¡¨ç¤ºæœ¬å¸§çš„æ•°æ®ä½“è¯»å®Œæ¯•
+	 *  -1: è¡¨ç¤ºè¯»å‡ºé”™ï¼Œéœ€é€šè¿‡è°ƒç”¨ eof() åˆ¤æ–­è¿æ¥æ˜¯å¦å·²ç»å…³é—­
+	 *  >0: è¡¨ç¤ºæœ¬æ¬¡è¯»åˆ°çš„æ•°æ®é•¿åº¦
 	 */
 	int peek_frame_data(char* buf, size_t size);
 	int peek_frame_data(string& buf, size_t size);
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°ÊÇ·ñÒÑ¶ÁÍê websocket Ö¡Í·Êı¾İ
+	 * åˆ¤æ–­å½“å‰æ˜¯å¦å·²è¯»å®Œ websocket å¸§å¤´æ•°æ®
 	 * @return {bool}
 	 */
 	bool is_head_finish(void) const;
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°ÍøÂçÁ¬½ÓÊÇ·ñÒÑ¾­¶Ï¿ª
+	 * åˆ¤æ–­å½“å‰ç½‘ç»œè¿æ¥æ˜¯å¦å·²ç»æ–­å¼€
 	 * @return {bool}
 	 */
 	bool eof(void);
 
 	/**
-	 * »ñµÃ¶Áµ½µÄÊı¾İÖ¡µÄÖ¡Í·
+	 * è·å¾—è¯»åˆ°çš„æ•°æ®å¸§çš„å¸§å¤´
 	 * @return {const frame_header&}
 	 */
 	const frame_header& get_frame_header(void) const
@@ -273,7 +273,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ï±¾Ö¡ÊÇ·ñÎª½áÊøÖ¡
+	 * åˆ¤æ–­æœ¬å¸§æ˜¯å¦ä¸ºç»“æŸå¸§
 	 * @return {bool}
 	 */
 	bool frame_is_fin(void) const
@@ -282,7 +282,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ï±¾Ö¡ÊÇ·ñÉèÖÃÁË±£Áô±êÖ¾Î»
+	 * åˆ¤æ–­æœ¬å¸§æ˜¯å¦è®¾ç½®äº†ä¿ç•™æ ‡å¿—ä½
 	 * @return {bool}
 	 */
 	bool frame_is_rsv1(void) const
@@ -291,7 +291,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ï±¾Ö¡ÊÇ·ñÉèÖÃÁË±£Áô±êÖ¾Î»
+	 * åˆ¤æ–­æœ¬å¸§æ˜¯å¦è®¾ç½®äº†ä¿ç•™æ ‡å¿—ä½
 	 * @return {bool}
 	 */
 	bool frame_is_rsv2(void) const
@@ -300,7 +300,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ï±¾Ö¡ÊÇ·ñÉèÖÃÁË±£Áô±êÖ¾Î»
+	 * åˆ¤æ–­æœ¬å¸§æ˜¯å¦è®¾ç½®äº†ä¿ç•™æ ‡å¿—ä½
 	 * @return {bool}
 	 */
 	bool frame_is_rsv3(void) const
@@ -309,7 +309,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾Êı¾İÖ¡µÄ×´Ì¬Âë£¬²Î¼ûÉÏÃæ£ºFRAME_XXX
+	 * è·å¾—æœ¬æ•°æ®å¸§çš„çŠ¶æ€ç ï¼Œå‚è§ä¸Šé¢ï¼šFRAME_XXX
 	 * @return {unsigned char}
 	 */
 	unsigned char get_frame_opcode(void) const
@@ -318,7 +318,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾Êı¾İÖ¡ÊÇ·ñÉèÖÃÁËÑÚÂë
+	 * è·å¾—æœ¬æ•°æ®å¸§æ˜¯å¦è®¾ç½®äº†æ©ç 
 	 * @return {bool}
 	 */
 	bool frame_has_mask(void) const
@@ -327,7 +327,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾Êı¾İÖ¡µÄÊı¾İÌå³¤¶È
+	 * è·å¾—æœ¬æ•°æ®å¸§çš„æ•°æ®ä½“é•¿åº¦
 	 * @return {unsigned long long}
 	 */
 	unsigned long long get_frame_payload_len(void) const
@@ -336,7 +336,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾Êı¾İÖ¡µÄÑÚÂëÖµ
+	 * è·å¾—æœ¬æ•°æ®å¸§çš„æ©ç å€¼
 	 * @return {unsigned int}
 	 */
 	unsigned int get_frame_masking_key(void) const
@@ -345,7 +345,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾Êı¾İÖ¡ÒÑ¶Áµ½µÄÊı¾İ³¤¶È
+	 * è·å¾—æœ¬æ•°æ®å¸§å·²è¯»åˆ°çš„æ•°æ®é•¿åº¦
 	 * @return {unsigned long long}
 	 */
 	unsigned long long get_frame_payload_nread(void) const

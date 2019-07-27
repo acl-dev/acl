@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file x509.h
  *
  * \brief X.509 certificate and private key decoding

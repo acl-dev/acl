@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "fiber_cpp_define.hpp"
 
 struct ACL_FIBER_MUTEX;
@@ -7,7 +7,7 @@ struct ACL_FIBER_RWLOCK;
 namespace acl {
 
 /**
- * ½öÄÜÓÃÓÚÍ¬Ò»Ïß³ÌÄÚ²¿µÄĞ­³ÌÖ®¼ä½øĞĞ»¥³âµÄ»¥³âËø
+ * ä»…èƒ½ç”¨äºåŒä¸€çº¿ç¨‹å†…éƒ¨çš„åç¨‹ä¹‹é—´è¿›è¡Œäº’æ–¥çš„äº’æ–¥é”
  */
 class FIBER_CPP_API fiber_mutex : public noncopyable
 {
@@ -16,20 +16,20 @@ public:
 	~fiber_mutex(void);
 
 	/**
-	 * µÈ´ı»¥³âËø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·ñÔò±íÊ¾ÄÚ²¿³ö´í
+	 * ç­‰å¾…äº’æ–¥é”
+	 * @return {bool} è¿”å› true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå†…éƒ¨å‡ºé”™
 	 */
 	bool lock(void);
 
 	/**
-	 * ³¢ÊÔµÈ´ı»¥³âËø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·ñÔò±íÊ¾ËøÕıÔÚ±»Õ¼ÓÃ
+	 * å°è¯•ç­‰å¾…äº’æ–¥é”
+	 * @return {bool} è¿”å› true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºé”æ­£åœ¨è¢«å ç”¨
 	 */
 	bool trylock(void);
 
 	/**
-	 * »¥³âËøÓµÓĞÕßÊÍ·ÅËø²¢Í¨ÖªµÈ´ıÕß
-	 * @return {bool} ·µ»Ø true ±íÊ¾Í¨Öª³É¹¦£¬·ñÔò±íÊ¾ÄÚ²¿³ö´í
+	 * äº’æ–¥é”æ‹¥æœ‰è€…é‡Šæ”¾é”å¹¶é€šçŸ¥ç­‰å¾…è€…
+	 * @return {bool} è¿”å› true è¡¨ç¤ºé€šçŸ¥æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå†…éƒ¨å‡ºé”™
 	 */
 	bool unlock(void);
 
@@ -38,7 +38,7 @@ private:
 };
 
 /**
- * ½öÄÜÓÃÔÚÍ¬Ò»Ïß³ÌÄÚµÄĞ­³ÌÖ®¼ä½øĞĞ»¥³âµÄ¶ÁĞ´Ëø
+ * ä»…èƒ½ç”¨åœ¨åŒä¸€çº¿ç¨‹å†…çš„åç¨‹ä¹‹é—´è¿›è¡Œäº’æ–¥çš„è¯»å†™é”
  */
 class FIBER_CPP_API fiber_rwlock : public noncopyable
 {
@@ -47,34 +47,34 @@ public:
 	~fiber_rwlock(void);
 
 	/**
-	 * ¼Ó¶ÁËø
+	 * åŠ è¯»é”
 	 */
 	void rlock(void);
 
 	/**
-	 * ³¢ÊÔ¼Ó¶ÁËø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·ñÔò±íÊ¾ËøÕıÔÚ±»Õ¼ÓÃ
+	 * å°è¯•åŠ è¯»é”
+	 * @return {bool} è¿”å› true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºé”æ­£åœ¨è¢«å ç”¨
 	 */
 	bool tryrlock(void);
 
 	/**
-	 * ½â¶ÁËø
+	 * è§£è¯»é”
 	 */
 	void runlock(void);
 
 	/**
-	 * ¼ÓĞ´Ëø
+	 * åŠ å†™é”
 	 */
 	void wlock(void);
 
 	/**
-	 * ³¢ÊÔ¼ÓĞ´Ëø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·ñÔò±íÊ¾ËøÕıÔÚ±»Õ¼ÓÃ
+	 * å°è¯•åŠ å†™é”
+	 * @return {bool} è¿”å› true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºé”æ­£åœ¨è¢«å ç”¨
 	 */
 	bool trywlock(void);
 
 	/**
-	 * ½âĞ´Ëø
+	 * è§£å†™é”
 	 */
 	void wunlock(void);
 

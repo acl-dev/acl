@@ -1,4 +1,4 @@
-/* DO NOT EDIT: automatically built by dist/s_include. */
+﻿/* DO NOT EDIT: automatically built by dist/s_include. */
 #ifndef	_rpc_client_ext_h_
 #define	_rpc_client_ext_h_
 

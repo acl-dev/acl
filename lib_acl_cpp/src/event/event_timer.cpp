@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/event/event_timer.hpp"
@@ -178,7 +178,7 @@ acl_int64 event_timer::trigger(void)
 
 	std::list<event_task*> tasks;
 
-	// ´Ó¶¨Ê±Æ÷ÖĞÈ¡³öµ½´ïµÄ¶¨Ê±ÈÎÎñ
+	// ä»å®šæ—¶å™¨ä¸­å–å‡ºåˆ°è¾¾çš„å®šæ—¶ä»»åŠ¡
 	for (std::list<event_task*>::iterator it = tasks_.begin();
 		it != tasks_.end();) {
 
@@ -203,13 +203,13 @@ acl_int64 event_timer::trigger(void)
 		it != tasks.end(); ++it) {
 
 		set_task(*it);
-		// µ÷ÓÃ×ÓÀàĞéº¯Êı£¬´¥·¢¶¨Ê±Æ÷ÈÎÎñ¹ı³Ì
+		// è°ƒç”¨å­ç±»è™šå‡½æ•°ï¼Œè§¦å‘å®šæ—¶å™¨ä»»åŠ¡è¿‡ç¨‹
 		timer_callback((*it)->id);
 	}
 
 	tasks.clear();
 
-	// ×ÓÀàÓĞ¿ÉÄÜ»áÔÚ timer_callback ÖĞÉ¾³ıÁËËùÓĞµÄ¶¨Ê±ÈÎÎñ
+	// å­ç±»æœ‰å¯èƒ½ä¼šåœ¨ timer_callback ä¸­åˆ é™¤äº†æ‰€æœ‰çš„å®šæ—¶ä»»åŠ¡
 	if (tasks_.empty()) {
 		return TIMER_EMPTY;
 	}

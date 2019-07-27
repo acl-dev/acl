@@ -1,4 +1,4 @@
-
+ï»¿
 #ifndef	__SERVICE_MAIN_INCLUDE_H__
 #define	__SERVICE_MAIN_INCLUDE_H__
 
@@ -9,16 +9,16 @@ extern "C" {
 #endif
 
 /**
- * ³õÊ¼»¯º¯Êı£¬·şÎñÆ÷Ä£°å¿ò¼ÜÆô¶¯ºó½öµ÷ÓÃ¸Ãº¯ÊıÒ»´Î
- * @param ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
+ * åˆå§‹åŒ–å‡½æ•°ï¼ŒæœåŠ¡å™¨æ¨¡æ¿æ¡†æ¶å¯åŠ¨åä»…è°ƒç”¨è¯¥å‡½æ•°ä¸€æ¬¡
+ * @param ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
  */
 extern void service_init(void *ctx);
 extern void service_exit(void *ctx);
 
 /**
- * Ğ­Òé´¦Àíº¯ÊıÈë¿Ú
- * @param stream {ACL_VSTREAM*} ¿Í»§¶ËÊı¾İÁ¬½ÓÁ÷
- * @param ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
+ * åè®®å¤„ç†å‡½æ•°å…¥å£
+ * @param stream {ACL_VSTREAM*} å®¢æˆ·ç«¯æ•°æ®è¿æ¥æµ
+ * @param ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
  */
 extern int service_main(void* ctx, ACL_VSTREAM *stream);
 

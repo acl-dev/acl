@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -62,13 +62,13 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 
 	WRITE_SAFE_DIABLE(conn);
 
-	/* ���ж��Ƿ��ǳ�ʱ���·��� */
+	/* 先判断是否是超时导致返回 */
 	if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
 		if (aio_timeout_callback(conn) < 0) {
 			acl_aio_iocp_close(conn);
 		} else if (conn->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
-			/* ����������IO�ӳٹر�״̬����Ϊ����дIO�Ѿ��ɹ���ɣ�
-			 * ������Ҫ�������IO�ӳٹرչ���
+			/* 该流正处于IO延迟关闭状态，因为本次写IO已经成功完成，
+			 * 所以需要完成流的IO延迟关闭过程
 			 */
 			acl_aio_iocp_close(conn);
 		} else {
@@ -80,7 +80,7 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	}
 
 #ifdef ACL_WINDOWS
-	/* ����ǻ��� win32 ������Ϣ���¼���������Ҫȡ��֮ǰ���õĳ�ʱ��ʱ�� */
+	/* 如果是基于 win32 窗口消息的事件引擎则需要取消之前设置的超时定时器 */
 	if (conn->aio->event_mode == ACL_EVENT_WMSG) {
 		acl_aio_cancel_timer(conn->aio, ConnectTimer, conn);
 	}
@@ -126,8 +126,8 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
 	}
 
-	/* �����ü�����1�Է�ֹ�� connect_fn �ڲ������˹رչ��̣�connect_fn
-	 * ��ͨ������-1���ڻص����غ������ر�
+	/* 将引用计数加1以防止在 connect_fn 内部调用了关闭过程，connect_fn
+	 * 可通过返回-1，在回调返回后真正关闭
 	 */
 	conn->nrefer++;
 
@@ -135,8 +135,8 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 		ACL_ITER iter;
 		ACL_FIFO connect_handles;
 
-		/* ���뽫�����ص�����ӻص�������һһ�������һ������������,
-		 * ��Ϊ ACL_AIO �ڻص��������п��ܷ���Ƕ�ף���ֹ���ظ�����
+		/* 必须将各个回调句柄从回调队列中一一提出置入一个单独队列中,
+		 * 因为 ACL_AIO 在回调过程中有可能发生嵌套，防止被重复调用
 		 */
 
 		acl_fifo_init(&connect_handles);
@@ -171,8 +171,8 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 	if (ret < 0) {
 		acl_aio_iocp_close(conn);
 	} else if ((conn->flag  & ACL_AIO_FLAG_IOCP_CLOSE)) {
-		/* ֮ǰ�����Ѿ���������IO����ӳٹرձ�־λ��
-		 * ���ٴ�����IO����ӳٹرչ���
+		/* 之前该流已经被设置了IO完成延迟关闭标志位，
+		 * 则再次启动IO完成延迟关闭过程
 		 */
 		acl_aio_iocp_close(conn);
 	}
@@ -258,11 +258,11 @@ static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 
-	/* ��Ϊ�� connect_callback �� connect_timeout ����˹رջص������Ե� 
-	 * ������������ʱ��һ��������ʧ�������µģ������������ӳ�ʱ���¡�
+	/* 因为在 connect_callback 和 connect_timeout 清除了关闭回调，所以当 
+	 * 本函数被调用时，一定是连接失败所导致的，而不是由连接超时所致。
 	 */
 
-	/* ��� DNS ��������� IP ��ַ������������һ�� IP ��ַ */
+	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
 	if (try_connect_one(ctx) != NULL) {
 		return -1;
 	}
@@ -277,13 +277,13 @@ static int connect_timeout(ACL_ASTREAM *conn, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 
-	 /* �� acl aio ����ƣ�����ʱ�ص������������ҷ��� -1 ʱ������ע���
-	  * �رջص����Żᱻ���ã�ͨ���ڴ˴���������������첽������ע��Ĺ�
-	  * �ջص����Ӷ���ֹ connect_failed �ٱ����á�
+	 /* 按 acl aio 的设计，当超时回调函数被调用且返回 -1 时，则所注册的
+	  * 关闭回调接着会被调用，通过在此处清除域名解析后异步连接所注册的关
+	  * 闭回调，从而禁止 connect_failed 再被调用。
 	 */
 	acl_aio_del_close_hook(conn, connect_failed, context);
 
-	/* ��� DNS ��������� IP ��ַ������������һ�� IP ��ַ */
+	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
 	if (try_connect_one(ctx) != NULL) {
 		return -1;
 	}
@@ -298,8 +298,8 @@ static int connect_callback(ACL_ASTREAM *conn, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
 
-	/* ����������������������ʱע��Ļص������������� IO ��ʱ��ر�ʱ
-	 * ֻ�ص�Ӧ��ע��Ļص�����
+	/* 清除在域名解析后进行连接时注册的回调函数，这样当 IO 超时或关闭时
+	 * 只回调应用注册的回调函数
 	 */
 	acl_aio_del_connect_hook(conn, connect_callback, context);
 	acl_aio_del_timeo_hook(conn, connect_timeout, context);

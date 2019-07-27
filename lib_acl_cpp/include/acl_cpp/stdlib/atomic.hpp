@@ -1,15 +1,15 @@
-#pragma once
+﻿#pragma once
 #include "../acl_cpp_define.hpp"
 
 namespace acl
 {
 
 // internal functions being used
-void* atomic_new(void);
-void  atomic_free(void*);
-void  atomic_set(void*, void*);
-void* atomic_cas(void*, void*, void*);
-void* atomic_xchg(void*, void*);
+ACL_CPP_API void* atomic_new(void);
+ACL_CPP_API void  atomic_free(void*);
+ACL_CPP_API void  atomic_set(void*, void*);
+ACL_CPP_API void* atomic_cas(void*, void*, void*);
+ACL_CPP_API void* atomic_xchg(void*, void*);
 
 template<typename T>
 class atomic
@@ -43,7 +43,7 @@ private:
 	atomic(const atomic&);
 };
 
-class atomic_long : public atomic<long long>
+class ACL_CPP_API atomic_long : public atomic<long long>
 {
 public:
 	atomic_long(long long n = 0);
@@ -122,7 +122,7 @@ private:
 
 #include "thread.hpp"
 
-class atomic_long_test
+class ACL_CPP_API atomic_long_test
 {
 private:
 	atomic_long count_;

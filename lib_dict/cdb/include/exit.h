@@ -1,4 +1,4 @@
-#ifndef EXIT_H
+﻿#ifndef EXIT_H
 #define EXIT_H
 
 extern void _exit();

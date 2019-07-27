@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -93,7 +93,7 @@ static void parent(int argc acl_unused, char *argv[])
 {
 	const char *myname = "parent";
 	char  *command;
-	ACL_ARGV *env = acl_argv_split("name1&value1&name2&±äÁ¿Öµ2&name3&±äÁ¿Öµ4", "&");
+	ACL_ARGV *env = acl_argv_split("name1&value1&name2&å˜é‡å€¼2&name3&å˜é‡å€¼4", "&");
 	ACL_VSTREAM *stream;
 	ACL_ARGV *args = acl_argv_alloc(1);
 	char  buf[1024];

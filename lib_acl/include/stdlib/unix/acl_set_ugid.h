@@ -1,4 +1,4 @@
-#ifndef ACL_SET_UGID_INCLUDE_H
+ï»¿#ifndef ACL_SET_UGID_INCLUDE_H
 #define ACL_SET_UGID_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -12,17 +12,17 @@ extern "C" {
 #include <unistd.h>
 
 /**
- * µ÷ÓÃ³ÌĞòµÄÓÃ»§ ID ¼°×é ID
- * @param uid {uid_t} ÓÃ»§ ID
- * @param gid {gid_t} ×é ID
- * @return {int} ÉèÖÃÊÇ·ñ³É¹¦£¬0 ±íÊ¾³É¹¦£¬-1 ±íÊ¾Ê§°Ü
+ * è°ƒç”¨ç¨‹åºçš„ç”¨æˆ· ID åŠç»„ ID
+ * @param uid {uid_t} ç”¨æˆ· ID
+ * @param gid {gid_t} ç»„ ID
+ * @return {int} è®¾ç½®æ˜¯å¦æˆåŠŸï¼Œ0 è¡¨ç¤ºæˆåŠŸï¼Œ-1 è¡¨ç¤ºå¤±è´¥
  */
 int acl_set_ugid(uid_t uid, gid_t gid);
 
 /**
- * ĞŞ¸Ä³ÌĞòµÄÓÃ»§ ID ÎªÖ¸¶¨ÓÃ»§µÄ ID
- * @param user {char* } ÏµÍ³ÓÃ»§ÕËºÅÃû
- * @return {int} ÉèÖÃÊÇ·ñ³É¹¦£¬0 ±íÊ¾³É¹¦£¬-1 ±íÊ¾Ê§°Ü
+ * ä¿®æ”¹ç¨‹åºçš„ç”¨æˆ· ID ä¸ºæŒ‡å®šç”¨æˆ·çš„ ID
+ * @param user {char* } ç³»ç»Ÿç”¨æˆ·è´¦å·å
+ * @return {int} è®¾ç½®æ˜¯å¦æˆåŠŸï¼Œ0 è¡¨ç¤ºæˆåŠŸï¼Œ-1 è¡¨ç¤ºå¤±è´¥
  */
 int acl_change_uid(const char *user);
 

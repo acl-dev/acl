@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef ACL_CPP_LIB
 # ifndef ACL_CPP_API

@@ -1,18 +1,18 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <assert.h>
 
 /**
- * ÓÃ»§×Ô¶¨ÒåÊý¾Ý½á¹¹
+ * ç”¨æˆ·è‡ªå®šä¹‰æ•°æ®ç»“æž„
  */
 typedef struct THREAD_CTX {
 	acl_pthread_pool_t *thr_pool;
 	int   i;
 } THREAD_CTX;
 
-/* È«¾ÖÐÔ¾²Ì¬±äÁ¿ */
+/* å…¨å±€æ€§é™æ€å˜é‡ */
 static acl_pthread_pool_t *__thr_pool = NULL;
 
-/* Ïß³Ì¾Ö²¿´æ´¢±äÁ¿(C99Ö§³Ö´ËÖÖ·½Ê½ÉùÃ÷£¬·½±ãÐí¶à) */
+/* çº¿ç¨‹å±€éƒ¨å­˜å‚¨å˜é‡(C99æ”¯æŒæ­¤ç§æ–¹å¼å£°æ˜Žï¼Œæ–¹ä¾¿è®¸å¤š) */
 static __thread unsigned int __local = 0;
 
 static void free_buf_fn(void *arg)
@@ -26,12 +26,12 @@ static void free_buf_fn(void *arg)
 
 static void worker_thread(void *arg)
 {
-	THREAD_CTX *ctx = (THREAD_CTX*) arg; /* »ñµÃÓÃ»§×Ô¶¨Òå¶ÔÏó */
+	THREAD_CTX *ctx = (THREAD_CTX*) arg; /* èŽ·å¾—ç”¨æˆ·è‡ªå®šä¹‰å¯¹è±¡ */
 	unsigned int   i = 0;
 	static __thread ACL_VSTRING *buf1 = NULL;
 	static __thread ACL_VSTRING *buf2 = NULL;
 
-	/* ½öÊÇÑéÖ¤²ÎÊý´«µÝ¹ý³Ì */
+	/* ä»…æ˜¯éªŒè¯å‚æ•°ä¼ é€’è¿‡ç¨‹ */
 	assert(ctx->thr_pool == __thr_pool);
 
 	if (buf1 == NULL)
@@ -43,7 +43,7 @@ static void worker_thread(void *arg)
 		(unsigned int) acl_pthread_self());
 	acl_vstring_sprintf(buf2, "buf2: tid=%u",
 		(unsigned int) acl_pthread_self());
-	/* ×¢²áº¯Êý£¬µ±¸ÃÏß³ÌÍË³öÊ±×Ô¶¯ÊÍ·Å buf ÄÚ´æ¿Õ¼ä */
+	/* æ³¨å†Œå‡½æ•°ï¼Œå½“è¯¥çº¿ç¨‹é€€å‡ºæ—¶è‡ªåŠ¨é‡Šæ”¾ buf å†…å­˜ç©ºé—´ */
 	acl_pthread_atexit_add(buf1, free_buf_fn);
 	acl_pthread_atexit_add(buf2, free_buf_fn);
 
@@ -53,14 +53,14 @@ static void worker_thread(void *arg)
 		printf("thread id=%u, i=%d, __local=%d\r\n",
 			(unsigned int) acl_pthread_self(), ctx->i, __local);
 		i++;
-		/* ÔÚ±¾Ïß³ÌÖÐ½«Ïß³Ì¾Ö²¿±äÁ¿¼Ó1 */
+		/* åœ¨æœ¬çº¿ç¨‹ä¸­å°†çº¿ç¨‹å±€éƒ¨å˜é‡åŠ 1 */
 		__local++;
 		sleep(1);
 	}
 
 	acl_myfree(ctx);
 
-	/* ÖÁ´Ë£¬¸Ã¹¤×÷Ïß³Ì½øÈë¿ÕÏÐ×´Ì¬£¬Ö±µ½¿ÕÏÐ³¬Ê±ÍË³ö */
+	/* è‡³æ­¤ï¼Œè¯¥å·¥ä½œçº¿ç¨‹è¿›å…¥ç©ºé—²çŠ¶æ€ï¼Œç›´åˆ°ç©ºé—²è¶…æ—¶é€€å‡º */
 }
 
 static int on_thread_init(void *arg)
@@ -68,11 +68,11 @@ static int on_thread_init(void *arg)
 	const char *myname = "on_thread_init";
 	acl_pthread_pool_t *thr_pool = (acl_pthread_pool_t*) arg;
 
-	/* ÅÐ¶ÏÒ»ÏÂ£¬½öÊÇÎªÁËÑéÖ¤²ÎÊý´«µÝ¹ý³Ì */
+	/* åˆ¤æ–­ä¸€ä¸‹ï¼Œä»…æ˜¯ä¸ºäº†éªŒè¯å‚æ•°ä¼ é€’è¿‡ç¨‹ */
 	assert(thr_pool == __thr_pool);
 	printf("%s: thread(%u) init now\r\n", myname, (unsigned int) acl_pthread_self());
 
-	/* ·µ»Ø0±íÊ¾¼ÌÐøÖ´ÐÐ¸ÃÏß³Ì»ñµÃµÄÐÂÈÎÎñ£¬·µ»Ø-1±íÊ¾Í£Ö¹Ö´ÐÐ¸ÃÈÎÎñ */
+	/* è¿”å›ž0è¡¨ç¤ºç»§ç»­æ‰§è¡Œè¯¥çº¿ç¨‹èŽ·å¾—çš„æ–°ä»»åŠ¡ï¼Œè¿”å›ž-1è¡¨ç¤ºåœæ­¢æ‰§è¡Œè¯¥ä»»åŠ¡ */
 	return (0);
 }
 
@@ -81,22 +81,22 @@ static void on_thread_exit(void *arg)
 	const char *myname = "on_thread_exit";
 	acl_pthread_pool_t *thr_pool = (acl_pthread_pool_t*) arg;
 
-	/* ÅÐ¶ÏÒ»ÏÂ£¬½öÊÇÎªÁËÑéÖ¤²ÎÊý´«µÝ¹ý³Ì */
+	/* åˆ¤æ–­ä¸€ä¸‹ï¼Œä»…æ˜¯ä¸ºäº†éªŒè¯å‚æ•°ä¼ é€’è¿‡ç¨‹ */
 	assert(thr_pool == __thr_pool);
 	printf("%s: thread(%u) exit now\r\n", myname, (unsigned int) acl_pthread_self());
 }
 
 static void run_thread_pool(acl_pthread_pool_t *thr_pool)
 {
-	THREAD_CTX *ctx;  /* ÓÃ»§×Ô¶¨Òå²ÎÊý */
+	THREAD_CTX *ctx;  /* ç”¨æˆ·è‡ªå®šä¹‰å‚æ•° */
 
-	/* ÉèÖÃÈ«¾Ö¾²Ì¬±äÁ¿ */
+	/* è®¾ç½®å…¨å±€é™æ€å˜é‡ */
 	__thr_pool = thr_pool;
 
-	/* ÉèÖÃÏß³Ì¿ªÊ¼Ê±µÄ»Øµ÷º¯Êý */
+	/* è®¾ç½®çº¿ç¨‹å¼€å§‹æ—¶çš„å›žè°ƒå‡½æ•° */
 	(void) acl_pthread_pool_atinit(thr_pool, on_thread_init, thr_pool);
 
-	/* ÉèÖÃÏß³ÌÍË³öÊ±µÄ»Øµ÷º¯Êý */
+	/* è®¾ç½®çº¿ç¨‹é€€å‡ºæ—¶çš„å›žè°ƒå‡½æ•° */
 	(void) acl_pthread_pool_atfree(thr_pool, on_thread_exit, thr_pool);
 
 	ctx = (THREAD_CTX*) acl_mycalloc(1, sizeof(THREAD_CTX));
@@ -105,11 +105,11 @@ static void run_thread_pool(acl_pthread_pool_t *thr_pool)
 	ctx->i = 0;
 
 	/**
-	* ÏòÏß³Ì³ØÖÐÌí¼ÓµÚÒ»¸öÈÎÎñ£¬¼´Æô¶¯µÚÒ»¸ö¹¤×÷Ïß³Ì
-	* @param wq Ïß³Ì³Ø¾ä±ú
-	* @param worker_thread ¹¤×÷Ïß³ÌµÄ»Øµ÷º¯Êý
-	* @param event_type ´Ë´¦Ð´0¼´¿É
-	* @param ctx ÓÃ»§¶¨Òå²ÎÊý
+	* å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ç¬¬ä¸€ä¸ªä»»åŠ¡ï¼Œå³å¯åŠ¨ç¬¬ä¸€ä¸ªå·¥ä½œçº¿ç¨‹
+	* @param wq çº¿ç¨‹æ± å¥æŸ„
+	* @param worker_thread å·¥ä½œçº¿ç¨‹çš„å›žè°ƒå‡½æ•°
+	* @param event_type æ­¤å¤„å†™0å³å¯
+	* @param ctx ç”¨æˆ·å®šä¹‰å‚æ•°
 	*/
 	acl_pthread_pool_add(thr_pool, worker_thread, ctx);
 	sleep(1);
@@ -118,7 +118,7 @@ static void run_thread_pool(acl_pthread_pool_t *thr_pool)
 	assert(ctx);
 	ctx->thr_pool = thr_pool;
 	ctx->i = 1;
-	/* ÏòÏß³Ì³ØÖÐÌí¼ÓµÚ¶þ¸öÈÎÎñ£¬¼´Æô¶¯µÚ¶þ¸ö¹¤×÷Ïß³Ì */
+	/* å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ç¬¬äºŒä¸ªä»»åŠ¡ï¼Œå³å¯åŠ¨ç¬¬äºŒä¸ªå·¥ä½œçº¿ç¨‹ */
 	acl_pthread_pool_add(thr_pool, worker_thread, ctx);
 }
 
@@ -141,7 +141,7 @@ static acl_pthread_pool_t *thr_pool_create(int threads, int timeout)
 	acl_pthread_pool_attr_set_threads_limit(&attr, threads);
 	acl_pthread_pool_attr_set_idle_timeout(&attr, timeout);
 
-	/* ´´½¨°ë×¤ÁôÏß³Ì¾ä±ú */
+	/* åˆ›å»ºåŠé©»ç•™çº¿ç¨‹å¥æŸ„ */
 	thr_pool = acl_pthread_pool_create(&attr);
 	assert(thr_pool);
 	return (thr_pool);
@@ -191,8 +191,8 @@ static void test_thread_pool(void)
 int main(int argc acl_unused, char *argv[] acl_unused)
 {
 	acl_pthread_pool_t *thr_pool;
-	int  max_threads = 20;  /* ×î¶à²¢·¢20¸öÏß³Ì */
-	int  idle_timeout = 10; /* Ã¿¸ö¹¤×÷Ïß³Ì¿ÕÏÐ10Ãëºó×Ô¶¯ÍË³ö */
+	int  max_threads = 20;  /* æœ€å¤šå¹¶å‘20ä¸ªçº¿ç¨‹ */
+	int  idle_timeout = 10; /* æ¯ä¸ªå·¥ä½œçº¿ç¨‹ç©ºé—²10ç§’åŽè‡ªåŠ¨é€€å‡º */
 	static __thread ACL_VSTRING *buf = NULL;
 
 	if (1) {
@@ -210,15 +210,15 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	run_thread_pool(thr_pool);
 
 	if (0) {
-		/* Èç¹ûÁ¢¼´ÔËÐÐ acl_pthread_pool_destroy£¬ÔòÓÉÓÚµ÷ÓÃÁËÏß³Ì³ØÏú»Ùº¯Êý£¬
-		 * Ö÷Ïß³Ì±ãÁ¢¿ÌÍ¨Öª¿ÕÏÐÏß³ÌÍË³ö£¬ËùÓÐ¿ÕÏÐÏß³Ì²»±ØµÈ´ý¿ÕÏÐ³¬Ê±Ê±¼ä±ã¿ÉÍË³ö,
+		/* å¦‚æžœç«‹å³è¿è¡Œ acl_pthread_pool_destroyï¼Œåˆ™ç”±äºŽè°ƒç”¨äº†çº¿ç¨‹æ± é”€æ¯å‡½æ•°ï¼Œ
+		 * ä¸»çº¿ç¨‹ä¾¿ç«‹åˆ»é€šçŸ¥ç©ºé—²çº¿ç¨‹é€€å‡ºï¼Œæ‰€æœ‰ç©ºé—²çº¿ç¨‹ä¸å¿…ç­‰å¾…ç©ºé—²è¶…æ—¶æ—¶é—´ä¾¿å¯é€€å‡º,
 		 */
 		printf("> wait all threads to be idle and free thread pool\r\n");
-		/* Á¢¼´Ïú»ÙÏß³Ì³Ø */
+		/* ç«‹å³é”€æ¯çº¿ç¨‹æ±  */
 		acl_pthread_pool_destroy(thr_pool);
 	} else {
-		/* ÒòÎª²»Á¢¼´µ÷ÓÃ acl_pthread_pool_destroy£¬ËùÓÐËùÓÐ¿ÕÏÐÏß³Ì¶¼ÊÇµ±¿ÕÏÐ
-		 * ³¬Ê±Ê±¼äµ½´ïºó²ÅÍË³ö
+		/* å› ä¸ºä¸ç«‹å³è°ƒç”¨ acl_pthread_pool_destroyï¼Œæ‰€æœ‰æ‰€æœ‰ç©ºé—²çº¿ç¨‹éƒ½æ˜¯å½“ç©ºé—²
+		 * è¶…æ—¶æ—¶é—´åˆ°è¾¾åŽæ‰é€€å‡º
 		 */
 		while (1) {
 			int   ret;
@@ -229,12 +229,12 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 			printf("> current threads in thread pool is: %d\r\n", ret);
 			sleep(1);
 		}
-		/* Ïß³Ì³ØÖÐµÄ¹¤×÷Ïß³ÌÊýÎª0Ê±Ïú»ÙÏß³Ì³Ø */
+		/* çº¿ç¨‹æ± ä¸­çš„å·¥ä½œçº¿ç¨‹æ•°ä¸º0æ—¶é”€æ¯çº¿ç¨‹æ±  */
 		printf("> all worker thread exit now\r\n");
 		acl_pthread_pool_destroy(thr_pool);
 	}
 
-	/* Ö÷Ïß³ÌµÈ´ýÓÃ»§ÔÚÖÕ¶ËÊäÈëÈÎÒâ×Ö·ûºóÍË³ö */
+	/* ä¸»çº¿ç¨‹ç­‰å¾…ç”¨æˆ·åœ¨ç»ˆç«¯è¾“å…¥ä»»æ„å­—ç¬¦åŽé€€å‡º */
 	printf("> enter any key to exit\r\n");
 	getchar();
 

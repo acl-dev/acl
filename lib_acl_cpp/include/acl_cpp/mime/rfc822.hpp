@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include <list>
@@ -9,12 +9,12 @@
 namespace acl {
 
 /**
- * ÓÊ¼şµØÖ·
+ * é‚®ä»¶åœ°å€
  */
 struct rfc822_addr
 {
-	char* addr;	// ÓÊ¼şµØÖ·£¬¸ñÊ½Îª£º xxx@xxx.xxx
-	char* comment;	// ÓÊ¼ş±¸×¢
+	char* addr;	// é‚®ä»¶åœ°å€ï¼Œæ ¼å¼ä¸ºï¼š xxx@xxx.xxx
+	char* comment;	// é‚®ä»¶å¤‡æ³¨
 };
 
 typedef enum
@@ -30,67 +30,67 @@ public:
 	~rfc822(void);
 
 	/**
-	 * ½âÎö·ûºÏ RFC822 ±ê×¼µÄÊ±¼ä¸ñÊ½
-	 * @param in {const char*} Ê±¼ä×Ö·û´®£¬Èç£º
+	 * è§£æç¬¦åˆ RFC822 æ ‡å‡†çš„æ—¶é—´æ ¼å¼
+	 * @param in {const char*} æ—¶é—´å­—ç¬¦ä¸²ï¼Œå¦‚ï¼š
 	 *  Wed, 11 May 2011 09:44:37 +0800 (CST)
 	 *  Wed, 11 May 2011 16:17:39 GMT
 	 */
 	time_t parse_date(const char *in);
 
 	/**
-	 * Éú³É·ûºÏ RFC822 ±ê×¼µÄÊ±¼ä¸ñÊ½
+	 * ç”Ÿæˆç¬¦åˆ RFC822 æ ‡å‡†çš„æ—¶é—´æ ¼å¼
 	 * @param t {time_t}
-	 * @param out {char*} ´æ´¢×ª»»½á¹û
-	 * @param size {size_t} out ¿Õ¼ä´óĞ¡
-	 * @param zone {tzone_t} ËùÔÚÊ±Çø
+	 * @param out {char*} å­˜å‚¨è½¬æ¢ç»“æœ
+	 * @param size {size_t} out ç©ºé—´å¤§å°
+	 * @param zone {tzone_t} æ‰€åœ¨æ—¶åŒº
 	 */
 	void mkdate(time_t t, char* out, size_t size, tzone_t  zone = tzone_cst);
 
 	/**
-	 * Éú³É¶«°ËÇøµÄÊ±¼ä¸ñÊ½
+	 * ç”Ÿæˆä¸œå…«åŒºçš„æ—¶é—´æ ¼å¼
 	 * @param t {time_t}
-	 * @param out {char*} ´æ´¢×ª»»½á¹û
-	 * @param size {size_t} out ¿Õ¼ä´óĞ¡
+	 * @param out {char*} å­˜å‚¨è½¬æ¢ç»“æœ
+	 * @param size {size_t} out ç©ºé—´å¤§å°
 	 */
 	void mkdate_cst(time_t t, char* out, size_t size);
 
 	/**
-	 * Éú³É¸ñÁÖÍşÖÎÊ±¼äµÄÊ±¼ä¸ñÊ½
+	 * ç”Ÿæˆæ ¼æ—å¨æ²»æ—¶é—´çš„æ—¶é—´æ ¼å¼
 	 * @param t {time_t}
-	 * @param out {char*} ´æ´¢×ª»»½á¹û
-	 * @param size {size_t} out ¿Õ¼ä´óĞ¡
+	 * @param out {char*} å­˜å‚¨è½¬æ¢ç»“æœ
+	 * @param size {size_t} out ç©ºé—´å¤§å°
 	 */
 	void mkdate_gmt(time_t t, char* out, size_t size);
 
 	/**
-	 * ½âÎöÓÊ¼şµØÖ·ÁĞ±í£¬½«·ûºÏ RFC822 ±ê×¼µÄÓÊ¼şµØÖ·ÁĞ±í½âÎö³É
-	 * ÈËÄÜÕı³£¿´¶®µÄÓÊ¼şµØÖ·ÁĞ±í£¬Í¬Ê±½«ÓÃ»§Ãû×¢ÊÍ²¿·Ö½øĞĞ
-	 * RFC2047½âÂë
-	 * @param in {const char*} RFC822 ¸ñÊ½µÄÓÊ¼şµØÖ·ÁĞ±í£¬Èç:
+	 * è§£æé‚®ä»¶åœ°å€åˆ—è¡¨ï¼Œå°†ç¬¦åˆ RFC822 æ ‡å‡†çš„é‚®ä»¶åœ°å€åˆ—è¡¨è§£ææˆ
+	 * äººèƒ½æ­£å¸¸çœ‹æ‡‚çš„é‚®ä»¶åœ°å€åˆ—è¡¨ï¼ŒåŒæ—¶å°†ç”¨æˆ·åæ³¨é‡Šéƒ¨åˆ†è¿›è¡Œ
+	 * RFC2047è§£ç 
+	 * @param in {const char*} RFC822 æ ¼å¼çš„é‚®ä»¶åœ°å€åˆ—è¡¨ï¼Œå¦‚:
 	 *  "=?gb2312?B?1dSx+A==?= <zhaobing@51iker.com>;\r\n"
 	 *  "\t\"=?GB2312?B?t+vBosn6?=\" <fenglisheng@51iker.com>;\r\n"
 	 *  "\t\"zhengshuxin3\";\"zhengshuxin4\" <zhengshuxin2@51iker.com>;"
 	 *  "<xuganghui@51iker.com>;<wangwenquan@51iker.com>;"
-	 * @param to_charset {const char*} Ä¿±ê×Ö·û¼¯£¬ÀıÈç£ºgbk, gb18030, utf-8
-	 * @return {const std::list<rfc822_addr*>&} ½âÎö½á¹û
+	 * @param to_charset {const char*} ç›®æ ‡å­—ç¬¦é›†ï¼Œä¾‹å¦‚ï¼šgbk, gb18030, utf-8
+	 * @return {const std::list<rfc822_addr*>&} è§£æç»“æœ
 	 */
 	const std::list<rfc822_addr*>& parse_addrs(const char* in,
 		const char* to_charset = "utf-8");
 
 	/**
-	 * ½âÎöÒ»¸ö·ûºÏ RFC822 ±ê×¼µÄÓÊ¼şµØÖ·£¬Í¬Ê±½«ÓÃ»§Ãû×¢ÊÍ²¿·Ö°´
-	 * RFC2047 ±ê×¼½øĞĞ½âÂë
-	 * @param in {const char*} RFC822 ¸ñÊ½µÄÓÊ¼şµØÖ·
-	 * @param to_charset {const char*} Ä¿±ê×Ö·û¼¯£¬ÀıÈç£ºgbk, gb18030, utf-8
-	 * @return {const rfc822_addr*} ·µ»Ø NULL ±íÃ÷ÊäÈëµÄÓÊ¼şµØÖ·²»·ûºÏ
-	 *  RFC822 ¹æ·¶
+	 * è§£æä¸€ä¸ªç¬¦åˆ RFC822 æ ‡å‡†çš„é‚®ä»¶åœ°å€ï¼ŒåŒæ—¶å°†ç”¨æˆ·åæ³¨é‡Šéƒ¨åˆ†æŒ‰
+	 * RFC2047 æ ‡å‡†è¿›è¡Œè§£ç 
+	 * @param in {const char*} RFC822 æ ¼å¼çš„é‚®ä»¶åœ°å€
+	 * @param to_charset {const char*} ç›®æ ‡å­—ç¬¦é›†ï¼Œä¾‹å¦‚ï¼šgbk, gb18030, utf-8
+	 * @return {const rfc822_addr*} è¿”å› NULL è¡¨æ˜è¾“å…¥çš„é‚®ä»¶åœ°å€ä¸ç¬¦åˆ
+	 *  RFC822 è§„èŒƒ
 	 */
 	const rfc822_addr* parse_addr(const char* in,
 		const char* to_charset = "utf-8");
 
 	/**
-	 * ¼ì²éÓÊ¼şµØÖ·ÊÇ·ñºÏ·¨
-	 * @param in {const char*} RFC822 ¸ñÊ½µÄÓÊ¼şµØÖ·
+	 * æ£€æŸ¥é‚®ä»¶åœ°å€æ˜¯å¦åˆæ³•
+	 * @param in {const char*} RFC822 æ ¼å¼çš„é‚®ä»¶åœ°å€
 	 * @return {bool}
 	 */
 	bool check_addr(const char* in);

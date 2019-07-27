@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "util.h"
 #include "thread_client.h"
 
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
 	bool  keep_alive = false;
 	acl::string server_addr("127.0.0.1:8888");
 
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	while ((ch = getopt(argc, argv, "hs:c:n:k")) > 0)
@@ -52,29 +52,29 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < cocurrent; i++)
 	{
-		// ´´½¨Ïß³
+		// åˆ›å»ºçº¿³
 		thread_client* thread = new thread_client(server_addr, keep_alive,
 				count, length);
 
-		// ÉèÖÃ´´½¨µÄÏß³ÌÎª·Ç·ÖÀëÄ£Ê½£¬ÒÔ±ãÓÚÏÂÃæ¿ÉÒÔµ÷Ó thread::wait
-		// µÈ´ıÏß³Ì½áÊø
+		// è®¾ç½®åˆ›å»ºçš„çº¿ç¨‹ä¸ºéåˆ†ç¦»æ¨¡å¼ï¼Œä»¥ä¾¿äºä¸‹é¢å¯ä»¥è°ƒÓ thread::wait
+		// ç­‰å¾…çº¿ç¨‹ç»“æŸ
 		thread->set_detachable(false);
 
-		// ½«Ïß³Ì·ÅÔÚ¶ÓÁĞÖ
+		// å°†çº¿ç¨‹æ”¾åœ¨é˜Ÿåˆ—Ö
 		threads.push_back(thread);
 
-		// Æô¶¯Ïß³
+		// å¯åŠ¨çº¿³
 		thread->start();
 	}
 
 	std::list<thread_client*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
-		// µÈ´ıÏß³Ì½áÊø
+		// ç­‰å¾…çº¿ç¨‹ç»“æŸ
 		if ((*it)->wait(NULL) == false)
 			printf("wait one thread(%lu) error\r\n",
 				(*it)->thread_id());
-		// É¾³ı¶¯Ì¬´´½¨µÄÏß³Ì¶ÔÏó
+		// åˆ é™¤åŠ¨æ€åˆ›å»ºçš„çº¿ç¨‹å¯¹è±¡
 		delete *it;
 
 	}

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file aes.h
  *
  * \brief AES block cipher

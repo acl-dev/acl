@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <assert.h>
 
 static void end(void)
@@ -103,7 +103,7 @@ static int test_vstream(void)
 	local_time = localtime(&sbuf.st_mtime);
 	if (local_time) {
 		strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", local_time);
-		printf("ÐÞ¸ÄÊ±¼ä£¬mtime=%s\r\n", buf);
+		printf("ä¿®æ”¹æ—¶é—´ï¼Œmtime=%s\r\n", buf);
 	} else {
 		printf("mtime: error(%s)\r\n", acl_last_serror());
 	}
@@ -111,7 +111,7 @@ static int test_vstream(void)
 	local_time = localtime(&sbuf.st_ctime);
 	if (local_time) {
 		strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", local_time);
-		printf("´´½¨Ê±¼ä£¬ctime=%s\r\n", buf);
+		printf("åˆ›å»ºæ—¶é—´ï¼Œctime=%s\r\n", buf);
 	} else {
 		printf("ctime: error(%s)\r\n", acl_last_serror());
 	}
@@ -119,7 +119,7 @@ static int test_vstream(void)
 	local_time = localtime(&sbuf.st_atime);
 	if (local_time) {
 		strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", local_time);
-		printf("·ÃÎÊÊ±¼ä£¬atime=%s\r\n", buf);
+		printf("è®¿é—®æ—¶é—´ï¼Œatime=%s\r\n", buf);
 	} else {
 		printf("atime: error(%s)\r\n", acl_last_serror());
 	}

@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+﻿#include "lib_acl.h"
 
 static struct {
 	unsigned short id;
@@ -219,7 +219,7 @@ int main(void)
 	else
 		printf("error\n");
 
-	src = "中国";
+	src = "涓浗";
 	if (acl_utf8_to_gb2312(src, strlen(src), buf, sizeof(buf)) > 0)
 		printf("ok, buf(%s)\n", buf);
 	else

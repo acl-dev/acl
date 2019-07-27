@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_msg.h"
@@ -66,7 +66,7 @@ void acl_trace_info(void)
 	char **results;
 	unsigned int *intbuf;
 
-	/* ³õÊ¼»¯Ïß³Ì¾Ö²¿±äÁ¿ */
+	/* åˆå§‹åŒ–çº¿ç¨‹å±€éƒ¨å˜é‡ */
 	if (acl_pthread_once(&__trace_once, trace_buf_init) != 0)
 		return;
 	intbuf = acl_pthread_getspecific(__trace_key);
@@ -83,7 +83,7 @@ void acl_trace_info(void)
 		}
 	}
 
-	/* Èç¹û²úÉúµİ¹éÇ¶Ì×£¬ÔòÖ±½Ó·µ»Ø */
+	/* å¦‚æœäº§ç”Ÿé€’å½’åµŒå¥—ï¼Œåˆ™ç›´æ¥è¿”å› */
 	if ((*intbuf) > 0)
 		return;
 
@@ -91,19 +91,19 @@ void acl_trace_info(void)
 	if (n == 0)
 		return;
 
-	/* ·ÀÖ¹µİ¹éÇ¶Ì×±êÖ¾×ÔÔö */
+	/* é˜²æ­¢é€’å½’åµŒå¥—æ ‡å¿—è‡ªå¢ */
 	(*intbuf)++;
 
 	results = backtrace_symbols(buffer, n);
 
-	/* ¼ÇÂ¼ÏÂËùÓĞµÄ¶ÑÕ»ĞÅÏ¢ */
+	/* è®°å½•ä¸‹æ‰€æœ‰çš„å †æ ˆä¿¡æ¯ */
 	for (i = 0; i < n; i++)
 		acl_msg_info("backtrace: %s", results[i]);
 
 	if (results != NULL)
 		free(results);
 
-	/* ·ÀÖ¹µİ¹éÇ¶Ì×±êÖ¾×Ô¼õ */
+	/* é˜²æ­¢é€’å½’åµŒå¥—æ ‡å¿—è‡ªå‡ */
 	(*intbuf)--;
 }
 

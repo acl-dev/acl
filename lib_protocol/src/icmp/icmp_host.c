@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "icmp_struct.h"
 #include "icmp_private.h"
 #include "icmp/lib_icmp.h"
@@ -28,7 +28,7 @@ ICMP_HOST *icmp_host_alloc(ICMP_CHAT *chat, const char *domain, const char *ip)
 
 	ptr = strchr(host->dest_ip, ':');
 	if (ptr)
-		*ptr = 0; /* È¥µô¶Ë¿Ú×Ö¶Î */
+		*ptr = 0; /* åŽ»æŽ‰ç«¯å£å­—æ®µ */
 
 	if (chat->aio != NULL)
 		icmp_chat_aio_add(chat, host);

@@ -1,4 +1,4 @@
-#ifndef	ACL_LOADCFG_INCLUDE_H
+ï»¿#ifndef	ACL_LOADCFG_INCLUDE_H
 #define	ACL_LOADCFG_INCLUDE_H
 
 # ifdef	__cplusplus
@@ -18,7 +18,7 @@ typedef struct ACL_CFG_LINE {
 			 * invalid line, but still be stored
 			 * here in pdata.
 			 */
-	int   line_number;	/* ¸ÃĞĞÔÚÅäÖÃÎÄ¼şÖĞµÄĞĞºÅ */
+	int   line_number;	/* è¯¥è¡Œåœ¨é…ç½®æ–‡ä»¶ä¸­çš„è¡Œå· */
 } ACL_CFG_LINE;
 
 typedef struct ACL_CFG_FN {

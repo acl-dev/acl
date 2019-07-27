@@ -1,4 +1,4 @@
-#ifndef _ATTR_CLNT_H_INCLUDED_
+﻿#ifndef _ATTR_CLNT_H_INCLUDED_
 #define _ATTR_CLNT_H_INCLUDED_
 
 /*++

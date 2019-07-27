@@ -1,4 +1,4 @@
-#ifndef	ACL_SPOOL_INCLUDE_H
+ï»¿#ifndef	ACL_SPOOL_INCLUDE_H
 #define	ACL_SPOOL_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -7,7 +7,7 @@ extern "C" {
 
 #include "acl_ioctl.h"
 
-/* ÎªÁË±£³ÖÏòºó¼æÈİ */
+/* ä¸ºäº†ä¿æŒå‘åå…¼å®¹ */
 
 #define	ACL_SPOOL			ACL_IOCTL
 #define	ACL_SPOOL_NOTIFY_FN		ACL_IOCTL_NOTIFY_FN

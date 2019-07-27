@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
 #include "acl_cpp/stdlib/log.hpp"
@@ -42,14 +42,14 @@ const char* db_row::field_value(const char* name) const
 {
 	size_t   i, n = names_.size();
 
-	// ±ØĞë±£Ö¤±íÖĞ×Ö¶ÎÃûµÄ¸öÊıÓëĞĞ¼ÇÂ¼µÄÖµµÄ¸öÊıÏàµÈ
+	// å¿…é¡»ä¿è¯è¡¨ä¸­å­—æ®µåçš„ä¸ªæ•°ä¸è¡Œè®°å½•çš„å€¼çš„ä¸ªæ•°ç›¸ç­‰
 	if (values_.size() != n) {
 		logger_error("invalid result, names=%d, values=%d",
 			(int) n, (int) values_.size());
 		return NULL;
 	}
 
-	// Í¨¹ıÉ¨Ãè×Ö¶ÎÃûÕÒ³ö×Ö¶ÎÖµµÄÏÂ±êÎ»ÖÃ
+	// é€šè¿‡æ‰«æå­—æ®µåæ‰¾å‡ºå­—æ®µå€¼çš„ä¸‹æ ‡ä½ç½®
 	for (i = 0; i < n; i++) {
 		if (strcasecmp(name, names_[i]) == 0) {
 			break;
@@ -60,7 +60,7 @@ const char* db_row::field_value(const char* name) const
 		return NULL;
 	}
 
-	// Ö±½Ó·µ»ØÏàÓ¦ÏÂ±êµÄ×Ö¶ÎÖµ
+	// ç›´æ¥è¿”å›ç›¸åº”ä¸‹æ ‡çš„å­—æ®µå€¼
 	return values_[i];
 }
 
@@ -180,14 +180,14 @@ size_t db_row::field_length(const char* name) const
 {
 	size_t   i, n = names_.size();
 
-	// ±ØĞë±£Ö¤±íÖĞ×Ö¶ÎÃûµÄ¸öÊıÓëĞĞ¼ÇÂ¼µÄÖµµÄ¸öÊıÏàµÈ
+	// å¿…é¡»ä¿è¯è¡¨ä¸­å­—æ®µåçš„ä¸ªæ•°ä¸è¡Œè®°å½•çš„å€¼çš„ä¸ªæ•°ç›¸ç­‰
 	if (lengths_.size() != n) {
 		logger_error("invalid result, names=%d, lengths_=%d",
 			(int) n, (int) lengths_.size());
 		return 0;
 	}
 
-	// Í¨¹ıÉ¨Ãè×Ö¶ÎÃûÕÒ³ö×Ö¶ÎÖµµÄÏÂ±êÎ»ÖÃ
+	// é€šè¿‡æ‰«æå­—æ®µåæ‰¾å‡ºå­—æ®µå€¼çš„ä¸‹æ ‡ä½ç½®
 	for (i = 0; i < n; i++) {
 		if (strcasecmp(name, names_[i]) == 0) {
 			break;
@@ -198,7 +198,7 @@ size_t db_row::field_length(const char* name) const
 		return 0;
 	}
 
-	// Ö±½Ó·µ»ØÏàÓ¦ÏÂ±êµÄ×Ö¶ÎÖµ
+	// ç›´æ¥è¿”å›ç›¸åº”ä¸‹æ ‡çš„å­—æ®µå€¼
 	return lengths_[i];
 }
 
@@ -236,7 +236,7 @@ db_rows::~db_rows(void)
 const std::vector<const db_row*>& db_rows::get_rows(
 	const char* name, const char* value)
 {
-	// ÏÈÇå¿ÕÉÏÒ»´ÎµÄÁÙÊ±½á¹û¼¯
+	// å…ˆæ¸…ç©ºä¸Šä¸€æ¬¡çš„ä¸´æ—¶ç»“æœé›†
 	rows_tmp_.clear();
 
 	if (empty()) {
@@ -245,7 +245,7 @@ const std::vector<const db_row*>& db_rows::get_rows(
 
 	size_t icolumn, ncolumn = names_.size();
 
-	// Í¨¹ıÉ¨Ãè×Ö¶ÎÃûÕÒ³ö×Ö¶ÎÖµµÄÏÂ±êÎ»ÖÃ
+	// é€šè¿‡æ‰«æå­—æ®µåæ‰¾å‡ºå­—æ®µå€¼çš„ä¸‹æ ‡ä½ç½®
 	for (icolumn = 0; icolumn < ncolumn; icolumn++) {
 		if (strcasecmp(name, names_[icolumn]) == 0) {
 			break;
@@ -255,7 +255,7 @@ const std::vector<const db_row*>& db_rows::get_rows(
 	const db_row* row;
 	const char* ptr = 0;
 
-	// ±È½Ï¶ÔÓ¦ÏÂ±êÏàÍ¬µÄ×Ö¶ÎÖµµÄĞĞ¼ÇÂ¼
+	// æ¯”è¾ƒå¯¹åº”ä¸‹æ ‡ç›¸åŒçš„å­—æ®µå€¼çš„è¡Œè®°å½•
 	size_t nrow = rows_.size();
 	for (size_t irow = 0; irow < nrow; irow++) {
 		row = rows_[irow];
@@ -315,7 +315,7 @@ db_handle::~db_handle(void)
 
 bool db_handle::open(void)
 {
-	// µ÷ÓÃĞé·½·¨µÄ×ÓÀàÊµÏÖ¹ı³Ì
+	// è°ƒç”¨è™šæ–¹æ³•çš„å­ç±»å®ç°è¿‡ç¨‹
 	return dbopen();
 }
 
@@ -372,7 +372,7 @@ string& db_handle::escape_string(const char* in, size_t len, string& out)
 
 void db_handle::print_out(size_t max /* = 0 */) const
 {
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨¶ş
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•äºŒ
 	for (size_t i = 0; i < length(); i++) {
 		if (max > 0 && i >= max) {
 			continue;

@@ -1,4 +1,4 @@
-
+﻿
 #ifndef	__PROTOCOL_INCLUDE_H__
 #define	__PROTOCOL_INCLUDE_H__
 

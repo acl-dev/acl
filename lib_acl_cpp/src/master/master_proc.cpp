@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -24,7 +24,7 @@ void master_proc::run_daemon(int argc, char** argv)
 #ifdef ACL_WINDOWS
 	logger_fatal("not support ACL_WINDOWS!");
 #else
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = true;
@@ -77,7 +77,7 @@ void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream,
 		mp->stop_ = true;
 	} else {
 		service_main(ctx, client);
-		acl_vstream_close(client); // ÒòÎªÔÚ service_main Àï²»»á¹Ø±ÕÁ¬½Ó
+		acl_vstream_close(client); // å› ä¸ºåœ¨ service_main é‡Œä¸ä¼šå…³é—­è¿æ¥
 
 		mp->count_++;
 		if (mp->count_limit_ > 0 && mp->count_ >= mp->count_limit_) {
@@ -89,7 +89,7 @@ void master_proc::listen_callback(int, ACL_EVENT*, ACL_VSTREAM *sstream,
 bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	int   count /* = 1 */)
 {
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = false;
@@ -100,7 +100,7 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_cpp_init();
 #endif
 	ACL_EVENT* eventp = acl_event_new_select(1, 0);
-	set_event(eventp);  // µ÷ÓÃ»ùÀà·½·¨ÉèÖÃÊÂ¼şÒıÇæ¾ä±ú
+	set_event(eventp);  // è°ƒç”¨åŸºç±»æ–¹æ³•è®¾ç½®äº‹ä»¶å¼•æ“å¥æŸ„
 
 	std::vector<ACL_VSTREAM*> sstreams;
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
@@ -123,7 +123,7 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 	}
 	acl_argv_free(tokens);
 
-	// ³õÊ¼»¯ÅäÖÃ²ÎÊı
+	// åˆå§‹åŒ–é…ç½®å‚æ•°
 	conf_.load(path);
 
 	service_pre_jail(this);
@@ -154,7 +154,7 @@ void master_proc::service_main(void* ctx, ACL_VSTREAM *stream)
 
 #ifndef	ACL_WINDOWS
 	if (mp->daemon_mode_) {
-		acl_watchdog_pat();  // ±ØĞëÍ¨Öª acl_master ¿ò¼ÜÒ»ÏÂ
+		acl_watchdog_pat();  // å¿…é¡»é€šçŸ¥ acl_master æ¡†æ¶ä¸€ä¸‹
 	}
 #endif
 	mp->on_accept(client);

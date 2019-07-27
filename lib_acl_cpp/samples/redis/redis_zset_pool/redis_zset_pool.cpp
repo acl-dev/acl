@@ -1,24 +1,24 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 	const char* big_data, size_t length, size_t base_length)
 {
-	// ½«´óÊı¾İ½øĞĞ·Ö¸î£¬¼ÆËã³ö·Ö¸îºóµÄÊı¾İ¿é¸öÊı
+	// å°†å¤§æ•°æ®è¿›è¡Œåˆ†å‰²ï¼Œè®¡ç®—å‡ºåˆ†å‰²åçš„æ•°æ®å—ä¸ªæ•°
 	size_t nmember = length / base_length;
 	if (length % base_length != 0)
 		nmember++;
 
-	// ´ÓÁ¬½Ó¶ÔÏóÖĞ»ñµÃÍ³Ò»µÄÄÚ´æ³Ø·ÖÅä¶ÔÏó£¬·ÖÅäĞ¡ÄÚ´æ¿é
+	// ä»è¿æ¥å¯¹è±¡ä¸­è·å¾—ç»Ÿä¸€çš„å†…å­˜æ± åˆ†é…å¯¹è±¡ï¼Œåˆ†é…å°å†…å­˜å—
 	acl::dbuf_pool* pool = redis.get_dbuf();
-	// ¶¯Ì¬·ÖÅäÊı¾İ¿éÖ¸ÕëÊı×éÄÚ´æ
+	// åŠ¨æ€åˆ†é…æ•°æ®å—æŒ‡é’ˆæ•°ç»„å†…å­˜
 	const char** members = (const char**)
 		pool->dbuf_alloc(nmember * sizeof(char*));
-	// ¶¯Ì¬·ÖÅäÊı¾İ¿é³¤¶ÈÊı×éÄÚ´æ
+	// åŠ¨æ€åˆ†é…æ•°æ®å—é•¿åº¦æ•°ç»„å†…å­˜
 	size_t* lens = (size_t*) pool->dbuf_alloc(nmember * sizeof(size_t));
-	// ¶¯Ì¬·ÖÅäÊı¾İ¿é·ÖÖµÊı×éÄÚ´æ
+	// åŠ¨æ€åˆ†é…æ•°æ®å—åˆ†å€¼æ•°ç»„å†…å­˜
 	double* scores = (double*) pool->dbuf_alloc(nmember * sizeof(double));
 
-	// ½«´óÊı¾İÇĞ·Ö³ÉĞ¡Êı¾İ£¬ÖÃÈëÊı¾İ¿éÊı×éÖĞ£¬Ê¹ÓÃµİÔöµÄÕûÊı×öÎª·ÖÖµ
+	// å°†å¤§æ•°æ®åˆ‡åˆ†æˆå°æ•°æ®ï¼Œç½®å…¥æ•°æ®å—æ•°ç»„ä¸­ï¼Œä½¿ç”¨é€’å¢çš„æ•´æ•°åšä¸ºåˆ†å€¼
 	size_t len;
 	const char* ptr = big_data;
 	char* buf, id[64];
@@ -28,8 +28,8 @@ static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 	{
 		len = length > base_length ? base_length : length;
 
-		// ÔÚÃ¿¸öÔ­Ê¼Êı¾İÇ°Ãæ¼ÓÎ¨Ò»Ç°×º£¬´Ó¶ø¿ÉÒÔ±£Ö¤ÓĞĞò¼¯ºÏÖĞ¶ÔÏóÖĞ
-		// µÄÃ¿¸ö³ÉÔ±Êı¾İ¶¼ÊÇ²»Í¬µÄ
+		// åœ¨æ¯ä¸ªåŸå§‹æ•°æ®å‰é¢åŠ å”¯ä¸€å‰ç¼€ï¼Œä»è€Œå¯ä»¥ä¿è¯æœ‰åºé›†åˆä¸­å¯¹è±¡ä¸­
+		// çš„æ¯ä¸ªæˆå‘˜æ•°æ®éƒ½æ˜¯ä¸åŒçš„
 		n = acl::safe_snprintf(id, sizeof(id),
 			"%lu:", (unsigned long) j);
 		buf = (char*) pool->dbuf_alloc(len + n);
@@ -37,19 +37,19 @@ static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 		memcpy(buf + n, ptr, len);
 		members[j] = buf;
 
-		lens[j] = len + n; // ¸ÃÊı¾İ¿éµÄ×Ü³¤¶È£ºÎ¨Ò»Ç°×º+Êı¾İ
+		lens[j] = len + n; // è¯¥æ•°æ®å—çš„æ€»é•¿åº¦ï¼šå”¯ä¸€å‰ç¼€+æ•°æ®
 		scores[j] = (double) j;
 
-		// Ê£ÓàÊı¾İ¿é³¤¶È
+		// å‰©ä½™æ•°æ®å—é•¿åº¦
 		length -= len;
 		ptr += len;
 	}
 
-	// ÒªÇó redis Á¬½Ó¶ÔÏó²ÉÓÃÄÚ´æÁ´Ğ­Òé×é×°·½Ê½£¬±ÜÃâÄÚ²¿×é×°ÇëÇóĞ­ÒéÊ±
-	// ÔÙ×é×°³É´óÄÚ´æ
+	// è¦æ±‚ redis è¿æ¥å¯¹è±¡é‡‡ç”¨å†…å­˜é“¾åè®®ç»„è£…æ–¹å¼ï¼Œé¿å…å†…éƒ¨ç»„è£…è¯·æ±‚åè®®æ—¶
+	// å†ç»„è£…æˆå¤§å†…å­˜
 	redis.get_client()->set_slice_request(true);
 
-	// ¿ªÊ¼Ïò redis Ìí¼ÓÊı¾İ
+	// å¼€å§‹å‘ redis æ·»åŠ æ•°æ®
 	int ret = redis.zadd(key, members, lens, scores, nmember);
 	if (ret < 0)
 	{
@@ -64,7 +64,7 @@ static bool test_zadd(acl::redis_zset& redis, int i, const char* key,
 
 static bool test_zcard(acl::redis_zset& redis, int i, const char* key)
 {
-	// ÒòÎª¸ÃĞ­ÒéÊı¾İ±È½ÏĞ¡£¬ËùÒÔÔÚ×é×°ÇëÇóÊı¾İÊ±²»±Ø²ÉÓÃ·ÖÆ¬·½Ê½
+	// å› ä¸ºè¯¥åè®®æ•°æ®æ¯”è¾ƒå°ï¼Œæ‰€ä»¥åœ¨ç»„è£…è¯·æ±‚æ•°æ®æ—¶ä¸å¿…é‡‡ç”¨åˆ†ç‰‡æ–¹å¼
 	redis.get_client()->set_slice_request(false);
 
 	int ret = redis.zcard(key);
@@ -84,10 +84,10 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 {
 	int start = 0, end = -1;
 
-	// ÇëÇóµÄÊı¾İÁ¿±È½ÏĞ¡£¬ËùÒÔÔÚ×é×°ÇëÇóĞ­ÒéÊ±²»±Ø²ÉÓÃ·ÖÆ¬·½Ê½
+	// è¯·æ±‚çš„æ•°æ®é‡æ¯”è¾ƒå°ï¼Œæ‰€ä»¥åœ¨ç»„è£…è¯·æ±‚åè®®æ—¶ä¸å¿…é‡‡ç”¨åˆ†ç‰‡æ–¹å¼
 	redis.get_client()->set_slice_request(false);
 
-	// ¶Ô·şÎñÆ÷·µ»ØµÄÊı¾İÒ²²»·ÖÆ¬
+	// å¯¹æœåŠ¡å™¨è¿”å›çš„æ•°æ®ä¹Ÿä¸åˆ†ç‰‡
 	redis.get_client()->set_slice_respond(false);
 
 	int ret = redis.zrange(key, start, end, NULL);
@@ -97,7 +97,7 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 		return false;
 	}
 
-	// »ñµÃÊı×éÔªËØ½á¹û¼¯
+	// è·å¾—æ•°ç»„å…ƒç´ ç»“æœé›†
 	const acl::redis_result* result = redis.get_result();
 	if (result == NULL)
 	{
@@ -106,7 +106,7 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 	}
 
 	size_t size;
-	// Ö±½Ó»ñµÃÊı×é¼¯ºÏ
+	// ç›´æ¥è·å¾—æ•°ç»„é›†åˆ
 	const acl::redis_result** children = result->get_children(&size);
 	if (children == NULL || size == 0)
 	{
@@ -115,7 +115,7 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 		return false;
 	}
 
-	// Ğ£Ñé»ñµÃµÄËùÓĞÊı¾İÆ¬µÄ MD5 Öµ£¬Óë´«ÈëµÄ½øĞĞ±È½Ï
+	// æ ¡éªŒè·å¾—çš„æ‰€æœ‰æ•°æ®ç‰‡çš„ MD5 å€¼ï¼Œä¸ä¼ å…¥çš„è¿›è¡Œæ¯”è¾ƒ
 	acl::md5* md5;
 	if (hmac != NULL)
 		md5 = new acl::md5;
@@ -125,14 +125,14 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 	const acl::redis_result* child;
 	size_t len, argc, n;
 
-	// ÏÈ±éÀúËùÓĞÊı×éÔªËØ¶ÔÏó
+	// å…ˆéå†æ‰€æœ‰æ•°ç»„å…ƒç´ å¯¹è±¡
 	for (size_t j = 0; j < size; j++)
 	{
 		child = children[j];
 		if (child == NULL)
 			continue;
 
-		// ÒòÎªÇ°ÃæÉèÖÃÁË½ûÖ¹¶ÔÏìÓ¦Êı¾İ½øĞĞ·ÖÆ¬£¬ËùÒÔÖ»ĞèÈ¡µÚÒ»¸öÔªËØ
+		// å› ä¸ºå‰é¢è®¾ç½®äº†ç¦æ­¢å¯¹å“åº”æ•°æ®è¿›è¡Œåˆ†ç‰‡ï¼Œæ‰€ä»¥åªéœ€å–ç¬¬ä¸€ä¸ªå…ƒç´ 
 		argc = child->get_size();
 		assert(argc == 1);
 
@@ -159,7 +159,7 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 
 		len -= n;
 
-		// È¡³öÊı¾İ¼ÆËã md5 Öµ
+		// å–å‡ºæ•°æ®è®¡ç®— md5 å€¼
 		if (md5 != NULL)
 			md5->update(dat, len);
 	}
@@ -167,7 +167,7 @@ static bool test_zrange(acl::redis_zset& redis, int i, const char* key,
 	if (md5 != NULL)
 		md5->finish();
 
-	// »ñµÃ×Ö·û´®·½Ê½µÄ MD5 Öµ
+	// è·å¾—å­—ç¬¦ä¸²æ–¹å¼çš„ MD5 å€¼
 	if (md5 != NULL)
 	{
 		const char* ptr = md5->get_string();
@@ -201,12 +201,12 @@ static bool test_del(acl::redis_key& redis, int i, const char* key)
 /////////////////////////////////////////////////////////////////////////////
 
 static acl::string __keypre("zset_key");
-static size_t __base_length = 8192;  // »ù×¼Êı¾İ¿é³¤¶È
+static size_t __base_length = 8192;  // åŸºå‡†æ•°æ®å—é•¿åº¦
 static char* __big_data;
-static size_t __big_data_length = 10240000;  // ´óÊı¾İ¿é³¤¶È£¬Ä¬ÈÏÊÇ 10 MB
+static size_t __big_data_length = 10240000;  // å¤§æ•°æ®å—é•¿åº¦ï¼Œé»˜è®¤æ˜¯ 10 MB
 static char* __hmac;
 
-// ×ÓÏß³ÌÀà£¬Ã¿¸öÏß³Ì¶ÔÏóÓë redis-server Ö®¼ä½¨Á¢Ò»¸öÁ¬½Ó
+// å­çº¿ç¨‹ç±»ï¼Œæ¯ä¸ªçº¿ç¨‹å¯¹è±¡ä¸ redis-server ä¹‹é—´å»ºç«‹ä¸€ä¸ªè¿æ¥
 class test_thread : public acl::thread
 {
 public:
@@ -226,7 +226,7 @@ protected:
 
 		for (int i = 0; i < n_; i++)
 		{
-			// ´ÓÈ«¾ÖÏß³Ì³ØÖĞ»ñÈ¡Ò»¸ö redis Á¬½Ó¶ÔÏó
+			// ä»å…¨å±€çº¿ç¨‹æ± ä¸­è·å–ä¸€ä¸ª redis è¿æ¥å¯¹è±¡
 			conn = (acl::redis_client*) pool_.peek();
 			
 			if (conn == NULL)
@@ -235,11 +235,11 @@ protected:
 				break;
 			}
 
-			// Ã¿¸öÏß³ÌÒ»¸ö ID ºÅ£¬×öÎª¼üÖµ×é³É²¿·Ö
+			// æ¯ä¸ªçº¿ç¨‹ä¸€ä¸ª ID å·ï¼Œåšä¸ºé”®å€¼ç»„æˆéƒ¨åˆ†
 			key.format("%s_%d_%d", __keypre.c_str(), id_, i);
 
 			redis.clear();
-			// ½« redis Á¬½Ó¶ÔÏóÓë redis ÃüÁî²Ù×÷Àà¶ÔÏó½øĞĞ°ó¶¨¹ØÁª
+			// å°† redis è¿æ¥å¯¹è±¡ä¸ redis å‘½ä»¤æ“ä½œç±»å¯¹è±¡è¿›è¡Œç»‘å®šå…³è”
 			redis.set_client(conn);
 
 			if (cmd_ == "zadd")
@@ -271,8 +271,8 @@ protected:
 			else
 				ret = true;
 
-			// ½« redis Á¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø£¬ÊÇ·ñ±£³Ö¸ÃÁ¬½Ó£¬
-			// Í¨¹ıÅĞ¶Ï¸ÃÁ¬½ÓÊÇ·ñ¶Ï¿ª¾ö¶¨
+			// å°† redis è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± ï¼Œæ˜¯å¦ä¿æŒè¯¥è¿æ¥ï¼Œ
+			// é€šè¿‡åˆ¤æ–­è¯¥è¿æ¥æ˜¯å¦æ–­å¼€å†³å®š
 			pool_.put(conn, !conn->eof());
 
 			if (ret == false)
@@ -401,22 +401,22 @@ int main(int argc, char* argv[])
 
 	std::vector<test_thread*> threads;
 
-	// ´´½¨Ò»×éÏß³Ì£¬Ã¿Ò»¸öÏß³ÌÓë redis-server ½¨Á¢Ò»¸öÁ¬½Ó
+	// åˆ›å»ºä¸€ç»„çº¿ç¨‹ï¼Œæ¯ä¸€ä¸ªçº¿ç¨‹ä¸ redis-server å»ºç«‹ä¸€ä¸ªè¿æ¥
 	for (int i = 0; i < max_threads; i++)
 	{
 		test_thread* thread = new test_thread(pool, cmd.c_str(),
 			n, i);
 		threads.push_back(thread);
-		// È¡ÏûÏß³ÌµÄ·ÖÀëÄ£Ê½£¬ÒÔ±ãÓÚÏÂÃæ»ØÊÕÏß³Ì£¬µÈ´ıÏß³ÌÍË³ö
+		// å–æ¶ˆçº¿ç¨‹çš„åˆ†ç¦»æ¨¡å¼ï¼Œä»¥ä¾¿äºä¸‹é¢å›æ”¶çº¿ç¨‹ï¼Œç­‰å¾…çº¿ç¨‹é€€å‡º
 		thread->set_detachable(false);
 		thread->start();
 	}
 
-	// »ØÊÕËùÓĞÏß³Ì
+	// å›æ”¶æ‰€æœ‰çº¿ç¨‹
 	std::vector<test_thread*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
-		// µÈ´ıÄ³¸öÏß³ÌÍË³ö
+		// ç­‰å¾…æŸä¸ªçº¿ç¨‹é€€å‡º
 		(*it)->wait();
 		delete (*it);
 	}

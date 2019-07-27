@@ -1,4 +1,4 @@
-
+﻿
 #ifndef	_RING_H_INCLUDE_
 #define	_RING_H_INCLUDE_
 

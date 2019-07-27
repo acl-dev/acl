@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../connpool/connect_pool.hpp"
 
@@ -8,27 +8,27 @@ namespace acl
 {
 
 /**
- * memcache ¿Í»§¶ËÁ¬½Ó³ØÀà£¬¸ÃÀà¸¸ÀàÎª connect_pool£¬¸ÃÀàÖ»ĞèÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı
- * create_connect ±ãÓµÓĞÁËÁ¬½Ó³Ø¸¸Àà connect_pool µÄ¹¦ÄÜ£»ÁíÍâ£¬¸ÃÀà´´½¨
- * µÄÁ¬½Ó¶ÔÏóÊÇ memcache ¶ÔÏó£¬ËùÒÔÔÚµ÷ÓÃ connect_pool::peek Ê±·µ»Ø
- * µÄ±ãÊÇ http_request Àà£¬µ÷ÓÃÕßĞèÒª½« peek ·µ»ØµÄÀà¶ÔÏóÇ¿ÖÆ×ªÎª memcache
- * Àà¶ÔÏó£¬±ã¿ÉÒÔÊ¹ÓÃ memcache ÀàÕÛËùÓĞ¹¦ÄÜ£¬ÆäÖĞ memcache ÀàÎª
- * connect_client µÄ×ÓÀà
+ * memcache å®¢æˆ·ç«¯è¿æ¥æ± ç±»ï¼Œè¯¥ç±»çˆ¶ç±»ä¸º connect_poolï¼Œè¯¥ç±»åªéœ€å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°
+ * create_connect ä¾¿æ‹¥æœ‰äº†è¿æ¥æ± çˆ¶ç±» connect_pool çš„åŠŸèƒ½ï¼›å¦å¤–ï¼Œè¯¥ç±»åˆ›å»º
+ * çš„è¿æ¥å¯¹è±¡æ˜¯ memcache å¯¹è±¡ï¼Œæ‰€ä»¥åœ¨è°ƒç”¨ connect_pool::peek æ—¶è¿”å›
+ * çš„ä¾¿æ˜¯ http_request ç±»ï¼Œè°ƒç”¨è€…éœ€è¦å°† peek è¿”å›çš„ç±»å¯¹è±¡å¼ºåˆ¶è½¬ä¸º memcache
+ * ç±»å¯¹è±¡ï¼Œä¾¿å¯ä»¥ä½¿ç”¨ memcache ç±»æŠ˜æ‰€æœ‰åŠŸèƒ½ï¼Œå…¶ä¸­ memcache ç±»ä¸º
+ * connect_client çš„å­ç±»
  */
 class ACL_CPP_API memcache_pool : public connect_pool
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param addr {const char*} ·şÎñ¶ËµØÖ·£¬¸ñÊ½£ºip:port
-	 * @param count {size_t} Á¬½Ó³ØµÄ×î´óÁ¬½ÓÊıÏŞÖÆ£¬µ±¸ÃÖµÎª 0 Ê±ÔòÃ»ÓĞÏŞÖÆ
-	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼)
+	 * æ„é€ å‡½æ•°
+	 * @param addr {const char*} æœåŠ¡ç«¯åœ°å€ï¼Œæ ¼å¼ï¼šip:port
+	 * @param count {size_t} è¿æ¥æ± çš„æœ€å¤§è¿æ¥æ•°é™åˆ¶ï¼Œå½“è¯¥å€¼ä¸º 0 æ—¶åˆ™æ²¡æœ‰é™åˆ¶
+	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹)
 	 */
 	memcache_pool(const char* addr, size_t count, size_t idx = 0);
 	~memcache_pool();
 
 protected:
-	// »ùÀà´¿Ğéº¯Êı
+	// åŸºç±»çº¯è™šå‡½æ•°
 	virtual connect_client* create_connect();
 };
 

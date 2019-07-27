@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <string.h>
 #include "gid_oper.h"
 #include "global.h"
@@ -22,7 +22,7 @@ static int send_respond_gid(ACL_VSTREAM *stream,
 		return (-1);
 	}
 	else
-		return (1);  /* ·µ»Ø1±íÊ¾±£³Ö³¤Á¬½Ó */
+		return (1);  /* è¿”å›1è¡¨ç¤ºä¿æŒé•¿è¿æ¥ */
 }
 
 static int send_respond_error(ACL_VSTREAM *stream,
@@ -65,22 +65,22 @@ static int proto_get_test_gid(ACL_VSTREAM *stream, const char *tag)
 /*--------------------------------------------------------------------------*/
 
 typedef struct PROTO_CMDLINE {
-	const char *cmd;  /* ÃüÁî×Ö */
-	int (*handle)(ACL_VSTREAM *, const char*);  /* Ğ­Òé´¦Àíº¯Êı¾ä±ú */
+	const char *cmd;  /* å‘½ä»¤å­— */
+	int (*handle)(ACL_VSTREAM *, const char*);  /* åè®®å¤„ç†å‡½æ•°å¥æŸ„ */
 } PROTO_CMDLINE;
 
-/* Ğ­ÒéÃüÁî´¦Àíº¯ÊıÓ³Éä±í */
+/* åè®®å‘½ä»¤å¤„ç†å‡½æ•°æ˜ å°„è¡¨ */
 static PROTO_CMDLINE __proto_cmdline_tab[] = {
 	{ CMD_NEW_GID, proto_new_gid },
 	{ CMD_TEST_GID, proto_get_test_gid },
 	{ NULL, NULL },
 };
 
-/* ½âÎöÊı¾İÍ· */
+/* è§£ææ•°æ®å¤´ */
 
-/* Ğ­Òé¸ñÊ½:
- * ÇëÇó¸ñÊ½: CMD^xxx|tag^xxx:sid\r\n
- * ÏìÓ¦¸ñÊ½: STATUS^[OK|ERR]|[GID^xxx|INFO^xxx]|tag^%s\r\n
+/* åè®®æ ¼å¼:
+ * è¯·æ±‚æ ¼å¼: CMD^xxx|tag^xxx:sid\r\n
+ * å“åº”æ ¼å¼: STATUS^[OK|ERR]|[GID^xxx|INFO^xxx]|tag^%s\r\n
  */
 int cmdline_service(ACL_VSTREAM *client)
 {       
@@ -91,7 +91,7 @@ int cmdline_service(ACL_VSTREAM *client)
 	int   i, ret;
 	ACL_ITER iter;
 
-	/* ÏÈ¶ÁÈ¡Êı¾İÍ· */
+	/* å…ˆè¯»å–æ•°æ®å¤´ */
 	ret = acl_vstream_gets_nonl(client, buf, sizeof(buf) - 1);
 	if (ret == ACL_VSTREAM_EOF)
 		return (-1);

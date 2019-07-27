@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 #include "string.hpp"
@@ -12,25 +12,25 @@ namespace acl {
 class token_tree;
 
 /**
- * 256 ²æÆ¥ÅäÊ÷ÖĞµÄ½Úµã¶ÔÏó£¬Îª´¿Ë½ÓĞÀà
+ * 256 å‰åŒ¹é…æ ‘ä¸­çš„èŠ‚ç‚¹å¯¹è±¡ï¼Œä¸ºçº¯ç§æœ‰ç±»
  */
 class ACL_CPP_API token_node : public noncopyable
 {
 public:
 	/**
-	 * »ñµÃ¸Ã½Úµã¶ÔÓ¦µÄ¼üÖµ
+	 * è·å¾—è¯¥èŠ‚ç‚¹å¯¹åº”çš„é”®å€¼
 	 * @return {const char*}
 	 */
 	const char* get_key(void) const;
 
 	/**
-	 * »ñµÃ¸Ã½ÚµãËù°ó¶¨µÄ¶ÔÏóµØÖ·
+	 * è·å¾—è¯¥èŠ‚ç‚¹æ‰€ç»‘å®šçš„å¯¹è±¡åœ°å€
 	 * @return {void*}
 	 */
 	void* get_ctx(void) const;
 
 	/**
-	 * »ñµÃ¸Ã½ÚµãËùÊôµÄÆ¥ÅäÊ÷¶ÔÏó
+	 * è·å¾—è¯¥èŠ‚ç‚¹æ‰€å±çš„åŒ¹é…æ ‘å¯¹è±¡
 	 * @return {token_tree*}
 	 */
 	token_tree* get_tree(void) const
@@ -39,7 +39,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ C °æ±¾µÄ½Úµã¶ÔÏó
+	 * è·å¾— C ç‰ˆæœ¬çš„èŠ‚ç‚¹å¯¹è±¡
 	 * @return {ACL_TOKEN*}
 	 */
 	ACL_TOKEN* get_token(void) const
@@ -48,7 +48,7 @@ public:
 	}
 
 private:
-	friend class token_tree;	// ½öÔÊĞí token_tree ¹¹Ôì/Îö¹¹±¾Àà¶ÔÏó
+	friend class token_tree;	// ä»…å…è®¸ token_tree æ„é€ /ææ„æœ¬ç±»å¯¹è±¡
 
 	token_node(void);
 	~token_node(void);
@@ -63,8 +63,8 @@ private:
 };
 
 /**
- * 256 ²æÊ÷×î´óÆ¥Åä²éÕÒËã·¨£¬¸ÃËã·¨¾ßÓĞÍ¨ÓÃĞÔ¼°·Ç³£¸ßµÄĞÔÄÜ(±È¹şÏ£ĞÔÄÜ»¹¸ß)£¬
- * Í¨¹ı½«×Ö·û´®Ó³Éäµ½ 256 ²æÊ÷ÉÏ½øĞĞÆ¥Åä²éÕÒ
+ * 256 å‰æ ‘æœ€å¤§åŒ¹é…æŸ¥æ‰¾ç®—æ³•ï¼Œè¯¥ç®—æ³•å…·æœ‰é€šç”¨æ€§åŠéå¸¸é«˜çš„æ€§èƒ½(æ¯”å“ˆå¸Œæ€§èƒ½è¿˜é«˜)ï¼Œ
+ * é€šè¿‡å°†å­—ç¬¦ä¸²æ˜ å°„åˆ° 256 å‰æ ‘ä¸Šè¿›è¡ŒåŒ¹é…æŸ¥æ‰¾
  */
 class ACL_CPP_API token_tree : public noncopyable
 {
@@ -73,72 +73,72 @@ public:
 	~token_tree(void);
 
 	/**
-	 * Ìí¼ÓÒ»¸öĞÂµÄÏî
-	 * @param key {const char*} ¼üÖµ
-	 * @param ctx {void*} ¸Ã key Ëù°ó¶¨µÄ¶ÔÏó£¬¿ÉÒÔÎª¿Õ
-	 * @return {bool} Ìí¼ÓÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÃ÷ÏàÍ¬ key ÒÑ´æÔÚ
+	 * æ·»åŠ ä¸€ä¸ªæ–°çš„é¡¹
+	 * @param key {const char*} é”®å€¼
+	 * @param ctx {void*} è¯¥ key æ‰€ç»‘å®šçš„å¯¹è±¡ï¼Œå¯ä»¥ä¸ºç©º
+	 * @return {bool} æ·»åŠ æ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨æ˜ç›¸åŒ key å·²å­˜åœ¨
 	 */
 	bool insert(const char* key, void* ctx = NULL);
 
 	/**
-	 * ´ÓÆ¥ÅäÊ÷ÖĞÉ¾³ıÖ¸¶¨µÄ key Ïî
-	 * @param key {const char*} ¼üÖµ
-	 * @return {void*} ·µ»ØÌí¼ÓÊ±°ó¶¨µÄ¶ÔÏóµØÖ·
+	 * ä»åŒ¹é…æ ‘ä¸­åˆ é™¤æŒ‡å®šçš„ key é¡¹
+	 * @param key {const char*} é”®å€¼
+	 * @return {void*} è¿”å›æ·»åŠ æ—¶ç»‘å®šçš„å¯¹è±¡åœ°å€
 	 */
 	void* remove(const char* key);
 
 	/**
-	 * ¸ù¾İ¼üÖµ¾«È·²éÕÒÆ¥ÅäµÄ½Úµã
-	 * @param key {const char*} ¼üÖµ
-	 * @return {const token_node*} ·µ»Ø NULL ±íÊ¾Î´ÕÒµ½Æ¥ÅäÏî
+	 * æ ¹æ®é”®å€¼ç²¾ç¡®æŸ¥æ‰¾åŒ¹é…çš„èŠ‚ç‚¹
+	 * @param key {const char*} é”®å€¼
+	 * @return {const token_node*} è¿”å› NULL è¡¨ç¤ºæœªæ‰¾åˆ°åŒ¹é…é¡¹
 	 */
 	const token_node* find(const char* key);
 
 	/**
-	 * °´×Ö·û´®×î´óÆ¥ÅäÄ£Ê½´ÓÆ¥ÅäÖĞ²éÕÒÓëËù¸øÎÄ±¾×Ö·û´®ÏàÆ¥ÅäµÄ½Úµã£¬Í¬Ê±
-	 * ÒÆ¶¯ÎÄ±¾×Ö·û´®µÄÖ¸ÕëÎ»ÖÃ
-	 * @param text {const char**} ÒªÆ¥Åä²éÕÒµÄÎÄ±¾×Ö·û´®£¬ÔÚÆ¥Åä¹ı³ÌÖĞ£¬¸Ã
-	 *  µØÖ·Ö¸Õë»á±»ÒÆ¶¯ÖÁÏÂÒ»Î»ÖÃ
-	 * @param delimiters {const char*} ·Ç NULL Ê±Ö¸¶¨µÄ½ØÖ¹·û×Ö·û´®£¬¼´²é
-	 *  ÕÒ¹ı³ÌÖĞÖ»ÒªÓöµ½µÄ×Ö·ûÔÚ¸Ã½ØÖ¹×Ö·û´®ÖĞ£¬Ôò·µ»Ø±¾´Î²éÕÒµÄ½á¹û
-	 * @param delimiters_tab {const char*} ·Ç NULL Ê±Ö¸¶¨µÄ½ØÖ¹·û×Ö·ûÊı×é£¬
-	 *  ¼´²éÕÒ¹ı³ÌÖĞÖ»ÒªÓöµ½µÄ×Ö·ûÔÚ¸Ã½ØÖ¹×Ö·ûÊı×éÖĞ£¬Ôò·µ»Ø±¾´Î²éÕÒµÄ½á¹û£¬¸ÃÊı×é
-	 *  ±ØĞëÓÉ create_delimiters_tab ´´½¨£¬ÓÉ free_delimiters_tab ÊÍ·Å
-	 * @return {token_node*} ·µ»Ø NULL ±íÊ¾±¾´Î²éÕÒÎ´ÕÒµ½Æ¥ÅäÏî£¬Í¨¹ı¼ì²é
-	 *  *text ÊÇ·ñÎª '\0' ±íÊ¾ÊÇ·ñÆ¥ÅäÍê±ÏÄ¿±êÎÄ±¾×Ö·û´®
-	 *  ×¢£ºµ± delimiters ·Ç¿ÕÊ±ÓÅÏÈÊ¹ÓÃ delimiters ×öÎª½ØÖ¹·û£¬·ñÔòÔÙ¼ì²é
-	 *  delimiters_tab ÊÇ·ñ·Ç¿Õ£¬Èç¹û·Ç¿ÕÔòÊ¹ÓÃÆä×öÎª½ØÖ¹·û
+	 * æŒ‰å­—ç¬¦ä¸²æœ€å¤§åŒ¹é…æ¨¡å¼ä»åŒ¹é…ä¸­æŸ¥æ‰¾ä¸æ‰€ç»™æ–‡æœ¬å­—ç¬¦ä¸²ç›¸åŒ¹é…çš„èŠ‚ç‚¹ï¼ŒåŒæ—¶
+	 * ç§»åŠ¨æ–‡æœ¬å­—ç¬¦ä¸²çš„æŒ‡é’ˆä½ç½®
+	 * @param text {const char**} è¦åŒ¹é…æŸ¥æ‰¾çš„æ–‡æœ¬å­—ç¬¦ä¸²ï¼Œåœ¨åŒ¹é…è¿‡ç¨‹ä¸­ï¼Œè¯¥
+	 *  åœ°å€æŒ‡é’ˆä¼šè¢«ç§»åŠ¨è‡³ä¸‹ä¸€ä½ç½®
+	 * @param delimiters {const char*} é NULL æ—¶æŒ‡å®šçš„æˆªæ­¢ç¬¦å­—ç¬¦ä¸²ï¼Œå³æŸ¥
+	 *  æ‰¾è¿‡ç¨‹ä¸­åªè¦é‡åˆ°çš„å­—ç¬¦åœ¨è¯¥æˆªæ­¢å­—ç¬¦ä¸²ä¸­ï¼Œåˆ™è¿”å›æœ¬æ¬¡æŸ¥æ‰¾çš„ç»“æœ
+	 * @param delimiters_tab {const char*} é NULL æ—¶æŒ‡å®šçš„æˆªæ­¢ç¬¦å­—ç¬¦æ•°ç»„ï¼Œ
+	 *  å³æŸ¥æ‰¾è¿‡ç¨‹ä¸­åªè¦é‡åˆ°çš„å­—ç¬¦åœ¨è¯¥æˆªæ­¢å­—ç¬¦æ•°ç»„ä¸­ï¼Œåˆ™è¿”å›æœ¬æ¬¡æŸ¥æ‰¾çš„ç»“æœï¼Œè¯¥æ•°ç»„
+	 *  å¿…é¡»ç”± create_delimiters_tab åˆ›å»ºï¼Œç”± free_delimiters_tab é‡Šæ”¾
+	 * @return {token_node*} è¿”å› NULL è¡¨ç¤ºæœ¬æ¬¡æŸ¥æ‰¾æœªæ‰¾åˆ°åŒ¹é…é¡¹ï¼Œé€šè¿‡æ£€æŸ¥
+	 *  *text æ˜¯å¦ä¸º '\0' è¡¨ç¤ºæ˜¯å¦åŒ¹é…å®Œæ¯•ç›®æ ‡æ–‡æœ¬å­—ç¬¦ä¸²
+	 *  æ³¨ï¼šå½“ delimiters éç©ºæ—¶ä¼˜å…ˆä½¿ç”¨ delimiters åšä¸ºæˆªæ­¢ç¬¦ï¼Œå¦åˆ™å†æ£€æŸ¥
+	 *  delimiters_tab æ˜¯å¦éç©ºï¼Œå¦‚æœéç©ºåˆ™ä½¿ç”¨å…¶åšä¸ºæˆªæ­¢ç¬¦
 	 */
 	const token_node* search(const char** text, const char* delimiters = NULL,
 		const char* delimiters_tab = NULL);
 
 	/**
-	 * ´´½¨½ØÖ¹·ûÊı×é
-	 * @param delimiters {const char*} ½ØÖ¹·û×Ö·û´®
-	 * @return {char*} ¸ù¾İ½ØÖ¹·û×Ö·û´®´´½¨µÄ½ØÖ¹·ûÊı×é
+	 * åˆ›å»ºæˆªæ­¢ç¬¦æ•°ç»„
+	 * @param delimiters {const char*} æˆªæ­¢ç¬¦å­—ç¬¦ä¸²
+	 * @return {char*} æ ¹æ®æˆªæ­¢ç¬¦å­—ç¬¦ä¸²åˆ›å»ºçš„æˆªæ­¢ç¬¦æ•°ç»„
 	 */
 	static char* create_delimiters_tab(const char* delimiters);
 
 	/**
-	 * ÊÍ·ÅÓÉ create_delimiters_tab ´´½¨µÄ½ØÖ¹·ûÊı×é
+	 * é‡Šæ”¾ç”± create_delimiters_tab åˆ›å»ºçš„æˆªæ­¢ç¬¦æ•°ç»„
 	 * @param delimiters_tab {char*}
 	 */
 	static void free_delimiters_tab(char* delimiters_tab);
 
 	/**
-	 * ±éÀú 256 Æ¥ÅäÊ÷Ê±ĞèÏÈµ÷ÓÃ±¾·½·¨»ñµÃµÚÒ»¸ö½Úµã¶ÔÏó
+	 * éå† 256 åŒ¹é…æ ‘æ—¶éœ€å…ˆè°ƒç”¨æœ¬æ–¹æ³•è·å¾—ç¬¬ä¸€ä¸ªèŠ‚ç‚¹å¯¹è±¡
 	 * @return {token_node*}
 	 */
 	const token_node* first_node(void);
 
 	/**
-	 * ±éÀú 256 Æ¥ÅäÊ÷Ê±ĞèÏÈµ÷ÓÃ±¾·½·¨»ñµÃÏÂÒ»¸ö½Úµã¶ÔÏó
+	 * éå† 256 åŒ¹é…æ ‘æ—¶éœ€å…ˆè°ƒç”¨æœ¬æ–¹æ³•è·å¾—ä¸‹ä¸€ä¸ªèŠ‚ç‚¹å¯¹è±¡
 	 * @return {token_node*}
 	 */
 	const token_node* next_node(void);
 
 	/**
-	 * »ñµÃ C °æ±¾µÄ 256 ²æÊ÷¶ÔÏó
+	 * è·å¾— C ç‰ˆæœ¬çš„ 256 å‰æ ‘å¯¹è±¡
 	 * @return {ACL_TOKEN*}
 	 */
 	ACL_TOKEN* get_tree(void) const

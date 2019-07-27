@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 static bool test_multi(acl::redis_transaction& redis)
 {

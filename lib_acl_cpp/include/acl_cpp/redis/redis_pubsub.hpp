@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <map>
@@ -36,38 +36,38 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ½«ĞÅÏ¢·¢ËÍµ½Ö¸¶¨µÄÆµµÀ channel
+	 * å°†ä¿¡æ¯å‘é€åˆ°æŒ‡å®šçš„é¢‘é“ channel
 	 * post a message to a channel
-	 * @param channel {const char*} Ëù·¢ËÍÏûÏ¢µÄÄ¿±êÆµµÀ
+	 * @param channel {const char*} æ‰€å‘é€æ¶ˆæ¯çš„ç›®æ ‡é¢‘é“
 	 *  the specified channel
-	 * @param msg {const char*} ÏûÏ¢ÄÚÈİ
+	 * @param msg {const char*} æ¶ˆæ¯å†…å®¹
 	 *  the message to be sent
-	 * @param len {size_t} ÏûÏ¢³¤¶È
+	 * @param len {size_t} æ¶ˆæ¯é•¿åº¦
 	 *  the message's length
-	 * @return {int} ³É¹¦·¢ËÍÖÁ¶©ÔÄ¸ÃÆµµÀµÄ¶©ÔÄÕßÊıÁ¿
+	 * @return {int} æˆåŠŸå‘é€è‡³è®¢é˜…è¯¥é¢‘é“çš„è®¢é˜…è€…æ•°é‡
 	 *  the number of clients that received the message
-	 *  -1£º±íÊ¾³ö´í
+	 *  -1ï¼šè¡¨ç¤ºå‡ºé”™
 	 *      error happened
-	 *   0£ºÃ»ÓĞ¶©ÔÄÕß
+	 *   0ï¼šæ²¡æœ‰è®¢é˜…è€…
 	 *      no client subscribe the channel
-	 *  >0£º¶©ÔÄ¸ÃÆµµÀµÄ¶©ÔÄÕßÊıÁ¿
+	 *  >0ï¼šè®¢é˜…è¯¥é¢‘é“çš„è®¢é˜…è€…æ•°é‡
 	 *      the number of clients that received the message
 	 */
 	int publish(const char* channel, const char* msg, size_t len);
 
 	/**
-	 * ¶©ÔÄ¸ø¶¨µÄÒ»¸ö»ò¶à¸öÆµµÀµÄĞÅÏ¢£»ÔÚµ÷ÓÃ±¾º¯ÊıºóµÄ²Ù×÷Ö»ÄÜ·¢ËÍµÄÃüÁîÓĞ£º
-	 * subscribe¡¢unsubscribe¡¢psubscribe¡¢punsubscribe¡¢get_message£¬Ö»ÓĞ
-	 * È¡Ïû¶©ÔÄÁËËùÓĞÆµµÀ£¨»òÁ¬½ÓÖØ½¨£©ºó²Å°ÚÍÑ¸ÃÏŞÖÆ
+	 * è®¢é˜…ç»™å®šçš„ä¸€ä¸ªæˆ–å¤šä¸ªé¢‘é“çš„ä¿¡æ¯ï¼›åœ¨è°ƒç”¨æœ¬å‡½æ•°åçš„æ“ä½œåªèƒ½å‘é€çš„å‘½ä»¤æœ‰ï¼š
+	 * subscribeã€unsubscribeã€psubscribeã€punsubscribeã€get_messageï¼Œåªæœ‰
+	 * å–æ¶ˆè®¢é˜…äº†æ‰€æœ‰é¢‘é“ï¼ˆæˆ–è¿æ¥é‡å»ºï¼‰åæ‰æ‘†è„±è¯¥é™åˆ¶
 	 * subscribe one or more channel(s). Once the client enters the
 	 * subscribed state it is not supposed to issue any other commands,
 	 * except for additional SUBSCRIBE, PSUBSCRIBE, UNSUBSCRIBE
 	 * and PUNSUBSCRIBE commands
-	 * @param first_channel {const char*} Ëù¶©ÔÄµÄÆµµÀÁĞ±íµÄµÚÒ»¸ö·Ç¿Õ×Ö·û´®
-	 *  µÄÆµµÀ£¬¶ÔÓÚ±ä²ÎÁĞ±íÖĞµÄ×îºóÒ»¸ö±ØĞëÊÇ NULL
+	 * @param first_channel {const char*} æ‰€è®¢é˜…çš„é¢‘é“åˆ—è¡¨çš„ç¬¬ä¸€ä¸ªéç©ºå­—ç¬¦ä¸²
+	 *  çš„é¢‘é“ï¼Œå¯¹äºå˜å‚åˆ—è¡¨ä¸­çš„æœ€åä¸€ä¸ªå¿…é¡»æ˜¯ NULL
 	 *  the first non-NULL channel in the channel list, and the last
 	 *  parameter must be NULL indicating the end of the channel list
-	 * @return {int} ·µ»Øµ±Ç°ÒÑ¾­³É¹¦¶©ÔÄµÄÆµµÀ¸öÊı£¨¼´Ëù¶©ÔÄµÄËùÓĞÆµµÀÊıÁ¿£©
+	 * @return {int} è¿”å›å½“å‰å·²ç»æˆåŠŸè®¢é˜…çš„é¢‘é“ä¸ªæ•°ï¼ˆå³æ‰€è®¢é˜…çš„æ‰€æœ‰é¢‘é“æ•°é‡ï¼‰
 	 *  the number of channels subscribed by the current client
 	 */
 	int subscribe(const char* first_channel, ...);
@@ -75,12 +75,12 @@ public:
 	int subscribe(const std::vector<string>& channels);
 
 	/**
-	 * È¡Ïû¶©ÔÄ¸ø¶¨µÄÒ»¸ö»ò¶à¸öÆµµÀµÄĞÅÏ¢
+	 * å–æ¶ˆè®¢é˜…ç»™å®šçš„ä¸€ä¸ªæˆ–å¤šä¸ªé¢‘é“çš„ä¿¡æ¯
 	 * stop listening for messages posted to the given channels
-	 * @param first_channel {const char*} ËùÈ¡ÏûµÄËù¶©ÔÄÆµµÀÁĞ±íµÄµÚÒ»¸öÆµµÀ
+	 * @param first_channel {const char*} æ‰€å–æ¶ˆçš„æ‰€è®¢é˜…é¢‘é“åˆ—è¡¨çš„ç¬¬ä¸€ä¸ªé¢‘é“
 	 *  the fist channel in channel list, and the last parameter must be
 	 *  NULL indicating the end of the channel list
-	 * @return {int} ·µ»ØÊ£ÓàµÄËù¶©ÔÄµÄÆµµÀµÄ¸öÊı
+	 * @return {int} è¿”å›å‰©ä½™çš„æ‰€è®¢é˜…çš„é¢‘é“çš„ä¸ªæ•°
 	 *  the rest channels listened by the current client
 	 */
 	int unsubscribe(const char* first_channel, ...);
@@ -88,14 +88,14 @@ public:
 	int unsubscribe(const std::vector<string>& channels);
 
 	/**
-	* ¶©ÔÄÒ»¸ö»ò¶à¸ö·ûºÏ¸ø¶¨Ä£Ê½µÄÆµµÀ£»Ã¿¸öÄ£Ê½ÒÔ * ×÷ÎªÆ¥Åä·û£»ÔÚµ÷ÓÃ±¾º¯ÊıºóµÄ²Ù×÷
-	* Ö»ÄÜ·¢ËÍµÄÃüÁîÓĞ£ºsubscribe¡¢unsubscribe¡¢psubscribe¡¢punsubscribe¡¢
-	* get_message£¬Ö»ÓĞÈ¡Ïû¶©ÔÄÁËËùÓĞÆµµÀ£¨»òÁ¬½ÓÖØ½¨£©ºó²Å°ÚÍÑ¸ÃÏŞÖÆ
+	* è®¢é˜…ä¸€ä¸ªæˆ–å¤šä¸ªç¬¦åˆç»™å®šæ¨¡å¼çš„é¢‘é“ï¼›æ¯ä¸ªæ¨¡å¼ä»¥ * ä½œä¸ºåŒ¹é…ç¬¦ï¼›åœ¨è°ƒç”¨æœ¬å‡½æ•°åçš„æ“ä½œ
+	* åªèƒ½å‘é€çš„å‘½ä»¤æœ‰ï¼šsubscribeã€unsubscribeã€psubscribeã€punsubscribeã€
+	* get_messageï¼Œåªæœ‰å–æ¶ˆè®¢é˜…äº†æ‰€æœ‰é¢‘é“ï¼ˆæˆ–è¿æ¥é‡å»ºï¼‰åæ‰æ‘†è„±è¯¥é™åˆ¶
 	* listen for messages published to channels matching the give patterns
-	 * @param first_pattern {const char*} µÚÒ»¸öÆ¥ÅäÄ£Ê½´®
+	 * @param first_pattern {const char*} ç¬¬ä¸€ä¸ªåŒ¹é…æ¨¡å¼ä¸²
 	 *  the first pattern in pattern list, the last parameter must be NULL
 	 *  int the variable args
-	 * @return {int} ·µ»Øµ±Ç°ÒÑ¾­³É¹¦¶©ÔÄµÄÆµµÀ¸öÊı£¨¼´Ëù¶©ÔÄµÄËùÓĞÆµµÀÊıÁ¿£©
+	 * @return {int} è¿”å›å½“å‰å·²ç»æˆåŠŸè®¢é˜…çš„é¢‘é“ä¸ªæ•°ï¼ˆå³æ‰€è®¢é˜…çš„æ‰€æœ‰é¢‘é“æ•°é‡ï¼‰
 	 *  the number of channels listened by the current client
 	 */
 	int psubscribe(const char* first_pattern, ...);
@@ -103,12 +103,12 @@ public:
 	int psubscribe(const std::vector<string>& patterns);
 
 	/**
-	 * ¸ù¾İÄ£Ê½Æ¥Åä´®È¡Ïû¶©ÔÄ¸ø¶¨µÄÒ»¸ö»ò¶à¸öÆµµÀµÄĞÅÏ¢
+	 * æ ¹æ®æ¨¡å¼åŒ¹é…ä¸²å–æ¶ˆè®¢é˜…ç»™å®šçš„ä¸€ä¸ªæˆ–å¤šä¸ªé¢‘é“çš„ä¿¡æ¯
 	 * stop listening for messaged posted to channels matching
 	 * the given patterns
-	 * @param first_pattern {const char*} µÚÒ»¸öÆ¥ÅäÄ£Ê½´®
+	 * @param first_pattern {const char*} ç¬¬ä¸€ä¸ªåŒ¹é…æ¨¡å¼ä¸²
 	 *  the first parttern in a variable args ending with NULL
-	 * @return {int} ·µ»ØÊ£ÓàµÄËù¶©ÔÄµÄÆµµÀµÄ¸öÊı
+	 * @return {int} è¿”å›å‰©ä½™çš„æ‰€è®¢é˜…çš„é¢‘é“çš„ä¸ªæ•°
 	 *  the rest number of channels be listened by the client
 	 */
 	int punsubscribe(const char* first_pattern, ...);
@@ -116,44 +116,44 @@ public:
 	int punsubscribe(const std::vector<string>& patterns);
 
 	/**
-	 * ÔÚ¶©ÔÄÆµµÀºó¿ÉÒÔÑ­»·µ÷ÓÃ±¾º¯Êı´ÓËù¶©ÔÄµÄÆµµÀÖĞ»ñÈ¡¶©ÔÄÏûÏ¢£»
-	 * ÔÚµ÷ÓÃ subscribe »ò psubscribe ºó²Å¿Éµ÷ÓÃ±¾º¯ÊıÀ´»ñÈ¡Ëù¶©ÔÄµÄÆµµÀµÄÏûÏ¢
+	 * åœ¨è®¢é˜…é¢‘é“åå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬å‡½æ•°ä»æ‰€è®¢é˜…çš„é¢‘é“ä¸­è·å–è®¢é˜…æ¶ˆæ¯ï¼›
+	 * åœ¨è°ƒç”¨ subscribe æˆ– psubscribe åæ‰å¯è°ƒç”¨æœ¬å‡½æ•°æ¥è·å–æ‰€è®¢é˜…çš„é¢‘é“çš„æ¶ˆæ¯
 	 * get messages posted to channels after SUBSCRIBE or PSUBSCRIBE
-	 * @param channel {string&} ´æ·Åµ±Ç°ÓĞÏûÏ¢µÄÆµµÀÃû
+	 * @param channel {string&} å­˜æ”¾å½“å‰æœ‰æ¶ˆæ¯çš„é¢‘é“å
 	 *  buffer for storing the channel associate with the msg
-	 * @param msg {string&} ´æ·Åµ±Ç°»ñµÃµÄÏûÏ¢ÄÚÈİ
+	 * @param msg {string&} å­˜æ”¾å½“å‰è·å¾—çš„æ¶ˆæ¯å†…å®¹
 	 *  store the message posted to the channel
 	 * @param message_type {string*} will store messsage or pmessage
 	 * @param pattern {string*} will store pattern set by psubscribe
-	 * @return {bool} ÊÇ·ñ³É¹¦£¬Èç¹û·µ»Ø false Ôò±íÊ¾³ö´í
+	 * @return {bool} æ˜¯å¦æˆåŠŸï¼Œå¦‚æœè¿”å› false åˆ™è¡¨ç¤ºå‡ºé”™
 	 *  true on success, false on error
 	 */
 	bool get_message(string& channel, string& msg,
 		string* message_type = NULL, string* pattern = NULL);
 
 	/**
-	 * ÁĞ³öµ±Ç°µÄ»îÔ¾ÆµµÀ£º»îÔ¾ÆµµÀÖ¸µÄÊÇÄÇĞ©ÖÁÉÙÓĞÒ»¸ö¶©ÔÄÕßµÄÆµµÀ£¬ ¶©ÔÄÄ£Ê½µÄ
-	 * ¿Í»§¶Ë²»¼ÆËãÔÚÄÚ
+	 * åˆ—å‡ºå½“å‰çš„æ´»è·ƒé¢‘é“ï¼šæ´»è·ƒé¢‘é“æŒ‡çš„æ˜¯é‚£äº›è‡³å°‘æœ‰ä¸€ä¸ªè®¢é˜…è€…çš„é¢‘é“ï¼Œ è®¢é˜…æ¨¡å¼çš„
+	 * å®¢æˆ·ç«¯ä¸è®¡ç®—åœ¨å†…
 	 * Lists the currently active channels.
-	 * @param channels {std::vector<string>*} ·Ç¿ÕÊ±´æ·ÅÆµµÀ½á¹û¼¯
+	 * @param channels {std::vector<string>*} éç©ºæ—¶å­˜æ”¾é¢‘é“ç»“æœé›†
 	 *  store the active channels
-	 * @param first_pattern {const char*} ×÷Îª¸½¼ÓµÄÆ¥ÅäÄ£Ê½µÚÒ»¸öÆ¥Åä×Ö·û´®£¬
-	 *  ¸ÃÖ¸Õë¿ÉÒÔÎª NULL£¬´ËÊ±»ñÈ¡Ö¸ËùÓĞµÄ»îÔ¾ÆµµÀ£»¶ÔÓÚ±ä²Î¶øÑÔ×îºóÒ»¸ö²ÎÊıĞèÎª NULL
+	 * @param first_pattern {const char*} ä½œä¸ºé™„åŠ çš„åŒ¹é…æ¨¡å¼ç¬¬ä¸€ä¸ªåŒ¹é…å­—ç¬¦ä¸²ï¼Œ
+	 *  è¯¥æŒ‡é’ˆå¯ä»¥ä¸º NULLï¼Œæ­¤æ—¶è·å–æŒ‡æ‰€æœ‰çš„æ´»è·ƒé¢‘é“ï¼›å¯¹äºå˜å‚è€Œè¨€æœ€åä¸€ä¸ªå‚æ•°éœ€ä¸º NULL
 	 *  the first pattern in a variable args ending with NULL arg, and
 	 *  the first arg can be NULL.
-	 * @return {int} ·µ»Ø»îÔ¾ÆµµÀÊı£» -1 ±íÊ¾³ö´í
+	 * @return {int} è¿”å›æ´»è·ƒé¢‘é“æ•°ï¼› -1 è¡¨ç¤ºå‡ºé”™
 	 *  the number of active channels. -1 if error
 	 *
-	 *  ²Ù×÷³É¹¦ºó¿ÉÒÔÍ¨¹ıÒÔÏÂÈÎÒ»·½Ê½»ñµÃÊı¾İ
-	 *  1¡¢»ùÀà·½·¨ get_value »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØÊı¾İ
-	 *  2¡¢»ùÀà·½·¨ get_child »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØ¶ÔÏó(redis_result£©£¬È»ºóÔÙÍ¨¹ı
-	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
-	 *  3¡¢»ùÀà·½·¨ get_result ·½·¨È¡µÃ×Ü½á¹û¼¯¶ÔÏó redis_result£¬È»ºóÔÙÍ¨¹ı
-	 *     redis_result::get_child »ñµÃÒ»¸öÔªËØ¶ÔÏó£¬È»ºóÔÙÍ¨¹ı·½Ê½ 2 ÖĞÖ¸¶¨
-	 *     µÄ·½·¨»ñµÃ¸ÃÔªËØµÄÊı¾İ
-	 *  4¡¢»ùÀà·½·¨ get_children »ñµÃ½á¹ûÔªËØÊı×é¶ÔÏó£¬ÔÙÍ¨¹ı redis_result ÖĞ
-	 *     µÄ·½·¨ argv_to_string ´ÓÃ¿Ò»¸öÔªËØ¶ÔÏóÖĞ»ñµÃÔªËØÊı¾İ
-	 *  5¡¢ÔÚµ÷ÓÃ·½·¨ÖĞ´«Èë·Ç¿ÕµÄ´æ´¢½á¹û¶ÔÏóµÄµØÖ·
+	 *  æ“ä½œæˆåŠŸåå¯ä»¥é€šè¿‡ä»¥ä¸‹ä»»ä¸€æ–¹å¼è·å¾—æ•°æ®
+	 *  1ã€åŸºç±»æ–¹æ³• get_value è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ æ•°æ®
+	 *  2ã€åŸºç±»æ–¹æ³• get_child è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ å¯¹è±¡(redis_resultï¼‰ï¼Œç„¶åå†é€šè¿‡
+	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
+	 *  3ã€åŸºç±»æ–¹æ³• get_result æ–¹æ³•å–å¾—æ€»ç»“æœé›†å¯¹è±¡ redis_resultï¼Œç„¶åå†é€šè¿‡
+	 *     redis_result::get_child è·å¾—ä¸€ä¸ªå…ƒç´ å¯¹è±¡ï¼Œç„¶åå†é€šè¿‡æ–¹å¼ 2 ä¸­æŒ‡å®š
+	 *     çš„æ–¹æ³•è·å¾—è¯¥å…ƒç´ çš„æ•°æ®
+	 *  4ã€åŸºç±»æ–¹æ³• get_children è·å¾—ç»“æœå…ƒç´ æ•°ç»„å¯¹è±¡ï¼Œå†é€šè¿‡ redis_result ä¸­
+	 *     çš„æ–¹æ³• argv_to_string ä»æ¯ä¸€ä¸ªå…ƒç´ å¯¹è±¡ä¸­è·å¾—å…ƒç´ æ•°æ®
+	 *  5ã€åœ¨è°ƒç”¨æ–¹æ³•ä¸­ä¼ å…¥éç©ºçš„å­˜å‚¨ç»“æœå¯¹è±¡çš„åœ°å€
 	 *
 	 */
 	int pubsub_channels(std::vector<string>* channels,
@@ -164,17 +164,17 @@ public:
 		std::vector<string>* channels);
 
 	/**
-	 * ·µ»Ø¸ø¶¨ÆµµÀµÄ¶©ÔÄÕßÊıÁ¿£¬ ¶©ÔÄÄ£Ê½µÄ¿Í»§¶Ë²»¼ÆËãÔÚÄÚ
+	 * è¿”å›ç»™å®šé¢‘é“çš„è®¢é˜…è€…æ•°é‡ï¼Œ è®¢é˜…æ¨¡å¼çš„å®¢æˆ·ç«¯ä¸è®¡ç®—åœ¨å†…
 	 * Returns the number of subscribers (not counting clients
 	 * subscribed to patterns) for the specified channels.
-	 * @param out {std::map<string, int>&} ´æ´¢²éÑ¯½á¹û£¬ÆäÖĞ out->first ´æ·Å
-	 *  ÆµµÀÃû£¬out->second ÔÚ×ù¸ÃÆµµÀµÄ¶©ÔÄÕßÊıÁ¿
+	 * @param out {std::map<string, int>&} å­˜å‚¨æŸ¥è¯¢ç»“æœï¼Œå…¶ä¸­ out->first å­˜æ”¾
+	 *  é¢‘é“åï¼Œout->second åœ¨åº§è¯¥é¢‘é“çš„è®¢é˜…è€…æ•°é‡
 	 *  store the results
-	 * @param first_pattern {const char*} ×÷Îª¸½¼ÓµÄÆ¥ÅäÄ£Ê½µÚÒ»¸öÆ¥Åä×Ö·û´®£¬
-	 *  ¸ÃÖ¸Õë¿ÉÒÔÎª NULL£¬´ËÊ±»ñÈ¡Ö¸ËùÓĞµÄ»îÔ¾ÆµµÀ£»¶ÔÓÚ±ä²Î¶øÑÔ×îºóÒ»¸ö²ÎÊıĞèÎª NULL
+	 * @param first_pattern {const char*} ä½œä¸ºé™„åŠ çš„åŒ¹é…æ¨¡å¼ç¬¬ä¸€ä¸ªåŒ¹é…å­—ç¬¦ä¸²ï¼Œ
+	 *  è¯¥æŒ‡é’ˆå¯ä»¥ä¸º NULLï¼Œæ­¤æ—¶è·å–æŒ‡æ‰€æœ‰çš„æ´»è·ƒé¢‘é“ï¼›å¯¹äºå˜å‚è€Œè¨€æœ€åä¸€ä¸ªå‚æ•°éœ€ä¸º NULL
 	 *  the first pattern in a variable args ending with NULL arg, and
 	 *  the first arg can be NULL.
-	 * @return {int} ÆµµÀµÄÊıÁ¿£¬-1 ±íÊ¾³ö´í
+	 * @return {int} é¢‘é“çš„æ•°é‡ï¼Œ-1 è¡¨ç¤ºå‡ºé”™
 	 */
 	int pubsub_numsub(std::map<string, int>& out,
 		const char* first_channel, ...);
@@ -184,10 +184,10 @@ public:
 		std::map<string, int>& out);
 
 	/**
-	 * ·µ»Ø¶©ÔÄÄ£Ê½µÄÊıÁ¿£¬Õâ¸öÃüÁî·µ»ØµÄ²»ÊÇ¶©ÔÄÄ£Ê½µÄ¿Í»§¶ËµÄÊıÁ¿£¬ ¶øÊÇ¿Í»§¶Ë¶©ÔÄµÄ
-	 * ËùÓĞÄ£Ê½µÄÊıÁ¿×ÜºÍ
+	 * è¿”å›è®¢é˜…æ¨¡å¼çš„æ•°é‡ï¼Œè¿™ä¸ªå‘½ä»¤è¿”å›çš„ä¸æ˜¯è®¢é˜…æ¨¡å¼çš„å®¢æˆ·ç«¯çš„æ•°é‡ï¼Œ è€Œæ˜¯å®¢æˆ·ç«¯è®¢é˜…çš„
+	 * æ‰€æœ‰æ¨¡å¼çš„æ•°é‡æ€»å’Œ
 	 * Returns the number of subscriptions to patterns.
-	 * @return {int} ¿Í»§¶ËËùÓĞ¶©ÔÄÄ£Ê½µÄ×ÜºÍ£¬-1 ±íÊ¾³ö´í
+	 * @return {int} å®¢æˆ·ç«¯æ‰€æœ‰è®¢é˜…æ¨¡å¼çš„æ€»å’Œï¼Œ-1 è¡¨ç¤ºå‡ºé”™
 	 *  the number of patterns all the clients are subscribed to,
 	 *  -1 if error.
 	 */

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file ctr_drbg.h
  *
  * \brief CTR_DRBG based on AES-256 (NIST SP 800-90)

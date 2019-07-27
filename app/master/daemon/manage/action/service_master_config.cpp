@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "master/master_params.h"
 #include "manage/http_client.h"
 #include "service_master_config.h"

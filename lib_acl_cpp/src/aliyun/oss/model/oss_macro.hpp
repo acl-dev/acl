@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <list>
 
 #define OSS_SANE_FREE(x) do \

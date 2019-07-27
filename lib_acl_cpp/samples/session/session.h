@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 // in memcache_session.cpp
 bool test_memcache_session(const char* addr, int n);

@@ -1,4 +1,4 @@
-#ifndef __STROPS_HEADER_H__
+﻿#ifndef __STROPS_HEADER_H__
 #define __STROPS_HEADER_H__
 
 #ifndef SAFE_STRNCPY

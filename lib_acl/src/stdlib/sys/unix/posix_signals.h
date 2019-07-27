@@ -1,4 +1,4 @@
-#ifndef __ACL_POSIX_SIGNALS_H_INCLUDED__
+﻿#ifndef __ACL_POSIX_SIGNALS_H_INCLUDED__
 #define __ACL_POSIX_SIGNALS_H_INCLUDED__
 
 #ifdef  __cplusplus

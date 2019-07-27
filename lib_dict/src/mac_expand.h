@@ -1,4 +1,4 @@
-#ifndef _MAC_EXPAND_H_INCLUDED_
+﻿#ifndef _MAC_EXPAND_H_INCLUDED_
 #define _MAC_EXPAND_H_INCLUDED_
 
 #include "lib_acl.h"

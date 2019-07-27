@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file pem.h
  *
  * \brief Privacy Enhanced Mail (PEM) decoding

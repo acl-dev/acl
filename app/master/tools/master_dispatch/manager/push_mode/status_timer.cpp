@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "push_mode/status_manager.h"
 #include "status_timer.h"
 

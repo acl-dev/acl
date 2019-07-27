@@ -1,8 +1,8 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ï»¿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=gb2312" />
-<title>Ğ´ĞÅ - ÈÎÎÒÓÊ</title>
+<title>å†™ä¿¡ - ä»»æˆ‘é‚®</title>
 <link rel="stylesheet" type="text/css" href="/mail/style/global.css" />
 <link rel="stylesheet" type="text/css" href="/mail/style/write.css" />
 <!--
@@ -36,7 +36,7 @@ $(function(){
 				+ 28 //tabHd.height
 				- $("#formBd").outerHeight()
 				- 14 //#formBd.margin-top
-				-2 //±à¼­Æ÷×ÔÉíµÄÉÏÏÂ±ß¿ò
+				-2 //ç¼–è¾‘å™¨è‡ªèº«çš„ä¸Šä¸‹è¾¹æ¡†
 				- (!window.XMLHttpRequest ? 2 : 0)
 			);
 		} else {
@@ -49,19 +49,19 @@ $(function(){
 				+ 28 //tabHd.height
 				- $("#formBd").outerHeight()
 				- 14 //#formBd.margin-top
-				- 27 //±à¼­Æ÷¹¤¾ßÀ¸
-				-2 //±à¼­Æ÷×ÔÉíµÄÉÏÏÂ±ß¿ò
+				- 27 //ç¼–è¾‘å™¨å·¥å…·æ 
+				-2 //ç¼–è¾‘å™¨è‡ªèº«çš„ä¸Šä¸‹è¾¹æ¡†
 				- (!window.XMLHttpRequest ? 2 : 0)
 			);
 		}
 	});
 
-	//ÏÔÊ¾ÏµÍ³ÌáÊ¾
+	//æ˜¾ç¤ºç³»ç»Ÿæç¤º
 	var showSysTips = function(msg){
 		top.adv.showSysTips(msg);
 	};
 
-	//ÏÔÊ¾/Òş²ØÍ¨Ñ¶Â¼
+	//æ˜¾ç¤º/éšè—é€šè®¯å½•
 	$("#switchBd").toggle(function(){
 			$("#tab").hide();
 			$("#switchBd").addClass("expandIcon");
@@ -73,7 +73,7 @@ $(function(){
 			return false;
 		});	
 
-	//Í¨Ñ¶Â¼±êÇ©ÇĞ»»
+	//é€šè®¯å½•æ ‡ç­¾åˆ‡æ¢
 	$("#tabHd a").each(function(i){
 		$(this).click(function(){
 			$(this).parent().siblings().removeClass("selected").end().addClass("selected");
@@ -82,19 +82,19 @@ $(function(){
 		});
 	});
 	
-	//¹Ø±Õ¶Ô»°¿ò
+	//å…³é—­å¯¹è¯æ¡†
 	$("#dialog .close, #dialog .btn").click(function(){
 		$("#dialog").hide();
 		return false;
 	});
 
-	//Ìí¼ÓÃÜËÍ
+	//æ·»åŠ å¯†é€
 	$("#addBcc").click(function(){
 		$("#bccTr").show().find("input").val("");
 	        return false;
 	});
 	
-	//Õ¹¿ª/ÊÕÆğ ÁªÏµÈË
+	//å±•å¼€/æ”¶èµ· è”ç³»äºº
 	$("#tabBd .subTreeHd").click(function(){
 		$(this).parent().toggleClass(function(){
 			if($(this).children("ul:first").is(":hidden")) {
@@ -108,7 +108,7 @@ $(function(){
 		return false;
 	});
 
-	// »ñµÃÓÊ¼ş½ÓÊÕÕßÁĞ±í
+	// è·å¾—é‚®ä»¶æ¥æ”¶è€…åˆ—è¡¨
 	var getRecipients = function() {
 		var mail_to = $("#mail_to").val();
 		var mail_cc = $("#mail_cc").val();
@@ -124,7 +124,7 @@ $(function(){
 		return (recipients);
 	};
 
-	// »ñµÃµ±Ç°×«Ğ´½çÃæÖĞµÄ²ÎÊıÁĞ±í
+	// è·å¾—å½“å‰æ’°å†™ç•Œé¢ä¸­çš„å‚æ•°åˆ—è¡¨
 	var getParams = function(){
 		var params = getRecipients();
 		var mail_subject = $("#mail_subject").val();
@@ -139,26 +139,26 @@ $(function(){
 		return (params);
 	};
 
-	// ·¢ËÍÓÊ¼ş¹ı³Ì
+	// å‘é€é‚®ä»¶è¿‡ç¨‹
 	$(".sendMail").live("click", function(){
 		var params = getRecipients();
 		params += "draft=" + encodeURIComponent("1278386028.3567.localhost.localdomain");
 		var url = g_compose + "?form=check_recipients&" + params;
 
-		// ÏÈ¼ì²éÓÊ¼ş½ÓÊÕÕßÊÇ·ñºÏ·¨
+		// å…ˆæ£€æŸ¥é‚®ä»¶æ¥æ”¶è€…æ˜¯å¦åˆæ³•
 		$.get(url, function(response) {
 			if (response != "ok") {
 				alert(response);
 				return;
 			}
-			// ·¢ËÍÓÊ¼ş
+			// å‘é€é‚®ä»¶
 			$("#sendSubmit").submit();
 			return true;
 		});
 		return false;
 	});
 
-	// ±£´æ²İ¸å¹ı³Ì
+	// ä¿å­˜è‰ç¨¿è¿‡ç¨‹
 	$("#saveDraft, #saveDraft2").live("click", function(){
 		var url = g_compose + "?form=save_draft";
 		var params = getParams();
@@ -166,12 +166,12 @@ $(function(){
 			var o = window['eval']("([" + response + "])");
 			var status = o[0]['status'];
 			var msg = o[0]['msg'];
-			showSysTips("±£´æ²İ¸å³É¹¦!");
+			showSysTips("ä¿å­˜è‰ç¨¿æˆåŠŸ!");
 		});
 		return false;
 	});
 
-	// ·µ»ØÓÊ¼şÁĞ±íÒ³
+	// è¿”å›é‚®ä»¶åˆ—è¡¨é¡µ
 	var cancelAction = function() {
 		this.location = g_compose + "?folder=INBOX&form=cancel";
 	}
@@ -180,7 +180,7 @@ $(function(){
 		return true;
 	});
 
-	// Ê¹ÓÃÇ©Ãû
+	// ä½¿ç”¨ç­¾å
 	$("#sign").live("click", function(){
 		var message = $("#message").val();
 		var url = g_compose + "?form=addsign";
@@ -215,7 +215,7 @@ $(function(){
 		return (icon);
 	};
 
-	// Ìí¼Ó¸½¼ş¹ı³Ì
+	// æ·»åŠ é™„ä»¶è¿‡ç¨‹
 	var button = $('#upload'), interval;
 	var upload = new AjaxUpload(button,{
 		action: g_compose,
@@ -223,7 +223,7 @@ $(function(){
 		//responseType: 'json',
 		onSubmit : function(file, ext){
 			// change button text, when user selects file
-			button.text('ÉÏ´«ÖĞ...');
+			button.text('ä¸Šä¼ ä¸­...');
 
 			// If you want to allow uploading only 1 file at time,
 			// you can disable upload button
@@ -236,13 +236,13 @@ $(function(){
 				if (text.length < 13){
 					button.text(text + '.');
 				} else {
-					button.text('ÉÏ´«ÖĞ...');
+					button.text('ä¸Šä¼ ä¸­...');
 				}
 			}, 200);
 		},
 		onComplete: function(file, response){
 			window.clearInterval(interval);
-			button.text('Ìí¼Ó¸½¼ş');
+			button.text('æ·»åŠ é™„ä»¶');
 			// enable upload button
 			this.enable();
 
@@ -253,24 +253,24 @@ $(function(){
 			var msg = o[0]['msg'];
 			var info;
 			if (msg.indexOf("already exist") >= 0)
-				info = "¸ÃÎÄ¼şÒÑ¾­ÉÏ´«!";
+				info = "è¯¥æ–‡ä»¶å·²ç»ä¸Šä¼ !";
 			else
 				info = msg;
 			showSysTips(info);
 			if (status != 'ok') {
-				//alert('ÉÏ´«ÎÄ¼şÊ§°Ü(' + info + ')!');
+				//alert('ä¸Šä¼ æ–‡ä»¶å¤±è´¥(' + info + ')!');
 				return;
 			}
 
 			var draft = o[0]['draft'];
 			if (!draft) {
-				alert("·şÎñÆ÷·µ»Ø´íÎó!");
+				alert("æœåŠ¡å™¨è¿”å›é”™è¯¯!");
 				alert(response);
 				return;
 			}
 			var attach_name = o[0]['attach_name'];
 			if (!attach_name) {
-				alert("Î´·¢ÏÖ¸½¼şÃû!");
+				alert("æœªå‘ç°é™„ä»¶å!");
 				alert(response);
 				return;
 			}
@@ -280,21 +280,21 @@ $(function(){
 			var icon = getIcon(ext);
 			// add file to the list
 			$("#attachBd").append("<li class='" + icon + "'>" + file
-			       	+ "<a href='#2' attach=" + attach_name + " draft=" + draft + " >É¾³ı</a></li>");
+			       	+ "<a href='#2' attach=" + attach_name + " draft=" + draft + " >åˆ é™¤</a></li>");
 		}
 	});
 
-	//É¾³ı¸½¼şºóµ÷ÓÃº¯Êı
+	//åˆ é™¤é™„ä»¶åè°ƒç”¨å‡½æ•°
 	var remove = function(e){
 		$(e).parent().fadeOut("fast", function(){
 			$(this).fadeIn("fast", function(){
 				$(this).remove();
-				showSysTips("É¾³ı³É¹¦£¡");
+				showSysTips("åˆ é™¤æˆåŠŸï¼");
 			});
 		});
 	}; 
 
-	// É¾³ı¸½¼ş¹ı³Ì
+	// åˆ é™¤é™„ä»¶è¿‡ç¨‹
 	$("#attachBd a").live("click", function(){
 			var o = $(this);
 			var attach_name = o.attr('attach');
@@ -307,7 +307,7 @@ $(function(){
 				var status = json[0]['status'];
 				var msg = json[0]['msg'];
 				if (status != 'ok') {
-					alert('É¾³ı¸½¼şÊ§°Ü(' + status + ')!');
+					alert('åˆ é™¤é™„ä»¶å¤±è´¥(' + status + ')!');
 					alert(response);
 					showSysTips(msg);	
 					return;
@@ -336,7 +336,7 @@ function initEditor()
 	
 }
 
-// Ê÷ĞÍÍ¨Ñ¶Â¼µÄ»Øµ÷º¯Êı
+// æ ‘å‹é€šè®¯å½•çš„å›è°ƒå‡½æ•°
 function addAddr(addrList)
 {
 	var mails = g_input.val();
@@ -372,7 +372,7 @@ function init()
 	$('#mail_cc').live('click', function() { g_input = $(this); });
 	$('#mail_bcc').live('click', function() { g_input = $(this); });
 
-	// ÉèÖÃµØÖ·²¾Ìí¼Ó»Øµ÷º¯Êı
+	// è®¾ç½®åœ°å€ç°¿æ·»åŠ å›è°ƒå‡½æ•°
 	addrTreat=addAddr;
 }
 
@@ -382,12 +382,12 @@ function init()
 
 <body onload="javascript:init();">
 
-<!--ÕıÎÄ¿ªÊ¼ -->
+<!--æ­£æ–‡å¼€å§‹ -->
 <div class="main">
 	<div class="tools clearfix" id="toolsTop">
-		<a class="btn sendMail" href="#2"><em>·¢ ËÍ</em></a>
-		<a class="btn" id="saveDraft" href="#2"><em>±£´æ²İ¸å</em></a>
-		<a class="btn" id="cancel" href="#2"><em>È¡ Ïû</em></a>
+		<a class="btn sendMail" href="#2"><em>å‘ é€</em></a>
+		<a class="btn" id="saveDraft" href="#2"><em>ä¿å­˜è‰ç¨¿</em></a>
+		<a class="btn" id="cancel" href="#2"><em>å– æ¶ˆ</em></a>
 	</div>
 	
 	<table class="container">
@@ -399,14 +399,14 @@ function init()
 					<input type="hidden" name="folder" value="INBOX" />
 					<input type="hidden" name="draft" value="1278386028.3567.localhost.localdomain" />
 					<table class="formBd" id="formBd">
-						<tr><th width="75">ÊÕ¼şÈË£º</th><td><div class="to"><a class="blind" href="#2" id="addBcc">Ìí¼ÓÃÜËÍ</a><input class="field" type="text" name="mail_to" id="mail_to" value="" /></div></td></tr>
-						<tr><th>³­ËÍ£º</th><td><input class="field" type="text" name="mail_cc" id="mail_cc" value="" /></td></tr>
-						<tr style="display:none" id="bccTr"><th>ÃÜËÍ£º</th><td><input class="field" type="text" name="mail_bcc" id="mail_bcc" value="" /></td></tr>
-						<tr class="subject"><th>Ö÷Ìâ£º</th><td><input class="field" type="text" name="mail_subject" id="mail_subject" value="" /></td></tr>
+						<tr><th width="75">æ”¶ä»¶äººï¼š</th><td><div class="to"><a class="blind" href="#2" id="addBcc">æ·»åŠ å¯†é€</a><input class="field" type="text" name="mail_to" id="mail_to" value="" /></div></td></tr>
+						<tr><th>æŠ„é€ï¼š</th><td><input class="field" type="text" name="mail_cc" id="mail_cc" value="" /></td></tr>
+						<tr style="display:none" id="bccTr"><th>å¯†é€ï¼š</th><td><input class="field" type="text" name="mail_bcc" id="mail_bcc" value="" /></td></tr>
+						<tr class="subject"><th>ä¸»é¢˜ï¼š</th><td><input class="field" type="text" name="mail_subject" id="mail_subject" value="" /></td></tr>
 						<tr>
-							<th>¸½¼ş£º</th>
+							<th>é™„ä»¶ï¼š</th>
 							<td class="attach">
-								<div id="upload" class="attachHd">Ìí¼Ó¸½¼ş</div>
+								<div id="upload" class="attachHd">æ·»åŠ é™„ä»¶</div>
 								<ul class="attachBd" id="attachBd">
 									<li id="attach_files">
 										<ol class="files"></ol>
@@ -417,59 +417,59 @@ function init()
 					</table>	
 					
 					<div class="editor">
-						<a class="sign" id="sign" href="#2">Ê¹ÓÃÇ©Ãû</a>
-						<!--±à¼­Æ÷ÒıÈëÇøÓò¿ªÊ¼ -->
+						<a class="sign" id="sign" href="#2">ä½¿ç”¨ç­¾å</a>
+						<!--ç¼–è¾‘å™¨å¼•å…¥åŒºåŸŸå¼€å§‹ -->
 						<textarea name="message" id="message" rows="60" cols="80" class="editorHtml"></textarea>
-						 <!--±à¼­Æ÷ÒıÈëÇøÓò½áÊø -->
+						 <!--ç¼–è¾‘å™¨å¼•å…¥åŒºåŸŸç»“æŸ -->
 					</div>
 				</form>
 			</td>
-			<td class="switch"><a id="switchBd" class="switchBd" href="#2" title="ÏÔÊ¾/Òş²ØÍ¨Ñ¶Â¼"></a></td>
+			<td class="switch"><a id="switchBd" class="switchBd" href="#2" title="æ˜¾ç¤º/éšè—é€šè®¯å½•"></a></td>
 			<td class="tab" id="tab">
 			
-	<!--µØÖ·Ä£°å¿ªÊ¼-->
+	<!--åœ°å€æ¨¡æ¿å¼€å§‹-->
 	<ul class="tabHd" id="tabHd">
-		<li class="first"><a href="#2">×éÖ¯½á¹¹</a></li>
-		<li><a href="#2">¹²ÏíÍ¨Ñ¶Â¼</a></li>
-		<li class="selected"><a href="#2">¸öÈËÍ¨Ñ¶Â¼</a></li>
+		<li class="first"><a href="#2">ç»„ç»‡ç»“æ„</a></li>
+		<li><a href="#2">å…±äº«é€šè®¯å½•</a></li>
+		<li class="selected"><a href="#2">ä¸ªäººé€šè®¯å½•</a></li>
 	</ul>
 	<div class="tabBd" id="tabBd">
-		<!--×éÖ¯½á¹¹¿ªÊ¼ -->
+		<!--ç»„ç»‡ç»“æ„å¼€å§‹ -->
 		<ul class="tree" style="display:none;">
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g0" data="{indexId:'0',addressName:'group1',addressType:'Group'}">group1</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n0" data="{indexId:'0',addressName:'admin@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:admin@test.com">admin</a></li>
+				<li><a href="#2" id="o_l_u_n0" data="{indexId:'0',addressName:'admin@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:admin@test.com">admin</a></li>
 				
-				<li><a href="#2" id="o_l_u_n1" data="{indexId:'1',addressName:'test1@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:test1@test.com">sdfds</a></li>
+				<li><a href="#2" id="o_l_u_n1" data="{indexId:'1',addressName:'test1@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:test1@test.com">sdfds</a></li>
 				
-				<li><a href="#2" id="o_l_u_n2" data="{indexId:'2',addressName:'test2@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:test2@test.com">qwrqrqwr</a></li>
+				<li><a href="#2" id="o_l_u_n2" data="{indexId:'2',addressName:'test2@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:test2@test.com">qwrqrqwr</a></li>
 				
-				<li><a href="#2" id="o_l_u_n12" data="{indexId:'12',addressName:'test_l2@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:test_l2@test.com">test_l2</a></li>
+				<li><a href="#2" id="o_l_u_n12" data="{indexId:'12',addressName:'test_l2@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:test_l2@test.com">test_l2</a></li>
 				
-				<li><a href="#2" id="o_l_u_n13" data="{indexId:'13',addressName:'test12@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:test12@test.com">test12</a></li>
+				<li><a href="#2" id="o_l_u_n13" data="{indexId:'13',addressName:'test12@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:test12@test.com">test12</a></li>
 				
-				<li><a href="#2" id="o_l_u_n14" data="{indexId:'14',addressName:'testzcc@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:testzcc@test.com">testzcc</a></li>
+				<li><a href="#2" id="o_l_u_n14" data="{indexId:'14',addressName:'testzcc@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:testzcc@test.com">testzcc</a></li>
 				
-				<li><a href="#2" id="o_l_u_n15" data="{indexId:'15',addressName:'dev@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:dev@test.com">dev</a></li>
+				<li><a href="#2" id="o_l_u_n15" data="{indexId:'15',addressName:'dev@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:dev@test.com">dev</a></li>
 				
-				<li><a href="#2" id="o_l_u_n20" data="{indexId:'20',addressName:'34545555@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:34545555@test.com">55555555</a></li>
+				<li><a href="#2" id="o_l_u_n20" data="{indexId:'20',addressName:'34545555@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:34545555@test.com">55555555</a></li>
 				
-				<li><a href="#2" id="o_l_u_n21" data="{indexId:'21',addressName:'ewrwe@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:ewrwe@test.com">sdfd</a></li>
+				<li><a href="#2" id="o_l_u_n21" data="{indexId:'21',addressName:'ewrwe@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:ewrwe@test.com">sdfd</a></li>
 				
-				<li><a href="#2" id="o_l_u_n22" data="{indexId:'22',addressName:'222222222222222222@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:222222222222222222@test.com">qweqw</a></li>
+				<li><a href="#2" id="o_l_u_n22" data="{indexId:'22',addressName:'222222222222222222@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:222222222222222222@test.com">qweqw</a></li>
 				
-				<li><a href="#2" id="o_l_u_n23" data="{indexId:'23',addressName:'4444444444@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:4444444444@test.com">sdfs</a></li>
+				<li><a href="#2" id="o_l_u_n23" data="{indexId:'23',addressName:'4444444444@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:4444444444@test.com">sdfs</a></li>
 				
-				<li><a href="#2" id="o_l_u_n24" data="{indexId:'24',addressName:'11111111@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:11111111@test.com">sdfs</a></li>
+				<li><a href="#2" id="o_l_u_n24" data="{indexId:'24',addressName:'11111111@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:11111111@test.com">sdfs</a></li>
 				
-				<li><a href="#2" id="o_l_u_n25" data="{indexId:'25',addressName:'33333333@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:33333333@test.com">tttttttt</a></li>
+				<li><a href="#2" id="o_l_u_n25" data="{indexId:'25',addressName:'33333333@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:33333333@test.com">tttttttt</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 				<li class="subTree collapse">
 				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p7" data="{indexId:'7',addressName:'1111',addressType:'Group'}">1111</a></div>
@@ -482,7 +482,7 @@ function init()
 				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p8" data="{indexId:'8',addressName:'gro2',addressType:'Group'}">gro2</a></div>
 				<ul>
 					
-					<li><a href="#2" id="o_l_t_u" data="{indexId:'8',addressName:'zjx@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zjx@test.com">zjx</a></li>
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'8',addressName:'zjx@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zjx@test.com">zjx</a></li>
 					
 				</ul>
 				</li>
@@ -491,7 +491,7 @@ function init()
 				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p9" data="{indexId:'9',addressName:'gro7',addressType:'Group'}">gro7</a></div>
 				<ul>
 					
-					<li><a href="#2" id="o_l_t_u" data="{indexId:'17',addressName:'group1_test1@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:group1_test1@test.com">group1_test1</a></li>
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'17',addressName:'group1_test1@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:group1_test1@test.com">group1_test1</a></li>
 					
 				</ul>
 				</li>
@@ -500,7 +500,7 @@ function init()
 				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p10" data="{indexId:'10',addressName:'gro1',addressType:'Group'}">gro1</a></div>
 				<ul>
 					
-					<li><a href="#2" id="o_l_t_u" data="{indexId:'4',addressName:'zsx@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zsx@test.com">zsx</a></li>
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'4',addressName:'zsx@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zsx@test.com">zsx</a></li>
 					
 				</ul>
 				</li>
@@ -508,47 +508,47 @@ function init()
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g1" data="{indexId:'1',addressName:'dev2',addressType:'Group'}">dev2</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n3" data="{indexId:'3',addressName:'dev2_admin@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:dev2_admin@test.com">dev2_admin</a></li>
+				<li><a href="#2" id="o_l_u_n3" data="{indexId:'3',addressName:'dev2_admin@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:dev2_admin@test.com">dev2_admin</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g2" data="{indexId:'2',addressName:'wych',addressType:'Group'}">wych</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n7" data="{indexId:'7',addressName:'wyc@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:wyc@test.com">wggggggg</a></li>
+				<li><a href="#2" id="o_l_u_n7" data="{indexId:'7',addressName:'wyc@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:wyc@test.com">wggggggg</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g3" data="{indexId:'3',addressName:'zu1',addressType:'Group'}">zu1</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n10" data="{indexId:'10',addressName:'zhangjuntao@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zhangjuntao@test.com">zhangjuntao</a></li>
+				<li><a href="#2" id="o_l_u_n10" data="{indexId:'10',addressName:'zhangjuntao@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zhangjuntao@test.com">zhangjuntao</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 				<li class="subTree collapse">
 				<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="g_l_t_p4" data="{indexId:'4',addressName:'sub_aaa',addressType:'Group'}">sub_aaa</a></div>
 				<ul>
 					
-					<li><a href="#2" id="o_l_t_u" data="{indexId:'11',addressName:'aaa@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:aaa@test.com">aaa</a></li>
+					<li><a href="#2" id="o_l_t_u" data="{indexId:'11',addressName:'aaa@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:aaa@test.com">aaa</a></li>
 					
 				</ul>
 				</li>
@@ -556,235 +556,235 @@ function init()
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g3" data="{indexId:'3',addressName:'zu1',addressType:'Group'}">zu1</a></div>
 			<ul>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g5" data="{indexId:'5',addressName:'depart1',addressType:'Group'}">depart1</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n6" data="{indexId:'6',addressName:'zcc@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zcc@test.com">zcc</a></li>
+				<li><a href="#2" id="o_l_u_n6" data="{indexId:'6',addressName:'zcc@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zcc@test.com">zcc</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n5" data="{indexId:'5',addressName:'zjt@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zjt@test.com">zjt</a></li>
+				<li><a href="#2" id="o_l_u_n5" data="{indexId:'5',addressName:'zjt@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zjt@test.com">zjt</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
-			<li class="subTree collapse">
-			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
-			<ul>
-				
-
-				<!-- ¶ş¼¶×é -->
-				
-			</ul>
-			</li>
-			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
 			<ul>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
 			<ul>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
 			<ul>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
+			<li class="subTree collapse">
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g6" data="{indexId:'6',addressName:'gasfda',addressType:'Group'}">gasfda</a></div>
+			<ul>
+				
+
+				<!-- äºŒçº§ç»„ -->
+				
+			</ul>
+			</li>
+			
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g11" data="{indexId:'11',addressName:'455',addressType:'Group'}">455</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n18" data="{indexId:'18',addressName:'8787@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:8787@test.com">sdf</a></li>
+				<li><a href="#2" id="o_l_u_n18" data="{indexId:'18',addressName:'8787@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:8787@test.com">sdf</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g12" data="{indexId:'12',addressName:'ghjjj',addressType:'Group'}">ghjjj</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n16" data="{indexId:'16',addressName:'123@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:123@test.com">123</a></li>
+				<li><a href="#2" id="o_l_u_n16" data="{indexId:'16',addressName:'123@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:123@test.com">123</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g13" data="{indexId:'13',addressName:'lfsjlalfdls',addressType:'Group'}">lfsjlalfdls</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n9" data="{indexId:'9',addressName:'yzl@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:yzl@test.com">yzl</a></li>
+				<li><a href="#2" id="o_l_u_n9" data="{indexId:'9',addressName:'yzl@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:yzl@test.com">yzl</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g14" data="{indexId:'14',addressName:'gasafs',addressType:'Group'}">gasafs</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n19" data="{indexId:'19',addressName:'ere@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:ere@test.com">erer</a></li>
+				<li><a href="#2" id="o_l_u_n19" data="{indexId:'19',addressName:'ere@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:ere@test.com">erer</a></li>
 				
-				<li><a href="#2" id="o_l_u_n26" data="{indexId:'26',addressName:'23423423@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:23423423@test.com">ewerw</a></li>
+				<li><a href="#2" id="o_l_u_n26" data="{indexId:'26',addressName:'23423423@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:23423423@test.com">ewerw</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
-			<!-- Ò»¼¶×é -->
+			<!-- ä¸€çº§ç»„ -->
 			<li class="subTree collapse">
 			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="o_l_g15" data="{indexId:'15',addressName:'firL1',addressType:'Group'}">firL1</a></div>
 			<ul>
 				
-				<li><a href="#2" id="o_l_u_n27" data="{indexId:'27',addressName:'man1@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:man1@test.com">man1</a></li>
+				<li><a href="#2" id="o_l_u_n27" data="{indexId:'27',addressName:'man1@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:man1@test.com">man1</a></li>
 				
 
-				<!-- ¶ş¼¶×é -->
+				<!-- äºŒçº§ç»„ -->
 				
 			</ul>
 			</li>
 			
 			<li class="subTree collapse">
-			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="defaultGroupId">Ä¬ÈÏ×é</a></div>
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="defaultGroupId">é»˜è®¤ç»„</a></div>
 			<ul id="defaultGroup">
 				
 			</ul>
 			</li>
 		</ul>
-		<!--×éÖ¯½á¹¹½áÊø -->
-		<!--¹²ÏíÍ¨Ñ¶Â¼¿ªÊ¼ -->
+		<!--ç»„ç»‡ç»“æ„ç»“æŸ -->
+		<!--å…±äº«é€šè®¯å½•å¼€å§‹ -->
 		<ul class="tree" style="display:none;">
 			<li class="subTree expand">
-			<div class="subTreeHd"><span class="expandIcon"></span><a href="#2" id="companyId">ÆóÒµÍ¨Ñ¶Â¼</a></div>
+			<div class="subTreeHd"><span class="expandIcon"></span><a href="#2" id="companyId">ä¼ä¸šé€šè®¯å½•</a></div>
 			<ul>
-				<!-- ×éÃû-->
+				<!-- ç»„å-->
 				
 				<li><a href="#2" id="s_e_g_n0" data="{indexId:'0',addressName:'group',addressType:'Group',addressMaillist:'zsx@test.com;admin@test.com'}">group</a></li>
 				
-				<!-- ÁªÏµÈËÃû -->
+				<!-- è”ç³»äººå -->
 				
-				<li><a href="#2" id="s_e_c_n0" data="{indexId:'0',addressName:'11111111@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:11111111@test.com">11111111</a></li>
+				<li><a href="#2" id="s_e_c_n0" data="{indexId:'0',addressName:'11111111@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:11111111@test.com">11111111</a></li>
 				
-				<li><a href="#2" id="s_e_c_n1" data="{indexId:'1',addressName:'23423423@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:23423423@test.com">23423423</a></li>
+				<li><a href="#2" id="s_e_c_n1" data="{indexId:'1',addressName:'23423423@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:23423423@test.com">23423423</a></li>
 				
-				<li><a href="#2" id="s_e_c_n2" data="{indexId:'2',addressName:'33333333@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:33333333@test.com">33333333</a></li>
+				<li><a href="#2" id="s_e_c_n2" data="{indexId:'2',addressName:'33333333@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:33333333@test.com">33333333</a></li>
 				
-				<li><a href="#2" id="s_e_c_n3" data="{indexId:'3',addressName:'zcc@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zcc@test.com">ÕÅ´«²ı</a></li>
+				<li><a href="#2" id="s_e_c_n3" data="{indexId:'3',addressName:'zcc@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zcc@test.com">å¼ ä¼ æ˜Œ</a></li>
 				
-				<li><a href="#2" id="s_e_c_n4" data="{indexId:'4',addressName:'zjt@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zjt@test.com">ÕÅ¿¡ÌÎ</a></li>
+				<li><a href="#2" id="s_e_c_n4" data="{indexId:'4',addressName:'zjt@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zjt@test.com">å¼ ä¿Šæ¶›</a></li>
 				
-				<!-- Óò±ğÃû-->
+				<!-- åŸŸåˆ«å-->
 				
 				<li><a href="#2" id="s_e_a_n(null)" data="{indexId:'(null)',addressName:'deve_mail',addressType:'Alias',addressMaillist:'zsx@test.com;zjx@test.com;zjt@test.com;zcc@test.com;yzl@test.com;wyc@test.com'}">deve_mail</a></li>
 				
 			</ul>
 			</li>
 			<li class="subTree collapse">
-			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="departId">²¿ÃÅÍ¨Ñ¶Â¼</a></div>
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="#2" id="departId">éƒ¨é—¨é€šè®¯å½•</a></div>
 			<ul>
-				<!-- ÁªÏµÈË -->
+				<!-- è”ç³»äºº -->
 				
-				<!-- ÓÊ¼ş×é -->
+				<!-- é‚®ä»¶ç»„ -->
 				
 			</ul>
 			</li>
 		</ul>
-		<!--¹²ÏíÍ¨Ñ¶Â¼½áÊø -->
+		<!--å…±äº«é€šè®¯å½•ç»“æŸ -->
 
-		<!--¸öÈËÍ¨Ñ¶Â¼¿ªÊ¼ -->
+		<!--ä¸ªäººé€šè®¯å½•å¼€å§‹ -->
 		<ul class="tree">
 			<li class="subTree expand">
-			<div class="subTreeHd"><span class="expandIcon"></span><a href="#2" id="contactId">³£ÓÃÁªÏµÈË</a></div>
+			<div class="subTreeHd"><span class="expandIcon"></span><a href="#2" id="contactId">å¸¸ç”¨è”ç³»äºº</a></div>
 			<ul>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z10@test.com&treeValue=contactId" id="f_c_n0" data="{indexId:'0',addressName:'z10@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z10@test.com">z10</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z10@test.com&treeValue=contactId" id="f_c_n0" data="{indexId:'0',addressName:'z10@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z10@test.com">z10</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z1@test.com&treeValue=contactId" id="f_c_n1" data="{indexId:'1',addressName:'z1@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z1@test.com">z1</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z1@test.com&treeValue=contactId" id="f_c_n1" data="{indexId:'1',addressName:'z1@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z1@test.com">z1</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z2@test.com&treeValue=contactId" id="f_c_n2" data="{indexId:'2',addressName:'z2@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z2@test.com">z2</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z2@test.com&treeValue=contactId" id="f_c_n2" data="{indexId:'2',addressName:'z2@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z2@test.com">z2</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z3@test.com&treeValue=contactId" id="f_c_n3" data="{indexId:'3',addressName:'z3@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z3@test.com">z3</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z3@test.com&treeValue=contactId" id="f_c_n3" data="{indexId:'3',addressName:'z3@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z3@test.com">z3</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z4@test.com&treeValue=contactId" id="f_c_n4" data="{indexId:'4',addressName:'z4@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z4@test.com">z4</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z4@test.com&treeValue=contactId" id="f_c_n4" data="{indexId:'4',addressName:'z4@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z4@test.com">z4</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z5@test.com&treeValue=contactId" id="f_c_n5" data="{indexId:'5',addressName:'z5@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z5@test.com">z5</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z5@test.com&treeValue=contactId" id="f_c_n5" data="{indexId:'5',addressName:'z5@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z5@test.com">z5</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z6@test.com&treeValue=contactId" id="f_c_n6" data="{indexId:'6',addressName:'z6@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z6@test.com">z6</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z6@test.com&treeValue=contactId" id="f_c_n6" data="{indexId:'6',addressName:'z6@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z6@test.com">z6</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z7@test.com&treeValue=contactId" id="f_c_n7" data="{indexId:'7',addressName:'z7@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z7@test.com">z7</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z7@test.com&treeValue=contactId" id="f_c_n7" data="{indexId:'7',addressName:'z7@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z7@test.com">z7</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z8@test.com&treeValue=contactId" id="f_c_n8" data="{indexId:'8',addressName:'z8@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z8@test.com">z8</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z8@test.com&treeValue=contactId" id="f_c_n8" data="{indexId:'8',addressName:'z8@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z8@test.com">z8</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z9@test.com&treeValue=contactId" id="f_c_n9" data="{indexId:'9',addressName:'z9@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:z9@test.com">z9</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=z9@test.com&treeValue=contactId" id="f_c_n9" data="{indexId:'9',addressName:'z9@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:z9@test.com">z9</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=admin@test.com&treeValue=contactId" id="f_c_n10" data="{indexId:'10',addressName:'admin@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:admin@test.com">admin</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=admin@test.com&treeValue=contactId" id="f_c_n10" data="{indexId:'10',addressName:'admin@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:admin@test.com">admin</a></li>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=zsx@test.com&treeValue=contactId" id="f_c_n11" data="{indexId:'11',addressName:'zsx@test.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:zsx@test.com">zsx</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&contact=1&addr_edit=zsx@test.com&treeValue=contactId" id="f_c_n11" data="{indexId:'11',addressName:'zsx@test.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:zsx@test.com">zsx</a></li>
 				
 			</ul>
 			</li>
 			<li class="subTree collapse">
-			<div class="subTreeHd"><span class="collapseIcon"></span><a href="/cgi-bin/mail/maillist/login/3567469987443046721278386028?form=maillist&pos=0&type=2&treeValue=emailGroupId" id="emailGroupId">ÓÊ¼ş×é</a></div>
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="/cgi-bin/mail/maillist/login/3567469987443046721278386028?form=maillist&pos=0&type=2&treeValue=emailGroupId" id="emailGroupId">é‚®ä»¶ç»„</a></div>
 			<ul>
 				
 				<li><a href="/cgi-bin/mail/maillist/login/3567469987443046721278386028?type=2&form=maillist&gaddr_look=zsx&treeValue=emailGroupId" id="u_g_n0" data="{indexId:'0',addressName:'zsx',addressType:'Group',addressMaillist:'zsx@test.com;zsx2@test.com;zsx3@test.com'}">zsx</a></li>
@@ -793,15 +793,15 @@ function init()
 			</li>
 
 			<li class="subTree collapse">
-			<div class="subTreeHd"><span class="collapseIcon"></span><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&treeValue=allContactId" id="allContactId">ËùÓĞÁªÏµÈË</a></div>
+			<div class="subTreeHd"><span class="collapseIcon"></span><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&treeValue=allContactId" id="allContactId">æ‰€æœ‰è”ç³»äºº</a></div>
 			<ul>
 				
-				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&addr_edit=report-noreply@jiankongbao.com&treeValue=allContactId" id="a_l0" data="{indexId:'0',addressName:'report-noreply@jiankongbao.com',addressType:'Unit'}" title="ÓÊ¼şµØÖ·:report-noreply@jiankongbao.com">¼à¿Ø±¦</a></li>
+				<li><a href="/cgi-bin/mail/addresses/login/3567469987443046721278386028?type=1&do_edit_succ=1&addr_edit=report-noreply@jiankongbao.com&treeValue=allContactId" id="a_l0" data="{indexId:'0',addressName:'report-noreply@jiankongbao.com',addressType:'Unit'}" title="é‚®ä»¶åœ°å€:report-noreply@jiankongbao.com">ç›‘æ§å®</a></li>
 				
 			</ul>
 			</li>
 		</ul>
-	<!--¸öÈËÍ¨Ñ¶Â¼½áÊø -->					
+	<!--ä¸ªäººé€šè®¯å½•ç»“æŸ -->					
 	</div>
 	<input id="personId" type="hidden" value="1"></input>
 	<input id="shareId" type="hidden" value="1"></input>
@@ -812,25 +812,25 @@ function init()
 	</table>
 
 	<div class="tools clearfix" id="toolsBottom">
-		<a class="btn sendMail" href="#2"><em>·¢ ËÍ</em></a>
-		<a class="btn" id="saveDraft2" href="#2"><em>±£´æ²İ¸å</em></a>
-		<a class="btn" id="cancel2" href="#2"><em>È¡ Ïû</em></a>
+		<a class="btn sendMail" href="#2"><em>å‘ é€</em></a>
+		<a class="btn" id="saveDraft2" href="#2"><em>ä¿å­˜è‰ç¨¿</em></a>
+		<a class="btn" id="cancel2" href="#2"><em>å– æ¶ˆ</em></a>
 	</div>
 </div>
-<!--ÕıÎÄ½áÊø -->
+<!--æ­£æ–‡ç»“æŸ -->
 
-<!--dialog¿ªÊ¼ -->
+<!--dialogå¼€å§‹ -->
 <div class="dialog" id="dialog">
-	<div class="dialogHd"><a href="#2" class="right close" title="¹Ø±Õ">¹Ø±Õ</a><strong>ÌáÊ¾£¡</strong></div>
+	<div class="dialogHd"><a href="#2" class="right close" title="å…³é—­">å…³é—­</a><strong>æç¤ºï¼</strong></div>
 	<div class="dialogBd">
-		<p>ÄãÎ´ÌîĞ´ÓÊ¼şÖ÷Ìâ£¬È·¶¨·¢ËÍÂğ£¿</p>
+		<p>ä½ æœªå¡«å†™é‚®ä»¶ä¸»é¢˜ï¼Œç¡®å®šå‘é€å—ï¼Ÿ</p>
 		<div class="btnWrap clearfix">
-			<!--<a href="#2" class="btn"><em>È¡ Ïû</em></a>-->
-			<a href="#2" class="btn"><em>È· ¶¨</em></a>
+			<!--<a href="#2" class="btn"><em>å– æ¶ˆ</em></a>-->
+			<a href="#2" class="btn"><em>ç¡® å®š</em></a>
 		</div>
 	</div>
 </div>
-<!--dialog½áÊø -->
+<!--dialogç»“æŸ -->
 
 <div class="sysTips" id="sysTips"></div>
 </body>

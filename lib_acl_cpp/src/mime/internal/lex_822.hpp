@@ -1,4 +1,4 @@
-#ifndef _LEX_822_H_INCLUDED_
+﻿#ifndef _LEX_822_H_INCLUDED_
 #define _LEX_822_H_INCLUDED_
 
 #if !defined(ACL_MIME_DISABLE)

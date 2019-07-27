@@ -1,4 +1,4 @@
-/*
+﻿/*
   Highcharts JS v4.0.3 (2014-07-03)
  Solid angular gauge module
 

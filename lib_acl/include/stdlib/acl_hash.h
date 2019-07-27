@@ -1,4 +1,4 @@
-#ifndef	ACL_HASH_INCLUD_H
+ï»¿#ifndef	ACL_HASH_INCLUD_H
 #define	ACL_HASH_INCLUD_H
 
 #ifdef	__cplusplus
@@ -9,9 +9,9 @@ extern "C" {
 #include <stdlib.h>
 
 /**
- * ¹şÏ£º¯ÊıÀàĞÍ¶¨Òå
- * @param buf ĞèÒª±»¹şÏ£µÄÊı¾İ»º³åÇøµØÖ·
- * @param len buf µÄ³¤¶È
+ * å“ˆå¸Œå‡½æ•°ç±»å‹å®šä¹‰
+ * @param buf éœ€è¦è¢«å“ˆå¸Œçš„æ•°æ®ç¼“å†²åŒºåœ°å€
+ * @param len buf çš„é•¿åº¦
  */
 typedef unsigned (*ACL_HASH_FN)(const void *buf, size_t len);
 

@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <utility>
 #include <stdarg.h>
@@ -156,29 +156,29 @@ char string::operator [](int n) const
 
 char& string::operator [](size_t n)
 {
-	// ��ƫ��λ�ô���������ռ�����λ�ã���Ҫ���·����ڴ�
+	// 当偏移位置大于所分配空间的最大位置，需要重新分配内存
 	if (n >= (size_t) CAP(vbf_)) {
 		int  len = (int) CAP(vbf_);
 		space(n + 1);
 		int  new_len = (int) CAP(vbf_);
 
-		// ��ʼ���·�����ڴ�
+		// 初始化新分配的内存
 		if (new_len > len) {
 			memset(END(vbf_), 0, new_len - len);
 		}
 
-		// �� vbf_->vbuf.ptr ָ�� n �ֽڴ���ͬʱ�޸� vbf_->vbuf.cnt ֵ
+		// 将 vbf_->vbuf.ptr 指向 n 字节处，同时修改 vbf_->vbuf.cnt 值
 		ACL_VSTRING_AT_OFFSET(vbf_, (int) n);
 	}
-	// ��ƫ��λ�ô��ڵ�ǰ���ݳ���ʱ��ͨ������ָ��λ�����޸����ݳ��ȣ�
-	// ���������� length() ����ʱ���Ի�ó���
+	// 当偏移位置大于当前数据长度时，通过重置指针位置以修改数据长度，
+	// 这样当调用 length() 方法时可以获得长度
 	else if (n >= LEN(vbf_)) {
 		ACL_VSTRING_AT_OFFSET(vbf_, (int) n);
-		// ��Ϊ������������ƫ��λ�� n ���ĵ�ַ���ú󣬵����߶Դ�����
-		// ��ַ��ֵ����������ʹ���������ݳ������ӣ����Դ˴��ں�������
-		// ǰ���� ADDCH �൱�ڵ������ⲿ��ֵ�����ݳ��ȼ� 1
+		// 因为本函数返回了偏移位置 n 处的地址引用后，调用者对此引用
+		// 地址赋值，但并不会使缓冲区数据长度增加，所以此处在函数返回
+		// 前调用 ADDCH 相当于调用者外部赋值后将数据长度加 1
 		ADDCH(vbf_, '\0');
-		// ��֤���һ���ֽ�Ϊ \0
+		// 保证最后一个字节为 \0
 		TERM(vbf_);
 	}
 
@@ -198,11 +198,11 @@ char& string::operator [](int n)
 		printf("%d: cap2: %d\n", __LINE__, CAP(vbf_));
 		int  new_len = CAP(vbf_);
 
-		// ��ʼ���·�����ڴ�
+		// 初始化新分配的内存
 		if (new_len > len)
 			memset(END(vbf_), 0, new_len - len);
 
-		// �� vbf_->vbuf.ptr ָ�� n �ֽڴ���ͬʱ�޸� vbf_->vbuf.cnt ֵ
+		// 将 vbf_->vbuf.ptr 指向 n 字节处，同时修改 vbf_->vbuf.cnt 值
 		ACL_VSTRING_AT_OFFSET(vbf_, n);
 	} else if (n >= (int) LEN(vbf_)) {
 		ACL_VSTRING_AT_OFFSET(vbf_, n);
@@ -1454,10 +1454,10 @@ string& string::strip(const char* needle, bool each /* false */)
 
 		while (true) {
 			if ((ptr = acl_mystrtok(&src, needle)) == NULL) {
-				// �����ʱ pVbf Ϊ NULL����˵��Դ������
-				// ȫ��Ϊƥ���ַ�������������£���һ��
-				// ���� acl_mystrtok �ͻ᷵�� NULL����ʱ
-				// ��Ҫ���Դ����������
+				// 如果此时 pVbf 为 NULL，则说明源串内容
+				// 全部为匹配字符，在这种情况下，第一次
+				// 调用 acl_mystrtok 就会返回 NULL，此时
+				// 需要清空源缓冲区内容
 				if (pVbf == NULL) {
 					RSET(vbf_);
 					TERM(vbf_);
@@ -1466,18 +1466,18 @@ string& string::strip(const char* needle, bool each /* false */)
 				break;
 			}
 
-			// ����дʱ������������Դ�������������κ�ƥ���ַ�
-			// ʱ�����ط�����ʱ������
+			// 采用写时拷贝技术，当源缓冲区均不含任何匹配字符
+			// 时，不必分配临时缓冲区
 			if (pVbf == NULL) {
 				pVbf = acl_vstring_alloc(LEN(vbf_) + 1);
 			}
 
-			// ������ƥ����������»�����
+			// 拷贝不匹配的数据至新缓冲区
 			SCAT(pVbf, ptr);
 		}
 		
-		// �����ʱ�������� NULL����˵��Դ���ݴ��ڲ���ƥ�����ݣ�
-		// ��Ҫ����ʱ��������Ϊ��ʽ�����������ͷ�Դ������
+		// 如果临时缓冲区非 NULL，则说明源数据存在部分匹配数据，
+		// 需要将临时缓冲区设为正式缓冲区并需释放源缓冲区
 		if (pVbf != NULL) {
 			FREE(vbf_);
 			vbf_ = pVbf;
@@ -1498,7 +1498,7 @@ string& string::strip(const char* needle, bool each /* false */)
 			break;
 		}
 
-		// ����дʱ�ӳٷ������
+		// 采用写时延迟分配策略
 		if (pVbf == NULL) {
 			pVbf = acl_vstring_alloc(LEN(vbf_));
 		}

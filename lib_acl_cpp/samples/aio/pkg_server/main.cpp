@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
@@ -11,15 +11,15 @@ typedef enum
 	STATUS_T_DAT,
 } status_t;
 
-// Êı¾İÍ·
+// æ•°æ®å¤´
 struct DAT_HDR
 {
-	int  len;		// Êı¾İÌå³¤¶È
-	char cmd[64];		// ÃüÁî×Ö
+	int  len;		// æ•°æ®ä½“é•¿åº¦
+	char cmd[64];		// å‘½ä»¤å­—
 };
 
 /**
- * Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_callback : public acl::aio_callback
 {
@@ -37,37 +37,37 @@ public:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ¶Á³É¹¦»Øµ÷¹ı³Ì
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¯»æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool read_callback(char* data, int len)
 	{
-		// µ±Ç°×´Ì¬ÊÇ´¦ÀíÊı¾İÍ·Ê±
+		// å½“å‰çŠ¶æ€æ˜¯å¤„ç†æ•°æ®å¤´æ—¶
 		if (status_ == STATUS_T_HDR) {
-			// ¼ìÑéÍ·²¿³¤¶ÈÊÇ·ñ·ûºÏÒªÇó
+			// æ£€éªŒå¤´éƒ¨é•¿åº¦æ˜¯å¦ç¬¦åˆè¦æ±‚
 			if (len != sizeof(DAT_HDR)) {
 				printf("invalid len(%d) != DAT_HDR(%d)\r\n",
 					len, (int) sizeof(DAT_HDR));
 				return false;
 			}
 
-			// È¡³öÊı¾İÌå³¤¶È£¬²¢¶ÁÖ¸¶¨³¤¶ÈµÄÊı¾İÌå
+			// å–å‡ºæ•°æ®ä½“é•¿åº¦ï¼Œå¹¶è¯»æŒ‡å®šé•¿åº¦çš„æ•°æ®ä½“
 
 			DAT_HDR* req_hdr = (DAT_HDR*) data;
 
-			// ½«ÍøÂç×Ö½ÚĞò×ªÎªÖ÷»ú×Ö½ÚĞò
+			// å°†ç½‘ç»œå­—èŠ‚åºè½¬ä¸ºä¸»æœºå­—èŠ‚åº
 			req_hdr->len = ntohl(req_hdr->len);
 			if (req_hdr->len <= 0) {
 				printf("invalid len: %d\r\n", req_hdr->len);
 				return false;
 			}
 
-			// ĞŞ¸Ä×´Ì¬Î»£¬±íÃ÷ÏÂÒ»²½ĞèÒª¶ÁÈ¡Êı¾İÌå
+			// ä¿®æ”¹çŠ¶æ€ä½ï¼Œè¡¨æ˜ä¸‹ä¸€æ­¥éœ€è¦è¯»å–æ•°æ®ä½“
 			status_ = STATUS_T_DAT;
 
-			// Òì²½¶ÁÖ¸¶¨³¤¶ÈµÄÊı¾İ
+			// å¼‚æ­¥è¯»æŒ‡å®šé•¿åº¦çš„æ•°æ®
 			client_->read(req_hdr->len, __timeout);
 			return true;
 		}
@@ -81,34 +81,34 @@ public:
 			printf("req len: %d, dat: %s\r\n", len, data);
 		}
 
-		// ÏòÔ¶³Ì¿Í»§¶Ë»ØĞ´ÊÕµ½µÄÊı¾İ
+		// å‘è¿œç¨‹å®¢æˆ·ç«¯å›å†™æ”¶åˆ°çš„æ•°æ®
 
 #define	OK	"+OK"
 		size_t dat_len = sizeof(OK) - 1;
 
 		DAT_HDR res_hdr;
 
-		// ½«Ö÷»ú×Ö½ÚĞò×ªÎªÍøÂç×Ö½ÚĞò
+		// å°†ä¸»æœºå­—èŠ‚åºè½¬ä¸ºç½‘ç»œå­—èŠ‚åº
 		res_hdr.len = (int) htonl((unsigned long) dat_len);
 		ACL_SAFE_STRNCPY(res_hdr.cmd, "ok", sizeof(res_hdr.cmd));
 
-		// Òì²½Ğ´ÏìÓ¦Êı¾İ°ü: Êı¾İÍ·¼°Êı¾İÌå
+		// å¼‚æ­¥å†™å“åº”æ•°æ®åŒ…: æ•°æ®å¤´åŠæ•°æ®ä½“
 
 		client_->write(&res_hdr, sizeof(res_hdr));
 		client_->write(OK, (int) dat_len);
 
-		// ÉèÖÃ×´Ì¬Îª¶ÁÈ¡ÏÂÒ»¸öÊı¾İ°ü
+		// è®¾ç½®çŠ¶æ€ä¸ºè¯»å–ä¸‹ä¸€ä¸ªæ•°æ®åŒ…
 		status_ = STATUS_T_HDR;
 
-		// ´ÓÒì²½Á÷¶ÁÊı¾İ°üÍ·
+		// ä»å¼‚æ­¥æµè¯»æ•°æ®åŒ…å¤´
 		client_->read(sizeof(DAT_HDR), __timeout);
 
 		return true;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄĞ´³É¹¦»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„å†™æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool write_callback(void)
 	{
@@ -116,17 +116,17 @@ public:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 	 */
 	void close_callback(void)
 	{
-		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		delete this;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool timeout_callback(void)
 	{
@@ -141,7 +141,7 @@ private:
 };
 
 /**
- * Òì²½¼àÌıÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥ç›‘å¬æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_accept_callback : public acl::aio_accept_callback
 {
@@ -153,28 +153,28 @@ public:
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±ÓĞĞÂÁ¬½Óµ½´ïºóµ÷ÓÃ´Ë»Øµ÷¹ı³Ì
-	 * @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
-	 * @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌıÁ÷¼ÌĞø¼àÌı
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾åè°ƒç”¨æ­¤å›è°ƒè¿‡ç¨‹
+	 * @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
+	 * @return {bool} è¿”å› true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
 	 */
 	bool accept_callback(acl::aio_socket_stream* client)
 	{
-		// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
+		// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
 		io_callback* callback = new io_callback(client);
 
-		// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
 		client->add_read_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
 		client->add_write_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
 		client->add_close_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 		client->add_timeout_callback(callback);
 
-		// ´ÓÒì²½Á÷¶ÁÊı¾İ°üÍ·
+		// ä»å¼‚æ­¥æµè¯»æ•°æ®åŒ…å¤´
 		client->read(sizeof(DAT_HDR), __timeout);
 		return true;
 	}
@@ -214,45 +214,45 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ³õÊ¼»¯ACL¿â(ÓÈÆäÊÇÔÚWIN32ÏÂÒ»¶¨Òªµ÷ÓÃ´Ëº¯Êı£¬ÔÚUNIXÆ½Ì¨ÏÂ¿É²»µ÷ÓÃ)
+	// åˆå§‹åŒ–ACLåº“(å°¤å…¶æ˜¯åœ¨WIN32ä¸‹ä¸€å®šè¦è°ƒç”¨æ­¤å‡½æ•°ï¼Œåœ¨UNIXå¹³å°ä¸‹å¯ä¸è°ƒç”¨)
 	acl::acl_cpp_init();
 
 	acl::log::stdout_open(true);
 
-	// ¹¹½¨Òì²½ÒıÇæÀà¶ÔÏó
+	// æ„å»ºå¼‚æ­¥å¼•æ“ç±»å¯¹è±¡
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
 
-	// ´´½¨¼àÌıÒì²½Á÷
+	// åˆ›å»ºç›‘å¬å¼‚æ­¥æµ
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
 
-	// ¼àÌıÖ¸¶¨µÄµØÖ·
+	// ç›‘å¬æŒ‡å®šçš„åœ°å€
 	if (!sstream->open(addr.c_str())) {
 		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
-		// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+		// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 		handle.check();
 
 		getchar();
 		return 1;
 	}
 
-	// ´´½¨»Øµ÷Àà¶ÔÏó£¬µ±ÓĞĞÂÁ¬½Óµ½´ïÊ±×Ô¶¯µ÷ÓÃ´ËÀà¶ÔÏóµÄ»Øµ÷¹ı³Ì
+	// åˆ›å»ºå›è°ƒç±»å¯¹è±¡ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾æ—¶è‡ªåŠ¨è°ƒç”¨æ­¤ç±»å¯¹è±¡çš„å›è°ƒè¿‡ç¨‹
 	io_accept_callback callback;
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			std::cout << "pkg_server stop now ..." << std::endl;
 			break;
 		}
 	}
 
-	// ¹Ø±Õ¼àÌıÁ÷²¢ÊÍ·ÅÁ÷¶ÔÏó
+	// å…³é—­ç›‘å¬æµå¹¶é‡Šæ”¾æµå¯¹è±¡
 	sstream->close();
 
-	// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+	// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 	handle.check();
 
 	return 0;

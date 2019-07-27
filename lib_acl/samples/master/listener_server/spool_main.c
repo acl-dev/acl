@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
@@ -72,7 +72,7 @@ void spool_add_worker(SPOOL *spool, ACL_VSTREAM *cstream)
 	if (cstream == NULL || spool == NULL)
 		acl_msg_fatal("%s(%d): input invalid", myname, __LINE__);
 	
-	/* ½«¿Í»§¶ËÊý¾ÝÁ÷µÄ×´Ì¬ÖÃÈëÊÂ¼þ¼à¿Ø¼¯ºÏÖÐ */
+	/* å°†å®¢æˆ·ç«¯æ•°æ®æµçš„çŠ¶æ€ç½®å…¥äº‹ä»¶ç›‘æŽ§é›†åˆä¸­ */
 	acl_spool_enable_read(spool->h_spool,
 				cstream,
 				var_cfg_client_idle_limit,

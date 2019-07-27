@@ -1,4 +1,4 @@
-#ifndef	ACL_SANE_BASENAME_INCLUDE_H
+ï»¿#ifndef	ACL_SANE_BASENAME_INCLUDE_H
 #define	ACL_SANE_BASENAME_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -8,16 +8,16 @@ extern "C" {
 #include "acl_vstring.h"
 
 /**
- * ´ÓÎÄ¼şÈ«Â·¾¶ÖĞÌáÈ¡ÎÄ¼şÃû
- * @parm bp {ACL_VSTRING*} ´æ´¢½á¹ûµÄ»º³åÇø£¬ÈôÎª NULL ÔòÒıÓÃÄÚ²¿µÄÏß³Ì¾Ö²¿´æ´¢
- * @return {char*} ÓÀ²»Îª¿Õ
+ * ä»æ–‡ä»¶å…¨è·¯å¾„ä¸­æå–æ–‡ä»¶å
+ * @parm bp {ACL_VSTRING*} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒºï¼Œè‹¥ä¸º NULL åˆ™å¼•ç”¨å†…éƒ¨çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨
+ * @return {char*} æ°¸ä¸ä¸ºç©º
  */
 ACL_API char *acl_sane_basename(ACL_VSTRING *bp, const char *path);
 
 /**
- * ´ÓÎÄ¼şÈ«Â·¾¶ÖĞÌáÈ¡ÎÄ¼şËùÔÚÄ¿Â¼
- * @parm bp {ACL_VSTRING*} ´æ´¢½á¹ûµÄ»º³åÇø£¬ÈôÎª NULL ÔòÒıÓÃÄÚ²¿µÄÏß³Ì¾Ö²¿´æ´¢
- * @return {char*} ÓÀ²»Îª¿Õ
+ * ä»æ–‡ä»¶å…¨è·¯å¾„ä¸­æå–æ–‡ä»¶æ‰€åœ¨ç›®å½•
+ * @parm bp {ACL_VSTRING*} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒºï¼Œè‹¥ä¸º NULL åˆ™å¼•ç”¨å†…éƒ¨çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨
+ * @return {char*} æ°¸ä¸ä¸ºç©º
  */
 ACL_API char *acl_sane_dirname(ACL_VSTRING *bp, const char *path);
 

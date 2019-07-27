@@ -1,18 +1,18 @@
-
+ï»¿
 5) 2013.10.7
-5.1) samples: Ìí¼ÓÁË vstream_server/vstream_client Á½¸ö²âÊÔÀı×Ó£¬ÒÔ²âÊÔÓÅ»¯ºó
-µÄ acl_vstream_readn/acl_vstream_read µÄĞÔÄÜ
+5.1) samples: æ·»åŠ äº† vstream_server/vstream_client ä¸¤ä¸ªæµ‹è¯•ä¾‹å­ï¼Œä»¥æµ‹è¯•ä¼˜åŒ–å
+çš„ acl_vstream_readn/acl_vstream_read çš„æ€§èƒ½
 
 4) 2013.10.3
-4.1) samples/http_probe: ÖØĞ´ÁË¸ÃÀı×Ó²¢²âÊÔÍ¨¹ı
+4.1) samples/http_probe: é‡å†™äº†è¯¥ä¾‹å­å¹¶æµ‹è¯•é€šè¿‡
 
 3) 2013.9.26
-3.1) samples/master/udp_echo: ¸ÃÀı×ÓÓÃÓÚ²âÊÔĞÂÔö¼ÓµÄ master ·şÎñÆ÷¿ò¼Ü
-×¨ÃÅÕë¶Ô  UDP Í¨ĞÅµÄ·şÎñÆ÷Í¨ĞÅÄ£°å
+3.1) samples/master/udp_echo: è¯¥ä¾‹å­ç”¨äºæµ‹è¯•æ–°å¢åŠ çš„ master æœåŠ¡å™¨æ¡†æ¶
+ä¸“é—¨é’ˆå¯¹  UDP é€šä¿¡çš„æœåŠ¡å™¨é€šä¿¡æ¨¡æ¿
 
 2) 2013.9.23
-2.1) samples: udp_client/udp_server Àı×ÓÔÚ WIN32 ÏÂ±àÒë²âÊÔÍ¨¹ı
+2.1) samples: udp_client/udp_server ä¾‹å­åœ¨ WIN32 ä¸‹ç¼–è¯‘æµ‹è¯•é€šè¿‡
 
 1) 2013.9.22
-1.1) samples/udp_client: Ôö¼Ó UDP ²âÊÔÓÃÀı
-1.1) samples/udp_server: Ôö¼Ó UDP ²âÊÔÓÃÀı
+1.1) samples/udp_client: å¢åŠ  UDP æµ‹è¯•ç”¨ä¾‹
+1.1) samples/udp_server: å¢åŠ  UDP æµ‹è¯•ç”¨ä¾‹

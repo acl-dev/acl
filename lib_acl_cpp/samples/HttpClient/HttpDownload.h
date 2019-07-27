@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 #include "lib_acl.h"
-#include "lib_protocol.h"  // http Ğ­ÒéÏà¹Ø
+#include "lib_protocol.h"  // http åè®®ç›¸å…³
 #include "acl_cpp/stream/ofstream.hpp"
 #include "acl_cpp/http/http_service.hpp"
 
@@ -17,23 +17,23 @@ public:
 	void SetHWnd(HWND hWnd);
 #endif
 
-	// »ùÀàĞé½Ó¿Ú£ºÏú»Ù¹ı³Ì£¬ÓÉ http_service Àà´¦ÀíÍê±Ïºó×Ô¶¯µ÷ÓÃ¸Ã»Øµ÷
+	// åŸºç±»è™šæ¥å£ï¼šé”€æ¯è¿‡ç¨‹ï¼Œç”± http_service ç±»å¤„ç†å®Œæ¯•åè‡ªåŠ¨è°ƒç”¨è¯¥å›è°ƒ
 	virtual void destroy();
 
 protected:
 	~CHttpDownload(void);
 
 	//////////////////////////////////////////////////////////////////////////
-	// »ùÀàĞé½Ó¿Ú
+	// åŸºç±»è™šæ¥å£
 
-	// »ñµÃHTTPÇëÇóµÄÊı¾İÌåÊ±µÄ»Øµ÷½Ó¿Ú£¬×¢Òâ¸Ãº¯ÊıµÄµ÷ÓÃ¿Õ¼äÓëÆäËüº¯Êı²»ÔÚÍ¬
-	// Ò»¸öÏß³Ì¿Õ¼ä£¬ËùÒÔÈç¹û¸Ãº¯Êı·ÃÎÊÓëÆäËüº¯ÊıÏàÍ¬µÄ×ÊÔ´Ê±ĞèÒª×¢Òâ»¥³â
+	// è·å¾—HTTPè¯·æ±‚çš„æ•°æ®ä½“æ—¶çš„å›è°ƒæ¥å£ï¼Œæ³¨æ„è¯¥å‡½æ•°çš„è°ƒç”¨ç©ºé—´ä¸å…¶å®ƒå‡½æ•°ä¸åœ¨åŒ
+	// ä¸€ä¸ªçº¿ç¨‹ç©ºé—´ï¼Œæ‰€ä»¥å¦‚æœè¯¥å‡½æ•°è®¿é—®ä¸å…¶å®ƒå‡½æ•°ç›¸åŒçš„èµ„æºæ—¶éœ€è¦æ³¨æ„äº’æ–¥
 	virtual const acl::string* get_body();
-	// Õı³£¶Áµ½ HTTP ÏìÓ¦Í·Ê±µÄ»Øµ÷½Ó¿Ú
+	// æ­£å¸¸è¯»åˆ° HTTP å“åº”å¤´æ—¶çš„å›è°ƒæ¥å£
 	virtual void on_hdr(const char* addr, const HTTP_HDR_RES* hdr);
-	// Õı³£¶Á HTTP ÏìÓ¦ÌåÊ±µÄ»Øµ÷º¯Êı
+	// æ­£å¸¸è¯» HTTP å“åº”ä½“æ—¶çš„å›è°ƒå‡½æ•°
 	virtual void on_body(const char* data, size_t dlen);
-	// µ±ÇëÇó»òÏìÓ¦Ê§°ÜÊ±µÄ»Øµ÷º¯Êı
+	// å½“è¯·æ±‚æˆ–å“åº”å¤±è´¥æ—¶çš„å›è°ƒå‡½æ•°
 	virtual void on_error(acl::http_status_t errnum);
 private:
 	acl::ofstream out_;

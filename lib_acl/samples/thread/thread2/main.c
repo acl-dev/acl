@@ -1,4 +1,4 @@
-#include "stdlib/acl_define_unix.h"
+﻿#include "stdlib/acl_define_unix.h"
 #ifdef ACL_UNIX
 # ifndef	_GNU_SOURCE
 #  define _GNU_SOURCE
@@ -33,7 +33,7 @@ static void *thread_main(void *arg acl_unused)
 
 	switch ((pid = fork())) {
 	case 0:
-		/* 先解锁 */
+		/* 鍏堣В閿� */
 		if ((ret = acl_pthread_mutex_unlock(__lock)) == 0)
 			printf("1: child thread(%lu) unlock ok\r\n",
 				acl_pthread_self());
@@ -42,7 +42,7 @@ static void *thread_main(void *arg acl_unused)
 				acl_pthread_self(), ret,
 				acl_strerror(ret, ebuf, sizeof(ebuf)));
 
-		/* 再加锁 */
+		/* 鍐嶅姞閿� */
 		if ((ret = acl_pthread_mutex_lock(__lock)) == 0)
 			printf("1: child thread(%lu) lock ok\r\n",
 				acl_pthread_self());
@@ -51,7 +51,7 @@ static void *thread_main(void *arg acl_unused)
 				acl_pthread_self(), ret,
 				acl_strerror(ret, ebuf, sizeof(ebuf)));
 
-		/* 再释放锁--该函数会报错 */
+		/* 鍐嶉噴鏀鹃攣--璇ュ嚱鏁颁細鎶ラ敊 */
 		if ((ret = acl_pthread_mutex_destroy(__lock)) == 0)
 			printf("1: child thread(%lu) destroy ok\r\n",
 				acl_pthread_self());

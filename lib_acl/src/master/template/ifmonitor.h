@@ -1,4 +1,4 @@
-#ifndef __IFMONITOR_INCLUDE_H__
+﻿#ifndef __IFMONITOR_INCLUDE_H__
 #define __IFMONITOR_INCLUDE_H__
 
 #ifdef	__cplusplus

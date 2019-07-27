@@ -1,4 +1,4 @@
-#ifndef _HEADER_TOKEN_H_INCLUDED_
+﻿#ifndef _HEADER_TOKEN_H_INCLUDED_
 #define _HEADER_TOKEN_H_INCLUDED_
 
 /*++

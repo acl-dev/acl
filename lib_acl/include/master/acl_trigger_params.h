@@ -1,4 +1,4 @@
-#ifndef	ACL_TRIGGER_PARAMS_INCLUDE_H
+﻿#ifndef	ACL_TRIGGER_PARAMS_INCLUDE_H
 #define	ACL_TRIGGER_PARAMS_INCLUDE_H
 
 #include "../stdlib/acl_define.h"

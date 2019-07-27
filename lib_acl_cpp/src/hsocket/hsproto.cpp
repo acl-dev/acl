@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <string.h>
 #include <stdio.h>

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class allow_list : public acl::singleton<allow_list>
 {

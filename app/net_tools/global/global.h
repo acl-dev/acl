@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class global : public acl::singleton<global>
 {

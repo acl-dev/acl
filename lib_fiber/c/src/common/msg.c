@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "fiber/libfiber.h"
 #include "init.h"
 #include "pthread_patch.h"

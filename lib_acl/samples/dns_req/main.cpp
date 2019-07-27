@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #if  defined(ACL_MS_WINDOWS)
 #pragma comment(lib,"ws2_32")
 #pragma comment(lib, "wsock32")
@@ -39,10 +39,10 @@ static void dns_lookup(char *domains, const char *dns_ips, int dns_port)
 	ACL_ARGV *ip_argv = acl_argv_split(dns_ips, ",:;|");
 	ACL_ITER  iter;
 
-	/* ´ò¿ªDNS»º´æ¹¦ÄÜ */
+	/* æ‰“å¼€DNSç¼“å­˜åŠŸèƒ½ */
 	acl_dns_open_cache(dns, 100);
 
-	/* Ìí¼ÓDNS·şÎñÆ÷µØÖ· */
+	/* æ·»åŠ DNSæœåŠ¡å™¨åœ°å€ */
 	acl_foreach(iter, ip_argv) {
 		char *ip = (char*) iter.data;
 		printf("add one dns, ip=%s, port=%d\r\n", ip, dns_port);
@@ -51,27 +51,27 @@ static void dns_lookup(char *domains, const char *dns_ips, int dns_port)
 
 	acl_argv_free(ip_argv);
 
-	/* ÉèÖÃĞ£ÑéDNSµØÖ·ÓĞĞ§ĞÔ±ê¼ÇÎ» */
+	/* è®¾ç½®æ ¡éªŒDNSåœ°å€æœ‰æ•ˆæ€§æ ‡è®°ä½ */
 	acl_dns_check_dns_ip(dns);
 
-	/* ²éÑ¯ÓòÃûËù¶ÔÓ¦µÄIPµØÖ· */
+	/* æŸ¥è¯¢åŸŸåæ‰€å¯¹åº”çš„IPåœ°å€ */
 	acl_foreach(iter, argv) {
 		char *domain = (char*) iter.data;
 		printf(">>>call dns lookup for: %s\n", domain);
 		acl_dns_lookup(dns, domain, dns_lookup_callback, domain);
 	}
 
-	/* ½øÈëÊÂ¼şÑ­»·ÖĞ */
+	/* è¿›å…¥äº‹ä»¶å¾ªç¯ä¸­ */
 	while (__nresult < iter.size) {
 		acl_aio_loop(aio);
 	}
 
 	printf("---------------------------------------------------\n");
 	printf(">>>DNS cache result search\n\n");
-	/* ²éÑ¯½á¹ûÇåÁã */
+	/* æŸ¥è¯¢ç»“æœæ¸…é›¶ */
 	__nresult = 0;
 
-	/* Í¨¹ı»º´æ²éÑ¯ÓòÃûËù¶ÔÓ¦µÄIPµØÖ· */
+	/* é€šè¿‡ç¼“å­˜æŸ¥è¯¢åŸŸåæ‰€å¯¹åº”çš„IPåœ°å€ */
 	acl_foreach(iter, argv) {
 		char *domain = (char*) iter.data;
 		printf(">>>call dns lookup from cache for: %s\n", domain);

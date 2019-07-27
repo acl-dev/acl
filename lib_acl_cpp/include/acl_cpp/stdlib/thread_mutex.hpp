@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 
@@ -14,38 +14,38 @@ struct acl_pthread_mutex_t;
 namespace acl {
 
 /**
- * Ïß³Ì»¥³âËø
+ * çº¿ç¨‹äº’æ–¥é”
  */
 class ACL_CPP_API thread_mutex : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôì·½·¨
-	 * @param recursive {bool} ÊÇ·ñÆôÓÃµİ¹éËø·½Ê½
+	 * æ„é€ æ–¹æ³•
+	 * @param recursive {bool} æ˜¯å¦å¯ç”¨é€’å½’é”æ–¹å¼
 	 */
 	thread_mutex(bool recursive = true);
 	~thread_mutex(void);
 
 	/**
-	 * ¶ÔÏß³ÌËø½øĞĞ¼ÓËø£¬Ò»Ö±µ½¼ÓËø³É¹¦»òÄÚ²¿Ê§°Ü(Ò»°ã²»»áÊ§°Ü£¬³ı·ÇÊÇÏµÍ³ÎÊÌâ)
-	 * @return {bool} ·µ»Ø false ËµÃ÷Ïß³ÌËøÓĞÎÊÌâ
+	 * å¯¹çº¿ç¨‹é”è¿›è¡ŒåŠ é”ï¼Œä¸€ç›´åˆ°åŠ é”æˆåŠŸæˆ–å†…éƒ¨å¤±è´¥(ä¸€èˆ¬ä¸ä¼šå¤±è´¥ï¼Œé™¤éæ˜¯ç³»ç»Ÿé—®é¢˜)
+	 * @return {bool} è¿”å› false è¯´æ˜çº¿ç¨‹é”æœ‰é—®é¢˜
 	 */
 	bool lock(void);
 
 	/**
-	 * ³¢ÊÔĞÔ¼ÓËø£¬ÎŞÂÛ³É¹¦Óë·ñ¶¼»áÁ¢¼´·µ»Ø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·µ»Ø false ±íÊ¾¼ÓËøÊ§°Ü
+	 * å°è¯•æ€§åŠ é”ï¼Œæ— è®ºæˆåŠŸä¸å¦éƒ½ä¼šç«‹å³è¿”å›
+	 * @return {bool} è¿”å› true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºåŠ é”å¤±è´¥
 	 */
 	bool try_lock(void);
 
 	/**
-	 * ½âÏß³ÌËø
-	 * @return {bool} ·µ»Ø false ±íÊ¾½âËøÊ§°Ü£¬ÓĞ¿ÉÄÜÖ®Ç°²¢Î´¼ÓËø³É¹¦ËùÖÂ
+	 * è§£çº¿ç¨‹é”
+	 * @return {bool} è¿”å› false è¡¨ç¤ºè§£é”å¤±è´¥ï¼Œæœ‰å¯èƒ½ä¹‹å‰å¹¶æœªåŠ é”æˆåŠŸæ‰€è‡´
 	 */
 	bool unlock(void);
 
 	/**
-	 * »ñµÃ acl ÖĞ C °æ±¾µÄÏµÍ³ÀàĞÍµÄÏß³ÌËø
+	 * è·å¾— acl ä¸­ C ç‰ˆæœ¬çš„ç³»ç»Ÿç±»å‹çš„çº¿ç¨‹é”
 	 * @return {acl_pthread_mutex_t*}
 	 */
 	acl_pthread_mutex_t* get_mutex(void) const;

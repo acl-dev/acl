@@ -1,9 +1,9 @@
-/*
+﻿/*
  *  fiber_cpp.h
  *  fiber_cpp
  *
  *  Created by zsx on 18/4/25.
- *  Copyright (c) 2018年 zsx. All rights reserved.
+ *  Copyright (c) 2018骞� zsx. All rights reserved.
  *
  */
 

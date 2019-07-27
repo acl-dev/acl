@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file asn1.h
  *
  * \brief Generic ASN.1 parsing

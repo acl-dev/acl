@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #ifndef WIN32
 #include <getopt.h>
 #endif
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 
 	acl::dns_service* server = new acl::dns_service(nthreads);
 
-	// Ê¹ÏûÏ¢·þÎñÆ÷¼àÌý 127.0.0.1 µÄµØÖ·
+	// ä½¿æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬ 127.0.0.1 çš„åœ°å€
 	if (!server->open(&handle)) {
 		delete server;
 		std::cout << "open server error!" << std::endl;

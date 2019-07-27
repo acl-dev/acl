@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +92,7 @@ static void test_thread3(void)
 
 int main(void)
 {
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	test_thread();

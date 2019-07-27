@@ -1,16 +1,16 @@
-#include "lib_acl.h"
+﻿#include "lib_acl.h"
 
 static int dns_lookup(const char *domain, const char *dns_ip,
 	unsigned short dns_port, ACL_VSTRING *sbuf)
 {
-	ACL_RES *res;		/* DNS 查询句柄 */
-	ACL_DNS_DB *dns_db;	/* DNS 查询结果 */
-	ACL_ITER iter;		/* 遍历句柄 */
+	ACL_RES *res;		/* DNS 鏌ヨ鍙ユ焺 */
+	ACL_DNS_DB *dns_db;	/* DNS 鏌ヨ缁撴灉 */
+	ACL_ITER iter;		/* 閬嶅巻鍙ユ焺 */
 
-	/* 创建 DNS 客户端查询对象 */
+	/* 鍒涘缓 DNS 瀹㈡埛绔煡璇㈠璞� */
 	res = acl_res_new(dns_ip, dns_port);
 
-	/* 向 DNS 服务器发送域名查询信息 */
+	/* 鍚� DNS 鏈嶅姟鍣ㄥ彂閫佸煙鍚嶆煡璇俊鎭� */
 	dns_db = acl_res_lookup(res, domain);
 	if (dns_db == NULL) {
 		acl_vstring_sprintf(sbuf, "failed for domain %s, %s",
@@ -19,10 +19,10 @@ static int dns_lookup(const char *domain, const char *dns_ip,
 		return -1;
 	}
 
-	/* 打印查询结果个数 */
+	/* 鎵撳嵃鏌ヨ缁撴灉涓暟 */
 	printf("domain: %s, count: %d\r\n", domain, acl_netdb_size(dns_db));
 
-	/* 遍历所有的域名查询结果 */
+	/* 閬嶅巻鎵€鏈夌殑鍩熷悕鏌ヨ缁撴灉 */
 	acl_vstring_sprintf_append(sbuf, "type\tttl\tip\t\tnet\t\tqid\t\n");
 	acl_foreach(iter, dns_db) {
 		ACL_HOST_INFO *info;
@@ -38,10 +38,10 @@ static int dns_lookup(const char *domain, const char *dns_ip,
 			info->ttl, info->ip, buf, res->cur_qid);
 	}
 
-	/* 释放 DNS 查询句柄 */
+	/* 閲婃斁 DNS 鏌ヨ鍙ユ焺 */
 	acl_res_free(res);
 
-	/* 释放域名查询结果 */
+	/* 閲婃斁鍩熷悕鏌ヨ缁撴灉 */
 	acl_netdb_free(dns_db);
 	return 0;
 }

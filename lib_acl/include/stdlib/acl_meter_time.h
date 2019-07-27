@@ -1,4 +1,4 @@
-#ifndef	ACL_METER_TIME_INCLUDE_H
+﻿#ifndef	ACL_METER_TIME_INCLUDE_H
 #define	ACL_METER_TIME_INCLUDE_H
 
 #ifdef	__cplusplus

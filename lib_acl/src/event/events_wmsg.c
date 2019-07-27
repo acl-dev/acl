@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -60,8 +60,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	snprintf(key, sizeof(key), "%d", sockfd);
 	acl_htable_delete(ev->htbl, key, NULL);
 
-	/* ËäÈ»¸ÃÉèÖÃÄÜÈ¡ÏûÒÔºóµÄ¶ÁĞ´ÏûÏ¢£¬µ«ÒÀÈ»²»ÄÜÈ¡ÏûÒòÎª
-	 * closesocket ¶ø²úÉúµÄ FD_CLOSE ÏûÏ¢
+	/* è™½ç„¶è¯¥è®¾ç½®èƒ½å–æ¶ˆä»¥åçš„è¯»å†™æ¶ˆæ¯ï¼Œä½†ä¾ç„¶ä¸èƒ½å–æ¶ˆå› ä¸º
+	 * closesocket è€Œäº§ç”Ÿçš„ FD_CLOSE æ¶ˆæ¯
 	 */
 	WSAAsyncSelect(sockfd, ev->hWnd, 0, 0);
 
@@ -555,8 +555,8 @@ static void handleRead(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 		fdp->r_callback(ACL_EVENT_READ, &ev->event,
 			fdp->stream, fdp->r_context);
 	else if (fdp->r_callback != NULL) {
-		/* ¸ÃÃèÊö×Ö¿É¶ÁÔòÉèÖÃ ACL_VSTREAM µÄÏµÍ³¿É¶Á±êÖ¾´Ó¶ø´¥·¢
-		 * ACL_VSTREAM Á÷ÔÚ¶ÁÊ±µ÷ÓÃÏµÍ³µÄ read º¯Êı
+		/* è¯¥æè¿°å­—å¯è¯»åˆ™è®¾ç½® ACL_VSTREAM çš„ç³»ç»Ÿå¯è¯»æ ‡å¿—ä»è€Œè§¦å‘
+		 * ACL_VSTREAM æµåœ¨è¯»æ—¶è°ƒç”¨ç³»ç»Ÿçš„ read å‡½æ•°
 		 */
 		fdp->stream->read_ready = 1;
 		fdp->r_callback(ACL_EVENT_READ, &ev->event,
@@ -735,7 +735,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 
-		/* Èç¹û¶¨Ê±Æ÷µÄÊ±¼ä¼ä¸ô > 0 ÇÒÔÊĞí¶¨Ê±Æ÷±»Ñ­»·µ÷ÓÃ£¬ÔòÔÙÖØÉè¶¨Ê±Æ÷ */
+		/* å¦‚æœå®šæ—¶å™¨çš„æ—¶é—´é—´éš” > 0 ä¸”å…è®¸å®šæ—¶å™¨è¢«å¾ªç¯è°ƒç”¨ï¼Œåˆ™å†é‡è®¾å®šæ—¶å™¨ */
 		if (timer->delay > 0 && timer->keep) {
 			timer->ncount++;
 			eventp->timer_request(eventp, timer->callback,
@@ -760,7 +760,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		SET_TIME(eventp->present);
 		delay = (int) (timer->when - eventp->present + 999) / 1000;
 
-		/* ÒªÇóÊ±¼ä¶¨Ê±Æ÷µÄ¼ä¸ô×îÉÙÊÇ 1 ºÁÃë */
+		/* è¦æ±‚æ—¶é—´å®šæ—¶å™¨çš„é—´éš”æœ€å°‘æ˜¯ 1 æ¯«ç§’ */
 		if (delay < 1000)
 			delay = 1000;
 		SetTimer(ev->hWnd, ev->tid, delay, event_timer_callback);
@@ -775,7 +775,7 @@ static acl_int64 event_set_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callba
 	acl_int64 when;
 	acl_int64 first_delay;
 
-	/* ÒªÇóÊ±¼ä¶¨Ê±Æ÷µÄ¼ä¸ô×îÉÙÊÇ 1 ºÁÃë */
+	/* è¦æ±‚æ—¶é—´å®šæ—¶å™¨çš„é—´éš”æœ€å°‘æ˜¯ 1 æ¯«ç§’ */
 	if (delay < 1000)
 		delay = 1000;
 

@@ -1,4 +1,4 @@
-#ifndef	ACL_SLICE_INCLUDE_H
+﻿#ifndef	ACL_SLICE_INCLUDE_H
 #define	ACL_SLICE_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -8,14 +8,14 @@ extern "C" {
 #include "acl_define.h"
 
 #define	ACL_SLICE_FLAG_OFF		(0)
-#define	ACL_SLICE_FLAG_GC1		(1 << 0)  /**< �ռ��ʡ, �� gc ���ܲ� */
-#define	ACL_SLICE_FLAG_GC2		(1 << 1)  /**< �ռ��е�, gc �ȽϺ� */
-#define	ACL_SLICE_FLAG_GC3		(1 << 2)  /**< �ռ����, gc ֻ��˳��ʱ��� */
-#define	ACL_SLICE_FLAG_RTGC_OFF		(1 << 10) /**< �ر�ʵʱ�ڴ��ͷ� */
-#define	ACL_SLICE_FLAG_LP64_ALIGN	(1 << 11) /**< �Ƿ����64λƽ̨��Ҫ��8�ֽڶ��� */
+#define	ACL_SLICE_FLAG_GC1		(1 << 0)  /**< 空间节省, 但 gc 性能差 */
+#define	ACL_SLICE_FLAG_GC2		(1 << 1)  /**< 空间中等, gc 比较好 */
+#define	ACL_SLICE_FLAG_GC3		(1 << 2)  /**< 空间最大, gc 只当顺序时最好 */
+#define	ACL_SLICE_FLAG_RTGC_OFF		(1 << 10) /**< 关闭实时内存释放 */
+#define	ACL_SLICE_FLAG_LP64_ALIGN	(1 << 11) /**< 是否针对64位平台需要按8字节对齐 */
 
 /**
- * �ڴ��Ƭ�ص�״̬�ṹ
+ * 内存分片池的状态结构
  */
 typedef struct ACL_SLICE_STAT {
 	int   nslots;           /**< total slice count free in slots */
@@ -33,67 +33,67 @@ typedef struct ACL_SLICE_STAT {
 typedef struct ACL_SLICE ACL_SLICE;
 
 /**
- * �����ڴ�Ƭ�ض���
- * @param name {const char*} ��ʶ���ƣ��Ա��ڵ���
- * @param page_size {int} �����ڴ�ʱ�ķ����ڴ�ҳ��С
- * @param slice_size {int} ÿ���̶������ڴ�Ƭ�Ĵ�С
- * @param flag {unsigned int} ��־λ���μ�������ACL_SLICE_FLAG_xxx
- * @return {ACL_SLICE*} �ڴ�Ƭ�ض�����
+ * 创建内存片池对象
+ * @param name {const char*} 标识名称，以便于调试
+ * @param page_size {int} 分配内存时的分配内存页大小
+ * @param slice_size {int} 每个固定长度内存片的大小
+ * @param flag {unsigned int} 标志位，参见上述：ACL_SLICE_FLAG_xxx
+ * @return {ACL_SLICE*} 内存片池对象句柄
  */
 ACL_API ACL_SLICE *acl_slice_create(const char *name, int page_size,
 	int slice_size, unsigned int flag);
 
 /**
- * ����һ���ڴ�Ƭ�ض���
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
+ * 销毁一个内存片池对象
+ * @param slice {ACL_SLICE*} 内存片池对象
  */
 ACL_API void acl_slice_destroy(ACL_SLICE *slice);
 
 /**
- * ���ڴ�Ƭ�����ж��ٸ��ڴ�Ƭ���ڱ�ʹ��
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
- * @return {int} >= 0, ���ڱ�ʹ�õ��ڴ�Ƭ����
+ * 该内存片池中有多少个内存片正在被使用
+ * @param slice {ACL_SLICE*} 内存片池对象
+ * @return {int} >= 0, 正在被使用的内存片个数
  */
 ACL_API int acl_slice_used(ACL_SLICE *slice);
 
 /**
- * ����һ���ڴ�Ƭ
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
- * @return {void*} �ڴ�Ƭ��ַ
+ * 分配一块内存片
+ * @param slice {ACL_SLICE*} 内存片池对象
+ * @return {void*} 内存片地址
  */
 ACL_API void *acl_slice_alloc(ACL_SLICE *slice);
 
 /**
- * ����һ���ڴ�Ƭ���ҽ��ڴ�Ƭ���ݳ�ʼ��Ϊ0
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
- * @return {void*} �ڴ�Ƭ��ַ
+ * 分配一块内存片，且将内存片内容初始化为0
+ * @param slice {ACL_SLICE*} 内存片池对象
+ * @return {void*} 内存片地址
  */
 ACL_API void *acl_slice_calloc(ACL_SLICE *slice);
 
 /**
- * �ͷ�һ���ڴ�Ƭ
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
- * @param ptr {void*} �ڴ�Ƭ��ַ, �������� acl_slice_alloc/acl_slice_calloc ������
+ * 释放一块内存片
+ * @param slice {ACL_SLICE*} 内存片池对象
+ * @param ptr {void*} 内存片地址, 必须是由 acl_slice_alloc/acl_slice_calloc 所分配
  */
 ACL_API void acl_slice_free2(ACL_SLICE *slice, void *ptr);
 
 /**
- * �ͷ�һ���ڴ�Ƭ
- * @param ptr {void*} �ڴ�Ƭ��ַ, �������� acl_slice_alloc/acl_slice_calloc ������
+ * 释放一块内存片
+ * @param ptr {void*} 内存片地址, 必须是由 acl_slice_alloc/acl_slice_calloc 所分配
  */
 ACL_API void acl_slice_free(void *ptr);
 
 /**
- * �鿴�ڴ�Ƭ�صĵ�ǰ״̬
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
- * @param sbuf {ACL_SLICE_STAT*} �洢���, ����Ϊ��
+ * 查看内存片池的当前状态
+ * @param slice {ACL_SLICE*} 内存片池对象
+ * @param sbuf {ACL_SLICE_STAT*} 存储结果, 不能为空
  */
 ACL_API void acl_slice_stat(ACL_SLICE *slice, ACL_SLICE_STAT *sbuf);
 
 /**
- * �ֹ����ڴ�Ƭ�ز��õ��ڴ�����ͷ�
- * @param slice {ACL_SLICE*} �ڴ�Ƭ�ض���
- * @param {int} �Ƿ��Ѿ��������ڴ�Ƭ�ͷ����, 0: ��; 1: ��
+ * 手工将内存片池不用的内存进行释放
+ * @param slice {ACL_SLICE*} 内存片池对象
+ * @param {int} 是否已经将所有内存片释放完毕, 0: 否; 1: 是
  */
 ACL_API int acl_slice_gc(ACL_SLICE *slice);
 

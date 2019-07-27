@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -40,7 +40,7 @@ bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout)
 
 bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 {
-	// �ȹرվɵ�������
+	// 先关闭旧的流对象
 	if (stream_) {
 		acl_vstream_close(stream_);
 	}
@@ -143,7 +143,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 		return dummy_;
 	}
 
-	// xxx: acl_vstream ��û�жԴ˵�ַ��ֵ
+	// xxx: acl_vstream 中没有对此地址赋值
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char  buf[256];
@@ -205,7 +205,7 @@ const char* socket_stream::get_local(bool full /* = false */) const
 		return dummy_;
 	}
 
-	// xxx: acl_vstream ��û�жԴ˵�ַ��ֵ
+	// xxx: acl_vstream 中没有对此地址赋值
 	char* ptr = ACL_VSTREAM_LOCAL(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char buf[256];
@@ -230,7 +230,7 @@ const char* socket_stream::get_local_ip(void) const
 		return dummy_;
 	}
 
-	// xxx: acl_vstream ��û�жԴ˵�ַ��ֵ
+	// xxx: acl_vstream 中没有对此地址赋值
 	//if (local_ip_[0] != 0)
 	//	return local_ip_;
 

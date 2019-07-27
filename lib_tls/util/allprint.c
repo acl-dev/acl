@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "stringops.h"
 
 /* allprint - return true if string is all printable */

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "service_app.h"
 
 bool service_app::save(const char* ip, const service_list_res_t& res)

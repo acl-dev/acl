@@ -1,4 +1,4 @@
-// fs_benchmark.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// fs_benchmark.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -37,7 +37,7 @@ public:
 
 	}
 
-	// Ö»Ğ´·½Ê½´´½¨ÎÄ¼ş
+	// åªå†™æ–¹å¼åˆ›å»ºæ–‡ä»¶
 	bool open_write()
 	{
 		fp_ = new acl::aio_fstream(handle_);
@@ -50,13 +50,13 @@ public:
 			return false;
 		}
 
-		// Ìí¼ÓĞ´³É¹¦µÄ»Øµ÷º¯Êı
+		// æ·»åŠ å†™æˆåŠŸçš„å›è°ƒå‡½æ•°
 		fp_->add_write_callback(this);
 
-		// Ìí¼Ó¹Ø±ÕµÄ»Øµ÷º¯Êı
+		// æ·»åŠ å…³é—­çš„å›è°ƒå‡½æ•°
 		fp_->add_close_callback(this);
 
-		// 1 ÃëºóÆô¶¯Ğ´¹ı³Ì
+		// 1 ç§’åå¯åŠ¨å†™è¿‡ç¨‹
 		fp_->write(__data, sizeof(__data), delay_ * 1000000);
 		return true;
 	}
@@ -75,7 +75,7 @@ protected:
 			printf("write one file(%s) ok, nwrite: %d\r\n",
 				filepath_.c_str(), nwrite_);
 
-			return false;  // ·µ»Ø false ÒÔÊ¹¿ò¼Ü¹Ø±Õ¸ÃÁ÷¶ÔÏó
+			return false;  // è¿”å› false ä»¥ä½¿æ¡†æ¶å…³é—­è¯¥æµå¯¹è±¡
 		}
 		fp_->write(__data, sizeof(__data));
 		return true;
@@ -83,7 +83,7 @@ protected:
 
 	void close_callback()
 	{
-		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		if (ifile_ >= nfiles_)
 		{
 			printf("write %s over!, ifile: %d, nfiles: %d\r\n",
@@ -97,7 +97,7 @@ protected:
 			nwrite_ = 0;
 			delay_ = 0;
 
-			// ÖØĞÂ´ò¿ªÒ»¸öĞÂµÄÒì²½Á÷¾ä±ú
+			// é‡æ–°æ‰“å¼€ä¸€ä¸ªæ–°çš„å¼‚æ­¥æµå¥æŸ„
 			if (open_write() == false)
 			{
 				printf("open file error\r\n");
@@ -128,7 +128,7 @@ static void thread_main(void*)
 		(unsigned long) acl_pthread_self());
 	acl::aio_handle* handle;
 
-	// Ã¿¸öÏß³Ì´´½¨µ¥¶ÀµÄÒì²½ÊÂ¼ş¾ä±ú
+	// æ¯ä¸ªçº¿ç¨‹åˆ›å»ºå•ç‹¬çš„å¼‚æ­¥äº‹ä»¶å¥æŸ„
 	handle = new acl::aio_handle(__kernel_event ?
 		acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
 
@@ -152,7 +152,7 @@ static void thread_main(void*)
 		return;
 	}
 
-	// ½øÈëÒì²½ÊÂ¼şÑ­»·¹ı³Ì
+	// è¿›å…¥å¼‚æ­¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹
 	while (true)
 	{
 		if (handle->check() == false)
@@ -165,10 +165,10 @@ static void thread_main(void*)
 		}
 	}
 
-	// ÒòÎª IO ¾ä±úÊÇÑÓ³ÙÊÍ·ÅµÄ£¬ËùÒÔĞèÒªÔÙ´Î¼ì²éÒ»±é
+	// å› ä¸º IO å¥æŸ„æ˜¯å»¶è¿Ÿé‡Šæ”¾çš„ï¼Œæ‰€ä»¥éœ€è¦å†æ¬¡æ£€æŸ¥ä¸€é
 	handle->check();
 
-	// Ïú»ÙÒì²½ÊÂ¼ş¾ä±ú
+	// é”€æ¯å¼‚æ­¥äº‹ä»¶å¥æŸ„
 	delete handle;
 }
 
@@ -241,14 +241,14 @@ int main(int argc, char* argv[])
 
 	acl_make_dirs(__path, 0700);
 
-	// ´´½¨Ïß³Ì³Ø¾ä±ú
+	// åˆ›å»ºçº¿ç¨‹æ± å¥æŸ„
 	acl_pthread_pool_t* tp = acl_thread_pool_create(nthreads, 0);
 
-	// Ìí¼ÓÏß³Ì´¦ÀíÈÎÎñ
+	// æ·»åŠ çº¿ç¨‹å¤„ç†ä»»åŠ¡
 	for (int i = 0; i < nthreads; i++)
 		acl_pthread_pool_add(tp, thread_main, NULL);
 
-	// Ïú»ÙÏß³Ì³Ø
+	// é”€æ¯çº¿ç¨‹æ± 
 	acl_pthread_pool_destroy(tp);
 
 	logger_close();

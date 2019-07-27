@@ -1,4 +1,4 @@
-/* krb5_asn.h */
+﻿/* krb5_asn.h */
 /* Written by Vern Staats <staatsvr@asc.hpc.mil> for the OpenSSL project,
 ** using ocsp/{*.h,*asn*.c} as a starting point
 */

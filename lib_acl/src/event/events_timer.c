@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -160,11 +160,11 @@ void event_timer_trigger(ACL_EVENT *eventp)
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void *timer_arg;
 
-	/* µ÷ÕûÊÂ¼þÒýÇæµÄÊ±¼ä½Ø */
+	/* è°ƒæ•´äº‹ä»¶å¼•æ“Žçš„æ—¶é—´æˆª */
 
 	SET_TIME(eventp->present);
 
-	/* ÓÅÏÈ´¦Àí¶¨Ê±Æ÷ÖÐµÄÈÎÎñ */
+	/* ä¼˜å…ˆå¤„ç†å®šæ—¶å™¨ä¸­çš„ä»»åŠ¡ */
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
 		timer = ACL_RING_TO_TIMER(iter.ptr);

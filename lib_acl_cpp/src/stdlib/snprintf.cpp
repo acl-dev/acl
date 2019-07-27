@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #endif
@@ -16,7 +16,7 @@ int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	int ret = safe_vsnprintf(buf, size, fmt, ap);  // µ÷ÓÃ acl::vsnprintf
+	int ret = safe_vsnprintf(buf, size, fmt, ap);  // è°ƒç”¨ acl::vsnprintf
 	va_end(ap);
 	return ret;
 }
@@ -43,7 +43,7 @@ int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	int ret = acl::safe_vsnprintf(buf, size, fmt, ap);  // µ÷ÓÃ acl::vsnprintf
+	int ret = acl::safe_vsnprintf(buf, size, fmt, ap);  // è°ƒç”¨ acl::vsnprintf
 	va_end(ap);
 	return ret;
 }
@@ -73,7 +73,7 @@ int safe_snprintf(char *buf, size_t size, const char *fmt, ...)
 	va_list ap;
 
 	va_start(ap, fmt);
-	int ret = safe_vsnprintf(buf, size, fmt, ap);  // µ÷ÓÃ acl::vsnprintf
+	int ret = safe_vsnprintf(buf, size, fmt, ap);  // è°ƒç”¨ acl::vsnprintf
 	va_end(ap);
 	return ret;
 }

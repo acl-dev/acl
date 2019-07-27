@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "stamp.h"
 
 static int __fibers_count = 2;

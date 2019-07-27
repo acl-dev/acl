@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stream/aio_socket_stream.hpp"
 
@@ -22,42 +22,42 @@ class polarssl_io;
 class http_header;
 
 /**
- * HTTP ¿Í»§¶ËÒì²½Í¨ĞÅÀà£¬²»½öÖ§³Ö±ê×¼ HTTP Í¨ĞÅĞ­Òé£¬¶øÇÒÖ§³Ö Websocket Í¨ĞÅ£¬
- * ¶ÔÓÚ HTTP Ğ­Òé¼° Websocket Í¨ĞÅ¾ùÖ§³Ö SSL ¼ÓÃÜ´«Êä£»
- * ÁíÍâ£¬¶ÔÓÚ HTTP Ğ­Òé£¬¸ù¾İÓÃ»§ÉèÖÃ£¬¿ÉÒÔ×Ô¶¯½âÑ¹ GZIP ÏìÓ¦Êı¾İ£¬ÕâÑùÔÚ»Øµ÷
- * ·½·¨ on_http_res_body() ÖĞÊÕµ½µÄ±ãÊÇ½âÑ¹ºóµÄÃ÷ÎÄÊı¾İ¡£
+ * HTTP å®¢æˆ·ç«¯å¼‚æ­¥é€šä¿¡ç±»ï¼Œä¸ä»…æ”¯æŒæ ‡å‡† HTTP é€šä¿¡åè®®ï¼Œè€Œä¸”æ”¯æŒ Websocket é€šä¿¡ï¼Œ
+ * å¯¹äº HTTP åè®®åŠ Websocket é€šä¿¡å‡æ”¯æŒ SSL åŠ å¯†ä¼ è¾“ï¼›
+ * å¦å¤–ï¼Œå¯¹äº HTTP åè®®ï¼Œæ ¹æ®ç”¨æˆ·è®¾ç½®ï¼Œå¯ä»¥è‡ªåŠ¨è§£å‹ GZIP å“åº”æ•°æ®ï¼Œè¿™æ ·åœ¨å›è°ƒ
+ * æ–¹æ³• on_http_res_body() ä¸­æ”¶åˆ°çš„ä¾¿æ˜¯è§£å‹åçš„æ˜æ–‡æ•°æ®ã€‚
  */
 class ACL_CPP_API http_aclient : public aio_open_callback
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param handle {aio_handle&} Òì²½Í¨ĞÅÊÂ¼şÒıÇæ¾ä±ú
-	 * @param ssl_conf {polarssl_conf*} ·Ç NULL Ê±×Ô¶¯²ÉÓÃ SSL Í¨ĞÅ·½Ê½
+	 * æ„é€ å‡½æ•°
+	 * @param handle {aio_handle&} å¼‚æ­¥é€šä¿¡äº‹ä»¶å¼•æ“å¥æŸ„
+	 * @param ssl_conf {polarssl_conf*} é NULL æ—¶è‡ªåŠ¨é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
 	 */
 	http_aclient(aio_handle& handle, polarssl_conf* ssl_conf = NULL);
 	virtual ~http_aclient(void);
 
 	/**
-	 * µ±¶ÔÏóÏú»ÙÊ±µÄ»Øµ÷·½·¨£¬×ÓÀà±ØĞëÊµÏÖ
+	 * å½“å¯¹è±¡é”€æ¯æ—¶çš„å›è°ƒæ–¹æ³•ï¼Œå­ç±»å¿…é¡»å®ç°
 	 */
 	virtual void destroy(void) = 0;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·£¬ÒÔ±ãÓÚÓ¦ÓÃÌí¼Ó HTTP ÇëÇóÍ·ÖĞµÄ×Ö¶ÎÄÚÈİ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ï¼Œä»¥ä¾¿äºåº”ç”¨æ·»åŠ  HTTP è¯·æ±‚å¤´ä¸­çš„å­—æ®µå†…å®¹
 	 * @return {http_header&}
 	 */
 	http_header& request_header(void);
 
 	/**
-	 * Õë¶Ô HTTP Ğ­ÒéµÄÏìÓ¦Êı¾İÊÇ·ñ×Ô¶¯½øĞĞ½âÑ¹
+	 * é’ˆå¯¹ HTTP åè®®çš„å“åº”æ•°æ®æ˜¯å¦è‡ªåŠ¨è¿›è¡Œè§£å‹
 	 * @param on {bool}
 	 * @return {http_aclient&}
 	 */
 	http_aclient& unzip_body(bool on);
 
 	/**
-	 * ÊÇ·ñÕë¶Ô GZIP Ñ¹ËõÊı¾İ×Ô¶¯½øĞĞ½âÑ¹
+	 * æ˜¯å¦é’ˆå¯¹ GZIP å‹ç¼©æ•°æ®è‡ªåŠ¨è¿›è¡Œè§£å‹
 	 * @return {bool}
 	 */
 	bool is_unzip_body(void) const
@@ -66,49 +66,49 @@ public:
 	}
 
 	/**
-	 * ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì WEB ·şÎñÆ÷
-	 * @param addr {const char*} Ô¶³Ì WEB ·şÎñÆ÷µØÖ·£¬¸ñÊ½Îª£º
-	 *  domain:port »ò ip:port, µ±µØÖ·ÎªÓòÃûÊ±£¬ÄÚ²¿×Ô¶¯½øĞĞÒì²½ÓòÃû½âÎö
-	 *  ¹ı³Ì£¬µ«ÒªÇóÔÚ³ÌĞò¿ªÊ¼Ê±±ØĞëÍ¨¹ı aio_handle::set_dns() ÉèÖÃ¹ıÓòÃû
-	 *  ·şÎñÆ÷µØÖ·£¬Èç¹ûµØÖ·Îª IP Ôò²»ĞèÒªÏÈÉèÖÃÓòÃû·şÎñÆ÷µØÖ·
-	 * @param conn_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @param rw_timeout {int} ÍøÂç IO ¶ÁĞ´³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @return {bool} ·µ»Ø false ±íÊ¾Á¬½ÓÊ§°Ü£¬·µ»Ø true ±íÊ¾½øÈëÒì²½Á¬½ÓÖĞ
+	 * å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹ WEB æœåŠ¡å™¨
+	 * @param addr {const char*} è¿œç¨‹ WEB æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ä¸ºï¼š
+	 *  domain:port æˆ– ip:port, å½“åœ°å€ä¸ºåŸŸåæ—¶ï¼Œå†…éƒ¨è‡ªåŠ¨è¿›è¡Œå¼‚æ­¥åŸŸåè§£æ
+	 *  è¿‡ç¨‹ï¼Œä½†è¦æ±‚åœ¨ç¨‹åºå¼€å§‹æ—¶å¿…é¡»é€šè¿‡ aio_handle::set_dns() è®¾ç½®è¿‡åŸŸå
+	 *  æœåŠ¡å™¨åœ°å€ï¼Œå¦‚æœåœ°å€ä¸º IP åˆ™ä¸éœ€è¦å…ˆè®¾ç½®åŸŸåæœåŠ¡å™¨åœ°å€
+	 * @param conn_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @param rw_timeout {int} ç½‘ç»œ IO è¯»å†™è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @return {bool} è¿”å› false è¡¨ç¤ºè¿æ¥å¤±è´¥ï¼Œè¿”å› true è¡¨ç¤ºè¿›å…¥å¼‚æ­¥è¿æ¥ä¸­
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
 protected:
 	/**
-	 * µ±Á¬½Ó³É¹¦ºóµÄ»Øµ÷·½·¨£¬×ÓÀà±ØĞëÊµÏÖ£¬×ÓÀàÓ¦ÔÚ¸Ã·½·¨Àï¹¹Ôì HTTP ÇëÇó
-	 * ²¢µ÷ÓÃ send_request ·½·¨Ïò WEB ·şÎñÆ÷·¢ËÍ HTTP ÇëÇó
-	 * @return {bool} ¸Ã·½·¨Èç¹û·µ»Ø false ÔòÄÚ²¿»á×Ô¶¯¹Ø±ÕÁ¬½Ó
+	 * å½“è¿æ¥æˆåŠŸåçš„å›è°ƒæ–¹æ³•ï¼Œå­ç±»å¿…é¡»å®ç°ï¼Œå­ç±»åº”åœ¨è¯¥æ–¹æ³•é‡Œæ„é€  HTTP è¯·æ±‚
+	 * å¹¶è°ƒç”¨ send_request æ–¹æ³•å‘ WEB æœåŠ¡å™¨å‘é€ HTTP è¯·æ±‚
+	 * @return {bool} è¯¥æ–¹æ³•å¦‚æœè¿”å› false åˆ™å†…éƒ¨ä¼šè‡ªåŠ¨å…³é—­è¿æ¥
 	 */
 	virtual bool on_connect(void) = 0;
 
 	/**
-	 * µ±Á¬½Ó³¬Ê±ºóµÄ»Øµ÷·½·¨
+	 * å½“è¿æ¥è¶…æ—¶åçš„å›è°ƒæ–¹æ³•
 	 */
 	virtual void on_connect_timeout(void) {}
 
 	/**
-	 * µ±Á¬½ÓÊ§°ÜºóµÄ»Øµ÷·½·¨
+	 * å½“è¿æ¥å¤±è´¥åçš„å›è°ƒæ–¹æ³•
 	 */
 	virtual void on_connect_failed(void) {}
 
 	/**
-	 * µ±ÍøÂç¶Á³¬Ê±Ê±µÄ»Øµ÷·½·¨
+	 * å½“ç½‘ç»œè¯»è¶…æ—¶æ—¶çš„å›è°ƒæ–¹æ³•
 	 */
 	virtual void on_read_timeout(void) {}
 
 	/**
-	 * ¶ÔÓÚÁ¬½Ó³É¹¦ºóÁ¬½Ó¹Ø±ÕºóµÄ»Øµ÷·½·¨
+	 * å¯¹äºè¿æ¥æˆåŠŸåè¿æ¥å…³é—­åçš„å›è°ƒæ–¹æ³•
 	 */
 	virtual void on_disconnect(void) {};
 
 	/**
-	 * µ±½ÓÊÕµ½ WEB ·şÎñ¶ËµÄÏìÓ¦Í·Ê±µÄ»Øµ÷·½·¨
+	 * å½“æ¥æ”¶åˆ° WEB æœåŠ¡ç«¯çš„å“åº”å¤´æ—¶çš„å›è°ƒæ–¹æ³•
 	 * @param header {const http_header&}
-	 * @return {bool} ·µ»Ø false Ôò½«»á¹Ø±ÕÁ¬½Ó£¬·ñÔò¼ÌĞø¶Á
+	 * @return {bool} è¿”å› false åˆ™å°†ä¼šå…³é—­è¿æ¥ï¼Œå¦åˆ™ç»§ç»­è¯»
 	 */
 	virtual bool on_http_res_hdr(const http_header& header)
 	{
@@ -117,11 +117,11 @@ protected:
 	}
 
 	/**
-	 * µ±½ÓÊÕµ½ WEB ·şÎñ¶ËµÄÏìÓ¦ÌåÊ±µÄ»Øµ÷·½·¨£¬¸Ã·½·¨¿ÉÄÜ»á±»¶à´Î»Øµ÷
-	 * Ö±µ½ÏìÓ¦Êı¾İ¶ÁÍê»ò³ö´í
-	 * @param data {char*} ¶Áµ½µÄ²¿·ÖÊı¾İÌåÄÚÈİ
-	 * @param dlen {size_t} ±¾´Î¶Áµ½µÄ data Êı¾İµÄ³¤¶È
-	 * @return {bool} ·µ»Ø false Ôò½«»á¹Ø±ÕÁ¬½Ó£¬·ñÔò¼ÌĞø¶Á
+	 * å½“æ¥æ”¶åˆ° WEB æœåŠ¡ç«¯çš„å“åº”ä½“æ—¶çš„å›è°ƒæ–¹æ³•ï¼Œè¯¥æ–¹æ³•å¯èƒ½ä¼šè¢«å¤šæ¬¡å›è°ƒ
+	 * ç›´åˆ°å“åº”æ•°æ®è¯»å®Œæˆ–å‡ºé”™
+	 * @param data {char*} è¯»åˆ°çš„éƒ¨åˆ†æ•°æ®ä½“å†…å®¹
+	 * @param dlen {size_t} æœ¬æ¬¡è¯»åˆ°çš„ data æ•°æ®çš„é•¿åº¦
+	 * @return {bool} è¿”å› false åˆ™å°†ä¼šå…³é—­è¿æ¥ï¼Œå¦åˆ™ç»§ç»­è¯»
 	 */
 	virtual bool on_http_res_body(char* data, size_t dlen)
 	{
@@ -131,9 +131,9 @@ protected:
 	}
 
 	/**
-	 * µ±¶ÁÍê HTTP ÏìÓ¦Ìå»ò³ö´íºóµÄ»Øµ÷·½·¨
-	 * @param success {bool} ÊÇ·ñ³É¹¦¶ÁÍê HTTP ÏìÓ¦ÌåÊı¾İ
-	 * @return {bool} Èç¹û³É¹¦¶ÁÍêÊı¾İÌåºó·µ»Ø false Ôò»á¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»å®Œ HTTP å“åº”ä½“æˆ–å‡ºé”™åçš„å›è°ƒæ–¹æ³•
+	 * @param success {bool} æ˜¯å¦æˆåŠŸè¯»å®Œ HTTP å“åº”ä½“æ•°æ®
+	 * @return {bool} å¦‚æœæˆåŠŸè¯»å®Œæ•°æ®ä½“åè¿”å› false åˆ™ä¼šå…³é—­è¿æ¥
 	 */
 	virtual bool on_http_res_finish(bool success)
 	{
@@ -142,44 +142,44 @@ protected:
 	}
 
 	/**
-	 * µ± websocket ÎÕÊÖ³É¹¦ºóµÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø false ±íÊ¾ĞèÒª¹Ø±ÕÁ¬½Ó£¬·ñÔò¼ÌĞø
+	 * å½“ websocket æ¡æ‰‹æˆåŠŸåçš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› false è¡¨ç¤ºéœ€è¦å…³é—­è¿æ¥ï¼Œå¦åˆ™ç»§ç»­
 	 */
 	virtual bool on_ws_handshake(void)
 	{
-		// ¿ªÊ¼Òì²½¶Á websocket Êı¾İ
+		// å¼€å§‹å¼‚æ­¥è¯» websocket æ•°æ®
 		this->ws_read_wait(0);
 		return true;
 	}
 
 	/**
-	 * µ± websocket ÎÕÊÖÊ§°ÜºóµÄ»Øµ÷·½·¨
-	 * @param status {int} ·şÎñÆ÷·µ»ØµÄ HTTP ÏìÓ¦×´Ì¬Âë
+	 * å½“ websocket æ¡æ‰‹å¤±è´¥åçš„å›è°ƒæ–¹æ³•
+	 * @param status {int} æœåŠ¡å™¨è¿”å›çš„ HTTP å“åº”çŠ¶æ€ç 
 	 */
 	virtual void on_ws_handshake_failed(int status) { (void) status; }
 
 	/**
-	 * µ±¶Áµ½Ò»¸ö text ÀàĞÍµÄÖ¡Ê±µÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»åˆ°ä¸€ä¸ª text ç±»å‹çš„å¸§æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_text(void) { return true; }
 
 	/**
-	 * µ±¶Áµ½Ò»¸ö binary ÀàĞÍµÄÖ¡Ê±µÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»åˆ°ä¸€ä¸ª binary ç±»å‹çš„å¸§æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_binary(void) { return true; }
 
 	/**
-	 * µ±¶Áµ½Ò»¸ö¹Ø±ÕÖ¡Êı¾İÊ±µÄ»Øµ÷·½·¨
+	 * å½“è¯»åˆ°ä¸€ä¸ªå…³é—­å¸§æ•°æ®æ—¶çš„å›è°ƒæ–¹æ³•
 	 */
 	virtual void on_ws_frame_closed(void) {}
 
 	/**
-	 * ÔÚ websocket Í¨ĞÅ·½Ê½£¬µ±¶Áµ½Êı¾İÌåÊ±µÄ»Øµ÷·½·¨
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param dlen {size_t} ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * åœ¨ websocket é€šä¿¡æ–¹å¼ï¼Œå½“è¯»åˆ°æ•°æ®ä½“æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param dlen {size_t} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_data(char* data, size_t dlen)
 	{
@@ -189,59 +189,59 @@ protected:
 	}
 
 	/**
-	 * µ±¶ÁÍêÒ»Ö¡Êı¾İÊ±µÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»å®Œä¸€å¸§æ•°æ®æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_finish(void) { return true; }
 
 public:
 	/**
-	 * Ïò WEB ·şÎñÆ÷·¢ËÍ HTTP ÇëÇó£¬ÄÚ²¿ÔÚ·¢ËÍºó»á×Ô¶¯¿ªÊ¼¶Á HTTP ÏìÓ¦¹ı³Ì
-	 * @param body {const void*} HTTP ÇëÇóµÄÊı¾İÌå£¬µ±Îª NULL Ê±£¬ÄÚ²¿»á×Ô
-	 *  ¶¯²ÉÓÃ HTTP GET ·½·¨
-	 * @param len {size_t} body ·Ç NULL Ê±±íÊ¾Êı¾İÌåµÄ³¤¶È
+	 * å‘ WEB æœåŠ¡å™¨å‘é€ HTTP è¯·æ±‚ï¼Œå†…éƒ¨åœ¨å‘é€åä¼šè‡ªåŠ¨å¼€å§‹è¯» HTTP å“åº”è¿‡ç¨‹
+	 * @param body {const void*} HTTP è¯·æ±‚çš„æ•°æ®ä½“ï¼Œå½“ä¸º NULL æ—¶ï¼Œå†…éƒ¨ä¼šè‡ª
+	 *  åŠ¨é‡‡ç”¨ HTTP GET æ–¹æ³•
+	 * @param len {size_t} body é NULL æ—¶è¡¨ç¤ºæ•°æ®ä½“çš„é•¿åº¦
 	 */
 	void send_request(const void* body, size_t len);
 
 	/**
-	 * Óë·şÎñÆ÷½øĞĞ WEBSOCKET ÎÕÊÖ
+	 * ä¸æœåŠ¡å™¨è¿›è¡Œ WEBSOCKET æ¡æ‰‹
 	 */
 	void ws_handshake(void);
 
 	/**
-	 * ¿ªÊ¼Òì²½¶Á websocket Êı¾İ
-	 * @param timeout {int} ¶Á³¬Ê±Ê±¼ä
+	 * å¼€å§‹å¼‚æ­¥è¯» websocket æ•°æ®
+	 * @param timeout {int} è¯»è¶…æ—¶æ—¶é—´
 	 */
 	void ws_read_wait(int timeout = 0);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_TEXT ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {char*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_TEXT ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {char*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_text(char* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_BINARY ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {void*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_BINARY ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {void*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_binary(void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_PING ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {void*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_PING ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {void*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_ping(void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_PONG ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {void*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_PONG ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {void*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_pong(void* data, size_t len);
@@ -276,9 +276,9 @@ protected:
 	websocket*         ws_in_;
 	websocket*         ws_out_;
 	string*            buff_;
-	bool               unzip_;		// ÊÇ·ñ×Ô¶¯½âÑ¹ÏìÓ¦ÌåÊı¾İ
-	zlib_stream*       zstream_;		// ½âÑ¹¶ÔÏó
-	int                gzip_header_left_;	// gzip ´«ÊäÊ±Ñ¹ËõÍ·²¿³¤¶È
+	bool               unzip_;		// æ˜¯å¦è‡ªåŠ¨è§£å‹å“åº”ä½“æ•°æ®
+	zlib_stream*       zstream_;		// è§£å‹å¯¹è±¡
+	int                gzip_header_left_;	// gzip ä¼ è¾“æ—¶å‹ç¼©å¤´éƒ¨é•¿åº¦
 
 	bool handle_connect(ACL_ASTREAM* stream);
 	bool handle_ssl_handshake(void);

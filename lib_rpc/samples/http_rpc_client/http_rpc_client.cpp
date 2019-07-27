@@ -1,4 +1,4 @@
-// http_rpc_client.cpp : Defines the entry point for the console application.
+ï»¿// http_rpc_client.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -17,7 +17,7 @@ static double __request_spent, __response_spent, __build_spent, __parse_spent;
 static bool handle_one(http_request& rpc, bool output)
 {
 	//////////////////////////////////////////////////////////////////
-	// ÇëÇó¹ı³Ì
+	// è¯·æ±‚è¿‡ç¨‹
 
 	static tutorial::AddressBook address;
 	int  person_count = 5;
@@ -26,7 +26,7 @@ static bool handle_one(http_request& rpc, bool output)
 
 	acl::string buf;
 
-	// ¸øµØÖ·²¾ÖĞÌí¼ÓÓÃ»§ÁĞ±í
+	// ç»™åœ°å€ç°¿ä¸­æ·»åŠ ç”¨æˆ·åˆ—è¡¨
 	for (int i = 0; i < person_count; i++)
 	{
 		tutorial::Person* person = address.add_person();
@@ -36,7 +36,7 @@ static bool handle_one(http_request& rpc, bool output)
 		person->set_email(buf.c_str());
 		person->set_id(i);
 
-		// ¸øÒ»¸öÓÃ»§Ìí¼Ó¶à¸öµç»°ºÅÂë
+		// ç»™ä¸€ä¸ªç”¨æˆ·æ·»åŠ å¤šä¸ªç”µè¯å·ç 
 		for (int j = 0; j < tutorial::Person::WORK; j++)
 		{
 			tutorial::Person::PhoneNumber* phone = person->add_phone();
@@ -46,7 +46,7 @@ static bool handle_one(http_request& rpc, bool output)
 	}
 
 	//////////////////////////////////////////////////////////////////
-	// ·¢ËÍÇëÇóÊı¾İÖÁ·şÎñ¶Ë£¬²¢¶ÁÈ¡·şÎñ¶ËµÄÏìÓ¦
+	// å‘é€è¯·æ±‚æ•°æ®è‡³æœåŠ¡ç«¯ï¼Œå¹¶è¯»å–æœåŠ¡ç«¯çš„å“åº”
 
 	static tutorial::AddressBook address_result;
 	address_result.Clear();
@@ -63,9 +63,9 @@ static bool handle_one(http_request& rpc, bool output)
 	__parse_spent += rpc.parse_spent();
 
 	//////////////////////////////////////////////////////////////////
-	// ·ÖÎöÏìÓ¦Êı¾İ
+	// åˆ†æå“åº”æ•°æ®
 
-	// ÁĞ³öµØÖ·²¾ÖĞËùÓĞÓÃ»§ĞÅÏ¢
+	// åˆ—å‡ºåœ°å€ç°¿ä¸­æ‰€æœ‰ç”¨æˆ·ä¿¡æ¯
 	for (int i = 0; i < address_result.person_size(); i++)
 	{
 		const tutorial::Person& person = address_result.person(i);
@@ -77,7 +77,7 @@ static bool handle_one(http_request& rpc, bool output)
 				person.email().c_str() : "null");
 		}
 
-		// ÁĞ³ö¸ÃÓÃ»§µÄËùÓĞµç»°
+		// åˆ—å‡ºè¯¥ç”¨æˆ·çš„æ‰€æœ‰ç”µè¯
 		for (int j = 0; j < person.phone_size(); j++)
 		{
 			const tutorial::Person::PhoneNumber& phone = person.phone(j);

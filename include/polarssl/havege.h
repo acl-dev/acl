@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file havege.h
  *
  * \brief HAVEGE: HArdware Volatile Entropy Gathering and Expansion

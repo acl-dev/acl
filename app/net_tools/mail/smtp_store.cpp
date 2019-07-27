@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "global/global.h"
 #include "smtp_client.h"
 #include "smtp_store.h"
@@ -23,7 +23,7 @@ smtp_store::~smtp_store()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³Ì¹ı³Ì
+// ä¸»çº¿ç¨‹è¿‡ç¨‹
 
 void smtp_store::rpc_onover()
 {
@@ -33,7 +33,7 @@ void smtp_store::rpc_onover()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³Ì¹ı³Ì
+// å­çº¿ç¨‹è¿‡ç¨‹
 
 static const char* CREATE_TBL =
 "create table smtp_tbl\r\n"

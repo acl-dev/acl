@@ -1,4 +1,4 @@
-// MeterCtrl.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// MeterCtrl.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -28,14 +28,14 @@ END_MESSAGE_MAP()
 
 
 
-// CMeterCtrl ÏûÏ¢´¦Àí³ÌĞò
+// CMeterCtrl æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 
 void CMeterCtrl::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
-	// ²»Îª»æÍ¼ÏûÏ¢µ÷ÓÃ CWnd::OnPaint()
+	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
+	// ä¸ä¸ºç»˜å›¾æ¶ˆæ¯è°ƒç”¨ CWnd::OnPaint()
 	CRect rClient;
 	GetClientRect(rClient);
 	CRect rLeft = rClient;
@@ -74,7 +74,7 @@ void CMeterCtrl::OnPaint()
 
 BOOL CMeterCtrl::OnEraseBkgnd(CDC* pDC)
 {
-	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
 	CRect r;
 	GetClientRect(r);
 	CBrush *pBrush = CBrush::FromHandle(GetSysColorBrush(COLOR_BTNFACE));
@@ -87,7 +87,7 @@ BOOL CMeterCtrl::OnEraseBkgnd(CDC* pDC)
 BOOL CMeterCtrl::Create(LPCTSTR lpszWindowName, DWORD dwStyle,
 		const RECT& rect, CWnd* pParentWnd, HMENU nID)
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 	static CString className = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW);
 
 	return CWnd::CreateEx(WS_EX_STATICEDGE, //WS_EX_CLIENTEDGE | WS_EX_STATICEDGE,
@@ -103,7 +103,7 @@ BOOL CMeterCtrl::CreateEx(DWORD dwExStyle, LPCTSTR lpszClassName,
 		LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect,
 		CWnd* pParentWnd, UINT nID, LPVOID lpParam)
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 
 	static CString className = AfxRegisterWndClass(CS_HREDRAW | CS_VREDRAW);
 

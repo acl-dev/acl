@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -55,7 +55,7 @@ bool scan_dir::open(const char* path, bool recursive /* = true */,
 		return false;
 	}
 
-	// �ȹر�֮ǰ���ܴ򿪵ľ�����Է�ֹ��Դй©
+	// 先关闭之前可能打开的句柄，以防止资源泄漏
 	close();
 
 	unsigned flags = 0;
@@ -267,7 +267,7 @@ bool scan_dir::get_cwd(string& out)
 		return false;
 	}
 
-	// ȥ��β���� '/'
+	// 去掉尾部的 '/'
 	char* end = buf + strlen(buf) - 1;
 	while (end > buf) {
 #ifdef ACL_WINDOWS

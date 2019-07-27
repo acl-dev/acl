@@ -1,4 +1,4 @@
-#include <vector>
+ï»¿#include <vector>
 #include <string>
 #include <assert.h>
 #include "string_util.hpp"
@@ -21,20 +21,20 @@ connect_manager::~connect_manager()
 {
 	std::vector<connect_pool*>::iterator it = pools_.begin();
 
-	// default_pool_ ÒÑ¾­°üº¬ÔÚ pools_ ÀïÁË
+	// default_pool_ å·²ç»åŒ…å«åœ¨ pools_ é‡Œäº†
 	for (; it != pools_.end(); ++it)
 		delete *it;
 
 	delete lock_;
 }
 
-// ·ÖÎöÒ»¸ö·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºIP:PORT[:MAX_CONN]
-// ·µ»ØÖµ < 0 ±íÊ¾·Ç·¨µÄµØÖ·
+// åˆ†æä¸€ä¸ªæœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORT[:MAX_CONN]
+// è¿”å›å€¼ < 0 è¡¨ç¤ºéæ³•çš„åœ°å€
 static int check_addr(const char* addr, std::string& buf, int default_count)
 {
 	buf.clear();
 
-	// Êı¾İ¸ñÊ½£ºIP:PORT[:CONNECT_COUNT]
+	// æ•°æ®æ ¼å¼ï¼šIP:PORT[:CONNECT_COUNT]
 	std::vector<std::string> tokens;
 	split3(addr, ":|", tokens);
 	if (tokens.size() < 2)
@@ -64,14 +64,14 @@ bool connect_manager::init(const char* default_addr,
 	if (addr_list != NULL && *addr_list != 0)
 		set_service_list(addr_list, count);
 
-	// ´´½¨È±Ê¡·şÎñÁ¬½Ó³Ø¶ÔÏó£¬¸Ã¶ÔÏóÒ»Í¬·ÅÈë×ÜµÄÁ¬½Ó³Ø¼¯ÈºÖĞ
+	// åˆ›å»ºç¼ºçœæœåŠ¡è¿æ¥æ± å¯¹è±¡ï¼Œè¯¥å¯¹è±¡ä¸€åŒæ”¾å…¥æ€»çš„è¿æ¥æ± é›†ç¾¤ä¸­
 	if (default_addr != NULL && *default_addr != 0)
 	{
 		int max = check_addr(default_addr, default_addr_, count);
 		default_pool_ = &set(default_addr_.c_str(), max);
 	}
 
-	// ±ØĞë±£Ö¤ÖÁÉÙÓĞÒ»¸ö·şÎñ¿ÉÓÃ
+	// å¿…é¡»ä¿è¯è‡³å°‘æœ‰ä¸€ä¸ªæœåŠ¡å¯ç”¨
 	return pools_.empty() ? false : true;
 }
 
@@ -80,7 +80,7 @@ void connect_manager::set_service_list(const char* addr_list, int count)
 	if (addr_list == NULL || *addr_list == 0)
 		return;
 
-	// ´´½¨Á¬½Ó³Ø·şÎñ¼¯Èº
+	// åˆ›å»ºè¿æ¥æ± æœåŠ¡é›†ç¾¤
 
 	std::vector<std::string> tokens;
 	char* buf = strdup(addr_list);

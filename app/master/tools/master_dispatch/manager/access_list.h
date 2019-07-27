@@ -1,7 +1,7 @@
-#pragma once
+ï»¿#pragma once
 #include <vector>
 
-// ÓÃ»§·ÃÎÊÁĞ±íÀà£¬ÓÃÀ´ÅĞ¶ÏËù¸øÓÃ»§ÊÇ·ñÔÊĞíÊ¹ÓÃ±¾·şÎñ
+// ç”¨æˆ·è®¿é—®åˆ—è¡¨ç±»ï¼Œç”¨æ¥åˆ¤æ–­æ‰€ç»™ç”¨æˆ·æ˜¯å¦å…è®¸ä½¿ç”¨æœ¬æœåŠ¡
 
 class access_list : public acl::singleton<access_list>
 {

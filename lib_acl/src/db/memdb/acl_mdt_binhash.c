@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -20,7 +20,7 @@
 #include "mdb_private.h"
 
 /**
- * ´´½¨Ë÷Òı
+ * åˆ›å»ºç´¢å¼•
  */
 static ACL_MDT_IDX *mdt_idx_create(ACL_MDT *mdt, size_t init_capacity,
 	const char *name, unsigned int flag)
@@ -61,9 +61,9 @@ static void mdt_idx_free(ACL_MDT_IDX *idx)
 
 
 /**
- * ÏòÒ»¸ö±íË÷ÒıÖĞÌí¼ÓĞÂµÄ×Ö¶Î
- * @param idx {ACL_MDT_IDX*} ±íË÷Òı
- * @param key {const char*} Êı¾İ±íË÷Òı×Ö¶ÎÖµ
+ * å‘ä¸€ä¸ªè¡¨ç´¢å¼•ä¸­æ·»åŠ æ–°çš„å­—æ®µ
+ * @param idx {ACL_MDT_IDX*} è¡¨ç´¢å¼•
+ * @param key {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µå€¼
  * @param rec {ACL_MDT_REC*}
  * @return {ACL_HTABLE_INFO*}
  */
@@ -83,10 +83,10 @@ static void mdt_idx_add(ACL_MDT_IDX *idx, const char *key, ACL_MDT_REC *rec)
 }
 
 /**
- * ´ÓÊı¾İ±íµÄË÷ÒıÖĞ²éÑ¯¶ÔÓ¦Ä³¸öË÷Òı¼üÖµµÄ½á¹û¼¯
- * @param idx {ACL_MDT_IDX*} ±íË÷Òı
- * @param key {const char*} Êı¾İ±íË÷Òı×Ö¶ÎÖµ
- * @return {ACL_MDT_REC*} ¶ÔÓ¦Ä³¸öË÷Òı×Ö¶ÎÖµµÄ½á¹û¼¯ºÏ
+ * ä»æ•°æ®è¡¨çš„ç´¢å¼•ä¸­æŸ¥è¯¢å¯¹åº”æŸä¸ªç´¢å¼•é”®å€¼çš„ç»“æœé›†
+ * @param idx {ACL_MDT_IDX*} è¡¨ç´¢å¼•
+ * @param key {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µå€¼
+ * @return {ACL_MDT_REC*} å¯¹åº”æŸä¸ªç´¢å¼•å­—æ®µå€¼çš„ç»“æœé›†åˆ
  */
 static ACL_MDT_REC *mdt_idx_get(ACL_MDT_IDX *idx, const char *key)
 {
@@ -99,22 +99,22 @@ static ACL_MDT_REC *mdt_idx_get(ACL_MDT_IDX *idx, const char *key)
 }
 
 /**
- * ´ÓÒ»¸ö±íË÷ÒıÖĞÉ¾³ı¸ÃË÷Òı
- * @param idx {ACL_MDT_IDX*} ±íË÷Òı
- * @param key_value {const char*} Êı¾İ½áµãµÄÒıÓÃ½áµãµÄÒıÓÃ¼üÖµ
+ * ä»ä¸€ä¸ªè¡¨ç´¢å¼•ä¸­åˆ é™¤è¯¥ç´¢å¼•
+ * @param idx {ACL_MDT_IDX*} è¡¨ç´¢å¼•
+ * @param key_value {const char*} æ•°æ®ç»“ç‚¹çš„å¼•ç”¨ç»“ç‚¹çš„å¼•ç”¨é”®å€¼
  */
 static void mdt_idx_del(ACL_MDT_IDX *idx, const char *key)
 {
 	ACL_MDT_IDX_BHASH *idx_bhash = (ACL_MDT_IDX_BHASH*) idx;
 
-	/* idx->table ¹şÏ£±íÀï´æ´¢µÄÊÇ: rec->key: rec ¶Ô£¬ËùÒÔ²»ĞèÒªÔÚ
-	 * ¹şÏ£±íÄÚ²¿ÊÍ·Å rec ÄÚ´æ£¬ÒòÎª¿ÉÒÔÏÔÊ¾µØÊÍ·Å¸Ã×ÊÔ´
+	/* idx->table å“ˆå¸Œè¡¨é‡Œå­˜å‚¨çš„æ˜¯: rec->key: rec å¯¹ï¼Œæ‰€ä»¥ä¸éœ€è¦åœ¨
+	 * å“ˆå¸Œè¡¨å†…éƒ¨é‡Šæ”¾ rec å†…å­˜ï¼Œå› ä¸ºå¯ä»¥æ˜¾ç¤ºåœ°é‡Šæ”¾è¯¥èµ„æº
 	 */
 	acl_binhash_delete(idx_bhash->table, key, (int) strlen(key) + 1, NULL);
 }
 
 /**
- * ÊÍ·Å¶ş½øÖÆ¹şÏ£Ä£Ê½µÄÊı¾İ±í
+ * é‡Šæ”¾äºŒè¿›åˆ¶å“ˆå¸Œæ¨¡å¼çš„æ•°æ®è¡¨
  */
 static void mdt_binhash_free(ACL_MDT *mdt)
 {

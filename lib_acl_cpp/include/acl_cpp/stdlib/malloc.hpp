@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 
 #ifdef HOOK_NEW
@@ -21,23 +21,23 @@ namespace acl {
 ACL_CPP_API void  acl_slice_init(void);
 
 /**
- * ÄÚ´æ·ÖÅäº¯Êı
- * @param size {size_t} ĞèÒª·ÖÅäµÄ³ß´ç´óĞ¡
- * @param filename {const char*} Ô´³ÌĞòÃû×Ö
- * @param funcname {const char*} º¯ÊıÃû
- * @param lineno {int} Ô´³ÌĞòĞĞºÅ
- * @return {void*} ·ÖÅäµÄÄÚ´æµØÖ·£¬Èç¹û·ÖÅäÄÚ´æÊ§°Ü£¬ÔòÖ±½Óabort
+ * å†…å­˜åˆ†é…å‡½æ•°
+ * @param size {size_t} éœ€è¦åˆ†é…çš„å°ºå¯¸å¤§å°
+ * @param filename {const char*} æºç¨‹åºåå­—
+ * @param funcname {const char*} å‡½æ•°å
+ * @param lineno {int} æºç¨‹åºè¡Œå·
+ * @return {void*} åˆ†é…çš„å†…å­˜åœ°å€ï¼Œå¦‚æœåˆ†é…å†…å­˜å¤±è´¥ï¼Œåˆ™ç›´æ¥abort
  */
 ACL_CPP_API void* acl_new(size_t size, const char* filename,
 	const char* funcname, int lineno);
 
 
 /**
- * ÊÍ·ÅÄÚ´æº¯Êı
- * @param ptr {void*} ÄÚ´æµØÖ·
- * @param filename {const char*} Ô´³ÌĞòÃû×Ö
- * @param funcname {const char*} º¯ÊıÃû
- * @param lineno {int} Ô´³ÌĞòĞĞºÅ
+ * é‡Šæ”¾å†…å­˜å‡½æ•°
+ * @param ptr {void*} å†…å­˜åœ°å€
+ * @param filename {const char*} æºç¨‹åºåå­—
+ * @param funcname {const char*} å‡½æ•°å
+ * @param lineno {int} æºç¨‹åºè¡Œå·
  */
 ACL_CPP_API void  acl_delete(void *ptr, const char* filename,
 	const char* funcname, int lineno);

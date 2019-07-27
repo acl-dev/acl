@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "aio_stream.hpp"
 
@@ -8,8 +8,8 @@ namespace acl
 class aio_socket_stream;
 
 /**
- * µ±Òì²½¼àÌıÁ÷½ÓÊÕµ½ĞÂµÄ¿Í»§¶ËÁ÷Ê±µ÷ÓÃ´Ë»Øµ÷ÀàÖĞµÄ»Øµ÷º¯Êı£¬
- * ¸ÃÀàÎª´¿ĞéÀà£¬ÒªÇó×ÓÀà±ØĞëÊµÏÖ accept_callback »Øµ÷¹ı³Ì
+ * å½“å¼‚æ­¥ç›‘å¬æµæ¥æ”¶åˆ°æ–°çš„å®¢æˆ·ç«¯æµæ—¶è°ƒç”¨æ­¤å›è°ƒç±»ä¸­çš„å›è°ƒå‡½æ•°ï¼Œ
+ * è¯¥ç±»ä¸ºçº¯è™šç±»ï¼Œè¦æ±‚å­ç±»å¿…é¡»å®ç° accept_callback å›è°ƒè¿‡ç¨‹
  */
 class ACL_CPP_API aio_accept_callback : public aio_callback
 {
@@ -18,11 +18,11 @@ public:
 	virtual ~aio_accept_callback(void) {}
 
 	/**
-	 * µ±½ÓÊÕµ½ĞÂµÄ¿Í»§¶ËÁ÷Ê±µÄ»Øµ÷º¯Êı
-	 * @param client {aio_socket_stream*} ¿Í»§¶ËÒì²½Á¬½ÓÁ÷£¬
-	 *  ¿ÉÒÔ¶Ô´ËÁ÷½øĞĞ¶ÁĞ´²Ù×÷
-	 * @return {bool} Èç¹ûÏ£Íû¹Ø±Õ¸ÃÒì²½¼àÌıÁ÷£¬¿ÉÒÔ·µ»Ø false£¬
-	 *  Ò»°ã²»Ó¦·µ»Ø false
+	 * å½“æ¥æ”¶åˆ°æ–°çš„å®¢æˆ·ç«¯æµæ—¶çš„å›è°ƒå‡½æ•°
+	 * @param client {aio_socket_stream*} å®¢æˆ·ç«¯å¼‚æ­¥è¿æ¥æµï¼Œ
+	 *  å¯ä»¥å¯¹æ­¤æµè¿›è¡Œè¯»å†™æ“ä½œ
+	 * @return {bool} å¦‚æœå¸Œæœ›å…³é—­è¯¥å¼‚æ­¥ç›‘å¬æµï¼Œå¯ä»¥è¿”å› falseï¼Œ
+	 *  ä¸€èˆ¬ä¸åº”è¿”å› false
 	 */
 	virtual bool accept_callback(aio_socket_stream* client) = 0;
 protected:
@@ -30,39 +30,39 @@ private:
 };
 
 /**
- * Òì²½¼àÌıÍøÂçÁ÷£¬¸ÃÀà½ÓÊÕÀ´×ÔÓÚ¿Í»§¶ËµÄÍâÀ´Á¬½Ó£¬Í¬Ê±¸ÃÀàÖ»ÄÜ
- * ÔÚ¶ÑÉÏ·ÖÅä£¬²»ÄÜÔÚÕ»·ÖÅä£¬Ó¦ÓÃ¿ÉÒÔµ÷ÓÃ close Ö÷¶¯¹Ø±ÕÁ÷£¬Á÷¹Ø±Õ
- * ºó¸ÃÒì²½Á÷¶ÔÏó×Ô¶¯ÊÍ·Å£¬ÎŞĞèµ÷ÓÃ delete É¾³ı¸ÃÀà¶ÔÏó
+ * å¼‚æ­¥ç›‘å¬ç½‘ç»œæµï¼Œè¯¥ç±»æ¥æ”¶æ¥è‡ªäºå®¢æˆ·ç«¯çš„å¤–æ¥è¿æ¥ï¼ŒåŒæ—¶è¯¥ç±»åªèƒ½
+ * åœ¨å †ä¸Šåˆ†é…ï¼Œä¸èƒ½åœ¨æ ˆåˆ†é…ï¼Œåº”ç”¨å¯ä»¥è°ƒç”¨ close ä¸»åŠ¨å…³é—­æµï¼Œæµå…³é—­
+ * åè¯¥å¼‚æ­¥æµå¯¹è±¡è‡ªåŠ¨é‡Šæ”¾ï¼Œæ— éœ€è°ƒç”¨ delete åˆ é™¤è¯¥ç±»å¯¹è±¡
  *
  */
 class ACL_CPP_API aio_listen_stream : public aio_stream
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı£¬ÓÃÒÔ¹¹ÔìÒì²½¼àÌıÁ÷
-	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú
+	 * æ„é€ å‡½æ•°ï¼Œç”¨ä»¥æ„é€ å¼‚æ­¥ç›‘å¬æµ
+	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
 	 */
 	aio_listen_stream(aio_handle* handle);
 
 	/**
-	 * Ìí¼ÓÒì²½¼àÌıÁ÷½ÓÊÕµ½ĞÂ¿Í»§¶ËÁ÷Ê±µÄ»Øµ÷º¯Êı
+	 * æ·»åŠ å¼‚æ­¥ç›‘å¬æµæ¥æ”¶åˆ°æ–°å®¢æˆ·ç«¯æµæ—¶çš„å›è°ƒå‡½æ•°
 	 * @param callback {aio_accept_callback*}
 	 */
 	void add_accept_callback(aio_accept_callback* callback);
 
 	/**
-	 * ¿ªÊ¼¼àÌıÄ³¸öÖ¸¶¨µØÖ·£¬¿ÉÒÔÎªÍøÂçÌ×½Ó¿Ú£¬Ò²¿ÉÒÔÎªÓòÌ×½Ó¿Ú£¬
-	 * @param addr {const char*} ¼àÌıµØÖ·£¬TCP¼àÌıµØÖ·»òÓò¼àÌıµØÖ·
-	 * ¸ñÊ½£º
-	 *      Õë¶ÔTCPÁ¬½Ó£ºIP:PORT£¬Èç£º127.0.0.1:9001
-	 *      Õë¶ÔÓòÌ×½Ó¿Ú£º{path}£¬Èç£º/tmp/my.sock
-	 * @param flag {unsigned} ´´½¨¼àÌıÌ×½Ó¿ÚÊ±µÄ´ò¿ª±êÖ¾Î»£¬¼û server_socket.hpp
-	 * @return {bool} ¼àÌıÊÇ·ñ³É¹¦
+	 * å¼€å§‹ç›‘å¬æŸä¸ªæŒ‡å®šåœ°å€ï¼Œå¯ä»¥ä¸ºç½‘ç»œå¥—æ¥å£ï¼Œä¹Ÿå¯ä»¥ä¸ºåŸŸå¥—æ¥å£ï¼Œ
+	 * @param addr {const char*} ç›‘å¬åœ°å€ï¼ŒTCPç›‘å¬åœ°å€æˆ–åŸŸç›‘å¬åœ°å€
+	 * æ ¼å¼ï¼š
+	 *      é’ˆå¯¹TCPè¿æ¥ï¼šIP:PORTï¼Œå¦‚ï¼š127.0.0.1:9001
+	 *      é’ˆå¯¹åŸŸå¥—æ¥å£ï¼š{path}ï¼Œå¦‚ï¼š/tmp/my.sock
+	 * @param flag {unsigned} åˆ›å»ºç›‘å¬å¥—æ¥å£æ—¶çš„æ‰“å¼€æ ‡å¿—ä½ï¼Œè§ server_socket.hpp
+	 * @return {bool} ç›‘å¬æ˜¯å¦æˆåŠŸ
 	 */
 	bool open(const char* addr, unsigned flag = 0);
 
 	/**
-	 * »ñµÃ·şÎñÆ÷¼àÌıµØÖ·
+	 * è·å¾—æœåŠ¡å™¨ç›‘å¬åœ°å€
 	 * @return {const char*}
 	 */
 	const char* get_addr(void) const;

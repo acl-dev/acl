@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include "db_driver.h"
 #include "driver_mysql.h"

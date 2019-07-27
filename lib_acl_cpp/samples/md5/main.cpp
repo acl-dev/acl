@@ -1,4 +1,4 @@
-// md5.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// md5.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 
 int main()
 {
-	const char* s = "ÖĞ¹úÈËÃñÒøĞĞ£¡";
+	const char* s = "ä¸­å›½äººæ°‘é“¶è¡Œï¼";
 	const char* key = "zsxxsz";
 	char  buf1[33], buf2[33];
 

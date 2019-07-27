@@ -1,4 +1,4 @@
-#ifndef ACL_MEM_HOOK_INCLUDE_H
+ï»¿#ifndef ACL_MEM_HOOK_INCLUDE_H
 #define ACL_MEM_HOOK_INCLUDE_H
 
 #ifdef __cplusplus
@@ -8,8 +8,8 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * ÉèÖÃÄÚ´æ·ÖÅä¡¢ÊÍ·ÅµÄ×¢²áº¯Êı£¬µ±ACLÄÚ²¿·ÖÅäÊÍ·ÅÄÚ´æÊ±±ãµ÷ÓÃÕâĞ©×¢²áµÄº¯Êı
- * ÔÚµ÷ÓÃ´Ëº¯Êı½øĞĞ×¢²áÊ±±ØĞë±£Ö¤Õâ¼¸¸öº¯ÊıÖ¸Õë²ÎÊı¾ù·Ç¿Õ
+ * è®¾ç½®å†…å­˜åˆ†é…ã€é‡Šæ”¾çš„æ³¨å†Œå‡½æ•°ï¼Œå½“ACLå†…éƒ¨åˆ†é…é‡Šæ”¾å†…å­˜æ—¶ä¾¿è°ƒç”¨è¿™äº›æ³¨å†Œçš„å‡½æ•°
+ * åœ¨è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œæ³¨å†Œæ—¶å¿…é¡»ä¿è¯è¿™å‡ ä¸ªå‡½æ•°æŒ‡é’ˆå‚æ•°å‡éç©º
  * @param malloc_hook {void *(*)(const char* fname, int lineno, size_t)}
  * @param calloc_hook {void *(*)(const char* fname, int lineno, size_t, size_t)}
  * @param realloc_hook {void *(*)(const char* fname, int lineno, void *, size_t)}
@@ -27,7 +27,7 @@ ACL_API void acl_mem_hook(void *(*malloc_hook)(const char*, int, size_t),
 		void  (*free_hook)(const char*, int, void*));
 
 /**
- * È¡ÏûÖ®Ç°ÉèÖÃµÄÄÚ´æ¹´×Óº¯Êı£¬»Ö¸´ÎªÈ±Ê¡×´Ì¬
+ * å–æ¶ˆä¹‹å‰è®¾ç½®çš„å†…å­˜å‹¾å­å‡½æ•°ï¼Œæ¢å¤ä¸ºç¼ºçœçŠ¶æ€
  */
 ACL_API void acl_mem_unhook(void);
 

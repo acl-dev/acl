@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include <map>
@@ -11,9 +11,9 @@ class beanstalk;
 class locker;
 
 /**
- * beanstalk ¿Í»§¶ËÁ¬½Ó³Ø£¬¿ÉÒÔÍ¬Ê±Á¬½Ó²»Í¬µÄ beanstalkd ·şÎñÆ÷£¬
- * Ã¿¸ö beanstalkd ÓĞ¶à¸öÁ¬½Ó£¬ÄÚ²¿×Ô¶¯¼ÓËø£»µ«²»¿ØÖÆÁ¬½ÓÊıÏŞÖÆ£¬
- * ÓÃ»§Ó¦×ÔĞĞ¿ØÖÆÁ¬½Ó³ØµÄ×î´óÁ¬½ÓÉÏÏŞ
+ * beanstalk å®¢æˆ·ç«¯è¿æ¥æ± ï¼Œå¯ä»¥åŒæ—¶è¿æ¥ä¸åŒçš„ beanstalkd æœåŠ¡å™¨ï¼Œ
+ * æ¯ä¸ª beanstalkd æœ‰å¤šä¸ªè¿æ¥ï¼Œå†…éƒ¨è‡ªåŠ¨åŠ é”ï¼›ä½†ä¸æ§åˆ¶è¿æ¥æ•°é™åˆ¶ï¼Œ
+ * ç”¨æˆ·åº”è‡ªè¡Œæ§åˆ¶è¿æ¥æ± çš„æœ€å¤§è¿æ¥ä¸Šé™
  */
 class ACL_CPP_API beanstalk_pool : public noncopyable
 {
@@ -22,22 +22,22 @@ public:
 	~beanstalk_pool();
 
 	/**
-	 * ´ÓÁ¬½Ó³ØÖĞÈ¡µÃÒ»¸ö beanstalkd µÄ¿Í»§¶ËÁ¬½Ó
-	 * @param addr {const char*} beanstalkd ·şÎñµØÖ·(domain:port)
-	 * @param clean_watch {bool} ÔÚÈ¡µÃÁ¬½Ó¶ÔÏóºóÊÇ·ñ×Ô¶¯È¡ÏûËùÓĞµÄ
-	 *  ÒÑ¹Ø×¢¶ÓÁĞ
-	 * @param conn_timeout {int} Á¬½Ó beanstalkd µÄ³¬Ê±Ê±¼ä
-	 * @return {beanstalk*} ·µ»Ø·Ç¿Õ±íÊ¾Õı³££¬·ñÔò±íÊ¾³ö´í
+	 * ä»è¿æ¥æ± ä¸­å–å¾—ä¸€ä¸ª beanstalkd çš„å®¢æˆ·ç«¯è¿æ¥
+	 * @param addr {const char*} beanstalkd æœåŠ¡åœ°å€(domain:port)
+	 * @param clean_watch {bool} åœ¨å–å¾—è¿æ¥å¯¹è±¡åæ˜¯å¦è‡ªåŠ¨å–æ¶ˆæ‰€æœ‰çš„
+	 *  å·²å…³æ³¨é˜Ÿåˆ—
+	 * @param conn_timeout {int} è¿æ¥ beanstalkd çš„è¶…æ—¶æ—¶é—´
+	 * @return {beanstalk*} è¿”å›éç©ºè¡¨ç¤ºæ­£å¸¸ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™
 	 */
 	beanstalk* peek(const char* addr, bool clean_watch = true,
 		int conn_timeout = 60);
 
 	/**
-	 * ½«²»ÓÃµÄ beanstalkd Á¬½Ó·Å»Øµ½Á¬½Ó³ØÖĞ
-	 * @param client {beanstalk*} beanstalkd ¿Í»§¶ËÁ¬½Ó
-	 * @param clean_watch {bool} ÊÇ·ñÈ¡ÏûÒÑ¾­¹Ø×¢µÄ¶ÓÁĞ
-	 * @param keep {bool} Èç¹ûÎª true Ôò½« client ·Å»ØÖÁÁ¬½Ó³Ø£¬
-	 *  ·ñÔòÊÍ·Å¸ÃÁ¬½Ó
+	 * å°†ä¸ç”¨çš„ beanstalkd è¿æ¥æ”¾å›åˆ°è¿æ¥æ± ä¸­
+	 * @param client {beanstalk*} beanstalkd å®¢æˆ·ç«¯è¿æ¥
+	 * @param clean_watch {bool} æ˜¯å¦å–æ¶ˆå·²ç»å…³æ³¨çš„é˜Ÿåˆ—
+	 * @param keep {bool} å¦‚æœä¸º true åˆ™å°† client æ”¾å›è‡³è¿æ¥æ± ï¼Œ
+	 *  å¦åˆ™é‡Šæ”¾è¯¥è¿æ¥
 	 */
 	void put(beanstalk* client, bool clean_watch = true,
 		bool keep = true);

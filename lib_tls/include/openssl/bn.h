@@ -1,4 +1,4 @@
-/* crypto/bn/bn.h */
+﻿/* crypto/bn/bn.h */
 /* Copyright (C) 1995-1997 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

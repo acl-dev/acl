@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #define BOX	acl::mbox
 //#define BOX	acl::tbox

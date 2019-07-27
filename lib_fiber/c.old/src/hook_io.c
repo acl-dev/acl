@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #ifdef HAS_PIPE2
 #define _GNU_SOURCE

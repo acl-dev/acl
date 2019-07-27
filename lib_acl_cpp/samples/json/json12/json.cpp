@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 static void test_type(acl::json& json, const char* name)
 {

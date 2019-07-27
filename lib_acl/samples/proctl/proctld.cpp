@@ -1,4 +1,4 @@
-// proctld.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// proctld.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 #pragma comment(lib,"ws2_32")
 #include "lib_acl.h"
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 		acl_msg_open(logfile, "daemon");
 		acl_debug_init("all:2");
 
-		/* ÒÔ·şÎñÆ÷Ä£Ê½Æô¶¯¼à¿Ø½ø³Ì */
+		/* ä»¥æœåŠ¡å™¨æ¨¡å¼å¯åŠ¨ç›‘æ§è¿›ç¨‹ */
 		acl_proctl_deamon_init(argv[0]);
 		acl_proctl_daemon_loop();
 	}

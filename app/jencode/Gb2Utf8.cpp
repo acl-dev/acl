@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "Gb2Utf8.h"
 
 CGb2Utf8::CGb2Utf8(const char* fromCharset, const char* toCharset)

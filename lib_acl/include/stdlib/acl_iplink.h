@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Name: iplink.h
  * Author: zsx
  * Date: 2003/11/30

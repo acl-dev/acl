@@ -1,4 +1,4 @@
-/* ocsp.h */
+﻿/* ocsp.h */
 /* Written by Tom Titchener <Tom_Titchener@groove.net> for the OpenSSL
  * project. */
 

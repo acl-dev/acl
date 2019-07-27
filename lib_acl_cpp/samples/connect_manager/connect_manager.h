@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class connect_manager : public acl::connect_manager
 {
@@ -8,7 +8,7 @@ public:
 	virtual ~connect_manager();
 
 protected:
-	// »ùÀà´¿Ğéº¯ÊıµÄÊµÏÖ
+	// åŸºç±»çº¯è™šå‡½æ•°çš„å®ç°
 	acl::connect_pool* create_pool(const char* addr,
 		size_t count, size_t idx);
 };

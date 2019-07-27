@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class db_store;
 
@@ -30,9 +30,9 @@ private:
 	char   addr_[256];
 
 private:
-	// Á¬½Ó·şÎñÆ÷
+	// è¿æ¥æœåŠ¡å™¨
 	acl::socket_stream* connect_server();
 
-	// ·¢ËÍ HTTP ÇëÇó¹ı³Ì
+	// å‘é€ HTTP è¯·æ±‚è¿‡ç¨‹
 	bool http_request(acl::socket_stream* conn, const char* host);
 };

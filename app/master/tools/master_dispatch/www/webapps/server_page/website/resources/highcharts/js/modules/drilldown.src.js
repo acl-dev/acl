@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Highcharts Drilldown plugin
  * 
  * Author: Torstein Honsi
@@ -39,7 +39,7 @@
 
 	// Add language
 	extend(defaultOptions.lang, {
-		drillUpText: '◁ Back to {series.name}'
+		drillUpText: '鈼� Back to {series.name}'
 	});
 	defaultOptions.drilldown = {
 		activeAxisLabelStyle: {

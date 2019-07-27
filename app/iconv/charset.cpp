@@ -1,4 +1,4 @@
-/**
+﻿/**
  * writen by yan.zhang
  */
 
@@ -89,7 +89,7 @@ charset_radar::~charset_radar(void)
 bool charset_radar::detact(const char *data, int len, acl::string &result_charset)
 {
 	typedef struct {
-		int group_id; /* 字符集分组id */
+		int group_id; /* 瀛楃闆嗗垎缁刬d */
 		const char *charset;
 		int result_len;
 	} eas_charset;

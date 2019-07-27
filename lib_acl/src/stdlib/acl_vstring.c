@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 /* System libraries. */
@@ -467,14 +467,14 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 	if (src >= acl_vstring_str(vp)
 		&& (src + len <= acl_vstring_str(vp) + ACL_VSTRING_SIZE(vp)))
 	{
-		/* ËµÃ÷ÊÇÍ¬Ò»ÄÚ´æÇø¼äµÄÊý¾ÝÒÆ¶¯ */
+		/* è¯´æ˜Žæ˜¯åŒä¸€å†…å­˜åŒºé—´çš„æ•°æ®ç§»åŠ¨ */
 		memmove(acl_vstring_str(vp), src, len);
 		ACL_VSTRING_AT_OFFSET(vp, (int) len);
 		ACL_VSTRING_TERMINATE(vp);
 		return vp;
 	}
 
-	/* ËµÃ÷²»ÊÇÍ¬Ò»ÄÚ´æÇø¼äµÄÊý¾ÝÒÆ¶¯ */
+	/* è¯´æ˜Žä¸æ˜¯åŒä¸€å†…å­˜åŒºé—´çš„æ•°æ®ç§»åŠ¨ */
 
 	acl_vstring_free_buf(vp);
 
@@ -882,20 +882,20 @@ const ACL_VSTRING *acl_buffer_gets_nonl(ACL_VSTRING *vp, const char **src, size_
 	if (ptr == NULL) {
 		acl_vstring_memcat(vp, pbegin, dlen);
 		ACL_VSTRING_TERMINATE(vp);
-		*src += dlen;  /* ÒÆ¶¯ *src Ö¸ÕëÎ»ÖÃ */
+		*src += dlen;  /* ç§»åŠ¨ *src æŒ‡é’ˆä½ç½® */
 		return NULL;
 	}
-	*src = ptr + 1;  /* ÒÆ¶¯ *src Ö¸ÕëÎ»ÖÃ */
+	*src = ptr + 1;  /* ç§»åŠ¨ *src æŒ‡é’ˆä½ç½® */
 	pend = ptr;
 
-	/* È¥³ý¶àÓàµÄ \r\n */
+	/* åŽ»é™¤å¤šä½™çš„ \r\n */
 	while (pend >= pbegin) {
 		if (*pend != '\r' && *pend != '\n')
 			break;
 		pend--;
 	}
 	if (pend < pbegin) {
-		/* ËµÃ÷ data ÖÐÖ»°üÀ¨ \r, \n */
+		/* è¯´æ˜Ž data ä¸­åªåŒ…æ‹¬ \r, \n */
 		ACL_VSTRING_TERMINATE(vp);
 		return vp;
 	}
@@ -925,6 +925,6 @@ const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp, const char **src, size_t dle
 
 	acl_vstring_memcat(vp, *src, ptr - *src + 1);
 	ACL_VSTRING_TERMINATE(vp);
-	*src = ptr + 1;  /* ÐÞ¸Ä *src Ö¸ÕëÎ»ÖÃ */
+	*src = ptr + 1;  /* ä¿®æ”¹ *src æŒ‡é’ˆä½ç½® */
 	return vp;
 }

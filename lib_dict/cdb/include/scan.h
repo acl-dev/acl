@@ -1,4 +1,4 @@
-#ifndef SCAN_H
+﻿#ifndef SCAN_H
 #define SCAN_H
 
 extern unsigned int scan_uint(char *,unsigned int *);

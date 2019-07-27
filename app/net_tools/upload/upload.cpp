@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "global/global.h"
 #include "global/util.h"
 #include "mail/mime_builder.hpp"
@@ -67,7 +67,7 @@ upload& upload::set_from(const char* s)
 
 upload& upload::add_to(const char* s)
 {
-	ACL_ARGV* tokens = acl_argv_split(s, ";,£¬£» \t\r\n");
+	ACL_ARGV* tokens = acl_argv_split(s, ";,ï¼Œï¼› \t\r\n");
 	ACL_ITER iter;
 
 	acl_foreach(iter, tokens)
@@ -109,7 +109,7 @@ struct UP_CTX
 };
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³ÌÖÐÔËÐÐ
+// ä¸»çº¿ç¨‹ä¸­è¿è¡Œ
 
 void upload::rpc_onover()
 {
@@ -126,11 +126,11 @@ void upload::rpc_wakeup(void* ctx)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³ÌÖÐÔËÐÐ
+// å­çº¿ç¨‹ä¸­è¿è¡Œ
 
 void upload::rpc_run()
 {
-	// ´´½¨ÓÊ¼þÄÚÈÝ
+	// åˆ›å»ºé‚®ä»¶å†…å®¹
 
 	mime_builder builer;
 	builer.primary_header()
@@ -167,11 +167,11 @@ void upload::rpc_run()
 		return;
 	}
 	//////////////////////////////////////////////////////////////////////////
-	// Ô¶³ÌÁ¬½Ó SMTP ·þÎñÆ÷£¬½«±¾µØ´´½¨µÄÓÊ¼þ·¢ËÍ³öÈ¥
+	// è¿œç¨‹è¿žæŽ¥ SMTP æœåŠ¡å™¨ï¼Œå°†æœ¬åœ°åˆ›å»ºçš„é‚®ä»¶å‘é€å‡ºåŽ»
 	UP_CTX* up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("Á¬½Ó SMTP ·þÎñÆ÷ ...");
+	up->msg.format("è¿žæŽ¥ SMTP æœåŠ¡å™¨ ...");
 	rpc_signal(up);
 
 	acl::string smtp_addr;
@@ -195,7 +195,7 @@ void upload::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("½ÓÊÕ SMTP ·þÎñÆ÷»¶Ó­ÐÅÏ¢(Á¬½ÓºÄÊ± %.2f ºÁÃë) ...",
+	up->msg.format("æŽ¥æ”¶ SMTP æœåŠ¡å™¨æ¬¢è¿Žä¿¡æ¯(è¿žæŽ¥è€—æ—¶ %.2f æ¯«ç§’) ...",
 		meter_.connect_cost);
 	rpc_signal(up);
 
@@ -216,7 +216,7 @@ void upload::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("ÈÏÖ¤ÓÃ»§Éí·Ý ...");
+	up->msg.format("è®¤è¯ç”¨æˆ·èº«ä»½ ...");
 	rpc_signal(up);
 
 	gettimeofday(&last, NULL);
@@ -238,7 +238,7 @@ void upload::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("·¢ËÍÓÊ¼þÐÅ·â(ÈÏÖ¤ºÄÊ± %.2f ºÁÃë) ...", meter_.auth_cost);
+	up->msg.format("å‘é€é‚®ä»¶ä¿¡å°(è®¤è¯è€—æ—¶ %.2f æ¯«ç§’) ...", meter_.auth_cost);
 	rpc_signal(up);
 
 	if (smtp_mail(conn, mail_from_.c_str()) != 0)
@@ -275,7 +275,7 @@ void upload::rpc_run()
 	gettimeofday(&now, NULL);
 	meter_.envelope_cost = util::stamp_sub(&now, &last);
 
-	// ·¢ËÍÓÊ¼þÄÚÈÝ
+	// å‘é€é‚®ä»¶å†…å®¹
 
 	char buf[8192];
 	int  ret;
@@ -297,11 +297,11 @@ void upload::rpc_run()
 		up = new UP_CTX;
 		up->curr = n;
 		up->total = (size_t) in.fsize();
-		up->msg.format("·¢ËÍÓÊ¼þÖÐ(%d/%d ×Ö½Ú) ...", up->curr, up->total);
+		up->msg.format("å‘é€é‚®ä»¶ä¸­(%d/%d å­—èŠ‚) ...", up->curr, up->total);
 		rpc_signal(up);
 	}
 
-	/* ·¢ËÍ \r\n.\r\n ±íÊ¾ÓÊ¼þÊý¾Ý·¢ËÍÍê±Ï */
+	/* å‘é€ \r\n.\r\n è¡¨ç¤ºé‚®ä»¶æ•°æ®å‘é€å®Œæ¯• */
 	if (smtp_data_end(conn) != 0)
 	{
 		logger_error("send . error: %s, code: %d\r\n",
@@ -316,7 +316,7 @@ void upload::rpc_run()
 	up = new UP_CTX;
 	up->curr = (size_t) in.fsize();
 	up->total = (size_t) in.fsize();
-	up->msg.format("·¢ËÍÓÊ¼þ³É¹¦£¡(%d/%d ×Ö½Ú, ºÄÊ± %.2f ºÁÃë)",
+	up->msg.format("å‘é€é‚®ä»¶æˆåŠŸï¼(%d/%d å­—èŠ‚, è€—æ—¶ %.2f æ¯«ç§’)",
 		up->curr, up->total, meter_.total_cost);
 	rpc_signal(up);
 }

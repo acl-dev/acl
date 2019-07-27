@@ -1,4 +1,4 @@
-/* DO NOT EDIT: automatically built by dist/s_win32. */
+﻿/* DO NOT EDIT: automatically built by dist/s_win32. */
 /* Define to 1 if you want to build a version for running the test suite. */
 /* #undef CONFIG_TEST */
 

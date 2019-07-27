@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "base_action.h"
 
 base_action::base_action(const acl::string& addr,

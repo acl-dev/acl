@@ -1,4 +1,4 @@
-#ifndef	__HTTP_SERVICE_INCLUDE_H__
+ï»¿#ifndef	__HTTP_SERVICE_INCLUDE_H__
 #define	__HTTP_SERVICE_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -11,19 +11,19 @@ extern "C" {
 /* in http_service.c */
 
 /**
- * HTTP Ğ­Òé·½Ê½´¦Àí·½·¨
- * @param client {ACL_VSTREAM*} ¿Í»§¶ËÁ÷
- * @return {int} 0£º±íÊ¾Õı³££¬1£º±íÊ¾Õı³£ÇÒ±£³Ö³¤Á¬½Ó£¬-1£º±íÊ¾³ö´í
+ * HTTP åè®®æ–¹å¼å¤„ç†æ–¹æ³•
+ * @param client {ACL_VSTREAM*} å®¢æˆ·ç«¯æµ
+ * @return {int} 0ï¼šè¡¨ç¤ºæ­£å¸¸ï¼Œ1ï¼šè¡¨ç¤ºæ­£å¸¸ä¸”ä¿æŒé•¿è¿æ¥ï¼Œ-1ï¼šè¡¨ç¤ºå‡ºé”™
  */
 int http_service(ACL_VSTREAM *client);
 
 /**
- * ·şÎñ¶Ë·µ»Ø HTTP ÏìÓ¦¸ø¿Í»§¶Ë
- * @param client {ACL_VSTREAM*} ¿Í»§¶ËÁ÷
- * @param status {int} HTTP ÏìÓ¦×´Ì¬Âë£¬1xx, 2xx, 3xx, 4xx, 5xx
- * @param keep_alive {int} ÊÇ·ñÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó
- * @param body {const char*} Êı¾İÌåÄÚÈİ
- * @param len {int} Êı¾İÌå³¤¶È
+ * æœåŠ¡ç«¯è¿”å› HTTP å“åº”ç»™å®¢æˆ·ç«¯
+ * @param client {ACL_VSTREAM*} å®¢æˆ·ç«¯æµ
+ * @param status {int} HTTP å“åº”çŠ¶æ€ç ï¼Œ1xx, 2xx, 3xx, 4xx, 5xx
+ * @param keep_alive {int} æ˜¯å¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥
+ * @param body {const char*} æ•°æ®ä½“å†…å®¹
+ * @param len {int} æ•°æ®ä½“é•¿åº¦
  */
 int http_server_send_respond(ACL_VSTREAM* client, int status,
 	int keep_alive, char* body, int len);
@@ -31,11 +31,11 @@ int http_server_send_respond(ACL_VSTREAM* client, int status,
 /* in http_json.c */
 
 /**
- * ÇëÇóÊı¾İµÄ¸ñÊ½Îª JSON ¸ñÊ½µÄ´¦Àí
+ * è¯·æ±‚æ•°æ®çš„æ ¼å¼ä¸º JSON æ ¼å¼çš„å¤„ç†
  * @param client {ACL_VSTREAM*}
- * @param hdr_req {HTTP_HDR_REQ*} HTTP ÇëÇóĞ­ÒéÍ·¶ÔÏó
- * @param json {ACL_JSON*} json ½âÎöÆ÷¶ÔÏó
- * @return {int} 0£º±íÊ¾Õı³££¬1£º±íÊ¾Õı³£ÇÒ±£³Ö³¤Á¬½Ó£¬-1£º±íÊ¾³ö´í
+ * @param hdr_req {HTTP_HDR_REQ*} HTTP è¯·æ±‚åè®®å¤´å¯¹è±¡
+ * @param json {ACL_JSON*} json è§£æå™¨å¯¹è±¡
+ * @return {int} 0ï¼šè¡¨ç¤ºæ­£å¸¸ï¼Œ1ï¼šè¡¨ç¤ºæ­£å¸¸ä¸”ä¿æŒé•¿è¿æ¥ï¼Œ-1ï¼šè¡¨ç¤ºå‡ºé”™
  */
 int http_json_service(ACL_VSTREAM *client,
 	HTTP_HDR_REQ *hdr_req, ACL_JSON *json);
@@ -43,11 +43,11 @@ int http_json_service(ACL_VSTREAM *client,
 /* in http_xml.c */
 
 /**
- * ÇëÇóÊı¾İµÄ¸ñÊ½Îª XML ¸ñÊ½µÄ´¦Àí
+ * è¯·æ±‚æ•°æ®çš„æ ¼å¼ä¸º XML æ ¼å¼çš„å¤„ç†
  * @param client {ACL_VSTREAM*}
- * @param hdr_req {HTTP_HDR_REQ*} HTTP ÇëÇóĞ­ÒéÍ·¶ÔÏó
- * @param xml {ACL_XML*} xml ½âÎöÆ÷¶ÔÏó
- * @return {int} 0£º±íÊ¾Õı³££¬1£º±íÊ¾Õı³£ÇÒ±£³Ö³¤Á¬½Ó£¬-1£º±íÊ¾³ö´í
+ * @param hdr_req {HTTP_HDR_REQ*} HTTP è¯·æ±‚åè®®å¤´å¯¹è±¡
+ * @param xml {ACL_XML*} xml è§£æå™¨å¯¹è±¡
+ * @return {int} 0ï¼šè¡¨ç¤ºæ­£å¸¸ï¼Œ1ï¼šè¡¨ç¤ºæ­£å¸¸ä¸”ä¿æŒé•¿è¿æ¥ï¼Œ-1ï¼šè¡¨ç¤ºå‡ºé”™
  */
 int http_xml_service(ACL_VSTREAM *client,
         HTTP_HDR_REQ *hdr_req, ACL_XML *xml);

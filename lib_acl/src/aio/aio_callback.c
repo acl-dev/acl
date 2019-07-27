@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -20,18 +20,18 @@ int aio_timeout_callback(ACL_ASTREAM *astream)
 {
 	int   ret = 0;
 
-	/* ÐèÒª½«»º³åÇøÇå¿Õ£¬ÒÔ·À±»ÖØ¸´ÀûÓÃ */
+	/* éœ€è¦å°†ç¼“å†²åŒºæ¸…ç©ºï¼Œä»¥é˜²è¢«é‡å¤åˆ©ç”¨ */
 	ACL_VSTRING_RESET(&astream->strbuf);
 
-	/* Á÷ÒýÓÃ¼ÆÊý¼Ó1£¬ÒÔ·ÀÖ¹Á÷±»Òì³£¹Ø±Õ */
+	/* æµå¼•ç”¨è®¡æ•°åŠ 1ï¼Œä»¥é˜²æ­¢æµè¢«å¼‚å¸¸å…³é—­ */
 	astream->nrefer++;
 
 	if (astream->timeo_handles) {
 		ACL_ITER iter;
 		ACL_FIFO timeo_handles;
 
-		/* XXX: ±ØÐë½«¸÷¸ö»Øµ÷¾ä±ú´Ó»Øµ÷¶ÓÁÐÖÐÒ»Ò»Ìá³öÖÃÈëÒ»¸öµ¥¶À¶ÓÁÐÖÐ,
-		 * ÒòÎª ACL_AIO ÔÚ»Øµ÷¹ý³ÌÖÐÓÐ¿ÉÄÜ·¢ÉúÇ¶Ì×£¬·ÀÖ¹±»ÖØ¸´µ÷ÓÃ
+		/* XXX: å¿…é¡»å°†å„ä¸ªå›žè°ƒå¥æŸ„ä»Žå›žè°ƒé˜Ÿåˆ—ä¸­ä¸€ä¸€æå‡ºç½®å…¥ä¸€ä¸ªå•ç‹¬é˜Ÿåˆ—ä¸­,
+		 * å› ä¸º ACL_AIO åœ¨å›žè°ƒè¿‡ç¨‹ä¸­æœ‰å¯èƒ½å‘ç”ŸåµŒå¥—ï¼Œé˜²æ­¢è¢«é‡å¤è°ƒç”¨
 		 */
 
 		acl_fifo_init(&timeo_handles);
@@ -60,18 +60,18 @@ int aio_timeout_callback(ACL_ASTREAM *astream)
 
 void aio_close_callback(ACL_ASTREAM *astream)
 {
-	/* ÐèÒª½«»º³åÇøÇå¿Õ£¬ÒÔ·À±»ÖØ¸´ÀûÓÃ */
+	/* éœ€è¦å°†ç¼“å†²åŒºæ¸…ç©ºï¼Œä»¥é˜²è¢«é‡å¤åˆ©ç”¨ */
 	ACL_VSTRING_RESET(&astream->strbuf);
 
-	/* Á÷ÒýÓÃ¼ÆÊý¼Ó1£¬ÒÔ·ÀÖ¹Á÷±»Òì³£¹Ø±Õ */
+	/* æµå¼•ç”¨è®¡æ•°åŠ 1ï¼Œä»¥é˜²æ­¢æµè¢«å¼‚å¸¸å…³é—­ */
 	astream->nrefer++;
 
 	if (astream->close_handles) {
 		ACL_ITER iter;
 		ACL_FIFO close_handles;
 
-		/* XXX: ±ØÐë½«¸÷¸ö»Øµ÷¾ä±ú´Ó»Øµ÷¶ÓÁÐÖÐÒ»Ò»Ìá³öÖÃÈëÒ»¸öµ¥¶À¶ÓÁÐÖÐ,
-		 * ÒòÎª ACL_AIO ÔÚ»Øµ÷¹ý³ÌÖÐÓÐ¿ÉÄÜ·¢ÉúÇ¶Ì×£¬·ÀÖ¹±»ÖØ¸´µ÷ÓÃ
+		/* XXX: å¿…é¡»å°†å„ä¸ªå›žè°ƒå¥æŸ„ä»Žå›žè°ƒé˜Ÿåˆ—ä¸­ä¸€ä¸€æå‡ºç½®å…¥ä¸€ä¸ªå•ç‹¬é˜Ÿåˆ—ä¸­,
+		 * å› ä¸º ACL_AIO åœ¨å›žè°ƒè¿‡ç¨‹ä¸­æœ‰å¯èƒ½å‘ç”ŸåµŒå¥—ï¼Œé˜²æ­¢è¢«é‡å¤è°ƒç”¨
 		 */
 
 		acl_fifo_init(&close_handles);
@@ -88,7 +88,7 @@ void aio_close_callback(ACL_ASTREAM *astream)
 
 			if (handle == NULL)
 				break;
-			/* xxx: ¹Ø±Õ»Øµ÷½öÄÜ±»µ÷ÓÃÒ»´Î */
+			/* xxx: å…³é—­å›žè°ƒä»…èƒ½è¢«è°ƒç”¨ä¸€æ¬¡ */
 			ctx = handle->ctx;
 			handle->disable = 1;
 			handle->ctx = NULL;

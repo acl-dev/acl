@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 struct SMTP_METER;
 class smtp_callback;
@@ -10,10 +10,10 @@ public:
 protected:
 	~smtp_store();
 
-	// »ùÀàĞéº¯Êı£º×ÓÏß³Ì´¦Àíº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šå­çº¿ç¨‹å¤„ç†å‡½æ•°
 	virtual void rpc_run();
 
-	// »ùÀàĞéº¯Êı£ºÖ÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
+	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
 	virtual void rpc_onover();
 
 private:

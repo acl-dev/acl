@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/pgsql_pool.hpp"
@@ -34,7 +34,7 @@ pgsql_manager& pgsql_manager::add(const pgsql_conf& conf)
 
 	pgsql_conf* mc = NEW pgsql_conf(conf);
 	dbs_[key] = mc;
-	// µ÷ÓÃ»ùÀà connect_manager::set ·½·¨Ìí¼Ó
+	// è°ƒç”¨åŸºç±» connect_manager::set æ–¹æ³•æ·»åŠ 
 	set(key, conf.get_dblimit());
 
 	return *this;

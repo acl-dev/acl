@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <signal.h>
 #include "master/master_params.h"
 #include "master/master_api.h"

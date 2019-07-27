@@ -1,4 +1,4 @@
-// json.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// json.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -24,7 +24,7 @@ static void list_print(const vector<acl::json_node*>& nodes)
 		if (node1 == NULL)
 			continue;
 
-		// µÚÒ»²ã×Ó½áµã
+		// ç¬¬ä¸€å±‚å­ç»“ç‚¹
 		while (node1)
 		{
 			name = node1->tag_name();
@@ -40,7 +40,7 @@ static void list_print(const vector<acl::json_node*>& nodes)
 				continue;
 			}
 
-			// µÚ¶ş²ã×Ó½áµã
+			// ç¬¬äºŒå±‚å­ç»“ç‚¹
 			while (node2)
 			{
 				name = node2->tag_name();
@@ -57,7 +57,7 @@ static void list_print(const vector<acl::json_node*>& nodes)
 					continue;
 				}
 
-				// µÚÈı²ã×Ó½áµã
+				// ç¬¬ä¸‰å±‚å­ç»“ç‚¹
 				while (node3)
 				{
 					name = node3->tag_name();

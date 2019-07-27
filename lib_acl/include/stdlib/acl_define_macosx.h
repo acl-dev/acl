@@ -1,4 +1,4 @@
-#ifndef	__ACL_DEFINE_MACOSX_INCLUDE_H__
+﻿#ifndef	__ACL_DEFINE_MACOSX_INCLUDE_H__
 #define	__ACL_DEFINE_MACOSX_INCLUDE_H__
 
 #if defined(MACOSX) || defined(__APPLE__)

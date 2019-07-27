@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file asn1write.h
  *
  * \brief ASN.1 buffer writing functionality

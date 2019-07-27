@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
@@ -33,20 +33,20 @@ public:
 	virtual ~redis_hyperloglog(void);
 
 	/**
-	 * ½«ÈÎÒâÊıÁ¿µÄÔªËØÌí¼Óµ½Ö¸¶¨µÄ HyperLogLog ÀïÃæ
+	 * å°†ä»»æ„æ•°é‡çš„å…ƒç´ æ·»åŠ åˆ°æŒ‡å®šçš„ HyperLogLog é‡Œé¢
 	 * add the specified elements to the specified HyperLogLog
-	 * @param key {const char*} Ö¸¶¨ key Öµ
+	 * @param key {const char*} æŒ‡å®š key å€¼
 	 *  the key
-	 * @param first_element {const char*} ÔªËØ¼¯ºÏµÄµÚÒ»¸öÔªËØÖµ£¬·Ç¿Õ×Ö·û´®
+	 * @param first_element {const char*} å…ƒç´ é›†åˆçš„ç¬¬ä¸€ä¸ªå…ƒç´ å€¼ï¼Œéç©ºå­—ç¬¦ä¸²
 	 *  the first element of the elements list, and the last must be NULL
 	 *  in the elements list
-	 * @return {int} ²Ù×÷ÊÇ·ñ³É¹¦£¬Í¬Ê±±íÃ÷ÊÇ·ñ·¢ÉúÁË±ä¸ü£¬·µ»ØÖµº¬ÒåÈçÏÂ£º
+	 * @return {int} æ“ä½œæ˜¯å¦æˆåŠŸï¼ŒåŒæ—¶è¡¨æ˜æ˜¯å¦å‘ç”Ÿäº†å˜æ›´ï¼Œè¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
 	 *  return the follow values:
-	 *  1£º²Ù×÷³É¹¦£¬ÇÒÊı¾İ·¢ÉúÁË±ä¸ü£¨ĞÂÔöÊı¾İ»òÀÏÊı¾İ·¢Éú±ä¸ü£©
+	 *  1ï¼šæ“ä½œæˆåŠŸï¼Œä¸”æ•°æ®å‘ç”Ÿäº†å˜æ›´ï¼ˆæ–°å¢æ•°æ®æˆ–è€æ•°æ®å‘ç”Ÿå˜æ›´ï¼‰
 	 *     successful, and the data was varied
-	 *  0£ºĞŞ¸ÄÀÏÊı¾İÎ´·¢Éú±ä»¯
+	 *  0ï¼šä¿®æ”¹è€æ•°æ®æœªå‘ç”Ÿå˜åŒ–
 	 *     nothing was changed after modifying the old data
-	 * -1£º³ö´í»ò¶ÔÓ¦µÄ key ¶ÔÏó·Ç hyperloglog ¶ÔÏó
+	 * -1ï¼šå‡ºé”™æˆ–å¯¹åº”çš„ key å¯¹è±¡é hyperloglog å¯¹è±¡
 	 *     error or the keh isn't a hyperloglog type
 	 */
 	int pfadd(const char* key, const char* first_element, ...);
@@ -54,29 +54,29 @@ public:
 	int pfadd(const char* key, const std::vector<string>& elements);
 
 	/**
-	 * »ñµÃ¸ø¶¨¼üÁĞ±íµÄ HyperLoglog È¥ÖØºóÔªËØµÄ½üËÆÊıÁ¿
+	 * è·å¾—ç»™å®šé”®åˆ—è¡¨çš„ HyperLoglog å»é‡åå…ƒç´ çš„è¿‘ä¼¼æ•°é‡
 	 * return the approximated cardinality of the set(s) observed by
 	 * the hyperloglog at key(s)
-	 * @param first_key {const char*} key ¼¯ºÏµÄµÚÒ»¸ö key£¬·Ç¿Õ×Ö·û´®
+	 * @param first_key {const char*} key é›†åˆçš„ç¬¬ä¸€ä¸ª keyï¼Œéç©ºå­—ç¬¦ä¸²
 	 *  the firs key which must not be NULL of the keys list, and the
 	 *  last parameter must be NULL in keys' list
-	 * @return {int} ¼üÁĞ±í¼¯ºÏÖĞ¾­È¥ÖØºóÔªËØµÄ½üËÆÊıÁ¿
+	 * @return {int} é”®åˆ—è¡¨é›†åˆä¸­ç»å»é‡åå…ƒç´ çš„è¿‘ä¼¼æ•°é‡
 	 */
 	int pfcount(const char* first_key, ...);
 	int pfcount(const std::vector<const char*>& keys);
 	int pfcount(const std::vector<string>& keys);
 
 	/**
-	 * ½«¶à¸ö HyperLogLog ºÏ²¢£¨merge£©ÎªÒ»¸ö HyperLogLog £¬ ºÏ²¢ºóµÄ
-	 * HyperLogLog µÄ»ùÊı½Ó½üÓÚËùÓĞÊäÈë HyperLogLog µÄ¿É¼û¼¯ºÏµÄ²¢¼¯
+	 * å°†å¤šä¸ª HyperLogLog åˆå¹¶ï¼ˆmergeï¼‰ä¸ºä¸€ä¸ª HyperLogLog ï¼Œ åˆå¹¶åçš„
+	 * HyperLogLog çš„åŸºæ•°æ¥è¿‘äºæ‰€æœ‰è¾“å…¥ HyperLogLog çš„å¯è§é›†åˆçš„å¹¶é›†
 	 * merge multiple different hyperloglogs into a single one
-	 * @param dst {const char*} Ä¿±ê´æ´¢ HyperLogLog ¶ÔÏóµÄ¼üÖµ
+	 * @param dst {const char*} ç›®æ ‡å­˜å‚¨ HyperLogLog å¯¹è±¡çš„é”®å€¼
 	 *  the single key as the destination
-	 * @param first_src {const char*} Ô´¶ÔÏó¼¯ºÏÖĞµÚÒ»¸öÔ´ HyperLogLog ¶ÔÏóµÄ¼ü
+	 * @param first_src {const char*} æºå¯¹è±¡é›†åˆä¸­ç¬¬ä¸€ä¸ªæº HyperLogLog å¯¹è±¡çš„é”®
 	 *  the first source key which must not be NULL in the sources list,
 	 *  and the last one must be NULL showing the end of the list
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÃ÷³ö´í»òÄ¿±ê/Ô´¶ÔÏó·Ç
-	 *  HyperLogLog ¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨æ˜å‡ºé”™æˆ–ç›®æ ‡/æºå¯¹è±¡é
+	 *  HyperLogLog å¯¹è±¡
 	 *  true on success, false if the error or the dest/src are not
 	 *  hyperloglog
 	 */

@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "notify.h"
 #include "service_var.h"
 #include "service_main.h"
@@ -11,7 +11,7 @@ static void cache_free(const ACL_CACHE_INFO *info acl_unused, void *ctx)
 	acl_myfree(ctx);
 }
 
-/* ³õÊ¼»¯º¯Êı */
+/* åˆå§‹åŒ–å‡½æ•° */
 void service_init(void *init_ctx acl_unused)
 {
 	const char *myname = "service_init";
@@ -41,7 +41,7 @@ void service_init(void *init_ctx acl_unused)
 			continue;
 
 		acl_msg_info(">>>ip: %s", ifaddr->ip);
-		/* ÍâÍøIPÓÅÏÈ */
+		/* å¤–ç½‘IPä¼˜å…ˆ */
 		if (strncmp(ifaddr->ip, "10.", 3) != 0
 			&& strncmp(ifaddr->ip, "192.", 4) != 0)
 		{
@@ -54,7 +54,7 @@ void service_init(void *init_ctx acl_unused)
 	}
 }
 
-/* ½ø³ÌÍË³öÇ°µ÷ÓÃµÄº¯Êı */
+/* è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨çš„å‡½æ•° */
 void service_exit(void *arg acl_unused)
 {
 	const char *myname = "service_exit";
@@ -67,7 +67,7 @@ void service_exit(void *arg acl_unused)
 	acl_msg_info("%s: exit now ...", myname);
 }
 
-/* Ğ­Òé´¦Àíº¯ÊıÈë¿Ú */
+/* åè®®å¤„ç†å‡½æ•°å…¥å£ */
 int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 {
 #if 0
@@ -80,7 +80,7 @@ int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 		ret = acl_vstream_gets_peek(client, buf, &ready);
 		if (ret == ACL_VSTREAM_EOF) {
 			acl_vstring_free(buf);
-			return (-1);  /* ·µ»Ø¸ºÖµÒÔÊ¹¿ò¼ÜÄÚ²¿¹Ø±Õ client Êı¾İÁ÷ */
+			return (-1);  /* è¿”å›è´Ÿå€¼ä»¥ä½¿æ¡†æ¶å†…éƒ¨å…³é—­ client æ•°æ®æµ */
 		} else if (!ready)
 			break;
 		if (notify(acl_vstring_str(buf)) < 0) {

@@ -1,4 +1,4 @@
-/* Copyright (C) 2003 Free Software Foundation, Inc.
+﻿/* Copyright (C) 2003 Free Software Foundation, Inc.
    This file is part of the GNU CHARSET Library.
 
    The GNU CHARSET Library is free software; you can redistribute it and/or

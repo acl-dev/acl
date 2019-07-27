@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include "http_header.hpp"
@@ -13,27 +13,27 @@ class HttpServletRequest;
 class HttpServletResponse;
 
 /**
- * ´¦Àí HTTP ¿Í»§¶ËÇëÇóµÄ»ùÀà£¬×ÓÀàĞèÒª¼Ì³Ğ¸ÃÀà
+ * å¤„ç† HTTP å®¢æˆ·ç«¯è¯·æ±‚çš„åŸºç±»ï¼Œå­ç±»éœ€è¦ç»§æ‰¿è¯¥ç±»
  */
 class ACL_CPP_API HttpServlet : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param stream {socket_stream*} µ±ÔÚ acl_master ·şÎñÆ÷¿ò¼Ü¿ØÖÆÏÂ
-	 *  ÔËĞĞÊ±£¬¸Ã²ÎÊı±ØĞë·Ç¿Õ£»µ±ÔÚ apache ÏÂÒÔ CGI ·½Ê½ÔËĞĞÊ±£¬¸Ã²ÎÊı
-	 *  ÉèÎª NULL£»ÁíÍâ£¬¸Ãº¯ÊıÄÚ²¿²»»á¹Ø±ÕÁ÷Á¬½Ó£¬Ó¦ÓÃÓ¦×ÔĞĞ´¦ÀíÁ÷¶ÔÏó
-	 *  µÄ¹Ø±ÕÇé¿ö£¬ÕâÑù¿ÉÒÔ·½±ãÓë acl_master ¼Ü¹¹½áºÏ
-	 * @param session {session*} Ã¿Ò»¸ö HttpServlet ¶ÔÏóÒ»¸ö session ¶ÔÏó
+	 * æ„é€ å‡½æ•°
+	 * @param stream {socket_stream*} å½“åœ¨ acl_master æœåŠ¡å™¨æ¡†æ¶æ§åˆ¶ä¸‹
+	 *  è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°å¿…é¡»éç©ºï¼›å½“åœ¨ apache ä¸‹ä»¥ CGI æ–¹å¼è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°
+	 *  è®¾ä¸º NULLï¼›å¦å¤–ï¼Œè¯¥å‡½æ•°å†…éƒ¨ä¸ä¼šå…³é—­æµè¿æ¥ï¼Œåº”ç”¨åº”è‡ªè¡Œå¤„ç†æµå¯¹è±¡
+	 *  çš„å…³é—­æƒ…å†µï¼Œè¿™æ ·å¯ä»¥æ–¹ä¾¿ä¸ acl_master æ¶æ„ç»“åˆ
+	 * @param session {session*} æ¯ä¸€ä¸ª HttpServlet å¯¹è±¡ä¸€ä¸ª session å¯¹è±¡
 	 */
 	HttpServlet(socket_stream* stream, session* session);
 
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param stream {socket_stream*} µ±ÔÚ acl_master ·şÎñÆ÷¿ò¼Ü¿ØÖÆÏÂ
-	 *  ÔËĞĞÊ±£¬¸Ã²ÎÊı±ØĞë·Ç¿Õ£»µ±ÔÚ apache ÏÂÒÔ CGI ·½Ê½ÔËĞĞÊ±£¬¸Ã²ÎÊı
-	 *  ÉèÎª NULL£»ÁíÍâ£¬¸Ãº¯ÊıÄÚ²¿²»»á¹Ø±ÕÁ÷Á¬½Ó£¬Ó¦ÓÃÓ¦×ÔĞĞ´¦ÀíÁ÷¶ÔÏó
-	 *  µÄ¹Ø±ÕÇé¿ö£¬ÕâÑù¿ÉÒÔ·½±ãÓë acl_master ¼Ü¹¹½áºÏ
+	 * æ„é€ å‡½æ•°
+	 * @param stream {socket_stream*} å½“åœ¨ acl_master æœåŠ¡å™¨æ¡†æ¶æ§åˆ¶ä¸‹
+	 *  è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°å¿…é¡»éç©ºï¼›å½“åœ¨ apache ä¸‹ä»¥ CGI æ–¹å¼è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°
+	 *  è®¾ä¸º NULLï¼›å¦å¤–ï¼Œè¯¥å‡½æ•°å†…éƒ¨ä¸ä¼šå…³é—­æµè¿æ¥ï¼Œåº”ç”¨åº”è‡ªè¡Œå¤„ç†æµå¯¹è±¡
+	 *  çš„å…³é—­æƒ…å†µï¼Œè¿™æ ·å¯ä»¥æ–¹ä¾¿ä¸ acl_master æ¶æ„ç»“åˆ
 	 * @param memcache_addr {const char*}
 	 */
 	HttpServlet(socket_stream* stream,
@@ -53,149 +53,149 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃ±¾µØ×Ö·û¼¯£¬Èç¹ûÉèÖÃÁË±¾µØ×Ö·û¼¯£¬ÔòÔÚ½ÓÊÕ HTTP ÇëÇóÊı¾İÊ±£¬»á
-	 * ×Ô¶¯½«ÇëÇóµÄ×Ö·û¼¯×ªÎª±¾µØ×Ö·û¼¯£»¸Ãº¯Êı±ØĞëÔÚ doRun Ö®Ç°µ÷ÓÃ²ÅÓĞĞ§
-	 * @param charset {const char*} ±¾µØ×Ö·û¼¯£¬Èç¹û¸ÃÖ¸ÕëÎª¿Õ£¬
-	 *  ÔòÇå³ı±¾µØ×Ö·û¼¯
+	 * è®¾ç½®æœ¬åœ°å­—ç¬¦é›†ï¼Œå¦‚æœè®¾ç½®äº†æœ¬åœ°å­—ç¬¦é›†ï¼Œåˆ™åœ¨æ¥æ”¶ HTTP è¯·æ±‚æ•°æ®æ—¶ï¼Œä¼š
+	 * è‡ªåŠ¨å°†è¯·æ±‚çš„å­—ç¬¦é›†è½¬ä¸ºæœ¬åœ°å­—ç¬¦é›†ï¼›è¯¥å‡½æ•°å¿…é¡»åœ¨ doRun ä¹‹å‰è°ƒç”¨æ‰æœ‰æ•ˆ
+	 * @param charset {const char*} æœ¬åœ°å­—ç¬¦é›†ï¼Œå¦‚æœè¯¥æŒ‡é’ˆä¸ºç©ºï¼Œ
+	 *  åˆ™æ¸…é™¤æœ¬åœ°å­—ç¬¦é›†
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setLocalCharset(const char* charset);
 
 	/**
-	 * ÉèÖÃ HTTP »á»°¹ı³Ì IO ¶ÁĞ´³¬Ê±Ê±¼ä£»¸Ãº¯Êı±ØĞëÔÚ doRun Ç°µ÷ÓÃ²ÅÓĞĞ§
-	 * @param rw_timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ãë)
+	 * è®¾ç½® HTTP ä¼šè¯è¿‡ç¨‹ IO è¯»å†™è¶…æ—¶æ—¶é—´ï¼›è¯¥å‡½æ•°å¿…é¡»åœ¨ doRun å‰è°ƒç”¨æ‰æœ‰æ•ˆ
+	 * @param rw_timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(ç§’)
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setRwTimeout(int rw_timeout);
 
 	/**
-	 * Õë¶Ô POST ·½·¨£¬¸Ã·½·¨ÉèÖÃÊÇ·ñĞèÒª½âÎöÊı¾İÌåÊı¾İ£¬Ä¬ÈÏÎª½âÎö£¬¸Ãº¯
-	 * Êı±ØĞëÔÚ doRun Ö®Ç°µ÷ÓÃ²ÅÓĞĞ§£»µ±Êı¾İÌåÎªÊı¾İÁ÷»ò MIME ¸ñÊ½£¬¼´Ê¹
-	 * µ÷ÓÃ±¾·½·¨ÉèÖÃÁË½âÎöÊı¾İ£¬Ò²²»»á¶ÔÊı¾İÌå½øĞĞ½âÎö
-	 * @param on {bool} ÊÇ·ñĞèÒª½âÎö
+	 * é’ˆå¯¹ POST æ–¹æ³•ï¼Œè¯¥æ–¹æ³•è®¾ç½®æ˜¯å¦éœ€è¦è§£ææ•°æ®ä½“æ•°æ®ï¼Œé»˜è®¤ä¸ºè§£æï¼Œè¯¥å‡½
+	 * æ•°å¿…é¡»åœ¨ doRun ä¹‹å‰è°ƒç”¨æ‰æœ‰æ•ˆï¼›å½“æ•°æ®ä½“ä¸ºæ•°æ®æµæˆ– MIME æ ¼å¼ï¼Œå³ä½¿
+	 * è°ƒç”¨æœ¬æ–¹æ³•è®¾ç½®äº†è§£ææ•°æ®ï¼Œä¹Ÿä¸ä¼šå¯¹æ•°æ®ä½“è¿›è¡Œè§£æ
+	 * @param on {bool} æ˜¯å¦éœ€è¦è§£æ
 	 * @return {HttpServlet&}
-	 * xxxx: ¸Ã·½·¨ÒÑ¾­±»·ÏÆú£¡
+	 * xxxx: è¯¥æ–¹æ³•å·²ç»è¢«åºŸå¼ƒï¼
 	 */
 	HttpServlet& setParseBody(bool on);
 
 	/**
-	 * Õë¶Ô POST ·½·¨£¬¸Ã·½·¨ÉèÖÃ½âÎöÊı¾İÌåµÄ×î´ó³¤¶È£¬Èç¹ûÊı¾İÌå£¬¸Ãº¯Êı
-	 * ±ØĞëÔÚ doRun Ö®Ç°µ÷ÓÃ²ÅÓĞĞ§
-	 * @param length {int} ×î´ó³¤¶ÈÏŞÖÆ£¬Èç¹ûÇëÇóµÄÊı¾İÌå³¤¶È¹ı´ó£¬ÔòÖ±½Ó
-	 *  ·µ»Ø false£¬Èç¹û¸ÃÖµ <= 0 ÔòÄÚ²¿²»ÏŞÖÆÊı¾İÌå³¤¶È£¬µ÷ÓÃ¸Ãº¯ÊıÇ°
-	 *  ÄÚ²¿È±Ê¡ÖµÎª 0
+	 * é’ˆå¯¹ POST æ–¹æ³•ï¼Œè¯¥æ–¹æ³•è®¾ç½®è§£ææ•°æ®ä½“çš„æœ€å¤§é•¿åº¦ï¼Œå¦‚æœæ•°æ®ä½“ï¼Œè¯¥å‡½æ•°
+	 * å¿…é¡»åœ¨ doRun ä¹‹å‰è°ƒç”¨æ‰æœ‰æ•ˆ
+	 * @param length {int} æœ€å¤§é•¿åº¦é™åˆ¶ï¼Œå¦‚æœè¯·æ±‚çš„æ•°æ®ä½“é•¿åº¦è¿‡å¤§ï¼Œåˆ™ç›´æ¥
+	 *  è¿”å› falseï¼Œå¦‚æœè¯¥å€¼ <= 0 åˆ™å†…éƒ¨ä¸é™åˆ¶æ•°æ®ä½“é•¿åº¦ï¼Œè°ƒç”¨è¯¥å‡½æ•°å‰
+	 *  å†…éƒ¨ç¼ºçœå€¼ä¸º 0
 	 * @return {HttpServlet&}
 	 */
 	HttpServlet& setParseBodyLimit(int length);
 	
 	/**
-	 * HttpServlet ¶ÔÏó¿ªÊ¼ÔËĞĞ£¬½ÓÊÕ HTTP ÇëÇó£¬²¢»Øµ÷ÒÔÏÂ doXXX Ğéº¯Êı£¬
-	 * @return {bool} ·µ»Ø´¦Àí½á¹û£¬·µ»Ø false ±íÊ¾´¦ÀíÊ§°Ü£¬ÔòÓ¦¹Ø±ÕÁ¬½Ó£¬
-	 *  ·µ»Ø true ±íÊ¾´¦Àí³É¹¦£¬µ÷ÓÃ´Ëº¯ÊıºóÓ¦¸Ã¼ÌĞøÍ¨¹ıÅĞ¶ÏÇëÇó/ÏìÓ¦¶ÔÏóÖĞ
-	 *  ÊÇ·ñĞèÒª±£³Ö³¤Á¬½ÓÀ´È·Êµ×îÖÕÊÇ·ñ±£³Ö³¤Á¬½Ó
+	 * HttpServlet å¯¹è±¡å¼€å§‹è¿è¡Œï¼Œæ¥æ”¶ HTTP è¯·æ±‚ï¼Œå¹¶å›è°ƒä»¥ä¸‹ doXXX è™šå‡½æ•°ï¼Œ
+	 * @return {bool} è¿”å›å¤„ç†ç»“æœï¼Œè¿”å› false è¡¨ç¤ºå¤„ç†å¤±è´¥ï¼Œåˆ™åº”å…³é—­è¿æ¥ï¼Œ
+	 *  è¿”å› true è¡¨ç¤ºå¤„ç†æˆåŠŸï¼Œè°ƒç”¨æ­¤å‡½æ•°ååº”è¯¥ç»§ç»­é€šè¿‡åˆ¤æ–­è¯·æ±‚/å“åº”å¯¹è±¡ä¸­
+	 *  æ˜¯å¦éœ€è¦ä¿æŒé•¿è¿æ¥æ¥ç¡®å®æœ€ç»ˆæ˜¯å¦ä¿æŒé•¿è¿æ¥
 	 */
 	bool start(void);
 
 	/**
-	 * HttpServlet ¶ÔÏó¿ªÊ¼ÔËĞĞ£¬½ÓÊÕ HTTP ÇëÇó£¬²¢»Øµ÷ÒÔÏÂ doXXX Ğéº¯Êı£¬
-	 * ¸Ãº¯ÊıÊ×ÏÈ»áµ÷ÓÃ start ¹ı³Ì£¬È»ºó¸ù¾İ start µÄ·µ»Ø½á¹û¼°ÇëÇó/ÏìÓ¦
-	 * ¶ÔÏóÊÇ·ñÒªÇó±£³Ö³¤Á¬½ÓÀ´¾ö¶¨ÊÇ·ñĞèÒªÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó
-	 * @return {bool} ·µ»Ø´¦Àí½á¹û£¬·µ»Ø false ±íÊ¾´¦ÀíÊ§°Ü»ò´¦Àí³É¹¦ÇÒ²»±£³Ö
-	 *  ³¤Á¬½Ó£¬Ó¦¹Ø±ÕÁ¬½Ó
+	 * HttpServlet å¯¹è±¡å¼€å§‹è¿è¡Œï¼Œæ¥æ”¶ HTTP è¯·æ±‚ï¼Œå¹¶å›è°ƒä»¥ä¸‹ doXXX è™šå‡½æ•°ï¼Œ
+	 * è¯¥å‡½æ•°é¦–å…ˆä¼šè°ƒç”¨ start è¿‡ç¨‹ï¼Œç„¶åæ ¹æ® start çš„è¿”å›ç»“æœåŠè¯·æ±‚/å“åº”
+	 * å¯¹è±¡æ˜¯å¦è¦æ±‚ä¿æŒé•¿è¿æ¥æ¥å†³å®šæ˜¯å¦éœ€è¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥
+	 * @return {bool} è¿”å›å¤„ç†ç»“æœï¼Œè¿”å› false è¡¨ç¤ºå¤„ç†å¤±è´¥æˆ–å¤„ç†æˆåŠŸä¸”ä¸ä¿æŒ
+	 *  é•¿è¿æ¥ï¼Œåº”å…³é—­è¿æ¥
 	 */
 	virtual bool doRun(void);
 
 	/**
-	 * HttpServlet ¶ÔÏó¿ªÊ¼ÔËĞĞ£¬½ÓÊÕ HTTP ÇëÇó£¬²¢»Øµ÷ÒÔÏÂ doXXX Ğéº¯Êı
-	 * @param session {session&} ´æ´¢ session Êı¾İµÄ¶ÔÏó
-	 * @param stream {socket_stream*} µ±ÔÚ acl_master ·şÎñÆ÷¿ò¼Ü¿ØÖÆÏÂ
-	 *  ÔËĞĞÊ±£¬¸Ã²ÎÊı±ØĞë·Ç¿Õ£»µ±ÔÚ apache ÏÂÒÔ CGI ·½Ê½ÔËĞĞÊ±£¬¸Ã²ÎÊı
-	 *  ÉèÎª NULL£»ÁíÍâ£¬¸Ãº¯ÊıÄÚ²¿²»»á¹Ø±ÕÁ÷Á¬½Ó£¬Ó¦ÓÃÓ¦×ÔĞĞ´¦ÀíÁ÷¶ÔÏó
-	 *  µÄ¹Ø±ÕÇé¿ö£¬ÕâÑù¿ÉÒÔ·½±ãÓë acl_master ¼Ü¹¹½áºÏ
-	 * @return {bool} ·µ»Ø´¦Àí½á¹û
+	 * HttpServlet å¯¹è±¡å¼€å§‹è¿è¡Œï¼Œæ¥æ”¶ HTTP è¯·æ±‚ï¼Œå¹¶å›è°ƒä»¥ä¸‹ doXXX è™šå‡½æ•°
+	 * @param session {session&} å­˜å‚¨ session æ•°æ®çš„å¯¹è±¡
+	 * @param stream {socket_stream*} å½“åœ¨ acl_master æœåŠ¡å™¨æ¡†æ¶æ§åˆ¶ä¸‹
+	 *  è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°å¿…é¡»éç©ºï¼›å½“åœ¨ apache ä¸‹ä»¥ CGI æ–¹å¼è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°
+	 *  è®¾ä¸º NULLï¼›å¦å¤–ï¼Œè¯¥å‡½æ•°å†…éƒ¨ä¸ä¼šå…³é—­æµè¿æ¥ï¼Œåº”ç”¨åº”è‡ªè¡Œå¤„ç†æµå¯¹è±¡
+	 *  çš„å…³é—­æƒ…å†µï¼Œè¿™æ ·å¯ä»¥æ–¹ä¾¿ä¸ acl_master æ¶æ„ç»“åˆ
+	 * @return {bool} è¿”å›å¤„ç†ç»“æœ
 	 */
 	virtual bool doRun(session& session, socket_stream* stream = NULL);
 
 	/**
-	 * HttpServlet ¶ÔÏó¿ªÊ¼ÔËĞĞ£¬½ÓÊÕ HTTP ÇëÇó£¬²¢»Øµ÷ÒÔÏÂ doXXX Ğéº¯Êı£¬
-	 * µ÷ÓÃ±¾º¯ÊıÒâÎ¶×Å²ÉÓÃ memcached À´´æ´¢ session Êı¾İ
-	 * @param memcached_addr {const char*} memcached ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºIP:PORT
-	 * @param stream {socket_stream*} º¬ÒåÍ¬ÉÏ
-	 * @return {bool} ·µ»Ø´¦Àí½á¹û
+	 * HttpServlet å¯¹è±¡å¼€å§‹è¿è¡Œï¼Œæ¥æ”¶ HTTP è¯·æ±‚ï¼Œå¹¶å›è°ƒä»¥ä¸‹ doXXX è™šå‡½æ•°ï¼Œ
+	 * è°ƒç”¨æœ¬å‡½æ•°æ„å‘³ç€é‡‡ç”¨ memcached æ¥å­˜å‚¨ session æ•°æ®
+	 * @param memcached_addr {const char*} memcached æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORT
+	 * @param stream {socket_stream*} å«ä¹‰åŒä¸Š
+	 * @return {bool} è¿”å›å¤„ç†ç»“æœ
 	 */
 	virtual bool doRun(const char* memcached_addr, socket_stream* stream);
 
 protected:
 	/**
-	 * µ± HTTP ÇëÇóÎª GET ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º GET æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doGet(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª websocket ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º websocket æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doWebSocket(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª POST ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º POST æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doPost(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª PUT ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º PUT æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doPut(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª PATCH ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º PATCH æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doPatch(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª CONNECT ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º CONNECT æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doConnect(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª PURGE ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı£¬¸Ã·½·¨ÔÚÇå³ı SQUID µÄ»º´æ
-	 * Ê±»áÓÃµ½
+	 * å½“ HTTP è¯·æ±‚ä¸º PURGE æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°ï¼Œè¯¥æ–¹æ³•åœ¨æ¸…é™¤ SQUID çš„ç¼“å­˜
+	 * æ—¶ä¼šç”¨åˆ°
 	 */
 	virtual bool doPurge(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª DELETE ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º DELETE æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doDelete(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª HEAD ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º HEAD æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doHead(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª OPTION ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º OPTION æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doOptions(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇóÎª PROPFIND ·½Ê½Ê±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚ä¸º PROPFIND æ–¹å¼æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doPropfind(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇó·½·¨Î´ÖªÊ±µ÷ÓÃµÄĞéº¯Êı
-	 * @param method {const char*} ÆäËüÎ´ÖªµÄÇëÇó·½·¨
+	 * å½“ HTTP è¯·æ±‚æ–¹æ³•æœªçŸ¥æ—¶è°ƒç”¨çš„è™šå‡½æ•°
+	 * @param method {const char*} å…¶å®ƒæœªçŸ¥çš„è¯·æ±‚æ–¹æ³•
 	 */
 	virtual bool doOther(HttpServletRequest&, HttpServletResponse&,
 		const char* method);
 
 	/**
-	 * µ± HTTP ÇëÇó·½·¨Î´ÖªÊ±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚æ–¹æ³•æœªçŸ¥æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doUnknown(HttpServletRequest&, HttpServletResponse&);
 
 	/**
-	 * µ± HTTP ÇëÇó³ö´íÊ±µ÷ÓÃµÄĞéº¯Êı
+	 * å½“ HTTP è¯·æ±‚å‡ºé”™æ—¶è°ƒç”¨çš„è™šå‡½æ•°
 	 */
 	virtual bool doError(HttpServletRequest&, HttpServletResponse&);
 

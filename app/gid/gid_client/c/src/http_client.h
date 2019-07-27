@@ -1,29 +1,29 @@
-#ifndef	__HTTP_CLIENT_INCLUDE_H__
+ï»¿#ifndef	__HTTP_CLIENT_INCLUDE_H__
 #define	__HTTP_CLIENT_INCLUDE_H__
 
 /**
- * Ïò·şÎñÆ÷°´ POST ·½Ê½·¢ËÍÇëÇó
- * @param client {ACL_VSTREAM*} Á¬½ÓÁ÷
- * @param url {const char*} URL ×Ö·û´®
- * @param keepalive {int} ÊÇ·ñÓë·şÎñ¶Ë±£³Ö³¤Á¬½Ó
- * @param gid_fmt {const char*} Êı¾İ¸ñÊ½£ºxml »ò json
- * @param body {char*} Êı¾İÌåµØÖ·
- * @param len {int} Êı¾İÌå³¤¶È
- * @param errnum {int*} Èô·Ç¿ÕÔò¼ÇÂ¼³ö´íÊ±µÄÔ­Òò
- * @return {int} 0 ±íÊ¾³É¹¦£¬·ñÔò±íÊ¾Ê§°Ü
+ * å‘æœåŠ¡å™¨æŒ‰ POST æ–¹å¼å‘é€è¯·æ±‚
+ * @param client {ACL_VSTREAM*} è¿æ¥æµ
+ * @param url {const char*} URL å­—ç¬¦ä¸²
+ * @param keepalive {int} æ˜¯å¦ä¸æœåŠ¡ç«¯ä¿æŒé•¿è¿æ¥
+ * @param gid_fmt {const char*} æ•°æ®æ ¼å¼ï¼šxml æˆ– json
+ * @param body {char*} æ•°æ®ä½“åœ°å€
+ * @param len {int} æ•°æ®ä½“é•¿åº¦
+ * @param errnum {int*} è‹¥éç©ºåˆ™è®°å½•å‡ºé”™æ—¶çš„åŸå› 
+ * @return {int} 0 è¡¨ç¤ºæˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå¤±è´¥
  */
 int http_client_post_request(ACL_VSTREAM *client, const char *url, int keepalive,
 	const char *gid_fmt, char* body, int len, int *errnum);
 
 /**
- * ´Ó·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Êı¾İ
- * @param client {ACL_VSTREAM*} Á¬½ÓÁ÷
- * @param json {ACL_JSON*} Èô·Ç¿Õ£¬Ôò²ÉÓÃ json ¸ñÊ½½øĞĞ½âÎö
- * @param xml {ACL_XML*} Èô·Ç¿Õ£¬Ôò²ÉÓÃ xml ¸ñÊ½½øĞĞ½âÎö
- * @param errnum {int*} Èô·Ç¿ÕÔò¼ÇÂ¼³ö´íÊ±µÄÔ­Òò
- * @param dump {ACL_VSTRING*} ·Ç¿ÕÔò´æ´¢ÏìÓ¦Êı¾İ
- * @return {int} 0 ±íÊ¾³É¹¦£¬·ñÔò±íÊ¾Ê§°Ü
- * ×¢£ºACL_JSON* ºÍ ACL_XML* ±ØĞëÓĞÇÒÖ»ÓĞÒ»¸ö·Ç¿Õ
+ * ä»æœåŠ¡å™¨è¯»å–å“åº”æ•°æ®
+ * @param client {ACL_VSTREAM*} è¿æ¥æµ
+ * @param json {ACL_JSON*} è‹¥éç©ºï¼Œåˆ™é‡‡ç”¨ json æ ¼å¼è¿›è¡Œè§£æ
+ * @param xml {ACL_XML*} è‹¥éç©ºï¼Œåˆ™é‡‡ç”¨ xml æ ¼å¼è¿›è¡Œè§£æ
+ * @param errnum {int*} è‹¥éç©ºåˆ™è®°å½•å‡ºé”™æ—¶çš„åŸå› 
+ * @param dump {ACL_VSTRING*} éç©ºåˆ™å­˜å‚¨å“åº”æ•°æ®
+ * @return {int} 0 è¡¨ç¤ºæˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå¤±è´¥
+ * æ³¨ï¼šACL_JSON* å’Œ ACL_XML* å¿…é¡»æœ‰ä¸”åªæœ‰ä¸€ä¸ªéç©º
  */
 int http_client_get_respond(ACL_VSTREAM* client, ACL_JSON *json,
 	ACL_XML *xml, int *errnum, ACL_VSTRING *dump);

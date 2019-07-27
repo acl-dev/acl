@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -62,7 +62,7 @@ static void gc_timer(int event_type acl_unused, ACL_EVENT *event acl_unused,
 	ACL_AIO *aio = (ACL_AIO *) context;
 
 	acl_mem_slice_delay_destroy();
-	/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
+	/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
 	acl_aio_request_timer(aio, gc_timer, aio, 2, 0);
 }
 
@@ -76,7 +76,7 @@ static void *__runner_loop(void *arg)
 	printf("start one thread ok, id=%lu, pid=%d\n",
 		(unsigned long) acl_pthread_self(), (int) getpid());
 
-	/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
+	/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
 	if (__use_slice)
 		acl_aio_request_timer(aio, gc_timer, aio, 2, 0);
 

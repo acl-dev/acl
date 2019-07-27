@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -47,7 +47,7 @@
 # error "unknown OS type"
 #endif
 
-/* ÄÚ²¿½á¹ûÀàÐÍ¶¨Òå */
+/* å†…éƒ¨ç»“æžœç±»åž‹å®šä¹‰ */
 
 struct ACL_AQUEUE_ITEM {
 	struct ACL_AQUEUE_ITEM *next;

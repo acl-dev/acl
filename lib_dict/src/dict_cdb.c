@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 
 #ifdef HAS_CDB
 #include <sys/stat.h>

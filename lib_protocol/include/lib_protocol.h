@@ -1,4 +1,4 @@
-#ifndef __LIB_PROTOCOL_INCLUDE_H__
+﻿#ifndef __LIB_PROTOCOL_INCLUDE_H__
 #define __LIB_PROTOCOL_INCLUDE_H__
 
 #include "http/lib_http.h"

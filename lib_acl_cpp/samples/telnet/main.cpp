@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "util.h"
 
 static char  __local_addr[64];
@@ -72,14 +72,14 @@ static void run(ACL_EVENT* event)
 {
 	acl::socket_stream udp;
 
-	// °ó¶¨±¾µØµØÖ·
+	// ç»‘å®šæœ¬åœ°åœ°å€
 	if (udp.bind_udp(__local_addr) == false) {
 		printf("bind addr %s error %s\r\n",
 			__server_addr, acl::last_serror());
 		return;
 	}
 
-	// ÉèÖÃÔ¶³Ì·şÎñµØÖ·
+	// è®¾ç½®è¿œç¨‹æœåŠ¡åœ°å€
 	udp.set_peer(__server_addr);
 	printf("local addr: %s, set peer addr: %s\r\n",
 		udp.get_local(true), __server_addr);

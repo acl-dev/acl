@@ -1,4 +1,4 @@
-// mysql.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// mysql.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -39,11 +39,11 @@ static bool tbl_create(acl::db_handle& db)
 	}
 }
 
-// Ìí¼Ó±íÊı¾İ
+// æ·»åŠ è¡¨æ•°æ®
 static bool tbl_insert(acl::db_handle& db, int n)
 {
 	const char* sql_fmt = "insert into group_tbl(group_name, uvip_tbl)"
-		" values('ÖĞ¹úÈË-%d', 'test')";
+		" values('ä¸­å›½äºº-%d', 'test')";
 
 	acl::string sql;
 	sql.format(sql_fmt, n);
@@ -67,11 +67,11 @@ static bool tbl_insert(acl::db_handle& db, int n)
 	return (true);
 }
 
-// ²éÑ¯±íÊı¾İ
+// æŸ¥è¯¢è¡¨æ•°æ®
 static int tbl_select(acl::db_handle& db, int n)
 {
 	const char* sql_fmt = "select * from group_tbl where"
-		" group_name='ÖĞ¹úÈË-%d' and uvip_tbl='test'";
+		" group_name='ä¸­å›½äºº-%d' and uvip_tbl='test'";
 
 	acl::string sql;
 	sql.format(sql_fmt, n);
@@ -84,7 +84,7 @@ static int tbl_select(acl::db_handle& db, int n)
 
 	printf("\r\n---------------------------------------------------\r\n");
 
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨Ò»
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•ä¸€
 	const acl::db_rows* result = db.get_result();
 	if (result)
 	{
@@ -100,14 +100,14 @@ static int tbl_select(acl::db_handle& db, int n)
 		}
 	}
 
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨¶ş
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•äºŒ
 	for (size_t i = 0; i < db.length(); i++)
 	{
 		if (n > 100)
 			continue;
 		const acl::db_row* row = db[i];
 
-		// È¡³ö¸ÃĞĞ¼ÇÂ¼ÖĞÄ³¸ö×Ö¶ÎµÄÖµ
+		// å–å‡ºè¯¥è¡Œè®°å½•ä¸­æŸä¸ªå­—æ®µçš„å€¼
 		const char* ptr = (*row)["group_name"];
 		if (ptr == NULL)
 		{
@@ -120,7 +120,7 @@ static int tbl_select(acl::db_handle& db, int n)
 		printf("\r\n");
 	}
 
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨Èı
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•ä¸‰
 	const std::vector<acl::db_row*>* rows = db.get_rows();
 	if (rows)
 	{
@@ -138,15 +138,15 @@ static int tbl_select(acl::db_handle& db, int n)
 	}
 	int  ret = (int) db.length();
 
-	// ÊÍ·Å²éÑ¯½á¹û
+	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
 	db.free_result();
 	return (ret);
 }
 
-// É¾³ı±íÊı¾İ
+// åˆ é™¤è¡¨æ•°æ®
 static bool tbl_delete(acl::db_handle& db, int n)
 {
-	const char* sql_fmt = "delete from group_tbl where group_name='ÖĞ¹úÈË-%d'";
+	const char* sql_fmt = "delete from group_tbl where group_name='ä¸­å›½äºº-%d'";
 
 	acl::string sql;
 	sql.format(sql_fmt, n);
@@ -164,7 +164,7 @@ static bool tbl_delete(acl::db_handle& db, int n)
 			printf("%s, ", (*row)[j]);
 		printf("\r\n");
 	}
-	// ÊÍ·Å²éÑ¯½á¹û
+	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
 	db.free_result();
 
 	return (true);
@@ -172,10 +172,10 @@ static bool tbl_delete(acl::db_handle& db, int n)
 
 int main(void)
 {
-	// WIN32 ÏÂĞèÒªµ÷ÓÃ´Ëº¯Êı½øĞĞÓĞ¹Ø SOCKET µÄ³õÊ¼»¯
+	// WIN32 ä¸‹éœ€è¦è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œæœ‰å…³ SOCKET çš„åˆå§‹åŒ–
 	acl::acl_cpp_init();
 
-	// ÔÊĞí½«´íÎóÈÕÖ¾Êä³öÖÁÆÁÄ»
+	// å…è®¸å°†é”™è¯¯æ—¥å¿—è¾“å‡ºè‡³å±å¹•
 	acl::log::stdout_open(true);
 
 	acl::string line;
@@ -190,7 +190,7 @@ int main(void)
 
 	acl::string path;
 
-	// ÒòÎª²ÉÓÃ¶¯Ì¬¼ÓÔØµÄ·½Ê½£¬ËùÒÔĞèÒªÓ¦ÓÃ¸ø³ö mysql ¿Í»§¶Ë¿âËùÔÚµÄÂ·¾¶
+	// å› ä¸ºé‡‡ç”¨åŠ¨æ€åŠ è½½çš„æ–¹å¼ï¼Œæ‰€ä»¥éœ€è¦åº”ç”¨ç»™å‡º mysql å®¢æˆ·ç«¯åº“æ‰€åœ¨çš„è·¯å¾„
 	out.format("Enter %s load path: ", libname);
 	if (in.gets(line) && !line.empty())
 #if	defined(_WIN32) || defined(_WIN64)
@@ -202,7 +202,7 @@ int main(void)
 		path = libname;
 
 	out.format("%s path: %s\r\n", libname, path.c_str());
-	// ÉèÖÃ¶¯Ì¬¿â¼ÓÔØµÄÈ«Â·¾¶
+	// è®¾ç½®åŠ¨æ€åº“åŠ è½½çš„å…¨è·¯å¾„
 	acl::db_handle::set_loadpath(path);
 
 #ifdef WIN32
@@ -215,7 +215,7 @@ int main(void)
 	acl::db_mysql db(dbaddr, dbname, dbuser, dbpass);
 	int   max = 100;
 
-	// ÔÊĞí½«´íÎóÈÕÖ¾Êä³öÖÁÆÁÄ»
+	// å…è®¸å°†é”™è¯¯æ—¥å¿—è¾“å‡ºè‡³å±å¹•
 	acl_msg_stdout_enable(1);
 
 	if (db.open() == false)

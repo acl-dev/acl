@@ -1,4 +1,4 @@
-/* MS VisualStudio Projects are monolithic, so we need the following
+ï»¿/* MS VisualStudio Projects are monolithic, so we need the following
  * #if to exclude the MD5 code from compile process when we are
  * building the SSL support.
  */
@@ -334,7 +334,7 @@ acl_int64 md5::md5_file(istream& in, const void *key, size_t klen,
 const char* md5::hex_encode(const void *in, char* out, size_t size)
 {
 	size_t i;
-	char  buf[34];  // xxx: ±ØÐëÊÇ 34 ¸ö×Ö½Ú
+	char  buf[34];  // xxx: å¿…é¡»æ˜¯ 34 ä¸ªå­—èŠ‚
 	char *ptr;
 	unsigned char digest[16];
 

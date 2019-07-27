@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "service_dead.h"
 
 #define DEAD		"dead"

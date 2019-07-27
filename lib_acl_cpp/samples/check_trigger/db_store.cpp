@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "http_thread.h"
 #include "db_store.h"
 
@@ -10,7 +10,7 @@ db_store::~db_store()
 {
 }
 
-// Êı¾İ¿â±í½á¹¹
+// æ•°æ®åº“è¡¨ç»“æ„
 static const char* CREATE_TBL =
 	"create table http_tbl\r\n"
 	"(\r\n"
@@ -28,10 +28,10 @@ static const char* CREATE_TBL =
 	"create index addr_idx on http_tbl(addr);\r\n"
 	"create index url_idx on http_tbl(url);\r\n";
 
-// ´´½¨Êı¾İ¿â±í
+// åˆ›å»ºæ•°æ®åº“è¡¨
 bool db_store::db_create()
 {
-	// »ñÈ¡Êı¾İ¿âÁ¬½Ó
+	// è·å–æ•°æ®åº“è¿æ¥
 	acl::db_handle* db = var_dbpool->peek();
 	if (db == NULL)
 	{
@@ -39,7 +39,7 @@ bool db_store::db_create()
 		return false;
 	}
 
-	// Ê×ÏÈ´ò¿ªÊı¾İ¿â
+	// é¦–å…ˆæ‰“å¼€æ•°æ®åº“
 	if (db->open(var_cfg_dbcharset) == false)
 	{
 		logger_error("open db error, charset: %s",
@@ -55,7 +55,7 @@ bool db_store::db_create()
 		return true;
 	}
 
-	// ´´½¨Êı¾İ¿â±í
+	// åˆ›å»ºæ•°æ®åº“è¡¨
 	if (db->sql_update(CREATE_TBL) == false)
 	{
 		logger_error("create db table failed, table: %s", CREATE_TBL);
@@ -69,7 +69,7 @@ bool db_store::db_create()
 
 bool db_store::db_update(const http_thread& http)
 {
-	// »ñÈ¡Êı¾İ¿âÁ¬½Ó
+	// è·å–æ•°æ®åº“è¿æ¥
 	acl::db_handle* db = var_dbpool->peek();
 	if (db == NULL)
 	{
@@ -77,7 +77,7 @@ bool db_store::db_update(const http_thread& http)
 		return false;
 	}
 
-	// Ê×ÏÈ´ò¿ªÊı¾İ¿â
+	// é¦–å…ˆæ‰“å¼€æ•°æ®åº“
 	if (db->open(var_cfg_dbcharset) == false)
 	{
 		logger_error("open db error, charset: %s",
@@ -86,7 +86,7 @@ bool db_store::db_update(const http_thread& http)
 		return false;
 	}
 
-	// ¼ÆËãÏÂÔØËÙ¶È
+	// è®¡ç®—ä¸‹è½½é€Ÿåº¦
 	double speed = (http.length_ * 1000) / http.spent_http_;
 
 	acl::string sql;
@@ -98,13 +98,13 @@ bool db_store::db_update(const http_thread& http)
 		http.spent_dns_, http.spent_connect_, http.spent_http_,
 		http.length_, speed, http.success_ ? "ok" : "error");
 
-	// ¸üĞÂÊı¾İ¿â±í×Ö¶Î
+	// æ›´æ–°æ•°æ®åº“è¡¨å­—æ®µ
 	if (db->sql_update(sql.c_str()) == false)
 		logger_error("sql(%s) error", sql.c_str());
 	else
 		logger("sql: %s ok", sql.c_str());
 
-	// ¹é»¹Êı¾İ¿âÁ¬½Ó
+	// å½’è¿˜æ•°æ®åº“è¿æ¥
 	var_dbpool->put(db);
 	return true;
 }

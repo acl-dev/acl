@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
@@ -8,17 +8,17 @@ struct ACL_EVENT;
 namespace acl
 {
 
-// ÊÂ¼şÒıÇæÀàĞÍ
+// äº‹ä»¶å¼•æ“ç±»å‹
 typedef enum
 {
-	ENGINE_SELECT,  // select Ä£Ê½(Ö§³ÖËùÓĞÆ½Ì¨)
-	ENGINE_POLL,    // poll Ä£Ê½(½ö UNIX Æ½Ì¨)
-	ENGINE_KERNEL,  // kernel Ä£Ê½(win32: iocp, Linux: epoll, FreeBsd: kqueue, Solaris: devpoll
-	ENGINE_WINMSG   // win32 GUI ÏûÏ¢Ä£Ê½
+	ENGINE_SELECT,  // select æ¨¡å¼(æ”¯æŒæ‰€æœ‰å¹³å°)
+	ENGINE_POLL,    // poll æ¨¡å¼(ä»… UNIX å¹³å°)
+	ENGINE_KERNEL,  // kernel æ¨¡å¼(win32: iocp, Linux: epoll, FreeBsd: kqueue, Solaris: devpoll
+	ENGINE_WINMSG   // win32 GUI æ¶ˆæ¯æ¨¡å¼
 } aio_handle_type;
 
 /**
- * ·Ç×èÈûIOµÄÊÂ¼şÒıÇæÀà£¬¸ÃÀà·â×°ÁËÏµÍ³µÄ select/poll/epoll/kqueue/devpoll/iocp,
+ * éé˜»å¡IOçš„äº‹ä»¶å¼•æ“ç±»ï¼Œè¯¥ç±»å°è£…äº†ç³»ç»Ÿçš„ select/poll/epoll/kqueue/devpoll/iocp,
  */
 
 class aio_timer_callback;
@@ -29,49 +29,49 @@ class ACL_CPP_API aio_handle : private noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı£¬»á×Ô¶¯´´½¨IOÊÂ¼şÒıÇæ£¬²¢ÇÒÔÚÎö¹¹º¯ÊıÖĞ»á×Ô¶¯ÊÍ·Å
-	 * @param engine_type {aio_handle_type} Ëù²ÉÓÃµÄÒıÇæÀàĞÍ
-	 *  ENGINE_SELECT: select ·½Ê½£¬Ö§³Ö win32/unix Æ½Ì¨
-	 *  ENGINE_POLL: poll ·½Ê½£¬Ö§³Ö unix Æ½Ì¨
-	 *  ENGINE_KERNEL: ×Ô¶¯¸ù¾İ¸÷¸öÏµÍ³Æ½Ì¨ËùÖ§³ÖµÄ¸ßĞ§ÄÚºËÒıÇæ½øĞĞÉèÖÃ
-	 *  ENGINE_WINMSG: win32 ½çÃæÏûÏ¢·½Ê½£¬Ö§³Ö win32 Æ½Ì¨
-	 * @param nMsg {unsigned int} Èô engine_type Îª ENGINE_WINMSG£¬µ±¸ÃÖµ
-	 *  ´óÓÚ 0 Ê±£¬¸ÃÒì²½¾ä±ú±ãÓë¸ÃÏûÏ¢°ó¶¨£¬·ñÔòÓëÈ±Ê¡ÏûÏ¢°ó¶¨£»
-	 *  µ± engine_type Îª·Ç ENGINE_WINMSG Ê±£¬¸ÃÖµ¶ÔÆäËüÒì²½¾ä±ú²»Æğ×÷ÓÃ
+	 * æ„é€ å‡½æ•°ï¼Œä¼šè‡ªåŠ¨åˆ›å»ºIOäº‹ä»¶å¼•æ“ï¼Œå¹¶ä¸”åœ¨ææ„å‡½æ•°ä¸­ä¼šè‡ªåŠ¨é‡Šæ”¾
+	 * @param engine_type {aio_handle_type} æ‰€é‡‡ç”¨çš„å¼•æ“ç±»å‹
+	 *  ENGINE_SELECT: select æ–¹å¼ï¼Œæ”¯æŒ win32/unix å¹³å°
+	 *  ENGINE_POLL: poll æ–¹å¼ï¼Œæ”¯æŒ unix å¹³å°
+	 *  ENGINE_KERNEL: è‡ªåŠ¨æ ¹æ®å„ä¸ªç³»ç»Ÿå¹³å°æ‰€æ”¯æŒçš„é«˜æ•ˆå†…æ ¸å¼•æ“è¿›è¡Œè®¾ç½®
+	 *  ENGINE_WINMSG: win32 ç•Œé¢æ¶ˆæ¯æ–¹å¼ï¼Œæ”¯æŒ win32 å¹³å°
+	 * @param nMsg {unsigned int} è‹¥ engine_type ä¸º ENGINE_WINMSGï¼Œå½“è¯¥å€¼
+	 *  å¤§äº 0 æ—¶ï¼Œè¯¥å¼‚æ­¥å¥æŸ„ä¾¿ä¸è¯¥æ¶ˆæ¯ç»‘å®šï¼Œå¦åˆ™ä¸ç¼ºçœæ¶ˆæ¯ç»‘å®šï¼›
+	 *  å½“ engine_type ä¸ºé ENGINE_WINMSG æ—¶ï¼Œè¯¥å€¼å¯¹å…¶å®ƒå¼‚æ­¥å¥æŸ„ä¸èµ·ä½œç”¨
 	 *  
 	 */
 	aio_handle(aio_handle_type engine_type = ENGINE_SELECT,
 		unsigned int nMsg = 0);
 
 	/**
-	 * ¹¹Ôìº¯Êı£¬µ÷ÓÃÕß½« ACL_AIO ¾ä±ú´«½ø£¬¶øÔÚÀàµÄÎö¹¹º¯ÊıÖĞ²¢²»»á
-	 * ×Ô¶¯ÊÍ·Å¸Ã ACL_AIO ¾ä±ú
-	 * @param handle {ACL_AIO*} ACL_AIO ¾ä±ú
+	 * æ„é€ å‡½æ•°ï¼Œè°ƒç”¨è€…å°† ACL_AIO å¥æŸ„ä¼ è¿›ï¼Œè€Œåœ¨ç±»çš„ææ„å‡½æ•°ä¸­å¹¶ä¸ä¼š
+	 * è‡ªåŠ¨é‡Šæ”¾è¯¥ ACL_AIO å¥æŸ„
+	 * @param handle {ACL_AIO*} ACL_AIO å¥æŸ„
 	 */
 	aio_handle(ACL_AIO* handle);
 
 	virtual ~aio_handle(void);
 
 	/**
-	 * Õë¶ÔÒì²½¶ÁÁ÷£¬ÉèÖÃÊÇ·ñÊÇÁ¬Ğø¶Á£¬¸ÃÅäÖÃÏî½«»á±»ËùÓĞµÄ»ùÓÚ
-	 * ¸ÃÒì²½ÒıÇæ¾ä±úµÄÒì²½¶ÁÁ÷Ëù¼Ì³Ğ£¬Ò»°ã aio_handle Àà¶ÔÏóÔÚÈ±Ê¡
-	 * Çé¿öÏÂÊÇÁ¬Ğø¶ÁµÄ
-	 * @param onoff {bool} ÉèÖÃÊÇ·ñÊÇÁ¬Ğø¶Á
+	 * é’ˆå¯¹å¼‚æ­¥è¯»æµï¼Œè®¾ç½®æ˜¯å¦æ˜¯è¿ç»­è¯»ï¼Œè¯¥é…ç½®é¡¹å°†ä¼šè¢«æ‰€æœ‰çš„åŸºäº
+	 * è¯¥å¼‚æ­¥å¼•æ“å¥æŸ„çš„å¼‚æ­¥è¯»æµæ‰€ç»§æ‰¿ï¼Œä¸€èˆ¬ aio_handle ç±»å¯¹è±¡åœ¨ç¼ºçœ
+	 * æƒ…å†µä¸‹æ˜¯è¿ç»­è¯»çš„
+	 * @param onoff {bool} è®¾ç½®æ˜¯å¦æ˜¯è¿ç»­è¯»
 	 */
 	void keep_read(bool onoff);
 
 	/**
-	 * »ñµÃÒì²½ÒıÇæ¾ä±úÊÇ·ñÉèÖÃÁË³ÖĞø¶ÁÊı¾İµÄ¹¦ÄÜ
+	 * è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„æ˜¯å¦è®¾ç½®äº†æŒç»­è¯»æ•°æ®çš„åŠŸèƒ½
 	 * @return {bool}
 	 */
 	bool keep_read(void) const;
 
 	/**
-	 * ÉèÖÃ¶¨Ê±Æ÷
-	 * @param callback {aio_timer_callback*} ¶¨Ê±Æ÷»Øµ÷º¯ÊıÀà¶ÔÏó
-	 * @param delay {int64} ¶¨Ê±Æ÷Ê±¼ä¼ä¸ô(Î¢Ãë)
-	 * @param id {unsigned int} ¶¨Ê±Æ÷Ä³¸öÈÎÎñµÄ ID ºÅ
-	 * @return {int64} ¶¨Ê±Æ÷ÉúĞ§Ê±¼ä(´Ó1970.1.1ÒÔÀ´µÄÎ¢ÃëÊı)
+	 * è®¾ç½®å®šæ—¶å™¨
+	 * @param callback {aio_timer_callback*} å®šæ—¶å™¨å›è°ƒå‡½æ•°ç±»å¯¹è±¡
+	 * @param delay {int64} å®šæ—¶å™¨æ—¶é—´é—´éš”(å¾®ç§’)
+	 * @param id {unsigned int} å®šæ—¶å™¨æŸä¸ªä»»åŠ¡çš„ ID å·
+	 * @return {int64} å®šæ—¶å™¨ç”Ÿæ•ˆæ—¶é—´(ä»1970.1.1ä»¥æ¥çš„å¾®ç§’æ•°)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 set_timer(aio_timer_callback* callback,
@@ -82,9 +82,9 @@ public:
 #endif
 
 	/**
-	 * É¾³ı¶¨Ê±Æ÷µÄËùÓĞ¶¨Ê±ÈÎÎñÊÂ¼ş
-	 * @param callback {aio_timer_callback*} ¶¨Ê±Æ÷»Øµ÷º¯ÊıÀà¶ÔÏó
-	 * @return {time_t} ¶¨Ê±Æ÷ÉúĞ§Ê±¼ä(´Ó1970.1.1ÒÔÀ´µÄÎ¢ÃëÊı)
+	 * åˆ é™¤å®šæ—¶å™¨çš„æ‰€æœ‰å®šæ—¶ä»»åŠ¡äº‹ä»¶
+	 * @param callback {aio_timer_callback*} å®šæ—¶å™¨å›è°ƒå‡½æ•°ç±»å¯¹è±¡
+	 * @return {time_t} å®šæ—¶å™¨ç”Ÿæ•ˆæ—¶é—´(ä»1970.1.1ä»¥æ¥çš„å¾®ç§’æ•°)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 del_timer(aio_timer_callback* callback);
@@ -93,10 +93,10 @@ public:
 #endif
 
 	/**
-	 * É¾³ı¶¨Ê±Æ÷ÖĞÄ³¸öÖ¸¶¨ ID ºÅµÄ¶¨Ê±ÈÎÎñ
-	 * @param callback {aio_timer_callback*} ¶¨Ê±Æ÷»Øµ÷º¯ÊıÀà¶ÔÏó
-	 * @param id {unsigned int} ¶¨Ê±Æ÷Ä³¸öÈÎÎñµÄ ID ºÅ
-	 * @return {time_t} ¶¨Ê±Æ÷ÉúĞ§Ê±¼ä(´Ó1970.1.1ÒÔÀ´µÄÎ¢ÃëÊı)
+	 * åˆ é™¤å®šæ—¶å™¨ä¸­æŸä¸ªæŒ‡å®š ID å·çš„å®šæ—¶ä»»åŠ¡
+	 * @param callback {aio_timer_callback*} å®šæ—¶å™¨å›è°ƒå‡½æ•°ç±»å¯¹è±¡
+	 * @param id {unsigned int} å®šæ—¶å™¨æŸä¸ªä»»åŠ¡çš„ ID å·
+	 * @return {time_t} å®šæ—¶å™¨ç”Ÿæ•ˆæ—¶é—´(ä»1970.1.1ä»¥æ¥çš„å¾®ç§’æ•°)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 del_timer(aio_timer_callback* callback, unsigned int id);
@@ -105,85 +105,85 @@ public:
 #endif
 
 	/**
-	 * µ±¶¨Ê±Æ÷´¦ÓÚËø¶¨×´Ì¬Ê±£¬ÓÃ»§ÒòÎªÎŞ·¨ÊÍ·Å¸Ã¶¨Ê±Æ÷¶øÔì³ÉÄÚ´æĞ¹Â¶£¬
-	 * Í¨¹ı´Ëº¯Êı£¬¿ÉÒÔ½«´¦ÓÚËø¶¨×´Ì¬µÄ¶¨Ê±Æ÷µ±´¦ÓÚÎ´Ëø¶¨×´Ì¬Ê±±»ÊÂ¼ş
-	 * ÒıÇæÑÓÆÚÊÍ·Å(µ÷ÓÃ aio_delay_free::destroy())£¬´Ó¶ø¿ÉÒÔ±ÜÃâ
-	 * ÄÚ´æĞ¹Â¶ÎÊÌâ
+	 * å½“å®šæ—¶å™¨å¤„äºé”å®šçŠ¶æ€æ—¶ï¼Œç”¨æˆ·å› ä¸ºæ— æ³•é‡Šæ”¾è¯¥å®šæ—¶å™¨è€Œé€ æˆå†…å­˜æ³„éœ²ï¼Œ
+	 * é€šè¿‡æ­¤å‡½æ•°ï¼Œå¯ä»¥å°†å¤„äºé”å®šçŠ¶æ€çš„å®šæ—¶å™¨å½“å¤„äºæœªé”å®šçŠ¶æ€æ—¶è¢«äº‹ä»¶
+	 * å¼•æ“å»¶æœŸé‡Šæ”¾(è°ƒç”¨ aio_delay_free::destroy())ï¼Œä»è€Œå¯ä»¥é¿å…
+	 * å†…å­˜æ³„éœ²é—®é¢˜
 	 * @param callback {aio_delay_free*}
 	 */
 	void delay_free(aio_delay_free* callback);
 
 	/**
-	 * »ñµÃ ACL_AIO ¾ä±ú
+	 * è·å¾— ACL_AIO å¥æŸ„
 	 * @return {ACL_AIO*}
 	 */
 	ACL_AIO* get_handle(void) const;
 
 	/**
-	 * »ñµÃÒì²½ÒıÇæµÄÀàĞÍ
+	 * è·å¾—å¼‚æ­¥å¼•æ“çš„ç±»å‹
 	 * @return {aio_handle_type}
 	 */
 	aio_handle_type get_engine_type(void) const;
 
 	/**
-	 * »ñµÃµ±Ç°´¦ÓÚ¼à¿ØµÄÒì²½Á÷µÄÊıÁ¿
+	 * è·å¾—å½“å‰å¤„äºç›‘æ§çš„å¼‚æ­¥æµçš„æ•°é‡
 	 * @return {int}
 	 */
 	int length(void) const;
 
 	/**
-	 * ¼ì²éËùÓĞÒì²½Á÷µÄ×´Ì¬£¬²¢´¥·¢×¼±¸µÄÒì²½Á÷µÄ´¦Àí¹ı³Ì
-	 * @return {bool} ÊÇ·ñÓ¦ÖĞÖ¹Òì²½ÒıÇæ
+	 * æ£€æŸ¥æ‰€æœ‰å¼‚æ­¥æµçš„çŠ¶æ€ï¼Œå¹¶è§¦å‘å‡†å¤‡çš„å¼‚æ­¥æµçš„å¤„ç†è¿‡ç¨‹
+	 * @return {bool} æ˜¯å¦åº”ä¸­æ­¢å¼‚æ­¥å¼•æ“
 	 */
 	bool check(void);
 
 	/**
-	 * »ñµÃ±¾´ÎÊÂ¼şÑ­»·±»´¥·¢µÄÊÂ¼ş´ÎÊı
+	 * è·å¾—æœ¬æ¬¡äº‹ä»¶å¾ªç¯è¢«è§¦å‘çš„äº‹ä»¶æ¬¡æ•°
 	 * @return {int}
 	 */
 	int last_nready(void) const;
 
 	/**
-	 * Í¨ÖªÒì²½Á÷ÒıÇæÖĞÖ¹
+	 * é€šçŸ¥å¼‚æ­¥æµå¼•æ“ä¸­æ­¢
 	 */
 	void stop(void);
 
 	/**
-	 * ÖØÖÃÒì²½ÒıÇæµÄÄÚ²¿×´Ì¬
+	 * é‡ç½®å¼‚æ­¥å¼•æ“çš„å†…éƒ¨çŠ¶æ€
 	 */
 	void reset(void);
 
 	/**
-	 * ÉèÖÃ DNS ·şÎñÆ÷µØÖ·ÁĞ±í£¬¸ñÊ½£ºip1:port1;ip2:port2...
-	 * @param addrs {const char*} DNS ·şÎñÆ÷µØÖ·£¬Èç£º8.8.8.8:53
-	 * @param timeout {int} DNS ²éÑ¯³¬Ê±Ê±¼ä£¨Ãë£©
+	 * è®¾ç½® DNS æœåŠ¡å™¨åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼šip1:port1;ip2:port2...
+	 * @param addrs {const char*} DNS æœåŠ¡å™¨åœ°å€ï¼Œå¦‚ï¼š8.8.8.8:53
+	 * @param timeout {int} DNS æŸ¥è¯¢è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
 	 */
 	void set_dns(const char* addrs, int timeout);
 
 public:
 	/**
-	 * ÉèÖÃÒì²½ÒıÇæÑ­»·µÄµÈ´ıÊ±¼äÖĞµÄÃë¼¶²¿·Ö
-	 * @param n {int} ÉèÖÃÓÃ select/poll/epoll/kqueue/devpoll
-	 *  Ê±µÄÃë¼¶µÈ´ıÊ±¼ä
+	 * è®¾ç½®å¼‚æ­¥å¼•æ“å¾ªç¯çš„ç­‰å¾…æ—¶é—´ä¸­çš„ç§’çº§éƒ¨åˆ†
+	 * @param n {int} è®¾ç½®ç”¨ select/poll/epoll/kqueue/devpoll
+	 *  æ—¶çš„ç§’çº§ç­‰å¾…æ—¶é—´
 	 */
 	void set_delay_sec(int n);
 
 	/**
-	 * ÉèÖÃÒì²½ÒıÇæÑ­»·µÄµÈ´ıÊ±¼äÖĞµÄÎ¢Ãë¼¶²¿·Ö
-	 * @param n {int} ÉèÖÃÓÃ select/poll/epoll/kqueue/devpoll
-	 *  Ê±µÄÎ¢Ãë¼¶µÈ´ıÊ±¼ä
+	 * è®¾ç½®å¼‚æ­¥å¼•æ“å¾ªç¯çš„ç­‰å¾…æ—¶é—´ä¸­çš„å¾®ç§’çº§éƒ¨åˆ†
+	 * @param n {int} è®¾ç½®ç”¨ select/poll/epoll/kqueue/devpoll
+	 *  æ—¶çš„å¾®ç§’çº§ç­‰å¾…æ—¶é—´
 	 */
 	void set_delay_usec(int n);
 
 	/**
-	 * ÉèÖÃÊÂ¼şÑ­»·¹ı³ÌÖĞ¶¨Ê±¼ì²éËùÓĞÃèÊö×Ö×´Ì¬µÄÊ±¼ä¼ä¸ô£¬
-	 * ÄÚ²¿È±Ê¡Öµ 100 ms
+	 * è®¾ç½®äº‹ä»¶å¾ªç¯è¿‡ç¨‹ä¸­å®šæ—¶æ£€æŸ¥æ‰€æœ‰æè¿°å­—çŠ¶æ€çš„æ—¶é—´é—´éš”ï¼Œ
+	 * å†…éƒ¨ç¼ºçœå€¼ 100 ms
 	 */
 	void set_check_inter(int n);
 
 	/**
-	 * ÉèÖÃÒì²½Á÷µÄ¶Á»º´æÇø´óĞ¡
-	 * @param n {int} ¶Á»º³åÇø´óĞ¡
+	 * è®¾ç½®å¼‚æ­¥æµçš„è¯»ç¼“å­˜åŒºå¤§å°
+	 * @param n {int} è¯»ç¼“å†²åŒºå¤§å°
 	 */
 	void set_rbuf_size(int n);
 
@@ -191,22 +191,22 @@ protected:
 	friend class aio_stream;
 
 	/**
-	 * Òì²½Á÷¸öÊı¼Ó 1
+	 * å¼‚æ­¥æµä¸ªæ•°åŠ  1
 	 */
 	void increase(void);
 
 	/**
-	 * µ±Òì²½Á÷¸öÊı¼Ó 1 Ê±µÄ»Øµ÷Ğéº¯Êı
+	 * å½“å¼‚æ­¥æµä¸ªæ•°åŠ  1 æ—¶çš„å›è°ƒè™šå‡½æ•°
 	 */
 	virtual void on_increase(void) {}
 
 	/**
-	 * Òì²½Á÷¸öÊı¼õ 1
+	 * å¼‚æ­¥æµä¸ªæ•°å‡ 1
 	 */
 	void decrease(void);
 
 	/**
-	 * µ±Òì²½Á÷¸öÊı¼õ 1 Ê±µÄ»Øµ÷Ğéº¯Êı
+	 * å½“å¼‚æ­¥æµä¸ªæ•°å‡ 1 æ—¶çš„å›è°ƒè™šå‡½æ•°
 	 */
 	virtual void on_decrease(void) {}
 

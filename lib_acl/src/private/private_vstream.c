@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -403,7 +403,7 @@ TAG_AGAIN:
 		if (n > 0) {
 			stream->sys_offset += n;
 			stream->offset = stream->sys_offset;
-			/* ·ÀÖ¹»º³åÇøÄÚµÄÊı¾İÓëÊµ¼Ê²»Ò»ÖÂ, ½ö¶ÔÎÄ¼şIOÓĞĞ§ */
+			/* é˜²æ­¢ç¼“å†²åŒºå†…çš„æ•°æ®ä¸å®é™…ä¸ä¸€è‡´, ä»…å¯¹æ–‡ä»¶IOæœ‰æ•ˆ */
 			stream->read_cnt = 0;
 		}
 	} else
@@ -545,7 +545,7 @@ ACL_VSTREAM *private_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
 }
 
 
-/* ¶¨ÒåÁ÷µÄ»º³åÇøµÄÄ¬ÈÏ´óĞ¡ */
+/* å®šä¹‰æµçš„ç¼“å†²åŒºçš„é»˜è®¤å¤§å° */
 
 #define ACL_VSTREAM_DEF_MAXLEN  8192
 
@@ -560,7 +560,7 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
 		buflen = ACL_VSTREAM_DEF_MAXLEN;
 
-	/* XXX: Ö»ÓĞ·Ç¼àÌıÁ÷²ÅĞèÒªÓĞ¶Á»º³åÇø */
+	/* XXX: åªæœ‰éç›‘å¬æµæ‰éœ€è¦æœ‰è¯»ç¼“å†²åŒº */
 
 	if ((fdtype & ACL_VSTREAM_TYPE_LISTEN_INET)
 	    || (fdtype & ACL_VSTREAM_TYPE_LISTEN_UNIX))
@@ -742,7 +742,7 @@ ACL_VSTREAM *private_vstream_connect_ex(const char *addr, int block_mode,
 void private_vstream_free(ACL_VSTREAM *stream)
 {
 	if (stream->nrefer > 0) {
-		/* ÉèÖÃÑÓ³ÙÊÍ·Å±êÖ¾Î» */
+		/* è®¾ç½®å»¶è¿Ÿé‡Šæ”¾æ ‡å¿—ä½ */
 		stream->flag |= ACL_VSTREAM_FLAG_DEFER_FREE;
 		return;
 	}
@@ -751,9 +751,9 @@ void private_vstream_free(ACL_VSTREAM *stream)
 		ACL_VSTREAM_CLOSE_HANDLE *close_handle;
 		int   i, n = private_array_size(stream->close_handle_lnk);
 
-		/* ÒòÎªÌí¼ÓÊ±ÊÇÕıĞòµÄ, ËùÒÔÔÚÉ¾³ıÊ±ÊÇµ¹ĞòµÄ,
-		 * ÕâÑù¶Ô¶¯Ì¬Êı×éµÄÊ¹ÓÃµÄĞ§ÂÊ²Å»á±È½Ï¸ß, 
-		 * ±ÜÃâÁË¶¯Ì¬Êı×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+		/* å› ä¸ºæ·»åŠ æ—¶æ˜¯æ­£åºçš„, æ‰€ä»¥åœ¨åˆ é™¤æ—¶æ˜¯å€’åºçš„,
+		 * è¿™æ ·å¯¹åŠ¨æ€æ•°ç»„çš„ä½¿ç”¨çš„æ•ˆç‡æ‰ä¼šæ¯”è¾ƒé«˜, 
+		 * é¿å…äº†åŠ¨æ€æ•°ç»„å†…éƒ¨ç§»åŠ¨çš„æƒ…å†µ
 		 */
 		for (i = n - 1; i >= 0; i++) {
 			close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
@@ -762,8 +762,8 @@ void private_vstream_free(ACL_VSTREAM *stream)
 				break;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* Ö»Ëù½«´Ëµ÷ÓÃ·ÅÔÚ close_fn Ç°Ãæ£¬ÊÇÎªÁË·ÀÖ¹ÓĞÈËÎóÔÚ close_fn
-			 * Àïµ÷ÓÃÁËÉ¾³ı»Øµ÷º¯ÊıµÄ²Ù×÷¶øÔì³É¶ÔÍ¬Ò»ÄÚ´æµÄ¶à´ÎÊÍ·Å
+			/* åªæ‰€å°†æ­¤è°ƒç”¨æ”¾åœ¨ close_fn å‰é¢ï¼Œæ˜¯ä¸ºäº†é˜²æ­¢æœ‰äººè¯¯åœ¨ close_fn
+			 * é‡Œè°ƒç”¨äº†åˆ é™¤å›è°ƒå‡½æ•°çš„æ“ä½œè€Œé€ æˆå¯¹åŒä¸€å†…å­˜çš„å¤šæ¬¡é‡Šæ”¾
 			 */
 			private_array_delete(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);
@@ -789,7 +789,7 @@ int private_vstream_close(ACL_VSTREAM *stream)
 	int  ret = 0;
 
 	if (stream->nrefer > 0) {
-		/* ÉèÖÃÑÓ³ÙÊÍ·Å±êÖ¾Î» */
+		/* è®¾ç½®å»¶è¿Ÿé‡Šæ”¾æ ‡å¿—ä½ */
 		stream->flag |= ACL_VSTREAM_FLAG_DEFER_FREE;
 		return (0);
 	}
@@ -801,9 +801,9 @@ int private_vstream_close(ACL_VSTREAM *stream)
 		ACL_VSTREAM_CLOSE_HANDLE *close_handle;
 		int   i, n = private_array_size(stream->close_handle_lnk);
 
-		/* ÒòÎªÌí¼ÓÊ±ÊÇÕıĞòµÄ, ËùÒÔÔÚÉ¾³ıÊ±ÊÇµ¹ĞòµÄ,
-		 * ÕâÑù¶Ô¶¯Ì¬Êı×éµÄÊ¹ÓÃµÄĞ§ÂÊ²Å»á±È½Ï¸ß, 
-		 * ±ÜÃâÁË¶¯Ì¬Êı×éÄÚ²¿ÒÆ¶¯µÄÇé¿ö
+		/* å› ä¸ºæ·»åŠ æ—¶æ˜¯æ­£åºçš„, æ‰€ä»¥åœ¨åˆ é™¤æ—¶æ˜¯å€’åºçš„,
+		 * è¿™æ ·å¯¹åŠ¨æ€æ•°ç»„çš„ä½¿ç”¨çš„æ•ˆç‡æ‰ä¼šæ¯”è¾ƒé«˜, 
+		 * é¿å…äº†åŠ¨æ€æ•°ç»„å†…éƒ¨ç§»åŠ¨çš„æƒ…å†µ
 		 */
 		for (i = n - 1; i >= 0; i--) {
 			close_handle = (ACL_VSTREAM_CLOSE_HANDLE *)
@@ -812,9 +812,9 @@ int private_vstream_close(ACL_VSTREAM *stream)
 				continue;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* Ö»Ëù½«´Ëµ÷ÓÃ·ÅÔÚ close_fn Ç°Ãæ£¬ÊÇÎªÁË·ÀÖ¹ÓĞÈËÎóÔÚ
-			 * close_fn Àïµ÷ÓÃÁËÉ¾³ı»Øµ÷º¯ÊıµÄ²Ù×÷¶øÔì³É¶ÔÍ¬Ò»ÄÚ´æ
-			 * µÄ¶à´ÎÊÍ·Å
+			/* åªæ‰€å°†æ­¤è°ƒç”¨æ”¾åœ¨ close_fn å‰é¢ï¼Œæ˜¯ä¸ºäº†é˜²æ­¢æœ‰äººè¯¯åœ¨
+			 * close_fn é‡Œè°ƒç”¨äº†åˆ é™¤å›è°ƒå‡½æ•°çš„æ“ä½œè€Œé€ æˆå¯¹åŒä¸€å†…å­˜
+			 * çš„å¤šæ¬¡é‡Šæ”¾
 			 */
 			private_array_delete(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);

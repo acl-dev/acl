@@ -1,4 +1,4 @@
-#ifndef	ACL_MEMDB_INCLUDE_H
+ï»¿#ifndef	ACL_MEMDB_INCLUDE_H
 #define	ACL_MEMDB_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -15,128 +15,128 @@ typedef struct ACL_MDT_IDX ACL_MDT_IDX;
 typedef struct ACL_MDT ACL_MDT;
 typedef struct ACL_MDB ACL_MDB;
 
-/* Êı¾İ±í¸÷Ë÷Òı¹Ø¼ü×Ö¶ÎµÄÔ¼Êø±êÖ¾Î» */
+/* æ•°æ®è¡¨å„ç´¢å¼•å…³é”®å­—æ®µçš„çº¦æŸæ ‡å¿—ä½ */
 #define ACL_MDT_FLAG_NUL		(0)
-#define ACL_MDT_FLAG_UNI		(1 << 0)	/**< ±íÊ¾Î¨Ò» */
-#define	ACL_MDT_FLAG_KMR		(1 << 1)	/**< ±íÊ¾ÖØÓÃ¼üÄÚ´æ */
-#define ACL_MDT_FLAG_DMR		(1 << 2)	/**< ±íÊ¾ÖØÓÃÖµÄÚ´æ */
-#define	ACL_MDT_FLAG_SLICE1		(1 << 10)	/**< ÆôÓÃ ACL_SLICE_FLAG_GC1 */
-#define	ACL_MDT_FLAG_SLICE2		(1 << 11)	/**< ÆôÓÃ ACL_SLICE_FLAG_GC2 */
-#define	ACL_MDT_FLAG_SLICE3		(1 << 12)	/**< ÆôÓÃ ACL_SLICE_FLAG_GC3 */
-#define	ACL_MDT_FLAG_SLICE_RTGC_OFF	(1 << 13)	/**< ¹Ø±ÕÄÚ´æÇĞÆ¬µÄÊµÊ±À¬»ø»ØÊÕ¹¦ÄÜ */
+#define ACL_MDT_FLAG_UNI		(1 << 0)	/**< è¡¨ç¤ºå”¯ä¸€ */
+#define	ACL_MDT_FLAG_KMR		(1 << 1)	/**< è¡¨ç¤ºé‡ç”¨é”®å†…å­˜ */
+#define ACL_MDT_FLAG_DMR		(1 << 2)	/**< è¡¨ç¤ºé‡ç”¨å€¼å†…å­˜ */
+#define	ACL_MDT_FLAG_SLICE1		(1 << 10)	/**< å¯ç”¨ ACL_SLICE_FLAG_GC1 */
+#define	ACL_MDT_FLAG_SLICE2		(1 << 11)	/**< å¯ç”¨ ACL_SLICE_FLAG_GC2 */
+#define	ACL_MDT_FLAG_SLICE3		(1 << 12)	/**< å¯ç”¨ ACL_SLICE_FLAG_GC3 */
+#define	ACL_MDT_FLAG_SLICE_RTGC_OFF	(1 << 13)	/**< å…³é—­å†…å­˜åˆ‡ç‰‡çš„å®æ—¶åƒåœ¾å›æ”¶åŠŸèƒ½ */
 
 /************************************************************************/
 /*                          in acl_mdb.c                                */
 /************************************************************************/
 
 /**
- * ´´½¨Ò»¸öÊı¾İ¿â¾ä±ú
- * @param dbname {const char*} Êı¾İ¿âÃû
- * @param dbtype {const char*} Êı¾İ¿âÀàĞÍ: hash/avl
- * @return {ACL_MDB*} Êı¾İ¿â¾ä±ú
+ * åˆ›å»ºä¸€ä¸ªæ•°æ®åº“å¥æŸ„
+ * @param dbname {const char*} æ•°æ®åº“å
+ * @param dbtype {const char*} æ•°æ®åº“ç±»å‹: hash/avl
+ * @return {ACL_MDB*} æ•°æ®åº“å¥æŸ„
  */
 ACL_API ACL_MDB *acl_mdb_create(const char *dbname, const char *dbtype);
 
 /**
- * ¹Ø±Õ²¢ÊÍ·ÅÒ»¸öÄÚ´æÊı¾İ¿â
- * @param {ACL_MDB*} Êı¾İ¿â¾ä±ú
+ * å…³é—­å¹¶é‡Šæ”¾ä¸€ä¸ªå†…å­˜æ•°æ®åº“
+ * @param {ACL_MDB*} æ•°æ®åº“å¥æŸ„
  */
 ACL_API void acl_mdb_free(ACL_MDB *mdb);
 
 /**
- * ÔÚ¸ø¶¨Êı¾İ¿âÉÏ´´½¨Ò»¸öÊı¾İ±í
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} ±íÃû
- * @param tlb_flag {unsigned int} ±íµÄÊôĞÔ±êÖ¾Î»
- * @param init_capacity {size_t} Êı¾İ±íÄÚÕë¶ÔÃ¿¸öË÷Òı¼üµÄÄÚ²¿¹şÏ£±íµÄ³õÊ¼»¯ÈİÁ¿
- * @param key_labels {const char *[]} Êı¾İ±í×Ö¶ÎÃûÊı×é
- * @param flags {unsigned int[]} Óë key_labels Ïà¶ÔÓ¦µÄÔ¼Êø±êÖ¾Î»
- * @return {ACL_MDT*} ĞÂ½¨µÄÊı¾İ±í¾ä±ú
+ * åœ¨ç»™å®šæ•°æ®åº“ä¸Šåˆ›å»ºä¸€ä¸ªæ•°æ®è¡¨
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} è¡¨å
+ * @param tlb_flag {unsigned int} è¡¨çš„å±æ€§æ ‡å¿—ä½
+ * @param init_capacity {size_t} æ•°æ®è¡¨å†…é’ˆå¯¹æ¯ä¸ªç´¢å¼•é”®çš„å†…éƒ¨å“ˆå¸Œè¡¨çš„åˆå§‹åŒ–å®¹é‡
+ * @param key_labels {const char *[]} æ•°æ®è¡¨å­—æ®µåæ•°ç»„
+ * @param flags {unsigned int[]} ä¸ key_labels ç›¸å¯¹åº”çš„çº¦æŸæ ‡å¿—ä½
+ * @return {ACL_MDT*} æ–°å»ºçš„æ•°æ®è¡¨å¥æŸ„
  */
 ACL_API ACL_MDT *acl_mdb_tbl_create(ACL_MDB *mdb, const char *tbl_name,
 	unsigned int tbl_flag, size_t init_capacity,
 	const char *key_labels[], unsigned int flags[]);
 
 /**
- * Ìí¼ÓÒ»ÌõĞÂµÄÊı¾İ¼ÇÂ¼
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
- * @param data {void*} Ó¦ÓÃÊı¾İÏî
- * @param dlen {unsigned int} data µÄÊı¾İ´óĞ¡
- * @param key_labels {const char *[]} Êı¾İ±í×Ö¶ÎÃûÊı×é
- * @param keys {const char *[]} Êı¾İ±í×Ö¶ÎÃû¶ÔÓ¦ÖµÊı×é
- * @return {ACL_MDB_NOD*} ĞÂÌí¼ÓµÄÊı¾İÔÚÊı¾İ±íÖĞ´æ´¢µÄ¾ä±ú
+ * æ·»åŠ ä¸€æ¡æ–°çš„æ•°æ®è®°å½•
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
+ * @param data {void*} åº”ç”¨æ•°æ®é¡¹
+ * @param dlen {unsigned int} data çš„æ•°æ®å¤§å°
+ * @param key_labels {const char *[]} æ•°æ®è¡¨å­—æ®µåæ•°ç»„
+ * @param keys {const char *[]} æ•°æ®è¡¨å­—æ®µåå¯¹åº”å€¼æ•°ç»„
+ * @return {ACL_MDB_NOD*} æ–°æ·»åŠ çš„æ•°æ®åœ¨æ•°æ®è¡¨ä¸­å­˜å‚¨çš„å¥æŸ„
  */
 ACL_API ACL_MDT_NOD *acl_mdb_add(ACL_MDB *mdb, const char *tbl_name,
 	void *data, unsigned int dlen,
 	const char *key_labels[], const char *keys[]);
 
 /**
- * Ì½²âÊı¾İ±íÖĞ¶ÔÓ¦µÄ×Ö¶ÎÖµÊÇ·ñ´æÔÚ
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
- * @param key_label {const char*} Êı¾İ±íË÷Òı×Ö¶ÎÃû
- * @param key {const char*} Êı¾İ±íË÷Òı×Ö¶Î¼üÖµ
- * @return {int} 0: ²»´æÔÚ, != 0: ´æÔÚ
+ * æ¢æµ‹æ•°æ®è¡¨ä¸­å¯¹åº”çš„å­—æ®µå€¼æ˜¯å¦å­˜åœ¨
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
+ * @param key_label {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µå
+ * @param key {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µé”®å€¼
+ * @return {int} 0: ä¸å­˜åœ¨, != 0: å­˜åœ¨
  */
 ACL_API int acl_mdb_probe(ACL_MDB *mdb, const char *tbl_name,
 	const char *key_label, const char *key);
 
 /**
- * ´ÓÊı¾İ¿âÖĞ²éÑ¯·ûºÏÌõ¼şµÄ½á¹û¼¯
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
- * @param key_label {const char*} Êı¾İ±íÖĞµÄ×Ö¶ÎÃû
- * @param key {const char*} Êı¾İ±íÖĞµÄ×Ö¶ÎÖµ
- * @param from {int} ²éÑ¯µÄ½á¹ûÏ£ÍûÊÇ´Ó¸ÃÎ»ÖÃ¿ªÊ¼½øĞĞ´æ´¢
- * @param limit {int} ²éÑ¯µÄ½á¹ûµÄ×î´óÏ£Íû¸öÊı
- * @return {ACL_MDT_RES*} ²éÑ¯½á¹û¼¯£¬Èç¹ûÎª¿ÕÔò±íÃ÷²éÑ¯½á¹ûÎª¿Õ»ò³ö´í
+ * ä»æ•°æ®åº“ä¸­æŸ¥è¯¢ç¬¦åˆæ¡ä»¶çš„ç»“æœé›†
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
+ * @param key_label {const char*} æ•°æ®è¡¨ä¸­çš„å­—æ®µå
+ * @param key {const char*} æ•°æ®è¡¨ä¸­çš„å­—æ®µå€¼
+ * @param from {int} æŸ¥è¯¢çš„ç»“æœå¸Œæœ›æ˜¯ä»è¯¥ä½ç½®å¼€å§‹è¿›è¡Œå­˜å‚¨
+ * @param limit {int} æŸ¥è¯¢çš„ç»“æœçš„æœ€å¤§å¸Œæœ›ä¸ªæ•°
+ * @return {ACL_MDT_RES*} æŸ¥è¯¢ç»“æœé›†ï¼Œå¦‚æœä¸ºç©ºåˆ™è¡¨æ˜æŸ¥è¯¢ç»“æœä¸ºç©ºæˆ–å‡ºé”™
  */
 ACL_API ACL_MDT_RES *acl_mdb_find(ACL_MDB *mdb, const char *tbl_name,
 	const char *key_label, const char *key, int from, int limit);
 
 /**
- * ´ÓÊı¾İ¿âÖĞÁĞ³öÄ³Êı¾İ±íÖĞÄ³¸ö·¶Î§µÄ½á¹û¼¯
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
- * @param from {int} ²éÑ¯µÄ½á¹ûÏ£ÍûÊÇ´Ó¸ÃÎ»ÖÃ¿ªÊ¼½øĞĞ´æ´¢
- * @param limit {int} ²éÑ¯µÄ½á¹ûµÄ×î´óÏ£Íû¸öÊı
- * @return {ACL_MDT_RES*} ²éÑ¯½á¹û¼¯£¬Èç¹ûÎª¿ÕÔò±íÃ÷²éÑ¯½á¹ûÎª¿Õ»ò³ö´í
+ * ä»æ•°æ®åº“ä¸­åˆ—å‡ºæŸæ•°æ®è¡¨ä¸­æŸä¸ªèŒƒå›´çš„ç»“æœé›†
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
+ * @param from {int} æŸ¥è¯¢çš„ç»“æœå¸Œæœ›æ˜¯ä»è¯¥ä½ç½®å¼€å§‹è¿›è¡Œå­˜å‚¨
+ * @param limit {int} æŸ¥è¯¢çš„ç»“æœçš„æœ€å¤§å¸Œæœ›ä¸ªæ•°
+ * @return {ACL_MDT_RES*} æŸ¥è¯¢ç»“æœé›†ï¼Œå¦‚æœä¸ºç©ºåˆ™è¡¨æ˜æŸ¥è¯¢ç»“æœä¸ºç©ºæˆ–å‡ºé”™
  */
 ACL_API ACL_MDT_RES *acl_mdb_list(ACL_MDB *mdb, const char *tbl_name,
 	int from, int limit);
 
 /**
- * ´ÓÊı¾İ¿âÖĞÉ¾³ıÒ»ÌõÊı¾İ¼ÇÂ¼
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
- * @param key_label {const char*} Êı¾İ±í×Ö¶ÎÃû
- * @param key {const char*} Êı¾İ±í×Ö¶ÎÖµ
+ * ä»æ•°æ®åº“ä¸­åˆ é™¤ä¸€æ¡æ•°æ®è®°å½•
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
+ * @param key_label {const char*} æ•°æ®è¡¨å­—æ®µå
+ * @param key {const char*} æ•°æ®è¡¨å­—æ®µå€¼
  * @param onfree_fn {void (*)(void*, unsigned int)}
-  *	ÊÍ·ÅÓÃ»§µÄ¶ÔÏóÊ±µ÷ÓÃµÄÊÍ·Å»Øµ÷º¯Êı
- * @return {int} É¾³ıµÄĞĞÊıÁ¿
+  *	é‡Šæ”¾ç”¨æˆ·çš„å¯¹è±¡æ—¶è°ƒç”¨çš„é‡Šæ”¾å›è°ƒå‡½æ•°
+ * @return {int} åˆ é™¤çš„è¡Œæ•°é‡
  */
 ACL_API int acl_mdb_del(ACL_MDB *mdb, const char *tbl_name,
 	const char *key_label, const char *key,
 	void (*onfree_fn)(void*, unsigned int));
 
 /**
- * ±éÀúÊı¾İ¿âÖĞÄ³¸öÊı¾İ±íµÄËùÓĞÊı¾İ½áµã
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
- * @param walk_fn ±éÀú»Øµ÷º¯Êı£¬Èç¹û¸Ãº¯Êı·µ»Ø·Ç0Öµ£¬ÔòÍ£Ö¹±éÀú
- * @param from {int} ²éÑ¯µÄ½á¹ûÏ£ÍûÊÇ´Ó¸ÃÎ»ÖÃ¿ªÊ¼½øĞĞ´æ´¢
- * @param limit {int} ²éÑ¯µÄ½á¹ûµÄ×î´óÏ£Íû¸öÊı
- * @return {int} ±éÀúµÄÊı¾İ½áµãÊıÖµ
+ * éå†æ•°æ®åº“ä¸­æŸä¸ªæ•°æ®è¡¨çš„æ‰€æœ‰æ•°æ®ç»“ç‚¹
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
+ * @param walk_fn éå†å›è°ƒå‡½æ•°ï¼Œå¦‚æœè¯¥å‡½æ•°è¿”å›é0å€¼ï¼Œåˆ™åœæ­¢éå†
+ * @param from {int} æŸ¥è¯¢çš„ç»“æœå¸Œæœ›æ˜¯ä»è¯¥ä½ç½®å¼€å§‹è¿›è¡Œå­˜å‚¨
+ * @param limit {int} æŸ¥è¯¢çš„ç»“æœçš„æœ€å¤§å¸Œæœ›ä¸ªæ•°
+ * @return {int} éå†çš„æ•°æ®ç»“ç‚¹æ•°å€¼
  */
 ACL_API int acl_mdb_walk(ACL_MDB *mdb, const char *tbl_name,
 	int (*walk_fn)(const void*, unsigned int),
 	int from, int limit);
 
 /**
- * Êı¾İ¿âÖĞÄ³¸öÊı¾İ±íÖĞÔªËØ×Ü¸öÊı
- * @param mdb {ACL_MDB*} Êı¾İ¿â¾ä±ú
- * @param tbl_name {const char*} Êı¾İ±íÃû
+ * æ•°æ®åº“ä¸­æŸä¸ªæ•°æ®è¡¨ä¸­å…ƒç´ æ€»ä¸ªæ•°
+ * @param mdb {ACL_MDB*} æ•°æ®åº“å¥æŸ„
+ * @param tbl_name {const char*} æ•°æ®è¡¨å
  * @return {int} >=0
  */
 ACL_API int acl_mdb_cnt(ACL_MDB *mdb, const char *tbl_name);
@@ -146,114 +146,114 @@ ACL_API int acl_mdb_cnt(ACL_MDB *mdb, const char *tbl_name);
 /************************************************************************/
 
 /**
- * ´´½¨Ò»¸öÊı¾İ±í
- * @param dbtype {const char *} ±íÀàĞÍ: hash/avl
- * @param tbl_name {const char*} ±íÃû
- * @param tlb_flag {unsigned int} ±íµÄÊôĞÔ±êÖ¾Î»
- * @param init_capacity {size_t} Ã¿¸öÄÚ²¿¹şÏ£±íµÄ³õÊ¼»¯ÈİÁ¿
- * @param key_labels {const char *[]} ±íÖĞµÄ¸÷¸ö×Ö¶ÎÃûÊı×é£¬×îºóÒÔNULL½áÊø
- * @param flags {unsigned int[]} Óë key_labels Ïà¶ÔÓ¦µÄÔ¼Êø±êÖ¾Î»
- * @return {ACL_MDT*} ĞÂ½¨µÄÊı¾İ±íµÄ¾ä±ú
+ * åˆ›å»ºä¸€ä¸ªæ•°æ®è¡¨
+ * @param dbtype {const char *} è¡¨ç±»å‹: hash/avl
+ * @param tbl_name {const char*} è¡¨å
+ * @param tlb_flag {unsigned int} è¡¨çš„å±æ€§æ ‡å¿—ä½
+ * @param init_capacity {size_t} æ¯ä¸ªå†…éƒ¨å“ˆå¸Œè¡¨çš„åˆå§‹åŒ–å®¹é‡
+ * @param key_labels {const char *[]} è¡¨ä¸­çš„å„ä¸ªå­—æ®µåæ•°ç»„ï¼Œæœ€åä»¥NULLç»“æŸ
+ * @param flags {unsigned int[]} ä¸ key_labels ç›¸å¯¹åº”çš„çº¦æŸæ ‡å¿—ä½
+ * @return {ACL_MDT*} æ–°å»ºçš„æ•°æ®è¡¨çš„å¥æŸ„
  */
 ACL_API ACL_MDT *acl_mdt_create(const char *dbtype, const char *tbl_name,
 	unsigned int tbl_flag, size_t init_capacity,
 	const char *key_labels[], unsigned int flags[]);
 
 /**
- * ÊÍ·ÅÒ»¸öÄÚ´æ±í
- * @param mdt {ACL_MDT*} ÄÚ´æÊı¾İ±í¾ä±ú
+ * é‡Šæ”¾ä¸€ä¸ªå†…å­˜è¡¨
+ * @param mdt {ACL_MDT*} å†…å­˜æ•°æ®è¡¨å¥æŸ„
  */
 ACL_API void acl_mdt_free(ACL_MDT *mdt);
 
 /**
- * ÏòÊı¾İ±íÖĞÌí¼ÓÒ»ÌõĞÂµÄÊı¾İ¼ÇÂ¼
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param data {void*} ÓÃ»§µÄ¶¯Ì¬Êı¾İ, Èç¹û±íµÄ ACL_MDT_FLAG_DMR ±êÖ¾Î»
- *  Î´±»ÉèÖÃ£¬Ôò½«ÔÚÄÚ²¿¿½±´Ò»·İ¸Ã¶¯Ì¬Êı¾İ
- * @param dlen {unsigned int} data µÄÊı¾İ³¤¶È
- * @param key_labels {const char*[]} Êı¾İ±íµÄË÷Òı×Ö¶ÎÃûÊı×é£¬ÒÔNULL½áÊø
- * @param keys {const char*[]} Êı¾İ±íµÄË÷Òı×Ö¶ÎÖµÊı×é£¬ÒÔNULL½áÊø
- * @return {ACL_MDT_NOD*} ĞÂÌí¼ÓµÄÊı¾İ½áµã¶ÔÏó
+ * å‘æ•°æ®è¡¨ä¸­æ·»åŠ ä¸€æ¡æ–°çš„æ•°æ®è®°å½•
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param data {void*} ç”¨æˆ·çš„åŠ¨æ€æ•°æ®, å¦‚æœè¡¨çš„ ACL_MDT_FLAG_DMR æ ‡å¿—ä½
+ *  æœªè¢«è®¾ç½®ï¼Œåˆ™å°†åœ¨å†…éƒ¨æ‹·è´ä¸€ä»½è¯¥åŠ¨æ€æ•°æ®
+ * @param dlen {unsigned int} data çš„æ•°æ®é•¿åº¦
+ * @param key_labels {const char*[]} æ•°æ®è¡¨çš„ç´¢å¼•å­—æ®µåæ•°ç»„ï¼Œä»¥NULLç»“æŸ
+ * @param keys {const char*[]} æ•°æ®è¡¨çš„ç´¢å¼•å­—æ®µå€¼æ•°ç»„ï¼Œä»¥NULLç»“æŸ
+ * @return {ACL_MDT_NOD*} æ–°æ·»åŠ çš„æ•°æ®ç»“ç‚¹å¯¹è±¡
  */
 ACL_API ACL_MDT_NOD *acl_mdt_add(ACL_MDT *mdt, void *data,
 	unsigned int dlen, const char *key_labels[], const char *keys[]);
 
 /**
- * Ì½²âÊı¾İ±íÖĞ¶ÔÓ¦µÄ×Ö¶ÎÖµÊÇ·ñ´æÔÚ
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param key_label {const char*} Êı¾İ±íË÷Òı×Ö¶ÎÃû
- * @param key {const char*} Êı¾İ±íË÷Òı×Ö¶Î¼üÖµ
- * @return {int} 0: ²»´æÔÚ, != 0: ´æÔÚ
+ * æ¢æµ‹æ•°æ®è¡¨ä¸­å¯¹åº”çš„å­—æ®µå€¼æ˜¯å¦å­˜åœ¨
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param key_label {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µå
+ * @param key {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µé”®å€¼
+ * @return {int} 0: ä¸å­˜åœ¨, != 0: å­˜åœ¨
  */
 ACL_API int acl_mdt_probe(ACL_MDT *mdt, const char *key_label, const char *key);
 
 /**
- * ´ÓÊı¾İ±íÖĞ²éÑ¯Ä³¸öÊı¾İ±íË÷Òı¼üÖµµÄ½á¹û¼¯ºÏ
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param key_label {const char*} Êı¾İ±íË÷Òı×Ö¶ÎÃû
- * @param key {const char*} Êı¾İ±íË÷Òı×Ö¶Î¼üÖµ
- * @param from {int} ²éÑ¯µÄ½á¹ûÏ£ÍûÊÇ´Ó¸ÃÎ»ÖÃ¿ªÊ¼½øĞĞ´æ´¢
- * @param limit {int} ²éÑ¯µÄ½á¹ûµÄ×î´óÏ£Íû¸öÊı
- * @return {ACL_MDT_REC*} ¶ÔÓ¦Ä³¸öË÷Òı×Ö¶ÎÖµµÄ½á¹û¼¯ºÏ
+ * ä»æ•°æ®è¡¨ä¸­æŸ¥è¯¢æŸä¸ªæ•°æ®è¡¨ç´¢å¼•é”®å€¼çš„ç»“æœé›†åˆ
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param key_label {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µå
+ * @param key {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µé”®å€¼
+ * @param from {int} æŸ¥è¯¢çš„ç»“æœå¸Œæœ›æ˜¯ä»è¯¥ä½ç½®å¼€å§‹è¿›è¡Œå­˜å‚¨
+ * @param limit {int} æŸ¥è¯¢çš„ç»“æœçš„æœ€å¤§å¸Œæœ›ä¸ªæ•°
+ * @return {ACL_MDT_REC*} å¯¹åº”æŸä¸ªç´¢å¼•å­—æ®µå€¼çš„ç»“æœé›†åˆ
  */
 ACL_API ACL_MDT_RES *acl_mdt_find(ACL_MDT *mdt, const char *key_label,
 	const char *key, int from, int limit);
 
 /**
- * ´ÓÊı¾İ±íÖĞË³ĞòÁĞ³öÄ³¸ö·¶Î§ÄÚµÄËùÓĞÊı¾İ½áµã¼¯ºÏ
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param from {int} ²éÑ¯µÄ½á¹ûÏ£ÍûÊÇ´Ó¸ÃÎ»ÖÃ¿ªÊ¼½øĞĞ´æ´¢
- * @param limit {int} ²éÑ¯µÄ½á¹ûµÄ×î´óÏ£Íû¸öÊı
- * @return {ACL_MDT_REC*} ¶ÔÓ¦Ä³¸öË÷Òı×Ö¶ÎÖµµÄ½á¹û¼¯ºÏ
+ * ä»æ•°æ®è¡¨ä¸­é¡ºåºåˆ—å‡ºæŸä¸ªèŒƒå›´å†…çš„æ‰€æœ‰æ•°æ®ç»“ç‚¹é›†åˆ
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param from {int} æŸ¥è¯¢çš„ç»“æœå¸Œæœ›æ˜¯ä»è¯¥ä½ç½®å¼€å§‹è¿›è¡Œå­˜å‚¨
+ * @param limit {int} æŸ¥è¯¢çš„ç»“æœçš„æœ€å¤§å¸Œæœ›ä¸ªæ•°
+ * @return {ACL_MDT_REC*} å¯¹åº”æŸä¸ªç´¢å¼•å­—æ®µå€¼çš„ç»“æœé›†åˆ
  */
 ACL_API ACL_MDT_RES *acl_mdt_list(ACL_MDT *mdt, int from, int limit);
 
 /**
- * ´ÓÊı¾İ±íÖĞÉ¾³ı¶ÔÓ¦Ä³¸öË÷Òı×Ö¶Î¼üÖµµÄ½á¹û¼¯ºÏ
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param key_label {const char*} Êı¾İ±íË÷Òı×Ö¶ÎÃû
- * @param key {const char*} Êı¾İ±íË÷Òı×Ö¶Î¼üÖµ
+ * ä»æ•°æ®è¡¨ä¸­åˆ é™¤å¯¹åº”æŸä¸ªç´¢å¼•å­—æ®µé”®å€¼çš„ç»“æœé›†åˆ
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param key_label {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µå
+ * @param key {const char*} æ•°æ®è¡¨ç´¢å¼•å­—æ®µé”®å€¼
  * @param onfree_fn {void (*)(void*, unsigned int}
- *	ÓÃ»§ÓÃÀ´ÊÍ·Å¶¯Ì¬Êı¾İµÄ»Øµ÷º¯Êı
- * @return {int} ËùÊÍ·ÅµÄÊı¾İ½áµãµÄÊıÄ¿
+ *	ç”¨æˆ·ç”¨æ¥é‡Šæ”¾åŠ¨æ€æ•°æ®çš„å›è°ƒå‡½æ•°
+ * @return {int} æ‰€é‡Šæ”¾çš„æ•°æ®ç»“ç‚¹çš„æ•°ç›®
  */
 ACL_API int acl_mdt_delete(ACL_MDT *mdt, const char *key_label,
 	const char *key, void (*onfree_fn)(void*, unsigned int));
 
 /**
- * ±éÀúÊı¾İ±íµÄËùÓĞÊı¾İ½áµã£¬²¢»Øµ÷ÓÃ»§µÄ´¦Àíº¯Êı
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param walk_fn »Øµ÷º¯Êı£¬Èç¹û·µ»Ø0Ôò¼ÌĞø£¬·ñÔòÍ£Ö¹±éÀú
- * @param from {int} ²éÑ¯µÄ½á¹ûÏ£ÍûÊÇ´Ó¸ÃÎ»ÖÃ¿ªÊ¼½øĞĞ´æ´¢
- * @param len {int} ²éÑ¯µÄ½á¹ûµÄ×î´óÏ£Íû¸öÊı
- * @return {int} Ëù±éÀúµÄÊı¾İ³¤¶È
+ * éå†æ•°æ®è¡¨çš„æ‰€æœ‰æ•°æ®ç»“ç‚¹ï¼Œå¹¶å›è°ƒç”¨æˆ·çš„å¤„ç†å‡½æ•°
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param walk_fn å›è°ƒå‡½æ•°ï¼Œå¦‚æœè¿”å›0åˆ™ç»§ç»­ï¼Œå¦åˆ™åœæ­¢éå†
+ * @param from {int} æŸ¥è¯¢çš„ç»“æœå¸Œæœ›æ˜¯ä»è¯¥ä½ç½®å¼€å§‹è¿›è¡Œå­˜å‚¨
+ * @param len {int} æŸ¥è¯¢çš„ç»“æœçš„æœ€å¤§å¸Œæœ›ä¸ªæ•°
+ * @return {int} æ‰€éå†çš„æ•°æ®é•¿åº¦
  */
 ACL_API int acl_mdt_walk(ACL_MDT *mdt, int (*walk_fn)(const void*, unsigned int),
 	int from, int len);
 
 /**
- * ´ÓËù²éÑ¯µÄ½á¹û¼¯ºÏÖĞ»ñÈ¡ÏÂÒ»¸öÊı¾İ½á¹û
- * @param res {ACL_MDT_RES*} Êı¾İ½á¹û¼¯ºÏ
- * @return {void*} ÓÃ»§×Ô¼ºÄÜ¹»Ê¶±ğµÄ¶¯Ì¬Êı¾İ£¬Èô·µ»ØNULL±íÊ¾³ö´í»òÒÑ¾­Ã»ÓĞÊı¾İ
+ * ä»æ‰€æŸ¥è¯¢çš„ç»“æœé›†åˆä¸­è·å–ä¸‹ä¸€ä¸ªæ•°æ®ç»“æœ
+ * @param res {ACL_MDT_RES*} æ•°æ®ç»“æœé›†åˆ
+ * @return {void*} ç”¨æˆ·è‡ªå·±èƒ½å¤Ÿè¯†åˆ«çš„åŠ¨æ€æ•°æ®ï¼Œè‹¥è¿”å›NULLè¡¨ç¤ºå‡ºé”™æˆ–å·²ç»æ²¡æœ‰æ•°æ®
  */
 ACL_API const void *acl_mdt_fetch_row(ACL_MDT_RES *res);
 
 /**
- * »ñµÃ²éÑ¯½á¹û¼¯ÖĞµÄ¼ÇÂ¼Êı
- * @param res {ACL_MDT_RES*} Êı¾İ½á¹û¼¯ºÏ
- * @return {int} 0: ½á¹û¼¯Îª¿Õ; > 0: ½á¹û¼¯²»Îª¿Õ
+ * è·å¾—æŸ¥è¯¢ç»“æœé›†ä¸­çš„è®°å½•æ•°
+ * @param res {ACL_MDT_RES*} æ•°æ®ç»“æœé›†åˆ
+ * @return {int} 0: ç»“æœé›†ä¸ºç©º; > 0: ç»“æœé›†ä¸ä¸ºç©º
  */
 ACL_API int acl_mdt_row_count(ACL_MDT_RES *res);
 
 /**
- * ÊÍ·Å²éÑ¯½á¹û¶¯Ì¬ÄÚ´æ£¬µ«²¢²»ÊÍ·ÅÊµ¼ÊµÄÊı¾İ½áµã
- * @param res {ACL_MDT_RES*} Êı¾İ½á¹û¼¯ºÏ
+ * é‡Šæ”¾æŸ¥è¯¢ç»“æœåŠ¨æ€å†…å­˜ï¼Œä½†å¹¶ä¸é‡Šæ”¾å®é™…çš„æ•°æ®ç»“ç‚¹
+ * @param res {ACL_MDT_RES*} æ•°æ®ç»“æœé›†åˆ
  */
 ACL_API void acl_mdt_res_free(ACL_MDT_RES *res);
 
 /**
- * Êı¾İ±íÖĞËùÓĞÔªËØµÄ×ÜÊı
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
+ * æ•°æ®è¡¨ä¸­æ‰€æœ‰å…ƒç´ çš„æ€»æ•°
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
  * @return {int} >=0
  */
 ACL_API int acl_mdt_cnt(ACL_MDT *mdt);

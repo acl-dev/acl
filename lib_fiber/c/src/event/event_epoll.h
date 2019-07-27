@@ -1,4 +1,4 @@
-#ifndef EVENT_EPOLL_INCLUDE_H
+﻿#ifndef EVENT_EPOLL_INCLUDE_H
 #define EVENT_EPOLL_INCLUDE_H
 
 #include "event.h"

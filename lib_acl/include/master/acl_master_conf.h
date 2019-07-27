@@ -1,4 +1,4 @@
-#ifndef	ACL_MASTER_CONF_INCLUDE_H
+﻿#ifndef	ACL_MASTER_CONF_INCLUDE_H
 #define	ACL_MASTER_CONF_INCLUDE_H
 
 #include "../stdlib/acl_define.h"

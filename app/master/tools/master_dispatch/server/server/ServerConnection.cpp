@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "server/ServerIOCallback.h"
 #include "server/ServerConnection.h"
 
@@ -17,14 +17,14 @@ ServerConnection::ServerConnection(acl::aio_socket_stream* conn)
 
 void ServerConnection::run()
 {
-	// ´´½¨·şÎñ¶ËÁ¬½Ó IO ´¦ÀíµÄ»Øµ÷´¦Àí¶ÔÏó
+	// åˆ›å»ºæœåŠ¡ç«¯è¿æ¥ IO å¤„ç†çš„å›è°ƒå¤„ç†å¯¹è±¡
 	ServerIOCallback* callback = new ServerIOCallback(this);
 
 	conn_->add_read_callback(callback);
 	conn_->add_close_callback(callback);
 	conn_->add_timeout_callback(callback);
 
-	// Òì²½´Ó·şÎñ¶Ë»ñÈ¡Ò»ĞĞÊı¾İ
+	// å¼‚æ­¥ä»æœåŠ¡ç«¯è·å–ä¸€è¡Œæ•°æ®
 	conn_->gets();
 }
 

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -67,7 +67,7 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	
 	astream->aio = aio;
 	astream->stream = stream;
-	stream->rw_timeout = 0; /* ·ÀÖ¹ÔÚ¶ÁÊ±×èÈû */
+	stream->rw_timeout = 0; /* é˜²æ­¢åœ¨è¯»æ—¶é˜»å¡ž */
 
 	acl_vstring_init(&astream->strbuf, __default_line_length);
 	astream->timeout = 0;
@@ -80,7 +80,7 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	astream->read_ready_fn = NULL;
 	astream->count = 0;
 	astream->line_length = 0;
-	astream->keep_read = aio->keep_read;  /* ¼Ì³ÐÒì²½¾ä±úµÄ³ÖÐø¶Á±êÖ¾ */
+	astream->keep_read = aio->keep_read;  /* ç»§æ‰¿å¼‚æ­¥å¥æŸ„çš„æŒç»­è¯»æ ‡å¿— */
 
 	/* just for listen fd */
 	if ((stream->type & ACL_VSTREAM_TYPE_LISTEN)) {
@@ -185,7 +185,7 @@ static void close_astream(ACL_ASTREAM *astream)
 	}
 	acl_aio_clean_hooks(astream);
 
-	/* bugfix: ÔÚ acl_aio_clean_hooks ÖÐ²¢²»»áÊÍ·ÅÊý×é¶ÔÏó --zsx, 2012.7.2 */
+	/* bugfix: åœ¨ acl_aio_clean_hooks ä¸­å¹¶ä¸ä¼šé‡Šæ”¾æ•°ç»„å¯¹è±¡ --zsx, 2012.7.2 */
 	acl_array_destroy(astream->read_handles, NULL);
 	acl_array_destroy(astream->write_handles, NULL);
 	acl_array_destroy(astream->close_handles, NULL);
@@ -198,9 +198,9 @@ static void close_astream(ACL_ASTREAM *astream)
 static void aio_delay_close(ACL_ASTREAM *astream)
 {
 	if (astream->nrefer > 0) {
-		/* Èç¹û¸ÃÒì²½Á÷¶ÔÏóµÄÒýÓÃ¼ÆÊý´óÓÚ0£¬ÔòÖ»ÐèÒªÖÃ±êÖ¾Î» */
+		/* å¦‚æžœè¯¥å¼‚æ­¥æµå¯¹è±¡çš„å¼•ç”¨è®¡æ•°å¤§äºŽ0ï¼Œåˆ™åªéœ€è¦ç½®æ ‡å¿—ä½ */
 		astream->flag |= ACL_AIO_FLAG_IOCP_CLOSE;
-		/* ·ÅÔÚÑÓ³Ù¹Ø±Õ¶ÓÁÐÖÐ */
+		/* æ”¾åœ¨å»¶è¿Ÿå…³é—­é˜Ÿåˆ—ä¸­ */
 		if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE) == 0) {
 			astream->aio->dead_streams->push_back(
 				astream->aio->dead_streams, astream);
@@ -208,7 +208,7 @@ static void aio_delay_close(ACL_ASTREAM *astream)
 		}
 		return;
 	} else if (astream->stream == NULL) {
-		/* ÐèÒª¹Ø±Õ¸ÃÒì²½Á÷¶ÔÏó */
+		/* éœ€è¦å…³é—­è¯¥å¼‚æ­¥æµå¯¹è±¡ */
 		aio_close_callback(astream);
 		close_astream(astream);
 		return;
@@ -220,7 +220,7 @@ static void aio_delay_close(ACL_ASTREAM *astream)
 	aio_close_callback(astream);
 	astream->nrefer--;
 
-	/* ÕæÕý¹Ø±ÕÒì²½Á÷ */
+	/* çœŸæ­£å…³é—­å¼‚æ­¥æµ */
 	close_astream(astream);
 }
 
@@ -315,7 +315,7 @@ static void init_thread_aio(void)
 
 #endif  /* ACL_WINDOWS */
 
-/* ¸Ãº¯Êý·Ç³£¹Ø¼ü£¬²ÉÓÃµÄIOÍê³ÉÊ±²Å¹Ø±ÕµÄ²ßÂÔ£¬·ÀÖ¹ÖØ¸´¹Ø±Õ */
+/* è¯¥å‡½æ•°éžå¸¸å…³é”®ï¼Œé‡‡ç”¨çš„IOå®Œæˆæ—¶æ‰å…³é—­çš„ç­–ç•¥ï¼Œé˜²æ­¢é‡å¤å…³é—­ */
 void acl_aio_iocp_close(ACL_ASTREAM *astream)
 {
 	const char *myname = "acl_aio_iocp_close";
@@ -337,7 +337,7 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 			acl_msg_fatal("%s(%d): flag: %d, size: %d",
 				myname, __LINE__, astream->flag, iter.size);
 	}
-	/* ·ÅÔÚÑÓ³Ù¹Ø±Õ¶ÓÁÐÖÐ */
+	/* æ”¾åœ¨å»¶è¿Ÿå…³é—­é˜Ÿåˆ—ä¸­ */
 	aio->dead_streams->push_back(aio->dead_streams, astream);
 	astream->flag |= ACL_AIO_FLAG_DELAY_CLOSE;
 	aio_disable_readwrite(aio, astream);

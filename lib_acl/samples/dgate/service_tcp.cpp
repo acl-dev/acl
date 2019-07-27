@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "service_main.h"
 
 static int respond_data_callback(ACL_ASTREAM *astream acl_unused,
@@ -107,7 +107,7 @@ static int request_data_callback(ACL_ASTREAM *astream acl_unused, void *context,
 	}
 
 	respond_ctx = service_ctx_new(service, server,
-		SERVICE_CTX_TCP_RESPOND, request_ctx->id);  // ÓëÇëÇó¶Ë¹²ÏíÍ¬Ò»ID
+		SERVICE_CTX_TCP_RESPOND, request_ctx->id);  // ä¸è¯·æ±‚ç«¯å…±äº«åŒä¸€ID
 	memcpy(respond_ctx->request_buf, data, len);
 	respond_ctx->request_len = len;
 	acl_aio_ctl(server,
@@ -158,5 +158,5 @@ void service_tcp_main(ACL_ASTREAM *client, SERVICE *service)
 		ACL_AIO_CTL_TIMEOUT, service->rw_timeout,
 		ACL_AIO_CTL_CTX, ctx,
 		ACL_AIO_CTL_END);
-	acl_aio_readn(client, 2);  // ¶ÁÈ¡Á½¸ö×Ö½Ú
+	acl_aio_readn(client, 2);  // è¯»å–ä¸¤ä¸ªå­—èŠ‚
 }

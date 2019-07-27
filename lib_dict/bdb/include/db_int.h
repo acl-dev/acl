@@ -1,4 +1,4 @@
-/* DO NOT EDIT: automatically built by dist/s_win32. */
+﻿/* DO NOT EDIT: automatically built by dist/s_win32. */
 /*-
  * See the file LICENSE for redistribution information.
  *

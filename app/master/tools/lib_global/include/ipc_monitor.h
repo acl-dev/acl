@@ -1,4 +1,4 @@
-class ipc_monitor : public acl::thread
+﻿class ipc_monitor : public acl::thread
 {
 public:
 	ipc_monitor(acl::tcp_ipc& ipc, int ttl, bool& service_exit);

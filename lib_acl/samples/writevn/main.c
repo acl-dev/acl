@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+﻿#include "lib_acl.h"
 
 static void usage(const char *proc)
 {
@@ -53,7 +53,7 @@ int   main(int argc, char *argv[])
 		return 1;
 	}
 
-	/* 连接服务器 */
+	/* 杩炴帴鏈嶅姟鍣� */
 	client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
 	if (client == NULL) {
 		printf("connect %s error %s\r\n", addr, acl_last_serror());

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include <stdarg.h>
 
@@ -49,42 +49,42 @@ class ACL_CPP_API log
 {
 public:
 	/**
-	 * ´ò¿ªÈÕÖ¾ÎÄ¼ş, ÔÚ³ÌĞò³õÊ¼»¯Àïµ÷ÓÃ±¾º¯ÊıÒ»´Î
-	 * @param recipients {const char*} ÈÕÖ¾½ÓÊÕÆ÷ÁĞ±í£¬ÓÉ "|" ·Ö¸ô£¬½ÓÊÕÆ÷
-	 *  ¿ÉÒÔÊÇ±¾µØÎÄ¼ş»òÔ¶³ÌÌ×½Ó¿Ú£¬Èç:
+	 * æ‰“å¼€æ—¥å¿—æ–‡ä»¶, åœ¨ç¨‹åºåˆå§‹åŒ–é‡Œè°ƒç”¨æœ¬å‡½æ•°ä¸€æ¬¡
+	 * @param recipients {const char*} æ—¥å¿—æ¥æ”¶å™¨åˆ—è¡¨ï¼Œç”± "|" åˆ†éš”ï¼Œæ¥æ”¶å™¨
+	 *  å¯ä»¥æ˜¯æœ¬åœ°æ–‡ä»¶æˆ–è¿œç¨‹å¥—æ¥å£ï¼Œå¦‚:
 	 *  /tmp/test.log|UDP:127.0.0.1:12345|TCP:127.0.0.1:12345|UNIX:/tmp/test.sock
-	 *  ¸ÃÅäÖÃÒªÇó½«ËùÓĞÈÕÖ¾Í¬Ê±·¢¸ø /tmp/test.log, UDP:127.0.0.1:12345,
-	 *  TCP:127.0.0.1:12345 ºÍ UNIX:/tmp/test.sock ËÄ¸öÈÕÖ¾½ÓÊÕÆ÷¶ÔÏó
-	 * @param procname ³ÌĞòÃû, Èç: test
-	 * @param cfg µ÷ÊÔÈÕÖ¾ÅäÖÃ, ¸ñÊ½Îª: {section}:{level}; {section}:{level}; ...
-	 *  Èç: 100:2; 101:3; 102: 4, ±íÊ¾Ö»¼ÇÂ¼±êÊ¶Îª 100/¼¶±ğ < 2,
-	 *  ÒÔ¼°±êÊ¶Îª 101/¼¶±ğ < 3, ÒÔ¼°±êÊ¶Îª 102/¼¶±ğ < 4 µÄÈÕÖ¾Ïî
+	 *  è¯¥é…ç½®è¦æ±‚å°†æ‰€æœ‰æ—¥å¿—åŒæ—¶å‘ç»™ /tmp/test.log, UDP:127.0.0.1:12345,
+	 *  TCP:127.0.0.1:12345 å’Œ UNIX:/tmp/test.sock å››ä¸ªæ—¥å¿—æ¥æ”¶å™¨å¯¹è±¡
+	 * @param procname ç¨‹åºå, å¦‚: test
+	 * @param cfg è°ƒè¯•æ—¥å¿—é…ç½®, æ ¼å¼ä¸º: {section}:{level}; {section}:{level}; ...
+	 *  å¦‚: 100:2; 101:3; 102: 4, è¡¨ç¤ºåªè®°å½•æ ‡è¯†ä¸º 100/çº§åˆ« < 2,
+	 *  ä»¥åŠæ ‡è¯†ä¸º 101/çº§åˆ« < 3, ä»¥åŠæ ‡è¯†ä¸º 102/çº§åˆ« < 4 çš„æ—¥å¿—é¡¹
 	 */
 	static void open(const char* recipients, const char* procname = "unknown",
 		const char* cfg = NULL);
 
 	/**
-	 * ³ÌĞòÍË³öÇ°µ÷ÓÃ´Ëº¯Êı¹Ø±ÕÈÕÖ¾
+	 * ç¨‹åºé€€å‡ºå‰è°ƒç”¨æ­¤å‡½æ•°å…³é—­æ—¥å¿—
 	 */
 	static void close(void);
 
 	/**
-	 * ³õÊ¼»¯ÈÕÖ¾µ÷ÊÔµ÷ÓÃ½Ó¿Ú
-	 * @param cfg {const char*} µ÷ÊÔ±êÇ©¼°¼¶±ğ×Ö·û´®, ¸ñÊ½ÈçÏÂ:
+	 * åˆå§‹åŒ–æ—¥å¿—è°ƒè¯•è°ƒç”¨æ¥å£
+	 * @param cfg {const char*} è°ƒè¯•æ ‡ç­¾åŠçº§åˆ«å­—ç¬¦ä¸², æ ¼å¼å¦‚ä¸‹:
 	 *  {section}:{level}; {section}:{level}; ...
-	 *  Èç: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8... or all:1
+	 *  å¦‚: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8... or all:1
 	 */
 	static void debug_init(const char* cfg);
 
 	/**
-	 * µ±Î´Í¨¹ı open ´ò¿ªÈÕÖ¾Á÷¶øµ÷ÓÃ¼ÇÈÕÖ¾µÈÏà¹Øº¯ÊıÊ±ÊÇ·ñĞèÒª½«ĞÅÏ¢
-	 * Êä³öÖÁ±ê×¼Êä³ö
+	 * å½“æœªé€šè¿‡ open æ‰“å¼€æ—¥å¿—æµè€Œè°ƒç”¨è®°æ—¥å¿—ç­‰ç›¸å…³å‡½æ•°æ—¶æ˜¯å¦éœ€è¦å°†ä¿¡æ¯
+	 * è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 	 * @param onoff {bool}
 	 */
 	static void stdout_open(bool onoff);
 
 	/**
-	 * ÈÕÖ¾¼ÇÂ¼º¯Êı
+	 * æ—¥å¿—è®°å½•å‡½æ•°
 	 */
 
 	static void ACL_CPP_PRINTF(1, 2) msg1(const char* fmt, ...);
@@ -127,7 +127,7 @@ public:
 		const char* fmt, va_list ap);
 
 	/************************************************************************/
-	/*                        Ê¾Àı                                          */
+	/*                        ç¤ºä¾‹                                          */
 	/************************************************************************/
 	static void logger_test1(void)
 	{
@@ -139,12 +139,12 @@ public:
 		const char* logfile = "test.log", *procname = "test";
 		const char* cfg = "101:2; 102:3; 103:2";
 
-		// ÔÚ³ÌĞò³õÊ¼»¯Ê±´ò¿ªÈÕÖ¾
+		// åœ¨ç¨‹åºåˆå§‹åŒ–æ—¶æ‰“å¼€æ—¥å¿—
 		logger_open(logfile, procname, cfg);
 
 #if defined(VC2003) || defined(VC2002) || defined(VC6)
 
-		// »áĞ´ÈÕÖ¾
+		// ä¼šå†™æ—¥å¿—
 
 		logger("%s(%d), %s: %s", __FILE__, __LINE__, __FUNCTION__, "zsx");
 
@@ -155,14 +155,14 @@ public:
 		logger_debug(DEBUG_TEST3, 2, "%s(%d), %s: hello world13(%s)!",
 			__FILE__, __LINE__, __FUNCTION__, "zsx");
 
-		// ²»»áĞ´ÈÕÖ¾
+		// ä¸ä¼šå†™æ—¥å¿—
 
 		logger_debug(DEBUG_TEST1, 3, "%s(%d), %s: hello world21(%s)!",
 			__FILE__, __LINE__, __FUNCTION__, "zsx");
 
 #else	// VC2005, VC2008, VC2010
 
-		// »áĞ´ÈÕÖ¾
+		// ä¼šå†™æ—¥å¿—
 
 		logger("error(%s)!", "zsx");
 
@@ -170,13 +170,13 @@ public:
 		logger_debug(DEBUG_TEST2, 3, "hello world12(%s)!", "zsx");
 		logger_debug(DEBUG_TEST3, 2, "hello world13(%s)!", "zsx");
 
-		// ²»»áĞ´ÈÕÖ¾
+		// ä¸ä¼šå†™æ—¥å¿—
 
 		logger_debug(DEBUG_TEST1, 3, "hello world21(%s)!", "zsx");
 
 #endif
 
-		// ³ÌĞò½áÊøÇ°¹Ø±ÕÈÕÖ¾
+		// ç¨‹åºç»“æŸå‰å…³é—­æ—¥å¿—
 		logger_close();
 	}
 	static void logger_test2(void)

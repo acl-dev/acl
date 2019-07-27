@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../db/db_service.hpp"
@@ -11,26 +11,26 @@ class ACL_CPP_API db_service_sqlite : public db_service
 {
 public:
 	/**
-	 * µ±Îª sqlite Êı¾İ¿âÊ±µÄ¹¹Ôìº¯Êı
-	 * @param dbname {const char*} Êı¾İ¿âÃû
-	 * @param dbfile {const char*} Êı¾İ¿âÎÄ¼şÃû(¶ÔÓÚÒ»Ğ©ÄÚÇ¶Êı¾İ¿âÓĞÓÃ)
-	 * @param dblimit {size_t} Êı¾İ¿âÁ¬½Ó³ØµÄ¸öÊıÏŞÖÆ
-	 * @param nthread {int} ×ÓÏß³Ì³ØµÄ×î´óÏß³ÌÊı
-	 * @param win32_gui {bool} ÊÇ·ñÊÇ´°¿ÚÀàµÄÏûÏ¢£¬Èç¹ûÊÇ£¬ÔòÄÚ²¿µÄ
-	 *  Í¨Ñ¶Ä£Ê½×Ô¶¯ÉèÖÃÎª»ùÓÚ _WIN32 µÄÏûÏ¢£¬·ñÔòÒÀÈ»²ÉÓÃÍ¨ÓÃµÄÌ×½Ó
-	 *  ¿ÚÍ¨Ñ¶·½Ê½
+	 * å½“ä¸º sqlite æ•°æ®åº“æ—¶çš„æ„é€ å‡½æ•°
+	 * @param dbname {const char*} æ•°æ®åº“å
+	 * @param dbfile {const char*} æ•°æ®åº“æ–‡ä»¶å(å¯¹äºä¸€äº›å†…åµŒæ•°æ®åº“æœ‰ç”¨)
+	 * @param dblimit {size_t} æ•°æ®åº“è¿æ¥æ± çš„ä¸ªæ•°é™åˆ¶
+	 * @param nthread {int} å­çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°
+	 * @param win32_gui {bool} æ˜¯å¦æ˜¯çª—å£ç±»çš„æ¶ˆæ¯ï¼Œå¦‚æœæ˜¯ï¼Œåˆ™å†…éƒ¨çš„
+	 *  é€šè®¯æ¨¡å¼è‡ªåŠ¨è®¾ç½®ä¸ºåŸºäº _WIN32 çš„æ¶ˆæ¯ï¼Œå¦åˆ™ä¾ç„¶é‡‡ç”¨é€šç”¨çš„å¥—æ¥
+	 *  å£é€šè®¯æ–¹å¼
 	 */
 	db_service_sqlite(const char* dbname, const char* dbfile,
 		size_t dblimit = 100, int nthread = 2, bool win32_gui = false);
 	~db_service_sqlite();
 
 private:
-	// Êı¾İ¿âÃû³Æ
+	// æ•°æ®åº“åç§°
 	string dbname_;
-	// sqlite Êı¾İ¿âÎÄ¼şÃû
+	// sqlite æ•°æ®åº“æ–‡ä»¶å
 	string dbfile_;
 
-	// »ùÀà´¿Ğéº¯Êı
+	// åŸºç±»çº¯è™šå‡½æ•°
 	virtual db_handle* db_create(void);
 };
 

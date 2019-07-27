@@ -1,4 +1,4 @@
-#ifndef ACL_MSGIO_INCLUDE_H
+ï»¿#ifndef ACL_MSGIO_INCLUDE_H
 #define ACL_MSGIO_INCLUDE_H
 
 #ifdef __cplusplus
@@ -17,15 +17,15 @@ typedef int (*ACL_MSGIO_NOTIFY_FN)(int msg_type, ACL_MSGIO *peer,
 				   const ACL_MSGIO_INFO *info, void *arg);
 
 /**
- * ÏûÏ¢ÀàĞÍ¶¨Òå
+ * æ¶ˆæ¯ç±»å‹å®šä¹‰
  */
 #define ACL_MSGIO_OK				0
-#define ACL_MSGIO_TIMEOUT			1	/* ³¬Ê±ÏûÏ¢ */
-#define ACL_MSGIO_EXCEPT			2	/* Òì³£ÏûÏ¢ */
-#define ACL_MSGIO_CONNECT			3	/* Á¬½Ó³É¹¦ÏûÏ¢ */
-#define ACL_MSGIO_CONNECT_TIMEOUT		4	/* Á¬½Ó³¬Ê±ÏûÏ¢ */
-#define ACL_MSGIO_QUIT				5	/* ÍË³öÏûÏ¢ */
-#define	ACL_MSGIO_OPEN				6	/* Êı¾İÁ÷´ò¿ªÏûÏ¢ */
+#define ACL_MSGIO_TIMEOUT			1	/* è¶…æ—¶æ¶ˆæ¯ */
+#define ACL_MSGIO_EXCEPT			2	/* å¼‚å¸¸æ¶ˆæ¯ */
+#define ACL_MSGIO_CONNECT			3	/* è¿æ¥æˆåŠŸæ¶ˆæ¯ */
+#define ACL_MSGIO_CONNECT_TIMEOUT		4	/* è¿æ¥è¶…æ—¶æ¶ˆæ¯ */
+#define ACL_MSGIO_QUIT				5	/* é€€å‡ºæ¶ˆæ¯ */
+#define	ACL_MSGIO_OPEN				6	/* æ•°æ®æµæ‰“å¼€æ¶ˆæ¯ */
 
 #define ACL_MSGIO_USER				1000
 

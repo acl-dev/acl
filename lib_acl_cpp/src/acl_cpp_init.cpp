@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #include "acl_cpp/acl_cpp_init.hpp"
 
 namespace acl
@@ -18,7 +18,7 @@ void open_dos(void)
 	if (dos_fp_)
 		return;
 
-	// ´ò¿ª DOS ´°¿Ú
+	// æ‰“å¼€ DOS çª—å£
 	AllocConsole();
 
 #if _MSC_VER >= 1500

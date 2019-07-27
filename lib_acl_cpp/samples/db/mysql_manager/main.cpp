@@ -1,4 +1,4 @@
-// mysql.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// mysql.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "acl_cpp/lib_acl.hpp"
@@ -101,7 +101,7 @@ static bool tbl_create(const char* dbaddr, const char* dbname,
 	}
 }
 
-// Ìí¼Ó±íÊı¾İ
+// æ·»åŠ è¡¨æ•°æ®
 static bool tbl_insert(acl::db_handle& db, int n)
 {
 	acl::query query;
@@ -131,7 +131,7 @@ static bool tbl_insert(acl::db_handle& db, int n)
 	return (true);
 }
 
-// ²éÑ¯±íÊı¾İ
+// æŸ¥è¯¢è¡¨æ•°æ®
 static int tbl_select(acl::db_handle& db, int n)
 {
 	acl::query query;
@@ -148,7 +148,7 @@ static int tbl_select(acl::db_handle& db, int n)
 
 	printf("\r\n---------------------------------------------------\r\n");
 
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨Ò»
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•ä¸€
 	const acl::db_rows* result = db.get_result();
 	if (result)
 	{
@@ -164,14 +164,14 @@ static int tbl_select(acl::db_handle& db, int n)
 		}
 	}
 
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨¶ş
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•äºŒ
 	for (size_t i = 0; i < db.length(); i++)
 	{
 		if (n > 100)
 			continue;
 		const acl::db_row* row = db[i];
 
-		// È¡³ö¸ÃĞĞ¼ÇÂ¼ÖĞÄ³¸ö×Ö¶ÎµÄÖµ
+		// å–å‡ºè¯¥è¡Œè®°å½•ä¸­æŸä¸ªå­—æ®µçš„å€¼
 		const char* ptr = (*row)["group_name"];
 		if (ptr == NULL)
 		{
@@ -184,7 +184,7 @@ static int tbl_select(acl::db_handle& db, int n)
 		printf("\r\n");
 	}
 
-	// ÁĞ³ö²éÑ¯½á¹û·½·¨Èı
+	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•ä¸‰
 	const std::vector<acl::db_row*>* rows = db.get_rows();
 	if (rows)
 	{
@@ -202,12 +202,12 @@ static int tbl_select(acl::db_handle& db, int n)
 	}
 	int  ret = (int) db.length();
 
-	// ÊÍ·Å²éÑ¯½á¹û
+	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
 	db.free_result();
 	return (ret);
 }
 
-// É¾³ı±íÊı¾İ
+// åˆ é™¤è¡¨æ•°æ®
 static bool tbl_delete(acl::db_handle& db, int n)
 {
 	acl::query query;
@@ -227,7 +227,7 @@ static bool tbl_delete(acl::db_handle& db, int n)
 			printf("%s, ", (*row)[j]);
 		printf("\r\n");
 	}
-	// ÊÍ·Å²éÑ¯½á¹û
+	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
 	db.free_result();
 
 	return (true);
@@ -280,7 +280,7 @@ protected:
 		printf(">>insert total: %d\r\n", n);
 
 		n = 0;
-		// ÅúÁ¿²éÑ¯Êı¾İ
+		// æ‰¹é‡æŸ¥è¯¢æ•°æ®
 		for (int i = 0; i < max_; i++)
 		{
 			acl::db_pool* pool = (acl::db_pool*)
@@ -311,7 +311,7 @@ protected:
 		printf("\r\n");
 		printf(">>select total: %d\r\n", n);
 
-		// ÅúÁ¿É¾³ıÊı¾İ
+		// æ‰¹é‡åˆ é™¤æ•°æ®
 		for (int i = 0; i < max_; i++)
 		{
 			acl::db_pool* pool = (acl::db_pool*)
@@ -352,10 +352,10 @@ private:
 
 int main(void)
 {
-	// WIN32 ÏÂĞèÒªµ÷ÓÃ´Ëº¯Êı½øĞĞÓĞ¹Ø SOCKET µÄ³õÊ¼»¯
+	// WIN32 ä¸‹éœ€è¦è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œæœ‰å…³ SOCKET çš„åˆå§‹åŒ–
 	acl::acl_cpp_init();
 
-	// ÔÊĞí½«´íÎóÈÕÖ¾Êä³öÖÁÆÁÄ»
+	// å…è®¸å°†é”™è¯¯æ—¥å¿—è¾“å‡ºè‡³å±å¹•
 	acl::log::stdout_open(true);
 
 	acl::string line;
@@ -370,7 +370,7 @@ int main(void)
 
 	acl::string path;
 
-	// ÒòÎª²ÉÓÃ¶¯Ì¬¼ÓÔØµÄ·½Ê½£¬ËùÒÔĞèÒªÓ¦ÓÃ¸ø³ö mysql ¿Í»§¶Ë¿âËùÔÚµÄÂ·¾¶
+	// å› ä¸ºé‡‡ç”¨åŠ¨æ€åŠ è½½çš„æ–¹å¼ï¼Œæ‰€ä»¥éœ€è¦åº”ç”¨ç»™å‡º mysql å®¢æˆ·ç«¯åº“æ‰€åœ¨çš„è·¯å¾„
 	out.format("Enter %s load path: ", libname);
 	if (in.gets(line) && !line.empty())
 #if	defined(_WIN32) || defined(_WIN64)
@@ -382,7 +382,7 @@ int main(void)
 		path = libname;
 
 	out.format("%s path: %s\r\n", libname, path.c_str());
-	// ÉèÖÃ¶¯Ì¬¿â¼ÓÔØµÄÈ«Â·¾¶
+	// è®¾ç½®åŠ¨æ€åº“åŠ è½½çš„å…¨è·¯å¾„
 	acl::db_handle::set_loadpath(path);
 
 	acl::string dbaddr("127.0.0.1:3306");
@@ -407,7 +407,7 @@ int main(void)
 	out.format("dbname: %s, dbuser: %s, dbpass: %s\r\n",
 		dbname.c_str(), dbuser.c_str(), dbpass.c_str());
 
-	// Èç¹ûĞèÒª´´½¨Êı¾İ¿â£¬ÔòĞèÒªÒÔ root Éí·İ½øĞĞ´´½¨
+	// å¦‚æœéœ€è¦åˆ›å»ºæ•°æ®åº“ï¼Œåˆ™éœ€è¦ä»¥ root èº«ä»½è¿›è¡Œåˆ›å»º
 	out.format("Do you want to create %s? yes|no: ", dbname.c_str());
 	if (in.gets(line) && (line == "yes" || line == "y"))
 	{
@@ -417,7 +417,7 @@ int main(void)
 			dbuser = "root";
 		}
 
-		// ´´½¨Êı¾İ¿â
+		// åˆ›å»ºæ•°æ®åº“
 		if (db_create(dbaddr, dbname, dbuser, dbpass) == false)
 		{
 			printf("create db failed, enter any key to exit.\r\n");
@@ -429,7 +429,7 @@ int main(void)
 		(void) in.gets(line);
 	}
 
-	// µ±Êı¾İ±í²»´æÔÚÊ±´´½¨±í
+	// å½“æ•°æ®è¡¨ä¸å­˜åœ¨æ—¶åˆ›å»ºè¡¨
 	if (tbl_create(dbaddr, dbname, dbuser, dbpass) == false)
 	{
 		printf("create table error\r\n");
@@ -442,24 +442,24 @@ int main(void)
 	out.puts("Enter any key to continue ...");
 	(void) in.gets(line);
 
-	// Á¬½Ó³ØÖĞ×î´óÁ¬½ÓÊıÁ¿ÏŞÖÆ£¬¸ÃÖµÓ¦ºÍÏß³Ì³ØÖĞµÄ×î´óÏß³ÌÊıÏàµÈ£¬
-	// ÒÔ±£Ö¤Ã¿¸öÏß³Ì¶¼¿ÉÒÔ»ñµÃÒ»¸öÁ¬½Ó
+	// è¿æ¥æ± ä¸­æœ€å¤§è¿æ¥æ•°é‡é™åˆ¶ï¼Œè¯¥å€¼åº”å’Œçº¿ç¨‹æ± ä¸­çš„æœ€å¤§çº¿ç¨‹æ•°ç›¸ç­‰ï¼Œ
+	// ä»¥ä¿è¯æ¯ä¸ªçº¿ç¨‹éƒ½å¯ä»¥è·å¾—ä¸€ä¸ªè¿æ¥
 	size_t  dblimit = 10;
 
-	// ´´½¨Êı¾İ¿âÁ¬½Ó³Ø¶ÔÏó
+	// åˆ›å»ºæ•°æ®åº“è¿æ¥æ± å¯¹è±¡
 	acl::mysql_manager* manager = new acl::mysql_manager;
 	manager->add(dbaddr, dbname, dbuser, dbpass, dblimit);
 
-	// ÉèÖÃÁ¬½Ó³ØÖĞÃ¿¸öÁ¬½ÓµÄ¿ÕÏĞÊ±¼ä(Ãë)
+	// è®¾ç½®è¿æ¥æ± ä¸­æ¯ä¸ªè¿æ¥çš„ç©ºé—²æ—¶é—´(ç§’)
 	//dp->set_idle(120);
 
-	// Ã¿¸ö´¦ÀíÏß³ÌÄÚ²¿Õë¶ÔÃ¿¸ö²Ù×÷Ö´ĞĞµÄ´ÎÊı
+	// æ¯ä¸ªå¤„ç†çº¿ç¨‹å†…éƒ¨é’ˆå¯¹æ¯ä¸ªæ“ä½œæ‰§è¡Œçš„æ¬¡æ•°
 	int  max = 10;
 
 	acl::string dbkey;
 	dbkey.format("%s@%s", dbname.c_str(), dbaddr.c_str());
 
-	// ´´½¨¶à¸öÏß³Ì
+	// åˆ›å»ºå¤šä¸ªçº¿ç¨‹
 	std::vector<db_thread*> threads;
 	for (size_t i = 0; i < dblimit; i++)
 	{
@@ -469,7 +469,7 @@ int main(void)
 		thread->start();
 	}
 
-	// µÈ´ıËùÓĞ¹¤×÷Ïß³ÌÍË³ö
+	// ç­‰å¾…æ‰€æœ‰å·¥ä½œçº¿ç¨‹é€€å‡º
 	std::vector<db_thread*>::iterator it;
 	for (it = threads.begin(); it != threads.end(); ++it)
 	{

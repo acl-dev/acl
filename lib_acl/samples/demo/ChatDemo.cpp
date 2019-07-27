@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include ".\chatdemo.h"
 
 CChatDemo::CChatDemo(const char *s)

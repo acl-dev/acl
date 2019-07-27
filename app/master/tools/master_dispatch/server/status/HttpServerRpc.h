@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class HttpServerRpc : public acl::rpc_request
 {
@@ -7,18 +7,18 @@ public:
 	~HttpServerRpc();
 
 protected:
-	// 基类 rpc_request 虚函数
+	// 鍩虹被 rpc_request 铏氬嚱鏁�
 
-	// 子线程处理函数
+	// 瀛愮嚎绋嬪鐞嗗嚱鏁�
 	void rpc_run();
 
-	// 主线程处理过程，收到子线程任务完成的消息
+	// 涓荤嚎绋嬪鐞嗚繃绋嬶紝鏀跺埌瀛愮嚎绋嬩换鍔″畬鎴愮殑娑堟伅
 	void rpc_onover();
 
 private:
 	acl::aio_socket_stream* client_;
 	bool keep_alive_;
 
-	// 处理 HTTP 请求过程
+	// 澶勭悊 HTTP 璇锋眰杩囩▼
 	void handle_http(acl::socket_stream& stream);
 };

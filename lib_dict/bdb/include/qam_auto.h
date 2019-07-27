@@ -1,4 +1,4 @@
-/* Do not edit: automatically built by gen_rec.awk. */
+﻿/* Do not edit: automatically built by gen_rec.awk. */
 
 #ifndef	__qam_AUTO_H
 #define	__qam_AUTO_H

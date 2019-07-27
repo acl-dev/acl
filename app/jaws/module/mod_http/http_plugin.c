@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "http_service.h"
 
 static ACL_FIFO *__handles = NULL;
@@ -34,14 +34,14 @@ void http_plugin_load(ACL_DLL_ENV *dll_env, const char *dlname, const char *plug
 
 	acl_fifo_push(__handles, handle);
 
-	/* ³õÊ¼»¯ */
+	/* åˆå§‹åŒ– */
 	plugin.init = (plugin_init_fn) (intptr_t)
 		acl_dlsym(handle, "http_plugin_init");
 	if (plugin.init) {
 		plugin.init(dll_env, plugin_cfgdir);
 	}
 
-	/* Ìí¼ÓÇëÇóÍ·¹ıÂËÆ÷ */
+	/* æ·»åŠ è¯·æ±‚å¤´è¿‡æ»¤å™¨ */
 
 	plugin.filter.request = (plugin_filter_request_fn) (intptr_t)
 		acl_dlsym(handle, "http_request_filter");
@@ -54,7 +54,7 @@ void http_plugin_load(ACL_DLL_ENV *dll_env, const char *dlname, const char *plug
 		acl_fifo_push(&__request_plugins, http_plugin);
 	}
 
-	/* Ìí¼ÓÇëÇóÌå¹ıÂËÆ÷ */
+	/* æ·»åŠ è¯·æ±‚ä½“è¿‡æ»¤å™¨ */
 
 	plugin.data_free = (plugin_dat_free_fn) (intptr_t)
 		acl_dlsym(handle, "http_request_dat_free");
@@ -67,7 +67,7 @@ void http_plugin_load(ACL_DLL_ENV *dll_env, const char *dlname, const char *plug
 		acl_fifo_push(&__request_dat_plugins, http_plugin);
 	}
 
-	/* Ìí¼ÓÏìÓ¦Í·¹ıÂËÆ÷ */
+	/* æ·»åŠ å“åº”å¤´è¿‡æ»¤å™¨ */
 
 	plugin.filter.respond = (plugin_filter_respond_fn) (intptr_t)
 		acl_dlsym(handle, "http_respond_filter");
@@ -80,7 +80,7 @@ void http_plugin_load(ACL_DLL_ENV *dll_env, const char *dlname, const char *plug
 		acl_fifo_push(&__respond_plugins, http_plugin);
 	}
 
-	/* Ìí¼ÓÏìÓ¦Ìå¹ıÂËÆ÷ */
+	/* æ·»åŠ å“åº”ä½“è¿‡æ»¤å™¨ */
 
 	plugin.data_filter = (plugin_dat_filter_fn) (intptr_t)
 		acl_dlsym(handle, "http_respond_dat_filter");
@@ -133,7 +133,7 @@ void http_plugin_set_callback(HTTP_SERVICE *service)
 	ACL_ITER iter;
 	HTTP_PLUGIN *http_plugin, *plugin;
 
-	/* ³õÊ¼»¯¹ıÂËÆ÷¶ÓÁĞ¼¯ºÏ */
+	/* åˆå§‹åŒ–è¿‡æ»¤å™¨é˜Ÿåˆ—é›†åˆ */
 	acl_fifo_init(&service->request_plugins);
 	acl_fifo_init(&service->respond_plugins);
 	acl_fifo_init(&service->request_dat_plugins);

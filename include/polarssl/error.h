@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file error.h
  *
  * \brief Error to string translation

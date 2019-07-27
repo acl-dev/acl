@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
 ////////////////////////////////////////////////////////////////////////////////
-// 配置内容项
+// 閰嶇疆鍐呭椤�
 
 extern char *var_cfg_rpc_addr;
 extern acl::master_str_tbl var_conf_str_tab[];

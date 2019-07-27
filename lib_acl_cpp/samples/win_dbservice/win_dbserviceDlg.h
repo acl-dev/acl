@@ -1,31 +1,31 @@
-// win_dbserviceDlg.h : Í·ÎÄ¼ş
+ï»¿// win_dbserviceDlg.h : å¤´æ–‡ä»¶
 //
 
 #pragma once
 
 #include "acl_cpp/db/db_service.hpp"
 
-// Cwin_dbserviceDlg ¶Ô»°¿ò
+// Cwin_dbserviceDlg å¯¹è¯æ¡†
 class Cwin_dbserviceDlg : public CDialog
 {
-// ¹¹Ôì
+// æ„é€ 
 public:
-	Cwin_dbserviceDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
+	Cwin_dbserviceDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
 
-	// Îö¹¹
+	// ææ„
 	~Cwin_dbserviceDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_WIN_DBSERVICE_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	HICON m_hIcon;
 
-	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
+	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

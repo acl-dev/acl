@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "rpc_stats.h"
 #include "http_rpc.h"
 
@@ -22,62 +22,62 @@ http_rpc::~http_rpc()
 
 void http_rpc::rpc_onover()
 {
-	// ¼õÉÙ rpc ¼ÆÊý
+	// å‡å°‘ rpc è®¡æ•°
 	rpc_del();
 
 	if (!proc_quit_ && keep_alive_)
 	{
 		rpc_read_wait_add();
 
-		// ¼à¿ØÒì²½Á÷ÊÇ·ñ¿É¶Á
+		// ç›‘æŽ§å¼‚æ­¥æµæ˜¯å¦å¯è¯»
 		client_->read_wait(10);
 	}
 	else
-		// ¹Ø±ÕÒì²½Á÷¶ÔÏó
+		// å…³é—­å¼‚æ­¥æµå¯¹è±¡
 		client_->close();
 
-	// ¿Í»§¶Ë·¢À´ÁËÒªÇó·þÎñÆ÷³ÌÐòÍË³öµÄÃüÁî
+	// å®¢æˆ·ç«¯å‘æ¥äº†è¦æ±‚æœåŠ¡å™¨ç¨‹åºé€€å‡ºçš„å‘½ä»¤
 	if (proc_quit_)
 		handle_.stop();
 }
 
-// µ÷ÓÃ service_.rpc_fork ºó£¬ÓÉ RPC ¿ò¼ÜÔÚ×ÓÏß³ÌÖÐµ÷ÓÃ±¾º¯Êý
-// À´´¦Àí±¾µØÆäËüÄ£¿é·¢À´µÄÇëÇóÐÅÏ¢
+// è°ƒç”¨ service_.rpc_fork åŽï¼Œç”± RPC æ¡†æž¶åœ¨å­çº¿ç¨‹ä¸­è°ƒç”¨æœ¬å‡½æ•°
+// æ¥å¤„ç†æœ¬åœ°å…¶å®ƒæ¨¡å—å‘æ¥çš„è¯·æ±‚ä¿¡æ¯
 void http_rpc::rpc_run()
 {
-	// ´ò¿ª×èÈûÁ÷¶ÔÏó
+	// æ‰“å¼€é˜»å¡žæµå¯¹è±¡
 	socket_stream stream;
 
-	// ±ØÐëÓÃ get_vstream() »ñµÃµÄ ACL_VSTREAM Á÷¶ÔÏó×ö²ÎÊý
-	// À´´ò¿ª stream ¶ÔÏó£¬ÒòÎªÔÚ acl_cpp ºÍ acl ÖÐµÄ×èÈûÁ÷
-	// ºÍ·Ç×èÈûÁ÷×îÖÕ¶¼ÊÇ»ùÓÚ ACL_VSTREAM£¬¶ø ACL_VSTREAM Á÷
-	// ÄÚ²¿Î¬»¤×ÅÁËÒ»¸ö¶Á/Ð´»º³åÇø£¬ËùÒÔÔÚ³¤Á¬½ÓµÄÊý¾Ý´¦ÀíÖÐ£¬
-	// ±ØÐëÃ¿´Î½« ACL_VSTREAM ×öÎªÄÚ²¿Á÷µÄ»º³åÁ÷À´¶Ô´ý
+	// å¿…é¡»ç”¨ get_vstream() èŽ·å¾—çš„ ACL_VSTREAM æµå¯¹è±¡åšå‚æ•°
+	// æ¥æ‰“å¼€ stream å¯¹è±¡ï¼Œå› ä¸ºåœ¨ acl_cpp å’Œ acl ä¸­çš„é˜»å¡žæµ
+	// å’Œéžé˜»å¡žæµæœ€ç»ˆéƒ½æ˜¯åŸºäºŽ ACL_VSTREAMï¼Œè€Œ ACL_VSTREAM æµ
+	// å†…éƒ¨ç»´æŠ¤ç€äº†ä¸€ä¸ªè¯»/å†™ç¼“å†²åŒºï¼Œæ‰€ä»¥åœ¨é•¿è¿žæŽ¥çš„æ•°æ®å¤„ç†ä¸­ï¼Œ
+	// å¿…é¡»æ¯æ¬¡å°† ACL_VSTREAM åšä¸ºå†…éƒ¨æµçš„ç¼“å†²æµæ¥å¯¹å¾…
 	ACL_VSTREAM* vstream = client_->get_vstream();
 	ACL_VSTREAM_SET_RWTIMO(vstream, 10);
 	(void) stream.open(vstream);
 
 	rpc_req_add();
 
-	// ¿ªÊ¼´¦Àí¸Ã HTTP ÇëÇó
+	// å¼€å§‹å¤„ç†è¯¥ HTTP è¯·æ±‚
 	handle_conn(&stream);
 
 	rpc_req_del();
 
-	// ½« ACL_VSTREAM Óë×èÈûÁ÷¶ÔÏó½â°ó¶¨£¬ÕâÑù²ÅÄÜ±£Ö¤µ±ÊÍ·Å×èÈûÁ÷¶ÔÏóÊ±
-	// ²»»á¹Ø±ÕÓëÇëÇóÕßµÄÁ¬½Ó£¬ÒòÎª¸ÃÁ¬½Ó±¾ÉíÊÇÊôÓÚ·Ç×èÈûÁ÷¶ÔÏóµÄ£¬ÐèÒª²É
-	// ÓÃÒì²½Á÷¹Ø±Õ·½Ê½½øÐÐ¹Ø±Õ
+	// å°† ACL_VSTREAM ä¸Žé˜»å¡žæµå¯¹è±¡è§£ç»‘å®šï¼Œè¿™æ ·æ‰èƒ½ä¿è¯å½“é‡Šæ”¾é˜»å¡žæµå¯¹è±¡æ—¶
+	// ä¸ä¼šå…³é—­ä¸Žè¯·æ±‚è€…çš„è¿žæŽ¥ï¼Œå› ä¸ºè¯¥è¿žæŽ¥æœ¬èº«æ˜¯å±žäºŽéžé˜»å¡žæµå¯¹è±¡çš„ï¼Œéœ€è¦é‡‡
+	// ç”¨å¼‚æ­¥æµå…³é—­æ–¹å¼è¿›è¡Œå…³é—­
 	stream.unbind();
 }
 
 void http_rpc::handle_conn(socket_stream* stream)
 {
-	// HTTP ÏìÓ¦¶ÔÏó¹¹Ôì
+	// HTTP å“åº”å¯¹è±¡æž„é€ 
 	http_response res(stream);
-	// ÏìÓ¦Êý¾ÝÌåÎª xml ¸ñÊ½
+	// å“åº”æ•°æ®ä½“ä¸º xml æ ¼å¼
 	res.response_header().set_content_type("text/html");
 
-	// ¶Á HTTP ÇëÇóÍ·
+	// è¯» HTTP è¯·æ±‚å¤´
 	if (res.read_header() == false)
 	{
 		keep_alive_ = false;
@@ -85,7 +85,7 @@ void http_rpc::handle_conn(socket_stream* stream)
 	}
 
 	string buf;
-	// ¶Á HTTP ÇëÇóÌåÊý¾Ý
+	// è¯» HTTP è¯·æ±‚ä½“æ•°æ®
 	if (res.get_body(buf) == false)
 	{
 		keep_alive_ = false;
@@ -94,10 +94,10 @@ void http_rpc::handle_conn(socket_stream* stream)
 
 	http_client* client = res.get_client();
 
-	// ÅÐ¶Ï¿Í»§¶ËÊÇ·ñÏ£Íû±£³Ö³¤Á¬½Ó
+	// åˆ¤æ–­å®¢æˆ·ç«¯æ˜¯å¦å¸Œæœ›ä¿æŒé•¿è¿žæŽ¥
 	keep_alive_ = client->keep_alive();
 
-	// ·µ»ØÊý¾Ý¸ø¿Í»§¶Ë
+	// è¿”å›žæ•°æ®ç»™å®¢æˆ·ç«¯
 
 	res.response_header()
 		.set_status(200)
@@ -106,7 +106,7 @@ void http_rpc::handle_conn(socket_stream* stream)
 
 	res.response(res_buf_, buf_size_);
 
-	// È¡µÃ¿Í»§¶ËµÄÃüÁî
+	// å–å¾—å®¢æˆ·ç«¯çš„å‘½ä»¤
 	const char* action = client->request_param("action");
 	if (action && (strcasecmp(action, "stop") == 0
 		|| strcasecmp(action, "quit") == 0))

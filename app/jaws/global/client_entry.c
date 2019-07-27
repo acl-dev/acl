@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "service.h"
 
 #ifdef ACL_BCB_COMPILER
@@ -10,7 +10,7 @@ void client_entry_free(CLIENT_ENTRY *entry)
 	acl_myfree(entry);
 }
 
-/* µ±¿Í»§¶ËÒì²½Á÷±»¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
+/* å½“å®¢æˆ·ç«¯å¼‚æ­¥æµè¢«å…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
 
 static void onclose_client_stream(ACL_VSTREAM *stream, void *arg)
 {
@@ -25,13 +25,13 @@ static void onclose_client_stream(ACL_VSTREAM *stream, void *arg)
 	if (stream->nrefer != 0)
 		acl_msg_fatal("%s: stream->nrefer(%d) != 0", myname, stream->nrefer);
 
-	/* ÐèÒªÌáÇ°ÉèÖÃÎª¿Õ, ÒÔ·ÀÔÚµ÷ÓÃ acl_aio_iocp_close ºóÓÖÒª²Ù×÷¸ÃÁ÷Ö¸Õë */
+	/* éœ€è¦æå‰è®¾ç½®ä¸ºç©º, ä»¥é˜²åœ¨è°ƒç”¨ acl_aio_iocp_close åŽåˆè¦æ“ä½œè¯¥æµæŒ‡é’ˆ */
 	entry->client = NULL;
 
 	if (entry->server)
 		acl_aio_iocp_close(entry->server);
 
-	/* ÐèÒª·ÅÔÚ acl_aio_iocp_lose() ºóÃæ£¬ÒÔ·ÀÖ¹ entry ¶ÔÏóÌáÇ°ÊÍ·Å */
+	/* éœ€è¦æ”¾åœ¨ acl_aio_iocp_lose() åŽé¢ï¼Œä»¥é˜²æ­¢ entry å¯¹è±¡æå‰é‡Šæ”¾ */
 	entry->nrefer--;
 	if (entry->nrefer > 0)
 		return;
@@ -62,7 +62,7 @@ CLIENT_ENTRY *client_entry_new(SERVICE *service, size_t size, ACL_ASTREAM *clien
 	return (entry);
 }
 
-/* µ±·þÎñ¶ËÒì²½Á÷±»¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
+/* å½“æœåŠ¡ç«¯å¼‚æ­¥æµè¢«å…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
 
 static void onclose_server_stream(ACL_VSTREAM *stream, void *arg)
 {
@@ -74,14 +74,14 @@ static void onclose_server_stream(ACL_VSTREAM *stream, void *arg)
 	if (stream->nrefer != 0)
 		acl_msg_fatal("%s: stream->nrefer(%d) != 0", myname, stream->nrefer);
 
-	/* ÐèÒªÌáÇ°ÉèÖÃÎª¿Õ, ÒÔ·ÀÔÚµ÷ÓÃ acl_aio_iocp_close ºóÓÖÒª²Ù×÷¸ÃÁ÷Ö¸Õë */
+	/* éœ€è¦æå‰è®¾ç½®ä¸ºç©º, ä»¥é˜²åœ¨è°ƒç”¨ acl_aio_iocp_close åŽåˆè¦æ“ä½œè¯¥æµæŒ‡é’ˆ */
 	entry->server = NULL;
 
 	if (entry->client) {
 		acl_aio_iocp_close(entry->client);
 	}
 
-	/* ÐèÒª·ÅÔÚ acl_aio_iocp_lose() ºóÃæ£¬ÒÔ·ÀÖ¹ entry ¶ÔÏóÌáÇ°ÊÍ·Å */
+	/* éœ€è¦æ”¾åœ¨ acl_aio_iocp_lose() åŽé¢ï¼Œä»¥é˜²æ­¢ entry å¯¹è±¡æå‰é‡Šæ”¾ */
 	entry->nrefer--;
 	if (entry->nrefer > 0)
 		return;
@@ -113,14 +113,14 @@ int client_entry_detach3(CLIENT_ENTRY *entry, ACL_VSTREAM *stream, int auto_free
 {
 	const char *myname = "client_entry_detach";
 
-	/* ±ØÐëÈ¡ÏûÔÚ¹Ø±ÕÁ÷Ê±µÄ»Øµ÷º¯Êý */
+	/* å¿…é¡»å–æ¶ˆåœ¨å…³é—­æµæ—¶çš„å›žè°ƒå‡½æ•° */
 	if (entry->client && acl_aio_vstream(entry->client) == stream) {
-		/* É¾³ýÁ÷µÄ¹Ø±Õ»Øµ÷º¯Êý¾ä±ú£¬ÕâÑù½öÇå³ýÓë¸ÃÓ¦ÓÃÏà¹ØµÄÉ¾³ý»Øµ÷ */
+		/* åˆ é™¤æµçš„å…³é—­å›žè°ƒå‡½æ•°å¥æŸ„ï¼Œè¿™æ ·ä»…æ¸…é™¤ä¸Žè¯¥åº”ç”¨ç›¸å…³çš„åˆ é™¤å›žè°ƒ */
 		acl_vstream_delete_close_handle(stream, onclose_client_stream, entry);
 		entry->client = NULL;
 		entry->nrefer--;
 	} else if (entry->server && acl_aio_vstream(entry->server) == stream) {
-		/* É¾³ýÁ÷µÄ¹Ø±Õ»Øµ÷º¯Êý¾ä±ú£¬ÕâÑù½öÇå³ýÓë¸ÃÓ¦ÓÃÏà¹ØµÄÉ¾³ý»Øµ÷ */
+		/* åˆ é™¤æµçš„å…³é—­å›žè°ƒå‡½æ•°å¥æŸ„ï¼Œè¿™æ ·ä»…æ¸…é™¤ä¸Žè¯¥åº”ç”¨ç›¸å…³çš„åˆ é™¤å›žè°ƒ */
 		acl_vstream_delete_close_handle(stream, onclose_server_stream, entry);
 		entry->server = NULL;
 		entry->nrefer--;
@@ -128,11 +128,11 @@ int client_entry_detach3(CLIENT_ENTRY *entry, ACL_VSTREAM *stream, int auto_free
 		acl_msg_fatal("%s(%d): unknown stream", myname, __LINE__);
 	}
 
-	/* Èç¹û entry ÒýÓÃ¶ÔÏó¼ÆÊýÎª0ÔòÐèÒªÊÍ·Åµô¸Ã¶ÔÏó */
+	/* å¦‚æžœ entry å¼•ç”¨å¯¹è±¡è®¡æ•°ä¸º0åˆ™éœ€è¦é‡Šæ”¾æŽ‰è¯¥å¯¹è±¡ */
 	if (entry->nrefer == 0) {
 		if (auto_free)
 			entry->free_fn(entry);
-		/* ¸æËßµ÷ÓÃÕß£¬ entry ×ÊÔ´ÒÑ¾­±»ÊÍ·Å£¬²»ÄÜÔÙÊ¹ÓÃ */
+		/* å‘Šè¯‰è°ƒç”¨è€…ï¼Œ entry èµ„æºå·²ç»è¢«é‡Šæ”¾ï¼Œä¸èƒ½å†ä½¿ç”¨ */
 		return (1);
 	} else if (entry->client == NULL && entry->server == NULL) {
 		acl_msg_warn("%s(%d): nrefer=%d, client %s, server %s\n",

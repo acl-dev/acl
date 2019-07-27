@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
@@ -9,73 +9,73 @@ class ACL_CPP_API mysql_conf
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param dbaddr {const char*} Êı¾İ¿âÁ¬½ÓµØÖ·£¬¿ÉÒÔÎª TCP Ì×½Ó¿Ú»ò
-	 *  UNIX ÓòÌ×½Ó¿Ú£¬µ±Îª TCP Ì×½Ó¿ÚÊ±£¬µØÖ·¸ñÊ½Îª£ºip:port, µ±Îª UNIX
-	 *  ÓòÌ×½Ó¿ÚÊ±£¬µØÖ·¸ñÊ½£º/xxx/xxx/xxx.sock
-	 * @param dbname {const char*} Êı¾İ¿âÃû
+	 * æ„é€ å‡½æ•°
+	 * @param dbaddr {const char*} æ•°æ®åº“è¿æ¥åœ°å€ï¼Œå¯ä»¥ä¸º TCP å¥—æ¥å£æˆ–
+	 *  UNIX åŸŸå¥—æ¥å£ï¼Œå½“ä¸º TCP å¥—æ¥å£æ—¶ï¼Œåœ°å€æ ¼å¼ä¸ºï¼šip:port, å½“ä¸º UNIX
+	 *  åŸŸå¥—æ¥å£æ—¶ï¼Œåœ°å€æ ¼å¼ï¼š/xxx/xxx/xxx.sock
+	 * @param dbname {const char*} æ•°æ®åº“å
 	 */
 	mysql_conf(const char* dbaddr, const char* dbname);
 
 	/**
-	 * ¿½±´¹¹Ôìº¯Êı
-	 * @param conf {const mysql_conf&} ÄÚ²¿´´½¨ĞÂ¶ÔÏóÍ¬Ê±¿½±´ÊäÈë¶ÔÏóÄÚÈİ
+	 * æ‹·è´æ„é€ å‡½æ•°
+	 * @param conf {const mysql_conf&} å†…éƒ¨åˆ›å»ºæ–°å¯¹è±¡åŒæ—¶æ‹·è´è¾“å…¥å¯¹è±¡å†…å®¹
 	 */
 	mysql_conf(const mysql_conf& conf);
 
 	~mysql_conf();
 
 	/**
-	 * ÉèÖÃÁ¬½ÓÊı¾İ¿âÊ±µÄÓÃ»§ÕËºÅ
-	 * @param dbuser {const char*} µ±Îª·Ç¿Õ×Ö·û´®Ê±Ö¸¶¨ÓÃ»§ÕËºÅ
+	 * è®¾ç½®è¿æ¥æ•°æ®åº“æ—¶çš„ç”¨æˆ·è´¦å·
+	 * @param dbuser {const char*} å½“ä¸ºéç©ºå­—ç¬¦ä¸²æ—¶æŒ‡å®šç”¨æˆ·è´¦å·
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbuser(const char* dbuser);
 
 	/**
-	 * ÉèÖÃÁ¬½ÓÊı¾İ¿âÊ±µÄÕËºÅÃÜÂë
-	 * @param dbpass {const char*} µ±Îª·Ç¿Õ×Ö·û´®Ê±Ö¸¶¨ÕËºÅÃÜÂë
+	 * è®¾ç½®è¿æ¥æ•°æ®åº“æ—¶çš„è´¦å·å¯†ç 
+	 * @param dbpass {const char*} å½“ä¸ºéç©ºå­—ç¬¦ä¸²æ—¶æŒ‡å®šè´¦å·å¯†ç 
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbpass(const char* dbpass);
 
 	/**
-	 * ÉèÖÃÊı¾İ¿âÁ¬½Ó³Ø×î´óÁ¬½ÓÉÏÏŞ
-	 * @param dblimit {size_t} Á¬½Ó³Ø×î´óÁ¬½ÓÊıÏŞÖÆ£¬µ±Îª 0 Ê±Ôò²»ÏŞÖÆ
+	 * è®¾ç½®æ•°æ®åº“è¿æ¥æ± æœ€å¤§è¿æ¥ä¸Šé™
+	 * @param dblimit {size_t} è¿æ¥æ± æœ€å¤§è¿æ¥æ•°é™åˆ¶ï¼Œå½“ä¸º 0 æ—¶åˆ™ä¸é™åˆ¶
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dblimit(size_t dblimit);
 
 	/**
-	 * ÉèÖÃ mysql Êı¾İ¿âµÄÒ»Ğ©ÌØÊâ±êÖ¾Î»
+	 * è®¾ç½® mysql æ•°æ®åº“çš„ä¸€äº›ç‰¹æ®Šæ ‡å¿—ä½
 	 * @param dbflags {unsigned long}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_dbflags(unsigned long dbflags);
 
 	/**
-	 * ÉèÖÃµ±ĞŞ¸ÄÊı¾İ¿âÄÚÈİÊ±ÊÇ·ñÔÊĞí×Ô¶¯Ìá½»£¬Ä¬ÈÏÎª×Ô¶¯Ìá½»
+	 * è®¾ç½®å½“ä¿®æ”¹æ•°æ®åº“å†…å®¹æ—¶æ˜¯å¦å…è®¸è‡ªåŠ¨æäº¤ï¼Œé»˜è®¤ä¸ºè‡ªåŠ¨æäº¤
 	 * @param on {bool}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_auto_commit(bool on);
 
 	/**
-	 * ÉèÖÃÁ¬½ÓÊı¾İ¿âµÄ³¬Ê±Ê±¼ä
+	 * è®¾ç½®è¿æ¥æ•°æ®åº“çš„è¶…æ—¶æ—¶é—´
 	 * @param timeout {int}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_conn_timeout(int timeout);
 
 	/**
-	 * ÉèÖÃ¶ÁÈ¡Êı¾İ¿â½á¹ûµÄ³¬Ê±Ê±¼ä
+	 * è®¾ç½®è¯»å–æ•°æ®åº“ç»“æœçš„è¶…æ—¶æ—¶é—´
 	 * @param int {timeout}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_rw_timeout(int timeout);
 
 	/**
-	 * ÉèÖÃÊı¾İ¿âÁ¬½ÓµÄ×Ö·û¼¯
+	 * è®¾ç½®æ•°æ®åº“è¿æ¥çš„å­—ç¬¦é›†
 	 * @param charset {const char*}
 	 * @return {mysql_conf&}
 	 */
@@ -137,17 +137,17 @@ public:
 	}
 
 private:
-	char* dbaddr_;          // Êı¾İ¿â¼àÌıµØÖ·
-	char* dbname_;          // Êı¾İ¿âÃû
+	char* dbaddr_;          // æ•°æ®åº“ç›‘å¬åœ°å€
+	char* dbname_;          // æ•°æ®åº“å
 	char* dbkey_;           // dbname@dbaddr
-	char* dbuser_;          // Êı¾İ¿âÕËºÅ
-	char* dbpass_;          // Êı¾İ¿âÕËºÅÃÜÂë
-	char* charset_;         // Á¬½ÓÊı¾İ¿âÊ±µÄ×Ö·û¼¯
-	size_t dblimit_;        // Êı¾İ¿âÁ¬½Ó³ØÁ¬½ÓÊıÉÏÏŞ
-	unsigned long dbflags_; // ´ò¿ªÊı¾İ¿âÊ±µÄ±êÖ¾Î»
-	bool  auto_commit_;     // ÊÇ·ñ×Ô¶¯Ìá½»ĞŞ¸ÄºóµÄÊı¾İ
-	int   conn_timeout_;    // Á¬½ÓÊı¾İ¿âµÄ³¬Ê±Ê±¼ä
-	int   rw_timeout_;      // ÓëÊı¾İ¿âÍ¨ĞÅµÄ³¬Ê±Ê±¼ä
+	char* dbuser_;          // æ•°æ®åº“è´¦å·
+	char* dbpass_;          // æ•°æ®åº“è´¦å·å¯†ç 
+	char* charset_;         // è¿æ¥æ•°æ®åº“æ—¶çš„å­—ç¬¦é›†
+	size_t dblimit_;        // æ•°æ®åº“è¿æ¥æ± è¿æ¥æ•°ä¸Šé™
+	unsigned long dbflags_; // æ‰“å¼€æ•°æ®åº“æ—¶çš„æ ‡å¿—ä½
+	bool  auto_commit_;     // æ˜¯å¦è‡ªåŠ¨æäº¤ä¿®æ”¹åçš„æ•°æ®
+	int   conn_timeout_;    // è¿æ¥æ•°æ®åº“çš„è¶…æ—¶æ—¶é—´
+	int   rw_timeout_;      // ä¸æ•°æ®åº“é€šä¿¡çš„è¶…æ—¶æ—¶é—´
 };
 
 } // namespace acl

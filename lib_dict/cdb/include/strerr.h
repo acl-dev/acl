@@ -1,4 +1,4 @@
-#ifndef STRERR_H
+﻿#ifndef STRERR_H
 #define STRERR_H
 
 struct strerr {

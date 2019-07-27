@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/locker.hpp"
 #include "acl_cpp/hsocket/hsclient.hpp"
@@ -53,15 +53,15 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 
 	locker_->lock();
 
-	// ��˳���ѯ���ϱ��ֶ����������Ӷ���
+	// 先顺序查询符合表字段条件的连接对象
 	std::list<hsclient*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it) {
-		// �����ַ��ƥ�����������ַ����ƥ��
+		// 如果地址不匹配查跳过，地址必须匹配
 		if (strcmp((*it)->get_addr(), addr) != 0) {
 			continue;
 		}
 
-		// ���Ѿ��򿪵ı�����ѯ���ֶ��Ƿ����
+		// 打开已经打开的表，查询表字段是否符合
 		if ((*it)->open_tbl(dbn, tbl, idx, flds, false)) {
 			client = *it;
 			pool_.erase(it);
@@ -70,25 +70,25 @@ hsclient* hspool::peek(const char* dbn, const char* tbl,
 		}
 	}
 
-	// ��ѯ��ַƥ������Ӷ����������һ��ƥ������Ӷ�����
-	// ���µı�
+	// 查询地址匹配的连接对象，如果存在一个匹配的连接对象，则
+	// 打开新的表
 	for (it = pool_.begin(); it != pool_.end();) {
-		// �����ַ��ƥ�����������ַ����ƥ��
+		// 如果地址不匹配查跳过，地址必须匹配
 		if (strcmp((*it)->get_addr(), addr) != 0) {
 			++it;
 			continue;
 		}
 
 		client = *it;
-		it = pool_.erase(it); // �����ӳ���ɾ��
+		it = pool_.erase(it); // 从连接池中删除
 
-		// ���µı�
+		// 打开新的表
 		if (client->open_tbl(dbn, tbl, idx, flds, true)) {
 			locker_->unlock();
 			return client;
 		}
 
-		// ��ʧ�ܣ�����Ҫɾ�������Ӷ���
+		// 打开失败，则需要删除该连接对象
 		delete client;
 	}
 

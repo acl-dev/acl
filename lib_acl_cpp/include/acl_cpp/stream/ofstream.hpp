@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "fstream.hpp"
 
@@ -11,17 +11,17 @@ public:
 	virtual ~ofstream(void);
 
 	/**
-	 * ÒÔÖ»Ğ´·½Ê½´ò¿ªÎÄ¼ş£¬Èç¹ûÎÄ¼ş²»´æÔÚÔò´´½¨ĞÂÎÄ¼ş
-	 * @param path {const char*} ÎÄ¼şÃû
-	 * @param otrunc {bool} ÈôÎÄ¼ş´æÔÚ£¬Ôò´ò¿ªÎÄ¼şÊ±ÊÇ·ñĞèÒªÏÈÇå¿Õ¸ÃÎÄ¼ş
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä»¥åªå†™æ–¹å¼æ‰“å¼€æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°æ–‡ä»¶
+	 * @param path {const char*} æ–‡ä»¶å
+	 * @param otrunc {bool} è‹¥æ–‡ä»¶å­˜åœ¨ï¼Œåˆ™æ‰“å¼€æ–‡ä»¶æ—¶æ˜¯å¦éœ€è¦å…ˆæ¸…ç©ºè¯¥æ–‡ä»¶
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool open_write(const char* path, bool otrunc = true);
 
 	/**
-	 * ÒÔÎ²²¿Ìí¼Ó·½Ê½´ò¿ªÎÄ¼ş£¬Èç¹ûÎÄ¼ş²»´æÔÚÔò´´½¨ĞÂÎÄ¼ş
-	 * @param path {const char*} ÎÄ¼şÃû
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä»¥å°¾éƒ¨æ·»åŠ æ–¹å¼æ‰“å¼€æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°æ–‡ä»¶
+	 * @param path {const char*} æ–‡ä»¶å
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool open_append(const char* path);
 };

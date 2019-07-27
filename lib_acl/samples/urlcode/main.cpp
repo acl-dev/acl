@@ -1,4 +1,4 @@
-
+ï»¿
 #if defined(ACL_WINDOWS)
 #pragma comment(lib,"ws2_32")
 #endif
@@ -8,7 +8,7 @@
 
 static void test_urlcode(void)
 {
-	const char *params = "n a m e=ÖĞ¹ú&value=ÈËÃñ&name2=ĞÕÃû&value2=åĞÒ£ÏÉ";
+	const char *params = "n a m e=ä¸­å›½&value=äººæ°‘&name2=å§“å&value2=é€é¥ä»™";
 	char *tmp1, *tmp2;
 
 	printf("params: (%s), len=%d\r\n", params, (int) strlen(params));

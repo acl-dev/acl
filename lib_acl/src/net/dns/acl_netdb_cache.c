@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -110,7 +110,7 @@ void acl_netdb_cache_push(const ACL_DNS_DB *h_dns_db, int timeout)
 	char  buf[256];
 	CACHE *cache;
 
-	/* Èç¹û½ûÖ¹»º´æ£¬ÔòÖ±½Ó·µ»Ø */
+	/* å¦‚æœç¦æ­¢ç¼“å­˜ï¼Œåˆ™ç›´æ¥è¿”å› */
 	if (__cache_timeout <= 0)
 		return;
 

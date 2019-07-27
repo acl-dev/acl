@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../connpool/connect_manager.hpp"
 
@@ -8,7 +8,7 @@ namespace acl
 class polarssl_conf;
 
 /**
- * HTTP ¿Í»§¶ËÇëÇóÁ¬½Ó³Ø¹ÜÀíÀà
+ * HTTP å®¢æˆ·ç«¯è¯·æ±‚è¿æ¥æ± ç®¡ç†ç±»
  */
 class ACL_CPP_API http_request_manager : public acl::connect_manager
 {
@@ -17,19 +17,19 @@ public:
 	virtual ~http_request_manager();
 
 	/**
-	 * µ÷ÓÃ±¾º¯ÊıÉèÖÃ SSL µÄ¿Í»§¶ËÄ£Ê½
+	 * è°ƒç”¨æœ¬å‡½æ•°è®¾ç½® SSL çš„å®¢æˆ·ç«¯æ¨¡å¼
 	 * @param ssl_conf {polarssl_conf*}
 	 */
 	void set_ssl(polarssl_conf* ssl_conf);
 
 protected:
 	/**
-	 * »ùÀà´¿Ğéº¯Êı£¬ÓÃÀ´´´½¨Á¬½Ó³Ø¶ÔÏó£¬¸Ãº¯Êı·µ»ØºóÓÉ»ùÀàÉèÖÃÁ¬½Ó³ØµÄ
-	 * ÍøÂçÁ¬½Ó¼°ÍøÂç IO µÄ³¬Ê±Ê±¼ä
-	 * @param addr {const char*} ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½£ºip:port
-	 * @param count {size_t} Á¬½Ó³ØµÄ´óĞ¡ÏŞÖÆ£¬µ±¸ÃÖµÎª 0 Ê±ÔòÃ»ÓĞÏŞÖÆ
-	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼)
-	 * @return {connect_pool*} ·µ»Ø´´½¨µÄÁ¬½Ó³Ø¶ÔÏó
+	 * åŸºç±»çº¯è™šå‡½æ•°ï¼Œç”¨æ¥åˆ›å»ºè¿æ¥æ± å¯¹è±¡ï¼Œè¯¥å‡½æ•°è¿”å›åç”±åŸºç±»è®¾ç½®è¿æ¥æ± çš„
+	 * ç½‘ç»œè¿æ¥åŠç½‘ç»œ IO çš„è¶…æ—¶æ—¶é—´
+	 * @param addr {const char*} æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šip:port
+	 * @param count {size_t} è¿æ¥æ± çš„å¤§å°é™åˆ¶ï¼Œå½“è¯¥å€¼ä¸º 0 æ—¶åˆ™æ²¡æœ‰é™åˆ¶
+	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹)
+	 * @return {connect_pool*} è¿”å›åˆ›å»ºçš„è¿æ¥æ± å¯¹è±¡
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 

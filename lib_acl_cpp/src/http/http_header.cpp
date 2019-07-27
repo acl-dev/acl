@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -212,7 +212,7 @@ void http_header::init()
 	CP(method_s_, "GET");
 	host_[0]          = 0;
 	keep_alive_       = false;
-	nredirect_        = 0; // Ä¬ÈÏÌõ¼şÏÂ²»Ö÷¶¯½øĞĞÖØ¶¨Ïò
+	nredirect_        = 0; // é»˜è®¤æ¡ä»¶ä¸‹ä¸ä¸»åŠ¨è¿›è¡Œé‡å®šå‘
 	accept_compress_  = true;
 	status_           = 200;
 	cgi_mode_         = false;
@@ -249,7 +249,7 @@ void http_header::reset()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Í¨ÓÃµÄº¯Êı
+// é€šç”¨çš„å‡½æ•°
 
 http_header& http_header::set_request_mode(bool onoff)
 {
@@ -370,9 +370,9 @@ void http_header::add_res_cookie(const HTTP_HDR_ENTRY& entry)
 		<HttpCookie, const char*, const char*, dbuf_guard*>
 		(entry.name, entry.value, dbuf_);
 
-	// Í¨¹ı setCookie ·½·¨¼ì²é value µÄÓĞĞ§ĞÔ£¬Èç¹û value ÖµÎŞĞ§£¬Ôò²»»á
-	// Íù cookies_ ÀïÌí¼Ó£¬ÒòÎª cookie ÊÇÔÚ dbuf_ ÉÏ·ÖÅäµÄ£¬ËùÒÔ´ËÄÚ´æÎŞ
-	// ĞèÊÖ¹¤ÊÍ·Å£¬µ± dbuf_ Ïú»ÙÊ±ÆäÄÚ´æ×ÔÈ»±»ÊÍ·Å
+	// é€šè¿‡ setCookie æ–¹æ³•æ£€æŸ¥ value çš„æœ‰æ•ˆæ€§ï¼Œå¦‚æœ value å€¼æ— æ•ˆï¼Œåˆ™ä¸ä¼š
+	// å¾€ cookies_ é‡Œæ·»åŠ ï¼Œå› ä¸º cookie æ˜¯åœ¨ dbuf_ ä¸Šåˆ†é…çš„ï¼Œæ‰€ä»¥æ­¤å†…å­˜æ— 
+	// éœ€æ‰‹å·¥é‡Šæ”¾ï¼Œå½“ dbuf_ é”€æ¯æ—¶å…¶å†…å­˜è‡ªç„¶è¢«é‡Šæ”¾
 	if (cookie->setCookie(entry.value)) {
 		cookies_.push_back(cookie);
 	}
@@ -446,7 +446,7 @@ void http_header::build_common(string& buf) const
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Óë HTTP ÇëÇóÍ·Ïà¹ØµÄº¯Êı
+// ä¸ HTTP è¯·æ±‚å¤´ç›¸å…³çš„å‡½æ•°
 
 http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 {
@@ -455,7 +455,7 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 	is_request_ = true;
 	size_t len = strlen(url);
 
-	// ¶à·ÖÅäÁ½¸ö×Ö½Ú£º'\0' ¼°¿ÉÄÜÌí¼ÓµÄ '/'
+	// å¤šåˆ†é…ä¸¤ä¸ªå­—èŠ‚ï¼š'\0' åŠå¯èƒ½æ·»åŠ çš„ '/'
 	url_ = (char*) dbuf_->dbuf_alloc(len + 2);
 	memcpy(url_, url, len);
 	url_[len] = 0;
@@ -475,9 +475,9 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 
 	char* params, *slash;
 
-	// ¿ªÊ¼ÌáÈ¡ host ×Ö¶Î
+	// å¼€å§‹æå– host å­—æ®µ
 
-	// µ± url ÖĞÖ»ÓĞÏà¶ÔÂ·¾¶Ê±
+	// å½“ url ä¸­åªæœ‰ç›¸å¯¹è·¯å¾„æ—¶
 	if (ptr == url_) {
 		if (encoding) {
 			params = strchr(ptr, '?');
@@ -486,14 +486,14 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 		}
 	}
 
-	// µ± url Îª¾ø¶ÔÂ·¾¶Ê±
+	// å½“ url ä¸ºç»å¯¹è·¯å¾„æ—¶
 	else if ((slash = strchr(ptr, '/')) != NULL && slash > ptr) {
 		size_t n = slash - ptr + 1;
 		if (n > sizeof(host_)) {
 			n = sizeof(host_);
 		}
 
-		// Ìí¼ÓÖ÷»úµØÖ·
+		// æ·»åŠ ä¸»æœºåœ°å€
 		ACL_SAFE_STRNCPY(host_, ptr, n);
 		if (encoding) {
 			params = strchr(slash, '?');
@@ -502,9 +502,9 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 		}
 	}
 
-	// µ± url Îª¾ø¶ÔÂ·¾¶ÇÒÖ÷»úµØÖ·ºóÃ»ÓĞ '/'
+	// å½“ url ä¸ºç»å¯¹è·¯å¾„ä¸”ä¸»æœºåœ°å€åæ²¡æœ‰ '/'
 	else {
-		// ÕâÊÇ°²È«µÄ£¬ÒòÎªÔÚÇ°Ãæ¸ø url_ ·ÖÅäÄÚ´æÊ±¶àÁËÒ»¸ö×Ö½Ú
+		// è¿™æ˜¯å®‰å…¨çš„ï¼Œå› ä¸ºåœ¨å‰é¢ç»™ url_ åˆ†é…å†…å­˜æ—¶å¤šäº†ä¸€ä¸ªå­—èŠ‚
 		if (slash == NULL) {
 			url_[len] = '/';
 			url_[len + 1] = 0;
@@ -842,19 +842,19 @@ bool http_header::build_request(string& buf) const
 				i++;
 			}
 
-			// ĞèÒª¶Ô²ÎÊı½øĞĞ URL ±àÂë
+			// éœ€è¦å¯¹å‚æ•°è¿›è¡Œ URL ç¼–ç 
 
 			tmp.url_encode((*it)->name);
 			buf += tmp.c_str();
 
-			// ÔÊĞí²ÎÊıÖµÎª¿ÕÖ¸Õë
+			// å…è®¸å‚æ•°å€¼ä¸ºç©ºæŒ‡é’ˆ
 			if ((*it)->value == NULL) {
 				continue;
 			}
 
 			buf += '=';
 
-			// ÔÊĞí²ÎÊıÖµÎª¿Õ´®
+			// å…è®¸å‚æ•°å€¼ä¸ºç©ºä¸²
 			if (*((*it)->value) == 0) {
 				continue;
 			}
@@ -864,7 +864,7 @@ bool http_header::build_request(string& buf) const
 		}
 	}
 
-	// HTTP/1.1 ÒªÇó±ØĞëÓĞ Host ×Ö¶Î£¬µ±Ã»ÓĞ Host ×Ö¶ÎÊ±£¬Ôò²ÉÓÃ HTTP/1.0
+	// HTTP/1.1 è¦æ±‚å¿…é¡»æœ‰ Host å­—æ®µï¼Œå½“æ²¡æœ‰ Host å­—æ®µæ—¶ï¼Œåˆ™é‡‡ç”¨ HTTP/1.0
 	if (host_[0] != 0) {
 		buf += " HTTP/1.1\r\n";
 	} else {
@@ -874,7 +874,7 @@ bool http_header::build_request(string& buf) const
 	build_common(buf);
 
 	if (accept_compress_) {
-		// ÒòÎªÄ¿Ç°µÄ zlib_stream ½öÖ§³ÖÓÚ´Ë
+		// å› ä¸ºç›®å‰çš„ zlib_stream ä»…æ”¯æŒäºæ­¤
 		buf += "Accept-Encoding: gzip\r\n";
 	}
 
@@ -908,7 +908,7 @@ bool http_header::build_request(string& buf) const
 		buf << "Sec-WebSocket-Version: " << ws_sec_ver_ << "\r\n";
 	}
 
-	// Ìí¼Ó·Ö¶ÎÇëÇó×Ö¶Î
+	// æ·»åŠ åˆ†æ®µè¯·æ±‚å­—æ®µ
 	if (range_from_ >= 0) {
 		buf << "Range: bytes=" << range_from_ << '-';
 		if (range_to_ >= range_from_) {
@@ -977,7 +977,7 @@ unsigned int http_header::get_redirect() const
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Óë HTTP ÏìÓ¦Í·Ïà¹ØµÄº¯Êı
+// ä¸ HTTP å“åº”å¤´ç›¸å…³çš„å‡½æ•°
 
 typedef struct HTTP_STATUS {
 	int   status;
@@ -1178,7 +1178,7 @@ bool http_header::build_response(string& out) const
 		return true;
 	}
 
-	// Ìí¼Ó·Ö¶ÎÏìÓ¦×Ö¶Î
+	// æ·»åŠ åˆ†æ®µå“åº”å­—æ®µ
 	if (range_from_ >= 0
 			&& range_to_ >= range_from_ && range_total_ > 0) {
 
@@ -1186,8 +1186,8 @@ bool http_header::build_response(string& out) const
 			<< range_to_ << '/' << range_total_ << "\r\n";
 	}
 
-	// Èç¹ûÊÇ gzip Ñ¹ËõÊı¾İ£¬µ±·Ç chunked ´«ÊäÊ±£¬±ØĞëÈ¡Ïû Content-Length
-	// ×Ö¶Î£¬Í¬Ê±½ûÖ¹±£³Ö³¤Á¬½Ó£¬¼´£º Connection: close
+	// å¦‚æœæ˜¯ gzip å‹ç¼©æ•°æ®ï¼Œå½“é chunked ä¼ è¾“æ—¶ï¼Œå¿…é¡»å–æ¶ˆ Content-Length
+	// å­—æ®µï¼ŒåŒæ—¶ç¦æ­¢ä¿æŒé•¿è¿æ¥ï¼Œå³ï¼š Connection: close
 	if (transfer_gzip_) {
 		out << "Content-Encoding: gzip\r\n";
 

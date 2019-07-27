@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include ".\dialogexpand.h"
 
 CDialogExpand::CDialogExpand(void)

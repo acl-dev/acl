@@ -1,4 +1,4 @@
-#ifndef _TLS_SCACHE_H_INCLUDED_
+﻿#ifndef _TLS_SCACHE_H_INCLUDED_
 #define _TLS_SCACHE_H_INCLUDED_
 
 /*++

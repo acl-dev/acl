@@ -1,4 +1,4 @@
-/*
+﻿/*
  * tpllib
  *
  * C library of functions for text template processing.

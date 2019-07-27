@@ -1,4 +1,4 @@
-package com.iker.gid;
+﻿package com.iker.gid;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,8 +10,8 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 /**
- * 命令行方式从GID服务器取得唯一ID号，是否应该使用该方式取得唯一ID号，
- * 应该取决于服务器的配置选项
+ * 鍛戒护琛屾柟寮忎粠GID鏈嶅姟鍣ㄥ彇寰楀敮涓€ID鍙凤紝鏄惁搴旇浣跨敤璇ユ柟寮忓彇寰楀敮涓€ID鍙凤紝
+ * 搴旇鍙栧喅浜庢湇鍔″櫒鐨勯厤缃€夐」
  * @author zsx
  *
  */
@@ -22,7 +22,7 @@ public final class GidClientCmdLine extends GidClient {
 	}
 	
 	/**
-	 * name-value 对类型类
+	 * name-value 瀵圭被鍨嬬被
 	 */
 	public final class NameValue {
 		private String name;
@@ -45,7 +45,7 @@ public final class GidClientCmdLine extends GidClient {
 	}
 
 	/**
-	 * 拆分字符串的类，该类将“名值”对进行拆分，数据格式为：
+	 * 鎷嗗垎瀛楃涓茬殑绫伙紝璇ョ被灏嗏€滃悕鍊尖€濆杩涜鎷嗗垎锛屾暟鎹牸寮忎负锛�
 	 * name1^value1|name2^value2|...
 	 */
 	public final class Tokens {
@@ -106,13 +106,13 @@ public final class GidClientCmdLine extends GidClient {
 			socket = OpenTcp();
 			
 			OutputStream out = socket.getOutputStream();
-			/* 请求的数据格式：CMD^new_gid|TAG^default */
+			/* 璇锋眰鐨勬暟鎹牸寮忥細CMD^new_gid|TAG^default */
 			String buf = "CMD^new_gid|TAG^" + tagName + "\r\n";
 			out.write(buf.getBytes());
 			out.flush();
 			//out.close();
 			
-			/* 响应数据格式：status^ok[|error]|gid^xxx[|tag^xxx|err^xxx|msg^xxx] */
+			/* 鍝嶅簲鏁版嵁鏍煎紡锛歴tatus^ok[|error]|gid^xxx[|tag^xxx|err^xxx|msg^xxx] */
 			InputStream in = socket.getInputStream();
 			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
 			buf = reader.readLine();

@@ -1,4 +1,4 @@
-GET http://wmail2.mail.hexun.com/cgi-bin/main/login/1262918837 HTTP/1.1
+﻿GET http://wmail2.mail.hexun.com/cgi-bin/main/login/1262918837 HTTP/1.1
 Host: wmail2.mail.hexun.com
 User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.0; zh-CN; rv:1.9.1.7) Gecko/20091221 Firefox/3.5.7
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8

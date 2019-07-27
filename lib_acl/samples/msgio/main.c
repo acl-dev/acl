@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -95,7 +95,7 @@ static void *service_thread(void *arg)
 	return (NULL);
 #endif
 
-	/* ½øÈëÊÂ¼þÑ­»· */
+	/* è¿›å…¥äº‹ä»¶å¾ªçŽ¯ */
 	while (1) {
 		acl_aio_loop(aio);
 		if (ipc->stop) {

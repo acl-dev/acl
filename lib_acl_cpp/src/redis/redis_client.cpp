@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -111,7 +111,7 @@ bool redis_client::open(void)
 		return false;
 	}
 
-	// Èç¹û SSL ÅäÖÃÏî·Ç¿Õ£¬Ôò×Ô¶¯½øĞĞ SSL ÎÕÊÖ
+	// å¦‚æœ SSL é…ç½®é¡¹éç©ºï¼Œåˆ™è‡ªåŠ¨è¿›è¡Œ SSL æ¡æ‰‹
 	if (ssl_conf_) {
 		polarssl_io* ssl = NEW polarssl_io(*ssl_conf_, false, false);
 		if (conn_.setup_hook(ssl) == ssl) {
@@ -122,9 +122,9 @@ bool redis_client::open(void)
 		}
 	}
 
-	// Èç¹ûÁ¬½ÓÃÜÂë·Ç¿Õ£¬Ôò³¢ÊÔÓÃ¸ÃÃÜÂëÏò redis-server ÈÏÖ¤ºÏ·¨ĞÔ
+	// å¦‚æœè¿æ¥å¯†ç éç©ºï¼Œåˆ™å°è¯•ç”¨è¯¥å¯†ç å‘ redis-server è®¤è¯åˆæ³•æ€§
 	if (pass_ && *pass_) { // && !authing_)
-		// ÉèÖÃµ±Ç°Á¬½ÓµÄ×´Ì¬ÎªÈÏÖ¤×´Ì¬£¬ÒÔ±ÜÃâ½øÈëËÀÑ­»·
+		// è®¾ç½®å½“å‰è¿æ¥çš„çŠ¶æ€ä¸ºè®¤è¯çŠ¶æ€ï¼Œä»¥é¿å…è¿›å…¥æ­»å¾ªç¯
 		authing_ = true;
 		redis_connection connection(this);
 		if (connection.auth(pass_) == false) {
@@ -254,7 +254,7 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 		buf[len] = 0;
 		rr->put(buf, (size_t) len);
 
-		// ¶Á \r\n
+		// è¯» \r\n
 		buf_.clear();
 		if (conn_.gets(buf_) == false) {
 			logger_error("gets line error, server: %s", addr_);
@@ -263,7 +263,7 @@ redis_result* redis_client::get_redis_string(dbuf_pool* pool)
 		return rr;
 	}
 
-	// ½«¿ÉÄÜ·µ»ØµÄ´óÄÚ´æ·Ö³É²»Á¬½ÓµÄÄÚ´æÁ´´æ´¢
+	// å°†å¯èƒ½è¿”å›çš„å¤§å†…å­˜åˆ†æˆä¸è¿æ¥çš„å†…å­˜é“¾å­˜å‚¨
 
 #define CHUNK_LENGTH	8192
 
@@ -363,7 +363,7 @@ redis_result* redis_client::get_redis_objects(dbuf_pool* pool, size_t nobjs)
 const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 	size_t nchildren, int* rw_timeout /* = NULL */)
 {
-	// ÖØÖÃĞ­Òé´¦Àí×´Ì¬
+	// é‡ç½®åè®®å¤„ç†çŠ¶æ€
 	bool retried = false;
 	redis_result* result;
 
@@ -439,7 +439,7 @@ const redis_result* redis_client::run(dbuf_pool* pool, const string& req,
 const redis_result* redis_client::run(dbuf_pool* pool, const redis_request& req,
 	size_t nchildren, int* rw_timeout /* = NULL */)
 {
-	// ÖØÖÃĞ­Òé´¦Àí×´Ì¬
+	// é‡ç½®åè®®å¤„ç†çŠ¶æ€
 	bool retried = false;
 
 	redis_result* result;

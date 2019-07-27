@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+Ôªø#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/db/pgsql_conf.hpp"
 #endif
@@ -12,7 +12,7 @@ pgsql_conf::pgsql_conf(const char* dbaddr, const char* dbname)
 	acl_assert(dbaddr && *dbaddr);
 	acl_assert(dbname && *dbname);
 
-	// µÿ÷∑∏Ò Ω£∫[dbname@]dbaddr
+	// Âú∞ÂùÄÊ†ºÂºèÔºö[dbname@]dbaddr
 	const char* ptr = strchr(dbaddr, '@');
 	if (ptr != NULL) {
 		ptr++;

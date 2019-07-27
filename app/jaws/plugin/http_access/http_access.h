@@ -1,4 +1,4 @@
-#ifndef	__HTTP_ACCESS_INCLUDE_H__
+﻿#ifndef	__HTTP_ACCESS_INCLUDE_H__
 #define	__HTTP_ACCESS_INCLUDE_H__
 
 void http_access_init(void);

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "charset_transfer.h"
 
 static void usage(const char* procname)

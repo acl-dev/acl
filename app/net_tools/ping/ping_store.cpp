@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "global/global.h"
 #include "ping.h"
 #include "ping_store.h"
@@ -17,7 +17,7 @@ ping_store::~ping_store()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³ÌÔËĞĞ¹ı³Ì
+// ä¸»çº¿ç¨‹è¿è¡Œè¿‡ç¨‹
 
 void ping_store::rpc_onover()
 {
@@ -27,7 +27,7 @@ void ping_store::rpc_onover()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³ÌÔËĞĞ¹ı³Ì
+// å­çº¿ç¨‹è¿è¡Œè¿‡ç¨‹
 
 static const char* CREATE_HOST_STATUS_TBL =
 "create table host_status_tbl\r\n"

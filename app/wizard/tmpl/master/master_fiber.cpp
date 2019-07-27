@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "master_service.h"
 
 static char *var_cfg_str;

@@ -1,4 +1,4 @@
-// http_rpc_server.cpp : Defines the entry point for the console application.
+ï»¿// http_rpc_server.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -36,7 +36,7 @@ static bool handle_one(http_response& response, bool output)
 			person.email().c_str() : "null");
 		person2->set_id(i);
 
-		// ÁĞ³ö¸ÃÓÃ»§µÄËùÓĞµç»°
+		// åˆ—å‡ºè¯¥ç”¨æˆ·çš„æ‰€æœ‰ç”µè¯
 		for (int j = 0; j < person.phone_size(); j++)
 		{
 			const tutorial::Person::PhoneNumber& phone = person.phone(j);
@@ -125,7 +125,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ¸Ãº¯ÊıµÄµ÷ÓÃ±ØĞëÔÚËùÓĞÊ¹ÓÃ acl µÄº¯ÊıÖ®Ç°
+	// è¯¥å‡½æ•°çš„è°ƒç”¨å¿…é¡»åœ¨æ‰€æœ‰ä½¿ç”¨ acl çš„å‡½æ•°ä¹‹å‰
 	if (use_mempool)
 		acl_mem_slice_init(8, 1024, 100000,
 			ACL_SLICE_FLAG_GC2 |

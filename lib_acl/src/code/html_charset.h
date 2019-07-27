@@ -1,4 +1,4 @@
-#ifndef	__HTML_CHARSET_INCLUDE_H__
+﻿#ifndef	__HTML_CHARSET_INCLUDE_H__
 #define	__HTML_CHARSET_INCLUDE_H__
 
 #ifndef ACL_CLIENT_ONLY

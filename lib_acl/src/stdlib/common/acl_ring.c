@@ -1,4 +1,4 @@
-/* Application-specific. */
+﻿/* Application-specific. */
 
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE

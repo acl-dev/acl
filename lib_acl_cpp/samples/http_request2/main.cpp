@@ -1,4 +1,4 @@
-// http_servlet.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// http_servlet.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 #include <assert.h>
 #include <getopt.h>
@@ -26,16 +26,16 @@ public:
 	{
 		http_request req(server_addr_);
 
-		// Ìí¼Ó HTTP ÇëÇóÍ·×Ö¶Î
+		// æ·»åŠ  HTTP è¯·æ±‚å¤´å­—æ®µ
 
 		string ctype("text/");
 		ctype << stype_ << "; charset=" << charset_;
 
-		http_header& hdr = req.request_header();  // ÇëÇóÍ·¶ÔÏóµÄÒıÓÃ
+		http_header& hdr = req.request_header();  // è¯·æ±‚å¤´å¯¹è±¡çš„å¼•ç”¨
 		hdr.set_url("/");
 		hdr.set_content_type(ctype);
 
-		// ·¢ËÍ HTTP ÇëÇóÊı¾İ
+		// å‘é€ HTTP è¯·æ±‚æ•°æ®
 		if (req.request(NULL, 0) == false)
 		{
 			logger_error("send http request to %s error",
@@ -61,10 +61,10 @@ public:
 	}
 
 private:
-	string server_addr_;	// web ·şÎñÆ÷µØÖ·
-	string stype_;		// ÇëÇóÊı¾İµÄ×ÓÊı¾İÀàĞÍ
-	string charset_;	// ±¾µØÇëÇóÊı¾İÎÄ¼şµÄ×Ö·û¼¯
-	string to_charset_;	// ½«·şÎñÆ÷ÏìÓ¦Êı¾İ×ªÎª±¾µØ×Ö·û¼¯
+	string server_addr_;	// web æœåŠ¡å™¨åœ°å€
+	string stype_;		// è¯·æ±‚æ•°æ®çš„å­æ•°æ®ç±»å‹
+	string charset_;	// æœ¬åœ°è¯·æ±‚æ•°æ®æ–‡ä»¶çš„å­—ç¬¦é›†
+	string to_charset_;	// å°†æœåŠ¡å™¨å“åº”æ•°æ®è½¬ä¸ºæœ¬åœ°å­—ç¬¦é›†
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 	log::stdout_open(true);
 	http_request_test test(server_addr, stype, charset);
 	test.run();

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 static int __fibers_count = 2;
 static int __fibers_max   = 2;

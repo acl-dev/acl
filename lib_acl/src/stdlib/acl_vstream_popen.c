@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -283,9 +283,9 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 
 		args.command = args.argv[0];
 
-		/* ×é½¨Æô¶¯½ø³ÌÃüÁîÐÐ²ÎÊý±í */
-		/* ÎªÁË±ÜÃâ²ÎÊý´«µÝÊ±¿ÉÄÜÒòÆäÖÐ¼äº¬ÓÐ¿Õ¸ñ¶ø±»·Ö¸ô³É
-		 * ¶à¸ö²ÎÊý£¬ËùÒÔÐèÒªÔÚ²ÎÊýÁ½±ß¼ÓÉÏÒýºÅ
+		/* ç»„å»ºå¯åŠ¨è¿›ç¨‹å‘½ä»¤è¡Œå‚æ•°è¡¨ */
+		/* ä¸ºäº†é¿å…å‚æ•°ä¼ é€’æ—¶å¯èƒ½å› å…¶ä¸­é—´å«æœ‰ç©ºæ ¼è€Œè¢«åˆ†éš”æˆ
+		 * å¤šä¸ªå‚æ•°ï¼Œæ‰€ä»¥éœ€è¦åœ¨å‚æ•°ä¸¤è¾¹åŠ ä¸Šå¼•å·
 		 */
 		for (i = 0; args.argv[i] != NULL; i++) {
 			acl_vstring_strcat(cmdline, "\"");

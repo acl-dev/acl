@@ -1,4 +1,4 @@
-/* System library. */
+ï»¿/* System library. */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
@@ -652,7 +652,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	acl_chroot_uid(root_dir, user_name);
 
 #ifdef ACL_UNIX
-	/* ÉèÖÃ×Ó½ø³ÌÔËĞĞ»·¾³£¬ÔÊĞí²úÉú core ÎÄ¼ş */
+	/* è®¾ç½®å­è¿›ç¨‹è¿è¡Œç¯å¢ƒï¼Œå…è®¸äº§ç”Ÿ core æ–‡ä»¶ */
 	if (acl_var_single_enable_core && acl_var_single_core_limit != 0) {
 		acl_set_core_limit(acl_var_single_core_limit);
 	}

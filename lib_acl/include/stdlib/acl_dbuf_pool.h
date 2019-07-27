@@ -1,4 +1,4 @@
-#ifndef	ACL_DBUF_POOL_INCLUDE_H
+ï»¿#ifndef	ACL_DBUF_POOL_INCLUDE_H
 #define	ACL_DBUF_POOL_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -8,97 +8,97 @@ extern "C" {
 typedef struct ACL_DBUF_POOL ACL_DBUF_POOL;
 
 /**
- * ´´½¨ÄÚ´æ³Ø¶ÔÏó
- * @param block_size {size_t} ÄÚ´æ³ØÖĞÃ¿¸öÁ¬ĞøÄÚ´æ¿éµÄ´óĞ¡£¨×Ö½Ú£©
- * @return {ACL_DBUF_POOL*} ·µ»Ø·Ç NULL ¶ÔÏó
+ * åˆ›å»ºå†…å­˜æ± å¯¹è±¡
+ * @param block_size {size_t} å†…å­˜æ± ä¸­æ¯ä¸ªè¿ç»­å†…å­˜å—çš„å¤§å°ï¼ˆå­—èŠ‚ï¼‰
+ * @return {ACL_DBUF_POOL*} è¿”å›é NULL å¯¹è±¡
  */
 ACL_API ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size);
 
 /**
- * ÖØÖÃÄÚ´æ³Ø×´Ì¬£¬»á½«¶àÓàµÄÄÚ´æÊı¾İ¿éÊÍ·Å
- * @param pool {ACL_DBUF_POOL*} ÄÚ´æ³Ø¶ÔÏó
- * @param off {size_t} ÒªÇó±£ÁôµÄ×îĞ¡ÄÚ´æÏà¶ÔÆ«ÒÆÎ»ÖÃ
- * @return {int} ·µ»Ø 0 ±íÊ¾²Ù×÷³É¹¦£¬·Ç 0 ±íÊ¾Ê§°Ü
+ * é‡ç½®å†…å­˜æ± çŠ¶æ€ï¼Œä¼šå°†å¤šä½™çš„å†…å­˜æ•°æ®å—é‡Šæ”¾
+ * @param pool {ACL_DBUF_POOL*} å†…å­˜æ± å¯¹è±¡
+ * @param off {size_t} è¦æ±‚ä¿ç•™çš„æœ€å°å†…å­˜ç›¸å¯¹åç§»ä½ç½®
+ * @return {int} è¿”å› 0 è¡¨ç¤ºæ“ä½œæˆåŠŸï¼Œé 0 è¡¨ç¤ºå¤±è´¥
  */
 ACL_API int  acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off);
 
 /**
- * Ïú»ÙÄÚ´æ³Ø
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
+ * é”€æ¯å†…å­˜æ± 
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
  */
 ACL_API void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool);
 
 /**
- * ·ÖÅäÖ¸¶¨³¤¶ÈµÄÄÚ´æ
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param  len {size_t} ĞèÒª·ÖÅäµÄÄÚ´æ´óĞ¡
- * @return {void*} ĞÂ·ÖÅäµÄÄÚ´æµØÖ·
+ * åˆ†é…æŒ‡å®šé•¿åº¦çš„å†…å­˜
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param  len {size_t} éœ€è¦åˆ†é…çš„å†…å­˜å¤§å°
+ * @return {void*} æ–°åˆ†é…çš„å†…å­˜åœ°å€
  */
 ACL_API void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t len);
 
 /**
- * ·ÖÅäÖ¸¶¨³¤¶ÈµÄÄÚ´æ²¢½«ÄÚ´æÇøÓòÇåÁã
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param len {size_t} ĞèÒª·ÖÅäµÄÄÚ´æ³¤¶È
- * @return {void*} ĞÂ·ÖÅäµÄÄÚ´æµØÖ·
+ * åˆ†é…æŒ‡å®šé•¿åº¦çš„å†…å­˜å¹¶å°†å†…å­˜åŒºåŸŸæ¸…é›¶
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param len {size_t} éœ€è¦åˆ†é…çš„å†…å­˜é•¿åº¦
+ * @return {void*} æ–°åˆ†é…çš„å†…å­˜åœ°å€
  */
 ACL_API void *acl_dbuf_pool_calloc(ACL_DBUF_POOL *pool, size_t len);
 
 /**
- * ¸ù¾İÊäÈëµÄ×Ö·û´®¶¯Ì¬´´½¨ĞÂµÄÄÚ´æ²¢½«×Ö·û´®½øĞĞ¸´ÖÆ£¬ÀàËÆÓÚ strdup
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param s {const char*} Ô´×Ö·û´®
- * @return {char*} ĞÂ¸´ÖÆµÄ×Ö·û´®µØÖ·
+ * æ ¹æ®è¾“å…¥çš„å­—ç¬¦ä¸²åŠ¨æ€åˆ›å»ºæ–°çš„å†…å­˜å¹¶å°†å­—ç¬¦ä¸²è¿›è¡Œå¤åˆ¶ï¼Œç±»ä¼¼äº strdup
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param s {const char*} æºå­—ç¬¦ä¸²
+ * @return {char*} æ–°å¤åˆ¶çš„å­—ç¬¦ä¸²åœ°å€
  */
 ACL_API char *acl_dbuf_pool_strdup(ACL_DBUF_POOL *pool, const char *s);
 
 /**
- * ¸ù¾İÊäÈëµÄ×Ö·û´®¶¯Ì¬´´½¨ĞÂµÄÄÚ´æ²¢½«×Ö·û´®½øĞĞ¸´ÖÆ£¬ÀàËÆÓÚ strdup
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param s {const char*} Ô´×Ö·û´®
- * @param len {size_t} ÏŞ¶¨µÄ×î´ó×Ö·û´®³¤¶È
- * @return {char*} ĞÂ¸´ÖÆµÄ×Ö·û´®µØÖ·
+ * æ ¹æ®è¾“å…¥çš„å­—ç¬¦ä¸²åŠ¨æ€åˆ›å»ºæ–°çš„å†…å­˜å¹¶å°†å­—ç¬¦ä¸²è¿›è¡Œå¤åˆ¶ï¼Œç±»ä¼¼äº strdup
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param s {const char*} æºå­—ç¬¦ä¸²
+ * @param len {size_t} é™å®šçš„æœ€å¤§å­—ç¬¦ä¸²é•¿åº¦
+ * @return {char*} æ–°å¤åˆ¶çš„å­—ç¬¦ä¸²åœ°å€
  */
 ACL_API char *acl_dbuf_pool_strndup(ACL_DBUF_POOL *pool,
 	const char *s, size_t len);
 
 /**
- * ¸ù¾İÊäÈëµÄÄÚ´æÊı¾İ¶¯Ì¬´´½¨ÄÚ´æ²¢½«Êı¾İ½øĞĞ¸´ÖÆ
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param addr {const void*} Ô´Êı¾İÄÚ´æµØÖ·
- * @param len {size_t} Ô´Êı¾İ³¤¶È
- * @return {void*} ĞÂ¸´ÖÆµÄÊı¾İµØÖ·
+ * æ ¹æ®è¾“å…¥çš„å†…å­˜æ•°æ®åŠ¨æ€åˆ›å»ºå†…å­˜å¹¶å°†æ•°æ®è¿›è¡Œå¤åˆ¶
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param addr {const void*} æºæ•°æ®å†…å­˜åœ°å€
+ * @param len {size_t} æºæ•°æ®é•¿åº¦
+ * @return {void*} æ–°å¤åˆ¶çš„æ•°æ®åœ°å€
  */
 ACL_API void *acl_dbuf_pool_memdup(ACL_DBUF_POOL *pool,
 		const void *addr, size_t len);
 
 /**
- * ¹é»¹ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æ
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param addr {const void*} ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æµØÖ·
- * @return {int} Èç¹û¸ÃÄÚ´æµØÖ··ÇÄÚ´æ³Ø·ÖÅä»òÊÍ·Å¶à´Î£¬Ôò·µ»Ø -1£¬²Ù×÷³É¹¦Ôò
- *  ·µ»Ø 0
+ * å½’è¿˜ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param addr {const void*} ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜åœ°å€
+ * @return {int} å¦‚æœè¯¥å†…å­˜åœ°å€éå†…å­˜æ± åˆ†é…æˆ–é‡Šæ”¾å¤šæ¬¡ï¼Œåˆ™è¿”å› -1ï¼Œæ“ä½œæˆåŠŸåˆ™
+ *  è¿”å› 0
  */
 ACL_API int acl_dbuf_pool_free(ACL_DBUF_POOL *pool, const void *addr);
 
 /**
- * ±£ÁôÓÉÄÚ´æ³Ø·ÖÅäµÄÄ³¶ÎµØÖ·£¬ÒÔÃâµ±µ÷ÓÃ reset Ê±±»ÌáÇ°ÊÍ·Åµô
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param addr {const void*} ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æµØÖ·
- * @return {int} ²Ù×÷³É¹¦Ôò·µ»Ø 0£¬Èç¹û¸ÃÄÚ´æµØÖ··ÇÄÚ´æ³Ø·ÖÅä£¬Ôò·µ»Ø -1
+ * ä¿ç•™ç”±å†…å­˜æ± åˆ†é…çš„æŸæ®µåœ°å€ï¼Œä»¥å…å½“è°ƒç”¨ reset æ—¶è¢«æå‰é‡Šæ”¾æ‰
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param addr {const void*} ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜åœ°å€
+ * @return {int} æ“ä½œæˆåŠŸåˆ™è¿”å› 0ï¼Œå¦‚æœè¯¥å†…å­˜åœ°å€éå†…å­˜æ± åˆ†é…ï¼Œåˆ™è¿”å› -1
  */
 ACL_API int acl_dbuf_pool_keep(ACL_DBUF_POOL *pool, const void *addr);
 
 /**
- * È¡Ïû±£ÁôÓÉÄÚ´æ³Ø·ÖÅäµÄÄ³¶ÎµØÖ·£¬ÒÔ±ãÓÚµ÷ÓÃ dbuf_reset Ê±±»ÊÍ·Åµô
- * @param pool {ACL_DBUF_POOL*} ¶ÔÏó³Ø¶ÔÏó
- * @param addr {const void*} ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æµØÖ·
- * @return {int} ²Ù×÷³É¹¦Ôò·µ»Ø 0£¬Èç¹û¸ÃÄÚ´æµØÖ··ÇÄÚ´æ³Ø·ÖÅä£¬Ôò·µ»Ø -1
+ * å–æ¶ˆä¿ç•™ç”±å†…å­˜æ± åˆ†é…çš„æŸæ®µåœ°å€ï¼Œä»¥ä¾¿äºè°ƒç”¨ dbuf_reset æ—¶è¢«é‡Šæ”¾æ‰
+ * @param pool {ACL_DBUF_POOL*} å¯¹è±¡æ± å¯¹è±¡
+ * @param addr {const void*} ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜åœ°å€
+ * @return {int} æ“ä½œæˆåŠŸåˆ™è¿”å› 0ï¼Œå¦‚æœè¯¥å†…å­˜åœ°å€éå†…å­˜æ± åˆ†é…ï¼Œåˆ™è¿”å› -1
  */
 ACL_API int acl_dbuf_pool_unkeep(ACL_DBUF_POOL *pool, const void *addr);
 
 /**
- * ÄÚ²¿²âÊÔÓÃº¯Êı
+ * å†…éƒ¨æµ‹è¯•ç”¨å‡½æ•°
  */
 ACL_API void acl_dbuf_pool_test(size_t max);
 

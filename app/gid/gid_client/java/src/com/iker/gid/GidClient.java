@@ -1,4 +1,4 @@
-package com.iker.gid;
+﻿package com.iker.gid;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -10,7 +10,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 
 /**
- * 抽象接口
+ * 鎶借薄鎺ュ彛
  * @author zsx
  *
  */
@@ -19,8 +19,8 @@ public abstract class GidClient {
 	protected String serverIp = "192.168.1.251";
 	protected int serverPort = 7072;
 	protected String tagName = "default";
-	protected int connTimeout = 10000; /* 连接超时时间为10秒 */
-	protected int rdTimeout = 30000; /* 读超时时间为30秒 */
+	protected int connTimeout = 10000; /* 杩炴帴瓒呮椂鏃堕棿涓�10绉� */
+	protected int rdTimeout = 30000; /* 璇昏秴鏃舵椂闂翠负30绉� */
 	
 	public GidClient(String ip, int port, String tag)
 	{
@@ -33,8 +33,8 @@ public abstract class GidClient {
 	}
 	
 	/**
-	 * 获得下一个唯一ID号
-	 * @return 返回唯一的64位整数，如果返回值 < 0 则表示出错
+	 * 鑾峰緱涓嬩竴涓敮涓€ID鍙�
+	 * @return 杩斿洖鍞竴鐨�64浣嶆暣鏁帮紝濡傛灉杩斿洖鍊� < 0 鍒欒〃绀哄嚭閿�
 	 */
 	abstract public long gidNext();
 
@@ -49,17 +49,17 @@ public abstract class GidClient {
 			urlConnection.setConnectTimeout(connTimeout);
 			urlConnection.setReadTimeout(rdTimeout);
 			
-			// 设置是否从httpUrlConnection读入，默认情况下是true;
+			// 璁剧疆鏄惁浠巋ttpUrlConnection璇诲叆锛岄粯璁ゆ儏鍐典笅鏄痶rue;
 			urlConnection.setDoInput(true);
 			
-			// 设置是否向httpUrlConnection输出，因为这个是post请求，
-			// 参数要放在 http正文内，因此需要设为true, 默认情况下是false;
+			// 璁剧疆鏄惁鍚慼ttpUrlConnection杈撳嚭锛屽洜涓鸿繖涓槸post璇锋眰锛�
+			// 鍙傛暟瑕佹斁鍦� http姝ｆ枃鍐咃紝鍥犳闇€瑕佽涓簍rue, 榛樿鎯呭喌涓嬫槸false;
 			urlConnection.setDoOutput(true);
 		
-			// 设置为 POST 请求方式
+			// 璁剧疆涓� POST 璇锋眰鏂瑰紡
 			urlConnection.setRequestMethod("POST");
 			
-			// Post 请求不能使用缓存
+			// Post 璇锋眰涓嶈兘浣跨敤缂撳瓨
 			urlConnection.setUseCaches(false);
 			urlConnection.setInstanceFollowRedirects(false);
 			urlConnection.setRequestProperty("User-Agent",
@@ -77,24 +77,24 @@ public abstract class GidClient {
 	}
 	
 	/**
-	 * 设置IO读超时时间
-	 * @param timeout 超时时间（单位为秒），如果不设置此时间，
-	 *  则内部缺省值为30秒
+	 * 璁剧疆IO璇昏秴鏃舵椂闂�
+	 * @param timeout 瓒呮椂鏃堕棿锛堝崟浣嶄负绉掞級锛屽鏋滀笉璁剧疆姝ゆ椂闂达紝
+	 *  鍒欏唴閮ㄧ己鐪佸€间负30绉�
 	 */
 	public void setRdTimeout(int timeout)
 	{
-		// 将秒转为毫秒
+		// 灏嗙杞负姣
 		rdTimeout = timeout * 1000;
 	}
 	
 	/**
-	 * 设置络连接时间
-	 * @param timeout 超时时间（单位为秒），如果不设置此时间，
-	 *  则内部缺省值为10秒
+	 * 璁剧疆缁滆繛鎺ユ椂闂�
+	 * @param timeout 瓒呮椂鏃堕棿锛堝崟浣嶄负绉掞級锛屽鏋滀笉璁剧疆姝ゆ椂闂达紝
+	 *  鍒欏唴閮ㄧ己鐪佸€间负10绉�
 	 */
 	public void setConnectTimeout(int timeout)
 	{
-		// 将秒转为毫秒
+		// 灏嗙杞负姣
 		connTimeout = timeout * 1000;
 	}
 	
@@ -105,7 +105,7 @@ public abstract class GidClient {
 			socket.setSoTimeout(rdTimeout);
 			SocketAddress socketAddress =
 					new InetSocketAddress(serverIp, serverPort);
-			// 带连接超时方式连接服务器
+			// 甯﹁繛鎺ヨ秴鏃舵柟寮忚繛鎺ユ湇鍔″櫒
 			socket.connect(socketAddress, connTimeout);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -116,8 +116,8 @@ public abstract class GidClient {
 	}
 
 	/**
-	 * 返回出错号
-	 * @return 错误号
+	 * 杩斿洖鍑洪敊鍙�
+	 * @return 閿欒鍙�
 	 */
 	int getLastError() {
 		return errnum;

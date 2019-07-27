@@ -1,4 +1,4 @@
-/* DO NOT EDIT: automatically built by dist/s_include. */
+﻿/* DO NOT EDIT: automatically built by dist/s_include. */
 #ifndef	_tcl_ext_h_
 #define	_tcl_ext_h_
 

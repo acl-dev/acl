@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "mail_object.h"
 
 mail_object::mail_object(acl::diff_manager& manager, const char* key, const char* val)

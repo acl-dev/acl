@@ -1,11 +1,11 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "acl_cpp/stream/ofstream.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include <stdio.h>
 #include <string>
 
-// std::string ²âÊÔ
+// std::string æµ‹è¯•
 
 static void test(void)
 {
@@ -120,7 +120,7 @@ static void test41(void)
 	buf += "hello world!";
 }
 
-// Ñ¹Á¦²âÊÔ acl::string
+// å‹åŠ›æµ‹è¯• acl::string
 
 static void test4(void)
 {
@@ -178,7 +178,7 @@ static void test51(void)
 	buf += "hello world!";
 }
 
-// Ñ¹Á¦²âÊÔ std::string
+// å‹åŠ›æµ‹è¯• std::string
 
 static void test5(void)
 {

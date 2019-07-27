@@ -1,33 +1,33 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "master_service.h"
 
 int main(int argc, char* argv[])
 {
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// ÉèÖÃÅäÖÃ²ÎÊý±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_int64(var_conf_int64_tab);
 	ms.set_cfg_str(var_conf_str_tab);
 	ms.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËÐÐ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {
-		// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
+		// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 		acl::log::stdout_open(true);
 
-		// µ±¸ÃÖµ > 0 Ê±Éè¶¨¶¨Ê±Æ÷±»´¥·¢µÄ´ÎÊýÏÞÖÆ£¬¼´µ±¶¨Ê±Æ÷´¥·¢
-		// µÄ´ÎÊý´ïµ½´ËÖµÊ±£¬³ÌÐòÍË³ö£»·ñÔò (<=0) Ôò¶¨Ê±Æ÷»áÒ»Ö±´¥·¢
+		// å½“è¯¥å€¼ > 0 æ—¶è®¾å®šå®šæ—¶å™¨è¢«è§¦å‘çš„æ¬¡æ•°é™åˆ¶ï¼Œå³å½“å®šæ—¶å™¨è§¦å‘
+		// çš„æ¬¡æ•°è¾¾åˆ°æ­¤å€¼æ—¶ï¼Œç¨‹åºé€€å‡ºï¼›å¦åˆ™ (<=0) åˆ™å®šæ—¶å™¨ä¼šä¸€ç›´è§¦å‘
 		int count = 5;
 
-		// ¶¨Ê±Æ÷´¥·¢µÄÊ±¼ä¼ä¸ô£¨µ¥Î»Îª£ºÃë£©
+		// å®šæ—¶å™¨è§¦å‘çš„æ—¶é—´é—´éš”ï¼ˆå•ä½ä¸ºï¼šç§’ï¼‰
 		int interval = 1;
 
-		// µ¥¶ÀÔËÐÐ·½Ê½
+		// å•ç‹¬è¿è¡Œæ–¹å¼
 		if (argc >= 3) {
 			ms.run_alone(argv[2], count, interval);
 		} else {
@@ -40,22 +40,22 @@ int main(int argc, char* argv[])
 	else
 	{
 #if defined(_WIN32) || defined(_WIN64)
-		// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
+		// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 		acl::log::stdout_open(true);
 
-		// µ±¸ÃÖµ > 0 Ê±Éè¶¨¶¨Ê±Æ÷±»´¥·¢µÄ´ÎÊýÏÞÖÆ£¬¼´µ±¶¨Ê±Æ÷´¥·¢
-		// µÄ´ÎÊý´ïµ½´ËÖµÊ±£¬³ÌÐòÍË³ö£»·ñÔò (<=0) Ôò¶¨Ê±Æ÷»áÒ»Ö±´¥·¢
+		// å½“è¯¥å€¼ > 0 æ—¶è®¾å®šå®šæ—¶å™¨è¢«è§¦å‘çš„æ¬¡æ•°é™åˆ¶ï¼Œå³å½“å®šæ—¶å™¨è§¦å‘
+		// çš„æ¬¡æ•°è¾¾åˆ°æ­¤å€¼æ—¶ï¼Œç¨‹åºé€€å‡ºï¼›å¦åˆ™ (<=0) åˆ™å®šæ—¶å™¨ä¼šä¸€ç›´è§¦å‘
 		int count = 5;
 
-		// ¶¨Ê±Æ÷´¥·¢µÄÊ±¼ä¼ä¸ô£¨µ¥Î»Îª£ºÃë£©
+		// å®šæ—¶å™¨è§¦å‘çš„æ—¶é—´é—´éš”ï¼ˆå•ä½ä¸ºï¼šç§’ï¼‰
 		int interval = 1;
 
-		// µ¥¶ÀÔËÐÐ·½Ê½
+		// å•ç‹¬è¿è¡Œæ–¹å¼
 		ms.run_alone(NULL, count, interval);
 		printf("Enter any key to exit now\r\n");
 		getchar();
 #else
-		// acl_master ¿ØÖÆÄ£Ê½ÔËÐÐ
+		// acl_master æŽ§åˆ¶æ¨¡å¼è¿è¡Œ
 		ms.run_daemon(argc, argv);
 #endif
 	}

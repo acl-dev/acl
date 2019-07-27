@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "IConnection.h"
 
 int IConnection::sock_handle() const

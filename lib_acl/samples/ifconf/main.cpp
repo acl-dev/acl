@@ -1,12 +1,12 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 
 static void test1(void)
 {
-        ACL_IFCONF *ifconf;	/* Íø¿¨²éÑ¯½á¹û¶ÔÏó */
-        ACL_IFADDR *ifaddr;	/* Ã¿¸öÍø¿¨ĞÅÏ¢¶ÔÏó */
-        ACL_ITER iter;		/* ±éÀú¶ÔÏó */
+        ACL_IFCONF *ifconf;	/* ç½‘å¡æŸ¥è¯¢ç»“æœå¯¹è±¡ */
+        ACL_IFADDR *ifaddr;	/* æ¯ä¸ªç½‘å¡ä¿¡æ¯å¯¹è±¡ */
+        ACL_ITER iter;		/* éå†å¯¹è±¡ */
 
-	/* ²éÑ¯±¾»úËùÓĞÍø¿¨ĞÅÏ¢ */
+	/* æŸ¥è¯¢æœ¬æœºæ‰€æœ‰ç½‘å¡ä¿¡æ¯ */
 	ifconf = acl_get_ifaddrs();
 
 	if (ifconf == NULL) {
@@ -16,7 +16,7 @@ static void test1(void)
 
 	printf("acl_get_ifaddrs:\r\n");
 
-	/* ±éÀúËùÓĞÍø¿¨µÄĞÅÏ¢ */
+	/* éå†æ‰€æœ‰ç½‘å¡çš„ä¿¡æ¯ */
 	acl_foreach(iter, ifconf) {
 		ifaddr = (ACL_IFADDR*) iter.data;
 		printf(">>>name=%s, addr=%s, type=%s\r\n",
@@ -26,13 +26,13 @@ static void test1(void)
 				 "AF_INET6" : "unknown"));
 	}
 
-	/* ÊÍ·Å²éÑ¯½á¹û */
+	/* é‡Šæ”¾æŸ¥è¯¢ç»“æœ */
 	acl_free_ifaddrs(ifconf);
 }
 
 static void test2(const char *pattern)
 {
-        ACL_ITER    iter;		/* ±éÀú¶ÔÏó */
+        ACL_ITER    iter;		/* éå†å¯¹è±¡ */
 	ACL_IFCONF *ifconf;
 
 	printf("pattern=%s\r\n", pattern);

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "dao/service_node.h"
 #include "dao/service_app.h"
 #include "dao/service_dead.h"

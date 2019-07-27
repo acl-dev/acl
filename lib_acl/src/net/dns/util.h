@@ -1,4 +1,4 @@
-#ifndef __DGATE_UTIL_INCLUDE_H__
+﻿#ifndef __DGATE_UTIL_INCLUDE_H__
 #define __DGATE_UTIL_INCLUDE_H__
 
 #include "lib_acl.h"

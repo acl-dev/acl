@@ -1,4 +1,4 @@
-#ifndef	IOSTUFF_INCLUDE_H
+ï»¿#ifndef	IOSTUFF_INCLUDE_H
 #define	IOSTUFF_INCLUDE_H
 #include <fiber/fiber_define.h>
 
@@ -6,45 +6,45 @@
 extern "C" {
 #endif
 
-#define CLOSE_ON_EXEC   1  /**< ±êÖ¾Î», µ÷ÓÃ exec ºó×Ô¶¯¹Ø±Õ´ò¿ªµÄÃèÊö×Ö */
+#define CLOSE_ON_EXEC   1  /**< æ ‡å¿—ä½, è°ƒç”¨ exec åè‡ªåŠ¨å…³é—­æ‰“å¼€çš„æè¿°å­— */
 #define PASS_ON_EXEC    0
 
-#define BLOCKING        0  /**< ×èÈû¶ÁĞ´±êÖ¾Î» */
-#define NON_BLOCKING    1  /**< ·Ç×èÈû¶ÁĞ´±êÖ¾Î» */
+#define BLOCKING        0  /**< é˜»å¡è¯»å†™æ ‡å¿—ä½ */
+#define NON_BLOCKING    1  /**< éé˜»å¡è¯»å†™æ ‡å¿—ä½ */
 
 /**
- * ÉèÖÃÌ×½Ó¿ÚÎª×èÈû»ò·Ç×èÈû
- * @param fd {int} Ì×½Ó×Ö
- * @param on {int} ÊÇ·ñÉèÖÃ¸ÃÌ×½Ó×ÖÎª·Ç×èÈû, BLOCKING »ò NON_BLOCKING
- * @return {int} >= 0: ³É¹¦, ·µ»ØÖµ > 0 ±íÊ¾ÉèÖÃÖ®Ç°µÄ±êÖ¾Î»; -1: Ê§°Ü
+ * è®¾ç½®å¥—æ¥å£ä¸ºé˜»å¡æˆ–éé˜»å¡
+ * @param fd {int} å¥—æ¥å­—
+ * @param on {int} æ˜¯å¦è®¾ç½®è¯¥å¥—æ¥å­—ä¸ºéé˜»å¡, BLOCKING æˆ– NON_BLOCKING
+ * @return {int} >= 0: æˆåŠŸ, è¿”å›å€¼ > 0 è¡¨ç¤ºè®¾ç½®ä¹‹å‰çš„æ ‡å¿—ä½; -1: å¤±è´¥
  */
 int non_blocking(socket_t fd, int on);
 
 /**
- * ºÁÃë¼¶±ğË¯Ãß
- * @param delay {unsigned} ºÁÃëÖµ
+ * æ¯«ç§’çº§åˆ«ç¡çœ 
+ * @param delay {unsigned} æ¯«ç§’å€¼
  */
 void doze(unsigned delay);
 
 /**
- * ÉèÖÃÎÄ¼şÃèÊö·û±êÖ¾Î»£¬µ±µ÷ÓÃ exec ºó¸ÃÃèÊö·û×Ô¶¯±»¹Ø±Õ
- * @param fd {int} ÎÄ¼şÃèÊö·û
- * @param on {int} 1 »ò 0
+ * è®¾ç½®æ–‡ä»¶æè¿°ç¬¦æ ‡å¿—ä½ï¼Œå½“è°ƒç”¨ exec åè¯¥æè¿°ç¬¦è‡ªåŠ¨è¢«å…³é—­
+ * @param fd {int} æ–‡ä»¶æè¿°ç¬¦
+ * @param on {int} 1 æˆ– 0
  * @return {int} 0: ok; -1: error
  */
 int close_on_exec(int fd, int on);
 
 /**
- * Éè¶¨µ±Ç°½ø³Ì¿ÉÒÔ´ò¿ª×î´óÎÄ¼şÃèÊö·ûÖµ
- * @param limit {int} Éè¶¨µÄ×î´óÖµ
+ * è®¾å®šå½“å‰è¿›ç¨‹å¯ä»¥æ‰“å¼€æœ€å¤§æ–‡ä»¶æè¿°ç¬¦å€¼
+ * @param limit {int} è®¾å®šçš„æœ€å¤§å€¼
  * @return {int} >=0: ok; -1: error
  */
 int open_limit(int limit);
 
 /**
- * ÅĞ¶Ï¸ø¶¨Ä³¸öÎÄ¼şÃèÊö×ÖÊÇ·ñÊÇÌ×½Ó×Ö
- * @param fd {int} ÎÄ¼şÃèÊö·û
- * @return {int} != 0: ÊÇ; 0: ·ñ
+ * åˆ¤æ–­ç»™å®šæŸä¸ªæ–‡ä»¶æè¿°å­—æ˜¯å¦æ˜¯å¥—æ¥å­—
+ * @param fd {int} æ–‡ä»¶æè¿°ç¬¦
+ * @return {int} != 0: æ˜¯; 0: å¦
  */
 int issock(int fd);
 

@@ -1,4 +1,4 @@
-#include <assert.h>
+﻿#include <assert.h>
 #include <iostream>
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/lib_fiber.hpp"
@@ -9,14 +9,14 @@ public:
 	fiber_client(acl::socket_stream* conn) : conn_(conn) {}
 
 protected:
-	// @override 实现基类纯虚函数
+	// @override 瀹炵幇鍩虹被绾櫄鍑芥暟
 	void run(void)
 	{
 		std::cout << "fiber-" << acl::fiber::self()
 			<< ": fd=" << conn_->sock_handle()
 			<< ", addr=" << conn_->get_peer() << std::endl;
 		echo();
-		delete this; // 因为是动态创建的，所以需自动销毁
+		delete this; // 鍥犱负鏄姩鎬佸垱寤虹殑锛屾墍浠ラ渶鑷姩閿€姣�
 	}
 
 private:
@@ -31,7 +31,7 @@ private:
 	{
 		char buf[8192];
 
-		// 从客户端读取数据并回显
+		// 浠庡鎴风璇诲彇鏁版嵁骞跺洖鏄�
 		while (!conn_->eof())
 		{
 			int ret = conn_->read(buf, sizeof(buf), false);
@@ -60,7 +60,7 @@ protected:
 	// @override
 	void run(void)
 	{
-		// 监听服务地址
+		// 鐩戝惉鏈嶅姟鍦板潃
 		acl::server_socket ss;
 		if (ss.open(addr_) == false)
 		{
@@ -74,7 +74,7 @@ protected:
 
 		while (true)
 		{
-			// 等待接收客户端连接
+			// 绛夊緟鎺ユ敹瀹㈡埛绔繛鎺�
 			acl::socket_stream* conn = ss.accept();
 			if (conn == NULL)
 			{
@@ -82,7 +82,7 @@ protected:
 				break;
 			}
 
-			// 创建客户端处理协程
+			// 鍒涘缓瀹㈡埛绔鐞嗗崗绋�
 			acl::fiber* fb = new fiber_client(conn);
 			fb->start();
 		}
@@ -100,10 +100,10 @@ int main(void)
 {
 	const char* addr = "127.0.0.1:8089";
 	
-	acl::fiber* fb = new fiber_server(addr); // 创建监听服务协程
-	fb->start(); // 启动监听协程
+	acl::fiber* fb = new fiber_server(addr); // 鍒涘缓鐩戝惉鏈嶅姟鍗忕▼
+	fb->start(); // 鍚姩鐩戝惉鍗忕▼
 
-	// 循环调度所有协程，直至所有协程退出
+	// 寰幆璋冨害鎵€鏈夊崗绋嬶紝鐩磋嚦鎵€鏈夊崗绋嬮€€鍑�
 	acl::fiber::schedule();
 
 	return 0;

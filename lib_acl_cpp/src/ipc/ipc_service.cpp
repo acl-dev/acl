@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
 #include "acl_cpp/stdlib/log.hpp"
@@ -64,37 +64,37 @@ static void thread_pool_main(REQ_CTX* ctx)
 		} else {
 			ctx->req->run(ipc);
 
-			// Èç¹û¸ÃÁ¬½ÓÁ÷ÒÀÈ»Õý³££¬Ôò·ÅÈëÁ¬½Ó³ØÖÐ
+			// å¦‚æžœè¯¥è¿žæŽ¥æµä¾ç„¶æ­£å¸¸ï¼Œåˆ™æ”¾å…¥è¿žæŽ¥æ± ä¸­
 			if (ipc->active()) {
 				ctx->service->push_conn(ipc);
 			}
 
-			// ·ñÔòÔòÊÍ·Å¶¯Ì¬¶ÔÏó
+			// å¦åˆ™åˆ™é‡Šæ”¾åŠ¨æ€å¯¹è±¡
 			else {
 				delete ipc;
 			}
 		}
 	} else {
-		// IO ÏûÏ¢Ä£Ê½
+		// IO æ¶ˆæ¯æ¨¡å¼
 
 		ipc_client* ipc = NEW ipc_client(ctx->magic);
 
-		// Á¬½ÓÏûÏ¢·þÎñÆ÷, ²ÉÓÃÍ¬²½IPCÍ¨µÀ·½Ê½
+		// è¿žæŽ¥æ¶ˆæ¯æœåŠ¡å™¨, é‡‡ç”¨åŒæ­¥IPCé€šé“æ–¹å¼
 		if (!ipc->open(ctx->addr, 0)) {
 			logger_error("open %s error(%s)",
 				ctx->addr, last_serror());
 		}
 
-		// µ÷ÓÃ×ÓÀàµÄ×èÈû´¦Àí¹ý³Ì
+		// è°ƒç”¨å­ç±»çš„é˜»å¡žå¤„ç†è¿‡ç¨‹
 		else {
 			ctx->req->run(ipc);
 		}
 
-		// Ïú»Ù IPC Á÷
+		// é”€æ¯ IPC æµ
 		delete ipc;
 	}
 
-	// ÊÍ·ÅÔÚÖ÷Ïß³ÌÖÐ·ÖÅäµÄ¶ÔÏó
+	// é‡Šæ”¾åœ¨ä¸»çº¿ç¨‹ä¸­åˆ†é…çš„å¯¹è±¡
 	acl_myfree(ctx);
 }
 
@@ -114,36 +114,36 @@ static void* thread_once_main(REQ_CTX* ctx)
 		} else {
 			ctx->req->run(ipc);
 
-			// Èç¹û¸ÃÁ¬½ÓÁ÷ÒÀÈ»Õý³££¬Ôò·ÅÈëÁ¬½Ó³ØÖÐ
+			// å¦‚æžœè¯¥è¿žæŽ¥æµä¾ç„¶æ­£å¸¸ï¼Œåˆ™æ”¾å…¥è¿žæŽ¥æ± ä¸­
 			if (ipc->active()) {
 				ctx->service->push_conn(ipc);
 			}
 
-			// ·ñÔòÔòÊÍ·Å¶¯Ì¬¶ÔÏó
+			// å¦åˆ™åˆ™é‡Šæ”¾åŠ¨æ€å¯¹è±¡
 			else {
 				delete ipc;
 			}
 		}
 	} else {
-		// IO ÏûÏ¢Ä£Ê½
+		// IO æ¶ˆæ¯æ¨¡å¼
 
 		ipc_client* ipc = NEW ipc_client(ctx->magic);
 
-		// Á¬½ÓÏûÏ¢·þÎñÆ÷
+		// è¿žæŽ¥æ¶ˆæ¯æœåŠ¡å™¨
 		if (!ipc->open(ctx->addr, 0)) {
 			logger_error("open %s error(%s)",
 				ctx->addr, acl_last_serror());
 		}
 
-		// µ÷ÓÃ×ÓÀàµÄ×èÈû´¦Àí¹ý³Ì
+		// è°ƒç”¨å­ç±»çš„é˜»å¡žå¤„ç†è¿‡ç¨‹
 		else {
 			ctx->req->run(ipc);
 		}
-		// Ïú»Ù IPC Á÷
+		// é”€æ¯ IPC æµ
 		delete ipc;
 	}
 
-	// ÊÍ·ÅÔÚÖ÷Ïß³ÌÖÐ·ÖÅäµÄ¶ÔÏó
+	// é‡Šæ”¾åœ¨ä¸»çº¿ç¨‹ä¸­åˆ†é…çš„å¯¹è±¡
 	acl_myfree(ctx);
 	return NULL;
 }
@@ -161,7 +161,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg,
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
-	// µ÷ÓÃ×ÓÀàµÄÏûÏ¢´¦Àí¹ý³Ì£¬ÏûÏ¢ºÅ±ØÐëÊÇ >= WM_USER
+	// è°ƒç”¨å­ç±»çš„æ¶ˆæ¯å¤„ç†è¿‡ç¨‹ï¼Œæ¶ˆæ¯å·å¿…é¡»æ˜¯ >= WM_USER
 	if (msg >= WM_USER) {
 		service->win32_proc(hWnd, msg, wParam, lParam);
 	}
@@ -252,10 +252,10 @@ bool ipc_service::create_window(void)
 			__class_name, acl_last_serror());
 	}
 
-	// Ìí¼Ó´°¿Ú¾ä±úµÄ¹ØÁª¶ÔÏó
+	// æ·»åŠ çª—å£å¥æŸ„çš„å…³è”å¯¹è±¡
 	SetWindowLongPtr(hWnd_, GWLP_USERDATA, (ULONG_PTR) this);
 
-	// µ÷ÓÃ×ÓÀà´¦Àí¹ý³Ì
+	// è°ƒç”¨å­ç±»å¤„ç†è¿‡ç¨‹
 	on_open("win32 gui message");
 	return true;
 }
@@ -309,7 +309,7 @@ ipc_service::~ipc_service(void)
 #ifdef ACL_WINDOWS
 void ipc_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	// ×ÓÀà±ØÐëÊµÏÖ¸Ã½Ó¿Ú
+	// å­ç±»å¿…é¡»å®žçŽ°è¯¥æŽ¥å£
 	logger_fatal("ipc_service::win32_proc be called");
 }
 #endif
@@ -352,7 +352,7 @@ ipc_client* ipc_service::peek_conn(void)
 {
 	ipc_client* ipc;
 
-	// ÏÈ´ÓÁ¬½Ó³ØÖÐ²éÕÒÊÇ·ñÓÐ¿ÉÓÃµÄÁ¬½Ó
+	// å…ˆä»Žè¿žæŽ¥æ± ä¸­æŸ¥æ‰¾æ˜¯å¦æœ‰å¯ç”¨çš„è¿žæŽ¥
 
 	lock_.lock();
 
@@ -370,12 +370,12 @@ ipc_client* ipc_service::peek_conn(void)
 		return ipc;
 	}
 
-	// ´´½¨ÐÂµÄ IO ÏûÏ¢Á÷
+	// åˆ›å»ºæ–°çš„ IO æ¶ˆæ¯æµ
 
 	ipc = NEW ipc_client(magic_);
 
 	const char* addr = get_addr();
-	// Á¬½ÓÏûÏ¢·þÎñÆ÷, ²ÉÓÃÍ¬²½IPCÍ¨µÀ·½Ê½
+	// è¿žæŽ¥æ¶ˆæ¯æœåŠ¡å™¨, é‡‡ç”¨åŒæ­¥IPCé€šé“æ–¹å¼
 	if (!ipc->open(addr, 0)) {
 		logger_error("open %s error(%s)", addr, acl_last_serror());
 		delete ipc;

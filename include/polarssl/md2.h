@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file md2.h
  *
  * \brief MD2 message digest algorithm (hash function)

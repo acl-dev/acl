@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class thread_client : public acl::thread
 {
@@ -8,11 +8,11 @@ public:
 	~thread_client();
 
 protected:
-	virtual void* run();		// »ùÀàĞéº¯Êı£¬ÔÚ×ÓÏß³ÌÖĞ±»µ÷ÓÃ
+	virtual void* run();		// åŸºç±»è™šå‡½æ•°ï¼Œåœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
 
 private:
-	acl::string server_addr_;	// ·şÎñÆ÷µØÖ·
-	bool  keep_alive_;		// ÊÇ·ñ²ÉÓÃ³¤Á¬½Ó·½Ê½
-	int   count_;			// IO »á»°´ÎÊı
-	int   length_;			// Ã¿´Î IO µÄÊı¾İ³¤¶È
+	acl::string server_addr_;	// æœåŠ¡å™¨åœ°å€
+	bool  keep_alive_;		// æ˜¯å¦é‡‡ç”¨é•¿è¿æ¥æ–¹å¼
+	int   count_;			// IO ä¼šè¯æ¬¡æ•°
+	int   length_;			// æ¯æ¬¡ IO çš„æ•°æ®é•¿åº¦
 };

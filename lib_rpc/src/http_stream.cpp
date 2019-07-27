@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "google/protobuf/message_lite.h"
 #include "google/protobuf/io/http_stream.h"
 #include "acl_cpp/stream/socket_stream.hpp"

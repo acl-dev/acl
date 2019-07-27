@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -67,7 +67,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		stream->fdp = (void *) fdp;
 	}
 
-	/* ¶ÔÍ¬Ò»Á¬½ÓµÄ¶ÁÐ´²Ù×÷½ûÖ¹Í¬Ê±½øÐÐ¼à¿Ø */
+	/* å¯¹åŒä¸€è¿žæŽ¥çš„è¯»å†™æ“ä½œç¦æ­¢åŒæ—¶è¿›è¡Œç›‘æŽ§ */
 	else if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		acl_msg_panic("%s(%d), %s: fd %d: multiple I/O request",
 			__FILE__, __LINE__, myname, sockfd);
@@ -114,7 +114,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		}
 	}
 
-	/* Ö÷ÒªÊÇÎªÁË¼õÉÙÍ¨Öª´ÎÊý */
+	/* ä¸»è¦æ˜¯ä¸ºäº†å‡å°‘é€šçŸ¥æ¬¡æ•° */
 	if (event_thr->event.blocked && event_thr->event.evdog
 	    && event_dog_client(event_thr->event.evdog) != stream)
 		event_dog_notify(event_thr->event.evdog);
@@ -138,7 +138,7 @@ static void event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		stream->fdp = (void *) fdp;
 	}
 
-	/* ¶ÔÍ¬Ò»Á¬½ÓµÄ¶ÁÐ´²Ù×÷½ûÖ¹Í¬Ê±½øÐÐ¼à¿Ø */
+	/* å¯¹åŒä¸€è¿žæŽ¥çš„è¯»å†™æ“ä½œç¦æ­¢åŒæ—¶è¿›è¡Œç›‘æŽ§ */
 	else if (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		acl_msg_panic("%s(%d)->%s: fd %d: multiple I/O request",
 			__FILE__, __LINE__, myname, sockfd);
@@ -201,7 +201,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->stream = stream;
 		stream->fdp = (void *) fdp;
 	}
-	/* ¶ÔÍ¬Ò»Á¬½ÓµÄ¶ÁÐ´²Ù×÷½ûÖ¹Í¬Ê±½øÐÐ¼à¿Ø */
+	/* å¯¹åŒä¸€è¿žæŽ¥çš„è¯»å†™æ“ä½œç¦æ­¢åŒæ—¶è¿›è¡Œç›‘æŽ§ */
 	else if (fdp->flag & EVENT_FDTABLE_FLAG_READ)
 		acl_msg_panic("%s(%d)->%s: fd %d: multiple I/O request",
 			__FILE__, __LINE__, myname, sockfd);

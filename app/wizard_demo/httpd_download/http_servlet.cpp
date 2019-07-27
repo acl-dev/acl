@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "http_servlet.h"
 
 http_servlet::http_servlet(const char* filepath, acl::socket_stream* conn,
@@ -60,9 +60,9 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
-	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
-	// memcached ·şÎñÕı³£¹¤×÷
+	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
+	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
+	// memcached æœåŠ¡æ­£å¸¸å·¥ä½œ
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0)
@@ -70,7 +70,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	// µ÷ÊÔ£º½«¿Í»§¶ËÇëÇóÍ·¼ÇÂ¼ÔÚÈÕÖ¾ÖĞ
+	// è°ƒè¯•ï¼šå°†å®¢æˆ·ç«¯è¯·æ±‚å¤´è®°å½•åœ¨æ—¥å¿—ä¸­
 	acl::string hdr;
 	req.getClient()->sprint_header(hdr);
 	logger("request head:\r\n%s\r\n", hdr.c_str());
@@ -82,13 +82,13 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		return transfer_file(req, res, range_from, range_to);
 }
 
-// ÆÕÍ¨ÏÂÔØ¹ı³Ì
+// æ™®é€šä¸‹è½½è¿‡ç¨‹
 bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
 	acl::ifstream in;
 
-	// Ö»¶Á·½Ê½´ò¿ªÎÄ¼şÁ÷
+	// åªè¯»æ–¹å¼æ‰“å¼€æ–‡ä»¶æµ
 	if (in.open_read(filepath_) == false)
 	{
 		logger_error("open file %s error %s", filepath_.c_str(),
@@ -103,15 +103,15 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 
 	acl::string hdr_entry;
 	acl::string filename;
-	filename.basename(in.file_path());  // ´ÓÎÄ¼şÈ«Â·¾¶ÖĞÌáÈ¡ÎÄ¼şÃû
+	filename.basename(in.file_path());  // ä»æ–‡ä»¶å…¨è·¯å¾„ä¸­æå–æ–‡ä»¶å
 	hdr_entry.format("attachment;filename=\"%s\"", filename.c_str());
 
-	// ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄ×Ö¶Î
+	// è®¾ç½® HTTP å“åº”å¤´ä¸­çš„å­—æ®µ
 	res.setStatus(200)
 		.setKeepAlive(req.isKeepAlive())
 		.setContentLength(fsize)
 		.setContentType("application/octet-stream")
-		// ÉèÖÃ HTTP Í·ÖĞµÄÎÄ¼şÃû
+		// è®¾ç½® HTTP å¤´ä¸­çš„æ–‡ä»¶å
 		.setHeader("Content-Disposition", hdr_entry.c_str());
 
 	acl::string hdr;
@@ -121,7 +121,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	long long n = 0;
 	char  buf[8192];
 
-	// ´ÓÎÄ¼şÁ÷ÖĞ¶ÁÈ¡Êı¾İ²¢½«Êı¾İ·¢¸ø¿Í»§¶Ë
+	// ä»æ–‡ä»¶æµä¸­è¯»å–æ•°æ®å¹¶å°†æ•°æ®å‘ç»™å®¢æˆ·ç«¯
 	while (!in.eof())
 	{
 		int ret = in.read(buf, sizeof(buf), false);
@@ -130,13 +130,13 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 		if (res.write(buf, ret) == false)
 			return false;
 		n += ret;
-		//acl_doze(100);  // ĞİÏ¢ 100 ms ±ãÓÚ²âÊÔ
+		//acl_doze(100);  // ä¼‘æ¯ 100 ms ä¾¿äºæµ‹è¯•
 	}
 
 	return n == fsize ? true : false;
 }
 
-// Ö§³Ö¶ÏµãĞø´«µÄÊı¾İ´«Êä¹ı³Ì
+// æ”¯æŒæ–­ç‚¹ç»­ä¼ çš„æ•°æ®ä¼ è¾“è¿‡ç¨‹
 bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res,
 	long long range_from, long long range_to)
@@ -155,7 +155,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 		length = -1;
 
 	acl::ifstream in;
-	// Ö»¶Á·½Ê½´ò¿ªÎÄ¼şÁ÷
+	// åªè¯»æ–¹å¼æ‰“å¼€æ–‡ä»¶æµ
 	if (in.open_read(filepath_) == false)
 	{
 		logger_error("open file %s error %s", filepath_.c_str(),
@@ -168,38 +168,38 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	if (fsize <= 0)
 		return reply(req, res, 500, "invalid file size: %lld", fsize);
 
-	// Èç¹ûÆ«ÒÆÎ»ÖÃ³¬¹ıÁËÎÄ¼ş×Ü³¤¶È£¬Ôò·µ»Ø´íÎó
+	// å¦‚æœåç§»ä½ç½®è¶…è¿‡äº†æ–‡ä»¶æ€»é•¿åº¦ï¼Œåˆ™è¿”å›é”™è¯¯
 	if (range_to >= fsize)
 		return reply(req, res, 400, "range_to(%lld) >= fsize(%lld)",
 			range_to, fsize);
 
-	// Èç¹û¿Í»§¶ËÒªÇó´ÓÖ¸¶¨Æ«ÒÆÎ»ÖÃÖÁÎÄ¼şÎ²£¬ÔòÖØĞÂ¼ÆËãĞèÒª¶ÁÈ¡µÄÊı¾İ³¤¶È£¬
-	// ´ËÖµ×÷ÎªÊµ¼ÊÒª´«Êä¸ø¿Í»§¶ËµÄ³¤¶È
+	// å¦‚æœå®¢æˆ·ç«¯è¦æ±‚ä»æŒ‡å®šåç§»ä½ç½®è‡³æ–‡ä»¶å°¾ï¼Œåˆ™é‡æ–°è®¡ç®—éœ€è¦è¯»å–çš„æ•°æ®é•¿åº¦ï¼Œ
+	// æ­¤å€¼ä½œä¸ºå®é™…è¦ä¼ è¾“ç»™å®¢æˆ·ç«¯çš„é•¿åº¦
 	if (length == -1)
 		length = fsize - range_from;
 
-	// ¶¨Î»ÎÄ¼şÆ«ÒÆÎ»ÖÃ
+	// å®šä½æ–‡ä»¶åç§»ä½ç½®
 	if (in.fseek(range_from, SEEK_SET) < 0)
 		return reply(req, res, 500, "fseek(%lld) error %s",
 			range_from, acl::last_serror());
 
 	acl::string hdr_entry;
 	acl::string filename;
-	filename.basename(in.file_path());  // ´ÓÎÄ¼şÈ«Â·¾¶ÖĞÌáÈ¡ÎÄ¼şÃû
+	filename.basename(in.file_path());  // ä»æ–‡ä»¶å…¨è·¯å¾„ä¸­æå–æ–‡ä»¶å
 	hdr_entry.format("attachment;filename=\"%s\"", filename.c_str());
 
-	// ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄ×Ö¶Î
-	res.setStatus(206)			// ÏìÓ¦×´Ì¬ 206 ±íÊ¾²¿·ÖÊı¾İ
-		.setKeepAlive(req.isKeepAlive())// ÊÇ·ñ±£³Ö³¤Á¬½Ó
-		.setContentLength(length)	// Êµ¼ÊÒª´«ÊäµÄÊı¾İ³¤¶È
-		.setContentType("application/octet-stream")  // Êı¾İÀàĞÍ
-		// ÉèÖÃ HTTP Í·ÖĞµÄÎÄ¼şÃû
+	// è®¾ç½® HTTP å“åº”å¤´ä¸­çš„å­—æ®µ
+	res.setStatus(206)			// å“åº”çŠ¶æ€ 206 è¡¨ç¤ºéƒ¨åˆ†æ•°æ®
+		.setKeepAlive(req.isKeepAlive())// æ˜¯å¦ä¿æŒé•¿è¿æ¥
+		.setContentLength(length)	// å®é™…è¦ä¼ è¾“çš„æ•°æ®é•¿åº¦
+		.setContentType("application/octet-stream")  // æ•°æ®ç±»å‹
+		// è®¾ç½® HTTP å¤´ä¸­çš„æ–‡ä»¶å
 		.setHeader("Content-Disposition", hdr_entry.c_str())
-		// ÉèÖÃ±¾´Î´«ÊäÇø¼äµÄÆğÊ¼Æ«ÒÆÎ»ÖÃ¼°Êı¾İµÄ×Ü³¤¶È
+		// è®¾ç½®æœ¬æ¬¡ä¼ è¾“åŒºé—´çš„èµ·å§‹åç§»ä½ç½®åŠæ•°æ®çš„æ€»é•¿åº¦
 		.setRange(range_from, range_to > 0
 				? range_to : fsize - 1, fsize);
 	
-	// µ÷ÊÔ£º½« HTTP ÏìÓ¦Í·¼ÇÔÚ±¾µØÈÕÖ¾ÖĞ
+	// è°ƒè¯•ï¼šå°† HTTP å“åº”å¤´è®°åœ¨æœ¬åœ°æ—¥å¿—ä¸­
 	acl::string hdr;
 	res.getHttpHeader().build_response(hdr);
 	logger("response head:\r\n%s\r\n", hdr.c_str());
@@ -208,13 +208,13 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	int   ret;
 	size_t size;
 
-	// ´ÓÎÄ¼şÖ¸¶¨Î»ÖÃ¶ÁÈ¡Êı¾İ£¬²¢½«Êı¾İ´«Êä¸ø¿Í»§¶Ë
+	// ä»æ–‡ä»¶æŒ‡å®šä½ç½®è¯»å–æ•°æ®ï¼Œå¹¶å°†æ•°æ®ä¼ è¾“ç»™å®¢æˆ·ç«¯
 	while (!in.eof() && length > 0)
 	{
 		size = sizeof(buf) > (size_t) length ?
 				(size_t) length : sizeof(buf);
 
-		// µÚÈı¸ö²ÎÊıÎª false ±íÊ¾½ö½øĞĞÒ»´Î¶Á²Ù×÷£¬²»±Ø´ı»º³åÇøÂúºóÔÙ·µ»Ø
+		// ç¬¬ä¸‰ä¸ªå‚æ•°ä¸º false è¡¨ç¤ºä»…è¿›è¡Œä¸€æ¬¡è¯»æ“ä½œï¼Œä¸å¿…å¾…ç¼“å†²åŒºæ»¡åå†è¿”å›
 		ret = in.read(buf, size, false);
 		if (ret == -1)
 		{
@@ -224,7 +224,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 		if (res.write(buf, ret) == false)
 			return false;
 		length -= ret;
-		//acl_doze(100);  // ĞİÏ¢ 100 ms ±ãÓÚ²âÊÔ
+		//acl_doze(100);  // ä¼‘æ¯ 100 ms ä¾¿äºæµ‹è¯•
 	}
 
 	if (length != 0)

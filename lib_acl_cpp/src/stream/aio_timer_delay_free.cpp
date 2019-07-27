@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -43,7 +43,7 @@ void aio_timer_delay_free::timer_callback(unsigned int /* id */)
 		}
 	}
 
-	// ²»¹ÜÊÂ¼şÒıÇæÊÇ·ñÉèÖÃÁËÖØ¸´¶¨Ê±Æ÷¹ı³Ì£¬ÖØÖÃ±¾¶¨Ê±Æ÷ÈÎÎñ
+	// ä¸ç®¡äº‹ä»¶å¼•æ“æ˜¯å¦è®¾ç½®äº†é‡å¤å®šæ—¶å™¨è¿‡ç¨‹ï¼Œé‡ç½®æœ¬å®šæ—¶å™¨ä»»åŠ¡
 	if (!gc_set_.empty()) {
 		handle_.set_timer(this, 100000, DELAY_TIMER_ID);
 	} else {

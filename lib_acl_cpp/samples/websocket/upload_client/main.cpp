@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 
 static bool handshake(acl::socket_stream& conn)
 {
@@ -151,9 +151,9 @@ static void usage(const char* proc)
 
 int main(int argc, char* argv[])
 {
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
-	acl::log::stdout_open(true);  // ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
+	acl::log::stdout_open(true);  // æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 	int ch;
 
 	acl::string addr, filename;

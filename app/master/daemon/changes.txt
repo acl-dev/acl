@@ -1,20 +1,20 @@
-
+﻿
 24) 2018.11.15
-24.1) feature: http_client::do_reply 记录请求信息，以便于排查问题
+24.1) feature: http_client::do_reply 璁板綍璇锋眰淇℃伅锛屼互渚夸簬鎺掓煡闂
 
 23) 2018.10.23
-23.1) feature: master_listen.cpp, master_listen_sock() 中的 defer_accept
-可以控制是否采用延迟接收方式
-23.2) bugfix: master_listen.cpp, master_bind_udp() 中在非 reuseport 方式下如果
-没有成功绑定任何地址，则应返回错误
+23.1) feature: master_listen.cpp, master_listen_sock() 涓殑 defer_accept
+鍙互鎺у埗鏄惁閲囩敤寤惰繜鎺ユ敹鏂瑰紡
+23.2) bugfix: master_listen.cpp, master_bind_udp() 涓湪闈� reuseport 鏂瑰紡涓嬪鏋�
+娌℃湁鎴愬姛缁戝畾浠讳綍鍦板潃锛屽垯搴旇繑鍥為敊璇�
 
 22) 2018.10.17
-22.1) bugfix: 对于 Centos7.x 以下版本，当需 acl_master 绑定 UDP 服务时，会造成
-因类型判断有误导致的崩溃问题，Centos7.x 以上版本不存在此问题，因为 UDP 服务是
-由服务模块自行进行绑定
+22.1) bugfix: 瀵逛簬 Centos7.x 浠ヤ笅鐗堟湰锛屽綋闇€ acl_master 缁戝畾 UDP 鏈嶅姟鏃讹紝浼氶€犳垚
+鍥犵被鍨嬪垽鏂湁璇鑷寸殑宕╂簝闂锛孋entos7.x 浠ヤ笂鐗堟湰涓嶅瓨鍦ㄦ闂锛屽洜涓� UDP 鏈嶅姟鏄�
+鐢辨湇鍔℃ā鍧楄嚜琛岃繘琛岀粦瀹�
 
 21) 2017.3.21
-21.1) feature: http_client.cpp 里需要记录客户端发来的命令字
+21.1) feature: http_client.cpp 閲岄渶瑕佽褰曞鎴风鍙戞潵鐨勫懡浠ゅ瓧
 
 20) 2017.1.31
 20.1) bugfix: master_conf.cpp check_xxx should be override after reloading services' configures.
@@ -35,10 +35,10 @@
 15.1) bugfix: the service start item is lost in action/service_list.cpp
 
 14) 2017.12.22
-14.1) bugfix: master_conf.cpp 中 master_add_service 在调用 acl_master_ent_find
-时，应该使用 entry->conf (配置文件路径) 而不是 entry->path 程序路径
-14.2) bugfix: master_api.cpp 远程调用 restart 命令时，没有重新读取配置文件，
-所以造成无法启动服务程序改名后的服务
+14.1) bugfix: master_conf.cpp 涓� master_add_service 鍦ㄨ皟鐢� acl_master_ent_find
+鏃讹紝搴旇浣跨敤 entry->conf (閰嶇疆鏂囦欢璺緞) 鑰屼笉鏄� entry->path 绋嬪簭璺緞
+14.2) bugfix: master_api.cpp 杩滅▼璋冪敤 restart 鍛戒护鏃讹紝娌℃湁閲嶆柊璇诲彇閰嶇疆鏂囦欢锛�
+鎵€浠ラ€犳垚鏃犳硶鍚姩鏈嶅姟绋嬪簭鏀瑰悕鍚庣殑鏈嶅姟
 
 13) 2017.11.21
 13.1) feature: add master_config command for getting the configure of master
@@ -64,8 +64,8 @@
 6) 2017.9.5
 6.1) feature: master can wait children to exit with sync or async
 6.2) feature: master can kill SIGTERM children when reloading
-6.3) bugfix: master_params.cpp 中的 init_conf_str_vars 函数在 master reload 时
-有内存泄露
+6.3) bugfix: master_params.cpp 涓殑 init_conf_str_vars 鍑芥暟鍦� master reload 鏃�
+鏈夊唴瀛樻硠闇�
 
 5) 2017.8.11
 5.1) safety: master can't fatal for some configure error of any app service.

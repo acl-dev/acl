@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file net.h
  *
  * \brief Network communication functions

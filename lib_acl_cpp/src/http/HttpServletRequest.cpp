@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -72,17 +72,17 @@ HttpServletRequest::~HttpServletRequest(void)
 	if (client_)
 		client_->~http_client();
 	delete dbuf_internal_;
-	delete body_; // ¸Ã¶ÔÏó²»ÊÇÔÚ dbuf ÉÏ·ÖÅäµÄ£¬ËùÒÔĞèÒªµ¥¶ÀÊÍ·Å
+	delete body_; // è¯¥å¯¹è±¡ä¸æ˜¯åœ¨ dbuf ä¸Šåˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦å•ç‹¬é‡Šæ”¾
 }
 
 http_method_t HttpServletRequest::getMethod(string* method_s /* = NULL */) const
 {
-	// HttpServlet Àà¶ÔÏóµÄ doRun ÔËĞĞÊ± readHeader ±ØĞëÏÈ±»µ÷ÓÃ£¬
-	// ¶ø HttpSevlet ÀàÔÚ³õÊ¼»¯ÇëÇóÊ±¿Ï¶¨»áµ÷ÓÃ getMethod ·½·¨£¬
-	// ËùÒÔÔÚ´Ëº¯ÊıÖĞ´¥·¢ readHeader ·½·¨±È½ÏºÃ£¬ÕâÑùÒ»·½Ãæ¿ÉÒÔ
-	// ½« readHeader ·½·¨Òş²ØÆğÀ´£¬ÃâµÃÓÃ»§Îóµ÷ÓÃ£»ÁíÒ»·½Ãæ£¬ÓÖ
-	// ÄÜ±£Ö¤ readHeader ¿Ï¶¨»á±»µ÷ÓÃ£»Í¬Ê±ÓÖ²»±Ø°Ñ HttpServlet
-	// ÀàÉùÃ÷±¾ÀàµÄÓÑÔªÀà
+	// HttpServlet ç±»å¯¹è±¡çš„ doRun è¿è¡Œæ—¶ readHeader å¿…é¡»å…ˆè¢«è°ƒç”¨ï¼Œ
+	// è€Œ HttpSevlet ç±»åœ¨åˆå§‹åŒ–è¯·æ±‚æ—¶è‚¯å®šä¼šè°ƒç”¨ getMethod æ–¹æ³•ï¼Œ
+	// æ‰€ä»¥åœ¨æ­¤å‡½æ•°ä¸­è§¦å‘ readHeader æ–¹æ³•æ¯”è¾ƒå¥½ï¼Œè¿™æ ·ä¸€æ–¹é¢å¯ä»¥
+	// å°† readHeader æ–¹æ³•éšè—èµ·æ¥ï¼Œå…å¾—ç”¨æˆ·è¯¯è°ƒç”¨ï¼›å¦ä¸€æ–¹é¢ï¼Œåˆ
+	// èƒ½ä¿è¯ readHeader è‚¯å®šä¼šè¢«è°ƒç”¨ï¼›åŒæ—¶åˆä¸å¿…æŠŠ HttpServlet
+	// ç±»å£°æ˜æœ¬ç±»çš„å‹å…ƒç±»
 
 	if (!readHeaderCalled_) {
 		const_cast<HttpServletRequest*>(this)->readHeader(method_s);
@@ -128,7 +128,7 @@ const std::vector<HttpCookie*>& HttpServletRequest::getCookies(void) const
 		return cookies_;
 	}
 
-	// ÉèÖÃ±ê¼Ç±íÃ÷ÒÑ¾­·ÖÎö¹ıcookieÁË£¬ÒÔ±ãÓÚÏÂ´ÎÖØ¸´µ÷ÓÃÊ±½ÚÊ¡Ê±¼ä
+	// è®¾ç½®æ ‡è®°è¡¨æ˜å·²ç»åˆ†æè¿‡cookieäº†ï¼Œä»¥ä¾¿äºä¸‹æ¬¡é‡å¤è°ƒç”¨æ—¶èŠ‚çœæ—¶é—´
 	const_cast<HttpServletRequest*>(this)->cookies_inited_ = true;
 
 	if (cgi_mode_) {
@@ -159,7 +159,7 @@ const std::vector<HttpCookie*>& HttpServletRequest::getCookies(void) const
 
 	ACL_HTABLE_ITER iter;
 
-	// ±éÀú HTTP  ÇëÇóÍ·ÖĞµÄ cookie Ïî
+	// éå† HTTP  è¯·æ±‚å¤´ä¸­çš„ cookie é¡¹
 	acl_htable_foreach(iter, req->cookies_table) {
 		const char* name  = acl_htable_iter_key(iter);
 		const char* value = (char*) acl_htable_iter_value(iter);
@@ -168,7 +168,7 @@ const std::vector<HttpCookie*>& HttpServletRequest::getCookies(void) const
 
 			continue;
 		}
-		// ´´½¨ cookie ¶ÔÏó²¢½«Ö®¼ÓÈëÊı×éÖĞ
+		// åˆ›å»º cookie å¯¹è±¡å¹¶å°†ä¹‹åŠ å…¥æ•°ç»„ä¸­
 		HttpCookie* cookie = dbuf_->create<HttpCookie, const char*,
 			const char*, dbuf_guard*>(name, value, dbuf_);
 		const_cast<HttpServletRequest*>
@@ -259,16 +259,16 @@ HttpSession& HttpServletRequest::getSession(bool create /* = true */,
 	if ((sid = getCookieValue(cookie_name_)) != NULL) {
 		store_.set_sid(sid);
 	} else if (create) {
-		// »ñµÃÎ¨Ò» ID ±êÊ¶·û
+		// è·å¾—å”¯ä¸€ ID æ ‡è¯†ç¬¦
 		sid = store_.get_sid();
-		// Éú³É cookie ¶ÔÏó£¬²¢·Ö±ğÏòÇëÇó¶ÔÏóºÍÏìÓ¦¶ÔÏóÌí¼Ó cookie
+		// ç”Ÿæˆ cookie å¯¹è±¡ï¼Œå¹¶åˆ†åˆ«å‘è¯·æ±‚å¯¹è±¡å’Œå“åº”å¯¹è±¡æ·»åŠ  cookie
 		HttpCookie* cookie = dbuf_->create<HttpCookie, const char*,
 			const char*, dbuf_guard*>(cookie_name_, sid, dbuf_);
 		res_.addCookie(cookie);
 		setCookie(cookie_name_, sid);
 	} else if (sid_in != NULL && *sid_in != 0) {
 		store_.set_sid(sid_in);
-		// Éú³É cookie ¶ÔÏó£¬²¢·Ö±ğÏòÇëÇó¶ÔÏóºÍÏìÓ¦¶ÔÏóÌí¼Ó cookie
+		// ç”Ÿæˆ cookie å¯¹è±¡ï¼Œå¹¶åˆ†åˆ«å‘è¯·æ±‚å¯¹è±¡å’Œå“åº”å¯¹è±¡æ·»åŠ  cookie
 		HttpCookie* cookie = dbuf_->create<HttpCookie, const char*,
 			const char*, dbuf_guard*>(cookie_name_, sid_in, dbuf_);
 		res_.addCookie(cookie);
@@ -452,7 +452,7 @@ const char* HttpServletRequest::getParameter(const char* name,
 		}
 	}
 
-	// Èç¹ûÊÇ MIME ¸ñÊ½£¬Ôò³¢ÊÔ´Ó mime_ ¶ÔÏóÖĞ²éÑ¯²ÎÊı
+	// å¦‚æœæ˜¯ MIME æ ¼å¼ï¼Œåˆ™å°è¯•ä» mime_ å¯¹è±¡ä¸­æŸ¥è¯¢å‚æ•°
 	if (mime_ == NULL) {
 		return NULL;
 	}
@@ -716,10 +716,10 @@ bool HttpServletRequest::readHeader(string* method_s)
 			content_type_.parse(ptr);
 		}
 
-		// ±ØĞëÊÇºó»ñµÃ method£¬ÒòÎª acl_getenv ÄÚ²¿µÄÄÚ´æÇøÓÃµÄ
-		// ÊÇÏß³Ì¾Ö²¿±äÁ¿£¬¸ÃÄÚ´æÇøÔÚÍ¬Ò»Ïß³ÌÖĞ»á±»ÖØ¸´Ê¹ÓÃ£¬ÕâÑù
-		// ºó»ñµÃ method ¿ÉÒÔ±£Ö¤ method ¿ÉÒÔÓÉÏÂÃæµÄ¹ı³ÌÈ·¶¨¾ßÌå
-		// µÄÇëÇó·½·¨
+		// å¿…é¡»æ˜¯åè·å¾— methodï¼Œå› ä¸º acl_getenv å†…éƒ¨çš„å†…å­˜åŒºç”¨çš„
+		// æ˜¯çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œè¯¥å†…å­˜åŒºåœ¨åŒä¸€çº¿ç¨‹ä¸­ä¼šè¢«é‡å¤ä½¿ç”¨ï¼Œè¿™æ ·
+		// åè·å¾— method å¯ä»¥ä¿è¯ method å¯ä»¥ç”±ä¸‹é¢çš„è¿‡ç¨‹ç¡®å®šå…·ä½“
+		// çš„è¯·æ±‚æ–¹æ³•
 		method = acl_getenv("REQUEST_METHOD");
 	} else {
 		client_ = new (dbuf_->dbuf_alloc(sizeof(http_client)))
@@ -742,7 +742,7 @@ bool HttpServletRequest::readHeader(string* method_s)
 		return false;
 	}
 
-	// »º´æ×Ö·û´®ÀàĞÍµÄÇëÇó·½·¨
+	// ç¼“å­˜å­—ç¬¦ä¸²ç±»å‹çš„è¯·æ±‚æ–¹æ³•
 	method_s->copy(method);
 
 	if (strcasecmp(method, "GET") == 0) {
@@ -788,7 +788,7 @@ bool HttpServletRequest::readHeader(string* method_s)
 	const char* ctype = getContentType();
 	const char* stype = content_type_.get_stype();
 
-	// Êı¾İÌåÎªÎÄ¼şÉÏ´«µÄ MIME ÀàĞÍ
+	// æ•°æ®ä½“ä¸ºæ–‡ä»¶ä¸Šä¼ çš„ MIME ç±»å‹
 	if (ctype == NULL || stype == NULL) {
 		request_type_ = HTTP_REQUEST_OTHER;
 		return true;
@@ -796,7 +796,7 @@ bool HttpServletRequest::readHeader(string* method_s)
 
 #define EQ	!strcasecmp
 
-	// µ±Êı¾İÌåÎª HTTP MIME ÉÏ´«Êı¾İÊ±
+	// å½“æ•°æ®ä½“ä¸º HTTP MIME ä¸Šä¼ æ•°æ®æ—¶
 	if (EQ(ctype, "multipart") && EQ(stype, "form-data")) {
 		const char* bound = content_type_.get_bound();
 		if (bound == NULL) {
@@ -810,20 +810,20 @@ bool HttpServletRequest::readHeader(string* method_s)
 		return true;
 	}
 
-	// Êı¾İÌåÎªÊı¾İÁ÷ÀàĞÍ
+	// æ•°æ®ä½“ä¸ºæ•°æ®æµç±»å‹
 	if (EQ(ctype, "application") && EQ(stype, "octet-stream")) {
 		request_type_ = HTTP_REQUEST_OCTET_STREAM;
 		return true;
 	}
 
-	// Èç¹ûĞèÒª·ÖÎöÊı¾İÌåµÄ²ÎÊıÊ±µÄÊı¾İÌå³¤¶È¹ı´ó£¬ÔòÖ±½Ó·µ»Ø´íÎó
+	// å¦‚æœéœ€è¦åˆ†ææ•°æ®ä½“çš„å‚æ•°æ—¶çš„æ•°æ®ä½“é•¿åº¦è¿‡å¤§ï¼Œåˆ™ç›´æ¥è¿”å›é”™è¯¯
 	if (body_limit_ > 0 && len >= body_limit_) {
 		logger_error("request body too large, len=%lld, limit=%d",
 			len, body_limit_);
 		return false;
 	}
 
-	// µ±Êı¾İÌåÎª form ¸ñÊ½Ê±£º
+	// å½“æ•°æ®ä½“ä¸º form æ ¼å¼æ—¶ï¼š
 	if (EQ(ctype, "application") && EQ(stype, "x-www-form-urlencoded")) {
 		request_type_ = HTTP_REQUEST_NORMAL;
 		char* query = (char*) dbuf_->dbuf_alloc((size_t) len + 1);
@@ -837,13 +837,13 @@ bool HttpServletRequest::readHeader(string* method_s)
 		return ret == -1 ? false : true;
 	}
 
-	// µ±Êı¾İÀàĞÍÎª application/json »ò text/json ¸ñÊ½Ê±£º
+	// å½“æ•°æ®ç±»å‹ä¸º application/json æˆ– text/json æ ¼å¼æ—¶ï¼š
 	if (EQ(stype, "json") && (EQ(ctype, "application") || EQ(ctype, "text"))) {
 		request_type_ = HTTP_REQUEST_TEXT_JSON;
 		return true;
 	}
 
-	// µ±Êı¾İÀàĞÍÎª application/xml »ò text/xml ¸ñÊ½Ê±£º
+	// å½“æ•°æ®ç±»å‹ä¸º application/xml æˆ– text/xml æ ¼å¼æ—¶ï¼š
 	if (EQ(stype, "xml") && (EQ(ctype, "application") || EQ(ctype, "text"))) {
 		request_type_ = HTTP_REQUEST_TEXT_XML;
 		return true;

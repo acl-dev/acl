@@ -1,4 +1,4 @@
-#ifndef __TRIGGER_INCLUDED_H__
+﻿#ifndef __TRIGGER_INCLUDED_H__
 #define __TRIGGER_INCLUDED_H__
 
 #ifdef	__cplusplus

@@ -1,4 +1,4 @@
-#ifndef SEEK_H
+﻿#ifndef SEEK_H
 #define SEEK_H
 
 typedef unsigned long seek_pos;

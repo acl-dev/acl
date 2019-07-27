@@ -1,4 +1,4 @@
-#ifndef	__ACL_CHARMAP_INCLUDE_H__
+﻿#ifndef	__ACL_CHARMAP_INCLUDE_H__
 #define	__ACL_CHARMAP_INCLUDE_H__
 
 #ifndef	USE_CHARMAP

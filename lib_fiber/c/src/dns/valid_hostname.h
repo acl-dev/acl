@@ -1,4 +1,4 @@
-#ifndef __VALID_HOSTNAME_INCLUDE_H__
+﻿#ifndef __VALID_HOSTNAME_INCLUDE_H__
 #define __VALID_HOSTNAME_INCLUDE_H__
 
 #ifdef  __cplusplus

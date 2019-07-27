@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file xtea.h
  *
  * \brief XTEA block cipher (32-bit)

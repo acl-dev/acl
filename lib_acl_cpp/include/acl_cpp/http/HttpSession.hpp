@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/dbuf_pool.hpp"
 #include "../session/session.hpp"
@@ -11,104 +11,104 @@ namespace acl {
 class session;
 
 /**
- * ·şÎñ¶Ë HttpSession Àà£¬Ä¿Ç°¸ÃÀàµÄÊı¾İ´æ´¢Ö»ÄÜÖ§³Ö´æÔÚ memcached ÉÏ
+ * æœåŠ¡ç«¯ HttpSession ç±»ï¼Œç›®å‰è¯¥ç±»çš„æ•°æ®å­˜å‚¨åªèƒ½æ”¯æŒå­˜åœ¨ memcached ä¸Š
  */
 class ACL_CPP_API HttpSession : public dbuf_obj
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param session {session&} »º´æ¶ÔÏó
+	 * æ„é€ å‡½æ•°
+	 * @param session {session&} ç¼“å­˜å¯¹è±¡
 	 */
 	HttpSession(session& session);
 	virtual ~HttpSession(void);
 
 	/**
-	 * »ñµÃ¿Í»§¶ËÔÚ·şÎñ¶Ë´æ´¢µÄ session µÄ×Ö·û´®ÊôĞÔÖµ
-	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
-	 * @return {const char*} session ÊôĞÔÖµ£¬·µ»ØµØÖ·ÓÀÔ¶·Ç¿ÕÖ¸Õë£¬ÓÃ»§
-	 *  ¿ÉÒÔÍ¨¹ıÅĞ¶Ï·µ»ØµØÖ·ÊÇ·ñÎª¿Õ´®("\0")À´ÅĞ¶ÏÊÇ·ñ´æÔÚ»ò³ö´í
-	 *  ×¢£º¸Ãº¯Êı·µ»Ø·Ç¿ÕÊı¾İºó£¬ÓÃ»§Ó¦¸ÃÁ¢¿Ì±£Áô´Ë·µ»ØÖµ£¬ÒòÎªÏÂ´Î
-	 *      µÄÆäËüº¯Êıµ÷ÓÃ¿ÉÄÜ»áÇå³ı¸ÃÁÙÊ±·µ»ØÊı¾İ
+	 * è·å¾—å®¢æˆ·ç«¯åœ¨æœåŠ¡ç«¯å­˜å‚¨çš„ session çš„å­—ç¬¦ä¸²å±æ€§å€¼
+	 * @param name {const char*} session å±æ€§åï¼Œéç©º
+	 * @return {const char*} session å±æ€§å€¼ï¼Œè¿”å›åœ°å€æ°¸è¿œéç©ºæŒ‡é’ˆï¼Œç”¨æˆ·
+	 *  å¯ä»¥é€šè¿‡åˆ¤æ–­è¿”å›åœ°å€æ˜¯å¦ä¸ºç©ºä¸²("\0")æ¥åˆ¤æ–­æ˜¯å¦å­˜åœ¨æˆ–å‡ºé”™
+	 *  æ³¨ï¼šè¯¥å‡½æ•°è¿”å›éç©ºæ•°æ®åï¼Œç”¨æˆ·åº”è¯¥ç«‹åˆ»ä¿ç•™æ­¤è¿”å›å€¼ï¼Œå› ä¸ºä¸‹æ¬¡
+	 *      çš„å…¶å®ƒå‡½æ•°è°ƒç”¨å¯èƒ½ä¼šæ¸…é™¤è¯¥ä¸´æ—¶è¿”å›æ•°æ®
 	 */
 	virtual const char* getAttribute(const char* name) const;
 
 	/**
-	 * »ñµÃ¿Í»§¶ËÔÚ·şÎñ¶Ë´æ´¢µÄ session µÄ¶ş½øÖÆÊôĞÔÖµ
-	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
-	 * @param size {size_t*} ¸Ã²ÎÊı·Ç¿ÕÇÒÊôĞÔÖµ·Ç¿ÕÊ±£¬¸ÃÖ¸ÕëµØÖ·
-	 *  ´æ´¢·µ»ØÊôĞÔÖµµÄ´óĞ¡
-	 * @return {const void*} session ÊôĞÔÖµ£¬Îª¿ÕÖ¸ÕëÊ±ËµÃ÷²»´æÔÚ
-	 *  »òÄÚ²¿²éÑ¯Ê§°Ü
-	 *  ×¢£º¸Ãº¯Êı·µ»Ø·Ç¿ÕÊı¾İºó£¬ÓÃ»§Ó¦¸ÃÁ¢¿Ì±£Áô´Ë·µ»ØÖµ£¬ÒòÎªÏÂ´Î
-	 *      µÄÆäËüº¯Êıµ÷ÓÃ¿ÉÄÜ»áÇå³ı¸ÃÁÙÊ±·µ»ØÊı¾İ
+	 * è·å¾—å®¢æˆ·ç«¯åœ¨æœåŠ¡ç«¯å­˜å‚¨çš„ session çš„äºŒè¿›åˆ¶å±æ€§å€¼
+	 * @param name {const char*} session å±æ€§åï¼Œéç©º
+	 * @param size {size_t*} è¯¥å‚æ•°éç©ºä¸”å±æ€§å€¼éç©ºæ—¶ï¼Œè¯¥æŒ‡é’ˆåœ°å€
+	 *  å­˜å‚¨è¿”å›å±æ€§å€¼çš„å¤§å°
+	 * @return {const void*} session å±æ€§å€¼ï¼Œä¸ºç©ºæŒ‡é’ˆæ—¶è¯´æ˜ä¸å­˜åœ¨
+	 *  æˆ–å†…éƒ¨æŸ¥è¯¢å¤±è´¥
+	 *  æ³¨ï¼šè¯¥å‡½æ•°è¿”å›éç©ºæ•°æ®åï¼Œç”¨æˆ·åº”è¯¥ç«‹åˆ»ä¿ç•™æ­¤è¿”å›å€¼ï¼Œå› ä¸ºä¸‹æ¬¡
+	 *      çš„å…¶å®ƒå‡½æ•°è°ƒç”¨å¯èƒ½ä¼šæ¸…é™¤è¯¥ä¸´æ—¶è¿”å›æ•°æ®
 	 */
 	virtual const void* getAttribute(const char* name, size_t* size) const;
 
 	/**
-	 * ´Ó·şÎñ¶Ë»ñµÃ¶ÔÓ¦¿Í»§¶ËµÄËùÓĞ»á»°ÊôĞÔ¶ÔÏó£¬ÕâÑù¿ÉÒÔ¼õÉÙÓë·şÎñ¶ËµÄ½»»¥´ÎÊı
+	 * ä»æœåŠ¡ç«¯è·å¾—å¯¹åº”å®¢æˆ·ç«¯çš„æ‰€æœ‰ä¼šè¯å±æ€§å¯¹è±¡ï¼Œè¿™æ ·å¯ä»¥å‡å°‘ä¸æœåŠ¡ç«¯çš„äº¤äº’æ¬¡æ•°
 	 * @param attrs {std::map<string, session_string>&}
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	virtual bool getAttributes(std::map<string, session_string>& attrs) const;
 
 	/**
-	 * ´Ó·şÎñ¶Ë»ñµÃ¶ÔÓ¦¿Í»§¶ËµÄÏàÓ¦ÊôĞÔ¼¯ºÏ
-	 * @param names {const std::vector<string>&} ÊôĞÔÃû¼¯ºÏ
-	 * @param values {std::vector<session_string>&} ´æ´¢¶ÔÓ¦µÄÊôĞÔÖµ½á¹û¼¯
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä»æœåŠ¡ç«¯è·å¾—å¯¹åº”å®¢æˆ·ç«¯çš„ç›¸åº”å±æ€§é›†åˆ
+	 * @param names {const std::vector<string>&} å±æ€§åé›†åˆ
+	 * @param values {std::vector<session_string>&} å­˜å‚¨å¯¹åº”çš„å±æ€§å€¼ç»“æœé›†
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	virtual bool getAttributes(const std::vector<string>& names,
 		std::vector<session_string>& values) const;
 
 	/**
-	 * ÔÚÉèÖÃ·şÎñ¶ËÉèÖÃ session µÄ×Ö·û´®ÊôĞÔÖµ
-	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
-	 * @param value {const char*} session ÊôĞÔÖµ£¬·Ç¿Õ
-	 * @return {bool} ·µ»Ø false ËµÃ÷ÉèÖÃÊ§°Ü
+	 * åœ¨è®¾ç½®æœåŠ¡ç«¯è®¾ç½® session çš„å­—ç¬¦ä¸²å±æ€§å€¼
+	 * @param name {const char*} session å±æ€§åï¼Œéç©º
+	 * @param value {const char*} session å±æ€§å€¼ï¼Œéç©º
+	 * @return {bool} è¿”å› false è¯´æ˜è®¾ç½®å¤±è´¥
 	 */
 	virtual bool setAttribute(const char* name, const char* value);
 
 	/**
-	 * ÔÚÉèÖÃ·şÎñ¶ËÉèÖÃ session µÄ¶ş½øÖÆÊôĞÔÖµ
-	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
-	 * @param value {const void*} session ÊôĞÔÖµ£¬·Ç¿Õ
-	 * @param len {size_t} value Êı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø false ËµÃ÷ÉèÖÃÊ§°Ü
+	 * åœ¨è®¾ç½®æœåŠ¡ç«¯è®¾ç½® session çš„äºŒè¿›åˆ¶å±æ€§å€¼
+	 * @param name {const char*} session å±æ€§åï¼Œéç©º
+	 * @param value {const void*} session å±æ€§å€¼ï¼Œéç©º
+	 * @param len {size_t} value æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› false è¯´æ˜è®¾ç½®å¤±è´¥
 	 */
 	virtual bool setAttribute(const char* name, const void* value, size_t len);
 
 	/**
-	 * ÔÚ·şÎñ¶ËÉèÖÃ session ÊôĞÔ¼¯ºÏ£¬ÕâÑù¿ÉÒÔ¼õÉÙÓëºó¶ËµÄ½»»¥´ÎÊı
-	 * @param attrs {const std::map<string, session_string>&} ÊôĞÔ¼¯ºÏ¶ÔÏó
-	 * @return {bool} ÉèÖÃÊÇ·ñ³É¹¦
+	 * åœ¨æœåŠ¡ç«¯è®¾ç½® session å±æ€§é›†åˆï¼Œè¿™æ ·å¯ä»¥å‡å°‘ä¸åç«¯çš„äº¤äº’æ¬¡æ•°
+	 * @param attrs {const std::map<string, session_string>&} å±æ€§é›†åˆå¯¹è±¡
+	 * @return {bool} è®¾ç½®æ˜¯å¦æˆåŠŸ
 	 */
 	virtual bool setAttributes(const std::map<string, session_string>& attrs);
 
 	/**
-	 * É¾³ı¿Í»§¶Ë session ÖĞµÄÄ³¸öÊôĞÔÖµ
-	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
-	 * @return {bool} É¾³ıÊÇ·ñ³É¹¦
+	 * åˆ é™¤å®¢æˆ·ç«¯ session ä¸­çš„æŸä¸ªå±æ€§å€¼
+	 * @param name {const char*} session å±æ€§åï¼Œéç©º
+	 * @return {bool} åˆ é™¤æ˜¯å¦æˆåŠŸ
 	 */
 	virtual bool removeAttribute(const char* name);
 
 	/**
-	 * ÉèÖÃ session ÔÚ»º´æ·şÎñÆ÷ÉÏµÄÉú´æÖÜÆÚ
-	 * @param ttl {time_t} Éú´æÖÜÆÚ(Ãë)
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * è®¾ç½® session åœ¨ç¼“å­˜æœåŠ¡å™¨ä¸Šçš„ç”Ÿå­˜å‘¨æœŸ
+	 * @param ttl {time_t} ç”Ÿå­˜å‘¨æœŸ(ç§’)
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	virtual bool setMaxAge(time_t ttl);
 
 	/**
-	 * Ê¹ session ´Ó·şÎñ¶ËµÄ»º´æÖĞÉ¾³ı¼´Ê¹ session Ê§Ğ§
-	 * @return {bool} ÊÇ·ñÊ¹ session Ê§Ğ§
+	 * ä½¿ session ä»æœåŠ¡ç«¯çš„ç¼“å­˜ä¸­åˆ é™¤å³ä½¿ session å¤±æ•ˆ
+	 * @return {bool} æ˜¯å¦ä½¿ session å¤±æ•ˆ
 	 */
 	virtual bool invalidate(void);
 
 	/**
-	 * »ñµÃËù²úÉúµÄ session ID ±êÊ¶
-	 * @return {const char*} ÓÀÔ¶·µ»ØÒÔ '\0' ½áÎ²µÄ·Ç¿ÕÖ¸Õë£¬¿É¸ù¾İ·µ»Ø
-	 *  ÖµÊÇ·ñÎª¿Õ´®("\0")À´ÅĞ¶Ï sid ÊÇ·ñ´æÔÚ
+	 * è·å¾—æ‰€äº§ç”Ÿçš„ session ID æ ‡è¯†
+	 * @return {const char*} æ°¸è¿œè¿”å›ä»¥ '\0' ç»“å°¾çš„éç©ºæŒ‡é’ˆï¼Œå¯æ ¹æ®è¿”å›
+	 *  å€¼æ˜¯å¦ä¸ºç©ºä¸²("\0")æ¥åˆ¤æ–­ sid æ˜¯å¦å­˜åœ¨
 	 */
 	const char* getSid(void) const;
 

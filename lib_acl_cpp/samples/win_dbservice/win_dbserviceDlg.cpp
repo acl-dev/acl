@@ -1,4 +1,4 @@
-// win_dbserviceDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// win_dbserviceDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -29,14 +29,14 @@ public:
 
 	}
 
-	// »ùÀàĞé½Ó¿Ú£ºµ± SQL Óï¾ä³ö´íÊ±µÄ»Øµ÷º¯Êı
+	// åŸºç±»è™šæ¥å£ï¼šå½“ SQL è¯­å¥å‡ºé”™æ—¶çš„å›è°ƒå‡½æ•°
 	virtual void on_error(acl::db_status status)
 	{
 		(void) status;
 		printf(">>on error, id: %d\r\n", id_);
 	}
 
-	// »ùÀàĞé½Ó¿Ú£ºµ± SQL Óï¾ä³É¹¦Ê±µÄ»Øµ÷º¯Êı
+	// åŸºç±»è™šæ¥å£ï¼šå½“ SQL è¯­å¥æˆåŠŸæ—¶çš„å›è°ƒå‡½æ•°
 	virtual void on_ok(const acl::db_rows* rows, int affected)
 	{
 		if (rows)
@@ -47,7 +47,7 @@ public:
 				id_, affected);
 	}
 
-	// »ùÀàĞé½Ó¿Ú£ºµ±¸ÃÀàÊµÀı¶ÔÏó±»ÊÍ·ÅÊ±µÄ»Øµ÷º¯Êı
+	// åŸºç±»è™šæ¥å£ï¼šå½“è¯¥ç±»å®ä¾‹å¯¹è±¡è¢«é‡Šæ”¾æ—¶çš„å›è°ƒå‡½æ•°
 	virtual void destroy()
 	{
 		printf(">> myquery destroy now\r\n");
@@ -58,7 +58,7 @@ private:
 	int   id_;
 };
 
-static acl::string __dbfile("²âÊÔ.db");
+static acl::string __dbfile("æµ‹è¯•.db");
 
 const char* CREATE_TBL =
 "create table group_tbl\r\n"
@@ -106,20 +106,20 @@ static bool create_db(void)
 
 //////////////////////////////////////////////////////////////////////////
 
-// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
+// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -137,7 +137,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Cwin_dbserviceDlg ¶Ô»°¿ò
+// Cwin_dbserviceDlg å¯¹è¯æ¡†
 
 
 
@@ -172,15 +172,15 @@ BEGIN_MESSAGE_MAP(Cwin_dbserviceDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Cwin_dbserviceDlg ÏûÏ¢´¦Àí³ÌĞò
+// Cwin_dbserviceDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL Cwin_dbserviceDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
+	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
 
-	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
+	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -196,26 +196,26 @@ BOOL Cwin_dbserviceDlg::OnInitDialog()
 		}
 	}
 
-	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
-	//  Ö´ĞĞ´Ë²Ù×÷
-	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
-	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
+	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
+	//  æ‰§è¡Œæ­¤æ“ä½œ
+	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
+	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
 
 	ShowWindow(SW_MINIMIZE);
 
-	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
 	
-	// ´ò¿ª DOS ´°¿Ú
+	// æ‰“å¼€ DOS çª—å£
 	AllocConsole();
 	FILE* fp = freopen("CONOUT$","w+t",stdout);
-	// ´ò¿ª¿âµÄ DOS ´°¿Ú
+	// æ‰“å¼€åº“çš„ DOS çª—å£
 	acl::open_dos();
 
 	logger_open("dbservice.log", "dbservice", "all:1");
 	if (create_db() == false)
 		printf(">>create table error\r\n");
 
-	// ²ÉÓÃ»ùÓÚ WIN32 ÏûÏ¢Ä£Ê½µÄIPC·½Ê½
+	// é‡‡ç”¨åŸºäº WIN32 æ¶ˆæ¯æ¨¡å¼çš„IPCæ–¹å¼
 	server_ = new acl::db_service_sqlite("DB_TEST", __dbfile, 2, 2, true);
 	if (server_->open(handle_) == false)
 	{
@@ -224,7 +224,7 @@ BOOL Cwin_dbserviceDlg::OnInitDialog()
 		server_ = NULL;
 	}
 
-	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
+	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
 }
 
 void Cwin_dbserviceDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -240,19 +240,19 @@ void Cwin_dbserviceDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
-//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
-//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
+// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
+//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
+//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
 
 void Cwin_dbserviceDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
+		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
+		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -260,7 +260,7 @@ void Cwin_dbserviceDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// »æÖÆÍ¼±ê
+		// ç»˜åˆ¶å›¾æ ‡
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -269,16 +269,16 @@ void Cwin_dbserviceDlg::OnPaint()
 	}
 }
 
-//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
+//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
 HCURSOR Cwin_dbserviceDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-// Ìí¼ÓÊı¾İ¹ı³Ì
+// æ·»åŠ æ•°æ®è¿‡ç¨‹
 void Cwin_dbserviceDlg::OnBnClickedAddData()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
 	if (server_ == NULL)
 	{
@@ -293,15 +293,15 @@ void Cwin_dbserviceDlg::OnBnClickedAddData()
 	{
 		query = new myquery(i);
 		sql.format("insert into group_tbl('group_name', 'uvip_tbl')"
-			" values('ÖĞ¹úÈË-%d', 'test')", i);
+			" values('ä¸­å›½äºº-%d', 'test')", i);
 		server_->sql_update(sql.c_str(), query);
 	}
 }
 
-// ²éÑ¯Êı¾İ¹ı³Ì
+// æŸ¥è¯¢æ•°æ®è¿‡ç¨‹
 void Cwin_dbserviceDlg::OnBnClickedGetData()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
 	if (server_ == NULL)
 	{
@@ -316,16 +316,16 @@ void Cwin_dbserviceDlg::OnBnClickedGetData()
 	{
 		query = new myquery(i);
 		sql.format("select * from group_tbl"
-			" where group_name='ÖĞ¹úÈË-%d'"
+			" where group_name='ä¸­å›½äºº-%d'"
 			" and uvip_tbl='test'", i);
 		server_->sql_select(sql.c_str(), query);
 	}
 }
 
-// É¾³ıÊı¾İ¹ı³Ì
+// åˆ é™¤æ•°æ®è¿‡ç¨‹
 void Cwin_dbserviceDlg::OnBnClickedDeleteData()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
 	if (server_ == NULL)
 	{
@@ -340,7 +340,7 @@ void Cwin_dbserviceDlg::OnBnClickedDeleteData()
 	{
 		query = new myquery(i);
 		sql.format("delete from group_tbl"
-			" where group_name='ÖĞ¹úÈË-%d'"
+			" where group_name='ä¸­å›½äºº-%d'"
 			" and uvip_tbl='test'", i);
 		server_->sql_update(sql.c_str(), query);
 	}

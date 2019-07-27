@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/redis/redis_client_cluster.hpp"
 #include "acl_cpp/redis/redis.hpp"
@@ -59,8 +59,8 @@ const session_string* redis_session::get_buf(const char* name)
 		return NULL;
 	}
 
-	// ÏÈ³¢ÊÔ´Ó»º´æ³ØÖĞ»ñµÃÒ»¸ö»º³åÇø£¬Èç¹ûÃ»ÓĞºÏÊÊµÄ£¬Ôò´´½¨ĞÂµÄ»º³åÇø¶ÔÏó
-	// ²¢½«Ö®¼ÓÈëÖÁ»º³å³ØÖĞ£¬ÒÔ±¸ÏÂ´ÎÖØ¸´²éÑ¯ÏàÍ¬ÊôĞÔÊ±Ê¹ÓÃ
+	// å…ˆå°è¯•ä»ç¼“å­˜æ± ä¸­è·å¾—ä¸€ä¸ªç¼“å†²åŒºï¼Œå¦‚æœæ²¡æœ‰åˆé€‚çš„ï¼Œåˆ™åˆ›å»ºæ–°çš„ç¼“å†²åŒºå¯¹è±¡
+	// å¹¶å°†ä¹‹åŠ å…¥è‡³ç¼“å†²æ± ä¸­ï¼Œä»¥å¤‡ä¸‹æ¬¡é‡å¤æŸ¥è¯¢ç›¸åŒå±æ€§æ—¶ä½¿ç”¨
 
 	session_string* ss;
 	std::map<string, session_string*>::iterator it = buffers_.find(name);

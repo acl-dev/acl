@@ -1,8 +1,8 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈÝÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_ssl_path;
 char *var_cfg_crt_file;
@@ -54,12 +54,12 @@ static acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
 	if (hook != NULL)
 		return hook;
 
-	// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ÐèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
-	// Á¬½ÓÁ÷¶ÔÏóÖÐ£¬¼´ÓÃ ssl io Ìæ»» stream ÖÐÄ¬ÈÏµÄµ×²ã IO ¹ý³Ì
+	// å¯¹äºŽä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
+	// è¿žæŽ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
 
 	//logger("begin setup ssl hook...");
 
-	// ²ÉÓÃ·Ç×èÈû SSL ÎÕÊÖ·½Ê½
+	// é‡‡ç”¨éžé˜»å¡ž SSL æ¡æ‰‹æ–¹å¼
 	acl::polarssl_io* ssl = new acl::polarssl_io(conf, true, true);
 	if (conn.setup_hook(ssl) == ssl)
 	{
@@ -76,8 +76,8 @@ static bool do_run(acl::socket_stream& conn, acl::polarssl_io*)
 {
 	acl::string* buf =(acl::string*) conn.get_ctx();
 
-	// ·Ç×èÈûÄ£Ê½¶ÁÈ¡Ò»ÐÐ£¬¸Ã·Ç×èÈû¶Á·½Ê½ÊÇÓÉ polarssl_io ÀàµÄµ×²ã
-	// IO ¹ý³Ì±£ÕÏµÄ
+	// éžé˜»å¡žæ¨¡å¼è¯»å–ä¸€è¡Œï¼Œè¯¥éžé˜»å¡žè¯»æ–¹å¼æ˜¯ç”± polarssl_io ç±»çš„åº•å±‚
+	// IO è¿‡ç¨‹ä¿éšœçš„
 	if (conn.gets_peek(buf, false) == false)
 	{
 		if (conn.eof())
@@ -86,8 +86,8 @@ static bool do_run(acl::socket_stream& conn, acl::polarssl_io*)
 			return true;
 	}
 
-	// ×èÈûÄ£Ê½»ØÐ´Êý¾Ý£¬ÒòÎª¸ÃÌ×½Ó×Ö²¢Î´ÉèÖÃÎª·Ç×èÈûÄ£Ê½£¬ËùÒÔÐ´µÄ¹ý³Ì
-	// »¹ÊÇ×èÈûµÄ
+	// é˜»å¡žæ¨¡å¼å›žå†™æ•°æ®ï¼Œå› ä¸ºè¯¥å¥—æŽ¥å­—å¹¶æœªè®¾ç½®ä¸ºéžé˜»å¡žæ¨¡å¼ï¼Œæ‰€ä»¥å†™çš„è¿‡ç¨‹
+	// è¿˜æ˜¯é˜»å¡žçš„
 	if (conn.write(*buf) == -1)
 	{
 		logger("write error!");
@@ -169,10 +169,10 @@ void master_service::proc_on_init()
 
 	conf_ = new acl::polarssl_conf();
 
-	// ÔÊÐí·þÎñ¶ËµÄ SSL »á»°»º´æ¹¦ÄÜ
+	// å…è®¸æœåŠ¡ç«¯çš„ SSL ä¼šè¯ç¼“å­˜åŠŸèƒ½
 	conf_->enable_cache(var_cfg_session_cache);
 
-	// Ìí¼Ó±¾µØ·þÎñµÄÖ¤Êé
+	// æ·»åŠ æœ¬åœ°æœåŠ¡çš„è¯ä¹¦
 	if (conf_->add_cert(var_cfg_crt_file) == false)
 	{
 		logger_error("add cert failed, crt: %s, key: %s",
@@ -184,7 +184,7 @@ void master_service::proc_on_init()
 	logger("load cert ok, crt: %s, key: %s",
 		var_cfg_crt_file, var_cfg_key_file);
 
-	// Ìí¼Ó±¾µØ·þÎñÃÜÔ¿
+	// æ·»åŠ æœ¬åœ°æœåŠ¡å¯†é’¥
 	if (conf_->set_key(var_cfg_key_file) == false)
 	{
 		logger_error("set private key error");

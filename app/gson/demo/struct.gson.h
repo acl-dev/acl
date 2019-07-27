@@ -1,4 +1,4 @@
-namespace acl
+﻿namespace acl
 {
     //base
     acl::string gson(const base &$obj);

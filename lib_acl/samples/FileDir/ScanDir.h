@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #ifndef KB
 #define KB	(1024)
@@ -19,7 +19,7 @@ protected:
 public:
 	 int BeginScan(void);
 private:
-	// É¨ÃèµÄÎÄ¼ş×ÜÊı
+	// æ‰«æçš„æ–‡ä»¶æ€»æ•°
 	int m_nFile, m_nDir;
 	__int64 m_nSize;
 public:

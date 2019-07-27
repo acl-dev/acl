@@ -1,30 +1,30 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "master_service.h"
 
 int main(int argc, char* argv[])
 {
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// ÉèÖÃÅäÖÃ²ÎÊı±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_int64(var_conf_int64_tab);
 	ms.set_cfg_str(var_conf_str_tab);
 	ms.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {
-		// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
+		// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 		acl::log::stdout_open(true);
 
-		// ¼àÌıµÄµØÖ·ÁĞ±í£¬¸ñÊ½£ºip|port1,ip|port2,...
+		// ç›‘å¬çš„åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼šip|port1,ip|port2,...
 		const char* addrs = "|8888";
 		printf("listen on: %s\r\n", addrs);
 
-		// µ¥¶ÀÔËĞĞ·½Ê½
+		// å•ç‹¬è¿è¡Œæ–¹å¼
 		if (argc >= 3) {
 			ms.run_alone(addrs, argv[2], acl::ENGINE_SELECT); 
 		} else {
@@ -35,21 +35,21 @@ int main(int argc, char* argv[])
 		getchar();
 	} else {
 #ifdef	WIN32
-		// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
+		// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 		acl::log::stdout_open(true);
 
-		// ¼àÌıµÄµØÖ·ÁĞ±í£¬¸ñÊ½£ºip:port1,ip:port2,...
+		// ç›‘å¬çš„åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼šip:port1,ip:port2,...
 		const char* addrs = "127.0.0.1:8888";
 		printf("listen on: %s\r\n", addrs);
 
-		// µ¥¶ÀÔËĞĞ·½Ê½
+		// å•ç‹¬è¿è¡Œæ–¹å¼
 		ms.run_alone(addrs, NULL, acl::ENGINE_SELECT);
 
 		printf("Enter any key to exit now\r\n");
 		getchar();
 	
 #else
-		// acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		// acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 		ms.run_daemon(argc, argv);
 #endif
 	}

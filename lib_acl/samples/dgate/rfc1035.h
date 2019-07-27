@@ -1,4 +1,4 @@
-#ifndef __MY_RFC1035_INCLUDE_H__
+﻿#ifndef __MY_RFC1035_INCLUDE_H__
 #define __MY_RFC1035_INCLUDE_H__
 
 #ifdef __cplusplus

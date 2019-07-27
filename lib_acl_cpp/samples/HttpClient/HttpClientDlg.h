@@ -1,30 +1,30 @@
-// HttpClientDlg.h : Í·ÎÄ¼ş
+ï»¿// HttpClientDlg.h : å¤´æ–‡ä»¶
 //
 
 #pragma once
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/http/http_service.hpp"
 
-// CHttpClientDlg ¶Ô»°¿ò
+// CHttpClientDlg å¯¹è¯æ¡†
 class CHttpClientDlg : public CDialog
 {
-// ¹¹Ôì
+// æ„é€ 
 public:
-	CHttpClientDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
+	CHttpClientDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
 	~CHttpClientDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_HTTPCLIENT_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
 
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	HICON m_hIcon;
 
-	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
+	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

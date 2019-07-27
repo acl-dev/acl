@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -12,13 +12,13 @@
 #include <windows.h>
 #include "proctl_internal.h"
 
-static ACL_ARRAY *__services = NULL;  /* µ±Ç°ÕıÔÚÔËĞĞµÄ·şÎñ¶ÔÏó¶ÓÁĞ */
+static ACL_ARRAY *__services = NULL;  /* å½“å‰æ­£åœ¨è¿è¡Œçš„æœåŠ¡å¯¹è±¡é˜Ÿåˆ— */
 static acl_pthread_mutex_t __mutex_running_service;
 static HANDLE *__handles = NULL;
 static HANDLE __sem_handle = INVALID_HANDLE_VALUE;
 static int   __max_handle = 64;
 static int   __cur_handle = 0;
-static ACL_FIFO *__services_wait = NULL;  /* µ±Ç°ÕıÔÚ´ıÆô¶¯µÄ·şÎñ¶ÔÏó¶ÓÁĞ */
+static ACL_FIFO *__services_wait = NULL;  /* å½“å‰æ­£åœ¨å¾…å¯åŠ¨çš„æœåŠ¡å¯¹è±¡é˜Ÿåˆ— */
 static acl_pthread_mutex_t __mutex_waiting_service;
 
 #define LOCK_RUNNING_SERVICE do \
@@ -41,7 +41,7 @@ static acl_pthread_mutex_t __mutex_waiting_service;
 	acl_pthread_mutex_unlock(&__mutex_waiting_service); \
 } while(0);
 
-/* ³õÊ¼»¯½ø³Ì¾ä±úÊı×é */
+/* åˆå§‹åŒ–è¿›ç¨‹å¥æŸ„æ•°ç»„ */
 
 static void handles_init(void)
 {
@@ -57,7 +57,7 @@ static void handles_init(void)
 	}
 }
 
-/* Ïò½ø³Ì¾ä±úÊı×éÖĞÌí¼ÓĞÂµÄ½ø³Ì¾ä±ú */
+/* å‘è¿›ç¨‹å¥æŸ„æ•°ç»„ä¸­æ·»åŠ æ–°çš„è¿›ç¨‹å¥æŸ„ */
 
 static void handles_add(HANDLE handle)
 {
@@ -78,7 +78,7 @@ static void handles_add(HANDLE handle)
 	acl_msg_fatal("%s(%d): no position for new handle", myname, __LINE__);
 }
 
-/* ´Ó½ø³Ì¾ä±úÊı×éÖĞÉ¾³ı¾ä±ú */
+/* ä»è¿›ç¨‹å¥æŸ„æ•°ç»„ä¸­åˆ é™¤å¥æŸ„ */
 
 static void handles_del(HANDLE handle)
 {
@@ -99,7 +99,7 @@ static void handles_del(HANDLE handle)
 	acl_msg_fatal("%s(%d): not found the handle", myname, __LINE__);
 }
 
-/* ½ø³Ì¹ÜÀí·şÎñ¿â³õÊ¼»¯ */
+/* è¿›ç¨‹ç®¡ç†æœåŠ¡åº“åˆå§‹åŒ– */
 
 void proctl_service_init()
 {
@@ -119,7 +119,7 @@ void proctl_service_init()
 	handles_add(__sem_handle);
 }
 
-/* ´´½¨Ò»¸öĞÂµÄ·şÎñ¶ÔÏó */
+/* åˆ›å»ºä¸€ä¸ªæ–°çš„æœåŠ¡å¯¹è±¡ */
 
 PROCTL_SERVICE *proctl_service_alloc(const char *filepath, ACL_VSTRING *cmdline)
 {
@@ -138,7 +138,7 @@ static void proctl_service_add(PROCTL_SERVICE *service)
 {
 	const char *myname = "proctl_service_add";
 
-	/* Ïò·şÎñ¶ÔÏóÊı¾İ×éÖĞÌí¼ÓĞÂµÄ·şÎñ¶ÔÏó */
+	/* å‘æœåŠ¡å¯¹è±¡æ•°æ®ç»„ä¸­æ·»åŠ æ–°çš„æœåŠ¡å¯¹è±¡ */
 
 	LOCK_RUNNING_SERVICE;
 	if (acl_array_append(__services, service) < 0)
@@ -155,10 +155,10 @@ PROCTL_SERVICE *proctl_service_new(const char *filepath, int argc, char *argv[])
 
 	acl_assert(cmdline);
 
-	/* ×é½¨Æô¶¯½ø³ÌÃüÁîĞĞ²ÎÊı±í */
+	/* ç»„å»ºå¯åŠ¨è¿›ç¨‹å‘½ä»¤è¡Œå‚æ•°è¡¨ */
 
-	/* ÎªÁË±ÜÃâ²ÎÊı´«µİÊ±¿ÉÄÜÒòÆäÖĞ¼äº¬ÓĞ¿Õ¸ñ¶ø±»·Ö¸ô³É
-	 * ¶à¸ö²ÎÊı£¬ËùÒÔĞèÒªÔÚ²ÎÊıÁ½±ß¼ÓÉÏÒıºÅ
+	/* ä¸ºäº†é¿å…å‚æ•°ä¼ é€’æ—¶å¯èƒ½å› å…¶ä¸­é—´å«æœ‰ç©ºæ ¼è€Œè¢«åˆ†éš”æˆ
+	 * å¤šä¸ªå‚æ•°ï¼Œæ‰€ä»¥éœ€è¦åœ¨å‚æ•°ä¸¤è¾¹åŠ ä¸Šå¼•å·
 	 */
 
 	acl_vstring_strcat(cmdline, "\"");
@@ -179,7 +179,7 @@ PROCTL_SERVICE *proctl_service_new(const char *filepath, int argc, char *argv[])
 	return (service);
 }
 
-/* ÊÍ·ÅÒ»¸ö·şÎñ¶ÔÏó */
+/* é‡Šæ”¾ä¸€ä¸ªæœåŠ¡å¯¹è±¡ */
 
 void proctl_service_free(PROCTL_SERVICE *service)
 {
@@ -195,7 +195,7 @@ void proctl_service_free(PROCTL_SERVICE *service)
 	acl_myfree(service);
 }
 
-/* ¸ù¾İ½ø³Ì¾ä±ú²éÑ¯·şÎñ¶ÔÏó */
+/* æ ¹æ®è¿›ç¨‹å¥æŸ„æŸ¥è¯¢æœåŠ¡å¯¹è±¡ */
 
 static PROCTL_SERVICE *proctl_service_find(HANDLE handle)
 {
@@ -218,7 +218,7 @@ static PROCTL_SERVICE *proctl_service_find(HANDLE handle)
 	return (NULL);
 }
 
-/* »ñµÃËùÓĞµÄ·şÎñ¶ÔÏóµÄ³ÌĞòÃû³Æ£¬²¢½«½á¹û´æ´¢ÔÚÒ»¸öÊı×éÖĞ */
+/* è·å¾—æ‰€æœ‰çš„æœåŠ¡å¯¹è±¡çš„ç¨‹åºåç§°ï¼Œå¹¶å°†ç»“æœå­˜å‚¨åœ¨ä¸€ä¸ªæ•°ç»„ä¸­ */
 
 ACL_ARGV *proctl_serivce_get_all()
 {
@@ -241,7 +241,7 @@ ACL_ARGV *proctl_serivce_get_all()
 	return (argv);
 }
 
-/* ÊÍ·ÅÓÉ proctl_service_get_all ²úÉúµÄ¶ÔÏóÊı×é */
+/* é‡Šæ”¾ç”± proctl_service_get_all äº§ç”Ÿçš„å¯¹è±¡æ•°ç»„ */
 
 void proctl_service_free_all(ACL_ARGV *argv)
 {
@@ -249,7 +249,7 @@ void proctl_service_free_all(ACL_ARGV *argv)
 		acl_argv_free(argv);
 }
 
-/* ¸ù¾İ³ÌĞòÈ«Â·¾¶Ãû²é¿´Ä³¸ö½ø³ÌÊÇ·ñÔÚÔËĞĞÖĞ */
+/* æ ¹æ®ç¨‹åºå…¨è·¯å¾„åæŸ¥çœ‹æŸä¸ªè¿›ç¨‹æ˜¯å¦åœ¨è¿è¡Œä¸­ */
 
 int proctl_service_exist(const char *filepath)
 {
@@ -270,7 +270,7 @@ int proctl_service_exist(const char *filepath)
 	return (1);
 }
 
-/* ÊÍ·ÅÄ³¸ö·şÎñ¶ÔÏó¼°ÆäËù°ó¶¨µÄ½ø³Ì¾ä±ú */
+/* é‡Šæ”¾æŸä¸ªæœåŠ¡å¯¹è±¡åŠå…¶æ‰€ç»‘å®šçš„è¿›ç¨‹å¥æŸ„ */
 
 static void proctl_service_stopped(PROCTL_SERVICE *service)
 {
@@ -278,7 +278,7 @@ static void proctl_service_stopped(PROCTL_SERVICE *service)
 	proctl_service_free(service);
 }
 
-/* ¿ªÊ¼Æô¶¯Ä³¸ö·şÎñ½ø³Ì */
+/* å¼€å§‹å¯åŠ¨æŸä¸ªæœåŠ¡è¿›ç¨‹ */
 
 int proctl_service_start(PROCTL_SERVICE *service)
 {
@@ -305,7 +305,7 @@ int proctl_service_start(PROCTL_SERVICE *service)
 	return (0);
 }
 
-/* ÖØĞÂÆô¶¯Ä³¸ö·şÎñ½ø³Ì */
+/* é‡æ–°å¯åŠ¨æŸä¸ªæœåŠ¡è¿›ç¨‹ */
 
 static int proctl_service_restart(PROCTL_SERVICE *service)
 {
@@ -331,18 +331,18 @@ void proctl_msg_free(PROCTL_MSG *msg)
 	acl_myfree(msg);
 }
 
-/* ÍùÏûÏ¢¶ÓÁĞÖĞÌí¼ÓÒ»¸öÏûÏ¢£¬²¢ÏòÖ÷Ïß³Ì·¢ËÍÍ¨Öª */
+/* å¾€æ¶ˆæ¯é˜Ÿåˆ—ä¸­æ·»åŠ ä¸€ä¸ªæ¶ˆæ¯ï¼Œå¹¶å‘ä¸»çº¿ç¨‹å‘é€é€šçŸ¥ */
 void proctl_msg_push(PROCTL_MSG *msg)
 {
 	LOCK_WAITING_SERVICE;
 	acl_fifo_push(__services_wait, msg);
 	UNLOCK_WAITING_SERVICE;
 
-	/* ÏòÖ÷Ïß³Ì·¢ËÍÏûÏ¢ */
+	/* å‘ä¸»çº¿ç¨‹å‘é€æ¶ˆæ¯ */
 	ReleaseSemaphore(__sem_handle, 1, NULL);
 }
 
-/* Æô¶¯ÏûÏ¢£ºÆô¶¯Ò»¸ö·şÎñ×Ó½ø³Ì */
+/* å¯åŠ¨æ¶ˆæ¯ï¼šå¯åŠ¨ä¸€ä¸ªæœåŠ¡å­è¿›ç¨‹ */
 static void proctl_msg_start(PROCTL_MSG *msg)
 {
 	PROCTL_SERVICE *service = msg->service;
@@ -351,7 +351,7 @@ static void proctl_msg_start(PROCTL_MSG *msg)
 	(void) proctl_service_start(service);
 }
 
-/* ´¦ÀíÀ´×ÔÓÚ¼àÌıÏß³ÌµÄÏûÏ¢ÃüÁîµÄÖ÷Èë¿Ú */
+/* å¤„ç†æ¥è‡ªäºç›‘å¬çº¿ç¨‹çš„æ¶ˆæ¯å‘½ä»¤çš„ä¸»å…¥å£ */
 static void proctl_msg_main(void)
 {
 	const char *myname = "proctl_msg_main";
@@ -378,7 +378,7 @@ static void proctl_msg_main(void)
 	UNLOCK_WAITING_SERVICE;
 }
 
-/* µÈ´ıËùÓĞµÄ·şÎñ½ø³ÌµÄ×´Ì¬ */
+/* ç­‰å¾…æ‰€æœ‰çš„æœåŠ¡è¿›ç¨‹çš„çŠ¶æ€ */
 
 int proctl_service_wait(void)
 {
@@ -409,7 +409,7 @@ int proctl_service_wait(void)
 	return (0);
 }
 
-/* »ØÊÕÒ»Ğ©ÍË³öµÄ½ø³Ì£¬²¢¸ù¾İÌõ¼şÖØÆôÒì³£ÍË³öµÄ½ø³Ì */
+/* å›æ”¶ä¸€äº›é€€å‡ºçš„è¿›ç¨‹ï¼Œå¹¶æ ¹æ®æ¡ä»¶é‡å¯å¼‚å¸¸é€€å‡ºçš„è¿›ç¨‹ */
 
 int proctl_service_join(void)
 {
@@ -443,7 +443,7 @@ int proctl_service_join(void)
 			acl_msg_error("%s(%d): child exit status 0, error(%s)",
 				myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
 
-			/* ÒòÎª½ø³ÌÊÇÕı³£ÍË³ö£¬ËùÒÔ²»ĞèÒªÖØÆô¶¯ */
+			/* å› ä¸ºè¿›ç¨‹æ˜¯æ­£å¸¸é€€å‡ºï¼Œæ‰€ä»¥ä¸éœ€è¦é‡å¯åŠ¨ */
 			proctl_service_stopped(service);
 		} else if (status != STILL_ACTIVE) {
 			/* child has exited abnormaly */
@@ -451,7 +451,7 @@ int proctl_service_join(void)
 				myname, __LINE__, (int) status,
 				acl_last_strerror(ebuf, sizeof(ebuf)));
 
-			/* ÒòÎª½ø³ÌÊÇÒì³£ÍË³ö£¬ËùÒÔĞèÒªÖØÆô¶¯ */
+			/* å› ä¸ºè¿›ç¨‹æ˜¯å¼‚å¸¸é€€å‡ºï¼Œæ‰€ä»¥éœ€è¦é‡å¯åŠ¨ */
 			if (proctl_service_restart(service) < 0)
 				proctl_service_stopped(service);
 		}

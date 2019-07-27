@@ -1,4 +1,4 @@
-#ifndef __LIB_ICMP_INCLUDE_H__
+ï»¿#ifndef __LIB_ICMP_INCLUDE_H__
 #define __LIB_ICMP_INCLUDE_H__
 
 /* #include "lib_acl.h" */
@@ -26,97 +26,97 @@ extern "C" {
 
 /* in icmp_chat.c */
 /**
- * ´´½¨ICMP»á»°¶ÔÏó
- * @param aio {ACL_AIO*} Èç¹û¸ÃÏî²»Îª¿Õ£¬ÔòÄÚ²¿ÔÚÍ¨ĞÅ¹ı³ÌÖĞ²ÉÓÃ·Ç×èÈûÄ£Ê½£¬
- *  ·ñÔò²ÉÓÃ×èÈûÄ£Ê½
- * @param check_tid {int} ÊÇ·ñÔÚĞ£ÑéÏìÓ¦°üÊ±¼ì²éÊı¾İÖĞµÄÏß³ÌºÅ×Ö¶Î
- * @return {ICMP_CHAT*} ICMP»á»°¶ÔÏó¾ä±ú
+ * åˆ›å»ºICMPä¼šè¯å¯¹è±¡
+ * @param aio {ACL_AIO*} å¦‚æœè¯¥é¡¹ä¸ä¸ºç©ºï¼Œåˆ™å†…éƒ¨åœ¨é€šä¿¡è¿‡ç¨‹ä¸­é‡‡ç”¨éé˜»å¡æ¨¡å¼ï¼Œ
+ *  å¦åˆ™é‡‡ç”¨é˜»å¡æ¨¡å¼
+ * @param check_tid {int} æ˜¯å¦åœ¨æ ¡éªŒå“åº”åŒ…æ—¶æ£€æŸ¥æ•°æ®ä¸­çš„çº¿ç¨‹å·å­—æ®µ
+ * @return {ICMP_CHAT*} ICMPä¼šè¯å¯¹è±¡å¥æŸ„
  */
 ICMP_API ICMP_CHAT *icmp_chat_create(ACL_AIO *aio, int check_tid);
 
 /**
- * ÊÍ·ÅICMP»á»°¶ÔÏó
- * @param chat {ICMP_CHAT*} ICMP»á»°¶ÔÏó¾ä±ú
+ * é‡Šæ”¾ICMPä¼šè¯å¯¹è±¡
+ * @param chat {ICMP_CHAT*} ICMPä¼šè¯å¯¹è±¡å¥æŸ„
  */
 ICMP_API void icmp_chat_free(ICMP_CHAT *chat);
 
 /**
- * ¿ªÊ¼ÓëÄ³¸öÄ¿µÄÖ÷»ú½øĞĞ»á»°
- * @param host {ICMP_HOST*} µ÷ÓÃ icmp_host_new ·µ»ØµÄ¶ÔÏó
+ * å¼€å§‹ä¸æŸä¸ªç›®çš„ä¸»æœºè¿›è¡Œä¼šè¯
+ * @param host {ICMP_HOST*} è°ƒç”¨ icmp_host_new è¿”å›çš„å¯¹è±¡
  */
 ICMP_API void icmp_chat(ICMP_HOST* host);
 
 /**
- * µ±Ç°µÄICMP»á»°¶ÔÏóÖĞ±»Ì½²âµÄÖ÷»ú¸öÊı
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
- * @return {int} ±»Ì½²âÖ÷»ú¸öÊı
+ * å½“å‰çš„ICMPä¼šè¯å¯¹è±¡ä¸­è¢«æ¢æµ‹çš„ä¸»æœºä¸ªæ•°
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
+ * @return {int} è¢«æ¢æµ‹ä¸»æœºä¸ªæ•°
  */
 ICMP_API int icmp_chat_size(ICMP_CHAT *chat);
 
 /**
- * µ±Ç°µÄICMP»á»°¶ÔÏóÖĞÒÑ¾­Íê³ÉµÄÌ½²âµÄÖ÷»ú¸öÊı
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
- * @return {int} ÒÑÍê³ÉµÄ±»Ì½²âÖ÷»ú¸öÊı
+ * å½“å‰çš„ICMPä¼šè¯å¯¹è±¡ä¸­å·²ç»å®Œæˆçš„æ¢æµ‹çš„ä¸»æœºä¸ªæ•°
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
+ * @return {int} å·²å®Œæˆçš„è¢«æ¢æµ‹ä¸»æœºä¸ªæ•°
  */
 ICMP_API int icmp_chat_count(ICMP_CHAT *chat);
 
 /**
- * ÅĞ¶Ïµ±Ç°µÄICMP»á»°¶ÔÏóÖĞËùÓĞÌ½²âÈÎÎñÊÇ·ñÒÑ¾­Íê³É
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
- * @return {int} != 0: ±íÊ¾Íê³É; 0: ±íÊ¾Î´Íê³É
+ * åˆ¤æ–­å½“å‰çš„ICMPä¼šè¯å¯¹è±¡ä¸­æ‰€æœ‰æ¢æµ‹ä»»åŠ¡æ˜¯å¦å·²ç»å®Œæˆ
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
+ * @return {int} != 0: è¡¨ç¤ºå®Œæˆ; 0: è¡¨ç¤ºæœªå®Œæˆ
  */
 ICMP_API int icmp_chat_finish(ICMP_CHAT *chat);
 
 /**
- * È¡µÃµ±Ç°ICMP»á»°¶ÔÏóÖĞµÄµ±Ç°»á»°ĞòÁĞºÅÖµ
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
- * @return {unsigned short} »á»°ĞòÁĞºÅÖµ
+ * å–å¾—å½“å‰ICMPä¼šè¯å¯¹è±¡ä¸­çš„å½“å‰ä¼šè¯åºåˆ—å·å€¼
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
+ * @return {unsigned short} ä¼šè¯åºåˆ—å·å€¼
  */
 ICMP_API unsigned short icmp_chat_seqno(ICMP_CHAT *chat);
 
 /* in icmp_stat.c */
 /**
- * Êä³öµ±Ç°ICMPµÄ»á»°×´Ì¬
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
+ * è¾“å‡ºå½“å‰ICMPçš„ä¼šè¯çŠ¶æ€
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
  */
 ICMP_API void icmp_stat(ICMP_CHAT *chat);
 
 /**
- * ¼ÆËãÄ³¸öÖ÷»úµÄICMP»á»°×´Ì¬
- * @param host {ICMP_HOST*} ±»Ì½²âÖ÷»ú¶ÔÏó
- * @param show_flag {int} ÊÇ·ñÊä³ö½á¹ûÖÁÈÕÖ¾ÎÄ¼ş
+ * è®¡ç®—æŸä¸ªä¸»æœºçš„ICMPä¼šè¯çŠ¶æ€
+ * @param host {ICMP_HOST*} è¢«æ¢æµ‹ä¸»æœºå¯¹è±¡
+ * @param show_flag {int} æ˜¯å¦è¾“å‡ºç»“æœè‡³æ—¥å¿—æ–‡ä»¶
  */
 ICMP_API void icmp_stat_host(ICMP_HOST *host, int show_flag);
 
 /* in icmp_host.c */
 /**
- * ´´½¨Ò»¸öĞÂµÄ±»Ì½²âµÄÖ÷»ú¶ÔÏó
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
- * @param domain {const char*} ÓòÃû±êÊ¶×Ö·û´®£¬¿ÉÒÔÎª¿Õ
- * @param ip {const char*} Ö÷»úIPµØÖ·£¬²»ÄÜÎª¿Õ
- * @param npkt {size_t} ¶Ô¸ÃÖ÷»ú·¢ËÍµÄÊı¾İ°ü¸öÊı
- * @param dlen {size_t} Ã¿¸öÌ½²âÊı¾İ°üµÄ³¤¶È
- * @param delay {int} ·¢ËÍÌ½²âÊı¾İ°üµÄÊ±¼ä¼ä¸ô(ºÁÃë)
- * @param timeout {int} ±»Ì½²âÖ÷»úµÄÏìÓ¦°ü³¬Ê±Ê±¼ä(ºÁÃë)
- * @return {ICMP_HOST*} ±»Ì½²âÖ÷»ú¶ÔÏó, Èç¹ûÎª¿ÕÔò±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ–°çš„è¢«æ¢æµ‹çš„ä¸»æœºå¯¹è±¡
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
+ * @param domain {const char*} åŸŸåæ ‡è¯†å­—ç¬¦ä¸²ï¼Œå¯ä»¥ä¸ºç©º
+ * @param ip {const char*} ä¸»æœºIPåœ°å€ï¼Œä¸èƒ½ä¸ºç©º
+ * @param npkt {size_t} å¯¹è¯¥ä¸»æœºå‘é€çš„æ•°æ®åŒ…ä¸ªæ•°
+ * @param dlen {size_t} æ¯ä¸ªæ¢æµ‹æ•°æ®åŒ…çš„é•¿åº¦
+ * @param delay {int} å‘é€æ¢æµ‹æ•°æ®åŒ…çš„æ—¶é—´é—´éš”(æ¯«ç§’)
+ * @param timeout {int} è¢«æ¢æµ‹ä¸»æœºçš„å“åº”åŒ…è¶…æ—¶æ—¶é—´(æ¯«ç§’)
+ * @return {ICMP_HOST*} è¢«æ¢æµ‹ä¸»æœºå¯¹è±¡, å¦‚æœä¸ºç©ºåˆ™è¡¨ç¤ºå‡ºé”™
  */
 ICMP_API ICMP_HOST* icmp_host_new(ICMP_CHAT *chat, const char *domain,
 	const char *ip, size_t npkt, size_t dlen, int delay, int timeout);
 
 /**
- * ÊÍ·ÅÒ»¸ö±»Ì½²âÖ÷»ú¶ÔÏó
- * @param host {ICMP_HOST*} ±»Ì½²âÖ÷»ú¶ÔÏó
+ * é‡Šæ”¾ä¸€ä¸ªè¢«æ¢æµ‹ä¸»æœºå¯¹è±¡
+ * @param host {ICMP_HOST*} è¢«æ¢æµ‹ä¸»æœºå¯¹è±¡
  */
 ICMP_API void icmp_host_free(ICMP_HOST *host);
 
 /**
- * ÉèÖÃÌ½²â½á¹ûµÄ»Øµ÷º¯Êı
- * @param host {ICMP_HOST*} ±»Ì½²âÖ÷»ú¶ÔÏó
- * @param arg {void*} »Øµ÷º¯ÊıµÄ²ÎÊıÖ®Ò»
- * @param stat_respond {void (*)(ICMP_PKT_STATUS*)} Õı³£ÏìÓ¦Ê±µÄ»Øµ÷º¯Êı
- * @param stat_timeout {void (*)(ICMP_PKT_STATUS*)} ³¬Ê±ÏìÓ¦Ê±µÄ»Øµ÷º¯Êı
- * @param stat_unreach {void (*)(ICMP_PKT_STATUS*}} Ö÷»ú²»¿É´ïÊ±µÄ»Øµ÷º¯Êı
- * @param stat_finish {void (*)(ICMP_HOST*)} Õë¶Ô¸ÃÖ÷»úµÄÌ½²âÈÎÎñÊ±µÄ»Øµ÷º¯Êı
+ * è®¾ç½®æ¢æµ‹ç»“æœçš„å›è°ƒå‡½æ•°
+ * @param host {ICMP_HOST*} è¢«æ¢æµ‹ä¸»æœºå¯¹è±¡
+ * @param arg {void*} å›è°ƒå‡½æ•°çš„å‚æ•°ä¹‹ä¸€
+ * @param stat_respond {void (*)(ICMP_PKT_STATUS*)} æ­£å¸¸å“åº”æ—¶çš„å›è°ƒå‡½æ•°
+ * @param stat_timeout {void (*)(ICMP_PKT_STATUS*)} è¶…æ—¶å“åº”æ—¶çš„å›è°ƒå‡½æ•°
+ * @param stat_unreach {void (*)(ICMP_PKT_STATUS*}} ä¸»æœºä¸å¯è¾¾æ—¶çš„å›è°ƒå‡½æ•°
+ * @param stat_finish {void (*)(ICMP_HOST*)} é’ˆå¯¹è¯¥ä¸»æœºçš„æ¢æµ‹ä»»åŠ¡æ—¶çš„å›è°ƒå‡½æ•°
  */
 ICMP_API void icmp_host_set(ICMP_HOST *host, void *arg,
 	void (*stat_respond)(ICMP_PKT_STATUS*, void*),
@@ -126,13 +126,13 @@ ICMP_API void icmp_host_set(ICMP_HOST *host, void *arg,
 
 /* in icmp_ping.c */
 /**
- * ping Ò»Ì¨Ö÷»ú(ÄÚ²¿Ä¬ÈÏÃ¿¸öÌ½²â°ü³¤¶ÈÎª64¸ö×Ö½Ú)
- * @param chat {ICMP_CHAT*} »á»°¶ÔÏó¾ä±ú
- * @param domain {const char*} ÓòÃû±êÊ¶×Ö·û´®£¬¿ÉÒÔÎª¿Õ
- * @param ip {const char*} Ö÷»úIPµØÖ·£¬²»ÄÜÎª¿Õ
- * @param npkt {size_t} ¶Ô¸ÃÖ÷»ú·¢ËÍµÄÊı¾İ°ü¸öÊı
- * @param delay {int} ·¢ËÍÌ½²âÊı¾İ°üµÄÊ±¼ä¼ä¸ô(ºÁÃë)
- * @param timeout {int} ±»Ì½²âÖ÷»úµÄÏìÓ¦°ü³¬Ê±Ê±¼ä(ºÁÃë)
+ * ping ä¸€å°ä¸»æœº(å†…éƒ¨é»˜è®¤æ¯ä¸ªæ¢æµ‹åŒ…é•¿åº¦ä¸º64ä¸ªå­—èŠ‚)
+ * @param chat {ICMP_CHAT*} ä¼šè¯å¯¹è±¡å¥æŸ„
+ * @param domain {const char*} åŸŸåæ ‡è¯†å­—ç¬¦ä¸²ï¼Œå¯ä»¥ä¸ºç©º
+ * @param ip {const char*} ä¸»æœºIPåœ°å€ï¼Œä¸èƒ½ä¸ºç©º
+ * @param npkt {size_t} å¯¹è¯¥ä¸»æœºå‘é€çš„æ•°æ®åŒ…ä¸ªæ•°
+ * @param delay {int} å‘é€æ¢æµ‹æ•°æ®åŒ…çš„æ—¶é—´é—´éš”(æ¯«ç§’)
+ * @param timeout {int} è¢«æ¢æµ‹ä¸»æœºçš„å“åº”åŒ…è¶…æ—¶æ—¶é—´(æ¯«ç§’)
  */
 ICMP_API void icmp_ping_one(ICMP_CHAT *chat, const char *domain,
 	const char *ip, size_t npkt, int delay, int timeout);

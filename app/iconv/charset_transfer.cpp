@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "charset.h"
 #include "charset_transfer.h"
 
@@ -8,7 +8,7 @@
 #define SEP	'/'
 #endif
 
-// 去年路径前的 "./" 或 ".\"，因为在 WIN32 下
+// 鍘诲勾璺緞鍓嶇殑 "./" 鎴� ".\"锛屽洜涓哄湪 WIN32 涓�
 #define SKIP(ptr) do  \
 {  \
 	if (*ptr == '.' && *(ptr + 1) == '/')  \

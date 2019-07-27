@@ -1,4 +1,4 @@
-/*
+﻿/*
  Data plugin for Highcharts
 
  (c) 2012-2014 Torstein Honsi

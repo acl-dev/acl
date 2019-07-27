@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "rfc1035.h"
 #include "configure.h"
 #include "service_main.h"
@@ -16,7 +16,7 @@ typedef struct UDP_CTX
 	struct sockaddr_in local_addr;
 	struct sockaddr_in remote_addr;
 
-	// ÁÙÊ±±äÁ¿ÓÃÓÚ´«µİ²ÎÊı
+	// ä¸´æ—¶å˜é‡ç”¨äºä¼ é€’å‚æ•°
 	struct sockaddr_in client_addr;
 	int   client_addr_len;
 
@@ -220,12 +220,12 @@ static void reply_client(ACL_SOCKET fd, char *buf, int dlen,
 	char  respond_buf[MAX_BUF];
 	int   ret;
 
-	// ÏÈ±¸·İÔ´Êı¾İ
+	// å…ˆå¤‡ä»½æºæ•°æ®
 	memcpy(respond_buf, buf, dlen);
 
 	ret = rfc1035MessageUnpack(buf, dlen, &msg);
 
-	// µ±ÉÏÓÎ DNS ·şÎñÆ÷·µ»ØÓòÃû²»´æÔÚ»ò³öÏÖ´íÎóÊ±£¬ÈôÔÊĞí½øĞĞÓòÃûÌæ»»£¬Ôò·µ»ØÈ±Ê¡µØÖ·
+	// å½“ä¸Šæ¸¸ DNS æœåŠ¡å™¨è¿”å›åŸŸåä¸å­˜åœ¨æˆ–å‡ºç°é”™è¯¯æ—¶ï¼Œè‹¥å…è®¸è¿›è¡ŒåŸŸåæ›¿æ¢ï¼Œåˆ™è¿”å›ç¼ºçœåœ°å€
 	if (var_cfg_hijack_unknown
 		&& service_ctx->qtype == RFC1035_TYPE_A && ret == -3)
 	{
@@ -237,7 +237,7 @@ static void reply_client(ACL_SOCKET fd, char *buf, int dlen,
 		acl_msg_error("%s(%d): rfc1035MessageUnpack error(%d)",
 			myname, __LINE__, ret);
 
-		// µ±½â°üÊ§°ÜÊ±·µ»Ø±¾µØÅäÖÃºÃµÄ IP ÁĞ±í
+		// å½“è§£åŒ…å¤±è´¥æ—¶è¿”å›æœ¬åœ°é…ç½®å¥½çš„ IP åˆ—è¡¨
 		ip_list = build_ip_list(domain_map);
 		dlen = rfc1035BuildAReply(
 			domain_query ? domain_query : "unknown",
@@ -255,7 +255,7 @@ static void reply_client(ACL_SOCKET fd, char *buf, int dlen,
 			&service_ctx->client_addr,
 			service_ctx->client_addr_len);
 	} else {
-		// »Ö¸´Ô­ID, ĞèÒª×ª»»³ÉÍøÂç×Ö½ÚĞò
+		// æ¢å¤åŸID, éœ€è¦è½¬æ¢æˆç½‘ç»œå­—èŠ‚åº
 		unsigned short id_original;
 
 		id_original = htons(service_ctx->id_original);
@@ -403,7 +403,7 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 	memcpy(&service_ctx->client_addr, &ctx->client_addr,
 		ctx->client_addr_len);
 	service_ctx->client_addr_len = ctx->client_addr_len;
-	// ±¸·İÔ­ID , ÇÒÒÔÖ÷»ú×Ö½ÚĞò´æ´¢
+	// å¤‡ä»½åŸID , ä¸”ä»¥ä¸»æœºå­—èŠ‚åºå­˜å‚¨
 	memcpy(&service_ctx->id_original, data, 2);
 	service_ctx->id_original = ntohs(service_ctx->id_original);
 	acl_msg_info("id_original=%d", service_ctx->id_original);
@@ -411,11 +411,11 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 	acl_msg_info(">>> query %s, type(%d) %s: ", service_ctx->domain,
 		service_ctx->qtype, get_query_type(service_ctx->qtype));
 
-	// ½ö´¦Àí A ¼ÇÂ¼
+	// ä»…å¤„ç† A è®°å½•
 	if (service_ctx->qtype == RFC1035_TYPE_A) {
 		DOMAIN_MAP *domain_map;
 
-		// ÏÈ²éÑ¯±¾µØÓòÃûÓ³ÉäÖĞÊÇ·ñ´æÔÚ¶ÔÓ¦ÓòÃû
+		// å…ˆæŸ¥è¯¢æœ¬åœ°åŸŸåæ˜ å°„ä¸­æ˜¯å¦å­˜åœ¨å¯¹åº”åŸŸå
 		domain_map = domain_map_find(service_ctx->domain);
 		if (domain_map) {
 			reply_client_local(
@@ -426,7 +426,7 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 		}
 	}
 
-	// Èç¹û·Ç A ¼ÇÂ¼ÇÒ±¾µØÓòÃûÓ³Éä±íÖĞ²»´æÔÚ¸ÃÓòÃû£¬ÔòĞèÒª×ª·¢ÇëÇó¸øÉÏÓÎ DNS ·şÎñÆ÷
+	// å¦‚æœé A è®°å½•ä¸”æœ¬åœ°åŸŸåæ˜ å°„è¡¨ä¸­ä¸å­˜åœ¨è¯¥åŸŸåï¼Œåˆ™éœ€è¦è½¬å‘è¯·æ±‚ç»™ä¸Šæ¸¸ DNS æœåŠ¡å™¨
 
 	service_ctx->request_len = len > MAX_BUF ? MAX_BUF : len;
 	memcpy(service_ctx->request_buf, data, len);
@@ -436,7 +436,7 @@ static int read_request_callback(ACL_ASTREAM *astream, void *context,
 	acl_msg_info("request one key=%s, request_len=%d, len=%d",
 		service_ctx->key, service_ctx->request_len, len);
 
-	// ÏòÉÏÓÎ DNS ·şÎñÆ÷×ª·¢ÇëÇó°ü£¬ÊÕµ½ÏìÓ¦ºó read_respond_callback ½«±»»Øµ÷
+	// å‘ä¸Šæ¸¸ DNS æœåŠ¡å™¨è½¬å‘è¯·æ±‚åŒ…ï¼Œæ”¶åˆ°å“åº”å read_respond_callback å°†è¢«å›è°ƒ
 	(void) udp_write(ACL_VSTREAM_SOCK(server_stream),
 		service_ctx->request_buf, service_ctx->request_len,
 		&ctx->remote_addr, sizeof(ctx->remote_addr));
@@ -465,7 +465,7 @@ void service_udp_init(SERVICE *service, const char *local_ip,
 	ctx->remote_addr.sin_port = htons(remote_port);
 	ctx->remote_addr.sin_family = AF_INET;
 
-	// ´´½¨½ÓÊÕ¿Í»§¶ËÇëÇóµÄÁ÷
+	// åˆ›å»ºæ¥æ”¶å®¢æˆ·ç«¯è¯·æ±‚çš„æµ
 	stream = stream_udp_bind(ctx->local_addr);
 	acl_vstream_ctl(stream,
 		ACL_VSTREAM_CTL_READ_FN, request_read_fn,
@@ -480,7 +480,7 @@ void service_udp_init(SERVICE *service, const char *local_ip,
 		ACL_AIO_CTL_END);
 	acl_aio_read(ctx->stream_request);
 
-	// ´´½¨½ÓÊÕ·şÎñ¶ËÏìÓ¦µÄÁ÷
+	// åˆ›å»ºæ¥æ”¶æœåŠ¡ç«¯å“åº”çš„æµ
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
 

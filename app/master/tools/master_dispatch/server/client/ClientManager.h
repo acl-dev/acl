@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include <vector>
 
 class ClientConnection;
 
 /**
- * µ¥ÀıÀà£¬ÓÃÀ´¹ÜÀí¿Í»§¶ËÁ¬½Ó¶ÔÏó
+ * å•ä¾‹ç±»ï¼Œç”¨æ¥ç®¡ç†å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡
  */
 class ClientManager : public acl::singleton<ClientManager>
 {
@@ -13,21 +13,21 @@ public:
 	~ClientManager() {}
 
 	/**
-	 * Ìí¼Ó¿Í»§¶ËÁ¬½Ó¶ÔÏó£¬²»ÄÜÖØ¸´Ìí¼ÓÏàÍ¬µÄÁ¬½Ó¶ÔÏó£¬
-	 * ·ñÔò£¬ÄÚ²¿Ö±½Ó fatal
-	 * @param conn {ClientConnection*} ·Ç¿Õ¶ÔÏó
+	 * æ·»åŠ å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡ï¼Œä¸èƒ½é‡å¤æ·»åŠ ç›¸åŒçš„è¿æ¥å¯¹è±¡ï¼Œ
+	 * å¦åˆ™ï¼Œå†…éƒ¨ç›´æ¥ fatal
+	 * @param conn {ClientConnection*} éç©ºå¯¹è±¡
 	 */
 	void set(ClientConnection* conn);
 
 	/**
-	 * É¾³ı¿Í»§¶Ë¶ÔÏó
-	 * @param conn {ClientConnection*} ·Ç¿Õ¶ÔÏó
+	 * åˆ é™¤å®¢æˆ·ç«¯å¯¹è±¡
+	 * @param conn {ClientConnection*} éç©ºå¯¹è±¡
 	 */
 	void del(ClientConnection* conn);
 
 	/**
-	 * ´ÓÁ¬½Ó¶ÔÏó¼¯ºÏÖĞµ¯³öÒ»¸öÁ¬½Ó¶ÔÏó£¬²¢´Ó¼¯ºÏÖĞÉ¾³ı
-	 * @return {ClientConnection*} Èç¹û·µ»Ø¿Õ£¬ÔòËµÃ÷Ã»ÓĞÁ¬½Ó¶ÔÏó
+	 * ä»è¿æ¥å¯¹è±¡é›†åˆä¸­å¼¹å‡ºä¸€ä¸ªè¿æ¥å¯¹è±¡ï¼Œå¹¶ä»é›†åˆä¸­åˆ é™¤
+	 * @return {ClientConnection*} å¦‚æœè¿”å›ç©ºï¼Œåˆ™è¯´æ˜æ²¡æœ‰è¿æ¥å¯¹è±¡
 	 */
 	ClientConnection* pop();
 
@@ -37,6 +37,6 @@ public:
 	}
 
 private:
-	// ´æ´¢¿Í»§¶ËÁ¬½Ó¶ÔÏóµÄÊı×é¼¯ºÏ
+	// å­˜å‚¨å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡çš„æ•°ç»„é›†åˆ
 	std::vector<ClientConnection*> conns_;
 };

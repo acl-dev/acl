@@ -1,4 +1,4 @@
-#ifndef MY_COMPILER_INCLUDED
+﻿#ifndef MY_COMPILER_INCLUDED
 #define MY_COMPILER_INCLUDED
 
 /* Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "client/ClientConnection.h"
 #include "client/ClientManager.h"
 

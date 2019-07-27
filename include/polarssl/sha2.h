@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file sha2.h
  *
  * \brief SHA-224 and SHA-256 cryptographic hash function

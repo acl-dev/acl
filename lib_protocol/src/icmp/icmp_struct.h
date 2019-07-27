@@ -1,4 +1,4 @@
-#ifndef __ICMP_INCLUDE_H__
+ï»¿#ifndef __ICMP_INCLUDE_H__
 #define __ICMP_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -10,52 +10,52 @@ typedef struct IP_HDR IP_HDR;
 typedef struct ICMP_HDR ICMP_HDR;
 
 /* in icmp_timer.cpp */
-/**< ¶¨Ê±Æ÷ÐÅÏ¢½á¹¹ */
+/**< å®šæ—¶å™¨ä¿¡æ¯ç»“æž„ */
 struct ICMP_TIMER {
-	/**< ÉèÖÃ¶¨Ê±ÈÎÎñ */
+	/**< è®¾ç½®å®šæ—¶ä»»åŠ¡ */
 	time_t (*request)(ICMP_TIMER* timer, ICMP_PKT* pkt, int delay);
-	/**< È¡Ïû¶¨Ê±ÈÎÎñ */
+	/**< å–æ¶ˆå®šæ—¶ä»»åŠ¡ */
 	time_t (*cancel)(ICMP_TIMER* timer, ICMP_PKT* pkt);
-	/**< ²éÕÒ²¢É¾³ý¶¨Ê±ÈÎÎñ */
+	/**< æŸ¥æ‰¾å¹¶åˆ é™¤å®šæ—¶ä»»åŠ¡ */
 	ICMP_PKT* (*find_delete)(ICMP_TIMER* timer, unsigned short i_seq);
-	/**< µ¯³öÏÂÒ»¸ö¶¨Ê±ÈÎÎñ */
+	/**< å¼¹å‡ºä¸‹ä¸€ä¸ªå®šæ—¶ä»»åŠ¡ */
 	ICMP_PKT* (*popup)(ICMP_TIMER* timer);                    
 
-	ACL_RING timer_header;      /**< ¶¨Ê±ÈÎÎñµÄÁ´±íÍ· */
-	time_t present;             /**< µ±Ç°Ê±¼ä */
-	time_t time_left;           /**< ¾àÏÂÒ»¸ö¶¨Ê±ÈÎÎñµÄÊ±¼ä */
+	ACL_RING timer_header;      /**< å®šæ—¶ä»»åŠ¡çš„é“¾è¡¨å¤´ */
+	time_t present;             /**< å½“å‰æ—¶é—´ */
+	time_t time_left;           /**< è·ä¸‹ä¸€ä¸ªå®šæ—¶ä»»åŠ¡çš„æ—¶é—´ */
 };
 
-/**< ·¢ËÍÓë½ÓÊÕ ICMP °üµÄÍ¨ÐÅÁ÷ */
+/**< å‘é€ä¸ŽæŽ¥æ”¶ ICMP åŒ…çš„é€šä¿¡æµ */
 struct ICMP_STREAM {
-	ACL_VSTREAM *vstream;       /**< Í¬²½Á÷Ö¸Õë */
-	ACL_ASTREAM *astream;       /**< Òì²½Á÷Ö¸Õë */
+	ACL_VSTREAM *vstream;       /**< åŒæ­¥æµæŒ‡é’ˆ */
+	ACL_ASTREAM *astream;       /**< å¼‚æ­¥æµæŒ‡é’ˆ */
 
-	struct sockaddr_in dest;    /**< Ä¿±ê·þÎñÆ÷µØÖ· */
-	struct sockaddr_in from;    /**< Êý¾ÝÔ´·þÎñÆ÷µØÖ· */
-	int    from_len;            /**< ´æ´¢ÔÚ from ÖÐµÄµØÖ·´óÐ¡ */
+	struct sockaddr_in dest;    /**< ç›®æ ‡æœåŠ¡å™¨åœ°å€ */
+	struct sockaddr_in from;    /**< æ•°æ®æºæœåŠ¡å™¨åœ°å€ */
+	int    from_len;            /**< å­˜å‚¨åœ¨ from ä¸­çš„åœ°å€å¤§å° */
 };
 
-/**< ICMP Í¨ÐÅ¾ä±ú */
+/**< ICMP é€šä¿¡å¥æŸ„ */
 struct ICMP_CHAT {
-	/* Í¨ÓÃµÄ³ÉÔ±±äÁ¿ */
-	ACL_RING host_head;         /**< µ±Ç° ICMP Í¨ÐÅ¶ÔÏóÖÐµÄÖ÷»ú×é³ÉµÄÁ´ */
-	unsigned short seq;         /**< Ã¿¸ö icmp °üµÄÐòÁÐºÅ */
-	ICMP_STREAM   *is;          /**< ÓëÄ³¸ö¿Í»§»úÏà¹ØµÄÁ÷ */
-	unsigned short pid;         /**< ÓÉµ±Ç°½ø³ÌID±íÊ¾ */
-	unsigned long  gid;         /**< ÓÉ½ø³ÌÄÚ²¿µÄÔ­×Ó²Ù×÷ID±íÊ¾ */
-	int            check_id;    /**< ÊÇ·ñ¼ì²éÏìÓ¦°üÖÐµÄ id Öµ */
+	/* é€šç”¨çš„æˆå‘˜å˜é‡ */
+	ACL_RING host_head;         /**< å½“å‰ ICMP é€šä¿¡å¯¹è±¡ä¸­çš„ä¸»æœºç»„æˆçš„é“¾ */
+	unsigned short seq;         /**< æ¯ä¸ª icmp åŒ…çš„åºåˆ—å· */
+	ICMP_STREAM   *is;          /**< ä¸ŽæŸä¸ªå®¢æˆ·æœºç›¸å…³çš„æµ */
+	unsigned short pid;         /**< ç”±å½“å‰è¿›ç¨‹IDè¡¨ç¤º */
+	unsigned long  gid;         /**< ç”±è¿›ç¨‹å†…éƒ¨çš„åŽŸå­æ“ä½œIDè¡¨ç¤º */
+	int            check_id;    /**< æ˜¯å¦æ£€æŸ¥å“åº”åŒ…ä¸­çš„ id å€¼ */
 
-	/* Òì²½IOµÄ³ÉÔ±±äÁ¿ */
-	ACL_AIO    *aio;            /**< Òì²½IO¾ä±ú */
-	ICMP_TIMER *timer;          /**< °ü·¢ÍêºóµÈ´ý°üÓ¦´ðµÄ¶¨Ê±Æ÷ */
-	int   cnt;                  /**< µ±Ç° ICMP Í¨ÐÅ¶ÔÏóÖÐÒÑÍê³ÉµÄÖ÷»úÊý */
-	int   check_inter;          /**< Ã¿¸ô¶àÉÙÃë¼ì²éÒ»ÏÂ¶¨Ê±Æ÷ÀïµÄÈÎÎñ */
+	/* å¼‚æ­¥IOçš„æˆå‘˜å˜é‡ */
+	ACL_AIO    *aio;            /**< å¼‚æ­¥IOå¥æŸ„ */
+	ICMP_TIMER *timer;          /**< åŒ…å‘å®ŒåŽç­‰å¾…åŒ…åº”ç­”çš„å®šæ—¶å™¨ */
+	int   cnt;                  /**< å½“å‰ ICMP é€šä¿¡å¯¹è±¡ä¸­å·²å®Œæˆçš„ä¸»æœºæ•° */
+	int   check_inter;          /**< æ¯éš”å¤šå°‘ç§’æ£€æŸ¥ä¸€ä¸‹å®šæ—¶å™¨é‡Œçš„ä»»åŠ¡ */
 };
 
 #define ICMP_MIN                8  /**< Minimum 8 bytes packet (just header) */
 
-/**< IP Ð­ÒéÍ·½á¹¹ */
+/**< IP åè®®å¤´ç»“æž„ */
 struct IP_HDR {
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 	unsigned int h_len:4;          /**< length of the header */
@@ -88,34 +88,34 @@ struct ICMP_HDR {
 	unsigned short seq;
 };
 
-/**< ICMP °üÊý¾Ý½á¹¹ */
+/**< ICMP åŒ…æ•°æ®ç»“æž„ */
 struct ICMP_PKT {
-	/* ·¢ËÍµÄÊý¾Ý°ü */
+	/* å‘é€çš„æ•°æ®åŒ… */
 
-	ICMP_HDR hdr;                   /**< icmp Í· */
+	ICMP_HDR hdr;                   /**< icmp å¤´ */
 	union {
-		unsigned int gid;       /**< ½ø³ÌÄÚÎ¨Ò»IDºÅ */
-		char data[ICMP_MAX_PACKET];  /**< icmp Êý¾ÝÌå */
+		unsigned int gid;       /**< è¿›ç¨‹å†…å”¯ä¸€IDå· */
+		char data[ICMP_MAX_PACKET];  /**< icmp æ•°æ®ä½“ */
 	} body;
 
 	/********************************************************************/
 
-	/* ±¾µØ´æ´¢µÄÊý¾Ý³ÉÔ±£¬Ö÷ÒªÎªÁË½âÎö·½±ã */
+	/* æœ¬åœ°å­˜å‚¨çš„æ•°æ®æˆå‘˜ï¼Œä¸»è¦ä¸ºäº†è§£æžæ–¹ä¾¿ */
 
-	const ICMP_PKT *peer;           /**< ÊÕµ½µÄ¶Ô¶ËµÄÊý¾Ý°ü¶ÔÏó */
+	const ICMP_PKT *peer;           /**< æ”¶åˆ°çš„å¯¹ç«¯çš„æ•°æ®åŒ…å¯¹è±¡ */
 
-	ICMP_HOST *host;                /**< Ä¿µÄÖ÷»ú */
+	ICMP_HOST *host;                /**< ç›®çš„ä¸»æœº */
 
-	/**< ICMP_PKT ÖÐÖ¸Ïò ICMP_CHAT µÄ¿ì½Ý·½Ê½ */
+	/**< ICMP_PKT ä¸­æŒ‡å‘ ICMP_CHAT çš„å¿«æ·æ–¹å¼ */
 #define pkt_chat host->chat
 
-	ACL_RING timer_ring;            /**< ¶¨Ê±Æ÷½áµã */
+	ACL_RING timer_ring;            /**< å®šæ—¶å™¨ç»“ç‚¹ */
 
-	size_t wlen;                    /**< ·¢ËÍµÄÊý¾Ý³¤¶È */
-	size_t dlen;                    /**< Êý¾Ý°üÖÐÊý¾ÝÌå³¤¶È */
+	size_t wlen;                    /**< å‘é€çš„æ•°æ®é•¿åº¦ */
+	size_t dlen;                    /**< æ•°æ®åŒ…ä¸­æ•°æ®ä½“é•¿åº¦ */
 	struct timeval stamp;           /**< time stamp */
 
-	/* ÏìÓ¦µÄÊý¾Ý°üµÄ·ÖÎö½á¹û */
+	/* å“åº”çš„æ•°æ®åŒ…çš„åˆ†æžç»“æžœ */
 	ICMP_PKT_STATUS pkt_status;
 };
 

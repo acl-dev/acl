@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class message;
 class message_manager;

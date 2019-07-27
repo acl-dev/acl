@@ -1,4 +1,4 @@
-/* dso.h -*- mode:C; c-file-style: "eay" -*- */
+﻿/* dso.h -*- mode:C; c-file-style: "eay" -*- */
 /* Written by Geoff Thorpe (geoff@geoffthorpe.net) for the OpenSSL
  * project 2000.
  */

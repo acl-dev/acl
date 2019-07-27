@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 
@@ -13,76 +13,76 @@ public:
 	~md5(void);
 
 	/**
-	 * ¿ÉÒÔÑ­»·µ÷ÓÃ´Ëº¯ÊıÌí¼ÓĞèÒª±» md5 µÄÊı¾İ
-	 * @param dat {const void*} Êı¾İµØÖ·
-	 * @param len {size_t} dat Êı¾İ³¤¶È
+	 * å¯ä»¥å¾ªç¯è°ƒç”¨æ­¤å‡½æ•°æ·»åŠ éœ€è¦è¢« md5 çš„æ•°æ®
+	 * @param dat {const void*} æ•°æ®åœ°å€
+	 * @param len {size_t} dat æ•°æ®é•¿åº¦
 	 * @return {md5&}
 	 */
 	md5& update(const void* dat, size_t len);
 
 	/**
-	 * ±ØĞëµ÷ÓÃ±¾º¯Êı±íÊ¾ md5 ¹ı³Ì½áÊø
+	 * å¿…é¡»è°ƒç”¨æœ¬å‡½æ•°è¡¨ç¤º md5 è¿‡ç¨‹ç»“æŸ
 	 * @return {md5&}
 	 */
 	md5& finish(void);
 
 	/**
-	 * ÖØÖÃ md5 Ëã·¨Æ÷µÄ×´Ì¬£¬´Ó¶øÔÊĞíÖØ¸´Ê¹ÓÃÍ¬Ò»¸ö md5 ¶ÔÏó
+	 * é‡ç½® md5 ç®—æ³•å™¨çš„çŠ¶æ€ï¼Œä»è€Œå…è®¸é‡å¤ä½¿ç”¨åŒä¸€ä¸ª md5 å¯¹è±¡
 	 * @return {md5&}
 	 */
 	md5& reset(void);
 
 	/**
-	 * »ñµÃ¶ş½øÖÆ¸ñÊ½µÄ md5 ½á¹ûÖµ
-	 * @return {const char*} ·µ»ØÖµÓÀÔ¶·Ç¿Õ£¬ÇÒ»º³åÇø³¤¶ÈÎª 16 ×Ö½Ú
+	 * è·å¾—äºŒè¿›åˆ¶æ ¼å¼çš„ md5 ç»“æœå€¼
+	 * @return {const char*} è¿”å›å€¼æ°¸è¿œéç©ºï¼Œä¸”ç¼“å†²åŒºé•¿åº¦ä¸º 16 å­—èŠ‚
 	 */
 	const char* get_digest() const;
 
 	/**
-	 * »ñµÃÒÔ×Ö·û´®ĞÎÊ½±íÊ¾µÄ m5 ½á¹ûÖµ
-	 * @return {const char*} ·µ»ØÖµÓÀÔ¶·Ç¿Õ£¬ÇÒÒÔ \0 ½áÎ²£¬ÇÒ×Ö·û´®
-	 *  ³¤¶ÈÎª 32 ×Ö½Ú
+	 * è·å¾—ä»¥å­—ç¬¦ä¸²å½¢å¼è¡¨ç¤ºçš„ m5 ç»“æœå€¼
+	 * @return {const char*} è¿”å›å€¼æ°¸è¿œéç©ºï¼Œä¸”ä»¥ \0 ç»“å°¾ï¼Œä¸”å­—ç¬¦ä¸²
+	 *  é•¿åº¦ä¸º 32 å­—èŠ‚
 	 */
 	const char* get_string() const;
 
 	/**
-	 * ½«Êı¾İÓÃ md5 Ëã·¨¼ÆËãÇ©ÃûÖµ£¬È¡µÃ 128 Î» (¼´ 16 ×Ö½Ú) ¶ş½øÖÆ½á¹û
-	 * @param dat {const void*} Ô´Êı¾İ
-	 * @param dlen {size_t} dat Êı¾İ³¤¶È
-	 * @param key {const char*} ·Ç¿ÕÊ±×öÎª¼üÊı¾İ
-	 * @param klen {size_t} key ·Ç¿ÕÊ±±íÊ¾ key µÄ³¤¶È
-	 * @param out {void*} ´æ´¢ md5 ½á¹û
-	 * @param size {size_t} out ´óĞ¡£¬ÖÁÉÙÓ¦¸ÃÎª 16 ×Ö½Ú
-	 * @return {const char*} ·µ»Ø´æ´¢½á¹ûµÄµØÖ·(¼´ out µØÖ·)
+	 * å°†æ•°æ®ç”¨ md5 ç®—æ³•è®¡ç®—ç­¾åå€¼ï¼Œå–å¾— 128 ä½ (å³ 16 å­—èŠ‚) äºŒè¿›åˆ¶ç»“æœ
+	 * @param dat {const void*} æºæ•°æ®
+	 * @param dlen {size_t} dat æ•°æ®é•¿åº¦
+	 * @param key {const char*} éç©ºæ—¶åšä¸ºé”®æ•°æ®
+	 * @param klen {size_t} key éç©ºæ—¶è¡¨ç¤º key çš„é•¿åº¦
+	 * @param out {void*} å­˜å‚¨ md5 ç»“æœ
+	 * @param size {size_t} out å¤§å°ï¼Œè‡³å°‘åº”è¯¥ä¸º 16 å­—èŠ‚
+	 * @return {const char*} è¿”å›å­˜å‚¨ç»“æœçš„åœ°å€(å³ out åœ°å€)
 	 */
 	static const char* md5_digest(const void *dat, size_t dlen,
 		const void *key, size_t klen, void* out, size_t size);
 
 	/**
-	 * ½«Êı¾İÓÃ md5 Ëã·¨¼ÆËãÇ©ÃûÖµ£¬È¡µÃ×Ö·û´®ĞÎÊ½µÄ½á¹û
-	 * @param dat {const void*} Ô´Êı¾İ
-	 * @param dlen {size_t} dat Êı¾İ³¤¶È
-	 * @param key {const char*} ·Ç¿ÕÊ±×öÎª¼üÊı¾İ
-	 * @param klen {size_t} key ·Ç¿ÕÊ±±íÊ¾ key µÄ³¤¶È
-	 * @param out {void*} ´æ´¢ md5 ½á¹û
-	 * @param size {size_t} out ´óĞ¡£¬ÖÁÉÙÓ¦¸ÃÎª 33 ×Ö½Ú
-	 * @return {const char*} ·µ»Ø´æ´¢½á¹ûµÄµØÖ·(¼´ out µØÖ·)£¬
-	 *  ÇÒ·µ»ØÖµÎªÒÔ \0 ½áÎ²µÄ 32 ×Ö½Ú³¤¶È(²»º¬ \0)×Ö·û´®
+	 * å°†æ•°æ®ç”¨ md5 ç®—æ³•è®¡ç®—ç­¾åå€¼ï¼Œå–å¾—å­—ç¬¦ä¸²å½¢å¼çš„ç»“æœ
+	 * @param dat {const void*} æºæ•°æ®
+	 * @param dlen {size_t} dat æ•°æ®é•¿åº¦
+	 * @param key {const char*} éç©ºæ—¶åšä¸ºé”®æ•°æ®
+	 * @param klen {size_t} key éç©ºæ—¶è¡¨ç¤º key çš„é•¿åº¦
+	 * @param out {void*} å­˜å‚¨ md5 ç»“æœ
+	 * @param size {size_t} out å¤§å°ï¼Œè‡³å°‘åº”è¯¥ä¸º 33 å­—èŠ‚
+	 * @return {const char*} è¿”å›å­˜å‚¨ç»“æœçš„åœ°å€(å³ out åœ°å€)ï¼Œ
+	 *  ä¸”è¿”å›å€¼ä¸ºä»¥ \0 ç»“å°¾çš„ 32 å­—èŠ‚é•¿åº¦(ä¸å« \0)å­—ç¬¦ä¸²
 	 */
 	static const char* md5_string(const void *dat, size_t dlen,
 		const void *key, size_t klen, char* out, size_t size);
 
 	/**
-	 * ½«ÎÄ¼şÖĞµÄÄÚÈİÓÃ md5 Ëã·¨¼ÆËãÇ©ÃûÖµ£¬²¢È¡µÃ×Ö·û´®ĞÎÊ½½á¹û
-	 * @param path {const char*} ÎÄ¼şÈ«Â·¾¶
-	 * @param key {const char*} ·Ç¿ÕÊ±×öÎª¼üÊı¾İ
-	 * @param klen {size_t} key ·Ç¿ÕÊ±±íÊ¾ key µÄ³¤¶È
-	 * @param out {void*} ´æ´¢ md5 ½á¹û
-	 * @param size {size_t} out ´óĞ¡£¬ÖÁÉÙÓ¦¸ÃÎª 33 ×Ö½Ú
-	 * @return {int64) ·µ»ØËù¶ÁÈ¡µÄÎÄ¼şÊı¾İµÄ³¤¶È£¬ÏÂÁĞÇé¿öÏÂ·µ»Ø -1
-	 *  1) ´ò¿ªÎÄ¼şÊ§°Ü
-	 *  2) Î´´ÓÎÄ¼şÖĞ¶Áµ½Êı¾İ
-	 *  3) out »º³åÇø´óĞ¡ size Ğ¡ÓÚ 33 ×Ö½Ú³¤¶È
+	 * å°†æ–‡ä»¶ä¸­çš„å†…å®¹ç”¨ md5 ç®—æ³•è®¡ç®—ç­¾åå€¼ï¼Œå¹¶å–å¾—å­—ç¬¦ä¸²å½¢å¼ç»“æœ
+	 * @param path {const char*} æ–‡ä»¶å…¨è·¯å¾„
+	 * @param key {const char*} éç©ºæ—¶åšä¸ºé”®æ•°æ®
+	 * @param klen {size_t} key éç©ºæ—¶è¡¨ç¤º key çš„é•¿åº¦
+	 * @param out {void*} å­˜å‚¨ md5 ç»“æœ
+	 * @param size {size_t} out å¤§å°ï¼Œè‡³å°‘åº”è¯¥ä¸º 33 å­—èŠ‚
+	 * @return {int64) è¿”å›æ‰€è¯»å–çš„æ–‡ä»¶æ•°æ®çš„é•¿åº¦ï¼Œä¸‹åˆ—æƒ…å†µä¸‹è¿”å› -1
+	 *  1) æ‰“å¼€æ–‡ä»¶å¤±è´¥
+	 *  2) æœªä»æ–‡ä»¶ä¸­è¯»åˆ°æ•°æ®
+	 *  3) out ç¼“å†²åŒºå¤§å° size å°äº 33 å­—èŠ‚é•¿åº¦
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	static __int64 md5_file(const char* path, const void *key,
@@ -93,15 +93,15 @@ public:
 #endif
 
 	/**
-	 * ½«ÎÄ¼şÖĞµÄÄÚÈİÓÃ md5 Ëã·¨¼ÆËãÇ©ÃûÖµ£¬²¢È¡µÃ×Ö·û´®ĞÎÊ½½á¹û
-	 * @param in {istream&} ÊäÈëÎÄ¼şÁ÷
-	 * @param key {const char*} ·Ç¿ÕÊ±×öÎª¼üÊı¾İ
-	 * @param klen {size_t} key ·Ç¿ÕÊ±±íÊ¾ key µÄ³¤¶È
-	 * @param out {void*} ´æ´¢ md5 ½á¹û
-	 * @param size {size_t} out ´óĞ¡£¬ÖÁÉÙÓ¦¸ÃÎª 33 ×Ö½Ú
-	 * @return {int64) ·µ»ØËù¶ÁÈ¡µÄÎÄ¼şÊı¾İµÄ³¤¶È£¬ÏÂÁĞÇé¿öÏÂ·µ»Ø -1:
-	 *  1) Î´´ÓÊäÈëÁ÷ÖĞ¶ÁÈ¡Êı¾İÊ±
-	 *  2) out »º³åÇø´óĞ¡ size Ğ¡ÓÚ 33 ×Ö½Ú³¤¶È
+	 * å°†æ–‡ä»¶ä¸­çš„å†…å®¹ç”¨ md5 ç®—æ³•è®¡ç®—ç­¾åå€¼ï¼Œå¹¶å–å¾—å­—ç¬¦ä¸²å½¢å¼ç»“æœ
+	 * @param in {istream&} è¾“å…¥æ–‡ä»¶æµ
+	 * @param key {const char*} éç©ºæ—¶åšä¸ºé”®æ•°æ®
+	 * @param klen {size_t} key éç©ºæ—¶è¡¨ç¤º key çš„é•¿åº¦
+	 * @param out {void*} å­˜å‚¨ md5 ç»“æœ
+	 * @param size {size_t} out å¤§å°ï¼Œè‡³å°‘åº”è¯¥ä¸º 33 å­—èŠ‚
+	 * @return {int64) è¿”å›æ‰€è¯»å–çš„æ–‡ä»¶æ•°æ®çš„é•¿åº¦ï¼Œä¸‹åˆ—æƒ…å†µä¸‹è¿”å› -1:
+	 *  1) æœªä»è¾“å…¥æµä¸­è¯»å–æ•°æ®æ—¶
+	 *  2) out ç¼“å†²åŒºå¤§å° size å°äº 33 å­—èŠ‚é•¿åº¦
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	static __int64 md5_file(istream& in, const void *key,
@@ -112,13 +112,13 @@ public:
 #endif
 
 	/**
-	 * ½« 16 ×Ö½Ú³¤¶ÈµÄ MD5 ¶ş½øÖÆ½á¹û×ª»»Îª 32 ×Ö½Ú³¤¶ÈµÄ×Ö·û´®
-	 * @param in {const void*} 128 Î»(¼´ 16 ×Ö½Ú)µÄ md5 Öµ£¬¼´ in µÄÊı¾İ³¤¶È
-	 *  ÖÁÉÙÓ¦¸Ã >= 16£¬·ñÔò»áÒıÆğÄÚ´æÆğÔ½½ç
-	 * @param out {char*} ´æ´¢×Ö·û´®ĞÎÊ½µÄ½á¹û
-	 * @param size {size_t} out ÄÚ´æ´óĞ¡£¬ÖÁÉÙÎª 33 ×Ö½Ú£¬·ñÔòÄÚ²¿²úÉú¶ÏÑÔ
-	 * @return {const char*} ·µ»Ø´æ´¢½á¹ûµÄµØÖ·(¼´ out µØÖ·)£¬
-	 *  ÇÒ·µ»ØÖµÎªÒÔ \0 ½áÎ²µÄ 32 ×Ö½Ú³¤¶È(²»º¬ \0)×Ö·û´®
+	 * å°† 16 å­—èŠ‚é•¿åº¦çš„ MD5 äºŒè¿›åˆ¶ç»“æœè½¬æ¢ä¸º 32 å­—èŠ‚é•¿åº¦çš„å­—ç¬¦ä¸²
+	 * @param in {const void*} 128 ä½(å³ 16 å­—èŠ‚)çš„ md5 å€¼ï¼Œå³ in çš„æ•°æ®é•¿åº¦
+	 *  è‡³å°‘åº”è¯¥ >= 16ï¼Œå¦åˆ™ä¼šå¼•èµ·å†…å­˜èµ·è¶Šç•Œ
+	 * @param out {char*} å­˜å‚¨å­—ç¬¦ä¸²å½¢å¼çš„ç»“æœ
+	 * @param size {size_t} out å†…å­˜å¤§å°ï¼Œè‡³å°‘ä¸º 33 å­—èŠ‚ï¼Œå¦åˆ™å†…éƒ¨äº§ç”Ÿæ–­è¨€
+	 * @return {const char*} è¿”å›å­˜å‚¨ç»“æœçš„åœ°å€(å³ out åœ°å€)ï¼Œ
+	 *  ä¸”è¿”å›å€¼ä¸ºä»¥ \0 ç»“å°¾çš„ 32 å­—èŠ‚é•¿åº¦(ä¸å« \0)å­—ç¬¦ä¸²
 	 */
 	static const char* hex_encode(const void *in, char* out, size_t size);
 

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include <fcntl.h>
 #include <ctype.h>
 #include <string.h>

@@ -1,4 +1,4 @@
-#ifndef _DICT_CDB_H_INCLUDED_
+﻿#ifndef _DICT_CDB_H_INCLUDED_
 #define _DICT_CDB_H_INCLUDED_
 
 #ifdef HAS_CDB

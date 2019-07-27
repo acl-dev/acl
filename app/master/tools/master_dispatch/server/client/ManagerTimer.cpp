@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "server/ServerManager.h"
 #include "server/ServerConnection.h"
 #include "client/ClientManager.h"
@@ -17,9 +17,9 @@ bool ManagerTimer::transfer(ClientConnection* client)
 	char  buf[256];
 	int   ret;
 
-	// ´Ó·þÎñ¶ËÁ¬½Ó¹ÜÀí¶ÔÏóÖÐÈ¡µÃÁ¬½ÓÊý×îÐ¡µÄÒ»¸ö
-	// ·þÎñ¶Ë¶ÔÏó£¬²¢½«Ëù¸ø¿Í»§¶ËÁ¬½Ó´«µÝ¸øËü£¬
-	// Ò»Ö±µ½³É¹¦»òËùÓÐ´«Êä¶¼Ê§°ÜÎªÖ¹
+	// ä»ŽæœåŠ¡ç«¯è¿žæŽ¥ç®¡ç†å¯¹è±¡ä¸­å–å¾—è¿žæŽ¥æ•°æœ€å°çš„ä¸€ä¸ª
+	// æœåŠ¡ç«¯å¯¹è±¡ï¼Œå¹¶å°†æ‰€ç»™å®¢æˆ·ç«¯è¿žæŽ¥ä¼ é€’ç»™å®ƒï¼Œ
+	// ä¸€ç›´åˆ°æˆåŠŸæˆ–æ‰€æœ‰ä¼ è¾“éƒ½å¤±è´¥ä¸ºæ­¢
 
 	while (true)
 	{
@@ -37,8 +37,8 @@ bool ManagerTimer::transfer(ClientConnection* client)
 		memset(buf, 0, sizeof(buf));
 		snprintf(buf, sizeof(buf), "%s", peer);
 
-		// ½«¿Í»§¶ËÁ¬½Ó´«µÝ¸ø·þÎñ¶Ë£¬Èç¹ûÊ§°Ü£¬Ôò³¢ÊÔÏÂÒ»¸ö
-		// ·þÎñ¶Ë£¬Í¬Ê±½«Ê§°ÜµÄ·þÎñ¶Ë´Ó·þÎñ¶Ë¹ÜÀí¼¯ºÏÖÐÉ¾³ý
+		// å°†å®¢æˆ·ç«¯è¿žæŽ¥ä¼ é€’ç»™æœåŠ¡ç«¯ï¼Œå¦‚æžœå¤±è´¥ï¼Œåˆ™å°è¯•ä¸‹ä¸€ä¸ª
+		// æœåŠ¡ç«¯ï¼ŒåŒæ—¶å°†å¤±è´¥çš„æœåŠ¡ç«¯ä»ŽæœåŠ¡ç«¯ç®¡ç†é›†åˆä¸­åˆ é™¤
 		ret = acl_write_fd(server->sock_handle(), buf,
 			strlen(buf), client->sock_handle());
 		if (ret == -1)
@@ -48,8 +48,8 @@ bool ManagerTimer::transfer(ClientConnection* client)
 			ServerManager::get_instance().del(server);
 			server->close();
 		}
-		// ·¢ËÍ³É¹¦ºó£¬ÏÈ¸ø¸Ã·þÎñ½ø³ÌµÄ¿Í»§¶ËÁ¬½ÓÊý¼Ó1£¬ÒÔ±ãÓÚÐÂµ½µÄ
-		// Á¬½Ó¿ÉÒÔÓÐ»ú»á·ÖÅä¸øÆäËü·þÎñ½ø³Ì
+		// å‘é€æˆåŠŸåŽï¼Œå…ˆç»™è¯¥æœåŠ¡è¿›ç¨‹çš„å®¢æˆ·ç«¯è¿žæŽ¥æ•°åŠ 1ï¼Œä»¥ä¾¿äºŽæ–°åˆ°çš„
+		// è¿žæŽ¥å¯ä»¥æœ‰æœºä¼šåˆ†é…ç»™å…¶å®ƒæœåŠ¡è¿›ç¨‹
 		else
 			server->inc_conns();
 
@@ -61,9 +61,9 @@ void ManagerTimer::timer_callback(unsigned int)
 {
 	ClientConnection* client;
 
-	// ´Ó¿Í»§¶Ë¹ÜÀí¶ÔÏóµ¯³öËùÓÐÑÓ³Ù´ý´¦ÀíµÄ¿Í»§¶ËÁ¬½Ó¶ÔÏó
-	// ²¢´«µÝ¸ø·þÎñ¶Ë£¬Èç¹û´«µÝÊ§°Ü£¬ÔòÔÙ´ÎÖÃÈë¿Í»§¶Ë¹ÜÀí
-	// ¶ÔÏó£¬ÓÉÏÂ´Î¶¨Ê±Æ÷ÔÙ´Î³¢ÊÔ´¦Àí
+	// ä»Žå®¢æˆ·ç«¯ç®¡ç†å¯¹è±¡å¼¹å‡ºæ‰€æœ‰å»¶è¿Ÿå¾…å¤„ç†çš„å®¢æˆ·ç«¯è¿žæŽ¥å¯¹è±¡
+	// å¹¶ä¼ é€’ç»™æœåŠ¡ç«¯ï¼Œå¦‚æžœä¼ é€’å¤±è´¥ï¼Œåˆ™å†æ¬¡ç½®å…¥å®¢æˆ·ç«¯ç®¡ç†
+	// å¯¹è±¡ï¼Œç”±ä¸‹æ¬¡å®šæ—¶å™¨å†æ¬¡å°è¯•å¤„ç†
 
 	logger("total client: %d, total server: %d",
 		(int) ClientManager::get_instance().length(),
@@ -82,8 +82,8 @@ void ManagerTimer::timer_callback(unsigned int)
 			continue;
 		}
 
-		// Èç¹ûÔÚ¹æ¶¨µÄÊ±¼äÄÚÒÀÈ»Ã»ÓÐ·þÎñ¶Ë×¼±¸½ÓÊÕÁ¬½Ó£¬
-		// ÔòÖ±½ÓÉ¾³ý¸Ã¶ÔÏó
+		// å¦‚æžœåœ¨è§„å®šçš„æ—¶é—´å†…ä¾ç„¶æ²¡æœ‰æœåŠ¡ç«¯å‡†å¤‡æŽ¥æ”¶è¿žæŽ¥ï¼Œ
+		// åˆ™ç›´æŽ¥åˆ é™¤è¯¥å¯¹è±¡
 		if (client->expired())
 		{
 			logger_error("no server side, client(%s) expired!",

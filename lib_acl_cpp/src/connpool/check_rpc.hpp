@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/ipc/rpc.hpp"
 
@@ -14,10 +14,10 @@ public:
 	check_rpc(connect_monitor& monitor, check_client& checker);
 
 protected:
-	// ×ÓÏß³Ì´¦Àíº¯Êı
+	// å­çº¿ç¨‹å¤„ç†å‡½æ•°
 	virtual void rpc_run(void);
 
-	// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
+	// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
 	virtual void rpc_onover(void);
 
 private:

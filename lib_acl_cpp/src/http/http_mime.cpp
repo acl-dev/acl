@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #include "../mime/internal/mime_state.hpp"
 #include "../mime/internal/header_opts.hpp"
 #ifndef ACL_PREPARE_COMPILE
@@ -63,7 +63,7 @@ void http_mime_node::load_param(const char* path)
 		return;
 	}
 
-	// Èç¹û begin >= end ÔòËµÃ÷¸Ã½ÚµãÃ»ÓĞÊı¾İ -- zsx, 2019.7.9
+	// å¦‚æœ begin >= end åˆ™è¯´æ˜è¯¥èŠ‚ç‚¹æ²¡æœ‰æ•°æ® -- zsx, 2019.7.9
 	if (begin >= end) {
 		return;
 	}
@@ -143,11 +143,11 @@ http_mime::http_mime(const char* boundary,
 		mime_state_ = NULL;
 		return;
 	}
-	// HTTP µÄ MIME ¸ñÊ½Óë ÓÊ¼şµÄ MIME µÄ·Ö¸ô·ûÓĞËù²»Í¬£¬
-	// HTTP µÄ·Ö¸ô·ûÒª±ÈÓÊ¼ş·Ö¸ô·û¶àÁ½¸ö '-'£¬¶øÄ¿Ç° HTTP
-	// µÄ MIME ½âÎöÆ÷ÓÃµÄÊÇÓÊ¼şµÄ MIME ½âÎöÆ÷£¬Ä¿Ç°ÓÊ¼şµÄ
-	// MIME ½âÎöÆ÷»á×Ô¶¯¼ÓÉÏÁ½¸ö '-' Ç°×º£¬ËùÒÔĞèÒªÈ¥µô
-	// ¿ªÍ·µÄÁ½¸ö '-'
+	// HTTP çš„ MIME æ ¼å¼ä¸ é‚®ä»¶çš„ MIME çš„åˆ†éš”ç¬¦æœ‰æ‰€ä¸åŒï¼Œ
+	// HTTP çš„åˆ†éš”ç¬¦è¦æ¯”é‚®ä»¶åˆ†éš”ç¬¦å¤šä¸¤ä¸ª '-'ï¼Œè€Œç›®å‰ HTTP
+	// çš„ MIME è§£æå™¨ç”¨çš„æ˜¯é‚®ä»¶çš„ MIME è§£æå™¨ï¼Œç›®å‰é‚®ä»¶çš„
+	// MIME è§£æå™¨ä¼šè‡ªåŠ¨åŠ ä¸Šä¸¤ä¸ª '-' å‰ç¼€ï¼Œæ‰€ä»¥éœ€è¦å»æ‰
+	// å¼€å¤´çš„ä¸¤ä¸ª '-'
 	if (*boundary == '-') {
 		boundary++;
 	}
@@ -168,14 +168,14 @@ http_mime::http_mime(const char* boundary,
 	save_path_.clear();
 	mime_state_ = mime_state_alloc();
 
-	// ÎªÁËÊ¹ÓÃÓÊ¼şµÄ mime ½âÎöÆ÷£¬ĞèÒªÄ£Äâ³öÒ»¸öÍ·²¿×Ö¶Î
+	// ä¸ºäº†ä½¿ç”¨é‚®ä»¶çš„ mime è§£æå™¨ï¼Œéœ€è¦æ¨¡æ‹Ÿå‡ºä¸€ä¸ªå¤´éƒ¨å­—æ®µ
 	mime_state_update(mime_state_, ctype_pre, sizeof(ctype_pre) - 1);
 	size_t len = strlen(boundary);
 	mime_state_update(mime_state_, boundary, (int) len);
 	mime_state_update(mime_state_, "\r\n\r\n", 4);
 
-	// ÒòÎª¸ÃÍ·×÷Îª½âÎöÆ÷µÄÖ÷Í·ÊÇ¶îÍâ¼Ó½øÈ¥µÄ£¬ËùÒÔ»áÔì³ÉÊµ¼ÊµÄÆ«ÒÆÁ¿£¬
-	// Í¨¹ı off_ À´½øĞĞÆ«ÒÆÁ¿²¹³¥
+	// å› ä¸ºè¯¥å¤´ä½œä¸ºè§£æå™¨çš„ä¸»å¤´æ˜¯é¢å¤–åŠ è¿›å»çš„ï¼Œæ‰€ä»¥ä¼šé€ æˆå®é™…çš„åç§»é‡ï¼Œ
+	// é€šè¿‡ off_ æ¥è¿›è¡Œåç§»é‡è¡¥å¿
 	off_ = 0 - ((off_t) sizeof(ctype_pre) - 1 + (off_t) len + 4);
 
 	parsed_ = false;
@@ -211,7 +211,7 @@ const std::list<http_mime_node*>& http_mime::get_nodes(void) const
 		return mime_nodes_;
 	}
 
-	// Èç¹û»¹Ã»ÓĞ·ÖÎöÍêÕû¾Íµ÷ÓÃ±¾º¯Êı£¬ÔòÖ±½Ó·µ»Ø¿ÕµÄ¼¯ºÏ
+	// å¦‚æœè¿˜æ²¡æœ‰åˆ†æå®Œæ•´å°±è°ƒç”¨æœ¬å‡½æ•°ï¼Œåˆ™ç›´æ¥è¿”å›ç©ºçš„é›†åˆ
 	if (mime_state_->curr_status != MIME_S_TERM) {
 		return mime_nodes_;
 	}
@@ -222,7 +222,7 @@ const std::list<http_mime_node*>& http_mime::get_nodes(void) const
 	MIME_NODE* node;
 	int  i = 0;
 	acl_foreach(iter, mime_state_) {
-		// Ã¿Ò»¸ö½ÚµãÊÇÖ÷Í·½áµã£¬ËùÒÔÌø¹ı
+		// æ¯ä¸€ä¸ªèŠ‚ç‚¹æ˜¯ä¸»å¤´ç»“ç‚¹ï¼Œæ‰€ä»¥è·³è¿‡
 		if (i++ == 0) {
 			continue;
 		}

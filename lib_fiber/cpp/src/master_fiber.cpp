@@ -1,4 +1,4 @@
-#include "stdafx.hpp"
+﻿#include "stdafx.hpp"
 #include "fiber_server.hpp"
 #include "fiber/master_fiber.hpp"
 
@@ -23,7 +23,7 @@ const char* master_fiber::get_conf_path(void) const
 
 void master_fiber::run(int argc, char** argv)
 {
-	// 每个进程只能有一个实例在运行
+	// 姣忎釜杩涚▼鍙兘鏈変竴涓疄渚嬪湪杩愯
 	acl_assert(has_called == false);
 	has_called = true;
 

@@ -1,4 +1,4 @@
-#ifndef	__DEFINE_INCLUDE_H__
+﻿#ifndef	__DEFINE_INCLUDE_H__
 #define	__DEFINE_INCLUDE_H__
 
 #if defined(__linux__)

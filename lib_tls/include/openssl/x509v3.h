@@ -1,4 +1,4 @@
-/* x509v3.h */
+﻿/* x509v3.h */
 /* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 1999.
  */

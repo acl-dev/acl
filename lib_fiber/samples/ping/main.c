@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "fiber/lib_fiber.h"
 #include <signal.h>
@@ -16,7 +16,7 @@ static int __show_unreach = 0;
 static void display_res(ICMP_CHAT *chat)
 {
 	if (chat) {
-		/* ÏÔÊ¾ PING µÄ½á¹û×Ü½á */
+		/* æ˜¾ç¤º PING çš„ç»“æœæ€»ç»“ */
 		icmp_stat(chat);
 		printf(">>>max pkts: %d\r\n", icmp_chat_seqno(chat));
 	}
@@ -67,7 +67,7 @@ static void finish_callback(ICMP_HOST *host, void *arg acl_unused)
 
 static void ping_one(const char *ip)
 {
-	ICMP_CHAT *chat = icmp_chat_create(NULL, 1); /* ´´½¨ ICMP ¶ÔÏó */
+	ICMP_CHAT *chat = icmp_chat_create(NULL, 1); /* åˆ›å»º ICMP å¯¹è±¡ */
 	ICMP_HOST *host = icmp_host_alloc(chat, ip, ip);
 
 	icmp_host_init(host, ICMP_TYPE_ECHO, ICMP_CODE_EXTRA, __npkt, 64,
@@ -75,28 +75,28 @@ static void ping_one(const char *ip)
 	icmp_host_set(host, host, reply_callback, timeout_callback,
 		unreach_callback, finish_callback);
 
-	icmp_chat(host);	/* ¿ªÊ¼ PING */
-	display_res(chat);	/* ÏÔÊ¾ PING ½á¹û */
+	icmp_chat(host);	/* å¼€å§‹ PING */
+	display_res(chat);	/* æ˜¾ç¤º PING ç»“æœ */
 
 	icmp_host_free(host);
-	icmp_chat_free(chat);	/* ÊÍ·Å ICMP ¶ÔÏó */
+	icmp_chat_free(chat);	/* é‡Šæ”¾ ICMP å¯¹è±¡ */
 }
 
-/* PING Ğ­³ÌÈë¿Ú */
+/* PING åç¨‹å…¥å£ */
 static void fiber_ping(ACL_FIBER *fiber acl_unused, void *arg)
 {
 	const char *dest = (const char *) arg;
 	ACL_DNS_DB* dns_db;
 	const char *ip;
 
-	/* Í¨¹ıÓòÃû½âÎö³öIPµØÖ· */
+	/* é€šè¿‡åŸŸåè§£æå‡ºIPåœ°å€ */
 	dns_db = acl_gethostbyname(dest, NULL);
 	if (dns_db == NULL) {
 		acl_msg_warn("Can't find domain %s", dest);
 		return;
 	}
 
-	/* Ö»È¡³öÓòÃûµÚÒ»¸ö IP µØÖ· PING */
+	/* åªå–å‡ºåŸŸåç¬¬ä¸€ä¸ª IP åœ°å€ PING */
 	ip = acl_netdb_index_ip(dns_db, 0);
 	if (ip == NULL || *ip == 0) {
 		acl_msg_error("ip invalid");
@@ -106,7 +106,7 @@ static void fiber_ping(ACL_FIBER *fiber acl_unused, void *arg)
 
 	ping_one(ip);
 
-	acl_netdb_free(dns_db);  /* ÊÍ·ÅÓòÃû½âÎö¶ÔÏó */
+	acl_netdb_free(dns_db);  /* é‡Šæ”¾åŸŸåè§£æå¯¹è±¡ */
 
 	if (--__nfibers == 0)
 		acl_fiber_schedule_stop();
@@ -163,7 +163,7 @@ static void show_list(const char *s)
 	acl_argv_free(tokens);
 }
 
-/* µ±ÊÕµ½ SIGINT ĞÅºÅ(¼´ÔÚ PING ¹ı³ÌÖĞÓÃ»§°´ÏÂ ctrl + c)Ê±µÄĞÅºÅ´¦Àíº¯Êı */
+/* å½“æ”¶åˆ° SIGINT ä¿¡å·(å³åœ¨ PING è¿‡ç¨‹ä¸­ç”¨æˆ·æŒ‰ä¸‹ ctrl + c)æ—¶çš„ä¿¡å·å¤„ç†å‡½æ•° */
 static void on_sigint(int signo acl_unused)
 {
 	exit(0);
@@ -175,8 +175,8 @@ int main(int argc, char* argv[])
 	int   i, stack_size = 16000;
 	char  iplist[256];
 
-	signal(SIGINT, on_sigint);  /* ÓÃ»§°´ÏÂ ctr + c Ê±ÖĞ¶Ï PING ³ÌĞò */
-	acl_msg_stdout_enable(1);  /* ÔÊĞí acl_msg_xxx ¼ÇÂ¼µÄĞÅÏ¢Êä³öÖÁÆÁÄ» */
+	signal(SIGINT, on_sigint);  /* ç”¨æˆ·æŒ‰ä¸‹ ctr + c æ—¶ä¸­æ–­ PING ç¨‹åº */
+	acl_msg_stdout_enable(1);  /* å…è®¸ acl_msg_xxx è®°å½•çš„ä¿¡æ¯è¾“å‡ºè‡³å±å¹• */
 
 	iplist[0] = 0;
 
@@ -253,7 +253,7 @@ int main(int argc, char* argv[])
 			return 0;
 		}
 
-		/* ¼ÇÂ¼ÒªÆô¶¯µÄĞ­³ÌµÄ×ÜÊı */
+		/* è®°å½•è¦å¯åŠ¨çš„åç¨‹çš„æ€»æ•° */
 		__nfibers = argc - optind;
 
 		for (i = optind; i < argc; i++)

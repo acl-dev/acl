@@ -1,6 +1,6 @@
-#pragma once
+ï»¿#pragma once
 
-// ´¿ĞéÀà£¬ÓÃÀ´´¦ÀíÀ´×ÔÓÚ¿Í»§¶Ë¼°·şÎñ¶ËµÄÁ¬½Ó
+// çº¯è™šç±»ï¼Œç”¨æ¥å¤„ç†æ¥è‡ªäºå®¢æˆ·ç«¯åŠæœåŠ¡ç«¯çš„è¿æ¥
 class IConnection
 {
 public:
@@ -8,18 +8,18 @@ public:
 	virtual ~IConnection() {}
 
 	/**
-	 * ´¿Ğéº¯Êı£¬×ÓÀà±ØĞëÊµÏÖ
+	 * çº¯è™šå‡½æ•°ï¼Œå­ç±»å¿…é¡»å®ç°
 	 */
 	virtual void run() = 0;
 
 	/**
-	 * »ñµÃÁ¬½Ó¶ÔÏóµÄ socket ÃèÊö·û
+	 * è·å¾—è¿æ¥å¯¹è±¡çš„ socket æè¿°ç¬¦
 	 * @return {int}
 	 */
 	int   sock_handle() const;
 
 	/**
-	 * »ñµÃ·Ç×èÈûÁ¬½ÓÁ÷¶ÔÏó
+	 * è·å¾—éé˜»å¡è¿æ¥æµå¯¹è±¡
 	 * @return {acl::aio_socket_stream*}
 	 */
 	acl::aio_socket_stream* get_conn() const
@@ -28,7 +28,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃÁ¬½Ó¶ÔÏóµÄµØÖ·
+	 * è·å¾—è¿æ¥å¯¹è±¡çš„åœ°å€
 	 * @return {const char*}
 	 */
 	const char* get_peer(bool full = true) const;

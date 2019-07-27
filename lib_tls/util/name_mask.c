@@ -1,4 +1,4 @@
-/*++
+﻿/*++
  * NAME
  *	name_mask 3
  * SUMMARY

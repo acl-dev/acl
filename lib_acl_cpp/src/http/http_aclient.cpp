@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/zlib_stream.hpp"
@@ -99,20 +99,20 @@ bool http_aclient::handle_connect(ACL_ASTREAM *stream)
 		return false;
 	}
 
-	// Á¬½Ó³É¹¦£¬´´½¨ C++ AIO Á¬½Ó¶ÔÏó
+	// è¿æ¥æˆåŠŸï¼Œåˆ›å»º C++ AIO è¿æ¥å¯¹è±¡
 	conn_ = new aio_socket_stream(&handle_, stream, true);
 
-	// ×¢²áÁ¬½Ó¹Ø±Õ»Øµ÷´¦Àí¶ÔÏó
+	// æ³¨å†Œè¿æ¥å…³é—­å›è°ƒå¤„ç†å¯¹è±¡
 	conn_->add_close_callback(this);
 
-	// ×¢²á IO ³¬Ê±»Øµ÷´¦Àí¶ÔÏó
+	// æ³¨å†Œ IO è¶…æ—¶å›è°ƒå¤„ç†å¯¹è±¡
 	conn_->add_timeout_callback(this);
 
 	if (!ssl_conf_) {
 		return this->on_connect();
 	}
 
-	// ÒòÎªÅäÖÃÁË SSL Í¨ĞÅ·½Ê½£¬ËùÒÔĞèÒª´´½¨ SSL IO ¹ı³Ì£¬¿ªÊ¼ SSL ÎÕÊÖ
+	// å› ä¸ºé…ç½®äº† SSL é€šä¿¡æ–¹å¼ï¼Œæ‰€ä»¥éœ€è¦åˆ›å»º SSL IO è¿‡ç¨‹ï¼Œå¼€å§‹ SSL æ¡æ‰‹
 	polarssl_io* ssl_io = new polarssl_io(*ssl_conf_, false, true);
 	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
 		logger_error("open ssl failed");
@@ -124,7 +124,7 @@ bool http_aclient::handle_connect(ACL_ASTREAM *stream)
 
 	status_ = HTTP_ACLIENT_STATUS_SSL_HANDSHAKE;
 
-	// ¿ªÊ¼ SSL ÎÕÊÖ¹ı³Ì£¬read_wait ¶ÔÓ¦µÄ»Øµ÷·½·¨Îª read_wakeup
+	// å¼€å§‹ SSL æ¡æ‰‹è¿‡ç¨‹ï¼Œread_wait å¯¹åº”çš„å›è°ƒæ–¹æ³•ä¸º read_wakeup
 	conn_->add_read_callback(this);
 	conn_->read_wait(rw_timeout_);
 	return true;
@@ -144,9 +144,9 @@ bool http_aclient::timeout_callback(void)
 
 void http_aclient::close_callback(void)
 {
-	// ÍøÂç¹Ø±ÕÊ±»Øµ÷×ÓÀàÖØÔØ·½·¨
+	// ç½‘ç»œå…³é—­æ—¶å›è°ƒå­ç±»é‡è½½æ–¹æ³•
 	this->on_disconnect();
-	// ¶ÔÏóÏú»Ù
+	// å¯¹è±¡é”€æ¯
 	this->destroy();
 }
 
@@ -167,7 +167,7 @@ bool http_aclient::handle_ws_ping(void)
 			}
 			return true;
 		case 0:
-			// Òì²½·¢ËÍ pong Êı¾İ
+			// å¼‚æ­¥å‘é€ pong æ•°æ®
 			res = ws_out_->send_frame_pong(*conn_,
 				(void*) buff_->c_str(), buff_->size());
 			buff_->clear();
@@ -262,7 +262,7 @@ bool http_aclient::handle_websocket(void)
 			return true;
 		}
 
-		// µ±¶ÁÍêÊı¾İÖ¡Í·Ê±£¬¸ù¾İ²»Í¬Ö¡ÀàĞÍ»Øµ÷²»Í¬·½·¨
+		// å½“è¯»å®Œæ•°æ®å¸§å¤´æ—¶ï¼Œæ ¹æ®ä¸åŒå¸§ç±»å‹å›è°ƒä¸åŒæ–¹æ³•
 		unsigned char opcode = ws_in_->get_frame_opcode();
 		switch (opcode) {
 		case FRAME_TEXT:
@@ -301,11 +301,11 @@ bool http_aclient::handle_websocket(void)
 	}
 }
 
-// ÔÚ SSL ÎÕÊÖ½×¶Î£¬¸Ã·½·¨»á¶à´Îµ÷ÓÃ£¬Ö±ÖÁ SSL ÎÕÊÖ³É¹¦»òÊ§°Ü
+// åœ¨ SSL æ¡æ‰‹é˜¶æ®µï¼Œè¯¥æ–¹æ³•ä¼šå¤šæ¬¡è°ƒç”¨ï¼Œç›´è‡³ SSL æ¡æ‰‹æˆåŠŸæˆ–å¤±è´¥
 bool http_aclient::read_wakeup(void)
 {
-	// Èç¹û websocket ·Ç NULL£¬ÔòËµÃ÷½øÈëµ½ websocket Í¨ĞÅ·½Ê½£¬
-	// ¸Ã´¥·¢Ìõ¼şÔÚ http_res_hdr_cllback ÖĞ×¢²á
+	// å¦‚æœ websocket é NULLï¼Œåˆ™è¯´æ˜è¿›å…¥åˆ° websocket é€šä¿¡æ–¹å¼ï¼Œ
+	// è¯¥è§¦å‘æ¡ä»¶åœ¨ http_res_hdr_cllback ä¸­æ³¨å†Œ
 	switch (status_) {
 	case HTTP_ACLIENT_STATUS_WS_READING:
 		acl_assert(ws_in_);
@@ -320,7 +320,7 @@ bool http_aclient::read_wakeup(void)
 
 bool http_aclient::handle_ssl_handshake(void)
 {
-	// ·ñÔò£¬ÔòÊÇµÚÒ»´Î½øĞĞ SSL ÎÕÊÖ½×¶ÎµÄ IO ¹ı³Ì
+	// å¦åˆ™ï¼Œåˆ™æ˜¯ç¬¬ä¸€æ¬¡è¿›è¡Œ SSL æ¡æ‰‹é˜¶æ®µçš„ IO è¿‡ç¨‹
 	polarssl_io* ssl_io = (polarssl_io*) conn_->get_hook();
 	if (ssl_io == NULL) {
 		logger_error("no ssl_io hooked!");
@@ -332,14 +332,14 @@ bool http_aclient::handle_ssl_handshake(void)
 		return false;
 	}
 
-	// SSL ÎÕÊÖ³É¹¦ºó£¬»Øµ÷Á¬½Ó³É¹¦·½·¨£¬Í¨Öª×ÓÀà¿ÉÒÔ·¢ËÍÇëÇóÊı¾İ
+	// SSL æ¡æ‰‹æˆåŠŸåï¼Œå›è°ƒè¿æ¥æˆåŠŸæ–¹æ³•ï¼Œé€šçŸ¥å­ç±»å¯ä»¥å‘é€è¯·æ±‚æ•°æ®
 	if (ssl_io->handshake_ok()) {
 		conn_->del_read_callback(this);
 		conn_->disable_read();
 		return this->on_connect();
 	}
 
-	// ¼ÌĞø SSL ÎÕÊÖ¹ı³Ì
+	// ç»§ç»­ SSL æ¡æ‰‹è¿‡ç¨‹
 	return true;
 }
 
@@ -353,16 +353,16 @@ bool http_aclient::read_callback(char* data, int len)
 bool http_aclient::res_plain_finish(char* data, int dlen)
 {
 	if (data == NULL || dlen <= 0) {
-		// ¶ÁÍê HTTP ÏìÓ¦Êı¾İ£¬»Øµ÷Íê³É·½·¨
+		// è¯»å®Œ HTTP å“åº”æ•°æ®ï¼Œå›è°ƒå®Œæˆæ–¹æ³•
 		return this->on_http_res_finish(true) && keep_alive_;
 	}
 
-	// ½«¶Áµ½µÄ HTTP ÏìÓ¦ÌåÊı¾İ´«µİ¸ø×ÓÀà
+	// å°†è¯»åˆ°çš„ HTTP å“åº”ä½“æ•°æ®ä¼ é€’ç»™å­ç±»
 	if (!this->on_http_res_body(data, (size_t) dlen)) {
 		return false;
 	}
 
-	// ¶ÁÍê HTTP ÏìÓ¦Êı¾İ£¬»Øµ÷Íê³É·½·¨
+	// è¯»å®Œ HTTP å“åº”æ•°æ®ï¼Œå›è°ƒå®Œæˆæ–¹æ³•
 	return this->on_http_res_finish(true) && keep_alive_;
 }
 
@@ -381,7 +381,7 @@ bool http_aclient::res_unzip_finish(zlib_stream& zstream, char* data, int dlen)
 			return false;
 		}
 
-		// ¶ÁÍê HTTP ÏìÓ¦Êı¾İ£¬»Øµ÷Íê³É·½·¨
+		// è¯»å®Œ HTTP å“åº”æ•°æ®ï¼Œå›è°ƒå®Œæˆæ–¹æ³•
 		return this->on_http_res_finish(true) && keep_alive_;
 	}
 
@@ -401,7 +401,7 @@ bool http_aclient::res_unzip_finish(zlib_stream& zstream, char* data, int dlen)
 		}
 	}
 
-	// ¶ÁÍê HTTP ÏìÓ¦Êı¾İ£¬»Øµ÷Íê³É·½·¨
+	// è¯»å®Œ HTTP å“åº”æ•°æ®ï¼Œå›è°ƒå®Œæˆæ–¹æ³•
 	return this->on_http_res_finish(true) && keep_alive_;
 }
 
@@ -469,7 +469,7 @@ int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
 		(void) me->on_http_res_finish(false);
 		return -1;
 	case HTTP_CHAT_DATA:
-		// ½«¶Áµ½µÄ HTTP ÏìÓ¦ÌåÊı¾İ´«µİ¸ø×ÓÀà
+		// å°†è¯»åˆ°çš„ HTTP å“åº”ä½“æ•°æ®ä¼ é€’ç»™å­ç±»
 		return me->handle_res_body(data, dlen) ? 0 : -1;
 	default:
 		return 0;
@@ -480,10 +480,10 @@ bool http_aclient::handle_res_hdr(int status)
 {
 	acl_assert(status == HTTP_CHAT_OK);
 
-	// ½âÎö HTTP ÏìÓ¦Í·
+	// è§£æ HTTP å“åº”å¤´
 	http_hdr_res_parse(hdr_res_);
 
-	// ½« C HTTP ÏìÓ¦Í·×ª»»³É C++ HTTP ÏìÓ¦Í·£¬²¢»Øµ÷×ÓÀà·½·¨
+	// å°† C HTTP å“åº”å¤´è½¬æ¢æˆ C++ HTTP å“åº”å¤´ï¼Œå¹¶å›è°ƒå­ç±»æ–¹æ³•
 	http_header header(*hdr_res_);
 	if (!this->on_http_res_hdr(header)) {
 		return false;
@@ -491,11 +491,11 @@ bool http_aclient::handle_res_hdr(int status)
 
 	keep_alive_ = header.get_keep_alive();
 
-	// Èç¹ûÊÇ websocket Í¨ĞÅ·½Ê½£¬Ôò×ªÈë websocket ´¦Àí¹ı³Ì
+	// å¦‚æœæ˜¯ websocket é€šä¿¡æ–¹å¼ï¼Œåˆ™è½¬å…¥ websocket å¤„ç†è¿‡ç¨‹
 	if (status_ == HTTP_ACLIENT_STATUS_WS_HANDSHAKE) {
 		acl_assert(ws_in_ && ws_out_);
 
-		// HTTP ÏìÓ¦×´Ì¬±ØĞëÊÇ 101£¬·ñÔò±íÃ÷ websocket ÎÕÊÖÊ§°Ü
+		// HTTP å“åº”çŠ¶æ€å¿…é¡»æ˜¯ 101ï¼Œå¦åˆ™è¡¨æ˜ websocket æ¡æ‰‹å¤±è´¥
 		if (hdr_res_->reply_status != 101) {
 			logger_error("invalid status=%d for websocket",
 				hdr_res_->reply_status);
@@ -503,19 +503,19 @@ bool http_aclient::handle_res_hdr(int status)
 			return false;
 		}
 
-		// »Øµ÷×ÓÀà·½·¨£¬Í¨Öª WS ÎÕÊÖÍê³É
+		// å›è°ƒå­ç±»æ–¹æ³•ï¼Œé€šçŸ¥ WS æ¡æ‰‹å®Œæˆ
 		if (!this->on_ws_handshake()) {
 			return false;
 		}
 		return true;
 	}
 
-	// ·ñÔò£¬×ßÕı³£µÄ HTTP ´¦Àí¹ı³Ì
+	// å¦åˆ™ï¼Œèµ°æ­£å¸¸çš„ HTTP å¤„ç†è¿‡ç¨‹
 
 	http_res_ = http_res_new(hdr_res_);
 
-	// Èç¹ûÏìÓ¦Êı¾İÎª GZIP Ñ¹ËõÊı¾İ£¬ÇÒÓÃ»§ÉèÖÃÁË×Ô¶¯½âÑ¹¹¦ÄÜ£¬ÔòĞèÒª´´½¨
-	// ½âÑ¹Á÷¶ÔÏó£¬Õë¶ÔÏìÓ¦Êı¾İ½øĞĞ½âÑ¹
+	// å¦‚æœå“åº”æ•°æ®ä¸º GZIP å‹ç¼©æ•°æ®ï¼Œä¸”ç”¨æˆ·è®¾ç½®äº†è‡ªåŠ¨è§£å‹åŠŸèƒ½ï¼Œåˆ™éœ€è¦åˆ›å»º
+	// è§£å‹æµå¯¹è±¡ï¼Œé’ˆå¯¹å“åº”æ•°æ®è¿›è¡Œè§£å‹
 	if (unzip_ && header.is_transfer_gzip()) {
 		zstream_ = NEW zlib_stream();
 		if (!zstream_->unzip_begin(false)) {
@@ -523,12 +523,12 @@ bool http_aclient::handle_res_hdr(int status)
 			delete zstream_;
 			zstream_ = NULL;
 		} else {
-			// gzip ÏìÓ¦Êı¾İÌåÇ°»áÓĞ 10 ×Ö½ÚµÄÍ·²¿×Ö¶Î
+			// gzip å“åº”æ•°æ®ä½“å‰ä¼šæœ‰ 10 å­—èŠ‚çš„å¤´éƒ¨å­—æ®µ
 			gzip_header_left_ = 10;
 		}
 	}
 
-	// Èç¹ûÏìÓ¦Êı¾İÌå³¤¶ÈÎª 0£¬Ôò±íÊ¾¸Ã HTTP ÏìÓ¦Íê³É
+	// å¦‚æœå“åº”æ•°æ®ä½“é•¿åº¦ä¸º 0ï¼Œåˆ™è¡¨ç¤ºè¯¥ HTTP å“åº”å®Œæˆ
 	if (header.get_content_length() == 0) {
 		if (this->on_http_res_finish(true) && keep_alive_) {
 			return true;
@@ -537,7 +537,7 @@ bool http_aclient::handle_res_hdr(int status)
 		}
 	}
 
-	// ¿ªÊ¼Òì²½¶ÁÈ¡ HTTP ÏìÓ¦ÌåÊı¾İ
+	// å¼€å§‹å¼‚æ­¥è¯»å– HTTP å“åº”ä½“æ•°æ®
 	http_res_body_get_async(http_res_, conn_->get_astream(),
 		http_res_callback, this, rw_timeout_);
 	return true;
@@ -560,17 +560,17 @@ void http_aclient::send_request(const void* body, size_t len)
 		header_->set_method(HTTP_METHOD_POST);
 	}
 
-	// ´´½¨ HTTP ÇëÇóÍ·²¢·¢ËÍ
+	// åˆ›å»º HTTP è¯·æ±‚å¤´å¹¶å‘é€
 	string buf;
 	header_->build_request(buf);
 	conn_->write(buf.c_str(), (int) buf.size());
 
 	if (body && len > 0) {
-		// ·¢ËÍ HTTP ÇëÇóÌå
+		// å‘é€ HTTP è¯·æ±‚ä½“
 		conn_->write(body, (int) len);
 	}
 
-	// ¿ªÊ¼¶ÁÈ¡ HTTP ÏìÓ¦Í·
+	// å¼€å§‹è¯»å– HTTP å“åº”å¤´
 	hdr_res_ = http_hdr_res_new();
 	http_hdr_res_get_async(hdr_res_, conn_->get_astream(),
 		http_res_hdr_cllback, this, rw_timeout_);
@@ -589,8 +589,8 @@ void http_aclient::ws_handshake(void)
 		.set_upgrade("websocket")
 		.set_keep_alive(true);
 
-	// ´´½¨ websocket ÊäÈëÊä³öÁ÷¶ÔÏó£¬²¢ÒÔ´Ë×öÎªÓÉ HTTP Ğ­³ÌÇĞ»»ÖÁ
-	// websocket µÄÒÀ¾İ
+	// åˆ›å»º websocket è¾“å…¥è¾“å‡ºæµå¯¹è±¡ï¼Œå¹¶ä»¥æ­¤åšä¸ºç”± HTTP åç¨‹åˆ‡æ¢è‡³
+	// websocket çš„ä¾æ®
 	ws_in_  = NEW websocket(*stream_);
 	ws_out_ = NEW websocket(*stream_);
 
@@ -604,7 +604,7 @@ void http_aclient::ws_read_wait(int timeout /* = 0 */)
 
 	status_ = HTTP_ACLIENT_STATUS_WS_READING;
 
-	// ×¢²á websocket ¶Á»Øµ÷¹ı³Ì
+	// æ³¨å†Œ websocket è¯»å›è°ƒè¿‡ç¨‹
 	conn_->add_read_callback(this);
 	conn_->read_wait(timeout);
 }

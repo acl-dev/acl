@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <assert.h>
 #include "lib_acl.h" // just for getopt on Windows
 #include "acl_cpp/acl_cpp_init.hpp"
@@ -12,7 +12,7 @@ static int   __max = 0;
 static int   __timeout = 0;
 
 /**
- * ÑÓ³Ù¶Á»Øµ÷´¦ÀíÀà
+ * å»¶è¿Ÿè¯»å›è°ƒå¤„ç†ç±»
  */
 class timer_reader: public acl::aio_timer_reader
 {
@@ -26,7 +26,7 @@ public:
 protected:
 	~timer_reader(void) {}
 
-	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
+	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
 	// @override
 	void destroy(void)
 	{
@@ -34,14 +34,14 @@ protected:
 		delete this;
 	}
 
-	// ÖØÔØ»ùÀà»Øµ÷·½·¨
+	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
 	// @override
 	void timer_callback(unsigned int id)
 	{
 		std::cout << "timer_reader(" << id
 			<< "): timer_callback, delay: " << delay_ << std::endl;
 
-		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
+		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
 		aio_timer_reader::timer_callback(id);
 	}
 
@@ -50,7 +50,7 @@ private:
 };
 
 /**
- * ÑÓ³ÙĞ´»Øµ÷´¦ÀíÀà
+ * å»¶è¿Ÿå†™å›è°ƒå¤„ç†ç±»
  */
 class timer_writer: public acl::aio_timer_writer
 {
@@ -64,7 +64,7 @@ public:
 protected:
 	~timer_writer(void) {}
 
-	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
+	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
 	// @override
 	void destroy(void)
 	{
@@ -72,14 +72,14 @@ protected:
 		delete this;
 	}
 
-	// ÖØÔØ»ùÀà»Øµ÷·½·¨
+	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
 	// @override
 	void timer_callback(unsigned int id)
 	{
 		std::cout << "timer_writer(" << id << "): timer_callback, delay: "
 			<< delay_ << std::endl;
 
-		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
+		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
 		acl::aio_timer_writer::timer_callback(id);
 	}
 
@@ -88,7 +88,7 @@ private:
 };
 
 /**
- * Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_callback : public acl::aio_callback
 {
@@ -104,10 +104,10 @@ protected:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ¶Á³É¹¦»Øµ÷¹ı³Ì
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¯»æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool read_callback(char* data, int len)
 	{
@@ -117,28 +117,28 @@ protected:
 				<< data << std::endl;
 		}
 
-		// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£ÍûÍË³ö£¬Ôò¹Ø±ÕÖ®
+		// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›é€€å‡ºï¼Œåˆ™å…³é—­ä¹‹
 		if (strncasecmp(data, "quit", 4) == 0) {
 			client_->format("Bye!\r\n");
 			client_->close();
 			return false;
 		}
 
-		// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£Íû·şÎñ¶ËÒ²¹Ø±Õ£¬ÔòÖĞÖ¹Òì²½ÊÂ¼ş¹ı³Ì
+		// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›æœåŠ¡ç«¯ä¹Ÿå…³é—­ï¼Œåˆ™ä¸­æ­¢å¼‚æ­¥äº‹ä»¶è¿‡ç¨‹
 		else if (strncasecmp(data, "stop", 4) == 0) {
 			client_->format("Stop now!\r\n");
-			client_->close();  // ¹Ø±ÕÔ¶³ÌÒì²½Á÷
+			client_->close();  // å…³é—­è¿œç¨‹å¼‚æ­¥æµ
 
-			// Í¨ÖªÒì²½ÒıÇæ¹Ø±ÕÑ­»·¹ı³Ì
+			// é€šçŸ¥å¼‚æ­¥å¼•æ“å…³é—­å¾ªç¯è¿‡ç¨‹
 			client_->get_handle().stop();
 		}
 
-		// ÏòÔ¶³Ì¿Í»§¶Ë»ØĞ´ÊÕµ½µÄÊı¾İ
+		// å‘è¿œç¨‹å®¢æˆ·ç«¯å›å†™æ”¶åˆ°çš„æ•°æ®
 
 		int   delay = 0;
 
 		if (!strncasecmp(data, "write_delay", strlen("write_delay"))) {
-			// ÑÓ³ÙĞ´¹ı³Ì
+			// å»¶è¿Ÿå†™è¿‡ç¨‹
 
 			const char* ptr = data + strlen("write_delay");
 			delay = atoi(ptr);
@@ -151,7 +151,7 @@ protected:
 				return true;
 			}
 		} else if (!strncasecmp(data, "read_delay", strlen("read_delay"))) {
-			// ÑÓ³Ù¶Á¹ı³Ì
+			// å»¶è¿Ÿè¯»è¿‡ç¨‹
 
 			const char* ptr = data + strlen("read_delay");
 			delay = atoi(ptr);
@@ -171,8 +171,8 @@ protected:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄĞ´³É¹¦»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„å†™æˆåŠŸå›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool write_callback(void)
 	{
@@ -180,17 +180,17 @@ protected:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 	 */
 	void close_callback(void)
 	{
-		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		delete this;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖĞµÄĞéº¯Êı£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®ç°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool timeout_callback(void)
 	{
@@ -204,7 +204,7 @@ private:
 };
 
 /**
- * Òì²½¼àÌıÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥ç›‘å¬æµçš„å›è°ƒç±»çš„å­ç±»
  */
 class io_accept_callback : public acl::aio_accept_callback
 {
@@ -216,33 +216,33 @@ public:
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±ÓĞĞÂÁ¬½Óµ½´ïºóµ÷ÓÃ´Ë»Øµ÷¹ı³Ì
-	 * @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
-	 * @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌıÁ÷¼ÌĞø¼àÌı
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾åè°ƒç”¨æ­¤å›è°ƒè¿‡ç¨‹
+	 * @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
+	 * @return {bool} è¿”å› true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
 	 */
 	bool accept_callback(acl::aio_socket_stream* client)
 	{
-		// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
+		// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
 		io_callback* callback = new io_callback(client);
 
-		// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
 		client->add_read_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
 		client->add_write_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
 		client->add_close_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 		client->add_timeout_callback(callback);
 
-		// µ±ÏŞ¶¨ÁËĞĞÊı¾İ×î´ó³¤¶ÈÊ±
+		// å½“é™å®šäº†è¡Œæ•°æ®æœ€å¤§é•¿åº¦æ—¶
 		if (__max > 0) {
 			client->set_buf_max(__max);
 		}
 
-		// ´ÓÒì²½Á÷¶ÁÒ»ĞĞÊı¾İ
+		// ä»å¼‚æ­¥æµè¯»ä¸€è¡Œæ•°æ®
 		client->gets(__timeout, false);
 		return true;
 	}
@@ -286,45 +286,45 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ³õÊ¼»¯ACL¿â(ÓÈÆäÊÇÔÚWIN32ÏÂÒ»¶¨Òªµ÷ÓÃ´Ëº¯Êı£¬ÔÚUNIXÆ½Ì¨ÏÂ¿É²»µ÷ÓÃ)
+	// åˆå§‹åŒ–ACLåº“(å°¤å…¶æ˜¯åœ¨WIN32ä¸‹ä¸€å®šè¦è°ƒç”¨æ­¤å‡½æ•°ï¼Œåœ¨UNIXå¹³å°ä¸‹å¯ä¸è°ƒç”¨)
 	acl::acl_cpp_init();
 
 	acl::log::stdout_open(true);
 
-	// ¹¹½¨Òì²½ÒıÇæÀà¶ÔÏó
+	// æ„å»ºå¼‚æ­¥å¼•æ“ç±»å¯¹è±¡
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
 
-	// ´´½¨¼àÌıÒì²½Á÷
+	// åˆ›å»ºç›‘å¬å¼‚æ­¥æµ
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
 
-	// ¼àÌıÖ¸¶¨µÄµØÖ·
+	// ç›‘å¬æŒ‡å®šçš„åœ°å€
 	if (!sstream->open(addr.c_str())) {
 		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
-		// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+		// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 		handle.check();
 
 		getchar();
 		return 1;
 	}
 
-	// ´´½¨»Øµ÷Àà¶ÔÏó£¬µ±ÓĞĞÂÁ¬½Óµ½´ïÊ±×Ô¶¯µ÷ÓÃ´ËÀà¶ÔÏóµÄ»Øµ÷¹ı³Ì
+	// åˆ›å»ºå›è°ƒç±»å¯¹è±¡ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾æ—¶è‡ªåŠ¨è°ƒç”¨æ­¤ç±»å¯¹è±¡çš„å›è°ƒè¿‡ç¨‹
 	io_accept_callback callback;
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			std::cout << "aio_server stop now ..." << std::endl;
 			break;
 		}
 	}
 
-	// ¹Ø±Õ¼àÌıÁ÷²¢ÊÍ·ÅÁ÷¶ÔÏó
+	// å…³é—­ç›‘å¬æµå¹¶é‡Šæ”¾æµå¯¹è±¡
 	sstream->close();
 
-	// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+	// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 	handle.check();
 
 	return 0;

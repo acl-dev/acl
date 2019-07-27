@@ -1,4 +1,4 @@
-#include <stdio.h>
+ï»¿#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 
@@ -68,14 +68,14 @@ int main(int argc, char *argv[])
 	}
 
 	{
-		char* p = "²Ë";
+		char* p = "èœ";
 		char buf[32];
 		strcpy(buf, p);
 		p = buf;
 		p++;
 		*p = 0;
 		b64_encode(buf);
-		strcpy(buf, "²ËÆ×");
+		strcpy(buf, "èœè°±");
 		p = buf;
 		p++;
 		b64_encode(p);

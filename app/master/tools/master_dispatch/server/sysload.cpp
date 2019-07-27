@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "sysload.h"
 
 double sysload::get_load(acl::string* out)

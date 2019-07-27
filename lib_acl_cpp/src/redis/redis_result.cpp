@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -230,7 +230,7 @@ redis_result& redis_result::put(const redis_result* rr, size_t idx)
 	else if (idx == 0)
 		children_idx_ = 0;
 
-	// +1 ÊÇÎªÁËÈ·±£×îºóÒ»¸öÊı×éÔªËØ¿ÉÒÔ±»ÉèÎª NULL
+	// +1 æ˜¯ä¸ºäº†ç¡®ä¿æœ€åä¸€ä¸ªæ•°ç»„å…ƒç´ å¯ä»¥è¢«è®¾ä¸º NULL
 	if (children_idx_ + 1 < children_size_) {
 		children_[children_idx_++] = rr;
 		return *this;

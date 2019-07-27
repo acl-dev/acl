@@ -1,4 +1,4 @@
-#include "html_template.h"
+﻿#include "html_template.h"
 
 char HTTP_REPLY_DNS_ERR[] = \
 "HTTP/1.1 503 DNS lookup error\r\n" \

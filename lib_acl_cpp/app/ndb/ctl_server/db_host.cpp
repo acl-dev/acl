@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include "db_host.h"
 
 db_host::db_host(unsigned int id, const char* addr,

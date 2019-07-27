@@ -1,4 +1,4 @@
-#include <string.h>
+ï»¿#include <string.h>
 #include "string_util.hpp"
 
 namespace acl_min
@@ -69,7 +69,7 @@ char *strtrim(char *str)
 			memmove(ptr, ptr + 1, len--);
 		else if (((*ptr) & 0xff) == 0xa1 && ((*(ptr + 1)) & 0xff) == 0xa1)
 		{
-			/* ¶ÔÓÚÈ«½ÇµÄ¿Õ¸ñÎª: '¡¡', ¼´ 0xa10xa1 */
+			/* å¯¹äºå…¨è§’çš„ç©ºæ ¼ä¸º: 'ã€€', å³ 0xa10xa1 */
 			len--;
 			memmove(ptr, ptr + 2, len--);
 		}

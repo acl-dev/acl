@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "check_async.h"
 
 check_async::check_async(acl::check_client& checker)
@@ -12,50 +12,50 @@ check_async::~check_async(void)
 
 bool check_async::read_callback(char* data, int len)
 {
-	// ÒòÎª acl µÄÒì²½ IO ¶Áµ½µÄÊý¾Ý¿Ï¶¨»áÔÚËù¶Áµ½µÄÊý¾Ý×îºóÌí¼Ó \0£¬
-	// ËùÒÔÖ±½Óµ±×Ö·û´®±È½ÏÔÚ´Ë´¦ÊÇ°²È«µÄ
+	// å› ä¸º acl çš„å¼‚æ­¥ IO è¯»åˆ°çš„æ•°æ®è‚¯å®šä¼šåœ¨æ‰€è¯»åˆ°çš„æ•°æ®æœ€åŽæ·»åŠ  \0ï¼Œ
+	// æ‰€ä»¥ç›´æŽ¥å½“å­—ç¬¦ä¸²æ¯”è¾ƒåœ¨æ­¤å¤„æ˜¯å®‰å…¨çš„
 
 	if (strncasecmp(data, "+OK", 3) == 0)
 	{
-		// ·¢ËÍ QUIT ÃüÁî
+		// å‘é€ QUIT å‘½ä»¤
 		checker_.get_conn().format("QUIT\r\n");
 
-		// ½«·þÎñ¶ËÁ¬½ÓÖÃÎª´æ»î×´Ì¬
+		// å°†æœåŠ¡ç«¯è¿žæŽ¥ç½®ä¸ºå­˜æ´»çŠ¶æ€
 		checker_.set_alive(true);
 
-		// Ö÷¶¯¹Ø±Õ¸Ã¼ì²âÁ¬½Ó
+		// ä¸»åŠ¨å…³é—­è¯¥æ£€æµ‹è¿žæŽ¥
 		checker_.close();
 
-		// ´Ë´¦·µ»Ø true »ò false ¶¼¿ÉÒÔ£¬ÒòÎªÉÏÃæÒÑ¾­Ö÷¶¯ÒªÇó¹Ø±Õ¼ì²âÁ¬½Ó
+		// æ­¤å¤„è¿”å›ž true æˆ– false éƒ½å¯ä»¥ï¼Œå› ä¸ºä¸Šé¢å·²ç»ä¸»åŠ¨è¦æ±‚å…³é—­æ£€æµ‹è¿žæŽ¥
 		printf(">>> NIO_CHECK SERVER(%s) OK: %s, len: %d <<<\r\n",
 			checker_.get_addr(), data, len);
 		return true;
 	}
 
-	// ·¢ËÍ QUIT ÃüÁî
+	// å‘é€ QUIT å‘½ä»¤
 	checker_.get_conn().format("QUIT\r\n");
 
-	// ½«·þÎñ¶ËÖÃÎª²»¿ÉÓÃ×´Ì¬
+	// å°†æœåŠ¡ç«¯ç½®ä¸ºä¸å¯ç”¨çŠ¶æ€
 	checker_.set_alive(false);
 
 	printf(">>> NIO_CHECK SERVER(%s) ERROR: %s, len: %d <<<\r\n",
 		checker_.get_addr(), data, len);
 
-	// ·µ»Ø false Í¨Öª¿ò¼Ü×Ô¶¯¹Ø±Õ¸ÃÁ¬½Ó
+	// è¿”å›ž false é€šçŸ¥æ¡†æž¶è‡ªåŠ¨å…³é—­è¯¥è¿žæŽ¥
 	return false;
 }
 
 bool check_async::timeout_callback()
 {
-	// ¶Á³¬Ê±£¬ËùÒÔÖ±½Ó½«Á¬½ÓÖÃÎª²»¿ÉÓÃ
+	// è¯»è¶…æ—¶ï¼Œæ‰€ä»¥ç›´æŽ¥å°†è¿žæŽ¥ç½®ä¸ºä¸å¯ç”¨
 	checker_.set_alive(false);
 
-	// ·µ»Ø false Í¨¹ý¿ò¼Ü×Ô¶¯¹Ø±Õ¸Ã¼ì²âÁ¬½Ó
+	// è¿”å›ž false é€šè¿‡æ¡†æž¶è‡ªåŠ¨å…³é—­è¯¥æ£€æµ‹è¿žæŽ¥
 	return false;
 }
 
 void check_async::close_callback()
 {
-	// ¶¯Ì¬´´½¨¶ÔÏó£¬ÐèÒª¶¯Ì¬É¾³ý
+	// åŠ¨æ€åˆ›å»ºå¯¹è±¡ï¼Œéœ€è¦åŠ¨æ€åˆ é™¤
 	delete this;
 }

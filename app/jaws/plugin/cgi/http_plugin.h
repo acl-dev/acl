@@ -1,4 +1,4 @@
-#ifndef	__HTTP_PLUGIN_INCLUDE_H__
+ï»¿#ifndef	__HTTP_PLUGIN_INCLUDE_H__
 #define	__HTTP_PLUGIN_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -9,32 +9,32 @@ extern "C" {
 #endif
 
 /**
- * HTTP ³õÊ¼»¯×¢²áº¯Êı, ¸Ãº¯ÊıÈç¹û·Ç¿Õ£¬ÔòÓÉÖ÷³ÌĞòÔÚ¸Õ¿ªÊ¼ÔËĞĞÊ±µ÷ÓÃ
- * @param dll_env {ACL_DLL_ENV*} DLL »·¾³±äÁ¿, dll_env->logfp ÈÕÖ¾ÎÄ¼ş¾ä±ú,
- *  Èç¹û²»Ï£Íû½«ÈÕÖ¾¼ÇÔÚÖ÷³ÌĞòÈÕÖ¾ÎÄ¼şÖĞ£¬Ôò¿ÉÒÔ½«´ËÖµÖÃ¿Õ
- * @param dmptr {ACL_DEBUG_MEM*} ÓÃÓÚÄÚ´æµ÷ÊÔµÄ¾ä±ú
- * @param cfg_dir {const char*} ÅäÖÃÎÄ¼şËùÔÚÂ·¾¶£¬¸ÃÂ·¾¶ÏÂ´æ·ÅËùÓĞ¶¯Ì¬¿âµÄÅäÖÃÎÄ¼ş
+ * HTTP åˆå§‹åŒ–æ³¨å†Œå‡½æ•°, è¯¥å‡½æ•°å¦‚æœéç©ºï¼Œåˆ™ç”±ä¸»ç¨‹åºåœ¨åˆšå¼€å§‹è¿è¡Œæ—¶è°ƒç”¨
+ * @param dll_env {ACL_DLL_ENV*} DLL ç¯å¢ƒå˜é‡, dll_env->logfp æ—¥å¿—æ–‡ä»¶å¥æŸ„,
+ *  å¦‚æœä¸å¸Œæœ›å°†æ—¥å¿—è®°åœ¨ä¸»ç¨‹åºæ—¥å¿—æ–‡ä»¶ä¸­ï¼Œåˆ™å¯ä»¥å°†æ­¤å€¼ç½®ç©º
+ * @param dmptr {ACL_DEBUG_MEM*} ç”¨äºå†…å­˜è°ƒè¯•çš„å¥æŸ„
+ * @param cfg_dir {const char*} é…ç½®æ–‡ä»¶æ‰€åœ¨è·¯å¾„ï¼Œè¯¥è·¯å¾„ä¸‹å­˜æ”¾æ‰€æœ‰åŠ¨æ€åº“çš„é…ç½®æ–‡ä»¶
  */
 void http_plugin_init(ACL_DLL_ENV *dll_env, const char *cfg_dir);
 
 /**
- * HTTP ÇëÇó¹ıÂË×¢²áº¯Êı£¬¸Ãº¯ÊıÈç¹û·Ç¿Õ£¬ÔòÓÉÖ÷³ÌĞòÔÚÊÕµ½HTTPÇëÇóÍ·Ê±µ÷ÓÃ
- * @param client {ACL_VSTREAM*} ¿Í»§¶ËÁ÷
- * @param hdr_req {HTTP_HDR_REQ*} HTTPÇëÇóÍ·
- * @param ctx_ptr {void**} ¸ÃÖ¸Õë¿ÉÒÔÓÃÀ´´æ´¢ÓÃ»§µÄ¶¯Ì¬Êı¾İ
- * @return {int} < 0: ±íÊ¾½ûÖ¹¸ÃHTTPÇëÇó, ¸ÃÖµ±íÊ¾´íÎóºÅ£¬¿ÉÒÔÎª£º-5xx/-4xx;
- *  0: ±íÊ¾¸ÃHTTPÇëÇó¼ÌĞøÓÉÖ÷³ÌĞò´¦Àí; > 0: ±íÊ¾¸ÃHTTPÇëÇó¿ÉÒÔÓÉÍâ¹ÒÄ£¿éµÄµ¥¶À
- *  Ïß³Ì´¦Àí
+ * HTTP è¯·æ±‚è¿‡æ»¤æ³¨å†Œå‡½æ•°ï¼Œè¯¥å‡½æ•°å¦‚æœéç©ºï¼Œåˆ™ç”±ä¸»ç¨‹åºåœ¨æ”¶åˆ°HTTPè¯·æ±‚å¤´æ—¶è°ƒç”¨
+ * @param client {ACL_VSTREAM*} å®¢æˆ·ç«¯æµ
+ * @param hdr_req {HTTP_HDR_REQ*} HTTPè¯·æ±‚å¤´
+ * @param ctx_ptr {void**} è¯¥æŒ‡é’ˆå¯ä»¥ç”¨æ¥å­˜å‚¨ç”¨æˆ·çš„åŠ¨æ€æ•°æ®
+ * @return {int} < 0: è¡¨ç¤ºç¦æ­¢è¯¥HTTPè¯·æ±‚, è¯¥å€¼è¡¨ç¤ºé”™è¯¯å·ï¼Œå¯ä»¥ä¸ºï¼š-5xx/-4xx;
+ *  0: è¡¨ç¤ºè¯¥HTTPè¯·æ±‚ç»§ç»­ç”±ä¸»ç¨‹åºå¤„ç†; > 0: è¡¨ç¤ºè¯¥HTTPè¯·æ±‚å¯ä»¥ç”±å¤–æŒ‚æ¨¡å—çš„å•ç‹¬
+ *  çº¿ç¨‹å¤„ç†
  */
 int http_request_filter(ACL_VSTREAM *client, HTTP_HDR_REQ *hdr_req, void **ctx_ptr);
 
 /**
- * HTTP ÇëÇó½Ó¹Ü´¦Àí×¢²áº¯Êı£¬¸Ãº¯ÊıÈç¹û·Ç¿Õ£¬ÇÒ http_request_filter() > 0£¬ÔòÓÉ
- * Ö÷³ÌĞòµ÷ÓÃ´Ëº¯ÊıÍêÈ«½Ó¹Ü¸ÃHTTPÇëÇó¼°ÏìÓ¦£¬Ö÷³ÌĞò²»ÔÙ´¦Àí¸ÃHTTPÇëÇó¼°HTTPÏìÓ¦
- * @param client {ACL_VSTREAM*} HTTP¿Í»§¶ËÊı¾İÁ¬½ÓÁ÷
- * @param hdr_req {HTTP_HDR_REQ*} ¿Í»§¶ËHTTPÇëÇóÍ·
- * @param ctx {void*} ¹ıÂËÆ÷µÄ²ÎÊı£¬¸Ã¶¯Ì¬²ÎÊıÊÇÓÉ http_request_filter ÖĞµÄ ctx_ptr
- *  ²ÎÊı·µ»ØµÄ
+ * HTTP è¯·æ±‚æ¥ç®¡å¤„ç†æ³¨å†Œå‡½æ•°ï¼Œè¯¥å‡½æ•°å¦‚æœéç©ºï¼Œä¸” http_request_filter() > 0ï¼Œåˆ™ç”±
+ * ä¸»ç¨‹åºè°ƒç”¨æ­¤å‡½æ•°å®Œå…¨æ¥ç®¡è¯¥HTTPè¯·æ±‚åŠå“åº”ï¼Œä¸»ç¨‹åºä¸å†å¤„ç†è¯¥HTTPè¯·æ±‚åŠHTTPå“åº”
+ * @param client {ACL_VSTREAM*} HTTPå®¢æˆ·ç«¯æ•°æ®è¿æ¥æµ
+ * @param hdr_req {HTTP_HDR_REQ*} å®¢æˆ·ç«¯HTTPè¯·æ±‚å¤´
+ * @param ctx {void*} è¿‡æ»¤å™¨çš„å‚æ•°ï¼Œè¯¥åŠ¨æ€å‚æ•°æ˜¯ç”± http_request_filter ä¸­çš„ ctx_ptr
+ *  å‚æ•°è¿”å›çš„
  */
 void http_request_forward(ACL_VSTREAM *client, HTTP_HDR_REQ *hdr_req, void *ctx);
 
@@ -56,7 +56,7 @@ typedef struct {
 	ACL_VSTREAM *client;
 } CGI;
 
-/* È«¾ÖÅäÖÃ±äÁ¿ */
+/* å…¨å±€é…ç½®å˜é‡ */
 
 extern char *var_cfg_log_name;
 extern char *var_cfg_cgi_bin;
@@ -65,30 +65,30 @@ extern int   var_cfg_data_clone;
 /* in http_conf.c */
 
 /**
- * ¼ÓÔØÅäÖÃÎÄ¼ş
- * @param cfg_dir {const char*} ÅäÖÃÎÄ¼şËùÔÚµÄÄ¿Â¼Î»ÖÃ
+ * åŠ è½½é…ç½®æ–‡ä»¶
+ * @param cfg_dir {const char*} é…ç½®æ–‡ä»¶æ‰€åœ¨çš„ç›®å½•ä½ç½®
  */
 void http_conf_load(const char *cfg_dir);
 
 /* in http_plugin.c */
 
 /**
- * ´´½¨°ëÄÑÁôÏß³Ì³Ø
- * @param threads_limit {int} Ïß³Ì³ØÖĞ×î´óÏß³Ì¸öÊı
- * @param threads_idle {int} Ïß³Ì³ÌÖĞÃ¿¸öÏß³ÌµÄ×î´ó¿ÕÏĞÊ±¼ä(Ãë)
+ * åˆ›å»ºåŠéš¾ç•™çº¿ç¨‹æ± 
+ * @param threads_limit {int} çº¿ç¨‹æ± ä¸­æœ€å¤§çº¿ç¨‹ä¸ªæ•°
+ * @param threads_idle {int} çº¿ç¨‹ç¨‹ä¸­æ¯ä¸ªçº¿ç¨‹çš„æœ€å¤§ç©ºé—²æ—¶é—´(ç§’)
  */
 void http_plugin_pool_create(int threads_limit, int threads_idle);
 
 /**
- * ÏòÏß³Ì³ØÖĞÌí¼ÓÈÎÎñ£¬ÓÃ»§Ìí¼ÓµÄÈÎÎñÓÉÏß³Ì³ØÖĞµÄÄ³¸öÏß³Ì½Ó¹Ü
- * @param start_routine {void (*)(void*)} ÓÃ»§Ìí¼ÓµÄÈÎÎñ»Øµ÷º¯Êı
- * @param arg {void*} Ïß³Ì³ØÖĞµÄÄ³¸öÏß³Ì»Øµ÷ start_routine Ê±µÄ»Øµ÷²ÎÊı
+ * å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ä»»åŠ¡ï¼Œç”¨æˆ·æ·»åŠ çš„ä»»åŠ¡ç”±çº¿ç¨‹æ± ä¸­çš„æŸä¸ªçº¿ç¨‹æ¥ç®¡
+ * @param start_routine {void (*)(void*)} ç”¨æˆ·æ·»åŠ çš„ä»»åŠ¡å›è°ƒå‡½æ•°
+ * @param arg {void*} çº¿ç¨‹æ± ä¸­çš„æŸä¸ªçº¿ç¨‹å›è°ƒ start_routine æ—¶çš„å›è°ƒå‚æ•°
  */
 void http_plugin_pool_append(void (*start_routine)(void *), void *arg);
 
 /**
- * µ±ĞèÒªµ÷ÊÔÄÚ´æ·ÖÅä×´Ì¬Ê±µÄº¯Êı
- * @param level {int} µ÷ÊÔ¼¶±ğ£¬¿ÉÓÃµÄ¼¶±ğÎª: 1, 2, 3
+ * å½“éœ€è¦è°ƒè¯•å†…å­˜åˆ†é…çŠ¶æ€æ—¶çš„å‡½æ•°
+ * @param level {int} è°ƒè¯•çº§åˆ«ï¼Œå¯ç”¨çš„çº§åˆ«ä¸º: 1, 2, 3
  */
 void http_plugin_debug_memory(int level);
 

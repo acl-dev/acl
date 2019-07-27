@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "connect_client.h"
 
 connect_client::connect_client(const char* addr,

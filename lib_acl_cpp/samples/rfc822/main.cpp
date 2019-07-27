@@ -1,4 +1,4 @@
-#include "acl_cpp/mime/rfc822.hpp"
+ï»¿#include "acl_cpp/mime/rfc822.hpp"
 
 int main(void)
 {
@@ -85,7 +85,7 @@ int main(void)
 		{ "xx@xx_xx", false },
 		{ "xx@_", false },
 		{ "@@xx.xx@xx.xx", false },
-		{ "ÖÐ@xx.xx", false },
+		{ "ä¸­@xx.xx", false },
 		{ "~@xx.xx", false },
 		{ "#@xx.xx", false },
 		{ "*@xx.xx", false },

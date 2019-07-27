@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "service_struct.h"
 #include "service_struct.gson.h"
 #include "acl_cpp/serialize/gson_helper.ipp"

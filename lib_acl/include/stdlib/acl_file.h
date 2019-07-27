@@ -1,4 +1,4 @@
-#ifndef	ACL_FILE_INCLUDE_H
+ï»¿#ifndef	ACL_FILE_INCLUDE_H
 #define	ACL_FILE_INCLUDE_H
 
 #include "acl_define.h"
@@ -10,196 +10,196 @@ extern "C" {
 #endif
 
 /**
- * ÎÄ¼şÁ÷ÀàĞÍ¶¨Òå
+ * æ–‡ä»¶æµç±»å‹å®šä¹‰
  */
 typedef struct ACL_FILE {
-	ACL_VSTREAM *fp;	/**< Á÷Ö¸Õë */
-	unsigned int status;	/**< ÎÄ¼şÁ÷×´Ì¬ */
+	ACL_VSTREAM *fp;	/**< æµæŒ‡é’ˆ */
+	unsigned int status;	/**< æ–‡ä»¶æµçŠ¶æ€ */
 #define	ACL_FILE_EOF		(1 << 0)
-	int   errnum;		/**< ÎÄ¼şÁ÷µÄ³ö´í´íÎóºÅ */
+	int   errnum;		/**< æ–‡ä»¶æµçš„å‡ºé”™é”™è¯¯å· */
 } ACL_FILE;
 
 #define	ACL_FPATH(fp)	ACL_VSTREAM_PATH((fp)->fp)
 #define	ACL_FSTREAM(fp)	((fp)->fp)
 
 /**
- * ´ò¿ª»ò´´½¨Ò»¸öÎÄ¼ş½øĞĞ¶ÁĞ´²Ù×÷
- * @param filenme {const char*} ÎÄ¼şÃû
- * @param mode {const char*} ´ò¿ª±êÖ¾.
- *  r or rb: Ö»¶Á·½Ê½´ò¿ªÒÑ¾­´æÔÚÎÄ¼ş
- *  w or wb: Ö»Ğ´·½Ê½´ò¿ªÒÑ´æÔÚÎÄ¼ş²¢Çå¿Õ»òÖ»Ğ´·½Ê½´´½¨ĞÂÎÄ¼ş
- *  a or ab: Î²²¿¸½¼ÓÖ»Ğ´·½Ê½´ò¿ªÒÑ´æÔÚÎÄ¼ş»ò´´½¨ĞÂÎÄ¼ş
- *  r+ or rb+: ÒÔ¶ÁĞ´·½Ê½´ò¿ªÒÑ´æÔÚÎÄ¼ş
- *  w+ or wb+: ÒÔ¶ÁĞ´·½Ê½´ò¿ªÒÑ´æÔÚÎÄ¼ş²¢Çå¿Õ»ò´´½¨ĞÂÎÄ¼ş
- *  a+ or ab+: ÒÔÎ²²¿¸½¼Ó¶ÁĞ´·½Ê½´ò¿ªÒÑ´æÔÚÎÄ¼ş»ò´´½¨ĞÂÎÄ¼ş
+ * æ‰“å¼€æˆ–åˆ›å»ºä¸€ä¸ªæ–‡ä»¶è¿›è¡Œè¯»å†™æ“ä½œ
+ * @param filenme {const char*} æ–‡ä»¶å
+ * @param mode {const char*} æ‰“å¼€æ ‡å¿—.
+ *  r or rb: åªè¯»æ–¹å¼æ‰“å¼€å·²ç»å­˜åœ¨æ–‡ä»¶
+ *  w or wb: åªå†™æ–¹å¼æ‰“å¼€å·²å­˜åœ¨æ–‡ä»¶å¹¶æ¸…ç©ºæˆ–åªå†™æ–¹å¼åˆ›å»ºæ–°æ–‡ä»¶
+ *  a or ab: å°¾éƒ¨é™„åŠ åªå†™æ–¹å¼æ‰“å¼€å·²å­˜åœ¨æ–‡ä»¶æˆ–åˆ›å»ºæ–°æ–‡ä»¶
+ *  r+ or rb+: ä»¥è¯»å†™æ–¹å¼æ‰“å¼€å·²å­˜åœ¨æ–‡ä»¶
+ *  w+ or wb+: ä»¥è¯»å†™æ–¹å¼æ‰“å¼€å·²å­˜åœ¨æ–‡ä»¶å¹¶æ¸…ç©ºæˆ–åˆ›å»ºæ–°æ–‡ä»¶
+ *  a+ or ab+: ä»¥å°¾éƒ¨é™„åŠ è¯»å†™æ–¹å¼æ‰“å¼€å·²å­˜åœ¨æ–‡ä»¶æˆ–åˆ›å»ºæ–°æ–‡ä»¶
  */
 ACL_API ACL_FILE *acl_fopen(const char *filename, const char *mode);
 
 /**
- * ¹Ø±ÕÒ»¸öÎÄ¼şÁ÷
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
+ * å…³é—­ä¸€ä¸ªæ–‡ä»¶æµ
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
  */
 ACL_API int acl_fclose(ACL_FILE *fp);
 
 /**
- * Çå³ıÎÄ¼şÁ÷µÄ´íÎóºÅ
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
+ * æ¸…é™¤æ–‡ä»¶æµçš„é”™è¯¯å·
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
  */
 ACL_API void acl_clearerr(ACL_FILE *fp);
 
 /**
- * ÅĞ¶ÏÊÇ·ñµ½´ïÎÄ¼şÎ²²¿
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
- * @return {int} 0: ·ñ; !0: ÊÇ
+ * åˆ¤æ–­æ˜¯å¦åˆ°è¾¾æ–‡ä»¶å°¾éƒ¨
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
+ * @return {int} 0: å¦; !0: æ˜¯
  */
 ACL_API int acl_feof(ACL_FILE *fp);
 
 /**
- * ´ÓÎÄ¼şÁ÷ÖĞ¶ÁÈ¡Ò»Ğ©¹Ì¶¨³¤¶ÈµÄÊı¾İ¿é
- * @param buf {void*} ÄÚ´æ»º³åÇøµØÖ·
- * @param size {size_t} Ã¿¸öÊı¾İ¿é³¤¶È
- * @param nitems {size_t} Êı¾İ¿é¸öÊı
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
- * @return {size_t} Êı¾İ¿é¸öÊı, Èô³ö´íÔò·µ»Ø EOF
+ * ä»æ–‡ä»¶æµä¸­è¯»å–ä¸€äº›å›ºå®šé•¿åº¦çš„æ•°æ®å—
+ * @param buf {void*} å†…å­˜ç¼“å†²åŒºåœ°å€
+ * @param size {size_t} æ¯ä¸ªæ•°æ®å—é•¿åº¦
+ * @param nitems {size_t} æ•°æ®å—ä¸ªæ•°
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
+ * @return {size_t} æ•°æ®å—ä¸ªæ•°, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API size_t acl_fread(void *buf, size_t size, size_t nitems, ACL_FILE *fp);
 
 /**
- * ´ÓÎÄ¼şÁ÷ÖĞ¶ÁÈ¡Ò»ĞĞÊı¾İ
- * @param buf {char*} »º³åÇøµØÖ·
- * @param size {int} buf ¿Õ¼ä´óĞ¡
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
- * @return {char*} NULL: Î´¶Áµ½ÍêÕûĞĞÊı¾İ; !NULL: ¶Áµ½ÍêÕûĞĞÊı¾İ
+ * ä»æ–‡ä»¶æµä¸­è¯»å–ä¸€è¡Œæ•°æ®
+ * @param buf {char*} ç¼“å†²åŒºåœ°å€
+ * @param size {int} buf ç©ºé—´å¤§å°
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
+ * @return {char*} NULL: æœªè¯»åˆ°å®Œæ•´è¡Œæ•°æ®; !NULL: è¯»åˆ°å®Œæ•´è¡Œæ•°æ®
  */
 ACL_API char *acl_fgets(char *buf, int size, ACL_FILE *fp);
 
 /**
- * ´ÓÎÄ¼şÁ÷ÖĞ¶ÁÈ¡Ò»ĞĞÊı¾İ£¬µ«·µ»ØµÄÊı¾İÎ²²¿²»°üº¬ "\r\n"
- * @param buf {char*} »º³åÇøµØÖ·
- * @param size {int} buf ¿Õ¼ä´óĞ¡
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
- * @return {char*} NULL: Î´¶Áµ½ÍêÕûĞĞÊı¾İ; !NULL: ¶Áµ½ÍêÕûĞĞÊı¾İ
+ * ä»æ–‡ä»¶æµä¸­è¯»å–ä¸€è¡Œæ•°æ®ï¼Œä½†è¿”å›çš„æ•°æ®å°¾éƒ¨ä¸åŒ…å« "\r\n"
+ * @param buf {char*} ç¼“å†²åŒºåœ°å€
+ * @param size {int} buf ç©ºé—´å¤§å°
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
+ * @return {char*} NULL: æœªè¯»åˆ°å®Œæ•´è¡Œæ•°æ®; !NULL: è¯»åˆ°å®Œæ•´è¡Œæ•°æ®
  */
 ACL_API char *acl_fgets_nonl(char *buf, int size, ACL_FILE *fp);
 
 /**
- * ´ÓÎÄ¼şÁ÷ÖĞ¶ÁÈ¡Ò»¸ö×Ö·û
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
- * @return {int} EOF: µ½´ïÎÄ¼şÎ²»ò³ö´í; !EOF: ÕıÈ·¶Áµ½Ò»¸ö×Ö·ûµÄ ASCII Âë
+ * ä»æ–‡ä»¶æµä¸­è¯»å–ä¸€ä¸ªå­—ç¬¦
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
+ * @return {int} EOF: åˆ°è¾¾æ–‡ä»¶å°¾æˆ–å‡ºé”™; !EOF: æ­£ç¡®è¯»åˆ°ä¸€ä¸ªå­—ç¬¦çš„ ASCII ç 
  */
 ACL_API int acl_fgetc(ACL_FILE *fp);
 #define	acl_getc	acl_fgetc
 
 /**
- * ´Ó±ê×¼ÊäÈëÖĞ¶ÁÈ¡Ò»ĞĞÊı¾İ
- * @param buf {char*} »º´æÇøµØÖ·
- * @param size {int} buf ¿Õ¼ä´óĞ¡
- * @return {char*} NULL: ¶Á½áÊø»ò³ö´í; !NULL: Ó¦Óë buf ÏàÍ¬µØÖ·
+ * ä»æ ‡å‡†è¾“å…¥ä¸­è¯»å–ä¸€è¡Œæ•°æ®
+ * @param buf {char*} ç¼“å­˜åŒºåœ°å€
+ * @param size {int} buf ç©ºé—´å¤§å°
+ * @return {char*} NULL: è¯»ç»“æŸæˆ–å‡ºé”™; !NULL: åº”ä¸ buf ç›¸åŒåœ°å€
  */
 ACL_API char *acl_gets(char *buf, size_t size);
 
 /**
- * ´Ó±ê×¼ÊäÈëÖĞ¶ÁÈ¡Ò»ĞĞÊı¾İ, µ«Êı¾İÎ²²¿²»°üº¬ "\r\n"
- * @param buf {char*} »º´æÇøµØÖ·
- * @param size {int} buf ¿Õ¼ä´óĞ¡
- * @return {char*} NULL: ¶Á½áÊø»ò³ö´í; !NULL: Ó¦Óë buf ÏàÍ¬µØÖ·
+ * ä»æ ‡å‡†è¾“å…¥ä¸­è¯»å–ä¸€è¡Œæ•°æ®, ä½†æ•°æ®å°¾éƒ¨ä¸åŒ…å« "\r\n"
+ * @param buf {char*} ç¼“å­˜åŒºåœ°å€
+ * @param size {int} buf ç©ºé—´å¤§å°
+ * @return {char*} NULL: è¯»ç»“æŸæˆ–å‡ºé”™; !NULL: åº”ä¸ buf ç›¸åŒåœ°å€
  */
 ACL_API char *acl_gets_nonl(char *buf, size_t size);
 
 /**
- * ´Ó±ê×¼ÊäÈëÖĞ¶ÁÈ¡Ò»¸ö×Ö·û
- * @return {int} EOF: µ½´ïÎÄ¼şÎ²»ò³ö´í; !EOF: ÕıÈ·¶Áµ½Ò»¸ö×Ö·ûµÄ ASCII Âë
+ * ä»æ ‡å‡†è¾“å…¥ä¸­è¯»å–ä¸€ä¸ªå­—ç¬¦
+ * @return {int} EOF: åˆ°è¾¾æ–‡ä»¶å°¾æˆ–å‡ºé”™; !EOF: æ­£ç¡®è¯»åˆ°ä¸€ä¸ªå­—ç¬¦çš„ ASCII ç 
  */
 ACL_API int acl_getchar(void);
 
 /**
- * ÏòÎÄ¼şÁ÷ÖĞĞ´Èë±ä²Î¸ñÊ½Êı¾İ
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷¾ä±ú
- * @param fmt {const char*} ±ä²Î¸ñÊ½
- * @param ... ±ä²Î
- * @return {size_t} Êı¾İ³¤¶È, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ–‡ä»¶æµä¸­å†™å…¥å˜å‚æ ¼å¼æ•°æ®
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµå¥æŸ„
+ * @param fmt {const char*} å˜å‚æ ¼å¼
+ * @param ... å˜å‚
+ * @return {size_t} æ•°æ®é•¿åº¦, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int ACL_PRINTF(2, 3) acl_fprintf(ACL_FILE *fp, const char *fmt, ...);
 
 /**
- * ÏòÎÄ¼şÁ÷ÖĞĞ´Èë±ä²Î¸ñÊ½Êı¾İ
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷¾ä±ú
- * @param fmt {const char*} ±ä²Î¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
- * @return {size_t} Êı¾İ³¤¶È, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ–‡ä»¶æµä¸­å†™å…¥å˜å‚æ ¼å¼æ•°æ®
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµå¥æŸ„
+ * @param fmt {const char*} å˜å‚æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
+ * @return {size_t} æ•°æ®é•¿åº¦, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int acl_vfprintf(ACL_FILE *fp, const char *fmt, va_list ap);
 
 /**
- * ÏòÎÄ¼şÁ÷ÖĞĞ´ÈëÒ»Ğ©¹Ì¶¨³¤¶ÈµÄÊı¾İ¿é
- * @param ptr {const void*} Êı¾İµØÖ·
- * @param size {size_t} Ã¿¸öÊı¾İ¿é³¤¶È
- * @param nitems {size_t} Êı¾İ¿é¸öÊı
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷Ö¸Õë
- * @return {size_t} Êı¾İ¿é¸öÊı, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ–‡ä»¶æµä¸­å†™å…¥ä¸€äº›å›ºå®šé•¿åº¦çš„æ•°æ®å—
+ * @param ptr {const void*} æ•°æ®åœ°å€
+ * @param size {size_t} æ¯ä¸ªæ•°æ®å—é•¿åº¦
+ * @param nitems {size_t} æ•°æ®å—ä¸ªæ•°
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµæŒ‡é’ˆ
+ * @return {size_t} æ•°æ®å—ä¸ªæ•°, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API size_t acl_fwrite(const void *ptr, size_t size, size_t nitems, ACL_FILE *fp);
 
 /**
- * ÏòÎÄ¼şÁ÷ÖĞĞ´ÈëÊı¾İ²¢×Ô¶¯ÔÚÎ²²¿Ìí¼Ó "\r\n"
- * @param s {const char*} ×Ö·û´®µØÖ·
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷Ö¸Õë
- * @return {int} Ğ´ÈëµÄÊı¾İÁ¿(°üº¬ "\r\n"), Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ–‡ä»¶æµä¸­å†™å…¥æ•°æ®å¹¶è‡ªåŠ¨åœ¨å°¾éƒ¨æ·»åŠ  "\r\n"
+ * @param s {const char*} å­—ç¬¦ä¸²åœ°å€
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµæŒ‡é’ˆ
+ * @return {int} å†™å…¥çš„æ•°æ®é‡(åŒ…å« "\r\n"), è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int acl_fputs(const char *s, ACL_FILE *fp);
 
 /**
- * Ïò±ê×¼Êä³öÁ÷ÖĞĞ´Èë±ä²Î¸ñÊ½Êı¾İ
- * @param fmt {const char*} ±ä²Î¸ñÊ½
- * @param ... ±ä²Î
- * @return {size_t} Êı¾İ³¤¶È, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ ‡å‡†è¾“å‡ºæµä¸­å†™å…¥å˜å‚æ ¼å¼æ•°æ®
+ * @param fmt {const char*} å˜å‚æ ¼å¼
+ * @param ... å˜å‚
+ * @return {size_t} æ•°æ®é•¿åº¦, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int ACL_PRINTF(1, 2) acl_printf(const char *fmt, ...);
 
 /**
- * Ïò±ê×¼Êä³öÁ÷ÖĞĞ´Èë±ä²Î¸ñÊ½Êı¾İ
- * @param fmt {const char*} ±ä²Î¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
- * @return {size_t} Êı¾İ³¤¶È, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ ‡å‡†è¾“å‡ºæµä¸­å†™å…¥å˜å‚æ ¼å¼æ•°æ®
+ * @param fmt {const char*} å˜å‚æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
+ * @return {size_t} æ•°æ®é•¿åº¦, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int acl_vprintf(const char *fmt, va_list ap);
 
 /**
- * ÏòÎÄ¼şÁ÷ÖĞĞ´ÈëÒ»¸ö×Ö½Ú
- * @param c {int} Ò»¸ö·ûµÄ ASCII Âë
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷Ö¸Õë
- * @return {int} Ğ´ÈëµÄÊı¾İÁ¿, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ–‡ä»¶æµä¸­å†™å…¥ä¸€ä¸ªå­—èŠ‚
+ * @param c {int} ä¸€ä¸ªç¬¦çš„ ASCII ç 
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµæŒ‡é’ˆ
+ * @return {int} å†™å…¥çš„æ•°æ®é‡, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int acl_putc(int c, ACL_FILE *fp);
 #define	acl_fputc	acl_putc
 
 /**
- * Ïò±ê×¼Êä³öÖĞĞ´ÈëÊı¾İ²¢×Ô¶¯ÔÚÎ²²¿Ìí¼Ó "\r\n"
- * @param s {const char*} ×Ö·û´®µØÖ·
- * @return {int} Ğ´ÈëµÄÊı¾İÁ¿(°üº¬ "\r\n"), Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ ‡å‡†è¾“å‡ºä¸­å†™å…¥æ•°æ®å¹¶è‡ªåŠ¨åœ¨å°¾éƒ¨æ·»åŠ  "\r\n"
+ * @param s {const char*} å­—ç¬¦ä¸²åœ°å€
+ * @return {int} å†™å…¥çš„æ•°æ®é‡(åŒ…å« "\r\n"), è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int acl_puts(const char *s);
 
 /**
- * ÏòÎÄ¼şÁ÷ÖĞĞ´ÈëÒ»¸ö×Ö½Ú
- * @param c {int} Ò»¸ö·ûµÄ ASCII Âë
- * @return {int} Ğ´ÈëµÄÊı¾İÁ¿, Èô³ö´íÔò·µ»Ø EOF
+ * å‘æ–‡ä»¶æµä¸­å†™å…¥ä¸€ä¸ªå­—èŠ‚
+ * @param c {int} ä¸€ä¸ªç¬¦çš„ ASCII ç 
+ * @return {int} å†™å…¥çš„æ•°æ®é‡, è‹¥å‡ºé”™åˆ™è¿”å› EOF
  */
 ACL_API int acl_putchar(int c);
 
 /**
- * ¶¨Î»ÎÄ¼şÎ»ÖÃ
- * @param fp {ACL_FILE*} ÎÄ¼şÁ÷
- * @param offset {acl_off_t} Æ«ÒÆÎ»ÖÃ
- * @param whence {int} Æ«ÒÆ·½Ïò, SEEK_SET, SEEK_CUR, SEEK_END
- * @return ret {acl_off_t}, ret >= 0: ÕıÈ·, ret < 0: ³ö´í
+ * å®šä½æ–‡ä»¶ä½ç½®
+ * @param fp {ACL_FILE*} æ–‡ä»¶æµ
+ * @param offset {acl_off_t} åç§»ä½ç½®
+ * @param whence {int} åç§»æ–¹å‘, SEEK_SET, SEEK_CUR, SEEK_END
+ * @return ret {acl_off_t}, ret >= 0: æ­£ç¡®, ret < 0: å‡ºé”™
  */
 ACL_API acl_off_t acl_fseek(ACL_FILE *fp, acl_off_t offset, int whence);
 
 /**
- * »ñµÃµ±Ç°ÎÄ¼şÖ¸ÕëÔÚÎÄ¼şÖĞµÄÎ»ÖÃ
- * @param fp {ACL_FILE*} ÎÄ¼ş¾ä±ú
- * @return {acl_off_t} ·µ»ØÖµ -1 ±íÊ¾³ö´í
+ * è·å¾—å½“å‰æ–‡ä»¶æŒ‡é’ˆåœ¨æ–‡ä»¶ä¸­çš„ä½ç½®
+ * @param fp {ACL_FILE*} æ–‡ä»¶å¥æŸ„
+ * @return {acl_off_t} è¿”å›å€¼ -1 è¡¨ç¤ºå‡ºé”™
  */
 ACL_API acl_off_t acl_ftell(ACL_FILE *fp);
 

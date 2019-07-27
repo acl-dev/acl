@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -25,7 +25,7 @@ $(function() {
 		title: { text: title, size: 10 },
                 xAxis: {
                     type: 'datetime',
-                    title: { text: '时间' },
+                    title: { text: '鏃堕棿' },
                     tickPixelInterval: 150
                 },
                 yAxis: {
@@ -49,10 +49,10 @@ $(function() {
 
     var allCharts = new Array();
     
-    var totalConnsChart = CreateChart("total_conns", "总连接数", "总连接数");
-    var totalQlenChart = CreateChart("total_qlen", "等待任务数", "等待任务数");
-    var currThreadsChart = CreateChart("curr_threads", "总线程数", "总线程数");
-    var busyThreadsChart = CreateChart("busy_threads", "繁忙线程数", "繁忙线程数");
+    var totalConnsChart = CreateChart("total_conns", "鎬昏繛鎺ユ暟", "鎬昏繛鎺ユ暟");
+    var totalQlenChart = CreateChart("total_qlen", "绛夊緟浠诲姟鏁�", "绛夊緟浠诲姟鏁�");
+    var currThreadsChart = CreateChart("curr_threads", "鎬荤嚎绋嬫暟", "鎬荤嚎绋嬫暟");
+    var busyThreadsChart = CreateChart("busy_threads", "绻佸繖绾跨▼鏁�", "绻佸繖绾跨▼鏁�");
     
     allCharts["totalConnsChart"] = totalConnsChart;
     allCharts["totalQlenChart"] = totalQlenChart;
@@ -71,13 +71,13 @@ $(function() {
         var td = $("<td id='" + id + "' style='width: 110px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
-        allCharts[id] = CreateChart(id, addr, "总连接数");
+        allCharts[id] = CreateChart(id, addr, "鎬昏繛鎺ユ暟");
 
         id = addr + "_qlen";
         td = $("<td id='" + id + "' style='width: 110px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
-        allCharts[id] = CreateChart(id, addr, "等待任务数");
+        allCharts[id] = CreateChart(id, addr, "绛夊緟浠诲姟鏁�");
 
         /////////////////////////////////////////////////////////////////////
         
@@ -87,13 +87,13 @@ $(function() {
         td = $("<td id='" + id + "' style='width: 110px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
-        allCharts[id] = CreateChart(id, addr, "总线程数");
+        allCharts[id] = CreateChart(id, addr, "鎬荤嚎绋嬫暟");
 
         id = addr + "_busy_threads";
         td = $("<td id='" + id + "' style='width: 110px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
-        var chart = CreateChart(id, addr, "繁忙线程数");
+        var chart = CreateChart(id, addr, "绻佸繖绾跨▼鏁�");
         allCharts[id] = chart;
 
         /////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ $(function() {
         td = $("<td id='" + id + "' style='width: 110px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
-        allCharts[id] = CreateChart(id, addr, "系统负载");
+        allCharts[id] = CreateChart(id, addr, "绯荤粺璐熻浇");
 
 	/*
         td = $("<td style='min-width: 110px; "

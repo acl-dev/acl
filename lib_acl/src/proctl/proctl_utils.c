@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -116,7 +116,7 @@ ACL_VSTREAM *local_listen()
 			myname, __LINE__, lock_file, acl_last_serror());
 	}
 
-	/* XXX: Ö»ÄÜ²ÉÓÃÏÈ½âÅÅËüËø£¬ÔÙ¼Ó¹²ÏíËø£¬Î¢Èí±È½ÏÈõ!!! */
+	/* XXX: åªèƒ½é‡‡ç”¨å…ˆè§£æ’å®ƒé”ï¼Œå†åŠ å…±äº«é”ï¼Œå¾®è½¯æ¯”è¾ƒå¼±!!! */
 
 	if (acl_myflock(handle, 0, ACL_FLOCK_OP_NONE) == -1)
 		acl_msg_fatal("%s(%d): unlock file(%s) error(%s)",

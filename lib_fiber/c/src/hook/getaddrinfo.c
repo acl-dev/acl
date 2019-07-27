@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "dns/dns.h"
 #include "dns/sane_inet.h"
 #include "common.h"

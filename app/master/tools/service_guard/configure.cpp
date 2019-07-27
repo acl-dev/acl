@@ -1,8 +1,8 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "configure.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// 配置内容项
+// 閰嶇疆鍐呭椤�
 
 char *var_cfg_redis_addrs;
 char *var_cfg_redis_passwd;

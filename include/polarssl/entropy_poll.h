@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file entropy_poll.h
  *
  * \brief Platform-specific and custom entropy polling functions

@@ -1,4 +1,4 @@
-#include <ctype.h>
+﻿#include <ctype.h>
 
 #include "string_patch.h"
 

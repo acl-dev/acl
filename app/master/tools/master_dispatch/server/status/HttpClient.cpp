@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "status/HttpClient.h"
 
 HttpClient::HttpClient(const char* server_addr, const acl::string* buf)
@@ -17,7 +17,7 @@ void HttpClient::set_auto_free(bool on)
 	auto_free_ = on;
 }
 
-// 基类虚函数
+// 鍩虹被铏氬嚱鏁�
 
 void* HttpClient::run()
 {
@@ -32,18 +32,18 @@ void* HttpClient::run()
 
 bool HttpClient::send()
 {
-	// 创建  HTTP 请求客户端
+	// 鍒涘缓  HTTP 璇锋眰瀹㈡埛绔�
 	acl::http_request req(server_addr_);
 	acl::http_header& hdr = req.request_header();
 
-	// 设置请求的 URL
+	// 璁剧疆璇锋眰鐨� URL
 	hdr.set_url("/");
 
-	// 设置 HTTP 请求头的字段
+	// 璁剧疆 HTTP 璇锋眰澶寸殑瀛楁
 	hdr.set_content_type("text/json; charset=gb2312");
 	hdr.set_keep_alive(false);
 
-	// 发送数据体
+	// 鍙戦€佹暟鎹綋
 	if (req.request(buf_->c_str(), buf_->length()) == false)
 	{
 		logger_error("request to server error, addr: %s",
@@ -63,7 +63,7 @@ bool HttpClient::send()
 	if (length <= 0)
 		return true;
 
-	// 将响应数据体读完
+	// 灏嗗搷搴旀暟鎹綋璇诲畬
 	acl::string buf;
 	if (req.get_body(buf) == false)
 	{

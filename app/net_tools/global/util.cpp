@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #include <IPTypes.h>
 #include <Iphlpapi.h>
 #include "util.h"

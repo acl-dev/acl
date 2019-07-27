@@ -1,4 +1,4 @@
-// HttpOption.cpp : ʵ���ļ�
+﻿// HttpOption.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include ".\httpoption.h"
 
 
-// CHttpOption �Ի���
+// CHttpOption 对话框
 
 IMPLEMENT_DYNAMIC(CHttpOption, CDialog)
 CHttpOption::CHttpOption(CWnd* pParent /*=NULL*/)
@@ -56,11 +56,11 @@ BEGIN_MESSAGE_MAP(CHttpOption, CDialog)
 END_MESSAGE_MAP()
 
 
-// CHttpOption ��Ϣ��������
+// CHttpOption 消息处理程序
 
 void CHttpOption::OnBnClickedCheckProto()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	if (IsDlgButtonChecked(IDC_CHECK_PROTO))
 		m_bHttp11 = TRUE;
 	else
@@ -69,7 +69,7 @@ void CHttpOption::OnBnClickedCheckProto()
 
 void CHttpOption::OnBnClickedCheckZip()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	if (IsDlgButtonChecked(IDC_CHECK_ZIP))
 		m_bZip = TRUE;
 	else
@@ -78,7 +78,7 @@ void CHttpOption::OnBnClickedCheckZip()
 
 void CHttpOption::OnBnClickedCheckKeepAlive()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	if (IsDlgButtonChecked(IDC_CHECK_KEEP_ALIVE))
 		m_bKeepAlive = TRUE;
 	else
@@ -89,16 +89,16 @@ BOOL CHttpOption::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// TODO:  �ڴ����Ӷ���ĳ�ʼ��
+	// TODO:  在此添加额外的初始化
 
 	return TRUE;  // return TRUE unless you set the focus to a control
-	// �쳣: OCX ����ҳӦ���� FALSE
+	// 异常: OCX 属性页应返回 FALSE
 }
 
 
 void CHttpOption::OnBnClickedPostMethod()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	if (IsDlgButtonChecked(IDC_POST_METHOD))
 		m_bPostMethod = TRUE;
 	else
@@ -107,6 +107,6 @@ void CHttpOption::OnBnClickedPostMethod()
 
 void CHttpOption::OnBnClickedOk()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	OnOK();
 }

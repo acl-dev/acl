@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class https_client : public acl::thread
 {
@@ -10,14 +10,14 @@ public:
 	void set_ssl_conf(acl::polarssl_conf* conf);
 
 protected:
-	virtual void* run();		// »ùÀàĞéº¯Êı£¬ÔÚ×ÓÏß³ÌÖĞ±»µ÷ÓÃ
+	virtual void* run();		// åŸºç±»è™šå‡½æ•°ï¼Œåœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
 
 private:
-	acl::string server_addr_;	// ·şÎñÆ÷µØÖ·
-	acl::string domain_;		// ÓòÃû
-	bool  keep_alive_;		// ÊÇ·ñ²ÉÓÃ³¤Á¬½Ó·½Ê½
-	int   count_;			// IO »á»°´ÎÊı
-	int   length_;			// Ã¿´Î IO µÄÊı¾İ³¤¶È
+	acl::string server_addr_;	// æœåŠ¡å™¨åœ°å€
+	acl::string domain_;		// åŸŸå
+	bool  keep_alive_;		// æ˜¯å¦é‡‡ç”¨é•¿è¿æ¥æ–¹å¼
+	int   count_;			// IO ä¼šè¯æ¬¡æ•°
+	int   length_;			// æ¯æ¬¡ IO çš„æ•°æ®é•¿åº¦
 	acl::polarssl_conf* ssl_conf_;
 
 	bool connect_server(acl::http_client& client);

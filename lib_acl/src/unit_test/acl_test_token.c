@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -39,10 +39,10 @@ AUT_LINE *aut_line_peer(const AUT_LINE *test_line)
 		aut_log_fatal("%s(%d)->%s: input error",
 				__FILE__, __LINE__, myname);
 
-	/* ´Ó acl_test_line ÖÐÈ¡³öÒÔÇ°×¢²áµÄ²ÎÊý */
+	/* ä»Ž acl_test_line ä¸­å–å‡ºä»¥å‰æ³¨å†Œçš„å‚æ•° */
 	token = (AUT_CMD_TOKEN *) test_line->arg_inner;
 
-	/* È¡µÃÏàÅä¶ÔµÄµÄÖ¸Õë */
+	/* å–å¾—ç›¸é…å¯¹çš„çš„æŒ‡é’ˆ */
 	test_peer = token->peer;
 	if (test_peer == NULL || test_peer->arg_inner == NULL) {
 		aut_log_fatal("%s(%d)->%s: peers null, cmd_name=%s, err=%s",
@@ -51,10 +51,10 @@ AUT_LINE *aut_line_peer(const AUT_LINE *test_line)
 			test_peer == NULL ? "test_line null": "arg_inner null");
 	}
 
-	/* ´Ó acl_test_line ÖÐÈ¡³öÒÔÇ°×¢²áµÄ²ÎÊý */
+	/* ä»Ž acl_test_line ä¸­å–å‡ºä»¥å‰æ³¨å†Œçš„å‚æ•° */
 	token_peer = (AUT_CMD_TOKEN *) test_peer->arg_inner;
 
-	/* ±È½Ï begin Óë end ÊÇ·ñÊÇÒ»¶Ô */
+	/* æ¯”è¾ƒ begin ä¸Ž end æ˜¯å¦æ˜¯ä¸€å¯¹ */
 	if (token_peer->peer != test_line)
 		aut_log_fatal("%s(%d)->%s: not peers",
 				__FILE__, __LINE__, myname);

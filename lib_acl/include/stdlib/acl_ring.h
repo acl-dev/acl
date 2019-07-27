@@ -1,4 +1,4 @@
-#ifndef	ACL_RING_INCLUDE_H
+ï»¿#ifndef	ACL_RING_INCLUDE_H
 #define	ACL_RING_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -11,7 +11,7 @@ extern "C" {
 typedef struct ACL_RING ACL_RING;
 
 /**
- * Êı¾İ»·½á¹¹ÀàĞÍ¶¨Òå
+ * æ•°æ®ç¯ç»“æ„ç±»å‹å®šä¹‰
  */
 struct ACL_RING {
 	ACL_RING *succ;           /**< successor */
@@ -26,72 +26,72 @@ typedef struct ACL_RING_ITER {
 } ACL_RING_ITER;
 
 /**
- * ³õÊ¼»¯Êı¾İ»·
- * @param ring {ACL_RING*} Êı¾İ»·
+ * åˆå§‹åŒ–æ•°æ®ç¯
+ * @param ring {ACL_RING*} æ•°æ®ç¯
  */
 ACL_API void acl_ring_init(ACL_RING *ring);
 
 /**
- * »ñµÃµ±Ç°Êı¾İ»·ÄÚÔªËØ¸öÊı
- * @param ring {ACL_RING*} Êı¾İ»·
- * @return {int} Êı¾İ»·ÄÚÔªËØ¸öÊı
+ * è·å¾—å½“å‰æ•°æ®ç¯å†…å…ƒç´ ä¸ªæ•°
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @return {int} æ•°æ®ç¯å†…å…ƒç´ ä¸ªæ•°
  */
 ACL_API int  acl_ring_size(const ACL_RING *ring);
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÍ·²¿
- * @param ring {ACL_RING*} Êı¾İ»·
- * @param entry {ACL_RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å¤´éƒ¨
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @param entry {ACL_RING*} æ–°çš„å…ƒç´ 
  */
 ACL_API void acl_ring_prepend(ACL_RING *ring, ACL_RING *entry);
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÎ²²¿
- * @param ring {ACL_RING*} Êı¾İ»·
- * @param entry {ACL_RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å°¾éƒ¨
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @param entry {ACL_RING*} æ–°çš„å…ƒç´ 
  */
 ACL_API void acl_ring_append(ACL_RING *ring, ACL_RING *entry);
 
 /**
- * ½«Ò»¸ö»·ÔªËØ´ÓÊı¾İ»·ÖĞÉ¾³ı
- * @param entry {ACL_RING*} »·ÔªËØ
+ * å°†ä¸€ä¸ªç¯å…ƒç´ ä»æ•°æ®ç¯ä¸­åˆ é™¤
+ * @param entry {ACL_RING*} ç¯å…ƒç´ 
  */
 ACL_API void acl_ring_detach(ACL_RING *entry);
 
 /**
- * ´Ó»·ÖĞµ¯³öÍ·²¿»·ÔªËØ
- * @param ring {ACL_RING*} Êı¾İ»·
- * @return {ACL_RING*} Í·²¿»·ÔªËØ£¬Èç¹û·µ»Ø¿ÕÔò±íÊ¾¸ÃÊı¾İ»·Îª¿Õ
+ * ä»ç¯ä¸­å¼¹å‡ºå¤´éƒ¨ç¯å…ƒç´ 
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @return {ACL_RING*} å¤´éƒ¨ç¯å…ƒç´ ï¼Œå¦‚æœè¿”å›ç©ºåˆ™è¡¨ç¤ºè¯¥æ•°æ®ç¯ä¸ºç©º
  */
 ACL_API ACL_RING *acl_ring_pop_head(ACL_RING *ring);
 
 /**
- * ´Ó»·ÖĞµ¯³öÎ²²¿»·ÔªËØ
- * @param ring {ACL_RING*} Êı¾İ»·
- * @return {ACL_RING*} Î²²¿»·ÔªËØ£¬Èç¹û·µ»Ø¿ÕÔò±íÊ¾¸ÃÊı¾İ»·Îª¿Õ
+ * ä»ç¯ä¸­å¼¹å‡ºå°¾éƒ¨ç¯å…ƒç´ 
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @return {ACL_RING*} å°¾éƒ¨ç¯å…ƒç´ ï¼Œå¦‚æœè¿”å›ç©ºåˆ™è¡¨ç¤ºè¯¥æ•°æ®ç¯ä¸ºç©º
  */
 ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 
-/*--------------------  Ò»Ğ©·½±ã¿ì½İµÄºê²Ù×÷ --------------------------------*/
+/*--------------------  ä¸€äº›æ–¹ä¾¿å¿«æ·çš„å®æ“ä½œ --------------------------------*/
 
 /**
- * ·µ»Øµ±Ç°»·ÔªËØµÄÏÂÒ»¸ö»·ÔªËØ
+ * è¿”å›å½“å‰ç¯å…ƒç´ çš„ä¸‹ä¸€ä¸ªç¯å…ƒç´ 
  */
 #define ACL_RING_SUCC(c) ((c)->succ)
 #define	acl_ring_succ	ACL_RING_SUCC
 
 /**
- * ·µ»Øµ±Ç°»·ÔªËØµÄÇ°Ò»¸ö»·ÔªËØ
+ * è¿”å›å½“å‰ç¯å…ƒç´ çš„å‰ä¸€ä¸ªç¯å…ƒç´ 
  */
 #define ACL_RING_PRED(c) ((c)->pred)
 #define	acl_ring_pred	ACL_RING_PRED
 
 /**
- * ½«»·ÔªËØÖ¸Õë×ª»»³ÉÓ¦ÓÃµÄ×Ô¶¨ÒåÀàĞÍµÄÖ¸ÕëµØÖ·
- * @param ring_ptr {ACL_RING*} »·ÔªËØÖ¸Õë
- * @param app_type Ó¦ÓÃ×Ô¶¨ÒåÀàĞÍ
- * @param ring_member {ACL_RING*} »·ÔªËØÔÚÓ¦ÓÃ×Ô¶¨Òå½á¹¹ÖĞµÄ³ÉÔ±Ãû³Æ
- * @return {app_type*} Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
+ * å°†ç¯å…ƒç´ æŒ‡é’ˆè½¬æ¢æˆåº”ç”¨çš„è‡ªå®šä¹‰ç±»å‹çš„æŒ‡é’ˆåœ°å€
+ * @param ring_ptr {ACL_RING*} ç¯å…ƒç´ æŒ‡é’ˆ
+ * @param app_type åº”ç”¨è‡ªå®šä¹‰ç±»å‹
+ * @param ring_member {ACL_RING*} ç¯å…ƒç´ åœ¨åº”ç”¨è‡ªå®šä¹‰ç»“æ„ä¸­çš„æˆå‘˜åç§°
+ * @return {app_type*} åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
  */
 #define ACL_RING_TO_APPL(ring_ptr, app_type, ring_member) \
     ((app_type *) (((char *) (ring_ptr)) - offsetof(app_type,ring_member)))
@@ -99,9 +99,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_to_appl	ACL_RING_TO_APPL
 
 /**
- * ´ÓÍ·²¿ÖÁÎ²²¿±éÀúÊı¾İ»·ÖĞµÄËùÓĞ»·ÔªËØ
+ * ä»å¤´éƒ¨è‡³å°¾éƒ¨éå†æ•°æ®ç¯ä¸­çš„æ‰€æœ‰ç¯å…ƒç´ 
  * @param iter {ACL_RING_ITER}
- * @param head_ptr {ACL_RING*} Êı¾İ»·µÄÍ·Ö¸Õë
+ * @param head_ptr {ACL_RING*} æ•°æ®ç¯çš„å¤´æŒ‡é’ˆ
  * @example:
  	typedef struct {
 		char  name[32];
@@ -144,9 +144,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_foreach		ACL_RING_FOREACH
 
 /**
- * ´ÓÎ²²¿ÖÁÍ·²¿±éÀúÊı¾İ»·ÖĞµÄËùÓĞ»·ÔªËØ
+ * ä»å°¾éƒ¨è‡³å¤´éƒ¨éå†æ•°æ®ç¯ä¸­çš„æ‰€æœ‰ç¯å…ƒç´ 
  * @param iter {ACL_RING_ITER}
- * @param head_ptr {ACL_RING*} Êı¾İ»·µÄÍ·Ö¸Õë
+ * @param head_ptr {ACL_RING*} æ•°æ®ç¯çš„å¤´æŒ‡é’ˆ
  */
 #define	ACL_RING_FOREACH_REVERSE(iter, head_ptr) \
         for ((iter).ptr = acl_ring_pred((head_ptr)); (iter).ptr != (head_ptr);  \
@@ -155,9 +155,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_foreach_reverse	ACL_RING_FOREACH_REVERSE
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞµÚÒ»¸ö»·ÔªËØÖ¸Õë
- * @param head {ACL_RING*} »·Í·Ö¸Õë
- * @return {ACL_RING*} NULL: »·Îª¿Õ
+ * è¿”å›æ•°æ®ç¯ä¸­ç¬¬ä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆ
+ * @param head {ACL_RING*} ç¯å¤´æŒ‡é’ˆ
+ * @return {ACL_RING*} NULL: ç¯ä¸ºç©º
  */
 #define ACL_RING_FIRST(head) \
 	(acl_ring_succ(head) != (head) ? acl_ring_succ(head) : 0)
@@ -165,11 +165,11 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_first		ACL_RING_FIRST
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞÍ·µÚÒ»¸ö»·ÔªËØÖ¸ÕëÍ¬Ê±½«Æä×ª»»Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
- * @param head {ACL_RING*} »·Í·Ö¸Õë
- * @param app_type Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍ
- * @param ring_member {ACL_RING*} »·ÔªËØÔÚÓ¦ÓÃ×Ô¶¨Òå½á¹¹ÖĞµÄ³ÉÔ±Ãû³Æ
- * @return {app_type*} Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
+ * è¿”å›æ•°æ®ç¯ä¸­å¤´ç¬¬ä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆåŒæ—¶å°†å…¶è½¬æ¢åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
+ * @param head {ACL_RING*} ç¯å¤´æŒ‡é’ˆ
+ * @param app_type åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹
+ * @param ring_member {ACL_RING*} ç¯å…ƒç´ åœ¨åº”ç”¨è‡ªå®šä¹‰ç»“æ„ä¸­çš„æˆå‘˜åç§°
+ * @return {app_type*} åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
  */
 #define ACL_RING_FIRST_APPL(head, app_type, ring_member) \
 	(acl_ring_succ(head) != (head) ? \
@@ -178,9 +178,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_first_appl	ACL_RING_FIRST_APPL
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞ×îºóÒ»¸ö»·ÔªËØÖ¸Õë
- * @param head {ACL_RING*} »·Í·Ö¸Õë
- * @return {ACL_RING*} NULL: »·Îª¿Õ
+ * è¿”å›æ•°æ®ç¯ä¸­æœ€åä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆ
+ * @param head {ACL_RING*} ç¯å¤´æŒ‡é’ˆ
+ * @return {ACL_RING*} NULL: ç¯ä¸ºç©º
  */
 #define ACL_RING_LAST(head) \
        (acl_ring_pred(head) != (head) ? acl_ring_pred(head) : 0)
@@ -188,11 +188,11 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_last		ACL_RING_LAST
 
 /**
- * ·µ»ØÊı¾İ»·ÖĞ×îºóÒ»¸ö»·ÔªËØÖ¸ÕëÍ¬Ê±½«Æä×ª»»Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
- * @param head {ACL_RING*} »·Í·Ö¸Õë
- * @param app_type Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍ
- * @param ring_member {ACL_RING*} »·ÔªËØÔÚÓ¦ÓÃ×Ô¶¨Òå½á¹¹ÖĞµÄ³ÉÔ±Ãû³Æ
- * @return {app_type*} Ó¦ÓÃ×Ô¶¨Òå½á¹¹ÀàĞÍµÄ¶ÔÏóµØÖ·
+ * è¿”å›æ•°æ®ç¯ä¸­æœ€åä¸€ä¸ªç¯å…ƒç´ æŒ‡é’ˆåŒæ—¶å°†å…¶è½¬æ¢åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
+ * @param head {ACL_RING*} ç¯å¤´æŒ‡é’ˆ
+ * @param app_type åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹
+ * @param ring_member {ACL_RING*} ç¯å…ƒç´ åœ¨åº”ç”¨è‡ªå®šä¹‰ç»“æ„ä¸­çš„æˆå‘˜åç§°
+ * @return {app_type*} åº”ç”¨è‡ªå®šä¹‰ç»“æ„ç±»å‹çš„å¯¹è±¡åœ°å€
  */
 #define ACL_RING_LAST_APPL(head, app_type, ring_member) \
        (acl_ring_pred(head) != (head) ? \
@@ -201,9 +201,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 #define	acl_ring_last_appl	ACL_RING_LAST_APPL
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÎ²²¿
- * @param ring {ACL_RING*} Êı¾İ»·
- * @param entry {ACL_RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å°¾éƒ¨
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @param entry {ACL_RING*} æ–°çš„å…ƒç´ 
  */
 #define	ACL_RING_APPEND(ring_in, entry_in) do {  \
 	ACL_RING *ring_ptr = (ring_in), *entry_ptr = (entry_in);  \
@@ -216,9 +216,9 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 } while (0)
 
 /**
- * ½«Ò»¸öĞÂÔªËØÌí¼Ó½ø»·µÄÍ·²¿
- * @param ring {ACL_RING*} Êı¾İ»·
- * @param entry {ACL_RING*} ĞÂµÄÔªËØ
+ * å°†ä¸€ä¸ªæ–°å…ƒç´ æ·»åŠ è¿›ç¯çš„å¤´éƒ¨
+ * @param ring {ACL_RING*} æ•°æ®ç¯
+ * @param entry {ACL_RING*} æ–°çš„å…ƒç´ 
  */
 #define	ACL_RING_PREPEND(ring_in, entry_in) do {  \
 	ACL_RING *ring_ptr = (ring_in), *entry_ptr = (entry_in);  \
@@ -231,8 +231,8 @@ ACL_API ACL_RING *acl_ring_pop_tail(ACL_RING *ring);
 } while (0)
 
 /**
- * ½«Ò»¸ö»·ÔªËØ´ÓÊı¾İ»·ÖĞÉ¾³ı
- * @param entry {ACL_RING*} »·ÔªËØ
+ * å°†ä¸€ä¸ªç¯å…ƒç´ ä»æ•°æ®ç¯ä¸­åˆ é™¤
+ * @param entry {ACL_RING*} ç¯å…ƒç´ 
  */
 #define	ACL_RING_DETACH(entry_in) do {  \
 	ACL_RING   *succ, *pred, *entry_ptr = (entry_in);  \

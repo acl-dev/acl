@@ -1,8 +1,8 @@
-// FileDirDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// FileDirDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
-#include "lib_acl.h"  // ×¢Òâ£ºlib_acl.h ±ØĞë·ÅÔÚ stdafx.h µÄºóÃæ£¬·ñÔò±àÒë»á³ö´í:(
+#include "lib_acl.h"  // æ³¨æ„ï¼šlib_acl.h å¿…é¡»æ”¾åœ¨ stdafx.h çš„åé¢ï¼Œå¦åˆ™ç¼–è¯‘ä¼šå‡ºé”™:(
 #include "stdlib/avl.h"
 #include "FileDir.h"
 #include "FileDirDlg.h"
@@ -30,20 +30,20 @@ typedef struct MY_TYPE
 } MY_TYPE;
 
 
-// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
+// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -61,7 +61,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CFileDirDlg ¶Ô»°¿ò
+// CFileDirDlg å¯¹è¯æ¡†
 
 CFileDirDlg::CFileDirDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CFileDirDlg::IDD, pParent)
@@ -112,15 +112,15 @@ BEGIN_MESSAGE_MAP(CFileDirDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CFileDirDlg ÏûÏ¢´¦Àí³ÌĞò
+// CFileDirDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL CFileDirDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
+	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
 
-	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
+	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -136,18 +136,18 @@ BOOL CFileDirDlg::OnInitDialog()
 		}
 	}
 
-	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
-	//  Ö´ĞĞ´Ë²Ù×÷
-	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
-	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
+	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
+	//  æ‰§è¡Œæ­¤æ“ä½œ
+	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
+	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
 
-	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
 
 	CheckDlgButton(IDC_CHECK_NETSTED, BST_CHECKED);
 	m_debugWin.SetLimitText(81920);
 	acl_msg_open("svn.log", "svn_update");
 
-	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
+	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
 }
 
 void CFileDirDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -163,19 +163,19 @@ void CFileDirDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
-//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
-//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
+// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
+//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
+//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
 
 void CFileDirDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
+		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
+		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -183,7 +183,7 @@ void CFileDirDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// »æÖÆÍ¼±ê
+		// ç»˜åˆ¶å›¾æ ‡
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -192,7 +192,7 @@ void CFileDirDlg::OnPaint()
 	}
 }
 
-//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
+//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
 HCURSOR CFileDirDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -223,7 +223,7 @@ int CFileDirDlg::GetDirPath(void)
 
 void CFileDirDlg::OnTimer(UINT nIDEvent)
 {
-	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
 
 	CDialog::OnTimer(nIDEvent);
 	ScanDir();
@@ -231,12 +231,12 @@ void CFileDirDlg::OnTimer(UINT nIDEvent)
 
 void CFileDirDlg::OnEnChangeEditPath()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 }
 
@@ -262,7 +262,7 @@ int CFileDirDlg::ScanCallback(ACL_SCAN_DIR * scan, void * ctx)
 		+ acl_scan_dir_ndirs(pfdd->m_pScan)) % 100 == 0) {
 		pfdd->UpdateInfo();
 		pfdd->SetTimer(TIMER_EVENT_USER_100, 10, NULL);
-		return (-1);  // ÔİÊ±Í£Ö¹É¨Ãè
+		return (-1);  // æš‚æ—¶åœæ­¢æ‰«æ
 	}
 
 	return 0;
@@ -282,7 +282,7 @@ void CFileDirDlg::ScanDir(void)
 	UpdateInfo();
 }
 
-// ¸üĞÂÏÔÊ¾ĞÅÏ¢
+// æ›´æ–°æ˜¾ç¤ºä¿¡æ¯
 void CFileDirDlg::UpdateInfo(void)
 {
 	if (m_pScan == NULL)
@@ -293,10 +293,10 @@ void CFileDirDlg::UpdateInfo(void)
 	msg.Format(_T("%I64u MB"), acl_scan_dir_nsize(m_pScan) / MB);
 	GetDlgItem(IDC_EDIT_SIZE)->SetWindowText(msg);
 
-	msg.Format(_T("%d ¸ö"), acl_scan_dir_nfiles(m_pScan));
+	msg.Format(_T("%d ä¸ª"), acl_scan_dir_nfiles(m_pScan));
 	GetDlgItem(IDC_EDIT_NFILE)->SetWindowText(msg);
 
-	msg.Format(_T("%d ¸ö"), acl_scan_dir_ndirs(m_pScan));
+	msg.Format(_T("%d ä¸ª"), acl_scan_dir_ndirs(m_pScan));
 	GetDlgItem(IDC_EDIT_NDIR)->SetWindowText(msg);
 }
 
@@ -304,19 +304,19 @@ void CFileDirDlg::ScanClose(void)
 {
 	KillTimer(TIMER_EVENT_USER_100);
 	UpdateInfo();
-	acl_scan_dir_close(m_pScan);  // ¹Ø±ÕÉ¨ÃèÄ¿Â¼¶ÔÏó
+	acl_scan_dir_close(m_pScan);  // å…³é—­æ‰«æç›®å½•å¯¹è±¡
 	m_pScan = NULL;
 }
 
 void CFileDirDlg::OnBnClickedCheckNetsted()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 }
 
 void CFileDirDlg::OnBnClickedButtonScan()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString msg;
 
 	if (GetDirPath() < 0)
@@ -329,7 +329,7 @@ void CFileDirDlg::OnBnClickedButtonScan()
 		return;
 	}
 
-	// ÉèÖÃ»Øµ÷º¯Êı¼°»Øµ÷²ÎÊı
+	// è®¾ç½®å›è°ƒå‡½æ•°åŠå›è°ƒå‚æ•°
 	acl_scan_dir_ctl(m_pScan, ACL_SCAN_CTL_FN, this->ScanCallback,
 		ACL_SCAN_CTL_CTX, this, ACL_SCAN_CTL_END);
 
@@ -338,7 +338,7 @@ void CFileDirDlg::OnBnClickedButtonScan()
 
 void CFileDirDlg::OnBnClickedButtonDelete()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString msg;
 
 	if (GetDirPath() < 0)
@@ -362,17 +362,17 @@ void CFileDirDlg::OnBnClickedButtonDelete()
 	GetDlgItem(IDC_EDIT_SIZE)->SetWindowText(msg);
 
 	int  n = scan.FileCount();
-	msg.Format(_T("%d ¸ö"), n);
+	msg.Format(_T("%d ä¸ª"), n);
 	GetDlgItem(IDC_EDIT_NFILE)->SetWindowText(msg);
 
 	n = scan.DirCount();
-	msg.Format(_T("%d ¸ö"), n);
+	msg.Format(_T("%d ä¸ª"), n);
 	GetDlgItem(IDC_EDIT_NDIR)->SetWindowText(msg);
 }
 
 void CFileDirDlg::OnBnClickedButtonAvlAdd()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	MY_TYPE *pm, m;
 
 	if (m_avlName.GetLength() == 0) {
@@ -409,7 +409,7 @@ void CFileDirDlg::OnBnClickedButtonAvlAdd()
 
 void CFileDirDlg::OnBnClickedButtonAvlFind()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	MY_TYPE m, *ptr;
 	CString msg;
 
@@ -442,7 +442,7 @@ int CFileDirDlg::compare_fn(const void* v1, const void* v2)
 
 void CFileDirDlg::OnBnClickedButtonWalk()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	MY_TYPE *next;
 	CString msg;
 	int   n = 0;
@@ -461,18 +461,18 @@ void CFileDirDlg::OnBnClickedButtonWalk()
 
 void CFileDirDlg::OnEnChangeEditAvlName()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 }
 
 void CFileDirDlg::OnBnClickedButtonTest()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	avl_node_t *node = (avl_node_t*) acl_mycalloc(1, sizeof(avl_node_t)), *pnode;
 	avl_index_t where;
 
@@ -492,18 +492,18 @@ void CFileDirDlg::OnBnClickedButtonTest()
 
 void CFileDirDlg::OnEnChangeEditAvlValue()
 {
-	// TODO:  Èç¹û¸Ã¿Ø¼şÊÇ RICHEDIT ¿Ø¼ş£¬ÔòËü½«²»»á
-	// ·¢ËÍ¸ÃÍ¨Öª£¬³ı·ÇÖØĞ´ CDialog::OnInitDialog()
-	// º¯Êı²¢µ÷ÓÃ CRichEditCtrl().SetEventMask()£¬
-	// Í¬Ê±½« ENM_CHANGE ±êÖ¾¡°»ò¡±ÔËËãµ½ÑÚÂëÖĞ¡£
+	// TODO:  å¦‚æœè¯¥æ§ä»¶æ˜¯ RICHEDIT æ§ä»¶ï¼Œåˆ™å®ƒå°†ä¸ä¼š
+	// å‘é€è¯¥é€šçŸ¥ï¼Œé™¤éé‡å†™ CDialog::OnInitDialog()
+	// å‡½æ•°å¹¶è°ƒç”¨ CRichEditCtrl().SetEventMask()ï¼Œ
+	// åŒæ—¶å°† ENM_CHANGE æ ‡å¿—â€œæˆ–â€è¿ç®—åˆ°æ©ç ä¸­ã€‚
 
-	// TODO:  ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 }
 
 void CFileDirDlg::OnBnClickedButtonAvlAddBat()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	MY_TYPE *pm, m;
 	int   i, n = 0;
 	CString msg;
@@ -533,7 +533,7 @@ void CFileDirDlg::OnBnClickedButtonAvlAddBat()
 
 void CFileDirDlg::OnBnClickedButtonAvlDel()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	MY_TYPE m, *pm;
 
 	if (m_avlName.GetLength() == 0) {
@@ -557,7 +557,7 @@ void CFileDirDlg::OnBnClickedButtonAvlDel()
 
 void CFileDirDlg::OnBnClickedButtonClear()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	m_avlName.Empty();
 	m_avlValue.Empty();
 	UpdateData(FALSE);
@@ -574,13 +574,13 @@ void CFileDirDlg::DebugWinAppend(CString& msg)
 
 void CFileDirDlg::OnBnClickedCheckOutName()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 }
 
 void CFileDirDlg::OnBnClickedSvnUpdate()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString msg;
 
 	if (GetDirPath() < 0)
@@ -593,7 +593,7 @@ void CFileDirDlg::OnBnClickedSvnUpdate()
 		return;
 	}
 
-	// ÉèÖÃ»Øµ÷º¯Êı¼°»Øµ÷²ÎÊı
+	// è®¾ç½®å›è°ƒå‡½æ•°åŠå›è°ƒå‚æ•°
 	acl_scan_dir_ctl(m_pScan, ACL_SCAN_CTL_FN, ScanSvnCallback,
 		ACL_SCAN_CTL_CTX, this, ACL_SCAN_CTL_END);
 
@@ -609,7 +609,7 @@ int CFileDirDlg::ScanSvnCallback(ACL_SCAN_DIR * scan, void * ctx)
 	{
 		pfdd->UpdateInfo();
 		pfdd->SetTimer(TIMER_EVENT_USER_100, 10, NULL);
-		return (-1);  // ÔİÊ±Í£Ö¹É¨Ãè
+		return (-1);  // æš‚æ—¶åœæ­¢æ‰«æ
 	}
 
 	if (!pfdd->m_outName)
@@ -688,16 +688,16 @@ BOOL CFileDirDlg::UpdateSvn(const char* filepath)
 	int   i = 0;
 	while (TRUE)
 	{
-		// Ö»ĞèÒªĞŞ¸ÄÇ° 10 Êı¾İ¼´¿É
+		// åªéœ€è¦ä¿®æ”¹å‰ 10 æ•°æ®å³å¯
 		if (i++ > 10)
 			break;
 
-		// ´Ó»º³åÇøÖĞ»ñµÃÒ»ĞĞÊı¾İ
+		// ä»ç¼“å†²åŒºä¸­è·å¾—ä¸€è¡Œæ•°æ®
 		const ACL_VSTRING* vp = acl_buffer_gets(vbuf, &ptr, strlen(ptr));
 		if (vp == NULL)
 			break;
 
-		// ±È½ÏÇ°×ºÊÇ·ñÏàµÈ
+		// æ¯”è¾ƒå‰ç¼€æ˜¯å¦ç›¸ç­‰
 		if (strncasecmp(old_svn, STR(vp), old_npre) != 0)
 		{
 			if (acl_vstream_writen(fp, STR(vp), LEN(vp)) == ACL_VSTREAM_EOF)
@@ -711,7 +711,7 @@ BOOL CFileDirDlg::UpdateSvn(const char* filepath)
 			continue;
 		}
 
-		// Ğ´ÈëĞÂµÄÇ°×º
+		// å†™å…¥æ–°çš„å‰ç¼€
 		if (acl_vstream_writen(fp, new_svn, new_npre) == ACL_VSTREAM_EOF)
 		{
 			acl_msg_error("%s(%d): write error(%s)",
@@ -726,7 +726,7 @@ BOOL CFileDirDlg::UpdateSvn(const char* filepath)
 			continue;
 		}
 
-		// Ğ´Èë¸ÃĞĞÊı¾İÖĞÊ£Óà²¿·Ö
+		// å†™å…¥è¯¥è¡Œæ•°æ®ä¸­å‰©ä½™éƒ¨åˆ†
 		if (acl_vstream_writen(fp, pleft, strlen(pleft)) == ACL_VSTREAM_EOF)
 		{
 			acl_msg_error("%s(%d): write error(%s)",

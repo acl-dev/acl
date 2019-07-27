@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #ifndef WIN32
 #include <algorithm>
 #include <vector>
@@ -35,7 +35,7 @@ static const char *var_md5_key = "hello world!";
 
 static const char *var_str = "hi!";
 
-/* Ä£ÄâÈ¡µÃÒ»¸öËæ»úµÄÕûĞÎÊı×é */
+/* æ¨¡æ‹Ÿå–å¾—ä¸€ä¸ªéšæœºçš„æ•´å½¢æ•°ç»„ */
 
 #ifndef WIN32
 
@@ -75,10 +75,10 @@ static int *random_get(int max, int mod)
 	char  buf[64], key_buf[16];
 	int   m = 0;
 
-	/* ÏÈ·ÖÅäÒ»¸ö´óÊı×é */
+	/* å…ˆåˆ†é…ä¸€ä¸ªå¤§æ•°ç»„ */
 	a = (int*) acl_mymalloc(sizeof(int) * max);
 
-	/* ³õÊ¼»¯¸Ã´óÊı×é */
+	/* åˆå§‹åŒ–è¯¥å¤§æ•°ç»„ */
 	memset(a, -1, sizeof(int) * max);
 
 	printf("begin: max: %d\n", max);
@@ -86,11 +86,11 @@ static int *random_get(int max, int mod)
 	for (i = 0; i < max; i++) {
 		snprintf(buf, sizeof(buf), "key: %d", i);
 
-		/* ÏÈ mda5 */
+		/* å…ˆ mda5 */
 		MD5Key(buf, strlen(buf), var_md5_key, strlen(var_md5_key),
 			key_buf, sizeof(key_buf));
 
-		/* ÔÙÈ¡Ä£ */
+		/* å†å–æ¨¡ */
 		key = acl_hash_crc32(key_buf, sizeof(key_buf)) % max;
 		if (a[key] == -1) {
 			a[key] = i;
@@ -103,7 +103,7 @@ static int *random_get(int max, int mod)
 
 		m++;
 
-		/* ËµÃ÷¸Ã key µÄÊı×éÏÂ±êÒÑ¾­±»Õ¼ÓÃ£¬ĞèÒªË³ĞòÕÒÒ»¸öÎ»ÖÃ¼´¿É */
+		/* è¯´æ˜è¯¥ key çš„æ•°ç»„ä¸‹æ ‡å·²ç»è¢«å ç”¨ï¼Œéœ€è¦é¡ºåºæ‰¾ä¸€ä¸ªä½ç½®å³å¯ */
 		for (j = off; j < max; j++) {
 			if (a[j] == -1) {
 				a[j] = i;
@@ -129,7 +129,7 @@ static void random_free(int *a)
 	acl_myfree(a);
 }
 
-/* Ëæ»úÅúÁ¿Ğ´ */
+/* éšæœºæ‰¹é‡å†™ */
 
 static int bench_random_add(ZDB *db, int max, int mod)
 {
@@ -174,7 +174,7 @@ static int bench_random_add(ZDB *db, int max, int mod)
 	return (max);
 }
 
-/* Ëæ»úÅúÁ¿¶Á */
+/* éšæœºæ‰¹é‡è¯» */
 
 static int bench_random_get(ZDB *db, int max, int mod)
 {
@@ -226,7 +226,7 @@ static int bench_random_get(ZDB *db, int max, int mod)
 
 /****************************************************************************/
 
-/* Ë³ĞòÅúÁ¿Ğ´ */
+/* é¡ºåºæ‰¹é‡å†™ */
 
 static int bench_add(ZDB *db, int max)
 {
@@ -263,7 +263,7 @@ static int bench_add(ZDB *db, int max)
 	return (max);
 }
 
-/* Ë³ĞòÅúÁ¿ĞŞ¸Ä */
+/* é¡ºåºæ‰¹é‡ä¿®æ”¹ */
 
 static int bench_update(ZDB *db, int max, int num)
 {
@@ -307,7 +307,7 @@ static int bench_update(ZDB *db, int max, int num)
 	return (max);
 }
 
-/* Ë³ĞòÅúÁ¿¶Á */
+/* é¡ºåºæ‰¹é‡è¯» */
 
 static int bench_get(ZDB *db, int max)
 {
@@ -711,16 +711,16 @@ void zdb_test_main(const char *cmd)
 
 	memset(&zdb_cfg, 0, sizeof(zdb_cfg));
 
-	/* ³õÊ¼»¯ ZDB ´æ´¢ÒıÇæ */
+	/* åˆå§‹åŒ– ZDB å­˜å‚¨å¼•æ“ */
 	zdb_init();
 
-	/* ¿ªÊ¼ÅäÖÃ ZDB ÅäÖÃ¶ÔÏó */
+	/* å¼€å§‹é…ç½® ZDB é…ç½®å¯¹è±¡ */
 	zdb_cfg.key_path = key_path;
 	zdb_cfg.key_begin = key_begin;
 	zdb_cfg.key_limit = key_limit;
 	zdb_cfg.dat_limit = dat_limit;
 	zdb_cfg.blk_dlen = (int) blk_dlen;
-	zdb_cfg.dat_nstep = dat_nstep;  /* Öµ´æ´¢ÎÄ¼şÃ¿´ÎÔö¼ÓµÄÊı¾İ¿é¸öÊı */
+	zdb_cfg.dat_nstep = dat_nstep;  /* å€¼å­˜å‚¨æ–‡ä»¶æ¯æ¬¡å¢åŠ çš„æ•°æ®å—ä¸ªæ•° */
 	if (cache_key_limit > 0 && cache_key_timeout > 0) {
 		zdb_cfg.key_cache_max = cache_key_limit * 2;
 		zdb_cfg.key_cache_timeout = cache_key_timeout;
@@ -736,7 +736,7 @@ void zdb_test_main(const char *cmd)
 	zdb_cfg.dat_cache_timeout = 0;
 	zdb_cfg.dat_wback_max = 0;
 
-	/* ´ò¿ªÒ»¸ö ZDB Êı¾İ¿â¶ÔÏó */
+	/* æ‰“å¼€ä¸€ä¸ª ZDB æ•°æ®åº“å¯¹è±¡ */
 	db = zdb_open(dbname, oflags, &zdb_cfg);
 	if (db == NULL)
 		acl_msg_fatal("%s: zdb open error(%s)", myname, acl_last_serror());

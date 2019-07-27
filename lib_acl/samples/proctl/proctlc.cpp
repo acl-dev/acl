@@ -1,4 +1,4 @@
-// proctlc.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// proctlc.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 #pragma comment(lib,"ws2_32")
 #include "lib_acl.h"
@@ -30,6 +30,6 @@ int main(int argc, char *argv[])
 		else
 			sleep(1);
 	}
-	return (-1);  // ·µ»Ø -1 ÊÇÎªÁËÈÃ¸¸½ø³Ì¼ÌĞøÆô¶¯
+	return (-1);  // è¿”å› -1 æ˜¯ä¸ºäº†è®©çˆ¶è¿›ç¨‹ç»§ç»­å¯åŠ¨
 }
 

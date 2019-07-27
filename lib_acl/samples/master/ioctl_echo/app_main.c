@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@ typedef struct APP_HANDLE {
 static APP_RUN_FN __run_fn = NULL;
 static void *__run_ctx = NULL;
 
-/* ¿Í»§¶ËIO³¬Ê±Ê±¼äÖµ */
+/* å®¢æˆ·ç«¯IOè¶…æ—¶æ—¶é—´å€¼ */
 int app_var_client_idle_limit = 60;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
@@ -28,8 +28,8 @@ static char *__deny_info;
 /*----------------------------------------------------------------------------*/
 
 /**
- * ´´½¨Ò»¸ö·şÎñÆ÷¿ò¼Ü
- * @return APP_HANDLE* ÓÃ»§×Ô¼ºµÄÓ¦ÓÃÊı¾İ¾ä±ú.
+ * åˆ›å»ºä¸€ä¸ªæœåŠ¡å™¨æ¡†æ¶
+ * @return APP_HANDLE* ç”¨æˆ·è‡ªå·±çš„åº”ç”¨æ•°æ®å¥æŸ„.
  */
 
 static APP_HANDLE *app_create(void)
@@ -91,12 +91,12 @@ static void __read_notify_callback(int event_type,
 }
 
 /**
- * ÏòÈÎÎñ³ØÖĞÌí¼ÓÒ»¸ö¹¤×÷ÈÎÎñ
- * @param h_ioctl ·şÎñÆ÷ÈÎÎñ³Ø¾ä±ú
- * @param app_handle ÓÃ»§×Ô¼ºµÄÓ¦ÓÃÊı¾İ¾ä±ú.
- * @param cstream ¿Í»§¶ËÊı¾İÁ÷Ö¸Õë
- * ×¢: cstream Êı¾İÁ÷»áÔÚ¸Ãº¯ÊıÄÚ²¿µÄ»Øµ÷º¯ÊıÖĞ½øĞĞ¹Ø±Õ, ËùÒÔ¸Ãº¯ÊıµÄµ÷ÓÃÕß²»Òª
- *     ¹Ø±Õ¸ÃÁ÷.
+ * å‘ä»»åŠ¡æ± ä¸­æ·»åŠ ä¸€ä¸ªå·¥ä½œä»»åŠ¡
+ * @param h_ioctl æœåŠ¡å™¨ä»»åŠ¡æ± å¥æŸ„
+ * @param app_handle ç”¨æˆ·è‡ªå·±çš„åº”ç”¨æ•°æ®å¥æŸ„.
+ * @param cstream å®¢æˆ·ç«¯æ•°æ®æµæŒ‡é’ˆ
+ * æ³¨: cstream æ•°æ®æµä¼šåœ¨è¯¥å‡½æ•°å†…éƒ¨çš„å›è°ƒå‡½æ•°ä¸­è¿›è¡Œå…³é—­, æ‰€ä»¥è¯¥å‡½æ•°çš„è°ƒç”¨è€…ä¸è¦
+ *     å…³é—­è¯¥æµ.
  */
 
 static void app_add_worker(ACL_IOCTL *h_ioctl, APP_HANDLE *app, ACL_VSTREAM *cstream)
@@ -106,7 +106,7 @@ static void app_add_worker(ACL_IOCTL *h_ioctl, APP_HANDLE *app, ACL_VSTREAM *cst
 	if (h_ioctl == NULL || cstream == NULL || app == NULL)
 		acl_msg_fatal("%s(%d): input invalid", myname, __LINE__);
 	
-	/* ½«¿Í»§¶ËÊı¾İÁ÷µÄ×´Ì¬ÖÃÈëÊÂ¼ş¼à¿Ø¼¯ºÏÖĞ */
+	/* å°†å®¢æˆ·ç«¯æ•°æ®æµçš„çŠ¶æ€ç½®å…¥äº‹ä»¶ç›‘æ§é›†åˆä¸­ */
 	if (acl_msg_verbose)
 		acl_msg_info("%s(%d): ioctl=%p, fd=%d",
 			myname, __LINE__, (void*) h_ioctl, ACL_VSTREAM_SOCK(cstream));
@@ -250,7 +250,7 @@ static void app_main_init(void)
 
 	acl_argv_free(env_argv);
 
-	/* ÒòÎªÊÇ¶àÏß³Ì³ÌĞò£¬ËùÒÔĞèÒª¼Ó»¥³âËø */
+	/* å› ä¸ºæ˜¯å¤šçº¿ç¨‹ç¨‹åºï¼Œæ‰€ä»¥éœ€è¦åŠ äº’æ–¥é” */
 	if (__mempool_limit > 0)
 		acl_mempool_open(__mempool_limit, 1);
 }
@@ -281,7 +281,7 @@ void app_main(int argc, char *argv[], APP_RUN_FN run_fn, void *run_ctx, int name
 
 	app_main_init();
 
-	/* ÌáÇ°½øĞĞÄ£°å³õÊ¼»¯£¬ÒÔÊ¹ÈÕÖ¾¾¡ÔçµØ´ò¿ª */
+	/* æå‰è¿›è¡Œæ¨¡æ¿åˆå§‹åŒ–ï¼Œä»¥ä½¿æ—¥å¿—å°½æ—©åœ°æ‰“å¼€ */
 	acl_master_log_open(argv[0]);
 
 	if (run_fn == NULL)

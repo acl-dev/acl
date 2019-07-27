@@ -1,22 +1,22 @@
-#pragma once
+ï»¿#pragma once
 #include "afxwin.h"
 
 
-// CHttpOption ¶Ô»°¿ò
+// CHttpOption å¯¹è¯æ¡†
 
 class CHttpOption : public CDialog
 {
 	DECLARE_DYNAMIC(CHttpOption)
 
 public:
-	CHttpOption(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	CHttpOption(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~CHttpOption();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_DIALOG_OPTION };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
 	DECLARE_MESSAGE_MAP()
 public:

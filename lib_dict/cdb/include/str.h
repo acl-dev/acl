@@ -1,4 +1,4 @@
-#ifndef STR_H
+﻿#ifndef STR_H
 #define STR_H
 
 extern unsigned int str_copy(char *,char *);

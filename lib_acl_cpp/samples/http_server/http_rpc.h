@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "acl_cpp/ipc/rpc.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -12,20 +12,20 @@ public:
 	~http_rpc();
 
 protected:
-	// ×ÓÏß³Ì´¦Àíº¯Êı
+	// å­çº¿ç¨‹å¤„ç†å‡½æ•°
 	virtual void rpc_run();
 
-	// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
+	// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
 	virtual void rpc_onover();
 
 private:
-	bool proc_quit_;  // ³ÌĞòÊÇ·ñÓ¦¸ÃÍË³ö
-	acl::aio_handle& handle_;  // Òì²½¿ò¼ÜÒıÇæ
-	acl::aio_socket_stream* client_;  // ¿Í»§¶ËÁ¬½ÓÁ÷
-	bool keep_alive_; // ÊÇ·ñÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó
-	char* res_buf_;  // ´æ·Å·µ»Ø¸ø¿Í»§¶ËÊı¾İµÄ»º³åÇø
-	unsigned buf_size_; // res_buf_ µÄ¿Õ¼ä´óĞ¡
+	bool proc_quit_;  // ç¨‹åºæ˜¯å¦åº”è¯¥é€€å‡º
+	acl::aio_handle& handle_;  // å¼‚æ­¥æ¡†æ¶å¼•æ“
+	acl::aio_socket_stream* client_;  // å®¢æˆ·ç«¯è¿æ¥æµ
+	bool keep_alive_; // æ˜¯å¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥
+	char* res_buf_;  // å­˜æ”¾è¿”å›ç»™å®¢æˆ·ç«¯æ•°æ®çš„ç¼“å†²åŒº
+	unsigned buf_size_; // res_buf_ çš„ç©ºé—´å¤§å°
 
-	// ÔÚ×ÓÏß³ÌÖĞÒÔ×èÈû·½Ê½´¦Àí¿Í»§¶ËÇëÇó
+	// åœ¨å­çº¿ç¨‹ä¸­ä»¥é˜»å¡æ–¹å¼å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
 	void handle_conn(acl::socket_stream* stream);
 };

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "file_tmpl.h"
 #include "http_creator.h"
 
@@ -138,7 +138,7 @@ static bool create_http_servlet(file_tmpl& tmpl)
 	printf("create %s ok.\r\n", filepath.c_str());
 	tpl_free(tpl);
 
-	// ÉèÖÃ·şÎñÆ÷Ä£°åÀàĞÍ
+	// è®¾ç½®æœåŠ¡å™¨æ¨¡æ¿ç±»å‹
 	return create_service(tmpl);
 }
 
@@ -146,7 +146,7 @@ void http_creator()
 {
 	file_tmpl tmpl;
 
-	// ÉèÖÃÔ´³ÌĞòËùÔÚÄ¿Â¼
+	// è®¾ç½®æºç¨‹åºæ‰€åœ¨ç›®å½•
 	tmpl.set_path_from("tmpl/http");
 
 	while (true)
@@ -164,7 +164,7 @@ void http_creator()
 			acl::safe_snprintf(buf, sizeof(buf), "http_demo");
 
 		tmpl.set_project_name(buf);
-		// ´´½¨Ä¿Â¼
+		// åˆ›å»ºç›®å½•
 		tmpl.create_dirs();
 
 		printf("please choose one http application type:\r\n");

@@ -1,4 +1,4 @@
-#ifndef	__passwd_crypt_include_h__
+﻿#ifndef	__passwd_crypt_include_h__
 #define	__passwd_crypt_include_h__
 
 #ifdef	__cplusplus

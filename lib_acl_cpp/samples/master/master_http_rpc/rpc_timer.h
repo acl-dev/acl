@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class rpc_timer : public acl::aio_timer_callback
 {
@@ -12,7 +12,7 @@ private:
 
 	acl::aio_handle& handle_;
 
-	// 基类纯虚函数
+	// 鍩虹被绾櫄鍑芥暟
 	virtual void timer_callback(unsigned int id);
 	virtual void destroy(void);
 };

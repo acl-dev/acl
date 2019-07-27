@@ -1,4 +1,4 @@
-#include <assert.h>
+﻿#include <assert.h>
 #include <iostream>
 #include "fiber/lib_fiber.hpp"
 
@@ -8,19 +8,19 @@ public:
 	myfiber(int max_loop) : max_loop_(max_loop) {}
 
 protected:
-	// @override 实现基类纯虚函数
+	// @override 瀹炵幇鍩虹被绾櫄鍑芥暟
 	void run(void)
 	{
-		// 两种方式均可以获得当前的协程号
+		// 涓ょ鏂瑰紡鍧囧彲浠ヨ幏寰楀綋鍓嶇殑鍗忕▼鍙�
 		assert(get_id() == acl::fiber::self());
 
 		for (int i = 0; i < max_loop_; i++)
 		{
-			acl::fiber::yield(); // 主动让出 CPU 给其它协程
+			acl::fiber::yield(); // 涓诲姩璁╁嚭 CPU 缁欏叾瀹冨崗绋�
 			std::cout << "fiber-" << acl::fiber::self() << std::endl;
 		}
 
-		delete this; // 因为是动态创建的，所以需自动销毁
+		delete this; // 鍥犱负鏄姩鎬佸垱寤虹殑锛屾墍浠ラ渶鑷姩閿€姣�
 	}
 
 private:
@@ -35,12 +35,12 @@ int main(void)
 	
 	for (i = 0; i < max_fiber; i++)
 	{
-		acl::fiber* fb = new myfiber(max_loop); // 创建协程
-		fb->start(); // 启动协程
+		acl::fiber* fb = new myfiber(max_loop); // 鍒涘缓鍗忕▼
+		fb->start(); // 鍚姩鍗忕▼
 	}
 
 	std::cout << "---- begin schedule fibers now ----" << std::endl;
-	// 循环调度所有协程，直至所有协程退出
+	// 寰幆璋冨害鎵€鏈夊崗绋嬶紝鐩磋嚦鎵€鏈夊崗绋嬮€€鍑�
 	acl::fiber::schedule();
 	std::cout << "---- all fibers exit ----" << std::endl;
 

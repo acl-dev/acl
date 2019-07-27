@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #include "internal/mime_state.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mime/rfc822.hpp"

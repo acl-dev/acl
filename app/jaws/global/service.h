@@ -1,4 +1,4 @@
-#ifndef	__SERVICE_INCLUDE_H__
+﻿#ifndef	__SERVICE_INCLUDE_H__
 #define	__SERVICE_INCLUDE_H__
 
 #include "service_struct.h"

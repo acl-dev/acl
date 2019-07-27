@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "util.h"
 
 static int   __max_count = 10;
@@ -12,7 +12,7 @@ static void run(void)
 	acl::socket_stream stream;
 	char* buf;
 
-	// °ó¶¨±¾µØµØÖ·
+	// ç»‘å®šæœ¬åœ°åœ°å€
 	if (stream.bind_udp(__local_addr) == false)
 	{
 		printf("bind addr %s error %s\r\n",
@@ -20,13 +20,13 @@ static void run(void)
 		return;
 	}
 
-	// ÉèÖÃÔ¶³Ì·şÎñµØÖ·
+	// è®¾ç½®è¿œç¨‹æœåŠ¡åœ°å€
 	else
 		stream.set_peer(__server_addr);
 
 	stream.set_rw_timeout(1);
 
-	// ·ÖÅäÄÚ´æ
+	// åˆ†é…å†…å­˜
 	buf = (char*) malloc(__dat_length + 1);
 	memset(buf, 'X', __dat_length);
 	buf[__dat_length] = 0;
@@ -39,18 +39,18 @@ static void run(void)
 	int   i = 0, ret;
 	for (; i < __max_count; i++)
 	{
-		// ·şÎñ¶Ë¿ÉÄÜ»áÓÃ±ğµÄµØÖ·»Ø¸´Êı¾İ£¬ËùÒÔĞèÒªÖØĞÂÉèÖÃÔ¶³Ì·şÎñµØÖ·
+		// æœåŠ¡ç«¯å¯èƒ½ä¼šç”¨åˆ«çš„åœ°å€å›å¤æ•°æ®ï¼Œæ‰€ä»¥éœ€è¦é‡æ–°è®¾ç½®è¿œç¨‹æœåŠ¡åœ°å€
 		if (!__server_fixed)
 			stream.set_peer(__server_addr);
 
-		// ·¢ËÍÊı¾İ
+		// å‘é€æ•°æ®
 		if (stream.write(buf, __dat_length) == -1)
 		{
 			printf("write error %s\r\n", acl::last_serror());
 			break;
 		}
 
-		// ½ÓÊÕÊı¾İ
+		// æ¥æ”¶æ•°æ®
 		else if ((ret = stream.read(res, sizeof(res) - 1, false)) == -1)
 		{
 			printf("read error %s\r\n", acl::last_serror());
@@ -76,7 +76,7 @@ static void run(void)
 	struct timeval end;
 	gettimeofday(&end, NULL);
 
-	// ¼ÆËãËÙ¶È
+	// è®¡ç®—é€Ÿåº¦
 	double spent = util::stamp_sub(&end, &begin);
 	printf("total: %d, curr: %d, spent: %.2f, speed: %.2f\r\n",
 		__max_count, i, spent, (i * 1000) / (spent > 1 ? spent : 1));

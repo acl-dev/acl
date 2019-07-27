@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef MINGW
 #include <sys/time.h>

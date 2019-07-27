@@ -1,10 +1,10 @@
-// singleton.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// singleton.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
 #include "acl_cpp/stdlib/singleton.hpp"
 
-// ¸ú×Ùµ÷ÓÃ¹ı³ÌµÄ¼ÆÊıÆ÷
+// è·Ÿè¸ªè°ƒç”¨è¿‡ç¨‹çš„è®¡æ•°å™¨
 static int __nstep = 0;
 
 class singleton_test : public acl::singleton <singleton_test>
@@ -12,8 +12,8 @@ class singleton_test : public acl::singleton <singleton_test>
 public:
 	singleton_test()
 	{
-		// Èç¹û¸Ã¾ä»°´òÓ¡ÏÈÓÚ main º¯ÊıÖĞµÄ´òÓ¡½á¹û£¬Ôò
-		// ËµÃ÷¸Ãµ¥ÀıÊÇÔÚ main º¯ÊıÖ´ĞĞÏÈ±»³õÊ¼»¯µÄ
+		// å¦‚æœè¯¥å¥è¯æ‰“å°å…ˆäº main å‡½æ•°ä¸­çš„æ‰“å°ç»“æœï¼Œåˆ™
+		// è¯´æ˜è¯¥å•ä¾‹æ˜¯åœ¨ main å‡½æ•°æ‰§è¡Œå…ˆè¢«åˆå§‹åŒ–çš„
 		printf("step %d: singleton_test construct called\r\n", ++__nstep);
 		fflush(stdout);
 	}
@@ -47,8 +47,8 @@ class singleton_test2
 public:
 	singleton_test2()
 	{
-		// Èç¹û¸Ã¾ä»°´òÓ¡ÏÈÓÚ main º¯ÊıÖĞµÄ´òÓ¡½á¹û£¬Ôò
-		// ËµÃ÷¸Ãµ¥ÀıÊÇÔÚ main º¯ÊıÖ´ĞĞÏÈ±»³õÊ¼»¯µÄ
+		// å¦‚æœè¯¥å¥è¯æ‰“å°å…ˆäº main å‡½æ•°ä¸­çš„æ‰“å°ç»“æœï¼Œåˆ™
+		// è¯´æ˜è¯¥å•ä¾‹æ˜¯åœ¨ main å‡½æ•°æ‰§è¡Œå…ˆè¢«åˆå§‹åŒ–çš„
 		printf("step %d: singleton_test2 construct called\r\n", ++__nstep);
 		fflush(stdout);
 	}
@@ -81,14 +81,14 @@ int main()
 	printf("step %d: first line in main\r\n", ++__nstep);
 	fflush(stdout);
 
-	// ·½·¨Ò»
+	// æ–¹æ³•ä¸€
 	const singleton_test& test1 = singleton_test::get_instance().init();
 	const singleton_test& test2 = singleton_test::get_instance();
 	test1.set("test1");
 	test2.set("test2");
 
-	// ·½·¨¶ş£¬ÓÃ VC2003 ±àÒë³É release °æ±¾Ê±£¬
-	// ¸Ã·½Ê½¿ÉÒÔ±£Ö¤µ¥ÌåÊµÀıÔÚ main Ö®Ç°±»¹¹Ôì
+	// æ–¹æ³•äºŒï¼Œç”¨ VC2003 ç¼–è¯‘æˆ release ç‰ˆæœ¬æ—¶ï¼Œ
+	// è¯¥æ–¹å¼å¯ä»¥ä¿è¯å•ä½“å®ä¾‹åœ¨ main ä¹‹å‰è¢«æ„é€ 
 	acl::singleton2<singleton_test2>::get_instance().init();
 	acl::singleton2<singleton_test2>::get_instance().set("test1");
 	acl::singleton2<singleton_test2>::get_instance().set("test2");

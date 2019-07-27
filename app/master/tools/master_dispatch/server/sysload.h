@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class sysload {
 
@@ -7,8 +7,8 @@ public:
 	~sysload() {}
 
 	/**
-	 * »ñµÃÏµÍ³µ±Ç°µÄ¸ºÔØ
-	 * @param out {acl::string*} Èç¹û·Ç¿Õ£¬Ôò´æ´¢×Ö·û´®¸ñÊ½µÄ½á¹û
+	 * è·å¾—ç³»ç»Ÿå½“å‰çš„è´Ÿè½½
+	 * @param out {acl::string*} å¦‚æœéç©ºï¼Œåˆ™å­˜å‚¨å­—ç¬¦ä¸²æ ¼å¼çš„ç»“æœ
 	 * @return {double}
 	 */
 	static double get_load(acl::string* out);

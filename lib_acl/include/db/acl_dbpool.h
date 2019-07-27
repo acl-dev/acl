@@ -1,4 +1,4 @@
-#ifndef	ACL_DBPOOL_INCLUDE_H
+ï»¿#ifndef	ACL_DBPOOL_INCLUDE_H
 #define	ACL_DBPOOL_INCLUDE_H
 
 #ifndef ACL_CLIENT_ONLY
@@ -18,28 +18,28 @@ typedef struct ACL_SQL_RES ACL_SQL_RES;
 typedef struct ACL_DB_POOL ACL_DB_POOL;
 
 typedef struct ACL_DB_INFO {
-	int   db_max;		/* Á¬½Ó³Ø×î´óÁ¬½ÓÊı */
-	char  db_addr[256];	/* Êı¾İ¿â·şÎñµØÖ· */
-	char  db_name[256];	/* Êı¾İ¿âÃû³Æ */
-	char  db_user[256];	/* Êı¾İ¿âÕÊºÅ */
-	char  db_pass[256];	/* ÕÊºÅÃÜÂë */
-	unsigned long db_flags;	/* (mysql) Á¬½Ó±êÖ¾Î» */
-	int   ping_inter;	/* Ì½²âÊı¾İ¿âÁ¬½ÓµÄÊ±¼ä¼ä¸ô */
-	int   timeout_inter;	/* Êı¾İ¿âÁ¬½ÓµÄ¿ÕÏĞ³¬Ê±Ê±¼ä */
-	int   auto_commit;	/* (mysql) ÊÇ·ñÆôÓÃ×Ô¶¯Ìá½»¹ı³Ì */
-	int   conn_timeout;	/* (mysql/null) Á¬½Ó³¬Ê±Ê±¼ä */
-	int   rw_timeout;	/* (mysql/null) IO¶ÁĞ´³¬Ê±Ê±¼ä */
-	int   buf_size;		/* (null) IO»º³åÇø´óĞ¡ */
-	int   debug_flag;	/* µ÷ÊÔ±êÖ¾Î» */
+	int   db_max;		/* è¿æ¥æ± æœ€å¤§è¿æ¥æ•° */
+	char  db_addr[256];	/* æ•°æ®åº“æœåŠ¡åœ°å€ */
+	char  db_name[256];	/* æ•°æ®åº“åç§° */
+	char  db_user[256];	/* æ•°æ®åº“å¸å· */
+	char  db_pass[256];	/* å¸å·å¯†ç  */
+	unsigned long db_flags;	/* (mysql) è¿æ¥æ ‡å¿—ä½ */
+	int   ping_inter;	/* æ¢æµ‹æ•°æ®åº“è¿æ¥çš„æ—¶é—´é—´éš” */
+	int   timeout_inter;	/* æ•°æ®åº“è¿æ¥çš„ç©ºé—²è¶…æ—¶æ—¶é—´ */
+	int   auto_commit;	/* (mysql) æ˜¯å¦å¯ç”¨è‡ªåŠ¨æäº¤è¿‡ç¨‹ */
+	int   conn_timeout;	/* (mysql/null) è¿æ¥è¶…æ—¶æ—¶é—´ */
+	int   rw_timeout;	/* (mysql/null) IOè¯»å†™è¶…æ—¶æ—¶é—´ */
+	int   buf_size;		/* (null) IOç¼“å†²åŒºå¤§å° */
+	int   debug_flag;	/* è°ƒè¯•æ ‡å¿—ä½ */
 
-	/* ÔÚÕæÊµÁ¬½ÓÊı¾İ¿âÖ®Ç°/ºóµ÷ÓÃÓÃ»§ÉèÖÃµÄ»Øµ÷º¯Êı, ´ËÏî¿ÉÒÔÉèÎª NULL,
-	 * Èç¹û db_before_connect/db_after_connect ·µ»Ø < 0 Ôò»áµ¼ÖÂ
-	 * acl_dbpool_peek ·µ»Ø NULL
+	/* åœ¨çœŸå®è¿æ¥æ•°æ®åº“ä¹‹å‰/åè°ƒç”¨ç”¨æˆ·è®¾ç½®çš„å›è°ƒå‡½æ•°, æ­¤é¡¹å¯ä»¥è®¾ä¸º NULL,
+	 * å¦‚æœ db_before_connect/db_after_connect è¿”å› < 0 åˆ™ä¼šå¯¼è‡´
+	 * acl_dbpool_peek è¿”å› NULL
 	 */
 	int  (*db_before_connect)(ACL_DB_HANDLE* db_handle, void *ctx);
 	int  (*db_after_connect)(ACL_DB_HANDLE* db_handle, void *ctx);
 
-	void *ctx;		/* db_before_connect/db_after_connect ²ÎÊıÖ®Ò» */
+	void *ctx;		/* db_before_connect/db_after_connect å‚æ•°ä¹‹ä¸€ */
 } ACL_DB_INFO;
 
 struct ACL_DB_HANDLE {
@@ -68,9 +68,9 @@ struct ACL_SQL_RES {
 
         /* for acl_iterator */
 
-	/* È¡µü´úÆ÷Í·º¯Êı */
+	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
 	const void *(*iter_head)(ACL_ITER*, struct ACL_SQL_RES*);
-	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
+	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
 	const void *(*iter_next)(ACL_ITER*, struct ACL_SQL_RES*);
 };
 
@@ -96,54 +96,54 @@ struct ACL_DB_POOL {
 
 /* in acl_dbpool.c */
 /**
- * ´´½¨Ò»¸öÊı¾İ¿âÁ¬½Ó³Ø
- * @param db_type {const char*} Êı¾İ¿âÀàĞÍÃû, Ä¿Ç°½öÖ§³Ö mysql
- * @param db_info {const ACL_DB_INFO*} ¼ÇÂ¼×ÅÓĞ¹ØÁ¬½ÓÊı¾İËùĞèÒªµÄĞÅÏ¢
- * @return {ACL_DB_POOL*} Ò»¸öÊı¾İ¿âÁ¬½Ó³Ø
+ * åˆ›å»ºä¸€ä¸ªæ•°æ®åº“è¿æ¥æ± 
+ * @param db_type {const char*} æ•°æ®åº“ç±»å‹å, ç›®å‰ä»…æ”¯æŒ mysql
+ * @param db_info {const ACL_DB_INFO*} è®°å½•ç€æœ‰å…³è¿æ¥æ•°æ®æ‰€éœ€è¦çš„ä¿¡æ¯
+ * @return {ACL_DB_POOL*} ä¸€ä¸ªæ•°æ®åº“è¿æ¥æ± 
  */
 ACL_API ACL_DB_POOL *acl_dbpool_create(const char *db_type, const ACL_DB_INFO *db_info);
 
 /**
- * Ïú»ÙÒ»¸öÊı¾İ¿âÁ¬½Ó³Ø
- * @param db_pool Êı¾İ¿âÁ¬½Ó³Ø¾ä±ú
+ * é”€æ¯ä¸€ä¸ªæ•°æ®åº“è¿æ¥æ± 
+ * @param db_pool æ•°æ®åº“è¿æ¥æ± å¥æŸ„
  */
 ACL_API void acl_dbpool_destroy(ACL_DB_POOL *db_pool);
 
 /**
- * ´ÓÁ¬½Ó³ØÖĞ»ñÈ¡Ò»¸öÁ¬½Ó¾ä±ú
- * @param db_pool {ACL_DB_POOL*} Êı¾İ¿âÁ¬½Ó³Ø¾ä±ú
- * @return {ACL_DB_HANDLE*} Êı¾İ¿âÁ¬½Ó¾ä±ú£¬Èç¹ûÎª¿ÕÔò±íÊ¾³ö´í»òÁ¬½Ó³ØÒÑÂú
+ * ä»è¿æ¥æ± ä¸­è·å–ä¸€ä¸ªè¿æ¥å¥æŸ„
+ * @param db_pool {ACL_DB_POOL*} æ•°æ®åº“è¿æ¥æ± å¥æŸ„
+ * @return {ACL_DB_HANDLE*} æ•°æ®åº“è¿æ¥å¥æŸ„ï¼Œå¦‚æœä¸ºç©ºåˆ™è¡¨ç¤ºå‡ºé”™æˆ–è¿æ¥æ± å·²æ»¡
  */
 ACL_API ACL_DB_HANDLE *acl_dbpool_peek(ACL_DB_POOL *db_pool);
 
 /**
- * ÊÖ¹¤¼ì²éÁ¬½Ó³ØµÄÃ¿¸öÁ¬½Ó?Ò»°ãÁ¬½Ó³ØÄÚ²¿»á¶¨ÆÚ¼ì²éÃ¿¸öÁ¬½Ó£¬
- * Ò²¿ÉÒÔÍ¨¹ı´Ëº¯ÊıÊÖ¹¤½øĞĞÇ¿ÖÆ¼ì²é
- * @param db_pool {ACL_DB_POOL*} Êı¾İ¿âÁ¬½Ó³Ø¾ä±ú
+ * æ‰‹å·¥æ£€æŸ¥è¿æ¥æ± çš„æ¯ä¸ªè¿æ¥?ä¸€èˆ¬è¿æ¥æ± å†…éƒ¨ä¼šå®šæœŸæ£€æŸ¥æ¯ä¸ªè¿æ¥ï¼Œ
+ * ä¹Ÿå¯ä»¥é€šè¿‡æ­¤å‡½æ•°æ‰‹å·¥è¿›è¡Œå¼ºåˆ¶æ£€æŸ¥
+ * @param db_pool {ACL_DB_POOL*} æ•°æ®åº“è¿æ¥æ± å¥æŸ„
  */
 ACL_API void acl_dbpool_check(ACL_DB_POOL *db_pool);
 
 /**
- * ½«Êı¾İ¿âÁ¬½Ó¾ä±úÊÍ·Å¸øÊı¾İ¿âÁ¬½Ó³Ø
- * @param db_handle {ACL_DB_HANDLE*} Êı¾İ¿âÁ¬½Ó¾ä±ú
+ * å°†æ•°æ®åº“è¿æ¥å¥æŸ„é‡Šæ”¾ç»™æ•°æ®åº“è¿æ¥æ± 
+ * @param db_handle {ACL_DB_HANDLE*} æ•°æ®åº“è¿æ¥å¥æŸ„
  */
 ACL_API void acl_dbpool_release(ACL_DB_HANDLE *db_handle);
 /**
- * ½«Êı¾İ¿âÁ¬½Ó×ª»»ÎªÊµ¼ÊµÄÊı¾İ¿âÁ¬½Ó¾ä±ú
- * @param db_handle {ACL_DB_HANDLE*} Êı¾İ¿âÁ¬½Ó¾ä±ú
- * @return void * Ê¹ÓÃÕßĞèÒª½«ÆäÇ¿ÖÆ×ª»»Îª×Ô¼ºËùÓÃµÄÊı¾İ¿âÁ¬½ÓÒıÇæ
+ * å°†æ•°æ®åº“è¿æ¥è½¬æ¢ä¸ºå®é™…çš„æ•°æ®åº“è¿æ¥å¥æŸ„
+ * @param db_handle {ACL_DB_HANDLE*} æ•°æ®åº“è¿æ¥å¥æŸ„
+ * @return void * ä½¿ç”¨è€…éœ€è¦å°†å…¶å¼ºåˆ¶è½¬æ¢ä¸ºè‡ªå·±æ‰€ç”¨çš„æ•°æ®åº“è¿æ¥å¼•æ“
  */
 ACL_API void *acl_dbpool_export(ACL_DB_HANDLE *db_handle);
 /**
- * µ±Ê¹ÓÃÕß×Ô¼º¼ì²âµ½¸ÃÊı¾İ¿âÁ¬½Ó³ö´íÊ±£¬¿ÉÒÔÍ¨¹ı´Ë½Ó¿ÚÇ¿ĞĞ¹Ø±Õ¸ÃÁ¬½Ó
- * @param db_handle {ACL_DB_HANDLE*} Êı¾İ¿âÁ¬½Ó¾ä±ú
+ * å½“ä½¿ç”¨è€…è‡ªå·±æ£€æµ‹åˆ°è¯¥æ•°æ®åº“è¿æ¥å‡ºé”™æ—¶ï¼Œå¯ä»¥é€šè¿‡æ­¤æ¥å£å¼ºè¡Œå…³é—­è¯¥è¿æ¥
+ * @param db_handle {ACL_DB_HANDLE*} æ•°æ®åº“è¿æ¥å¥æŸ„
  */
 ACL_API void acl_dbpool_close(ACL_DB_HANDLE *db_handle);
 
 /**
- * ÉèÖÃÁ¬½Ó³ØµÄ¶¨Ê±PING´¦Àíº¯Êı£¬Èç¹û²»ÉèÖÃ´ËÖµÔòÄÚ²¿²ÉÓÃÈ±Ê¡·½Ê½
- * @param db_pool {ACL_DB_POOL*} Êı¾İ¿âÁ¬½Ó³Ø¾ä±ú
- * @param ping_fn {int (*)(ACL_DB_HANDLE*)} Ì½²âÁ¬½Ó×´Ì¬µÄº¯ÊıÖ¸Õë
+ * è®¾ç½®è¿æ¥æ± çš„å®šæ—¶PINGå¤„ç†å‡½æ•°ï¼Œå¦‚æœä¸è®¾ç½®æ­¤å€¼åˆ™å†…éƒ¨é‡‡ç”¨ç¼ºçœæ–¹å¼
+ * @param db_pool {ACL_DB_POOL*} æ•°æ®åº“è¿æ¥æ± å¥æŸ„
+ * @param ping_fn {int (*)(ACL_DB_HANDLE*)} æ¢æµ‹è¿æ¥çŠ¶æ€çš„å‡½æ•°æŒ‡é’ˆ
  */
 ACL_API void acl_dbpool_set_ping(ACL_DB_POOL *db_pool, int (*ping_fn)(ACL_DB_HANDLE*));
 /*----------------------------------------------------------------------------*/

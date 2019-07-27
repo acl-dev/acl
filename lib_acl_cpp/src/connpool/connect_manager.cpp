@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/thread.hpp"
@@ -41,11 +41,11 @@ void connect_manager::bind_thread(bool yes)
 	thread_binding_ = yes;
 }
 
-// ·ÖÎöÒ»¸ö·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºIP:PORT[:MAX_CONN]
-// ·µ»ØÖµ < 0 ±íÊ¾·Ç·¨µÄµØÖ·
+// åˆ†æä¸€ä¸ªæœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORT[:MAX_CONN]
+// è¿”å›å€¼ < 0 è¡¨ç¤ºéæ³•çš„åœ°å€
 static int check_addr(const char* addr, string& buf, size_t default_count)
 {
-	// Êı¾İ¸ñÊ½£ºIP:PORT[:CONNECT_COUNT]
+	// æ•°æ®æ ¼å¼ï¼šIP:PORT[:CONNECT_COUNT]
 	ACL_ARGV* tokens = acl_argv_split(addr, ":|");
 	if (tokens->argc < 2) {
 		logger_error("invalid addr: %s", addr);
@@ -108,7 +108,7 @@ void connect_manager::init(const char* default_addr, const char* addr_list,
 			conn_timeout, rw_timeout);
 	}
 
-	// ´´½¨È±Ê¡·şÎñÁ¬½Ó³Ø¶ÔÏó£¬¸Ã¶ÔÏóÒ»Í¬·ÅÈë×ÜµÄÁ¬½Ó³Ø¼¯ÈºÖĞ
+	// åˆ›å»ºç¼ºçœæœåŠ¡è¿æ¥æ± å¯¹è±¡ï¼Œè¯¥å¯¹è±¡ä¸€åŒæ”¾å…¥æ€»çš„è¿æ¥æ± é›†ç¾¤ä¸­
 	if (default_addr != NULL && *default_addr != 0) {
 		logger("default_pool: %s", default_addr);
 		int max = check_addr(default_addr, default_addr_, count);
@@ -131,7 +131,7 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 		return;
 	}
 
-	// ´´½¨Á¬½Ó³Ø·şÎñ¼¯Èº
+	// åˆ›å»ºè¿æ¥æ± æœåŠ¡é›†ç¾¤
 	char* buf   = acl_mystrdup(addr_list);
 	char* addrs = acl_mystr_trim(buf);
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,");
@@ -414,14 +414,14 @@ connect_pool* connect_manager::peek(void)
 
 	conns_pools& pools = get_pools_by_id(id);
 	service_size = pools.pools.size();
-	// Èç¹ûµ±Ç°Á¬½Ó³Ø¶ÔÏó»¹Î´³õÊ¼»¯£¬ÔòÎªÆä´´½¨ËùÓĞÁ¬½Ó³Ø
+	// å¦‚æœå½“å‰è¿æ¥æ± å¯¹è±¡è¿˜æœªåˆå§‹åŒ–ï¼Œåˆ™ä¸ºå…¶åˆ›å»ºæ‰€æœ‰è¿æ¥æ± 
 	if (service_size == 0) {
 		create_pools_for(pools.pools);
 		service_size = pools.pools.size();
 		assert(service_size > 0);
 	}
 
-	// ±éÀúËùÓĞµÄÁ¬½Ó³Ø£¬ÕÒ³öÒ»¸ö¿ÉÓÃµÄÁ¬½Ó³Ø
+	// éå†æ‰€æœ‰çš„è¿æ¥æ± ï¼Œæ‰¾å‡ºä¸€ä¸ªå¯ç”¨çš„è¿æ¥æ± 
 	for(size_t i = 0; i < service_size; i++) {
 		n = pools.conns_next++ % service_size;
 		pool = pools.pools[n];
@@ -510,9 +510,9 @@ bool connect_manager::start_monitor(connect_monitor* monitor)
 
 	monitor_ = monitor;
 
-	// ÉèÖÃ¼ì²âÏß³ÌÎª·Ç·ÖÀëÄ£Ê½£¬ÒÔ±ãÓÚÖ÷Ïß³Ì¿ÉÒÔµÈ´ı¼ì²âÏß³ÌÍË³ö
+	// è®¾ç½®æ£€æµ‹çº¿ç¨‹ä¸ºéåˆ†ç¦»æ¨¡å¼ï¼Œä»¥ä¾¿äºä¸»çº¿ç¨‹å¯ä»¥ç­‰å¾…æ£€æµ‹çº¿ç¨‹é€€å‡º
 	monitor_->set_detachable(false);
-	// Æô¶¯¼ì²âÏß³Ì
+	// å¯åŠ¨æ£€æµ‹çº¿ç¨‹
 	monitor_->start();
 
 	return true;
@@ -523,13 +523,13 @@ connect_monitor* connect_manager::stop_monitor(bool graceful /* = true */)
 	connect_monitor* monitor = monitor_;
 
 	if (monitor) {
-		// ÏÈ½«Á¬½Ó¼ì²â¶ÔÏóÖÃ NULL
+		// å…ˆå°†è¿æ¥æ£€æµ‹å¯¹è±¡ç½® NULL
 		monitor_ = NULL;
 
-		// ÏÈÍ¨Öª¼ì²âÏß³ÌÍ£Ö¹¼ì²â¹ı³Ì
+		// å…ˆé€šçŸ¥æ£€æµ‹çº¿ç¨‹åœæ­¢æ£€æµ‹è¿‡ç¨‹
 		monitor->stop(graceful);
 
-		// ÔÙµÈ´ı¼ì²âÏß³ÌÍË³ö
+		// å†ç­‰å¾…æ£€æµ‹çº¿ç¨‹é€€å‡º
 		monitor->wait();
 	}
 

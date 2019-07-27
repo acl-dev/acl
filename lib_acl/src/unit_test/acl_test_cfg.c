@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -35,9 +35,9 @@
 
 #endif
 
-/* ¾Ö²¿±äÁ¿ */
+/* å±€éƒ¨å˜é‡ */
 
-/* ÈİÄÉËùÓĞÓĞĞ§ÅäÖÃĞĞµÄ¶¯Ì¬Êı×éÖ¸Õë */
+/* å®¹çº³æ‰€æœ‰æœ‰æ•ˆé…ç½®è¡Œçš„åŠ¨æ€æ•°ç»„æŒ‡é’ˆ */
 ACL_ARRAY *var_aut_line_array = NULL;
 
 int var_aut_valid_line_idx = 0;
@@ -45,7 +45,7 @@ int var_aut_valid_line_idx = 0;
 int var_aut_log_level = 0;
 
 /*--------------------------------------------------------------------------*/
-/* ·ÖÎöÅäÖÃÎÄ¼şÖĞµÄµÚËÄ¸ö²ÎÊı, ½«Æä½øĞĞ·Ö½â²¢´æÈë¶¯Ì¬Êı×éÖ®ÖĞ */
+/* åˆ†æé…ç½®æ–‡ä»¶ä¸­çš„ç¬¬å››ä¸ªå‚æ•°, å°†å…¶è¿›è¡Œåˆ†è§£å¹¶å­˜å…¥åŠ¨æ€æ•°ç»„ä¹‹ä¸­ */
 ACL_ARRAY *aut_parse_args_list(const char *str_in)
 {
 	const char *myname = "aut_parse_args_list";
@@ -65,23 +65,23 @@ ACL_ARRAY *aut_parse_args_list(const char *str_in)
 
 	len = (int) strlen("=");
 	while (1) {
-		/* ÕÒµ½Ã¿Ò»²ÎÊıÏî, ·Ö¸ô·ûÎª¶ººÅ */
+		/* æ‰¾åˆ°æ¯ä¸€å‚æ•°é¡¹, åˆ†éš”ç¬¦ä¸ºé€—å· */
 		ptr_item = acl_mystrtok(&pstr, ",");
 		if (ptr_item == NULL)
 			break;
 
-		/* É¾³ı±äÁ¿ÃûÇ°µÄ¿Õ¸ñºÍ tab */
+		/* åˆ é™¤å˜é‡åå‰çš„ç©ºæ ¼å’Œ tab */
 		SKIP_WHILE((*ptr_item == ' ' || *ptr_item == '\t'), ptr_item);
 		pname = ptr_item;
 
-		/* ÏÈÕÒµ½µÈÓÚºÅ·Ö¸ô·û */
+		/* å…ˆæ‰¾åˆ°ç­‰äºå·åˆ†éš”ç¬¦ */
 		pvalue = strstr(ptr_item, "=");
 		if (pvalue == NULL) /* not found '=' */
 			continue;
 
 		ptr = pvalue;
 
-		/* É¾³ıµÈºÅ×ó±ßµÄ¿Õ¸ñ»ò tab */
+		/* åˆ é™¤ç­‰å·å·¦è¾¹çš„ç©ºæ ¼æˆ– tab */
 		SKIP_WHILE_DEC((*ptr == ' ' || *ptr == '\t'), ptr);
 		if (ptr < pvalue)
 			*(++ptr) = 0;
@@ -89,17 +89,17 @@ ACL_ARRAY *aut_parse_args_list(const char *str_in)
 		*pvalue = 0;
 		pvalue += len; /* skip '=' */
 
-		/* É¾³ıµÈºÅÓÒ±ßµÄ¿Õ¸ñºÍ¡tab */
+		/* åˆ é™¤ç­‰å·å³è¾¹çš„ç©ºæ ¼å’Œî“ºab */
 		SKIP_WHILE((*pvalue == ' ' || *pvalue == '\t'), pvalue);
 		if (*pvalue == 0)
 			continue;
 
-		/* ·ÖÅäÒ»¸ö²ÎÊıÏî */
+		/* åˆ†é…ä¸€ä¸ªå‚æ•°é¡¹ */
 		arg_item = (AUT_ARG_ITEM *) acl_mycalloc(1, sizeof(AUT_ARG_ITEM));
 		arg_item->name = acl_mystrdup(pname);
 		arg_item->value = acl_mystrdup(pvalue);
 
-		/* °Ñ¸Ã²ÎÊıÏî¼ÓÈëµ½¶¯Ì¬Êı×éÖ®ÖĞ */
+		/* æŠŠè¯¥å‚æ•°é¡¹åŠ å…¥åˆ°åŠ¨æ€æ•°ç»„ä¹‹ä¸­ */
 		if (acl_array_append(argvs_array, (void *) arg_item) < 0)
 			aut_log_fatal("%s(%d): append to array error(%s)",
 				myname, __LINE__, acl_last_strerror(tbuf, sizeof(tbuf)));
@@ -125,32 +125,32 @@ void aut_free_args_list(ACL_ARRAY *a)
 	acl_array_free(a, free_arg_item);
 }
 
-/*------------------------- ËùÓĞµÄÓĞĞ§ÅäÖÃĞĞÈë¿Ú ---------------------------*/
+/*------------------------- æ‰€æœ‰çš„æœ‰æ•ˆé…ç½®è¡Œå…¥å£ ---------------------------*/
 
 static void __parse_cfg_line(const ACL_CFG_LINE *line)
 {
 /*
- * ÃüÁîº¯ÊıÃû³Æ|Ô¤²â½á¹û[0:±íÊ¾³É¹¦, 1:±íÊ¾Ê§°Ü]|²ÎÊı¸öÊı|²ÎÊıÁĞ±í[name=²ÎÊı1, name=²ÎÊı2...]
- * test_line->value[0]: ÃüÁîº¯ÊıÃû³Æ
- * test_line->value[1]: Ô¤²â½á¹û
- * test_line->value[2]: ²ÎÊı¸öÊı
- * test_line->value[3]: ²ÎÊıÁĞ±í
- * ËµÃ÷: ÒªÇóÇ° 3 ¸ö²ÎÊı±ØĞëÓĞ, ºóÒ»¸ö²ÎÊı¿ÉÑ¡
+ * å‘½ä»¤å‡½æ•°åç§°|é¢„æµ‹ç»“æœ[0:è¡¨ç¤ºæˆåŠŸ, 1:è¡¨ç¤ºå¤±è´¥]|å‚æ•°ä¸ªæ•°|å‚æ•°åˆ—è¡¨[name=å‚æ•°1, name=å‚æ•°2...]
+ * test_line->value[0]: å‘½ä»¤å‡½æ•°åç§°
+ * test_line->value[1]: é¢„æµ‹ç»“æœ
+ * test_line->value[2]: å‚æ•°ä¸ªæ•°
+ * test_line->value[3]: å‚æ•°åˆ—è¡¨
+ * è¯´æ˜: è¦æ±‚å‰ 3 ä¸ªå‚æ•°å¿…é¡»æœ‰, åä¸€ä¸ªå‚æ•°å¯é€‰
  */
 
-	/* ÓÅÏÈ²éÕÒÄÚ²¿¶¨ÒåµÄÓĞĞ§ÅäÖÃÑ¡Ïî */
+	/* ä¼˜å…ˆæŸ¥æ‰¾å†…éƒ¨å®šä¹‰çš„æœ‰æ•ˆé…ç½®é€‰é¡¹ */
 	if (aut_cfg_add_general_line(line) == 0)
 		return;
 
-	/* ÔÙ²éÕÒÊÇ·ñÊÇÄÚ²¿ÃüÁîÑ¡Ïî */
+	/* å†æŸ¥æ‰¾æ˜¯å¦æ˜¯å†…éƒ¨å‘½ä»¤é€‰é¡¹ */
 	if (aut_add_inner_cmd(line))
 		return;
 
-	/* ºÍÓ¦ÓÃÏà¹ØµÄÃüÁîÑ¡ÏîµÄ´¦Àí */
+	/* å’Œåº”ç”¨ç›¸å…³çš„å‘½ä»¤é€‰é¡¹çš„å¤„ç† */
 	(void) aut_add_outer_cmd(line);
 }
 
-/* ³õÊ¼»¯ */
+/* åˆå§‹åŒ– */
 static void __init(void)
 {
 	const char *myname = "__init";
@@ -167,7 +167,7 @@ static void __init(void)
 	var_aut_valid_line_idx = 0;
 }
 
-/* ½«ÅäÖÃÎÄ¼ş¶ÁÈëÄÚ´æ²¢½øĞĞ·Ö½â */
+/* å°†é…ç½®æ–‡ä»¶è¯»å…¥å†…å­˜å¹¶è¿›è¡Œåˆ†è§£ */
 int aut_cfg_parse(const char *pathname)
 {
 	const char *myname = "aut_cfg_parse";
@@ -206,7 +206,7 @@ int aut_cfg_parse(const char *pathname)
 }
 
 /*--------------------------------------------------------------------------*/
-/* ´òÓ¡Êä³öÅäÖÃÎÄ¼şÖĞµÄÓĞĞ§ÅäÖÃĞĞ */
+/* æ‰“å°è¾“å‡ºé…ç½®æ–‡ä»¶ä¸­çš„æœ‰æ•ˆé…ç½®è¡Œ */
 int aut_cfg_print(void)
 {
 	const char *myname = "aut_cfg_print";
@@ -234,7 +234,7 @@ int aut_cfg_print(void)
 			if (arg == NULL)
 				break;
 
-			/* ÅĞ¶ÏÊÇ·ñÊÇµÚÒ»¸ö²ÎÊıÏî */
+			/* åˆ¤æ–­æ˜¯å¦æ˜¯ç¬¬ä¸€ä¸ªå‚æ•°é¡¹ */
 			if (first_line_arg) {
 				printf("%s=%s", arg->name, arg->value);
 				first_line_arg = 0;

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 static acl::string __queue("greeting");
 static acl::string __jobpre("test_job");

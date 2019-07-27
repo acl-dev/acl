@@ -1,4 +1,4 @@
-#ifndef	__GID_INCLUDE_H__
+﻿#ifndef	__GID_INCLUDE_H__
 #define	__GID_INCLUDE_H__
 
 #include "lib_acl.h"

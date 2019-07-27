@@ -1,4 +1,4 @@
-/* Do not edit: automatically built by gen_rec.awk. */
+﻿/* Do not edit: automatically built by gen_rec.awk. */
 
 #ifndef	__ham_AUTO_H
 #define	__ham_AUTO_H

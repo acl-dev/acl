@@ -1,4 +1,4 @@
-= Beanstalk Protocol =
+﻿= Beanstalk Protocol =
 
 Protocol
 --------

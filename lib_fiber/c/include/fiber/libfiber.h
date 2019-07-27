@@ -1,4 +1,4 @@
-#ifndef LIBFIBER_INCLUDE_H
+﻿#ifndef LIBFIBER_INCLUDE_H
 #define LIBFIBER_INCLUDE_H
 
 #include "fiber_base.h"

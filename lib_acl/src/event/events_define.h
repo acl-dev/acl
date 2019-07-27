@@ -1,4 +1,4 @@
-
+﻿
 #ifndef	__EVENTS_DEFINE_INCLUDE_H__
 #define	__EVENTS_DEFINE_INCLUDE_H__
 

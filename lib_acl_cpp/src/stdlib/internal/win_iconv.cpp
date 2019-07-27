@@ -1,4 +1,4 @@
-/*
+﻿/*
  * iconv library implemented with Win32 API.
  *
  * This file is placed in the public domain.

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file md_wrap.h
  * 
  * \brief Message digest wrappers.

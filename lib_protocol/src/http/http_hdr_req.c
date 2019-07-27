@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -125,7 +125,7 @@ static void cache_init(void)
 }
 #endif
 
-/* Éú³ÉÒ»¸öÐÂµÄ HTTP_HDR_REQ Êý¾Ý½á¹¹ */
+/* ç”Ÿæˆä¸€ä¸ªæ–°çš„ HTTP_HDR_REQ æ•°æ®ç»“æž„ */
 
 HTTP_HDR_REQ *http_hdr_req_new(void)
 {
@@ -297,7 +297,7 @@ HTTP_HDR_REQ *http_hdr_req_clone(const HTTP_HDR_REQ* hdr_req)
 	return hh;
 }
 
-/* ÊÍ·ÅÒ»¸ö HTTP_HDR_REQ ½á¹¹ */
+/* é‡Šæ”¾ä¸€ä¸ª HTTP_HDR_REQ ç»“æž„ */
 
 void http_hdr_req_free(HTTP_HDR_REQ *hh)
 {
@@ -341,7 +341,7 @@ void http_hdr_req_reset(HTTP_HDR_REQ *hh)
 
 /*----------------------------------------------------------------------------*/
 
-/* ½« cookie ÐÐÖÐµÄ name=value ¶ÔÖÃÈë¹þÏ£±íÖÐ, ÒÔ±ãÓÚ²éÑ¯ */
+/* å°† cookie è¡Œä¸­çš„ name=value å¯¹ç½®å…¥å“ˆå¸Œè¡¨ä¸­, ä»¥ä¾¿äºŽæŸ¥è¯¢ */
 
 static void __add_cookie_item(ACL_HTABLE *table, const char *data)
 {
@@ -401,10 +401,10 @@ static void __add_cookie_item(ACL_HTABLE *table, const char *data)
 	TRUNC_BLANK(ptr);
 	name = ptr;
 
-	/* ÓÐÐ©Õ¾µãµÄCOOKIE±È½ÏÈõ£¬ÈçºÍÑ¶µÄreg.hexun.com£¬COOKIEÃû»áÓÐÖØ¸´
-	 * µÄÇé¿ö£¬ËùÒÔ±ØÐëÅÐ¶ÏÒ»ÏÂ£¬²»±ØÖØ¸´´æ´¢ÏàÍ¬Ãû×ÖµÄCOOKIEÖµ£¬¼´Èç¹û
-	 * ³öÏÖÖØ¸´COOKIEÃû£¬ÔòÖ»´æ´¢µÚÒ»¸ö£¬ÕâÑù¾Í±ÜÃâÁË²ÉÓÃ¹þÏ£·½Ê½´æ´¢µÄ
-	 * Â©ÄÚ´æµÄÏÖÏó·¢Éú¡£--- zsx, 2008.1.8
+	/* æœ‰äº›ç«™ç‚¹çš„COOKIEæ¯”è¾ƒå¼±ï¼Œå¦‚å’Œè®¯çš„reg.hexun.comï¼ŒCOOKIEåä¼šæœ‰é‡å¤
+	 * çš„æƒ…å†µï¼Œæ‰€ä»¥å¿…é¡»åˆ¤æ–­ä¸€ä¸‹ï¼Œä¸å¿…é‡å¤å­˜å‚¨ç›¸åŒåå­—çš„COOKIEå€¼ï¼Œå³å¦‚æžœ
+	 * å‡ºçŽ°é‡å¤COOKIEåï¼Œåˆ™åªå­˜å‚¨ç¬¬ä¸€ä¸ªï¼Œè¿™æ ·å°±é¿å…äº†é‡‡ç”¨å“ˆå¸Œæ–¹å¼å­˜å‚¨çš„
+	 * æ¼å†…å­˜çš„çŽ°è±¡å‘ç”Ÿã€‚--- zsx, 2008.1.8
 	 */
 	if (acl_htable_find(table, name) != NULL) {
 		RETURN;
@@ -425,8 +425,8 @@ static void __add_cookie_item(ACL_HTABLE *table, const char *data)
 			acl_vstring_sprintf_append(str, "=%s", ptr);
 	}
 
-	/* ½«ÕæÊµµÄ´æ´¢Êý¾ÝµÄÇøÓòÄÚ´æÒý³ö, Í¬Ê±½«Íâ°ü½á¹¹ÄÚ´æÊÍ·Å,
-	 * POSTFIXÕæÊÇ¸öºÃ¶«Î÷:) ---zsx
+	/* å°†çœŸå®žçš„å­˜å‚¨æ•°æ®çš„åŒºåŸŸå†…å­˜å¼•å‡º, åŒæ—¶å°†å¤–åŒ…ç»“æž„å†…å­˜é‡Šæ”¾,
+	 * POSTFIXçœŸæ˜¯ä¸ªå¥½ä¸œè¥¿:) ---zsx
 	 */
 	value = acl_vstring_export(str);
 
@@ -456,10 +456,10 @@ int http_hdr_req_cookies_parse(HTTP_HDR_REQ *hh)
 	if (entry == NULL)
 		return 0;
 
-	/* bugfix: ÔÚ´´½¨¹þÏ£±íÊ±´Ë´¦²»Ó¦ÉèÖÃ ACL_HTABLE_FLAG_KEY_REUSE ±êÖ¾Î»£¬
-	 * Èç¹ûÉèÖÃÁË´Ë±êÖ¾£¬ÔòÔÚ __add_cookie_item ÖÐµ÷ÓÃ acl_htable_enter Ê±£¬
-	 * »á½« name ÖµµÄÄÚ´æ½»¸ø htable£¬µ«ËæºóÔÚºê RETURN Ê±È´µ÷ÓÃÁËÊÍ·ÅÊý×é
-	 * µÄº¯Êý acl_argv_free(argv)£¬½« name ËùÊôµÄÊý×éÄÚ´æÒ»Æð¸øÊÍ·ÅÁË
+	/* bugfix: åœ¨åˆ›å»ºå“ˆå¸Œè¡¨æ—¶æ­¤å¤„ä¸åº”è®¾ç½® ACL_HTABLE_FLAG_KEY_REUSE æ ‡å¿—ä½ï¼Œ
+	 * å¦‚æžœè®¾ç½®äº†æ­¤æ ‡å¿—ï¼Œåˆ™åœ¨ __add_cookie_item ä¸­è°ƒç”¨ acl_htable_enter æ—¶ï¼Œ
+	 * ä¼šå°† name å€¼çš„å†…å­˜äº¤ç»™ htableï¼Œä½†éšåŽåœ¨å® RETURN æ—¶å´è°ƒç”¨äº†é‡Šæ”¾æ•°ç»„
+	 * çš„å‡½æ•° acl_argv_free(argv)ï¼Œå°† name æ‰€å±žçš„æ•°ç»„å†…å­˜ä¸€èµ·ç»™é‡Šæ”¾äº†
 	 * ---zsx, 2014.5.13
 	 */
 	if (hh->cookies_table == NULL)
@@ -474,7 +474,7 @@ int http_hdr_req_cookies_parse(HTTP_HDR_REQ *hh)
 		acl_msg_fatal("%s, %s(%d): htable create error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
 
-	/* ·Ö¸ôÊý¾Ý¶Î */
+	/* åˆ†éš”æ•°æ®æ®µ */
 	argv = acl_argv_split(entry->value, ";");
 	acl_foreach(iter, argv) {
 		ptr = (const char*) iter.data;
@@ -504,9 +504,9 @@ const char *http_hdr_req_cookie_get(HTTP_HDR_REQ *hh, const char *name)
 	return acl_htable_find(hh->cookies_table, name);
 }
 
-/*--------------- ·ÖÎöHTTPÐ­ÒéÇëÇóÍ·ÖÐµÚÒ»ÐÐÊý¾ÝÐÅÏ¢µÄº¯Êý¼¯ºÏ   -------------*/
+/*--------------- åˆ†æžHTTPåè®®è¯·æ±‚å¤´ä¸­ç¬¬ä¸€è¡Œæ•°æ®ä¿¡æ¯çš„å‡½æ•°é›†åˆ   -------------*/
 
-/* ½«HTTPÇëÇóÐÐÖÐµÄ name=value ¶ÔÖÃÈë¹þÏ£±íÖÐ, ÒÔ±ãÓÚ²éÑ¯ */
+/* å°†HTTPè¯·æ±‚è¡Œä¸­çš„ name=value å¯¹ç½®å…¥å“ˆå¸Œè¡¨ä¸­, ä»¥ä¾¿äºŽæŸ¥è¯¢ */
 static void __add_request_item(ACL_HTABLE *table, const char *data)
 {
 	/* data format: name=value */
@@ -523,8 +523,8 @@ static void __add_request_item(ACL_HTABLE *table, const char *data)
 
 	name = acl_argv_index(argv, 0);
 
-	/* ÏÈÅÐ¶ÏÊÇ·ñÒÑ¾­´æÔÚ¸Ã±äÁ¿Ãû£¬·ÀÖ¹³öÏÖÖØ¸´ÏÖÏó£¬
-	 * ±ÜÃâ²ÉÓÃ¹þÏ£´æ´¢Ê±µÄÄÚ´æÐ¹Â© ---zsx, 2008.1.8
+	/* å…ˆåˆ¤æ–­æ˜¯å¦å·²ç»å­˜åœ¨è¯¥å˜é‡åï¼Œé˜²æ­¢å‡ºçŽ°é‡å¤çŽ°è±¡ï¼Œ
+	 * é¿å…é‡‡ç”¨å“ˆå¸Œå­˜å‚¨æ—¶çš„å†…å­˜æ³„æ¼ ---zsx, 2008.1.8
 	 */
 	if (acl_htable_find(table, name) != NULL) {
 		acl_argv_free(argv);  /* bugfix: add by zsx, 2009-11-11 */
@@ -543,7 +543,7 @@ static void __add_request_item(ACL_HTABLE *table, const char *data)
 	acl_argv_free(argv);
 }
 
-/* Èç¹ûÃ»ÓÐ Host ÊµÌå£¬ÔòÐèÒª´ÓÊ×ÐÐµÄURL·ÖÎöÒÔÆÚ»ñµÃHost */
+/* å¦‚æžœæ²¡æœ‰ Host å®žä½“ï¼Œåˆ™éœ€è¦ä»Žé¦–è¡Œçš„URLåˆ†æžä»¥æœŸèŽ·å¾—Host */
 
 /* data: "http://www.gmail.com:443/path/test.cgi?name=value&name2=value2 */
 
@@ -586,11 +586,11 @@ static void __strip_url_path(ACL_VSTRING *buf, const char *url)
 
 	argv = acl_argv_split(url, "/");
 
-	/* xxx: ±ØÐë½«ÏÂÃæÁ½ÐÐµÄ³õÊ¼»¯·ÅÔÚ acl_argv_split µÄºóÃæ£¬ÒòÎª url
-	 * ËùÖ¸ÄÚÈÝÓÐ¿ÉÄÜÓë buf ÖÐµÄ»º³åÇøµØÖ·ÏàÍ¬£¬²Î¼û __strip_url_path
-	 * µÄÁ½´¦µ÷ÓÃ£»ÁíÍâ£¬ÔÚµ÷ÓÃ ACL_VSTRING_RESET ºó»¹±ØÐëµ÷ÓÃ
-	 * ACL_VSTRING_TERMINATE£¬·ñÔò ACL_VSTRING_RESET ½öÒÆ¶¯Ö¸ÕëÎ»ÖÃ£¬
-	 * ²¢²»»á½«³õÊ¼Î»ÖÃ¸³ '\0'
+	/* xxx: å¿…é¡»å°†ä¸‹é¢ä¸¤è¡Œçš„åˆå§‹åŒ–æ”¾åœ¨ acl_argv_split çš„åŽé¢ï¼Œå› ä¸º url
+	 * æ‰€æŒ‡å†…å®¹æœ‰å¯èƒ½ä¸Ž buf ä¸­çš„ç¼“å†²åŒºåœ°å€ç›¸åŒï¼Œå‚è§ __strip_url_path
+	 * çš„ä¸¤å¤„è°ƒç”¨ï¼›å¦å¤–ï¼Œåœ¨è°ƒç”¨ ACL_VSTRING_RESET åŽè¿˜å¿…é¡»è°ƒç”¨
+	 * ACL_VSTRING_TERMINATEï¼Œå¦åˆ™ ACL_VSTRING_RESET ä»…ç§»åŠ¨æŒ‡é’ˆä½ç½®ï¼Œ
+	 * å¹¶ä¸ä¼šå°†åˆå§‹ä½ç½®èµ‹ '\0'
 	 */
 	ACL_VSTRING_RESET(buf);
 	ACL_VSTRING_TERMINATE(buf);
@@ -750,7 +750,7 @@ int http_hdr_req_line_parse(HTTP_HDR_REQ *hh)
 	}
 
 #if 0
-	/* È¥µô¸ÃÅÐ¶Ï£¬ÒÔÔÊÐíÉÏ²ãÓ¦ÓÃ¿ÉÒÔÀ©Õ¹ HTTP ÇëÇó·½·¨ */
+	/* åŽ»æŽ‰è¯¥åˆ¤æ–­ï¼Œä»¥å…è®¸ä¸Šå±‚åº”ç”¨å¯ä»¥æ‰©å±• HTTP è¯·æ±‚æ–¹æ³• */
 	if (strcasecmp(entry->name, "POST") != 0
 	    && strcasecmp(entry->name, "GET") != 0
 	    && strcasecmp(entry->name, "CONNECT") != 0
@@ -853,7 +853,7 @@ int http_hdr_req_rewrite2(HTTP_HDR_REQ *hh, const char *url)
 		if (purl == NULL)
 			purl = "/";
 	} else {
-		phost = hh->host;  /* Èç¹ûURLÖÐÃ»ÓÐ http[s]:// ÔòÄ¬ÈÏ²ÉÓÃÔ­ Host ×Ö¶Î */
+		phost = hh->host;  /* å¦‚æžœURLä¸­æ²¡æœ‰ http[s]:// åˆ™é»˜è®¤é‡‡ç”¨åŽŸ Host å­—æ®µ */
 		purl = url;
 	}
 	host[0] = 0;
@@ -862,7 +862,7 @@ int http_hdr_req_rewrite2(HTTP_HDR_REQ *hh, const char *url)
 	if (ptr)
 		*ptr = 0;
 
-	/* ½«ÐÂµÄÖ÷»úÐÅÏ¢¸²¸Ç¾ÉÐÅÏ¢ */
+	/* å°†æ–°çš„ä¸»æœºä¿¡æ¯è¦†ç›–æ—§ä¿¡æ¯ */
 	ACL_SAFE_STRNCPY(hh->host, host, sizeof(hh->host));
 
 	buf = acl_vstring_alloc(256);
@@ -912,14 +912,14 @@ HTTP_HDR_REQ *http_hdr_req_rewrite(const HTTP_HDR_REQ *hh, const char *url)
 	return hdr_req;
 }
 
-/* È¡µÃHTTPÇëÇóµÄ·½·¨ */
+/* å–å¾—HTTPè¯·æ±‚çš„æ–¹æ³• */
 
 const char *http_hdr_req_method(const HTTP_HDR_REQ *hh)
 {
 	return hh->method;
 }
 
-/* »ñÈ¡ÇëÇóURLÖÐÄ³¸öÇëÇó×Ö¶ÎµÄÊý¾Ý, ÈçÈ¡: /cgi-bin/n1=v1&n2=v2 ÖÐµÄ n2µÄÖµv2 */
+/* èŽ·å–è¯·æ±‚URLä¸­æŸä¸ªè¯·æ±‚å­—æ®µçš„æ•°æ®, å¦‚å–: /cgi-bin/n1=v1&n2=v2 ä¸­çš„ n2çš„å€¼v2 */
 
 const char *http_hdr_req_param(const HTTP_HDR_REQ *hh, const char *name)
 {
@@ -1001,8 +1001,8 @@ int http_hdr_req_range(const HTTP_HDR_REQ *hdr_req, http_off_t *range_from,
 	if (range_to == NULL)
 		acl_msg_fatal("%s(%d): range_to null", myname, __LINE__);
 
-	/* Êý¾Ý¸ñÊ½: Range: bytes={range_from}-{range_to}
-	 * »ò: Range: bytes={range_from}-
+	/* æ•°æ®æ ¼å¼: Range: bytes={range_from}-{range_to}
+	 * æˆ–: Range: bytes={range_from}-
 	 */
 	ptr = http_hdr_entry_value(&hdr_req->hdr, "Range");
 	if (ptr == NULL)

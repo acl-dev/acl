@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "http_servlet.h"
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
@@ -22,10 +22,10 @@ bool http_servlet::doUnknown(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// ·¢ËÍ http ÏìÓ¦Í·
+	// å‘é€ http å“åº”å¤´
 	if (res.sendHeader() == false)
 		return false;
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -42,11 +42,11 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 {
 	bool keep_alive = req.isKeepAlive();
 
-	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(keep_alive)		// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
-		.setChunkedTransferEncoding(true);	// chunked ´«ÊäÄ£Ê½
+	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(keep_alive)		// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
+		.setChunkedTransferEncoding(true);	// chunked ä¼ è¾“æ¨¡å¼
 
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 
 	if (res.write("first line\r\nsecond line\r\nthird line\r\n\r\n") == false)
 	{
@@ -96,7 +96,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		}
 	}
 
-	// ×îºóÒ»ĞĞ²»Ğ´ \r\n
+	// æœ€åä¸€è¡Œä¸å†™ \r\n
 	if (res.write("Bye") == false)
 	{
 		logger_error("write error!");

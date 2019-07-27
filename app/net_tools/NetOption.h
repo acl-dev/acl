@@ -1,23 +1,23 @@
-#pragma once
+ï»¿#pragma once
 
 
-// CNetOption ¶Ô»°¿ò
+// CNetOption å¯¹è¯æ¡†
 
 class CNetOption : public CDialog
 {
 	DECLARE_DYNAMIC(CNetOption)
 
 public:
-	CNetOption(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	CNetOption(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~CNetOption();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_OPTION };
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
+	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

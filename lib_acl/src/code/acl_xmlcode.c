@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -113,7 +113,7 @@ static void xml_decode_init(void)
 		acl_token_tree_add(__token_tree, __tab[i].txt,
 			ACL_TOKEN_F_STOP, &__tab[i]);
 
-	/* ½ø³ÌÍË³öÊ±µ÷ÓÃ html_decode_free ÊÍ·ÅÄÚ´æ×ÊÔ´ */
+	/* è¿›ç¨‹é€€å‡ºæ—¶è°ƒç”¨ html_decode_free é‡Šæ”¾å†…å­˜èµ„æº */
 	atexit(xml_decode_free);
 }
 

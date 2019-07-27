@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <iostream>
 #include "util.h"
 #include "https_client.h"

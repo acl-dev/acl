@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/mime/mime_base64.hpp"
@@ -188,7 +188,7 @@ bool mail_body::save_relative(const char* html, size_t hlen,
 	out.append("\r\n");
 	out.format_append("--%s\r\n", boundary_.c_str());
 
-	// µİ¹éÒ»²ã£¬µ÷ÓÃÉú³É alternative ¸ñÊ½Êı¾İ
+	// é€’å½’ä¸€å±‚ï¼Œè°ƒç”¨ç”Ÿæˆ alternative æ ¼å¼æ•°æ®
 	mail_body body(charset_.c_str(), transfer_encoding_.c_str());
 	bool ret = body.save_alternative(html, hlen, plain, plen, out);
 	if (ret == false) {

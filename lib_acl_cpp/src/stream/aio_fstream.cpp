@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stream/fstream.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -23,15 +23,15 @@ aio_fstream::aio_fstream(aio_handle* handle, ACL_FILE_HANDLE fd,
 	ACL_VSTREAM* vstream = acl_vstream_fhopen(fd, oflags);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// ���û���� hook_error ���� handle �������첽������,
-	// ͬʱ hook �رռ���ʱ�ص�����
+	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
+	// 同时 hook 关闭及超时回调过程
 	hook_error();
 
-	// ֻ�е������ӳɹ���ſ� hook IO ��д״̬
-	// hook ���ص�����
+	// 只有当流连接成功后才可 hook IO 读写状态
+	// hook 读回调过程
 	hook_read();
 
-	// hook д�ص�����
+	// hook 写回调过程
 	hook_write();
 }
 
@@ -52,17 +52,17 @@ bool aio_fstream::open(const char* path, unsigned int oflags, unsigned int mode)
 	}
 	stream_ = acl_aio_open(handle_->get_handle(), fp);
 
-	// ���û���� hook_error ���� handle �������첽������,
-	// ͬʱ hook �رռ���ʱ�ص�����
+	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
+	// 同时 hook 关闭及超时回调过程
 	hook_error();
 
-	// ֻ�е������ӳɹ���ſ� hook IO ��д״̬
-	// hook ���ص�����
+	// 只有当流连接成功后才可 hook IO 读写状态
+	// hook 读回调过程
 	if ((oflags & (O_RDONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
 		hook_read();
 	}
 
-	// hook д�ص�����
+	// hook 写回调过程
 	if ((oflags & (O_WRONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
 		hook_write();
 	}

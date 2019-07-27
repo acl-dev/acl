@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/connpool/tcp_sender.hpp"

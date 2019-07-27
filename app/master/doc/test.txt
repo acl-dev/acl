@@ -1,4 +1,4 @@
-POST /?cmd=list HTTP/1.0
+﻿POST /?cmd=list HTTP/1.0
 Content-Length: 25
 Connection: keep-alive
 Content-Type: text/json

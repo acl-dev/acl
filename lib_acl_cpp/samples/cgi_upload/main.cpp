@@ -1,4 +1,4 @@
-// main.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// main.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 #include "stdafx.h"
 #include <assert.h>
@@ -27,28 +27,28 @@ public:
 	{
 	}
 
-	// GET ·½·¨
+	// GET æ–¹æ³•
 	virtual bool doGet(HttpServletRequest& req, HttpServletResponse& res)
 	{
 		return doPost(req, res);
 	}
 
-	// POST ·½·¨
+	// POST æ–¹æ³•
 	virtual bool doPost(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// Èç¹û session Ïî²»´æÔÚ£¬ÔòÉèÖÃ
+		// å¦‚æœ session é¡¹ä¸å­˜åœ¨ï¼Œåˆ™è®¾ç½®
 #if 0
 		const char* sid = req.getSession().getAttribute("sid");
 		if (*sid == 0)
 			req.getSession().setAttribute("sid", "xxxxxx");
 #endif
 
-		// ´´½¨ HTTP ÏìÓ¦Í·
+		// åˆ›å»º HTTP å“åº”å¤´
                 res.addCookie("name1", "value1");
 		res.addCookie("name2", "value2", ".test.com", "/", 3600 * 24);
-//		res.setStatus(400);  // ¿ÉÒÔÉèÖÃ·µ»ØµÄ×´Ì¬Âë
+//		res.setStatus(400);  // å¯ä»¥è®¾ç½®è¿”å›çš„çŠ¶æ€ç 
 
-		// Á½ÖÖ·½Ê½¶¼¿ÉÒÔÉèÖÃ×Ö·û¼¯
+		// ä¸¤ç§æ–¹å¼éƒ½å¯ä»¥è®¾ç½®å­—ç¬¦é›†
 		if (0)
 			res.setContentType("text/xml; charset=gb2312");
 		else
@@ -57,8 +57,8 @@ public:
 			res.setCharacterEncoding("gb2312");
 		}
 
-		// »ñµÃ HTTP ÇëÇóµÄÊı¾İÀàĞÍ£¬Õı³£µÄ²ÎÊıÀàĞÍ£¬¼´ name&value ·½Ê½
-		// »¹ÊÇ MIME Êı¾İÀàĞÍ£¬»¹ÊÇÊı¾İÁ÷ÀàĞÍ
+		// è·å¾— HTTP è¯·æ±‚çš„æ•°æ®ç±»å‹ï¼Œæ­£å¸¸çš„å‚æ•°ç±»å‹ï¼Œå³ name&value æ–¹å¼
+		// è¿˜æ˜¯ MIME æ•°æ®ç±»å‹ï¼Œè¿˜æ˜¯æ•°æ®æµç±»å‹
 		http_request_t request_type = req.getRequestType();
 		if (request_type == HTTP_REQUEST_NORMAL)
 			return doParams(req, res);
@@ -70,18 +70,18 @@ public:
 
 	bool doResponse(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// »ñµÃä¯ÀÀÆ÷´«À´µÄ cookie Öµ
+		// è·å¾—æµè§ˆå™¨ä¼ æ¥çš„ cookie å€¼
 		const char* cookie1 = req.getCookieValue("name1");
 		const char* cookie2 = req.getCookieValue("name2");
 
-		// »ñµÃ sid session Öµ
+		// è·å¾— sid session å€¼
 #if 0
 		const char* sid = req.getSession().getAttribute("sid");
 #else
 		const char* sid = "test_sid";
 #endif
 
-		// ´´½¨ xml ¸ñÊ½µÄÊı¾İÌå
+		// åˆ›å»º xml æ ¼å¼çš„æ•°æ®ä½“
 		xml1 body;
 		body.get_root().add_child("root", true)
 			.add_child("content_type", true)
@@ -123,16 +123,16 @@ public:
 		string buf;
 		body.build_xml(buf);
 
-		// ·¢ËÍ http ÏìÓ¦Í·
+		// å‘é€ http å“åº”å¤´
 		if (res.sendHeader() == false)
 			return false;
-		// ·¢ËÍ http ÏìÓ¦Ìå
+		// å‘é€ http å“åº”ä½“
 		if (res.getOutputStream().write(buf) == -1)
 			return false;
 		return true;
 	}
 
-	// GET ·½Ê½»ò POST ·½Ê½ÇÒÂú×ã£º
+	// GET æ–¹å¼æˆ– POST æ–¹å¼ä¸”æ»¡è¶³ï¼š
 	// Content-Type: application/x-www-form-urlencoded
 	bool doParams(HttpServletRequest& req, HttpServletResponse& res)
 	{
@@ -142,11 +142,11 @@ public:
 		return doResponse(req, res);
 	}
 
-	// POST ·½Ê½ÇÒÂú×ã£º
+	// POST æ–¹å¼ä¸”æ»¡è¶³ï¼š
 	// Content-Type: multipart/form-data; boundary=xxx
 	bool doUpload(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// ÏÈ»ñµÃ Content-Type ¶ÔÓ¦µÄ http_ctype ¶ÔÏó
+		// å…ˆè·å¾— Content-Type å¯¹åº”çš„ http_ctype å¯¹è±¡
 		http_mime* mime = req.getHttpMime();
 		if (mime == NULL)
 		{
@@ -154,7 +154,7 @@ public:
 			return false;
 		}
 
-		// »ñµÃÊı¾İÌåµÄ³¤¶È
+		// è·å¾—æ•°æ®ä½“çš„é•¿åº¦
 		long long int len = req.getContentLength();
 		if (len <= 0)
 		{
@@ -162,7 +162,7 @@ public:
 			return false;
 		}
 
-		// »ñµÃÊäÈëÁ÷
+		// è·å¾—è¾“å…¥æµ
 		istream& in = req.getInputStream();
 		char  buf[8192];
 		int   ret;
@@ -172,12 +172,12 @@ public:
 		ofstream out;
 		out.open_write(filepath);
 
-		// ÉèÖÃÔ­Ê¼ÎÄ¼ş´æÈëÂ·¾¶
+		// è®¾ç½®åŸå§‹æ–‡ä»¶å­˜å…¥è·¯å¾„
 		mime->set_saved_path(filepath);
 
 		size_t k;
 
-		// ¶ÁÈ¡ HTTP ¿Í»§¶ËÇëÇóÊı¾İ
+		// è¯»å– HTTP å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®
 		while (len > 0)
 		{
 			k = (size_t) len > sizeof(buf)
@@ -192,7 +192,7 @@ public:
 
 			len -= ret;
 
-			// ½«¶ÁµÃµ½µÄÊı¾İÊäÈëÖÁ½âÎöÆ÷½øĞĞ½âÎö
+			// å°†è¯»å¾—åˆ°çš„æ•°æ®è¾“å…¥è‡³è§£æå™¨è¿›è¡Œè§£æ
 			if (!finish && mime->update(buf, ret) == true)
 				finish = true;
 		}
@@ -207,7 +207,7 @@ public:
 
 		string path;
 
-		// ±éÀúËùÓĞµÄ MIME ½áµã£¬ÕÒ³öÆäÖĞÎªÎÄ¼ş½áµãµÄ²¿·Ö½øĞĞ×ª´¢
+		// éå†æ‰€æœ‰çš„ MIME ç»“ç‚¹ï¼Œæ‰¾å‡ºå…¶ä¸­ä¸ºæ–‡ä»¶ç»“ç‚¹çš„éƒ¨åˆ†è¿›è¡Œè½¬å‚¨
 		const std::list<http_mime_node*>& nodes = mime->get_nodes();
 		std::list<http_mime_node*>::const_iterator cit = nodes.begin();
 		for (; cit != nodes.end(); ++cit)
@@ -233,8 +233,8 @@ public:
 				else if (strcmp(name, "file3") == 0)
 					file3_ = filename;
 
-				// ÓĞµÄä¯ÀÀÆ÷£¨ÈçIE£©ÉÏ´«ÎÄ¼şÊ±»á´ø×ÅÎÄ¼şÂ·¾¶£¬ËùÒÔ
-				// ĞèÒªÏÈ½«Â·¾¶È¥µô
+				// æœ‰çš„æµè§ˆå™¨ï¼ˆå¦‚IEï¼‰ä¸Šä¼ æ–‡ä»¶æ—¶ä¼šå¸¦ç€æ–‡ä»¶è·¯å¾„ï¼Œæ‰€ä»¥
+				// éœ€è¦å…ˆå°†è·¯å¾„å»æ‰
 				filename = acl_safe_basename(filename);
 #ifdef WIN32
 				path.format("var\\%s", filename);
@@ -245,15 +245,15 @@ public:
 			}
 		}
 
-		// ²éÕÒÉÏÔØµÄÄ³¸öÎÄ¼ş²¢×ª´¢
+		// æŸ¥æ‰¾ä¸Šè½½çš„æŸä¸ªæ–‡ä»¶å¹¶è½¬å‚¨
 		const http_mime_node* node = mime->get_node("file1");
 		if (node && node->get_mime_type() == HTTP_MIME_FILE)
 		{
 			const char* ptr = node->get_filename();
 			if (ptr)
 			{
-				// ÓĞµÄä¯ÀÀÆ÷£¨ÈçIE£©ÉÏ´«ÎÄ¼şÊ±»á´ø×ÅÎÄ¼şÂ·¾¶£¬ËùÒÔ
-				// ĞèÒªÏÈ½«Â·¾¶È¥µô
+				// æœ‰çš„æµè§ˆå™¨ï¼ˆå¦‚IEï¼‰ä¸Šä¼ æ–‡ä»¶æ—¶ä¼šå¸¦ç€æ–‡ä»¶è·¯å¾„ï¼Œæ‰€ä»¥
+				// éœ€è¦å…ˆå°†è·¯å¾„å»æ‰
 				ptr = acl_safe_basename(ptr);
 #ifdef WIN32
 				path.format(".\\var\\1_%s", ptr);
@@ -266,7 +266,7 @@ public:
 		return doResponse(req, res);
 	}
 
-	// POST ·½Ê½ÇÒÂú×ã£º
+	// POST æ–¹å¼ä¸”æ»¡è¶³ï¼š
 	// Content-Type: application/octet-stream
 	bool doOctetStream(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -293,7 +293,7 @@ static void do_run(socket_stream* stream)
 	servlet.doRun();
 }
 
-// ·şÎñÆ÷·½Ê½ÔËĞĞÊ±µÄ·şÎñÀà
+// æœåŠ¡å™¨æ–¹å¼è¿è¡Œæ—¶çš„æœåŠ¡ç±»
 class master_service : public master_proc
 {
 public:
@@ -306,17 +306,17 @@ protected:
 	}
 };
 
-// WEB ·şÎñÄ£Ê½
+// WEB æœåŠ¡æ¨¡å¼
 static void do_alone(void)
 {
 	master_service service;
 	acl::log::stdout_open(true);
 	const char* addr = "0.0.0.0:8081";
 	printf("listen: %s ...\r\n", addr);
-	service.run_alone(addr, NULL, 0);  // µ¥¶ÀÔËĞĞ·½Ê½
+	service.run_alone(addr, NULL, 0);  // å•ç‹¬è¿è¡Œæ–¹å¼
 }
 
-// WEB CGI Ä£Ê½
+// WEB CGI æ¨¡å¼
 static void do_cgi(void)
 {
 	do_run(NULL);
@@ -330,7 +330,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 #endif
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 		do_alone();
 	else

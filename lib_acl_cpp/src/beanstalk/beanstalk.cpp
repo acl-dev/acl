@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <stdarg.h>
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -26,7 +26,7 @@ beanstalk::beanstalk(const char* addr, int conn_timeout,
 	acl_lowercase(addr_);
 	errbuf_[0] = 0;
 	tube_used_ = NULL;
-	// ·ÅÖÃÈ±Ê¡¶ÓÁĞ
+	// æ”¾ç½®ç¼ºçœé˜Ÿåˆ—
 	tubes_watched_.push_back(acl_mystrdup("default"));
 }
 
@@ -138,9 +138,9 @@ unsigned beanstalk::beanstalk_watch(const char* tube)
 	unsigned n = (unsigned) atoi(tokens->argv[1]);
 	acl_argv_free(tokens);
 
-	// Èç¹û·şÎñÆ÷·µ»ØËù¹Ø×¢µÄ¶ÓÁĞÊıÎª 0£¬¿Ï¶¨ÊÇ³ö´íÁË£¬ÒòÎªÖÁÉÙ»¹ÓĞÒ»¸ö
-	// È±Ê¡¶ÓÁĞ£ºdefault£¬ËùÒÔ´ËÊ±ĞèÒª¹Ø±ÕÁ¬½Ó£¬ÒÔ¾¡Á¿Ïû³ıÓë±¾Á¬½ÓÏà¹Ø
-	// µÄ´íÎó£¬ÏÂÒ»¸öÃüÁî»á×Ô¶¯½øĞĞÖØÁ¬²Ù×÷ÒÔ»Ö¸´²Ù×÷¹ı³Ì
+	// å¦‚æœæœåŠ¡å™¨è¿”å›æ‰€å…³æ³¨çš„é˜Ÿåˆ—æ•°ä¸º 0ï¼Œè‚¯å®šæ˜¯å‡ºé”™äº†ï¼Œå› ä¸ºè‡³å°‘è¿˜æœ‰ä¸€ä¸ª
+	// ç¼ºçœé˜Ÿåˆ—ï¼šdefaultï¼Œæ‰€ä»¥æ­¤æ—¶éœ€è¦å…³é—­è¿æ¥ï¼Œä»¥å°½é‡æ¶ˆé™¤ä¸æœ¬è¿æ¥ç›¸å…³
+	// çš„é”™è¯¯ï¼Œä¸‹ä¸€ä¸ªå‘½ä»¤ä¼šè‡ªåŠ¨è¿›è¡Œé‡è¿æ“ä½œä»¥æ¢å¤æ“ä½œè¿‡ç¨‹
 	if (n == 0) {
 		logger_error("'watch %s' error(%s), tube watched is 0",
 			line.c_str(), tube);
@@ -161,7 +161,7 @@ ACL_ARGV* beanstalk::beanstalk_request(const string& cmdline,
 			return NULL;
 		}
 
-		// ÏÈĞ´ÈëÊı¾İÍ·
+		// å…ˆå†™å…¥æ•°æ®å¤´
 		if (conn_.write(cmdline) == -1) {
 			conn_.close();
 			if (retry_ && !retried) {
@@ -174,7 +174,7 @@ ACL_ARGV* beanstalk::beanstalk_request(const string& cmdline,
 			return NULL;
 		}
 
-		// Èç¹ûÓĞÊı¾İÌå£¬ÔòĞ´ÈëÊı¾İÌå
+		// å¦‚æœæœ‰æ•°æ®ä½“ï¼Œåˆ™å†™å…¥æ•°æ®ä½“
 		if (data && len > 0 && (conn_.write(data, len) == -1
 			|| conn_.write("\r\n", 2) == -1)) {
 
@@ -242,9 +242,9 @@ void beanstalk::close(void)
 bool beanstalk::use(const char* tube)
 {
 	if (tube_used_) {
-		// ÔÚ beanstalk_request Ç°ÊÍ·Åµô¸ÃÖµ£¬¿ÉÒÔ±ÜÃâÔÚ
-		// beanstalk_request ´¥·¢ beanstalk_use ¹ı³Ì£¬ËäÈ»
-		// ´¥·¢¸Ã¹ı³Ì²¢Ã»ÓĞº¦´¦£¬µ«È´¶àÁËÒ»´ÎÍ¨Ñ¶¹ı³Ì
+		// åœ¨ beanstalk_request å‰é‡Šæ”¾æ‰è¯¥å€¼ï¼Œå¯ä»¥é¿å…åœ¨
+		// beanstalk_request è§¦å‘ beanstalk_use è¿‡ç¨‹ï¼Œè™½ç„¶
+		// è§¦å‘è¯¥è¿‡ç¨‹å¹¶æ²¡æœ‰å®³å¤„ï¼Œä½†å´å¤šäº†ä¸€æ¬¡é€šè®¯è¿‡ç¨‹
 		acl_myfree(tube_used_);
 		tube_used_ = NULL;
 	}
@@ -268,7 +268,7 @@ bool beanstalk::use(const char* tube)
 
 	acl_argv_free(tokens);
 
-	// ·ÅÔÚºóÃæ£¬ÔÚµÚÒ»´ÎÊ¹ÓÃÊ±¿ÉÒÔ±ÜÃâ¶àÒ»´ÎÍ¨Ñ¶½»»¥
+	// æ”¾åœ¨åé¢ï¼Œåœ¨ç¬¬ä¸€æ¬¡ä½¿ç”¨æ—¶å¯ä»¥é¿å…å¤šä¸€æ¬¡é€šè®¯äº¤äº’
 	tube_used_ = acl_mystrdup(tube);
 	return true;
 }
@@ -333,7 +333,7 @@ unsigned long long beanstalk::format_put(const char* fmt, ...)
 
 unsigned beanstalk::watch(const char* tube)
 {
-	// ÏÈ¼ì²éÊÇ·ñÒÑ¾­¼à¿ØÏàÍ¬¶ÓÁĞ
+	// å…ˆæ£€æŸ¥æ˜¯å¦å·²ç»ç›‘æ§ç›¸åŒé˜Ÿåˆ—
 	std::vector<char*>::iterator it = tubes_watched_.begin();
 	for (; it != tubes_watched_.end(); ++it) {
 		if (strcmp(*it, tube) == 0) {
@@ -359,16 +359,16 @@ unsigned beanstalk::watch(const char* tube)
 	unsigned n = (unsigned) atoi(tokens->argv[1]);
 	acl_argv_free(tokens);
 
-	// Èç¹û·şÎñÆ÷·µ»ØËù¹Ø×¢µÄ¶ÓÁĞÊıÎª 0£¬¿Ï¶¨ÊÇ³ö´íÁË£¬ÒòÎªÖÁÉÙ»¹ÓĞÒ»¸ö
-	// È±Ê¡¶ÓÁĞ£ºdefault£¬ËùÒÔ´ËÊ±ĞèÒª¹Ø±ÕÁ¬½Ó£¬ÒÔ¾¡Á¿Ïû³ıÓë±¾Á¬½ÓÏà¹Ø
-	// µÄ´íÎó£¬ÏÂÒ»¸öÃüÁî»á×Ô¶¯½øĞĞÖØÁ¬²Ù×÷ÒÔ»Ö¸´²Ù×÷¹ı³Ì
+	// å¦‚æœæœåŠ¡å™¨è¿”å›æ‰€å…³æ³¨çš„é˜Ÿåˆ—æ•°ä¸º 0ï¼Œè‚¯å®šæ˜¯å‡ºé”™äº†ï¼Œå› ä¸ºè‡³å°‘è¿˜æœ‰ä¸€ä¸ª
+	// ç¼ºçœé˜Ÿåˆ—ï¼šdefaultï¼Œæ‰€ä»¥æ­¤æ—¶éœ€è¦å…³é—­è¿æ¥ï¼Œä»¥å°½é‡æ¶ˆé™¤ä¸æœ¬è¿æ¥ç›¸å…³
+	// çš„é”™è¯¯ï¼Œä¸‹ä¸€ä¸ªå‘½ä»¤ä¼šè‡ªåŠ¨è¿›è¡Œé‡è¿æ“ä½œä»¥æ¢å¤æ“ä½œè¿‡ç¨‹
 	if (n == 0) {
 		logger_error("'%s' error, tube watched is 0", cmdline.c_str());
 		errbuf_ = "watching";
 		close();
 	}
 
-	// Ìí¼Ó½ø¼à¿Ø¼¯ºÏÖĞ
+	// æ·»åŠ è¿›ç›‘æ§é›†åˆä¸­
 	else if (it == tubes_watched_.end()) {
 		tubes_watched_.push_back(acl_mystrdup(tube));
 	}
@@ -453,9 +453,9 @@ unsigned beanstalk::ignore_one(const char* tube)
 	unsigned n = (unsigned) atoi(tokens->argv[1]);
 	acl_argv_free(tokens);
 
-	// Èç¹û·şÎñÆ÷·µ»ØËù¹Ø×¢µÄ¶ÓÁĞÊıÎª 0£¬¿Ï¶¨ÊÇ³ö´íÁË£¬ÒòÎªÖÁÉÙ»¹ÓĞÒ»¸ö
-	// È±Ê¡¶ÓÁĞ£ºdefault£¬ËùÒÔ´ËÊ±ĞèÒª¹Ø±ÕÁ¬½Ó£¬ÒÔ¾¡Á¿Ïû³ıÓë±¾Á¬½ÓÏà¹Ø
-	// µÄ´íÎó£¬ÏÂÒ»¸öÃüÁî»á×Ô¶¯½øĞĞÖØÁ¬²Ù×÷ÒÔ»Ö¸´²Ù×÷¹ı³Ì
+	// å¦‚æœæœåŠ¡å™¨è¿”å›æ‰€å…³æ³¨çš„é˜Ÿåˆ—æ•°ä¸º 0ï¼Œè‚¯å®šæ˜¯å‡ºé”™äº†ï¼Œå› ä¸ºè‡³å°‘è¿˜æœ‰ä¸€ä¸ª
+	// ç¼ºçœé˜Ÿåˆ—ï¼šdefaultï¼Œæ‰€ä»¥æ­¤æ—¶éœ€è¦å…³é—­è¿æ¥ï¼Œä»¥å°½é‡æ¶ˆé™¤ä¸æœ¬è¿æ¥ç›¸å…³
+	// çš„é”™è¯¯ï¼Œä¸‹ä¸€ä¸ªå‘½ä»¤ä¼šè‡ªåŠ¨è¿›è¡Œé‡è¿æ“ä½œä»¥æ¢å¤æ“ä½œè¿‡ç¨‹
 	if (n == 0) {
 		logger_error("'%s' error, tube watched is 0", cmdline.c_str());
 		errbuf_ = "no_watching";
@@ -466,7 +466,7 @@ unsigned beanstalk::ignore_one(const char* tube)
 
 unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 {
-	buf.clear(); // ËäÈ»¶Á²Ù×÷¹ı³ÌÒ²»áÇå¿Õ»º´æ
+	buf.clear(); // è™½ç„¶è¯»æ“ä½œè¿‡ç¨‹ä¹Ÿä¼šæ¸…ç©ºç¼“å­˜
 	string cmdline(128);
 	if (timeout >= 0) {
 		cmdline.format("reserve-with-timeout %d\r\n", timeout);
@@ -508,7 +508,7 @@ unsigned long long beanstalk::reserve(string& buf, int timeout /* = -1 */)
 		return 0;
 	}
 
-	// ¶ÁÈ¡¹æ¶¨µÄ×Ö½ÚÊı
+	// è¯»å–è§„å®šçš„å­—èŠ‚æ•°
 	if (!conn_.read(buf, n, true)) {
 		logger_error("reserve read body failed");
 		errbuf_ = "read";
@@ -606,7 +606,7 @@ bool beanstalk::touch(unsigned long long id)
 
 unsigned long long beanstalk::peek_fmt(string& buf, const char* fmt, ...)
 {
-	buf.clear(); // ËäÈ»¶Á²Ù×÷¹ı³ÌÒ²»áÇå¿Õ»º´æ
+	buf.clear(); // è™½ç„¶è¯»æ“ä½œè¿‡ç¨‹ä¹Ÿä¼šæ¸…ç©ºç¼“å­˜
 
 	string cmdline(128);
 	va_list ap;
@@ -640,7 +640,7 @@ unsigned long long beanstalk::peek_fmt(string& buf, const char* fmt, ...)
 		return 0;
 	}
 
-	// ¶ÁÈ¡¹æ¶¨µÄ×Ö½ÚÊı
+	// è¯»å–è§„å®šçš„å­—èŠ‚æ•°
 	if (!conn_.read(buf, n, true)) {
 		logger_error("peek read body failed");
 		errbuf_ = "read";
@@ -703,7 +703,7 @@ int beanstalk::kick(unsigned n)
 
 bool beanstalk::list_tube_used(string& buf)
 {
-	buf.clear(); // ËäÈ»¶Á²Ù×÷¹ı³ÌÒ²»áÇå¿Õ»º´æ
+	buf.clear(); // è™½ç„¶è¯»æ“ä½œè¿‡ç¨‹ä¹Ÿä¼šæ¸…ç©ºç¼“å­˜
 
 	string cmdline(128);
 	cmdline.format("list-tube-used\r\n");
@@ -727,7 +727,7 @@ bool beanstalk::list_tube_used(string& buf)
 
 bool beanstalk::list_tubes_fmt(string& buf, const char* fmt, ...)
 {
-	buf.clear(); // ËäÈ»¶Á²Ù×÷¹ı³ÌÒ²»áÇå¿Õ»º´æ
+	buf.clear(); // è™½ç„¶è¯»æ“ä½œè¿‡ç¨‹ä¹Ÿä¼šæ¸…ç©ºç¼“å­˜
 
 	string cmdline(128);
 	va_list ap;
@@ -756,7 +756,7 @@ bool beanstalk::list_tubes_fmt(string& buf, const char* fmt, ...)
 		return false;
 	}
 
-	// ¶ÁÈ¡¹æ¶¨µÄ×Ö½ÚÊı
+	// è¯»å–è§„å®šçš„å­—èŠ‚æ•°
 	if (!conn_.read(buf, n, true)) {
 		logger_error("peek read body failed");
 		errbuf_ = "read";

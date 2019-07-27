@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "fiber/lib_fiber.hpp"
 
 class CFiberListener : public acl::fiber

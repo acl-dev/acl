@@ -1,4 +1,4 @@
-/*++
+﻿/*++
  * NAME
  *	auto_clnt 3
  * SUMMARY

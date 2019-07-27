@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 struct master_config_req_t;
 struct master_config_res_t;

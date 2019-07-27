@@ -1,4 +1,4 @@
-#ifndef	ACL_THREADS_PARAMS_INCLUDE_H
+﻿#ifndef	ACL_THREADS_PARAMS_INCLUDE_H
 #define	ACL_THREADS_PARAMS_INCLUDE_H
 
 #include "../stdlib/acl_define.h"

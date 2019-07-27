@@ -1,4 +1,4 @@
-// xml.cpp : �������̨Ӧ�ó������ڵ㡣
+﻿// xml.cpp : 定义控制台应用程序的入口点。
 //
 #include "stdafx.h"
 #include <list>
@@ -62,11 +62,11 @@ static void test(void)
 
 	//////////////////////////////////////////////////////////////////////
 
-	const char* s2 = "<html><head>Title\r\n</head><body>��λͬѧ��\r\n"
-		"���¿���ͳ����Ϊ20�գ������λͬѧ��19���°�֮ǰ���콫������Ҫ���ߵ������Ҳ����쵼����ͨ\r\n"
-		"�������ڲ����޸Ŀ��ڡ�\r\n"
-		"�����뱾��������١��¼١����ٵ�ͬѧ�����ʼ��������쵼������ת������������лл��λͬѧ��ϡ�\r\n"
-		"���ڿ�����δ�յ������ʼ����Ҳ��Ž����տ����ϸ�ִ�в������κ��޸ġ�</body></html>\r\n";
+	const char* s2 = "<html><head>Title\r\n</head><body>各位同学：\r\n"
+		"本月考勤统计日为20日，烦请各位同学在19日下班之前尽快将个人需要申诉的事由找部门领导审批通\r\n"
+		"过。逾期不再修改考勤。\r\n"
+		"另烦请本月有请年假、事假、病假的同学补发邮件给部门领导审批并转发给行政部。谢谢各位同学配合。\r\n"
+		"如在考勤日未收到以上邮件，我部门将按照考勤严格执行不再做任何修改。</body></html>\r\n";
 	xml.update("<dummy_root>");
 	xml.update(s2);
 	xml.update("</dummy_root>");
@@ -204,7 +204,7 @@ static void test2(void)
 	acl::xml body;
 	body.get_root().add_child("test", true)
 		.add_attr("mail", "\"zsxxsz1\" zsxxsz1@test.com")
-		.add_attr("title", "��<��>��\'��</test>�й���\"���й���\\\"")
+		.add_attr("title", "中<国>人\'，</test>中国人\"，中国人\\\"")
 		.add_attr("from", "\"zsxxsz2\" zsxxsz2@test.com");
 	acl::string buf;
 	body.build_xml(buf);

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "global/global.h"
 #include "global/passwd_crypt.h"
 #include "net_store.h"
@@ -135,7 +135,7 @@ bool net_store::set_key(const char* name, const char* value)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³ÌÖĞÔËĞĞ
+// ä¸»çº¿ç¨‹ä¸­è¿è¡Œ
 
 void net_store::rpc_onover()
 {
@@ -147,7 +147,7 @@ void net_store::rpc_onover()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³ÌÖĞÔËĞĞ
+// å­çº¿ç¨‹ä¸­è¿è¡Œ
 
 static const char* CREATE_MAIL_TBL =
 "create table mail_tbl\r\n"
@@ -203,7 +203,7 @@ void net_store::save_mail_db(acl::db_handle& db)
 {
 	acl::string sql;
 
-	// ÏÈÉ¾³ıÔ­À´ËùÓĞµÄ¼ÇÂ¼
+	// å…ˆåˆ é™¤åŸæ¥æ‰€æœ‰çš„è®°å½•
 	sql.format("delete from mail_tbl");
 	db.sql_update(sql.c_str());
 
@@ -225,7 +225,7 @@ void net_store::save_mail_db(acl::db_handle& db)
 	acl_argv_free(tokens);
 	db.escape_string(buf.c_str(), recipients_.length(), recipients);
 
-	// ÃÜÂëĞèÒª¼ÓÃÜ´æ´¢
+	// å¯†ç éœ€è¦åŠ å¯†å­˜å‚¨
 	char* pass_crypted = passwd_crypt(pass.c_str());
 	sql.format("insert into mail_tbl(smtp_addr, smtp_port, pop3_addr,"
 		" pop3_port, user, pass, recipients)"
@@ -278,7 +278,7 @@ void net_store::load_mail_db(acl::db_handle& db)
 	ptr = (*first_row)["pass"];
 	if (ptr)
 	{
-		// ¶Ô¼ÓÃÜµÄÃÜÂëĞèÒªÏÈ½âÃÜ
+		// å¯¹åŠ å¯†çš„å¯†ç éœ€è¦å…ˆè§£å¯†
 		char* pass_plain = passwd_decrypt(ptr);
 		if (pass_plain)
 		{

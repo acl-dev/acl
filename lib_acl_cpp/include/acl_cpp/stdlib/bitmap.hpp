@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "noncopyable.hpp"
 
 namespace acl {
@@ -7,76 +7,76 @@ class bitmap : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param buf {const void*} Ô´Êı¾İÄÚ´æÎ»Ó³ÉäÇø
-	 * @param len {size_} buf Î»Ó³ÉäÄÚ´æÇøÖĞ±»ÖÃÎ»µÄÊıÁ¿
+	 * æ„é€ å‡½æ•°
+	 * @param buf {const void*} æºæ•°æ®å†…å­˜ä½æ˜ å°„åŒº
+	 * @param len {size_} buf ä½æ˜ å°„å†…å­˜åŒºä¸­è¢«ç½®ä½çš„æ•°é‡
 	 */
 	bitmap(const void* buf, size_t len);
 
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param len {size_t} ×î´óÈİÄÉµÄÎ»Ó³ÉäµÄÊıÁ¿
+	 * æ„é€ å‡½æ•°
+	 * @param len {size_t} æœ€å¤§å®¹çº³çš„ä½æ˜ å°„çš„æ•°é‡
 	 */
 	bitmap(size_t len);
 
 	~bitmap();
 
 	/**
-	 * ½«Ëù¸øÊıÖµÓ³ÉäÔÚÎ»¼¯ºÏÖĞ
+	 * å°†æ‰€ç»™æ•°å€¼æ˜ å°„åœ¨ä½é›†åˆä¸­
 	 * @param n {size_t}
-	 * @return {bool} ·µ»Ø true ±íÊ¾Ìí¼Ó³É¹¦£¬·ñÔò±íÊ¾¸ÃÖµÔ½½ç»òÒÑ¾­´æÔÚ
+	 * @return {bool} è¿”å› true è¡¨ç¤ºæ·»åŠ æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºè¯¥å€¼è¶Šç•Œæˆ–å·²ç»å­˜åœ¨
 	 */
 	bool bit_set(size_t n);
 
 	/**
-	 * ÅĞ¶ÏËù¸øÊı¾İÊÇ·ñÒÑ¾­±»ÉèÖÃÔÚÎ»Ó³ÉäÖĞ
+	 * åˆ¤æ–­æ‰€ç»™æ•°æ®æ˜¯å¦å·²ç»è¢«è®¾ç½®åœ¨ä½æ˜ å°„ä¸­
 	 * @param n {size_t}
-	 * @return {bool} ÅĞ¶ÏÖ¸¶¨ÊıÖµÊÇ·ñ´æÔÚÓÚÎ»Ó³Éä¼¯ºÏÖĞ
+	 * @return {bool} åˆ¤æ–­æŒ‡å®šæ•°å€¼æ˜¯å¦å­˜åœ¨äºä½æ˜ å°„é›†åˆä¸­
 	 */
 	bool bit_isset(size_t n);
 
 	/**
-	 * ½«Ö¸¶¨ÊıÖµ´ÓÎ»¼¯ºÏÖĞÈ¥³ı
+	 * å°†æŒ‡å®šæ•°å€¼ä»ä½é›†åˆä¸­å»é™¤
 	 * @param n {size_t}
-	 * @return {bool} ·µ»Ø false ±íÊ¾¸ÃÖµÔ½½ç»ò²»´æÔÚÓÚÎ»¼¯ºÏÖĞ
+	 * @return {bool} è¿”å› false è¡¨ç¤ºè¯¥å€¼è¶Šç•Œæˆ–ä¸å­˜åœ¨äºä½é›†åˆä¸­
 	 */
 	bool bit_unset(size_t n);
 
 	/**
-	 * ½«bitmapĞÅÏ¢¿½±´µ½bufÖĞ
-	 * @param buf {void*}´æ·Å¿½±´½á¹û
-	 * @param len {size_t} bufµÄ×î´ó³¤¶È
-	 * @return {size_t} ·µ»Ø³É¹¦¿½±´µÄÄÚ´æ³¤¶È£¬·µ»Ø 0 ±íÊ¾ buf Ì«Ğ¡
+	 * å°†bitmapä¿¡æ¯æ‹·è´åˆ°bufä¸­
+	 * @param buf {void*}å­˜æ”¾æ‹·è´ç»“æœ
+	 * @param len {size_t} bufçš„æœ€å¤§é•¿åº¦
+	 * @return {size_t} è¿”å›æˆåŠŸæ‹·è´çš„å†…å­˜é•¿åº¦ï¼Œè¿”å› 0 è¡¨ç¤º buf å¤ªå°
 	 */
 	size_t tobuf(void* buf, size_t len);
 
 	/**
-	 * ´ÓbufÖĞÉèÖÃµ±Ç°bitmapĞÅÏ¢
-	 * @param buf {const void*} ÒªÉèÖÃbitmapĞÅÏ¢
-	 * @param len {size_t} bufµÄ³¤¶È
-	 * @return true ³É¹¦£¬falseÊ§°Ü
+	 * ä»bufä¸­è®¾ç½®å½“å‰bitmapä¿¡æ¯
+	 * @param buf {const void*} è¦è®¾ç½®bitmapä¿¡æ¯
+	 * @param len {size_t} bufçš„é•¿åº¦
+	 * @return true æˆåŠŸï¼Œfalseå¤±è´¥
 	 */
 	bool frombuf(const void* buf, size_t len);
 
 	/**
-	 * ÖØÖÃµ±Ç°µÄbitmapÎª 0
+	 * é‡ç½®å½“å‰çš„bitmapä¸º 0
 	 */
 	void reset(void);
 
 	/**
-	 * »ñÈ¡µ±Ç°Î»Ó³Éä´æ´¢¿Õ¼äµÄ´óĞ¡
+	 * è·å–å½“å‰ä½æ˜ å°„å­˜å‚¨ç©ºé—´çš„å¤§å°
 	 * @return {size_t}
 	 */
 	size_t size(void);
 
 	/**
-	 * »ñÈ¡µ±Ç°ÒÑ¾­ÉèÖÃµÄ¸öÊı
+	 * è·å–å½“å‰å·²ç»è®¾ç½®çš„ä¸ªæ•°
 	 * @return {size_t}
 	 */
 	size_t count(void);
 
 	/**
-	 * µ±Ç°bitmapÊÇ·ñÒÑÂú
+	 * å½“å‰bitmapæ˜¯å¦å·²æ»¡
 	 * @return {bool}
 	 */
 	bool full(void);
@@ -86,7 +86,7 @@ private:
 	size_t size_;
 	size_t count_;
 
-	//´ÓĞÂÍ³¼ÆcountÊıÁ¿
+	//ä»æ–°ç»Ÿè®¡countæ•°é‡
 	void recount(void);
 };
 

@@ -1,4 +1,4 @@
-#ifndef	__DICT_POOL_INCLUDE_H__
+ï»¿#ifndef	__DICT_POOL_INCLUDE_H__
 #define	__DICT_POOL_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -13,160 +13,160 @@ typedef struct DICT_POOL DICT_POOL;
 typedef struct DICT_POOL_DB DICT_POOL_DB;
 
 /**
- * ³õÊ¼»¯£¬½öÄÜ±»µ÷ÓÃÒ»´Î
+ * åˆå§‹åŒ–ï¼Œä»…èƒ½è¢«è°ƒç”¨ä¸€æ¬¡
  */
 DICT_API void dict_pool_init(void);
 
 /**
- * ´´½¨Ò»¸ö´æ´¢³Ø
- * @param partions {const char*} ´æ´¢·ÖÇøÇé¿öµÄ×Ö·û´®Êı×é
- * @param partions_size {int} partions ·ÖÇøµÄ¸öÊı
- * @param dict_type {const char*} ´æ´¢ÀàĞÍ (btree/hash/cdb)
- * @param dict_name {const char*} ´æ´¢³ØÃû
- * @param dict_size {int} ¸Ã´æ´¢³Ø±»·ÖÎª¼¸¸ö´æ´¢·ÖÇø
- * @return {DICT_POOL*} ´æ´¢³ØµÄ¶ÔÏóÖ¸Õë, ÈôÎª NULL Ôò±íÊ¾´´½¨Ê§°Ü
+ * åˆ›å»ºä¸€ä¸ªå­˜å‚¨æ± 
+ * @param partions {const char*} å­˜å‚¨åˆ†åŒºæƒ…å†µçš„å­—ç¬¦ä¸²æ•°ç»„
+ * @param partions_size {int} partions åˆ†åŒºçš„ä¸ªæ•°
+ * @param dict_type {const char*} å­˜å‚¨ç±»å‹ (btree/hash/cdb)
+ * @param dict_name {const char*} å­˜å‚¨æ± å
+ * @param dict_size {int} è¯¥å­˜å‚¨æ± è¢«åˆ†ä¸ºå‡ ä¸ªå­˜å‚¨åˆ†åŒº
+ * @return {DICT_POOL*} å­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ, è‹¥ä¸º NULL åˆ™è¡¨ç¤ºåˆ›å»ºå¤±è´¥
  */
 DICT_API DICT_POOL *dict_pool_new(const char **partions, int partions_size,
 	const char *dict_type, const char *dict_path,
 	const char *dict_name, int pool_size);
 
 /**
- * ¹Ø±Õ²¢ÊÍ·ÅÒ»¸ö´æ´¢³Ø
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
+ * å…³é—­å¹¶é‡Šæ”¾ä¸€ä¸ªå­˜å‚¨æ± 
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
  */
 DICT_API void dict_pool_free(DICT_POOL *pool);
 
 /**
- * Ìí¼ÓÒ»¸ö key/value ¶ÔÖÁÒ»¸ö´æ´¢³Ø
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
- * @param value {char*} Êı¾İµØÖ·
- * @param len {size_t} value Êı¾İµÄ³¤¶È´óĞ¡(×Ö½Ú)
+ * æ·»åŠ ä¸€ä¸ª key/value å¯¹è‡³ä¸€ä¸ªå­˜å‚¨æ± 
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
+ * @param value {char*} æ•°æ®åœ°å€
+ * @param len {size_t} value æ•°æ®çš„é•¿åº¦å¤§å°(å­—èŠ‚)
  * @return {int} 0: OK, < 0: Error
  */
 DICT_API int  dict_pool_set(DICT_POOL *pool, char *key, size_t key_len, char *value, size_t len);
 
 /**
- * ´ÓÒ»¸ö´æ´¢³ØÖĞ¶ÁÈ¡Êı¾İ
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
- * @param size {size_t*} ´æ´¢Ëù¶Áµ½Êı¾İ¶ÔÏóµÄ³¤¶È´óĞ¡(×Ö½Ú)
- * @param {char*} Ëù¶Áµ½µÄÊı¾İµØÖ·£¬µ±Îª¿ÕÊ±Ôò±íÊ¾¸Ã¶ÔÏó²»´æÔÚ,
- * ×¢£ºÈç¹û·µ»ØµÄÊı¾İµØÖ·²»Îª¿Õ£¬Ôòµ÷ÓÃÕßĞèÔÚÓÃÍê¸Ã·µ»ØÊı¾İ¶ÔÏóºó
- *     ÓÃ acl_myfree/1 ÊÍ·Åµô¸Ã·µ»ØµÄ¶¯Ì¬ÄÚ´æµØÖ·
+ * ä»ä¸€ä¸ªå­˜å‚¨æ± ä¸­è¯»å–æ•°æ®
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
+ * @param size {size_t*} å­˜å‚¨æ‰€è¯»åˆ°æ•°æ®å¯¹è±¡çš„é•¿åº¦å¤§å°(å­—èŠ‚)
+ * @param {char*} æ‰€è¯»åˆ°çš„æ•°æ®åœ°å€ï¼Œå½“ä¸ºç©ºæ—¶åˆ™è¡¨ç¤ºè¯¥å¯¹è±¡ä¸å­˜åœ¨,
+ * æ³¨ï¼šå¦‚æœè¿”å›çš„æ•°æ®åœ°å€ä¸ä¸ºç©ºï¼Œåˆ™è°ƒç”¨è€…éœ€åœ¨ç”¨å®Œè¯¥è¿”å›æ•°æ®å¯¹è±¡å
+ *     ç”¨ acl_myfree/1 é‡Šæ”¾æ‰è¯¥è¿”å›çš„åŠ¨æ€å†…å­˜åœ°å€
  */
 DICT_API char *dict_pool_get(DICT_POOL *pool, char *key, size_t key_len, size_t *size);
 
 /**
- * ´ÓÒ»¸ö´æ´¢³ØÖĞÉ¾³ıÊı¾İ
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
+ * ä»ä¸€ä¸ªå­˜å‚¨æ± ä¸­åˆ é™¤æ•°æ®
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
  * @return {int} 0: ok; != 0: error
  */
 DICT_API int  dict_pool_del(DICT_POOL *pool, char *key, size_t key_len);
 
 /**
- * ±éÀú´æ´¢ÖĞµÄËùÓĞÊı¾İ
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @param key {char**} Èç¹û½á¹û·Ç¿ÕÔò´æ´¢½¡Öµ½á¹û, Èç¹û·µ»ØÖµ²»Îª¿Õ£¬
- *  ÔòÊÍ·Å key ĞèÒªµ÷ÓÃ: acl_myfree/1, ·ñÔò»áÔì³ÉÄÚ´æĞ¹Â¶
- * @param key_size {size_t*} Èô½á¹û·Ç¿ÕÔò´æ´¢½¡Öµ½á¹ûµÄ³¤¶È
- * @param val {char**} Èç¹û½á¹û·Ç¿ÕÔò´æ´¢Êı¾İ½á¹û, Èç¹û·µ»ØÖµ²»Îª¿Õ£¬
- *  ÔòÊÍ·Å val ĞèÒªµ÷ÓÃ: acl_myfree/1, ·ñÔò »áÔì³ÉÄÚ´æĞ¹Â¶
- * @param val_size {size_t*} Èç¹û½á¹û·Ç¿ÕÔò´æ´¢Êı¾İ½á¹ûµÄ³¤¶È
- * @return {int} 0: ±íÊ¾½á¹û·Ç¿Õ, != 0: ±íÊ¾½á¹ûÎª¿Õ
+ * éå†å­˜å‚¨ä¸­çš„æ‰€æœ‰æ•°æ®
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @param key {char**} å¦‚æœç»“æœéç©ºåˆ™å­˜å‚¨å¥å€¼ç»“æœ, å¦‚æœè¿”å›å€¼ä¸ä¸ºç©ºï¼Œ
+ *  åˆ™é‡Šæ”¾ key éœ€è¦è°ƒç”¨: acl_myfree/1, å¦åˆ™ä¼šé€ æˆå†…å­˜æ³„éœ²
+ * @param key_size {size_t*} è‹¥ç»“æœéç©ºåˆ™å­˜å‚¨å¥å€¼ç»“æœçš„é•¿åº¦
+ * @param val {char**} å¦‚æœç»“æœéç©ºåˆ™å­˜å‚¨æ•°æ®ç»“æœ, å¦‚æœè¿”å›å€¼ä¸ä¸ºç©ºï¼Œ
+ *  åˆ™é‡Šæ”¾ val éœ€è¦è°ƒç”¨: acl_myfree/1, å¦åˆ™ ä¼šé€ æˆå†…å­˜æ³„éœ²
+ * @param val_size {size_t*} å¦‚æœç»“æœéç©ºåˆ™å­˜å‚¨æ•°æ®ç»“æœçš„é•¿åº¦
+ * @return {int} 0: è¡¨ç¤ºç»“æœéç©º, != 0: è¡¨ç¤ºç»“æœä¸ºç©º
  */
 DICT_API int dict_pool_seq(DICT_POOL *pool, char **key, size_t *key_size,
         char **val, size_t *val_size);
 
 /**
- * ÖØÖÃ´æ´¢±éÀú¶ÔÏó
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
+ * é‡ç½®å­˜å‚¨éå†å¯¹è±¡
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
  */
 DICT_API void dict_pool_seq_reset(DICT_POOL *pool);
 
 /**
- * É¾³ıµ±Ç°Êı¾İ±éÀú¹â±êËùÖ¸µÄÊı¾İ
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @return {int} 0: É¾³ıOK, != 0: ²»´æÔÚ»òÉ¾³ıÊ§°Ü
+ * åˆ é™¤å½“å‰æ•°æ®éå†å…‰æ ‡æ‰€æŒ‡çš„æ•°æ®
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @return {int} 0: åˆ é™¤OK, != 0: ä¸å­˜åœ¨æˆ–åˆ é™¤å¤±è´¥
  */
 DICT_API int dict_pool_seq_delcur(DICT_POOL *pool);
 
 /**
- * ¸ù¾İ½¡Öµ´Ó´æ´¢³ØÖĞ»ñµÃ¸Ã½¡ËùÔÚµÄ´æ´¢DB
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
- * @return {DICT_POOL_DB*} ´æ´¢DB
+ * æ ¹æ®å¥å€¼ä»å­˜å‚¨æ± ä¸­è·å¾—è¯¥å¥æ‰€åœ¨çš„å­˜å‚¨DB
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
+ * @return {DICT_POOL_DB*} å­˜å‚¨DB
  */
 DICT_API DICT_POOL_DB *dict_pool_db(DICT_POOL *pool, const char *key, size_t key_len);
 
 /**
- * »ñµÃÄ³´æ´¢DBµÄÎÄ¼şÈ«Â·¾¶
- * @param pool {DICT_POOL*} Ä³¸ö´æ´¢³ØµÄ¶ÔÏóÖ¸Õë
- * @return {const char*} ´æ´¢ÎÄ¼şÃû
+ * è·å¾—æŸå­˜å‚¨DBçš„æ–‡ä»¶å…¨è·¯å¾„
+ * @param pool {DICT_POOL*} æŸä¸ªå­˜å‚¨æ± çš„å¯¹è±¡æŒ‡é’ˆ
+ * @return {const char*} å­˜å‚¨æ–‡ä»¶å
  */
 DICT_API const char *dict_pool_db_path(DICT_POOL_DB *db);
 
 /**
- * ¼ÓËøÄ³¸ö´æ´¢DB
- * @param {DICT_POOL_DB*} ´æ´¢DB
+ * åŠ é”æŸä¸ªå­˜å‚¨DB
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
  */
 DICT_API void dict_pool_db_lock(DICT_POOL_DB *db);
 
 /**
- * ½âËøÄ³¸ö´æ´¢DB
- * @param {DICT_POOL_DB*} ´æ´¢DB
+ * è§£é”æŸä¸ªå­˜å‚¨DB
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
  */
 DICT_API void dict_pool_db_unlock(DICT_POOL_DB *db);
 
 /**
- * Ìí¼Ó»òĞŞ¸ÄÊı¾İ
- * @param {DICT_POOL_DB*} ´æ´¢DB
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
- * @param value {char*} Öµ
- * @param len {size_t} value ³¤¶È
+ * æ·»åŠ æˆ–ä¿®æ”¹æ•°æ®
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
+ * @param value {char*} å€¼
+ * @param len {size_t} value é•¿åº¦
  * @return {int} 0: ok; < 0: error
  */
 DICT_API int  dict_pool_db_set(DICT_POOL_DB *db, char *key, size_t key_len, char *value, size_t len);
 
 /**
- * ´Ó´æ´¢DBÖĞ»ñµÃÄ³¸ö½¡Ëù¶ÔÓ¦µÄÖµ
- * @param {DICT_POOL_DB*} ´æ´¢DB
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
- * @param size {size_t*} Èç¹û²éÑ¯½á¹û·Ç¿ÕÔò´æ´¢·µ»Ø½á¹ûµÄ³¤¶È
- * @return {char*} ½¡Ëù¶ÔÓ¦µÄÖµ, ĞèÒªÓÃ acl_myfree()/1 ÊÍ·Å
+ * ä»å­˜å‚¨DBä¸­è·å¾—æŸä¸ªå¥æ‰€å¯¹åº”çš„å€¼
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
+ * @param size {size_t*} å¦‚æœæŸ¥è¯¢ç»“æœéç©ºåˆ™å­˜å‚¨è¿”å›ç»“æœçš„é•¿åº¦
+ * @return {char*} å¥æ‰€å¯¹åº”çš„å€¼, éœ€è¦ç”¨ acl_myfree()/1 é‡Šæ”¾
  */
 DICT_API char *dict_pool_db_get(DICT_POOL_DB *db, char *key, size_t key_len, size_t *size);
 
 /**
- * ´Ó´æ´¢DBÖĞÉ¾³ıÄ³¸ö½¡¶ÔÓ¦µÄÖµ
- * @param {DICT_POOL_DB*} ´æ´¢DB
- * @param key {char*} ½¡ÖµµØÖ·
- * @param key_len {size_t} key µÄ³¤¶È
+ * ä»å­˜å‚¨DBä¸­åˆ é™¤æŸä¸ªå¥å¯¹åº”çš„å€¼
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
+ * @param key {char*} å¥å€¼åœ°å€
+ * @param key_len {size_t} key çš„é•¿åº¦
  * @return {int} 0: ok; != 0: error
  */
 DICT_API int dict_pool_db_del(DICT_POOL_DB *db, char *key, size_t key_len);
 
 /**
- * ÖØÖÃÖ®Ç°Ôø±éÀúµÄ´æ´¢DB
- * @param {DICT_POOL_DB*} ´æ´¢DB
+ * é‡ç½®ä¹‹å‰æ›¾éå†çš„å­˜å‚¨DB
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
  */
 DICT_API void dict_pool_db_seq_reset(DICT_POOL_DB *db);
 
 /**
- * ±éÀúÄ³¸ö´æ´¢DB
- * @param {DICT_POOL_DB*} ´æ´¢DB
- * @param key {char**} ´æ´¢½¡µÄµØÖ·
- * @param key_size {size_t*} ´æ´¢ÔÚ key ÖĞÊı¾İµÄ³¤¶È
- * @param value {char**} ´æ´¢ÖµµÄµØÖ·
- * @param value_size {size_t*} ´æ´¢ÔÚ value ÖĞÊı¾İµÄ³¤¶È
- * @return {int} 0: ±íÊ¾½á¹û·Ç¿Õ, != 0: ±íÊ¾½á¹ûÎª¿Õ
+ * éå†æŸä¸ªå­˜å‚¨DB
+ * @param {DICT_POOL_DB*} å­˜å‚¨DB
+ * @param key {char**} å­˜å‚¨å¥çš„åœ°å€
+ * @param key_size {size_t*} å­˜å‚¨åœ¨ key ä¸­æ•°æ®çš„é•¿åº¦
+ * @param value {char**} å­˜å‚¨å€¼çš„åœ°å€
+ * @param value_size {size_t*} å­˜å‚¨åœ¨ value ä¸­æ•°æ®çš„é•¿åº¦
+ * @return {int} 0: è¡¨ç¤ºç»“æœéç©º, != 0: è¡¨ç¤ºç»“æœä¸ºç©º
  */
 DICT_API int dict_pool_db_seq(DICT_POOL_DB *db, char **key, size_t *key_size,
         char **val, size_t *val_size);

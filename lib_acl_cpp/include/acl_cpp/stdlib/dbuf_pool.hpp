@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "noncopyable.hpp"
 #include <vector>
@@ -9,30 +9,30 @@ namespace acl
 {
 
 /**
- * »á»°ÀàµÄÄÚ´æÁ´¹ÜÀíÀà£¬¸ÃÀà½öÌá¹©ÄÚ´æ·ÖÅäº¯Êı£¬ÔÚÕû¸öÀà¶ÔÏó±»Îö¹¹Ê±¸ÃÄÚ´æÁ´
- * »á±»Ò»´ÎĞÔµØÊÍ·Å£¬¸ÃÀàÊÊºÏÓÚĞèÒªÆµ·±·ÖÅäÒ»Ğ©´óĞ¡²»µÈµÄĞ¡ÄÚ´æµÄÓ¦ÓÃ£»
- * ¸ÃÀàÊµ¼ÊÉÏÊÇ·â×°ÁË lib_acl ÖĞµÄ ACL_DBUF_POOL ½á¹¹¼°·½·¨
+ * ä¼šè¯ç±»çš„å†…å­˜é“¾ç®¡ç†ç±»ï¼Œè¯¥ç±»ä»…æä¾›å†…å­˜åˆ†é…å‡½æ•°ï¼Œåœ¨æ•´ä¸ªç±»å¯¹è±¡è¢«ææ„æ—¶è¯¥å†…å­˜é“¾
+ * ä¼šè¢«ä¸€æ¬¡æ€§åœ°é‡Šæ”¾ï¼Œè¯¥ç±»é€‚åˆäºéœ€è¦é¢‘ç¹åˆ†é…ä¸€äº›å¤§å°ä¸ç­‰çš„å°å†…å­˜çš„åº”ç”¨ï¼›
+ * è¯¥ç±»å®é™…ä¸Šæ˜¯å°è£…äº† lib_acl ä¸­çš„ ACL_DBUF_POOL ç»“æ„åŠæ–¹æ³•
  */
 
 class ACL_CPP_API dbuf_pool // : public noncopyable
 {
 public:
 	/**
-	 * ¸ÃÀà¶ÔÏó±ØĞë¶¯Ì¬´´½¨
+	 * è¯¥ç±»å¯¹è±¡å¿…é¡»åŠ¨æ€åˆ›å»º
 	 */
 	dbuf_pool();
 
 	/**
-	 * ¸ÃÀà¶ÔÏó±ØĞëÒª¶¯Ì¬´´½¨£¬ËùÒÔÒş²ØÁËÎö¹¹º¯Êı£¬Ê¹ÓÃÕßĞèÒªµ÷ÓÃ destroy
-	 * º¯ÊıÀ´Ïú»Ù¶¯Ì¬¶ÔÏó
+	 * è¯¥ç±»å¯¹è±¡å¿…é¡»è¦åŠ¨æ€åˆ›å»ºï¼Œæ‰€ä»¥éšè—äº†ææ„å‡½æ•°ï¼Œä½¿ç”¨è€…éœ€è¦è°ƒç”¨ destroy
+	 * å‡½æ•°æ¥é”€æ¯åŠ¨æ€å¯¹è±¡
 	 */
 	void destroy();
 
 	/**
-	 * ÖØÔØ new/delete ²Ù×÷·û£¬Ê¹ dbuf_pool ¶ÔÏó±¾ÉíÒ²´´½¨ÔÚÄÚ´æ³ØÉÏ£¬
-	 * ´Ó¶ø¼õÉÙÁË malloc/free µÄ´ÎÊı
-	 * @param size {size_t} ÓÉ±àÒë´«ÈëµÄ dbuf_pool ¶ÔÏóµÄ³¤¶È´óĞ¡
-	 * @param nblock {size_t} ÄÚ²¿²ÉÓÃµÄÄÚ´æ¿é£¨4096£©µÄ±¶Êı
+	 * é‡è½½ new/delete æ“ä½œç¬¦ï¼Œä½¿ dbuf_pool å¯¹è±¡æœ¬èº«ä¹Ÿåˆ›å»ºåœ¨å†…å­˜æ± ä¸Šï¼Œ
+	 * ä»è€Œå‡å°‘äº† malloc/free çš„æ¬¡æ•°
+	 * @param size {size_t} ç”±ç¼–è¯‘ä¼ å…¥çš„ dbuf_pool å¯¹è±¡çš„é•¿åº¦å¤§å°
+	 * @param nblock {size_t} å†…éƒ¨é‡‡ç”¨çš„å†…å­˜å—ï¼ˆ4096ï¼‰çš„å€æ•°
 	 */
 	void *operator new(size_t size, size_t nblock = 2);
 
@@ -42,75 +42,75 @@ public:
 	void operator delete(void* ptr);
 
 	/**
-	 * ÖØÖÃÄÚ´æ³ØµÄ×´Ì¬ÒÔ±ãÓÚÖØ¸´Ê¹ÓÃ¸ÃÄÚ´æ³Ø¶ÔÏó
-	 * @param reserve {size_t} Èô¸ÃÖµ > 0£¬ÔòĞèÒªÖ¸¶¨¶îÍâ±£ÁôµÄÄÚ´æ´óĞ¡£¬
-	 *  ¸Ã´óĞ¡±ØĞëĞ¡ÓÚµÈÓÚÒÑ¾­ÔÚ¸ÃÄÚ´æ³Ø¶ÔÏó·ÖÅäµÄ´óĞ¡
-	 * @return {bool} Èç¹ûÊäÈë²ÎÊı·Ç·¨£¬Ôò·µ»Ø false
+	 * é‡ç½®å†…å­˜æ± çš„çŠ¶æ€ä»¥ä¾¿äºé‡å¤ä½¿ç”¨è¯¥å†…å­˜æ± å¯¹è±¡
+	 * @param reserve {size_t} è‹¥è¯¥å€¼ > 0ï¼Œåˆ™éœ€è¦æŒ‡å®šé¢å¤–ä¿ç•™çš„å†…å­˜å¤§å°ï¼Œ
+	 *  è¯¥å¤§å°å¿…é¡»å°äºç­‰äºå·²ç»åœ¨è¯¥å†…å­˜æ± å¯¹è±¡åˆ†é…çš„å¤§å°
+	 * @return {bool} å¦‚æœè¾“å…¥å‚æ•°éæ³•ï¼Œåˆ™è¿”å› false
 	 */
 	bool dbuf_reset(size_t reserve = 0);
 
 	/**
-	 * ·ÖÅäÖ¸¶¨³¤¶ÈµÄÄÚ´æ
-	 * @param len {size_t} ĞèÒª·ÖÅäµÄÄÚ´æ³¤¶È£¬µ±ÄÚ´æ±È½ÏĞ¡Ê±(Ğ¡ÓÚ¹¹Ôìº¯Êı
-	 *  ÖĞµÄ block_size)Ê±£¬Ëù·ÖÅäµÄÄÚ´æÊÇÔÚ dbuf_pool Ëù¹ÜÀíµÄÄÚ´æÁ´ÉÏ£¬
-	 *  µ±ÄÚ´æ½Ï´óÊ±»áÖ±½ÓÊ¹ÓÃ malloc ½øĞĞ·ÖÅä
-	 * @return {void*} ĞÂ·ÖÅäµÄÄÚ´æµØÖ·
+	 * åˆ†é…æŒ‡å®šé•¿åº¦çš„å†…å­˜
+	 * @param len {size_t} éœ€è¦åˆ†é…çš„å†…å­˜é•¿åº¦ï¼Œå½“å†…å­˜æ¯”è¾ƒå°æ—¶(å°äºæ„é€ å‡½æ•°
+	 *  ä¸­çš„ block_size)æ—¶ï¼Œæ‰€åˆ†é…çš„å†…å­˜æ˜¯åœ¨ dbuf_pool æ‰€ç®¡ç†çš„å†…å­˜é“¾ä¸Šï¼Œ
+	 *  å½“å†…å­˜è¾ƒå¤§æ—¶ä¼šç›´æ¥ä½¿ç”¨ malloc è¿›è¡Œåˆ†é…
+	 * @return {void*} æ–°åˆ†é…çš„å†…å­˜åœ°å€
 	 */
 	void* dbuf_alloc(size_t len);
 
 	/**
-	 * ·ÖÅäÖ¸¶¨³¤¶ÈµÄÄÚ´æ²¢½«ÄÚ´æÇøÓòÇåÁã
-	 * @param len {size_t} ĞèÒª·ÖÅäµÄÄÚ´æ³¤¶È
-	 * @return {void*} ĞÂ·ÖÅäµÄÄÚ´æµØÖ·
+	 * åˆ†é…æŒ‡å®šé•¿åº¦çš„å†…å­˜å¹¶å°†å†…å­˜åŒºåŸŸæ¸…é›¶
+	 * @param len {size_t} éœ€è¦åˆ†é…çš„å†…å­˜é•¿åº¦
+	 * @return {void*} æ–°åˆ†é…çš„å†…å­˜åœ°å€
 	 */
 	void* dbuf_calloc(size_t len);
 
 	/**
-	 * ¸ù¾İÊäÈëµÄ×Ö·û´®¶¯Ì¬´´½¨ĞÂµÄÄÚ´æ²¢½«×Ö·û´®½øĞĞ¸´ÖÆ£¬ÀàËÆÓÚ strdup
-	 * @param s {const char*} Ô´×Ö·û´®
-	 * @return {char*} ĞÂ¸´ÖÆµÄ×Ö·û´®µØÖ·
+	 * æ ¹æ®è¾“å…¥çš„å­—ç¬¦ä¸²åŠ¨æ€åˆ›å»ºæ–°çš„å†…å­˜å¹¶å°†å­—ç¬¦ä¸²è¿›è¡Œå¤åˆ¶ï¼Œç±»ä¼¼äº strdup
+	 * @param s {const char*} æºå­—ç¬¦ä¸²
+	 * @return {char*} æ–°å¤åˆ¶çš„å­—ç¬¦ä¸²åœ°å€
 	 */
 	char* dbuf_strdup(const char* s);
 
 	/**
-	 * ¸ù¾İÊäÈëµÄ×Ö·û´®¶¯Ì¬´´½¨ĞÂµÄÄÚ´æ²¢½«×Ö·û´®½øĞĞ¸´ÖÆ£¬ÀàËÆÓÚ strdup
-	 * @param s {const char*} Ô´×Ö·û´®
-	 * @param len {size_t} ÏŞÖÆËù¸´ÖÆ×Ö·û´®µÄ×î´ó³¤¶È
-	 * @return {char*} ĞÂ¸´ÖÆµÄ×Ö·û´®µØÖ·
+	 * æ ¹æ®è¾“å…¥çš„å­—ç¬¦ä¸²åŠ¨æ€åˆ›å»ºæ–°çš„å†…å­˜å¹¶å°†å­—ç¬¦ä¸²è¿›è¡Œå¤åˆ¶ï¼Œç±»ä¼¼äº strdup
+	 * @param s {const char*} æºå­—ç¬¦ä¸²
+	 * @param len {size_t} é™åˆ¶æ‰€å¤åˆ¶å­—ç¬¦ä¸²çš„æœ€å¤§é•¿åº¦
+	 * @return {char*} æ–°å¤åˆ¶çš„å­—ç¬¦ä¸²åœ°å€
 	 */
 	char* dbuf_strndup(const char* s, size_t len);
 
 	/**
-	 * ¸ù¾İÊäÈëµÄÄÚ´æÊı¾İ¶¯Ì¬´´½¨ÄÚ´æ²¢½«Êı¾İ½øĞĞ¸´ÖÆ
-	 * @param addr {const void*} Ô´Êı¾İÄÚ´æµØÖ·
-	 * @param len {size_t} Ô´Êı¾İ³¤¶È
-	 * @return {void*} ĞÂ¸´ÖÆµÄÊı¾İµØÖ·
+	 * æ ¹æ®è¾“å…¥çš„å†…å­˜æ•°æ®åŠ¨æ€åˆ›å»ºå†…å­˜å¹¶å°†æ•°æ®è¿›è¡Œå¤åˆ¶
+	 * @param addr {const void*} æºæ•°æ®å†…å­˜åœ°å€
+	 * @param len {size_t} æºæ•°æ®é•¿åº¦
+	 * @return {void*} æ–°å¤åˆ¶çš„æ•°æ®åœ°å€
 	 */
 	void* dbuf_memdup(const void* addr, size_t len);
 
 	/**
-	 * ¹é»¹ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æ
-	 * @param addr {const void*} ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æµØÖ·
-	 * @return {bool} Èç¹û¸ÃÄÚ´æµØÖ··ÇÄÚ´æ³Ø·ÖÅä»òÊÍ·Å¶à´Î£¬Ôò·µ»Ø false
+	 * å½’è¿˜ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜
+	 * @param addr {const void*} ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜åœ°å€
+	 * @return {bool} å¦‚æœè¯¥å†…å­˜åœ°å€éå†…å­˜æ± åˆ†é…æˆ–é‡Šæ”¾å¤šæ¬¡ï¼Œåˆ™è¿”å› false
 	 */
 	bool dbuf_free(const void* addr);
 
 	/**
-	 * ±£ÁôÓÉÄÚ´æ³Ø·ÖÅäµÄÄ³¶ÎµØÖ·£¬ÒÔÃâµ±µ÷ÓÃ dbuf_reset Ê±±»ÌáÇ°ÊÍ·Åµô
-	 * @param addr {const void*} ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æµØÖ·
-	 * @return {bool} Èç¹û¸ÃÄÚ´æµØÖ··ÇÄÚ´æ³Ø·ÖÅä£¬Ôò·µ»Ø false
+	 * ä¿ç•™ç”±å†…å­˜æ± åˆ†é…çš„æŸæ®µåœ°å€ï¼Œä»¥å…å½“è°ƒç”¨ dbuf_reset æ—¶è¢«æå‰é‡Šæ”¾æ‰
+	 * @param addr {const void*} ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜åœ°å€
+	 * @return {bool} å¦‚æœè¯¥å†…å­˜åœ°å€éå†…å­˜æ± åˆ†é…ï¼Œåˆ™è¿”å› false
 	 */
 	bool dbuf_keep(const void* addr);
 
 	/**
-	 * È¡Ïû±£ÁôÓÉÄÚ´æ³Ø·ÖÅäµÄÄ³¶ÎµØÖ·£¬ÒÔ±ãÓÚµ÷ÓÃ dbuf_reset Ê±±»ÊÍ·Åµô
-	 * @param addr {const void*} ÓÉÄÚ´æ³Ø·ÖÅäµÄÄÚ´æµØÖ·
-	 * @return {bool} Èç¹û¸ÃÄÚ´æµØÖ··ÇÄÚ´æ³Ø·ÖÅä£¬Ôò·µ»Ø false
+	 * å–æ¶ˆä¿ç•™ç”±å†…å­˜æ± åˆ†é…çš„æŸæ®µåœ°å€ï¼Œä»¥ä¾¿äºè°ƒç”¨ dbuf_reset æ—¶è¢«é‡Šæ”¾æ‰
+	 * @param addr {const void*} ç”±å†…å­˜æ± åˆ†é…çš„å†…å­˜åœ°å€
+	 * @return {bool} å¦‚æœè¯¥å†…å­˜åœ°å€éå†…å­˜æ± åˆ†é…ï¼Œåˆ™è¿”å› false
 	 */
 	bool dbuf_unkeep(const void* addr);
 
 	/**
-	 * »ñµÃÄÚ²¿ ACL_DBUF_POOL ¶ÔÏó£¬ÒÔ±ãÓÚ²Ù×÷ C ½Ó¿ÚµÄÄÚ´æ³Ø¶ÔÏó
+	 * è·å¾—å†…éƒ¨ ACL_DBUF_POOL å¯¹è±¡ï¼Œä»¥ä¾¿äºæ“ä½œ C æ¥å£çš„å†…å­˜æ± å¯¹è±¡
 	 * @return {ACL_DBUF_POOL*}
 	 */
 	ACL_DBUF_POOL *get_dbuf()
@@ -138,7 +138,7 @@ public:
  *      }
  *      dbuf->destroy();
  *
- *      // ´´½¨ dbuf ¶ÔÏóÊ±£¬Ö¸¶¨ÁËÄÚ²¿·ÖÅäÄÚ´æ¿éµÄÎ»Êı
+ *      // åˆ›å»º dbuf å¯¹è±¡æ—¶ï¼ŒæŒ‡å®šäº†å†…éƒ¨åˆ†é…å†…å­˜å—çš„ä½æ•°
  *      dbuf = new(8) acl::dbuf_pool;
  *      for (int i = 0; i < 1000; i++)
  *      {
@@ -146,7 +146,7 @@ public:
  *          printf("%s\r\n", p);
  *      }
  *
- *	// Ïú»Ù dbuf ¶ÔÏó
+ *	// é”€æ¯ dbuf å¯¹è±¡
  *      dbuf->destroy();
  *  }
  *
@@ -156,25 +156,25 @@ public:
 class dbuf_guard;
 
 /**
- * ÔÚ»á»°ÄÚ´æ³Ø¶ÔÏóÉÏ·ÖÅäµÄ¶ÔÏó»ù´¡Àà
+ * åœ¨ä¼šè¯å†…å­˜æ± å¯¹è±¡ä¸Šåˆ†é…çš„å¯¹è±¡åŸºç¡€ç±»
  */
 class ACL_CPP_API dbuf_obj : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param guard {dbuf_guard*} ¸Ã²ÎÊı·Ç¿ÕÊ±£¬Ôò±¾ÀàµÄ×ÓÀà¶ÔÏó»á±»
-	 *  dbuf_guard Àà¶ÔÏó×Ô¶¯¹ÜÀí£¬Í³Ò»Ïú»Ù£»Èç¹û¸Ã²ÎÊıÎª¿Õ£¬ÔòÓ¦ÓÃÓ¦
-	 *  µ÷ÓÃ dbuf_guard::push_back ·½·¨½«×ÓÀà¶ÔÏóÄÉÈëÍ³Ò»¹ÜÀí
+	 * æ„é€ å‡½æ•°
+	 * @param guard {dbuf_guard*} è¯¥å‚æ•°éç©ºæ—¶ï¼Œåˆ™æœ¬ç±»çš„å­ç±»å¯¹è±¡ä¼šè¢«
+	 *  dbuf_guard ç±»å¯¹è±¡è‡ªåŠ¨ç®¡ç†ï¼Œç»Ÿä¸€é”€æ¯ï¼›å¦‚æœè¯¥å‚æ•°ä¸ºç©ºï¼Œåˆ™åº”ç”¨åº”
+	 *  è°ƒç”¨ dbuf_guard::push_back æ–¹æ³•å°†å­ç±»å¯¹è±¡çº³å…¥ç»Ÿä¸€ç®¡ç†
 	 */
 	dbuf_obj(dbuf_guard* guard = NULL);
 
 	virtual ~dbuf_obj() {}
 
 	/**
-	 * »ñµÃ¸Ã¶ÔÏóÔÚ dbuf_guard ÖĞµÄÊı×éÖĞµÄÏÂ±êÎ»ÖÃ
-	 * @return {int} ·µ»Ø¸Ã¶ÔÏóÔÚ dbuf_guard ÖĞµÄÊı×éÖĞµÄÏÂ±êÎ»ÖÃ£¬µ±¸Ã
-	 *  ¶ÔÏóÃ»ÓĞ±» dbuf_guard ±£´æÊ±£¬Ôò·µ»Ø -1£¬´ËÊ±ÓĞ¿ÉÄÜ»áÔì³ÉÄÚ´æĞ¹Â¶
+	 * è·å¾—è¯¥å¯¹è±¡åœ¨ dbuf_guard ä¸­çš„æ•°ç»„ä¸­çš„ä¸‹æ ‡ä½ç½®
+	 * @return {int} è¿”å›è¯¥å¯¹è±¡åœ¨ dbuf_guard ä¸­çš„æ•°ç»„ä¸­çš„ä¸‹æ ‡ä½ç½®ï¼Œå½“è¯¥
+	 *  å¯¹è±¡æ²¡æœ‰è¢« dbuf_guard ä¿å­˜æ—¶ï¼Œåˆ™è¿”å› -1ï¼Œæ­¤æ—¶æœ‰å¯èƒ½ä¼šé€ æˆå†…å­˜æ³„éœ²
 	 */
 	int pos() const
 	{
@@ -182,7 +182,7 @@ public:
 	}
 
 	/**
-	 * ·µ»Ø¹¹Ôìº¯ÊıÖĞ dbuf_guard ¶ÔÏó
+	 * è¿”å›æ„é€ å‡½æ•°ä¸­ dbuf_guard å¯¹è±¡
 	 * @return {dbuf_guard*}
 	 */
 	dbuf_guard* get_guard() const
@@ -193,53 +193,53 @@ public:
 private:
 	friend class dbuf_guard;
 
-	// ¼ÇÂ¼±¾¶ÔÏóËùÊôµÄ dbuf_guard ¶ÔÏó
+	// è®°å½•æœ¬å¯¹è±¡æ‰€å±çš„ dbuf_guard å¯¹è±¡
 	dbuf_guard* guard_;
 
-	// ¸Ã±äÁ¿±ãÓÚ dbuf_guard ¶ÔÏóÊ¹ÓÃ£¬ÒÔÔö¼Ó°²È«ĞÔ
+	// è¯¥å˜é‡ä¾¿äº dbuf_guard å¯¹è±¡ä½¿ç”¨ï¼Œä»¥å¢åŠ å®‰å…¨æ€§
 	int nrefer_;
 
-	// ¸Ã¶ÔÏóÔÚ dbuf_guard ¶ÔÏóÖĞ¼ÇÂ¼µÄÊı×éµÄÎ»ÖÃ
+	// è¯¥å¯¹è±¡åœ¨ dbuf_guard å¯¹è±¡ä¸­è®°å½•çš„æ•°ç»„çš„ä½ç½®
 	int pos_;
 };
 
 /**
- * »á»°ÄÚ´æ³Ø¹ÜÀíÆ÷£¬ÓÉ¸ÃÀà¶ÔÏó¹ÜÀí dbuf_pool ¶ÔÏó¼°ÔÚÆäÉÏ·ÖÅäµÄ¶ÔÏó£¬µ±¸ÃÀà
- * ¶ÔÏóÏú»ÙÊ±£¬dbuf_pool ¶ÔÏó¼°ÔÚÉÏÃæ¾ù±»ÊÍ·Å¡£
+ * ä¼šè¯å†…å­˜æ± ç®¡ç†å™¨ï¼Œç”±è¯¥ç±»å¯¹è±¡ç®¡ç† dbuf_pool å¯¹è±¡åŠåœ¨å…¶ä¸Šåˆ†é…çš„å¯¹è±¡ï¼Œå½“è¯¥ç±»
+ * å¯¹è±¡é”€æ¯æ—¶ï¼Œdbuf_pool å¯¹è±¡åŠåœ¨ä¸Šé¢å‡è¢«é‡Šæ”¾ã€‚
  */
 class ACL_CPP_API dbuf_guard // : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param dbuf {dbuf_pool*} µ±¸ÃÄÚ´æ³Ø¶ÔÏó·Ç¿ÕÊ±£¬dbuf ½«ÓÉ dbuf_guard
-	 *  ½Ó¹Ü£¬Èç¹ûÎª¿Õ£¬Ôò±¾¹¹Ôìº¯ÊıÄÚ²¿½«»á×Ô¶¯´´½¨Ò»¸ö dbuf_pool ¶ÔÏó
-	 * @param capacity {size_t} ÄÚ²¿´´½¨µÄ objs_ Êı×éµÄ³õÊ¼³¤¶È
+	 * æ„é€ å‡½æ•°
+	 * @param dbuf {dbuf_pool*} å½“è¯¥å†…å­˜æ± å¯¹è±¡éç©ºæ—¶ï¼Œdbuf å°†ç”± dbuf_guard
+	 *  æ¥ç®¡ï¼Œå¦‚æœä¸ºç©ºï¼Œåˆ™æœ¬æ„é€ å‡½æ•°å†…éƒ¨å°†ä¼šè‡ªåŠ¨åˆ›å»ºä¸€ä¸ª dbuf_pool å¯¹è±¡
+	 * @param capacity {size_t} å†…éƒ¨åˆ›å»ºçš„ objs_ æ•°ç»„çš„åˆå§‹é•¿åº¦
 	 */
 	dbuf_guard(dbuf_pool* dbuf, size_t capacity = 500);
 
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param nblock {size_t} ±¾Àà¶ÔÏóÄÚ²¿´´½¨ dbuf_pool ¶ÔÏóÊ±£¬±¾²ÎÊı
-	 *  Ö¸¶¨ÁËÄÚ´æ¿é(4096)µÄ±¶Êı
-	 * @param capacity {size_t} ÄÚ²¿´´½¨µÄ objs_ Êı×éµÄ³õÊ¼³¤¶È
+	 * æ„é€ å‡½æ•°
+	 * @param nblock {size_t} æœ¬ç±»å¯¹è±¡å†…éƒ¨åˆ›å»º dbuf_pool å¯¹è±¡æ—¶ï¼Œæœ¬å‚æ•°
+	 *  æŒ‡å®šäº†å†…å­˜å—(4096)çš„å€æ•°
+	 * @param capacity {size_t} å†…éƒ¨åˆ›å»ºçš„ objs_ æ•°ç»„çš„åˆå§‹é•¿åº¦
 	 */
 	dbuf_guard(size_t nblock = 2, size_t capacity = 500);
 
 	/**
-	 * Îö¹¹º¯Êı£¬ÔÚÎö¹¹º¯ÊıÄÚ²¿½«»á×Ô¶¯Ïú»ÙÓÉ¹¹Ôìº¯Êı´«ÈëµÄ dbuf_pool ¶ÔÏó
+	 * ææ„å‡½æ•°ï¼Œåœ¨ææ„å‡½æ•°å†…éƒ¨å°†ä¼šè‡ªåŠ¨é”€æ¯ç”±æ„é€ å‡½æ•°ä¼ å…¥çš„ dbuf_pool å¯¹è±¡
 	 */
 	~dbuf_guard();
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_reset
+	 * è°ƒç”¨ dbuf_pool::dbuf_reset
 	 * @param reserve {size_t}
 	 * @return {bool}
 	 */
 	bool dbuf_reset(size_t reserve = 0);
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_alloc
+	 * è°ƒç”¨ dbuf_pool::dbuf_alloc
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
@@ -249,7 +249,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_calloc
+	 * è°ƒç”¨ dbuf_pool::dbuf_calloc
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
@@ -259,7 +259,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_strdup
+	 * è°ƒç”¨ dbuf_pool::dbuf_strdup
 	 * @param s {const char*}
 	 * @return {char*}
 	 */
@@ -269,7 +269,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_strndup
+	 * è°ƒç”¨ dbuf_pool::dbuf_strndup
 	 * @param s {const char*}
 	 * @param len {size_t}
 	 * @return {char*}
@@ -280,7 +280,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_memdup
+	 * è°ƒç”¨ dbuf_pool::dbuf_memdup
 	 * @param addr {const void*}
 	 * @param len {size_t}
 	 * @return {void*}
@@ -291,7 +291,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_free
+	 * è°ƒç”¨ dbuf_pool::dbuf_free
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
@@ -301,7 +301,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_keep
+	 * è°ƒç”¨ dbuf_pool::dbuf_keep
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
@@ -311,7 +311,7 @@ public:
 	}
 
 	/**
-	 * µ÷ÓÃ dbuf_pool::dbuf_unkeep
+	 * è°ƒç”¨ dbuf_pool::dbuf_unkeep
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
@@ -321,7 +321,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ dbuf_pool ¶ÔÏó
+	 * è·å¾— dbuf_pool å¯¹è±¡
 	 * @return {acl::dbuf_pool&}
 	 */
 	acl::dbuf_pool& get_dbuf() const
@@ -330,18 +330,18 @@ public:
 	}
 
 	/**
-	 * ¿ÉÒÔÊÖ¶¯µ÷ÓÃ±¾º¯Êı£¬½«ÔÚ dbuf_pool ÉÏ·ÖÅäµÄ dbuf_obj ×ÓÀà¶ÔÏó½»¸ø
-	 * dbuf_guard ¶ÔÏóÍ³Ò»½øĞĞÏú»Ù¹ÜÀí£»ÑÏ½û½«Í¬Ò»¸ö dbuf_obj ×ÓÀà¶ÔÏóÍ¬
-	 * Ê±½«¸ø¶à¸ö dbuf_guard ¶ÔÏó½øĞĞ¹ÜÀí£¬·ñÔò½«»á²úÉú¶ÔÏóµÄÖØ¸´ÊÍ·Å
+	 * å¯ä»¥æ‰‹åŠ¨è°ƒç”¨æœ¬å‡½æ•°ï¼Œå°†åœ¨ dbuf_pool ä¸Šåˆ†é…çš„ dbuf_obj å­ç±»å¯¹è±¡äº¤ç»™
+	 * dbuf_guard å¯¹è±¡ç»Ÿä¸€è¿›è¡Œé”€æ¯ç®¡ç†ï¼›ä¸¥ç¦å°†åŒä¸€ä¸ª dbuf_obj å­ç±»å¯¹è±¡åŒ
+	 * æ—¶å°†ç»™å¤šä¸ª dbuf_guard å¯¹è±¡è¿›è¡Œç®¡ç†ï¼Œå¦åˆ™å°†ä¼šäº§ç”Ÿå¯¹è±¡çš„é‡å¤é‡Šæ”¾
 	 * @param obj {dbuf_obj*}
-	 * @return {int} ·µ»Ø obj ±»Ìí¼ÓºóÆäÔÚ dbuf_obj ¶ÔÏóÊı×éÖĞµÄÏÂ±êÎ»ÖÃ£¬
-	 *  dbuf_guard ÄÚ²¿¶Ô dbuf_obj ¶ÔÏóµÄ¹ÜÀí¾ßÓĞ·ÀÖØÌí¼Ó»úÖÆ£¬ËùÒÔµ±¶à´Î
-	 *  ½«Í¬Ò»¸ö dbuf_obj ¶ÔÏóÖÃÈëÍ¬Ò»¸ö dbuf_guard ¶ÔÏóÊ±£¬ÄÚ²¿Ö»»á·ÅÒ»´Î
+	 * @return {int} è¿”å› obj è¢«æ·»åŠ åå…¶åœ¨ dbuf_obj å¯¹è±¡æ•°ç»„ä¸­çš„ä¸‹æ ‡ä½ç½®ï¼Œ
+	 *  dbuf_guard å†…éƒ¨å¯¹ dbuf_obj å¯¹è±¡çš„ç®¡ç†å…·æœ‰é˜²é‡æ·»åŠ æœºåˆ¶ï¼Œæ‰€ä»¥å½“å¤šæ¬¡
+	 *  å°†åŒä¸€ä¸ª dbuf_obj å¯¹è±¡ç½®å…¥åŒä¸€ä¸ª dbuf_guard å¯¹è±¡æ—¶ï¼Œå†…éƒ¨åªä¼šæ”¾ä¸€æ¬¡
 	 */
 	int push_back(dbuf_obj* obj);
 
 	/**
-	 * »ñµÃµ±Ç°ÄÚ´æ³ØÖĞ¹ÜÀíµÄ¶ÔÏóÊıÁ¿
+	 * è·å¾—å½“å‰å†…å­˜æ± ä¸­ç®¡ç†çš„å¯¹è±¡æ•°é‡
 	 * @return {size_t}
 	 */
 	size_t size() const
@@ -350,21 +350,21 @@ public:
 	}
 
 	/**
-	 * ·µ»ØÖ¸¶¨ÏÂ±êµÄ¶ÔÏó
-	 * @param pos {size_t} Ö¸¶¨¶ÔÏóµÄÏÂ±êÎ»ÖÃ£¬²»Ó¦Ô½½ç
-	 * @return {dbuf_obj*} µ±ÏÂ±êÎ»ÖÃÔ½½çÊ±·µ»Ø NULL
+	 * è¿”å›æŒ‡å®šä¸‹æ ‡çš„å¯¹è±¡
+	 * @param pos {size_t} æŒ‡å®šå¯¹è±¡çš„ä¸‹æ ‡ä½ç½®ï¼Œä¸åº”è¶Šç•Œ
+	 * @return {dbuf_obj*} å½“ä¸‹æ ‡ä½ç½®è¶Šç•Œæ—¶è¿”å› NULL
 	 */
 	dbuf_obj* operator[](size_t pos) const;
 
 	/**
-	 * ·µ»ØÖ¸¶¨ÏÂ±êµÄ¶ÔÏó
-	 * @param pos {size_t} Ö¸¶¨¶ÔÏóµÄÏÂ±êÎ»ÖÃ£¬²»Ó¦Ô½½ç
-	 * @return {dbuf_obj*} µ±ÏÂ±êÎ»ÖÃÔ½½çÊ±·µ»Ø NULL
+	 * è¿”å›æŒ‡å®šä¸‹æ ‡çš„å¯¹è±¡
+	 * @param pos {size_t} æŒ‡å®šå¯¹è±¡çš„ä¸‹æ ‡ä½ç½®ï¼Œä¸åº”è¶Šç•Œ
+	 * @return {dbuf_obj*} å½“ä¸‹æ ‡ä½ç½®è¶Šç•Œæ—¶è¿”å› NULL
 	 */
 	dbuf_obj* get(size_t pos) const;
 
 	/**
-	 * ÉèÖÃÄÚ½¨ objs_ Êı×é¶ÔÏóÃ¿´ÎÔÚÀ©³ä¿Õ¼äÊ±µÄÔöÁ¿£¬ÄÚ²¿È±Ê¡ÖµÎª 100
+	 * è®¾ç½®å†…å»º objs_ æ•°ç»„å¯¹è±¡æ¯æ¬¡åœ¨æ‰©å……ç©ºé—´æ—¶çš„å¢é‡ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º 100
 	 * @param incr {size_t}
 	 */
 	void set_increment(size_t incr);
@@ -475,20 +475,20 @@ public:
 	}
 
 private:
-	size_t nblock_;			// ÄÚ²¿×Ô½¨ dbuf_pool ÄÚ´æ¿éµÄµ¥Î»¸öÊı
-	size_t incr_;			// Ôö¼ÓĞÂµÄ dbuf_objs_link Ê±µÄ
-					// capacity ´óĞ¡
-	dbuf_pool* dbuf_;		// ÄÚ´æ³Ø¶ÔÏó
+	size_t nblock_;			// å†…éƒ¨è‡ªå»º dbuf_pool å†…å­˜å—çš„å•ä½ä¸ªæ•°
+	size_t incr_;			// å¢åŠ æ–°çš„ dbuf_objs_link æ—¶çš„
+					// capacity å¤§å°
+	dbuf_pool* dbuf_;		// å†…å­˜æ± å¯¹è±¡
 
-	// ´Ë´¦Ö®ËùÒÔÊ¹ÓÃ×ÔÊµÏÖµÄ dbuf_obj Êı×é¶ÔÏó£¬¶øÃ»ÓĞÊ¹ÓÃ std::vector£¬
-	// Ò»·½ÃæÊ¹Êı×é¶ÔÏóÒ²ÔÚ dbuf_pool ÄÚ´æ³ØÉÏ´´½¨£¬ÁíÒ»·½Ãæ¿ÉÒÔ±ÜÃâ
-	// std::vector ÄÚ²¿ÔÚÀ©ÈİÊ±µÄÄÚ´æ²»¿É¿ØĞÔ
+	// æ­¤å¤„ä¹‹æ‰€ä»¥ä½¿ç”¨è‡ªå®ç°çš„ dbuf_obj æ•°ç»„å¯¹è±¡ï¼Œè€Œæ²¡æœ‰ä½¿ç”¨ std::vectorï¼Œ
+	// ä¸€æ–¹é¢ä½¿æ•°ç»„å¯¹è±¡ä¹Ÿåœ¨ dbuf_pool å†…å­˜æ± ä¸Šåˆ›å»ºï¼Œå¦ä¸€æ–¹é¢å¯ä»¥é¿å…
+	// std::vector å†…éƒ¨åœ¨æ‰©å®¹æ—¶çš„å†…å­˜ä¸å¯æ§æ€§
 
 	struct dbuf_objs_link
 	{
-		dbuf_obj** objs;	// ´æ´¢ dbuf_obj ¶ÔÏóµÄÊı×é¶ÔÏó
-		size_t size;		// ´æ´¢ÓÚ objs ÖĞµÄ¶ÔÏó¸öÊı
-		size_t capacity;	// objs Êı×éµÄ´óĞ¡
+		dbuf_obj** objs;	// å­˜å‚¨ dbuf_obj å¯¹è±¡çš„æ•°ç»„å¯¹è±¡
+		size_t size;		// å­˜å‚¨äº objs ä¸­çš„å¯¹è±¡ä¸ªæ•°
+		size_t capacity;	// objs æ•°ç»„çš„å¤§å°
 
 		struct dbuf_objs_link* next;
 	};
@@ -499,17 +499,17 @@ private:
 
 	void init(size_t capacity);
 
-	// À©³ä objs_ Êı×é¶ÔÏóµÄ¿Õ¼ä
+	// æ‰©å…… objs_ æ•°ç»„å¯¹è±¡çš„ç©ºé—´
 	void extend_objs();
 };
 
 /**
  * sample1:
- * // ¼Ì³Ğ acl::dbuf_obj µÄ×ÓÀà
+ * // ç»§æ‰¿ acl::dbuf_obj çš„å­ç±»
  * class myobj1 : public acl::dbuf_obj
  * {
  * public:
- * 	// ½« guard ¶ÔÏó´«µİ¸ø»ùÀà¶ÔÏó£¬»ùÀà½«±¾¶ÔÏó¼ÓÈë guard µÄ¶ÔÏó¼¯ºÏÖĞ
+ * 	// å°† guard å¯¹è±¡ä¼ é€’ç»™åŸºç±»å¯¹è±¡ï¼ŒåŸºç±»å°†æœ¬å¯¹è±¡åŠ å…¥ guard çš„å¯¹è±¡é›†åˆä¸­
  * 	myobj1(acl::dbuf_guard* guard) : dbuf_obj(guard) {}
  *
  * 	void doit()
@@ -525,15 +525,15 @@ private:
  * {
  * 	acl::dbuf_guard dbuf;
  *
- *	// ÔÚ dbuf_guard ¶ÔÏóÉÏ´´½¨¶¯Ì¬ 100 ¸ö myobj ¶ÔÏó
+ *	// åœ¨ dbuf_guard å¯¹è±¡ä¸Šåˆ›å»ºåŠ¨æ€ 100 ä¸ª myobj å¯¹è±¡
  * 	for (int i = 0; i < 100; i++)
  * 	{
- * 		// ÔÚ guard ¶ÔÏóÉÏ´´½¨¶¯Ì¬ myobj ¶ÔÏó£¬ÇÒ½« guard ×÷Îª¹¹Ôì²ÎÊı
+ * 		// åœ¨ guard å¯¹è±¡ä¸Šåˆ›å»ºåŠ¨æ€ myobj å¯¹è±¡ï¼Œä¸”å°† guard ä½œä¸ºæ„é€ å‚æ•°
  * 		myobj* obj = new (dbuf.dbuf_alloc(sizeof(myobj))) myobj(&dbuf);
  * 		obj->doit();
  * 	}
  *
- *	// µ± dbuf Ïú»ÙÊ±£¬ÔÚÆäÉÏÃæ´´½¨µÄ¶¯Ì¬¶ÔÏó×Ô¶¯Ïú»Ù
+ *	// å½“ dbuf é”€æ¯æ—¶ï¼Œåœ¨å…¶ä¸Šé¢åˆ›å»ºçš„åŠ¨æ€å¯¹è±¡è‡ªåŠ¨é”€æ¯
  * }
  *
  * // sample2

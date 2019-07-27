@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
@@ -86,8 +86,8 @@ void connect_pool::reset_statistics(int inter)
 
 bool connect_pool::aliving()
 {
-	// XXX£¬ËäÈ»´Ë´¦Î´¼ÓËø£¬µ«Ò²Ó¦¸Ã²»»áÓÐÎÊÌâ£¬ÒòÎªÏÂÃæµÄ peek() ¹ý³Ì»áÔÙ´Î
-	// ¶Ô alive_ ¼ÓËø£¬ÒÔ·ÀÖ¹¶àÏß³Ì²Ù×÷Ê±µÄ³åÍ»
+	// XXXï¼Œè™½ç„¶æ­¤å¤„æœªåŠ é”ï¼Œä½†ä¹Ÿåº”è¯¥ä¸ä¼šæœ‰é—®é¢˜ï¼Œå› ä¸ºä¸‹é¢çš„ peek() è¿‡ç¨‹ä¼šå†æ¬¡
+	// å¯¹ alive_ åŠ é”ï¼Œä»¥é˜²æ­¢å¤šçº¿ç¨‹æ“ä½œæ—¶çš„å†²çª
 	if (alive_) {
 		return true;
 	}
@@ -99,7 +99,7 @@ bool connect_pool::aliving()
 		alive_ = true;
 		lock_.unlock();
 
-		// ÖØÖÃ·þÎñ¶ËÁ¬½Ó×´Ì¬£¬ÒÔ±ãÖØÊÔ
+		// é‡ç½®æœåŠ¡ç«¯è¿žæŽ¥çŠ¶æ€ï¼Œä»¥ä¾¿é‡è¯•
 		logger("reset server: %s", get_addr());
 		return true;
 	}
@@ -119,7 +119,7 @@ connect_client* connect_pool::peek(bool on /* = true */)
 		}
 		alive_ = true;
 
-		// ÖØÖÃ·þÎñ¶ËÁ¬½Ó×´Ì¬£¬ÒÔ±ãÖØÊÔ
+		// é‡ç½®æœåŠ¡ç«¯è¿žæŽ¥çŠ¶æ€ï¼Œä»¥ä¾¿é‡è¯•
 		logger("reset server: %s", get_addr());
 	}
 
@@ -146,22 +146,22 @@ connect_client* connect_pool::peek(bool on /* = true */)
 		return NULL;
 	}
 
-	// ½«ÒÔÏÂÈý¸öÖµÔ¤ +1
+	// å°†ä»¥ä¸‹ä¸‰ä¸ªå€¼é¢„ +1
 	count_++;
 	total_used_++;
 	current_used_++;
 
 	lock_.unlock();
 
-	// µ÷ÓÃÐéº¯ÊýµÄ×ÓÀàÊµÏÖ·½·¨£¬´´½¨ÐÂÁ¬½Ó¶ÔÏó£¬²¢´ò¿ªÁ¬½Ó
+	// è°ƒç”¨è™šå‡½æ•°çš„å­ç±»å®žçŽ°æ–¹æ³•ï¼Œåˆ›å»ºæ–°è¿žæŽ¥å¯¹è±¡ï¼Œå¹¶æ‰“å¼€è¿žæŽ¥
 	conn = create_connect();
-	// ÔÚµ÷ÓÃ open Ö®Ç°ÏÈÉèÖÃ³¬Ê±Ê±¼ä
+	// åœ¨è°ƒç”¨ open ä¹‹å‰å…ˆè®¾ç½®è¶…æ—¶æ—¶é—´
 	conn->set_timeout(conn_timeout_, rw_timeout_);
-	// µ÷ÓÃ×ÓÀà·½·¨´ò¿ªÁ¬½Ó
+	// è°ƒç”¨å­ç±»æ–¹æ³•æ‰“å¼€è¿žæŽ¥
 	if (conn->open() == false) {
 		lock_.lock();
 
-		// ÒòÎª´ò¿ªÁ¬½ÓÊ§°Ü£¬ËùÒÔ»¹Ðè½«ÉÏÃæÔ¤ +1 µÄÈý¸ö³ÉÔ±ÔÙ -1
+		// å› ä¸ºæ‰“å¼€è¿žæŽ¥å¤±è´¥ï¼Œæ‰€ä»¥è¿˜éœ€å°†ä¸Šé¢é¢„ +1 çš„ä¸‰ä¸ªæˆå‘˜å† -1
 		count_--;
 		total_used_--;
 		current_used_--;
@@ -195,7 +195,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 
 	lock_.lock();
 
-	// ¼ì²éÊÇ·ñÉèÖÃÁË×ÔÏú»Ù±êÖ¾Î»
+	// æ£€æŸ¥æ˜¯å¦è®¾ç½®äº†è‡ªé”€æ¯æ ‡å¿—ä½
 	if (delay_destroy_) {
 		if (conn->get_pool() == this) {
 			count_--;
@@ -203,7 +203,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 		delete conn;
 
 		if (count_ <= 0) {
-			// Èç¹ûÒýÓÃ¼ÆÊýÎª 0 Ôò×ÔÏú»Ù
+			// å¦‚æžœå¼•ç”¨è®¡æ•°ä¸º 0 åˆ™è‡ªé”€æ¯
 			lock_.unlock();
 			delete this;
 		} else {
@@ -215,8 +215,8 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	if (keep && alive_) {
 		conn->set_when(now);
 
-		// ½«¹é»¹µÄÁ¬½Ó·ÅÔÚÁ´±íÊ×²¿£¬ÕâÑùÔÚµ÷ÓÃÊÍ·Å¹ýÆÚÁ¬½Ó
-		// Ê±±È½Ï·½±ã£¬ÓÐÀûÓÚ¾¡¿ì½«²»Ã¦µÄÊý¾Ý¿âÁ¬½Ó¹Ø±Õ
+		// å°†å½’è¿˜çš„è¿žæŽ¥æ”¾åœ¨é“¾è¡¨é¦–éƒ¨ï¼Œè¿™æ ·åœ¨è°ƒç”¨é‡Šæ”¾è¿‡æœŸè¿žæŽ¥
+		// æ—¶æ¯”è¾ƒæ–¹ä¾¿ï¼Œæœ‰åˆ©äºŽå°½å¿«å°†ä¸å¿™çš„æ•°æ®åº“è¿žæŽ¥å…³é—­
 		pool_.push_front(conn);
 	} else {
 		acl_assert(count_ > 0);

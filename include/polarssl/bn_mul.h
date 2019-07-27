@@ -1,4 +1,4 @@
-/**
+﻿/**
  * \file bn_mul.h
  *
  * \brief  Multi-precision integer library

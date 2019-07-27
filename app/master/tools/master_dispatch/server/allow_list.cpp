@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "allow_list.h"
 
 allow_list::allow_list()

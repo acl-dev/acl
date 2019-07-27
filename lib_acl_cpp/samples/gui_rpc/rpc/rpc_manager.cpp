@@ -1,16 +1,16 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "rpc_manager.h"
 
 rpc_manager::rpc_manager(int max_threads /* = 10 */)
 {
-	// ÒòÎª±¾ÀàÊµÀýÊÇµ¥Àý£¬»áÔÚ³ÌÐò main Ö®Ç°±»µ÷ÓÃ£¬
-	// ËùÒÔÐèÒªÔÚ´ËÀàÖÐ´ò¿ªÈÕÖ¾
+	// å› ä¸ºæœ¬ç±»å®žä¾‹æ˜¯å•ä¾‹ï¼Œä¼šåœ¨ç¨‹åº main ä¹‹å‰è¢«è°ƒç”¨ï¼Œ
+	// æ‰€ä»¥éœ€è¦åœ¨æ­¤ç±»ä¸­æ‰“å¼€æ—¥å¿—
 	logger_open("gui_rpc.log", "gui_rpc");
-	// ´´½¨·Ç×èÈû¿ò¼Ü¾ä±ú£¬²¢²ÉÓÃ WIN32 ÏûÏ¢Ä£Ê½£ºacl::ENGINE_WINMSG
+	// åˆ›å»ºéžé˜»å¡žæ¡†æž¶å¥æŸ„ï¼Œå¹¶é‡‡ç”¨ WIN32 æ¶ˆæ¯æ¨¡å¼ï¼šacl::ENGINE_WINMSG
 	handle_ = new acl::aio_handle(acl::ENGINE_WINMSG);
-	// ´´½¨ rpc ·þÎñ¶ÔÏó
+	// åˆ›å»º rpc æœåŠ¡å¯¹è±¡
 	service_ = new acl::rpc_service(max_threads);
-	// ´ò¿ªÏûÏ¢·þÎñ
+	// æ‰“å¼€æ¶ˆæ¯æœåŠ¡
 	if (service_->open(handle_) == false)
 		logger_fatal("open service error: %s", acl::last_serror());
 }

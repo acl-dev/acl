@@ -1,4 +1,4 @@
-/* System interfaces. */
+﻿/* System interfaces. */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 

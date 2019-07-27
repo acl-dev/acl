@@ -1,4 +1,4 @@
-#ifndef ACL_MSG_INCLUDE_H
+ï»¿#ifndef ACL_MSG_INCLUDE_H
 #define ACL_MSG_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -12,209 +12,209 @@ extern "C" {
 #undef	USE_PRINTF_MACRO
 
 /**
- * ÔÚ½«Ğ´ÈÕÖ¾ÖÁÈÕÖ¾ÎÄ¼şÇ°»Øµ÷ÓÃ»§×Ô¶¨ÒåµÄº¯Êı£¬ÇÒ½«ÈÕÖ¾ĞÅÏ¢´«µİ¸ø¸Ãº¯Êı£¬
- * Ö»ÓĞµ±ÓÃ»§Í¨¹ı acl_msg_pre_write ½øĞĞÉèÖÃºó²ÅÉúĞ§
- * @param ctx {void*} ÓÃ»§µÄ×Ô¶¨Òå²ÎÊı
- * @param fmt {const char*} ¸ñÊ½²ÎÊı
- * @param ap {va_list} ¸ñÊ½²ÎÊıÁĞ±í
+ * åœ¨å°†å†™æ—¥å¿—è‡³æ—¥å¿—æ–‡ä»¶å‰å›è°ƒç”¨æˆ·è‡ªå®šä¹‰çš„å‡½æ•°ï¼Œä¸”å°†æ—¥å¿—ä¿¡æ¯ä¼ é€’ç»™è¯¥å‡½æ•°ï¼Œ
+ * åªæœ‰å½“ç”¨æˆ·é€šè¿‡ acl_msg_pre_write è¿›è¡Œè®¾ç½®åæ‰ç”Ÿæ•ˆ
+ * @param ctx {void*} ç”¨æˆ·çš„è‡ªå®šä¹‰å‚æ•°
+ * @param fmt {const char*} æ ¼å¼å‚æ•°
+ * @param ap {va_list} æ ¼å¼å‚æ•°åˆ—è¡¨
  */
 typedef void (*ACL_MSG_PRE_WRITE_FN)(void *ctx, const char *fmt, va_list ap);
 
 /**
- * Ó¦ÓÃÍ¨¹ı´Ëº¯ÊıÀàĞÍ¿ÉÒÔ×Ô¶¨ÒåÈÕÖ¾´ò¿ªº¯Êı£¬µ±Ó¦ÓÃÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ
- * acl_msg_register ×¢²áÁË×Ô¶¨Òå´ò¿ªº¯Êı£¬Ôòµ±Ó¦ÓÃµ÷ÓÃ acl_msg_open
- * Ê±»áµ÷ÓÃ´Ë¶¨Òå´ò¿ªÈÕÖ¾º¯Êı´ò¿ªÈÕÖ¾£¬·ñÔòÔòÓÃÈ±Ê¡µÄ·½·¨´ò¿ªÈÕÖ¾ÎÄ¼ş
- * @param file_name {const char*} »Ø´«¸ø×Ô¶¨ÒåÈÕÖ¾´ò¿ªº¯ÊıµÄ²ÎÊı£¬¼´
- *  ½«ÈÕÖ¾ÎÄ¼ş»Ø´«
- * @param ctx {void*} Ó¦ÓÃ´«µİ½øÈ¥µÄ²ÎÊı
- * @return {int} Èç¹û×Ô¶¨Òå´ò¿ªÈÕÖ¾º¯Êı·µ»Ø -1 Ôòµ÷ÓÃÈ±Ê¡µÄÈÕÖ¾´ò¿ªº¯Êı
+ * åº”ç”¨é€šè¿‡æ­¤å‡½æ•°ç±»å‹å¯ä»¥è‡ªå®šä¹‰æ—¥å¿—æ‰“å¼€å‡½æ•°ï¼Œå½“åº”ç”¨åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨
+ * acl_msg_register æ³¨å†Œäº†è‡ªå®šä¹‰æ‰“å¼€å‡½æ•°ï¼Œåˆ™å½“åº”ç”¨è°ƒç”¨ acl_msg_open
+ * æ—¶ä¼šè°ƒç”¨æ­¤å®šä¹‰æ‰“å¼€æ—¥å¿—å‡½æ•°æ‰“å¼€æ—¥å¿—ï¼Œå¦åˆ™åˆ™ç”¨ç¼ºçœçš„æ–¹æ³•æ‰“å¼€æ—¥å¿—æ–‡ä»¶
+ * @param file_name {const char*} å›ä¼ ç»™è‡ªå®šä¹‰æ—¥å¿—æ‰“å¼€å‡½æ•°çš„å‚æ•°ï¼Œå³
+ *  å°†æ—¥å¿—æ–‡ä»¶å›ä¼ 
+ * @param ctx {void*} åº”ç”¨ä¼ é€’è¿›å»çš„å‚æ•°
+ * @return {int} å¦‚æœè‡ªå®šä¹‰æ‰“å¼€æ—¥å¿—å‡½æ•°è¿”å› -1 åˆ™è°ƒç”¨ç¼ºçœçš„æ—¥å¿—æ‰“å¼€å‡½æ•°
  */
 typedef int (*ACL_MSG_OPEN_FN) (const char *file_name, void *ctx);
 
 /**
- * Ó¦ÓÃÍ¨¹ı´Ëº¯ÊıÀàĞÍ¿ÉÒÔ×Ô¶¨ÒåÈÕÖ¾¹Ø±Õº¯Êı£¬µ±Ó¦ÓÃÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ
- * acl_msg_register ×¢²áÁË×Ô¶¨Òå´ò¿ªº¯Êı£¬Ôòµ±Ó¦ÓÃµ÷ÓÃ acl_msg_close
- * Ê±»áµ÷ÓÃ´Ë¶¨Òå¹Ø±ÕÈÕÖ¾º¯Êı¹Ø±ÕÈÕÖ¾£¬·ñÔòÔòÓÃÈ±Ê¡µÄ·½·¨¹Ø±ÕÈÕÖ¾ÎÄ¼ş
- * @param ctx {void*} Ó¦ÓÃ´«µİ½øÈ¥µÄ²ÎÊı
+ * åº”ç”¨é€šè¿‡æ­¤å‡½æ•°ç±»å‹å¯ä»¥è‡ªå®šä¹‰æ—¥å¿—å…³é—­å‡½æ•°ï¼Œå½“åº”ç”¨åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨
+ * acl_msg_register æ³¨å†Œäº†è‡ªå®šä¹‰æ‰“å¼€å‡½æ•°ï¼Œåˆ™å½“åº”ç”¨è°ƒç”¨ acl_msg_close
+ * æ—¶ä¼šè°ƒç”¨æ­¤å®šä¹‰å…³é—­æ—¥å¿—å‡½æ•°å…³é—­æ—¥å¿—ï¼Œå¦åˆ™åˆ™ç”¨ç¼ºçœçš„æ–¹æ³•å…³é—­æ—¥å¿—æ–‡ä»¶
+ * @param ctx {void*} åº”ç”¨ä¼ é€’è¿›å»çš„å‚æ•°
  */
 typedef void (*ACL_MSG_CLOSE_FN) (void *ctx);
 
 /**
- * Ó¦ÓÃÍ¨¹ı´Ëº¯ÊıÀàĞÍ¿ÉÒÔ×Ô¶¨ÒåÈÕÖ¾¼ÇÂ¼º¯Êı£¬µ±Ó¦ÓÃÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ
- * acl_msg_register ×¢²áÁË×Ô¶¨Òå¼ÇÂ¼º¯Êı£¬Ôòµ±Ó¦ÓÃĞ´ÈÕÖ¾Ê±±ãÓÃ´Ë×Ô¶¨Òå
- * º¯Êı¼ÇÂ¼ÈÕÖ¾£¬·ñÔòÓÃÈ±Ê¡µÄÈÕÖ¾¼ÇÂ¼º¯Êı
- * @param ctx {void*} Ó¦ÓÃ´«µİ½øÈ¥µÄ²ÎÊı
- * @param fmt {const char*} ¸ñÊ½²ÎÊı
- * @param ap {va_list} ²ÎÊıÁĞ±í
+ * åº”ç”¨é€šè¿‡æ­¤å‡½æ•°ç±»å‹å¯ä»¥è‡ªå®šä¹‰æ—¥å¿—è®°å½•å‡½æ•°ï¼Œå½“åº”ç”¨åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨
+ * acl_msg_register æ³¨å†Œäº†è‡ªå®šä¹‰è®°å½•å‡½æ•°ï¼Œåˆ™å½“åº”ç”¨å†™æ—¥å¿—æ—¶ä¾¿ç”¨æ­¤è‡ªå®šä¹‰
+ * å‡½æ•°è®°å½•æ—¥å¿—ï¼Œå¦åˆ™ç”¨ç¼ºçœçš„æ—¥å¿—è®°å½•å‡½æ•°
+ * @param ctx {void*} åº”ç”¨ä¼ é€’è¿›å»çš„å‚æ•°
+ * @param fmt {const char*} æ ¼å¼å‚æ•°
+ * @param ap {va_list} å‚æ•°åˆ—è¡¨
  */
 typedef void (*ACL_MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
 
 /**
- * ÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ´Ëº¯Êı×¢²áÓ¦ÓÃ×Ô¼ºµÄÈÕÖ¾´ò¿ªº¯Êı¡¢ÈÕÖ¾¹Ø±Õº¯Êı¡¢ÈÕÖ¾¼ÇÂ¼º¯Êı
- * @param open_fn {ACL_MSG_OPEN_FN} ×Ô¶¨ÒåÈÕÖ¾´ò¿ªº¯Êı
- * @param close_fn {ACL_MSG_CLOSE_FN} ×Ô¶¨ÒåÈÕÖ¾¹Ø±Õº¯Êı
- * @param write_fn {ACL_MSG_WRITE_FN} ×Ô¶¨ÒåÈÕÖ¾¼ÇÂ¼º¯Êı
- * @param ctx {void*} ×Ô¶¨Òå²ÎÊı
+ * åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨æ­¤å‡½æ•°æ³¨å†Œåº”ç”¨è‡ªå·±çš„æ—¥å¿—æ‰“å¼€å‡½æ•°ã€æ—¥å¿—å…³é—­å‡½æ•°ã€æ—¥å¿—è®°å½•å‡½æ•°
+ * @param open_fn {ACL_MSG_OPEN_FN} è‡ªå®šä¹‰æ—¥å¿—æ‰“å¼€å‡½æ•°
+ * @param close_fn {ACL_MSG_CLOSE_FN} è‡ªå®šä¹‰æ—¥å¿—å…³é—­å‡½æ•°
+ * @param write_fn {ACL_MSG_WRITE_FN} è‡ªå®šä¹‰æ—¥å¿—è®°å½•å‡½æ•°
+ * @param ctx {void*} è‡ªå®šä¹‰å‚æ•°
  */
 ACL_API void acl_msg_register(ACL_MSG_OPEN_FN open_fn, ACL_MSG_CLOSE_FN close_fn,
         ACL_MSG_WRITE_FN write_fn, void *ctx);
 
 /**
- * ½« acl_msg_register ×¢²á×Ô¶¨Òåº¯ÊıÇå³ı£¬²ÉÓÃÈ±Ê¡µÄÈÕÖ¾º¯Êı¼¯
+ * å°† acl_msg_register æ³¨å†Œè‡ªå®šä¹‰å‡½æ•°æ¸…é™¤ï¼Œé‡‡ç”¨ç¼ºçœçš„æ—¥å¿—å‡½æ•°é›†
  */
 ACL_API void acl_msg_unregister(void);
 
 /**
- * ÔÚ´ò¿ªÈÕÖ¾Ç°µ÷ÓÃ´Ëº¯Êı×¢²áÓ¦ÓÃµÄË½ÓĞº¯Êı£¬ÔÚ¼ÇÂ¼ÈÕÖ¾Ç°»áÏÈ¼ÇÂ¼ĞÅÏ¢Í¨¹ı
- * ´Ë×¢²áµÄº¯Êı´«µİ¸øÓ¦ÓÃ
- * @param pre_write {ACL_MSG_PRE_WRITE_FN} ÈÕÖ¾¼ÇÂ¼Ç°µ÷ÓÃµÄº¯Êı
- * @param ctx {void*} ×Ô¶¨Òå²ÎÊı
+ * åœ¨æ‰“å¼€æ—¥å¿—å‰è°ƒç”¨æ­¤å‡½æ•°æ³¨å†Œåº”ç”¨çš„ç§æœ‰å‡½æ•°ï¼Œåœ¨è®°å½•æ—¥å¿—å‰ä¼šå…ˆè®°å½•ä¿¡æ¯é€šè¿‡
+ * æ­¤æ³¨å†Œçš„å‡½æ•°ä¼ é€’ç»™åº”ç”¨
+ * @param pre_write {ACL_MSG_PRE_WRITE_FN} æ—¥å¿—è®°å½•å‰è°ƒç”¨çš„å‡½æ•°
+ * @param ctx {void*} è‡ªå®šä¹‰å‚æ•°
  */
 ACL_API void acl_msg_pre_write(ACL_MSG_PRE_WRITE_FN pre_write, void *ctx);
 
 /**
- * È«¾Ö±äÁ¿£¬±íÊ¾µ÷ÊÔ¼¶±ğ
- * @deprecated ½«À´¸Ã²ÎÊı½«Ö»»áÄÚ²¿Ê¹ÓÃ£¬Íâ²¿Ó¦ÓÃ²»Ó¦ÓÃËü
+ * å…¨å±€å˜é‡ï¼Œè¡¨ç¤ºè°ƒè¯•çº§åˆ«
+ * @deprecated å°†æ¥è¯¥å‚æ•°å°†åªä¼šå†…éƒ¨ä½¿ç”¨ï¼Œå¤–éƒ¨åº”ç”¨ä¸åº”ç”¨å®ƒ
  */
 extern ACL_API int acl_msg_verbose;
 
 /**
- * µ±Î´µ÷ÓÃ acl_msg_open ·½Ê½´ò¿ªÈÕÖ¾Ê±£¬µ÷ÓÃÁË acl_msg_info/error/fatal/warn
- * µÄ²Ù×÷£¬ÊÇ·ñÔÊĞíĞÅÏ¢Êä³öÖÁ±ê×¼Êä³öÆÁÄ»ÉÏ£¬Í¨¹ı´Ëº¯ÊıÀ´ÉèÖÃ¸Ã¿ª¹Ø£¬¸Ã¿ª¹Ø
- * ½öÓ°ÏìÊÇ·ñĞèÒª½«ĞÅÏ¢Êä³öÖÁÖÕ¶ËÆÁÄ»¶ø²»Ó°ÏìÊÇ·ñÊä³öÖÁÎÄ¼şÖĞ
- * @param onoff {int} ·Ç 0 ±íÊ¾ÔÊĞíÊä³öÖÁÆÁÄ»
+ * å½“æœªè°ƒç”¨ acl_msg_open æ–¹å¼æ‰“å¼€æ—¥å¿—æ—¶ï¼Œè°ƒç”¨äº† acl_msg_info/error/fatal/warn
+ * çš„æ“ä½œï¼Œæ˜¯å¦å…è®¸ä¿¡æ¯è¾“å‡ºè‡³æ ‡å‡†è¾“å‡ºå±å¹•ä¸Šï¼Œé€šè¿‡æ­¤å‡½æ•°æ¥è®¾ç½®è¯¥å¼€å…³ï¼Œè¯¥å¼€å…³
+ * ä»…å½±å“æ˜¯å¦éœ€è¦å°†ä¿¡æ¯è¾“å‡ºè‡³ç»ˆç«¯å±å¹•è€Œä¸å½±å“æ˜¯å¦è¾“å‡ºè‡³æ–‡ä»¶ä¸­
+ * @param onoff {int} é 0 è¡¨ç¤ºå…è®¸è¾“å‡ºè‡³å±å¹•
  */
 ACL_API void acl_msg_stdout_enable(int onoff);
 
 /**
- * µ±µ÷ÓÃ acl_msg_error_xxx/acl_msg_warn_xxx µÈº¯Êı¼ÇÂ¼³ö´í»ò¾¯¸æÀàĞÍµÄÈÕÖ¾Ê±
- * ÊÇ·ñĞèÒª¼ÇÂ¼µ÷ÓÃ¶ÑÕ»£¬¿ÉÓÉ¸Ãº¯Êı½øĞĞÉèÖÃ
- * @param onoff {int} ·Ç 0 ±íÊ¾ÔÊĞí¼ÇÂ¼µ÷ÓÃ³ö´í/¾¯¸æÈÕÖ¾µÄ¶ÑÕ»£¬È±Ê¡²»¼ÇÂ¼
+ * å½“è°ƒç”¨ acl_msg_error_xxx/acl_msg_warn_xxx ç­‰å‡½æ•°è®°å½•å‡ºé”™æˆ–è­¦å‘Šç±»å‹çš„æ—¥å¿—æ—¶
+ * æ˜¯å¦éœ€è¦è®°å½•è°ƒç”¨å †æ ˆï¼Œå¯ç”±è¯¥å‡½æ•°è¿›è¡Œè®¾ç½®
+ * @param onoff {int} é 0 è¡¨ç¤ºå…è®¸è®°å½•è°ƒç”¨å‡ºé”™/è­¦å‘Šæ—¥å¿—çš„å †æ ˆï¼Œç¼ºçœä¸è®°å½•
  */
 ACL_API void acl_msg_trace_enable(int onoff);
 
 /**
- * ÈÕÖ¾´ò¿ªº¯Êı
- * @param log_file {const char*} ÈÕÖ¾½ÓÊÕÕß¼¯ºÏ£¬ÓÉ "|" ·Ö¸ô£¬½ÓÊÕÆ÷
- *  ¿ÉÒÔÊÇ±¾µØÎÄ¼ş»òÔ¶³ÌÌ×½Ó¿Ú£¬Èç:
+ * æ—¥å¿—æ‰“å¼€å‡½æ•°
+ * @param log_file {const char*} æ—¥å¿—æ¥æ”¶è€…é›†åˆï¼Œç”± "|" åˆ†éš”ï¼Œæ¥æ”¶å™¨
+ *  å¯ä»¥æ˜¯æœ¬åœ°æ–‡ä»¶æˆ–è¿œç¨‹å¥—æ¥å£ï¼Œå¦‚:
  *  /tmp/test.log|UDP:127.0.0.1:12345|TCP:127.0.0.1:12345|UNIX:/tmp/test.sock
- *  ¸ÃÅäÖÃÒªÇó½«ËùÓĞÈÕÖ¾Í¬Ê±·¢¸ø /tmp/test.log, UDP:127.0.0.1:12345,
- *  TCP:127.0.0.1:12345 ºÍ UNIX:/tmp/test.sock ËÄ¸öÈÕÖ¾½ÓÊÕÆ÷¶ÔÏó
- * @param plog_pre {const char*} ÈÕÖ¾¼ÇÂ¼ĞÅÏ¢Ç°µÄÌáÊ¾ĞÅÏ¢£¬½¨ÒéÓÃ½ø³Ì
- * @param info_pre {const char*} ÈÕÖ¾¼ÇÂ¼ĞÅÏ¢Ç°µÄÌáÊ¾ĞÅÏ¢
+ *  è¯¥é…ç½®è¦æ±‚å°†æ‰€æœ‰æ—¥å¿—åŒæ—¶å‘ç»™ /tmp/test.log, UDP:127.0.0.1:12345,
+ *  TCP:127.0.0.1:12345 å’Œ UNIX:/tmp/test.sock å››ä¸ªæ—¥å¿—æ¥æ”¶å™¨å¯¹è±¡
+ * @param plog_pre {const char*} æ—¥å¿—è®°å½•ä¿¡æ¯å‰çš„æç¤ºä¿¡æ¯ï¼Œå»ºè®®ç”¨è¿›ç¨‹
+ * @param info_pre {const char*} æ—¥å¿—è®°å½•ä¿¡æ¯å‰çš„æç¤ºä¿¡æ¯
  */
 ACL_API void acl_msg_open(const char *log_file, const char *info_pre);
 
 /**
- * ÈÕÖ¾´ò¿ªº¯Êı
- * @param fp {ACL_VSTREAM *} ÈÕÖ¾ÎÄ¼şÁ÷¾ä±ú
- * @param info_pre {const char*} ÈÕÖ¾¼ÇÂ¼ĞÅÏ¢Ç°µÄÌáÊ¾ĞÅÏ¢
+ * æ—¥å¿—æ‰“å¼€å‡½æ•°
+ * @param fp {ACL_VSTREAM *} æ—¥å¿—æ–‡ä»¶æµå¥æŸ„
+ * @param info_pre {const char*} æ—¥å¿—è®°å½•ä¿¡æ¯å‰çš„æç¤ºä¿¡æ¯
  */
 ACL_API void acl_msg_open2(ACL_VSTREAM *fp, const char *info_pre);
 
 /**
- * ¹Ø±ÕÈÕÖ¾º¯Êı
+ * å…³é—­æ—¥å¿—å‡½æ•°
  */
 ACL_API void acl_msg_close(void);
 
 /**
- * µ±¼ÇÂ¼ÈÕÖ¾ĞÅÏ¢ÖÁÈÕÖ¾ÎÄ¼şÊ±£¬ĞèÒªµ÷ÓÃÈçÏÂµÄÈÕÖ¾¼ÇÂ¼º¯Êı
+ * å½“è®°å½•æ—¥å¿—ä¿¡æ¯è‡³æ—¥å¿—æ–‡ä»¶æ—¶ï¼Œéœ€è¦è°ƒç”¨å¦‚ä¸‹çš„æ—¥å¿—è®°å½•å‡½æ•°
  */
 
 #ifndef	USE_PRINTF_MACRO
 
 /**
- * Ò»°ã¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * ä¸€èˆ¬çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(1, 2) acl_msg_info(const char *fmt,...);
 
 /**
- * ¾¯¸æ¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * è­¦å‘Šçº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(1, 2) acl_msg_warn(const char *fmt,...);
 
 /**
- * ´íÎó¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * é”™è¯¯çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(1, 2) acl_msg_error(const char *fmt,...);
 
 /**
- * ÖÂÃü¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * è‡´å‘½çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(1, 2) acl_msg_fatal(const char *fmt,...);
 
 /**
- * ÖÂÃü¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param status {int} µ±Ç°Î´ÓÃ
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * è‡´å‘½çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param status {int} å½“å‰æœªç”¨
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(2, 3)
 	acl_msg_fatal_status(int status, const char *fmt,...);
 
 /**
- * ¿Ö»Å¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * ææ…Œçº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(1, 2) acl_msg_panic(const char *fmt,...);
 
 /**
- * Ò»°ã¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
+ * ä¸€èˆ¬çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_msg_info2(const char *fmt, va_list ap);
 
 
 /**
- * ¾¯¸æ¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
+ * è­¦å‘Šçº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_msg_warn2(const char *fmt, va_list ap);
 
 /**
- * ´íÎó¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
+ * é”™è¯¯çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_msg_error2(const char *fmt, va_list ap);
 
 
 /**
- * ÖÂÃü¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
+ * è‡´å‘½çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_msg_fatal2(const char *fmt, va_list ap);
 
 /**
- * ÖÂÃü¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param status {int} µ±Ç°Î´ÓÃ
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
+ * è‡´å‘½çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param status {int} å½“å‰æœªç”¨
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_msg_fatal_status2(int status, const char *fmt, va_list ap);
 
 /**
- * ¿Ö»Å¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ap {va_list} ±ä²ÎÁĞ±í
+ * ææ…Œçº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ap {va_list} å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_msg_panic2(const char *fmt, va_list ap);
 #else
 
 /**
- * µ±¼ÇÂ¼ÈÕÖ¾ĞÅÏ¢ÖÁ±ê×¼Êä³öÊ±£¬ĞèÒªµ÷ÓÃÈçÏÂµÄÈÕÖ¾¼ÇÂ¼º¯Êı
+ * å½“è®°å½•æ—¥å¿—ä¿¡æ¯è‡³æ ‡å‡†è¾“å‡ºæ—¶ï¼Œéœ€è¦è°ƒç”¨å¦‚ä¸‹çš„æ—¥å¿—è®°å½•å‡½æ•°
  */
 
 #include <stdio.h>
@@ -234,46 +234,46 @@ ACL_API void acl_msg_panic2(const char *fmt, va_list ap);
 #endif
 
 /**
- * ÀàËÆÓÚ±ê×¼CµÄ strerror, µ«¸Ãº¯ÊıÊÇ¿çÆ½Ì¨ÇÒÊÇÏß³Ì°²È«µÄ£¬»ñµÃ¶ÔÓ¦Ä³¸ö´íÎó
- * ºÅµÄ´íÎóÃèÊöĞÅÏ¢
- * @param errnum {unsigned int} ´íÎóºÅ
- * @param buffer {char*} ´æ´¢´íÎóÃèÊöĞÅÏ¢µÄÄÚ´æ»º³åÇø
- * @param size {int} buffer »º³åÇøµÄ´óĞ¡
- * @return {const char*} ·µ»ØµÄµØÖ·Ó¦Óë buffer ÏàÍ¬
+ * ç±»ä¼¼äºæ ‡å‡†Cçš„ strerror, ä½†è¯¥å‡½æ•°æ˜¯è·¨å¹³å°ä¸”æ˜¯çº¿ç¨‹å®‰å…¨çš„ï¼Œè·å¾—å¯¹åº”æŸä¸ªé”™è¯¯
+ * å·çš„é”™è¯¯æè¿°ä¿¡æ¯
+ * @param errnum {unsigned int} é”™è¯¯å·
+ * @param buffer {char*} å­˜å‚¨é”™è¯¯æè¿°ä¿¡æ¯çš„å†…å­˜ç¼“å†²åŒº
+ * @param size {int} buffer ç¼“å†²åŒºçš„å¤§å°
+ * @return {const char*} è¿”å›çš„åœ°å€åº”ä¸ buffer ç›¸åŒ
  */
 ACL_API const char *acl_strerror(unsigned int errnum, char *buffer, int size);
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢
- * @param buffer {char*} ´æ´¢´íÎóÃèÊöĞÅÏ¢µÄÄÚ´æ»º³åÇø
- * @param size {int} buffer µÄ¿Õ¼ä´óĞ¡
- * @return {const char*} ·µ»ØµÄµØÖ·Ó¦Óë buffer ÏàÍ¬
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯
+ * @param buffer {char*} å­˜å‚¨é”™è¯¯æè¿°ä¿¡æ¯çš„å†…å­˜ç¼“å†²åŒº
+ * @param size {int} buffer çš„ç©ºé—´å¤§å°
+ * @return {const char*} è¿”å›çš„åœ°å€åº”ä¸ buffer ç›¸åŒ
  */
 ACL_API const char *acl_last_strerror(char *buffer, int size);
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢£¬¸Ãº¯ÊıÄÚ²¿²ÉÓÃÁËÏß³Ì¾Ö²¿±äÁ¿£¬ËùÒÔÊÇÏß³Ì
- * °²È«µÄ£¬µ«Ê¹ÓÃÆğÀ´¸ü¼òµ¥Ğ©
- * @return {const char *} ·µ»Ø´íÎóÌáÊ¾ĞÅÏ¢ 
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯ï¼Œè¯¥å‡½æ•°å†…éƒ¨é‡‡ç”¨äº†çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œæ‰€ä»¥æ˜¯çº¿ç¨‹
+ * å®‰å…¨çš„ï¼Œä½†ä½¿ç”¨èµ·æ¥æ›´ç®€å•äº›
+ * @return {const char *} è¿”å›é”™è¯¯æç¤ºä¿¡æ¯ 
  */
 ACL_API const char *acl_last_serror(void);
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóºÅ
- * @return {int} ´íÎóºÅ
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯å·
+ * @return {int} é”™è¯¯å·
  */
 ACL_API int acl_last_error(void);
 
 /**
- * ÊÖ¹¤ÉèÖÃ´íÎóºÅ
- * @param errnum {int} ´íÎóºÅ
+ * æ‰‹å·¥è®¾ç½®é”™è¯¯å·
+ * @param errnum {int} é”™è¯¯å·
  */
 ACL_API void acl_set_error(int errnum);
 
 /**
- * Êä³öĞÅÏ¢ÖÁ±ê×¼Êä³ö
- * @param fmt {const char*} ¸ñÊ½²ÎÊı
- * @param ... ±ä²ÎĞòÁĞ
+ * è¾“å‡ºä¿¡æ¯è‡³æ ‡å‡†è¾“å‡º
+ * @param fmt {const char*} æ ¼å¼å‚æ•°
+ * @param ... å˜å‚åºåˆ—
  */
 ACL_API void ACL_PRINTF(1, 2) acl_msg_printf(const char *fmt,...);
 

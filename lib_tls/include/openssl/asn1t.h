@@ -1,4 +1,4 @@
-/* asn1t.h */
+﻿/* asn1t.h */
 /* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 2000.
  */

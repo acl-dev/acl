@@ -1,4 +1,4 @@
-#ifndef __MASTER_VERSION_INCLUDE_H__
+﻿#ifndef __MASTER_VERSION_INCLUDE_H__
 #define __MASTER_VERSION_INCLUDE_H__
 
 #define MASTER_NAME	"acl_master"

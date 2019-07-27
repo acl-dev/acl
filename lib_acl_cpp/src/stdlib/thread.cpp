@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -80,9 +80,9 @@ void* thread::thread_run(void* arg)
 
 	thr->sync_->push(NULL);
 
-	// Èç¹ûÏß³Ì´´½¨Ê±Îª·ÖÀëÄ£Ê½£¬Ôòµ± run ÔËĞĞÊ±ÓÃ»§ÓĞ¿ÉÄÜ
-	// ½«Ïß³Ì¶ÔÏóÏú»ÙÁË£¬ËùÒÔ²»ÄÜÔÙ½« thr->return_arg_ ½øĞĞ
-	// ¸³Öµ£¬·ñÔò¾ÍÓĞ¿ÉÄÜ³öÏÖÄÚ´æ·Ç·¨·ÃÎÊ
+	// å¦‚æœçº¿ç¨‹åˆ›å»ºæ—¶ä¸ºåˆ†ç¦»æ¨¡å¼ï¼Œåˆ™å½“ run è¿è¡Œæ—¶ç”¨æˆ·æœ‰å¯èƒ½
+	// å°†çº¿ç¨‹å¯¹è±¡é”€æ¯äº†ï¼Œæ‰€ä»¥ä¸èƒ½å†å°† thr->return_arg_ è¿›è¡Œ
+	// èµ‹å€¼ï¼Œå¦åˆ™å°±æœ‰å¯èƒ½å‡ºç°å†…å­˜éæ³•è®¿é—®
 	if (thr->detachable_) {
 		return thr->run();
 	}
@@ -96,8 +96,8 @@ bool thread::start(bool sync /* = false */)
 	acl_pthread_attr_t attr;
 	acl_pthread_attr_init(&attr);
 
-	// µ±Ò»¸öÏß³Ì¶ÔÏó±»ÖØ¸´Ê¹ÓÃÊ±£¬ÎªÁË·ÀÖ¹ wait(void** out /* = NULL */)
-	// Ö´ĞĞÊ± logger_warn("pthread_josin's arg invalid?") ±¨´í
+	// å½“ä¸€ä¸ªçº¿ç¨‹å¯¹è±¡è¢«é‡å¤ä½¿ç”¨æ—¶ï¼Œä¸ºäº†é˜²æ­¢ wait(void** out /* = NULL */)
+	// æ‰§è¡Œæ—¶ logger_warn("pthread_josin's arg invalid?") æŠ¥é”™
 	// --- by 562351190@qq.com 
 	thread_id_ = 0;
 
@@ -125,8 +125,8 @@ bool thread::start(bool sync /* = false */)
 		wait_for_running();
 	}
 
-	// Èç¹ûÏß³Ì´´½¨×ã¹»¿ì£¬ÔÚ thread_run ÖĞÓĞ¿ÉÄÜÓÃ»§½«Ïß³Ì¶ÔÏóÊÍ·Å£¬
-	// ÔòÏÂÃæµÄ´úÂë¾Í»áÔì³ÉÄÚ´æ·Ç·¨·ÃÎÊ
+	// å¦‚æœçº¿ç¨‹åˆ›å»ºè¶³å¤Ÿå¿«ï¼Œåœ¨ thread_run ä¸­æœ‰å¯èƒ½ç”¨æˆ·å°†çº¿ç¨‹å¯¹è±¡é‡Šæ”¾ï¼Œ
+	// åˆ™ä¸‹é¢çš„ä»£ç å°±ä¼šé€ æˆå†…å­˜éæ³•è®¿é—®
 #if 0
 #ifdef	ACL_WINDOWS
 	thread_id_ = ((acl_pthread_t*) thread_)->id;
@@ -165,7 +165,7 @@ bool thread::wait(void** out /* = NULL */)
 		return false;
 	}
 
-	// ±È½ÏÍ¨¹ıÔÚ thread_run ÖĞ½Ø»ñµÄ²ÎÊıÓë pthread_join »ñµÃµÄ²ÎÊıÊÇ·ñÏàÍ¬
+	// æ¯”è¾ƒé€šè¿‡åœ¨ thread_run ä¸­æˆªè·çš„å‚æ•°ä¸ pthread_join è·å¾—çš„å‚æ•°æ˜¯å¦ç›¸åŒ
 	if (ptr != return_arg_) {
 		logger_warn("pthread_josin's arg invalid?");
 	}

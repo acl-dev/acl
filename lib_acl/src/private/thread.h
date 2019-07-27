@@ -1,4 +1,4 @@
-#ifndef	__INTERNAL_THREAD_INCLUDE_H__
+﻿#ifndef	__INTERNAL_THREAD_INCLUDE_H__
 #define	__INTERNAL_THREAD_INCLUDE_H__
 
 #ifdef	__cplusplus

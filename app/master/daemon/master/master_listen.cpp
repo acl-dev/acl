@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #include <sys/socket.h>
 #include <netinet/in.h>

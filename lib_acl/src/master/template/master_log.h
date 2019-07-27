@@ -1,4 +1,4 @@
-#ifndef	__MASTER_LOG_INCLUDE_H__
+﻿#ifndef	__MASTER_LOG_INCLUDE_H__
 #define	__MASTER_LOG_INCLUDE_H__
 
 #include "stdlib/acl_define.h"

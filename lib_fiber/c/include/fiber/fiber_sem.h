@@ -1,4 +1,4 @@
-#ifndef FIBER_SEM_INCLUDE_H
+﻿#ifndef FIBER_SEM_INCLUDE_H
 #define FIBER_SEM_INCLUDE_H
 
 #include "fiber_define.h"

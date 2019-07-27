@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
@@ -22,7 +22,7 @@ static bool __has_called = false;
 
 void master_threads::run(int argc, char** argv)
 {
-	// µ÷ÓÃ acl ·şÎñÆ÷¿ò¼ÜµÄ¶àÏß³ÌÄ£°å
+	// è°ƒç”¨ acl æœåŠ¡å™¨æ¡†æ¶çš„å¤šçº¿ç¨‹æ¨¡æ¿
 	acl_threads_server_main(argc, argv, service_main, this,
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_ON_ACCEPT, service_on_accept,
@@ -58,7 +58,7 @@ const char* master_threads::get_conf_path(void) const
 void master_threads::run_daemon(int argc, char** argv)
 {
 #ifndef ACL_WINDOWS
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = true;
@@ -76,7 +76,7 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_cpp_init();
 #endif
 
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = false;
@@ -202,39 +202,39 @@ int master_threads::service_on_accept(void* ctx, ACL_VSTREAM* client)
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt);
 
-	// client->context ²»Ó¦±»Õ¼ÓÃ
+	// client->context ä¸åº”è¢«å ç”¨
 	if (client->context != NULL) {
 		logger_fatal("client->context not null!");
 	}
 
 	socket_stream* stream = NEW socket_stream();
 
-	// ÉèÖÃ client->context ÎªÁ÷¶ÔÏó£¬¸ÃÁ÷¶ÔÏó½«Í³Ò»ÔÚ
-	// service_on_close ÖĞ±»ÊÍ·Å
+	// è®¾ç½® client->context ä¸ºæµå¯¹è±¡ï¼Œè¯¥æµå¯¹è±¡å°†ç»Ÿä¸€åœ¨
+	// service_on_close ä¸­è¢«é‡Šæ”¾
 	client->context = stream;
 
 	if (!stream->open(client)) {
 		logger_error("open stream error(%s)", acl_last_serror());
-		// ·µ»Ø -1 ÓÉÉÏ²ã¿ò¼Üµ÷ÓÃ service_on_close ¹ı³Ì£¬ÔÚÀïÃæ
-		// ÊÍ·Å stream ¶ÔÏó
+		// è¿”å› -1 ç”±ä¸Šå±‚æ¡†æ¶è°ƒç”¨ service_on_close è¿‡ç¨‹ï¼Œåœ¨é‡Œé¢
+		// é‡Šæ”¾ stream å¯¹è±¡
 		return -1;
 	}
 
-	// Èç¹û×ÓÀàµÄ thread_on_accept ·½·¨·µ»Ø false£¬ÔòÖ±½Ó·µ»Ø¸øÉÏ²ã
-	// ¿ò¼Ü -1£¬ÓÉÉÏ²ã¿ò¼ÜÔÙµ÷ÓÃ service_on_close ¹ı³Ì£¬´Ó¶øÔÚ¸Ã¹ı³Ì
-	// ÖĞ½« stream ¶ÔÏóÊÍ·Å
+	// å¦‚æœå­ç±»çš„ thread_on_accept æ–¹æ³•è¿”å› falseï¼Œåˆ™ç›´æ¥è¿”å›ç»™ä¸Šå±‚
+	// æ¡†æ¶ -1ï¼Œç”±ä¸Šå±‚æ¡†æ¶å†è°ƒç”¨ service_on_close è¿‡ç¨‹ï¼Œä»è€Œåœ¨è¯¥è¿‡ç¨‹
+	// ä¸­å°† stream å¯¹è±¡é‡Šæ”¾
 	if (!mt->thread_on_accept(stream)) {
 		return -1;
 	}
 
-	// Èç¹û×ÓÀàµÄ thread_on_handshake ·½·¨·µ»Ø false£¬ÔòÖ±½Ó·µ»Ø¸øÉÏ²ã
-	// ¿ò¼Ü -1£¬ÓÉÉÏ²ã¿ò¼ÜÔÙµ÷ÓÃ service_on_close ¹ı³Ì£¬´Ó¶øÔÚ¸Ã¹ı³Ì
-	// ÖĞ½« stream ¶ÔÏóÊÍ·Å
+	// å¦‚æœå­ç±»çš„ thread_on_handshake æ–¹æ³•è¿”å› falseï¼Œåˆ™ç›´æ¥è¿”å›ç»™ä¸Šå±‚
+	// æ¡†æ¶ -1ï¼Œç”±ä¸Šå±‚æ¡†æ¶å†è°ƒç”¨ service_on_close è¿‡ç¨‹ï¼Œä»è€Œåœ¨è¯¥è¿‡ç¨‹
+	// ä¸­å°† stream å¯¹è±¡é‡Šæ”¾
 	//if (mt->thread_on_handshake(stream) == false)
 	//	return -1;
 
-	// ·µ»Ø 0 ±íÊ¾¿ÉÒÔ¼ÌĞø´¦Àí¸Ã¿Í»§¶ËÁ¬½Ó£¬´Ó¶øÓÉÉÏ²ã¿ò¼Ü½«ÆäÖÃÈë
-	// ¶Á¼à¿Ø¼¯ºÏÖĞ
+	// è¿”å› 0 è¡¨ç¤ºå¯ä»¥ç»§ç»­å¤„ç†è¯¥å®¢æˆ·ç«¯è¿æ¥ï¼Œä»è€Œç”±ä¸Šå±‚æ¡†æ¶å°†å…¶ç½®å…¥
+	// è¯»ç›‘æ§é›†åˆä¸­
 	return 0;
 }
 
@@ -243,15 +243,15 @@ int master_threads::service_on_handshake(void* ctx, ACL_VSTREAM *client)
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt != NULL);
 
-	// client->context ÔÚ service_on_accept ÖĞ±»ÉèÖÃ
+	// client->context åœ¨ service_on_accept ä¸­è¢«è®¾ç½®
 	socket_stream* stream = (socket_stream*) client->context;
 	if (stream == NULL) {
 		logger_fatal("client->context is null!");
 	}
 
-	// Èç¹û×ÓÀàµÄ thread_on_handshake ·½·¨·µ»Ø false£¬ÔòÖ±½Ó·µ»Ø¸øÉÏ²ã
-	// ¿ò¼Ü -1£¬ÓÉÉÏ²ã¿ò¼ÜÔÙµ÷ÓÃ service_on_close ¹ı³Ì£¬´Ó¶øÔÚ¸Ã¹ı³Ì
-	// ÖĞ½« stream ¶ÔÏóÊÍ·Å
+	// å¦‚æœå­ç±»çš„ thread_on_handshake æ–¹æ³•è¿”å› falseï¼Œåˆ™ç›´æ¥è¿”å›ç»™ä¸Šå±‚
+	// æ¡†æ¶ -1ï¼Œç”±ä¸Šå±‚æ¡†æ¶å†è°ƒç”¨ service_on_close è¿‡ç¨‹ï¼Œä»è€Œåœ¨è¯¥è¿‡ç¨‹
+	// ä¸­å°† stream å¯¹è±¡é‡Šæ”¾
 	if (mt->thread_on_handshake(stream)) {
 		return 0;
 	}
@@ -263,39 +263,39 @@ int master_threads::service_main(void* ctx, ACL_VSTREAM *client)
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt != NULL);
 
-	// client->context ÔÚ service_on_accept ÖĞ±»ÉèÖÃ
+	// client->context åœ¨ service_on_accept ä¸­è¢«è®¾ç½®
 	socket_stream* stream = (socket_stream*) client->context;
 	if (stream == NULL) {
 		logger_fatal("client->context is null!");
 	}
 
-	// µ÷ÓÃ×ÓÀàµÄĞéº¯ÊıÊµÏÖ£¬Èç¹û·µ»Ø true ±íÊ¾ÈÃ¿ò¼Ü¼ÌĞø¼à¿Ø¸ÃÁ¬½ÓÁ÷£¬
-	// ·ñÔòĞèÒª¹Ø±Õ¸ÃÁ÷
-	// ¸øÉÏ²ã¿ò¼Ü·µ»ØÖµº¯ÊıÈçÏÂ£º
-	// 0 ±íÊ¾½«Óë¸ÃÁ¬½Ó±£³Ö³¤Á¬½Ó£¬ÇÒĞèÒª¼ÌĞø¼à¿Ø¸ÃÁ¬½ÓÊÇ·ñ¿É¶Á
-	// -1 ±íÊ¾ĞèÒª¹Ø±Õ¸ÃÁ¬½Ó
-	// 1 ±íÊ¾²»ÔÙ¼à¿Ø¸ÃÁ¬½Ó
+	// è°ƒç”¨å­ç±»çš„è™šå‡½æ•°å®ç°ï¼Œå¦‚æœè¿”å› true è¡¨ç¤ºè®©æ¡†æ¶ç»§ç»­ç›‘æ§è¯¥è¿æ¥æµï¼Œ
+	// å¦åˆ™éœ€è¦å…³é—­è¯¥æµ
+	// ç»™ä¸Šå±‚æ¡†æ¶è¿”å›å€¼å‡½æ•°å¦‚ä¸‹ï¼š
+	// 0 è¡¨ç¤ºå°†ä¸è¯¥è¿æ¥ä¿æŒé•¿è¿æ¥ï¼Œä¸”éœ€è¦ç»§ç»­ç›‘æ§è¯¥è¿æ¥æ˜¯å¦å¯è¯»
+	// -1 è¡¨ç¤ºéœ€è¦å…³é—­è¯¥è¿æ¥
+	// 1 è¡¨ç¤ºä¸å†ç›‘æ§è¯¥è¿æ¥
 
 	if (mt->thread_on_read(stream)) {
-		// Èç¹û×ÓÀàÔÚ·µ»Ø true ºó²»Ï£Íû¿ò¼Ü¼ÌĞø¼à¿ØÁ÷£¬ÔòÖ±½Ó·µ»Ø¸ø¿ò¼Ü 1
+		// å¦‚æœå­ç±»åœ¨è¿”å› true åä¸å¸Œæœ›æ¡†æ¶ç»§ç»­ç›‘æ§æµï¼Œåˆ™ç›´æ¥è¿”å›ç»™æ¡†æ¶ 1
 		if (!mt->keep_read(stream)) {
 			return 1;
 		}
 
-		// ·ñÔò£¬ĞèÒª¼ì²é¸ÃÁ÷ÊÇ·ñÒÑ¾­¹Ø±Õ£¬Èç¹û¹Ø±Õ£¬Ôò±ØĞë·µ»Ø -1
+		// å¦åˆ™ï¼Œéœ€è¦æ£€æŸ¥è¯¥æµæ˜¯å¦å·²ç»å…³é—­ï¼Œå¦‚æœå…³é—­ï¼Œåˆ™å¿…é¡»è¿”å› -1
 		if (stream->eof()) {
 			logger_error("DISCONNECTED, CLOSING, FD: %d",
 				(int) stream->sock_handle());
 			return -1;
 		}
 
-		// ·µ»Ø 0 ±íÊ¾¼ÌĞø¼à¿Ø¸ÃÁ÷µÄ¿É¶Á×´Ì¬
+		// è¿”å› 0 è¡¨ç¤ºç»§ç»­ç›‘æ§è¯¥æµçš„å¯è¯»çŠ¶æ€
 		return 0;
 	}
 
-	// ·µ»Ø -1 ±íÊ¾ÓÉÉÏ²ã¿ò¼ÜÕæÕı¹Ø±ÕÁ÷£¬ÉÏ²ã¿ò¼ÜÔÚÕæÕı¹Ø±ÕÁ÷Ç°
-	// ½«»á»Øµ÷ service_on_close ¹ı³Ì½øĞĞÁ÷¹Ø±ÕÇ°µÄÉÆºó´¦Àí¹¤×÷£¬
-	// stream ¶ÔÏó½«ÔÚ service_on_close ÖĞ±»ÊÍ·Å
+	// è¿”å› -1 è¡¨ç¤ºç”±ä¸Šå±‚æ¡†æ¶çœŸæ­£å…³é—­æµï¼Œä¸Šå±‚æ¡†æ¶åœ¨çœŸæ­£å…³é—­æµå‰
+	// å°†ä¼šå›è°ƒ service_on_close è¿‡ç¨‹è¿›è¡Œæµå…³é—­å‰çš„å–„åå¤„ç†å·¥ä½œï¼Œ
+	// stream å¯¹è±¡å°†åœ¨ service_on_close ä¸­è¢«é‡Šæ”¾
 	return -1;
 }
 
@@ -333,12 +333,12 @@ void master_threads::service_on_close(void* ctx, ACL_VSTREAM* client)
 		logger_fatal("client->context is null!");
 	}
 
-	// µ÷ÓÃ×ÓÀàº¯Êı¶Ô½«Òª¹Ø±ÕµÄÁ÷½øĞĞÉÆºó´¦Àí
+	// è°ƒç”¨å­ç±»å‡½æ•°å¯¹å°†è¦å…³é—­çš„æµè¿›è¡Œå–„åå¤„ç†
 	mt->thread_on_close(stream);
 
-	// ½âÊÍÓëÁ¬½ÓÁ÷µÄ°ó¶¨¹ØÏµ£¬ÕâÑù¿ÉÒÔ·ÀÖ¹ÔÚÉ¾³ıÁ÷¶ÔÏóÊ±
-	// ÕæÕı¹Ø±ÕÁËÁ¬½ÓÁ÷£¬ÒòÎª¸ÃÁ÷Á¬½ÓĞèÒªÔÚ±¾º¯Êı·µ»ØºóÓÉ
-	// ¿ò¼Ü×Ô¶¯¹Ø±Õ
+	// è§£é‡Šä¸è¿æ¥æµçš„ç»‘å®šå…³ç³»ï¼Œè¿™æ ·å¯ä»¥é˜²æ­¢åœ¨åˆ é™¤æµå¯¹è±¡æ—¶
+	// çœŸæ­£å…³é—­äº†è¿æ¥æµï¼Œå› ä¸ºè¯¥æµè¿æ¥éœ€è¦åœ¨æœ¬å‡½æ•°è¿”å›åç”±
+	// æ¡†æ¶è‡ªåŠ¨å…³é—­
 	(void) stream->unbind();
 	delete stream;
 }

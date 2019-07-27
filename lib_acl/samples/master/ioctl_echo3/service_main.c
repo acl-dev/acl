@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "service_var.h"
 #include "service_main.h"
 
@@ -8,7 +8,7 @@ typedef struct
 	char  s[128];
 } MY_CTX;
 
-/* ³õÊ¼»¯º¯Êı */
+/* åˆå§‹åŒ–å‡½æ•° */
 void service_init(void *init_ctx acl_unused)
 {
 	const char *myname = "service_init";
@@ -16,7 +16,7 @@ void service_init(void *init_ctx acl_unused)
 	acl_msg_info("%s: init ok ...", myname);
 }
 
-/* ½ø³ÌÍË³öÇ°µ÷ÓÃµÄº¯Êı */
+/* è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨çš„å‡½æ•° */
 void service_exit(void *arg acl_unused)
 {
 	const char *myname = "service_exit";
@@ -45,7 +45,7 @@ int service_on_accept(void *arg acl_unused, ACL_VSTREAM *client)
 	return (0);
 }
 
-/* Ğ­Òé´¦Àíº¯ÊıÈë¿Ú */
+/* åè®®å¤„ç†å‡½æ•°å…¥å£ */
 int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 {
 	const char *myname = "service_main";
@@ -63,7 +63,7 @@ int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 				acl_msg_info("%s: close client now, (%s), timeout: %d",
 					myname, var_cfg_debug_msg, client->rw_timeout);
 			acl_vstring_free(buf);
-			return (-1);  /* ·µ»Ø¸ºÖµÒÔÊ¹¿ò¼ÜÄÚ²¿¹Ø±Õ client Êı¾İÁ÷ */
+			return (-1);  /* è¿”å›è´Ÿå€¼ä»¥ä½¿æ¡†æ¶å†…éƒ¨å…³é—­ client æ•°æ®æµ */
 		} else if (!ready)
 			break;
 
@@ -72,7 +72,7 @@ int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 				acl_msg_info("%s: write to client error, close now(%s)",
 					myname, var_cfg_debug_msg);
 			acl_vstring_free(buf);
-			return (-1);  /* ·µ»Ø¸ºÖµÒÔÊ¹¿ò¼ÜÄÚ²¿¹Ø±Õ client Êı¾İÁ÷ */
+			return (-1);  /* è¿”å›è´Ÿå€¼ä»¥ä½¿æ¡†æ¶å†…éƒ¨å…³é—­ client æ•°æ®æµ */
 		}
 	}
 	acl_vstring_free(buf);
@@ -80,11 +80,11 @@ int service_main(void *run_ctx acl_unused, ACL_VSTREAM *client)
 	if (var_cfg_keep_alive) {
 		if (var_cfg_debug_enable)
 			acl_msg_info("%s: keep alive, wait client...", myname);
-		return (0);  /* ·µ»Ø 0 ÒÔÊ¹¿ò¼ÜÄÚ²¿×Ô¶¯¼àÌı¸ÃÊı¾İÁ÷´Ó¶ø±£³Ö³¤Á¬½Ó */
+		return (0);  /* è¿”å› 0 ä»¥ä½¿æ¡†æ¶å†…éƒ¨è‡ªåŠ¨ç›‘å¬è¯¥æ•°æ®æµä»è€Œä¿æŒé•¿è¿æ¥ */
 	} else {
-		/* ¿ÉÒÔÔÚ´Ë´¦·µ»Ø =1, Ê¹¿ò¼ÜÄÚ²¿×Ô¶¯¹Ø±Õ client Êı¾İÁ÷,
-		 * Ò²¿ÉÒÔÔÚ´Ë´¦Ö±½Ó¹Ø±Õ client Êı¾İÁ÷£¬Í¬Ê±·µ»Ø 1 ¸æËß¿ò¼Ü
-		 * ¸ÃÁ÷ÒÑ¾­±»ÓÃ»§¹Ø±ÕÁË²»±ØÔÙ¹ØĞÄ¸Ã client Êı¾İÁ÷.
+		/* å¯ä»¥åœ¨æ­¤å¤„è¿”å› =1, ä½¿æ¡†æ¶å†…éƒ¨è‡ªåŠ¨å…³é—­ client æ•°æ®æµ,
+		 * ä¹Ÿå¯ä»¥åœ¨æ­¤å¤„ç›´æ¥å…³é—­ client æ•°æ®æµï¼ŒåŒæ—¶è¿”å› 1 å‘Šè¯‰æ¡†æ¶
+		 * è¯¥æµå·²ç»è¢«ç”¨æˆ·å…³é—­äº†ä¸å¿…å†å…³å¿ƒè¯¥ client æ•°æ®æµ.
 		 */
 		acl_vstream_close(client);
 		return (1);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 class CGb2Utf8 : public acl::thread
 {

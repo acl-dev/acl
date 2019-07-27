@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "icmp/lib_icmp.h"
 #include "icmp_struct.h"
 #include "icmp_private.h"
@@ -82,7 +82,7 @@ ICMP_STREAM* icmp_stream_open(ACL_AIO* aio)
 
 	is->from_len = sizeof(is->from);
 
-	/* ´´½¨Í¨ÐÅÁ÷ */
+	/* åˆ›å»ºé€šä¿¡æµ */
 
 	fd = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
 	if (fd == ACL_SOCKET_INVALID)
@@ -95,7 +95,7 @@ ICMP_STREAM* icmp_stream_open(ACL_AIO* aio)
 		ACL_VSTREAM_CTL_WRITE_FN, icmp_write, ACL_VSTREAM_CTL_CONTEXT,
 		is, ACL_VSTREAM_CTL_END);
 
-	/* Èç¹û²ÉÓÃÒì²½·½Ê½£¬Ôò´ò¿ªÒì²½Á÷ */
+	/* å¦‚æžœé‡‡ç”¨å¼‚æ­¥æ–¹å¼ï¼Œåˆ™æ‰“å¼€å¼‚æ­¥æµ */
 	if (aio)
 		is->astream = acl_aio_open(aio, is->vstream);
 
@@ -106,7 +106,7 @@ void icmp_stream_reopen(ACL_AIO* aio, ICMP_STREAM* is)
 {
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(is->vstream);
 	ACL_VSTREAM_SOCK(is->vstream) =
-		ACL_SOCKET_INVALID; /* ·ÀÖ¹Ô­SOCKET±»¹Ø±Õ:) */
+		ACL_SOCKET_INVALID; /* é˜²æ­¢åŽŸSOCKETè¢«å…³é—­:) */
 
 	is->vstream = acl_vstream_fdopen(
 		fd, O_RDWR, 1024, 0, ACL_VSTREAM_TYPE_SOCK);

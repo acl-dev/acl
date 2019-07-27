@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 #include "http_plugin.h"
 
 typedef struct {
@@ -107,7 +107,7 @@ static void run_cgi(CGI *cgi, ACL_ARGV *env)
 	int   ret, errnum = 200;
 	char **cpp;
 
-	/* ´ò¿ªÓëCGI³ÌĞòµÄ¹ÜµÀÊı¾İÁ÷ */
+	/* æ‰“å¼€ä¸CGIç¨‹åºçš„ç®¡é“æ•°æ®æµ */
 	stream = acl_vstream_popen(O_RDWR,
 			ACL_VSTREAM_POPEN_COMMAND, command,
 			ACL_VSTREAM_POPEN_ENV, env->argv,
@@ -139,7 +139,7 @@ static void run_cgi(CGI *cgi, ACL_ARGV *env)
 
 	cgi_hdrs = acl_argv_alloc(10);
 
-	/* ¶ÁCGI·¢ËÍµÄÏìÓ¦Í· */
+	/* è¯»CGIå‘é€çš„å“åº”å¤´ */
 	while (1) {
 		char *pname, *ptr;
 
@@ -176,7 +176,7 @@ static void run_cgi(CGI *cgi, ACL_ARGV *env)
 
 	ret = acl_vstream_writen(cgi->client, STR(vbuf), LEN(vbuf));
 	if (ret > 0) {
-		/* ¶ÁCGIµÄÏìÓ¦Êı¾İÌå²¢·¢ËÍÖÁä¯ÀÀÆ÷ */
+		/* è¯»CGIçš„å“åº”æ•°æ®ä½“å¹¶å‘é€è‡³æµè§ˆå™¨ */
 		while (1) {
 			ret = acl_vstream_read(stream, buf, sizeof(buf));
 			if (ret == ACL_VSTREAM_EOF)

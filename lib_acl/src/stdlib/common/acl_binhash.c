@@ -1,4 +1,4 @@
-/* C library */
+﻿/* C library */
 
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE

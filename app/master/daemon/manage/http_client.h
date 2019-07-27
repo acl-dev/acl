@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "json/serialize.h"
 
 class service_reload;

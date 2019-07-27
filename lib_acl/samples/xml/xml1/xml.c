@@ -1,4 +1,4 @@
-#include "lib_acl.h"
+ï»¿#include "lib_acl.h"
 
 #define STR	acl_vstring_str
 
@@ -139,7 +139,7 @@ static void parse_xml_benchmark(int once, int max, const char *data)
 		if (once) {
 			acl_xml_parse(xml, ptr);
 		} else {
-			/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö xml Êı¾İ */
+			/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æ xml æ•°æ® */
 			while (*ptr != 0) {
 				char  ch2[2];
 
@@ -193,11 +193,11 @@ static void parse_xml(int once, const char *data)
 	ptr = data;
 
 	if (once) {
-		/* Ò»´ÎĞÔµØ·ÖÎöÍêÕû xml Êı¾İ */
+		/* ä¸€æ¬¡æ€§åœ°åˆ†æå®Œæ•´ xml æ•°æ® */
 		ACL_METER_TIME("-------------once begin--------------");
 		acl_xml_parse(xml, ptr);
 	} else {
-		/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö xml Êı¾İ */
+		/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æ xml æ•°æ® */
 		ACL_METER_TIME("-------------stream begin--------------");
 		while (*ptr != 0) {
 			char  ch2[2];
@@ -220,21 +220,21 @@ static void parse_xml(int once, const char *data)
 
 	total = xml->node_cnt;
 
-	/* ±éÀú¸ù½áµãµÄÒ»¼¶×Ó½áµã */
+	/* éå†æ ¹ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹ */
 	acl_foreach(iter1, xml->root) {
 		ACL_ITER iter2;
 
 		ACL_XML_NODE *node = (ACL_XML_NODE*) iter1.data;
 		printf("tag> %s, text: %s\n", STR(node->ltag), STR(node->text));
 
-		/* ±éÀúÒ»¼¶×Ó½áµãµÄ¶ş¼¶×Ó½áµã */
+		/* éå†ä¸€çº§å­ç»“ç‚¹çš„äºŒçº§å­ç»“ç‚¹ */
 		acl_foreach(iter2, node) {
 			ACL_ITER iter3;
 			ACL_XML_NODE *node2 = (ACL_XML_NODE*) iter2.data;
 
 			printf("\ttag> %s, text: %s\n", STR(node2->ltag), STR(node2->text));
 
-			/* ±éÀú¶ş¼¶×Ó½áµãµÄÊôĞÔ */
+			/* éå†äºŒçº§å­ç»“ç‚¹çš„å±æ€§ */
 			acl_foreach(iter3, node2->attr_list) {
 				ACL_XML_ATTR *attr = (ACL_XML_ATTR*) iter3.data;
 				printf("\t\tattr> %s: %s\n", STR(attr->name), STR(attr->value));
@@ -244,7 +244,7 @@ static void parse_xml(int once, const char *data)
 
 	printf("----------------------------------------------------\n");
 
-	/* ´Ó¸ù½áµã¿ªÊ¼±éÀú xml ¶ÔÏóµÄËùÓĞ½áµã */
+	/* ä»æ ¹ç»“ç‚¹å¼€å§‹éå† xml å¯¹è±¡çš„æ‰€æœ‰ç»“ç‚¹ */
 
 	acl_foreach(iter1, xml) {
 		ACL_ITER iter2;
@@ -256,7 +256,7 @@ static void parse_xml(int once, const char *data)
 
 		printf("tag> %s, text: %s\n", STR(node->ltag), STR(node->text));
 
-		/* ±éÀú xml ½áµãµÄÊôĞÔ */
+		/* éå† xml ç»“ç‚¹çš„å±æ€§ */
 		acl_foreach(iter2, node->attr_list) {
 			ACL_XML_ATTR *attr = (ACL_XML_ATTR*) iter2.data;
 
@@ -268,41 +268,41 @@ static void parse_xml(int once, const char *data)
 		}
 	}
 
-	/* ¸ù¾İ±êÇ©Ãû»ñµÃ xml ½áµã¼¯ºÏ */
+	/* æ ¹æ®æ ‡ç­¾åè·å¾— xml ç»“ç‚¹é›†åˆ */
 
 	printf("--------- acl_xml_getElementsByTagName ----------\n");
 	a = acl_xml_getElementsByTagName(xml, "user");
 	if (a) {
-		/* ±éÀú½á¹û¼¯ */
+		/* éå†ç»“æœé›† */
 		acl_foreach(iter1, a) {
 			ACL_XML_NODE *node = (ACL_XML_NODE*) iter1.data;
 			printf("tag> %s, text: %s\n", STR(node->ltag), STR(node->text));
 		}
-		/* ÊÍ·ÅÊı×é¶ÔÏó */
+		/* é‡Šæ”¾æ•°ç»„å¯¹è±¡ */
 		acl_xml_free_array(a);
 	}
 
 
-	/* ²éÑ¯ÊôĞÔÃûÎª name, ÊôĞÔÖµÎª user2_1 µÄËùÓĞ xml ½áµãµÄ¼¯ºÏ */
+	/* æŸ¥è¯¢å±æ€§åä¸º name, å±æ€§å€¼ä¸º user2_1 çš„æ‰€æœ‰ xml ç»“ç‚¹çš„é›†åˆ */
 
 	printf("--------- acl_xml_getElementsByName ------------\n");
 	a = acl_xml_getElementsByName(xml, "user2_1");
 	if (a) {
-		/* ±éÀú½á¹û¼¯ */
+		/* éå†ç»“æœé›† */
 		acl_foreach(iter1, a) {
 			ACL_XML_NODE *node = (ACL_XML_NODE*) iter1.data;
 			printf("tag> %s, text: %s\n", STR(node->ltag), STR(node->text));
 		}
-		/* ÊÍ·ÅÊı×é¶ÔÏó */
+		/* é‡Šæ”¾æ•°ç»„å¯¹è±¡ */
 		acl_xml_free_array(a);
 	}
 
-	/* ²éÑ¯ÊôĞÔÃûÎª id, ÊôĞÔÖµÎª id2_2 µÄËùÓĞ xml ½áµã¼¯ºÏ */
+	/* æŸ¥è¯¢å±æ€§åä¸º id, å±æ€§å€¼ä¸º id2_2 çš„æ‰€æœ‰ xml ç»“ç‚¹é›†åˆ */
 	printf("----------- acl_xml_getElementById -------------\n");
 	pnode = acl_xml_getElementById(xml, "id2_2");
 	if (pnode) {
 		printf("tag> %s, text: %s\n", STR(pnode->ltag), STR(pnode->text));
-		/* ±éÀú¸Ã xml ½áµãµÄÊôĞÔ */
+		/* éå†è¯¥ xml ç»“ç‚¹çš„å±æ€§ */
 		acl_foreach(iter1, pnode->attr_list) {
 			ACL_XML_ATTR *attr = (ACL_XML_ATTR*) iter1.data;
 			printf("\tattr_name: %s, attr_value: %s\n",
@@ -313,7 +313,7 @@ static void parse_xml(int once, const char *data)
 		printf("----------------- the id2_2's next node is ---------------------\n");
 		if (pnode) {
 			printf("-------------- walk node -------------------\n");
-			/* ±éÀú¸Ã xml ½áµãµÄÊôĞÔ */
+			/* éå†è¯¥ xml ç»“ç‚¹çš„å±æ€§ */
 			acl_foreach(iter1, pnode->attr_list) {
 				ACL_XML_ATTR *attr = (ACL_XML_ATTR*) iter1.data;
 				printf("\tattr_name: %s, attr_value: %s\n",
@@ -329,7 +329,7 @@ static void parse_xml(int once, const char *data)
 	if (pnode) {
 		int   ndel = 0, node_cnt;
 
-		/* É¾³ı¸Ã½áµã¼°Æä×Ó½áµã */
+		/* åˆ é™¤è¯¥ç»“ç‚¹åŠå…¶å­ç»“ç‚¹ */
 		printf(">>>before delete %s, total: %d\n", STR(pnode->ltag), xml->node_cnt);
 		ndel = acl_xml_node_delete(pnode);
 		node_cnt = xml->node_cnt;
@@ -347,7 +347,7 @@ static void parse_xml(int once, const char *data)
 	pnode = acl_xml_getElementById(xml, "id12");
 	if (pnode) {
 		printf("-------------- walk %s node -------------------\n", STR(pnode->ltag));
-		/* ±éÀú¸Ã xml ½áµãµÄÊôĞÔ */
+		/* éå†è¯¥ xml ç»“ç‚¹çš„å±æ€§ */
 		acl_foreach(iter1, pnode->attr_list) {
 			ACL_XML_ATTR *attr = (ACL_XML_ATTR*) iter1.data;
 			printf("\tattr_name: %s, attr_value: %s\n",
@@ -359,7 +359,7 @@ static void parse_xml(int once, const char *data)
 
 	build_xml(xml, data);
 
-	/* ÊÍ·Å xml ¶ÔÏó */
+	/* é‡Šæ”¾ xml å¯¹è±¡ */
 	left = acl_xml_free(xml);
 	printf("free all node ok, total(%d), left is: %d\n", total, left);
 }
@@ -377,16 +377,16 @@ static void parse_xml_file(const char *filepath, int once)
 
 	gettimeofday(&begin, NULL);
 
-	/* ´´½¨ xml ¶ÔÏó */
+	/* åˆ›å»º xml å¯¹è±¡ */
 	xml = acl_xml_alloc();
 
 	ptr = data;
 
 	if (once) {
-		/* Ò»´ÎĞÔµØ·ÖÎöÍêÕû xml Êı¾İ */
+		/* ä¸€æ¬¡æ€§åœ°åˆ†æå®Œæ•´ xml æ•°æ® */
 		acl_xml_parse(xml, ptr);
 	} else {
-		/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö xml Êı¾İ */
+		/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æ xml æ•°æ® */
 		while (*ptr) {
 			char  ch2[2];
 
@@ -406,7 +406,7 @@ static void parse_xml_file(const char *filepath, int once)
 
 	fp = acl_vstream_fopen("dump.txt", O_RDWR | O_CREAT | O_TRUNC, 0600, 4096);
 
-	/* ½« xml ¶ÔÏó×ª´¢ÖÁÖ¸¶¨Á÷ÖĞ */
+	/* å°† xml å¯¹è±¡è½¬å‚¨è‡³æŒ‡å®šæµä¸­ */
 	acl_xml_dump(xml, fp);
 
 	acl_vstream_fclose(fp);

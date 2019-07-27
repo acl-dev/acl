@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #if defined(_WIN32) || defined (_WIN64)
 /* typedef intptr_t ssize_t; */

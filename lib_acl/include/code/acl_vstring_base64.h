@@ -1,4 +1,4 @@
-#ifndef ACL_VSTRING_BASE64_CODE_INCLUDE_H
+ï»¿#ifndef ACL_VSTRING_BASE64_CODE_INCLUDE_H
 #define ACL_VSTRING_BASE64_CODE_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -9,21 +9,21 @@ extern "C" {
 #include "../stdlib/acl_vstring.h"
 
 /**
- * BASE64 ±àÂëº¯Êı
- * @param vp {ACL_VSTRING*} ´æ´¢±àÂëºó½á¹û
- * @param in {const char*} Ô´Êı¾İ
- * @param len {int} in Ô´Êı¾İµÄ³¤¶È
- * @return {ACL_VSTRING*} Óë vp ÏàÍ¬
+ * BASE64 ç¼–ç å‡½æ•°
+ * @param vp {ACL_VSTRING*} å­˜å‚¨ç¼–ç åç»“æœ
+ * @param in {const char*} æºæ•°æ®
+ * @param len {int} in æºæ•°æ®çš„é•¿åº¦
+ * @return {ACL_VSTRING*} ä¸ vp ç›¸åŒ
  */
 ACL_API ACL_VSTRING *acl_vstring_base64_encode(ACL_VSTRING *vp,
 	const char *in, int len);
 
 /**
- * BASE64 ½âÂëº¯Êı
- * @param vp {ACL_VSTRING*} ´æ´¢½âÂëºó½á¹û
- * @param in {const char*} ±àÂëºóµÄÊı¾İ
- * @param len {int} in Êı¾İ³¤¶È
- * @return {ACL_VSTRING*} NULL: ½âÂëÊ§°Ü; !=NULL: ½âÂë³É¹¦ÇÒÓë vp ÏàÍ¬µØÖ·
+ * BASE64 è§£ç å‡½æ•°
+ * @param vp {ACL_VSTRING*} å­˜å‚¨è§£ç åç»“æœ
+ * @param in {const char*} ç¼–ç åçš„æ•°æ®
+ * @param len {int} in æ•°æ®é•¿åº¦
+ * @return {ACL_VSTRING*} NULL: è§£ç å¤±è´¥; !=NULL: è§£ç æˆåŠŸä¸”ä¸ vp ç›¸åŒåœ°å€
  */
 ACL_API ACL_VSTRING *acl_vstring_base64_decode(ACL_VSTRING *vp,
 	const char *in, int len);

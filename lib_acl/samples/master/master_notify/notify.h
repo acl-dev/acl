@@ -1,4 +1,4 @@
-#ifndef __NOTIFY_INCLUDE_H__
+﻿#ifndef __NOTIFY_INCLUDE_H__
 #define __NOTIFY_INCLUDE_H__
 
 #include "lib_acl.h"

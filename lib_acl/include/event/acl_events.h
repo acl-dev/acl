@@ -1,4 +1,4 @@
-#ifndef ACL_EVENTS_H_INCLUDED
+ï»¿#ifndef ACL_EVENTS_H_INCLUDED
 #define ACL_EVENTS_H_INCLUDED
 
 #ifdef	__cplusplus
@@ -10,7 +10,7 @@ extern "C" {
 #include "../stdlib/acl_vstream.h"
 #include "acl_timer.h"
 
-/*+++++++++++++++++++++++++++ È«¾Öºê¶¨Òå +++++++++++++++++++++++++++++++++++*/
+/*+++++++++++++++++++++++++++ å…¨å±€å®å®šä¹‰ +++++++++++++++++++++++++++++++++++*/
  /* Event codes. */
 #define ACL_EVENT_READ          (1 << 0)      /**< read event */
 #define	ACL_EVENT_ACCEPT        (1 << 1)      /**< accept one connection */
@@ -65,72 +65,72 @@ typedef void (*ACL_EVENT_NOTIFY_TIME)(int event_type, ACL_EVENT *event,
 /*----------------------------------------------------------------------------*/
 
 /**
- * ´´½¨Ò»¸öÊÂ¼şÑ­»·¶ÔÏóµÄ×ÜÈë¿Ú£¬´Ëº¯Êı»á¸ù¾İÓÃ»§²ÎÊıµÄ²»Í¬×Ô¶¯µ÷ÓÃÏÂÃæµÄÊÂ¼ş¶ÔÏó´´½¨º¯Êı
- * @param event_mode {int} ÊÂ¼ş´¦Àí·½Ê½£¬Ä¿Ç°½öÖ§³Ö: ACL_EVENT_SELECT, ACL_EVENT_KERNEL,
+ * åˆ›å»ºä¸€ä¸ªäº‹ä»¶å¾ªç¯å¯¹è±¡çš„æ€»å…¥å£ï¼Œæ­¤å‡½æ•°ä¼šæ ¹æ®ç”¨æˆ·å‚æ•°çš„ä¸åŒè‡ªåŠ¨è°ƒç”¨ä¸‹é¢çš„äº‹ä»¶å¯¹è±¡åˆ›å»ºå‡½æ•°
+ * @param event_mode {int} äº‹ä»¶å¤„ç†æ–¹å¼ï¼Œç›®å‰ä»…æ”¯æŒ: ACL_EVENT_SELECT, ACL_EVENT_KERNEL,
  *  ACL_EVENT_POLL, ACL_EVENT_WMSG
- * @param use_thr {int} ÊÇ·ñ²ÉÓÃÏß³ÌÊÂ¼ş·½Ê½£¬·Ç0±íÊ¾°´Ïß³ÌÊÂ¼ş·½Ê½
- * @param delay_sec {int} ÊÂ¼şÑ­»·µÈ´ıÊ±µÄ×î³¤ÃëÊı£¬µ± event_mode Îª ACL_EVENT_WMSG
- *  Ê±£¬ÇÒ¸ÃÖµ´óÓÚ 0 Ê±£¬Ôò¸ÃÖµ±»µ±×÷ÏûÏ¢Öµ¶Ô´ı´«¸ø acl_event_new_wmsg£¬ÓÃÀ´ÓëÒì
- *  ²½ÏûÏ¢¾ä±ú°ó¶¨
- * @param delay_usec {int} ÊÂ¼şÑ­»·µÈ´ıÊ±µÄ×î³¤Î¢ÃëÊı(½ö select ·½Ê½ÓĞÓÃ)
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * @param use_thr {int} æ˜¯å¦é‡‡ç”¨çº¿ç¨‹äº‹ä»¶æ–¹å¼ï¼Œé0è¡¨ç¤ºæŒ‰çº¿ç¨‹äº‹ä»¶æ–¹å¼
+ * @param delay_sec {int} äº‹ä»¶å¾ªç¯ç­‰å¾…æ—¶çš„æœ€é•¿ç§’æ•°ï¼Œå½“ event_mode ä¸º ACL_EVENT_WMSG
+ *  æ—¶ï¼Œä¸”è¯¥å€¼å¤§äº 0 æ—¶ï¼Œåˆ™è¯¥å€¼è¢«å½“ä½œæ¶ˆæ¯å€¼å¯¹å¾…ä¼ ç»™ acl_event_new_wmsgï¼Œç”¨æ¥ä¸å¼‚
+ *  æ­¥æ¶ˆæ¯å¥æŸ„ç»‘å®š
+ * @param delay_usec {int} äº‹ä»¶å¾ªç¯ç­‰å¾…æ—¶çš„æœ€é•¿å¾®ç§’æ•°(ä»… select æ–¹å¼æœ‰ç”¨)
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new(int event_mode, int use_thr,
 	int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öĞÂµÄÊÂ¼ş¶ÔÏó, ¸ÃÊÂ¼ş²»Ö§³Ö¶àÏß³Ì
- * @param delay_sec {int} ÔÚµ÷ÓÃ select() º¯ÊıÊ±ĞİÏ¢µÄÃëÊı
- * @param delay_usec {int} ÔÚµ÷ÓÃ select() º¯ÊıÊ±ĞİÏ¢µÄÎ¢ÃëÊı
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ–°çš„äº‹ä»¶å¯¹è±¡, è¯¥äº‹ä»¶ä¸æ”¯æŒå¤šçº¿ç¨‹
+ * @param delay_sec {int} åœ¨è°ƒç”¨ select() å‡½æ•°æ—¶ä¼‘æ¯çš„ç§’æ•°
+ * @param delay_usec {int} åœ¨è°ƒç”¨ select() å‡½æ•°æ—¶ä¼‘æ¯çš„å¾®ç§’æ•°
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_select(int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öĞÂµÄÊÂ¼ş¶ÔÏó, ¸ÃÊÂ¼şÖ§³ÖÏß³ÌÄ£Ê½
- * @param delay_sec {int} ÔÚµ÷ÓÃ select() º¯ÊıÊ±ĞİÏ¢µÄÃëÊı
- * @param delay_usec {int} ÔÚµ÷ÓÃ select() º¯ÊıÊ±ĞİÏ¢µÄÎ¢ÃëÊı
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ–°çš„äº‹ä»¶å¯¹è±¡, è¯¥äº‹ä»¶æ”¯æŒçº¿ç¨‹æ¨¡å¼
+ * @param delay_sec {int} åœ¨è°ƒç”¨ select() å‡½æ•°æ—¶ä¼‘æ¯çš„ç§’æ•°
+ * @param delay_usec {int} åœ¨è°ƒç”¨ select() å‡½æ•°æ—¶ä¼‘æ¯çš„å¾®ç§’æ•°
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_select_thr(int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öÖ§³Ö poll µÄÊÂ¼ş¶ÔÏó£¬²»Ö§³Ö¶àÏß³Ì
- * @param delay_sec {int} ÔÚµ÷ÓÃ poll() º¯ÊıÊ±ĞİÏ¢µÄÃëÊı
- * @param delay_usec {int} ÔÚµ÷ÓÃ poll() º¯ÊıÊ±ĞİÏ¢µÄÎ¢ÃëÊı
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ”¯æŒ poll çš„äº‹ä»¶å¯¹è±¡ï¼Œä¸æ”¯æŒå¤šçº¿ç¨‹
+ * @param delay_sec {int} åœ¨è°ƒç”¨ poll() å‡½æ•°æ—¶ä¼‘æ¯çš„ç§’æ•°
+ * @param delay_usec {int} åœ¨è°ƒç”¨ poll() å‡½æ•°æ—¶ä¼‘æ¯çš„å¾®ç§’æ•°
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_poll(int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öÖ§³Ö poll µÄÊÂ¼ş¶ÔÏó£¬Ö§³Ö¶àÏß³Ì
- * @param delay_sec {int} ÔÚµ÷ÓÃ poll() º¯ÊıÊ±ĞİÏ¢µÄÃëÊı
- * @param delay_usec {int} ÔÚµ÷ÓÃ poll() º¯ÊıÊ±ĞİÏ¢µÄÎ¢ÃëÊı
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ”¯æŒ poll çš„äº‹ä»¶å¯¹è±¡ï¼Œæ”¯æŒå¤šçº¿ç¨‹
+ * @param delay_sec {int} åœ¨è°ƒç”¨ poll() å‡½æ•°æ—¶ä¼‘æ¯çš„ç§’æ•°
+ * @param delay_usec {int} åœ¨è°ƒç”¨ poll() å‡½æ•°æ—¶ä¼‘æ¯çš„å¾®ç§’æ•°
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_poll_thr(int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öĞÂµÄÊÂ¼ş¶ÔÏó, ¸ÃÊÂ¼ş²ÉÓÃĞ§ÂÊ¸ßµÄ epoll/devpoll/kqueue ·½Ê½£¬ÇÒ²»Ö§³Ö¶àÏß³Ì
- * @param delay_sec {int} ÔÚµ÷ÓÃÊÂ¼şÑ­»·º¯ÊıÊ±ĞİÏ¢µÄÃëÊı
- * @param delay_usec {int} ÔÚµ÷ÓÃÊÂ¼şÑ­»·º¯ÊıÊ±ĞİÏ¢µÄÎ¢ÃëÊı(ºöÂÔ²»¼Æ)
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ–°çš„äº‹ä»¶å¯¹è±¡, è¯¥äº‹ä»¶é‡‡ç”¨æ•ˆç‡é«˜çš„ epoll/devpoll/kqueue æ–¹å¼ï¼Œä¸”ä¸æ”¯æŒå¤šçº¿ç¨‹
+ * @param delay_sec {int} åœ¨è°ƒç”¨äº‹ä»¶å¾ªç¯å‡½æ•°æ—¶ä¼‘æ¯çš„ç§’æ•°
+ * @param delay_usec {int} åœ¨è°ƒç”¨äº‹ä»¶å¾ªç¯å‡½æ•°æ—¶ä¼‘æ¯çš„å¾®ç§’æ•°(å¿½ç•¥ä¸è®¡)
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öĞÂµÄÊÂ¼ş¶ÔÏó, ¸ÃÊÂ¼ş²ÉÓÃĞ§ÂÊ¸ßµÄ epoll/devpoll/kqueue ·½Ê½£¬ÇÒ²ÉÓÃÏß³Ì·½Ê½
- * @param delay_sec {int} ÔÚµ÷ÓÃÊÂ¼şÑ­»·º¯ÊıÊ±ĞİÏ¢µÄÃëÊı
- * @param delay_usec {int} ÔÚµ÷ÓÃÊÂ¼şÑ­»·º¯ÊıÊ±ĞİÏ¢µÄÎ¢ÃëÊı(ºöÂÔ²»¼Æ)
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªæ–°çš„äº‹ä»¶å¯¹è±¡, è¯¥äº‹ä»¶é‡‡ç”¨æ•ˆç‡é«˜çš„ epoll/devpoll/kqueue æ–¹å¼ï¼Œä¸”é‡‡ç”¨çº¿ç¨‹æ–¹å¼
+ * @param delay_sec {int} åœ¨è°ƒç”¨äº‹ä»¶å¾ªç¯å‡½æ•°æ—¶ä¼‘æ¯çš„ç§’æ•°
+ * @param delay_usec {int} åœ¨è°ƒç”¨äº‹ä»¶å¾ªç¯å‡½æ•°æ—¶ä¼‘æ¯çš„å¾®ç§’æ•°(å¿½ç•¥ä¸è®¡)
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_kernel_thr(int delay_sec, int delay_usec);
 
 /**
- * ´´½¨Ò»¸öÄÜÓë Windows ½çÃæÏûÏ¢°óÔÚÒ»ÆğµÄÊÂ¼şÒıÇæ¶ÔÏó
- * @param nMsg {unsigned int} Èç¹û¸ÃÖµ´óÓÚ 0 Ôò½«¸ÃÒì²½¾ä±úÓë¸ÃÏûÏ¢Öµ°ó¶¨£¬
- *  ·ñÔò½«¸ÃÒì²½¾ä±úÓëÈ±Ê¡µÄÏûÏ¢Öµ°ó¶¨
- * @return {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë£¬Èç¹ûÎª¿Õ±íÊ¾³ö´í
+ * åˆ›å»ºä¸€ä¸ªèƒ½ä¸ Windows ç•Œé¢æ¶ˆæ¯ç»‘åœ¨ä¸€èµ·çš„äº‹ä»¶å¼•æ“å¯¹è±¡
+ * @param nMsg {unsigned int} å¦‚æœè¯¥å€¼å¤§äº 0 åˆ™å°†è¯¥å¼‚æ­¥å¥æŸ„ä¸è¯¥æ¶ˆæ¯å€¼ç»‘å®šï¼Œ
+ *  å¦åˆ™å°†è¯¥å¼‚æ­¥å¥æŸ„ä¸ç¼ºçœçš„æ¶ˆæ¯å€¼ç»‘å®š
+ * @return {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºè¡¨ç¤ºå‡ºé”™
  */
 ACL_API ACL_EVENT *acl_event_new_wmsg(unsigned int nMsg);
 
@@ -139,18 +139,18 @@ ACL_API HWND acl_event_wmsg_hwnd(ACL_EVENT *eventp);
 #endif
 
 /**
- * ÎªÁË·ÀÖ¹ÔÚ¶àÏß³ÌÄ£Ê½ÏÂ select µÈÊÂ¼şÑ­»·µÄÊ±¼äµÈ´ı£¬¿ÉÒÔÌí¼Ó´ËÏîÒÔÖĞ¶ÏµÈ´ı£¬
- * ¼Ó¿ìÊÂ¼şÑ­»·¹ı³Ì
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
+ * ä¸ºäº†é˜²æ­¢åœ¨å¤šçº¿ç¨‹æ¨¡å¼ä¸‹ select ç­‰äº‹ä»¶å¾ªç¯çš„æ—¶é—´ç­‰å¾…ï¼Œå¯ä»¥æ·»åŠ æ­¤é¡¹ä»¥ä¸­æ–­ç­‰å¾…ï¼Œ
+ * åŠ å¿«äº‹ä»¶å¾ªç¯è¿‡ç¨‹
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
  */
 ACL_API void acl_event_add_dog(ACL_EVENT *eventp);
 
 /**
- * ÉèÖÃÊÂ¼ş´¥·¢µÄÇ°ÖÃºÍºóÖÃ´¦Àí¹ı³Ì
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param fire_begin {void (*)(ACL_EVENT*, void*)} µ±ÊÂ¼ş±»Í³Ò»´¥·¢Ç°µÄ»Øµ÷¹ı³Ì
- * @param fire_end {void (*)(ACL_EVENT*, void*)} µ±ÊÂ¼ş±»Í³Ò»´¥·¢ºóµÄ»Øµ÷¹ı³Ì
- * @param ctx {void*} fire_begin / fire_end µÄµÚ¶ş¸ö²ÎÊı
+ * è®¾ç½®äº‹ä»¶è§¦å‘çš„å‰ç½®å’Œåç½®å¤„ç†è¿‡ç¨‹
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param fire_begin {void (*)(ACL_EVENT*, void*)} å½“äº‹ä»¶è¢«ç»Ÿä¸€è§¦å‘å‰çš„å›è°ƒè¿‡ç¨‹
+ * @param fire_end {void (*)(ACL_EVENT*, void*)} å½“äº‹ä»¶è¢«ç»Ÿä¸€è§¦å‘åçš„å›è°ƒè¿‡ç¨‹
+ * @param ctx {void*} fire_begin / fire_end çš„ç¬¬äºŒä¸ªå‚æ•°
  */
 ACL_API void acl_event_set_fire_hook(ACL_EVENT *eventp,
 		void (*fire_begin)(ACL_EVENT*, void*),
@@ -158,209 +158,209 @@ ACL_API void acl_event_set_fire_hook(ACL_EVENT *eventp,
 		void* ctx);
 
 /**
- * ÉèÖÃÊÂ¼şÑ­»·¹ı³ÌÖĞ¶¨Ê±¼ì²éËùÓĞÃèÊö×Ö×´Ì¬µÄÊ±¼ä¼ä¸ô£¬ÄÚ²¿È±Ê¡ÖµÎª 100 ms
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param n {int} ¶¨Ê±²é¼ìÊ±¼ä¼ä¸ô (ºÁÃë¼¶)
+ * è®¾ç½®äº‹ä»¶å¾ªç¯è¿‡ç¨‹ä¸­å®šæ—¶æ£€æŸ¥æ‰€æœ‰æè¿°å­—çŠ¶æ€çš„æ—¶é—´é—´éš”ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º 100 ms
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param n {int} å®šæ—¶æŸ¥æ£€æ—¶é—´é—´éš” (æ¯«ç§’çº§)
  */
 ACL_API void acl_event_set_check_inter(ACL_EVENT *eventp, int n);
 
 /**
- * ÊÍ·ÅÊÂ¼ş½á¹¹
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
+ * é‡Šæ”¾äº‹ä»¶ç»“æ„
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
  */
 ACL_API void acl_event_free(ACL_EVENT *eventp);
 
 /**
- * ·µ»ØÊÂ¼şµÄÊ±¼ä½Ø
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @return {acl_int64} µ±Ç°ÊÂ¼şµÄÊ±¼ä½Ø(Î¢Ãë¼¶±ğ)
+ * è¿”å›äº‹ä»¶çš„æ—¶é—´æˆª
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @return {acl_int64} å½“å‰äº‹ä»¶çš„æ—¶é—´æˆª(å¾®ç§’çº§åˆ«)
  */
 ACL_API acl_int64 acl_event_time(ACL_EVENT *eventp);
 
 /**
- * ½«ÊÂ¼şÖĞµÄËùÓĞÈÎÎñÖ´ĞĞÍê±Ï
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
+ * å°†äº‹ä»¶ä¸­çš„æ‰€æœ‰ä»»åŠ¡æ‰§è¡Œå®Œæ¯•
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
  */
 ACL_API void acl_event_drain(ACL_EVENT *eventp);
 
 /**
- * ÉèÖÃÊı¾İÁ÷¿É¶ÁÊ±(Ö¸ÓĞÊı¾İ´ı¶Á»òÃèÊö·û³ö´í»òÃèÊö·û¹Ø±Õ)µÄ»Øµ÷º¯Êı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
- * @param read_timeout {int} ¶Á³¬Ê±Ê±¼ä(Ãë)
- * @param callback {ACL_EVENT_NOTIFY_RDWR} Êı¾İÁ÷¿É¶ÁÊ±µÄ»Øµ÷º¯Êı
- * @param context {void*} »Øµ÷º¯Êı callback ËùĞèÒªµÄ²ÎÊı
+ * è®¾ç½®æ•°æ®æµå¯è¯»æ—¶(æŒ‡æœ‰æ•°æ®å¾…è¯»æˆ–æè¿°ç¬¦å‡ºé”™æˆ–æè¿°ç¬¦å…³é—­)çš„å›è°ƒå‡½æ•°
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
+ * @param read_timeout {int} è¯»è¶…æ—¶æ—¶é—´(ç§’)
+ * @param callback {ACL_EVENT_NOTIFY_RDWR} æ•°æ®æµå¯è¯»æ—¶çš„å›è°ƒå‡½æ•°
+ * @param context {void*} å›è°ƒå‡½æ•° callback æ‰€éœ€è¦çš„å‚æ•°
  */
 ACL_API void acl_event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int read_timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context);
 
 /**
- * ÉèÖÃÊı¾İÁ÷¿ÉĞ´Ê±(Ö¸ÓĞ¿Õ¼ä¿ÉÒÔĞ´»òÃèÊö·û³ö´í»òÃèÊö·û¹Ø±Õ)µÄ»Øµ÷º¯Êı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
- * @param write_timeout {int} Ğ´³¬Ê±Ê±¼ä(Ãë)
- * @param callback {ACL_EVENT_NOTIFY_RDWR} Êı¾İÁ÷¿ÉĞ´Ê±µÄ»Øµ÷º¯Êı
- * @param context {void*} »Øµ÷º¯Êı callback ËùĞèÒªµÄ²ÎÊı
+ * è®¾ç½®æ•°æ®æµå¯å†™æ—¶(æŒ‡æœ‰ç©ºé—´å¯ä»¥å†™æˆ–æè¿°ç¬¦å‡ºé”™æˆ–æè¿°ç¬¦å…³é—­)çš„å›è°ƒå‡½æ•°
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
+ * @param write_timeout {int} å†™è¶…æ—¶æ—¶é—´(ç§’)
+ * @param callback {ACL_EVENT_NOTIFY_RDWR} æ•°æ®æµå¯å†™æ—¶çš„å›è°ƒå‡½æ•°
+ * @param context {void*} å›è°ƒå‡½æ•° callback æ‰€éœ€è¦çš„å‚æ•°
  */
 ACL_API void acl_event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int write_timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context);
 
 /**
- * ÉèÖÃ¼àÌıÌ×½Ó¿Ú(Ö¸ÓĞĞÂÁ¬½Óµ½´ï/±»ÏµÍ³ÖĞ¶Ï/³ö´íÊ±)µÄ»Øµ÷º¯Êı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
- * @param read_timeout {int} ¼àÌı³¬Ê±Ê±¼ä(Ãë)£¬¿ÉÒÔÎª0
- * @param callback {ACL_EVENT_NOTIFY_RDWR} Êı¾İÁ÷¿É¶ÁÊ±µÄ»Øµ÷º¯Êı
- * @param context {void*} »Øµ÷º¯Êı callback ËùĞèÒªµÄ²ÎÊı
+ * è®¾ç½®ç›‘å¬å¥—æ¥å£(æŒ‡æœ‰æ–°è¿æ¥åˆ°è¾¾/è¢«ç³»ç»Ÿä¸­æ–­/å‡ºé”™æ—¶)çš„å›è°ƒå‡½æ•°
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
+ * @param read_timeout {int} ç›‘å¬è¶…æ—¶æ—¶é—´(ç§’)ï¼Œå¯ä»¥ä¸º0
+ * @param callback {ACL_EVENT_NOTIFY_RDWR} æ•°æ®æµå¯è¯»æ—¶çš„å›è°ƒå‡½æ•°
+ * @param context {void*} å›è°ƒå‡½æ•° callback æ‰€éœ€è¦çš„å‚æ•°
  */
 ACL_API void acl_event_enable_listen(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	int read_timeout, ACL_EVENT_NOTIFY_RDWR callback, void *context);
 
 /**
- * ½«Êı¾İÁ÷´ÓÊÂ¼şµÄ¶Á¼àÌıÁ÷¼¯ºÏÖĞÇå³ı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * å°†æ•°æ®æµä»äº‹ä»¶çš„è¯»ç›‘å¬æµé›†åˆä¸­æ¸…é™¤
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API void acl_event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * ½«Êı¾İÁ÷´ÓÊÂ¼şµÄĞ´¼àÌıÁ÷¼¯ºÏÖĞÇå³ı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * å°†æ•°æ®æµä»äº‹ä»¶çš„å†™ç›‘å¬æµé›†åˆä¸­æ¸…é™¤
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API void acl_event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * ½«Êı¾İÁ÷´ÓÊÂ¼şµÄ¶ÁĞ´¼àÌıÁ÷¼¯ºÏÖĞÇå³ı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * å°†æ•°æ®æµä»äº‹ä»¶çš„è¯»å†™ç›‘å¬æµé›†åˆä¸­æ¸…é™¤
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API void acl_event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * ¼ì²éÁ÷ÖĞµÄÃèÊö·ûÊÇ·ñÒÑ¾­ÖÃÈë¶Á¡¢Ğ´»òÒì³£ÊÂ¼şµÄ¼¯ºÏÖĞ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * æ£€æŸ¥æµä¸­çš„æè¿°ç¬¦æ˜¯å¦å·²ç»ç½®å…¥è¯»ã€å†™æˆ–å¼‚å¸¸äº‹ä»¶çš„é›†åˆä¸­
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API int acl_event_isset(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * ¼ì²éÁ÷ÖĞµÄÃèÊö·ûÊÇ·ñÒÑ¾­ÖÃÈë¶ÁÊÂ¼şµÄ¼¯ºÏÖĞ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * æ£€æŸ¥æµä¸­çš„æè¿°ç¬¦æ˜¯å¦å·²ç»ç½®å…¥è¯»äº‹ä»¶çš„é›†åˆä¸­
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API int acl_event_isrset(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * ¼ì²éÁ÷ÖĞµÄÃèÊö·ûÊÇ·ñÒÑ¾­ÖÃÈëĞ´ÊÂ¼şµÄ¼¯ºÏÖĞ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * æ£€æŸ¥æµä¸­çš„æè¿°ç¬¦æ˜¯å¦å·²ç»ç½®å…¥å†™äº‹ä»¶çš„é›†åˆä¸­
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API int acl_event_iswset(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * ¼ì²éÁ÷ÖĞµÄÃèÊö·ûÊÇ·ñÒÑ¾­ÖÃÈëÒì³£ÊÂ¼şµÄ¼¯ºÏÖĞ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param stream {ACL_VSTREAM*} Êı¾İÁ÷Ö¸Õë, ²»ÄÜÎª¿Õ, ÇÒÆäÖĞµÄÃèÊö·û±ØĞëÊÇÓĞĞ§µÄ
+ * æ£€æŸ¥æµä¸­çš„æè¿°ç¬¦æ˜¯å¦å·²ç»ç½®å…¥å¼‚å¸¸äº‹ä»¶çš„é›†åˆä¸­
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param stream {ACL_VSTREAM*} æ•°æ®æµæŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º, ä¸”å…¶ä¸­çš„æè¿°ç¬¦å¿…é¡»æ˜¯æœ‰æ•ˆçš„
  */
 ACL_API int acl_event_isxset(ACL_EVENT *eventp, ACL_VSTREAM *stream);
 
 /**
- * Ìí¼ÓÒ»¸ö¶¨Ê±ÊÂ¼ş
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param callback {ACL_EVENT_NOTIFY_TIME} ¶¨Ê±ÊÂ¼şµÄ»Øµ÷º¯Êı
- * @param context {void*} callback ËùĞèÒªµÄ»Øµ÷²ÎÊı
- * @param delay {acl_int64} eventp->event_present + delay Îª¸ÃÊÂ¼şº¯Êı¿ªÊ¼Ö´ĞĞµÄÊ±¼ä
- *  µ¥Î»ÎªÎ¢Ãë
- * @param keep {int} ÊÇ·ñÖØ¸´¶¨Ê±Æ÷ÈÎÎñ
- * @return {acl_int64} ÊÂ¼şÖ´ĞĞµÄÊ±¼ä½Ø£¬µ¥Î»ÎªÎ¢Ãë
+ * æ·»åŠ ä¸€ä¸ªå®šæ—¶äº‹ä»¶
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param callback {ACL_EVENT_NOTIFY_TIME} å®šæ—¶äº‹ä»¶çš„å›è°ƒå‡½æ•°
+ * @param context {void*} callback æ‰€éœ€è¦çš„å›è°ƒå‚æ•°
+ * @param delay {acl_int64} eventp->event_present + delay ä¸ºè¯¥äº‹ä»¶å‡½æ•°å¼€å§‹æ‰§è¡Œçš„æ—¶é—´
+ *  å•ä½ä¸ºå¾®ç§’
+ * @param keep {int} æ˜¯å¦é‡å¤å®šæ—¶å™¨ä»»åŠ¡
+ * @return {acl_int64} äº‹ä»¶æ‰§è¡Œçš„æ—¶é—´æˆªï¼Œå•ä½ä¸ºå¾®ç§’
  */
 ACL_API acl_int64 acl_event_request_timer(ACL_EVENT *eventp,
 	ACL_EVENT_NOTIFY_TIME callback, void *context, acl_int64 delay, int keep);
 
 /**
- * È¡ÏûÒ»¸ö¶¨Ê±ÊÂ¼ş
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param callback {ACL_EVENT_NOTIFY_TIME} ¶¨Ê±ÊÂ¼şµÄ»Øµ÷º¯Êı
- * @param context {void*} callback ËùĞèÒªµÄ»Øµ÷²ÎÊı
- * @return acl_int64 {acl_int64} ¾àÀë¿ªÊ¼Ö´ĞĞÊÂ¼şº¯ÊıµÄÊ±¼ä¼ä¸ô, ÒÔÎ¢ÃëÎªµ¥Î»
+ * å–æ¶ˆä¸€ä¸ªå®šæ—¶äº‹ä»¶
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param callback {ACL_EVENT_NOTIFY_TIME} å®šæ—¶äº‹ä»¶çš„å›è°ƒå‡½æ•°
+ * @param context {void*} callback æ‰€éœ€è¦çš„å›è°ƒå‚æ•°
+ * @return acl_int64 {acl_int64} è·ç¦»å¼€å§‹æ‰§è¡Œäº‹ä»¶å‡½æ•°çš„æ—¶é—´é—´éš”, ä»¥å¾®ç§’ä¸ºå•ä½
  */
 ACL_API acl_int64 acl_event_cancel_timer(ACL_EVENT *eventp,
 	ACL_EVENT_NOTIFY_TIME callback, void *context);
 
 /**
- * µ±¶¨Ê±Æ÷´¦ÀíÍê±Ïºó£¬ÊÇ·ñĞèÒªÔÙ´ÎÉèÖÃ¸Ã¶¨Ê±Æ÷£¬ÒÔ·½±ãµ÷ÓÃÕßÑ­»·
- * Ê¹ÓÃ¸Ã¶¨Ê±Æ÷
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param callback {ACL_EVENT_NOTIFY_TIME} ·Ç¿Õ
- * @param context {void*} ¸½ÊôÓÚ callback µÄ±äÁ¿
- * @param onoff {int} ÊÇ·ñÖØ¸´Í¨¹ı acl_event_request_timer ÉèÖÃµÄ¶¨Ê±Æ÷
+ * å½“å®šæ—¶å™¨å¤„ç†å®Œæ¯•åï¼Œæ˜¯å¦éœ€è¦å†æ¬¡è®¾ç½®è¯¥å®šæ—¶å™¨ï¼Œä»¥æ–¹ä¾¿è°ƒç”¨è€…å¾ªç¯
+ * ä½¿ç”¨è¯¥å®šæ—¶å™¨
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param callback {ACL_EVENT_NOTIFY_TIME} éç©º
+ * @param context {void*} é™„å±äº callback çš„å˜é‡
+ * @param onoff {int} æ˜¯å¦é‡å¤é€šè¿‡ acl_event_request_timer è®¾ç½®çš„å®šæ—¶å™¨
  */
 ACL_API void acl_event_keep_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, int onoff);
 
 /**
- * ÅĞ¶ÏËùÉèÖÃµÄ¶¨Ê±Æ÷¶¼´¦ÓÚÖØ¸´Ê¹ÓÃ×´Ì¬
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param callback {ACL_EVENT_NOTIFY_TIME} ·Ç¿Õ
- * @param context {void*} ¸½ÊôÓÚ callback µÄ±äÁ¿
- * @return {int} !0 ±íÊ¾ËùÉèÖÃµÄ¶¨Ê±Æ÷¶¼´¦ÓÚÖØ¸´Ê¹ÓÃ×´Ì¬
+ * åˆ¤æ–­æ‰€è®¾ç½®çš„å®šæ—¶å™¨éƒ½å¤„äºé‡å¤ä½¿ç”¨çŠ¶æ€
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param callback {ACL_EVENT_NOTIFY_TIME} éç©º
+ * @param context {void*} é™„å±äº callback çš„å˜é‡
+ * @return {int} !0 è¡¨ç¤ºæ‰€è®¾ç½®çš„å®šæ—¶å™¨éƒ½å¤„äºé‡å¤ä½¿ç”¨çŠ¶æ€
  */
 ACL_API int acl_event_timer_ifkeep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	void *context);
 
 /**
- * ÊÂ¼şÑ­»·Ö´ĞĞµÄµ÷¶Èº¯Êı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
+ * äº‹ä»¶å¾ªç¯æ‰§è¡Œçš„è°ƒåº¦å‡½æ•°
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
  */
 ACL_API void acl_event_loop(ACL_EVENT *eventp);
 
 /**
- * ÉèÖÃÊÂ¼şÑ­»·µÄ¿ÕÏĞĞİÏ¢Ê±¼äÖĞµÄÃë¼¶ÊıÖµ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param sec {int} Ãë¼¶¿ÕÏĞĞİÏ¢Ê±¼äÖµ
+ * è®¾ç½®äº‹ä»¶å¾ªç¯çš„ç©ºé—²ä¼‘æ¯æ—¶é—´ä¸­çš„ç§’çº§æ•°å€¼
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param sec {int} ç§’çº§ç©ºé—²ä¼‘æ¯æ—¶é—´å€¼
  */
 ACL_API void acl_event_set_delay_sec(ACL_EVENT *eventp, int sec);
 
 /**
- * ÉèÖÃÊÂ¼şÑ­»·µÄ¿ÕÏĞĞİÏ¢Ê±¼äÖĞµÄÎ¢Ãë¼¶ÊıÖµ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @param usec {int} Î¢Ãë¼¶¿ÕÏĞĞİÏ¢Ê±¼äÖµ
+ * è®¾ç½®äº‹ä»¶å¾ªç¯çš„ç©ºé—²ä¼‘æ¯æ—¶é—´ä¸­çš„å¾®ç§’çº§æ•°å€¼
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @param usec {int} å¾®ç§’çº§ç©ºé—²ä¼‘æ¯æ—¶é—´å€¼
  */
 ACL_API void acl_event_set_delay_usec(ACL_EVENT *eventp, int usec);
 
 /**
- * »ñµÃÊÂ¼şÑ­»·µÄ¿ÕÏĞĞİÏ¢Ê±¼äÖĞµÄÃë¼¶ÊıÖµ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @return {int} Ãë¼¶¿ÕÏĞĞİÏ¢Ê±¼äÖµ
+ * è·å¾—äº‹ä»¶å¾ªç¯çš„ç©ºé—²ä¼‘æ¯æ—¶é—´ä¸­çš„ç§’çº§æ•°å€¼
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @return {int} ç§’çº§ç©ºé—²ä¼‘æ¯æ—¶é—´å€¼
  */
 ACL_API int acl_event_get_delay_sec(ACL_EVENT *eventp);
 
 /**
- * »ñµÃÊÂ¼şÑ­»·µÄ¿ÕÏĞĞİÏ¢Ê±¼äÖĞµÄÎ¢Ãë¼¶ÊıÖµ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @return {int} Î¢Ãë¼¶¿ÕÏĞĞİÏ¢Ê±¼äÖµ
+ * è·å¾—äº‹ä»¶å¾ªç¯çš„ç©ºé—²ä¼‘æ¯æ—¶é—´ä¸­çš„å¾®ç§’çº§æ•°å€¼
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @return {int} å¾®ç§’çº§ç©ºé—²ä¼‘æ¯æ—¶é—´å€¼
  */
 ACL_API int acl_event_get_delay_usec(ACL_EVENT *eventp);
 
 /**
- * ÊÇ·ñ²ÉÓÃÏß³ÌÊÂ¼ş·½Ê½
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @return {int} 0: ·ñ; !=0: ÊÇ
+ * æ˜¯å¦é‡‡ç”¨çº¿ç¨‹äº‹ä»¶æ–¹å¼
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @return {int} 0: å¦; !=0: æ˜¯
  */
 ACL_API int acl_event_use_thread(ACL_EVENT *eventp);
 
 /**
- * »ñµÃµ±Ç°ÊÂ¼şÒıÇæµÄÊÂ¼şÄ£ĞÍ
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
+ * è·å¾—å½“å‰äº‹ä»¶å¼•æ“çš„äº‹ä»¶æ¨¡å‹
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
  * @return {int} ACL_EVENT_SELECT/ACL_EVENT_KERNEL/ACL_EVENT_POLL
  */
 ACL_API int acl_event_mode(ACL_EVENT *eventp);
 
 /**
- * »ñµÃ±¾´ÎÊÂ¼şÑ­»·ºó±»´¥·¢µÄ IO ÊÂ¼şµÄ´ÎÊı
- * @param eventp {ACL_EVENT*} ÊÂ¼ş¶ÔÏóÖ¸Õë, ²»ÎªÄÜÎª¿Õ
- * @return {int} ¸ÃÖµÎª±¾´ÎÑ­»·±»´¥·¢µÄÊÂ¼ş´ÎÊı
+ * è·å¾—æœ¬æ¬¡äº‹ä»¶å¾ªç¯åè¢«è§¦å‘çš„ IO äº‹ä»¶çš„æ¬¡æ•°
+ * @param eventp {ACL_EVENT*} äº‹ä»¶å¯¹è±¡æŒ‡é’ˆ, ä¸ä¸ºèƒ½ä¸ºç©º
+ * @return {int} è¯¥å€¼ä¸ºæœ¬æ¬¡å¾ªç¯è¢«è§¦å‘çš„äº‹ä»¶æ¬¡æ•°
  */
 ACL_API int acl_event_last_nready(ACL_EVENT *eventp);
 

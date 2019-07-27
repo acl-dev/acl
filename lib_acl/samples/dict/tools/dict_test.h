@@ -1,4 +1,4 @@
-#ifndef	__DICT_TEST_INCLUDE_H__
+﻿#ifndef	__DICT_TEST_INCLUDE_H__
 #define	__DICT_TEST_INCLUDE_H__
 
 /* dict_test.c */

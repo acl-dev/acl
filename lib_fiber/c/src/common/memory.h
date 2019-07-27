@@ -1,4 +1,4 @@
-#ifndef __MEMORY_HEAD_H__
+﻿#ifndef __MEMORY_HEAD_H__
 #define __MEMORY_HEAD_H__
 
 void *stack_alloc(size_t size);

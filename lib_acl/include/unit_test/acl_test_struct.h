@@ -1,4 +1,4 @@
-#ifndef	ACL_TEST_STRUCT_INCLUDE_H
+ï»¿#ifndef	ACL_TEST_STRUCT_INCLUDE_H
 #define	ACL_TEST_STRUCT_INCLUDE_H
 
 # ifdef	__cplusplus
@@ -8,17 +8,17 @@ extern "C" {
 #include "../stdlib/acl_array.h"
 
 typedef struct AUT_LINE {
-	char  cmd_name[128];	/* ÃüÁîº¯ÊıÃû³Æ */
-	int   result;		/* Ö´ĞĞ½á¹û */
-	int   argc;		/* ²ÎÊı¸öÊı */
-	ACL_ARRAY *argv;	/* ²ÎÊıÁĞ±í */
-	char *args_str;		/* ²ÎÊıÁĞ±íµÄ±¸·İ */
-	int   valid_line_idx;	/* ¸ÃÓĞĞ§ÅäÖÃĞĞÔÚËùÓĞÓĞĞ§ÅäÖÃĞĞÖĞµÄĞĞºÅ */
-	int   line_number;	/* ¸ÃÓĞĞ§ÅäÖÃĞĞÔÚÅäÖÃÎÄ¼şÖĞµÄĞĞºÅ */
-	void *arg_inner;	/* ÄÚ²¿×¢²á×Ô¼ºµÄ²ÎÊıµ½¸Ã½á¹¹ÖĞ */
+	char  cmd_name[128];	/* å‘½ä»¤å‡½æ•°åç§° */
+	int   result;		/* æ‰§è¡Œç»“æœ */
+	int   argc;		/* å‚æ•°ä¸ªæ•° */
+	ACL_ARRAY *argv;	/* å‚æ•°åˆ—è¡¨ */
+	char *args_str;		/* å‚æ•°åˆ—è¡¨çš„å¤‡ä»½ */
+	int   valid_line_idx;	/* è¯¥æœ‰æ•ˆé…ç½®è¡Œåœ¨æ‰€æœ‰æœ‰æ•ˆé…ç½®è¡Œä¸­çš„è¡Œå· */
+	int   line_number;	/* è¯¥æœ‰æ•ˆé…ç½®è¡Œåœ¨é…ç½®æ–‡ä»¶ä¸­çš„è¡Œå· */
+	void *arg_inner;	/* å†…éƒ¨æ³¨å†Œè‡ªå·±çš„å‚æ•°åˆ°è¯¥ç»“æ„ä¸­ */
 	void (*free_arg_inner)(void*);
-	void *arg_outer;	/* Íâ²¿Ó¦ÓÃ×¢²á×Ô¼ºµÄ²ÎÊıµ½¸Ã½á¹¹ÖĞ */
-	int   obj_type;		/* ÊÇÄÚ²¿ÃüÁî¶ÔÏó»¹ÊÇÍâ²¿ÃüÁî¶ÔÏó±êÖ¾Î»,
+	void *arg_outer;	/* å¤–éƒ¨åº”ç”¨æ³¨å†Œè‡ªå·±çš„å‚æ•°åˆ°è¯¥ç»“æ„ä¸­ */
+	int   obj_type;		/* æ˜¯å†…éƒ¨å‘½ä»¤å¯¹è±¡è¿˜æ˜¯å¤–éƒ¨å‘½ä»¤å¯¹è±¡æ ‡å¿—ä½,
 				 * defined as: AUT_OBJ_
 				 */
 } AUT_LINE;
@@ -26,43 +26,43 @@ typedef struct AUT_LINE {
 typedef int (*AUT_FN) (AUT_LINE *test_line, void *arg);
 
 /**
- * ËµÃ÷: µ¥Ôª²âÊÔËù²ÉÓÃµÄÒ»ÖÂµÄÊı¾İ½á¹¹
+ * è¯´æ˜: å•å…ƒæµ‹è¯•æ‰€é‡‡ç”¨çš„ä¸€è‡´çš„æ•°æ®ç»“æ„
  */
 typedef struct AUT_FN_ITEM {
-	const char *cmd_name;		/* ÃüÁî×ÖÃû³Æ */
-	const char *fn_name;		/* º¯ÊıÃû³Æ */
-	AUT_FN fn_callback;		/* ²âÊÔÓÃ»Øµ÷º¯Êı */
-	void *arg;			/* ²âÊÔ»Øµ÷º¯ÊıËùÓÃµÄ²ÎÊı */
-	int   inner;			/* ÊÇ·ñÊÇÄÚ²¿µÄÃüÁî */
+	const char *cmd_name;		/* å‘½ä»¤å­—åç§° */
+	const char *fn_name;		/* å‡½æ•°åç§° */
+	AUT_FN fn_callback;		/* æµ‹è¯•ç”¨å›è°ƒå‡½æ•° */
+	void *arg;			/* æµ‹è¯•å›è°ƒå‡½æ•°æ‰€ç”¨çš„å‚æ•° */
+	int   inner;			/* æ˜¯å¦æ˜¯å†…éƒ¨çš„å‘½ä»¤ */
 } AUT_FN_ITEM;
 
-/* ÄÚ²¿Êı¾İ½á¹¹¶¨Òå */
+/* å†…éƒ¨æ•°æ®ç»“æ„å®šä¹‰ */
 typedef struct {
 	char *name;
 	char *value;
 } AUT_ARG_ITEM;
 
 typedef struct {
-	int match_number;		/* ³É¶ÔÃüÁîÖĞÏà»¥¼äµÄÆ¥ÅäºÅ,
-					 * ÀıÈç: loop_begin Óë loop_end Ö®¼ä
-					 * ¶Ô·Ç³É¶ÔµÄÃüÁîÏîÎŞĞ§, Èç¶Ô:
-					 * stop ÃüÁîÏî.
+	int match_number;		/* æˆå¯¹å‘½ä»¤ä¸­ç›¸äº’é—´çš„åŒ¹é…å·,
+					 * ä¾‹å¦‚: loop_begin ä¸ loop_end ä¹‹é—´
+					 * å¯¹éæˆå¯¹çš„å‘½ä»¤é¡¹æ— æ•ˆ, å¦‚å¯¹:
+					 * stop å‘½ä»¤é¡¹.
 					 */
-	AUT_LINE *peer;			/* Óë¸ÃÓĞĞ§ÅäÖÃĞĞ³É¶ÔµÄÁíÒ»¸ö¶ÔÏó */
+	AUT_LINE *peer;			/* ä¸è¯¥æœ‰æ•ˆé…ç½®è¡Œæˆå¯¹çš„å¦ä¸€ä¸ªå¯¹è±¡ */
 	int flag;			/* define as: AUT_FLAG_ */
 	int status;			/* define as: AUT_STAT_ */
-	int valid_line_idx;		/* ÔÚËùÓĞÓĞĞ§ÅäÖÃĞĞÖĞµÄÏÂ±êÎ»ÖÃ */
+	int valid_line_idx;		/* åœ¨æ‰€æœ‰æœ‰æ•ˆé…ç½®è¡Œä¸­çš„ä¸‹æ ‡ä½ç½® */
 
-	/* Ë½ÓĞÀàĞÍ¶¨ÒåÈçÏÂ */
-	/* Õë¶ÔÑ­»·Ö´ĞĞÃüÁîĞòÁĞ */
-	int nloop_max;			/* ×î´óÑ­»·´ÎÊı, ÓÉÅäÖÃÎÄ¼şÖĞ»ñµÃ */
-	int nloop_cur;			/* µ±Ç°Ñ­»·µÄ´ÎÊı */
-	int offset_valid_line_idx;	/* Ïà¶ÔÓĞĞ§ÅäÖÃĞĞÏÂ±êË÷Òı */
-	int loop_sleep;			/* Ñ­»·Ö´ĞĞÊ±µÄĞİÏ¢ */
+	/* ç§æœ‰ç±»å‹å®šä¹‰å¦‚ä¸‹ */
+	/* é’ˆå¯¹å¾ªç¯æ‰§è¡Œå‘½ä»¤åºåˆ— */
+	int nloop_max;			/* æœ€å¤§å¾ªç¯æ¬¡æ•°, ç”±é…ç½®æ–‡ä»¶ä¸­è·å¾— */
+	int nloop_cur;			/* å½“å‰å¾ªç¯çš„æ¬¡æ•° */
+	int offset_valid_line_idx;	/* ç›¸å¯¹æœ‰æ•ˆé…ç½®è¡Œä¸‹æ ‡ç´¢å¼• */
+	int loop_sleep;			/* å¾ªç¯æ‰§è¡Œæ—¶çš„ä¼‘æ¯ */
 } AUT_CMD_TOKEN;
 
-#define	AUT_OBJ_OUTER		0	/* Ä¬ÈÏÎªÍâ²¿ÃüÁî¶ÔÏó */
-#define	AUT_OBJ_INNER		1	/* ÎªÄÚ²¿¶ÔÏó */
+#define	AUT_OBJ_OUTER		0	/* é»˜è®¤ä¸ºå¤–éƒ¨å‘½ä»¤å¯¹è±¡ */
+#define	AUT_OBJ_INNER		1	/* ä¸ºå†…éƒ¨å¯¹è±¡ */
 
 #define	AUT_FLAG_LOOP_BEGIN	1
 #define	AUT_FLAG_LOOP_BREAK	2
@@ -85,49 +85,49 @@ typedef struct {
 #define	VAR_AUT_LOG_PRINT	0x0001
 #define	VAR_AUT_LOG_FPRINT	0x0010
 
-/* ÅäÖÃÎÄ¼şÖĞµÄ¹Ø¼ü×Ö */
-/* ÈÕÖ¾¼ÇÂ¼¼¶±ğ */
+/* é…ç½®æ–‡ä»¶ä¸­çš„å…³é”®å­— */
+/* æ—¥å¿—è®°å½•çº§åˆ« */
 #define	VAR_AUT_LOG			"LOG"
 
-/* Ö´ĞĞÍ£Ö¹±êÖ¾Î» */
+/* æ‰§è¡Œåœæ­¢æ ‡å¿—ä½ */
 #define	VAR_AUT_STOP			"STOP"
 
-/* ĞİÏ¢±êÖ¾Î» */
+/* ä¼‘æ¯æ ‡å¿—ä½ */
 #define	VAR_AUT_SLEEP			"SLEEP"
 
-/* ÔİÍ£±êÖ¾Î» */
+/* æš‚åœæ ‡å¿—ä½ */
 #define	VAR_AUT_PAUSE			"PAUSE"
 
-/* Ñ­»·Ö´ĞĞ¿ªÊ¼±êÖ¾Î» */
+/* å¾ªç¯æ‰§è¡Œå¼€å§‹æ ‡å¿—ä½ */
 #define	VAR_AUT_LOOP_BEGIN		"LOOP_BEGIN"
 
-/* Ñ­»·Ö´ĞĞÍ£Ö¹±êÖ¾Î» */
+/* å¾ªç¯æ‰§è¡Œåœæ­¢æ ‡å¿—ä½ */
 #define	VAR_AUT_LOOP_END		"LOOP_END"
 
-/* Ìø³öÑ­»·Ö´ĞĞ */
+/* è·³å‡ºå¾ªç¯æ‰§è¡Œ */
 #define	VAR_AUT_LOOP_BREAK		"LOOP_BREAK"
 
-/* Ñ­»·¼ÌĞø */
+/* å¾ªç¯ç»§ç»­ */
 #define	VAR_AUT_LOOP_CONTINUE		"LOOP_CONTINUE"
 
-/* Ìõ¼şÅĞ¶Ï¿ªÊ¼Óï¾ä */
+/* æ¡ä»¶åˆ¤æ–­å¼€å§‹è¯­å¥ */
 #define	VAR_AUT_IF			"IF"
 
-/* Ìõ¼şÅĞ¶Ï else Óï¾ä */
+/* æ¡ä»¶åˆ¤æ–­ else è¯­å¥ */
 #define	VAR_AUT_ELSE			"ELSE"
 
-/* Ìõ¼şÅĞ¶Ï½áÊøÓï¾ä */
+/* æ¡ä»¶åˆ¤æ–­ç»“æŸè¯­å¥ */
 #define	VAR_AUT_ENDIF			"ENDIF"
 
-/* Ìø×ªÖ´ĞĞÓï¾ä */
+/* è·³è½¬æ‰§è¡Œè¯­å¥ */
 #define	VAR_AUT_GOTO			"GOTO"
 
-/*----------------- ÄÚ²¿±£ÁôµÄÒ»Ğ©ÅäÖÃÎÄ¼ş²ÎÊı -----------------------------*/
+/*----------------- å†…éƒ¨ä¿ç•™çš„ä¸€äº›é…ç½®æ–‡ä»¶å‚æ•° -----------------------------*/
 /**
- * Í¨ÓÃµÄÕûÊıÖµ²ÎÊıÃû±äÁ¿:
+ * é€šç”¨çš„æ•´æ•°å€¼å‚æ•°åå˜é‡:
  *
- * ¶ÔÓÚ VAR_AUT_SLEEP Ôò±íÊ¾ÎªĞİÏ¢µÄÃëÊıÖµ;
- * ¶ÔÓÚ VAR_AUT_LOOP_BEGIN Ôò±íÊ¾Ñ­»·µÄ´ÎÊı
+ * å¯¹äº VAR_AUT_SLEEP åˆ™è¡¨ç¤ºä¸ºä¼‘æ¯çš„ç§’æ•°å€¼;
+ * å¯¹äº VAR_AUT_LOOP_BEGIN åˆ™è¡¨ç¤ºå¾ªç¯çš„æ¬¡æ•°
  */
 
 #define	VAR_AUT_ITEM_COUNT		"COUNT"

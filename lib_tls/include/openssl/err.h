@@ -1,4 +1,4 @@
-/* crypto/err/err.h */
+﻿/* crypto/err/err.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

@@ -1,4 +1,4 @@
-#ifndef	__ARRAY_INCLUDE_H__
+﻿#ifndef	__ARRAY_INCLUDE_H__
 #define	__ARRAY_INCLUDE_H__
 
 #ifdef  __cplusplus
@@ -8,172 +8,172 @@ extern "C" {
 #include "iterator.h"
 
 /**
- * ��̬�������Ͷ���
+ * 动态数组类型定义
  */
 typedef	struct ARRAY ARRAY;
 struct ARRAY{
-	int     capacity;	/**< items ����ռ��С */
-	int     count;		/**< items �к���Ԫ�صĸ��� */
-	void    **items;	/**< ��̬���� */
+	int     capacity;	/**< items 数组空间大小 */
+	int     count;		/**< items 中含有元素的个数 */
+	void    **items;	/**< 动态数组 */
 
-	/* ���Ӽ����� */
+	/* 添加及弹出 */
 
-	/* ������β�����Ӷ�̬���� */
+	/* 向数组尾部添加动态对象 */
 	void  (*push_back)(struct ARRAY*, void*);
-	/* ������ͷ�����Ӷ�̬���� */
+	/* 向数组头部添加动态对象 */
 	void  (*push_front)(struct ARRAY*, void*);
-	/* ��������β����̬���� */
+	/* 弹出数组尾部动态对象 */
 	void *(*pop_back)(struct ARRAY*);
-	/* ��������ͷ����̬���� */
+	/* 弹出数组头部动态对象 */
 	void *(*pop_front)(struct ARRAY*);
 
 	/* for iterator */
 
-	/* ȡ������ͷ���� */
+	/* 取迭代器头函数 */
 	void *(*iter_head)(ITER*, struct ARRAY*);
-	/* ȡ��������һ������ */
+	/* 取迭代器下一个函数 */
 	void *(*iter_next)(ITER*, struct ARRAY*);
-	/* ȡ������β���� */
+	/* 取迭代器尾函数 */
 	void *(*iter_tail)(ITER*, struct ARRAY*);
-	/* ȡ��������һ������ */
+	/* 取迭代器上一个函数 */
 	void *(*iter_prev)(ITER*, struct ARRAY*);
 };
 
 /**
- * ����һ����̬����
- * @param init_size {int} ��̬����ĳ�ʼ��С
- * @return {ARRAY*} ��̬����ָ��
+ * 创建一个动态数组
+ * @param init_size {int} 动态数组的初始大小
+ * @return {ARRAY*} 动态数组指针
  */
 ARRAY *array_create(int init_size);
 
 /**
- * �ͷŵ���̬�����ڵĳ�Ա�������������ͷŶ�̬�������
- * @param a {ARRAY*} ��̬����ָ��
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ��
+ * 释放掉动态数组内的成员变量，但并不释放动态数组对象
+ * @param a {ARRAY*} 动态数组指针
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针
  */
 void array_clean(ARRAY *a, void (*free_fn)(void *));
 
 /**
- * �ͷŵ���̬�����ڵĳ�Ա���������ͷŶ�̬������󣬵�������󴴽� dbuf ����
- * ʱ��������������ͷŽ������ͷ� dbuf ʱ���ͷ�
- * @param a {ARRAY*} ��̬����ָ��
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ��
+ * 释放掉动态数组内的成员变量，并释放动态数组对象，当数组对象创建 dbuf 对象
+ * 时，则该数组对象的释放将会在释放 dbuf 时被释放
+ * @param a {ARRAY*} 动态数组指针
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针
  */
 void array_free(ARRAY *a, void (*free_fn)(void *));
 #define array_destroy array_free
 
 /**
- * ��̬����β�����Ӷ�̬��Ա����
- * @param a {ARRAY*} ��̬����ָ��
- * @param obj {void*} ��̬��Ա����
- * @return {int} >=0: �ɹ�, ����ֵΪ��Ԫ���������е��±�λ�ã�-1: ʧ��
+ * 向动态数组尾部添加动态成员变量
+ * @param a {ARRAY*} 动态数组指针
+ * @param obj {void*} 动态成员变量
+ * @return {int} >=0: 成功, 返回值为该元素在数组中的下标位置；-1: 失败
  */
 int array_append(ARRAY *a, void *obj);
 
 /**
- * ��̬����ͷ�����Ӷ�̬��Ա����
- * @param a {ARRAY*} ��̬����ָ��
- * @param obj {void*} ��̬��Ա����
- * @return {int} >=0: �ɹ�, ����ֵΪ��Ԫ���������е��±�λ�ã�-1: ʧ��
+ * 向动态数组头部添加动态成员变量
+ * @param a {ARRAY*} 动态数组指针
+ * @param obj {void*} 动态成员变量
+ * @return {int} >=0: 成功, 返回值为该元素在数组中的下标位置；-1: 失败
  */
 int array_prepend(ARRAY *a, void *obj);
 
 /**
- * ��̬������ָ��λ��ǰ���Ӷ�̬��Ա����(�ý�㼰�Ժ����н�㶼����һ��λ��)
- * @param a {ARRAY*} ��̬����ָ��
- * @param position {int} ĳ��λ�ã�����Խ��
- * @param obj {void*} ��̬��Ա����
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 向动态数组中指定位置前添加动态成员变量(该结点及以后所有结点都后移一个位置)
+ * @param a {ARRAY*} 动态数组指针
+ * @param position {int} 某个位置，不得越界
+ * @param obj {void*} 动态成员变量
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_pred_insert(ARRAY *a, int position, void *obj);
 
 /**
- * ��̬������ָ��λ�ú����Ӷ�̬��Ա����(�ý���Ժ����н�㶼����һ��λ��)
- * @param a {ARRAY*} ��̬����ָ��
- * @param position {int} ĳ��λ�ã�����Խ��
- * @param obj {void*} ��̬��Ա����
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 向动态数组中指定位置后添加动态成员变量(该结点以后所有结点都后移一个位置)
+ * @param a {ARRAY*} 动态数组指针
+ * @param position {int} 某个位置，不得越界
+ * @param obj {void*} 动态成员变量
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_succ_insert(ARRAY *a, int position, void *obj);
 #define array_insert array_succ_insert
 
 /**
- * �Ӷ�̬�����е�ָ��λ��ɾ��ĳ����̬����, ɾ����������Ԫ�ص��Ⱥ�˳�򱣳ֲ���,
- * �����ɾ��λ�����м�ĳ��λ�ã�Ϊ�˱�֤Ԫ�ص�˳���ԣ��ڲ�����ɾ��Ԫ�غ������Ԫ��
- * ��ǰ��һ��λ��
- * @param a {ARRAY*} ��̬����ָ��
- * @param position {int} ĳ��λ�ã�����Խ��
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ�룬�����
- *  ָ��Ϊ�գ����ͷţ������ô˺��������ͷŶ�̬����
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 从动态数组中的指定位置删除某个动态对象, 删除后数组内元素的先后顺序保持不变,
+ * 如果被删除位置在中间某个位置，为了保证元素的顺序性，内部将被删除元素后的所有元素
+ * 都前移一个位置
+ * @param a {ARRAY*} 动态数组指针
+ * @param position {int} 某个位置，不得越界
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
+ *  指针为空，则不释放，否则用此函数进行释放动态对象
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_delete_idx(ARRAY *a, int position, void (*free_fn)(void *));
 
 /**
- * �Ӷ�̬�����е�ָ��λ��ɾ��ĳ������ɾ����������Ԫ�ص��Ⱥ�˳���п��ܷ����˸ı�,
- * ��Ϊɾ������Զ�������������Ԫ��������λ�ô�
- * @param a {ARRAY*} ��̬����ָ��
- * @param position {int} ĳ��λ�ã�����Խ��
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ�룬�����
- *  ָ��Ϊ�գ����ͷţ������ô˺��������ͷŶ�̬����
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 从动态数组中的指定位置删除某个对象，删除后数组内元素的先后顺序有可能发生了改变,
+ * 因为删除后会自动将数组中最后的元素移至该位置处
+ * @param a {ARRAY*} 动态数组指针
+ * @param position {int} 某个位置，不得越界
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
+ *  指针为空，则不释放，否则用此函数进行释放动态对象
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_delete(ARRAY *a, int position, void (*free_fn)(void*));
 
 /**
- * �Ӷ�̬������ɾ��ָ��ָ���ַ�Ķ�̬����, ɾ����������Ԫ�ص��Ⱥ�˳�򱣳ֲ���
- * �����ɾ��λ�����м�ĳ��λ�ã�Ϊ�˱�֤Ԫ�ص�˳�����ڲ�������ɾ��Ԫ�غ������Ԫ��
- * ��ǰ��һ��λ��
- * @param a {ARRAY*} ��̬����ָ��
- * @param obj {void*} ��̬����ָ���ַ
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ�룬�����
- *  ָ��Ϊ�գ����ͷţ������ô˺��������ͷŶ�̬����
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 从动态数组中删除指定指针地址的动态对象, 删除后数组内元素的先后顺序保持不变
+ * 如果被删除位置在中间某个位置，为了保证元素的顺序性内部，将被删除元素后的所有元素
+ * 都前移一个位置
+ * @param a {ARRAY*} 动态数组指针
+ * @param obj {void*} 动态对象指针地址
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
+ *  指针为空，则不释放，否则用此函数进行释放动态对象
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_delete_obj(ARRAY *a, void *obj, void (*free_fn)(void *));
 
 /**
- * �Ӷ�̬������ɾ��ĳ���±귶Χ�Ķ�̬����
- * @param a {ARRAY*} ��̬����ָ��
- * @param ibegin {int} ��ʼ�±�λ��
- * @param iend {int} �����±�λ��
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ�룬�����
- *  ָ��Ϊ�գ����ͷţ������ô˺��������ͷŶ�̬����
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 从动态数组中删除某个下标范围的动态对象
+ * @param a {ARRAY*} 动态数组指针
+ * @param ibegin {int} 开始下标位置
+ * @param iend {int} 结束下标位置
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
+ *  指针为空，则不释放，否则用此函数进行释放动态对象
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_delete_range(ARRAY *a, int ibegin, int iend, void (*free_fn)(void*));
 
 /**
- * �ƶ���̬�����еĶ���
- * @param a {ARRAY*} ��̬����ָ��
- * @param ito {int} �ƶ���Ŀ���±�λ��
- * @param ifrom {int} �Ӵ��±�λ�ÿ�ʼ�ƶ�
- * @param free_fn {void (*)(void*)} �����ͷŶ�̬�����ڳ�Ա�������ͷź���ָ�룬�����
- *  ָ��Ϊ�գ����ͷţ������ô˺��������ͷŶ�̬�����ͷŵĶ�̬��������Ϊ
- *  [idx_obj_begin, idx_src_begin), Ϊһ�뿪�������
- * @return {int} 0: �ɹ���-1: ʧ��
+ * 移动动态数组中的对象
+ * @param a {ARRAY*} 动态数组指针
+ * @param ito {int} 移动至目标下标位置
+ * @param ifrom {int} 从此下标位置开始移动
+ * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
+ *  指针为空，则不释放，否则用此函数进行释放动态对象被释放的动态对象区间为
+ *  [idx_obj_begin, idx_src_begin), 为一半开半闭区间
+ * @return {int} 0: 成功；-1: 失败
  */
 int array_mv_idx(ARRAY *a, int ito, int ifrom, void (*free_fn)(void *) );
 
 /**
- * Ԥ�ȱ�֤��̬����Ŀռ䳤��
- * @param a {ARRAY*} ��̬����ָ��
- * @param app_count {int} ��Ҫ��̬���������� app_count ������λ��
+ * 预先保证动态数组的空间长度
+ * @param a {ARRAY*} 动态数组指针
+ * @param app_count {int} 需要动态数组至少有 app_count 个空闲位置
  */
 void array_pre_append(ARRAY *a, int app_count);
 
 /**
- * �Ӷ�̬�����е�ĳ���±�λ��ȡ����̬����
- * @param a {ARRAY*} ��̬����ָ��
- * @param idx {int} �±�λ�ã�����Խ�磬���򷵻�-1
- * @return {void*} != NULL: �ɹ���== NULL: �����ڻ�ʧ��
+ * 从动态数组中的某个下标位置取出动态对象
+ * @param a {ARRAY*} 动态数组指针
+ * @param idx {int} 下标位置，不能越界，否则返回-1
+ * @return {void*} != NULL: 成功；== NULL: 不存在或失败
  */
 void *array_index(const ARRAY *a, int idx);
 
 /**
- * ��õ�ǰ��̬�����ж�̬����ĸ���
- * @param a {ARRAY*} ��̬����ָ��
- * @return {int} ��̬�����ж�̬����ĸ���
+ * 获得当前动态数组中动态对象的个数
+ * @param a {ARRAY*} 动态数组指针
+ * @return {int} 动态数组中动态对象的个数
  */
 int array_size(const ARRAY *a);
 

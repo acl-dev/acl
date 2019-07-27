@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "dict.h"
 #include "debug_var.h"
 #include "dict_pool.h"
@@ -271,7 +271,7 @@ int dict_pool_seq(DICT_POOL *pool, char **key, size_t *key_size,
 		}
 		pool->dbpool[pool->dict_cur].seqcnt = 0;
 
-		/* ·µ»Ø·Ç0Öµ£¬ÓÐ¿ÉÄÜÊÇµ±Ç°µÄDB½áµãÒÑ¾­±éÀúÍê±Ï, xxx: Ó¦¸Ã½øÒ»²½ÅÐ¶Ï²ÅÊÇ */
+		/* è¿”å›žéž0å€¼ï¼Œæœ‰å¯èƒ½æ˜¯å½“å‰çš„DBç»“ç‚¹å·²ç»éåŽ†å®Œæ¯•, xxx: åº”è¯¥è¿›ä¸€æ­¥åˆ¤æ–­æ‰æ˜¯ */
 		pool->dict_cur++;
 	}
 }

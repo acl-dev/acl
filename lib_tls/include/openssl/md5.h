@@ -1,4 +1,4 @@
-/* crypto/md5/md5.h */
+﻿/* crypto/md5/md5.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+﻿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -104,13 +104,13 @@ acl_int64 acl_timer_left(ACL_TIMER* timer)
 	pTimerItem = FIRST_TIMER(&timer->timer_header);
 	if (pTimerItem != NULL) {
 		time_left = pTimerItem->when - timer->present;
-		/* �����һ����ʱ�����Ѿ����ڣ���ʣ��ʱ���趨Ϊ0��
-		 * ��ʹ��ʱ�����촥�����ڶ�ʱ����
+		/* 如果下一个定时任务已经到期，则将剩余时间设定为0，
+		 * 以使定时器尽快触发到期定时任务
 		 */
 		if (time_left < 0)
 			time_left = 0;
 	} else {
-		/* �����ʱ��ʱ��û�ж�ʱ������ʱ��ֵ��Ϊ -1 */
+		/* 如果当时定时器没有定时任务，则将时间值赋为 -1 */
 		time_left = -1;
 	}
 

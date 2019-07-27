@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 
 #ifdef	HAS_READLINE
 #include <readline/readline.h>

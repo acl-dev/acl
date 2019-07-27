@@ -1,4 +1,4 @@
-
+﻿
 #ifndef	__LOG_WRAP_INCLUDE_H__
 #define	__LOG_WRAP_INCLUDE_H__
 

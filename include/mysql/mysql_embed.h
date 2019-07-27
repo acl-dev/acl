@@ -1,4 +1,4 @@
-#ifndef MYSQL_EMBED_INCLUDED
+﻿#ifndef MYSQL_EMBED_INCLUDED
 #define MYSQL_EMBED_INCLUDED
 
 /* Copyright (C) 2000 MySQL AB

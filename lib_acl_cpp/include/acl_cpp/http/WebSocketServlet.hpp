@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "HttpServlet.hpp"
 
@@ -18,32 +18,32 @@ public:
 	WebSocketServlet(void);
 
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param stream {socket_stream*} µ±ÔÚ acl_master ·şÎñÆ÷¿ò¼Ü¿ØÖÆÏÂ
-	 *  ÔËĞĞÊ±£¬¸Ã²ÎÊı±ØĞë·Ç¿Õ£»µ±ÔÚ apache ÏÂÒÔ CGI ·½Ê½ÔËĞĞÊ±£¬¸Ã²ÎÊı
-	 *  ÉèÎª NULL£»ÁíÍâ£¬¸Ãº¯ÊıÄÚ²¿²»»á¹Ø±ÕÁ÷Á¬½Ó£¬Ó¦ÓÃÓ¦×ÔĞĞ´¦ÀíÁ÷¶ÔÏó
-	 *  µÄ¹Ø±ÕÇé¿ö£¬ÕâÑù¿ÉÒÔ·½±ãÓë acl_master ¼Ü¹¹½áºÏ
-	 * @param session {session*} Ã¿Ò»¸ö HttpServlet ¶ÔÏóÒ»¸ö session ¶ÔÏó
+	 * æ„é€ å‡½æ•°
+	 * @param stream {socket_stream*} å½“åœ¨ acl_master æœåŠ¡å™¨æ¡†æ¶æ§åˆ¶ä¸‹
+	 *  è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°å¿…é¡»éç©ºï¼›å½“åœ¨ apache ä¸‹ä»¥ CGI æ–¹å¼è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°
+	 *  è®¾ä¸º NULLï¼›å¦å¤–ï¼Œè¯¥å‡½æ•°å†…éƒ¨ä¸ä¼šå…³é—­æµè¿æ¥ï¼Œåº”ç”¨åº”è‡ªè¡Œå¤„ç†æµå¯¹è±¡
+	 *  çš„å…³é—­æƒ…å†µï¼Œè¿™æ ·å¯ä»¥æ–¹ä¾¿ä¸ acl_master æ¶æ„ç»“åˆ
+	 * @param session {session*} æ¯ä¸€ä¸ª HttpServlet å¯¹è±¡ä¸€ä¸ª session å¯¹è±¡
 	 */
 	WebSocketServlet(socket_stream* stream, session* session);
 
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param stream {socket_stream*} µ±ÔÚ acl_master ·şÎñÆ÷¿ò¼Ü¿ØÖÆÏÂ
-	 *  ÔËĞĞÊ±£¬¸Ã²ÎÊı±ØĞë·Ç¿Õ£»µ±ÔÚ apache ÏÂÒÔ CGI ·½Ê½ÔËĞĞÊ±£¬¸Ã²ÎÊı
-	 *  ÉèÎª NULL£»ÁíÍâ£¬¸Ãº¯ÊıÄÚ²¿²»»á¹Ø±ÕÁ÷Á¬½Ó£¬Ó¦ÓÃÓ¦×ÔĞĞ´¦ÀíÁ÷¶ÔÏó
-	 *  µÄ¹Ø±ÕÇé¿ö£¬ÕâÑù¿ÉÒÔ·½±ãÓë acl_master ¼Ü¹¹½áºÏ
+	 * æ„é€ å‡½æ•°
+	 * @param stream {socket_stream*} å½“åœ¨ acl_master æœåŠ¡å™¨æ¡†æ¶æ§åˆ¶ä¸‹
+	 *  è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°å¿…é¡»éç©ºï¼›å½“åœ¨ apache ä¸‹ä»¥ CGI æ–¹å¼è¿è¡Œæ—¶ï¼Œè¯¥å‚æ•°
+	 *  è®¾ä¸º NULLï¼›å¦å¤–ï¼Œè¯¥å‡½æ•°å†…éƒ¨ä¸ä¼šå…³é—­æµè¿æ¥ï¼Œåº”ç”¨åº”è‡ªè¡Œå¤„ç†æµå¯¹è±¡
+	 *  çš„å…³é—­æƒ…å†µï¼Œè¿™æ ·å¯ä»¥æ–¹ä¾¿ä¸ acl_master æ¶æ„ç»“åˆ
 	 * @param memcache_addr {const char*}
 	 */
 	WebSocketServlet(socket_stream* stream,
 		const char* memcache_addr = "127.0.0.1:11211");
 
 	/**
-	 * HttpServlet ¶ÔÏó¿ªÊ¼ÔËĞĞ£¬½ÓÊÕ HTTP ÇëÇó£¬²¢»Øµ÷ÒÔÏÂ doXXX Ğéº¯Êı£¬
-	 * ¸Ãº¯ÊıÊ×ÏÈ»áµ÷ÓÃ start ¹ı³Ì£¬È»ºó¸ù¾İ start µÄ·µ»Ø½á¹û¼°ÇëÇó/ÏìÓ¦
-	 * ¶ÔÏóÊÇ·ñÒªÇó±£³Ö³¤Á¬½ÓÀ´¾ö¶¨ÊÇ·ñĞèÒªÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó.
-	 * @return {bool} ·µ»Ø´¦Àí½á¹û£¬·µ»Ø false ±íÊ¾´¦ÀíÊ§°Ü»ò´¦Àí³É¹¦ÇÒ
-	 *  ²»±£³Ö³¤Á¬½Ó£¬Ó¦¹Ø±ÕÁ¬½Ó
+	 * HttpServlet å¯¹è±¡å¼€å§‹è¿è¡Œï¼Œæ¥æ”¶ HTTP è¯·æ±‚ï¼Œå¹¶å›è°ƒä»¥ä¸‹ doXXX è™šå‡½æ•°ï¼Œ
+	 * è¯¥å‡½æ•°é¦–å…ˆä¼šè°ƒç”¨ start è¿‡ç¨‹ï¼Œç„¶åæ ¹æ® start çš„è¿”å›ç»“æœåŠè¯·æ±‚/å“åº”
+	 * å¯¹è±¡æ˜¯å¦è¦æ±‚ä¿æŒé•¿è¿æ¥æ¥å†³å®šæ˜¯å¦éœ€è¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥.
+	 * @return {bool} è¿”å›å¤„ç†ç»“æœï¼Œè¿”å› false è¡¨ç¤ºå¤„ç†å¤±è´¥æˆ–å¤„ç†æˆåŠŸä¸”
+	 *  ä¸ä¿æŒé•¿è¿æ¥ï¼Œåº”å…³é—­è¿æ¥
 	 */
 
 	virtual ~WebSocketServlet(void);
@@ -58,79 +58,79 @@ public:
 	bool doRun(const char* memcached_addr, socket_stream* stream);
 
 	/**
-	 * ·¢ËÍ¶ş½øÖÆÊı¾İ.
-	 * @param rw_timeout {const char *} ·¢ËÍµÄÊı¾İ
-	 * @return {bool} ´íÎó false.·ñÔò true
+	 * å‘é€äºŒè¿›åˆ¶æ•°æ®.
+	 * @param rw_timeout {const char *} å‘é€çš„æ•°æ®
+	 * @return {bool} é”™è¯¯ false.å¦åˆ™ true
 	 */
 	bool sendBinary(const char *buf, int len);
 
 	/**
-	 * ·¢ËÍÎÄ±¾Êı¾İ.
-	 * @param rw_timeout {const char *} ·¢ËÍµÄÊı¾İ
-	 * @return {bool} ´íÎó false.·ñÔò true
+	 * å‘é€æ–‡æœ¬æ•°æ®.
+	 * @param rw_timeout {const char *} å‘é€çš„æ•°æ®
+	 * @return {bool} é”™è¯¯ false.å¦åˆ™ true
 	 */
 	bool sendText(const char *text);
 
 	/**
-	 * ·¢ËÍpong ÏûÏ¢.
-	 * @param rw_timeout {const char *} ·¢ËÍµÄÊı¾İ
-	 * @return {bool} ´íÎó false.·ñÔò true
+	 * å‘é€pong æ¶ˆæ¯.
+	 * @param rw_timeout {const char *} å‘é€çš„æ•°æ®
+	 * @return {bool} é”™è¯¯ false.å¦åˆ™ true
 	 */
 	bool sendPong(const char *buffer = NULL);
 
 	/**
-	 * ·¢ËÍpong ÏûÏ¢.
-	 * @param rw_timeout {const char *} ·¢ËÍµÄÊı¾İ
-	 * @return {bool} ´íÎó false.·ñÔò true
+	 * å‘é€pong æ¶ˆæ¯.
+	 * @param rw_timeout {const char *} å‘é€çš„æ•°æ®
+	 * @return {bool} é”™è¯¯ false.å¦åˆ™ true
 	 */
 	bool sendPing(const char *buffer = NULL);
 
 protected:
 	/**
-	 * websocket ¹Ø±ÕÏûÏ¢»Øµ÷
+	 * websocket å…³é—­æ¶ˆæ¯å›è°ƒ
 	 * @return {void}
 	 */
 	virtual void onClose(void) {}
 
 	/**
-	 * websocket ping ÏûÏ¢»Øµ÷.
-	 * @param payload_len {unsigned long long} ÏûÏ¢Êı¾İ×Ü³¤¶È
-	 * @param finish {bool} ±¾Êı¾İ°üÊÇ·ñ×îºóÒ»¸ö
-	 * @return {bool} false ¶Ï¿ªÁ¬½Ó¡£
+	 * websocket ping æ¶ˆæ¯å›è°ƒ.
+	 * @param payload_len {unsigned long long} æ¶ˆæ¯æ•°æ®æ€»é•¿åº¦
+	 * @param finish {bool} æœ¬æ•°æ®åŒ…æ˜¯å¦æœ€åä¸€ä¸ª
+	 * @return {bool} false æ–­å¼€è¿æ¥ã€‚
 	 */
 	virtual bool onPing(unsigned long long payload_len, bool finish) = 0;
 
 	/**
-	 * websocket pong ÏûÏ¢»Øµ÷.
-	 * @param payload_len {unsigned long long} ÏûÏ¢Êı¾İ×Ü³¤¶È
-	 * @param finish {bool} ±¾Êı¾İ°üÊÇ·ñ×îºóÒ»¸ö
-	 * @return {bool} false ¶Ï¿ªÁ¬½Ó¡£
+	 * websocket pong æ¶ˆæ¯å›è°ƒ.
+	 * @param payload_len {unsigned long long} æ¶ˆæ¯æ•°æ®æ€»é•¿åº¦
+	 * @param finish {bool} æœ¬æ•°æ®åŒ…æ˜¯å¦æœ€åä¸€ä¸ª
+	 * @return {bool} false æ–­å¼€è¿æ¥ã€‚
 	 */
 	virtual bool onPong(unsigned long long payload_len, bool finish) = 0;
 
 	/**
-	 * websocket ping ÏûÏ¢»Øµ÷.
-	 * @param payload_len {unsigned long long} ÏûÏ¢Êı¾İ×Ü³¤¶È
-	 * @param text {bool } true ±íÊ¾ÎªÎÄ±¾Êı¾İ, ·ñÔòÊÇ ¶ş½øÖÆÊı¾İ¡£
-	 * @param finish {bool} ±¾Êı¾İ°üÊÇ·ñ×îºóÒ»¸ö
-	 * @return {bool} false ¶Ï¿ªÁ¬½Ó¡£
+	 * websocket ping æ¶ˆæ¯å›è°ƒ.
+	 * @param payload_len {unsigned long long} æ¶ˆæ¯æ•°æ®æ€»é•¿åº¦
+	 * @param text {bool } true è¡¨ç¤ºä¸ºæ–‡æœ¬æ•°æ®, å¦åˆ™æ˜¯ äºŒè¿›åˆ¶æ•°æ®ã€‚
+	 * @param finish {bool} æœ¬æ•°æ®åŒ…æ˜¯å¦æœ€åä¸€ä¸ª
+	 * @return {bool} false æ–­å¼€è¿æ¥ã€‚
 	 */
 	virtual bool onMessage(unsigned long long payload_len,
 			bool text, bool finish) = 0;
 
 	/**
-	 * ×ÓÀà¿ÉÒÔÑ­»·µ÷ÓÃ´Ë·½·¨»ñµÃÊı¾İÖ¡µÄÊı¾İÌå£¬Ö±ÖÁ·µ»Ø <= 0 ÎªÖ¹
-	 * @param buf {size_t*} Êı¾İ»º³åÇøÓÃÀ´´æ·Å½á¹ûÊı¾İ
-	 * @param size {size_t} buf »º³åÇø´óĞ¡
-	 * @return {int} ¶Áµ½µÄÊı¾İ³¤¶È£¬·ÖÒÔÏÂÈıÖÖÇéĞÎ£º
-	 *   0: ±íÊ¾Êı¾İÖ¡Õı³£¶ÁÍê
-	 *  -1: ±íÊ¾¶Á³ö´í
-	 *  >0: ±íÊ¾¶Áµ½µÄÊı¾İ£¬Ó¦ÔÙ´Îµ÷ÓÃ±¾·½·¨ÒÔ±ã¶ÁÓàÏÂµÄÊı¾İ
+	 * å­ç±»å¯ä»¥å¾ªç¯è°ƒç”¨æ­¤æ–¹æ³•è·å¾—æ•°æ®å¸§çš„æ•°æ®ä½“ï¼Œç›´è‡³è¿”å› <= 0 ä¸ºæ­¢
+	 * @param buf {size_t*} æ•°æ®ç¼“å†²åŒºç”¨æ¥å­˜æ”¾ç»“æœæ•°æ®
+	 * @param size {size_t} buf ç¼“å†²åŒºå¤§å°
+	 * @return {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦ï¼Œåˆ†ä»¥ä¸‹ä¸‰ç§æƒ…å½¢ï¼š
+	 *   0: è¡¨ç¤ºæ•°æ®å¸§æ­£å¸¸è¯»å®Œ
+	 *  -1: è¡¨ç¤ºè¯»å‡ºé”™
+	 *  >0: è¡¨ç¤ºè¯»åˆ°çš„æ•°æ®ï¼Œåº”å†æ¬¡è°ƒç”¨æœ¬æ–¹æ³•ä»¥ä¾¿è¯»ä½™ä¸‹çš„æ•°æ®
 	 */
 	int readPayload(void* buf, size_t size);
 
 	/**
-	 * ·µ»Ø websocket ¶ÔÏó£¬Èç¹û·µ»Ø NULL ±íÊ¾»¹Î´½¨Á¢ websocket Á¬½Ó
+	 * è¿”å› websocket å¯¹è±¡ï¼Œå¦‚æœè¿”å› NULL è¡¨ç¤ºè¿˜æœªå»ºç«‹ websocket è¿æ¥
 	 * @return {websocket*}
 	 */
 	websocket* get_websocket(void) const

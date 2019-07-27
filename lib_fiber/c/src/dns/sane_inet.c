@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "valid_hostname.h"
 #include "sane_inet.h"
 

@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+﻿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/db/db_mysql.hpp"
 #include "acl_cpp/db/db_service_mysql.hpp"

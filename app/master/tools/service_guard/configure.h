@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 extern char *var_cfg_redis_addrs;
 extern char *var_cfg_redis_passwd;

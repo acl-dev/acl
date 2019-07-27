@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "http_client.h"
 
 http_client::http_client(acl::aio_socket_stream* conn, int buf_size)

@@ -1,4 +1,4 @@
-#ifndef	__PROBE_INCLUDE_H__
+ï»¿#ifndef	__PROBE_INCLUDE_H__
 #define	__PROBE_INCLUDE_H__
 
 #ifdef	__cplusplus
@@ -8,7 +8,7 @@ extern "C" {
 #include "lib_acl.h"
 #include "lib_protocol.h"
 
-/* ´íÎóºÅ */
+/* é”™è¯¯å· */
 #define	PROBE_HTTP_STAT_MAX	599
 #define	PROBE_HTTP_STAT_200	200
 #define	PROBE_HTTP_STAT_404	404
@@ -17,27 +17,27 @@ extern "C" {
 #define	PROBE_HTTP_STAT_504	504
 #define	PROBE_HTTP_STAT_505	505
 
-#define	PROBE_ERR_NONE		0		/* ÎÞ´íÎó */
-#define	PROBE_ERR_CONN		-1		/* Á¬½ÓÖ÷»ú´íÎó */
-#define	PROBE_ERR_HTTP		-2		/* HTTPÐ­Òé·µ»Ø´íÎó */
-#define	PROBE_ERR_URL		-3		/* ËùÇëÇóµÄURL·µ»Ø´íÎó */
-#define	PROBE_ERR_ARG		-4		/* ÊäÈë²ÎÊý´íÎó */
-#define	PROBE_ERR_DSEARCH	-5		/* Ëù²éÑ¯µÄÓò½áµã²»´æÔÚ */
-#define	PROBE_ERR_HSEARCH	-6		/* Ëù²éÑ¯µÄÖ÷»ú½áµã²»´æÔÚ */
-#define	PROBE_ERR_HDEAD		-7		/* Ëù²éÑ¯µÄÖ÷»ú½áµãÒÑ¾­ËÀµô */
-#define	PROBE_ERR_SOPEN		-8		/* ´ò¿ªÁ÷´íÎó */
-#define	PROBE_ERR_WRITE		-9		/* Ð´´íÎó */
-#define	PROBE_ERR_READ		-10		/* ¶Á´íÎó */
-#define	PROBE_ERR_TOO_MANY_ITEM	-11		/* Í·²¿»Ø¸´ÐÐÊýÌ«¶à */
+#define	PROBE_ERR_NONE		0		/* æ— é”™è¯¯ */
+#define	PROBE_ERR_CONN		-1		/* è¿žæŽ¥ä¸»æœºé”™è¯¯ */
+#define	PROBE_ERR_HTTP		-2		/* HTTPåè®®è¿”å›žé”™è¯¯ */
+#define	PROBE_ERR_URL		-3		/* æ‰€è¯·æ±‚çš„URLè¿”å›žé”™è¯¯ */
+#define	PROBE_ERR_ARG		-4		/* è¾“å…¥å‚æ•°é”™è¯¯ */
+#define	PROBE_ERR_DSEARCH	-5		/* æ‰€æŸ¥è¯¢çš„åŸŸç»“ç‚¹ä¸å­˜åœ¨ */
+#define	PROBE_ERR_HSEARCH	-6		/* æ‰€æŸ¥è¯¢çš„ä¸»æœºç»“ç‚¹ä¸å­˜åœ¨ */
+#define	PROBE_ERR_HDEAD		-7		/* æ‰€æŸ¥è¯¢çš„ä¸»æœºç»“ç‚¹å·²ç»æ­»æŽ‰ */
+#define	PROBE_ERR_SOPEN		-8		/* æ‰“å¼€æµé”™è¯¯ */
+#define	PROBE_ERR_WRITE		-9		/* å†™é”™è¯¯ */
+#define	PROBE_ERR_READ		-10		/* è¯»é”™è¯¯ */
+#define	PROBE_ERR_TOO_MANY_ITEM	-11		/* å¤´éƒ¨å›žå¤è¡Œæ•°å¤ªå¤š */
 
-#define	HOST_STATUS_ALIVE	0		/* ¸ÃÖ÷»ú´¦ÓÚ´æ»î×´Ì¬ */
-#define	HOST_STATUS_DEAD	1		/* ¸ÃÖ÷»úÒÑ¾­ËÀµô */
+#define	HOST_STATUS_ALIVE	0		/* è¯¥ä¸»æœºå¤„äºŽå­˜æ´»çŠ¶æ€ */
+#define	HOST_STATUS_DEAD	1		/* è¯¥ä¸»æœºå·²ç»æ­»æŽ‰ */
 
-#define	HOST_FLAG_PROBE_FREE	0		/* ¸ÃÖ÷»úÎ´´¦ÓÚÌ½²â×´Ì¬ */
-#define	HOST_FLAG_PROBE_BUSY	1		/* ¸ÃÖ÷»úÒÑ¾­´¦ÓÚÌ½²â×´Ì¬ÁË */
+#define	HOST_FLAG_PROBE_FREE	0		/* è¯¥ä¸»æœºæœªå¤„äºŽæŽ¢æµ‹çŠ¶æ€ */
+#define	HOST_FLAG_PROBE_BUSY	1		/* è¯¥ä¸»æœºå·²ç»å¤„äºŽæŽ¢æµ‹çŠ¶æ€äº† */
 
 
-/* ³£Á¿¶¨Òå */
+/* å¸¸é‡å®šä¹‰ */
 #define	HTTP_HEADER_MAX_SIZE		8192
 #define	HTTP_HEADER_MAX_NUM		20
 

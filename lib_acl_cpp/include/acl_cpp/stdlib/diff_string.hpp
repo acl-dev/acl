@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "diff_object.hpp"
 
@@ -9,21 +9,21 @@ class diff_string : public diff_object
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 * @param manager {diff_manager&}
-	 * @param key {const char*} ÒÔ×Ö·û´®·½Ê½±íÊ¾µÄ¼ü£¬·Ç¿Õ×Ö·û´®
-	 * @param val {const char*} ÒÔ×Ö·û´®·½Ê½±íÊ¾µÄÖµ£¬·Ç¿Õ×Ö·û´®
+	 * @param key {const char*} ä»¥å­—ç¬¦ä¸²æ–¹å¼è¡¨ç¤ºçš„é”®ï¼Œéç©ºå­—ç¬¦ä¸²
+	 * @param val {const char*} ä»¥å­—ç¬¦ä¸²æ–¹å¼è¡¨ç¤ºçš„å€¼ï¼Œéç©ºå­—ç¬¦ä¸²
 	 */
 	diff_string(diff_manager& manager, const char* key, const char* val);
 
 	/**
-	 * ÉèÖÃ±¾¶ÔÏóËùÔÚµÄÇø¼äÖµ
+	 * è®¾ç½®æœ¬å¯¹è±¡æ‰€åœ¨çš„åŒºé—´å€¼
 	 * @param range {long long}
 	 */
 	void set_range(long long range);
 
 	/**
-	 * »ñµÃ±¾¶ÔÏóËùÔÚµÄÇø¼äÖµ
+	 * è·å¾—æœ¬å¯¹è±¡æ‰€åœ¨çš„åŒºé—´å€¼
 	 * @return {long long}
 	 */
 	long long get_range(void) const
@@ -32,13 +32,13 @@ public:
 	}
 
 public:
-	// override: »ùÀà´¿Ğéº¯ÊıµÄÊµÏÖ
+	// override: åŸºç±»çº¯è™šå‡½æ•°çš„å®ç°
 	const char* get_key(void) const;
 
-	// override: »ùÀà´¿Ğéº¯ÊıµÄÊµÏÖ
+	// override: åŸºç±»çº¯è™šå‡½æ•°çš„å®ç°
 	const char* get_val(void) const;
 
-	// override: »ùÀà´¿º¯ÊıµÄÊµÏÖ
+	// override: åŸºç±»çº¯å‡½æ•°çš„å®ç°
 	bool operator== (const diff_object& obj) const;
 
 	// @override
@@ -49,7 +49,7 @@ private:
 	const char* val_;
 	long long range_;
 
-	// Îö¹¹º¯ÊıÉùÃ÷ÎªË½ÓĞµÄ£¬´Ó¶øÒªÇó¶¯Ì¬´´½¨±¾Àà¶ÔÏó
+	// ææ„å‡½æ•°å£°æ˜ä¸ºç§æœ‰çš„ï¼Œä»è€Œè¦æ±‚åŠ¨æ€åˆ›å»ºæœ¬ç±»å¯¹è±¡
 	~diff_string(void);
 };
 

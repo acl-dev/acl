@@ -1,4 +1,4 @@
-/* pkcs12.h */
+﻿/* pkcs12.h */
 /* Written by Dr Stephen N Henson (shenson@bigfoot.com) for the OpenSSL
  * project 1999.
  */

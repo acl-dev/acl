@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -52,32 +52,32 @@ const char* smtp_client::get_status(void) const
 bool smtp_client::send(const mail_message& message,
 	const char* email /* = NULL */)
 {
-	// ·¢ËÍ SMTP ÓÊ¼şĞÅ·â¹ı³Ì
+	// å‘é€ SMTP é‚®ä»¶ä¿¡å°è¿‡ç¨‹
 	if (!send_envelope(message)) {
 		return false;
 	}
 
-	// ÓÅÏÈÊ¹ÓÃ²ÎÊı¸ø³öµÄÓÊ¼şÎÄ¼ş£¬È»ºó²ÅÊÇ message ÖĞ×Ô¶¯Éú³ÉµÄÓÊ¼şÎÄ¼ş
+	// ä¼˜å…ˆä½¿ç”¨å‚æ•°ç»™å‡ºçš„é‚®ä»¶æ–‡ä»¶ï¼Œç„¶åæ‰æ˜¯ message ä¸­è‡ªåŠ¨ç”Ÿæˆçš„é‚®ä»¶æ–‡ä»¶
 	if (email == NULL) {
 		email = message.get_email();
 	}
 
-	// Èç¹ûÃ»ÓĞ¿É·¢ËÍµÄÓÊ¼şÎÄ¼ş£¬ÔòÈÏÎªµ÷ÓÃÕßÏëÍ¨¹ı write µÈ½Ó¿ÚÖ±½Ó·¢ËÍÊı¾İ
+	// å¦‚æœæ²¡æœ‰å¯å‘é€çš„é‚®ä»¶æ–‡ä»¶ï¼Œåˆ™è®¤ä¸ºè°ƒç”¨è€…æƒ³é€šè¿‡ write ç­‰æ¥å£ç›´æ¥å‘é€æ•°æ®
 	if (email == NULL) {
 		return true;
 	}
 
-	// ·¢ËÍ DATA ÃüÁî
+	// å‘é€ DATA å‘½ä»¤
 	if (!data_begin()) {
 		return false;
 	}
 
-	// ·¢ËÍÓÊ¼ş
+	// å‘é€é‚®ä»¶
 	if (!send_email(email)) {
 		return false;
 	}
 
-	// ·¢ËÍ DATA ½áÊø·û
+	// å‘é€ DATA ç»“æŸç¬¦
 	return data_end();
 }
 
@@ -127,10 +127,10 @@ bool smtp_client::open(void)
 		return false;
 	}
 
-	// ´ò¿ªÁ÷¶ÔÏó£¬Ö»ËùÒÔÊ¹ÓÃ stream_ Ö÷ÒªÎªÁËÊ¹ÓÃ SSL Í¨ĞÅ
+	// æ‰“å¼€æµå¯¹è±¡ï¼Œåªæ‰€ä»¥ä½¿ç”¨ stream_ ä¸»è¦ä¸ºäº†ä½¿ç”¨ SSL é€šä¿¡
 	stream_.open(client_->conn);
 
-	// Èç¹ûÉèÖÃÁË SSL Í¨ĞÅ·½Ê½£¬ÔòĞèÒª´ò¿ª SSL Í¨ĞÅ½Ó¿Ú
+	// å¦‚æœè®¾ç½®äº† SSL é€šä¿¡æ–¹å¼ï¼Œåˆ™éœ€è¦æ‰“å¼€ SSL é€šä¿¡æ¥å£
 	if (ssl_conf_) {
 		polarssl_io* ssl = new polarssl_io(*ssl_conf_, false);
 		if (stream_.setup_hook(ssl) == ssl) {
@@ -146,25 +146,25 @@ bool smtp_client::open(void)
 void smtp_client::close(void)
 {
 	if (client_) {
-		// ½« SMTP_CLIENT ¶ÔÏóµÄÁ÷ÖÃ¿Õ£¬ÒÔ±ÜÃâÄÚ²¿ÔÙ´ÎÊÍ·Å£¬
-		// ÒòÎª¸ÃÁ÷¶ÔÏó»áÔÚÏÂÃæ stream_.close() Ê±±»ÊÍ·Å
+		// å°† SMTP_CLIENT å¯¹è±¡çš„æµç½®ç©ºï¼Œä»¥é¿å…å†…éƒ¨å†æ¬¡é‡Šæ”¾ï¼Œ
+		// å› ä¸ºè¯¥æµå¯¹è±¡ä¼šåœ¨ä¸‹é¢ stream_.close() æ—¶è¢«é‡Šæ”¾
 		client_->conn = NULL;
 		smtp_close(client_);
 		client_ = NULL;
 	}
 
-	// µ± socket Á÷¶ÔÏó´ò¿ª×Å£¬Ôò¹Ø±ÕÖ®£¬Í¬Ê±½«ÒÀ¸½ÓÚÆäµÄ SSL ¶ÔÏóÊÍ·Å
+	// å½“ socket æµå¯¹è±¡æ‰“å¼€ç€ï¼Œåˆ™å…³é—­ä¹‹ï¼ŒåŒæ—¶å°†ä¾é™„äºå…¶çš„ SSL å¯¹è±¡é‡Šæ”¾
 	if (stream_.opened()) {
 		stream_.close();
 	}
 
-	// ÖØÖÃÁ¬½ÓÊÇ·ñ±»ÖØÓÃµÄ×´Ì¬
+	// é‡ç½®è¿æ¥æ˜¯å¦è¢«é‡ç”¨çš„çŠ¶æ€
 	reuse_ = false;
 }
 
 bool smtp_client::get_banner(void)
 {
-	// Èç¹ûÊÇÍ¬Ò»¸öÁ¬½Ó±»Ê¹ÓÃ£¬Ôò²»±ØÔÙ»ñµÃ·şÎñ¶ËµÄ»¶Ó­ĞÅÏ¢
+	// å¦‚æœæ˜¯åŒä¸€ä¸ªè¿æ¥è¢«ä½¿ç”¨ï¼Œåˆ™ä¸å¿…å†è·å¾—æœåŠ¡ç«¯çš„æ¬¢è¿ä¿¡æ¯
 	if (reuse_) {
 		return true;
 	}

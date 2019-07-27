@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
@@ -25,22 +25,22 @@ class HttpCookie;
 class HttpServletResponse;
 
 /**
- * Óë HTTP ¿Í»§¶ËÇëÇóÏà¹ØµÄÀà£¬¸ÃÀà²»Ó¦±»¼Ì³Ğ£¬ÓÃ»§Ò²²»ĞèÒª
- * ¶¨Òå»ò´´½¨¸ÃÀà¶ÔÏó
+ * ä¸ HTTP å®¢æˆ·ç«¯è¯·æ±‚ç›¸å…³çš„ç±»ï¼Œè¯¥ç±»ä¸åº”è¢«ç»§æ‰¿ï¼Œç”¨æˆ·ä¹Ÿä¸éœ€è¦
+ * å®šä¹‰æˆ–åˆ›å»ºè¯¥ç±»å¯¹è±¡
  */
 class ACL_CPP_API HttpServletRequest : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 * @param res {HttpServletResponse&}
-	 * @param store {session&} ´æ´¢»á»°Êı¾İµÄ¶ÔÏó
-	 * @param stream {socket_stream&} Êı¾İÁ÷£¬ÄÚ²¿²»»áÖ÷¶¯¹Ø±ÕÁ÷
-	 * @param charset {const char*} ±¾µØ×Ö·û¼¯£¬¸ÃÖµ·Ç¿ÕÊ±£¬
-	 *  ÄÚ²¿»á×Ô¶¯½« HTTP ÇëÇóµÄÊı¾İ×ª»»Îª±¾µØ×Ö·û¼¯£¬·ñÔò²»×ª»»
-	 * @param body_limit {int} Õë¶Ô POST ·½·¨£¬µ±Êı¾İÌåÎªÎÄ±¾²ÎÊı
-	 *  ÀàĞÍÊ±£¬´Ë²ÎÊıÏŞÖÆÊı¾İÌåµÄ³¤¶È£»µ±Êı¾İÌåÎªÊı¾İÁ÷»ò MIME
-	 *  ¸ñÊ½»ò on Îª false£¬´Ë²ÎÊıÎŞĞ§
+	 * @param store {session&} å­˜å‚¨ä¼šè¯æ•°æ®çš„å¯¹è±¡
+	 * @param stream {socket_stream&} æ•°æ®æµï¼Œå†…éƒ¨ä¸ä¼šä¸»åŠ¨å…³é—­æµ
+	 * @param charset {const char*} æœ¬åœ°å­—ç¬¦é›†ï¼Œè¯¥å€¼éç©ºæ—¶ï¼Œ
+	 *  å†…éƒ¨ä¼šè‡ªåŠ¨å°† HTTP è¯·æ±‚çš„æ•°æ®è½¬æ¢ä¸ºæœ¬åœ°å­—ç¬¦é›†ï¼Œå¦åˆ™ä¸è½¬æ¢
+	 * @param body_limit {int} é’ˆå¯¹ POST æ–¹æ³•ï¼Œå½“æ•°æ®ä½“ä¸ºæ–‡æœ¬å‚æ•°
+	 *  ç±»å‹æ—¶ï¼Œæ­¤å‚æ•°é™åˆ¶æ•°æ®ä½“çš„é•¿åº¦ï¼›å½“æ•°æ®ä½“ä¸ºæ•°æ®æµæˆ– MIME
+	 *  æ ¼å¼æˆ– on ä¸º falseï¼Œæ­¤å‚æ•°æ— æ•ˆ
 	 */
 	HttpServletRequest(HttpServletResponse& res, session& store,
 		socket_stream& stream, const char* charset = NULL,
@@ -48,91 +48,91 @@ public:
 	~HttpServletRequest(void);
 
 	/**
-	 * »ñµÃ HTTP ¿Í»§¶ËÇëÇó·½·¨£ºGET, POST, PUT, CONNECT, PURGE
-	 * @param method_s {string*} ·Ç¿ÕÊ±´æ´¢×Ö·û´®·½Ê½µÄÇëÇó·½·¨
+	 * è·å¾— HTTP å®¢æˆ·ç«¯è¯·æ±‚æ–¹æ³•ï¼šGET, POST, PUT, CONNECT, PURGE
+	 * @param method_s {string*} éç©ºæ—¶å­˜å‚¨å­—ç¬¦ä¸²æ–¹å¼çš„è¯·æ±‚æ–¹æ³•
 	 * @return {http_method_t}
 	 */
 	http_method_t getMethod(string* method_s = NULL) const;
 
 	/**
-	 * »ñµÃ HTTP ¿Í»§¶ËÇëÇóµÄËùÓĞ cookie ¶ÔÏó¼¯ºÏ
+	 * è·å¾— HTTP å®¢æˆ·ç«¯è¯·æ±‚çš„æ‰€æœ‰ cookie å¯¹è±¡é›†åˆ
 	 * @return {const std::vector<HttpCookie*>&}
 	 */
 	const std::vector<HttpCookie*>& getCookies(void) const;
 
 	/**
-	 * »ñµÃ HTTP ¿Í»§¶ËÇëÇóµÄÄ³¸ö cookie Öµ
-	 * @param name {const char*} cookie Ãû³Æ£¬±ØĞë·Ç¿Õ
-	 * @return {const char*} cookie Öµ£¬Èô·µ»Ø NULL Ôò±íÊ¾¸Ã cookie
-	 *  ²»´æÔÚ
+	 * è·å¾— HTTP å®¢æˆ·ç«¯è¯·æ±‚çš„æŸä¸ª cookie å€¼
+	 * @param name {const char*} cookie åç§°ï¼Œå¿…é¡»éç©º
+	 * @return {const char*} cookie å€¼ï¼Œè‹¥è¿”å› NULL åˆ™è¡¨ç¤ºè¯¥ cookie
+	 *  ä¸å­˜åœ¨
 	 */
 	const char* getCookieValue(const char* name) const;
 
 	/**
-	 * ¸ø HTTP ÇëÇó¶ÔÏóÌí¼Ó cookie ¶ÔÏó
-	 * @param name {const char*} cookie Ãû£¬·Ç¿Õ×Ö·û´®
-	 * @param value {const char*} cookie Öµ£¬·Ç¿Õ×Ö·û´®
+	 * ç»™ HTTP è¯·æ±‚å¯¹è±¡æ·»åŠ  cookie å¯¹è±¡
+	 * @param name {const char*} cookie åï¼Œéç©ºå­—ç¬¦ä¸²
+	 * @param value {const char*} cookie å€¼ï¼Œéç©ºå­—ç¬¦ä¸²
 	 */
 	void setCookie(const char* name, const char* value);
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·ÖĞµÄÄ³¸ö×Ö¶ÎÖµ
-	 * @param name {const char*} HTTP ÇëÇóÍ·ÖĞµÄ×Ö¶ÎÃû£¬·Ç¿Õ
-	 * @return {const char*} HTTP ÇëÇóÍ·ÖĞµÄ×Ö¶ÎÖµ£¬·µ»Ø NULL
-	 *  Ê±±íÊ¾²»´æÔÚ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ä¸­çš„æŸä¸ªå­—æ®µå€¼
+	 * @param name {const char*} HTTP è¯·æ±‚å¤´ä¸­çš„å­—æ®µåï¼Œéç©º
+	 * @return {const char*} HTTP è¯·æ±‚å¤´ä¸­çš„å­—æ®µå€¼ï¼Œè¿”å› NULL
+	 *  æ—¶è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getHeader(const char* name) const;
 
 	/**
-	 * »ñµÃ HTTP GET ÇëÇó·½Ê½ URL ÖĞµÄ²ÎÊı²¿·Ö£¬¼´ ? ºóÃæµÄ²¿·Ö
-	 * @return {const char*} Ã»ÓĞ½øĞĞURL ½âÂëµÄÇëÇó²ÎÊı²¿·Ö£¬
-	 *  ·µ»Ø¿Õ´®Ôò±íÊ¾ URL ÖĞÃ»ÓĞ²ÎÊı
+	 * è·å¾— HTTP GET è¯·æ±‚æ–¹å¼ URL ä¸­çš„å‚æ•°éƒ¨åˆ†ï¼Œå³ ? åé¢çš„éƒ¨åˆ†
+	 * @return {const char*} æ²¡æœ‰è¿›è¡ŒURL è§£ç çš„è¯·æ±‚å‚æ•°éƒ¨åˆ†ï¼Œ
+	 *  è¿”å›ç©ºä¸²åˆ™è¡¨ç¤º URL ä¸­æ²¡æœ‰å‚æ•°
 	 */
 	const char* getQueryString(void) const;
 
 	/**
-	 * »ñµÃ  http://test.com.cn/cgi-bin/test?name=value ÖĞµÄ
-	 * /cgi-bin/test Â·¾¶²¿·Ö
-	 * @return {const char*} ·µ»Ø¿Õ´®±íÊ¾²»´æÔÚ
+	 * è·å¾—  http://test.com.cn/cgi-bin/test?name=value ä¸­çš„
+	 * /cgi-bin/test è·¯å¾„éƒ¨åˆ†
+	 * @return {const char*} è¿”å›ç©ºä¸²è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getPathInfo(void) const;
 
 	/**
-	 * »ñµÃ  http://test.com.cn/cgi-bin/test?name=value ÖĞµÄ
-	 * /cgi-bin/test?name=value Â·¾¶²¿·Ö
-	 * @return {const char*} ·µ»Ø¿Õ´®±íÊ¾²»´æÔÚ
+	 * è·å¾—  http://test.com.cn/cgi-bin/test?name=value ä¸­çš„
+	 * /cgi-bin/test?name=value è·¯å¾„éƒ¨åˆ†
+	 * @return {const char*} è¿”å›ç©ºä¸²è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getRequestUri(void) const;
 
 	/**
-	 * »ñµÃÓë¸Ã HTTP »á»°Ïà¹ØµÄ HttpSession ¶ÔÏóÒıÓÃ
-	 * @param create {bool} µ± session ²»´æÔÚÊ±ÊÇ·ñÔÚ»º´æ·şÎñÆ÷×Ô¶¯´´½¨£»
-	 *  µ±Ä³¿Í»§¶ËµÄ session ²»´æÔÚÇÒ¸Ã²ÎÊıÎª false Ê±£¬Ôò¸Ãº¯Êı·µ
-	 *  »ØµÄ session ¶ÔÏó»áÒòÃ»ÓĞ±»ÕæÕı´´½¨¶øÎŞ·¨½øĞĞ¶ÁĞ´²Ù×÷
-	 * @param sid {const char*} µ± session ²»´æÔÚ£¬ÇÒ create ²ÎÊı·Ç¿ÕÊ±£¬
-	 *  Èç¹û sid ·Ç¿Õ£¬ÔòÊ¹ÓÃ´ËÖµÉèÖÃÓÃ»§µÄÎ¨Ò»»á»°£¬Í¬Ê±Ìí¼Ó½ø¿Í»§¶ËµÄ
-	 *  cookie ÖĞ
+	 * è·å¾—ä¸è¯¥ HTTP ä¼šè¯ç›¸å…³çš„ HttpSession å¯¹è±¡å¼•ç”¨
+	 * @param create {bool} å½“ session ä¸å­˜åœ¨æ—¶æ˜¯å¦åœ¨ç¼“å­˜æœåŠ¡å™¨è‡ªåŠ¨åˆ›å»ºï¼›
+	 *  å½“æŸå®¢æˆ·ç«¯çš„ session ä¸å­˜åœ¨ä¸”è¯¥å‚æ•°ä¸º false æ—¶ï¼Œåˆ™è¯¥å‡½æ•°è¿”
+	 *  å›çš„ session å¯¹è±¡ä¼šå› æ²¡æœ‰è¢«çœŸæ­£åˆ›å»ºè€Œæ— æ³•è¿›è¡Œè¯»å†™æ“ä½œ
+	 * @param sid {const char*} å½“ session ä¸å­˜åœ¨ï¼Œä¸” create å‚æ•°éç©ºæ—¶ï¼Œ
+	 *  å¦‚æœ sid éç©ºï¼Œåˆ™ä½¿ç”¨æ­¤å€¼è®¾ç½®ç”¨æˆ·çš„å”¯ä¸€ä¼šè¯ï¼ŒåŒæ—¶æ·»åŠ è¿›å®¢æˆ·ç«¯çš„
+	 *  cookie ä¸­
 	 * @return {HttpSession&}
-	 *  ×¢£ºÓÅÏÈ¼¶£¬ä¯ÀÀÆ÷ COOKIE > create = true > sid != NULL
+	 *  æ³¨ï¼šä¼˜å…ˆçº§ï¼Œæµè§ˆå™¨ COOKIE > create = true > sid != NULL
 	 */
 	HttpSession& getSession(bool create = true, const char* sid = NULL);
 
 	/**
-	 * »ñµÃÓë HTTP ¿Í»§¶ËÁ¬½Ó¹ØÁªµÄÊäÈëÁ÷¶ÔÏóÒıÓÃ
+	 * è·å¾—ä¸ HTTP å®¢æˆ·ç«¯è¿æ¥å…³è”çš„è¾“å…¥æµå¯¹è±¡å¼•ç”¨
 	 * @return {istream&}
 	 */
 	istream& getInputStream(void) const;
 
 	/**
-	 * »ñµÃ HTTP Ë«ÏòÁ÷¶ÔÏó£¬ÓÉ¹¹Ôìº¯ÊıµÄ²ÎÊıÊäÈë
+	 * è·å¾— HTTP åŒå‘æµå¯¹è±¡ï¼Œç”±æ„é€ å‡½æ•°çš„å‚æ•°è¾“å…¥
 	 * @return {socket_stream&}
 	 */
 	socket_stream& getSocketStream(void) const;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÊı¾İµÄÊı¾İ³¤¶È
-	 * @return {acl_int64} ·µ»Ø -1 ±íÊ¾¿ÉÄÜÎª GET ·½·¨£¬
-	 *  »ò HTTP ÇëÇóÍ·ÖĞÃ»ÓĞ Content-Length ×Ö¶Î
+	 * è·å¾— HTTP è¯·æ±‚æ•°æ®çš„æ•°æ®é•¿åº¦
+	 * @return {acl_int64} è¿”å› -1 è¡¨ç¤ºå¯èƒ½ä¸º GET æ–¹æ³•ï¼Œ
+	 *  æˆ– HTTP è¯·æ±‚å¤´ä¸­æ²¡æœ‰ Content-Length å­—æ®µ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 getContentLength(void) const;
@@ -141,12 +141,12 @@ public:
 #endif
 
 	/**
-	 * Èç¹û¿Í»§¶ËµÄÇëÇóÊÇ·Ö¶ÎÊı¾İ£¬Ôò¸Ãº¯Êı½«»ñµÃÇëÇóÍ·ÖĞµÄ³¤¶ÈÆğÊ¼µØÖ·
-	 * ¼°½áÊøµØÖ·
-	 * @param range_from {long long int&} Æ«ÒÆÆğÊ¼Î»ÖÃ
-	 * @param range_to {long long int&} Æ«ÒÆ½áÊøÎ»ÖÃ
-	 * @return {bool} Èô³ö´í»ò·Ç·Ö¶ÎÇëÇóÔò·µ»Øfalse£¬ÈôÊÇ·Ö¶ÎÇëÇóÔò·µ»Øtrue
-	 *  ×¢£ºrange_from/range_to ÏÂ±ê´Ó 0 ¿ªÊ¼
+	 * å¦‚æœå®¢æˆ·ç«¯çš„è¯·æ±‚æ˜¯åˆ†æ®µæ•°æ®ï¼Œåˆ™è¯¥å‡½æ•°å°†è·å¾—è¯·æ±‚å¤´ä¸­çš„é•¿åº¦èµ·å§‹åœ°å€
+	 * åŠç»“æŸåœ°å€
+	 * @param range_from {long long int&} åç§»èµ·å§‹ä½ç½®
+	 * @param range_to {long long int&} åç§»ç»“æŸä½ç½®
+	 * @return {bool} è‹¥å‡ºé”™æˆ–éåˆ†æ®µè¯·æ±‚åˆ™è¿”å›falseï¼Œè‹¥æ˜¯åˆ†æ®µè¯·æ±‚åˆ™è¿”å›true
+	 *  æ³¨ï¼šrange_from/range_to ä¸‹æ ‡ä» 0 å¼€å§‹
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool getRange(__int64& range_from, __int64& range_to);
@@ -154,238 +154,238 @@ public:
 	bool getRange(long long int& range_from, long long int& range_to);
 #endif
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·ÖĞ Content-Type: text/html; charset=gb2312
-	 * Content-Type µÄ×Ö¶ÎÖµ
-	 * @param part {bool} Èç¹ûÎª true Ôò·µ»Ø text£¬·ñÔò·µ»ØÍêÕûµÄ
-	 * Öµ£¬Èç£ºtext/html; charset=gb2312
-	 * @param ctype {http_ctype*} Îª·Ç¿ÕÖ¸ÕëÊ±£¬½«´æ´¢ÍêÕûµÄ http_ctype ĞÅÏ¢
-	 * @return {const char*} ·µ»Ø NULL ±íÊ¾ Content-Type ×Ö¶Î²»´æÔÚ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ä¸­ Content-Type: text/html; charset=gb2312
+	 * Content-Type çš„å­—æ®µå€¼
+	 * @param part {bool} å¦‚æœä¸º true åˆ™è¿”å› textï¼Œå¦åˆ™è¿”å›å®Œæ•´çš„
+	 * å€¼ï¼Œå¦‚ï¼štext/html; charset=gb2312
+	 * @param ctype {http_ctype*} ä¸ºéç©ºæŒ‡é’ˆæ—¶ï¼Œå°†å­˜å‚¨å®Œæ•´çš„ http_ctype ä¿¡æ¯
+	 * @return {const char*} è¿”å› NULL è¡¨ç¤º Content-Type å­—æ®µä¸å­˜åœ¨
 	 */
 	const char* getContentType(
 		bool part = true, http_ctype* ctype = NULL) const;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·ÖĞµÄ Content-Type: text/html; charset=gb2312
-	 * ÖĞµÄ charset ×Ö¶ÎÖµ gb2312
-	 * @return {const char*} ·µ»Ø NULL ±íÊ¾ Content-Type ×Ö¶Î »ò
-	 *  charset=xxx ²»´æÔÚ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ä¸­çš„ Content-Type: text/html; charset=gb2312
+	 * ä¸­çš„ charset å­—æ®µå€¼ gb2312
+	 * @return {const char*} è¿”å› NULL è¡¨ç¤º Content-Type å­—æ®µ æˆ–
+	 *  charset=xxx ä¸å­˜åœ¨
 	 */
 	const char* getCharacterEncoding(void) const;
 
 	/**
-	 * ·µ»Ø±¾µØµÄ×Ö¶Î×Ö·û¼¯
-	 * @ return {const char*} ·µ»Ø NULL ±íÊ¾Ã»ÓĞÉèÖÃ±¾µØ×Ö·û¼¯
+	 * è¿”å›æœ¬åœ°çš„å­—æ®µå­—ç¬¦é›†
+	 * @ return {const char*} è¿”å› NULL è¡¨ç¤ºæ²¡æœ‰è®¾ç½®æœ¬åœ°å­—ç¬¦é›†
 	 */
 	const char* getLocalCharset(void) const;
 
 	/**
-	 * ·µ»Ø HTTP Á¬½ÓµÄ±¾µØ IP µØÖ·
-	 * @return {const char*} ·µ»Ø¿Õ£¬±íÊ¾ÎŞ·¨»ñµÃ
+	 * è¿”å› HTTP è¿æ¥çš„æœ¬åœ° IP åœ°å€
+	 * @return {const char*} è¿”å›ç©ºï¼Œè¡¨ç¤ºæ— æ³•è·å¾—
 	 */
 	const char* getLocalAddr(void) const;
 
 	/**
-	 * ·µ»Ø HTTP Á¬½ÓµÄ±¾µØ PORT ºÅ
-	 * @return {unsigned short} ·µ»Ø 0 ±íÊ¾ÎŞ·¨»ñµÃ
+	 * è¿”å› HTTP è¿æ¥çš„æœ¬åœ° PORT å·
+	 * @return {unsigned short} è¿”å› 0 è¡¨ç¤ºæ— æ³•è·å¾—
 	 */
 	unsigned short getLocalPort(void) const;
 
 	/**
-	 * ·µ»Ø HTTP Á¬½ÓµÄÔ¶³Ì¿Í»§¶Ë IP µØÖ·
-	 * @return {const char*} ·µ»Ø¿Õ£¬±íÊ¾ÎŞ·¨»ñµÃ
+	 * è¿”å› HTTP è¿æ¥çš„è¿œç¨‹å®¢æˆ·ç«¯ IP åœ°å€
+	 * @return {const char*} è¿”å›ç©ºï¼Œè¡¨ç¤ºæ— æ³•è·å¾—
 	 */
 	const char* getRemoteAddr(void) const;
 
 	/**
-	 * ·µ»Ø HTTP Á¬½ÓµÄÔ¶³Ì¿Í»§¶Ë PORT ºÅ
-	 * @return {unsigned short} ·µ»Ø 0 ±íÊ¾ÎŞ·¨»ñµÃ
+	 * è¿”å› HTTP è¿æ¥çš„è¿œç¨‹å®¢æˆ·ç«¯ PORT å·
+	 * @return {unsigned short} è¿”å› 0 è¡¨ç¤ºæ— æ³•è·å¾—
 	 */
 	unsigned short getRemotePort(void) const;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·ÖĞÉèÖÃµÄ Host ×Ö¶Î
-	 * @return {const char*} Èç¹ûÎª¿Õ£¬Ôò±íÊ¾²»´æÔÚ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ä¸­è®¾ç½®çš„ Host å­—æ®µ
+	 * @return {const char*} å¦‚æœä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getRemoteHost(void) const;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·ÖĞÉèÖÃµÄ User-Agent ×Ö¶Î
-	 * @return {const char*} Èç¹ûÎª¿Õ£¬Ôò±íÊ¾²»´æÔÚ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ä¸­è®¾ç½®çš„ User-Agent å­—æ®µ
+	 * @return {const char*} å¦‚æœä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getUserAgent(void) const;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÖĞµÄ²ÎÊıÖµ£¬¸ÃÖµÒÑ¾­±» URL ½âÂëÇÒ
-	 * ×ª»»³É±¾µØÒªÇóµÄ×Ö·û¼¯£»Õë¶Ô GET ·½·¨£¬ÔòÊÇ»ñµÃ
-	 * URL ÖĞ ? ºóÃæµÄ²ÎÊıÖµ£»Õë¶Ô POST ·½·¨£¬Ôò¿ÉÒÔ»ñµÃ
-	 * URL ÖĞ ? ºóÃæµÄ²ÎÊıÖµ»òÇëÇóÌåÖĞµÄ²ÎÊıÖµ
-	 * @param name {const char*} ²ÎÊıÃû
-	 * @param case_sensitive {bool} ±È½ÏÊ±Õë¶Ô²ÎÊıÃûÊÇ·ñÇø·Ö´óĞ¡Ğ´
-	 * @return {const char*} ·µ»Ø²ÎÊıÖµ£¬µ±²ÎÊı²»´æÔÚÊ±·µ»Ø NULL
+	 * è·å¾— HTTP è¯·æ±‚ä¸­çš„å‚æ•°å€¼ï¼Œè¯¥å€¼å·²ç»è¢« URL è§£ç ä¸”
+	 * è½¬æ¢æˆæœ¬åœ°è¦æ±‚çš„å­—ç¬¦é›†ï¼›é’ˆå¯¹ GET æ–¹æ³•ï¼Œåˆ™æ˜¯è·å¾—
+	 * URL ä¸­ ? åé¢çš„å‚æ•°å€¼ï¼›é’ˆå¯¹ POST æ–¹æ³•ï¼Œåˆ™å¯ä»¥è·å¾—
+	 * URL ä¸­ ? åé¢çš„å‚æ•°å€¼æˆ–è¯·æ±‚ä½“ä¸­çš„å‚æ•°å€¼
+	 * @param name {const char*} å‚æ•°å
+	 * @param case_sensitive {bool} æ¯”è¾ƒæ—¶é’ˆå¯¹å‚æ•°åæ˜¯å¦åŒºåˆ†å¤§å°å†™
+	 * @return {const char*} è¿”å›å‚æ•°å€¼ï¼Œå½“å‚æ•°ä¸å­˜åœ¨æ—¶è¿”å› NULL
 	 */
 	const char* getParameter(const char* name,
 		bool case_sensitive = false) const;
 
 	/**
-	 * µ± HTTP ÇëÇóÍ·ÖĞµÄ Content-Type Îª
-	 * multipart/form-data; boundary=xxx ¸ñÊ½Ê±£¬ËµÃ÷ÎªÎÄ¼şÉÏ´«Êı¾İÀàĞÍ£¬
-	 * Ôò¿ÉÒÔÍ¨¹ı´Ëº¯Êı»ñµÃ http_mime ¶ÔÏó
-	 * @return {const http_mime*} ·µ»Ø NULL ÔòËµÃ÷Ã»ÓĞ MIME ¶ÔÏó£¬
-	 *  ·µ»ØµÄÖµÓÃ»§²»ÄÜÊÖ¹¤ÊÍ·Å£¬ÒòÎªÔÚ HttpServletRequest µÄÎö
-	 *  ¹¹ÖĞ»á×Ô¶¯ÊÍ·Å
+	 * å½“ HTTP è¯·æ±‚å¤´ä¸­çš„ Content-Type ä¸º
+	 * multipart/form-data; boundary=xxx æ ¼å¼æ—¶ï¼Œè¯´æ˜ä¸ºæ–‡ä»¶ä¸Šä¼ æ•°æ®ç±»å‹ï¼Œ
+	 * åˆ™å¯ä»¥é€šè¿‡æ­¤å‡½æ•°è·å¾— http_mime å¯¹è±¡
+	 * @return {const http_mime*} è¿”å› NULL åˆ™è¯´æ˜æ²¡æœ‰ MIME å¯¹è±¡ï¼Œ
+	 *  è¿”å›çš„å€¼ç”¨æˆ·ä¸èƒ½æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸ºåœ¨ HttpServletRequest çš„æ
+	 *  æ„ä¸­ä¼šè‡ªåŠ¨é‡Šæ”¾
 	 */
 	http_mime* getHttpMime(void);
 
 	/**
-	 * Êı¾İÀàĞÍÎª text/json »ò application/json ¸ñÊ½Ê±¿Éµ÷ÓÃ´Ë·½·¨¶ÁÈ¡ json
-	 * Êı¾İÌå²¢½øĞĞ½âÎö£¬³É¹¦ºó·µ»Ø json ¶ÔÏó£¬¸Ã¶ÔÏóÓÉÄÚ²¿²úÉú²¢¹ÜÀí£¬µ±
-	 * ±¾ HttpServletRequest ¶ÔÏóÊÍ·ÅÊ±¸Ã json ¶ÔÏóÒ»Æğ±»ÊÍ·Å
-	 * @param body_limit {size_t} ÏŞ¶¨Êı¾İÌå³¤¶ÈÒÔ·ÀÖ¹ÄÚ´æÒç³ö£¬ÈôÇëÇóÊı¾İ
-	 *  Ìå³¬¹ı´ËÖµ£¬Ôò·µ»Ø´íÎó£»Èç¹û´ËÖµÉèÎª 0£¬Ôò²»ÏŞÖÆ³¤¶È
-	 * @return {json*} ·µ»Ø½âÎöºÃµÄ json ¶ÔÏó£¬Èô·µ»Ø NULL ÔòÓĞÒÔÏÂ¼¸¸öÔ­Òò£º
-	 *  1¡¢¶ÁÊı¾İ³ö´í
-	 *  2¡¢·Ç json Êı¾İ¸ñÊ½
-	 *  3¡¢Êı¾İÌå¹ı³¤
+	 * æ•°æ®ç±»å‹ä¸º text/json æˆ– application/json æ ¼å¼æ—¶å¯è°ƒç”¨æ­¤æ–¹æ³•è¯»å– json
+	 * æ•°æ®ä½“å¹¶è¿›è¡Œè§£æï¼ŒæˆåŠŸåè¿”å› json å¯¹è±¡ï¼Œè¯¥å¯¹è±¡ç”±å†…éƒ¨äº§ç”Ÿå¹¶ç®¡ç†ï¼Œå½“
+	 * æœ¬ HttpServletRequest å¯¹è±¡é‡Šæ”¾æ—¶è¯¥ json å¯¹è±¡ä¸€èµ·è¢«é‡Šæ”¾
+	 * @param body_limit {size_t} é™å®šæ•°æ®ä½“é•¿åº¦ä»¥é˜²æ­¢å†…å­˜æº¢å‡ºï¼Œè‹¥è¯·æ±‚æ•°æ®
+	 *  ä½“è¶…è¿‡æ­¤å€¼ï¼Œåˆ™è¿”å›é”™è¯¯ï¼›å¦‚æœæ­¤å€¼è®¾ä¸º 0ï¼Œåˆ™ä¸é™åˆ¶é•¿åº¦
+	 * @return {json*} è¿”å›è§£æå¥½çš„ json å¯¹è±¡ï¼Œè‹¥è¿”å› NULL åˆ™æœ‰ä»¥ä¸‹å‡ ä¸ªåŸå› ï¼š
+	 *  1ã€è¯»æ•°æ®å‡ºé”™
+	 *  2ã€é json æ•°æ®æ ¼å¼
+	 *  3ã€æ•°æ®ä½“è¿‡é•¿
 	 */
 	json* getJson(size_t body_limit = 1024000);
 
 	/**
-	 * ¸Ã¹¦ÄÜÓëÉÏÃæ·½·¨ÀàËÆ£¬Î¨Ò»Çø±ğÊÇ½«½âÎö½á¹û´æÈëÓÃ»§´«ÈëµÄ¶ÔÏóÖĞ
+	 * è¯¥åŠŸèƒ½ä¸ä¸Šé¢æ–¹æ³•ç±»ä¼¼ï¼Œå”¯ä¸€åŒºåˆ«æ˜¯å°†è§£æç»“æœå­˜å…¥ç”¨æˆ·ä¼ å…¥çš„å¯¹è±¡ä¸­
 	 * @param out {json&}
-	 * @param body_limit {size_t} ÏŞ¶¨Êı¾İÌå³¤¶ÈÒÔ·ÀÖ¹ÄÚ´æÒç³ö£¬ÈôÇëÇóÊı¾İ
-	 *  Ìå³¬¹ı´ËÖµ£¬Ôò·µ»Ø´íÎó£»Èç¹û´ËÖµÉèÎª 0£¬Ôò²»ÏŞÖÆ³¤¶È
-	 * @return {bool} ·µ»Ø false Ô­ÒòÈçÏÂ£º
-	 *  1¡¢¶ÁÊı¾İ³ö´í
-	 *  2¡¢·Ç json Êı¾İ¸ñÊ½
-	 *  3¡¢Êı¾İÌå¹ı³¤
+	 * @param body_limit {size_t} é™å®šæ•°æ®ä½“é•¿åº¦ä»¥é˜²æ­¢å†…å­˜æº¢å‡ºï¼Œè‹¥è¯·æ±‚æ•°æ®
+	 *  ä½“è¶…è¿‡æ­¤å€¼ï¼Œåˆ™è¿”å›é”™è¯¯ï¼›å¦‚æœæ­¤å€¼è®¾ä¸º 0ï¼Œåˆ™ä¸é™åˆ¶é•¿åº¦
+	 * @return {bool} è¿”å› false åŸå› å¦‚ä¸‹ï¼š
+	 *  1ã€è¯»æ•°æ®å‡ºé”™
+	 *  2ã€é json æ•°æ®æ ¼å¼
+	 *  3ã€æ•°æ®ä½“è¿‡é•¿
 	 */
 	bool getJson(json& out, size_t body_limit = 1024000);
 
 	/**
-	 * Êı¾İÀàĞÍÎª text/xml »ò application/xml ¸ñÊ½Ê±¿Éµ÷ÓÃ´Ë·½·¨¶ÁÈ¡ xml
-	 * Êı¾İÌå²¢½øĞĞ½âÎö£¬³É¹¦ºó·µ»Ø mxl ¶ÔÏó£¬¸Ã¶ÔÏóÓÉÄÚ²¿²úÉú²¢¹ÜÀí£¬µ±
-	 * ±¾ HttpServletRequest ¶ÔÏóÊÍ·ÅÊ±¸Ã xml ¶ÔÏóÒ»Æğ±»ÊÍ·Å
-	 * @param body_limit {size_t} ÏŞ¶¨Êı¾İÌå³¤¶ÈÒÔ·ÀÖ¹ÄÚ´æÒç³ö£¬ÈôÇëÇóÊı¾İ
-	 *  Ìå³¬¹ı´ËÖµ£¬Ôò·µ»Ø´íÎó£»Èç¹û´ËÖµÉèÎª 0£¬Ôò²»ÏŞÖÆ³¤¶È
-	 * @return {xml*} ·µ»Ø½âÎöºÃµÄ xml ¶ÔÏó£¬Èô·µ»Ø NULL ÔòÓĞÒÔÏÂ¼¸¸öÔ­Òò£º
-	 *  1¡¢¶ÁÊı¾İ³ö´í
-	 *  2¡¢·Ç xml Êı¾İ¸ñÊ½
+	 * æ•°æ®ç±»å‹ä¸º text/xml æˆ– application/xml æ ¼å¼æ—¶å¯è°ƒç”¨æ­¤æ–¹æ³•è¯»å– xml
+	 * æ•°æ®ä½“å¹¶è¿›è¡Œè§£æï¼ŒæˆåŠŸåè¿”å› mxl å¯¹è±¡ï¼Œè¯¥å¯¹è±¡ç”±å†…éƒ¨äº§ç”Ÿå¹¶ç®¡ç†ï¼Œå½“
+	 * æœ¬ HttpServletRequest å¯¹è±¡é‡Šæ”¾æ—¶è¯¥ xml å¯¹è±¡ä¸€èµ·è¢«é‡Šæ”¾
+	 * @param body_limit {size_t} é™å®šæ•°æ®ä½“é•¿åº¦ä»¥é˜²æ­¢å†…å­˜æº¢å‡ºï¼Œè‹¥è¯·æ±‚æ•°æ®
+	 *  ä½“è¶…è¿‡æ­¤å€¼ï¼Œåˆ™è¿”å›é”™è¯¯ï¼›å¦‚æœæ­¤å€¼è®¾ä¸º 0ï¼Œåˆ™ä¸é™åˆ¶é•¿åº¦
+	 * @return {xml*} è¿”å›è§£æå¥½çš„ xml å¯¹è±¡ï¼Œè‹¥è¿”å› NULL åˆ™æœ‰ä»¥ä¸‹å‡ ä¸ªåŸå› ï¼š
+	 *  1ã€è¯»æ•°æ®å‡ºé”™
+	 *  2ã€é xml æ•°æ®æ ¼å¼
 	 */
 	xml* getXml(size_t body_limit = 1024000);
 
 	/**
-	 * ¸Ã¹¦ÄÜÓëÉÏÃæ·½·¨ÀàËÆ£¬Î¨Ò»Çø±ğÊÇ½«½âÎö½á¹û´æÈëÓÃ»§´«ÈëµÄ¶ÔÏóÖĞ
+	 * è¯¥åŠŸèƒ½ä¸ä¸Šé¢æ–¹æ³•ç±»ä¼¼ï¼Œå”¯ä¸€åŒºåˆ«æ˜¯å°†è§£æç»“æœå­˜å…¥ç”¨æˆ·ä¼ å…¥çš„å¯¹è±¡ä¸­
 	 * @param out {xml&}
-	 * @param body_limit {size_t} ÏŞ¶¨Êı¾İÌå³¤¶ÈÒÔ·ÀÖ¹ÄÚ´æÒç³ö£¬ÈôÇëÇóÊı¾İ
-	 *  Ìå³¬¹ı´ËÖµ£¬Ôò·µ»Ø´íÎó£»Èç¹û´ËÖµÉèÎª 0£¬Ôò²»ÏŞÖÆ³¤¶È
-	 * @return {bool} ·µ»Ø false Ô­ÒòÈçÏÂ£º
-	 *  1¡¢¶ÁÊı¾İ³ö´í
-	 *  2¡¢·Ç xml Êı¾İ¸ñÊ½
-	 *  3¡¢Êı¾İÌå¹ı³¤
+	 * @param body_limit {size_t} é™å®šæ•°æ®ä½“é•¿åº¦ä»¥é˜²æ­¢å†…å­˜æº¢å‡ºï¼Œè‹¥è¯·æ±‚æ•°æ®
+	 *  ä½“è¶…è¿‡æ­¤å€¼ï¼Œåˆ™è¿”å›é”™è¯¯ï¼›å¦‚æœæ­¤å€¼è®¾ä¸º 0ï¼Œåˆ™ä¸é™åˆ¶é•¿åº¦
+	 * @return {bool} è¿”å› false åŸå› å¦‚ä¸‹ï¼š
+	 *  1ã€è¯»æ•°æ®å‡ºé”™
+	 *  2ã€é xml æ•°æ®æ ¼å¼
+	 *  3ã€æ•°æ®ä½“è¿‡é•¿
 	 */
 	bool getXml(xml& out, size_t body_limit = 1024000);
 
 	/**
-	 * Õë¶Ô POST Àà·½·¨£¨¼´ÓĞÊı¾İÇëÇóÌåÇéĞÎ£©£¬¿ÉÒÔÖ±½Óµ÷ÓÃ´Ë·½·¨»ñµÃÇëÇó
-	 * Êı¾İÌåµÄÄÚÈİ
-	 * @param body_limit {size_t} ÏŞ¶¨Êı¾İÌå³¤¶ÈÒÔ·ÀÖ¹ÄÚ´æÒç³ö£¬ÈôÇëÇóÊı¾İ
-	 *  Ìå³¬¹ı´ËÖµ£¬Ôò·µ»Ø´íÎó£»Èç¹û´ËÖµÉèÎª 0£¬Ôò²»ÏŞÖÆ³¤¶È
-	 * @return {string*} ·µ»Ø´æ·ÅÊı¾İÌåµÄ¶ÔÏó£¬·µ»Ø NULL ÓĞÒÔÏÂÔ­Òò£º
-	 *  1¡¢¶ÁÊı¾İ³ö´í
-	 *  2¡¢Ã»ÓĞÊı¾İÌå
-	 *  3¡¢Êı¾İÌå¹ı³¤
+	 * é’ˆå¯¹ POST ç±»æ–¹æ³•ï¼ˆå³æœ‰æ•°æ®è¯·æ±‚ä½“æƒ…å½¢ï¼‰ï¼Œå¯ä»¥ç›´æ¥è°ƒç”¨æ­¤æ–¹æ³•è·å¾—è¯·æ±‚
+	 * æ•°æ®ä½“çš„å†…å®¹
+	 * @param body_limit {size_t} é™å®šæ•°æ®ä½“é•¿åº¦ä»¥é˜²æ­¢å†…å­˜æº¢å‡ºï¼Œè‹¥è¯·æ±‚æ•°æ®
+	 *  ä½“è¶…è¿‡æ­¤å€¼ï¼Œåˆ™è¿”å›é”™è¯¯ï¼›å¦‚æœæ­¤å€¼è®¾ä¸º 0ï¼Œåˆ™ä¸é™åˆ¶é•¿åº¦
+	 * @return {string*} è¿”å›å­˜æ”¾æ•°æ®ä½“çš„å¯¹è±¡ï¼Œè¿”å› NULL æœ‰ä»¥ä¸‹åŸå› ï¼š
+	 *  1ã€è¯»æ•°æ®å‡ºé”™
+	 *  2ã€æ²¡æœ‰æ•°æ®ä½“
+	 *  3ã€æ•°æ®ä½“è¿‡é•¿
 	 */
 	string* getBody(size_t body_limit = 1024000);
 
 	/**
-	 * ¸Ã¹¦ÄÜÓëÉÏÃæ·½·¨ÀàËÆ£¬Î¨Ò»Çø±ğÊÇ½«½á¹û´æÈëÓÃ»§´«ÈëµÄ¶ÔÏóÖĞ
+	 * è¯¥åŠŸèƒ½ä¸ä¸Šé¢æ–¹æ³•ç±»ä¼¼ï¼Œå”¯ä¸€åŒºåˆ«æ˜¯å°†ç»“æœå­˜å…¥ç”¨æˆ·ä¼ å…¥çš„å¯¹è±¡ä¸­
 	 * @param out {string&}
 	 * @param body_limit {size_t}
-	 * @return {bool} ·µ»Ø false Ô­ÒòÈçÏÂ£º
-	 *  1¡¢¶ÁÊı¾İ³ö´í
-	 *  2¡¢Ã»ÓĞÊı¾İÌå
-	 *  3¡¢Êı¾İÌå¹ı³¤
+	 * @return {bool} è¿”å› false åŸå› å¦‚ä¸‹ï¼š
+	 *  1ã€è¯»æ•°æ®å‡ºé”™
+	 *  2ã€æ²¡æœ‰æ•°æ®ä½“
+	 *  3ã€æ•°æ®ä½“è¿‡é•¿
 	 */
 	bool getBody(string& out, size_t body_limit = 1024000);
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÊı¾İµÄÀàĞÍ
-	 * @return {http_request_t}£¬Ò»°ã¶Ô POST ·½·¨ÖĞµÄÉÏ´«ÎÄ¼şÓ¦ÓÃ£¬ĞèÒªµ÷ÓÃ
-	 *  ¸Ãº¯Êı»ñµÃÊÇ·ñÊÇÉÏ´«Êı¾İÀàĞÍ£¬µ±¸Ãº¯Êı·µ»Ø HTTP_REQUEST_OTHER Ê±£¬
-	 *  ÓÃ»§¿ÉÒÔÍ¨¹ıµ÷ÓÃ getContentType »ñµÃ¾ßÌåµÄÀàĞÍ×Ö·û´®
+	 * è·å¾— HTTP è¯·æ±‚æ•°æ®çš„ç±»å‹
+	 * @return {http_request_t}ï¼Œä¸€èˆ¬å¯¹ POST æ–¹æ³•ä¸­çš„ä¸Šä¼ æ–‡ä»¶åº”ç”¨ï¼Œéœ€è¦è°ƒç”¨
+	 *  è¯¥å‡½æ•°è·å¾—æ˜¯å¦æ˜¯ä¸Šä¼ æ•°æ®ç±»å‹ï¼Œå½“è¯¥å‡½æ•°è¿”å› HTTP_REQUEST_OTHER æ—¶ï¼Œ
+	 *  ç”¨æˆ·å¯ä»¥é€šè¿‡è°ƒç”¨ getContentType è·å¾—å…·ä½“çš„ç±»å‹å­—ç¬¦ä¸²
 	 */
 	http_request_t getRequestType(void) const;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÒ³ÃæµÄ referer URL
-	 * @return {const char*} Îª NULL ÔòËµÃ÷ÓÃ»§Ö±½Ó·ÃÎÊ±¾ URL
+	 * è·å¾— HTTP è¯·æ±‚é¡µé¢çš„ referer URL
+	 * @return {const char*} ä¸º NULL åˆ™è¯´æ˜ç”¨æˆ·ç›´æ¥è®¿é—®æœ¬ URL
 	 */
 	const char* getRequestReferer(void) const;
 
 	/**
-	 * »ñµÃ¸ù¾İ HTTP ÇëÇóÍ·»ñµÃµÄ http_ctype ¶ÔÏó
+	 * è·å¾—æ ¹æ® HTTP è¯·æ±‚å¤´è·å¾—çš„ http_ctype å¯¹è±¡
 	 * @return {const http_ctype&}
 	 */
 	const http_ctype& getHttpCtype(void) const;
 
 	/**
-	 * ÅĞ¶Ï HTTP ¿Í»§¶ËÊÇ·ñÒªÇó±£³Ö³¤Á¬½Ó
+	 * åˆ¤æ–­ HTTP å®¢æˆ·ç«¯æ˜¯å¦è¦æ±‚ä¿æŒé•¿è¿æ¥
 	 * @return {bool}
 	 */
 	bool isKeepAlive(void) const;
 
 	/**
-	 * µ±¿Í»§¶ËÒªÇó±£³Ö³¤Á¬½ÓÊ±£¬´Ó HTTP ÇëÇóÍ·ÖĞ»ñµÃ±£³ÖµÄÊ±¼ä
-	 * @return {int} ·µ»ØÖµ < 0 ±íÊ¾²»´æÔÚ Keep-Alive ×Ö¶Î
+	 * å½“å®¢æˆ·ç«¯è¦æ±‚ä¿æŒé•¿è¿æ¥æ—¶ï¼Œä» HTTP è¯·æ±‚å¤´ä¸­è·å¾—ä¿æŒçš„æ—¶é—´
+	 * @return {int} è¿”å›å€¼ < 0 è¡¨ç¤ºä¸å­˜åœ¨ Keep-Alive å­—æ®µ
 	 */
 	int getKeepAlive(void) const;
 
 	/**
-	 * »ñµÃ HTTP ¿Í»§¶ËÇëÇóµÄ°æ±¾ºÅ
-	 * @param major {unsigned&} ½«´æ·ÅÖ÷°æ±¾ºÅ
-	 * @param minor {unsigned&} ½«´æ·Å´Î°æ±¾ºÅ
-	 * @return {bool} ÊÇ·ñ³É¹¦È¡µÃÁË¿Í»§¶ËÇëÇóµÄ°æ±¾ºÅ
+	 * è·å¾— HTTP å®¢æˆ·ç«¯è¯·æ±‚çš„ç‰ˆæœ¬å·
+	 * @param major {unsigned&} å°†å­˜æ”¾ä¸»ç‰ˆæœ¬å·
+	 * @param minor {unsigned&} å°†å­˜æ”¾æ¬¡ç‰ˆæœ¬å·
+	 * @return {bool} æ˜¯å¦æˆåŠŸå–å¾—äº†å®¢æˆ·ç«¯è¯·æ±‚çš„ç‰ˆæœ¬å·
 	 */
 	bool getVersion(unsigned& major, unsigned& minor) const;
 
 	/**
-	 * »ñµÃ HTTP ¿Í»§¶ËÖ§³ÖµÄÊı¾İÑ¹ËõËã·¨¼¯ºÏ
-	 * @param out {std::vector<string>&} ´æ´¢½á¹û¼¯
+	 * è·å¾— HTTP å®¢æˆ·ç«¯æ”¯æŒçš„æ•°æ®å‹ç¼©ç®—æ³•é›†åˆ
+	 * @param out {std::vector<string>&} å­˜å‚¨ç»“æœé›†
 	 */
 	void getAcceptEncoding(std::vector<string>& out) const;
 
 	/*
-	 * µ± HTTP ÇëÇóÎª POST ·½·¨£¬Í¨¹ı±¾º¯ÊıÉèÖÃ¶Á HTTP Êı¾İÌåµÄ
-	 * IO ³¬Ê±Ê±¼äÖµ(Ãë)
-	 * @param rw_timeout {int} ¶ÁÊı¾İÌåÊ±µÄ³¬Ê±Ê±¼ä(Ãë)
+	 * å½“ HTTP è¯·æ±‚ä¸º POST æ–¹æ³•ï¼Œé€šè¿‡æœ¬å‡½æ•°è®¾ç½®è¯» HTTP æ•°æ®ä½“çš„
+	 * IO è¶…æ—¶æ—¶é—´å€¼(ç§’)
+	 * @param rw_timeout {int} è¯»æ•°æ®ä½“æ—¶çš„è¶…æ—¶æ—¶é—´(ç§’)
 	 */
 	void setRwTimeout(int rw_timeout);
 
 	/**
-	 * »ñµÃÉÏ´Î³ö´íµÄ´íÎóºÅ
+	 * è·å¾—ä¸Šæ¬¡å‡ºé”™çš„é”™è¯¯å·
 	 * @return {http_request_error_t}
 	 */
 	http_request_error_t getLastError(void) const;
 
 	/**
-	 * µ± HttpServlet ÀàÒÔ·şÎñÄ£Ê½(¼´·Ç CGI ·½Ê½)ÔËĞĞÊ±£¬¿ÉÒÔµ÷ÓÃ´Ë
-	 * ·½·¨»ñµÃ¿Í»§¶ËÁ¬½ÓµÄ HTTP Àà¶ÔÏó£¬´Ó¶ø»ñµÃ¸ü¶àµÄ²ÎÊı
-	 * @return {http_client*} µ±ÒÔ·şÎñÄ£Ê½ÔËĞĞÊ±£¬´Ëº¯Êı·µ»Ø HTTP ¿Í»§¶Ë
-	 *  Á¬½Ó·Ç¿Õ¶ÔÏó£»µ±ÒÔ CGI ·½Ê½ÔËĞĞÊ±£¬Ôò·µ»Ø¿ÕÖ¸Õë
+	 * å½“ HttpServlet ç±»ä»¥æœåŠ¡æ¨¡å¼(å³é CGI æ–¹å¼)è¿è¡Œæ—¶ï¼Œå¯ä»¥è°ƒç”¨æ­¤
+	 * æ–¹æ³•è·å¾—å®¢æˆ·ç«¯è¿æ¥çš„ HTTP ç±»å¯¹è±¡ï¼Œä»è€Œè·å¾—æ›´å¤šçš„å‚æ•°
+	 * @return {http_client*} å½“ä»¥æœåŠ¡æ¨¡å¼è¿è¡Œæ—¶ï¼Œæ­¤å‡½æ•°è¿”å› HTTP å®¢æˆ·ç«¯
+	 *  è¿æ¥éç©ºå¯¹è±¡ï¼›å½“ä»¥ CGI æ–¹å¼è¿è¡Œæ—¶ï¼Œåˆ™è¿”å›ç©ºæŒ‡é’ˆ
 	 */
 	http_client* getClient(void) const;
 
 	/**
-	 * ½« HTTP ÇëÇóÍ·Êä³öÖÁÁ÷ÖĞ£¨ÎÄ¼şÁ÷»òÍøÂçÁ÷£©
+	 * å°† HTTP è¯·æ±‚å¤´è¾“å‡ºè‡³æµä¸­ï¼ˆæ–‡ä»¶æµæˆ–ç½‘ç»œæµï¼‰
 	 * @param out {ostream&}
-	 * @param prompt {const char*} ÌáÊ¾ÄÚÈİ
+	 * @param prompt {const char*} æç¤ºå†…å®¹
 	 */	 
 	void fprint_header(ostream& out, const char* prompt);
 
 	/**
-	 * ½« HTTP ÇëÇóÍ·Êä³öÖÁ¸ø¶¨»º³åÇøÖĞ
+	 * å°† HTTP è¯·æ±‚å¤´è¾“å‡ºè‡³ç»™å®šç¼“å†²åŒºä¸­
 	 * @param out {string&}
-	 * @param prompt {const char*} ÌáÊ¾ÄÚÈİ
+	 * @param prompt {const char*} æç¤ºå†…å®¹
 	 */
 	void sprint_header(string& out, const char* prompt);
 

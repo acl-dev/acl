@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 class message_manager;
 
@@ -9,7 +9,7 @@ public:
 	~collect_client() {}
 
 protected:
-	// »ùÀà acl::thread ÖÐÐé·½·¨
+	// åŸºç±» acl::thread ä¸­è™šæ–¹æ³•
 	void* run();
 
 private:

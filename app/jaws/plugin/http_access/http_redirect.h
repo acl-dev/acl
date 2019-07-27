@@ -1,4 +1,4 @@
-#ifndef	__HTTP_REDIRECT_INCLUDE_H__
+﻿#ifndef	__HTTP_REDIRECT_INCLUDE_H__
 #define	__HTTP_REDIRECT_INCLUDE_H__
 
 typedef struct {

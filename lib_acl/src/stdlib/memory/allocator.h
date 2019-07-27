@@ -1,4 +1,4 @@
-#ifndef __ALLOCATOR_INCLUDE_H__
+﻿#ifndef __ALLOCATOR_INCLUDE_H__
 #define __ALLOCATOR_INCLUDE_H__
 
 #ifdef __cplusplus

@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include <list>
 #include <vector>
@@ -10,7 +10,7 @@ namespace acl
 class diff_object;
 
 /**
- * ÇóÁ½¸ö¼¯ºÏµÄ²î¼¯µÄ¹ÜÀíÆ÷
+ * æ±‚ä¸¤ä¸ªé›†åˆçš„å·®é›†çš„ç®¡ç†å™¨
  */
 class diff_manager : public noncopyable
 {
@@ -19,25 +19,25 @@ public:
 	~diff_manager(void);
 
 	/**
-	 * »ñµÃÄÚ²¿´´½¨µÄÄÚ´æ³Ø¶ÔÏó
-	 * @return {dbuf_guard&} ·µ»ØÄÚ½¨ÄÚ´æ³Ø¶ÔÏó£¬Ê¹ÓÃ¸ÃÄÚ´æ³Ø´´½¨µÄ
-	 *  ¶ÔÏó±ØĞëÔÚ diff_manager ¶ÔÏóÏú»ÙÇ°Ïú»Ù£¬ÒòÎª diff_manager Ïú»ÙÊ±
-	 *  ¸ÃÄÚ½¨ÄÚ´æ³Ø»á×Ô¶¯Ïú»Ù
+	 * è·å¾—å†…éƒ¨åˆ›å»ºçš„å†…å­˜æ± å¯¹è±¡
+	 * @return {dbuf_guard&} è¿”å›å†…å»ºå†…å­˜æ± å¯¹è±¡ï¼Œä½¿ç”¨è¯¥å†…å­˜æ± åˆ›å»ºçš„
+	 *  å¯¹è±¡å¿…é¡»åœ¨ diff_manager å¯¹è±¡é”€æ¯å‰é”€æ¯ï¼Œå› ä¸º diff_manager é”€æ¯æ—¶
+	 *  è¯¥å†…å»ºå†…å­˜æ± ä¼šè‡ªåŠ¨é”€æ¯
 	 */
 	dbuf_guard& get_dbuf(void);
 
 	/**
-	 * ±È½ÏÁ½¸ö¼¯ºÏµÄ²î¼¯£¬´Ó¶ø»ñµÃÁ½¸ö¼¯ºÏĞÂÔöµÄ¶ÔÏó¼¯ºÏ¡¢É¾³ıµÄ¶ÔÏó¼¯ºÏ
-	 * ÒÔ¼°±ä»¯µÄ¶ÔÏó¼¯ºÏ
-	 * @param curr_objs {const std::vector<diff_object*>&} µ±Ç°¶ÔÏóµÄ¼¯ºÏ
-	 * @param old_olds {const std::list<diff_object*>&} ¾ÉÔªËØ¼¯ºÏ£¬ÄÚ²¿
-	 *  ÓÃ¸Ã¼¯ºÏÉú³É¹şÏ£±í£¬Ê¹µ±Ç°¼¯ºÏÓë¸Ã¾É¼¯ºÏ½øĞĞ²îÒì»¯±È½Ï
+	 * æ¯”è¾ƒä¸¤ä¸ªé›†åˆçš„å·®é›†ï¼Œä»è€Œè·å¾—ä¸¤ä¸ªé›†åˆæ–°å¢çš„å¯¹è±¡é›†åˆã€åˆ é™¤çš„å¯¹è±¡é›†åˆ
+	 * ä»¥åŠå˜åŒ–çš„å¯¹è±¡é›†åˆ
+	 * @param curr_objs {const std::vector<diff_object*>&} å½“å‰å¯¹è±¡çš„é›†åˆ
+	 * @param old_olds {const std::list<diff_object*>&} æ—§å…ƒç´ é›†åˆï¼Œå†…éƒ¨
+	 *  ç”¨è¯¥é›†åˆç”Ÿæˆå“ˆå¸Œè¡¨ï¼Œä½¿å½“å‰é›†åˆä¸è¯¥æ—§é›†åˆè¿›è¡Œå·®å¼‚åŒ–æ¯”è¾ƒ
 	 */
 	void diff_changes(const std::vector<diff_object*>& curr_objs,
 		const std::vector<diff_object*>& old_olds);
 
 	/**
-	 * »ñµÃĞÂÔöµÄ¶ÔÏó¼¯ºÏ
+	 * è·å¾—æ–°å¢çš„å¯¹è±¡é›†åˆ
 	 * @return {std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_new(void) const
@@ -46,8 +46,8 @@ public:
 	}
 
 	/**
-	 * µ± diff_changes ½øĞĞ²îÒì»¯±È½Ï³É¹¦ºó£¬±¾º¯ÊıÓÃÓÚ·µ»ØÏà¶ÔÓÚ¾É¼¯ºÏ£¬
-	 * ÔÚµ±Ç°¼¯ºÏÖĞ²»´æÔÚµÄ£¨¼´±»É¾³ıµÄ£©ÔªËØ¼¯ºÏ
+	 * å½“ diff_changes è¿›è¡Œå·®å¼‚åŒ–æ¯”è¾ƒæˆåŠŸåï¼Œæœ¬å‡½æ•°ç”¨äºè¿”å›ç›¸å¯¹äºæ—§é›†åˆï¼Œ
+	 * åœ¨å½“å‰é›†åˆä¸­ä¸å­˜åœ¨çš„ï¼ˆå³è¢«åˆ é™¤çš„ï¼‰å…ƒç´ é›†åˆ
 	 * @return {std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_deleted(void) const
@@ -56,11 +56,11 @@ public:
 	}
 
 	/**
-	 * µ± diff_changes ½øĞĞ²îÒì»¯±È½Ï³É¹¦ºó£¬±¾º¯ÊıÓÃÓÚ·µ»ØÏà¶ÔÓÚ¾É¼¯ºÏ£¬
-	 * ÔÚµ±Ç°¼¯ºÏÖĞ¶ÔÏóÖµ·¢Éú±ä»¯µÄ±ä»¯¼¯ºÏ¶ÔÏó
+	 * å½“ diff_changes è¿›è¡Œå·®å¼‚åŒ–æ¯”è¾ƒæˆåŠŸåï¼Œæœ¬å‡½æ•°ç”¨äºè¿”å›ç›¸å¯¹äºæ—§é›†åˆï¼Œ
+	 * åœ¨å½“å‰é›†åˆä¸­å¯¹è±¡å€¼å‘ç”Ÿå˜åŒ–çš„å˜åŒ–é›†åˆå¯¹è±¡
 	 * @return {std::vector<std::pair<diff_object*, diff_object*> >&}
-	 *  ·µ»Ø²úÉú±ä»¯µÄ¶ÔÏóµÄ¼¯ºÏ£¬ÆäÖĞ pair ÖĞµÄ first ÎªĞÂ¶ÔÏó£¬second
-	 *  Îª¾É¶ÔÏó
+	 *  è¿”å›äº§ç”Ÿå˜åŒ–çš„å¯¹è±¡çš„é›†åˆï¼Œå…¶ä¸­ pair ä¸­çš„ first ä¸ºæ–°å¯¹è±¡ï¼Œsecond
+	 *  ä¸ºæ—§å¯¹è±¡
 	 * @sample
 	 *  const std::vector<std::pair<diff_object*, diff_object*> >&
 	 *  	results = manager.get_updated();
@@ -79,7 +79,7 @@ public:
 	}
 
 	/**
-	 * µ± diff_manger ½øĞĞ²îÒì»ª±È½Ï³É¹¦ºó£¬±¾º¯ÊıÓÃÓÚ·µ»ØÏàÍ¬¶ÔÏóµÄ¼¯ºÏ
+	 * å½“ diff_manger è¿›è¡Œå·®å¼‚åæ¯”è¾ƒæˆåŠŸåï¼Œæœ¬å‡½æ•°ç”¨äºè¿”å›ç›¸åŒå¯¹è±¡çš„é›†åˆ
 	 * @return {std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_same(void) const
@@ -88,7 +88,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃĞÂÔöµÄ²»ÔÚÖ¸¶¨Çø¼ä·¶Î§ÄÚµÄ¶ÔÏó¼¯ºÏ
+	 * è·å¾—æ–°å¢çš„ä¸åœ¨æŒ‡å®šåŒºé—´èŒƒå›´å†…çš„å¯¹è±¡é›†åˆ
 	 * @return {const std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_extra_added(void) const
@@ -97,7 +97,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃÉ¾³ıµÄ²»ÔÚÖ¸¶¨Çø¼ä·¶Î§ÄÚµÄ¶ÔÏó¼¯ºÏ
+	 * è·å¾—åˆ é™¤çš„ä¸åœ¨æŒ‡å®šåŒºé—´èŒƒå›´å†…çš„å¯¹è±¡é›†åˆ
 	 * @return {const std::vector<diff_object*>&}
 	 */
 	const std::vector<diff_object*>& get_extra_deleted(void) const
@@ -106,7 +106,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃĞŞ¸ÄµÄ²»ÔÚÖ¸¶¨Çø¼ä·¶Î§ÄÚµÄ¶ÔÏó¼¯ºÏ
+	 * è·å¾—ä¿®æ”¹çš„ä¸åœ¨æŒ‡å®šåŒºé—´èŒƒå›´å†…çš„å¯¹è±¡é›†åˆ
 	 * @return {const std::vector<diff_object*>&}
 	 */
 	const std::vector<std::pair<diff_object*, diff_object*> >&
@@ -116,8 +116,8 @@ public:
 	}
 
 	/**
-	 * µ±ÖØ¸´Ê¹ÓÃ±¾ diff_manager ½øĞĞ²îÒì»¯±È½ÏÊ±£¬ĞèÒªµ÷ÓÃ±¾·½·¨À´Çå¿Õ
-	 * ÉÏÒ»´Î±È½Ï¹ı³ÌÖĞ²úÉúµÄÁÙÊ±ÄÚ´æ¼°¶ÔÏó
+	 * å½“é‡å¤ä½¿ç”¨æœ¬ diff_manager è¿›è¡Œå·®å¼‚åŒ–æ¯”è¾ƒæ—¶ï¼Œéœ€è¦è°ƒç”¨æœ¬æ–¹æ³•æ¥æ¸…ç©º
+	 * ä¸Šä¸€æ¬¡æ¯”è¾ƒè¿‡ç¨‹ä¸­äº§ç”Ÿçš„ä¸´æ—¶å†…å­˜åŠå¯¹è±¡
 	 */
 	void reset(void);
 
@@ -126,25 +126,25 @@ private:
 	long long  range_from_;
 	long long  range_to_;
 
-	// ÏàÍ¬µÄ¶ÔÏó¼¯ºÏ
+	// ç›¸åŒçš„å¯¹è±¡é›†åˆ
 	std::vector<diff_object*> objs_equ_;
 
-	// ±ä»¯µÄ¶ÔÏó¼¯ºÏ
+	// å˜åŒ–çš„å¯¹è±¡é›†åˆ
 
-	// ĞÂÔöµÄ¶ÔÏó¼¯ºÏ
+	// æ–°å¢çš„å¯¹è±¡é›†åˆ
 	std::vector<diff_object*> objs_new_;
-	// É¾³ıµÄ¶ÔÏó¼¯ºÏ
+	// åˆ é™¤çš„å¯¹è±¡é›†åˆ
 	std::vector<diff_object*> objs_del_;
-	// ĞŞ¸ÄµÄ¶ÔÏó¼¯ºÏ
+	// ä¿®æ”¹çš„å¯¹è±¡é›†åˆ
 	std::vector<std::pair<diff_object*, diff_object*> > objs_upd_;
 
-	// ¶àÓàµÄ¶ÔÏó¼¯ºÏ
+	// å¤šä½™çš„å¯¹è±¡é›†åˆ
 
-	// ĞÂÔöµÄ¶àÓà¶ÔÏó¼¯ºÏ
+	// æ–°å¢çš„å¤šä½™å¯¹è±¡é›†åˆ
 	std::vector<diff_object*> objs_new_extra_;
-	// É¾³ıµÄ¶àÓà¶ÔÏó¼¯ºÏ
+	// åˆ é™¤çš„å¤šä½™å¯¹è±¡é›†åˆ
 	std::vector<diff_object*> objs_del_extra_;
-	// ĞŞ¸ÄµÄ¶àÓà¶ÔÏó¼¯ºÏ
+	// ä¿®æ”¹çš„å¤šä½™å¯¹è±¡é›†åˆ
 	std::vector<std::pair<diff_object*, diff_object*> > objs_upd_extra_;
 };
 

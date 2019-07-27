@@ -1,4 +1,4 @@
-#ifndef	__FILE_CACHE_INCLUDE_H__
+﻿#ifndef	__FILE_CACHE_INCLUDE_H__
 #define	__FILE_CACHE_INCLUDE_H__
 
 #include "lib_acl.h"

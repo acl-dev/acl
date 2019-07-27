@@ -1,55 +1,55 @@
+﻿========================================================================
+    MICROSOFT 基础类库 : lib_ctrl 项目概况
 ========================================================================
-    MICROSOFT ������� : lib_ctrl ��Ŀ�ſ�
-========================================================================
 
 
-Ӧ�ó�������Ϊ�������˴� lib_ctrl DLL���� DLL ����
-˵����ʹ�� Microsoft ������Ļ���������
-Ҳ�Ǳ�д DLL ����㡣
+应用程序向导已为您创建了此 lib_ctrl DLL。此 DLL 不仅
+说明了使用 Microsoft 基础类的基础，而且
+也是编写 DLL 的起点。
 
-���ļ�������� lib_ctrl DLL
-��ÿ���ļ�������ժҪ��
+此文件包含组成 lib_ctrl DLL
+的每个文件的内容摘要。
 
 lib_ctrl.vcproj
-    ������Ӧ�ó��������ɵ� VC++ ��Ŀ������Ŀ�ļ���
-    �������й����ɴ��ļ��� Visual C++ �汾����Ϣ���Լ�
-    �й�ʹ��Ӧ�ó�����ѡ���
-    ƽ̨�����ú���Ŀ���ܵ���Ϣ��
+    这是用应用程序向导生成的 VC++ 项目的主项目文件。
+    它包含有关生成此文件的 Visual C++ 版本的信息，以及
+    有关使用应用程序向导选择的
+    平台、配置和项目功能的信息。
 
 lib_ctrl.cpp
-    ���ǰ��� DllMain() 
-    ������� DLL Դ�ļ���
+    这是包含 DllMain() 
+    定义的主 DLL 源文件。
 lib_ctrl.rc
-    ���ǳ���ʹ�õ����� Microsoft Windows ��Դ���б���
-    �������洢�� RES ��Ŀ¼�µ�ͼ�ꡢλͼ�͹�ꡣ
-    ���ļ����� Microsoft Visual C++ ��ֱ�ӱ༭��
+    这是程序使用的所有 Microsoft Windows 资源的列表。
+    它包含存储在 RES 子目录下的图标、位图和光标。
+    此文件可在 Microsoft Visual C++ 中直接编辑。
     
 
 res\lib_ctrl.rc2
-    ���ļ��������� Microsoft 
-    Visual C++ �༭����Դ����Ӧ��������
-    ��Դ�༭���༭��������Դ�����ڴ��ļ��С�
+    此文件包含不由 Microsoft 
+    Visual C++ 编辑的资源。您应将不能由
+    资源编辑器编辑的所有资源放置在此文件中。
 
 lib_ctrl.def
-    ���ļ������й����� Microsoft Windows 
-    ����� DLL ����Ϣ��
-    ������� DLL �����ƺ�˵���Ȳ�����
-    �����Ӵ� DLL ����������
+    此文件包含有关运行 Microsoft Windows 
+    所需的 DLL 的信息。
+    它定义此 DLL 的名称和说明等参数。
+    它还从此 DLL 导出函数。
 
 /////////////////////////////////////////////////////////////////////////////
-������׼�ļ�:
+其他标准文件:
 
-StdAfx.h��StdAfx.cpp
-    ��Щ�ļ�����������Ϊ lib_ctrl.pch
-    ��Ԥ����ͷ(PCH)�ļ��Լ���Ϊ StdAfx.obj ��Ԥ���������ļ���
+StdAfx.h、StdAfx.cpp
+    这些文件用于生成名为 lib_ctrl.pch
+    的预编译头(PCH)文件以及名为 StdAfx.obj 的预编译类型文件。
 
 Resource.h
-    ���Ǳ�׼��ͷ�ļ������������µ���Դ ID��
-    Microsoft Visual C++ ��ȡ�͸��´��ļ���
+    这是标准的头文件，它定义了新的资源 ID。
+    Microsoft Visual C++ 读取和更新此文件。
 
 /////////////////////////////////////////////////////////////////////////////
-����ע��:
+其他注释:
 
-Ӧ�ó�����ʹ�� "TODO:" ע��ָʾӦ���ӻ��Զ����Դ���벿�֡�
+应用程序向导使用 "TODO:" 注释指示应添加或自定义的源代码部分。
 
 /////////////////////////////////////////////////////////////////////////////

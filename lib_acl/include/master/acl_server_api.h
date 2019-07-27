@@ -1,4 +1,4 @@
-#ifndef	ACL_MASTER_SERVER_API_INCLUDE_H
+﻿#ifndef	ACL_MASTER_SERVER_API_INCLUDE_H
 #define	ACL_MASTER_SERVER_API_INCLUDE_H
 
 #include "../stdlib/acl_define.h"

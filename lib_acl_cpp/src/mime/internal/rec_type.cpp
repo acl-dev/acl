@@ -1,4 +1,4 @@
-/*++
+﻿/*++
  * NAME
  *	rec_type 3
  * SUMMARY

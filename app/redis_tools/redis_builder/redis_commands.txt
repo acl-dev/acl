@@ -1,4 +1,4 @@
-#command	broadcast(none/master/slave)	permission(yes/no/warn)
+﻿#command	broadcast(none/master/slave)	permission(yes/no/warn)
 del		none				warn
 set		none				yes
 get		none				yes

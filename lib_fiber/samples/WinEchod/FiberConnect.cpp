@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Resource.h"
 #include "WinEchodDlg.h"
 #include "afxdialogex.h"

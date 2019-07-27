@@ -1,4 +1,4 @@
-// net_toolsDlg.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// net_toolsDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -20,20 +20,20 @@
 #endif
 
 
-// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
+// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -51,7 +51,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Cnet_toolsDlg ¶Ô»°¿ò
+// Cnet_toolsDlg å¯¹è¯æ¡†
 
 
 
@@ -157,15 +157,15 @@ BEGIN_MESSAGE_MAP(Cnet_toolsDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Cnet_toolsDlg ÏûÏ¢´¦Àí³ÌĞò
+// Cnet_toolsDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL Cnet_toolsDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
+	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
 
-	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
+	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -181,29 +181,29 @@ BOOL Cnet_toolsDlg::OnInitDialog()
 		}
 	}
 
-	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
-	//  Ö´ĞĞ´Ë²Ù×÷
-	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
-	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
+	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
+	//  æ‰§è¡Œæ­¤æ“ä½œ
+	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
+	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
 
 	//ShowWindow(SW_MAXIMIZE);
 
-	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
 
 	theApp.m_singleCtrl.Register();
 
-	// Ìí¼Ó×´Ì¬À¸
+	// æ·»åŠ çŠ¶æ€æ 
 	int aWidths[3] = {50, 400, -1};
 	m_wndMeterBar.SetParts(3, aWidths);
 
 	m_wndMeterBar.Create(WS_CHILD | WS_VISIBLE | WS_BORDER
 		| CCS_BOTTOM | SBARS_SIZEGRIP,
 		CRect(0,0,0,0), this, 0); 
-	m_wndMeterBar.SetText("¾ÍĞ÷", 0, 0);
+	m_wndMeterBar.SetText("å°±ç»ª", 0, 0);
 	m_wndMeterBar.SetText("", 1, 0);
 	m_wndMeterBar.SetText("", 2, 0);
 
-	// È¡µÃ±¾»úµÄDNS·şÎñÆ÷
+	// å–å¾—æœ¬æœºçš„DNSæœåŠ¡å™¨
 	std::vector<acl::string> dns_list;
 	if (util::get_dns(dns_list) > 0)
 	{
@@ -216,7 +216,7 @@ BOOL Cnet_toolsDlg::OnInitDialog()
 	logpath.format("%s/net_tools.txt", path);
 	logger_open(logpath.c_str(), "net_tools");
 
-	// ´ÓÊı¾İ¿âÖĞ¶ÁÈ¡ÅäÖÃÏî
+	// ä»æ•°æ®åº“ä¸­è¯»å–é…ç½®é¡¹
 	net_store* ns = new net_store(m_smtpAddr, m_smtpPort, m_pop3Addr, m_pop3Port,
 		m_smtpUser, m_smtpPass, m_recipients, this);
 	rpc_manager::get_instance().fork(ns);
@@ -227,7 +227,7 @@ BOOL Cnet_toolsDlg::OnInitDialog()
 	if (m_domainFilePath.IsEmpty())
 		GetDlgItem(IDC_NSLOOKUP)->EnableWindow(FALSE);
 
-	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
+	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
 }
 
 void Cnet_toolsDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -243,19 +243,19 @@ void Cnet_toolsDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
-//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
-//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
+// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
+//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
+//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
 
 void Cnet_toolsDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
+		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
+		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -263,7 +263,7 @@ void Cnet_toolsDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// »æÖÆÍ¼±ê
+		// ç»˜åˆ¶å›¾æ ‡
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -272,7 +272,7 @@ void Cnet_toolsDlg::OnPaint()
 	}
 }
 
-//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
+//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
 HCURSOR Cnet_toolsDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -280,7 +280,7 @@ HCURSOR Cnet_toolsDlg::OnQueryDragIcon()
 
 void Cnet_toolsDlg::OnBnClickedOpenDos()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (m_dosFp == NULL)
 	{
 		//GetDlgItem(IDC_OPEN_DOS)->EnableWindow(FALSE);
@@ -289,7 +289,7 @@ void Cnet_toolsDlg::OnBnClickedOpenDos()
 		printf("DOS opened now!\r\n");
 		const char* path = acl_getcwd();
 		printf("current path: %s\r\n", path);
-		GetDlgItem(IDC_OPEN_DOS)->SetWindowText("¹Ø±Õ DOS ´°¿Ú");
+		GetDlgItem(IDC_OPEN_DOS)->SetWindowText("å…³é—­ DOS çª—å£");
 		acl::log::stdout_open(true);
 		logger_close();
 	}
@@ -298,7 +298,7 @@ void Cnet_toolsDlg::OnBnClickedOpenDos()
 		fclose(m_dosFp);
 		m_dosFp = NULL;
 		FreeConsole();
-		GetDlgItem(IDC_OPEN_DOS)->SetWindowText("´ò¿ª DOS ´°¿Ú");
+		GetDlgItem(IDC_OPEN_DOS)->SetWindowText("æ‰“å¼€ DOS çª—å£");
 		acl::log::stdout_open(false);
 		const char* path = acl_getcwd();
 		acl::string logpath;
@@ -341,7 +341,7 @@ void Cnet_toolsDlg::load_db_callback(const char* smtp_addr, int smtp_port,
 
 	check();
 
-	// Èç¹ûÓĞÒ»¸ö±ØÌîµÄÅäÖÃÏî·Ç¿Õ£¬ÔòÇ¿ÖÆÓÃ»§ÌîĞ´
+	// å¦‚æœæœ‰ä¸€ä¸ªå¿…å¡«çš„é…ç½®é¡¹éç©ºï¼Œåˆ™å¼ºåˆ¶ç”¨æˆ·å¡«å†™
 	if (m_smtpAddr.IsEmpty() || m_pop3Addr.IsEmpty()
 		|| m_smtpUser.IsEmpty() || m_smtpPass.IsEmpty()
 		|| m_recipients.IsEmpty())
@@ -356,7 +356,7 @@ void Cnet_toolsDlg::load_db_callback(const char* smtp_addr, int smtp_port,
 
 void Cnet_toolsDlg::OnBnClickedOption()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	//CNetOption option(m_smtpAddr, m_pop3Addr, m_smtpUser, m_smtpPass,
 	//	m_recipients);
 	CNetOption option;
@@ -401,20 +401,20 @@ void Cnet_toolsDlg::OnBnClickedOption()
 
 void Cnet_toolsDlg::OnOpenMain()
 {
-	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
 	ShowWindow(SW_NORMAL);
 }
 
 void Cnet_toolsDlg::OnQuit()
 {
-	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
 	m_bShutdown = TRUE;
 	SendMessage(WM_CLOSE);
 }
 
 void Cnet_toolsDlg::OnClose()
 {
-	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
+	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
 
 	//__super::OnClose();
 	acl::string buf;
@@ -448,8 +448,8 @@ void Cnet_toolsDlg::OnClose()
 
 void Cnet_toolsDlg::OnNcPaint()
 {
-	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
-	// ²»Îª»æÍ¼ÏûÏ¢µ÷ÓÃ __super::OnNcPaint()
+	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
+	// ä¸ä¸ºç»˜å›¾æ¶ˆæ¯è°ƒç”¨ __super::OnNcPaint()
 	//static int i = 2;
 	//if(i > 0)
 	//{
@@ -466,7 +466,7 @@ int Cnet_toolsDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	// TODO:  ÔÚ´ËÌí¼ÓÄú×¨ÓÃµÄ´´½¨´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ‚¨ä¸“ç”¨çš„åˆ›å»ºä»£ç 
 
 	m_trayIcon.SetNotificationWnd(this, WM_MY_TRAY_NOTIFICATION);
 	m_trayIcon.SetIcon(IDI_ICON_MIN);
@@ -484,7 +484,7 @@ afx_msg LRESULT Cnet_toolsDlg::OnTrayNotification(WPARAM uID, LPARAM lEvent)
 
 void Cnet_toolsDlg::OnEnSetfocusDomainFile()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString pathname;
 
 	GetDlgItem(IDC_DOMAIN_FILE)->GetWindowText(pathname);
@@ -498,8 +498,8 @@ void Cnet_toolsDlg::OnEnSetfocusDomainFile()
 
 void Cnet_toolsDlg::OnBnClickedLoadDomain()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
-	CFileDialog file(TRUE,"ÎÄ¼ş","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	CFileDialog file(TRUE,"æ–‡ä»¶","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 	if(file.DoModal()==IDOK)
 	{
 		CString pathname;
@@ -513,7 +513,7 @@ void Cnet_toolsDlg::OnBnClickedLoadDomain()
 
 void Cnet_toolsDlg::OnBnClickedNslookup()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
 	if (m_dnsBusy)
 		return;
@@ -526,7 +526,7 @@ void Cnet_toolsDlg::OnBnClickedNslookup()
 	GetDlgItem(IDC_DOMAIN_FILE)->GetWindowText(filePath);
 	if (filePath.IsEmpty())
 	{
-		MessageBox("ÇëÏÈÑ¡ÔñÓòÃûÁĞ±íÅäÖÃÎÄ¼ş£¡");
+		MessageBox("è¯·å…ˆé€‰æ‹©åŸŸååˆ—è¡¨é…ç½®æ–‡ä»¶ï¼");
 		return;
 	}
 
@@ -553,7 +553,7 @@ void Cnet_toolsDlg::nslookup_report(size_t total, size_t curr)
 	}
 
 	CString msg;
-	msg.Format("¹² %d ¸öÓòÃû, Íê³É %d ¸öÓòÃû", total, curr);
+	msg.Format("å…± %d ä¸ªåŸŸå, å®Œæˆ %d ä¸ªåŸŸå", total, curr);
 	m_wndMeterBar.SetText(msg, 1, 0);
 }
 
@@ -571,7 +571,7 @@ void Cnet_toolsDlg::nslookup_finish(const char* dbpath)
 
 	if (dbpath && *dbpath)
 	{
-		// ½«Êı¾İ¿âÎÄ¼ş·¢ÓÊ¼şÖÁ·şÎñÆ÷
+		// å°†æ•°æ®åº“æ–‡ä»¶å‘é‚®ä»¶è‡³æœåŠ¡å™¨
 		upload* up = new upload();
 		(*up).set_callback(this)
 			.add_file(dbpath)
@@ -581,7 +581,7 @@ void Cnet_toolsDlg::nslookup_finish(const char* dbpath)
 			.set_account(m_smtpUser.GetString())
 			.set_passwd(m_smtpPass.GetString())
 			.set_from(m_smtpUser.GetString())
-			.set_subject("DNS ²éÑ¯½á¹ûÊı¾İ")
+			.set_subject("DNS æŸ¥è¯¢ç»“æœæ•°æ®")
 			.add_to(m_recipients.GetString());
 		rpc_manager::get_instance().fork(up);
 	}
@@ -591,7 +591,7 @@ void Cnet_toolsDlg::nslookup_finish(const char* dbpath)
 
 void Cnet_toolsDlg::OnEnSetfocusIpFilePath()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString pathname;
 
 	GetDlgItem(IDC_IP_FILE_PATH)->GetWindowText(pathname);
@@ -605,8 +605,8 @@ void Cnet_toolsDlg::OnEnSetfocusIpFilePath()
 
 void Cnet_toolsDlg::OnBnClickedLoadIp()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
-	CFileDialog file(TRUE,"ÎÄ¼ş","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	CFileDialog file(TRUE,"æ–‡ä»¶","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 	if(file.DoModal()==IDOK)
 	{
 		CString pathname;
@@ -620,7 +620,7 @@ void Cnet_toolsDlg::OnBnClickedLoadIp()
 
 void Cnet_toolsDlg::OnBnClickedPing()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	if (m_pingBusy)
 		return;
 
@@ -632,7 +632,7 @@ void Cnet_toolsDlg::OnBnClickedPing()
 	GetDlgItem(IDC_IP_FILE_PATH)->GetWindowText(filePath);
 	if (filePath.IsEmpty())
 	{
-		MessageBox("ÇëÏÈÑ¡Ôñ ip ÁĞ±íÅäÖÃÎÄ¼ş£¡");
+		MessageBox("è¯·å…ˆé€‰æ‹© ip åˆ—è¡¨é…ç½®æ–‡ä»¶ï¼");
 
 		return;
 	}
@@ -677,7 +677,7 @@ void Cnet_toolsDlg::ping_finish(const char* dbpath)
 
 	if (dbpath && *dbpath)
 	{
-		// ½«Êı¾İ¿âÎÄ¼ş·¢ÓÊ¼şÖÁ·şÎñÆ÷
+		// å°†æ•°æ®åº“æ–‡ä»¶å‘é‚®ä»¶è‡³æœåŠ¡å™¨
 		upload* up = new upload();
 		(*up).set_callback(this)
 			.add_file(dbpath)
@@ -687,7 +687,7 @@ void Cnet_toolsDlg::ping_finish(const char* dbpath)
 			.set_account(m_smtpUser.GetString())
 			.set_passwd(m_smtpPass.GetString())
 			.set_from(m_smtpUser.GetString())
-			.set_subject("PING ½á¹ûÊı¾İ")
+			.set_subject("PING ç»“æœæ•°æ®")
 			.add_to(m_recipients.GetString());
 		rpc_manager::get_instance().fork(up);
 	}
@@ -697,7 +697,7 @@ void Cnet_toolsDlg::ping_finish(const char* dbpath)
 
 void Cnet_toolsDlg::OnEnSetfocusFile()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	CString pathname;
 
 	GetDlgItem(IDC_FILE)->GetWindowText(pathname);
@@ -711,8 +711,8 @@ void Cnet_toolsDlg::OnEnSetfocusFile()
 
 void Cnet_toolsDlg::OnBnClickedLoadFile()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
-	CFileDialog file(TRUE,"ÎÄ¼ş","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	CFileDialog file(TRUE,"æ–‡ä»¶","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 	if(file.DoModal()==IDOK)
 	{
 		CString pathname;
@@ -726,8 +726,8 @@ void Cnet_toolsDlg::OnBnClickedLoadFile()
 
 void Cnet_toolsDlg::OnBnClickedSendMail()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
-	// ·¢ÓÊ¼şÖÁ·şÎñÆ÷
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// å‘é‚®ä»¶è‡³æœåŠ¡å™¨
 
 	UpdateData();
 
@@ -737,7 +737,7 @@ void Cnet_toolsDlg::OnBnClickedSendMail()
 	GetDlgItem(IDC_FILE)->GetWindowText(filePath);
 	if (filePath.IsEmpty())
 	{
-		MessageBox("ÇëÏÈÑ¡Ôñ¸½¼ş£¡");
+		MessageBox("è¯·å…ˆé€‰æ‹©é™„ä»¶ï¼");
 		return;
 	}
 
@@ -750,7 +750,7 @@ void Cnet_toolsDlg::OnBnClickedSendMail()
 		.set_account(m_smtpUser.GetString())
 		.set_passwd(m_smtpPass.GetString())
 		.set_from(m_smtpUser.GetString())
-		.set_subject("²âÊÔÓÊ¼ş·¢ËÍ¹ı³Ì!")
+		.set_subject("æµ‹è¯•é‚®ä»¶å‘é€è¿‡ç¨‹!")
 		.add_to(m_recipients.GetString());
 	rpc_manager::get_instance().fork(smtp);
 }
@@ -781,7 +781,7 @@ void Cnet_toolsDlg::smtp_finish(const char* dbpath)
 
 	if (dbpath && *dbpath)
 	{
-		// ½«Êı¾İ¿âÎÄ¼ş·¢ÓÊ¼şÖÁ·şÎñÆ÷
+		// å°†æ•°æ®åº“æ–‡ä»¶å‘é‚®ä»¶è‡³æœåŠ¡å™¨
 		upload* up = new upload();
 		(*up).set_callback(this)
 			.add_file(dbpath)
@@ -791,7 +791,7 @@ void Cnet_toolsDlg::smtp_finish(const char* dbpath)
 			.set_account(m_smtpUser.GetString())
 			.set_passwd(m_smtpPass.GetString())
 			.set_from(m_smtpUser.GetString())
-			.set_subject("ÓÊ¼ş·¢ËÍ½á¹ûÊı¾İ")
+			.set_subject("é‚®ä»¶å‘é€ç»“æœæ•°æ®")
 			.add_to(m_recipients.GetString());
 		rpc_manager::get_instance().fork(up);
 	}
@@ -801,7 +801,7 @@ void Cnet_toolsDlg::smtp_finish(const char* dbpath)
 
 void Cnet_toolsDlg::OnBnClickedRecvMail()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData();
 
 	GetDlgItem(IDC_RECV_MAIL)->EnableWindow(FALSE);
@@ -838,7 +838,7 @@ void Cnet_toolsDlg::pop3_finish(const char* dbpath)
 
 	if (dbpath && *dbpath)
 	{
-		// ½«Êı¾İ¿âÎÄ¼ş·¢ÓÊ¼şÖÁ·şÎñÆ÷
+		// å°†æ•°æ®åº“æ–‡ä»¶å‘é‚®ä»¶è‡³æœåŠ¡å™¨
 		upload* up = new upload();
 		(*up).set_callback(this)
 			.add_file(dbpath)
@@ -848,7 +848,7 @@ void Cnet_toolsDlg::pop3_finish(const char* dbpath)
 			.set_account(m_smtpUser.GetString())
 			.set_passwd(m_smtpPass.GetString())
 			.set_from(m_smtpUser.GetString())
-			.set_subject("ÓÊ¼ş½ÓÊÕ½á¹ûÊı¾İ")
+			.set_subject("é‚®ä»¶æ¥æ”¶ç»“æœæ•°æ®")
 			.add_to(m_recipients.GetString());
 		rpc_manager::get_instance().fork(up);
 	}
@@ -858,7 +858,7 @@ void Cnet_toolsDlg::pop3_finish(const char* dbpath)
 
 void Cnet_toolsDlg::OnBnClickedTestall()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 
 	CString ipFile;
@@ -871,7 +871,7 @@ void Cnet_toolsDlg::OnBnClickedTestall()
 	if (ipFile.IsEmpty() || domainFile.IsEmpty() || attach.IsEmpty())
 	{
 		CString msg;
-		msg.Format("Çë±£Ö¤·Ç¿ÕÏî£ºIP ÅäÖÃÎÄ¼ş£¬ÓòÃûÅäÖÃÎÄ¼ş£¬Ìí¼Ó¸½¼ş");
+		msg.Format("è¯·ä¿è¯éç©ºé¡¹ï¼šIP é…ç½®æ–‡ä»¶ï¼ŒåŸŸåé…ç½®æ–‡ä»¶ï¼Œæ·»åŠ é™„ä»¶");
 		MessageBox(msg);
 		return;
 	}
@@ -922,7 +922,7 @@ void Cnet_toolsDlg::test_finish()
 	if (attaches_.empty())
 		return;
 
-	// ½«Êı¾İ¿âÎÄ¼ş·¢ÓÊ¼şÖÁ·şÎñÆ÷
+	// å°†æ•°æ®åº“æ–‡ä»¶å‘é‚®ä»¶è‡³æœåŠ¡å™¨
 	upload* up = new upload();
 	(*up).set_callback(this)
 		.set_server(m_smtpAddr.GetString(), m_smtpPort)
@@ -931,7 +931,7 @@ void Cnet_toolsDlg::test_finish()
 		.set_account(m_smtpUser.GetString())
 		.set_passwd(m_smtpPass.GetString())
 		.set_from(m_smtpUser.GetString())
-		.set_subject("Ò»¼ü²âÊÔ½á¹ûÊı¾İ")
+		.set_subject("ä¸€é”®æµ‹è¯•ç»“æœæ•°æ®")
 		.add_to(m_recipients.GetString());
 
 	std::vector<acl::string>::const_iterator cit = attaches_.begin();
@@ -946,7 +946,7 @@ void Cnet_toolsDlg::test_finish()
 
 void Cnet_toolsDlg::OnBnClickedRecvAll()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	UpdateData(TRUE);
 	if (IsDlgButtonChecked(IDC_RECV_ALL))
 	{
@@ -965,7 +965,7 @@ void Cnet_toolsDlg::OnDestroy()
 {
 	__super::OnDestroy();
 
-	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
 	theApp.m_singleCtrl.Remove();
 }
 
@@ -1043,71 +1043,71 @@ void Cnet_toolsDlg::check()
 
 void Cnet_toolsDlg::OnEnKillfocusIpFilePath()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusNpkt()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusDelay()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusTimeout()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusPktSize()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusDomainFile()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusDnsPort()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusLookupTimeout()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusFile()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnEnKillfocusRecvLimit()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnBnKillfocusRecvAll()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 	check();
 }
 
 void Cnet_toolsDlg::OnBnClickedRecvSave()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 }

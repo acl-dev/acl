@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "fiber_transfer.h"
 #include "http_servlet.h"
 
@@ -17,7 +17,7 @@ bool http_servlet::doError(request_t&, response_t& res)
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
 
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	res.write(buf);
@@ -29,7 +29,7 @@ bool http_servlet::doOther(request_t&, response_t& res, const char* method)
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
 	res.write(buf);
@@ -44,9 +44,9 @@ bool http_servlet::doGet(request_t& req, response_t& res)
 
 bool http_servlet::doPost(request_t& req, response_t& res)
 {
-	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
-	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
-	// memcached ·şÎñÕı³£¹¤×÷
+	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
+	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
+	// memcached æœåŠ¡æ­£å¸¸å·¥ä½œ
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0)
@@ -54,7 +54,7 @@ bool http_servlet::doPost(request_t& req, response_t& res)
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	// Èç¹ûĞèÒªÈ¡µÃä¯ÀÀÆ÷ cookie Çë´ò¿ªÏÂÃæ×¢ÊÍ
+	// å¦‚æœéœ€è¦å–å¾—æµè§ˆå™¨ cookie è¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Š
 	/*
 	
 	*/
@@ -71,10 +71,10 @@ bool http_servlet::on_default(request_t& req, response_t& res)
 
 bool http_servlet::on_hello(request_t& req, response_t& res)
 {
-	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
-		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
-		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
+	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
+		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
+		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
 
 	acl::string buf;
 	buf.format("<html><body>xxxxxxx<br>\r\n");

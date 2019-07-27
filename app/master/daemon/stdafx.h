@@ -1,4 +1,4 @@
-#ifndef __STDAFX_INCLUDE_H_
+﻿#ifndef __STDAFX_INCLUDE_H_
 #define __STDAFX_INCLUDE_H_
 
 #include <vector>

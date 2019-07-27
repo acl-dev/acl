@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "IConnection.h"
 
 class ClientConnection : public IConnection
@@ -10,7 +10,7 @@ public:
 	bool expired() const;
 
 protected:
-	// »ùÀà´¿Ðéº¯Êý
+	// åŸºç±»çº¯è™šå‡½æ•°
 	void run();
 
 private:

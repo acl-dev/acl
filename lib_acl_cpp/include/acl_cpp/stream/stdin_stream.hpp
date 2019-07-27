@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "istream.hpp"
 
 namespace acl {
 
 /**
- * ±ê×¼ÊäÈëÁ÷£¬¸ÃÀà¶ÔÏó½öÄÜ½øĞĞ¶Á²Ù×÷
+ * æ ‡å‡†è¾“å…¥æµï¼Œè¯¥ç±»å¯¹è±¡ä»…èƒ½è¿›è¡Œè¯»æ“ä½œ
  */
 
 class ACL_CPP_API stdin_stream : public istream

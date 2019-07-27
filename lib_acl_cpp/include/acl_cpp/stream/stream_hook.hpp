@@ -1,15 +1,15 @@
-#pragma once
+ï»¿#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
 namespace acl {
 
 /**
- * Á÷¶ÔÏó IO ×¢²á»Øµ÷Àà£¬×ÓÀàĞèÊµÏÖ¸ÃÀàÖĞµÄĞé·½·¨£¬×ÓÀà¶ÔÏóÍ¨¹ı setup_hook ×¢²á£¬
- * È»ºó¸Ã×ÓÀà¶ÔÏóÖĞµÄ IO ¹ı³Ì×÷Îª stream/aio_stream Àà¶ÔÏóµÄµ×²ã IO ¹ı³Ì±»Ê¹ÓÃ£»
- * Èç¹û²»µ÷ÓÃ stream/aio_stream µÄ setup_hook ×¢²á¹ı³Ì£¬Ôò stream/aio_stream
- * Àà¶ÔÏóµÄµ×²ã IO ¹ı³ÌÎªÄ¬ÈÏ¹ı³Ì
- * XXX£º ±¾´¿ĞéÀà±»ÉùÃ÷Îª¶Ñ¶ÔÏóÀà£¬½¨Òé×ÓÀàÒ²Ó¦¸ÃÉùÃ÷Îª¶Ñ¶ÔÏóÀà
+ * æµå¯¹è±¡ IO æ³¨å†Œå›è°ƒç±»ï¼Œå­ç±»éœ€å®ç°è¯¥ç±»ä¸­çš„è™šæ–¹æ³•ï¼Œå­ç±»å¯¹è±¡é€šè¿‡ setup_hook æ³¨å†Œï¼Œ
+ * ç„¶åè¯¥å­ç±»å¯¹è±¡ä¸­çš„ IO è¿‡ç¨‹ä½œä¸º stream/aio_stream ç±»å¯¹è±¡çš„åº•å±‚ IO è¿‡ç¨‹è¢«ä½¿ç”¨ï¼›
+ * å¦‚æœä¸è°ƒç”¨ stream/aio_stream çš„ setup_hook æ³¨å†Œè¿‡ç¨‹ï¼Œåˆ™ stream/aio_stream
+ * ç±»å¯¹è±¡çš„åº•å±‚ IO è¿‡ç¨‹ä¸ºé»˜è®¤è¿‡ç¨‹
+ * XXXï¼š æœ¬çº¯è™šç±»è¢«å£°æ˜ä¸ºå †å¯¹è±¡ç±»ï¼Œå»ºè®®å­ç±»ä¹Ÿåº”è¯¥å£°æ˜ä¸ºå †å¯¹è±¡ç±»
  */
 class ACL_CPP_API stream_hook : public noncopyable
 {
@@ -17,39 +17,39 @@ public:
 	stream_hook(void) {}
 
 	/**
-	 * ¶ÁÊı¾İ½Ó¿Ú
-	 * @param buf {void*} ¶Á»º³åÇøµØÖ·£¬¶Áµ½µÄÊı¾İ½«´æ·ÅÔÚ¸Ã»º³åÇøÖĞ
-	 * @param len {size_t} buf »º³åÇø´óĞ¡
-	 * @return {int} ¶Áµ½×Ö½ÚÊı£¬µ±·µ»ØÖµ < 0 Ê±±íÊ¾³ö´í
+	 * è¯»æ•°æ®æ¥å£
+	 * @param buf {void*} è¯»ç¼“å†²åŒºåœ°å€ï¼Œè¯»åˆ°çš„æ•°æ®å°†å­˜æ”¾åœ¨è¯¥ç¼“å†²åŒºä¸­
+	 * @param len {size_t} buf ç¼“å†²åŒºå¤§å°
+	 * @return {int} è¯»åˆ°å­—èŠ‚æ•°ï¼Œå½“è¿”å›å€¼ < 0 æ—¶è¡¨ç¤ºå‡ºé”™
 	 */
 	virtual int read(void* buf, size_t len) = 0;
 
 	/**
-	 * ·¢ËÍÊı¾İ½Ó¿Ú
-	 * @param buf {const void*} ·¢ËÍ»º³åÇøµØÖ·
-	 * @param len {size_t} buf »º³åÇøÖĞÊı¾İµÄ³¤¶È(±ØĞë > 0)
-	 * @return {int} Ğ´ÈëµÄÊı¾İ³¤¶È£¬·µ»ØÖµ <£°¡¡Ê±±íÊ¾³ö´í
+	 * å‘é€æ•°æ®æ¥å£
+	 * @param buf {const void*} å‘é€ç¼“å†²åŒºåœ°å€
+	 * @param len {size_t} buf ç¼“å†²åŒºä¸­æ•°æ®çš„é•¿åº¦(å¿…é¡» > 0)
+	 * @return {int} å†™å…¥çš„æ•°æ®é•¿åº¦ï¼Œè¿”å›å€¼ <ï¼ã€€æ—¶è¡¨ç¤ºå‡ºé”™
 	 */
 	virtual int send(const void* buf, size_t len) = 0;
 
 	/**
-	 * ÔÚ stream/aio_stream µÄ setup_hook ÄÚ²¿½«»áµ÷ÓÃ stream_hook::open
-	 * ¹ı³Ì£¬ÒÔ±ãÓÚ×ÓÀà¶ÔÏóÓÃÀ´³õÊ¼»¯Ò»Ğ©Êı¾İ¼°»á»°
-	 * @param s {ACL_VSTREAM*} ÔÚ setup_hook ÄÚ²¿µ÷ÓÃ¸Ã·½·¨½«´´½¨µÄÁ÷¶ÔÏó
-	 *  ×÷Îª²ÎÊı´«Èë
-	 * @return {bool} Èç¹û×ÓÀàÊµÀı·µ»Ø false£¬Ôò setup_hook µ÷ÓÃÊ§°ÜÇÒ»á»Ö¸´Ô­Ñù
+	 * åœ¨ stream/aio_stream çš„ setup_hook å†…éƒ¨å°†ä¼šè°ƒç”¨ stream_hook::open
+	 * è¿‡ç¨‹ï¼Œä»¥ä¾¿äºå­ç±»å¯¹è±¡ç”¨æ¥åˆå§‹åŒ–ä¸€äº›æ•°æ®åŠä¼šè¯
+	 * @param s {ACL_VSTREAM*} åœ¨ setup_hook å†…éƒ¨è°ƒç”¨è¯¥æ–¹æ³•å°†åˆ›å»ºçš„æµå¯¹è±¡
+	 *  ä½œä¸ºå‚æ•°ä¼ å…¥
+	 * @return {bool} å¦‚æœå­ç±»å®ä¾‹è¿”å› falseï¼Œåˆ™ setup_hook è°ƒç”¨å¤±è´¥ä¸”ä¼šæ¢å¤åŸæ ·
 	 */
 	virtual bool open(ACL_VSTREAM* s) = 0;
 
 	/**
-	 * µ± stream/aio_stream Á÷¶ÔÏó¹Ø±ÕÇ°½«»á»Øµ÷¸Ãº¯ÊıÒÔ±ãÓÚ×ÓÀàÊµÀı×öÒ»Ğ©ÉÆºó¹¤×÷
-	 * @param alive {bool} ¸ÃÁ¬½ÓÊÇ·ñÒÀÈ»Õı³£
+	 * å½“ stream/aio_stream æµå¯¹è±¡å…³é—­å‰å°†ä¼šå›è°ƒè¯¥å‡½æ•°ä»¥ä¾¿äºå­ç±»å®ä¾‹åšä¸€äº›å–„åå·¥ä½œ
+	 * @param alive {bool} è¯¥è¿æ¥æ˜¯å¦ä¾ç„¶æ­£å¸¸
 	 * @return {bool}
 	 */
 	virtual bool on_close(bool alive) { (void) alive; return true; }
 
 	/**
-	 * µ± stream/aio_stream ¶ÔÏóĞèÒªÊÍ·Å stream_hook ×ÓÀà¶ÔÏóÊ±µ÷ÓÃ´Ë·½·¨
+	 * å½“ stream/aio_stream å¯¹è±¡éœ€è¦é‡Šæ”¾ stream_hook å­ç±»å¯¹è±¡æ—¶è°ƒç”¨æ­¤æ–¹æ³•
 	 */
 	virtual void destroy(void) {}
 

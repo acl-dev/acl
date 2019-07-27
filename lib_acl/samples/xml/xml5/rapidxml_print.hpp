@@ -1,4 +1,4 @@
-#ifndef RAPIDXML_PRINT_HPP_INCLUDED
+﻿#ifndef RAPIDXML_PRINT_HPP_INCLUDED
 #define RAPIDXML_PRINT_HPP_INCLUDED
 
 // Copyright (C) 2006, 2009 Marcin Kalicinski

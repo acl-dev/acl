@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -106,7 +106,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-	/* Ö÷ÒªÊÇÎªÁË¼õÉÙÍ¨Öª´ÎÊı */
+	/* ä¸»è¦æ˜¯ä¸ºäº†å‡å°‘é€šçŸ¥æ¬¡æ•° */
 	if (event_thr->event.blocked && event_thr->event.evdog
 	    && event_dog_client(event_thr->event.evdog) != stream)
 		event_dog_notify(event_thr->event.evdog);

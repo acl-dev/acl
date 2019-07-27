@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -91,34 +91,34 @@ bool HttpCookie::splitNameValue(char* data, HTTP_PARAM* param)
 #define SKIP_SPECIAL(x) { while (*(x) == ' ' || *(x) == '\t' || *(x) == '=') (x)++; }
 #define SKIP_WHILE(cond, x) { while(*(x) && (cond)) (x)++; }
 
-	// ¿ªÊ¼½âÎö¹ý³Ì
+	// å¼€å§‹è§£æžè¿‡ç¨‹
 	param->name = data;
 
-	// È¥µô¿ªÍ·ÎÞÓÃµÄÌØÊâ×Ö·û
+	// åŽ»æŽ‰å¼€å¤´æ— ç”¨çš„ç‰¹æ®Šå­—ç¬¦
 	SKIP_SPECIAL(param->name);
 	if (*(param->name) == 0) {
 		return false;
 	}
 
-	// ÕÒµ½ '='
+	// æ‰¾åˆ° '='
 	param->value = param->name;
 	SKIP_WHILE(*(param->value) != '=', param->value);
 	if (*(param->value) != '=') {
 		return false;
 	}
 
-	// È¥µô '=' Ç°ÃæµÄ¿Õ¸ñ
+	// åŽ»æŽ‰ '=' å‰é¢çš„ç©ºæ ¼
 	char* ptr       = param->value - 1;
 	*param->value++ = 0;
 	while (ptr > param->name && (*ptr == ' ' || *ptr == '\t')) {
 		*ptr-- = 0;
 	}
 
-	// È¥µô value ¿ªÊ¼µÄÎÞÐ§×Ö·û
+	// åŽ»æŽ‰ value å¼€å§‹çš„æ— æ•ˆå­—ç¬¦
 	SKIP_SPECIAL(param->value);
 
-	// ÕÒµ½ value ÖµµÄ½áÊøÎ»ÖÃ
-	// ÔÊÐí value = "\0"
+	// æ‰¾åˆ° value å€¼çš„ç»“æŸä½ç½®
+	// å…è®¸ value = "\0"
 	ptr = param->value + strlen(param->value) - 1;
 	while (ptr >= param->value && (*ptr == ' ' || *ptr == '\t')) {
 		*ptr-- = 0;
@@ -127,7 +127,7 @@ bool HttpCookie::splitNameValue(char* data, HTTP_PARAM* param)
 	return true;
 }
 
-// value ¸ñÊ½£ºxxx=xxx; domain=xxx; expires=xxx; path=xxx
+// value æ ¼å¼ï¼šxxx=xxx; domain=xxx; expires=xxx; path=xxx
 bool HttpCookie::setCookie(const char* value)
 {
 	if (value == NULL || *value == 0) {
@@ -139,12 +139,12 @@ bool HttpCookie::setCookie(const char* value)
 
 	HTTP_PARAM param;
 
-	// ´ÓµÚÒ»¸ö name=value ×Ö¶ÎÖÐÈ¡µÃ cookie Ãû¼° cookie Öµ
+	// ä»Žç¬¬ä¸€ä¸ª name=value å­—æ®µä¸­å–å¾— cookie ååŠ cookie å€¼
 	if (splitNameValue(tokens->argv[0], &param) == false) {
 		acl_argv_free(tokens);
 		return false;
 	}
-	// name ¿Ï¶¨·Ç "\0"£¬¶ø value ¿ÉÒÔÎª "\0"
+	// name è‚¯å®šéž "\0"ï¼Œè€Œ value å¯ä»¥ä¸º "\0"
 	name_  = dbuf_->dbuf_strdup(param.name);
 	value_ = dbuf_->dbuf_strdup(param.value);
 

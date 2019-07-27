@@ -1,4 +1,4 @@
-#include "acl_stdafx.hpp"
+ï»¿#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -17,7 +17,7 @@ namespace acl {
 bool mime_body::save_body(pipe_manager& out, const char* src /* = NULL */,
 	int len /* = 0 */)
 {
-	// ÊÇ·ñĞèÒª´Ó HTML Êı¾İÖĞÌáÈ¡³ö´¿ÎÄ±¾Êı¾İ
+	// æ˜¯å¦éœ€è¦ä» HTML æ•°æ®ä¸­æå–å‡ºçº¯æ–‡æœ¬æ•°æ®
 
 	xml* pXml;
 	if (m_htmlFirst == false && m_ctype == MIME_CTYPE_TEXT
@@ -28,7 +28,7 @@ bool mime_body::save_body(pipe_manager& out, const char* src /* = NULL */,
 		pXml = NULL;
 	}
 
-	// µ±ĞèÒª½øĞĞ×Ö·û¼¯×ª»»Ê±²éÕÒ×Ö·û¼¯×ª»»Æ÷
+	// å½“éœ€è¦è¿›è¡Œå­—ç¬¦é›†è½¬æ¢æ—¶æŸ¥æ‰¾å­—ç¬¦é›†è½¬æ¢å™¨
 
 	charset_conv* conv;
 	if (m_toCharset[0] != 0) {
@@ -40,7 +40,7 @@ bool mime_body::save_body(pipe_manager& out, const char* src /* = NULL */,
 		conv = NULL;
 	}
 
-	bool ret = save(out, src, len); // µ÷ÓÃ mime_node::save
+	bool ret = save(out, src, len); // è°ƒç”¨ mime_node::save
 
 	if (pXml) {
 		delete pXml;
