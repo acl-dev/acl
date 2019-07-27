@@ -230,7 +230,7 @@ static bool test_spop(acl::redis_set& redis, int n)
 			continue;
 
 		printf("spop %s, key: %s, member: %s\r\n",
-			ret ? "ok" : "empty", key.c_str(),
+			ret ? "OK" : "EMPTY", key.c_str(),
 			ret ? member.c_str() : "");
 	}
 

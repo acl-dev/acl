@@ -1,5 +1,8 @@
 修改历史列表：
 
+583) 2019.7.27
+583.1) bugfix: redis_set::spop 当键不存在或集合为空时应该返回 false
+
 582) 2019.7.24
 582.1) feature: fstream 新增静态方法 fsize 用来获取指定文件路径的文件大小
 582.2) feature: ifstream 针对 load 新增不同重载接口

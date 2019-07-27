@@ -90,7 +90,7 @@ bool redis_set::spop(const char* key, string& buf)
 
 	hash_slot(key);
 	build_request(2, argv, lens);
-	return get_string(buf) < 0 ? false : true;
+	return get_string(buf) > 0 ? true : false;
 }
 
 int redis_set::scard(const char* key)
