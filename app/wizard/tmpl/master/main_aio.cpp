@@ -20,8 +20,8 @@ int main(int argc, char* argv[])
 		// 日志输出至标准输出
 		acl::log::stdout_open(true);
 
-		// 监听的地址列表，格式：ip:port1,ip:port2,...
-		const char* addrs = ":8888";
+		// 监听的地址列表，格式：ip|port1,ip|port2,...
+		const char* addrs = "|8888";
 		printf("listen on: %s\r\n", addrs);
 
 		// 单独运行方式

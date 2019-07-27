@@ -13,7 +13,7 @@ int main(int argc, char *argv[])
 	ms.set_cfg_bool(var_conf_bool_tab);
 
 	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0) {
-		const char* addr = ":8887";
+		const char* addr = "|8887";
 
 		acl::log::stdout_open(true);
 		if (argc >= 4) {
