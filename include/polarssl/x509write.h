@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file x509write.h
  *
  * \brief X509 buffer writing functionality

@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "global/global.h"
 #include "global/util.h"
 #include "rpc/rpc_manager.h"
@@ -62,7 +62,7 @@ smtp_client& smtp_client::set_from(const char* s)
 
 smtp_client& smtp_client::add_to(const char* s)
 {
-	ACL_ARGV* tokens = acl_argv_split(s, ";,ï¼Œï¼› \t\r\n");
+	ACL_ARGV* tokens = acl_argv_split(s, ";,£¬£» \t\r\n");
 	ACL_ITER iter;
 
 	acl_foreach(iter, tokens)
@@ -110,7 +110,7 @@ struct UP_CTX
 };
 
 //////////////////////////////////////////////////////////////////////////
-// ä¸»çº¿ç¨‹ä¸­è¿è¡Œ
+// Ö÷Ïß³ÌÖÐÔËÐÐ
 
 void smtp_client::rpc_onover()
 {
@@ -130,13 +130,13 @@ void smtp_client::rpc_wakeup(void* ctx)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// å­çº¿ç¨‹ä¸­è¿è¡Œ
+// ×ÓÏß³ÌÖÐÔËÐÐ
 
 void smtp_client::rpc_run()
 {
 	UP_CTX* up;
 
-	// åˆ›å»ºé‚®ä»¶å†…å®¹
+	// ´´½¨ÓÊ¼þÄÚÈÝ
 	acl::ifstream in;
 	if (create_mail(in) == false)
 		return;
@@ -146,7 +146,7 @@ void smtp_client::rpc_run()
 	gettimeofday(&begin, NULL);
 
 	//////////////////////////////////////////////////////////////////////////
-	// åŸŸåè§£æžè¿‡ç¨‹
+	// ÓòÃû½âÎö¹ý³Ì
 
 	gettimeofday(&last, NULL);
 	if (get_ip() == false)
@@ -154,7 +154,7 @@ void smtp_client::rpc_run()
 		up = new UP_CTX;
 		up->curr = 0;
 		up->total = (size_t) in.fsize();
-		up->msg.format("è§£æž smtp åŸŸåï¼š%s å¤±è´¥ï¼", smtp_addr_.c_str());
+		up->msg.format("½âÎö smtp ÓòÃû£º%s Ê§°Ü£¡", smtp_addr_.c_str());
 		rpc_signal(up);
 
 		return;
@@ -165,12 +165,12 @@ void smtp_client::rpc_run()
 	smtp_addr.format("%s:%d", smtp_ip_.c_str(), smtp_port_);
 
 	//////////////////////////////////////////////////////////////////////////
-	// è¿œç¨‹è¿žæŽ¥ SMTP æœåŠ¡å™¨
+	// Ô¶³ÌÁ¬½Ó SMTP ·þÎñÆ÷
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("è¿žæŽ¥ SMTP æœåŠ¡å™¨ ...");
+	up->msg.format("Á¬½Ó SMTP ·þÎñÆ÷ ...");
 	rpc_signal(up);
 
 	SMTP_CLIENT* conn = smtp_open(smtp_addr.c_str(), connect_timeout_,
@@ -181,7 +181,7 @@ void smtp_client::rpc_run()
 		up = new UP_CTX;
 		up->curr = 0;
 		up->total = (size_t) in.fsize();
-		up->msg.format("è¿žæŽ¥ smtp æœåŠ¡å™¨ï¼š%s å¤±è´¥ï¼", smtp_addr.c_str());
+		up->msg.format("Á¬½Ó smtp ·þÎñÆ÷£º%s Ê§°Ü£¡", smtp_addr.c_str());
 		rpc_signal(up);
 		return;
 	}
@@ -196,7 +196,7 @@ void smtp_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("æŽ¥æ”¶ SMTP æœåŠ¡å™¨æ¬¢è¿Žä¿¡æ¯(è¿žæŽ¥è€—æ—¶ %.2f æ¯«ç§’) ...",
+	up->msg.format("½ÓÊÕ SMTP ·þÎñÆ÷»¶Ó­ÐÅÏ¢(Á¬½ÓºÄÊ± %.2f ºÁÃë) ...",
 		meter_.smtp_connect_elapsed);
 	rpc_signal(up);
 
@@ -217,12 +217,12 @@ void smtp_client::rpc_run()
 	gettimeofday(&now, NULL);
 	meter_.smtp_banner_elapsed = util::stamp_sub(&now, &last);
 	//////////////////////////////////////////////////////////////////////////
-	// è®¤è¯ç”¨æˆ·èº«ä»½
+	// ÈÏÖ¤ÓÃ»§Éí·Ý
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("è®¤è¯ç”¨æˆ·èº«ä»½ ...");
+	up->msg.format("ÈÏÖ¤ÓÃ»§Éí·Ý ...");
 	rpc_signal(up);
 
 	gettimeofday(&last, NULL);
@@ -244,7 +244,7 @@ void smtp_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = (size_t) in.fsize();
-	up->msg.format("å‘é€é‚®ä»¶ä¿¡å°(è®¤è¯è€—æ—¶ %.2f æ¯«ç§’) ...",
+	up->msg.format("·¢ËÍÓÊ¼þÐÅ·â(ÈÏÖ¤ºÄÊ± %.2f ºÁÃë) ...",
 		meter_.smtp_auth_elapsed);
 	rpc_signal(up);
 
@@ -299,7 +299,7 @@ void smtp_client::rpc_run()
 
 	meter_.smtp_envelope_eplased = util::stamp_sub(&now, &envelop_begin);
 
-	// å‘é€é‚®ä»¶å†…å®¹
+	// ·¢ËÍÓÊ¼þÄÚÈÝ
 
 	char buf[8192];
 	int  ret;
@@ -321,11 +321,11 @@ void smtp_client::rpc_run()
 		up = new UP_CTX;
 		up->curr = n;
 		up->total = (size_t) in.fsize();
-		up->msg.format("å‘é€é‚®ä»¶ä¸­(%d/%d å­—èŠ‚) ...", up->curr, up->total);
+		up->msg.format("·¢ËÍÓÊ¼þÖÐ(%d/%d ×Ö½Ú) ...", up->curr, up->total);
 		rpc_signal(up);
 	}
 
-	/* å‘é€ \r\n.\r\n è¡¨ç¤ºé‚®ä»¶æ•°æ®å‘é€å®Œæ¯• */
+	/* ·¢ËÍ \r\n.\r\n ±íÊ¾ÓÊ¼þÊý¾Ý·¢ËÍÍê±Ï */
 	if (smtp_data_end(conn) != 0)
 	{
 		logger_error("send . error: %s, code: %d\r\n",
@@ -341,7 +341,7 @@ void smtp_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = (size_t) in.fsize();
 	up->total = (size_t) in.fsize();
-	up->msg.format("å‘é€é‚®ä»¶æˆåŠŸï¼(%d/%d å­—èŠ‚, è€—æ—¶ %.2f æ¯«ç§’)",
+	up->msg.format("·¢ËÍÓÊ¼þ³É¹¦£¡(%d/%d ×Ö½Ú, ºÄÊ± %.2f ºÁÃë)",
 		up->curr, up->total, meter_.smtp_total_elapsed);
 	rpc_signal(up);
 }

@@ -1,4 +1,4 @@
-ï»¿// winaioDlg.cpp : å®ç°æ–‡ä»¶
+// winaioDlg.cpp : ÊµÏÖÎÄ¼ş
 //
 
 #include "stdafx.h"
@@ -29,20 +29,20 @@
 
 using namespace acl;
 
-// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
+// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -60,7 +60,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CwinaioDlg å¯¹è¯æ¡†
+// CwinaioDlg ¶Ô»°¿ò
 
 
 
@@ -119,15 +119,15 @@ BEGIN_MESSAGE_MAP(CwinaioDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CwinaioDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CwinaioDlg ÏûÏ¢´¦Àí³ÌĞò
 
 BOOL CwinaioDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
+	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
 
-	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
+	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -143,12 +143,12 @@ BOOL CwinaioDlg::OnInitDialog()
 		}
 	}
 
-	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
-	//  æ‰§è¡Œæ­¤æ“ä½œ
-	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
-	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
+	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
+	//  Ö´ĞĞ´Ë²Ù×÷
+	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
+	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
 
-	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
 	GetDlgItem(IDC_SET_TIMER)->EnableWindow(TRUE);
 	GetDlgItem(IDC_DEL_TIMER)->EnableWindow(FALSE);
 
@@ -162,7 +162,7 @@ BOOL CwinaioDlg::OnInitDialog()
 	handle_ = new acl::aio_handle(ENGINE_WINMSG);
 	InitCtx();
 	
-	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
+	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
 }
 
 void CwinaioDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -178,19 +178,19 @@ void CwinaioDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
-//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
-//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
+// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
+//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
+//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
 
 void CwinaioDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
+		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
+		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -198,7 +198,7 @@ void CwinaioDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ç»˜åˆ¶å›¾æ ‡
+		// »æÖÆÍ¼±ê
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -207,7 +207,7 @@ void CwinaioDlg::OnPaint()
 	}
 }
 
-//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
+//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
 HCURSOR CwinaioDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -215,28 +215,28 @@ HCURSOR CwinaioDlg::OnQueryDragIcon()
 
 void CwinaioDlg::OnBnClickedListen()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 
 	sstream_ = new aio_listen_stream(handle_);
 	const char* addr = "127.0.0.1:9001";
-	// ç›‘å¬æŒ‡å®šçš„åœ°å€
+	// ¼àÌıÖ¸¶¨µÄµØÖ·
 	if (sstream_->open(addr) == false)
 	{
 		std::cout << "open " << addr << " error!" << std::endl;
-		sstream_->close(); // é‡Šæ”¾ç›‘å¬æµæ‰€å èµ„æº
-		handle_->check(); // æ¸…ç©ºæ‰€æœ‰å¼‚æ­¥æµæ‰€å èµ„æº
-		acl_pthread_end(); // æ¸…é™¤æ‰€æœ‰çº¿ç¨‹æ‰€å èµ„æº
+		sstream_->close(); // ÊÍ·Å¼àÌıÁ÷ËùÕ¼×ÊÔ´
+		handle_->check(); // Çå¿ÕËùÓĞÒì²½Á÷ËùÕ¼×ÊÔ´
+		acl_pthread_end(); // Çå³ıËùÓĞÏß³ÌËùÕ¼×ÊÔ´
 		return;
 	}
 	GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
-	// åˆ›å»ºå›è°ƒç±»å¯¹è±¡ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾æ—¶è‡ªåŠ¨è°ƒç”¨æ­¤ç±»å¯¹è±¡çš„å›è°ƒè¿‡ç¨‹
+	// ´´½¨»Øµ÷Àà¶ÔÏó£¬µ±ÓĞĞÂÁ¬½Óµ½´ïÊ±×Ô¶¯µ÷ÓÃ´ËÀà¶ÔÏóµÄ»Øµ÷¹ı³Ì
 	sstream_->add_accept_callback(&callback_);
 	std::cout << "Listen: " << addr << " ok!" << std::endl;
 }
 
 void CwinaioDlg::OnBnClickedConnect()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	if (CConnectClientCallback::connect_server(&client_ctx_,
 			client_ctx_.id_begin) == false)
 	{
@@ -248,7 +248,7 @@ void CwinaioDlg::OnBnClickedConnect()
 
 void CwinaioDlg::OnBnClickedSetTimer()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 
 	GetDlgItem(IDC_SET_TIMER)->EnableWindow(FALSE);
 	GetDlgItem(IDC_DEL_TIMER)->EnableWindow(TRUE);
@@ -264,7 +264,7 @@ void CwinaioDlg::OnBnClickedSetTimer()
 
 void CwinaioDlg::OnBnClickedDelTimer()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	GetDlgItem(IDC_SET_TIMER)->EnableWindow(TRUE);
 	GetDlgItem(IDC_DEL_TIMER)->EnableWindow(FALSE);
 
@@ -279,13 +279,13 @@ void CwinaioDlg::OnBnClickedDelTimer()
 
 void CwinaioDlg::OnBnClickedOk()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	if (sstream_)
 	{
-		sstream_->close(); // é‡Šæ”¾ç›‘å¬æµèµ„æº
-		handle_->check(); // æœ€åæ¸…ç©ºä¸€ä¸‹æ‰€æœ‰å¼‚æ­¥æµæ‰€å çš„èµ„æº
+		sstream_->close(); // ÊÍ·Å¼àÌıÁ÷×ÊÔ´
+		handle_->check(); // ×îºóÇå¿ÕÒ»ÏÂËùÓĞÒì²½Á÷ËùÕ¼µÄ×ÊÔ´
 	}
-	acl_pthread_end(); // æ¸…é™¤æ‰€æœ‰çº¿ç¨‹æ‰€å èµ„æº
+	acl_pthread_end(); // Çå³ıËùÓĞÏß³ÌËùÕ¼×ÊÔ´
 
 	OnOK();
 }
@@ -297,7 +297,7 @@ void CwinaioDlg::on_increase()
 
 void CwinaioDlg::on_decrease()
 {
-	/* è·å¾—å¼‚æ­¥å¼•æ“ä¸­å—ç›‘æ§çš„å¼‚æ­¥æµä¸ªæ•° */
+	/* »ñµÃÒì²½ÒıÇæÖĞÊÜ¼à¿ØµÄÒì²½Á÷¸öÊı */
 	int nleft = handle_->length();
 	if (client_ctx_.nopen_total == client_ctx_.nopen_limit && nleft == 1)
 	{
@@ -310,7 +310,7 @@ void CwinaioDlg::on_decrease()
 }
 void CwinaioDlg::OnBnClickedButtonKeepTimer()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	keep_timer_ = true;
 	GetDlgItem(IDC_BUTTON_KEEP_TIMER)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_NO_KEEP_TIMER)->EnableWindow(TRUE);
@@ -318,7 +318,7 @@ void CwinaioDlg::OnBnClickedButtonKeepTimer()
 
 void CwinaioDlg::OnBnClickedButtonNoKeepTimer()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	keep_timer_ = false;
 	GetDlgItem(IDC_BUTTON_KEEP_TIMER)->EnableWindow(TRUE);
 	GetDlgItem(IDC_BUTTON_NO_KEEP_TIMER)->EnableWindow(FALSE);
@@ -326,7 +326,7 @@ void CwinaioDlg::OnBnClickedButtonNoKeepTimer()
 
 void CwinaioDlg::OnBnClickedButtonMemtest()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CMemory* m = new CMemory;
 	delete m;
 }

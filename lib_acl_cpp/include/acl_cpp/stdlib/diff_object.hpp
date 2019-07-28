@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "dbuf_pool.hpp"
 
@@ -8,14 +8,14 @@ namespace acl
 class diff_manager;
 
 /**
- * å·®é›†æ¯”è¾ƒçº¯è™šç±»ï¼Œå­ç±»å¿…é¡»ç»§æ‰¿è¯¥ç±»ï¼Œå¹¶å®ç°å…¶ä¸­çš„çº¯è™šæ–¹æ³•
- * è¯¥ç±»ç»§æ‰¿äº dbuf_obj ç±»ï¼Œä¾¿äºç”± dbuf_guard ç»Ÿä¸€ç®¡ç†ï¼Œç»Ÿä¸€é”€æ¯
+ * ²î¼¯±È½Ï´¿ĞéÀà£¬×ÓÀà±ØĞë¼Ì³Ğ¸ÃÀà£¬²¢ÊµÏÖÆäÖĞµÄ´¿Ğé·½·¨
+ * ¸ÃÀà¼Ì³ĞÓÚ dbuf_obj Àà£¬±ãÓÚÓÉ dbuf_guard Í³Ò»¹ÜÀí£¬Í³Ò»Ïú»Ù
  */
 class diff_object : public dbuf_obj
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
+	 * ¹¹Ôìº¯Êı
 	 * @param manager {diff_manager&}
 	 */
 	diff_object(diff_manager& manager);
@@ -23,29 +23,29 @@ public:
 	virtual ~diff_object(void) {}
 
 	/**
-	 * çº¯è™šæ¥å£ï¼Œè·å¾—è¯¥å¯¹è±¡çš„é”®å­—ç¬¦ä¸²
-	 * @return {const char*} å¿…é¡»è¿”å›éç©ºå­—ç¬¦ä¸²
+	 * ´¿Ğé½Ó¿Ú£¬»ñµÃ¸Ã¶ÔÏóµÄ¼ü×Ö·û´®
+	 * @return {const char*} ±ØĞë·µ»Ø·Ç¿Õ×Ö·û´®
 	 */
 	virtual const char* get_key(void) const = 0;
 
 	/**
-	 * çº¯è™šæ¥å£ï¼Œè·å¾—è¯¥å¯¹è±¡çš„å€¼å­—ç¬¦ä¸²
-	 * @return {const char*} å¿…é¡»è¿”å›éç©ºå­—ç¬¦ä¸²
+	 * ´¿Ğé½Ó¿Ú£¬»ñµÃ¸Ã¶ÔÏóµÄÖµ×Ö·û´®
+	 * @return {const char*} ±ØĞë·µ»Ø·Ç¿Õ×Ö·û´®
 	 */
 	virtual const char* get_val(void) const = 0;
 
 	/**
-	 * çº¯è™šæ¥å£ï¼Œç”¨æ¥æ¯”è¾ƒä¸¤ä¸ªå¯¹è±¡
+	 * ´¿Ğé½Ó¿Ú£¬ÓÃÀ´±È½ÏÁ½¸ö¶ÔÏó
 	 * @param obj {const diff_object&}
-	 * @return {bool} ä¸¤ä¸ªå¯¹è±¡æ˜¯å¦ç›¸ç­‰
+	 * @return {bool} Á½¸ö¶ÔÏóÊÇ·ñÏàµÈ
 	 */
 	virtual bool operator== (const diff_object& obj) const = 0;
 
 	/**
-	 * æ˜¯å¦æ˜¯ä¸åœ¨ç»™å®šåŒºé—´èŒƒå›´ï¼ˆé—­åŒºé—´ï¼‰çš„å¤šä½™æ•°æ®
-	 * @param range_from {long long} èµ·å§‹ä½ç½®
-	 * @param range_to {long long} ç»“æŸä½ç½®
-	 * @return {bool} æ˜¯å¦æ˜¯è¶…è¿‡ç»™å®šåŒºé—´èŒƒå›´çš„å¤šä½™æ•°æ®å¯¹è±¡
+	 * ÊÇ·ñÊÇ²»ÔÚ¸ø¶¨Çø¼ä·¶Î§£¨±ÕÇø¼ä£©µÄ¶àÓàÊı¾İ
+	 * @param range_from {long long} ÆğÊ¼Î»ÖÃ
+	 * @param range_to {long long} ½áÊøÎ»ÖÃ
+	 * @return {bool} ÊÇ·ñÊÇ³¬¹ı¸ø¶¨Çø¼ä·¶Î§µÄ¶àÓàÊı¾İ¶ÔÏó
 	 */
 	virtual bool check_range(long long range_from, long long range_to) const
 	{

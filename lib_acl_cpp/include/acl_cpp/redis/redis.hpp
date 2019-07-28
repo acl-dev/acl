@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "redis_connection.hpp"
 #include "redis_hash.hpp"
@@ -22,7 +22,7 @@ namespace acl
 {
 
 /**
- * è¯¥ç±»ç»§æ‰¿äº†æ‰€æœ‰ redis å‘½ä»¤ç±»ï¼Œå› æ­¤å¯ä»¥åªé€šè¿‡æ­¤ç±»å¯¹è±¡ä½¿ç”¨æ‰€æœ‰çš„ redis å‘½ä»¤ã€‚
+ * ¸ÃÀà¼Ì³ĞÁËËùÓĞ redis ÃüÁîÀà£¬Òò´Ë¿ÉÒÔÖ»Í¨¹ı´ËÀà¶ÔÏóÊ¹ÓÃËùÓĞµÄ redis ÃüÁî¡£
  * inherit all the redis command class, which include all the commands
  * of Key, String, Hash, List, Set, SortedSet, Hyperloglog, Pub/Sub,
  * Transaction, Script, Connection, Server.
@@ -46,20 +46,20 @@ class ACL_CPP_API redis
 {
 public:
 	/**
-	 * éé›†ç¾¤æ–¹å¼çš„æ„é€ å‡½æ•°
+	 * ·Ç¼¯Èº·½Ê½µÄ¹¹Ôìº¯Êı
 	 * the constructor with no redis cluster
-	 * @param conn {redis_client*} ä¸€ä¸ª redis èŠ‚ç‚¹çš„è¿æ¥å¯¹è±¡
+	 * @param conn {redis_client*} Ò»¸ö redis ½ÚµãµÄÁ¬½Ó¶ÔÏó
 	 *  one redis node's connection
 	 */
 	redis(redis_client* conn = NULL);
 
 	/**
-	 * é›†ç¾¤æ–¹å¼çš„æ„é€ å‡½æ•°
+	 * ¼¯Èº·½Ê½µÄ¹¹Ôìº¯Êı
 	 * the constructor in redis cluster mode
-	 * @param cluster {redis_client_cluster*} é›†ç¾¤å¯¹è±¡
+	 * @param cluster {redis_client_cluster*} ¼¯Èº¶ÔÏó
 	 *  the redis cluster object
-	 * @param max_conns {size_t} é›†ç¾¤æ–¹å¼ä¸‹è¿æ¥æ¯ä¸ª redis æœåŠ¡èŠ‚ç‚¹çš„
-	 *  è¿æ¥æ± è¿æ¥ä¸Šé™ï¼Œå¦‚æœè®¾ä¸º 0ï¼Œåˆ™æ¯ä¸ªè¿æ¥æ± æ²¡æœ‰ä¸Šé™é™åˆ¶
+	 * @param max_conns {size_t} ¼¯Èº·½Ê½ÏÂÁ¬½ÓÃ¿¸ö redis ·şÎñ½ÚµãµÄ
+	 *  Á¬½Ó³ØÁ¬½ÓÉÏÏŞ£¬Èç¹ûÉèÎª 0£¬ÔòÃ¿¸öÁ¬½Ó³ØÃ»ÓĞÉÏÏŞÏŞÖÆ
 	 *  the limit of each connections pool in redis cluster mode,
 	 *  there is no connections limit of each pool if the max_conns
 	 *  is set to 0.

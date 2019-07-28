@@ -1,9 +1,9 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "req_callback.h"
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 static char *var_cfg_backend_addr;
 static char *var_cfg_request_file;

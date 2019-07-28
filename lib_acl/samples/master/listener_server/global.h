@@ -1,4 +1,4 @@
-﻿
+
 #ifndef	__SPOOL_GLOBAL_INCLUDE_H__
 #define	__SPOOL_GLOBAL_INCLUDE_H__
 

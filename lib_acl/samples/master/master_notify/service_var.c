@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "service_var.h"
 
 char *var_cfg_debug_msg;
@@ -17,7 +17,7 @@ char *var_cfg_host_ip;
 ACL_CFG_STR_TABLE var_conf_str_tab[] = {
 	{ "debug_msg", "test_msg", &var_cfg_debug_msg },
 
-	/* 邮件通知相关 */
+	/* �ʼ�֪ͨ��� */
 
 	{ "smtpd_addr", "mail.inc365.com:25", &var_cfg_smtpd_addr },
 	{ "mail_from", "acl_notify@acl_master.com", &var_cfg_mail_from },

@@ -1,4 +1,4 @@
-﻿#ifndef __SINGLECTRL_INCLUDE_H__
+#ifndef __SINGLECTRL_INCLUDE_H__
 #define __SINGLECTRL_INCLUDE_H__
 
 class  CSingleCtrl

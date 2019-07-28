@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -43,7 +43,7 @@ static int __test_stop(AUT_LINE *test_line, void *arg acl_unused)
 	return (0);
 }
 
-/* å†…éƒ¨ç¡çœ å‘½ä»¤å‡½æ•° */
+/* ÄÚ²¿Ë¯ÃßÃüÁîº¯Êı */
 static int __test_sleep(AUT_LINE *test_line, void *arg acl_unused)
 {
 	const char *myname = "__test_sleep";
@@ -65,7 +65,7 @@ static int __test_sleep(AUT_LINE *test_line, void *arg acl_unused)
 	return (0);
 }
 
-/* å†…éƒ¨æš‚åœå‡½æ•° */
+/* ÄÚ²¿ÔİÍ£º¯Êı */
 static int __test_pause(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
 	const char *myname = "__test_pause";
@@ -174,9 +174,9 @@ static int __test_goto(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 	return (1);
 }
 
-/* å†…éƒ¨ç”¨åŠ¨ä½œå‘½ä»¤è¡¨ */
+/* ÄÚ²¿ÓÃ¶¯×÷ÃüÁî±í */
 static AUT_FN_ITEM __inner_fn_tab[] = {
-	/* ç”¨æ¥åœæ­¢æ‰§è¡Œä¸‹ä¸€æ­¥æµ‹è¯•æ“ä½œ */
+	/* ÓÃÀ´Í£Ö¹Ö´ĞĞÏÂÒ»²½²âÊÔ²Ù×÷ */
 	{ VAR_AUT_STOP, "__test_stop", __test_stop, NULL, 1 },
 	{ VAR_AUT_SLEEP, "__test_sleep", __test_sleep, NULL, 1 },
 	{ VAR_AUT_PAUSE, "__test_pause", __test_pause, NULL, 1 },
@@ -293,7 +293,7 @@ int aut_start(void)
 		return (-1);
 	}
 
-	/* å–å¾—æ‰€æœ‰æœ‰æ•ˆé…ç½®è¡Œçš„æ€»å’Œ */
+	/* È¡µÃËùÓĞÓĞĞ§ÅäÖÃĞĞµÄ×ÜºÍ */
 	max = aut_size();
 	if (max <= 0) {
 		aut_log_error("%s(%d): configure's size is null",
@@ -349,11 +349,11 @@ void aut_register(const AUT_FN_ITEM test_fn_tab[])
 	if (__all_callback_fn == NULL)
 		__all_callback_fn = acl_array_create(10);
 
-	/* å…ˆå¢åŠ æ³¨å†Œå†…éƒ¨ç”¨å‘½ä»¤ */
+	/* ÏÈÔö¼Ó×¢²áÄÚ²¿ÓÃÃüÁî */
 	for (i = 0; __inner_fn_tab[i].cmd_name != NULL; i++)
 		__add_fn_item(__all_callback_fn, &__inner_fn_tab[i], 1);
 
-	/* å†æ³¨å†Œå¤–éƒ¨ä¼ æ¥çš„å‘½ä»¤ä»»åŠ¡ */
+	/* ÔÙ×¢²áÍâ²¿´«À´µÄÃüÁîÈÎÎñ */
 	for (i = 0; test_fn_tab[i].cmd_name != NULL; i++)
 		__add_fn_item(__all_callback_fn, &test_fn_tab[i], 0);
 }

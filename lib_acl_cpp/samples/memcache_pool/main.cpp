@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 
 using namespace acl;
@@ -9,29 +9,29 @@ static string __action("get");
 static char __data[256];
 static acl_pthread_pool_t* __thr_pool = NULL;
 
-// åˆå§‹åŒ–è¿‡ç¨‹
+// ³õÊ¼»¯¹ı³Ì
 static void init(const char* addr, int count)
 {
-	// åˆ›å»º HTTP è¯·æ±‚è¿æ¥æ± å¯¹è±¡
+	// ´´½¨ HTTP ÇëÇóÁ¬½Ó³Ø¶ÔÏó
 	__conn_pool = new memcache_pool(addr, count);
 
-	// åˆ›å»ºçº¿ç¨‹æ± 
+	// ´´½¨Ïß³Ì³Ø
 	__thr_pool = acl_thread_pool_create(count, 60);
 }
 
-// è¿›ç¨‹é€€å‡ºå‰æ¸…ç†èµ„æº
+// ½ø³ÌÍË³öÇ°ÇåÀí×ÊÔ´
 static void end(void)
 {
-	// é”€æ¯çº¿ç¨‹æ± 
+	// Ïú»ÙÏß³Ì³Ø
 	acl_pthread_pool_destroy(__thr_pool);
 
-	// é”€æ¯è¿æ¥æ± 
+	// Ïú»ÙÁ¬½Ó³Ø
 	delete __conn_pool;
 }
 
 static const char* __keypre = "test";
 
-// MEMCACHE è¯·æ±‚è¿‡ç¨‹ï¼Œå‘æœåŠ¡å™¨å‘é€è¯·æ±‚åä»æœåŠ¡å™¨è¯»å–å“åº”æ•°æ®
+// MEMCACHE ÇëÇó¹ı³Ì£¬Ïò·şÎñÆ÷·¢ËÍÇëÇóºó´Ó·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Êı¾İ
 static bool memcache_get(memcache* conn, const char* key)
 {
 	string buf;
@@ -46,7 +46,7 @@ static bool memcache_get(memcache* conn, const char* key)
 		return true;
 }
 
-// å‘ MEMCACHE æœåŠ¡å™¨æ·»åŠ æ•°æ®
+// Ïò MEMCACHE ·şÎñÆ÷Ìí¼ÓÊı¾İ
 static bool memcache_set(memcache* conn, const char* key)
 {
 	string buf;
@@ -61,7 +61,7 @@ static bool memcache_set(memcache* conn, const char* key)
 		return true;
 }
 
-// çº¿ç¨‹å¤„ç†è¿‡ç¨‹
+// Ïß³Ì´¦Àí¹ı³Ì
 static void thread_main(void* ctx)
 {
 	char* key = (char*) ctx;
@@ -84,7 +84,7 @@ static void thread_main(void* ctx)
 	int   i = 0;
 	for (; i < __loop_count; i++)
 	{
-		// ä»è¿æ¥æ± ä¸­è·å–ä¸€ä¸ª HTTP è¿æ¥
+		// ´ÓÁ¬½Ó³ØÖĞ»ñÈ¡Ò»¸ö HTTP Á¬½Ó
 		memcache* conn = (memcache*) __conn_pool->peek();
 		if (conn == NULL)
 		{
@@ -94,11 +94,11 @@ static void thread_main(void* ctx)
 
 		keybuf.format("%s_%d", key, i);
 
-		// å¼€å§‹æ–°çš„ HTTP è¯·æ±‚è¿‡ç¨‹
+		// ¿ªÊ¼ĞÂµÄ HTTP ÇëÇó¹ı³Ì
 		if (action_fn(conn, keybuf.c_str()) == false)
 		{
 			printf("one request failed, close connection\r\n");
-			// é”™è¯¯è¿æ¥éœ€è¦å…³é—­
+			// ´íÎóÁ¬½ÓĞèÒª¹Ø±Õ
 			__conn_pool->put(conn, false);
 			break;
 		}
@@ -122,7 +122,7 @@ static void thread_main(void* ctx)
 
 static void run(int cocurrent, char* key)
 {
-	// å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ä»»åŠ¡
+	// ÏòÏß³Ì³ØÖĞÌí¼ÓÈÎÎñ
 	for (int i = 0; i < cocurrent; i++)
 		acl_pthread_pool_add(__thr_pool, thread_main, key);
 }
@@ -143,7 +143,7 @@ int main(int argc, char* argv[])
 	string addr("127.0.0.1:11211");
 	string  key;
 
-	// åˆå§‹åŒ– acl åº“
+	// ³õÊ¼»¯ acl ¿â
 	acl::acl_cpp_init();
 
 	while ((ch = getopt(argc, argv, "hs:n:c:k:a:")) > 0)

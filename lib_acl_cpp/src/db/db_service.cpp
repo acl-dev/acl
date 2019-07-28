@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
 #include "acl_cpp/stdlib/string.hpp"
@@ -23,7 +23,7 @@ struct DB_IPC_DAT
 };
 
 //////////////////////////////////////////////////////////////////////////
-// å·¥ä½œå­çº¿ç¨‹çš„å¤„ç†ç±»
+// ¹¤×÷×ÓÏß³ÌµÄ´¦ÀíÀà
 
 class db_ipc_request : public ipc_request
 {
@@ -41,7 +41,7 @@ public:
 	}
 
 protected:
-	// åŸºç±» ipc_request ä¼šè‡ªåŠ¨è°ƒç”¨æ­¤å›è°ƒå¤„ç†è¯·æ±‚è¿‡ç¨‹
+	// »ùÀà ipc_request »á×Ô¶¯µ÷ÓÃ´Ë»Øµ÷´¦ÀíÇëÇó¹ı³Ì
 	virtual void run(ipc_client* ipc)
 	{
 		DB_IPC_DAT data;
@@ -64,17 +64,17 @@ protected:
 			ipc->send_message(DB_ERR_EXEC_SQL, &data, sizeof(data));
 		} else {
 			data.rows = db_->get_result();
-			// ä¿®æ”¹æ“ä½œï¼Œéœ€è¦å–ä¸€ä¸‹ SQL æ“ä½œå½±å“çš„è¡Œæ•°
+			// ĞŞ¸Ä²Ù×÷£¬ĞèÒªÈ¡Ò»ÏÂ SQL ²Ù×÷Ó°ÏìµÄĞĞÊı
 			data.affected_rows = db_->affect_count();
 			ipc->send_message(DB_OK, &data, sizeof(data));
 		}
-		// å› ä¸ºæœ¬è¯·æ±‚å¯¹è±¡æ˜¯åŠ¨æ€åˆ›å»ºçš„ï¼Œæ‰€ä»¥éœ€è¦é‡Šæ”¾
+		// ÒòÎª±¾ÇëÇó¶ÔÏóÊÇ¶¯Ì¬´´½¨µÄ£¬ËùÒÔĞèÒªÊÍ·Å
 		delete this;
 	}
 
 #ifdef ACL_WINDOWS
 
-	// åŸºç±»è™šæ¥å£ï¼Œä½¿å­çº¿ç¨‹å¯ä»¥åœ¨æ‰§è¡Œå®Œä»»åŠ¡åå‘ä¸»çº¿ç¨‹å‘é€ ACL_WINDOWS çª—å£æ¶ˆæ¯
+	// »ùÀàĞé½Ó¿Ú£¬Ê¹×ÓÏß³Ì¿ÉÒÔÔÚÖ´ĞĞÍêÈÎÎñºóÏòÖ÷Ïß³Ì·¢ËÍ ACL_WINDOWS ´°¿ÚÏûÏ¢
 
 	virtual void run(HWND hWnd)
 	{
@@ -98,12 +98,12 @@ protected:
 			::PostMessage(hWnd, DB_ERR_EXEC_SQL + WM_USER, 0, (LPARAM) data);
 		} else {
 			data->rows = db_->get_result();
-			// ä¿®æ”¹æ“ä½œï¼Œéœ€è¦å–ä¸€ä¸‹ SQL æ“ä½œå½±å“çš„è¡Œæ•°
+			// ĞŞ¸Ä²Ù×÷£¬ĞèÒªÈ¡Ò»ÏÂ SQL ²Ù×÷Ó°ÏìµÄĞĞÊı
 			data->affected_rows = db_->affect_count();
 			::PostMessage(hWnd, DB_OK + WM_USER, 0, (LPARAM) data);
 			//::SendMessage(hWnd, DB_OK + WM_USER, 0, (LPARAM) data);
 		}
-		// å› ä¸ºæœ¬è¯·æ±‚å¯¹è±¡æ˜¯åŠ¨æ€åˆ›å»ºçš„ï¼Œæ‰€ä»¥éœ€è¦é‡Šæ”¾
+		// ÒòÎª±¾ÇëÇó¶ÔÏóÊÇ¶¯Ì¬´´½¨µÄ£¬ËùÒÔĞèÒªÊÍ·Å
 		delete this;
 	}
 #endif
@@ -115,7 +115,7 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
-// æœåŠ¡çº¿ç¨‹ä¸å­çº¿ç¨‹æ± ä¹‹é—´çš„ IPC é€šé“ç±»å®šä¹‰
+// ·şÎñÏß³ÌÓë×ÓÏß³Ì³ØÖ®¼äµÄ IPC Í¨µÀÀà¶¨Òå
 
 class db_ipc : public ipc_client
 {
@@ -172,7 +172,7 @@ db_service::db_service(size_t dblimit /* = 100 */, int nthread /* = 2 */,
 : ipc_service(nthread, win32_gui)
 , dbsize_(0)
 {
-	// å½“é‡‡ç”¨çº¿ç¨‹æ± æ–¹å¼ï¼Œåˆ™æ•°æ®åº“è¿æ¥æ± çš„æœ€å¤§å€¼ä¸åº”è¶…è¿‡çº¿ç¨‹æ•°
+	// µ±²ÉÓÃÏß³Ì³Ø·½Ê½£¬ÔòÊı¾İ¿âÁ¬½Ó³ØµÄ×î´óÖµ²»Ó¦³¬¹ıÏß³ÌÊı
 	if (nthread > 1) {
 		dblimit_ = (int) dblimit > nthread ? nthread : dblimit;
 	} else {
@@ -196,26 +196,26 @@ db_service::~db_service(void)
 void db_service::on_accept(acl::aio_socket_stream* client)
 {
 	ACL_SOCKET fd = client->get_socket();
-	// åœ¨æ­¤å¤„è®¾ç½®æœåŠ¡ç«¯æ¥æ”¶åˆ°çš„å¥—æ¥å£çš„ SO_LINGER é€‰é¡¹ï¼Œ
-	// ä»¥ä¿è¯åœ¨å¥—æ¥å£å…³é—­åå…¶èµ„æºèƒ½å¾—åˆ°ç«‹åˆ»é‡Šæ”¾ï¼Œè™½ç„¶ä¸€èˆ¬
-	// è€Œè¨€è®¾ç½®æ­¤é€‰é¡¹ä¼šæœ‰å±å®³ï¼Œä½†è€ƒè™‘åˆ°æœåŠ¡ç«¯åªæœ‰æ¥æ”¶åˆ°
-	// å®Œæ•´çš„å®¢æˆ·ç«¯æ•°æ®åæ‰ä¼šè°ƒç”¨å…³é—­æ“ä½œï¼Œæ‰€ä»¥åº”è¯¥ä¸ä¼š
-	// é€ æˆæ•°æ®å‘é€ä¸å…¨çš„é—®é¢˜ï¼Œåˆ‡è®°ï¼Œä¸åº”åœ¨å®¢æˆ·ç«¯çš„å…³é—­
-	// æ“ä½œä¸­è®¾ç½® SO_LINGER é€‰é¡¹ï¼Œä»¥é˜²æ•°æ®æœªå®Œæ•´å‘é€
-	// åœ¨æœåŠ¡ç«¯è®¾ç½®æ¥æ”¶è¿æ¥çš„ SO_LINGER é€‰é¡¹ï¼Œæœ‰åŠ©äºæ“ä½œ
-	// ç³»ç»Ÿå¿«é€Ÿå›æ”¶å¥—æ¥å£èµ„æº
+	// ÔÚ´Ë´¦ÉèÖÃ·şÎñ¶Ë½ÓÊÕµ½µÄÌ×½Ó¿ÚµÄ SO_LINGER Ñ¡Ïî£¬
+	// ÒÔ±£Ö¤ÔÚÌ×½Ó¿Ú¹Ø±ÕºóÆä×ÊÔ´ÄÜµÃµ½Á¢¿ÌÊÍ·Å£¬ËäÈ»Ò»°ã
+	// ¶øÑÔÉèÖÃ´ËÑ¡Ïî»áÓĞÎ£º¦£¬µ«¿¼ÂÇµ½·şÎñ¶ËÖ»ÓĞ½ÓÊÕµ½
+	// ÍêÕûµÄ¿Í»§¶ËÊı¾İºó²Å»áµ÷ÓÃ¹Ø±Õ²Ù×÷£¬ËùÒÔÓ¦¸Ã²»»á
+	// Ôì³ÉÊı¾İ·¢ËÍ²»È«µÄÎÊÌâ£¬ÇĞ¼Ç£¬²»Ó¦ÔÚ¿Í»§¶ËµÄ¹Ø±Õ
+	// ²Ù×÷ÖĞÉèÖÃ SO_LINGER Ñ¡Ïî£¬ÒÔ·ÀÊı¾İÎ´ÍêÕû·¢ËÍ
+	// ÔÚ·şÎñ¶ËÉèÖÃ½ÓÊÕÁ¬½ÓµÄ SO_LINGER Ñ¡Ïî£¬ÓĞÖúÓÚ²Ù×÷
+	// ÏµÍ³¿ìËÙ»ØÊÕÌ×½Ó¿Ú×ÊÔ´
 	acl_tcp_so_linger(fd, 1, 0);
 
 	ipc_client* ipc = NEW db_ipc(this, magic_);
 	ipc->open(client);
 
-	// æ·»åŠ æœåŠ¡çº¿ç¨‹çš„æ¶ˆæ¯å¤„ç†
+	// Ìí¼Ó·şÎñÏß³ÌµÄÏûÏ¢´¦Àí
 
 	ipc->append_message(DB_OK);
 	ipc->append_message(DB_ERR_OPEN);
 	ipc->append_message(DB_ERR_EXEC_SQL);
 
-	// å¼‚æ­¥ç­‰å¾…æ¶ˆæ¯
+	// Òì²½µÈ´ıÏûÏ¢
 	ipc->wait();
 }
 
@@ -251,7 +251,7 @@ void db_service::win32_proc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		push_back(dat->db);
 		query->destroy();
 
-		// åœ¨é‡‡ç”¨ ACL_WINDOWS æ¶ˆæ¯æ—¶è¯¥å¯¹è±¡ç©ºé—´æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦é‡Šæ”¾
+		// ÔÚ²ÉÓÃ ACL_WINDOWS ÏûÏ¢Ê±¸Ã¶ÔÏó¿Õ¼äÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔĞèÒªÊÍ·Å
 		acl_myfree(dat);
 	}
 }
@@ -272,10 +272,10 @@ void db_service::sql_select(const char* sql, db_query* query)
 		dbpool_.erase(it);
 	}
 
-	// åˆ›å»ºå­çº¿ç¨‹çš„è¯·æ±‚å¯¹è±¡
+	// ´´½¨×ÓÏß³ÌµÄÇëÇó¶ÔÏó
 	db_ipc_request* ipc_req = NEW db_ipc_request(db, sql, query, true);
 
-	// è°ƒç”¨åŸºç±» ipc_service è¯·æ±‚è¿‡ç¨‹
+	// µ÷ÓÃ»ùÀà ipc_service ÇëÇó¹ı³Ì
 	request(ipc_req);
 }
 
@@ -293,10 +293,10 @@ void db_service::sql_update(const char* sql, db_query* query)
 		dbpool_.erase(it);
 	}
 
-	// åˆ›å»ºå­çº¿ç¨‹çš„è¯·æ±‚å¯¹è±¡
+	// ´´½¨×ÓÏß³ÌµÄÇëÇó¶ÔÏó
 	db_ipc_request* ipc_req = NEW db_ipc_request(db, sql, query, false);
 
-	// è°ƒç”¨åŸºç±» ipc_service è¯·æ±‚è¿‡ç¨‹
+	// µ÷ÓÃ»ùÀà ipc_service ÇëÇó¹ı³Ì
 	request(ipc_req);
 }
 

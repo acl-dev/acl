@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class http_thread;
 
@@ -8,10 +8,10 @@ public:
 	db_store();
 	~db_store();
 
-	// æ›´æ–°æ•°æ®è¡¨
+	// ¸üĞÂÊı¾İ±í
 	bool db_update(const http_thread& http);
 
-	// åˆ›å»ºæ•°æ®è¡¨
+	// ´´½¨Êı¾İ±í
 	bool db_create();
 
 private:

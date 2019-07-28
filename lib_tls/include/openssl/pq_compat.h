@@ -1,4 +1,4 @@
-﻿/* crypto/pqueue/pqueue_compat.h */
+/* crypto/pqueue/pqueue_compat.h */
 /* 
  * DTLS implementation written by Nagendra Modadugu
  * (nagendra@cs.stanford.edu) for the OpenSSL project 2005.  

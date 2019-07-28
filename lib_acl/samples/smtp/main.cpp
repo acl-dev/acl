@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 
 static int echo_cmd(ACL_VSTREAM *client, const char *s)
 {

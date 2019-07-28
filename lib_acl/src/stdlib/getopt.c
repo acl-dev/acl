@@ -1,4 +1,4 @@
-﻿
+
 /*
 Newsgroups: mod.std.unix
 Subject: public domain AT&T getopt source

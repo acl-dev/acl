@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/http/http_utils.hpp"
@@ -23,7 +23,7 @@ http_download::http_download(const char* url, const char* addr /* = NULL */)
 	}
 
 	url_ = acl_mystrdup(url);
-	req_ = NEW http_request(addr_);  // HTTP è¯·æ±‚å¯¹è±¡
+	req_ = NEW http_request(addr_);  // HTTP ÇëÇó¶ÔÏó
 	req_->request_header().set_url(url_)
 		.set_content_type("text/html")
 		.set_host(addr_);
@@ -76,7 +76,7 @@ bool http_download::reset(const char* url /* = NULL */,
 	if (req_) {
 		delete req_;
 	}
-	req_ = NEW http_request(addr_);  // HTTP è¯·æ±‚å¯¹è±¡
+	req_ = NEW http_request(addr_);  // HTTP ÇëÇó¶ÔÏó
 	req_->request_header().set_url(url_)
 		.set_content_type("text/html")
 		.set_host(addr_);
@@ -118,15 +118,15 @@ bool http_download::get(acl_int64 from /* = -1 */, acl_int64 to /* = -1 */,
 
 bool http_download::save_total(const char* body, size_t len)
 {
-	// å‘é€ä¸å¸¦ range å­—æ®µçš„ä¸‹è½½è¯·æ±‚
+	// ·¢ËÍ²»´ø range ×Ö¶ÎµÄÏÂÔØÇëÇó
 
 	http_method_t method = body && len > 0
 		? HTTP_METHOD_POST : HTTP_METHOD_GET;
 
-	// è®¾ç½® HTTP è¯·æ±‚å¤´ä¿¡æ¯
+	// ÉèÖÃ HTTP ÇëÇóÍ·ÐÅÏ¢
 	req_->request_header().set_method(method);
 
-	// å‘é€ HTTP è¯·æ±‚æ•°æ®
+	// ·¢ËÍ HTTP ÇëÇóÊý¾Ý
 	if (!req_->request(body, len)) {
 		logger_error("send request error, url: %s", url_);
 		return false;
@@ -137,22 +137,22 @@ bool http_download::save_total(const char* body, size_t len)
 		logger_fatal("no connect to server");
 	}
 
-	// å›žè°ƒå­ç±»è™šæŽ¥å£å®žçŽ°
+	// »Øµ÷×ÓÀàÐé½Ó¿ÚÊµÏÖ
 	if (!on_response(conn)) {
 		logger_error("deny url(%s)'s download", url_);
 		return false;
 	}
 
-	// èŽ·å¾—æ–‡ä»¶é•¿åº¦
+	// »ñµÃÎÄ¼þ³¤¶È
 	acl_int64 length = conn->body_length();
 
-	// å›žè°ƒå­ç±»è™šæŽ¥å£å®žçŽ°
+	// »Øµ÷×ÓÀàÐé½Ó¿ÚÊµÏÖ
 	if (!on_length(length)) {
 		logger_error("deny url(%s)'s download", url_);
 		return false;
 	}
 
-	// å¼€å§‹ä¸‹è½½æ•°æ®ä½“è¿‡ç¨‹
+	// ¿ªÊ¼ÏÂÔØÊý¾ÝÌå¹ý³Ì
 	return save(req_);
 }
 
@@ -171,22 +171,22 @@ bool http_download::save_range(const char* body, size_t len,
 	http_method_t method = body && len > 0
 		? HTTP_METHOD_POST : HTTP_METHOD_GET;
 
-	// å‘é€å¸¦ range å­—æ®µçš„ä¸‹è½½è¯·æ±‚
+	// ·¢ËÍ´ø range ×Ö¶ÎµÄÏÂÔØÇëÇó
 
-	// è®¾ç½® HTTP è¯·æ±‚å¤´ä¿¡æ¯
+	// ÉèÖÃ HTTP ÇëÇóÍ·ÐÅÏ¢
 	req_->request_header().set_method(method)
 		.set_range(range_from, range_to);
 
-	// å‘é€ HTTP è¯·æ±‚æ•°æ®
+	// ·¢ËÍ HTTP ÇëÇóÊý¾Ý
 	if (!req_->request(NULL, 0)) {
 		logger_error("send request error, url: %s", url_);
 		return false;
 	}
 
-	// èŽ·å¾—æ–‡ä»¶é•¿åº¦
+	// »ñµÃÎÄ¼þ³¤¶È
 	acl_int64 length = req_->get_range_max();
 	if (length <= 0) {
-		// å¯èƒ½æ˜¯æœåŠ¡å™¨ä¸æ”¯æŒ range åŠŸèƒ½ï¼Œæ‰€ä»¥è¿˜å¾—ä»Žå¤´ä¸‹è½½
+		// ¿ÉÄÜÊÇ·þÎñÆ÷²»Ö§³Ö range ¹¦ÄÜ£¬ËùÒÔ»¹µÃ´ÓÍ·ÏÂÔØ
 		return false;
 	}
 
@@ -195,13 +195,13 @@ bool http_download::save_range(const char* body, size_t len,
 		logger_fatal("no connect to server");
 	}
 
-	// å›žè°ƒå­ç±»è™šæŽ¥å£å®žçŽ°
+	// »Øµ÷×ÓÀàÐé½Ó¿ÚÊµÏÖ
 	if (!on_response(conn)) {
 		logger_error("deny url(%s)'s download", url_);
 		return false;
 	}
 
-	// å›žè°ƒå­ç±»è™šæŽ¥å£å®žçŽ°
+	// »Øµ÷×ÓÀàÐé½Ó¿ÚÊµÏÖ
 	if (!on_length(length)) {
 		logger_error("deny url(%s)'s download", url_);
 		return false;
@@ -212,7 +212,7 @@ bool http_download::save_range(const char* body, size_t len,
 
 bool http_download::save(http_request* req)
 {
-	// å¼€å§‹æŽ¥æ”¶æœåŠ¡ç«¯çš„ HTTP æ•°æ®ä½“
+	// ¿ªÊ¼½ÓÊÕ·þÎñ¶ËµÄ HTTP Êý¾ÝÌå
 
 	char  buf[8192];
 	int   ret;

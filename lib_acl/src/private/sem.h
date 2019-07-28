@@ -1,4 +1,4 @@
-﻿
+
 #ifndef	__INTERNAL_SEM_INCLUDE_H__
 #define	__INTERNAL_SEM_INCLUDE_H__
 

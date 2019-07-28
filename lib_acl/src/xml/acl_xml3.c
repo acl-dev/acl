@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include <string.h>
@@ -238,7 +238,7 @@ static ACL_XML3_NODE *xml_iter_next(ACL_ITER *it, ACL_XML3 *xml)
 
 	node = (struct ACL_XML3_NODE*) it->data;
 
-	/* å…ˆéå†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
+	/* ÏÈ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã */
 
 	ring_ptr = acl_ring_succ(&node->children);
 	if (ring_ptr != &node->children) {
@@ -248,7 +248,7 @@ static ACL_XML3_NODE *xml_iter_next(ACL_ITER *it, ACL_XML3 *xml)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹éå†å®Œæ¯•ï¼Œå†éå†å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄ×Ó½Úµã±éÀúÍê±Ï£¬ÔÙ±éÀúµ±Ç°½ÚµãµÄĞÖµÜ½Úµã */
 
 	parent = acl_xml3_node_parent(node);
 	ring_ptr = acl_ring_succ(&node->node);
@@ -259,7 +259,7 @@ static ACL_XML3_NODE *xml_iter_next(ACL_ITER *it, ACL_XML3 *xml)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹éå†å®Œæ¯•ï¼Œæœ€åéå†å½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄĞÖµÜ½Úµã±éÀúÍê±Ï£¬×îºó±éÀúµ±Ç°½ÚµãµÄ¸¸½ÚµãµÄĞÖµÜ½Úµã */
 
 	do {
 		if (parent == xml->root)
@@ -280,7 +280,7 @@ static ACL_XML3_NODE *xml_iter_next(ACL_ITER *it, ACL_XML3 *xml)
 		}
 	} while (ring_ptr != &xml->root->children);
 
-	/* éå†å®Œæ‰€æœ‰èŠ‚ç‚¹ */
+	/* ±éÀúÍêËùÓĞ½Úµã */
 
 	it->ptr = it->data = NULL;
 	return NULL;
@@ -314,7 +314,7 @@ static ACL_XML3_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML3 *xml)
 
 	node = (struct ACL_XML3_NODE*) it->data;
 
-	/* å…ˆéå†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
+	/* ÏÈ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã */
 
 	ring_ptr = acl_ring_pred(&node->children);
 	if (ring_ptr != &node->children) {
@@ -324,7 +324,7 @@ static ACL_XML3_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML3 *xml)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹éå†å®Œæ¯•ï¼Œå†éå†å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄ×Ó½Úµã±éÀúÍê±Ï£¬ÔÙ±éÀúµ±Ç°½ÚµãµÄĞÖµÜ½Úµã */
 
 	parent = acl_xml3_node_parent(node);
 	ring_ptr = acl_ring_pred(&node->node);
@@ -335,7 +335,7 @@ static ACL_XML3_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML3 *xml)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹éå†å®Œæ¯•ï¼Œæœ€åéå†å½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄĞÖµÜ½Úµã±éÀúÍê±Ï£¬×îºó±éÀúµ±Ç°½ÚµãµÄ¸¸½ÚµãµÄĞÖµÜ½Úµã */
 
 	do {
 		if (parent == xml->root)
@@ -355,7 +355,7 @@ static ACL_XML3_NODE *xml_iter_prev(ACL_ITER *it, ACL_XML3 *xml)
 		}
 	} while (ring_ptr != &xml->root->children);
 
-	/* éå†å®Œæ‰€æœ‰èŠ‚ç‚¹ */
+	/* ±éÀúÍêËùÓĞ½Úµã */
 
 	it->ptr = it->data = NULL;
 	return NULL;
@@ -452,18 +452,18 @@ int acl_xml3_is_closure(ACL_XML3 *xml)
 	ACL_RING *ring_ptr;
 	ACL_XML3_NODE *node;
 
-	/* è·å¾— xml->root èŠ‚ç‚¹çš„æœ€åä¸€ä¸ªä¸€çº§å­èŠ‚ç‚¹ */
+	/* »ñµÃ xml->root ½ÚµãµÄ×îºóÒ»¸öÒ»¼¶×Ó½Úµã */
 	ring_ptr = acl_ring_succ(&xml->root->children);
 
 	if (ring_ptr == &xml->root->children) {
-		/* è¯´æ˜æ²¡æœ‰çœŸå®å­èŠ‚ç‚¹ */
+		/* ËµÃ÷Ã»ÓĞÕæÊµ×Ó½Úµã */
 		return 0;
 	}
 
 	node = acl_ring_to_appl(ring_ptr, ACL_XML3_NODE, node);
 
 	if ((node->flag & ACL_XML3_F_SELF_CL)) {
-		/* è¯´æ˜è¯¥èŠ‚ç‚¹æ˜¯è‡ªé—­åˆèŠ‚ç‚¹ */
+		/* ËµÃ÷¸Ã½ÚµãÊÇ×Ô±ÕºÏ½Úµã */
 		return 1;
 	}
 
@@ -471,7 +471,7 @@ int acl_xml3_is_closure(ACL_XML3 *xml)
 		return 1;
 	}
 
-	/* è¯´æ˜æœ€åä¸€ä¸ªä¸€çº§å­èŠ‚ç‚¹è¿˜æœªå¤„ç†å®Œæ¯• */
+	/* ËµÃ÷×îºóÒ»¸öÒ»¼¶×Ó½Úµã»¹Î´´¦ÀíÍê±Ï */
 	return 0;
 }
 
@@ -492,20 +492,20 @@ int acl_xml3_is_complete(ACL_XML3 *xml, const char *tag)
 	}
 
 	if (last_node == NULL)
-		/* è¯´æ˜æ²¡æœ‰çœŸå®å­èŠ‚ç‚¹ */
+		/* ËµÃ÷Ã»ÓĞÕæÊµ×Ó½Úµã */
 		return 0;
 
 	if ((last_node->flag & ACL_XML3_F_SELF_CL))
-		/* è¯´æ˜è¯¥èŠ‚ç‚¹æ˜¯è‡ªé—­åˆèŠ‚ç‚¹ */
+		/* ËµÃ÷¸Ã½ÚµãÊÇ×Ô±ÕºÏ½Úµã */
 		return 1;
 
 	if (last_node->status != ACL_XML3_S_RGT)
-		/* è¯´æ˜æœ€åä¸€ä¸ªä¸€çº§å­èŠ‚ç‚¹è¿˜æœªå¤„ç†å®Œæ¯• */
+		/* ËµÃ÷×îºóÒ»¸öÒ»¼¶×Ó½Úµã»¹Î´´¦ÀíÍê±Ï */
 		return 0;
 
 	if (strcasecmp(last_node->rtag, tag) == 0)
 		return 1;
 
-	/* è¯´æ˜ xml ä¸­çš„æœ€åä¸€ä¸ªèŠ‚ç‚¹ä¸æ‰€ç»™æ ‡ç­¾ä¸åŒ¹é… */
+	/* ËµÃ÷ xml ÖĞµÄ×îºóÒ»¸ö½ÚµãÓëËù¸ø±êÇ©²»Æ¥Åä */
 	return 0;
 }

@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -156,7 +156,7 @@ void aio_stream::add_close_callback(aio_callback* callback)
 {
 	acl_assert(callback);
 
-	// å…ˆæŸ¥è¯¢è¯¥å›è°ƒå¯¹è±¡å·²ç»å­˜åœ¨
+	// ÏÈ²éÑ¯¸Ã»Øµ÷¶ÔÏóÒÑ¾­´æÔÚ
 	std::list<AIO_CALLBACK*>::iterator it =
 		close_callbacks_.begin();
 	for (; it != close_callbacks_.end(); ++it) {
@@ -168,7 +168,7 @@ void aio_stream::add_close_callback(aio_callback* callback)
 		}
 	}
 
-	// æ‰¾ä¸€ä¸ªç©ºä½
+	// ÕÒÒ»¸ö¿ÕÎ»
 	it = close_callbacks_.begin();
 	for (; it != close_callbacks_.end(); ++it) {
 		if ((*it)->callback == NULL) {
@@ -178,13 +178,13 @@ void aio_stream::add_close_callback(aio_callback* callback)
 		}
 	}
 
-	// åˆ†é…ä¸€ä¸ªæ–°çš„ä½ç½®
+	// ·ÖÅäÒ»¸öĞÂµÄÎ»ÖÃ
 	AIO_CALLBACK* ac = (AIO_CALLBACK*)
 		acl_mycalloc(1, sizeof(AIO_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
-	// æ·»åŠ è¿›å›è°ƒå¯¹è±¡é˜Ÿåˆ—ä¸­
+	// Ìí¼Ó½ø»Øµ÷¶ÔÏó¶ÓÁĞÖĞ
 	close_callbacks_.push_back(ac);
 }
 
@@ -192,7 +192,7 @@ void aio_stream::add_timeout_callback(aio_callback* callback)
 {
 	acl_assert(callback);
 
-	// å…ˆæŸ¥è¯¢è¯¥å›è°ƒå¯¹è±¡å·²ç»å­˜åœ¨
+	// ÏÈ²éÑ¯¸Ã»Øµ÷¶ÔÏóÒÑ¾­´æÔÚ
 	std::list<AIO_CALLBACK*>::iterator it =
 		timeout_callbacks_.begin();
 	for (; it != timeout_callbacks_.end(); ++it) {
@@ -204,7 +204,7 @@ void aio_stream::add_timeout_callback(aio_callback* callback)
 		}
 	}
 
-	// æ‰¾ä¸€ä¸ªç©ºä½
+	// ÕÒÒ»¸ö¿ÕÎ»
 	it = timeout_callbacks_.begin();
 	for (; it != timeout_callbacks_.end(); ++it) {
 		if ((*it)->callback == NULL) {
@@ -214,13 +214,13 @@ void aio_stream::add_timeout_callback(aio_callback* callback)
 		}
 	}
 
-	// åˆ†é…ä¸€ä¸ªæ–°çš„ä½ç½®
+	// ·ÖÅäÒ»¸öĞÂµÄÎ»ÖÃ
 	AIO_CALLBACK* ac = (AIO_CALLBACK*)
 		acl_mycalloc(1, sizeof(AIO_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
-	// æ·»åŠ è¿›å›è°ƒå¯¹è±¡é˜Ÿåˆ—ä¸­
+	// Ìí¼Ó½ø»Øµ÷¶ÔÏó¶ÓÁĞÖĞ
 	timeout_callbacks_.push_back(ac);
 }
 
@@ -392,12 +392,12 @@ void aio_stream::hook_error(void)
 	}
 
 	error_hooked_ = true;
-	handle_->increase();  // å¢åŠ å¼‚æ­¥æµè®¡æ•°
+	handle_->increase();  // Ôö¼ÓÒì²½Á÷¼ÆÊı
 
-	// æ³¨å†Œå›è°ƒå‡½æ•°ä»¥æˆªè·å…³é—­æ—¶çš„è¿‡ç¨‹
+	// ×¢²á»Øµ÷º¯ÊıÒÔ½Ø»ñ¹Ø±ÕÊ±µÄ¹ı³Ì
 	acl_aio_add_close_hook(stream_, close_callback, this);
 
-	// æ³¨å†Œå›è°ƒå‡½æ•°ä»¥æˆªè·è¶…æ—¶æ—¶çš„è¿‡ç¨‹
+	// ×¢²á»Øµ÷º¯ÊıÒÔ½Ø»ñ³¬Ê±Ê±µÄ¹ı³Ì
 	acl_aio_add_timeo_hook(stream_, timeout_callback, this);
 }
 
@@ -488,7 +488,7 @@ stream_hook* aio_stream::setup_hook(stream_hook* hook)
 		acl_vstream_add_object(vstream, HOOK_KEY, this);
 
 		if (hook->open(vstream) == false) {
-			// å¦‚æœæ‰“å¼€å¤±è´¥ï¼Œåˆ™æ¢å¤
+			// Èç¹û´ò¿ªÊ§°Ü£¬Ôò»Ö¸´
 
 			vstream->fread_fn  = read_fn;
 			vstream->fwrite_fn = write_fn;
@@ -506,7 +506,7 @@ stream_hook* aio_stream::setup_hook(stream_hook* hook)
 		acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(vstream));
 
 		if (hook->open(vstream) == false) {
-			// å¦‚æœæ‰“å¼€å¤±è´¥ï¼Œåˆ™æ¢å¤
+			// Èç¹û´ò¿ªÊ§°Ü£¬Ôò»Ö¸´
 
 			vstream->read_fn = read_fn;
 			vstream->write_fn = write_fn;

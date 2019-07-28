@@ -1,4 +1,4 @@
-﻿#ifndef MYSQL_SERVICE_THD_ALLOC_INCLUDED
+#ifndef MYSQL_SERVICE_THD_ALLOC_INCLUDED
 /* Copyright (C) 2009 Sun Microsystems, Inc.
 
    This program is free software; you can redistribute it and/or modify

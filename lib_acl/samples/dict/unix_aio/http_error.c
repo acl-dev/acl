@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "http_service.h"
 
 static char reply_error_fmt[] = "HTTP/1.1 %d %s\r\n"

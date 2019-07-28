@@ -1,4 +1,4 @@
-ï»¿// sqlite.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// sqlite.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -38,11 +38,11 @@ static bool tbl_create(acl::db_handle& db)
 	}
 }
 
-// æ·»åŠ è¡¨æ•°æ®
+// Ìí¼Ó±íÊı¾İ
 static bool tbl_insert(acl::db_handle& db, int n)
 {
 	const char* sql_fmt = "insert into group_tbl('group_name', 'uvip_tbl')"
-		" values('ä¸­å›½äºº-%d', 'test')";
+		" values('ÖĞ¹úÈË-%d', 'test')";
 
 	acl::string sql;
 	sql.format(sql_fmt, n);
@@ -66,11 +66,11 @@ static bool tbl_insert(acl::db_handle& db, int n)
 	return (true);
 }
 
-// æŸ¥è¯¢è¡¨æ•°æ®
+// ²éÑ¯±íÊı¾İ
 static int tbl_select(acl::db_handle& db, int n)
 {
 	const char* sql_fmt = "select * from group_tbl where"
-		" group_name='ä¸­å›½äºº-%d' and uvip_tbl='test'";
+		" group_name='ÖĞ¹úÈË-%d' and uvip_tbl='test'";
 
 	acl::string sql;
 	sql.format(sql_fmt, n);
@@ -81,7 +81,7 @@ static int tbl_select(acl::db_handle& db, int n)
 		return (-1);
 	}
 
-	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•ä¸€
+	// ÁĞ³ö²éÑ¯½á¹û·½·¨Ò»
 	const acl::db_rows* result = db.get_result();
 	if (result)
 	{
@@ -97,14 +97,14 @@ static int tbl_select(acl::db_handle& db, int n)
 		}
 	}
 
-	// åˆ—å‡ºæŸ¥è¯¢ç»“æœæ–¹æ³•äºŒ
+	// ÁĞ³ö²éÑ¯½á¹û·½·¨¶ş
 	for (size_t i = 0; i < db.length(); i++)
 	{
 		if (n >= 5)
 			continue;
 		const acl::db_row* row = db[i];
 
-		// å–å‡ºè¯¥è¡Œè®°å½•ä¸­æŸä¸ªå­—æ®µçš„å€¼
+		// È¡³ö¸ÃĞĞ¼ÇÂ¼ÖĞÄ³¸ö×Ö¶ÎµÄÖµ
 		const char* ptr = (*row)["group_name"];
 		if (ptr == NULL)
 		{
@@ -119,15 +119,15 @@ static int tbl_select(acl::db_handle& db, int n)
 
 	int  ret = (int) db.length();
 
-	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
+	// ÊÍ·Å²éÑ¯½á¹û
 	db.free_result();
 	return (ret);
 }
 
-// åˆ é™¤è¡¨æ•°æ®
+// É¾³ı±íÊı¾İ
 static bool tbl_delete(acl::db_handle& db, int n)
 {
-	const char* sql_fmt = "delete from group_tbl where group_name='ä¸­å›½äºº-%d'";
+	const char* sql_fmt = "delete from group_tbl where group_name='ÖĞ¹úÈË-%d'";
 
 	acl::string sql;
 	sql.format(sql_fmt, n);
@@ -145,7 +145,7 @@ static bool tbl_delete(acl::db_handle& db, int n)
 			printf("%s, ", (*row)[j]);
 		printf("\r\n");
 	}
-	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
+	// ÊÍ·Å²éÑ¯½á¹û
 	db.free_result();
 
 	return (true);
@@ -252,14 +252,14 @@ int main(void)
 		path = libname;
 
 	out.format("%s path: %s\r\n", libname, path.c_str());
-	// è®¾ç½®åŠ¨æ€åº“åŠ è½½çš„å…¨è·¯å¾„
+	// ÉèÖÃ¶¯Ì¬¿â¼ÓÔØµÄÈ«Â·¾¶
 	acl::db_handle::set_loadpath(path);
 
-	//acl::string dbfile("æµ‹è¯•æ•°æ®åº“.db");
+	//acl::string dbfile("²âÊÔÊı¾İ¿â.db");
 	acl::string dbfile("./path1/path2/mydb.db");
 
-	// db_sqlite ç±»å¯¹è±¡çš„å£°æ˜éœ€åœ¨ set_loadpath ä¹‹åï¼Œå› ä¸ºåœ¨ db_sqlite çš„
-	// æ„é€ å‡½æ•°ä¸­éœ€è¦è¿è¡ŒåŠ è½½ libsqlite3.so
+	// db_sqlite Àà¶ÔÏóµÄÉùÃ÷ĞèÔÚ set_loadpath Ö®ºó£¬ÒòÎªÔÚ db_sqlite µÄ
+	// ¹¹Ôìº¯ÊıÖĞĞèÒªÔËĞĞ¼ÓÔØ libsqlite3.so
 	acl::db_sqlite db(dbfile, "gbk");
 
 	if (db.open() == false)
@@ -278,7 +278,7 @@ int main(void)
 		return 1;
 	}
 
-	// é…ç½®æ•°æ®åº“å¼•æ“
+	// ÅäÖÃÊı¾İ¿âÒıÇæ
 	db.set_conf("PRAGMA synchronous = off");
 	db.set_conf("PRAGMA encoding = \"UTF-8\"");
 	acl::string buf;

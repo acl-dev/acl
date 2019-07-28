@@ -1,4 +1,4 @@
-ï»¿// http_servlet.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// http_servlet.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -24,10 +24,10 @@ public:
 	{
 		res.setStatus(400);
 		res.setContentType("text/xml; charset=gb2312");
-		// å‘é€ http å“åº”å¤´
+		// ·¢ËÍ http ÏìÓ¦Í·
 		if (res.sendHeader() == false)
 			return false;
-		// å‘é€ http å“åº”ä½“
+		// ·¢ËÍ http ÏìÓ¦Ìå
 		string buf("<root error='unkown request method' />\r\n");
 		(void) res.getOutputStream().write(buf);
 		return false;
@@ -48,7 +48,7 @@ public:
 		for (size_t i = 0; environ[i] != NULL; i++)
 			buf << environ[i] << "\r\n";
 
-		// åˆ›å»º HTTP å“åº”å¤´
+		// ´´½¨ HTTP ÏìÓ¦Í·
 		res.setStatus(200);
 		res.setContentType("text/plain");
 		res.setCharacterEncoding("gb2312");
@@ -70,7 +70,7 @@ static void do_run(socket_stream* stream)
 	servlet.doRun(session, stream);
 }
 
-// æœåŠ¡å™¨æ–¹å¼è¿è¡Œæ—¶çš„æœåŠ¡ç±»
+// ·şÎñÆ÷·½Ê½ÔËĞĞÊ±µÄ·şÎñÀà
 class master_service : public master_proc
 {
 public:
@@ -83,15 +83,15 @@ protected:
 	}
 };
 
-// WEB æœåŠ¡æ¨¡å¼
+// WEB ·şÎñÄ£Ê½
 static void do_alone(void)
 {
 	master_service service;
 	printf("listen: 0.0.0.0:8888 ...\r\n");
-	service.run_alone("0.0.0.0:8888", NULL, 0);  // å•ç‹¬è¿è¡Œæ–¹å¼
+	service.run_alone("0.0.0.0:8888", NULL, 0);  // µ¥¶ÀÔËĞĞ·½Ê½
 }
 
-// WEB CGI æ¨¡å¼
+// WEB CGI Ä£Ê½
 static void do_cgi(void)
 {
 	do_run(NULL);
@@ -103,7 +103,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 #endif
 
-	// å¼€å§‹è¿è¡Œ
+	// ¿ªÊ¼ÔËĞĞ
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 		do_alone();
 	else

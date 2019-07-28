@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include <list>
@@ -12,107 +12,107 @@ class mime_code;
 
 struct rfc2047_entry 
 {
-	string* pData;		// æ•°æ®å†…å®¹
-	string* pCharset;	// å­—ç¬¦é›†
-	char  coding;		// ç¼–ç æ ¼å¼ï¼ŒB è¡¨ç¤º BASE64, Q è¡¨ç¤º QP
+	string* pData;		// Êı¾İÄÚÈİ
+	string* pCharset;	// ×Ö·û¼¯
+	char  coding;		// ±àÂë¸ñÊ½£¬B ±íÊ¾ BASE64, Q ±íÊ¾ QP
 };
 
 class ACL_CPP_API rfc2047 : public noncopyable
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param strip_sp {bool} åœ¨è§£ç è¿‡ç¨‹ä¸­æ˜¯å¦å»æ‰å›è½¦æ¢è¡Œç¬¦åŠæ¯è¡Œå¼€å¤´çš„
-	 *  ç©ºæ ¼åŠTAB
-	 * @param addCrlf {bool} åœ¨ç¼–ç è¿‡ç¨‹ä¸­å½“æ•°æ®æ¯”è¾ƒé•¿æ—¶æ˜¯å¦è‡ªåŠ¨æ·»åŠ  "\r\n"
+	 * ¹¹Ôìº¯Êı
+	 * @param strip_sp {bool} ÔÚ½âÂë¹ı³ÌÖĞÊÇ·ñÈ¥µô»Ø³µ»»ĞĞ·û¼°Ã¿ĞĞ¿ªÍ·µÄ
+	 *  ¿Õ¸ñ¼°TAB
+	 * @param addCrlf {bool} ÔÚ±àÂë¹ı³ÌÖĞµ±Êı¾İ±È½Ï³¤Ê±ÊÇ·ñ×Ô¶¯Ìí¼Ó "\r\n"
 	 */
 	rfc2047(bool strip_sp = true, bool addCrlf = true);
 	~rfc2047(void);
 
 	/**
-	 * æµå¼è§£ææ•°æ®, å¯ä»¥å¾ªç¯è°ƒç”¨æ­¤å‡½æ•°, æ¯æ¬¡æ·»åŠ éƒ¨åˆ†æ•°æ®
-	 * ç›´è‡³æ·»åŠ å®Œæ¯•
-	 * @param in {const char*} è¾“å…¥æºå­—ç¬¦ä¸²
-	 * @param n {int} in è¾“å…¥ä¸²çš„é•¿åº¦
+	 * Á÷Ê½½âÎöÊı¾İ, ¿ÉÒÔÑ­»·µ÷ÓÃ´Ëº¯Êı, Ã¿´ÎÌí¼Ó²¿·ÖÊı¾İ
+	 * Ö±ÖÁÌí¼ÓÍê±Ï
+	 * @param in {const char*} ÊäÈëÔ´×Ö·û´®
+	 * @param n {int} in ÊäÈë´®µÄ³¤¶È
 	 */
 	void decode_update(const char* in, int n);
 
 	/**
-	 * å°† rfc2047 è§£æç»“æœè½¬æ¢æˆæŒ‡å®šçš„å­—ç¬¦é›†å­—ç¬¦ä¸², å¦‚æœä¸èƒ½
-	 * æ­£ç¡®è½¬æ¢åˆ™ä¿ç•™æºä¸²å†…å®¹
-	 * @param to_charset {const char*} ç›®æ ‡å­—ç¬¦é›†
-	 * @param out {string*} å­˜å‚¨è½¬æ¢ç»“æœ
-	 * @param addInvalid {bool} å½“ä¸º true æ—¶ï¼Œåˆ™è½¬ç è¿‡ç¨‹ä¸­å¦‚æœé‡åˆ°äº†
-	 *  éæ³•å­—ç¬¦é›†ï¼Œåˆ™ç›´æ¥æ‹·è´ï¼Œå¦åˆ™åˆ™è·³è¿‡ï¼Œé»˜è®¤æƒ…å†µä¸‹æ˜¯ç›´æ¥æ‹·è´
-	 * @return {bool} è½¬æ¢æ˜¯å¦æˆåŠŸ
+	 * ½« rfc2047 ½âÎö½á¹û×ª»»³ÉÖ¸¶¨µÄ×Ö·û¼¯×Ö·û´®, Èç¹û²»ÄÜ
+	 * ÕıÈ·×ª»»Ôò±£ÁôÔ´´®ÄÚÈİ
+	 * @param to_charset {const char*} Ä¿±ê×Ö·û¼¯
+	 * @param out {string*} ´æ´¢×ª»»½á¹û
+	 * @param addInvalid {bool} µ±Îª true Ê±£¬Ôò×ªÂë¹ı³ÌÖĞÈç¹ûÓöµ½ÁË
+	 *  ·Ç·¨×Ö·û¼¯£¬ÔòÖ±½Ó¿½±´£¬·ñÔòÔòÌø¹ı£¬Ä¬ÈÏÇé¿öÏÂÊÇÖ±½Ó¿½±´
+	 * @return {bool} ×ª»»ÊÇ·ñ³É¹¦
 	 */
 	bool decode_finish(const char* to_charset, string* out,
 		bool addInvalid = true);
 
 	/**
-	 * rfc2047 ç¼–ç è¿‡ç¨‹ä¸­æ·»åŠ æ•°æ®
-	 * @param in {const char*} è¾“å…¥æ•°æ®
-	 * @param n {int} in æ•°æ®é•¿åº¦
-	 * @param out {string*} å­˜å‚¨ç¼–ç ç»“æœ
-	 * @param charset {const char*} è¾“å…¥æ•°æ®çš„å­—ç¬¦é›†ç±»å‹
-	 * @param coding {char} ç¼–ç ç±»å‹ï¼Œæ”¯æŒçš„ç¼–ç ç±»å‹æœ‰:
+	 * rfc2047 ±àÂë¹ı³ÌÖĞÌí¼ÓÊı¾İ
+	 * @param in {const char*} ÊäÈëÊı¾İ
+	 * @param n {int} in Êı¾İ³¤¶È
+	 * @param out {string*} ´æ´¢±àÂë½á¹û
+	 * @param charset {const char*} ÊäÈëÊı¾İµÄ×Ö·û¼¯ÀàĞÍ
+	 * @param coding {char} ±àÂëÀàĞÍ£¬Ö§³ÖµÄ±àÂëÀàĞÍÓĞ:
 	 *   B: base64, Q: quoted_printable
-	 * @return {bool} æ£€æŸ¥è¾“å…¥å‚æ•°æ˜¯å¦æ­£ç¡®ä¸”ç¼–ç æ˜¯å¦æˆåŠŸ
+	 * @return {bool} ¼ì²éÊäÈë²ÎÊıÊÇ·ñÕıÈ·ÇÒ±àÂëÊÇ·ñ³É¹¦
 	 */
 	bool encode_update(const char* in, int n, string* out,
 		const char* charset = "gb2312", char coding = 'B');
 
 	/**
-	 * å°† encode_update æ·»åŠ çš„æ•°æ®è¿›è¡Œç¼–ç åå­˜å‚¨äºç”¨æˆ·æŒ‡å®šç¼“å†²åŒº
-	 * @param  out {string*} å­˜å‚¨ç¼–ç ç»“æœçš„ç”¨æˆ·ç¼“å†²åŒº
-	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * ½« encode_update Ìí¼ÓµÄÊı¾İ½øĞĞ±àÂëºó´æ´¢ÓÚÓÃ»§Ö¸¶¨»º³åÇø
+	 * @param  out {string*} ´æ´¢±àÂë½á¹ûµÄÓÃ»§»º³åÇø
+	 * @return {bool} ÊÇ·ñ³É¹¦
 	 */
 	bool encode_finish(string* out);
 
 	/**
-	 * é™æ€ç¼–ç å™¨
-	 * @param in {const char*} è¾“å…¥æ•°æ®åœ°å€
-	 * @param n {int} æ•°æ®é•¿åº¦
-	 * @param out {string*} å­˜å‚¨ç¼–ç ç»“æœçš„ç¼“å†²åŒº
-	 * @param charset {const char*} è¾“å…¥æ•°æ®çš„å­—ç¬¦é›†
-	 * @param coding {char} ç¼–ç ç±»å‹ï¼Œæ”¯æŒçš„ç¼–ç ç±»å‹æœ‰:
+	 * ¾²Ì¬±àÂëÆ÷
+	 * @param in {const char*} ÊäÈëÊı¾İµØÖ·
+	 * @param n {int} Êı¾İ³¤¶È
+	 * @param out {string*} ´æ´¢±àÂë½á¹ûµÄ»º³åÇø
+	 * @param charset {const char*} ÊäÈëÊı¾İµÄ×Ö·û¼¯
+	 * @param coding {char} ±àÂëÀàĞÍ£¬Ö§³ÖµÄ±àÂëÀàĞÍÓĞ:
 	 *   B: base64, Q: quoted_printable
-	 * @param addCrlf {bool} åœ¨ç¼–ç è¿‡ç¨‹ä¸­å½“æ•°æ®æ¯”è¾ƒé•¿æ—¶æ˜¯å¦è‡ªåŠ¨æ·»åŠ  "\r\n"
-	 * @return {bool} ç¼–ç æ˜¯å¦æˆåŠŸ
+	 * @param addCrlf {bool} ÔÚ±àÂë¹ı³ÌÖĞµ±Êı¾İ±È½Ï³¤Ê±ÊÇ·ñ×Ô¶¯Ìí¼Ó "\r\n"
+	 * @return {bool} ±àÂëÊÇ·ñ³É¹¦
 	 */
 	static bool encode(const char* in, int n, string* out,
 		const char* charset = "gb2312", char coding = 'B',
 		bool addCrlf = true);
 
 	/**
-	 * é™æ€è§£ç å™¨
-	 * @param in {const char*} è¾“å…¥æ•°æ®åœ°å€
-	 * @param n {int} æ•°æ®é•¿åº¦
-	 * @param out {string*} å­˜å‚¨è§£ç ç»“æœçš„ç¼“å†²åŒº
-	 * @param to_charset {const char*} ç›®æ ‡å­—ç¬¦é›†
-	 * @param strip_sp {bool} æ˜¯å¦å»æ‰å›è½¦æ¢è¡Œç¬¦åŠæ¯è¡Œå¼€å¤´çš„ç©ºæ ¼åŠTAB
-	 * @param addInvalid {bool} å½“ä¸º true æ—¶ï¼Œåˆ™è½¬ç è¿‡ç¨‹ä¸­å¦‚æœé‡åˆ°äº†
-	 *  éæ³•å­—ç¬¦é›†ï¼Œåˆ™ç›´æ¥æ‹·è´ï¼Œå¦åˆ™åˆ™è·³è¿‡ï¼Œé»˜è®¤æƒ…å†µä¸‹æ˜¯ç›´æ¥æ‹·è´
-	 * @return {bool} è§£ç æ˜¯å¦æˆåŠŸ
+	 * ¾²Ì¬½âÂëÆ÷
+	 * @param in {const char*} ÊäÈëÊı¾İµØÖ·
+	 * @param n {int} Êı¾İ³¤¶È
+	 * @param out {string*} ´æ´¢½âÂë½á¹ûµÄ»º³åÇø
+	 * @param to_charset {const char*} Ä¿±ê×Ö·û¼¯
+	 * @param strip_sp {bool} ÊÇ·ñÈ¥µô»Ø³µ»»ĞĞ·û¼°Ã¿ĞĞ¿ªÍ·µÄ¿Õ¸ñ¼°TAB
+	 * @param addInvalid {bool} µ±Îª true Ê±£¬Ôò×ªÂë¹ı³ÌÖĞÈç¹ûÓöµ½ÁË
+	 *  ·Ç·¨×Ö·û¼¯£¬ÔòÖ±½Ó¿½±´£¬·ñÔòÔòÌø¹ı£¬Ä¬ÈÏÇé¿öÏÂÊÇÖ±½Ó¿½±´
+	 * @return {bool} ½âÂëÊÇ·ñ³É¹¦
 	 */
 	static bool decode(const char* in, int n, string* out,
 		const char* to_charset = "gb2312", bool strip_sp = false,
 		bool addInvalid = true);
 
 	/**
-	 * å°†è§£æç»“æœä»¥é“¾è¡¨çš„å½¢å¼ç»™å‡º
+	 * ½«½âÎö½á¹ûÒÔÁ´±íµÄĞÎÊ½¸ø³ö
 	 * @return {const std::list<rfc2047_entry*>&}
 	 */
 	const std::list<rfc2047_entry*>& get_list(void) const;
 
 	/**
-	 * é‡ç½®è§£æå™¨çŠ¶æ€å, è¯¥è§£æå™¨å¯å†æ¬¡ä½¿ç”¨
-	 * @param strip_sp {bool} æ˜¯å¦å»æ‰å›è½¦æ¢è¡Œç¬¦åŠæ¯è¡Œå¼€å¤´çš„ç©ºæ ¼åŠTAB
+	 * ÖØÖÃ½âÎöÆ÷×´Ì¬ºó, ¸Ã½âÎöÆ÷¿ÉÔÙ´ÎÊ¹ÓÃ
+	 * @param strip_sp {bool} ÊÇ·ñÈ¥µô»Ø³µ»»ĞĞ·û¼°Ã¿ĞĞ¿ªÍ·µÄ¿Õ¸ñ¼°TAB
 	 */
 	void reset(bool strip_sp = true);
 
 	/**
-	 * è°ƒè¯•è¾“å‡ºè§£æç»“æœ
+	 * µ÷ÊÔÊä³ö½âÎö½á¹û
 	 */
 	void debug_rfc2047(void) const;
 
@@ -126,7 +126,7 @@ private:
 	char  m_lastCh;
 
 public:
-	// ä»¥ä¸‹å‡½æ•°ä»…å†…éƒ¨ä½¿ç”¨
+	// ÒÔÏÂº¯Êı½öÄÚ²¿Ê¹ÓÃ
 
 	int status_next(const char* s, int n);
 	int status_data(const char* s, int n);

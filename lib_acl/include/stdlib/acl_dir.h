@@ -1,4 +1,4 @@
-﻿#ifndef ACL_DIR_INCLUDE_H
+#ifndef ACL_DIR_INCLUDE_H
 #define ACL_DIR_INCLUDE_H
 
 #ifdef __cplusplus

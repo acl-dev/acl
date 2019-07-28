@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file gcm.h
  *
  * \brief Galois/Counter mode for AES

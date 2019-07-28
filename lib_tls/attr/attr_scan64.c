@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	attr_scan64 3
  * SUMMARY

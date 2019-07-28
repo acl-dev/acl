@@ -1,30 +1,30 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 static void get_url(const char *method, const char *url,
 	const char *proxy, const char *dump, int out)
 {
-	/* åˆ›å»º HTTP_UTIL è¯·æ±‚å¯¹è±¡ */
+	/* ´´½¨ HTTP_UTIL ÇëÇó¶ÔÏó */
 	HTTP_UTIL *http = http_util_req_new(url, method);
 	int   ret;
 
-	/* å¦‚æœè®¾å®šä»£ç†æœåŠ¡å™¨ï¼Œåˆ™è¿æ¥ä»£ç†æœåŠ¡å™¨åœ°å€ï¼Œ
-	 * å¦åˆ™ä½¿ç”¨ HTTP è¯·æ±‚å¤´é‡ŒæŒ‡å®šçš„åœ°å€
+	/* Èç¹ûÉè¶¨´úÀí·şÎñÆ÷£¬ÔòÁ¬½Ó´úÀí·şÎñÆ÷µØÖ·£¬
+	 * ·ñÔòÊ¹ÓÃ HTTP ÇëÇóÍ·ÀïÖ¸¶¨µÄµØÖ·
 	 */
 
 	if (proxy && *proxy)
 		http_util_set_req_proxy(http, proxy);
 
-	/* è®¾ç½®è½¬å‚¨æ–‡ä»¶ */
+	/* ÉèÖÃ×ª´¢ÎÄ¼ş */
 
 	if (dump && *dump)
 		http_util_set_dump_file(http, dump);
 
-	/* è¾“å‡º HTTP è¯·æ±‚å¤´å†…å®¹ */
+	/* Êä³ö HTTP ÇëÇóÍ·ÄÚÈİ */
 
 	http_hdr_print(&http->hdr_req->hdr, "---request hdr---");
 
-	/* è¿æ¥è¿œç¨‹ http æœåŠ¡å™¨ */
+	/* Á¬½ÓÔ¶³Ì http ·şÎñÆ÷ */
 
 	if (http_util_req_open(http) < 0) {
 		printf("open connection(%s) error\n", http->server_addr);
@@ -32,7 +32,7 @@ static void get_url(const char *method, const char *url,
 		return;
 	}
 
-	/* è¯»å– HTTP æœåŠ¡å™¨å“åº”å¤´*/
+	/* ¶ÁÈ¡ HTTP ·şÎñÆ÷ÏìÓ¦Í·*/
 
 	ret = http_util_get_res_hdr(http);
 	if (ret < 0) {
@@ -41,11 +41,11 @@ static void get_url(const char *method, const char *url,
 		return;
 	}
 
-	/* è¾“å‡º HTTP å“åº”å¤´ */
+	/* Êä³ö HTTP ÏìÓ¦Í· */
 
 	http_hdr_print(&http->hdr_res->hdr, "--- reply http header ---");
 
-	/* å¦‚æœæœ‰æ•°æ®ä½“åˆ™å¼€å§‹è¯»å– HTTP å“åº”æ•°æ®ä½“éƒ¨åˆ† */
+	/* Èç¹ûÓĞÊı¾İÌåÔò¿ªÊ¼¶ÁÈ¡ HTTP ÏìÓ¦Êı¾İÌå²¿·Ö */
 
 	while (1) {
 		char  buf[4096];
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 	int   ch, out = 0;
 	char  url[256], dump[256], proxy[256], method[32];
 
-	acl_lib_init();  /* åˆå§‹åŒ– acl åº“ */
+	acl_lib_init();  /* ³õÊ¼»¯ acl ¿â */
 
 	ACL_SAFE_STRNCPY(method, "GET", sizeof(method));
 	url[0] = 0;

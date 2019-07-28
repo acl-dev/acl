@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_forward.h"
 
 static bool save_info(const char* cmd)

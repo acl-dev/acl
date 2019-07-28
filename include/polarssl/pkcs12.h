@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file pkcs12.h
  *
  * \brief PKCS#12 Personal Information Exchange Syntax

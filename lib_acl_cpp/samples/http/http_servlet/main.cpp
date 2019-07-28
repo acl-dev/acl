@@ -1,37 +1,37 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "master_service.h"
 
 int main(int argc, char* argv[])
 {
-	// åˆå§‹åŒ– acl åº“
+	// ³õÊ¼»¯ acl ¿â
 	acl::acl_cpp_init();
 
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// è®¾ç½®é…ç½®å‚æ•°è¡¨
+	// ÉèÖÃÅäÖÃ²ÎÊı±í
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_int64(var_conf_int64_tab);
 	ms.set_cfg_str(var_conf_str_tab);
 	ms.set_cfg_bool(var_conf_bool_tab);
 
-	// å¼€å§‹è¿è¡Œ
+	// ¿ªÊ¼ÔËĞĞ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
-		acl::log::stdout_open(true);  // æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
+		acl::log::stdout_open(true);  // ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
 		const char* addr = "0.0.0.0:8888";
 		//const char* addr = "/home/zsx/work/acl/trunk/app/wizard/http_server/http.sock";
 		if (argc >= 3)
 			addr = argv[2];
 
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, 0, 1000);  // å•ç‹¬è¿è¡Œæ–¹å¼
+		ms.run_alone(addr, NULL, 0, 1000);  // µ¥¶ÀÔËĞĞ·½Ê½
 
 		printf("Enter any key to exit now\r\n");
 		getchar();
 	}
 	else
-		ms.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
+		ms.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
 
 	return 0;
 }

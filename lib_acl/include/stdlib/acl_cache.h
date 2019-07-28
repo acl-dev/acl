@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_CACHE_INCLUDE_H
+#ifndef	ACL_CACHE_INCLUDE_H
 #define	ACL_CACHE_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -10,186 +10,186 @@ extern "C" {
 #include <time.h>
 
 /**
- * ç¼“å­˜æ± ä¸­å­˜å‚¨çš„ç¼“å­˜å¯¹è±¡
+ * »º´æ³ØÖÐ´æ´¢µÄ»º´æ¶ÔÏó
  */
 typedef struct ACL_CACHE_INFO {
-	char *key;		/**< å¥å€¼ */
-	void *value;		/**< ç”¨æˆ·åŠ¨æ€å¯¹è±¡ */
-	int   nrefer;		/**< å¼•ç”¨è®¡æ•° */
-	time_t when_timeout;	/**< è¿‡æœŸæ—¶é—´æˆª */
-	ACL_RING entry;		/**< å†…éƒ¨æ•°æ®é“¾æˆå‘˜ */
+	char *key;		/**< ½¡Öµ */
+	void *value;		/**< ÓÃ»§¶¯Ì¬¶ÔÏó */
+	int   nrefer;		/**< ÒýÓÃ¼ÆÊý */
+	time_t when_timeout;	/**< ¹ýÆÚÊ±¼ä½Ø */
+	ACL_RING entry;		/**< ÄÚ²¿Êý¾ÝÁ´³ÉÔ± */
 } ACL_CACHE_INFO;
 
 /**
- * ç¼“å†²æ± 
+ * »º³å³Ø
  */
 typedef struct ACL_CACHE { 
-	ACL_HTABLE *table;	/**< å“ˆå¸Œè¡¨ */
-	ACL_RING ring;		/**< å°†è¢«åˆ é™¤çš„å¯¹è±¡çš„æ•°æ®é“¾è¡¨ */
-	int   max_size;		/**< ç¼“å­˜æ± å®¹é‡å¤§å°é™åˆ¶å€¼ */
-	int   size;		/**< å½“å‰ç¼“å­˜æ± ä¸­çš„ç¼“å­˜å¯¹è±¡ä¸ªæ•° */
-	int   timeout;		/**< æ¯ä¸ªç¼“å­˜å¯¹è±¡çš„ç”Ÿå­˜æ—¶é•¿(ç§’) */
+	ACL_HTABLE *table;	/**< ¹þÏ£±í */
+	ACL_RING ring;		/**< ½«±»É¾³ýµÄ¶ÔÏóµÄÊý¾ÝÁ´±í */
+	int   max_size;		/**< »º´æ³ØÈÝÁ¿´óÐ¡ÏÞÖÆÖµ */
+	int   size;		/**< µ±Ç°»º´æ³ØÖÐµÄ»º´æ¶ÔÏó¸öÊý */
+	int   timeout;		/**< Ã¿¸ö»º´æ¶ÔÏóµÄÉú´æÊ±³¤(Ãë) */
 
-	/**< é‡Šæ”¾ç”¨æˆ·åŠ¨æ€å¯¹è±¡çš„é‡Šæ”¾å›žè°ƒå‡½æ•° */
+	/**< ÊÍ·ÅÓÃ»§¶¯Ì¬¶ÔÏóµÄÊÍ·Å»Øµ÷º¯Êý */
 	void  (*free_fn)(const ACL_CACHE_INFO*, void *);
-	acl_pthread_mutex_t lock;	/**< ç¼“å­˜æ± é” */
-	ACL_SLICE *slice;		/**< å†…å­˜åˆ‡ç‰‡å¯¹è±¡ */
+	acl_pthread_mutex_t lock;	/**< »º´æ³ØËø */
+	ACL_SLICE *slice;		/**< ÄÚ´æÇÐÆ¬¶ÔÏó */
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êý */
 	void *(*iter_head)(ACL_ITER*, struct ACL_CACHE*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
 	void *(*iter_next)(ACL_ITER*, struct ACL_CACHE*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êý */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_CACHE*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_CACHE*);
-	/* å–è¿­ä»£å™¨å…³è”çš„å½“å‰å®¹å™¨æˆå‘˜ç»“æž„å¯¹è±¡ */
+	/* È¡µü´úÆ÷¹ØÁªµÄµ±Ç°ÈÝÆ÷³ÉÔ±½á¹¹¶ÔÏó */
 	ACL_CACHE_INFO *(*iter_info)(ACL_ITER*, struct ACL_CACHE*);
 } ACL_CACHE;
 
 /**
- * åˆ›å»ºä¸€ä¸ªç¼“å­˜æ± ï¼Œå¹¶è®¾ç½®æ¯ä¸ªç¼“å­˜å¯¹è±¡çš„æœ€å¤§ç¼“å­˜æ—¶é•¿åŠè¯¥ç¼“å­˜æ± çš„ç©ºé—´å®¹é‡é™åˆ¶
- * @param max_size {int} è¯¥ç¼“å­˜æ± çš„å®¹é‡é™åˆ¶
- * @param timeout {int} æ¯ä¸ªç¼“å­˜å¯¹è±¡çš„ç¼“å­˜æ—¶é•¿
- * @param free_fn {void (*)(void*)} ç”¨æˆ·çº§çš„é‡Šæ”¾ç¼“å­˜å¯¹è±¡çš„å‡½æ•°
- * @return {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
+ * ´´½¨Ò»¸ö»º´æ³Ø£¬²¢ÉèÖÃÃ¿¸ö»º´æ¶ÔÏóµÄ×î´ó»º´æÊ±³¤¼°¸Ã»º´æ³ØµÄ¿Õ¼äÈÝÁ¿ÏÞÖÆ
+ * @param max_size {int} ¸Ã»º´æ³ØµÄÈÝÁ¿ÏÞÖÆ
+ * @param timeout {int} Ã¿¸ö»º´æ¶ÔÏóµÄ»º´æÊ±³¤
+ * @param free_fn {void (*)(void*)} ÓÃ»§¼¶µÄÊÍ·Å»º´æ¶ÔÏóµÄº¯Êý
+ * @return {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
  */
 ACL_API ACL_CACHE *acl_cache_create(int max_size, int timeout,
 	void (*free_fn)(const ACL_CACHE_INFO*, void*));
 
 /**
- * é‡Šæ”¾ä¸€ä¸ªç¼“å­˜æ± ï¼Œå¹¶è‡ªåŠ¨è°ƒç”¨ acl_cache_create()/3 ä¸­çš„é‡Šæ”¾å‡½æ•°é‡Šæ”¾ç¼“å­˜å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
+ * ÊÍ·ÅÒ»¸ö»º´æ³Ø£¬²¢×Ô¶¯µ÷ÓÃ acl_cache_create()/3 ÖÐµÄÊÍ·Åº¯ÊýÊÍ·Å»º´æ¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
  */
 ACL_API void acl_cache_free(ACL_CACHE *cache);
 
 /**
- * å‘ç¼“å­˜æ± ä¸­æ·»åŠ è¢«ç¼“å­˜çš„å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param key {const char*} ç¼“å­˜å¯¹è±¡çš„å¥å€¼
- * @param value {void*} åŠ¨æ€ç¼“å­˜å¯¹è±¡
- * @return {ACL_CACHE_INFO*} ç¼“å­˜å¯¹è±¡æ‰€ä¾é™„çš„ç»“æž„å¯¹è±¡ï¼Œå…¶ä¸­çš„ value ä¸Žç”¨æˆ·çš„å¯¹è±¡ç›¸åŒ,
- *   å¦‚æžœè¿”å›ž NULL åˆ™è¡¨ç¤ºæ·»åŠ å¤±è´¥ï¼Œå¤±è´¥åŽŸå› ä¸ºï¼šç¼“å­˜æ± å¤ªå¤§æº¢å‡ºæˆ–ç›¸åŒå¥å€¼çš„å¯¹è±¡å­˜åœ¨
- *   ä¸”å¼•ç”¨è®¡æ•°éž0; å¦‚æžœè¿”å›žéž NULL åˆ™è¡¨ç¤ºæ·»åŠ æˆåŠŸï¼Œå¦‚æžœå¯¹åŒä¸€å¥å€¼çš„é‡å¤æ·»åŠ ï¼Œä¼šç”¨
- *   æ–°çš„æ•°æ®æ›¿æ¢æ—§çš„æ•°æ®ï¼Œä¸”æ—§æ•°æ®è°ƒç”¨é‡Šæ”¾å‡½æ•°è¿›è¡Œé‡Šæ”¾
+ * Ïò»º´æ³ØÖÐÌí¼Ó±»»º´æµÄ¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param key {const char*} »º´æ¶ÔÏóµÄ½¡Öµ
+ * @param value {void*} ¶¯Ì¬»º´æ¶ÔÏó
+ * @return {ACL_CACHE_INFO*} »º´æ¶ÔÏóËùÒÀ¸½µÄ½á¹¹¶ÔÏó£¬ÆäÖÐµÄ value ÓëÓÃ»§µÄ¶ÔÏóÏàÍ¬,
+ *   Èç¹û·µ»Ø NULL Ôò±íÊ¾Ìí¼ÓÊ§°Ü£¬Ê§°ÜÔ­ÒòÎª£º»º´æ³ØÌ«´óÒç³ö»òÏàÍ¬½¡ÖµµÄ¶ÔÏó´æÔÚ
+ *   ÇÒÒýÓÃ¼ÆÊý·Ç0; Èç¹û·µ»Ø·Ç NULL Ôò±íÊ¾Ìí¼Ó³É¹¦£¬Èç¹û¶ÔÍ¬Ò»½¡ÖµµÄÖØ¸´Ìí¼Ó£¬»áÓÃ
+ *   ÐÂµÄÊý¾ÝÌæ»»¾ÉµÄÊý¾Ý£¬ÇÒ¾ÉÊý¾Ýµ÷ÓÃÊÍ·Åº¯Êý½øÐÐÊÍ·Å
  */
 ACL_API ACL_CACHE_INFO *acl_cache_enter(ACL_CACHE *cache, const char *key, void *value);
 
 /**
- * ä»Žç¼“å­˜æ± ä¸­æŸ¥æ‰¾æŸä¸ªè¢«ç¼“å­˜çš„å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param key {const char*} æŸ¥è¯¢å¥
- * @return {void*} è¢«ç¼“å­˜çš„ç”¨æˆ·å¯¹è±¡çš„åœ°å€ï¼Œä¸ºNULLæ—¶è¡¨ç¤ºæœªæ‰¾åˆ°
+ * ´Ó»º´æ³ØÖÐ²éÕÒÄ³¸ö±»»º´æµÄ¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param key {const char*} ²éÑ¯½¡
+ * @return {void*} ±»»º´æµÄÓÃ»§¶ÔÏóµÄµØÖ·£¬ÎªNULLÊ±±íÊ¾Î´ÕÒµ½
  */
 ACL_API void *acl_cache_find(ACL_CACHE *cache, const char *key);
 
 /**
- * ä»Žç¼“å­˜æ± ä¸­æŸ¥æ‰¾æŸä¸ªè¢«ç¼“å­˜çš„å¯¹è±¡æ‰€ä¾é™„çš„ç¼“å­˜ä¿¡æ¯å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param key {const char*} æŸ¥è¯¢å¥
- * @return {ACL_CACHE_INFO*} ç¼“å­˜ä¿¡æ¯å¯¹è±¡åœ°å€ï¼Œä¸ºNULLæ—¶è¡¨ç¤ºæœªæ‰¾åˆ°
+ * ´Ó»º´æ³ØÖÐ²éÕÒÄ³¸ö±»»º´æµÄ¶ÔÏóËùÒÀ¸½µÄ»º´æÐÅÏ¢¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param key {const char*} ²éÑ¯½¡
+ * @return {ACL_CACHE_INFO*} »º´æÐÅÏ¢¶ÔÏóµØÖ·£¬ÎªNULLÊ±±íÊ¾Î´ÕÒµ½
  */
 ACL_API ACL_CACHE_INFO *acl_cache_locate(ACL_CACHE *cache, const char *key);
 
 /**
- * ä»Žç¼“å­˜æ± ä¸­åˆ é™¤æŸä¸ªç¼“å­˜å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param info {ACL_CACHE_INFO*} ç”¨æˆ·å¯¹è±¡æ‰€ä¾é™„çš„ç¼“å­˜ä¿¡æ¯å¯¹è±¡
- * @return {int} 0: è¡¨ç¤ºåˆ é™¤æˆåŠŸ; -1: è¡¨ç¤ºè¯¥å¯¹è±¡çš„å¼•ç”¨è®¡æ•°éž0æˆ–è¯¥å¯¹è±¡ä¸å­˜åœ¨
+ * ´Ó»º´æ³ØÖÐÉ¾³ýÄ³¸ö»º´æ¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param info {ACL_CACHE_INFO*} ÓÃ»§¶ÔÏóËùÒÀ¸½µÄ»º´æÐÅÏ¢¶ÔÏó
+ * @return {int} 0: ±íÊ¾É¾³ý³É¹¦; -1: ±íÊ¾¸Ã¶ÔÏóµÄÒýÓÃ¼ÆÊý·Ç0»ò¸Ã¶ÔÏó²»´æÔÚ
  */
 ACL_API int acl_cache_delete(ACL_CACHE *cache, ACL_CACHE_INFO *info);
 
 /**
- * ä»Žç¼“å­˜æ± ä¸­åˆ é™¤æŸä¸ªç¼“å­˜å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param key {const char*} å¥å€¼
- * @return {int} 0: è¡¨ç¤ºåˆ é™¤æˆåŠŸ; -1: è¡¨ç¤ºè¯¥å¯¹è±¡çš„å¼•ç”¨è®¡æ•°éž0æˆ–è¯¥å¯¹è±¡ä¸å­˜åœ¨
+ * ´Ó»º´æ³ØÖÐÉ¾³ýÄ³¸ö»º´æ¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param key {const char*} ½¡Öµ
+ * @return {int} 0: ±íÊ¾É¾³ý³É¹¦; -1: ±íÊ¾¸Ã¶ÔÏóµÄÒýÓÃ¼ÆÊý·Ç0»ò¸Ã¶ÔÏó²»´æÔÚ
  */
 ACL_API int acl_cache_delete2(ACL_CACHE *cache, const char *key);
 
 /**
- * ä½¿ç¼“å­˜æ± ä¸­çš„è¿‡æœŸå¯¹è±¡è¢«è‡ªåŠ¨åˆ é™¤
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @return {int} >= 0: è¢«è‡ªåŠ¨åˆ é™¤çš„ç¼“å­˜å¯¹è±¡çš„ä¸ªæ•°
+ * Ê¹»º´æ³ØÖÐµÄ¹ýÆÚ¶ÔÏó±»×Ô¶¯É¾³ý
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @return {int} >= 0: ±»×Ô¶¯É¾³ýµÄ»º´æ¶ÔÏóµÄ¸öÊý
  */
 ACL_API int acl_cache_timeout(ACL_CACHE *cache);
 
 /**
- * ä½¿æŸä¸ªç¼“å­˜å¯¹è±¡çš„ç¼“å­˜æ—¶é—´åŠ é•¿
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param info {ACL_CACHE_INFO*} ç¼“å­˜å¯¹è±¡
- * @param timeout {int} ç¼“å­˜æ—¶é•¿(ç§’)
+ * Ê¹Ä³¸ö»º´æ¶ÔÏóµÄ»º´æÊ±¼ä¼Ó³¤
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param info {ACL_CACHE_INFO*} »º´æ¶ÔÏó
+ * @param timeout {int} »º´æÊ±³¤(Ãë)
  */
 ACL_API void acl_cache_update2(ACL_CACHE *cache, ACL_CACHE_INFO *info, int timeout);
 
 /**
- * ä½¿æŸä¸ªç¼“å­˜å¯¹è±¡çš„ç¼“å­˜æ—¶é—´åŠ é•¿
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param key {const char*} å¥å€¼
- * @param timeout {int} ç¼“å­˜æ—¶é•¿(ç§’)
+ * Ê¹Ä³¸ö»º´æ¶ÔÏóµÄ»º´æÊ±¼ä¼Ó³¤
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param key {const char*} ½¡Öµ
+ * @param timeout {int} »º´æÊ±³¤(Ãë)
  */
 ACL_API void acl_cache_update(ACL_CACHE *cache, const char *key, int timeout);
 
 /**
- * å¢žåŠ æŸç¼“å­˜å¯¹è±¡çš„å¼•ç”¨è®¡æ•°ï¼Œé˜²æ­¢è¢«æå‰åˆ é™¤
- * @param info {ACL_CACHE_INFO*} ç”¨æˆ·å¯¹è±¡æ‰€ä¾é™„çš„ç¼“å­˜ä¿¡æ¯å¯¹è±¡
+ * Ôö¼ÓÄ³»º´æ¶ÔÏóµÄÒýÓÃ¼ÆÊý£¬·ÀÖ¹±»ÌáÇ°É¾³ý
+ * @param info {ACL_CACHE_INFO*} ÓÃ»§¶ÔÏóËùÒÀ¸½µÄ»º´æÐÅÏ¢¶ÔÏó
  */
 ACL_API void acl_cache_refer(ACL_CACHE_INFO *info);
 
 /**
- * å¢žåŠ æŸç¼“å­˜å¯¹è±¡çš„å¼•ç”¨è®¡æ•°ï¼Œé˜²æ­¢è¢«æå‰åˆ é™¤
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
+ * Ôö¼ÓÄ³»º´æ¶ÔÏóµÄÒýÓÃ¼ÆÊý£¬·ÀÖ¹±»ÌáÇ°É¾³ý
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
  * @param key {const char*}
  */
 ACL_API void acl_cache_refer2(ACL_CACHE *cache, const char *key);
 
 /**
- * å‡å°‘æŸç¼“å­˜å¯¹è±¡çš„å¼•ç”¨è®¡æ•°
- * @param info {ACL_CACHE_INFO*} ç”¨æˆ·å¯¹è±¡æ‰€ä¾é™„çš„ç¼“å­˜ä¿¡æ¯å¯¹è±¡
+ * ¼õÉÙÄ³»º´æ¶ÔÏóµÄÒýÓÃ¼ÆÊý
+ * @param info {ACL_CACHE_INFO*} ÓÃ»§¶ÔÏóËùÒÀ¸½µÄ»º´æÐÅÏ¢¶ÔÏó
  */
 ACL_API void acl_cache_unrefer(ACL_CACHE_INFO *info);
 
 /**
- * å‡å°‘æŸç¼“å­˜å¯¹è±¡çš„å¼•ç”¨è®¡æ•°
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
+ * ¼õÉÙÄ³»º´æ¶ÔÏóµÄÒýÓÃ¼ÆÊý
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
  * @param key {const char*}
  */
 ACL_API void acl_cache_unrefer2(ACL_CACHE *cache, const char *key);
 
 /**
- * åŠ é”ç¼“å­˜æ± å¯¹è±¡ï¼Œåœ¨å¤šçº¿ç¨‹æ—¶ç”¨
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
+ * ¼ÓËø»º´æ³Ø¶ÔÏó£¬ÔÚ¶àÏß³ÌÊ±ÓÃ
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
  */
 ACL_API void acl_cache_lock(ACL_CACHE *cache);
 
 /**
- * è§£é”ç¼“å­˜æ± å¯¹è±¡ï¼Œåœ¨å¤šçº¿ç¨‹æ—¶ç”¨
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
+ * ½âËø»º´æ³Ø¶ÔÏó£¬ÔÚ¶àÏß³ÌÊ±ÓÃ
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
  */
 ACL_API void acl_cache_unlock(ACL_CACHE *cache);
 
 /**
- * éåŽ†ç¼“å­˜ä¸­çš„æ‰€æœ‰å¯¹è±¡
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param walk_fn {void (*)(ACL_CACHE_INFO*, void*)} éåŽ†å›žè°ƒå‡½æ•°
- * @param arg {void *} walk_fn()/2 ä¸­çš„ç¬¬äºŒä¸ªå‚æ•°
+ * ±éÀú»º´æÖÐµÄËùÓÐ¶ÔÏó
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param walk_fn {void (*)(ACL_CACHE_INFO*, void*)} ±éÀú»Øµ÷º¯Êý
+ * @param arg {void *} walk_fn()/2 ÖÐµÄµÚ¶þ¸ö²ÎÊý
  */
 ACL_API void acl_cache_walk(ACL_CACHE *cache, void (*walk_fn)(ACL_CACHE_INFO *, void *), void *arg);
 
 /**
- * æ¸…ç©ºç¼“å­˜æ± ä¸­çš„ç¼“å­˜å¯¹è±¡ï¼Œå¦‚æžœæŸä¸ªç¼“å­˜å¯¹è±¡ä¾ç„¶åœ¨è¢«å¼•ç”¨ä¸”éžå¼ºåˆ¶æ€§åˆ é™¤ï¼Œåˆ™å°†ä¸ä¼šè¢«æ¸…ç©º
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @param force {int} å¦‚æžœéž0ï¼Œåˆ™å³ä½¿æŸä¸ªç¼“å­˜å¯¹è±¡çš„å¼•ç”¨è®¡æ•°éž0ä¹Ÿä¼šè¢«åˆ é™¤
- * @return {int} è¢«æ¸…é™¤çš„ç¼“å­˜å¯¹è±¡ä¸ªæ•°
+ * Çå¿Õ»º´æ³ØÖÐµÄ»º´æ¶ÔÏó£¬Èç¹ûÄ³¸ö»º´æ¶ÔÏóÒÀÈ»ÔÚ±»ÒýÓÃÇÒ·ÇÇ¿ÖÆÐÔÉ¾³ý£¬Ôò½«²»»á±»Çå¿Õ
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @param force {int} Èç¹û·Ç0£¬Ôò¼´Ê¹Ä³¸ö»º´æ¶ÔÏóµÄÒýÓÃ¼ÆÊý·Ç0Ò²»á±»É¾³ý
+ * @return {int} ±»Çå³ýµÄ»º´æ¶ÔÏó¸öÊý
  */
 ACL_API int acl_cache_clean(ACL_CACHE *cache, int force);
 
 /**
- * å½“å‰ç¼“å­˜æ± ä¸­ç¼“å­˜å¯¹è±¡çš„ä¸ªæ•°
- * @param cache {ACL_CACHE*} ç¼“å­˜æ± å¯¹è±¡å¥æŸ„
- * @return {int} è¢«ç¼“å­˜çš„å¯¹è±¡ä¸ªæ•°
+ * µ±Ç°»º´æ³ØÖÐ»º´æ¶ÔÏóµÄ¸öÊý
+ * @param cache {ACL_CACHE*} »º´æ³Ø¶ÔÏó¾ä±ú
+ * @return {int} ±»»º´æµÄ¶ÔÏó¸öÊý
  */
 ACL_API int acl_cache_size(ACL_CACHE *cache);
 

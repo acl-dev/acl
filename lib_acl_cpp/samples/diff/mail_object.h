@@ -1,26 +1,26 @@
-﻿#pragma once
+#pragma once
 
 class mail_object : public acl::diff_object
 {
 public:
 	/**
-	 * 鏋勯€犲嚱鏁�
+	 * 构造函数
 	 * @param manager {diff_manager&}
-	 * @param key {const char*} 浠ュ瓧绗︿覆鏂瑰紡琛ㄧず鐨勯敭锛岄潪绌哄瓧绗︿覆
-	 * @param val {const char*} 浠ュ瓧绗︿覆鏂瑰紡琛ㄧず鐨勫€硷紝闈炵┖瀛楃涓�
+	 * @param key {const char*} 以字符串方式表示的键，非空字符串
+	 * @param val {const char*} 以字符串方式表示的值，非空字符串
 	 */
 	mail_object(acl::diff_manager& manager, const char* key, const char* val);
 
 	void set_ctime(long long n);
 
 public:
-	// override: 鍩虹被绾櫄鍑芥暟鐨勫疄鐜�
+	// override: 基类纯虚函数的实现
 	const char* get_key() const;
 
-	// override: 鍩虹被绾櫄鍑芥暟鐨勫疄鐜�
+	// override: 基类纯虚函数的实现
 	const char* get_val() const;
 
-	// override: 鍩虹被绾嚱鏁扮殑瀹炵幇
+	// override: 基类纯函数的实现
 	bool operator== (const acl::diff_object& obj) const;
 
 	// @override
@@ -31,6 +31,6 @@ private:
 	const char* val_;
 	long long ctime_;
 
-	// 鏋愭瀯鍑芥暟澹版槑涓虹鏈夌殑锛屼粠鑰岃姹傚姩鎬佸垱寤烘湰绫诲璞�
+	// 析构函数声明为私有的，从而要求动态创建本类对象
 	~mail_object();
 };

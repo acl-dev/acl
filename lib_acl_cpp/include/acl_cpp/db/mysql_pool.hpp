@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../db/db_pool.hpp"
 
@@ -13,18 +13,18 @@ class ACL_CPP_API mysql_pool : public db_pool
 {
 public:
 	/**
-	 * é‡‡ç”¨ mysql æ•°æ®åº“æ—¶çš„æ„é€ å‡½æ•°
-	 * @param dbaddr {const char*} mysql æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORTï¼Œ
-	 *  åœ¨ UNIX å¹³å°ä¸‹å¯ä»¥ä¸º UNIX åŸŸå¥—æ¥å£
-	 * @param dbname {const char*} æ•°æ®åº“å
-	 * @param dbuser {const char*} æ•°æ®åº“ç”¨æˆ·
-	 * @param dbpass {const char*} æ•°æ®åº“ç”¨æˆ·å¯†ç 
-	 * @param dblimit {int} æ•°æ®åº“è¿æ¥æ± çš„æœ€å¤§è¿æ¥æ•°é™åˆ¶
-	 * @param dbflags {unsigned long} mysql æ ‡è®°ä½
-	 * @param auto_commit {bool} æ˜¯å¦è‡ªåŠ¨æäº¤
-	 * @param conn_timeout {int} è¿æ¥æ•°æ®åº“è¶…æ—¶æ—¶é—´(ç§’)
-	 * @param rw_timeout {int} ä¸æ•°æ®åº“é€šä¿¡æ—¶çš„IOæ—¶é—´(ç§’)
-	 * @param charset {const char*} è¿æ¥æ•°æ®åº“çš„å­—ç¬¦é›†(utf8, gbk, ...)
+	 * ²ÉÓÃ mysql Êı¾İ¿âÊ±µÄ¹¹Ôìº¯Êı
+	 * @param dbaddr {const char*} mysql ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºIP:PORT£¬
+	 *  ÔÚ UNIX Æ½Ì¨ÏÂ¿ÉÒÔÎª UNIX ÓòÌ×½Ó¿Ú
+	 * @param dbname {const char*} Êı¾İ¿âÃû
+	 * @param dbuser {const char*} Êı¾İ¿âÓÃ»§
+	 * @param dbpass {const char*} Êı¾İ¿âÓÃ»§ÃÜÂë
+	 * @param dblimit {int} Êı¾İ¿âÁ¬½Ó³ØµÄ×î´óÁ¬½ÓÊıÏŞÖÆ
+	 * @param dbflags {unsigned long} mysql ±ê¼ÇÎ»
+	 * @param auto_commit {bool} ÊÇ·ñ×Ô¶¯Ìá½»
+	 * @param conn_timeout {int} Á¬½ÓÊı¾İ¿â³¬Ê±Ê±¼ä(Ãë)
+	 * @param rw_timeout {int} ÓëÊı¾İ¿âÍ¨ĞÅÊ±µÄIOÊ±¼ä(Ãë)
+	 * @param charset {const char*} Á¬½ÓÊı¾İ¿âµÄ×Ö·û¼¯(utf8, gbk, ...)
 	 */
 	mysql_pool(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -33,14 +33,14 @@ public:
 		int rw_timeout = 60, const char* charset = "utf8");
 
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param conf {const mysql_conf&} mysql æ•°æ®åº“è¿æ¥é…ç½®å¯¹è±¡
+	 * ¹¹Ôìº¯Êı
+	 * @param conf {const mysql_conf&} mysql Êı¾İ¿âÁ¬½ÓÅäÖÃ¶ÔÏó
 	 */
 	mysql_pool(const mysql_conf& conf);
 	~mysql_pool();
 
 protected:
-	// åŸºç±» connect_pool çº¯è™šå‡½æ•°ï¼šåˆ›å»ºæ•°æ®åº“è¿æ¥å¥æŸ„
+	// »ùÀà connect_pool ´¿Ğéº¯Êı£º´´½¨Êı¾İ¿âÁ¬½Ó¾ä±ú
 	connect_client* create_connect();
 
 private:

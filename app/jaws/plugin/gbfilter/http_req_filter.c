@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "http_plugin.h"
 
@@ -10,7 +10,7 @@ int http_request_filter(ACL_VSTREAM *client acl_unused, HTTP_HDR_REQ *hdr_req ac
 	   http_hdr_fprint(__logfp, &hdr_req->hdr, "http_request_filter");
 	 */
 
-	/* å…³é—­åŽ‹ç¼©è¯·æ±‚ */
+	/* ¹Ø±ÕÑ¹ËõÇëÇó */
 	http_hdr_entry_off(&hdr_req->hdr, "Accept-Encoding");
 	return (0);
 }

@@ -1,4 +1,4 @@
-﻿#ifndef FIBER_BASE_INCLUDE_H
+#ifndef FIBER_BASE_INCLUDE_H
 #define FIBER_BASE_INCLUDE_H
 
 #include <stdarg.h>

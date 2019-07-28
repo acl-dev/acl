@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 class CAddBOM : public acl::thread
 {
 public:

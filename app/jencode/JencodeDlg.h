@@ -1,29 +1,29 @@
-ï»¿// JencodeDlg.h : å¤´æ–‡ä»¶
+// JencodeDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
 #include <time.h>
 
-// CJencodeDlg å¯¹è¯æ¡†
+// CJencodeDlg ¶Ô»°¿ò
 class CJencodeDlg : public CDialog
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	CJencodeDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	CJencodeDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_JENCODE_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 
 	CStatusBarCtrl m_wndStatus;
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

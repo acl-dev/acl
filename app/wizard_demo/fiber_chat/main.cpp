@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "configure.h"
 #include "master_service.h"
 
@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// 璁剧疆閰嶇疆鍙傛暟琛�
+	// 设置配置参数表
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_int64(var_conf_int64_tab);
 	ms.set_cfg_str(var_conf_str_tab);

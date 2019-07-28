@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -33,21 +33,21 @@ static void dlink_free_callback(void *arg)
 }
 
 /*
- * åŠŸèƒ½:	æ‰¾å‡ºæŸä¸ªé•¿æ•´æ•°åœ¨æ•°ç»„ä¸­çš„ä¸‹æ ‡èŒƒå›´ä½ç½®
- * å‚æ•°:
- * a:		ç»“æ„æ•°ç»„æŒ‡é’ˆ
- * n:		é•¿æ•´æ•°
- * è¿”å›å€¼:	ä¸‹æ ‡ç´¢å¼•, è¯¥ç´¢å¼•æ»¡è¶³å¦‚ä¸‹æ¡ä»¶:
+ * ¹¦ÄÜ:	ÕÒ³öÄ³¸ö³¤ÕûÊıÔÚÊı×éÖĞµÄÏÂ±ê·¶Î§Î»ÖÃ
+ * ²ÎÊı:
+ * a:		½á¹¹Êı×éÖ¸Õë
+ * n:		³¤ÕûÊı
+ * ·µ»ØÖµ:	ÏÂ±êË÷Òı, ¸ÃË÷ÒıÂú×ãÈçÏÂÌõ¼ş:
  *		(idx >= 0 && idx < a->count - 1
  *		 && n >= a->items[idx]->begin
  *		 && n <  a->item[a->count - 1]->begin )
  *		or (idx == 0 && n < a->item[idx]->begin)
  *		or (idx == a->count - 1 && n >= a->item[idx]->begin)
- * å¤±è´¥:	-1
- * æˆåŠŸ:	>= 0
- * è¯´æ˜:	if idx == 0 ----> è¯´æ˜åœ¨æ•°ç»„çš„å¼€å§‹ä½ç½®æ·»åŠ æˆ–åœ¨å¼€å§‹ä½ç½®å‰æ’å…¥
- * 		if idx > 0 && idx <= a->count - 1 -----> è¯´æ˜åœ¨æ•°ç»„çš„ä¸­é—´çš„æŸä¸€ä½ç½®
- *		if idx > a->count - 1 -----> è¯´æ˜åœ¨æ•°ç»„çš„æœ€åä¸€ä½ç½®æ·»åŠ 
+ * Ê§°Ü:	-1
+ * ³É¹¦:	>= 0
+ * ËµÃ÷:	if idx == 0 ----> ËµÃ÷ÔÚÊı×éµÄ¿ªÊ¼Î»ÖÃÌí¼Ó»òÔÚ¿ªÊ¼Î»ÖÃÇ°²åÈë
+ * 		if idx > 0 && idx <= a->count - 1 -----> ËµÃ÷ÔÚÊı×éµÄÖĞ¼äµÄÄ³Ò»Î»ÖÃ
+ *		if idx > a->count - 1 -----> ËµÃ÷ÔÚÊı×éµÄ×îºóÒ»Î»ÖÃÌí¼Ó
  */
 static int scope_pos(const ACL_ARRAY *a, acl_int64 n)
 {
@@ -606,7 +606,7 @@ ACL_DITEM *acl_dlink_insert(ACL_DLINK *plink, acl_int64 begin, acl_int64 end)
 		return dlink_append(plink->parray, begin, end);
 	}
 
-	/* æ­¤å‡½æ•°å†…æœ‰å¯èƒ½è¿›è¡Œäº†ç»“ç‚¹é¡¹çš„åˆå¹¶ */
+	/* ´Ëº¯ÊıÄÚÓĞ¿ÉÄÜ½øĞĞÁË½áµãÏîµÄºÏ²¢ */
 	return dlink_add(plink->parray, begin, end);
 }
 

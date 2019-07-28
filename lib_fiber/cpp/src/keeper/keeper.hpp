@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "fiber/fiber_tbox.hpp"
 
 namespace acl {

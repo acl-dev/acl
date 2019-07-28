@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "IdxTrans.h"
 
 CIdxTrans::CIdxTrans(void)
@@ -46,12 +46,12 @@ void CIdxTrans::Trans(void)
 
 	if (m_sPath.GetLength() == 0)
 	{
-		MessageBox(NULL, "æ–‡ä»¶è·¯å¾„ä¸ºç©ºï¼", "Error", 0);
+		MessageBox(NULL, "ÎÄ¼şÂ·¾¶Îª¿Õ£¡", "Error", 0);
 		return;
 	}
 	if (acl_stat(m_sPath, &stat_buf) < 0)
 	{
-		MessageBox(NULL, "æ— æ³•è·å¾—æ–‡ä»¶é•¿åº¦ï¼", "Error", 0);
+		MessageBox(NULL, "ÎŞ·¨»ñµÃÎÄ¼ş³¤¶È£¡", "Error", 0);
 		return;
 	}
 	size = (size_t) stat_buf.st_size;
@@ -155,12 +155,12 @@ void CIdxTrans::Trans(void)
 	fp = acl_vstream_fopen("result.idx", O_CREAT | O_TRUNC | O_RDWR | O_BINARY, 0600, 1024);
 	if (fp == NULL)
 	{
-		MessageBox(NULL, "åˆ›å»ºæ–‡ä»¶å¤±è´¥ï¼", "Error", 0);
+		MessageBox(NULL, "´´½¨ÎÄ¼şÊ§°Ü£¡", "Error", 0);
 	}
 	else
 	{
 		if (acl_vstream_writen(fp, sBuf, size_saved) == ACL_VSTREAM_EOF) {
-			MessageBox(NULL, "å†™æ–‡ä»¶å¤±è´¥ï¼", "Error", 0);
+			MessageBox(NULL, "Ğ´ÎÄ¼şÊ§°Ü£¡", "Error", 0);
 		}
 		acl_vstream_close(fp);
 	}

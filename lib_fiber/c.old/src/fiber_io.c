@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <limits.h>
 #include "fiber/lib_fiber.h"
 #include "event.h"

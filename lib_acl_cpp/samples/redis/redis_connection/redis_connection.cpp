@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 static bool test_auth(acl::redis_connection& redis)
 {

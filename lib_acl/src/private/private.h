@@ -1,4 +1,4 @@
-﻿#ifndef __PRIVATE_INCLUDE_H__
+#ifndef __PRIVATE_INCLUDE_H__
 #define __PRIVATE_INCLUDE_H__
 
 #ifndef KEY_REUSE

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "file_copy.h"
 
 bool file_copy(const char* from, const char* to)

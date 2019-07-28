@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <list>
 #include "acl_cpp/stdlib/log.hpp"
@@ -47,16 +47,16 @@ public:
 			acl_netdb_free(db);
 		}
 
-		// å‘ä¸»çº¿ç¨‹å‘é€ç»“æœ
+		// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
 		ipc->send_message(IPC_RES, &data_, sizeof(data_));
 
-		// é”€æ¯æœ¬ç±»å¯¹è±¡ï¼Œå› ä¸ºå…¶æ˜¯åŠ¨æ€åˆ†é…çš„
+		// Ïú»Ù±¾Àà¶ÔÏó£¬ÒòÎªÆäÊÇ¶¯Ì¬·ÖÅäµÄ
 		delete this;
 	}
 
 #ifdef ACL_WINDOWS
 
-	// åŸºç±»è™šæ¥å£ï¼Œä½¿å­çº¿ç¨‹å¯ä»¥åœ¨æ‰§è¡Œå®Œä»»åŠ¡åå‘ä¸»çº¿ç¨‹å‘é€ ACL_WINDOWS çª—å£æ¶ˆæ¯
+	// »ùÀàĞé½Ó¿Ú£¬Ê¹×ÓÏß³Ì¿ÉÒÔÔÚÖ´ĞĞÍêÈÎÎñºóÏòÖ÷Ïß³Ì·¢ËÍ ACL_WINDOWS ´°¿ÚÏûÏ¢
 
 	virtual void run(HWND hWnd)
 	{
@@ -75,10 +75,10 @@ public:
 			acl_netdb_free(db);
 		}
 
-		// å‘ä¸»çº¿ç¨‹å‘é€ç»“æœ
+		// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
 		::PostMessage(hWnd, IPC_RES + WM_USER, 0, (LPARAM) data);
 
-		// é”€æ¯æœ¬ç±»å¯¹è±¡ï¼Œå› ä¸ºå…¶æ˜¯åŠ¨æ€åˆ†é…çš„
+		// Ïú»Ù±¾Àà¶ÔÏó£¬ÒòÎªÆäÊÇ¶¯Ì¬·ÖÅäµÄ
 		delete this;
 	}
 #endif
@@ -147,7 +147,7 @@ void dns_service::on_accept(aio_socket_stream* client)
 	ipc_client* ipc = NEW dns_ipc(this, magic_);
 	ipc->open(client);
 
-	// æ·»åŠ æ¶ˆæ¯å›è°ƒå¯¹è±¡
+	// Ìí¼ÓÏûÏ¢»Øµ÷¶ÔÏó
 	ipc->append_message(IPC_RES);
 	ipc->wait();
 }
@@ -170,7 +170,7 @@ void dns_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam)
 	on_result(*res);
 	delete res;
 
-	// åœ¨é‡‡ç”¨ ACL_WINDOWS æ¶ˆæ¯æ—¶è¯¥å¯¹è±¡ç©ºé—´æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦é‡Šæ”¾
+	// ÔÚ²ÉÓÃ ACL_WINDOWS ÏûÏ¢Ê±¸Ã¶ÔÏó¿Õ¼äÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔĞèÒªÊÍ·Å
 	acl_myfree(dat);
 }
 
@@ -192,7 +192,7 @@ void dns_service::lookup(dns_result_callback* callback)
 
 	ipc_request* req = NEW dns_request(domain);
 
-	// è°ƒç”¨åŸºç±» ipc_service è¯·æ±‚è¿‡ç¨‹
+	// µ÷ÓÃ»ùÀà ipc_service ÇëÇó¹ı³Ì
 	request(req);
 }
 
@@ -202,9 +202,9 @@ void dns_service::on_result(const dns_res& res)
 		it != callbacks_.end();) {
 
 		if ((*it)->get_domain() == res.domain_.c_str()) {
-			// é€šçŸ¥è¯·æ±‚å¯¹è±¡çš„è§£æç»“æœ
+			// Í¨ÖªÇëÇó¶ÔÏóµÄ½âÎö½á¹û
 			(*it)->on_result((*it)->get_domain(), res);
-			(*it)->destroy(); // è°ƒç”¨è¯·æ±‚å¯¹è±¡çš„é”€æ¯è¿‡ç¨‹
+			(*it)->destroy(); // µ÷ÓÃÇëÇó¶ÔÏóµÄÏú»Ù¹ı³Ì
 			it = callbacks_.erase(it);
 		} else {
 			++it;

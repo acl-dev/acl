@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "google/protobuf/io/acl_fstream.h"
 
 namespace google {

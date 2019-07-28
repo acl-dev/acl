@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_RES_INCLUDE_H
+#ifndef ACL_RES_INCLUDE_H
 #define ACL_RES_INCLUDE_H
 
 #ifdef __cplusplus
@@ -10,68 +10,68 @@ extern "C" {
 #include <time.h>
 
 /**
- * DNSè¿”å›žç»“æžœçš„å­˜å‚¨ç»“æž„
+ * DNS·µ»Ø½á¹ûµÄ´æ´¢½á¹¹
  */
 typedef struct ACL_RES {
-	char dns_ip[64];                /**< DNSçš„IPåœ°å€ */
-	unsigned short dns_port;        /**< DNSçš„Port */
-	unsigned short cur_qid;         /**< å†…éƒ¨å˜é‡ï¼Œæ•°æ®åŒ…çš„æ ‡è¯† */
-	time_t tm_spent;                /**< æŸ¥è¯¢æ—¶é—´è€—è´¹(ç§’) */
+	char dns_ip[64];                /**< DNSµÄIPµØÖ· */
+	unsigned short dns_port;        /**< DNSµÄPort */
+	unsigned short cur_qid;         /**< ÄÚ²¿±äÁ¿£¬Êý¾Ý°üµÄ±êÊ¶ */
+	time_t tm_spent;                /**< ²éÑ¯Ê±¼äºÄ·Ñ(Ãë) */
 	int   errnum;
-#define ACL_RES_ERR_SEND	-100    /**< å†™å‡ºé”™ */
-#define ACL_RES_ERR_READ	-101    /**< è¯»å‡ºé”™ */
-#define ACL_RES_ERR_RTMO	-102    /**< è¯»è¶…æ—¶ */
-#define ACL_RES_ERR_NULL	-103    /**< ç©ºç»“æžœ */
-#define ACL_RES_ERR_CONN	-104    /**< TCPæ–¹å¼æ—¶è¿žæŽ¥å¤±è´¥ */
+#define ACL_RES_ERR_SEND	-100    /**< Ð´³ö´í */
+#define ACL_RES_ERR_READ	-101    /**< ¶Á³ö´í */
+#define ACL_RES_ERR_RTMO	-102    /**< ¶Á³¬Ê± */
+#define ACL_RES_ERR_NULL	-103    /**< ¿Õ½á¹û */
+#define ACL_RES_ERR_CONN	-104    /**< TCP·½Ê½Ê±Á¬½ÓÊ§°Ü */
 
-	int transfer;                   /**< TCP/UDP ä¼ è¾“æ¨¡å¼ */
-#define ACL_RES_USE_UDP		0       /**< UDP ä¼ è¾“æ¨¡å¼ */
-#define ACL_RES_USE_TCP		1       /**< TCP ä¼ è¾“æ¨¡å¼ */
+	int transfer;                   /**< TCP/UDP ´«ÊäÄ£Ê½ */
+#define ACL_RES_USE_UDP		0       /**< UDP ´«ÊäÄ£Ê½ */
+#define ACL_RES_USE_TCP		1       /**< TCP ´«ÊäÄ£Ê½ */
 
-	int   conn_timeout;             /**< TCP ä¼ è¾“æ—¶çš„è¿žæŽ¥è¶…æ—¶æ—¶é—´, é»˜è®¤ä¸º10ç§’ */
-	int   rw_timeout;               /**< TCP/UDP ä¼ è¾“çš„IOè¶…æ—¶æ—¶é—´, é»˜è®¤ä¸º10ç§’ */
+	int   conn_timeout;             /**< TCP ´«ÊäÊ±µÄÁ¬½Ó³¬Ê±Ê±¼ä, Ä¬ÈÏÎª10Ãë */
+	int   rw_timeout;               /**< TCP/UDP ´«ÊäµÄIO³¬Ê±Ê±¼ä, Ä¬ÈÏÎª10Ãë */
 } ACL_RES;
 
 /**
- * åˆ›å»ºä¸€ä¸ªDNSæŸ¥è¯¢å¯¹è±¡
- * @param dns_ip {const char*} DNSçš„IPåœ°å€
- * @param dns_port {unsigned short} DNSçš„Port
- * @return {ACL_RES*} æ–°åˆ›å»ºçš„æŸ¥è¯¢å¯¹è±¡
+ * ´´½¨Ò»¸öDNS²éÑ¯¶ÔÏó
+ * @param dns_ip {const char*} DNSµÄIPµØÖ·
+ * @param dns_port {unsigned short} DNSµÄPort
+ * @return {ACL_RES*} ÐÂ´´½¨µÄ²éÑ¯¶ÔÏó
  */
 ACL_API ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port);
 
 /**
- * è®¾ç½®DNSæŸ¥è¯¢çš„è¶…æ—¶æ—¶é—´
- * @param conn_timeout {int} TCP ä¼ è¾“æ—¶çš„è¿žæŽ¥è¶…æ—¶æ—¶é—´
- * @param rw_timeout {int} TCP/UDP ä¼ è¾“çš„IOè¶…æ—¶æ—¶é—´
+ * ÉèÖÃDNS²éÑ¯µÄ³¬Ê±Ê±¼ä
+ * @param conn_timeout {int} TCP ´«ÊäÊ±µÄÁ¬½Ó³¬Ê±Ê±¼ä
+ * @param rw_timeout {int} TCP/UDP ´«ÊäµÄIO³¬Ê±Ê±¼ä
  */
 ACL_API void acl_res_set_timeout(int conn_timeout, int rw_timeout);
 
 /**
- * é‡Šæ”¾ä¸€ä¸ªDNSæŸ¥è¯¢å¯¹è±¡
- * @param res {ACL_RES*} DNSæŸ¥è¯¢å¯¹è±¡
+ * ÊÍ·ÅÒ»¸öDNS²éÑ¯¶ÔÏó
+ * @param res {ACL_RES*} DNS²éÑ¯¶ÔÏó
  */
 ACL_API void acl_res_free(ACL_RES *res);
 
 /**
- * æŸ¥è¯¢æŸä¸ªåŸŸåçš„IPåœ°å€
- * @param res {ACL_RES*} DNSæŸ¥è¯¢å¯¹è±¡
- * @param domain {const char*} è¦æŸ¥è¯¢çš„åŸŸå
- * @return {ACL_DNS_DB*} æŸ¥è¯¢çš„ç»“æžœé›†
+ * ²éÑ¯Ä³¸öÓòÃûµÄIPµØÖ·
+ * @param res {ACL_RES*} DNS²éÑ¯¶ÔÏó
+ * @param domain {const char*} Òª²éÑ¯µÄÓòÃû
+ * @return {ACL_DNS_DB*} ²éÑ¯µÄ½á¹û¼¯
  */
 ACL_API ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain);
 
 /**
- * æ ¹æ®é”™è¯¯å·èŽ·å¾—æŸ¥è¯¢å¤±è´¥çš„åŽŸå› 
- * @param errnum {int} é”™è¯¯å·
- * @return {const char*} é”™è¯¯ä¿¡æ¯
+ * ¸ù¾Ý´íÎóºÅ»ñµÃ²éÑ¯Ê§°ÜµÄÔ­Òò
+ * @param errnum {int} ´íÎóºÅ
+ * @return {const char*} ´íÎóÐÅÏ¢
  */
 ACL_API const char *acl_res_strerror(int errnum);
 
 /**
- * èŽ·å¾—å½“å‰æŸ¥è¯¢çš„é”™è¯¯ä¿¡æ¯
- * @param res {ACL_RES*} DNSæŸ¥è¯¢å¯¹è±¡
- * @return {const char*} é”™è¯¯ä¿¡æ¯
+ * »ñµÃµ±Ç°²éÑ¯µÄ´íÎóÐÅÏ¢
+ * @param res {ACL_RES*} DNS²éÑ¯¶ÔÏó
+ * @return {const char*} ´íÎóÐÅÏ¢
  */
 ACL_API const char *acl_res_errmsg(const ACL_RES *res);
 

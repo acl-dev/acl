@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file ssl.h
  *
  * \brief SSL/TLS functions.

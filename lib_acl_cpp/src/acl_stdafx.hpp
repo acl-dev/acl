@@ -1,12 +1,12 @@
-﻿// stdafx.h : 标准系统包含文件的包含文件，
-// 或是常用但不常更改的项目特定的包含文件
+// stdafx.h : ��׼ϵͳ�����ļ��İ����ļ���
+// ���ǳ��õ��������ĵ���Ŀ�ض��İ����ļ�
 //
 
 //#pragma once
 
-//#define WIN32_LEAN_AND_MEAN		// 从 Windows 头中排除极少使用的资料
+//#define WIN32_LEAN_AND_MEAN		// �� Windows ͷ���ų�����ʹ�õ�����
 
-// TODO: 在此处引用程序要求的附加头文件
+// TODO: �ڴ˴����ó���Ҫ��ĸ���ͷ�ļ�
 
 #include "acl_cpp/acl_cpp_define.hpp"
 
@@ -52,7 +52,7 @@
 #include <zlib.h>
 #endif
 
-// 加入下面一行可以加快在 VC 下的编译速度
+// ��������һ�п��Լӿ��� VC �µı����ٶ�
 //#if defined(_WIN32) || defined(_WIN64)
 #include "acl_cpp/lib_acl.hpp"
 //#endif

@@ -1,4 +1,4 @@
-Ôªø#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 			max = 10;
 	}
 
-	// ÂàùÂßãÂåñ acl Â∫ì
+	// ≥ı ºªØ acl ø‚
 	acl::acl_cpp_init();
 
 	acl::thread_queue queue;

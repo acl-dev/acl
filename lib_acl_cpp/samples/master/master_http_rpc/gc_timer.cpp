@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "gc_timer.h"
 
 gc_timer::gc_timer(acl::aio_handle& handle)
@@ -18,7 +18,7 @@ void gc_timer::destroy()
 
 void gc_timer::start(int delay)
 {
-	// 璁剧疆瀹氭椂鍣紝灏嗙杞崲涓哄井濡�
+	// 设置定时器，将秒转换为微妙
 	handle_.set_timer(this, delay * 1000000);
 }
 

@@ -1,4 +1,4 @@
-﻿namespace acl
+namespace acl
 {
     //files_outdate
     acl::string gson(const files_outdate &$obj);

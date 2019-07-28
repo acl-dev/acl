@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "mysql.h"
 #include <stdio.h>
 #include <stdlib.h>

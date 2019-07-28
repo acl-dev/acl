@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h" // just for ACL_METER_TIME
+#include "lib_acl.h" // just for ACL_METER_TIME
 #include "acl_cpp/lib_acl.hpp"
 #include <getopt.h>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -45,13 +45,13 @@
 #define	TERM(x)		ACL_VSTRING_TERMINATE((x)->vbuf)
 #define	NO_SPACE(x)	acl_vbuf_eof(&((x)->vbuf->vbuf))
 
-/* 状态机数据结构类型 */
+/* ״̬�����ݽṹ���� */
 
 struct XML_STATUS_MACHINE {
-	/**< 状态码 */
+	/**< ״̬�� */
 	int   status;
 
-	/**< 状态机处理函数 */
+	/**< ״̬���������� */
 	const char *(*callback) (ACL_XML2*, const char*);
 };
 
@@ -543,7 +543,7 @@ static const char *xml_parse_meta_comment(ACL_XML2 *xml, const char *data)
 
 static const char *xml_parse_meta_end(ACL_XML2 *xml, const char *data)
 {
-	/* meta 标签是自关闭类型，直接跳至右边 '>' 处理位置 */
+	/* meta ��ǩ���Թر����ͣ�ֱ�������ұ� '>' ����λ�� */
 	xml->curr_node->status = ACL_XML2_S_RGT;
 	return data;
 }
@@ -644,9 +644,9 @@ static const char *xml_parse_attr(ACL_XML2 *xml, const char *data)
 	if (*data == '/') {
 		data++;
 
-		/* 此处返回后会触发本函数再次被调用，当下一个字节为 '>' 时，
-		 * 上面通过调用 xml_parse_check_self_closed 检查是否为自封闭
-		 * 标签: "/>"
+		/* �˴����غ�ᴥ���������ٴα����ã�����һ���ֽ�Ϊ '>' ʱ��
+		 * ����ͨ������ xml_parse_check_self_closed ����Ƿ�Ϊ�Է��
+		 * ��ǩ: "/>"
 		 */
 		return data;
 	}
@@ -752,11 +752,11 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 		data++;
 	}
 
-	/* 说明属性值还未解析完，需要继续解析 */
+	/* ˵������ֵ��δ�����꣬��Ҫ�������� */
 	if (xml->curr_node->status == ACL_XML2_S_AVAL)
 		return data;
 
-	/* 当状态发生改变时，则说明属性值已经完毕 */
+	/* ��״̬�����ı�ʱ����˵������ֵ�Ѿ���� */
 
 	if ((xml->flag & ACL_XML2_FLAG_XML_DECODE) && attr->value_size > 1) {
 		const char *val = attr->value;
@@ -767,21 +767,21 @@ static const char *xml_parse_attr_val(ACL_XML2 *xml, const char *data)
 		ADD(xml, '\0');  /* skip one byte */
 	}
 
-	/* 将该标签ID号映射至哈希表中，以便于快速查询 */
+	/* ���ñ�ǩID��ӳ������ϣ���У��Ա��ڿ��ٲ�ѯ */
 	if (IS_ID(attr->name) && *attr->value != 0) {
 		const char *ptr = attr->value;
 
-		/* 防止重复ID被插入现象 */
+		/* ��ֹ�ظ�ID���������� */
 		if (acl_htable_find(xml->id_table, ptr) == NULL) {
 			acl_htable_enter(xml->id_table, ptr, attr);
 
-			/* 当该属性被加入哈希表后才会赋于节点 id */
+			/* �������Ա������ϣ����Żḳ�ڽڵ� id */
 			xml->curr_node->id = attr->value;
 		}
 	}
 
-	/* 必须将该节点的当前属性对象置空，以便于继续解析时
-	 * 可以创建新的属性对象
+	/* ���뽫�ýڵ�ĵ�ǰ���Զ����ÿգ��Ա��ڼ�������ʱ
+	 * ���Դ����µ����Զ���
 	 */
 	xml->curr_node->curr_attr = NULL;
 
@@ -880,12 +880,12 @@ static const char *xml_parse_right_lt(ACL_XML2 *xml, const char *data)
 		return data;
 	}
 
-	/* 说明遇到了当前节点的子节点 */
+	/* ˵�������˵�ǰ�ڵ���ӽڵ� */
 
-	/* 重新设置当前节点状态，以便于其被子节点弹出时可以找到 "</" */
+	/* �������õ�ǰ�ڵ�״̬���Ա����䱻�ӽڵ㵯��ʱ�����ҵ� "</" */
 	xml->curr_node->status = ACL_XML2_S_TXT;
 
-	/* 创建新的子节点，并将其加入至当前节点的子节点集合中 */
+	/* �����µ��ӽڵ㣬�������������ǰ�ڵ���ӽڵ㼯���� */
 
 	node = acl_xml2_node_alloc(xml);
 	acl_xml2_node_add_child(xml->curr_node, node);
@@ -898,8 +898,8 @@ static const char *xml_parse_right_lt(ACL_XML2 *xml, const char *data)
 	return data;
 }
 
-/* 因为该父节点其实为叶节点，所以需要更新附属于该伪父节点的
- * 子节点的深度值，都应与该伪父节点相同
+/* ��Ϊ�ø��ڵ���ʵΪҶ�ڵ㣬������Ҫ���¸����ڸ�α���ڵ��
+ * �ӽڵ�����ֵ����Ӧ���α���ڵ���ͬ
  */ 
 static void update_children_depth(ACL_XML2_NODE *parent)
 {
@@ -913,7 +913,7 @@ static void update_children_depth(ACL_XML2_NODE *parent)
 	}
 }
 
-/* 查找与右标签相同的父节点 */
+/* �������ұ�ǩ��ͬ�ĸ��ڵ� */
 static int search_match_node(ACL_XML2 *xml)
 {
 	ACL_XML2_NODE *parent, *node;
@@ -1006,13 +1006,13 @@ static const char *xml_parse_right_tag(ACL_XML2 *xml, const char *data)
 			ret = 0;
 
 		if (ret == 0) {
-			/* 如果节点标签名与开始标签名不匹配，
-			 * 则需要继续寻找真正的结束标签
+			/* ����ڵ��ǩ���뿪ʼ��ǩ����ƥ�䣬
+			 * ����Ҫ����Ѱ�������Ľ�����ǩ
 			 */ 
 			curr_node->text = END(xml);
 			APPEND(xml, curr_node->rtag);
 
-			/* 重新设置当前节点状态，以便于其可以找到 "</" */
+			/* �������õ�ǰ�ڵ�״̬���Ա���������ҵ� "</" */
 			curr_node->status = ACL_XML2_S_TXT;
 		}
 	}
@@ -1022,7 +1022,7 @@ static const char *xml_parse_right_tag(ACL_XML2 *xml, const char *data)
 
 static const char *xml_parse_right_gt(ACL_XML2 *xml, const char *data)
 {
-	/* 当前节点分析完毕，需要弹出当前节点的父节点继续分析 */
+	/* ��ǰ�ڵ������ϣ���Ҫ������ǰ�ڵ�ĸ��ڵ�������� */
 	ACL_XML2_NODE *parent = acl_xml2_node_parent(xml->curr_node);
 
 	if (parent == xml->root) {
@@ -1067,7 +1067,7 @@ const char *acl_xml2_update(ACL_XML2 *xml, const char *data)
 	if (!(xml->flag & ACL_XML2_FLAG_MULTI_ROOT) && xml->root_cnt > 0)
 		return data;
 
-	/* XML 解析器状态机循环处理过程 */
+	/* XML ������״̬��ѭ���������� */
 
 	while (*data) {
 		if (xml->curr_node == NULL) {

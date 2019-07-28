@@ -1,4 +1,4 @@
-ï»¿// vstream_fseek.cpp : å®šä¹‰æŽ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// vstream_fseek.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£
 //
 
 #include "lib_acl.h"
@@ -107,7 +107,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 		printf("ok(%d): after seek 8193, offset=%d, sys_offset=%d\r\n",
 			__LINE__, (int) fp->offset, (int) fp->sys_offset);
 
-	// ç³»åˆ—è¯»
+	// ÏµÁÐ¶Á
 	printf("%d>>>begin check: offset=%d, sys_offset=%d\r\n",
 		__LINE__, (int) fp->offset, (int) fp->sys_offset);
 	off = acl_vstream_fseek(fp, 100, SEEK_SET);

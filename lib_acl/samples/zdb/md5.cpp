@@ -1,4 +1,4 @@
-﻿
+
 /* MS VisualStudio Projects are monolithic, so we need the following
  * #if to exclude the MD5 code from compile process when we are
  * building the SSL support.

@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "ring.h"
 
 typedef struct DUMMY {

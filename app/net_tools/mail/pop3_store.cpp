@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "rpc/rpc_manager.h"
 #include "global/global.h"
 #include "pop3_client.h"
@@ -24,7 +24,7 @@ pop3_store::~pop3_store()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ä¸»çº¿ç¨‹è¿‡ç¨‹
+// Ö÷Ïß³Ì¹ı³Ì
 
 void pop3_store::rpc_onover()
 {
@@ -34,7 +34,7 @@ void pop3_store::rpc_onover()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// å­çº¿ç¨‹è¿‡ç¨‹
+// ×ÓÏß³Ì¹ı³Ì
 
 static const char* CREATE_TBL =
 "create table pop3_tbl\r\n"

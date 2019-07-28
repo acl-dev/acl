@@ -1,4 +1,4 @@
-﻿#ifndef SQUID_MD5_H
+#ifndef SQUID_MD5_H
 #define SQUID_MD5_H
 
 #include <stdlib.h>

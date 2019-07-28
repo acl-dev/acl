@@ -1,4 +1,4 @@
-ï»¿#include <time.h>
+#include <time.h>
 #include <assert.h>
 #include "locker.hpp"
 #include "connpool/connect_client.hpp"
@@ -102,7 +102,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 
 	lock_->lock();
 
-	// æ£€æŸ¥æ˜¯å¦è®¾ç½®äº†è‡ªé”€æ¯æ ‡å¿—ä½
+	// ¼ì²éÊÇ·ñÉèÖÃÁË×ÔÏú»Ù±êÖ¾Î»
 	if (delay_destroy_)
 	{
 		delete conn;
@@ -110,7 +110,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 		assert(count_ >= 0);
 		if (count_ == 0)
 		{
-			// å¦‚æžœå¼•ç”¨è®¡æ•°ä¸º 0 åˆ™è‡ªé”€æ¯
+			// Èç¹ûÒýÓÃ¼ÆÊýÎª 0 Ôò×ÔÏú»Ù
 			lock_->unlock();
 			delete this;
 		}

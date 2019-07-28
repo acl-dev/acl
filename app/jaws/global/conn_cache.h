@@ -1,4 +1,4 @@
-ï»¿#ifndef	__CONN_CACHE_INCLUDE_H__
+#ifndef	__CONN_CACHE_INCLUDE_H__
 #define	__CONN_CACHE_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -19,58 +19,58 @@ typedef struct CONN_CACHE {
 typedef struct CONN CONN;
 
 /**
- * è¿æ¥æ± åˆå§‹åŒ–å‡½æ•°, è¯¥å‡½æ•°ä»…åœ¨ç¨‹åºåˆå§‹åŒ–æ—¶è¢«è°ƒç”¨ä¸€æ¬¡
- * @param aio {ACL_AIO*} å¼‚æ­¥æµå¯¹è±¡
- * @param conn_limit {int} æ¯ä¸€ä¸ªè¿æ¥æ± çš„æ•°é‡é™åˆ¶
- * @return {CONN_CACHE*} åˆ›å»ºä¸€ä¸ªè¿æ¥æ± çš„ç¼“å­˜å¯¹è±¡
+ * Á¬½Ó³Ø³õÊ¼»¯º¯Êı, ¸Ãº¯Êı½öÔÚ³ÌĞò³õÊ¼»¯Ê±±»µ÷ÓÃÒ»´Î
+ * @param aio {ACL_AIO*} Òì²½Á÷¶ÔÏó
+ * @param conn_limit {int} Ã¿Ò»¸öÁ¬½Ó³ØµÄÊıÁ¿ÏŞÖÆ
+ * @return {CONN_CACHE*} ´´½¨Ò»¸öÁ¬½Ó³ØµÄ»º´æ¶ÔÏó
  */
 CONN_CACHE *conn_cache_create(ACL_AIO *aio, int conn_limit);
 
 /**
- * å‘è¿æ¥æ± ä¸­æ·»åŠ ä¸€ä¸ªè¿æ¥æµ
- * @param cache {CONN_CAHCE*} é•¿è¿æ¥ç¼“å­˜å¯¹è±¡
- * @param timeout {int} è¯¥è¿æ¥çš„è¶…æ—¶æ—¶é—´
- * @param free_fn {void (*)(ACL_ASTREAM*, void*)} å…³é—­è¿æ¥æ—¶çš„å›è°ƒå‡½æ•°,
- *  å¦‚æœè¯¥å‚æ•°éç©ºï¼Œåˆ™å½“è¯¥è¿æ¥è¢«å…³é—­å‰ä¼šè‡ªåŠ¨è°ƒç”¨ free_fn
- * @param ctx {void*} free_fn çš„å‚æ•°ä¹‹ä¸€
+ * ÏòÁ¬½Ó³ØÖĞÌí¼ÓÒ»¸öÁ¬½ÓÁ÷
+ * @param cache {CONN_CAHCE*} ³¤Á¬½Ó»º´æ¶ÔÏó
+ * @param timeout {int} ¸ÃÁ¬½ÓµÄ³¬Ê±Ê±¼ä
+ * @param free_fn {void (*)(ACL_ASTREAM*, void*)} ¹Ø±ÕÁ¬½ÓÊ±µÄ»Øµ÷º¯Êı,
+ *  Èç¹û¸Ã²ÎÊı·Ç¿Õ£¬Ôòµ±¸ÃÁ¬½Ó±»¹Ø±ÕÇ°»á×Ô¶¯µ÷ÓÃ free_fn
+ * @param ctx {void*} free_fn µÄ²ÎÊıÖ®Ò»
  */
 void conn_cache_push_stream(CONN_CACHE *cache, ACL_ASTREAM *stream,
 	int timeout, void (*free_fn)(ACL_ASTREAM*, void*), void *ctx);
 
 /**
- * ä»è¿æ¥æ± å–å‡ºå¯¹åº”æŸä¸ªé”®å€¼çš„è¿æ¥å¯¹è±¡
- * @param cache {CONN_CAHCE*} é•¿è¿æ¥ç¼“å­˜å¯¹è±¡
- * @param key {const char*} æŸ¥è¯¢é”®å€¼ï¼Œå¦‚ï¼š192.168.0.1:80
- * @return {CONN*} è¿æ¥å¯¹è±¡, è‹¥ä¸º NULL åˆ™è¡¨ç¤ºä¸å­˜åœ¨
+ * ´ÓÁ¬½Ó³ØÈ¡³ö¶ÔÓ¦Ä³¸ö¼üÖµµÄÁ¬½Ó¶ÔÏó
+ * @param cache {CONN_CAHCE*} ³¤Á¬½Ó»º´æ¶ÔÏó
+ * @param key {const char*} ²éÑ¯¼üÖµ£¬Èç£º192.168.0.1:80
+ * @return {CONN*} Á¬½Ó¶ÔÏó, ÈôÎª NULL Ôò±íÊ¾²»´æÔÚ
  */
 CONN *conn_cache_get_conn(CONN_CACHE *cache, const char *key);
 
 /**
- * ä»è¿æ¥æ± å–å‡ºå¯¹åº”æŸä¸ªé”®å€¼çš„è¿æ¥æµ
- * @param cache {CONN_CAHCE*} é•¿è¿æ¥ç¼“å­˜å¯¹è±¡
- * @param key {const char*} æŸ¥è¯¢é”®å€¼ï¼Œå¦‚ï¼š192.168.0.1:80
- * @param ctx_pptr {void**} å¦‚æœç»“æœéç©ºï¼Œåˆ™å­˜å‚¨ç”¨æˆ·çš„è‡ªå®šä¹‰å˜é‡
- * @return {ACL_ASTREAM*} è¿æ¥æµ
+ * ´ÓÁ¬½Ó³ØÈ¡³ö¶ÔÓ¦Ä³¸ö¼üÖµµÄÁ¬½ÓÁ÷
+ * @param cache {CONN_CAHCE*} ³¤Á¬½Ó»º´æ¶ÔÏó
+ * @param key {const char*} ²éÑ¯¼üÖµ£¬Èç£º192.168.0.1:80
+ * @param ctx_pptr {void**} Èç¹û½á¹û·Ç¿Õ£¬Ôò´æ´¢ÓÃ»§µÄ×Ô¶¨Òå±äÁ¿
+ * @return {ACL_ASTREAM*} Á¬½ÓÁ÷
  */
 ACL_ASTREAM *conn_cache_get_stream(CONN_CACHE *cache, const char *key, void **ctx_pptr);
 
 /**
- * ä»è¿æ¥æ± ä¸­åˆ é™¤å¯¹åº”æŸä¸ªé”®å€¼çš„è¿æ¥
- * @param cache {CONN_CAHCE*} é•¿è¿æ¥ç¼“å­˜å¯¹è±¡
- * @param key {const char*} æŸ¥è¯¢é”®å€¼ï¼Œå¦‚ï¼š192.168.0.1:80
+ * ´ÓÁ¬½Ó³ØÖĞÉ¾³ı¶ÔÓ¦Ä³¸ö¼üÖµµÄÁ¬½Ó
+ * @param cache {CONN_CAHCE*} ³¤Á¬½Ó»º´æ¶ÔÏó
+ * @param key {const char*} ²éÑ¯¼üÖµ£¬Èç£º192.168.0.1:80
  */
 void conn_cache_delete_key(CONN_CACHE *cache, const char *key);
 
 /**
- * ä»è¿æ¥æ± ä¸­åˆ é™¤æŸä¸ªè¿æ¥å¯¹è±¡ä¸”å…³é—­è¿æ¥æµ
- * @param conn {CONN*} è¿æ¥å¯¹è±¡
+ * ´ÓÁ¬½Ó³ØÖĞÉ¾³ıÄ³¸öÁ¬½Ó¶ÔÏóÇÒ¹Ø±ÕÁ¬½ÓÁ÷
+ * @param conn {CONN*} Á¬½Ó¶ÔÏó
  */
 void conn_cache_delete_conn(CONN *conn);
 
 /**
- * ä»è¿æ¥æ± ä¸­åˆ é™¤æŸä¸ªè¿æ¥æµå¹¶åˆ é™¤å¯¹åº”çš„è¿æ¥å¯¹è±¡ä¸”å…³é—­è¿æ¥æµ
- * @param cache {CONN_CAHCE*} é•¿è¿æ¥ç¼“å­˜å¯¹è±¡
- * @param stream {ACL_ASTREAM*} è¿æ¥æµ
+ * ´ÓÁ¬½Ó³ØÖĞÉ¾³ıÄ³¸öÁ¬½ÓÁ÷²¢É¾³ı¶ÔÓ¦µÄÁ¬½Ó¶ÔÏóÇÒ¹Ø±ÕÁ¬½ÓÁ÷
+ * @param cache {CONN_CAHCE*} ³¤Á¬½Ó»º´æ¶ÔÏó
+ * @param stream {ACL_ASTREAM*} Á¬½ÓÁ÷
  */
 void conn_cache_delete_stream(CONN_CACHE *cache, ACL_ASTREAM *stream);
 

@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -30,7 +30,7 @@ queue_manager::queue_manager(const char* home, const char* queueName,
 	string buf = home;
 	buf << PATH_SEP << queueName;
 
-	// å…ˆåˆ›å»ºæ ¹ç›®å½•
+	// ÏÈ´´½¨¸ùÄ¿Â¼
 	if (acl_make_dirs(buf.c_str(), 0700) == -1) {
 		logger_error("create dir: %s error %s", buf.c_str(),
 			last_serror());
@@ -44,7 +44,7 @@ queue_manager::queue_manager(const char* home, const char* queueName,
 		safe_snprintf(node, sizeof(node), "%d", i);
 		buf << home << PATH_SEP << queueName
 			<< PATH_SEP << node;
-		// åˆ›å»ºé˜Ÿåˆ—ä¸‹å­ç›®å½•
+		// ´´½¨¶ÓÁĞÏÂ×ÓÄ¿Â¼
 		if (acl_make_dirs(buf.c_str(), 0700) == -1) {
 			logger_error("create dir: %s error %s",
 				buf.c_str(), last_serror());
@@ -100,7 +100,7 @@ queue_file* queue_manager::open_file(const char* filePath, bool no_cache /* = tr
 
 	queue_file* fp;
 
-	// å¦‚æœè¯¥æ–‡ä»¶å­˜åœ¨äºå†…å­˜ä¸­åˆ™ç›´æ¥è¿”å›ä¹‹
+	// Èç¹û¸ÃÎÄ¼ş´æÔÚÓÚÄÚ´æÖĞÔòÖ±½Ó·µ»ØÖ®
 	fp = cache_find(partName);
 	if (fp != NULL) {
 		if (no_cache) {
@@ -110,7 +110,7 @@ queue_file* queue_manager::open_file(const char* filePath, bool no_cache /* = tr
 		return fp;
 	}
 
-	// ä»ç£ç›˜æ‰“å¼€å·²ç»å­˜åœ¨çš„é˜Ÿåˆ—æ–‡ä»¶
+	// ´Ó´ÅÅÌ´ò¿ªÒÑ¾­´æÔÚµÄ¶ÓÁĞÎÄ¼ş
 	fp = NEW queue_file;
 	if (!fp->open(home.c_str(), queueName.c_str(), queueSub.c_str(),
 		partName.c_str(), extName.c_str())) {
@@ -175,7 +175,7 @@ bool queue_manager::parse_filePath(const char* filePath, string* home,
 		return false;
 	}
 
-	// æ ¼å¼ä¸º: /home/queue_name/queue_sub_node/file_name.file_ext
+	// ¸ñÊ½Îª: /home/queue_name/queue_sub_node/file_name.file_ext
 
 	ACL_ARGV *argv = acl_argv_split(filePath, "/\\");
 	if (argv->argc < 4) {
@@ -186,12 +186,12 @@ bool queue_manager::parse_filePath(const char* filePath, string* home,
 
 	home->clear();
 
-	// å¦‚æœç¬¬ä¸€ä¸ªå­—ç¬¦ä¸º PATH_SEP åˆ™éœ€è¦è¡¥é½
+	// Èç¹ûµÚÒ»¸ö×Ö·ûÎª PATH_SEP ÔòĞèÒª²¹Æë
 	if (*filePath == PATH_SEP) {
 		home->push_back(PATH_SEP);
 	}
 
-	// ä»…å­˜å‚¨æ ¹è·¯å¾„éƒ¨åˆ†
+	// ½ö´æ´¢¸ùÂ·¾¶²¿·Ö
 	for (int i = 0; i < argv->argc - 3; i++) {
 		if (i > 0 && home->length() > 0) {
 			(*home) += PATH_SEP;
@@ -199,11 +199,11 @@ bool queue_manager::parse_filePath(const char* filePath, string* home,
 		(*home) += argv->argv[i];
 	}
 
-	// å–å¾—é˜Ÿåˆ—å
+	// È¡µÃ¶ÓÁĞÃû
 	*queueName = argv->argv[argv->argc - 3];
 	*queueSub  = argv->argv[argv->argc - 2];
 
-	// ç»§ç»­åˆ†ææ–‡ä»¶åéƒ¨åˆ†
+	// ¼ÌĞø·ÖÎöÎÄ¼şÃû²¿·Ö
 	bool ret  = parse_fileName(argv->argv[argv->argc - 1], partName, extName);
 
 	acl_argv_free(argv);
@@ -218,7 +218,7 @@ bool queue_manager::parse_fileName(const char* fileName, string* partName, strin
 		return false;
 	}
 
-	// æ‹·è´æ–‡ä»¶å
+	// ¿½±´ÎÄ¼şÃû
 	partName->copy(fileName, extSep - fileName);
 	extSep++;
 	if (*extSep == 0) {
@@ -226,7 +226,7 @@ bool queue_manager::parse_fileName(const char* fileName, string* partName, strin
 		return false;
 	}
 
-	// æ‹·è´æ‰©å±•å
+	// ¿½±´À©Õ¹Ãû
 	*extName = extSep;
 	return true;
 }
@@ -239,8 +239,8 @@ bool queue_manager::parse_path(const char* path, string* home,
 		return false;
 	}
 
-	/* WINDOWS æ”¯æŒ '/' å’Œ '\\' ä¸¤ç§åˆ†éš”ç¬¦ */
-	// æ•°æ®æ ¼å¼: /home/queueName/queueSub
+	/* WINDOWS Ö§³Ö '/' ºÍ '\\' Á½ÖÖ·Ö¸ô·û */
+	// Êı¾İ¸ñÊ½: /home/queueName/queueSub
 	ACL_ARGV *argv = acl_argv_split(path, "/\\");
 	if (argv->argc < 3) {
 		logger_error("path(%s) invalid", path);
@@ -248,17 +248,17 @@ bool queue_manager::parse_path(const char* path, string* home,
 		return false;
 	}
 
-	// å–å¾—home
+	// È¡µÃhome
 	home->clear();
-	// å¦‚æœç¬¬ä¸€ä¸ªå­—ç¬¦ä¸º PATH_SEP åˆ™éœ€è¦è¡¥é½
+	// Èç¹ûµÚÒ»¸ö×Ö·ûÎª PATH_SEP ÔòĞèÒª²¹Æë
 	if (*path == PATH_SEP) {
 		home->push_back(PATH_SEP);
 	}
 	*home += argv->argv[argv->argc - 3];
 
-	// å–å¾—é˜Ÿåˆ—å
+	// È¡µÃ¶ÓÁĞÃû
 	*queueName = argv->argv[argv->argc - 2];
-	// å–å¾—é˜Ÿåˆ—å­ç›®å½•å
+	// È¡µÃ¶ÓÁĞ×ÓÄ¿Â¼Ãû
 	*queueSub = argv->argv[argv->argc - 1];
 	acl_argv_free(argv);
 	return true;
@@ -386,7 +386,7 @@ queue_file* queue_manager::scan_next(void)
 	string filePath;
 
 	while (1) {
-		// æ‰«æä¸‹ä¸€ä¸ªç£ç›˜æ–‡ä»¶
+		// É¨ÃèÏÂÒ»¸ö´ÅÅÌÎÄ¼ş
 		const char* fileName = acl_scan_dir_next_file(m_scanDir);
 		if (fileName == NULL) {
 			return NULL;
@@ -398,7 +398,7 @@ queue_file* queue_manager::scan_next(void)
 			continue;
 		}
 
-		// å¦‚æœè¯¥é˜Ÿåˆ—æ–‡ä»¶å·²ç»å­˜åœ¨äºå†…å­˜é˜Ÿåˆ—ä¸­åˆ™è·³è¿‡
+		// Èç¹û¸Ã¶ÓÁĞÎÄ¼şÒÑ¾­´æÔÚÓÚÄÚ´æ¶ÓÁĞÖĞÔòÌø¹ı
 		if (busy(partName.c_str())) {
 			continue;
 		}
@@ -412,7 +412,7 @@ queue_file* queue_manager::scan_next(void)
 		filePath.clear();
 		filePath << path << PATH_SEP << fileName;
 		fp = NEW queue_file;
-		// ä»ç£ç›˜æ‰“å¼€å·²ç»å­˜åœ¨çš„é˜Ÿåˆ—æ–‡ä»¶
+		// ´Ó´ÅÅÌ´ò¿ªÒÑ¾­´æÔÚµÄ¶ÓÁĞÎÄ¼ş
 		if (!fp->open(filePath.c_str())) {
 			logger_error("open %s error(%s)", filePath.c_str(),
 				last_serror());

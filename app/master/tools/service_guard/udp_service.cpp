@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "action/guard_action.h"
 #include "configure.h"
 #include "udp_service.h"

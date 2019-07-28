@@ -1,4 +1,4 @@
-ï»¿/* #include "StdAfx.h"*/
+/* #include "StdAfx.h"*/
 #ifndef ACL_PREPARE_COMPILE
 
 #include "lib_acl.h"
@@ -59,7 +59,7 @@ int test_x64toa(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 
 int test_strcasestr(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
-	char *src = "href=\"http://3g.hexun.com\" target=\"_blank\" style=\"background:url(http://www.hexun.com/upload/phaone2.png) no-repeat; padding:2px 0 2px 13px;\">æ‰‹æœºç‰ˆ</a></div>";
+	char *src = "href=\"http://3g.hexun.com\" target=\"_blank\" style=\"background:url(http://www.hexun.com/upload/phaone2.png) no-repeat; padding:2px 0 2px 13px;\">ÊÖ»ú°æ</a></div>";
 	const char *ptr = ">", *ptr1;
 
 	ptr1 = acl_strcasestr(src, ptr);

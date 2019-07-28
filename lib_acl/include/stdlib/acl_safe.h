@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_SAFE_INCLUDE_H
+#ifndef	ACL_SAFE_INCLUDE_H
 #define	ACL_SAFE_INCLUDE_H
 
 #ifdef	__cplusplus

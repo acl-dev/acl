@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "https_request.h"
 
 https_request::https_request(const char* addr, acl::polarssl_conf* ssl_conf)
@@ -35,7 +35,7 @@ void* https_request::run(void)
 	acl::http_ctype ctype;
 	ctype.parse(ptr);
 
-	// å“åº”å¤´æ•°æ®ç±»å‹çš„å­ç±»å‹
+	// ÏìÓ¦Í·Êı¾İÀàĞÍµÄ×ÓÀàĞÍ
 	const char* stype = ctype.get_stype();
 
 	bool ret;

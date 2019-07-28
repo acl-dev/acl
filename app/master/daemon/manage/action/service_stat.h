@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 struct stat_req_t;
 struct stat_res_t;

@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "master_base.hpp"
 #include "../stdlib/thread_mutex.hpp"
@@ -13,52 +13,52 @@ class ACL_CPP_API master_udp : public master_base
 {
 public:
 	/**
-	 * å¼€å§‹è¿è¡Œï¼Œè°ƒç”¨è¯¥å‡½æ•°æ˜¯æŒ‡è¯¥æœåŠ¡è¿›ç¨‹æ˜¯åœ¨ acl_master æœåŠ¡æ¡†æ¶
-	 * æ§åˆ¶ä¹‹ä¸‹è¿è¡Œï¼Œä¸€èˆ¬ç”¨äºç”Ÿäº§æœºçŠ¶æ€
-	 * @param argc {int} ä» main ä¸­ä¼ é€’çš„ç¬¬ä¸€ä¸ªå‚æ•°ï¼Œè¡¨ç¤ºå‚æ•°ä¸ªæ•°
-	 * @param argv {char**} ä» main ä¸­ä¼ é€’çš„ç¬¬äºŒä¸ªå‚æ•°
+	 * ¿ªÊ¼ÔËĞĞ£¬µ÷ÓÃ¸Ãº¯ÊıÊÇÖ¸¸Ã·şÎñ½ø³ÌÊÇÔÚ acl_master ·şÎñ¿ò¼Ü
+	 * ¿ØÖÆÖ®ÏÂÔËĞĞ£¬Ò»°ãÓÃÓÚÉú²ú»ú×´Ì¬
+	 * @param argc {int} ´Ó main ÖĞ´«µİµÄµÚÒ»¸ö²ÎÊı£¬±íÊ¾²ÎÊı¸öÊı
+	 * @param argv {char**} ´Ó main ÖĞ´«µİµÄµÚ¶ş¸ö²ÎÊı
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * åœ¨å•ç‹¬è¿è¡Œæ—¶çš„å¤„ç†å‡½æ•°ï¼Œç”¨æˆ·å¯ä»¥è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œä¸€äº›å¿…è¦çš„è°ƒè¯•å·¥ä½œ
-	 * @param addrs {const char*} æœåŠ¡ç›‘å¬åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼šIP:PORT, IP:PORT...
-	 * @param path {const char*} é…ç½®æ–‡ä»¶å…¨è·¯å¾„
-	 * @param count {unsigned int} å¾ªç¯æœåŠ¡çš„æ¬¡æ•°ï¼Œè¾¾åˆ°æ­¤å€¼åå‡½æ•°è‡ªåŠ¨è¿”å›ï¼›
-	 *  è‹¥è¯¥å€¼ä¸º 0 åˆ™è¡¨ç¤ºç¨‹åºä¸€ç›´å¾ªç¯å¤„ç†å¤–æ¥è¯·æ±‚è€Œä¸è¿”å›
-	 * @return {bool} ç›‘å¬æ˜¯å¦æˆåŠŸ
+	 * ÔÚµ¥¶ÀÔËĞĞÊ±µÄ´¦Àíº¯Êı£¬ÓÃ»§¿ÉÒÔµ÷ÓÃ´Ëº¯Êı½øĞĞÒ»Ğ©±ØÒªµÄµ÷ÊÔ¹¤×÷
+	 * @param addrs {const char*} ·şÎñ¼àÌıµØÖ·ÁĞ±í£¬¸ñÊ½£ºIP:PORT, IP:PORT...
+	 * @param path {const char*} ÅäÖÃÎÄ¼şÈ«Â·¾¶
+	 * @param count {unsigned int} Ñ­»··şÎñµÄ´ÎÊı£¬´ïµ½´ËÖµºóº¯Êı×Ô¶¯·µ»Ø£»
+	 *  Èô¸ÃÖµÎª 0 Ôò±íÊ¾³ÌĞòÒ»Ö±Ñ­»·´¦ÀíÍâÀ´ÇëÇó¶ø²»·µ»Ø
+	 * @return {bool} ¼àÌıÊÇ·ñ³É¹¦
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL,
 		unsigned int count = 1);
 
 protected:
-	// è¯¥ç±»ä¸èƒ½ç›´æ¥è¢«å®ä¾‹åŒ–
+	// ¸ÃÀà²»ÄÜÖ±½Ó±»ÊµÀı»¯
 	master_udp();
 	virtual ~master_udp();
 
 	/**
-	 * çº¯è™šå‡½æ•°ï¼šå½“ UDP æµæœ‰æ•°æ®å¯è¯»æ—¶å›è°ƒå­ç±»æ­¤å‡½æ•°ï¼Œè¯¥æ–¹æ³•åœ¨å­çº¿ç¨‹ä¸­è°ƒç”¨
+	 * ´¿Ğéº¯Êı£ºµ± UDP Á÷ÓĞÊı¾İ¿É¶ÁÊ±»Øµ÷×ÓÀà´Ëº¯Êı£¬¸Ã·½·¨ÔÚ×ÓÏß³ÌÖĞµ÷ÓÃ
 	 * @param stream {socket_stream*}
 	 */
 	virtual void on_read(socket_stream* stream) = 0;
 
 	/**
-	 * å½“ç»‘å®š UDP åœ°å€æˆåŠŸåå›è°ƒæ­¤è™šæ–¹æ³•ï¼Œè¯¥æ–¹æ³•åœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
+	 * µ±°ó¶¨ UDP µØÖ·³É¹¦ºó»Øµ÷´ËĞé·½·¨£¬¸Ã·½·¨ÔÚ×ÓÏß³ÌÖĞ±»µ÷ÓÃ
 	 */
 	virtual void proc_on_bind(socket_stream&) {}
 
 	/**
-	 * å½“è§£ç»‘ UDP åœ°å€æ—¶å›è°ƒæ­¤è™šæ–¹æ³•ï¼Œè¯¥æ–¹æ³•åœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
+	 * µ±½â°ó UDP µØÖ·Ê±»Øµ÷´ËĞé·½·¨£¬¸Ã·½·¨ÔÚ×ÓÏß³ÌÖĞ±»µ÷ÓÃ
 	 */
 	virtual void proc_on_unbind(socket_stream&) {}
 
 	/**
-	 * å½“çº¿ç¨‹åˆå§‹åŒ–æ—¶è¯¥è™šæ–¹æ³•å°†è¢«è°ƒç”¨
+	 * µ±Ïß³Ì³õÊ¼»¯Ê±¸ÃĞé·½·¨½«±»µ÷ÓÃ
 	 */
 	virtual void thread_on_init(void) {}
 
 	/**
-	 * è·å¾—æœ¬åœ°ç›‘å¬çš„å¥—æ¥å£æµå¯¹è±¡é›†åˆ
+	 * »ñµÃ±¾µØ¼àÌıµÄÌ×½Ó¿ÚÁ÷¶ÔÏó¼¯ºÏ
 	 * @return {const std::vector<socket_stream*>&}
 	 */
 	const std::vector<socket_stream*>& get_sstreams() const
@@ -67,8 +67,8 @@ protected:
 	}
 
 	/**
-	 * è·å¾—é…ç½®æ–‡ä»¶è·¯å¾„
-	 * @return {const char*} è¿”å›å€¼ä¸º NULL è¡¨ç¤ºæ²¡æœ‰è®¾é…ç½®æ–‡ä»¶
+	 * »ñµÃÅäÖÃÎÄ¼şÂ·¾¶
+	 * @return {const char*} ·µ»ØÖµÎª NULL ±íÊ¾Ã»ÓĞÉèÅäÖÃÎÄ¼ş
 	 */
 	const char* get_conf_path(void) const;
 
@@ -85,28 +85,28 @@ private:
 	void remove(socket_stream* ss);
 
 private:
-	// å½“æ¥æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥æ—¶å›è°ƒæ­¤å‡½æ•°
+	// µ±½ÓÊÕµ½Ò»¸ö¿Í»§¶ËÁ¬½ÓÊ±»Øµ÷´Ëº¯Êı
 	static void service_main(void*, ACL_VSTREAM*);
 
-	// å½“ç»‘å®šåœ°å€æˆåŠŸåçš„å›è°ƒå‡½æ•°
+	// µ±°ó¶¨µØÖ·³É¹¦ºóµÄ»Øµ÷º¯Êı
 	static void service_on_bind(void*, ACL_VSTREAM*);
 
-	// å½“è§£ç»‘åœ°å€æ—¶çš„å›è°ƒå‡½æ•°
+	// µ±½â°óµØÖ·Ê±µÄ»Øµ÷º¯Êı
 	static void service_on_unbind(void*, ACL_VSTREAM*);
 
-	// å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void service_pre_jail(void*);
 
-	// å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void service_init(void*);
 
-	// å½“è¿›ç¨‹é€€å‡ºæ—¶è°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±½ø³ÌÍË³öÊ±µ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void service_exit(void*);
 
-	// å½“çº¿ç¨‹å¯åŠ¨æ—¶è°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±Ïß³ÌÆô¶¯Ê±µ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void thread_init(void*);
 
-	// å½“è¿›ç¨‹æ”¶åˆ° SIGHUP ä¿¡å·åä¼šå›è°ƒæœ¬å‡½æ•°
+	// µ±½ø³ÌÊÕµ½ SIGHUP ĞÅºÅºó»á»Øµ÷±¾º¯Êı
 	static int service_on_sighup(void*, ACL_VSTRING*);
 };
 

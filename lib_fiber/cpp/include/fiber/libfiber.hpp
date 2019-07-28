@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "fiber.hpp"
 #include "master_fiber.hpp"

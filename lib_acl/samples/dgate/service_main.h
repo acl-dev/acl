@@ -1,4 +1,4 @@
-﻿#ifndef __SERVICE_MAIN_INCLUDE_H__
+#ifndef __SERVICE_MAIN_INCLUDE_H__
 #define __SERVICE_MAIN_INCLUDE_H__
 
 #ifdef __cplusplus

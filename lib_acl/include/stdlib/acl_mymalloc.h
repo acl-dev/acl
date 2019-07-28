@@ -1,12 +1,12 @@
-ï»¿/*
+/*
  * @file	mymalloc.h
  * @author	zsx
  * @date	2003-12-15
  * @version	1.0
- * @brief	æœ¬æ–‡ä»¶ä¸ºä½¿ç”¨ACLåº“æ—¶çš„é«˜çº§å†…å­˜åˆ†é…æ¥å£ï¼Œç”¨æˆ·åº”è¯¥ä¸»è¦ä½¿ç”¨æ­¤æ¥å£æ¥
- *		è¿›è¡Œå†…å­˜çš„åˆ†é…åŠé‡Šæ”¾, ç”¨æˆ·å¯ä»¥å…ˆè¡Œè°ƒç”¨ acl_mem_hook.h ä¸­çš„å‡½æ•°
- *		æ¥å£æ³¨å†Œè‡ªå·±çš„å†…å­˜åˆ†é…ä¸é‡Šæ”¾ç­‰ç®¡ç†æ¥å£ï¼Œè¿™æ ·å†è°ƒç”¨ acl_myxxx ç±»
- *		çš„å®æ—¶ä¾¿è‡ªåŠ¨åˆ‡æ¢åˆ°ç”¨æˆ·è‡ªå·±çš„å†…å­˜ç®¡ç†æ¥å£è°ƒç”¨ä¸Š
+ * @brief	±¾ÎÄ¼şÎªÊ¹ÓÃACL¿âÊ±µÄ¸ß¼¶ÄÚ´æ·ÖÅä½Ó¿Ú£¬ÓÃ»§Ó¦¸ÃÖ÷ÒªÊ¹ÓÃ´Ë½Ó¿ÚÀ´
+ *		½øĞĞÄÚ´æµÄ·ÖÅä¼°ÊÍ·Å, ÓÃ»§¿ÉÒÔÏÈĞĞµ÷ÓÃ acl_mem_hook.h ÖĞµÄº¯Êı
+ *		½Ó¿Ú×¢²á×Ô¼ºµÄÄÚ´æ·ÖÅäÓëÊÍ·ÅµÈ¹ÜÀí½Ó¿Ú£¬ÕâÑùÔÙµ÷ÓÃ acl_myxxx Àà
+ *		µÄºêÊ±±ã×Ô¶¯ÇĞ»»µ½ÓÃ»§×Ô¼ºµÄÄÚ´æ¹ÜÀí½Ó¿Úµ÷ÓÃÉÏ
  */
 
 #ifndef	ACL_MYMALLOC_INCLUDE_H
@@ -20,54 +20,54 @@ extern "C" {
 #include "acl_malloc.h"
 
 /**
- * åŠ¨æ€åˆ†é…å†…å­˜çš„å®å®šä¹‰ï¼Œä¸åˆå§‹åŒ–æ–°åˆ†é…çš„å†…å­˜ç©ºé—´
- * @param size {size_t} åˆ†é…é•¿åº¦
+ * ¶¯Ì¬·ÖÅäÄÚ´æµÄºê¶¨Òå£¬²»³õÊ¼»¯ĞÂ·ÖÅäµÄÄÚ´æ¿Õ¼ä
+ * @param size {size_t} ·ÖÅä³¤¶È
  * @return {void *}
  */
 #define acl_mymalloc(size) acl_malloc_glue(__FILE__, __LINE__, size)
 
 /**
- * åŠ¨æ€åˆ†é…å†…å­˜çš„å®å®šä¹‰ï¼Œåˆå§‹åŒ–æ–°åˆ†é…çš„å†…å­˜ç©ºé—´ä¸ºé›¶
- * @param nmemb {size_t} å…ƒç´ ä¸ªæ•°
- * @param size {size_t} æ¯ä¸ªå…ƒç´ çš„é•¿åº¦
+ * ¶¯Ì¬·ÖÅäÄÚ´æµÄºê¶¨Òå£¬³õÊ¼»¯ĞÂ·ÖÅäµÄÄÚ´æ¿Õ¼äÎªÁã
+ * @param nmemb {size_t} ÔªËØ¸öÊı
+ * @param size {size_t} Ã¿¸öÔªËØµÄ³¤¶È
  * @return {void *}
  */
 #define acl_mycalloc(nmemb, size) acl_calloc_glue(__FILE__, __LINE__, nmemb, size)
 
 /**
- * é‡æ–°åŠ¨æ€åˆ†é…å†…å­˜çš„å®å®šä¹‰
- * @param ptr {void*} åŸå†…å­˜åœ°å€
- * @param size {size_t} æ–°åˆ†é…å†…å­˜æ—¶è¦æ±‚çš„é•¿åº¦
+ * ÖØĞÂ¶¯Ì¬·ÖÅäÄÚ´æµÄºê¶¨Òå
+ * @param ptr {void*} Ô­ÄÚ´æµØÖ·
+ * @param size {size_t} ĞÂ·ÖÅäÄÚ´æÊ±ÒªÇóµÄ³¤¶È
  * @return {void *}
  */
 #define acl_myrealloc(ptr, size) acl_realloc_glue(__FILE__, __LINE__, (ptr), size)
 
 /**
- * åŠ¨æ€å¤åˆ¶å­—ç¬¦ä¸²å®å®šä¹‰
- * @param str {const char*} æºå­—ç¬¦ä¸²
- * @return {char*} æ–°çš„å­—ç¬¦ä¸²ï¼Œéœ€ç”¨ acl_myfree é‡Šæ”¾
+ * ¶¯Ì¬¸´ÖÆ×Ö·û´®ºê¶¨Òå
+ * @param str {const char*} Ô´×Ö·û´®
+ * @return {char*} ĞÂµÄ×Ö·û´®£¬ĞèÓÃ acl_myfree ÊÍ·Å
  */
 #define acl_mystrdup(str) acl_strdup_glue(__FILE__, __LINE__, (str))
 
 /**
- * åŠ¨æ€å¤åˆ¶å­—ç¬¦ä¸²å®å®šä¹‰ï¼Œå¹¶é™å®šæœ€å¤§å†…å­˜ç©ºé—´å¤§å°
- * @param str {const char*} æºå­—ç¬¦ä¸²
- * @param len {size_t} æ–°å­—ç¬¦ä¸²æœ€å¤§å†…å­˜ç©ºé—´å¤§å°é™åˆ¶å€¼
- * @return {char*} æ–°çš„å­—ç¬¦ä¸²ï¼Œéœ€ç”¨ acl_myfree é‡Šæ”¾
+ * ¶¯Ì¬¸´ÖÆ×Ö·û´®ºê¶¨Òå£¬²¢ÏŞ¶¨×î´óÄÚ´æ¿Õ¼ä´óĞ¡
+ * @param str {const char*} Ô´×Ö·û´®
+ * @param len {size_t} ĞÂ×Ö·û´®×î´óÄÚ´æ¿Õ¼ä´óĞ¡ÏŞÖÆÖµ
+ * @return {char*} ĞÂµÄ×Ö·û´®£¬ĞèÓÃ acl_myfree ÊÍ·Å
  */
 #define acl_mystrndup(str, len) acl_strndup_glue(__FILE__, __LINE__, (str), len)
 
 /**
- * åŠ¨æ€å¤åˆ¶å†…å­˜å®å®šä¹‰
- * @param ptr {const void*} æºå†…å­˜åœ°å€
- * @param len {size_t} æºå†…å­˜å¤§å°
- * @return {void*} æ–°çš„å­—ç¬¦ä¸²ï¼Œéœ€ç”¨ acl_myfree é‡Šæ”¾
+ * ¶¯Ì¬¸´ÖÆÄÚ´æºê¶¨Òå
+ * @param ptr {const void*} Ô´ÄÚ´æµØÖ·
+ * @param len {size_t} Ô´ÄÚ´æ´óĞ¡
+ * @return {void*} ĞÂµÄ×Ö·û´®£¬ĞèÓÃ acl_myfree ÊÍ·Å
  */
 #define acl_mymemdup(ptr, len) acl_memdup_glue(__FILE__, __LINE__, (ptr), len)
 
 /**
- * é‡Šæ”¾åŠ¨æ€åˆ†é…çš„å†…å­˜ç©ºé—´
- * @param _ptr_ {void*} åŠ¨æ€å†…å­˜åœ°å€
+ * ÊÍ·Å¶¯Ì¬·ÖÅäµÄÄÚ´æ¿Õ¼ä
+ * @param _ptr_ {void*} ¶¯Ì¬ÄÚ´æµØÖ·
  */
 #define acl_myfree(_ptr_) do {  \
 	if (_ptr_) {  \
@@ -77,7 +77,7 @@ extern "C" {
 } while (0)
 
 /**
- * XXX: å› ä¸ºè¯¥å‡½æ•°ç”¨äºå›è°ƒå‡½æ•°ï¼Œæ‰€ä»¥æ— æ³•è¿›è¡Œå®å®šä¹‰è½¬æ¢, å°†æ¥å†å®Œå–„æ­¤å‡½æ•°
+ * XXX: ÒòÎª¸Ãº¯ÊıÓÃÓÚ»Øµ÷º¯Êı£¬ËùÒÔÎŞ·¨½øĞĞºê¶¨Òå×ª»», ½«À´ÔÙÍêÉÆ´Ëº¯Êı
  */
 #define	acl_myfree_fn acl_free_fn_glue
 

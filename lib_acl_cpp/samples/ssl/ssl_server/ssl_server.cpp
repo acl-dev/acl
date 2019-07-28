@@ -1,4 +1,4 @@
-ï»¿// main.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// main.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 #include "stdafx.h"
 #include <assert.h>
@@ -34,7 +34,7 @@ public:
 		return false;
 	}
 
-	// GET æ–¹æ³•
+	// GET ·½·¨
 	virtual bool doGet(HttpServletRequest& req, HttpServletResponse& res)
 	{
 		bool ret = doPost(req, res);
@@ -45,21 +45,21 @@ public:
 		return ret;
 	}
 
-	// POST æ–¹æ³•
+	// POST ·½·¨
 	virtual bool doPost(HttpServletRequest& req, HttpServletResponse& res)
 	{
 		first_ = false;
 
 		logger("request one now");
 
-		// åˆ›å»º HTTP å“åº”å¤´
+		// ´´½¨ HTTP ÏìÓ¦Í·
 		res.addCookie("name1", "value1");
 		res.addCookie("name2", "value2", ".test.com", "/", 3600 * 24);
 		res.setChunkedTransferEncoding(true);
 		res.setKeepAlive(true);
-		//		res.setStatus(400);  // å¯ä»¥è®¾ç½®è¿”å›çš„çŠ¶æ€ç 
+		//		res.setStatus(400);  // ¿ÉÒÔÉèÖÃ·µ»ØµÄ×´Ì¬Âë
 
-		// ä¸¤ç§æ–¹å¼éƒ½å¯ä»¥è®¾ç½®å­—ç¬¦é›†
+		// Á½ÖÖ·½Ê½¶¼¿ÉÒÔÉèÖÃ×Ö·û¼¯
 		if (0)
 			res.setContentType("text/xml; charset=gb2312");
 		else
@@ -68,8 +68,8 @@ public:
 			res.setCharacterEncoding("gb2312");
 		}
 
-		// è·å¾— HTTP è¯·æ±‚çš„æ•°æ®ç±»å‹ï¼Œæ­£å¸¸çš„å‚æ•°ç±»å‹ï¼Œå³ name&value æ–¹å¼
-		// è¿˜æ˜¯ MIME æ•°æ®ç±»å‹ï¼Œè¿˜æ˜¯æ•°æ®æµç±»å‹
+		// »ñµÃ HTTP ÇëÇóµÄÊı¾İÀàĞÍ£¬Õı³£µÄ²ÎÊıÀàĞÍ£¬¼´ name&value ·½Ê½
+		// »¹ÊÇ MIME Êı¾İÀàĞÍ£¬»¹ÊÇÊı¾İÁ÷ÀàĞÍ
 		http_request_t request_type = req.getRequestType();
 		if (request_type == HTTP_REQUEST_NORMAL)
 			return doParams(req, res);
@@ -81,11 +81,11 @@ public:
 
 	bool doResponse(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// è·å¾—æµè§ˆå™¨ä¼ æ¥çš„ cookie å€¼
+		// »ñµÃä¯ÀÀÆ÷´«À´µÄ cookie Öµ
 		const char* cookie1 = req.getCookieValue("name1");
 		const char* cookie2 = req.getCookieValue("name2");
 
-		// åˆ›å»º xml æ ¼å¼çš„æ•°æ®ä½“
+		// ´´½¨ xml ¸ñÊ½µÄÊı¾İÌå
 		xml1 body;
 		body.get_root().add_child("root", true)
 			.add_child("content_type", true)
@@ -125,16 +125,16 @@ public:
 		//printf(">>>response: %s\r\n", buf.c_str());
 		//res.setContentLength(buf.length());
 
-		// ä¸å¿…æ˜¾ç¤ºå·¥è°ƒç”¨ä¸‹é¢è¿‡ç¨‹æ¥å‘é€ http å“åº”å¤´
+		// ²»±ØÏÔÊ¾¹¤µ÷ÓÃÏÂÃæ¹ı³ÌÀ´·¢ËÍ http ÏìÓ¦Í·
 		//if (res.sendHeader() == false)
 		//	return false;
-		// å‘é€ http å“åº”ä½“ï¼Œå½“ä½¿ç”¨ chunk ä¼ è¾“æ—¶ï¼Œå¿…é¡»æœ€åè°ƒç”¨ä¸€æ¬¡å‘é€ç©ºæ•°æ®
+		// ·¢ËÍ http ÏìÓ¦Ìå£¬µ±Ê¹ÓÃ chunk ´«ÊäÊ±£¬±ØĞë×îºóµ÷ÓÃÒ»´Î·¢ËÍ¿ÕÊı¾İ
 		if (res.write(buf) == false || res.write(NULL, 0) == false)
 			return false;
 		return true;
 	}
 
-	// GET æ–¹å¼æˆ– POST æ–¹å¼ä¸”æ»¡è¶³ï¼š
+	// GET ·½Ê½»ò POST ·½Ê½ÇÒÂú×ã£º
 	// Content-Type: application/x-www-form-urlencoded
 	bool doParams(HttpServletRequest& req, HttpServletResponse& res)
 	{
@@ -144,11 +144,11 @@ public:
 		return doResponse(req, res);
 	}
 
-	// POST æ–¹å¼ä¸”æ»¡è¶³ï¼š
+	// POST ·½Ê½ÇÒÂú×ã£º
 	// Content-Type: multipart/form-data; boundary=xxx
 	bool doUpload(HttpServletRequest& req, HttpServletResponse& res)
 	{
-		// å…ˆè·å¾— Content-Type å¯¹åº”çš„ http_ctype å¯¹è±¡
+		// ÏÈ»ñµÃ Content-Type ¶ÔÓ¦µÄ http_ctype ¶ÔÏó
 		http_mime* mime = req.getHttpMime();
 		if (mime == NULL)
 		{
@@ -156,7 +156,7 @@ public:
 			return false;
 		}
 
-		// è·å¾—æ•°æ®ä½“çš„é•¿åº¦
+		// »ñµÃÊı¾İÌåµÄ³¤¶È
 		long long int len = req.getContentLength();
 		if (len <= 0)
 		{
@@ -164,7 +164,7 @@ public:
 			return false;
 		}
 
-		// è·å¾—è¾“å…¥æµ
+		// »ñµÃÊäÈëÁ÷
 		istream& in = req.getInputStream();
 		char  buf[8192];
 		int   ret;
@@ -174,12 +174,12 @@ public:
 		ofstream out;
 		out.open_write(filepath);
 
-		// è®¾ç½®åŸå§‹æ–‡ä»¶å­˜å…¥è·¯å¾„
+		// ÉèÖÃÔ­Ê¼ÎÄ¼ş´æÈëÂ·¾¶
 		mime->set_saved_path(filepath);
 
 		size_t k;
 
-		// è¯»å– HTTP å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®
+		// ¶ÁÈ¡ HTTP ¿Í»§¶ËÇëÇóÊı¾İ
 		while (len > 0)
 		{
 			k = (size_t) len > sizeof(buf) ? sizeof(buf) : (size_t) len;
@@ -193,7 +193,7 @@ public:
 
 			len -= ret;
 
-			// å°†è¯»å¾—åˆ°çš„æ•°æ®è¾“å…¥è‡³è§£æå™¨è¿›è¡Œè§£æ
+			// ½«¶ÁµÃµ½µÄÊı¾İÊäÈëÖÁ½âÎöÆ÷½øĞĞ½âÎö
 			if (!finish && mime->update(buf, ret) == true)
 				finish = true;
 		}
@@ -208,7 +208,7 @@ public:
 
 		string path;
 
-		// éå†æ‰€æœ‰çš„ MIME ç»“ç‚¹ï¼Œæ‰¾å‡ºå…¶ä¸­ä¸ºæ–‡ä»¶ç»“ç‚¹çš„éƒ¨åˆ†è¿›è¡Œè½¬å‚¨
+		// ±éÀúËùÓĞµÄ MIME ½áµã£¬ÕÒ³öÆäÖĞÎªÎÄ¼ş½áµãµÄ²¿·Ö½øĞĞ×ª´¢
 		const std::list<http_mime_node*>& nodes = mime->get_nodes();
 		std::list<http_mime_node*>::const_iterator cit = nodes.begin();
 		for (; cit != nodes.end(); ++cit)
@@ -234,8 +234,8 @@ public:
 				else if (strcmp(name, "file3") == 0)
 					file3_ = filename;
 
-				// æœ‰çš„æµè§ˆå™¨ï¼ˆå¦‚IEï¼‰ä¸Šä¼ æ–‡ä»¶æ—¶ä¼šå¸¦ç€æ–‡ä»¶è·¯å¾„ï¼Œæ‰€ä»¥
-				// éœ€è¦å…ˆå°†è·¯å¾„å»æ‰
+				// ÓĞµÄä¯ÀÀÆ÷£¨ÈçIE£©ÉÏ´«ÎÄ¼şÊ±»á´ø×ÅÎÄ¼şÂ·¾¶£¬ËùÒÔ
+				// ĞèÒªÏÈ½«Â·¾¶È¥µô
 				filename = acl_safe_basename(filename);
 #ifdef WIN32
 				path.format("var\\%s", filename);
@@ -246,15 +246,15 @@ public:
 			}
 		}
 
-		// æŸ¥æ‰¾ä¸Šè½½çš„æŸä¸ªæ–‡ä»¶å¹¶è½¬å‚¨
+		// ²éÕÒÉÏÔØµÄÄ³¸öÎÄ¼ş²¢×ª´¢
 		const http_mime_node* node = mime->get_node("file1");
 		if (node && node->get_mime_type() == HTTP_MIME_FILE)
 		{
 			const char* ptr = node->get_filename();
 			if (ptr)
 			{
-				// æœ‰çš„æµè§ˆå™¨ï¼ˆå¦‚IEï¼‰ä¸Šä¼ æ–‡ä»¶æ—¶ä¼šå¸¦ç€æ–‡ä»¶è·¯å¾„ï¼Œæ‰€ä»¥
-				// éœ€è¦å…ˆå°†è·¯å¾„å»æ‰
+				// ÓĞµÄä¯ÀÀÆ÷£¨ÈçIE£©ÉÏ´«ÎÄ¼şÊ±»á´ø×ÅÎÄ¼şÂ·¾¶£¬ËùÒÔ
+				// ĞèÒªÏÈ½«Â·¾¶È¥µô
 				ptr = acl_safe_basename(ptr);
 #ifdef WIN32
 				path.format(".\\var\\1_%s", ptr);
@@ -267,7 +267,7 @@ public:
 		return doResponse(req, res);
 	}
 
-	// POST æ–¹å¼ä¸”æ»¡è¶³ï¼š
+	// POST ·½Ê½ÇÒÂú×ã£º
 	// Content-Type: application/octet-stream
 	bool doOctetStream(HttpServletRequest&, HttpServletResponse&)
 	{
@@ -296,7 +296,7 @@ static void do_run(socket_stream* stream)
 	servlet.doRun(session, stream);
 }
 
-// æœåŠ¡å™¨æ–¹å¼è¿è¡Œæ—¶çš„æœåŠ¡ç±»
+// ·şÎñÆ÷·½Ê½ÔËĞĞÊ±µÄ·şÎñÀà
 class master_service : public master_proc
 {
 public:
@@ -327,8 +327,8 @@ protected:
 
 		if (conf_)
 		{
-			// å¯¹äºä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
-			// è¿æ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
+			// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ĞèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
+			// Á¬½ÓÁ÷¶ÔÏóÖĞ£¬¼´ÓÃ ssl io Ìæ»» stream ÖĞÄ¬ÈÏµÄµ×²ã IO ¹ı³Ì
 
 			logger("begin setup ssl hook...");
 
@@ -349,10 +349,10 @@ protected:
 		if (conf_ == NULL)
 			return;
 
-		// å…è®¸æœåŠ¡ç«¯çš„ SSL ä¼šè¯ç¼“å­˜åŠŸèƒ½
+		// ÔÊĞí·şÎñ¶ËµÄ SSL »á»°»º´æ¹¦ÄÜ
 		conf_->enable_cache(true);
 
-		// æ·»åŠ æœ¬åœ°æœåŠ¡çš„è¯ä¹¦
+		// Ìí¼Ó±¾µØ·şÎñµÄÖ¤Êé
 		if (conf_->add_cert(crt_file_.c_str()) == false)
 		{
 			logger_error("add cert failed, crt: %s, key: %s",
@@ -364,7 +364,7 @@ protected:
 		logger("load cert ok, crt: %s, key: %s",
 			crt_file_.c_str(), key_file_.c_str());
 
-		// æ·»åŠ æœ¬åœ°æœåŠ¡å¯†é’¥
+		// Ìí¼Ó±¾µØ·şÎñÃÜÔ¿
 		if (conf_->set_key(key_file_.c_str()) == false)
 		{
 			logger_error("set private key error");
@@ -382,7 +382,7 @@ private:
 	acl::polarssl_verify_t verify_mode_;
 };
 
-// WEB æœåŠ¡æ¨¡å¼
+// WEB ·şÎñÄ£Ê½
 static void do_alone(const char* crt_file, const char* key_file,
 	acl::polarssl_verify_t verify_mode)
 {
@@ -390,10 +390,10 @@ static void do_alone(const char* crt_file, const char* key_file,
 	acl::log::stdout_open(true);
 	const char* addr = "0.0.0.0:2443";
 	printf("listen: %s ...\r\n", addr);
-	service.run_alone(addr, NULL, 0);  // å•ç‹¬è¿è¡Œæ–¹å¼
+	service.run_alone(addr, NULL, 0);  // µ¥¶ÀÔËĞĞ·½Ê½
 }
 
-// WEB CGI æ¨¡å¼
+// WEB CGI Ä£Ê½
 static void do_cgi(void)
 {
 	do_run(NULL);
@@ -411,7 +411,7 @@ int main(int argc, char* argv[])
 	acl::polarssl_conf::set_libpath("../libpolarssl.so");
 	acl::polarssl_conf::load();
 
-	// å¼€å§‹è¿è¡Œ
+	// ¿ªÊ¼ÔËĞĞ
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
 		acl::polarssl_verify_t verify_mode;

@@ -1,7 +1,7 @@
-ï»¿#pragma once
+#pragma once
 
 /**
- * æœ¬ç±»å¯¹è±¡å°†é˜»å¡ä»»åŠ¡äº¤ç»™å­çº¿ç¨‹å¤„ç†ï¼›ä¸ºäº†æ–¹ä¾¿ä½¿ç”¨ï¼Œå°†è¯¥ç±»å£°æ˜ä¸ºå•ä¾‹ç±»
+ * ±¾Àà¶ÔÏó½«×èÈûÈÎÎñ½»¸ø×ÓÏß³Ì´¦Àí£»ÎªÁË·½±ãÊ¹ÓÃ£¬½«¸ÃÀàÉùÃ÷Îªµ¥ÀıÀà
  */
 class rpc_manager : public acl::singleton<rpc_manager>
 {
@@ -10,25 +10,25 @@ public:
 	~rpc_manager(void);
 
 	/**
-	 * å•ä¾‹åˆå§‹åŒ–å‡½æ•°
-	 * @param handle {acl::aio_handle&} å¼‚æ­¥å¼•æ“å¥æŸ„
-	 * @param max_threads {int} å­çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°é‡
-	 * @param addr {const char*} rpc æœåŠ¡ç›‘å¬çš„åœ°å€ï¼Œå¦‚æœä¸ºç©ºï¼Œåˆ™å†…éƒ¨ç”±ç³»
-	 *  ç»Ÿè‡ªåŠ¨ç»™å®šä¸€ä¸ª 127.0.0.1:PORT åœ°å€è¿›è¡Œç›‘å¬ï¼Œéç©ºæ—¶åˆ™ç›‘å¬æŒ‡å®šçš„åœ°å€
+	 * µ¥Àı³õÊ¼»¯º¯Êı
+	 * @param handle {acl::aio_handle&} Òì²½ÒıÇæ¾ä±ú
+	 * @param max_threads {int} ×ÓÏß³Ì³ØµÄ×î´óÏß³ÌÊıÁ¿
+	 * @param addr {const char*} rpc ·şÎñ¼àÌıµÄµØÖ·£¬Èç¹ûÎª¿Õ£¬ÔòÄÚ²¿ÓÉÏµ
+	 *  Í³×Ô¶¯¸ø¶¨Ò»¸ö 127.0.0.1:PORT µØÖ·½øĞĞ¼àÌı£¬·Ç¿ÕÊ±Ôò¼àÌıÖ¸¶¨µÄµØÖ·
 	 */
 	void init(acl::aio_handle& handle, int max_threads = 10,
 		const char* addr = NULL);
 
 	/**
-	 * å‘èµ·ä¸€ä¸ªé˜»å¡è¿‡ç¨‹ï¼Œå°†è¯¥è¿‡ç¨‹äº¤ç”±å­çº¿ç¨‹å¤„ç†
-	 * @param req {acl::rpc_request*} é˜»å¡ä»»åŠ¡å¯¹è±¡
+	 * ·¢ÆğÒ»¸ö×èÈû¹ı³Ì£¬½«¸Ã¹ı³Ì½»ÓÉ×ÓÏß³Ì´¦Àí
+	 * @param req {acl::rpc_request*} ×èÈûÈÎÎñ¶ÔÏó
 	 */
 	void fork(acl::rpc_request* req);
 
 private:
-	// å¼‚æ­¥æ¶ˆæ¯å¥æŸ„
+	// Òì²½ÏûÏ¢¾ä±ú
 	acl::aio_handle* handle_;
 
-	// å¼‚æ­¥ RPC é€šä¿¡æœåŠ¡å¥æŸ„
+	// Òì²½ RPC Í¨ĞÅ·şÎñ¾ä±ú
 	acl::rpc_service* service_;
 };

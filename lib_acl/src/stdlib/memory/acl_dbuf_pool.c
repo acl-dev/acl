@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -57,9 +57,9 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 	if (size < (size_t) page_size)
 		size = page_size;
 
-	/* xxx: ä¸ºäº†å°½é‡ä¿è¯åœ¨è°ƒç”¨ acl_mymalloc åˆ†é…å†…å­˜æ—¶ä¸ºå†…å­˜é¡µçš„æ•´æ•°å€ï¼Œ
-	 * éœ€è¦å‡åŽ» sizeof(ACL_DBUF) å’Œ 16 å­—èŠ‚ï¼Œå…¶ä¸­ 16 å­—èŠ‚æ˜¯ acl_mymalloc
-	 * å†…éƒ¨ç»™æ¯ä¸ªå†…å­˜å—é¢å¤–æ·»åŠ çš„æŽ§åˆ¶å¤´ï¼Œåœ¨ acl_mymalloc å†…éƒ¨ 16 å­—èŠ‚ä¸ºï¼š
+	/* xxx: ÎªÁË¾¡Á¿±£Ö¤ÔÚµ÷ÓÃ acl_mymalloc ·ÖÅäÄÚ´æÊ±ÎªÄÚ´æÒ³µÄÕûÊý±¶£¬
+	 * ÐèÒª¼õÈ¥ sizeof(ACL_DBUF) ºÍ 16 ×Ö½Ú£¬ÆäÖÐ 16 ×Ö½ÚÊÇ acl_mymalloc
+	 * ÄÚ²¿¸øÃ¿¸öÄÚ´æ¿é¶îÍâÌí¼ÓµÄ¿ØÖÆÍ·£¬ÔÚ acl_mymalloc ÄÚ²¿ 16 ×Ö½ÚÎª£º
 	 * offsetof(MBLOCK, u.payload[0])
 	 */
 	size -= 16 + sizeof(ACL_DBUF);
@@ -124,21 +124,21 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 		return 0;
 
 	while (1) {
-		/* å¦‚æžœå½“å‰å†…å­˜å—æœ‰ä¿ç•™å†…å­˜åŒºï¼Œåˆ™ä¿ç•™æ•´ä¸ªå†…å­˜å— */
+		/* Èç¹ûµ±Ç°ÄÚ´æ¿éÓÐ±£ÁôÄÚ´æÇø£¬Ôò±£ÁôÕû¸öÄÚ´æ¿é */
 		if (iter->keep)
 			break;
 
-		/* è®¡ç®—å½“å‰å†…å­˜å—è¢«ä½¿ç”¨çš„å†…å­˜å¤§å° */
+		/* ¼ÆËãµ±Ç°ÄÚ´æ¿é±»Ê¹ÓÃµÄÄÚ´æ´óÐ¡ */
 		n = iter->addr - iter->buf;
 
-		/* å½“ off ç›¸å¯¹åç§»é‡åœ¨å½“å‰å†…å­˜å—æ—¶ï¼Œåˆ™é€€å‡ºå¾ªçŽ¯ */
+		/* µ± off Ïà¶ÔÆ«ÒÆÁ¿ÔÚµ±Ç°ÄÚ´æ¿éÊ±£¬ÔòÍË³öÑ­»· */
 		if (pool->off <= off + n) {
 			iter->addr -= pool->off - off;
 			pool->off  = off;
 			break;
 		}
 
-		/* é™¤å¤´éƒ¨èŠ‚ç‚¹å¤–ï¼Œè‡³å°‘å†ä¿ç•™ä¸€ä¸ªç©ºé—²çš„èŠ‚ç‚¹ï¼Œä»¥ä¾¿é‡å¤ä½¿ç”¨ */
+		/* ³ýÍ·²¿½ÚµãÍâ£¬ÖÁÉÙÔÙ±£ÁôÒ»¸ö¿ÕÏÐµÄ½Úµã£¬ÒÔ±ãÖØ¸´Ê¹ÓÃ */
 		if (pool->count == 2) {
 			ACL_DBUF *first = (ACL_DBUF*) pool->buf;
 			pool->head->addr = pool->head->buf;
@@ -147,14 +147,14 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 			break;
 		}
 
-		/* ä¿ç•™å½“å‰å†…å­˜å—æŒ‡é’ˆä»¥ä¾¿äºŽä¸‹é¢è¿›è¡Œé‡Šæ”¾ */
+		/* ±£Áôµ±Ç°ÄÚ´æ¿éÖ¸ÕëÒÔ±ãÓÚÏÂÃæ½øÐÐÊÍ·Å */
 		tmp = iter;
-		/* æŒ‡å‘ä¸‹ä¸€ä¸ªå†…å­˜å—åœ°å€ */
+		/* Ö¸ÏòÏÂÒ»¸öÄÚ´æ¿éµØÖ· */
 		iter = iter->next;
 
 		pool->head = iter;
 
-		/* off ä¸ºä¸‹ä¸€ä¸ªå†…å­˜å—çš„ addr æ‰€åœ¨çš„ç›¸å¯¹åç§»ä½ç½®  */
+		/* off ÎªÏÂÒ»¸öÄÚ´æ¿éµÄ addr ËùÔÚµÄÏà¶ÔÆ«ÒÆÎ»ÖÃ  */
 		pool->off -=n;
 
 		if (tmp->size > pool->block_size)

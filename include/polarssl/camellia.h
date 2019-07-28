@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file camellia.h
  *
  * \brief Camellia block cipher

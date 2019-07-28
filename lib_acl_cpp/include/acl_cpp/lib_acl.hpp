@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "acl_cpp_define.hpp"
 #include "acl_cpp_init.hpp"

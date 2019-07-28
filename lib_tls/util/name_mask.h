@@ -1,4 +1,4 @@
-﻿#ifndef _NAME_MASK_H_INCLUDED_
+#ifndef _NAME_MASK_H_INCLUDED_
 #define _NAME_MASK_H_INCLUDED_
 
 /*++

@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
@@ -214,7 +214,7 @@ stream_hook* stream::setup_hook(stream_hook* hook)
 		acl_vstream_add_object(stream_, HOOK_KEY, this);
 
 		if (!hook->open(stream_)) {
-			// å¦‚æžœæ‰“å¼€å¤±è´¥ï¼Œåˆ™æ¢å¤
+			// Èç¹û´ò¿ªÊ§°Ü£¬Ôò»Ö¸´
 
 			stream_->fread_fn  = read_fn;
 			stream_->fwrite_fn = write_fn;
@@ -232,7 +232,7 @@ stream_hook* stream::setup_hook(stream_hook* hook)
 		acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(stream_));
 
 		if (!hook->open(stream_)) {
-			// å¦‚æžœæ‰“å¼€å¤±è´¥ï¼Œåˆ™æ¢å¤
+			// Èç¹û´ò¿ªÊ§°Ü£¬Ôò»Ö¸´
 
 			stream_->read_fn  = read_fn;
 			stream_->write_fn = write_fn;

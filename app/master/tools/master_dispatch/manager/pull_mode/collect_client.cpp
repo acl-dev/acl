@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "pull_mode/message.h"
 #include "pull_mode/message_manager.h"
 #include "pull_mode/collect_client.h"
@@ -11,10 +11,10 @@ collect_client::collect_client(message_manager& manager, const char* server)
 
 void* collect_client::run()
 {
-	// é‡‡ç”¨ url ç¼–ç æ–¹å¼ï¼š
+	// ²ÉÓÃ url ±àÂë·½Ê½£º
 	// type=xxx
 
-	// åˆ›å»º HTTP è¯·æ±‚å¤´
+	// ´´½¨ HTTP ÇëÇóÍ·
 	acl::http_request req(server_);
 	req.request_header()
 		.set_url("/?type=xml&xml_meta=false")
@@ -23,7 +23,7 @@ void* collect_client::run()
 
 	req.set_timeout(var_cfg_conn_timeout, var_cfg_rw_timeout);
 
-	// å‘é€ HTTP è¯·æ±‚å¤´ & è¯»å– HTTP å“åº”å¤´
+	// ·¢ËÍ HTTP ÇëÇóÍ· & ¶ÁÈ¡ HTTP ÏìÓ¦Í·
 	if (req.request(NULL, 0) == false)
 	{
 		logger_error("request to server: %s", server_.c_str());
@@ -48,7 +48,7 @@ void* collect_client::run()
 		msg->add(buf.c_str(), buf.length());
 	}
 
-	// å‘çº¿ç¨‹å¼‚æ­¥é˜Ÿåˆ—æ·»åŠ æŸ¥è¯¢ç»“æœæ¶ˆæ¯
+	// ÏòÏß³ÌÒì²½¶ÓÁĞÌí¼Ó²éÑ¯½á¹ûÏûÏ¢
 	manager_.put(msg);
 	return NULL;
 }

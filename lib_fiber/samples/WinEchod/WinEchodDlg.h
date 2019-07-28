@@ -1,28 +1,28 @@
-ï»¿
-// WinEchodDlg.h : å¤´æ–‡ä»¶
+
+// WinEchodDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
 
-// CWinEchodDlg å¯¹è¯æ¡†
+// CWinEchodDlg ¶Ô»°¿ò
 class CWinEchodDlg : public CDialogEx
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	CWinEchodDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	CWinEchodDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 	~CWinEchodDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_WINECHOD_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

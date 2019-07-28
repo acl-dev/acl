@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "udp_sock.h"
 #include "udp_pkt.h"
 

@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -20,7 +20,7 @@
 #include "stdlib/unix/acl_mychown.h"
 
 
-/* æ³¨æ„, æ­¤å‡½æ•°æ˜¯çº¿ç¨‹ä¸å®‰å…¨çš„, å¦‚æœæ¯æ¬¡çš„ s_owner ä¸ s_group éƒ½ä¸€æ ·åˆ™æ— æ‰€è°“ */
+/* ×¢Òâ, ´Ëº¯ÊıÊÇÏß³Ì²»°²È«µÄ, Èç¹ûÃ¿´ÎµÄ s_owner Óë s_group ¶¼Ò»ÑùÔòÎŞËùÎ½ */
 int acl_mychown(const char *path, const char *s_owner, const char *s_group)
 {
 	struct	passwd	*pwd;
@@ -46,7 +46,7 @@ int acl_mychown(const char *path, const char *s_owner, const char *s_group)
 	return(-1);
 }
 
-/* æ³¨æ„, æ­¤å‡½æ•°æ˜¯çº¿ç¨‹ä¸å®‰å…¨çš„, å¦‚æœæ¯æ¬¡çš„ s_owner ä¸ s_group éƒ½ä¸€æ ·åˆ™æ— æ‰€è°“ */
+/* ×¢Òâ, ´Ëº¯ÊıÊÇÏß³Ì²»°²È«µÄ, Èç¹ûÃ¿´ÎµÄ s_owner Óë s_group ¶¼Ò»ÑùÔòÎŞËùÎ½ */
 int acl_myfchown(const int fd, const char *s_owner, const char *s_group)
 {
 	struct	passwd	*pwd;

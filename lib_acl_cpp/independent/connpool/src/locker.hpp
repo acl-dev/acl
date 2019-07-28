@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include <stdlib.h>
 #ifndef WIN32
 #include <pthread.h>
@@ -12,7 +12,7 @@ namespace acl_min
 {
 
 /**
- * äº’æ–¥é”ï¼Œå¯ä»¥åŒæ—¶åˆ›å»ºæ–‡ä»¶é”å’Œçº¿ç¨‹é”ï¼Œä¹Ÿå¯ä»¥åªåˆ›å»ºä¸€ç§é”
+ * »¥³âËø£¬¿ÉÒÔÍ¬Ê±´´½¨ÎÄ¼þËøºÍÏß³ÌËø£¬Ò²¿ÉÒÔÖ»´´½¨Ò»ÖÖËø
  */
 class locker
 {
@@ -21,14 +21,14 @@ public:
 	virtual ~locker();
 
 	/**
-	 * é’ˆå¯¹å·²ç»æ‰“å¼€çš„é”(åŒ…æ‹¬çº¿ç¨‹é”å’Œæ–‡ä»¶é”)è¿›è¡ŒåŠ é”
-	 * @return {bool} åŠ é”æ˜¯å¦æˆåŠŸ
+	 * Õë¶ÔÒÑ¾­´ò¿ªµÄËø(°üÀ¨Ïß³ÌËøºÍÎÄ¼þËø)½øÐÐ¼ÓËø
+	 * @return {bool} ¼ÓËøÊÇ·ñ³É¹¦
 	 */
 	bool lock();
 
 	/**
-	 * é’ˆå¯¹å·²ç»æ‰“å¼€çš„é”(åŒ…æ‹¬çº¿ç¨‹é”å’Œæ–‡ä»¶é”)è¿›è¡Œè§£é”
-	 * @return {bool} è§£é”æ˜¯å¦æˆåŠŸ
+	 * Õë¶ÔÒÑ¾­´ò¿ªµÄËø(°üÀ¨Ïß³ÌËøºÍÎÄ¼þËø)½øÐÐ½âËø
+	 * @return {bool} ½âËøÊÇ·ñ³É¹¦
 	 */
 	bool unlock();
 

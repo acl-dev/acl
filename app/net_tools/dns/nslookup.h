@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +46,7 @@ public:
 	}
 
 private:
-	// get_nslookup å‡½æ•°åªå¯ä»¥è¢« nslookup ç±»å®ä¾‹è°ƒç”¨
+	// get_nslookup º¯ÊıÖ»¿ÉÒÔ±» nslookup ÀàÊµÀıµ÷ÓÃ
 	friend class nslookup;
 	nslookup& get_nslookup() const
 	{
@@ -69,13 +69,13 @@ public:
 protected:
 	~nslookup();
 
-	// åŸºç±»è™šå‡½æ•°ï¼šå­çº¿ç¨‹å¤„ç†å‡½æ•°
+	// »ùÀàĞéº¯Êı£º×ÓÏß³Ì´¦Àíº¯Êı
 	virtual void rpc_run();
 
-	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
+	// »ùÀàĞéº¯Êı£ºÖ÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
 	virtual void rpc_onover();
 
-	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹çš„é€šçŸ¥æ¶ˆæ¯
+	// »ùÀàĞéº¯Êı£ºÖ÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌµÄÍ¨ÖªÏûÏ¢
 	virtual void rpc_wakeup(void* ctx);
 
 private:
@@ -85,7 +85,7 @@ private:
 	int   dns_port_;
 	int   timeout_;
 	std::vector<domain_info*>* domain_list_;
-	size_t nresult_;  // å·²ç»è¿”å›æŸ¥è¯¢ç»“æœçš„ä¸ªæ•°
+	size_t nresult_;  // ÒÑ¾­·µ»Ø²éÑ¯½á¹ûµÄ¸öÊı
 
 	bool load_file();
 	void lookup_all();

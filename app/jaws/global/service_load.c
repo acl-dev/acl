@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "service.h"
 
 typedef struct {
@@ -27,7 +27,7 @@ void service_load(ACL_FIFO *service_modules, const char *dlname)
 
 	acl_msg_info("%s(%d): load %s ok.", __FUNCTION__, __LINE__, dlname);
 
-	/* æ·»åŠ è¯·æ±‚è¿‡æ»¤å™¨ */
+	/* Ìí¼ÓÇëÇó¹ýÂËÆ÷ */
 
 	module.mod_init = (module_service_init_fn) (intptr_t)
 		acl_dlsym(handle, "module_service_init");

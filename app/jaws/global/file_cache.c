@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include <time.h>
 #include <assert.h>

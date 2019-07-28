@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 #include "db_store.h"
 #include "http_thread.h"
@@ -23,7 +23,7 @@ http_thread::~http_thread()
 {
 	db_store store;
 
-	// çº¿ç¨‹é€€å‡ºå‰å°†ç»“æžœå…¥åº“
+	// Ïß³ÌÍË³öÇ°½«½á¹ûÈë¿â
 	store.db_update(*this);
 }
 
@@ -53,7 +53,7 @@ void* http_thread::run()
 
 	struct timeval begin, end;
 
-	// è¿žæŽ¥ HTTP æœåŠ¡å™¨å¹¶è®¡ç®—è€—æ—¶
+	// Á¬½Ó HTTP ·þÎñÆ÷²¢¼ÆËãºÄÊ±
 	gettimeofday(&begin, NULL);
 	acl::socket_stream* conn = connect_server();
 	gettimeofday(&end, NULL);
@@ -80,7 +80,7 @@ void* http_thread::run()
 
 acl::socket_stream* http_thread::connect_server()
 {
-	// è¿žæŽ¥è¿œç¨‹ HTTP æœåŠ¡å™¨
+	// Á¬½ÓÔ¶³Ì HTTP ·þÎñÆ÷
 	acl::socket_stream* conn = new acl::socket_stream();
 	if (conn->open(addr_, var_cfg_conn_timeout,
 		var_cfg_rw_timeout) == false)
@@ -98,7 +98,7 @@ bool http_thread::http_request(acl::socket_stream* conn, const char* host)
 	acl::http_request req(conn);
 	acl::http_header& header = req.request_header();
 
-	// æž„é€  HTTP è¯·æ±‚å¤´
+	// ¹¹Ôì HTTP ÇëÇóÍ·
 	header.set_url(url_.c_str())
 		.set_keep_alive(false)
 		.set_host(host)
@@ -107,7 +107,7 @@ bool http_thread::http_request(acl::socket_stream* conn, const char* host)
 		.add_entry("Accept-Encoding", "plain")
 		.accept_gzip(true);
 
-	// å‘é€ HTTP è¯·æ±‚å¤´ï¼ŒåŒæ—¶è¯»å–å“åº”å¤´
+	// ·¢ËÍ HTTP ÇëÇóÍ·£¬Í¬Ê±¶ÁÈ¡ÏìÓ¦Í·
 	if (req.request(NULL, 0) == false)
 	{
 		logger_error("send request to %s error %s",
@@ -122,7 +122,7 @@ bool http_thread::http_request(acl::socket_stream* conn, const char* host)
 	acl::string buf;
 	int   ret, len;
 
-	// å¼€å§‹è¯»æ•°æ®ä½“
+	// ¿ªÊ¼¶ÁÊý¾ÝÌå
 	while (true)
 	{
 		ret = req.read_body(buf, true, &len);
@@ -137,12 +137,12 @@ bool http_thread::http_request(acl::socket_stream* conn, const char* host)
 		length_ += len;
 	}
 #else
-	// sohu çš„ www.sohu.com æ¯”è¾ƒå¼±ï¼Œè™½ç„¶å®¢æˆ·ç«¯å‘é€äº†åªæŽ¥æ”¶ plain æ•°æ®
-	// å…¶ä¾ç„¶ä¼šå‘ gzip å“åº”æ•°æ®
+	// sohu µÄ www.sohu.com ±È½ÏÈõ£¬ËäÈ»¿Í»§¶Ë·¢ËÍÁËÖ»½ÓÊÕ plain Êý¾Ý
+	// ÆäÒÀÈ»»á·¢ gzip ÏìÓ¦Êý¾Ý
 	char  buf[8192];
 	int   ret;
 
-	// å¼€å§‹è¯»æ•°æ®ä½“
+	// ¿ªÊ¼¶ÁÊý¾ÝÌå
 	while (true)
 	{
 		ret = req.get_body(buf, sizeof(buf) - 1);
@@ -158,7 +158,7 @@ bool http_thread::http_request(acl::socket_stream* conn, const char* host)
 	}
 #endif
 
-	// å¦‚æžœè¯»åˆ°çš„æ•°æ®ä¸Ž HTTP å“åº”å¤´ä¸­çš„æ•°æ®ä¸ä¸€è‡´ï¼Œåˆ™æŠ¥é”™
+	// Èç¹û¶Áµ½µÄÊý¾ÝÓë HTTP ÏìÓ¦Í·ÖÐµÄÊý¾Ý²»Ò»ÖÂ£¬Ôò±¨´í
 	if (content_length > 0 && length_ != content_length)
 	{
 		logger_error("length: %d != content_length: %lld, server: %s",

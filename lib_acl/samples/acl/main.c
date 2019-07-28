@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #ifdef	ACL_FREEBSD
 #include <pthread_np.h>
 #endif

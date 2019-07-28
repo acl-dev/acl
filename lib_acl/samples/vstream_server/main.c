@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 
 static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
 {
@@ -89,7 +89,7 @@ int   main(int argc, char *argv[])
 	n = acl_is_listening_socket(ACL_VSTREAM_SOCK(server));
 	printf("server is listening socket: %s\r\n", n ? "yes" : "no");
 
-	/* 鎺ユ敹澶栨潵瀹㈡埛绔繛鎺� */
+	/* 接收外来客户端连接 */
 	client = acl_vstream_accept(server, addr, sizeof(addr));
 	if (client == NULL) {
 		printf("accept error %s\r\n", acl_last_serror());
@@ -99,7 +99,7 @@ int   main(int argc, char *argv[])
 	printf("client is listening socket: %s\r\n",
 		acl_is_listening_socket(ACL_VSTREAM_SOCK(client)) ? "yes" : "no");
 
-	/* 浠庡鎴风璇诲彇涓€琛屾暟鎹紝浠庤€岀煡閬撳鎴锋瘡娆″彂閫佹暟鎹殑闀垮害 */
+	/* 从客户端读取一行数据，从而知道客户每次发送数据的长度 */
 	n = acl_vstream_gets_nonl(client, line, sizeof(line));
 	if (n == ACL_VSTREAM_EOF)
 		goto END;

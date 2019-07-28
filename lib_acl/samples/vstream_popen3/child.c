@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <signal.h>
 
 static void on_sigterm(int signo)

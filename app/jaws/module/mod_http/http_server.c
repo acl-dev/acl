@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include <assert.h>
 #include <sys/types.h>
@@ -216,7 +216,7 @@ static int http_doc_cache(HTTP_CLIENT *client, FILE_CACHE *cache)
 }
 
 /**     
- * 成功读到HTTP请求头后的回调函数
+ * �ɹ�����HTTP����ͷ��Ļص�����
  */                     
 static int request_header_ready(int status, void *arg)
 {
@@ -230,7 +230,7 @@ static int request_header_ready(int status, void *arg)
 			http_client->entry.service)->file_path;
 	char *ptr;
 
-	/* 先禁止读操作，因为目前还不支持 pipeline 模式 */
+	/* �Ƚ�ֹ����������ΪĿǰ����֧�� pipeline ģʽ */
 	acl_aio_disable_read(http_client->entry.client);
 
 	if (status != HTTP_CHAT_OK) {
@@ -269,17 +269,17 @@ static int request_header_ready(int status, void *arg)
 	}
 
 	if (http_client->req_curr != NULL) {
-		/* 如果前一个请求还未处理完毕，则返回 */
+		/* ���ǰһ������δ������ϣ��򷵻� */
 		return (0);
 	}
-	http_client->req_curr = req;  /* 设置当前可以处理的请求 */
+	http_client->req_curr = req;  /* ���õ�ǰ���Դ��������� */
 
-	/* 先检查用户自定义过滤器 */
+	/* �ȼ���û��Զ�������� */
 	if (http_client_req_filter(http_client)) {
-		/* 返回 -1 仅是为了让异步框架自动关闭该异步流对象，
-		 * 因为该异步流已经与数据流分离，所以当关闭异步流
-		 * 时，并不真正关闭与浏览器之间的数据流，也不关闭
-		 * 与服务器之间的数据流
+		/* ���� -1 ����Ϊ�����첽����Զ��رո��첽������
+		 * ��Ϊ���첽���Ѿ������������룬���Ե��ر��첽��
+		 * ʱ�����������ر��������֮�����������Ҳ���ر�
+		 * �������֮���������
 		 */
 		return (-1);
 	}

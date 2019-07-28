@@ -1,4 +1,4 @@
-﻿
+
 #ifndef	__UNIT_TEST_INCLUDE_H__
 #define	__UNIT_TEST_INCLUDE_H__
 

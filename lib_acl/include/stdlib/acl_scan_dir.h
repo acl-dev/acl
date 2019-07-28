@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_SCAN_DIR_INCLUDE_H
+#ifndef ACL_SCAN_DIR_INCLUDE_H
 #define ACL_SCAN_DIR_INCLUDE_H
 
 #include <sys/stat.h>
@@ -9,216 +9,216 @@ extern "C" {
 
 #include "acl_define.h"
 /**
- * ç›®å½•æ‰«æå¥æŸ„ç±»å‹å®šä¹‰
+ * Ä¿Â¼É¨Ãè¾ä±úÀàĞÍ¶¨Òå
  */
 typedef struct ACL_SCAN_DIR ACL_SCAN_DIR;
 
 /**
- * ç›®å½•æ‰«æè¿‡ç¨‹ä¸­ç”¨æˆ·å¯ä»¥è®¾ç½®çš„å›è°ƒå‡½æ•°ç±»å‹å®šä¹‰
- * @param scan {ACL_SCAN_DIR*} ç›®å½•æ‰«ææŒ‡é’ˆ
- * @param ctx {void*} ç”¨æˆ·å‚æ•°æŒ‡é’ˆ
+ * Ä¿Â¼É¨Ãè¹ı³ÌÖĞÓÃ»§¿ÉÒÔÉèÖÃµÄ»Øµ÷º¯ÊıÀàĞÍ¶¨Òå
+ * @param scan {ACL_SCAN_DIR*} Ä¿Â¼É¨ÃèÖ¸Õë
+ * @param ctx {void*} ÓÃ»§²ÎÊıÖ¸Õë
  */
 typedef int (*ACL_SCAN_DIR_FN)(ACL_SCAN_DIR *scan, void *ctx);
 
 /**
- * ç›®å½•æ‰«æè¿‡ç¨‹ä¸­ï¼Œå¦‚æœé‡åˆ°ç©ºç›®å½•ä¸”ç”¨æˆ·è®¾ç½®äº†è‡ªåŠ¨åˆ é™¤ç©ºç›®å½•æ ‡è®°ï¼Œåˆ™å›è°ƒæ­¤æ–¹æ³•
- * é€šçŸ¥ç”¨æˆ·åˆ é™¤æŒ‡å®šçš„ç©ºç›®å½•
- * @param scan {ACL_SCAN_DIR*} ç›®å½•æ‰«ææŒ‡é’ˆ
- * @param ctx {void*} ç”¨æˆ·å‚æ•°æŒ‡é’ˆ
+ * Ä¿Â¼É¨Ãè¹ı³ÌÖĞ£¬Èç¹ûÓöµ½¿ÕÄ¿Â¼ÇÒÓÃ»§ÉèÖÃÁË×Ô¶¯É¾³ı¿ÕÄ¿Â¼±ê¼Ç£¬Ôò»Øµ÷´Ë·½·¨
+ * Í¨ÖªÓÃ»§É¾³ıÖ¸¶¨µÄ¿ÕÄ¿Â¼
+ * @param scan {ACL_SCAN_DIR*} Ä¿Â¼É¨ÃèÖ¸Õë
+ * @param ctx {void*} ÓÃ»§²ÎÊıÖ¸Õë
  */
 typedef int (*ACL_SCAN_RMDIR_FN)(ACL_SCAN_DIR *scan, const char *path, void *ctx);
 
 /**
- * æ‰“å¼€æ‰«æè·¯å¾„, ä¸ºæ•´ä¸ª acl_scan_dir å‡½æ•°åº“çš„åˆå§‹åŒ–å‡½æ•°
- * @param path {const char*} è¦æ‰“å¼€çš„è·¯å¾„åç§°
- * @param recursive {int} æ˜¯å¦éœ€è¦é€’å½’æ‰«æå­ç›®å½•
+ * ´ò¿ªÉ¨ÃèÂ·¾¶, ÎªÕû¸ö acl_scan_dir º¯Êı¿âµÄ³õÊ¼»¯º¯Êı
+ * @param path {const char*} Òª´ò¿ªµÄÂ·¾¶Ãû³Æ
+ * @param recursive {int} ÊÇ·ñĞèÒªµİ¹éÉ¨Ãè×ÓÄ¿Â¼
  * @return {ACL_SCAN_DIR*} NULL: Err; != NULL, OK
  */
 ACL_API ACL_SCAN_DIR *acl_scan_dir_open(const char *path, int recursive);
 
 /**
- * æ‰“å¼€æ‰«æè·¯å¾„, ä¸ºæ•´ä¸ª acl_scan_dir å‡½æ•°åº“çš„åˆå§‹åŒ–å‡½æ•°
- * @param path {const char*} è¦æ‰“å¼€çš„è·¯å¾„åç§°
- * @param flags {unsigned} æ ‡å¿—ä½, è§ ACL_SCAN_FLAG_XXX
+ * ´ò¿ªÉ¨ÃèÂ·¾¶, ÎªÕû¸ö acl_scan_dir º¯Êı¿âµÄ³õÊ¼»¯º¯Êı
+ * @param path {const char*} Òª´ò¿ªµÄÂ·¾¶Ãû³Æ
+ * @param flags {unsigned} ±êÖ¾Î», ¼û ACL_SCAN_FLAG_XXX
  * @return {ACL_SCAN_DIR*} NULL: Err; != NULL, OK
  */
 ACL_API ACL_SCAN_DIR *acl_scan_dir_open2(const char *path, unsigned flags);
-#define ACL_SCAN_FLAG_RECURSIVE	(1 << 0)	/* æ˜¯å¦åšé€’å½’æ‰«æ */
-#define ACL_SCAN_FLAG_RMDIR	(1 << 1)	/* æ˜¯å¦è‡ªåŠ¨åˆ é™¤ç©ºç›®å½• */
+#define ACL_SCAN_FLAG_RECURSIVE	(1 << 0)	/* ÊÇ·ñ×öµİ¹éÉ¨Ãè */
+#define ACL_SCAN_FLAG_RMDIR	(1 << 1)	/* ÊÇ·ñ×Ô¶¯É¾³ı¿ÕÄ¿Â¼ */
 
 /**
- * å…³é—­æ‰«æå¥æŸ„
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
+ * ¹Ø±ÕÉ¨Ãè¾ä±ú
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
  */
 ACL_API void acl_scan_dir_close(ACL_SCAN_DIR *scan);
 
 /**
- * å°†ç›®å½•æ‰«æå¥æŸ„çš„ä¸ç»Ÿè®¡ä¿¡æ¯ç›¸å…³çš„å˜é‡ç½®0
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
+ * ½«Ä¿Â¼É¨Ãè¾ä±úµÄÓëÍ³¼ÆĞÅÏ¢Ïà¹ØµÄ±äÁ¿ÖÃ0
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
  */
 ACL_API void acl_scan_dir_reset(ACL_SCAN_DIR *scan);
 
 /**
- * é€šè¿‡æ­¤æ¥å£è®¾ç½®æ‰«æå¥æŸ„çš„å›è°ƒå‡½æ•°ã€å‚æ•°ç­‰ï¼Œå½“æœ€åçš„ä¸€ä¸ªæ§åˆ¶æ ‡å¿—
- * ä¸º ACL_SCAN_CTL_END æ—¶è¡¨ç¤ºæ§åˆ¶å‚æ•°åˆ—è¡¨ç»“æŸ
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @param name {int} ç¬¬ä¸€ä¸ªæ§åˆ¶é¡¹ï¼Œ ACL_SCAN_CTL_XXX
+ * Í¨¹ı´Ë½Ó¿ÚÉèÖÃÉ¨Ãè¾ä±úµÄ»Øµ÷º¯Êı¡¢²ÎÊıµÈ£¬µ±×îºóµÄÒ»¸ö¿ØÖÆ±êÖ¾
+ * Îª ACL_SCAN_CTL_END Ê±±íÊ¾¿ØÖÆ²ÎÊıÁĞ±í½áÊø
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @param name {int} µÚÒ»¸ö¿ØÖÆÏî£¬ ACL_SCAN_CTL_XXX
  */
 ACL_API void acl_scan_dir_ctl(ACL_SCAN_DIR *scan, int name, ...);
-#define ACL_SCAN_CTL_END	0  /**< æ§åˆ¶ç»“æŸæ ‡å¿— */
-#define ACL_SCAN_CTL_FN		1  /**< è®¾ç½® ACL_SCAN_DIR_FN æ ‡å¿— */
-#define ACL_SCAN_CTL_CTX	2  /**< è®¾ç½®ç”¨æˆ·å‚æ•° */
-#define ACL_SCAN_CTL_RMDIR_FN	3  /**< è®¾ç½®åˆ é™¤ç›®å½•å›è°ƒå‡½æ•° */
+#define ACL_SCAN_CTL_END	0  /**< ¿ØÖÆ½áÊø±êÖ¾ */
+#define ACL_SCAN_CTL_FN		1  /**< ÉèÖÃ ACL_SCAN_DIR_FN ±êÖ¾ */
+#define ACL_SCAN_CTL_CTX	2  /**< ÉèÖÃÓÃ»§²ÎÊı */
+#define ACL_SCAN_CTL_RMDIR_FN	3  /**< ÉèÖÃÉ¾³ıÄ¿Â¼»Øµ÷º¯Êı */
 
 /**
- * è·å¾—å½“å‰çŠ¶æ€ä¸‹çš„ç›¸å¯¹è·¯å¾„(ç›¸å¯¹äºç¨‹åºè°ƒç”¨ acl_scan_dir_open
- * å‡½æ•°æ—¶çš„ç¨‹åºè¿è¡Œè·¯å¾„)
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @return {const char*} ç›¸å¯¹è·¯å¾„, == NULL: err; != NULL, OK
+ * »ñµÃµ±Ç°×´Ì¬ÏÂµÄÏà¶ÔÂ·¾¶(Ïà¶ÔÓÚ³ÌĞòµ÷ÓÃ acl_scan_dir_open
+ * º¯ÊıÊ±µÄ³ÌĞòÔËĞĞÂ·¾¶)
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @return {const char*} Ïà¶ÔÂ·¾¶, == NULL: err; != NULL, OK
  */
 ACL_API const char *acl_scan_dir_path(ACL_SCAN_DIR *scan);
 
 /**
- * å½“å‰æ‰€æ‰«æçš„æ–‡ä»¶åï¼Œå¦‚æœæ‰«æçš„å¯¹è±¡ä¸æ˜¯æ–‡ä»¶ï¼Œåˆ™è¿”å› "\0"
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @return {const char*} æ–‡ä»¶å
+ * µ±Ç°ËùÉ¨ÃèµÄÎÄ¼şÃû£¬Èç¹ûÉ¨ÃèµÄ¶ÔÏó²»ÊÇÎÄ¼ş£¬Ôò·µ»Ø "\0"
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @return {const char*} ÎÄ¼şÃû
  */
 ACL_API const char *acl_scan_dir_file(ACL_SCAN_DIR *scan);
 
 /**
- * å½“å‰å·²ç»æ‰«æçš„ç›®å½•æ€»ä¸ªæ•°
+ * µ±Ç°ÒÑ¾­É¨ÃèµÄÄ¿Â¼×Ü¸öÊı
  * @param scan {ACL_SCAN_DIR*}
- * @return {unsigned} ç›®å½•æ€»ä¸ªæ•°
+ * @return {unsigned} Ä¿Â¼×Ü¸öÊı
  */
 ACL_API unsigned acl_scan_dir_ndirs(ACL_SCAN_DIR *scan);
 
 /**
- * å½“å‰å·²ç»æ‰«æçš„æ–‡ä»¶æ€»ä¸ªæ•°
+ * µ±Ç°ÒÑ¾­É¨ÃèµÄÎÄ¼ş×Ü¸öÊı
  * @param scan {ACL_SCAN_DIR*}
- * @return {unsigned} æ–‡ä»¶æ€»ä¸ªæ•°
+ * @return {unsigned} ÎÄ¼ş×Ü¸öÊı
  */
 ACL_API unsigned acl_scan_dir_nfiles(ACL_SCAN_DIR *scan);
 
 /**
- * å½“å‰å·²ç»æ‰«æçš„æ–‡ä»¶å¤§å°æ€»å’Œ
+ * µ±Ç°ÒÑ¾­É¨ÃèµÄÎÄ¼ş´óĞ¡×ÜºÍ
  * @param scan {ACL_SCAN_DIR*}
  * @return {acl_int64} -1: Error; >= 0: Ok
  */
 ACL_API acl_int64 acl_scan_dir_nsize(ACL_SCAN_DIR *scan);
 
 /**
- * å–å¾—å½“å‰æ‰«æåˆ°çš„æ–‡ä»¶æˆ–ç›®å½•çš„å±æ€§ä¿¡æ¯ï¼Œç±»ä¼¼äºæ ‡å‡†çš„ stat() å‡½æ•°
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @param sbuf: {struct acl_stat*} ç±»å‹æŒ‡é’ˆ
+ * È¡µÃµ±Ç°É¨Ãèµ½µÄÎÄ¼ş»òÄ¿Â¼µÄÊôĞÔĞÅÏ¢£¬ÀàËÆÓÚ±ê×¼µÄ stat() º¯Êı
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @param sbuf: {struct acl_stat*} ÀàĞÍÖ¸Õë
  * @return {int} 0: Ok, -1: Error
  */
 ACL_API int acl_scan_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf);
 
 /**
- * å–å¾—å½“å‰æ­£åœ¨æ‰«æçš„ç›®å½•èŠ‚ç‚¹çš„å±æ€§ä¿¡æ¯ï¼Œè¯¥ API ä¸åŒäº acl_scan_stat
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @param sbuf: {struct acl_stat*} ç±»å‹æŒ‡é’ˆ
+ * È¡µÃµ±Ç°ÕıÔÚÉ¨ÃèµÄÄ¿Â¼½ÚµãµÄÊôĞÔĞÅÏ¢£¬¸Ã API ²»Í¬ÓÚ acl_scan_stat
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @param sbuf: {struct acl_stat*} ÀàĞÍÖ¸Õë
  * @return {int} 0: Ok, -1: Error
  */
 ACL_API int acl_scan_dir_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf);
 
 /**
- * ç›®å½•æ˜¯å¦æ‰«æå®Œæ¯•
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @return {int} 0: è¡¨ç¤ºæœªæ‰«æå®Œæ¯•ï¼› !=0: è¡¨ç¤ºæ‰«æå®Œæ¯•
+ * Ä¿Â¼ÊÇ·ñÉ¨ÃèÍê±Ï
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @return {int} 0: ±íÊ¾Î´É¨ÃèÍê±Ï£» !=0: ±íÊ¾É¨ÃèÍê±Ï
  */
 ACL_API int acl_scan_dir_end(ACL_SCAN_DIR *scan);
 
 /**
- * å°†éœ€è¦è¿›è¡Œæ‰«æçš„ç›¸å¯¹è·¯å¾„å‹æ ˆ
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @param path {const char*} éœ€è¦å‹æ ˆçš„ç›¸å¯¹è·¯å¾„
+ * ½«ĞèÒª½øĞĞÉ¨ÃèµÄÏà¶ÔÂ·¾¶Ñ¹Õ»
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @param path {const char*} ĞèÒªÑ¹Õ»µÄÏà¶ÔÂ·¾¶
  * @return {int} 0: OK; -1: Err
  */
 ACL_API int acl_scan_dir_push(ACL_SCAN_DIR *scan, const char *path);
 
 /**
- * å¼¹å‡ºä¸‹ä¸€ä¸ªè·¯å¾„
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @return {ACL_SCAN_DIR*} è¿”å›å †æ ˆä¸­çš„ä¸‹ä¸€ä¸ªå¯¹è±¡, == NULL: ç»“æŸ; != NULL, OK
+ * µ¯³öÏÂÒ»¸öÂ·¾¶
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @return {ACL_SCAN_DIR*} ·µ»Ø¶ÑÕ»ÖĞµÄÏÂÒ»¸ö¶ÔÏó, == NULL: ½áÊø; != NULL, OK
  */
 ACL_API ACL_SCAN_DIR *acl_scan_dir_pop(ACL_SCAN_DIR *scan);
 
 /**
- * è·å¾— scan å½“å‰æ‰€åœ¨è·¯å¾„ä¸­ä¸‹ä¸€ä¸ªè·¯å¾„åæˆ–æ–‡ä»¶å, æ³¨æ„ï¼Œè¯¥å‡½æ•°å†…éƒ¨ä¸ä¼šé€’å½’æ‰«æ,
- * å³ acl_scan_dir_open ä¸­çš„å‚æ•° recursive å¯¹è¯¥å‡½æ•°æ— æ•ˆ
- *  1ã€ ".." ä¸ "." ä¸åŒ…å«åœ¨å†…
- *  2ã€ ä»…è¿”å›åç§°, ä¸åŒ…æ‹¬è·¯å¾„, è·¯å¾„å¯ä»¥ç”± acl_scan_dir_path è·å¾—
- * @param scan {ACL_SCAN_DIR*} æŒ‡é’ˆåœ°å€
- * @return {const char*} ä¸ºç›®å½•åç§°æˆ–æ–‡ä»¶åç§°, != NULL: OK; == NULL, æ‰«æå®Œæ¯•
+ * »ñµÃ scan µ±Ç°ËùÔÚÂ·¾¶ÖĞÏÂÒ»¸öÂ·¾¶Ãû»òÎÄ¼şÃû, ×¢Òâ£¬¸Ãº¯ÊıÄÚ²¿²»»áµİ¹éÉ¨Ãè,
+ * ¼´ acl_scan_dir_open ÖĞµÄ²ÎÊı recursive ¶Ô¸Ãº¯ÊıÎŞĞ§
+ *  1¡¢ ".." Óë "." ²»°üº¬ÔÚÄÚ
+ *  2¡¢ ½ö·µ»ØÃû³Æ, ²»°üÀ¨Â·¾¶, Â·¾¶¿ÉÒÔÓÉ acl_scan_dir_path »ñµÃ
+ * @param scan {ACL_SCAN_DIR*} Ö¸ÕëµØÖ·
+ * @return {const char*} ÎªÄ¿Â¼Ãû³Æ»òÎÄ¼şÃû³Æ, != NULL: OK; == NULL, É¨ÃèÍê±Ï
  */
 ACL_API const char *acl_scan_dir_next(ACL_SCAN_DIR *scan);
 
 /**
- * è·å¾—ä¸‹ä¸€ä¸ªæ–‡ä»¶å(ä¸åŒ…å«è·¯å¾„å, ç›¸å¯¹è·¯å¾„åå¯ä»¥é€šè¿‡ acl_scan_dir_path è·å¾—),
- * è¯¥å‡½æ•°å†…éƒ¨æ”¯æŒé€’å½’æ‰«æç›®å½•åŠŸèƒ½, acl_scan_dir_open ä¸­çš„å‚æ•° recursive å¯¹è¯¥å‡½æ•°æœ‰æ•ˆ
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @return {const char*} è¿”å›ä¸‹ä¸€ä¸ªæ‰«æçš„æ–‡ä»¶å: !NULL, OK; NULL æ‰«æå®Œæ¯•ï¼Œåº”ç»“æŸæ‰«æ
+ * »ñµÃÏÂÒ»¸öÎÄ¼şÃû(²»°üº¬Â·¾¶Ãû, Ïà¶ÔÂ·¾¶Ãû¿ÉÒÔÍ¨¹ı acl_scan_dir_path »ñµÃ),
+ * ¸Ãº¯ÊıÄÚ²¿Ö§³Öµİ¹éÉ¨ÃèÄ¿Â¼¹¦ÄÜ, acl_scan_dir_open ÖĞµÄ²ÎÊı recursive ¶Ô¸Ãº¯ÊıÓĞĞ§
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @return {const char*} ·µ»ØÏÂÒ»¸öÉ¨ÃèµÄÎÄ¼şÃû: !NULL, OK; NULL É¨ÃèÍê±Ï£¬Ó¦½áÊøÉ¨Ãè
  */
 ACL_API const char *acl_scan_dir_next_file(ACL_SCAN_DIR *scan);
 
 /**
- * è·å¾—ä¸‹ä¸€ä¸ªç›®å½•å(ä¸åŒ…å«è·¯å¾„å, ç›¸å¯¹è·¯å¾„åå¯ä»¥é€šè¿‡ acl_scan_dir_path è·å¾—),
- * è¯¥å‡½æ•°å†…éƒ¨æ”¯æŒé€’å½’æ‰«æç›®å½•åŠŸèƒ½, acl_scan_dir_open ä¸­çš„å‚æ•° recursive å¯¹è¯¥å‡½æ•°æœ‰æ•ˆ
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @return {const char*} è¿”å›ä¸‹ä¸€ä¸ªæ‰«æçš„ç›®å½•å: !NULL, OK; NULL æ‰«æå®Œæ¯•, åº”ç»“æŸæ‰«æ
+ * »ñµÃÏÂÒ»¸öÄ¿Â¼Ãû(²»°üº¬Â·¾¶Ãû, Ïà¶ÔÂ·¾¶Ãû¿ÉÒÔÍ¨¹ı acl_scan_dir_path »ñµÃ),
+ * ¸Ãº¯ÊıÄÚ²¿Ö§³Öµİ¹éÉ¨ÃèÄ¿Â¼¹¦ÄÜ, acl_scan_dir_open ÖĞµÄ²ÎÊı recursive ¶Ô¸Ãº¯ÊıÓĞĞ§
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @return {const char*} ·µ»ØÏÂÒ»¸öÉ¨ÃèµÄÄ¿Â¼Ãû: !NULL, OK; NULL É¨ÃèÍê±Ï, Ó¦½áÊøÉ¨Ãè
  */
 ACL_API const char *acl_scan_dir_next_dir(ACL_SCAN_DIR *scan);
 
 /**
- * è·å¾—ä¸‹ä¸€ä¸ªç›®å½•åæˆ–æ–‡ä»¶å(ä¸åŒ…å«è·¯å¾„å, ç›¸å¯¹è·¯å¾„åå¯ä»¥é€šè¿‡ acl_scan_dir_path è·å¾—),
- * è¯¥å‡½æ•°å†…éƒ¨æ”¯æŒé€’å½’æ‰«æç›®å½•åŠŸèƒ½, acl_scan_dir_open ä¸­çš„å‚æ•° recursive å¯¹è¯¥å‡½æ•°æœ‰æ•ˆ
- * @param scan {ACL_SCAN_DIR*} ç±»å‹æŒ‡é’ˆ
- * @param is_file {int*} å½“è¿”å›ç»“æœéç©ºæ—¶ï¼Œè¯¥åœ°å€å­˜å‚¨çš„å€¼è¡¨ç¤ºæ‰€æ‰«æåˆ°çš„æ˜¯å¦æ˜¯
- *  æ–‡ä»¶ï¼Œå¦‚æœä¸º true åˆ™ä¸ºæ–‡ä»¶ï¼Œå¦åˆ™ä¸ºç›®å½•
- * @return {const char*} è¿”å›ä¸‹ä¸€ä¸ªæ‰«æçš„ç›®å½•åæˆ–æ–‡ä»¶å: !NULL, OK; NULL æ‰«æå®Œæ¯•,
- *  åº”ç»“æŸæ‰«æ
+ * »ñµÃÏÂÒ»¸öÄ¿Â¼Ãû»òÎÄ¼şÃû(²»°üº¬Â·¾¶Ãû, Ïà¶ÔÂ·¾¶Ãû¿ÉÒÔÍ¨¹ı acl_scan_dir_path »ñµÃ),
+ * ¸Ãº¯ÊıÄÚ²¿Ö§³Öµİ¹éÉ¨ÃèÄ¿Â¼¹¦ÄÜ, acl_scan_dir_open ÖĞµÄ²ÎÊı recursive ¶Ô¸Ãº¯ÊıÓĞĞ§
+ * @param scan {ACL_SCAN_DIR*} ÀàĞÍÖ¸Õë
+ * @param is_file {int*} µ±·µ»Ø½á¹û·Ç¿ÕÊ±£¬¸ÃµØÖ·´æ´¢µÄÖµ±íÊ¾ËùÉ¨Ãèµ½µÄÊÇ·ñÊÇ
+ *  ÎÄ¼ş£¬Èç¹ûÎª true ÔòÎªÎÄ¼ş£¬·ñÔòÎªÄ¿Â¼
+ * @return {const char*} ·µ»ØÏÂÒ»¸öÉ¨ÃèµÄÄ¿Â¼Ãû»òÎÄ¼şÃû: !NULL, OK; NULL É¨ÃèÍê±Ï,
+ *  Ó¦½áÊøÉ¨Ãè
  */
 ACL_API const char *acl_scan_dir_next_name(ACL_SCAN_DIR *scan, int *is_file);
 
 /**
- * å–å¾—å½“å‰ç›®å½•ä¸‹æ‰€å ç£ç›˜ç©ºé—´å¤§å°(ä»¥å­—èŠ‚è®¡ç®—)
- * è¯¥å‡½æ•°å†…éƒ¨æ”¯æŒé€’å½’æ‰«æç›®å½•åŠŸèƒ½, acl_scan_dir_open ä¸­çš„å‚æ•° recursive å¯¹è¯¥å‡½æ•°æœ‰æ•ˆ
- * @param scan {ACL_SCAN_DIR*} æ‰“å¼€ç›®å½•æ—¶çš„æ‰«æå¥æŸ„
- * @param nfile {int*} æ‰«æå®Œåè®°å½•æ‰€æ‰«æçš„æ–‡ä»¶æ€»æ•°
- * @param ndir {int*} æ‰«æå®Œåè®°å½•æ‰€æ‰«æçš„ç›®å½•æ€»æ•°
+ * È¡µÃµ±Ç°Ä¿Â¼ÏÂËùÕ¼´ÅÅÌ¿Õ¼ä´óĞ¡(ÒÔ×Ö½Ú¼ÆËã)
+ * ¸Ãº¯ÊıÄÚ²¿Ö§³Öµİ¹éÉ¨ÃèÄ¿Â¼¹¦ÄÜ, acl_scan_dir_open ÖĞµÄ²ÎÊı recursive ¶Ô¸Ãº¯ÊıÓĞĞ§
+ * @param scan {ACL_SCAN_DIR*} ´ò¿ªÄ¿Â¼Ê±µÄÉ¨Ãè¾ä±ú
+ * @param nfile {int*} É¨ÃèÍêºó¼ÇÂ¼ËùÉ¨ÃèµÄÎÄ¼ş×ÜÊı
+ * @param ndir {int*} É¨ÃèÍêºó¼ÇÂ¼ËùÉ¨ÃèµÄÄ¿Â¼×ÜÊı
  * @return {acl_int64} -1: Error; >= 0: Ok
  */
 ACL_API acl_int64 acl_scan_dir_size2(ACL_SCAN_DIR *scan, int *nfile, int *ndir);
 
 /**
- * å–å¾—å½“å‰ç›®å½•ä¸‹æ‰€å ç£ç›˜ç©ºé—´å¤§å°(ä»¥å­—èŠ‚è®¡ç®—)
- * @param pathname {const char*} ç›®å½•è·¯å¾„å
- * @param recursive {int} æ˜¯å¦è¦é€’å½’æ‰«æè¯¥ç›®å½•ä¸‹çš„æ‰€æœ‰å­ç›®å½•
- * @param nfile {int*} æ‰«æå®Œåè®°å½•æ‰€æ‰«æçš„æ–‡ä»¶æ€»æ•°
- * @param ndir {int*} æ‰«æå®Œåè®°å½•æ‰€æ‰«æçš„ç›®å½•æ€»æ•°
+ * È¡µÃµ±Ç°Ä¿Â¼ÏÂËùÕ¼´ÅÅÌ¿Õ¼ä´óĞ¡(ÒÔ×Ö½Ú¼ÆËã)
+ * @param pathname {const char*} Ä¿Â¼Â·¾¶Ãû
+ * @param recursive {int} ÊÇ·ñÒªµİ¹éÉ¨Ãè¸ÃÄ¿Â¼ÏÂµÄËùÓĞ×ÓÄ¿Â¼
+ * @param nfile {int*} É¨ÃèÍêºó¼ÇÂ¼ËùÉ¨ÃèµÄÎÄ¼ş×ÜÊı
+ * @param ndir {int*} É¨ÃèÍêºó¼ÇÂ¼ËùÉ¨ÃèµÄÄ¿Â¼×ÜÊı
  * @return {acl_int64} -1: Error, >= 0: Ok
  */
 ACL_API acl_int64 acl_scan_dir_size(const char *pathname, int recursive,
 		int *nfile, int *ndir);
 
 /**
- * åˆ é™¤æ‰€ç»™è·¯å¾„ä¸‹æ‰€æœ‰çš„æ–‡ä»¶åŠç›®å½•
- * @param nfile {int*} æ‰«æå®Œåè®°å½•æ‰€æ‰«æçš„æ–‡ä»¶æ€»æ•°
- * @param ndir {int*} æ‰«æå®Œåè®°å½•æ‰€æ‰«æçš„ç›®å½•æ€»æ•°
- * è¯¥å‡½æ•°å†…éƒ¨æ”¯æŒé€’å½’æ‰«æç›®å½•åŠŸèƒ½, acl_scan_dir_open ä¸­çš„å‚æ•° recursive å¯¹è¯¥å‡½æ•°æœ‰æ•ˆ
- * @param scan {ACL_SCAN_DIR*} æ‰“å¼€ç›®å½•æ—¶çš„æ‰«æå¥æŸ„
- * @return {acl_int64} >= 0: å®é™…åˆ é™¤çš„æ–‡ä»¶æ•°ä¸ç›®å½•æ•°çš„å°ºå¯¸å¤§å°ä¹‹å’Œ(å­—èŠ‚); < 0: å‡ºé”™.
+ * É¾³ıËù¸øÂ·¾¶ÏÂËùÓĞµÄÎÄ¼ş¼°Ä¿Â¼
+ * @param nfile {int*} É¨ÃèÍêºó¼ÇÂ¼ËùÉ¨ÃèµÄÎÄ¼ş×ÜÊı
+ * @param ndir {int*} É¨ÃèÍêºó¼ÇÂ¼ËùÉ¨ÃèµÄÄ¿Â¼×ÜÊı
+ * ¸Ãº¯ÊıÄÚ²¿Ö§³Öµİ¹éÉ¨ÃèÄ¿Â¼¹¦ÄÜ, acl_scan_dir_open ÖĞµÄ²ÎÊı recursive ¶Ô¸Ãº¯ÊıÓĞĞ§
+ * @param scan {ACL_SCAN_DIR*} ´ò¿ªÄ¿Â¼Ê±µÄÉ¨Ãè¾ä±ú
+ * @return {acl_int64} >= 0: Êµ¼ÊÉ¾³ıµÄÎÄ¼şÊıÓëÄ¿Â¼ÊıµÄ³ß´ç´óĞ¡Ö®ºÍ(×Ö½Ú); < 0: ³ö´í.
  */
 ACL_API acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *nfile, int *ndir);
 
 /**
- * åˆ é™¤æ‰€ç»™è·¯å¾„ä¸‹æ‰€æœ‰çš„æ–‡ä»¶åŠç›®å½•
- * @param pathname {const char*} è·¯å¾„å
- * @param recursive {int} æ˜¯å¦é€’å½’åˆ é™¤æ‰€æœ‰å­ç›®å½•åŠå­ç›®å½•ä¸‹çš„æ–‡ä»¶
- * @param ndir {int*} è‹¥è¯¥å‚æ•°éç©ºï¼Œè¿‡ç¨‹ç»“æŸå *ndir ç­‰äºæ€»å…±åˆ é™¤çš„ç›®å½•æ•°ç›®
- * @param nfile {int*} è‹¥è¯¥å‚æ•°éç©ºï¼Œè¿‡ç¨‹ç»“æŸå *nfile ç­‰äºæ€»å…±åˆ é™¤çš„æ–‡ä»¶æ•°ç›®
- * @return {acl_int64} >= 0: å®é™…åˆ é™¤çš„æ–‡ä»¶æ•°ä¸ç›®å½•æ•°çš„å°ºå¯¸å¤§å°ä¹‹å’Œ(å­—èŠ‚); < 0: å‡ºé”™.
+ * É¾³ıËù¸øÂ·¾¶ÏÂËùÓĞµÄÎÄ¼ş¼°Ä¿Â¼
+ * @param pathname {const char*} Â·¾¶Ãû
+ * @param recursive {int} ÊÇ·ñµİ¹éÉ¾³ıËùÓĞ×ÓÄ¿Â¼¼°×ÓÄ¿Â¼ÏÂµÄÎÄ¼ş
+ * @param ndir {int*} Èô¸Ã²ÎÊı·Ç¿Õ£¬¹ı³Ì½áÊøºó *ndir µÈÓÚ×Ü¹²É¾³ıµÄÄ¿Â¼ÊıÄ¿
+ * @param nfile {int*} Èô¸Ã²ÎÊı·Ç¿Õ£¬¹ı³Ì½áÊøºó *nfile µÈÓÚ×Ü¹²É¾³ıµÄÎÄ¼şÊıÄ¿
+ * @return {acl_int64} >= 0: Êµ¼ÊÉ¾³ıµÄÎÄ¼şÊıÓëÄ¿Â¼ÊıµÄ³ß´ç´óĞ¡Ö®ºÍ(×Ö½Ú); < 0: ³ö´í.
  */
 ACL_API acl_int64 acl_scan_dir_rm(const char *pathname, int recursive,
 		int *ndir, int *nfile);

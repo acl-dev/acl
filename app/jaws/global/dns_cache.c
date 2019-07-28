@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 #ifdef ACL_BCB_COMPILER
 #pragma hdrstop
@@ -265,7 +265,7 @@ ACL_DNS_DB *dns_cache_lookup(DNS_CACHE *dns_cache, const char *name)
 	} else
 		cache_lock(dns_cache);
 
-	cache_timer_fn(dns_cache); /* å…ˆå¯åŠ¨å®šæ—¶æ¸…ç†å™¨ï¼Œå°†è¿‡æœŸçš„DNSè§£æå»æ‰ */
+	cache_timer_fn(dns_cache); /* ÏÈÆô¶¯¶¨Ê±ÇåÀíÆ÷£¬½«¹ıÆÚµÄDNS½âÎöÈ¥µô */
 
 	ACL_SAFE_STRNCPY(buf, name, sizeof(buf));
 	acl_lowercase(buf);

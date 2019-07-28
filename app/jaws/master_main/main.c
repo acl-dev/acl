@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "app_log.h"
 #include "http_service.h"
 #include "service_conf.h"

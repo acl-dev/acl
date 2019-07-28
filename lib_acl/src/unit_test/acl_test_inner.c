@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -75,7 +75,7 @@ static AUT_LINE *__mkcmd_endif(const ACL_CFG_LINE *line)
 		if (if_token_peer->match_number != if_token->match_number)
 			continue;
 
-		/* æ‰¾åˆ°åŒ¹é…çš„å¾ªç¯å¼€å§‹å¯¹ç­‰ç»“ç‚¹ */
+		/* ÕÒµ½Æ¥ÅäµÄÑ­»·¿ªÊ¼¶ÔµÈ½áµã */
 		if_token_peer->peer = test_line;
 		if_token->peer      = test_line_peer;
 	}
@@ -111,14 +111,14 @@ static AUT_LINE *__mkcmd_stop(const ACL_CFG_LINE *line)
 	return (test_line);
 }
 
-/*---------------------------- åˆ†æä¸å†…éƒ¨å‘½ä»¤ç›¸åŒ¹é…çš„é…ç½®è¡Œ ---------------- */
-/* å†…éƒ¨ä¿ç•™çš„å‘½ä»¤é¡¹æ•°æ®ç»“æ„å®šä¹‰ */
+/*---------------------------- ·ÖÎöÓëÄÚ²¿ÃüÁîÏàÆ¥ÅäµÄÅäÖÃĞĞ ---------------- */
+/* ÄÚ²¿±£ÁôµÄÃüÁîÏîÊı¾İ½á¹¹¶¨Òå */
 typedef struct {
 	const char *cmd_name;
 	AUT_LINE *(*match_fn)(const ACL_CFG_LINE *line);
 } __MATCH_CMD;
 
-/* å†…éƒ¨ä¿ç•™çš„å‘½ä»¤å¯¹è±¡è¡¨ */
+/* ÄÚ²¿±£ÁôµÄÃüÁî¶ÔÏó±í */
 static __MATCH_CMD __inner_cmd_tab[] = {
 	{ VAR_AUT_LOOP_BEGIN, aut_loop_make_begin },
 	{ VAR_AUT_LOOP_BREAK, aut_loop_make_break },
@@ -129,7 +129,7 @@ static __MATCH_CMD __inner_cmd_tab[] = {
 	{ NULL, NULL },
 };
 
-/* ä»å†…éƒ¨å‘½ä»¤è¡¨ä¸­å–å¾—ç›¸åº”çš„å¯¹è±¡ */
+/* ´ÓÄÚ²¿ÃüÁî±íÖĞÈ¡µÃÏàÓ¦µÄ¶ÔÏó */
 
 AUT_LINE *aut_add_inner_cmd(const ACL_CFG_LINE *line)
 {
@@ -147,8 +147,8 @@ AUT_LINE *aut_add_inner_cmd(const ACL_CFG_LINE *line)
 	for (i = 0; __inner_cmd_tab[i].cmd_name != NULL; i++) {
 		pmatch_cmd = &__inner_cmd_tab[i];
 		if (strcasecmp(line->value[0], pmatch_cmd->cmd_name) == 0) {
-			/* ç”±å†…éƒ¨å‘½ä»¤ä¿ç•™å‡½æ•°åŠ¨æ€åˆ†é…ä¸€ä¸ªç›¸å¯¹åº”çš„
-			 * AUT_LINE å¯¹è±¡
+			/* ÓÉÄÚ²¿ÃüÁî±£Áôº¯Êı¶¯Ì¬·ÖÅäÒ»¸öÏà¶ÔÓ¦µÄ
+			 * AUT_LINE ¶ÔÏó
 			 */
 			test_line = pmatch_cmd->match_fn(line);
 			break;
@@ -165,17 +165,17 @@ AUT_LINE *aut_add_inner_cmd(const ACL_CFG_LINE *line)
 			myname, test_line->cmd_name, acl_last_strerror(tbuf, sizeof(tbuf)));
 	}
 
-	/* è®¾ç½®æœ‰æ•ˆè¡Œå· */
+	/* ÉèÖÃÓĞĞ§ĞĞºÅ */
 	inner_token = (AUT_CMD_TOKEN *) test_line->arg_inner;
 	if (inner_token == NULL)
 		return (test_line);
 
 	test_line->valid_line_idx = var_aut_valid_line_idx++;
 
-	/* è°ƒæ•´æœ‰æ•ˆè¡Œå· */
+	/* µ÷ÕûÓĞĞ§ĞĞºÅ */
 	inner_token->valid_line_idx = test_line->valid_line_idx;
 
-	/* åªå¯¹å¾ªç¯å‘½ä»¤èµ·ä½œç”¨, è®¾ç½®ç›¸å¯¹å‘½ä»¤ä½ç§» */
+	/* Ö»¶ÔÑ­»·ÃüÁîÆğ×÷ÓÃ, ÉèÖÃÏà¶ÔÃüÁîÎ»ÒÆ */
 	inner_token->offset_valid_line_idx = inner_token->valid_line_idx;
 
 	return (test_line);

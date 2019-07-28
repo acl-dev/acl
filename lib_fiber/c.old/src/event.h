@@ -1,4 +1,4 @@
-﻿#ifndef EVENT_INCLUDE_H
+#ifndef EVENT_INCLUDE_H
 #define EVENT_INCLUDE_H
 
 #include <sys/epoll.h>

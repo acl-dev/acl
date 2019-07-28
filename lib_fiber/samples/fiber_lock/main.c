@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "fiber/libfiber.h"

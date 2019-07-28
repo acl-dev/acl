@@ -1,4 +1,4 @@
-ï»¿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include "acl_cpp/db/query.hpp"
@@ -13,7 +13,7 @@ int main(void)
 {
 	acl::query query;
 
-	// åˆ›å»ºæŸ¥è¯¢æ–¹å¼çš„ SQL æŸ¥è¯¢å™¨
+	// ´´½¨²éÑ¯·½Ê½µÄ SQL ²éÑ¯Æ÷
 	query.create_sql("select * from person where name = :name"
 		" and age >= :age and male = 1 and nick = :name");
 	query.set_parameter("name", "'zsxxsz'\\");
@@ -21,14 +21,14 @@ int main(void)
 
 	printf("sql: %s\r\n", query.to_string().c_str());
 
-	// é‡å¤ä½¿ç”¨è¯¥æŸ¥è¯¢å™¨å¯¹è±¡æ—¶éœ€è¦é‡ç½®è¯¥æŸ¥è¯¢å™¨çŠ¶æ€
+	// ÖØ¸´Ê¹ÓÃ¸Ã²éÑ¯Æ÷¶ÔÏóÊ±ĞèÒªÖØÖÃ¸Ã²éÑ¯Æ÷×´Ì¬
 	query.reset();
 
 	int age = 20;
 	query.create_sql("update table set name=:name, age=%d"
 		", home=:home where nick=:name and price=:price", age)
 		.set_parameter("name", "zsx1&xsz1")
-		.set_parameter("home", "å›é¾™è§‚")
+		.set_parameter("home", "»ØÁú¹Û")
 		.set_parameter("price", 1.00212, 6);
 	printf("sql: %s\r\n", query.to_string().c_str());
 
@@ -36,8 +36,8 @@ int main(void)
 	query.create_sql("insert into table(name, age, home, nick, date, time)"
 		" values(:name, %d, :home, :nick, :date, :time)", age)
 		.set_parameter("name", "zsx'xsz")
-		.set_parameter("home", "åŒ—äº¬.æ˜Œå¹³.å›é¾™è§‚")
-		.set_parameter("nick", "'é€é¥ä»™'")
+		.set_parameter("home", "±±¾©.²ıÆ½.»ØÁú¹Û")
+		.set_parameter("nick", "'åĞÒ£ÏÉ'")
 		.set_date("date", time(NULL), "%Y-%m-%d")
 		.set_date("time", time(NULL));
 

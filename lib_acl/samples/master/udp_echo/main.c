@@ -1,6 +1,6 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
-/* é…ç½®æ–‡ä»¶é¡¹ */
+/* ÅäÖÃÎÄ¼şÏî */
 
 /* configure info */
 
@@ -36,7 +36,7 @@ static void service_exit(void *ctx acl_unused)
 {
 }
 
-/* åè®®å¤„ç†å‡½æ•°å…¥å£ */
+/* Ğ­Òé´¦Àíº¯ÊıÈë¿Ú */
 static void service_main(void *ctx acl_unused, ACL_VSTREAM *client)
 {
 	char  buf[256];

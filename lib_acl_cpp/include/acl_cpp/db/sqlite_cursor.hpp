@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "db_cursor.hpp"
@@ -18,14 +18,14 @@ class sqlite_cursor : public db_cursor
 {
 public:
 	/**
-	 * æ„é€ æ–¹æ³•
-	 * @param q {query&} SQL æŸ¥è¯¢å¯¹è±¡ï¼Œåœ¨æ„é€ æ–¹æ³•å†…ä¼šé¦–å…ˆå°†å…¶è½¬ä¸º Sql å­—ç¬¦ä¸²
+	 * ¹¹Ôì·½·¨
+	 * @param q {query&} SQL ²éÑ¯¶ÔÏó£¬ÔÚ¹¹Ôì·½·¨ÄÚ»áÊ×ÏÈ½«Æä×ªÎª Sql ×Ö·û´®
 	 */
 	sqlite_cursor(query& q);
 	~sqlite_cursor(void);
 
 	/**
-	 * è·å¾—æŸ¥è¯¢ SQL è¯­å¥
+	 * »ñµÃ²éÑ¯ SQL Óï¾ä
 	 * @return {const string&}
 	 */
 	const string& get_sql(void) const
@@ -34,7 +34,7 @@ public:
 	}
 
 	/**
-	 * åœ¨éå†æŸ¥è¯¢ç»“æ„é›†æ—¶ï¼Œæ¯æ¬¡æŸ¥è¯¢åå¯é€šè¿‡æœ¬æ–¹æ³•è·å¾—ç»“æœè¡Œ
+	 * ÔÚ±éÀú²éÑ¯½á¹¹¼¯Ê±£¬Ã¿´Î²éÑ¯ºó¿ÉÍ¨¹ı±¾·½·¨»ñµÃ½á¹ûĞĞ
 	 * @return {db_row*}
 	 */
 	db_row* get_row(void) const
@@ -43,36 +43,36 @@ public:
 	}
 
 	/**
-	 * ç”± db_sqlite ç±»è°ƒç”¨æ¥åˆå§‹åŒ– names_ å­—æ®µå
-	 * @param name {const char*} æ•°æ®è¡¨åˆ—å
+	 * ÓÉ db_sqlite Ààµ÷ÓÃÀ´³õÊ¼»¯ names_ ×Ö¶ÎÃû
+	 * @param name {const char*} Êı¾İ±íÁĞÃû
 	 */
 	void add_column_name(const char* name);
 	
 	/**
-	 * æ·»åŠ åˆ—å€¼
+	 * Ìí¼ÓÁĞÖµ
 	 * @param n {long long}
 	 */
 	void add_column_value(long long n);
 
 	/**
-	 * æ·»åŠ åˆ—å€¼
+	 * Ìí¼ÓÁĞÖµ
 	 * @param n {double}
 	 */
 	void add_column_value(double n);
 
 	/**
-	 * æ·»åŠ åˆ—å€¼
-	 * @param s {cont char*} è¯¥å‚æ•°çš„ç”Ÿå‘½å‘¨æœŸç”± stmt_ å†³å®š
+	 * Ìí¼ÓÁĞÖµ
+	 * @param s {cont char*} ¸Ã²ÎÊıµÄÉúÃüÖÜÆÚÓÉ stmt_ ¾ö¶¨
 	 */
 	void add_column_value(const char* s);
 
 	/**
-	 * åˆ›å»ºè¡Œè®°å½•å¯¹è±¡ï¼Œç”¨æ¥å­˜æ”¾æŸ¥è¯¢ç»“æœè¡Œ
+	 * ´´½¨ĞĞ¼ÇÂ¼¶ÔÏó£¬ÓÃÀ´´æ·Å²éÑ¯½á¹ûĞĞ
 	 */
 	void create_row(void);
 
 	/**
-	 * åœ¨éå†è¿‡ç¨‹ä¸­ï¼Œdb_sqlite::next æ–¹æ³•ä¼šé¦–å…ˆè°ƒç”¨æœ¬æ–¹æ³•æ¸…é™¤ä¸Šæ¬¡çš„æŸ¥è¯¢ç»“æœ
+	 * ÔÚ±éÀú¹ı³ÌÖĞ£¬db_sqlite::next ·½·¨»áÊ×ÏÈµ÷ÓÃ±¾·½·¨Çå³ıÉÏ´ÎµÄ²éÑ¯½á¹û
 	 */
 	void clear(void);
 
@@ -85,11 +85,11 @@ private:
 	sqlite3_stmt* stmt_;
 	free_sqlite3_stmt_fn free_callback;
 
-	// æ•°æ®è¡¨å­—æ®µå
+	// Êı¾İ±í×Ö¶ÎÃû
 	std::vector<const char*> names_;
 
-	dbuf_guard* dbuf_;	// å†…å­˜åˆ†é…å™¨
-	db_row* row_;		// å¯¹äºæŸ¥è¯¢è¯­å¥è€Œè¨€ï¼Œç”¨æ¥å­˜å‚¨ç»“æœ
+	dbuf_guard* dbuf_;	// ÄÚ´æ·ÖÅäÆ÷
+	db_row* row_;		// ¶ÔÓÚ²éÑ¯Óï¾ä¶øÑÔ£¬ÓÃÀ´´æ´¢½á¹û
 };
 
 }

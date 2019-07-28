@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "file_tmpl.h"
 #include "master_creator.h"
 
@@ -138,7 +138,7 @@ void master_creator()
 {
 	file_tmpl tmpl;
 
-	// è®¾ç½®æºç¨‹åºæ‰€åœ¨ç›®å½•
+	// ÉèÖÃÔ´³ÌĞòËùÔÚÄ¿Â¼
 	tmpl.set_path_from("tmpl/master");
 
 	while (true)
@@ -156,7 +156,7 @@ void master_creator()
 			acl::safe_snprintf(buf, sizeof(buf), "master_service");
 
 		tmpl.set_project_name(buf);
-		// åˆ›å»ºç›®å½•
+		// ´´½¨Ä¿Â¼
 		tmpl.create_dirs();
 
 		printf("choose master_service type:\r\n");

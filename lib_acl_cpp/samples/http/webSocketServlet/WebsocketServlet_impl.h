@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class WebsocketServlet_impl : public acl::WebSocketServlet
 {
@@ -22,7 +22,7 @@ protected:
 	//for websocket
 	/**
 	 * @override
-	 * websocket å…³é—­æ¶ˆæ¯å›è°ƒ
+	 * websocket ¹Ø±ÕÏûÏ¢»Øµ÷
 	 * @return {void}
 	 */
 	void onClose(void) {}

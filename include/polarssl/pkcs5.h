@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file pkcs#5.h
  *
  * \brief PKCS#5 functions

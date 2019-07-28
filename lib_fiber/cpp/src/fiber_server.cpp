@@ -1,4 +1,4 @@
-﻿#include "stdafx.hpp"
+#include "stdafx.hpp"
 #include <stdarg.h>
 #if defined(_WIN32) || defined(_WIN64)
 #include <process.h>

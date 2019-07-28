@@ -1,4 +1,4 @@
-ï»¿#include <sys/mman.h>
+#include <sys/mman.h>
 #include <sys/stat.h>
 #include "lib_acl.h"
 
@@ -153,7 +153,7 @@ static void parse_xml_benchmark(int once, int max, const char *data)
 		if (once) {
 			acl_xml2_parse(xml, ptr);
 		} else {
-			/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æž xml æ•°æ® */
+			/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö xml Êý¾Ý */
 			while (*ptr != 0) {
 				char  ch2[2];
 
@@ -236,7 +236,7 @@ static void walk_xml(ACL_XML2* xml)
 {
 	ACL_ITER iter1;
 
-	/* ä»Žæ ¹ç»“ç‚¹å¼€å§‹éåŽ† xml å¯¹è±¡çš„æ‰€æœ‰ç»“ç‚¹ */
+	/* ´Ó¸ù½áµã¿ªÊ¼±éÀú xml ¶ÔÏóµÄËùÓÐ½áµã */
 
 	printf("-------------- walk_xml -----------------------\r\n");
 
@@ -251,7 +251,7 @@ static void walk_xml(ACL_XML2* xml)
 		printf("%s(%d): tag->%s, size: %ld\n", __FUNCTION__, __LINE__,
 			node->ltag, (long) node->ltag_size);
 
-		/* éåŽ† xml ç»“ç‚¹çš„å±žæ€§ */
+		/* ±éÀú xml ½áµãµÄÊôÐÔ */
 		acl_foreach(iter2, node->attr_list) {
 			ACL_XML2_ATTR *attr = (ACL_XML2_ATTR*) iter2.data;
 
@@ -312,7 +312,7 @@ static void walk_xml_node(ACL_XML2_NODE *node, int n)
 {
 	ACL_ITER iter;
 
-	/* éåŽ†ç»“ç‚¹çš„å­ç»“ç‚¹ */
+	/* ±éÀú½áµãµÄ×Ó½áµã */
 
 	acl_foreach(iter, node) {
 		int   i;
@@ -379,7 +379,7 @@ static void test_getElementsByTagName(ACL_XML2 *xml, const char *tag)
 
 	a = acl_xml2_getElementsByTagName(xml, tag);
 	if (a) {
-		/* éåŽ†ç»“æžœé›† */
+		/* ±éÀú½á¹û¼¯ */
 		acl_foreach(iter, a) {
 			ACL_XML2_NODE *node = (ACL_XML2_NODE*) iter.data;
 			printf("tag->%s, text: %s\n", node->ltag, node->text);
@@ -387,7 +387,7 @@ static void test_getElementsByTagName(ACL_XML2 *xml, const char *tag)
 			walk_xml_node(node, 1);
 		}
 
-		/* é‡Šæ”¾æ•°ç»„å¯¹è±¡ */
+		/* ÊÍ·ÅÊý×é¶ÔÏó */
 		acl_xml2_free_array(a);
 	}
 	else
@@ -412,7 +412,7 @@ static ACL_XML2_NODE *test_getElementById(ACL_XML2 *xml, const char *id)
 
 	printf("tag-> %s, text: %s\n", node->ltag, node->text);
 
-	/* éåŽ†è¯¥ xml ç»“ç‚¹çš„å±žæ€§ */
+	/* ±éÀú¸Ã xml ½áµãµÄÊôÐÔ */
 	acl_foreach(iter1, node->attr_list) {
 		ACL_XML2_ATTR *attr = (ACL_XML2_ATTR*) iter1.data;
 		printf("\tattr_name: %s, attr_value: %s\n",
@@ -426,7 +426,7 @@ static ACL_XML2_NODE *test_getElementById(ACL_XML2 *xml, const char *id)
 	if (node) {
 		printf("-------------- walk node ----------------\n");
 
-		/* éåŽ†è¯¥ xml ç»“ç‚¹çš„å±žæ€§ */
+		/* ±éÀú¸Ã xml ½áµãµÄÊôÐÔ */
 		acl_foreach(iter1, node->attr_list) {
 			ACL_XML2_ATTR *attr = (ACL_XML2_ATTR*) iter1.data;
 			printf("\tattr_name: %s, attr_value: %s\n",
@@ -462,11 +462,11 @@ static ACL_XML2 *get_xml(int once, const char *data,
 	acl_xml2_slash(xml, 1);
 
 	if (once) {
-		/* ä¸€æ¬¡æ€§åœ°åˆ†æžå®Œæ•´ xml æ•°æ® */
+		/* Ò»´ÎÐÔµØ·ÖÎöÍêÕû xml Êý¾Ý */
 		ACL_METER_TIME("-------------once begin--------------");
 		left = acl_xml2_parse(xml, data);
 	} else {
-		/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æž xml æ•°æ® */
+		/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö xml Êý¾Ý */
 		ACL_METER_TIME("-------------stream begin--------------");
 		while (*data != 0) {
 			char  ch2[2];
@@ -505,10 +505,10 @@ static void parse_xml(int once, const char *data,
 	int total = xml->node_cnt, left;
 	const char *ptr;
 
-	/* éåŽ†æ‰€æœ‰ xml èŠ‚ç‚¹ */
+	/* ±éÀúËùÓÐ xml ½Úµã */
 	walk_xml(xml);
 
-	/* é€’å½’éåŽ† root èŠ‚ç‚¹çš„æ‰€æœ‰å­èŠ‚ç‚¹ */
+	/* µÝ¹é±éÀú root ½ÚµãµÄËùÓÐ×Ó½Úµã */
 	printf("-------------------- walk root node -------------------\r\n");
 	walk_xml_node(xml->root, 0);
 	printf("-------------------- walk root node end ---------------\r\n");
@@ -516,23 +516,23 @@ static void parse_xml(int once, const char *data,
 	printf("Enter any key to continue ...\r\n");
 	getchar();
 
-	/* æ ¹æ®æ ‡ç­¾åèŽ·å¾— xml ç»“ç‚¹é›†åˆ */
+	/* ¸ù¾Ý±êÇ©Ãû»ñµÃ xml ½áµã¼¯ºÏ */
 
-	/* æŸ¥è¯¢å±žæ€§åä¸º name, å±žæ€§å€¼ä¸º user çš„æ‰€æœ‰ xml ç»“ç‚¹çš„é›†åˆ */
+	/* ²éÑ¯ÊôÐÔÃûÎª name, ÊôÐÔÖµÎª user µÄËùÓÐ xml ½áµãµÄ¼¯ºÏ */
 	test_getElementsByTagName(xml, "user");
 
-	/* æŸ¥è¯¢å±žæ€§åä¸º name, å±žæ€§å€¼ä¸º user2_1 çš„æ‰€æœ‰ xml ç»“ç‚¹çš„é›†åˆ */
+	/* ²éÑ¯ÊôÐÔÃûÎª name, ÊôÐÔÖµÎª user2_1 µÄËùÓÐ xml ½áµãµÄ¼¯ºÏ */
 	test_getElementsByTagName(xml, "user2_1");
 
-	/* æŸ¥è¯¢å±žæ€§åä¸º id, å±žæ€§å€¼ä¸º id2_2 çš„æ‰€æœ‰ xml ç»“ç‚¹é›†åˆ */
+	/* ²éÑ¯ÊôÐÔÃûÎª id, ÊôÐÔÖµÎª id2_2 µÄËùÓÐ xml ½áµã¼¯ºÏ */
 	(void) test_getElementById(xml, "id2_2");
 
-	/* æŸ¥è¯¢å±žæ€§åä¸º id, å±žæ€§å€¼ä¸º id2_3 çš„æ‰€æœ‰ xml ç»“ç‚¹é›†åˆ */
+	/* ²éÑ¯ÊôÐÔÃûÎª id, ÊôÐÔÖµÎª id2_3 µÄËùÓÐ xml ½áµã¼¯ºÏ */
 	node = test_getElementById(xml, "id2_3");
 	if (node) {
 		int   ndel = 0, node_cnt;
 
-		/* åˆ é™¤è¯¥ç»“ç‚¹åŠå…¶å­ç»“ç‚¹ */
+		/* É¾³ý¸Ã½áµã¼°Æä×Ó½áµã */
 		printf(">>>before delete %s, total: %d\n",
 			node->ltag, xml->node_cnt);
 		ndel = acl_xml2_node_delete(node);
@@ -557,7 +557,7 @@ static void parse_xml(int once, const char *data,
 
 	printf("----------------- build xml end ---------------------\r\n");
 
-	/* é‡Šæ”¾ xml å¯¹è±¡ */
+	/* ÊÍ·Å xml ¶ÔÏó */
 	acl_vstring_free(xml->vbuf);
 	left = acl_xml2_free(xml);
 

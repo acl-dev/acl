@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 static void print_slaves_slots(const acl::redis_slot* slot)
 {

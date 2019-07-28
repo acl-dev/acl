@@ -1,9 +1,9 @@
-ï»¿// mysql.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// mysql.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
 
-// æŸ¥è¯¢è¡¨æ•°æ®
+// ²éÑ¯±íÊı¾İ
 static int tbl_select(acl::db_handle& db)
 {
 	const char* sql = "select value, category, type from black_white_list";
@@ -31,17 +31,17 @@ static int tbl_select(acl::db_handle& db)
 
 	int  ret = (int) db.length();
 
-	// é‡Šæ”¾æŸ¥è¯¢ç»“æœ
+	// ÊÍ·Å²éÑ¯½á¹û
 	db.free_result();
 	return (ret);
 }
 
 int main(void)
 {
-	// WIN32 ä¸‹éœ€è¦è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œæœ‰å…³ SOCKET çš„åˆå§‹åŒ–
+	// WIN32 ÏÂĞèÒªµ÷ÓÃ´Ëº¯Êı½øĞĞÓĞ¹Ø SOCKET µÄ³õÊ¼»¯
 	acl::acl_cpp_init();
 
-	// å…è®¸å°†é”™è¯¯æ—¥å¿—è¾“å‡ºè‡³å±å¹•
+	// ÔÊĞí½«´íÎóÈÕÖ¾Êä³öÖÁÆÁÄ»
 	acl::log::stdout_open(true);
 
 	acl::string line;
@@ -56,7 +56,7 @@ int main(void)
 
 	acl::string path;
 
-	// å› ä¸ºé‡‡ç”¨åŠ¨æ€åŠ è½½çš„æ–¹å¼ï¼Œæ‰€ä»¥éœ€è¦åº”ç”¨ç»™å‡º mysql å®¢æˆ·ç«¯åº“æ‰€åœ¨çš„è·¯å¾„
+	// ÒòÎª²ÉÓÃ¶¯Ì¬¼ÓÔØµÄ·½Ê½£¬ËùÒÔĞèÒªÓ¦ÓÃ¸ø³ö mysql ¿Í»§¶Ë¿âËùÔÚµÄÂ·¾¶
 	out.format("Enter %s load path: ", libname);
 	if (in.gets(line) && !line.empty())
 #if	defined(_WIN32) || defined(_WIN64)
@@ -68,7 +68,7 @@ int main(void)
 		path = libname;
 
 	out.format("%s path: %s\r\n", libname, path.c_str());
-	// è®¾ç½®åŠ¨æ€åº“åŠ è½½çš„å…¨è·¯å¾„
+	// ÉèÖÃ¶¯Ì¬¿â¼ÓÔØµÄÈ«Â·¾¶
 	acl::db_handle::set_loadpath(path);
 
 	const char* dbaddr = "127.0.0.1:16811";

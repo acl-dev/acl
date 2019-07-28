@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 
 #if  defined(ACL_MS_WINDOWS)
 #pragma comment(lib,"ws2_32")

@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	is_header 3
  * SUMMARY

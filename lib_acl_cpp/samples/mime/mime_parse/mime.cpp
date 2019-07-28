@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 
 static void mime_test(acl::mime& mime, const char* path, bool htmlFirst)
 {
@@ -41,7 +41,7 @@ static void mime_test(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// å°†é‚®ä»¶ä¸­çš„é™„ä»¶ä¿å­˜åœ¨ç£ç›˜ä¸Š
+	// ½«ÓÊ¼şÖĞµÄ¸½¼ş±£´æÔÚ´ÅÅÌÉÏ
 
 	printf("---------------------------------------------------------\r\n");
 	printf(">>>> saving attach file now ...\r\n");
@@ -69,7 +69,7 @@ static void mime_test(acl::mime& mime, const char* path, bool htmlFirst)
 
 	printf(">>>> saved attach file ok ...\r\n");
 	//////////////////////////////////////////////////////////////////////
-	// éå†æ‰€æœ‰èŠ‚ç‚¹
+	// ±éÀúËùÓĞ½Úµã
 	printf("------------------------------------------------------\r\n");
 
 	acl::string tmp;
@@ -91,7 +91,7 @@ static void mime_test(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// å°†è§£æåçš„é‚®ä»¶å†é‡æ–°ç»„åˆå¹¶ä¿å­˜åœ¨ç£ç›˜ä¸Š
+	// ½«½âÎöºóµÄÓÊ¼şÔÙÖØĞÂ×éºÏ²¢±£´æÔÚ´ÅÅÌÉÏ
 
 	mime.save_mail("./var", "test.html");
 }

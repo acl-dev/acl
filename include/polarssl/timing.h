@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file timing.h
  *
  * \brief Portable interface to the CPU cycle counter

@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	header_token 3
  * SUMMARY

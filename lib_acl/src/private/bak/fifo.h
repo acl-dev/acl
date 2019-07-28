@@ -1,4 +1,4 @@
-﻿#ifndef __FIFO_INCLUDE_H__
+#ifndef __FIFO_INCLUDE_H__
 #define __FIFO_INCLUDE_H__
 
 #ifdef __cplusplus

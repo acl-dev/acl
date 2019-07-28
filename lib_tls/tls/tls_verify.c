@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tls_verify 3
  * SUMMARY

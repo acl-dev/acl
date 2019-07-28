@@ -1,4 +1,4 @@
-ï»¿#ifndef __HTTP_SERVICE_INCLUDE_H__
+#ifndef __HTTP_SERVICE_INCLUDE_H__
 #define __HTTP_SERVICE_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -17,7 +17,7 @@ extern "C" {
 #define DEBUG_PROXY_BASE	60
 #define DEBUG_HTML_TITLE	(DEBUG_PROXY_BASE + 1)
 
-/* å¸¸é‡å®šä¹‰ */
+/* ³£Á¿¶¨Òå */
 #define	STR	acl_vstring_str
 #define	LEN	ACL_VSTRING_LEN
 #define	SCP	ACL_SAFE_STRNCPY
@@ -31,10 +31,10 @@ extern "C" {
 typedef struct HTTP_SERVICE HTTP_SERVICE;
 typedef struct HTTP_CLIENT HTTP_CLIENT;
 
-/* è¿‡æ»¤å™¨åˆå§‹åŒ–å‡½æ•°ç±»å‹å®šä¹‰ */
+/* ¹ıÂËÆ÷³õÊ¼»¯º¯ÊıÀàĞÍ¶¨Òå */
 typedef void (*plugin_init_fn)(ACL_DLL_ENV *dll_env, const char *plugin_cfg_dir);
 
-/* è¿‡æ»¤å™¨åŒ¹é…å‡½æ•°ç±»å‹å®šä¹‰ */
+/* ¹ıÂËÆ÷Æ¥Åäº¯ÊıÀàĞÍ¶¨Òå */
 typedef int (*plugin_filter_request_fn)(ACL_VSTREAM *client,
 					HTTP_HDR_REQ *hdr_req,
 					void **ctx_ptr);
@@ -44,65 +44,65 @@ typedef int (*plugin_filter_respond_fn)(ACL_VSTREAM *client,
 					HTTP_HDR_RES *hdr_res,
 					void **ctx_ptr);
 
-/* è¿‡æ»¤å™¨æ¥ç®¡å‡½æ•°ç±»å‹å®šä¹‰ */
+/* ¹ıÂËÆ÷½Ó¹Üº¯ÊıÀàĞÍ¶¨Òå */
 typedef void (*plugin_forward_request_fn)(ACL_VSTREAM *client,
 		HTTP_HDR_REQ *hdr_req, void *ctx);
 typedef void (*plugin_forward_respond_fn)(ACL_VSTREAM *client, ACL_VSTREAM *server,
 		HTTP_HDR_REQ *hdr_req, HTTP_HDR_RES *hdr_res, void *ctx);
 
-/* HTTPæ•°æ®ä½“è¿‡æ»¤å™¨å‡½æ•°ç±»å‹å®šä¹‰ */
+/* HTTPÊı¾İÌå¹ıÂËÆ÷º¯ÊıÀàĞÍ¶¨Òå */
 typedef char *(*plugin_dat_filter_fn)(const char *data, int dlen,
 		int *ret, int *stop, void *ctx);
-/* é‡Šæ”¾HTTPæ•°æ®ä½“è¿‡æ»¤å™¨åˆ†é…çš„å†…å­˜ */
+/* ÊÍ·ÅHTTPÊı¾İÌå¹ıÂËÆ÷·ÖÅäµÄÄÚ´æ */
 typedef void (*plugin_dat_free_fn)(void *buf, void *ctx);
 
-/* è¿‡æ»¤å™¨ç»“æ„ç±»å‹å®šä¹‰ */
+/* ¹ıÂËÆ÷½á¹¹ÀàĞÍ¶¨Òå */
 typedef struct HTTP_PLUGIN {
 	plugin_init_fn init;
 	union {
-		plugin_filter_request_fn request;	/* è¯·æ±‚è¿‡æ»¤å™¨ */
-		plugin_filter_respond_fn respond;	/* å“åº”è¿‡æ»¤å™¨ */
-	} filter;	/* è¿‡æ»¤å™¨æ¥å£ */
+		plugin_filter_request_fn request;	/* ÇëÇó¹ıÂËÆ÷ */
+		plugin_filter_respond_fn respond;	/* ÏìÓ¦¹ıÂËÆ÷ */
+	} filter;	/* ¹ıÂËÆ÷½Ó¿Ú */
 	union {
-		plugin_forward_request_fn request;	/* è¯·æ±‚æ¥ç®¡å™¨ */
-		plugin_forward_respond_fn respond;	/* å“åº”æ¥ç®¡å™¨ */
-	} forward;	/* æ¥ç®¡å™¨æ¥å£ */
-	plugin_dat_filter_fn data_filter;		/* æ•°æ®ä½“è¿‡æ»¤å™¨ */
-	plugin_dat_free_fn data_free;			/* é‡Šæ”¾åŠ¨æ€å†…å­˜ */
+		plugin_forward_request_fn request;	/* ÇëÇó½Ó¹ÜÆ÷ */
+		plugin_forward_respond_fn respond;	/* ÏìÓ¦½Ó¹ÜÆ÷ */
+	} forward;	/* ½Ó¹ÜÆ÷½Ó¿Ú */
+	plugin_dat_filter_fn data_filter;		/* Êı¾İÌå¹ıÂËÆ÷ */
+	plugin_dat_free_fn data_free;			/* ÊÍ·Å¶¯Ì¬ÄÚ´æ */
 } HTTP_PLUGIN;
 
 struct HTTP_SERVICE {
 	SERVICE service;
 	ACL_VSTRING *file_path;
 
-	ACL_FIFO request_plugins;		/* å¤–æŒ‚è¯·æ±‚è¿‡æ»¤å™¨(HTTP_PLUGIN)é›†åˆ */
-	ACL_FIFO respond_plugins;		/* å¤–æŒ‚å“åº”è¿‡æ»¤å™¨(HTTP_PLUGIN)é›†åˆ */
-	ACL_FIFO request_dat_plugins;		/* å¤–æŒ‚è¯·æ±‚è¿‡æ»¤å™¨(HTTP_PLUGIN)é›†åˆ */
-	ACL_FIFO respond_dat_plugins;		/* å¤–æŒ‚å“åº”è¿‡æ»¤å™¨(HTTP_PLUGIN)é›†åˆ */
+	ACL_FIFO request_plugins;		/* Íâ¹ÒÇëÇó¹ıÂËÆ÷(HTTP_PLUGIN)¼¯ºÏ */
+	ACL_FIFO respond_plugins;		/* Íâ¹ÒÏìÓ¦¹ıÂËÆ÷(HTTP_PLUGIN)¼¯ºÏ */
+	ACL_FIFO request_dat_plugins;		/* Íâ¹ÒÇëÇó¹ıÂËÆ÷(HTTP_PLUGIN)¼¯ºÏ */
+	ACL_FIFO respond_dat_plugins;		/* Íâ¹ÒÏìÓ¦¹ıÂËÆ÷(HTTP_PLUGIN)¼¯ºÏ */
 };
 
 typedef struct {
 	HTTP_CLIENT  *http_client;
-	HTTP_HDR_REQ *hdr_req;			/* HTTPåè®®è¯·æ±‚å¤´æŒ‡é’ˆ */
-	HTTP_REQ     *req;			/* HTTPåè®®è¯·æ±‚ */
+	HTTP_HDR_REQ *hdr_req;			/* HTTPĞ­ÒéÇëÇóÍ·Ö¸Õë */
+	HTTP_REQ     *req;			/* HTTPĞ­ÒéÇëÇó */
 	int   flag;
 #define	CLIENT_READ_WAIT		(1 << 2)
 #define	SERVER_READ_WAIT		(1 << 3)
 } HTTP_CLIENT_REQ;
 
 struct HTTP_CLIENT {
-	CLIENT_ENTRY  entry;			/* åŸºæœ¬ä»£ç†å¯¹è±¡ */
-	HTTP_CLIENT_REQ *req_curr;		/* å½“å‰æ­£è¢«å¤„ç†çš„è¯·æ±‚ */
-	ACL_FIFO      req_list;			/* HTTPè¯·æ±‚é˜Ÿåˆ— */
+	CLIENT_ENTRY  entry;			/* »ù±¾´úÀí¶ÔÏó */
+	HTTP_CLIENT_REQ *req_curr;		/* µ±Ç°Õı±»´¦ÀíµÄÇëÇó */
+	ACL_FIFO      req_list;			/* HTTPÇëÇó¶ÓÁĞ */
 #define	WRITE_TO_CLIENT(x, buff, dlen)	acl_aio_writen((x)->entry.client, (buff), (int) (dlen))
 #define	WRITEV_TO_CLIENT(x, vect, cnt)	acl_aio_writev((x)->entry.client, (vect), (int) (cnt))
 #define	WRITE_TO_SERVER(x, buff, dlen)	acl_aio_writen((x)->entry.server, (buff), (int) (dlen))
-	HTTP_HDR_RES *hdr_res;			/* HTTPåè®®å“åº”å¤´æŒ‡é’ˆ */
-	HTTP_RES     *res;			/* HTTPåè®®å“åº” */
+	HTTP_HDR_RES *hdr_res;			/* HTTPĞ­ÒéÏìÓ¦Í·Ö¸Õë */
+	HTTP_RES     *res;			/* HTTPĞ­ÒéÏìÓ¦ */
 	ACL_VSTREAM  *fp;
 
 	int   use_cache;
-	ACL_VSTRING  *buf;			/* å†…éƒ¨ç”¨çš„åŠ¨æ€å†…å­˜ */
+	ACL_VSTRING  *buf;			/* ÄÚ²¿ÓÃµÄ¶¯Ì¬ÄÚ´æ */
 	FILE_CACHE   *cache;
 	CACHE_ITER    cache_iter;
 
@@ -120,20 +120,20 @@ struct HTTP_CLIENT {
 	size_t sent_size;
 
 	struct {
-		time_t read_reqhdr;		/* è¯»HTTPåè®®è¯·æ±‚å¤´æ—¶é—´ */
-		time_t read_reqbody;		/* è¯»HTTPåè®®è¯·æ±‚ä½“æ—¶é—´ */
-		time_t read_reshdr;		/* è¯»HTTPåè®®å“åº”å¤´æ—¶é—´ */
-		time_t read_resbody;		/* è¯»HTTPåè®®å“åº”ä½“æ—¶é—´ */
-		time_t send_reqhdr;		/* å†™HTTPåè®®è¯·æ±‚å¤´æ—¶é—´ */
-		time_t send_reqbody;		/* å†™HTTPåè®®è¯·æ±‚ä½“æ—¶é—´ */
-		time_t send_reshdr;		/* å†™HTTPåè®®å“åº”å¤´æ—¶é—´ */
-		time_t send_resbody;		/* å†™HTTPåè®®å“åº”ä½“æ—¶é—´ */
+		time_t read_reqhdr;		/* ¶ÁHTTPĞ­ÒéÇëÇóÍ·Ê±¼ä */
+		time_t read_reqbody;		/* ¶ÁHTTPĞ­ÒéÇëÇóÌåÊ±¼ä */
+		time_t read_reshdr;		/* ¶ÁHTTPĞ­ÒéÏìÓ¦Í·Ê±¼ä */
+		time_t read_resbody;		/* ¶ÁHTTPĞ­ÒéÏìÓ¦ÌåÊ±¼ä */
+		time_t send_reqhdr;		/* Ğ´HTTPĞ­ÒéÇëÇóÍ·Ê±¼ä */
+		time_t send_reqbody;		/* Ğ´HTTPĞ­ÒéÇëÇóÌåÊ±¼ä */
+		time_t send_reshdr;		/* Ğ´HTTPĞ­ÒéÏìÓ¦Í·Ê±¼ä */
+		time_t send_resbody;		/* Ğ´HTTPĞ­ÒéÏìÓ¦ÌåÊ±¼ä */
 	} tm;
 
-	plugin_dat_filter_fn request_filter;	/* å¤–æŒ‚æ¨¡å—HTTPè¯·æ±‚æ•°æ®ä½“è¿‡æ»¤å™¨ */
-	plugin_dat_filter_fn respond_filter;	/* å¤–æŒ‚æ¨¡å—HTTPå“åº”æ•°æ®ä½“è¿‡æ»¤å™¨ */
-	void *plugin_req_ctx;			/* å¤–æŒ‚æ¨¡å—åœ¨HTTPè¯·æ±‚é˜¶æ®µçš„åŠ¨æ€å‚æ•° */
-	void *plugin_res_ctx;			/* å¤–æŒ‚æ¨¡å—åœ¨HTTPå“åº”é˜¶æ®µçš„åŠ¨æ€å‚æ•° */
+	plugin_dat_filter_fn request_filter;	/* Íâ¹ÒÄ£¿éHTTPÇëÇóÊı¾İÌå¹ıÂËÆ÷ */
+	plugin_dat_filter_fn respond_filter;	/* Íâ¹ÒÄ£¿éHTTPÏìÓ¦Êı¾İÌå¹ıÂËÆ÷ */
+	void *plugin_req_ctx;			/* Íâ¹ÒÄ£¿éÔÚHTTPÇëÇó½×¶ÎµÄ¶¯Ì¬²ÎÊı */
+	void *plugin_res_ctx;			/* Íâ¹ÒÄ£¿éÔÚHTTPÏìÓ¦½×¶ÎµÄ¶¯Ì¬²ÎÊı */
 };
 
 /* in html_template.c */

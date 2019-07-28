@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include <google/protobuf/io/zero_copy_stream.h>
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
@@ -16,7 +16,7 @@ public:
 	explicit acl_ifstream(acl::istream* in, int block_size = -1);
 	~acl_ifstream();
 
-	//åŸºç±» ZeroCopyInputStream è™šå‡½æ•°å®ç°
+	//»ùÀà ZeroCopyInputStream Ğéº¯ÊıÊµÏÖ
 	bool Next(const void** data, int* size);
 	void BackUp(int count);
 	bool Skip(int count);
@@ -52,7 +52,7 @@ public:
 
 	bool Flush();
 
-	//åŸºç±» ZeroCopyInputStream è™šå‡½æ•°å®ç°
+	//»ùÀà ZeroCopyInputStream Ğéº¯ÊıÊµÏÖ
 	bool Next(void** data, int* size);
 	void BackUp(int count);
 	int64 ByteCount() const;

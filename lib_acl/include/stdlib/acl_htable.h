@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_HTABLE_INCLUDE_H
+#ifndef ACL_HTABLE_INCLUDE_H
 #define ACL_HTABLE_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -16,7 +16,7 @@ typedef struct ACL_HTABLE	ACL_HTABLE;
 typedef struct ACL_HTABLE_INFO 	ACL_HTABLE_INFO;
 
 /**
- * å“ˆå¸Œè¡¨å¯¹è±¡ç»“æ„å¥æŸ„
+ * ¹şÏ£±í¶ÔÏó½á¹¹¾ä±ú
  */
 struct ACL_HTABLE {
 	int     size;                   /* length of entries array */
@@ -32,25 +32,25 @@ struct ACL_HTABLE {
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êı */
 	void *(*iter_head)(ACL_ITER*, struct ACL_HTABLE*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
 	void *(*iter_next)(ACL_ITER*, struct ACL_HTABLE*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êı */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_HTABLE*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êı */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_HTABLE*);
-	/* å–è¿­ä»£å™¨å…³è”çš„å½“å‰å®¹å™¨æˆå‘˜ç»“æ„å¯¹è±¡ */
+	/* È¡µü´úÆ÷¹ØÁªµÄµ±Ç°ÈİÆ÷³ÉÔ±½á¹¹¶ÔÏó */
 	ACL_HTABLE_INFO *(*iter_info)(ACL_ITER*, struct ACL_HTABLE*);
 };
 
 /**
- * å“ˆå¸Œè¡¨ä¸­æ¯ä¸€ä¸ªå“ˆå¸Œé¡¹çš„å­˜å‚¨ä¿¡æ¯ç±»å‹
+ * ¹şÏ£±íÖĞÃ¿Ò»¸ö¹şÏ£ÏîµÄ´æ´¢ĞÅÏ¢ÀàĞÍ
  */
 struct ACL_HTABLE_INFO {
 	/**
-	 * å“ˆå¸Œé”®, åªæ‰€ä»¥å¦‚æ­¤å£°æ˜ï¼Œæ˜¯å› ä¸ºå½“åˆ›å»ºå“ˆå¸Œè¡¨çš„æ ‡å¿—ä½ä¸º
-	 * ACL_BINHASH_FLAG_KEY_REUSE æ—¶éœ€è¦å¤ç”¨è¾“å…¥çš„é”®ç©ºé—´
+	 * ¹şÏ£¼ü, Ö»ËùÒÔÈç´ËÉùÃ÷£¬ÊÇÒòÎªµ±´´½¨¹şÏ£±íµÄ±êÖ¾Î»Îª
+	 * ACL_BINHASH_FLAG_KEY_REUSE Ê±ĞèÒª¸´ÓÃÊäÈëµÄ¼ü¿Õ¼ä
 	 */
 	union {
 		char *key;
@@ -63,7 +63,7 @@ struct ACL_HTABLE_INFO {
 };
 
 /**
- * ACL_HTABLE éå†ç”¨ç±»å‹
+ * ACL_HTABLE ±éÀúÓÃÀàĞÍ
  */
 typedef struct ACL_HTABLE_ITER {
 	/* public */
@@ -76,203 +76,203 @@ typedef struct ACL_HTABLE_ITER {
 } ACL_HTABLE_ITER;
 
 /**
- * å»ºç«‹å“ˆå¸Œè¡¨
- * @param size å“ˆå¸Œè¡¨é•¿åº¦
- * @param flag {unsigned int} å“ˆå¸Œè¡¨å±æ€§æ ‡å¿—ä½, ACL_BINHASH_FLAG_xxx
- * @return æ‰€å»ºå“ˆå¸Œè¡¨çš„å¤´æŒ‡é’ˆæˆ–ä¸ºç©º(è¿™æ—¶è¡¨ç¤ºå‡ºäº†ä¸¥é‡çš„é”™è¯¯, ä¸»è¦æ˜¯å†…å­˜åˆ†é…é—®é¢˜)
+ * ½¨Á¢¹şÏ£±í
+ * @param size ¹şÏ£±í³¤¶È
+ * @param flag {unsigned int} ¹şÏ£±íÊôĞÔ±êÖ¾Î», ACL_BINHASH_FLAG_xxx
+ * @return Ëù½¨¹şÏ£±íµÄÍ·Ö¸Õë»òÎª¿Õ(ÕâÊ±±íÊ¾³öÁËÑÏÖØµÄ´íÎó, Ö÷ÒªÊÇÄÚ´æ·ÖÅäÎÊÌâ)
  */
 ACL_API ACL_HTABLE *acl_htable_create(int size, unsigned int flag);
-/* æ·»åŠ æ–°çš„å¯¹è±¡æ—¶æ˜¯å¦ç›´æ¥å¤ç”¨é”®åœ°å€ */
+/* Ìí¼ÓĞÂµÄ¶ÔÏóÊ±ÊÇ·ñÖ±½Ó¸´ÓÃ¼üµØÖ· */
 #define	ACL_HTABLE_FLAG_KEY_REUSE	(1 << 0)
 
-/* æ˜¯å¦é’ˆå¯¹å¯ç”¨å¤šçº¿ç¨‹äº’æ–¥æ–¹å¼ */
+/* ÊÇ·ñÕë¶ÔÆôÓÃ¶àÏß³Ì»¥³â·½Ê½ */
 #define	ACL_HTABLE_FLAG_USE_LOCK	(1 << 1)
 
-/* æ¯æ¬¡æŸ¥è¯¢æ—¶æ˜¯å¦å°†æŸ¥è¯¢ç»“æœå¯¹è±¡æ”¾åœ¨é“¾å¤´ */
+/* Ã¿´Î²éÑ¯Ê±ÊÇ·ñ½«²éÑ¯½á¹û¶ÔÏó·ÅÔÚÁ´Í· */
 #define	ACL_HTABLE_FLAG_MSLOOK		(1 << 2)
 
-/* ç»Ÿä¸€å°†é”®è½¬æ¢ä¸ºå°å†™ï¼Œä»è€Œå®ç°é”®æŸ¥è¯¢ä¸åŒºåˆ†å¤§å°å†™çš„åŠŸèƒ½ */
+/* Í³Ò»½«¼ü×ª»»ÎªĞ¡Ğ´£¬´Ó¶øÊµÏÖ¼ü²éÑ¯²»Çø·Ö´óĞ¡Ğ´µÄ¹¦ÄÜ */
 #define	ACL_HTABLE_FLAG_KEY_LOWER	(1 << 3)
 
 ACL_API ACL_HTABLE *acl_htable_create3(int size, unsigned int flag,
 		ACL_SLICE_POOL *slice);
 
 /**
- * è®¾ç½®å“ˆå¸Œè¡¨çš„æ§åˆ¶å‚æ•°
- * @param table å“ˆå¸Œè¡¨å¯¹è±¡å¥æŸ„
- * @param name æ§åˆ¶å‚æ•°çš„å˜å‚åˆå§‹å€¼, name åŠä»¥åçš„æ§åˆ¶å‚æ•°å¦‚ä¸‹å®šä¹‰
- *  ACL_HTABLE_CTL_END: å˜å‚è¡¨ç»“æŸæ ‡å¿—
- *  ACL_HTABLE_CTL_RWLOCK: æ˜¯å¦å¯ç”¨è¯»å†™é”æœºåˆ¶
- *  ACL_HTABLE_CTL_HASH_FN: ç”¨æˆ·è‡ªå®šä¹‰çš„å“ˆå¸Œå€¼è®¡ç®—å‡½æ•°
+ * ÉèÖÃ¹şÏ£±íµÄ¿ØÖÆ²ÎÊı
+ * @param table ¹şÏ£±í¶ÔÏó¾ä±ú
+ * @param name ¿ØÖÆ²ÎÊıµÄ±ä²Î³õÊ¼Öµ, name ¼°ÒÔºóµÄ¿ØÖÆ²ÎÊıÈçÏÂ¶¨Òå
+ *  ACL_HTABLE_CTL_END: ±ä²Î±í½áÊø±êÖ¾
+ *  ACL_HTABLE_CTL_RWLOCK: ÊÇ·ñÆôÓÃ¶ÁĞ´Ëø»úÖÆ
+ *  ACL_HTABLE_CTL_HASH_FN: ÓÃ»§×Ô¶¨ÒåµÄ¹şÏ£Öµ¼ÆËãº¯Êı
  */
 ACL_API void acl_htable_ctl(ACL_HTABLE *table, int name, ...);
-#define	ACL_HTABLE_CTL_END      0  /**< æ§åˆ¶ç»“æŸæ ‡å¿— */
-#define	ACL_HTABLE_CTL_RWLOCK   1  /**< æ˜¯å¦åŠ é” */
-#define	ACL_HTABLE_CTL_HASH_FN  2  /**< è®¾ç½®ç§æœ‰å“ˆå¸Œå‡½æ•° */
+#define	ACL_HTABLE_CTL_END      0  /**< ¿ØÖÆ½áÊø±êÖ¾ */
+#define	ACL_HTABLE_CTL_RWLOCK   1  /**< ÊÇ·ñ¼ÓËø */
+#define	ACL_HTABLE_CTL_HASH_FN  2  /**< ÉèÖÃË½ÓĞ¹şÏ£º¯Êı */
 
 /**
- * æ£€æŸ¥ä¸Šä¸€æ¬¡å“ˆå¸Œè¡¨æ“ä½œåå“ˆå¸Œè¡¨çš„çŠ¶æ€
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @return {int} æ“ä½œå“ˆå¸Œè¡¨åçš„çŠ¶æ€, å‚è§å¦‚ä¸‹çš„ ACL_HTABLE_STAT_XXX
+ * ¼ì²éÉÏÒ»´Î¹şÏ£±í²Ù×÷ºó¹şÏ£±íµÄ×´Ì¬
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @return {int} ²Ù×÷¹şÏ£±íºóµÄ×´Ì¬, ²Î¼ûÈçÏÂµÄ ACL_HTABLE_STAT_XXX
  */
 ACL_API int acl_htable_errno(ACL_HTABLE *table);
-#define	ACL_HTABLE_STAT_OK          0  /**< çŠ¶æ€æ­£å¸¸ */
-#define	ACL_HTABLE_STAT_INVAL       1  /**< æ— æ•ˆå‚æ•° */
-#define	ACL_HTABLE_STAT_DUPLEX_KEY  2  /**< é‡å¤é”® */
+#define	ACL_HTABLE_STAT_OK          0  /**< ×´Ì¬Õı³£ */
+#define	ACL_HTABLE_STAT_INVAL       1  /**< ÎŞĞ§²ÎÊı */
+#define	ACL_HTABLE_STAT_DUPLEX_KEY  2  /**< ÖØ¸´¼ü */
 
 /**
- * è®¾ç½®å“ˆå¸Œè¡¨çš„å½“å‰çŠ¶æ€, error å–å€¼ ACL_HTABLE_STAT_XXX
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param error è®¾ç½®å“ˆå¸Œè¡¨çš„é”™è¯¯çŠ¶æ€
+ * ÉèÖÃ¹şÏ£±íµÄµ±Ç°×´Ì¬, error È¡Öµ ACL_HTABLE_STAT_XXX
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param error ÉèÖÃ¹şÏ£±íµÄ´íÎó×´Ì¬
  */
 ACL_API void acl_htable_set_errno(ACL_HTABLE *table, int error);
 
 /**
- * å¾€å“ˆå¸Œè¡¨é‡Œæ·»åŠ æ–°çš„é¡¹
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®, åœ¨å‡½æ•°å†…éƒ¨ä¼šå¤åˆ¶æ­¤ key é”®
- * @param value ç”¨æˆ·è‡ªå·±çš„ç‰¹å®šæ•°æ®é¡¹(å¯ä»¥ç”±ç±»å‹ç¡¬è½¬åŒ–è€Œæ¥, ä½†æ˜¯æ­¤æ•°æ®é¡¹å¿…é¡»
- *  ä¸èƒ½å †æ ˆå˜é‡)
- * @return æ‰€åˆ†é…çš„å“ˆå¸Œè¡¨é¡¹çš„æŒ‡é’ˆ, == NULL: è¡¨ç¤ºå†…éƒ¨åˆ†é…å†…å­˜å‡ºé”™, ä¸ºä¸¥é‡çš„é”™è¯¯
- *  æ³¨ï¼šå¦‚æœåœ¨æ·»åŠ æ—¶è¯¥å“ˆå¸Œäº‰é”®å­˜åœ¨ï¼Œåˆ™è¿”å›å·²ç»å­˜åœ¨çš„å“ˆå¸Œé¡¹ï¼Œä½¿ç”¨è€…åº”è¯¥é€šè¿‡è°ƒç”¨
- *  acl_htable_last_errno() æ¥æŸ¥çœ‹æ˜¯å¦é‡å¤æ·»åŠ åŒä¸€ä¸ªé”®å€¼(ACL_HTABLE_STAT_DUPLEX_KEY)
+ * Íù¹şÏ£±íÀïÌí¼ÓĞÂµÄÏî
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü, ÔÚº¯ÊıÄÚ²¿»á¸´ÖÆ´Ë key ¼ü
+ * @param value ÓÃ»§×Ô¼ºµÄÌØ¶¨Êı¾İÏî(¿ÉÒÔÓÉÀàĞÍÓ²×ª»¯¶øÀ´, µ«ÊÇ´ËÊı¾İÏî±ØĞë
+ *  ²»ÄÜ¶ÑÕ»±äÁ¿)
+ * @return Ëù·ÖÅäµÄ¹şÏ£±íÏîµÄÖ¸Õë, == NULL: ±íÊ¾ÄÚ²¿·ÖÅäÄÚ´æ³ö´í, ÎªÑÏÖØµÄ´íÎó
+ *  ×¢£ºÈç¹ûÔÚÌí¼ÓÊ±¸Ã¹şÏ£Õù¼ü´æÔÚ£¬Ôò·µ»ØÒÑ¾­´æÔÚµÄ¹şÏ£Ïî£¬Ê¹ÓÃÕßÓ¦¸ÃÍ¨¹ıµ÷ÓÃ
+ *  acl_htable_last_errno() À´²é¿´ÊÇ·ñÖØ¸´Ìí¼ÓÍ¬Ò»¸ö¼üÖµ(ACL_HTABLE_STAT_DUPLEX_KEY)
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table,
 		const char *key, void *value);
 
 /**
- * å¾€å“ˆå¸Œè¡¨é‡Œæ·»åŠ æ–°çš„é¡¹ï¼Œå½“å¤šä¸ªçº¿ç¨‹åŒæ—¶è¿›è¡Œæ­¤æ“ä½œæ—¶ï¼Œå‡½æ•°å†…éƒ¨ä¼šè‡ªåŠ¨ä¿è¯äº’æ–¥æ“ä½œ
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®, åœ¨å‡½æ•°å†…éƒ¨ä¼šå¤åˆ¶æ­¤ key é”®
- * @param value ç”¨æˆ·è‡ªå·±çš„ç‰¹å®šæ•°æ®é¡¹(å¯ä»¥ç”±ç±»å‹ç¡¬è½¬åŒ–è€Œæ¥, ä½†æ˜¯æ­¤æ•°æ®é¡¹å¿…é¡»
- *  ä¸èƒ½å †æ ˆå˜é‡)
- * @param callback å¦‚æœè¯¥å‡½æ•°æŒ‡é’ˆä¸ä¸ºç©ºï¼Œåˆ™å½“æ·»åŠ æˆåŠŸåä¾¿è°ƒç”¨è¯¥å‡½æ•°
- * @param arg callback çš„å‚æ•°ä¹‹ä¸€
- * @return {int} 0 è¡¨ç¤º æ·»åŠ æˆåŠŸï¼Œ-1 è¡¨ç¤ºæ·»åŠ å¤±è´¥
- *  æ³¨ï¼šå¦‚æœåœ¨æ·»åŠ æ—¶è¯¥å“ˆå¸Œäº‰é”®å­˜åœ¨ï¼Œåˆ™è¿”å›å·²ç»å­˜åœ¨çš„å“ˆå¸Œé¡¹ï¼Œä½¿ç”¨è€…åº”è¯¥é€šè¿‡è°ƒç”¨
- *  acl_htable_last_errno() æ¥æŸ¥çœ‹æ˜¯å¦é‡å¤æ·»åŠ åŒä¸€ä¸ªé”®å€¼(ACL_HTABLE_STAT_DUPLEX_KEY)
+ * Íù¹şÏ£±íÀïÌí¼ÓĞÂµÄÏî£¬µ±¶à¸öÏß³ÌÍ¬Ê±½øĞĞ´Ë²Ù×÷Ê±£¬º¯ÊıÄÚ²¿»á×Ô¶¯±£Ö¤»¥³â²Ù×÷
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü, ÔÚº¯ÊıÄÚ²¿»á¸´ÖÆ´Ë key ¼ü
+ * @param value ÓÃ»§×Ô¼ºµÄÌØ¶¨Êı¾İÏî(¿ÉÒÔÓÉÀàĞÍÓ²×ª»¯¶øÀ´, µ«ÊÇ´ËÊı¾İÏî±ØĞë
+ *  ²»ÄÜ¶ÑÕ»±äÁ¿)
+ * @param callback Èç¹û¸Ãº¯ÊıÖ¸Õë²»Îª¿Õ£¬Ôòµ±Ìí¼Ó³É¹¦ºó±ãµ÷ÓÃ¸Ãº¯Êı
+ * @param arg callback µÄ²ÎÊıÖ®Ò»
+ * @return {int} 0 ±íÊ¾ Ìí¼Ó³É¹¦£¬-1 ±íÊ¾Ìí¼ÓÊ§°Ü
+ *  ×¢£ºÈç¹ûÔÚÌí¼ÓÊ±¸Ã¹şÏ£Õù¼ü´æÔÚ£¬Ôò·µ»ØÒÑ¾­´æÔÚµÄ¹şÏ£Ïî£¬Ê¹ÓÃÕßÓ¦¸ÃÍ¨¹ıµ÷ÓÃ
+ *  acl_htable_last_errno() À´²é¿´ÊÇ·ñÖØ¸´Ìí¼ÓÍ¬Ò»¸ö¼üÖµ(ACL_HTABLE_STAT_DUPLEX_KEY)
  */
 ACL_API int acl_htable_enter_r(ACL_HTABLE *table, const char *key, void *value,
 		void (*callback)(ACL_HTABLE_INFO *ht, void *arg), void *arg);
 
 /**
- * ç”±æ‰€ç»™çš„ key é”®æŸ¥å¯»æŸä¸€ç‰¹å®šå“ˆå¸Œé¡¹
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®
- * @return ä¸ä¸ºç©ºæŒ‡é’ˆ: è¡¨ç¤ºæŸ¥åˆ°äº†å¯¹åº”äº key é”®çš„å“ˆå¸Œé¡¹
- *         ä¸ºç©º: è¡¨ç¤ºæœªæŸ¥åˆ°å¯¹åº”äº key é”®çš„å“ˆå¸Œé¡¹
+ * ÓÉËù¸øµÄ key ¼ü²éÑ°Ä³Ò»ÌØ¶¨¹şÏ£Ïî
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü
+ * @return ²»Îª¿ÕÖ¸Õë: ±íÊ¾²éµ½ÁË¶ÔÓ¦ÓÚ key ¼üµÄ¹şÏ£Ïî
+ *         Îª¿Õ: ±íÊ¾Î´²éµ½¶ÔÓ¦ÓÚ key ¼üµÄ¹şÏ£Ïî
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key);
 
 /**
- * ç”±æ‰€ç»™çš„ key é”®æŸ¥å¯»æŸä¸€ç‰¹å®šå“ˆå¸Œé¡¹ï¼Œå½“å¤šä¸ªçº¿ç¨‹åŒæ—¶è¿›è¡Œæ­¤æ“ä½œæ—¶ï¼Œ
- * å‡½æ•°å†…éƒ¨ä¼šè‡ªåŠ¨ä¿è¯äº’æ–¥æ“ä½œ
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®
- * @param callback æŸ¥åˆ°æ‰€è¦æ±‚çš„é”®å€¼åå¦‚æœè¯¥æŒ‡é’ˆéç©ºåˆ™è°ƒç”¨ä¹‹
- * @param arg callback å‚æ•°ä¹‹ä¸€
- * @return ä¸ä¸ºç©ºæŒ‡é’ˆ: è¡¨ç¤ºæŸ¥åˆ°äº†å¯¹åº”äº key é”®çš„å“ˆå¸Œé¡¹
- *         ä¸ºç©º: è¡¨ç¤ºæœªæŸ¥åˆ°å¯¹åº”äº key é”®çš„å“ˆå¸Œé¡¹
+ * ÓÉËù¸øµÄ key ¼ü²éÑ°Ä³Ò»ÌØ¶¨¹şÏ£Ïî£¬µ±¶à¸öÏß³ÌÍ¬Ê±½øĞĞ´Ë²Ù×÷Ê±£¬
+ * º¯ÊıÄÚ²¿»á×Ô¶¯±£Ö¤»¥³â²Ù×÷
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü
+ * @param callback ²éµ½ËùÒªÇóµÄ¼üÖµºóÈç¹û¸ÃÖ¸Õë·Ç¿ÕÔòµ÷ÓÃÖ®
+ * @param arg callback ²ÎÊıÖ®Ò»
+ * @return ²»Îª¿ÕÖ¸Õë: ±íÊ¾²éµ½ÁË¶ÔÓ¦ÓÚ key ¼üµÄ¹şÏ£Ïî
+ *         Îª¿Õ: ±íÊ¾Î´²éµ½¶ÔÓ¦ÓÚ key ¼üµÄ¹şÏ£Ïî
  */
 ACL_API int acl_htable_locate_r(ACL_HTABLE *table, const char *key,
 		void (*callback)(ACL_HTABLE_INFO *ht, void *arg), void *arg);
 
 /**
- * ç”±æ‰€ç»™çš„ key é”®æŸ¥å¯»ç”¨æˆ·çš„æ•°æ®é¡¹
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®
- * @return ä¸ä¸ºç©º: è¡¨ç¤ºæŸ¥åˆ°äº†å¯¹åº”äº key é”®çš„æ•°æ®é¡¹, ç”¨æˆ·å¯ä»¥æ ¹æ®ç”¨æˆ·è‡ªå·±çš„
- *  æ•°æ®ç±»å‹è¿›è¡Œè½¬æ¢; ä¸ºç©º: è¡¨ç¤ºæœªæŸ¥åˆ°å¯¹åº”äº key é”®çš„æ•°æ®é¡¹
+ * ÓÉËù¸øµÄ key ¼ü²éÑ°ÓÃ»§µÄÊı¾İÏî
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü
+ * @return ²»Îª¿Õ: ±íÊ¾²éµ½ÁË¶ÔÓ¦ÓÚ key ¼üµÄÊı¾İÏî, ÓÃ»§¿ÉÒÔ¸ù¾İÓÃ»§×Ô¼ºµÄ
+ *  Êı¾İÀàĞÍ½øĞĞ×ª»»; Îª¿Õ: ±íÊ¾Î´²éµ½¶ÔÓ¦ÓÚ key ¼üµÄÊı¾İÏî
  */
 ACL_API void *acl_htable_find(ACL_HTABLE *table, const char *key);
 
 /**
- * ç”±æ‰€ç»™çš„ key é”®æŸ¥å¯»ç”¨æˆ·çš„æ•°æ®é¡¹, å½“å¤šä¸ªçº¿ç¨‹åŒæ—¶è¿›è¡Œæ­¤æ“ä½œæ—¶ï¼Œ
- * å‡½æ•°å†…éƒ¨ä¼šè‡ªåŠ¨ä¿è¯äº’æ–¥æ“ä½œ
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®
- * @param callback å½“æŸ¥åˆ°æ‰€è¦æ±‚çš„é”®å€¼åï¼Œå¦‚æœè¯¥å‡½æ•°æŒ‡é’ˆä¸ä¸ºç©ºåˆ™è°ƒç”¨ä¹‹
- * @param arg callback çš„å‚æ•°ä¹‹ä¸€
- * @return ä¸ä¸ºç©º: è¡¨ç¤ºæŸ¥åˆ°äº†å¯¹åº”äº key é”®çš„æ•°æ®é¡¹, ç”¨æˆ·å¯ä»¥æ ¹æ®ç”¨æˆ·è‡ªå·±çš„
- *  æ•°æ®ç±»å‹è¿›è¡Œè½¬æ¢; ä¸ºç©º: è¡¨ç¤ºæœªæŸ¥åˆ°å¯¹åº”äº key é”®çš„æ•°æ®é¡¹
+ * ÓÉËù¸øµÄ key ¼ü²éÑ°ÓÃ»§µÄÊı¾İÏî, µ±¶à¸öÏß³ÌÍ¬Ê±½øĞĞ´Ë²Ù×÷Ê±£¬
+ * º¯ÊıÄÚ²¿»á×Ô¶¯±£Ö¤»¥³â²Ù×÷
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü
+ * @param callback µ±²éµ½ËùÒªÇóµÄ¼üÖµºó£¬Èç¹û¸Ãº¯ÊıÖ¸Õë²»Îª¿ÕÔòµ÷ÓÃÖ®
+ * @param arg callback µÄ²ÎÊıÖ®Ò»
+ * @return ²»Îª¿Õ: ±íÊ¾²éµ½ÁË¶ÔÓ¦ÓÚ key ¼üµÄÊı¾İÏî, ÓÃ»§¿ÉÒÔ¸ù¾İÓÃ»§×Ô¼ºµÄ
+ *  Êı¾İÀàĞÍ½øĞĞ×ª»»; Îª¿Õ: ±íÊ¾Î´²éµ½¶ÔÓ¦ÓÚ key ¼üµÄÊı¾İÏî
  */
 ACL_API int  acl_htable_find_r(ACL_HTABLE *table, const char *key,
 		void (*callback)(void *value, void *arg), void *arg);
 
 /**
- * æ ¹æ®æ‰€ç»™çš„ key é”®åˆ é™¤æŸä¸€å“ˆå¸Œé¡¹
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param key é”®
- * @param free_fn å¦‚æœè¯¥å‡½æ•°æŒ‡é’ˆä¸ä¸ºç©ºå¹¶ä¸”æ‰¾åˆ°äº†å¯¹åº”äº key é”®çš„æ•°æ®é¡¹, åˆ™å…ˆ
- *  è°ƒç”¨ç”¨æˆ·æ‰€æä¾›çš„ææ„å‡½æ•°åšä¸€äº›æ¸…å°¾å·¥ä½œ, ç„¶åå†é‡Šæ”¾è¯¥å“ˆå¸Œé¡¹
- * @return 0: æˆåŠŸ;  -1: æœªæ‰¾åˆ°è¯¥ key é”®
+ * ¸ù¾İËù¸øµÄ key ¼üÉ¾³ıÄ³Ò»¹şÏ£Ïî
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param key ¼ü
+ * @param free_fn Èç¹û¸Ãº¯ÊıÖ¸Õë²»Îª¿Õ²¢ÇÒÕÒµ½ÁË¶ÔÓ¦ÓÚ key ¼üµÄÊı¾İÏî, ÔòÏÈ
+ *  µ÷ÓÃÓÃ»§ËùÌá¹©µÄÎö¹¹º¯Êı×öÒ»Ğ©ÇåÎ²¹¤×÷, È»ºóÔÙÊÍ·Å¸Ã¹şÏ£Ïî
+ * @return 0: ³É¹¦;  -1: Î´ÕÒµ½¸Ã key ¼ü
  */
 ACL_API int acl_htable_delete(ACL_HTABLE *table, const char *key,
 		void (*free_fn) (void *));
 #define	acl_htable_delete_r	acl_htable_delete
 
 /**
- * ç›´æ¥æ ¹æ® acl_htable_locate è¿”å›çš„éç©ºå¯¹è±¡ä»å“ˆå¸Œè¡¨ä¸­åˆ é™¤è¯¥å¯¹è±¡
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param ht {ACL_HTABLE_INFO*} å­˜å‚¨äºå“ˆå¸Œè¡¨ä¸­çš„å†…éƒ¨ç»“æ„å¯¹è±¡
- * @param free_fn å¦‚æœè¯¥å‡½æ•°æŒ‡é’ˆä¸ä¸ºç©ºå¹¶ä¸”æ‰¾åˆ°äº†å¯¹åº”äº key é”®çš„æ•°æ®é¡¹, åˆ™å…ˆ
- *  è°ƒç”¨ç”¨æˆ·æ‰€æä¾›çš„ææ„å‡½æ•°åšä¸€äº›æ¸…å°¾å·¥ä½œ, ç„¶åå†é‡Šæ”¾è¯¥å“ˆå¸Œé¡¹
+ * Ö±½Ó¸ù¾İ acl_htable_locate ·µ»ØµÄ·Ç¿Õ¶ÔÏó´Ó¹şÏ£±íÖĞÉ¾³ı¸Ã¶ÔÏó
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param ht {ACL_HTABLE_INFO*} ´æ´¢ÓÚ¹şÏ£±íÖĞµÄÄÚ²¿½á¹¹¶ÔÏó
+ * @param free_fn Èç¹û¸Ãº¯ÊıÖ¸Õë²»Îª¿Õ²¢ÇÒÕÒµ½ÁË¶ÔÓ¦ÓÚ key ¼üµÄÊı¾İÏî, ÔòÏÈ
+ *  µ÷ÓÃÓÃ»§ËùÌá¹©µÄÎö¹¹º¯Êı×öÒ»Ğ©ÇåÎ²¹¤×÷, È»ºóÔÙÊÍ·Å¸Ã¹şÏ£Ïî
  */
 ACL_API void acl_htable_delete_entry(ACL_HTABLE *table, ACL_HTABLE_INFO *ht,
 		void (*free_fn) (void *));
 
 /**
- * é‡Šæ”¾æ•´ä¸ªå“ˆå¸Œè¡¨
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param free_fn å¦‚æœè¯¥æŒ‡é’ˆä¸ä¸ºç©ºåˆ™å¯¹å“ˆå¸Œè¡¨ä¸­çš„æ¯ä¸€é¡¹å“ˆå¸Œé¡¹å…ˆç”¨è¯¥å‡½æ•°åš
- *  æ¸…å°¾å·¥ä½œ, ç„¶åå†é‡Šæ”¾
+ * ÊÍ·ÅÕû¸ö¹şÏ£±í
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param free_fn Èç¹û¸ÃÖ¸Õë²»Îª¿ÕÔò¶Ô¹şÏ£±íÖĞµÄÃ¿Ò»Ïî¹şÏ£ÏîÏÈÓÃ¸Ãº¯Êı×ö
+ *  ÇåÎ²¹¤×÷, È»ºóÔÙÊÍ·Å
  */
 ACL_API void acl_htable_free(ACL_HTABLE *table, void (*free_fn) (void *));
 
 /**
- * é‡ç½®å“ˆå¸Œè¡¨, è¯¥å‡½æ•°ä¼šé‡Šæ”¾å“ˆå¸Œè¡¨ä¸­çš„æ‰€æœ‰å†…å®¹é¡¹, å¹¶é‡æ–°åˆå§‹åŒ–
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param free_fn å¦‚æœè¯¥æŒ‡é’ˆä¸ä¸ºç©ºåˆ™å¯¹å“ˆå¸Œè¡¨ä¸­çš„æ¯ä¸€é¡¹å“ˆå¸Œé¡¹å…ˆç”¨è¯¥å‡½æ•°åš
- *  æ¸…å°¾å·¥ä½œ, ç„¶åå†é‡Šæ”¾
- * @return æ˜¯å¦é‡ç½®æˆåŠŸ. 0: OK; < 0: error.
+ * ÖØÖÃ¹şÏ£±í, ¸Ãº¯Êı»áÊÍ·Å¹şÏ£±íÖĞµÄËùÓĞÄÚÈİÏî, ²¢ÖØĞÂ³õÊ¼»¯
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param free_fn Èç¹û¸ÃÖ¸Õë²»Îª¿ÕÔò¶Ô¹şÏ£±íÖĞµÄÃ¿Ò»Ïî¹şÏ£ÏîÏÈÓÃ¸Ãº¯Êı×ö
+ *  ÇåÎ²¹¤×÷, È»ºóÔÙÊÍ·Å
+ * @return ÊÇ·ñÖØÖÃ³É¹¦. 0: OK; < 0: error.
  */
 ACL_API int acl_htable_reset(ACL_HTABLE *table, void (*free_fn) (void *));
 #define	acl_htable_reset_r	acl_htable_reset
 
 /**
- * å¯¹å“ˆå¸Œè¡¨ä¸­çš„æ¯ä¸€é¡¹å“ˆå¸Œé¡¹è¿›è¡Œå¤„ç†
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @param walk_fn å¤„ç†æ¯ä¸€é¡¹å“ˆå¸Œé¡¹çš„å‡½æ•°æŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º
- * @param arg ç”¨æˆ·è‡ªå·±ç±»å‹çš„æ•°æ®
+ * ¶Ô¹şÏ£±íÖĞµÄÃ¿Ò»Ïî¹şÏ£Ïî½øĞĞ´¦Àí
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @param walk_fn ´¦ÀíÃ¿Ò»Ïî¹şÏ£ÏîµÄº¯ÊıÖ¸Õë, ²»ÄÜÎª¿Õ
+ * @param arg ÓÃ»§×Ô¼ºÀàĞÍµÄÊı¾İ
  */
 ACL_API void acl_htable_walk(ACL_HTABLE *table,
 		void (*walk_fn) (ACL_HTABLE_INFO *, void *), void *arg);
 #define	acl_htable_walk_r	acl_htable_walk
 
 /**
- * è¿”å›å“ˆå¸Œè¡¨å½“å‰çš„å®¹å™¨ç©ºé—´å¤§å°
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @return å“ˆå¸Œè¡¨çš„å®¹å™¨ç©ºé—´å¤§å°
+ * ·µ»Ø¹şÏ£±íµ±Ç°µÄÈİÆ÷¿Õ¼ä´óĞ¡
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @return ¹şÏ£±íµÄÈİÆ÷¿Õ¼ä´óĞ¡
  */
 ACL_API int acl_htable_size(const ACL_HTABLE *table);
 
 /**
- * è¿”å›å“ˆå¸Œè¡¨å½“å‰çš„çª—å£ä¸­æ‰€å«å…ƒç´ ä¸ªæ•°
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
- * @return å“ˆå¸Œè¡¨ä¸­å…ƒç´ ä¸ªæ•°
+ * ·µ»Ø¹şÏ£±íµ±Ç°µÄ´°¿ÚÖĞËùº¬ÔªËØ¸öÊı
+ * @param table ¹şÏ£±íÖ¸Õë
+ * @return ¹şÏ£±íÖĞÔªËØ¸öÊı
  */
 ACL_API int acl_htable_used(const ACL_HTABLE *table);
 
 /**
- * å°†å“ˆå¸Œè¡¨é‡Œçš„æ‰€æœ‰é¡¹ç»„åˆæˆä¸€ä¸ªé“¾è¡¨
- * @param table å“ˆå¸Œè¡¨
- * @return ä¸ä¸ºç©º: é“¾è¡¨æŒ‡é’ˆ; ä¸ºç©º: è¡¨ç¤ºè¯¥å“ˆå¸Œè¡¨é‡Œæ²¡æœ‰å“ˆå¸Œé¡¹
+ * ½«¹şÏ£±íÀïµÄËùÓĞÏî×éºÏ³ÉÒ»¸öÁ´±í
+ * @param table ¹şÏ£±í
+ * @return ²»Îª¿Õ: Á´±íÖ¸Õë; Îª¿Õ: ±íÊ¾¸Ã¹şÏ£±íÀïÃ»ÓĞ¹şÏ£Ïî
  */
 ACL_API ACL_HTABLE_INFO **acl_htable_list(const ACL_HTABLE *table);
 
 /**
- * æ˜¾ç¤ºå“ˆå¸Œè¡¨ä¸­ key é”®çš„åˆ†å¸ƒçŠ¶æ€
- * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * ÏÔÊ¾¹şÏ£±íÖĞ key ¼üµÄ·Ö²¼×´Ì¬
+ * @param table ¹şÏ£±íÖ¸Õë
  */
 ACL_API void acl_htable_stat(const ACL_HTABLE *table);
 #define	acl_htable_stat_r	acl_htable_stat
@@ -285,7 +285,7 @@ ACL_API const ACL_HTABLE_INFO *acl_htable_iter_tail(
 		ACL_HTABLE *table, ACL_HTABLE_ITER *iter);
 ACL_API const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter);
 
-/*--------------------  ä¸€äº›æ–¹ä¾¿å¿«æ·çš„å®æ“ä½œ --------------------------------*/
+/*--------------------  Ò»Ğ©·½±ã¿ì½İµÄºê²Ù×÷ --------------------------------*/
 
 #define	ACL_HTABLE_ITER_KEY(iter)	((iter).ptr->key.c_key)
 #define	acl_htable_iter_key		ACL_HTABLE_ITER_KEY
@@ -294,7 +294,7 @@ ACL_API const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter);
 #define	acl_htable_iter_value		ACL_HTABLE_ITER_VALUE
 
 /**
- * éå† ACL_HTABLE
+ * ±éÀú ACL_HTABLE
  * @param iter {ACL_HTABLE_ITER}
  * @param table_ptr {ACL_HTABLE *}
  * @example:

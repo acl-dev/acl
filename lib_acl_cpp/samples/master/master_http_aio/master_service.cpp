@@ -1,9 +1,9 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_client.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 int  var_cfg_preread;
 acl::master_bool_tbl var_conf_bool_tab[] = {
@@ -33,31 +33,31 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 {
 	//acl_tcp_nodelay(client->get_socket(), 1);
 
-	// å¦‚æœå…è®¸åœ¨ä¸»çº¿ç¨‹ä¸­é¢„è¯»ï¼Œåˆ™è®¾ç½®æµçš„é¢„è¯»æ ‡å¿—ä½
+	// Èç¹ûÔÊĞíÔÚÖ÷Ïß³ÌÖĞÔ¤¶Á£¬ÔòÉèÖÃÁ÷µÄÔ¤¶Á±êÖ¾Î»
 	if (var_cfg_preread)
 	{
 		ACL_VSTREAM* vstream = client->get_vstream();
 		vstream->flag |= ACL_VSTREAM_FLAG_PREREAD;
 	}
 
-	// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
+	// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
 	http_client* callback = new http_client(client, var_cfg_buf_size);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
 	client->add_read_callback(callback);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
 	client->add_write_callback(callback);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
 	client->add_close_callback(callback);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
 	client->add_timeout_callback(callback);
 
 	client->keep_read(true);
 
-	// ç›‘æ§å¼‚æ­¥æµæ˜¯å¦å¯è¯»
+	// ¼à¿ØÒì²½Á÷ÊÇ·ñ¿É¶Á
 	client->read_wait(0);
 
 	return true;

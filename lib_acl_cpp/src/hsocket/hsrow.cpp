@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <vector>
 #include "acl_cpp/stdlib/log.hpp"

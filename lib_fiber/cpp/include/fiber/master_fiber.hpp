@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "fiber_cpp_define.hpp"
 //#include "acl_cpp/master/master_base.hpp"
 
@@ -9,29 +9,29 @@ namespace acl {
 class socket_stream;
 
 /**
- * åŸºäºåç¨‹æ–¹å¼çš„ç½‘ç»œæœåŠ¡ç±»
+ * »ùÓÚĞ­³Ì·½Ê½µÄÍøÂç·şÎñÀà
  */
 class FIBER_CPP_API master_fiber : public master_base
 {
 public:
 	/**
-	 * åœ¨ acl_master æ¡†æ¶ä¸‹è¿è¡Œæœ¬ç½‘ç»œæœåŠ¡å¯¹è±¡
-	 * @param argc {int} ä¼ å…¥çš„å‚æ•°æ•°ç»„å¤§å°
-	 * @param argv {char**} ä¼ å…¥çš„å‚æ•°æ•°ç»„
+	 * ÔÚ acl_master ¿ò¼ÜÏÂÔËĞĞ±¾ÍøÂç·şÎñ¶ÔÏó
+	 * @param argc {int} ´«ÈëµÄ²ÎÊıÊı×é´óĞ¡
+	 * @param argv {char**} ´«ÈëµÄ²ÎÊıÊı×é
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * ä»¥ç‹¬ç«‹è¿è¡Œæ¨¡å¼å¯åŠ¨æœ¬ç½‘ç»œæœåŠ¡å¯¹è±¡
-	 * @param addrs {const char*} ç›‘å¬çš„æœ¬æœºæœåŠ¡åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼š
+	 * ÒÔ¶ÀÁ¢ÔËĞĞÄ£Ê½Æô¶¯±¾ÍøÂç·şÎñ¶ÔÏó
+	 * @param addrs {const char*} ¼àÌıµÄ±¾»ú·şÎñµØÖ·ÁĞ±í£¬¸ñÊ½£º
 	 *  ip:port, ip:port, ...
-	 * @param path {const char*} é NULL æŒ‡å®šé…ç½®æ–‡ä»¶è·¯å¾„
+	 * @param path {const char*} ·Ç NULL Ö¸¶¨ÅäÖÃÎÄ¼şÂ·¾¶
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL);
 
 	/**
-	 * è·å¾—é…ç½®æ–‡ä»¶è·¯å¾„
-	 * @return {const char*} è¿”å›å€¼ä¸º NULL è¡¨ç¤ºæ²¡æœ‰è®¾é…ç½®æ–‡ä»¶
+	 * »ñµÃÅäÖÃÎÄ¼şÂ·¾¶
+	 * @return {const char*} ·µ»ØÖµÎª NULL ±íÊ¾Ã»ÓĞÉèÅäÖÃÎÄ¼ş
 	 */
 	const char* get_conf_path(void) const;
 
@@ -41,14 +41,14 @@ protected:
 	virtual ~master_fiber();
 
 	/**
-	 * è™šå‡½æ•°ï¼Œå½“åç¨‹æœåŠ¡å™¨æ¥æ”¶åˆ°å®¢æˆ·ç«¯è¿æ¥åè°ƒç”¨æœ¬å‡½æ•°
-	 * @param stream {socket_stream&} å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡ï¼Œæœ¬å‡½æ•°è¿”å›åï¼Œåç¨‹
-	 *  æœåŠ¡æ¡†æ¶å°†ä¼šå…³é—­è¯¥è¿æ¥å¯¹è±¡
+	 * Ğéº¯Êı£¬µ±Ğ­³Ì·şÎñÆ÷½ÓÊÕµ½¿Í»§¶ËÁ¬½Óºóµ÷ÓÃ±¾º¯Êı
+	 * @param stream {socket_stream&} ¿Í»§¶ËÁ¬½Ó¶ÔÏó£¬±¾º¯Êı·µ»Øºó£¬Ğ­³Ì
+	 *  ·şÎñ¿ò¼Ü½«»á¹Ø±Õ¸ÃÁ¬½Ó¶ÔÏó
 	 */
 	virtual void on_accept(socket_stream& stream) = 0;
 
 	/**
-	 * å½“çº¿ç¨‹åˆå§‹åŒ–æ—¶è¯¥è™šæ–¹æ³•å°†è¢«è°ƒç”¨
+	 * µ±Ïß³Ì³õÊ¼»¯Ê±¸ÃĞé·½·¨½«±»µ÷ÓÃ
 	 */
 	virtual void thread_on_init(void) {}
 

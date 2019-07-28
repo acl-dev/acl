@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <stdio.h>
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_iterator.h"
@@ -310,7 +310,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 				acl_vstring_strcat(buf, ",");
 		}
 
-		/* åªæœ‰å½“æ ‡ç­¾çš„å¯¹åº”å€¼ä¸º JSON å¯¹è±¡æˆ–æ•°ç»„å¯¹è±¡æ—¶ tag_node éžç©º */
+		/* Ö»ÓÐµ±±êÇ©µÄ¶ÔÓ¦ÖµÎª JSON ¶ÔÏó»òÊý×é¶ÔÏóÊ± tag_node ·Ç¿Õ */
 		if (node->tag_node != NULL) {
 			if (LEN(node->ltag) > 0) {
 				json_escape_append(buf, STR(node->ltag));
@@ -324,7 +324,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 				ACL_VSTRING_ADDCH(buf, node->left_ch);
 		}
 
-		/* å½“èŠ‚ç‚¹æœ‰æ ‡ç­¾åæ—¶ */
+		/* µ±½ÚµãÓÐ±êÇ©ÃûÊ± */
 		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
@@ -346,7 +346,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 			}
 		}
 
-		/* å½“èŠ‚ç‚¹ä¸ºæ•°ç»„çš„æˆå‘˜æ—¶ */
+		/* µ±½ÚµãÎªÊý×éµÄ³ÉÔ±Ê± */
 		else if (LEN(node->text) > 0 && node->parent
 			&& node->parent->left_ch != 0)
 		{
@@ -365,17 +365,17 @@ void acl_json_building(ACL_JSON *json, size_t length,
 			}
 		}
 
-		/* å½“èŠ‚ç‚¹ä¸ºæ²¡æœ‰æ ‡ç­¾åçš„å®¹å™¨(ä¸º '{}' æˆ– '[]')æ—¶ */
+		/* µ±½ÚµãÎªÃ»ÓÐ±êÇ©ÃûµÄÈÝÆ÷(Îª '{}' »ò '[]')Ê± */
 		else if (node->left_ch != 0) {
 			ACL_VSTRING_ADDCH(buf, node->left_ch);
 		}
 
 		/*
-		 * éåŽ†æ–¹å¼ä¸ºå‰åºéåŽ†æ–¹å¼ï¼Œå³å…ˆéåŽ†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ï¼Œ
-		 * å†éåŽ†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ï¼Œæœ€åŽéåŽ†å½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹
+		 * ±éÀú·½Ê½ÎªÇ°Ðò±éÀú·½Ê½£¬¼´ÏÈ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã£¬
+		 * ÔÙ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã£¬×îºó±éÀúµ±Ç°½ÚµãµÄ¸¸½Úµã
 		 */
-		/* å½“æœ¬èŠ‚ç‚¹æœ‰å­èŠ‚ç‚¹æˆ–è™½ä¸ºå¶èŠ‚ç‚¹ï¼Œä½†è¯¥èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹
-		 * éžç©ºæ—¶ç»§ç»­ä¸‹ä¸€ä¸ªå¾ªçŽ¯è¿‡ç¨‹
+		/* µ±±¾½ÚµãÓÐ×Ó½Úµã»òËäÎªÒ¶½Úµã£¬µ«¸Ã½ÚµãµÄÏÂÒ»¸öÐÖµÜ½Úµã
+		 * ·Ç¿ÕÊ±¼ÌÐøÏÂÒ»¸öÑ­»·¹ý³Ì
 		 */
 		if (acl_ring_size(&node->children) > 0)
 			continue;
@@ -388,9 +388,9 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		if (node->right_ch > 0)
 			ACL_VSTRING_ADDCH(buf, node->right_ch);
 
-		/* å½“æœ¬èŠ‚ç‚¹ä¸ºå¶èŠ‚ç‚¹ä¸”åŽé¢æ²¡æœ‰å…„å¼ŸèŠ‚ç‚¹æ—¶ï¼Œéœ€è¦ä¸€çº§ä¸€çº§å›žæº¯
-		 * å°†çˆ¶èŠ‚ç‚¹çš„åˆ†éš”ç¬¦æ·»åŠ è‡³æœ¬å¶èŠ‚ç‚¹å°¾éƒ¨ï¼Œç›´åˆ°é‡åˆ°æ ¹èŠ‚ç‚¹æˆ–çˆ¶
-		 * èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹éžç©º
+		/* µ±±¾½ÚµãÎªÒ¶½ÚµãÇÒºóÃæÃ»ÓÐÐÖµÜ½ÚµãÊ±£¬ÐèÒªÒ»¼¶Ò»¼¶»ØËÝ
+		 * ½«¸¸½ÚµãµÄ·Ö¸ô·ûÌí¼ÓÖÁ±¾Ò¶½ÚµãÎ²²¿£¬Ö±µ½Óöµ½¸ù½Úµã»ò¸¸
+		 * ½ÚµãµÄÏÂÒ»¸öÐÖµÜ½Úµã·Ç¿Õ
 		 */
 		while (acl_json_node_next(node) == NULL) {
 			if (node->parent == json->root)
@@ -417,7 +417,7 @@ void acl_json_building(ACL_JSON *json, size_t length,
 
 	acl_vstring_free(buf);
 
-	/* å°†ç¬¬äºŒä¸ªå‚æ•°ç½® NULL è¡¨ç¤ºå¤„ç†å®Œæ¯• */
+	/* ½«µÚ¶þ¸ö²ÎÊýÖÃ NULL ±íÊ¾´¦ÀíÍê±Ï */
 	if (callback != NULL)
 		(void) callback(json, NULL, ctx);
 }
@@ -443,7 +443,7 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 				acl_vstring_strcat(buf, ",");
 		}
 
-		/* åªæœ‰å½“æ ‡ç­¾çš„å¯¹åº”å€¼ä¸º JSON å¯¹è±¡æˆ–æ•°ç»„å¯¹è±¡æ—¶ tag_node éžç©º */
+		/* Ö»ÓÐµ±±êÇ©µÄ¶ÔÓ¦ÖµÎª JSON ¶ÔÏó»òÊý×é¶ÔÏóÊ± tag_node ·Ç¿Õ */
 		if (node->tag_node != NULL) {
 			if (LEN(node->ltag) > 0) {
 				json_escape_append(buf, STR(node->ltag));
@@ -457,7 +457,7 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 				ACL_VSTRING_ADDCH(buf, node->left_ch);
 		}
 
-		/* å½“èŠ‚ç‚¹æœ‰æ ‡ç­¾åæ—¶ */
+		/* µ±½ÚµãÓÐ±êÇ©ÃûÊ± */
 		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
@@ -479,10 +479,10 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			}
 		}
 
-		/* å½“èŠ‚ç‚¹ä¸ºæ•°ç»„çš„æˆå‘˜æ—¶ */
+		/* µ±½ÚµãÎªÊý×éµÄ³ÉÔ±Ê± */
 #if 0
 		else if (LEN(node->text) > 0 && node->parent
-			/* åº”è¯¥ä¾æ®çˆ¶èŠ‚ç‚¹ç±»åž‹æ¥ç¡®å®šå½“å‰èŠ‚ç‚¹æ˜¯å¦ä¸ºæ•°ç»„èŠ‚ç‚¹
+			/* Ó¦¸ÃÒÀ¾Ý¸¸½ÚµãÀàÐÍÀ´È·¶¨µ±Ç°½ÚµãÊÇ·ñÎªÊý×é½Úµã
 			 * && node->parent->left_ch != 0)
 			 */
 			&& node->parent->type == ACL_JSON_T_ARRAY)
@@ -513,17 +513,17 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			}
 		}
 
-		/* å½“èŠ‚ç‚¹ä¸ºæ²¡æœ‰æ ‡ç­¾åçš„å®¹å™¨(ä¸º '{}' æˆ– '[]')æ—¶ */
+		/* µ±½ÚµãÎªÃ»ÓÐ±êÇ©ÃûµÄÈÝÆ÷(Îª '{}' »ò '[]')Ê± */
 		else if (node->left_ch != 0) {
 			ACL_VSTRING_ADDCH(buf, node->left_ch);
 		}
 
 		/*
-		 * éåŽ†æ–¹å¼ä¸ºå‰åºéåŽ†æ–¹å¼ï¼Œå³å…ˆéåŽ†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ï¼Œ
-		 * å†éåŽ†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ï¼Œæœ€åŽéåŽ†å½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹
+		 * ±éÀú·½Ê½ÎªÇ°Ðò±éÀú·½Ê½£¬¼´ÏÈ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã£¬
+		 * ÔÙ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã£¬×îºó±éÀúµ±Ç°½ÚµãµÄ¸¸½Úµã
 		 */
-		/* å½“æœ¬èŠ‚ç‚¹æœ‰å­èŠ‚ç‚¹æˆ–è™½ä¸ºå¶èŠ‚ç‚¹ï¼Œä½†è¯¥èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹
-		 * éžç©ºæ—¶ç»§ç»­ä¸‹ä¸€ä¸ªå¾ªçŽ¯è¿‡ç¨‹
+		/* µ±±¾½ÚµãÓÐ×Ó½Úµã»òËäÎªÒ¶½Úµã£¬µ«¸Ã½ÚµãµÄÏÂÒ»¸öÐÖµÜ½Úµã
+		 * ·Ç¿ÕÊ±¼ÌÐøÏÂÒ»¸öÑ­»·¹ý³Ì
 		 */
 		if (acl_ring_size(&node->children) > 0)
 			continue;
@@ -536,9 +536,9 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 		if (node->right_ch > 0)
 			ACL_VSTRING_ADDCH(buf, node->right_ch);
 
-		/* å½“æœ¬èŠ‚ç‚¹ä¸ºå¶èŠ‚ç‚¹ä¸”åŽé¢æ²¡æœ‰å…„å¼ŸèŠ‚ç‚¹æ—¶ï¼Œéœ€è¦ä¸€çº§ä¸€çº§å›žæº¯
-		 * å°†çˆ¶èŠ‚ç‚¹çš„åˆ†éš”ç¬¦æ·»åŠ è‡³æœ¬å¶èŠ‚ç‚¹å°¾éƒ¨ï¼Œç›´åˆ°é‡åˆ°æ ¹èŠ‚ç‚¹æˆ–çˆ¶
-		 * èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹éžç©º
+		/* µ±±¾½ÚµãÎªÒ¶½ÚµãÇÒºóÃæÃ»ÓÐÐÖµÜ½ÚµãÊ±£¬ÐèÒªÒ»¼¶Ò»¼¶»ØËÝ
+		 * ½«¸¸½ÚµãµÄ·Ö¸ô·ûÌí¼ÓÖÁ±¾Ò¶½ÚµãÎ²²¿£¬Ö±µ½Óöµ½¸ù½Úµã»ò¸¸
+		 * ½ÚµãµÄÏÂÒ»¸öÐÖµÜ½Úµã·Ç¿Õ
 		 */
 		while (acl_json_node_next(node) == NULL) {
 			if (node->parent == json->root)

@@ -1,4 +1,4 @@
-﻿#ifndef __GETTIMEOFDAY_HEAD_H__
+#ifndef __GETTIMEOFDAY_HEAD_H__
 #define __GETTIMEOFDAY_HEAD_H__
 
 #include "define.h"

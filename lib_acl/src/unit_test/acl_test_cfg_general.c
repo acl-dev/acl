@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -15,7 +15,7 @@
 
 #endif
 
-/*------------------------ é€šå¸¸çš„é…ç½®æ–‡ä»¶é€‰é¡¹å¤„ç† --------------------------*/
+/*------------------------ Í¨³£µÄÅäÖÃÎÄ¼şÑ¡Ïî´¦Àí --------------------------*/
 
 static int __put_log_level(const ACL_CFG_LINE *cfg_line)
 {

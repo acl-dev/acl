@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 #include "global.h"
 #include "http_client.h"
@@ -30,7 +30,7 @@ acl_int64 gid_xml_next(ACL_VSTREAM *client, const char *tag, int *errnum)
 	else
 		snprintf(buf, sizeof(buf), "<request cmd='%s' />\r\n", GID_CMD_NEXT);
 
-	/* å‘é€ HTTP JSON è¯·æ±‚ */
+	/* ·¢ËÍ HTTP JSON ÇëÇó */
 	if (http_client_post_request(client, var_gid_url, 1,
 		"xml", buf, (int) strlen(buf), errnum) < 0)
 	{
@@ -39,14 +39,14 @@ acl_int64 gid_xml_next(ACL_VSTREAM *client, const char *tag, int *errnum)
 		return (-1);
 	}
 
-	xml = acl_xml_alloc();  /* åˆ†é… JSON å¯¹è±¡ */
+	xml = acl_xml_alloc();  /* ·ÖÅä JSON ¶ÔÏó */
 
 	if (tt == NULL)
 		tt = acl_vstring_alloc(100);
 	else
 		ACL_VSTRING_RESET(tt);
 
-	/* æ¥æ”¶ HTTP JSON å“åº” */
+	/* ½ÓÊÕ HTTP JSON ÏìÓ¦ */
 	if (http_client_get_respond(client, NULL, xml, errnum, tt) < 0)
 	{
 		if (errnum)
@@ -66,18 +66,18 @@ acl_int64 gid_xml_next(ACL_VSTREAM *client, const char *tag, int *errnum)
 	}
 	*/
 
-	/* æ•°æ®æ ¼å¼: <respond status='ok|error' gid=xxx tag='xxx' msg='xxx' err='xxx' /> */
+	/* Êı¾İ¸ñÊ½: <respond status='ok|error' gid=xxx tag='xxx' msg='xxx' err='xxx' /> */
 
 	acl_foreach(iter, xml) {
 		ACL_XML_NODE *node = (ACL_XML_NODE*) iter.data;
 
-		/* æ‰¾åˆ° respond ç»“ç‚¹ */
+		/* ÕÒµ½ respond ½áµã */
 		if (strcasecmp(STR(node->ltag), "respond") == 0
 			&& node->attr_list != NULL)
 		{
 			ACL_ITER attr_iter;
 
-			/* éå†ç»“ç‚¹å±æ€§ */
+			/* ±éÀú½áµãÊôĞÔ */
 			acl_foreach(attr_iter, node->attr_list) {
 				ACL_XML_ATTR *attr = (ACL_XML_ATTR*) attr_iter.data;
 

@@ -1,8 +1,8 @@
-ï»¿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "lib_acl.h"
-#include "lib_protocol.h"  // http åè®®ç›¸å…³
+#include "lib_protocol.h"  // http Ğ­ÒéÏà¹Ø
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/ofstream.hpp"
@@ -23,19 +23,19 @@ public:
 	~http_request(void)
 	{
 		printf("notify aio handle to stop!\r\n");
-		// é€šçŸ¥å¼‚æ­¥äº‹ä»¶å¼•æ“å®Œå…¨é€€å‡º
+		// Í¨ÖªÒì²½ÊÂ¼şÒıÇæÍêÈ«ÍË³ö
 		handle_->stop();
 	}
 protected:
 	//////////////////////////////////////////////////////////////////////////
-	// åŸºç±»è™šæ¥å£
+	// »ùÀàĞé½Ó¿Ú
 
 	virtual const acl::string* get_body()
 	{
 		return (NULL);
 	}
 
-	// æ­£å¸¸è¯»åˆ° HTTP å“åº”å¤´æ—¶çš„å›è°ƒæ¥å£
+	// Õı³£¶Áµ½ HTTP ÏìÓ¦Í·Ê±µÄ»Øµ÷½Ó¿Ú
 	virtual void on_hdr(const char* addr, const HTTP_HDR_RES* hdr)
 	{
 		printf(">>server addr: %s, http reply status: %d\n",
@@ -51,7 +51,7 @@ protected:
 		time(&begin_);
 	}
 
-	// æ­£å¸¸è¯» HTTP å“åº”ä½“æ—¶çš„å›è°ƒå‡½æ•°
+	// Õı³£¶Á HTTP ÏìÓ¦ÌåÊ±µÄ»Øµ÷º¯Êı
 	virtual void on_body(const char* data, size_t dlen)
 	{
 		if (data == NULL && dlen == 0)
@@ -63,7 +63,7 @@ protected:
 			printf("\n>> http reply body over, total: %lld, %lld\n",
 				content_length_, read_length_);
 #endif
-			// å‡ºé”™åï¼Œå› ä¸ºæœ¬ç±»å¯¹è±¡æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦åœ¨æ­¤å¤„é‡Šæ”¾
+			// ³ö´íºó£¬ÒòÎª±¾Àà¶ÔÏóÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔĞèÒªÔÚ´Ë´¦ÊÍ·Å
 			time_t end = time(NULL);
 			printf(">>spent %d seconds\n", (int)(end - begin_));
 
@@ -81,12 +81,12 @@ protected:
 			out_.write(data, dlen);
 	}
 
-	// å½“è¯·æ±‚æˆ–å“åº”å¤±è´¥æ—¶çš„å›è°ƒå‡½æ•°
+	// µ±ÇëÇó»òÏìÓ¦Ê§°ÜÊ±µÄ»Øµ÷º¯Êı
 	virtual void on_error(acl::http_status_t errnum)
 	{
 		printf(">> error: %d\n", (int) errnum);
 
-		// å‡ºé”™åï¼Œå› ä¸ºæœ¬ç±»å¯¹è±¡æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦åœ¨æ­¤å¤„é‡Šæ”¾
+		// ³ö´íºó£¬ÒòÎª±¾Àà¶ÔÏóÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔĞèÒªÔÚ´Ë´¦ÊÍ·Å
 	}
 
 	virtual void destroy()
@@ -111,7 +111,7 @@ int main()
 	acl::aio_handle handle(acl::ENGINE_SELECT);
 	acl::http_service* service = new acl::http_service();
 
-	// ä½¿æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬ 127.0.0.1 çš„åœ°å€
+	// Ê¹ÏûÏ¢·şÎñÆ÷¼àÌı 127.0.0.1 µÄµØÖ·
 	if (service->open(&handle) == false)
 	{
 		printf(">>open message service error!\n");
@@ -121,7 +121,7 @@ int main()
 	}
 
 
-	// åˆ›å»º HTTP è¯·æ±‚è¿‡ç¨‹
+	// ´´½¨ HTTP ÇëÇó¹ı³Ì
 	acl::string domain;
 	domain = "www.hexun.com";
 	//domain = "192.168.1.229";
@@ -133,9 +133,9 @@ int main()
 	req->set_keep_alive(false);
 	req->set_method(acl::HTTP_METHOD_GET);
 	req->add_cookie("x-cookie-name", "cookie-value");
-	//req->set_redirect(1); // è®¾ç½®è‡ªåŠ¨é‡å®šå‘çš„æ¬¡æ•°é™åˆ¶
+	//req->set_redirect(1); // ÉèÖÃ×Ô¶¯ÖØ¶¨ÏòµÄ´ÎÊıÏŞÖÆ
 
-	// é€šçŸ¥å¼‚æ­¥æ¶ˆæ¯æœåŠ¡å™¨å¤„ç†è¯¥ HTTP è¯·æ±‚è¿‡ç¨‹
+	// Í¨ÖªÒì²½ÏûÏ¢·şÎñÆ÷´¦Àí¸Ã HTTP ÇëÇó¹ı³Ì
 
 	//////////////////////////////////////////////////////////////////////////
 	//acl::string buf;

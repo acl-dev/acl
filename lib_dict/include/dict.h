@@ -1,4 +1,4 @@
-﻿#ifndef _DICT_H_INCLUDED_
+#ifndef _DICT_H_INCLUDED_
 #define _DICT_H_INCLUDED_
 
 #include "lib_acl.h"

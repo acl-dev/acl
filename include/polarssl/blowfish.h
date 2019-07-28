@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file blowfish.h
  *
  * \brief Blowfish block cipher

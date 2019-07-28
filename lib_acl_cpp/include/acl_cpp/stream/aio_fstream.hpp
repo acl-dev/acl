@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "aio_istream.hpp"
 #include "aio_ostream.hpp"
@@ -8,7 +8,7 @@ namespace acl {
 class fstream;
 
 /**
- * å¼‚æ­¥æ–‡ä»¶è¯»å†™æµï¼Œè¯¥ç±»å¯¹è±¡åªå¯ç”¨åœ¨ UNIX ç³»ç»Ÿä¸­
+ * Òì²½ÎÄ¼ş¶ÁĞ´Á÷£¬¸ÃÀà¶ÔÏóÖ»¿ÉÓÃÔÚ UNIX ÏµÍ³ÖĞ
  */
 class ACL_CPP_API aio_fstream
 	: public aio_istream
@@ -16,8 +16,8 @@ class ACL_CPP_API aio_fstream
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param handle {aio_handle*} å¼‚æ­¥äº‹ä»¶å¥æŸ„
+	 * ¹¹Ôìº¯Êı
+	 * @param handle {aio_handle*} Òì²½ÊÂ¼ş¾ä±ú
 	 */
 	aio_fstream(aio_handle* handle);
 
@@ -28,61 +28,61 @@ public:
 #endif
 
 	/**
-	 * æ ¹æ®æ–‡ä»¶è·¯å¾„æ‰“å¼€æ–‡ä»¶æµ, è¿™æ˜¯æœ€åŸºç¡€çš„æ‰“å¼€æ–‡ä»¶çš„æ–¹å¼
-	 * @param path {const char*} æ–‡ä»¶å
-	 * @param oflags {unsigned int} æ ‡å¿—ä½, We're assuming that O_RDONLY: 0x0000,
+	 * ¸ù¾İÎÄ¼şÂ·¾¶´ò¿ªÎÄ¼şÁ÷, ÕâÊÇ×î»ù´¡µÄ´ò¿ªÎÄ¼şµÄ·½Ê½
+	 * @param path {const char*} ÎÄ¼şÃû
+	 * @param oflags {unsigned int} ±êÖ¾Î», We're assuming that O_RDONLY: 0x0000,
 	 *  O_WRONLY: 0x0001, O_RDWR: 0x0002, O_APPEND: 0x0008, O_CREAT: 0x0100,
 	 *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
 	 *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
-	 * @param mode {int} æ‰“å¼€æ–‡ä»¶å¥æŸ„æ—¶çš„æ¨¡å¼(å¦‚: 0600)
-	 * @return {bool} æ‰“å¼€æ–‡ä»¶æ˜¯å¦æˆåŠŸ
+	 * @param mode {int} ´ò¿ªÎÄ¼ş¾ä±úÊ±µÄÄ£Ê½(Èç: 0600)
+	 * @return {bool} ´ò¿ªÎÄ¼şÊÇ·ñ³É¹¦
 	 */
 	bool open(const char* path, unsigned int oflags, unsigned int mode);
 
 	/**
-	 * ä»¥è¯»/å†™æ–¹å¼æ‰“å¼€æ–‡ä»¶æµï¼Œå½“æ–‡ä»¶ä¸å­˜åœ¨æ—¶åˆ™åˆ›å»ºæ–°æ–‡ä»¶ï¼Œå½“æ–‡ä»¶å­˜åœ¨æ—¶åˆ™
-	 * å°†æ–‡ä»¶æ¸…ç©º, æ–‡ä»¶å±æ€§ä¸º 0700
-	 * @param path {const char*} æ–‡ä»¶å
-	 * @param mode {int} æ‰“å¼€æ–‡ä»¶å¥æŸ„æ—¶çš„æ¨¡å¼(å¦‚: 0600)
-	 * @return {bool} æ‰“å¼€æ–‡ä»¶æ˜¯å¦æˆåŠŸ
+	 * ÒÔ¶Á/Ğ´·½Ê½´ò¿ªÎÄ¼şÁ÷£¬µ±ÎÄ¼ş²»´æÔÚÊ±Ôò´´½¨ĞÂÎÄ¼ş£¬µ±ÎÄ¼ş´æÔÚÊ±Ôò
+	 * ½«ÎÄ¼şÇå¿Õ, ÎÄ¼şÊôĞÔÎª 0700
+	 * @param path {const char*} ÎÄ¼şÃû
+	 * @param mode {int} ´ò¿ªÎÄ¼ş¾ä±úÊ±µÄÄ£Ê½(Èç: 0600)
+	 * @return {bool} ´ò¿ªÎÄ¼şÊÇ·ñ³É¹¦
 	 */
 	bool open_trunc(const char* path, unsigned int mode = 0600);
 
 	/**
-	 * ä»¥è¯»/å†™æ–¹å¼å»ºæ–°æ–‡ä»¶ï¼Œæ–‡ä»¶å±æ€§ä¸º 0600, è‹¥æ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°æ–‡ä»¶ï¼Œè‹¥å­˜åœ¨åˆ™
-	 * æ‰“å¼€æ—§æ–‡ä»¶
-	 * @param path {const char*} æ–‡ä»¶å…¨è·¯å¾„
-	 * @param mode {int} æ‰“å¼€æ–‡ä»¶å¥æŸ„æ—¶çš„æ¨¡å¼(å¦‚: 0600)
-	 * @return {bool} æ–‡ä»¶åˆ›å»ºæ˜¯å¦æˆåŠŸ
+	 * ÒÔ¶Á/Ğ´·½Ê½½¨ĞÂÎÄ¼ş£¬ÎÄ¼şÊôĞÔÎª 0600, ÈôÎÄ¼ş²»´æÔÚÔò´´½¨ĞÂÎÄ¼ş£¬Èô´æÔÚÔò
+	 * ´ò¿ª¾ÉÎÄ¼ş
+	 * @param path {const char*} ÎÄ¼şÈ«Â·¾¶
+	 * @param mode {int} ´ò¿ªÎÄ¼ş¾ä±úÊ±µÄÄ£Ê½(Èç: 0600)
+	 * @return {bool} ÎÄ¼ş´´½¨ÊÇ·ñ³É¹¦
 	 */
 	bool create(const char* path, unsigned int mode = 0600);
 
 	/**
-	 * ä»¥åªè¯»æ–¹å¼æ‰“å¼€å·²ç»å­˜åœ¨çš„æ–‡ä»¶
-	 * @param path {const char*} æ–‡ä»¶å
-	 * @return {bool} æ‰“å¼€æ–‡ä»¶æ˜¯å¦æˆåŠŸ
+	 * ÒÔÖ»¶Á·½Ê½´ò¿ªÒÑ¾­´æÔÚµÄÎÄ¼ş
+	 * @param path {const char*} ÎÄ¼şÃû
+	 * @return {bool} ´ò¿ªÎÄ¼şÊÇ·ñ³É¹¦
 	 */
 	bool open_read(const char* path);
 
 	/**
-	 * ä»¥åªå†™æ–¹å¼æ‰“å¼€æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶
-	 * å­˜åœ¨ï¼Œåˆ™å°†æ–‡ä»¶å†…å®¹æ¸…ç©º
-	 * @param path {const char*} æ–‡ä»¶å
-	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * ÒÔÖ»Ğ´·½Ê½´ò¿ªÎÄ¼ş£¬Èç¹ûÎÄ¼ş²»´æÔÚÔò´´½¨ĞÂÎÄ¼ş£¬Èç¹ûÎÄ¼ş
+	 * ´æÔÚ£¬Ôò½«ÎÄ¼şÄÚÈİÇå¿Õ
+	 * @param path {const char*} ÎÄ¼şÃû
+	 * @return {bool} ÊÇ·ñ³É¹¦
 	 */
 	bool open_write(const char* path);
 
 	/**
-	 * ä»¥å°¾éƒ¨æ·»åŠ æ–¹å¼æ‰“å¼€æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°æ–‡ä»¶
-	 * @param path {const char*} æ–‡ä»¶å
-	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * ÒÔÎ²²¿Ìí¼Ó·½Ê½´ò¿ªÎÄ¼ş£¬Èç¹ûÎÄ¼ş²»´æÔÚÔò´´½¨ĞÂÎÄ¼ş
+	 * @param path {const char*} ÎÄ¼şÃû
+	 * @return {bool} ÊÇ·ñ³É¹¦
 	 */
 	bool open_append(const char* path);
 
 protected:
 	~aio_fstream(void);
 	/**
-	 * é€šè¿‡æ­¤å‡½æ•°æ¥åŠ¨æ€é‡Šæ”¾åªèƒ½åœ¨å †ä¸Šåˆ†é…çš„å¼‚æ­¥æµç±»å¯¹è±¡
+	 * Í¨¹ı´Ëº¯ÊıÀ´¶¯Ì¬ÊÍ·ÅÖ»ÄÜÔÚ¶ÑÉÏ·ÖÅäµÄÒì²½Á÷Àà¶ÔÏó
 	 */
 	virtual void destroy(void);
 

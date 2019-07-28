@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "redis_command.hpp"
 
@@ -10,8 +10,8 @@ namespace acl
 class redis_client;
 
 /**
- * redis Connection ç±»ï¼ŒåŒ…å«å‘½ä»¤å¦‚ä¸‹ï¼š
- * AUTHã€ECHOã€PINGã€QUITã€SELECT
+ * redis Connection Àà£¬°üº¬ÃüÁîÈçÏÂ£º
+ * AUTH¡¢ECHO¡¢PING¡¢QUIT¡¢SELECT
  * redis connection command clss, including as below:
  * AUTH, ECHO, PING, QUIT, SELECT
  */
@@ -29,7 +29,7 @@ public:
 	redis_connection(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_client_cluster*ï¼Œ size_t)
+	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
 	redis_connection(redis_client_cluster* cluster, size_t max_conns = 0);
 
@@ -38,43 +38,43 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * è¿æ¥è‡³ redis-server æ—¶è¿›è¡Œèº«ä»½éªŒè¯
+	 * Á¬½ÓÖÁ redis-server Ê±½øĞĞÉí·İÑéÖ¤
 	 * AUTH command to login the redis server.
-	 * @param passwd {const char*} åœ¨ redis é…ç½®æ–‡ä»¶ä¸­æŒ‡å®šçš„è®¤è¯å¯†ç 
+	 * @param passwd {const char*} ÔÚ redis ÅäÖÃÎÄ¼şÖĞÖ¸¶¨µÄÈÏÖ¤ÃÜÂë
 	 *  the password in redis-server configure
-	 * @return {bool} èº«ä»½è®¤è¯æ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºè®¤è¯å¤±è´¥æˆ–æ“ä½œå¤±è´¥
+	 * @return {bool} Éí·İÈÏÖ¤ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾ÈÏÖ¤Ê§°Ü»ò²Ù×÷Ê§°Ü
 	 *  return true if success, or false because auth failed or error.
 	 */
 	bool auth(const char* passwd);
 
 	/**
-	 * é€‰æ‹© redis-server ä¸­çš„æ•°æ®åº“ ID
+	 * Ñ¡Ôñ redis-server ÖĞµÄÊı¾İ¿â ID
 	 * SELECT command to select the DB id in redis-server
-	 * @param dbnum {int} redis æ•°æ®åº“ ID
+	 * @param dbnum {int} redis Êı¾İ¿â ID
 	 *  the DB id
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  return true if success, or false for failed.
 	 */
 	bool select(int dbnum);
 
 	/**
-	 * æ¢æµ‹ redis è¿æ¥æ˜¯å¦æ­£å¸¸
+	 * Ì½²â redis Á¬½ÓÊÇ·ñÕı³£
 	 * PING command for testing if the connection is OK
-	 * @return {bool} è¿æ¥æ˜¯å¦æ­£å¸¸
+	 * @return {bool} Á¬½ÓÊÇ·ñÕı³£
 	 *  return true if success
 	 */
 	bool ping();
 
 	/**
-	 * æµ‹è¯•ç”¨å‘½ä»¤ï¼Œè®© redis-server å›æ˜¾ç»™å®šå­—ç¬¦ä¸²
+	 * ²âÊÔÓÃÃüÁî£¬ÈÃ redis-server »ØÏÔ¸ø¶¨×Ö·û´®
 	 * ECHO command, request redis-server to echo something.
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  return true if success
 	 */
 	bool echo(const char* s);
 
 	/**
-	 * å…³é—­ redis è¿æ¥
+	 * ¹Ø±Õ redis Á¬½Ó
 	 * QUIT command to close the redis connection
 	 * @return {bool}
 	 *  return true if success

@@ -1,4 +1,4 @@
-Ôªø#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/db/mysql_conf.hpp"
 #endif
@@ -12,7 +12,7 @@ mysql_conf::mysql_conf(const char* dbaddr, const char* dbname)
 	acl_assert(dbaddr && *dbaddr);
 	acl_assert(dbname && *dbname);
 
-	// Âú∞ÂùÄÊ†ºÂºèÔºö[dbname@]dbaddr
+	// µÿ÷∑∏Ò Ω£∫[dbname@]dbaddr
 	const char* ptr = strchr(dbaddr, '@');
 	if (ptr != NULL) {
 		ptr++;

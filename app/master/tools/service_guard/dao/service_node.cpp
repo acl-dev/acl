@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "service_node.h"
 
 #define SERVICE		"service"

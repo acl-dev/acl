@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <vector>
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -68,7 +68,7 @@ redis_client_pool* redis_client_cluster::peek_slot(int slot)
 	if (slot < 0 || slot >= max_slot_)
 		return NULL;
 
-	// éœ€è¦åŠ é”ä¿æŠ¤
+	// ĞèÒª¼ÓËø±£»¤
 	lock();
 
 	if (slot_addrs_[slot] == NULL) {
@@ -76,7 +76,7 @@ redis_client_pool* redis_client_cluster::peek_slot(int slot)
 		return NULL;
 	}
 
-	// å› ä¸ºå·²ç»è¿›è¡Œäº†åŠ é”ä¿æŠ¤ï¼Œæ‰€ä»¥åœ¨è°ƒç”¨ get æ–¹æ³•æ—¶çš„ç¬¬äºŒä¸ªé”ä¿æŠ¤å‚æ•°è®¾ä¸º false
+	// ÒòÎªÒÑ¾­½øĞĞÁË¼ÓËø±£»¤£¬ËùÒÔÔÚµ÷ÓÃ get ·½·¨Ê±µÄµÚ¶ş¸öËø±£»¤²ÎÊıÉèÎª false
 	redis_client_pool* conns =
 		(redis_client_pool*) get(slot_addrs_[slot], false);
 
@@ -99,9 +99,9 @@ void redis_client_cluster::set_slot(int slot, const char* addr)
 	if (slot < 0 || slot >= max_slot_ || addr == NULL || *addr == 0)
 		return;
 
-	// éå†ç¼“å­˜çš„æ‰€æœ‰åœ°å€ï¼Œè‹¥è¯¥åœ°å€ä¸å­˜åœ¨åˆ™ç›´æ¥æ·»åŠ ï¼Œç„¶åä½¿ä¹‹ä¸ slot è¿›è¡Œå…³è”
+	// ±éÀú»º´æµÄËùÓĞµØÖ·£¬Èô¸ÃµØÖ·²»´æÔÚÔòÖ±½ÓÌí¼Ó£¬È»ºóÊ¹Ö®Óë slot ½øĞĞ¹ØÁª
 
-	// è¯¥æ®µä»£ç éœ€è¦åŠ é”ä¿æŠ¤
+	// ¸Ã¶Î´úÂëĞèÒª¼ÓËø±£»¤
 	lock();
 
 	std::vector<char*>::const_iterator cit = addrs_.begin();
@@ -110,13 +110,13 @@ void redis_client_cluster::set_slot(int slot, const char* addr)
 			break;
 	}
 
-	// å°† slot ä¸åœ°å€è¿›è¡Œå…³è”æ˜ å°„
+	// ½« slot ÓëµØÖ·½øĞĞ¹ØÁªÓ³Éä
 	if (cit != addrs_.end())
 		slot_addrs_[slot] = *cit;
 	else {
-		// åªæ‰€ä»¥é‡‡ç”¨åŠ¨æ€åˆ†é…æ–¹å¼ï¼Œæ˜¯å› ä¸ºåœ¨å¾€æ•°ç»„ä¸­æ·»åŠ å¯¹è±¡æ—¶ï¼Œæ— è®º
-		// æ•°ç»„å¦‚ä½•åšåŠ¨æ€è°ƒæ•´ï¼Œè¯¥æ·»åŠ çš„åŠ¨æ€å†…å­˜åœ°å€éƒ½æ˜¯å›ºå®šçš„ï¼Œæ‰€ä»¥
-		// slot_addrs_ çš„ä¸‹æ ‡åœ°å€ä¹Ÿæ˜¯ç›¸å¯¹ä¸å˜çš„
+		// Ö»ËùÒÔ²ÉÓÃ¶¯Ì¬·ÖÅä·½Ê½£¬ÊÇÒòÎªÔÚÍùÊı×éÖĞÌí¼Ó¶ÔÏóÊ±£¬ÎŞÂÛ
+		// Êı×éÈçºÎ×ö¶¯Ì¬µ÷Õû£¬¸ÃÌí¼ÓµÄ¶¯Ì¬ÄÚ´æµØÖ·¶¼ÊÇ¹Ì¶¨µÄ£¬ËùÒÔ
+		// slot_addrs_ µÄÏÂ±êµØÖ·Ò²ÊÇÏà¶Ô²»±äµÄ
 		char* buf = acl_mystrdup(addr);
 		addrs_.push_back(buf);
 		slot_addrs_[slot] = buf;
@@ -180,8 +180,8 @@ redis_client_cluster& redis_client_cluster::set_ssl_conf(polarssl_conf* ssl_conf
 redis_client_cluster& redis_client_cluster::set_password(
 	const char* addr, const char* pass)
 {
-	// å…è®¸ pass ä¸ºç©ºå­—ç¬¦ä¸²ä¸”éç©ºæŒ‡é’ˆï¼Œè¿™æ ·å°±å¯ä»¥å½“ default å€¼è¢«è®¾ç½®æ—¶ï¼Œ
-	// å…è®¸éƒ¨åˆ† redis èŠ‚ç‚¹æ— éœ€è¿æ¥å¯†ç 
+	// ÔÊĞí pass Îª¿Õ×Ö·û´®ÇÒ·Ç¿ÕÖ¸Õë£¬ÕâÑù¾Í¿ÉÒÔµ± default Öµ±»ÉèÖÃÊ±£¬
+	// ÔÊĞí²¿·Ö redis ½ÚµãÎŞĞèÁ¬½ÓÃÜÂë
 	if (addr == NULL || *addr == 0 || pass == NULL || *pass == 0)
 		return *this;
 

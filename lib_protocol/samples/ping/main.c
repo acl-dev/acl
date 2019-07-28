@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "lib_acl.h"
 #include <signal.h>
@@ -45,7 +45,7 @@ static ICMP_CHAT *__chat = NULL;
 static void display_res2(ICMP_CHAT *chat)
 {
 	if (chat) {
-		/* æ˜¾ç¤º PING çš„ç»“æœæ€»ç»“ */
+		/* ÏÔÊ¾ PING µÄ½á¹û×Ü½á */
 		icmp_stat(chat);
 		printf(">>>max pkts: %d\r\n", icmp_chat_seqno(chat));
 	}
@@ -56,56 +56,56 @@ static void display_res(void)
 	if (__chat) {
 		display_res2(__chat);
 
-		/* é‡Šæ”¾ ICMP å¯¹è±¡ */
+		/* ÊÍ·Å ICMP ¶ÔÏó */
 		icmp_chat_free(__chat);
 		__chat = NULL;
 	}
 }
 
-/* å•çº¿ç¨‹å¼‚æ­¥ PING å¤šä¸ªåœ°å€çš„å‡½æ•°å…¥å£ */
+/* µ¥Ïß³ÌÒì²½ PING ¶à¸öµØÖ·µÄº¯ÊıÈë¿Ú */
 static void ping_main_async(const ACL_ARGV *ip_list, int npkt)
 {
 	ACL_AIO *aio;
 
-	/* åˆ›å»ºéé˜»å¡å¼‚æ­¥é€šä¿¡å¥æŸ„ */
+	/* ´´½¨·Ç×èÈûÒì²½Í¨ĞÅ¾ä±ú */
 	aio = acl_aio_create(ACL_EVENT_SELECT);
 	acl_aio_set_keep_read(aio, 0);
 
-	/* åˆ›å»º ICMP å¯¹è±¡ */
+	/* ´´½¨ ICMP ¶ÔÏó */
 	__chat = icmp_chat_create(aio, 1);
 
-	/* æ·»åŠ éœ€è¦ PING çš„åœ°å€åˆ—è¡¨ */
+	/* Ìí¼ÓĞèÒª PING µÄµØÖ·ÁĞ±í */
 	add_ip_list(__chat, ip_list, npkt);
 
 	while (1) {
-		/* å¦‚æœ PING ç»“æŸï¼Œåˆ™é€€å‡ºå¾ªç¯ */
+		/* Èç¹û PING ½áÊø£¬ÔòÍË³öÑ­»· */
 		if (icmp_chat_finish(__chat)) {
 			printf("over now!, hosts' size=%d, count=%d\r\n",
 				icmp_chat_size(__chat), icmp_chat_count(__chat));
 			break;
 		}
 
-		/* å¼‚æ­¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹ */
+		/* Òì²½ÊÂ¼şÑ­»·¹ı³Ì */
 		acl_aio_loop(aio);
 	}
 
-	/* æ˜¾ç¤º PING ç»“æœ */
+	/* ÏÔÊ¾ PING ½á¹û */
 	display_res();
 
-	/* é”€æ¯éé˜»å¡å¥æŸ„ */
+	/* Ïú»Ù·Ç×èÈû¾ä±ú */
 	acl_aio_free(aio);
 }
 
-/* å•çº¿ç¨‹ PING å•ä¸ªåœ°å€çš„å‡½æ•°å…¥å£ */
+/* µ¥Ïß³Ì PING µ¥¸öµØÖ·µÄº¯ÊıÈë¿Ú */
 static void ping_main_sync(const char *dest, int npkt)
 {
 	ACL_DNS_DB* dns_db;
 	const char* ip;
 
-	/* åˆ›å»º ICMP å¯¹è±¡ */
+	/* ´´½¨ ICMP ¶ÔÏó */
 	__chat = icmp_chat_create(NULL, 1);
 
-	/* ç”±åŸŸåè§£æå‡º IP åœ°å€ */
+	/* ÓÉÓòÃû½âÎö³ö IP µØÖ· */
 	dns_db = acl_gethostbyname(dest, NULL);
 	if (dns_db == NULL) {
 		acl_msg_warn("Can't find domain %s", dest);
@@ -116,20 +116,20 @@ static void ping_main_sync(const char *dest, int npkt)
 	if (ip == NULL || *ip == 0)
 		acl_msg_fatal("ip invalid");
 
-	/* å¼€å§‹ PING ä¸€ä¸ª IP åœ°å€ */
+	/* ¿ªÊ¼ PING Ò»¸ö IP µØÖ· */
 	if (strcmp(dest, ip) == 0)
 		icmp_ping_one(__chat, NULL, ip, npkt, __delay, 1);
 	else
 		icmp_ping_one(__chat, dest, ip, npkt, __delay, 1);
 
-	/* é‡Šæ”¾ DNS æŸ¥è¯¢ç»“æœ */
+	/* ÊÍ·Å DNS ²éÑ¯½á¹û */
 	acl_netdb_free(dns_db);
 
-	/* æ˜¾ç¤º PING ç»“æœå°ç»“ */
+	/* ÏÔÊ¾ PING ½á¹ûĞ¡½á */
 	display_res();
 }
 
-/* PING çº¿ç¨‹å…¥å£ */
+/* PING Ïß³ÌÈë¿Ú */
 static int __npkt = 10;
 static void *ping_thread(void *arg)
 {
@@ -137,14 +137,14 @@ static void *ping_thread(void *arg)
 	ACL_DNS_DB* dns_db;
 	ICMP_CHAT *chat;
 
-	/* é€šè¿‡åŸŸåè§£æå‡ºIPåœ°å€ */
+	/* Í¨¹ıÓòÃû½âÎö³öIPµØÖ· */
 	dns_db = acl_gethostbyname(dest, NULL);
 	if (dns_db == NULL) {
 		acl_msg_warn("Can't find domain %s", dest);
 		return (NULL);
 	}
 
-	/* åªå–å‡ºåŸŸåç¬¬ä¸€ä¸ª IP åœ°å€ PING */
+	/* Ö»È¡³öÓòÃûµÚÒ»¸ö IP µØÖ· PING */
 	ip = acl_netdb_index_ip(dns_db, 0);
 	if (ip == NULL || *ip == 0) {
 		acl_msg_error("ip invalid");
@@ -152,21 +152,21 @@ static void *ping_thread(void *arg)
 		return (NULL);
 	}
 
-	/* åˆ›å»º ICMP å¯¹è±¡ */
+	/* ´´½¨ ICMP ¶ÔÏó */
 	chat = icmp_chat_create(NULL, 1);
 
-	/* å¼€å§‹ PING */
+	/* ¿ªÊ¼ PING */
 	if (strcmp(dest, ip) == 0)
 		icmp_ping_one(chat, NULL, ip, __npkt, __delay, 1);
 	else
 		icmp_ping_one(chat, dest, ip, __npkt, __delay, 1);
-	acl_netdb_free(dns_db);  /* é‡Šæ”¾åŸŸåè§£æå¯¹è±¡ */
-	display_res2(chat);  /* æ˜¾ç¤º PING ç»“æœ */
-	icmp_chat_free(chat);  /* é‡Šæ”¾ ICMP å¯¹è±¡ */
+	acl_netdb_free(dns_db);  /* ÊÍ·ÅÓòÃû½âÎö¶ÔÏó */
+	display_res2(chat);  /* ÏÔÊ¾ PING ½á¹û */
+	icmp_chat_free(chat);  /* ÊÍ·Å ICMP ¶ÔÏó */
 	return (NULL);
 }
 
-/* å¤šçº¿ç¨‹æ–¹å¼ PING å¤šä¸ªç›®æ ‡åœ°å€ï¼Œæ¯ä¸ªçº¿ç¨‹é‡‡ç”¨åŒæ­¥ PING æ–¹å¼ */
+/* ¶àÏß³Ì·½Ê½ PING ¶à¸öÄ¿±êµØÖ·£¬Ã¿¸öÏß³Ì²ÉÓÃÍ¬²½ PING ·½Ê½ */
 static void ping_main_threads(const ACL_ARGV *ip_list, int npkt)
 {
 	int   i, n;
@@ -177,14 +177,14 @@ static void ping_main_threads(const ACL_ARGV *ip_list, int npkt)
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, 0);
 
-	/* é™å®šæ¯æ¬¡æœ€å¤§çš„çº¿ç¨‹æ•°ï¼Œé˜²æ­¢ç³»ç»Ÿå¼€é”€å¤ªå¤§ */
+	/* ÏŞ¶¨Ã¿´Î×î´óµÄÏß³ÌÊı£¬·ÀÖ¹ÏµÍ³¿ªÏúÌ«´ó */
 	n = ip_list->argc > 128 ? 128 : ip_list->argc;
 	for (i = 0; i < n; i++)
-		/* åˆ›å»º PING çº¿ç¨‹ */
+		/* ´´½¨ PING Ïß³Ì */
 		acl_pthread_create(&tids[i], &attr, ping_thread, ip_list->argv[i]);
 
 	for (i = 0; i < n; i++)
-		/* å›æ”¶çº¿ç¨‹çŠ¶æ€ */
+		/* »ØÊÕÏß³Ì×´Ì¬ */
 		acl_pthread_join(tids[i], NULL);
 }
 
@@ -199,7 +199,7 @@ static void usage(const char* progname)
 #endif
 }
 
-/* å½“æ”¶åˆ° SIGINT ä¿¡å·(å³åœ¨ PING è¿‡ç¨‹ä¸­ç”¨æˆ·æŒ‰ä¸‹ ctrl + c)æ—¶çš„ä¿¡å·å¤„ç†å‡½æ•° */
+/* µ±ÊÕµ½ SIGINT ĞÅºÅ(¼´ÔÚ PING ¹ı³ÌÖĞÓÃ»§°´ÏÂ ctrl + c)Ê±µÄĞÅºÅ´¦Àíº¯Êı */
 static void OnSigInt(int signo acl_unused)
 {
 	display_res();
@@ -212,9 +212,9 @@ int main(int argc, char* argv[])
 	int   npkt = 5, i, syn = 0, thread = 0;
 	ACL_ARGV* dest_list = acl_argv_alloc(10);
 
-	signal(SIGINT, OnSigInt);  /* ç”¨æˆ·æŒ‰ä¸‹ ctr + c æ—¶ä¸­æ–­ PING ç¨‹åº */
-	acl_socket_init();  /* åœ¨ WIN32 ä¸‹éœ€è¦åˆå§‹åŒ–å…¨å±€å¥—æ¥å­—åº“ */
-	acl_msg_stdout_enable(1);  /* å…è®¸ acl_msg_xxx è®°å½•çš„ä¿¡æ¯è¾“å‡ºè‡³å±å¹• */
+	signal(SIGINT, OnSigInt);  /* ÓÃ»§°´ÏÂ ctr + c Ê±ÖĞ¶Ï PING ³ÌĞò */
+	acl_socket_init();  /* ÔÚ WIN32 ÏÂĞèÒª³õÊ¼»¯È«¾ÖÌ×½Ó×Ö¿â */
+	acl_msg_stdout_enable(1);  /* ÔÊĞí acl_msg_xxx ¼ÇÂ¼µÄĞÅÏ¢Êä³öÖÁÆÁÄ» */
 
 	while ((ch = getopt(argc, argv, "htsl:n:d:")) > 0) {
 		switch (ch) {
@@ -251,15 +251,15 @@ int main(int argc, char* argv[])
 	if (npkt <= 0)
 		npkt = 0;
 
-	/* åŒæ­¥ PING æ–¹å¼ï¼Œå¯¹äºå¤šä¸ªç›®æ ‡åœ°å€ï¼Œé‡‡ç”¨ä¸€ä¸ªçº¿ç¨‹ PING ä¸€ä¸ªåœ°å€ */
+	/* Í¬²½ PING ·½Ê½£¬¶ÔÓÚ¶à¸öÄ¿±êµØÖ·£¬²ÉÓÃÒ»¸öÏß³Ì PING Ò»¸öµØÖ· */
 	if (thread)
 		ping_main_threads(dest_list, npkt);
 
-	/* åŒæ­¥ PING æ–¹å¼ï¼Œåªèƒ½åŒæ—¶ PING ä¸€ä¸ªåœ°å€ */
+	/* Í¬²½ PING ·½Ê½£¬Ö»ÄÜÍ¬Ê± PING Ò»¸öµØÖ· */
 	else if (syn)
 		ping_main_sync(dest_list->argv[0], npkt);
 
-	/* å¼‚æ­¥ PING æ–¹å¼ï¼Œå¯ä»¥åœ¨ä¸€ä¸ªçº¿ç¨‹ä¸­åŒæ—¶ PING å¤šä¸ªåœ°å€ */
+	/* Òì²½ PING ·½Ê½£¬¿ÉÒÔÔÚÒ»¸öÏß³ÌÖĞÍ¬Ê± PING ¶à¸öµØÖ· */
 	else
 		ping_main_async(dest_list, npkt);
 

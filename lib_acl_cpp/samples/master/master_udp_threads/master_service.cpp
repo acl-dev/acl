@@ -1,8 +1,8 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈÝÏî
 
 char *var_cfg_local_addr;
 acl::master_str_tbl var_conf_str_tab[] = {
@@ -59,14 +59,14 @@ public:
 protected:
 	virtual void* run()
 	{
-		// å›žå†™éœ€è¦å…ˆè®¾ç½®è¿œç¨‹è¿žæŽ¥åœ°å€
+		// »ØÐ´ÐèÒªÏÈÉèÖÃÔ¶³ÌÁ¬½ÓµØÖ·
 		acl::socket_stream* conn = (acl::socket_stream*)
 			acl_pthread_getspecific(stream_key);
 		acl_assert(conn);
 		conn->set_peer(peer_addr_);
 		conn->write(buf_, len_);
 
-		// å› ä¸ºè¯¥å¯¹è±¡æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦é‡Šæ”¾æŽ‰
+		// ÒòÎª¸Ã¶ÔÏóÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔÐèÒªÊÍ·Åµô
 		delete this;
 		return NULL;
 	}
@@ -138,7 +138,7 @@ void master_service::on_read(acl::socket_stream* stream)
 	int   n;
 	char  buf[4096];
 
-	// ä»Žè¿œç¨‹è¿žæŽ¥è¯»ä¸€æ¡è®°å½•
+	// ´ÓÔ¶³ÌÁ¬½Ó¶ÁÒ»Ìõ¼ÇÂ¼
 	if ((n = stream->read(buf, sizeof(buf), false)) == -1)
 		return;
 
@@ -146,14 +146,14 @@ void master_service::on_read(acl::socket_stream* stream)
 		logger("read from %s, %d bytes, local: %s",
 			stream->get_peer(true), n, stream->get_local(true));
 
-	// å¦‚æžœé‡‡ç”¨å•çº¿ç¨‹æ¨¡å¼ï¼Œåˆ™ç›´æŽ¥å›žå†™
+	// Èç¹û²ÉÓÃµ¥Ïß³ÌÄ£Ê½£¬ÔòÖ±½Ó»ØÐ´
 	if (__threads == NULL)
 	{
 		stream->write(buf, n);
 		return;
 	}
 
-	// å¦åˆ™ï¼Œé‡‡ç”¨å¤šçº¿ç¨‹æ¨¡å¼ï¼Œå°†å›žå†™ä»»åŠ¡äº¤ç»™çº¿ç¨‹æ± å¤„ç†
+	// ·ñÔò£¬²ÉÓÃ¶àÏß³ÌÄ£Ê½£¬½«»ØÐ´ÈÎÎñ½»¸øÏß³Ì³Ø´¦Àí
 
 	echo_thread* thr = new echo_thread(stream->get_peer(true), buf, n);
 	__threads->run(thr);
@@ -163,7 +163,7 @@ void master_service::proc_on_init()
 {
 	if (var_cfg_use_threads)
 	{
-		// çº¿ç¨‹æ± æ¨¡å¼ä¸‹ï¼Œéœ€è¦åˆ›å»ºçº¿ç¨‹æ± 
+		// Ïß³Ì³ØÄ£Ê½ÏÂ£¬ÐèÒª´´½¨Ïß³Ì³Ø
 
 		__threads = new mythread_pool;
 		__threads->set_limit(100);
@@ -177,7 +177,7 @@ void master_service::proc_on_exit()
 {
 	if (__threads)
 	{
-		// åœæ­¢çº¿ç¨‹æ± å¹¶é”€æ¯
+		// Í£Ö¹Ïß³Ì³Ø²¢Ïú»Ù
 
 		__threads->stop();
 		delete __threads;

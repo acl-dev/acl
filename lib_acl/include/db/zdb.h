@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_ZDB_INCLUDE_H
+#ifndef	ACL_ZDB_INCLUDE_H
 #define	ACL_ZDB_INCLUDE_H
 
 #include "../stdlib/acl_define.h"
@@ -16,77 +16,77 @@ typedef struct ZDB_KEY_STORE ZDB_KEY_STORE;
 typedef struct ZDB_DAT_STORE ZDB_DAT_STORE;
 typedef struct ZDB_IO ZDB_IO;
 
-/* åç§»é‡çš„é•¿åº¦ç±»å‹ */
+/* Æ«ÒÆÁ¿µÄ³¤¶ÈÀàĞÍ */
 typedef acl_int64 zdb_off_t;
 
-/* é”®ç±»å‹å®šä¹‰ */
+/* ¼üÀàĞÍ¶¨Òå */
 typedef acl_int64 zdb_key_t;
 
-/* å€¼å­˜å‚¨ä¸­ç©ºé—²æ•°æ®å—é“¾æ¥åç§»é‡ç±»å‹ */
+/* Öµ´æ´¢ÖĞ¿ÕÏĞÊı¾İ¿éÁ´½ÓÆ«ÒÆÁ¿ÀàĞÍ */
 typedef int zdb_lnk_t;
 
-/* ç£ç›˜åˆ†åŒºä¿¡æ¯ç±»å‹ */
+/* ´ÅÅÌ·ÖÇøĞÅÏ¢ÀàĞÍ */
 typedef struct ZDB_DISK {
-	acl_int64 limit;	/* è¯¥åˆ†åŒºçš„æ€»æ•°é™åˆ¶ */
-	acl_int64 count;	/* ç›®å‰è¯¥åˆ†åŒºå·²åˆ†é…æ•°é‡ */
-	char *path;		/* ç£ç›˜åˆ†åŒºè·¯å¾„ */
-	int   idisk;		/* è¯¥ç£ç›˜åˆ†åŒºå· */
-	int   priority;		/* æƒé‡ä¼˜å…ˆçº§ */
-	int  *dat_ifiles;	/* å½“å‰å¯ç”¨çš„ dat_ifile å€¼å­˜å‚¨æ–‡ä»¶ç´¢å¼•å· */
-	int   dat_ifiles_size;	/* dat_ifiles çš„å¤§å° */
+	acl_int64 limit;	/* ¸Ã·ÖÇøµÄ×ÜÊıÏŞÖÆ */
+	acl_int64 count;	/* Ä¿Ç°¸Ã·ÖÇøÒÑ·ÖÅäÊıÁ¿ */
+	char *path;		/* ´ÅÅÌ·ÖÇøÂ·¾¶ */
+	int   idisk;		/* ¸Ã´ÅÅÌ·ÖÇøºÅ */
+	int   priority;		/* È¨ÖØÓÅÏÈ¼¶ */
+	int  *dat_ifiles;	/* µ±Ç°¿ÉÓÃµÄ dat_ifile Öµ´æ´¢ÎÄ¼şË÷ÒıºÅ */
+	int   dat_ifiles_size;	/* dat_ifiles µÄ´óĞ¡ */
 } ZDB_DISK;
 
-/* è°ƒç”¨ zdb_open() æ—¶çš„ ZDB é…ç½®å¯¹è±¡ */
+/* µ÷ÓÃ zdb_open() Ê±µÄ ZDB ÅäÖÃ¶ÔÏó */
 typedef struct ZDB_CFG {
-	const char *key_path;	/* é”®å­˜å‚¨æ‰€åœ¨çš„æ ¹ç›®å½• */
-	zdb_key_t key_begin;	/* é”®å€¼çš„èµ·å§‹å€¼ */
-	zdb_key_t key_limit;	/* æ¯ä¸ªé”®å­˜å‚¨æ–‡ä»¶ä¸­é”®çš„æœ€å¤§ä¸ªæ•° */
-	acl_int64 dat_limit;	/* æ¯ä¸ªå€¼å­˜å‚¨æ–‡ä»¶ä¸­æ•°æ®çš„æœ€å¤§ä¸ªæ•° */
+	const char *key_path;	/* ¼ü´æ´¢ËùÔÚµÄ¸ùÄ¿Â¼ */
+	zdb_key_t key_begin;	/* ¼üÖµµÄÆğÊ¼Öµ */
+	zdb_key_t key_limit;	/* Ã¿¸ö¼ü´æ´¢ÎÄ¼şÖĞ¼üµÄ×î´ó¸öÊı */
+	acl_int64 dat_limit;	/* Ã¿¸öÖµ´æ´¢ÎÄ¼şÖĞÊı¾İµÄ×î´ó¸öÊı */
 
-	int   key_cache_max;	/* å¯ç”¨é”®å­˜å‚¨ IO ç¼“å­˜æ—¶çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
-	int   key_cache_timeout; /* å¯ç”¨é”®å­˜å‚¨ IO ç¼“å­˜æ—¶æ¯ä¸ªç¼“å­˜å—çš„è¿‡æœŸæ—¶é—´ */
-	int   key_wback_max;	/* å¯ç”¨é”®å­˜å‚¨ IO ç¼“å­˜æ—¶å†™ç¼“å­˜çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
+	int   key_cache_max;	/* ÆôÓÃ¼ü´æ´¢ IO »º´æÊ±µÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
+	int   key_cache_timeout; /* ÆôÓÃ¼ü´æ´¢ IO »º´æÊ±Ã¿¸ö»º´æ¿éµÄ¹ıÆÚÊ±¼ä */
+	int   key_wback_max;	/* ÆôÓÃ¼ü´æ´¢ IO »º´æÊ±Ğ´»º´æµÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
 
-	int   dat_nstep;	/* å€¼å­˜å‚¨ä¸­å¢åŠ æ•°æ®å—æ—¶çš„æ­¥è¿›å€¼ */
-	int   blk_dlen;		/* å€¼å­˜å‚¨ä¸­æ•°æ®å—ä¸­æ•°æ®éƒ¨åˆ†çš„é•¿åº¦(ç­‰äºç”¨æˆ·æ•°æ®é•¿åº¦) */
-	int   dat_cache_max;	/* å¯ç”¨å€¼å­˜å‚¨ IO ç¼“å­˜æ—¶çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
-	int   dat_cache_timeout; /* å¯ç”¨å€¼å­˜å‚¨ IO ç¼“å­˜æ—¶æ¯ä¸ªç¼“å­˜å—çš„è¿‡æœŸæ—¶é—´ */
-	int   dat_wback_max;	/* å¯ç”¨å€¼å­˜å‚¨ IO ç¼“å­˜æ—¶å†™ç¼“å­˜çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
+	int   dat_nstep;	/* Öµ´æ´¢ÖĞÔö¼ÓÊı¾İ¿éÊ±µÄ²½½øÖµ */
+	int   blk_dlen;		/* Öµ´æ´¢ÖĞÊı¾İ¿éÖĞÊı¾İ²¿·ÖµÄ³¤¶È(µÈÓÚÓÃ»§Êı¾İ³¤¶È) */
+	int   dat_cache_max;	/* ÆôÓÃÖµ´æ´¢ IO »º´æÊ±µÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
+	int   dat_cache_timeout; /* ÆôÓÃÖµ´æ´¢ IO »º´æÊ±Ã¿¸ö»º´æ¿éµÄ¹ıÆÚÊ±¼ä */
+	int   dat_wback_max;	/* ÆôÓÃÖµ´æ´¢ IO »º´æÊ±Ğ´»º´æµÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
 } ZDB_CFG;
 
-/* ZDB ç»“æ„ç±»å‹ */
+/* ZDB ½á¹¹ÀàĞÍ */
 struct ZDB {
 	/* public */
 
-	char *dbname;		/* æ•°æ®åº“å */
-	char *key_path;		/* ZDB çš„keyå­˜å‚¨è·¯å¾„ */
-	unsigned int oflags;	/* æ‰“å¼€æ—¶çš„æ ‡å¿—ä½ */
-#define	ZDB_FLAG_LINK_BUSY	(1 << 0)  /* å°†å€¼å­˜å‚¨ä¸­çš„å ç”¨æ•°æ®å—è¿æ¥èµ·æ¥ */
-#define	ZDB_FLAG_OPEN_LOCK	(1 << 1)  /* ä»¥åŠ é”æ¨¡å¼æ‰“å¼€å­˜å‚¨å¥æŸ„ */
-#define	ZDB_FLAG_CACHE_DAT	(1 << 2)  /* æ˜¯å¦ç¼“å­˜å€¼å­˜å‚¨çš„æ•°æ® */
-#define	ZDB_FLAG_CACHE_KEY	(1 << 3)  /* æ˜¯å¦ç¼“å­˜é”®å­˜å‚¨çš„æ•°æ® */
-#define	ZDB_FLAG_SLICE_KEY	(1 << 4)  /* å¯ç”¨å€¼å­˜å‚¨æ—¶æ˜¯å¦é‡‡ç”¨å†…å­˜åˆ‡ç‰‡æ–¹å¼ */
-#define	ZDB_FLAG_SLICE_DAT	(1 << 5)  /* å¯ç”¨é”®å­˜å‚¨æ—¶æ˜¯å¦é‡‡ç”¨å†…å­˜åˆ‡ç‰‡æ–¹å¼ */
+	char *dbname;		/* Êı¾İ¿âÃû */
+	char *key_path;		/* ZDB µÄkey´æ´¢Â·¾¶ */
+	unsigned int oflags;	/* ´ò¿ªÊ±µÄ±êÖ¾Î» */
+#define	ZDB_FLAG_LINK_BUSY	(1 << 0)  /* ½«Öµ´æ´¢ÖĞµÄÕ¼ÓÃÊı¾İ¿éÁ¬½ÓÆğÀ´ */
+#define	ZDB_FLAG_OPEN_LOCK	(1 << 1)  /* ÒÔ¼ÓËøÄ£Ê½´ò¿ª´æ´¢¾ä±ú */
+#define	ZDB_FLAG_CACHE_DAT	(1 << 2)  /* ÊÇ·ñ»º´æÖµ´æ´¢µÄÊı¾İ */
+#define	ZDB_FLAG_CACHE_KEY	(1 << 3)  /* ÊÇ·ñ»º´æ¼ü´æ´¢µÄÊı¾İ */
+#define	ZDB_FLAG_SLICE_KEY	(1 << 4)  /* ÆôÓÃÖµ´æ´¢Ê±ÊÇ·ñ²ÉÓÃÄÚ´æÇĞÆ¬·½Ê½ */
+#define	ZDB_FLAG_SLICE_DAT	(1 << 5)  /* ÆôÓÃ¼ü´æ´¢Ê±ÊÇ·ñ²ÉÓÃÄÚ´æÇĞÆ¬·½Ê½ */
 
-	unsigned int status;	/* çŠ¶æ€ä½ */
-#define	ZDB_STAT_KEY_NEW	(1 << 0)  /* æ–°é”® */
+	unsigned int status;	/* ×´Ì¬Î» */
+#define	ZDB_STAT_KEY_NEW	(1 << 0)  /* ĞÂ¼ü */
 
 	/* private */
 
-	zdb_key_t key_begin;	/* æ‰€æœ‰é”®å­˜å‚¨çš„èµ·å§‹å€¼ */
-	zdb_key_t key_limit;	/* æ¯ä¸ªé”®å­˜å‚¨ä¸­é”®çš„ä¸ªæ•°çš„æœ€å¤§å€¼ */
-	int   key_cache_max;	/* å¯ç”¨é”®å­˜å‚¨ IO ç¼“å­˜æ—¶çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
-	int   key_cache_timeout; /* å¯ç”¨é”®å­˜å‚¨ IO ç¼“å­˜æ—¶æ¯ä¸ªç¼“å­˜å—çš„è¿‡æœŸæ—¶é—´ */
-	int   key_wback_max;	/* å¯ç”¨é”®å­˜å‚¨ IO ç¼“å­˜æ—¶å†™ç¼“å­˜çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
+	zdb_key_t key_begin;	/* ËùÓĞ¼ü´æ´¢µÄÆğÊ¼Öµ */
+	zdb_key_t key_limit;	/* Ã¿¸ö¼ü´æ´¢ÖĞ¼üµÄ¸öÊıµÄ×î´óÖµ */
+	int   key_cache_max;	/* ÆôÓÃ¼ü´æ´¢ IO »º´æÊ±µÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
+	int   key_cache_timeout; /* ÆôÓÃ¼ü´æ´¢ IO »º´æÊ±Ã¿¸ö»º´æ¿éµÄ¹ıÆÚÊ±¼ä */
+	int   key_wback_max;	/* ÆôÓÃ¼ü´æ´¢ IO »º´æÊ±Ğ´»º´æµÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
 
-	acl_int64 dat_limit;	/* å€¼å­˜å‚¨ä¸­å€¼å¯¹è±¡å­˜å‚¨ä¸ªæ•°é™åˆ¶ */
-	int   blk_dlen;		/* å€¼å­˜å‚¨ä¸­æ•°æ®å—ä¸­æ¯ä¸ªåŸºç¡€å—å•å…ƒé•¿åº¦ */
-	int   dat_nstep;	/* å€¼å­˜å‚¨ä¸­æ¯æ¬¡å¢åŠ æ•°æ®å—çš„ä¸ªæ•° */
-	int   dat_cache_max;	/* å¯ç”¨å€¼å­˜å‚¨ IO ç¼“å­˜æ—¶çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
-	int   dat_cache_timeout; /* å¯ç”¨å€¼å­˜å‚¨ IO ç¼“å­˜æ—¶æ¯ä¸ªç¼“å­˜å—çš„è¿‡æœŸæ—¶é—´ */
-	int   dat_wback_max;	/* å¯ç”¨å€¼å­˜å‚¨ IO ç¼“å­˜æ—¶å†™ç¼“å­˜çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
+	acl_int64 dat_limit;	/* Öµ´æ´¢ÖĞÖµ¶ÔÏó´æ´¢¸öÊıÏŞÖÆ */
+	int   blk_dlen;		/* Öµ´æ´¢ÖĞÊı¾İ¿éÖĞÃ¿¸ö»ù´¡¿éµ¥Ôª³¤¶È */
+	int   dat_nstep;	/* Öµ´æ´¢ÖĞÃ¿´ÎÔö¼ÓÊı¾İ¿éµÄ¸öÊı */
+	int   dat_cache_max;	/* ÆôÓÃÖµ´æ´¢ IO »º´æÊ±µÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
+	int   dat_cache_timeout; /* ÆôÓÃÖµ´æ´¢ IO »º´æÊ±Ã¿¸ö»º´æ¿éµÄ¹ıÆÚÊ±¼ä */
+	int   dat_wback_max;	/* ÆôÓÃÖµ´æ´¢ IO »º´æÊ±Ğ´»º´æµÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
 
-	ZDB_DISK *dat_disks;	/* å€¼å­˜å‚¨ç£ç›˜åˆ†åŒºæ•°ç»„ */
+	ZDB_DISK *dat_disks;	/* Öµ´æ´¢´ÅÅÌ·ÖÇøÊı×é */
 
 	int   (*key_get)(ZDB*, zdb_key_t, ZDB_BLK_OFF*);
 	int   (*key_set) (ZDB*, zdb_key_t, const ZDB_BLK_OFF*);
@@ -98,14 +98,14 @@ struct ZDB {
 
 	/* private */
 
-	/* ä»¥ä¸‹ä¸ºä¸´æ—¶å˜é‡ */
+	/* ÒÔÏÂÎªÁÙÊ±±äÁ¿ */
 
-	ACL_VSTRING *path_tmp;	/* ä¸´æ—¶ç”¨çš„å­˜å‚¨æ–‡ä»¶çš„å…¨è·¯å¾„, ä¸»è¦ä¸ºäº†å‚æ•°ä¼ é€’ */
-	int   blk_count_tmp;	/* ä¸´æ—¶ç”¨çš„å—æ•°, ä¸»è¦ä¸ºäº†å‚æ•°ä¼ é€’ */
-	int   inode_tmp;	/* ä¸´æ—¶ç”¨çš„ç›¸å¯¹è·¯å¾„å·ï¼Œä¸»è¦ä¸ºäº†å‚æ•°ä¼ é€’ */
+	ACL_VSTRING *path_tmp;	/* ÁÙÊ±ÓÃµÄ´æ´¢ÎÄ¼şµÄÈ«Â·¾¶, Ö÷ÒªÎªÁË²ÎÊı´«µİ */
+	int   blk_count_tmp;	/* ÁÙÊ±ÓÃµÄ¿éÊı, Ö÷ÒªÎªÁË²ÎÊı´«µİ */
+	int   inode_tmp;	/* ÁÙÊ±ÓÃµÄÏà¶ÔÂ·¾¶ºÅ£¬Ö÷ÒªÎªÁË²ÎÊı´«µİ */
 };
 
-/* xxx: ä¸ºäº†ä¿è¯è·¨å¹³å°æ€§ï¼Œä»¥ä¸‹ç»“æ„å®šä¹‰éƒ½æ˜¯4å­—èŠ‚å¯¹é½çš„ */
+/* xxx: ÎªÁË±£Ö¤¿çÆ½Ì¨ĞÔ£¬ÒÔÏÂ½á¹¹¶¨Òå¶¼ÊÇ4×Ö½Ú¶ÔÆëµÄ */
 
 #ifdef	ACL_SUNOS5
 #pragma pack(4)
@@ -113,57 +113,57 @@ struct ZDB {
 #pragma pack(push, 4)
 #endif
 
-/* å€¼å­˜å‚¨å¤´ */
+/* Öµ´æ´¢Í· */
 struct ZDB_DAT_HDR {
-	acl_int64  limit;	/* å€¼å­˜å‚¨ä¸­å€¼å¯¹è±¡å­˜å‚¨ä¸ªæ•°é™åˆ¶ */
-	acl_int64  size;	/* å½“å‰å€¼å­˜å‚¨æ–‡ä»¶å·²ç»åˆ†é…çš„å¯¹è±¡å­˜å‚¨çš„ä¸ªæ•° */
-	acl_int64  count;	/* å½“å‰å€¼å­˜å‚¨ä¸­çš„æ€»æ•° */
-	acl_int64  reserv1;	/* ä¿ç•™å­—æ®µ */
-	acl_int64  reserv2;	/* ä¿ç•™å­—æ®µ */
-	acl_int64  reserv3;	/* ä¿ç•™å­—æ®µ */
-	acl_int64  reserv4;	/* ä¿ç•™å­—æ®µ */
-	int   nstep;		/* æ¯æ¬¡å¢åŠ æ—¶å€¼å­˜å‚¨æ–‡ä»¶å¤§å°æ—¶çš„æ­¥è¿›å€¼å¤§å° */
-	int   blk_hdr_dlen;	/* å€¼å­˜å‚¨ä¸­æ¯å—æ•°æ®çš„å¤´éƒ¨é•¿åº¦: ZDB_BLK_HDR.sizeof */
-	int   blk_dlen;		/* å€¼å­˜å‚¨ä¸­æ•°æ®å—ä¸­æ¯ä¸ªåŸºç¡€å—å•å…ƒé•¿åº¦ */
-	int   blk_count;	/* è¯¥å€¼å­˜å‚¨ä¸­çš„æ•°æ®å—ä¸­åŸºç¡€å—ä¸ªæ•° */
+	acl_int64  limit;	/* Öµ´æ´¢ÖĞÖµ¶ÔÏó´æ´¢¸öÊıÏŞÖÆ */
+	acl_int64  size;	/* µ±Ç°Öµ´æ´¢ÎÄ¼şÒÑ¾­·ÖÅäµÄ¶ÔÏó´æ´¢µÄ¸öÊı */
+	acl_int64  count;	/* µ±Ç°Öµ´æ´¢ÖĞµÄ×ÜÊı */
+	acl_int64  reserv1;	/* ±£Áô×Ö¶Î */
+	acl_int64  reserv2;	/* ±£Áô×Ö¶Î */
+	acl_int64  reserv3;	/* ±£Áô×Ö¶Î */
+	acl_int64  reserv4;	/* ±£Áô×Ö¶Î */
+	int   nstep;		/* Ã¿´ÎÔö¼ÓÊ±Öµ´æ´¢ÎÄ¼ş´óĞ¡Ê±µÄ²½½øÖµ´óĞ¡ */
+	int   blk_hdr_dlen;	/* Öµ´æ´¢ÖĞÃ¿¿éÊı¾İµÄÍ·²¿³¤¶È: ZDB_BLK_HDR.sizeof */
+	int   blk_dlen;		/* Öµ´æ´¢ÖĞÊı¾İ¿éÖĞÃ¿¸ö»ù´¡¿éµ¥Ôª³¤¶È */
+	int   blk_count;	/* ¸ÃÖµ´æ´¢ÖĞµÄÊı¾İ¿éÖĞ»ù´¡¿é¸öÊı */
 
-	/* ç¬¬ä¸€ä¸ªç©ºé—²å—çš„ä½ç½®çš„çœŸå®å…·ä½“ä½ç½®çš„è®¡ç®—å…¬å¼ä¸º:
+	/* µÚÒ»¸ö¿ÕÏĞ¿éµÄÎ»ÖÃµÄÕæÊµ¾ßÌåÎ»ÖÃµÄ¼ÆËã¹«Ê½Îª:
 	 * zdb_off_t off_head = ZDB_DAT_HDR.sizeof +
 	 *     ZDB_DAT_HDR.ihead_idle * (ZDB_DAT_HDR.blk_hdr_dlen +
 	 *         ZDB_DAT_HDR.blk_dlen * ZDB_DAT_HDR.blk_count);
 	 */
 	zdb_lnk_t ihead_idle;
 
-	/* ç¬¬ä¸€ä¸ªæ•°æ®å—çš„ä½ç½®çš„çœŸå®å…·ä½“ä½ç½®çš„è®¡ç®—å…¬å¼ä¸º:
+	/* µÚÒ»¸öÊı¾İ¿éµÄÎ»ÖÃµÄÕæÊµ¾ßÌåÎ»ÖÃµÄ¼ÆËã¹«Ê½Îª:
 	 * zdb_off_t off_head = ZDB_DAT_HDR.sizeof +
 	 *     ZDB_DAT_HDR.ihead_busy * (ZDB_DAT_HDR.blk_hdr_dlen +
 	 *         ZDB_DAT_HDR.blk_dlen * ZDB_DAT_HDR.blk_count);
 	 */
 	zdb_lnk_t ihead_busy;
 	zdb_lnk_t itail_busy;
-	int   dummy;		/* ä¿è¯8å­—èŠ‚å¯¹é½ */
+	int   dummy;		/* ±£Ö¤8×Ö½Ú¶ÔÆë */
 };
 
-/* é”®å­˜å‚¨çš„å¤´ */
+/* ¼ü´æ´¢µÄÍ· */
 struct ZDB_KEY_HDR {
-	zdb_key_t  key_limit;	/* è¯¥é”®å­˜å‚¨çš„æœ€å¤§å®¹é‡ */
-	zdb_key_t  key_count;	/* å½“å‰æ‰€æœ‰é”®çš„æ€»æ•° */
-	zdb_key_t  key_begin;	/* é”®çš„èµ·å§‹å€¼ */
-	acl_int64  reserv1;	/* ä¿ç•™å­—æ®µ */
-	acl_int64  reserv2;	/* ä¿ç•™å­—æ®µ */
-	acl_int64  reserv3;	/* ä¿ç•™å­—æ®µ */
-	acl_int64  reserv4;	/* ä¿ç•™å­—æ®µ */
+	zdb_key_t  key_limit;	/* ¸Ã¼ü´æ´¢µÄ×î´óÈİÁ¿ */
+	zdb_key_t  key_count;	/* µ±Ç°ËùÓĞ¼üµÄ×ÜÊı */
+	zdb_key_t  key_begin;	/* ¼üµÄÆğÊ¼Öµ */
+	acl_int64  reserv1;	/* ±£Áô×Ö¶Î */
+	acl_int64  reserv2;	/* ±£Áô×Ö¶Î */
+	acl_int64  reserv3;	/* ±£Áô×Ö¶Î */
+	acl_int64  reserv4;	/* ±£Áô×Ö¶Î */
 };
 
-/* å—æ•°æ®çš„å¤´ç»“æ„ç±»å‹ */
+/* ¿éÊı¾İµÄÍ·½á¹¹ÀàĞÍ */
 typedef struct ZDB_BLK_HDR {
-	zdb_key_t  key;		/* å¯¹åº”äºé”®å­˜å‚¨ä¸­çš„é”® */
+	zdb_key_t  key;		/* ¶ÔÓ¦ÓÚ¼ü´æ´¢ÖĞµÄ¼ü */
 
-	/* æ ‡è¯†æœ¬æ•°æ®å—çš„ç´¢å¼•ä½ç½®, æ ¡éªŒç”¨, åŒæ—¶ä¿è¯äº† 8 å­—èŠ‚å¯¹é½ */
+	/* ±êÊ¶±¾Êı¾İ¿éµÄË÷ÒıÎ»ÖÃ, Ğ£ÑéÓÃ, Í¬Ê±±£Ö¤ÁË 8 ×Ö½Ú¶ÔÆë */
 	zdb_lnk_t  blk_ilnk;
 
-	/* ç”± inext_idle å°†ç©ºé—²æ•°æ®å—è¿æ¥æˆä¸€ä¸ªå•å‘é“¾è¡¨, è‹¥æ­¤å€¼ä¸º -1 åˆ™è¡¨ç¤º
-	 * éç©ºé—²å—, åä¸€ä¸ªç©ºé—²å—ä½ç½®, åä¸€ä¸ªç©ºé—²å—çš„çœŸå®å…·ä½“ä½ç½®çš„è®¡ç®—å…¬å¼ä¸º:
+	/* ÓÉ inext_idle ½«¿ÕÏĞÊı¾İ¿éÁ¬½Ó³ÉÒ»¸öµ¥ÏòÁ´±í, Èô´ËÖµÎª -1 Ôò±íÊ¾
+	 * ·Ç¿ÕÏĞ¿é, ºóÒ»¸ö¿ÕÏĞ¿éÎ»ÖÃ, ºóÒ»¸ö¿ÕÏĞ¿éµÄÕæÊµ¾ßÌåÎ»ÖÃµÄ¼ÆËã¹«Ê½Îª:
 	 * zdb_off_t off_next = ZDB_BLK_HDR.sizeof +
 	 *     ZDB_BLK_HDR.inext_idle * (ZDB_BLK_HDR.blk_hdr_dlen +
 	 *         ZDB_DAT_HDR.blk_dlen * ZDB_DAT_HDR.blk_count);
@@ -171,8 +171,8 @@ typedef struct ZDB_BLK_HDR {
 	zdb_lnk_t  inext_idle;
 
 #ifdef	ZDB_LINK_BUSY
-	/* ç”± inext_busy/iprev_busy å°†å ç”¨æ•°æ®å—è¿æ¥æˆä¸€ä¸ªåŒå‘é“¾è¡¨, è‹¥æ­¤å€¼ä¸º -1
-	 * åˆ™è¡¨ç¤ºéå ç”¨å—, åä¸€ä¸ªå ç”¨å—ä½ç½®, åä¸€ä¸ªå ç”¨å—çš„çœŸå®å…·ä½“ä½ç½®çš„è®¡ç®—å…¬å¼ä¸º:
+	/* ÓÉ inext_busy/iprev_busy ½«Õ¼ÓÃÊı¾İ¿éÁ¬½Ó³ÉÒ»¸öË«ÏòÁ´±í, Èô´ËÖµÎª -1
+	 * Ôò±íÊ¾·ÇÕ¼ÓÃ¿é, ºóÒ»¸öÕ¼ÓÃ¿éÎ»ÖÃ, ºóÒ»¸öÕ¼ÓÃ¿éµÄÕæÊµ¾ßÌåÎ»ÖÃµÄ¼ÆËã¹«Ê½Îª:
 	 * zdb_off_t off_next = ZDB_BLK_HDR.sizeof +
 	 *     ZDB_BLK_HDR.inext_busy * (ZDB_BLK_HDR.blk_hdr_dlen +
 	 *         ZDB_DAT_HDR.blk_dlen * ZDB_DAT_HDR.blk_count);
@@ -185,57 +185,57 @@ typedef struct ZDB_BLK_HDR {
 #endif
 } ZDB_BLK_HDR;
 
-/* é”®å­˜å‚¨ä¸­å­˜å‚¨çš„å€¼å­˜å‚¨çš„åç§»é‡ç±»å‹ */
+/* ¼ü´æ´¢ÖĞ´æ´¢µÄÖµ´æ´¢µÄÆ«ÒÆÁ¿ÀàĞÍ */
 struct ZDB_BLK_OFF {
-	zdb_off_t offset;	/* åç§»é‡ä¿¡æ¯ */
-	int   inode;		/* è·¯å¾„ä¿¡æ¯ */
+	zdb_off_t offset;	/* Æ«ÒÆÁ¿ĞÅÏ¢ */
+	int   inode;		/* Â·¾¶ĞÅÏ¢ */
 };
 
-/* å—æ•°æ®ç»“æ„ç±»å‹ */
+/* ¿éÊı¾İ½á¹¹ÀàĞÍ */
 struct ZDB_BLK {
 	ZDB_BLK_HDR hdr;
-	char  dat[1];		/* å€¼å­˜å‚¨ä¸­æ¯å—æ•°æ®çš„ä½“æ•°æ® */
+	char  dat[1];		/* Öµ´æ´¢ÖĞÃ¿¿éÊı¾İµÄÌåÊı¾İ */
 };
 
 #ifdef	ACL_SUNOS5
-#pragma pack(0)  /* ä»¥ä¸‹å–æ¶ˆ4å­—èŠ‚å¯¹é½é™åˆ¶ */
+#pragma pack(0)  /* ÒÔÏÂÈ¡Ïû4×Ö½Ú¶ÔÆëÏŞÖÆ */
 #else
-#pragma pack(pop)  /* ä»¥ä¸‹å–æ¶ˆ4å­—èŠ‚å¯¹é½é™åˆ¶ */
+#pragma pack(pop)  /* ÒÔÏÂÈ¡Ïû4×Ö½Ú¶ÔÆëÏŞÖÆ */
 #endif
 
-/* é€šç”¨å­˜å‚¨å¥æŸ„ç»“æ„ */
+/* Í¨ÓÃ´æ´¢¾ä±ú½á¹¹ */
 typedef struct ZDB_STORE {
-	ACL_FHANDLE fhandle;	/* æ–‡ä»¶å¥æŸ„ */
-	ZDB *db;		/* å¼•ç”¨å¯¹è±¡ */
-	ZDB_IO *io;		/* IO å¥æŸ„å¯¹è±¡ */
-	int   cache_max;	/* å¯ç”¨å­˜å‚¨ IO ç¼“å­˜æ—¶çš„æœ€å¤§ç¼“å­˜æ•°æ®å—ä¸ªæ•° */
-	int   cache_timeout;	/* å¯ç”¨å­˜å‚¨ IO ç¼“å­˜æ—¶æ¯ä¸ªç¼“å­˜å—çš„è¿‡æœŸæ—¶é—´ */
-	int   wback_max;	/* å†™ç¼“å­˜ä¸­æ•°æ®å—çš„é™åˆ¶ */
+	ACL_FHANDLE fhandle;	/* ÎÄ¼ş¾ä±ú */
+	ZDB *db;		/* ÒıÓÃ¶ÔÏó */
+	ZDB_IO *io;		/* IO ¾ä±ú¶ÔÏó */
+	int   cache_max;	/* ÆôÓÃ´æ´¢ IO »º´æÊ±µÄ×î´ó»º´æÊı¾İ¿é¸öÊı */
+	int   cache_timeout;	/* ÆôÓÃ´æ´¢ IO »º´æÊ±Ã¿¸ö»º´æ¿éµÄ¹ıÆÚÊ±¼ä */
+	int   wback_max;	/* Ğ´»º´æÖĞÊı¾İ¿éµÄÏŞÖÆ */
 
-	unsigned int flag;	/* æ ‡å¿—ä½ */
-#define	STORE_FLAG_KEY		(1 << 0)  /* è¡¨ç¤ºæ˜¯é”®å­˜å‚¨ */
-#define	STORE_FLAG_DAT		(1 << 1)  /* è¡¨ç¤ºæ˜¯å€¼å­˜å‚¨ */
-#define	STORE_FLAG_IO_SLICE	(1 << 2)  /* æ˜¯å¦å¯ç”¨ ZDB_IO çš„å†…å­˜åˆ‡ç‰‡åˆ†é…æ–¹å¼ */
+	unsigned int flag;	/* ±êÖ¾Î» */
+#define	STORE_FLAG_KEY		(1 << 0)  /* ±íÊ¾ÊÇ¼ü´æ´¢ */
+#define	STORE_FLAG_DAT		(1 << 1)  /* ±íÊ¾ÊÇÖµ´æ´¢ */
+#define	STORE_FLAG_IO_SLICE	(1 << 2)  /* ÊÇ·ñÆôÓÃ ZDB_IO µÄÄÚ´æÇĞÆ¬·ÖÅä·½Ê½ */
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êı */
 	const void *(*iter_head)(ACL_ITER*, struct ZDB_STORE*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
 	const void *(*iter_next)(ACL_ITER*, struct ZDB_STORE*);
 } ZDB_STORE;
 
-/* é”®å­˜å‚¨ */
+/* ¼ü´æ´¢ */
 struct ZDB_KEY_STORE {
 	ZDB_STORE store;
-	ZDB_KEY_HDR hdr;	/* é”®å­˜å‚¨å¤´ */
+	ZDB_KEY_HDR hdr;	/* ¼ü´æ´¢Í· */
 };
 
 
-/* å€¼å­˜å‚¨ */
+/* Öµ´æ´¢ */
 struct ZDB_DAT_STORE {
 	ZDB_STORE store;
-	ZDB_DAT_HDR hdr;	/* å€¼å­˜å‚¨å¤´ */
+	ZDB_DAT_HDR hdr;	/* Öµ´æ´¢Í· */
 };
 
 #ifdef	__cplusplus
@@ -245,7 +245,7 @@ extern "C" {
 /*-------------------------  in zdb_test.c  ----------------------------------*/
 
 /**
- * zdb æµ‹è¯•å‡½æ•°
+ * zdb ²âÊÔº¯Êı
  */
 ACL_API void zdb_test(const char *cmd);
 
@@ -254,77 +254,77 @@ ACL_API void zdb_test(const char *cmd);
 /* in zdb.c */
 
 /**
- * ç¨‹åºå¼€å§‹è¿è¡Œæ—¶éœ€è¦åˆå§‹åŒ– zdb
+ * ³ÌĞò¿ªÊ¼ÔËĞĞÊ±ĞèÒª³õÊ¼»¯ zdb
  */
 ACL_API void zdb_init(void);
 
 /**
- * ç¨‹åºé€€å‡ºå‰éœ€è¦é‡Šæ”¾ zdb å†…éƒ¨ä¸€äº›èµ„æº
+ * ³ÌĞòÍË³öÇ°ĞèÒªÊÍ·Å zdb ÄÚ²¿Ò»Ğ©×ÊÔ´
  */
 ACL_API void zdb_end(void);
 
 /**
- * æ›´æ–°ZDBç›¸å…³ä¿¡æ¯è‡³ç£ç›˜
+ * ¸üĞÂZDBÏà¹ØĞÅÏ¢ÖÁ´ÅÅÌ
  * @param db {ZDB*}
  */
 ACL_API void zdb_sync(ZDB *db);
 
 /**
- * æ‰“å¼€æˆ–åˆ›å»ºä¸€ä¸ª ZDB æ•°æ®åº“
- * @param dbname {const char*} ZDB æ•°æ®åº“åç§°
- * @param oflags {unsigned int} æ‰“å¼€ ZDB åº“æ—¶çš„æ ‡å¿—ä½
- * @param cfg {const ZDB_CFG*} æ‰“å¼€ ZDB æ—¶çš„é…ç½®å¯¹è±¡
- * @return {ZDB*} ZDB æ•°æ®åº“å¥æŸ„
+ * ´ò¿ª»ò´´½¨Ò»¸ö ZDB Êı¾İ¿â
+ * @param dbname {const char*} ZDB Êı¾İ¿âÃû³Æ
+ * @param oflags {unsigned int} ´ò¿ª ZDB ¿âÊ±µÄ±êÖ¾Î»
+ * @param cfg {const ZDB_CFG*} ´ò¿ª ZDB Ê±µÄÅäÖÃ¶ÔÏó
+ * @return {ZDB*} ZDB Êı¾İ¿â¾ä±ú
  */
 ACL_API ZDB *zdb_open(const char *dbname, unsigned int oflags, const ZDB_CFG *cfg);
 
 /**
- * å…³é—­ ZDB æ•°æ®åº“å¥æŸ„
- * @param db {ZDB*} ZDB æ•°æ®åº“å¥æŸ„
+ * ¹Ø±Õ ZDB Êı¾İ¿â¾ä±ú
+ * @param db {ZDB*} ZDB Êı¾İ¿â¾ä±ú
  */
 ACL_API void zdb_close(ZDB *db);
 
 /**
- * åœ¨ ZDB æ•°æ®åº“ä¸­æŸ¥æ‰¾ç›¸åº”é”®å€¼çš„æ•°æ®
- * @param db {ZDB*} ZDB æ•°æ®åº“å¥æŸ„
- * @param key {zdb_key_t} é”®å€¼
- * @param size {size_t*} è‹¥æ­¤æŒ‡é’ˆéç©ºä¸”æŸ¥è¯¢ç»“æœä¹Ÿéç©ºåˆ™å­˜å‚¨æŸ¥è¯¢ç»“æœçš„æ•°æ®é•¿åº¦,
- *  å³æ˜¯ ZDB_BLK.dat ä¸­å­˜å‚¨æ•°æ®çš„é•¿åº¦
- * @param blk_off_buf {ZDB_BLK_OFF*} è‹¥éç©ºåˆ™å­˜å‚¨æ‰€æŸ¥å€¼çš„åç§»ä½ç½®ç´¢å¼•å·
- * @return {ZDB_BLK*} NULL: æœªæ‰¾åˆ°; !NULL: ZDB_BLK->dat ä¸ºç”¨æˆ·æ•°æ®çš„åœ°å€,
- *  å…¶ä¸­ ZDB_BLK å¯¹è±¡å¯ä»¥ç”¨ acl_myfree()/1 è¿›è¡Œé‡Šæ”¾
- * æ³¨æ„:
- *  å½“ size æŒ‡é’ˆåœ°å€éç©ºæ—¶ï¼Œè°ƒç”¨è€…çš„ç±»å‹å¿…é¡»æ˜¯ size_t ç±»å‹è€Œé int ç±»å‹ï¼Œå› ä¸ºåœ¨
- *  64ä½æœºä¸Š size_t ä¸º8ä¸ªå­—èŠ‚é•¿åº¦ï¼Œè€Œ int ä¸º4ä¸ªå­—èŠ‚é•¿åº¦ï¼Œå†…éƒ¨åœ¨å¯¹ size åœ°å€èµ‹å€¼
- *  æ—¶ï¼Œç¼–è¯‘å™¨ä¼šè‡ªåŠ¨æŒ‰ size_t çš„çœŸå®ç©ºé—´é•¿åº¦èµ‹å€¼ï¼Œå¦‚æœè°ƒç”¨è€…çš„ size ä¸º int ç±»å‹ï¼Œ
- *  åˆ™å°±ä¼šå‡ºç°ç©ºé—´è¶ŠåŠç°è±¡ï¼Œä»è€Œä¼šä½¿æ•´ä¸ªç¨‹åºå‡ºç°è«åå…¶å¦™çš„é—®é¢˜ï¼Œå¹¶ä¸”ç”¨ valgrind
- *  ä¹ŸæŸ¥ä¸å‡ºè¿™ä¸ªé”™è¯¯æ¥!
+ * ÔÚ ZDB Êı¾İ¿âÖĞ²éÕÒÏàÓ¦¼üÖµµÄÊı¾İ
+ * @param db {ZDB*} ZDB Êı¾İ¿â¾ä±ú
+ * @param key {zdb_key_t} ¼üÖµ
+ * @param size {size_t*} Èô´ËÖ¸Õë·Ç¿ÕÇÒ²éÑ¯½á¹ûÒ²·Ç¿ÕÔò´æ´¢²éÑ¯½á¹ûµÄÊı¾İ³¤¶È,
+ *  ¼´ÊÇ ZDB_BLK.dat ÖĞ´æ´¢Êı¾İµÄ³¤¶È
+ * @param blk_off_buf {ZDB_BLK_OFF*} Èô·Ç¿ÕÔò´æ´¢Ëù²éÖµµÄÆ«ÒÆÎ»ÖÃË÷ÒıºÅ
+ * @return {ZDB_BLK*} NULL: Î´ÕÒµ½; !NULL: ZDB_BLK->dat ÎªÓÃ»§Êı¾İµÄµØÖ·,
+ *  ÆäÖĞ ZDB_BLK ¶ÔÏó¿ÉÒÔÓÃ acl_myfree()/1 ½øĞĞÊÍ·Å
+ * ×¢Òâ:
+ *  µ± size Ö¸ÕëµØÖ··Ç¿ÕÊ±£¬µ÷ÓÃÕßµÄÀàĞÍ±ØĞëÊÇ size_t ÀàĞÍ¶ø·Ç int ÀàĞÍ£¬ÒòÎªÔÚ
+ *  64Î»»úÉÏ size_t Îª8¸ö×Ö½Ú³¤¶È£¬¶ø int Îª4¸ö×Ö½Ú³¤¶È£¬ÄÚ²¿ÔÚ¶Ô size µØÖ·¸³Öµ
+ *  Ê±£¬±àÒëÆ÷»á×Ô¶¯°´ size_t µÄÕæÊµ¿Õ¼ä³¤¶È¸³Öµ£¬Èç¹ûµ÷ÓÃÕßµÄ size Îª int ÀàĞÍ£¬
+ *  Ôò¾Í»á³öÏÖ¿Õ¼äÔ½°ìÏÖÏó£¬´Ó¶ø»áÊ¹Õû¸ö³ÌĞò³öÏÖÄªÃûÆäÃîµÄÎÊÌâ£¬²¢ÇÒÓÃ valgrind
+ *  Ò²²é²»³öÕâ¸ö´íÎóÀ´!
  */
 ACL_API ZDB_BLK *zdb_lookup(ZDB *db, zdb_key_t key, size_t *size, ZDB_BLK_OFF *blk_off_buf);
 
 /**
- * ä» ZDB_BLK ä¸­å–å¾—ç”¨æˆ·æ•°æ®
+ * ´Ó ZDB_BLK ÖĞÈ¡µÃÓÃ»§Êı¾İ
  * @param b {ZDB_BLK*}
  * @return {void*}
  */
 #define	zdb_blk_data(b)	((b)->dat)
 
 /**
- * é‡Šæ”¾ç”± zdb_lookup()/3 è¿”å›çš„æ•°æ®ç©ºé—´
+ * ÊÍ·ÅÓÉ zdb_lookup()/3 ·µ»ØµÄÊı¾İ¿Õ¼ä
  * @param b {ZDB_BLK*}
  */
 #define	zdb_blk_free(b)	acl_myfree((b))
 
 /**
- * æ·»åŠ æˆ–æ›´æ–° ZDB æ•°æ®åº“ä¸­çš„æ•°æ®
- * @param db {ZDB*} ZDB æ•°æ®åº“å¥æŸ„
- * @param key {zdb_key_t} é”®å€¼
- * @param blk_off_saved {const ZDB_BLK_OFF*} ä¸Šæ¬¡è°ƒç”¨ zdb_lookup()/4 æ—¶çš„è¿”å›ç»“æœ,
- *  ä»è€Œé€šè¿‡é‡å¤åˆ©ç”¨æŸ¥è¯¢ç»“æœæ¥æé«˜æ•ˆç‡, å¦‚æœåœ¨è°ƒç”¨ zdb_lookup()/4 æ—¶è¿”å›ç»“æœä¸ºç©º,
- *  åˆ™è°ƒç”¨ zdb_update()/5 æ—¶å¿…é¡»å°†æ­¤å€¼ç½® NULL
- * @param dat {const void*} é”® key æ‰€å¯¹åº”çš„æ•°æ®åœ°å€
- * @param len {size_t} dat æ•°æ®é•¿åº¦
- * @return {int} 0: æœªæ›´æ–°æˆ–æ·»åŠ ; -1: å‡ºé”™; 1: æˆåŠŸ
+ * Ìí¼Ó»ò¸üĞÂ ZDB Êı¾İ¿âÖĞµÄÊı¾İ
+ * @param db {ZDB*} ZDB Êı¾İ¿â¾ä±ú
+ * @param key {zdb_key_t} ¼üÖµ
+ * @param blk_off_saved {const ZDB_BLK_OFF*} ÉÏ´Îµ÷ÓÃ zdb_lookup()/4 Ê±µÄ·µ»Ø½á¹û,
+ *  ´Ó¶øÍ¨¹ıÖØ¸´ÀûÓÃ²éÑ¯½á¹ûÀ´Ìá¸ßĞ§ÂÊ, Èç¹ûÔÚµ÷ÓÃ zdb_lookup()/4 Ê±·µ»Ø½á¹ûÎª¿Õ,
+ *  Ôòµ÷ÓÃ zdb_update()/5 Ê±±ØĞë½«´ËÖµÖÃ NULL
+ * @param dat {const void*} ¼ü key Ëù¶ÔÓ¦µÄÊı¾İµØÖ·
+ * @param len {size_t} dat Êı¾İ³¤¶È
+ * @return {int} 0: Î´¸üĞÂ»òÌí¼Ó; -1: ³ö´í; 1: ³É¹¦
  */
 ACL_API int zdb_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off_saved,
 	const void *dat, size_t len);
@@ -332,36 +332,36 @@ ACL_API int zdb_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off_saved,
 /*--------------------------------- in zdb_key.c -----------------------------*/
 
 /**
- * åŒæ­¥é”®å­˜å‚¨å¤´è‡³ç£ç›˜
- * @param store {ZDB_KEY_STORE*} å€¼å­˜å‚¨å¥æŸ„
+ * Í¬²½¼ü´æ´¢Í·ÖÁ´ÅÅÌ
+ * @param store {ZDB_KEY_STORE*} Öµ´æ´¢¾ä±ú
  * @return {int} -1: error, > 0 ok
  */
 ACL_API int key_store_header_sync(ZDB_KEY_STORE *store);
 
 /**
- * æ ¹æ®é”®å€¼æ‰“å¼€é”®å­˜å‚¨
+ * ¸ù¾İ¼üÖµ´ò¿ª¼ü´æ´¢
  * @param db {ZDB*}
- * @param key {zdb_key_t} é”®å€¼
+ * @param key {zdb_key_t} ¼üÖµ
  * @return {ZDB_KEY_STORE*} !NULL: ok; NULL: error
  */
 ACL_API ZDB_KEY_STORE *zdb_key_store_open(ZDB *db, zdb_key_t key);
 
 /**
- * æ ¹æ®æ–‡ä»¶åæ‰“å¼€é”®å­˜å‚¨
+ * ¸ù¾İÎÄ¼şÃû´ò¿ª¼ü´æ´¢
  * @param db {ZDB*}
- * @param filepath {const char*} æ–‡ä»¶å
+ * @param filepath {const char*} ÎÄ¼şÃû
  * @return {ZDB_KEY_STORE*} !NULL: ok; NULL: error
  */
 ACL_API ZDB_KEY_STORE *zdb_key_store_open2(ZDB *db, const char *filepath);
 
 /**
- * å…³é—­é”®å­˜å‚¨
- * @param store {ZDB_KEY_STORE*} é”®å­˜å‚¨å¥æŸ„
+ * ¹Ø±Õ¼ü´æ´¢
+ * @param store {ZDB_KEY_STORE*} ¼ü´æ´¢¾ä±ú
  */
 ACL_API void zdb_key_store_close(ZDB_KEY_STORE *store);
 
 /**
- * è®¾ç½®é”®å­˜å‚¨ä¸­é”®ä½ç½®çš„å€¼ä½ç½®å€¼
+ * ÉèÖÃ¼ü´æ´¢ÖĞ¼üÎ»ÖÃµÄÖµÎ»ÖÃÖµ
  * @param db {ZDB*}
  * @param key {zdb_key_t}
  * @param blk_off {const ZDB_BLK_OFF*}
@@ -370,117 +370,117 @@ ACL_API void zdb_key_store_close(ZDB_KEY_STORE *store);
 ACL_API int zdb_key_set(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off);
 
 /**
- * æ ¹æ®é”®å€¼ä»é”®å­˜å‚¨ä¸­å–å¾—è¯¥é”®æ‰€å¯¹åº”çš„æ•°æ®ç´¢å¼•ä½ç½®
+ * ¸ù¾İ¼üÖµ´Ó¼ü´æ´¢ÖĞÈ¡µÃ¸Ã¼üËù¶ÔÓ¦µÄÊı¾İË÷ÒıÎ»ÖÃ
  * @param db {ZDB*}
- * @param key {zdb_key_t} é”®å€¼
- * @param blk_off {ZDB_BLK_OFF*} å­˜å‚¨ç»“æœçš„å¯¹è±¡
- * @return {int} 1: è¡¨ç¤ºæŸ¥åˆ°, 0: è¡¨ç¤ºæœªæŸ¥åˆ°, -1: è¡¨ç¤ºå‡ºé”™
+ * @param key {zdb_key_t} ¼üÖµ
+ * @param blk_off {ZDB_BLK_OFF*} ´æ´¢½á¹ûµÄ¶ÔÏó
+ * @return {int} 1: ±íÊ¾²éµ½, 0: ±íÊ¾Î´²éµ½, -1: ±íÊ¾³ö´í
  */
 ACL_API int zdb_key_get(ZDB *db, zdb_key_t key, ZDB_BLK_OFF *blk_off);
 
 /**
- * æŸ¥è¯¢é”®å­˜å‚¨å¤´çš„çŠ¶æ€
+ * ²éÑ¯¼ü´æ´¢Í·µÄ×´Ì¬
  * @param db {ZDB*}
- * @param filepath {const char*} é”®å­˜å‚¨æ–‡ä»¶å…¨è·¯å¾„
- * @param key_hdr {ZDB_KEY_HDR*} ç”¨æ¥å­˜æ”¾é”®å­˜å‚¨å¤´ä¿¡æ¯çš„å†…å­˜åœ°å€
+ * @param filepath {const char*} ¼ü´æ´¢ÎÄ¼şÈ«Â·¾¶
+ * @param key_hdr {ZDB_KEY_HDR*} ÓÃÀ´´æ·Å¼ü´æ´¢Í·ĞÅÏ¢µÄÄÚ´æµØÖ·
  * @return {int} 0: ok; -1: error
  */
 ACL_API int zdb_key_status(ZDB *db, const char *filepath, ZDB_KEY_HDR *key_hdr);
 
 /**
- * éå†é”®å­˜å‚¨ä¸­çš„é”®çš„çŠ¶æ€
+ * ±éÀú¼ü´æ´¢ÖĞµÄ¼üµÄ×´Ì¬
  * @param db {ZDB*}
- * @param filepath {const char*} é”®å­˜å‚¨æ–‡ä»¶å…¨è·¯å¾„
- * @param key_hdr {ZDB_KEY_HDR*} è‹¥éç©ºåˆ™ç”¨æ¥å­˜æ”¾é”®å­˜å‚¨å¤´ä¿¡æ¯çš„å†…å­˜åœ°å€
+ * @param filepath {const char*} ¼ü´æ´¢ÎÄ¼şÈ«Â·¾¶
+ * @param key_hdr {ZDB_KEY_HDR*} Èô·Ç¿ÕÔòÓÃÀ´´æ·Å¼ü´æ´¢Í·ĞÅÏ¢µÄÄÚ´æµØÖ·
  * @return {int} 0: ok; -1: error
  */
 ACL_API int zdb_key_check3(ZDB *db, const char *filepath, ZDB_KEY_HDR *key_hdr);
 ACL_API int zdb_key_check(ZDB_KEY_STORE *store, ZDB_KEY_HDR *key_hdr);
 
 /**
- * åˆå§‹åŒ–é”®å­˜å‚¨
+ * ³õÊ¼»¯¼ü´æ´¢
  * @param db {ZDB*}
- * @param key_begin {zdb_key_t} èµ·å§‹é”®å€¼
- * @param key_end {zdb_key_t} ç»“æŸé”®å€¼
+ * @param key_begin {zdb_key_t} ÆğÊ¼¼üÖµ
+ * @param key_end {zdb_key_t} ½áÊø¼üÖµ
  * @return {int} 0: ok; -1: error
  */
 ACL_API int zdb_key_init(ZDB *db, zdb_key_t key_begin, zdb_key_t key_end);
 /*--------------------------------- in zdb_dat.c -----------------------------*/
 
 /**
- * åŒæ­¥å€¼å­˜å‚¨å¤´è‡³ç£ç›˜
- * @param store {ZDB_DAT_STORE*} å€¼å­˜å‚¨å¥æŸ„
+ * Í¬²½Öµ´æ´¢Í·ÖÁ´ÅÅÌ
+ * @param store {ZDB_DAT_STORE*} Öµ´æ´¢¾ä±ú
  * @return {int} -1: error, > 0 ok
  */
 ACL_API int dat_store_header_sync(ZDB_DAT_STORE *store);
 
 /**
- * å…³é—­å€¼å­˜å‚¨
- * @param store {ZDB_DAT_STORE*} å€¼å­˜å‚¨å¥æŸ„
+ * ¹Ø±ÕÖµ´æ´¢
+ * @param store {ZDB_DAT_STORE*} Öµ´æ´¢¾ä±ú
  */
 ACL_API void zdb_dat_store_close(ZDB_DAT_STORE *store);
 
 /**
- * æ‰“å¼€æˆ–åˆ›å»ºå€¼å­˜å‚¨
- * @param filepath {const char*} å€¼å­˜å‚¨æ–‡ä»¶å…¨è·¯å¾„
+ * ´ò¿ª»ò´´½¨Öµ´æ´¢
+ * @param filepath {const char*} Öµ´æ´¢ÎÄ¼şÈ«Â·¾¶
  * @return {ZDB_DAT_STORE*} !NULL: ok; NULL: error
  */
 ACL_API ZDB_DAT_STORE *zdb_dat_store_open(ZDB *db, const char *filepath);
 
 /**
- * ä»å€¼å­˜å‚¨ä¸­å–å¾—å¯¹åº”çš„æ•°æ®
+ * ´ÓÖµ´æ´¢ÖĞÈ¡µÃ¶ÔÓ¦µÄÊı¾İ
  * @param db {ZDB*}
  * @param blk_off {const ZDB_BLK_OFF*}
- * @param key {zdb_key_t*} å­˜å‚¨é”®çš„å€¼
- * @param size {size_t*} å­˜å‚¨æ•°æ®çš„é•¿åº¦
- * @return {void*} æ•°æ®åœ°å€ï¼Œè‹¥æ‰¾åˆ°åˆ™ä¸ä¸ºç©ºï¼Œæ‰¾ä¸åˆ°æˆ–å‡ºé”™åˆ™ä¸ºç©º, è‹¥ä¸ä¸ºç©º,
- *  åˆ™éœ€è¦ç”¨ zdb_blk_free()/1 è¿›è¡Œé‡Šæ”¾
- * æ³¨æ„:
- *  å½“ size æŒ‡é’ˆåœ°å€éç©ºæ—¶ï¼Œè°ƒç”¨è€…çš„ç±»å‹å¿…é¡»æ˜¯ size_t ç±»å‹è€Œé int ç±»å‹ï¼Œå› ä¸ºåœ¨
- *  64ä½æœºä¸Š size_t ä¸º8ä¸ªå­—èŠ‚é•¿åº¦ï¼Œè€Œ int ä¸º4ä¸ªå­—èŠ‚é•¿åº¦ï¼Œå†…éƒ¨åœ¨å¯¹ size åœ°å€èµ‹å€¼
- *  æ—¶ï¼Œç¼–è¯‘å™¨ä¼šè‡ªåŠ¨æŒ‰ size_t çš„çœŸå®ç©ºé—´é•¿åº¦èµ‹å€¼ï¼Œå¦‚æœè°ƒç”¨è€…çš„ size ä¸º int ç±»å‹ï¼Œ
- *  åˆ™å°±ä¼šå‡ºç°ç©ºé—´è¶ŠåŠç°è±¡ï¼Œä»è€Œä¼šä½¿æ•´ä¸ªç¨‹åºå‡ºç°è«åå…¶å¦™çš„é—®é¢˜ï¼Œå¹¶ä¸”ç”¨ valgrind
- *  ä¹ŸæŸ¥ä¸å‡ºè¿™ä¸ªé”™è¯¯æ¥!
+ * @param key {zdb_key_t*} ´æ´¢¼üµÄÖµ
+ * @param size {size_t*} ´æ´¢Êı¾İµÄ³¤¶È
+ * @return {void*} Êı¾İµØÖ·£¬ÈôÕÒµ½Ôò²»Îª¿Õ£¬ÕÒ²»µ½»ò³ö´íÔòÎª¿Õ, Èô²»Îª¿Õ,
+ *  ÔòĞèÒªÓÃ zdb_blk_free()/1 ½øĞĞÊÍ·Å
+ * ×¢Òâ:
+ *  µ± size Ö¸ÕëµØÖ··Ç¿ÕÊ±£¬µ÷ÓÃÕßµÄÀàĞÍ±ØĞëÊÇ size_t ÀàĞÍ¶ø·Ç int ÀàĞÍ£¬ÒòÎªÔÚ
+ *  64Î»»úÉÏ size_t Îª8¸ö×Ö½Ú³¤¶È£¬¶ø int Îª4¸ö×Ö½Ú³¤¶È£¬ÄÚ²¿ÔÚ¶Ô size µØÖ·¸³Öµ
+ *  Ê±£¬±àÒëÆ÷»á×Ô¶¯°´ size_t µÄÕæÊµ¿Õ¼ä³¤¶È¸³Öµ£¬Èç¹ûµ÷ÓÃÕßµÄ size Îª int ÀàĞÍ£¬
+ *  Ôò¾Í»á³öÏÖ¿Õ¼äÔ½°ìÏÖÏó£¬´Ó¶ø»áÊ¹Õû¸ö³ÌĞò³öÏÖÄªÃûÆäÃîµÄÎÊÌâ£¬²¢ÇÒÓÃ valgrind
+ *  Ò²²é²»³öÕâ¸ö´íÎóÀ´!
  */
 ACL_API ZDB_BLK *zdb_dat_get(ZDB *db, const ZDB_BLK_OFF *blk_off,
 	zdb_key_t *key, size_t *size);
 
 /**
- * å‘å€¼å­˜å‚¨ä¸­æ·»åŠ æ–°æ•°æ®
+ * ÏòÖµ´æ´¢ÖĞÌí¼ÓĞÂÊı¾İ
  * @param db {ZDB*}
- * @param key {zdb_key_t} é”®å€¼
- * @param dat {const void*} æ•°æ®åœ°å€
- * @param len {size_t} dat æ•°æ®é•¿åº¦
- * @return {int} 0: æ•°æ®æ²¡æœ‰æ›´æ–°; 1: æ•°æ®æ›´æ–°; -1: å‡ºé”™
+ * @param key {zdb_key_t} ¼üÖµ
+ * @param dat {const void*} Êı¾İµØÖ·
+ * @param len {size_t} dat Êı¾İ³¤¶È
+ * @return {int} 0: Êı¾İÃ»ÓĞ¸üĞÂ; 1: Êı¾İ¸üĞÂ; -1: ³ö´í
  */
 ACL_API int zdb_dat_add(ZDB *db, zdb_key_t key, const void *dat, int len);
 
 /**
- * æ›´æ–°å€¼å­˜å‚¨ä¸­çš„æ•°æ®ä¿¡æ¯
+ * ¸üĞÂÖµ´æ´¢ÖĞµÄÊı¾İĞÅÏ¢
  * @param db {ZDB*}
- * @param key {zdb_key_t} é”®
- * @param blk_off {const ZDB_BLK_OFF*} å­˜å‚¨äºé”®å­˜å‚¨ä¸­ç›¸åº”å€¼çš„ä½ç½®ä¿¡æ¯
- * @param dat {const void*} æ•°æ®åœ°å€
- * @param len {size_t} dat æ•°æ®é•¿åº¦
- * @return {int} 0: æ•°æ®æ²¡æœ‰æ›´æ–°; 1: æ•°æ®æ›´æ–°; -1: å‡ºé”™
+ * @param key {zdb_key_t} ¼ü
+ * @param blk_off {const ZDB_BLK_OFF*} ´æ´¢ÓÚ¼ü´æ´¢ÖĞÏàÓ¦ÖµµÄÎ»ÖÃĞÅÏ¢
+ * @param dat {const void*} Êı¾İµØÖ·
+ * @param len {size_t} dat Êı¾İ³¤¶È
+ * @return {int} 0: Êı¾İÃ»ÓĞ¸üĞÂ; 1: Êı¾İ¸üĞÂ; -1: ³ö´í
  */
 ACL_API int zdb_dat_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off,
 	const void *dat, size_t len);
 
 /**
- * è¯»å–å€¼å­˜å‚¨çš„å¤´ä¿¡æ¯
+ * ¶ÁÈ¡Öµ´æ´¢µÄÍ·ĞÅÏ¢
  * @param db {ZDB*}
- * @param filepath {const char*} å€¼å­˜å‚¨æ–‡ä»¶å
- * @param dat_hdr {ZDB_DAT_HDR*} å­˜å‚¨ç»“æœ
+ * @param filepath {const char*} Öµ´æ´¢ÎÄ¼şÃû
+ * @param dat_hdr {ZDB_DAT_HDR*} ´æ´¢½á¹û
  * @retur {int} 0: ok; -1: error
  */
 ACL_API int zdb_dat_stat(ZDB *db, const char *filepath, ZDB_DAT_HDR *dat_hdr);
 
 /**
- * æ£€æŸ¥å€¼å­˜å‚¨ä¸­çš„æ•°æ®å—çš„æ­£ç¡®æ€§
+ * ¼ì²éÖµ´æ´¢ÖĞµÄÊı¾İ¿éµÄÕıÈ·ĞÔ
  * @param db {ZDB*}
- * @param filepath {const char*} å€¼å­˜å‚¨æ–‡ä»¶å
- * @param dat_hdr {ZDB_DAT_HDR*} è‹¥éç©ºåˆ™å­˜å‚¨å€¼å­˜å‚¨å¤´ä¿¡æ¯
+ * @param filepath {const char*} Öµ´æ´¢ÎÄ¼şÃû
+ * @param dat_hdr {ZDB_DAT_HDR*} Èô·Ç¿ÕÔò´æ´¢Öµ´æ´¢Í·ĞÅÏ¢
  * @return {int} 0: ok; -1: error
  */
 ACL_API int zdb_dat_check3(ZDB *db, const char *filepath, ZDB_DAT_HDR *dat_hdr);
@@ -496,10 +496,10 @@ ACL_API int zdb_dat_walk(ZDB *db, int (*walk_fn)(ZDB_DAT_STORE *store));
 
 /*--------------------   in zdb_dat_iter.c -----------------------------------*/
 /**
- * è®¾ç½®å€¼å­˜å‚¨çš„è¿­ä»£å™¨
+ * ÉèÖÃÖµ´æ´¢µÄµü´úÆ÷
  * @param store {ZDB_DAT_STORE*}
- * @param read_data {int} æ˜¯å¦éœ€è¦è¯»å–æ•°æ®å—ä¸­çš„æ•°æ®éƒ¨åˆ†, !0: è¡¨ç¤ºè¯»å–æ•°æ®å—ä¸­çš„
- *  æ•°æ®éƒ¨åˆ†; 0: ä»…è¯»å–æ•°æ®å—ä¸­çš„å¤´
+ * @param read_data {int} ÊÇ·ñĞèÒª¶ÁÈ¡Êı¾İ¿éÖĞµÄÊı¾İ²¿·Ö, !0: ±íÊ¾¶ÁÈ¡Êı¾İ¿éÖĞµÄ
+ *  Êı¾İ²¿·Ö; 0: ½ö¶ÁÈ¡Êı¾İ¿éÖĞµÄÍ·
  */
 ACL_API void zdb_dat_iter_set(ZDB_DAT_STORE *store, int read_data);
 

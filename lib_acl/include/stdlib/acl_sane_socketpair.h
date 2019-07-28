@@ -1,4 +1,4 @@
-﻿#ifndef ACL_SANE_SOCKETPAIR_H
+#ifndef ACL_SANE_SOCKETPAIR_H
 #define ACL_SANE_SOCKETPAIR_H
 
 #ifdef  __cplusplus

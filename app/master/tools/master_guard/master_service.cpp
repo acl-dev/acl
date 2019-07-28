@@ -1,11 +1,11 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include <signal.h>
 #include "ipc_monitor.h"
 #include "action/service_list.h"
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 char *var_cfg_guard_manager;
 char *var_cfg_master_ctld;

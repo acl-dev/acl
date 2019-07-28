@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "service.h"
 
 void service_free(SERVICE *service)
@@ -19,7 +19,7 @@ SERVICE *service_alloc(const char *service_name, size_t size)
 		acl_msg_fatal("%s(%d): size(%d) invalid",
 			myname, __LINE__, size);
 	service = (SERVICE *) acl_mycalloc(1, size);
-	/* è®¾ç½®æœåŠ¡åç§° */
+	/* ÉèÖÃ·şÎñÃû³Æ */
 	ACL_SAFE_STRNCPY(service->name, service_name, sizeof(service->name));
 	return (service);
 }
@@ -32,20 +32,20 @@ void service_set_dns(SERVICE *service, ACL_AIO *aio,
 	ACL_ARGV *argv;
 	ACL_ITER iter;
 
-	/* åˆ›å»ºDNSåŸŸåæŸ¥è¯¢å¯¹è±¡ï¼šå¤–æŒ‚å¼æŸ¥è¯¢æˆ–éé˜»å¡å¼æŸ¥è¯¢ */
+	/* ´´½¨DNSÓòÃû²éÑ¯¶ÔÏó£ºÍâ¹ÒÊ½²éÑ¯»ò·Ç×èÈûÊ½²éÑ¯ */
 
 	if (!dns_list || !strcmp(dns_list, "")) {
 		int nthreads = 100, idle = 60;
 
-		/* åˆ›å»ºå¤–æŒ‚å¼DNSæŸ¥è¯¢å¯¹è±¡ */
+		/* ´´½¨Íâ¹ÒÊ½DNS²éÑ¯¶ÔÏó */
 		service->dns_server = dns_server_create(aio, 300);
 		service->dns_table = acl_htable_create(100, 0);
-		/* åˆ›å»ºåŠé©»ç•™çº¿ç¨‹æ± å¯¹è±¡ */
+		/* ´´½¨°ë×¤ÁôÏß³Ì³Ø¶ÔÏó */
 		service->wq = acl_thread_pool_create(nthreads, idle);
 		return;
 	}
 
-	/* é‡‡ç”¨ç›´æ¥å‘é€DNSåè®®æ–¹å¼è¿›è¡ŒæŸ¥è¯¢çš„å¯¹è±¡ */
+	/* ²ÉÓÃÖ±½Ó·¢ËÍDNSĞ­Òé·½Ê½½øĞĞ²éÑ¯µÄ¶ÔÏó */
 
 	argv = acl_argv_split(dns_list, ",; \t");
 
@@ -53,7 +53,7 @@ void service_set_dns(SERVICE *service, ACL_AIO *aio,
 	if (dns_cache_limit > 0)
 		acl_dns_open_cache(service->dns_handle, dns_cache_limit);
 
-	/* æ·»åŠ DNSæœåŠ¡å™¨åœ°å€ */
+	/* Ìí¼ÓDNS·şÎñÆ÷µØÖ· */
 
 	acl_foreach(iter, argv) {
 		char *addr = (char*) iter.data;
@@ -82,7 +82,7 @@ void service_set_dns(SERVICE *service, ACL_AIO *aio,
 
 	acl_argv_free(argv);
 
-	/* æ·»åŠ  hosts ä¸­çš„é™æ€é…ç½®åŸŸå */
+	/* Ìí¼Ó hosts ÖĞµÄ¾²Ì¬ÅäÖÃÓòÃû */
 	if (hosts_list && *hosts_list)
 		dns_hosts_load(service->dns_handle, hosts_list);
 }

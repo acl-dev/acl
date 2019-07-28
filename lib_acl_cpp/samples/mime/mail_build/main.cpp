@@ -1,4 +1,4 @@
-ï»¿#include <string>
+#include <string>
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 #include <vector>
@@ -10,13 +10,13 @@ static void build_html(void)
 	message.set_from("zsxxsz@263.net")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>")
-//		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>; <zsx3@sina.com>")
-//		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼")
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>")
+//		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>; <zsx3@sina.com>")
+//		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡")
 		.add_header("X-Forward-For", "<zsx@263.net>");
 
-	const char* html = "<html><body><B><font color='red'>ä¸­å›½äººæ°‘é“¶è¡Œ HTML æ ¼å¼</font></B></body></html>";
+	const char* html = "<html><body><B><font color='red'>ÖĞ¹úÈËÃñÒøĞĞ HTML ¸ñÊ½</font></B></body></html>";
 	acl::mail_body body("gbk");
 	body.set_html(html, strlen(html));
 	message.set_body(body);
@@ -35,11 +35,11 @@ static void build_plain(void)
 	message.set_from("zsxxsz@263.net")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
-	const char* plain = "ä¸­å›½äººæ°‘é“¶è¡Œ TEXT æ ¼å¼";
+	const char* plain = "ÖĞ¹úÈËÃñÒøĞĞ TEXT ¸ñÊ½";
 	acl::mail_body body("gbk");
 	body.set_plain(plain, strlen(plain));
 	message.set_body(body);
@@ -55,17 +55,17 @@ static void build_alternative(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 	message.add_attachment("main.cpp", "text/plain")
 		.add_attachment("Makefile", "text/plain");
 
-	const char* plain = "ä¸­å›½äººæ°‘é“¶è¡Œ TEXT æ ¼å¼";
-	const char* html = "<html><body><B><font color='red'>ä¸­å›½äººæ°‘é“¶è¡Œ HTML æ ¼å¼</font></B></body></html>";
+	const char* plain = "ÖĞ¹úÈËÃñÒøĞĞ TEXT ¸ñÊ½";
+	const char* html = "<html><body><B><font color='red'>ÖĞ¹úÈËÃñÒøĞĞ HTML ¸ñÊ½</font></B></body></html>";
 	acl::mail_body body("gbk");
 	body.set_alternative(html, strlen(html), plain, strlen(plain));
 	message.set_body(body);
@@ -81,12 +81,12 @@ static void build_relative(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
 	const char* plain_file = "./var/plain.txt";
 	const char* html_file = "./var/html.txt";
@@ -191,12 +191,12 @@ static void build_relative(void)
 	else
 		printf("compose %s ok\r\n", filepath);
 
-	// è°ƒç”¨æ‰€æœ‰åŠ¨æ€å¯¹è±¡çš„ææ„å‡½æ•°
+	// µ÷ÓÃËùÓĞ¶¯Ì¬¶ÔÏóµÄÎö¹¹º¯Êı
 	std::vector<acl::mail_attach*>::iterator it = attachments.begin();
 	for (; it != attachments.end(); ++it)
 		(*it)->~mail_attach();
 
-	// ä¸€æ¬¡æ€§é‡Šæ”¾å‰é¢åŠ¨æ€åˆ†é…çš„å†…å­˜
+	// Ò»´ÎĞÔÊÍ·ÅÇ°Ãæ¶¯Ì¬·ÖÅäµÄÄÚ´æ
 	dbuf->destroy();
 }
 
@@ -204,12 +204,12 @@ static void build_mixed_relative(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
 	message.add_attachment("main.cpp", "text/plain")
 		.add_attachment("Makefile", "text/plain");
@@ -317,12 +317,12 @@ static void build_mixed_relative(void)
 	else
 		printf("compose %s ok\r\n", filepath);
 
-	// è°ƒç”¨æ‰€æœ‰åŠ¨æ€å¯¹è±¡çš„ææ„å‡½æ•°
+	// µ÷ÓÃËùÓĞ¶¯Ì¬¶ÔÏóµÄÎö¹¹º¯Êı
 	std::vector<acl::mail_attach*>::iterator it = attachments.begin();
 	for (; it != attachments.end(); ++it)
 		(*it)->~mail_attach();
 
-	// ä¸€æ¬¡æ€§é‡Šæ”¾å‰é¢åŠ¨æ€åˆ†é…çš„å†…å­˜
+	// Ò»´ÎĞÔÊÍ·ÅÇ°Ãæ¶¯Ì¬·ÖÅäµÄÄÚ´æ
 	dbuf->destroy();
 }
 
@@ -330,12 +330,12 @@ static void build_mixed_relative2(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
 	message.add_attachment("main.cpp", "text/plain")
 		.add_attachment("var/email2/architecture.pptx", "application/ms-pptx");
@@ -381,12 +381,12 @@ static void build_mixed(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
 	message.add_attachment("main.cpp", "text/plain")
 		.add_attachment("var/email2/architecture.pptx", "application/ms-pptx");
@@ -402,12 +402,12 @@ static void build_mixed_html(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
 	message.add_attachment("main.cpp", "text/plain")
 		.add_attachment("var/email2/architecture.pptx", "application/ms-pptx");
@@ -437,12 +437,12 @@ static void build_mixed_plain(void)
 {
 	acl::mail_message message("gbk");
 
-	message.set_from("zsxxsz@263.net", "éƒ‘æ ‘æ–°")
+	message.set_from("zsxxsz@263.net", "Ö£Ê÷ĞÂ")
 		.set_sender("zsx1@263.net")
 		.set_reply_to("zsx2@263.net")
-		.add_to("\"éƒ‘æ ‘æ–°1\" <zsx1@sina.com>; \"éƒ‘æ ‘æ–°2\" <zsx2@sina.com>")
-		.add_cc("\"éƒ‘æ ‘æ–°3\" <zsx1@163.com>; \"éƒ‘æ ‘æ–°4\" <zsx2@163.com>")
-		.set_subject("ä¸»é¢˜ï¼šä¸­å›½äººæ°‘é“¶è¡Œï¼");
+		.add_to("\"Ö£Ê÷ĞÂ1\" <zsx1@sina.com>; \"Ö£Ê÷ĞÂ2\" <zsx2@sina.com>")
+		.add_cc("\"Ö£Ê÷ĞÂ3\" <zsx1@163.com>; \"Ö£Ê÷ĞÂ4\" <zsx2@163.com>")
+		.set_subject("Ö÷Ìâ£ºÖĞ¹úÈËÃñÒøĞĞ£¡");
 
 	message.add_attachment("main.cpp", "text/plain")
 		.add_attachment("var/email2/architecture.pptx", "application/ms-pptx");

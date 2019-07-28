@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 int http_forward(const char* addr, const char* cmd,
 	const acl::string& body, acl::string& out);

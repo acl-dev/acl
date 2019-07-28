@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
@@ -12,39 +12,39 @@ class ACL_CPP_API http_download : public noncopyable
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param url {const char*} æ–‡ä»¶åœ¨æœåŠ¡å™¨ä¸Šçš„ url åœ°å€
-	 * @param addr {const char*} éç©ºæ—¶ï¼Œè®¾ç½®æœåŠ¡å™¨åœ°å€(æ ¼å¼ä¸º:
-	 *  ip[|domain]:portï¼Œå¦åˆ™æœåŠ¡å™¨åœ°å€ä» url ä¸­æå–
+	 * ¹¹Ôìº¯Êı
+	 * @param url {const char*} ÎÄ¼şÔÚ·şÎñÆ÷ÉÏµÄ url µØÖ·
+	 * @param addr {const char*} ·Ç¿ÕÊ±£¬ÉèÖÃ·şÎñÆ÷µØÖ·(¸ñÊ½Îª:
+	 *  ip[|domain]:port£¬·ñÔò·şÎñÆ÷µØÖ·´Ó url ÖĞÌáÈ¡
 	 */
 	http_download(const char* url, const char* addr = NULL);
 	virtual ~http_download();
 
 	/**
-	 * åœ¨è°ƒç”¨ run ä¹‹å‰å¯ä»¥é€šè¿‡æœ¬å‡½æ•°è·å¾—è¯·æ±‚å¤´å¯¹è±¡ï¼Œä¾¿äºç”¨æˆ·è®¾ç½®
-	 * è‡ªå·±çš„è¯·æ±‚å¤´å­—æ®µ(ä½† set_method/set_range æ˜¯å†…éƒ¨è‡ªåŠ¨è®¾ç½®çš„)
-	 * @return {http_header*} è¿”å› NULL è¡¨ç¤ºè¾“å…¥çš„ URL éæ³•
+	 * ÔÚµ÷ÓÃ run Ö®Ç°¿ÉÒÔÍ¨¹ı±¾º¯Êı»ñµÃÇëÇóÍ·¶ÔÏó£¬±ãÓÚÓÃ»§ÉèÖÃ
+	 * ×Ô¼ºµÄÇëÇóÍ·×Ö¶Î(µ« set_method/set_range ÊÇÄÚ²¿×Ô¶¯ÉèÖÃµÄ)
+	 * @return {http_header*} ·µ»Ø NULL ±íÊ¾ÊäÈëµÄ URL ·Ç·¨
 	 */
 	http_header* request_header() const;
 
 	/**
-	 * è°ƒç”¨æ­¤å‡½æ•°å¯ä»¥è·å¾— http_request å¯¹è±¡ï¼Œä¾¿äºè®¾ç½®æˆ–æŸ¥è¯¢è¯·æ±‚å¤´
-	 * æˆ–è¿”å›æ•°æ®ä¸­çš„å‚æ•°
-	 * @return {http_request*} è¿”å› NULL è¡¨ç¤ºè¾“å…¥çš„ URL éæ³•
+	 * µ÷ÓÃ´Ëº¯Êı¿ÉÒÔ»ñµÃ http_request ¶ÔÏó£¬±ãÓÚÉèÖÃ»ò²éÑ¯ÇëÇóÍ·
+	 * »ò·µ»ØÊı¾İÖĞµÄ²ÎÊı
+	 * @return {http_request*} ·µ»Ø NULL ±íÊ¾ÊäÈëµÄ URL ·Ç·¨
 	 */
 	http_request* request() const;
 
 	/**
-	 * ä¸‹è½½æ–‡ä»¶ï¼Œå½“ range_from >= 0 ä¸” range_to >= range_from æ—¶è‡ªåŠ¨
-	 * é‡‡ç”¨åˆ†æ®µä¸‹è½½æ–¹å¼ï¼Œå¦åˆ™é‡‡ç”¨å…¨éƒ¨ä¸‹è½½æ–¹å¼
-	 * @param range_from {acl_int64} ä¸‹è½½èµ·å§‹åç§»ä½ç½®ï¼Œä¸‹æ ‡ä» 0 å¼€å§‹ï¼Œ
-	 *  å½“è¯¥å€¼ >= 0 ä¸” range_to >= æœ¬å€¼æ—¶æ‰é‡‡ç”¨åˆ†æ®µä¸‹è½½æ–¹å¼
-	 * @param range_to {acl_int64} ä¸‹è½½ç»“æŸåç§»ä½ç½®
-	 * @param req_body {const char*} è¯·æ±‚çš„æ•°æ®ä½“
-	 * @param len {size_t} req_body éç©ºæ—¶æŒ‡æ˜å…¶é•¿åº¦
-	 * @return {bool} ä¸‹è½½æ˜¯å¦æˆåŠŸï¼Œå¦‚æœè¿”å› true åˆ™è¡¨ç¤ºä¸‹è½½æˆåŠŸï¼Œå¦åˆ™
-	 *  å¯èƒ½æ˜¯è¾“å…¥å‚æ•°éæ³•ï¼Œæˆ– URL ä¸å­˜åœ¨ï¼Œæˆ–æœåŠ¡å™¨ä¸æ”¯æŒæ–­ç‚¹ä¼ è¾“ï¼Œæˆ–
-	 *  åœ¨ä¸‹è½½è¿‡ç¨‹ä¸­å­ç±»è¿”å› false ç¦æ­¢ç»§ç»­ä¸‹è½½
+	 * ÏÂÔØÎÄ¼ş£¬µ± range_from >= 0 ÇÒ range_to >= range_from Ê±×Ô¶¯
+	 * ²ÉÓÃ·Ö¶ÎÏÂÔØ·½Ê½£¬·ñÔò²ÉÓÃÈ«²¿ÏÂÔØ·½Ê½
+	 * @param range_from {acl_int64} ÏÂÔØÆğÊ¼Æ«ÒÆÎ»ÖÃ£¬ÏÂ±ê´Ó 0 ¿ªÊ¼£¬
+	 *  µ±¸ÃÖµ >= 0 ÇÒ range_to >= ±¾ÖµÊ±²Å²ÉÓÃ·Ö¶ÎÏÂÔØ·½Ê½
+	 * @param range_to {acl_int64} ÏÂÔØ½áÊøÆ«ÒÆÎ»ÖÃ
+	 * @param req_body {const char*} ÇëÇóµÄÊı¾İÌå
+	 * @param len {size_t} req_body ·Ç¿ÕÊ±Ö¸Ã÷Æä³¤¶È
+	 * @return {bool} ÏÂÔØÊÇ·ñ³É¹¦£¬Èç¹û·µ»Ø true Ôò±íÊ¾ÏÂÔØ³É¹¦£¬·ñÔò
+	 *  ¿ÉÄÜÊÇÊäÈë²ÎÊı·Ç·¨£¬»ò URL ²»´æÔÚ£¬»ò·şÎñÆ÷²»Ö§³Ö¶Ïµã´«Êä£¬»ò
+	 *  ÔÚÏÂÔØ¹ı³ÌÖĞ×ÓÀà·µ»Ø false ½ûÖ¹¼ÌĞøÏÂÔØ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool get(__int64 range_from = -1, __int64 range_to = -1,
@@ -55,40 +55,40 @@ public:
 #endif
 
 	/**
-	 * é‡ç½®å†…éƒ¨è¯·æ±‚çŠ¶æ€
-	 * @param url {const char*} éç©ºæ—¶åˆ™ç”¨æ­¤ URL æ›¿ä»£æ„é€ å‡½æ•°ä¸­è¾“å…¥çš„ URL,
-	 *  å¦åˆ™ä¾ç„¶ä½¿ç”¨æ„é€ å‡½æ•°ä¸­ä½¿ç”¨çš„ url
-	 * @param addr {const char*} éç©ºæ—¶ï¼Œè®¾ç½®æœåŠ¡å™¨åœ°å€(æ ¼å¼ä¸º:
-	 *  ip[|domain]:portï¼Œå¦åˆ™æœåŠ¡å™¨åœ°å€ä» url ä¸­æå–
-	 * @return {bool} è¿”å› false è¡¨ç¤º url éæ³•
+	 * ÖØÖÃÄÚ²¿ÇëÇó×´Ì¬
+	 * @param url {const char*} ·Ç¿ÕÊ±ÔòÓÃ´Ë URL Ìæ´ú¹¹Ôìº¯ÊıÖĞÊäÈëµÄ URL,
+	 *  ·ñÔòÒÀÈ»Ê¹ÓÃ¹¹Ôìº¯ÊıÖĞÊ¹ÓÃµÄ url
+	 * @param addr {const char*} ·Ç¿ÕÊ±£¬ÉèÖÃ·şÎñÆ÷µØÖ·(¸ñÊ½Îª:
+	 *  ip[|domain]:port£¬·ñÔò·şÎñÆ÷µØÖ·´Ó url ÖĞÌáÈ¡
+	 * @return {bool} ·µ»Ø false ±íÊ¾ url ·Ç·¨
 	 */
 	bool reset(const char* url = NULL, const char* addr = NULL);
 
 	/**
-	 * å–å¾—ç”±æ„é€ å‡½æ•°æˆ– reset å‡½æ•°è¾“å…¥çš„ url
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºè¾“å…¥çš„ url éæ³•
+	 * È¡µÃÓÉ¹¹Ôìº¯Êı»ò reset º¯ÊıÊäÈëµÄ url
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾ÊäÈëµÄ url ·Ç·¨
 	 */
 	const char* get_url() const;
 
 	/**
-	 * å–å¾—ç”±æ„é€ å‡½æ•°æˆ– reset å‡½æ•°è¾“å…¥çš„ url æ‰€å¾—åˆ°çš„æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ä¸ºï¼š
+	 * È¡µÃÓÉ¹¹Ôìº¯Êı»ò reset º¯ÊıÊäÈëµÄ url ËùµÃµ½µÄ·şÎñÆ÷µØÖ·£¬¸ñÊ½Îª£º
 	 * ip[|domain]:port
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºè¾“å…¥çš„ url éæ³•
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾ÊäÈëµÄ url ·Ç·¨
 	 */
 	const char* get_addr() const;
 
 protected:
 	/**
-	 * å½“å‘é€å®Œ HTTP è¯·æ±‚æ•°æ®åï¼Œè¯»åˆ° HTTP æœåŠ¡å™¨å“åº”å¤´åçš„å›è°ƒå‡½æ•°
+	 * µ±·¢ËÍÍê HTTP ÇëÇóÊı¾İºó£¬¶Áµ½ HTTP ·şÎñÆ÷ÏìÓ¦Í·ºóµÄ»Øµ÷º¯Êı
 	 * @param conn {http_client*}
-	 * @return {bool} è‹¥å­ç±»è¿”å› false åˆ™åœæ­¢ç»§ç»­ä¸‹è½½
+	 * @return {bool} Èô×ÓÀà·µ»Ø false ÔòÍ£Ö¹¼ÌĞøÏÂÔØ
 	 */
 	virtual bool on_response(http_client* conn);
 
 	/**
-	 * å½“å¾—åˆ°æœåŠ¡å™¨è¿”å›å®Œæ•´æ–‡ä»¶é•¿åº¦åçš„å›è°ƒå‡½æ•°
-	 * @param n {__int64} å®Œæ•´æ–‡ä»¶é•¿åº¦
-	 * @return {bool} è‹¥å­ç±»è¿”å› false åˆ™åœæ­¢ç»§ç»­ä¸‹è½½
+	 * µ±µÃµ½·şÎñÆ÷·µ»ØÍêÕûÎÄ¼ş³¤¶ÈºóµÄ»Øµ÷º¯Êı
+	 * @param n {__int64} ÍêÕûÎÄ¼ş³¤¶È
+	 * @return {bool} Èô×ÓÀà·µ»Ø false ÔòÍ£Ö¹¼ÌĞøÏÂÔØ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	virtual bool on_length(__int64 n);
@@ -97,10 +97,10 @@ protected:
 #endif
 
 	/**
-	 * ä¸‹è½½è¿‡ç¨‹ä¸­ï¼Œè¾¹ä¸‹è½½è¾¹é€šçŸ¥å­ç±»ä¸‹è½½çš„æ•°æ®åŠæ•°æ®é•¿åº¦
-	 * @param data {const void*} ä¸‹è½½çš„æ•°æ®åœ°å€
-	 * @param len {size_t} ä¸‹è½½çš„æ•°æ®é•¿åº¦
-	 * @return {bool} è‹¥å­ç±»è¿”å› false åˆ™åœæ­¢ç»§ç»­ä¸‹è½½
+	 * ÏÂÔØ¹ı³ÌÖĞ£¬±ßÏÂÔØ±ßÍ¨Öª×ÓÀàÏÂÔØµÄÊı¾İ¼°Êı¾İ³¤¶È
+	 * @param data {const void*} ÏÂÔØµÄÊı¾İµØÖ·
+	 * @param len {size_t} ÏÂÔØµÄÊı¾İ³¤¶È
+	 * @return {bool} Èô×ÓÀà·µ»Ø false ÔòÍ£Ö¹¼ÌĞøÏÂÔØ
 	 */
 	virtual bool on_save(const void* data, size_t len) = 0;
 
@@ -109,10 +109,10 @@ private:
 	char  addr_[128];
 	http_request* req_;
 
-	// ä»å¤´å¼€å§‹ä¸‹è½½æ•´ä¸ªæ–‡ä»¶
+	// ´ÓÍ·¿ªÊ¼ÏÂÔØÕû¸öÎÄ¼ş
 	bool save_total(const char* body, size_t len);
 
-	// æ–­ç‚¹ä¸‹è½½éƒ¨åˆ†æ–‡ä»¶
+	// ¶ÏµãÏÂÔØ²¿·ÖÎÄ¼ş
 #if defined(_WIN32) || defined(_WIN64)
 	bool save_range(const char* body, size_t len,
 		__int64 range_from, __int64 range_to);
@@ -121,7 +121,7 @@ private:
 		long long int range_from, long long int range_to);
 #endif
 
-	// å¼€å§‹ä¸‹è½½
+	// ¿ªÊ¼ÏÂÔØ
 	bool save(http_request* req);
 };
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/noncopyable.hpp"
@@ -17,112 +17,112 @@ public:
 	virtual ~stream(void) = 0;
 
 	/**
-	 * 调用本函数关闭流连接
-	 * @return {bool} true: 关闭成功; false: 关闭失败
+	 * ���ñ������ر�������
+	 * @return {bool} true: �رճɹ�; false: �ر�ʧ��
 	 */
 	bool close(void);
 
 	/**
-	* 判断流是否已经结束
-	* @return {bool} true: 流已经结束; false: 流未结束
+	* �ж����Ƿ��Ѿ�����
+	* @return {bool} true: ���Ѿ�����; false: ��δ����
 	*/
 	bool eof(void) const;
 
 	/**
-	 * 清除流结束标志位，即将 eof_ 标志位置为 false
+	 * �����������־λ������ eof_ ��־λ��Ϊ false
 	 */
 	void clear_eof(void);
 
 	/**
-	* 当前流是否处理打开状态
-	* @return {bool} true: 流已经打开; false: 流未打开
+	* ��ǰ���Ƿ�����״̬
+	* @return {bool} true: ���Ѿ���; false: ��δ��
 	*/
 	bool opened(void) const;
 
 	/**
-	 * 获得当前流的 ACL_VSTREAM 流对象
+	 * ��õ�ǰ���� ACL_VSTREAM ������
 	 * @return {ACL_VSTREAM*}
 	 */
 	ACL_VSTREAM* get_vstream(void) const;
 
 	/**
-	 * 解绑 ACL_VSTREAM 与流对象的绑定关系，同时将 ACL_VSTREAM 返回
-	 * 给用户，即将该 ACL_VSTREAM的管理权交给用户，本流对象在释放时
-	 * 不会关闭该 ACL_VSTREAM ，但用户接管该 ACL_VSTREAM 后用完后
-	 * 必须将其关闭；解绑后除了 close/open 的调用有意义外，其它的调用
-	 * (包括流对象读写在内)都无意义
-	 * @return {ACL_VSTREAM} 返回 NULL 表示流对象已经将 ACL_VSTREAM 解绑
+	 * ��� ACL_VSTREAM ��������İ󶨹�ϵ��ͬʱ�� ACL_VSTREAM ����
+	 * ���û��������� ACL_VSTREAM�Ĺ���Ȩ�����û��������������ͷ�ʱ
+	 * ����رո� ACL_VSTREAM �����û��ӹܸ� ACL_VSTREAM �������
+	 * ���뽫��رգ�������� close/open �ĵ����������⣬�����ĵ���
+	 * (�����������д����)��������
+	 * @return {ACL_VSTREAM} ���� NULL ��ʾ�������Ѿ��� ACL_VSTREAM ���
 	 */
 	ACL_VSTREAM* unbind(void);
 
 	/**
-	 * 设置流的绑定对象
+	 * �������İ󶨶���
 	 * @param ctx {void*}
-	 * @param key {const char* } 标识该 ctx 的键
-	 * @param replace {bool} 当对应的 KEY 存在时是否允许覆盖
-	 * @return {bool} 当 replace 为 false 且 key 已经存在时则返回 false
+	 * @param key {const char* } ��ʶ�� ctx �ļ�
+	 * @param replace {bool} ����Ӧ�� KEY ����ʱ�Ƿ���������
+	 * @return {bool} �� replace Ϊ false �� key �Ѿ�����ʱ�򷵻� false
 	 */
 	bool set_ctx(void* ctx, const char* key = NULL, bool replace = true);
 
 	/**
-	 * 获得与流绑定的对象
-	 * @param key {const char* key} 非空时使用该 key 查询对应的 ctx 对象，
-	 *  否则返回缺省的 ctx 对象
+	 * ��������󶨵Ķ���
+	 * @param key {const char* key} �ǿ�ʱʹ�ø� key ��ѯ��Ӧ�� ctx ����
+	 *  ���򷵻�ȱʡ�� ctx ����
 	 * @return {void*}
 	 */
 	void* get_ctx(const char* key = NULL) const;
 
 	/**
-	 * 删除流中绑定的对象
-	 * @param key {const char*} 非空时删除对应该 key 的 ctx 对象，否则删除
-	 *  缺省的 ctx 对象
-	 * @return {void*} 当对象不存在时返回 NULL，成功删除后返回该对象
+	 * ɾ�����а󶨵Ķ���
+	 * @param key {const char*} �ǿ�ʱɾ����Ӧ�� key �� ctx ���󣬷���ɾ��
+	 *  ȱʡ�� ctx ����
+	 * @return {void*} �����󲻴���ʱ���� NULL���ɹ�ɾ���󷵻ظö���
 	 */
 	void* del_ctx(const char* key = NULL);
 
 	/**
-	 * 设置流的读写超时时间
-	 * @param n {int} 超时时间(单位: 秒)，该值 > 0 则启用超时检测过程，否则将会
-	 *  一直阻塞直到可读或出错
+	 * �������Ķ�д��ʱʱ��
+	 * @param n {int} ��ʱʱ��(��λ: ��)����ֵ > 0 �����ó�ʱ�����̣����򽫻�
+	 *  һֱ����ֱ���ɶ������
 	 */
 	void set_rw_timeout(int n);
 
 	/**
-	 * 获得当前流的读写超时时间
-	 * @return {int} 获得流的读写超时时间(秒)
+	 * ��õ�ǰ���Ķ�д��ʱʱ��
+	 * @return {int} ������Ķ�д��ʱʱ��(��)
 	 */
 	int get_rw_timeout(void) const;
 
 	/**
-	 * 注册读写流对象，内部会自动调用 hook->open 过程，如果成功，则返回之前注册的对象
-	 * (可能为NULL)，若失败则返回与输入参数相同的指针，应用可以通过判断返回值与输入值
-	 * 是否相同来判断注册流对象是否成功
-	 * xxx: 在调用此方法前必须保证流连接已经创建
-	 * @param hook {stream_hook*} 非空对象指针
-	 * @return {stream_hook*} 返回值与输入值不同则表示成功
+	 * ע���д�������ڲ����Զ����� hook->open ���̣�����ɹ����򷵻�֮ǰע��Ķ���
+	 * (����ΪNULL)����ʧ���򷵻������������ͬ��ָ�룬Ӧ�ÿ���ͨ���жϷ���ֵ������ֵ
+	 * �Ƿ���ͬ���ж�ע���������Ƿ�ɹ�
+	 * xxx: �ڵ��ô˷���ǰ���뱣֤�������Ѿ�����
+	 * @param hook {stream_hook*} �ǿն���ָ��
+	 * @return {stream_hook*} ����ֵ������ֵ��ͬ���ʾ�ɹ�
 	 */
 	stream_hook* setup_hook(stream_hook* hook);
 
 	/**
-	 * 获得当前注册的流读写对象
+	 * ��õ�ǰע�������д����
 	 * @return {stream_hook*}
 	 */
 	stream_hook* get_hook(void) const;
 
 	/**
-	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
+	 * ɾ����ǰע�������д���󲢷��ظö��󣬻ָ�ȱʡ�Ķ�д����
 	 * @return {stream_hook*}
 	 */
 	stream_hook* remove_hook(void);
 
 protected:
 	/**
-	 * 打开流对象，如果流已经打开，则不会重复打开
+	 * ��������������Ѿ��򿪣��򲻻��ظ���
 	 */
 	void open_stream(bool is_file = false);
 
 	/**
-	 * 重新打开流对象，如果流已经打开则先释放流对象再打开
+	 * ���´�������������Ѿ��������ͷ��������ٴ�
 	 */
 	void reopen_stream(bool is_file = false);
 

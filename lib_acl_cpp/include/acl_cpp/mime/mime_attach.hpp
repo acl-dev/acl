@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "mime_node.hpp"
@@ -17,8 +17,8 @@ public:
 	virtual ~mime_attach(void);
 
 	/**
-	 * è·å¾—é™„ä»¶çš„æ–‡ä»¶å
-	 * @return {const char*} è¿”å›å€¼ä¸º NULL åˆ™è¯´æ˜æ²¡æœ‰æ‰¾åˆ°æ–‡ä»¶å
+	 * »ñµÃ¸½¼şµÄÎÄ¼şÃû
+	 * @return {const char*} ·µ»ØÖµÎª NULL ÔòËµÃ÷Ã»ÓĞÕÒµ½ÎÄ¼şÃû
 	 */
 	const char* get_filename(void) const;
 

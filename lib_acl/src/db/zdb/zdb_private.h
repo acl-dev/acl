@@ -1,4 +1,4 @@
-ï»¿#ifndef	__ZDB_PRIVATE_INCLUDE_H__
+#ifndef	__ZDB_PRIVATE_INCLUDE_H__
 #define	__ZDB_PRIVATE_INCLUDE_H__
 
 #ifndef ACL_CLIENT_ONLY
@@ -13,13 +13,13 @@
 #define	ZDB_DBG_DAT		(ZDB_DBG_BASE + 4)
 
 #define	ZDB_KEY_LIMIT		(unsigned int) -1
-#define	ZDB_DAT_FILE_LIMIT	10000	/* å€¼å­˜å‚¨ç›®å½•ä¸‹æ¯ä¸ªç›®å½•ä¸‹æœ€å¤§çš„æ–‡ä»¶ä¸ªæ•° */
-#define	ZDB_KEY_DIR_LIMIT	10	/* é”®å­˜å‚¨ç›®å½•ä¸ªæ•° */
-#define	ZDB_DAT_DIR_LIMIT	10	/* å€¼å­˜å‚¨ç›®å½•ä¸ªæ•° */
+#define	ZDB_DAT_FILE_LIMIT	10000	/* Öµ´æ´¢Ä¿Â¼ÏÂÃ¿¸öÄ¿Â¼ÏÂ×î´óµÄÎÄ¼ş¸öÊı */
+#define	ZDB_KEY_DIR_LIMIT	10	/* ¼ü´æ´¢Ä¿Â¼¸öÊı */
+#define	ZDB_DAT_DIR_LIMIT	10	/* Öµ´æ´¢Ä¿Â¼¸öÊı */
 
 typedef const void *(*STORE_ITER)(ACL_ITER*, ZDB_STORE*);
 
-/*--------------------------- ä¸€äº›ç®€å•æ–¹ä¾¿çš„å®å®šä¹‰ ---------------------------*/
+/*--------------------------- Ò»Ğ©¼òµ¥·½±ãµÄºê¶¨Òå ---------------------------*/
 
 #define	DISK_BITS	8
 #define	DISK_MASK	0xff
@@ -30,7 +30,7 @@ typedef const void *(*STORE_ITER)(ACL_ITER*, ZDB_STORE*);
 #define	DIR_LIMIT	(1 << 24)
 
 /**
- * å–å¾— ACL_VSTRING å¯¹è±¡ä¸­çš„æ•°æ®åœ°å€
+ * È¡µÃ ACL_VSTRING ¶ÔÏóÖĞµÄÊı¾İµØÖ·
  * @param x {ACL_VSTRING*}
  * @return {char*}
  */
@@ -39,60 +39,60 @@ typedef const void *(*STORE_ITER)(ACL_ITER*, ZDB_STORE*);
 #endif
 
 /**
- * å–å¾— ACL_VSTRING å¯¹è±¡ä¸­æ•°æ®é•¿åº¦
+ * È¡µÃ ACL_VSTRING ¶ÔÏóÖĞÊı¾İ³¤¶È
  * @param x {ACL_VSTRING*}
- * @return {size_t} æ•°æ®é•¿åº¦
+ * @return {size_t} Êı¾İ³¤¶È
  */
 #ifndef	LEN
 #define	LEN(x)	ACL_VSTRING_LEN((x))
 #endif
 
 /**
- * å–å¾— ACL_VSTREAM å¯¹è±¡ä¸­æ–‡ä»¶è·¯å¾„
+ * È¡µÃ ACL_VSTREAM ¶ÔÏóÖĞÎÄ¼şÂ·¾¶
  * @param x {ACL_VSTREAM*}
- * @return {char*} æ–‡ä»¶è·¯å¾„
+ * @return {char*} ÎÄ¼şÂ·¾¶
  */
 #define	PATH(x)	ACL_VSTREAM_PATH((x))
 
 /**
- * å–å¾—å­˜å‚¨ä¸­æ–‡ä»¶å¥æŸ„çš„æ–‡ä»¶è·¯å¾„
+ * È¡µÃ´æ´¢ÖĞÎÄ¼ş¾ä±úµÄÎÄ¼şÂ·¾¶
  * @param s {ZDB_KEY_STORE* || ZDB_DAT_STORE*}
- * @return {char*} æ–‡ä»¶è·¯å¾„
+ * @return {char*} ÎÄ¼şÂ·¾¶
  */
 #define	STORE_PATH(s)	PATH((s)->fhandle.fp)
 
 /**
- * å–å¾—å­˜å‚¨ä¸­æ–‡ä»¶æè¿°ç¬¦
+ * È¡µÃ´æ´¢ÖĞÎÄ¼şÃèÊö·û
  * @param s {ZDB_KEY_STORE* || ZDB_DAT_STORE*}
- * @return {ACL_FILE_HANDLE} æ–‡ä»¶æè¿°ç¬¦
+ * @return {ACL_FILE_HANDLE} ÎÄ¼şÃèÊö·û
  */
 #define	STORE_FILE(s)	ACL_VSTREAM_FILE((s)->fhandle.fp)
 
 /**
- * è·å¾—å­˜å‚¨æ–‡ä»¶çš„ ACL_VSTREAM æµ
+ * »ñµÃ´æ´¢ÎÄ¼şµÄ ACL_VSTREAM Á÷
  * @param s {ZDB_KEY_STORE* || ZDB_DAT_STORE*}
  * @return {ACL_VSTREAM*}
  */
 #define	STORE_STREAM(s)	((s)->fhandle.fp)
 
 /**
- * æ ¹æ®é”®å€¼å–å¾—é”®å­˜å‚¨çš„ç›¸å¯¹è·¯å¾„å·
+ * ¸ù¾İ¼üÖµÈ¡µÃ¼ü´æ´¢µÄÏà¶ÔÂ·¾¶ºÅ
  * @param z {ZDB*}
  * @param k {zdb_key_t}
- * @return {int} ç›¸å¯¹è·¯å¾„å·
+ * @return {int} Ïà¶ÔÂ·¾¶ºÅ
  */
 #define	KEY_INODE(z, k)	(int) ((k) / (z)->key_limit)
 
 /**
- * ç”±é”®å€¼åŠé”®é™åˆ¶å€¼å–å¾—è¯¥é”®å€¼çš„ä½™æ•°
+ * ÓÉ¼üÖµ¼°¼üÏŞÖÆÖµÈ¡µÃ¸Ã¼üÖµµÄÓàÊı
  * @param z {ZDB*}
  * @param k {zdb_key_t}
- * @return {zdb_key_t} ä½™æ•°
+ * @return {zdb_key_t} ÓàÊı
  */
 #define	KEY_MOD(z, k) ((k) % (z)->key_limit)
 
 /**
- * æ ¹æ®é”®å€¼å–å¾—è¯¥é”®åœ¨é”®å­˜å‚¨æ–‡ä»¶ä¸­çš„åç§»ä½ç½®
+ * ¸ù¾İ¼üÖµÈ¡µÃ¸Ã¼üÔÚ¼ü´æ´¢ÎÄ¼şÖĞµÄÆ«ÒÆÎ»ÖÃ
  * @param z {ZDB*}
  * @param k {zdb_key_t}
  * @return {zdb_off_t}
@@ -103,14 +103,14 @@ typedef const void *(*STORE_ITER)(ACL_ITER*, ZDB_STORE*);
 	+ (zdb_off_t) sizeof(ZDB_KEY_HDR)  )
 
 /**
- * æ•°æ®å—å¤´éƒ¨é•¿åº¦
+ * Êı¾İ¿éÍ·²¿³¤¶È
  * @param s {ZDB_DAT_STORE*}
  * @return {int}
  */
 #define	BLK_HDR_LEN(s)	((zdb_off_t) (s)->hdr.blk_hdr_dlen)
 
 /**
- * æ•°æ®å—é•¿åº¦(åŒ…å«æ•°æ®å¤´éƒ¨åˆ†)
+ * Êı¾İ¿é³¤¶È(°üº¬Êı¾İÍ·²¿·Ö)
  * @param s {ZDB_DAT_STORE*}
  * @return {int}
  */
@@ -119,18 +119,18 @@ typedef const void *(*STORE_ITER)(ACL_ITER*, ZDB_STORE*);
 	(zdb_off_t) (s)->hdr.blk_dlen * (zdb_off_t) (s)->hdr.blk_count  )
 
 /**
- * è®¡ç®—æ•°æ®å—ä¸­æ•°æ®å¤´åœ¨å€¼å­˜å‚¨ä¸­çš„åç§»ä½ç½®
+ * ¼ÆËãÊı¾İ¿éÖĞÊı¾İÍ·ÔÚÖµ´æ´¢ÖĞµÄÆ«ÒÆÎ»ÖÃ
  * @param s {ZDB_DAT_STORE*}
- * @param x {zdb_lnk_t} æ–‡ä»¶å­˜å‚¨ä½ç½®ç´¢å¼•å·
+ * @param x {zdb_lnk_t} ÎÄ¼ş´æ´¢Î»ÖÃË÷ÒıºÅ
  * @return {zdb_off_t}
  */
 #define	BLK_HDR_OFF(s, x)  (  \
 	(zdb_off_t) sizeof(ZDB_DAT_HDR) + BLK_LEN((s)) * (zdb_off_t) ((x))  )
 
 /**
- * è®¡ç®—æ•°æ®å—ä¸­æ•°æ®éƒ¨åˆ†åœ¨å€¼å­˜å‚¨ä¸­çš„åç§»ä½ç½®
+ * ¼ÆËãÊı¾İ¿éÖĞÊı¾İ²¿·ÖÔÚÖµ´æ´¢ÖĞµÄÆ«ÒÆÎ»ÖÃ
  * @param s {ZDB_DAT_STORE*}
- * @param x {zdb_lnk_t} æ–‡ä»¶å­˜å‚¨ä½ç½®ç´¢å¼•å·
+ * @param x {zdb_lnk_t} ÎÄ¼ş´æ´¢Î»ÖÃË÷ÒıºÅ
  * @return {zdb_off_t}
  */
 #define	BLK_DAT_OFF(s, x)  \
@@ -143,7 +143,7 @@ extern "C" {
 /*----------------------------   in zdb.c   ----------------------------------*/
 
 /**
- * ä»ç£ç›˜åˆ†åŒºä¸­é€‰æ‹©åˆé€‚çš„åˆ†åŒºèŠ‚ç‚¹
+ * ´Ó´ÅÅÌ·ÖÇøÖĞÑ¡ÔñºÏÊÊµÄ·ÖÇø½Úµã
  * @param db {ZDB*}
  */
 int zdb_disk_select(ZDB *db);
@@ -174,21 +174,21 @@ void zdb_io_cache_open(ZDB_STORE *store, size_t blk_len);
 void zdb_io_cache_close(ZDB_STORE *store);
 
 /**
- * å°è£…äº† pwrite64 çš„å†™æ¥å£
- * @param store {ZDB_STORE*} æ–‡ä»¶å¥æŸ„
- * @param buf {const void*} æ•°æ®åœ°å€
- * @param len {size_t} æ•°æ®é•¿åº¦
- * @param off {zdb_off_t} æ–‡ä»¶ä¸­çš„ä½ç½®åç§»é‡
+ * ·â×°ÁË pwrite64 µÄĞ´½Ó¿Ú
+ * @param store {ZDB_STORE*} ÎÄ¼ş¾ä±ú
+ * @param buf {const void*} Êı¾İµØÖ·
+ * @param len {size_t} Êı¾İ³¤¶È
+ * @param off {zdb_off_t} ÎÄ¼şÖĞµÄÎ»ÖÃÆ«ÒÆÁ¿
  * @return {int} > 0: ok; -1: error
  */
 int zdb_write(ZDB_STORE *store, const void *buf, size_t len, zdb_off_t off);
 
 /**
- * å°è£…äº† pread64 çš„è¯»æ¥å£
- * @param store {ZDB_STORE*} æ–‡ä»¶å¥æŸ„
- * @param buf {const void*} ç¼“å†²åŒºåœ°å€
- * @param len {size_t} ç¼“å†²åŒºé•¿åº¦
- * @param off {zdb_off_t} æ–‡ä»¶ä¸­çš„ä½ç½®åç§»é‡
+ * ·â×°ÁË pread64 µÄ¶Á½Ó¿Ú
+ * @param store {ZDB_STORE*} ÎÄ¼ş¾ä±ú
+ * @param buf {const void*} »º³åÇøµØÖ·
+ * @param len {size_t} »º³åÇø³¤¶È
+ * @param off {zdb_off_t} ÎÄ¼şÖĞµÄÎ»ÖÃÆ«ÒÆÁ¿
  * @return {int} > 0: ok; -1: error
  */
 int zdb_read(ZDB_STORE *store, void *buf, size_t size, zdb_off_t off);

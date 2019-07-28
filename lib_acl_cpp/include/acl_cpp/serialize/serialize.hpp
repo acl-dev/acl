@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/json.hpp"

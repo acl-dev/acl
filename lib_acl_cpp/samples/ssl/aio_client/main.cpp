@@ -1,4 +1,4 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
 #include "../../util.h"
@@ -22,17 +22,17 @@ typedef struct
 static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id);
 
 /**
- * å®¢æˆ·ç«¯å¼‚æ­¥è¿æ¥æµå›è°ƒå‡½æ•°ç±»
+ * ¿Í»§¶ËÒì²½Á¬½ÓÁ÷»Øµ÷º¯ÊıÀà
  */
 class client_io_callback : public acl::aio_open_callback
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param client {aio_socket_stream*} å¼‚æ­¥è¿æ¥æµ
-	 * @param ssl_conf {acl::polarssl_conf*} éç©ºæ—¶æŒ‡å®š SSL è¿æ¥æ–¹å¼
+	 * ¹¹Ôìº¯Êı
+	 * @param client {aio_socket_stream*} Òì²½Á¬½ÓÁ÷
+	 * @param ssl_conf {acl::polarssl_conf*} ·Ç¿ÕÊ±Ö¸¶¨ SSL Á¬½Ó·½Ê½
 	 * @param ctx {IO_CTX*}
-	 * @param id {int} æœ¬æµçš„IDå·
+	 * @param id {int} ±¾Á÷µÄIDºÅ
 	 */
 	client_io_callback(acl::aio_socket_stream* client,
 			acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
@@ -58,10 +58,10 @@ public:
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµè¯»åˆ°æ‰€è¦æ±‚çš„æ•°æ®æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
-	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
-	 * @param len {intï½ è¯»åˆ°çš„æ•°æ®é•¿åº¦
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı, µ±Òì²½Á÷¶Áµ½ËùÒªÇóµÄÊı¾İÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı
+	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
+	 * @param len {int£ı ¶Áµ½µÄÊı¾İ³¤¶È
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool read_callback(char*, int len)
 	{
@@ -83,8 +83,8 @@ public:
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµå†™æˆåŠŸæ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı, µ±Òì²½Á÷Ğ´³É¹¦Ê±µ÷ÓÃ´Ë»Øµ÷º¯Êı
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool write_callback()
 	{
@@ -95,7 +95,7 @@ public:
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“è¯¥å¼‚æ­¥æµå…³é—­æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
+	 * »ùÀàĞéº¯Êı, µ±¸ÃÒì²½Á÷¹Ø±ÕÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı
 	 */
 	void close_callback()
 	{
@@ -105,11 +105,11 @@ public:
 				<< ctx_->addr << " error: "
 				<< acl::last_serror();
 
-			// å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡è¿æ¥å°±å¤±è´¥ï¼Œåˆ™é€€å‡º
+			// Èç¹ûÊÇµÚÒ»´ÎÁ¬½Ó¾ÍÊ§°Ü£¬ÔòÍË³ö
 			if (ctx_->nopen_total == 0)
 			{
 				std::cout << ", first connect error, quit";
-				/* è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
+				/* »ñµÃÒì²½ÒıÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
 				client_->get_handle().stop();
 			}
 			std::cout << std::endl;
@@ -117,23 +117,23 @@ public:
 			return;
 		}
 
-		/* è·å¾—å¼‚æ­¥å¼•æ“ä¸­å—ç›‘æ§çš„å¼‚æ­¥æµä¸ªæ•° */
+		/* »ñµÃÒì²½ÒıÇæÖĞÊÜ¼à¿ØµÄÒì²½Á÷¸öÊı */
 		int nleft = client_->get_handle().length();
 		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1)
 		{
 			std::cout << "Id: " << id_ << " stop now! nstream: "
 				<< nleft << std::endl;
-			/* è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
+			/* »ñµÃÒì²½ÒıÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
 			client_->get_handle().stop();
 		}
 
-		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
+		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
 		delete this;
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“å¼‚æ­¥æµè¶…æ—¶æ—¶è°ƒç”¨æ­¤å‡½æ•°
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı£¬µ±Òì²½Á÷³¬Ê±Ê±µ÷ÓÃ´Ëº¯Êı
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool timeout_callback()
 	{
@@ -145,7 +145,7 @@ public:
 
 	bool read_wakeup()
 	{
-		// å–å¾—ä¹‹å‰é€šè¿‡ setup_hook æ³¨å†Œçš„ SSL IOå¥æŸ„
+		// È¡µÃÖ®Ç°Í¨¹ı setup_hook ×¢²áµÄ SSL IO¾ä±ú
 		acl::polarssl_io* hook =
 			(acl::polarssl_io*) client_->get_hook();
 
@@ -155,36 +155,36 @@ public:
 			return false;
 		}
 
-		// å°è¯•è¿›è¡Œ SSL æ¡æ‰‹
+		// ³¢ÊÔ½øĞĞ SSL ÎÕÊÖ
 		if (hook->handshake() == false)
 		{
 			logger_error("ssl handshake failed");
 			return false;
 		}
 
-		// SSL æ¡æ‰‹è¿˜æœªå®Œæˆï¼Œç­‰å¾…æœ¬å‡½æ•°å†æ¬¡è¢«è§¦å‘
+		// SSL ÎÕÊÖ»¹Î´Íê³É£¬µÈ´ı±¾º¯ÊıÔÙ´Î±»´¥·¢
 		if (hook->handshake_ok() == false)
 			return true;
 
-		// å¦‚æœ SSL æ¡æ‰‹å·²ç»æˆåŠŸï¼Œåˆ™å¼€å§‹è¯»æ•°æ®
+		// Èç¹û SSL ÎÕÊÖÒÑ¾­³É¹¦£¬Ôò¿ªÊ¼¶ÁÊı¾İ
 		
 		printf("ssl handshake ok\r\n");
 
-		// ç”± reactor æ¨¡å¼è½¬ä¸º proactor æ¨¡å¼ï¼Œä»è€Œå–æ¶ˆ
-		// read_wakeup å›è°ƒè¿‡ç¨‹
+		// ÓÉ reactor Ä£Ê½×ªÎª proactor Ä£Ê½£¬´Ó¶øÈ¡Ïû
+		// read_wakeup »Øµ÷¹ı³Ì
 		client_->disable_read();
 
-		// å¼€å§‹ä¸æœåŠ¡ç«¯çš„è¯»å†™è¿‡ç¨‹
+		// ¿ªÊ¼Óë·şÎñ¶ËµÄ¶ÁĞ´¹ı³Ì
 		return begin_run();
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥è¿æ¥æˆåŠŸåè°ƒç”¨æ­¤å‡½æ•°
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı, µ±Òì²½Á¬½Ó³É¹¦ºóµ÷ÓÃ´Ëº¯Êı
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool open_callback()
 	{
-		// è¿æ¥æˆåŠŸï¼Œè®¾ç½®IOè¯»å†™å›è°ƒå‡½æ•°
+		// Á¬½Ó³É¹¦£¬ÉèÖÃIO¶ÁĞ´»Øµ÷º¯Êı
 		client_->add_read_callback(this);
 		client_->add_write_callback(this);
 		ctx_->nopen_total++;
@@ -192,16 +192,16 @@ public:
 		acl::assert_(id_ > 0);
 		if (ctx_->nopen_total < ctx_->nopen_limit)
 		{
-			// å¼€å§‹è¿›è¡Œä¸‹ä¸€ä¸ªè¿æ¥è¿‡ç¨‹
+			// ¿ªÊ¼½øĞĞÏÂÒ»¸öÁ¬½Ó¹ı³Ì
 			if (connect_server(ssl_conf_, ctx_, id_ + 1) == false)
 				std::cout << "connect error!" << std::endl;
 		}
 
-		// è®¾ç½® SSL æ–¹å¼
+		// ÉèÖÃ SSL ·½Ê½
 		if (ssl_conf_)
 			return setup_ssl(*ssl_conf_);
 
-		// å¼€å§‹ä¸æœåŠ¡ç«¯çš„è¯»å†™è¿‡ç¨‹
+		// ¿ªÊ¼Óë·şÎñ¶ËµÄ¶ÁĞ´¹ı³Ì
 		else
 			return begin_run();
 	}
@@ -221,7 +221,7 @@ private:
 		acl::polarssl_io* ssl =
 			new acl::polarssl_io(ssl_conf, false, true);
 
-		// å°† SSL IO è¿‡ç¨‹æ³¨å†Œè‡³å¼‚æ­¥æµä¸­
+		// ½« SSL IO ¹ı³Ì×¢²áÖÁÒì²½Á÷ÖĞ
 		if (client_->setup_hook(ssl) == ssl)
 		{
 			std::cout << "open ssl error!" << std::endl;
@@ -229,7 +229,7 @@ private:
 			return false;
 		}
 
-		// å¼€å§‹ SSL æ¡æ‰‹è¿‡ç¨‹
+		// ¿ªÊ¼ SSL ÎÕÊÖ¹ı³Ì
 		if (ssl->handshake() == false)
 		{
 			client_->remove_hook();
@@ -237,7 +237,7 @@ private:
 			return false;
 		}
 
-		// å¼€å§‹å¼‚æ­¥ SSL æ¡æ‰‹è¿‡ç¨‹ï¼Œæ»¡è¶³å¯è¯»æ¡ä»¶æ—¶å°†è§¦å‘ read_wakeup
+		// ¿ªÊ¼Òì²½ SSL ÎÕÊÖ¹ı³Ì£¬Âú×ã¿É¶ÁÌõ¼şÊ±½«´¥·¢ read_wakeup
 		client_->read_wait(10);
 		return true;
 	}
@@ -246,7 +246,7 @@ private:
 	{
 		write_line();
 
-		// å¼‚æ­¥ä»æœåŠ¡å™¨è¯»å–æ•°æ®
+		// Òì²½´Ó·şÎñÆ÷¶ÁÈ¡Êı¾İ
 		//client_->read();
 		client_->gets(10, false);
 
@@ -255,7 +255,7 @@ private:
 
 	void write_line(void)
 	{
-		// å¼‚æ­¥å‘æœåŠ¡å™¨å‘é€æ•°æ®
+		// Òì²½Ïò·şÎñÆ÷·¢ËÍÊı¾İ
 		client_->write(buff_, dlen_);
 
 		if (nwrite_ >= ctx_->nwrite_limit)
@@ -265,7 +265,7 @@ private:
 
 static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
 {
-	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹æœåŠ¡å™¨
+	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì·şÎñÆ÷
 	acl::aio_socket_stream* stream = acl::aio_socket_stream::open(
 			ctx->handle, ctx->addr, ctx->connect_timeout);
 	if (stream == NULL)
@@ -279,17 +279,17 @@ static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
 
 	acl_non_blocking(stream->sock_handle(), ACL_BLOCKING);
 
-	// åˆ›å»ºè¿æ¥åçš„å›è°ƒå‡½æ•°ç±»
+	// ´´½¨Á¬½ÓºóµÄ»Øµ÷º¯ÊıÀà
 	client_io_callback* callback = new
 		client_io_callback(stream, ssl_conf, ctx,  id);
 
-	// æ·»åŠ è¿æ¥æˆåŠŸçš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³É¹¦µÄ»Øµ÷º¯ÊıÀà
 	stream->add_open_callback(callback);
 
-	// æ·»åŠ è¿æ¥å¤±è´¥åå›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½ÓÊ§°Üºó»Øµ÷º¯ÊıÀà
 	stream->add_close_callback(callback);
 
-	// æ·»åŠ è¿æ¥è¶…æ—¶çš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³¬Ê±µÄ»Øµ÷º¯ÊıÀà
 	stream->add_timeout_callback(callback);
 
 	return true;
@@ -413,7 +413,7 @@ int main(int argc, char* argv[])
 
 	while (true)
 	{
-		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
+		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
 		if (handle.check() == false)
 			break;
 	}

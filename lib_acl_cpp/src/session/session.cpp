@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <utility>
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -43,12 +43,12 @@ void session::set_sid(const char* sid)
 	sid_.copy(sid);
 	sid_.todo_ = TODO_NUL;
 
-	// æœ‰å¯èƒ½å·²ç»å­˜å‚¨åœ¨åç«¯ cache æœåŠ¡ç«¯äº†
+	// ÓĞ¿ÉÄÜÒÑ¾­´æ´¢ÔÚºó¶Ë cache ·şÎñ¶ËÁË
 	if (!sid_saved_) {
 		sid_saved_ = true;
 	}
 
-	// å¿…é¡»æ¸…é™¤ä¸Šæ¬¡çš„ä¸­é—´ç»“æœ
+	// ±ØĞëÇå³ıÉÏ´ÎµÄÖĞ¼ä½á¹û
 	reset();
 }
 
@@ -70,7 +70,7 @@ bool session::flush(void)
 	}
 	dirty_ = false;
 
-	// è°ƒç”¨çº¯è™šæ¥å£ï¼Œè·å¾—åŸæ¥çš„ sid æ•°æ®
+	// µ÷ÓÃ´¿Ğé½Ó¿Ú£¬»ñµÃÔ­À´µÄ sid Êı¾İ
 	if (get_attrs(attrs_)) {
 		if (!sid_saved_) {
 			sid_saved_ = true;
@@ -80,7 +80,7 @@ bool session::flush(void)
 	std::map<string, session_string>::iterator it_cache =
 		attrs_cache_.begin();
 	for (; it_cache != attrs_cache_.end(); ++it_cache) {
-		// å¦‚æœè¯¥å±æ€§å·²å­˜åœ¨ï¼Œåˆ™éœ€è¦å…ˆé‡Šæ”¾åŸæ¥çš„å±æ€§å€¼åå†æ·»åŠ æ–°å€¼
+		// Èç¹û¸ÃÊôĞÔÒÑ´æÔÚ£¬ÔòĞèÒªÏÈÊÍ·ÅÔ­À´µÄÊôĞÔÖµºóÔÙÌí¼ÓĞÂÖµ
 
 		std::map<string, session_string>::iterator it_attr =
 			attrs_.find(it_cache->first);
@@ -90,7 +90,7 @@ bool session::flush(void)
 					it_cache->second));
 			}
 		} else if (it_cache->second.todo_ == TODO_SET) {
-			// è®¾ç½®æ–°çš„æ•°æ®
+			// ÉèÖÃĞÂµÄÊı¾İ
 			attrs_.insert(std::make_pair(it_cache->first,
 				it_cache->second));
 		} else if (it_cache->second.todo_ == TODO_DEL) {
@@ -101,19 +101,19 @@ bool session::flush(void)
 		}
 	}
 
-	// æ¸…é™¤ç¼“å­˜çš„æ•°æ®ï¼šå› ä¸ºå†…éƒ¨çš„æ•°æ®å·²ç»è¢«æ·»åŠ è‡³ attrs_ ä¸­ï¼Œ
-	// æ‰€ä»¥åªéœ€è¦å°† attrs_cache_ ç©ºé—´æ¸…é™¤å³å¯
+	// Çå³ı»º´æµÄÊı¾İ£ºÒòÎªÄÚ²¿µÄÊı¾İÒÑ¾­±»Ìí¼ÓÖÁ attrs_ ÖĞ£¬
+	// ËùÒÔÖ»ĞèÒª½« attrs_cache_ ¿Õ¼äÇå³ı¼´¿É
 	attrs_cache_.clear();
 
-	// è°ƒç”¨çº¯è™šæ¥å£ï¼Œå‘ memcached æˆ–ç±»ä¼¼ç¼“å­˜ä¸­æ·»åŠ æ•°æ®
+	// µ÷ÓÃ´¿Ğé½Ó¿Ú£¬Ïò memcached »òÀàËÆ»º´æÖĞÌí¼ÓÊı¾İ
 	if (!this->set_attrs(attrs_)) {
 		logger_error("set cache error, sid(%s)", sid_.c_str());
-		attrs_clear(attrs_);  // æ¸…é™¤å±æ€§é›†åˆæ•°æ®
+		attrs_clear(attrs_);  // Çå³ıÊôĞÔ¼¯ºÏÊı¾İ
 
 		return false;
 	}
 
-	attrs_clear(attrs_);  // æ¸…é™¤å±æ€§é›†åˆæ•°æ®
+	attrs_clear(attrs_);  // Çå³ıÊôĞÔ¼¯ºÏÊı¾İ
 
 	if (!sid_saved_) {
 		sid_saved_ = true;
@@ -139,36 +139,36 @@ bool session::set_delay(const char* name, const void* value, size_t len)
 
 bool session::set(const char* name, const void* value, size_t len)
 {
-	// ç›´æ¥æ“ä½œåç«¯ cache æœåŠ¡å™¨ï¼Œè®¾ç½®(æ·»åŠ /ä¿®æ”¹) å±æ€§å­—æ®µ
+	// Ö±½Ó²Ù×÷ºó¶Ë cache ·şÎñÆ÷£¬ÉèÖÃ(Ìí¼Ó/ĞŞ¸Ä) ÊôĞÔ×Ö¶Î
 
-	// è°ƒç”¨çº¯è™šæ¥å£ï¼Œè·å¾—åŸæ¥çš„ sid æ•°æ®
+	// µ÷ÓÃ´¿Ğé½Ó¿Ú£¬»ñµÃÔ­À´µÄ sid Êı¾İ
 	if (!this->get_attrs(attrs_)) {
 		session_string ss(len);
 		ss.copy(value, len);
 		ss.todo_ = TODO_SET;
 		attrs_cache_.insert(std::make_pair(string(name), ss));
 	}
-	// å¦‚æœå­˜åœ¨å¯¹åº” sid çš„æ•°æ®ï¼Œåˆ™å°†æ–°æ•°æ®æ·»åŠ åœ¨åŸæ¥æ•°æ®ä¸­
+	// Èç¹û´æÔÚ¶ÔÓ¦ sid µÄÊı¾İ£¬Ôò½«ĞÂÊı¾İÌí¼ÓÔÚÔ­À´Êı¾İÖĞ
 	else {
 		if (!sid_saved_) {
 			sid_saved_ = true;
 		}
 
-		// å¦‚æœè¯¥å±æ€§å·²å­˜åœ¨ï¼Œåˆ™éœ€è¦å…ˆé‡Šæ”¾åŸæ¥çš„å±æ€§å€¼åå†æ·»åŠ æ–°å€¼
+		// Èç¹û¸ÃÊôĞÔÒÑ´æÔÚ£¬ÔòĞèÒªÏÈÊÍ·ÅÔ­À´µÄÊôĞÔÖµºóÔÙÌí¼ÓĞÂÖµ
 		session_string ss(len);
 		ss.copy(value, len);
 		ss.todo_ = TODO_SET;
 		attrs_cache_.insert(std::make_pair(string(name), ss));
 	}
 
-	// è°ƒç”¨çº¯è™šæ¥å£ï¼Œå‘ memcached æˆ–ç±»ä¼¼ç¼“å­˜ä¸­æ·»åŠ æ•°æ®
+	// µ÷ÓÃ´¿Ğé½Ó¿Ú£¬Ïò memcached »òÀàËÆ»º´æÖĞÌí¼ÓÊı¾İ
 	if (!this->set_attrs(attrs_)) {
 		logger_error("set cache error, sid(%s)", sid_.c_str());
-		attrs_clear(attrs_);  // æ¸…é™¤å±æ€§é›†åˆæ•°æ®
+		attrs_clear(attrs_);  // Çå³ıÊôĞÔ¼¯ºÏÊı¾İ
 
 		return false;
 	}
-	attrs_clear(attrs_);  // æ¸…é™¤å±æ€§é›†åˆæ•°æ®
+	attrs_clear(attrs_);  // Çå³ıÊôĞÔ¼¯ºÏÊı¾İ
 
 	if (!sid_saved_) {
 		sid_saved_ = true;
@@ -230,7 +230,7 @@ bool session::set_ttl(time_t ttl, bool delay)
 		return true;
 	}
 
-	// å¦‚æœæ˜¯å»¶è¿Ÿä¿®æ”¹ï¼Œåˆ™ä»…è®¾ç½®ç›¸å…³æˆå‘˜å˜é‡ï¼Œæœ€åç»Ÿä¸€ flush
+	// Èç¹ûÊÇÑÓ³ÙĞŞ¸Ä£¬Ôò½öÉèÖÃÏà¹Ø³ÉÔ±±äÁ¿£¬×îºóÍ³Ò» flush
 	else if (delay) {
 		ttl_   = ttl;
 		dirty_ = true;
@@ -238,14 +238,14 @@ bool session::set_ttl(time_t ttl, bool delay)
 	}
 
 #if 0
-	// å¦‚æœè¯¥ sid è¿˜æ²¡æœ‰åœ¨åç«¯ cache ä¸Šå­˜å‚¨è¿‡ï¼Œåˆ™ä»…åœ¨å¯¹è±¡ä¸­æœ¬åœ°è®¾ç½®ä¸€ä¸‹
+	// Èç¹û¸Ã sid »¹Ã»ÓĞÔÚºó¶Ë cache ÉÏ´æ´¢¹ı£¬Ôò½öÔÚ¶ÔÏóÖĞ±¾µØÉèÖÃÒ»ÏÂ
 	else if (!sid_saved_) {
 		ttl_ = ttl;
 		return true;
 	}
 #endif
 
-	// ä¿®æ”¹åç«¯ cache ä¸Šé’ˆå¯¹è¯¥ sid çš„ ttl
+	// ĞŞ¸Äºó¶Ë cache ÉÏÕë¶Ô¸Ã sid µÄ ttl
 	else if (set_timeout(ttl)) {
 		ttl_ = ttl;
 		return true;
@@ -266,7 +266,7 @@ bool session::del_delay(const char* name)
 
 bool session::del(const char* name)
 {
-	// ç›´æ¥æ“ä½œåç«¯ cache æœåŠ¡å™¨ï¼Œåˆ é™¤å±æ€§å­—æ®µ
+	// Ö±½Ó²Ù×÷ºó¶Ë cache ·şÎñÆ÷£¬É¾³ıÊôĞÔ×Ö¶Î
 
 	if (!get_attrs(attrs_)) {
 		return true;
@@ -277,12 +277,12 @@ bool session::del(const char* name)
 		return false;
 	}
 
-	// å…ˆåˆ é™¤å¹¶é‡Šæ”¾å¯¹åº”çš„å¯¹è±¡
+	// ÏÈÉ¾³ı²¢ÊÍ·Å¶ÔÓ¦µÄ¶ÔÏó
 	attrs_.erase(it);
 
-	// å¦‚æœ sid ä¸­å·²ç»æ²¡æœ‰äº†æ•°æ®ï¼Œåˆ™åº”è¯¥å°† sid å¯¹è±¡ä» memcached ä¸­åˆ é™¤
+	// Èç¹û sid ÖĞÒÑ¾­Ã»ÓĞÁËÊı¾İ£¬ÔòÓ¦¸Ã½« sid ¶ÔÏó´Ó memcached ÖĞÉ¾³ı
 	if (attrs_.empty()) {
-		// è°ƒç”¨è™šå‡½æ•°ï¼Œåˆ é™¤è¯¥ sid å¯¹åº”çš„ç¼“å­˜å†…å®¹
+		// µ÷ÓÃĞéº¯Êı£¬É¾³ı¸Ã sid ¶ÔÓ¦µÄ»º´æÄÚÈİ
 		if (!this->remove()) {
 			logger_error("del sid(%s) error", sid_.c_str());
 			return false;
@@ -290,41 +290,41 @@ bool session::del(const char* name)
 		return true;
 	}
 
-	// é‡æ–°æ·»åŠ å‰©ä½™çš„æ•°æ®
+	// ÖØĞÂÌí¼ÓÊ£ÓàµÄÊı¾İ
 
 	if (!set_attrs(attrs_)) {
 		logger_error("set cache error, sid(%s)", sid_.c_str());
-		attrs_clear(attrs_);  // æ¸…é™¤å±æ€§é›†åˆæ•°æ®
+		attrs_clear(attrs_);  // Çå³ıÊôĞÔ¼¯ºÏÊı¾İ
 
 		return false;
 	}
 
-	attrs_clear(attrs_);  // æ¸…é™¤å±æ€§é›†åˆæ•°æ®
+	attrs_clear(attrs_);  // Çå³ıÊôĞÔ¼¯ºÏÊı¾İ
 	return true;
 }
 
-// é‡‡ç”¨ handlersocket çš„ç¼–ç æ–¹å¼
+// ²ÉÓÃ handlersocket µÄ±àÂë·½Ê½
 
 void session::serialize(const std::map<string, session_string>& attrs,
 	string& out)
 {
-	out.clear(); // å…ˆæ¸…é™¤ç¼“å†²åŒº
+	out.clear(); // ÏÈÇå³ı»º³åÇø
 
 	std::map<string, session_string>::const_iterator it = attrs.begin();
 	if (it == attrs.end()) {
 		return;
 	}
 
-	// æ·»åŠ ç¬¬ä¸€ä¸ªå±æ€§
+	// Ìí¼ÓµÚÒ»¸öÊôĞÔ
 	const char ch = 1;
 	escape(it->first.c_str(), it->first.length(), out);
 	escape(&ch, 1, out);
 	escape(it->second.c_str(), it->second.length(), out);
 	++it;
 
-	// æ·»åŠ åç»­çš„å±æ€§
+	// Ìí¼ÓºóĞøµÄÊôĞÔ
 	for (; it != attrs.end(); ++it) {
-		// é™¤ç¬¬ä¸€ä¸ªå±æ€§å¤–åç»­çš„éƒ½éœ€è¦æ·»åŠ åˆ†éš”ç¬¦
+		// ³ıµÚÒ»¸öÊôĞÔÍâºóĞøµÄ¶¼ĞèÒªÌí¼Ó·Ö¸ô·û
 		out << '\t';
 		escape(it->first.c_str(), it->first.length(), out);
 		escape(&ch, 1, out);
@@ -332,26 +332,26 @@ void session::serialize(const std::map<string, session_string>& attrs,
 	}
 }
 
-// é‡‡ç”¨ handlersocket çš„è§£ç æ–¹å¼
+// ²ÉÓÃ handlersocket µÄ½âÂë·½Ê½
 
 void session::deserialize(string& buf, std::map<string, session_string>& attrs)
 {
-	attrs_clear(attrs);  // å…ˆé‡ç½® session å‰ä¸€æ¬¡æŸ¥è¯¢çŠ¶æ€
+	attrs_clear(attrs);  // ÏÈÖØÖÃ session Ç°Ò»´Î²éÑ¯×´Ì¬
 
 	ACL_ARGV* tokens = acl_argv_split(buf.c_str(), "\t");
 	ACL_ITER  iter;
 	acl_foreach(iter, tokens) {
 		char* ptr = (char*) iter.data;
 
-		// é‡å¤ä½¿ç”¨åŸæ¥çš„å†…å­˜åŒºï¼Œå› ä¸º tokens ä¸­å·²ç»å­˜å‚¨äº†ä¸­é—´ç»“æœæ•°æ®
+		// ÖØ¸´Ê¹ÓÃÔ­À´µÄÄÚ´æÇø£¬ÒòÎª tokens ÖĞÒÑ¾­´æ´¢ÁËÖĞ¼ä½á¹ûÊı¾İ
 		buf.clear();
 		if (!unescape(ptr, strlen(ptr), buf)) {
 			logger_error("unescape error");
 			continue;
 		}
 		ptr = buf.c_str();
-		// å› ä¸º acl::string è‚¯å®šèƒ½ä¿è¯ç¼“å†²åŒºæ•°æ®çš„å°¾éƒ¨æœ‰ \0ï¼Œæ‰€ä»¥åœ¨ç”¨
-		// strchr æ—¶ä¸å¿…é¡»æ‹…å¿ƒè¶Šç•Œé—®é¢˜ï¼Œä½† std::string å¹¶ä¸ä¿è¯è¿™æ ·
+		// ÒòÎª acl::string ¿Ï¶¨ÄÜ±£Ö¤»º³åÇøÊı¾İµÄÎ²²¿ÓĞ \0£¬ËùÒÔÔÚÓÃ
+		// strchr Ê±²»±ØĞëµ£ĞÄÔ½½çÎÊÌâ£¬µ« std::string ²¢²»±£Ö¤ÕâÑù
 		char* p1 = strchr(ptr, 1);
 		if (p1 == NULL || *(p1 + 1) == 0) {
 			continue;

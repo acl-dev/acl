@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <atlbase.h>
 
 class AFX_EXT_CLASS CRegRun

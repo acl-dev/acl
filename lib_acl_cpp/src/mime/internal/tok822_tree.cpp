@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tok822_tree 3
  * SUMMARY

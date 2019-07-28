@@ -1,4 +1,4 @@
-﻿#ifndef _TOK822_H_INCLUDED_
+#ifndef _TOK822_H_INCLUDED_
 #define _TOK822_H_INCLUDED_
 
 #if !defined(ACL_MIME_DISABLE)

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 #include "http_thread.h"
 #include "http_job.h"
@@ -41,7 +41,7 @@ void* http_job::run()
 
 	gettimeofday(&begin, NULL);
 
-	// æŸ¥è¯¢åŸŸåçš„ IP åˆ—è¡¨
+	// ²éÑ¯ÓòÃûµÄ IP ÁĞ±í
 	if (dns_lookup(domain, ips) == false)
 	{
 		delete this;
@@ -50,24 +50,24 @@ void* http_job::run()
 
 	gettimeofday(&end, NULL);
 
-	// è®¡ç®— DNS çš„æŸ¥è¯¢è€—æ—¶
+	// ¼ÆËã DNS µÄ²éÑ¯ºÄÊ±
 	double spent = util::stamp_sub(&end, &begin);
 
 	std::vector<acl::thread*> threads;
 
-	// éå† IP åœ°å€åˆ—è¡¨ï¼Œæ¯ä¸€ä¸ª IP åˆ›å»ºä¸€ä¸ª HTTP å®¢æˆ·ç«¯çº¿ç¨‹
+	// ±éÀú IP µØÖ·ÁĞ±í£¬Ã¿Ò»¸ö IP ´´½¨Ò»¸ö HTTP ¿Í»§¶ËÏß³Ì
 	std::vector<acl::string>::const_iterator cit = ips.begin();
 	for (; cit != ips.end(); ++cit)
 	{
-		// åˆ›å»ºå¹¶å¯åŠ¨ä¸€ä¸ªçº¿ç¨‹å¯¹è±¡
+		// ´´½¨²¢Æô¶¯Ò»¸öÏß³Ì¶ÔÏó
 		acl::thread* thr = new http_thread(domain, (*cit).c_str(),
 				port, url_.c_str(), spent);
-		thr->set_detachable(false);  // è®¾ç½®çº¿ç¨‹ä¸ºéåˆ†ç¦»çŠ¶æ€
+		thr->set_detachable(false);  // ÉèÖÃÏß³ÌÎª·Ç·ÖÀë×´Ì¬
 		thr->start();
 		threads.push_back(thr);
 	}
 
-	// ç­‰å¾…æ‰€æœ‰ HTTP å·¥ä½œçº¿ç¨‹æ‰§è¡Œå®Œæ¯•
+	// µÈ´ıËùÓĞ HTTP ¹¤×÷Ïß³ÌÖ´ĞĞÍê±Ï
 	std::vector<acl::thread*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
@@ -76,7 +76,7 @@ void* http_job::run()
 		delete thr;
 	}
 
-	delete this;  // è‡ªé”€æ¯
+	delete this;  // ×ÔÏú»Ù
 	return NULL;
 }
 
@@ -87,7 +87,7 @@ bool http_job::dns_lookup(const char* domain, std::vector<acl::string>& ips)
 
 	res = acl_res_new(dns_ip_.c_str(), dns_port_);
 
-	// ç›´æ¥å‘ DNS æœåŠ¡å™¨å‘é€ DNS æŸ¥è¯¢æ•°æ®åŒ…
+	// Ö±½ÓÏò DNS ·şÎñÆ÷·¢ËÍ DNS ²éÑ¯Êı¾İ°ü
 	dns_db = acl_res_lookup(res, domain);
 	if (dns_db == NULL)
 	{

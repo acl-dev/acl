@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/memcache/memcache.hpp"
@@ -42,7 +42,7 @@ memcache_session::~memcache_session(void)
 
 bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
 {
-	// æ¸…ç©ºåŸæœ‰æ•°æ®
+	// Çå¿ÕÔ­ÓĞÊı¾İ
 	attrs_clear(attrs);
 	const char* sid = get_sid();
 	if (sid == NULL || *sid == 0) {
@@ -54,7 +54,7 @@ bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
 		return false;
 	}
 
-	// ååºåˆ—åŒ–
+	// ·´ĞòÁĞ»¯
 	deserialize(buf, attrs);
 	return true;
 }
@@ -67,7 +67,7 @@ bool memcache_session::set_attrs(const std::map<string, session_string>& attrs)
 	}
 
 	string buf;
-	serialize(attrs, buf);  // åºåˆ—åŒ–æ•°æ®
+	serialize(attrs, buf);  // ĞòÁĞ»¯Êı¾İ
 	time_t ttl = get_ttl();
 	return cache_->set(sid, buf.c_str(), buf.length(), ttl);
 }

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file entropy.h
  *
  * \brief Entropy accumulator implementation

@@ -1,5 +1,5 @@
-﻿// stdafx.h : 标准系统包含文件的包含文件，
-// 或是常用但不常更改的项目特定的包含文件
+// stdafx.h : ��׼ϵͳ�����ļ��İ����ļ���
+// ���ǳ��õ��������ĵ���Ŀ�ض��İ����ļ�
 //
 
 #pragma once
@@ -8,7 +8,7 @@
 //#include <iostream>
 //#include <tchar.h>
 
-// TODO: 在此处引莹序要求的附加头文件
+// TODO: �ڴ˴���Ө����Ҫ��ĸ���ͷ�ļ�
 
 #include "acl_cpp/lib_acl.hpp"
 #include "lib_acl.h"

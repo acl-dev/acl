@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_TRACE_INCLUDE_H
+#ifndef	ACL_TRACE_INCLUDE_H
 #define	ACL_TRACE_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -6,13 +6,13 @@ extern "C" {
 #endif
 
 /**
- * å°†å½“å‰å‡½æ•°çš„å †æ ˆè¾“å‡ºè‡³æŒ‡å®šæ–‡ä»¶ä¸­
- * @param filepath {const char*} ç›®æ ‡æ–‡ä»¶å
+ * ½«µ±Ç°º¯ÊıµÄ¶ÑÕ»Êä³öÖÁÖ¸¶¨ÎÄ¼şÖĞ
+ * @param filepath {const char*} Ä¿±êÎÄ¼şÃû
  */
 void acl_trace_save(const char *filepath);
 
 /**
- * å°†å½“å‰å‡½æ•°çš„å †æ ˆè¾“å‡ºè‡³æ—¥å¿—ä¸­
+ * ½«µ±Ç°º¯ÊıµÄ¶ÑÕ»Êä³öÖÁÈÕÖ¾ÖĞ
  */
 void acl_trace_info(void);
 

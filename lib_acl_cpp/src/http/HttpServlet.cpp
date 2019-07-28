@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -141,8 +141,8 @@ bool HttpServlet::start(void)
 	}
 
 	if (stream_ == NULL) {
-		// æ•°æ®æµä¸ºç©ºï¼Œåˆ™å½“ CGI æ¨¡å¼å¤„ç†ï¼Œå°†æ ‡å‡†è¾“å…¥è¾“å‡º
-		// ä½œä¸ºæ•°æ®æµ
+		// Êý¾ÝÁ÷Îª¿Õ£¬Ôòµ± CGI Ä£Ê½´¦Àí£¬½«±ê×¼ÊäÈëÊä³ö
+		// ×÷ÎªÊý¾ÝÁ÷
 		in = NEW socket_stream();
 		in->open(ACL_VSTREAM_IN);
 
@@ -154,7 +154,7 @@ bool HttpServlet::start(void)
 		cgi_mode = false;
 	}
 
-	// åœ¨ HTTP é•¿è¿žæŽ¥é‡å¤è¯·æ±‚æƒ…å†µä¸‹ï¼Œä»¥é˜²ä¸‡ä¸€ï¼Œéœ€è¦é¦–å…ˆåˆ é™¤è¯·æ±‚/å“åº”å¯¹è±¡
+	// ÔÚ HTTP ³¤Á¬½ÓÖØ¸´ÇëÇóÇé¿öÏÂ£¬ÒÔ·ÀÍòÒ»£¬ÐèÒªÊ×ÏÈÉ¾³ýÇëÇó/ÏìÓ¦¶ÔÏó
 	delete req_;
 	delete res_;
 
@@ -162,7 +162,7 @@ bool HttpServlet::start(void)
 	req_ = NEW HttpServletRequest(*res_, *session_, *in, local_charset_,
 			parse_body_limit_);
 
-	// è®¾ç½® HttpServletRequest å¯¹è±¡
+	// ÉèÖÃ HttpServletRequest ¶ÔÏó
 	res_->setHttpServletRequest(req_);
 
 	if (rw_timeout_ >= 0) {
@@ -174,7 +174,7 @@ bool HttpServlet::start(void)
 	string method_s(32);
 	http_method_t method = req_->getMethod(&method_s);
 
-	// æ ¹æ®è¯·æ±‚çš„å€¼è‡ªåŠ¨è®¾å®šæ˜¯å¦éœ€è¦ä¿æŒé•¿è¿žæŽ¥
+	// ¸ù¾ÝÇëÇóµÄÖµ×Ô¶¯Éè¶¨ÊÇ·ñÐèÒª±£³Ö³¤Á¬½Ó
 	if (!cgi_mode) {
 		res_->setKeepAlive(req_->isKeepAlive());
 	}
@@ -224,7 +224,7 @@ bool HttpServlet::start(void)
 		ret = doOther(*req_, *res_, method_s.c_str());
 		break;
 	default:
-		ret = false; // æœ‰å¯èƒ½æ˜¯IOå¤±è´¥æˆ–æœªçŸ¥æ–¹æ³•
+		ret = false; // ÓÐ¿ÉÄÜÊÇIOÊ§°Ü»òÎ´Öª·½·¨
 		if (req_->getLastError() == HTTP_REQ_ERR_METHOD) {
 			doUnknown(*req_, *res_);
 		} else if (first) {
@@ -234,9 +234,9 @@ bool HttpServlet::start(void)
 	}
 
 	if (in != out) {
-		// å¦‚æžœæ˜¯æ ‡å‡†è¾“å…¥è¾“å‡ºæµï¼Œåˆ™éœ€è¦å…ˆå°†æ•°æ®æµä¸Žæ ‡å‡†è¾“å…¥è¾“å‡ºè§£ç»‘ï¼Œ
-		// ç„¶åŽæ‰èƒ½é‡Šæ”¾æ•°æ®æµå¯¹è±¡ï¼Œæ•°æ®æµå†…éƒ¨ä¼šè‡ªåŠ¨åˆ¤æ–­æµå¥æŸ„åˆæ³•æ€§
-		// è¿™æ ·å¯ä»¥ä¿è¯ä¸Žå®¢æˆ·ç«¯ä¿æŒé•¿è¿žæŽ¥
+		// Èç¹ûÊÇ±ê×¼ÊäÈëÊä³öÁ÷£¬ÔòÐèÒªÏÈ½«Êý¾ÝÁ÷Óë±ê×¼ÊäÈëÊä³ö½â°ó£¬
+		// È»ºó²ÅÄÜÊÍ·ÅÊý¾ÝÁ÷¶ÔÏó£¬Êý¾ÝÁ÷ÄÚ²¿»á×Ô¶¯ÅÐ¶ÏÁ÷¾ä±úºÏ·¨ÐÔ
+		// ÕâÑù¿ÉÒÔ±£Ö¤Óë¿Í»§¶Ë±£³Ö³¤Á¬½Ó
 		in->unbind();
 		out->unbind();
 		delete in;
@@ -256,7 +256,7 @@ bool HttpServlet::doRun(void)
 		return false;
 	}
 
-	// è¿”å›žç»™ä¸Šå±‚è°ƒç”¨è€…ï¼štrue è¡¨ç¤ºç»§ç»­ä¿æŒé•¿è¿žæŽ¥ï¼Œå¦åˆ™è¡¨ç¤ºéœ€æ–­å¼€è¿žæŽ¥
+	// ·µ»Ø¸øÉÏ²ãµ÷ÓÃÕß£ºtrue ±íÊ¾¼ÌÐø±£³Ö³¤Á¬½Ó£¬·ñÔò±íÊ¾Ðè¶Ï¿ªÁ¬½Ó
 	return req_->isKeepAlive()
 		&& res_->getHttpHeader().get_keep_alive();
 }

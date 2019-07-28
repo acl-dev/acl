@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class host_status;
 class ping_callback;
@@ -9,10 +9,10 @@ public:
 		ping_callback* callback);
 	~ping_store();
 protected:
-	// åŸºç±»è™šå‡½æ•°ï¼šå­çº¿ç¨‹å¤„ç†å‡½æ•°
+	// »ùÀàĞéº¯Êı£º×ÓÏß³Ì´¦Àíº¯Êı
 	virtual void rpc_run();
 
-	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
+	// »ùÀàĞéº¯Êı£ºÖ÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
 	virtual void rpc_onover();
 private:
 	std::vector<host_status*>* host_list_;

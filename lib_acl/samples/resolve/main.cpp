@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <netdb.h>
 #include <stdio.h>
 //#include <netdb.h>

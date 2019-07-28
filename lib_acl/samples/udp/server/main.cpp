@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "udp.h"
 
 static void sio(SOCK_UDP *sock, int inter, bool echo)

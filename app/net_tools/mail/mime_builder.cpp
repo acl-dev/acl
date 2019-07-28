@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "global/global.h"
 #include "mime_builder.hpp"
 
@@ -109,7 +109,7 @@ bool mime_builder::save_as(acl::ofstream& fp)
 			return false;
 	}
 
-	// æ·»åŠ æœ€åä¸€ä¸ªåˆ†éš”ç¬¦
+	// Ìí¼Ó×îºóÒ»¸ö·Ö¸ô·û
 	return add_boundary(fp, true);
 }
 
@@ -188,7 +188,7 @@ bool mime_builder::add_boundary(acl::ofstream& fp, bool end /* = false */)
 bool mime_builder::add_attach(acl::ofstream& fp, const char* filepath)
 {
 	//////////////////////////////////////////////////////////////////////////
-	// åˆ›å»ºå¤´éƒ¨åˆ†ä¿¡æ¯å¹¶å†™å…¥é‚®ä»¶ä¸­
+	// ´´½¨Í·²¿·ÖĞÅÏ¢²¢Ğ´ÈëÓÊ¼şÖĞ
 
 	acl::string filebuf;
 	global::get_filename(filepath, filebuf);
@@ -210,7 +210,7 @@ bool mime_builder::add_attach(acl::ofstream& fp, const char* filepath)
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// è¯»å–é™„ä»¶æ•°æ®å¹¶å†™å…¥é‚®ä»¶ä¸­
+	// ¶ÁÈ¡¸½¼şÊı¾İ²¢Ğ´ÈëÓÊ¼şÖĞ
 
 	acl::ifstream in;
 	if (in.open_read(filepath) == false)

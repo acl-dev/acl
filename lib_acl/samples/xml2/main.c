@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 
 static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
 {

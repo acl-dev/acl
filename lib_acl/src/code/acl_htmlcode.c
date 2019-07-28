@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -57,7 +57,7 @@ static void html_decode_init(void)
 
 	__decode_token_tree = acl_token_new();
 
-	/* æš‚ä¸”ä¸å…¼å®¹å…¨è§’ç©ºæ ¼ç­‰å­—ç¬¦ */
+	/* ÔİÇÒ²»¼æÈİÈ«½Ç¿Õ¸ñµÈ×Ö·û */
 
 	for (i = 0; i < n; i++) {
 #if 0
@@ -71,7 +71,7 @@ static void html_decode_init(void)
 			ACL_TOKEN_F_STOP, &html_tab[i]);
 	}
 
-	/* è¿›ç¨‹é€€å‡ºæ—¶è°ƒç”¨ html_decode_free é‡Šæ”¾å†…å­˜èµ„æº */
+	/* ½ø³ÌÍË³öÊ±µ÷ÓÃ html_decode_free ÊÍ·ÅÄÚ´æ×ÊÔ´ */
 	atexit(html_decode_free);
 }
 

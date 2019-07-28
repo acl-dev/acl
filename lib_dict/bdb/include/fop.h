@@ -1,4 +1,4 @@
-﻿/*-
+/*-
  * See the file LICENSE for redistribution information.
  *
  * Copyright (c) 2001-2004

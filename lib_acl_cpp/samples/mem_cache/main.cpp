@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "acl_cpp/memcache/memcache.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include <stdio.h>

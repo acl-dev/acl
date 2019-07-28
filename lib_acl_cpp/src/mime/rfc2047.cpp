@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mime/mime_base64.hpp"
 #include "acl_cpp/mime/mime_quoted_printable.hpp"
@@ -330,14 +330,14 @@ static bool decoder_update(rfc2047_entry* entry,
 		return true;
 	}
 
-	// å¦‚æžœæºå­—ç¬¦é›†ä¸Žç›®æ ‡å­—ç¬¦é›†ç›¸åŒåˆ™ä¸è¿›è¡Œå­—ç¬¦é›†è½¬ç 
+	// Èç¹ûÔ´×Ö·û¼¯ÓëÄ¿±ê×Ö·û¼¯ÏàÍ¬Ôò²»½øÐÐ×Ö·û¼¯×ªÂë
 
 	if (EQ(fromCharset, toCharset) || pConv == NULL) {
 		out->append(buf1->c_str(), buf1->length());
 		return true;
 	}
 
-	// è¿›è¡Œå­—ç¬¦é›†è½¬ç 
+	// ½øÐÐ×Ö·û¼¯×ªÂë
 
 	buf2->clear();
 
@@ -396,7 +396,7 @@ bool rfc2047::decode_finish(const char* toCharset,
 	mime_base64 base64;
 	mime_quoted_printable qp;
 
-	// é€‰æ‹©ä¸€ä¸ªé»˜è®¤çš„è§£ç å™¨ï¼Œç„¶åŽæ ¹æ®éœ€è¦å˜åŒ–
+	// Ñ¡ÔñÒ»¸öÄ¬ÈÏµÄ½âÂëÆ÷£¬È»ºó¸ù¾ÝÐèÒª±ä»¯
 	mime_code* pDecoder = &base64;
 	const char *fromCharset = NULL;
 	charset_conv conv;
@@ -421,7 +421,7 @@ bool rfc2047::decode_finish(const char* toCharset,
 				}
 				pDecoder->reset();
 			}
-			pDecoder = &qp;  // qp è§£ç 
+			pDecoder = &qp;  // qp ½âÂë
 			fromCharset = (*cit)->pCharset->c_str();
 			if (*fromCharset == 0) {
 				fromCharset = NULL;
@@ -446,7 +446,7 @@ bool rfc2047::decode_finish(const char* toCharset,
 				}
 				pDecoder->reset();
 			}
-			pDecoder = &base64;  // base64 è§£ç 
+			pDecoder = &base64;  // base64 ½âÂë
 			fromCharset = (*cit)->pCharset->c_str();
 			if (*fromCharset == 0) {
 				fromCharset = NULL;

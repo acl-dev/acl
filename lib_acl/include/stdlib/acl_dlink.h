@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_DLINK_INCLUDE
+#ifndef ACL_DLINK_INCLUDE
 #define ACL_DLINK_INCLUDE
 
 #ifdef __cplusplus
@@ -10,7 +10,7 @@ extern "C" {
 #include "acl_iterator.h"
 
 /**
- * äºŒåˆ†å—æ•°æ®é“¾å…ƒç´ ç±»å‹å®šä¹‰
+ * ¶ş·Ö¿éÊı¾İÁ´ÔªËØÀàĞÍ¶¨Òå
  */
 typedef	struct {
 	acl_int64 begin;
@@ -19,7 +19,7 @@ typedef	struct {
 } ACL_DITEM;
 
 /**
- * äºŒåˆ†å—æ•°æ®é“¾ç±»å‹å®šä¹‰
+ * ¶ş·Ö¿éÊı¾İÁ´ÀàĞÍ¶¨Òå
  */
 typedef	struct ACL_DLINK {
 	ACL_ARRAY *parray;
@@ -27,160 +27,160 @@ typedef	struct ACL_DLINK {
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êı */
 	void *(*iter_head)(ACL_ITER*, struct ACL_DLINK*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
 	void *(*iter_next)(ACL_ITER*, struct ACL_DLINK*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êı */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_DLINK*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êı */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_DLINK*);
 } ACL_DLINK;
 
 /**
- * åˆ›å»ºä¸€ä¸ªäºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡
- * @param nsize {int} åˆå§‹æ•°ç»„å¤§å°
- * @return {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡
+ * ´´½¨Ò»¸ö¶ş·Ö¿éÊı¾İÁ´¶ÔÏó
+ * @param nsize {int} ³õÊ¼Êı×é´óĞ¡
+ * @return {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏó
  */
 ACL_API ACL_DLINK *acl_dlink_create(int nsize);
 
 /**
- * é‡Šæ”¾ä¸€ä¸ªäºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡
- * @param plink {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
+ * ÊÍ·ÅÒ»¸ö¶ş·Ö¿éÊı¾İÁ´¶ÔÏó
+ * @param plink {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
  */
 ACL_API void acl_dlink_free(ACL_DLINK *plink);
 
 /**
- * æ ¹æ®äºŒåˆ†å—æ•°æ®å…ƒç´ æŸ¥æ‰¾å…¶æ˜¯å¦æ­£åœ¨äºäºŒåˆ†å—æ•°æ®é“¾ä¸­
- * @param plink {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param pitem {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ¸ù¾İ¶ş·Ö¿éÊı¾İÔªËØ²éÕÒÆäÊÇ·ñÕıÔÚÓÚ¶ş·Ö¿éÊı¾İÁ´ÖĞ
+ * @param plink {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param pitem {ACL_DITEM*} Êı¾İ¿éÔªËØ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_by_item(const ACL_DLINK *plink,
 	ACL_DITEM *pitem);
 
 /**
- * æ ¹æ®æ•°æ®å…ƒç´ æŸ¥æ‰¾äºŒåˆ†å—æ•°æ®é“¾ä¸­çš„æ•°æ®å…ƒç´ 
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param pitem {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
- * @param pidx {int*} å­˜å‚¨æŸ¥è¯¢æ•°æ®å…ƒç´ ç»“æœåœ¨äºŒåˆ†æ•°æ®é“¾ä¸­çš„ä¸‹æ ‡ä½ç½®
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ¸ù¾İÊı¾İÔªËØ²éÕÒ¶ş·Ö¿éÊı¾İÁ´ÖĞµÄÊı¾İÔªËØ
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param pitem {ACL_DITEM*} Êı¾İ¿éÔªËØ
+ * @param pidx {int*} ´æ´¢²éÑ¯Êı¾İÔªËØ½á¹ûÔÚ¶ş·ÖÊı¾İÁ´ÖĞµÄÏÂ±êÎ»ÖÃ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup2_by_item(const ACL_DLINK *plink,
 	ACL_DITEM *pitem, int *pidx);
 
 /**
- * ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­æŸ¥è¯¢æŸä¸ªå€¼æ‰€å¯¹åº”çš„æ•°æ®å—å…ƒç´ åœ°å€
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param n {acl_int64} æŸ¥è¯¢å€¼
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞ²éÑ¯Ä³¸öÖµËù¶ÔÓ¦µÄÊı¾İ¿éÔªËØµØÖ·
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param n {acl_int64} ²éÑ¯Öµ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup(const ACL_DLINK *plink, acl_int64 n);
 
 /**
- * ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­æŸ¥è¯¢æŸä¸ªå€¼æ‰€å¯¹åº”çš„æ•°æ®å—å…ƒç´ åœ°å€å¹¶è®°å½•å…¶ä¸‹æ ‡ä½ç½®
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param n {acl_int64} æŸ¥è¯¢å€¼
- * @param pidx {int*} å­˜å‚¨æŸ¥è¯¢æ•°æ®å…ƒç´ ç»“æœåœ¨äºŒåˆ†æ•°æ®é“¾ä¸­çš„ä¸‹æ ‡ä½ç½®
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞ²éÑ¯Ä³¸öÖµËù¶ÔÓ¦µÄÊı¾İ¿éÔªËØµØÖ·²¢¼ÇÂ¼ÆäÏÂ±êÎ»ÖÃ
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param n {acl_int64} ²éÑ¯Öµ
+ * @param pidx {int*} ´æ´¢²éÑ¯Êı¾İÔªËØ½á¹ûÔÚ¶ş·ÖÊı¾İÁ´ÖĞµÄÏÂ±êÎ»ÖÃ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup2(const ACL_DLINK *plink,
 	acl_int64 n, int *pidx);
 
 /**
- * ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­æŸ¥è¯¢æŸä¸ªèŒƒå›´çš„æ•°æ®å—å…ƒç´ åœ°å€å¹¶è®°å½•å…¶ä¸‹æ ‡ä½ç½®
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param begin {acl_int64} æŸ¥è¯¢èŒƒå›´çš„èµ·å§‹ä½ç½®å€¼
- * @param end {acl_int64} æŸ¥è¯¢èŒƒå›´çš„ç»“æŸä½ç½®å€¼
- * @param pidx {int*} å­˜å‚¨æŸ¥è¯¢æ•°æ®å…ƒç´ ç»“æœåœ¨äºŒåˆ†æ•°æ®é“¾ä¸­çš„ä¸‹æ ‡ä½ç½®
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞ²éÑ¯Ä³¸ö·¶Î§µÄÊı¾İ¿éÔªËØµØÖ·²¢¼ÇÂ¼ÆäÏÂ±êÎ»ÖÃ
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param begin {acl_int64} ²éÑ¯·¶Î§µÄÆğÊ¼Î»ÖÃÖµ
+ * @param end {acl_int64} ²éÑ¯·¶Î§µÄ½áÊøÎ»ÖÃÖµ
+ * @param pidx {int*} ´æ´¢²éÑ¯Êı¾İÔªËØ½á¹ûÔÚ¶ş·ÖÊı¾İÁ´ÖĞµÄÏÂ±êÎ»ÖÃ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_range(const ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end, int *pidx);
 
 /**
- * ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­æŸ¥è¯¢ç¬¬ä¸€ä¸ªå¤§äºæŸä¸ªç»™å®šå€¼çš„æ•°æ®å—å…ƒç´ å¹¶è®°å½•ä¸‹æ ‡ä½ç½®
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param off {acl_int64} ç»™å®šæ¯”è¾ƒå€¼
- * @param pidx {int*} å­˜å‚¨æŸ¥è¯¢æ•°æ®å…ƒç´ ç»“æœåœ¨äºŒåˆ†æ•°æ®é“¾ä¸­çš„ä¸‹æ ‡ä½ç½®
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞ²éÑ¯µÚÒ»¸ö´óÓÚÄ³¸ö¸ø¶¨ÖµµÄÊı¾İ¿éÔªËØ²¢¼ÇÂ¼ÏÂ±êÎ»ÖÃ
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param off {acl_int64} ¸ø¶¨±È½ÏÖµ
+ * @param pidx {int*} ´æ´¢²éÑ¯Êı¾İÔªËØ½á¹ûÔÚ¶ş·ÖÊı¾İÁ´ÖĞµÄÏÂ±êÎ»ÖÃ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_larger(const ACL_DLINK *plink,
 	acl_int64 off, int *pidx);
 
 /**
- * ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­æŸ¥è¯¢ç¬¬ä¸€ä¸ªå°äºæŸä¸ªç»™å®šå€¼çš„æ•°æ®å—å…ƒç´ å¹¶è®°å½•ä¸‹æ ‡ä½ç½®
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param off {acl_int64} ç»™å®šæ¯”è¾ƒå€¼
- * @param pidx {int*} å­˜å‚¨æŸ¥è¯¢æ•°æ®å…ƒç´ ç»“æœåœ¨äºŒåˆ†æ•°æ®é“¾ä¸­çš„ä¸‹æ ‡ä½ç½®
- * @return {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
+ * ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞ²éÑ¯µÚÒ»¸öĞ¡ÓÚÄ³¸ö¸ø¶¨ÖµµÄÊı¾İ¿éÔªËØ²¢¼ÇÂ¼ÏÂ±êÎ»ÖÃ
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param off {acl_int64} ¸ø¶¨±È½ÏÖµ
+ * @param pidx {int*} ´æ´¢²éÑ¯Êı¾İÔªËØ½á¹ûÔÚ¶ş·ÖÊı¾İÁ´ÖĞµÄÏÂ±êÎ»ÖÃ
+ * @return {ACL_DITEM*} Êı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_lookup_lower(const ACL_DLINK *plink,
 	acl_int64 off, int *pidx);
 
 /**
- * å‘äºŒåˆ†å—æ•°æ®é“¾ä¸­æ·»åŠ èµ·å§‹ã€ç»“æŸæ•°æ®å—
- * @param plink {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param begin {acl_int64} ç»™å®šèµ·å§‹ä½ç½®å€¼
- * @param end {acl_int64} ç»™å®šç»“æŸä½ç½®å€¼
- * @return {ACL_DITEM*} æ–°åˆ›å»ºçš„æ•°æ®å—å…ƒç´ 
+ * Ïò¶ş·Ö¿éÊı¾İÁ´ÖĞÌí¼ÓÆğÊ¼¡¢½áÊøÊı¾İ¿é
+ * @param plink {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param begin {acl_int64} ¸ø¶¨ÆğÊ¼Î»ÖÃÖµ
+ * @param end {acl_int64} ¸ø¶¨½áÊøÎ»ÖÃÖµ
+ * @return {ACL_DITEM*} ĞÂ´´½¨µÄÊı¾İ¿éÔªËØ
  */
 ACL_API ACL_DITEM *acl_dlink_insert(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);
 
 /**
- * ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­åˆ é™¤åŒ…å«æŸä¸ªç»™å®šå€¼çš„æ•°æ®å—å…ƒç´ 
- * @param plink {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param n {acl_int64} ç»™å®šä½ç½®å€¼
- * @return {int} 0ï¼šè¡¨ç¤ºOKï¼Œ-1: è¡¨ç¤ºè¾“å…¥å‚æ•°éæ³•æˆ–ä¸å­˜åœ¨
+ * ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞÉ¾³ı°üº¬Ä³¸ö¸ø¶¨ÖµµÄÊı¾İ¿éÔªËØ
+ * @param plink {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param n {acl_int64} ¸ø¶¨Î»ÖÃÖµ
+ * @return {int} 0£º±íÊ¾OK£¬-1: ±íÊ¾ÊäÈë²ÎÊı·Ç·¨»ò²»´æÔÚ
  */
 ACL_API int acl_dlink_delete(ACL_DLINK *plink, acl_int64 n);
 
 /**
- * æ ¹æ®æ•°æ®å—å…ƒç´ ä»äºŒåˆ†å—æ•°æ®é“¾ä¸­åˆ é™¤è¯¥æ•°æ®å—å…ƒç´ 
- * @param plink {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param pitem {ACL_DITEM*} æ•°æ®å—å…ƒç´ 
- * @return {int} 0ï¼šè¡¨ç¤ºOKï¼Œ-1: è¡¨ç¤ºè¾“å…¥å‚æ•°éæ³•
+ * ¸ù¾İÊı¾İ¿éÔªËØ´Ó¶ş·Ö¿éÊı¾İÁ´ÖĞÉ¾³ı¸ÃÊı¾İ¿éÔªËØ
+ * @param plink {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param pitem {ACL_DITEM*} Êı¾İ¿éÔªËØ
+ * @return {int} 0£º±íÊ¾OK£¬-1: ±íÊ¾ÊäÈë²ÎÊı·Ç·¨
  */
 ACL_API int acl_dlink_delete_by_item(ACL_DLINK *plink, ACL_DITEM *pitem);
 
 /**
- * åŠŸèƒ½åŒ acl_dlink_insert
- * @deprecated æ­¤å‡½æ•°å°†æ¥ä¹Ÿè®¸ä¸å†æä¾›
+ * ¹¦ÄÜÍ¬ acl_dlink_insert
+ * @deprecated ´Ëº¯Êı½«À´Ò²Ğí²»ÔÙÌá¹©
  */
 ACL_API ACL_DITEM *acl_dlink_modify(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);
 
 /**
- * ä»äºŒåˆ†æ•°æ®é“¾ä¸­åˆ é™¤æŸä¸ªæ•°å€¼èŒƒå›´çš„æ•°æ®å—é›†åˆ, 
- * åˆ é™¤åæœ‰å¯èƒ½ä¼šåœ¨å†…éƒ¨å¢åŠ æ–°çš„æ•°æ®å—å…ƒç´ 
- * @param plink {ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param begin {acl_int64} éœ€è¦åˆ é™¤èŒƒå›´çš„èµ·å§‹ä½ç½®
- * @param end {acl_int64} éœ€è¦åˆ é™¤èŒƒå›´çš„ç»“æŸä½ç½®
- * @return {int} 0ï¼šè¡¨ç¤ºOKï¼Œ-1: è¡¨ç¤ºè¾“å…¥å‚æ•°éæ³•
+ * ´Ó¶ş·ÖÊı¾İÁ´ÖĞÉ¾³ıÄ³¸öÊıÖµ·¶Î§µÄÊı¾İ¿é¼¯ºÏ, 
+ * É¾³ıºóÓĞ¿ÉÄÜ»áÔÚÄÚ²¿Ôö¼ÓĞÂµÄÊı¾İ¿éÔªËØ
+ * @param plink {ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param begin {acl_int64} ĞèÒªÉ¾³ı·¶Î§µÄÆğÊ¼Î»ÖÃ
+ * @param end {acl_int64} ĞèÒªÉ¾³ı·¶Î§µÄ½áÊøÎ»ÖÃ
+ * @return {int} 0£º±íÊ¾OK£¬-1: ±íÊ¾ÊäÈë²ÎÊı·Ç·¨
  */
 ACL_API int acl_dlink_delete_range(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);
 
 /**
- * è¿”å›æŸä¸‹æ ‡ä½ç½®çš„æ•°æ®å—å…ƒç´ åœ°å€
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @param idx {int} ä¸‹æ ‡ä½ç½®
- * @return {ACL_DITEM*} NULL: ä¸‹æ ‡è¶Šç•Œ; != NULL: æ•°æ®å—å…ƒç´ åœ°å€
+ * ·µ»ØÄ³ÏÂ±êÎ»ÖÃµÄÊı¾İ¿éÔªËØµØÖ·
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @param idx {int} ÏÂ±êÎ»ÖÃ
+ * @return {ACL_DITEM*} NULL: ÏÂ±êÔ½½ç; != NULL: Êı¾İ¿éÔªËØµØÖ·
  */
 ACL_API ACL_DITEM *acl_dlink_index(const ACL_DLINK *plink, int idx);
 
 /**
- * è·å¾—å½“å‰äºŒåˆ†æ•°æ®é“¾ä¸­æ‰€æœ‰æ•°æ®å—çš„ä¸ªæ•°æ€»å’Œ
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @return {int} æ•°æ®å—çš„ä¸ªæ•°
+ * »ñµÃµ±Ç°¶ş·ÖÊı¾İÁ´ÖĞËùÓĞÊı¾İ¿éµÄ¸öÊı×ÜºÍ
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @return {int} Êı¾İ¿éµÄ¸öÊı
  */
 ACL_API int acl_dlink_size(const ACL_DLINK *plink);
 
 /**
- * (è°ƒè¯•ç”¨)æ‰“å°äºŒåˆ†æ•°æ®é“¾ä¸­æ‰€æœ‰æ•°æ®å—çš„èµ·å§‹ã€ç»“æŸä½ç½®ç­‰ä¿¡æ¯
- * @param plink {const ACL_DLINK*} äºŒåˆ†å—æ•°æ®é“¾å¯¹è±¡æŒ‡é’ˆ
- * @return {int} 0ï¼šè¡¨ç¤ºOKï¼Œ-1: è¡¨ç¤ºè¾“å…¥å‚æ•°éæ³•
+ * (µ÷ÊÔÓÃ)´òÓ¡¶ş·ÖÊı¾İÁ´ÖĞËùÓĞÊı¾İ¿éµÄÆğÊ¼¡¢½áÊøÎ»ÖÃµÈĞÅÏ¢
+ * @param plink {const ACL_DLINK*} ¶ş·Ö¿éÊı¾İÁ´¶ÔÏóÖ¸Õë
+ * @return {int} 0£º±íÊ¾OK£¬-1: ±íÊ¾ÊäÈë²ÎÊı·Ç·¨
  */
 ACL_API int acl_dlink_list(const ACL_DLINK *plink);
 

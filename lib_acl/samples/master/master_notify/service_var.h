@@ -1,9 +1,9 @@
-ï»¿#ifndef	__SERVICE_VAR_INCLUDE_H__
+#ifndef	__SERVICE_VAR_INCLUDE_H__
 #define	__SERVICE_VAR_INCLUDE_H__
 
 #include "lib_acl.h"
 
-/*------------- å­—ç¬¦ä¸²é…ç½®é¡¹ ----------------*/
+/*------------- ×Ö·û´®ÅäÖÃÏî ----------------*/
 
 extern ACL_CFG_STR_TABLE var_conf_str_tab[];
 
@@ -18,21 +18,21 @@ extern char *var_cfg_smtp_helo;
 extern char *var_cfg_sms_addr;
 extern char *var_cfg_host_ip;
 
-/*-------------- å¸ƒå°”å€¼é…ç½®é¡¹ ---------------*/
+/*-------------- ²¼¶ûÖµÅäÖÃÏî ---------------*/
 
 extern ACL_CFG_BOOL_TABLE var_conf_bool_tab[];
 
-/* æ˜¯å¦è¾“å‡ºæ—¥å¿—è°ƒè¯•ä¿¡æ¯ */
+/* ÊÇ·ñÊä³öÈÕÖ¾µ÷ÊÔĞÅÏ¢ */
 extern int var_cfg_debug_enable;
 
-/* æ˜¯å¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥ */
+/* ÊÇ·ñÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó */
 extern int var_cfg_keep_alive;
 
-/*-------------- æ•´æ•°é…ç½®é¡¹ -----------------*/
+/*-------------- ÕûÊıÅäÖÃÏî -----------------*/
 
 extern ACL_CFG_INT_TABLE var_conf_int_tab[];
 
-/* æ¯æ¬¡ä¸å®¢æˆ·ç«¯é€šä¿¡æ—¶ï¼Œè¯»è¶…æ—¶æ—¶é—´(ç§’) */
+/* Ã¿´ÎÓë¿Í»§¶ËÍ¨ĞÅÊ±£¬¶Á³¬Ê±Ê±¼ä(Ãë) */
 extern int  var_cfg_io_timeout;
 extern int  var_cfg_smtp_notify_cache_timeout;
 extern int  var_cfg_sms_notify_cache_timeout;
@@ -41,7 +41,7 @@ extern int  var_cfg_work_week_max;
 extern int  var_cfg_work_hour_min;
 extern int  var_cfg_work_hour_max;
 
-/*----------------- éé…ç½®é¡¹çš„å…¨å±€å˜é‡ ------*/
+/*----------------- ·ÇÅäÖÃÏîµÄÈ«¾Ö±äÁ¿ ------*/
 extern ACL_ARGV *var_recipients;
 extern ACL_ARGV *var_ccs;
 extern ACL_ARGV *var_bccs;

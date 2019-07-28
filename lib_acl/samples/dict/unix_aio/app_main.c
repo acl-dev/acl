@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -64,7 +64,7 @@ static void __pre_accept(char *name acl_unused, char **argv acl_unused)
 
 static void __pre_jail_init(char *name acl_unused, char **argv acl_unused)
 {
-        /* æ˜¯å¦é‡‡ç”¨ libcore çš„æ—¥å¿—è®°å½• */
+        /* ÊÇ·ñ²ÉÓÃ libcore µÄÈÕÖ¾¼ÇÂ¼ */
 #ifdef  HAS_LIB_CORE
 # ifdef USE_LIBCORE_LOG
 	app_set_libcore_log();
@@ -180,7 +180,7 @@ void app_main(int argc, char *argv[], APP_RUN_FN run_fn, void *run_ctx, int name
 	ACL_CONFIG_STR_TABLE *str_tab = null_conf_str_tab;
 
 	app_main_init();
-	/* æå‰è¿›è¡Œæ¨¡æ¿åˆå§‹åŒ–ï¼Œä»¥ä½¿æ—¥å¿—å°½æ—©åœ°æ‰“å¼€ */
+	/* ÌáÇ°½øĞĞÄ£°å³õÊ¼»¯£¬ÒÔÊ¹ÈÕÖ¾¾¡ÔçµØ´ò¿ª */
 	acl_master_log_open(argv[0]);
 
 	if (run_fn == NULL)

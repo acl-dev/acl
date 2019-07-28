@@ -1,4 +1,4 @@
-﻿#ifndef SSLOPT_VARS_INCLUDED
+#ifndef SSLOPT_VARS_INCLUDED
 #define SSLOPT_VARS_INCLUDED
 
 /* Copyright (C) 2000 MySQL AB

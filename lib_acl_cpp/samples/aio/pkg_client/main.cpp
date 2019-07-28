@@ -1,4 +1,4 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
@@ -11,11 +11,11 @@ typedef enum
 	STATUS_T_DAT,
 } status_t;
 
-// æ•°æ®å¤´
+// Êı¾İÍ·
 struct DAT_HDR
 {
-	int  len;		// æ•°æ®ä½“é•¿åº¦
-	char cmd[64];		// å‘½ä»¤å­—
+	int  len;		// Êı¾İÌå³¤¶È
+	char cmd[64];		// ÃüÁî×Ö
 };
 
 class mythread : public acl::thread
@@ -44,7 +44,7 @@ protected:
 	{
 		acl::socket_stream conn;
 
-		// è¿æ¥æœåŠ¡å™¨
+		// Á¬½Ó·şÎñÆ÷
 		if (!conn.open(addr_.c_str(), __timeout, __timeout)) {
 			printf("connect %s error\r\n", addr_.c_str());
 			return NULL;
@@ -66,13 +66,13 @@ private:
 		req_hdr.len = htonl(length_);
 		ACL_SAFE_STRNCPY(req_hdr.cmd, "SEND", sizeof(req_hdr.cmd));
 
-		// å…ˆå†™æ•°æ®å¤´
+		// ÏÈĞ´Êı¾İÍ·
 		if (conn.write(&req_hdr, sizeof(req_hdr)) == -1) {
 			printf("write hdr to server failed\r\n");
 			return false;
 		}
 
-		// å†å†™æ•°æ®ä½“
+		// ÔÙĞ´Êı¾İÌå
 		if (conn.write(req_dat_, length_) == -1) {
 			printf("write dat to server failed\r\n");
 			return false;
@@ -80,27 +80,27 @@ private:
 
 		//////////////////////////////////////////////////////////////
 
-		// å…ˆè¯»å“åº”å¤´
+		// ÏÈ¶ÁÏìÓ¦Í·
 		DAT_HDR res;
 		if (conn.read(&res, sizeof(DAT_HDR)) == -1) {
 			printf("read DAT_HDR error\r\n");
 			return false;
 		}
 
-		// å°†å“åº”ä½“æ•°æ®é•¿åº¦è½¬ä¸ºä¸»æœºå­—èŠ‚åº
+		// ½«ÏìÓ¦ÌåÊı¾İ³¤¶È×ªÎªÖ÷»ú×Ö½ÚĞò
 		res.len = ntohl(res.len);
 		if (res.len <= 0) {
 			printf("invalid length: %d\r\n", res.len);
 			return false;
 		}
 
-		// æ£€æµ‹æ˜¯å¦éœ€è¦é‡æ–°åˆ†é…è¯»å“åº”æ•°æ®çš„å†…å­˜
+		// ¼ì²âÊÇ·ñĞèÒªÖØĞÂ·ÖÅä¶ÁÏìÓ¦Êı¾İµÄÄÚ´æ
 		if (res.len + 1 >= res_max_) {
 			res_max_ = res.len + 1;
 			res_dat_ = (char*) realloc(res_dat_, res_max_);
 		}
 
-		// å†è¯»å“åº”ä½“
+		// ÔÙ¶ÁÏìÓ¦Ìå
 		if (conn.read(res_dat_, res.len) == -1) {
 			printf("read data error, len: %d\r\n", res.len);
 			return false;

@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -26,7 +26,7 @@ static int  __timeout    = 120;
 static long long __nloop = 1000;
 static long long __count = 0;
 
-// 褰撹繛鎺ュ彞鏌勫叧闂椂鐨勫洖璋冨嚱鏁�
+// 当连接句柄关闭时的回调函数
 
 static int on_close(ACL_ASTREAM *conn, void *ctx)
 {
@@ -38,14 +38,14 @@ static int on_close(ACL_ASTREAM *conn, void *ctx)
 	return 0;
 }
 
-// 褰撳啓鎴愬姛鏃剁殑鍥炶皟鍑芥暟
+// 当写成功时的回调函数
 
 static int on_write(ACL_ASTREAM *conn acl_unused, void *ctx acl_unused)
 {
 	return 0;
 }
 
-// 褰撹鍒版湇鍔＄鐨勬暟鎹椂鐨勫洖璋冨嚱鏁�
+// 当读到服务端的数据时的回调函数
 
 static int on_read(ACL_ASTREAM *conn, void *ctx acl_unused,
 		char *data, int dlen)
@@ -66,7 +66,7 @@ static int on_read(ACL_ASTREAM *conn, void *ctx acl_unused,
 	return -1;
 }
 
-// 杩炴帴鎴愬姛鎴栧け璐ユ椂鐨勫洖璋冨嚱鏁�
+// 连接成功或失败时的回调函数
 
 static int on_connect(ACL_ASTREAM *conn, void *ctx)
 {
@@ -84,22 +84,22 @@ static int on_connect(ACL_ASTREAM *conn, void *ctx)
 
 	printf("connect %s ok\r\n", server_addr);
 
-	// 娣诲姞璇绘垚鍔熸椂鐨勫洖璋冨嚱鏁�
+	// 添加读成功时的回调函数
 	acl_aio_add_read_hook(conn, on_read, ctx);
 
-	// 娣诲姞鍐欐垚鍔熸椂鐨勫洖璋冨嚱鏁�
+	// 添加写成功时的回调函数
 	acl_aio_add_write_hook(conn, on_write, ctx);
 
-	// 娣诲姞杩炴帴鍙ユ焺鍏抽棴鏃剁殑鍥炶皟鍑芥暟
+	// 添加连接句柄关闭时的回调函数
 	acl_aio_add_close_hook(conn, on_close, ctx);
 
-	// 娉ㄥ唽璇讳簨浠惰繃绋�
+	// 注册读事件过程
 	acl_aio_read(conn);
 
-	// 寰€鏈嶅姟鍣ㄥ啓鏁版嵁锛屼粠鑰屽紑濮嬭Е鍙戞湇鍔″櫒鐨勫洖鏄剧ず杩囩▼
+	// 往服务器写数据，从而开始触发服务器的回显示过程
 	acl_aio_writen(conn, data, sizeof(data) - 1);
 
-	// 杩斿洖 0 琛ㄧず缁х画
+	// 返回 0 表示继续
 	return 0;
 }
 
@@ -156,16 +156,16 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	// 鍒涘缓寮傛 IO 鍙ユ焺
+	// 创建异步 IO 句柄
 	aio = acl_aio_create(ACL_EVENT_KERNEL);
 
-	// 璁剧疆鎸佺画璇绘爣蹇椾綅
+	// 设置持续读标志位
 	acl_aio_set_keep_read(aio, 1);
 
-	// 璁剧疆鍩熷悕鏈嶅姟鍣ㄥ湴鍧€
+	// 设置域名服务器地址
 	acl_aio_set_dns(aio, dns_addr, 5);
 
-	// 杩炴帴鍥炴樉鏈嶅姟鍣ㄥ湴鍧€锛屽苟娉ㄥ唽杩炴帴鍥炶皟鍑芥暟
+	// 连接回显服务器地址，并注册连接回调函数
 	for (i = 0; i < __nconnect; i++) {
 		acl_aio_connect_addr(aio, svr_addr, __timeout, on_connect, svr_addr);
 	}
@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 
 	gettimeofday(&end, NULL);
 
-	// 璁＄畻 IO 澶勭悊閫熷害
+	// 计算 IO 处理速度
 	spent = stamp_sub(&end, &begin);
 	speed = (__count * 1000) / (spent > 0 ? spent : 1);
 

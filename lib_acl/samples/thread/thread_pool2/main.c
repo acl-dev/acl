@@ -1,4 +1,4 @@
-﻿#include <getopt.h>
+#include <getopt.h>
 #include "lib_acl.h"
 
 static char  __addr[128];

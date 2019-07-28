@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Grid-light theme for Highcharts JS
  * @author Torstein Honsi
  */

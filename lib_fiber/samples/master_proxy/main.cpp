@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <poll.h>
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	// 璁剧疆閰嶇疆鍙傛暟琛�
+	// 设置配置参数表
 	mf.set_cfg_int(var_conf_int_tab);
 	mf.set_cfg_int64(NULL);
 	mf.set_cfg_str(var_conf_str_tab);

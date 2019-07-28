@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	attr_print64 3
  * SUMMARY

@@ -1,17 +1,17 @@
-ï»¿// JawsCtrl.h : PROJECT_NAME åº”ç”¨ç¨‹åºçš„ä¸»å¤´æ–‡ä»¶
+// JawsCtrl.h : PROJECT_NAME Ó¦ÓÃ³ÌĞòµÄÖ÷Í·ÎÄ¼ş
 //
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error åœ¨åŒ…å«ç”¨äº PCH çš„æ­¤æ–‡ä»¶ä¹‹å‰åŒ…å«â€œstdafx.hâ€
+	#error ÔÚ°üº¬ÓÃÓÚ PCH µÄ´ËÎÄ¼şÖ®Ç°°üº¬¡°stdafx.h¡±
 #endif
 #include "SingleCtrl.h"
-#include "resource.h"		// ä¸»ç¬¦å·
+#include "resource.h"		// Ö÷·ûºÅ
 
 
 // CJawsCtrlApp:
-// æœ‰å…³æ­¤ç±»çš„å®ç°ï¼Œè¯·å‚é˜… JawsCtrl.cpp
+// ÓĞ¹Ø´ËÀàµÄÊµÏÖ£¬Çë²ÎÔÄ JawsCtrl.cpp
 //
 
 class CJawsCtrlApp : public CWinApp
@@ -19,13 +19,13 @@ class CJawsCtrlApp : public CWinApp
 public:
 	CJawsCtrlApp();
 
-// é‡å†™
+// ÖØĞ´
 	public:
 	virtual BOOL InitInstance();
 
 	CSingleCtrl m_singleCtrl;
 
-// å®ç°
+// ÊµÏÖ
 
 	DECLARE_MESSAGE_MAP()
 };

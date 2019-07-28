@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "zdb_test.h"
 
 int main(int argc acl_unused, char *argv[] acl_unused)

@@ -1,10 +1,10 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "http_plugin.h"
 
 static ACL_DLL_ENV __dll_env;
 static acl_pthread_pool_t *__thrpool = NULL;
 
-/* åˆå§‹åŒ–è¯¥æ’ä»¶çš„ç¯å¢ƒ */
+/* ³õÊ¼»¯¸Ã²å¼şµÄ»·¾³ */
 
 static void plugin_init(ACL_DLL_ENV *dll_env)
 {
@@ -18,7 +18,7 @@ static void plugin_init(ACL_DLL_ENV *dll_env)
                         __LINE__, ACL_VSTREAM_PATH(__dll_env.logfp));
         }
 
-	/* å¦‚æœ mem_slice éç©ºåˆ™è®¾ç½®å†…å­˜åˆ†é…é‡‡ç”¨åˆ‡ç‰‡åˆ†é…æ–¹å¼ */
+	/* Èç¹û mem_slice ·Ç¿ÕÔòÉèÖÃÄÚ´æ·ÖÅä²ÉÓÃÇĞÆ¬·ÖÅä·½Ê½ */
 	if (__dll_env.mem_slice)
 		acl_mem_slice_set(__dll_env.mem_slice);
 }
@@ -38,7 +38,7 @@ void http_plugin_pool_create(int threads_limit, int threads_idle)
 			myname, __LINE__);
 		return;
 	}
-	/* åˆ›å»ºçº¿ç¨‹æ±  */
+	/* ´´½¨Ïß³Ì³Ø */
 	__thrpool = acl_thread_pool_create(threads_limit, threads_idle);
 }
 
@@ -49,7 +49,7 @@ void http_plugin_pool_append(void (*start_routine)(void *), void *arg)
 
 void http_plugin_debug_memory(int level)
 {
-	/* æ˜¯å¦è°ƒè¯•æ’ä»¶çš„å†…å­˜åˆ†é…æƒ…å†µ */
+	/* ÊÇ·ñµ÷ÊÔ²å¼şµÄÄÚ´æ·ÖÅäÇé¿ö */
 
 	switch (level) {
 	case 1:

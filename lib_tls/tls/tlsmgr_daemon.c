@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <sys/stat.h>
 #include <stdlib.h>
 #ifdef	ACL_UNIX

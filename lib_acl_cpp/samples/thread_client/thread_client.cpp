@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 #include "thread_client.h"
 
@@ -19,7 +19,7 @@ void* thread_client::run()
 {
 	acl::socket_stream conn;
 
-	// è¿æ¥è¿œç¨‹æœåŠ¡å™¨
+	// Á¬½ÓÔ¶³Ì·şÎñÆ÷
 	if (conn.open(server_addr_, 10, 10) == false)
 	{
 		printf("connect %s error %s\r\n", server_addr_.c_str(),
@@ -39,7 +39,7 @@ void* thread_client::run()
 	int   i = 0;
 	for (; i < count_; i++)
 	{
-		// å‘æœåŠ¡å™¨å†™ä¸€è¡Œæ•°æ®
+		// Ïò·şÎñÆ÷Ğ´Ò»ĞĞÊı¾İ
 		if (conn.write(data, length_) == -1)
 		{
 			printf("write to %s error %s\r\n",
@@ -47,7 +47,7 @@ void* thread_client::run()
 			break;
 		}
 
-		// ä»æœåŠ¡å™¨è¯»ä¸€è¡Œæ•°æ®
+		// ´Ó·şÎñÆ÷¶ÁÒ»ĞĞÊı¾İ
 		if (conn.gets(buf) == false)
 		{
 			printf("gets from %s error %s\r\n",
@@ -64,7 +64,7 @@ void* thread_client::run()
 		if (keep_alive_)
 			continue;
 
-		// å¦‚æœé‡‡ç”¨çŸ­è¿æ¥ï¼Œåˆ™å…ˆå…³é—­è¿æ¥å†æ‰“å¼€è¿æ¥
+		// Èç¹û²ÉÓÃ¶ÌÁ¬½Ó£¬ÔòÏÈ¹Ø±ÕÁ¬½ÓÔÙ´ò¿ªÁ¬½Ó
 		conn.close();
 		if (conn.open(server_addr_.c_str(), 10, 10) == false)
 		{

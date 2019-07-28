@@ -1,4 +1,4 @@
-﻿#ifndef SANE_SOCKET_INCLUDE_H
+#ifndef SANE_SOCKET_INCLUDE_H
 #define SANE_SOCKET_INCLUDE_H
 
 #include "fiber/libfiber.h"

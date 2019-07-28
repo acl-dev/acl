@@ -1,10 +1,10 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "dict_pool.h"
 #include "http_service.h"
 #include "service_main.h"
 
-/* é…ç½®æ–‡ä»¶é¡¹ */
+/* ÅäÖÃÎÄ¼şÏî */
 char *var_cfg_mysql_dbaddr;
 char *var_cfg_mysql_dbuser;
 char *var_cfg_mysql_dbpass;
@@ -60,7 +60,7 @@ ACL_CONFIG_STR_TABLE service_conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-/* åˆå§‹åŒ–å‡½æ•° */
+/* ³õÊ¼»¯º¯Êı */
 void service_init(void *init_ctx)
 {
 	acl_init();
@@ -72,7 +72,7 @@ void service_exit(void *exit_ctx)
 	http_service_exit(exit_ctx);
 }
 
-/* åè®®å¤„ç†å‡½æ•°å…¥å£ */
+/* Ğ­Òé´¦Àíº¯ÊıÈë¿Ú */
 int service_main(ACL_VSTREAM *client, void *run_ctx acl_unused)
 {
 #ifdef	TEST_ECHO

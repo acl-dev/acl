@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "udp.h"
 
 static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)

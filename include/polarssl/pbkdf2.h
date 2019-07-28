@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file pbkdf2.h
  *
  * \brief Password-Based Key Derivation Function 2 (from PKCS#5)

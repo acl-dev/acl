@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include <memory>
 #include <iostream>
 #include "master_service.h"
@@ -19,7 +19,7 @@ https_client::~https_client()
 bool https_client::connect_server(const acl::string& server_addr,
 	acl::http_client& client)
 {
-	// å…ˆæŸ¥æœ¬åœ°æ˜ å°„è¡¨ä¸­æœ‰æ²¡æœ‰æ˜ å°„é¡¹
+	// ÏÈ²é±¾µØÓ³Éä±íÖĞÓĞÃ»ÓĞÓ³ÉäÏî
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 	const char* addr = ms.get_addr(server_addr.c_str());
 	if (addr == NULL)
@@ -66,22 +66,22 @@ bool https_client::http_request(acl::HttpServletRequest& req,
 
 	std::auto_ptr<acl::http_client> backend(new acl::http_client);
 
-	// è¿æ¥æœåŠ¡å™¨
+	// Á¬½Ó·şÎñÆ÷
 	if (connect_server(server_addr, *backend) == false)
 		return false;
 
 	acl::http_client* front = req.getClient();
 
-	// å¯ä»¥åœ¨æ­¤å¤„å¼ºåˆ¶æ›¿æ¢ HTTP è¯·æ±‚å¤´ä¸­çš„ HOST å­—æ®µ
+	// ¿ÉÒÔÔÚ´Ë´¦Ç¿ÖÆÌæ»» HTTP ÇëÇóÍ·ÖĞµÄ HOST ×Ö¶Î
 	//front->header_update("Host", "www.test.com:443");
 
-	// å–å¾—  HTTP è¯·æ±‚å¤´æ•°æ®
+	// È¡µÃ  HTTP ÇëÇóÍ·Êı¾İ
 	acl::string req_hdr;
 	front->sprint_header(req_hdr, NULL);
 
 	printf(">>>req_hdr: %s\r\n", req_hdr.c_str());
 
-	// è½¬å‘ HTTP è¯·æ±‚å¤´è‡³æœåŠ¡å™¨
+	// ×ª·¢ HTTP ÇëÇóÍ·ÖÁ·şÎñÆ÷
 	if (backend->get_ostream().write(req_hdr) == -1)
 	{
 		out_.puts(">>>>write header error");
@@ -93,7 +93,7 @@ bool https_client::http_request(acl::HttpServletRequest& req,
 		return false;
 	}
 
-	// å¦‚æœè¿˜æœ‰æ•°æ®ä½“ï¼Œåˆ™è½¬å‘è¯·æ±‚çš„æ•°æ®ä½“ç»™æœåŠ¡å™¨
+	// Èç¹û»¹ÓĞÊı¾İÌå£¬Ôò×ª·¢ÇëÇóµÄÊı¾İÌå¸ø·şÎñÆ÷
 	long long int len = req.getContentLength();
 
 	if (len > 0)
@@ -123,7 +123,7 @@ bool https_client::http_request(acl::HttpServletRequest& req,
 	}
 	out_.puts("");
 
-	// å¼€å§‹ä»åç«¯æœåŠ¡å™¨è¯»å–å“åº”å¤´å’Œå“åº”ä½“æ•°æ®
+	// ¿ªÊ¼´Óºó¶Ë·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Í·ºÍÏìÓ¦ÌåÊı¾İ
 
 	out_.puts(">>>> begin read res header<<<<<");
 	if (backend->read_head() == false)
@@ -176,7 +176,7 @@ bool https_client::http_request(acl::HttpServletRequest& req,
 	if (ptr == NULL || *ptr == 0 || strcasecmp(ptr, "chunked") != 0)
 		return backend->keep_alive();
 
-	// å‘é€ http å“åº”ä½“ï¼Œå› ä¸ºè®¾ç½®äº† chunk ä¼ è¾“æ¨¡å¼ï¼Œæ‰€ä»¥éœ€è¦å¤šè°ƒç”¨ä¸€æ¬¡
-	// res.write ä¸”ä¸¤ä¸ªå‚æ•°å‡ä¸º 0 ä»¥è¡¨ç¤º chunk ä¼ è¾“æ•°æ®ç»“æŸ
+	// ·¢ËÍ http ÏìÓ¦Ìå£¬ÒòÎªÉèÖÃÁË chunk ´«ÊäÄ£Ê½£¬ËùÒÔĞèÒª¶àµ÷ÓÃÒ»´Î
+	// res.write ÇÒÁ½¸ö²ÎÊı¾ùÎª 0 ÒÔ±íÊ¾ chunk ´«ÊäÊı¾İ½áÊø
 	return res.write(NULL, 0);
 }

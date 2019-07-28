@@ -1,4 +1,4 @@
-ï»¿#ifndef	__SPOOL_MAIN_INCLUDE_H__
+#ifndef	__SPOOL_MAIN_INCLUDE_H__
 #define	__SPOOL_MAIN_INCLUDE_H__
 
 #ifdef	__cplusplus
@@ -14,25 +14,25 @@ typedef struct SPOOL {
 /*----------------------------------------------------------------------------*/
 /* in spool_main.c */
 /**
- * åˆ›å»ºä¸€ä¸ªæœåŠ¡å™¨æ¡†æ¶
- * @param max_threads æœ€å¤§çº¿ç¨‹æ•°
- * @param idle_timeout æ¯ä¸ªçº¿ç¨‹ç©ºé—²è¶…æ—¶æ—¶é—´
- * @return SPOOL* æœåŠ¡å™¨è¿æ¥æ± å¥æŸ„
+ * ´´½¨Ò»¸ö·şÎñÆ÷¿ò¼Ü
+ * @param max_threads ×î´óÏß³ÌÊı
+ * @param idle_timeout Ã¿¸öÏß³Ì¿ÕÏĞ³¬Ê±Ê±¼ä
+ * @return SPOOL* ·şÎñÆ÷Á¬½Ó³Ø¾ä±ú
  */
 extern SPOOL *spool_create(int max_threads, int idle_timeout);
 
 /**
- * å¯åŠ¨ä»»åŠ¡å·¥ä½œæ± 
- * @param spool æœåŠ¡å™¨ä»»åŠ¡æ± å¥æŸ„
+ * Æô¶¯ÈÎÎñ¹¤×÷³Ø
+ * @param spool ·şÎñÆ÷ÈÎÎñ³Ø¾ä±ú
  */
 extern int spool_start(const SPOOL *spool);
 
 /**
- * å‘ä»»åŠ¡æ± ä¸­æ·»åŠ ä¸€ä¸ªå·¥ä½œä»»åŠ¡
- * @param spool æœåŠ¡å™¨ä»»åŠ¡æ± å¥æŸ„
- * @param cstream å®¢æˆ·ç«¯æ•°æ®æµæŒ‡é’ˆ
- * æ³¨: cstream æ•°æ®æµä¼šåœ¨è¯¥å‡½æ•°å†…éƒ¨çš„å›è°ƒå‡½æ•°ä¸­è¿›è¡Œå…³é—­, æ‰€ä»¥è¯¥å‡½æ•°çš„è°ƒç”¨è€…ä¸è¦
- *     å…³é—­è¯¥æµ.
+ * ÏòÈÎÎñ³ØÖĞÌí¼ÓÒ»¸ö¹¤×÷ÈÎÎñ
+ * @param spool ·şÎñÆ÷ÈÎÎñ³Ø¾ä±ú
+ * @param cstream ¿Í»§¶ËÊı¾İÁ÷Ö¸Õë
+ * ×¢: cstream Êı¾İÁ÷»áÔÚ¸Ãº¯ÊıÄÚ²¿µÄ»Øµ÷º¯ÊıÖĞ½øĞĞ¹Ø±Õ, ËùÒÔ¸Ãº¯ÊıµÄµ÷ÓÃÕß²»Òª
+ *     ¹Ø±Õ¸ÃÁ÷.
  */
 extern void spool_add_worker(SPOOL *spool, ACL_VSTREAM *cstream);
 /*----------------------------------------------------------------------------*/

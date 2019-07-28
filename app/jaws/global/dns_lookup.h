@@ -1,4 +1,4 @@
-﻿#ifndef	__DNS_LOOKUP_INCLUDE_H__
+#ifndef	__DNS_LOOKUP_INCLUDE_H__
 #define	__DNS_LOOKUP_INCLUDE_H__
 
 #include "dns.h"

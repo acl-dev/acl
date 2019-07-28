@@ -1,4 +1,4 @@
-﻿#ifndef	__DEFINE_PRIVATE_H__
+#ifndef	__DEFINE_PRIVATE_H__
 #define	__DEFINE_PRIVATE_H__
 
 #ifdef	PACK_STRUCT

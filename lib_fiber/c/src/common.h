@@ -1,4 +1,4 @@
-﻿#ifndef __COMMON_INCLUDE_H__
+#ifndef __COMMON_INCLUDE_H__
 #define __COMMON_INCLUDE_H__
 
 #include "common/init.h"

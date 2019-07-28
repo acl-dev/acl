@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "mime_code.hpp"
 
@@ -10,27 +10,27 @@ class ACL_CPP_API mime_xxcode : public mime_code
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param addCrlf {bool} éæµå¼ç¼–ç æ—¶æ˜¯å¦åœ¨æœ«å°¾æ·»åŠ  "\r\n"
-	 * @param addInvalid {bool} æµå¼è§£ç æ—¶æ˜¯å¦é‡åˆ°éæ³•å­—ç¬¦æ˜¯å¦åŸæ ·æ‹·è´
+	 * ¹¹Ôìº¯Êı
+	 * @param addCrlf {bool} ·ÇÁ÷Ê½±àÂëÊ±ÊÇ·ñÔÚÄ©Î²Ìí¼Ó "\r\n"
+	 * @param addInvalid {bool} Á÷Ê½½âÂëÊ±ÊÇ·ñÓöµ½·Ç·¨×Ö·ûÊÇ·ñÔ­Ñù¿½±´
 	 */
 	mime_xxcode(bool addCrlf = false, bool addInvalid = false);
 	~mime_xxcode(void);
 
 	/**
-	 * é™æ€ç¼–ç å‡½æ•°ï¼Œç›´æ¥å°†è¾“å…¥æ•°æ®è¿›è¡Œç¼–ç åŒæ—¶å­˜å…¥ç”¨æˆ·ç¼“å†²åŒº
-	 * ç”¨æˆ·ç¼“å†²åŒº
-	 * @param in {const char*} è¾“å…¥æ•°æ®åœ°å€
-	 * @param n {int} è¾“å…¥æ•°æ®é•¿åº¦
-	 * @param out {string*} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒº
+	 * ¾²Ì¬±àÂëº¯Êı£¬Ö±½Ó½«ÊäÈëÊı¾İ½øĞĞ±àÂëÍ¬Ê±´æÈëÓÃ»§»º³åÇø
+	 * ÓÃ»§»º³åÇø
+	 * @param in {const char*} ÊäÈëÊı¾İµØÖ·
+	 * @param n {int} ÊäÈëÊı¾İ³¤¶È
+	 * @param out {string*} ´æ´¢½á¹ûµÄ»º³åÇø
 	 */
 	static void encode(const char* in, int n, string* out);
 
 	/**
-	 * é™æ€è§£ç å‡½æ•°ï¼Œç›´æ¥å°†è¾“å…¥æ•°æ®è¿›è¡Œè§£æå¹¶å­˜å…¥ç”¨æˆ·ç¼“å†²åŒº
-	 * @param in {const char*} è¾“å…¥æ•°æ®åœ°å€
-	 * @param n {int} æ•°æ®é•¿åº¦
-	 * @param out {string*} å­˜å‚¨è§£æç»“æœ
+	 * ¾²Ì¬½âÂëº¯Êı£¬Ö±½Ó½«ÊäÈëÊı¾İ½øĞĞ½âÎö²¢´æÈëÓÃ»§»º³åÇø
+	 * @param in {const char*} ÊäÈëÊı¾İµØÖ·
+	 * @param n {int} Êı¾İ³¤¶È
+	 * @param out {string*} ´æ´¢½âÎö½á¹û
 	 */
 	static void decode(const char* in, int n, string* out);
 

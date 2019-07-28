@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/event/event_timer.hpp"
@@ -70,20 +70,20 @@ static void timer_callback(int, ACL_EVENT* event, void* ctx)
 {
 	event_timer* timer = (event_timer*) ctx;
 
-	// è§¦å‘å®šæ—¶å™¨ä¸­çš„æ‰€æœ‰å®šæ—¶ä»»åŠ¡
+	// ´¥·¢¶¨Ê±Æ÷ÖĞµÄËùÓĞ¶¨Ê±ÈÎÎñ
 	acl_int64 next_delay = timer->trigger();
 
-	// å¦‚æœå®šæ—¶å™¨ä¸­çš„ä»»åŠ¡ä¸ºç©ºæˆ–æœªè®¾ç½®å®šæ—¶å™¨çš„é‡å¤ä½¿ç”¨ï¼Œåˆ™åˆ é™¤å®šæ—¶å™¨
+	// Èç¹û¶¨Ê±Æ÷ÖĞµÄÈÎÎñÎª¿Õ»òÎ´ÉèÖÃ¶¨Ê±Æ÷µÄÖØ¸´Ê¹ÓÃ£¬ÔòÉ¾³ı¶¨Ê±Æ÷
 	if (timer->empty() || !timer->keep_timer()) {
-		// åˆ é™¤å®šæ—¶å™¨
+		// É¾³ı¶¨Ê±Æ÷
 		acl_event_cancel_timer(event, timer_callback, timer);
 		timer->destroy();
 		return;
 	}
 
-	// å¦‚æœå…è®¸é‡å¤ä½¿ç”¨å®šæ—¶å™¨ä¸”å®šæ—¶å™¨ä¸­çš„ä»»åŠ¡éç©ºï¼Œåˆ™å†æ¬¡è®¾ç½®è¯¥å®šæ—¶å™¨
+	// Èç¹ûÔÊĞíÖØ¸´Ê¹ÓÃ¶¨Ê±Æ÷ÇÒ¶¨Ê±Æ÷ÖĞµÄÈÎÎñ·Ç¿Õ£¬ÔòÔÙ´ÎÉèÖÃ¸Ã¶¨Ê±Æ÷
 
-	//  éœ€è¦é‡ç½®å®šæ—¶å™¨çš„åˆ°è¾¾æ—¶é—´æˆª
+	//  ĞèÒªÖØÖÃ¶¨Ê±Æ÷µÄµ½´ïÊ±¼ä½Ø
 	acl_event_request_timer(event, timer_callback, timer,
 		next_delay < 0 ? 0 : next_delay, timer->keep_timer() ? 1 : 0);
 }

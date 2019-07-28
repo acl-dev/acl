@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "redis_util.h"
 
 redis_util::redis_util(void)

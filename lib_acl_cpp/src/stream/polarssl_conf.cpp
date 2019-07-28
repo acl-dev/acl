@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 
 #ifdef HAS_POLARSSL_DLL
 # ifndef HAS_POLARSSL

@@ -1,7 +1,7 @@
-ï»¿#pragma once
+#pragma once
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 extern char* var_cfg_dbcharset;
 extern acl::master_str_tbl var_conf_str_tab[];
@@ -16,7 +16,7 @@ extern acl::master_int64_tbl var_conf_int64_tab[];
 
 
 ////////////////////////////////////////////////////////////////////////////////
-// å…¶å®ƒå…¨å±€é¡¹
+// ÆäËüÈ«¾ÖÏî
 
 extern acl::db_pool* var_dbpool;
 extern acl::thread_pool* var_thrpool;

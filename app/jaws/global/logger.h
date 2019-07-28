@@ -1,4 +1,4 @@
-﻿#ifndef	__LOGGER_INCLUDE_H__
+#ifndef	__LOGGER_INCLUDE_H__
 #define	__LOGGER_INCLUDE_H__
 
 #include "lib_acl.h"

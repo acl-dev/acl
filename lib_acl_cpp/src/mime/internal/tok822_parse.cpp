@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tok822_parse 3
  * SUMMARY

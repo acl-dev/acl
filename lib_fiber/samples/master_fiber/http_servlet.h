@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 
 class http_servlet : public acl::HttpServlet
 {
@@ -27,7 +27,7 @@ public:
 		res.setContentLength(len);
 		res.setKeepAlive(true);
 
-		// å‘é€ http å“åº”ä½“
+		// ·¢ËÍ http ÏìÓ¦Ìå
 		return res.write(buf, len) && res.write(NULL, 0);
 	}
 };

@@ -1,4 +1,4 @@
-﻿// wizard.cpp : 定义控制台应用程序的入口点。
+// wizard.cpp : �������̨Ӧ�ó������ڵ㡣
 //
 
 #include "stdafx.h"

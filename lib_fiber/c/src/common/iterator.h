@@ -1,25 +1,25 @@
-ï»¿#ifndef	__ITERATOR_INCLUDE_H__
+#ifndef	__ITERATOR_INCLUDE_H__
 #define	__ITERATOR_INCLUDE_H__
 
 typedef struct ITER ITER;
 
 /**
- * ACL åº“ä¸­æ•°æ®ç»“æ„ç”¨çš„é€šç”¨è¿­ä»£å™¨ç»“æ„å®šä¹‰
+ * ACL ¿âÖĞÊı¾İ½á¹¹ÓÃµÄÍ¨ÓÃµü´úÆ÷½á¹¹¶¨Òå
  */
 struct ITER {
-	void *ptr;		/**< è¿­ä»£å™¨æŒ‡é’ˆ, ä¸å®¹å™¨ç›¸å…³ */
-	void *data;		/**< ç”¨æˆ·æ•°æ®æŒ‡é’ˆ */
-	int   dlen;		/**< ç”¨æˆ·æ•°æ®é•¿åº¦, å®ç°è€…å¯è®¾ç½®æ­¤å€¼ä¹Ÿå¯ä¸è®¾ç½® */
-	const char *key;	/**< è‹¥ä¸ºå“ˆå¸Œè¡¨çš„è¿­ä»£å™¨, åˆ™ä¸ºå“ˆå¸Œé”®å€¼åœ°å€ */
-	int   klen;		/**< è‹¥ä¸ºBINHASHè¿­ä»£å™¨, åˆ™ä¸ºé”®é•¿åº¦ */
-	int   i;		/**< å½“å‰è¿­ä»£å™¨åœ¨å®¹å™¨ä¸­çš„ä½ç½®ç´¢å¼• */
-	int   size;		/**< å½“å‰å®¹å™¨ä¸­å…ƒç´ æ€»ä¸ªæ•° */
+	void *ptr;		/**< µü´úÆ÷Ö¸Õë, ÓëÈİÆ÷Ïà¹Ø */
+	void *data;		/**< ÓÃ»§Êı¾İÖ¸Õë */
+	int   dlen;		/**< ÓÃ»§Êı¾İ³¤¶È, ÊµÏÖÕß¿ÉÉèÖÃ´ËÖµÒ²¿É²»ÉèÖÃ */
+	const char *key;	/**< ÈôÎª¹şÏ£±íµÄµü´úÆ÷, ÔòÎª¹şÏ£¼üÖµµØÖ· */
+	int   klen;		/**< ÈôÎªBINHASHµü´úÆ÷, ÔòÎª¼ü³¤¶È */
+	int   i;		/**< µ±Ç°µü´úÆ÷ÔÚÈİÆ÷ÖĞµÄÎ»ÖÃË÷Òı */
+	int   size;		/**< µ±Ç°ÈİÆ÷ÖĞÔªËØ×Ü¸öÊı */
 };
 
 /**
- * æ­£å‘éå†å®¹å™¨ä¸­å…ƒç´ 
+ * ÕıÏò±éÀúÈİÆ÷ÖĞÔªËØ
  * @param iter {ITER}
- * @param container {void*} å®¹å™¨åœ°å€
+ * @param container {void*} ÈİÆ÷µØÖ·
  * @examples: samples/iterator/
  */
 #define	FOREACH(iter, container)  \
@@ -28,9 +28,9 @@ struct ITER {
              (container)->iter_next(&(iter), (container)))
 
 /**
- * åå‘éå†å®¹å™¨ä¸­å…ƒç´ 
+ * ·´Ïò±éÀúÈİÆ÷ÖĞÔªËØ
  * @param iter {ITER}
- * @param container {void*} å®¹å™¨åœ°å€
+ * @param container {void*} ÈİÆ÷µØÖ·
  * @examples: samples/iterator/
  */
 #define	FOREACH_REVERSE(iter, container)  \
@@ -39,9 +39,9 @@ struct ITER {
              (container)->iter_prev(&(iter), (container)))
 
 /**
- * è·å¾—å½“å‰è¿­ä»£æŒ‡é’ˆä¸æŸå®¹å™¨å…³è”çš„æˆå‘˜ç»“æ„ç±»å‹å¯¹è±¡
+ * »ñµÃµ±Ç°µü´úÖ¸ÕëÓëÄ³ÈİÆ÷¹ØÁªµÄ³ÉÔ±½á¹¹ÀàĞÍ¶ÔÏó
  * @param iter {ITER}
- * @param container {void*} å®¹å™¨åœ°å€
+ * @param container {void*} ÈİÆ÷µØÖ·
  */
 #define	ITER_INFO(iter, container)  \
 	(container)->iter_info(&(iter), (container))

@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <iostream>
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "winaioDlg.h"

@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 #include "global.h"
 #include "http_client.h"
@@ -29,7 +29,7 @@ acl_int64 gid_json_next(ACL_VSTREAM *client, const char *tag, int *errnum)
 	else
 		snprintf(buf, sizeof(buf), "{ cmd: '%s' }\r\n", GID_CMD_NEXT);
 
-	/* å‘é€ HTTP JSON è¯·æ±‚ */
+	/* ·¢ËÍ HTTP JSON ÇëÇó */
 	if (http_client_post_request(client, var_gid_url, 1,
 		"json", buf, (int) strlen(buf), errnum) < 0)
 	{
@@ -38,9 +38,9 @@ acl_int64 gid_json_next(ACL_VSTREAM *client, const char *tag, int *errnum)
 		return (-1);
 	}
 
-	json = acl_json_alloc();  /* åˆ†é… JSON å¯¹è±¡ */
+	json = acl_json_alloc();  /* ·ÖÅä JSON ¶ÔÏó */
 
-	/* æ¥æ”¶ HTTP JSON å“åº” */
+	/* ½ÓÊÕ HTTP JSON ÏìÓ¦ */
 	if (http_client_get_respond(client, json, NULL, errnum, NULL) < 0)
 	{
 		if (errnum)
@@ -51,7 +51,7 @@ acl_int64 gid_json_next(ACL_VSTREAM *client, const char *tag, int *errnum)
 
 #define	STR	acl_vstring_str
 
-	/* æ•°æ®æ ¼å¼: { status: 'ok|error', gid: xxx, tag: 'xxx', msg: 'xxx', err: 'xxx' } */
+	/* Êı¾İ¸ñÊ½: { status: 'ok|error', gid: xxx, tag: 'xxx', msg: 'xxx', err: 'xxx' } */
 
 	acl_foreach(iter, json) {
 		ACL_JSON_NODE *node = (ACL_JSON_NODE*) iter.data;

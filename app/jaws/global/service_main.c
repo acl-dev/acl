@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "service.h"
 #include "service_conf.h"
 #include "service_ipc.h"
@@ -20,12 +20,12 @@ static SERVICE *service_create(ACL_AIO *aio,
 	SERVICE *service, *curr_service = NULL;
 	ACL_ITER iter;
 
-	/* å…³é—­æŒç»­è¯»åŠŸèƒ½ */
+	/* ¹Ø±Õ³ÖĞø¶Á¹¦ÄÜ */
 	acl_aio_set_keep_read(aio, 0);
 
 	services = acl_fifo_new();
 
-	/* åŠ è½½æ‰€æœ‰çš„æœåŠ¡æ¨¡å— */
+	/* ¼ÓÔØËùÓĞµÄ·şÎñÄ£¿é */
 	acl_foreach(iter, service_modules) {
 		MODULE_SERVICE *module = (MODULE_SERVICE*) iter.data;
 
@@ -41,7 +41,7 @@ static SERVICE *service_create(ACL_AIO *aio,
 				var_cfg_dns_lookup_timeout,
 				var_cfg_dns_cache_limit,
 				var_cfg_hosts_list);
-		/* åˆ›å»ºè¿æ¥æ± ç¼“å­˜å¯¹è±¡ */
+		/* ´´½¨Á¬½Ó³Ø»º´æ¶ÔÏó */
 		service->conn_cache = conn_cache_create(aio, var_cfg_server_conn_limit);
 
 		if (ip_argv) {
@@ -67,7 +67,7 @@ static SERVICE *service_create(ACL_AIO *aio,
 	if (acl_fifo_size(service_modules) == 0)
 		acl_msg_fatal("%s(%d): no service available", myname, __LINE__);
 
-	/* è®¾ç½®åè®®å¤„ç†æ–¹å¼ */
+	/* ÉèÖÃĞ­Òé´¦Àí·½Ê½ */
 	acl_foreach(iter, services) {
 		service = (SERVICE*) iter.data;
 
@@ -115,7 +115,7 @@ void service_init(ACL_AIO *aio, ACL_FIFO *modules)
 	*/
 	__dll_env.mem_slice = var_mem_slice;
 	if (var_mem_slice) {
-		/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
+		/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
 		acl_aio_request_timer(aio, gc_timer, aio, 2, 1);
 	}
 
@@ -145,7 +145,7 @@ void service_init(ACL_AIO *aio, ACL_FIFO *modules)
 	service_load_all(__service_modules, var_cfg_service_dlnames);
 #endif
 
-	/* åˆå§‹åŒ–æ‰€æœ‰åŠ è½½æ¨¡å— */
+	/* ³õÊ¼»¯ËùÓĞ¼ÓÔØÄ£¿é */
 	acl_foreach(iter, __service_modules) {
 		MODULE_SERVICE *module = (MODULE_SERVICE*) iter.data;
 		module->mod_init(&__dll_env, var_cfg_service_cfgdir);
@@ -155,13 +155,13 @@ void service_init(ACL_AIO *aio, ACL_FIFO *modules)
 		int   i, event_mode = acl_aio_event_mode(aio);
 		SERVICE *service;
 
-		/* åˆå§‹åŒ– IPC é€šé“ */
+		/* ³õÊ¼»¯ IPC Í¨µÀ */
 		service_ipc_init(aio, var_cfg_nthreads);
 
 		for (i = 0; i < var_cfg_nthreads; i++) {
 			ACL_AIO *aio_thr;
 
-			/* åˆ›å»ºå•ç‹¬è¿è¡Œçš„çº¿ç¨‹å®ä¾‹çš„å¼‚æ­¥å¥æŸ„ */
+			/* ´´½¨µ¥¶ÀÔËĞĞµÄÏß³ÌÊµÀıµÄÒì²½¾ä±ú */
 			aio_thr = acl_aio_create(event_mode);
 			if (var_cfg_aio_buf_size > 0)
 				acl_aio_set_rbuf_size(aio, var_cfg_aio_buf_size);
@@ -175,7 +175,7 @@ void service_init(ACL_AIO *aio, ACL_FIFO *modules)
 	if (ip_argv)
 		acl_argv_free(ip_argv);
 
-	/* å†…å­˜åƒåœ¾å›æ”¶å®šæ—¶å™¨ */
+	/* ÄÚ´æÀ¬»ø»ØÊÕ¶¨Ê±Æ÷ */
 	service_set_gctimer(aio, 10);
 }
 
@@ -183,7 +183,7 @@ void service_exit(void)
 {
 	const char *myname = "service_exit";
 
-	/* XXX: åœ¨ä½¿ç”¨å†…å­˜åˆ‡ç‰‡æ–¹å¼æ—¶ï¼Œå¦‚æœå¸è½½åŠ¨æ€åŠ è½½çš„åº“ä¼šå‡ºç° core æ–‡ä»¶ï¼Œå¥‡æ€ª:) */
+	/* XXX: ÔÚÊ¹ÓÃÄÚ´æÇĞÆ¬·½Ê½Ê±£¬Èç¹ûĞ¶ÔØ¶¯Ì¬¼ÓÔØµÄ¿â»á³öÏÖ core ÎÄ¼ş£¬Ææ¹Ö:) */
 	/*
 	 * service_unload_all();
 	 */
@@ -199,13 +199,13 @@ int service_main(ACL_SOCKET fd, ACL_AIO *aio)
 	acl_close_on_exec(fd, 1);
 #endif
 	if (var_cfg_nthreads > 1) {
-		/* å¤šçº¿ç¨‹æ¨¡å¼ä¸‹ï¼Œå‘å„ä¸ªå®ä¾‹çº¿ç¨‹å‘é€æ–°çš„è¿æ¥ */
+		/* ¶àÏß³ÌÄ£Ê½ÏÂ£¬Ïò¸÷¸öÊµÀıÏß³Ì·¢ËÍĞÂµÄÁ¬½Ó */
 		service_ipc_add(fd);
 	} else {
 		ACL_VSTREAM *vstream;
 		ACL_ASTREAM *astream;
 
-		/* åœ¨å•çº¿ç¨‹æ¨¡å¼ä¸‹æ‰“å¼€å¼‚æ­¥æµ */
+		/* ÔÚµ¥Ïß³ÌÄ£Ê½ÏÂ´ò¿ªÒì²½Á÷ */
 		vstream = acl_vstream_fdopen(fd, O_RDWR, var_cfg_aio_buf_size,
 				0, ACL_VSTREAM_TYPE_SOCK);
 		astream = acl_aio_open(aio, vstream);

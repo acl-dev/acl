@@ -1,7 +1,7 @@
-ï»¿#pragma once
+#pragma once
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 extern char *var_cfg_backend_service;
 extern char *var_cfg_status_servers;

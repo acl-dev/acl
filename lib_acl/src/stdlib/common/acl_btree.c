@@ -1,4 +1,4 @@
-﻿/*
+/*
  * FILE:     btree.c
  * PROGRAM:  RAT
  * AUTHOR:   O.Hodson

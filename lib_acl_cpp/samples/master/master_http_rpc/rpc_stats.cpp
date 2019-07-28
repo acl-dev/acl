@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "rpc_stats.h"
 
 static int __count = 0;

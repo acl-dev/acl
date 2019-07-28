@@ -1,18 +1,18 @@
-ï»¿
-// WinEchod.h : PROJECT_NAME åº”ç”¨ç¨‹åºçš„ä¸»å¤´æ–‡ä»¶
+
+// WinEchod.h : PROJECT_NAME Ó¦ÓÃ³ÌĞòµÄÖ÷Í·ÎÄ¼ş
 //
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error "åœ¨åŒ…å«æ­¤æ–‡ä»¶ä¹‹å‰åŒ…å«â€œstdafx.hâ€ä»¥ç”Ÿæˆ PCH æ–‡ä»¶"
+	#error "ÔÚ°üº¬´ËÎÄ¼şÖ®Ç°°üº¬¡°stdafx.h¡±ÒÔÉú³É PCH ÎÄ¼ş"
 #endif
 
-#include "resource.h"		// ä¸»ç¬¦å·
+#include "resource.h"		// Ö÷·ûºÅ
 
 
 // CWinEchodApp:
-// æœ‰å…³æ­¤ç±»çš„å®ç°ï¼Œè¯·å‚é˜… WinEchod.cpp
+// ÓĞ¹Ø´ËÀàµÄÊµÏÖ£¬Çë²ÎÔÄ WinEchod.cpp
 //
 
 class CWinEchodApp : public CWinApp
@@ -20,11 +20,11 @@ class CWinEchodApp : public CWinApp
 public:
 	CWinEchodApp();
 
-// é‡å†™
+// ÖØĞ´
 public:
 	virtual BOOL InitInstance();
 
-// å®ç°
+// ÊµÏÖ
 
 	DECLARE_MESSAGE_MAP()
 };

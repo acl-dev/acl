@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <errno.h>
 #include <string.h>
 #include <pthread.h>
@@ -6,34 +6,34 @@
 #include "gid_oper.h"
 
 typedef struct GID_STORE {
-	ACL_FHANDLE fh;		/* æ–‡ä»¶å¥æŸ„ */
-	ACL_VSTREAM *logger;	/* æ—¥å¿—å¥æŸ„ */
-	char tag[64];		/* æ–‡ä»¶æ ‡è¯†å· */
-	char sid[64];		/* ä¼šè¯IDå·ï¼Œç›¸å½“äºå¯†ç  */
-	unsigned int step;	/* æ­¥è¿›å€¼ */
-	acl_int64  cur_gid;	/* å½“å‰çš„IDå€¼ */
-	acl_int64  min_gid;	/* æœ€å°çš„IDå€¼ */
-	acl_int64  max_gid;	/* æœ€å¤§çš„IDå€¼ */
+	ACL_FHANDLE fh;		/* ÎÄ¼ş¾ä±ú */
+	ACL_VSTREAM *logger;	/* ÈÕÖ¾¾ä±ú */
+	char tag[64];		/* ÎÄ¼ş±êÊ¶ºÅ */
+	char sid[64];		/* »á»°IDºÅ£¬Ïàµ±ÓÚÃÜÂë */
+	unsigned int step;	/* ²½½øÖµ */
+	acl_int64  cur_gid;	/* µ±Ç°µÄIDÖµ */
+	acl_int64  min_gid;	/* ×îĞ¡µÄIDÖµ */
+	acl_int64  max_gid;	/* ×î´óµÄIDÖµ */
 } GID_STORE;
 
 typedef struct {
-	char tag[64];		/* æ–‡ä»¶æ ‡è¯†å· */
-	char sid[64];		/* ä¼šè¯IDå·ï¼Œç›¸å½“äºå¯†ç  */
-	unsigned int step;	/* æ­¥è¿›å€¼ */
-	acl_int64  cur_gid;	/* å½“å‰çš„IDå€¼ */
-	acl_int64  min_gid;	/* æœ€å°çš„IDå€¼ */
-	acl_int64  max_gid;	/* æœ€å¤§çš„IDå€¼ */
+	char tag[64];		/* ÎÄ¼ş±êÊ¶ºÅ */
+	char sid[64];		/* »á»°IDºÅ£¬Ïàµ±ÓÚÃÜÂë */
+	unsigned int step;	/* ²½½øÖµ */
+	acl_int64  cur_gid;	/* µ±Ç°µÄIDÖµ */
+	acl_int64  min_gid;	/* ×îĞ¡µÄIDÖµ */
+	acl_int64  max_gid;	/* ×î´óµÄIDÖµ */
 } GID_STORE_CTX;
 
 static int __sync_gid = 1;
 
-/* åŒæ­¥å†…å­˜æ•°æ®è‡³ç£ç›˜ */
+/* Í¬²½ÄÚ´æÊı¾İÖÁ´ÅÅÌ */
 
 static int gid_store_sync(GID_STORE *store)
 {
 	char  buf[1024];
 
-	/* éœ€è¦å…ˆå°†æ–‡ä»¶å†…å®¹æ¸…ç©º */
+	/* ĞèÒªÏÈ½«ÎÄ¼şÄÚÈİÇå¿Õ */
 #if 0
 	if (acl_file_ftruncate(store->fh.fp, 0) < 0) {
 		acl_msg_error("%s(%d), %s: ftruncate %s error(%s)",
@@ -52,7 +52,7 @@ static int gid_store_sync(GID_STORE *store)
 		store->tag, store->sid, store->step, store->cur_gid,
 		store->min_gid, store->max_gid);
 
-	/* åˆå§‹åŒ–æ–‡ä»¶å†…å®¹: tag:sid step cur_gid min_gid max_gid\r\n */
+	/* ³õÊ¼»¯ÎÄ¼şÄÚÈİ: tag:sid step cur_gid min_gid max_gid\r\n */
 	if (acl_vstream_writen(store->fh.fp,
 		buf, strlen(buf)) == ACL_VSTREAM_EOF)
 	{
@@ -65,7 +65,7 @@ static int gid_store_sync(GID_STORE *store)
 	return (0);
 }
 
-/* æ–‡ä»¶æ‰“å¼€æ—¶çš„å›è°ƒå‡½æ•°ï¼Œæœ‰å¯èƒ½æ˜¯æ‰“å¼€äº†ç¼“å­˜å¥æŸ„å¯¹è±¡ */
+/* ÎÄ¼ş´ò¿ªÊ±µÄ»Øµ÷º¯Êı£¬ÓĞ¿ÉÄÜÊÇ´ò¿ªÁË»º´æ¾ä±ú¶ÔÏó */
 
 static int gid_store_on_open(ACL_FHANDLE *fh, void *ctx)
 {
@@ -75,13 +75,13 @@ static int gid_store_on_open(ACL_FHANDLE *fh, void *ctx)
 	char  buf[512], *ptr;
 	int   ret;
 
-	/* æ£€æŸ¥æ˜¯å¦æœ‰é—®é¢˜ */
+	/* ¼ì²éÊÇ·ñÓĞÎÊÌâ */
 	if (fh->size != sizeof(GID_STORE))
 		acl_msg_fatal("%s(%d), %s: size(%d) != GID_STORE's size(%d)",
 			__FILE__, __LINE__, __FUNCTION__,
 			(int) fh->size, (int) sizeof(GID_STORE));
 
-	/* å¦‚æœæ˜¯æ–°æ–‡ä»¶åˆ™åˆå§‹åŒ– */
+	/* Èç¹ûÊÇĞÂÎÄ¼şÔò³õÊ¼»¯ */
 	if (fh->fsize == 0) {
 		ACL_SAFE_STRNCPY(store->tag, sc->tag, sizeof(store->tag));
 		ACL_SAFE_STRNCPY(store->sid, sc->sid, sizeof(store->sid));
@@ -93,9 +93,9 @@ static int gid_store_on_open(ACL_FHANDLE *fh, void *ctx)
 		return (gid_store_sync(store));
 	}
 
-	/* æ•°æ®æ ¼å¼ï¼štag:sid step cur_gid min_gid max_gid\r\n */
+	/* Êı¾İ¸ñÊ½£ºtag:sid step cur_gid min_gid max_gid\r\n */
 
-	/* ä»æ–‡ä»¶ä¸­è·å¾—æ•°æ® */
+	/* ´ÓÎÄ¼şÖĞ»ñµÃÊı¾İ */
 	ret = acl_vstream_gets_nonl(fh->fp, buf, sizeof(buf));
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d), %s: gets from %s error(%s)",
@@ -104,7 +104,7 @@ static int gid_store_on_open(ACL_FHANDLE *fh, void *ctx)
 		return (-1);
 	}
 
-	/* æ‹†åˆ†å­—ç¬¦ä¸² */
+	/* ²ğ·Ö×Ö·û´® */
 	argv = acl_argv_split(buf, ",\t ");
 	if (argv->argc < 5) {
 		acl_msg_error("%s(%d), %s: invalid line(%s) from %s",
@@ -122,7 +122,7 @@ static int gid_store_on_open(ACL_FHANDLE *fh, void *ctx)
 	}
 	store->step = atoi(argv->argv[1]);
 
-	/* å¦‚æœå­˜å‚¨çš„æ­¥è¿›å€¼ä¸å‚æ•°ä¸­çš„æ­¥è¿›å€¼ä¸ä¸€è‡´ï¼Œåˆ™ä¼˜å…ˆé‡‡ç”¨å‚æ•°æ­¥è¿›å€¼ */
+	/* Èç¹û´æ´¢µÄ²½½øÖµÓë²ÎÊıÖĞµÄ²½½øÖµ²»Ò»ÖÂ£¬ÔòÓÅÏÈ²ÉÓÃ²ÎÊı²½½øÖµ */
 	if (store->step != sc->step) {
 		acl_msg_warn("%s(%d), %s: change step from %d to %d for %s",
 			__FILE__, __LINE__, __FUNCTION__,
@@ -137,20 +137,20 @@ static int gid_store_on_open(ACL_FHANDLE *fh, void *ctx)
 	return (0);
 }
 
-/* æ–‡ä»¶å¥æŸ„çœŸæ­£å…³é—­æ—¶çš„å›è°ƒå‡½æ•° */
+/* ÎÄ¼ş¾ä±úÕæÕı¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı */
 
 static void gid_store_on_close(ACL_FHANDLE *fh acl_unused)
 {
 	GID_STORE *store = (GID_STORE*) fh;
 
-	/* å½“è®¾ç½®äº†éå®æ—¶åŒæ­¥æ ‡è®°æ—¶æ‰éœ€è¦åœ¨æ–‡ä»¶å¥æŸ„å…³é—­æ—¶åŒæ­¥ç£ç›˜ */
+	/* µ±ÉèÖÃÁË·ÇÊµÊ±Í¬²½±ê¼ÇÊ±²ÅĞèÒªÔÚÎÄ¼ş¾ä±ú¹Ø±ÕÊ±Í¬²½´ÅÅÌ */
 	if (__sync_gid == 0 && gid_store_sync(store) < 0)
 		acl_msg_fatal("%s(%d), %s: save %s error(%s)",
 			__FILE__, __LINE__, __FUNCTION__,
 			ACL_VSTREAM_PATH(store->fh.fp), acl_last_serror());
 }
 
-/* æ‰“å¼€æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°çš„æ–‡ä»¶ï¼Œå¦‚æœæ–‡ä»¶å¥æŸ„å·²ç»å­˜åœ¨åˆ™ç›´æ¥è¿”å› */
+/* ´ò¿ªÎÄ¼ş£¬Èç¹ûÎÄ¼ş²»´æÔÚÔò´´½¨ĞÂµÄÎÄ¼ş£¬Èç¹ûÎÄ¼ş¾ä±úÒÑ¾­´æÔÚÔòÖ±½Ó·µ»Ø */
 
 static GID_STORE *gid_store_open(const char *path, const char *tag,
 	const char *sid, unsigned int step)
@@ -179,7 +179,7 @@ static GID_STORE *gid_store_open(const char *path, const char *tag,
 	return (store);
 }
 
-/* è·å¾—å½“å‰æœ¬åœ°æ—¶é—´ */
+/* »ñµÃµ±Ç°±¾µØÊ±¼ä */
 
 static void logtime_fmt(char *buf, size_t size)
 {
@@ -191,7 +191,7 @@ static void logtime_fmt(char *buf, size_t size)
 	strftime(buf, size, "%Y/%m/%d %H:%M:%S", &local_time);
 }
 
-/* è®°å½•æ—¥å¿— */
+/* ¼ÇÂ¼ÈÕÖ¾ */
 
 static void gid_logger(GID_STORE *store)
 {
@@ -218,7 +218,7 @@ acl_int64 gid_next(const char *path, const char *tag_in,
 	char  tag[128], *sid;
 	GID_STORE *store;
 
-	/* éœ€è¦ä» tag ä¸²ä¸­åˆ†ç¦»å‡º sid ä¸² */
+	/* ĞèÒª´Ó tag ´®ÖĞ·ÖÀë³ö sid ´® */
 	ACL_SAFE_STRNCPY(tag, tag_in, sizeof(tag));
 	sid = strchr(tag, ':');
 	if (sid)
@@ -235,13 +235,13 @@ acl_int64 gid_next(const char *path, const char *tag_in,
 			if (errnum)
 				*errnum = GID_ERR_SID;
 
-			/* å…³é—­æ–‡ä»¶å¥æŸ„ï¼Œå»¶è¿Ÿ 60 ç§’åå…³é—­ */
+			/* ¹Ø±ÕÎÄ¼ş¾ä±ú£¬ÑÓ³Ù 60 Ãëºó¹Ø±Õ */
 			acl_fhandle_close(&store->fh, 60);
 			return (-1);
 		}
 	}
 
-	/* å¦‚æœå·²ç»è¾¾åˆ°æœ€å¤§å€¼ï¼Œåˆ™å´©æºƒäº†! */
+	/* Èç¹ûÒÑ¾­´ïµ½×î´óÖµ£¬Ôò±ÀÀ£ÁË! */
 	if (store->max_gid - (unsigned int) store->step <= store->cur_gid) {
 		acl_msg_error("%s(%d), %s: %s Override!!, max_gid: %lld,"
 			" step: %d, cur_gid: %lld", __FILE__, __LINE__,
@@ -250,7 +250,7 @@ acl_int64 gid_next(const char *path, const char *tag_in,
 
 		if (errnum)
 			*errnum = GID_ERR_OVERRIDE;
-		/* å…³é—­æ–‡ä»¶å¥æŸ„ï¼Œå»¶è¿Ÿ 60 ç§’åå…³é—­ */
+		/* ¹Ø±ÕÎÄ¼ş¾ä±ú£¬ÑÓ³Ù 60 Ãëºó¹Ø±Õ */
 		acl_fhandle_close(&store->fh, 60);
 		return (-1);
 	}
@@ -266,16 +266,16 @@ acl_int64 gid_next(const char *path, const char *tag_in,
 			ACL_VSTREAM_PATH(store->fh.fp),
 			acl_last_serror());
 
-		/* å…³é—­æ–‡ä»¶å¥æŸ„ï¼Œå»¶è¿Ÿ 60 ç§’åå…³é—­ */
+		/* ¹Ø±ÕÎÄ¼ş¾ä±ú£¬ÑÓ³Ù 60 Ãëºó¹Ø±Õ */
 		acl_fhandle_close(&store->fh, 60);
 		return (-1);
 	}
 
-	/* è®°æ—¥å¿— */
+	/* ¼ÇÈÕÖ¾ */
 	if (store->logger)
 		gid_logger(store);
 
-	/* å…³é—­æ–‡ä»¶å¥æŸ„ï¼Œå»¶è¿Ÿ 60 ç§’åå…³é—­ */
+	/* ¹Ø±ÕÎÄ¼ş¾ä±ú£¬ÑÓ³Ù 60 Ãëºó¹Ø±Õ */
 	acl_fhandle_close(&store->fh, 60);
 
 	if (errnum)

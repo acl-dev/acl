@@ -1,4 +1,4 @@
-﻿#ifndef _REC_TYPE_H_INCLUDED_
+#ifndef _REC_TYPE_H_INCLUDED_
 #define _REC_TYPE_H_INCLUDED_
 
 #if !defined(ACL_MIME_DISABLE)

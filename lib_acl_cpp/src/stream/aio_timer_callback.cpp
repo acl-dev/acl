@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_timer_callback.hpp"
@@ -33,7 +33,7 @@ aio_timer_callback::aio_timer_callback(bool keep /* = false */)
 
 aio_timer_callback::~aio_timer_callback(void)
 {
-	// å¦‚æœæ­£åœ¨è§¦å‘å®šæ—¶å™¨çš„å›è°ƒè¿‡ç¨‹ä¸­ææ„è¿‡ç¨‹è¢«è°ƒç”¨åˆ™ä¼šå‘ç”Ÿä¸¥é‡é—®é¢˜
+	// Èç¹ûÕıÔÚ´¥·¢¶¨Ê±Æ÷µÄ»Øµ÷¹ı³ÌÖĞÎö¹¹¹ı³Ì±»µ÷ÓÃÔò»á·¢ÉúÑÏÖØÎÊÌâ
 	if (locked()) {
 		logger_error("In trigger proccess, you delete me now!");
 		acl_assert(0);
@@ -176,7 +176,7 @@ acl_int64 aio_timer_callback::trigger(void)
 	std::list<aio_timer_task*> tasks;
 	aio_timer_task* task;
 
-	// ä»å®šæ—¶å™¨ä¸­å–å‡ºåˆ°è¾¾çš„å®šæ—¶ä»»åŠ¡
+	// ´Ó¶¨Ê±Æ÷ÖĞÈ¡³öµ½´ïµÄ¶¨Ê±ÈÎÎñ
 	for (it = tasks_.begin(); it != tasks_.end();) {
 		if ((*it)->when > present_) {
 			break;
@@ -187,7 +187,7 @@ acl_int64 aio_timer_callback::trigger(void)
 		tasks.push_back(task);
 	}
 
-	// æœ‰å¯èƒ½è¿™äº›åˆ°è¾¾çš„å®šæ—¶ä»»åŠ¡å·²ç»è¢«ç”¨æˆ·æå‰åˆ é™¤äº†
+	// ÓĞ¿ÉÄÜÕâĞ©µ½´ïµÄ¶¨Ê±ÈÎÎñÒÑ¾­±»ÓÃ»§ÌáÇ°É¾³ıÁË
 	if (tasks.empty()) {
 		acl_assert(!tasks_.empty());
 
@@ -196,17 +196,17 @@ acl_int64 aio_timer_callback::trigger(void)
 		return delay < 0 ? 0 : delay;
 	}
 
-	// å°†åˆ°è¾¾çš„å®šæ—¶ä»»åŠ¡é‡æ–°æ”¾å›è‡³å®šæ—¶å™¨çš„ä»»åŠ¡åˆ—è¡¨ä¸­ï¼Œ
-	// å¹¶å¼€å§‹è§¦å‘æ‰€æœ‰çš„åˆ°è¾¾çš„å®šæ—¶ä»»åŠ¡
+	// ½«µ½´ïµÄ¶¨Ê±ÈÎÎñÖØĞÂ·Å»ØÖÁ¶¨Ê±Æ÷µÄÈÎÎñÁĞ±íÖĞ£¬
+	// ²¢¿ªÊ¼´¥·¢ËùÓĞµÄµ½´ïµÄ¶¨Ê±ÈÎÎñ
 
-	// å¿…é¡»å…ˆè®¾ç½®è§¦å‘å™¨çš„å¿™çŠ¶æ€ï¼Œä»¥é˜²æ­¢å­ç±»åœ¨å›è°ƒè¿‡ç¨‹
-	// ä¸­è°ƒç”¨äº†è¯¥ç±»å¯¹è±¡çš„ææ„è¿‡ç¨‹
+	// ±ØĞëÏÈÉèÖÃ´¥·¢Æ÷µÄÃ¦×´Ì¬£¬ÒÔ·ÀÖ¹×ÓÀàÔÚ»Øµ÷¹ı³Ì
+	// ÖĞµ÷ÓÃÁË¸ÃÀà¶ÔÏóµÄÎö¹¹¹ı³Ì
 	set_locked();
 
-	// è®¾ç½®è§£é”åé”€æ¯æ ‡å¿—ä¸º falseï¼Œå› ä¸ºå½“å‰è¯¥å®šæ—¶å™¨å¤„äº
-	// é”å®šçŠ¶æ€ï¼Œæ‰€ä»¥å…¶å®ƒç±»å¯¹è±¡ä¸èƒ½ç›´æ¥åœ¨é”å®šæ—¶é”€æ¯æœ¬ç±»
-	// å¯¹è±¡ï¼Œå½“è§£é”åï¼Œå¦‚æœè¯¥æ ‡è¯†è¢«ç½®ä¸º trueï¼Œåˆ™æœ¬ç±»å¯¹è±¡
-	// åº”è¯¥è‡ªåŠ¨é”€æ¯
+	// ÉèÖÃ½âËøºóÏú»Ù±êÖ¾Îª false£¬ÒòÎªµ±Ç°¸Ã¶¨Ê±Æ÷´¦ÓÚ
+	// Ëø¶¨×´Ì¬£¬ËùÒÔÆäËüÀà¶ÔÏó²»ÄÜÖ±½ÓÔÚËø¶¨Ê±Ïú»Ù±¾Àà
+	// ¶ÔÏó£¬µ±½âËøºó£¬Èç¹û¸Ã±êÊ¶±»ÖÃÎª true£¬Ôò±¾Àà¶ÔÏó
+	// Ó¦¸Ã×Ô¶¯Ïú»Ù
 	destroy_on_unlock_ = false;
 
 	for (it = tasks.begin(); it != tasks.end(); ++it) {
@@ -216,10 +216,10 @@ acl_int64 aio_timer_callback::trigger(void)
 
 	tasks.clear();
 
-	// å…è®¸ä¹‹åçš„æ“ä½œä¸­è¢«å­ç±»è°ƒç”¨ææ„è¿‡ç¨‹
+	// ÔÊĞíÖ®ºóµÄ²Ù×÷ÖĞ±»×ÓÀàµ÷ÓÃÎö¹¹¹ı³Ì
 	unset_locked();
 
-	// å­ç±»æœ‰å¯èƒ½ä¼šåœ¨ timer_callback ä¸­åˆ é™¤äº†æ‰€æœ‰çš„å®šæ—¶ä»»åŠ¡
+	// ×ÓÀàÓĞ¿ÉÄÜ»áÔÚ timer_callback ÖĞÉ¾³ıÁËËùÓĞµÄ¶¨Ê±ÈÎÎñ
 	if (tasks_.empty()) {
 		return TIMER_EMPTY;
 	}
@@ -227,7 +227,7 @@ acl_int64 aio_timer_callback::trigger(void)
 	aio_timer_task* first = tasks_.front();
 	acl_int64 delay = first->when - present_;
 
-	// å¦‚æœåœ¨åŠ é”æœŸé—´å¤–éƒ¨ç¨‹åºè¦æ±‚é‡Šæ”¾è¯¥å¯¹è±¡ï¼Œåˆ™åœ¨æ­¤å¤„é‡Šæ”¾
+	// Èç¹ûÔÚ¼ÓËøÆÚ¼äÍâ²¿³ÌĞòÒªÇóÊÍ·Å¸Ã¶ÔÏó£¬ÔòÔÚ´Ë´¦ÊÍ·Å
 	if (destroy_on_unlock_) {
 		destroy();
 		return TIMER_EMPTY;

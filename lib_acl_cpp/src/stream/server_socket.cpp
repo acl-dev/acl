@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
@@ -112,16 +112,16 @@ bool server_socket::open(const char* addr)
 		return false;
 	}
 
-	// ä¿ç•™ç”±æœ¬ç±»å¯¹è±¡äº§ç”Ÿçš„å¥æŸ„ï¼Œä»¥ä¾¿äºåœ¨ææ„å‡½æ•°ä¸­å°†å…¶å…³é—­
+	// ±£ÁôÓÉ±¾Àà¶ÔÏó²úÉúµÄ¾ä±ú£¬ÒÔ±ãÓÚÔÚÎö¹¹º¯ÊıÖĞ½«Æä¹Ø±Õ
 	fd_local_ = fd_;
 
 	if (unix_sock_) {
 		return true;
 	}
 
-	// ä¹‹æ‰€ä»¥å†ç”¨ getsockname é‡æ–°è·å¾—ä¸€äº›ç›‘å¬åœ°å€ï¼Œä¸»è¦æ˜¯ä¸ºäº†åº”å¯¹å½“è¾“å…¥
-	// çš„ addr ä¸º ip:0 çš„æƒ…å½¢ï¼Œå³å½“ç»™å®šçš„åœ°å€ä¸­çš„ç«¯å£ä¸º 0 æ—¶è¦æ±‚æ“ä½œç³»ç»Ÿ
-	// è‡ªåŠ¨åˆ†é…ä¸€ä¸ªç«¯å£å·
+	// Ö®ËùÒÔÔÙÓÃ getsockname ÖØĞÂ»ñµÃÒ»Ğ©¼àÌıµØÖ·£¬Ö÷ÒªÊÇÎªÁËÓ¦¶Ôµ±ÊäÈë
+	// µÄ addr Îª ip:0 µÄÇéĞÎ£¬¼´µ±¸ø¶¨µÄµØÖ·ÖĞµÄ¶Ë¿ÚÎª 0 Ê±ÒªÇó²Ù×÷ÏµÍ³
+	// ×Ô¶¯·ÖÅäÒ»¸ö¶Ë¿ÚºÅ
 	char buf[512];
 	if (acl_getsockname(fd_, buf, sizeof(buf)) < 0) {
 		logger_error("getsockname error: %s", acl_last_serror());

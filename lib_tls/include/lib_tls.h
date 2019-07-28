@@ -1,4 +1,4 @@
-﻿#ifndef	__LIB_TLS_INCLUDE_H__
+#ifndef	__LIB_TLS_INCLUDE_H__
 #define	__LIB_TLS_INCLUDE_H__
 
 #ifdef	__cplusplus

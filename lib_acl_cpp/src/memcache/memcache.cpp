@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/mime/rfc2047.hpp"
@@ -340,7 +340,7 @@ AGAIN:
 		return -1;
 	}
 
-	// è¯»å–æœåŠ¡å™¨å“åº”è¡Œ
+	// ¶ÁÈ¡·şÎñÆ÷ÏìÓ¦ĞĞ
 	if (!conn_->gets(res_line_)) {
 		close();
 		if (retry_ && !has_tried) {
@@ -373,7 +373,7 @@ AGAIN:
 	content_length_ = atoi(tokens->argv[3]);
 	acl_argv_free(tokens);
 
-	// å¦‚æœæœåŠ¡ç«¯è¿”å›æ•°æ®ä½“é•¿åº¦å€¼ä¸º 0 åˆ™å½“ä¸å­˜åœ¨å¤„ç†
+	// Èç¹û·şÎñ¶Ë·µ»ØÊı¾İÌå³¤¶ÈÖµÎª 0 Ôòµ±²»´æÔÚ´¦Àí
 	if (content_length_ == 0) {
 		return 0;
 	}
@@ -385,13 +385,13 @@ int memcache::get_data(void* buf, size_t size)
 	acl_assert(content_length_ >= length_);
 
 	if (length_ == content_length_) {
-		// è¯»å–æ•°æ®å°¾éƒ¨çš„ "\r\n"
+		// ¶ÁÈ¡Êı¾İÎ²²¿µÄ "\r\n"
 		if (!conn_->gets(res_line_)) {
 			close();
 			ebuf_.format("read data CRLF error");
 			return -1;
 		}
-		// è¯»å– "END\r\n"
+		// ¶ÁÈ¡ "END\r\n"
 		if (!conn_->gets(res_line_)
 			|| res_line_.compare("END", false) != 0) {
 
@@ -425,8 +425,8 @@ bool memcache::get(const char* key, size_t klen, string& out,
 		return false;
 	}
 
-	// å¾—éœ€è¦ä¿è¯è¶³å¤Ÿçš„ç©ºé—´èƒ½å®¹çº³è¯»å–çš„æ•°æ®ï¼Œè¯¥ç§æ–¹å¼
-	// å¯èƒ½ä¼šé€ æˆæ•°æ®é‡éå¸¸å¤§æ—¶çš„ç¼“å†²åŒºæº¢å‡ºï¼
+	// µÃĞèÒª±£Ö¤×ã¹»µÄ¿Õ¼äÄÜÈİÄÉ¶ÁÈ¡µÄÊı¾İ£¬¸ÃÖÖ·½Ê½
+	// ¿ÉÄÜ»áÔì³ÉÊı¾İÁ¿·Ç³£´óÊ±µÄ»º³åÇøÒç³ö£¡
 
 	char  buf[4096];
 	int   n;

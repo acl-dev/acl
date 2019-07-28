@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <map>
 #include <vector>
@@ -15,7 +15,7 @@ class check_timer;
 class aio_socket_stream;
 
 /**
- * å¼‚æ­¥è¿æ¥å›è°ƒå‡½æ•°å¤„ç†ç±»
+ * Òì²½Á¬½Ó»Øµ÷º¯Êı´¦ÀíÀà
  */
 class ACL_CPP_API check_client : public aio_open_callback
 {
@@ -24,7 +24,7 @@ public:
 		aio_socket_stream& conn, struct timeval& begin);
 
 	/**
-	 * è·å¾—è¾“å…¥çš„éé˜»å¡ IO å¥æŸ„
+	 * »ñµÃÊäÈëµÄ·Ç×èÈû IO ¾ä±ú
 	 * @return {aio_socket_stream&}
 	 */
 	aio_socket_stream& get_conn() const
@@ -33,7 +33,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ä¼ å…¥çš„æœåŠ¡ç«¯åœ°å€
+	 * »ñµÃ´«ÈëµÄ·şÎñ¶ËµØÖ·
 	 * @return {const char*}
 	 */
 	const char* get_addr() const
@@ -42,20 +42,20 @@ public:
 	}
 
 	/**
-	 * è®¾ç½®è¿æ¥æ˜¯å¦æ˜¯å­˜æ´»çš„
+	 * ÉèÖÃÁ¬½ÓÊÇ·ñÊÇ´æ»îµÄ
 	 * @param yesno {bool}
 	 */
 	void set_alive(bool yesno);
 
 	/**
-	 * å…³é—­éé˜»å¡ IO å¥æŸ„
+	 * ¹Ø±Õ·Ç×èÈû IO ¾ä±ú
 	 */
 	void close();
 
 public:
-	// ä»¥ä¸‹çš„å‡½æ•°ä»…ä¾›å†…éƒ¨ä½¿ç”¨
+	// ÒÔÏÂµÄº¯Êı½ö¹©ÄÚ²¿Ê¹ÓÃ
 	/**
-	 * å½“å‰æ£€æµ‹å¯¹è±¡æ˜¯å¦å¤„äºé˜»å¡æ¨¡å¼ä¸‹
+	 * µ±Ç°¼ì²â¶ÔÏóÊÇ·ñ´¦ÓÚ×èÈûÄ£Ê½ÏÂ
 	 * @return {bool}
 	 */
 	bool blocked() const
@@ -64,14 +64,14 @@ public:
 	}
 
 	/**
-	 * åœ¨é˜»å¡æ£€æµ‹æ–¹å¼ä¸‹ï¼Œè°ƒç”¨æ­¤å‡½æ•°ç”¨æ¥è®¾ç½®æ£€æµ‹å¯¹è±¡æ˜¯å¦å¤„äºé˜»å¡çŠ¶æ€ï¼Œ
-	 * å¤„äºé˜»å¡çŠ¶æ€æ—¶è¯¥æ£€æµ‹å¯¹è±¡æ˜¯ç¦æ­¢é€šè¿‡è°ƒç”¨æ–¹æ³• close æ¥å…³é—­çš„
-	 * @param on {bool} è®¾ç½®æ£€æµ‹å¯¹è±¡æ˜¯å¦å¤„äºé˜»å¡çŠ¶æ€ï¼Œç¼ºçœä¸ºå¤„äºé˜»å¡çŠ¶æ€
+	 * ÔÚ×èÈû¼ì²â·½Ê½ÏÂ£¬µ÷ÓÃ´Ëº¯ÊıÓÃÀ´ÉèÖÃ¼ì²â¶ÔÏóÊÇ·ñ´¦ÓÚ×èÈû×´Ì¬£¬
+	 * ´¦ÓÚ×èÈû×´Ì¬Ê±¸Ã¼ì²â¶ÔÏóÊÇ½ûÖ¹Í¨¹ıµ÷ÓÃ·½·¨ close À´¹Ø±ÕµÄ
+	 * @param on {bool} ÉèÖÃ¼ì²â¶ÔÏóÊÇ·ñ´¦ÓÚ×èÈû×´Ì¬£¬È±Ê¡Îª´¦ÓÚ×èÈû×´Ì¬
 	 */
 	void set_blocked(bool on);
 
 private:
-	// åŸºç±»è™šå‡½æ•°
+	// »ùÀàĞéº¯Êı
 	bool open_callback();
 	void close_callback();
 	bool timeout_callback();

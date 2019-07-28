@@ -1,4 +1,4 @@
-﻿#ifndef	__TEST_MAIN_INCLUDE_H__
+#ifndef	__TEST_MAIN_INCLUDE_H__
 #define	__TEST_MAIN_INCLUDE_H__
 
 #include "lib_acl.h"

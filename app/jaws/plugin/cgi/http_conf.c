@@ -1,11 +1,11 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "http_plugin.h"
 
 char *var_cfg_log_name;
 char *var_cfg_cgi_bin;
 
 static ACL_CFG_STR_TABLE __conf_str_tab[] = {
-	/* é…ç½®é¡¹åç§°, é…ç½®é¡¹ç¼ºçœå€¼, å­˜å‚¨é…ç½®é¡¹å€¼çš„åœ°å€ */
+	/* ÅäÖÃÏîÃû³Æ, ÅäÖÃÏîÈ±Ê¡Öµ, ´æ´¢ÅäÖÃÏîÖµµÄµØÖ· */
 	{ "logpath", "/tmp/cgifilter.log", &var_cfg_log_name },
 	{ "cgi-bin", "/opt/jaws/www/cgi-bin", &var_cfg_cgi_bin },
 
@@ -16,7 +16,7 @@ int   var_cfg_data_clone;
 static int   var_cfg_debug_mem;
 
 static ACL_CFG_BOOL_TABLE __conf_bool_tab[] = {
-	/* é…ç½®é¡¹åç§°, é…ç½®é¡¹ç¼ºçœå€¼, å­˜å‚¨é…ç½®é¡¹å€¼çš„åœ°å€ */
+	/* ÅäÖÃÏîÃû³Æ, ÅäÖÃÏîÈ±Ê¡Öµ, ´æ´¢ÅäÖÃÏîÖµµÄµØÖ· */
 	{ "data_clone", 0, &var_cfg_data_clone },
 	{ "debug_mem", 0, &var_cfg_debug_mem },
 	{ 0, 0 , 0 }
@@ -26,7 +26,7 @@ static int var_cfg_threads_limit;
 static int var_cfg_threads_idle;
 
 static ACL_CFG_INT_TABLE __conf_int_tab[] = {
-	/* é…ç½®é¡¹åç§°, é…ç½®é¡¹ç¼ºçœå€¼, å­˜å‚¨é…ç½®é¡¹å€¼çš„åœ°å€ */
+	/* ÅäÖÃÏîÃû³Æ, ÅäÖÃÏîÈ±Ê¡Öµ, ´æ´¢ÅäÖÃÏîÖµµÄµØÖ· */
 	{ "threads_limit", 100, &var_cfg_threads_limit, 0, 0 },
 	{ "threads_idle", 120, &var_cfg_threads_idle, 0, 0 },
 	{ 0, 0 , 0, 0, 0 }
@@ -38,7 +38,7 @@ void http_conf_load(const char *cfg_dir)
 	ACL_XINETD_CFG_PARSER *cfg;
 	const ACL_ARRAY *cgi_maps;
 
-	/* è¯»å–é…ç½®æ–‡ä»¶ */
+	/* ¶ÁÈ¡ÅäÖÃÎÄ¼ş */
 
 	filepath = acl_concatenate((cfg_dir && *cfg_dir)
 			? cfg_dir : "/tmp", "/cgi.cf", NULL);
@@ -79,10 +79,10 @@ void http_conf_load(const char *cfg_dir)
 		acl_xinetd_cfg_free(cfg);
 	acl_myfree(filepath);
 
-	/* åˆå§‹åŒ–CGIæ¨¡å— */
+	/* ³õÊ¼»¯CGIÄ£¿é */
 	http_cgi_init();
 
-	/* åˆ›å»ºçº¿ç¨‹æ±  */
+	/* ´´½¨Ïß³Ì³Ø */
 	http_plugin_pool_create(var_cfg_threads_limit, var_cfg_threads_idle);
 
 	http_plugin_debug_memory(var_cfg_debug_mem);

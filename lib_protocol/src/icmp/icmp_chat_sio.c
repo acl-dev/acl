@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "icmp/lib_icmp.h"
 #include "icmp_struct.h"
 #include "icmp_private.h"
@@ -27,7 +27,7 @@ static void read_pkt(ICMP_HOST *host, ICMP_PKT *pkt_src)
 		if (acl_read_select_wait(ACL_VSTREAM_SOCK(stream),
 			host->timeout) < 0) {
 #endif
-			/* æ±‡æŠ¥è¯·æ±‚åŒ…è¶…æ—¶ */
+			/* »ã±¨ÇëÇó°ü³¬Ê± */
 			icmp_stat_timeout(host, pkt_src);
 			return;
 		}
@@ -78,20 +78,20 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 	ACL_VSTREAM *stream = host->chat->is->vstream;
 	int ret;
 
-	/* æŒ‡å®šå½“å‰åŒ…çš„ç›®çš„ä¸»æœº */
+	/* Ö¸¶¨µ±Ç°°üµÄÄ¿µÄÖ÷»ú */
 	chat->is->dest = host->dest;
 
-	/* ç»„å»ºå‘é€æ•°æ®åŒ… */
+	/* ×é½¨·¢ËÍÊı¾İ°ü */
 	icmp_pkt_build(pkt, chat->seq++);
 
 	gettimeofday(&pkt->stamp, NULL);
 
-	/* é‡‡ç”¨åŒæ­¥å‘é€çš„æ¨¡å¼ */
+	/* ²ÉÓÃÍ¬²½·¢ËÍµÄÄ£Ê½ */
 	ret = acl_vstream_writen(stream, (const char*) pkt, (int) pkt->wlen);
 	host->nsent++;
 
 	if (ret == ACL_VSTREAM_EOF) {
-		/* æ±‡æŠ¥ä¸»æœºä¸å¯è¾¾ä¿¡æ¯ */
+		/* »ã±¨Ö÷»ú²»¿É´ïĞÅÏ¢ */
 		icmp_stat_unreach(host, pkt);
 	}
 }

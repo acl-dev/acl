@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include "acl_cpp/mime/mime_head.hpp"
 
@@ -9,7 +9,7 @@ public:
 	~mime_builder();
 
 	/**
-	 * è·å¾—é‚®ä»¶å¤´
+	 * »ñµÃÓÊ¼şÍ·
 	 * @return {acl::mime_head&}
 	 */
 	acl::mime_head& primary_header(void)
@@ -18,38 +18,38 @@ public:
 	}
 
 	/**
-	 * è®¾ç½®é‚®ä»¶æ­£æ–‡å†…å®¹ï¼Œä¸ºçº¯æ–‡æœ¬æ ¼å¼
-	 * @param src {const char*) æ­£æ–‡å†…å®¹
-	 * @param len {size_t} src å†…å®¹é•¿åº¦
+	 * ÉèÖÃÓÊ¼şÕıÎÄÄÚÈİ£¬Îª´¿ÎÄ±¾¸ñÊ½
+	 * @param src {const char*) ÕıÎÄÄÚÈİ
+	 * @param len {size_t} src ÄÚÈİ³¤¶È
 	 * @return {mime_builder&}
 	 */
 	mime_builder& set_body_text(const char* src, size_t len);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶æ­£æ–‡å†…å®¹ï¼Œä¸º HTML æ ¼å¼
-	 * @param src {const char*) æ­£æ–‡å†…å®¹
-	 * @param len {size_t} src å†…å®¹é•¿åº¦
+	 * ÉèÖÃÓÊ¼şÕıÎÄÄÚÈİ£¬Îª HTML ¸ñÊ½
+	 * @param src {const char*) ÕıÎÄÄÚÈİ
+	 * @param len {size_t} src ÄÚÈİ³¤¶È
 	 * @return {mime_builder&}
 	 */
 	mime_builder& set_body_html(const char* src, size_t len);
 
 	/**
-	 * æ·»åŠ é™„ä»¶
-	 * @param filepath {const char*} é™„ä»¶æ–‡ä»¶è·¯å¾„
+	 * Ìí¼Ó¸½¼ş
+	 * @param filepath {const char*} ¸½¼şÎÄ¼şÂ·¾¶
 	 * @return {mime_builder&}
 	 */
 	mime_builder& add_file(const char* filepath);
 
 	/**
-	 * åˆ›å»ºé‚®ä»¶å†…å®¹ï¼Œå¹¶è½¬å­˜è‡³æ–‡ä»¶ä¸­
-	 * @param to {const char*} ç›®æ ‡æ–‡ä»¶
+	 * ´´½¨ÓÊ¼şÄÚÈİ£¬²¢×ª´æÖÁÎÄ¼şÖĞ
+	 * @param to {const char*} Ä¿±êÎÄ¼ş
 	 * @return {bool}
 	 */
 	bool save_as(const char* to);
 
 	/**
-	 * åˆ›å»ºé‚®ä»¶å†…å®¹ï¼Œå¹¶è½¬å­˜è‡³æ–‡ä»¶ä¸­
-	 * @param fp {acl::ofstream&} ç›®æ ‡æ–‡ä»¶å¥æŸ„
+	 * ´´½¨ÓÊ¼şÄÚÈİ£¬²¢×ª´æÖÁÎÄ¼şÖĞ
+	 * @param fp {acl::ofstream&} Ä¿±êÎÄ¼ş¾ä±ú
 	 * @return {bool}
 	 */
 	bool save_as(acl::ofstream& fp);

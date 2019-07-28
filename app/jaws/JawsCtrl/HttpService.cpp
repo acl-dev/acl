@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include ".\httpservice.h"
 
 static char *tag_addr = "--addr";

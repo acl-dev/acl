@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "fiber_cpp_define.hpp"
 
 #if !defined(_WIN32) && !defined(_WIN64)
@@ -10,7 +10,7 @@ namespace acl {
 class fiber_event;
 
 /**
- * å¯ç”¨åœ¨åç¨‹ä¹‹é—´ï¼Œçº¿ç¨‹ä¹‹é—´ï¼Œåç¨‹ä¸çº¿ç¨‹ä¹‹é—´çš„æ¡ä»¶å˜é‡
+ * ¿ÉÓÃÔÚĞ­³ÌÖ®¼ä£¬Ïß³ÌÖ®¼ä£¬Ğ­³ÌÓëÏß³ÌÖ®¼äµÄÌõ¼ş±äÁ¿
  */
 class FIBER_CPP_API fiber_cond : public noncopyable
 {
@@ -19,23 +19,23 @@ public:
 	~fiber_cond(void);
 
 	/**
-	 * ç­‰å¾…æ¡ä»¶å˜é‡äº‹ä»¶è¢«è§¦å‘
+	 * µÈ´ıÌõ¼ş±äÁ¿ÊÂ¼ş±»´¥·¢
 	 * @param event {fiber_event&}
-	 * @param timeout {int} è¶…æ—¶ç­‰å¾…æ—¶é—´ï¼ˆæ¯«ç§’ï¼‰
-	 * @return {bool} æˆåŠŸæ—¶è¿”å› trueï¼Œå¦åˆ™è¿”å› false è¡¨ç¤ºè¶…æ—¶
+	 * @param timeout {int} ³¬Ê±µÈ´ıÊ±¼ä£¨ºÁÃë£©
+	 * @return {bool} ³É¹¦Ê±·µ»Ø true£¬·ñÔò·µ»Ø false ±íÊ¾³¬Ê±
 	 */
 	bool wait(fiber_event& event, int timeout = -1);
 
 	/**
-	 * å”¤é†’åœ¨æ¡ä»¶å˜é‡ä¸Šçš„ç­‰å¾…è€…ï¼Œå¦‚æœæ²¡æœ‰ç­‰å¾…è€…åˆ™ç›´æ¥è¿”å›ï¼Œè¿è¡Œè¡Œä¸ºå’Œ
-	 * çº¿ç¨‹æ¡ä»¶å˜é‡ç±»ä¼¼
-	 * @return {bool} æˆåŠŸè¿”å› trueï¼Œå¦åˆ™è¿”å› false è¡¨ç¤ºå¤±è´¥
+	 * »½ĞÑÔÚÌõ¼ş±äÁ¿ÉÏµÄµÈ´ıÕß£¬Èç¹ûÃ»ÓĞµÈ´ıÕßÔòÖ±½Ó·µ»Ø£¬ÔËĞĞĞĞÎªºÍ
+	 * Ïß³ÌÌõ¼ş±äÁ¿ÀàËÆ
+	 * @return {bool} ³É¹¦·µ»Ø true£¬·ñÔò·µ»Ø false ±íÊ¾Ê§°Ü
 	 */
 	bool notify(void);
 
 public:
 	/**
-	 * è¿”å› C ç‰ˆæœ¬çš„æ¡ä»¶å˜é‡å¯¹è±¡
+	 * ·µ»Ø C °æ±¾µÄÌõ¼ş±äÁ¿¶ÔÏó
 	 * @return {ACL_FIBER_COND*}
 	 */
 	ACL_FIBER_COND* get_cond(void) const

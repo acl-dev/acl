@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file config.h
  *
  * \brief Configuration options (set of defines)

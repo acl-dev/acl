@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "sysload.h"
 #include "server/ServerConnection.h"
 #include "server/ServerManager.h"
@@ -44,12 +44,12 @@ void ServerManager::del(ServerConnection* conn)
 	}
 }
 
-// 璇ュ嚱鏁扮敱涓荤嚎绋嬩腑鐨勫畾鏃跺櫒璋冪敤
+// 该函数由主线程中的定时器调用
 void ServerManager::buildStatus()
 {
-	// 鍥犱负鍦ㄥ瓙绾跨▼涓篃浼氳鍙� json_ 瀵硅薄锛屾墍浠ュ鍗曚緥鎴愬憳鍙橀噺
-	// json_ 杩涜鍔犻攣淇濇姢锛屼负浜嗛槻姝富绾跨▼琚暱鏈熼樆濉炲湪閿佷笂锛屾墍浠�
-	// 閲囩敤浜嗗皾璇曞姞閿佹柟寮�
+	// 因为在子线程中也会读取 json_ 对象，所以对单例成员变量
+	// json_ 进行加锁保护，为了防止主线程被长期阻塞在锁上，所以
+	// 采用了尝试加锁方式
 	if (lock_.try_lock() == false)
 		return;
 
@@ -66,7 +66,7 @@ void ServerManager::buildStatus()
 	long long total_max_threads = 0, total_curr_threads = 0;
 	long long total_busy_threads = 0;
 	acl::string load_s;
-	(void) sysload::get_load(&load_s);  // 鑾峰緱褰撳墠绯荤粺鐨勮礋杞�
+	(void) sysload::get_load(&load_s);  // 获得当前系统的负载
 
 	std::vector<ServerConnection*>::const_iterator cit = conns_.begin();
 	for (; cit != conns_.end(); ++cit)
@@ -146,7 +146,7 @@ void ServerManager::buildStatus()
 
 void ServerManager::statusToJson(acl::string& buf)
 {
-	// 鍥犱负璇ユ柟娉曞皢鐢卞瓙绾跨▼璋冪敤锛屾墍浠ュ鍗曚緥鎴愬憳鍙橀噺 json_ 杩涜鍔犻攣淇濇姢
+	// 因为该方法将由子线程调用，所以对单例成员变量 json_ 进行加锁保护
 	lock_.lock();
 	json_.build_json(buf);
 	lock_.unlock();
@@ -154,7 +154,7 @@ void ServerManager::statusToJson(acl::string& buf)
 
 void ServerManager::statusToXml(acl::string& buf)
 {
-	// 鍥犱负璇ユ柟娉曞皢鐢卞瓙绾跨▼璋冪敤锛屾墍浠ュ鍗曚緥鎴愬憳鍙橀噺 xml_ 杩涜鍔犻攣淇濇姢
+	// 因为该方法将由子线程调用，所以对单例成员变量 xml_ 进行加锁保护
 	lock_.lock();
 	xml_.build_xml(buf);
 	lock_.unlock();

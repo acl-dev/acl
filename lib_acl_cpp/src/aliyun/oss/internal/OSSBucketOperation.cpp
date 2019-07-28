@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "OSSBucketOperation.hpp"
 
 namespace acl

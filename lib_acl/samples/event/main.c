@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 typedef struct {
 	ACL_VSTREAM *in;
@@ -21,7 +21,7 @@ static STREAM_IN *create_stream(ACL_EVENT *eventp)
 {
 	STREAM_IN *in = (STREAM_IN*) acl_mymalloc(sizeof(STREAM_IN));
 
-	in->in = acl_vstream_fhopen(fileno(stdin), 0);  /* ç”¨æ ‡å‡†è¾“å…¥åšä¸ºè¾“å…¥æµ */
+	in->in = acl_vstream_fhopen(fileno(stdin), 0);  /* ÓÃ±ê×¼ÊäÈë×öÎªÊäÈëÁ÷ */
 	in->buf = acl_vstring_alloc(256);
 	in->event = eventp;
 	return in;
@@ -43,7 +43,7 @@ static void read_callback(int event_type acl_unused, ACL_EVENT *event,
 	acl_assert(in->in == stream);
 	acl_assert(in->event == event);
 
-	/* å°è¯•ä»è¾“å…¥æµä¸­è¯»å–ä¸€è¡Œæ•°æ®ï¼Œå¹¶ä¸”è¦æ±‚å»æ‰å°¾éƒ¨çš„å›è½¦æ¢è¡Œç¬¦ */
+	/* ³¢ÊÔ´ÓÊäÈëÁ÷ÖĞ¶ÁÈ¡Ò»ĞĞÊı¾İ£¬²¢ÇÒÒªÇóÈ¥µôÎ²²¿µÄ»Ø³µ»»ĞĞ·û */
 	if (acl_vstream_gets_nonl_peek(stream, in->buf, &ready) == ACL_VSTREAM_EOF)
 	{
 		acl_event_disable_read(event, stream);
@@ -53,7 +53,7 @@ static void read_callback(int event_type acl_unused, ACL_EVENT *event,
 	} else if (ready) {
 #define	STR	acl_vstring_str
 
-		/* å¦‚æœè¯»åˆ°å®Œæ•´çš„ä¸€è¡Œæ•°æ®ï¼Œåˆ™æ˜¾ç¤ºä¹‹ */
+		/* Èç¹û¶Áµ½ÍêÕûµÄÒ»ĞĞÊı¾İ£¬ÔòÏÔÊ¾Ö® */
 		printf(">>>>gets one line: %s\r\n", STR(in->buf));
 
 		if (strcasecmp(STR(in->buf), "QUIT") == 0) {
@@ -62,7 +62,7 @@ static void read_callback(int event_type acl_unused, ACL_EVENT *event,
 		} else {
 			printf("please input: ");
 			fflush(stdout);
-			ACL_VSTRING_RESET(in->buf); /* æ¸…ç©ºç¼“å†²åŒº */
+			ACL_VSTRING_RESET(in->buf); /* Çå¿Õ»º³åÇø */
 		}
 	}
 }
@@ -87,10 +87,10 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	int   timer_delay = 100, timer_keep = 0;
 	int   meter = 0;
 
-	/* åˆå§‹åŒ– acl åº“ */
+	/* ³õÊ¼»¯ acl ¿â */
 	acl_lib_init();
 
-	/* å°†é”™è¯¯æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º */
+	/* ½«´íÎóÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö */
 	acl_msg_stdout_enable(1);
 
 	event_type[0] = 0;
@@ -127,7 +127,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 		}
 	}
 
-	/* åˆ›å»ºéé˜»å¡äº‹ä»¶å¼•æ“ */
+	/* ´´½¨·Ç×èÈûÊÂ¼şÒıÇæ */
 	if (strcasecmp(event_type, "kernel") == 0)
 		eventp = acl_event_new_kernel(delay_sec, delay_usec);
 	else if (strcasecmp(event_type, "poll") == 0)
@@ -139,15 +139,15 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 		acl_event_request_timer(eventp, trigger_event, NULL,
 			timer_delay, timer_keep);
 
-	/* åˆ›å»ºè¾“å…¥æµå¯¹è±¡ */
+	/* ´´½¨ÊäÈëÁ÷¶ÔÏó */
 	in = create_stream(eventp);
 
-	/* å°†æ ‡å‡†è¾“å…¥ç½®å…¥å¼‚æ­¥ IO ç›‘å¬äº‹ä»¶ä¸­ */
+	/* ½«±ê×¼ÊäÈëÖÃÈëÒì²½ IO ¼àÌıÊÂ¼şÖĞ */
 	acl_event_enable_read(eventp, in->in, 0, read_callback, in);
 
 	printf("begin wait input from standard in\r\n");
 
-	/* è¿›è¡Œäº‹ä»¶å¾ªç¯ä¸­ */
+	/* ½øĞĞÊÂ¼şÑ­»·ÖĞ */
 	while (!__stop_event) {
 		if (meter)
 			ACL_METER_TIME("begin event");
@@ -156,7 +156,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 			ACL_METER_TIME("end event");
 	}
 
-	/* é‡Šæ”¾äº‹ä»¶å¼•æ“ */
+	/* ÊÍ·ÅÊÂ¼şÒıÇæ */
 	acl_event_free(eventp);
 
 	printf("event stopped!\r\n");

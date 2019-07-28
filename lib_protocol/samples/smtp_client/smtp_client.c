@@ -1,4 +1,4 @@
-ï»¿/* smtp_client.cpp : å®šä¹‰æŽ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ */
+/* smtp_client.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã */
 
 #include "lib_acl.h"
 #include "lib_protocol.h"
@@ -24,7 +24,7 @@ static int smtp_sender(void)
 	else
 		snprintf(addr, sizeof(addr), "%s", line);
 
-	/* è¿žæŽ¥ SMTP æœåŠ¡å™¨ */
+	/* Á¬½Ó SMTP ·þÎñÆ÷ */
 	conn = smtp_open(addr, 60, 60, 1024);
 	if (conn == NULL)
 	{
@@ -34,7 +34,7 @@ static int smtp_sender(void)
 	else
 		acl_printf("connect smtpd(%s) ok\r\n", addr);
 
-	/* ä»Ž SMTP æœåŠ¡å™¨èŽ·å¾—æ¬¢è¿Žä¿¡æ¯ */
+	/* ´Ó SMTP ·þÎñÆ÷»ñµÃ»¶Ó­ÐÅÏ¢ */
 	if (smtp_get_banner(conn) != 0)
 	{
 		acl_puts("get banner from server error");
@@ -44,7 +44,7 @@ static int smtp_sender(void)
 	else
 		acl_printf(">smtpd: %s\r\n", conn->buf);
 
-	/* å‘ SMTP æœåŠ¡å™¨å‘é€ EHLO/HELO å‘½ä»¤ */
+	/* Ïò SMTP ·þÎñÆ÷·¢ËÍ EHLO/HELO ÃüÁî */
 	if (smtp_greet(conn, "localhost", 0) != 0)
 	{
 		acl_printf("send ehlo cmd error: %s\r\n", conn->buf);
@@ -54,7 +54,7 @@ static int smtp_sender(void)
 	else
 		acl_printf(">smtpd: %s\r\n", conn->buf);
 
-	/* ç”¨æˆ·æ˜¯å¦éœ€è¦è¿›è¡Œ SMTP èº«ä»½è®¤è¯ */
+	/* ÓÃ»§ÊÇ·ñÐèÒª½øÐÐ SMTP Éí·ÝÈÏÖ¤ */
 	acl_printf("Do you want to auth login? n[y|n]: ");
 	if (acl_gets_nonl(line, sizeof(line)) == NULL)
 	{
@@ -63,7 +63,7 @@ static int smtp_sender(void)
 		return -1;
 	}
 
-	/* å¯¹ç”¨æˆ·èº«ä»½è¿›è¡Œ SMTP èº«ä»½è®¤è¯ */
+	/* ¶ÔÓÃ»§Éí·Ý½øÐÐ SMTP Éí·ÝÈÏÖ¤ */
 	else if (strcasecmp(line, "Y") == 0)
 	{
 		char user[128], pass[128];
@@ -83,7 +83,7 @@ static int smtp_sender(void)
 			return -1;
 		}
 
-		/* å¼€å§‹è¿›è¡Œ SMTP èº«ä»½è®¤è¯ */
+		/* ¿ªÊ¼½øÐÐ SMTP Éí·ÝÈÏÖ¤ */
 		if (smtp_auth(conn, user, pass) != 0)
 		{
 			acl_printf("smtp auth(%s, %s) error: %s, code: %d\r\n",
@@ -95,7 +95,7 @@ static int smtp_sender(void)
 			acl_printf(">smtpd: %s\r\n", conn->buf);
 	}
 
-	/* èŽ·å¾—å‘ä»¶äººé‚®ç®±åœ°å€ */
+	/* »ñµÃ·¢¼þÈËÓÊÏäµØÖ· */
 	acl_printf("please input sender's email: ");
 	if (acl_gets_nonl(line, sizeof(line)) == NULL)
 	{
@@ -104,7 +104,7 @@ static int smtp_sender(void)
 		return -1;
 	}
 
-	/* å‘é€ MAIL FROM: å‘½ä»¤ */
+	/* ·¢ËÍ MAIL FROM: ÃüÁî */
 	if (smtp_mail(conn, line) != 0)
 	{
 		acl_printf("smtp send MAIL FROM %s error\r\n", line);
@@ -114,7 +114,7 @@ static int smtp_sender(void)
 	else
 		acl_printf(">smtpd: %s\r\n", conn->buf);
 
-	/* å‘é€ RCPT TO: å‘½ä»¤ */
+	/* ·¢ËÍ RCPT TO: ÃüÁî */
 	while (1)
 	{
 		acl_printf("please input mail recipients: ");
@@ -125,7 +125,7 @@ static int smtp_sender(void)
 			return -1;
 		}
 
-		/* å‘é€ RCPT TO: å‘½ä»¤ */
+		/* ·¢ËÍ RCPT TO: ÃüÁî */
 		else if (smtp_rcpt(conn, line) != 0)
 		{
 			acl_printf("send RCPT TO: %s error: %s, code: %d\r\n",
@@ -147,7 +147,7 @@ static int smtp_sender(void)
 			break;
 	}
 
-	/* å‘é€ DATA: å‘½ä»¤ */
+	/* ·¢ËÍ DATA: ÃüÁî */
 	if (smtp_data(conn) != 0)
 	{
 		acl_printf("send DATA error %s, code: %d\r\n",
@@ -158,7 +158,7 @@ static int smtp_sender(void)
 	else
 		acl_printf(">smtpd: %s\r\n", conn->buf);
 
-	/* ä»Žç»ˆç«¯æŽ¥æ”¶ç”¨æˆ·çš„è¾“å…¥çš„é‚®ä»¶å†…å®¹å¹¶å‘å¾€ SMTP æœåŠ¡å™¨ */
+	/* ´ÓÖÕ¶Ë½ÓÊÕÓÃ»§µÄÊäÈëµÄÓÊ¼þÄÚÈÝ²¢·¢Íù SMTP ·þÎñÆ÷ */
 	acl_puts("Please enter the email data below, end with \\r\\n.\\r\\n");
 
 	while (1)
@@ -179,7 +179,7 @@ static int smtp_sender(void)
 		}
 	}
 
-	/* å‘é€ \r\n.\r\n è¡¨ç¤ºé‚®ä»¶æ•°æ®å‘é€å®Œæ¯• */
+	/* ·¢ËÍ \r\n.\r\n ±íÊ¾ÓÊ¼þÊý¾Ý·¢ËÍÍê±Ï */
 	if (smtp_data_end(conn) != 0)
 	{
 		acl_printf("send . error: %s, code: %d\r\n",
@@ -190,7 +190,7 @@ static int smtp_sender(void)
 	else
 		acl_printf(">smtpd: %s\r\n", conn->buf);
 
-	/* å‘é€ QUIT å‘½ä»¤ */
+	/* ·¢ËÍ QUIT ÃüÁî */
 	if (smtp_quit(conn) != 0)
 	{
 		acl_printf("smtp QUIT error: %s\r\n", conn->buf);

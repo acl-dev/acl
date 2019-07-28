@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 
 namespace acl

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "db_conf.h"
 
 char* var_cfg_mysql_dbaddr;

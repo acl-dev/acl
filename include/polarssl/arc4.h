@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file arc4.h
  *
  * \brief The ARCFOUR stream cipher

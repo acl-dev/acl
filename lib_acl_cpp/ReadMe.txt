@@ -1,18 +1,18 @@
-ï»¿1) ç¼–è¯‘
-1.1) WIN32 å¹³å°ï¼šå¯ä»¥ç”¨ vc2003 æˆ– vc2010 æ‰“å¼€å·¥ç¨‹æ–‡ä»¶è¿›è¡Œç¼–è¯‘ï¼Œç¼–è¯‘åçš„ lib_acl.lib åº“è¢«æ‹·è´è‡³
-lib/ ç›®å½•ä¸‹ï¼Œå¦‚æœéœ€è¦ç¼–è¯‘ samples/ ä¸‹çš„ä¾‹å­ï¼Œè¿˜éœ€è¦å°† acl_project çš„ç¼–è¯‘åçš„åº“
+1) ±àÒë
+1.1) WIN32 Æ½Ì¨£º¿ÉÒÔÓÃ vc2003 »ò vc2010 ´ò¿ª¹¤³ÌÎÄ¼ş½øĞĞ±àÒë£¬±àÒëºóµÄ lib_acl.lib ¿â±»¿½±´ÖÁ
+lib/ Ä¿Â¼ÏÂ£¬Èç¹ûĞèÒª±àÒë samples/ ÏÂµÄÀı×Ó£¬»¹ĞèÒª½« acl_project µÄ±àÒëºóµÄ¿â
 lib_acl_d.dll/lib_acl_d.lib, lib_acl.dll/lib_acl.lib, lib_acl_vc2003d.lib, lib_acl_vc2003.lib,
-lib_acl_vc2010d.lib, lib_acl_vc2010.lib ä»¥åŠ lib_protocol_d.dll/lib_protocol_d.lib,
+lib_acl_vc2010d.lib, lib_acl_vc2010.lib ÒÔ¼° lib_protocol_d.dll/lib_protocol_d.lib,
 lib_protocol.dll/lib_protocol.lib, lib_protocol_vc2003d.lib, lib_protocol_vc2003.lib,
-lib_protocol_vc2010d.lib, lib_protocol_vc2010.lib æ‹·è´è‡³ lib/ ç›®å½•ä¸‹ï¼Œå¦å¤–ï¼Œå¦‚æœéœ€è¦ç¼–è¯‘
-ä¸å‹ç¼©ã€æ•°æ®åº“æ“ä½œçš„ç¤ºä¾‹ï¼Œåˆ™è¿˜éœ€è¦å°† mysql, sqlite3 ä»¥åŠ zlib çš„åº“æ‹·è´è‡³ lib/ ç›®å½•ä¸‹ï¼Œå¦‚æœ
-éœ€è¦ç¼–è¯‘ ssl ç›¸å…³çš„ç¤ºä¾‹ï¼Œéœ€è¦å°† polarssl çš„åº“æ‹·è´è‡³ lib/ ç›®å½•ä¸‹.
+lib_protocol_vc2010d.lib, lib_protocol_vc2010.lib ¿½±´ÖÁ lib/ Ä¿Â¼ÏÂ£¬ÁíÍâ£¬Èç¹ûĞèÒª±àÒë
+ÓëÑ¹Ëõ¡¢Êı¾İ¿â²Ù×÷µÄÊ¾Àı£¬Ôò»¹ĞèÒª½« mysql, sqlite3 ÒÔ¼° zlib µÄ¿â¿½±´ÖÁ lib/ Ä¿Â¼ÏÂ£¬Èç¹û
+ĞèÒª±àÒë ssl Ïà¹ØµÄÊ¾Àı£¬ĞèÒª½« polarssl µÄ¿â¿½±´ÖÁ lib/ Ä¿Â¼ÏÂ.
 
-1.2) Linux å¹³å°ï¼šç›´æ¥è¿è¡Œ make ä¾¿å¯åœ¨ lib/ ç›®å½•ä¸‹ç”Ÿæˆ lib_acl.a åº“ï¼Œå¦‚æœéœ€è¦ç”ŸæˆåŠ¨æ€åº“ï¼Œåˆ™éœ€è¦è¿è¡Œ
-make rpath=xxx, å…¶ä¸­ xxx ä»£è¡¨ mysql, sqlite, polarssl åº“æ‰€åœ¨çš„è·¯å¾„
+1.2) Linux Æ½Ì¨£ºÖ±½ÓÔËĞĞ make ±ã¿ÉÔÚ lib/ Ä¿Â¼ÏÂÉú³É lib_acl.a ¿â£¬Èç¹ûĞèÒªÉú³É¶¯Ì¬¿â£¬ÔòĞèÒªÔËĞĞ
+make rpath=xxx, ÆäÖĞ xxx ´ú±í mysql, sqlite, polarssl ¿âËùÔÚµÄÂ·¾¶
 
-2) ä¾èµ–å…³ç³»
-2.1) acl: å¿…é¡»æ˜¯ acl.2.1.2.8.src.2012.8.1.tgz ä»¥åçš„ç‰ˆæœ¬, https://sourceforge.net/projects/acl/
+2) ÒÀÀµ¹ØÏµ
+2.1) acl: ±ØĞëÊÇ acl.2.1.2.8.src.2012.8.1.tgz ÒÔºóµÄ°æ±¾, https://sourceforge.net/projects/acl/
 2.2) zlib: http://zlib.net/
 2.3) polarssl: http://polarssl.org/
 2.4) libmysqlcient

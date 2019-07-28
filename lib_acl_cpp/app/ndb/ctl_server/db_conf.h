@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 extern char* var_cfg_mysql_dbaddr;
 extern char* var_cfg_mysql_dbname;
@@ -10,12 +10,12 @@ extern int   var_cfg_mysql_dbpool_timeout;
 extern int   var_cfg_mysql_dbpool_dbping;
 
 /**
- * åŠ è½½é…ç½®é¡¹
- * @param path {const char*} é…ç½®æ–‡ä»¶è·¯å¾„
+ * ¼ÓÔØÅäÖÃÏî
+ * @param path {const char*} ÅäÖÃÎÄ¼şÂ·¾¶
  */
 bool db_conf_load(const char* path);
 
 /**
- * å¸è½½é…ç½®å†…å®¹é¡¹å†…å­˜
+ * Ğ¶ÔØÅäÖÃÄÚÈİÏîÄÚ´æ
  */
 void db_conf_unload(void);

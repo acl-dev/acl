@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_IFCONF_INCLUDE_H
+#ifndef	ACL_IFCONF_INCLUDE_H
 #define	ACL_IFCONF_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -10,49 +10,49 @@ extern "C" {
 #include "acl_sane_inet.h"
 
 typedef struct ACL_IFADDR {
-	char name[256];		/* æ¥å£åç§° */
+	char name[256];		/* ½Ó¿ÚÃû³Æ */
 #if defined(_WIN32) || defined(_WIN64)
-	char desc[256];		/* æ¥å£æè¿° */
+	char desc[256];		/* ½Ó¿ÚÃèÊö */
 #endif
-	char addr[128];		/* ä»¥å­—ç¬¦ä¸²è¡¨ç¤ºçš„IPåœ°å€ */
-	ACL_SOCKADDR saddr;	/* å…¼å®¹ IPV4 & IPV6 çš„åœ°å€ */
+	char addr[128];		/* ÒÔ×Ö·û´®±íÊ¾µÄIPµØÖ· */
+	ACL_SOCKADDR saddr;	/* ¼æÈİ IPV4 & IPV6 µÄµØÖ· */
 } ACL_IFADDR;
 
 typedef struct ACL_IFCONF {
-	ACL_IFADDR *addrs;	/* ACL_IFADDR æ•°ç»„ */
-	int  length;		/* ACL_IFADDR æ•°ç»„é•¿åº¦ */
+	ACL_IFADDR *addrs;	/* ACL_IFADDR Êı×é */
+	int  length;		/* ACL_IFADDR Êı×é³¤¶È */
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êı */
 	const ACL_IFADDR *(*iter_head)(ACL_ITER*, struct ACL_IFCONF*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
 	const ACL_IFADDR *(*iter_next)(ACL_ITER*, struct ACL_IFCONF*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êı */
 	const ACL_IFADDR *(*iter_tail)(ACL_ITER*, struct ACL_IFCONF*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êı */
 	const ACL_IFADDR *(*iter_prev)(ACL_ITER*, struct ACL_IFCONF*);
 } ACL_IFCONF;
 
 /**
- * è·å¾—ä¸»æœºçš„æ‰€æœ‰ç½‘ç»œåœ°å€åŠç½‘ç»œæ¥å£åç§°
- * @return {ACL_IFCONF*} è¿”å›å€¼é NULL æ—¶ï¼Œéœ€è°ƒç”¨ acl_free_ifaddrs é‡Šæ”¾
+ * »ñµÃÖ÷»úµÄËùÓĞÍøÂçµØÖ·¼°ÍøÂç½Ó¿ÚÃû³Æ
+ * @return {ACL_IFCONF*} ·µ»ØÖµ·Ç NULL Ê±£¬Ğèµ÷ÓÃ acl_free_ifaddrs ÊÍ·Å
  */
 ACL_API ACL_IFCONF *acl_get_ifaddrs(void);
 
 /**
- * é‡Šæ”¾ç”± acl_get_ifaddrs() è¿”å›çš„ ACL_IFCONF å†…å­˜
+ * ÊÍ·ÅÓÉ acl_get_ifaddrs() ·µ»ØµÄ ACL_IFCONF ÄÚ´æ
  * @param ifconf {ACL_IFCONF*}
  */
 ACL_API void acl_free_ifaddrs(ACL_IFCONF *ifconf);
 
 /**
- * æ‰«ææœ¬æœºæ‰€æœ‰ç½‘å¡ IPï¼Œå°†æ‰€æœ‰åŒ¹é…æŒ‡å®šæ¨¡å¼çš„ IP åœ°å€è¿”å›ï¼Œç›®å‰ä»…æ”¯æŒ IPV4
- * @param pattern {const char *} æŒ‡å®šçš„åŒ¹é…æ¨¡å¼ï¼Œæ ¼å¼ä¸ºï¼šxxx.xxx.xxx.xxx æˆ–
- *  xxx.xxx.xxx.xxx:portï¼Œå¦‚ï¼š192.168.*.*, 192.168.*.8:80ï¼Œ10.*.0.*:81
- * @return {ACL_IFCONF *} è¿”å›æ¡ä»¶çš„ç»“æœé›†ï¼Œå¦‚æœ pattern åé¢å¸¦æœ‰ç«¯å£ï¼Œåˆ™è‡ªåŠ¨
- *  å°†ç«¯å£æ·»åŠ åœ¨æ¯ä¸ª IP åé¢ï¼Œè‹¥è¿”å›å¯¹è±¡éç©ºï¼Œé€šè¿‡è°ƒç”¨ acl_free_ifaddrs
- *  é‡Šæ”¾è¯¥å¯¹è±¡
+ * É¨Ãè±¾»úËùÓĞÍø¿¨ IP£¬½«ËùÓĞÆ¥ÅäÖ¸¶¨Ä£Ê½µÄ IP µØÖ··µ»Ø£¬Ä¿Ç°½öÖ§³Ö IPV4
+ * @param pattern {const char *} Ö¸¶¨µÄÆ¥ÅäÄ£Ê½£¬¸ñÊ½Îª£ºxxx.xxx.xxx.xxx »ò
+ *  xxx.xxx.xxx.xxx:port£¬Èç£º192.168.*.*, 192.168.*.8:80£¬10.*.0.*:81
+ * @return {ACL_IFCONF *} ·µ»ØÌõ¼şµÄ½á¹û¼¯£¬Èç¹û pattern ºóÃæ´øÓĞ¶Ë¿Ú£¬Ôò×Ô¶¯
+ *  ½«¶Ë¿ÚÌí¼ÓÔÚÃ¿¸ö IP ºóÃæ£¬Èô·µ»Ø¶ÔÏó·Ç¿Õ£¬Í¨¹ıµ÷ÓÃ acl_free_ifaddrs
+ *  ÊÍ·Å¸Ã¶ÔÏó
  */
 ACL_API ACL_IFCONF *acl_ifconf_search(const char *pattern);
 

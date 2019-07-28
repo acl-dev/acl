@@ -1,4 +1,4 @@
-﻿class redis_thread : public acl::thread
+class redis_thread : public acl::thread
 {
 public:
 	redis_thread(const char* addr, const char* passwd, int conn_timeout,

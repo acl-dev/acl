@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_DLL_INCLUDE_H
+#ifndef	ACL_DLL_INCLUDE_H
 #define	ACL_DLL_INCLUDE_H
 
 #ifdef	__cplusplus

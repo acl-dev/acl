@@ -1,17 +1,17 @@
-ï»¿// http_client.h : PROJECT_NAME åº”ç”¨ç¨‹åºçš„ä¸»å¤´æ–‡ä»¶
+// http_client.h : PROJECT_NAME Ó¦ÓÃ³ÌĞòµÄÖ÷Í·ÎÄ¼ş
 //
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error åœ¨åŒ…å«ç”¨äº PCH çš„æ­¤æ–‡ä»¶ä¹‹å‰åŒ…å«â€œstdafx.hâ€
+	#error ÔÚ°üº¬ÓÃÓÚ PCH µÄ´ËÎÄ¼şÖ®Ç°°üº¬¡°stdafx.h¡±
 #endif
 
-#include "resource.h"		// ä¸»ç¬¦å·
+#include "resource.h"		// Ö÷·ûºÅ
 
 
 // Chttp_clientApp:
-// æœ‰å…³æ­¤ç±»çš„å®ç°ï¼Œè¯·å‚é˜… http_client.cpp
+// ÓĞ¹Ø´ËÀàµÄÊµÏÖ£¬Çë²ÎÔÄ http_client.cpp
 //
 
 class Chttp_clientApp : public CWinApp
@@ -19,11 +19,11 @@ class Chttp_clientApp : public CWinApp
 public:
 	Chttp_clientApp();
 
-// é‡å†™
+// ÖØĞ´
 	public:
 	virtual BOOL InitInstance();
 
-// å®ç°
+// ÊµÏÖ
 
 	DECLARE_MESSAGE_MAP()
 };

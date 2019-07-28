@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "OSSConstants.hpp"
 #include "acl_cpp/aliyun/oss/OSSClient.hpp"
 

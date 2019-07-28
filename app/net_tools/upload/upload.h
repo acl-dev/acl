@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -45,13 +45,13 @@ public:
 protected:
 	~upload();
 
-	// 基类虚函数：子线程处理函数
+	// �����麯�������̴߳�������
 	virtual void rpc_run();
 
-	// 基类虚函数：主线程处理过程，收到子线程任务完成的消息
+	// �����麯�������̴߳������̣��յ����߳�������ɵ���Ϣ
 	virtual void rpc_onover();
 
-	// 基类虚函数：主线程处理过程，收到子线程的通知消息
+	// �����麯�������̴߳������̣��յ����̵߳�֪ͨ��Ϣ
 	virtual void rpc_wakeup(void* ctx);
 private:
 	upload_callback* callback_;

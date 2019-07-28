@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class HttpClientRpc : public acl::rpc_request
 {
@@ -6,12 +6,12 @@ public:
 	HttpClientRpc(acl::string* buf, const char* server_addrs);
 
 protected:
-	// 瀹炵幇鍩虹被铏氬嚱鏁�
+	// 实现基类虚函数
 
-	// 鍦ㄥ瓙绾跨▼寮€濮嬭繍琛�
+	// 在子线程开始运行
 	void rpc_run();
 
-	// 褰� rpc_run 杩斿洖鍚庡湪涓荤嚎绋嬩腑杩愯
+	// 当 rpc_run 返回后在主线程中运行
 	void rpc_onover();
 
 private:

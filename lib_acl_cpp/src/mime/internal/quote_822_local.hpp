@@ -1,4 +1,4 @@
-﻿#ifndef _QUOTE_822_H_INCLUDED_
+#ifndef _QUOTE_822_H_INCLUDED_
 #define _QUOTE_822_H_INCLUDED_
 
 #if !defined(ACL_MIME_DISABLE)

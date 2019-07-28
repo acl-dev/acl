@@ -1,6 +1,6 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 /**
- * æµ‹è¯•jsonè§£æžå™¨å¯¹äºŽåˆ¶è¡¨ç¬¦è§£æžé—®é¢˜ï¼Œ\t \nç­‰
+ * ²âÊÔjson½âÎöÆ÷¶ÔÓÚÖÆ±í·û½âÎöÎÊÌâ£¬\t \nµÈ
  */
 
 int main()
@@ -16,13 +16,13 @@ int main()
 	first.add_text("tablename", tablename);
 	first.add_text("name", name);
 
-	// ç”Ÿæˆjsonå­—ç¬¦ä¸²
+	// Éú³Éjson×Ö·û´®
 	printf("json to string:%s\r\n", json.to_string().c_str());
 	printf("first json node to string: %s\r\n", first.to_string().c_str());
 
 	acl::string buf;
 	json.build_json(buf);
-	// æ ¹æ®ç”Ÿæˆçš„å­—ç¬¦ä¸²èŽ·å–é”®å€¼
+	// ¸ù¾ÝÉú³ÉµÄ×Ö·û´®»ñÈ¡¼üÖµ
 	acl::json json2(first);
 	acl::json_node* root2 = &json2.get_root();
 	acl::json_node* child = root2->first_child();

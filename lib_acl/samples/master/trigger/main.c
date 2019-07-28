@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <assert.h>
 
 static int var_cfg_sleep_time;

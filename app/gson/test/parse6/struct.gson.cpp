@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "struct.h"
 #include "struct.gson.h"
 namespace acl

@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../stdlib/thread_mutex.hpp"
 #include "../stream/aio_handle.hpp"
 #include "../stream/aio_listen_stream.hpp"
@@ -15,43 +15,43 @@ class aio_handle;
 class aio_socket_stream;
 
 /**
- * acl_master æœåŠ¡å™¨æ¡†æ¶ä¸­å•çº¿ç¨‹éé˜»å¡æ–¹å¼çš„æ¨¡æ¿ç±»ï¼Œè¯¥ç±»å¯¹è±¡åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹è¿è¡Œ
+ * acl_master ·şÎñÆ÷¿ò¼ÜÖĞµ¥Ïß³Ì·Ç×èÈû·½Ê½µÄÄ£°åÀà£¬¸ÃÀà¶ÔÏóÖ»ÄÜÓĞÒ»¸öÊµÀıÔËĞĞ
  */
 class ACL_CPP_API master_aio : public master_base, public aio_accept_callback
 {
 public:
 	/**
-	 * å¼€å§‹è¿è¡Œï¼Œè°ƒç”¨è¯¥å‡½æ•°æ˜¯æŒ‡è¯¥æœåŠ¡è¿›ç¨‹æ˜¯åœ¨ acl_master æœåŠ¡æ¡†æ¶
-	 * æ§åˆ¶ä¹‹ä¸‹è¿è¡Œï¼Œä¸€èˆ¬ç”¨äºç”Ÿäº§æœºçŠ¶æ€
-	 * @param argc {int} ä» main ä¸­ä¼ é€’çš„ç¬¬ä¸€ä¸ªå‚æ•°ï¼Œè¡¨ç¤ºå‚æ•°ä¸ªæ•°
-	 * @param argv {char**} ä» main ä¸­ä¼ é€’çš„ç¬¬äºŒä¸ªå‚æ•°
+	 * ¿ªÊ¼ÔËĞĞ£¬µ÷ÓÃ¸Ãº¯ÊıÊÇÖ¸¸Ã·şÎñ½ø³ÌÊÇÔÚ acl_master ·şÎñ¿ò¼Ü
+	 * ¿ØÖÆÖ®ÏÂÔËĞĞ£¬Ò»°ãÓÃÓÚÉú²ú»ú×´Ì¬
+	 * @param argc {int} ´Ó main ÖĞ´«µİµÄµÚÒ»¸ö²ÎÊı£¬±íÊ¾²ÎÊı¸öÊı
+	 * @param argv {char**} ´Ó main ÖĞ´«µİµÄµÚ¶ş¸ö²ÎÊı
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * åœ¨å•ç‹¬è¿è¡Œæ—¶çš„å¤„ç†å‡½æ•°ï¼Œç”¨æˆ·å¯ä»¥è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œä¸€äº›å¿…è¦çš„è°ƒè¯•å·¥ä½œ
-	 * @param addrs {const char*} æœåŠ¡ç›‘å¬åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼šIP:PORT, IP:PORT...
-	 * @param path {const char*} é…ç½®æ–‡ä»¶å…¨è·¯å¾„
-	 * @param ht {aio_handle_type} äº‹ä»¶å¼•æ“çš„ç±»å‹
-	 * @return {bool} ç›‘å¬æ˜¯å¦æˆåŠŸ
+	 * ÔÚµ¥¶ÀÔËĞĞÊ±µÄ´¦Àíº¯Êı£¬ÓÃ»§¿ÉÒÔµ÷ÓÃ´Ëº¯Êı½øĞĞÒ»Ğ©±ØÒªµÄµ÷ÊÔ¹¤×÷
+	 * @param addrs {const char*} ·şÎñ¼àÌıµØÖ·ÁĞ±í£¬¸ñÊ½£ºIP:PORT, IP:PORT...
+	 * @param path {const char*} ÅäÖÃÎÄ¼şÈ«Â·¾¶
+	 * @param ht {aio_handle_type} ÊÂ¼şÒıÇæµÄÀàĞÍ
+	 * @return {bool} ¼àÌıÊÇ·ñ³É¹¦
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL,
 		aio_handle_type ht = ENGINE_SELECT);
 
 	/**
-	 * è·å¾—å¼‚æ­¥IOçš„äº‹ä»¶å¼•æ“å¥æŸ„ï¼Œé€šè¿‡æ­¤å¥æŸ„ï¼Œç”¨æˆ·å¯ä»¥è®¾ç½®å®šæ—¶å™¨ç­‰åŠŸèƒ½
+	 * »ñµÃÒì²½IOµÄÊÂ¼şÒıÇæ¾ä±ú£¬Í¨¹ı´Ë¾ä±ú£¬ÓÃ»§¿ÉÒÔÉèÖÃ¶¨Ê±Æ÷µÈ¹¦ÄÜ
 	 * @return {aio_handle*}
 	 */
 	aio_handle* get_handle() const;
 
 	/**
-	 * åœ¨ run_alone æ¨¡å¼ä¸‹ï¼Œé€šçŸ¥æœåŠ¡å™¨æ¡†æ¶å…³é—­å¼•æ“ï¼Œé€€å‡ºç¨‹åº
+	 * ÔÚ run_alone Ä£Ê½ÏÂ£¬Í¨Öª·şÎñÆ÷¿ò¼Ü¹Ø±ÕÒıÇæ£¬ÍË³ö³ÌĞò
 	 */
 	void stop();
 
 	/**
-	 * è·å¾—é…ç½®æ–‡ä»¶è·¯å¾„
-	 * @return {const char*} è¿”å›å€¼ä¸º NULL è¡¨ç¤ºæ²¡æœ‰è®¾é…ç½®æ–‡ä»¶
+	 * »ñµÃÅäÖÃÎÄ¼şÂ·¾¶
+	 * @return {const char*} ·µ»ØÖµÎª NULL ±íÊ¾Ã»ÓĞÉèÅäÖÃÎÄ¼ş
 	 */
 	const char* get_conf_path(void) const;
 
@@ -60,19 +60,19 @@ protected:
 	virtual ~master_aio();
 
 	/**
-	 * çº¯è™šå‡½æ•°ï¼šå½“æ¥æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥æ—¶è°ƒç”¨æ­¤å‡½æ•°
-	 * @param stream {aio_socket_stream*} æ–°æ¥æ”¶åˆ°çš„å®¢æˆ·ç«¯å¼‚æ­¥æµå¯¹è±¡
-	 * @return {bool} è¯¥å‡½æ•°å¦‚æœè¿”å› false åˆ™é€šçŸ¥æœåŠ¡å™¨æ¡†æ¶ä¸å†æ¥æ”¶
-	 *  è¿œç¨‹å®¢æˆ·ç«¯è¿æ¥ï¼Œå¦åˆ™ç»§ç»­æ¥æ”¶å®¢æˆ·ç«¯è¿æ¥
+	 * ´¿Ğéº¯Êı£ºµ±½ÓÊÕµ½Ò»¸ö¿Í»§¶ËÁ¬½ÓÊ±µ÷ÓÃ´Ëº¯Êı
+	 * @param stream {aio_socket_stream*} ĞÂ½ÓÊÕµ½µÄ¿Í»§¶ËÒì²½Á÷¶ÔÏó
+	 * @return {bool} ¸Ãº¯ÊıÈç¹û·µ»Ø false ÔòÍ¨Öª·şÎñÆ÷¿ò¼Ü²»ÔÙ½ÓÊÕ
+	 *  Ô¶³Ì¿Í»§¶ËÁ¬½Ó£¬·ñÔò¼ÌĞø½ÓÊÕ¿Í»§¶ËÁ¬½Ó
 	 */
 	virtual bool on_accept(aio_socket_stream* stream) = 0;
 
 private:
 	aio_handle* handle_;
 	/**
-	 * åŸºç±» aio_accept_callback çš„è™šå‡½æ•°å®ç°
-	 * @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
-	 * @return {bool} è¿”å› true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
+	 * »ùÀà aio_accept_callback µÄĞéº¯ÊıÊµÏÖ
+	 * @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
+	 * @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌıÁ÷¼ÌĞø¼àÌı
 	 */
 	virtual bool accept_callback(aio_socket_stream* client);
 
@@ -82,25 +82,25 @@ private:
 
 private:
 #if defined(_WIN32) || defined(_WIN64)
-	// å½“æ¥æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥æ—¶å›è°ƒæ­¤å‡½æ•°
+	// µ±½ÓÊÕµ½Ò»¸ö¿Í»§¶ËÁ¬½ÓÊ±»Øµ÷´Ëº¯Êı
 	static void service_main(SOCKET, void*);
 #else
 	static void service_main(int, void*);
 #endif
 
-	// å½“ç›‘å¬ä¸€ä¸ªæœåŠ¡åœ°å€æ—¶å›è°ƒæ­¤å‡½æ•°
+	// µ±¼àÌıÒ»¸ö·şÎñµØÖ·Ê±»Øµ÷´Ëº¯Êı
 	static void service_on_listen(void*, ACL_VSTREAM*);
 
-	// å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void service_pre_jail(void*);
 
-	// å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void service_init(void*);
 
-	// å½“è¿›ç¨‹é€€å‡ºæ—¶è°ƒç”¨çš„å›è°ƒå‡½æ•°
+	// µ±½ø³ÌÍË³öÊ±µ÷ÓÃµÄ»Øµ÷º¯Êı
 	static void service_exit(void*);
 
-	// å½“è¿›ç¨‹æ”¶åˆ° SIGHUP ä¿¡å·åä¼šå›è°ƒæœ¬å‡½æ•°
+	// µ±½ø³ÌÊÕµ½ SIGHUP ĞÅºÅºó»á»Øµ÷±¾º¯Êı
 	static int service_on_sighup(void*, ACL_VSTRING*);
 };
 

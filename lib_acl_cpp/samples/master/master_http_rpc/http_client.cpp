@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "rpc_manager.h"
 #include "rpc_stats.h"
 #include "http_rpc.h"
@@ -33,14 +33,14 @@ void http_client::close_callback()
 
 bool http_client::read_wakeup()
 {
-	// 娴嬭瘯鐘舵€�
+	// 测试状态
 	rpc_read_wait_del();
 	rpc_add();
 
-	// 鍏堢姝㈠紓姝ユ祦鐩戞帶
+	// 先禁止异步流监控
 	conn_->disable_read();
 
-	// 鍙戣捣涓€涓� http 浼氳瘽杩囩▼
+	// 发起一个 http 会话过程
 	rpc_manager::get_instance().fork(http_);
 
 	return true;

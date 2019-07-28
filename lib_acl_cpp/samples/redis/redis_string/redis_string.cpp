@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 static bool __check_addr = false;
 static acl::string __keypre("test_key");

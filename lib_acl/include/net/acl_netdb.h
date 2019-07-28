@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_NETDB_INCLUDE_H
+#ifndef	ACL_NETDB_INCLUDE_H
 #define	ACL_NETDB_INCLUDE_H
 
 #include "../stdlib/acl_define.h"
@@ -11,7 +11,7 @@
 #include "acl_sane_inet.h"
 
 /**
- * ä¸»æœºåœ°å€ç»“æ„
+ * Ö÷»úµØÖ·½á¹¹
  */
 typedef struct ACL_HOSTNAME ACL_HOST_INFO;
 typedef struct ACL_HOSTNAME {
@@ -23,7 +23,7 @@ typedef struct ACL_HOSTNAME {
 } ACL_HOSTNAME;
 
 /**
- * DNSæŸ¥è¯¢ç»“æœé›†
+ * DNS²éÑ¯½á¹û¼¯
  */
 typedef struct ACL_DNS_DB {
 	ACL_ARRAY *h_db;
@@ -32,151 +32,151 @@ typedef struct ACL_DNS_DB {
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êı */
 	const ACL_HOST_INFO *(*iter_head)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
 	const ACL_HOST_INFO *(*iter_next)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êı */
 	const ACL_HOST_INFO *(*iter_tail)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êı */
 	const ACL_HOST_INFO *(*iter_prev)(ACL_ITER*, struct ACL_DNS_DB*);
-	/* å–è¿­ä»£å™¨å…³è”çš„å½“å‰å®¹å™¨æˆå‘˜ç»“æ„å¯¹è±¡ */
+	/* È¡µü´úÆ÷¹ØÁªµÄµ±Ç°ÈİÆ÷³ÉÔ±½á¹¹¶ÔÏó */
 	const ACL_HOST_INFO *(*iter_info)(ACL_ITER*, struct ACL_DNS_DB*);
 } ACL_DNS_DB;
 
 /* in acl_netdb.c */
 
 /**
- * ä»ç»“æœé›†ä¸­å–å¾—æŸä¸ªä¸‹æ ‡ä½ç½®çš„ä¸»æœºåœ°å€ç»“æ„
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @param i {int} ä¸‹æ ‡ä½ç½®
- * @return {const ACL_HOSTNAME*} è¿”å›ç›¸åº”ä¸‹æ ‡çš„ä¸»æœºåœ°å€ç»“æ„
+ * ´Ó½á¹û¼¯ÖĞÈ¡µÃÄ³¸öÏÂ±êÎ»ÖÃµÄÖ÷»úµØÖ·½á¹¹
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @param i {int} ÏÂ±êÎ»ÖÃ
+ * @return {const ACL_HOSTNAME*} ·µ»ØÏàÓ¦ÏÂ±êµÄÖ÷»úµØÖ·½á¹¹
  */
 ACL_API const ACL_HOSTNAME *acl_netdb_index(const ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * ä»ç»“æœé›†ä¸­å–å¾—æŸä¸ªä¸‹æ ‡ä½ç½®çš„ä¸»æœºIPåœ°å€
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @param i {int} ä¸‹æ ‡ä½ç½®
- * @return {const ACL_SOCKADDR*} IPåœ°å€ç»“æ„, NULLè¡¨ç¤ºå¤±è´¥
+ * ´Ó½á¹û¼¯ÖĞÈ¡µÃÄ³¸öÏÂ±êÎ»ÖÃµÄÖ÷»úIPµØÖ·
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @param i {int} ÏÂ±êÎ»ÖÃ
+ * @return {const ACL_SOCKADDR*} IPµØÖ·½á¹¹, NULL±íÊ¾Ê§°Ü
  */
 ACL_API const ACL_SOCKADDR *acl_netdb_index_saddr(ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * å°†ç»“æœé›†ä¸­çš„å¯¹åº”æŸä¸ªä¸‹æ ‡çš„ä¸»æœºåœ°å€å¼•ç”¨å¢åŠ 
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @param i {int} ä¸‹æ ‡ä½ç½®
- * @param n {int} éœ€è¦å¢åŠ çš„å¼•ç”¨å€¼
+ * ½«½á¹û¼¯ÖĞµÄ¶ÔÓ¦Ä³¸öÏÂ±êµÄÖ÷»úµØÖ·ÒıÓÃÔö¼Ó
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @param i {int} ÏÂ±êÎ»ÖÃ
+ * @param n {int} ĞèÒªÔö¼ÓµÄÒıÓÃÖµ
  */
 ACL_API void acl_netdb_refer_oper(ACL_DNS_DB *h_dns_db, int i, int n);
 
 /**
- * å°†ç»“æœé›†ä¸­çš„å¯¹åº”æŸä¸ªä¸‹æ ‡çš„ä¸»æœºåœ°å€å¼•ç”¨åŠ 1
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @param i {int} ä¸‹æ ‡ä½ç½®
+ * ½«½á¹û¼¯ÖĞµÄ¶ÔÓ¦Ä³¸öÏÂ±êµÄÖ÷»úµØÖ·ÒıÓÃ¼Ó1
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @param i {int} ÏÂ±êÎ»ÖÃ
  */
 ACL_API void acl_netdb_refer(ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * å°†ç»“æœé›†ä¸­çš„å¯¹åº”æŸä¸ªä¸‹æ ‡çš„ä¸»æœºåœ°å€å¼•ç”¨å‡1
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @param i {int} ä¸‹æ ‡ä½ç½®
+ * ½«½á¹û¼¯ÖĞµÄ¶ÔÓ¦Ä³¸öÏÂ±êµÄÖ÷»úµØÖ·ÒıÓÃ¼õ1
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @param i {int} ÏÂ±êÎ»ÖÃ
  */
 ACL_API void acl_netdb_unrefer(ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * å°†ç»“æœé›†ä¸­çš„å¯¹åº”æŸä¸ªä¸‹æ ‡çš„IPåœ°å€ï¼Œä»¥å­—ç¬¦ä¸²è¡¨ç¤º
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @param i {int} ä¸‹æ ‡ä½ç½®
- * @return {const char*} æŸ¥å¾—çš„ç»“æœï¼ŒNULL è¡¨ç¤ºå¤±è´¥
+ * ½«½á¹û¼¯ÖĞµÄ¶ÔÓ¦Ä³¸öÏÂ±êµÄIPµØÖ·£¬ÒÔ×Ö·û´®±íÊ¾
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @param i {int} ÏÂ±êÎ»ÖÃ
+ * @return {const char*} ²éµÃµÄ½á¹û£¬NULL ±íÊ¾Ê§°Ü
  */
 ACL_API const char *acl_netdb_index_ip(const ACL_DNS_DB *h_dns_db, int i);
 
 /**
- * å–å¾—ç»“æœé›†ä¸­ä¸»æœºåœ°å€çš„ä¸ªæ•°
- * @param h_dns_db {const ACL_DNS_DB*} DNSç»“æœé›†
- * @return {int} ä¸»æœºåœ°å€ä¸ªæ•° > 0, -1 è¡¨ç¤ºå‚æ•°è¾“å…¥æœ‰è¯¯
+ * È¡µÃ½á¹û¼¯ÖĞÖ÷»úµØÖ·µÄ¸öÊı
+ * @param h_dns_db {const ACL_DNS_DB*} DNS½á¹û¼¯
+ * @return {int} Ö÷»úµØÖ·¸öÊı > 0, -1 ±íÊ¾²ÎÊıÊäÈëÓĞÎó
  */
 ACL_API int acl_netdb_size(const ACL_DNS_DB *h_dns_db);
 
 /**
- *  é‡Šæ”¾ç»“æœé›†å†…å­˜èµ„æº
- * @param h_dns_db {ACL_DNS_DB*} DNSç»“æœé›†
+ *  ÊÍ·Å½á¹û¼¯ÄÚ´æ×ÊÔ´
+ * @param h_dns_db {ACL_DNS_DB*} DNS½á¹û¼¯
  */
 ACL_API void acl_netdb_free(ACL_DNS_DB *h_dns_db);
 
 /**
- * æ ¹æ®åŸŸååˆ›å»ºä¸€ä¸ªæŸ¥è¯¢ç»“æœé›†çš„ç»“æ„ï¼Œä½†å¹¶ä¸è¿›è¡ŒDNSæŸ¥è¯¢
- * @param domain {const char*} è¦æŸ¥è¯¢çš„åŸŸå
- * @return {ACL_DNS_DB*} åˆ›å»ºçš„ç»“æœé›†å¯¹è±¡
+ * ¸ù¾İÓòÃû´´½¨Ò»¸ö²éÑ¯½á¹û¼¯µÄ½á¹¹£¬µ«²¢²»½øĞĞDNS²éÑ¯
+ * @param domain {const char*} Òª²éÑ¯µÄÓòÃû
+ * @return {ACL_DNS_DB*} ´´½¨µÄ½á¹û¼¯¶ÔÏó
  */
 ACL_API ACL_DNS_DB *acl_netdb_new(const char *domain);
 
 /**
- * å‘ç»“æœé›†ä¸­æ·»åŠ IPåœ°å€
- * @param h_dns_db {ACL_DNS_DB*} æŸ¥è¯¢ç»“æœé›†å¯¹è±¡
- * @param ip {const char*} è¦æ·»åŠ çš„IPåœ°å€
+ * Ïò½á¹û¼¯ÖĞÌí¼ÓIPµØÖ·
+ * @param h_dns_db {ACL_DNS_DB*} ²éÑ¯½á¹û¼¯¶ÔÏó
+ * @param ip {const char*} ÒªÌí¼ÓµÄIPµØÖ·
  */
 ACL_API void acl_netdb_addip(ACL_DNS_DB *h_dns_db, const char *ip);
 
 /**
- * å‘ç»“æœé›†ä¸­æ·»åŠ IPåœ°å€åŠç«¯å£å·
- * @param h_dns_db {ACL_DNS_DB*} æŸ¥è¯¢ç»“æœé›†å¯¹è±¡
- * @param ip {const char*} è¦æ·»åŠ çš„IPåœ°å€
- * @param port {int} è¦æ·»åŠ çš„ç«¯å£å·
+ * Ïò½á¹û¼¯ÖĞÌí¼ÓIPµØÖ·¼°¶Ë¿ÚºÅ
+ * @param h_dns_db {ACL_DNS_DB*} ²éÑ¯½á¹û¼¯¶ÔÏó
+ * @param ip {const char*} ÒªÌí¼ÓµÄIPµØÖ·
+ * @param port {int} ÒªÌí¼ÓµÄ¶Ë¿ÚºÅ
  */
 ACL_API void acl_netdb_add_addr(ACL_DNS_DB *h_dns_db, const char *ip, int port);
 
 /**
- * å…‹éš†ä¸€ä¸ªæŸ¥è¯¢ç»“æœé›†å¯¹è±¡
- * @param h_dns_db {const ACL_DNS_DB*} æºç»“æœé›†å¯¹è±¡
- * @return {ACL_DNS_DB*} æ–°å…‹éš†çš„ç»“æœé›†å¯¹è±¡
+ * ¿ËÂ¡Ò»¸ö²éÑ¯½á¹û¼¯¶ÔÏó
+ * @param h_dns_db {const ACL_DNS_DB*} Ô´½á¹û¼¯¶ÔÏó
+ * @return {ACL_DNS_DB*} ĞÂ¿ËÂ¡µÄ½á¹û¼¯¶ÔÏó
  */
 ACL_API ACL_DNS_DB *acl_netdb_clone(const ACL_DNS_DB *h_dns_db);
 
 /**
- * æŸ¥è¯¢æŸä¸ªåŸŸåçš„IPåœ°å€é›†
- * @param name {const char*} åŸŸå
- * @param h_error {int*} å¦‚æœæŸ¥è¯¢å¤±è´¥å­˜å‚¨å‡ºé”™åŸå› 
- * @return {ACL_DNS_DB*} æŸ¥è¯¢ç»“æœé›†, å¦‚æœä¸ºNULLåˆ™æŸ¥è¯¢å¤±è´¥, å¦å¤–ï¼Œå³ä½¿è¿”å›ä¸ä¸ºç©ºï¼Œ
- *  ä¹Ÿå¾—éœ€è¦é€šè¿‡ acl_netdb_size()/1 è·å¾—ç»“æœé›†çš„æ•°ç»„é•¿åº¦
+ * ²éÑ¯Ä³¸öÓòÃûµÄIPµØÖ·¼¯
+ * @param name {const char*} ÓòÃû
+ * @param h_error {int*} Èç¹û²éÑ¯Ê§°Ü´æ´¢³ö´íÔ­Òò
+ * @return {ACL_DNS_DB*} ²éÑ¯½á¹û¼¯, Èç¹ûÎªNULLÔò²éÑ¯Ê§°Ü, ÁíÍâ£¬¼´Ê¹·µ»Ø²»Îª¿Õ£¬
+ *  Ò²µÃĞèÒªÍ¨¹ı acl_netdb_size()/1 »ñµÃ½á¹û¼¯µÄÊı×é³¤¶È
  */
 ACL_API ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error);
 
 /**
- * æ ¹æ®é”™è¯¯å·è·å¾—å‡ºé”™æç¤ºä¿¡æ¯
- * @param errnum {int} é”™è¯¯å·
- * @return {const char*} å‡ºé”™ä¿¡æ¯
+ * ¸ù¾İ´íÎóºÅ»ñµÃ³ö´íÌáÊ¾ĞÅÏ¢
+ * @param errnum {int} ´íÎóºÅ
+ * @return {const char*} ³ö´íĞÅÏ¢
  */ 
 ACL_API const char *acl_netdb_strerror(int errnum);
 
 /* in acl_netdb_cache.c */
 /**
- * å‘DNSç¼“å­˜ä¸­æ·»åŠ ç¼“å­˜æ•°æ®
- * @param h_dns_db {const ACL_DNS_DB*} DNSæŸ¥è¯¢ç»“æœé›†
- * @param timeout {int} è¯¥ç»“æœé›†è¢«ç¼“å­˜çš„è¶…æ—¶æ—¶é—´ï¼Œå¦‚æœ <= 0, åˆ™é‡‡ç”¨é»˜è®¤çš„å€¼ï¼Œ
- *  è¯¥é»˜è®¤å€¼æ˜¯åœ¨ acl_netdb_cache_init()/2 ä¸­çš„è®¾ç½®å€¼, å•ä½ä¸ºç§’
+ * ÏòDNS»º´æÖĞÌí¼Ó»º´æÊı¾İ
+ * @param h_dns_db {const ACL_DNS_DB*} DNS²éÑ¯½á¹û¼¯
+ * @param timeout {int} ¸Ã½á¹û¼¯±»»º´æµÄ³¬Ê±Ê±¼ä£¬Èç¹û <= 0, Ôò²ÉÓÃÄ¬ÈÏµÄÖµ£¬
+ *  ¸ÃÄ¬ÈÏÖµÊÇÔÚ acl_netdb_cache_init()/2 ÖĞµÄÉèÖÃÖµ, µ¥Î»ÎªÃë
  */
 ACL_API void acl_netdb_cache_push(const ACL_DNS_DB *h_dns_db, int timeout);
 
 /**
- * ä»DNSç¼“å­˜ä¸­å–å¾—DNSæŸ¥è¯¢ç»“æœé›†
- * @param name {const char*} åŸŸå
- * @return {ACL_DNS_DB*} DNSæŸ¥è¯¢ç»“æœé›†
+ * ´ÓDNS»º´æÖĞÈ¡µÃDNS²éÑ¯½á¹û¼¯
+ * @param name {const char*} ÓòÃû
+ * @return {ACL_DNS_DB*} DNS²éÑ¯½á¹û¼¯
  */
 ACL_API ACL_DNS_DB *acl_netdb_cache_lookup(const char *name);
 
 /**
- * ä»DNSç¼“å­˜ä¸­åˆ é™¤æŸä¸ªDNSæŸ¥è¯¢ç»“æœé›†
- * @param name {const char*} åŸŸå
+ * ´ÓDNS»º´æÖĞÉ¾³ıÄ³¸öDNS²éÑ¯½á¹û¼¯
+ * @param name {const char*} ÓòÃû
  */
 ACL_API void acl_netdb_cache_del_host(const char *name);
 
 /**
- * åˆå§‹åŒ–DNSç¼“å­˜åŒº
- * @param timeout {int} DNSç»“æœé›†çš„é»˜è®¤ç¼“å­˜æ—¶é—´(ç§’)
- * @param thread_safe {int} æ˜¯å¦éœ€è¦DNSç¼“å­˜åŒºçº¿ç¨‹å®‰å…¨, 0: è¡¨ç¤ºä¸éœ€è¦,
- *  1: è¡¨ç¤ºéœ€è¦çº¿ç¨‹å®‰å…¨
+ * ³õÊ¼»¯DNS»º´æÇø
+ * @param timeout {int} DNS½á¹û¼¯µÄÄ¬ÈÏ»º´æÊ±¼ä(Ãë)
+ * @param thread_safe {int} ÊÇ·ñĞèÒªDNS»º´æÇøÏß³Ì°²È«, 0: ±íÊ¾²»ĞèÒª,
+ *  1: ±íÊ¾ĞèÒªÏß³Ì°²È«
  */
 ACL_API void acl_netdb_cache_init(int timeout, int thread_safe);
 

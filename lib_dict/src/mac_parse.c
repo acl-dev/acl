@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "debug_var.h"
 #include <ctype.h>
 #include "mac_parse.h"

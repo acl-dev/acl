@@ -1,4 +1,4 @@
-﻿#ifndef	__STRING_PATCH_INCLUDE_H__
+#ifndef	__STRING_PATCH_INCLUDE_H__
 #define	__STRING_PATCH_INCLUDE_H__
 
 #ifdef	__cplusplus

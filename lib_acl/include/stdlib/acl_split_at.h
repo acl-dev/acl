@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_SPLIT_AT_INCLUDE_H
+#ifndef ACL_SPLIT_AT_INCLUDE_H
 #define ACL_SPLIT_AT_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -8,18 +8,18 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * ä»å­—ç¬¦ä¸²å·¦è¾¹å¼€å§‹å°†åŒ…å«ç»™å®šåˆ†éš”ç¬¦åœ¨å†…çš„å³è¾¹æˆªæ–­
- * @param string {char*} æºå­—ç¬¦ä¸²
- * @param delimiter {int} åˆ†éš”ç¬¦
- * @return {char*} åˆ†éš”ç¬¦ä»¥å³çš„å­—ç¬¦ä¸²ï¼Œå½“ä¸ºNULLæ—¶è¡¨æ˜æœªæ‰¾åˆ°æŒ‡å®šåˆ†éš”ç¬¦
+ * ´Ó×Ö·û´®×ó±ß¿ªÊ¼½«°üº¬¸ø¶¨·Ö¸ô·ûÔÚÄÚµÄÓÒ±ß½Ø¶Ï
+ * @param string {char*} Ô´×Ö·û´®
+ * @param delimiter {int} ·Ö¸ô·û
+ * @return {char*} ·Ö¸ô·ûÒÔÓÒµÄ×Ö·û´®£¬µ±ÎªNULLÊ±±íÃ÷Î´ÕÒµ½Ö¸¶¨·Ö¸ô·û
  */
 ACL_API char *acl_split_at(char *string, int delimiter);
 
 /**
- * ä»å­—ç¬¦ä¸²å³è¾¹å¼€å§‹å°†åŒ…å«ç»™å®šåˆ†éš”ç¬¦åœ¨å†…çš„å³è¾¹æˆªæ–­
- * @param string {char*} æºå­—ç¬¦ä¸²
- * @param delimiter {int} åˆ†éš”ç¬¦
- * @return {char*} åˆ†éš”ç¬¦ä»¥å³çš„å­—ç¬¦ä¸²ï¼Œå½“ä¸ºNULLæ—¶è¡¨æ˜æœªæ‰¾åˆ°æŒ‡å®šåˆ†éš”ç¬¦
+ * ´Ó×Ö·û´®ÓÒ±ß¿ªÊ¼½«°üº¬¸ø¶¨·Ö¸ô·ûÔÚÄÚµÄÓÒ±ß½Ø¶Ï
+ * @param string {char*} Ô´×Ö·û´®
+ * @param delimiter {int} ·Ö¸ô·û
+ * @return {char*} ·Ö¸ô·ûÒÔÓÒµÄ×Ö·û´®£¬µ±ÎªNULLÊ±±íÃ÷Î´ÕÒµ½Ö¸¶¨·Ö¸ô·û
  */
 ACL_API char *acl_split_at_right(char *string, int delimiter);
 

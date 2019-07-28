@@ -1,28 +1,28 @@
-ï»¿// demoDlg.h : å¤´æ–‡ä»¶
+// demoDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
 
 
-// CdemoDlg å¯¹è¯æ¡†
+// CdemoDlg ¶Ô»°¿ò
 class CdemoDlg : public CDialog
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	CdemoDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	CdemoDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_DEMO_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

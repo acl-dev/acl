@@ -1,4 +1,4 @@
-﻿#ifndef MYSQL_SERVICE_MY_SNPRINTF_INCLUDED
+#ifndef MYSQL_SERVICE_MY_SNPRINTF_INCLUDED
 /* Copyright (C) 2009 Sun Microsystems, Inc.
 
    This program is free software; you can redistribute it and/or modify

@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_TEST_VAR_INCLUDE_H
+#ifndef	ACL_TEST_VAR_INCLUDE_H
 #define	ACL_TEST_VAR_INCLUDE_H
 
 # ifdef	__cplusplus

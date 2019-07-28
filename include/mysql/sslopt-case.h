@@ -1,4 +1,4 @@
-﻿#ifndef SSLOPT_CASE_INCLUDED
+#ifndef SSLOPT_CASE_INCLUDED
 #define SSLOPT_CASE_INCLUDED
 
 /* Copyright (C) 2000 MySQL AB

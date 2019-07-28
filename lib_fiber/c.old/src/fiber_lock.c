@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "fiber/lib_fiber.h"
 #include "fiber.h"
 

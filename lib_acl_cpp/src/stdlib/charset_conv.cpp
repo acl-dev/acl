@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 
 #if !defined(HAVE_H_ICONV) && !defined(ANDROID)
 # define HAVE_H_ICONV
@@ -46,7 +46,7 @@ static iconvctl_fn __iconvctl = NULL;
 static acl_pthread_once_t __iconv_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __iconv_dll = NULL;
 
-// ç¨‹åºé€€å‡ºæ—¶é‡Šæ”¾åŠ¨æ€åŠ è½½çš„ iconv.dll åº“
+// ³ÌĞòÍË³öÊ±ÊÍ·Å¶¯Ì¬¼ÓÔØµÄ iconv.dll ¿â
 static void __iconv_dll_unload(void)
 {
 	if (__iconv_dll != NULL) {
@@ -56,7 +56,7 @@ static void __iconv_dll_unload(void)
 	}
 }
 
-// åŠ¨æ€åŠ è½½ iconv.dll åº“
+// ¶¯Ì¬¼ÓÔØ iconv.dll ¿â
 static void __iconv_dll_load(void)
 {
 	const char* path = "iconv.dll";
@@ -221,9 +221,9 @@ bool charset_conv::update_begin(const char* fromCharset,
 		return false;
 	}
 
-	// å¦‚æœæºæ˜¯ UTF-8 ç¼–ç ï¼Œåˆ™ m_pTuf8Pre ä» UTF8_HEADER å¤´éƒ¨ç¬¬
-	// ä¸€ä¸ªå­—èŠ‚å¼€å§‹è¿›è¡ŒåŒ¹é…ï¼Œå¦åˆ™ä»æœ€åä¸€ä¸ªå­—èŠ‚ '\0' å¼€å§‹åŒ¹é…ï¼Œ
-	// å³è·³è¿‡ UTF-8 å¤´éƒ¨åŒ¹é…è¿‡ç¨‹
+	// Èç¹ûÔ´ÊÇ UTF-8 ±àÂë£¬Ôò m_pTuf8Pre ´Ó UTF8_HEADER Í·²¿µÚ
+	// Ò»¸ö×Ö½Ú¿ªÊ¼½øĞĞÆ¥Åä£¬·ñÔò´Ó×îºóÒ»¸ö×Ö½Ú '\0' ¿ªÊ¼Æ¥Åä£¬
+	// ¼´Ìø¹ı UTF-8 Í·²¿Æ¥Åä¹ı³Ì
 	if (EQ(fromCharset, "utf-8") || EQ(fromCharset, "utf8")) {
 		m_pUtf8Pre = UTF8_HEADER;
 	} else {
@@ -309,13 +309,13 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 		return false;
 	}
 
-	// å»æ‰æœ‰äº› UTF-8 æ–‡æ¡£ä¸­å¼€å§‹çš„ UTF-8 å¼•å¯¼ç¬¦
+	// È¥µôÓĞĞ© UTF-8 ÎÄµµÖĞ¿ªÊ¼µÄ UTF-8 Òıµ¼·û
 	if (*m_pUtf8Pre) {
 		while (len > 0) {
 			if (*m_pUtf8Pre == 0x00) {
 				break;
 			} else if (*m_pUtf8Pre != *in) {
-				// å¿…é¡»ä½¿ UTF-8 å‰ç¼€å¤±æ•ˆ
+				// ±ØĞëÊ¹ UTF-8 Ç°×ºÊ§Ğ§
 				m_pUtf8Pre = &UTF8_HEADER[3];
 				break;
 			}
@@ -339,7 +339,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 		ACL_VSTRING_SPACE(m_pOutBuf, (int) len);
 	}
 
-	// å…ˆå°†è¾“å…¥æ•°æ®è¿›è¡Œç¼“å†²
+	// ÏÈ½«ÊäÈëÊı¾İ½øĞĞ»º³å
 	if (*m_pUtf8Pre && m_pUtf8Pre - UTF8_HEADER > 0) {
 		acl_vstring_memcpy(m_pInBuf, UTF8_HEADER,
 			m_pUtf8Pre - UTF8_HEADER);
@@ -392,14 +392,14 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			if (pIn > STR(m_pInBuf) && nIn < LEN(m_pInBuf)) {
 				acl_vstring_memmove(m_pInBuf, pIn, nIn);
 			}
-			// æ‰©å¤§å†…å­˜ç©ºé—´
+			// À©´óÄÚ´æ¿Õ¼ä
 			ACL_VSTRING_SPACE(m_pOutBuf, SIZE(m_pOutBuf) * 2);
 			continue;
 		} else if (errno == EILSEQ) {
 			char  *pi = NULL, *po = NULL;
 			size_t zi = 0, zo = 0;
 
-			// é‡ç½®çŠ¶æ€, ä¼¼ä¹ä¹Ÿæ²¡å•¥ç”¨å¤„
+			// ÖØÖÃ×´Ì¬, ËÆºõÒ²Ã»É¶ÓÃ´¦
 #ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
@@ -414,9 +414,9 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			__iconv(m_iconv, &pi, &zi, &po, &zo);
 #endif
 
-			// é‡åˆ°æ— æ•ˆçš„å¤šå­—èŠ‚åºåˆ—ï¼ŒpIn æŒ‡å‘ç¬¬ä¸€ä¸ªæ— æ•ˆçš„ä½ç½®
+			// Óöµ½ÎŞĞ§µÄ¶à×Ö½ÚĞòÁĞ£¬pIn Ö¸ÏòµÚÒ»¸öÎŞĞ§µÄÎ»ÖÃ
 
-			// å…ˆæ‹·è´å·²ç»è½¬æ¢çš„æ•°æ®
+			// ÏÈ¿½±´ÒÑ¾­×ª»»µÄÊı¾İ
 			if ((ret = SIZE(m_pOutBuf) - nOut) > 0) {
 				out->append(STR(m_pOutBuf), ret);
 			}
@@ -428,9 +428,9 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 
 			acl_assert(pIn >= STR(m_pInBuf));
 
-			// æ˜¯å¦è·³è¿‡æ— æ•ˆå­—èŠ‚?
+			// ÊÇ·ñÌø¹ıÎŞĞ§×Ö½Ú?
 			if (m_addInvalid) {
-				(*out) += (char)(*pIn); // ç›´æ¥æ‹·è´æ— æ•ˆå­—èŠ‚
+				(*out) += (char)(*pIn); // Ö±½Ó¿½±´ÎŞĞ§×Ö½Ú
 			}
 			nIn--;
 			pIn++;
@@ -443,7 +443,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			char  *pi = NULL, *po = NULL;
 			size_t zi = 0, zo = 0;
 
-			// é‡ç½®çŠ¶æ€, ä¼¼ä¹ä¹Ÿæ²¡å•¥ç”¨å¤„
+			// ÖØÖÃ×´Ì¬, ËÆºõÒ²Ã»É¶ÓÃ´¦
 #ifdef	ACL_WINDOWS
 # ifdef USE_WIN_ICONV
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
@@ -458,14 +458,14 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			__iconv(m_iconv, &pi, &zi, &po, &zo);
 #endif
 
-			// è¾“å…¥çš„å¤šå­—èŠ‚åºåˆ—ä¸å®Œæ•´ï¼ŒpIn æŒ‡å‘è¯¥ä¸å®Œæ•´çš„ä½ç½®
+			// ÊäÈëµÄ¶à×Ö½ÚĞòÁĞ²»ÍêÕû£¬pIn Ö¸Ïò¸Ã²»ÍêÕûµÄÎ»ÖÃ
 
-			// å…ˆæ‹·è´å·²ç»è½¬æ¢çš„æ•°æ®
+			// ÏÈ¿½±´ÒÑ¾­×ª»»µÄÊı¾İ
 			if ((ret = SIZE(m_pOutBuf) - nOut) > 0) {
 				out->append(STR(m_pOutBuf), ret);
 			}
 
-			// ç§»åŠ¨æ•°æ®ï¼Œå°†æœªè½¬æ¢çš„æ•°æ®ç§»è‡³ç¼“å†²åŒºèµ·å§‹ä½ç½®
+			// ÒÆ¶¯Êı¾İ£¬½«Î´×ª»»µÄÊı¾İÒÆÖÁ»º³åÇøÆğÊ¼Î»ÖÃ
 			if (nIn > 0) {
 				acl_vstring_memmove(m_pInBuf, pIn, nIn);
 			} else {
@@ -473,8 +473,8 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 			}
 			break;
 		} else if (LEN(m_pInBuf) > 0) {
-			// å¦‚æœé‡åˆ°äº†æ— æ•ˆçš„å­—ç¬¦é›†ï¼Œæ ¹æ®è®¾ç½®çš„æ ‡å¿—ä½
-			// å†³å®šæ˜¯å¦ç›´æ¥æ‹·è´
+			// Èç¹ûÓöµ½ÁËÎŞĞ§µÄ×Ö·û¼¯£¬¸ù¾İÉèÖÃµÄ±êÖ¾Î»
+			// ¾ö¶¨ÊÇ·ñÖ±½Ó¿½±´
 			if (m_addInvalid) {
 				out->append(STR(m_pInBuf), LEN(m_pInBuf));
 				ACL_VSTRING_RESET(m_pInBuf);
@@ -573,7 +573,7 @@ void charset_conv::clear(void)
 	}
 }
 
-// è·å¾—å­—ç¬¦é›†è½¬æ¢å™¨
+// »ñµÃ×Ö·û¼¯×ª»»Æ÷
 charset_conv* charset_conv::create(const char* fromCharset, const char* toCharset)
 {
 	if (fromCharset == NULL || toCharset == NULL) {

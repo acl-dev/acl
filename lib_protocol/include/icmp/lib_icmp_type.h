@@ -1,4 +1,4 @@
-ï»¿#ifndef __LIB_ICMP_TYPE_INCLUDE_H__
+#ifndef __LIB_ICMP_TYPE_INCLUDE_H__
 #define __LIB_ICMP_TYPE_INCLUDE_H__
 
 #define ICMP_TYPE_ECHOREPLY	0
@@ -13,28 +13,28 @@ typedef struct ICMP_HOST ICMP_HOST;
 typedef struct ICMP_PKT ICMP_PKT;
 typedef struct ICMP_PKT_STATUS ICMP_PKT_STATUS;
 
-/**< ICMP é€šä¿¡è¿‡ç¨‹ä¸­æ¯ä¸ªä¸»æœºçš„ PING å“åº”çŠ¶æ€ä¿¡æ¯æ±‡æ€» */
+/**< ICMP Í¨ÐÅ¹ý³ÌÖÐÃ¿¸öÖ÷»úµÄ PING ÏìÓ¦×´Ì¬ÐÅÏ¢»ã×Ü */
 struct ICMP_STAT {
-	double tmin;			/**< æœ€çŸ­æ—¶é—´ */
-	double tmax;			/**< æœ€é•¿æ—¶é—´ */
-	double tsum;			/**< æ€»æ—¶é—´ */
-	double tave;			/**< å¹³å‡æ—¶é—´ */
-	size_t nsent;			/**< å·²ç»å‘é€çš„åŒ…ä¸ªæ•° */
-	size_t nreceived;		/**< å·²ç»æ”¶åˆ°çš„åŒ…ä¸ªæ•° */
-	double loss;			/**< ä¸¢å¤±çš„åŒ…ä¸ªæ•° */
+	double tmin;			/**< ×î¶ÌÊ±¼ä */
+	double tmax;			/**< ×î³¤Ê±¼ä */
+	double tsum;			/**< ×ÜÊ±¼ä */
+	double tave;			/**< Æ½¾ùÊ±¼ä */
+	size_t nsent;			/**< ÒÑ¾­·¢ËÍµÄ°ü¸öÊý */
+	size_t nreceived;		/**< ÒÑ¾­ÊÕµ½µÄ°ü¸öÊý */
+	double loss;			/**< ¶ªÊ§µÄ°ü¸öÊý */
 };
 
 #define ICMP_MIN_PACKET		32
 #define ICMP_MAX_PACKET		1024
 
-/**< ICMP æ‰€å‘é€çš„æ¯ä¸ª PING åŒ…ä¹‹åŽçš„ä¸»æœºçŠ¶æ€åº”ç­” */
+/**< ICMP Ëù·¢ËÍµÄÃ¿¸ö PING °üÖ®ºóµÄÖ÷»ú×´Ì¬Ó¦´ð */
 struct ICMP_PKT_STATUS {
-	size_t reply_len;		/**< åŒ…å›žå¤çš„æ•°æ®é•¿åº¦ */
-	char   from_ip[64];		/**< æºåœ°å€ */
+	size_t reply_len;		/**< °ü»Ø¸´µÄÊý¾Ý³¤¶È */
+	char   from_ip[64];		/**< Ô´µØÖ· */
 
-	double         rtt;		/**< å¾€è¿”æ—¶é—´(æ¯«ç§’)(Round Trip Time) */
-	unsigned short seq;		/**< åºåˆ—å·(seq no) */
-	unsigned char  ttl;		/**< ç”Ÿå­˜æ—¶é—´(time to live) */
+	double         rtt;		/**< Íù·µÊ±¼ä(ºÁÃë)(Round Trip Time) */
+	unsigned short seq;		/**< ÐòÁÐºÅ(seq no) */
+	unsigned char  ttl;		/**< Éú´æÊ±¼ä(time to live) */
 	unsigned int   gid;
 	char          *data;
 	size_t         dlen;
@@ -47,40 +47,40 @@ struct ICMP_PKT_STATUS {
 	ICMP_PKT      *pkt;
 };
 
-/**< ç›®çš„ä¸»æœºä¿¡æ¯ç»“æž„ */
+/**< Ä¿µÄÖ÷»úÐÅÏ¢½á¹¹ */
 struct ICMP_HOST {
-	ICMP_STAT icmp_stat;		/**< ICMP é€šä¿¡è¿‡ç¨‹ä¸­çš„çŠ¶æ€ */
-	char dest_ip[32];		/**< ç›®çš„ä¸»æœºIPåœ°å€ */
-	char domain[64];		/**< ç›®çš„ä¸»æœºIPæ‰€å¯¹åº”çš„åŸŸå */
-	struct sockaddr_in dest;	/**< å‘é€åŒ…æ—¶ç›®çš„ä¸»æœºåœ°å€ */
-	struct sockaddr_in from;	/**< æŽ¥æ”¶æ—¶æºä¸»æœºåœ°å€ */
-	int   from_len;			/**< æŽ¥æ”¶æ—¶å­˜å‚¨åœ¨ from ä¸­çš„åœ°å€é•¿åº¦ */
-	int   delay;			/**< å‘é€ PING çš„é—´éš”ï¼Œå•ä½ä¸ºæ¯«ç§’ */
-	int   timeout;			/**< è¶…æ—¶æ—¶é—´(æ¯«ç§’) */
-	size_t dlen;			/**< æ¯ä¸ªå‘é€åŒ…çš„å¤§å°(å­—èŠ‚) */
-	size_t nsent;			/**< å·²ç»å‘é€ç»™è¯¥ç›®çš„ä¸»æœºåŒ…çš„ä¸ªæ•° */
+	ICMP_STAT icmp_stat;		/**< ICMP Í¨ÐÅ¹ý³ÌÖÐµÄ×´Ì¬ */
+	char dest_ip[32];		/**< Ä¿µÄÖ÷»úIPµØÖ· */
+	char domain[64];		/**< Ä¿µÄÖ÷»úIPËù¶ÔÓ¦µÄÓòÃû */
+	struct sockaddr_in dest;	/**< ·¢ËÍ°üÊ±Ä¿µÄÖ÷»úµØÖ· */
+	struct sockaddr_in from;	/**< ½ÓÊÕÊ±Ô´Ö÷»úµØÖ· */
+	int   from_len;			/**< ½ÓÊÕÊ±´æ´¢ÔÚ from ÖÐµÄµØÖ·³¤¶È */
+	int   delay;			/**< ·¢ËÍ PING µÄ¼ä¸ô£¬µ¥Î»ÎªºÁÃë */
+	int   timeout;			/**< ³¬Ê±Ê±¼ä(ºÁÃë) */
+	size_t dlen;			/**< Ã¿¸ö·¢ËÍ°üµÄ´óÐ¡(×Ö½Ú) */
+	size_t nsent;			/**< ÒÑ¾­·¢ËÍ¸ø¸ÃÄ¿µÄÖ÷»ú°üµÄ¸öÊý */
 
-	ICMP_PKT **pkts;		/**< æ‰€æœ‰åŒ…çš„æ•°ç»„ */
-	size_t npkt;			/**< è®¾ç½®çš„å‘è¯¥ç›®çš„ä¸»æœºå‘é€åŒ…çš„ä¸ªæ•° */
-	size_t ipkt;			/**< è®°å½•ä¸‹ä¸€ä¸ªè¦å‘é€çš„åŒ…çš„ä¸‹æ ‡ */
+	ICMP_PKT **pkts;		/**< ËùÓÐ°üµÄÊý×é */
+	size_t npkt;			/**< ÉèÖÃµÄÏò¸ÃÄ¿µÄÖ÷»ú·¢ËÍ°üµÄ¸öÊý */
+	size_t ipkt;			/**< ¼ÇÂ¼ÏÂÒ»¸öÒª·¢ËÍµÄ°üµÄÏÂ±ê */
 
-	ACL_RING   host_ring;		/**< é“¾å…¥ ICMP_CHAT->host_head é“¾ä¸­ */
-	ICMP_CHAT *chat;		/**< æ‰€å±žçš„é€šä¿¡å¯¹è±¡ */
-	char  enable_log;		/**< æ˜¯å¦å°†å“åº”åŒ…çš„ä¿¡æ¯è®°æ—¥å¿— */
+	ACL_RING   host_ring;		/**< Á´Èë ICMP_CHAT->host_head Á´ÖÐ */
+	ICMP_CHAT *chat;		/**< ËùÊôµÄÍ¨ÐÅ¶ÔÏó */
+	char  enable_log;		/**< ÊÇ·ñ½«ÏìÓ¦°üµÄÐÅÏ¢¼ÇÈÕÖ¾ */
 
-	/**< æ±‡æŠ¥å‘é€åŒ…çš„å“åº”åŒ…çŠ¶æ€ */
+	/**< »ã±¨·¢ËÍ°üµÄÏìÓ¦°ü×´Ì¬ */
 	void (*stat_respond)(ICMP_PKT_STATUS*, void*);
 
-	/**< è¯¥å‘é€åŒ…çš„å“åº”åŒ…è¶…æ—¶ */
+	/**< ¸Ã·¢ËÍ°üµÄÏìÓ¦°ü³¬Ê± */
 	void (*stat_timeout)(ICMP_PKT_STATUS*, void*);
 
-	/**< è¯¥ä¸»æœºä¸å¯è¾¾ */
+	/**< ¸ÃÖ÷»ú²»¿É´ï */
 	void (*stat_unreach)(ICMP_PKT_STATUS*, void*);
 
-	/**< å½“ä¸»æœºçš„åŒ…å‘å®Œæ—¶çš„å›žè°ƒå‡½æ•° */
+	/**< µ±Ö÷»úµÄ°ü·¢ÍêÊ±µÄ»Øµ÷º¯Êý */
 	void (*stat_finish)(ICMP_HOST*, void*);
 
-	/**< åº”ç”¨ä¼ é€’çš„ç§æœ‰å‚æ•°åœ°å€ */
+	/**< Ó¦ÓÃ´«µÝµÄË½ÓÐ²ÎÊýµØÖ· */
 	void *arg;
 };
 

@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdio.h>
 #include <string.h>
 #include "mem_gc.h"

@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <iostream>
 #include "lib_acl.h"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -9,7 +9,7 @@
 using namespace acl;
 
 /**
-* å»¶è¿Ÿè¯»å›è°ƒå¤„ç†ç±»
+* ÑÓ³Ù¶Á»Øµ÷´¦ÀíÀà
 */
 class timer_reader: public aio_timer_reader
 {
@@ -23,25 +23,25 @@ public:
 	{
 	}
 
-	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
+	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
 	void destroy()
 	{
 		std::cout << "timer_reader delete now" << std::endl;
 		delete this;
 	}
 
-	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
+	// ÖØÔØ»ùÀà»Øµ÷·½·¨
 	virtual void timer_callback(unsigned int id)
 	{
 		std::cout << "timer_reader: timer_callback now" << std::endl;
 
-		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
+		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
 		aio_timer_reader::timer_callback(id);
 	}
 };
 
 /**
-* å»¶è¿Ÿå†™å›è°ƒå¤„ç†ç±»
+* ÑÓ³ÙĞ´»Øµ÷´¦ÀíÀà
 */
 class timer_writer: public aio_timer_writer
 {
@@ -55,19 +55,19 @@ public:
 	{
 	}
 
-	// aio_timer_reader çš„å­ç±»å¿…é¡»é‡è½½ destroy æ–¹æ³•
+	// aio_timer_reader µÄ×ÓÀà±ØĞëÖØÔØ destroy ·½·¨
 	void destroy()
 	{
 		std::cout << "timer_writer delete now" << std::endl;
 		delete this;
 	}
 
-	// é‡è½½åŸºç±»å›è°ƒæ–¹æ³•
+	// ÖØÔØ»ùÀà»Øµ÷·½·¨
 	virtual void timer_callback(unsigned int id)
 	{
 		std::cout << "timer_writer: timer_callback now" << std::endl;
 
-		// è°ƒç”¨åŸºç±»çš„å¤„ç†è¿‡ç¨‹
+		// µ÷ÓÃ»ùÀàµÄ´¦Àí¹ı³Ì
 		aio_timer_writer::timer_callback(0);
 	}
 };
@@ -90,7 +90,7 @@ bool CAcceptedClientCallback::read_callback(char* data, int len)
 	if (i_ < 10)
 		std::cout << ">>gets(i:" << i_ << "): " << data;
 
-	// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›é€€å‡ºï¼Œåˆ™å…³é—­ä¹‹
+	// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£ÍûÍË³ö£¬Ôò¹Ø±ÕÖ®
 	if (strncasecmp(data, "quit", 4) == 0)
 	{
 		client_->format("Bye!\r\n");
@@ -98,13 +98,13 @@ bool CAcceptedClientCallback::read_callback(char* data, int len)
 		return (true);
 	}
 
-	// å¦‚æœè¿œç¨‹å®¢æˆ·ç«¯å¸Œæœ›æœåŠ¡ç«¯ä¹Ÿå…³é—­ï¼Œåˆ™ä¸­æ­¢å¼‚æ­¥äº‹ä»¶è¿‡ç¨‹
+	// Èç¹ûÔ¶³Ì¿Í»§¶ËÏ£Íû·şÎñ¶ËÒ²¹Ø±Õ£¬ÔòÖĞÖ¹Òì²½ÊÂ¼ş¹ı³Ì
 	else if (strncasecmp(data, "stop", 4) == 0)
 	{
 		client_->format("Stop now!\r\n");
-		client_->close();  // å…³é—­è¿œç¨‹å¼‚æ­¥æµ
+		client_->close();  // ¹Ø±ÕÔ¶³ÌÒì²½Á÷
 
-		// é€šçŸ¥å¼‚æ­¥å¼•æ“å…³é—­å¾ªç¯è¿‡ç¨‹
+		// Í¨ÖªÒì²½ÒıÇæ¹Ø±ÕÑ­»·¹ı³Ì
 		client_->get_handle().stop();
 		return (true);
 	}
@@ -113,7 +113,7 @@ bool CAcceptedClientCallback::read_callback(char* data, int len)
 
 	if (strncasecmp(data, "write_delay", strlen("write_delay")) == 0)
 	{
-		// å»¶è¿Ÿå†™è¿‡ç¨‹
+		// ÑÓ³ÙĞ´¹ı³Ì
 
 		const char* ptr = data + strlen("write_delay");
 		delay = atoi(ptr);
@@ -129,7 +129,7 @@ bool CAcceptedClientCallback::read_callback(char* data, int len)
 	}
 	else if (strncasecmp(data, "read_delay", strlen("read_delay")) == 0)
 	{
-		// å»¶è¿Ÿè¯»è¿‡ç¨‹
+		// ÑÓ³Ù¶Á¹ı³Ì
 
 		const char* ptr = data + strlen("read_delay");
 		delay = atoi(ptr);
@@ -144,10 +144,10 @@ bool CAcceptedClientCallback::read_callback(char* data, int len)
 		}
 	}
 
-	// å‘è¿œç¨‹å®¢æˆ·ç«¯å›å†™æ”¶åˆ°çš„æ•°æ®
+	// ÏòÔ¶³Ì¿Í»§¶Ë»ØĞ´ÊÕµ½µÄÊı¾İ
 	client_->write(data, len);
 
-	// ç»§ç»­è¯»ä¸‹ä¸€è¡Œæ•°æ®
+	// ¼ÌĞø¶ÁÏÂÒ»ĞĞÊı¾İ
 	client_->gets(10, false);
 	return (true);
 }
@@ -159,7 +159,7 @@ bool CAcceptedClientCallback::write_callback()
 
 void CAcceptedClientCallback::close_callback()
 {
-	// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
+	// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
 	delete this;
 }
 
@@ -183,22 +183,22 @@ CServerCallback::~CServerCallback()
 
 bool CServerCallback::accept_callback(aio_socket_stream* client)
 {
-	// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
+	// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
 	CAcceptedClientCallback* callback = new CAcceptedClientCallback(client);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
 	client->add_read_callback(callback);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
 	client->add_write_callback(callback);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
 	client->add_close_callback(callback);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
 	client->add_timeout_callback(callback);
 
-	// ä»å¼‚æ­¥æµè¯»ä¸€è¡Œæ•°æ®
+	// ´ÓÒì²½Á÷¶ÁÒ»ĞĞÊı¾İ
 	client->gets(10, false);
 	return (true);
 }

@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_NET_INCLUDE_H
+#ifndef	ACL_NET_INCLUDE_H
 #define	ACL_NET_INCLUDE_H
 
 #ifdef	__cplusplus

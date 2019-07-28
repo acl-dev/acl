@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/diff_object.hpp"
 #include "acl_cpp/stdlib/diff_manager.hpp"
@@ -46,7 +46,7 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 {
 	size_t size = curr_objs.size() + old_objs.size();
 
-	// ä¸€æ¬¡æ€§é¢„åˆ†é…æ•°ç»„ç©ºé—´ï¼Œä»¥å…åœ¨æ·»åŠ è¿‡ç¨‹ä¸­å†…å­˜é‡æ–°åˆ†é…
+	// Ò»´ÎĞÔÔ¤·ÖÅäÊı×é¿Õ¼ä£¬ÒÔÃâÔÚÌí¼Ó¹ı³ÌÖĞÄÚ´æÖØĞÂ·ÖÅä
 	objs_equ_.reserve(size + 1);
 	objs_new_.reserve(size + 1);
 	objs_del_.reserve(size + 1);
@@ -57,7 +57,7 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 	const char* key;
 
-	// åˆ›å»ºå“ˆå¸Œè¡¨ï¼Œå°†æ—§æ•°ç»„ä¸­çš„å…ƒç´ æ·»åŠ è¿›å“ˆå¸Œè¡¨ä¸­
+	// ´´½¨¹şÏ£±í£¬½«¾ÉÊı×éÖĞµÄÔªËØÌí¼Ó½ø¹şÏ£±íÖĞ
 
 	ACL_HTABLE *htable = acl_htable_create((int) size * 2 + 1,
 			ACL_HTABLE_FLAG_KEY_REUSE);
@@ -72,19 +72,19 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 	ACL_HTABLE_INFO* entry;
 	diff_object* obj;
 
-	// éå†å½“å‰é›†åˆä¸­çš„å¯¹è±¡ï¼Œå°†ä¹‹ä¸æ—§å¯¹è±¡é›†åˆè¿›è¡Œæ¯”è¾ƒï¼Œæ‰¾å‡ºæ–°å¢çš„ï¼Œæ—§çš„
-	// ä»¥åŠå˜åŒ–çš„å¯¹è±¡é›†åˆ
+	// ±éÀúµ±Ç°¼¯ºÏÖĞµÄ¶ÔÏó£¬½«Ö®Óë¾É¶ÔÏó¼¯ºÏ½øĞĞ±È½Ï£¬ÕÒ³öĞÂÔöµÄ£¬¾ÉµÄ
+	// ÒÔ¼°±ä»¯µÄ¶ÔÏó¼¯ºÏ
 	for (std::vector<diff_object*>::const_iterator cit = curr_objs.begin();
 		cit != curr_objs.end(); ++cit) {
 
 		key = (*cit)->get_key();
 
-		// åœ¨æ—§é›†åˆä¸­æŸ¥è¯¢å½“å‰å¯¹è±¡æ˜¯å¦å­˜åœ¨
+		// ÔÚ¾É¼¯ºÏÖĞ²éÑ¯µ±Ç°¶ÔÏóÊÇ·ñ´æÔÚ
 		// obj = (diff_object*) acl_htable_find(htable, key);
 		entry = acl_htable_locate(htable, key);
 
-		// å¦‚æœä¸å­˜åœ¨ï¼Œåˆ™è¯´æ˜è¯¥å¯¹è±¡ä¸ºæ–°å¯¹è±¡ï¼Œåˆ™å°†è¯¥å¯¹è±¡åšä¸ºæ–°æ·»åŠ å¯¹è±¡
-		// æ·»åŠ è¿›æ–°å¯¹è±¡é›†åˆä¸­
+		// Èç¹û²»´æÔÚ£¬ÔòËµÃ÷¸Ã¶ÔÏóÎªĞÂ¶ÔÏó£¬Ôò½«¸Ã¶ÔÏó×öÎªĞÂÌí¼Ó¶ÔÏó
+		// Ìí¼Ó½øĞÂ¶ÔÏó¼¯ºÏÖĞ
 		if (entry == NULL) {
 			if ((*cit)->check_range(range_from_, range_to_)) {
 				objs_new_extra_.push_back(*cit);
@@ -96,16 +96,16 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 		obj = (diff_object*) entry->value;
 
-		// å¦‚æœå½“å‰å¯¹è±¡ä¸æ—§å¯¹è±¡ç›¸åŒï¼Œåˆ™å°†è¯¥å¯¹è±¡æ”¾è‡³ç›¸åŒå¯¹è±¡é›†åˆä¸­ï¼Œ
-		// åŒæ—¶å°†ä¹‹ä»å½“å‰å¯¹è±¡é›†åˆåŠæ—§å¯¹è±¡é›†åˆï¼ˆå“ˆå¸Œé›†åˆï¼‰ä¸­åˆ é™¤
+		// Èç¹ûµ±Ç°¶ÔÏóÓë¾É¶ÔÏóÏàÍ¬£¬Ôò½«¸Ã¶ÔÏó·ÅÖÁÏàÍ¬¶ÔÏó¼¯ºÏÖĞ£¬
+		// Í¬Ê±½«Ö®´Óµ±Ç°¶ÔÏó¼¯ºÏ¼°¾É¶ÔÏó¼¯ºÏ£¨¹şÏ£¼¯ºÏ£©ÖĞÉ¾³ı
 		if (*obj == **cit) {
 			acl_htable_delete_entry(htable, entry, NULL);
 			objs_equ_.push_back(*cit);
 			continue;
 		}
 
-		// è¯´æ˜æ˜¯ KEY ç›¸ç­‰ï¼Œä½†å¯¹è±¡ä¸­çš„å†…å®¹å¹¶ä¸ç›¸ç­‰ï¼Œåˆ™éœ€è¦ä»å½“å‰é›†åˆ
-		// åŠå“ˆå¸Œé›†åˆä¸­åˆ é™¤ï¼Œå¹¶åŠ å…¥è‡³å˜åŒ–çš„é›†åˆä¸­
+		// ËµÃ÷ÊÇ KEY ÏàµÈ£¬µ«¶ÔÏóÖĞµÄÄÚÈİ²¢²»ÏàµÈ£¬ÔòĞèÒª´Óµ±Ç°¼¯ºÏ
+		// ¼°¹şÏ£¼¯ºÏÖĞÉ¾³ı£¬²¢¼ÓÈëÖÁ±ä»¯µÄ¼¯ºÏÖĞ
 		if ((*cit)->check_range(range_from_, range_to_)) {
 			objs_upd_extra_.push_back(std::make_pair(*cit, obj));
 		} else {
@@ -116,7 +116,7 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 
 	// printf("objs_new_extra_: %d, %d\r\n",
 	// 	(int) objs_new_extra_.size(), (int) objs_new_.size());
-	// éå†å­˜æœ‰æ—§å¯¹è±¡çš„é›†åˆï¼ˆå“ˆå¸Œè¡¨å¯¹è±¡ï¼‰ï¼Œå…¶ä¸­å‰©ä½™çš„å…ƒç´ ä¸ºå·²åˆ é™¤çš„å¯¹è±¡
+	// ±éÀú´æÓĞ¾É¶ÔÏóµÄ¼¯ºÏ£¨¹şÏ£±í¶ÔÏó£©£¬ÆäÖĞÊ£ÓàµÄÔªËØÎªÒÑÉ¾³ıµÄ¶ÔÏó
 	ACL_ITER iter;
 	acl_foreach(iter, htable) {
 		obj = (diff_object*) iter.data;
@@ -127,7 +127,7 @@ void diff_manager::diff_changes(const std::vector<diff_object*>& curr_objs,
 		}
 	}
 
-	// é”€æ¯ä¸´æ—¶å“ˆå¸Œè¡¨å¯¹è±¡
+	// Ïú»ÙÁÙÊ±¹şÏ£±í¶ÔÏó
 	acl_htable_free(htable, NULL);
 }
 

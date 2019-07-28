@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -21,7 +21,7 @@
 
 typedef struct MSGIO_CTX MSGIO_CTX;
 
-/* IO æ¶ˆæ¯å¥æŸ„ */
+/* IO ÏûÏ¢¾ä±ú */
 struct ACL_MSGIO {
 	ACL_AIO *aio;
 	ACL_RING msg_list;
@@ -40,22 +40,22 @@ struct ACL_MSGIO {
 	int   keep_alive;
 };
 
-/* æ¶ˆæ¯ä¿¡æ¯è½½ä½“ç»“æ„å®šä¹‰ */
+/* ÏûÏ¢ĞÅÏ¢ÔØÌå½á¹¹¶¨Òå */
 typedef struct MSG_ITEM {
-	int   id;		/* æ¶ˆæ¯ ID */
-	int   inherit;		/* æ˜¯å¦å…è®¸æ¶ˆæ¯ç»§æ‰¿ï¼Œä¸»è¦ç”¨äºåœ¨åˆ›å»ºå®¢æˆ·ç«¯
-				 * æ¶ˆæ¯å¯¹è±¡åå…‹éš†ç›‘å¬å¯¹è±¡çš„æ¶ˆæ¯é›†åˆæ—¶
+	int   id;		/* ÏûÏ¢ ID */
+	int   inherit;		/* ÊÇ·ñÔÊĞíÏûÏ¢¼Ì³Ğ£¬Ö÷ÒªÓÃÓÚÔÚ´´½¨¿Í»§¶Ë
+				 * ÏûÏ¢¶ÔÏóºó¿ËÂ¡¼àÌı¶ÔÏóµÄÏûÏ¢¼¯ºÏÊ±
 				 */
-	ACL_RING entry;		/* è¿æ¥è¿› ACL_MSGIO.msg_list */
-	ACL_RING call_list;	/* MSG_CALL å¯¹è±¡é›†åˆ */
+	ACL_RING entry;		/* Á¬½Ó½ø ACL_MSGIO.msg_list */
+	ACL_RING call_list;	/* MSG_CALL ¶ÔÏó¼¯ºÏ */
 } MSG_ITEM;
 
-/* æ¶ˆæ¯å›è°ƒå¤„ç†è¿‡ç¨‹è½½ä½“ç»“æ„å®šä¹‰ */
+/* ÏûÏ¢»Øµ÷´¦Àí¹ı³ÌÔØÌå½á¹¹¶¨Òå */
 typedef struct MSG_CALL {
-	MSG_ITEM  *msg;		/* æŒ‡å‘æ¶ˆæ¯ */
-	ACL_RING entry;		/* è¿æ¥è¿› MSG_ITEM.call_list */
-	ACL_MSGIO_NOTIFY_FN notify_fn; /* æ¶ˆæ¯å›è°ƒå‡½æ•° */
-	void *arg;		/* æ¶ˆæ¯å›è°ƒå‡½æ•°çš„å‚æ•° */
+	MSG_ITEM  *msg;		/* Ö¸ÏòÏûÏ¢ */
+	ACL_RING entry;		/* Á¬½Ó½ø MSG_ITEM.call_list */
+	ACL_MSGIO_NOTIFY_FN notify_fn; /* ÏûÏ¢»Øµ÷º¯Êı */
+	void *arg;		/* ÏûÏ¢»Øµ÷º¯ÊıµÄ²ÎÊı */
 } MSG_CALL;
 
 struct MSGIO_CTX {
@@ -89,7 +89,7 @@ static void msg_ctx_free(MSGIO_CTX *ctx)
 
 /*----------------------------------------------------------------------------*/
 
-/* åˆ›å»ºæ–°çš„æ¶ˆæ¯å›è°ƒå¤„ç†å¯¹è±¡ */
+/* ´´½¨ĞÂµÄÏûÏ¢»Øµ÷´¦Àí¶ÔÏó */
 
 static MSG_CALL *msg_call_new(MSG_ITEM *msg, ACL_MSGIO_NOTIFY_FN notify_fn, void *arg)
 {
@@ -101,7 +101,7 @@ static MSG_CALL *msg_call_new(MSG_ITEM *msg, ACL_MSGIO_NOTIFY_FN notify_fn, void
 	return (call);
 }
 
-/* é‡Šæ”¾æ¶ˆæ¯å›è°ƒå¤„ç†å¯¹è±¡ */
+/* ÊÍ·ÅÏûÏ¢»Øµ÷´¦Àí¶ÔÏó */
 
 static void msg_call_free(MSG_CALL *call)
 {
@@ -110,7 +110,7 @@ static void msg_call_free(MSG_CALL *call)
 
 /*----------------------------------------------------------------------------*/
 
-/* åˆ›å»ºæ–°çš„æ¶ˆæ¯å¯¹è±¡ */
+/* ´´½¨ĞÂµÄÏûÏ¢¶ÔÏó */
 
 static MSG_ITEM *msg_new(int id, int inherit)
 {
@@ -123,14 +123,14 @@ static MSG_ITEM *msg_new(int id, int inherit)
 	return (msg);
 }
 
-/* å‘æ¶ˆæ¯çš„å¤„ç†å¯¹è±¡é›†åˆä¸­æ·»åŠ æ–°çš„å¤„ç†å¯¹è±¡ */
+/* ÏòÏûÏ¢µÄ´¦Àí¶ÔÏó¼¯ºÏÖĞÌí¼ÓĞÂµÄ´¦Àí¶ÔÏó */
   
 static void msg_add(MSG_ITEM *msg, MSG_CALL *call)
 {
 	acl_ring_append(&msg->call_list, &call->entry);
 }
 
-/* é‡Šæ”¾æ¶ˆæ¯å¯¹è±¡ */
+/* ÊÍ·ÅÏûÏ¢¶ÔÏó */
 
 static void msg_free(MSG_ITEM *msg)
 {
@@ -144,7 +144,7 @@ static void msg_free(MSG_ITEM *msg)
 	acl_myfree(msg);
 }
 
-/* å‘æ¶ˆæ¯å¤„ç†å¯¹è±¡é›†åˆä¸­æ·»åŠ æ–°çš„å¤„ç†å¯¹è±¡ */
+/* ÏòÏûÏ¢´¦Àí¶ÔÏó¼¯ºÏÖĞÌí¼ÓĞÂµÄ´¦Àí¶ÔÏó */
 
 static void msg_append(MSG_ITEM *msg, ACL_MSGIO_NOTIFY_FN notify_fn, void *arg)
 {
@@ -162,7 +162,7 @@ static void msg_append(MSG_ITEM *msg, ACL_MSGIO_NOTIFY_FN notify_fn, void *arg)
 	acl_ring_append(&msg->call_list, &call->entry);
 }
 
-/* æ‹·è´å…‹éš†æŸæ¶ˆæ¯çš„å¤„ç†å¯¹è±¡é›†åˆ */
+/* ¿½±´¿ËÂ¡Ä³ÏûÏ¢µÄ´¦Àí¶ÔÏó¼¯ºÏ */
 
 static void msg_clone(MSG_ITEM *msg_from, MSG_ITEM *msg_to)
 {
@@ -177,7 +177,7 @@ static void msg_clone(MSG_ITEM *msg_from, MSG_ITEM *msg_to)
 	}
 }
 
-/* æ‹·è´å…‹éš†æ¶ˆæ¯é›†åˆåŠæ¶ˆæ¯å¤„ç†å¯¹è±¡é›†åˆ */
+/* ¿½±´¿ËÂ¡ÏûÏ¢¼¯ºÏ¼°ÏûÏ¢´¦Àí¶ÔÏó¼¯ºÏ */
 
 static void msg_list_clone(ACL_MSGIO *mio_from, ACL_MSGIO *mio_to)
 {
@@ -194,7 +194,7 @@ static void msg_list_clone(ACL_MSGIO *mio_from, ACL_MSGIO *mio_to)
 	}
 }
 
-/* æ ¹æ®æ¶ˆæ¯IDæŸ¥è¯¢æ¶ˆæ¯å¯¹è±¡ */
+/* ¸ù¾İÏûÏ¢ID²éÑ¯ÏûÏ¢¶ÔÏó */
 
 static MSG_ITEM *msg_find(ACL_MSGIO *mio, int id)
 {
@@ -210,7 +210,7 @@ static MSG_ITEM *msg_find(ACL_MSGIO *mio, int id)
 	return (NULL);
 }
 
-/* å–æ¶ˆæŸæ¶ˆæ¯çš„æŸä¸ªå¤„ç†è¿‡ç¨‹ */
+/* È¡ÏûÄ³ÏûÏ¢µÄÄ³¸ö´¦Àí¹ı³Ì */
 
 static void msg_unreg(MSG_ITEM *msg, ACL_MSGIO_NOTIFY_FN notify_fn)
 {
@@ -227,7 +227,7 @@ static void msg_unreg(MSG_ITEM *msg, ACL_MSGIO_NOTIFY_FN notify_fn)
 	}
 }
 
-/* å–æ¶ˆæŸæ¶ˆæ¯çš„æ‰€æœ‰å¤„ç†è¿‡ç¨‹å¹¶é‡Šæ”¾æ¶ˆæ¯å¯¹è±¡ */
+/* È¡ÏûÄ³ÏûÏ¢µÄËùÓĞ´¦Àí¹ı³Ì²¢ÊÍ·ÅÏûÏ¢¶ÔÏó */
 
 static void msg_unreg_all(MSG_ITEM *msg)
 {
@@ -287,8 +287,8 @@ static void msgio_reg(ACL_MSGIO *mio, int id,
 
 	msg = msg_find(mio, id);
 
-	/* å…ˆæŸ¥è¯¢æŸä¸ªæ¶ˆæ¯æ˜¯å¦å­˜åœ¨ï¼Œå¦‚æœå­˜åœ¨åˆ™å‘è¯¥æ¶ˆæ¯å¯¹è±¡æ·»åŠ å¤„ç†è¿‡ç¨‹,
-	 * å¦åˆ™ï¼Œåˆ›å»ºå¹¶æ·»åŠ æ–°çš„æ¶ˆæ¯å¯¹è±¡åŠå¤„ç†è¿‡ç¨‹
+	/* ÏÈ²éÑ¯Ä³¸öÏûÏ¢ÊÇ·ñ´æÔÚ£¬Èç¹û´æÔÚÔòÏò¸ÃÏûÏ¢¶ÔÏóÌí¼Ó´¦Àí¹ı³Ì,
+	 * ·ñÔò£¬´´½¨²¢Ìí¼ÓĞÂµÄÏûÏ¢¶ÔÏó¼°´¦Àí¹ı³Ì
 	 */
 
 	if (msg) {
@@ -371,7 +371,7 @@ void acl_msgio_unreg_all(ACL_MSGIO *mio)
 	}
 }
 
-/* è°ƒç”¨æŸä¸ª ACL_MSGIO å¥æŸ„ä¸­æŸä¸ªæ¶ˆæ¯çš„æ‰€æœ‰å¤„ç†è¿‡ç¨‹ */
+/* µ÷ÓÃÄ³¸ö ACL_MSGIO ¾ä±úÖĞÄ³¸öÏûÏ¢µÄËùÓĞ´¦Àí¹ı³Ì */
 
 static int dispatch_foreach(ACL_MSGIO *mio, const ACL_MSGIO_INFO *info, int id)
 {
@@ -381,7 +381,7 @@ static int dispatch_foreach(ACL_MSGIO *mio, const ACL_MSGIO_INFO *info, int id)
 	MSG_ITEM *msg;
 	int   ret = 0;
 
-	/* æ‰¾å‡ºæ³¨å†Œè¯¥æ¶ˆæ¯ (id) çš„å¯¹è±¡é›†åˆ */
+	/* ÕÒ³ö×¢²á¸ÃÏûÏ¢ (id) µÄ¶ÔÏó¼¯ºÏ */
 	msg = msg_find(mio, id);
 	if (msg == NULL) {
 		if (id == ACL_MSGIO_QUIT) {
@@ -407,7 +407,7 @@ static int dispatch_foreach(ACL_MSGIO *mio, const ACL_MSGIO_INFO *info, int id)
 	return (ret);
 }
 
-/* å‘é€æ¶ˆæ¯, è°ƒç”¨æ¶ˆæ¯å›è°ƒå‡½æ•° */
+/* ·¢ËÍÏûÏ¢, µ÷ÓÃÏûÏ¢»Øµ÷º¯Êı */
 
 static int message_dispatch(MSGIO_CTX *ctx)
 {
@@ -433,7 +433,7 @@ static int message_dispatch(MSGIO_CTX *ctx)
 	return (ret);
 }
 
-/* å¼‚æ­¥è¯»æ¶ˆæ¯ä½“å›è°ƒå‡½æ•° */
+/* Òì²½¶ÁÏûÏ¢Ìå»Øµ÷º¯Êı */
 
 static int read_body_callback(ACL_ASTREAM *astream acl_unused, void *arg,
 	char *data, int dlen)
@@ -446,18 +446,18 @@ static int read_body_callback(ACL_ASTREAM *astream acl_unused, void *arg,
 			myname, dlen, ctx->info.hdr.dlen);
 	}
 
-	/* æ‹·è´æ¶ˆæ¯ä½“æ•°æ® */
+	/* ¿½±´ÏûÏ¢ÌåÊı¾İ */
 	acl_vstring_memcpy(ctx->info.body.buf, data, dlen);
 
-	/* å‘é€æ¶ˆæ¯è‡³å„ä¸ªæ³¨å†Œå‡½æ•° */
+	/* ·¢ËÍÏûÏ¢ÖÁ¸÷¸ö×¢²áº¯Êı */
 	if (message_dispatch(ctx) < 0)
 		return (-1);
 
-	/* å¼‚æ­¥ç­‰å¾…ä¸‹ä¸€ä¸ªæ¶ˆæ¯ */
+	/* Òì²½µÈ´ıÏÂÒ»¸öÏûÏ¢ */
 	return (acl_msgio_wait(ctx->mio));
 }
 
-/* å¼‚æ­¥è¯»æ¶ˆæ¯å¤´å›è°ƒå‡½æ•° */
+/* Òì²½¶ÁÏûÏ¢Í·»Øµ÷º¯Êı */
 
 static int read_hdr_callback(ACL_ASTREAM *astream, void *arg,
 	char *data, int dlen)
@@ -466,7 +466,7 @@ static int read_hdr_callback(ACL_ASTREAM *astream, void *arg,
 	MSGIO_CTX *ctx = (MSGIO_CTX *) arg;
 	const ACL_MSGIO_INFO *info = (const ACL_MSGIO_INFO *) data;
 
-	/* æ ¡éªŒæ¶ˆæ¯å¤´é•¿åº¦ */
+	/* Ğ£ÑéÏûÏ¢Í·³¤¶È */
 	if (dlen != sizeof(ctx->info.hdr)) {
 		acl_msg_fatal("%s: dlen=%d, size=%d",
 			myname, dlen, (int) sizeof(ctx->info.hdr));
@@ -475,39 +475,39 @@ static int read_hdr_callback(ACL_ASTREAM *astream, void *arg,
 	ctx->info.hdr.type = info->hdr.type;
 	ctx->info.hdr.dlen = info->hdr.dlen;
 
-	/* å¦‚æœè¯¥æ¶ˆæ¯æœ‰æ¶ˆæ¯ä½“åˆ™è¯»æ¶ˆæ¯ä½“ */
+	/* Èç¹û¸ÃÏûÏ¢ÓĞÏûÏ¢ÌåÔò¶ÁÏûÏ¢Ìå */
 	if (ctx->info.hdr.dlen > 0) {
 		acl_aio_add_read_hook(astream, read_body_callback, ctx);
-		/* å¼€å§‹è¯»æ¶ˆæ¯ä½“ */
+		/* ¿ªÊ¼¶ÁÏûÏ¢Ìå */
 		acl_aio_readn(astream, ctx->info.hdr.dlen);
 		return (0);
 	}
 
-	/* è¯¥æ¶ˆæ¯æ²¡æœ‰æ¶ˆæ¯ä½“ï¼Œåˆ™å¼€å§‹æ´¾å‘æ¶ˆæ¯ */
+	/* ¸ÃÏûÏ¢Ã»ÓĞÏûÏ¢Ìå£¬Ôò¿ªÊ¼ÅÉ·¢ÏûÏ¢ */
 	if (message_dispatch(ctx) < 0) {
 		acl_msg_error("%s: message_dispatch error", myname);
 		return (-1);
 	}
 
-	/* å¼‚æ­¥ç­‰å¾…ä¸‹ä¸€ä¸ªæ¶ˆæ¯ */
+	/* Òì²½µÈ´ıÏÂÒ»¸öÏûÏ¢ */
 	return (acl_msgio_wait(ctx->mio));
 }
 
-/* å¼‚æ­¥æ–¹å¼ç­‰å¾…IOæ¶ˆæ¯ */
+/* Òì²½·½Ê½µÈ´ıIOÏûÏ¢ */
 
 static int async_wait_msg(ACL_MSGIO *mio)
 {
-	/* æ³¨å†Œå›è°ƒå‡½æ•° */
+	/* ×¢²á»Øµ÷º¯Êı */
 	acl_aio_ctl(mio->stream.async,
 		ACL_AIO_CTL_READ_HOOK_ADD, read_hdr_callback, mio->ctx,
 		ACL_AIO_CTL_END);
 
-	/* å¼‚æ­¥è¯»æ¶ˆæ¯å¤´ */
+	/* Òì²½¶ÁÏûÏ¢Í· */
 	acl_aio_readn(mio->stream.async, sizeof(mio->ctx->info.hdr));
 	return (0);
 }
 
-/* åŒæ­¥æ–¹å¼ç­‰å¾…IOæ¶ˆæ¯ */
+/* Í¬²½·½Ê½µÈ´ıIOÏûÏ¢ */
 
 static int sync_wait_msg(ACL_MSGIO *mio)
 {
@@ -516,7 +516,7 @@ static int sync_wait_msg(ACL_MSGIO *mio)
 	char  buf[1024];
 	int   dlen, n;
 
-	/* åŒæ­¥è¯»æ¶ˆæ¯å¤´ */
+	/* Í¬²½¶ÁÏûÏ¢Í· */
 	if (acl_vstream_readn(mio->stream.sync,
 		&ctx->info.hdr, sizeof(ctx->info.hdr)) == ACL_VSTREAM_EOF)
 	{
@@ -526,10 +526,10 @@ static int sync_wait_msg(ACL_MSGIO *mio)
 	}
 
 	if (ctx->info.hdr.dlen <= 0)
-		return (message_dispatch(ctx));  /* å‘é€æ¶ˆæ¯åˆ°å„ä¸ªæ³¨å†Œå‡½æ•° */
+		return (message_dispatch(ctx));  /* ·¢ËÍÏûÏ¢µ½¸÷¸ö×¢²áº¯Êı */
 
 	dlen = ctx->info.hdr.dlen;
-	/* åŒæ­¥è¯»æ¶ˆæ¯ä½“ */
+	/* Í¬²½¶ÁÏûÏ¢Ìå */
 	while (dlen > 0) {
 		n = acl_vstream_read(mio->stream.sync, buf, sizeof(buf));
 		if (n == ACL_VSTREAM_EOF) {
@@ -542,7 +542,7 @@ static int sync_wait_msg(ACL_MSGIO *mio)
 		dlen -= n;
 	}
 
-	/* å‘é€æ¶ˆæ¯åˆ°å„ä¸ªæ³¨å†Œå‡½æ•° */
+	/* ·¢ËÍÏûÏ¢µ½¸÷¸ö×¢²áº¯Êı */
 	return (message_dispatch(ctx));
 }
 
@@ -598,7 +598,7 @@ static int io_timeout_callback(ACL_ASTREAM *astream acl_unused, void *arg)
 	return (0);
 }
 
-/* æ¶ˆæ¯æœåŠ¡å™¨æ¥æ”¶å®¢æˆ·ç«¯è¿æ¥ */
+/* ÏûÏ¢·şÎñÆ÷½ÓÊÕ¿Í»§¶ËÁ¬½Ó */
 
 static ACL_MSGIO *accept_connection(ACL_VSTREAM *sstream, ACL_MSGIO *listener)
 {
@@ -626,7 +626,7 @@ static ACL_MSGIO *accept_connection(ACL_VSTREAM *sstream, ACL_MSGIO *listener)
 	acl_vstream_add_close_handle(stream, free_mio_onclose, mio_client);
 
 	if (mio_client->aio) {
-		/* è‹¥æ˜¯å¼‚æ­¥è¯»æ¶ˆæ¯ï¼Œåˆ™... */
+		/* ÈôÊÇÒì²½¶ÁÏûÏ¢£¬Ôò... */
 		mio_client->stream.async = acl_aio_open(mio_client->aio, stream);
 		acl_aio_ctl(mio_client->stream.async,
 			ACL_AIO_CTL_TIMEOUT, mio_client->rw_timeout,
@@ -640,7 +640,7 @@ static ACL_MSGIO *accept_connection(ACL_VSTREAM *sstream, ACL_MSGIO *listener)
 	return (mio_client);
 }
 
-/* ç›‘å¬æè¿°ç¬¦å¯è¯»çš„å›è°ƒå‡½æ•° */
+/* ¼àÌıÃèÊö·û¿É¶ÁµÄ»Øµ÷º¯Êı */
 
 static int listen_callback(ACL_ASTREAM *sstream acl_unused, void *arg)
 {
@@ -713,7 +713,7 @@ ACL_MSGIO *acl_msgio_accept(ACL_MSGIO *listener)
 	return (mio_client);
 }
 
-/* è¿æ¥è¶…æ—¶å›è°ƒå‡½æ•° */
+/* Á¬½Ó³¬Ê±»Øµ÷º¯Êı */
 
 static int connect_timeout_callback(ACL_ASTREAM *astream acl_unused, void *arg)
 {
@@ -725,7 +725,7 @@ static int connect_timeout_callback(ACL_ASTREAM *astream acl_unused, void *arg)
 	return (-1);
 }
 
-/* è¿æ¥æˆåŠŸå›è°ƒå‡½æ•° */
+/* Á¬½Ó³É¹¦»Øµ÷º¯Êı */
 
 static int connect_callback(ACL_ASTREAM *astream, void *arg)
 {
@@ -741,11 +741,11 @@ static int connect_callback(ACL_ASTREAM *astream, void *arg)
 	if (message_dispatch(ctx) < 0)
 		return (-1);
 
-	/* å¼‚æ­¥ç­‰å¾…æ¶ˆæ¯ */
+	/* Òì²½µÈ´ıÏûÏ¢ */
 	return (acl_msgio_wait(ctx->mio));
 }
 
-/* å¼€å§‹å¼‚æ­¥è¿æ¥æ¶ˆæ¯æœåŠ¡å™¨ */
+/* ¿ªÊ¼Òì²½Á¬½ÓÏûÏ¢·şÎñÆ÷ */
 
 static ACL_ASTREAM *async_connect(ACL_AIO *aio, const char *addr,
 	int rw_timeout, MSGIO_CTX *ctx)
@@ -773,7 +773,7 @@ void acl_msgio_set_noblock(ACL_AIO *aio, ACL_MSGIO *mio)
 		ACL_AIO_CTL_CTX, mio->ctx,
 		ACL_AIO_CTL_END);
 
-	/* å¼‚æ­¥ç­‰å¾…æ¶ˆæ¯ */
+	/* Òì²½µÈ´ıÏûÏ¢ */
 	(void) acl_msgio_wait(mio);
 }
 
@@ -815,7 +815,7 @@ ACL_MSGIO *acl_msgio_connect(ACL_AIO *aio, const char *addr, int rw_timeout)
 	return (mio);
 }
 
-/* åŒæ­¥å‘é€æ¶ˆæ¯ */
+/* Í¬²½·¢ËÍÏûÏ¢ */
 
 static int send_msg(ACL_MSGIO *mio, int type, void *data, int dlen)
 {
@@ -857,7 +857,7 @@ static int send_msg(ACL_MSGIO *mio, int type, void *data, int dlen)
 	}
 	return (0);
 #elif 1
-	/* åŒæ­¥å‘é€æ¶ˆæ¯å¤´ */
+	/* Í¬²½·¢ËÍÏûÏ¢Í· */
 	ret = acl_vstream_buffed_writen(stream, &info.hdr, sizeof(info.hdr));
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s: write msg hdr error(%s)",
@@ -866,7 +866,7 @@ static int send_msg(ACL_MSGIO *mio, int type, void *data, int dlen)
 	}
 
 	if (dlen > 0) {
-		/* åŒæ­¥å‘é€æ¶ˆæ¯ä½“ */
+		/* Í¬²½·¢ËÍÏûÏ¢Ìå */
 		ret = acl_vstream_buffed_writen(stream, data, dlen);
 		if (ret == ACL_VSTREAM_EOF) {
 			acl_msg_error("%s: write msg body error(%s)",
@@ -881,7 +881,7 @@ static int send_msg(ACL_MSGIO *mio, int type, void *data, int dlen)
 		return (-1);
 	}
 #else
-	/* åŒæ­¥å‘é€æ¶ˆæ¯å¤´ */
+	/* Í¬²½·¢ËÍÏûÏ¢Í· */
 	ret = acl_vstream_writen(stream, &info.hdr, sizeof(info.hdr));
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s: write msg hdr error(%s)",
@@ -890,7 +890,7 @@ static int send_msg(ACL_MSGIO *mio, int type, void *data, int dlen)
 	}
 
 	if (dlen > 0) {
-		/* åŒæ­¥å‘é€æ¶ˆæ¯ä½“ */
+		/* Í¬²½·¢ËÍÏûÏ¢Ìå */
 		ret = acl_vstream_writen(stream, data, dlen);
 		if (ret == ACL_VSTREAM_EOF) {
 			acl_msg_error("%s: write msg body error(%s)",

@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mime/mime_quoted_printable.hpp"
 #endif
@@ -106,8 +106,8 @@ void mime_quoted_printable::encode(string* out)
 	for (cp = CU_CHAR_PTR(m_encodeBuf), n = 0; cp < end; cp++) {
 		if (*cp == ' ' || *cp == '\t') {
 			if (cp + 1 == end) {
-				/* æ— æ³•ç¡®å®šåŽé¢å­—èŠ‚æ˜¯å¦æ˜¯å›žè½¦æ¢è¡Œ,
-				* æ‰€ä»¥æš‚æ—¶ç¼“å­˜è¯¥æ•°æ®
+				/* ÎÞ·¨È·¶¨ºóÃæ×Ö½ÚÊÇ·ñÊÇ»Ø³µ»»ÐÐ,
+				* ËùÒÔÔÝÊ±»º´æ¸ÃÊý¾Ý
 				*/
 				m_encodeBuf[0] = *cp;
 				m_encodeCnt = 1;
@@ -237,7 +237,7 @@ void mime_quoted_printable::decode(string* out)
 			continue;
 		}
 
-		/* '=' åŽé¢éœ€è¦æœ‰ä¸¤ä¸ªå­—èŠ‚æ‰å¯æ“ä½œ */
+		/* '=' ºóÃæÐèÒªÓÐÁ½¸ö×Ö½Ú²Å¿É²Ù×÷ */
 		if (m_decodeCnt == 1) {
 			m_decodeBuf[0] = *cp;
 			m_decodeCnt = 1;
@@ -251,12 +251,12 @@ void mime_quoted_printable::decode(string* out)
 
 		if (*(cp + 1) == '\r') {
 			if (*(cp + 2) == '\n') {
-				/* åŽ»æŽ‰è½¯å›žè½¦æ¢è¡Œ */
+				/* È¥µôÈí»Ø³µ»»ÐÐ */
 				cp += 3;
 				m_decodeCnt -= 3;
 			} else {
 				if (m_addInvalid) {
-					/* xxx: å°†éžæ³•æ•°æ®åŽŸæ ·ç…§æ¬ */
+					/* xxx: ½«·Ç·¨Êý¾ÝÔ­ÑùÕÕ°á */
 					out->push_back((char) (*(cp + 1)));
 					out->push_back((char) (*(cp + 2)));
 				}
@@ -264,7 +264,7 @@ void mime_quoted_printable::decode(string* out)
 				m_decodeCnt -= 3;
 			}
 		} else if (*(cp + 1) == '\n') {
-			/* xxx: unix æ ¼å¼çš„è½¯æ¢è¡Œ ? */
+			/* xxx: unix ¸ñÊ½µÄÈí»»ÐÐ ? */
 			cp += 2;
 			m_decodeCnt -= 2;
 		} else {
@@ -276,7 +276,7 @@ void mime_quoted_printable::decode(string* out)
 				out->push_back((char) result);
 			} else {
 				if (m_addInvalid) {
-					/* å°†éžæ³•æ•°æ®åŽŸæ ·ç…§æ¬ */
+					/* ½«·Ç·¨Êý¾ÝÔ­ÑùÕÕ°á */
 					out->push_back((char) first);
 					out->push_back((char) second);
 				}

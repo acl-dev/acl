@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "FiberClient.h"
 
 CFiberClient::CFiberClient(acl::socket_stream* conn)

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "master_service.h"
 
 int main(int argc, char* argv[])
@@ -10,33 +10,33 @@ int main(int argc, char* argv[])
 			ACL_SLICE_FLAG_LP64_ALIGN);
 #endif
 
-	// åˆå§‹åŒ– acl åº“
+	// ³õÊ¼»¯ acl ¿â
 	acl::acl_cpp_init();
 
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// è®¾ç½®é…ç½®å‚æ•°è¡¨
+	// ÉèÖÃÅäÖÃ²ÎÊı±í
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_int64(var_conf_int64_tab);
 	ms.set_cfg_str(var_conf_str_tab);
 	ms.set_cfg_bool(var_conf_bool_tab);
 
-	// å¼€å§‹è¿è¡Œ
+	// ¿ªÊ¼ÔËĞĞ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
 		const char* addr = ":8888";
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, 0, 256);  // å•ç‹¬è¿è¡Œæ–¹å¼
+		ms.run_alone(addr, NULL, 0, 256);  // µ¥¶ÀÔËĞĞ·½Ê½
 	}
 	else
 	{
 #ifdef	WIN32
 		const char* addr = ":8888";
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, 0, 256);  // å•ç‹¬è¿è¡Œæ–¹å¼
+		ms.run_alone(addr, NULL, 0, 256);  // µ¥¶ÀÔËĞĞ·½Ê½
 #else
-		ms.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
+		ms.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
 #endif
 	}
 

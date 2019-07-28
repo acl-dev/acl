@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
@@ -41,7 +41,7 @@ void ipc_client::on_message(int nMsg, void* data, int dlen)
 	(void) data;
 	(void) dlen;
 
-	// å­ç±»å¿…é¡»å®ç°è¯¥æ¥å£
+	// ×ÓÀà±ØĞëÊµÏÖ¸Ã½Ó¿Ú
 	logger_fatal("ipc_client be called here");
 }
 
@@ -55,13 +55,13 @@ bool ipc_client::open(aio_handle* handle, const char* addr, int timeout)
 	}
 	addr_ = acl_mystrdup(addr);
 
-	// æ·»åŠ è¿æ¥æˆåŠŸçš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³É¹¦µÄ»Øµ÷º¯ÊıÀà
 	async_stream_->add_open_callback(this);
 
-	// æ·»åŠ è¿æ¥å¤±è´¥åå›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½ÓÊ§°Üºó»Øµ÷º¯ÊıÀà
 	async_stream_->add_close_callback(this);
 
-	// æ·»åŠ è¿æ¥è¶…æ—¶çš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³¬Ê±µÄ»Øµ÷º¯ÊıÀà
 	async_stream_->add_timeout_callback(this);
 	return true;
 }
@@ -73,16 +73,16 @@ void ipc_client::open(aio_socket_stream* client)
 
 	async_stream_ = client;
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
 	client->add_read_callback(this);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
 	client->add_write_callback(this);
 
-	// æ·»åŠ è¿æ¥å¤±è´¥åå›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½ÓÊ§°Üºó»Øµ÷º¯ÊıÀà
 	client->add_close_callback(this);
 
-	// æ·»åŠ è¿æ¥è¶…æ—¶çš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³¬Ê±µÄ»Øµ÷º¯ÊıÀà
 	client->add_timeout_callback(this);
 }
 
@@ -112,7 +112,7 @@ void ipc_client::wait(void)
 		return;
 	}
 
-	// åŒæ­¥æ¥æ”¶æ¶ˆæ¯
+	// Í¬²½½ÓÊÕÏûÏ¢
 	if (sync_stream_) {
 		MSG_HDR hdr;
 		int   n;
@@ -134,14 +134,14 @@ void ipc_client::wait(void)
 		trigger(hdr.nMsg, buf.c_str(), n);
 	}
 
-	// å¼‚æ­¥æ¥æ”¶æ¶ˆæ¯
+	// Òì²½½ÓÊÕÏûÏ¢
 	else if (async_stream_) {
-		// è¿›å…¥å¼‚æ­¥è¯»æ¶ˆæ¯è¿‡ç¨‹
+		// ½øÈëÒì²½¶ÁÏûÏ¢¹ı³Ì
 		status_ = IO_WAIT_HDR;
 		async_stream_->read(sizeof(MSG_HDR));
 	}
 
-	// æœªçŸ¥æƒ…å†µ
+	// Î´ÖªÇé¿ö
 	else {
 		acl_assert(0);
 	}
@@ -195,7 +195,7 @@ void ipc_client::append_message(int nMsg)
 {
 	std::list<int>::iterator it = messages_.begin();
 
-	// è¯¥æ¶ˆæ¯æ˜¯å¦å·²ç»å­˜åœ¨äºå·²ç»æ³¨å†Œçš„æ¶ˆæ¯é›†åˆä¸­
+	// ¸ÃÏûÏ¢ÊÇ·ñÒÑ¾­´æÔÚÓÚÒÑ¾­×¢²áµÄÏûÏ¢¼¯ºÏÖĞ
 	for (; it != messages_.end(); ++it) {
 		if (*it == nMsg) {
 			return;
@@ -209,7 +209,7 @@ void ipc_client::delete_message(int nMsg)
 {
 	std::list<int>::iterator it = messages_.begin();
 
-	// è¯¥æ¶ˆæ¯æ˜¯å¦å·²ç»å­˜åœ¨äºå·²ç»æ³¨å†Œçš„æ¶ˆæ¯é›†åˆä¸­
+	// ¸ÃÏûÏ¢ÊÇ·ñÒÑ¾­´æÔÚÓÚÒÑ¾­×¢²áµÄÏûÏ¢¼¯ºÏÖĞ
 	for (; it != messages_.end(); ++it) {
 		if (*it == nMsg) {
 			messages_.erase(it);
@@ -226,7 +226,7 @@ void ipc_client::send_message(int nMsg, const void* data, int dlen)
 	hdr.dlen = dlen > 0 ? dlen : 0;
 	hdr.magic = magic_;
 
-	// å‘é€æ¶ˆæ¯å¤´
+	// ·¢ËÍÏûÏ¢Í·
 	if (sync_stream_ != NULL) {
 		sync_stream_->write(&hdr, sizeof(hdr));
 	} else if (async_stream_ != NULL) {
@@ -235,7 +235,7 @@ void ipc_client::send_message(int nMsg, const void* data, int dlen)
 		acl_assert(0);
 	}
 
-	// å‘å…³æ¶ˆæ¯ä½“
+	// ·¢¹ØÏûÏ¢Ìå
 	if (data && dlen > 0) {
 		if (sync_stream_ == NULL) {
 			async_stream_->write(data, dlen);
@@ -249,7 +249,7 @@ void ipc_client::trigger(int nMsg, void* data, int dlen)
 {
 	std::list<int>::iterator it = messages_.begin();
 
-	// è¯¥æ¶ˆæ¯æ˜¯å¦å·²ç»å­˜åœ¨äºå·²ç»æ³¨å†Œçš„æ¶ˆæ¯é›†åˆä¸­
+	// ¸ÃÏûÏ¢ÊÇ·ñÒÑ¾­´æÔÚÓÚÒÑ¾­×¢²áµÄÏûÏ¢¼¯ºÏÖĞ
 	for (; it != messages_.end(); ++it) {
 		if (*it == nMsg) {
 			on_message(nMsg, data, dlen);
@@ -266,7 +266,7 @@ bool ipc_client::read_callback(char* data, int len)
 		acl_assert(len == sizeof(MSG_HDR));
 		MSG_HDR* hdr = (MSG_HDR*) data;
 
-		// å…ˆæ£€æŸ¥ IPC æ¶ˆæ¯æ•°æ®çš„æœ‰æ•ˆæ€§
+		// ÏÈ¼ì²é IPC ÏûÏ¢Êı¾İµÄÓĞĞ§ĞÔ
 		if (hdr->magic != magic_) {
 			logger_error("unknown ipc magic: %lld", hdr->magic);
 			return false;
@@ -275,23 +275,23 @@ bool ipc_client::read_callback(char* data, int len)
 		if (hdr->dlen > 0) {
 			hdr_.nMsg = hdr->nMsg;
 			hdr_.dlen = hdr->dlen;
-			// å¦‚æœæœ‰æ¶ˆæ¯ä½“åˆ™ç»§ç»­è¯»æ¶ˆæ¯ä½“
+			// Èç¹ûÓĞÏûÏ¢ÌåÔò¼ÌĞø¶ÁÏûÏ¢Ìå
 			status_ = IO_WAIT_DAT;
 			async_stream_->read(hdr->dlen);
 			return (true);
 		}
 
-		// æ¶ˆæ¯å¤„ç†è¿‡ç¨‹
+		// ÏûÏ¢´¦Àí¹ı³Ì
 		trigger(hdr->nMsg, NULL, 0);
 
-		// å¼‚æ­¥ç­‰å¾…ä¸‹ä¸€æ¡æ¶ˆæ¯
+		// Òì²½µÈ´ıÏÂÒ»ÌõÏûÏ¢
 		wait();
 		return (true);
 	} else if (status_ == IO_WAIT_DAT) {
 		acl_assert(len == hdr_.dlen);
 		trigger(hdr_.nMsg, data, len);
 
-		// å¼‚æ­¥ç­‰å¾…ä¸‹ä¸€æ¡æ¶ˆæ¯
+		// Òì²½µÈ´ıÏÂÒ»ÌõÏûÏ¢
 		wait();
 		return (true);
 	} else {
@@ -308,7 +308,7 @@ bool ipc_client::write_callback(void)
 
 void ipc_client::close_callback(void)
 {
-	// é€šçŸ¥å­ç±»å…³é—­IPCå¼‚æ­¥æµ
+	// Í¨Öª×ÓÀà¹Ø±ÕIPCÒì²½Á÷
 	on_close();
 }
 
@@ -319,14 +319,14 @@ bool ipc_client::timeout_callback(void)
 
 bool ipc_client::open_callback(void)
 {
-	// è¿æ¥æˆåŠŸï¼Œè®¾ç½®IOè¯»å†™å›è°ƒå‡½æ•°
+	// Á¬½Ó³É¹¦£¬ÉèÖÃIO¶ÁĞ´»Øµ÷º¯Êı
 	async_stream_->add_read_callback(this);
 	async_stream_->add_write_callback(this);
 
-	// é€šçŸ¥å­ç±»è¿æ¥æ¶ˆæ¯æœåŠ¡å™¨æˆåŠŸ
+	// Í¨Öª×ÓÀàÁ¬½ÓÏûÏ¢·şÎñÆ÷³É¹¦
 	on_open();
 
-	// è¿”å› true è¡¨ç¤ºç»§ç»­å¼‚æ­¥è¿‡ç¨‹
+	// ·µ»Ø true ±íÊ¾¼ÌĞøÒì²½¹ı³Ì
 	return true;
 }
 

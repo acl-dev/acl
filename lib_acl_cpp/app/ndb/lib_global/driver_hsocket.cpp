@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "driver_hsocket.h"
 
 driver_hsocket::driver_hsocket(void)

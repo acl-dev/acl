@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "AclTrans.h"
 
 CAclTrans::CAclTrans(void)
@@ -235,7 +235,7 @@ int CAclTrans::TransFile(const char *psPath)
 
 	iLen = strlen(sBuf);
 	if (m_bTrans)
-		Trans(sBuf);  // å¼€å§‹è½¬æ¢
+		Trans(sBuf);  // ¿ªÊ¼×ª»»
 	else if (strstr(psPath, ".html") != NULL)
 		Restore(sBuf);
 	else

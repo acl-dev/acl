@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 extern acl::master_str_tbl var_conf_str_tab[];
 extern acl::master_bool_tbl var_conf_bool_tab[];

@@ -1,4 +1,4 @@
-﻿// http_aio.cpp : 定义控制台应用程序的入口点。
+// http_aio.cpp : �������̨Ӧ�ó������ڵ㡣
 //
 
 #include "stdafx.h"

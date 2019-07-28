@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_forward.h"
 #include "commands_action.h"
 

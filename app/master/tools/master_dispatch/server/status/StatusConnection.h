@@ -1,8 +1,8 @@
-ï»¿#pragma once
+#pragma once
 #include "IConnection.h"
 
 /**
- * æœåŠ¡ç«¯è¿æ¥å¯¹è±¡
+ * ·şÎñ¶ËÁ¬½Ó¶ÔÏó
  */
 class StatusConnection : public IConnection
 {
@@ -11,9 +11,9 @@ public:
 	~StatusConnection() {}
 
 	/**
-	 * å…³é—­æœåŠ¡ç«¯è¿æ¥ï¼Œå½“è¿æ¥å…³é—­æ—¶ä¼šè§¦å‘ ServiceIOCallback ä¸­çš„
-	 * close_callback è¿‡ç¨‹ï¼ŒåŒæ—¶åœ¨ ServiceIOCallback å¯¹è±¡çš„ææ„è¿‡ç¨‹
-	 * ä¸­ä¼šåˆ é™¤æœåŠ¡ç«¯æœ¬æœåŠ¡ç«¯è¿æ¥å¯¹è±¡
+	 * ¹Ø±Õ·şÎñ¶ËÁ¬½Ó£¬µ±Á¬½Ó¹Ø±ÕÊ±»á´¥·¢ ServiceIOCallback ÖĞµÄ
+	 * close_callback ¹ı³Ì£¬Í¬Ê±ÔÚ ServiceIOCallback ¶ÔÏóµÄÎö¹¹¹ı³Ì
+	 * ÖĞ»áÉ¾³ı·şÎñ¶Ë±¾·şÎñ¶ËÁ¬½Ó¶ÔÏó
 	 */
 	void close();
 

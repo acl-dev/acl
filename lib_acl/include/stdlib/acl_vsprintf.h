@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_VSPRINTF_INCLUDE_H
+#ifndef	ACL_VSPRINTF_INCLUDE_H
 #define	ACL_VSPRINTF_INCLUDE_H
 
 #ifdef	__cplusplus

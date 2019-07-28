@@ -1,4 +1,4 @@
-﻿#include "stdafx.hpp"
+#include "stdafx.hpp"
 #include "fiber/fiber_event.hpp"
 
 #if !defined(_WIN32) && !defined(_WIN64)

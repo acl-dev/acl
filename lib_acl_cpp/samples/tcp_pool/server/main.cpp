@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "lib_acl.h"
 
 static ACL_ATOMIC* __atomic;

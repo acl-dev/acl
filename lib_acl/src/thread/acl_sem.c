@@ -1,4 +1,4 @@
-﻿/* Semaphore functions using the Win32 API */
+/* Semaphore functions using the Win32 API */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 

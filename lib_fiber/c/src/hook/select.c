@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #ifndef FD_SETSIZE
 #define FD_SETSIZE 10240
 #endif

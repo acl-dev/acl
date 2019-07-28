@@ -1,4 +1,4 @@
-﻿#ifndef _NAME_CODE_H_INCLUDED_
+#ifndef _NAME_CODE_H_INCLUDED_
 #define _NAME_CODE_H_INCLUDED_
 
 /*++

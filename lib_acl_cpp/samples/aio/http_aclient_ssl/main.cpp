@@ -1,4 +1,4 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include <assert.h>
 #include <getopt.h>
 #include <unistd.h>
@@ -362,7 +362,7 @@ protected:
 			return false;
 		}
 
-		// å¼€å§‹è¿›å…¥ websocket å¼‚æ­¥è¯»è¿‡ç¨‹
+		// ¿ªÊ¼½øÈë websocket Òì²½¶Á¹ı³Ì
 		this->ws_read_wait(0);
 		return true;
 	}
@@ -491,16 +491,16 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	// å¦‚æœè®¾ç½®äº† SSL è¿æ¥åº“ï¼Œåˆ™å¯ç”¨ SSL è¿æ¥æ¨¡å¼
+	// Èç¹ûÉèÖÃÁË SSL Á¬½Ó¿â£¬ÔòÆôÓÃ SSL Á¬½ÓÄ£Ê½
 	if (!ssl_lib_path.empty()) {
 		if (access(ssl_lib_path.c_str(), R_OK) == 0) {
-			// è®¾ç½® libpolarssl.so åº“å…¨è·¯å¾„
+			// ÉèÖÃ libpolarssl.so ¿âÈ«Â·¾¶
 			acl::polarssl_conf::set_libpath(ssl_lib_path);
 
-			// åŠ¨æ€åŠ è½½ libpolarssl.so åº“
+			// ¶¯Ì¬¼ÓÔØ libpolarssl.so ¿â
 			acl::polarssl_conf::load();
 
-			// åˆ›å»ºå…¨å±€ SSL é…ç½®é¡¹
+			// ´´½¨È«¾Ö SSL ÅäÖÃÏî
 			ssl_conf = new acl::polarssl_conf;
 		} else {
 			printf("disable ssl, %s not found\r\n",
@@ -508,7 +508,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// å®šä¹‰ AIO äº‹ä»¶å¼•æ“
+	// ¶¨Òå AIO ÊÂ¼şÒıÇæ
 	acl::aio_handle handle(acl::ENGINE_KERNEL);
 
 	int fds[2];
@@ -541,10 +541,10 @@ int main(int argc, char* argv[])
 
 	//////////////////////////////////////////////////////////////////////
 
-	// è®¾ç½® DNS åŸŸåæœåŠ¡å™¨åœ°å€
+	// ÉèÖÃ DNS ÓòÃû·şÎñÆ÷µØÖ·
 	handle.set_dns(name_server.c_str(), 5);
 
-	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹ WEB æœåŠ¡å™¨
+	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì WEB ·şÎñÆ÷
 	http_aio_client* conn = new http_aio_client(handle, ssl_conf, host);
 	if (!conn->open(addr, conn_timeout, rw_timeout)) {
 		printf("connect %s error\r\n", addr.c_str());
@@ -554,11 +554,11 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	(*conn).enable_debug(debug)		// æ˜¯å¦å¯ç”¨è°ƒè¯•æ–¹å¼
-		.enable_websocket(ws_enable);	// æ˜¯å¦å¯ç”¨ websocket
-	conn->unzip_body(enable_ungip);		// é’ˆå¯¹ HTTP æ˜¯å¦è‡ªåŠ¨è§£å‹
+	(*conn).enable_debug(debug)		// ÊÇ·ñÆôÓÃµ÷ÊÔ·½Ê½
+		.enable_websocket(ws_enable);	// ÊÇ·ñÆôÓÃ websocket
+	conn->unzip_body(enable_ungip);		// Õë¶Ô HTTP ÊÇ·ñ×Ô¶¯½âÑ¹
 
-	// è®¾ç½® HTTP è¯·æ±‚å¤´ï¼Œä¹Ÿå¯å°†æ­¤è¿‡ç¨‹æ”¾åœ¨ conn->on_connect() é‡Œ
+	// ÉèÖÃ HTTP ÇëÇóÍ·£¬Ò²¿É½«´Ë¹ı³Ì·ÅÔÚ conn->on_connect() Àï
 	acl::http_header& head = conn->request_header();
 	head.set_url("/")
 		.set_content_length(0)
@@ -572,9 +572,9 @@ int main(int argc, char* argv[])
 	printf("[%s]\r\n", buf.c_str());
 	fflush(stdout);
 
-	// å¼€å§‹ AIO äº‹ä»¶å¾ªç¯è¿‡ç¨‹
+	// ¿ªÊ¼ AIO ÊÂ¼şÑ­»·¹ı³Ì
 	while (true) {
-		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
+		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
 		if (!handle.check()) {
 			break;
 		}

@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <map>
@@ -18,7 +18,7 @@ class disque_node;
 class disque_job;
 
 /**
- * disque å‘½ä»¤æ“ä½œç±»
+ * disque ÃüÁî²Ù×÷Àà
  */
 class ACL_CPP_API disque : virtual public redis_command
 {
@@ -34,7 +34,7 @@ public:
 	disque(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_client_cluster*ï¼Œ size_t)
+	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
 	 */
 	disque(redis_client_cluster* cluster, size_t max_conns);
 
@@ -44,26 +44,26 @@ public:
 
 	/**
 	 * add a job to the specified queue
-	 * æ·»åŠ ä¸€ä¸ªä»»åŠ¡æ¶ˆæ¯è‡³æŒ‡å®šçš„é˜Ÿåˆ—ä¸­
+	 * Ìí¼ÓÒ»¸öÈÎÎñÏûÏ¢ÖÁÖ¸¶¨µÄ¶ÓÁĞÖĞ
 	 * @param name {const char*} the name of the specified queue
-	 *  é˜Ÿåˆ—åç§°
+	 *  ¶ÓÁĞÃû³Æ
 	 * @param job {const char*} a message to deliver
-	 *  ä»»åŠ¡æ¶ˆæ¯å­—ç¬¦ä¸²
+	 *  ÈÎÎñÏûÏ¢×Ö·û´®
 	 * @param timeout {int} the command timeout in milliseconds
-	 *  è¯¥å‘½ä»¤æ‰§è¡Œçš„è¶…æ—¶æ—¶é—´ï¼ˆæ¯«ç§’ï¼‰
+	 *  ¸ÃÃüÁîÖ´ĞĞµÄ³¬Ê±Ê±¼ä£¨ºÁÃë£©
 	 * @param args {const std::map<acl::string, int>*} the condition
 	 *  for ADDJOB command, the conditions name include:
 	 *  REPLICATE, DELAY, RETRY, TTL, MAXLEN, ASYNC, if the args was NULL,
 	 *  none condition will be used in this operation
-	 *  æ·»åŠ æ¶ˆæ¯çš„å¤„ç†æ¡ä»¶é›†åˆï¼Œå¯¹åº”çš„æ¡ä»¶å†…å®¹é¡¹ï¼š
-	 *   REPLICATE -- å‰¯æœ¬ä¸ªæ•°ï¼Œ
-	 *   DELAY -- æŒ‡å®šä»»åŠ¡åœ¨æ”¾å…¥å„ä¸ªèŠ‚ç‚¹çš„é˜Ÿåˆ—ä¹‹å‰ï¼Œ éœ€è¦ç­‰å¾…å¤šå°‘ç§’é’Ÿ
-	 *   TTL -- ä»»åŠ¡ç”Ÿå­˜å‘¨æœŸï¼ˆç§’ï¼‰
-	 *   MAXLEN -- æŒ‡å®šé˜Ÿåˆ—æœ€å¤šå¯ä»¥å­˜æ”¾å¤šå°‘ä¸ªå¾…ä¼ é€’çš„ä»»åŠ¡
-	 *   ASYNC -- æœåŠ¡ç«¯é‡‡ç”¨å¼‚æ­¥æ–¹å¼å°†ä»»åŠ¡åŒæ­¥è‡³å…¶å‰¯æœ¬ç»“ç‚¹
+	 *  Ìí¼ÓÏûÏ¢µÄ´¦ÀíÌõ¼ş¼¯ºÏ£¬¶ÔÓ¦µÄÌõ¼şÄÚÈİÏî£º
+	 *   REPLICATE -- ¸±±¾¸öÊı£¬
+	 *   DELAY -- Ö¸¶¨ÈÎÎñÔÚ·ÅÈë¸÷¸ö½ÚµãµÄ¶ÓÁĞÖ®Ç°£¬ ĞèÒªµÈ´ı¶àÉÙÃëÖÓ
+	 *   TTL -- ÈÎÎñÉú´æÖÜÆÚ£¨Ãë£©
+	 *   MAXLEN -- Ö¸¶¨¶ÓÁĞ×î¶à¿ÉÒÔ´æ·Å¶àÉÙ¸ö´ı´«µİµÄÈÎÎñ
+	 *   ASYNC -- ·şÎñ¶Ë²ÉÓÃÒì²½·½Ê½½«ÈÎÎñÍ¬²½ÖÁÆä¸±±¾½áµã
 	 * @return {const char*} a ID of the job will be returned, NULL will
 	 *  be returned if some error happened.
-	 *  è¿”å›ä»»åŠ¡ ID å·ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤ºå‡ºé”™
+	 *  ·µ»ØÈÎÎñ ID ºÅ£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾³ö´í
 	 */
 	const char* addjob(const char* name, const char* job,
 		int timeout, const std::map<string, int>* args = NULL);
@@ -74,18 +74,18 @@ public:
 
 	/**
 	 * add a job to the specified queue
-	 * å‘æŒ‡å®šæ¶ˆæ¯é˜Ÿåˆ—æ·»åŠ ä»»åŠ¡
+	 * ÏòÖ¸¶¨ÏûÏ¢¶ÓÁĞÌí¼ÓÈÎÎñ
 	 * @param name {const char*} the name of the specified queue
-	 *  æŒ‡å®šçš„æ¶ˆæ¯é˜Ÿåˆ—åç§°
+	 *  Ö¸¶¨µÄÏûÏ¢¶ÓÁĞÃû³Æ
 	 * @param job {const char*} a message to deliver
-	 *  å°†æ·»åŠ çš„ä»»åŠ¡
+	 *  ½«Ìí¼ÓµÄÈÎÎñ
 	 * @param timeout {int} the command timeout in milliseconds
-	 *  æ¯«ç§’ç²¾åº¦çš„å‘½ä»¤è¶…æ—¶é™åˆ¶
+	 *  ºÁÃë¾«¶ÈµÄÃüÁî³¬Ê±ÏŞÖÆ
 	 * @param cond {const acl::disque_cond*} the condition for the ADDJOB
-	 *  æ·»åŠ ä»»åŠ¡çš„æ¡ä»¶ï¼Œå‚è§ç±» disque_cond
+	 *  Ìí¼ÓÈÎÎñµÄÌõ¼ş£¬²Î¼ûÀà disque_cond
 	 * @return {const char*} a ID of the job will be returned, NULL will
 	 *  be returned if some error happened.
-	 *  è¿”å›ä»»åŠ¡ ID å·ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤ºå‡ºé”™
+	 *  ·µ»ØÈÎÎñ ID ºÅ£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾³ö´í
 	 */
 	const char* addjob(const char* name, const char* job,
 		int timeout, const disque_cond* cond);
@@ -97,16 +97,16 @@ public:
 	/**
 	 * get jobs from the specified queues, or return NULL if the timeout
 	 * is reached.
-	 * ä»æŒ‡å®šçš„é˜Ÿåˆ—é›†åˆä¸­è·å¾—å–æŒ‡å®šæœ€å¤§æ•°é‡çš„ä»»åŠ¡
+	 * ´ÓÖ¸¶¨µÄ¶ÓÁĞ¼¯ºÏÖĞ»ñµÃÈ¡Ö¸¶¨×î´óÊıÁ¿µÄÈÎÎñ
 	 * @param names {const std::vector<acl::string>&} the specified queues
-	 *  æŒ‡å®šçš„åˆ—è¡¨åç§°é›†åˆ
+	 *  Ö¸¶¨µÄÁĞ±íÃû³Æ¼¯ºÏ
 	 * @param timeout {int} the command timeout in milliseconds
-	 *  æ¯«ç§’ç²¾åº¦çš„å‘½ä»¤è¶…æ—¶é™åˆ¶
+	 *  ºÁÃë¾«¶ÈµÄÃüÁî³¬Ê±ÏŞÖÆ
 	 * @param count {size_t} the max count of the jobs to be got
-	 *  æŒ‡å®šäº†è¿”å›ä»»åŠ¡ç»“æœé›†çš„æœ€å¤§ä¸ªæ•°é™åˆ¶
+	 *  Ö¸¶¨ÁË·µ»ØÈÎÎñ½á¹û¼¯µÄ×î´ó¸öÊıÏŞÖÆ
 	 * @return {const std::vector<acl::disque_job*>*} return the jobs,
 	 *  or return NULL if the timeout is reached or some error happens.
-	 *  è¿”å›ç»“æœé›†ã€‚å¦‚æœè¶…æ—¶æˆ–å‘ç”Ÿé”™è¯¯åˆ™è¿”å› NULL
+	 *  ·µ»Ø½á¹û¼¯¡£Èç¹û³¬Ê±»ò·¢Éú´íÎóÔò·µ»Ø NULL
 	 */
 	const std::vector<disque_job*>* getjob(const std::vector<string>& names,
 		size_t timeout, size_t count);
@@ -118,119 +118,119 @@ public:
 	 * receiving the ACK will replicate it to multiple nodes and will try
 	 * to garbage collect both the job and the ACKs from the cluster so
 	 * that memory can be freed.
-	 * é€šè¿‡ç»™å®šä»»åŠ¡ ID ï¼Œ å‘èŠ‚ç‚¹å‘ŠçŸ¥ä»»åŠ¡å·²ç»è¢«æ‰§è¡Œã€‚æ¥æ”¶åˆ° ACK æ¶ˆæ¯çš„èŠ‚ç‚¹ä¼šå°†è¯¥æ¶ˆæ¯
-	 * å¤åˆ¶è‡³å¤šä¸ªèŠ‚ç‚¹ï¼Œ å¹¶å°è¯•å¯¹ä»»åŠ¡å’Œæ¥è‡ªé›†ç¾¤çš„ ACK æ¶ˆæ¯è¿›è¡Œåƒåœ¾å›æ”¶æ“ä½œï¼Œ ä»è€Œé‡Šæ”¾
-	 * è¢«å ç”¨çš„å†…å­˜ã€‚
+	 * Í¨¹ı¸ø¶¨ÈÎÎñ ID £¬ Ïò½Úµã¸æÖªÈÎÎñÒÑ¾­±»Ö´ĞĞ¡£½ÓÊÕµ½ ACK ÏûÏ¢µÄ½Úµã»á½«¸ÃÏûÏ¢
+	 * ¸´ÖÆÖÁ¶à¸ö½Úµã£¬ ²¢³¢ÊÔ¶ÔÈÎÎñºÍÀ´×Ô¼¯ÈºµÄ ACK ÏûÏ¢½øĞĞÀ¬»ø»ØÊÕ²Ù×÷£¬ ´Ó¶øÊÍ·Å
+	 * ±»Õ¼ÓÃµÄÄÚ´æ¡£
 	 * @param job_ids {const std::vector<acl::string>&} the jobs' IDs
-	 *  ä»»åŠ¡ ID é›†åˆ
+	 *  ÈÎÎñ ID ¼¯ºÏ
 	 * @return {int} return the number of IDs been ACKed, -1 will be
 	 *  returned if some error happened
-	 *  è¿”å›è¢«ç¡®è®¤çš„ä»»åŠ¡ä¸ªæ•°ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› -1
+	 *  ·µ»Ø±»È·ÈÏµÄÈÎÎñ¸öÊı£¬Èç¹û³ö´íÔò·µ»Ø -1
 	 */
 	int ackjob(const std::vector<string>& job_ids);
 
 	/**
 	 * perform a best effort cluster wide detection of the specified
 	 * job IDs.
-	 * å°½æœ€å¤§åŠªåŠ›åœ¨é›†ç¾¤èŒƒå›´å†…å¯¹ç»™å®šçš„ä»»åŠ¡è¿›è¡Œåˆ é™¤ï¼›åœ¨ç½‘ç»œè¿æ¥è‰¯å¥½å¹¶ä¸”æ‰€æœ‰èŠ‚ç‚¹éƒ½åœ¨çº¿æ—¶ï¼Œ 
-	 * è¿™ä¸ªå‘½ä»¤çš„æ•ˆæœå’Œ ACKJOB å‘½ä»¤çš„æ•ˆæœä¸€æ ·ï¼Œ ä½†æ˜¯å› ä¸ºè¿™ä¸ªå‘½ä»¤å¼•å‘çš„æ¶ˆæ¯äº¤æ¢æ¯”
-	 * ACKJOB è¦å°‘ï¼Œ æ‰€ä»¥å®ƒçš„é€Ÿåº¦æ¯” ACKJOB è¦å¿«ä¸å°‘ï¼›ä½†æ˜¯å½“é›†ç¾¤ä¸­åŒ…å«äº†å¤±æ•ˆèŠ‚ç‚¹çš„
-	 * æ—¶å€™ï¼Œ FASTACK å‘½ä»¤æ¯” ACKJOB å‘½ä»¤æ›´å®¹æ˜“å‡ºç°å¤šæ¬¡å‘é€åŒä¸€æ¶ˆæ¯çš„æƒ…å†µ
+	 * ¾¡×î´óÅ¬Á¦ÔÚ¼¯Èº·¶Î§ÄÚ¶Ô¸ø¶¨µÄÈÎÎñ½øĞĞÉ¾³ı£»ÔÚÍøÂçÁ¬½ÓÁ¼ºÃ²¢ÇÒËùÓĞ½Úµã¶¼ÔÚÏßÊ±£¬ 
+	 * Õâ¸öÃüÁîµÄĞ§¹ûºÍ ACKJOB ÃüÁîµÄĞ§¹ûÒ»Ñù£¬ µ«ÊÇÒòÎªÕâ¸öÃüÁîÒı·¢µÄÏûÏ¢½»»»±È
+	 * ACKJOB ÒªÉÙ£¬ ËùÒÔËüµÄËÙ¶È±È ACKJOB Òª¿ì²»ÉÙ£»µ«ÊÇµ±¼¯ÈºÖĞ°üº¬ÁËÊ§Ğ§½ÚµãµÄ
+	 * Ê±ºò£¬ FASTACK ÃüÁî±È ACKJOB ÃüÁî¸üÈİÒ×³öÏÖ¶à´Î·¢ËÍÍ¬Ò»ÏûÏ¢µÄÇé¿ö
 	 * @param job_ids {const std::vector<acl::string>&} the jobs' IDs
-	 *  ä»»åŠ¡ ID é›†åˆ
+	 *  ÈÎÎñ ID ¼¯ºÏ
 	 * @return {int} return the number of IDs been ACKed, -1 will be
 	 *  returned if some error happened
-	 *  è¿”å›è¢«ç¡®è®¤çš„ä»»åŠ¡ä¸ªæ•°ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› -1
+	 *  ·µ»Ø±»È·ÈÏµÄÈÎÎñ¸öÊı£¬Èç¹û³ö´íÔò·µ»Ø -1
 	 */
 	int fastack(const std::vector<string>& job_ids);
 
 	/**
 	 * peek some jobs no more than the specified count from the specified
 	 * queue and remain these jobs in queue.
-	 * åœ¨ä¸å–å‡ºä»»åŠ¡çš„æƒ…å†µä¸‹ï¼Œ ä»é˜Ÿåˆ—é‡Œé¢è¿”å›æŒ‡å®šæ•°é‡çš„ä»»åŠ¡
+	 * ÔÚ²»È¡³öÈÎÎñµÄÇé¿öÏÂ£¬ ´Ó¶ÓÁĞÀïÃæ·µ»ØÖ¸¶¨ÊıÁ¿µÄÈÎÎñ
 	 * @param name {const char*} the specified queue
-	 *  æŒ‡å®šçš„é˜Ÿåˆ—åç§°
+	 *  Ö¸¶¨µÄ¶ÓÁĞÃû³Æ
 	 * @param count {int} limit the max count of jobs to be got
-	 *  é™å®šäº†è¿”å›ç»“æœé›†çš„æœ€å¤§æ•°é‡
+	 *  ÏŞ¶¨ÁË·µ»Ø½á¹û¼¯µÄ×î´óÊıÁ¿
 	 * @return {const std::vector<acl::disque_job*>*} return the jobs
 	 *  if the queue isn't empty. NULL will be returned if the queue
 	 *  is empty or some error happened.
-	 *  è¿”å›ç»“æœé›†ï¼Œå¦‚æœé˜Ÿåˆ—ä¸ºç©ºæˆ–å‡ºé”™åˆ™è¿”å› NULL
+	 *  ·µ»Ø½á¹û¼¯£¬Èç¹û¶ÓÁĞÎª¿Õ»ò³ö´íÔò·µ»Ø NULL
 	 */
 	const std::vector<disque_job*>* qpeek(const char* name, int count);
 
 	/**
 	 * get the number of jobs stored in the specified queue
-	 * è·å¾—æŒ‡å®šé˜Ÿåˆ—ä¸­çš„ä»»åŠ¡æ•°é‡
+	 * »ñµÃÖ¸¶¨¶ÓÁĞÖĞµÄÈÎÎñÊıÁ¿
 	 * @param name {const char*} the specified queue
-	 *  æŒ‡å®šçš„é˜Ÿåˆ—åç§°
+	 *  Ö¸¶¨µÄ¶ÓÁĞÃû³Æ
 	 * @return {int} return the number of the jobs in queue
-	 *  è¿”å›æŒ‡å®šé˜Ÿåˆ—ä¸­çš„ä»»åŠ¡æ•°é‡ï¼Œè¿”å›å‡ºé”™åˆ™è¿”å› -1
+	 *  ·µ»ØÖ¸¶¨¶ÓÁĞÖĞµÄÈÎÎñÊıÁ¿£¬·µ»Ø³ö´íÔò·µ»Ø -1
 	 */
 	int qlen(const char* name);
 
 	/**
 	 * get the stat information of the specified job by job id
-	 * æ ¹æ®ä»»åŠ¡ ID è·å¾—ä»»åŠ¡çš„ç›¸å…³ä¿¡æ¯
+	 * ¸ù¾İÈÎÎñ ID »ñµÃÈÎÎñµÄÏà¹ØĞÅÏ¢
 	 * @param job_id {const char*} the id of the job
-	 *  æŒ‡å®šçš„ä»»åŠ¡ ID
+	 *  Ö¸¶¨µÄÈÎÎñ ID
 	 * @return {const acl::disque_job*} return the job's information,
 	 *  return NULL if the job doesn't exist or some error happens.
-	 *  è¿”å›æŒ‡å®šä»»åŠ¡çš„ä¿¡æ¯ï¼Œå‚è€ƒç±» disque_jobï¼›å¦‚æœä»»åŠ¡ä¸å­˜åœ¨æˆ–å‡ºé”™åˆ™è¿”å› NULL
+	 *  ·µ»ØÖ¸¶¨ÈÎÎñµÄĞÅÏ¢£¬²Î¿¼Àà disque_job£»Èç¹ûÈÎÎñ²»´æÔÚ»ò³ö´íÔò·µ»Ø NULL
 	 */
 	const disque_job* show(const char* job_id);
 
 	/**
 	 * queue jobs if not already queued
-	 * å¦‚æœç»™å®šä»»åŠ¡æœªè¢«æ”¾å…¥åˆ°é˜Ÿåˆ—é‡Œï¼Œ åˆ™æŠŠå®ƒä»¬æ”¾å…¥åˆ°é˜Ÿåˆ—é‡Œ
+	 * Èç¹û¸ø¶¨ÈÎÎñÎ´±»·ÅÈëµ½¶ÓÁĞÀï£¬ Ôò°ÑËüÃÇ·ÅÈëµ½¶ÓÁĞÀï
 	 * @param job_ids {const std::vector<acl::string>&} the job IDs
-	 *  æŒ‡å®šçš„ä»»åŠ¡ ID é›†åˆ
+	 *  Ö¸¶¨µÄÈÎÎñ ID ¼¯ºÏ
 	 * @return {int} return the number of jobs been queued, -1 will be
 	 *  returned if some error happens.
-	 *  è¿”å›è¢«æ”¾å…¥é˜Ÿåˆ—é‡Œçš„ä»»åŠ¡æ•°é‡ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› -1
+	 *  ·µ»Ø±»·ÅÈë¶ÓÁĞÀïµÄÈÎÎñÊıÁ¿£¬Èç¹û³ö´íÔò·µ»Ø -1
 	 */
 	int enqueue(const std::vector<string>& job_ids);
 
 	/**
 	 * remove the jobs from the queue
-	 * ä»é˜Ÿåˆ—é‡Œé¢ç§»é™¤æŒ‡å®šçš„ä»»åŠ¡
+	 * ´Ó¶ÓÁĞÀïÃæÒÆ³ıÖ¸¶¨µÄÈÎÎñ
 	 * @param job_ids {const std::vector<acl::string>&} the job IDs
-	 *  å‡†å¤‡ç§»é™¤çš„ä»»åŠ¡ ID é›†åˆ
+	 *  ×¼±¸ÒÆ³ıµÄÈÎÎñ ID ¼¯ºÏ
 	 * @return {int} return the number of jobs been removed, -1 will be
 	 *  returned if some error happens.
-	 *  è¿”å›è¢«ç§»é™¤çš„ä»»åŠ¡æ•°é‡ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› -1
+	 *  ·µ»Ø±»ÒÆ³ıµÄÈÎÎñÊıÁ¿£¬Èç¹û³ö´íÔò·µ»Ø -1
 	 */
 	int dequeue(const std::vector<string>& job_ids);
 
 	/**
 	 * completely delete a job from a node.
-	 * åœ¨èŠ‚ç‚¹é‡Œé¢å½»åº•åœ°åˆ é™¤ç»™å®šçš„ä»»åŠ¡ã€‚ è¿™ä¸ªå‘½ä»¤å’Œ FASTACK å¾ˆç›¸ä¼¼ï¼Œ å”¯ä¸€çš„ä¸åŒæ˜¯ï¼Œ
-	 * DELJOB å‘½ä»¤å¼•å‘çš„åˆ é™¤æ“ä½œåªä¼šåœ¨å•ä¸ªèŠ‚ç‚¹é‡Œé¢æ‰§è¡Œï¼Œ å®ƒä¸ä¼šå°† DELJOB é›†ç¾¤æ€»çº¿
-	 * æ¶ˆæ¯ï¼ˆcluster bus messageï¼‰å‘é€è‡³å…¶ä»–èŠ‚ç‚¹
+	 * ÔÚ½ÚµãÀïÃæ³¹µ×µØÉ¾³ı¸ø¶¨µÄÈÎÎñ¡£ Õâ¸öÃüÁîºÍ FASTACK ºÜÏàËÆ£¬ Î¨Ò»µÄ²»Í¬ÊÇ£¬
+	 * DELJOB ÃüÁîÒı·¢µÄÉ¾³ı²Ù×÷Ö»»áÔÚµ¥¸ö½ÚµãÀïÃæÖ´ĞĞ£¬ Ëü²»»á½« DELJOB ¼¯Èº×ÜÏß
+	 * ÏûÏ¢£¨cluster bus message£©·¢ËÍÖÁÆäËû½Úµã
 	 * @param job_ids {const std::vector<acl::string>&} the job IDs
-	 * è¢«åˆ é™¤çš„ä»»åŠ¡ ID é›†åˆ
+	 * ±»É¾³ıµÄÈÎÎñ ID ¼¯ºÏ
 	 * @return {int} return the number of jobs been deleted, -1 will be
 	 *  returned if some error happens.
-	 *  è¿”å›è¢«åˆ é™¤çš„ä»»åŠ¡æ•°é‡ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› -1
+	 *  ·µ»Ø±»É¾³ıµÄÈÎÎñÊıÁ¿£¬Èç¹û³ö´íÔò·µ»Ø -1
 	 */
 	int deljob(const std::vector<string>& job_ids);
 
 	/**
 	 * display the information of the disque cluster
-	 * è·å¾—å½“å‰é›†ç¾¤çš„çŠ¶æ€ä¿¡æ¯
+	 * »ñµÃµ±Ç°¼¯ÈºµÄ×´Ì¬ĞÅÏ¢
 	 * @param out {std::map<acl::string, acl::string>&} store result
-	 *  å­˜å‚¨ç»“æœ
+	 *  ´æ´¢½á¹û
 	 * @return {bool} if the operation is successful
-	 *  æ“ä½œæ˜¯å¦æ­£å¸¸ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› false
+	 *  ²Ù×÷ÊÇ·ñÕı³££¬Èç¹û³ö´íÔò·µ»Ø false
 	 */
 	bool info(std::map<string, string>& out);
 
 	/**
 	 * get the information of all the nodes in the cluster
-	 * è·å¾—é›†ç¾¤ä¸­æ‰€æœ‰ç»“ç‚¹çš„ä¿¡æ¯
+	 * »ñµÃ¼¯ÈºÖĞËùÓĞ½áµãµÄĞÅÏ¢
 	 * @return {const std::vector<acl::disque_node*>*} all the nodes'
 	 *  information in the cluster, return NULL if some error happened.
-	 *  è¿”å›é›†ç¾¤ä¸­æ‰€æœ‰ç»“ç‚¹ä¿¡æ¯çš„ç»“æœé›†ï¼Œå¦‚æœå‡ºé”™åˆ™è¿”å› NULLï¼›å‚è€ƒç±» disque_node
+	 *  ·µ»Ø¼¯ÈºÖĞËùÓĞ½áµãĞÅÏ¢µÄ½á¹û¼¯£¬Èç¹û³ö´íÔò·µ»Ø NULL£»²Î¿¼Àà disque_node
 	 */
 	const std::vector<disque_node*>* hello();
 

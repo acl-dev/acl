@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file cipher_wrap.h
  * 
  * \brief Cipher wrappers.

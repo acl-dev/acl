@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_TIMER_INCLUDE_H
+#ifndef	ACL_TIMER_INCLUDE_H
 #define	ACL_TIMER_INCLUDE_H
 
 #include "../stdlib/acl_define.h"
@@ -11,18 +11,18 @@ extern "C" {
 #endif
 
 /**
- * å®šæ—¶å™¨ç±»åž‹å®šä¹‰
+ * ¶¨Ê±Æ÷ÀàÐÍ¶¨Òå
  */
 typedef struct ACL_TIMER_INFO {               
 	/* public */
-	void *obj;              /**< ç”¨æˆ·çš„æ•°æ®å¯¹è±¡æŒ‡é’ˆ */
-	acl_int64 when;         /**< è¢«è§¦å‘çš„æ—¶é—´æˆª(å¾®å¦™çº§) */
+	void *obj;              /**< ÓÃ»§µÄÊý¾Ý¶ÔÏóÖ¸Õë */
+	acl_int64 when;         /**< ±»´¥·¢µÄÊ±¼ä½Ø(Î¢Ãî¼¶) */
 
 	/* private */
-	ACL_RING entry;         /**< å†…éƒ¨ç”¨çš„å®šæ—¶é“¾ */
+	ACL_RING entry;         /**< ÄÚ²¿ÓÃµÄ¶¨Ê±Á´ */
 } ACL_TIMER_INFO;
 
-/* å®šæ—¶å™¨å¥æŸ„ç»“æž„ */
+/* ¶¨Ê±Æ÷¾ä±ú½á¹¹ */
 typedef struct ACL_TIMER ACL_TIMER;
 
 struct ACL_TIMER {
@@ -36,73 +36,73 @@ struct ACL_TIMER {
 
 	/* for acl_iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êý */
 	const void *(*iter_head)(ACL_ITER*, struct ACL_TIMER*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
 	const void *(*iter_next)(ACL_ITER*, struct ACL_TIMER*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êý */
 	const void *(*iter_tail)(ACL_ITER*, struct ACL_TIMER*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
 	const void *(*iter_prev)(ACL_ITER*, struct ACL_TIMER*);
 
-	/* èŽ·å¾—ä¸Žå½“å‰è¿­ä»£æŒ‡é’ˆç›¸å…³è”çš„ ACL_TIMER_INFO å¯¹è±¡ */
+	/* »ñµÃÓëµ±Ç°µü´úÖ¸ÕëÏà¹ØÁªµÄ ACL_TIMER_INFO ¶ÔÏó */
 	const ACL_TIMER_INFO *(*iter_info)(ACL_ITER*, struct ACL_TIMER*);
 };
 
 /**
- * æ·»åŠ å®šæ—¶ä»»åŠ¡
- * @param timer {ACL_TIMER*}ï¼Œå®šæ—¶å™¨å¥æŸ„
- * @param obj {void*}ï¼Œç”¨æˆ·çº§åŠ¨æ€å˜é‡
- * @param delay {acl_int64}ï¼Œè¢«è§¦å‘çš„æ—¶é—´é—´éš”(å¾®ç§’çº§)
- * @return {acl_int64} æ–°çš„å®šæ—¶ä»»åŠ¡çš„è§£å†³æ—¶é—´æˆª(å¾®ç§’çº§)
+ * Ìí¼Ó¶¨Ê±ÈÎÎñ
+ * @param timer {ACL_TIMER*}£¬¶¨Ê±Æ÷¾ä±ú
+ * @param obj {void*}£¬ÓÃ»§¼¶¶¯Ì¬±äÁ¿
+ * @param delay {acl_int64}£¬±»´¥·¢µÄÊ±¼ä¼ä¸ô(Î¢Ãë¼¶)
+ * @return {acl_int64} ÐÂµÄ¶¨Ê±ÈÎÎñµÄ½â¾öÊ±¼ä½Ø(Î¢Ãë¼¶)
  */
 ACL_API acl_int64 acl_timer_request(ACL_TIMER* timer, void *obj, acl_int64 delay);
 
 /**
- * å–æ¶ˆå®šæ—¶ä»»åŠ¡
- * @param timer {ACL_TIMER*}ï¼Œå®šæ—¶å™¨å¥æŸ„
- * @param obj {void*}ï¼Œç”¨æˆ·çº§åŠ¨æ€å˜é‡
- * @return {acl_int64}ï¼Œè·ç¦»ä¸‹ä¸€ä¸ªå®šæ—¶ä»»åŠ¡è¢«è§¦å‘çš„æ—¶é—´é—´éš”(å¾®ç§’çº§)
+ * È¡Ïû¶¨Ê±ÈÎÎñ
+ * @param timer {ACL_TIMER*}£¬¶¨Ê±Æ÷¾ä±ú
+ * @param obj {void*}£¬ÓÃ»§¼¶¶¯Ì¬±äÁ¿
+ * @return {acl_int64}£¬¾àÀëÏÂÒ»¸ö¶¨Ê±ÈÎÎñ±»´¥·¢µÄÊ±¼ä¼ä¸ô(Î¢Ãë¼¶)
  */
 ACL_API acl_int64 acl_timer_cancel(ACL_TIMER* timer, void *obj);
 
 /**
- * ä»Žå®šæ—¶å™¨ä¸­èŽ·å–åˆ°æ—¶çš„å®šæ—¶ä»»åŠ¡
- * @param timer {ACL_TIMER*}ï¼Œå®šæ—¶å™¨å¥æŸ„
- * @return {void*}ï¼Œç”¨æˆ·çº§åŠ¨æ€å˜é‡
+ * ´Ó¶¨Ê±Æ÷ÖÐ»ñÈ¡µ½Ê±µÄ¶¨Ê±ÈÎÎñ
+ * @param timer {ACL_TIMER*}£¬¶¨Ê±Æ÷¾ä±ú
+ * @return {void*}£¬ÓÃ»§¼¶¶¯Ì¬±äÁ¿
  */
 ACL_API void *acl_timer_popup(ACL_TIMER* timer);
 
 /**
- * è·ç¦»ä¸‹ä¸€ä¸ªå®šæ—¶ä»»åŠ¡è¢«è§¦å‘çš„æ—¶é—´é—´éš”
- * @param timer {ACL_TIMER*}ï¼Œå®šæ—¶å™¨å¥æŸ„
- * @return {acl_int64} è¿”å›žå€¼å•ä½ä¸ºå¾®ç§’
+ * ¾àÀëÏÂÒ»¸ö¶¨Ê±ÈÎÎñ±»´¥·¢µÄÊ±¼ä¼ä¸ô
+ * @param timer {ACL_TIMER*}£¬¶¨Ê±Æ÷¾ä±ú
+ * @return {acl_int64} ·µ»ØÖµµ¥Î»ÎªÎ¢Ãë
  */
 ACL_API acl_int64 acl_timer_left(ACL_TIMER* timer);
 
 /**
- * éåŽ†å®šæ—¶å™¨é‡Œçš„æ‰€æœ‰å®šæ—¶ä»»åŠ¡é¡¹
- * @param timer {ACL_TIMER*}ï¼Œå®šæ—¶å™¨å¥æŸ„
- * @param action {void (*)(ACL_TIMER_INFO*, void*)} ç”¨æˆ·çš„éåŽ†å›žè°ƒå‡½æ•°
- * @param arg {void*} action ä¸­çš„ç¬¬äºŒä¸ªå‚æ•°
+ * ±éÀú¶¨Ê±Æ÷ÀïµÄËùÓÐ¶¨Ê±ÈÎÎñÏî
+ * @param timer {ACL_TIMER*}£¬¶¨Ê±Æ÷¾ä±ú
+ * @param action {void (*)(ACL_TIMER_INFO*, void*)} ÓÃ»§µÄ±éÀú»Øµ÷º¯Êý
+ * @param arg {void*} action ÖÐµÄµÚ¶þ¸ö²ÎÊý
  */
 ACL_API void acl_timer_walk(ACL_TIMER *timer, void (*action)(ACL_TIMER_INFO *, void *), void *arg);
 
 /**
- * åˆ›å»ºå®šæ—¶å™¨å¥æŸ„
+ * ´´½¨¶¨Ê±Æ÷¾ä±ú
  * @return {ACL_TIMER*}
  */
 ACL_API ACL_TIMER *acl_timer_new(void);
 
 /**
- * é‡Šæ”¾å®šæ—¶å™¨å¥æŸ„
+ * ÊÍ·Å¶¨Ê±Æ÷¾ä±ú
  * @param timer {ACL_TIMER*}
- * @param free_fn {void (*)(void*)} é‡Šæ”¾å®šæ—¶å™¨é‡Œçš„ç”¨æˆ·å¯¹è±¡çš„å›žè°ƒé‡Šæ”¾å‡½æ•°
+ * @param free_fn {void (*)(void*)} ÊÍ·Å¶¨Ê±Æ÷ÀïµÄÓÃ»§¶ÔÏóµÄ»Øµ÷ÊÍ·Åº¯Êý
  */
 ACL_API void acl_timer_free(ACL_TIMER* timer, void (*free_fn)(void*));
 
 /**
- * èŽ·å¾—å®šæ—¶å™¨é‡Œå®šæ—¶ä»»åŠ¡çš„æ•°é‡
+ * »ñµÃ¶¨Ê±Æ÷Àï¶¨Ê±ÈÎÎñµÄÊýÁ¿
  * @param timer {ACL_TIMER*}
  * @return {int} >= 0
  */

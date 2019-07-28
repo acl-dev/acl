@@ -1,4 +1,4 @@
-ï»¿// http_servlet.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// http_servlet.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 #include <assert.h>
 #include "acl_cpp/lib_acl.hpp"
@@ -25,12 +25,12 @@ public:
 	}
 
 protected:
-	// å½“æ¥æ”¶åˆ°å®¢æˆ·ç«¯è¿æ¥æµåå›è°ƒçš„è™šæ¥å£
+	// µ±½ÓÊÕµ½¿Í»§¶ËÁ¬½ÓÁ÷ºó»Øµ÷µÄĞé½Ó¿Ú
 	virtual void on_accept(socket_stream* stream)
 	{
 		http_response res(stream);
 
-		// è¯»å®¢æˆ·ç«¯çš„ HTTP è¯·æ±‚å¤´
+		// ¶Á¿Í»§¶ËµÄ HTTP ÇëÇóÍ·
 		if (res.read_header() == false)
 		{
 			const char* ptr = "read request header error";
@@ -39,7 +39,7 @@ protected:
 			return;
 		}
 
-		// ä» HTTP è¯·æ±‚å¤´ä¸­å–å‡º Content-Type å­—æ®µå€¼
+		// ´Ó HTTP ÇëÇóÍ·ÖĞÈ¡³ö Content-Type ×Ö¶ÎÖµ
 		// Content-Type: text/xml; charset=utf-8
 		http_client* client = res.get_client();
 		assert(client);
@@ -52,9 +52,9 @@ protected:
 			return;
 		}
 
-		// ä» HTTP è¯·æ±‚å¤´ä¸­å–å¾—æ•°æ®ç±»å‹ä¸­çš„å­ç±»å‹
-		// å¦‚æœè¯·æ±‚å¤´ä¸­æœ‰ï¼šContent-Type: text/xml; charset=utf-8
-		// åˆ™ get_stype å–å¾— xml å­ç±»å‹
+		// ´Ó HTTP ÇëÇóÍ·ÖĞÈ¡µÃÊı¾İÀàĞÍÖĞµÄ×ÓÀàĞÍ
+		// Èç¹ûÇëÇóÍ·ÖĞÓĞ£ºContent-Type: text/xml; charset=utf-8
+		// Ôò get_stype È¡µÃ xml ×ÓÀàĞÍ
 		http_ctype content_type;
 		content_type.parse(p);
 		const char* stype = content_type.get_stype();
@@ -63,16 +63,16 @@ protected:
 		bool ret;
 		string err;
 
-		// æ ¹æ®å­ç±»å‹çš„ä¸åŒè°ƒç”¨ä¸åŒçš„å¤„ç†è¿‡ç¨‹
+		// ¸ù¾İ×ÓÀàĞÍµÄ²»Í¬µ÷ÓÃ²»Í¬µÄ´¦Àí¹ı³Ì
 
 		if (stype == NULL)
 			ret = do_plain(res, req_charset, err);
 
-		// text/xml æ ¼å¼
+		// text/xml ¸ñÊ½
 		else if (strcasecmp(stype, "xml") == 0)
 			ret = do_xml(res, req_charset, err);
 
-		// text/json æ ¼å¼
+		// text/json ¸ñÊ½
 		else if (strcasecmp(stype, "json") == 0)
 			ret = do_json(res, req_charset, err);
 		else
@@ -82,7 +82,7 @@ protected:
 	}
 
 private:
-	// å¤„ç† text/plain æ•°æ®ä½“
+	// ´¦Àí text/plain Êı¾İÌå
 	bool do_plain(http_response& res, const char* req_charset, string& err)
 	{
 		string body;
@@ -93,7 +93,7 @@ private:
 		}
 		printf("body:\r\n(%s)\r\n", body.c_str());
 
-		// è®¾ç½®å“åº”å¤´å­—æ®µ
+		// ÉèÖÃÏìÓ¦Í·×Ö¶Î
 		http_header& header = res.response_header();
 		string ctype("text/plain");
 		if (req_charset)
@@ -106,11 +106,11 @@ private:
 
 		printf(">>ctype: %s\r\n", ctype.c_str());
 
-		// å‘é€å“åº”ä½“æ•°æ®
+		// ·¢ËÍÏìÓ¦ÌåÊı¾İ
 		return response_body(res, body, req_charset);
 	}
 
-	// å¤„ç† text/xml æ•°æ®ä½“
+	// ´¦Àí text/xml Êı¾İÌå
 	bool do_xml(http_response& res, const char* req_charset, string& err)
 	{
 		xml1 body;
@@ -132,7 +132,7 @@ private:
 			node = body.next_node();
 		}
 
-		// è®¾ç½®å“åº”å¤´å­—æ®µ
+		// ÉèÖÃÏìÓ¦Í·×Ö¶Î
 		http_header& header = res.response_header();
 		string ctype("text/xml");
 		if (req_charset)
@@ -145,15 +145,15 @@ private:
 
 		printf(">>ctype: %s\r\n", ctype.c_str());
 
-		// æ„å»ºå“åº”ä½“æ•°æ®ï¼Œå¹¶å‘é€å“åº”ä½“æ•°æ®
+		// ¹¹½¨ÏìÓ¦ÌåÊı¾İ£¬²¢·¢ËÍÏìÓ¦ÌåÊı¾İ
 		string buf;
 		body.build_xml(buf);
 
-		// å‘é€å“åº”ä½“æ•°æ®
+		// ·¢ËÍÏìÓ¦ÌåÊı¾İ
 		return response_body(res, buf, req_charset);
 	}
 
-	// å¤„ç† text/json æ•°æ®
+	// ´¦Àí text/json Êı¾İ
 	bool do_json(http_response& res, const char* req_charset, string& err)
 	{
 		json body;
@@ -177,7 +177,7 @@ private:
 			node = body.next_node();
 		}
 
-		// è®¾ç½®å“åº”å¤´å­—æ®µ
+		// ÉèÖÃÏìÓ¦Í·×Ö¶Î
 		http_header& header = res.response_header();
 		string ctype("text/json");
 		if (req_charset)
@@ -190,22 +190,22 @@ private:
 
 		printf(">>ctype: %s\r\n", ctype.c_str());
 
-		// æ„å»ºå“åº”ä½“æ•°æ®ï¼Œå¹¶å‘é€å“åº”ä½“æ•°æ®
+		// ¹¹½¨ÏìÓ¦ÌåÊı¾İ£¬²¢·¢ËÍÏìÓ¦ÌåÊı¾İ
 		string buf;
 		body.build_json(buf);
 
-		// å‘é€å“åº”ä½“æ•°æ®
+		// ·¢ËÍÏìÓ¦ÌåÊı¾İ
 		return response_body(res, buf, req_charset);
 	}
 
 	bool response_body(http_response& res, const string& body,
 		const char* req_charset)
 	{
-		// å¦‚æœæœ¬åœ°å­—ç¬¦é›†ä¸è¯·æ±‚å­—ç¬¦é›†ç›¸åŒï¼Œåˆ™ç›´æ¥å‘é€
+		// Èç¹û±¾µØ×Ö·û¼¯ÓëÇëÇó×Ö·û¼¯ÏàÍ¬£¬ÔòÖ±½Ó·¢ËÍ
 		if (local_charset_ == req_charset)
 			return res.response(body.c_str(), body.length());
 
-		// ä¸ä¸€è‡´æ—¶ï¼Œåˆ™éœ€è¦è¿›è¡Œè½¬ç 
+		// ²»Ò»ÖÂÊ±£¬ÔòĞèÒª½øĞĞ×ªÂë
 		string buf;
 		charset_conv conv;
 		if (conv.convert(local_charset_, req_charset,
@@ -231,9 +231,9 @@ int main(int argc, char* argv[])
 #ifdef	WIN32
 	acl::acl_cpp_init();
 #endif
-	master_service service;  // æœåŠ¡å™¨å•ä¾‹å¯¹è±¡
+	master_service service;  // ·şÎñÆ÷µ¥Àı¶ÔÏó
 
-	// å¼€å§‹è¿è¡Œ
+	// ¿ªÊ¼ÔËĞĞ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
@@ -242,10 +242,10 @@ int main(int argc, char* argv[])
 
 		format = (void (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0:8888 ...\r\n");
-		service.run_alone("0.0.0.0:8888", NULL, 1);  // å•ç‹¬è¿è¡Œæ–¹å¼
+		service.run_alone("0.0.0.0:8888", NULL, 1);  // µ¥¶ÀÔËĞĞ·½Ê½
 	}
 	else
-		service.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
+		service.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
 
 	return 0;
 }

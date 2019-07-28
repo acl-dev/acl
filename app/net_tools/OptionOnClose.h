@@ -1,24 +1,24 @@
-ï»¿#pragma once
+#pragma once
 #include "afxwin.h"
 
 
-// COptionOnClose å¯¹è¯æ¡†
+// COptionOnClose ¶Ô»°¿ò
 
 class COptionOnClose : public CDialog
 {
 	DECLARE_DYNCREATE(COptionOnClose)
 
 public:
-	COptionOnClose(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
+	COptionOnClose(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
 	virtual ~COptionOnClose();
 
 	void init(BOOL QuitOnClose);
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_DIALOG_QUIT};
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

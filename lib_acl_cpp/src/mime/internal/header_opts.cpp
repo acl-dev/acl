@@ -1,4 +1,4 @@
-﻿/*++
+/*++
 * NAME
 *	header_opts 3
 * SUMMARY

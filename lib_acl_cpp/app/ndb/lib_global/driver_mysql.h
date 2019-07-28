@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "db_driver.h"
 
 struct ACL_DB_POOL;
@@ -14,71 +14,71 @@ public:
 	virtual ~driver_mysql(void);
 
 	/**
-	 * åˆ›å»ºæ•°æ®åº“åŠæ•°æ®è¡¨ï¼Œè‹¥æ•°æ®åº“æœªå­˜åœ¨åˆ™åˆ›å»ºæ–°çš„æ•°æ®åº“ï¼Œå¦åˆ™
-	 * åœ¨è¯¥æ•°æ®åº“ä¸Šåˆ›å»ºæ–°çš„æ•°æ®è¡¨ï¼Œè‹¥æ•°æ®è¡¨ä¹Ÿå­˜åœ¨åˆ™åœ¨è¯¥æ•°æ®è¡¨ä¸Šåˆ›å»º
-	 * æ–°çš„ç´¢å¼•ï¼Œè‹¥ç´¢å¼•ä¹Ÿå­˜åœ¨ï¼Œåˆ™ç›´æ¥è¿”å›æ­£ç¡®
-	 * @param dbname {const char*} æ•°æ®åº“åç§°
-	 * @param tbl {const char* tbl} æ•°æ®è¡¨å
-	 * @param idx {const char* idx} æ•°æ®è¡¨çš„ç´¢å¼•åï¼Œè‹¥è¯¥ç´¢å¼•å€¼åœ¨æ•°æ®è¡¨
-	 *  ä¸å­˜åœ¨åˆ™åˆ›å»ºæ–°çš„åŸºäºè¯¥ç´¢å¼•åçš„ç´¢å¼•ï¼Œå¦åˆ™æ‰“å¼€å·²ç»å­˜åœ¨çš„ç´¢å¼•å
-	 * @param idx_unique {bool} ç´¢å¼•å­—æ®µæ˜¯å¦è¦æ±‚å”¯ä¸€æ€§
-	 * @param user {const char*} æ‰“å¼€è¯¥æ•°æ®åº“çš„è´¦å·å
-	 * @param pass {const char*} æ‰“å¼€è¯¥æ•°æ®åº“çš„è´¦å·å¯†ç 
-	 * @return {bool} åˆ›å»ºæ˜¯å¦æˆåŠŸ
+	 * ´´½¨Êı¾İ¿â¼°Êı¾İ±í£¬ÈôÊı¾İ¿âÎ´´æÔÚÔò´´½¨ĞÂµÄÊı¾İ¿â£¬·ñÔò
+	 * ÔÚ¸ÃÊı¾İ¿âÉÏ´´½¨ĞÂµÄÊı¾İ±í£¬ÈôÊı¾İ±íÒ²´æÔÚÔòÔÚ¸ÃÊı¾İ±íÉÏ´´½¨
+	 * ĞÂµÄË÷Òı£¬ÈôË÷ÒıÒ²´æÔÚ£¬ÔòÖ±½Ó·µ»ØÕıÈ·
+	 * @param dbname {const char*} Êı¾İ¿âÃû³Æ
+	 * @param tbl {const char* tbl} Êı¾İ±íÃû
+	 * @param idx {const char* idx} Êı¾İ±íµÄË÷ÒıÃû£¬Èô¸ÃË÷ÒıÖµÔÚÊı¾İ±í
+	 *  ²»´æÔÚÔò´´½¨ĞÂµÄ»ùÓÚ¸ÃË÷ÒıÃûµÄË÷Òı£¬·ñÔò´ò¿ªÒÑ¾­´æÔÚµÄË÷ÒıÃû
+	 * @param idx_unique {bool} Ë÷Òı×Ö¶ÎÊÇ·ñÒªÇóÎ¨Ò»ĞÔ
+	 * @param user {const char*} ´ò¿ª¸ÃÊı¾İ¿âµÄÕËºÅÃû
+	 * @param pass {const char*} ´ò¿ª¸ÃÊı¾İ¿âµÄÕËºÅÃÜÂë
+	 * @return {bool} ´´½¨ÊÇ·ñ³É¹¦
 	 */
 	virtual  bool create(const char* dbname, const char* tbl,
 			const char* idx, bool idx_unique = false,
 			const char* user = NULL, const char* pass = NULL);
 
 	/**
-	 * æ‰“å¼€æ•°æ®åº“åŠæ•°æ®è¡¨ï¼Œå¦‚æœæ•°æ®åº“ã€æ•°æ®è¡¨æˆ–ç´¢å¼•ä¸å­˜åœ¨åˆ™è¿”å›å¤±è´¥
-	 * @param dbname {const char*} æ•°æ®åº“åç§°
-	 * @param tbl {const char* tbl} æ•°æ®è¡¨å
-	 * @param idx {const char*} ç´¢å¼•å­—æ®µå
-	 * @param user {const char*} æ‰“å¼€è¯¥æ•°æ®åº“çš„è´¦å·å
-	 * @param pass {const char*} æ‰“å¼€è¯¥æ•°æ®åº“çš„è´¦å·å¯†ç 
-	 * @return {bool} åˆ›å»ºæ˜¯å¦æˆåŠŸ
+	 * ´ò¿ªÊı¾İ¿â¼°Êı¾İ±í£¬Èç¹ûÊı¾İ¿â¡¢Êı¾İ±í»òË÷Òı²»´æÔÚÔò·µ»ØÊ§°Ü
+	 * @param dbname {const char*} Êı¾İ¿âÃû³Æ
+	 * @param tbl {const char* tbl} Êı¾İ±íÃû
+	 * @param idx {const char*} Ë÷Òı×Ö¶ÎÃû
+	 * @param user {const char*} ´ò¿ª¸ÃÊı¾İ¿âµÄÕËºÅÃû
+	 * @param pass {const char*} ´ò¿ª¸ÃÊı¾İ¿âµÄÕËºÅÃÜÂë
+	 * @return {bool} ´´½¨ÊÇ·ñ³É¹¦
 	 */
 	virtual bool open(const char* dbname, const char*tbl, const char* idx,
 			const char* user = NULL, const char* pass = NULL);
 
 	/**
-	 * æ·»åŠ æˆ–ä¿®æ”¹æ•°æ®ï¼Œå½“ç´¢å¼•å€¼å¯¹åº”æ•°æ®ä¸å­˜åœ¨æ—¶åˆ™æ·»åŠ æ•°æ®ï¼Œå¦åˆ™ä¿®æ”¹
-	 * ä¸ºæ–°çš„æ•°æ®
-	 * @param idx_value {const char*} ç´¢å¼•å€¼ï¼Œå¿…é¡»å¯¹åº” open å‡½æ•°ä¸­çš„ç´¢å¼•å
-	 * @param data {cost void*} æ•°æ®åœ°å€
-	 * @param dlen {size_t} data æ•°æ®é•¿åº¦
-	 * @return {bool} è¿”å› false è¡¨ç¤ºå¤±è´¥ï¼ŒåŸå› è¯·è°ƒç”¨ last_error() è·å¾—
+	 * Ìí¼Ó»òĞŞ¸ÄÊı¾İ£¬µ±Ë÷ÒıÖµ¶ÔÓ¦Êı¾İ²»´æÔÚÊ±ÔòÌí¼ÓÊı¾İ£¬·ñÔòĞŞ¸Ä
+	 * ÎªĞÂµÄÊı¾İ
+	 * @param idx_value {const char*} Ë÷ÒıÖµ£¬±ØĞë¶ÔÓ¦ open º¯ÊıÖĞµÄË÷ÒıÃû
+	 * @param data {cost void*} Êı¾İµØÖ·
+	 * @param dlen {size_t} data Êı¾İ³¤¶È
+	 * @return {bool} ·µ»Ø false ±íÊ¾Ê§°Ü£¬Ô­ÒòÇëµ÷ÓÃ last_error() »ñµÃ
 	 */
 	virtual bool set(const char* idx_value, const void* data, size_t dlen);
 
 	/**
-	 * æ ¹æ®è¾“å…¥çš„ç´¢å¼•å€¼è·å¾—æ•°æ®
-	 * @param idx_value {const char*} ç´¢å¼•å€¼ï¼Œå¯¹åº” open æ‰“å¼€çš„ç´¢å¼•å­—æ®µ
-	 * @return {db_result*} å­˜å‚¨æŸ¥è¯¢ç»“æœï¼Œå¦‚æœè¿”å›å€¼éç©ºåˆ™è¡¨ç¤ºæŸ¥è¯¢æˆåŠŸï¼Œ
-	 *  éœ€è¦è¿›ä¸€æ­¥è°ƒç”¨ db_result å¯¹è±¡ä¸­çš„å‡½æ•°æ¥è·å¾—æŸ¥è¯¢ç»“æœï¼›å¦‚æœè¿”å›
-	 *  NULL åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œéœ€è¦è°ƒç”¨ last_error() è·å¾—å‡ºé”™åŸå› 
+	 * ¸ù¾İÊäÈëµÄË÷ÒıÖµ»ñµÃÊı¾İ
+	 * @param idx_value {const char*} Ë÷ÒıÖµ£¬¶ÔÓ¦ open ´ò¿ªµÄË÷Òı×Ö¶Î
+	 * @return {db_result*} ´æ´¢²éÑ¯½á¹û£¬Èç¹û·µ»ØÖµ·Ç¿ÕÔò±íÊ¾²éÑ¯³É¹¦£¬
+	 *  ĞèÒª½øÒ»²½µ÷ÓÃ db_result ¶ÔÏóÖĞµÄº¯ÊıÀ´»ñµÃ²éÑ¯½á¹û£»Èç¹û·µ»Ø
+	 *  NULL Ôò±íÊ¾³ö´í£¬ĞèÒªµ÷ÓÃ last_error() »ñµÃ³ö´íÔ­Òò
 	 */
 	virtual db_result* get(const char* idx_value);
 
 	/**
-	 * æ ¹æ®è¾“å…¥çš„ç´¢å¼•å€¼åˆ é™¤æ•°æ®ï¼ŒåŒæ—¶åˆ é™¤ä¸è¯¥æ•°æ®ç›¸å…³çš„å…¶å®ƒçš„ç´¢å¼•é¡¹çš„å€¼
-	 * @param idx_value {const char*} å¯¹åº” open ä¸­çš„ç´¢å¼•å­—æ®µçš„ç´¢å¼•å€¼
-	 * @return {bool} è¿”å› false è¡¨ç¤ºå¤±è´¥ï¼ŒåŸå› è¯·è°ƒç”¨ last_error() è·å¾—ï¼Œ
-	 *  åˆ é™¤çš„æ¡æ•°è¯·è°ƒç”¨ affect_count() è·å¾—
+	 * ¸ù¾İÊäÈëµÄË÷ÒıÖµÉ¾³ıÊı¾İ£¬Í¬Ê±É¾³ıÓë¸ÃÊı¾İÏà¹ØµÄÆäËüµÄË÷ÒıÏîµÄÖµ
+	 * @param idx_value {const char*} ¶ÔÓ¦ open ÖĞµÄË÷Òı×Ö¶ÎµÄË÷ÒıÖµ
+	 * @return {bool} ·µ»Ø false ±íÊ¾Ê§°Ü£¬Ô­ÒòÇëµ÷ÓÃ last_error() »ñµÃ£¬
+	 *  É¾³ıµÄÌõÊıÇëµ÷ÓÃ affect_count() »ñµÃ
 	 */
 	virtual bool del(const char* idx_value);
 
 	/**
-	 * åœ¨è°ƒç”¨ set/del æ“ä½œæ—¶è°ƒç”¨æ­¤å‡½æ•°å¯ä»¥è·å¾—æ‰€å½±å“çš„è®°å½•çš„æ¡æ•°ï¼Œå¯¹äº get
-	 * æ“ä½œæ²¡æœ‰å¿…è¦è°ƒç”¨æ­¤å‡½æ•°
-	 * @return {int} è¿”å›å€¼ >= 0 è¡¨ç¤ºå½±å“è®°å½•çš„æ¡æ•°
+	 * ÔÚµ÷ÓÃ set/del ²Ù×÷Ê±µ÷ÓÃ´Ëº¯Êı¿ÉÒÔ»ñµÃËùÓ°ÏìµÄ¼ÇÂ¼µÄÌõÊı£¬¶ÔÓÚ get
+	 * ²Ù×÷Ã»ÓĞ±ØÒªµ÷ÓÃ´Ëº¯Êı
+	 * @return {int} ·µ»ØÖµ >= 0 ±íÊ¾Ó°Ïì¼ÇÂ¼µÄÌõÊı
 	 */
 	virtual size_t affect_count() const;
 
 	/**
-	 * è°ƒç”¨æ­¤å‡½æ•°è·å¾—ä¸Šæ¬¡æ“ä½œçš„é”™è¯¯å·
-	 * @return {db_error_t} é”™è¯¯å·ç±»å‹
+	 * µ÷ÓÃ´Ëº¯Êı»ñµÃÉÏ´Î²Ù×÷µÄ´íÎóºÅ
+	 * @return {db_error_t} ´íÎóºÅÀàĞÍ
 	 */
 	virtual db_error_t last_error() const;
 

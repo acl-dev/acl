@@ -1,4 +1,4 @@
-﻿#ifndef	__GLOBAL_INCLUDE_H__
+#ifndef	__GLOBAL_INCLUDE_H__
 #define	__GLOBAL_INCLUDE_H__
 
 extern char  var_gid_server_addr[];

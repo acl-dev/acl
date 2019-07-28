@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 
 static void handle_connection(acl::socket_stream* conn)
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
 	else
 		printf("listen %s ok\r\n", addr.c_str());
 
-	// 鎺ユ敹涓€涓鎴风杩炴帴
+	// 接收一个客户端连接
 	acl::socket_stream* conn = server.accept();
 	if (conn == NULL)
 	{

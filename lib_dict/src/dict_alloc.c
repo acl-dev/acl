@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "dict.h"
 
 /* dict_default_lookup - trap unimplemented operation */

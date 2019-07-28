@@ -1,4 +1,4 @@
-ï»¿// db_service.cpp : å®šä¹‰æŽ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// db_service.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -48,7 +48,7 @@ private:
 	int   id_;
 };
 
-static acl::string __dbfile("æµ‹è¯•.db");
+static acl::string __dbfile("²âÊÔ.db");
 
 const char* CREATE_TBL =
 "create table group_tbl\r\n"
@@ -112,7 +112,7 @@ int main(void)
 	acl::aio_handle handle;
 	acl::db_service* server = new acl::db_service_sqlite("DB_TEST", __dbfile, 100, 2);
 
-	// ä½¿æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬ 127.0.0.1 çš„åœ°å€
+	// Ê¹ÏûÏ¢·þÎñÆ÷¼àÌý 127.0.0.1 µÄµØÖ·
 	if (server->open(&handle) == false)
 	{
 		delete server;
@@ -128,7 +128,7 @@ int main(void)
 	{
 		query = new myquery(i);
 		sql.format("insert into group_tbl('group_name', 'uvip_tbl')"
-			" values('ä¸­å›½äºº-%d', 'test')", i);
+			" values('ÖÐ¹úÈË-%d', 'test')", i);
 		server->sql_update(sql.c_str(), query);
 	}
 

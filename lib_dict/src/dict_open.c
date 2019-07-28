@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "dict_db.h"
 #include "dict_cdb.h"
 #include "dict_tc.h"

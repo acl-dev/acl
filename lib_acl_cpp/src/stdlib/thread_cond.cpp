@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -76,7 +76,7 @@ bool thread_cond::block_wait(bool locked)
 		logger_error("pthread_cond_wait error %s", last_serror());
 	}
 
-	// å¦‚æžœæœ¬æ–¹æ³•å†…éƒ¨å‰é¢åŠ äº†é”ï¼Œåˆ™æ­¤å¤„éœ€è¦è§£é”
+	// Èç¹û±¾·½·¨ÄÚ²¿Ç°Ãæ¼ÓÁËËø£¬Ôò´Ë´¦ÐèÒª½âËø
 	if (locked_internal && !mutex_->unlock()) {
 		logger_error("mutex unlock error=%s", last_serror());
 		return false;

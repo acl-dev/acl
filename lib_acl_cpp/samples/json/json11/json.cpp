@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 static bool test(const char* in, const char* tag, bool once,
 	acl::string& out, acl::string* left = NULL)

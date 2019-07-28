@@ -1,8 +1,8 @@
-﻿package com.iker.gid;
+package com.iker.gid;
 
 /**
  * @author zsx
- * 璇ョ被涓昏瀹氫箟浜咷ID鐨勯敊璇彿浠ュ強灏嗛敊璇彿杞负瀛楃涓叉弿杩颁俊鎭殑鍐呭
+ * 该类主要定义了GID的错误号以及将错误号转为字符串描述信息的内容
  */
 public final class GidStatus {
 	public static final int gidOk = 200;
@@ -16,7 +16,7 @@ public final class GidStatus {
 	public static final int gidErrSave = 502;
 	
 	/**
-	 * 灏嗛敊璇彿杞负瀛楃涓叉弿杩颁俊鎭�
+	 * 将错误号转为字符串描述信息
 	 * @param gidStatus
 	 * @return String
 	 */

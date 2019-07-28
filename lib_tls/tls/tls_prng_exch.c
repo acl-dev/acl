@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tls_prng_exch 3
  * SUMMARY

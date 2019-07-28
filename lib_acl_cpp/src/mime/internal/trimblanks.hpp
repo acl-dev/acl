@@ -1,4 +1,4 @@
-﻿#ifndef _S_OPTS_H_INCLUDED_
+#ifndef _S_OPTS_H_INCLUDED_
 #define _S_OPTS_H_INCLUDED_
 
 #if !defined(ACL_MIME_DISABLE)

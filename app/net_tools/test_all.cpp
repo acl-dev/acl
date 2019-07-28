@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "rpc/rpc_manager.h"
 #include "ping/ping.h"
 #include "dns/nslookup.h"
@@ -84,17 +84,17 @@ void test_all::start()
 {
 	acl::rpc_request* req;
 
-	// å¯åŠ¨ PING è¿‡ç¨‹
+	// Æô¶¯ PING ¹ı³Ì
 	req = new ping(ip_file_.c_str(), &ping_result_,
 		ping_npkt_, ping_delay_, ping_timeout_, ping_size_);
 	rpc_manager::get_instance().fork(req);
 
-	// å¯åŠ¨ DNS æŸ¥è¯¢è¿‡ç¨‹
+	// Æô¶¯ DNS ²éÑ¯¹ı³Ì
 	req = new nslookup(domain_file_.c_str(), &ns_result_,
 		dns_ip_.c_str(), dns_port_, dns_timeout_);
 	rpc_manager::get_instance().fork(req);
 
-	// å¯åŠ¨é‚®ä»¶å‘é€è¿‡ç¨‹
+	// Æô¶¯ÓÊ¼ş·¢ËÍ¹ı³Ì
 	smtp_client* smtp = new smtp_client();
 	(*smtp).set_callback(&smtp_result_)
 		.add_file(attach_.c_str())
@@ -104,11 +104,11 @@ void test_all::start()
 		.set_account(mail_user_.c_str())
 		.set_passwd(mail_pass_.c_str())
 		.set_from(mail_user_.c_str())
-		.set_subject("é‚®ä»¶å‘é€è¿‡ç¨‹æµ‹è¯•!")
+		.set_subject("ÓÊ¼ş·¢ËÍ¹ı³Ì²âÊÔ!")
 		.add_to(recipients_.c_str());
 	rpc_manager::get_instance().fork(smtp);
 
-	// å¯åŠ¨é‚®ä»¶æ¥æ”¶è¿‡ç¨‹
+	// Æô¶¯ÓÊ¼ş½ÓÊÕ¹ı³Ì
 	pop3_client* pop3 = new pop3_client();
 	(*pop3).set_callback(&pop3_result_)
 		.set_pop3(pop3_addr_.c_str(), pop3_port_)
@@ -139,7 +139,7 @@ void test_all::ping_report(size_t total, size_t curr, size_t nerr)
 		nstep = 0;
 
 	acl::string msg;
-	msg.format("ping è¿‡ç¨‹ %d/%d; failed: %d", curr, total, nerr);
+	msg.format("ping ¹ı³Ì %d/%d; failed: %d", curr, total, nerr);
 	callback_->test_report(msg.c_str(), nstep);
 }
 
@@ -159,7 +159,7 @@ void test_all::nslookup_report(size_t total, size_t curr)
 		nstep;
 
 	acl::string msg;
-	msg.format("å…± %d ä¸ªåŸŸå, å®Œæˆ %d ä¸ªåŸŸå", total, curr);
+	msg.format("¹² %d ¸öÓòÃû, Íê³É %d ¸öÓòÃû", total, curr);
 	callback_->test_report(msg.c_str(), nstep);
 }
 

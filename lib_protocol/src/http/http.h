@@ -1,4 +1,4 @@
-﻿#ifndef	__HTTP_INCLUDE_H__
+#ifndef	__HTTP_INCLUDE_H__
 #define	__HTTP_INCLUDE_H__
 
 #include "http/lib_http_struct.h"

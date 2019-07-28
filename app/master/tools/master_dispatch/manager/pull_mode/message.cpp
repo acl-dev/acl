@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "pull_mode/message.h"
 
 message::message(const acl::string& server)

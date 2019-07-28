@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "redis_request.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)

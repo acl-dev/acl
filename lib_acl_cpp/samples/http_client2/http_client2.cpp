@@ -1,4 +1,4 @@
-ï»¿// http_client2.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// http_client2.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -74,7 +74,7 @@ static void get_url(const char* url, const char* host,
 int main(int argc, char* argv[])
 {
 	(void) argc; (void) argv;
-	acl::acl_cpp_init(); // å¿…é¡»å…ˆåˆå§‹åŒ–
+	acl::acl_cpp_init(); // ±ØĞëÏÈ³õÊ¼»¯
 
 	//const char* url = "http://www.sina.com.cn/";
 	//const char* host = "www.sina.com.cn";

@@ -1,4 +1,4 @@
-﻿#ifndef ERRMSG_INCLUDED
+#ifndef ERRMSG_INCLUDED
 #define ERRMSG_INCLUDED
 
 /* Copyright (C) 2000 MySQL AB

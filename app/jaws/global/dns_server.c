@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "sys_patch.h"
 
 #ifdef ACL_BCB_COMPILER
@@ -9,28 +9,28 @@
 
 #define MSG_SEND	acl_msgio_send
 
-/* DNSæŸ¥è¯¢çº¿ç¨‹å‘ä¸»çº¿ç¨‹å‘é€IOæ¶ˆæ¯ï¼Œå› ä¸ºå¤šä¸ªçº¿ç¨‹éƒ½è¦ç”¨ä¸€ä¸ªæ¶ˆæ¯å¥æŸ„å‘é€æ¶ˆæ¯ï¼Œæ‰€ä»¥éœ€è¦åŠ é” */
+/* DNS²éÑ¯Ïß³ÌÏòÖ÷Ïß³Ì·¢ËÍIOÏûÏ¢£¬ÒòÎª¶à¸öÏß³Ì¶¼ÒªÓÃÒ»¸öÏûÏ¢¾ä±ú·¢ËÍÏûÏ¢£¬ËùÒÔĞèÒª¼ÓËø */
 
 static void reply_lookup_msg(DNS_CTX *dns_ctx, DNS_SERVER *dns)
 {
 	const char *myname = "reply_lookup_msg";
 
-	/* åŠ é” */
+	/* ¼ÓËø */
 	acl_pthread_mutex_lock(&dns->lock);
 
-	/* å‘ä¸»çº¿ç¨‹å‘é€DNSæŸ¥è¯¢ç»“æœæ¶ˆæ¯ */
+	/* ÏòÖ÷Ïß³Ì·¢ËÍDNS²éÑ¯½á¹ûÏûÏ¢ */
 	if (MSG_SEND(dns_ctx->mio, DNS_MSG_LOOKUP_RESULT, dns_ctx, sizeof(DNS_CTX)) < 0) {
 		acl_msg_error("%s: send msg error, domain(%s)", myname, dns_ctx->domain_key);
 	}
 
-	/* è§£é” */
+	/* ½âËø */
 	acl_pthread_mutex_unlock(&dns->lock);
 
-	/* é‡Šæ”¾ç”± msg_lookup å‡½æ•°åˆ†é…çš„å†…å­˜ */
+	/* ÊÍ·ÅÓÉ msg_lookup º¯Êı·ÖÅäµÄÄÚ´æ */
 	acl_myfree(dns_ctx);
 }
 
-/* DNSæŸ¥è¯¢çº¿ç¨‹ï¼ŒæŸ¥åˆ°DNSç»“æœä¼šé€šè¿‡IOæ¶ˆæ¯å°†æ•°æ®ä¼ é€’ç»™éé˜»å¡å¼ä¸»çº¿ç¨‹çš„æ¶ˆæ¯é˜Ÿåˆ— */
+/* DNS²éÑ¯Ïß³Ì£¬²éµ½DNS½á¹û»áÍ¨¹ıIOÏûÏ¢½«Êı¾İ´«µİ¸ø·Ç×èÈûÊ½Ö÷Ïß³ÌµÄÏûÏ¢¶ÓÁĞ */
 
 static void lookup_thread(void *arg)
 {
@@ -59,12 +59,12 @@ static void lookup_thread(void *arg)
 	for (i = 0; i < dns_ctx->ip_cnt; i++) {
 		snprintf(dns_ctx->ip[i], sizeof(dns_ctx->ip[i]), "%s",
 			acl_netdb_index_ip(dns_ctx->dns_db, i));
-		dns_ctx->port[i] = 0; /* å¯¹äºDNSæŸ¥è¯¢åˆ°çš„ç»“æœï¼Œé‡‡ç”¨é»˜è®¤çš„ç«¯å£å· */
+		dns_ctx->port[i] = 0; /* ¶ÔÓÚDNS²éÑ¯µ½µÄ½á¹û£¬²ÉÓÃÄ¬ÈÏµÄ¶Ë¿ÚºÅ */
 	}
 	reply_lookup_msg(dns_ctx, dns);
 }
 
-/* ä¸»çº¿ç¨‹æ¶ˆæ¯å¤„ç†å‡½æ•°: ä¸»çº¿ç¨‹é€šè¿‡æ­¤å‡½æ•°åˆ›å»ºDNSçº¿ç¨‹è¿›è¡ŒDNSæŸ¥è¯¢è¿‡ç¨‹ */
+/* Ö÷Ïß³ÌÏûÏ¢´¦Àíº¯Êı: Ö÷Ïß³ÌÍ¨¹ı´Ëº¯Êı´´½¨DNSÏß³Ì½øĞĞDNS²éÑ¯¹ı³Ì */
 
 static int msg_lookup(int msg_type acl_unused, ACL_MSGIO *mio,
 		  const ACL_MSGIO_INFO *info, void *arg)
@@ -75,14 +75,14 @@ static int msg_lookup(int msg_type acl_unused, ACL_MSGIO *mio,
 	memcpy(dns_ctx, acl_vstring_str(info->body.buf),
 		ACL_VSTRING_LEN(info->body.buf));
 
-	/* è®¾ç½®DNSå¥æŸ„ */
+	/* ÉèÖÃDNS¾ä±ú */
 	dns_ctx->dns = (DNS_SERVER *) arg;
-	/* è®¾ç½®æ¶ˆæ¯å¥æŸ„ï¼Œçº¿ç¨‹æ± ä¸­çš„æŸ¥è¯¢çº¿ç¨‹é€šè¿‡å‘æ­¤å¥æŸ„å‘é€æ¶ˆæ¯ä»¥é€šçŸ¥
-	 * ä¸»çº¿ç¨‹æœ‰å…³DNSçš„æŸ¥è¯¢ç»“æœ 
+	/* ÉèÖÃÏûÏ¢¾ä±ú£¬Ïß³Ì³ØÖĞµÄ²éÑ¯Ïß³ÌÍ¨¹ıÏò´Ë¾ä±ú·¢ËÍÏûÏ¢ÒÔÍ¨Öª
+	 * Ö÷Ïß³ÌÓĞ¹ØDNSµÄ²éÑ¯½á¹û 
 	 */
 	dns_ctx->mio = mio;
 
-	/* åˆ›å»ºå•ç‹¬çš„çº¿ç¨‹è¿›è¡Œé˜»å¡å¼DNSæŸ¥è¯¢è¿‡ç¨‹ */
+	/* ´´½¨µ¥¶ÀµÄÏß³Ì½øĞĞ×èÈûÊ½DNS²éÑ¯¹ı³Ì */
 #ifdef USE_THREAD_POOL
 	acl_pthread_pool_add(dns_ctx->dns->wq, lookup_thread, dns_ctx);
 #else
@@ -92,7 +92,7 @@ static int msg_lookup(int msg_type acl_unused, ACL_MSGIO *mio,
 	return (1);
 }
 
-/* ä¸»çº¿ç¨‹æ¶ˆæ¯å¤„ç†å‡½æ•°: ä¸»çº¿ç¨‹é€šè¿‡æ­¤å‡½æ•°æ¥æ”¶DNSæŸ¥è¯¢çº¿ç¨‹å‘é€çš„DNSæŸ¥è¯¢ç»“æœæ¶ˆæ¯ */
+/* Ö÷Ïß³ÌÏûÏ¢´¦Àíº¯Êı: Ö÷Ïß³ÌÍ¨¹ı´Ëº¯Êı½ÓÊÕDNS²éÑ¯Ïß³Ì·¢ËÍµÄDNS²éÑ¯½á¹ûÏûÏ¢ */
 
 static int msg_lookup_result(int msg_type acl_unused, ACL_MSGIO *mio acl_unused,
 		  const ACL_MSGIO_INFO *info, void *arg)
@@ -100,54 +100,54 @@ static int msg_lookup_result(int msg_type acl_unused, ACL_MSGIO *mio acl_unused,
 	DNS_CTX *dns_ctx;
 	DNS_SERVER *dns = (DNS_SERVER*) arg;
 
-	/* è·å¾—DNSæŸ¥è¯¢çº¿ç¨‹çš„ç»“æœæ¶ˆæ¯ */
+	/* »ñµÃDNS²éÑ¯Ïß³ÌµÄ½á¹ûÏûÏ¢ */
 	dns_ctx = (DNS_CTX *) acl_vstring_str(info->body.buf);
 
-	/* å°†æŸ¥è¯¢ç»“æœæ”¾å…¥DNSç¼“å­˜ä¸­ */
+	/* ½«²éÑ¯½á¹û·ÅÈëDNS»º´æÖĞ */
 	if (dns_ctx->ip_cnt > 0)
 		dns_cache_push(dns->dns_cache, dns_ctx->dns_db);
 
-	/* é‡Šæ”¾ç”± lookup_thread åˆ†é…çš„ dns_db å¯¹è±¡ */
+	/* ÊÍ·ÅÓÉ lookup_thread ·ÖÅäµÄ dns_db ¶ÔÏó */
 	if (dns_ctx->dns_db)
 		acl_netdb_free(dns_ctx->dns_db);
 	dns_ctx->dns_db = NULL;
 
-	/* å›è°ƒè¯·æ±‚ä»»åŠ¡å‡½æ•° */
+	/* »Øµ÷ÇëÇóÈÎÎñº¯Êı */
 	dns_ctx->callback(dns_ctx);
 
 	return (1);
 }
 
-/* åˆ›å»ºDNSæŸ¥è¯¢å¥æŸ„ */
+/* ´´½¨DNS²éÑ¯¾ä±ú */
 
 DNS_SERVER *dns_server_create(ACL_AIO *aio, int timeout)
 {
 	const char *myname = "dns_server_create";
 	DNS_SERVER *dns;
 	int   max_threads = 200;
-	int   idle_timeout = 60 /* æ­¤å€¼ç›®å‰ä¸èµ·ä½œç”¨ï¼Œéœ€è¦ä¿®æ”¹ä¸€ä¸‹ACLåº“æ‰å¯ */;
+	int   idle_timeout = 60 /* ´ËÖµÄ¿Ç°²»Æğ×÷ÓÃ£¬ĞèÒªĞŞ¸ÄÒ»ÏÂACL¿â²Å¿É */;
 
 	if (aio == NULL)
 		acl_msg_fatal("%s(%d): aio null", myname, __LINE__);
 
-	/* acl åº“çš„DNSç¼“å­˜æ¨¡å—éœ€è¦åŠ é”ï¼Œå› ä¸ºæŸ¥è¯¢çº¿ç¨‹æ± éƒ½è¦è®¿é—®è¯¥åŒä¸€èµ„æº
-	 * ä»…è®© acl çš„DNSç¼“å­˜æ¨¡å—çš„ç¼“å­˜æ—¶é—´ä¸º60ç§’ï¼Œå› ä¸ºæœ¬ç¨‹åºæ¨¡å—ä¹Ÿæœ‰ç¼“å­˜æ§åˆ¶
-	 * å› ä¸ºæœ¬ä»£ç è‡ªå·±å·²ç»å®ç°äº†DNSç¼“å­˜ï¼Œæ‰€ä»¥ä¸éœ€è¦ACLåº“çš„DNSç¼“å­˜å¤„ç†
+	/* acl ¿âµÄDNS»º´æÄ£¿éĞèÒª¼ÓËø£¬ÒòÎª²éÑ¯Ïß³Ì³Ø¶¼Òª·ÃÎÊ¸ÃÍ¬Ò»×ÊÔ´
+	 * ½öÈÃ acl µÄDNS»º´æÄ£¿éµÄ»º´æÊ±¼äÎª60Ãë£¬ÒòÎª±¾³ÌĞòÄ£¿éÒ²ÓĞ»º´æ¿ØÖÆ
+	 * ÒòÎª±¾´úÂë×Ô¼ºÒÑ¾­ÊµÏÖÁËDNS»º´æ£¬ËùÒÔ²»ĞèÒªACL¿âµÄDNS»º´æ´¦Àí
 	 * acl_netdb_cache_init(60 , 1);
 	 */
 
 	dns = (DNS_SERVER *) acl_mycalloc(1, sizeof(DNS_SERVER));
 	dns->aio = aio;
-	/* æœ¬åœ°çš„DNSç¼“å­˜æ¨¡å—éœ€è¦åŠ é”ï¼Œå› ä¸ºåªæœ‰ä¸€ä¸ªçº¿ç¨‹è®¿é—®å…¶èµ„æº */
+	/* ±¾µØµÄDNS»º´æÄ£¿éĞèÒª¼ÓËø£¬ÒòÎªÖ»ÓĞÒ»¸öÏß³Ì·ÃÎÊÆä×ÊÔ´ */
 	dns->dns_cache = dns_cache_create(timeout, 0);
 
 
-	/* ç›‘å¬ IO äº‹ä»¶æ¶ˆæ¯ */
+	/* ¼àÌı IO ÊÂ¼şÏûÏ¢ */
 	dns->listener = acl_msgio_listen(aio, NULL);
 	if (dns->listener == NULL)
 		acl_msg_fatal("%s: listen error", myname);
 
-	/* æ³¨å†Œ IO äº‹ä»¶æ¶ˆæ¯åŠå¤„ç†å‡½æ•°ï¼šç”¨äºç›‘å¬æ–°çš„æŸ¥è¯¢è¯·æ±‚ */
+	/* ×¢²á IO ÊÂ¼şÏûÏ¢¼°´¦Àíº¯Êı£ºÓÃÓÚ¼àÌıĞÂµÄ²éÑ¯ÇëÇó */
 	acl_msgio_listen_reg(dns->listener, DNS_MSG_LOOKUP, msg_lookup, dns, 1);
 
 	acl_msgio_addr(dns->listener, dns->addr, sizeof(dns->addr));
@@ -155,13 +155,13 @@ DNS_SERVER *dns_server_create(ACL_AIO *aio, int timeout)
 	if (dns->mio == NULL)
 		acl_msg_fatal("%s: connect server(%s) error", myname, dns->addr);
 
-	/* æ³¨å†Œ IO äº‹ä»¶æ¶ˆæ¯åŠå¤„ç†å‡½æ•°ï¼šç”¨äºå¤„ç†æŸ¥è¯¢çº¿ç¨‹è¿”å›æŸ¥è¯¢ç»“æœ */
+	/* ×¢²á IO ÊÂ¼şÏûÏ¢¼°´¦Àíº¯Êı£ºÓÃÓÚ´¦Àí²éÑ¯Ïß³Ì·µ»Ø²éÑ¯½á¹û */
 	acl_msgio_reg(dns->mio, DNS_MSG_LOOKUP_RESULT, msg_lookup_result, dns);
 
-	/* åˆå§‹åŒ–DNSå…±äº«çº¿ç¨‹é” */
+	/* ³õÊ¼»¯DNS¹²ÏíÏß³ÌËø */
 	acl_pthread_mutex_init(&dns->lock, NULL);
 
-	/* éœ€è¦åˆ›å»ºç‹¬ç«‹çš„çº¿ç¨‹ç¨‹æŸ¥è¯¢DNS(å› ä¸ºæŸ¥è¯¢DNSæ˜¯é˜»å¡å¼æŸ¥è¯¢) */
+	/* ĞèÒª´´½¨¶ÀÁ¢µÄÏß³Ì³Ì²éÑ¯DNS(ÒòÎª²éÑ¯DNSÊÇ×èÈûÊ½²éÑ¯) */
 #ifdef USE_THREAD_POOL
 	dns->wq = acl_thread_pool_create(max_threads, idle_timeout);
 #endif
@@ -169,7 +169,7 @@ DNS_SERVER *dns_server_create(ACL_AIO *aio, int timeout)
 	return (dns);
 }
 
-/* å…³é—­DNSæŸ¥è¯¢å¥æŸ„ */
+/* ¹Ø±ÕDNS²éÑ¯¾ä±ú */
 
 void dns_server_close(DNS_SERVER *dns)
 {
@@ -214,12 +214,12 @@ void dns_server_static_add(DNS_SERVER *dns, const char *map, const char *delim, 
 		acl_netdb_add_addr(dns_db, argv->argv[i], port);
 	}
 
-	/* è®¾ç½®è¶…æ—¶æ—¶é—´ä¸º0ä»è€Œä½¿å…¶æ°¸ä¸è¶…æ—¶ */
+	/* ÉèÖÃ³¬Ê±Ê±¼äÎª0´Ó¶øÊ¹ÆäÓÀ²»³¬Ê± */
 	dns_cache_push_one(dns->dns_cache, dns_db, 0);
 	RETURN;
 }
 
-/* å¼€å§‹æŸ¥è¯¢æŸä¸ªåŸŸå */
+/* ¿ªÊ¼²éÑ¯Ä³¸öÓòÃû */
 
 int dns_server_lookup(DNS_SERVER *dns, const DNS_CTX *ctx)
 {
@@ -228,10 +228,10 @@ int dns_server_lookup(DNS_SERVER *dns, const DNS_CTX *ctx)
 	DNS_CTX dns_ctx;
 	ACL_DNS_DB *dns_db;
 
-	/* åªæ‰€ä»¥é‡‡ç”¨æ­¤æ–¹å¼ï¼Œæ˜¯ä¸ºäº†ä¿è¯ dns_server_lookup å‚æ•° ctxä¸º const ç±»å‹ */
+	/* Ö»ËùÒÔ²ÉÓÃ´Ë·½Ê½£¬ÊÇÎªÁË±£Ö¤ dns_server_lookup ²ÎÊı ctxÎª const ÀàĞÍ */
 	memcpy(&dns_ctx, ctx, sizeof(dns_ctx));
 
-	/* å…ˆæŸ¥è¯¢DNSç¼“å­˜è¡¨ä¸­æ˜¯å¦å­˜åœ¨æœ¬æ¬¡æ‰€æŸ¥åŸŸå */
+	/* ÏÈ²éÑ¯DNS»º´æ±íÖĞÊÇ·ñ´æÔÚ±¾´ÎËù²éÓòÃû */
 	dns_db = dns_cache_lookup(dns->dns_cache, ctx->domain_key);
 	if (dns_db) {
 		ACL_ITER iter;
@@ -249,17 +249,17 @@ int dns_server_lookup(DNS_SERVER *dns, const DNS_CTX *ctx)
 				break;
 		}
 
-		/* å¯¹å·²ç»DNSç¼“å­˜è¡¨ä¸­å·²ç»å­˜åœ¨çš„åŸŸåç›´æ¥è§¦å‘ä»»åŠ¡å›è°ƒè¿‡ç¨‹ */
+		/* ¶ÔÒÑ¾­DNS»º´æ±íÖĞÒÑ¾­´æÔÚµÄÓòÃûÖ±½Ó´¥·¢ÈÎÎñ»Øµ÷¹ı³Ì */
 		dns_ctx.callback(&dns_ctx);
 
-		/* æ­¤å¤„ä¹‹æ‰€ä»¥éœ€è¦é‡Šæ”¾è¯¥å¯¹è±¡ï¼Œæ˜¯å› ä¸º dns_cache_lookup è¿”å›çš„å¯¹è±¡ä¸ºåŠ¨æ€
-		 * åˆ†é…çš„(acl_netdb_clone)
+		/* ´Ë´¦Ö®ËùÒÔĞèÒªÊÍ·Å¸Ã¶ÔÏó£¬ÊÇÒòÎª dns_cache_lookup ·µ»ØµÄ¶ÔÏóÎª¶¯Ì¬
+		 * ·ÖÅäµÄ(acl_netdb_clone)
 		 */
 		acl_netdb_free(dns_db);
 		return (0);
 	}
 
-	/* å‘æŸ¥è¯¢çº¿ç¨‹æ± å‘é€æŸ¥è¯¢æŒ‡ä»¤ */
+	/* Ïò²éÑ¯Ïß³Ì³Ø·¢ËÍ²éÑ¯Ö¸Áî */
 	
 	if (MSG_SEND(mio, DNS_MSG_LOOKUP, &dns_ctx, sizeof(DNS_CTX)) < 0) {
 		acl_msg_error("%s: send msg error, domain(%s)",

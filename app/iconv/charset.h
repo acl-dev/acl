@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class charset_radar
 {
@@ -7,17 +7,17 @@ public:
 	~charset_radar(void);
 
 	/**
-	 * 璇嗗埆缁欏畾瀛楃涓茬殑瀛楃闆�
-	 * @param data 闇€瑕佽瘑鍒殑瀛楃涓�
-	 * @param len  瀛楃涓查暱搴�
-	 * @param charset_result  璇嗗埆鐨勫瓧绗﹂泦
-	 * @return {bool} 鏄惁璇嗗埆鎴愬姛
+	 * 识别给定字符串的字符集
+	 * @param data 需要识别的字符串
+	 * @param len  字符串长度
+	 * @param charset_result  识别的字符集
+	 * @return {bool} 是否识别成功
 	 */
 	bool detact(const char *data, int len, acl::string &charset_result);
 	bool detact(const acl::string &data, acl::string &charset_result);
 
 	/*
-	 * 璁剧疆鏄惁寮€鍚皟璇曟ā寮�
+	 * 设置是否开启调试模式
 	 */
 	void setDebugMode(bool flag)
 	{

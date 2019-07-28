@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "tools.h"
 
 bool tools::get_line(ACL_VSTREAM* fp, acl::string& out)

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 void* __new(size_t n, const char* filename,
 	const char* funcname, int lineno);

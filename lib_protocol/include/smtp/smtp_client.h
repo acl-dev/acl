@@ -1,4 +1,4 @@
-ï»¿#ifndef	__SMTP_CLIENT_INCLUDE_H__
+#ifndef	__SMTP_CLIENT_INCLUDE_H__
 #define	__SMTP_CLIENT_INCLUDE_H__
 
 /* #include "lib_acl.h" */
@@ -40,162 +40,162 @@ typedef struct SMTP_CLIENT {
 } SMTP_CLIENT;
 
 /**
- * è¿œç¨‹è¿æ¥ SMTP æœåŠ¡å™¨
- * @param addr {const char*} SMTP æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šdomain:port
- * @param conn_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´
- * @param rw_timeout {int} IOè¯»å†™è¶…æ—¶æ—¶é—´
- * @param line_limit {int} SMTP ä¼šè¯è¿‡ç¨‹ä¸­æ¯è¡Œçš„æœ€å¤§é•¿åº¦é™åˆ¶
- * @return {SMTP_CLIENT*} è¿æ¥æˆåŠŸè¿”å›éç©ºå€¼ï¼Œå¦åˆ™è¿”å› NULL
+ * Ô¶³ÌÁ¬½Ó SMTP ·şÎñÆ÷
+ * @param addr {const char*} SMTP ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºdomain:port
+ * @param conn_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä
+ * @param rw_timeout {int} IO¶ÁĞ´³¬Ê±Ê±¼ä
+ * @param line_limit {int} SMTP »á»°¹ı³ÌÖĞÃ¿ĞĞµÄ×î´ó³¤¶ÈÏŞÖÆ
+ * @return {SMTP_CLIENT*} Á¬½Ó³É¹¦·µ»Ø·Ç¿ÕÖµ£¬·ñÔò·µ»Ø NULL
  */
 SMTP_API SMTP_CLIENT *smtp_open(const char *addr, int conn_timeout,
 	int rw_timeout, int line_limit);
 
 /**
- * å…³é—­ç”± smtp_open æ‰“å¼€çš„ SMTP è¿æ¥å¹¶é‡Šæ”¾å¯¹è±¡
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
+ * ¹Ø±ÕÓÉ smtp_open ´ò¿ªµÄ SMTP Á¬½Ó²¢ÊÍ·Å¶ÔÏó
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
  */
 SMTP_API void smtp_close(SMTP_CLIENT *client);
 
 /**
- * è·å¾— SMTP æœåŠ¡å™¨çš„æ¬¢è¿ä¿¡æ¯
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * »ñµÃ SMTP ·şÎñÆ÷µÄ»¶Ó­ĞÅÏ¢
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_get_banner(SMTP_CLIENT *client);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ HELO/EHLO å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param name {const char*} æ¡æ‰‹ä¿¡æ¯ï¼Œä¸€èˆ¬ç”¨åŸŸå
- * @param ehlo {int} é 0 æ—¶ä½¿ç”¨ EHLOï¼Œå¦åˆ™ä½¿ç”¨ HELO
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ HELO/EHLO ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param name {const char*} ÎÕÊÖĞÅÏ¢£¬Ò»°ãÓÃÓòÃû
+ * @param ehlo {int} ·Ç 0 Ê±Ê¹ÓÃ EHLO£¬·ñÔòÊ¹ÓÃ HELO
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 
 SMTP_API int smtp_greet(SMTP_CLIENT *client, const char* name, int ehlo);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ HELO å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param helo {const char*} æ¡æ‰‹ä¿¡æ¯ï¼Œä¸€èˆ¬ç”¨åŸŸå
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ HELO ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param helo {const char*} ÎÕÊÖĞÅÏ¢£¬Ò»°ãÓÃÓòÃû
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_helo(SMTP_CLIENT *client, const char *helo);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ EHLO å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param ehlo {const char*} æ¡æ‰‹ä¿¡æ¯ï¼Œä¸€èˆ¬ç”¨åŸŸå
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ EHLO ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param ehlo {const char*} ÎÕÊÖĞÅÏ¢£¬Ò»°ãÓÃÓòÃû
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_ehlo(SMTP_CLIENT *client, const char *ehlo);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€éªŒè¯ä¿¡æ¯
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param user {const char*} SMTP é‚®ä»¶è´¦å·
- * @param pass {const char*} SMTP é‚®ä»¶è´¦å·å¯†ç 
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍÑéÖ¤ĞÅÏ¢
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param user {const char*} SMTP ÓÊ¼şÕËºÅ
+ * @param pass {const char*} SMTP ÓÊ¼şÕËºÅÃÜÂë
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ MAIL FROM å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param from {const char*} å‘é€è€…é‚®ç®±
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ MAIL FROM ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param from {const char*} ·¢ËÍÕßÓÊÏä
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_mail(SMTP_CLIENT *client, const char *from);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ RCPT TO å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param to {const char*} æ¥æ”¶è€…é‚®ç®±
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ RCPT TO ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param to {const char*} ½ÓÊÕÕßÓÊÏä
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_rcpt(SMTP_CLIENT *client, const char *to);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ DATA å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ DATA ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_data(SMTP_CLIENT *client);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€é‚®ä»¶ä½“å†…å®¹ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬å‡½æ•°ç›´è‡³æ•°æ®å‘é€å®Œæ¯•
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param src {const char*} éµå®ˆé‚®ä»¶ MIME ç¼–ç æ ¼å¼çš„é‚®ä»¶ä½“å†…å®¹
- * @param len {size_t} src æ•°æ®é•¿åº¦
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍÓÊ¼şÌåÄÚÈİ£¬¿ÉÒÔÑ­»·µ÷ÓÃ±¾º¯ÊıÖ±ÖÁÊı¾İ·¢ËÍÍê±Ï
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param src {const char*} ×ñÊØÓÊ¼ş MIME ±àÂë¸ñÊ½µÄÓÊ¼şÌåÄÚÈİ
+ * @param len {size_t} src Êı¾İ³¤¶È
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_send(SMTP_CLIENT *client, const char* src, size_t len);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€é‚®ä»¶ä½“å†…å®¹ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬å‡½æ•°ç›´è‡³æ•°æ®å‘é€å®Œæ¯•
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param fmt {const char*} æ ¼å¼å­—ç¬¦ä¸²
- * @param ... å˜å‚
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍÓÊ¼şÌåÄÚÈİ£¬¿ÉÒÔÑ­»·µ÷ÓÃ±¾º¯ÊıÖ±ÖÁÊı¾İ·¢ËÍÍê±Ï
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param fmt {const char*} ¸ñÊ½×Ö·û´®
+ * @param ... ±ä²Î
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_printf(SMTP_CLIENT *client, const char* fmt, ...);
 
 /**
- * å‘é€å®Œé‚®ä»¶å†…å®¹åè°ƒç”¨æœ¬å‡½æ•°å‘Šè¯‰ SMTP æœåŠ¡å™¨é‚®ä»¶æ•°æ®å®Œæ¯•
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * ·¢ËÍÍêÓÊ¼şÄÚÈİºóµ÷ÓÃ±¾º¯Êı¸æËß SMTP ·şÎñÆ÷ÓÊ¼şÊı¾İÍê±Ï
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_data_end(SMTP_CLIENT *client);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€æŒ‡å®šä»¶è·¯å¾„çš„é‚®ä»¶æ–‡ä»¶
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param filepath {const char*} é‚®ä»¶æ–‡ä»¶è·¯å¾„
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍÖ¸¶¨¼şÂ·¾¶µÄÓÊ¼şÎÄ¼ş
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param filepath {const char*} ÓÊ¼şÎÄ¼şÂ·¾¶
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_send_file(SMTP_CLIENT *client, const char *filepath);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ç»™å®šæ–‡ä»¶æµçš„é‚®ä»¶å†…å®¹
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @param int {ACL_VSTREAM*} é‚®ä»¶æ–‡ä»¶è¾“å…¥æµ
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ¸ø¶¨ÎÄ¼şÁ÷µÄÓÊ¼şÄÚÈİ
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @param int {ACL_VSTREAM*} ÓÊ¼şÎÄ¼şÊäÈëÁ÷
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_send_stream(SMTP_CLIENT *client, ACL_VSTREAM *in);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€é€€å‡º(QUIT)å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍÍË³ö(QUIT)ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_quit(SMTP_CLIENT *client);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ NOOP å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ NOOP ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_noop(SMTP_CLIENT *client);
 
 /**
- * å‘ SMTP æœåŠ¡å™¨å‘é€ RSET å‘½ä»¤
- * @param client {SMTP_CLIENT*} SMTP è¿æ¥å¯¹è±¡
- * @return {int} 0 è¡¨ç¤ºæˆåŠŸ(SMTP_CLIENT::smtp_code è¡¨ç¤ºè¿”å›ç ï¼Œ
- *  SMTP_CLIENT::buf å­˜å‚¨å“åº”å†…å®¹)ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™ï¼Œåº”è¯¥å…³é—­è¿æ¥å¯¹è±¡
+ * Ïò SMTP ·şÎñÆ÷·¢ËÍ RSET ÃüÁî
+ * @param client {SMTP_CLIENT*} SMTP Á¬½Ó¶ÔÏó
+ * @return {int} 0 ±íÊ¾³É¹¦(SMTP_CLIENT::smtp_code ±íÊ¾·µ»ØÂë£¬
+ *  SMTP_CLIENT::buf ´æ´¢ÏìÓ¦ÄÚÈİ)£¬·ñÔò±íÊ¾³ö´í£¬Ó¦¸Ã¹Ø±ÕÁ¬½Ó¶ÔÏó
  */
 SMTP_API int smtp_rset(SMTP_CLIENT *client);
 

@@ -1,4 +1,4 @@
-﻿#ifndef __HOOK_CLOSE_H_INCLUDE__
+#ifndef __HOOK_CLOSE_H_INCLUDE__
 #define __HOOK_CLOSE_H_INCLUDE__
 
 #ifdef __cpluplus

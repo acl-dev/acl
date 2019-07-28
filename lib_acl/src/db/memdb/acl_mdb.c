@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -97,7 +97,7 @@ ACL_MDT_NOD *acl_mdb_add(ACL_MDB *mdb, const char *tbl_name,
 		return (NULL);
 	}
 
-	/* ä»Žæ•°æ®åº“ä¸­èŽ·å¾—æ‰€éœ€è¦çš„æ•°æ®ç´¢å¼•è¡¨ */
+	/* ´ÓÊý¾Ý¿âÖÐ»ñµÃËùÐèÒªµÄÊý¾ÝË÷Òý±í */
 	mdt = (ACL_MDT *) acl_htable_find(mdb->tbls, tbl_name);
 	if (mdt == NULL) {
 		acl_msg_error("%s(%d): table no exist, tbl_name(%s)",

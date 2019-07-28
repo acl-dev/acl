@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,30 +6,30 @@
 #include "http/lib_http.h"
 #include "http.h"
 
-/* æ ‡è¯†æ˜¯è¯·æ±‚è¿˜æ˜¯å“åº” */
+/* ±êÊ¶ÊÇÇëÇó»¹ÊÇÏìÓ¦ */
 typedef enum { CTX_TYPE_REQ, CTX_TYPE_RES } ctx_type;
 
 typedef struct HTTP_CHAT_CTX {
-	HTTP_HDR  *hdr;                     /**< é€šç”¨HTTPå¤´(è¯·æ±‚å¤´æˆ–å“åº”å¤´) */
-	ACL_ASTREAM *stream;                /**< æµæŒ‡é’ˆ */
-	int   timeout;                      /**< è¯»å†™è¶…æ—¶æ—¶é—´ï¼Œç§’ */
-	int   chunked;                      /**< æ˜¯å¦æ˜¯å—ä¼ è¾“æ¨¡å¼ */
-	ctx_type type;                      /**< ä»…ä¸ºäº†è°ƒè¯•æ–¹ä¾¿ */
-	int   status;                       /**< å½“å‰æ‰€å¤„IOçŠ¶æ€ */
-#define	CHAT_S_HDR		(1 << 0)    /**< è¯» HTTP å¤´ */
-#define	CHAT_S_CHUNK_HDR        (1 << 1)    /**< è¯» chunk å¤´ */
-#define	CHAT_S_CHUNK_DAT        (1 << 2)    /**< è¯» chunk ä½“ */
-#define	CHAT_S_CHUNK_SEP        (1 << 3)    /**< è¯» chunk ä½“åˆ†éš”è¡Œ */
-#define	CHAT_S_CHUNK_TAL        (1 << 4)    /**< è¯»ç»“æŸå°¾ */
+	HTTP_HDR  *hdr;                     /**< Í¨ÓÃHTTPÍ·(ÇëÇóÍ·»òÏìÓ¦Í·) */
+	ACL_ASTREAM *stream;                /**< Á÷Ö¸Õë */
+	int   timeout;                      /**< ¶ÁĞ´³¬Ê±Ê±¼ä£¬Ãë */
+	int   chunked;                      /**< ÊÇ·ñÊÇ¿é´«ÊäÄ£Ê½ */
+	ctx_type type;                      /**< ½öÎªÁËµ÷ÊÔ·½±ã */
+	int   status;                       /**< µ±Ç°Ëù´¦IO×´Ì¬ */
+#define	CHAT_S_HDR		(1 << 0)    /**< ¶Á HTTP Í· */
+#define	CHAT_S_CHUNK_HDR        (1 << 1)    /**< ¶Á chunk Í· */
+#define	CHAT_S_CHUNK_DAT        (1 << 2)    /**< ¶Á chunk Ìå */
+#define	CHAT_S_CHUNK_SEP        (1 << 3)    /**< ¶Á chunk Ìå·Ö¸ôĞĞ */
+#define	CHAT_S_CHUNK_TAL        (1 << 4)    /**< ¶Á½áÊøÎ² */
 
-	http_off_t   chunk_len;             /**< å½“å‰æ•°æ®å—æ‰€éœ€è¦è¯»çš„æ•°æ®é•¿åº¦(å­—èŠ‚) */
-	http_off_t   read_cnt;              /**< å½“å‰æ•°æ®å—æ‰€è¯»æ•°æ®é•¿åº¦(å­—èŠ‚) */
-	http_off_t   body_len;              /**< æ‰€è¯»åˆ°æ•°æ®ä½“æ€»é•¿åº¦(å­—èŠ‚) */
+	http_off_t   chunk_len;             /**< µ±Ç°Êı¾İ¿éËùĞèÒª¶ÁµÄÊı¾İ³¤¶È(×Ö½Ú) */
+	http_off_t   read_cnt;              /**< µ±Ç°Êı¾İ¿éËù¶ÁÊı¾İ³¤¶È(×Ö½Ú) */
+	http_off_t   body_len;              /**< Ëù¶Áµ½Êı¾İÌå×Ü³¤¶È(×Ö½Ú) */
 	union {
-		HTTP_HDR_NOTIFY  hdr_notify;    /**< æ•°æ®å¤´å›è°ƒå‡½æ•° */
-		HTTP_BODY_NOTIFY body_notify;   /**< æ•°æ®ä½“å›è°ƒå‡½æ•° */
-	} notify;                           /**< å›è°ƒå‡½æ•° */
-	void *arg;                          /**< å›è°ƒå‚æ•° */
+		HTTP_HDR_NOTIFY  hdr_notify;    /**< Êı¾İÍ·»Øµ÷º¯Êı */
+		HTTP_BODY_NOTIFY body_notify;   /**< Êı¾İÌå»Øµ÷º¯Êı */
+	} notify;                           /**< »Øµ÷º¯Êı */
+	void *arg;                          /**< »Øµ÷²ÎÊı */
 } HTTP_CHAT_CTX;
 
 #define	HTTP_LEN_ROUND(_ctx) \
@@ -68,7 +68,7 @@ static void free_ctx_fn(void *ctx)
 
 /*----------------------------------------------------------------------------*/
 
-/* åˆ†æä¸€è¡Œæ•°æ®, æ˜¯å¦æ˜¯ä¸€ä¸ªå®Œæ•´çš„HTTPåè®®å¤´ */
+/* ·ÖÎöÒ»ĞĞÊı¾İ, ÊÇ·ñÊÇÒ»¸öÍêÕûµÄHTTPĞ­ÒéÍ· */
 
 static int hdr_ready(HTTP_HDR *hdr, char *line, int dlen)
 {
@@ -107,7 +107,7 @@ static int hdr_ready(HTTP_HDR *hdr, char *line, int dlen)
 	return HTTP_CHAT_CONTINUE;
 }
 
-/* å¼‚æ­¥è¯»å–ä¸€è¡Œæ•°æ®çš„å›è°ƒå‡½æ•°  */
+/* Òì²½¶ÁÈ¡Ò»ĞĞÊı¾İµÄ»Øµ÷º¯Êı  */
 
 #if 0
 static int hdr_gets_ready(ACL_ASTREAM *astream, void *context,
@@ -196,7 +196,7 @@ static int hdr_can_read(ACL_ASTREAM *astream, void *context)
 	return 0;
 }
 
-/* å¼‚æ­¥è¯»å–ä¸€ä¸ªå®Œæ•´çš„HTTPåè®®å¤´ */
+/* Òì²½¶ÁÈ¡Ò»¸öÍêÕûµÄHTTPĞ­ÒéÍ· */
 
 static void hdr_get_async(ctx_type type, HTTP_HDR *hdr, ACL_ASTREAM *astream,
 	HTTP_HDR_NOTIFY notify, void *arg, int timeout)
@@ -250,7 +250,7 @@ void http_hdr_res_get_async(HTTP_HDR_RES *hdr_res, ACL_ASTREAM *astream,
 
 /*------------------------ read http body data -------------------------------*/
 
-/* å½“è¯»åˆ°å—æ•°æ®ä½“ä¸­çš„æœ€åä¸€ä¸ªåˆ†éš”è¡Œæ—¶çš„å›è°ƒå‡½æ•° */
+/* µ±¶Áµ½¿éÊı¾İÌåÖĞµÄ×îºóÒ»¸ö·Ö¸ôĞĞÊ±µÄ»Øµ÷º¯Êı */
 
 static int chunked_data_endl(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 {
@@ -294,8 +294,8 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 	} else {
 		ret = (int) HTTP_LEN_ROUND(ctx);
 		if (ret <= 0) {
-			/* è¯´æ˜æœ¬æ¬¡ HTTP æ•°æ®å·²ç»è¯»å®Œä¸”é‡åˆ°å¯¹æ–¹å…³é—­
-			 * æˆ–å¯¹æ–¹å‘æ¥äº†å¤šä½™çš„æ•°æ®ï¼Œæ‰€ä»¥éœ€è¦è¿”å› -1
+			/* ËµÃ÷±¾´Î HTTP Êı¾İÒÑ¾­¶ÁÍêÇÒÓöµ½¶Ô·½¹Ø±Õ
+			 * »ò¶Ô·½·¢À´ÁË¶àÓàµÄÊı¾İ£¬ËùÒÔĞèÒª·µ»Ø -1
 			 */
 			DISABLE_READ(astream);
 			if (notify(HTTP_CHAT_OK, NULL, 0, arg) < 0) {
@@ -320,10 +320,10 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 
 	if (ctx->chunk_len > 0 && ctx->read_cnt >= ctx->chunk_len) {
 		if (!ctx->chunked) {
-			/* å¦‚æœè¯»åˆ°å®Œäº†æ•´å—æ•°æ®ä¸”é CHUNK ä¼ è¾“ï¼Œ
-			 * åˆ™è®¤ä¸ºè¯»å®Œ HTTP å“åº”
+			/* Èç¹û¶Áµ½ÍêÁËÕû¿éÊı¾İÇÒ·Ç CHUNK ´«Êä£¬
+			 * ÔòÈÏÎª¶ÁÍê HTTP ÏìÓ¦
 			 */
-			/* xxx: ç¦æ­¢è¿ç»­è¯» */
+			/* xxx: ½ûÖ¹Á¬Ğø¶Á */
 			DISABLE_READ(astream);
 			if (notify(HTTP_CHAT_OK, data, dlen, arg) < 0) {
 				return -1;
@@ -331,7 +331,7 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 			return 1;
 		}
 
-		/* å¯¹äº chunk ä¼ è¾“ï¼Œè¯»å®Œæœ¬æ•°æ®å— */
+		/* ¶ÔÓÚ chunk ´«Êä£¬¶ÁÍê±¾Êı¾İ¿é */
 		if (notify(HTTP_CHAT_DATA, data, dlen, arg) < 0) {
 			return -1;
 		}
@@ -340,7 +340,7 @@ static int chunked_data(ACL_ASTREAM *astream, HTTP_CHAT_CTX *ctx)
 		 * printf(">>%s: chunk_len=%d, read=%d\r\n", __FUNCTION__,
 		 *	(int) ctx->chunk_len, (int) ctx->read_cnt);
 		 */
-		/* è®¾ç½®æ ‡å¿—ä½å¼€å§‹è¯»å–å—æ•°æ®ä½“çš„åˆ†éš”è¡Œæ•°æ® */
+		/* ÉèÖÃ±êÖ¾Î»¿ªÊ¼¶ÁÈ¡¿éÊı¾İÌåµÄ·Ö¸ôĞĞÊı¾İ */
 		ctx->status = CHAT_S_CHUNK_SEP;
 		return 0;
 	}

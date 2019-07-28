@@ -1,4 +1,4 @@
-﻿#ifndef	__HTTP_SERVICE_INCLUDE_H__
+#ifndef	__HTTP_SERVICE_INCLUDE_H__
 #define	__HTTP_SERVICE_INCLUDE_H__
 
 #include "lib_acl.h"

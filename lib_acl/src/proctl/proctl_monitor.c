@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -12,7 +12,7 @@
 #include <windows.h>
 #include "proctl_internal.h"
 
-/* è¿æ¥æŸä¸ªæœåŠ¡è¿›ç¨‹çš„ç›‘å¬æ¥å£ï¼Œå‘é€åœæ­¢æ¶ˆæ¯ */
+/* Á¬½ÓÄ³¸ö·şÎñ½ø³ÌµÄ¼àÌı½Ó¿Ú£¬·¢ËÍÍ£Ö¹ÏûÏ¢ */
 static void proctl_monitor_stop_service(ACL_VSTREAM *client,
 	const char *filepath, const char *args)
 {
@@ -70,7 +70,7 @@ static void proctl_monitor_stop_service(ACL_VSTREAM *client,
 	acl_vstream_close(stream);
 }
 
-/* åœæ­¢æ‰€æœ‰æœåŠ¡è¿›ç¨‹ */
+/* Í£Ö¹ËùÓĞ·şÎñ½ø³Ì */
 static void proctl_monitor_stop_all_service(ACL_VSTREAM *client)
 {
 	ACL_ARGV *service_argv;
@@ -89,7 +89,7 @@ static void proctl_monitor_stop_all_service(ACL_VSTREAM *client)
 	proctl_service_free_all(service_argv);
 }
 
-/* åœæ­¢æŸä¸ªæœåŠ¡è¿›ç¨‹ */
+/* Í£Ö¹Ä³¸ö·şÎñ½ø³Ì */
 static int proctl_monitor_cmd_stop(ACL_VSTREAM *client,
 	const char *filepath, const char *args)
 {
@@ -118,7 +118,7 @@ static int proctl_monitor_cmd_stop(ACL_VSTREAM *client,
 	return (0);
 }
 
-/* é€šçŸ¥ä¸»çº¿ç¨‹ï¼Œå¯åŠ¨ä¸€ä¸ªæœåŠ¡ */
+/* Í¨ÖªÖ÷Ïß³Ì£¬Æô¶¯Ò»¸ö·şÎñ */
 static int proctl_monitor_cmd_start(ACL_VSTREAM *client,
 	const char *filepath, const char *args)
 {
@@ -156,7 +156,7 @@ static int proctl_monitor_cmd_start(ACL_VSTREAM *client,
 	return (0);
 }
 
-/* åœæ­¢æ‰€æœ‰çš„æœåŠ¡ï¼Œå¹¶é€€å‡ºæ•´ä¸ªæ§åˆ¶è¿›ç¨‹ */
+/* Í£Ö¹ËùÓĞµÄ·şÎñ£¬²¢ÍË³öÕû¸ö¿ØÖÆ½ø³Ì */
 static void proctl_monitor_cmd_quit(ACL_VSTREAM *client)
 {
 	const char *myname = "proctl_monitor_cmd_quit";
@@ -220,7 +220,7 @@ static void usage(ACL_VSTREAM *client)
 		"|-f|filepath|-a|args");
 }
 
-/* æ§åˆ¶è¿›ç¨‹çš„ç›‘å¬çº¿ç¨‹å¤„ç†å‘½ä»¤æ€»å…¥å£ */
+/* ¿ØÖÆ½ø³ÌµÄ¼àÌıÏß³Ì´¦ÀíÃüÁî×ÜÈë¿Ú */
 static int proctl_monitor_main(ACL_VSTREAM *client, int argc, char *argv[])
 {
 	const char *myname = "proctl_monitor_main";

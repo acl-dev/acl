@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 struct stop_req_t;
 struct stop_res_t;

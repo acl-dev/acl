@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_servlet.h"
 
 http_servlet::http_servlet(void)
@@ -16,10 +16,10 @@ bool http_servlet::doUnknown(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (res.sendHeader() == false)
 		return false;
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -34,9 +34,9 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
-	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
-	// memcached æœåŠ¡æ­£å¸¸å·¥ä½œ
+	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
+	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
+	// memcached ·şÎñÕı³£¹¤×÷
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0)
@@ -44,7 +44,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	// å¦‚æœéœ€è¦å–å¾—æµè§ˆå™¨ cookie è¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Š
+	// Èç¹ûĞèÒªÈ¡µÃä¯ÀÀÆ÷ cookie Çë´ò¿ªÏÂÃæ×¢ÊÍ
 	/*
 	const char* mycookie = req.getCookieValue("mycookie");
 	if (mycookie == NULL)
@@ -54,7 +54,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	const char* param1 = req.getParameter("name1");
 	const char* param2 = req.getParameter("name2");
 
-	// åˆ›å»º xml æ ¼å¼çš„æ•°æ®ä½“
+	// ´´½¨ xml ¸ñÊ½µÄÊı¾İÌå
 	acl::xml1 body;
 	body.get_root()
 		.add_child("root", true)
@@ -71,13 +71,13 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	bool keep_alive = req.isKeepAlive();
 
-	res.setContentType("text/xml; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
-		.setKeepAlive(keep_alive)		// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
+	res.setContentType("text/xml; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
+		.setKeepAlive(keep_alive)		// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
 		.setContentLength(buf.size())
-		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
+		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
 
-	// å‘é€ http å“åº”ä½“ï¼Œå› ä¸ºè®¾ç½®äº† chunk ä¼ è¾“æ¨¡å¼ï¼Œæ‰€ä»¥éœ€è¦å¤šè°ƒç”¨ä¸€æ¬¡
-	// res.write ä¸”ä¸¤ä¸ªå‚æ•°å‡ä¸º 0 ä»¥è¡¨ç¤º chunk ä¼ è¾“æ•°æ®ç»“æŸ
+	// ·¢ËÍ http ÏìÓ¦Ìå£¬ÒòÎªÉèÖÃÁË chunk ´«ÊäÄ£Ê½£¬ËùÒÔĞèÒª¶àµ÷ÓÃÒ»´Î
+	// res.write ÇÒÁ½¸ö²ÎÊı¾ùÎª 0 ÒÔ±íÊ¾ chunk ´«ÊäÊı¾İ½áÊø
 	bool ret = res.write(buf) && res.write(NULL, 0) && keep_alive;
 	printf(">>>ret: %s\r\n", ret ? "ok":"err");
 	return ret;

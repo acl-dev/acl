@@ -1,9 +1,9 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_servlet.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈÝÏî
 
 char *var_cfg_redis_servers;
 acl::master_str_tbl var_conf_str_tab[] = {
@@ -73,7 +73,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 		conn->sock_handle());
 	conn->set_rw_timeout(0);
 
-	// ä½¿ç”¨ redis é›†ç¾¤æ¥å­˜å‚¨ session
+	// Ê¹ÓÃ redis ¼¯ÈºÀ´´æ´¢ session
 	http_servlet* servlet = new http_servlet(*session_server,
 			var_cfg_max_threads);
 	conn->set_ctx(servlet);
@@ -108,7 +108,7 @@ void master_service::thread_on_exit()
 
 void master_service::proc_on_init()
 {
-	// åˆ›å»º redis é›†ç¾¤å®¢æˆ·ç«¯å¯¹è±¡ï¼Œå¹¶ä½¿ç”¨ redis é›†ç¾¤æ¥å­˜å‚¨ session
+	// ´´½¨ redis ¼¯Èº¿Í»§¶Ë¶ÔÏó£¬²¢Ê¹ÓÃ redis ¼¯ÈºÀ´´æ´¢ session
 	session_server = new acl::redis_client_cluster;
 	session_server->init(NULL, var_cfg_redis_servers, var_cfg_max_threads);
 }

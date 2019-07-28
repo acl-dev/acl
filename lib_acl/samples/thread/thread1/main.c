@@ -1,4 +1,4 @@
-﻿
+
 #include "stdlib/acl_define_unix.h"
 #ifdef ACL_UNIX
 # ifndef	_GNU_SOURCE

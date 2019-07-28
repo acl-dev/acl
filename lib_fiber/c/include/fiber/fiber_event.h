@@ -1,4 +1,4 @@
-﻿#ifndef FIBER_EVENT_INCLUDE_H
+#ifndef FIBER_EVENT_INCLUDE_H
 #define FIBER_EVENT_INCLUDE_H
 
 #include "fiber_define.h"

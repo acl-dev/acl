@@ -1,4 +1,4 @@
-﻿
+
 #ifndef ACL_CLIENT_ONLY
 
 static const unsigned short __ft2jt_tab[] = {

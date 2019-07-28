@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_DEBUG_INCLUDE_H
+#ifndef ACL_DEBUG_INCLUDE_H
 #define	ACL_DEBUG_INCLUDE_H
 
 #include "acl_define.h"
@@ -8,44 +8,44 @@
 extern "C" {
 #endif
 
-#define	ACL_DEBUG_INTER_BASE    0  /**< æœ€å°è°ƒè¯•æ ‡ç­¾å€¼ */
-#define	ACL_DEBUG_WQ            (ACL_DEBUG_INTER_BASE + 1)  /**< ACL_WORKQ è°ƒè¯•æ ‡ç­¾ */
-#define ACL_DEBUG_PROCTL        (ACL_DEBUG_INTER_BASE + 2)  /**< ACL_PROCTL è°ƒè¯•æ ‡ç­¾ */
-#define ACL_DEBUG_THR_POOL      (ACL_DEBUG_INTER_BASE + 3)  /**< ACL_PTHREAD_POOL è°ƒè¯•æ ‡ç­¾ */
-#define	ACL_DEBUG_EVENT		(ACL_DEBUG_INTER_BASE + 4)  /**< ACL_EVENT è°ƒåº¦æ ‡ç­¾ */
+#define	ACL_DEBUG_INTER_BASE    0  /**< ×îÐ¡µ÷ÊÔ±êÇ©Öµ */
+#define	ACL_DEBUG_WQ            (ACL_DEBUG_INTER_BASE + 1)  /**< ACL_WORKQ µ÷ÊÔ±êÇ© */
+#define ACL_DEBUG_PROCTL        (ACL_DEBUG_INTER_BASE + 2)  /**< ACL_PROCTL µ÷ÊÔ±êÇ© */
+#define ACL_DEBUG_THR_POOL      (ACL_DEBUG_INTER_BASE + 3)  /**< ACL_PTHREAD_POOL µ÷ÊÔ±êÇ© */
+#define	ACL_DEBUG_EVENT		(ACL_DEBUG_INTER_BASE + 4)  /**< ACL_EVENT µ÷¶È±êÇ© */
 
 /**
- * æ—¥å¿—è°ƒè¯•å®æŽ¥å£
- * @param SECTION {int} è°ƒè¯•æ ‡ç­¾å€¼
- * @param LEVEL {int} å¯¹åº”äºŽSECTIONè°ƒè¯•æ ‡ç­¾çš„çº§åˆ«
+ * ÈÕÖ¾µ÷ÊÔºê½Ó¿Ú
+ * @param SECTION {int} µ÷ÊÔ±êÇ©Öµ
+ * @param LEVEL {int} ¶ÔÓ¦ÓÚSECTIONµ÷ÊÔ±êÇ©µÄ¼¶±ð
  */
 #define acl_debug(SECTION, LEVEL) \
 	!acl_do_debug((SECTION), (LEVEL)) ? (void) 0 : acl_msg_info
 
 /**
- * é‡Šæ”¾å†…éƒ¨ä¸€äº›å†…å­˜ç­‰èµ„æº
+ * ÊÍ·ÅÄÚ²¿Ò»Ð©ÄÚ´æµÈ×ÊÔ´
  */
 ACL_API void acl_debug_end(void);
 
 /**
- * åˆå§‹åŒ–æ—¥å¿—è°ƒè¯•è°ƒç”¨æŽ¥å£
- * @param ptr {const char*} è°ƒè¯•æ ‡ç­¾åŠçº§åˆ«å­—ç¬¦ä¸²ï¼Œ
- *  æ ¼å¼: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
+ * ³õÊ¼»¯ÈÕÖ¾µ÷ÊÔµ÷ÓÃ½Ó¿Ú
+ * @param ptr {const char*} µ÷ÊÔ±êÇ©¼°¼¶±ð×Ö·û´®£¬
+ *  ¸ñÊ½: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
  */
 ACL_API void acl_debug_init(const char *ptr);
 
 /**
- * åˆå§‹åŒ–æ—¥å¿—è°ƒè¯•è°ƒç”¨æŽ¥å£
- * @param ptr {const char*} è°ƒè¯•æ ‡ç­¾åŠçº§åˆ«å­—ç¬¦ä¸²ï¼Œ
- *  æ ¼å¼: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
- * @param max_debug_level {int} æœ€å¤§è°ƒè¯•æ ‡ç­¾å€¼
+ * ³õÊ¼»¯ÈÕÖ¾µ÷ÊÔµ÷ÓÃ½Ó¿Ú
+ * @param ptr {const char*} µ÷ÊÔ±êÇ©¼°¼¶±ð×Ö·û´®£¬
+ *  ¸ñÊ½: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
+ * @param max_debug_level {int} ×î´óµ÷ÊÔ±êÇ©Öµ
  */
 ACL_API void acl_debug_init2(const char *ptr, int max_debug_level);
 
 /**
- * åˆ¤æ–­ç»™å®šæ ‡ç­¾çš„çº§åˆ«æ˜¯å¦åœ¨æ—¥å¿—è¾“å‡ºæ¡ä»¶èŒƒå›´å†…
- * @param section {int} æ ‡ç­¾å€¼
- * @param level {int} çº§åˆ«å€¼
+ * ÅÐ¶Ï¸ø¶¨±êÇ©µÄ¼¶±ðÊÇ·ñÔÚÈÕÖ¾Êä³öÌõ¼þ·¶Î§ÄÚ
+ * @param section {int} ±êÇ©Öµ
+ * @param level {int} ¼¶±ðÖµ
  */
 ACL_API int acl_do_debug(int section, int level);
 

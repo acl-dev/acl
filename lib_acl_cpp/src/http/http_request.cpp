@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -31,7 +31,7 @@ namespace acl
 http_request::http_request(socket_stream* client, int conn_timeout /* = 60 */,
 	bool unzip /* = true */, bool stream_fixed /* = false */)
 {
-	// è®¾ç½®è§£å‹å‚æ•°
+	// ÉèÖÃ½âÑ¹²ÎÊı
 	client_ = NEW http_client(client, true, unzip, stream_fixed);
 
 	unzip_            = unzip;
@@ -179,7 +179,7 @@ http_client* http_request::get_client(void) const
 bool http_request::write_head()
 {
 #if 0
-	// å¿…é¡»ä¿è¯è¯¥è¿æ¥å·²ç»æ‰“å¼€
+	// ±ØĞë±£Ö¤¸ÃÁ¬½ÓÒÑ¾­´ò¿ª
 	if (client_ == NULL) {
 		logger_error("connection not opened!");
 		return false;
@@ -190,7 +190,7 @@ bool http_request::write_head()
 	http_method_t method = header_.get_method();
 
 	while (true) {
-		// å°è¯•æ‰“å¼€è¿œç¨‹è¿æ¥
+		// ³¢ÊÔ´ò¿ªÔ¶³ÌÁ¬½Ó
 		if (try_open(&reuse_conn) == false) {
 			logger_error("connect server error");
 			need_retry_ = false;
@@ -198,13 +198,13 @@ bool http_request::write_head()
 
 		}
 
-		// å¦‚æœæ˜¯æ–°åˆ›å»ºçš„è¿æ¥ï¼Œåˆ™ä¸éœ€é‡è¯•
+		// Èç¹ûÊÇĞÂ´´½¨µÄÁ¬½Ó£¬Ôò²»ĞèÖØÊÔ
 		if (!reuse_conn) {
 			need_retry_ = false;
 		}
 
-		// å¦‚æœè¯·æ±‚æ–¹æ³•é GET/PURGE/HEAD/DELETE/CONNECTï¼Œ
-		// åˆ™éœ€è¦é¦–å…ˆæ¢æµ‹ä¸€ä¸‹è¿æ¥æ˜¯å¦æ­£å¸¸
+		// Èç¹ûÇëÇó·½·¨·Ç GET/PURGE/HEAD/DELETE/CONNECT£¬
+		// ÔòĞèÒªÊ×ÏÈÌ½²âÒ»ÏÂÁ¬½ÓÊÇ·ñÕı³£
 		if (method != HTTP_METHOD_GET
 			&& method != HTTP_METHOD_PURGE
 			&& method != HTTP_METHOD_HEAD
@@ -213,15 +213,15 @@ bool http_request::write_head()
 			&& method != HTTP_METHOD_CONNECT
 			&& !client_->get_stream().alive()) {
 
-			/* å› ä¸ºç³»ç»Ÿ write API æˆåŠŸå¹¶ä¸èƒ½ä¿è¯è¿æ¥æ­£å¸¸ï¼Œæ‰€ä»¥åªèƒ½
-			 * æ˜¯è°ƒç”¨ç³»ç»Ÿ read API æ¥æ¢æµ‹è¿æ¥æ˜¯å¦æ­£å¸¸ï¼Œè¯¥å‡½æ•°å†…éƒ¨
-			 * ä¼šå°†å¥—æ¥å£å…ˆè½¬éé˜»å¡å¥—æ¥å£è¿›è¡Œè¯»æ“ä½œï¼Œæ‰€ä»¥ä¸ä¼šé˜»å¡ï¼Œ
-			 * åŒæ—¶å³ä½¿æœ‰æ•°æ®è¯»åˆ°ä¹Ÿä¼šå…ˆæ”¾åˆ° ACL_VSTREAM è¯»ç¼“å†²ä¸­ï¼Œ
-			 * æ‰€ä»¥ä¹Ÿä¸ä¼šä¸¢å¤±æ•°æ®
+			/* ÒòÎªÏµÍ³ write API ³É¹¦²¢²»ÄÜ±£Ö¤Á¬½ÓÕı³££¬ËùÒÔÖ»ÄÜ
+			 * ÊÇµ÷ÓÃÏµÍ³ read API À´Ì½²âÁ¬½ÓÊÇ·ñÕı³££¬¸Ãº¯ÊıÄÚ²¿
+			 * »á½«Ì×½Ó¿ÚÏÈ×ª·Ç×èÈûÌ×½Ó¿Ú½øĞĞ¶Á²Ù×÷£¬ËùÒÔ²»»á×èÈû£¬
+			 * Í¬Ê±¼´Ê¹ÓĞÊı¾İ¶Áµ½Ò²»áÏÈ·Åµ½ ACL_VSTREAM ¶Á»º³åÖĞ£¬
+			 * ËùÒÔÒ²²»»á¶ªÊ§Êı¾İ
 			 */
 			close();
 
-			// å¯¹äºæ–°åˆ›å»ºçš„è¿æ¥ï¼Œåˆ™ç›´æ¥æŠ¥é”™
+			// ¶ÔÓÚĞÂ´´½¨µÄÁ¬½Ó£¬ÔòÖ±½Ó±¨´í
 			if (!reuse_conn) {
 				logger_error("new connection error");
 				return false;
@@ -231,9 +231,9 @@ bool http_request::write_head()
 			continue;
 		}
 
-		client_->reset();  // é‡ç½®çŠ¶æ€
+		client_->reset();  // ÖØÖÃ×´Ì¬
 
-		// å‘é€ HTTP è¯·æ±‚å¤´
+		// ·¢ËÍ HTTP ÇëÇóÍ·
 		if (client_->write_head(header_)) {
 			return true;
 		}
@@ -244,7 +244,7 @@ bool http_request::write_head()
 			return false;
 		}
 
-		// å…ˆå–æ¶ˆé‡è¯•æ ‡å¿—ä½ï¼Œç„¶åå†é‡è¯•ä¸€æ¬¡
+		// ÏÈÈ¡ÏûÖØÊÔ±êÖ¾Î»£¬È»ºóÔÙÖØÊÔÒ»´Î
 		need_retry_ = false;
 	}
 }
@@ -257,29 +257,29 @@ bool http_request::write_body(const void* data, size_t len)
 				return false;
 			}
 
-			// å–æ¶ˆé‡è¯•æ ‡å¿—ä½
+			// È¡ÏûÖØÊÔ±êÖ¾Î»
 			need_retry_ = false;
 
-			// å†é‡è¯•ä¸€æ¬¡
+			// ÔÙÖØÊÔÒ»´Î
 			if (write_head() == false) {
 				return false;
 			}
 
-			// å†æ¬¡å†™æ•°æ®ä½“
+			// ÔÙ´ÎĞ´Êı¾İÌå
 			continue;
 		}
 
-		// è¯´æ˜è‡³å°‘å·²ç»ä¸¤æ¬¡å†™æ“ä½œäº†ï¼Œæ‰€ä»¥åº”è¯¥å–æ¶ˆé‡è¯•æ ‡å¿—ä½
+		// ËµÃ÷ÖÁÉÙÒÑ¾­Á½´ÎĞ´²Ù×÷ÁË£¬ËùÒÔÓ¦¸ÃÈ¡ÏûÖØÊÔ±êÖ¾Î»
 		need_retry_ = false;
 
-		// å¦‚æœæ•°æ®éç©ºï¼Œåˆ™è¯´æ˜è¿˜æœ‰æ•°æ®å¯å†™
+		// Èç¹ûÊı¾İ·Ç¿Õ£¬ÔòËµÃ÷»¹ÓĞÊı¾İ¿ÉĞ´
 		if (data != NULL && len > 0) {
 			return true;
 		}
 
-		// data == NULL || len == 0 æ—¶ï¼Œè¡¨ç¤ºè¯·æ±‚æ•°æ®
-		// å·²ç»å‘é€å®Œæ¯•ï¼Œå¼€å§‹ä»æœåŠ¡ç«¯è¯»å– HTTP å“åº”æ•°æ®
-		// è¯» HTTP å“åº”å¤´
+		// data == NULL || len == 0 Ê±£¬±íÊ¾ÇëÇóÊı¾İ
+		// ÒÑ¾­·¢ËÍÍê±Ï£¬¿ªÊ¼´Ó·şÎñ¶Ë¶ÁÈ¡ HTTP ÏìÓ¦Êı¾İ
+		// ¶Á HTTP ÏìÓ¦Í·
 		if (client_->read_head() == true) {
 			break;
 		}
@@ -287,13 +287,13 @@ bool http_request::write_body(const void* data, size_t len)
 		return false;
 	}
 
-	// è¯´æ˜æ‰€æœ‰æ•°æ®å·²ç»å‘é€å®Œæ¯•ï¼Œå¹¶ä¸”æˆåŠŸè¯»å–äº† HTTP å“åº”å¤´ï¼Œ
-	// ä¸‹é¢å¯ä»¥è¯»å– HTTP å“åº”æ•°æ®ä½“äº†
+	// ËµÃ÷ËùÓĞÊı¾İÒÑ¾­·¢ËÍÍê±Ï£¬²¢ÇÒ³É¹¦¶ÁÈ¡ÁË HTTP ÏìÓ¦Í·£¬
+	// ÏÂÃæ¿ÉÒÔ¶ÁÈ¡ HTTP ÏìÓ¦Êı¾İÌåÁË
 
-	// è®¾ç½®å­—ç¬¦é›†è½¬æ¢å™¨
+	// ÉèÖÃ×Ö·û¼¯×ª»»Æ÷
 	set_charset_conv();
 
-	// æ£€æŸ¥è¿”å›å¤´ä¸­æ˜¯å¦æœ‰ Content-Range å­—æ®µ
+	// ¼ì²é·µ»ØÍ·ÖĞÊÇ·ñÓĞ Content-Range ×Ö¶Î
 	check_range();
 
 	return true;
@@ -301,20 +301,20 @@ bool http_request::write_body(const void* data, size_t len)
 
 bool http_request::send_request(const void* data, size_t len)
 {
-	// å¿…é¡»ä¿è¯è¯¥è¿æ¥å·²ç»æ‰“å¼€
+	// ±ØĞë±£Ö¤¸ÃÁ¬½ÓÒÑ¾­´ò¿ª
 	if (client_ == NULL) {
 		return false;
 	}
 
-	client_->reset();  // é‡ç½®çŠ¶æ€
+	client_->reset();  // ÖØÖÃ×´Ì¬
 
-	// å†™ HTTP è¯·æ±‚å¤´
+	// Ğ´ HTTP ÇëÇóÍ·
 	if (client_->write_head(header_) == false) {
 		close();
 		return false;
 	}
 
-	// å†™ HTTP è¯·æ±‚ä½“
+	// Ğ´ HTTP ÇëÇóÌå
 	if (client_->write_body(data, len) == false) {
 		close();
 		return false;
@@ -329,14 +329,14 @@ bool http_request::request(const void* data, size_t len)
 	bool  reuse_conn;
 	http_method_t method = header_.get_method();
 
-	// æ„å»º HTTP è¯·æ±‚å¤´
+	// ¹¹½¨ HTTP ÇëÇóÍ·
 	if (data && len > 0) {
 		header_.set_content_length(len);
 
 		if (method != HTTP_METHOD_POST && method != HTTP_METHOD_PUT
 			&& method != HTTP_METHOD_PATCH) {
 
-			// åœ¨æœ‰æ•°æ®ä½“çš„æ¡ä»¶ä¸‹ï¼Œé‡æ–°è®¾ç½® HTTP è¯·æ±‚æ–¹æ³•
+			// ÔÚÓĞÊı¾İÌåµÄÌõ¼şÏÂ£¬ÖØĞÂÉèÖÃ HTTP ÇëÇó·½·¨
 			header_.set_method(HTTP_METHOD_POST);
 		}
 	} else if (method == HTTP_METHOD_POST || method == HTTP_METHOD_PUT) {
@@ -344,27 +344,27 @@ bool http_request::request(const void* data, size_t len)
 	}
 
 	while (true) {
-		// å°è¯•æ‰“å¼€è¿œç¨‹è¿æ¥
+		// ³¢ÊÔ´ò¿ªÔ¶³ÌÁ¬½Ó
 		if (try_open(&reuse_conn) == false) {
 			logger_error("connect server error");
 			return false;
 		}
 
-		// å‘é€ HTTP è¯·æ±‚è‡³æœåŠ¡å™¨
+		// ·¢ËÍ HTTP ÇëÇóÖÁ·şÎñÆ÷
 		if (send_request(data, len) == false) {
 			if (have_retried || !reuse_conn) {
 				logger_error("send request error");
 				return false;
 			}
 
-			// å¯¹äºé•¿è¿æ¥ï¼Œå¦‚æœæ˜¯ç¬¬ä¸€æ¬¡IOå¤±è´¥ï¼Œåˆ™å¯ä»¥å†é‡è¯•ä¸€æ¬¡
+			// ¶ÔÓÚ³¤Á¬½Ó£¬Èç¹ûÊÇµÚÒ»´ÎIOÊ§°Ü£¬Ôò¿ÉÒÔÔÙÖØÊÔÒ»´Î
 			have_retried = true;
 			continue;
 		}
 
-		client_->reset();  // é‡ç½®çŠ¶æ€
+		client_->reset();  // ÖØÖÃ×´Ì¬
 
-		// è¯» HTTP å“åº”å¤´
+		// ¶Á HTTP ÏìÓ¦Í·
 		if (client_->read_head() == true) {
 			break;
 		}
@@ -375,17 +375,17 @@ bool http_request::request(const void* data, size_t len)
 			return false;
 		}
 
-		// å…ˆå…³é—­ä¹‹å‰çš„è¿æ¥æµ
+		// ÏÈ¹Ø±ÕÖ®Ç°µÄÁ¬½ÓÁ÷
 		close();
 
-		// å¯¹äºé•¿è¿æ¥ï¼Œå¦‚æœæ˜¯ç¬¬ä¸€æ¬¡IOå¤±è´¥ï¼Œåˆ™å¯ä»¥å†é‡è¯•ä¸€æ¬¡
+		// ¶ÔÓÚ³¤Á¬½Ó£¬Èç¹ûÊÇµÚÒ»´ÎIOÊ§°Ü£¬Ôò¿ÉÒÔÔÙÖØÊÔÒ»´Î
 		have_retried = true;
 	}
 
-	// è®¾ç½®å­—ç¬¦é›†è½¬æ¢å™¨
+	// ÉèÖÃ×Ö·û¼¯×ª»»Æ÷
 	set_charset_conv();
 
-	// æ£€æŸ¥è¿”å›å¤´ä¸­æ˜¯å¦æœ‰ Content-Range å­—æ®µ
+	// ¼ì²é·µ»ØÍ·ÖĞÊÇ·ñÓĞ Content-Range ×Ö¶Î
 	check_range();
 
 	return true;
@@ -421,7 +421,7 @@ void http_request::check_range()
 	http_off_t range_from, range_to;
 	acl_int64 length;
 
-	// å…ˆå–å‡ºç”¨æˆ·åœ¨è¯·æ±‚æ—¶è®¾ç½®çš„ range å­—æ®µï¼Œå¦‚æœæ²¡è®¾ç½®åˆ™ç›´æ¥è¿”å›
+	// ÏÈÈ¡³öÓÃ»§ÔÚÇëÇóÊ±ÉèÖÃµÄ range ×Ö¶Î£¬Èç¹ûÃ»ÉèÖÃÔòÖ±½Ó·µ»Ø
 	header_.get_range(&range_from, &range_to);
 	if (range_from < 0) {
 		return;
@@ -429,15 +429,15 @@ void http_request::check_range()
 
 	const HTTP_HDR_RES* hdr_res = client_->get_respond_head(NULL);
 
-	// ä» HTTP æœåŠ¡å™¨å“åº”ä¸­è·å¾— range å›åº”å­—æ®µï¼Œå¦‚æœæ²¡æœ‰åˆ™è¯´æ˜
-	// æœåŠ¡å™¨ä¸æ”¯æŒ range è¯·æ±‚
+	// ´Ó HTTP ·şÎñÆ÷ÏìÓ¦ÖĞ»ñµÃ range »ØÓ¦×Ö¶Î£¬Èç¹ûÃ»ÓĞÔòËµÃ÷
+	// ·şÎñÆ÷²»Ö§³Ö range ÇëÇó
 	if (http_hdr_res_range((HTTP_HDR_RES*) hdr_res, &range_from_,
 		&range_to_, &range_max_) < 0) {
 
 		RESET_RANGE();
 	}
 
-	// å¦‚æœæœåŠ¡å™¨è¿”å›çš„ range å†…å®¹ä¸è¯·æ±‚çš„ä¸ä¸€è‡´ï¼Œåˆ™è¯´æ˜æœ‰é”™
+	// Èç¹û·şÎñÆ÷·µ»ØµÄ range ÄÚÈİÓëÇëÇóµÄ²»Ò»ÖÂ£¬ÔòËµÃ÷ÓĞ´í
 	else if (range_from_ != range_from) {
 		logger_error("range_from(%lld) != %lld",
 			range_from_, range_from);
@@ -449,8 +449,8 @@ void http_request::check_range()
 		RESET_RANGE();
 	}
 
-	// è™½ç„¶ç”¨æˆ·å‘é€äº† range è¯·æ±‚ï¼Œä½†å‘é€çš„è¯·æ±‚å†…å®¹æ˜¯æ•´ä¸ªæ•°æ®ä½“ï¼Œ
-	// åˆ™éœ€è¦æ£€æŸ¥æ•°æ®ä½“é•¿åº¦çš„ä¸€è‡´æ€§
+	// ËäÈ»ÓÃ»§·¢ËÍÁË range ÇëÇó£¬µ«·¢ËÍµÄÇëÇóÄÚÈİÊÇÕû¸öÊı¾İÌå£¬
+	// ÔòĞèÒª¼ì²éÊı¾İÌå³¤¶ÈµÄÒ»ÖÂĞÔ
 	else if (range_from == 0 && range_to < 0
 		&& (length = client_->body_length()) > 0
 		&& range_max_ != length) {
@@ -494,7 +494,7 @@ void http_request::set_charset_conv()
 		return;
 	}
 
-	// éœ€è¦è·å¾—å“åº”å¤´å­—ç¬¦é›†ä¿¡æ¯
+	// ĞèÒª»ñµÃÏìÓ¦Í·×Ö·û¼¯ĞÅÏ¢
 	const char* ptr = client_->header_value("Content-Type");
 	if (ptr == NULL || *ptr == 0) {
 		return;
@@ -513,12 +513,12 @@ void http_request::set_charset_conv()
 		return;
 	}
 
-	// åˆå§‹åŒ–å­—ç¬¦é›†è½¬æ¢å™¨
+	// ³õÊ¼»¯×Ö·û¼¯×ª»»Æ÷
 
 	if (conv_ == NULL) {
 		conv_ = charset_conv::create(from_charset, local_charset_);
 	}
-	// å¤ç”¨ä¹‹å‰åˆ›å»ºçš„å­—ç¬¦é›†è½¬æ¢å™¨
+	// ¸´ÓÃÖ®Ç°´´½¨µÄ×Ö·û¼¯×ª»»Æ÷
 	else if (!conv_->update_begin(from_charset, local_charset_)) {
 		logger_error("invalid charset conv, from %s, to %s",
 			from_charset, local_charset_);
@@ -532,10 +532,10 @@ void http_request::set_charset_conv()
 http_pipe* http_request::get_pipe(const char* to_charset)
 {
 	if (to_charset != NULL) {
-		// é‡æ–°è®¾ç½®å­—ç¬¦é›†è½¬æ¢å™¨
+		// ÖØĞÂÉèÖÃ×Ö·û¼¯×ª»»Æ÷
 		set_local_charset(to_charset);
 
-		// è·å–å­—ç¬¦é›†è½¬æ¢å™¨
+		// »ñÈ¡×Ö·û¼¯×ª»»Æ÷
 		set_charset_conv();
 	}
 
@@ -545,7 +545,7 @@ http_pipe* http_request::get_pipe(const char* to_charset)
 
 	http_pipe* hp = NEW http_pipe();
 
-	// å°†å­—ç¬¦é›†è½¬æ¢å™¨äº¤ç”± http_pipe ç®¡ç†
+	// ½«×Ö·û¼¯×ª»»Æ÷½»ÓÉ http_pipe ¹ÜÀí
 	hp->set_charset(conv_);
 	conv_ = NULL;
 
@@ -566,9 +566,9 @@ bool http_request::get_body(xml& out, const char* to_charset /* = NULL */)
 	string buf(4096);
 	int    ret;
 
-	// è¯» HTTP å“åº”ä½“ï¼Œå¹¶æŒ‰ xml æ ¼å¼è¿›è¡Œåˆ†æ
+	// ¶Á HTTP ÏìÓ¦Ìå£¬²¢°´ xml ¸ñÊ½½øĞĞ·ÖÎö
 	while (true) {
-		// è°ƒç”¨å¯ä»¥è‡ªåŠ¨è§£å‹ç¼©çš„è¯»å‡½æ•°
+		// µ÷ÓÃ¿ÉÒÔ×Ô¶¯½âÑ¹ËõµÄ¶Áº¯Êı
 		ret = client_->read_body(buf);
 		if (ret < 0) {
 			close();
@@ -603,7 +603,7 @@ bool http_request::get_body(json& out, const char* to_charset /* = NULL */)
 
 	string  buf(4096);
 	int   ret;
-	// è¯» HTTP å“åº”ä½“ï¼Œå¹¶æŒ‰ json æ ¼å¼è¿›è¡Œåˆ†æå‘˜
+	// ¶Á HTTP ÏìÓ¦Ìå£¬²¢°´ json ¸ñÊ½½øĞĞ·ÖÎöÔ±
 	while (true) {
 		ret = client_->read_body(buf);
 		if (ret < 0) {
@@ -643,7 +643,7 @@ bool http_request::get_body(string& out, const char* to_charset /* = NULL */)
 
 	string  buf(4096);
 	int   ret;
-	// è¯» HTTP å“åº”ä½“
+	// ¶Á HTTP ÏìÓ¦Ìå
 	while (true) {
 		ret = client_->read_body(buf);
 		if (ret < 0) {
@@ -705,8 +705,8 @@ int http_request::read_body(string& out, bool clean /* = false */,
 
 	size_t curr_size = out.length();
 
-	// åœ¨è¿›è¡Œå­—ç¬¦é›†è½¬æ¢æ—¶ï¼Œå†…å®¹å°ºå¯¸å¯èƒ½å˜åŒ–ï¼Œæ‰€ä»¥æ ¹æ®å‰åå®é™…
-	// å†…å®¹å°ºå¯¸ä¹‹å·®æ¥è®¡ç®—æœ¬æ¬¡è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	// ÔÚ½øĞĞ×Ö·û¼¯×ª»»Ê±£¬ÄÚÈİ³ß´ç¿ÉÄÜ±ä»¯£¬ËùÒÔ¸ù¾İÇ°ºóÊµ¼Ê
+	// ÄÚÈİ³ß´çÖ®²îÀ´¼ÆËã±¾´Î¶Áµ½µÄÊı¾İ³¤¶È
 	return (int) (curr_size - saved_size);
 }
 

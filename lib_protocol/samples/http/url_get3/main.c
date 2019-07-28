@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 static void get_url(const char *url, const char *dump)
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	int   ch;
 	char  url[256], dump[256];
 
-	acl_lib_init();  /* åˆå§‹åŒ– acl åº“ */
+	acl_lib_init();  /* ³õÊ¼»¯ acl ¿â */
 
 	url[0] = 0;
 	dump[0] = 0;

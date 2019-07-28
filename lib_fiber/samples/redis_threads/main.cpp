@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "redis_thread.h"
 
 #define	STACK_SIZE 32000

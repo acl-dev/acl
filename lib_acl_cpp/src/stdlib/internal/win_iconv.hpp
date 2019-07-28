@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #if defined(_WIN32) || defined(_WIN64)
 #ifdef USE_WIN_ICONV

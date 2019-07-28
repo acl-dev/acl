@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "status/StatusIOCallback.h"
 #include "status/StatusConnection.h"
 
@@ -9,13 +9,13 @@ StatusConnection::StatusConnection(acl::aio_socket_stream* conn)
 
 void StatusConnection::run()
 {
-	// 鍒涘缓鐘舵€佹眹鎶� IO 澶勭悊鍥炶皟绫诲璞�
+	// 创建状态汇报 IO 处理回调类对象
 	StatusIOCallback* callback = new StatusIOCallback(this);
 	conn_->add_read_callback(callback);
 	conn_->add_close_callback(callback);
 	conn_->add_timeout_callback(callback);
 
-	// 鐩戞帶寮傛娴佹槸鍚﹀彲璇�
+	// 监控异步流是否可读
 	conn_->read_wait(var_cfg_rw_timeout);
 }
 

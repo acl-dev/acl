@@ -1,4 +1,4 @@
-﻿#ifndef	__HTTP_MODULE_INCLUDE_H__
+#ifndef	__HTTP_MODULE_INCLUDE_H__
 #define	__HTTP_MODULE_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -26,25 +26,25 @@ extern int   var_cfg_http_domain_allow_all;
 extern int   var_cfg_http_method_connect_enable;
 extern int   var_cfg_http_proxy_connection_off;
 
-/* 动态加载的函数接口 */
+/* ��̬���صĺ����ӿ� */
 
 /**
- * 被动态加载的模块的初始化函数，仅被调用一次
- * @param dll_env {ACL_DLL_ENV*} 由加载程序传递过来的环境变量
- * @param cfg_dir {const char*} 该动态模块的配置文件所在路径
+ * ����̬���ص�ģ��ĳ�ʼ����������������һ��
+ * @param dll_env {ACL_DLL_ENV*} �ɼ��س��򴫵ݹ����Ļ�������
+ * @param cfg_dir {const char*} �ö�̬ģ��������ļ�����·��
  */
 MOD_HTTP_API void module_service_init(ACL_DLL_ENV *dll_env, const char *cfg_dir);
 
 /**
- * 由动态模块创建一个服务实例，可以被加载程序调用多次以产生多个服务实例
- * @return {SERVICE*} 由动态模块创建的服务对象实例
+ * �ɶ�̬ģ�鴴��һ������ʵ�������Ա����س�����ö���Բ����������ʵ��
+ * @return {SERVICE*} �ɶ�̬ģ�鴴���ķ������ʵ��
  */
 MOD_HTTP_API SERVICE *module_service_create(void);
 
 /**
- * 当加载程序接收到一个客户端连接后调用此函数
- * @param service {SERVICE*} 由 module_service_create 创建的服务对象
- * @param stream {ACL_ASTREAM*} 由加载程序接收的客户端异步流对象
+ * �����س�����յ�һ���ͻ������Ӻ���ô˺���
+ * @param service {SERVICE*} �� module_service_create �����ķ������
+ * @param stream {ACL_ASTREAM*} �ɼ��س�����յĿͻ����첽������
  */
 MOD_HTTP_API void module_service_main(SERVICE *service, ACL_ASTREAM *stream);
 

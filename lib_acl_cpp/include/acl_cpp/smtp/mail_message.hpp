@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/noncopyable.hpp"
@@ -15,32 +15,32 @@ class mail_body;
 class ofstream;
 
 /**
- * é‚®ä»¶æ•°æ®æ„é€ ç±»ï¼Œæ­¤ç±»å¯ä»¥ç”Ÿæˆä¸€å°å®Œæ•´çš„é‚®ä»¶ï¼ŒåŒæ—¶è¿˜ç”¨äºæ„å»º SMTP å‘é€è¿‡ç¨‹
- * çš„é‚®ä»¶ä¿¡å°ä¿¡æ¯
+ * ÓÊ¼şÊı¾İ¹¹ÔìÀà£¬´ËÀà¿ÉÒÔÉú³ÉÒ»·âÍêÕûµÄÓÊ¼ş£¬Í¬Ê±»¹ÓÃÓÚ¹¹½¨ SMTP ·¢ËÍ¹ı³Ì
+ * µÄÓÊ¼şĞÅ·âĞÅÏ¢
  */
 class ACL_CPP_API mail_message : public noncopyable
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param charset {const char*} å­—ç¬¦é›†
+	 * ¹¹Ôìº¯Êı
+	 * @param charset {const char*} ×Ö·û¼¯
 	 */
 	mail_message(const char* charset = "utf-8");
 	~mail_message();
 
 	/**
-	 * è®¾ç½® SMTP å‘é€è¿‡ç¨‹çš„èº«ä»½éªŒè¯ä¿¡æ¯
-	 * @param user {const char*} é‚®ç®±è´¦å·
-	 * @param pass {const char*} é‚®ç®±å¯†ç 
+	 * ÉèÖÃ SMTP ·¢ËÍ¹ı³ÌµÄÉí·İÑéÖ¤ĞÅÏ¢
+	 * @param user {const char*} ÓÊÏäÕËºÅ
+	 * @param pass {const char*} ÓÊÏäÃÜÂë
 	 * @return {mail_message&}
 	 */
 	mail_message& set_auth(const char* user, const char* pass);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶çš„å‘é€éƒ½é‚®ç®±ï¼Œæ­¤å­—æ®µå¯ç”¨äº SMTP å‘é€è¿‡ç¨‹çš„ MAIL FROM å‘½ä»¤ï¼Œ
-	 * åŒæ—¶åˆå¯ä½œä¸ºé‚®ä»¶å¤´ä¸­çš„ From å­—æ®µå€¼
-	 * @param from {const char*} å‘ä»¶äººé‚®ä»¶åœ°å€
-	 * @param name {const char*} å‘ä»¶äººåç§°
+	 * ÉèÖÃÓÊ¼şµÄ·¢ËÍ¶¼ÓÊÏä£¬´Ë×Ö¶Î¿ÉÓÃÓÚ SMTP ·¢ËÍ¹ı³ÌµÄ MAIL FROM ÃüÁî£¬
+	 * Í¬Ê±ÓÖ¿É×÷ÎªÓÊ¼şÍ·ÖĞµÄ From ×Ö¶ÎÖµ
+	 * @param from {const char*} ·¢¼şÈËÓÊ¼şµØÖ·
+	 * @param name {const char*} ·¢¼şÈËÃû³Æ
 	 * @return {mail_message&}
 	 */
 	mail_message& set_from(const char* from, const char* name = NULL);
@@ -48,104 +48,104 @@ public:
 	mail_message& set_sender(const char* sender, const char* name = NULL);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å¤´ä¸­çš„ Reply-To å­—æ®µå€¼
-	 * @param reply_to {const char*} Reply-To é‚®ç®±å­—æ®µå€¼
-	 * @param name {const char*} Reply-To å¯¹åº”çš„äººå‘˜åç§°
+	 * ÉèÖÃÓÊ¼şÍ·ÖĞµÄ Reply-To ×Ö¶ÎÖµ
+	 * @param reply_to {const char*} Reply-To ÓÊÏä×Ö¶ÎÖµ
+	 * @param name {const char*} Reply-To ¶ÔÓ¦µÄÈËÔ±Ãû³Æ
 	 * @return {mail_message&}
 	 */
 	mail_message& set_reply_to(const char* reply_to, const char* name = NULL);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å¤´ä¸­çš„ Return-Path å­—æ®µå€¼
-	 * @param return_path {const char*} Return-Path é‚®ç®±å­—æ®µå€¼
+	 * ÉèÖÃÓÊ¼şÍ·ÖĞµÄ Return-Path ×Ö¶ÎÖµ
+	 * @param return_path {const char*} Return-Path ÓÊÏä×Ö¶ÎÖµ
 	 * @return {mail_message&}
 	 */
 	mail_message& set_return_path(const char* return_path);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å¤´ä¸­çš„ Delivered-To å­—æ®µå€¼
-	 * @param delivered_to {const char*} Delivered-To é‚®ç®±å­—æ®µå€¼
+	 * ÉèÖÃÓÊ¼şÍ·ÖĞµÄ Delivered-To ×Ö¶ÎÖµ
+	 * @param delivered_to {const char*} Delivered-To ÓÊÏä×Ö¶ÎÖµ
 	 * @return {mail_message&}
 	 */
 	mail_message& set_delivered_to(const char* delivered_to);
 
 	/**
-	 * æ·»åŠ æ”¶ä»¶äººåœ°å€ï¼Œè¯¥åœ°å€ä»…å‡ºç°åœ¨ä¿¡å°ä¸­ï¼Œä¸å‡ºç°åœ¨é‚®ä»¶å¤´ä¸­
-	 * @param recipients {const char*} æ”¶ä»¶äººé›†åˆï¼Œéµå®ˆ RFC822 æ ¼å¼
+	 * Ìí¼ÓÊÕ¼şÈËµØÖ·£¬¸ÃµØÖ·½ö³öÏÖÔÚĞÅ·âÖĞ£¬²»³öÏÖÔÚÓÊ¼şÍ·ÖĞ
+	 * @param recipients {const char*} ÊÕ¼şÈË¼¯ºÏ£¬×ñÊØ RFC822 ¸ñÊ½
 	 * @return {mail_message&}
 	 */
 	mail_message& add_recipients(const char* recipients);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å¤´ä¸­çš„ To å­—æ®µå€¼ï¼ŒåŒæ—¶è¯¥æ”¶ä»¶äººåœ°å€é›†åˆè¢«ç”¨äºä¿¡å°ä¸­ä½œä¸ºæ”¶ä»¶äºº
-	 * @param to {const char*} æ”¶ä»¶äººé‚®ç®±åœ°å€é›†åˆï¼Œéµå®ˆ RFC822 æ ¼å¼
+	 * ÉèÖÃÓÊ¼şÍ·ÖĞµÄ To ×Ö¶ÎÖµ£¬Í¬Ê±¸ÃÊÕ¼şÈËµØÖ·¼¯ºÏ±»ÓÃÓÚĞÅ·âÖĞ×÷ÎªÊÕ¼şÈË
+	 * @param to {const char*} ÊÕ¼şÈËÓÊÏäµØÖ·¼¯ºÏ£¬×ñÊØ RFC822 ¸ñÊ½
 	 * @return {mail_message&}
 	 */
 	mail_message& add_to(const char* to);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å¤´ä¸­çš„ Cc å­—æ®µå€¼ï¼ŒåŒæ—¶è¯¥æ”¶ä»¶äººåœ°å€é›†åˆè¢«ç”¨äºä¿¡å°ä¸­ä½œä¸ºæ”¶ä»¶äºº
-	 * @param cc {const char*} æ”¶ä»¶äººé‚®ç®±åœ°å€é›†åˆï¼Œéµå®ˆ RFC822 æ ¼å¼
+	 * ÉèÖÃÓÊ¼şÍ·ÖĞµÄ Cc ×Ö¶ÎÖµ£¬Í¬Ê±¸ÃÊÕ¼şÈËµØÖ·¼¯ºÏ±»ÓÃÓÚĞÅ·âÖĞ×÷ÎªÊÕ¼şÈË
+	 * @param cc {const char*} ÊÕ¼şÈËÓÊÏäµØÖ·¼¯ºÏ£¬×ñÊØ RFC822 ¸ñÊ½
 	 * @return {mail_message&}
 	 */
 	mail_message& add_cc(const char* cc);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å‘é€çš„æš—é€åœ°å€é›†åˆï¼Œè¯¥åœ°å€é›†åˆä¸ä¼šå‡ºç°åœ¨é‚®ä»¶å¤´ä¸­
-	 * @param bcc {const char*} æš—é€é‚®ç®±åœ°å€é›†åˆï¼Œéµå®ˆ RFC822 æ ¼å¼
+	 * ÉèÖÃÓÊ¼ş·¢ËÍµÄ°µËÍµØÖ·¼¯ºÏ£¬¸ÃµØÖ·¼¯ºÏ²»»á³öÏÖÔÚÓÊ¼şÍ·ÖĞ
+	 * @param bcc {const char*} °µËÍÓÊÏäµØÖ·¼¯ºÏ£¬×ñÊØ RFC822 ¸ñÊ½
 	 * @return {mail_message&}
 	 */
 	mail_message& add_bcc(const char* bcc);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶å¤´ä¸­çš„ä¸»é¢˜ï¼Œè¯¥ä¸»é¢˜å°†é‡‡ç”¨ rfc2047 ç¼–ç ä¸”é‡‡ç”¨ç±»æ„é€ å‡½æ•°
-	 * è®¾ç½®çš„å­—ç¬¦é›†
-	 * @param subject {const char*} é‚®ä»¶å¤´ä¸»é¢˜å­—æ®µå€¼
+	 * ÉèÖÃÓÊ¼şÍ·ÖĞµÄÖ÷Ìâ£¬¸ÃÖ÷Ìâ½«²ÉÓÃ rfc2047 ±àÂëÇÒ²ÉÓÃÀà¹¹Ôìº¯Êı
+	 * ÉèÖÃµÄ×Ö·û¼¯
+	 * @param subject {const char*} ÓÊ¼şÍ·Ö÷Ìâ×Ö¶ÎÖµ
 	 * @return {mail_message&}
 	 */
 	mail_message& set_subject(const char* subject);
 
 	/**
-	 * ç”¨æˆ·å¯ä»¥è°ƒç”¨æ­¤å‡½æ•°æ·»åŠ é‚®ä»¶å¤´ä¸­çš„å¤´éƒ¨æ‰©å±•å­—æ®µå€¼
-	 * @param name {const char*} å­—æ®µå
-	 * @param value {const char*} å­—æ®µå€¼
+	 * ÓÃ»§¿ÉÒÔµ÷ÓÃ´Ëº¯ÊıÌí¼ÓÓÊ¼şÍ·ÖĞµÄÍ·²¿À©Õ¹×Ö¶ÎÖµ
+	 * @param name {const char*} ×Ö¶ÎÃû
+	 * @param value {const char*} ×Ö¶ÎÖµ
 	 * @return {mail_message&}
 	 */
 	mail_message& add_header(const char* name, const char* value);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶çš„æ­£æ–‡å¯¹è±¡
-	 * @param body {const mail_body&} é‚®ä»¶æ­£æ–‡å¯¹è±¡
+	 * ÉèÖÃÓÊ¼şµÄÕıÎÄ¶ÔÏó
+	 * @param body {const mail_body&} ÓÊ¼şÕıÎÄ¶ÔÏó
 	 * @return {mail_message&}
 	 */
 	mail_message& set_body(const mail_body& body);
 
 	/**
-	 * ç»™ä¸€å°é‚®ä»¶æ·»åŠ ä¸€ä¸ªé™„ä»¶
-	 * @param filepath {const char*} é™„ä»¶å…¨è·¯å¾„ï¼ˆéç©ºï¼‰
-	 * @param content_type {const char*} é™„ä»¶ç±»å‹ï¼ˆéç©ºï¼‰
+	 * ¸øÒ»·âÓÊ¼şÌí¼ÓÒ»¸ö¸½¼ş
+	 * @param filepath {const char*} ¸½¼şÈ«Â·¾¶£¨·Ç¿Õ£©
+	 * @param content_type {const char*} ¸½¼şÀàĞÍ£¨·Ç¿Õ£©
 	 * @return {mail_message&}
 	 */
 	mail_message& add_attachment(const char* filepath,
 		const char* content_type);
 
 	/**
-	 * æ„é€ ä¸€å°å®Œæ•´çš„é‚®ä»¶ï¼Œå¹¶å°†é‚®ä»¶å†…å®¹å­˜å‚¨äºç»™å®šç£ç›˜æ–‡ä»¶ä¸­ï¼Œå¦‚æœè¯¥æ–‡ä»¶
-	 * å­˜åœ¨åˆ™é¦–å…ˆä¼šæ¸…ç©ºï¼Œå¦åˆ™ä¼šåˆ›å»ºæ–°çš„æ–‡ä»¶
-	 * @param filepath {const char*} ç›®æ ‡æ–‡ä»¶
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * ¹¹ÔìÒ»·âÍêÕûµÄÓÊ¼ş£¬²¢½«ÓÊ¼şÄÚÈİ´æ´¢ÓÚ¸ø¶¨´ÅÅÌÎÄ¼şÖĞ£¬Èç¹û¸ÃÎÄ¼ş
+	 * ´æÔÚÔòÊ×ÏÈ»áÇå¿Õ£¬·ñÔò»á´´½¨ĞÂµÄÎÄ¼ş
+	 * @param filepath {const char*} Ä¿±êÎÄ¼ş
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_to(const char* filepath);
 
 	/**
-	 * å¯ä»¥å•ç‹¬è°ƒç”¨æœ¬å‡½æ•°ç”¨æ¥ç”Ÿæˆé‚®ä»¶å¤´æ•°æ®
-	 * @param out {string&} åˆ›å»ºçš„é‚®ä»¶å¤´æ•°æ®å°†è¿½åŠ äºè¯¥ç¼“å†²åŒºä¸­
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * ¿ÉÒÔµ¥¶Àµ÷ÓÃ±¾º¯ÊıÓÃÀ´Éú³ÉÓÊ¼şÍ·Êı¾İ
+	 * @param out {string&} ´´½¨µÄÓÊ¼şÍ·Êı¾İ½«×·¼ÓÓÚ¸Ã»º³åÇøÖĞ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool build_header(string& out);
 
 	/**
-	 * è·å¾—æ‰€åˆ›å»ºçš„é‚®ä»¶åœ¨ç£ç›˜ä¸Šçš„å…¨è·¯å¾„ï¼Œè¯¥å‡½æ•°å¿…é¡»åœ¨è°ƒç”¨ save_to æˆåŠŸåè°ƒç”¨
+	 * »ñµÃËù´´½¨µÄÓÊ¼şÔÚ´ÅÅÌÉÏµÄÈ«Â·¾¶£¬¸Ãº¯Êı±ØĞëÔÚµ÷ÓÃ save_to ³É¹¦ºóµ÷ÓÃ
 	 * @return {const char*}
 	 */
 	const char* get_email() const
@@ -154,7 +154,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”¨äº SMTP èº«ä»½éªŒè¯æ—¶çš„é‚®ç®±è´¦å·
+	 * »ñµÃÓÃÓÚ SMTP Éí·İÑéÖ¤Ê±µÄÓÊÏäÕËºÅ
 	 * @return {const char*}
 	 */
 	const char* get_auth_user() const
@@ -163,7 +163,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”¨äº SMTP èº«ä»½éªŒè¯æ—¶çš„é‚®ç®±è´¦å·å¯†ç 
+	 * »ñµÃÓÃÓÚ SMTP Éí·İÑéÖ¤Ê±µÄÓÊÏäÕËºÅÃÜÂë
 	 * @return {const char*}
 	 */
 	const char* get_auth_pass() const
@@ -172,7 +172,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_from è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡
+	 * »ñµÃÓÉ set_from ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_from() const
@@ -181,7 +181,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_sender è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡
+	 * »ñµÃÓÉ set_sender ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_sender() const
@@ -190,7 +190,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_reply_to è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡
+	 * »ñµÃÓÉ set_reply_to ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_reply_to() const
@@ -199,7 +199,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_return_path è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡
+	 * »ñµÃÓÉ set_return_path ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_return_path() const
@@ -208,7 +208,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_delivered_to è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡
+	 * »ñµÃÓÉ set_delivered_to ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó
 	 * @return {const rfc822_addr*}
 	 */
 	const rfc822_addr* get_delivered_to() const
@@ -222,7 +222,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_cc è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡é›†åˆ
+	 * »ñµÃÓÉ set_cc ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó¼¯ºÏ
 	 * @return {const std::vector<rfc822_addr*>&}
 	 */
 	const std::vector<rfc822_addr*>& get_cc() const
@@ -231,7 +231,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”± set_bcc è®¾ç½®çš„é‚®ç®±åœ°å€å¯¹è±¡é›†åˆ
+	 * »ñµÃÓÉ set_bcc ÉèÖÃµÄÓÊÏäµØÖ·¶ÔÏó¼¯ºÏ
 	 * @return {const std::vector<rfc822_addr*>&}
 	 */
 	const std::vector<rfc822_addr*>& get_bcc() const
@@ -240,7 +240,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—æ‰€æœ‰é‚®ä»¶æ¥æ”¶è€…çš„åœ°å€é›†åˆ
+	 * »ñµÃËùÓĞÓÊ¼ş½ÓÊÕÕßµÄµØÖ·¼¯ºÏ
 	 * @return {const std::vector<rfc822_addr*>&}
 	 */
 	const std::vector<rfc822_addr*>& get_recipients() const
@@ -249,16 +249,16 @@ public:
 	}
 
 	/**
-	 * è·å¾—ç”¨æˆ·è®¾ç½®çš„é‚®ä»¶å¤´æ‰©å±•å­—æ®µå€¼
-	 * @param name {const char*} å­—æ®µå
+	 * »ñµÃÓÃ»§ÉèÖÃµÄÓÊ¼şÍ·À©Õ¹×Ö¶ÎÖµ
+	 * @param name {const char*} ×Ö¶ÎÃû
 	 * @return {const char*}
 	 */
 	const char* get_header_value(const char* name) const;
 
 	/**
-	 * ä¸º MIME æ•°æ®åˆ›å»ºå”¯ä¸€çš„åˆ†éš”ç¬¦
-	 * @param id {const char*} è°ƒç”¨è€…å¡«å†™çš„ ID æ ‡è¯†
-	 * @param out {string&} å­˜å‚¨ç»“æœ
+	 * Îª MIME Êı¾İ´´½¨Î¨Ò»µÄ·Ö¸ô·û
+	 * @param id {const char*} µ÷ÓÃÕßÌîĞ´µÄ ID ±êÊ¶
+	 * @param out {string&} ´æ´¢½á¹û
 	 */
 	static void create_boundary(const char* id, string& out);
 

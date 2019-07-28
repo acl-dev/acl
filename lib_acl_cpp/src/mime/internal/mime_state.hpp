@@ -1,4 +1,4 @@
-ï»¿#ifndef __MIME_STATE_INCLUDE__
+#ifndef __MIME_STATE_INCLUDE__
 #define __MIME_STATE_INCLUDE__
 
 #if !defined(ACL_MIME_DISABLE)
@@ -19,26 +19,26 @@ struct MAIL_ADDR
 
 struct MIME_NODE
 {
-	ACL_RING children;                      /**< å­ç»“ç‚¹é›†åˆ */
-	int  depth;                             /**< å½“å‰ç»“ç‚¹çš„æ·±åº¦ */
-	MIME_NODE *parent;                      /**< çˆ¶ç»“ç‚¹ */
-	MIME_STATE *state;                      /**< MIME_STATE å¯¹è±¡ */
+	ACL_RING children;                      /**< ×Ó½áµã¼¯ºÏ */
+	int  depth;                             /**< µ±Ç°½áµãµÄÉî¶È */
+	MIME_NODE *parent;                      /**< ¸¸½áµã */
+	MIME_STATE *state;                      /**< MIME_STATE ¶ÔÏó */
 
-	/* é‚®ä»¶å¤´ */
-	ACL_FIFO *header_list;                  /**< HEADER_NV é›†åˆ */
-	ACL_FIFO *header_to_list;               /**< MAIL_ADDR é›†åˆ */
-	ACL_FIFO *header_cc_list;               /**< MAIL_ADDR é›†åˆ */
-	ACL_FIFO *header_bcc_list;              /**< MAIL_ADDR é›†åˆ */
+	/* ÓÊ¼þÍ· */
+	ACL_FIFO *header_list;                  /**< HEADER_NV ¼¯ºÏ */
+	ACL_FIFO *header_to_list;               /**< MAIL_ADDR ¼¯ºÏ */
+	ACL_FIFO *header_cc_list;               /**< MAIL_ADDR ¼¯ºÏ */
+	ACL_FIFO *header_bcc_list;              /**< MAIL_ADDR ¼¯ºÏ */
 	char *header_sender;
 	char *header_from;
 	char *header_replyto;
 	char *header_returnpath;
 	char *header_subject;
 
-	/* multipart å¤´ */
+	/* multipart Í· */
 	char *header_filename;
 
-	/* é€šç”¨å¤´ */
+	/* Í¨ÓÃÍ· */
 	int   ctype;                            /**< MIME_CTYPE_XXX */
 	int   stype;                            /**< MIME_STYPE_XXX */
 	char *ctype_s;
@@ -49,36 +49,36 @@ struct MIME_NODE
 	int   domain;
 	int   encoding;                         /**< MIME_ENC_XXX */
 	int   valid_line;
-	char  last_ch;                          /**< åˆ†æžè¿‡ç¨‹ä¸­è®°å½•çš„å‰ä¸€ä¸ªå­—èŠ‚ */
-	char  last_lf;                          /**< åˆ†æžå¤´éƒ¨æ¯è¡Œæ•°æ®æ—¶å‰ä¸€ä¸ª \n */
-	off_t last_cr_pos;                      /**< ä¸Šä¸€ä¸ª \r çš„åç§»ä½ç½® */
-	off_t last_lf_pos;                      /**< ä¸Šä¸€ä¸ª \n çš„åç§»ä½ç½® */
-	ACL_VSTRING *boundary;                  /**< å½“æ˜¯ multipart é‚®ä»¶æ—¶å­˜å‚¨åˆ†éš”ç¬¦ */
+	char  last_ch;                          /**< ·ÖÎö¹ý³ÌÖÐ¼ÇÂ¼µÄÇ°Ò»¸ö×Ö½Ú */
+	char  last_lf;                          /**< ·ÖÎöÍ·²¿Ã¿ÐÐÊý¾ÝÊ±Ç°Ò»¸ö \n */
+	off_t last_cr_pos;                      /**< ÉÏÒ»¸ö \r µÄÆ«ÒÆÎ»ÖÃ */
+	off_t last_lf_pos;                      /**< ÉÏÒ»¸ö \n µÄÆ«ÒÆÎ»ÖÃ */
+	ACL_VSTRING *boundary;                  /**< µ±ÊÇ multipart ÓÊ¼þÊ±´æ´¢·Ö¸ô·û */
 
-	/**< å½“æ˜¯ multipart é‚®ä»¶æ—¶è®°å½•åˆ†éš”ç¬¦çš„ä¸‹ä¸€ä¸ªåŒ¹é…ä½ç½®ï¼Œ
-	  å½“è¯¥å€¼æŒ‡å‘åˆ†éš”ç¬¦å°¾éƒ¨æ—¶è¯´æ˜Žå®Œå…¨åŒ¹é…å®Œæ¯• */
+	/**< µ±ÊÇ multipart ÓÊ¼þÊ±¼ÇÂ¼·Ö¸ô·ûµÄÏÂÒ»¸öÆ¥ÅäÎ»ÖÃ£¬
+	  µ±¸ÃÖµÖ¸Ïò·Ö¸ô·ûÎ²²¿Ê±ËµÃ÷ÍêÈ«Æ¥ÅäÍê±Ï */
 	const char *bound_ptr;
 
 	char  bound_term[3];
 	ACL_VSTRING *buffer;                    /**< headers, quoted-printable body */
-	ACL_RING node;                          /**< å½“å‰ç»“ç‚¹ */
+	ACL_RING node;                          /**< µ±Ç°½áµã */
 
-	off_t header_begin;			/**< ç»“ç‚¹å¤´å¼€å§‹ä½ç½® */
-	off_t header_end;			/**< ç»“ç‚¹å¤´ç»“æŸä½ç½® */
-	off_t body_begin;			/**< ç»“ç‚¹ä½“å¼€å§‹ä½ç½® */
-	off_t body_end;				/**< ç»“ç‚¹ä½“ç»“æŸä½ç½® */
-	off_t body_data_end;			/**< ç»“ç‚¹æ•°æ®ä½“ç»“æŸä½ç½® */
-	off_t bound_end;			/**< åˆ†éš”ä½“ç»“æŸä½ç½® */
+	off_t header_begin;			/**< ½áµãÍ·¿ªÊ¼Î»ÖÃ */
+	off_t header_end;			/**< ½áµãÍ·½áÊøÎ»ÖÃ */
+	off_t body_begin;			/**< ½áµãÌå¿ªÊ¼Î»ÖÃ */
+	off_t body_end;				/**< ½áµãÌå½áÊøÎ»ÖÃ */
+	off_t body_data_end;			/**< ½áµãÊý¾ÝÌå½áÊøÎ»ÖÃ */
+	off_t bound_end;			/**< ·Ö¸ôÌå½áÊøÎ»ÖÃ */
 
-	/* for acl_iterator, é€šè¿‡ acl_foreach åˆ—å‡ºè¯¥ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹ */
+	/* for acl_iterator, Í¨¹ý acl_foreach ÁÐ³ö¸Ã½áµãµÄÒ»¼¶×Ó½áµã */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êý */
 	MIME_NODE *(*iter_head)(ACL_ITER*, MIME_NODE*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
 	MIME_NODE *(*iter_next)(ACL_ITER*, MIME_NODE*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êý */
 	MIME_NODE *(*iter_tail)(ACL_ITER*, MIME_NODE*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
 	MIME_NODE *(*iter_prev)(ACL_ITER*, MIME_NODE*);
 };
 
@@ -86,17 +86,17 @@ struct MIME_NODE
 
 struct MIME_STATE
 {
-	int   depth;                    /**< æœ€å¤§æ·±åº¦ */
-	int   node_cnt;			/**< ç»“ç‚¹æ€»æ•°, åŒ…æ‹¬ root ç»“ç‚¹ */
-	MIME_NODE *root;		/**< MIME_NODE æ ¹ç»“ç‚¹ */
-	int   use_crlf;			/**< æ˜¯ç”¨ \r\n è¿˜æ˜¯ç”¨ \n åšä¸ºæ¢è¡Œç¬¦ */
+	int   depth;                    /**< ×î´óÉî¶È */
+	int   node_cnt;			/**< ½áµã×ÜÊý, °üÀ¨ root ½áµã */
+	MIME_NODE *root;		/**< MIME_NODE ¸ù½áµã */
+	int   use_crlf;			/**< ÊÇÓÃ \r\n »¹ÊÇÓÃ \n ×öÎª»»ÐÐ·û */
 
 	/* private */
 
-	MIME_NODE *curr_node;           /**< å½“å‰æ­£åœ¨å¤„ç†çš„ MIME_NODE ç»“ç‚¹ */
-	const char *curr_bound;         /**< é’ˆå¯¹ multipart é‚®ä»¶, å½“å‰çš„åˆ†éš”ç¬¦ */
-	off_t curr_off;                 /**< é’ˆå¯¹é‚®ä»¶çš„å½“å‰åç§», å®ƒæ€»æ˜¯ä¼šæŒ‡å‘ä¸‹ä¸€ä¸ªä½ç½® */
-	int   curr_status;              /**< çŠ¶æ€æœºå½“å‰è§£æžçŠ¶æ€ */
+	MIME_NODE *curr_node;           /**< µ±Ç°ÕýÔÚ´¦ÀíµÄ MIME_NODE ½áµã */
+	const char *curr_bound;         /**< Õë¶Ô multipart ÓÊ¼þ, µ±Ç°µÄ·Ö¸ô·û */
+	off_t curr_off;                 /**< Õë¶ÔÓÊ¼þµÄµ±Ç°Æ«ÒÆ, Ëü×ÜÊÇ»áÖ¸ÏòÏÂÒ»¸öÎ»ÖÃ */
+	int   curr_status;              /**< ×´Ì¬»úµ±Ç°½âÎö×´Ì¬ */
 #define MIME_S_HEAD                     0
 #define MIME_S_BODY                     1
 #define MIME_S_BODY_BOUND_CRLF          2
@@ -108,15 +108,15 @@ struct MIME_STATE
 	ACL_VSTRING *token_buffer;      /* header parser scratch buffer */
 	ACL_VSTRING *key_buffer;
 
-	/* for acl_iterator, é€šè¿‡ acl_foreach å¯ä»¥åˆ—å‡ºæ‰€æœ‰å­ç»“ç‚¹ */
+	/* for acl_iterator, Í¨¹ý acl_foreach ¿ÉÒÔÁÐ³öËùÓÐ×Ó½áµã */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êý */
 	MIME_NODE *(*iter_head)(ACL_ITER*, MIME_STATE*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
 	MIME_NODE *(*iter_next)(ACL_ITER*, MIME_STATE*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êý */
 	MIME_NODE *(*iter_tail)(ACL_ITER*, MIME_STATE*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
 	MIME_NODE *(*iter_prev)(ACL_ITER*, MIME_STATE*);
 };
 

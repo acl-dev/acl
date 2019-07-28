@@ -1,4 +1,4 @@
-﻿/* crypto/ecdh/ecdh.h */
+/* crypto/ecdh/ecdh.h */
 /* ====================================================================
  * Copyright 2002 Sun Microsystems, Inc. ALL RIGHTS RESERVED.
  *

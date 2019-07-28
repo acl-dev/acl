@@ -1,4 +1,4 @@
-﻿锘�// WinEchodDlg.cpp : 瀹炵幇鏂囦欢
+﻿// WinEchodDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -14,20 +14,20 @@
 #endif
 
 
-// 鐢ㄤ簬搴旂敤绋嬪簭鈥滃叧浜庘€濊彍鍗曢」鐨� CAboutDlg 瀵硅瘽妗�
+// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialogEx
 {
 public:
 	CAboutDlg();
 
-// 瀵硅瘽妗嗘暟鎹�
+// 对话框数据
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 鏀寔
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 瀹炵幇
+// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -45,7 +45,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CWinEchodDlg 瀵硅瘽妗�
+// CWinEchodDlg 对话框
 
 CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(CWinEchodDlg::IDD, pParent)
@@ -95,15 +95,15 @@ BEGIN_MESSAGE_MAP(CWinEchodDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CWinEchodDlg 娑堟伅澶勭悊绋嬪簭
+// CWinEchodDlg 消息处理程序
 
 BOOL CWinEchodDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// 灏嗏€滃叧浜�...鈥濊彍鍗曢」娣诲姞鍒扮郴缁熻彍鍗曚腑銆�
+	// 将“关于...”菜单项添加到系统菜单中。
 
-	// IDM_ABOUTBOX 蹇呴』鍦ㄧ郴缁熷懡浠よ寖鍥村唴銆�
+	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -121,16 +121,16 @@ BOOL CWinEchodDlg::OnInitDialog()
 		}
 	}
 
-	// 璁剧疆姝ゅ璇濇鐨勫浘鏍囥€傚綋搴旂敤绋嬪簭涓荤獥鍙ｄ笉鏄璇濇鏃讹紝妗嗘灦灏嗚嚜鍔�
-	//  鎵ц姝ゆ搷浣�
-	SetIcon(m_hIcon, TRUE);			// 璁剧疆澶у浘鏍�
-	SetIcon(m_hIcon, FALSE);		// 璁剧疆灏忓浘鏍�
+	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
+	//  执行此操作
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	//ShowWindow(SW_MAXIMIZE);
 
-	// TODO: 鍦ㄦ娣诲姞棰濆鐨勫垵濮嬪寲浠ｇ爜
-	InitFiber();  // 鍒濆鍖栧崗绋嬬幆澧�
-	return TRUE;  // 闄ら潪灏嗙劍鐐硅缃埌鎺т欢锛屽惁鍒欒繑鍥� TRUE
+	// TODO: 在此添加额外的初始化代码
+	InitFiber();  // 初始化协程环境
+	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
 void CWinEchodDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -146,19 +146,19 @@ void CWinEchodDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// 濡傛灉鍚戝璇濇娣诲姞鏈€灏忓寲鎸夐挳锛屽垯闇€瑕佷笅闈㈢殑浠ｇ爜
-//  鏉ョ粯鍒惰鍥炬爣銆傚浜庝娇鐢ㄦ枃妗�/瑙嗗浘妯″瀷鐨� MFC 搴旂敤绋嬪簭锛�
-//  杩欏皢鐢辨鏋惰嚜鍔ㄥ畬鎴愩€�
+// 如果向对话框添加最小化按钮，则需要下面的代码
+//  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
+//  这将由框架自动完成。
 
 void CWinEchodDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // 鐢ㄤ簬缁樺埗鐨勮澶囦笂涓嬫枃
+		CPaintDC dc(this); // 用于绘制的设备上下文
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// 浣垮浘鏍囧湪宸ヤ綔鍖虹煩褰腑灞呬腑
+		// 使图标在工作区矩形中居中
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -166,7 +166,7 @@ void CWinEchodDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// 缁樺埗鍥炬爣
+		// 绘制图标
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -175,8 +175,8 @@ void CWinEchodDlg::OnPaint()
 	}
 }
 
-//褰撶敤鎴锋嫋鍔ㄦ渶灏忓寲绐楀彛鏃剁郴缁熻皟鐢ㄦ鍑芥暟鍙栧緱鍏夋爣
-//鏄剧ず銆�
+//当用户拖动最小化窗口时系统调用此函数取得光标
+//显示。
 HCURSOR CWinEchodDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -184,7 +184,7 @@ HCURSOR CWinEchodDlg::OnQueryDragIcon()
 
 void CWinEchodDlg::OnBnClickedOpenDos()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (m_dosFp == NULL)
 	{
 		//GetDlgItem(IDC_OPEN_DOS)->EnableWindow(FALSE);
@@ -193,7 +193,7 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 		m_dosFp = freopen("CONOUT$","w+t",stdout);
 		printf("DOS opened now, listen=%s:%d\r\n",
 			m_listenIP.GetString(), m_listenPort);
-		CString info(_T("鍏抽棴 DOS 绐楀彛 "));
+		CString info(_T("关闭 DOS 窗口 "));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
 	}
 	else
@@ -201,12 +201,12 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 		fclose(m_dosFp);
 		m_dosFp = NULL;
 		FreeConsole();
-		CString info(_T("鎵撳紑 DOS 绐楀彛"));
+		CString info(_T("打开 DOS 窗口"));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
 	}
 }
 
-// UNICODE 杞瀛楃
+// UNICODE 转宽字符
 void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 {
 	int len = WideCharToMultiByte(CP_ACP, 0, in.GetString(), in.GetLength(),
@@ -221,15 +221,15 @@ void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 
 void CWinEchodDlg::InitFiber(void)
 {
-	// 璁剧疆鍗忕▼璋冨害鐨勪簨浠跺紩鎿庯紝鍚屾椂灏嗗崗绋嬭皟搴﹁涓鸿嚜鍔ㄥ惎鍔ㄦā寮�
+	// 设置协程调度的事件引擎，同时将协程调度设为自动启动模式
 	acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
-	// HOOK ACL 搴撲腑鐨勭綉缁� IO 杩囩▼
+	// HOOK ACL 库中的网络 IO 过程
 	acl::fiber::acl_io_hook();
 }
 
 void CWinEchodDlg::OnBnClickedListen()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (m_fiberListen == NULL)
 	{
 		UpdateData();
@@ -240,7 +240,7 @@ void CWinEchodDlg::OnBnClickedListen()
 			printf("listen %s error %s\r\n", m_listenAddr.c_str());
 			return;
 		}
-		CString info(_T("鍋滄鐩戝惉"));
+		CString info(_T("停止监听"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 
 		printf("listen %s ok\r\n", m_listenAddr.c_str());
@@ -256,7 +256,7 @@ void CWinEchodDlg::OnBnClickedListen()
 		printf("listening socket was closed\r\n");
 		m_fiberListen = NULL;
 		printf("fiber schedule stopped!\r\n");
-		CString info(_T("寮€濮嬬洃鍚�"));
+		CString info(_T("开始监听"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
 	}
@@ -266,7 +266,7 @@ void CWinEchodDlg::OnBnClickedListen()
 		m_listen.close();
 		printf("listening socket was closed\r\n");
 		m_fiberListen = NULL;
-		CString info(_T("寮€濮嬬洃鍚�"));
+		CString info(_T("开始监听"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
 	}
@@ -274,14 +274,14 @@ void CWinEchodDlg::OnBnClickedListen()
 
 void CWinEchodDlg::OnBnClickedCreateTimer()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	acl::fiber* fb = new CFiberSleep;
 	fb->start();
 }
 
 void CWinEchodDlg::OnBnClickedConnect()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	UpdateData();
 	GetDlgItem(IDC_CONNECT)->EnableWindow(FALSE);
 
@@ -306,7 +306,7 @@ void CWinEchodDlg::OnFiberConnectExit(void)
 
 void CWinEchodDlg::OnBnClickedOk()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (acl::fiber::scheduled())
 	{
 		acl::fiber::schedule_stop();

@@ -1,4 +1,4 @@
-﻿#ifndef	__PRIVATE_FIFO_INCLUDE_H__
+#ifndef	__PRIVATE_FIFO_INCLUDE_H__
 #define	__PRIVATE_FIFO_INCLUDE_H__
 
 #include "stdlib/acl_fifo.h"

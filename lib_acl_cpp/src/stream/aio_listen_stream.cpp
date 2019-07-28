@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
@@ -57,11 +57,11 @@ bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 
 	stream_ = acl_aio_open(handle_->get_handle(), sstream);
 
-	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
-	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
+	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
 	hook_error();
 
-	// hook ç›‘å¬çš„å›è°ƒè¿‡ç¨‹
+	// hook ¼àÌıµÄ»Øµ÷¹ı³Ì
 	hook_accept();
 	return true;
 }

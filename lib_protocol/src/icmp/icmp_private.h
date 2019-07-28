@@ -1,4 +1,4 @@
-﻿#ifndef __ICMP_PRIVATE_INCLUDE_H__
+#ifndef __ICMP_PRIVATE_INCLUDE_H__
 #define __ICMP_PRIVATE_INCLUDE_H__
 
 #include "lib_acl.h"

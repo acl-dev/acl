@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <map>
 #include "acl_cpp/stdlib/log.hpp"
@@ -64,40 +64,40 @@ void connect_monitor::stop(bool graceful)
 
 void* connect_monitor::run(void)
 {
-	// æ£€æŸ¥æœåŠ¡ç«¯è¿æ¥çŠ¶æ€å®šæ—¶å™¨
+	// ¼ì²é·şÎñ¶ËÁ¬½Ó×´Ì¬¶¨Ê±Æ÷
 	check_timer timer(*this, handle_, conn_timeout_);
 
-	timer.keep_timer(true);  // ä¿æŒå®šæ—¶å™¨
+	timer.keep_timer(true);  // ±£³Ö¶¨Ê±Æ÷
 	handle_.set_timer(&timer, check_inter_ * 1000000);
 
 	while (!stop_) {
 		handle_.check();
 	}
 
-	// ç­‰å¾…å®šæ—¶å™¨ç»“æŸ
+	// µÈ´ı¶¨Ê±Æ÷½áÊø
 	while (!timer.finish(stop_graceful_)) {
 		handle_.check();
 	}
 
-	// å¦‚æœ rpc_service_ å¯¹è±¡éç©ºåˆ™åˆ é™¤ä¹‹
+	// Èç¹û rpc_service_ ¶ÔÏó·Ç¿ÕÔòÉ¾³ıÖ®
 	delete rpc_service_;
 
-	// æœ€åå†æ£€æµ‹ä¸€æ¬¡ï¼Œä»¥å°½é‡é‡Šæ”¾å¯èƒ½å­˜åœ¨çš„å¼‚æ­¥å¯¹è±¡
+	// ×îºóÔÙ¼ì²âÒ»´Î£¬ÒÔ¾¡Á¿ÊÍ·Å¿ÉÄÜ´æÔÚµÄÒì²½¶ÔÏó
 	handle_.check();
 	return NULL;
 }
 
 void connect_monitor::on_open(check_client& checker)
 {
-	// å¦‚æœæœªè®¾ç½® rpc æœåŠ¡å¯¹è±¡ï¼Œåˆ™é‡‡ç”¨å¼‚æ­¥ IO æ£€æµ‹è¿‡ç¨‹
+	// Èç¹ûÎ´ÉèÖÃ rpc ·şÎñ¶ÔÏó£¬Ôò²ÉÓÃÒì²½ IO ¼ì²â¹ı³Ì
 	if (rpc_service_ == NULL) {
 		checker.set_blocked(false);
 		nio_check(checker, checker.get_conn());
 	} else {
-		// è®¾ç½®æ£€æµ‹å¯¹è±¡ä¸ºé˜»å¡æ¨¡å¼
+		// ÉèÖÃ¼ì²â¶ÔÏóÎª×èÈûÄ£Ê½
 		checker.set_blocked(true);
 
-		// åˆ›å»º rpc è¯·æ±‚å¯¹è±¡ï¼Œå°†å…¶æ”¾å…¥çº¿ç¨‹æ± ä¸­è¿è¡Œï¼Œé‡‡ç”¨é˜»å¡ IO è¿‡ç¨‹
+		// ´´½¨ rpc ÇëÇó¶ÔÏó£¬½«Æä·ÅÈëÏß³Ì³ØÖĞÔËĞĞ£¬²ÉÓÃ×èÈû IO ¹ı³Ì
 		check_rpc* req = new check_rpc(*this, checker);
 		rpc_service_->rpc_fork(req);
 	}
@@ -105,10 +105,10 @@ void connect_monitor::on_open(check_client& checker)
 
 void connect_monitor::nio_check(check_client& checker, aio_socket_stream&)
 {
-	// è®¾ç½®çŠ¶æ€è¡¨æ˜è¯¥è¿æ¥æ˜¯å­˜æ´»çš„
+	// ÉèÖÃ×´Ì¬±íÃ÷¸ÃÁ¬½ÓÊÇ´æ»îµÄ
 	checker.set_alive(true);
 
-	// å¼‚æ­¥å…³é—­è¿æ¥æ£€æµ‹å¯¹è±¡
+	// Òì²½¹Ø±ÕÁ¬½Ó¼ì²â¶ÔÏó
 	checker.close();
 }
 

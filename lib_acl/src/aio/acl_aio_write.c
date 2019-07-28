@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -46,15 +46,15 @@ static int write_complete_callback(ACL_ASTREAM *astream)
 {
 	int   ret = 0;
 
-	/* æµå¼•ç”¨è®¡æ•°åŠ 1ï¼Œä»¥é˜²æ­¢æµè¢«å¼‚å¸¸å…³é—­ */
+	/* Á÷ÒıÓÃ¼ÆÊı¼Ó1£¬ÒÔ·ÀÖ¹Á÷±»Òì³£¹Ø±Õ */
 	astream->nrefer++;
 
 	if (astream->write_handles) {
 		ACL_ITER iter;
 		AIO_WRITE_HOOK *handle;
 
-		/* å¿…é¡»å°†å„ä¸ªå›è°ƒå¥æŸ„ä»å›è°ƒé˜Ÿåˆ—ä¸­ä¸€ä¸€æå‡ºç½®å…¥ä¸€ä¸ªå•ç‹¬é˜Ÿåˆ—ä¸­,
-		 * å› ä¸º ACL_AIO åœ¨å›è°ƒè¿‡ç¨‹ä¸­æœ‰å¯èƒ½å‘ç”ŸåµŒå¥—ï¼Œé˜²æ­¢è¢«é‡å¤è°ƒç”¨
+		/* ±ØĞë½«¸÷¸ö»Øµ÷¾ä±ú´Ó»Øµ÷¶ÓÁĞÖĞÒ»Ò»Ìá³öÖÃÈëÒ»¸öµ¥¶À¶ÓÁĞÖĞ,
+		 * ÒòÎª ACL_AIO ÔÚ»Øµ÷¹ı³ÌÖĞÓĞ¿ÉÄÜ·¢ÉúÇ¶Ì×£¬·ÀÖ¹±»ÖØ¸´µ÷ÓÃ
 		 */
 
 		while (1) {
@@ -71,7 +71,7 @@ static int write_complete_callback(ACL_ASTREAM *astream)
 			if (handle->disable)
 				continue;
 
-			/* å›è°ƒå†™æˆåŠŸæ³¨å†Œå‡½æ•° */
+			/* »Øµ÷Ğ´³É¹¦×¢²áº¯Êı */
 			ret = handle->callback(astream, handle->ctx);
 			if (ret != 0) {
 				astream->nrefer--;
@@ -84,7 +84,7 @@ static int write_complete_callback(ACL_ASTREAM *astream)
 	return (ret);
 }
 
-/* å°è¯•å‘é€æµå†™é˜Ÿåˆ—é‡Œçš„æ•°æ®ï¼Œè¿”å›å€¼ä¸ºå†™é˜Ÿåˆ—é‡Œè¿˜å‰©ä½™çš„æ•°æ®é•¿åº¦æˆ–å†™å¤±è´¥ */
+/* ³¢ÊÔ·¢ËÍÁ÷Ğ´¶ÓÁĞÀïµÄÊı¾İ£¬·µ»ØÖµÎªĞ´¶ÓÁĞÀï»¹Ê£ÓàµÄÊı¾İ³¤¶È»òĞ´Ê§°Ü */
 
 static int __try_fflush(ACL_ASTREAM *astream)
 {
@@ -94,65 +94,65 @@ static int __try_fflush(ACL_ASTREAM *astream)
 	int   n, dlen;
 	int   i = 0;
 
-	/* é’ˆå¯¹å†™é˜Ÿåˆ—ï¼Œä¹Ÿè®¸è°ƒç”¨ writev ä¼šæ›´å¥½ï¼Œåº”è¯¥é‚£ä¸ªå†™çš„æ•ˆç‡ä¼šæ›´é«˜äº›
+	/* Õë¶ÔĞ´¶ÓÁĞ£¬Ò²Ğíµ÷ÓÃ writev »á¸üºÃ£¬Ó¦¸ÃÄÇ¸öĞ´µÄĞ§ÂÊ»á¸ü¸ßĞ©
 	 * --- zsx */
 
 	while (1) {
-		/* æå–æµå†™é˜Ÿåˆ—çš„æ•°æ®å¤´éƒ¨åˆ† */
+		/* ÌáÈ¡Á÷Ğ´¶ÓÁĞµÄÊı¾İÍ·²¿·Ö */
 		str = acl_fifo_head(&astream->write_fifo);
 		if (str == NULL) {
-			/* è¯´æ˜å†™é˜Ÿåˆ—å·²ç»ä¸ºç©º */
+			/* ËµÃ÷Ğ´¶ÓÁĞÒÑ¾­Îª¿Õ */
 			if (astream->write_left != 0)
 				acl_msg_fatal("%s: write_left(%d) != 0",
 					myname, astream->write_left);
 			return (astream->write_left);
 		}
 
-		/* è®¡ç®—æœ¬æ•°æ®å—çš„é•¿åº¦åŠæ•°æ®å¼€å§‹ä½ç½®, write_offset ä»…æ˜¯æœ¬æ•°æ®å—
-		 * çš„ç›¸å¯¹ä½ç½®, å³ç›¸å¯¹äºæ•°æ®å—çš„èµ·å§‹ä½ç½®çš„ç›¸å¯¹é•¿åº¦ï¼Œæ‰€ä»¥ dlen
-		 * ä»…æ˜¯æœ¬æ•°æ®å—ä¸­åœ¨æœ¬æ¬¡å†™æ“ä½œéœ€è¦è¢«å†™çš„æ•°æ®çš„é•¿åº¦ï¼›è€Œ
-		 * write_left åˆ™æ˜¯å…¨å±€æ€§çš„ï¼Œæ˜¯æ•´ä¸ªå†™é˜Ÿåˆ—çš„æ•°æ®é•¿åº¦ï¼Œéœ€è¦å°†è¯¥
-		 * è¿™ä¸¤ä¸ªå˜é‡åŒºåˆ†å¼€ï¼Œå°†æ¥ä¹Ÿè®¸åº”è¯¥å°† write_offset ä¹Ÿè®¾å®šä¸ºå…¨å±€
-		 * æ€§çš„ã€‚--- zsx :)
+		/* ¼ÆËã±¾Êı¾İ¿éµÄ³¤¶È¼°Êı¾İ¿ªÊ¼Î»ÖÃ, write_offset ½öÊÇ±¾Êı¾İ¿é
+		 * µÄÏà¶ÔÎ»ÖÃ, ¼´Ïà¶ÔÓÚÊı¾İ¿éµÄÆğÊ¼Î»ÖÃµÄÏà¶Ô³¤¶È£¬ËùÒÔ dlen
+		 * ½öÊÇ±¾Êı¾İ¿éÖĞÔÚ±¾´ÎĞ´²Ù×÷ĞèÒª±»Ğ´µÄÊı¾İµÄ³¤¶È£»¶ø
+		 * write_left ÔòÊÇÈ«¾ÖĞÔµÄ£¬ÊÇÕû¸öĞ´¶ÓÁĞµÄÊı¾İ³¤¶È£¬ĞèÒª½«¸Ã
+		 * ÕâÁ½¸ö±äÁ¿Çø·Ö¿ª£¬½«À´Ò²ĞíÓ¦¸Ã½« write_offset Ò²Éè¶¨ÎªÈ«¾Ö
+		 * ĞÔµÄ¡£--- zsx :)
 		 */
 
 		dlen = (int) ACL_VSTRING_LEN(str) - astream->write_offset;
 		ptr = acl_vstring_str(str) + astream->write_offset;
-		/* å¼€å§‹è¿›è¡Œéé˜»å¡å¼å†™æ“ä½œ */
+		/* ¿ªÊ¼½øĞĞ·Ç×èÈûÊ½Ğ´²Ù×÷ */
 		n = acl_vstream_write(astream->stream, ptr, dlen);
 		if (n == ACL_VSTREAM_EOF) {
 			if (acl_last_error() != ACL_EAGAIN) {
 				astream->flag |= ACL_AIO_FLAG_DEAD;
 				return (-1);
 			}
-			/* æœ¬æ¬¡å†™æ“ä½œæœªå†™å…¥æ•°æ®ï¼Œä»…éœ€è¦è¿”å›å‰©ä½™æ•°æ®é•¿åº¦å³å¯ */
+			/* ±¾´ÎĞ´²Ù×÷Î´Ğ´ÈëÊı¾İ£¬½öĞèÒª·µ»ØÊ£ÓàÊı¾İ³¤¶È¼´¿É */
 			return (astream->write_left);
 		}
 
-		/* é‡æ–°è®¡ç®—å†™é˜Ÿåˆ—é‡Œå‰©ä½™æ•°æ®çš„æ€»é•¿åº¦ */
+		/* ÖØĞÂ¼ÆËãĞ´¶ÓÁĞÀïÊ£ÓàÊı¾İµÄ×Ü³¤¶È */
 		astream->write_left -= n;
 
 		if (n < dlen) {
-			/* æœªèƒ½å°†æœ¬æ•°æ®å—çš„å¯å†™æ•°æ®å…¨éƒ¨å†™å…¥ï¼Œæ‰€ä»¥éœ€è¦é‡æ–°è®¡ç®—
-			 * è¯¥æ•°æ®å—çš„å¯å†™æ•°æ®çš„ç›¸å¯¹åç§»ä½ç½®
+			/* Î´ÄÜ½«±¾Êı¾İ¿éµÄ¿ÉĞ´Êı¾İÈ«²¿Ğ´Èë£¬ËùÒÔĞèÒªÖØĞÂ¼ÆËã
+			 * ¸ÃÊı¾İ¿éµÄ¿ÉĞ´Êı¾İµÄÏà¶ÔÆ«ÒÆÎ»ÖÃ
 			 */
 			astream->write_offset += n;
 			return (astream->write_left);
 		}
 
-		/* å°†æœ¬æ•°æ®å—ä»å†™é˜Ÿåˆ—ä¸­å‰”é™¤å¹¶é‡Šæ”¾è¯¥æ•°æ®å—æ‰€å çš„å†…å­˜ */
+		/* ½«±¾Êı¾İ¿é´ÓĞ´¶ÓÁĞÖĞÌŞ³ı²¢ÊÍ·Å¸ÃÊı¾İ¿éËùÕ¼µÄÄÚ´æ */
 
 		str = acl_fifo_pop(&astream->write_fifo);
 		acl_vstring_free(str);
 
-		/* é‡ç½® write_offset ä»¥ä¸ºå†™å…¥ä¸‹ä¸€ä¸ªæ•°æ®å—åšå‡†å¤‡, å°†æ¥è¯¥å˜é‡
-		 * ä½œä¸ºå†™é˜Ÿåˆ—çš„ç›¸å¯¹åç§»å˜é‡åä¼šæ›´å¥½äº›. --- zsx
+		/* ÖØÖÃ write_offset ÒÔÎªĞ´ÈëÏÂÒ»¸öÊı¾İ¿é×ö×¼±¸, ½«À´¸Ã±äÁ¿
+		 * ×÷ÎªĞ´¶ÓÁĞµÄÏà¶ÔÆ«ÒÆ±äÁ¿ºó»á¸üºÃĞ©. --- zsx
 		 */
 		astream->write_offset = 0;
 
-		/* å¦‚æœæœ¬è½®å†™é˜Ÿåˆ—æ“ä½œçš„å¾ªç¯æ¬¡æ•°è¿‡å¤šï¼Œåˆ™åº”è¿”å›ï¼Œä»¥ç»™å…¶å®ƒçš„æ•°æ®
-		 * è¿æ¥å¯è¯»å†™çš„æœºä¼š, åˆ«å¿˜äº†ï¼Œåœ¨å•çº¿ç¨‹æ¡ä»¶ä¸‹è¿›è¡Œéé˜»å¡å†™æ—¶å¯èƒ½
-		 * ä¼šæœ‰å¾ˆå¤šæ•°æ®è¿æ¥éœ€è¦è¢«å¤„ç†ï¼Œæ€»ä¹‹ï¼Œæ•°æ®é¢å‰å¤§å®¶å¹³ç­‰:)
+		/* Èç¹û±¾ÂÖĞ´¶ÓÁĞ²Ù×÷µÄÑ­»·´ÎÊı¹ı¶à£¬ÔòÓ¦·µ»Ø£¬ÒÔ¸øÆäËüµÄÊı¾İ
+		 * Á¬½Ó¿É¶ÁĞ´µÄ»ú»á, ±ğÍüÁË£¬ÔÚµ¥Ïß³ÌÌõ¼şÏÂ½øĞĞ·Ç×èÈûĞ´Ê±¿ÉÄÜ
+		 * »áÓĞºÜ¶àÊı¾İÁ¬½ÓĞèÒª±»´¦Àí£¬×ÜÖ®£¬Êı¾İÃæÇ°´ó¼ÒÆ½µÈ:)
 		 */
 		if (++i >= 10) {
 			if (acl_msg_verbose)
@@ -163,7 +163,7 @@ static int __try_fflush(ACL_ASTREAM *astream)
 	}
 }
 
-/* æµå‡ºé”™æˆ–æµå¯å†™æ—¶è§¦å‘äº†æµçš„å†™äº‹ä»¶å¤„ç†å‡½æ•° */
+/* Á÷³ö´í»òÁ÷¿ÉĞ´Ê±´¥·¢ÁËÁ÷µÄĞ´ÊÂ¼ş´¦Àíº¯Êı */
 
 static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused,
 	ACL_VSTREAM *stream acl_unused, void *context)
@@ -175,21 +175,21 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 	WRITE_SAFE_DIABLE(astream);
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
-		/* æµå‘ç”Ÿäº†é”™è¯¯ï¼Œå¯åŠ¨IOå®Œæˆå»¶è¿Ÿå…³é—­å…³é—­ */
+		/* Á÷·¢ÉúÁË´íÎó£¬Æô¶¯IOÍê³ÉÑÓ³Ù¹Ø±Õ¹Ø±Õ */
 		WRITE_IOCP_CLOSE(astream);
 		return;
 	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
-		/* å†™æ“ä½œè¶…æ—¶ï¼Œè‹¥ç”¨æˆ·çš„å›è°ƒå‡½æ•°è¿”å› -1 åˆ™é‡‡ç”¨ IO å®Œæˆå»¶è¿Ÿ
-		 * å…³é—­è¿‡ç¨‹ */
+		/* Ğ´²Ù×÷³¬Ê±£¬ÈôÓÃ»§µÄ»Øµ÷º¯Êı·µ»Ø -1 Ôò²ÉÓÃ IO Íê³ÉÑÓ³Ù
+		 * ¹Ø±Õ¹ı³Ì */
 		if (aio_timeout_callback(astream) < 0) {
 			WRITE_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
-			/* è¯¥æµæ­£å¤„äºIOå»¶è¿Ÿå…³é—­çŠ¶æ€ï¼Œå› æœ¬æ¬¡å†™IOå·²ç»æˆåŠŸå®Œæˆï¼Œ
-			 * æ‰€ä»¥éœ€è¦å®Œæˆæµçš„IOå»¶è¿Ÿå…³é—­è¿‡ç¨‹
+			/* ¸ÃÁ÷Õı´¦ÓÚIOÑÓ³Ù¹Ø±Õ×´Ì¬£¬Òò±¾´ÎĞ´IOÒÑ¾­³É¹¦Íê³É£¬
+			 * ËùÒÔĞèÒªÍê³ÉÁ÷µÄIOÑÓ³Ù¹Ø±Õ¹ı³Ì
 			 */
 			WRITE_IOCP_CLOSE(astream);
 		} else {
-			/* è¯´æ˜ç”¨æˆ·å¸Œæœ›ç»§ç»­ç­‰å¾…å†™äº‹ä»¶ */
+			/* ËµÃ÷ÓÃ»§Ï£Íû¼ÌĞøµÈ´ıĞ´ÊÂ¼ş */
 			WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 		}
 		return;
@@ -198,29 +198,29 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 	if ((event_type & ACL_EVENT_WRITE) == 0)
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
 
-	/* å°è¯•å‘é€æµçš„å†™é˜Ÿåˆ—é‡Œçš„æ•°æ® */
+	/* ³¢ÊÔ·¢ËÍÁ÷µÄĞ´¶ÓÁĞÀïµÄÊı¾İ */
 	nleft = __try_fflush(astream);
 
 	if (nleft < 0) {
-		/* å°è¯•å†™å¤±è´¥åˆ™å¯åŠ¨IOå®Œæˆå»¶è¿Ÿè¿‡ç¨‹ */
+		/* ³¢ÊÔĞ´Ê§°ÜÔòÆô¶¯IOÍê³ÉÑÓ³Ù¹ı³Ì */
 		WRITE_IOCP_CLOSE(astream);
 	} else if (nleft == 0) {
-		/* ä¹‹å‰æµçš„å†™é˜Ÿåˆ—ä¸ºç©ºæˆ–å·²ç»æˆåŠŸæ¸…ç©ºäº†å†™é˜Ÿåˆ—é‡Œçš„æ‰€æœ‰æ•°æ® */
+		/* Ö®Ç°Á÷µÄĞ´¶ÓÁĞÎª¿Õ»òÒÑ¾­³É¹¦Çå¿ÕÁËĞ´¶ÓÁĞÀïµÄËùÓĞÊı¾İ */
 		int   ret;
 
 		ret = write_complete_callback(astream);
 		if (ret < 0) {
-			/* ç”¨æˆ·å¸Œæœ›å…³é—­è¯¥æµï¼Œåˆ™å¯åŠ¨IOå®Œæˆå»¶è¿Ÿå…³é—­è¿‡ç¨‹ */
+			/* ÓÃ»§Ï£Íû¹Ø±Õ¸ÃÁ÷£¬ÔòÆô¶¯IOÍê³ÉÑÓ³Ù¹Ø±Õ¹ı³Ì */
 			WRITE_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
-			/* ä¹‹å‰è¯¥æµå·²ç»è¢«è®¾ç½®äº†IOå®Œæˆå»¶è¿Ÿå…³é—­æ ‡å¿—ä½ï¼Œ
-			 * åˆ™å†æ¬¡å¯åŠ¨IOå®Œæˆå»¶è¿Ÿå…³é—­è¿‡ç¨‹
+			/* Ö®Ç°¸ÃÁ÷ÒÑ¾­±»ÉèÖÃÁËIOÍê³ÉÑÓ³Ù¹Ø±Õ±êÖ¾Î»£¬
+			 * ÔòÔÙ´ÎÆô¶¯IOÍê³ÉÑÓ³Ù¹Ø±Õ¹ı³Ì
 			 */
 			WRITE_IOCP_CLOSE(astream);
 		}
 	} else {
-		/* è¯´æ˜å†™é˜Ÿåˆ—é‡Œçš„æ•°æ®æœªå‘é€å®Œæ¯•ï¼Œéœ€è¦å†æ¬¡å‘é€ï¼Œæ‰€ä»¥å°†å†™äº‹ä»¶ç½®
-		 * å…¥äº‹ä»¶ç›‘æ§ä¸­ */
+		/* ËµÃ÷Ğ´¶ÓÁĞÀïµÄÊı¾İÎ´·¢ËÍÍê±Ï£¬ĞèÒªÔÙ´Î·¢ËÍ£¬ËùÒÔ½«Ğ´ÊÂ¼şÖÃ
+		 * ÈëÊÂ¼ş¼à¿ØÖĞ */
 		WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 	}
 }
@@ -234,11 +234,11 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD)))
 		return;
 
-	/* å°†åµŒå¥—è®¡æ•°åŠ 1ï¼Œä»¥é˜²æ­¢åµŒå¥—å±‚æ¬¡å¤ªæ·±è€Œä½¿æ ˆæº¢å‡º */
+	/* ½«Ç¶Ì×¼ÆÊı¼Ó1£¬ÒÔ·ÀÖ¹Ç¶Ì×²ã´ÎÌ«Éî¶øÊ¹Õ»Òç³ö */
 	astream->write_nested++;
 
 	if (astream->write_nested >= astream->write_nested_limit) {
-		/* é€’å½’å†™æ¬¡æ•°è¾¾åˆ°äº†é˜€å€¼ï¼Œåªéœ€è®°ä¸ªè­¦å‘Šä¿¡æ¯ï¼Œå› ä¸ºæœ‰åµŒå¥—é™åˆ¶ */
+		/* µİ¹éĞ´´ÎÊı´ïµ½ÁË·§Öµ£¬Ö»Ğè¼Ç¸ö¾¯¸æĞÅÏ¢£¬ÒòÎªÓĞÇ¶Ì×ÏŞÖÆ */
 		if (acl_msg_verbose)
 			acl_msg_warn("%s(%d): write_nested(%d) >= max(%d)",
 				myname, __LINE__, astream->write_nested,
@@ -246,35 +246,35 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 		n = 0;
 	}
 
-	/* å¦‚æœåµŒå¥—è°ƒç”¨æ¬¡æ•°å°äºé˜€å€¼ï¼Œåˆ™å…è®¸è¿›è¡ŒåµŒå¥—è°ƒç”¨ */
-	/* å…ˆå°è¯•å†™æµçš„å†™é˜Ÿåˆ—ä¸­çš„æ•°æ® */
+	/* Èç¹ûÇ¶Ì×µ÷ÓÃ´ÎÊıĞ¡ÓÚ·§Öµ£¬ÔòÔÊĞí½øĞĞÇ¶Ì×µ÷ÓÃ */
+	/* ÏÈ³¢ÊÔĞ´Á÷µÄĞ´¶ÓÁĞÖĞµÄÊı¾İ */
 	else if ((n = __try_fflush(astream)) < 0) {
-		/* è¯´æ˜å°è¯•å†™å¤±è´¥ï¼Œéœ€è¦å…³é—­æµ */
+		/* ËµÃ÷³¢ÊÔĞ´Ê§°Ü£¬ĞèÒª¹Ø±ÕÁ÷ */
 		astream->write_nested--;
 		WRITE_IOCP_CLOSE(astream);
 		return;
 	} else if (n > 0) {
-		/* __try_fflush å¹¶æœªå…¨éƒ¨å†™å®Œå†™é˜Ÿåˆ—çš„æ‰€æœ‰çš„æ•°æ®ï¼Œæ‰€ä»¥
-		 * ä¹Ÿéœ€è¦æœ¬æ¬¡çš„æ•°æ®å…¨éƒ¨åŠ å…¥æµçš„å†™é˜Ÿåˆ—ä¸­
+		/* __try_fflush ²¢Î´È«²¿Ğ´ÍêĞ´¶ÓÁĞµÄËùÓĞµÄÊı¾İ£¬ËùÒÔ
+		 * Ò²ĞèÒª±¾´ÎµÄÊı¾İÈ«²¿¼ÓÈëÁ÷µÄĞ´¶ÓÁĞÖĞ
 		 */
 		n = 0;
 	}
 
-	/* __try_fflush è¿”å› 0, é˜Ÿåˆ—ä¸­æ•°æ®å·²ç»æ¸…ç©ºï¼Œå¯ä»¥çœŸæ­£è°ƒç”¨ä¸€æ¬¡å†™æ“ä½œ */
+	/* __try_fflush ·µ»Ø 0, ¶ÓÁĞÖĞÊı¾İÒÑ¾­Çå¿Õ£¬¿ÉÒÔÕæÕıµ÷ÓÃÒ»´ÎĞ´²Ù×÷ */
 	else if ((n = acl_vstream_write(astream->stream, data, dlen)) == dlen)
 	{
-		/* è¯´æ˜å·²ç»æˆåŠŸå†™å…¥äº†å…¨éƒ¨çš„æ•°æ® */
+		/* ËµÃ÷ÒÑ¾­³É¹¦Ğ´ÈëÁËÈ«²¿µÄÊı¾İ */
 
 		if (write_complete_callback(astream) < 0) {
 			astream->write_nested--;
 
-			/* è°ƒç”¨è€…å¸Œæœ›å…³é—­æµ */
+			/* µ÷ÓÃÕßÏ£Íû¹Ø±ÕÁ÷ */
 			WRITE_IOCP_CLOSE(astream);
 		} else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
 			astream->write_nested--;
 
-			/* å› ä¸ºæœ¬æ¬¡å†™IOå·²ç»æˆåŠŸå®Œæˆï¼Œæ‰€ä»¥éœ€è¦
-			 * å®Œæˆæµçš„IOå»¶è¿Ÿå…³é—­è¿‡ç¨‹
+			/* ÒòÎª±¾´ÎĞ´IOÒÑ¾­³É¹¦Íê³É£¬ËùÒÔĞèÒª
+			 * Íê³ÉÁ÷µÄIOÑÓ³Ù¹Ø±Õ¹ı³Ì
 			 */
 			WRITE_IOCP_CLOSE(astream);
 		} else
@@ -289,26 +289,26 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 			return;
 		}
 
-		/* è‹¥æœªå†™ä»»ä½•æ•°æ®ä¸”è¯Šæ–­è¯¥æµçš„å¯¹ç­‰ç‚¹å¹¶æœªå…³é—­ï¼Œ
-		 * åˆ™å°†æ­¤æ¬¡æ•°æ®ç½®å…¥è¯¥æµçš„å†™é˜Ÿåˆ—ä¸­
+		/* ÈôÎ´Ğ´ÈÎºÎÊı¾İÇÒÕï¶Ï¸ÃÁ÷µÄ¶ÔµÈµã²¢Î´¹Ø±Õ£¬
+		 * Ôò½«´Ë´ÎÊı¾İÖÃÈë¸ÃÁ÷µÄĞ´¶ÓÁĞÖĞ
 		 */
 		n = 0;
 	}
 
-	/* å¦åˆ™ï¼Œç¦æ­¢ç»§ç»­åµŒå¥—ï¼Œå°†å†™äº‹ä»¶ç½®äºäº‹ä»¶ç›‘æ§ä¸­ï¼Œä»è€Œå‡å°‘åµŒå¥—å±‚æ¬¡ */
+	/* ·ñÔò£¬½ûÖ¹¼ÌĞøÇ¶Ì×£¬½«Ğ´ÊÂ¼şÖÃÓÚÊÂ¼ş¼à¿ØÖĞ£¬´Ó¶ø¼õÉÙÇ¶Ì×²ã´Î */
 
 	astream->write_nested--;
 
 	/* XXX: In acl_vstring_memcpy, vstring_extend should not be called */
 
-	/* å°†æ•°æ®ç½®å…¥è¯¥æµçš„å†™é˜Ÿåˆ—ä¸­ */
+	/* ½«Êı¾İÖÃÈë¸ÃÁ÷µÄĞ´¶ÓÁĞÖĞ */
 
 	str = acl_vstring_alloc(dlen - n + 1);
 	acl_vstring_memcpy(str, data + n, dlen - n);
 	acl_fifo_push(&astream->write_fifo, str);
 	astream->write_left += dlen - n;
 
-	/* å°†è¯¥æµçš„å†™äº‹ä»¶ç½®å…¥äº‹ä»¶ç›‘æ§ä¸­ */
+	/* ½«¸ÃÁ÷µÄĞ´ÊÂ¼şÖÃÈëÊÂ¼ş¼à¿ØÖĞ */
 	WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 }
 
@@ -324,12 +324,12 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 	str = acl_vstring_alloc(__default_line_length);
 	acl_vstring_vsprintf(str, fmt, ap);
 
-	/* å°†åµŒå¥—è®¡æ•°åŠ 1ï¼Œä»¥é˜²æ­¢åµŒå¥—å±‚æ¬¡å¤ªæ·±è€Œä½¿æ ˆæº¢å‡º */
+	/* ½«Ç¶Ì×¼ÆÊı¼Ó1£¬ÒÔ·ÀÖ¹Ç¶Ì×²ã´ÎÌ«Éî¶øÊ¹Õ»Òç³ö */
 	astream->write_nested++;
 
 	if (astream->write_nested >= astream->write_nested_limit) {
-		/* é€’å½’åµŒå¥—å†™æ¬¡æ•°è¾¾åˆ°äº†è§„å®šçš„é˜€å€¼ï¼Œåªéœ€è®°ä¸ªè­¦å‘Šä¿¡æ¯å³å¯ï¼Œ
-		 * å› ä¸ºæœ‰åµŒå¥—é™åˆ¶ */
+		/* µİ¹éÇ¶Ì×Ğ´´ÎÊı´ïµ½ÁË¹æ¶¨µÄ·§Öµ£¬Ö»Ğè¼Ç¸ö¾¯¸æĞÅÏ¢¼´¿É£¬
+		 * ÒòÎªÓĞÇ¶Ì×ÏŞÖÆ */
 		if (acl_msg_verbose)
 			acl_msg_warn("%s: write_nested(%d) >= max(%d)",
 				myname, astream->write_nested,
@@ -337,16 +337,16 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 		n = 0;
 	}
 
-	/* å¦‚æœåµŒå¥—è°ƒç”¨æ¬¡æ•°å°äºé˜€å€¼ï¼Œåˆ™å…è®¸è¿›è¡ŒåµŒå¥—è°ƒç”¨ */
-	/* å…ˆå°è¯•å†™æµçš„å†™é˜Ÿåˆ—ä¸­çš„æ•°æ® */
+	/* Èç¹ûÇ¶Ì×µ÷ÓÃ´ÎÊıĞ¡ÓÚ·§Öµ£¬ÔòÔÊĞí½øĞĞÇ¶Ì×µ÷ÓÃ */
+	/* ÏÈ³¢ÊÔĞ´Á÷µÄĞ´¶ÓÁĞÖĞµÄÊı¾İ */
 	else if ((n = __try_fflush(astream)) < 0) {
-		/* è¯´æ˜å°è¯•å†™å¤±è´¥ï¼Œéœ€è¦å…³é—­æµ */
+		/* ËµÃ÷³¢ÊÔĞ´Ê§°Ü£¬ĞèÒª¹Ø±ÕÁ÷ */
 		astream->write_nested--;
 		WRITE_IOCP_CLOSE(astream);
 		return;
 	} else if (n == 0) {
-		/* __try_fflush è¿”å›çš„æ˜¯é˜Ÿåˆ—ä¸­çš„æ•°æ®å·²ç»æ¸…ç©ºï¼Œ
-		 * æœ¬æ¬¡å¯ä»¥çœŸæ­£è°ƒç”¨ä¸€æ¬¡å†™æ“ä½œ
+		/* __try_fflush ·µ»ØµÄÊÇ¶ÓÁĞÖĞµÄÊı¾İÒÑ¾­Çå¿Õ£¬
+		 * ±¾´Î¿ÉÒÔÕæÕıµ÷ÓÃÒ»´ÎĞ´²Ù×÷
 		 */
 		const char *ptr = acl_vstring_str(str);
 		len = (int) ACL_VSTRING_LEN(str);
@@ -358,22 +358,22 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 				WRITE_IOCP_CLOSE(astream);
 				return;
 			}
-			/* å¦‚æœæœªå†™ä»»ä½•æ•°æ®ä¸”è¯Šæ–­è¯¥æµçš„å¯¹ç­‰ç‚¹å¹¶æœªå…³é—­ï¼Œ
-			 * åˆ™å°†æ­¤æ¬¡æ•°æ®ç½®å…¥è¯¥æµçš„å†™é˜Ÿåˆ—ä¸­
+			/* Èç¹ûÎ´Ğ´ÈÎºÎÊı¾İÇÒÕï¶Ï¸ÃÁ÷µÄ¶ÔµÈµã²¢Î´¹Ø±Õ£¬
+			 * Ôò½«´Ë´ÎÊı¾İÖÃÈë¸ÃÁ÷µÄĞ´¶ÓÁĞÖĞ
 			 */
 			n = 0;
 		} else if (n == len) {
-			/* è¯´æ˜å·²ç»æˆåŠŸå†™å…¥äº†å…¨éƒ¨çš„æ•°æ® */
+			/* ËµÃ÷ÒÑ¾­³É¹¦Ğ´ÈëÁËÈ«²¿µÄÊı¾İ */
 
 			int ret = write_complete_callback(astream);
 			acl_vstring_free(str);
 			astream->write_nested--;
 
-			if (ret < 0) /* è°ƒç”¨è€…å¸Œæœ›å…³é—­æµ */
+			if (ret < 0) /* µ÷ÓÃÕßÏ£Íû¹Ø±ÕÁ÷ */
 				WRITE_IOCP_CLOSE(astream);
 			else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
-				/* å› ä¸ºæœ¬æ¬¡å†™IOå·²ç»æˆåŠŸå®Œæˆï¼Œæ‰€ä»¥éœ€è¦
-				 * å®Œæˆæµçš„IOå»¶è¿Ÿå…³é—­è¿‡ç¨‹ */
+				/* ÒòÎª±¾´ÎĞ´IOÒÑ¾­³É¹¦Íê³É£¬ËùÒÔĞèÒª
+				 * Íê³ÉÁ÷µÄIOÑÓ³Ù¹Ø±Õ¹ı³Ì */
 				WRITE_IOCP_CLOSE(astream);
 			}
 
@@ -381,15 +381,15 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 		}
 	}
 
-	/* åªæ˜¯æˆåŠŸå†™å…¥äº†éƒ¨åˆ†æµï¼Œn è¡¨ç¤ºè¿˜å‰©ä½™çš„æ•°æ®é•¿åº¦ */
+	/* Ö»ÊÇ³É¹¦Ğ´ÈëÁË²¿·ÖÁ÷£¬n ±íÊ¾»¹Ê£ÓàµÄÊı¾İ³¤¶È */
 	else {
-		/* __try_fflush å¹¶æœªå…¨éƒ¨å†™å®Œå†™é˜Ÿåˆ—çš„æ‰€æœ‰çš„æ•°æ®ï¼Œæ‰€ä»¥ä¹Ÿ
-		 * éœ€è¦æœ¬æ¬¡çš„æ•°æ®å…¨éƒ¨åŠ å…¥æµçš„å†™é˜Ÿåˆ—ä¸­
+		/* __try_fflush ²¢Î´È«²¿Ğ´ÍêĞ´¶ÓÁĞµÄËùÓĞµÄÊı¾İ£¬ËùÒÔÒ²
+		 * ĞèÒª±¾´ÎµÄÊı¾İÈ«²¿¼ÓÈëÁ÷µÄĞ´¶ÓÁĞÖĞ
 		 */
 		n = 0;
 	}
 
-	/* å¦åˆ™ï¼Œç¦æ­¢ç»§ç»­åµŒå¥—ï¼Œå°†å†™äº‹ä»¶ç½®äºäº‹ä»¶ç›‘æ§ä¸­ï¼Œä»è€Œå‡å°‘åµŒå¥—å±‚æ¬¡ */
+	/* ·ñÔò£¬½ûÖ¹¼ÌĞøÇ¶Ì×£¬½«Ğ´ÊÂ¼şÖÃÓÚÊÂ¼ş¼à¿ØÖĞ£¬´Ó¶ø¼õÉÙÇ¶Ì×²ã´Î */
 
 	astream->write_nested--;
 
@@ -399,11 +399,11 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 	if (n < len)
 		acl_vstring_memmove(str, acl_vstring_str(str) + n, len - n);
 
-	/* å°†æ•°æ®ç½®å…¥è¯¥æµçš„å†™é˜Ÿåˆ—ä¸­ */
+	/* ½«Êı¾İÖÃÈë¸ÃÁ÷µÄĞ´¶ÓÁĞÖĞ */
 	acl_fifo_push(&astream->write_fifo, str);
 	astream->write_left += (int) ACL_VSTRING_LEN(str);
 
-	/* å°†è¯¥æµçš„å†™äº‹ä»¶ç½®å…¥äº‹ä»¶ç›‘æ§ä¸­ */
+	/* ½«¸ÃÁ÷µÄĞ´ÊÂ¼şÖÃÈëÊÂ¼ş¼à¿ØÖĞ */
 	WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 }
 
@@ -428,12 +428,12 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD)))
 		return;
 
-	/* å°†åµŒå¥—è®¡æ•°åŠ 1ï¼Œä»¥é˜²æ­¢åµŒå¥—å±‚æ¬¡å¤ªæ·±è€Œä½¿æ ˆæº¢å‡º */
+	/* ½«Ç¶Ì×¼ÆÊı¼Ó1£¬ÒÔ·ÀÖ¹Ç¶Ì×²ã´ÎÌ«Éî¶øÊ¹Õ»Òç³ö */
 	astream->write_nested++;
 
 	if (astream->write_nested >= astream->write_nested_limit) {
-		/* é€’å½’åµŒå¥—å†™æ¬¡æ•°è¾¾åˆ°äº†è§„å®šçš„é˜€å€¼ï¼Œåªéœ€è®°ä¸ªè­¦å‘Šä¿¡æ¯å³å¯ï¼Œ
-		 * å› ä¸ºæœ‰åµŒå¥—é™åˆ¶ */
+		/* µİ¹éÇ¶Ì×Ğ´´ÎÊı´ïµ½ÁË¹æ¶¨µÄ·§Öµ£¬Ö»Ğè¼Ç¸ö¾¯¸æĞÅÏ¢¼´¿É£¬
+		 * ÒòÎªÓĞÇ¶Ì×ÏŞÖÆ */
 		if (acl_msg_verbose)
 			acl_msg_warn("%s(%d): write_nested(%d) >= max(%d)",
 				myname, __LINE__, astream->write_nested,
@@ -442,22 +442,22 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 
 	}
 
-	/* å¦‚æœåµŒå¥—è°ƒç”¨æ¬¡æ•°å°äºé˜€å€¼ï¼Œåˆ™å…è®¸è¿›è¡ŒåµŒå¥—è°ƒç”¨ */
-	/* å…ˆå°è¯•å†™æµçš„å†™é˜Ÿåˆ—ä¸­çš„æ•°æ® */
+	/* Èç¹ûÇ¶Ì×µ÷ÓÃ´ÎÊıĞ¡ÓÚ·§Öµ£¬ÔòÔÊĞí½øĞĞÇ¶Ì×µ÷ÓÃ */
+	/* ÏÈ³¢ÊÔĞ´Á÷µÄĞ´¶ÓÁĞÖĞµÄÊı¾İ */
 	else if ((n = __try_fflush(astream)) < 0) {
-		/* è¯´æ˜å°è¯•å†™å¤±è´¥ï¼Œéœ€è¦å…³é—­æµ */
+		/* ËµÃ÷³¢ÊÔĞ´Ê§°Ü£¬ĞèÒª¹Ø±ÕÁ÷ */
 		astream->write_nested--;
 		WRITE_IOCP_CLOSE(astream);
 		return;
 	} else if (n > 0) {
-		/* __try_fflush å¹¶æœªå…¨éƒ¨å†™å®Œå†™é˜Ÿåˆ—çš„æ‰€æœ‰çš„æ•°æ®ï¼Œæ‰€ä»¥ä¹Ÿ
-		 * éœ€è¦æœ¬æ¬¡çš„æ•°æ®å…¨éƒ¨åŠ å…¥æµçš„å†™é˜Ÿåˆ—ä¸­
+		/* __try_fflush ²¢Î´È«²¿Ğ´ÍêĞ´¶ÓÁĞµÄËùÓĞµÄÊı¾İ£¬ËùÒÔÒ²
+		 * ĞèÒª±¾´ÎµÄÊı¾İÈ«²¿¼ÓÈëÁ÷µÄĞ´¶ÓÁĞÖĞ
 		 */
 		n = 0;
 	}
 
-	/* __try_fflush è¿”å›çš„æ˜¯é˜Ÿåˆ—ä¸­çš„æ•°æ®å·²ç»æ¸…ç©ºï¼Œ
-	 * æœ¬æ¬¡å¯ä»¥çœŸæ­£è°ƒç”¨ä¸€æ¬¡å†™æ“ä½œ
+	/* __try_fflush ·µ»ØµÄÊÇ¶ÓÁĞÖĞµÄÊı¾İÒÑ¾­Çå¿Õ£¬
+	 * ±¾´Î¿ÉÒÔÕæÕıµ÷ÓÃÒ»´ÎĞ´²Ù×÷
 	 */
 	else if ((n = acl_vstream_writev(astream->stream, vector, count))
 		== ACL_VSTREAM_EOF)
@@ -468,13 +468,13 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 			WRITE_IOCP_CLOSE(astream);
 			return;
 		}
-		/* å¦‚æœæœªå†™ä»»ä½•æ•°æ®ä¸”è¯Šæ–­è¯¥æµçš„å¯¹ç­‰ç‚¹å¹¶æœªå…³é—­ï¼Œ
-		 * åˆ™å°†æ­¤æ¬¡æ•°æ®ç½®å…¥è¯¥æµçš„å†™é˜Ÿåˆ—ä¸­
+		/* Èç¹ûÎ´Ğ´ÈÎºÎÊı¾İÇÒÕï¶Ï¸ÃÁ÷µÄ¶ÔµÈµã²¢Î´¹Ø±Õ£¬
+		 * Ôò½«´Ë´ÎÊı¾İÖÃÈë¸ÃÁ÷µÄĞ´¶ÓÁĞÖĞ
 		 */
 		n = 0;
 	}
 
-	/* è®¡ç®—å‰©ä½™çš„æœªå‘é€çš„æ•°æ®é•¿åº¦ */
+	/* ¼ÆËãÊ£ÓàµÄÎ´·¢ËÍµÄÊı¾İ³¤¶È */
 
 	for (i = 0; i < count; i++) {
 		if (n >= (int) vector[i].iov_len) {
@@ -494,22 +494,22 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 		astream->write_nested--;
 
 		if (ret < 0) {
-			/* è°ƒç”¨è€…å¸Œæœ›å…³é—­æµ */
+			/* µ÷ÓÃÕßÏ£Íû¹Ø±ÕÁ÷ */
 			WRITE_IOCP_CLOSE(astream);
 		} else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
-			/* å› ä¸ºæœ¬æ¬¡å†™IOå·²ç»æˆåŠŸå®Œæˆï¼Œæ‰€ä»¥éœ€è¦å®Œæˆæµçš„IOå»¶è¿Ÿ
-			 * å…³é—­è¿‡ç¨‹ */
+			/* ÒòÎª±¾´ÎĞ´IOÒÑ¾­³É¹¦Íê³É£¬ËùÒÔĞèÒªÍê³ÉÁ÷µÄIOÑÓ³Ù
+			 * ¹Ø±Õ¹ı³Ì */
 			WRITE_IOCP_CLOSE(astream);
 		}
 
 		return;
 	}
 
-	/* å¦åˆ™ï¼Œç¦æ­¢ç»§ç»­åµŒå¥—ï¼Œå°†å†™äº‹ä»¶ç½®äºäº‹ä»¶ç›‘æ§ä¸­ï¼Œä»è€Œå‡å°‘åµŒå¥—å±‚æ¬¡ */
+	/* ·ñÔò£¬½ûÖ¹¼ÌĞøÇ¶Ì×£¬½«Ğ´ÊÂ¼şÖÃÓÚÊÂ¼ş¼à¿ØÖĞ£¬´Ó¶ø¼õÉÙÇ¶Ì×²ã´Î */
 
 	astream->write_nested--;
 
-	/* è®¡ç®—å‰©ä½™çš„æ•°æ®æ€»é•¿åº¦ */
+	/* ¼ÆËãÊ£ÓàµÄÊı¾İ×Ü³¤¶È */
 
 	j = i;
 	dlen = (int) vector[i].iov_len - n;
@@ -518,9 +518,9 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 		dlen += (int) vector[i].iov_len;
 	}
 
-	/* å°†æ•°æ®ç½®å…¥è¯¥æµçš„å†™é˜Ÿåˆ—ä¸­ */
+	/* ½«Êı¾İÖÃÈë¸ÃÁ÷µÄĞ´¶ÓÁĞÖĞ */
 
-	/* å…ˆåˆ†é…ä¸€ä¸ªè¶³å¤Ÿå¤§çš„ç¼“å†²åŒºä»¥èƒ½å®¹ä¸‹æ‰€æœ‰çš„å‰©ä½™çš„æ•°æ® */
+	/* ÏÈ·ÖÅäÒ»¸ö×ã¹»´óµÄ»º³åÇøÒÔÄÜÈİÏÂËùÓĞµÄÊ£ÓàµÄÊı¾İ */
 	str = acl_vstring_alloc(dlen + 1);
  
 	acl_vstring_memcpy(str, (const char*) vector[j].iov_base + n,
@@ -532,7 +532,7 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	acl_fifo_push(&astream->write_fifo, str);
 	astream->write_left += dlen;
 
-	/* å°†è¯¥æµçš„å†™äº‹ä»¶ç½®å…¥äº‹ä»¶ç›‘æ§ä¸­ */
+	/* ½«¸ÃÁ÷µÄĞ´ÊÂ¼şÖÃÈëÊÂ¼ş¼à¿ØÖĞ */
 	WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 }
 
@@ -551,8 +551,8 @@ static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
 		if (aio_timeout_callback(astream) < 0) {
 			WRITE_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
-			/* è¯¥æµæ­£å¤„äºIOå»¶è¿Ÿå…³é—­çŠ¶æ€ï¼Œå› ä¸ºæœ¬æ¬¡è¯»IOå·²ç»æˆåŠŸå®Œæˆï¼Œ
-			* æ‰€ä»¥éœ€è¦å®Œæˆæµçš„IOå»¶è¿Ÿå…³é—­è¿‡ç¨‹
+			/* ¸ÃÁ÷Õı´¦ÓÚIOÑÓ³Ù¹Ø±Õ×´Ì¬£¬ÒòÎª±¾´Î¶ÁIOÒÑ¾­³É¹¦Íê³É£¬
+			* ËùÒÔĞèÒªÍê³ÉÁ÷µÄIOÑÓ³Ù¹Ø±Õ¹ı³Ì
 			*/
 			WRITE_IOCP_CLOSE(astream);
 		} else {

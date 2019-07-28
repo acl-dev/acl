@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "internal/mime_state.hpp"
 #include "internal/header_opts.hpp"
 #ifndef ACL_PREPARE_COMPILE
@@ -126,7 +126,7 @@ void mime::primary_head_finish(void)
 
 	m_primaryHeader.set_type(node->ctype_s, node->stype_s);
 
-	// é’ˆå¯¹é‚®ä»¶ä¸»å¤´éƒ¨
+	// Õë¶ÔÓÊ¼şÖ÷Í·²¿
 	ACL_ITER iter;
 
 	if (node->header_to_list) {
@@ -279,9 +279,9 @@ static bool save_to(ifstream& in, ostream& out, MIME_NODE* node)
 		return false;
 	}
 
-	// å¯¹äº multipart é‚®ä»¶å…¶ bound_end åº”å¤§äº body_begin,
-	// è€Œå¯¹äºé multipart é‚®ä»¶å…¶ bound_end åº”ä¸º 0ï¼Œæ­¤æ—¶åº”
-	// é‡‡ç”¨ body_end
+	// ¶ÔÓÚ multipart ÓÊ¼şÆä bound_end Ó¦´óÓÚ body_begin,
+	// ¶ø¶ÔÓÚ·Ç multipart ÓÊ¼şÆä bound_end Ó¦Îª 0£¬´ËÊ±Ó¦
+	// ²ÉÓÃ body_end
 	if (node->bound_end > node->body_begin) {
 		len = (ssize_t) node->bound_end - (ssize_t) node->body_begin;
 	} else {
@@ -311,18 +311,18 @@ bool mime::save_as(ostream& out)
 
 	//if (acl_ring_size(&m_pMimeState->root->children) == 0)
 	//{
-	//	// å¦‚æœæ²¡æœ‰ MIME ç»“ç‚¹åˆ™è¯´æ˜ä¸æ˜¯ multipart æ ¼å¼
+	//	// Èç¹ûÃ»ÓĞ MIME ½áµãÔòËµÃ÷²»ÊÇ multipart ¸ñÊ½
 	//	return (copy_file(in, out));
 	//}
 
-	// è¯´æ˜æ˜¯ multipart æ ¼å¼
+	// ËµÃ÷ÊÇ multipart ¸ñÊ½
 
-	// è¾“å‡ºé‚®ä»¶å¤´
+	// Êä³öÓÊ¼şÍ·
 	if (!save_to(in, out, m_pMimeState->root)) {
 		return false;
 	}
 
-	// è¾“å‡ºé‚®ä»¶ä½“çš„å„ä¸ªä¸€çº§ MIME ç»“ç‚¹åŠæ‰€å±å†…å®¹
+	// Êä³öÓÊ¼şÌåµÄ¸÷¸öÒ»¼¶ MIME ½áµã¼°ËùÊôÄÚÈİ
 	acl_foreach(iter, m_pMimeState->root) {
 		MIME_NODE* node = (MIME_NODE*) iter.data;
 		if (!save_to(in, out, node)) {
@@ -330,7 +330,7 @@ bool mime::save_as(ostream& out)
 		}
 	}
 
-	// è¾“å‡ºæœ€åä¸€ä¸ªç©ºè¡Œ
+	// Êä³ö×îºóÒ»¸ö¿ÕĞĞ
 	if (m_pMimeState->use_crlf) {
 		out << "\r\n";
 	} else {
@@ -497,10 +497,10 @@ bool mime::save_mail(const char* path, const char* filename,
 
 static MIME_NODE *get_alternative(MIME_STATE *pMime)
 {
-	// ä»æ ¹ç»“ç‚¹å¼€å§‹éå†æ•´ä¸ª multipart é‚®ä»¶ä¸­æ‰€æœ‰çš„å­ç»“ç‚¹ï¼Œ
-	// ç›´è‡³æ‰¾åˆ°ç¬¬ä¸€ä¸ªä¸åŒ…å«å­ç»“ç‚¹çš„ç»“ç‚¹ï¼Œå› ä¸ºéå†è¿‡ç¨‹æœ¬èº«
-	// ä¿è¯äº†éå†æ˜¯è‡ªä¸Šè€Œä¸‹éå†çš„ï¼Œå³å…ˆéå†æ ¹ç»“ç‚¹çš„å­ç»“ç‚¹ï¼Œ
-	// ç„¶åå±‚å±‚éå†å­ç»“ç‚¹çš„å­ç»“ç‚¹ç›´è‡³æ»¡è¶³æ¡ä»¶ä¸ºæ­¢
+	// ´Ó¸ù½áµã¿ªÊ¼±éÀúÕû¸ö multipart ÓÊ¼şÖĞËùÓĞµÄ×Ó½áµã£¬
+	// Ö±ÖÁÕÒµ½µÚÒ»¸ö²»°üº¬×Ó½áµãµÄ½áµã£¬ÒòÎª±éÀú¹ı³Ì±¾Éí
+	// ±£Ö¤ÁË±éÀúÊÇ×ÔÉÏ¶øÏÂ±éÀúµÄ£¬¼´ÏÈ±éÀú¸ù½áµãµÄ×Ó½áµã£¬
+	// È»ºó²ã²ã±éÀú×Ó½áµãµÄ×Ó½áµãÖ±ÖÁÂú×ãÌõ¼şÎªÖ¹
 
 	MIME_NODE* pAlterNative = NULL;
 	ACL_ITER iter;
@@ -512,7 +512,7 @@ static MIME_NODE *get_alternative(MIME_STATE *pMime)
 
 			continue;
 		}
-		// å¦‚æœè¯¥ç»“ç‚¹çš„å­ç»“ç‚¹æ•°å°äº 2 åˆ™è¯´æ˜é‚®ä»¶æ ¼å¼æœ‰è¯¯
+		// Èç¹û¸Ã½áµãµÄ×Ó½áµãÊıĞ¡ÓÚ 2 ÔòËµÃ÷ÓÊ¼ş¸ñÊ½ÓĞÎó
 		if (acl_ring_size(&pNode->children) < 2) {
 			continue;
 		}
@@ -537,7 +537,7 @@ static MIME_NODE *get_text_html(MIME_NODE *pAlterNative, bool *is_html = NULL)
 			pHtml = pNode;
 			break;
 		} else if (pNode->stype == MIME_STYPE_PLAIN) {
-			// ä»…ä¿ç•™ç¬¬ä¸€ä¸ªçº¯æ–‡æœ¬çš„ç»“ç‚¹
+			// ½ö±£ÁôµÚÒ»¸ö´¿ÎÄ±¾µÄ½áµã
 			if (pText == NULL) {
 				pText = pNode;
 			}
@@ -570,7 +570,7 @@ static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL)
 			pText = pNode;
 			break;
 		} else if (pNode->stype == MIME_STYPE_HTML) {
-			// ä»…ä¿ç•™ç¬¬ä¸€ä¸ªHTMLç»“ç‚¹
+			// ½ö±£ÁôµÚÒ»¸öHTML½áµã
 			if (pHtml == NULL) {
 				pHtml = pNode;
 			}
@@ -588,7 +588,7 @@ static MIME_NODE *get_text_plain(MIME_NODE *pAlterNative, bool *is_html = NULL)
 	return pText != NULL ? pText : pHtml;
 }
 
-// æ‰¾åˆ°é‚®ä»¶æ­£æ–‡ç»“ç‚¹
+// ÕÒµ½ÓÊ¼şÕıÎÄ½áµã
 static MIME_NODE* body_node(MIME_STATE* pMime, bool htmlFirst,
 	bool *is_html = NULL)
 {
@@ -913,7 +913,7 @@ static void mime_node_dump(const char* from_path, const char* dump_path,
 void mime::mime_debug(const char* save_path, bool decode /* = true */)
 {
 	MIME_STATE* state = m_pMimeState;
-	// å¦‚æœ multipart æ ¼å¼, åˆ™åˆ†æå„ä¸ªéƒ¨åˆ†æ•°æ®
+	// Èç¹û multipart ¸ñÊ½, Ôò·ÖÎö¸÷¸ö²¿·ÖÊı¾İ
 	MIME_STATE state_dummy;
 	ACL_ITER iter;
 

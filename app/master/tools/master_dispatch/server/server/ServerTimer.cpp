@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "server/ServerManager.h"
 #include "server/ServerTimer.h"
 
@@ -7,9 +7,9 @@ void ServerTimer::destroy()
 	delete this;
 }
 
-// 璇ュ畾鏃跺櫒鐨勫洖璋冨嚱鏁拌繍琛屽湪涓荤嚎绋嬬嚎绋嬬┖闂�
+// 该定时器的回调函数运行在主线程线程空间
 void ServerTimer::timer_callback(unsigned int)
 {
-	// 鍦ㄥ畾鏃跺櫒涓畾鏃剁粺璁℃湇鍔＄鐨勮礋杞芥儏鍐�
+	// 在定时器中定时统计服务端的负载情况
 	ServerManager::get_instance().buildStatus();
 }

@@ -1,10 +1,10 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 static void get_url(const char *method, const char *url,
 	const char *proxy, const char *dump)
 {
-	/* åˆ›å»º HTTP è¯·æ±‚å¤´ */
+	/* ´´½¨ HTTP ÇëÇóÍ· */
 	HTTP_HDR_REQ *hdr_req = http_hdr_req_create(url, method, "HTTP/1.1");
 	ACL_VSTREAM *stream;
 	ACL_VSTRING *buf = acl_vstring_alloc(256);
@@ -14,12 +14,12 @@ static void get_url(const char *method, const char *url,
 	const char *ptr;
 	int   ret;
 
-	/* è¾“å‡º HTTP è¯·æ±‚å¤´å†…å®¹ */
+	/* Êä³ö HTTP ÇëÇóÍ·ÄÚÈİ */
 
 	http_hdr_print(&hdr_req->hdr, "---request hdr---");
 
-	/* å¦‚æœè®¾å®šä»£ç†æœåŠ¡å™¨ï¼Œåˆ™è¿æ¥ä»£ç†æœåŠ¡å™¨åœ°å€ï¼Œ
-	 * å¦åˆ™ä½¿ç”¨ HTTP è¯·æ±‚å¤´é‡ŒæŒ‡å®šçš„åœ°å€
+	/* Èç¹ûÉè¶¨´úÀí·şÎñÆ÷£¬ÔòÁ¬½Ó´úÀí·şÎñÆ÷µØÖ·£¬
+	 * ·ñÔòÊ¹ÓÃ HTTP ÇëÇóÍ·ÀïÖ¸¶¨µÄµØÖ·
 	 */
 
 	if (*proxy)
@@ -27,7 +27,7 @@ static void get_url(const char *method, const char *url,
 	else
 		acl_vstring_strcpy(buf, http_hdr_req_host(hdr_req));
 
-	/* è·å¾—è¿œç¨‹ HTTP æœåŠ¡å™¨çš„è¿æ¥åœ°å€ */
+	/* »ñµÃÔ¶³Ì HTTP ·şÎñÆ÷µÄÁ¬½ÓµØÖ· */
 
 	ptr = acl_vstring_memchr(buf, ':');
 	if (ptr == NULL)
@@ -44,13 +44,13 @@ static void get_url(const char *method, const char *url,
 		}
 	}
 
-	/* è¿æ¥è¿œç¨‹ http æœåŠ¡å™¨ */
+	/* Á¬½ÓÔ¶³Ì http ·şÎñÆ÷ */
 
-	stream = acl_vstream_connect(acl_vstring_str(buf) /* æœåŠ¡å™¨åœ°å€ */,
-			ACL_BLOCKING /* é‡‡ç”¨é˜»å¡æ–¹å¼ */,
-			10 /* è¿æ¥è¶…æ—¶æ—¶é—´ä¸º 10 ç§’ */,
-			10 /* ç½‘ç»œ IO æ“ä½œè¶…æ—¶æ—¶é—´ä¸º 10 ç§’ */,
-			4096 /* stream æµç¼“å†²åŒºå¤§å°ä¸º 4096 å­—èŠ‚ */);
+	stream = acl_vstream_connect(acl_vstring_str(buf) /* ·şÎñÆ÷µØÖ· */,
+			ACL_BLOCKING /* ²ÉÓÃ×èÈû·½Ê½ */,
+			10 /* Á¬½Ó³¬Ê±Ê±¼äÎª 10 Ãë */,
+			10 /* ÍøÂç IO ²Ù×÷³¬Ê±Ê±¼äÎª 10 Ãë */,
+			4096 /* stream Á÷»º³åÇø´óĞ¡Îª 4096 ×Ö½Ú */);
 	if (stream == NULL) {
 		printf("connect addr(%s) error(%s)\n",
 			acl_vstring_str(buf), acl_last_serror());
@@ -59,11 +59,11 @@ static void get_url(const char *method, const char *url,
 		return;
 	}
 
-	/* æ„å»º HTTP è¯·æ±‚å¤´æ•°æ® */
+	/* ¹¹½¨ HTTP ÇëÇóÍ·Êı¾İ */
 
 	http_hdr_build_request(hdr_req, buf);
 
-	/* å‘ HTTP æœåŠ¡å™¨å‘é€è¯·æ±‚ */
+	/* Ïò HTTP ·şÎñÆ÷·¢ËÍÇëÇó */
 
 	ret = acl_vstream_writen(stream, acl_vstring_str(buf), ACL_VSTRING_LEN(buf));
 	if (ret == ACL_VSTREAM_EOF) {
@@ -74,13 +74,13 @@ static void get_url(const char *method, const char *url,
 		return;
 	}
 
-	/* åˆ›å»ºä¸€ä¸ª HTTP å“åº”å¤´å¯¹è±¡ */
+	/* ´´½¨Ò»¸ö HTTP ÏìÓ¦Í·¶ÔÏó */
 
 	hdr_res = http_hdr_res_new();
 
-	/* è¯»å– HTTP æœåŠ¡å™¨å“åº”å¤´*/
+	/* ¶ÁÈ¡ HTTP ·şÎñÆ÷ÏìÓ¦Í·*/
 
-	ret = http_hdr_res_get_sync(hdr_res, stream, 10 /* IO è¶…æ—¶æ—¶é—´ä¸º 10 ç§’ */);
+	ret = http_hdr_res_get_sync(hdr_res, stream, 10 /* IO ³¬Ê±Ê±¼äÎª 10 Ãë */);
 	if (ret < 0) {
 		printf("get http reply header error(%s)\n", acl_last_serror());
 		http_hdr_res_free(hdr_res);
@@ -100,7 +100,7 @@ static void get_url(const char *method, const char *url,
 		return;
 	}
 
-	/* å¦‚æœéœ€è¦è½¬å‚¨è‡³ç£ç›˜åˆ™éœ€è¦å…ˆæ‰“å¼€æ–‡ä»¶ */
+	/* Èç¹ûĞèÒª×ª´¢ÖÁ´ÅÅÌÔòĞèÒªÏÈ´ò¿ªÎÄ¼ş */
 
 	if (dump != NULL) {
 		fp = acl_fopen(dump, "w+");
@@ -109,7 +109,7 @@ static void get_url(const char *method, const char *url,
 				dump, acl_last_serror());
 	}
 
-	/* å¦‚æœ HTTP å“åº”æ²¡æœ‰æ•°æ®ä½“åˆ™ä»…è¾“å‡º HTTP å“åº”å¤´å³å¯ */
+	/* Èç¹û HTTP ÏìÓ¦Ã»ÓĞÊı¾İÌåÔò½öÊä³ö HTTP ÏìÓ¦Í·¼´¿É */
 
 	if (hdr_res->hdr.content_length == 0
 		|| (hdr_res->hdr.content_length == -1
@@ -130,15 +130,15 @@ static void get_url(const char *method, const char *url,
 		return;
 	}
 
-	/* è¾“å‡º HTTP å“åº”å¤´ */
+	/* Êä³ö HTTP ÏìÓ¦Í· */
 
 	http_hdr_print(&hdr_res->hdr, "--- reply http header ---");
 
-	/* åˆ›å»º HTTP å“åº”ä½“å¯¹è±¡ */
+	/* ´´½¨ HTTP ÏìÓ¦Ìå¶ÔÏó */
 
 	res = http_res_new(hdr_res);
 
-	/* å¦‚æœæœ‰æ•°æ®ä½“åˆ™å¼€å§‹è¯»å– HTTP å“åº”æ•°æ®ä½“éƒ¨åˆ† */
+	/* Èç¹ûÓĞÊı¾İÌåÔò¿ªÊ¼¶ÁÈ¡ HTTP ÏìÓ¦Êı¾İÌå²¿·Ö */
 	while (1) {
 		http_off_t  n;
 		char  buf2[4096];
@@ -161,10 +161,10 @@ static void get_url(const char *method, const char *url,
 
 	if (fp)
 		acl_fclose(fp);
-	http_res_free(res);  /* é‡Šæ”¾ HTTP å“åº”å¯¹è±¡, hdr_res ä¼šåœ¨æ­¤å‡½æ•°å†…éƒ¨è‡ªåŠ¨è¢«é‡Šæ”¾ */
-	acl_vstream_close(stream);  /* å…³é—­ç½‘ç»œæµ */
-	acl_vstring_free(buf);  /* é‡Šæ”¾å†…å­˜åŒº */
-	http_hdr_req_free(hdr_req);  /* é‡Šæ”¾ HTTP è¯·æ±‚å¤´å¯¹è±¡ */
+	http_res_free(res);  /* ÊÍ·Å HTTP ÏìÓ¦¶ÔÏó, hdr_res »áÔÚ´Ëº¯ÊıÄÚ²¿×Ô¶¯±»ÊÍ·Å */
+	acl_vstream_close(stream);  /* ¹Ø±ÕÍøÂçÁ÷ */
+	acl_vstring_free(buf);  /* ÊÍ·ÅÄÚ´æÇø */
+	http_hdr_req_free(hdr_req);  /* ÊÍ·Å HTTP ÇëÇóÍ·¶ÔÏó */
 }
 
 static void usage(const char *procname)
@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
 	return (0);
 	*/
 
-	acl_lib_init();  /* åˆå§‹åŒ– acl åº“ */
+	acl_lib_init();  /* ³õÊ¼»¯ acl ¿â */
 
 	ACL_SAFE_STRNCPY(method, "GET", sizeof(method));
 	url[0] = 0;

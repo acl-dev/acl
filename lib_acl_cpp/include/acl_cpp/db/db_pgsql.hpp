@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../db/db_handle.hpp"
@@ -20,7 +20,7 @@ public:
 	static void load(void);
 
 	/********************************************************************/
-	/*         ä»¥ä¸‹ä¸ºåŸºç±» db_handle çš„è™šæ¥å£                            */
+	/*         ÒÔÏÂÎª»ùÀà db_handle µÄĞé½Ó¿Ú                            */
 	/********************************************************************/
 
 	const char* dbtype(void) const;
@@ -86,11 +86,11 @@ public:
 	bool rollback(void);
 
 private:
-	char*   dbaddr_;  // æ•°æ®åº“ç›‘å¬åœ°å€
-	char*   dbname_;  // æ•°æ®åº“å
-	char*   dbuser_;  // æ•°æ®åº“è´¦å·
-	char*   dbpass_;  // æ•°æ®åº“è´¦å·å¯†ç 
-	string  charset_; // è¿æ¥æ•°æ®åº“é‡‡ç”¨çš„å­—ç¬¦é›†
+	char*   dbaddr_;  // Êı¾İ¿â¼àÌıµØÖ·
+	char*   dbname_;  // Êı¾İ¿âÃû
+	char*   dbuser_;  // Êı¾İ¿âÕËºÅ
+	char*   dbpass_;  // Êı¾İ¿âÕËºÅÃÜÂë
+	string  charset_; // Á¬½ÓÊı¾İ¿â²ÉÓÃµÄ×Ö·û¼¯
 
 	int     conn_timeout_;
 	int     rw_timeout_;

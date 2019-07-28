@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "acl_cpp/acl_cpp_define.hpp"
 #include <map>
 #include <vector>
@@ -29,7 +29,7 @@ public:
 	bool finish(bool graceful);
 
 protected:
-	// åŸºç±»çº¯è™šå‡½æ•°
+	// »ùÀà´¿Ðéº¯Êý
 	void timer_callback(unsigned int id);
 	void destroy(void) {}
 

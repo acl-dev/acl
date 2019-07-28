@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
@@ -13,22 +13,22 @@ class mime_code;
 class mail_attach;
 
 /**
- * é‚®ä»¶æ­£æ–‡æ„å»ºç±»
+ * ÓÊ¼şÕıÎÄ¹¹½¨Àà
  */
 class ACL_CPP_API mail_body : public noncopyable
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param charset {const char*} æ­£æ–‡çš„å­—ç¬¦é›†
-	 * @param encoding {const char*} æ­£æ–‡çš„ç¼–ç æ ¼å¼
+	 * ¹¹Ôìº¯Êı
+	 * @param charset {const char*} ÕıÎÄµÄ×Ö·û¼¯
+	 * @param encoding {const char*} ÕıÎÄµÄ±àÂë¸ñÊ½
 	 */
 	mail_body(const char* charset = "utf-8",
 		const char* encoding = "base64");
 	~mail_body();
 
 	/**
-	 * è·å¾—æ­£æ–‡æŠ˜å†…å®¹ç±»å‹
+	 * »ñµÃÕıÎÄÕÛÄÚÈİÀàĞÍ
 	 * @return {const string&}
 	 */
 	const string& get_content_type() const
@@ -37,7 +37,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—æ­£æ–‡å†…å®¹ç±»å‹å¯¹è±¡
+	 * »ñµÃÕıÎÄÄÚÈİÀàĞÍ¶ÔÏó
 	 * @return {const http_ctype&}
 	 */
 	const http_ctype& get_ctype() const
@@ -46,43 +46,43 @@ public:
 	}
 
 	/**
-	 * è®¾ç½®é‚®ä»¶æ­£æ–‡ä¸º TEXT/HTML æ ¼å¼
-	 * @param html {const char*} HTML æ•°æ®
-	 * @param len {size_t} html æ•°æ®é•¿åº¦(è™½ç„¶ html æ˜¯å­—ç¬¦ä¸²æ ¼å¼ï¼Œä½†æä¾›
-	 *  æ•°æ®é•¿åº¦æœ‰åˆ©äºè°ƒç”¨æ›´çµæ´»é«˜æ•ˆï¼Œå†…éƒ¨ä¸å†é‡æ–°é€šè¿‡ strlen è®¡ç®—é•¿åº¦)
+	 * ÉèÖÃÓÊ¼şÕıÎÄÎª TEXT/HTML ¸ñÊ½
+	 * @param html {const char*} HTML Êı¾İ
+	 * @param len {size_t} html Êı¾İ³¤¶È(ËäÈ» html ÊÇ×Ö·û´®¸ñÊ½£¬µ«Ìá¹©
+	 *  Êı¾İ³¤¶ÈÓĞÀûÓÚµ÷ÓÃ¸üÁé»î¸ßĞ§£¬ÄÚ²¿²»ÔÙÖØĞÂÍ¨¹ı strlen ¼ÆËã³¤¶È)
 	 * @return {mail_body&}
 	 */
 	mail_body& set_html(const char* html, size_t len);
 
 	/**
-	 * è®¾ç½®é‚®ä»¶æ­£æ–‡ä¸º TEXT/PLAIN æ ¼å¼
-	 * @param plain {const char*} TEXT æ•°æ®
-	 * @param len {size_t} plain æ•°æ®é•¿åº¦(è™½ç„¶ plain æ˜¯æ–‡æœ¬æ ¼å¼ï¼Œä½†æä¾›
-	 *  æ•°æ®é•¿åº¦æœ‰åˆ©äºè°ƒç”¨æ›´çµæ´»é«˜æ•ˆï¼Œå†…éƒ¨ä¸å†é‡æ–°é€šè¿‡ strlen è®¡ç®—é•¿åº¦)
+	 * ÉèÖÃÓÊ¼şÕıÎÄÎª TEXT/PLAIN ¸ñÊ½
+	 * @param plain {const char*} TEXT Êı¾İ
+	 * @param len {size_t} plain Êı¾İ³¤¶È(ËäÈ» plain ÊÇÎÄ±¾¸ñÊ½£¬µ«Ìá¹©
+	 *  Êı¾İ³¤¶ÈÓĞÀûÓÚµ÷ÓÃ¸üÁé»î¸ßĞ§£¬ÄÚ²¿²»ÔÙÖØĞÂÍ¨¹ı strlen ¼ÆËã³¤¶È)
 	 * @return {mail_body&}
 	 */
 	mail_body& set_plain(const char* plain, size_t len);
 
 	/**
-	 * å½“é‚®ä»¶å†…å®¹ä¸º multipart/alternative æ ¼å¼æ—¶è°ƒç”¨æ­¤å‡½æ•°è®¾ç½®ç›¸åº”ç±»å‹çš„
-	 * æ­£æ–‡å†…å®¹
-	 * @param html {const char*} æ­£æ–‡ä¸­çš„ HTML æ•°æ®(éç©º)
-	 * @param hlen {size_t} html æ•°æ®é•¿åº¦(>0)
-	 * @param plain {const char*} æ­£æ–‡ä¸­çš„ TEXT æ•°æ®(éç©º)
-	 * @param plen {size_t} plain æ•°æ®é•¿åº¦(>0)
+	 * µ±ÓÊ¼şÄÚÈİÎª multipart/alternative ¸ñÊ½Ê±µ÷ÓÃ´Ëº¯ÊıÉèÖÃÏàÓ¦ÀàĞÍµÄ
+	 * ÕıÎÄÄÚÈİ
+	 * @param html {const char*} ÕıÎÄÖĞµÄ HTML Êı¾İ(·Ç¿Õ)
+	 * @param hlen {size_t} html Êı¾İ³¤¶È(>0)
+	 * @param plain {const char*} ÕıÎÄÖĞµÄ TEXT Êı¾İ(·Ç¿Õ)
+	 * @param plen {size_t} plain Êı¾İ³¤¶È(>0)
 	 * @return {mail_body&}
 	 */
 	mail_body& set_alternative(const char* html, size_t hlen,
 		const char* plain, size_t plen);
 
 	/**
-	 * å½“é‚®ä»¶æ­£æ–‡å†…å®¹ä¸º multipart/relative æ ¼å¼æ—¶è°ƒç”¨æ­¤å‡½æ•°è®¾ç½®æ­£æ–‡å†…å®¹
-	 * @param html {const char*} æ­£æ–‡ä¸­çš„ HTML æ•°æ®(éç©º)
-	 * @param hlen {size_t} html æ•°æ®é•¿åº¦(>0)
-	 * @param plain {const char*} æ­£æ–‡ä¸­çš„ plain æ•°æ®(éç©º)
-	 * @param plen {size_t} plain æ•°æ®é•¿åº¦(>0)
-	 * @param attachments {const std::vector<mail_attach*>&} å­˜æ”¾
-	 *  ä¸ html ä¸­çš„ cid ç›¸å…³çš„å›¾ç‰‡ç­‰é™„ä»¶å¯¹è±¡
+	 * µ±ÓÊ¼şÕıÎÄÄÚÈİÎª multipart/relative ¸ñÊ½Ê±µ÷ÓÃ´Ëº¯ÊıÉèÖÃÕıÎÄÄÚÈİ
+	 * @param html {const char*} ÕıÎÄÖĞµÄ HTML Êı¾İ(·Ç¿Õ)
+	 * @param hlen {size_t} html Êı¾İ³¤¶È(>0)
+	 * @param plain {const char*} ÕıÎÄÖĞµÄ plain Êı¾İ(·Ç¿Õ)
+	 * @param plen {size_t} plain Êı¾İ³¤¶È(>0)
+	 * @param attachments {const std::vector<mail_attach*>&} ´æ·Å
+	 *  Óë html ÖĞµÄ cid Ïà¹ØµÄÍ¼Æ¬µÈ¸½¼ş¶ÔÏó
 	 * @return {mail_body&}
 	 */
 	mail_body& set_relative(const char* html, size_t hlen,
@@ -90,8 +90,8 @@ public:
 		const std::vector<mail_attach*>& attachments);
 
 	/**
-	 * è·å¾— set_html å‡½æ•°è®¾ç½®çš„ html/plain æ•°æ®
-	 * @param len {size_t} å­˜æ”¾æ•°æ®é•¿åº¦ç»“æœ
+	 * »ñµÃ set_html º¯ÊıÉèÖÃµÄ html/plain Êı¾İ
+	 * @param len {size_t} ´æ·ÅÊı¾İ³¤¶È½á¹û
 	 * @return {const char*}
 	 */
 	const char* get_html(size_t& len) const
@@ -101,8 +101,8 @@ public:
 	}
 
 	/**
-	 * è·å¾— set_plain å‡½æ•°è®¾ç½®çš„ plain/plain æ•°æ®
-	 * @param len {size_t} å­˜æ”¾æ•°æ®é•¿åº¦ç»“æœ
+	 * »ñµÃ set_plain º¯ÊıÉèÖÃµÄ plain/plain Êı¾İ
+	 * @param len {size_t} ´æ·ÅÊı¾İ³¤¶È½á¹û
 	 * @return {const char*}
 	 */
 	const char* get_plain(size_t& len) const
@@ -112,7 +112,7 @@ public:
 	}
 
 	/**
-	 * è·å¾— set_attachments å‡½æ•°è®¾ç½®çš„é™„ä»¶é›†åˆ
+	 * »ñµÃ set_attachments º¯ÊıÉèÖÃµÄ¸½¼ş¼¯ºÏ
 	 * @return {const std::vector<mail_attach*>*}
 	 */
 	const std::vector<mail_attach*>* get_attachments() const
@@ -121,47 +121,47 @@ public:
 	}
 
 	/**
-	 * æ„é€ é‚®ä»¶æ­£æ–‡å¹¶å°†ç»“æœè¿½åŠ äºç»™å®šçš„è¾“å‡ºæµä¸­
-	 * @param out {ostream&} è¾“å‡ºæµå¯¹è±¡
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * ¹¹ÔìÓÊ¼şÕıÎÄ²¢½«½á¹û×·¼ÓÓÚ¸ø¶¨µÄÊä³öÁ÷ÖĞ
+	 * @param out {ostream&} Êä³öÁ÷¶ÔÏó
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_to(ostream& out) const;
 
 	/**
-	 * æ„é€ é‚®ä»¶æ­£æ–‡å¹¶å°†ç»“æœè¿½åŠ äºç»™å®šçš„ç¼“å†²åŒºä¸­
-	 * @param out {string&} å­˜å‚¨ç»“æœ
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * ¹¹ÔìÓÊ¼şÕıÎÄ²¢½«½á¹û×·¼ÓÓÚ¸ø¶¨µÄ»º³åÇøÖĞ
+	 * @param out {string&} ´æ´¢½á¹û
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_to(string& out) const;
 
 	/**
-	 * text/html æ ¼å¼çš„é‚®ä»¶æ­£æ–‡æ„é€ è¿‡ç¨‹ï¼Œå¹¶å°†ç»“æœè¿½åŠ äºç»™å®šçš„ç¼“å†²åŒºä¸­
-	 * @param in {const char*} è¾“å…¥çš„ html æ ¼å¼æ•°æ®
-	 * @param len {size_t} in çš„æ•°æ®é•¿åº¦
-	 * @param out {string&} ä»¥æ•°æ®è¿½åŠ æ–¹å¼å­˜å‚¨ç»“æœ
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * text/html ¸ñÊ½µÄÓÊ¼şÕıÎÄ¹¹Ôì¹ı³Ì£¬²¢½«½á¹û×·¼ÓÓÚ¸ø¶¨µÄ»º³åÇøÖĞ
+	 * @param in {const char*} ÊäÈëµÄ html ¸ñÊ½Êı¾İ
+	 * @param len {size_t} in µÄÊı¾İ³¤¶È
+	 * @param out {string&} ÒÔÊı¾İ×·¼Ó·½Ê½´æ´¢½á¹û
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_html(const char* in, size_t len, string& out) const;
 
 	/**
-	 * text/plain æ ¼å¼çš„é‚®ä»¶æ­£æ–‡æ„é€ è¿‡ç¨‹ï¼Œå¹¶å°†ç»“æœè¿½åŠ äºç»™å®šçš„ç¼“å†²åŒºä¸­
-	 * @param in {const char*} è¾“å…¥çš„ plain æ ¼å¼æ•°æ®
-	 * @param len {size_t} in çš„æ•°æ®é•¿åº¦
-	 * @param out {string&} ä»¥æ•°æ®è¿½åŠ æ–¹å¼å­˜å‚¨ç»“æœ
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * text/plain ¸ñÊ½µÄÓÊ¼şÕıÎÄ¹¹Ôì¹ı³Ì£¬²¢½«½á¹û×·¼ÓÓÚ¸ø¶¨µÄ»º³åÇøÖĞ
+	 * @param in {const char*} ÊäÈëµÄ plain ¸ñÊ½Êı¾İ
+	 * @param len {size_t} in µÄÊı¾İ³¤¶È
+	 * @param out {string&} ÒÔÊı¾İ×·¼Ó·½Ê½´æ´¢½á¹û
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_plain(const char* in, size_t len, string& out) const;
 
 	/**
-	 * multipart/relative æ ¼å¼çš„é‚®ä»¶æ­£æ–‡æ„é€ è¿‡ç¨‹ï¼Œå¹¶å°†ç»“æœè¿½åŠ äºç»™å®šçš„ç¼“å†²åŒºä¸­
-	 * @param html {const char*} è¾“å…¥çš„ html æ ¼å¼æ•°æ®
-	 * @param hlen {size_t} html çš„æ•°æ®é•¿åº¦
-	 * @param plain {const char*} æ­£æ–‡ä¸­çš„ TEXT æ•°æ®(éç©º)
-	 * @param plen {size_t} plain æ•°æ®é•¿åº¦(>0)
-	 * @param attachments {const std::vector<mail_attach*>&} å­˜æ”¾
-	 *  ä¸ html ä¸­çš„ cid ç›¸å…³çš„å›¾ç‰‡ç­‰é™„ä»¶å¯¹è±¡
-	 * @param out {string&} ä»¥æ•°æ®è¿½åŠ æ–¹å¼å­˜å‚¨ç»“æœ
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * multipart/relative ¸ñÊ½µÄÓÊ¼şÕıÎÄ¹¹Ôì¹ı³Ì£¬²¢½«½á¹û×·¼ÓÓÚ¸ø¶¨µÄ»º³åÇøÖĞ
+	 * @param html {const char*} ÊäÈëµÄ html ¸ñÊ½Êı¾İ
+	 * @param hlen {size_t} html µÄÊı¾İ³¤¶È
+	 * @param plain {const char*} ÕıÎÄÖĞµÄ TEXT Êı¾İ(·Ç¿Õ)
+	 * @param plen {size_t} plain Êı¾İ³¤¶È(>0)
+	 * @param attachments {const std::vector<mail_attach*>&} ´æ·Å
+	 *  Óë html ÖĞµÄ cid Ïà¹ØµÄÍ¼Æ¬µÈ¸½¼ş¶ÔÏó
+	 * @param out {string&} ÒÔÊı¾İ×·¼Ó·½Ê½´æ´¢½á¹û
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_relative(const char* html, size_t hlen,
 		const char* plain, size_t plen,
@@ -169,13 +169,13 @@ public:
 		string& out) const;
 
 	/**
-	 * multipart/alternative æ ¼å¼çš„é‚®ä»¶æ­£æ–‡æ„é€ è¿‡ç¨‹ï¼Œå¹¶å°†ç»“æœè¿½åŠ äºç»™å®šçš„ç¼“å†²åŒºä¸­
-	 * @param html {const char*} è¾“å…¥çš„ html æ ¼å¼æ•°æ®
-	 * @param hlen {size_t} html çš„æ•°æ®é•¿åº¦
-	 * @param plain {const char*} æ­£æ–‡ä¸­çš„ TEXT æ•°æ®(éç©º)
-	 * @param plen {size_t} plain æ•°æ®é•¿åº¦(>0)
-	 * @param out {string&} ä»¥æ•°æ®è¿½åŠ æ–¹å¼å­˜å‚¨ç»“æœ
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * multipart/alternative ¸ñÊ½µÄÓÊ¼şÕıÎÄ¹¹Ôì¹ı³Ì£¬²¢½«½á¹û×·¼ÓÓÚ¸ø¶¨µÄ»º³åÇøÖĞ
+	 * @param html {const char*} ÊäÈëµÄ html ¸ñÊ½Êı¾İ
+	 * @param hlen {size_t} html µÄÊı¾İ³¤¶È
+	 * @param plain {const char*} ÕıÎÄÖĞµÄ TEXT Êı¾İ(·Ç¿Õ)
+	 * @param plen {size_t} plain Êı¾İ³¤¶È(>0)
+	 * @param out {string&} ÒÔÊı¾İ×·¼Ó·½Ê½´æ´¢½á¹û
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	bool save_alternative(const char* html, size_t hlen,
 		const char* plain, size_t plen, string& out) const;

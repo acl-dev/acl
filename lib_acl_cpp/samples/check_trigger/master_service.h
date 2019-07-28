@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class master_service : public acl::master_trigger
 {
@@ -8,18 +8,18 @@ public:
 
 protected:
 	/**
-	 * 当触发器时间到时调用此函数
+	 * ��������ʱ�䵽ʱ���ô˺���
 	 */
 	virtual void on_trigger();
 
 	/**
-	 * 当进程切换用户身份后调用的回调函数，此函数被调用时，进程
-	 * 的权限为普通受限级别
+	 * �������л��û����ݺ���õĻص��������˺���������ʱ������
+	 * ��Ȩ��Ϊ��ͨ���޼���
 	 */
 	virtual void proc_on_init();
 
 	/**
-	 * 当进程退出前调用的回调函数
+	 * �������˳�ǰ���õĻص�����
 	 */
 	virtual void proc_on_exit();
 

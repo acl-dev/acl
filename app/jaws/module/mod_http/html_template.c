@@ -1,4 +1,4 @@
-﻿#include "http_service.h"
+#include "http_service.h"
 
 char HTTP_REPLY_DNS_ERR[] = \
 "HTTP/1.1 503 DNS lookup error\r\n" \

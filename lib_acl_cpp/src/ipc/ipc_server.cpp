@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
@@ -33,7 +33,7 @@ bool ipc_server::open(aio_handle* handle, const char* addr /* = "127.0.0.1:0" */
 	}
 
 #ifdef ACL_WINDOWS
-	// å¦‚æœäº‹ä»¶å¼•æ“æ˜¯åŸºäº ACL_WINDOWS çª—å£æ¶ˆæ¯ï¼Œåˆ™ç›´æ¥è¿”å›
+	// Èç¹ûÊÂ¼şÒıÇæÊÇ»ùÓÚ ACL_WINDOWS ´°¿ÚÏûÏ¢£¬ÔòÖ±½Ó·µ»Ø
 	if (handle->get_engine_type() == ENGINE_WINMSG) {
 		return create_window();
 	}
@@ -51,7 +51,7 @@ bool ipc_server::open(aio_handle* handle, const char* addr /* = "127.0.0.1:0" */
 	}
 	sstream_->add_accept_callback(this);
 
-	// è°ƒç”¨å­ç±»å¤„ç†è¿‡ç¨‹
+	// µ÷ÓÃ×ÓÀà´¦Àí¹ı³Ì
 	on_open(get_addr());
 	return true;
 }
@@ -64,7 +64,7 @@ bool ipc_server::accept_callback(aio_socket_stream* client)
 
 void ipc_server::close_callback(void)
 {
-	// è°ƒç”¨å­ç±»å¤„ç†è¿‡ç¨‹
+	// µ÷ÓÃ×ÓÀà´¦Àí¹ı³Ì
 	on_close();
 }
 

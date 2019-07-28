@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 
 #ifdef ACL_WINDOWS
 #pragma comment(lib, "Iphlpapi.lib")

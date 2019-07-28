@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tls_misc 3
  * SUMMARY

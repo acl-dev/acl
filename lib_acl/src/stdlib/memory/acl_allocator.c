@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -129,7 +129,7 @@ ACL_ALLOCATOR *acl_allocator_create(size_t mem_limit)
 	if (allocator->pool_config_fn)
 		allocator->pool_config_fn(allocator, mem_limit);
 
-	/* åˆ›å»ºä¸¤ä¸ªé»˜è®¤çš„å†…å­˜åˆ†é…ç±»å‹æ±  */
+	/* ´´½¨Á½¸öÄ¬ÈÏµÄÄÚ´æ·ÖÅäÀàĞÍ³Ø */
 	mem_pool_create(allocator);
 	vstring_pool_create(allocator);
 

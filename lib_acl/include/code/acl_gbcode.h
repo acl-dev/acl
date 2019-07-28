@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_GBCODE_INCLUDE_H
+#ifndef	ACL_GBCODE_INCLUDE_H
 #define	ACL_GBCODE_INCLUDE_H
 
 #ifndef ACL_CLIENT_ONLY
@@ -9,21 +9,21 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * å°†GBKå­—ç¬¦é›†ä¸­çš„ç®€ä½“è½¬æ¢ä¸ºGBKå­—ç¬¦é›†ä¸­çš„ç¹ä½“
- * @param data {const char*} ç®€ä½“æ•°æ®
- * @param dlen {size_t} data é•¿åº¦
- * @param buf {char*} å­˜å‚¨è½¬æ¢åç»“æœï¼Œå…¶ä¸­ buf åœ°å€å’Œ data å¯ä»¥æ˜¯åŒä¸€åœ°å€
- * @param size {size_t} buf ç©ºé—´å¤§å°
+ * ½«GBK×Ö·û¼¯ÖĞµÄ¼òÌå×ª»»ÎªGBK×Ö·û¼¯ÖĞµÄ·±Ìå
+ * @param data {const char*} ¼òÌåÊı¾İ
+ * @param dlen {size_t} data ³¤¶È
+ * @param buf {char*} ´æ´¢×ª»»ºó½á¹û£¬ÆäÖĞ buf µØÖ·ºÍ data ¿ÉÒÔÊÇÍ¬Ò»µØÖ·
+ * @param size {size_t} buf ¿Õ¼ä´óĞ¡
  */
 ACL_API void acl_gbjt2ft(const char *data, size_t dlen, char *buf, size_t size);
 
 
 /**
- * å°†GBKå­—ç¬¦é›†ä¸­çš„ç¹ä½“è½¬æ¢ä¸ºGBKå­—ç¬¦é›†ä¸­çš„ç®€ä½“
- * @param data {const char*} ç¹ä½“æ•°æ®
- * @param dlen {size_t} data é•¿åº¦
- * @param buf {char*} å­˜å‚¨è½¬æ¢åç»“æœï¼Œå…¶ä¸­ buf åœ°å€å’Œ data å¯ä»¥æ˜¯åŒä¸€åœ°å€
- * @param size {size_t} buf ç©ºé—´å¤§å°
+ * ½«GBK×Ö·û¼¯ÖĞµÄ·±Ìå×ª»»ÎªGBK×Ö·û¼¯ÖĞµÄ¼òÌå
+ * @param data {const char*} ·±ÌåÊı¾İ
+ * @param dlen {size_t} data ³¤¶È
+ * @param buf {char*} ´æ´¢×ª»»ºó½á¹û£¬ÆäÖĞ buf µØÖ·ºÍ data ¿ÉÒÔÊÇÍ¬Ò»µØÖ·
+ * @param size {size_t} buf ¿Õ¼ä´óĞ¡
  */
 ACL_API void acl_gbft2jt(const char *data, size_t dlen, char *buf, size_t size);
 

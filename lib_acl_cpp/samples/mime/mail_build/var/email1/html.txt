@@ -1,4 +1,4 @@
-ï»¿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML xmlns:o = "urn:schemas-microsoft-com:office:office"><HEAD>
 <META http-equiv=Content-Type content="text/html; charset=gb2312">
 <STYLE type=text/css>BODY {
@@ -53,33 +53,33 @@ cellSpacing=0 cellPadding=0 width="99.99%" border=0>
             <DIV>
             <DIV><FONT size=3></FONT></DIV>&nbsp;</DIV>
             <DIV><FONT color=#c0c0c0>
-            <DIV><FONT color=#000000 size=4>å„ä½åŒå­¦ï¼š</FONT></DIV>
+            <DIV><FONT color=#000000 size=4>¸÷Î»Í¬Ñ§£º</FONT></DIV>
             <DIV><FONT color=#000000 size=4></FONT>&nbsp;</DIV>
             <DIV><FONT color=#000000 
-            size=4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;æœ¬æœˆè€ƒå‹¤ç»Ÿè®¡æ—¥ä¸º20æ—¥ï¼Œçƒ¦è¯·å„ä½åŒå­¦åœ¨19æ—¥ä¸‹ç­ä¹‹å‰å°½å¿«å°†ä¸ªäººéœ€è¦ç”³è¯‰çš„äº‹ç”±æ‰¾éƒ¨é—¨é¢†å¯¼å®¡æ‰¹é€š</FONT></DIV>
+            size=4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;±¾ÔÂ¿¼ÇÚÍ³¼ÆÈÕÎª20ÈÕ£¬·³Çë¸÷Î»Í¬Ñ§ÔÚ19ÈÕÏÂ°àÖ®Ç°¾¡¿ì½«¸öÈËĞèÒªÉêËßµÄÊÂÓÉÕÒ²¿ÃÅÁìµ¼ÉóÅúÍ¨</FONT></DIV>
             <DIV><FONT color=#000000 size=4></FONT>&nbsp;</DIV>
-            <DIV><FONT color=#000000 size=4>è¿‡ã€‚</FONT><FONT color=#ff0000 
-            size=4><STRONG>é€¾æœŸä¸å†ä¿®æ”¹è€ƒå‹¤ã€‚</STRONG></FONT></DIV>
+            <DIV><FONT color=#000000 size=4>¹ı¡£</FONT><FONT color=#ff0000 
+            size=4><STRONG>ÓâÆÚ²»ÔÙĞŞ¸Ä¿¼ÇÚ¡£</STRONG></FONT></DIV>
             <DIV><FONT color=#000000 size=4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
             </FONT></DIV>
             <DIV><FONT color=#000000 size=4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-            å¦çƒ¦è¯·æœ¬æœˆæœ‰è¯·å¹´å‡ã€äº‹å‡ã€ç—…å‡çš„åŒå­¦è¡¥å‘é‚®ä»¶ç»™éƒ¨é—¨é¢†å¯¼å®¡æ‰¹å¹¶è½¬å‘ç»™è¡Œæ”¿éƒ¨ã€‚è°¢è°¢å„ä½åŒå­¦é…åˆã€‚</FONT></DIV><FONT 
+            Áí·³Çë±¾ÔÂÓĞÇëÄê¼Ù¡¢ÊÂ¼Ù¡¢²¡¼ÙµÄÍ¬Ñ§²¹·¢ÓÊ¼ş¸ø²¿ÃÅÁìµ¼ÉóÅú²¢×ª·¢¸øĞĞÕş²¿¡£Ğ»Ğ»¸÷Î»Í¬Ñ§ÅäºÏ¡£</FONT></DIV><FONT 
             color=#000000 size=4></FONT>
             <DIV><FONT color=#c0c0c0><FONT color=#000000 
             size=4></FONT></FONT>&nbsp;</DIV>
             <DIV><FONT color=#c0c0c0><FONT color=#ff0000 
-            size=4><STRONG>å¦‚åœ¨è€ƒå‹¤æ—¥æœªæ”¶åˆ°ä»¥ä¸Šé‚®ä»¶ï¼Œæˆ‘éƒ¨é—¨å°†æŒ‰ç…§è€ƒå‹¤ä¸¥æ ¼æ‰§è¡Œä¸å†åšä»»ä½•ä¿®æ”¹ã€‚</STRONG></FONT></FONT></DIV>
+            size=4><STRONG>ÈçÔÚ¿¼ÇÚÈÕÎ´ÊÕµ½ÒÔÉÏÓÊ¼ş£¬ÎÒ²¿ÃÅ½«°´ÕÕ¿¼ÇÚÑÏ¸ñÖ´ĞĞ²»ÔÙ×öÈÎºÎĞŞ¸Ä¡£</STRONG></FONT></FONT></DIV>
             <DIV><FONT color=#c0c0c0><STRONG><FONT color=#ff0000 
             size=4></FONT></STRONG></FONT>&nbsp;</DIV>
             <DIV><FONT color=#c0c0c0><STRONG><FONT color=#ff0000 
             size=4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
             <FONT 
-            color=#000000>è‰¾å…‹èµ›ä¹è¡Œæ”¿éƒ¨</FONT></FONT></STRONG></FONT><BR>2010-09-17 
+            color=#000000>°¬¿ËÈüÀÖĞĞÕş²¿</FONT></FONT></STRONG></FONT><BR>2010-09-17 
             </FONT></DIV></DIV>
             <DIV align=left>
             <HR style="WIDTH: 122px; HEIGHT: 2px" align=left SIZE=2>
             </DIV>
-            <DIV><FONT color=#c0c0c0><SPAN>è¡Œæ”¿éƒ¨</SPAN> 
+            <DIV><FONT color=#c0c0c0><SPAN>ĞĞÕş²¿</SPAN> 
           </DIV></FONT></DIV></FONT></TD></TR></TBODY></TABLE></TD>
     <TD vAlign=bottom background=cid:__6@Foxmail.net>
       <TABLE cellSpacing=0 cellPadding=0 width="100%" border=0>

@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 #include "global.h"
@@ -7,7 +7,7 @@
 #include "http_service.h"
 #include "service_main.h"
 
-/* é…ç½®æ–‡ä»¶é¡¹ */
+/* ÅäÖÃÎÄ¼şÏî */
 
 /* TODO: you can add configure items here */
 
@@ -109,7 +109,7 @@ static void parse_proto_list(void)
 	acl_argv_free(tokens);
 }
 
-/* åˆå§‹åŒ–å‡½æ•° */
+/* ³õÊ¼»¯º¯Êı */
 void service_init(void *ctx acl_unused)
 {
 	if (var_cfg_debug_mem) {

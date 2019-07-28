@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "access_list.h"
 #include "client_servlet.h"
 #include "pull_mode/server_manager.h"
@@ -7,7 +7,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 char *var_cfg_servers;
 char *var_cfg_index_page;
@@ -113,18 +113,18 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 	logger_debug(DEBUG_CONN, 2, "connect from %s, fd: %d",
 		conn->get_peer(true), conn->sock_handle());
 
-	// è®¾ç½®è¯»å†™è¶…æ—¶æ—¶é—´
+	// ÉèÖÃ¶ÁĞ´³¬Ê±Ê±¼ä
 	conn->set_rw_timeout(var_cfg_rw_timeout);
 
 	acl::HttpServlet* servlet;
 
-	// æ ¹æ®æ‰€è®¿é—®çš„æœåŠ¡åœ°å€åŒºåˆ†è®¿é—®çš„æ•°æ®ç±»å‹
+	// ¸ù¾İËù·ÃÎÊµÄ·şÎñµØÖ·Çø·Ö·ÃÎÊµÄÊı¾İÀàĞÍ
 
-	// å½“è®¿é—®è€…æ¥è‡ªäºåç«¯æœåŠ¡å™¨é›†ç¾¤æ—¶
+	// µ±·ÃÎÊÕßÀ´×ÔÓÚºó¶Ë·şÎñÆ÷¼¯ÈºÊ±
 	if (acl_strrncasecmp(local, var_cfg_status_service,
 		strlen(var_cfg_status_service)) == 0)
 	{
-		// æ£€æŸ¥æœåŠ¡ç«¯ IP è®¿é—®æƒé™
+		// ¼ì²é·şÎñ¶Ë IP ·ÃÎÊÈ¨ÏŞ
 		if (access_list::get_instance().check_server(peer) == false)
 		{
 			logger_warn("Denied from server ip: %s", peer);
@@ -132,17 +132,17 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 		}
 
 		servlet = new server_servlet();
-		// å› ä¸ºè¯·æ±‚æ•°æ®ä½“æ˜¯ JSON/XML æ•°æ®ï¼Œæ‰€ä»¥ä¸è¦æ±‚è§£æ
+		// ÒòÎªÇëÇóÊı¾İÌåÊÇ JSON/XML Êı¾İ£¬ËùÒÔ²»ÒªÇó½âÎö
 		servlet->setParseBody(false);
 	}
 
-	// å½“è®¿é—®è€…æ¥è‡ªäºå‰ç«¯æ—¶ï¼Œæ£€æŸ¥å®¢æˆ·ç«¯ IP è®¿é—®æƒé™
+	// µ±·ÃÎÊÕßÀ´×ÔÓÚÇ°¶ËÊ±£¬¼ì²é¿Í»§¶Ë IP ·ÃÎÊÈ¨ÏŞ
 	else if (access_list::get_instance().check_client(peer) == false)
 	{
 		logger_warn("Denied from client ip: %s", peer);
 		return false;
 	}
-	// åˆ›å»ºä¸ºå‰ç«¯å®¢æˆ·ç«¯æä¾›æœåŠ¡çš„æœåŠ¡å¯¹è±¡
+	// ´´½¨ÎªÇ°¶Ë¿Í»§¶ËÌá¹©·şÎñµÄ·şÎñ¶ÔÏó
 	else
 		servlet = new client_servlet(var_cfg_server_domain,
 			var_cfg_server_port);
@@ -178,41 +178,41 @@ void master_service::thread_on_exit()
 
 void master_service::proc_on_init()
 {
-	// åˆå§‹åŒ–ç”¨æˆ·ç«¯ IP è®¿é—®ç™½åå•
+	// ³õÊ¼»¯ÓÃ»§¶Ë IP ·ÃÎÊ°×Ãûµ¥
 	if (var_cfg_allow_clients && *var_cfg_allow_clients)
 	{
 		access_list::get_instance()
 			.set_allow_clients(var_cfg_allow_clients);
 	}
 
-	/*----------------- æ‹‰æ•°æ®æ¨¡å¼ä¸‹çš„é…ç½®é€‰é¡¹ ------------------------*/
+	/*----------------- À­Êı¾İÄ£Ê½ÏÂµÄÅäÖÃÑ¡Ïî ------------------------*/
 
-	// åˆå§‹åŒ– DNS æŸ¥è¯¢çš„åœ¨ acl åº“ä¸­çš„ç¼“å­˜æ—¶é—´
+	// ³õÊ¼»¯ DNS ²éÑ¯µÄÔÚ acl ¿âÖĞµÄ»º´æÊ±¼ä
 	// acl_netdb_cache_init(var_cfg_dns_ttl, 1);
 
-	// å…ˆä½¿ç”¨é…ç½®æ–‡ä»¶ä¸­çš„æœåŠ¡å™¨é¡¹
+	// ÏÈÊ¹ÓÃÅäÖÃÎÄ¼şÖĞµÄ·şÎñÆ÷Ïî
 	if (var_cfg_servers && *var_cfg_servers && server_manager
 		::get_instance().init(var_cfg_servers) == false)
 	{
 		logger("Add static server: none!");
 	}
 
-	// åˆå§‹åŒ–ç”¨æˆ·è®¿é—®ç™½åå•
+	// ³õÊ¼»¯ÓÃ»§·ÃÎÊ°×Ãûµ¥
 	if (var_cfg_allow_users && *var_cfg_allow_users)
 	{
 		access_list::get_instance()
 			.set_allow_users(var_cfg_allow_users);
 	}
 
-	/*----------------- æ¨æ•°æ®æ¨¡å¼ä¸‹çš„é…ç½®é€‰é¡¹ ------------------------*/
-	// åˆå§‹åŒ–åç«¯æœåŠ¡ IP è®¿é—®ç™½åå•
+	/*----------------- ÍÆÊı¾İÄ£Ê½ÏÂµÄÅäÖÃÑ¡Ïî ------------------------*/
+	// ³õÊ¼»¯ºó¶Ë·şÎñ IP ·ÃÎÊ°×Ãûµ¥
 	if (var_cfg_allow_servers && *var_cfg_allow_servers)
 	{
 		access_list::get_instance()
 			.set_allow_servers(var_cfg_allow_servers);
 	}
 
-	// é‡‡ç”¨å®šæ—¶å™¨ç”¨æ¥æ¸…ç†é•¿æ—¶é—´æœªæ±‡æŠ¥çŠ¶æ€çš„æœåŠ¡å™¨ä¿¡æ¯
+	// ²ÉÓÃ¶¨Ê±Æ÷ÓÃÀ´ÇåÀí³¤Ê±¼äÎ´»ã±¨×´Ì¬µÄ·şÎñÆ÷ĞÅÏ¢
 	if (var_cfg_status_ttl > 0)
 	{
 		status_timer_ = new status_timer();

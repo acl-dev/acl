@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 
 #include "master_params.h"
 #include "master.h"
@@ -91,7 +91,7 @@ static void notify_thread(void *arg)
 		return;
 	}
 
-	/* ç¦æ­¢å°†è¯¥å¥æŸ„ä¼ é€’ç»™å­è¿›ç¨‹ */
+	/* ½ûÖ¹½«¸Ã¾ä±ú´«µÝ¸ø×Ó½ø³Ì */
 	acl_close_on_exec(ACL_VSTREAM_SOCK(client), ACL_CLOSE_ON_EXEC);
 
 	//acl_msg_info(">>>>Notify=[%s]<<<<<", acl_vstring_str(buf));

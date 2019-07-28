@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -28,7 +28,7 @@ static bool __has_called = false;
 
 void master_udp::run(int argc, char** argv)
 {
-	// è°ƒç”¨ acl æœåŠ¡å™¨æ¡†æ¶ä¸­ UDP æœåŠ¡å™¨æ¨¡æ¿æ¥å£
+	// µ÷ÓÃ acl ·şÎñÆ÷¿ò¼ÜÖĞ UDP ·şÎñÆ÷Ä£°å½Ó¿Ú
 	acl_udp_server_main(argc, argv, service_main,
 		ACL_MASTER_SERVER_CTX, this,
 		ACL_APP_CTL_THREAD_INIT_CTX, this,
@@ -51,7 +51,7 @@ void master_udp::run_daemon(int argc, char** argv)
 #ifdef ACL_WINDOWS
 	logger_fatal("no support win32 yet!");
 #else
-	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
+	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = true;
@@ -80,7 +80,7 @@ bool master_udp::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_cpp_init();
 #endif
 
-	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
+	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = false;
@@ -148,7 +148,7 @@ void master_udp::service_main(void* ctx, ACL_VSTREAM *stream)
 /*
 #ifndef	ACL_WINDOWS
 	if (mu->daemon_mode_)
-		acl_watchdog_pat();  // å¿…é¡»é€šçŸ¥ acl_master æ¡†æ¶ä¸€ä¸‹
+		acl_watchdog_pat();  // ±ØĞëÍ¨Öª acl_master ¿ò¼ÜÒ»ÏÂ
 #endif
 */
 	mu->on_read(ss);

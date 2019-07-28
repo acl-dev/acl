@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "lib_acl.h"
 
 void aio_server_log_fn(void (*write_fn)(void *, const char *fmt, ...),

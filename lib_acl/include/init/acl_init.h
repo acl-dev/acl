@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_INIT_INCLUDE_H
+#ifndef ACL_INIT_INCLUDE_H
 #define ACL_INIT_INCLUDE_H
 
 #ifdef __cplusplus
@@ -8,30 +8,30 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * åˆå§‹åŒ–æ•´ä¸ªACLåº“
+ * ³õÊ¼»¯Õû¸öACL¿â
  */
 ACL_API void acl_lib_init(void);
 
 /**
- * ç»“æŸæ•´ä¸ªACLåº“
+ * ½áÊøÕû¸öACL¿â
  */
 ACL_API void acl_lib_end(void);
 
 /**
- * æ˜¯å¦ä¼˜å…ˆä½¿ç”¨ poll è€Œé select
- * @param yesno {int} é 0 æ—¶è¡¨ç¤ºä¼˜å…ˆä½¿ç”¨ poll
+ * ÊÇ·ñÓÅÏÈÊ¹ÓÃ poll ¶ø·Ç select
+ * @param yesno {int} ·Ç 0 Ê±±íÊ¾ÓÅÏÈÊ¹ÓÃ poll
  */
 ACL_API void acl_poll_prefered(int yesno);
 
 /**
- * è·å¾—å½“å‰ acl åº“çš„ç‰ˆæœ¬ä¿¡æ¯
- * @return {const char*} å½“å‰ acl åº“ç‰ˆæœ¬ä¿¡æ¯
+ * »ñµÃµ±Ç° acl ¿âµÄ°æ±¾ĞÅÏ¢
+ * @return {const char*} µ±Ç° acl ¿â°æ±¾ĞÅÏ¢
  */
 ACL_API const char *acl_version(void);
 
 
 /**
- * è·å¾—ä¸»çº¿ç¨‹çš„çº¿ç¨‹å·
+ * »ñµÃÖ÷Ïß³ÌµÄÏß³ÌºÅ
  * @return {unsigned int}
  */
 ACL_API unsigned long acl_main_thread_self(void);

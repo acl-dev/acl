@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 void rpc_stats_init();
 

@@ -1,4 +1,4 @@
-ï»¿// beanstalk.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// beanstalk.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -8,11 +8,11 @@ static char  __addr[64];
 static const char* __tube = "zsxxsz";
 static int __max = 100;
 
-// æ¥æ”¶é˜Ÿåˆ—æ¶ˆæ¯çš„æ¶ˆè´¹è€…çº¿ç¨‹
+// ½ÓÊÕ¶ÓÁĞÏûÏ¢µÄÏû·ÑÕßÏß³Ì
 static void consumer(void)
 {
 	acl::beanstalk conn(__addr, 10);
-	// ä»æŒ‡å®šæ¶ˆæ¯é˜Ÿåˆ—ä¸­æ¥æ”¶æ¶ˆæ¯
+	// ´ÓÖ¸¶¨ÏûÏ¢¶ÓÁĞÖĞ½ÓÊÕÏûÏ¢
 	if (conn.watch(__tube) == false)
 	{
 		printf("watch %s faile\r\n", __tube);
@@ -22,7 +22,7 @@ static void consumer(void)
 	acl::string buf;
 	unsigned long long id;
 
-	// è¶…æ—¶æ¥æ”¶ä¸€æ¡æ¶ˆæ¯
+	// ³¬Ê±½ÓÊÕÒ»ÌõÏûÏ¢
 	if ((id = conn.reserve(buf)) == 0)
 		printf("reserve failed, error: %s\r\n", conn.get_error());
 	else
@@ -31,7 +31,7 @@ static void consumer(void)
 		conn.delete_id(id);
 	}
 
-	// é˜»å¡æ¥æ”¶ä¸€æ¡æ¶ˆæ¯
+	// ×èÈû½ÓÊÕÒ»ÌõÏûÏ¢
 	if ((id = conn.reserve(buf, 1)) == 0)
 		printf("reserve failed, error: %s\r\n", conn.get_error());
 	else

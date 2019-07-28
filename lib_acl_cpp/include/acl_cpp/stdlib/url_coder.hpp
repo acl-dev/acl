@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "dbuf_pool.hpp"
 #include <vector>
@@ -17,46 +17,46 @@ class ACL_CPP_API url_coder : public dbuf_obj
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param nocase {bool} å½“ä¸º true æ—¶è¡¨ç¤ºå‚æ•°åä¸åŒºåˆ«å¤§å°å†™
-	 * @param dbuf {dbuf_guard*} å†…å­˜æ± å¯¹è±¡
+	 * ¹¹Ôìº¯Êı
+	 * @param nocase {bool} µ±Îª true Ê±±íÊ¾²ÎÊıÃû²»Çø±ğ´óĞ¡Ğ´
+	 * @param dbuf {dbuf_guard*} ÄÚ´æ³Ø¶ÔÏó
 	 */
 	url_coder(bool nocase = true, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * æ„é€ å‡½æ•°ï¼Œé€šè¿‡ç±»å®ä¾‹å¯¹è±¡æ„é€ 
+	 * ¹¹Ôìº¯Êı£¬Í¨¹ıÀàÊµÀı¶ÔÏó¹¹Ôì
 	 * @param coder {const url_coder&}
-	 * @param dbuf {dbuf_guard*} å†…å­˜æ± å¯¹è±¡
+	 * @param dbuf {dbuf_guard*} ÄÚ´æ³Ø¶ÔÏó
 	 */
 	url_coder(const url_coder& coder, dbuf_guard* dbuf = NULL);
 
 	~url_coder();
 
 	/**
-	 * å°†å­˜å‚¨äº params_ æ•°ç»„ä¸­çš„æ•°æ®è¿›è¡Œ url ç¼–ç 
-	 * @param buf {string&} å­˜å‚¨ç¼–ç åçš„ç»“æœ
-	 * @param clean {bool} æ˜¯å¦æ¸…ç©ºä¼ å…¥çš„ buf ç¼“å†²åŒº
+	 * ½«´æ´¢ÓÚ params_ Êı×éÖĞµÄÊı¾İ½øĞĞ url ±àÂë
+	 * @param buf {string&} ´æ´¢±àÂëºóµÄ½á¹û
+	 * @param clean {bool} ÊÇ·ñÇå¿Õ´«ÈëµÄ buf »º³åÇø
 	 */
 	void encode(string& buf, bool clean = true) const;
 
 	/**
-	 * è·å¾—å°†æ•°ç»„å¯¹è±¡è½¬æ¢ä¸ºç¼–ç åçš„å­—ç¬¦ä¸²å¯¹è±¡
+	 * »ñµÃ½«Êı×é¶ÔÏó×ª»»Îª±àÂëºóµÄ×Ö·û´®¶ÔÏó
 	 * @return {const string&}
 	 */
 	const string& to_string() const;
 
 	/**
-	 * è§£æä»¥ URL ç¼–ç çš„å­—ç¬¦ä¸²
-	 * @param str {const char*} url ç¼–ç å½¢å¼çš„å­—ç¬¦ä¸²
+	 * ½âÎöÒÔ URL ±àÂëµÄ×Ö·û´®
+	 * @param str {const char*} url ±àÂëĞÎÊ½µÄ×Ö·û´®
 	 */
 	void decode(const char* str);
 	
 	/**
-	 * é‡‡ç”¨ url ç¼–ç æ—¶ï¼Œè°ƒç”¨æ­¤å‡½æ•°æ·»åŠ å˜é‡
-	 * @param name {const char*} å˜é‡å
-	 * @param value å˜é‡å€¼
-	 * @param override {bool} å¦‚æœå­˜åœ¨åŒåå˜é‡æ˜¯å¦ç›´æ¥è¦†ç›–
-	 * @return è¿”å› url_coder å¯¹è±¡çš„å¼•ç”¨
+	 * ²ÉÓÃ url ±àÂëÊ±£¬µ÷ÓÃ´Ëº¯ÊıÌí¼Ó±äÁ¿
+	 * @param name {const char*} ±äÁ¿Ãû
+	 * @param value ±äÁ¿Öµ
+	 * @param override {bool} Èç¹û´æÔÚÍ¬Ãû±äÁ¿ÊÇ·ñÖ±½Ó¸²¸Ç
+	 * @return ·µ»Ø url_coder ¶ÔÏóµÄÒıÓÃ
 	 */
 	url_coder& set(const char* name, const char* value,
 		bool override = true);
@@ -67,28 +67,28 @@ public:
 		bool override = true);
 
 	/**
-	 * è·å¾— URL è§£ç å params_ æ•°ç»„ä¸­æŸä¸ªå˜é‡åçš„å€¼
-	 * @param name {const char*} å˜é‡å
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºä¸å­˜åœ¨
+	 * »ñµÃ URL ½âÂëºó params_ Êı×éÖĞÄ³¸ö±äÁ¿ÃûµÄÖµ
+	 * @param name {const char*} ±äÁ¿Ãû
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾²»´æÔÚ
 	 */
 	const char* get(const char* name) const;
 
 	/**
-	 * è·å¾— URL è§£ç å params_ æ•°ç»„ä¸­æŸä¸ªå˜é‡åçš„å€¼
-	 * @param name {const char*} å˜é‡å
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºä¸å­˜åœ¨
+	 * »ñµÃ URL ½âÂëºó params_ Êı×éÖĞÄ³¸ö±äÁ¿ÃûµÄÖµ
+	 * @param name {const char*} ±äÁ¿Ãû
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾²»´æÔÚ
 	 */
 	const char* operator[](const char* name) const;
 
 	/**
-	 * URL ç¼–ç å™¨å¯¹è±¡çš„æ‹·è´
-	 * @param coder {const url_coder&} URL æºç¼–ç å™¨å¯¹è±¡
+	 * URL ±àÂëÆ÷¶ÔÏóµÄ¿½±´
+	 * @param coder {const url_coder&} URL Ô´±àÂëÆ÷¶ÔÏó
 	 * @return {const url_coder&}
 	 */
 	const url_coder& operator =(const url_coder& coder);
 
 	/**
-	 * è·å¾—å‚æ•°æ•°ç»„å¯¹è±¡
+	 * »ñµÃ²ÎÊıÊı×é¶ÔÏó
 	 * @return {std::vector<URL_NV*>&}
 	 */
 	const std::vector<URL_NV*>& get_params() const
@@ -97,14 +97,14 @@ public:
 	}
 
 	/**
-	 * ä» params_ å‚æ•°æ•°ç»„ä¸­åˆ é™¤æŸä¸ªå˜é‡
-	 * @param name {const char*} å˜é‡å
-	 * @return {bool} è¿”å› true è¡¨ç¤ºåˆ é™¤æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºä¸å­˜åœ¨
+	 * ´Ó params_ ²ÎÊıÊı×éÖĞÉ¾³ıÄ³¸ö±äÁ¿
+	 * @param name {const char*} ±äÁ¿Ãû
+	 * @return {bool} ·µ»Ø true ±íÊ¾É¾³ı³É¹¦£¬·ñÔò±íÊ¾²»´æÔÚ
 	 */
 	bool del(const char* name);
 
 	/**
-	 * é‡ç½®è§£æå™¨çŠ¶æ€ï¼Œæ¸…é™¤å†…éƒ¨ç¼“å­˜
+	 * ÖØÖÃ½âÎöÆ÷×´Ì¬£¬Çå³ıÄÚ²¿»º´æ
 	 */
 	void reset();
 

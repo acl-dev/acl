@@ -1,4 +1,4 @@
-﻿/* System libraries. */
+/* System libraries. */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 

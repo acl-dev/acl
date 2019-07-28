@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 
 static void quote_split(const char* str, const char* delim)
 {

@@ -1,4 +1,4 @@
-﻿#ifndef ALLOC_H
+#ifndef ALLOC_H
 #define ALLOC_H
 
 extern /*@null@*//*@out@*/char *alloc();

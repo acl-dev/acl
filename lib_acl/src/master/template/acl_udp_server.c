@@ -1,4 +1,4 @@
-ï»¿/* System library. */
+/* System library. */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
@@ -546,10 +546,10 @@ static void udp_server_read(int event_type, ACL_EVENT *event acl_unused,
 			__FILE__, myname, __LINE__, event_type);
 	}
 
-	/* å›è°ƒç”¨æˆ·æ³¨å†Œçš„å¤„ç†è¿‡ç¨‹ */
+	/* »Øµ÷ÓÃ»§×¢²áµÄ´¦Àí¹ı³Ì */
 	__service_main(__service_ctx, stream);
 
-	/* æ¸…é™¤å‘ç”Ÿåœ¨ UDP å¥—æ¥å­—ä¸Šçš„ä¸´æ—¶æ€§é”™è¯¯ï¼Œä»¥å…äº‹ä»¶å¼•æ“æŠ¥é”™ */
+	/* Çå³ı·¢ÉúÔÚ UDP Ì×½Ó×ÖÉÏµÄÁÙÊ±ĞÔ´íÎó£¬ÒÔÃâÊÂ¼şÒıÇæ±¨´í */
 	stream->flag = 0;
 
 	acl_atomic_clock_count_add(__clock, 1);
@@ -1164,7 +1164,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		user_name = acl_var_udp_owner;
 	}
 
-	/* è®¾ç½®å›å›è°ƒè¿‡ç¨‹ç›¸å…³å‚æ•° */
+	/* ÉèÖÃ»Ø»Øµ÷¹ı³ÌÏà¹Ø²ÎÊı */
 	__service_main = service;
 	__service_name = service_name;
 	__service_argv = argv + optind;
@@ -1190,25 +1190,25 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 		__nservers = acl_var_udp_threads;
 	}
 
-	/* åˆ›å»ºç”¨äºçº¿ç¨‹å±€éƒ¨å˜é‡çš„é”®å¯¹è±¡ */
+	/* ´´½¨ÓÃÓÚÏß³Ì¾Ö²¿±äÁ¿µÄ¼ü¶ÔÏó */
 	acl_pthread_key_create(&__server_key, thread_server_exit);
 
-	/* å¿…é¡»å…ˆè®¾ç½®ä¸»çº¿ç¨‹çš„å¯¹è±¡ï¼Œä»¥ä¾¿äºåº”ç”¨èƒ½åŠæ—¶ä½¿ç”¨ */
+	/* ±ØĞëÏÈÉèÖÃÖ÷Ïß³ÌµÄ¶ÔÏó£¬ÒÔ±ãÓÚÓ¦ÓÃÄÜ¼°Ê±Ê¹ÓÃ */
 	server = &__servers[acl_var_udp_threads - 1];
 	acl_pthread_setspecific(__server_key, server);
 
-	/* åˆ‡æ¢ç”¨æˆ·è¿è¡Œèº«ä»½å‰å›è°ƒåº”ç”¨è®¾ç½®çš„å›è°ƒå‡½æ•° */
+	/* ÇĞ»»ÓÃ»§ÔËĞĞÉí·İÇ°»Øµ÷Ó¦ÓÃÉèÖÃµÄ»Øµ÷º¯Êı */
 	if (pre_init) {
 		pre_init(__service_ctx);
 	}
 
 #ifdef ACL_UNIX
-	/* è®¾ç½®å­è¿›ç¨‹è¿è¡Œç¯å¢ƒï¼Œå…è®¸äº§ç”Ÿ core æ–‡ä»¶ */
+	/* ÉèÖÃ×Ó½ø³ÌÔËĞĞ»·¾³£¬ÔÊĞí²úÉú core ÎÄ¼ş */
 	if (acl_var_udp_enable_core && acl_var_udp_core_limit != 0) {
 		acl_set_core_limit(acl_var_udp_core_limit);
 	}
 
-	/* åœ¨åˆ‡æ¢ç”¨æˆ·è¿è¡Œèº«ä»½å‰åˆ‡æ¢ç¨‹åºè¿è¡Œç›®å½• */
+	/* ÔÚÇĞ»»ÓÃ»§ÔËĞĞÉí·İÇ°ÇĞ»»³ÌĞòÔËĞĞÄ¿Â¼ */
 	if (__daemon_mode && chdir(acl_var_udp_queue_dir) < 0) {
 		acl_msg_fatal("chdir(\"%s\"): %s",
 			acl_var_udp_queue_dir, acl_last_serror());
@@ -1224,7 +1224,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	udp_server_open_log();
 	log_event_mode(__event_mode);
 
-	/* è¿›ç¨‹åˆå§‹åŒ–å®Œæ¯•åå›è°ƒæ­¤å‡½æ•°ï¼Œä»¥ä½¿ç”¨æˆ·å¯ä»¥åˆå§‹åŒ–è‡ªå·±çš„ç¯å¢ƒ */
+	/* ½ø³Ì³õÊ¼»¯Íê±Ïºó»Øµ÷´Ëº¯Êı£¬ÒÔÊ¹ÓÃ»§¿ÉÒÔ³õÊ¼»¯×Ô¼ºµÄ»·¾³ */
 	if (post_init) {
 		post_init(__service_ctx);
 	}
@@ -1237,7 +1237,7 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 	}
 #endif
 
-	/* è®¾ç½® SIGHUP ä¿¡å· */
+	/* ÉèÖÃ SIGHUP ĞÅºÅ */
 	acl_server_sighup_setup();
 	acl_server_sigterm_setup();
 

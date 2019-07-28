@@ -1,4 +1,4 @@
-﻿/* crypto/md4/md4.h */
+/* crypto/md4/md4.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

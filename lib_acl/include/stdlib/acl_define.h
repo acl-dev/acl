@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_DEFINE_INCLUDE_H
+#ifndef	ACL_DEFINE_INCLUDE_H
 #define	ACL_DEFINE_INCLUDE_H
 
 #ifdef MINGW

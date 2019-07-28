@@ -1,8 +1,8 @@
-﻿#pragma once
+#pragma once
 
 //////////////////////////////////////////////////////////////////////////
 
-// 纯虚类，子类须实现该类中的纯虚接口
+// �����࣬������ʵ�ָ����еĴ���ӿ�
 class ping_callback
 {
 public:
@@ -107,13 +107,13 @@ public:
 protected:
 	~ping();
 
-	// 基类虚函数：子线程处理函数
+	// �����麯�������̴߳�������
 	virtual void rpc_run();
 
-	// 基类虚函数：主线程处理过程，收到子线程任务完成的消息
+	// �����麯�������̴߳������̣��յ����߳�������ɵ���Ϣ
 	virtual void rpc_onover();
 
-	// 基类虚函数：主线程处理过程，收到子线程的通知消息
+	// �����麯�������̴߳������̣��յ����̵߳�֪ͨ��Ϣ
 	virtual void rpc_wakeup(void* ctx);
 
 protected:

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 #include <sys/wait.h>
 #include <stdlib.h>

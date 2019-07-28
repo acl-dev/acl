@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "redis_thread.h"
 
 double redis_thread::stamp_sub(const struct timeval *from,

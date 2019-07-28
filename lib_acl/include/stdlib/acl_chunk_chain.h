@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_CHUNK_CHAIN_INCLUDE_H
+#ifndef ACL_CHUNK_CHAIN_INCLUDE_H
 #define ACL_CHUNK_CHAIN_INCLUDE_H
 
 #ifdef __cplusplus
@@ -8,93 +8,93 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * æ•°æ®é“¾ç±»å‹å®šä¹‰
+ * Êı¾İÁ´ÀàĞÍ¶¨Òå
  */
 typedef struct ACL_CHAIN ACL_CHAIN;
 
 /**
- * åˆ›å»ºä¸€ä¸ªæ•°æ®é“¾å¯¹è±¡
- * @param init_size {size_t} è¿ç»­æ•°æ®åŠ¨æ€å†…å­˜çš„åˆå§‹å°ºå¯¸å¤§å°
- * @param off_begin {acl_int64} è¿ç»­æ•°æ®å—çš„èµ·å§‹ä½ç½®
- * @return {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
+ * ´´½¨Ò»¸öÊı¾İÁ´¶ÔÏó
+ * @param init_size {size_t} Á¬ĞøÊı¾İ¶¯Ì¬ÄÚ´æµÄ³õÊ¼³ß´ç´óĞ¡
+ * @param off_begin {acl_int64} Á¬ĞøÊı¾İ¿éµÄÆğÊ¼Î»ÖÃ
+ * @return {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
  */
 ACL_API ACL_CHAIN *acl_chain_new(size_t init_size, acl_int64 off_begin);
 
 /**
- * é‡Šæ”¾æ•°æ®é“¾å¯¹è±¡
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
+ * ÊÍ·ÅÊı¾İÁ´¶ÔÏó
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
  */
 ACL_API void acl_chain_free(ACL_CHAIN *chain);
 
 /**
- * è®¾ç½®è¿ç»­æ•°æ®å—çš„ä¸‹ä¸€ä¸ªåç§»ä½ç½®
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @param from_next {acl_int64} è¿ç»­æ•°æ®å—çš„ä¸‹ä¸€ä¸ªåç§»ä½ç½®
+ * ÉèÖÃÁ¬ĞøÊı¾İ¿éµÄÏÂÒ»¸öÆ«ÒÆÎ»ÖÃ
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @param from_next {acl_int64} Á¬ĞøÊı¾İ¿éµÄÏÂÒ»¸öÆ«ÒÆÎ»ÖÃ
  */
 ACL_API void acl_chain_set_from_next(ACL_CHAIN *chain, acl_int64 from_next);
 
 /**
- * é‡ç½®æ•°æ®é“¾å¯¹è±¡ï¼Œå¹¶å°†èµ·å§‹ä½ç½®é‡ç½®ä¸ºç»™å®šå€¼
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @param off_begin {acl_int64} ç»™å®šè¿æ¥æ•°æ®å—çš„èµ·å§‹ä½ç½®
+ * ÖØÖÃÊı¾İÁ´¶ÔÏó£¬²¢½«ÆğÊ¼Î»ÖÃÖØÖÃÎª¸ø¶¨Öµ
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @param off_begin {acl_int64} ¸ø¶¨Á¬½ÓÊı¾İ¿éµÄÆğÊ¼Î»ÖÃ
  */
 ACL_API void acl_chain_reset(ACL_CHAIN *chain, acl_int64 off_begin);
 
 /**
- * è·å¾—å½“å‰æ•°æ®é“¾å¯¹è±¡ä¸­è¿ç»­æ•°æ®å—ä¸­çš„ä¸‹ä¸€ä¸ªä½ç½®
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @return {acl_int64} è¿æ¥æ•°æ®å—çš„ä¸‹ä¸€ä¸ªä½ç½®
+ * »ñµÃµ±Ç°Êı¾İÁ´¶ÔÏóÖĞÁ¬ĞøÊı¾İ¿éÖĞµÄÏÂÒ»¸öÎ»ÖÃ
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @return {acl_int64} Á¬½ÓÊı¾İ¿éµÄÏÂÒ»¸öÎ»ÖÃ
  */
 ACL_API acl_int64 acl_chain_from_next(ACL_CHAIN *chain);
 
 /**
- * è·å¾—å½“å‰æ•°æ®é“¾å¯¹è±¡çš„èµ·å§‹ä½ç½®
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @return {acl_int64} æ•°æ®é“¾çš„èµ·å§‹ä½ç½®
+ * »ñµÃµ±Ç°Êı¾İÁ´¶ÔÏóµÄÆğÊ¼Î»ÖÃ
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @return {acl_int64} Êı¾İÁ´µÄÆğÊ¼Î»ÖÃ
  */
 ACL_API acl_int64 acl_chain_off_begin(ACL_CHAIN *chain);
 
 /**
- * è·å¾—å½“å‰æ•°æ®é“¾ä¸­è¿ç»­æ•°æ®å—çš„èµ·å§‹å­˜å‚¨æŒ‡é’ˆåœ°å€
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @return {const char*} è¿ç»­æ•°æ®å—çš„èµ·å§‹å­˜å‚¨æŒ‡é’ˆåœ°å€
+ * »ñµÃµ±Ç°Êı¾İÁ´ÖĞÁ¬ĞøÊı¾İ¿éµÄÆğÊ¼´æ´¢Ö¸ÕëµØÖ·
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @return {const char*} Á¬ĞøÊı¾İ¿éµÄÆğÊ¼´æ´¢Ö¸ÕëµØÖ·
  */
 ACL_API const char *acl_chain_data(ACL_CHAIN *chain);
 
 /**
- * è·å¾—å½“å‰æ•°æ®é“¾ä¸­è¿ç»­æ•°æ®å—çš„æ•°æ®é•¿åº¦
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @return {int} è¿ç»­æ•°æ®å—çš„æ•°æ®é•¿åº¦
+ * »ñµÃµ±Ç°Êı¾İÁ´ÖĞÁ¬ĞøÊı¾İ¿éµÄÊı¾İ³¤¶È
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @return {int} Á¬ĞøÊı¾İ¿éµÄÊı¾İ³¤¶È
  */
 ACL_API int acl_chain_data_len(ACL_CHAIN *chain);
 
 /**
- * å½“å‰æ•°æ®é“¾ä¸­éè¿ç»­æ•°æ®å—çš„ä¸ªæ•°
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @return {int} éè¿ç»­æ•°æ®å—çš„ä¸ªæ•°
+ * µ±Ç°Êı¾İÁ´ÖĞ·ÇÁ¬ĞøÊı¾İ¿éµÄ¸öÊı
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @return {int} ·ÇÁ¬ĞøÊı¾İ¿éµÄ¸öÊı
  */
 ACL_API int acl_chain_size(ACL_CHAIN *chain);
 
 /**
- * è·å¾—å½“å‰æ•°æ®é“¾ä¸­éè¿ç»­æ•°æ®å—çš„æ‰€æœ‰æ•°æ®æ€»é•¿åº¦
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @return {int} éè¿ç»­æ•°æ®å—çš„æ€»é•¿åº¦
+ * »ñµÃµ±Ç°Êı¾İÁ´ÖĞ·ÇÁ¬ĞøÊı¾İ¿éµÄËùÓĞÊı¾İ×Ü³¤¶È
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @return {int} ·ÇÁ¬ĞøÊı¾İ¿éµÄ×Ü³¤¶È
  */
 ACL_API int acl_chain_chunk_data_len(ACL_CHAIN *chain);
 
 /**
- * å‘æ•°æ®é“¾ä¸­æ·»åŠ ä¸€ä¸ªæ•°æ®å—ï¼Œå†…éƒ¨è‡ªåŠ¨å»æ‰é‡å æ•°æ®
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
- * @param data {const void*} æ•°æ®å—æŒ‡é’ˆ
- * @param from {acl_int64} è¯¥æ–°æ•°æ®å—çš„èµ·å§‹ä½ç½®
- * @param dlen {int} æ•°æ®å—çš„é•¿åº¦
+ * ÏòÊı¾İÁ´ÖĞÌí¼ÓÒ»¸öÊı¾İ¿é£¬ÄÚ²¿×Ô¶¯È¥µôÖØµşÊı¾İ
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
+ * @param data {const void*} Êı¾İ¿éÖ¸Õë
+ * @param from {acl_int64} ¸ÃĞÂÊı¾İ¿éµÄÆğÊ¼Î»ÖÃ
+ * @param dlen {int} Êı¾İ¿éµÄ³¤¶È
  */
 ACL_API void acl_chain_add(ACL_CHAIN *chain, const void *data,
 	acl_int64 from, int dlen);
 
 /**
- * æ‰“å°è¾“å‡ºå½“å‰æ•°æ®é“¾çš„è¿ç»­æ•°æ®å—åŠéè¿ç»­æ•°æ®å—çš„èµ·å§‹ä½ç½®ä¿¡æ¯
- * @param chain {ACL_CHAIN*} æ•°æ®é“¾å¯¹è±¡
+ * ´òÓ¡Êä³öµ±Ç°Êı¾İÁ´µÄÁ¬ĞøÊı¾İ¿é¼°·ÇÁ¬ĞøÊı¾İ¿éµÄÆğÊ¼Î»ÖÃĞÅÏ¢
+ * @param chain {ACL_CHAIN*} Êı¾İÁ´¶ÔÏó
  */
 ACL_API void acl_chain_list(ACL_CHAIN *chain);
 

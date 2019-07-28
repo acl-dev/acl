@@ -1,4 +1,4 @@
-ï»¿#ifndef FIFO_INCLUDE_H
+#ifndef FIFO_INCLUDE_H
 #define FIFO_INCLUDE_H
 
 #ifdef __cplusplus
@@ -26,33 +26,33 @@ struct FIFO {
 	FIFO_INFO *tail;
 	int   cnt;
 
-	/* æ·»åŠ åŠå¼¹å‡º */
+	/* Ìí¼Ó¼°µ¯³ö */
 
-	/* å‘é˜Ÿåˆ—å°¾éƒ¨æ·»åŠ åŠ¨æ€å¯¹è±¡ */
+	/* Ïò¶ÓÁÐÎ²²¿Ìí¼Ó¶¯Ì¬¶ÔÏó */
 	void  (*push_back)(struct FIFO*, void*);
-	/* å‘é˜Ÿåˆ—å¤´éƒ¨æ·»åŠ åŠ¨æ€å¯¹è±¡ */
+	/* Ïò¶ÓÁÐÍ·²¿Ìí¼Ó¶¯Ì¬¶ÔÏó */
 	void  (*push_front)(struct FIFO*, void*);
-	/* å¼¹å‡ºé˜Ÿåˆ—å°¾éƒ¨åŠ¨æ€å¯¹è±¡ */
+	/* µ¯³ö¶ÓÁÐÎ²²¿¶¯Ì¬¶ÔÏó */
 	void *(*pop_back)(struct FIFO*);
-	/* å¼¹å‡ºé˜Ÿåˆ—å¤´éƒ¨åŠ¨æ€å¯¹è±¡ */
+	/* µ¯³ö¶ÓÁÐÍ·²¿¶¯Ì¬¶ÔÏó */
 	void *(*pop_front)(struct FIFO*);
 
 	/* for iterator */
 
-	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
+	/* È¡µü´úÆ÷Í·º¯Êý */
 	void *(*iter_head)(ITER*, struct FIFO*);
-	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
 	void *(*iter_next)(ITER*, struct FIFO*);
-	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
+	/* È¡µü´úÆ÷Î²º¯Êý */
 	void *(*iter_tail)(ITER*, struct FIFO*);
-	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
+	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
 	void *(*iter_prev)(ITER*, struct FIFO*);
-	/* å–è¿­ä»£å™¨å…³è”çš„å½“å‰å®¹å™¨æˆå‘˜ç»“æž„å¯¹è±¡ */
+	/* È¡µü´úÆ÷¹ØÁªµÄµ±Ç°ÈÝÆ÷³ÉÔ±½á¹¹¶ÔÏó */
 	FIFO_INFO *(*iter_info)(ITER*, struct FIFO*);
 };
 
 /**
- * åˆå§‹åŒ–ä¸€ä¸ªç»™å®šé˜Ÿåˆ—ï¼Œåº”ç”¨å¯ä»¥åœ¨æ ˆä¸Šåˆ†é…é˜Ÿåˆ—ï¼Œè€ŒåŽè°ƒç”¨è¯¥å‡½æ•°è¿›è¡Œåˆå§‹åŒ–
+ * ³õÊ¼»¯Ò»¸ö¸ø¶¨¶ÓÁÐ£¬Ó¦ÓÃ¿ÉÒÔÔÚÕ»ÉÏ·ÖÅä¶ÓÁÐ£¬¶øºóµ÷ÓÃ¸Ãº¯Êý½øÐÐ³õÊ¼»¯
  * @param fifo {FIFO *}
  * @example:
  *   void test(void) {
@@ -64,19 +64,19 @@ struct FIFO {
 void fifo_init(FIFO *fifo);
 
 /**
- * ä»Žå†…å­˜å †ä¸­åˆ†é…ä¸€ä¸ªé˜Ÿåˆ—å¯¹è±¡
+ * ´ÓÄÚ´æ¶ÑÖÐ·ÖÅäÒ»¸ö¶ÓÁÐ¶ÔÏó
  * @return {FIFO*}
  */
 FIFO *fifo_new(void);
 
 /**
- * ä»Žå†…å­˜å †ä¸­åˆ†é…ä¸€ä¸ªé˜Ÿåˆ—å¯¹è±¡å¹¶ä¼ å†…å­˜æ± å¯¹è±¡åšä¸ºåˆ†é…å™¨
+ * ´ÓÄÚ´æ¶ÑÖÐ·ÖÅäÒ»¸ö¶ÓÁÐ¶ÔÏó²¢´«ÄÚ´æ³Ø¶ÔÏó×öÎª·ÖÅäÆ÷
  * @return {FIFO*}
  */
 FIFO *fifo_new(void);
 
 /**
- * ä»Žé˜Ÿåˆ—ä¸­åˆ é™¤ä¸Žæ‰€ç»™å€¼ç›¸åŒçš„å¯¹è±¡
+ * ´Ó¶ÓÁÐÖÐÉ¾³ýÓëËù¸øÖµÏàÍ¬µÄ¶ÔÏó
  * @param fifo {FIFO*}
  * @param data {const void*}
  */
@@ -84,19 +84,19 @@ int fifo_delete(FIFO *fifo, const void *data);
 void fifo_delete_info(FIFO *fifo, FIFO_INFO *info);
 
 /**
- * é‡Šæ”¾ä»¥å †åˆ†é…çš„é˜Ÿåˆ—å¯¹è±¡
+ * ÊÍ·ÅÒÔ¶Ñ·ÖÅäµÄ¶ÓÁÐ¶ÔÏó
  * @param fifo {FIFO*}
- * @param free_fn {void (*)(void*)}, å¦‚æžœè¯¥å‡½æ•°æŒ‡é’ˆä¸ä¸ºç©ºåˆ™
- *  ç”¨æ¥é‡Šæ”¾é˜Ÿåˆ—ä¸­åŠ¨æ€åˆ†é…çš„å¯¹è±¡
+ * @param free_fn {void (*)(void*)}, Èç¹û¸Ãº¯ÊýÖ¸Õë²»Îª¿ÕÔò
+ *  ÓÃÀ´ÊÍ·Å¶ÓÁÐÖÐ¶¯Ì¬·ÖÅäµÄ¶ÔÏó
  */
 void fifo_free(FIFO *fifo, void (*free_fn)(void *));
 void fifo_free2(FIFO *fifo, void (*free_fn)(FIFO_INFO *));
 
 /**
- * å‘é˜Ÿåˆ—ä¸­æ·»åŠ ä¸€ä¸ªåŠ¨æ€å †å¯¹è±¡
+ * Ïò¶ÓÁÐÖÐÌí¼ÓÒ»¸ö¶¯Ì¬¶Ñ¶ÔÏó
  * @param fifo {FIFO*}
- * @param data {void*} åŠ¨æ€å¯¹è±¡
- * @return {FIFO_INFO*} å¦‚æžœ data éžç©ºåˆ™è¿”å›žé˜Ÿåˆ—ä¸­çš„æ–°æ·»åŠ å¯¹è±¡, å¦åˆ™è¿”å›ž NULL
+ * @param data {void*} ¶¯Ì¬¶ÔÏó
+ * @return {FIFO_INFO*} Èç¹û data ·Ç¿ÕÔò·µ»Ø¶ÓÁÐÖÐµÄÐÂÌí¼Ó¶ÔÏó, ·ñÔò·µ»Ø NULL
  */
 FIFO_INFO *fifo_push_back(FIFO *fifo, void *data);
 #define fifo_push	fifo_push_back
@@ -105,39 +105,39 @@ void fifo_push_info_back(FIFO *fifo, FIFO_INFO *info);
 FIFO_INFO *fifo_push_front(FIFO *fifo, void *data);
 
 /**
- * ä»Žé˜Ÿåˆ—ä¸­ä»¥å…ˆè¿›å…ˆå‡ºæ–¹å¼å¼¹å‡ºä¸€ä¸ªåŠ¨æ€å¯¹è±¡, åŒæ—¶å°†è¯¥å¯¹è±¡ä»Žé˜Ÿåˆ—ä¸­åˆ é™¤
+ * ´Ó¶ÓÁÐÖÐÒÔÏÈ½øÏÈ³ö·½Ê½µ¯³öÒ»¸ö¶¯Ì¬¶ÔÏó, Í¬Ê±½«¸Ã¶ÔÏó´Ó¶ÓÁÐÖÐÉ¾³ý
  * @param fifo {FIFO*}
- * @return {void*}, å¦‚æžœä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºé˜Ÿåˆ—ä¸ºç©º
+ * @return {void*}, Èç¹ûÎª¿Õ£¬Ôò±íÊ¾¶ÓÁÐÎª¿Õ
  */
 void *fifo_pop_front(FIFO *fifo);
 #define fifo_pop	fifo_pop_front
 FIFO_INFO *fifo_pop_info(FIFO *fifo);
 
 /**
- * ä»Žé˜Ÿåˆ—ä¸­ä»¥åŽè¿›å…ˆå‡ºæ–¹å¼å¼¹å‡ºä¸€ä¸ªåŠ¨æ€å¯¹è±¡ï¼Œ åŒæ—¶è¯¥å¯¹è±¡ä»Žé˜Ÿåˆ—ä¸­åˆ é™¤
+ * ´Ó¶ÓÁÐÖÐÒÔºó½øÏÈ³ö·½Ê½µ¯³öÒ»¸ö¶¯Ì¬¶ÔÏó£¬ Í¬Ê±¸Ã¶ÔÏó´Ó¶ÓÁÐÖÐÉ¾³ý
  * @param fifo {FIFO*}
- * @return {void*}, å¦‚æžœä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºé˜Ÿåˆ—ä¸ºç©º
+ * @return {void*}, Èç¹ûÎª¿Õ£¬Ôò±íÊ¾¶ÓÁÐÎª¿Õ
  */
 void *fifo_pop_back(FIFO *fifo);
 
 /**
- * è¿”å›žé˜Ÿåˆ—ä¸­å¤´éƒ¨çš„åŠ¨æ€å¯¹è±¡
+ * ·µ»Ø¶ÓÁÐÖÐÍ·²¿µÄ¶¯Ì¬¶ÔÏó
  * @param fifo {FIFO*}
- * @return {void*}, å¦‚æžœä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºé˜Ÿåˆ—ä¸ºç©º
+ * @return {void*}, Èç¹ûÎª¿Õ£¬Ôò±íÊ¾¶ÓÁÐÎª¿Õ
  */
 void *fifo_head(FIFO *fifo);
 FIFO_INFO *fifo_head_info(FIFO *fifo);
 
 /**
- * è¿”å›žé˜Ÿåˆ—ä¸­å°¾éƒ¨çš„åŠ¨æ€å¯¹è±¡
+ * ·µ»Ø¶ÓÁÐÖÐÎ²²¿µÄ¶¯Ì¬¶ÔÏó
  * @param fifo {FIFO*}
- * @return {void*}, å¦‚æžœä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºé˜Ÿåˆ—ä¸ºç©º
+ * @return {void*}, Èç¹ûÎª¿Õ£¬Ôò±íÊ¾¶ÓÁÐÎª¿Õ
  */
 void *fifo_tail(FIFO *fifo);
 FIFO_INFO *fifo_tail_info(FIFO *fifo);
 
 /**
- * è¿”å›žé˜Ÿåˆ—ä¸­åŠ¨æ€å¯¹è±¡çš„æ€»ä¸ªæ•°
+ * ·µ»Ø¶ÓÁÐÖÐ¶¯Ì¬¶ÔÏóµÄ×Ü¸öÊý
  * @param fifo {FIFO*}
  * @return {int}, >= 0
  */

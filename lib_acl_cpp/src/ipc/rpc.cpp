@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/ipc/ipc_client.hpp"
@@ -8,7 +8,7 @@
 namespace acl
 {
 
-// æ‰€æœ‰æ¶ˆæ¯ç±»åž‹å®šä¹‰
+// ËùÓÐÏûÏ¢ÀàÐÍ¶¨Òå
 enum
 {
 	RPC_MSG,
@@ -20,7 +20,7 @@ enum
 #define RPC_WIN32_SIG	(WM_USER + 101)
 #endif
 
-// IPC é€šä¿¡æ—¶ï¼Œå­çº¿ç¨‹é€šè¿‡å‘é€æ­¤æ•°æ®é€šçŸ¥ä¸»çº¿ç¨‹ä»»åŠ¡å¤„ç†ç»“æžœ
+// IPC Í¨ÐÅÊ±£¬×ÓÏß³ÌÍ¨¹ý·¢ËÍ´ËÊý¾ÝÍ¨ÖªÖ÷Ïß³ÌÈÎÎñ´¦Àí½á¹û
 /*
 struct IPC_DAT 
 {
@@ -53,7 +53,7 @@ rpc_request::~rpc_request(void)
 	acl_myfree(cond_);
 }
 
-// è¯¥å‡½æ•°åœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
+// ¸Ãº¯ÊýÔÚ×ÓÏß³ÌÖÐ±»µ÷ÓÃ
 void rpc_request::run(ipc_client* ipc)
 {
 	ipc_ = ipc;
@@ -62,32 +62,32 @@ void rpc_request::run(ipc_client* ipc)
 	IPC_DAT data;
 	data.req = this;
 	data.ctx = NULL;
-	// å‘ä¸»çº¿ç¨‹å‘é€ç»“æžœ
+	// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
 	ipc->send_message(RPC_MSG, &data, sizeof(data));
 	*/
 	dat_.ctx = NULL;
 
-	// å‘ä¸»çº¿ç¨‹å‘é€ç»“æžœ
+	// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
 	ipc->send_message(RPC_MSG, &dat_, sizeof(RPC_DAT));
 }
 
-// è¯¥å‡½æ•°åœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
+// ¸Ãº¯ÊýÔÚ×ÓÏß³ÌÖÐ±»µ÷ÓÃ
 #ifdef ACL_WINDOWS
 void rpc_request::run(HWND hWnd)
 {
 	rpc_run();
-	// å‘çª—å£å¥æŸ„å‘æ¶ˆæ¯ï¼Œå°†å½“å‰å¯¹è±¡çš„åœ°å€å‘ç»™ä¸»çº¿ç¨‹
+	// Ïò´°¿Ú¾ä±ú·¢ÏûÏ¢£¬½«µ±Ç°¶ÔÏóµÄµØÖ··¢¸øÖ÷Ïß³Ì
 	::PostMessage(hWnd, RPC_WIN32_MSG, 0, (LPARAM) this);
 }
 #endif
 
-// è¯¥å‡½æ•°åœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
+// ¸Ãº¯ÊýÔÚ×ÓÏß³ÌÖÐ±»µ÷ÓÃ
 void rpc_request::rpc_signal(void* ctx)
 {
 #ifdef ACL_WINDOWS
 	HWND hWnd = get_hwnd();
 	if (hWnd != NULL) {
-		// å‘çª—å£å¥æŸ„å‘æ¶ˆæ¯ï¼Œå°†å½“å‰å¯¹è±¡çš„åœ°å€å‘ç»™ä¸»çº¿ç¨‹
+		// Ïò´°¿Ú¾ä±ú·¢ÏûÏ¢£¬½«µ±Ç°¶ÔÏóµÄµØÖ··¢¸øÖ÷Ïß³Ì
 		::PostMessage(hWnd, RPC_WIN32_SIG, (WPARAM) ctx, (LPARAM) this);
 		return;
 	}
@@ -99,11 +99,11 @@ void rpc_request::rpc_signal(void* ctx)
 	IPC_DAT data;
 	data.req = this;
 	data.ctx = ctx;
-	// å‘ä¸»çº¿ç¨‹å‘é€ç»“æžœ
+	// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
 	ipc_->send_message(RPC_SIG, &data, sizeof(data));
 	*/
 	dat_.ctx = ctx;
-	// å‘ä¸»çº¿ç¨‹å‘é€ç»“æžœ
+	// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
 	ipc_->send_message(RPC_SIG, &dat_, sizeof(RPC_DAT));
 }
 
@@ -203,7 +203,7 @@ bool rpc_request::cond_signal(void)
 
 //////////////////////////////////////////////////////////////////////////
 
-// è¯¥ç±»å®žä¾‹åœ¨ä¸»çº¿ç¨‹ä¸­è¿è¡Œ
+// ¸ÃÀàÊµÀýÔÚÖ÷Ïß³ÌÖÐÔËÐÐ
 
 class rpc_client : public ipc_client
 {
@@ -214,10 +214,10 @@ public:
 protected:
 	/**
 	 * @override
-	 * åŸºç±»è™šæŽ¥å£ï¼šå½“æ”¶åˆ°æ¶ˆæ¯æ—¶çš„å›žè°ƒå‡½æ•°
-	 * @param nMsg {int} ç”¨æˆ·æ·»åŠ çš„è‡ªå®šä¹‰æ¶ˆæ¯å€¼
-	 * @param data {void*} æ¶ˆæ¯æ•°æ®
-	 * @param dlen {int} æ¶ˆæ¯æ•°æ®çš„é•¿åº¦
+	 * »ùÀàÐé½Ó¿Ú£ºµ±ÊÕµ½ÏûÏ¢Ê±µÄ»Øµ÷º¯Êý
+	 * @param nMsg {int} ÓÃ»§Ìí¼ÓµÄ×Ô¶¨ÒåÏûÏ¢Öµ
+	 * @param data {void*} ÏûÏ¢Êý¾Ý
+	 * @param dlen {int} ÏûÏ¢Êý¾ÝµÄ³¤¶È
 	 */
 	void on_message(int nMsg, void* data, int dlen)
 	{
@@ -237,7 +237,7 @@ protected:
 	}
 
 	// @override
-	// åŸºç±»è™šæŽ¥å£
+	// »ùÀàÐé½Ó¿Ú
 	void on_close(void)
 	{
 		delete this;
@@ -261,11 +261,11 @@ rpc_service::rpc_service(int nthread, bool ipc_keep /* = true */)
 
 void rpc_service::on_accept(aio_socket_stream* client)
 {
-	// åˆ›å»ºæŽ¥æ”¶æ¥è‡ªäºŽå­çº¿ç¨‹æ¶ˆæ¯çš„ IPC è¿žæŽ¥å¯¹è±¡
+	// ´´½¨½ÓÊÕÀ´×ÔÓÚ×ÓÏß³ÌÏûÏ¢µÄ IPC Á¬½Ó¶ÔÏó
 	ipc_client* ipc = new rpc_client(magic_);
 	ipc->open(client);
 
-	// æ·»åŠ æ¶ˆæ¯å›žè°ƒå¯¹è±¡
+	// Ìí¼ÓÏûÏ¢»Øµ÷¶ÔÏó
 	ipc->append_message(RPC_MSG);
 	ipc->append_message(RPC_SIG);
 	ipc->wait();

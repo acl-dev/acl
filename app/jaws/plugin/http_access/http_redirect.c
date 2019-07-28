@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "http_plugin.h"
 #include "http_redirect.h"
@@ -43,9 +43,9 @@ void http_redirect_init(void)
 	    || *var_cfg_http_domain_redirect == 0)
 		return;
 	
-	/* å»æ‰å¤šä½™çš„ç©ºæ ¼å’Œç¼©è¿‘ */
+	/* È¥µô¶àÓàµÄ¿Õ¸ñºÍËõ½ü */
 	acl_mystr_trim(var_cfg_http_domain_redirect);
-	/* ç»Ÿä¸€è½¬æ¢ä¸ºå°å†™ */
+	/* Í³Ò»×ª»»ÎªĞ¡Ğ´ */
 	acl_lowercase(var_cfg_http_domain_redirect);
 	argv = acl_argv_split(var_cfg_http_domain_redirect, ";");
 	acl_foreach(iter, argv) {

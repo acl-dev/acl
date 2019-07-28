@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_XINETD_CFG_INCLUDE_H
+#ifndef	ACL_XINETD_CFG_INCLUDE_H
 #define	ACL_XINETD_CFG_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -9,32 +9,32 @@ extern "C" {
 #include "acl_array.h"
 
 /**
- * é…ç½®æ–‡ä»¶è§£æžå¥æŸ„ç±»åž‹å®šä¹‰
+ * ÅäÖÃÎÄ¼þ½âÎö¾ä±úÀàÐÍ¶¨Òå
  */
 typedef struct ACL_XINETD_CFG_PARSER ACL_XINETD_CFG_PARSER;
 
 /**
- * åŠŸèƒ½: èŽ·å¾—æ‰€éœ€è¦çš„é…ç½® é¡¹çš„å†…å®¹
- * @param xcp: ç»“æž„æŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º
- * @param name: é…ç½®é¡¹çš„å˜é‡å
- * @return é…ç½®æ–‡ä»¶ä¸­é…ç½®é¡¹çš„å†…å®¹
+ * ¹¦ÄÜ: »ñµÃËùÐèÒªµÄÅäÖÃ ÏîµÄÄÚÈÝ
+ * @param xcp: ½á¹¹Ö¸Õë, ²»ÄÜÎª¿Õ
+ * @param name: ÅäÖÃÏîµÄ±äÁ¿Ãû
+ * @return ÅäÖÃÎÄ¼þÖÐÅäÖÃÏîµÄÄÚÈÝ
  */
 ACL_API const char *acl_xinetd_cfg_get(const ACL_XINETD_CFG_PARSER *xcp, const char *name);
 
 /**
- * åŠŸèƒ½: èŽ·å¾—æ‰€éœ€è¦çš„é…ç½®é¡¹çš„æ•°ç»„ï¼Œå¯¹äºŽä¸€ä¸ªå˜é‡åå¯¹åº”å¤šä¸ªå˜é‡å€¼æ—¶æœ‰ç”¨
- * @param xcp: ç»“æž„æŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º
- * @param name: é…ç½®é¡¹çš„å˜é‡å
- * @return é…ç½®æ–‡ä»¶ä¸­é…ç½®é¡¹çš„å†…å®¹åŠ¨æ€æ•°ç»„
+ * ¹¦ÄÜ: »ñµÃËùÐèÒªµÄÅäÖÃÏîµÄÊý×é£¬¶ÔÓÚÒ»¸ö±äÁ¿Ãû¶ÔÓ¦¶à¸ö±äÁ¿ÖµÊ±ÓÐÓÃ
+ * @param xcp: ½á¹¹Ö¸Õë, ²»ÄÜÎª¿Õ
+ * @param name: ÅäÖÃÏîµÄ±äÁ¿Ãû
+ * @return ÅäÖÃÎÄ¼þÖÐÅäÖÃÏîµÄÄÚÈÝ¶¯Ì¬Êý×é
  */
 ACL_API const ACL_ARRAY *acl_xinetd_cfg_get_ex(const ACL_XINETD_CFG_PARSER *xcp, const char *name);
 
 /**
- * åŠŸèƒ½: ä»Žé…ç½®æ–‡ä»¶ä¸­èŽ·å¾—å¯¹åº”åœ¨äºŽæŸä¸€ä¸ªç´¢å¼•å€¼ä½ç½®çš„å†…å®¹
- * @param xcp: ç»“æž„æŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º
- * @param idx: ç´¢å¼•ä½ç½®å€¼
- * @param ppname: æŒ‡å‘æŒ‡é’ˆçš„åœ°å€çš„å˜é‡
- * @param ppvalue: æŒ‡å‘æŒ‡é’ˆçš„åœ°å€çš„å˜é‡
+ * ¹¦ÄÜ: ´ÓÅäÖÃÎÄ¼þÖÐ»ñµÃ¶ÔÓ¦ÔÚÓÚÄ³Ò»¸öË÷ÒýÖµÎ»ÖÃµÄÄÚÈÝ
+ * @param xcp: ½á¹¹Ö¸Õë, ²»ÄÜÎª¿Õ
+ * @param idx: Ë÷ÒýÎ»ÖÃÖµ
+ * @param ppname: Ö¸ÏòÖ¸ÕëµÄµØÖ·µÄ±äÁ¿
+ * @param ppvalue: Ö¸ÏòÖ¸ÕëµÄµØÖ·µÄ±äÁ¿
  * @return  0: OK, -1: ERR
  */
 ACL_API int acl_xinetd_cfg_index(const ACL_XINETD_CFG_PARSER *xcp,
@@ -43,27 +43,27 @@ ACL_API int acl_xinetd_cfg_index(const ACL_XINETD_CFG_PARSER *xcp,
 			char **ppvalue);
 
 /**
- * åŠŸèƒ½: é…ç½®æ–‡ä»¶ä¸­é…ç½®é¡¹çš„æ¡æ•°
- * @param xcp: ç»“æž„æŒ‡é’ˆ, ä¸èƒ½ä¸ºç©º
- * @return é…ç½®æ–‡ä»¶ä¸­é…ç½®é¡¹çš„æ¡æ•°
+ * ¹¦ÄÜ: ÅäÖÃÎÄ¼þÖÐÅäÖÃÏîµÄÌõÊý
+ * @param xcp: ½á¹¹Ö¸Õë, ²»ÄÜÎª¿Õ
+ * @return ÅäÖÃÎÄ¼þÖÐÅäÖÃÏîµÄÌõÊý
  */
 ACL_API int acl_xinetd_cfg_size(const ACL_XINETD_CFG_PARSER *xcp);
 
 /**
- * åŠŸèƒ½: é‡Šæ”¾ç”±ç»“æž„æŒ‡é’ˆæ‰€æŒ‡å‘çš„å†…å­˜ç©ºé—´
- * @param xcp: ç»“æž„æŒ‡é’ˆ
+ * ¹¦ÄÜ: ÊÍ·ÅÓÉ½á¹¹Ö¸ÕëËùÖ¸ÏòµÄÄÚ´æ¿Õ¼ä
+ * @param xcp: ½á¹¹Ö¸Õë
  */
 ACL_API void acl_xinetd_cfg_free(ACL_XINETD_CFG_PARSER *xcp);
 
 /**
- * åŠŸèƒ½: è¯»å–é…ç½®æ–‡ä»¶å¹¶è¿›è¡Œè§£æž
- * @param pathname: é…ç½®æ–‡ä»¶çš„æ–‡ä»¶å
- * @return å·²ç»è§£æžäº†é…ç½®æ–‡ä»¶çš„ç»“æž„æŒ‡é’ˆ
+ * ¹¦ÄÜ: ¶ÁÈ¡ÅäÖÃÎÄ¼þ²¢½øÐÐ½âÎö
+ * @param pathname: ÅäÖÃÎÄ¼þµÄÎÄ¼þÃû
+ * @return ÒÑ¾­½âÎöÁËÅäÖÃÎÄ¼þµÄ½á¹¹Ö¸Õë
  */
 ACL_API ACL_XINETD_CFG_PARSER *acl_xinetd_cfg_load(const char *pathname);
 
 /**
- * æ•´æ•°ç±»é…ç½®é¡¹ç»“æž„
+ * ÕûÊýÀàÅäÖÃÏî½á¹¹
  */
 typedef struct ACL_CFG_INT_TABLE {
 	const char *name;
@@ -74,7 +74,7 @@ typedef struct ACL_CFG_INT_TABLE {
 } ACL_CFG_INT_TABLE;
 
 /**
- * 64 ä½æ•´æ•°ç±»é…ç½®é¡¹ç»“æž„
+ * 64 Î»ÕûÊýÀàÅäÖÃÏî½á¹¹
  */
 typedef struct ACL_CFG_INT64_TABLE {
 	const char *name;
@@ -85,7 +85,7 @@ typedef struct ACL_CFG_INT64_TABLE {
 } ACL_CFG_INT64_TABLE;
 
 /**
- * å­—ç¬¦ä¸²ç±»é…ç½®é¡¹ç»“æž„
+ * ×Ö·û´®ÀàÅäÖÃÏî½á¹¹
  */
 typedef struct ACL_CFG_STR_TABLE {
 	const char *name;
@@ -94,7 +94,7 @@ typedef struct ACL_CFG_STR_TABLE {
 } ACL_CFG_STR_TABLE;
 
 /**
- * å¸ƒå°”åž‹ç±»é…ç½®é¡¹ç»“æž„
+ * ²¼¶ûÐÍÀàÅäÖÃÏî½á¹¹
  */
 typedef struct ACL_CFG_BOOL_TABLE {
 	const char *name;
@@ -105,32 +105,32 @@ typedef struct ACL_CFG_BOOL_TABLE {
 /* in acl_xinetd_params.c */
 
 /**
- * ä»Žé…ç½®æ–‡ä»¶è§£æžå™¨ä¸­è¯»å–æ•´æ•°ç±»åž‹çš„è¡¨
- * @param cfg {ACL_XINETD_CFG_PARSER*} å½“ä¸ºç©ºæ—¶åˆ™ç”¨é»˜è®¤å€¼è¿›è¡Œèµ‹å€¼
+ * ´ÓÅäÖÃÎÄ¼þ½âÎöÆ÷ÖÐ¶ÁÈ¡ÕûÊýÀàÐÍµÄ±í
+ * @param cfg {ACL_XINETD_CFG_PARSER*} µ±Îª¿ÕÊ±ÔòÓÃÄ¬ÈÏÖµ½øÐÐ¸³Öµ
  * @param table {ACL_CFG_INT_TABLE*}
  */
 ACL_API void acl_xinetd_params_int_table(ACL_XINETD_CFG_PARSER *cfg,
 	ACL_CFG_INT_TABLE *table);
 
 /**
- * ä»Žé…ç½®æ–‡ä»¶è§£æžå™¨ä¸­è¯»å– 64 ä½æ•´æ•°ç±»åž‹çš„è¡¨
- * @param cfg {ACL_XINETD_CFG_PARSER*} å½“ä¸ºç©ºæ—¶åˆ™ç”¨é»˜è®¤å€¼è¿›è¡Œèµ‹å€¼
+ * ´ÓÅäÖÃÎÄ¼þ½âÎöÆ÷ÖÐ¶ÁÈ¡ 64 Î»ÕûÊýÀàÐÍµÄ±í
+ * @param cfg {ACL_XINETD_CFG_PARSER*} µ±Îª¿ÕÊ±ÔòÓÃÄ¬ÈÏÖµ½øÐÐ¸³Öµ
  * @param table {ACL_CFG_INT64_TABLE*}
  */
 ACL_API void acl_xinetd_params_int64_table(ACL_XINETD_CFG_PARSER *cfg,
 	ACL_CFG_INT64_TABLE *table);
 
 /**
-* ä»Žé…ç½®æ–‡ä»¶è§£æžå™¨ä¸­è¯»å–å­—ç¬¦ä¸²ç±»åž‹çš„è¡¨
-* @param cfg {ACL_XINETD_CFG_PARSER*} å½“ä¸ºç©ºæ—¶åˆ™ç”¨é»˜è®¤å€¼è¿›è¡Œèµ‹å€¼
+* ´ÓÅäÖÃÎÄ¼þ½âÎöÆ÷ÖÐ¶ÁÈ¡×Ö·û´®ÀàÐÍµÄ±í
+* @param cfg {ACL_XINETD_CFG_PARSER*} µ±Îª¿ÕÊ±ÔòÓÃÄ¬ÈÏÖµ½øÐÐ¸³Öµ
 * @param table {ACL_CFG_STR_TABLE*}
 */
 ACL_API void  acl_xinetd_params_str_table(ACL_XINETD_CFG_PARSER *cfg,
 	ACL_CFG_STR_TABLE *table);
 
 /**
-* ä»Žé…ç½®æ–‡ä»¶è§£æžå™¨ä¸­è¯»å–BOOLç±»åž‹çš„è¡¨
-* @param cfg {ACL_XINETD_CFG_PARSER*} å½“ä¸ºç©ºæ—¶åˆ™ç”¨é»˜è®¤å€¼è¿›è¡Œèµ‹å€¼
+* ´ÓÅäÖÃÎÄ¼þ½âÎöÆ÷ÖÐ¶ÁÈ¡BOOLÀàÐÍµÄ±í
+* @param cfg {ACL_XINETD_CFG_PARSER*} µ±Îª¿ÕÊ±ÔòÓÃÄ¬ÈÏÖµ½øÐÐ¸³Öµ
 * @param table {ACL_CFG_BOOL_TABLE*}
 */
 ACL_API void  acl_xinetd_params_bool_table(ACL_XINETD_CFG_PARSER *cfg,

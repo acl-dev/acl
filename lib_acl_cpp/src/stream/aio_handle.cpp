@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_timer_callback.hpp"
@@ -35,11 +35,11 @@ aio_handle::aio_handle(aio_handle_type engine_type /* = ENGINE_SELECT */,
 	aio_ = acl_aio_create2(event_type, nMsg);
 	inner_alloc_ = true;
 
-	// åˆ›å»ºå»¶è¿Ÿå…³é—­çš„å®šæ—¶å™¨å¯¹è±¡
+	// ´´½¨ÑÓ³Ù¹Ø±ÕµÄ¶¨Ê±Æ÷¶ÔÏó
 	delay_free_timer_ = NEW aio_timer_delay_free(*this);
 
-	// åœ¨å¼‚æ­¥å¼•æ“Žå¯¹è±¡çš„ç”Ÿå‘½å‘¨æœŸå†…é”å®šè¯¥å»¶è¿Ÿé‡Šæ”¾å®šæ—¶
-	// å™¨ï¼Œä»¥é˜²æ­¢å¼‚æ­¥å¼•æ“Žè‡ªåŠ¨é”€æ¯è¯¥å®šæ—¶å™¨
+	// ÔÚÒì²½ÒýÇæ¶ÔÏóµÄÉúÃüÖÜÆÚÄÚËø¶¨¸ÃÑÓ³ÙÊÍ·Å¶¨Ê±
+	// Æ÷£¬ÒÔ·ÀÖ¹Òì²½ÒýÇæ×Ô¶¯Ïú»Ù¸Ã¶¨Ê±Æ÷
 	delay_free_timer_->set_locked();
 }
 
@@ -65,10 +65,10 @@ aio_handle::aio_handle(ACL_AIO* aio)
 
 	inner_alloc_ = false;
 
-	// åˆ›å»ºå»¶è¿Ÿå…³é—­çš„å®šæ—¶å™¨å¯¹è±¡
+	// ´´½¨ÑÓ³Ù¹Ø±ÕµÄ¶¨Ê±Æ÷¶ÔÏó
 	delay_free_timer_ = NEW aio_timer_delay_free(*this);
-	// åœ¨å¼‚æ­¥å¼•æ“Žå¯¹è±¡çš„ç”Ÿå‘½å‘¨æœŸå†…é”å®šè¯¥å»¶è¿Ÿé‡Šæ”¾å®šæ—¶
-	// å™¨ï¼Œä»¥é˜²æ­¢å¼‚æ­¥å¼•æ“Žè‡ªåŠ¨é”€æ¯è¯¥å®šæ—¶å™¨
+	// ÔÚÒì²½ÒýÇæ¶ÔÏóµÄÉúÃüÖÜÆÚÄÚËø¶¨¸ÃÑÓ³ÙÊÍ·Å¶¨Ê±
+	// Æ÷£¬ÒÔ·ÀÖ¹Òì²½ÒýÇæ×Ô¶¯Ïú»Ù¸Ã¶¨Ê±Æ÷
 	delay_free_timer_->set_locked();
 }
 
@@ -111,10 +111,10 @@ void aio_handle::on_timer_callback(int, ACL_EVENT*,
 	acl_assert(callback->handle_);
 	aio_handle* handle = callback->handle_;
 
-	// è§¦å‘å®šæ—¶å™¨ä¸­çš„æ‰€æœ‰å®šæ—¶ä»»åŠ¡
+	// ´¥·¢¶¨Ê±Æ÷ÖÐµÄËùÓÐ¶¨Ê±ÈÎÎñ
 	acl_int64 next_delay = callback->trigger();
 
-	// å¦‚æžœå®šæ—¶å™¨ä¸­çš„ä»»åŠ¡ä¸ºç©ºæˆ–æœªè®¾ç½®å®šæ—¶å™¨çš„é‡å¤ä½¿ç”¨ï¼Œåˆ™åˆ é™¤å®šæ—¶å™¨
+	// Èç¹û¶¨Ê±Æ÷ÖÐµÄÈÎÎñÎª¿Õ»òÎ´ÉèÖÃ¶¨Ê±Æ÷µÄÖØ¸´Ê¹ÓÃ£¬ÔòÉ¾³ý¶¨Ê±Æ÷
 
 	if (callback->empty()) {
 		logger("timer empty, delete it");
@@ -128,9 +128,9 @@ void aio_handle::on_timer_callback(int, ACL_EVENT*,
 		return;
 	}
 
-	// å¦‚æžœå…è®¸é‡å¤ä½¿ç”¨å®šæ—¶å™¨ä¸”å®šæ—¶å™¨ä¸­çš„ä»»åŠ¡éžç©ºï¼Œåˆ™å†æ¬¡è®¾ç½®è¯¥å®šæ—¶å™¨
+	// Èç¹ûÔÊÐíÖØ¸´Ê¹ÓÃ¶¨Ê±Æ÷ÇÒ¶¨Ê±Æ÷ÖÐµÄÈÎÎñ·Ç¿Õ£¬ÔòÔÙ´ÎÉèÖÃ¸Ã¶¨Ê±Æ÷
 
-	//  éœ€è¦é‡ç½®å®šæ—¶å™¨çš„åˆ°è¾¾æ—¶é—´æˆª
+	//  ÐèÒªÖØÖÃ¶¨Ê±Æ÷µÄµ½´ïÊ±¼ä½Ø
 	acl_aio_request_timer(handle->aio_,
 		(void (*)(int, ACL_EVENT*, void*)) on_timer_callback,
 		callback, next_delay < 0 ? 0 : next_delay,
@@ -142,7 +142,7 @@ acl_int64 aio_handle::del_timer(aio_timer_callback* callback, unsigned int id)
 	acl_assert(aio_);
 	acl_int64 next_delay = callback->del_task(id);
 
-	// å¦‚æžœå®šæ—¶å™¨ä¸­çš„ä»»åŠ¡ä¸ºç©ºï¼Œåˆ™åˆ é™¤è¯¥å®šæ—¶å™¨
+	// Èç¹û¶¨Ê±Æ÷ÖÐµÄÈÎÎñÎª¿Õ£¬ÔòÉ¾³ý¸Ã¶¨Ê±Æ÷
 	if (callback->empty()) {
 		return del_timer(callback);
 	}
@@ -167,7 +167,7 @@ acl_int64 aio_handle::del_timer(aio_timer_callback* callback)
 
 void aio_handle::delay_free(aio_delay_free* callback)
 {
-	// æ·»åŠ å»¶è¿Ÿé‡Šæ”¾å®šæ—¶å™¨çš„å®šæ—¶ä»»åŠ¡
+	// Ìí¼ÓÑÓ³ÙÊÍ·Å¶¨Ê±Æ÷µÄ¶¨Ê±ÈÎÎñ
 	if (delay_free_timer_->add(callback)) {
 		set_timer(delay_free_timer_, 100000, 0);
 	}
@@ -177,14 +177,14 @@ void aio_handle::destroy_timer(aio_timer_callback* callback)
 {
 	delay_free_timer_->del(callback);
 
-	// å¦‚æžœè¯¥å®šæ—¶å™¨å·²ç»åœ¨ trigger ä¸­è¢«é”å®šï¼Œåˆ™åªéœ€è¦
-	// è®¾ç½®åœ¨è§£é”åŽéœ€è¦å°†å…¶é”€æ¯çš„æ ‡è¯†å³å¯ï¼Œç”±å…¶æœ¬èº«
-	// è‡ªè¡Œé”€æ¯
+	// Èç¹û¸Ã¶¨Ê±Æ÷ÒÑ¾­ÔÚ trigger ÖÐ±»Ëø¶¨£¬ÔòÖ»ÐèÒª
+	// ÉèÖÃÔÚ½âËøºóÐèÒª½«ÆäÏú»ÙµÄ±êÊ¶¼´¿É£¬ÓÉÆä±¾Éí
+	// ×ÔÐÐÏú»Ù
 	if (callback->locked()) {
 		callback->destroy_on_unlock_ = true;
 	}
 
-	// ç›´æŽ¥é”€æ¯æœªé”å®šçš„å®šæ—¶å™¨
+	// Ö±½ÓÏú»ÙÎ´Ëø¶¨µÄ¶¨Ê±Æ÷
 	else {
 		callback->destroy();
 	}

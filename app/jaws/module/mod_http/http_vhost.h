@@ -1,4 +1,4 @@
-﻿#ifndef	__HTTP_VHOST_INCLUDE_H__
+#ifndef	__HTTP_VHOST_INCLUDE_H__
 #define	__HTTP_VHOST_INCLUDE_H__
 
 #ifdef	__cplusplus

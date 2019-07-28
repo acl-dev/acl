@@ -1,4 +1,4 @@
-ï»¿#ifndef	__TEST_STDTAB_INCLUDE_H__
+#ifndef	__TEST_STDTAB_INCLUDE_H__
 #define	__TEST_STDTAB_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -9,7 +9,7 @@ extern "C" {
 #include "test_stdlib.h"
 
 static AUT_FN_ITEM __test_fn_tab[] = {
-	/* å‘½ä»¤å­—åç§°		å‡½æ•°æç¤ºå		å›è°ƒå‡½æ•°åç§°		å›è°ƒå‚æ•° æ˜¯å¦æ˜¯å†…éƒ¨å‘½ä»¤ */
+	/* ÃüÁî×ÖÃû³Æ		º¯ÊıÌáÊ¾Ãû		»Øµ÷º¯ÊıÃû³Æ		»Øµ÷²ÎÊı ÊÇ·ñÊÇÄÚ²¿ÃüÁî */
 	/* test_mylock.c */
 	{ "test_mylock_unlock",	"test_mylock_unlock",	test_mylock_unlock,	NULL, 0 },
 	{ "test_mylock_excl",	"test_mylock_excl",	test_mylock_excl,	NULL, 0 },

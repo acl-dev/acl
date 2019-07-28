@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include <zlib.h>
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
@@ -70,16 +70,16 @@ void http_client::reset(void)
 	}
 
 	if (res_) {
-		// è¯´æ˜æ˜¯é•¿è¿æ¥çš„ç¬¬äºŒæ¬¡è¯·æ±‚ï¼Œæ‰€ä»¥éœ€è¦æŠŠä¸Šæ¬¡è¯·æ±‚çš„
-		// å“åº”å¤´å¯¹è±¡åŠå“åº”ä½“å¯¹è±¡é‡Šæ”¾
+		// ËµÃ÷ÊÇ³¤Á¬½ÓµÄµÚ¶ş´ÎÇëÇó£¬ËùÒÔĞèÒª°ÑÉÏ´ÎÇëÇóµÄ
+		// ÏìÓ¦Í·¶ÔÏó¼°ÏìÓ¦Ìå¶ÔÏóÊÍ·Å
 
 		acl_assert(hdr_res_);
 		http_res_free(res_);
 		hdr_res_ = NULL;
 		res_     = NULL;
 	} else if (hdr_res_) {
-		// è¯´æ˜æ˜¯é•¿è¿æ¥çš„ç¬¬äºŒæ¬¡è¯·æ±‚ï¼Œå› ä¸ºæœ‰å¯èƒ½ç¬¬ä¸€æ¬¡è¯·æ±‚
-		// åªæœ‰å“åº”å¤´ï¼Œæ‰€ä»¥ä»…éœ€è¦é‡Šæ”¾ä¸Šæ¬¡çš„å“åº”å¤´å¯¹è±¡
+		// ËµÃ÷ÊÇ³¤Á¬½ÓµÄµÚ¶ş´ÎÇëÇó£¬ÒòÎªÓĞ¿ÉÄÜµÚÒ»´ÎÇëÇó
+		// Ö»ÓĞÏìÓ¦Í·£¬ËùÒÔ½öĞèÒªÊÍ·ÅÉÏ´ÎµÄÏìÓ¦Í·¶ÔÏó
 
 		http_hdr_res_free(hdr_res_);
 		hdr_res_ = NULL;
@@ -209,21 +209,21 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 		buf_->clear();
 	}
 
-	// è¾¹å‹ç¼©è¾¹è¾“å‡ºæ•°æ®
+	// ±ßÑ¹Ëõ±ßÊä³öÊı¾İ
 	if (data && len > 0) {
-		// å¢åŠ éå‹ç¼©æ•°æ®æ€»é•¿åº¦
+		// Ôö¼Ó·ÇÑ¹ËõÊı¾İ×Ü³¤¶È
 		gzip_total_in_ += (unsigned int) len;
 
-		// è®¡ç®— crc32 æ•°æ®æ ¡éªŒå’Œ
+		// ¼ÆËã crc32 Êı¾İĞ£ÑéºÍ
 		gzip_crc32_ = zstream_->crc32_update(gzip_crc32_, data, len);
 
-		// å¯¹è¯¥æ®µæ•°æ®è¿›è¡Œå‹ç¼©å¤„ç†
+		// ¶Ô¸Ã¶ÎÊı¾İ½øĞĞÑ¹Ëõ´¦Àí
 		if (!zstream_->zip_update((const char*) data, (int) len, buf_)) {
 			logger_error("zip_update error!");
 			return false;
 		}
 
-		// å¦‚æœä¸ºç©ºï¼Œåˆ™ç›´æ¥è¿”å›ï¼Œç­‰å¾…ä¸‹æ¬¡çš„å†™æ“ä½œ
+		// Èç¹ûÎª¿Õ£¬ÔòÖ±½Ó·µ»Ø£¬µÈ´ıÏÂ´ÎµÄĞ´²Ù×÷
 		if (buf_->empty()) {
 			return true;
 		}
@@ -232,9 +232,9 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 		len  = buf_->size();
 	}
 
-	// å†™å…¥ zstream æµå¯¹è±¡ä¸­æœ€åå¯èƒ½ç¼“å­˜çš„æ•°æ®ï¼ŒåŒæ—¶ç»“æŸå‹ç¼©è¿‡ç¨‹
+	// Ğ´Èë zstream Á÷¶ÔÏóÖĞ×îºó¿ÉÄÜ»º´æµÄÊı¾İ£¬Í¬Ê±½áÊøÑ¹Ëõ¹ı³Ì
 	else {
-		// æ£€æŸ¥æ•°æ®é•¿åº¦æœ‰æ•ˆ
+		// ¼ì²éÊı¾İ³¤¶ÈÓĞĞ§
 		unsigned total_in = (unsigned) zstream_->get_zstream()->total_in;
 		if (total_in != gzip_total_in_) {
 			logger_warn("total_in: %d != gzip_total_in_: %d",
@@ -254,12 +254,12 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 		len  = buf_->size();
 	}
 
-	// å—ä¼ è¾“æ–¹å¼è¾“å‡ºå‹ç¼©æ•°æ®
+	// ¿é´«Êä·½Ê½Êä³öÑ¹ËõÊı¾İ
 	if (chunked_transfer_) {
 		return write_chunk(out, data, len);
 	}
 
-	// æ™®é€šæµå¼æ–¹å¼è¾“å‡ºå‹ç¼©æ•°æ®
+	// ÆÕÍ¨Á÷Ê½·½Ê½Êä³öÑ¹ËõÊı¾İ
 	if (out.write(data, len, true, true) < 0 || !out.fflush()) {
 		disconnected_ = true;
 		return false;
@@ -268,7 +268,7 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 	return true;
 }
 
-// è¾“å‡º gzip å°¾éƒ¨ç»“æŸæ•°æ®
+// Êä³ö gzip Î²²¿½áÊøÊı¾İ
 
 bool http_client::write_gzip_trailer(ostream& out)
 {
@@ -300,13 +300,13 @@ bool http_client::write_gzip_trailer(ostream& out)
 
 #endif // HAVE_BIG_ENDIAN
 
-	// å—ä¼ è¾“æ–¹å¼è¾“å‡º gzip å°¾
+	// ¿é´«Êä·½Ê½Êä³ö gzip Î²
 	if (chunked_transfer_) {
 		return write_chunk(out, &trailer, sizeof(trailer))
 			&& write_chunk_trailer(out);
 	}
 
-	// æ™®é€šæ–¹å¼è¾“å‡º gzip å°¾
+	// ÆÕÍ¨·½Ê½Êä³ö gzip Î²
 	if (out.write(&trailer, sizeof(trailer)) < 0) {
 		disconnected_ = true;
 		return false;
@@ -322,10 +322,10 @@ bool http_client::write_head(const http_header& header)
 	}
 	head_sent_ = true;
 
-	// å…ˆä¿ç•™æ˜¯å¦ä¸ºå—ä¼ è¾“çš„çŠ¶æ€
+	// ÏÈ±£ÁôÊÇ·ñÎª¿é´«ÊäµÄ×´Ì¬
 	chunked_transfer_ = header.chunked_transfer();
 
-	// å¦‚æœè®¾ç½®äº† gzip ä¼ è¾“æ–¹å¼ï¼Œåˆ™éœ€è¦å…ˆåˆå§‹åŒ– zlib æµå¯¹è±¡
+	// Èç¹ûÉèÖÃÁË gzip ´«Êä·½Ê½£¬ÔòĞèÒªÏÈ³õÊ¼»¯ zlib Á÷¶ÔÏó
 	if (header.is_transfer_gzip()) {
 		if (zstream_ != NULL) {
 			delete zstream_;
@@ -339,18 +339,18 @@ bool http_client::write_head(const http_header& header)
 			delete zstream_;
 			zstream_ = NULL;
 
-			// å¦‚æœåˆå§‹åŒ– zip å¤±è´¥ï¼Œåˆ™å¼ºåˆ¶è½¬æ¢æˆé zip æ¨¡å¼
+			// Èç¹û³õÊ¼»¯ zip Ê§°Ü£¬ÔòÇ¿ÖÆ×ª»»³É·Ç zip Ä£Ê½
 			const_cast<http_header*>
 				(&header)->set_transfer_gzip(false);
 		}
 
-		// åˆå§‹åŒ– crc32 æ ¡éªŒå’Œ
+		// ³õÊ¼»¯ crc32 Ğ£ÑéºÍ
 		gzip_crc32_ = zstream_->crc32_update(0, Z_NULL, 0);
-		// åˆå§‹åŒ–éå‹ç¼©æ•°æ®æ€»é•¿åº¦
+		// ³õÊ¼»¯·ÇÑ¹ËõÊı¾İ×Ü³¤¶È
 		gzip_total_in_ = 0;
 	}
 
-	// åˆ›å»º HTTP è¯·æ±‚/å“åº”å¤´
+	// ´´½¨ HTTP ÇëÇó/ÏìÓ¦Í·
 	string buf;
 	if (header.is_request()) {
 		header.build_request(buf);
@@ -360,7 +360,7 @@ bool http_client::write_head(const http_header& header)
 
 	ostream& out = get_ostream();
 
-	// å…ˆå†™ HTTP å¤´
+	// ÏÈĞ´ HTTP Í·
 	if (out.write(buf.c_str(), buf.length(), true,
 		header.get_content_length() > 0) < 0) {
 
@@ -370,7 +370,7 @@ bool http_client::write_head(const http_header& header)
 		return true;
 	}
 
-	// å¦‚æœæ˜¯é‡‡ç”¨ gzip æ•°æ®å‹ç¼©æ–¹å¼ï¼Œåˆ™éœ€è¦å…ˆè¾“å‡º gzip å¤´
+	// Èç¹ûÊÇ²ÉÓÃ gzip Êı¾İÑ¹Ëõ·½Ê½£¬ÔòĞèÒªÏÈÊä³ö gzip Í·
 
 	/**
 	 * RFC 1952 Section 2.3 defines the gzip header:
@@ -383,7 +383,7 @@ bool http_client::write_head(const http_header& header)
 		{ 0x1f, 0x8b, Z_DEFLATED, 0, 0, 0, 0, 0, 0, 3 };
 
 	if (chunked_transfer_) {
-		// å—ä¼ è¾“æ–¹å¼å†™æ•°æ®
+		// ¿é´«Êä·½Ê½Ğ´Êı¾İ
 		if (!write_chunk(out, gzheader, sizeof(gzheader))) {
 			return false;
 		} else {
@@ -391,7 +391,7 @@ bool http_client::write_head(const http_header& header)
 		}
 	}
 
-	// æ™®é€šæµå¼å†™æ•°æ®
+	// ÆÕÍ¨Á÷Ê½Ğ´Êı¾İ
 	else if (out.write(gzheader, sizeof(gzheader), true, true) < 0) {
 		disconnected_ = true;
 		return false;
@@ -404,14 +404,14 @@ bool http_client::write_body(const void* data, size_t len)
 {
 	ostream& out = get_ostream();
 
-	// å¦‚æœæ˜¯ gzip ä¼ è¾“ï¼Œåˆ™è¾¹å‹ç¼©è¾¹å†™æ•°æ®
+	// Èç¹ûÊÇ gzip ´«Êä£¬Ôò±ßÑ¹Ëõ±ßĞ´Êı¾İ
 	if (zstream_ != NULL) {
-		// è¾“å‡ºå‹ç¼©æ•°æ®ä½“
+		// Êä³öÑ¹ËõÊı¾İÌå
 		if (!write_gzip(out, data, len)) {
 			return false;
 		}
 
-		// å¦‚æœæ•°æ®è¾“å‡ºå®Œæ¯•ï¼Œåˆ™è¿˜éœ€è¾“å‡º gzip å°¾éƒ¨å­—æ®µ
+		// Èç¹ûÊı¾İÊä³öÍê±Ï£¬Ôò»¹ĞèÊä³ö gzip Î²²¿×Ö¶Î
 		if (data == NULL || len == 0) {
 			return write_gzip_trailer(out);
 		} else {
@@ -419,9 +419,9 @@ bool http_client::write_body(const void* data, size_t len)
 		}
 	}
 
-	// éå‹ç¼©æ–¹å¼ä¼ è¾“æ•°æ®
+	// ·ÇÑ¹Ëõ·½Ê½´«ÊäÊı¾İ
 
-	// å¦‚æœå‚æ•°ä¸º NULLï¼Œåˆ™è¯´æ˜æ•°æ®å†™å®Œæ¯•
+	// Èç¹û²ÎÊıÎª NULL£¬ÔòËµÃ÷Êı¾İĞ´Íê±Ï
 	if (data == NULL || len == 0) {
 		if (chunked_transfer_) {
 			return write_chunk_trailer(out);
@@ -430,12 +430,12 @@ bool http_client::write_body(const void* data, size_t len)
 		}
 	}
 
-	// å—æ–¹å¼å†™å…¥æ•°æ®ä½“
+	// ¿é·½Ê½Ğ´ÈëÊı¾İÌå
 	else if (chunked_transfer_) {
 		return write_chunk(out, data, len);
 	}
 
-	// æ™®é€šæµå¼å†™å…¥æ•°æ®ä½“
+	// ÆÕÍ¨Á÷Ê½Ğ´ÈëÊı¾İÌå
 	else if (out.write(data, len, true, true) == -1 || !out.fflush()) {
 		disconnected_ = true;
 		return false;
@@ -475,7 +475,7 @@ bool http_client::read_head(void)
 
 bool http_client::read_response_head(void)
 {
-	// ä»¥é˜²ä¸‡ä¸€ï¼Œå…ˆæ¸…é™¤å¯èƒ½çš„ä¸Šæ¬¡è¯·æ±‚çš„æ®‹ç•™çš„ä¸­é—´æ•°æ®å¯¹è±¡
+	// ÒÔ·ÀÍòÒ»£¬ÏÈÇå³ı¿ÉÄÜµÄÉÏ´ÎÇëÇóµÄ²ĞÁôµÄÖĞ¼äÊı¾İ¶ÔÏó
 	reset();
 
 	if (stream_ == NULL) {
@@ -507,9 +507,9 @@ bool http_client::read_response_head(void)
 		return false;
 	}
 
-	// å—ä¼ è¾“çš„ä¼˜å…ˆçº§æœ€é«˜
+	// ¿é´«ÊäµÄÓÅÏÈ¼¶×î¸ß
 	if (!hdr_res_->hdr.chunked) {
-		// å¦‚æœæœåŠ¡å™¨å“åº”æ—¶æ˜ç¡®æŒ‡æ˜äº†é•¿åº¦ä¸º 0 åˆ™è¡¨ç¤ºä¸æ²¡æœ‰æ•°æ®ä½“
+		// Èç¹û·şÎñÆ÷ÏìÓ¦Ê±Ã÷È·Ö¸Ã÷ÁË³¤¶ÈÎª 0 Ôò±íÊ¾²»Ã»ÓĞÊı¾İÌå
 		if (hdr_res_->hdr.content_length == 0) {
 			body_finish_ = true;
 			return true;
@@ -519,7 +519,7 @@ bool http_client::read_response_head(void)
 	const char* ptr = http_hdr_entry_value(&hdr_res_->hdr,
 			"Content-Encoding");
 	if (ptr && unzip_) {
-		// ç›®å‰ä»…æ”¯æŒ gzip æ•°æ®çš„è§£å‹
+		// Ä¿Ç°½öÖ§³Ö gzip Êı¾İµÄ½âÑ¹
 		if (strcasecmp(ptr, "gzip") == 0) {
 			zstream_ = NEW zlib_stream();
 			if (!zstream_->unzip_begin(false)) {
@@ -528,7 +528,7 @@ bool http_client::read_response_head(void)
 				zstream_ = NULL;
 			}
 
-			// gzip å“åº”æ•°æ®ä½“å‰ä¼šæœ‰ 10 å­—èŠ‚çš„å¤´éƒ¨å­—æ®µ
+			// gzip ÏìÓ¦Êı¾İÌåÇ°»áÓĞ 10 ×Ö½ÚµÄÍ·²¿×Ö¶Î
 			gzip_header_left_ = 10;
 		} else {
 			logger_warn("unknown compress format: %s", ptr);
@@ -540,7 +540,7 @@ bool http_client::read_response_head(void)
 
 bool http_client::read_request_head(void)
 {
-	// ä»¥é˜²ä¸‡ä¸€ï¼Œå…ˆæ¸…é™¤å¯èƒ½çš„ä¸Šæ¬¡è¯·æ±‚çš„æ®‹ç•™çš„ä¸­é—´æ•°æ®å¯¹è±¡
+	// ÒÔ·ÀÍòÒ»£¬ÏÈÇå³ı¿ÉÄÜµÄÉÏ´ÎÇëÇóµÄ²ĞÁôµÄÖĞ¼äÊı¾İ¶ÔÏó
 	reset();
 
 	if (stream_ == NULL) {
@@ -625,8 +625,8 @@ bool http_client::is_keep_alive(void) const
 
 bool http_client::is_server_keep_alive(void) const
 {
-	// è¡¨ç¤ºè¯¥å¯¹è±¡ä¸º HTTP è¯·æ±‚å®¢æˆ·ç«¯å¯¹è±¡ï¼Œæ‰€ä»¥éœ€è¦æ ¹æ®æœåŠ¡ç«¯å“åº”
-	// å¤´ä¸­çš„å­—æ®µåˆ¤æ–­æ˜¯å¦éœ€è¦ä¿æŒé•¿è¿æ¥
+	// ±íÊ¾¸Ã¶ÔÏóÎª HTTP ÇëÇó¿Í»§¶Ë¶ÔÏó£¬ËùÒÔĞèÒª¸ù¾İ·şÎñ¶ËÏìÓ¦
+	// Í·ÖĞµÄ×Ö¶ÎÅĞ¶ÏÊÇ·ñĞèÒª±£³Ö³¤Á¬½Ó
 
 	if (hdr_res_ == NULL) {
 		return false;
@@ -638,8 +638,8 @@ bool http_client::is_server_keep_alive(void) const
 		return true;
 	}
 
-	// å¦‚æœæœªç½® Connection: keep-alive å­—æ®µï¼Œå½“ç‰ˆæœ¬ä¸º1.1æ—¶
-	// åˆ™æŒ‰æ”¯æŒé•¿è¿æ¥å¯¹å¾…
+	// Èç¹ûÎ´ÖÃ Connection: keep-alive ×Ö¶Î£¬µ±°æ±¾Îª1.1Ê±
+	// Ôò°´Ö§³Ö³¤Á¬½Ó¶Ô´ı
 
 	unsigned major, minor;
 	if (!get_version(major, minor)) {
@@ -658,8 +658,8 @@ bool http_client::is_client_keep_alive(void) const
 		return false;
 	}
 
-	// è¡¨ç¤ºè¯¥å¯¹è±¡ä¸º HTTP å“åº”å®¢æˆ·ç«¯å¯¹è±¡ï¼Œå³æœ¬å¯¹è±¡å¤„äºæœåŠ¡ç«¯ä½ç½®ï¼Œ
-	// éœ€è¦æ ¹æ® HTTP è¯·æ±‚å®¢æˆ·ç«¯å¯¹è±¡ä¸­çš„å­—æ®µæ˜¯å¦éœ€è¦ä¿æŒé•¿è¿æ¥
+	// ±íÊ¾¸Ã¶ÔÏóÎª HTTP ÏìÓ¦¿Í»§¶Ë¶ÔÏó£¬¼´±¾¶ÔÏó´¦ÓÚ·şÎñ¶ËÎ»ÖÃ£¬
+	// ĞèÒª¸ù¾İ HTTP ÇëÇó¿Í»§¶Ë¶ÔÏóÖĞµÄ×Ö¶ÎÊÇ·ñĞèÒª±£³Ö³¤Á¬½Ó
 
 	if (hdr_req_->hdr.keep_alive == 0) {
 		return false;
@@ -667,8 +667,8 @@ bool http_client::is_client_keep_alive(void) const
 		return true;
 	}
 
-	// å¦‚æœæœªç½® Connection: keep-alive å­—æ®µï¼Œå½“ç‰ˆæœ¬ä¸º1.1æ—¶
-	// åˆ™æŒ‰æ”¯æŒé•¿è¿æ¥å¯¹å¾…
+	// Èç¹ûÎ´ÖÃ Connection: keep-alive ×Ö¶Î£¬µ±°æ±¾Îª1.1Ê±
+	// Ôò°´Ö§³Ö³¤Á¬½Ó¶Ô´ı
 
 	unsigned major, minor;
 	if (!get_version(major, minor)) {
@@ -858,16 +858,16 @@ int http_client::read_response_body(char* buf, size_t size)
 		res_ = http_res_new(hdr_res_);
 	}
 
-	// ç¼“å†²åŒºå¤ªå¤§äº†æ²¡æœ‰ä»»ä½•æ„ä¹‰
+	// »º³åÇøÌ«´óÁËÃ»ÓĞÈÎºÎÒâÒå
 	if (size >= 1024000) {
 		size = 1024000;
 	}
 	http_off_t ret = http_res_body_get_sync(res_, vstream, buf, (int) size);
 
 	if (ret <= 0) {
-		// å¦‚æœåœ¨è¯»å“åº”å¤´æ—¶è°ƒç”¨äº† unzip_beginï¼Œåˆ™å¿…é¡»ä¿è¯è¯»å®Œæ•°æ®
-		// åå†è°ƒç”¨ unzip_finishï¼Œå¦åˆ™ä¼šå› ä¸º zlib æœ¬èº«çš„è®¾è®¡è€Œå¯¼è‡´
-		// å†…å­˜æ³„éœ²
+		// Èç¹ûÔÚ¶ÁÏìÓ¦Í·Ê±µ÷ÓÃÁË unzip_begin£¬Ôò±ØĞë±£Ö¤¶ÁÍêÊı¾İ
+		// ºóÔÙµ÷ÓÃ unzip_finish£¬·ñÔò»áÒòÎª zlib ±¾ÉíµÄÉè¼Æ¶øµ¼ÖÂ
+		// ÄÚ´æĞ¹Â¶
 		if (zstream_ != NULL) {
 			string dummy(64);
 			zstream_->unzip_finish(&dummy);
@@ -905,7 +905,7 @@ int http_client::read_request_body(char* buf, size_t size)
 		req_ = http_req_new(hdr_req_);
 	}
 
-	// ç¼“å†²åŒºå¤ªå¤§äº†æ²¡æœ‰ä»»ä½•æ„ä¹‰
+	// »º³åÇøÌ«´óÁËÃ»ÓĞÈÎºÎÒâÒå
 	if (size >= 1024000) {
 		size = 1024000;
 	}
@@ -982,7 +982,7 @@ int http_client::read_response_body(string& out, bool clean, int* real_size)
 	int   saved_count = (int) out.length();
 	char  buf[8192];
 
-READ_AGAIN:  // å¯¹äºæœ‰ GZIP å¤´æ•°æ®ï¼Œå¯èƒ½éœ€è¦é‡å¤è¯»
+READ_AGAIN:  // ¶ÔÓÚÓĞ GZIP Í·Êı¾İ£¬¿ÉÄÜĞèÒªÖØ¸´¶Á
 
 	int ret = (int) http_res_body_get_sync(res_, vs, buf, sizeof(buf));
 
@@ -993,7 +993,7 @@ READ_AGAIN:  // å¯¹äºæœ‰ GZIP å¤´æ•°æ®ï¼Œå¯èƒ½éœ€è¦é‡å¤è¯»
 				*real_size = ret;
 			}
 		} else {
-			body_finish_ = true; // è¡¨ç¤ºæ•°æ®å·²ç»è¯»å®Œ
+			body_finish_ = true; // ±íÊ¾Êı¾İÒÑ¾­¶ÁÍê
 			if (ret < 0) {
 				disconnected_ = true;
 			}
@@ -1008,8 +1008,8 @@ READ_AGAIN:  // å¯¹äºæœ‰ GZIP å¤´æ•°æ®ï¼Œå¯èƒ½éœ€è¦é‡å¤è¯»
 			return -1;
 		}
 
-		last_ret_    = ret; // è®°å½•è¿”å›å€¼
-		body_finish_ = true; // è¡¨ç¤ºæ•°æ®å·²ç»è¯»å®Œä¸”è§£å‹ç¼©å®Œæ¯•
+		last_ret_    = ret; // ¼ÇÂ¼·µ»ØÖµ
+		body_finish_ = true; // ±íÊ¾Êı¾İÒÑ¾­¶ÁÍêÇÒ½âÑ¹ËõÍê±Ï
 		if (ret < 0) {
 			disconnected_ = true;
 		}
@@ -1020,7 +1020,7 @@ READ_AGAIN:  // å¯¹äºæœ‰ GZIP å¤´æ•°æ®ï¼Œå¯èƒ½éœ€è¦é‡å¤è¯»
 		(*real_size) += ret;
 	}
 
-	// éœ€è¦å…ˆè·³è¿‡ gzip å¤´
+	// ĞèÒªÏÈÌø¹ı gzip Í·
 
 	if (gzip_header_left_ >= ret) {
 		gzip_header_left_ -= ret;
@@ -1043,9 +1043,9 @@ READ_AGAIN:  // å¯¹äºæœ‰ GZIP å¤´æ•°æ®ï¼Œå¯èƒ½éœ€è¦é‡å¤è¯»
 
 	n = (int) out.length() - saved_count;
 
-	// å¦‚æœæ–°è§£å‹æ•°æ®ä¸º 0ï¼Œåˆ™æœ‰å¯èƒ½æ˜¯æœ¬æ¬¡è§£å‹è¿‡ç¨‹éœ€è¦çš„å‹ç¼©æ•°æ®ä¸å®Œæ•´ï¼Œ
-	// æˆ–æœ‰å¯èƒ½æ˜¯æ­¤æ¬¡è¯»åˆ°äº†æœ€åçš„ 8 ä¸ªå­—èŠ‚çš„å°¾éƒ¨å­—æ®µæ‰€è‡³ï¼Œæ‰€ä»¥éœ€è¦å†
-	// å°è¯•è¯»ä¸€æ¬¡ï¼Œä»¥æœŸè¯»åˆ°ä¸‹ä¸€éƒ¨åˆ†æ•°æ®æˆ–è¯»å®Œæ‰€æœ‰çš„æ•°æ®ä½“
+	// Èç¹ûĞÂ½âÑ¹Êı¾İÎª 0£¬ÔòÓĞ¿ÉÄÜÊÇ±¾´Î½âÑ¹¹ı³ÌĞèÒªµÄÑ¹ËõÊı¾İ²»ÍêÕû£¬
+	// »òÓĞ¿ÉÄÜÊÇ´Ë´Î¶Áµ½ÁË×îºóµÄ 8 ¸ö×Ö½ÚµÄÎ²²¿×Ö¶ÎËùÖÁ£¬ËùÒÔĞèÒªÔÙ
+	// ³¢ÊÔ¶ÁÒ»´Î£¬ÒÔÆÚ¶Áµ½ÏÂÒ»²¿·ÖÊı¾İ»ò¶ÁÍêËùÓĞµÄÊı¾İÌå
 	if (n == 0) {
 		goto READ_AGAIN;
 	}
@@ -1097,7 +1097,7 @@ int http_client::read_request_body(string& out, bool clean, int* real_size)
 			*real_size = ret;
 		}
 	} else {
-		body_finish_ = true; // è¡¨ç¤ºæ•°æ®å·²ç»è¯»å®Œ
+		body_finish_ = true; // ±íÊ¾Êı¾İÒÑ¾­¶ÁÍê
 		if (ret < 0) {
 			disconnected_ = true;
 		}
@@ -1115,7 +1115,7 @@ bool http_client::body_gets(string& out, bool nonl /* = true */,
 
 	size_t len, size_saved = out.length();
 
-	// é¦–å…ˆåˆ¤æ–­æ˜¯å¦å·²ç»è¯»å®Œ HTTP æ•°æ®ä½“
+	// Ê×ÏÈÅĞ¶ÏÊÇ·ñÒÑ¾­¶ÁÍê HTTP Êı¾İÌå
 	if (body_finish_) {
 		if (buf_->empty()) {
 			if (size) {
@@ -1124,7 +1124,7 @@ bool http_client::body_gets(string& out, bool nonl /* = true */,
 			return false;
 		}
 
-		// å½“è¯»ç¼“å†²åŒºæ•°æ®éç©ºæ—¶ï¼Œå…ˆå°è¯•ä»ä¸­è·å–ä¸€è¡Œæ•°æ®
+		// µ±¶Á»º³åÇøÊı¾İ·Ç¿ÕÊ±£¬ÏÈ³¢ÊÔ´ÓÖĞ»ñÈ¡Ò»ĞĞÊı¾İ
 		if (buf_->scan_line(out, nonl, &len)) {
 			if (size) {
 				*size = out.length() - size_saved;
@@ -1132,8 +1132,8 @@ bool http_client::body_gets(string& out, bool nonl /* = true */,
 			return true;
 		}
 
-		// å¦‚æœä¸èƒ½è¯»åˆ°å®Œæ•´è¡Œæ•°æ®ä¸” HTTP æ•°æ®ä½“è¯»å®Œçš„æƒ…å†µä¸‹åˆ™å°†è¯»
-		// ç¼“å†²åŒºå†…çš„æ•°æ®éƒ½æ‹·è´è‡³ç›®æ ‡ç¼“å†²åŒº
+		// Èç¹û²»ÄÜ¶Áµ½ÍêÕûĞĞÊı¾İÇÒ HTTP Êı¾İÌå¶ÁÍêµÄÇé¿öÏÂÔò½«¶Á
+		// »º³åÇøÄÚµÄÊı¾İ¶¼¿½±´ÖÁÄ¿±ê»º³åÇø
 		out.append(buf_);
 		buf_->clear();
 
@@ -1144,7 +1144,7 @@ bool http_client::body_gets(string& out, bool nonl /* = true */,
 		return true;
 	}
 
-	// ç»§ç»­è¯» HTTP æ•°æ®ä½“ï¼Œå¹¶å°è¯•ä»ä¸­è¯»å–ä¸€è¡Œæ•°æ®
+	// ¼ÌĞø¶Á HTTP Êı¾İÌå£¬²¢³¢ÊÔ´ÓÖĞ¶ÁÈ¡Ò»ĞĞÊı¾İ
 
 	len = 0;
 
@@ -1157,8 +1157,8 @@ bool http_client::body_gets(string& out, bool nonl /* = true */,
 				return true;
 			}
 
-			// ä¸ºäº†å‡å°‘ä¸‹æ¬¡å¾ªç¯æ—¶è°ƒç”¨ scan_line çš„å­—ç¬¦ä¸²æŸ¥æ‰¾æ¬¡æ•°ï¼Œ
-			// å°†è¯»ç¼“å†²åŒºä¸­çš„æ•°æ®å…ˆæ‹·è´è‡³ç›®æ ‡ç¼“å†²åŒºä¸­
+			// ÎªÁË¼õÉÙÏÂ´ÎÑ­»·Ê±µ÷ÓÃ scan_line µÄ×Ö·û´®²éÕÒ´ÎÊı£¬
+			// ½«¶Á»º³åÇøÖĞµÄÊı¾İÏÈ¿½±´ÖÁÄ¿±ê»º³åÇøÖĞ
 
 			len += buf_->length();
 			out.append(buf_);

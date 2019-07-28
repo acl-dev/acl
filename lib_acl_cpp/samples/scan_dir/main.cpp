@@ -1,4 +1,4 @@
-﻿#include <map>
+#include <map>
 #include <vector>
 #include <algorithm>
 #include "lib_acl.h"

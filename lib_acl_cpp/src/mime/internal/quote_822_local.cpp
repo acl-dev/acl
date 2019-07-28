@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	quote_822_local 3
  * SUMMARY

@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <stdio.h>
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
@@ -171,7 +171,7 @@ ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node)
 }
 
 /************************************************************************/
-/*               json å¯¹è±¡å¤„ç†å‡½æ•°é›†                                    */
+/*               json ¶ÔÏó´¦Àíº¯Êý¼¯                                    */
 /************************************************************************/
 
 static ACL_JSON_NODE *json_iter_head(ACL_ITER *it, ACL_JSON *json)
@@ -203,7 +203,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 
 	node = (struct ACL_JSON_NODE*) it->data;
 
-	/* å…ˆéåŽ†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
+	/* ÏÈ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã */
 
 	ring_ptr = acl_ring_succ(&node->children);
 	if (ring_ptr != &node->children) {
@@ -213,7 +213,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹éåŽ†å®Œæ¯•ï¼Œå†éåŽ†å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄ×Ó½Úµã±éÀúÍê±Ï£¬ÔÙ±éÀúµ±Ç°½ÚµãµÄÐÖµÜ½Úµã */
 
 	parent = acl_json_node_parent(node);
 	ring_ptr = acl_ring_succ(&node->node);
@@ -224,7 +224,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹éåŽ†å®Œæ¯•ï¼Œæœ€åŽéåŽ†å½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄÐÖµÜ½Úµã±éÀúÍê±Ï£¬×îºó±éÀúµ±Ç°½ÚµãµÄ¸¸½ÚµãµÄÐÖµÜ½Úµã */
 
 	do {
 		if (parent == json->root)
@@ -243,7 +243,7 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 		}
 	} while (ring_ptr != &json->root->children);
 
-	/* éåŽ†å®Œæ‰€æœ‰èŠ‚ç‚¹ */
+	/* ±éÀúÍêËùÓÐ½Úµã */
 
 	it->ptr = it->data = NULL;
 	return NULL;
@@ -277,7 +277,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 
 	node = (struct ACL_JSON_NODE*) it->data;
 
-	/* å…ˆéåŽ†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
+	/* ÏÈ±éÀúµ±Ç°½ÚµãµÄ×Ó½Úµã */
 
 	ring_ptr = acl_ring_pred(&node->children);
 	if (ring_ptr != &node->children) {
@@ -287,7 +287,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹éåŽ†å®Œæ¯•ï¼Œå†éåŽ†å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄ×Ó½Úµã±éÀúÍê±Ï£¬ÔÙ±éÀúµ±Ç°½ÚµãµÄÐÖµÜ½Úµã */
 
 	parent = acl_json_node_parent(node);
 	ring_ptr = acl_ring_pred(&node->node);
@@ -298,7 +298,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		return it->ptr;
 	}
 
-	/* å½“å‰èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹éåŽ†å®Œæ¯•ï¼Œæœ€åŽéåŽ†å½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹ */
+	/* µ±Ç°½ÚµãµÄÐÖµÜ½Úµã±éÀúÍê±Ï£¬×îºó±éÀúµ±Ç°½ÚµãµÄ¸¸½ÚµãµÄÐÖµÜ½Úµã */
 
 	do {
 		if (parent == json->root)
@@ -316,7 +316,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 		}
 	} while (ring_ptr != &json->root->children);
 
-	/* éåŽ†å®Œæ‰€æœ‰èŠ‚ç‚¹ */
+	/* ±éÀúÍêËùÓÐ½Úµã */
 
 	it->ptr = it->data = NULL;
 	return NULL;
@@ -344,9 +344,9 @@ ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf)
 	json->dbuf_keep = sizeof(ACL_JSON);
 
 	json->root = acl_json_node_alloc(json);
-	/* å°†æ ¹èŠ‚ç‚¹ä½œä¸ºå½“å‰èŠ‚ç‚¹ */
+	/* ½«¸ù½Úµã×÷Îªµ±Ç°½Úµã */
 	json->curr_node = json->root;
-	/* è®¾ç½®çŠ¶æ€æœºçš„çŠ¶æ€ */
+	/* ÉèÖÃ×´Ì¬»úµÄ×´Ì¬ */
 #if 0
 	json->status = ACL_JSON_S_OBJ;
 #else
@@ -355,7 +355,7 @@ ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf)
 	json->status = ACL_JSON_S_ROOT;
 #endif
 
-	/* è®¾ç½®è¿­ä»£å‡½æ•° */
+	/* ÉèÖÃµü´úº¯Êý */
 
 	json->iter_head = json_iter_head;
 	json->iter_next = json_iter_next;
@@ -399,7 +399,7 @@ ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 	json->dbuf = dbuf;
 	json->dbuf_inner = dbuf;
 
-	/* å¦‚æžœä¼ å…¥çš„èŠ‚ç‚¹ä¸º root èŠ‚ç‚¹ï¼Œåˆ™ç›´æŽ¥èµ‹å€¼åˆ›å»º root å³å¯ */
+	/* Èç¹û´«ÈëµÄ½ÚµãÎª root ½Úµã£¬ÔòÖ±½Ó¸³Öµ´´½¨ root ¼´¿É */
 	if (node == root) {
 		json->root = acl_json_node_duplicate(json, node);
 	} else {
@@ -410,9 +410,9 @@ ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 		acl_json_node_add_child(json->root, first);
 	}
 
-	/* å°†æ ¹èŠ‚ç‚¹ä½œä¸ºå½“å‰èŠ‚ç‚¹ */
+	/* ½«¸ù½Úµã×÷Îªµ±Ç°½Úµã */
 	json->curr_node = json->root;
-	/* è®¾ç½®çŠ¶æ€æœºçš„çŠ¶æ€ */
+	/* ÉèÖÃ×´Ì¬»úµÄ×´Ì¬ */
 #if 0
 	json->status = ACL_JSON_S_OBJ;
 #else
@@ -421,7 +421,7 @@ ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 	json->root->right_ch = '}';
 #endif
 
-	/* è®¾ç½®è¿­ä»£å‡½æ•° */
+	/* ÉèÖÃµü´úº¯Êý */
 
 	json->iter_head = json_iter_head;
 	json->iter_next = json_iter_next;

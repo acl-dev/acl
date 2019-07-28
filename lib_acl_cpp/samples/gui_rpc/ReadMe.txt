@@ -1,85 +1,85 @@
-﻿================================================================================
-    MICROSOFT 基础类库： gui_rpc 项目概述
+================================================================================
+    MICROSOFT ������⣺ gui_rpc ��Ŀ����
 ===============================================================================
 
-应用程序向导已为您创建了此 gui_rpc 应用程序。此应用程序
-不仅介绍了使用 Microsoft 基础类的基本知识，
-而且是编写应用程序的起点。
+Ӧ�ó�������Ϊ�������˴� gui_rpc Ӧ�ó��򡣴�Ӧ�ó���
+����������ʹ�� Microsoft ������Ļ���֪ʶ��
+�����Ǳ�дӦ�ó������㡣
 
-此文件包含组成 gui_rpc 应用程序的每个文件的内容摘要。
+���ļ�������� gui_rpc Ӧ�ó����ÿ���ļ�������ժҪ��
 
 gui_rpc.vcproj
-    这是使用“应用程序向导”生成的 VC++ 项目的主项目文件。 
-    它包含有关生成文件的 Visual C++ 版本的信息，以及
-    有关用“应用程序向导”所选择的平台、配置和
-    项目功能的信息。
+    ����ʹ�á�Ӧ�ó����򵼡����ɵ� VC++ ��Ŀ������Ŀ�ļ��� 
+    �������й������ļ��� Visual C++ �汾����Ϣ���Լ�
+    �й��á�Ӧ�ó����򵼡���ѡ���ƽ̨�����ú�
+    ��Ŀ���ܵ���Ϣ��
 
 gui_rpc.h
-    这是应用程序的主头文件。  它包含其他
-    项目特定的头文件（包括 Resource.h），并声明
-    Cgui_rpcApp 应用程序类。
+    ����Ӧ�ó������ͷ�ļ���  ����������
+    ��Ŀ�ض���ͷ�ļ������� Resource.h����������
+    Cgui_rpcApp Ӧ�ó����ࡣ
 
 gui_rpc.cpp
-    这是包含应用程序
-    类 Cgui_rpcApp 的主应用程序源文件。
+    ���ǰ���Ӧ�ó���
+    �� Cgui_rpcApp ����Ӧ�ó���Դ�ļ���
 
 gui_rpc.rc
-    这是程序使用的所有 Microsoft Windows 资源
-    的列表。  它包含存储在 RES 子目录中
-    的图标、位图和光标。  可直接在 Microsoft 
-    Visual C++ 中编辑此文件。 项目资源包含在 2052 中。
+    ���ǳ���ʹ�õ����� Microsoft Windows ��Դ
+    ���б���  �������洢�� RES ��Ŀ¼��
+    ��ͼ�ꡢλͼ�͹�ꡣ  ��ֱ���� Microsoft 
+    Visual C++ �б༭���ļ��� ��Ŀ��Դ������ 2052 �С�
 
 res\gui_rpc.ico
-    这是一个图标文件，用作应用程序的图标。  此
-    图标包含在主资源文件 gui_rpc.rc 中。
+    ����һ��ͼ���ļ�������Ӧ�ó����ͼ�ꡣ  ��
+    ͼ�����������Դ�ļ� gui_rpc.rc �С�
 
 res\gui_rpc.rc2
-    此文件包含不由 Microsoft 
-    Visual C++ 编辑的资源。 应将所有不能由
-    资源编辑器编辑的资源放在此文件中。
+    ���ļ��������� Microsoft 
+    Visual C++ �༭����Դ�� Ӧ�����в�����
+    ��Դ�༭���༭����Դ���ڴ��ļ��С�
 
 /////////////////////////////////////////////////////////////////////////////
 
-应用程序向导将创建一个对话框类：
-gui_rpcDlg.h、gui_rpcDlg.cpp - 对话框
-    这些文件包含 Cgui_rpcDlg 类。  此类定义
-    应用程序主对话框的行为。  此对话框的模板包含在 
-    gui_rpc.rc 中，而此文件可以在 Microsoft Visual C++ 中进行编辑。
+Ӧ�ó����򵼽�����һ���Ի����ࣺ
+gui_rpcDlg.h��gui_rpcDlg.cpp - �Ի���
+    ��Щ�ļ����� Cgui_rpcDlg �ࡣ  ���ඨ��
+    Ӧ�ó������Ի������Ϊ��  �˶Ի����ģ������� 
+    gui_rpc.rc �У������ļ������� Microsoft Visual C++ �н��б༭��
 /////////////////////////////////////////////////////////////////////////////
 
-其他功能：
+�������ܣ�
 
-ActiveX 控件
-    应用程序支持使用 ActiveX 控件。
+ActiveX �ؼ�
+    Ӧ�ó���֧��ʹ�� ActiveX �ؼ���
 
-Windows 套接字
-    应用程序支持在 TCP/IP 网络上建立通讯。
+Windows �׽���
+    Ӧ�ó���֧���� TCP/IP �����Ͻ���ͨѶ��
 /////////////////////////////////////////////////////////////////////////////
 
-其他标准文件：
+������׼�ļ���
 
-StdAfx.h、StdAfx.cpp
-    这些文件用于生成名为 gui_rpc.pch 的预编译头文件 (PCH)
-    和名为 StdAfx.obj 的预编译类型文件。
+StdAfx.h��StdAfx.cpp
+    ��Щ�ļ�����������Ϊ gui_rpc.pch ��Ԥ����ͷ�ļ� (PCH)
+    ����Ϊ StdAfx.obj ��Ԥ���������ļ���
 
 Resource.h
-    这是标准头文件，它定义新资源 ID。
-    Microsoft Visual C++ 将读取并更新此文件。
+    ���Ǳ�׼ͷ�ļ�������������Դ ID��
+    Microsoft Visual C++ ����ȡ�����´��ļ���
 
 /////////////////////////////////////////////////////////////////////////////
 
-其他说明：
+����˵����
 
-应用程序向导使用“TODO:” 来指示
-应添加或自定义的源代码部分。
+Ӧ�ó�����ʹ�á�TODO:�� ��ָʾ
+Ӧ���ӻ��Զ����Դ���벿�֡�
 
-如果应用程序在共享 DLL 中使用 MFC，且应用程序使用的语言不是
-操作系统的当前语言，则需要从 Microsoft Visual C++ 光盘上 
-Win\System 目录下将相应的本地化资源 MFC70XXX.DLL 
-复制到计算机的 system 或 system32 目录下，
-并将其重命名为 MFCLOC.DLL。  （“XXX”代表
-语言缩写。  例如，MFC70DEU.DLL 包含翻译成
-德语的资源。）  如果不这样做，应用程序的某些 UI 元素
-将保留为操作系统的语言。
+���Ӧ�ó����ڹ��� DLL ��ʹ�� MFC����Ӧ�ó���ʹ�õ����Բ���
+����ϵͳ�ĵ�ǰ���ԣ�����Ҫ�� Microsoft Visual C++ ������ 
+Win\System Ŀ¼�½���Ӧ�ı��ػ���Դ MFC70XXX.DLL 
+���Ƶ�������� system �� system32 Ŀ¼�£�
+������������Ϊ MFCLOC.DLL��  ����XXX������
+������д��  ���磬MFC70DEU.DLL ���������
+�������Դ����  �������������Ӧ�ó����ĳЩ UI Ԫ��
+������Ϊ����ϵͳ�����ԡ�
 
 /////////////////////////////////////////////////////////////////////////////

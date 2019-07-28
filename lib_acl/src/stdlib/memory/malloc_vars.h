@@ -1,4 +1,4 @@
-﻿#ifndef	__MALLOC_VARS_INCLUDE_H__
+#ifndef	__MALLOC_VARS_INCLUDE_H__
 #define	__MALLOC_VARS_INCLUDE_H__
 
 #ifdef	__cplusplus

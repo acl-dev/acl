@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "fiber_cpp_define.hpp"
 
 #if !defined(_WIN32) && !defined(_WIN64)
@@ -8,47 +8,47 @@ struct ACL_FIBER_EVENT;
 namespace acl {
 
 /**
- * 可用于协程之间、线程之间以及协程与线程之间，通过事件等待/通知方式进行同步的
- * 的事件混合锁
+ * ������Э��֮�䡢�߳�֮���Լ�Э�����߳�֮�䣬ͨ���¼��ȴ�/֪ͨ��ʽ����ͬ����
+ * ���¼������
  */
 class FIBER_CPP_API fiber_event : public noncopyable
 {
 public:
 	/**
-	 * 构造方法
-	 * @param use_mutex {bool} 在用在多线程之间进行事件同步时，如果启动的
-	 *  的线程数较多（成百上千个线程），则此标志应设为 true 以便于内部在
-	 *  同步内部对象时使用线程互斥锁进行保护，以避免形成惊群现象，如果启动
-	 *  的线程数较多但该标志为 false，则内部使用原子数进行同步保护，很容易
-	 *  造成惊群问题；当启动的线程数较（几十个左右），则此参数可以设为 false
-	 *  以告之内部使用原子数进行同步保护
-	 * @param fatal_on_error {bool} 内部发生错误时是否直接崩溃，以便于开发
-	 *  人员进行错误调试
+	 * ���췽��
+	 * @param use_mutex {bool} �����ڶ��߳�֮������¼�ͬ��ʱ�����������
+	 *  ���߳����϶ࣨ�ɰ���ǧ���̣߳�����˱�־Ӧ��Ϊ true �Ա����ڲ���
+	 *  ͬ���ڲ�����ʱʹ���̻߳��������б������Ա����γɾ�Ⱥ�����������
+	 *  ���߳����϶൫�ñ�־Ϊ false�����ڲ�ʹ��ԭ��������ͬ��������������
+	 *  ��ɾ�Ⱥ���⣻���������߳����ϣ���ʮ�����ң�����˲���������Ϊ false
+	 *  �Ը�֮�ڲ�ʹ��ԭ��������ͬ������
+	 * @param fatal_on_error {bool} �ڲ���������ʱ�Ƿ�ֱ�ӱ������Ա��ڿ���
+	 *  ��Ա���д������
 	 */
 	fiber_event(bool use_mutex = true, bool fatal_on_error = true);
 	~fiber_event(void);
 
 	/**
-	 * 等待事件锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
+	 * �ȴ��¼���
+	 * @return {bool} ���� true ��ʾ�����ɹ��������ʾ�ڲ�����
 	 */
 	bool wait(void);
 
 	/**
-	 * 尝试等待事件锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
+	 * ���Եȴ��¼���
+	 * @return {bool} ���� true ��ʾ�����ɹ��������ʾ�����ڱ�ռ��
 	 */
 	bool trywait(void);
 
 	/**
-	 * 事件锁拥有者释放事件锁并通知等待者
-	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
+	 * �¼���ӵ�����ͷ��¼�����֪ͨ�ȴ���
+	 * @return {bool} ���� true ��ʾ֪ͨ�ɹ��������ʾ�ڲ�����
 	 */
 	bool notify(void);
 
 public:
 	/**
-	 * 返回 C 版本的事件对象
+	 * ���� C �汾���¼�����
 	 * @return {ACL_FIBER_EVENT*}
 	 */
 	ACL_FIBER_EVENT* get_event(void) const

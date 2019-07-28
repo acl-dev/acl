@@ -1,1 +1,1 @@
-﻿echo 'core.%e.%t.%p' > /proc/sys/kernel/core_pattern
+echo 'core.%e.%t.%p' > /proc/sys/kernel/core_pattern

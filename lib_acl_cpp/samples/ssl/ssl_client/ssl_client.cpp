@@ -1,4 +1,4 @@
-ï»¿// ssl_client.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// ssl_client.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -56,7 +56,7 @@ static void test0(int i)
 
 static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 {
-	// è¿æ¥ WEB æœåŠ¡å™¨è¿‡ç¨‹
+	// Á¬½Ó WEB ·şÎñÆ÷¹ı³Ì
 
 	acl::string addr;
 	addr << domain << ':' << port;
@@ -68,7 +68,7 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 		return;
 	}
 
-	// å¦‚æœä½¿ç”¨ SSL æ–¹å¼ï¼Œåˆ™è¿›è¡Œ SSL æ¡æ‰‹è¿‡ç¨‹
+	// Èç¹ûÊ¹ÓÃ SSL ·½Ê½£¬Ôò½øĞĞ SSL ÎÕÊÖ¹ı³Ì
 	if (use_ssl) {
 		acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
 		if (client.setup_hook(ssl) == ssl) {
@@ -79,14 +79,14 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 		}
 	}
 
-	// æ„å»º HTTP è¯·æ±‚å¤´
+	// ¹¹½¨ HTTP ÇëÇóÍ·
 	acl::http_header header;
 	header.set_url("/")
 		.set_host(domain)
 		.accept_gzip(use_gzip)
 		.set_keep_alive(false);
-	// mail.126.com æ¯”è¾ƒåœŸé³–ï¼Œæœ‰æ—¶å®¢æˆ·ç«¯è¦æ±‚éå‹ç¼©æ•°æ®å…¶ä¹Ÿä¼šè¿”å›å‹ç¼©æ•°æ®ï¼Œæ‰€ä»¥æ­¤å¤„
-	// å¼ºåˆ¶è¦æ±‚éå‹ç¼©æ•°æ®
+	// mail.126.com ±È½ÏÍÁ±î£¬ÓĞÊ±¿Í»§¶ËÒªÇó·ÇÑ¹ËõÊı¾İÆäÒ²»á·µ»ØÑ¹ËõÊı¾İ£¬ËùÒÔ´Ë´¦
+	// Ç¿ÖÆÒªÇó·ÇÑ¹ËõÊı¾İ
 	if (!use_gzip) {
 		header.add_entry("Accept-Encoding", "text/plain");
 	}
@@ -99,14 +99,14 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 	std::cout << request.c_str();
 	std::cout << "----------------------------------------" << std::endl;
 
-	// å‘é€ HTTP GET è¯·æ±‚å¤´
+	// ·¢ËÍ HTTP GET ÇëÇóÍ·
 	if (!client.write(request)) {
 		std::cout << "write to " << addr.c_str() <<
 			" error!" << std::endl;
 		return;
 	}
 
-	// è¯»å– HTTP æ•°æ®ä½“è¿‡ç¨‹
+	// ¶ÁÈ¡ HTTP Êı¾İÌå¹ı³Ì
 
 	char  buf[8192];
 	size_t size;
@@ -125,7 +125,7 @@ static void test1(const char* domain, int port, bool use_gzip, bool use_ssl)
 
 static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 {
-	// è¿æ¥ WEB æœåŠ¡å™¨è¿‡ç¨‹
+	// Á¬½Ó WEB ·şÎñÆ÷¹ı³Ì
 
 	acl::string addr;
 	addr << domain << ':' << port;
@@ -138,8 +138,8 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 	}
 
 	if (use_ssl) {
-		// åˆ›å»º SSL å¯¹è±¡å¹¶ä¸ç½‘ç»œå®¢æˆ·ç«¯è¿æ¥æµç»‘å®šï¼Œå½“æµå¯¹è±¡è¢«é‡Šæ”¾å‰è¯¥ SSL å¯¹è±¡
-		// å°†ç”±æµå¯¹è±¡å†…éƒ¨é€šè¿‡è°ƒç”¨ stream_hook::destroy() é‡Šæ”¾
+		// ´´½¨ SSL ¶ÔÏó²¢ÓëÍøÂç¿Í»§¶ËÁ¬½ÓÁ÷°ó¶¨£¬µ±Á÷¶ÔÏó±»ÊÍ·ÅÇ°¸Ã SSL ¶ÔÏó
+		// ½«ÓÉÁ÷¶ÔÏóÄÚ²¿Í¨¹ıµ÷ÓÃ stream_hook::destroy() ÊÍ·Å
 		acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
 		if (client.get_stream().setup_hook(ssl) == ssl) {
 			std::cout << "open ssl client " << addr.c_str()
@@ -149,7 +149,7 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 		}
 	}
 
-	// æ„å»º HTTP è¯·æ±‚å¤´
+	// ¹¹½¨ HTTP ÇëÇóÍ·
 
 	acl::http_header header;
 	header.set_url("/")
@@ -169,7 +169,7 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 	std::cout << request.c_str();
 	std::cout << "----------------------------------------" << std::endl;
 
-	// å‘é€ HTTP GET è¯·æ±‚å¤´
+	// ·¢ËÍ HTTP GET ÇëÇóÍ·
 
 	if (!client.write_head(header)) {
 		std::cout << "write to " << addr.c_str()
@@ -177,7 +177,7 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 		return;
 	}
 
-	// è¯»å– HTTP å“åº”å¤´
+	// ¶ÁÈ¡ HTTP ÏìÓ¦Í·
 	if (!client.read_head()) {
 		std::cout << "read http respond header error!" << std::endl;
 		return;
@@ -187,7 +187,7 @@ static void test2(const char* domain, int port, bool use_gzip, bool use_ssl)
 	std::cout << "respond header:" << std::endl;
 	std::cout << request.c_str();
 
-	// è¯»å–æœåŠ¡å™¨å“åº”çš„ HTTP æ•°æ®ä½“è¿‡ç¨‹
+	// ¶ÁÈ¡·şÎñÆ÷ÏìÓ¦µÄ HTTP Êı¾İÌå¹ı³Ì
 
 	char  buf[8192];
 	size_t size;
@@ -231,8 +231,8 @@ int main(int argc, char* argv[])
 	}
 	ACL_METER_TIME("---------- end ----------");
 
-	// 126 çš„ SSL ä¼ è¾“æ—¶å½“ HTTP è¯·æ±‚å¤´ä¸­çš„ Host å€¼ä¸º mail.126.com:443 æ—¶å…¶ nginx
-	// ä¼šæŠ¥é”™ï¼Œåªèƒ½æ˜¯ï¼šHost: mail.126.comï¼ŒåœŸé³–
+	// 126 µÄ SSL ´«ÊäÊ±µ± HTTP ÇëÇóÍ·ÖĞµÄ Host ÖµÎª mail.126.com:443 Ê±Æä nginx
+	// »á±¨´í£¬Ö»ÄÜÊÇ£ºHost: mail.126.com£¬ÍÁ±î
 
 	test1("mail.126.com", 443, false, true);
 	test2("mail.126.com", 443, false, true);

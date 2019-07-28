@@ -1,4 +1,4 @@
-﻿POST /cgi-bin/test/http_servlet?name1=%CD%E2%B9%FA%C8%CB HTTP/1.1
+POST /cgi-bin/test/http_servlet?name1=%CD%E2%B9%FA%C8%CB HTTP/1.1
 Host: 127.0.0.1
 User-Agent: Mozilla/5.0 (Windows NT 5.1; rv:12.0) Gecko/20100101 Firefox/12.0
 Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8

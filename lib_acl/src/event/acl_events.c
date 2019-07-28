@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -157,7 +157,7 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	/* åœ¨ ACL_WINDOWS ä¸‹çš„ iocp å¯ä»¥æ”¯æ’‘æ›´å¤§çš„è¿æ¥ï¼Œé»˜è®¤è®¾ä¸º 102400 ä¸ªè¿æ¥
+	/* ÔÚ ACL_WINDOWS ÏÂµÄ iocp ¿ÉÒÔÖ§³Å¸ü´óµÄÁ¬½Ó£¬Ä¬ÈÏÉèÎª 102400 ¸öÁ¬½Ó
 	 */
 	fdsize = 102400;
 	eventp = event_new_iocp(fdsize);
@@ -252,7 +252,7 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr,
 			eventp = acl_event_new_poll(delay_sec, delay_usec);
 			break;
 		case ACL_EVENT_WMSG:
-			/* ä½¿ç”¨è¯¥å€¼ä½œä¸ºæ¶ˆæ¯å· */
+			/* Ê¹ÓÃ¸ÃÖµ×÷ÎªÏûÏ¢ºÅ */
 			eventp = acl_event_new_wmsg((unsigned int) delay_sec);
 			break;
 		default:

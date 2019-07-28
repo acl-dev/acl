@@ -1,8 +1,8 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 char *var_cfg_str;
 acl::master_str_tbl var_conf_str_tab[] = {
@@ -48,24 +48,24 @@ master_service::~master_service()
 bool master_service::thread_on_read(acl::socket_stream* stream)
 {
 	acl::http_response res(stream);
-	// å“åº”æ•°æ®ä½“ä¸º xml æ ¼å¼
+	// ÏìÓ¦Êı¾İÌåÎª xml ¸ñÊ½
 	res.response_header().set_content_type("text/html");
 
-	// è¯» HTTP è¯·æ±‚å¤´
+	// ¶Á HTTP ÇëÇóÍ·
 	if (res.read_header() == false)
 		return false;
 
 	acl::string buf;
-	// è¯» HTTP è¯·æ±‚ä½“æ•°æ®
+	// ¶Á HTTP ÇëÇóÌåÊı¾İ
 	if (res.get_body(buf) == false)
 		return false;
 
 	acl::http_client* client = res.get_client();
 
-	// åˆ¤æ–­å®¢æˆ·ç«¯æ˜¯å¦å¸Œæœ›ä¿æŒé•¿è¿æ¥
+	// ÅĞ¶Ï¿Í»§¶ËÊÇ·ñÏ£Íû±£³Ö³¤Á¬½Ó
 	bool keep_alive = client->keep_alive();
 
-	// è¿”å›æ•°æ®ç»™å®¢æˆ·ç«¯
+	// ·µ»ØÊı¾İ¸ø¿Í»§¶Ë
 
 	res.response_header()
 		.set_status(200)

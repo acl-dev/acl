@@ -1,4 +1,4 @@
-ï»¿// zlib.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// zlib.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -13,7 +13,7 @@
 
 static int test_zip_stream(void)
 {
-	const char* dummy = "ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘\r\n";
+	const char* dummy = "ÖĞ¹úÈËÃñÖĞ¹úÈËÃñÖĞ¹úÈËÃñÖĞ¹úÈËÃñÖĞ¹úÈËÃñ\r\n";
 	acl::zlib_stream zstream;
 	acl::string out, out2;
 
@@ -85,7 +85,7 @@ static int test_compress(void)
 {
 	printf("-----------------------------------------------\r\n");
 
-	const char* dummy = "ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘ä¸­å›½äººæ°‘\r\n";
+	const char* dummy = "ÖĞ¹úÈËÃñÖĞ¹úÈËÃñÖĞ¹úÈËÃñÖĞ¹úÈËÃñÖĞ¹úÈËÃñ\r\n";
 	acl::zlib_stream zstream;
 	acl::string out, out2;
 
@@ -147,7 +147,7 @@ static void test_zlib_pipe(void)
 
 	if (0)
 	{
-		// å€’åºæ–¹å¼æ·»åŠ ï¼Œå³æ‰§è¡Œçš„é¡ºåºä¸æ·»åŠ çš„é¡ºåºç›¸å
+		// µ¹Ğò·½Ê½Ìí¼Ó£¬¼´Ö´ĞĞµÄË³ĞòÓëÌí¼ÓµÄË³ĞòÏà·´
 
 		manager.push_front(&ps);
 		manager.push_front(&out);
@@ -158,7 +158,7 @@ static void test_zlib_pipe(void)
 	}
 	else
 	{
-		// æ­£åºæ–¹å¼æ·»åŠ ï¼Œå³æ‰§è¡Œçš„é¡ºåºä¸æ·»åŠ çš„é¡ºåºç›¸åŒ
+		// ÕıĞò·½Ê½Ìí¼Ó£¬¼´Ö´ĞĞµÄË³ĞòÓëÌí¼ÓµÄË³ĞòÏàÍ¬
 
 		manager.push_back(&gbToUtf);
 		manager.push_back(&zip);
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
 
 	atexit(check);
 
-	//  win32 ä¸‹ï¼Œåœ¨ DLL ä¸­ä¸å¾—ä½¿ç”¨å†…å­˜æ± åŠŸèƒ½
+	//  win32 ÏÂ£¬ÔÚ DLL ÖĞ²»µÃÊ¹ÓÃÄÚ´æ³Ø¹¦ÄÜ
 #ifdef  USE_SLICE
 # ifndef ACL_DLL
 	acl::acl_slice_init();

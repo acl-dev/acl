@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <map>
 #include "../stdlib/dbuf_pool.hpp"
@@ -8,8 +8,8 @@
 
 namespace acl {
 
-// ç”¨æ¥å­˜å‚¨å±æ€§å€¼çš„ç¼“å†²åŒºå¯¹è±¡å®šä¹‰ï¼Œè¿™ä¸»è¦æ˜¯ä¸ºäº†å…¼å®¹å±æ€§å€¼
-// å¯ä»¥ä¸ºäºŒè¿›åˆ¶çš„æƒ…å½¢è€Œå¢åŠ çš„ç»“æ„ç±»å‹
+// ÓÃÀ´´æ´¢ÊôĞÔÖµµÄ»º³åÇø¶ÔÏó¶¨Òå£¬ÕâÖ÷ÒªÊÇÎªÁË¼æÈİÊôĞÔÖµ
+// ¿ÉÒÔÎª¶ş½øÖÆµÄÇéĞÎ¶øÔö¼ÓµÄ½á¹¹ÀàĞÍ
 typedef enum
 {
 	TODO_NUL,
@@ -33,34 +33,34 @@ public:
 };
 
 /**
- * session ç±»ï¼Œè¯¥ç±»ä½¿ç”¨ memcached å­˜å‚¨ session æ•°æ®
+ * session Àà£¬¸ÃÀàÊ¹ÓÃ memcached ´æ´¢ session Êı¾İ
  */
 class ACL_CPP_API session : public dbuf_obj
 {
 public:
 	/**
-	 * å½“æ„é€ å‡½æ•°çš„å‚æ•° sid éç©ºæ—¶ï¼Œåˆ™è¯¥ session å¯¹è±¡ä½¿ç”¨è¯¥
-	 * sidï¼›å¦åˆ™å†…éƒ¨ä¼šè‡ªåŠ¨ç”Ÿæˆä¸€ä¸ª sidï¼Œç”¨æˆ·åº”è¯¥é€šè¿‡ get_sid()
-	 * è·å¾—è¿™ä¸ªè‡ªåŠ¨ç”Ÿæˆçš„ sid ä»¥ä¾¿äºæ¯æ¬¡æŸ¥è¯¢è¯¥ sid å¯¹åº”çš„æ•°æ®
-	 * @param ttl {time_t} æŒ‡å®š session çš„ç”Ÿå­˜å‘¨æœŸ(ç§’)
-	 * @param sid {const char*} éç©ºæ—¶ï¼Œåˆ™ session çš„ sid ä½¿
-	 *  è¯¥å€¼ï¼Œå¦åˆ™å†…éƒ¨ä¼šäº§ç”Ÿä¸€ä¸ªéšæœºçš„ session sidï¼Œè¯¥éšæœºçš„
-	 *  sid å¯ä»¥é€šè¿‡è°ƒç”¨ get_sid() è·å¾—ï¼›å½“ç„¶åœ¨ä½¿ç”¨è¿‡ç¨‹ä¸­ï¼Œç”¨æˆ·
-	 *  ä¹Ÿå¯ä»¥é€šè¿‡ set_sid() ä¿®æ”¹æœ¬å¯¹è±¡çš„ session sidï¼›
-	 *  æ­¤å¤–ï¼Œå¦‚æœè¯¥ sid ä¸ºç©ºï¼Œåˆ™å¦‚æœç”¨æˆ·æŸ¥æŸ¥æ‰¾æŸä¸ª sid å¯¹åº”çš„
-	 *  æ•°æ®ï¼Œåˆ™ç”¨æˆ·å¿…é¡»å…ˆè°ƒç”¨ set_sid()
+	 * µ±¹¹Ôìº¯ÊıµÄ²ÎÊı sid ·Ç¿ÕÊ±£¬Ôò¸Ã session ¶ÔÏóÊ¹ÓÃ¸Ã
+	 * sid£»·ñÔòÄÚ²¿»á×Ô¶¯Éú³ÉÒ»¸ö sid£¬ÓÃ»§Ó¦¸ÃÍ¨¹ı get_sid()
+	 * »ñµÃÕâ¸ö×Ô¶¯Éú³ÉµÄ sid ÒÔ±ãÓÚÃ¿´Î²éÑ¯¸Ã sid ¶ÔÓ¦µÄÊı¾İ
+	 * @param ttl {time_t} Ö¸¶¨ session µÄÉú´æÖÜÆÚ(Ãë)
+	 * @param sid {const char*} ·Ç¿ÕÊ±£¬Ôò session µÄ sid Ê¹
+	 *  ¸ÃÖµ£¬·ñÔòÄÚ²¿»á²úÉúÒ»¸öËæ»úµÄ session sid£¬¸ÃËæ»úµÄ
+	 *  sid ¿ÉÒÔÍ¨¹ıµ÷ÓÃ get_sid() »ñµÃ£»µ±È»ÔÚÊ¹ÓÃ¹ı³ÌÖĞ£¬ÓÃ»§
+	 *  Ò²¿ÉÒÔÍ¨¹ı set_sid() ĞŞ¸Ä±¾¶ÔÏóµÄ session sid£»
+	 *  ´ËÍâ£¬Èç¹û¸Ã sid Îª¿Õ£¬ÔòÈç¹ûÓÃ»§²é²éÕÒÄ³¸ö sid ¶ÔÓ¦µÄ
+	 *  Êı¾İ£¬ÔòÓÃ»§±ØĞëÏÈµ÷ÓÃ set_sid()
 	 */
 	session(time_t ttl = 0, const char* sid = NULL);
 	virtual ~session(void);
 	
 	/**
-	 * é‡ç½®å†…éƒ¨çŠ¶æ€ï¼Œæ¸…ç†æ‰ä¸€äº›ä¸´æ—¶æ•°æ®
+	 * ÖØÖÃÄÚ²¿×´Ì¬£¬ÇåÀíµôÒ»Ğ©ÁÙÊ±Êı¾İ
 	 */
 	void reset(void);
 
 	/**
-	 * è·å¾—æœ¬ session å¯¹è±¡çš„å”¯ä¸€ ID æ ‡è¯†
-	 * @return {const char*} éç©º
+	 * »ñµÃ±¾ session ¶ÔÏóµÄÎ¨Ò» ID ±êÊ¶
+	 * @return {const char*} ·Ç¿Õ
 	 */
 	virtual const char* get_sid(void) const
 	{
@@ -68,93 +68,93 @@ public:
 	}
 
 	/**
-	 * è®¾ç½®æœ¬ session å¯¹è±¡çš„å”¯ä¸€ ID æ ‡è¯†
-	 * @param sid {const char*} éç©º
-	 * æ³¨ï¼šè°ƒç”¨æœ¬å‡½æ•°åï¼Œä¼šè‡ªåŠ¨æ¸…é™¤ä¹‹å‰çš„ä¸­é—´ç¼“å­˜æ•°æ®
+	 * ÉèÖÃ±¾ session ¶ÔÏóµÄÎ¨Ò» ID ±êÊ¶
+	 * @param sid {const char*} ·Ç¿Õ
+	 * ×¢£ºµ÷ÓÃ±¾º¯Êıºó£¬»á×Ô¶¯Çå³ıÖ®Ç°µÄÖĞ¼ä»º´æÊı¾İ
 	 */
 	void set_sid(const char* sid);
 
 	/**
-	 * å½“è°ƒç”¨ session ç±»çš„ set/set_ttl æ—¶ï¼Œå¦‚æœæœ€åä¸€ä¸ªå‚æ•° delay ä¸º trueï¼Œ
-	 * åˆ™å¿…é¡»é€šè¿‡è°ƒç”¨æœ¬å‡½æ•°å°†æ•°æ®çœŸæ­£è¿›è¡Œæ›´æ–°
-	 * @return {bool} æ•°æ®æ›´æ–°æ˜¯å¦æˆåŠŸ
+	 * µ±µ÷ÓÃ session ÀàµÄ set/set_ttl Ê±£¬Èç¹û×îºóÒ»¸ö²ÎÊı delay Îª true£¬
+	 * Ôò±ØĞëÍ¨¹ıµ÷ÓÃ±¾º¯Êı½«Êı¾İÕæÕı½øĞĞ¸üĞÂ
+	 * @return {bool} Êı¾İ¸üĞÂÊÇ·ñ³É¹¦
 	 */
 	virtual bool flush();
 
 	/**
-	 * å‘ session ä¸­æ·»åŠ æ–°çš„å­—ç¬¦ä¸²å±æ€§ï¼ŒåŒæ—¶è®¾ç½®è¯¥
-	 * session çš„è¿‡æœŸæ—¶é—´é—´éš”(ç§’)
-	 * @param name {const char*} session åï¼Œéç©º
-	 * @param value {const char*} session å€¼ï¼Œéç©º
-	 * @return {bool} è¿”å› false è¡¨ç¤ºå‡ºé”™
+	 * Ïò session ÖĞÌí¼ÓĞÂµÄ×Ö·û´®ÊôĞÔ£¬Í¬Ê±ÉèÖÃ¸Ã
+	 * session µÄ¹ıÆÚÊ±¼ä¼ä¸ô(Ãë)
+	 * @param name {const char*} session Ãû£¬·Ç¿Õ
+	 * @param value {const char*} session Öµ£¬·Ç¿Õ
+	 * @return {bool} ·µ»Ø false ±íÊ¾³ö´í
 	 */
 	virtual bool set(const char* name, const char* value);
 
 	/**
-	 * å‘ session ä¸­æ·»åŠ æ–°çš„å±æ€§å¯¹è±¡å¹¶è®¾ç½®è¯¥ session çš„è¿‡æœŸæ—¶é—´é—´éš”(ç§’)ï¼Œ
-	 * @param name {const char*} session å±æ€§åï¼Œéç©º
-	 * @param value {const char*} session å±æ€§å€¼ï¼Œéç©º
-	 * @param len {size_t} value å€¼é•¿åº¦
-	 * @return {bool} è¿”å› false è¡¨ç¤ºå‡ºé”™
+	 * Ïò session ÖĞÌí¼ÓĞÂµÄÊôĞÔ¶ÔÏó²¢ÉèÖÃ¸Ã session µÄ¹ıÆÚÊ±¼ä¼ä¸ô(Ãë)£¬
+	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
+	 * @param value {const char*} session ÊôĞÔÖµ£¬·Ç¿Õ
+	 * @param len {size_t} value Öµ³¤¶È
+	 * @return {bool} ·µ»Ø false ±íÊ¾³ö´í
 	 */
 	virtual bool set(const char* name, const void* value, size_t len);
 
 	/**
-	 * å»¶è¿Ÿå‘ session ä¸­æ·»åŠ æ–°çš„å±æ€§å¯¹è±¡å¹¶è®¾ç½®è¯¥ session çš„è¿‡æœŸæ—¶é—´é—´éš”(ç§’)ï¼Œ
-	 * å½“ç”¨æˆ·è°ƒç”¨äº† session::flush åå†è¿›è¡Œæ•°æ®æ›´æ–°ï¼Œ è¿™æ ·å¯ä»¥æé«˜ä¼ è¾“æ•ˆç‡
-	 * @param name {const char*} session å±æ€§åï¼Œéç©º
-	 * @param value {const char*} session å±æ€§å€¼ï¼Œéç©º
-	 * @param len {size_t} value å€¼é•¿åº¦
-	 * @return {bool} è¿”å› false è¡¨ç¤ºå‡ºé”™
+	 * ÑÓ³ÙÏò session ÖĞÌí¼ÓĞÂµÄÊôĞÔ¶ÔÏó²¢ÉèÖÃ¸Ã session µÄ¹ıÆÚÊ±¼ä¼ä¸ô(Ãë)£¬
+	 * µ±ÓÃ»§µ÷ÓÃÁË session::flush ºóÔÙ½øĞĞÊı¾İ¸üĞÂ£¬ ÕâÑù¿ÉÒÔÌá¸ß´«ÊäĞ§ÂÊ
+	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
+	 * @param value {const char*} session ÊôĞÔÖµ£¬·Ç¿Õ
+	 * @param len {size_t} value Öµ³¤¶È
+	 * @return {bool} ·µ»Ø false ±íÊ¾³ö´í
 	 */
 	virtual bool set_delay(const char* name, const void* value, size_t len);
 	
 	/**
-	 * ä» session ä¸­å–å¾—å­—ç¬¦ä¸²ç±»å‹å±æ€§å€¼
-	 * @param name {const char*} session å±æ€§åï¼Œéç©º
-	 * @return {const char*} session å±æ€§å€¼ï¼Œè¿”å›çš„æŒ‡é’ˆåœ°å€æ°¸è¿œéç©ºï¼Œç”¨æˆ·
-	 *  å¯ä»¥é€šè¿‡åˆ¤æ–­è¿”å›çš„æ˜¯å¦æ˜¯ç©ºä¸²(å³: "\0")æ¥åˆ¤æ–­å‡ºé”™æˆ–ä¸å­˜åœ¨
-	 *  æ³¨ï¼šè¯¥å‡½æ•°è¿”å›éç©ºæ•°æ®åï¼Œç”¨æˆ·åº”è¯¥ç«‹åˆ»ä¿ç•™æ­¤è¿”å›å€¼ï¼Œå› ä¸ºä¸‹æ¬¡
-	 *      çš„å…¶å®ƒå‡½æ•°è°ƒç”¨å¯èƒ½ä¼šæ¸…é™¤è¯¥ä¸´æ—¶è¿”å›æ•°æ®
+	 * ´Ó session ÖĞÈ¡µÃ×Ö·û´®ÀàĞÍÊôĞÔÖµ
+	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
+	 * @return {const char*} session ÊôĞÔÖµ£¬·µ»ØµÄÖ¸ÕëµØÖ·ÓÀÔ¶·Ç¿Õ£¬ÓÃ»§
+	 *  ¿ÉÒÔÍ¨¹ıÅĞ¶Ï·µ»ØµÄÊÇ·ñÊÇ¿Õ´®(¼´: "\0")À´ÅĞ¶Ï³ö´í»ò²»´æÔÚ
+	 *  ×¢£º¸Ãº¯Êı·µ»Ø·Ç¿ÕÊı¾İºó£¬ÓÃ»§Ó¦¸ÃÁ¢¿Ì±£Áô´Ë·µ»ØÖµ£¬ÒòÎªÏÂ´Î
+	 *      µÄÆäËüº¯Êıµ÷ÓÃ¿ÉÄÜ»áÇå³ı¸ÃÁÙÊ±·µ»ØÊı¾İ
 	 */
 	const char* get(const char* name);
 
 	/**
-	 * ä» session ä¸­å–å¾—äºŒè¿›åˆ¶æ•°æ®ç±»å‹çš„å±æ€§å€¼
-	 * @param name {const char*} session å±æ€§åï¼Œéç©º
-	 * @return {const session_string*} session å±æ€§å€¼ï¼Œè¿”å›ç©ºæ—¶
-	 *  è¡¨ç¤ºå‡ºé”™æˆ–ä¸å­˜åœ¨
-	 *  æ³¨ï¼šè¯¥å‡½æ•°è¿”å›éç©ºæ•°æ®åï¼Œç”¨æˆ·åº”è¯¥ç«‹åˆ»ä¿ç•™æ­¤è¿”å›å€¼ï¼Œå› ä¸ºä¸‹æ¬¡
-	 *      çš„å…¶å®ƒå‡½æ•°è°ƒç”¨å¯èƒ½ä¼šæ¸…é™¤è¯¥ä¸´æ—¶è¿”å›æ•°æ®
+	 * ´Ó session ÖĞÈ¡µÃ¶ş½øÖÆÊı¾İÀàĞÍµÄÊôĞÔÖµ
+	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
+	 * @return {const session_string*} session ÊôĞÔÖµ£¬·µ»Ø¿ÕÊ±
+	 *  ±íÊ¾³ö´í»ò²»´æÔÚ
+	 *  ×¢£º¸Ãº¯Êı·µ»Ø·Ç¿ÕÊı¾İºó£¬ÓÃ»§Ó¦¸ÃÁ¢¿Ì±£Áô´Ë·µ»ØÖµ£¬ÒòÎªÏÂ´Î
+	 *      µÄÆäËüº¯Êıµ÷ÓÃ¿ÉÄÜ»áÇå³ı¸ÃÁÙÊ±·µ»ØÊı¾İ
 	 */
 	virtual const session_string* get_buf(const char* name);
 
 	/**
-	 * ä» session ä¸­åˆ é™¤æŒ‡å®šå±æ€§å€¼ï¼Œå½“æ‰€æœ‰çš„å˜é‡éƒ½åˆ é™¤
-	 * æ—¶ä¼šå°†æ•´ä¸ªå¯¹è±¡ä» memcached ä¸­åˆ é™¤
-	 * @param name {const char*} session å±æ€§åï¼Œéç©º
-	 * @return {bool} true è¡¨ç¤ºæˆåŠŸ(å«ä¸å­˜åœ¨æƒ…å†µ)ï¼Œfalse è¡¨ç¤ºåˆ é™¤å¤±è´¥
-	 *  æ³¨ï¼šå½“é‡‡ç”¨å»¶è¿Ÿæ–¹å¼åˆ é™¤æŸä¸ªå±æ€§æ—¶ï¼Œåˆ™å»¶è¿Ÿå‘é€æ›´æ–°æŒ‡ä»¤åˆ°åç«¯çš„
-	 *  ç¼“å­˜æœåŠ¡å™¨ï¼Œå½“ç”¨æˆ·è°ƒç”¨äº† session::flush åå†è¿›è¡Œæ•°æ®æ›´æ–°ï¼Œè¿™
-	 *  æ ·å¯ä»¥æé«˜ä¼ è¾“æ•ˆç‡ï¼›å¦åˆ™ï¼Œåˆ™ç«‹åˆ»æ›´æ–°æ•°æ®
+	 * ´Ó session ÖĞÉ¾³ıÖ¸¶¨ÊôĞÔÖµ£¬µ±ËùÓĞµÄ±äÁ¿¶¼É¾³ı
+	 * Ê±»á½«Õû¸ö¶ÔÏó´Ó memcached ÖĞÉ¾³ı
+	 * @param name {const char*} session ÊôĞÔÃû£¬·Ç¿Õ
+	 * @return {bool} true ±íÊ¾³É¹¦(º¬²»´æÔÚÇé¿ö)£¬false ±íÊ¾É¾³ıÊ§°Ü
+	 *  ×¢£ºµ±²ÉÓÃÑÓ³Ù·½Ê½É¾³ıÄ³¸öÊôĞÔÊ±£¬ÔòÑÓ³Ù·¢ËÍ¸üĞÂÖ¸Áîµ½ºó¶ËµÄ
+	 *  »º´æ·şÎñÆ÷£¬µ±ÓÃ»§µ÷ÓÃÁË session::flush ºóÔÙ½øĞĞÊı¾İ¸üĞÂ£¬Õâ
+	 *  Ñù¿ÉÒÔÌá¸ß´«ÊäĞ§ÂÊ£»·ñÔò£¬ÔòÁ¢¿Ì¸üĞÂÊı¾İ
 	 */
 	virtual bool del_delay(const char* name);
 	virtual bool del(const char* name);
 
 	/**
-	 * é‡æ–°è®¾ç½® session åœ¨ç¼“å­˜æœåŠ¡å™¨ä¸Šçš„ç¼“å­˜æ—¶é—´
-	 * @param ttl {time_t} ç”Ÿå­˜å‘¨æœŸ(ç§’)
-	 * @param delay {bool} å½“ä¸º true æ—¶ï¼Œåˆ™å»¶è¿Ÿå‘é€æ›´æ–°æŒ‡ä»¤åˆ°åç«¯çš„
-	 *  ç¼“å­˜æœåŠ¡å™¨ï¼Œå½“ç”¨æˆ·è°ƒç”¨äº† session::flush åå†è¿›è¡Œæ•°æ®æ›´æ–°ï¼Œè¿™
-	 *  æ ·å¯ä»¥æé«˜ä¼ è¾“æ•ˆç‡ï¼›å½“ä¸º false æ—¶ï¼Œåˆ™ç«‹åˆ»æ›´æ–°æ•°æ®
-	 * @return {bool} è®¾ç½®æ˜¯å¦æˆåŠŸ
+	 * ÖØĞÂÉèÖÃ session ÔÚ»º´æ·şÎñÆ÷ÉÏµÄ»º´æÊ±¼ä
+	 * @param ttl {time_t} Éú´æÖÜÆÚ(Ãë)
+	 * @param delay {bool} µ±Îª true Ê±£¬ÔòÑÓ³Ù·¢ËÍ¸üĞÂÖ¸Áîµ½ºó¶ËµÄ
+	 *  »º´æ·şÎñÆ÷£¬µ±ÓÃ»§µ÷ÓÃÁË session::flush ºóÔÙ½øĞĞÊı¾İ¸üĞÂ£¬Õâ
+	 *  Ñù¿ÉÒÔÌá¸ß´«ÊäĞ§ÂÊ£»µ±Îª false Ê±£¬ÔòÁ¢¿Ì¸üĞÂÊı¾İ
+	 * @return {bool} ÉèÖÃÊÇ·ñ³É¹¦
 	 */
 	bool set_ttl(time_t ttl, bool delay);
 
 	/**
-	 * è·å¾—æœ¬ session å¯¹è±¡ä¸­è®°å½•çš„ session ç”Ÿå­˜å‘¨æœŸï¼›è¯¥å€¼æœ‰å¯èƒ½
-	 * ä¸çœŸæ­£å­˜å‚¨åœ¨ç¼“å­˜æœåŠ¡å™¨çš„æ—¶é—´ä¸ä¸€è‡´ï¼Œå› ä¸ºæœ‰å¯èƒ½å…¶å®ƒçš„å®ä¾‹
-	 * é‡æ–°è®¾ç½®äº† session åœ¨ç¼“å­˜æœåŠ¡å™¨ä¸Šçš„ç”Ÿå­˜å‘¨æœŸ
+	 * »ñµÃ±¾ session ¶ÔÏóÖĞ¼ÇÂ¼µÄ session Éú´æÖÜÆÚ£»¸ÃÖµÓĞ¿ÉÄÜ
+	 * ÓëÕæÕı´æ´¢ÔÚ»º´æ·şÎñÆ÷µÄÊ±¼ä²»Ò»ÖÂ£¬ÒòÎªÓĞ¿ÉÄÜÆäËüµÄÊµÀı
+	 * ÖØĞÂÉèÖÃÁË session ÔÚ»º´æ·şÎñÆ÷ÉÏµÄÉú´æÖÜÆÚ
 	 * @return {time_t}
 	 */
 	time_t get_ttl(void) const
@@ -163,57 +163,57 @@ public:
 	}
 
 	/**
-	 * ä½¿ session ä»æœåŠ¡ç«¯çš„ç¼“å­˜ä¸­åˆ é™¤å³ä½¿ session å¤±æ•ˆ
-	 * @return {bool} æ˜¯å¦ä½¿ session å¤±æ•ˆ
+	 * Ê¹ session ´Ó·şÎñ¶ËµÄ»º´æÖĞÉ¾³ı¼´Ê¹ session Ê§Ğ§
+	 * @return {bool} ÊÇ·ñÊ¹ session Ê§Ğ§
 	 */
 	virtual bool remove(void) = 0;
 
 	/**
-	 * ä»åç«¯ç¼“å­˜ä¸­è·å¾—å¯¹åº” sid çš„å±æ€§å¯¹è±¡é›†åˆ
+	 * ´Óºó¶Ë»º´æÖĞ»ñµÃ¶ÔÓ¦ sid µÄÊôĞÔ¶ÔÏó¼¯ºÏ
 	 * @param attrs {std::map<string, session_string>&}
 	 * @return {bool}
 	 */
 	virtual bool get_attrs(std::map<string, session_string>& attrs) = 0;
 
 	/**
-	 * ä»åç«¯ç¼“å­˜ä¸­è·å¾—å¯¹åº” sid çš„æŒ‡å®šå±æ€§é›†åˆ
-	 * @param names {const std::vector<string>&} å±æ€§åé›†åˆ
-	 * @param values {std::vector<session_string>&} å­˜å‚¨å¯¹åº”çš„å±æ€§å€¼ç»“æœé›†
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * ´Óºó¶Ë»º´æÖĞ»ñµÃ¶ÔÓ¦ sid µÄÖ¸¶¨ÊôĞÔ¼¯ºÏ
+	 * @param names {const std::vector<string>&} ÊôĞÔÃû¼¯ºÏ
+	 * @param values {std::vector<session_string>&} ´æ´¢¶ÔÓ¦µÄÊôĞÔÖµ½á¹û¼¯
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 */
 	virtual bool get_attrs(const std::vector<string>& names,
 		std::vector<session_string>& values);
 
 	/**
-	 * å‘åç«¯ç¼“å­˜å†™å…¥å¯¹åº” sid çš„å±æ€§å¯¹è±¡é›†åˆ
+	 * Ïòºó¶Ë»º´æĞ´Èë¶ÔÓ¦ sid µÄÊôĞÔ¶ÔÏó¼¯ºÏ
 	 * @param attrs {std::map<string, session_string>&}
 	 * @return {bool}
 	 */
 	virtual bool set_attrs(const std::map<string, session_string>& attrs) = 0;
 
 protected:
-	// è®¾ç½®å¯¹åº” sid æ•°æ®çš„è¿‡æœŸæ—¶é—´
+	// ÉèÖÃ¶ÔÓ¦ sid Êı¾İµÄ¹ıÆÚÊ±¼ä
 	virtual bool set_timeout(time_t ttl) = 0;
 
 protected:
-	// å°† session æ•°æ®åºåˆ—åŒ–
+	// ½« session Êı¾İĞòÁĞ»¯
 	static void serialize(const std::map<string, session_string>& attrs,
 		string& out);
 
-	// å°† session æ•°æ®ååºåˆ—åŒ–
+	// ½« session Êı¾İ·´ĞòÁĞ»¯
 	static void deserialize(string& buf,
 		std::map<string, session_string>& attrs);
 
-	// æ¸…ç©º session å±æ€§é›†åˆ
+	// Çå¿Õ session ÊôĞÔ¼¯ºÏ
 	static void attrs_clear(std::map<string, session_string>& attrs);
 
 protected:
 	session_string sid_;
 	time_t ttl_;
 
-	// è¯¥å˜é‡ä¸»è¦ç”¨åœ¨ set_ttl å‡½æ•°ä¸­ï¼Œå¦‚æœæ¨æµ‹è¯¥ sid_ åªæ˜¯æ–°äº§ç”Ÿçš„
-	// ä¸”è¿˜æ²¡æœ‰åœ¨åç«¯ cache æœåŠ¡ç«¯å­˜å‚¨ï¼Œåˆ™ set_ttl ä¸ä¼šç«‹å³æ›´æ–°åç«¯
-	// çš„ cache æœåŠ¡å™¨
+	// ¸Ã±äÁ¿Ö÷ÒªÓÃÔÚ set_ttl º¯ÊıÖĞ£¬Èç¹ûÍÆ²â¸Ã sid_ Ö»ÊÇĞÂ²úÉúµÄ
+	// ÇÒ»¹Ã»ÓĞÔÚºó¶Ë cache ·şÎñ¶Ë´æ´¢£¬Ôò set_ttl ²»»áÁ¢¼´¸üĞÂºó¶Ë
+	// µÄ cache ·şÎñÆ÷
 	bool sid_saved_;
 	bool dirty_;
 	std::map<string, session_string> attrs_;

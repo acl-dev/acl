@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class http_job : public acl::thread_job
 {
@@ -7,11 +7,11 @@ public:
 		const char* dns_ip, int dns_port);
 
 private:
-	// è¦æ±‚ç±»å®ä¾‹å¿…é¡»æ˜¯åŠ¨æ€åˆ›å»º
+	// ÒªÇóÀàÊµÀı±ØĞëÊÇ¶¯Ì¬´´½¨
 	~http_job();
 
 protected:
-	// åŸºç±»çº¯è™šå‡½æ•°
+	// »ùÀà´¿Ğéº¯Êı
 	virtual void* run();
 	
 private:

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class guard_action : public acl::thread_job
 {

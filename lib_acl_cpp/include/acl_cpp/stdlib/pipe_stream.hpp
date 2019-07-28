@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <list>
 #include "noncopyable.hpp"
@@ -7,8 +7,8 @@
 namespace acl {
 
 /**
- * åŒå‘è¾“å…¥è¾“å‡ºç¼“å†²ç®¡é“æµ, è¯¥æµä¸ä»…å¯æŽ¥æ”¶è¾“å…¥æ•°æ®ï¼ŒåŒæ—¶è¿˜å¯è¾“å‡ºæ‰€
- * è¾“å…¥çš„æ•°æ®ï¼Œçº¯è™šåŸºç±»ï¼Œå­ç±»éœ€è¦å®žçŽ°ä¸‰ä¸ªæŽ¥å£å‡½æ•°
+ * Ë«ÏòÊäÈëÊä³ö»º³å¹ÜµÀÁ÷, ¸ÃÁ÷²»½ö¿É½ÓÊÕÊäÈëÊý¾Ý£¬Í¬Ê±»¹¿ÉÊä³öËù
+ * ÊäÈëµÄÊý¾Ý£¬´¿Ðé»ùÀà£¬×ÓÀàÐèÒªÊµÏÖÈý¸ö½Ó¿Úº¯Êý
  */
 class ACL_CPP_API pipe_stream : public noncopyable
 {
@@ -17,34 +17,34 @@ public:
 	virtual ~pipe_stream() {}
 
 	/**
-	 * æ•°æ®è¾“å…¥è¾“å‡ºæŽ¥å£
-	 * @param in {const char*} è¾“å…¥æ•°æ®çš„åœ°å€
-	 * @param len {size_t} è¾“å…¥æ•°æ®é•¿åº¦
-	 * @param out {string*} å­˜å‚¨è¾“å‡ºç»“æžœç¼“å†²åŒºï¼Œä¸èƒ½ä¸ºç©º
-	 * @param max {size_t} å¸Œæœ›æŽ¥æ”¶åˆ°è¾“å‡ºç»“æžœçš„é•¿åº¦é™åˆ¶ï¼Œå¦‚æžœä¸º0åˆ™
-	 *  è¡¨ç¤ºæ²¡æœ‰é™åˆ¶ï¼Œè¾“å‡ºç»“æžœéƒ½å­˜å‚¨åœ¨ out ç¼“å†²åŒºä¸­
-	 * @return {int} è¾“å‡ºæ•°æ®çš„é•¿åº¦ï¼Œå¦‚æžœ < 0 åˆ™è¡¨ç¤ºå‡ºé”™
+	 * Êý¾ÝÊäÈëÊä³ö½Ó¿Ú
+	 * @param in {const char*} ÊäÈëÊý¾ÝµÄµØÖ·
+	 * @param len {size_t} ÊäÈëÊý¾Ý³¤¶È
+	 * @param out {string*} ´æ´¢Êä³ö½á¹û»º³åÇø£¬²»ÄÜÎª¿Õ
+	 * @param max {size_t} Ï£Íû½ÓÊÕµ½Êä³ö½á¹ûµÄ³¤¶ÈÏÞÖÆ£¬Èç¹ûÎª0Ôò
+	 *  ±íÊ¾Ã»ÓÐÏÞÖÆ£¬Êä³ö½á¹û¶¼´æ´¢ÔÚ out »º³åÇøÖÐ
+	 * @return {int} Êä³öÊý¾ÝµÄ³¤¶È£¬Èç¹û < 0 Ôò±íÊ¾³ö´í
 	 */
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0) = 0;
 
 	/**
-	 * æœ€åŽå¤„ç†çš„è¾“å‡ºæ•°æ®æŽ¥å£
-	 * @param out {string*} å­˜å‚¨è¾“å‡ºç»“æžœç¼“å†²åŒºï¼Œä¸èƒ½ä¸ºç©º
-	 * @param max {size_t} å¸Œæœ›æŽ¥æ”¶åˆ°è¾“å‡ºç»“æžœçš„é•¿åº¦é™åˆ¶ï¼Œå¦‚æžœä¸º0åˆ™
-	 *  è¡¨ç¤ºæ²¡æœ‰é™åˆ¶ï¼Œè¾“å‡ºç»“æžœéƒ½å­˜å‚¨åœ¨ out ç¼“å†²åŒºä¸­
-	 * @return {int} è¾“å‡ºæ•°æ®çš„é•¿åº¦ï¼Œå¦‚æžœ < 0 åˆ™è¡¨ç¤ºå‡ºé”™
+	 * ×îºó´¦ÀíµÄÊä³öÊý¾Ý½Ó¿Ú
+	 * @param out {string*} ´æ´¢Êä³ö½á¹û»º³åÇø£¬²»ÄÜÎª¿Õ
+	 * @param max {size_t} Ï£Íû½ÓÊÕµ½Êä³ö½á¹ûµÄ³¤¶ÈÏÞÖÆ£¬Èç¹ûÎª0Ôò
+	 *  ±íÊ¾Ã»ÓÐÏÞÖÆ£¬Êä³ö½á¹û¶¼´æ´¢ÔÚ out »º³åÇøÖÐ
+	 * @return {int} Êä³öÊý¾ÝµÄ³¤¶È£¬Èç¹û < 0 Ôò±íÊ¾³ö´í
 	 */
 	virtual int pop_end(string* out, size_t max = 0) = 0;
 
 	/**
-	 * æ¸…ç©ºå†…éƒ¨ç¼“å†²åŒº
+	 * Çå¿ÕÄÚ²¿»º³åÇø
 	 */
 	virtual void clear() {}
 };
 
 /**
- * å­—ç¬¦ä¸²å¤„ç†åŒå‘ç®¡ç†æµ
+ * ×Ö·û´®´¦ÀíË«Ïò¹ÜÀíÁ÷
  */
 class ACL_CPP_API pipe_string : public pipe_stream
 {
@@ -53,7 +53,7 @@ public:
 	pipe_string(string& s);
 	virtual ~pipe_string();
 
-	// pipe_stream åŸºç±»ä¸­çš„å››ä¸ªè™šå‡½æ•°
+	// pipe_stream »ùÀàÖÐµÄËÄ¸öÐéº¯Êý
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
@@ -90,9 +90,9 @@ private:
 };
 
 /**
- * ç®¡é“æµç®¡ç†å™¨ï¼Œè¯¥ç±»ç®¡ç†æ‰€æœ‰çš„ç®¡ç†æµï¼Œå°†æ•°æ®ä¾æ¬¡ä¼ é€’ç»™æ‰€æœ‰ç®¡ç†æµçš„
- * è¾“å…¥æŽ¥å£ï¼ŒåŒæ—¶ä»Žæ‰€æœ‰ç®¡é“æµçš„è¾“å‡ºæŽ¥å£ä¸­èŽ·å¾—æ•°æ®ç„¶åŽå†å°†æ•°æ®ä¼ é€’ç»™
- * ä¸‹ä¸€ä¸ªç®¡é“æµçš„è¾“å…¥æŽ¥å£ï¼Œä»¥æ­¤ç±»æŽ¨ï¼Œç›´åˆ°æœ€åŽä¸€ä¸ªç®¡é“æµ
+ * ¹ÜµÀÁ÷¹ÜÀíÆ÷£¬¸ÃÀà¹ÜÀíËùÓÐµÄ¹ÜÀíÁ÷£¬½«Êý¾ÝÒÀ´Î´«µÝ¸øËùÓÐ¹ÜÀíÁ÷µÄ
+ * ÊäÈë½Ó¿Ú£¬Í¬Ê±´ÓËùÓÐ¹ÜµÀÁ÷µÄÊä³ö½Ó¿ÚÖÐ»ñµÃÊý¾ÝÈ»ºóÔÙ½«Êý¾Ý´«µÝ¸ø
+ * ÏÂÒ»¸ö¹ÜµÀÁ÷µÄÊäÈë½Ó¿Ú£¬ÒÔ´ËÀàÍÆ£¬Ö±µ½×îºóÒ»¸ö¹ÜµÀÁ÷
  */
 class ACL_CPP_API pipe_manager : public noncopyable
 {
@@ -101,36 +101,36 @@ public:
 	~pipe_manager();
 
 	/**
-	 * ä»¥å°¾éƒ¨æ·»åŠ çš„æ–¹å¼æ³¨å†Œæ–°çš„ç®¡é“æµå¤„ç†å™¨
-	 * @param stream {pipe_stream*} ç®¡é“æµå¤„ç†å™¨å¯¹è±¡
-	 * @return {bool} å¦‚æžœè¯¥ç®¡é“æµå¤„ç†å™¨å¯¹è±¡å·²ç»å­˜åœ¨åˆ™è¿”å›ž false
+	 * ÒÔÎ²²¿Ìí¼ÓµÄ·½Ê½×¢²áÐÂµÄ¹ÜµÀÁ÷´¦ÀíÆ÷
+	 * @param stream {pipe_stream*} ¹ÜµÀÁ÷´¦ÀíÆ÷¶ÔÏó
+	 * @return {bool} Èç¹û¸Ã¹ÜµÀÁ÷´¦ÀíÆ÷¶ÔÏóÒÑ¾­´æÔÚÔò·µ»Ø false
 	 */
 	bool push_back(pipe_stream* stream);
 
 	/**
-	 * ä»¥å¤´éƒ¨æ·»åŠ çš„æ–¹å¼æ³¨å†Œæ–°çš„ç®¡é“æµå¤„ç†å™¨
-	 * @param stream {pipe_stream*} ç®¡é“æµå¤„ç†å™¨å¯¹è±¡
-	 * @return {bool} å¦‚æžœè¯¥ç®¡é“æµå¤„ç†å™¨å¯¹è±¡å·²ç»å­˜åœ¨åˆ™è¿”å›ž false
+	 * ÒÔÍ·²¿Ìí¼ÓµÄ·½Ê½×¢²áÐÂµÄ¹ÜµÀÁ÷´¦ÀíÆ÷
+	 * @param stream {pipe_stream*} ¹ÜµÀÁ÷´¦ÀíÆ÷¶ÔÏó
+	 * @return {bool} Èç¹û¸Ã¹ÜµÀÁ÷´¦ÀíÆ÷¶ÔÏóÒÑ¾­´æÔÚÔò·µ»Ø false
 	 */
 	bool push_front(pipe_stream* stream);
 
 	/**
-	 * åº”ç”¨å‘ç®¡é“æµç®¡ç†å™¨æ·»åŠ æ–°æ•°æ®ï¼Œç”±è¯¥ç®¡ç†å™¨ä¾æ¬¡ä¼ é€’ç»™æ‰€æœ‰å·²æ³¨å†Œç®¡é“æµ
-	 * å¤„ç†å™¨ï¼ŒåŒæ—¶ä»Žå·²æ³¨å†Œç®¡é“æµå¤„ç†å™¨æŽ¥æ”¶å¤„ç†ç»“æžœï¼Œä¾æ¬¡ä¼ é€’ç»™ä¸‹ä¸€ä¸ª
-	 * @param src {const char*} å¾…å¤„ç†çš„æ•°æ®åœ°å€
-	 * @param len {size_t} src æ•°æ®é•¿åº¦
-	 * @param out {pipe_stream*} å¦‚æžœéžç©ºï¼Œåˆ™è¯¥ç®¡é“å¤„ç†å™¨å°†æ˜¯æœ€åŽä¸€ä¸ªåªæŽ¥æ”¶
-	 *  è¾“å…¥è€Œä¸è¿›è¡Œè¾“å‡ºçš„ç®¡é“å¤„ç†å™¨
-	 * @return {bool} æ˜¯å¦æœ‰é”™è¯¯å‘ç”Ÿ
+	 * Ó¦ÓÃÏò¹ÜµÀÁ÷¹ÜÀíÆ÷Ìí¼ÓÐÂÊý¾Ý£¬ÓÉ¸Ã¹ÜÀíÆ÷ÒÀ´Î´«µÝ¸øËùÓÐÒÑ×¢²á¹ÜµÀÁ÷
+	 * ´¦ÀíÆ÷£¬Í¬Ê±´ÓÒÑ×¢²á¹ÜµÀÁ÷´¦ÀíÆ÷½ÓÊÕ´¦Àí½á¹û£¬ÒÀ´Î´«µÝ¸øÏÂÒ»¸ö
+	 * @param src {const char*} ´ý´¦ÀíµÄÊý¾ÝµØÖ·
+	 * @param len {size_t} src Êý¾Ý³¤¶È
+	 * @param out {pipe_stream*} Èç¹û·Ç¿Õ£¬Ôò¸Ã¹ÜµÀ´¦ÀíÆ÷½«ÊÇ×îºóÒ»¸öÖ»½ÓÊÕ
+	 *  ÊäÈë¶ø²»½øÐÐÊä³öµÄ¹ÜµÀ´¦ÀíÆ÷
+	 * @return {bool} ÊÇ·ñÓÐ´íÎó·¢Éú
 	 */
 	bool update(const char* src, size_t len, pipe_stream* out = NULL);
 
 	/**
-	 * æœ€åŽå¿…é¡»è°ƒç”¨ä¸€æ¬¡è¯¥å‡½æ•°ï¼Œä»¥ä½¿æœ‰äº›ç®¡é“çš„ç¼“å†²åŒºé‡Œçš„æ•°æ®å¯ä»¥ä¸€æ¬¡æ€§åœ°
-	 * åˆ·æ–°è‡³æœ€åŽçš„ç®¡é“ä¸­
-	 * @param out {pipe_stream*} å¦‚æžœéžç©ºï¼Œåˆ™è¯¥ç®¡é“å¤„ç†å™¨å°†æ˜¯æœ€åŽä¸€ä¸ªåªæŽ¥æ”¶
-	 *  è¾“å…¥è€Œä¸è¿›è¡Œè¾“å‡ºçš„ç®¡é“å¤„ç†å™¨
-	 * @return {bool} æ˜¯å¦æœ‰é”™è¯¯å‘ç”Ÿ
+	 * ×îºó±ØÐëµ÷ÓÃÒ»´Î¸Ãº¯Êý£¬ÒÔÊ¹ÓÐÐ©¹ÜµÀµÄ»º³åÇøÀïµÄÊý¾Ý¿ÉÒÔÒ»´ÎÐÔµØ
+	 * Ë¢ÐÂÖÁ×îºóµÄ¹ÜµÀÖÐ
+	 * @param out {pipe_stream*} Èç¹û·Ç¿Õ£¬Ôò¸Ã¹ÜµÀ´¦ÀíÆ÷½«ÊÇ×îºóÒ»¸öÖ»½ÓÊÕ
+	 *  ÊäÈë¶ø²»½øÐÐÊä³öµÄ¹ÜµÀ´¦ÀíÆ÷
+	 * @return {bool} ÊÇ·ñÓÐ´íÎó·¢Éú
 	 */
 	bool update_end(pipe_stream* out = NULL);
 

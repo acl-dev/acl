@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "daemon/version.h"
 #include "action/action.h"
 #include "master_ctld_version.h"
@@ -54,7 +54,7 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
 
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	res.write(buf);
@@ -67,7 +67,7 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
 	res.write(buf);
@@ -92,9 +92,9 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
-	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
-	// memcached æœåŠ¡æ­£å¸¸å·¥ä½œ
+	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
+	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
+	// memcached ·şÎñÕı³£¹¤×÷
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0)
@@ -102,15 +102,15 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	// å¦‚æœéœ€è¦å–å¾—æµè§ˆå™¨ cookie è¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Š
+	// Èç¹ûĞèÒªÈ¡µÃä¯ÀÀÆ÷ cookie Çë´ò¿ªÏÂÃæ×¢ÊÍ
 	/*
 	
 	*/
 
-	res.setContentType("text/xml; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
-		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
-		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
-		.setChunkedTransferEncoding(false);	// chunk ä¼ è¾“æ–¹å¼
+	res.setContentType("text/xml; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
+		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
+		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
+		.setChunkedTransferEncoding(false);	// chunk ´«Êä·½Ê½
 
 	const char* cmd = req.getParameter("cmd");
 	if (cmd == NULL || *cmd == 0)

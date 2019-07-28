@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	attr_print_plain 3
  * SUMMARY

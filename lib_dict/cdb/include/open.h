@@ -1,4 +1,4 @@
-﻿#ifndef OPEN_H
+#ifndef OPEN_H
 #define OPEN_H
 
 extern int open_read(char *);

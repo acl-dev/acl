@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "service.h"
 #include "http_service.h"
@@ -113,10 +113,10 @@ int http_client_req_filter(HTTP_CLIENT *http_client)
 	ACL_ITER iter;
 	int   ret = 0;
 
-	/* xxx: plugin_req_ctx è¯¥å‚æ•°åœ¨æ¯æ¬¡è¯·æ±‚éƒ½æœ‰å¯èƒ½ä¸ä¸€æ ·, å¤–æŒ‚æ¨¡å—åº”è¯¥è‡ªè¡Œç®¡ç† */
+	/* xxx: plugin_req_ctx ¸Ã²ÎÊıÔÚÃ¿´ÎÇëÇó¶¼ÓĞ¿ÉÄÜ²»Ò»Ñù, Íâ¹ÒÄ£¿éÓ¦¸Ã×ÔĞĞ¹ÜÀí */
 	http_client->plugin_req_ctx = NULL;
 
-	/* æ£€æŸ¥ç”¨æˆ·è‡ªå®šä¹‰è¿‡æ»¤å™¨ */
+	/* ¼ì²éÓÃ»§×Ô¶¨Òå¹ıÂËÆ÷ */
 
 	acl_foreach(iter, &service->request_plugins) {
 		HTTP_PLUGIN *tmp = (HTTP_PLUGIN*) iter.data;
@@ -132,7 +132,7 @@ int http_client_req_filter(HTTP_CLIENT *http_client)
 		}
 	}
 
-	/* è¿”å› 0 è¡¨ç¤ºç”¨æˆ·è‡ªå®šä¹‰è¿‡æ»¤å™¨ä¸å‡†å¤‡æ¥ç®¡è¯¥è¯·æ±‚ */
+	/* ·µ»Ø 0 ±íÊ¾ÓÃ»§×Ô¶¨Òå¹ıÂËÆ÷²»×¼±¸½Ó¹Ü¸ÃÇëÇó */
 	if (plugin == NULL || ret == 0)
 		return (0);
 
@@ -140,7 +140,7 @@ int http_client_req_filter(HTTP_CLIENT *http_client)
 	stream = acl_aio_vstream(astream);
 
 	if (ret < 0) {
-		/* è¿”å›è´Ÿå€¼è¡¨ç¤ºç¦æ­¢è¯¥è¯·æ±‚ï¼Œå¯ä»¥ä¸ºï¼š-4xx, -5xx */
+		/* ·µ»Ø¸ºÖµ±íÊ¾½ûÖ¹¸ÃÇëÇó£¬¿ÉÒÔÎª£º-4xx, -5xx */
 
 		acl_aio_refer(astream);
 
@@ -176,28 +176,28 @@ int http_client_req_filter(HTTP_CLIENT *http_client)
 
 	plugin_req_ctx = http_client->plugin_req_ctx;
 
-	/* é‡Šæ”¾æ‰å¼‚æ­¥æµç›¸å…³çš„å¯¹è±¡, å°†å®¢æˆ·ç«¯æ•°æ®æµä¸è¯¥ä»£ç†å¯¹è±¡åˆ†ç¦»,
-	 * å› ä¸ºæ­¤æ—¶ä¸ºè¯·æ±‚æ—¶çš„è¿‡æ»¤å™¨ï¼Œæ‰€ä»¥åªæœ‰è¯·æ±‚ç«¯æ²¡æœ‰å“åº”ç«¯ï¼Œåˆ™
-	 * è°ƒç”¨ client_entry_detach åä¼šå› ä¸ºå¼•ç”¨è®¡æ•°ä¸º0è€Œè‡ªåŠ¨å°†
-	 * http_client é‡Šæ”¾
+	/* ÊÍ·ÅµôÒì²½Á÷Ïà¹ØµÄ¶ÔÏó, ½«¿Í»§¶ËÊı¾İÁ÷Óë¸Ã´úÀí¶ÔÏó·ÖÀë,
+	 * ÒòÎª´ËÊ±ÎªÇëÇóÊ±µÄ¹ıÂËÆ÷£¬ËùÒÔÖ»ÓĞÇëÇó¶ËÃ»ÓĞÏìÓ¦¶Ë£¬Ôò
+	 * µ÷ÓÃ client_entry_detach ºó»áÒòÎªÒıÓÃ¼ÆÊıÎª0¶ø×Ô¶¯½«
+	 * http_client ÊÍ·Å
 	 */
 	client_entry_detach(&http_client->entry, stream);
 
-	/* å…³é—­è¯»ç›‘å¬äº‹ä»¶ */
+	/* ¹Ø±Õ¶Á¼àÌıÊÂ¼ş */
 	acl_aio_disable_read(astream);
-	/* æ¸…é™¤å›è°ƒå‡½æ•° */
+	/* Çå³ı»Øµ÷º¯Êı */
 	acl_aio_clean_hooks(astream);
 
-	/* å°†å®¢æˆ·ç«¯å¼‚æ­¥æµçš„æ•°æ®æµç½®ç©º */
+	/* ½«¿Í»§¶ËÒì²½Á÷µÄÊı¾İÁ÷ÖÃ¿Õ */
 	acl_aio_ctl(astream, ACL_AIO_CTL_STREAM, NULL, ACL_AIO_CTL_END);
 
-	/* xxx: å¼‚æ­¥å…³é—­ astream å¼‚æ­¥æµ */
+	/* xxx: Òì²½¹Ø±Õ astream Òì²½Á÷ */
 	acl_aio_iocp_close(astream);
 
-	/* å¿…é¡»æµç”±éé˜»å¡æ¨¡å¼è½¬æ¢ä¸ºé˜»å¡æ¨¡å¼ */
+	/* ±ØĞëÁ÷ÓÉ·Ç×èÈûÄ£Ê½×ª»»Îª×èÈûÄ£Ê½ */
 	acl_non_blocking(ACL_VSTREAM_SOCK(stream), ACL_BLOCKING);
 
-	/* è½¬ç»™ç”¨æˆ·è‡ªå®šä¹‰å¤„ç†è¿‡ç¨‹ */
+	/* ×ª¸øÓÃ»§×Ô¶¨Òå´¦Àí¹ı³Ì */
 	plugin->forward.request(stream, hdr_req, plugin_req_ctx);
 	return (1);
 }

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 class http_servlet : public acl::HttpServlet
 {

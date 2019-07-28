@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <stdio.h>
 #include <string.h>
 #ifndef ACL_PREPARE_COMPILE
@@ -45,7 +45,7 @@ static const char *json_root(ACL_JSON *json, const char *data)
 	return data;
 }
 
-/* åˆ†æèŠ‚ç‚¹å¯¹è±¡å€¼ï¼Œå¿…é¡»æ‰¾åˆ° '{' æˆ– '[' */
+/* ·ÖÎö½Úµã¶ÔÏóÖµ£¬±ØĞëÕÒµ½ '{' »ò '[' */
 
 static const char *json_obj(ACL_JSON *json, const char *data)
 {
@@ -55,7 +55,7 @@ static const char *json_obj(ACL_JSON *json, const char *data)
 	if (*data == 0)
 		return data;
 
-	/* åˆ›å»ºå¯¹è±¡ '{}' å­èŠ‚ç‚¹ */
+	/* ´´½¨¶ÔÏó '{}' ×Ó½Úµã */
 
 	obj = acl_json_node_alloc(json);
 	obj->type = ACL_JSON_T_OBJ;
@@ -63,7 +63,7 @@ static const char *json_obj(ACL_JSON *json, const char *data)
 	if (obj->depth > json->depth)
 		json->depth = obj->depth;
 
-	/* æ ¹æ® json èŠ‚ç‚¹å¯¹è±¡å‰ç¼€çš„ä¸åŒï¼Œè®°å½•ä¸åŒçš„å¯¹è±¡åç¼€ */
+	/* ¸ù¾İ json ½Úµã¶ÔÏóÇ°×ºµÄ²»Í¬£¬¼ÇÂ¼²»Í¬µÄ¶ÔÏóºó×º */
 	obj->left_ch = '{';
 	obj->right_ch = '}';
 
@@ -80,7 +80,7 @@ static const char *json_obj(ACL_JSON *json, const char *data)
 
 static const char *json_member(ACL_JSON *json, const char *data)
 {
-	/* åˆ›å»ºä¸Šé¢æ‰€å»ºå¯¹è±¡èŠ‚ç‚¹çš„æˆå‘˜å¯¹è±¡ */
+	/* ´´½¨ÉÏÃæËù½¨¶ÔÏó½ÚµãµÄ³ÉÔ±¶ÔÏó */
 	ACL_JSON_NODE *member = acl_json_node_alloc(json);
 
 	member->type = ACL_JSON_T_MEMBER;
@@ -90,14 +90,14 @@ static const char *json_member(ACL_JSON *json, const char *data)
 
 	acl_json_node_add_child(json->curr_node, member);
 
-	/* å°†è¯¥æˆå‘˜å¯¹è±¡ç½®ä¸ºå½“å‰ JSON åˆ†æèŠ‚ç‚¹ */
+	/* ½«¸Ã³ÉÔ±¶ÔÏóÖÃÎªµ±Ç° JSON ·ÖÎö½Úµã */
 	json->curr_node = member;
 	json->status = ACL_JSON_S_PAIR;
 
 	return data;
 }
 
-/* è§£æèŠ‚ç‚¹çš„æ ‡ç­¾åç§°ï¼ŒèŠ‚ç‚¹å…è®¸æ²¡æœ‰æ ‡ç­¾åï¼›å¶èŠ‚ç‚¹æ²¡æœ‰ { } [ ] åˆ†éš”ç¬¦ */
+/* ½âÎö½ÚµãµÄ±êÇ©Ãû³Æ£¬½ÚµãÔÊĞíÃ»ÓĞ±êÇ©Ãû£»Ò¶½ÚµãÃ»ÓĞ { } [ ] ·Ö¸ô·û */
 
 static const char *json_pair(ACL_JSON *json, const char *data)
 {
@@ -109,22 +109,22 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 
 	acl_assert(parent);
 
-	/* å¦‚æœå½“å‰å­—ç¬¦ä¸ºçˆ¶èŠ‚ç‚¹çš„å³åˆ†éš”ç¬¦ï¼Œåˆ™è¡¨ç¤ºçˆ¶èŠ‚ç‚¹ç»“æŸ */
+	/* Èç¹ûµ±Ç°×Ö·ûÎª¸¸½ÚµãµÄÓÒ·Ö¸ô·û£¬Ôò±íÊ¾¸¸½Úµã½áÊø */
 	if (*data == parent->right_ch) {
-		data++;  /* å»æ‰çˆ¶èŠ‚ç‚¹çš„å³åˆ†éš”ç¬¦ */
+		data++;  /* È¥µô¸¸½ÚµãµÄÓÒ·Ö¸ô·û */
 		if (parent == json->root) {
-			/* å¦‚æœæ ¹èŠ‚ç‚¹åˆ†æç»“æŸåˆ™æ•´ä¸ª json åˆ†æå®Œæ¯• */
+			/* Èç¹û¸ù½Úµã·ÖÎö½áÊøÔòÕû¸ö json ·ÖÎöÍê±Ï */
 			json->finish = 1;
 			return data;
 		}
-		/* å¼¹å‡ºçˆ¶èŠ‚ç‚¹ */
+		/* µ¯³ö¸¸½Úµã */
 		json->curr_node = parent;
-		/* æŸ¥è¯¢çˆ¶èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹ */
+		/* ²éÑ¯¸¸½ÚµãµÄÏÂÒ»¸öĞÖµÜ½Úµã */
 		json->status = ACL_JSON_S_NEXT;
 		return data;
 	}
 
-	/* ä¸º '{' æˆ– '[' æ—¶è¯´æ˜é‡åˆ°äº†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
+	/* Îª '{' »ò '[' Ê±ËµÃ÷Óöµ½ÁËµ±Ç°½ÚµãµÄ×Ó½Úµã */
 	if (*data == '{') {
 		data++;
 		json->status = ACL_JSON_S_OBJ;
@@ -136,7 +136,7 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 		return data;
 	}
 
-	/* å¦‚æœæ ‡ç­¾åå‰æœ‰å¼•å·ï¼Œè®°å½•ä¸‹è¯¥å¼•å· */
+	/* Èç¹û±êÇ©ÃûÇ°ÓĞÒıºÅ£¬¼ÇÂ¼ÏÂ¸ÃÒıºÅ */
 	if (IS_QUOTE(*data) && json->curr_node->quote == 0)
 		json->curr_node->quote = *data++;
 
@@ -146,7 +146,7 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 	return data;
 }
 
-/* è§£æèŠ‚ç‚¹çš„æ ‡ç­¾åç§°ï¼ŒèŠ‚ç‚¹å…è®¸æ²¡æœ‰æ ‡ç­¾åï¼›å¶èŠ‚ç‚¹æ²¡æœ‰ { } [ ] åˆ†éš”ç¬¦ */
+/* ½âÎö½ÚµãµÄ±êÇ©Ãû³Æ£¬½ÚµãÔÊĞíÃ»ÓĞ±êÇ©Ãû£»Ò¶½ÚµãÃ»ÓĞ { } [ ] ·Ö¸ô·û */
 
 static const char *json_tag(ACL_JSON *json, const char *data)
 {
@@ -154,7 +154,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 	int   ch;
 
 	while ((ch = *data) != 0) {
-		/* å¦‚æœå‰é¢æœ‰å¼•å·ï¼Œåˆ™éœ€è¦æ‰¾åˆ°ç»“å°¾å¼•å· */
+		/* Èç¹ûÇ°ÃæÓĞÒıºÅ£¬ÔòĞèÒªÕÒµ½½áÎ²ÒıºÅ */
 		if (node->quote) {
 			if (node->backslash) {
 				if (ch == 'b')
@@ -172,11 +172,11 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 				node->backslash = 0;
 			}
 
-			/* å½“ä¸ºåŒå­—èŠ‚æ±‰å­—æ—¶ï¼Œç¬¬ä¸€ä¸ªå­—èŠ‚ä¸ºçš„é«˜ä½ä¸º 1ï¼Œ
-			 * ç¬¬äºŒä¸ªå­—èŠ‚ä¸º 92ï¼Œæ­£å¥½ä¸è½¬ä¹‰å­—ç¬¦ç›¸åŒ
+			/* µ±ÎªË«×Ö½Úºº×ÖÊ±£¬µÚÒ»¸ö×Ö½ÚÎªµÄ¸ßÎ»Îª 1£¬
+			 * µÚ¶ş¸ö×Ö½ÚÎª 92£¬ÕıºÃÓë×ªÒå×Ö·ûÏàÍ¬
 			 */
 			else if (ch == '\\') {
-				/* å¤„ç†åŠä¸ªæ±‰å­—çš„æƒ…å½¢ */
+				/* ´¦Àí°ë¸öºº×ÖµÄÇéĞÎ */
 				if (node->part_word) {
 					ADDCH(node->ltag, ch);
 					node->part_word = 0;
@@ -189,17 +189,17 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 
 				acl_assert(parent);
 
-				/* æ•°ç»„å¯¹è±¡çš„å­èŠ‚ç‚¹å…è®¸ä¸ºå•ç‹¬çš„å­—ç¬¦ä¸²æˆ–å¯¹è±¡ */
+				/* Êı×é¶ÔÏóµÄ×Ó½ÚµãÔÊĞíÎªµ¥¶ÀµÄ×Ö·û´®»ò¶ÔÏó */
 				if (parent->left_ch == '[')
 					json->status = ACL_JSON_S_NEXT;
 
-				/* æ ‡ç­¾å€¼åˆ†æç»“æŸï¼Œä¸‹ä¸€æ­¥éœ€è¦æ‰¾åˆ°å†’å· */
+				/* ±êÇ©Öµ·ÖÎö½áÊø£¬ÏÂÒ»²½ĞèÒªÕÒµ½Ã°ºÅ */
 				else
 					json->status = ACL_JSON_S_COLON;
 
-				/* å½“åœ¨åˆ†ææ ‡ç­¾åç»“æŸåï¼Œéœ€è¦æŠŠ quote èµ‹ 0ï¼Œ
-				 * è¿™æ ·åœ¨åˆ†ææ ‡ç­¾å€¼æ—¶ï¼Œå¯ä»¥å¤ç”¨è¯¥ quote å˜é‡,
-				 * å¦‚æœä¸æ¸… 0ï¼Œåˆ™ä¼šå¹²æ‰°åˆ†ææ ‡ç­¾å€¼è¿‡ç¨‹
+				/* µ±ÔÚ·ÖÎö±êÇ©Ãû½áÊøºó£¬ĞèÒª°Ñ quote ¸³ 0£¬
+				 * ÕâÑùÔÚ·ÖÎö±êÇ©ÖµÊ±£¬¿ÉÒÔ¸´ÓÃ¸Ã quote ±äÁ¿,
+				 * Èç¹û²»Çå 0£¬Ôò»á¸ÉÈÅ·ÖÎö±êÇ©Öµ¹ı³Ì
 				 */
 				node->quote = 0;
 				node->part_word = 0;
@@ -207,11 +207,11 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 				break;
 			}
 
-			/* æ˜¯å¦å…¼å®¹ååŠä¸ªæ±‰å­—ä¸ºè½¬ä¹‰ç¬¦ '\' çš„æƒ…å†µ */
+			/* ÊÇ·ñ¼æÈİºó°ë¸öºº×ÖÎª×ªÒå·û '\' µÄÇé¿ö */
 			else if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
 				ADDCH(node->ltag, ch);
 
-				/* å¤„ç†åŠä¸ªæ±‰å­—çš„æƒ…å½¢ */
+				/* ´¦Àí°ë¸öºº×ÖµÄÇéĞÎ */
 				if (node->part_word)
 					node->part_word = 0;
 				else if (ch < 0)
@@ -221,35 +221,35 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 			}
 		}
 
-		/* åˆ†ææ ‡ç­¾åå‰æ²¡æœ‰å¼•å·çš„æƒ…å†µ */
+		/* ·ÖÎö±êÇ©ÃûÇ°Ã»ÓĞÒıºÅµÄÇé¿ö */
 
 		else if (node->backslash) {
 			ADDCH(node->ltag, ch);
 			node->backslash = 0;
 		}
 
-		/* å½“ä¸ºåŒå­—èŠ‚æ±‰å­—æ—¶ï¼Œç¬¬ä¸€ä¸ªå­—èŠ‚ä¸ºçš„é«˜ä½ä¸º 1ï¼Œ
-		 * ç¬¬äºŒä¸ªå­—èŠ‚ä¸º 92ï¼Œæ­£å¥½ä¸è½¬ä¹‰å­—ç¬¦ç›¸åŒ
+		/* µ±ÎªË«×Ö½Úºº×ÖÊ±£¬µÚÒ»¸ö×Ö½ÚÎªµÄ¸ßÎ»Îª 1£¬
+		 * µÚ¶ş¸ö×Ö½ÚÎª 92£¬ÕıºÃÓë×ªÒå×Ö·ûÏàÍ¬
 		 */
 		else if (ch == '\\') {
-			/* å¤„ç†åŠä¸ªæ±‰å­—çš„æƒ…å½¢ */
+			/* ´¦Àí°ë¸öºº×ÖµÄÇéĞÎ */
 			if (node->part_word) {
 				ADDCH(node->ltag, ch);
 				node->part_word = 0;
 			} else
 				node->backslash = 1;
 		} else if (IS_SPACE(ch) || ch == ':') {
-			/* æ ‡ç­¾ååˆ†æç»“æŸï¼Œä¸‹ä¸€æ­¥éœ€è¦æ‰¾åˆ°å†’å· */
+			/* ±êÇ©Ãû·ÖÎö½áÊø£¬ÏÂÒ»²½ĞèÒªÕÒµ½Ã°ºÅ */
 			json->status = ACL_JSON_S_COLON;
 			node->part_word = 0;
 			break;
 		}
 
-		/* æ˜¯å¦å…¼å®¹ååŠä¸ªæ±‰å­—ä¸ºè½¬ä¹‰ç¬¦ '\' çš„æƒ…å†µ */
+		/* ÊÇ·ñ¼æÈİºó°ë¸öºº×ÖÎª×ªÒå·û '\' µÄÇé¿ö */
 		else if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
 			ADDCH(node->ltag, ch);
 
-			/* å¤„ç†åŠä¸ªæ±‰å­—çš„æƒ…å½¢ */
+			/* ´¦Àí°ë¸öºº×ÖµÄÇéĞÎ */
 			if (node->part_word)
 				node->part_word = 0;
 			else if (ch < 0)
@@ -260,14 +260,14 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 		data++;
 	}
 
-	/* å¦‚æœæ ‡ç­¾åéç©ºï¼Œåˆ™éœ€è¦ä¿è¯ä»¥ 0 ç»“å°¾ */
+	/* Èç¹û±êÇ©Ãû·Ç¿Õ£¬ÔòĞèÒª±£Ö¤ÒÔ 0 ½áÎ² */
 	if (LEN(node->ltag) > 0)
 		ACL_VSTRING_TERMINATE(node->ltag);
 
 	return data;
 }
 
-/* ä¸€ç›´æŸ¥åˆ°å†’å·ä¸ºæ­¢ï¼Œç„¶ååˆ‡æ¢è‡³åˆ†ææ ‡ç­¾å€¼è¿‡ç¨‹ */
+/* Ò»Ö±²éµ½Ã°ºÅÎªÖ¹£¬È»ºóÇĞ»»ÖÁ·ÖÎö±êÇ©Öµ¹ı³Ì */
 
 static const char *json_colon(ACL_JSON *json, const char *data)
 {
@@ -282,8 +282,8 @@ static const char *json_colon(ACL_JSON *json, const char *data)
 
 	data++;
 
-	/* ä¸‹ä¸€æ­¥åˆ†ææ ‡ç­¾åæ‰€å¯¹åº”çš„æ ‡ç­¾å€¼ï¼Œæœ‰å¯èƒ½ä¸ºå­—ç¬¦ä¸²ï¼Œ
-	 * ä¹Ÿæœ‰å¯èƒ½ä¸ºå­èŠ‚ç‚¹å¯¹è±¡
+	/* ÏÂÒ»²½·ÖÎö±êÇ©ÃûËù¶ÔÓ¦µÄ±êÇ©Öµ£¬ÓĞ¿ÉÄÜÎª×Ö·û´®£¬
+	 * Ò²ÓĞ¿ÉÄÜÎª×Ó½Úµã¶ÔÏó
 	 */
 	json->status = ACL_JSON_S_VALUE;
 
@@ -298,7 +298,7 @@ static const char *json_array(ACL_JSON *json, const char *data)
 	if (*data == 0)
 		return data;
 
-	/* åˆ›å»ºæ•°ç»„å¯¹è±¡ */
+	/* ´´½¨Êı×é¶ÔÏó */
 	array = acl_json_node_alloc(json);
 	array->left_ch = '[';
 	array->right_ch = ']';
@@ -315,7 +315,7 @@ static const char *json_array(ACL_JSON *json, const char *data)
 	json->curr_node = array;
 	json->status = ACL_JSON_S_ELEMENT;
 
-	/* å¦‚æœè¯¥æ•°ç»„ä¸ºç©ºï¼Œåˆ™ç›´æ¥æŸ¥è¯¢å…¶å…„å¼ŸèŠ‚ç‚¹ */
+	/* Èç¹û¸ÃÊı×éÎª¿Õ£¬ÔòÖ±½Ó²éÑ¯ÆäĞÖµÜ½Úµã */
 	if (*data == ']') {
 		json->status = ACL_JSON_S_NEXT;
 		data++;
@@ -326,7 +326,7 @@ static const char *json_array(ACL_JSON *json, const char *data)
 
 static const char *json_element(ACL_JSON *json, const char *data)
 {
-	/* åˆ›å»ºæ•°ç»„æˆå‘˜å¯¹è±¡ */
+	/* ´´½¨Êı×é³ÉÔ±¶ÔÏó */
 	ACL_JSON_NODE *element;
 
 	SKIP_SPACE(data);
@@ -351,14 +351,14 @@ static const char *json_element(ACL_JSON *json, const char *data)
 
 	acl_json_node_add_child(json->curr_node, element);
 
-	/* å°†è¯¥æ•°ç»„æˆå‘˜å¯¹è±¡ç½®ä¸ºå½“å‰ JSON åˆ†æèŠ‚ç‚¹ */
+	/* ½«¸ÃÊı×é³ÉÔ±¶ÔÏóÖÃÎªµ±Ç° JSON ·ÖÎö½Úµã */
 	json->curr_node = element;
 	json->status = ACL_JSON_S_VALUE;
 
 	return data;
 }
 
-/* åˆ†ææ ‡ç­¾å€¼ï¼Œè¯¥å€¼æœ‰å¯èƒ½æ˜¯çº¯æ–‡æœ¬(å³è¯¥èŠ‚ç‚¹ä¸ºå¶èŠ‚ç‚¹)ï¼Œä¹Ÿæœ‰å¯èƒ½æ˜¯ä¸€ä¸ªå­èŠ‚ç‚¹ */
+/* ·ÖÎö±êÇ©Öµ£¬¸ÃÖµÓĞ¿ÉÄÜÊÇ´¿ÎÄ±¾(¼´¸Ã½ÚµãÎªÒ¶½Úµã)£¬Ò²ÓĞ¿ÉÄÜÊÇÒ»¸ö×Ó½Úµã */
 
 static const char *json_value(ACL_JSON *json, const char *data)
 {
@@ -366,7 +366,7 @@ static const char *json_value(ACL_JSON *json, const char *data)
 	if (*data == 0)
 		return data;
 
-	/* ä¸º '{' æˆ– '[' æ—¶è¯´æ˜é‡åˆ°äº†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
+	/* Îª '{' »ò '[' Ê±ËµÃ÷Óöµ½ÁËµ±Ç°½ÚµãµÄ×Ó½Úµã */
 	if (*data == '{') {
 		data++;
 		json->status = ACL_JSON_S_OBJ;
@@ -375,15 +375,15 @@ static const char *json_value(ACL_JSON *json, const char *data)
 		json->status = ACL_JSON_S_ARRAY;
 	}
 
-	/* å…¼å®¹ä¸€ä¸‹æœ‰äº›æ•°æ®æ ¼å¼ä¸º "xxx: ," çš„æ–¹å¼ */
+	/* ¼æÈİÒ»ÏÂÓĞĞ©Êı¾İ¸ñÊ½Îª "xxx: ," µÄ·½Ê½ */
 	else if (*data == ',' || *data == ';') {
 		data++;
-		/* åˆ‡æ¢è‡³æŸ¥è¯¢è¯¥èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹çš„è¿‡ç¨‹ */
+		/* ÇĞ»»ÖÁ²éÑ¯¸Ã½ÚµãµÄĞÖµÜ½ÚµãµÄ¹ı³Ì */
 		json->status = ACL_JSON_S_NEXT;
 	}
 
-	/* è¯´æ˜æ ‡ç­¾ååé¢çš„æ ‡ç­¾å€¼ä¸ºå­—ç¬¦ä¸²æˆ–æ•°å­— */
-	/* å¦‚æœæ ‡ç­¾å€¼å‰æœ‰å¼•å·ï¼Œè®°å½•ä¸‹è¯¥å¼•å· */
+	/* ËµÃ÷±êÇ©ÃûºóÃæµÄ±êÇ©ÖµÎª×Ö·û´®»òÊı×Ö */
+	/* Èç¹û±êÇ©ÖµÇ°ÓĞÒıºÅ£¬¼ÇÂ¼ÏÂ¸ÃÒıºÅ */
 	else if (IS_QUOTE(*data)) { /* && json->curr_node->quote == 0) { */
 		json->curr_node->quote = *data++;
 		json->status = ACL_JSON_S_STRING;
@@ -399,22 +399,22 @@ static const char *json_string(ACL_JSON *json, const char *data)
 	ACL_JSON_NODE *node = json->curr_node;
 	int   ch;
 
-	/* Bugfix: è¿™é˜²æ­¢å­—ç¬¦ä¸²å¼€å§‹éƒ¨åˆ†ä¸ºç©ºæ ¼æ—¶è¢«å¿½ç•¥éœ€æ³¨æ‰ä¸‹é¢è¿‡æ»¤é€»è¾‘ */
+	/* Bugfix: Õâ·ÀÖ¹×Ö·û´®¿ªÊ¼²¿·ÖÎª¿Õ¸ñÊ±±»ºöÂÔĞè×¢µôÏÂÃæ¹ıÂËÂß¼­ */
 #if 0
-	/* å½“æ–‡æœ¬é•¿åº¦ä¸º 0 æ—¶ï¼Œå¯ä»¥è®¤ä¸ºè¿˜æœªé‡åˆ°æœ‰æ•ˆçš„å­—ç¬¦ */
+	/* µ±ÎÄ±¾³¤¶ÈÎª 0 Ê±£¬¿ÉÒÔÈÏÎª»¹Î´Óöµ½ÓĞĞ§µÄ×Ö·û */
 
 	if (LEN(node->text) == 0) {
-		/* å…ˆè¿‡æ»¤å¼€å¤´æ²¡ç”¨çš„ç©ºæ ¼ */
+		/* ÏÈ¹ıÂË¿ªÍ·Ã»ÓÃµÄ¿Õ¸ñ */
 		//SKIP_SPACE(data);
 		if (*data == 0)
 			return data;
 	}
 #endif
 
-	/* è¯´æ˜æœ¬èŠ‚ç‚¹æ˜¯å¶èŠ‚ç‚¹ */
+	/* ËµÃ÷±¾½ÚµãÊÇÒ¶½Úµã */
 
 	while ((ch = *data) != 0) {
-		/* å¦‚æœå¼€å§‹æœ‰å¼•å·ï¼Œåˆ™éœ€è¦ä»¥è¯¥å¼•å·ä½œä¸ºç»“å°¾ç¬¦ */
+		/* Èç¹û¿ªÊ¼ÓĞÒıºÅ£¬ÔòĞèÒªÒÔ¸ÃÒıºÅ×÷Îª½áÎ²·û */
 		if (node->quote) {
 			if (node->backslash) {
 				if (ch == 'b')
@@ -432,12 +432,12 @@ static const char *json_string(ACL_JSON *json, const char *data)
 				node->backslash = 0;
 			}
 
-			/* å½“ä¸ºåŒå­—èŠ‚æ±‰å­—æ—¶ï¼Œç¬¬ä¸€ä¸ªå­—èŠ‚ä¸ºçš„é«˜ä½ä¸º 1ï¼Œ
-			 * ç¬¬äºŒä¸ªå­—èŠ‚æœ‰å¯èƒ½ä¸º 92ï¼Œæ­£å¥½ä¸è½¬ä¹‰å­—ç¬¦ç›¸åŒ
+			/* µ±ÎªË«×Ö½Úºº×ÖÊ±£¬µÚÒ»¸ö×Ö½ÚÎªµÄ¸ßÎ»Îª 1£¬
+			 * µÚ¶ş¸ö×Ö½ÚÓĞ¿ÉÄÜÎª 92£¬ÕıºÃÓë×ªÒå×Ö·ûÏàÍ¬
 			 */
 			else if (ch == '\\') {
-				/* å¤„ç†åŠä¸ªæ±‰å­—çš„æƒ…å†µï¼Œå¦‚æœå‰ä¸€ä¸ªå­—èŠ‚æ˜¯å‰
-				 * åŠä¸ªæ±‰å­—ï¼Œåˆ™å½“å‰çš„è½¬ä¹‰ç¬¦å½“ä½œååŠä¸ªæ±‰å­—
+				/* ´¦Àí°ë¸öºº×ÖµÄÇé¿ö£¬Èç¹ûÇ°Ò»¸ö×Ö½ÚÊÇÇ°
+				 * °ë¸öºº×Ö£¬Ôòµ±Ç°µÄ×ªÒå·ûµ±×÷ºó°ë¸öºº×Ö
 				 */
 				if (node->part_word) {
 					ADDCH(node->text, ch);
@@ -445,30 +445,30 @@ static const char *json_string(ACL_JSON *json, const char *data)
 				} else
 					node->backslash = 1;
 			} else if (ch == node->quote) {
-				/* å¯¹èŠ‚ç‚¹çš„å€¼ï¼Œå¿…é¡»ä¿ç•™è¯¥ quote å€¼ï¼Œä»¥ä¾¿äºåŒºåˆ†
-				 * ä¸åŒçš„å€¼ç±»å‹ï¼šbool, null, number, string
+				/* ¶Ô½ÚµãµÄÖµ£¬±ØĞë±£Áô¸Ã quote Öµ£¬ÒÔ±ãÓÚÇø·Ö
+				 * ²»Í¬µÄÖµÀàĞÍ£ºbool, null, number, string
 				 * node->quote = 0;
 				 */
 
-				/* åˆ‡æ¢è‡³æŸ¥è¯¢è¯¥èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹çš„è¿‡ç¨‹ */
+				/* ÇĞ»»ÖÁ²éÑ¯¸Ã½ÚµãµÄĞÖµÜ½ÚµãµÄ¹ı³Ì */
 				json->status = ACL_JSON_S_STREND;
 				node->part_word = 0;
 				data++;
 				break;
 			}
 
-			/* æ˜¯å¦å…¼å®¹ååŠä¸ªæ±‰å­—ä¸ºè½¬ä¹‰ç¬¦ '\' çš„æƒ…å†µ */
+			/* ÊÇ·ñ¼æÈİºó°ë¸öºº×ÖÎª×ªÒå·û '\' µÄÇé¿ö */
 			else if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
 				ADDCH(node->text, ch);
 
-				/* è‹¥å‰ä¸€ä¸ªå­—èŠ‚ä¸ºå‰åŠä¸ªæ±‰å­—ï¼Œåˆ™å½“å‰å­—èŠ‚
-				 * ä¸ºååŠä¸ªæ±‰å­—ï¼Œæ­£å¥½ä¸ºä¸€ä¸ªå®Œæ•´çš„æ±‰å­—
+				/* ÈôÇ°Ò»¸ö×Ö½ÚÎªÇ°°ë¸öºº×Ö£¬Ôòµ±Ç°×Ö½Ú
+				 * Îªºó°ë¸öºº×Ö£¬ÕıºÃÎªÒ»¸öÍêÕûµÄºº×Ö
 				 */
 				if (node->part_word)
 					node->part_word = 0;
 
-				/* å‰ä¸€ä¸ªå­—èŠ‚éå‰åŠä¸ªæ±‰å­—ä¸”å½“å‰å­—èŠ‚é«˜ä½
-				 * ä¸º 1ï¼Œåˆ™è¡¨æ˜å½“å‰å­—èŠ‚ä¸ºå‰åŠä¸ªæ±‰å­—
+				/* Ç°Ò»¸ö×Ö½Ú·ÇÇ°°ë¸öºº×ÖÇÒµ±Ç°×Ö½Ú¸ßÎ»
+				 * Îª 1£¬Ôò±íÃ÷µ±Ç°×Ö½ÚÎªÇ°°ë¸öºº×Ö
 				 */
 				else if (ch < 0)
 					node->part_word = 1;
@@ -487,16 +487,16 @@ static const char *json_string(ACL_JSON *json, const char *data)
 		} else if (IS_SPACE(ch) || ch == ',' || ch == ';'
 			|| ch == '}' || ch == ']')
 		{
-			/* åˆ‡æ¢è‡³æŸ¥è¯¢è¯¥èŠ‚ç‚¹çš„å…„å¼ŸèŠ‚ç‚¹çš„è¿‡ç¨‹ */
+			/* ÇĞ»»ÖÁ²éÑ¯¸Ã½ÚµãµÄĞÖµÜ½ÚµãµÄ¹ı³Ì */
 			json->status = ACL_JSON_S_STREND;
 			break;
 		}
 
-		/* æ˜¯å¦å…¼å®¹ååŠä¸ªæ±‰å­—ä¸ºè½¬ä¹‰ç¬¦ '\' çš„æƒ…å†µ */
+		/* ÊÇ·ñ¼æÈİºó°ë¸öºº×ÖÎª×ªÒå·û '\' µÄÇé¿ö */
 		else if ((json->flag & ACL_JSON_FLAG_PART_WORD)) {
 			ADDCH(node->text, ch);
 
-			/* å¤„ç†åŠä¸ªæ±‰å­—çš„æƒ…å½¢ */
+			/* ´¦Àí°ë¸öºº×ÖµÄÇéĞÎ */
 			if (node->part_word)
 				node->part_word = 0;
 			else if (ch < 0)
@@ -587,7 +587,7 @@ static const char *json_strend(ACL_JSON *json, const char *data)
 	return data;
 }
 
-/* å°è¯•åˆ†ææœ¬èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹ï¼Œå¿…é¡»èƒ½æ‰¾åˆ°åˆ†éš”ç¬¦ ',' æˆ– ';' */
+/* ³¢ÊÔ·ÖÎö±¾½ÚµãµÄÏÂÒ»¸öĞÖµÜ½Úµã£¬±ØĞëÄÜÕÒµ½·Ö¸ô·û ',' »ò ';' */
 
 static const char *json_brother(ACL_JSON *json, const char *data)
 {
@@ -602,7 +602,7 @@ static const char *json_brother(ACL_JSON *json, const char *data)
 	if (*data == 0)
 		return data;
 
-	/* å¦‚æœåˆ°è¾¾æ ¹èŠ‚ç‚¹çš„ç»“æŸç¬¦ï¼Œåˆ™ json è§£æè¿‡ç¨‹å®Œæ¯• */
+	/* Èç¹ûµ½´ï¸ù½ÚµãµÄ½áÊø·û£¬Ôò json ½âÎö¹ı³ÌÍê±Ï */
 	parent = acl_json_node_parent(json->curr_node);
 	acl_assert(parent);
 
@@ -628,7 +628,7 @@ static const char *json_brother(ACL_JSON *json, const char *data)
 		}
 
 		json->curr_node = parent;
-		/* æŸ¥è¯¢çˆ¶èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹ */
+		/* ²éÑ¯¸¸½ÚµãµÄÏÂÒ»¸öĞÖµÜ½Úµã */
 		json->status = ACL_JSON_S_NEXT;
 		return data;
 	}
@@ -644,13 +644,13 @@ static const char *json_brother(ACL_JSON *json, const char *data)
 	return data;
 }
 
-/* çŠ¶æ€æœºæ•°æ®ç»“æ„ç±»å‹ */
+/* ×´Ì¬»úÊı¾İ½á¹¹ÀàĞÍ */
 
 struct JSON_STATUS_MACHINE {
-	/* çŠ¶æ€ç  */
+	/* ×´Ì¬Âë */
 	int   status;
 
-	/* çŠ¶æ€æœºå¤„ç†å‡½æ•° */
+	/* ×´Ì¬»ú´¦Àíº¯Êı */
 	const char *(*callback) (ACL_JSON*, const char*);
 };
 
@@ -676,11 +676,11 @@ const char* acl_json_update(ACL_JSON *json, const char *data)
 	if (data == NULL)
 		return "";
 
-	/* æ£€æŸ¥æ˜¯å¦å·²ç»è§£æå®Œæ¯• */
+	/* ¼ì²éÊÇ·ñÒÑ¾­½âÎöÍê±Ï */
 	if (json->finish)
 		return ptr;
 
-	/* json è§£æå™¨çŠ¶æ€æœºå¾ªç¯å¤„ç†è¿‡ç¨‹ */
+	/* json ½âÎöÆ÷×´Ì¬»úÑ­»·´¦Àí¹ı³Ì */
 
 	while (*ptr && !json->finish)
 		ptr = status_tab[json->status].callback(json, ptr);

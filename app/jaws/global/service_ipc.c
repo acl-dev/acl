@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "service_struct.h"
 #include "service.h"
 #include "service_conf.h"
@@ -29,7 +29,7 @@ static ACL_MSGIO *__ipc_listener = NULL;
 static char __ipc_addr[256];
 static module_service_main_fn __service_callback = NULL;
 
-/* æŸä¸ªçº¿ç¨‹æœåŠ¡å®ä¾‹æ¥æ”¶åˆ°ä¸€ä¸ªæ–°çš„è¿œç¨‹å®¢æˆ·ç«¯è¿æ¥è¯·æ±‚ */
+/* Ä³¸öÏß³Ì·şÎñÊµÀı½ÓÊÕµ½Ò»¸öĞÂµÄÔ¶³Ì¿Í»§¶ËÁ¬½ÓÇëÇó */
 
 static int msg_ipc_accept(int msg_type acl_unused, ACL_MSGIO *mio acl_unused,
         const ACL_MSGIO_INFO *info, void *arg)
@@ -41,27 +41,27 @@ static int msg_ipc_accept(int msg_type acl_unused, ACL_MSGIO *mio acl_unused,
 
 	memcpy(&ctx, acl_vstring_str(info->body.buf), ACL_VSTRING_LEN(info->body.buf));
 
-	/* æ‰“å¼€å¼‚æ­¥æµ */
+	/* ´ò¿ªÒì²½Á÷ */
 	stream = acl_vstream_fdopen(ctx.fd, O_RDWR, var_cfg_aio_buf_size,
 			0, ACL_VSTREAM_TYPE_SOCK);
 	client = acl_aio_open(ctx.aio, stream);
 
-	/* å¼€å§‹å¤„ç†è¯¥å®¢æˆ·ç«¯è¿æ¥ */
+	/* ¿ªÊ¼´¦Àí¸Ã¿Í»§¶ËÁ¬½Ó */
 	__service_callback(service, client);
 	return (0);
 }
 
-/* å•çº¿ç¨‹å®ä¾‹éé˜»å¡å¤„ç†è¿‡ç¨‹ */
+/* µ¥Ïß³ÌÊµÀı·Ç×èÈû´¦Àí¹ı³Ì */
 
 static void *service_thread(void *arg)
 {
 	ACL_MSGIO *ipc_client = (ACL_MSGIO*) arg;
 	ACL_AIO *aio = acl_msgio_aio(ipc_client);
 
-	/* å†…å­˜åƒåœ¾å›æ”¶å®šæ—¶å™¨ */
+	/* ÄÚ´æÀ¬»ø»ØÊÕ¶¨Ê±Æ÷ */
 	service_set_gctimer(aio, 10);
 
-	/* è¿›å…¥äº‹ä»¶å¾ªç¯ */
+	/* ½øÈëÊÂ¼şÑ­»· */
 	while (1) {
 		acl_aio_loop(aio);
 	}
@@ -69,7 +69,7 @@ static void *service_thread(void *arg)
 	return (NULL);
 }
 
-/* ä¸»çº¿ç¨‹æ”¶åˆ°æ–°çš„è¿æ¥åˆ°è¾¾æ¶ˆæ¯ */
+/* Ö÷Ïß³ÌÊÕµ½ĞÂµÄÁ¬½Óµ½´ïÏûÏ¢ */
 
 void service_ipc_init(ACL_AIO *aio, int nthreads)
 {
@@ -101,12 +101,12 @@ void service_ipc_add_service(SERVICE *service,
 		acl_msg_fatal("%s(%d): __ipc_ithread(%d) >= __ipc_nthread(%d)",
 			myname, __LINE__, __ipc_ithread, __ipc_nthread);
 
-	/* åˆ›å»ºéé˜»å¡çº¿ç¨‹æ± å®ä¾‹ï¼Œæ¯ä¸ªçº¿ç¨‹ä¸ºä¸€ä¸ªå•ç‹¬çš„éé˜»å¡å®ä¾‹ */
+	/* ´´½¨·Ç×èÈûÏß³Ì³ØÊµÀı£¬Ã¿¸öÏß³ÌÎªÒ»¸öµ¥¶ÀµÄ·Ç×èÈûÊµÀı */
 
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, 1);
 
-	/* è¿æ¥æ¶ˆæ¯æœåŠ¡å™¨ */
+	/* Á¬½ÓÏûÏ¢·şÎñÆ÷ */
 #if 1
 	ipc_client = acl_msgio_connect(aio, __ipc_addr, 0);
 	if (ipc_client == NULL)
@@ -117,18 +117,18 @@ void service_ipc_add_service(SERVICE *service,
 	if (ipc_client == NULL)
 		acl_msg_fatal("%s(%d): connect server(%s) error(%s)",
 			myname, __LINE__, __ipc_addr, acl_last_serror());
-	/* è®¾ä¸ºéé˜»å¡æ¨¡å¼ */
+	/* ÉèÎª·Ç×èÈûÄ£Ê½ */
 	acl_msgio_set_noblock(aio, ipc_client);
 #endif
-	/* æ³¨å†Œæ¶ˆæ¯äº‹ä»¶ */
+	/* ×¢²áÏûÏ¢ÊÂ¼ş */
 	acl_msgio_reg(ipc_client, MSG_IPC_ACCEPT, msg_ipc_accept, service);
 
-	/* è®°å½•æœåŠ¡ç«¯IPCé€šé“ */
+	/* ¼ÇÂ¼·şÎñ¶ËIPCÍ¨µÀ */
 	__ipc_threads[__ipc_ithread].mio = acl_msgio_accept(__ipc_listener);
 	__ipc_threads[__ipc_ithread].aio = aio;
 	__ipc_threads[__ipc_ithread].service = service;
 	acl_non_blocking(ACL_VSTREAM_SOCK(acl_msgio_vstream(__ipc_threads[__ipc_ithread].mio)), ACL_BLOCKING);
-	/* åˆ›å»ºå•çº¿ç¨‹éé˜»å¡å®ä¾‹ */
+	/* ´´½¨µ¥Ïß³Ì·Ç×èÈûÊµÀı */
 	acl_pthread_create(&__ipc_threads[__ipc_ithread].tid, &attr,
 		service_thread, ipc_client);
 	__ipc_ithread++;
@@ -138,16 +138,16 @@ void service_ipc_add(ACL_SOCKET fd)
 {
 	IPC_CTX ctx;
 
-	/* è½®å¾ªä¸‹ä¸€ä¸ªå®ä¾‹çº¿ç¨‹ */
+	/* ÂÖÑ­ÏÂÒ»¸öÊµÀıÏß³Ì */
 	if (__ipc_ithread >= __ipc_nthread)
 		__ipc_ithread = 0;
 
-	/* æ„é€ æ¶ˆæ¯æ•°æ® */
+	/* ¹¹ÔìÏûÏ¢Êı¾İ */
 
 	ctx.fd = fd; 
 	ctx.aio = __ipc_threads[__ipc_ithread].aio;
 
-	/* å‘é€æ¶ˆæ¯ */
+	/* ·¢ËÍÏûÏ¢ */
 	acl_msgio_send(__ipc_threads[__ipc_ithread].mio,
 		MSG_IPC_ACCEPT, &ctx, sizeof(IPC_CTX));
 	__ipc_threads[__ipc_ithread].n++;

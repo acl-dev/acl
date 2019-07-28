@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <map>
 #include "../stdlib/string.hpp"
@@ -17,7 +17,7 @@ public:
 	~pgsql_manager();
 
 	/**
-	 * æ·»åŠ ä¸€ä¸ªæ•°æ®åº“å®ä¾‹æ–¹æ³•äºŒ
+	 * Ìí¼ÓÒ»¸öÊı¾İ¿âÊµÀı·½·¨¶ş
 	 * @param conf {const pgsql_conf&}
 	 * @return {pgsql_manager&}
 	 */
@@ -25,16 +25,16 @@ public:
 
 protected:
 	/**
-	 * åŸºç±» connect_manager è™šå‡½æ•°çš„å®ç°
-	 * @param addr {const char*} æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šip:port
-	 * @param count {size_t} è¿æ¥æ± çš„å¤§å°é™åˆ¶ï¼Œè¯¥å€¼ä¸º 0 æ—¶åˆ™æ²¡æœ‰é™åˆ¶
-	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹)
-	 * @return {connect_pool*} è¿”å›åˆ›å»ºçš„è¿æ¥æ± å¯¹è±¡
+	 * »ùÀà connect_manager Ğéº¯ÊıµÄÊµÏÖ
+	 * @param addr {const char*} ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½£ºip:port
+	 * @param count {size_t} Á¬½Ó³ØµÄ´óĞ¡ÏŞÖÆ£¬¸ÃÖµÎª 0 Ê±ÔòÃ»ÓĞÏŞÖÆ
+	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼)
+	 * @return {connect_pool*} ·µ»Ø´´½¨µÄÁ¬½Ó³Ø¶ÔÏó
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	time_t idle_ttl_;       // æ•°æ®åº“è¿æ¥çš„ç©ºé—²è¿‡æœŸæ—¶é—´
+	time_t idle_ttl_;       // Êı¾İ¿âÁ¬½ÓµÄ¿ÕÏĞ¹ıÆÚÊ±¼ä
 	std::map<string, pgsql_conf*> dbs_;
 };
 

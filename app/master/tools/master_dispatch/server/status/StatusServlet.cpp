@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "server/ServerManager.h"
 #include "status/StatusServlet.h"
 
@@ -44,7 +44,7 @@ bool StatusServlet::doPost(acl::HttpServletRequest& req,
 	keep_alive_ = req.isKeepAlive() ? true : false;
 	res.setKeepAlive(keep_alive_);
 
-	// 璋冪敤鍗曚緥鏈嶅姟鍣ㄧ姸鎬佹柟娉曡幏寰楀悗绔湇鍔″瓙杩涚▼瀹炰緥鐨勭姸鎬�
+	// 调用单例服务器状态方法获得后端服务子进程实例的状态
 	acl::string buf;
 	if (use_xml)
 	{

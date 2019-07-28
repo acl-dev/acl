@@ -1,11 +1,11 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 #include "global.h"
 #include "gid.h"
 #include "lib_gid.h"
 
-/* ä½¿ç”¨çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œä½†æ³¨æ„æ­¤åº“ä¸å¾—ç¼–è¯‘æˆåŠ¨æ€åº“XXX */
+/* Ê¹ÓÃÏß³Ì¾Ö²¿±äÁ¿£¬µ«×¢Òâ´Ë¿â²»µÃ±àÒë³É¶¯Ì¬¿âXXX */
 
 static __thread ACL_VSTREAM *__client = NULL;
 
@@ -83,14 +83,14 @@ const char *gid_client_serror(int errnum)
 	} errors[] = {
 		{ GID_OK, "ok" },
 
-		/* å®¢æˆ·ç«¯ç›¸å…³é”™è¯¯ */
+		/* ¿Í»§¶ËÏà¹Ø´íÎó */
 		{ GID_ERR_INIT, "gid_client_init should called first" },
 		{ GID_ERR_CONN, "connect server error" },
 		{ GID_ERR_IO, "readwrite from server error" },
 		{ GID_ERR_PROTO, "gid protocol error" },
 		{ GID_ERR_SERVER, "gid server internal error" },
 
-		/* æœåŠ¡ç«¯è¿”å›çš„é”™è¯¯ */
+		/* ·şÎñ¶Ë·µ»ØµÄ´íÎó */
 		{ GID_ERR_SID, "sid invalid" },
 		{ GID_ERR_OVERRIDE, "gid override" },
 		{ GID_ERR_SAVE, "gid save error" },

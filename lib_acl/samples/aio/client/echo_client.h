@@ -1,4 +1,4 @@
-﻿#ifndef	__AIO_ECHO_CLIENT_INCLUDE_H__
+#ifndef	__AIO_ECHO_CLIENT_INCLUDE_H__
 #define	__AIO_ECHO_CLIENT_INCLUDE_H__
 
 #define	ECHO_CTL_END		0

@@ -1,4 +1,4 @@
-﻿#include "stdlib/acl_define.h"
+#include "stdlib/acl_define.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_slice.h"

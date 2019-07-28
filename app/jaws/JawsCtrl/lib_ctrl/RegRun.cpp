@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include ".\regrun.h"
 
 CRegRun::CRegRun(void)

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "fiber_cpp_define.hpp"
 

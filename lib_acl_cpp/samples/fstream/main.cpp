@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "acl_cpp/stream/ifstream.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
 #include <stdio.h>

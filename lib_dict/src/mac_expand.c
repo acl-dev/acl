@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <ctype.h>
 #include <string.h>
 #include "mac_parse.h"

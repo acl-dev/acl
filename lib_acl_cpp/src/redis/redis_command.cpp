@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -198,7 +198,7 @@ void redis_command::hash_slot(const char* key)
 
 void redis_command::hash_slot(const char* key, size_t len)
 {
-	// åªæœ‰é›†ç¾¤æ¨¡å¼æ‰éœ€è¦è®¡ç®—å“ˆå¸Œæ§½å€¼
+	// Ö»ÓĞ¼¯ÈºÄ£Ê½²ÅĞèÒª¼ÆËã¹şÏ£²ÛÖµ
 	if (cluster_ == NULL)
 		return;
 
@@ -206,7 +206,7 @@ void redis_command::hash_slot(const char* key, size_t len)
 	if (max_slot <= 0)
 		return;
 
-	// å¦‚æœç¼“å­˜äº†å“ˆå¸Œæ§½å€¼ï¼Œåˆ™ä¸å¿…é‡æ–°è®¡ç®—
+	// Èç¹û»º´æÁË¹şÏ£²ÛÖµ£¬Ôò²»±ØÖØĞÂ¼ÆËã
 	if (slot_ >= 0 && slot_ < max_slot)
 		return;
 
@@ -277,7 +277,7 @@ const char* redis_command::result_value(size_t i, size_t* len /* = NULL */) cons
 	if (size == 1)
 		return child->get(0, len);
 
-	// å¤§å†…å­˜æœ‰å¯èƒ½è¢«åˆ‡ç‰‡æˆå¤šä¸ªä¸è¿ç»­çš„å°å†…å­˜
+	// ´óÄÚ´æÓĞ¿ÉÄÜ±»ÇĞÆ¬³É¶à¸ö²»Á¬ĞøµÄĞ¡ÄÚ´æ
 	size = child->get_length();
 	size++;
 	char* buf = (char*) dbuf_->dbuf_alloc(size);
@@ -292,7 +292,7 @@ const redis_result* redis_command::get_result() const
 	return result_;
 }
 
-// åˆ†æé‡å®šå‘ä¿¡æ¯ï¼Œè·å¾—é‡å®šå‘çš„æœåŠ¡å™¨åœ°å€
+// ·ÖÎöÖØ¶¨ÏòĞÅÏ¢£¬»ñµÃÖØ¶¨ÏòµÄ·şÎñÆ÷µØÖ·
 const char* redis_command::get_addr(const char* info)
 {
 	char* cmd = dbuf_->dbuf_strdup(info);
@@ -310,14 +310,14 @@ const char* redis_command::get_addr(const char* info)
 	return addr;
 }
 
-// æ ¹æ®è¾“å…¥çš„ç›®æ ‡åœ°å€è¿›è¡Œé‡å®šå‘ï¼šæ‰“å¼€ä¸è¯¥åœ°å€çš„è¿æ¥ï¼Œå¦‚æœè¿æ¥å¤±è´¥ï¼Œåˆ™éšæœº
-// é€‰å–ä¸€ä¸ªæœåŠ¡å™¨åœ°å€è¿›è¡Œè¿æ¥
+// ¸ù¾İÊäÈëµÄÄ¿±êµØÖ·½øĞĞÖØ¶¨Ïò£º´ò¿ªÓë¸ÃµØÖ·µÄÁ¬½Ó£¬Èç¹ûÁ¬½ÓÊ§°Ü£¬ÔòËæ»ú
+// Ñ¡È¡Ò»¸ö·şÎñÆ÷µØÖ·½øĞĞÁ¬½Ó
 redis_client* redis_command::redirect(redis_client_cluster* cluster,
 	const char* addr)
 {
 	redis_client_pool* conns;
 
-	// å¦‚æœæœåŠ¡å™¨åœ°å€ä¸å­˜åœ¨ï¼Œåˆ™æ ¹æ®æœåŠ¡å™¨åœ°å€åŠ¨æ€åˆ›å»ºè¿æ¥æ± å¯¹è±¡
+	// Èç¹û·şÎñÆ÷µØÖ·²»´æÔÚ£¬Ôò¸ù¾İ·şÎñÆ÷µØÖ·¶¯Ì¬´´½¨Á¬½Ó³Ø¶ÔÏó
 	if ((conns = (redis_client_pool*) cluster->get(addr)) == NULL) {
 		cluster->set(addr, max_conns_);
 		conns = (redis_client_pool*) cluster->get(addr);
@@ -352,8 +352,8 @@ redis_client* redis_command::redirect(redis_client_cluster* cluster,
 
 redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 {
-	// å¦‚æœå·²ç»è®¡ç®—äº†å“ˆå¸Œæ§½å€¼ï¼Œåˆ™ä¼˜å…ˆä»æœ¬åœ°ç¼“å­˜ä¸­æŸ¥æ‰¾å¯¹åº”çš„è¿æ¥æ± 
-	// å¦‚æœæœªæ‰¾åˆ°ï¼Œåˆ™ä»æ‰€æœ‰é›†ç¾¤ç»“ç‚¹ä¸­éšä¾¿æ‰¾ä¸€ä¸ªå¯ç”¨çš„è¿æ¥æ± å¯¹è±¡
+	// Èç¹ûÒÑ¾­¼ÆËãÁË¹şÏ£²ÛÖµ£¬ÔòÓÅÏÈ´Ó±¾µØ»º´æÖĞ²éÕÒ¶ÔÓ¦µÄÁ¬½Ó³Ø
+	// Èç¹ûÎ´ÕÒµ½£¬Ôò´ÓËùÓĞ¼¯Èº½áµãÖĞËæ±ãÕÒÒ»¸ö¿ÉÓÃµÄÁ¬½Ó³Ø¶ÔÏó
 
 	redis_client_pool* conns;
 	redis_client* conn;
@@ -374,11 +374,11 @@ redis_client* redis_command::peek_conn(redis_client_cluster* cluster, int slot)
 		if (conn != NULL)
 			return conn;
 
-		// å–æ¶ˆå“ˆå¸Œæ§½çš„åœ°å€æ˜ å°„å…³ç³»
+		// È¡Ïû¹şÏ£²ÛµÄµØÖ·Ó³Éä¹ØÏµ
 		cluster->clear_slot(slot);
 
 #ifdef AUTO_SET_ALIVE
-		// å°†è¿æ¥æ± å¯¹è±¡ç½®ä¸ºä¸å¯ç”¨çŠ¶æ€
+		// ½«Á¬½Ó³Ø¶ÔÏóÖÃÎª²»¿ÉÓÃ×´Ì¬
 		conns->set_alive(false);
 #endif
 	}
@@ -392,7 +392,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 {
 	redis_client* conn = peek_conn(cluster, slot_);
 
-	// å¦‚æœæ²¡æœ‰æ‰¾åˆ°å¯ç”¨çš„è¿æ¥å¯¹è±¡ï¼Œåˆ™ç›´æ¥è¿”å› NULL è¡¨ç¤ºå‡ºé”™
+	// Èç¹ûÃ»ÓĞÕÒµ½¿ÉÓÃµÄÁ¬½Ó¶ÔÏó£¬ÔòÖ±½Ó·µ»Ø NULL ±íÊ¾³ö´í
 	if (conn == NULL) {
 		logger_error("peek_conn NULL, slot_: %d", slot_);
 		return NULL;
@@ -406,23 +406,23 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 	int   n = 0;
 
 	while (n++ < redirect_max_) {
-		// æ ¹æ®è¯·æ±‚è¿‡ç¨‹æ˜¯å¦é‡‡ç”¨å†…å­˜åˆ†ç‰‡æ–¹å¼è°ƒç”¨ä¸åŒçš„è¯·æ±‚è¿‡ç¨‹
+		// ¸ù¾İÇëÇó¹ı³ÌÊÇ·ñ²ÉÓÃÄÚ´æ·ÖÆ¬·½Ê½µ÷ÓÃ²»Í¬µÄÇëÇó¹ı³Ì
 		if (slice_req_)
 			result_ = conn->run(dbuf_, *request_obj_, nchild, timeout);
 		else
 			result_ = conn->run(dbuf_, *request_buf_, nchild, timeout);
 
-		// å¦‚æœè¿æ¥å¼‚å¸¸æ–­å¼€ï¼Œåˆ™éœ€è¦è¿›è¡Œé‡è¯•
+		// Èç¹ûÁ¬½ÓÒì³£¶Ï¿ª£¬ÔòĞèÒª½øĞĞÖØÊÔ
 		if (conn->eof()) {
 			connect_pool* pool = conn->get_pool();
 
-			// åˆ é™¤å“ˆå¸Œæ§½ä¸­çš„åœ°å€æ˜ å°„å…³ç³»ä»¥ä¾¿ä¸‹æ¬¡æ“ä½œæ—¶é‡æ–°è·å–
+			// É¾³ı¹şÏ£²ÛÖĞµÄµØÖ·Ó³Éä¹ØÏµÒÔ±ãÏÂ´Î²Ù×÷Ê±ÖØĞÂ»ñÈ¡
 			cluster->clear_slot(slot_);
 
-			// å°†è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«Á¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			pool->put(conn, false);
 
-			// å¦‚æœè¿æ¥æ–­å¼€ä¸”è¯·æ±‚æ•°æ®ä¸ºç©ºæ—¶ï¼Œåˆ™æ— é¡»é‡è¯•
+			// Èç¹ûÁ¬½Ó¶Ï¿ªÇÒÇëÇóÊı¾İÎª¿ÕÊ±£¬ÔòÎŞĞëÖØÊÔ
 			if ((request_obj_ == NULL || !request_obj_->get_size())
 				&& request_buf_->empty()) {
 
@@ -431,11 +431,11 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			}
 
 #ifdef AUTO_SET_ALIVE
-			// å°†è¿æ¥æ± å¯¹è±¡ç½®ä¸ºä¸å¯ç”¨çŠ¶æ€
+			// ½«Á¬½Ó³Ø¶ÔÏóÖÃÎª²»¿ÉÓÃ×´Ì¬
 			pool->set_alive(false);
 #endif
 
-			// ä»è¿æ¥æ± é›†ç¾¤ä¸­é¡ºåºå–å¾—ä¸€ä¸ªè¿æ¥å¯¹è±¡
+			// ´ÓÁ¬½Ó³Ø¼¯ÈºÖĞË³ĞòÈ¡µÃÒ»¸öÁ¬½Ó¶ÔÏó
 			conn = peek_conn(cluster, slot_);
 			if (conn == NULL) {
 				logger_error("peek_conn NULL");
@@ -449,18 +449,18 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		}
 
 		if (result_ == NULL) {
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 			logger_error("result NULL");
 
 			return NULL;
 		}
 
-		// å–å¾—æœåŠ¡å™¨çš„å“åº”ç»“æœçš„ç±»å‹ï¼Œå¹¶è¿›è¡Œåˆ†åˆ«å¤„ç†
+		// È¡µÃ·şÎñÆ÷µÄÏìÓ¦½á¹ûµÄÀàĞÍ£¬²¢½øĞĞ·Ö±ğ´¦Àí
 		type = result_->get_type();
 
 		if (type == REDIS_RESULT_UNKOWN) {
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 			logger_error("unknown result type: %d", type);
 
@@ -468,19 +468,19 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 		}
 
 		if (type != REDIS_RESULT_ERROR) {
-			// å¦‚æœå‘ç”Ÿé‡å®šå‘è¿‡ç¨‹ï¼Œåˆ™è®¾ç½®å“ˆå¸Œæ§½å¯¹åº” redis æœåŠ¡åœ°å€
+			// Èç¹û·¢ÉúÖØ¶¨Ïò¹ı³Ì£¬ÔòÉèÖÃ¹şÏ£²Û¶ÔÓ¦ redis ·şÎñµØÖ·
 			if (slot_ < 0 || !last_moved) {
-				// å°†è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+				// ½«Á¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 				conn->get_pool()->put(conn, true);
 				return result_;
 			}
 
-			// XXX: å› ä¸ºæ­¤å¤„è¿˜è¦å¼•ç”¨ä¸€æ¬¡ conn å¯¹è±¡ï¼Œæ‰€ä»¥å°† conn
-			// å½’è¿˜ç»™è¿æ¥æ± çš„è¿‡ç¨‹é¡»æ”¾åœ¨æ­¤æ®µä»£ç ä¹‹å
+			// XXX: ÒòÎª´Ë´¦»¹ÒªÒıÓÃÒ»´Î conn ¶ÔÏó£¬ËùÒÔ½« conn
+			// ¹é»¹¸øÁ¬½Ó³ØµÄ¹ı³ÌĞë·ÅÔÚ´Ë¶Î´úÂëÖ®ºó
 			const char* addr = conn->get_pool()->get_addr();
 			cluster->set_slot(slot_, addr);
 
-			// å°†è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«Á¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 
 			return result_;
@@ -488,19 +488,19 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 #define	EQ(x, y) !strncasecmp((x), (y), sizeof(y) -1)
 
-		// å¯¹äºç»“æœç±»å‹ä¸ºé”™è¯¯ç±»å‹ï¼Œåˆ™éœ€è¦è¿›ä¸€æ­¥åˆ¤æ–­æ˜¯å¦æ˜¯é‡å®šå‘æŒ‡ä»¤
+		// ¶ÔÓÚ½á¹ûÀàĞÍÎª´íÎóÀàĞÍ£¬ÔòĞèÒª½øÒ»²½ÅĞ¶ÏÊÇ·ñÊÇÖØ¶¨ÏòÖ¸Áî
 		const char* ptr = result_->get_error();
 		if (ptr == NULL || *ptr == 0) {
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 			logger_error("result error: null");
 
 			return result_;
 		}
 
-		// å¦‚æœå‡ºé”™ä¿¡æ¯ä¸ºé‡å®šå‘æŒ‡ä»¤ï¼Œåˆ™æ‰§è¡Œé‡å®šå‘è¿‡ç¨‹
+		// Èç¹û³ö´íĞÅÏ¢ÎªÖØ¶¨ÏòÖ¸Áî£¬ÔòÖ´ĞĞÖØ¶¨Ïò¹ı³Ì
 		if (EQ(ptr, "MOVED")) {
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 
 			const char* addr = get_addr(ptr);
@@ -530,10 +530,10 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 
 			last_moved = true;
 
-			// éœ€è¦ä¿å­˜å“ˆå¸Œæ§½å€¼
+			// ĞèÒª±£´æ¹şÏ£²ÛÖµ
 			clear(true);
 		} else if (EQ(ptr, "ASK")) {
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 
 			const char* addr = get_addr(ptr);
@@ -579,7 +579,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			clear(true);
 		}
 
-		// å¤„ç†ä¸€ä¸ªä¸»ç»“ç‚¹å¤±æ•ˆçš„æƒ…å½¢
+		// ´¦ÀíÒ»¸öÖ÷½áµãÊ§Ğ§µÄÇéĞÎ
 		else if (EQ(ptr, "CLUSTERDOWN")) {
 			cluster->clear_slot(slot_);
 
@@ -590,7 +590,7 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 				acl_doze(redirect_sleep_);
 			}
 
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 
 			conn = peek_conn(cluster, -1);
@@ -603,9 +603,9 @@ const redis_result* redis_command::run(redis_client_cluster* cluster,
 			set_client_addr(*conn);
 		}
 
-		// å¯¹äºå…¶å®ƒé”™è¯¯ç±»å‹ï¼Œåˆ™ç›´æ¥è¿”å›æœ¬æ¬¡å¾—åˆ°çš„å“åº”ç»“æœå¯¹è±¡
+		// ¶ÔÓÚÆäËü´íÎóÀàĞÍ£¬ÔòÖ±½Ó·µ»Ø±¾´ÎµÃµ½µÄÏìÓ¦½á¹û¶ÔÏó
 		else {
-			// å°†æ—§è¿æ¥å¯¹è±¡å½’è¿˜ç»™è¿æ¥æ± å¯¹è±¡
+			// ½«¾ÉÁ¬½Ó¶ÔÏó¹é»¹¸øÁ¬½Ó³Ø¶ÔÏó
 			conn->get_pool()->put(conn, true);
 
 			logger_error("server error: %s", ptr);

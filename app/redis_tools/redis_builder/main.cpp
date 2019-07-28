@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "redis_status.h"
 #include "redis_monitor.h"
 #include "redis_util.h"

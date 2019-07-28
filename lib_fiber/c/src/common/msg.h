@@ -1,4 +1,4 @@
-ï»¿#ifndef _MSG_INCLUDE_H_
+#ifndef _MSG_INCLUDE_H_
 #define _MSG_INCLUDE_H_
 
 #ifdef  __cplusplus
@@ -12,43 +12,43 @@ extern "C" {
 #undef	USE_PRINTF_MACRO
 
 /**
- * å½“è®°å½•æ—¥å¿—ä¿¡æ¯è‡³æ—¥å¿—æ–‡ä»¶æ—¶ï¼Œéœ€è¦è°ƒç”¨å¦‚ä¸‹çš„æ—¥å¿—è®°å½•å‡½æ•°
+ * µ±¼ÇÂ¼ÈÕÖ¾ĞÅÏ¢ÖÁÈÕÖ¾ÎÄ¼şÊ±£¬ĞèÒªµ÷ÓÃÈçÏÂµÄÈÕÖ¾¼ÇÂ¼º¯Êı
  */
 
 #ifndef	USE_PRINTF_MACRO
 
 /**
- * ä¸€èˆ¬çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
- * @param fmt {const char*} å‚æ•°æ ¼å¼
- * @param ... å˜å‚åºåˆ—
+ * Ò»°ã¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
+ * @param fmt {const char*} ²ÎÊı¸ñÊ½
+ * @param ... ±ä²ÎĞòÁĞ
  */
 void PRINTF(1, 2) msg_info(const char *fmt,...);
 
 /**
- * è­¦å‘Šçº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
- * @param fmt {const char*} å‚æ•°æ ¼å¼
- * @param ... å˜å‚åºåˆ—
+ * ¾¯¸æ¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
+ * @param fmt {const char*} ²ÎÊı¸ñÊ½
+ * @param ... ±ä²ÎĞòÁĞ
  */
 void PRINTF(1, 2) msg_warn(const char *fmt,...);
 
 /**
- * é”™è¯¯çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
- * @param fmt {const char*} å‚æ•°æ ¼å¼
- * @param ... å˜å‚åºåˆ—
+ * ´íÎó¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
+ * @param fmt {const char*} ²ÎÊı¸ñÊ½
+ * @param ... ±ä²ÎĞòÁĞ
  */
 void PRINTF(1, 2) msg_error(const char *fmt,...);
 
 /**
- * è‡´å‘½çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
- * @param fmt {const char*} å‚æ•°æ ¼å¼
- * @param ... å˜å‚åºåˆ—
+ * ÖÂÃü¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
+ * @param fmt {const char*} ²ÎÊı¸ñÊ½
+ * @param ... ±ä²ÎĞòÁĞ
  */
 void PRINTF(1, 2) msg_fatal(const char *fmt,...);
 
 #else
 
 /**
- * å½“è®°å½•æ—¥å¿—ä¿¡æ¯è‡³æ ‡å‡†è¾“å‡ºæ—¶ï¼Œéœ€è¦è°ƒç”¨å¦‚ä¸‹çš„æ—¥å¿—è®°å½•å‡½æ•°
+ * µ±¼ÇÂ¼ÈÕÖ¾ĞÅÏ¢ÖÁ±ê×¼Êä³öÊ±£¬ĞèÒªµ÷ÓÃÈçÏÂµÄÈÕÖ¾¼ÇÂ¼º¯Êı
  */
 
 #include <stdio.h>
@@ -66,24 +66,24 @@ void PRINTF(1, 2) msg_fatal(const char *fmt,...);
 #endif
 
 /**
- * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯
- * @param buffer {char*} å­˜å‚¨é”™è¯¯æè¿°ä¿¡æ¯çš„å†…å­˜ç¼“å†²åŒº
- * @param size {size_t} buffer çš„ç©ºé—´å¤§å°
- * @return {const char*} è¿”å›çš„åœ°å€åº”ä¸ buffer ç›¸åŒ
+ * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢
+ * @param buffer {char*} ´æ´¢´íÎóÃèÊöĞÅÏ¢µÄÄÚ´æ»º³åÇø
+ * @param size {size_t} buffer µÄ¿Õ¼ä´óĞ¡
+ * @return {const char*} ·µ»ØµÄµØÖ·Ó¦Óë buffer ÏàÍ¬
  */
 const char *last_strerror(char *buffer, size_t size);
 
 /**
- * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯ï¼Œè¯¥å‡½æ•°å†…éƒ¨é‡‡ç”¨äº†çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œæ‰€ä»¥æ˜¯
- * çº¿ç¨‹å®‰å…¨çš„ï¼Œä½†ä½¿ç”¨èµ·æ¥æ›´ç®€å•äº›
- * @return {const char *} è¿”å›é”™è¯¯æç¤ºä¿¡æ¯ 
+ * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢£¬¸Ãº¯ÊıÄÚ²¿²ÉÓÃÁËÏß³Ì¾Ö²¿±äÁ¿£¬ËùÒÔÊÇ
+ * Ïß³Ì°²È«µÄ£¬µ«Ê¹ÓÃÆğÀ´¸ü¼òµ¥Ğ©
+ * @return {const char *} ·µ»Ø´íÎóÌáÊ¾ĞÅÏ¢ 
  */
 const char *last_serror(void);
 
 /**
- * è¾“å‡ºä¿¡æ¯è‡³æ ‡å‡†è¾“å‡º
- * @param fmt {const char*} æ ¼å¼å‚æ•°
- * @param ... å˜å‚åºåˆ—
+ * Êä³öĞÅÏ¢ÖÁ±ê×¼Êä³ö
+ * @param fmt {const char*} ¸ñÊ½²ÎÊı
+ * @param ... ±ä²ÎĞòÁĞ
  */
 void PRINTF(1, 2) msg_printf(const char *fmt,...);
 

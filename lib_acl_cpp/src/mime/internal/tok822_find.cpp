@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tok822_find 3
  * SUMMARY

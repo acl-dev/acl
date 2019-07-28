@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
@@ -15,26 +15,26 @@ struct MIME_NODE;
 namespace acl {
 
 /**
- * http mime ç»“ç‚¹ç±»ï¼Œç»§æ‰¿å…³ç³»ï¼š
+ * http mime ½áµãÀà£¬¼Ì³Ğ¹ØÏµ£º
  *   http_mime_node : mime_attach : mime_node
- * å¸¸ç”¨å‡½æ•°åŠŸèƒ½ï¼š
- * http_mime_node::get_mime_type è·å¾—è¯¥ç»“ç‚¹çš„ç±»å‹
- * mime_node::get_name: è·å¾—è¯¥ç»“ç‚¹çš„åç§°
- * mime_attach::get_filename: å½“ç»“ç‚¹ä¸ºä¸Šä¼ æ–‡ä»¶ç±»å‹æ—¶ï¼Œæ­¤å‡½æ•°
- *   è·å¾—ä¸Šä¼ æ–‡ä»¶çš„æ–‡ä»¶å
- * http_mime_node::get_value: å½“ç»“ç‚¹ä¸ºå‚æ•°ç±»å‹æ—¶ï¼Œæ­¤å‡½æ•°è·å¾—
- *   å‚æ•°å€¼
+ * ³£ÓÃº¯Êı¹¦ÄÜ£º
+ * http_mime_node::get_mime_type »ñµÃ¸Ã½áµãµÄÀàĞÍ
+ * mime_node::get_name: »ñµÃ¸Ã½áµãµÄÃû³Æ
+ * mime_attach::get_filename: µ±½áµãÎªÉÏ´«ÎÄ¼şÀàĞÍÊ±£¬´Ëº¯Êı
+ *   »ñµÃÉÏ´«ÎÄ¼şµÄÎÄ¼şÃû
+ * http_mime_node::get_value: µ±½áµãÎª²ÎÊıÀàĞÍÊ±£¬´Ëº¯Êı»ñµÃ
+ *   ²ÎÊıÖµ
  */
 class ACL_CPP_API http_mime_node : public mime_attach
 {
 public:
 	/**
-	 * @param path {const char*} åŸå§‹æ–‡ä»¶å­˜æ”¾è·¯å¾„ï¼Œä¸èƒ½ä¸ºç©º
-	 * @param node {MIME_NODE*} å¯¹åº”çš„ MIME ç»“ç‚¹ï¼Œéç©º
-	 * @param decodeIt {bool} æ˜¯å¦å¯¹ MIME ç»“ç‚¹çš„å¤´éƒ¨æ•°æ®
-	 *  æˆ–æ•°æ®ä½“æ•°æ®è¿›è¡Œè§£ç 
-	 * @param toCharset {const char*} æœ¬æœºçš„å­—ç¬¦é›†
-	 * @param off {off_t} åç§»æ•°æ®ä½ç½®
+	 * @param path {const char*} Ô­Ê¼ÎÄ¼ş´æ·ÅÂ·¾¶£¬²»ÄÜÎª¿Õ
+	 * @param node {MIME_NODE*} ¶ÔÓ¦µÄ MIME ½áµã£¬·Ç¿Õ
+	 * @param decodeIt {bool} ÊÇ·ñ¶Ô MIME ½áµãµÄÍ·²¿Êı¾İ
+	 *  »òÊı¾İÌåÊı¾İ½øĞĞ½âÂë
+	 * @param toCharset {const char*} ±¾»úµÄ×Ö·û¼¯
+	 * @param off {off_t} Æ«ÒÆÊı¾İÎ»ÖÃ
 	 */
 	http_mime_node(const char* path, const MIME_NODE* node,
 		bool decodeIt = true, const char* toCharset = "gb2312",
@@ -42,15 +42,15 @@ public:
 	~http_mime_node(void);
 
 	/**
-	 * è·å¾—è¯¥ç»“ç‚¹çš„ç±»å‹
+	 * »ñµÃ¸Ã½áµãµÄÀàĞÍ
 	 * @return {http_mime_t}
 	 */
 	http_mime_t get_mime_type(void) const;
 
 	/**
-	 * å½“ get_mime_type è¿”å›çš„ç±»å‹ä¸º HTTP_MIME_PARAM æ—¶ï¼Œå¯ä»¥
-	 * è°ƒç”¨æ­¤å‡½æ•°è·å¾—å‚æ•°å€¼ï¼›å‚æ•°åå¯ä»¥é€šè¿‡åŸºç±»çš„ get_name() è·å¾—
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºå‚æ•°ä¸å­˜åœ¨
+	 * µ± get_mime_type ·µ»ØµÄÀàĞÍÎª HTTP_MIME_PARAM Ê±£¬¿ÉÒÔ
+	 * µ÷ÓÃ´Ëº¯Êı»ñµÃ²ÎÊıÖµ£»²ÎÊıÃû¿ÉÒÔÍ¨¹ı»ùÀàµÄ get_name() »ñµÃ
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾²ÎÊı²»´æÔÚ
 	 */
 	const char* get_value(void) const;
 
@@ -66,55 +66,55 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * http mime è§£æå™¨ï¼Œè¯¥è§£æå™¨ä¸ºæµå¼è§£æå™¨ï¼Œç”¨æˆ·åœ¨ä½¿ç”¨æ—¶å¯ä»¥æ¯æ¬¡ä»…è¾“å…¥
- * éƒ¨åˆ†æ•°æ®ç»™ update å‡½æ•°ï¼Œå½“è¯¥å‡½æ•°è¿”å› true æ—¶è¡¨ç¤ºè§£æå®Œæˆä¸”è§£ææ­£ç¡®
+ * http mime ½âÎöÆ÷£¬¸Ã½âÎöÆ÷ÎªÁ÷Ê½½âÎöÆ÷£¬ÓÃ»§ÔÚÊ¹ÓÃÊ±¿ÉÒÔÃ¿´Î½öÊäÈë
+ * ²¿·ÖÊı¾İ¸ø update º¯Êı£¬µ±¸Ãº¯Êı·µ»Ø true Ê±±íÊ¾½âÎöÍê³ÉÇÒ½âÎöÕıÈ·
  */
 class ACL_CPP_API http_mime : public dbuf_obj
 {
 public:
 	/**
-	 * æ„å»ºå‡½æ•°
-	 * @param boundary {const char*} åˆ†éš”ç¬¦ï¼Œä¸èƒ½ä¸ºç©º
-	 * @param local_charset {const char*} æœ¬åœ°å­—ç¬¦é›†ï¼Œéç©ºæ—¶ä¼šè‡ªåŠ¨å°†
-	 *  å‚æ•°å†…å®¹è½¬ä¸ºæœ¬åœ°å­—ç¬¦é›†
+	 * ¹¹½¨º¯Êı
+	 * @param boundary {const char*} ·Ö¸ô·û£¬²»ÄÜÎª¿Õ
+	 * @param local_charset {const char*} ±¾µØ×Ö·û¼¯£¬·Ç¿ÕÊ±»á×Ô¶¯½«
+	 *  ²ÎÊıÄÚÈİ×ªÎª±¾µØ×Ö·û¼¯
 	 */
 	http_mime(const char* boundary, const char* local_charset  = "gb2312");
 	~http_mime(void);
 
 	/**
-	 * è®¾ç½® MIME æ•°æ®çš„å­˜å‚¨è·¯å¾„ï¼Œå½“åˆ†æå®Œ MIME æ•°æ®åï¼Œå¦‚æœæƒ³è¦
-	 * ä»ä¸­æå–æ•°æ®ï¼Œåˆ™å¿…é¡»ç»™å‡ºè¯¥ MIME çš„åŸå§‹æ•°æ®çš„å­˜å‚¨ä½ç½®ï¼Œå¦åˆ™
-	 * æ— æ³•è·å¾—ç›¸åº”æ•°æ®ï¼Œå³ save_xxx/get_nodes/get_node å‡½æ•°å‡æ— æ³•
-	 * æ­£å¸¸ä½¿ç”¨
-	 * @param path {const char*} æ–‡ä»¶è·¯å¾„å, å¦‚æœè¯¥å‚æ•°ä¸ºç©º, åˆ™ä¸èƒ½
-	 *  è·å¾—æ•°æ®ä½“æ•°æ®, ä¹Ÿä¸èƒ½è°ƒç”¨ save_xxx ç›¸å…³çš„æ¥å£
+	 * ÉèÖÃ MIME Êı¾İµÄ´æ´¢Â·¾¶£¬µ±·ÖÎöÍê MIME Êı¾İºó£¬Èç¹ûÏëÒª
+	 * ´ÓÖĞÌáÈ¡Êı¾İ£¬Ôò±ØĞë¸ø³ö¸Ã MIME µÄÔ­Ê¼Êı¾İµÄ´æ´¢Î»ÖÃ£¬·ñÔò
+	 * ÎŞ·¨»ñµÃÏàÓ¦Êı¾İ£¬¼´ save_xxx/get_nodes/get_node º¯Êı¾ùÎŞ·¨
+	 * Õı³£Ê¹ÓÃ
+	 * @param path {const char*} ÎÄ¼şÂ·¾¶Ãû, Èç¹û¸Ã²ÎÊıÎª¿Õ, Ôò²»ÄÜ
+	 *  »ñµÃÊı¾İÌåÊı¾İ, Ò²²»ÄÜµ÷ÓÃ save_xxx Ïà¹ØµÄ½Ó¿Ú
 	 */
 	void set_saved_path(const char* path);
 
 	/**
-	 * è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œæµå¼æ–¹å¼è§£ææ•°æ®ä½“å†…å®¹
-	 * @param data {const char*} æ•°æ®ä½“(å¯èƒ½æ˜¯æ•°æ®å¤´ä¹Ÿå¯èƒ½æ˜¯æ•°æ®ä½“, 
-	 *  å¹¶ä¸”ä¸å¿…æ˜¯å®Œæ•´çš„æ•°æ®è¡Œ)
-	 * @param len {size_t} data æ•°æ®é•¿åº¦
-	 * @return {bool} é’ˆå¯¹ multipart æ•°æ®, è¿”å› true è¡¨ç¤ºè§£æå®Œæ¯•;
-	 *  å¯¹äºé multipart æ–‡ä»¶, è¯¥è¿”å›å€¼æ°¸è¿œä¸º false, æ²¡æœ‰ä»»ä½•æ„ä¹‰, 
-	 *  éœ€è¦è°ƒç”¨è€…è‡ªå·±åˆ¤æ–­æ•°æ®ä½“çš„ç»“æŸä½ç½®
-	 * æ³¨æ„: è°ƒç”¨å®Œæ­¤å‡½æ•°åä¸€å®šéœ€è¦è°ƒç”¨ update_end å‡½æ•°é€šçŸ¥è§£æå™¨
-	 * è§£æå®Œæ¯•
+	 * µ÷ÓÃ´Ëº¯Êı½øĞĞÁ÷Ê½·½Ê½½âÎöÊı¾İÌåÄÚÈİ
+	 * @param data {const char*} Êı¾İÌå(¿ÉÄÜÊÇÊı¾İÍ·Ò²¿ÉÄÜÊÇÊı¾İÌå, 
+	 *  ²¢ÇÒ²»±ØÊÇÍêÕûµÄÊı¾İĞĞ)
+	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * @return {bool} Õë¶Ô multipart Êı¾İ, ·µ»Ø true ±íÊ¾½âÎöÍê±Ï;
+	 *  ¶ÔÓÚ·Ç multipart ÎÄ¼ş, ¸Ã·µ»ØÖµÓÀÔ¶Îª false, Ã»ÓĞÈÎºÎÒâÒå, 
+	 *  ĞèÒªµ÷ÓÃÕß×Ô¼ºÅĞ¶ÏÊı¾İÌåµÄ½áÊøÎ»ÖÃ
+	 * ×¢Òâ: µ÷ÓÃÍê´Ëº¯ÊıºóÒ»¶¨ĞèÒªµ÷ÓÃ update_end º¯ÊıÍ¨Öª½âÎöÆ÷
+	 * ½âÎöÍê±Ï
 	 */
 	bool update(const char* data, size_t len);
 
 	/**
-	 * è·å¾—æ‰€æœ‰çš„ MIME ç»“ç‚¹
+	 * »ñµÃËùÓĞµÄ MIME ½áµã
 	 * @return {const std::list<http_mimde_node*>&}
 	 */
 	const std::list<http_mime_node*>& get_nodes(void) const;
 
 	/**
-	 * æ ¹æ®å˜é‡åå–å¾— HTTP MIME ç»“ç‚¹
-	 * @param name {const char*} å˜é‡å
-	 * @return {const http_mime_node*} è¿”å›ç©ºåˆ™è¯´æ˜å¯¹åº”å˜é‡åçš„ç»“ç‚¹
-	 *  ä¸å­˜åœ¨
+	 * ¸ù¾İ±äÁ¿ÃûÈ¡µÃ HTTP MIME ½áµã
+	 * @param name {const char*} ±äÁ¿Ãû
+	 * @return {const http_mime_node*} ·µ»Ø¿ÕÔòËµÃ÷¶ÔÓ¦±äÁ¿ÃûµÄ½áµã
+	 *  ²»´æÔÚ
 	 */
 	const http_mime_node* get_node(const char* name) const;
 

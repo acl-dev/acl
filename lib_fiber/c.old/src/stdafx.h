@@ -1,4 +1,4 @@
-﻿#ifndef __STD_AFX_INCLUDE_H__
+#ifndef __STD_AFX_INCLUDE_H__
 #define __STD_AFX_INCLUDE_H__
 
 # if defined(_WIN32) || defined(_WIN64)

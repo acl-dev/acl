@@ -1,4 +1,4 @@
-﻿#ifndef ACL_IPV6_PATCH_INCLUDE_H
+#ifndef ACL_IPV6_PATCH_INCLUDE_H
 #define ACL_IPV6_PATCH_INCLUDE_H
 
 #if 1

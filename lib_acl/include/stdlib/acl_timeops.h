@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  * Name: misc.h
  * Author: zsx
  * Date: 2003-12-16
@@ -16,9 +16,9 @@ extern "C" {
 
 /* acl_str2time.c */
 /**
- * å°†æ—¶é—´å­—ç¬¦ä¸²è½¬æ¢ä¸º time_t ç±»å‹
- * @param str æ—¶é—´å­—ç¬¦ä¸²æ ¼å¼ä¸º: year-month-mday(å¦‚: 2004-1-1)
- * @return time_t ç±»å‹çš„å€¼
+ * ½«Ê±¼ä×Ö·û´®×ª»»Îª time_t ÀàĞÍ
+ * @param str Ê±¼ä×Ö·û´®¸ñÊ½Îª: year-month-mday(Èç: 2004-1-1)
+ * @return time_t ÀàĞÍµÄÖµ
  */
 ACL_API time_t acl_str2time_t(const char *str);
 

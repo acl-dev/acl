@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tls_scache 3
  * SUMMARY

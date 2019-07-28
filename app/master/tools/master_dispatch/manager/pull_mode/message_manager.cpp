@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "pull_mode/message.h"
 #include "pull_mode/message_manager.h"
 

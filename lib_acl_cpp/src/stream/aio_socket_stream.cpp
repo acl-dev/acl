@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
@@ -18,16 +18,16 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle,
 
 	stream_ = stream;
 
-	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
-	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
+	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
 	hook_error();
 
-	// åªæœ‰å½“æµè¿æ¥æˆåŠŸåæ‰å¯ hook IO è¯»å†™çŠ¶æ€
+	// Ö»ÓĞµ±Á÷Á¬½Ó³É¹¦ºó²Å¿É hook IO ¶ÁĞ´×´Ì¬
 	if (opened) {
-		// hook è¯»å›è°ƒè¿‡ç¨‹
+		// hook ¶Á»Øµ÷¹ı³Ì
 		hook_read();
 
-		// hook å†™å›è°ƒè¿‡ç¨‹
+		// hook Ğ´»Øµ÷¹ı³Ì
 		hook_write();
 	}
 }
@@ -43,15 +43,15 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
-	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
+	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
 	hook_error();
 
-	// åªæœ‰å½“æµè¿æ¥æˆåŠŸåæ‰å¯ hook IO è¯»çŠ¶æ€
-	// hook è¯»å›è°ƒè¿‡ç¨‹
+	// Ö»ÓĞµ±Á÷Á¬½Ó³É¹¦ºó²Å¿É hook IO ¶Á×´Ì¬
+	// hook ¶Á»Øµ÷¹ı³Ì
 	hook_read();
 
-	// hook å†™å›è°ƒè¿‡ç¨‹
+	// hook Ğ´»Øµ÷¹ı³Ì
 	hook_write();
 }
 
@@ -71,7 +71,7 @@ void aio_socket_stream::destroy(void)
 
 void aio_socket_stream::add_open_callback(aio_open_callback* callback)
 {
-	// å…ˆæŸ¥è¯¢è¯¥å›è°ƒå¯¹è±¡å·²ç»å­˜åœ¨
+	// ÏÈ²éÑ¯¸Ã»Øµ÷¶ÔÏóÒÑ¾­´æÔÚ
 	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_.begin();
 	for (; it != open_callbacks_.end(); ++it) {
 		if ((*it)->callback == callback) {
@@ -82,7 +82,7 @@ void aio_socket_stream::add_open_callback(aio_open_callback* callback)
 		}
 	}
 
-	// æ‰¾ä¸€ä¸ªç©ºä½
+	// ÕÒÒ»¸ö¿ÕÎ»
 	it = open_callbacks_.begin();
 	for (; it != open_callbacks_.end(); ++it) {
 		if ((*it)->callback == NULL) {
@@ -92,13 +92,13 @@ void aio_socket_stream::add_open_callback(aio_open_callback* callback)
 		}
 	}
 
-	// åˆ†é…ä¸€ä¸ªæ–°çš„ä½ç½®
+	// ·ÖÅäÒ»¸öĞÂµÄÎ»ÖÃ
 	AIO_OPEN_CALLBACK* ac = (AIO_OPEN_CALLBACK*)
 		acl_mycalloc(1, sizeof(AIO_OPEN_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
-	// æ·»åŠ è¿›å›è°ƒå¯¹è±¡é˜Ÿåˆ—ä¸­
+	// Ìí¼Ó½ø»Øµ÷¶ÔÏó¶ÓÁĞÖĞ
 	open_callbacks_.push_back(ac);
 }
 
@@ -196,10 +196,10 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 	aio_socket_stream* stream =
 		NEW aio_socket_stream(handle, astream, false);
 
-	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
-	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
+	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
 	stream->hook_error();
-	// hook è¿æ¥æˆåŠŸçš„å›è°ƒè¿‡ç¨‹
+	// hook Á¬½Ó³É¹¦µÄ»Øµ÷¹ı³Ì
 	stream->hook_open();
 
 	return stream;
@@ -227,16 +227,16 @@ int aio_socket_stream::open_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 {
 	aio_socket_stream* ss = (aio_socket_stream*) ctx;
 
-	// è®¾ç½®çŠ¶æ€ï¼Œè¡¨æ˜å·²ç»è¿æ¥æˆåŠŸ
+	// ÉèÖÃ×´Ì¬£¬±íÃ÷ÒÑ¾­Á¬½Ó³É¹¦
 	ss->opened_ = true;
 
-	// hook è¯»å›è°ƒè¿‡ç¨‹
+	// hook ¶Á»Øµ÷¹ı³Ì
 	ss->hook_read();
 
-	// hook å†™å›è°ƒè¿‡ç¨‹
+	// hook Ğ´»Øµ÷¹ı³Ì
 	ss->hook_write();
 
-	// éå†æ‰€æœ‰çš„æ‰“å¼€å›è°ƒå¯¹è±¡ï¼Œå¹¶è°ƒç”¨ä¹‹
+	// ±éÀúËùÓĞµÄ´ò¿ª»Øµ÷¶ÔÏó£¬²¢µ÷ÓÃÖ®
 	std::list<AIO_OPEN_CALLBACK*>::iterator it =
 		ss->open_callbacks_.begin();
 	for (; it != ss->open_callbacks_.end(); ++it) {

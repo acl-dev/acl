@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "common.h"
 
 #include "event/event_epoll.h"

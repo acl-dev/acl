@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "connect_manager.h"
 #include "mymonitor.h"
 #include "connect_pool.h"
@@ -28,19 +28,19 @@ static void check_all_connections(void)
 			(*cit)->aliving() ? "alive" : "dead");
 }
 
-// åˆå§‹åŒ–è¿‡ç¨‹
+// ³õÊ¼»¯¹ı³Ì
 static void init(const char* addrs, int count,
 	bool sync_check, const acl::string& proto)
 {
-	// åˆ›å»º HTTP è¯·æ±‚è¿æ¥æ± é›†ç¾¤ç®¡ç†å¯¹è±¡
+	// ´´½¨ HTTP ÇëÇóÁ¬½Ó³Ø¼¯Èº¹ÜÀí¶ÔÏó
 	__conn_manager = new connect_manager();
 
-	// æ·»åŠ æœåŠ¡å™¨é›†ç¾¤åœ°å€
+	// Ìí¼Ó·şÎñÆ÷¼¯ÈºµØÖ·
 	__conn_manager->init(addrs, addrs, 100);
 
 	printf(">>>start monitor thread\r\n");
 
-	// å¯åŠ¨åå°æ£€æµ‹çº¿ç¨‹
+	// Æô¶¯ºóÌ¨¼ì²âÏß³Ì
 	int  check_inter = 1, conn_timeout = 5;
 
 	acl::connect_monitor* monitor = new mymonitor(*__conn_manager, proto);
@@ -55,17 +55,17 @@ static void init(const char* addrs, int count,
 	sleep_while(n);
 
 	printf(">>>create thread pool\r\n");
-	// åˆ›å»ºçº¿ç¨‹æ± 
+	// ´´½¨Ïß³Ì³Ø
 	__thr_pool = acl_thread_pool_create(count, 60);
 }
 
-// è¿›ç¨‹é€€å‡ºå‰æ¸…ç†èµ„æº
+// ½ø³ÌÍË³öÇ°ÇåÀí×ÊÔ´
 static void end(void)
 {
-	// é”€æ¯çº¿ç¨‹æ± 
+	// Ïú»ÙÏß³Ì³Ø
 	acl_pthread_pool_destroy(__thr_pool);
 
-	// æ‰“å°æ‰€æœ‰è¿æ¥æ± é›†ç¾¤çš„å­˜æ´»çŠ¶æ€
+	// ´òÓ¡ËùÓĞÁ¬½Ó³Ø¼¯ÈºµÄ´æ»î×´Ì¬
 	printf("\r\n");
 
 	check_all_connections();
@@ -81,17 +81,17 @@ static void end(void)
 	}
 #endif
 
-	// åœæ­¢åå°æ£€æµ‹çº¿ç¨‹
+	// Í£Ö¹ºóÌ¨¼ì²âÏß³Ì
 	acl::connect_monitor* monitor = __conn_manager->stop_monitor(true);
 
-	// åˆ é™¤æ£€æµ‹å™¨å¯¹è±¡
+	// É¾³ı¼ì²âÆ÷¶ÔÏó
 	delete monitor;
 
-	// é”€æ¯è¿æ¥æ± 
+	// Ïú»ÙÁ¬½Ó³Ø
 	delete __conn_manager;
 }
 
-// è¯·æ±‚è¿‡ç¨‹ï¼Œå‘æœåŠ¡å™¨å‘é€è¯·æ±‚åä»æœåŠ¡å™¨è¯»å–å“åº”æ•°æ®
+// ÇëÇó¹ı³Ì£¬Ïò·şÎñÆ÷·¢ËÍÇëÇóºó´Ó·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Êı¾İ
 static bool get(connect_client* conn, int n)
 {
 	printf(">>>check addr: %s, n: %d\r\n", conn->get_addr(), n);
@@ -99,7 +99,7 @@ static bool get(connect_client* conn, int n)
 	return true;
 }
 
-// å­çº¿ç¨‹å¤„ç†è¿‡ç¨‹
+// ×ÓÏß³Ì´¦Àí¹ı³Ì
 static void thread_main(void*)
 {
 	for (int i = 0; i < __loop_count; i++)
@@ -113,10 +113,10 @@ static void thread_main(void*)
 			break;
 		}
 
-		// è®¾ç½®è¿æ¥çš„è¶…æ—¶æ—¶é—´åŠè¯»è¶…æ—¶æ—¶é—´
+		// ÉèÖÃÁ¬½ÓµÄ³¬Ê±Ê±¼ä¼°¶Á³¬Ê±Ê±¼ä
 		pool->set_timeout(2, 2);
 
-		// ä»è¿æ¥æ± ä¸­è·å–ä¸€ä¸ªè¿æ¥
+		// ´ÓÁ¬½Ó³ØÖĞ»ñÈ¡Ò»¸öÁ¬½Ó
 		connect_client* conn = (connect_client*) pool->peek();
 		if (conn == NULL)
 		{
@@ -127,15 +127,15 @@ static void thread_main(void*)
 			break;
 		}
 
-		// éœ€è¦å¯¹è·å¾—çš„è¿æ¥é‡ç½®çŠ¶æ€ï¼Œä»¥æ¸…é™¤ä¸Šæ¬¡è¯·æ±‚è¿‡ç¨‹çš„ä¸´æ—¶æ•°æ®
+		// ĞèÒª¶Ô»ñµÃµÄÁ¬½ÓÖØÖÃ×´Ì¬£¬ÒÔÇå³ıÉÏ´ÎÇëÇó¹ı³ÌµÄÁÙÊ±Êı¾İ
 		else
 			conn->reset();
 
-		// å¼€å§‹æ–°çš„ HTTP è¯·æ±‚è¿‡ç¨‹
+		// ¿ªÊ¼ĞÂµÄ HTTP ÇëÇó¹ı³Ì
 		if (get(conn, i) == false)
 		{
 			printf("one request failed, close connection\r\n");
-			// é”™è¯¯è¿æ¥éœ€è¦å…³é—­
+			// ´íÎóÁ¬½ÓĞèÒª¹Ø±Õ
 			pool->put(conn, false);
 		}
 		else
@@ -147,7 +147,7 @@ static void thread_main(void*)
 
 static void run(int cocurrent)
 {
-	// å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ä»»åŠ¡
+	// ÏòÏß³Ì³ØÖĞÌí¼ÓÈÎÎñ
 	for (int i = 0; i < cocurrent; i++)
 		acl_pthread_pool_add(__thr_pool, thread_main, NULL);
 }
@@ -169,10 +169,10 @@ int main(int argc, char* argv[])
 	acl::string addrs("www.sina.com.cn:80;www.263.net:80;www.qq.com:81");
 	acl::string proto("pop3");
 
-	// åˆå§‹åŒ– acl åº“
+	// ³õÊ¼»¯ acl ¿â
 	acl::acl_cpp_init();
 
-	// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
+	// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
 	acl::log::stdout_open(true);
 
 	while ((ch = getopt(argc, argv, "hs:n:c:SP:")) > 0)

@@ -1,4 +1,4 @@
-ï»¿// http_clientDlg.h : å¤´æ–‡ä»¶
+// http_clientDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
@@ -8,25 +8,25 @@
 #include "afxwin.h"
 #include "afxext.h"
 
-// Chttp_clientDlg å¯¹è¯æ¡†
+// Chttp_clientDlg ¶Ô»°¿ò
 class Chttp_clientDlg : public CDialog
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	Chttp_clientDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	Chttp_clientDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_HTTP_CLIENT_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

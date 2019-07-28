@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "action/service_list.h"
 #include "action/service_stat.h"
 #include "action/service_start.h"

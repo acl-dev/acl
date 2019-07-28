@@ -1,4 +1,4 @@
-﻿#ifndef	__TLS_PRIVATE_INCLUDE_H__
+#ifndef	__TLS_PRIVATE_INCLUDE_H__
 #define	__TLS_PRIVATE_INCLUDE_H__
 
 #ifdef USE_TLS

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "master_service.h"
 #include "http_servlet.h"
 #if defined(_WIN32) || defined(_WIN64)
@@ -30,12 +30,12 @@ bool http_servlet::doError(request_t&, response_t& res)
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (!res.sendHeader()) {
 		return false;
 	}
 
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	(void) res.getOutputStream().write(buf);
@@ -46,21 +46,21 @@ bool http_servlet::doOther(request_t&, response_t& res, const char* method)
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (!res.sendHeader()) {
 		return false;
 	}
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
 	(void) res.getOutputStream().write(buf);
 	return false;
 }
 
-// ä¸šåŠ¡é€»è¾‘å…¥å£
+// ÒµÎñÂß¼­Èë¿Ú
 bool http_servlet::run(void)
 {
-	// å¦‚æœæ­£åœ¨è¯»å–å®¢æˆ·ç«¯ä¸Šä¼ çš„æ•°æ®ï¼Œåˆ™è¿›å…¥ä¸Šä¼ å¤„ç†è¿‡ç¨‹
+	// Èç¹ûÕıÔÚ¶ÁÈ¡¿Í»§¶ËÉÏ´«µÄÊı¾İ£¬Ôò½øÈëÉÏ´«´¦Àí¹ı³Ì
 	if (uploading_) {
 		if (req_ == NULL) {
 			logger_error("req_ null");
@@ -73,7 +73,7 @@ bool http_servlet::run(void)
 
 		return doUpload(*req_, *res_);
 	}
-	// å¦åˆ™ï¼Œèµ°æ­£å¸¸çš„HTTPå¤„ç†æµç¨‹ï¼ŒdoGet/doPost å°†ä¼šè¢«è°ƒç”¨
+	// ·ñÔò£¬×ßÕı³£µÄHTTP´¦ÀíÁ÷³Ì£¬doGet/doPost ½«»á±»µ÷ÓÃ
 	else {
 		return doRun();
 	}
@@ -91,13 +91,13 @@ bool http_servlet::doPost(request_t& req, response_t& res)
 	return handler ? (this->*handler)(req, res) : onPage(req, res);
 }
 
-// ç¼ºçœ HTTP è¯·æ±‚ï¼Œå°† upload.html é¡µé¢è¿”å›ç»™ HTTP å®¢æˆ·ç«¯
+// È±Ê¡ HTTP ÇëÇó£¬½« upload.html Ò³Ãæ·µ»Ø¸ø HTTP ¿Í»§¶Ë
 bool http_servlet::onPage(request_t& req, response_t& res)
 {
-	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
-		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
-		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
-		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
+	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
+		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
+		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
+		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
 
 	const char* page_html = "upload.html";
 	acl::string buf;
@@ -112,27 +112,27 @@ bool http_servlet::onPage(request_t& req, response_t& res)
 
 bool http_servlet::onUpload(request_t& req, response_t& res)
 {
-	res.setContentType("text/xml; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
-		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
-		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
-		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
+	res.setContentType("text/xml; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
+		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
+		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
+		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
 
-	// è·å¾— HTTP è¯·æ±‚çš„æ•°æ®ç±»å‹ï¼Œæ­£å¸¸çš„å‚æ•°ç±»å‹ï¼Œå³ name&value æ–¹å¼
-	// è¿˜æ˜¯ MIME æ•°æ®ç±»å‹ï¼Œè¿˜æ˜¯æ•°æ®æµç±»å‹
+	// »ñµÃ HTTP ÇëÇóµÄÊı¾İÀàĞÍ£¬Õı³£µÄ²ÎÊıÀàĞÍ£¬¼´ name&value ·½Ê½
+	// »¹ÊÇ MIME Êı¾İÀàĞÍ£¬»¹ÊÇÊı¾İÁ÷ÀàĞÍ
 	acl::http_request_t request_type = req.getRequestType();
 	if (request_type != acl::HTTP_REQUEST_MULTIPART_FORM) {
 		logger_warn("should be acl::HTTP_REQUEST_MULTIPART_FORM");
 		return onPage(req, res);
 	}
 
-	// å…ˆè·å¾— Content-Type å¯¹åº”çš„ http_ctype å¯¹è±¡
+	// ÏÈ»ñµÃ Content-Type ¶ÔÓ¦µÄ http_ctype ¶ÔÏó
 	mime_ = req.getHttpMime();
 	if (mime_ == NULL) {
 		logger_error("http_mime null");
 		return onPage(req, res);
 	}
 
-	// è·å¾—æ•°æ®ä½“çš„é•¿åº¦
+	// »ñµÃÊı¾İÌåµÄ³¤¶È
 	content_length_ = req.getContentLength();
 	if (content_length_ <= 0) {
 		logger_error("body empty");
@@ -154,14 +154,14 @@ bool http_servlet::onUpload(request_t& req, response_t& res)
 	acl::meter_time(__FUNCTION__, __LINE__, "begin");
 
 	if (fp_.open_write(path)) {
-		// è®¾ç½®åŸå§‹æ–‡ä»¶å­˜å…¥è·¯å¾„
+		// ÉèÖÃÔ­Ê¼ÎÄ¼ş´æÈëÂ·¾¶
 		mime_->set_saved_path(path);
 
 		req_       = &req;
 		res_       = &res;
 		uploading_ = true;
 
-		// ç›´æ¥è¿”å›ï¼Œä»è€Œè§¦å‘å¼‚æ­¥è¯» HTTP æ•°æ®ä½“è¿‡ç¨‹
+		// Ö±½Ó·µ»Ø£¬´Ó¶ø´¥·¢Òì²½¶Á HTTP Êı¾İÌå¹ı³Ì
 		return true;
 	}
 
@@ -192,22 +192,22 @@ void http_servlet::reset(void)
 
 bool http_servlet::doUpload(request_t& req, response_t& res)
 {
-	// å½“æœªè¯»å®Œæ•°æ®ä½“æ—¶ï¼Œéœ€è¦å¼‚æ­¥è¯» HTTP è¯·æ±‚æ•°æ®ä½“
+	// µ±Î´¶ÁÍêÊı¾İÌåÊ±£¬ĞèÒªÒì²½¶Á HTTP ÇëÇóÊı¾İÌå
 	if (content_length_ > read_length_) {
 		if (!upload(req, res)) {
 			return false;
 		}
 	}
 
-	// è¿˜æ²¡æœ‰è¯»å®Œä¸Šä¼ çš„æ•°æ®ï¼Œéœ€è¦è¿”å›ï¼Œå¼‚æ­¥ç­‰å¾…å¯è¯»
+	// »¹Ã»ÓĞ¶ÁÍêÉÏ´«µÄÊı¾İ£¬ĞèÒª·µ»Ø£¬Òì²½µÈ´ı¿É¶Á
 	if (content_length_ > read_length_) {
 		return true;
 	}
 
-	// å½“å·²ç»è¯»å®Œ HTTP è¯·æ±‚æ•°æ®ä½“æ—¶ï¼Œåˆ™å¼€å§‹åˆ†æä¸Šä¼ çš„æ•°æ®
+	// µ±ÒÑ¾­¶ÁÍê HTTP ÇëÇóÊı¾İÌåÊ±£¬Ôò¿ªÊ¼·ÖÎöÉÏ´«µÄÊı¾İ
 	bool ret = parse(req, res);
 
-	// å¤„ç†å®Œæ¯•ï¼Œéœ€é‡ç½® HTTP ä¼šè¯çŠ¶æ€ï¼Œä»¥ä¾¿äºå¤„ç†ä¸‹ä¸€ä¸ª HTTP è¯·æ±‚
+	// ´¦ÀíÍê±Ï£¬ĞèÖØÖÃ HTTP »á»°×´Ì¬£¬ÒÔ±ãÓÚ´¦ÀíÏÂÒ»¸ö HTTP ÇëÇó
 	reset();
 	acl::meter_time(__FUNCTION__, __LINE__, "end");
 	return ret;
@@ -217,7 +217,7 @@ bool http_servlet::doUpload(request_t& req, response_t& res)
 
 bool http_servlet::upload(request_t& req, response_t& res)
 {
-	// è·å¾—è¾“å…¥æµ
+	// »ñµÃÊäÈëÁ÷
 	acl::istream& in = req.getInputStream();
 	acl::string buf(8193);
 	bool finish = false;
@@ -225,7 +225,7 @@ bool http_servlet::upload(request_t& req, response_t& res)
 	//logger(">>>>>>>>>>read: %lld, total: %lld<<<<<",
 	//	read_length_, content_length_);
 
-	// è¯»å– HTTP å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®
+	// ¶ÁÈ¡ HTTP ¿Í»§¶ËÇëÇóÊı¾İ
 	while (content_length_ > read_length_) {
 		if (!in.read_peek(buf, true)) {
 			break;
@@ -244,8 +244,8 @@ bool http_servlet::upload(request_t& req, response_t& res)
 
 		read_length_ += buf.size();
 
-		// å°†è¯»å¾—åˆ°çš„æ•°æ®è¾“å…¥è‡³è§£æå™¨è¿›è¡Œè§£æ
-		// å¦‚æœå†è¯»åˆ°å¤šä½™æ•°æ®ï¼Œå¯ä»¥ç›´æ¥ä¸¢æ‰ï¼Œä¸å¿…å†æ”¾å…¥ mime è§£æå™¨ä¸­
+		// ½«¶ÁµÃµ½µÄÊı¾İÊäÈëÖÁ½âÎöÆ÷½øĞĞ½âÎö
+		// Èç¹ûÔÙ¶Áµ½¶àÓàÊı¾İ£¬¿ÉÒÔÖ±½Ó¶ªµô£¬²»±ØÔÙ·ÅÈë mime ½âÎöÆ÷ÖĞ
 		if (!finish && mime_->update(buf, buf.size())) {
 			finish = true;
 		}
@@ -263,7 +263,7 @@ bool http_servlet::upload(request_t& req, response_t& res)
 
 bool http_servlet::upload(request_t& req, response_t& res)
 {
-	// è·å¾—è¾“å…¥æµ
+	// »ñµÃÊäÈëÁ÷
 	acl::istream& in = req.getInputStream();
 	char buf[8192];
 	bool finish = false;
@@ -271,7 +271,7 @@ bool http_servlet::upload(request_t& req, response_t& res)
 	//logger(">>>>>>>>>>read: %lld, total: %lld<<<<<",
 	//	read_length_, content_length_);
 
-	// è¯»å– HTTP å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®
+	// ¶ÁÈ¡ HTTP ¿Í»§¶ËÇëÇóÊı¾İ
 	while (content_length_ > read_length_) {
 		int ret = in.read_peek(buf, sizeof(buf));
 
@@ -288,8 +288,8 @@ bool http_servlet::upload(request_t& req, response_t& res)
 
 		read_length_ += (size_t) ret;
 
-		// å°†è¯»å¾—åˆ°çš„æ•°æ®è¾“å…¥è‡³è§£æå™¨è¿›è¡Œè§£æ
-		// å¦‚æœå†è¯»åˆ°å¤šä½™æ•°æ®ï¼Œå¯ä»¥ç›´æ¥ä¸¢æ‰ï¼Œä¸å¿…å†æ”¾å…¥ mime è§£æå™¨ä¸­
+		// ½«¶ÁµÃµ½µÄÊı¾İÊäÈëÖÁ½âÎöÆ÷½øĞĞ½âÎö
+		// Èç¹ûÔÙ¶Áµ½¶àÓàÊı¾İ£¬¿ÉÒÔÖ±½Ó¶ªµô£¬²»±ØÔÙ·ÅÈë mime ½âÎöÆ÷ÖĞ
 		if (!finish && mime_->update(buf, (size_t) ret)) {
 			finish = true;
 		}
@@ -322,7 +322,7 @@ bool http_servlet::parse(request_t& req, response_t& res)
 
 	acl::string path;
 
-	// éå†æ‰€æœ‰çš„ MIME ç»“ç‚¹ï¼Œæ‰¾å‡ºå…¶ä¸­ä¸ºæ–‡ä»¶ç»“ç‚¹çš„éƒ¨åˆ†è¿›è¡Œè½¬å‚¨
+	// ±éÀúËùÓĞµÄ MIME ½áµã£¬ÕÒ³öÆäÖĞÎªÎÄ¼ş½áµãµÄ²¿·Ö½øĞĞ×ª´¢
 	const std::list<acl::http_mime_node*>& nodes = mime_->get_nodes();
 	std::list<acl::http_mime_node*>::const_iterator cit = nodes.begin();
 	for (; cit != nodes.end(); ++cit) {
@@ -339,8 +339,8 @@ bool http_servlet::parse(request_t& req, response_t& res)
 				continue;
 			}
 
-			// æœ‰çš„æµè§ˆå™¨ï¼ˆå¦‚IEï¼‰ä¸Šä¼ æ–‡ä»¶æ—¶ä¼šå¸¦ç€æ–‡ä»¶è·¯å¾„ï¼Œæ‰€ä»¥
-			// éœ€è¦å…ˆå°†è·¯å¾„å»æ‰
+			// ÓĞµÄä¯ÀÀÆ÷£¨ÈçIE£©ÉÏ´«ÎÄ¼şÊ±»á´ø×ÅÎÄ¼şÂ·¾¶£¬ËùÒÔ
+			// ĞèÒªÏÈ½«Â·¾¶È¥µô
 			filename = acl_safe_basename(filename);
 #if defined(_WIN32) || defined(_WIN64)
 			path.format("%s\\%s", var_cfg_var_path, filename);
@@ -362,13 +362,13 @@ bool http_servlet::parse(request_t& req, response_t& res)
 		}
 	}
 
-	// æŸ¥æ‰¾ä¸Šè½½çš„æŸä¸ªæ–‡ä»¶å¹¶è½¬å‚¨
+	// ²éÕÒÉÏÔØµÄÄ³¸öÎÄ¼ş²¢×ª´¢
 	const acl::http_mime_node* node = mime_->get_node("file1");
 	if (node && node->get_mime_type() == acl::HTTP_MIME_FILE) {
 		ptr = node->get_filename();
 		if (ptr) {
-			// æœ‰çš„æµè§ˆå™¨ï¼ˆå¦‚IEï¼‰ä¸Šä¼ æ–‡ä»¶æ—¶ä¼šå¸¦ç€æ–‡ä»¶è·¯å¾„ï¼Œæ‰€ä»¥
-			// éœ€è¦å…ˆå°†è·¯å¾„å»æ‰
+			// ÓĞµÄä¯ÀÀÆ÷£¨ÈçIE£©ÉÏ´«ÎÄ¼şÊ±»á´ø×ÅÎÄ¼şÂ·¾¶£¬ËùÒÔ
+			// ĞèÒªÏÈ½«Â·¾¶È¥µô
 			ptr = acl_safe_basename(ptr);
 #if defined(_WIN32) || defined(_WIN64)
 			path.format("%s\\1_%s", var_cfg_var_path, ptr);
@@ -384,7 +384,7 @@ bool http_servlet::parse(request_t& req, response_t& res)
 
 bool http_servlet::doReply(request_t& req, response_t& res, const char* info)
 {
-	// åˆ›å»º xml æ ¼å¼çš„æ•°æ®ä½“
+	// ´´½¨ xml ¸ñÊ½µÄÊı¾İÌå
 	acl::xml1 body;
 
 	body.get_root().add_child("root", true)

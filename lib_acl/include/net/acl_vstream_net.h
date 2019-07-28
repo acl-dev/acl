@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_VSTREAM_NET_INCLUDE_H
+#ifndef ACL_VSTREAM_NET_INCLUDE_H
 #define ACL_VSTREAM_NET_INCLUDE_H
 
 #ifdef __cplusplus
@@ -9,95 +9,95 @@ extern "C" {
 #include "../stdlib/acl_vstream.h"
 
 /**
- * ç›‘å¬æŸä¸ªåœ°å€ï¼ˆå¯¹äºUNIXï¼Œè¿˜å¯ä»¥ç›‘å¬åŸŸå¥—æ¥å­—ï¼‰
- * @param addr {const char*} ç›‘å¬åœ°å€,
- *  å¦‚ï¼š127.0.0.1:80; æˆ–åŸŸå¥—æ¥å­—(UNIXå¹³å°) å¦‚ï¼š/tmp/test.sock
- * @param qlen {int} ç›‘å¬é˜Ÿåˆ—çš„é•¿åº¦
- * @param flag {unsigned} ç›‘å¬æ ‡å¿—ä½ï¼Œå‚è§ï¼šACL_INET_FLAG_XXX
- * @param bufsize {int} æ¥æ”¶çš„æ–°çš„å®¢æˆ·ç«¯å¥—æ¥å­—çš„IOç¼“å†²åŒºå¤§å°
- * @param rw_timeout {int} æ¥æ”¶çš„æ–°çš„å®¢æˆ·ç«¯å¥—æ¥å­—çš„IOè¯»å†™è¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºç§’
- * @return {ACL_VSTREAM*} ç›‘å¬æµæŒ‡é’ˆ
+ * ¼àÌıÄ³¸öµØÖ·£¨¶ÔÓÚUNIX£¬»¹¿ÉÒÔ¼àÌıÓòÌ×½Ó×Ö£©
+ * @param addr {const char*} ¼àÌıµØÖ·,
+ *  Èç£º127.0.0.1:80; »òÓòÌ×½Ó×Ö(UNIXÆ½Ì¨) Èç£º/tmp/test.sock
+ * @param qlen {int} ¼àÌı¶ÓÁĞµÄ³¤¶È
+ * @param flag {unsigned} ¼àÌı±êÖ¾Î»£¬²Î¼û£ºACL_INET_FLAG_XXX
+ * @param bufsize {int} ½ÓÊÕµÄĞÂµÄ¿Í»§¶ËÌ×½Ó×ÖµÄIO»º³åÇø´óĞ¡
+ * @param rw_timeout {int} ½ÓÊÕµÄĞÂµÄ¿Í»§¶ËÌ×½Ó×ÖµÄIO¶ÁĞ´³¬Ê±Ê±¼ä£¬µ¥Î»ÎªÃë
+ * @return {ACL_VSTREAM*} ¼àÌıÁ÷Ö¸Õë
  */
 ACL_API ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		unsigned flag, int io_bufsize, int rw_timeout);
 
 /**
- * ç›‘å¬æŸä¸ªåœ°å€ï¼ˆå¯¹äºUNIXï¼Œè¿˜å¯ä»¥ç›‘å¬åŸŸå¥—æ¥å­—ï¼‰
- * @param addr {const char*} ç›‘å¬åœ°å€
- *  å¦‚ï¼š127.0.0.1:80, æˆ–åŸŸå¥—æ¥å­—, å¦‚ï¼š/tmp/test.sockï¼Œå½“åœ°å€ä¸º ip:0 æ—¶åˆ™ç›‘å¬ç«¯å£å·
- *  ç”±æ“ä½œç³»ç»Ÿè‡ªåŠ¨åˆ†é…
- * @param qlen {int} ç›‘å¬é˜Ÿåˆ—çš„é•¿åº¦
- * @return {ACL_VSTREAM*} ç›‘å¬æµæŒ‡é’ˆ
+ * ¼àÌıÄ³¸öµØÖ·£¨¶ÔÓÚUNIX£¬»¹¿ÉÒÔ¼àÌıÓòÌ×½Ó×Ö£©
+ * @param addr {const char*} ¼àÌıµØÖ·
+ *  Èç£º127.0.0.1:80, »òÓòÌ×½Ó×Ö, Èç£º/tmp/test.sock£¬µ±µØÖ·Îª ip:0 Ê±Ôò¼àÌı¶Ë¿ÚºÅ
+ *  ÓÉ²Ù×÷ÏµÍ³×Ô¶¯·ÖÅä
+ * @param qlen {int} ¼àÌı¶ÓÁĞµÄ³¤¶È
+ * @return {ACL_VSTREAM*} ¼àÌıÁ÷Ö¸Õë
  */
 ACL_API ACL_VSTREAM *acl_vstream_listen(const char *addr, int qlen);
 
 /**
- * ä»ç›‘å¬æµä¸­æ¥æ”¶ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥æµ
- * @param listen_stream {ACL_VSTREAM*} ç›‘å¬æµ
- * @param client_stream {ACL_VSTREAM*} å¯é‡å¤åˆ©ç”¨çš„ ACL_VSTREAM ç»“æ„ï¼Œ
- *  å¦‚æœä¸ºç©ºåˆ™å†…éƒ¨äº§ç”Ÿä¸€ä¸ªæ–°çš„ ACL_VSTREAM æµï¼Œå¦åˆ™å¤ç”¨è¯¥ç»“æ„ç©ºé—´
- * @param ipbuf {char*} å¦‚æœä¸ä¸ºç©ºåˆ™ç”¨æ¥å­˜å‚¨å®¢æˆ·ç«¯çš„IPåœ°å€
- * @param bsize {int} å¦‚æœ ipbuf ä¸ä¸ºç©ºï¼Œåˆ™è¡¨ç¤º ipbuf çš„ç©ºé—´å¤§å°
- * @return {ACL_VSTREAM*} å¦‚æœä¸ä¸ºç©ºåˆ™è¡¨ç¤ºæ–°æ¥æ”¶çš„å®¢æˆ·ç«¯æµ
+ * ´Ó¼àÌıÁ÷ÖĞ½ÓÊÕÒ»¸ö¿Í»§¶ËÁ¬½ÓÁ÷
+ * @param listen_stream {ACL_VSTREAM*} ¼àÌıÁ÷
+ * @param client_stream {ACL_VSTREAM*} ¿ÉÖØ¸´ÀûÓÃµÄ ACL_VSTREAM ½á¹¹£¬
+ *  Èç¹ûÎª¿ÕÔòÄÚ²¿²úÉúÒ»¸öĞÂµÄ ACL_VSTREAM Á÷£¬·ñÔò¸´ÓÃ¸Ã½á¹¹¿Õ¼ä
+ * @param ipbuf {char*} Èç¹û²»Îª¿ÕÔòÓÃÀ´´æ´¢¿Í»§¶ËµÄIPµØÖ·
+ * @param bsize {int} Èç¹û ipbuf ²»Îª¿Õ£¬Ôò±íÊ¾ ipbuf µÄ¿Õ¼ä´óĞ¡
+ * @return {ACL_VSTREAM*} Èç¹û²»Îª¿ÕÔò±íÊ¾ĞÂ½ÓÊÕµÄ¿Í»§¶ËÁ÷
  */
 ACL_API ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *listen_stream,
 		ACL_VSTREAM *client_stream, char *ipbuf, int bsize);
 
 /**
- * ä»ç›‘å¬æµä¸­æ¥æ”¶ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥æµ
- * @param listen_stream {ACL_VSTREAM*} ç›‘å¬æµ
- * @param ipbuf {char*} å¦‚æœä¸ä¸ºç©ºåˆ™ç”¨æ¥å­˜å‚¨å®¢æˆ·ç«¯çš„IPåœ°å€
- * @param bsize {int} å¦‚æœ ipbuf ä¸ä¸ºç©ºï¼Œåˆ™è¡¨ç¤º ipbuf çš„ç©ºé—´å¤§å°
- * @return {ACL_VSTREAM*} å¦‚æœä¸ä¸ºç©ºåˆ™è¡¨ç¤ºæ–°æ¥æ”¶çš„å®¢æˆ·ç«¯æµ
+ * ´Ó¼àÌıÁ÷ÖĞ½ÓÊÕÒ»¸ö¿Í»§¶ËÁ¬½ÓÁ÷
+ * @param listen_stream {ACL_VSTREAM*} ¼àÌıÁ÷
+ * @param ipbuf {char*} Èç¹û²»Îª¿ÕÔòÓÃÀ´´æ´¢¿Í»§¶ËµÄIPµØÖ·
+ * @param bsize {int} Èç¹û ipbuf ²»Îª¿Õ£¬Ôò±íÊ¾ ipbuf µÄ¿Õ¼ä´óĞ¡
+ * @return {ACL_VSTREAM*} Èç¹û²»Îª¿ÕÔò±íÊ¾ĞÂ½ÓÊÕµÄ¿Í»§¶ËÁ÷
  */
 ACL_API ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *listen_stream,
 		char *ipbuf, int bsize);
 
 /**
- * è¿œç¨‹è¿æ¥æœåŠ¡å™¨
- * @param addr {const char*} æœåŠ¡å™¨åœ°å€, å¦‚æœè¿æ¥ä¸€ä¸ªåŸŸå¥—æ¥å£æœåŠ¡å™¨(ä»…UNIXå¹³å°),
- *  åŸŸå¥—æ¥åœ°å€ï¼š/tmp/test.sock; å¦‚æœè¿æ¥ä¸€ä¸ªTCPæœåŠ¡å™¨ï¼Œåˆ™åœ°å€æ ¼å¼ä¸º:
- *  [${local_ip}@]${remote_addr}, å¦‚: 60.28.250.199@www.sina.com:80, æ„æ€æ˜¯ç»‘å®šæœ¬çš„
- *  ç½‘å¡åœ°å€ä¸º: 60.28.250.199, è¿œç¨‹è¿æ¥ www.sina.com çš„ 80 ç«¯å£, å¦‚æœç”±OSè‡ªåŠ¨ç»‘å®šæœ¬åœ°
- *  IP åœ°å€ï¼Œåˆ™å¯ä»¥å†™ä¸ºï¼šwww.sina.com:80
- * @param block_mode {int} é˜»å¡è¿æ¥è¿˜æ˜¯éé˜»å¡è¿æ¥ï¼ŒACL_BLOCKING, ACL_NON_BLOCKING
- * @param conn_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´(ç§’)
- * @param rw_timeout {int} è¿æ¥æµæˆåŠŸåçš„è¯»å†™è¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºç§’
- * @param bufsize {int} è¿æ¥æµæˆåŠŸåçš„ç¼“å†²åŒºå¤§å°
- * @param errorp {int*} å¦‚æœä¸ä¸ºç©ºï¼Œåˆ™å­˜å‚¨è¿æ¥å¤±è´¥åçš„é”™è¯¯å·
- * @return {ACL_VSTREAM*} å¦‚æœä¸ä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºè¿æ¥æˆåŠŸåçš„æ•°æ®æµ
+ * Ô¶³ÌÁ¬½Ó·şÎñÆ÷
+ * @param addr {const char*} ·şÎñÆ÷µØÖ·, Èç¹ûÁ¬½ÓÒ»¸öÓòÌ×½Ó¿Ú·şÎñÆ÷(½öUNIXÆ½Ì¨),
+ *  ÓòÌ×½ÓµØÖ·£º/tmp/test.sock; Èç¹ûÁ¬½ÓÒ»¸öTCP·şÎñÆ÷£¬ÔòµØÖ·¸ñÊ½Îª:
+ *  [${local_ip}@]${remote_addr}, Èç: 60.28.250.199@www.sina.com:80, ÒâË¼ÊÇ°ó¶¨±¾µÄ
+ *  Íø¿¨µØÖ·Îª: 60.28.250.199, Ô¶³ÌÁ¬½Ó www.sina.com µÄ 80 ¶Ë¿Ú, Èç¹ûÓÉOS×Ô¶¯°ó¶¨±¾µØ
+ *  IP µØÖ·£¬Ôò¿ÉÒÔĞ´Îª£ºwww.sina.com:80
+ * @param block_mode {int} ×èÈûÁ¬½Ó»¹ÊÇ·Ç×èÈûÁ¬½Ó£¬ACL_BLOCKING, ACL_NON_BLOCKING
+ * @param conn_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(Ãë)
+ * @param rw_timeout {int} Á¬½ÓÁ÷³É¹¦ºóµÄ¶ÁĞ´³¬Ê±Ê±¼ä£¬µ¥Î»ÎªÃë
+ * @param bufsize {int} Á¬½ÓÁ÷³É¹¦ºóµÄ»º³åÇø´óĞ¡
+ * @param errorp {int*} Èç¹û²»Îª¿Õ£¬Ôò´æ´¢Á¬½ÓÊ§°ÜºóµÄ´íÎóºÅ
+ * @return {ACL_VSTREAM*} Èç¹û²»Îª¿Õ£¬Ôò±íÊ¾Á¬½Ó³É¹¦ºóµÄÊı¾İÁ÷
  */
 ACL_API ACL_VSTREAM *acl_vstream_connect_ex(const char *addr, int block_mode,
 		int conn_timeout, int rw_timeout, int bufsize, int *errorp);
 
 /**
- * è¿œç¨‹è¿æ¥æœåŠ¡å™¨
- * @param addr {const char*} æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼å¦‚ï¼š127.0.0.1ï¼Œ
- *  æˆ– åŸŸå¥—æ¥åœ°å€ï¼š/tmp/test.sock
- * @param block_mode {int} é˜»å¡è¿æ¥è¿˜æ˜¯éé˜»å¡è¿æ¥ï¼ŒACL_BLOCKING, ACL_NON_BLOCKING
- * @param connect_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´(ç§’)
- * @param rw_timeout {int} è¿æ¥æµæˆåŠŸåçš„è¯»å†™è¶…æ—¶æ—¶é—´ï¼Œå•ä½ä¸ºç§’
- * @param rw_bufsize {int} è¿æ¥æµæˆåŠŸåçš„ç¼“å†²åŒºå¤§å°
- * @return {ACL_VSTREAM*} å¦‚æœä¸ä¸ºç©ºï¼Œåˆ™è¡¨ç¤ºè¿æ¥æˆåŠŸåçš„æ•°æ®æµ
+ * Ô¶³ÌÁ¬½Ó·şÎñÆ÷
+ * @param addr {const char*} ·şÎñÆ÷µØÖ·£¬¸ñÊ½Èç£º127.0.0.1£¬
+ *  »ò ÓòÌ×½ÓµØÖ·£º/tmp/test.sock
+ * @param block_mode {int} ×èÈûÁ¬½Ó»¹ÊÇ·Ç×èÈûÁ¬½Ó£¬ACL_BLOCKING, ACL_NON_BLOCKING
+ * @param connect_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(Ãë)
+ * @param rw_timeout {int} Á¬½ÓÁ÷³É¹¦ºóµÄ¶ÁĞ´³¬Ê±Ê±¼ä£¬µ¥Î»ÎªÃë
+ * @param rw_bufsize {int} Á¬½ÓÁ÷³É¹¦ºóµÄ»º³åÇø´óĞ¡
+ * @return {ACL_VSTREAM*} Èç¹û²»Îª¿Õ£¬Ôò±íÊ¾Á¬½Ó³É¹¦ºóµÄÊı¾İÁ÷
  */
 ACL_API ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
 		int connect_timeout, int rw_timeout, int rw_bufsize);
 
 /**
- * é’ˆå¯¹ UDP é€šä¿¡ï¼Œè¯¥å‡½æ•°ç”¨æ¥ç»‘å®šæœ¬åœ° UDP åœ°å€ï¼Œå¦‚æœç»‘å®šæˆåŠŸï¼Œåˆ™åˆ›å»º
- * ACL_VSTREAM å¯¹è±¡, ç”¨æˆ·å¯ä»¥è±¡è°ƒç”¨ ACL_VSTREAM å¯¹è±¡çš„è¯»å†™æ¥å£
- * @param addr {const char*} æœ¬åœ° UDP åœ°å€ï¼Œæ ¼å¼ï¼šip:portï¼Œå¯ä»¥è¾“å…¥åœ°å€ ip:0 æ¥è®©
- *  æ“ä½œç³»ç»Ÿè‡ªåŠ¨åˆ†é…æœ¬åœ°ç«¯å£å·ï¼Œæ­¤å¤–è¿˜æ”¯æŒåœ¨ UNIX å¹³å°ä¸‹ç»‘å®š UNIX åŸŸå¥—æ¥å£ï¼Œ
- *  UNIX åŸŸå¥—æ¥å£çš„åœ°å€æ ¼å¼ä¸ºï¼š{path}@udpï¼Œå…¶ä¸­ {path} ä¸ºåŸŸå¥—æ¥å£è·¯å¾„ï¼Œ@udp ä¸º
- *  UDP åç¼€
- * @param rw_timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(ç§’)
- * @param flag {unsigned} æ ‡å¿—ä½
- * @return {ACL_VSTREAM*} è¿”å› NULL è¡¨ç¤ºç»‘å®šå¤±è´¥
+ * Õë¶Ô UDP Í¨ĞÅ£¬¸Ãº¯ÊıÓÃÀ´°ó¶¨±¾µØ UDP µØÖ·£¬Èç¹û°ó¶¨³É¹¦£¬Ôò´´½¨
+ * ACL_VSTREAM ¶ÔÏó, ÓÃ»§¿ÉÒÔÏóµ÷ÓÃ ACL_VSTREAM ¶ÔÏóµÄ¶ÁĞ´½Ó¿Ú
+ * @param addr {const char*} ±¾µØ UDP µØÖ·£¬¸ñÊ½£ºip:port£¬¿ÉÒÔÊäÈëµØÖ· ip:0 À´ÈÃ
+ *  ²Ù×÷ÏµÍ³×Ô¶¯·ÖÅä±¾µØ¶Ë¿ÚºÅ£¬´ËÍâ»¹Ö§³ÖÔÚ UNIX Æ½Ì¨ÏÂ°ó¶¨ UNIX ÓòÌ×½Ó¿Ú£¬
+ *  UNIX ÓòÌ×½Ó¿ÚµÄµØÖ·¸ñÊ½Îª£º{path}@udp£¬ÆäÖĞ {path} ÎªÓòÌ×½Ó¿ÚÂ·¾¶£¬@udp Îª
+ *  UDP ºó×º
+ * @param rw_timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ãë)
+ * @param flag {unsigned} ±êÖ¾Î»
+ * @return {ACL_VSTREAM*} ·µ»Ø NULL ±íÊ¾°ó¶¨Ê§°Ü
  */
 ACL_API ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag);
 
 /**
- * å°†ç½‘ç»œæµå¯¹è±¡è®¾ç½®ä¸º UDP IO æ¨¡å¼
+ * ½«ÍøÂçÁ÷¶ÔÏóÉèÖÃÎª UDP IO Ä£Ê½
  * @param stream {ACL_VSTREAM*}
  */
 ACL_API void acl_vstream_set_udp_io(ACL_VSTREAM *stream);

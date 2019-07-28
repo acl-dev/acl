@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "dns_store.h"
 #include "global/util.h"
 #include "rpc/rpc_manager.h"
@@ -62,15 +62,15 @@ nslookup::~nslookup()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ä¸»çº¿ç¨‹è¿è¡Œ
+// Ö÷Ïß³ÌÔËĞĞ
 
 void nslookup::rpc_onover()
 {
 	callback_->nslookup_report(domain_list_->size(),
 		domain_list_->size());
-	// å°†ç»“æœå­˜å…¥æ•°æ®åº“ï¼ŒåŒæ—¶å°†å›è°ƒæ¥å£ä¼ å…¥
+	// ½«½á¹û´æÈëÊı¾İ¿â£¬Í¬Ê±½«»Øµ÷½Ó¿Ú´«Èë
 	dns_store* ds = new dns_store(domain_list_, *callback_);
-	// å› ä¸ºè¯¥å˜é‡å·²ç»è¢«æ¥ç®¡ï¼Œæ‰€ä»¥æ­¤å¤„éœ€è¦ç½®ç©ºä»¥å…è¢«é‡å¤é‡Šæ”¾
+	// ÒòÎª¸Ã±äÁ¿ÒÑ¾­±»½Ó¹Ü£¬ËùÒÔ´Ë´¦ĞèÒªÖÃ¿ÕÒÔÃâ±»ÖØ¸´ÊÍ·Å
 	domain_list_ = NULL;
 	rpc_manager::get_instance().fork(ds);
 	delete this;
@@ -82,7 +82,7 @@ void nslookup::rpc_wakeup(void*)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// å­çº¿ç¨‹è¿è¡Œ
+// ×ÓÏß³ÌÔËĞĞ
 
 void nslookup::rpc_run()
 {
@@ -127,11 +127,11 @@ void nslookup::lookup_all()
 	}
 
 	ACL_AIO *aio;
-	/* åˆ›å»ºéé˜»å¡å¼‚æ­¥é€šä¿¡å¥æŸ„ */
+	/* ´´½¨·Ç×èÈûÒì²½Í¨ĞÅ¾ä±ú */
 	aio = acl_aio_create(ACL_EVENT_SELECT);
 //	acl_aio_set_keep_read(aio, 0);
 
-	// åˆ›å»º DNS æŸ¥è¯¢å¥æŸ„
+	// ´´½¨ DNS ²éÑ¯¾ä±ú
 	ACL_DNS* dns = acl_dns_create(aio, timeout_);
 	acl_dns_add_dns(dns, dns_ip_.c_str(), dns_port_, 24);
 
@@ -139,7 +139,7 @@ void nslookup::lookup_all()
 
 	time_t last_signal = time(NULL), t;
 
-	// æ·»åŠ ç›®æ ‡ domain åœ°å€
+	// Ìí¼ÓÄ¿±ê domain µØÖ·
 	std::vector<domain_info*>::iterator it = domain_list_->begin();
 	for (; it != domain_list_->end(); ++it)
 	{
@@ -148,10 +148,10 @@ void nslookup::lookup_all()
 	}
 
 	while (1) {
-		/* å¼‚æ­¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹ */
+		/* Òì²½ÊÂ¼şÑ­»·¹ı³Ì */
 		acl_aio_loop(aio);
 
-		// å¦‚æœæ‰€æœ‰æŸ¥è¯¢è¿‡ç¨‹éƒ½å®Œæˆï¼Œåˆ™é€€å‡ºå¼‚æ­¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹
+		// Èç¹ûËùÓĞ²éÑ¯¹ı³Ì¶¼Íê³É£¬ÔòÍË³öÒì²½ÊÂ¼şÑ­»·¹ı³Ì
 		if (nresult_ >= domain_list_->size())
 		{
 			logger("DNS lookup over: %d, %d",
@@ -167,11 +167,11 @@ void nslookup::lookup_all()
 		}
 	}
 
-	/* æ˜¾ç¤ºåŸŸåæŸ¥è¯¢ç»“æœ */
+	/* ÏÔÊ¾ÓòÃû²éÑ¯½á¹û */
 
 	acl_dns_close(dns);
 
-	/* é”€æ¯éé˜»å¡å¥æŸ„ */
+	/* Ïú»Ù·Ç×èÈû¾ä±ú */
 	acl_aio_free(aio);
 }
 
@@ -194,7 +194,7 @@ void nslookup::dns_result(ACL_DNS_DB *dns_db, void *ctx, int errnum)
 	buf.format("OK, domain: %s, spent: %0.2f, ip_list: ",
 		info->get_domain(), info->get_spent());
 
-	// éå†è¯¥åŸŸåçš„æ‰€æœ‰æŸ¥è¯¢ç»“æœ
+	// ±éÀú¸ÃÓòÃûµÄËùÓĞ²éÑ¯½á¹û
 	const ACL_HOST_INFO *hi;
 	acl_foreach(iter, dns_db) {
 

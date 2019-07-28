@@ -1,4 +1,4 @@
-ï»¿#ifndef	__UNIT_TAB_TEST_INCLUDE_H__
+#ifndef	__UNIT_TAB_TEST_INCLUDE_H__
 #define	__UNIT_TAB_TEST_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -9,7 +9,7 @@ extern "C" {
 #include "unit_test.h"
 
 static AUT_FN_ITEM __test_fn_tab[] = {
-	/* å‘½ä»¤å­—åç§°		å‡½æ•°æç¤ºå		å›è°ƒå‡½æ•°åç§°		å›è°ƒå‚æ•° æ˜¯å¦æ˜¯å†…éƒ¨å‘½ä»¤ */
+	/* ÃüÁî×ÖÃû³Æ		º¯ÊıÌáÊ¾Ãû		»Øµ÷º¯ÊıÃû³Æ		»Øµ÷²ÎÊı ÊÇ·ñÊÇÄÚ²¿ÃüÁî */
 	/* in test_unit_fn.c */
 	{ "test_param",		"fn_test_param",	test_unit_param,	NULL, 0 },
 	{ "test_loop",		"fn_test_loop",		test_unit_loop,		NULL, 0 },

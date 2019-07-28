@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #ifndef WIN32
 #include <getopt.h>
 #endif
@@ -23,13 +23,13 @@ protected:
 	// @override
 	void on_open(void)
 	{
-		// æ·»åŠ æ¶ˆæ¯å›žè°ƒå¯¹è±¡
+		// Ìí¼ÓÏûÏ¢»Øµ÷¶ÔÏó
 		this->append_message(MSG_RES);
 
-		// å‘æ¶ˆæ¯æœåŠ¡å™¨å‘é€è¯·æ±‚æ¶ˆæ¯
+		// ÏòÏûÏ¢·þÎñÆ÷·¢ËÍÇëÇóÏûÏ¢
 		this->send_message(MSG_REQ, NULL, 0);
 
-		// å¼‚æ­¥ç­‰å¾…æ¶ˆæ¯
+		// Òì²½µÈ´ýÏûÏ¢
 		this->wait();
 	}
 
@@ -52,14 +52,14 @@ protected:
 	}
 };
 
-// å­çº¿ç¨‹å¤„ç†è¿‡ç¨‹
+// ×ÓÏß³Ì´¦Àí¹ý³Ì
 
 static bool client_main(acl::aio_handle* handle, const char* addr)
 {
-	// åˆ›å»ºæ¶ˆæ¯è¿žæŽ¥
+	// ´´½¨ÏûÏ¢Á¬½Ó
 	acl::ipc_client* ipc = new test_client1();
 	
-	// è¿žæŽ¥æ¶ˆæ¯æœåŠ¡å™¨
+	// Á¬½ÓÏûÏ¢·þÎñÆ÷
 	if (!ipc->open(handle, addr, 0)) {
 		std::cout << "open " << addr << " error!" << std::endl;
 		delete ipc;
@@ -79,7 +79,7 @@ static void* thread_callback(void *ctx)
 		return NULL;
 	}
 
-	// æ¶ˆæ¯å¾ªçŽ¯
+	// ÏûÏ¢Ñ­»·
 	while (true) {
 		if (!handle.check()) {
 			break;
@@ -117,7 +117,7 @@ protected:
 			this->close();
 			this->get_handle().stop();
 		} else {
-			// å›žåº”å®¢æˆ·ç«¯æ¶ˆæ¯
+			// »ØÓ¦¿Í»§¶ËÏûÏ¢
 			this->send_message(MSG_RES, NULL, 0);
 		}
 	}
@@ -136,10 +136,10 @@ protected:
 	{
 		acl::ipc_client* ipc = new test_client2();
 
-		// æ‰“å¼€å¼‚æ­¥IPCè¿‡ç¨‹
+		// ´ò¿ªÒì²½IPC¹ý³Ì
 		ipc->open(client);
 
-		// æ·»åŠ æ¶ˆæ¯å›žè°ƒå¯¹è±¡
+		// Ìí¼ÓÏûÏ¢»Øµ÷¶ÔÏó
 		ipc->append_message(MSG_REQ);
 		ipc->append_message(MSG_STOP);
 		ipc->wait();
@@ -175,7 +175,7 @@ int main(int argc, char* argv[])
 
 	acl::ipc_server* server = new test_server();
 
-	// ä½¿æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬ 127.0.0.1 çš„åœ°å€
+	// Ê¹ÏûÏ¢·þÎñÆ÷¼àÌý 127.0.0.1 µÄµØÖ·
 	if (!server->open(&handle, "127.0.0.1:0")) {
 		delete server;
 		std::cout << "open server error!" << std::endl;

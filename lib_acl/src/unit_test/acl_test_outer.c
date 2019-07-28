@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -18,7 +18,7 @@
 
 #endif
 
-/*---------------------------- åˆ†æå¤–éƒ¨å‘½ä»¤é…ç½®è¡Œ --------------------------*/
+/*---------------------------- ·ÖÎöÍâ²¿ÃüÁîÅäÖÃĞĞ --------------------------*/
 
 AUT_LINE *aut_add_outer_cmd(const ACL_CFG_LINE *cfg_line)
 {

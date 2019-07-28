@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/noncopyable.hpp"
@@ -12,7 +12,7 @@ namespace acl
 class redis_result;
 
 /**
- * åœ¨ä» disque é˜Ÿåˆ—ä¸­è·å¾—çš„ä»»åŠ¡ä¿¡æ¯çš„ç±»
+ * ÔÚ´Ó disque ¶ÓÁĞÖĞ»ñµÃµÄÈÎÎñĞÅÏ¢µÄÀà
  */
 class ACL_CPP_API disque_job : public noncopyable
 {
@@ -22,7 +22,7 @@ public:
 
 	/**
 	 * get the ID of the job
-	 * è·å¾—å½“å‰ä»»åŠ¡çš„ ID å·
+	 * »ñµÃµ±Ç°ÈÎÎñµÄ ID ºÅ
 	 * @return {const char*}
 	 */
 	const char* get_id() const
@@ -32,7 +32,7 @@ public:
 
 	/**
 	 * get the queue name holding the job
-	 * è·å¾—å½“å‰ä»»åŠ¡æ‰€åœ¨çš„é˜Ÿåˆ—
+	 * »ñµÃµ±Ç°ÈÎÎñËùÔÚµÄ¶ÓÁĞ
 	 * @return {const char*}
 	 */
 	const char* get_queue() const
@@ -42,7 +42,7 @@ public:
 
 	/**
 	 * get the job's data
-	 * è·å¾—å½“å‰ä»»åŠ¡çš„æ¶ˆæ¯å†…å®¹
+	 * »ñµÃµ±Ç°ÈÎÎñµÄÏûÏ¢ÄÚÈİ
 	 * @return {const string&}
 	 */
 	const string& get_body() const

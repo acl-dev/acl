@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file version.h
  *
  * \brief Run-time version information

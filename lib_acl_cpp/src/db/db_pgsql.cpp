@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "libpq-fe.h"
 #ifndef ACL_PREPARE_COMPILE
 #include <assert.h>
@@ -58,7 +58,7 @@ static ACL_DLL_HANDLE __pgsql_dll = NULL;
 
 static acl::string __pgsql_path;
 
-// ç¨‹åºé€€å‡ºé‡Šæ”¾åŠ¨æ€åŠ è½½çš„åº“
+// ³ÌĞòÍË³öÊÍ·Å¶¯Ì¬¼ÓÔØµÄ¿â
 static void __pgsql_dll_unload(void)
 {
 	if (__pgsql_dll != NULL) {
@@ -68,7 +68,7 @@ static void __pgsql_dll_unload(void)
 	}
 }
 
-// åŠ¨æ€åŠ è½½ libpg.dll åº“
+// ¶¯Ì¬¼ÓÔØ libpg.dll ¿â
 static void __pgsql_dll_load(void)
 {
 	if (__pgsql_dll != NULL) {
@@ -94,7 +94,7 @@ static void __pgsql_dll_load(void)
 		logger_fatal("load %s error: %s", path, acl_dlerror());
 	}
 
-	// è®°å½•åŠ¨æ€åº“è·¯å¾„ï¼Œä»¥ä¾¿äºåœ¨åŠ¨æ€åº“å¸è½½æ—¶è¾“å‡ºåº“è·¯å¾„å
+	// ¼ÇÂ¼¶¯Ì¬¿âÂ·¾¶£¬ÒÔ±ãÓÚÔÚ¶¯Ì¬¿âĞ¶ÔØÊ±Êä³ö¿âÂ·¾¶Ãû
 	__pgsql_path = path;
 
 	__dbconnect = (PQconnectdb_fn) acl_dlsym(__pgsql_dll, "PQconnectdb");
@@ -203,7 +203,7 @@ namespace acl
 {
 
 //////////////////////////////////////////////////////////////////////////
-// pgsql çš„è®°å½•è¡Œç±»å‹å®šä¹‰
+// pgsql µÄ¼ÇÂ¼ĞĞÀàĞÍ¶¨Òå
 
 static void pgsql_rows_free(void* ctx)
 {
@@ -221,12 +221,12 @@ static void pgsql_rows_save(PGresult* res, db_rows& result)
 {
 	int   ncolumn = __dbnfields(res);
 
-	// å–å‡ºå˜é‡å
+	// È¡³ö±äÁ¿Ãû
 	for (int j = 0; j < ncolumn; j++) {
 		result.names_.push_back(__dbfname(res, j));
 	}
 
-	// å¼€å§‹å–å‡ºæ‰€æœ‰è¡Œæ•°æ®ç»“æœï¼ŒåŠ å…¥åŠ¨æ€æ•°ç»„ä¸­
+	// ¿ªÊ¼È¡³öËùÓĞĞĞÊı¾İ½á¹û£¬¼ÓÈë¶¯Ì¬Êı×éÖĞ
 	int nrow = __dbntuples(res);
 	for (int i = 0; i < nrow; i++) {
 		db_row* row = NEW db_row(result.names_);
@@ -257,7 +257,7 @@ void db_pgsql::sane_pgsql_init(const char* dbaddr, const char* dbname,
 		logger_fatal("dbname null");
 	}
 
-	// åœ°å€æ ¼å¼ï¼š[dbname@]dbaddr
+	// µØÖ·¸ñÊ½£º[dbname@]dbaddr
 	const char* ptr = strchr(dbaddr, '@');
 	if (ptr) {
 		ptr++;
@@ -496,7 +496,7 @@ void* db_pgsql::sane_pgsql_query(const char* sql)
 		return res;
 	}
 
-	/* é‡æ–°æ‰“å¼€è¿æ¥è¿›è¡Œé‡è¯• */
+	/* ÖØĞÂ´ò¿ªÁ¬½Ó½øĞĞÖØÊÔ */
 	close();
 	if (!dbopen()) {
 		logger_error("reopen db(%s) error", dbname_);
@@ -536,7 +536,7 @@ bool db_pgsql::tbl_exists(const char* tbl_name)
 
 bool db_pgsql::sql_select(const char* sql, db_rows* result /* = NULL */)
 {
-	// ä¼˜å…ˆè°ƒç”¨åŸºç±»æ–¹æ³•é‡Šæ”¾ä¸Šæ¬¡çš„æŸ¥è¯¢ç»“æœ
+	// ÓÅÏÈµ÷ÓÃ»ùÀà·½·¨ÊÍ·ÅÉÏ´ÎµÄ²éÑ¯½á¹û
 	free_result();
 
 	PGresult* res = (PGresult *) sane_pgsql_query(sql);

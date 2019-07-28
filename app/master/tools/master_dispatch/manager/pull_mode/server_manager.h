@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <vector>
 
 class server_manager : public acl::singleton<server_manager>

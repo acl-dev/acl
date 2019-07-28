@@ -1,4 +1,4 @@
-﻿#ifndef	__ACL_PTHREAD_INCLUDE_H__
+#ifndef	__ACL_PTHREAD_INCLUDE_H__
 #define	__ACL_PTHREAD_INCLUDE_H__
 
 #ifdef	__cplusplus

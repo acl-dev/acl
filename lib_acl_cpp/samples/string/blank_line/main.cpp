@@ -1,4 +1,4 @@
-﻿#include "acl_cpp/lib_acl.hpp"
+#include "acl_cpp/lib_acl.hpp"
 
 #ifdef WIN32
 #define strdup _strdup

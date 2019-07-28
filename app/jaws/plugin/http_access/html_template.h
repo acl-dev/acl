@@ -1,4 +1,4 @@
-﻿#ifndef	__HTML_TEMPLATE_INCLUDE_H__
+#ifndef	__HTML_TEMPLATE_INCLUDE_H__
 #define	__HTML_TEMPLATE_INCLUDE_H__
 
 /* in html_template.c */

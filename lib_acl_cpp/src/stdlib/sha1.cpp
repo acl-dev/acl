@@ -1,4 +1,4 @@
-ï»¿/*
+/*
  *  sha1.cpp
  *
  *  Copyright (C) 1998, 2009
@@ -168,8 +168,8 @@ bool sha1::result(unsigned char *message_digest_array)
 		computed_ = true;
 	}
 
-	// æ­¤å¤„åº”è¯¥æ˜¯å°†unsigned intæ•°ç»„ä¸­çš„æ¯å­—èŠ‚ä¿å­˜åˆ°ä¸€ä¸ª unsigned char é‡Œé¢
-	// ä¸èƒ½ç›´æ¥å°†ä¸€ä¸ªintç›´æ¥èµ‹å€¼ç»™4ä¸ªcharæ•°ç»„
+	// ´Ë´¦Ó¦¸ÃÊÇ½«unsigned intÊı×éÖĞµÄÃ¿×Ö½Ú±£´æµ½Ò»¸ö unsigned char ÀïÃæ
+	// ²»ÄÜÖ±½Ó½«Ò»¸öintÖ±½Ó¸³Öµ¸ø4¸öcharÊı×é
 	// --- dawei.lin@net263.com, 2018.11.22
 	for(i = 0; i < 20; ++i) {
 		message_digest_array[i] = h_[i >> 2] >> 8 * (3 - (i & 0x03));

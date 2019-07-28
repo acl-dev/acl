@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -60,7 +60,7 @@ static ACL_VSTREAM *init(const char *filepath)
 	if (cfg)
 		acl_xinetd_cfg_free(cfg);
 
-	signal(SIGINT, on_sigint); /* æ³¨å†Œç¨‹åºé€€å‡ºå›è°ƒå‡½æ•° */
+	signal(SIGINT, on_sigint); /* ×¢²á³ÌĞòÍË³ö»Øµ÷º¯Êı */
 	service_init(NULL);
 
 	return (sstream);

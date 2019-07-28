@@ -1,4 +1,4 @@
-ï»¿/* System library. */
+/* System library. */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
@@ -441,7 +441,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 
 	va_list ap;
 
-	/* æå‰è¿›è¡Œæ¨¡æ¿åˆå§‹åŒ–ï¼Œä»¥ä½¿æ—¥å¿—å°½æ—©åœ°æ‰“å¼€, å¼€å§‹å…ˆä½¿ç”¨ acl_master çš„æ—¥å¿—æ–‡ä»¶ */
+	/* ÌáÇ°½øĞĞÄ£°å³õÊ¼»¯£¬ÒÔÊ¹ÈÕÖ¾¾¡ÔçµØ´ò¿ª, ¿ªÊ¼ÏÈÊ¹ÓÃ acl_master µÄÈÕÖ¾ÎÄ¼ş */
 	master_log_open(argv[0]);
 
 	/*
@@ -655,7 +655,7 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 	trigger_server_open_log();
 
 #ifdef ACL_UNIX
-	/* è®¾ç½®å­è¿›ç¨‹è¿è¡Œç¯å¢ƒï¼Œå…è®¸äº§ç”Ÿ core æ–‡ä»¶ */
+	/* ÉèÖÃ×Ó½ø³ÌÔËĞĞ»·¾³£¬ÔÊĞí²úÉú core ÎÄ¼ş */
 	if (acl_var_trigger_enable_core && acl_var_trigger_core_limit != 0) {
 		acl_set_core_limit(acl_var_trigger_core_limit);
 	}

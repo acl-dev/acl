@@ -1,4 +1,4 @@
-﻿#ifndef __CONFIGURE_INCLUDE_H__
+#ifndef __CONFIGURE_INCLUDE_H__
 #define __CONFIGURE_INCLUDE_H__
 
 #ifdef __cplusplus

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "master_service.h"
 #include "http_servlet.h"
 
@@ -47,11 +47,11 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (res.sendHeader() == false)
 		return false;
 
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	(void) res.getOutputStream().write(buf);
@@ -63,10 +63,10 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (res.sendHeader() == false)
 		return false;
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
 	(void) res.getOutputStream().write(buf);
@@ -82,9 +82,9 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
-	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
-	// memcached æœåŠ¡æ­£å¸¸å·¥ä½œ
+	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
+	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
+	// memcached ·şÎñÕı³£¹¤×÷
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0)
@@ -92,10 +92,10 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	res.setCharacterEncoding("utf-8")		// è®¾ç½®å“åº”å­—ç¬¦é›†
-		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
-		.setContentEncoding(false)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
-		.setChunkedTransferEncoding(false);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
+	res.setCharacterEncoding("utf-8")		// ÉèÖÃÏìÓ¦×Ö·û¼¯
+		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
+		.setContentEncoding(false)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
+		.setChunkedTransferEncoding(false);	// ²ÉÓÃ chunk ´«Êä·½Ê½
 
 	acl::string path;
 	path = req.getPathInfo();
@@ -174,7 +174,7 @@ bool http_servlet::doApp(acl::HttpServletRequest& req,
 bool http_servlet::xmlToJson(acl::xml& xml, acl::json& json)
 {
 	/**
-	 * æ•°æ®æ ¼å¼
+	 * Êı¾İ¸ñÊ½
 	 * <servers>
 	 *  <server conns='xxx' used='xxx' qlen='xxx' max_threads='xxx'
 	 *    curr_threads='xxx' busy_threads='xxx' addr='xxx' load='xxx'>

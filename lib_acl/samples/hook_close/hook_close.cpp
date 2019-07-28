@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <unistd.h>
 #include <execinfo.h>
 #include <sys/types.h>

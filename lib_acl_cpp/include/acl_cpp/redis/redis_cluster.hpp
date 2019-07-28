@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <list>
@@ -36,17 +36,17 @@ public:
 	virtual ~redis_cluster(void);
 
 	/**
-	 * æ‰¹é‡æ·»åŠ å¯ç”¨çš„å“ˆå¸Œæ§½ï¼Œæœ€åå¿…é¡»ä»¥å°äº 0 çš„å“ˆå¸Œæ§½å€¼è¡¨ç¤ºç»“æŸ
+	 * ÅúÁ¿Ìí¼Ó¿ÉÓÃµÄ¹şÏ£²Û£¬×îºó±ØĞëÒÔĞ¡ÓÚ 0 µÄ¹şÏ£²ÛÖµ±íÊ¾½áÊø
 	 * add some hash-slots, the last slot value must be < 0 indicating
 	 * the end of the slots array
-	 * @param first {int} ç¬¬ä¸€ä¸ªå“ˆå¸Œæ§½ï¼Œè¯¥å€¼å¿…é¡» >= 0 æ‰æœ‰æ•ˆ
+	 * @param first {int} µÚÒ»¸ö¹şÏ£²Û£¬¸ÃÖµ±ØĞë >= 0 ²ÅÓĞĞ§
 	 *  the first hash-slot which must be >= 0
-	 * @param slot_list {const int[]} è¦æ·»åŠ çš„å“ˆå¸Œæ§½çš„åˆ—è¡¨
+	 * @param slot_list {const int[]} ÒªÌí¼ÓµÄ¹şÏ£²ÛµÄÁĞ±í
 	 *  the hash-slots array to be added
 	 * @param n {size_t} the count of the hash-slots list
-	 * @param slot_list {const std::vector<init>&} è¦æ·»åŠ çš„å“ˆå¸Œæ§½çš„åˆ—è¡¨
+	 * @param slot_list {const std::vector<init>&} ÒªÌí¼ÓµÄ¹şÏ£²ÛµÄÁĞ±í
 	 *  the hash-slots list to be added
-	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * @return {bool} ÊÇ·ñ³É¹¦
 	 *  return true if successful
 	 */
 	bool cluster_addslots(int first, ...);
@@ -54,17 +54,17 @@ public:
 	bool cluster_addslots(const std::vector<int>& slot_list);
 
 	/**
-	 * æ‰¹é‡åˆ é™¤å“ˆå¸Œæ§½ï¼Œæœ€åå¿…é¡»ä»¥å°äº 0 çš„å“ˆå¸Œæ§½è¡¨ç¤ºç»“æŸ
+	 * ÅúÁ¿É¾³ı¹şÏ£²Û£¬×îºó±ØĞëÒÔĞ¡ÓÚ 0 µÄ¹şÏ£²Û±íÊ¾½áÊø
 	 * remove some hash-slots, the last slot value must be < 0 indicating
 	 * the end of the slots array
-	 * @param first {int} ç¬¬ä¸€ä¸ªå“ˆå¸Œæ§½ï¼Œè¯¥å€¼å¿…é¡» >= 0 æ‰æœ‰æ•ˆ
+	 * @param first {int} µÚÒ»¸ö¹şÏ£²Û£¬¸ÃÖµ±ØĞë >= 0 ²ÅÓĞĞ§
 	 *  the first hash-slot which must be >= 0
-	 * @param slot_list {const int[]} è¦åˆ é™¤çš„å“ˆå¸Œæ§½çš„åˆ—è¡¨
+	 * @param slot_list {const int[]} ÒªÉ¾³ıµÄ¹şÏ£²ÛµÄÁĞ±í
 	 *  the hash-slots array to be removed
 	 * @param n {size_t} the count of the hash-slots list
-	 * @param slot_list {const std::vector<init>&} è¦åˆ é™¤çš„å“ˆå¸Œæ§½çš„åˆ—è¡¨
+	 * @param slot_list {const std::vector<init>&} ÒªÉ¾³ıµÄ¹şÏ£²ÛµÄÁĞ±í
 	 *  the hash-slots array to be removed
-	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * @return {bool} ÊÇ·ñ³É¹¦
 	 *  return true if successful
 	 */
 	bool cluster_delslots(int first, ...);
@@ -72,39 +72,39 @@ public:
 	bool cluster_delslots(const std::vector<int>& slot_list);
 
 	/**
-	 * è·å¾—æŸä¸ªå“ˆå¸Œæ§½å½“å‰æ‰€å­˜å‚¨å¯¹è±¡çš„é”®åé›†åˆ
+	 * »ñµÃÄ³¸ö¹şÏ£²Ûµ±Ç°Ëù´æ´¢¶ÔÏóµÄ¼üÃû¼¯ºÏ
 	 * get keys array stored in one specified hash-slot
-	 * @param slot {size_t} å“ˆå¸Œæ§½å€¼
+	 * @param slot {size_t} ¹şÏ£²ÛÖµ
 	 *  the specified hash-slot
-	 * @param max {size_t} é™åˆ¶çš„ç»“æœé›†æ•°é‡
+	 * @param max {size_t} ÏŞÖÆµÄ½á¹û¼¯ÊıÁ¿
 	 *  limit the max results count
-	 * @param result {std::list<acl::string>&} å­˜å‚¨ç»“æœé›†
+	 * @param result {std::list<acl::string>&} ´æ´¢½á¹û¼¯
 	 *  stored the results
-	 * @return {int} æŸ¥è¯¢ç»“æœé›†çš„ä¸ªæ•°ï¼Œ-1 è¡¨ç¤ºå‡ºé”™
+	 * @return {int} ²éÑ¯½á¹û¼¯µÄ¸öÊı£¬-1 ±íÊ¾³ö´í
 	 *  >= 0 if OK, -1 if error
 	 */
 	int cluster_getkeysinslot(size_t slot, size_t max, std::list<string>& result);
 
 	/**
-	 * åœ¨å»ºç«‹ redis é›†ç¾¤æ—¶ï¼Œå¯ä»¥ä½¿ç”¨æ­¤å‘½ä»¤è®©ä¸€ä¸ª redis ç»“ç‚¹æ˜¯è¿æ¥åˆ«çš„ç»“ç‚¹
+	 * ÔÚ½¨Á¢ redis ¼¯ÈºÊ±£¬¿ÉÒÔÊ¹ÓÃ´ËÃüÁîÈÃÒ»¸ö redis ½áµãÊÇÁ¬½Ó±ğµÄ½áµã
 	 * let one redis node to link to the other redis node
 	 * when buiding the redis cluster
-	 * @param ip {const char*} è¢«è¿æ¥çš„å…¶å®ƒä¸€ä¸ª redis ç»“ç‚¹çš„ IP åœ°å€
+	 * @param ip {const char*} ±»Á¬½ÓµÄÆäËüÒ»¸ö redis ½áµãµÄ IP µØÖ·
 	 *  the other redis node's ip to be linked
-	 * @param port {int} è¢«è¿æ¥çš„å…¶å®ƒä¸€ä¸ª redis ç»“ç‚¹çš„ port ç«¯å£
+	 * @param port {int} ±»Á¬½ÓµÄÆäËüÒ»¸ö redis ½áµãµÄ port ¶Ë¿Ú
 	 *  the other redis node's port to be linked
-	 * @return {bool} è¿æ¥æ˜¯å¦æˆåŠŸ
+	 * @return {bool} Á¬½ÓÊÇ·ñ³É¹¦
 	 *  if the linking is successful
 	 */
 	bool cluster_meet(const char* ip, int port);
 
 	/**
-	 * é‡ç½®ä¸€ä¸ª redis ç»“ç‚¹çš„çŠ¶æ€ï¼Œä½¿ä¹‹ä»é›†ç¾¤ç»“ç‚¹ä¸­è„±ç¦»ï¼Œæ¸…é™¤å“ˆå¸Œæ§½-ç»“ç‚¹çš„å¯¹åº”å…³ç³»ï¼Œ
-	 * è¯¥æ–¹æ³•ç­‰åŒäº reset_soft
+	 * ÖØÖÃÒ»¸ö redis ½áµãµÄ×´Ì¬£¬Ê¹Ö®´Ó¼¯Èº½áµãÖĞÍÑÀë£¬Çå³ı¹şÏ£²Û-½áµãµÄ¶ÔÓ¦¹ØÏµ£¬
+	 * ¸Ã·½·¨µÈÍ¬ÓÚ reset_soft
 	 * reset one redis node's status, escaping from the other nodes
 	 * of the redis cluster, and clearing slot-to-nodes mapping;
 	 * same as reset_soft
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation is successful
 	 */
 	bool cluster_reset();
@@ -112,148 +112,148 @@ public:
 	bool cluster_reset_soft();
 
 	/**
-	 * è®¾å®šæŸä¸ªå“ˆå¸Œæ§½åœ¨å½“å‰ redis ç»“ç‚¹ä¸Šæ­£å¤„äºå¯¼å…¥çŠ¶æ€
+	 * Éè¶¨Ä³¸ö¹şÏ£²ÛÔÚµ±Ç° redis ½áµãÉÏÕı´¦ÓÚµ¼Èë×´Ì¬
 	 * set the hash-slot in importing status from the other node
 	 * to the current node
-	 * @param slot {size_t} å“ˆå¸Œæ§½å€¼
+	 * @param slot {size_t} ¹şÏ£²ÛÖµ
 	 *  the hash-slot value
-	 * @param src_node {const char*} è¯¥å“ˆå¸Œæ§½çš„ redis æºç»“ç‚¹
+	 * @param src_node {const char*} ¸Ã¹şÏ£²ÛµÄ redis Ô´½áµã
 	 *  the source redis-node of the hash-slot importing from
-	 * @return {boo} è®¾ç½®çŠ¶æ€æ˜¯å¦æˆåŠŸ
+	 * @return {boo} ÉèÖÃ×´Ì¬ÊÇ·ñ³É¹¦
 	 *  if success for setting the slot's status
 	 */
 	bool cluster_setslot_importing(size_t slot, const char* src_node);
 
 	/**
-	 * è®¾å®šæŸä¸ªå“ˆå¸Œæ§½åœ¨å½“å‰ redis ç»“ç‚¹ä¸Šæ­£å¤„äºè¿ç§»çŠ¶æ€
+	 * Éè¶¨Ä³¸ö¹şÏ£²ÛÔÚµ±Ç° redis ½áµãÉÏÕı´¦ÓÚÇ¨ÒÆ×´Ì¬
 	 * set the hash-slot in migrating status to the other node
 	 * from the current node
-	 * @param slot {size_t} å“ˆå¸Œæ§½å€¼
+	 * @param slot {size_t} ¹şÏ£²ÛÖµ
 	 *  the hash-slot value
-	 * @param src_node {const char*} è¯¥å“ˆå¸Œæ§½çš„ redis è¿ç§»ç›®æ ‡ç»“ç‚¹
+	 * @param src_node {const char*} ¸Ã¹şÏ£²ÛµÄ redis Ç¨ÒÆÄ¿±ê½áµã
 	 *  the target redis-node of the hash-slot migrating to
-	 * @return {boo} è®¾ç½®çŠ¶æ€æ˜¯å¦æˆåŠŸ
+	 * @return {boo} ÉèÖÃ×´Ì¬ÊÇ·ñ³É¹¦
 	 *  if success for setting the slot's status
 	 */
 	bool cluster_setslot_migrating(size_t slot, const char* dst_node);
 
 	/**
-	 * å½“å¯¼å…¥/è¿ç§»å“ˆå¸Œæ§½å®Œæˆåä½¿ç”¨æ­¤æ“ä½œæŒ‡å®šè¯¥å“ˆå¸Œæ§½ä¸ºç¨³å®šçŠ¶æ€
+	 * µ±µ¼Èë/Ç¨ÒÆ¹şÏ£²ÛÍê³ÉºóÊ¹ÓÃ´Ë²Ù×÷Ö¸¶¨¸Ã¹şÏ£²ÛÎªÎÈ¶¨×´Ì¬
 	 * set the hash-slot stable after importing or migrating
-	 * @param slot {size_t} å“ˆå¸Œæ§½å€¼
+	 * @param slot {size_t} ¹şÏ£²ÛÖµ
 	 *  the hash-slot value
-	 * @return {bool} è®¾ç½®çŠ¶æ€æ˜¯å¦æˆåŠŸ
+	 * @return {bool} ÉèÖÃ×´Ì¬ÊÇ·ñ³É¹¦
 	 *  if success for setting the slot's status
 	 */
 	bool cluster_setslot_stable(size_t slot);
 
 	/**
-	 * è®¾ç½®æŒ‡å®šçš„å“ˆå¸Œæ§½è‡³æŒ‡å®šçš„æŸä¸ª redis ç»“ç‚¹ï¼Œè¯¥æŒ‡ä»¤æœ‰è¾ƒä¸ºå¤æ‚çš„è¡Œä¸ºç‰¹å¾ï¼Œå…·ä½“
-	 * è¯·å‚è§å®˜æ–¹åœ¨çº¿æ–‡æ¡£
+	 * ÉèÖÃÖ¸¶¨µÄ¹şÏ£²ÛÖÁÖ¸¶¨µÄÄ³¸ö redis ½áµã£¬¸ÃÖ¸ÁîÓĞ½ÏÎª¸´ÔÓµÄĞĞÎªÌØÕ÷£¬¾ßÌå
+	 * Çë²Î¼û¹Ù·½ÔÚÏßÎÄµµ
 	 * set one hash-slot to one redis node, for more help see online doc
-	 * @param slot {size_t} å“ˆå¸Œæ§½å€¼
+	 * @param slot {size_t} ¹şÏ£²ÛÖµ
 	 *  the hash-slot to be set
-	 * @param node {const char*} æ¥æ”¶è¯¥å“ˆå¸Œæ§½çš„ redis ç»“ç‚¹
+	 * @param node {const char*} ½ÓÊÕ¸Ã¹şÏ£²ÛµÄ redis ½áµã
 	 *  the redis node to be holding the hash-slot
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation is successful
 	 */
 	bool cluster_setslot_node(size_t slot, const char* node);
 
 	/**
-	 * è·å¾—æŸä¸ªæŒ‡å®š redis ç»“ç‚¹æŠ¥é”™çš„æ•°é‡
+	 * »ñµÃÄ³¸öÖ¸¶¨ redis ½áµã±¨´íµÄÊıÁ¿
 	 * get the count of the failure resports by one redis node
-	 * @param node {const char*} æŒ‡å®šçš„æŸä¸ª redis ç»“ç‚¹
-	 * @return {int} ç»“ç‚¹æŠ¥é”™çš„æ•°é‡ï¼Œæ­£å¸¸æƒ…å†µä¸‹ >= 0ï¼Œå¦‚æœè¿”å›å€¼ -1 è¡¨æ˜æ“ä½œå‡ºé”™
+	 * @param node {const char*} Ö¸¶¨µÄÄ³¸ö redis ½áµã
+	 * @return {int} ½áµã±¨´íµÄÊıÁ¿£¬Õı³£Çé¿öÏÂ >= 0£¬Èç¹û·µ»ØÖµ -1 ±íÃ÷²Ù×÷³ö´í
 	 *  return the failure count reporting by the specified redis node,
 	 *  return value >= 0 if successful, or -1 for error happened
 	 */
 	int cluster_count_failure_reports(const char* node);
 
 	/**
-	 * è¯¥å‘½ä»¤æ“ä½œåªèƒ½å‘é€ç»™ä¸€ä¸ªä»ç»“ç‚¹ï¼Œç”¨æ¥å¯¹ä¸»ç»“ç‚¹è¿›è¡Œæ•…éšœè½¬ç§»ï¼Œä½¿å½“å‰çš„ä»ç»“ç‚¹
-	 * åšä¸ºä¸»ç»“ç‚¹ï¼Œéœ€è¦ä¸å®ƒçš„ä¸»ç»“ç‚¹è¿›è¡Œåå•†ï¼ŒåŒæ—¶éœ€è¦è·å¾—å…¶å®ƒä¸»ç»“ç‚¹çš„è®¤å¯
+	 * ¸ÃÃüÁî²Ù×÷Ö»ÄÜ·¢ËÍ¸øÒ»¸ö´Ó½áµã£¬ÓÃÀ´¶ÔÖ÷½áµã½øĞĞ¹ÊÕÏ×ªÒÆ£¬Ê¹µ±Ç°µÄ´Ó½áµã
+	 * ×öÎªÖ÷½áµã£¬ĞèÒªÓëËüµÄÖ÷½áµã½øĞĞĞ­ÉÌ£¬Í¬Ê±ĞèÒª»ñµÃÆäËüÖ÷½áµãµÄÈÏ¿É
 	 * this command can only be sent to one slave node for failover
 	 * of the master node, make the current slave to be the master
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation is successful
 	 */
 	bool cluster_failover();
 
 	/**
-	 * å¼ºåˆ¶æ€§å°†ä¸€ä¸ªä»ç»“ç‚¹å˜ä¸ºä¸»ç»“ç‚¹ï¼Œè¯¥æ“ä½œä¸å¿…ä¸åŸæ¥çš„ä¸»ç»“ç‚¹è¿›è¡Œåå•†ï¼Œä½†ä»éœ€å¾—åˆ°
-	 * é›†ç¾¤ä¸­å¤§å¤šæ•°ä¸»ç»“ç‚¹çš„åŒæ„
+	 * Ç¿ÖÆĞÔ½«Ò»¸ö´Ó½áµã±äÎªÖ÷½áµã£¬¸Ã²Ù×÷²»±ØÓëÔ­À´µÄÖ÷½áµã½øĞĞĞ­ÉÌ£¬µ«ÈÔĞèµÃµ½
+	 * ¼¯ÈºÖĞ´ó¶àÊıÖ÷½áµãµÄÍ¬Òâ
 	 * force a slave to be the master, not handshake with it's master,
 	 * but still need get agreement by majority of the masters in cluster
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation is successful
 	 */
 	bool cluster_failover_force();
 
 	/**
-	 * å¼ºåˆ¶æ€§å°†ä¸€ä¸ªä»ç»“ç‚¹å˜ä¸ºä¸»ç»“ç‚¹ï¼Œè¯¥æ“ä½œä¸å¿…ä¸åŸæ¥çš„ä¸»ç»“ç‚¹å’Œé›†ç¾¤ä¸­çš„å…¶å®ƒä¸»ç»“ç‚¹
-	 * è¿›è¡Œåå•†
+	 * Ç¿ÖÆĞÔ½«Ò»¸ö´Ó½áµã±äÎªÖ÷½áµã£¬¸Ã²Ù×÷²»±ØÓëÔ­À´µÄÖ÷½áµãºÍ¼¯ÈºÖĞµÄÆäËüÖ÷½áµã
+	 * ½øĞĞĞ­ÉÌ
 	 * force a slave to be the master, not handshake with it's master,
 	 * and also no need get agreement by the other masters in cluster
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation is successful
 	 */
 	bool cluster_failover_takeover();
 
 	/**
-	 * è·å¾—å½“å‰é›†ç¾¤çš„ä¸€äº›æ¦‚è¿°ä¿¡æ¯
+	 * »ñµÃµ±Ç°¼¯ÈºµÄÒ»Ğ©¸ÅÊöĞÅÏ¢
 	 * get running informantion about the redis cluster
-	 * @param result {std::map<acl::string, acl::string>&} å­˜å‚¨ç»“æœ
+	 * @param result {std::map<acl::string, acl::string>&} ´æ´¢½á¹û
 	 *  store the result of this operation
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if this operation is successful
 	 */
 	bool cluster_info(std::map<string, string>& result);
 
 	/**
-	 * è®©å½“å‰ redis ç»“ç‚¹å°†é…ç½®ä¿¡æ¯ä¿å­˜è‡³ç£ç›˜çš„ nodes.conf ä¸­
+	 * ÈÃµ±Ç° redis ½áµã½«ÅäÖÃĞÅÏ¢±£´æÖÁ´ÅÅÌµÄ nodes.conf ÖĞ
 	 * let the current node to save the cluster information in nodes.conf
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if this operation is successful
 	 */
 	bool cluster_saveconfig();
 
 	/**
-	 * è·å¾—æŸä¸ªå“ˆå¸Œæ§½ä¸­çš„å¯¹è±¡æ€»æ•°é‡
+	 * »ñµÃÄ³¸ö¹şÏ£²ÛÖĞµÄ¶ÔÏó×ÜÊıÁ¿
 	 * get all the keys's count in one hash-slot
-	 * @param slot {size_t} æŒ‡å®šå“ˆå¸Œæ§½
+	 * @param slot {size_t} Ö¸¶¨¹şÏ£²Û
 	 *  the specified hash-slot
-	 * @return {int} è¿”å›å“ˆå¸Œæ§½ä¸­çš„å¯¹è±¡æ•°é‡ï¼Œ-1 è¡¨ç¤ºå‡ºé”™
-	 *ã€€return the keys's count in the hash-slot, return -1 if error 
+	 * @return {int} ·µ»Ø¹şÏ£²ÛÖĞµÄ¶ÔÏóÊıÁ¿£¬-1 ±íÊ¾³ö´í
+	 *¡¡return the keys's count in the hash-slot, return -1 if error 
 	 */
 	int cluster_countkeysinslot(size_t slot);
 
 	/**
-	 * å°†æŒ‡å®šç»“ç‚¹ä»å½“å‰çš„ç»“ç‚¹ä¸­ç§»é™¤
+	 * ½«Ö¸¶¨½áµã´Óµ±Ç°µÄ½áµãÖĞÒÆ³ı
 	 * remove the specified node from the current node
-	 * @param node {const char*} æŒ‡å®šçš„è¦è¢«ç§»é™¤çš„ç»“ç‚¹
+	 * @param node {const char*} Ö¸¶¨µÄÒª±»ÒÆ³ıµÄ½áµã
 	 *  the speicied node to be removed
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if this operation is successful
 	 */
 	bool cluster_forget(const char* node);
 
 	/**
-	 * è·å¾—æŸä¸ªé”®æ‰€å±çš„å“ˆå¸Œæ§½
+	 * »ñµÃÄ³¸ö¼üËùÊôµÄ¹şÏ£²Û
 	 * get the hash-slot wich the key belongs to
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key string
-	 * @return {int} å“ˆå¸Œæ§½å€¼ï¼Œ>= 0 è¡¨ç¤ºæˆåŠŸï¼Œ-1 è¡¨ç¤ºæ“ä½œå¤±è´¥
+	 * @return {int} ¹şÏ£²ÛÖµ£¬>= 0 ±íÊ¾³É¹¦£¬-1 ±íÊ¾²Ù×÷Ê§°Ü
 	 *  return the key's hash-slot, >= 0 if successful, -1 on error
 	 */
 	int cluster_keyslot(const char* key);
 
 	/**
-	 * å°†æŒ‡å®šç»“ç‚¹è®¾ç½®ä¸ºä»ç»“ç‚¹ï¼Œå¦‚æœè¯¥ç»“ç‚¹åŸæ¥ä¸ºä»ç»“ç‚¹ï¼Œåˆ™ä¹Ÿä¼šè¿”å›æˆåŠŸ
+	 * ½«Ö¸¶¨½áµãÉèÖÃÎª´Ó½áµã£¬Èç¹û¸Ã½áµãÔ­À´Îª´Ó½áµã£¬ÔòÒ²»á·µ»Ø³É¹¦
 	 * set the specified node to be a slave node
-	 * @param node {const char*} æŒ‡å®šç»“ç‚¹æ ‡è¯†ç¬¦
+	 * @param node {const char*} Ö¸¶¨½áµã±êÊ¶·û
 	 *  the specified node
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if this operation is successful
 	 */
 	bool cluster_replicate(const char* node);
@@ -261,10 +261,10 @@ public:
 	bool cluster_set_config_epoch(const char* epoch);
 
 	/**
-	 * è·å¾—æ‰€æœ‰å“ˆå¸Œæ§½åœ¨é›†ç¾¤ä¸­å„ä¸ª redis ç»“ç‚¹çš„åˆ†å¸ƒæƒ…å†µ
+	 * »ñµÃËùÓĞ¹şÏ£²ÛÔÚ¼¯ÈºÖĞ¸÷¸ö redis ½áµãµÄ·Ö²¼Çé¿ö
 	 * get all nodes with all slots
-	 * @return {const std::vector<redis_slot*>*} è¿”å›å­˜å‚¨å“ˆå¸Œæ§½ä¿¡æ¯
-	 *  çš„æ‰€æœ‰ä¸»ç»“ç‚¹é›†åˆï¼Œè¿”å› NULL è¡¨ç¤ºå‡ºé”™
+	 * @return {const std::vector<redis_slot*>*} ·µ»Ø´æ´¢¹şÏ£²ÛĞÅÏ¢
+	 *  µÄËùÓĞÖ÷½áµã¼¯ºÏ£¬·µ»Ø NULL ±íÊ¾³ö´í
 	 *  return all the master nodes with all hash-slots in them,
 	 *  and NULL will be returned if error happened, and the return
 	 *  value needn't be freed because it can be freed internal
@@ -272,21 +272,21 @@ public:
 	const std::vector<redis_slot*>* cluster_slots();
 	
 	/**
-	 * è·å¾—å½“å‰é›†ç¾¤ä¸­æ‰€æœ‰ç»“ç‚¹çš„ä¸»ç»“ç‚¹ï¼Œä¸»ç»“ç‚¹çš„æ‰€æœ‰ä»ç»“ç‚¹å¯ä»¥é€šè¿‡
-	 * redis_node::get_slaves è·å¾—
+	 * »ñµÃµ±Ç°¼¯ÈºÖĞËùÓĞ½áµãµÄÖ÷½áµã£¬Ö÷½áµãµÄËùÓĞ´Ó½áµã¿ÉÒÔÍ¨¹ı
+	 * redis_node::get_slaves »ñµÃ
 	 * get all the masters of the cluster, and master's slave nodes
 	 * can be got by redis_node::get_slaves
-	 * @return {const std::map<string, redis_node*>*} è¿”å› NULL è¡¨ç¤ºå‡ºé”™
+	 * @return {const std::map<string, redis_node*>*} ·µ»Ø NULL ±íÊ¾³ö´í
 	 *  return NULL if error happened, the return value needn't be
 	 *  freed because it can be freed internal
 	 */
 	const std::map<string, redis_node*>* cluster_nodes();
 
 	/**
-	 * è·å¾—æŒ‡å®šä¸»ç»“ç‚¹çš„æ‰€æœ‰ä»ç»“ç‚¹
+	 * »ñµÃÖ¸¶¨Ö÷½áµãµÄËùÓĞ´Ó½áµã
 	 * get all slave nodes of the specified master node
-	 * @return node {const char*} ä¸»ç»“ç‚¹æ ‡è¯†ç¬¦ï¼Œè¿”å› NULL è¡¨ç¤ºå‡ºé”™ï¼Œè¯¥
-	 *  è¿”å›ç»“æœä¸éœ€è¦é‡Šæ”¾ï¼Œå†…éƒ¨è‡ªåŠ¨ç»´æŠ¤
+	 * @return node {const char*} Ö÷½áµã±êÊ¶·û£¬·µ»Ø NULL ±íÊ¾³ö´í£¬¸Ã
+	 *  ·µ»Ø½á¹û²»ĞèÒªÊÍ·Å£¬ÄÚ²¿×Ô¶¯Î¬»¤
 	 *  one of the master node, NULL if error, and the return value
 	 *  needn't be freed because it can be freed internal
 	 */

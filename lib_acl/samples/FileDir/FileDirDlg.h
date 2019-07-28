@@ -1,4 +1,4 @@
-ï»¿// FileDirDlg.h : å¤´æ–‡ä»¶
+// FileDirDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
@@ -7,25 +7,25 @@
 #include "afxcmn.h"
 #include "afxwin.h"
 
-// CFileDirDlg å¯¹è¯æ¡†
+// CFileDirDlg ¶Ô»°¿ò
 class CFileDirDlg : public CDialog
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	CFileDirDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	CFileDirDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_FILEDIR_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
@@ -45,7 +45,7 @@ private:
 	static int ScanSvnCallback(ACL_SCAN_DIR * scan, void * ctx);
 	void ScanDir(void);
 	void ScanSvnDir(void);
-	// æ›´æ–°æ˜¾ç¤ºä¿¡æ¯
+	// ¸üĞÂÏÔÊ¾ĞÅÏ¢
 	void UpdateInfo(void);
 	BOOL UpdateSvn(const char* filepath);
 	void ScanClose(void);
@@ -79,7 +79,7 @@ public:
 private:
 	void DebugWinAppend(CString& msg);
 public:
-	// æ˜¯å¦å°†æ‰«æç›®å½•çš„æ–‡ä»¶åè¾“å‡º
+	// ÊÇ·ñ½«É¨ÃèÄ¿Â¼µÄÎÄ¼şÃûÊä³ö
 	BOOL m_outName;
 	afx_msg void OnBnClickedCheckOutName();
 	afx_msg void OnBnClickedSvnUpdate();

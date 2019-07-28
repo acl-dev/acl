@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 #include "gid_oper.h"
@@ -37,20 +37,20 @@ static int xml_new_gid(ACL_VSTREAM *client, int keep_alive, ACL_XML_NODE *node)
 /*--------------------------------------------------------------------------*/
 
 typedef struct PROTO_XML {
-	/* å‘½ä»¤å­— */
+	/* ÃüÁî×Ö */
 	const char *cmd;
 
-	/* åè®®å¤„ç†å‡½æ•°å¥æŸ„ */
+	/* Ğ­Òé´¦Àíº¯Êı¾ä±ú */
 	int (*handle)(ACL_VSTREAM *client, int keep_alive, ACL_XML_NODE*);
 } PROTO_XML;
 
-/* åè®®å‘½ä»¤å¤„ç†å‡½æ•°æ˜ å°„è¡¨ */
+/* Ğ­ÒéÃüÁî´¦Àíº¯ÊıÓ³Éä±í */
 static PROTO_XML __proto_xml_tab[] = {
 	{ CMD_NEW_GID, xml_new_gid },
 	{ NULL, NULL },
 };
 
-/* å¤„ç† xml æ•°æ®æ ¼å¼çš„è¯·æ±‚ */
+/* ´¦Àí xml Êı¾İ¸ñÊ½µÄÇëÇó */
 
 int http_xml_service(ACL_VSTREAM *client,
 	HTTP_HDR_REQ *hdr_req, ACL_XML *xml)
@@ -62,9 +62,9 @@ int http_xml_service(ACL_VSTREAM *client,
 	ACL_XML_NODE *node;
 	int   ret, i, keep_alive = 0;
 
-	/* xml æ•°æ®æ ¼å¼è¦æ±‚: <request cmd='xxx' tag='xxx:sid' /> */
+	/* xml Êı¾İ¸ñÊ½ÒªÇó: <request cmd='xxx' tag='xxx:sid' /> */
 
-	/* è·å¾— cmd å‘½ä»¤å­— */
+	/* »ñµÃ cmd ÃüÁî×Ö */
 
 	a = acl_xml_getElementsByTagName(xml, "request");
 	if (a == NULL) {
@@ -73,7 +73,7 @@ int http_xml_service(ACL_VSTREAM *client,
 		return (-1);
 	}
 
-	/* æ‰¾åˆ°ç¬¬ä¸€ä¸ªç»“ç‚¹å³å¯ */
+	/* ÕÒµ½µÚÒ»¸ö½áµã¼´¿É */
 
 	node = NULL;
 	acl_foreach(iter, a) {
@@ -81,7 +81,7 @@ int http_xml_service(ACL_VSTREAM *client,
 		break;
 	}
 
-	/* ä» xml å¯¹è±¡è·å¾—å‘½ä»¤å­— */
+	/* ´Ó xml ¶ÔÏó»ñµÃÃüÁî×Ö */
 
 	ptr = acl_xml_getElementAttrVal(node, "cmd");
 	if (ptr == NULL || *ptr == 0) {
@@ -99,10 +99,10 @@ int http_xml_service(ACL_VSTREAM *client,
 		return (-1);
 	}
 
-	/* å®¢æˆ·ç«¯æ˜¯å¦è¦æ±‚ä¿æŒé•¿è¿æ¥ */
+	/* ¿Í»§¶ËÊÇ·ñÒªÇó±£³Ö³¤Á¬½Ó */
 	keep_alive = hdr_req->hdr.keep_alive;
 
-	/* æŸ¥è¯¢å¯¹åº”å‘½ä»¤çš„å¤„ç†å‡½æ•°å¯¹è±¡ */
+	/* ²éÑ¯¶ÔÓ¦ÃüÁîµÄ´¦Àíº¯Êı¶ÔÏó */
 	ret = -1;
 	for (i = 0; __proto_xml_tab[i].cmd != NULL; i++) {
 		if (strcasecmp(cmd, __proto_xml_tab[i].cmd) == 0) {
@@ -112,7 +112,7 @@ int http_xml_service(ACL_VSTREAM *client,
 		}
 	}
 
-	/* å¿…é¡»æ˜¯åœ¨ä¸ç”¨ node æ—¶æ‰å¯ä»¥é‡Šæ”¾è¯¥æ•°ç»„å¯¹è±¡ */
+	/* ±ØĞëÊÇÔÚ²»ÓÃ node Ê±²Å¿ÉÒÔÊÍ·Å¸ÃÊı×é¶ÔÏó */
 	acl_xml_free_array(a);
 
 	if (__proto_xml_tab[i].cmd == NULL)
@@ -120,9 +120,9 @@ int http_xml_service(ACL_VSTREAM *client,
 			__FILE__, __LINE__, __FUNCTION__, cmd);
 
 	if (ret < 0)
-		return (-1);  /* å‡ºé”™ */
+		return (-1);  /* ³ö´í */
 	else if (keep_alive)
-		return (1);  /* æ­£å¸¸ä¸”éœ€è¦ä¿æŒé•¿è¿æ¥ */
+		return (1);  /* Õı³£ÇÒĞèÒª±£³Ö³¤Á¬½Ó */
 	else
-		return (0);  /* æ­£å¸¸ä¾¿æ˜¯çŸ­è¿æ¥ */
+		return (0);  /* Õı³£±ãÊÇ¶ÌÁ¬½Ó */
 }

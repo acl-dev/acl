@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -196,7 +196,7 @@ char *acl_strtrim(char *str)
 		} else if (((*ptr) &0xff) == 0xa1
 			&& ((*(ptr + 1)) & 0xff) == 0xa1)
 		{
-			/* å¯¹äºå…¨è§’çš„ç©ºæ ¼ä¸º: 'ã€€', å³ 0xa10xa1 */
+			/* ¶ÔÓÚÈ«½ÇµÄ¿Õ¸ñÎª: '¡¡', ¼´ 0xa10xa1 */
 			len--;
 			memmove(ptr, ptr + 2, len--);
 		} else {
@@ -265,9 +265,9 @@ int acl_strtrunc_byln(char *str)
 }
 
 /*--------------------------------------------------------------------------
- * è¿”å›æŒ‡é’ˆçš„å½“å‰ä½ç½®, å¹¶ä¸”åˆ é™¤è·¯å¾„ä¸­å¤šä½™çš„ '/'(for unix) or '\\'(for windows)
- * å¹¶ä¸”è¿”å›çš„å½“å‰æŒ‡é’ˆæ‰€å­˜å‚¨çš„å­—ç¬¦ä¸º '\0', è€Œåˆ°æ•°ç¬¬äºŒä¸ªå­—ç¬¦æœ‰å¯èƒ½ä¸º '/' or '\\',
- * ä¹Ÿæœ‰å¯èƒ½ä¸ä¸º //'/' or '\\', ä½†åœ¨ç»“æœé›†ä¸­ç»ä¸ä¼šå‡ºç°è¿ç»­çš„ '/' or '\\'
+ * ·µ»ØÖ¸ÕëµÄµ±Ç°Î»ÖÃ, ²¢ÇÒÉ¾³ıÂ·¾¶ÖĞ¶àÓàµÄ '/'(for unix) or '\\'(for windows)
+ * ²¢ÇÒ·µ»ØµÄµ±Ç°Ö¸ÕëËù´æ´¢µÄ×Ö·ûÎª '\0', ¶øµ½ÊıµÚ¶ş¸ö×Ö·ûÓĞ¿ÉÄÜÎª '/' or '\\',
+ * Ò²ÓĞ¿ÉÄÜ²»Îª //'/' or '\\', µ«ÔÚ½á¹û¼¯ÖĞ¾ø²»»á³öÏÖÁ¬ĞøµÄ '/' or '\\'
  */
 static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 {
@@ -293,16 +293,16 @@ static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 		ptr++;
 	}
 
-	if (n <= 0)      /* è¯´æ˜æ‰€ç»™çš„ç¼“å†²åŒºç©ºé—´ä¸å¤Ÿå¤§ */
+	if (n <= 0)      /* ËµÃ÷Ëù¸øµÄ»º³åÇø¿Õ¼ä²»¹»´ó */
 		return NULL;
 
-	/* å¿…é¡»ä¿è¯æœ€åä¸€ä¸ªå­—ç¬¦æ˜¯ä»¥ '\0' ç»“æŸ */
+	/* ±ØĞë±£Ö¤×îºóÒ»¸ö×Ö·ûÊÇÒÔ '\0' ½áÊø */
 	*obj = 0;
 
 	return obj;
 }
 /*----------------------------------------------------------------------------
- * ä¿è¯ç»“æœç±»ä¼¼äºå¦‚ä¸‹å½¢å¼:
+ * ±£Ö¤½á¹ûÀàËÆÓÚÈçÏÂĞÎÊ½:
  * /home/avwall/test.txt
  */
 int acl_file_path_correct(const char *psrc_file_path, char *pbuf, int sizeb)
@@ -315,26 +315,26 @@ int acl_file_path_correct(const char *psrc_file_path, char *pbuf, int sizeb)
 	return 0;
 }
 /*----------------------------------------------------------------------------
- * ä¿è¯è·¯å¾„åç»è¿‡æ­¤å‡½æ•°åéƒ½ä¸ºå¦‚ä¸‹æ ¼å¼:
- * æº:   /home/avwall/, /home//////avwall/, /home/avwall, /////home/avwall///
+ * ±£Ö¤Â·¾¶Ãû¾­¹ı´Ëº¯Êıºó¶¼ÎªÈçÏÂ¸ñÊ½:
+ * Ô´:   /home/avwall/, /home//////avwall/, /home/avwall, /////home/avwall///
  *       /home/avwall////, /home///avwall///, ///home///avwall///
- * ç»“æœ: /home/avwall/
+ * ½á¹û: /home/avwall/
  */
 int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb)
 {
 	char    *ptr;
 
-	/* åˆ é™¤è¿ç»­çš„ '/'(unix) or '\\'(windows) */
+	/* É¾³ıÁ¬ĞøµÄ '/'(unix) or '\\'(windows) */
 	ptr = path_str_strip(psrc_dir, pbuf, sizeb);
 
-	/* è¯¥å‡½æ•°è‹¥è¿”å›çš„ç»“æœä¸ä¸ºç©º, åˆ™ *ptr å®šä¸º '\0' */
+	/* ¸Ãº¯ÊıÈô·µ»ØµÄ½á¹û²»Îª¿Õ, Ôò *ptr ¶¨Îª '\0' */
 	if (ptr == NULL)
 		return -1;
 
-	/* ä¸ºäº†ä¿è¯æœ€åä¸€ä¸ªå­—ç¬¦è‚¯å®šä¸º '/'(unix) or '\\'(windows), éœ€åšå¦‚ä¸‹å¤„ç† */
+	/* ÎªÁË±£Ö¤×îºóÒ»¸ö×Ö·û¿Ï¶¨Îª '/'(unix) or '\\'(windows), Ğè×öÈçÏÂ´¦Àí */
 
 	if (*(ptr - 1) != PATH_SEP_C) {
-		if (ptr >= pbuf + sizeb) /* è¯´æ˜æ‰€ç»™çš„å†…å­˜ç©ºé—´ä¸å¤Ÿ */
+		if (ptr >= pbuf + sizeb) /* ËµÃ÷Ëù¸øµÄÄÚ´æ¿Õ¼ä²»¹» */
 			return -1;
 		*ptr++ = PATH_SEP_C;
 		*ptr = 0;
@@ -539,7 +539,7 @@ const char *acl_ui64toa_radix(acl_uint64 val, char *buf, size_t size, int radix)
 
 static int get_blank_line(const char* s, int n, ACL_LINE_STATE* state)
 {
-	/* å¦‚æœè¿˜æœªæ‰¾åˆ°æ¢è¡Œç¬¦ï¼Œåˆ™ç»§ç»­ */
+	/* Èç¹û»¹Î´ÕÒµ½»»ĞĞ·û£¬Ôò¼ÌĞø */
 
 	if (state->last_lf == 0) {
 		while (n > 0) {
@@ -556,9 +556,9 @@ static int get_blank_line(const char* s, int n, ACL_LINE_STATE* state)
 		return n;
 	}
 
-	/* å¦‚æœæ•°æ®ä»¥æ¢è¡Œå¼€å§‹ï¼Œ è¯´æ˜å½“å‰çš„ç©ºè¡Œæ‰¾åˆ° */
+	/* Èç¹ûÊı¾İÒÔ»»ĞĞ¿ªÊ¼£¬ ËµÃ÷µ±Ç°µÄ¿ÕĞĞÕÒµ½ */
 	if (*s == '\n') {
-		/* ä¸Šæ¬¡æ•°æ®ä¸º: \n\r æˆ– \n */
+		/* ÉÏ´ÎÊı¾İÎª: \n\r »ò \n */
 
 		state->offset++;
 		state->finish = 1;
@@ -569,17 +569,17 @@ static int get_blank_line(const char* s, int n, ACL_LINE_STATE* state)
 	if (*s == '\r') {
 		state->offset++;
 		if (state->last_ch == '\r') {
-			/* XXX: å‡ºç°äº† \n\r\r ç°è±¡ */
+			/* XXX: ³öÏÖÁË \n\r\r ÏÖÏó */
 			state->last_lf = 0;
 			return n - 1;
 		}
 
-		/* è¿”å›, ä»¥æœŸå¾…ä¸‹ä¸€ä¸ªå­—ç¬¦ä¸º '\n' */
+		/* ·µ»Ø, ÒÔÆÚ´ıÏÂÒ»¸ö×Ö·ûÎª '\n' */
 		state->last_ch = '\r';
 		return n - 1;
 	}
 
-	/* æ¸…é™¤ '\n' */
+	/* Çå³ı '\n' */
 	state->last_lf = 0;
 
 	return n;

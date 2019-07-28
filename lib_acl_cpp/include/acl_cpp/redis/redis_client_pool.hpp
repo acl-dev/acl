@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../connpool/connect_pool.hpp"
 
@@ -10,8 +10,8 @@ namespace acl
 class polarssl_conf;
 
 /**
- * redis è¿æ¥æ± ç±»ï¼Œè¯¥ç±»ç»§æ‰¿äº connect_poolï¼Œåœ¨ connect_pool å®šä¹‰äº†é€šç”¨çš„æœ‰å…³
- * TCP è¿æ¥æ± çš„é€šç”¨æ–¹æ³•ã€‚
+ * redis Á¬½Ó³ØÀà£¬¸ÃÀà¼Ì³ĞÓÚ connect_pool£¬ÔÚ connect_pool ¶¨ÒåÁËÍ¨ÓÃµÄÓĞ¹Ø
+ * TCP Á¬½Ó³ØµÄÍ¨ÓÃ·½·¨¡£
  * redis connection pool inherting from connect_pool, which includes
  * TCP connection pool methods.
  */
@@ -19,15 +19,15 @@ class ACL_CPP_API redis_client_pool : public connect_pool
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
+	 * ¹¹Ôìº¯Êı
 	 * constructor
-	 * @param addr {const char*} æœåŠ¡ç«¯åœ°å€ï¼Œæ ¼å¼ï¼šip:port
+	 * @param addr {const char*} ·şÎñ¶ËµØÖ·£¬¸ñÊ½£ºip:port
 	 *  the redis-server's listening address, format: ip:port
-	 * @param count {size_t} è¿æ¥æ± çš„æœ€å¤§è¿æ¥æ•°é™åˆ¶ï¼Œå¦‚æœæ­¤å€¼ä¸º 0ï¼Œåˆ™è¿æ¥æ± 
-	 *  æ²¡æœ‰ä¸Šé™é™åˆ¶ã€‚
+	 * @param count {size_t} Á¬½Ó³ØµÄ×î´óÁ¬½ÓÊıÏŞÖÆ£¬Èç¹û´ËÖµÎª 0£¬ÔòÁ¬½Ó³Ø
+	 *  Ã»ÓĞÉÏÏŞÏŞÖÆ¡£
 	 *  the max connections for each connection pool. there is
 	 *  no connections limit of the pool when the count is 0.
-	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹)
+	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼)
 	 *  the subscript of the connection pool in the connection cluster
 	 */
 	redis_client_pool(const char* addr, size_t count, size_t idx = 0);
@@ -35,8 +35,8 @@ public:
 	virtual ~redis_client_pool(void);
 
 	/**
-	 * è®¾ç½® SSL é€šä¿¡æ–¹å¼ä¸‹çš„é…ç½®å¥æŸ„ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º NULLï¼Œå¦‚æœè®¾ç½®äº† SSL è¿
-	 * æ¥é…ç½®å¯¹è±¡ï¼Œåˆ™å†…éƒ¨åˆ‡æ¢æˆ SSL é€šä¿¡æ–¹å¼
+	 * ÉèÖÃ SSL Í¨ĞÅ·½Ê½ÏÂµÄÅäÖÃ¾ä±ú£¬ÄÚ²¿È±Ê¡ÖµÎª NULL£¬Èç¹ûÉèÖÃÁË SSL Á¬
+	 * ½ÓÅäÖÃ¶ÔÏó£¬ÔòÄÚ²¿ÇĞ»»³É SSL Í¨ĞÅ·½Ê½
 	 * set SSL communication with Redis-server if ssl_conf not NULL
 	 * @param ssl_conf {polarssl_conf*}
 	 * @return {redis_client_pool&}
@@ -44,14 +44,14 @@ public:
 	redis_client_pool& set_ssl_conf(polarssl_conf* ssl_conf);
 
 	/**
-	 * è®¾ç½®è¿æ¥ redis æœåŠ¡å™¨çš„è¿æ¥å¯†ç 
-	 * @param pass {const char*} è¿æ¥å¯†ç 
+	 * ÉèÖÃÁ¬½Ó redis ·şÎñÆ÷µÄÁ¬½ÓÃÜÂë
+	 * @param pass {const char*} Á¬½ÓÃÜÂë
 	 * @return {redis_client_pool&}
 	 */
 	redis_client_pool& set_password(const char* pass);
 
 	/**
-	 * åœ¨éé›†ç¾¤æ¨¡å¼ä¸‹ï¼Œæœ¬æ–¹æ³•ç”¨æ¥è®¾ç½®è¿æ¥å»ºç«‹åæ‰€é€‰æ‹©çš„db
+	 * ÔÚ·Ç¼¯ÈºÄ£Ê½ÏÂ£¬±¾·½·¨ÓÃÀ´ÉèÖÃÁ¬½Ó½¨Á¢ºóËùÑ¡ÔñµÄdb
 	 * in no-cluster mode, the method is used to select the db after
 	 * the connection is created
 	 * @param dbnum {int}
@@ -60,7 +60,7 @@ public:
 	redis_client_pool& set_db(int dbnum);
 
 	/**
-	 * è·å¾—æœ¬è¿æ¥æ± æ‰€å¯¹åº”çš„db
+	 * »ñµÃ±¾Á¬½Ó³ØËù¶ÔÓ¦µÄdb
 	 * get the current db of the connections pool
 	 * @return {int}
 	 */
@@ -71,7 +71,7 @@ public:
 
 protected:
 	/**
-	 * åŸºç±»çº¯è™šå‡½æ•°: è°ƒç”¨æ­¤å‡½æ•°ç”¨æ¥åˆ›å»ºä¸€ä¸ªæ–°çš„è¿æ¥
+	 * »ùÀà´¿Ğéº¯Êı: µ÷ÓÃ´Ëº¯ÊıÓÃÀ´´´½¨Ò»¸öĞÂµÄÁ¬½Ó
 	 * virtual function in class connect_pool to create a new connection
 	 * @return {connect_client*}
 	 */

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 
 int main()
 {
@@ -6,37 +6,37 @@ int main()
 	acl::json_node& root = json.get_root();
 
 
-	// ç”Ÿæˆ json ä¸²ï¼š{"1": {"1": {"1": "aa"}}}
+	// Éú³É json ´®£º{"1": {"1": {"1": "aa"}}}
 	root.add_child("1", true).add_child("1", true).add_text("1", "aa");
 	printf("%s\r\n", json.to_string().c_str());
 
 	json.reset();
 
 	//////////////////////////////////////////////////////////////////////
-	// ä»¥ä¸‹ä¸‰ç§æ–¹æ³•å¯ä»¥ç”Ÿæˆç›¸åŒçš„ json ä¸²å¦‚ä¸‹ï¼š
+	// ÒÔÏÂÈıÖÖ·½·¨¿ÉÒÔÉú³ÉÏàÍ¬µÄ json ´®ÈçÏÂ£º
 	// {"cmd": "add", "Para": {"xxx": "111", "yyy": "222", "zzz": true, "eee": 100}, "status": true, "length": 100}
 	
 	//////////////////////////////////////////////////////////////////////
-	// æ–¹æ³•ä¸€ï¼š
+	// ·½·¨Ò»£º
 
-	root.add_text("cmd", "add")	// æ·»åŠ  root èŠ‚ç‚¹çš„å­èŠ‚ç‚¹å¹¶è¿”å› root
-	  .add_child("Para", true)	// æ·»åŠ  root çš„å­èŠ‚ç‚¹(Para)å¹¶è¿”å› Para
-	    .add_text("xxx", "111")	// æ·»åŠ  Para çš„å­èŠ‚ç‚¹å¹¶è¿”å› Para
-	    .add_text("yyy", "222")	// æ·»åŠ  Para çš„å­èŠ‚ç‚¹å¹¶è¿”å› Para
-	    .add_bool("zzz", true)	// æ·»åŠ  Para çš„å­èŠ‚ç‚¹å¹¶è¿”å› Para
-	    .add_number("eee", 100)	// æ·»åŠ  Para çš„å­èŠ‚ç‚¹å¹¶è¿”å› Para
-	  .get_parent()			// è¿”å› Para çš„çˆ¶èŠ‚ç‚¹(rootèŠ‚ç‚¹)
-	  .add_bool("status", true)	// æ·»åŠ  root èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ status
-	  .add_number("length", 100);	// æ·»åŠ  root èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ length
+	root.add_text("cmd", "add")	// Ìí¼Ó root ½ÚµãµÄ×Ó½Úµã²¢·µ»Ø root
+	  .add_child("Para", true)	// Ìí¼Ó root µÄ×Ó½Úµã(Para)²¢·µ»Ø Para
+	    .add_text("xxx", "111")	// Ìí¼Ó Para µÄ×Ó½Úµã²¢·µ»Ø Para
+	    .add_text("yyy", "222")	// Ìí¼Ó Para µÄ×Ó½Úµã²¢·µ»Ø Para
+	    .add_bool("zzz", true)	// Ìí¼Ó Para µÄ×Ó½Úµã²¢·µ»Ø Para
+	    .add_number("eee", 100)	// Ìí¼Ó Para µÄ×Ó½Úµã²¢·µ»Ø Para
+	  .get_parent()			// ·µ»Ø Para µÄ¸¸½Úµã(root½Úµã)
+	  .add_bool("status", true)	// Ìí¼Ó root ½ÚµãµÄ×Ó½Úµã status
+	  .add_number("length", 100);	// Ìí¼Ó root ½ÚµãµÄ×Ó½Úµã length
 
 	printf("%s\r\n", json.to_string().c_str());
 	acl::string buf1;
 	json.build_json(buf1);
 
 	//////////////////////////////////////////////////////////////////////
-	// æ–¹æ³•äºŒï¼š
+	// ·½·¨¶ş£º
 
-	// åœ¨é‡æ–°ä½¿ç”¨å‰éœ€è¦é‡ç½® json ç”Ÿæˆå™¨çŠ¶æ€
+	// ÔÚÖØĞÂÊ¹ÓÃÇ°ĞèÒªÖØÖÃ json Éú³ÉÆ÷×´Ì¬
 	json.reset();
 
 	root.add_text("cmd", "add")
@@ -54,9 +54,9 @@ int main()
 	json.build_json(buf2);
 
 	//////////////////////////////////////////////////////////////////////
-	// æ–¹æ³•ä¸‰ï¼š
+	// ·½·¨Èı£º
 
-	// åœ¨é‡æ–°ä½¿ç”¨å‰éœ€è¦é‡ç½® json ç”Ÿæˆå™¨çŠ¶æ€
+	// ÔÚÖØĞÂÊ¹ÓÃÇ°ĞèÒªÖØÖÃ json Éú³ÉÆ÷×´Ì¬
 	json.reset();
 
 	acl::json_node& cmd = json.create_node("cmd", "add");
@@ -88,7 +88,7 @@ int main()
 	json.build_json(buf3);
 
 	//////////////////////////////////////////////////////////////////////
-	// æ¯”è¾ƒä¸‰ç§æ–¹æ³•çš„ç»“æœæ˜¯å¦ç›¸ç­‰
+	// ±È½ÏÈıÖÖ·½·¨µÄ½á¹ûÊÇ·ñÏàµÈ
 
 	if (buf2 == buf1 && buf3 == buf2)
 		printf("OK\r\n");

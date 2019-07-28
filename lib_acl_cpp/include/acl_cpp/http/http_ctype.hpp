@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/noncopyable.hpp"
@@ -8,7 +8,7 @@
 namespace acl {
 
 /**
- * ä¸ HTTP å¤´ä¸­çš„ Content-Type ç›¸å…³çš„ç±»å®šä¹‰ï¼Œå¯ä»¥åˆ†æå¦‚ä¸‹æ•°æ®ï¼š
+ * Óë HTTP Í·ÖĞµÄ Content-Type Ïà¹ØµÄÀà¶¨Òå£¬¿ÉÒÔ·ÖÎöÈçÏÂÊı¾İ£º
  * Content-Type: application/x-www-form-urlencoded
  * Content-Type: multipart/form-data; boundary=xxx
  * Content-Type: application/octet-stream
@@ -23,52 +23,52 @@ public:
 	~http_ctype(void);
 
 	/**
-	 * é‡è½½äº† "=" æ“ä½œç¬¦è¿›è¡Œå¯¹è±¡çš„å¤åˆ¶
-	 * @param ctype {const http_ctype&} æºå¯¹è±¡
+	 * ÖØÔØÁË "=" ²Ù×÷·û½øĞĞ¶ÔÏóµÄ¸´ÖÆ
+	 * @param ctype {const http_ctype&} Ô´¶ÔÏó
 	 * @return {http_ctype&}
 	 */
 	http_ctype& operator=(const http_ctype& ctype);
 
 	/**
-	 * åˆ†æ HTTP å¤´ä¸­ Content-Type å­—æ®µå€¼
-	 * @param cp {const char*} Content-Type å­—æ®µå€¼ï¼Œå¦‚ï¼š
+	 * ·ÖÎö HTTP Í·ÖĞ Content-Type ×Ö¶ÎÖµ
+	 * @param cp {const char*} Content-Type ×Ö¶ÎÖµ£¬Èç£º
 	 * application/x-www-form-urlencoded
 	 * multipart/form-data; boundary=xxx
 	 * application/octet-stream
-	 * @return {bool} è¾“å…¥æ•°æ®æ˜¯å¦åˆæ³•
+	 * @return {bool} ÊäÈëÊı¾İÊÇ·ñºÏ·¨
 	 */
 	bool parse(const char* cp);
 
 	/**
-	 * è·å¾— Content-Type å­—æ®µå€¼ text/html; charset=utf8 ä¸­çš„ text
-	 * @return {const char*} è¿”å› NULL è¯´æ˜æ²¡æœ‰è¯¥æ•°æ®ï¼Œä¸€èˆ¬æ˜¯å› ä¸º
-	 *  parse å¤±è´¥å¯¼è‡´çš„
+	 * »ñµÃ Content-Type ×Ö¶ÎÖµ text/html; charset=utf8 ÖĞµÄ text
+	 * @return {const char*} ·µ»Ø NULL ËµÃ÷Ã»ÓĞ¸ÃÊı¾İ£¬Ò»°ãÊÇÒòÎª
+	 *  parse Ê§°Üµ¼ÖÂµÄ
 	 */
 	const char* get_ctype(void) const;
 
 	/**
-	 * è·å¾— Content-Type å­—æ®µå€¼ text/html; charset=utf8 ä¸­çš„ html
-	 * @return {const char*} è¿”å› NULL è¯´æ˜æ²¡æœ‰è¯¥æ•°æ®
+	 * »ñµÃ Content-Type ×Ö¶ÎÖµ text/html; charset=utf8 ÖĞµÄ html
+	 * @return {const char*} ·µ»Ø NULL ËµÃ÷Ã»ÓĞ¸ÃÊı¾İ
 	 */
 	const char* get_stype(void) const;
 
 	/**
-	 * è·å¾— Content-Type å­—æ®µå€¼ multipart/form-data; boundary=xxx
-	 * ä¸­çš„ boundary çš„å€¼ xxx
-	 * @return {const char*} è¿”å› NULL è¯´æ˜æ²¡æœ‰è¯¥æ•°æ®
+	 * »ñµÃ Content-Type ×Ö¶ÎÖµ multipart/form-data; boundary=xxx
+	 * ÖĞµÄ boundary µÄÖµ xxx
+	 * @return {const char*} ·µ»Ø NULL ËµÃ÷Ã»ÓĞ¸ÃÊı¾İ
 	 */
 	const char* get_bound(void) const;
 
 	/**
-	 * è·å¾— Content-Type: xxx/xxx; name=name_xxx
-	 * ä¸­çš„ name çš„å€¼ name_xxx
-	 * @return {const char*} è¿”å› NULL è¯´æ˜æ²¡æœ‰è¯¥æ•°æ®
+	 * »ñµÃ Content-Type: xxx/xxx; name=name_xxx
+	 * ÖĞµÄ name µÄÖµ name_xxx
+	 * @return {const char*} ·µ»Ø NULL ËµÃ÷Ã»ÓĞ¸ÃÊı¾İ
 	 */
 	const char* get_name(void) const;
 
 	/**
-	 * è·å¾— Content-Type å­—æ®µå€¼ text/html; charset=utf8 ä¸­çš„ utf8
-	 * @return {const char*} è¿”å› NULL è¯´æ˜æ²¡æœ‰è¯¥æ•°æ®
+	 * »ñµÃ Content-Type ×Ö¶ÎÖµ text/html; charset=utf8 ÖĞµÄ utf8
+	 * @return {const char*} ·µ»Ø NULL ËµÃ÷Ã»ÓĞ¸ÃÊı¾İ
 	 */
 	const char* get_charset(void) const;
 

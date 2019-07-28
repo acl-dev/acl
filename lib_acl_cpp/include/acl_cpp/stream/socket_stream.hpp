@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
@@ -19,10 +19,10 @@ public:
 	virtual ~socket_stream(void);
 
 	/**
-	 * æ ¹æ®å¥—æ¥å­—æ‰“å¼€çš„ä¸€ä¸ªç½‘ç»œæµ
-	 * @param fd å¥—æ¥å­—
-	 * @param udp_mode {bool} æ˜¯å¦æ˜¯ UDP æ–¹å¼
-	 * @return {bool} è¿æ¥æ˜¯å¦æˆåŠŸ
+	 * ¸ù¾İÌ×½Ó×Ö´ò¿ªµÄÒ»¸öÍøÂçÁ÷
+	 * @param fd Ì×½Ó×Ö
+	 * @param udp_mode {bool} ÊÇ·ñÊÇ UDP ·½Ê½
+	 * @return {bool} Á¬½ÓÊÇ·ñ³É¹¦
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool open(SOCKET fd, bool udp_mode = false);
@@ -31,57 +31,57 @@ public:
 #endif
 
 	/**
-	 * æ ¹æ® ACL_VSTREAM æµæ‰“å¼€ç½‘ç»œæµ
+	 * ¸ù¾İ ACL_VSTREAM Á÷´ò¿ªÍøÂçÁ÷
 	 * @param vstream {ACL_VSTREAM*}
-	 * @param udp_mode {bool} æ˜¯å¦æ˜¯ UDP æ–¹å¼
-	 * @return {bool} è¿æ¥æ˜¯å¦æˆåŠŸ
+	 * @param udp_mode {bool} ÊÇ·ñÊÇ UDP ·½Ê½
+	 * @return {bool} Á¬½ÓÊÇ·ñ³É¹¦
 	 */
 	bool open(ACL_VSTREAM* vstream, bool udp_mode = false);
 
 	/**
-	 * è¿æ¥è¿œç¨‹æœåŠ¡å™¨å¹¶æ‰“å¼€ç½‘ç»œè¿æ¥æµ
-	 * @param addr {const char*} æœåŠ¡å™¨åœ°å€, è‹¥è¿æ¥åŸŸå¥—æ¥å£æœåŠ¡å™¨(ä»…UNIXå¹³å°),
-	 *  åŸŸå¥—æ¥åœ°å€ï¼š/tmp/test.sock; å¦‚æœè¿æ¥ä¸€ä¸ªTCPæœåŠ¡å™¨ï¼Œåˆ™åœ°å€æ ¼å¼ä¸º:
-	 *  [${local_ip}@]${remote_addr}, å¦‚: 60.28.250.199@www.sina.com:80,
-	 *  æ„æ€æ˜¯ç»‘å®šæœ¬çš„ç½‘å¡åœ°å€ä¸º: 60.28.250.199, è¿œç¨‹è¿æ¥ www.sina.com çš„ 80,
-	 *  å¦‚æœç”±OSè‡ªåŠ¨ç»‘å®šæœ¬åœ° IP åœ°å€ï¼Œåˆ™å¯ä»¥å†™ä¸ºï¼šwww.sina.com:80
-	 * @param conn_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´(ç§’)
-	 * @param rw_timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(ç§’)
-	 * @return {bool} è¿æ¥æ˜¯å¦æˆåŠŸ
+	 * Á¬½ÓÔ¶³Ì·şÎñÆ÷²¢´ò¿ªÍøÂçÁ¬½ÓÁ÷
+	 * @param addr {const char*} ·şÎñÆ÷µØÖ·, ÈôÁ¬½ÓÓòÌ×½Ó¿Ú·şÎñÆ÷(½öUNIXÆ½Ì¨),
+	 *  ÓòÌ×½ÓµØÖ·£º/tmp/test.sock; Èç¹ûÁ¬½ÓÒ»¸öTCP·şÎñÆ÷£¬ÔòµØÖ·¸ñÊ½Îª:
+	 *  [${local_ip}@]${remote_addr}, Èç: 60.28.250.199@www.sina.com:80,
+	 *  ÒâË¼ÊÇ°ó¶¨±¾µÄÍø¿¨µØÖ·Îª: 60.28.250.199, Ô¶³ÌÁ¬½Ó www.sina.com µÄ 80,
+	 *  Èç¹ûÓÉOS×Ô¶¯°ó¶¨±¾µØ IP µØÖ·£¬Ôò¿ÉÒÔĞ´Îª£ºwww.sina.com:80
+	 * @param conn_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(Ãë)
+	 * @param rw_timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ãë)
+	 * @return {bool} Á¬½ÓÊÇ·ñ³É¹¦
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
 	/**
-	 * ç»‘å®šæœ¬åœ° UDP åœ°å€ï¼Œåˆ›å»º UDP ç½‘ç»œæµå¯¹è±¡
-	 * @param addr {const char*} æœ¬æœºåœ°å€ï¼Œæ ¼å¼ï¼šip:port
-	 * @param rw_timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(ç§’)
+	 * °ó¶¨±¾µØ UDP µØÖ·£¬´´½¨ UDP ÍøÂçÁ÷¶ÔÏó
+	 * @param addr {const char*} ±¾»úµØÖ·£¬¸ñÊ½£ºip:port
+	 * @param rw_timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ãë)
 	 * @param flag {unsigned}
-	 * @return {bool} ç»‘å®šæ˜¯å¦æˆåŠŸ
+	 * @return {bool} °ó¶¨ÊÇ·ñ³É¹¦
 	 */
 	bool bind_udp(const char* addr, int rw_timeout = 0, unsigned flag = 0);
 
 	/**
-	 * å…³é—­å¥—æ¥å£è¯»æ“ä½œ
+	 * ¹Ø±ÕÌ×½Ó¿Ú¶Á²Ù×÷
 	 * @return {bool}
 	 */
 	bool shutdown_read(void);
 
 	/**
-	 * å…³é—­å¥—æ¥å£å†™æ“ä½œ
+	 * ¹Ø±ÕÌ×½Ó¿ÚĞ´²Ù×÷
 	 * @return {bool}
 	 */
 	bool shutdown_write(void);
 
 	/**
-	 * å…³é—­å¥—æ¥å£è¯»å†™æ“ä½œ
+	 * ¹Ø±ÕÌ×½Ó¿Ú¶ÁĞ´²Ù×÷
 	 * @return {bool}
 	 */
 	bool shutdown_readwrite(void);
 
 	/**
-	 * è·å¾—ç½‘ç»œè¿æ¥æµçš„å¥—æ¥å­—è¿æ¥å¥æŸ„
-	 * @return {ACL_SOCKET} è‹¥å‡ºé”™ï¼Œåˆ™è¿”å› - 1(UNIX å¹³å°)
-	 *  æˆ– INVALID_SOCKET(win32å¹³å°)
+	 * »ñµÃÍøÂçÁ¬½ÓÁ÷µÄÌ×½Ó×ÖÁ¬½Ó¾ä±ú
+	 * @return {ACL_SOCKET} Èô³ö´í£¬Ôò·µ»Ø - 1(UNIX Æ½Ì¨)
+	 *  »ò INVALID_SOCKET(win32Æ½Ì¨)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET sock_handle(void) const;
@@ -90,13 +90,13 @@ public:
 #endif
 
 	/**
-	 * è§£ç»‘å¥—æ¥å­—ä¸æµå¯¹è±¡çš„ç»‘å®šå…³ç³»ï¼ŒåŒæ—¶å°†å¥—æ¥å­—è¿”å›ç»™ç”¨æˆ·ï¼Œå³
-	 * å°†è¯¥å¥—æ¥å­—çš„ç®¡ç†æƒäº¤ç»™ç”¨æˆ·ï¼Œæœ¬æµå¯¹è±¡åœ¨é‡Šæ”¾æ—¶ä¸ä¼šå…³é—­è¯¥å¥—
-	 * æ¥å­—ï¼Œä½†ç”¨æˆ·æ¥ç®¡è¯¥å¥—æ¥å­—åç”¨å®Œåå¿…é¡»å°†å…¶å…³é—­
-	 * è§£ç»‘åé™¤äº† close/open çš„è°ƒç”¨æœ‰æ„ä¹‰å¤–ï¼Œå…¶å®ƒçš„è°ƒç”¨(åŒ…æ‹¬æµå¯¹
-	 * è±¡è¯»å†™åœ¨å†…)éƒ½æ— æ„ä¹‰
-	 * @return {ACL_SOCKET} è¿”å› ACL_SOCKET_INVALID è¡¨ç¤ºè¯¥æµå¯¹è±¡
-	 *  å·²ç»å°†å¥—æ¥å­—è§£ç»‘
+	 * ½â°óÌ×½Ó×ÖÓëÁ÷¶ÔÏóµÄ°ó¶¨¹ØÏµ£¬Í¬Ê±½«Ì×½Ó×Ö·µ»Ø¸øÓÃ»§£¬¼´
+	 * ½«¸ÃÌ×½Ó×ÖµÄ¹ÜÀíÈ¨½»¸øÓÃ»§£¬±¾Á÷¶ÔÏóÔÚÊÍ·ÅÊ±²»»á¹Ø±Õ¸ÃÌ×
+	 * ½Ó×Ö£¬µ«ÓÃ»§½Ó¹Ü¸ÃÌ×½Ó×ÖºóÓÃÍêºó±ØĞë½«Æä¹Ø±Õ
+	 * ½â°óºó³ıÁË close/open µÄµ÷ÓÃÓĞÒâÒåÍâ£¬ÆäËüµÄµ÷ÓÃ(°üÀ¨Á÷¶Ô
+	 * Ïó¶ÁĞ´ÔÚÄÚ)¶¼ÎŞÒâÒå
+	 * @return {ACL_SOCKET} ·µ»Ø ACL_SOCKET_INVALID ±íÊ¾¸ÃÁ÷¶ÔÏó
+	 *  ÒÑ¾­½«Ì×½Ó×Ö½â°ó
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET unbind_sock(void);
@@ -105,136 +105,136 @@ public:
 #endif
 
 	/**
-	 * è·å¾— socket çš„ç±»å‹
-	 * @return {int} è¿”å›å€¼æœ‰ï¼šAF_INET, AF_INT6, AF_UNIXï¼Œå‡ºé”™æ—¶è¿”å› -1
+	 * »ñµÃ socket µÄÀàĞÍ
+	 * @return {int} ·µ»ØÖµÓĞ£ºAF_INET, AF_INT6, AF_UNIX£¬³ö´íÊ±·µ»Ø -1
 	 */
 	int sock_type(void) const;
 
 	/**
-	 * è·å¾—è¿œç¨‹è¿æ¥çš„åœ°å€
-	 * @param full {bool} æ˜¯å¦è·å¾—å®Œæ•´åœ°å€ï¼Œå³ï¼šIP:PORTï¼Œå¦‚æœè¯¥å‚æ•°
-	 *  ä¸º falseï¼Œåˆ™ä»…è¿”å› IPï¼Œå¦åˆ™è¿”å› IP:PORT
-	 * @return {const char*} è¿œç¨‹è¿æ¥åœ°å€ï¼Œè‹¥è¿”å›å€¼ == '\0' åˆ™è¡¨ç¤º
-	 *  æ— æ³•è·å¾—è¿œç¨‹è¿æ¥åœ°å€
+	 * »ñµÃÔ¶³ÌÁ¬½ÓµÄµØÖ·
+	 * @param full {bool} ÊÇ·ñ»ñµÃÍêÕûµØÖ·£¬¼´£ºIP:PORT£¬Èç¹û¸Ã²ÎÊı
+	 *  Îª false£¬Ôò½ö·µ»Ø IP£¬·ñÔò·µ»Ø IP:PORT
+	 * @return {const char*} Ô¶³ÌÁ¬½ÓµØÖ·£¬Èô·µ»ØÖµ == '\0' Ôò±íÊ¾
+	 *  ÎŞ·¨»ñµÃÔ¶³ÌÁ¬½ÓµØÖ·
 	 */
 	const char* get_peer(bool full = false) const;
 
 	/**
-	 * è·å¾—è¿œç¨‹è¿æ¥çš„ IP åœ°å€
-	 * @return {const char*} è¿œç¨‹è¿æ¥åœ°å€ï¼Œè‹¥è¿”å›å€¼ == '\0' åˆ™è¡¨ç¤º
-	 *  æ— æ³•è·å¾—è¿œç¨‹è¿æ¥åœ°å€
+	 * »ñµÃÔ¶³ÌÁ¬½ÓµÄ IP µØÖ·
+	 * @return {const char*} Ô¶³ÌÁ¬½ÓµØÖ·£¬Èô·µ»ØÖµ == '\0' Ôò±íÊ¾
+	 *  ÎŞ·¨»ñµÃÔ¶³ÌÁ¬½ÓµØÖ·
 	 */
 	const char* get_peer_ip(void) const;
 
 	/**
-	 * è®¾ç½®è¿œç¨‹è¿æ¥å¯¹è±¡çš„åœ°å€ï¼Œå¯¹äº TCP ä¼ è¾“æ–¹å¼ï¼Œä¸éœ€è¦æ˜¾ç¤ºè°ƒç”¨æ­¤å‡½æ•°
-	 * è®¾ç½®è¿œç¨‹å¯¹è±¡åœ°å€ï¼ŒUDP ä¼ è¾“æ–¹å¼æ—¶éœ€è¦è°ƒç”¨æ­¤å‡½æ•°è®¾ç½®è¿œç¨‹åœ°å€ï¼Œç„¶å
-	 * æ‰å¯ä»¥å‘è¿œç¨‹è¿æ¥å†™æ•°æ®
-	 * @param addr {const char*} è¿œç¨‹è¿æ¥å¯¹è±¡çš„åœ°å€ï¼Œæ ¼å¼ï¼šip:port
-	 * @return {bool} å½“æµå¯¹è±¡æœªæ‰“å¼€æ—¶è¿”å› false
+	 * ÉèÖÃÔ¶³ÌÁ¬½Ó¶ÔÏóµÄµØÖ·£¬¶ÔÓÚ TCP ´«Êä·½Ê½£¬²»ĞèÒªÏÔÊ¾µ÷ÓÃ´Ëº¯Êı
+	 * ÉèÖÃÔ¶³Ì¶ÔÏóµØÖ·£¬UDP ´«Êä·½Ê½Ê±ĞèÒªµ÷ÓÃ´Ëº¯ÊıÉèÖÃÔ¶³ÌµØÖ·£¬È»ºó
+	 * ²Å¿ÉÒÔÏòÔ¶³ÌÁ¬½ÓĞ´Êı¾İ
+	 * @param addr {const char*} Ô¶³ÌÁ¬½Ó¶ÔÏóµÄµØÖ·£¬¸ñÊ½£ºip:port
+	 * @return {bool} µ±Á÷¶ÔÏóÎ´´ò¿ªÊ±·µ»Ø false
 	 */
 	bool set_peer(const char* addr);
 
 	/**
-	 * è·å¾—è¿æ¥çš„æœ¬åœ°åœ°å€
-	 * @param full {bool} æ˜¯å¦è·å¾—å®Œæ•´åœ°å€ï¼Œå³ï¼šIP:PORTï¼Œå¦‚æœè¯¥å‚æ•°
-	 *  ä¸º falseï¼Œåˆ™ä»…è¿”å› IPï¼Œå¦åˆ™è¿”å› IP:PORT
-	 * @return {const char*} è¯¥è¿æ¥çš„æœ¬åœ°åœ°å€ï¼Œè‹¥è¿”å›å€¼ == "" åˆ™è¡¨ç¤º
-	 *  æ— æ³•è·å¾—æœ¬åœ°åœ°å€
+	 * »ñµÃÁ¬½ÓµÄ±¾µØµØÖ·
+	 * @param full {bool} ÊÇ·ñ»ñµÃÍêÕûµØÖ·£¬¼´£ºIP:PORT£¬Èç¹û¸Ã²ÎÊı
+	 *  Îª false£¬Ôò½ö·µ»Ø IP£¬·ñÔò·µ»Ø IP:PORT
+	 * @return {const char*} ¸ÃÁ¬½ÓµÄ±¾µØµØÖ·£¬Èô·µ»ØÖµ == "" Ôò±íÊ¾
+	 *  ÎŞ·¨»ñµÃ±¾µØµØÖ·
 	 */
 	const char* get_local(bool full = false) const;
 
 	/**
-	 * è·å¾—è¿æ¥çš„æœ¬åœ° IP åœ°å€
-	 * @return {const char*} è¯¥è¿æ¥çš„æœ¬åœ°åœ°å€ï¼Œè‹¥è¿”å›å€¼ == "" åˆ™è¡¨ç¤º
-	 *  æ— æ³•è·å¾—æœ¬åœ°åœ°å€
+	 * »ñµÃÁ¬½ÓµÄ±¾µØ IP µØÖ·
+	 * @return {const char*} ¸ÃÁ¬½ÓµÄ±¾µØµØÖ·£¬Èô·µ»ØÖµ == "" Ôò±íÊ¾
+	 *  ÎŞ·¨»ñµÃ±¾µØµØÖ·
 	 */
 	const char* get_local_ip(void) const;
 
 	/**
-	 * è®¾ç½®æœ¬åœ°åœ°å€
-	 * @param addr {const char*} åœ°å€ï¼Œæ ¼å¼ï¼šip:port
-	 * @return {bool} å½“æµå¯¹è±¡æœªæ‰“å¼€æ—¶è¿”å› false
+	 * ÉèÖÃ±¾µØµØÖ·
+	 * @param addr {const char*} µØÖ·£¬¸ñÊ½£ºip:port
+	 * @return {bool} µ±Á÷¶ÔÏóÎ´´ò¿ªÊ±·µ»Ø false
 	 */
 	bool set_local(const char* addr);
 
 	/**
-	 * æ£€æŸ¥å¥—æ¥å£è¿æ¥çš„å­˜æ´»çŠ¶æ€(å†…éƒ¨ä½¿ç”¨äº†éé˜»å¡è¯»çš„æ–¹å¼è¿›è¡Œæ¢æµ‹)
-	 * @return {bool} å½“ç½‘ç»œè¿æ¥æœªæ‰“å¼€æˆ–å·²ç»å…³é—­æ—¶è¯¥å‡½æ•°è¿”å› falseï¼Œå¦‚æœ
-	 *  è¿æ¥æ­£å¸¸åˆ™è¿”å› true
+	 * ¼ì²éÌ×½Ó¿ÚÁ¬½ÓµÄ´æ»î×´Ì¬(ÄÚ²¿Ê¹ÓÃÁË·Ç×èÈû¶ÁµÄ·½Ê½½øĞĞÌ½²â)
+	 * @return {bool} µ±ÍøÂçÁ¬½ÓÎ´´ò¿ª»òÒÑ¾­¹Ø±ÕÊ±¸Ãº¯Êı·µ»Ø false£¬Èç¹û
+	 *  Á¬½ÓÕı³£Ôò·µ»Ø true
 	 */
 	bool alive(void) const;
 
 	/**
-	 * è®¾ç½® TCP å¥—æ¥å­—çš„ nodelay åŠŸèƒ½
-	 * @param on {bool} true è¡¨ç¤ºæ‰“å¼€ï¼Œfalse è¡¨ç¤ºå…³é—­
+	 * ÉèÖÃ TCP Ì×½Ó×ÖµÄ nodelay ¹¦ÄÜ
+	 * @param on {bool} true ±íÊ¾´ò¿ª£¬false ±íÊ¾¹Ø±Õ
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_nodelay(bool on);
 
 	/**
-	 * è®¾ç½® TCP å¥—æ¥å­—çš„ SO_LINGER é€‰é¡¹
-	 * @param on {bool} æ˜¯å¦å¯ç”¨ SO_LINGER é€‰é¡¹
-	 * @param linger {int} å½“SO_LINGERæ‰“å¼€æ—¶ï¼Œå–æ¶ˆ timed_wait çš„æ—¶é—´ï¼Œå•ä½ä¸ºç§’
+	 * ÉèÖÃ TCP Ì×½Ó×ÖµÄ SO_LINGER Ñ¡Ïî
+	 * @param on {bool} ÊÇ·ñÆôÓÃ SO_LINGER Ñ¡Ïî
+	 * @param linger {int} µ±SO_LINGER´ò¿ªÊ±£¬È¡Ïû timed_wait µÄÊ±¼ä£¬µ¥Î»ÎªÃë
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_solinger(bool on, int linger);
 
 	/**
-	 * è®¾ç½® TCP å¥—æ¥å­—çš„å†™ç¼“å†²åŒºå¤§å°
-	 * @param size {int} ç¼“å†²åŒºè®¾ç½®å¤§å°
+	 * ÉèÖÃ TCP Ì×½Ó×ÖµÄĞ´»º³åÇø´óĞ¡
+	 * @param size {int} »º³åÇøÉèÖÃ´óĞ¡
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_sendbuf(int size);
 
 	/**
-	 * è®¾ç½® TCP å¥—æ¥å­—çš„è¯»ç¼“å†²åŒºå¤§å°
-	 * @param size {int} ç¼“å†²åŒºè®¾ç½®å¤§å°
+	 * ÉèÖÃ TCP Ì×½Ó×ÖµÄ¶Á»º³åÇø´óĞ¡
+	 * @param size {int} »º³åÇøÉèÖÃ´óĞ¡
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_recvbuf(int size);
 
 	/**
-	 * è®¾ç½® TCP å¥—æ¥å­—çš„éé˜»å¡çŠ¶æ€
-	 * @param on {bool} æ˜¯å¦è®¾ç½®ä¸ºéé˜»å¡çŠ¶æ€ï¼Œå½“ä¸º true æ—¶ï¼Œ
-	 *  åˆ™è¯¥å¥—æ¥å­—è¢«è®¾ä¸ºéé˜»å¡çŠ¶æ€ï¼›å¦åˆ™ä¸ºé˜»å¡çŠ¶æ€
+	 * ÉèÖÃ TCP Ì×½Ó×ÖµÄ·Ç×èÈû×´Ì¬
+	 * @param on {bool} ÊÇ·ñÉèÖÃÎª·Ç×èÈû×´Ì¬£¬µ±Îª true Ê±£¬
+	 *  Ôò¸ÃÌ×½Ó×Ö±»ÉèÎª·Ç×èÈû×´Ì¬£»·ñÔòÎª×èÈû×´Ì¬
 	 * @return {socket_stream&}
 	 */
 	socket_stream& set_tcp_non_blocking(bool on);
 
 	/**
-	 * è·å¾— TCP å¥—æ¥å­—æ˜¯å¦è®¾ç½®äº† nodelay é€‰é¡¹
-	 * @return {bool} true è¡¨ç¤ºæ‰“å¼€ï¼Œfalse è¡¨ç¤ºå…³é—­
+	 * »ñµÃ TCP Ì×½Ó×ÖÊÇ·ñÉèÖÃÁË nodelay Ñ¡Ïî
+	 * @return {bool} true ±íÊ¾´ò¿ª£¬false ±íÊ¾¹Ø±Õ
 	 */
 	bool get_tcp_nodelay(void);
 
 	/**
-	 * è·å¾— TCP å¥—æ¥å­—çš„ linger å€¼
-	 * @param fd {ACL_SOCKET} å¥—æ¥å­—
-	 * @return {int} è¿”å› -1 è¡¨ç¤ºæœªè®¾ç½® linger é€‰é¡¹æˆ–å†…éƒ¨å‡ºé”™ï¼Œ>= 0
-	 *  è¡¨ç¤ºè®¾ç½®äº† linger é€‰é¡¹ä¸”è¯¥å€¼è¡¨ç¤ºå¥—æ¥å­—å…³é—­åè¯¥ TCP è¿æ¥åœ¨å†…æ ¸ä¸­
-	 *  ç»´æŒ TIME_WAIT çŠ¶æ€çš„é€—ç•™æ—¶é—´(ç§’)
+	 * »ñµÃ TCP Ì×½Ó×ÖµÄ linger Öµ
+	 * @param fd {ACL_SOCKET} Ì×½Ó×Ö
+	 * @return {int} ·µ»Ø -1 ±íÊ¾Î´ÉèÖÃ linger Ñ¡Ïî»òÄÚ²¿³ö´í£¬>= 0
+	 *  ±íÊ¾ÉèÖÃÁË linger Ñ¡ÏîÇÒ¸ÃÖµ±íÊ¾Ì×½Ó×Ö¹Ø±Õºó¸Ã TCP Á¬½ÓÔÚÄÚºËÖĞ
+	 *  Î¬³Ö TIME_WAIT ×´Ì¬µÄ¶ºÁôÊ±¼ä(Ãë)
 	 */
 	int get_tcp_solinger(void);
 
 	/**
-	 * è·å– TCP å¥—æ¥å­—çš„å†™ç¼“å†²åŒºå¤§å°
-	 * @param fd {ACL_SOCKET} å¥—æ¥å­—
-	 * @return {int} ç¼“å†²åŒºå¤§å°
+	 * »ñÈ¡ TCP Ì×½Ó×ÖµÄĞ´»º³åÇø´óĞ¡
+	 * @param fd {ACL_SOCKET} Ì×½Ó×Ö
+	 * @return {int} »º³åÇø´óĞ¡
 	 */
 	int get_tcp_sendbuf(void);
 
 	/**
-	 * è·å– TCP å¥—æ¥å­—çš„è¯»ç¼“å†²åŒºå¤§å°
-	 * @param fd {ACL_SOCKET} å¥—æ¥å­—
-	 * @return {int} ç¼“å†²åŒºå¤§å°
+	 * »ñÈ¡ TCP Ì×½Ó×ÖµÄ¶Á»º³åÇø´óĞ¡
+	 * @param fd {ACL_SOCKET} Ì×½Ó×Ö
+	 * @return {int} »º³åÇø´óĞ¡
 	 */
 	int get_tcp_recvbuf(void);
 
 	/**
-	 * åˆ¤æ–­å½“å‰å¥—æ¥å­—æ˜¯å¦è¢«è®¾ç½®äº†éé˜»å¡æ¨¡å¼
+	 * ÅĞ¶Ïµ±Ç°Ì×½Ó×ÖÊÇ·ñ±»ÉèÖÃÁË·Ç×èÈûÄ£Ê½
 	 * @return {bool}
-	 * æ³¨ï¼šè¯¥æ–¹æ³•ç›®å‰ä»…æ”¯æŒ UNIX å¹³å°
+	 * ×¢£º¸Ã·½·¨Ä¿Ç°½öÖ§³Ö UNIX Æ½Ì¨
 	 */
 	bool get_tcp_non_blocking(void);
 

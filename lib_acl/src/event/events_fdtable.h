@@ -1,4 +1,4 @@
-﻿#ifndef	__EVENTS_FDTABLE_INCLUDE_H__
+#ifndef	__EVENTS_FDTABLE_INCLUDE_H__
 #define	__EVENTS_FDTABLE_INCLUDE_H__
 
 #ifdef	__cplusplus

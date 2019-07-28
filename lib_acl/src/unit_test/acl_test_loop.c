@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -25,10 +25,10 @@ AUT_LINE *aut_loop_make_begin(const ACL_CFG_LINE *cfg_line)
 	AUT_CMD_TOKEN *loop_token = NULL;
 	const char *ptr;
 
-	/* è®°æ•°å™¨, å¯¹ loop_begin æ ‡è®°è®°æ•°åŠ  1 */
+	/* ¼ÇÊıÆ÷, ¶Ô loop_begin ±ê¼Ç¼ÇÊı¼Ó 1 */
 	__loop_begin_count++;
 
-	/* å¾ªç¯å¯¹åµŒå¥—åŠ  1 */
+	/* Ñ­»·¶ÔÇ¶Ì×¼Ó 1 */
 	__loop_nested_count++;
 
 	loop_token = (AUT_CMD_TOKEN *) acl_mycalloc(1, sizeof(*loop_token));
@@ -43,7 +43,7 @@ AUT_LINE *aut_loop_make_begin(const ACL_CFG_LINE *cfg_line)
 	test_line                    = aut_line_new(cfg_line);
 	test_line->obj_type          = AUT_OBJ_INNER;
 
-	/* å°† loop_token ä½œä¸ºå†…éƒ¨å‚æ•°å­˜å‚¨åœ¨ test_line->arg_inner ä¸­ */
+	/* ½« loop_token ×÷ÎªÄÚ²¿²ÎÊı´æ´¢ÔÚ test_line->arg_inner ÖĞ */
 	test_line->arg_inner         = (void *) loop_token;
 	test_line->free_arg_inner   = acl_myfree_fn;
 
@@ -52,10 +52,10 @@ AUT_LINE *aut_loop_make_begin(const ACL_CFG_LINE *cfg_line)
 		return (test_line);
 	}
 
-	/* åˆ†æé…ç½®è¡Œå‚æ•° */
+	/* ·ÖÎöÅäÖÃĞĞ²ÎÊı */
 	test_line->argv = aut_parse_args_list(cfg_line->value[1]);
 
-	/* ä»é…ç½®æ–‡ä»¶ä¸­å–å‡ºè¦å¾ªç¯çš„æ¬¡æ•° */
+	/* ´ÓÅäÖÃÎÄ¼şÖĞÈ¡³öÒªÑ­»·µÄ´ÎÊı */
 	ptr = aut_line_getvalue(test_line, VAR_AUT_ITEM_COUNT);
 	if (ptr != NULL)
 		loop_token->nloop_max = atoi(ptr);
@@ -79,7 +79,7 @@ AUT_LINE *aut_loop_make_break(const ACL_CFG_LINE *cfg_line)
 	break_token = (AUT_CMD_TOKEN *) acl_mycalloc(1, sizeof(AUT_CMD_TOKEN));
 	break_token->flag = AUT_FLAG_LOOP_BREAK;
 
-	/* å°† breaktoken ä½œä¸ºå†…éƒ¨å‚æ•°å­˜å‚¨åœ¨ break_line->arg_inner ä¸­ */
+	/* ½« breaktoken ×÷ÎªÄÚ²¿²ÎÊı´æ´¢ÔÚ break_line->arg_inner ÖĞ */
 	break_line->arg_inner = (void *) break_token;
 	break_line->free_arg_inner = acl_myfree_fn;
 
@@ -119,62 +119,62 @@ AUT_LINE *aut_loop_make_end(const ACL_CFG_LINE *cfg_line)
 	AUT_CMD_TOKEN *loop_token = NULL, *loop_token_peer;
 	int   n, i;
 
-	/* è®°æ•°å™¨, å¯¹ loop_end æ ‡è®°è®°æ•°å‡  1 */
+	/* ¼ÇÊıÆ÷, ¶Ô loop_end ±ê¼Ç¼ÇÊı¼õ  1 */
 	__loop_end_count++;
 
 	loop_token = (AUT_CMD_TOKEN *) acl_mycalloc(1, sizeof(*loop_token));
 	loop_token->flag   = AUT_FLAG_LOOP_END;
 	loop_token->status = AUT_STAT_BUSY;
 
-	/* ä¸å‰é¢çš„ loop_begin ç›¸åŒ¹é… */
+	/* ÓëÇ°ÃæµÄ loop_begin ÏàÆ¥Åä */
 	loop_token->match_number = __loop_nested_count;
 	loop_token->peer = NULL;
 
-	/* å¾ªç¯å¯¹åµŒå¥—å‡ 1 */
+	/* Ñ­»·¶ÔÇ¶Ì×¼õ 1 */
 	__loop_nested_count--;
 
 	test_line = aut_line_new(cfg_line);
 	test_line->obj_type = AUT_OBJ_INNER;
 
-	/* å°† loop_token ä½œä¸ºå†…éƒ¨å‚æ•°å­˜å‚¨åœ¨ test_line->arg_inner ä¸­ */
+	/* ½« loop_token ×÷ÎªÄÚ²¿²ÎÊı´æ´¢ÔÚ test_line->arg_inner ÖĞ */
 	test_line->arg_inner = (void *) loop_token;
 	test_line->free_arg_inner = acl_myfree_fn;
 
 	n = acl_array_size(var_aut_line_array);
 
-	/* æŸ¥æ‰¾ä¸å¾ªç¯ç»“æŸæ ‡å¿—ç›¸é…å¯¹çš„å¾ªç¯å¼€å§‹å¯¹è±¡ */
+	/* ²éÕÒÓëÑ­»·½áÊø±êÖ¾ÏàÅä¶ÔµÄÑ­»·¿ªÊ¼¶ÔÏó */
 
 	for (i = 0; i < n; i++) {
 		test_line_peer = (AUT_LINE *)
 				acl_array_index(var_aut_line_array, i);
 
-		/* xxx: ä¸åº”è¯¥å‘ç”Ÿæ­¤ç§æƒ…å†µ, é™¤éåŠ¨æ€æ•°ç»„å‡ºäº†æ•…éšœ */
+		/* xxx: ²»Ó¦¸Ã·¢Éú´ËÖÖÇé¿ö, ³ı·Ç¶¯Ì¬Êı×é³öÁË¹ÊÕÏ */
 		if (test_line_peer == NULL)
 			break;
 
-		/* å…ˆåˆ¤æ–­æ˜¯å¦æ˜¯å†…éƒ¨å¯¹è±¡ */
+		/* ÏÈÅĞ¶ÏÊÇ·ñÊÇÄÚ²¿¶ÔÏó */
 		if (test_line_peer->obj_type != AUT_OBJ_INNER)
 			continue;
 
-		/* å…ˆæŸ¥çœ‹æ˜¯å¦æœ‰å†…éƒ¨æ•°æ®å‚æ•°å­˜å‚¨åœ¨ test_line_peer ä¸­ */
+		/* ÏÈ²é¿´ÊÇ·ñÓĞÄÚ²¿Êı¾İ²ÎÊı´æ´¢ÔÚ test_line_peer ÖĞ */
 		if (test_line_peer->arg_inner == NULL)
 			continue;
 
 		loop_token_peer = (AUT_CMD_TOKEN *) test_line_peer->arg_inner;
 
-		/* çœ‹è¯¥ loopbegin å¯¹è±¡æ˜¯å¦å·²ç»è¢« ä¸€ä¸ª loopend å¯¹è±¡ç»™åŒ¹é…äº† */
+		/* ¿´¸Ã loopbegin ¶ÔÏóÊÇ·ñÒÑ¾­±» Ò»¸ö loopend ¶ÔÏó¸øÆ¥ÅäÁË */
 		if (loop_token_peer->status == AUT_STAT_BUSY)
 			continue;
 
-		/* æ˜¯å¦æ˜¯ å¾ªç¯å¼€å§‹æ ‡å¿—, ä»¥åˆ¤æ–­æ˜¯å¦æ˜¯ä¸€ä¸ªå¾ªç¯çš„å¼€å§‹ */
+		/* ÊÇ·ñÊÇ Ñ­»·¿ªÊ¼±êÖ¾, ÒÔÅĞ¶ÏÊÇ·ñÊÇÒ»¸öÑ­»·µÄ¿ªÊ¼ */
 		if (loop_token_peer->flag != AUT_FLAG_LOOP_BEGIN)
 			continue;
 
-		/* æ¯”è¾ƒåŒ¹é…è¡Œå·æ˜¯å¦ç›¸ç­‰ */
+		/* ±È½ÏÆ¥ÅäĞĞºÅÊÇ·ñÏàµÈ */
 		if (loop_token_peer->match_number != loop_token->match_number)
 			continue;
 
-		/* æ‰¾åˆ°åŒ¹é…çš„å¾ªç¯å¼€å§‹å¯¹ç­‰ç»“ç‚¹ */
+		/* ÕÒµ½Æ¥ÅäµÄÑ­»·¿ªÊ¼¶ÔµÈ½áµã */
 		loop_token_peer->peer   = test_line;
 		loop_token_peer->status = AUT_STAT_BUSY;
 		loop_token->peer        = test_line_peer;
@@ -194,7 +194,7 @@ AUT_LINE *aut_loop_make_end(const ACL_CFG_LINE *cfg_line)
 	return (test_line);
 }
 
-/*-------------------------- ä¸å‘½ä»¤å¾ªç¯ç›¸å…³çš„å‡½æ•°æ¥å£ ----------------------*/
+/*-------------------------- ÓëÃüÁîÑ­»·Ïà¹ØµÄº¯Êı½Ó¿Ú ----------------------*/
 const AUT_LINE *aut_loop_end(const AUT_LINE *test_begin)
 {
 	if (test_begin == NULL)

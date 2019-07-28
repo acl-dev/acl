@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
@@ -14,7 +14,7 @@
 #define SEP	'/'
 #endif
 
-// å»å¹´è·¯å¾„å‰çš„ "./" æˆ– ".\"ï¼Œå› ä¸ºåœ¨ WIN32 ä¸‹
+// È¥ÄêÂ·¾¶Ç°µÄ "./" »ò ".\"£¬ÒòÎªÔÚ WIN32 ÏÂ
 #define SKIP(ptr) do  \
 {  \
 	if (*ptr == '.' && *(ptr + 1) == '/')  \
@@ -46,7 +46,7 @@ static bool cmp_file(acl::scan_dir& scan, const char* name,
 	else
 		from_filepath << rpath << SEP << name;
 
-	// åªè¯»æ–¹å¼æ‰“å¼€æºæ–‡ä»¶ï¼Œå¦‚æœæ‰“å¼€å¤±è´¥ï¼Œåˆ™ç›´æ¥è¿”å› false
+	// Ö»¶Á·½Ê½´ò¿ªÔ´ÎÄ¼ş£¬Èç¹û´ò¿ªÊ§°Ü£¬ÔòÖ±½Ó·µ»Ø false
 	acl::ifstream from_fp;
 	if (from_fp.open_read(from_filepath.c_str()) == false)
 	{
@@ -63,7 +63,7 @@ static bool cmp_file(acl::scan_dir& scan, const char* name,
 	//printf("from_filepath: %s, to_filepath: %s\r\n",
 	//	from_fp.file_path(), to_filepath.c_str());
 
-	// å°è¯•æ‰“å¼€ç›®æ ‡æ–‡ä»¶ï¼Œå¦‚æœç›®æ ‡æ–‡ä»¶ä¸å­˜åœ¨ï¼Œåˆ™å°†è®¡æ•°å™¨åŠ 1
+	// ³¢ÊÔ´ò¿ªÄ¿±êÎÄ¼ş£¬Èç¹ûÄ¿±êÎÄ¼ş²»´æÔÚ£¬Ôò½«¼ÆÊıÆ÷¼Ó1
 	acl::ifstream to_fp;
 	if (to_fp.open_read(to_filepath.c_str()) == false)
 	{
@@ -73,7 +73,7 @@ static bool cmp_file(acl::scan_dir& scan, const char* name,
 		return true;
 	}
 
-	// å…ˆæ¯”è¾ƒç›®æ ‡æ–‡ä»¶ä¸æºæ–‡ä»¶å¤§å°æ˜¯å¦ç›¸åŒ
+	// ÏÈ±È½ÏÄ¿±êÎÄ¼şÓëÔ´ÎÄ¼ş´óĞ¡ÊÇ·ñÏàÍ¬
 	acl_int64 length;
 	if ((length = to_fp.fsize()) != from_fp.fsize())
 	{
@@ -83,7 +83,7 @@ static bool cmp_file(acl::scan_dir& scan, const char* name,
 		return true;
 	}
 
-	// å†æ¯”è¾ƒç›®æ ‡æ–‡ä»¶ä¸æºæ–‡ä»¶å†…å®¹æ˜¯å¦ç›¸åŒ
+	// ÔÙ±È½ÏÄ¿±êÎÄ¼şÓëÔ´ÎÄ¼şÄÚÈİÊÇ·ñÏàÍ¬
 	char from_buf[4096], to_buf[4096];
 	int from_len, to_len;
 	acl_int64 read_len = 0;

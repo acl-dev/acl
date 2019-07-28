@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
@@ -19,7 +19,7 @@ fstream::~fstream(void)
 void fstream::open(ACL_FILE_HANDLE fh, unsigned int oflags,
 	const char* path /* = NULL */)
 {
-	open_stream(true);  // è°ƒç”¨åŸºç±»æ–¹æ³•å…ˆåˆ›å»ºç©ºæµå¯¹è±¡
+	open_stream(true);  // µ÷ÓÃ»ùÀà·½·¨ÏÈ´´½¨¿ÕÁ÷¶ÔÏó
 
 	acl_assert(ACL_VSTREAM_FILE(stream_) == ACL_FILE_INVALID);
 
@@ -54,7 +54,7 @@ bool fstream::open(const char* path, unsigned int oflags, int mode)
 		return false;
 	}
 
-	open_stream(true);  // è°ƒç”¨åŸºç±»æ–¹æ³•å…ˆåˆ›å»ºç©ºæµå¯¹è±¡
+	open_stream(true);  // µ÷ÓÃ»ùÀà·½·¨ÏÈ´´½¨¿ÕÁ÷¶ÔÏó
 
 	stream_->fread_fn   = acl_file_read;
 	stream_->fwrite_fn  = acl_file_write;
@@ -80,7 +80,7 @@ bool fstream::remove(void)
 	}
 
 #if defined(_WIN32) || defined(_WIN64)
-	// WINDOWS ä¸‹å¿…é¡»å…ˆå…³é—­æ–‡ä»¶å¥æŸ„
+	// WINDOWS ÏÂ±ØĞëÏÈ¹Ø±ÕÎÄ¼ş¾ä±ú
 	close();
 	return ::_unlink(filepath) == 0 ? true : false;
 #else
@@ -106,7 +106,7 @@ bool fstream::rename(const char* from_path, const char* to_path)
 	if (opened() && stream_ != NULL) {
 		oflags = stream_->oflags;
 		omode  = stream_->omode;
-		// WINDOWS ä¸‹å¿…é¡»å…ˆå…³é—­æ–‡ä»¶å¥æŸ„
+		// WINDOWS ÏÂ±ØĞëÏÈ¹Ø±ÕÎÄ¼ş¾ä±ú
 		close();
 		need_reopen = true;
 	} else {
@@ -129,7 +129,7 @@ bool fstream::rename(const char* from_path, const char* to_path)
 		return true;
 	}
 
-	// é’ˆå¯¹ windows å¹³å°ï¼Œéœ€è¦é‡æ–°æ‰“å¼€è¯¥æ–‡ä»¶å¥æŸ„
+	// Õë¶Ô windows Æ½Ì¨£¬ĞèÒªÖØĞÂ´ò¿ª¸ÃÎÄ¼ş¾ä±ú
 	return open(to_path, oflags, omode);
 }
 
@@ -164,7 +164,7 @@ acl_off_t fstream::ftell(void)
 
 bool fstream::ftruncate(acl_off_t length)
 {
-	// éœ€è¦å…ˆå°†æ–‡ä»¶æŒ‡é’ˆç§»åˆ°å¼€å§‹ä½ç½®
+	// ĞèÒªÏÈ½«ÎÄ¼şÖ¸ÕëÒÆµ½¿ªÊ¼Î»ÖÃ
 	if (fseek(0, SEEK_SET) < 0) {
 		return false;
 	}

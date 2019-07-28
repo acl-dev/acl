@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../db/db_handle.hpp"
@@ -16,53 +16,53 @@ class ACL_CPP_API db_sqlite : public db_handle
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param charset {const char*} æœ¬åœ°å­—ç¬¦é›†(gbk, utf-8, ...)
+	 * ¹¹Ôìº¯Êı
+	 * @param charset {const char*} ±¾µØ×Ö·û¼¯(gbk, utf-8, ...)
 	 */
 	db_sqlite(const char* dbfile, const char* charset = "utf-8");
 	~db_sqlite(void);
 
 	/**
-	 * è¿”å›å½“å‰çš„ sqlite çš„ç‰ˆæœ¬ä¿¡æ¯
+	 * ·µ»Øµ±Ç°µÄ sqlite µÄ°æ±¾ĞÅÏ¢
 	 */
 	const char* version(void) const;
 
 	/**
-	 * å½“æ•°æ®åº“æ‰“å¼€åé€šè¿‡æ­¤å‡½æ•°å¯¹æ•°æ®åº“çš„æ“ä½œå¼•æ“è¿›è¡Œé…ç½®ï¼Œ
-	 * è¿›è¡Œé…ç½®çš„å†…å®¹éœ€è¦ä¸¥æ ¼éµå¾ª sqlite æœ¬èº«çš„é…ç½®é€‰é¡¹è¦æ±‚
-	 * @param pragma {const char*} é…ç½®é€‰é¡¹å†…å®¹ï¼Œæ ¼å¼ä¸ºï¼š
+	 * µ±Êı¾İ¿â´ò¿ªºóÍ¨¹ı´Ëº¯Êı¶ÔÊı¾İ¿âµÄ²Ù×÷ÒıÇæ½øĞĞÅäÖÃ£¬
+	 * ½øĞĞÅäÖÃµÄÄÚÈİĞèÒªÑÏ¸ñ×ñÑ­ sqlite ±¾ÉíµÄÅäÖÃÑ¡ÏîÒªÇó
+	 * @param pragma {const char*} ÅäÖÃÑ¡ÏîÄÚÈİ£¬¸ñÊ½Îª£º
 	 *  PRAGMA xxx=xxx
-	 *  å¦‚ï¼šPRAGMA synchronous = NORMAL
-	 * @return {bool} é…ç½®æ•°æ®åº“æ˜¯å¦æˆåŠŸ
+	 *  Èç£ºPRAGMA synchronous = NORMAL
+	 * @return {bool} ÅäÖÃÊı¾İ¿âÊÇ·ñ³É¹¦
 	 */
 	bool set_conf(const char* pragma);
 
 	/**
-	 * å½“æ•°æ®åº“æ‰“å¼€è°ƒç”¨æ­¤å‡½æ•°è·å¾—æ•°æ®å¼•æ“çš„é…ç½®é€‰é¡¹
-	 * @param pragma {const char*} é…ç½®é€‰é¡¹å†…å®¹ï¼Œæ ¼å¼ä¸ºï¼š
+	 * µ±Êı¾İ¿â´ò¿ªµ÷ÓÃ´Ëº¯Êı»ñµÃÊı¾İÒıÇæµÄÅäÖÃÑ¡Ïî
+	 * @param pragma {const char*} ÅäÖÃÑ¡ÏîÄÚÈİ£¬¸ñÊ½Îª£º
 	 *  PRAGMA xxx
-	 *  å¦‚ï¼šPRAGMA synchronous
-	 * @param out {string&} å¦‚æœè¿”å›å€¼éç©ºåˆ™å­˜å‚¨ç»“æœ
-	 * @return {const char*} ä¸ºç©ºåˆ™è¯´æ˜è¯¥é…ç½®ä¸å­˜åœ¨æˆ–æ•°æ®åº“æœªæ‰“å¼€
+	 *  Èç£ºPRAGMA synchronous
+	 * @param out {string&} Èç¹û·µ»ØÖµ·Ç¿ÕÔò´æ´¢½á¹û
+	 * @return {const char*} Îª¿ÕÔòËµÃ÷¸ÃÅäÖÃ²»´æÔÚ»òÊı¾İ¿âÎ´´ò¿ª
 	 */
 	const char* get_conf(const char* pragma, string& out);
 
 	/**
-	 * åœ¨æ•°æ®åº“æ‰“å¼€çš„æƒ…å†µä¸‹è¾“å…¥æ•°æ®åº“å¼•æ“çš„é…ç½®é€‰é¡¹
-	 * @param pragma {const char*} æŒ‡å®šçš„é…ç½®é€‰é¡¹ï¼Œå¦‚æœè¯¥å‚æ•°ä¸ºç©ºï¼Œ
-	 *  åˆ™è¾“å‡ºæ‰€æœ‰çš„é…ç½®é€‰é¡¹ï¼Œæ ¼å¼ä¸ºï¼šPRAGMA xxxï¼Œå¦‚ï¼šPRAGMA synchronous
+	 * ÔÚÊı¾İ¿â´ò¿ªµÄÇé¿öÏÂÊäÈëÊı¾İ¿âÒıÇæµÄÅäÖÃÑ¡Ïî
+	 * @param pragma {const char*} Ö¸¶¨µÄÅäÖÃÑ¡Ïî£¬Èç¹û¸Ã²ÎÊıÎª¿Õ£¬
+	 *  ÔòÊä³öËùÓĞµÄÅäÖÃÑ¡Ïî£¬¸ñÊ½Îª£ºPRAGMA xxx£¬Èç£ºPRAGMA synchronous
 	 */
 	void show_conf(const char* pragma = NULL);
 
 	/**
-	 * è‡ªæ•°æ®åº“æ‰“å¼€åæ‰€æœ‰çš„å½±å“çš„è®°å½•è¡Œæ•°
-	 * @return {int} å½±å“çš„è¡Œæ•°ï¼Œ-1 è¡¨ç¤ºå‡ºé”™
+	 * ×ÔÊı¾İ¿â´ò¿ªºóËùÓĞµÄÓ°ÏìµÄ¼ÇÂ¼ĞĞÊı
+	 * @return {int} Ó°ÏìµÄĞĞÊı£¬-1 ±íÊ¾³ö´í
 	 */
 	int affect_total_count(void) const;
 
 	/**
-	 * ç›´æ¥è·å¾— sqlite çš„å¥æŸ„ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤º sqlite è¿˜æ²¡æœ‰æ‰“å¼€
-	 * æˆ–å‡ºé”™æ—¶å†…éƒ¨è‡ªåŠ¨å…³é—­äº† sqlite
+	 * Ö±½Ó»ñµÃ sqlite µÄ¾ä±ú£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾ sqlite »¹Ã»ÓĞ´ò¿ª
+	 * »ò³ö´íÊ±ÄÚ²¿×Ô¶¯¹Ø±ÕÁË sqlite
 	 * @return {sqlite3*}
 	 */
 	sqlite3* get_conn(void) const
@@ -71,21 +71,21 @@ public:
 	}
 
 	/**
-	 * å‡†å¤‡æ¸¸æ ‡
+	 * ×¼±¸ÓÎ±ê
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
 	bool prepare(sqlite_cursor& cursor);
 
 	/**
-	 * æ‰§è¡Œä¸‹ä¸€æ­¥ï¼Œå¦‚æœæ˜¯æŸ¥è¯¢ç±»è¿‡ç¨‹ï¼Œåˆ™å°†æŸ¥è¯¢ç»“æœå­˜å…¥ç»™å®šçš„å‚æ•°ä¸­
+	 * Ö´ĞĞÏÂÒ»²½£¬Èç¹ûÊÇ²éÑ¯Àà¹ı³Ì£¬Ôò½«²éÑ¯½á¹û´æÈë¸ø¶¨µÄ²ÎÊıÖĞ
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
 	bool next(sqlite_cursor& cursor, bool* done);
 
 	/********************************************************************/
-	/*            ä»¥ä¸‹ä¸ºåŸºç±» db_handle çš„è™šæ¥å£                         */
+	/*            ÒÔÏÂÎª»ùÀà db_handle µÄĞé½Ó¿Ú                         */
 	/********************************************************************/
 
 	/**
@@ -154,19 +154,19 @@ public:
 	bool set_busy_timeout(int nMillisecs);
 
 private:
-	// sqlite å¼•æ“
+	// sqlite ÒıÇæ
 	sqlite3* db_;
 
-	// æ•°æ®å­˜å‚¨æ–‡ä»¶
+	// Êı¾İ´æ´¢ÎÄ¼ş
 	string dbfile_;
 
-	// å­—ç¬¦é›†è½¬ç å™¨
+	// ×Ö·û¼¯×ªÂëÆ÷
 	charset_conv* conv_;
 
-	// æœ¬åœ°å­—ç¬¦é›†
+	// ±¾µØ×Ö·û¼¯
 	string charset_;
 
-	// çœŸæ­£æ‰§è¡ŒSQLæŸ¥è¯¢çš„å‡½æ•°
+	// ÕæÕıÖ´ĞĞSQL²éÑ¯µÄº¯Êı
 	bool exec_sql(const char* sql, db_rows* result = NULL);
 };
 

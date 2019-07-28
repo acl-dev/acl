@@ -1,4 +1,4 @@
-﻿#ifndef MYSQL_SERVICES_INCLUDED
+#ifndef MYSQL_SERVICES_INCLUDED
 /* Copyright (C) 2009 Sun Microsystems, Inc.
 
    This program is free software; you can redistribute it and/or modify

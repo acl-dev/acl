@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/locker.hpp"
 #include "../stdlib/noncopyable.hpp"
@@ -17,21 +17,21 @@ public:
 	virtual ~ipc_request();
 
 	/**
-	 * è™šæ¥å£ï¼Œå­ç±»å®ç°æ­¤ç±»ç”¨äºå¤„ç†å…·ä½“çš„ä»»åŠ¡ï¼Œè¯¥æ¥å£é€‚ç”¨
-	 * äºé‡‡ç”¨ IO æ¶ˆæ¯çš„æ¨¡å¼
+	 * Ğé½Ó¿Ú£¬×ÓÀàÊµÏÖ´ËÀàÓÃÓÚ´¦Àí¾ßÌåµÄÈÎÎñ£¬¸Ã½Ó¿ÚÊÊÓÃ
+	 * ÓÚ²ÉÓÃ IO ÏûÏ¢µÄÄ£Ê½
 	 */
 	virtual void run(ipc_client* ipc);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * è™šæ¥å£ï¼Œå­ç±»å®ç°æ­¤ç±»ç”¨äºå¤„ç†å…·ä½“çš„ä»»åŠ¡ï¼Œè¯¥æ¥å£é€‚ç”¨
-	 * äºé‡‡ç”¨ _WIN32 æ¶ˆæ¯çš„æ¨¡å¼
+	 * Ğé½Ó¿Ú£¬×ÓÀàÊµÏÖ´ËÀàÓÃÓÚ´¦Àí¾ßÌåµÄÈÎÎñ£¬¸Ã½Ó¿ÚÊÊÓÃ
+	 * ÓÚ²ÉÓÃ _WIN32 ÏûÏ¢µÄÄ£Ê½
 	 */
 	virtual void run(HWND hWnd);
 
 	/**
-	 * è®¾ç½® _WIN32 çª—å£å¥æŸ„
-	 * @param hWnd {HWND} çª—å£å¥æŸ„
+	 * ÉèÖÃ _WIN32 ´°¿Ú¾ä±ú
+	 * @param hWnd {HWND} ´°¿Ú¾ä±ú
 	 */
 	void set_hwnd(HWND hWnd)
 	{
@@ -39,8 +39,8 @@ public:
 	}
 
 	/**
-	 * è·å¾— _WIN32 çª—å£å¥æŸ„
-	 * @return {HWND} çª—å£å¥æŸ„
+	 * »ñµÃ _WIN32 ´°¿Ú¾ä±ú
+	 * @return {HWND} ´°¿Ú¾ä±ú
 	 */
 	HWND get_hwnd(void) const
 	{
@@ -57,11 +57,11 @@ class ACL_CPP_API ipc_service : public ipc_server
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param nthread {int} å¦‚æœè¯¥å€¼ > 1 åˆ™å†…éƒ¨è‡ªåŠ¨é‡‡ç”¨çº¿ç¨‹æ± ï¼Œå¦åˆ™
-	 *  åˆ™æ˜¯ä¸€ä¸ªè¯·æ±‚ä¸€ä¸ªçº¿ç¨‹
-	 * @param ipc_keep {bool} å†…éƒ¨ IPC æ¶ˆæ¯æµæ˜¯å¦ä¿æŒé•¿è¿æ¥ï¼Œä¿æŒé•¿
-	 *  è¿æ¥æœ‰åŠ©äºæé«˜æ¶ˆæ¯ä¼ é€’çš„æ•ˆç‡
+	 * ¹¹Ôìº¯Êı
+	 * @param nthread {int} Èç¹û¸ÃÖµ > 1 ÔòÄÚ²¿×Ô¶¯²ÉÓÃÏß³Ì³Ø£¬·ñÔò
+	 *  ÔòÊÇÒ»¸öÇëÇóÒ»¸öÏß³Ì
+	 * @param ipc_keep {bool} ÄÚ²¿ IPC ÏûÏ¢Á÷ÊÇ·ñ±£³Ö³¤Á¬½Ó£¬±£³Ö³¤
+	 *  Á¬½ÓÓĞÖúÓÚÌá¸ßÏûÏ¢´«µİµÄĞ§ÂÊ
 	 */
 	ipc_service(int nthread, bool ipc_keep = true);
 
@@ -69,26 +69,26 @@ public:
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * å½“é‡‡ç”¨ _WIN32 æ¶ˆæ¯æ¨¡å¼æ—¶ï¼Œå­ç±»éœ€è¦å®ç°æ­¤è™šæ¥å£ç”¨äºå¤„ç†å…·ä½“çš„
-	 * æ¶ˆæ¯è¿‡ç¨‹ï¼Œå­ç±»å¿…é¡»å®ç°è¯¥æ¥å£
-	 * @param hWnd {HWND} çª—å£å¥æŸ„
-	 * @param msg {UINT} ç”¨æˆ·è‡ªå®šä¹‰æ¶ˆæ¯å·
-	 * @param wParam {WPARAM} å‚æ•°
-	 * @param lParam {LPARAM} å‚æ•°
+	 * µ±²ÉÓÃ _WIN32 ÏûÏ¢Ä£Ê½Ê±£¬×ÓÀàĞèÒªÊµÏÖ´ËĞé½Ó¿ÚÓÃÓÚ´¦Àí¾ßÌåµÄ
+	 * ÏûÏ¢¹ı³Ì£¬×ÓÀà±ØĞëÊµÏÖ¸Ã½Ó¿Ú
+	 * @param hWnd {HWND} ´°¿Ú¾ä±ú
+	 * @param msg {UINT} ÓÃ»§×Ô¶¨ÒåÏûÏ¢ºÅ
+	 * @param wParam {WPARAM} ²ÎÊı
+	 * @param lParam {LPARAM} ²ÎÊı
 	 */
 	virtual void win32_proc(HWND hWnd, UINT msg,
 		WPARAM wParam, LPARAM lParam);
 #endif
 
 	/**
-	 * ä» ipc æ¶ˆæ¯æµè¿æ¥æ± ä¸­å–å¾—ä¸€ä¸ªè¿æ¥
-	 * @return {ipc_client*} è¿”å› NULL è¡¨ç¤ºæ— æ³•è¿æ¥æ¶ˆæ¯æœåŠ¡å™¨
+	 * ´Ó ipc ÏûÏ¢Á÷Á¬½Ó³ØÖĞÈ¡µÃÒ»¸öÁ¬½Ó
+	 * @return {ipc_client*} ·µ»Ø NULL ±íÊ¾ÎŞ·¨Á¬½ÓÏûÏ¢·şÎñÆ÷
 	 */
 	ipc_client* peek_conn();
 
 	/**
-	 * å°†ç”¨å®Œçš„ ipc æ¶ˆæ¯è¿æ¥æ”¾å›è¿æ¥æ± ä¸­
-	 * @param conn {ipc_client*} ipc æ¶ˆæ¯è¿æ¥æµ
+	 * ½«ÓÃÍêµÄ ipc ÏûÏ¢Á¬½Ó·Å»ØÁ¬½Ó³ØÖĞ
+	 * @param conn {ipc_client*} ipc ÏûÏ¢Á¬½ÓÁ÷
 	 */
 	void push_conn(ipc_client* conn);
 protected:
@@ -99,7 +99,7 @@ protected:
 #endif
 
 	/**
-	 * å­ç±»è°ƒç”¨æ­¤å‡½æ•°å‘é€è¯·æ±‚æœåŠ¡
+	 * ×ÓÀàµ÷ÓÃ´Ëº¯Êı·¢ËÍÇëÇó·şÎñ
 	 * @param req {ipc_request*}
 	 */
 	void request(ipc_request* req);
@@ -111,12 +111,12 @@ private:
 	HINSTANCE hInstance_;
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°ï¼šWindows æ¶ˆæ¯æ–¹å¼ä¸‹ï¼Œåˆ›å»ºéšè—çª—å£å¥æŸ„
+	 * »ùÀàĞéº¯Êı£ºWindows ÏûÏ¢·½Ê½ÏÂ£¬´´½¨Òş²Ø´°¿Ú¾ä±ú
 	 */
 	virtual bool create_window(void);
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°ï¼šWindows æ¶ˆæ¯æ–¹å¼ä¸‹ï¼Œå…³é—­éšè—çª—å£å¥æŸ„
+	 * »ùÀàĞéº¯Êı£ºWindows ÏûÏ¢·½Ê½ÏÂ£¬¹Ø±ÕÒş²Ø´°¿Ú¾ä±ú
 	 */
 	virtual void close_window(void);
 #endif

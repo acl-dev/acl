@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include <vector>
@@ -24,8 +24,8 @@ class dbuf_pool;
 class redis_client;
 
 /**
- * å¯¹ redis-server è¿”å›ç»“æœå¯¹è±¡ç±»ï¼Œå¯¹ redis-server è¿”å›çš„æ•°æ®è¿›è¡Œåˆ†æååˆ›å»º
- * redis_result ç±»å¯¹è±¡ã€‚
+ * ¶Ô redis-server ·µ»Ø½á¹û¶ÔÏóÀà£¬¶Ô redis-server ·µ»ØµÄÊı¾İ½øĞĞ·ÖÎöºó´´½¨
+ * redis_result Àà¶ÔÏó¡£
  * the redis result for redis-server's reply
  */
 class ACL_CPP_API redis_result : public noncopyable
@@ -34,8 +34,8 @@ public:
 	redis_result(dbuf_pool* dbuf);
 
 	/**
-	 * é‡è½½äº† new/delete æ“ä½œç¬¦ï¼Œåœ¨ new æ–°å¯¹è±¡æ—¶ï¼Œä½¿å†…å­˜çš„åˆ†é…åœ¨
-	 * å†…å­˜æ± è¿›è¡Œåˆ†é…
+	 * ÖØÔØÁË new/delete ²Ù×÷·û£¬ÔÚ new ĞÂ¶ÔÏóÊ±£¬Ê¹ÄÚ´æµÄ·ÖÅäÔÚ
+	 * ÄÚ´æ³Ø½øĞĞ·ÖÅä
 	 * override new/delete operator, when the new object was created,
 	 * memory was alloc in dbuf_pool, which is a memroy pool allocator
 	 */
@@ -43,7 +43,7 @@ public:
 	void operator delete(void* ptr, dbuf_pool* pool);
 
 	/**
-	 * è·å¾—å½“å‰ç»“æœç»“ç‚¹çš„æ•°æ®ç±»å‹
+	 * »ñµÃµ±Ç°½á¹û½áµãµÄÊı¾İÀàĞÍ
 	 * get the data type of the reply from redis-server
 	 * @return {redis_result_t}
 	 *  defined above REDIS_RESULT_
@@ -54,76 +54,76 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰ç»“æœç»“ç‚¹å­˜å‚¨çš„å¯¹è±¡çš„ä¸ªæ•°
+	 * »ñµÃµ±Ç°½á¹û½áµã´æ´¢µÄ¶ÔÏóµÄ¸öÊı
 	 * get the number of objects from redis-server
-	 * @return {size_t} è¿”å›å€¼ä¸å­˜å‚¨ç±»å‹çš„å¯¹åº”å…³ç³»å¦‚ä¸‹ï¼š
+	 * @return {size_t} ·µ»ØÖµÓë´æ´¢ÀàĞÍµÄ¶ÔÓ¦¹ØÏµÈçÏÂ£º
 	 *  the relation between returned value and result type show below:
 	 *  REDIS_RESULT_ERROR: 1
 	 *  REDIS_RESULT_STATUS: 1
 	 *  REDIS_RESULT_INTEGER: 1
-	 *  REDIS_RESULT_STRING: > 0 æ—¶è¡¨ç¤ºè¯¥å­—ç¬¦ä¸²æ•°æ®è¢«åˆ‡åˆ†æˆéè¿æ¥å†…å­˜å—çš„ä¸ªæ•°
+	 *  REDIS_RESULT_STRING: > 0 Ê±±íÊ¾¸Ã×Ö·û´®Êı¾İ±»ÇĞ·Ö³É·ÇÁ¬½ÓÄÚ´æ¿éµÄ¸öÊı
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
 	size_t get_size(void) const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_INTEGER ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›å¯¹åº”çš„ 32 ä½æ•´æ•°å€¼
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_INTEGER ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø¶ÔÓ¦µÄ 32 Î»ÕûÊıÖµ
 	 * get the 32 bits integer for REDIS_RESULT_INTEGER result
-	 * @param success {bool*} æœ¬æŒ‡é’ˆé NULL æ—¶è®°å½•æ“ä½œè¿‡ç¨‹æ˜¯å¦æˆåŠŸ
+	 * @param success {bool*} ±¾Ö¸Õë·Ç NULL Ê±¼ÇÂ¼²Ù×÷¹ı³ÌÊÇ·ñ³É¹¦
 	 *  when not NULL, storing the status of success
 	 * @return {int}
 	 */
 	int get_integer(bool* success = NULL) const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_INTEGER ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›å¯¹åº”çš„ 64 ä½æ•´æ•°å€¼
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_INTEGER ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø¶ÔÓ¦µÄ 64 Î»ÕûÊıÖµ
 	 * get the 64 bits integer for REDIS_RESULT_INTEGER result
-	 * @param success {bool*} æœ¬æŒ‡é’ˆé NULL æ—¶è®°å½•æ“ä½œè¿‡ç¨‹æ˜¯å¦æˆåŠŸ
+	 * @param success {bool*} ±¾Ö¸Õë·Ç NULL Ê±¼ÇÂ¼²Ù×÷¹ı³ÌÊÇ·ñ³É¹¦
 	 *  when not NULL, storing the status of success
 	 * @return {long long int}
 	 */
 	long long int get_integer64(bool* success = NULL) const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_STRING ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›å¯¹åº”çš„ double ç±»å‹å€¼
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_STRING ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø¶ÔÓ¦µÄ double ÀàĞÍÖµ
 	 * get the double value for REDIS_RESULT_STRING result
-	 * @param success {bool*} æœ¬æŒ‡é’ˆé NULL æ—¶è®°å½•æ“ä½œè¿‡ç¨‹æ˜¯å¦æˆåŠŸ
+	 * @param success {bool*} ±¾Ö¸Õë·Ç NULL Ê±¼ÇÂ¼²Ù×÷¹ı³ÌÊÇ·ñ³É¹¦
 	 *  when not NULL, storing the status of success
 	 * @return {double}
 	 */
 	double get_double(bool* success = NULL) const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_STATUS ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›çŠ¶æ€ä¿¡æ¯
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_STATUS ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø×´Ì¬ĞÅÏ¢
 	 * get operation status for REDIS_RESULT_STATUS result
-	 * @return {const char*} è¿”å› "" è¡¨ç¤ºå‡ºé”™
+	 * @return {const char*} ·µ»Ø "" ±íÊ¾³ö´í
 	 *  error if empty string returned
 	 */
 	const char* get_status() const;
 
 	/**
-	 * å½“å‡ºé”™æ—¶è¿”å›å€¼ä¸º REDIS_RESULT_ERROR ç±»å‹ï¼Œæœ¬æ–¹æ³•è¿”å›å‡ºé”™ä¿¡æ¯
+	 * µ±³ö´íÊ±·µ»ØÖµÎª REDIS_RESULT_ERROR ÀàĞÍ£¬±¾·½·¨·µ»Ø³ö´íĞÅÏ¢
 	 * when some error happened, this can get the error information
-	 * @return {const char*} è¿”å›ç©ºä¸² "" è¡¨ç¤ºæ²¡æœ‰å‡ºé”™ä¿¡æ¯
+	 * @return {const char*} ·µ»Ø¿Õ´® "" ±íÊ¾Ã»ÓĞ³ö´íĞÅÏ¢
 	 *  there was no error information if empty string returned
 	 */
 	const char* get_error(void) const;
 
 	/**
-	 * è¿”å›å¯¹åº”ä¸‹æ ‡çš„æ•°æ®(å½“æ•°æ®ç±»å‹é REDIS_RESULT_ARRAY æ—¶ï¼‰
+	 * ·µ»Ø¶ÔÓ¦ÏÂ±êµÄÊı¾İ(µ±Êı¾İÀàĞÍ·Ç REDIS_RESULT_ARRAY Ê±£©
 	 * get the string data of associated subscript(just for the type
 	 * of no REDIS_RESULT_ARRAY)
-	 * @param i {size_t} æ•°ç»„ä¸‹æ ‡
+	 * @param i {size_t} Êı×éÏÂ±ê
 	 *  the array's subscript
-	 * @param len {size_t*} å½“ä¸ºé NULL æŒ‡é’ˆæ—¶å­˜å‚¨æ‰€è¿”å›æ•°æ®çš„é•¿åº¦
+	 * @param len {size_t*} µ±Îª·Ç NULL Ö¸ÕëÊ±´æ´¢Ëù·µ»ØÊı¾İµÄ³¤¶È
 	 *  when not NULL, the parameter will store the length of the result
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºä¸‹æ ‡è¶Šç•Œ
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾ÏÂ±êÔ½½ç
 	 *  NULL if nothing exists or the subscript is out of bounds
 	 */
 	const char* get(size_t i, size_t* len = NULL) const;
 
 	/**
-	 * è¿”å›æ‰€æœ‰çš„æ•°æ®æ•°ç»„(å½“æ•°æ®ç±»å‹é REDIS_RESULT_ARRAY æ—¶ï¼‰åœ°å€
+	 * ·µ»ØËùÓĞµÄÊı¾İÊı×é(µ±Êı¾İÀàĞÍ·Ç REDIS_RESULT_ARRAY Ê±£©µØÖ·
 	 * return all data's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const char**}
 	 */
@@ -133,7 +133,7 @@ public:
 	}
 
 	/**
-	 * è¿”å›æ‰€æœ‰çš„æ•°æ®é•¿åº¦æ•°ç»„(å½“æ•°æ®ç±»å‹é REDIS_RESULT_ARRAY æ—¶ï¼‰åœ°å€
+	 * ·µ»ØËùÓĞµÄÊı¾İ³¤¶ÈÊı×é(µ±Êı¾İÀàĞÍ·Ç REDIS_RESULT_ARRAY Ê±£©µØÖ·
 	 * return all length's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const size_t*}
 	 */
@@ -143,45 +143,45 @@ public:
 	}
 
 	/**
-	 * è¿”å›æ‰€æœ‰æ•°æ®çš„æ€»é•¿åº¦(å½“æ•°æ®ç±»å‹é REDIS_RESULT_ARRAY æ—¶ï¼‰
+	 * ·µ»ØËùÓĞÊı¾İµÄ×Ü³¤¶È(µ±Êı¾İÀàĞÍ·Ç REDIS_RESULT_ARRAY Ê±£©
 	 * return the total length of all data for no REDIS_RESULT_ARRAY
 	 * @return {size_t}
 	 */
 	size_t get_length(void) const;
 
 	/**
-	 * å½“æ•°æ®ç±»å‹ä¸º REDIS_RESULT_STRING ç±»å‹æ—¶ï¼Œè¯¥å‡½æ•°å°†æŒ‰å†…å­˜å—å­˜æ”¾çš„æ•°æ®
-	 * å­˜å‚¨è‡³è¿æ¥å†…å­˜ä¸­ï¼Œä½†éœ€è¦æ³¨æ„é˜²æ­¢å†…å­˜æº¢å‡º
+	 * µ±Êı¾İÀàĞÍÎª REDIS_RESULT_STRING ÀàĞÍÊ±£¬¸Ãº¯Êı½«°´ÄÚ´æ¿é´æ·ÅµÄÊı¾İ
+	 * ´æ´¢ÖÁÁ¬½ÓÄÚ´æÖĞ£¬µ«ĞèÒª×¢Òâ·ÀÖ¹ÄÚ´æÒç³ö
 	 * compose a continus data for the slicing chunk data internal
-	 * @param buf {string&} å­˜å‚¨ç»“æœæ•°æ®ï¼Œå†…éƒ¨ä¼šå…ˆè°ƒç”¨ buf.clear()
+	 * @param buf {string&} ´æ´¢½á¹ûÊı¾İ£¬ÄÚ²¿»áÏÈµ÷ÓÃ buf.clear()
 	 *  store the result
-	 * @return {int} æ•°æ®çš„æ€»é•¿åº¦ï¼Œè¿”å›å€¼ 0 è¡¨ç¤ºå†…éƒ¨æ•°ç»„ä¸ºç©º
+	 * @return {int} Êı¾İµÄ×Ü³¤¶È£¬·µ»ØÖµ 0 ±íÊ¾ÄÚ²¿Êı×éÎª¿Õ
 	 *  return the total length of data, 0 if data array has no elements
 	 */
 	int argv_to_string(string& buf) const;
 	int argv_to_string(char* buf, size_t size) const;
 
 	/**
-	 * å½“æ•°æ®ç±»å‹ä¸º REDIS_RESULT_ARRAY ç±»å‹æ—¶ï¼Œè¯¥å‡½æ•°è¿”å›æ‰€æœ‰çš„æ•°ç»„å¯¹è±¡
+	 * µ±Êı¾İÀàĞÍÎª REDIS_RESULT_ARRAY ÀàĞÍÊ±£¬¸Ãº¯Êı·µ»ØËùÓĞµÄÊı×é¶ÔÏó
 	 * return the objects array when result type is REDIS_RESULT_ARRAY
-	 * @param size {size_t*} å½“è¿”å›æ•°ç»„éç©ºæ—¶ï¼Œåˆ™è¯¥åœ°å€å­˜æ”¾æ•°ç»„é•¿åº¦
+	 * @param size {size_t*} µ±·µ»ØÊı×é·Ç¿ÕÊ±£¬Ôò¸ÃµØÖ·´æ·ÅÊı×é³¤¶È
 	 *  store the array's length if size isn't NULL
 	 * @return {const const redis_result*}
 	 */
 	const redis_result** get_children(size_t* size) const;
 
 	/**
-	 * å½“æ•°æ®ç±»å‹ä¸º REDIS_RESULT_ARRAY ç±»å‹æ—¶ï¼Œè¯¥å‡½æ•°è¿”å›å¯¹åº”ä¸‹æ ‡çš„ç»“æœå¯¹è±¡
+	 * µ±Êı¾İÀàĞÍÎª REDIS_RESULT_ARRAY ÀàĞÍÊ±£¬¸Ãº¯Êı·µ»Ø¶ÔÓ¦ÏÂ±êµÄ½á¹û¶ÔÏó
 	 * get one object of the given subscript from objects array
-	 * @param i {size_t} ä¸‹æ ‡å€¼
+	 * @param i {size_t} ÏÂ±êÖµ
 	 *  the given subscript
-	 * @return {const redis_result*} å½“ä¸‹æ ‡å€¼è¶Šç•Œæˆ–ç»“æœä¸å­˜åœ¨æ—¶ï¼Œåˆ™è¿”å› NULL
+	 * @return {const redis_result*} µ±ÏÂ±êÖµÔ½½ç»ò½á¹û²»´æÔÚÊ±£¬Ôò·µ»Ø NULL
 	 *  NULL if subscript is out of bounds or object not exist
 	 */
 	const redis_result* get_child(size_t i) const;
 
 	/**
-	 * è¿”å›æ„é€ å‡½æ•°ä¼ å…¥çš„å†…å­˜æ± å¯¹è±¡
+	 * ·µ»Ø¹¹Ôìº¯Êı´«ÈëµÄÄÚ´æ³Ø¶ÔÏó
 	 * get the memory pool object set in constructor
 	 * @return {dbuf_pool*}
 	 */
@@ -191,8 +191,8 @@ public:
 	}
 
 	/**
-	 * å°†æ•´ä¸ªå¯¹è±¡è½¬æ¢æˆå­—ç¬¦ä¸²
-	 * @param out {string&} å­˜å‚¨ç»“æœ(ä»¥è¿½åŠ æ–¹å¼æ·»åŠ )
+	 * ½«Õû¸ö¶ÔÏó×ª»»³É×Ö·û´®
+	 * @param out {string&} ´æ´¢½á¹û(ÒÔ×·¼Ó·½Ê½Ìí¼Ó)
 	 * @return {const string&}
 	 */
 	const string& to_string(string& out) const;

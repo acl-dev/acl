@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/db/mysql_pool.hpp"
@@ -65,7 +65,7 @@ mysql_manager& mysql_manager::add(const char* dbaddr, const char* dbname,
 	conf->set_rw_timeout(rw_timeout);
 
 	dbs_[key] = conf;
-	// è°ƒç”¨åŸºç±» connect_manager::set æ–¹æ³•æ·»åŠ 
+	// µ÷ÓÃ»ùÀà connect_manager::set ·½·¨Ìí¼Ó
 	set(key.c_str(), dblimit);
 
 	return *this;
@@ -82,7 +82,7 @@ mysql_manager& mysql_manager::add(const mysql_conf& conf)
 
 	mysql_conf* mc = NEW mysql_conf(conf);
 	dbs_[key] = mc;
-	// è°ƒç”¨åŸºç±» connect_manager::set æ–¹æ³•æ·»åŠ 
+	// µ÷ÓÃ»ùÀà connect_manager::set ·½·¨Ìí¼Ó
 	set(key, conf.get_dblimit());
 
 	return *this;

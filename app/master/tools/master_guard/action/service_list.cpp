@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "tools/lib_global/json/service_struct.h"
 #include "tools/lib_global/json/service_struct.gson.h"
 #include "daemon/json/serialize.h"

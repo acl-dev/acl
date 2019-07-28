@@ -1,17 +1,17 @@
-ï»¿// gui_rpc.h : PROJECT_NAME åº”ç”¨ç¨‹åºçš„ä¸»å¤´æ–‡ä»¶
+// gui_rpc.h : PROJECT_NAME Ó¦ÓÃ³ÌĞòµÄÖ÷Í·ÎÄ¼ş
 //
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error åœ¨åŒ…å«ç”¨äº PCH çš„æ­¤æ–‡ä»¶ä¹‹å‰åŒ…å«â€œstdafx.hâ€
+	#error ÔÚ°üº¬ÓÃÓÚ PCH µÄ´ËÎÄ¼şÖ®Ç°°üº¬¡°stdafx.h¡±
 #endif
 
-#include "resource.h"		// ä¸»ç¬¦å·
+#include "resource.h"		// Ö÷·ûºÅ
 
 
 // Cgui_rpcApp:
-// æœ‰å…³æ­¤ç±»çš„å®ç°ï¼Œè¯·å‚é˜… gui_rpc.cpp
+// ÓĞ¹Ø´ËÀàµÄÊµÏÖ£¬Çë²ÎÔÄ gui_rpc.cpp
 //
 
 class Cgui_rpcApp : public CWinApp
@@ -19,11 +19,11 @@ class Cgui_rpcApp : public CWinApp
 public:
 	Cgui_rpcApp();
 
-// é‡å†™
+// ÖØĞ´
 	public:
 	virtual BOOL InitInstance();
 
-// å®ç°
+// ÊµÏÖ
 
 	DECLARE_MESSAGE_MAP()
 };

@@ -1,27 +1,27 @@
-ï»¿#pragma once
+#pragma once
 
 /**
- * æœ¬ç±»å¯¹è±¡å°†é˜»å¡ä»»åŠ¡äº¤ç»™å­çº¿ç¨‹å¤„ç†ï¼›ä¸ºäº†æ–¹ä¾¿ä½¿ç”¨ï¼Œå°†è¯¥ç±»å£°æ˜ä¸ºå•ä¾‹ç±»
+ * ±¾Àà¶ÔÏó½«×èÈûÈÎÎñ½»¸ø×ÓÏß³Ì´¦Àí£»ÎªÁË·½±ãÊ¹ÓÃ£¬½«¸ÃÀàÉùÃ÷Îªµ¥ÀıÀà
  */
 class rpc_manager : public acl::singleton<rpc_manager>
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param max_threads {int} å­çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°é‡
+	 * ¹¹Ôìº¯Êı
+	 * @param max_threads {int} ×ÓÏß³Ì³ØµÄ×î´óÏß³ÌÊıÁ¿
 	 */
 	rpc_manager(int max_threads = 10);
 	~rpc_manager();
 
 	/**
-	 * å‘èµ·ä¸€ä¸ªé˜»å¡è¿‡ç¨‹ï¼Œå°†è¯¥è¿‡ç¨‹äº¤ç”±å­çº¿ç¨‹å¤„ç†
-	 * @param req {acl::rpc_request*} é˜»å¡ä»»åŠ¡å¯¹è±¡
+	 * ·¢ÆğÒ»¸ö×èÈû¹ı³Ì£¬½«¸Ã¹ı³Ì½»ÓÉ×ÓÏß³Ì´¦Àí
+	 * @param req {acl::rpc_request*} ×èÈûÈÎÎñ¶ÔÏó
 	 */
 	void fork(acl::rpc_request* req);
 protected:
 private:
-	// å¼‚æ­¥æ¶ˆæ¯å¥æŸ„
+	// Òì²½ÏûÏ¢¾ä±ú
 	acl::aio_handle* handle_;
-	// å¼‚æ­¥ RPC é€šä¿¡æœåŠ¡å¥æŸ„
+	// Òì²½ RPC Í¨ĞÅ·şÎñ¾ä±ú
 	acl::rpc_service* service_;
 };

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file debug.h
  *
  * \brief Debug functions

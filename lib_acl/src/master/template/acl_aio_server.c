@@ -1,4 +1,4 @@
-ï»¿/* System library. */
+/* System library. */
 #include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
@@ -813,7 +813,7 @@ static int aio_server_accept_sock2(ACL_ASTREAM *astream, ACL_AIO *aio)
 #else
 		if (fd >= 0) {
 #endif
-			/* TCP è¿æ¥é¿å…å‘é€å»¶è¿Ÿç°è±¡ */
+			/* TCP Á¬½Ó±ÜÃâ·¢ËÍÑÓ³ÙÏÖÏó */
 #ifdef AF_INET6
 			if (sock_type == AF_INET || sock_type == AF_INET6)
 #else
@@ -1065,7 +1065,7 @@ static void aio_server_init(const char *procname)
 			__FILE__, __LINE__, myname, acl_var_aio_log_file);
 	}
 
-	/* è·å¾—æœ¬æœåŠ¡å™¨æ¡†æ¶æ‰€éœ€è¦çš„é…ç½®å‚æ•° */
+	/* »ñµÃ±¾·şÎñÆ÷¿ò¼ÜËùĞèÒªµÄÅäÖÃ²ÎÊı */
 
 	acl_get_app_conf_int_table(__conf_int_tab);
 	acl_get_app_conf_int64_table(__conf_int64_tab);
@@ -1101,7 +1101,7 @@ static void usage(int argc, char *argv[])
 		" -f conf_file", argv[0]);
 }
 
-/* åˆ›å»ºå¼‚æ­¥IO */
+/* ´´½¨Òì²½IO */
 
 static ACL_AIO *create_aio(int *event_mode)
 {
@@ -1141,7 +1141,7 @@ static void log_event_mode(int event_mode)
 	}
 }
 
-/* åˆ›å»ºå®šæ—¶å™¨ */
+/* ´´½¨¶¨Ê±Æ÷ */
 
 static void create_timer(ACL_AIO *aio, int use_limit_delay)
 {
@@ -1159,7 +1159,7 @@ static void create_timer(ACL_AIO *aio, int use_limit_delay)
 			aio, (acl_int64) use_limit_delay * 1000000, 0);
 }
 
-/* åˆ›å»ºç›‘å¬è€… */
+/* ´´½¨¼àÌıÕß */
 
 static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 	const char *transport, int socket_count)
@@ -1176,7 +1176,7 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 	for (i = 0; i < socket_count + 1; i++)
 		sstreams[i] = NULL;
 
-	/* é€‰æ‹©è¿æ¥æ¥æ”¶æ¥å£ */
+	/* Ñ¡ÔñÁ¬½Ó½ÓÊÕ½Ó¿Ú */
 
 	if (transport == 0)
 		acl_msg_fatal("%s: no transport type specified", myname);
@@ -1201,7 +1201,7 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 	for (i = 0, fd = ACL_MASTER_LISTEN_FD;
 		fd < ACL_MASTER_LISTEN_FD + socket_count; fd++)
 	{
-		/* æ‰“å¼€ç›‘å¬æ•°æ®æµ */
+		/* ´ò¿ª¼àÌıÊı¾İÁ÷ */
 		vs = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
 			acl_var_aio_rw_timeout, type);
 		acl_assert(vs);
@@ -1209,17 +1209,17 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 		acl_non_blocking(ACL_VSTREAM_SOCK(vs), ACL_NON_BLOCKING);
 		acl_close_on_exec(ACL_VSTREAM_SOCK(vs), ACL_CLOSE_ON_EXEC);
 
-		/* æ‰“å¼€å¼‚æ­¥æ•°æ®æµ */
+		/* ´ò¿ªÒì²½Êı¾İÁ÷ */
 		as = acl_aio_open(aio, vs);
 		acl_assert(as);
 
-		/* è‹¥é‡‡ç”¨å­çº¿ç¨‹å•ç‹¬ accept è¿æ¥ï¼Œåˆ™ __service_accept åœ¨å­çº¿ç¨‹
-		 * çš„å¼‚æ­¥äº‹ä»¶å¾ªç¯ä¸­è¿è¡Œï¼Œå¦åˆ™åœ¨ä¸»çº¿ç¨‹çš„å¼‚æ­¥äº‹ä»¶å¾ªç¯ä¸­è¿è¡Œ
+		/* Èô²ÉÓÃ×ÓÏß³Ìµ¥¶À accept Á¬½Ó£¬Ôò __service_accept ÔÚ×ÓÏß³Ì
+		 * µÄÒì²½ÊÂ¼şÑ­»·ÖĞÔËĞĞ£¬·ñÔòÔÚÖ÷Ïß³ÌµÄÒì²½ÊÂ¼şÑ­»·ÖĞÔËĞĞ
 		 */
 		acl_aio_ctl(as, ACL_AIO_CTL_LISTEN_FN, __service_accept, 
 			ACL_AIO_CTL_CTX, aio, ACL_AIO_CTL_END);
 
-		/* è®¾ç½®å¼‚æ­¥ç›‘å¬ */
+		/* ÉèÖÃÒì²½¼àÌı */
 		acl_aio_listen(as);
 		if (__service_on_listen)
 			__service_on_listen(__service_ctx, vs);
@@ -1228,7 +1228,7 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 		if (acl_var_aio_accept_timer <= 0)
 			continue;
 
-		/* ä¸ºäº†ä¿è¯ accept çš„ä¼˜å…ˆçº§ï¼Œå¯ä»¥è®¾ç½®æ¥æ”¶å®šæ—¶å™¨ */
+		/* ÎªÁË±£Ö¤ accept µÄÓÅÏÈ¼¶£¬¿ÉÒÔÉèÖÃ½ÓÊÕ¶¨Ê±Æ÷ */
 
 		acl_aio_request_timer(aio, aio_server_accept_timer,
 			as, (acl_int64) acl_var_aio_accept_timer * 1000000, 0);
@@ -1237,7 +1237,7 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 	return sstreams;
 }
 
-/* è¿›ç¨‹é—´é€šä¿¡è®¾ç½® */
+/* ½ø³Ì¼äÍ¨ĞÅÉèÖÃ */
 
 static void setup_ipc(ACL_AIO *aio)
 {
@@ -1256,7 +1256,7 @@ static void setup_ipc(ACL_AIO *aio)
 	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
 }
 
-/* å¼€å§‹è¿›å…¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹ */
+/* ¿ªÊ¼½øÈëÊÂ¼şÑ­»·¹ı³Ì */
 
 static void run_loop(const char *procname)
 {
@@ -1301,8 +1301,8 @@ static void run_loop(const char *procname)
 		if (__listen_disabled == 1) {
 			__listen_disabled = 2;
 
-			/* è¯¥è¿›ç¨‹ä¸å†è´Ÿè´£ç›‘å¬ï¼Œé˜²æ­¢ acl_master ä¸»è¿›ç¨‹
-			 * æ— æ³•æ­£å¸¸é‡å¯
+			/* ¸Ã½ø³Ì²»ÔÙ¸ºÔğ¼àÌı£¬·ÀÖ¹ acl_master Ö÷½ø³Ì
+			 * ÎŞ·¨Õı³£ÖØÆô
 			 */
 			disable_listen();
 			dispatch_close(__h_aio);
@@ -1338,9 +1338,9 @@ static void server_main(int argc, char **argv, va_list ap)
 
 	/*******************************************************************/
 
-	aio_init();  /* åˆå§‹åŒ– */
+	aio_init();  /* ³õÊ¼»¯ */
 
-	/* åœ¨å­è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½ä¹‹å‰ï¼Œå…ˆç”¨ acl_master çš„æ—¥å¿—å¥æŸ„è®°æ—¥å¿— */
+	/* ÔÚ×Ó½ø³ÌÇĞ»»ÓÃ»§Éí·İÖ®Ç°£¬ÏÈÓÃ acl_master µÄÈÕÖ¾¾ä±ú¼ÇÈÕÖ¾ */
 	master_log_open(argv[0]);
 
 	/*******************************************************************/
@@ -1475,14 +1475,14 @@ static void server_main(int argc, char **argv, va_list ap)
 	__service_name = service_name;
 	__service_argv = argv + optind;
 
-	__h_aio = create_aio(&__event_mode);  /* åˆ›å»ºå¼‚æ­¥IOå¼•æ“ */
+	__h_aio = create_aio(&__event_mode);  /* ´´½¨Òì²½IOÒıÇæ */
 
 	/* change to given directory */
 	if (chdir(acl_var_aio_queue_dir) < 0)
 		acl_msg_fatal("chdir(\"%s\"): %s", acl_var_aio_queue_dir,
 			acl_last_serror());
 
-	/* å¢åŠ  ip åœ°å€é™åˆ¶ */
+	/* Ôö¼Ó ip µØÖ·ÏŞÖÆ */
 	if (acl_var_aio_access_allow && *acl_var_aio_access_allow)
 		acl_access_add(acl_var_aio_access_allow, ", \t", ":");
 
@@ -1490,22 +1490,22 @@ static void server_main(int argc, char **argv, va_list ap)
 	if (pre_init)
 		pre_init(__service_ctx);
 
-	acl_chroot_uid(root_dir, user_name);  /* åˆ‡æ¢ç”¨æˆ·èº«ä»½ */
-	open_service_log();  /* æ‰“å¼€æœ¬è¿›ç¨‹è‡ªå·±çš„æ—¥å¿— */
+	acl_chroot_uid(root_dir, user_name);  /* ÇĞ»»ÓÃ»§Éí·İ */
+	open_service_log();  /* ´ò¿ª±¾½ø³Ì×Ô¼ºµÄÈÕÖ¾ */
 
 #ifdef ACL_UNIX
-	/* è®¾ç½®å­è¿›ç¨‹è¿è¡Œç¯å¢ƒï¼Œå…è®¸äº§ç”Ÿ core æ–‡ä»¶ */
+	/* ÉèÖÃ×Ó½ø³ÌÔËĞĞ»·¾³£¬ÔÊĞí²úÉú core ÎÄ¼ş */
 	if (acl_var_aio_enable_core && acl_var_aio_core_limit != 0) {
 		acl_set_core_limit(acl_var_aio_core_limit);
 	}
 #endif
 
-	log_event_mode(__event_mode);  /* å°†äº‹ä»¶æ¨¡å¼è®°å…¥æ—¥å¿—ä¸­ */
+	log_event_mode(__event_mode);  /* ½«ÊÂ¼şÄ£Ê½¼ÇÈëÈÕÖ¾ÖĞ */
 
-	create_timer(__h_aio, __use_limit_delay);  /* åˆ›å»ºå®šæ—¶å™¨ */
+	create_timer(__h_aio, __use_limit_delay);  /* ´´½¨¶¨Ê±Æ÷ */
 	__sstreams = create_listener(__h_aio, __event_mode,
-		transport, __socket_count);  /* åˆ›å»ºç›‘å¬è€… */
-	setup_ipc(__h_aio);  /* å®‰è£…è¿›ç¨‹é—´é€šä¿¡çš„é€šé“ */
+		transport, __socket_count);  /* ´´½¨¼àÌıÕß */
+	setup_ipc(__h_aio);  /* °²×°½ø³Ì¼äÍ¨ĞÅµÄÍ¨µÀ */
 
 	/* Run post-jail initialization. */
 	if (post_init)
@@ -1521,7 +1521,7 @@ static void server_main(int argc, char **argv, va_list ap)
 	if (acl_var_aio_dispatch_addr && *acl_var_aio_dispatch_addr)
 		dispatch_open(acl_aio_server_event(), __h_aio);
 
-	run_loop(argv[0]);  /* è¿›å…¥äº‹ä»¶ä¸»å¾ªç¯è¿‡ç¨‹ */
+	run_loop(argv[0]);  /* ½øÈëÊÂ¼şÖ÷Ñ­»·¹ı³Ì */
 }
 
 void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
@@ -1531,7 +1531,7 @@ void acl_aio_server_main(int argc, char **argv, ACL_AIO_SERVER_FN service,...)
 	__service_main = service;
 
 	va_start(ap, service);
-	/* ap å°†åœ¨ server_mainn ä¸­æ”¶å°¾ */
+	/* ap ½«ÔÚ server_mainn ÖĞÊÕÎ² */
 	server_main(argc, argv, ap);
 }
 
@@ -1542,7 +1542,7 @@ void acl_aio_server2_main(int argc, char **argv, ACL_AIO_SERVER2_FN service,...)
 	__service2_main = service;
 
 	va_start(ap, service);
-	/* ap å°†åœ¨ server_mainn ä¸­æ”¶å°¾ */
+	/* ap ½«ÔÚ server_mainn ÖĞÊÕÎ² */
 	server_main(argc, argv, ap);
 }
 

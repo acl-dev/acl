@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include <list>
 #include "acl_cpp/stdlib/log.hpp"
@@ -415,12 +415,12 @@ bool mail_message::append_multipart(ofstream& fp)
 {
 	string boundary;
 
-	// åˆ›å»º MIME æ•°æ®å”¯ä¸€åˆ†éš”ç¬¦
+	// ´´½¨ MIME Êý¾ÝÎ¨Ò»·Ö¸ô·û
 	create_boundary("0001", boundary);
 	
 	string buf(8192);
 
-	// å‘é‚®ä»¶å¤´ä¸­æ·»åŠ  MIME ç›¸å…³çš„ä¿¡æ¯å¤´
+	// ÏòÓÊ¼þÍ·ÖÐÌí¼Ó MIME Ïà¹ØµÄÐÅÏ¢Í·
 	buf.format("Content-Type: multipart/mixed;\r\n"
 		"\tcharset=\"%s\";\r\n"
 		"\tboundary=\"%s\"\r\n\r\n",
@@ -429,7 +429,7 @@ bool mail_message::append_multipart(ofstream& fp)
 	const char *prompt = "This is a multi-part message in MIME format.";
 	buf.format_append("%s\r\n\r\n", prompt);
 
-	// æ·»åŠ æ•°æ®ä½“
+	// Ìí¼ÓÊý¾ÝÌå
 	if (body_ != NULL) {
 		buf.format_append("--%s\r\n", boundary.c_str());
 		if (!body_->save_to(buf)) {
@@ -445,7 +445,7 @@ bool mail_message::append_multipart(ofstream& fp)
 		return false;
 	}
 
-	// å°†æ‰€æœ‰é™„ä»¶å†…å®¹è¿›è¡Œ BASE64 ç¼–ç åŽå­˜å…¥ç›®æ ‡æ–‡ä»¶ä¸­
+	// ½«ËùÓÐ¸½¼þÄÚÈÝ½øÐÐ BASE64 ±àÂëºó´æÈëÄ¿±êÎÄ¼þÖÐ
 
 	mime_base64 base64(true, false);
 
@@ -464,7 +464,7 @@ bool mail_message::append_multipart(ofstream& fp)
 		}
 	}
 
-	// æ·»åŠ æœ€åŽçš„åˆ†éš”ç¬¦è‡³é‚®ä»¶å°¾éƒ¨
+	// Ìí¼Ó×îºóµÄ·Ö¸ô·ûÖÁÓÊ¼þÎ²²¿
 
 	if (fp.format("--%s--\r\n", boundary.c_str()) == -1) {
 		logger_error("write boundary end to %s error %s",
@@ -485,13 +485,13 @@ bool mail_message::save_to(const char* filepath)
 
 	filepath_ = dbuf_->dbuf_strdup(filepath);
 
-	// å…ˆæ·»åŠ é‚®ä»¶å¤´éƒ¨åˆ†æ•°æ®è‡³æ–‡ä»¶æµä¸­
+	// ÏÈÌí¼ÓÓÊ¼þÍ·²¿·ÖÊý¾ÝÖÁÎÄ¼þÁ÷ÖÐ
 
 	if (!append_header(fp)) {
 		return false;
 	}
 
-	// å¦‚æžœæ˜¯ multipart æ ¼å¼ï¼Œåˆ™å°† multipart æ•°æ®è¾“å‡ºè‡³æ–‡ä»¶æµä¸­
+	// Èç¹ûÊÇ multipart ¸ñÊ½£¬Ôò½« multipart Êý¾ÝÊä³öÖÁÎÄ¼þÁ÷ÖÐ
 
 	if (!attachments_.empty()) {
 		return append_multipart(fp);
@@ -502,7 +502,7 @@ bool mail_message::save_to(const char* filepath)
 		return false;
 	}
 
-	// å¯¹éž multipart æ ¼å¼ï¼Œç›´æŽ¥å°†æ­£æ–‡æ•°æ®è¾“å‡ºè‡³æ–‡ä»¶æµä¸­
+	// ¶Ô·Ç multipart ¸ñÊ½£¬Ö±½Ó½«ÕýÎÄÊý¾ÝÊä³öÖÁÎÄ¼þÁ÷ÖÐ
 
 	string buf(8192);
 	if (!body_->save_to(buf)) {

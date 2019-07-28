@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
@@ -34,20 +34,20 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * å°†ä¸€ä¸ªæˆ–å¤šä¸ª member å…ƒç´ åŠ å…¥åˆ°é›†åˆ key å½“ä¸­ï¼Œå·²ç»å­˜åœ¨äºé›†åˆçš„ member å…ƒç´ 
-	 * å°†è¢«å¿½ç•¥;
-	 * 1) å‡å¦‚ key ä¸å­˜åœ¨ï¼Œåˆ™åˆ›å»ºä¸€ä¸ªåªåŒ…å« member å…ƒç´ ä½œæˆå‘˜çš„é›†åˆ
-	 * 2) å½“ key ä¸æ˜¯é›†åˆç±»å‹æ—¶ï¼Œè¿”å›ä¸€ä¸ªé”™è¯¯
+	 * ½«Ò»¸ö»ò¶à¸ö member ÔªËØ¼ÓÈëµ½¼¯ºÏ key µ±ÖĞ£¬ÒÑ¾­´æÔÚÓÚ¼¯ºÏµÄ member ÔªËØ
+	 * ½«±»ºöÂÔ;
+	 * 1) ¼ÙÈç key ²»´æÔÚ£¬Ôò´´½¨Ò»¸öÖ»°üº¬ member ÔªËØ×÷³ÉÔ±µÄ¼¯ºÏ
+	 * 2) µ± key ²»ÊÇ¼¯ºÏÀàĞÍÊ±£¬·µ»ØÒ»¸ö´íÎó
 	 * add one or more members to a set stored at a key
 	 * 1) if the key doesn't exist, a new set by the key will be created,
 	 *    and add the members to the set
 	 * 2) if the key exists and not a set's key, then error happened
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼ü
 	 *  the key of a set
-	 * @param first_member {const char*} ç¬¬ä¸€ä¸ªé NULL çš„æˆå‘˜
+	 * @param first_member {const char*} µÚÒ»¸ö·Ç NULL µÄ³ÉÔ±
 	 *  the first member of a variable args which isn't NULL, the last
 	 *  arg of the args must be NULL indicating the end of args
-	 * @return {int} è¢«æ·»åŠ åˆ°é›†åˆä¸­çš„æ–°å…ƒç´ çš„æ•°é‡ï¼Œä¸åŒ…æ‹¬è¢«å¿½ç•¥çš„å…ƒç´ 
+	 * @return {int} ±»Ìí¼Óµ½¼¯ºÏÖĞµÄĞÂÔªËØµÄÊıÁ¿£¬²»°üÀ¨±»ºöÂÔµÄÔªËØ
 	 *  the number of elements that were added to the set, not including
 	 *  all the elements already present into the set. -1 if error
 	 *  happened or it isn't a set stored by the key.
@@ -60,85 +60,85 @@ public:
 		size_t argc);
 
 	/**
-	 * ä»é›†åˆå¯¹è±¡ä¸­éšæœºç§»é™¤å¹¶è¿”å›æŸä¸ªæˆå‘˜
+	 * ´Ó¼¯ºÏ¶ÔÏóÖĞËæ»úÒÆ³ı²¢·µ»ØÄ³¸ö³ÉÔ±
 	 * remove and get one member from the set
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼ü
 	 *  the key of the set
-	 * @param buf {string&} å­˜å‚¨è¢«ç§»é™¤çš„æˆå‘˜
+	 * @param buf {string&} ´æ´¢±»ÒÆ³ıµÄ³ÉÔ±
 	 *  store the member removed from the set
-	 * @return {bool} å½“ key ä¸å­˜åœ¨æˆ– key æ˜¯ç©ºé›†æ—¶è¿”å› false
+	 * @return {bool} µ± key ²»´æÔÚ»ò key ÊÇ¿Õ¼¯Ê±·µ»Ø false
 	 *  true if one member has been removed and got, false if the key
 	 *  doesn't exist or it isn't a set stored at the key.
 	 */
 	bool spop(const char* key, string& buf);
 
 	/**
-	 * è·å¾—é›†åˆå¯¹è±¡ä¸­æˆå‘˜çš„æ•°é‡
+	 * »ñµÃ¼¯ºÏ¶ÔÏóÖĞ³ÉÔ±µÄÊıÁ¿
 	 * get the number of members in a set stored at the key
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼ü
 	 *  the key of the set
-	 * @return {int} è¿”å›è¯¥é›†åˆå¯¹è±¡ä¸­æˆå‘˜æ•°é‡ï¼Œå«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ·µ»Ø¸Ã¼¯ºÏ¶ÔÏóÖĞ³ÉÔ±ÊıÁ¿£¬º¬ÒåÈçÏÂ£º
 	 *  return int value as below:
-	 *  -1ï¼šå‡ºé”™æˆ–éé›†åˆå¯¹è±¡
+	 *  -1£º³ö´í»ò·Ç¼¯ºÏ¶ÔÏó
 	 *      error or it's not a set by the key
-	 *   0ï¼šæˆå‘˜æ•°é‡ä¸ºç©ºæˆ–è¯¥ key ä¸å­˜åœ¨
+	 *   0£º³ÉÔ±ÊıÁ¿Îª¿Õ»ò¸Ã key ²»´æÔÚ
 	 *      the set is empty or the key doesn't exist
-	 *  >0ï¼šæˆå‘˜æ•°é‡éç©º
+	 *  >0£º³ÉÔ±ÊıÁ¿·Ç¿Õ
 	 *      the number of members in the set
 	 */
 	int scard(const char* key);
 
 	/**
-	 * è¿”å›é›†åˆ key ä¸­çš„æ‰€æœ‰æˆå‘˜
+	 * ·µ»Ø¼¯ºÏ key ÖĞµÄËùÓĞ³ÉÔ±
 	 * get all the members in a set stored at a key
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®å€¼
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼üÖµ
 	 *  the key of the set
-	 * @param members {std::vector<string>*} éç©ºæ—¶å­˜å‚¨ç»“æœé›†
+	 * @param members {std::vector<string>*} ·Ç¿ÕÊ±´æ´¢½á¹û¼¯
 	 *  if not NULL, it will store the members.
-	 * @return {int} ç»“æœé›†æ•°é‡ï¼Œè¿”å› -1 è¡¨ç¤ºå‡ºé”™æˆ–æœ‰ä¸€ä¸ª key éé›†åˆå¯¹è±¡
+	 * @return {int} ½á¹û¼¯ÊıÁ¿£¬·µ»Ø -1 ±íÊ¾³ö´í»òÓĞÒ»¸ö key ·Ç¼¯ºÏ¶ÔÏó
 	 *  the number of elements got, -1 if error happened or it't not
 	 *  a set by the key.
 	 *
-	 *  æ“ä½œæˆåŠŸåå¯ä»¥é€šè¿‡ä»¥ä¸‹ä»»ä¸€æ–¹å¼è·å¾—æ•°æ®
+	 *  ²Ù×÷³É¹¦ºó¿ÉÒÔÍ¨¹ıÒÔÏÂÈÎÒ»·½Ê½»ñµÃÊı¾İ
 	 *  if successul, one of below ways can be used to get the result:
-	 *  1ã€åœ¨è°ƒç”¨æ–¹æ³•ä¸­ä¼ å…¥éç©ºçš„å­˜å‚¨ç»“æœå¯¹è±¡çš„åœ°å€
+	 *  1¡¢ÔÚµ÷ÓÃ·½·¨ÖĞ´«Èë·Ç¿ÕµÄ´æ´¢½á¹û¶ÔÏóµÄµØÖ·
 	 *     the most easily way is to set a non-NULL result parameter
 	 *     for this function 
-	 *  2ã€åŸºç±»æ–¹æ³• get_value è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ æ•°æ®
+	 *  2¡¢»ùÀà·½·¨ get_value »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØÊı¾İ
 	 *     call redis_command::result_value with the specified subscript
-	 *  3ã€åŸºç±»æ–¹æ³• get_child è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ å¯¹è±¡(redis_resultï¼‰ï¼Œç„¶åå†é€šè¿‡
-	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
+	 *  3¡¢»ùÀà·½·¨ get_child »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØ¶ÔÏó(redis_result£©£¬È»ºóÔÙÍ¨¹ı
+	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
 	 *     get redis_result object with the given subscript, and get the
 	 *     element by redis_result::argv_to_string
-	 *  4ã€åŸºç±»æ–¹æ³• get_result æ–¹æ³•å–å¾—æ€»ç»“æœé›†å¯¹è±¡ redis_resultï¼Œç„¶åå†é€šè¿‡
-	 *     redis_result::get_child è·å¾—ä¸€ä¸ªå…ƒç´ å¯¹è±¡ï¼Œç„¶åå†é€šè¿‡æ–¹å¼ 2 ä¸­æŒ‡å®š
-	 *     çš„æ–¹æ³•è·å¾—è¯¥å…ƒç´ çš„æ•°æ®
+	 *  4¡¢»ùÀà·½·¨ get_result ·½·¨È¡µÃ×Ü½á¹û¼¯¶ÔÏó redis_result£¬È»ºóÔÙÍ¨¹ı
+	 *     redis_result::get_child »ñµÃÒ»¸öÔªËØ¶ÔÏó£¬È»ºóÔÙÍ¨¹ı·½Ê½ 2 ÖĞÖ¸¶¨
+	 *     µÄ·½·¨»ñµÃ¸ÃÔªËØµÄÊı¾İ
 	 *     get redis_result object by redis_command::get_result, and get
 	 *     the first element by redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above
-	 *  5ã€åŸºç±»æ–¹æ³• get_children è·å¾—ç»“æœå…ƒç´ æ•°ç»„å¯¹è±¡ï¼Œå†é€šè¿‡ redis_result ä¸­
-	 *     çš„æ–¹æ³• argv_to_string ä»æ¯ä¸€ä¸ªå…ƒç´ å¯¹è±¡ä¸­è·å¾—å…ƒç´ æ•°æ®
+	 *  5¡¢»ùÀà·½·¨ get_children »ñµÃ½á¹ûÔªËØÊı×é¶ÔÏó£¬ÔÙÍ¨¹ı redis_result ÖĞ
+	 *     µÄ·½·¨ argv_to_string ´ÓÃ¿Ò»¸öÔªËØ¶ÔÏóÖĞ»ñµÃÔªËØÊı¾İ
 	 *     get child array by redis_command::get_children, and get the
 	 *     element from one of redis_result array by argv_to_string
 	 */
 	int smembers(const char* key, std::vector<string>* members);
 
 	/**
-	 * å°† member å…ƒç´ ä» src é›†åˆç§»åŠ¨åˆ° dst é›†åˆ
+	 * ½« member ÔªËØ´Ó src ¼¯ºÏÒÆ¶¯µ½ dst ¼¯ºÏ
 	 * move a member from one set to another
-	 * @param src {const char*} æºé›†åˆå¯¹è±¡çš„é”®å€¼
+	 * @param src {const char*} Ô´¼¯ºÏ¶ÔÏóµÄ¼üÖµ
 	 *  the source key of a set
-	 * @param dst {const char*} ç›®æ ‡é›†åˆå¯¹è±¡çš„é”®å€¼
+	 * @param dst {const char*} Ä¿±ê¼¯ºÏ¶ÔÏóµÄ¼üÖµ
 	 *  the destination key of a set
-	 * @param member {const char*} æºé›†åˆå¯¹è±¡çš„æˆå‘˜
+	 * @param member {const char*} Ô´¼¯ºÏ¶ÔÏóµÄ³ÉÔ±
 	 *  the member in the source set
-	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
 	 *  return int value as below:
-	 *  -1ï¼šå‡ºé”™æˆ–æº/ç›®æ ‡å¯¹è±¡æœ‰ä¸€ä¸ªéé›†åˆå¯¹è±¡
+	 *  -1£º³ö´í»òÔ´/Ä¿±ê¶ÔÏóÓĞÒ»¸ö·Ç¼¯ºÏ¶ÔÏó
 	 *      error happened, or one of source and destination isn't a set
-	 *   0ï¼šæºå¯¹è±¡ä¸å­˜åœ¨æˆ–æˆå‘˜åœ¨æºå¯¹è±¡ä¸­ä¸å­˜åœ¨
+	 *   0£ºÔ´¶ÔÏó²»´æÔÚ»ò³ÉÔ±ÔÚÔ´¶ÔÏóÖĞ²»´æÔÚ
 	 *     the source set or the member doesn't exist
-	 *   1ï¼šæˆåŠŸä»æºå¯¹è±¡ä¸­å°†ä¸€ä¸ªæˆå‘˜ç§»åŠ¨è‡³ç›®æ ‡å¯¹è±¡ä¸­
+	 *   1£º³É¹¦´ÓÔ´¶ÔÏóÖĞ½«Ò»¸ö³ÉÔ±ÒÆ¶¯ÖÁÄ¿±ê¶ÔÏóÖĞ
 	 *      move successfully the member from source set to
 	 *      the destination set
 	 */
@@ -148,36 +148,36 @@ public:
 		const char* member, size_t len);
 
 	/**
-	 * è¿”å›ä¸€ä¸ªé›†åˆçš„å…¨éƒ¨æˆå‘˜ï¼Œè¯¥é›†åˆæ˜¯æ‰€æœ‰ç»™å®šé›†åˆä¹‹é—´çš„å·®é›†
+	 * ·µ»ØÒ»¸ö¼¯ºÏµÄÈ«²¿³ÉÔ±£¬¸Ã¼¯ºÏÊÇËùÓĞ¸ø¶¨¼¯ºÏÖ®¼äµÄ²î¼¯
 	 * return the members of the set resulting from the difference
 	 * between the first set and all the successive sets.
-	 * @param members {std::vector<string>*} éç©ºæ—¶å­˜å‚¨ç»“æœé›†
+	 * @param members {std::vector<string>*} ·Ç¿ÕÊ±´æ´¢½á¹û¼¯
 	 *  if not NULL, it will store the members.
-	 * @param first_key {const char*} ç¬¬ä¸€ä¸ªéç©ºçš„é›†åˆå¯¹è±¡ key
+	 * @param first_key {const char*} µÚÒ»¸ö·Ç¿ÕµÄ¼¯ºÏ¶ÔÏó key
 	 *  the key of the first set in a variable sets list, the last one
 	 *  must be NULL indicating the end of the sets list.
-	 * @return {int} ç»“æœé›†æ•°é‡ï¼Œè¿”å› -1 è¡¨ç¤ºå‡ºé”™æˆ–æœ‰ä¸€ä¸ª key éé›†åˆå¯¹è±¡
+	 * @return {int} ½á¹û¼¯ÊıÁ¿£¬·µ»Ø -1 ±íÊ¾³ö´í»òÓĞÒ»¸ö key ·Ç¼¯ºÏ¶ÔÏó
 	 *  the number of elements got, -1 if error happened or it't not
 	 *  a set by the key.
-	 *  æ“ä½œæˆåŠŸåå¯ä»¥é€šè¿‡ä»¥ä¸‹ä»»ä¸€æ–¹å¼è·å¾—æ•°æ®
+	 *  ²Ù×÷³É¹¦ºó¿ÉÒÔÍ¨¹ıÒÔÏÂÈÎÒ»·½Ê½»ñµÃÊı¾İ
 	 *  if successul, one of below ways can be used to get the result:
-	 *  1ã€åœ¨è°ƒç”¨æ–¹æ³•ä¸­ä¼ å…¥éç©ºçš„å­˜å‚¨ç»“æœå¯¹è±¡çš„åœ°å€
+	 *  1¡¢ÔÚµ÷ÓÃ·½·¨ÖĞ´«Èë·Ç¿ÕµÄ´æ´¢½á¹û¶ÔÏóµÄµØÖ·
 	 *     the most easily way is to set a non-NULL result parameter
 	 *     for this function
-	 *  2ã€åŸºç±»æ–¹æ³• get_value è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ æ•°æ®
+	 *  2¡¢»ùÀà·½·¨ get_value »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØÊı¾İ
 	 *     get the specified subscript's element by redis_command::get_value
-	 *  3ã€åŸºç±»æ–¹æ³• get_child è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ å¯¹è±¡(redis_resultï¼‰ï¼Œç„¶åå†é€šè¿‡
-	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
+	 *  3¡¢»ùÀà·½·¨ get_child »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØ¶ÔÏó(redis_result£©£¬È»ºóÔÙÍ¨¹ı
+	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
 	 *     get redis_result object with the given subscript, and get the
 	 *     element by redis_result::argv_to_string
-	 *  4ã€åŸºç±»æ–¹æ³• get_result æ–¹æ³•å–å¾—æ€»ç»“æœé›†å¯¹è±¡ redis_resultï¼Œç„¶åå†é€šè¿‡
-	 *     redis_result::get_child è·å¾—ä¸€ä¸ªå…ƒç´ å¯¹è±¡ï¼Œç„¶åå†é€šè¿‡æ–¹å¼ 2 ä¸­æŒ‡å®š
-	 *     çš„æ–¹æ³•è·å¾—è¯¥å…ƒç´ çš„æ•°æ®
+	 *  4¡¢»ùÀà·½·¨ get_result ·½·¨È¡µÃ×Ü½á¹û¼¯¶ÔÏó redis_result£¬È»ºóÔÙÍ¨¹ı
+	 *     redis_result::get_child »ñµÃÒ»¸öÔªËØ¶ÔÏó£¬È»ºóÔÙÍ¨¹ı·½Ê½ 2 ÖĞÖ¸¶¨
+	 *     µÄ·½·¨»ñµÃ¸ÃÔªËØµÄÊı¾İ
 	 *     get redis_result object by redis_command::get_result, and get
 	 *     the first element by redis_result::get_child, then get the
 	 *     element by the way same as the way 2 above.
-	 *  5ã€åŸºç±»æ–¹æ³• get_children è·å¾—ç»“æœå…ƒç´ æ•°ç»„å¯¹è±¡ï¼Œå†é€šè¿‡ redis_result ä¸­
-	 *     çš„æ–¹æ³• argv_to_string ä»æ¯ä¸€ä¸ªå…ƒç´ å¯¹è±¡ä¸­è·å¾—å…ƒç´ æ•°æ®
+	 *  5¡¢»ùÀà·½·¨ get_children »ñµÃ½á¹ûÔªËØÊı×é¶ÔÏó£¬ÔÙÍ¨¹ı redis_result ÖĞ
+	 *     µÄ·½·¨ argv_to_string ´ÓÃ¿Ò»¸öÔªËØ¶ÔÏóÖĞ»ñµÃÔªËØÊı¾İ
 	 *     get child array by redis_command::get_children, and get the
 	 *     element from one of redis_result array by argv_to_string
 	 */
@@ -188,15 +188,15 @@ public:
 		std::vector<string>* members);
 
 	/**
-	 * è¿”å›ä¸€ä¸ªé›†åˆçš„å…¨éƒ¨æˆå‘˜ï¼Œè¯¥é›†åˆæ˜¯æ‰€æœ‰ç»™å®šé›†åˆçš„äº¤é›†
+	 * ·µ»ØÒ»¸ö¼¯ºÏµÄÈ«²¿³ÉÔ±£¬¸Ã¼¯ºÏÊÇËùÓĞ¸ø¶¨¼¯ºÏµÄ½»¼¯
 	 * return the members of a set resulting from the intersection of
 	 * all the give sets.
-	 * @param members {std::vector<string>*} éç©ºæ—¶å­˜å‚¨ç»“æœé›†
+	 * @param members {std::vector<string>*} ·Ç¿ÕÊ±´æ´¢½á¹û¼¯
 	 *  if not NULL, it will store the result
-	 * @param first_key {const char*} ç¬¬ä¸€ä¸ªé›†åˆå¯¹è±¡ keyï¼ˆéNULLï¼‰
+	 * @param first_key {const char*} µÚÒ»¸ö¼¯ºÏ¶ÔÏó key£¨·ÇNULL£©
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  the last one must be NULL in the set list.
-	 * @return {int} ç»“æœé›†æ•°é‡ï¼Œè¿”å› -1 è¡¨ç¤ºå‡ºé”™æˆ–æœ‰ä¸€ä¸ª key éé›†åˆå¯¹è±¡
+	 * @return {int} ½á¹û¼¯ÊıÁ¿£¬·µ»Ø -1 ±íÊ¾³ö´í»òÓĞÒ»¸ö key ·Ç¼¯ºÏ¶ÔÏó
 	 *  return the number of the members, -1 if error happened or
 	 *  it't not a set by the key.
 	 */
@@ -207,15 +207,15 @@ public:
 		std::vector<string>* members);
 
 	/**
-	 * è¿”å›ä¸€ä¸ªé›†åˆçš„å…¨éƒ¨æˆå‘˜ï¼Œè¯¥é›†åˆæ˜¯æ‰€æœ‰ç»™å®šé›†åˆçš„å¹¶é›†
+	 * ·µ»ØÒ»¸ö¼¯ºÏµÄÈ«²¿³ÉÔ±£¬¸Ã¼¯ºÏÊÇËùÓĞ¸ø¶¨¼¯ºÏµÄ²¢¼¯
 	 * return the members of a set resulting from the union of all the
 	 * given sets.
-	 * @param members {std::vector<string>*} éç©ºæ—¶å­˜å‚¨ç»“æœé›†
+	 * @param members {std::vector<string>*} ·Ç¿ÕÊ±´æ´¢½á¹û¼¯
 	 *  if not NULL, it will store the result
-	 * @param first_key {const char*} ç¬¬ä¸€ä¸ªé›†åˆå¯¹è±¡ keyï¼ˆéNULLï¼‰
+	 * @param first_key {const char*} µÚÒ»¸ö¼¯ºÏ¶ÔÏó key£¨·ÇNULL£©
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  and the last arg must be NULL indicating the end of the set list.
-	 * @return {int} ç»“æœé›†æ•°é‡ï¼Œè¿”å› -1 è¡¨ç¤ºå‡ºé”™æˆ–æœ‰ä¸€ä¸ª key éé›†åˆå¯¹è±¡
+	 * @return {int} ½á¹û¼¯ÊıÁ¿£¬·µ»Ø -1 ±íÊ¾³ö´í»òÓĞÒ»¸ö key ·Ç¼¯ºÏ¶ÔÏó
 	 *  return the number of members, -1 if error happened or it's not
 	 *  a set by the key.
 	 */
@@ -226,15 +226,15 @@ public:
 		std::vector<string>* members);
 
 	/**
-	 * è¿™ä¸ªå‘½ä»¤çš„ä½œç”¨å’Œ SDIFF ç±»ä¼¼ï¼Œä½†å®ƒå°†ç»“æœä¿å­˜åˆ° dst é›†åˆï¼Œè€Œä¸æ˜¯ç®€å•åœ°è¿”å›ç»“æœé›†
+	 * Õâ¸öÃüÁîµÄ×÷ÓÃºÍ SDIFF ÀàËÆ£¬µ«Ëü½«½á¹û±£´æµ½ dst ¼¯ºÏ£¬¶ø²»ÊÇ¼òµ¥µØ·µ»Ø½á¹û¼¯
 	 * This command is equal to SDIFF, but instead of returning
 	 * the resulting set, it is stored in destination.
-	 * @param dst {const char*} ç›®æ ‡é›†åˆå¯¹è±¡é”®å€¼
+	 * @param dst {const char*} Ä¿±ê¼¯ºÏ¶ÔÏó¼üÖµ
 	 *  the key of the destination set
-	 * @param first_key {const char*} ç¬¬ä¸€ä¸ªéç©ºçš„é›†åˆå¯¹è±¡é”®å€¼
+	 * @param first_key {const char*} µÚÒ»¸ö·Ç¿ÕµÄ¼¯ºÏ¶ÔÏó¼üÖµ
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  and the last arg must be NULL indicating the end of the set list. 
-	 * @return {int} ç»“æœé›†ä¸­çš„æˆå‘˜æ•°é‡
+	 * @return {int} ½á¹û¼¯ÖĞµÄ³ÉÔ±ÊıÁ¿
 	 *  return the number of members, -1 if error happened or it's not
 	 *  a set by the key.
 	 */
@@ -243,15 +243,15 @@ public:
 	int sdiffstore(const char* dst, const std::vector<string>& keys);
 
 	/**
-	 * è¿™ä¸ªå‘½ä»¤ç±»ä¼¼äº SINTER å‘½ä»¤ï¼Œä½†å®ƒå°†ç»“æœä¿å­˜åˆ° dst é›†åˆï¼Œè€Œä¸æ˜¯ç®€å•åœ°è¿”å›ç»“æœé›†
+	 * Õâ¸öÃüÁîÀàËÆÓÚ SINTER ÃüÁî£¬µ«Ëü½«½á¹û±£´æµ½ dst ¼¯ºÏ£¬¶ø²»ÊÇ¼òµ¥µØ·µ»Ø½á¹û¼¯
 	 * This command is equal to SINTER, but instead of returning
 	 * the resulting set, it is stored in destination.
-	 * @param dst {const char*} ç›®æ ‡é›†åˆå¯¹è±¡é”®å€¼
+	 * @param dst {const char*} Ä¿±ê¼¯ºÏ¶ÔÏó¼üÖµ
 	 *  the key of the destination set
-	 * @param first_key {const char*} ç¬¬ä¸€ä¸ªéç©ºçš„é›†åˆå¯¹è±¡é”®å€¼
+	 * @param first_key {const char*} µÚÒ»¸ö·Ç¿ÕµÄ¼¯ºÏ¶ÔÏó¼üÖµ
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  and the last arg must be NULL indicating the end of the set list.
-	 * @return {int} ç»“æœé›†ä¸­çš„æˆå‘˜æ•°é‡
+	 * @return {int} ½á¹û¼¯ÖĞµÄ³ÉÔ±ÊıÁ¿
 	 *  return the number of members, -1 if error happened or it's not
 	 *  a set by the key.
 	 */
@@ -260,15 +260,15 @@ public:
 	int sinterstore(const char* dst, const std::vector<string>& keys);
 
 	/**
-	 * è¿™ä¸ªå‘½ä»¤ç±»ä¼¼äº SUNION å‘½ä»¤ï¼Œä½†å®ƒå°†ç»“æœä¿å­˜åˆ° dst é›†åˆï¼Œè€Œä¸æ˜¯ç®€å•åœ°è¿”å›ç»“æœé›†
+	 * Õâ¸öÃüÁîÀàËÆÓÚ SUNION ÃüÁî£¬µ«Ëü½«½á¹û±£´æµ½ dst ¼¯ºÏ£¬¶ø²»ÊÇ¼òµ¥µØ·µ»Ø½á¹û¼¯
 	 * This command is equal to SUNION, but instead of returning
 	 * the resulting set, it is stored in destination.
-	 * @param dst {const char*} ç›®æ ‡é›†åˆå¯¹è±¡é”®å€¼
+	 * @param dst {const char*} Ä¿±ê¼¯ºÏ¶ÔÏó¼üÖµ
 	 *  the key of the destination set
-	 * @param first_key {const char*} ç¬¬ä¸€ä¸ªéç©ºçš„é›†åˆå¯¹è±¡é”®å€¼
+	 * @param first_key {const char*} µÚÒ»¸ö·Ç¿ÕµÄ¼¯ºÏ¶ÔÏó¼üÖµ
 	 *  the key of the first set in a variable set list, which isn't NULL,
 	 *  and the last arg must be NULL indicating the end of the set list.
-	 * @return {int} ç»“æœé›†ä¸­çš„æˆå‘˜æ•°é‡
+	 * @return {int} ½á¹û¼¯ÖĞµÄ³ÉÔ±ÊıÁ¿
 	 *  return the number of members, -1 if error happened or it's not
 	 *  a set by the key.
 	 */
@@ -277,14 +277,14 @@ public:
 	int sunionstore(const char* dst, const std::vector<string>& keys);
 
 	/**
-	 * åˆ¤æ–­ member å…ƒç´ æ˜¯å¦é›†åˆ key çš„æˆå‘˜
+	 * ÅĞ¶Ï member ÔªËØÊÇ·ñ¼¯ºÏ key µÄ³ÉÔ±
 	 * determine if a given value is a member of a set
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®å€¼
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼üÖµ
 	 *  the key of a set
-	 * @param member {const char*} ç»™å®šå€¼
+	 * @param member {const char*} ¸ø¶¨Öµ
 	 *  the given value
-	 * @return {bool} è¿”å› true è¡¨ç¤ºæ˜¯ï¼Œå¦åˆ™å¯èƒ½æ˜¯å› ä¸ºä¸æ˜¯æˆ–å‡ºé”™æˆ–è¯¥ key å¯¹è±¡
-	 *  éé›†åˆå¯¹è±¡
+	 * @return {bool} ·µ»Ø true ±íÊ¾ÊÇ£¬·ñÔò¿ÉÄÜÊÇÒòÎª²»ÊÇ»ò³ö´í»ò¸Ã key ¶ÔÏó
+	 *  ·Ç¼¯ºÏ¶ÔÏó
 	 *  true if the given is a member of the set, false if it's not a
 	 *  member of the set, or error, or it's not a set by the key.
 	 */
@@ -292,14 +292,14 @@ public:
 	bool sismember(const char* key, const char* member, size_t len);
 
 	/**
-	 * å¦‚æœå‘½ä»¤æ‰§è¡Œæ—¶ï¼Œåªæä¾›äº† key å‚æ•°ï¼Œé‚£ä¹ˆè¿”å›é›†åˆä¸­çš„ä¸€ä¸ªéšæœºå…ƒç´ ï¼Œå¦‚æœè¿˜åŒæ—¶æŒ‡å®š
-	 * äº†å…ƒç´ ä¸ªæ•°ï¼Œåˆ™ä¼šè¿”å›ä¸€ä¸ªä¸è¶…è¿‡è¯¥ä¸ªæ•°é™åˆ¶çš„ç»“æœé›†
+	 * Èç¹ûÃüÁîÖ´ĞĞÊ±£¬Ö»Ìá¹©ÁË key ²ÎÊı£¬ÄÇÃ´·µ»Ø¼¯ºÏÖĞµÄÒ»¸öËæ»úÔªËØ£¬Èç¹û»¹Í¬Ê±Ö¸¶¨
+	 * ÁËÔªËØ¸öÊı£¬Ôò»á·µ»ØÒ»¸ö²»³¬¹ı¸Ã¸öÊıÏŞÖÆµÄ½á¹û¼¯
 	 * get one or multiple memebers from a set
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®å€¼
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼üÖµ
 	 *  the key of a set
-	 * @param out å­˜å‚¨ç»“æœæˆ–ç»“æœé›†
+	 * @param out ´æ´¢½á¹û»ò½á¹û¼¯
 	 *  store the result
-	 * @return {int} ç»“æœçš„ä¸ªæ•°ï¼Œä¸º -1 è¡¨ç¤ºå‡ºé”™ï¼Œ0 è¡¨ç¤ºæ²¡æœ‰æˆå‘˜
+	 * @return {int} ½á¹ûµÄ¸öÊı£¬Îª -1 ±íÊ¾³ö´í£¬0 ±íÊ¾Ã»ÓĞ³ÉÔ±
 	 *  the number of members, 0 if the set by the key is empty,
 	 *  -1 if error happened.
 	 */
@@ -307,17 +307,17 @@ public:
 	int srandmember(const char* key, size_t n, std::vector<string>& out);
 
 	/**
-	 * ç§»é™¤é›†åˆ key ä¸­çš„ä¸€ä¸ªæˆ–å¤šä¸ª member å…ƒç´ ï¼Œä¸å­˜åœ¨çš„ member å…ƒç´ ä¼šè¢«å¿½ç•¥
+	 * ÒÆ³ı¼¯ºÏ key ÖĞµÄÒ»¸ö»ò¶à¸ö member ÔªËØ£¬²»´æÔÚµÄ member ÔªËØ»á±»ºöÂÔ
 	 * Remove the specified members from the set stored at key. if the
 	 * member doesn't exist, it will be ignored.
-	 * @param key {const char*} é›†åˆå¯¹è±¡çš„é”®å€¼
+	 * @param key {const char*} ¼¯ºÏ¶ÔÏóµÄ¼üÖµ
 	 *  the key of the set
-	 * @param first_member {const char*} éœ€è¦è¢«ç§»é™¤çš„æˆå‘˜åˆ—è¡¨çš„ç¬¬ä¸€ä¸ªé NULLæˆå‘˜ï¼Œ
-	 *  åœ¨å˜å‚çš„è¾“å…¥ä¸­éœ€è¦å°†æœ€åä¸€ä¸ªå˜å‚å†™ NULL
+	 * @param first_member {const char*} ĞèÒª±»ÒÆ³ıµÄ³ÉÔ±ÁĞ±íµÄµÚÒ»¸ö·Ç NULL³ÉÔ±£¬
+	 *  ÔÚ±ä²ÎµÄÊäÈëÖĞĞèÒª½«×îºóÒ»¸ö±ä²ÎĞ´ NULL
 	 *  the first non-NULL member to be removed in a variable member list,
 	 *  and the last one must be NULL indicating the end of the list.
-	 * @retur {int} è¢«ç§»é™¤çš„æˆå‘˜å…ƒç´ çš„ä¸ªæ•°ï¼Œå½“å‡ºé”™æˆ–éé›†åˆå¯¹è±¡æ—¶è¿”å› -1ï¼›å½“ key ä¸
-	 *  å­˜åœ¨æˆ–æˆå‘˜ä¸å­˜åœ¨æ—¶è¿”å› 0
+	 * @retur {int} ±»ÒÆ³ıµÄ³ÉÔ±ÔªËØµÄ¸öÊı£¬µ±³ö´í»ò·Ç¼¯ºÏ¶ÔÏóÊ±·µ»Ø -1£»µ± key ²»
+	 *  ´æÔÚ»ò³ÉÔ±²»´æÔÚÊ±·µ»Ø 0
 	 *  the number of members be removed, 0 if the set is empty or the
 	 *  key doesn't exist, -1 if error happened or it's not a set by key
 	 */
@@ -328,27 +328,27 @@ public:
 		size_t lens[], size_t argc);
 
 	/**
-	 * å‘½ä»¤ç”¨äºè¿­ä»£å½“å‰æ•°æ®åº“ä¸­çš„æ•°æ®åº“é”®
+	 * ÃüÁîÓÃÓÚµü´úµ±Ç°Êı¾İ¿âÖĞµÄÊı¾İ¿â¼ü
 	 * scan the members in a set stored at key
-	 * @param key {const char*} å“ˆå¸Œé”®å€¼
+	 * @param key {const char*} ¹şÏ£¼üÖµ
 	 *  the key of a set
-	 * @param cursor {int} æ¸¸æ ‡å€¼ï¼Œå¼€å§‹éå†æ—¶è¯¥å€¼å†™ 0
+	 * @param cursor {int} ÓÎ±êÖµ£¬¿ªÊ¼±éÀúÊ±¸ÃÖµĞ´ 0
 	 *  the cursor value, which is 0 at begin
-	 * @param out {std::vector<string>&} å­˜å‚¨ç»“æœé›†ï¼Œå†…éƒ¨ä»¥è¿½åŠ æ–¹å¼å°†æœ¬æ¬¡éå†
-	 *  ç»“æœé›†åˆæ·»åŠ è¿›è¯¥æ•°ç»„ä¸­ï¼Œä¸ºé˜²æ­¢å› æ€»ç»“æœé›†è¿‡å¤§å¯¼è‡´è¯¥æ•°ç»„æº¢å‡ºï¼Œç”¨æˆ·å¯åœ¨è°ƒç”¨æœ¬
-	 *  å‡½æ•°å‰åæ¸…ç†è¯¥æ•°ç»„å¯¹è±¡
+	 * @param out {std::vector<string>&} ´æ´¢½á¹û¼¯£¬ÄÚ²¿ÒÔ×·¼Ó·½Ê½½«±¾´Î±éÀú
+	 *  ½á¹û¼¯ºÏÌí¼Ó½ø¸ÃÊı×éÖĞ£¬Îª·ÀÖ¹Òò×Ü½á¹û¼¯¹ı´óµ¼ÖÂ¸ÃÊı×éÒç³ö£¬ÓÃ»§¿ÉÔÚµ÷ÓÃ±¾
+	 *  º¯ÊıÇ°ºóÇåÀí¸ÃÊı×é¶ÔÏó
 	 *  store result in appending mode.
-	 * @param pattern {const char*} åŒ¹é…æ¨¡å¼ï¼Œglob é£æ ¼ï¼Œéç©ºæ—¶æœ‰æ•ˆ
+	 * @param pattern {const char*} Æ¥ÅäÄ£Ê½£¬glob ·ç¸ñ£¬·Ç¿ÕÊ±ÓĞĞ§
 	 *  match pattern, effective only on no-NULL
-	 * @param count {const size_t*} é™å®šçš„ç»“æœé›†æ•°é‡ï¼Œéç©ºæŒ‡é’ˆæ—¶æœ‰æ•ˆ
+	 * @param count {const size_t*} ÏŞ¶¨µÄ½á¹û¼¯ÊıÁ¿£¬·Ç¿ÕÖ¸ÕëÊ±ÓĞĞ§
 	 *  the max count of one scan process, effective only on no-NULL
-	 * @return {int} ä¸‹ä¸€ä¸ªæ¸¸æ ‡ä½ç½®ï¼Œå«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ÏÂÒ»¸öÓÎ±êÎ»ÖÃ£¬º¬ÒåÈçÏÂ£º
 	 *  return the next cursor position, as below:
-	 *   0ï¼šéå†ç»“æŸ
+	 *   0£º±éÀú½áÊø
 	 *     scan finish
-	 *  -1: å‡ºé”™
+	 *  -1: ³ö´í
 	 *     some error happened
-	 *  >0: æ¸¸æ ‡çš„ä¸‹ä¸€ä¸ªä½ç½®ï¼Œå³ä½¿è¿™æ ·ï¼Œå…·ä½“æœ‰å¤šå°‘ç»“æœè¿˜éœ€è¦æ£€æŸ¥ outï¼Œå› ä¸ºæœ‰å¯èƒ½ä¸ºç©º
+	 *  >0: ÓÎ±êµÄÏÂÒ»¸öÎ»ÖÃ£¬¼´Ê¹ÕâÑù£¬¾ßÌåÓĞ¶àÉÙ½á¹û»¹ĞèÒª¼ì²é out£¬ÒòÎªÓĞ¿ÉÄÜÎª¿Õ
 	 *     the next cursor postion to scan
 	 */
 	int sscan(const char* key, int cursor, std::vector<string>& out,

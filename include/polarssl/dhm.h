@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file dhm.h
  *
  * \brief Diffie-Hellman-Merkle key exchange

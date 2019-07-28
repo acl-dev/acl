@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <map>
 #include "../stdlib/string.hpp"
@@ -17,18 +17,18 @@ public:
 	~mysql_manager();
 
 	/**
-	 * æ·»åŠ ä¸€ä¸ªæ•°æ®åº“å®ä¾‹æ–¹æ³•ä¸€
-	 * @param dbaddr {const char*} mysql æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORTï¼Œ
-	 *  åœ¨ UNIX å¹³å°ä¸‹å¯ä»¥ä¸º UNIX åŸŸå¥—æ¥å£
-	 * @param dbname {const char*} æ•°æ®åº“å
-	 * @param dbuser {const char*} æ•°æ®åº“ç”¨æˆ·
-	 * @param dbpass {const char*} æ•°æ®åº“ç”¨æˆ·å¯†ç 
-	 * @param dblimit {size_t} æ•°æ®åº“è¿æ¥æ± çš„æœ€å¤§è¿æ¥æ•°é™åˆ¶
-	 * @param dbflags {unsigned long} mysql æ ‡è®°ä½
-	 * @param auto_commit {bool} æ˜¯å¦è‡ªåŠ¨æäº¤
-	 * @param conn_timeout {int} è¿æ¥æ•°æ®åº“è¶…æ—¶æ—¶é—´(ç§’)
-	 * @param rw_timeout {int} ä¸æ•°æ®åº“é€šä¿¡æ—¶çš„IOæ—¶é—´(ç§’)
-	 * @param charset {const char*} è¿æ¥æ•°æ®åº“æ—¶çš„å­—ç¬¦é›†
+	 * Ìí¼ÓÒ»¸öÊı¾İ¿âÊµÀı·½·¨Ò»
+	 * @param dbaddr {const char*} mysql ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºIP:PORT£¬
+	 *  ÔÚ UNIX Æ½Ì¨ÏÂ¿ÉÒÔÎª UNIX ÓòÌ×½Ó¿Ú
+	 * @param dbname {const char*} Êı¾İ¿âÃû
+	 * @param dbuser {const char*} Êı¾İ¿âÓÃ»§
+	 * @param dbpass {const char*} Êı¾İ¿âÓÃ»§ÃÜÂë
+	 * @param dblimit {size_t} Êı¾İ¿âÁ¬½Ó³ØµÄ×î´óÁ¬½ÓÊıÏŞÖÆ
+	 * @param dbflags {unsigned long} mysql ±ê¼ÇÎ»
+	 * @param auto_commit {bool} ÊÇ·ñ×Ô¶¯Ìá½»
+	 * @param conn_timeout {int} Á¬½ÓÊı¾İ¿â³¬Ê±Ê±¼ä(Ãë)
+	 * @param rw_timeout {int} ÓëÊı¾İ¿âÍ¨ĞÅÊ±µÄIOÊ±¼ä(Ãë)
+	 * @param charset {const char*} Á¬½ÓÊı¾İ¿âÊ±µÄ×Ö·û¼¯
 	 * @return {mysql_manager&}
 	 */
 	mysql_manager& add(const char* dbaddr, const char* dbname,
@@ -38,7 +38,7 @@ public:
 		int rw_timeout = 60, const char* charset = "utf8");
 
 	/**
-	 * æ·»åŠ ä¸€ä¸ªæ•°æ®åº“å®ä¾‹æ–¹æ³•äºŒ
+	 * Ìí¼ÓÒ»¸öÊı¾İ¿âÊµÀı·½·¨¶ş
 	 * @param conf {const mysql_conf&}
 	 * @return {mysql_manager&}
 	 */
@@ -46,16 +46,16 @@ public:
 
 protected:
 	/**
-	 * åŸºç±» connect_manager è™šå‡½æ•°çš„å®ç°
-	 * @param addr {const char*} æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šip:port
-	 * @param count {size_t} è¿æ¥æ± çš„å¤§å°é™åˆ¶ï¼Œè¯¥å€¼ä¸º 0 æ—¶åˆ™æ²¡æœ‰é™åˆ¶
-	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹)
-	 * @return {connect_pool*} è¿”å›åˆ›å»ºçš„è¿æ¥æ± å¯¹è±¡
+	 * »ùÀà connect_manager Ğéº¯ÊıµÄÊµÏÖ
+	 * @param addr {const char*} ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½£ºip:port
+	 * @param count {size_t} Á¬½Ó³ØµÄ´óĞ¡ÏŞÖÆ£¬¸ÃÖµÎª 0 Ê±ÔòÃ»ÓĞÏŞÖÆ
+	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼)
+	 * @return {connect_pool*} ·µ»Ø´´½¨µÄÁ¬½Ó³Ø¶ÔÏó
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	time_t idle_ttl_;       // æ•°æ®åº“è¿æ¥çš„ç©ºé—²è¿‡æœŸæ—¶é—´
+	time_t idle_ttl_;       // Êı¾İ¿âÁ¬½ÓµÄ¿ÕÏĞ¹ıÆÚÊ±¼ä
 	std::map<string, mysql_conf*> dbs_;
 };
 

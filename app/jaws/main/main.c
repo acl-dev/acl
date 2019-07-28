@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "service_conf.h"
@@ -58,7 +58,7 @@ static void run_loop(ACL_AIO *aio, const char *listen_addr)
 		ACL_AIO_CTL_LISTEN_FN, listen_callback,
 		ACL_AIO_CTL_END);
 	acl_aio_listen(astream);
-	/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
+	/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
 	acl_aio_request_timer(aio, gc_timer, aio, 2, 1);
 
 	while (1) {
@@ -136,10 +136,10 @@ static ACL_AIO *init(const char *procname, int use_slice, int open_log acl_unuse
 	else
 		var_mem_slice = NULL;
 
-	/* åˆå§‹åŒ– acl åº“ */
+	/* ³õÊ¼»¯ acl ¿â */
 	acl_init();
 
-	/* åŠ è½½é…ç½®æ–‡ä»¶ */
+	/* ¼ÓÔØÅäÖÃÎÄ¼ş */
 	cfg = acl_xinetd_cfg_load(conf);
 	if (cfg == NULL)
 		acl_msg_warn("load cfg(%s) error(%s)",

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "rpc_manager.h"
 
 rpc_manager::rpc_manager()
@@ -18,9 +18,9 @@ void rpc_manager::init(acl::aio_handle* handle, int max_threads /* = 10 */,
 {
 	handle_ = handle;
 
-	// åˆ›å»º rpc æœåŠ¡å¯¹è±¡
+	// ´´½¨ rpc ·þÎñ¶ÔÏó
 	service_ = new acl::rpc_service(max_threads);
-	// æ‰“å¼€æ¶ˆæ¯æœåŠ¡
+	// ´ò¿ªÏûÏ¢·þÎñ
 	if (service_->open(handle_, rpc_addr) == false)
 		logger_fatal("open service error: %s", acl::last_serror());
 }

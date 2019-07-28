@@ -1,7 +1,7 @@
-ï»¿#ifndef	__SERVICE_CONF_INCLUDE_H__
+#ifndef	__SERVICE_CONF_INCLUDE_H__
 #define	__SERVICE_CONF_INCLUDE_H__
 
-/* é…ç½®æ–‡ä»¶é¡¹ */
+/* ÅäÖÃÎÄ¼şÏî */
 /* in service_main.c */
 
 extern int   var_cfg_debug_mem;

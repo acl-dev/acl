@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "pthread_patch.h"
 #include "init.h"
 

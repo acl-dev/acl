@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <assert.h>
 #ifdef ACL_MS_WINDOWS
 #include <process.h>

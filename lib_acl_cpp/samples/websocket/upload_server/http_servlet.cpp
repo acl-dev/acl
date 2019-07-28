@@ -1,10 +1,10 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "acl_cpp/http/websocket.hpp"
 #include "http_servlet.h"
 
 http_servlet::http_servlet(acl::redis_client_cluster& cluster, size_t max_conns)
 {
-	// åˆ›å»º session å­˜å‚¨å¯¹è±¡
+	// ´´½¨ session ´æ´¢¶ÔÏó
 	session_ = new acl::redis_session(cluster, max_conns);
 }
 
@@ -18,11 +18,11 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (res.sendHeader() == false)
 		return false;
 
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	(void) res.getOutputStream().write(buf);
@@ -34,10 +34,10 @@ bool http_servlet::doUnknown(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// å‘é€ http å“åº”å¤´
+	// ·¢ËÍ http ÏìÓ¦Í·
 	if (res.sendHeader() == false)
 		return false;
-	// å‘é€ http å“åº”ä½“
+	// ·¢ËÍ http ÏìÓ¦Ìå
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -53,9 +53,9 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
-		.setContentEncoding(true)		// è®¾ç½®æ˜¯å¦å‹ç¼©æ•°æ®
-		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
+	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
+		.setContentEncoding(true)		// ÉèÖÃÊÇ·ñÑ¹ËõÊı¾İ
+		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
 
 	const char* ip = req.getLocalAddr();
 	if (ip == NULL || *ip == 0)
@@ -87,8 +87,8 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	buf << "<script>g_url='ws://" << local_addr << "/'</script>";
 
-	// å‘é€ http å“åº”ä½“ï¼Œå› ä¸ºè®¾ç½®äº† chunk ä¼ è¾“æ¨¡å¼ï¼Œæ‰€ä»¥éœ€è¦å¤šè°ƒç”¨ä¸€æ¬¡
-	// res.write ä¸”ä¸¤ä¸ªå‚æ•°å‡ä¸º 0 ä»¥è¡¨ç¤º chunk ä¼ è¾“æ•°æ®ç»“æŸ
+	// ·¢ËÍ http ÏìÓ¦Ìå£¬ÒòÎªÉèÖÃÁË chunk ´«ÊäÄ£Ê½£¬ËùÒÔĞèÒª¶àµ÷ÓÃÒ»´Î
+	// res.write ÇÒÁ½¸ö²ÎÊı¾ùÎª 0 ÒÔ±íÊ¾ chunk ´«ÊäÊı¾İ½áÊø
 	return res.write(buf) && res.write(NULL, 0);
 }
 

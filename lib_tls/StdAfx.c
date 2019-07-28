@@ -1,1 +1,1 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"

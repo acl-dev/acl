@@ -1,4 +1,4 @@
-﻿#ifndef	__PRIVATE_VSTREAM_INCLUDE_H__
+#ifndef	__PRIVATE_VSTREAM_INCLUDE_H__
 #define	__PRIVATE_VSTREAM_INCLUDE_H__
 
 #include "stdlib/acl_vstream.h"

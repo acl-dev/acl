@@ -1,4 +1,4 @@
-ï»¿// JawsCtrlDlg.h : å¤´æ–‡ä»¶
+// JawsCtrlDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
@@ -9,26 +9,26 @@
 #include "RegRun.h"
 #include "afxcmn.h"
 
-// CJawsCtrlDlg å¯¹è¯æ¡†
+// CJawsCtrlDlg ¶Ô»°¿ò
 class CJawsCtrlDlg : public CDialog
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	CJawsCtrlDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	CJawsCtrlDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_JAWSCTRL_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 	CTrayIcon m_trayIcon;
 
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

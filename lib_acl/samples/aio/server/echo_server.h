@@ -1,4 +1,4 @@
-﻿#ifndef	__AIO_ECHO_SERVER_INCLUDE_H__
+#ifndef	__AIO_ECHO_SERVER_INCLUDE_H__
 #define	__AIO_ECHO_SERVER_INCLUDE_H__
 
 #include "lib_acl.h"

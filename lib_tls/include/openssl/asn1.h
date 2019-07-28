@@ -1,4 +1,4 @@
-﻿/* crypto/asn1/asn1.h */
+/* crypto/asn1/asn1.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

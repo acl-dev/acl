@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <string.h>
 #include "http/lib_http_struct.h"
 #include "http/lib_http.h"
@@ -212,13 +212,13 @@ int http_util_req_open(HTTP_UTIL *http_util)
 	const char *myname = "http_util_req_open";
 	int   ret;
 
-	/* è¿žæŽ¥è¿œç¨‹ http æœåŠ¡å™¨ */
+	/* Á¬½ÓÔ¶³Ì http ·þÎñÆ÷ */
 
 	http_util->stream = acl_vstream_connect(http_util->server_addr,
-			ACL_BLOCKING /* é‡‡ç”¨é˜»å¡žæ–¹å¼ */,
-			http_util->conn_timeout /* è¿žæŽ¥è¶…æ—¶æ—¶é—´ */,
-			http_util->rw_timeout /* ç½‘ç»œ IO æ“ä½œè¶…æ—¶æ—¶é—´ */,
-			4096 /* stream æµç¼“å†²åŒºå¤§å°ä¸º 4096 å­—èŠ‚ */);
+			ACL_BLOCKING /* ²ÉÓÃ×èÈû·½Ê½ */,
+			http_util->conn_timeout /* Á¬½Ó³¬Ê±Ê±¼ä */,
+			http_util->rw_timeout /* ÍøÂç IO ²Ù×÷³¬Ê±Ê±¼ä */,
+			4096 /* stream Á÷»º³åÇø´óÐ¡Îª 4096 ×Ö½Ú */);
 	if (http_util->stream == NULL) {
 		acl_msg_error("%s(%d): connect %s error(%s)",
 			myname, __LINE__, http_util->server_addr,
@@ -226,11 +226,11 @@ int http_util_req_open(HTTP_UTIL *http_util)
 		return (-1);
 	}
 
-	/* æž„å»º HTTP è¯·æ±‚å¤´æ•°æ® */
+	/* ¹¹½¨ HTTP ÇëÇóÍ·Êý¾Ý */
 
 	http_hdr_build_request(http_util->hdr_req, http_util->req_buf);
 
-	/* å‘ HTTP æœåŠ¡å™¨å‘é€è¯·æ±‚ */
+	/* Ïò HTTP ·þÎñÆ÷·¢ËÍÇëÇó */
 
 	ret = acl_vstream_writen(http_util->stream,
 			acl_vstring_str(http_util->req_buf),
@@ -264,7 +264,7 @@ int http_util_get_res_hdr(HTTP_UTIL *http_util)
 	const char *myname = "http_util_get_res_hdr";
 	int   ret;
 
-	/* è¯»å– HTTP æœåŠ¡å™¨å“åº”å¤´*/
+	/* ¶ÁÈ¡ HTTP ·þÎñÆ÷ÏìÓ¦Í·*/
 
 	ret = http_hdr_res_get_sync(http_util->hdr_res,
 			http_util->stream, http_util->rw_timeout);
@@ -354,7 +354,7 @@ int http_util_get_res_body(HTTP_UTIL *http_util, char *buf, size_t size)
 
 	if (acl_vstream_writen(http_util->dump_stream, buf, ret) == ACL_VSTREAM_EOF)
 	{
-		/* å¦‚æžœæœ‰ä¸€æ¬¡ä¸èƒ½è½¬å‚¨æ•°æ®è‡³æ–‡ä»¶æˆ–æµåˆ™å…³é—­è¯¥åŠŸèƒ½ä¸å†è¿›è¡Œè½¬å‚¨ */
+		/* Èç¹ûÓÐÒ»´Î²»ÄÜ×ª´¢Êý¾ÝÖÁÎÄ¼þ»òÁ÷Ôò¹Ø±Õ¸Ã¹¦ÄÜ²»ÔÙ½øÐÐ×ª´¢ */
 
 		acl_msg_error("%s(%d): dump to stream(%s) error(%s)",
 			myname, __LINE__, ACL_VSTREAM_PATH(http_util->dump_stream),

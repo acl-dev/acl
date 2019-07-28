@@ -1,9 +1,9 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "logger_servlet.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 char *var_cfg_str;
 acl::master_str_tbl var_conf_str_tab[] = {

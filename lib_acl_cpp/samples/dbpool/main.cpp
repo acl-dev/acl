@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 using namespace acl;
 
@@ -9,7 +9,7 @@ int main(void)
 
 	std::list<db_handle*> dbs;
 
-	// 璁剧疆绌洪棽杩炴帴鐨勭敓瀛樺懆鏈�
+	// 设置空闲连接的生存周期
 	dp->set_idle(1);
 	for (int i = 0; i < 10; i++)
 	{

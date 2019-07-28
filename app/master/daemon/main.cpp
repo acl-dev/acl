@@ -1,4 +1,4 @@
-﻿/* System libraries. */
+/* System libraries. */
 #include "stdafx.h"
 
 #include <stdio.h>

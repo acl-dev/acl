@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_VSTREAM_POPEN_INCLUDE_H
+#ifndef	ACL_VSTREAM_POPEN_INCLUDE_H
 #define	ACL_VSTREAM_POPEN_INCLUDE_H
 
 #ifdef	__cplusplus

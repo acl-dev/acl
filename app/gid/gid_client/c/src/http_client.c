@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 
 #include "lib_gid.h"
@@ -10,28 +10,28 @@ int http_client_post_request(ACL_VSTREAM *client, const char *url, int keepalive
 {
 	HTTP_HDR_REQ* hdr_req = http_hdr_req_create(url, "POST", "HTTP/1.1");
 	ACL_VSTRING* buf = acl_vstring_alloc(256);
-	struct iovec vector[2];  /* æ•°æ®æ•°ç»„ */
+	struct iovec vector[2];  /* Êı¾İÊı×é */
 	int   ret;
 
-	/* åœ¨è¯·æ±‚å¤´ä¸­è®¾ç½®è¯·æ±‚ä½“çš„æ•°æ®é•¿åº¦ */
+	/* ÔÚÇëÇóÍ·ÖĞÉèÖÃÇëÇóÌåµÄÊı¾İ³¤¶È */
 	http_hdr_put_int(&hdr_req->hdr, "Content-Length", len);
 	if (keepalive)
 		http_hdr_put_str(&hdr_req->hdr, "Connection", "keep-alive");
 	if (gid_fmt && *gid_fmt)
 		http_hdr_put_str(&hdr_req->hdr, "x-gid-format", gid_fmt);
-	http_hdr_build_request(hdr_req, buf);  /* æ„å»º HTTP è¯·æ±‚å¤´æ•°æ® */
+	http_hdr_build_request(hdr_req, buf);  /* ¹¹½¨ HTTP ÇëÇóÍ·Êı¾İ */
 
-	/* è®¾ç½® HTTP å¤´ */
+	/* ÉèÖÃ HTTP Í· */
 	vector[0].iov_base = acl_vstring_str(buf);
 	vector[0].iov_len = ACL_VSTRING_LEN(buf);
 
-	/* è®¾ç½® HTTP ä½“ */
+	/* ÉèÖÃ HTTP Ìå */
 	vector[1].iov_base = (char*) body;
 	vector[1].iov_len = len;
 
-	ret = acl_vstream_writevn(client, vector, 2);  /* å‘é€è¯·æ±‚å¤´åŠè¯·æ±‚ä½“ */
-	http_hdr_req_free(hdr_req);  /* é‡Šæ”¾ HTTP è¯·æ±‚å¤´å¯¹è±¡ */
-	acl_vstring_free(buf);  /* é‡Šæ”¾ç¼“å†²åŒº */
+	ret = acl_vstream_writevn(client, vector, 2);  /* ·¢ËÍÇëÇóÍ·¼°ÇëÇóÌå */
+	http_hdr_req_free(hdr_req);  /* ÊÍ·Å HTTP ÇëÇóÍ·¶ÔÏó */
+	acl_vstring_free(buf);  /* ÊÍ·Å»º³åÇø */
 
 	if (ret == ACL_VSTREAM_EOF) {
 		if (errnum)
@@ -39,7 +39,7 @@ int http_client_post_request(ACL_VSTREAM *client, const char *url, int keepalive
 		return -1;
 	}
 
-	/* å‘é€HTTPè¯·æ±‚æˆåŠŸ */
+	/* ·¢ËÍHTTPÇëÇó³É¹¦ */
 	return (0);
 }
 
@@ -53,15 +53,15 @@ int http_client_get_respond(ACL_VSTREAM* client, ACL_JSON *json,
 
 	acl_assert(json != NULL || xml != NULL);
 
-	hdr_res = http_hdr_res_new();  /* åˆ›å»ºHTTP å“åº”å¤´å¯¹è±¡ */
-	/* è¯»å– HTTP æœåŠ¡å™¨å“åº”å¤´ */
+	hdr_res = http_hdr_res_new();  /* ´´½¨HTTP ÏìÓ¦Í·¶ÔÏó */
+	/* ¶ÁÈ¡ HTTP ·şÎñÆ÷ÏìÓ¦Í· */
 	ret = http_hdr_res_get_sync(hdr_res, client, var_gid_rw_timeout);
 	if (ret < 0) {
-		http_hdr_res_free(hdr_res); /* é‡Šæ”¾ HTTP å“åº”å¤´å¯¹è±¡ */
+		http_hdr_res_free(hdr_res); /* ÊÍ·Å HTTP ÏìÓ¦Í·¶ÔÏó */
 		return -1;
 	}
-	/* è§£æ HTTP å“åº”å¤´ */
-	if (http_hdr_res_parse(hdr_res) < 0) {  /* è§£æå‡ºé”™ */
+	/* ½âÎö HTTP ÏìÓ¦Í· */
+	if (http_hdr_res_parse(hdr_res) < 0) {  /* ½âÎö³ö´í */
 		http_hdr_res_free(hdr_res);
 		return -1;
 	}
@@ -70,7 +70,7 @@ int http_client_get_respond(ACL_VSTREAM* client, ACL_JSON *json,
 	http_hdr_print(&hdr_res->hdr, "---respond---");
 	*/
 
-	/* éœ€è¦å…ˆæ ¹æ® HTTP å“åº”å¤´åˆ¤æ–­æ˜¯å¦æœ‰æ•°æ®ä½“ */
+	/* ĞèÒªÏÈ¸ù¾İ HTTP ÏìÓ¦Í·ÅĞ¶ÏÊÇ·ñÓĞÊı¾İÌå */
 	if (hdr_res->hdr.content_length == 0  ||
 		(hdr_res->hdr.content_length == -1 && !hdr_res->hdr.chunked  
 		&& hdr_res->reply_status > 300  && hdr_res->reply_status < 400)) 
@@ -78,9 +78,9 @@ int http_client_get_respond(ACL_VSTREAM* client, ACL_JSON *json,
 		http_hdr_res_free(hdr_res);
 		return 0;  
 	}
-	res = http_res_new(hdr_res);   /* åˆ›å»º HTTP å“åº”ä½“å¯¹è±¡ */
+	res = http_res_new(hdr_res);   /* ´´½¨ HTTP ÏìÓ¦Ìå¶ÔÏó */
 	while (1) {
-		/* è¯»æ•°æ®ä½“æ•°æ® */
+		/* ¶ÁÊı¾İÌåÊı¾İ */
 		ret = http_res_body_get_sync(res, client, buf, sizeof(buf) - 1);
 		if (ret <= 0)
 			break;
@@ -93,7 +93,7 @@ int http_client_get_respond(ACL_VSTREAM* client, ACL_JSON *json,
 			acl_vstring_strcat(dump, buf);
 	}
 
-	/* å› ä¸º res ä¸­å«æœ‰ hdr_res æ‰€ä»¥ä¼šä¸€åŒè¿ hdr_res é‡Šæ”¾ */
+	/* ÒòÎª res ÖĞº¬ÓĞ hdr_res ËùÒÔ»áÒ»Í¬Á¬ hdr_res ÊÍ·Å */
 	http_res_free(res);
 	return (0);
 }

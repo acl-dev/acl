@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
@@ -35,106 +35,106 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ç›‘è§†ä¸€ä¸ª(æˆ–å¤šä¸ª) key ï¼Œå¦‚æœåœ¨äº‹åŠ¡æ‰§è¡Œä¹‹å‰è¿™ä¸ª(æˆ–è¿™äº›) key è¢«å…¶ä»–å‘½ä»¤æ‰€æ”¹åŠ¨ï¼Œ
-	 * é‚£ä¹ˆäº‹åŠ¡å°†è¢«æ‰“æ–­
+	 * ¼àÊÓÒ»¸ö(»ò¶à¸ö) key £¬Èç¹ûÔÚÊÂÎñÖ´ĞĞÖ®Ç°Õâ¸ö(»òÕâĞ©) key ±»ÆäËûÃüÁîËù¸Ä¶¯£¬
+	 * ÄÇÃ´ÊÂÎñ½«±»´ò¶Ï
 	 * watch the given keys to determine execution of the MULTI/EXEC
 	 * block, before EXEC some of the given keys were changed outer,
 	 * the transaction will break
-	 * @param keys {const std::vector<string>&} key é›†åˆ
+	 * @param keys {const std::vector<string>&} key ¼¯ºÏ
 	 *  the given keys collection
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œå³ä½¿ key é›†åˆä¸­çš„æœ‰ key ä¸å­˜åœ¨ä¹Ÿä¼šè¿”å›æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬¼´Ê¹ key ¼¯ºÏÖĞµÄÓĞ key ²»´æÔÚÒ²»á·µ»Ø³É¹¦
 	 *  if success of this operation
 	 */
 	bool watch(const std::vector<string>& keys);
 
 	/**
-	 * å–æ¶ˆ WATCH å‘½ä»¤å¯¹æ‰€æœ‰ key çš„ç›‘è§†
+	 * È¡Ïû WATCH ÃüÁî¶ÔËùÓĞ key µÄ¼àÊÓ
 	 * forget about all watched keys
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 * if success of this operation
 	 */
 	bool unwatch(void);
 
 	/**
-	 * æ ‡è®°ä¸€ä¸ªäº‹åŠ¡å—çš„å¼€å§‹ï¼Œäº‹åŠ¡å—å†…çš„å¤šæ¡å‘½ä»¤ä¼šæŒ‰ç…§å…ˆåé¡ºåºè¢«æ”¾è¿›ä¸€ä¸ªé˜Ÿåˆ—å½“ä¸­ï¼Œ
-	 * æœ€åç”± EXEC å‘½ä»¤åŸå­æ€§(atomic)åœ°æ‰§è¡Œ
+	 * ±ê¼ÇÒ»¸öÊÂÎñ¿éµÄ¿ªÊ¼£¬ÊÂÎñ¿éÄÚµÄ¶àÌõÃüÁî»á°´ÕÕÏÈºóË³Ğò±»·Å½øÒ»¸ö¶ÓÁĞµ±ÖĞ£¬
+	 * ×îºóÓÉ EXEC ÃüÁîÔ­×ÓĞÔ(atomic)µØÖ´ĞĞ
 	 * mark the start of a transaction block
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if success of this operation
 	 */
 	bool multi(void);
 
 	/**
-	 * æ‰§è¡Œæ‰€æœ‰äº‹åŠ¡å—å†…çš„å‘½ä»¤ï¼Œå‡å¦‚æŸä¸ª(æˆ–æŸäº›) key æ­£å¤„äº WATCH å‘½ä»¤çš„ç›‘è§†ä¹‹ä¸‹ï¼Œ
-	 * ä¸”äº‹åŠ¡å—ä¸­æœ‰å’Œè¿™ä¸ª(æˆ–è¿™äº›) key ç›¸å…³çš„å‘½ä»¤ï¼Œé‚£ä¹ˆ EXEC å‘½ä»¤åªåœ¨è¿™ä¸ª(æˆ–è¿™äº›)
-	 * key æ²¡æœ‰è¢«å…¶ä»–å‘½ä»¤æ‰€æ”¹åŠ¨çš„æƒ…å†µä¸‹æ‰§è¡Œå¹¶ç”Ÿæ•ˆï¼Œå¦åˆ™è¯¥äº‹åŠ¡è¢«æ‰“æ–­(abort)ï¼›
-	 * åœ¨æ‰§è¡Œæœ¬æ¡å‘½ä»¤æˆåŠŸåï¼Œå¯ä»¥è°ƒç”¨ä¸‹é¢çš„ get_size()/get_child() è·å¾—æ¯æ¡å‘½ä»¤çš„
-	 * æ“ä½œç»“æœ
+	 * Ö´ĞĞËùÓĞÊÂÎñ¿éÄÚµÄÃüÁî£¬¼ÙÈçÄ³¸ö(»òÄ³Ğ©) key Õı´¦ÓÚ WATCH ÃüÁîµÄ¼àÊÓÖ®ÏÂ£¬
+	 * ÇÒÊÂÎñ¿éÖĞÓĞºÍÕâ¸ö(»òÕâĞ©) key Ïà¹ØµÄÃüÁî£¬ÄÇÃ´ EXEC ÃüÁîÖ»ÔÚÕâ¸ö(»òÕâĞ©)
+	 * key Ã»ÓĞ±»ÆäËûÃüÁîËù¸Ä¶¯µÄÇé¿öÏÂÖ´ĞĞ²¢ÉúĞ§£¬·ñÔò¸ÃÊÂÎñ±»´ò¶Ï(abort)£»
+	 * ÔÚÖ´ĞĞ±¾ÌõÃüÁî³É¹¦ºó£¬¿ÉÒÔµ÷ÓÃÏÂÃæµÄ get_size()/get_child() »ñµÃÃ¿ÌõÃüÁîµÄ
+	 * ²Ù×÷½á¹û
 	 * execute all commands issued after MULTI
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if success of this operation
 	 */
 	bool exec(void);
 
 	/**
-	 * å–æ¶ˆäº‹åŠ¡ï¼Œæ”¾å¼ƒæ‰§è¡Œäº‹åŠ¡å—å†…çš„æ‰€æœ‰å‘½ä»¤ï¼Œå¦‚æœæ­£åœ¨ä½¿ç”¨ WATCH å‘½ä»¤ç›‘è§†æŸä¸ª(æˆ–æŸäº›)
-	 * keyï¼Œé‚£ä¹ˆå–æ¶ˆæ‰€æœ‰ç›‘è§†ï¼Œç­‰åŒäºæ‰§è¡Œå‘½ä»¤ UNWATCH
+	 * È¡ÏûÊÂÎñ£¬·ÅÆúÖ´ĞĞÊÂÎñ¿éÄÚµÄËùÓĞÃüÁî£¬Èç¹ûÕıÔÚÊ¹ÓÃ WATCH ÃüÁî¼àÊÓÄ³¸ö(»òÄ³Ğ©)
+	 * key£¬ÄÇÃ´È¡ÏûËùÓĞ¼àÊÓ£¬µÈÍ¬ÓÚÖ´ĞĞÃüÁî UNWATCH
 	 * discard all commands issued after MULTI
 	 * @return {bool}
 	 */
 	bool discard(void);
 
 	/**
-	 * åœ¨ multi å’Œ exec ä¹‹é—´å¯å¤šæ¬¡è°ƒç”¨æœ¬å‡½æ•°æ‰§è¡Œå¤šæ¡ redis å®¢æˆ·ç«¯å‘½ä»¤
+	 * ÔÚ multi ºÍ exec Ö®¼ä¿É¶à´Îµ÷ÓÃ±¾º¯ÊıÖ´ĞĞ¶àÌõ redis ¿Í»§¶ËÃüÁî
 	 * run one command between MULTI and EXEC
-	 * @param cmd {const char*} redis å‘½ä»¤
+	 * @param cmd {const char*} redis ÃüÁî
 	 *  the command
-	 * @param argv {const char* []} å‚æ•°æ•°ç»„
+	 * @param argv {const char* []} ²ÎÊıÊı×é
 	 *  the args array associate with the command
-	 * @param lens [const size_t []} å‚æ•°çš„é•¿åº¦æ•°ç»„
+	 * @param lens [const size_t []} ²ÎÊıµÄ³¤¶ÈÊı×é
 	 *  the length array of the args array
-	 * @param argc {size_t} å‚æ•°æ•°ç»„çš„é•¿åº¦
+	 * @param argc {size_t} ²ÎÊıÊı×éµÄ³¤¶È
 	 *  the length of the array for args
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if successful
 	 */
 	bool run_cmd(const char* cmd, const char* argv[],
 		const size_t lens[], size_t argc);
 
 	/**
-	 * åœ¨ multi å’Œ exec ä¹‹é—´å¤šæ¬¡è°ƒç”¨æœ¬å‡½æ•°æ‰§è¡Œå¤šæ¡ redis å®¢æˆ·ç«¯å‘½ä»¤
+	 * ÔÚ multi ºÍ exec Ö®¼ä¶à´Îµ÷ÓÃ±¾º¯ÊıÖ´ĞĞ¶àÌõ redis ¿Í»§¶ËÃüÁî
 	 * run one command between MULTI and exec, this function can be
 	 * called more than once
-	 * @param cmd {const char*} redis å‘½ä»¤
+	 * @param cmd {const char*} redis ÃüÁî
 	 *  the redis command
-	 * @param args {const std::vector<string>&} å‚æ•°æ•°ç»„
+	 * @param args {const std::vector<string>&} ²ÎÊıÊı×é
 	 *  the args array for the command
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if successful
 	 */
 	bool run_cmd(const char* cmd, const std::vector<string>& args);
 
 	/**
-	 * åœ¨æˆåŠŸè°ƒç”¨ exec åè°ƒç”¨æœ¬å‡½æ•°è·å¾—æ“ä½œç»“æœæ•°ç»„çš„é•¿åº¦
+	 * ÔÚ³É¹¦µ÷ÓÃ exec ºóµ÷ÓÃ±¾º¯Êı»ñµÃ²Ù×÷½á¹ûÊı×éµÄ³¤¶È
 	 * get the result array's length after EXEC
 	 * @return {size_t}
 	 */
 	size_t get_size(void) const;
 
 	/**
-	 * è·å–æŒ‡å®šä¸‹æ ‡çš„å¯¹åº”çš„å‘½ä»¤çš„æ‰§è¡Œç»“æœå¯¹è±¡
+	 * »ñÈ¡Ö¸¶¨ÏÂ±êµÄ¶ÔÓ¦µÄÃüÁîµÄÖ´ĞĞ½á¹û¶ÔÏó
 	 * get the result of the given subscript
-	 * @param i {size_t} å‘½ä»¤æ‰§è¡Œç»“æœåœ¨ç»“æœæ•°ç»„ä¸­çš„ä¸‹æ ‡
+	 * @param i {size_t} ÃüÁîÖ´ĞĞ½á¹ûÔÚ½á¹ûÊı×éÖĞµÄÏÂ±ê
 	 *  the given subscript
-	 * @param cmd {string*} è¯¥å‚æ•°éç©ºæ—¶å­˜æ”¾å¯¹åº”çš„ redis å‘½ä»¤
+	 * @param cmd {string*} ¸Ã²ÎÊı·Ç¿ÕÊ±´æ·Å¶ÔÓ¦µÄ redis ÃüÁî
 	 *  if not NULL, it will store the command of the given subscript
-	 * @return {const redis_result*} æ‰§è¡ŒæŸæ¡å‘½ä»¤çš„ç»“æœï¼Œå½“ i è¶Šç•Œæ—¶è¿”å› NULL
+	 * @return {const redis_result*} Ö´ĞĞÄ³ÌõÃüÁîµÄ½á¹û£¬µ± i Ô½½çÊ±·µ»Ø NULL
 	 *  return the result of one command, NULL if i was out of bounds
 	 */
 	const redis_result* get_child(size_t i, string* cmd) const;
 
 	/**
-	 * è·å¾—å½“å‰äº‹åŠ¡æ‰€é‡çš„å‘½ä»¤é›†åˆ
+	 * »ñµÃµ±Ç°ÊÂÎñËùÖØµÄÃüÁî¼¯ºÏ
 	 * get all the commands issued between MULTI and EXEC
 	 * @return {const std::vector<string>&}
 	 */

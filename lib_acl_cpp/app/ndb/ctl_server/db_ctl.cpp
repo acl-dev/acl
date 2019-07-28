@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "db_mysql.hpp"
 
 #include "driver_mysql.h"
@@ -99,7 +99,7 @@ void db_ctl::load()
 	load_db_tbls();
 	load_tbl_idxes();
 
-	// å°†ä»æ•°æ®åº“ä¸­æŸ¥è¯¢çš„ä¿¡æ¯è¿›è¡Œå…³è”æ„å»º
+	// ½«´ÓÊı¾İ¿âÖĞ²éÑ¯µÄĞÅÏ¢½øĞĞ¹ØÁª¹¹½¨
 	build_db();
 }
 
@@ -121,14 +121,14 @@ unsigned int db_ctl::db_add_name(const char* name, name_type_t type)
 {
 	char sql[256];
 
-	// å…ˆæ·»åŠ æ•°æ®åº“è®°å½•
+	// ÏÈÌí¼ÓÊı¾İ¿â¼ÇÂ¼
 	snprintf(sql, sizeof(sql), "insert into tbl_name_type(name, type)"
 		" values('%s', %d)", name, (int) type);
 
-	// ä¸å¿…å…³å¿ƒæ•°æ®åº“è®°å½•æ˜¯å¦å·²ç»å­˜åœ¨
+	// ²»±Ø¹ØĞÄÊı¾İ¿â¼ÇÂ¼ÊÇ·ñÒÑ¾­´æÔÚ
 	(void) ctl_conn_->sql_update(sql);
 
-	// æŸ¥è¯¢æ•°æ®åº“åæ‰€å¯¹åº”çš„IDå·
+	// ²éÑ¯Êı¾İ¿âÃûËù¶ÔÓ¦µÄIDºÅ
 	snprintf(sql, sizeof(sql), "select id from tbl_name_type"
 		" where name='%s' and type=0", name);
 	if (ctl_conn_->sql_select(sql) == false)
@@ -158,10 +158,10 @@ unsigned int db_ctl::db_add_name(const char* name, name_type_t type)
 database* db_ctl::db_create(const char* dbname, const char* dbuser /* = NULL */,
 	const char* dbpass /* = NULL */)
 {
-	// å› ä¸ºå¯¹ ctl_db åªæœ‰ä¸€ä¸ªæ•°æ®åº“è¿æ¥ï¼Œæ‰€ä»¥éœ€è¦åŠ é”
+	// ÒòÎª¶Ô ctl_db Ö»ÓĞÒ»¸öÊı¾İ¿âÁ¬½Ó£¬ËùÒÔĞèÒª¼ÓËø
 	ctl_conn_lock_->lock();
 	unsigned int id = db_add_name(dbname, NAME_TYPE_DB);
-	// é‡Šæ”¾æ•°æ®åº“è¿æ¥äº’æ–¥é”
+	// ÊÍ·ÅÊı¾İ¿âÁ¬½Ó»¥³âËø
 	ctl_conn_lock_->unlock();
 
 	if (id == (unsigned int) -1)
@@ -170,10 +170,10 @@ database* db_ctl::db_create(const char* dbname, const char* dbuser /* = NULL */,
 		return NULL;
 	}
 
-	// å…ˆåŠ é”
+	// ÏÈ¼ÓËø
 	lock_->lock();
 
-	// å…ˆæ£€æŸ¥æ˜¯å¦å·²ç»å­˜åœ¨äº†
+	// ÏÈ¼ì²éÊÇ·ñÒÑ¾­´æÔÚÁË
 	std::map<std::string, database*>::iterator it = dbs_.find(dbname);
 	if (it != dbs_.end())
 	{
@@ -181,10 +181,10 @@ database* db_ctl::db_create(const char* dbname, const char* dbuser /* = NULL */,
 		return it->second;
 	}
 	database* db = new database(dbname, id);
-	db_host_set(db);  // æ–°åˆ›å»ºçš„æ•°æ®åº“å¯¹è±¡éœ€è¦è®¾ç½®å…¶ç´¢å¼•æœåŠ¡å™¨ä½ç½®
+	db_host_set(db);  // ĞÂ´´½¨µÄÊı¾İ¿â¶ÔÏóĞèÒªÉèÖÃÆäË÷Òı·şÎñÆ÷Î»ÖÃ
 	dbs_[dbname] = db;
 
-	// è§£é”
+	// ½âËø
 	lock_->unlock();
 	return db;
 }
@@ -213,13 +213,13 @@ bool db_ctl::db_host_set(database* db)
 	return true;
 }
 
-// æ·»åŠ æ•°æ®è¡¨å¯¹è±¡ï¼Œéœ€è¦å…ˆåœ¨æ•°æ®åº“ä¸­æ·»åŠ è¡¨è®°å½•ï¼Œç„¶åè·å¾—ç›¸åº”ID
+// Ìí¼ÓÊı¾İ±í¶ÔÏó£¬ĞèÒªÏÈÔÚÊı¾İ¿âÖĞÌí¼Ó±í¼ÇÂ¼£¬È»ºó»ñµÃÏàÓ¦ID
 db_tbl* db_ctl::db_add_tbl(database* db, const char* tbl_name)
 {
-	// å› ä¸ºå¯¹ ctl_db åªæœ‰ä¸€ä¸ªæ•°æ®åº“è¿æ¥ï¼Œæ‰€ä»¥éœ€è¦åŠ é”
+	// ÒòÎª¶Ô ctl_db Ö»ÓĞÒ»¸öÊı¾İ¿âÁ¬½Ó£¬ËùÒÔĞèÒª¼ÓËø
 	ctl_conn_lock_->lock();
 	unsigned int id = db_add_name(tbl_name, NAME_TYPE_TBL);
-	// é‡Šæ”¾æ•°æ®åº“è¿æ¥äº’æ–¥é”
+	// ÊÍ·ÅÊı¾İ¿âÁ¬½Ó»¥³âËø
 	ctl_conn_lock_->unlock();
 
 	if (id == (unsigned int) -1)
@@ -233,7 +233,7 @@ db_tbl* db_ctl::db_add_tbl(database* db, const char* tbl_name)
 	add_tbl(db->get_id(), id, 0);
 	lock_->unlock();
 
-	// å°†è¡¨å¯¹è±¡æ·»åŠ è¿›æ•°æ®åº“å¯¹è±¡ä¸­
+	// ½«±í¶ÔÏóÌí¼Ó½øÊı¾İ¿â¶ÔÏóÖĞ
 	db_tbl* tbl = new db_tbl(db, tbl_name, id);
 	db->add_tbl(tbl);
 	return tbl;
@@ -242,10 +242,10 @@ db_tbl* db_ctl::db_add_tbl(database* db, const char* tbl_name)
 db_idx* db_ctl::db_add_idx(db_tbl* tbl, const char* tbl_idx,
 	idx_type_t idx_type)
 {
-	// å› ä¸ºå¯¹ ctl_db åªæœ‰ä¸€ä¸ªæ•°æ®åº“è¿æ¥ï¼Œæ‰€ä»¥éœ€è¦åŠ é”
+	// ÒòÎª¶Ô ctl_db Ö»ÓĞÒ»¸öÊı¾İ¿âÁ¬½Ó£¬ËùÒÔĞèÒª¼ÓËø
 	ctl_conn_lock_->lock();
 	unsigned int id = db_add_name(tbl_idx, NAME_TYPE_TBL);
-	// é‡Šæ”¾æ•°æ®åº“è¿æ¥äº’æ–¥é”
+	// ÊÍ·ÅÊı¾İ¿âÁ¬½Ó»¥³âËø
 	ctl_conn_lock_->unlock();
 
 	if (id == (unsigned int) -1)
@@ -589,7 +589,7 @@ idx_host* db_ctl::get_idx_host(unsigned int id) const
 void db_ctl::build_db(void)
 {
 	std::list<NAME_TYPE*>::iterator name_type_it = names_.begin();
-	// å…ˆä»ä¸­æå–å‡ºæ•°æ®åº“æ ‡è¯†
+	// ÏÈ´ÓÖĞÌáÈ¡³öÊı¾İ¿â±êÊ¶
 	for (; name_type_it != names_.end(); name_type_it++)
 	{
 		if ((*name_type_it)->type != NAME_TYPE_DB)
@@ -599,7 +599,7 @@ void db_ctl::build_db(void)
 		dbs_[db->get_name()] = db;
 	}
 
-	// å–å‡ºæ‰€æœ‰çš„æ•°æ®è¡¨å¯¹è±¡ï¼Œå¹¶å°†ä¹‹åŠ å…¥å¯¹åº”çš„æ•°æ®åº“å¯¹è±¡ä¸­
+	// È¡³öËùÓĞµÄÊı¾İ±í¶ÔÏó£¬²¢½«Ö®¼ÓÈë¶ÔÓ¦µÄÊı¾İ¿â¶ÔÏóÖĞ
 	std::list<DB_TBL*>::iterator tbl_it = db_tbls_.begin();
 	for (; tbl_it != db_tbls_.end(); tbl_it++)
 	{
@@ -611,7 +611,7 @@ void db_ctl::build_db(void)
 				(*tbl_it)->id_tbl, (*tbl_it)->id_db);
 	}
 
-	// å–å‡ºæ‰€æœ‰çš„å°†ç´¢å¼•æœåŠ¡å™¨å¯¹è±¡ï¼Œå¹¶å°†ä¹‹åŠ å…¥å¯¹åº”çš„æ•°æ®åº“å¯¹è±¡ä¸­
+	// È¡³öËùÓĞµÄ½«Ë÷Òı·şÎñÆ÷¶ÔÏó£¬²¢½«Ö®¼ÓÈë¶ÔÓ¦µÄÊı¾İ¿â¶ÔÏóÖĞ
 	std::list<DB_HOST*>::iterator host_it = db_hosts_.begin();
 	for (; host_it != db_hosts_.end(); host_it++)
 	{
@@ -658,7 +658,7 @@ void db_ctl::add_name(const char* name, unsigned int id, name_type_t type)
 
 void db_ctl::add_tbl(database* db, DB_TBL* dbTbl)
 {
-	// éœ€è¦æ£€æŸ¥è¯¥è¡¨å¯¹è±¡æ˜¯å¦ä¸å‘½åè¡¨ä¸­çš„è®°å½•ä¸€è‡´
+	// ĞèÒª¼ì²é¸Ã±í¶ÔÏóÊÇ·ñÓëÃüÃû±íÖĞµÄ¼ÇÂ¼Ò»ÖÂ
 	NAME_TYPE* name_type = NULL;
 	std::list<NAME_TYPE*>::iterator name_type_it = names_.begin();
 	for (; name_type_it != names_.end(); name_type_it++)
@@ -676,7 +676,7 @@ void db_ctl::add_tbl(database* db, DB_TBL* dbTbl)
 	db_tbl* tbl = new db_tbl(db, name_type->name, name_type->id);
 	db->add_tbl(tbl);
 
-	// æ·»åŠ æ‰€æœ‰çš„è¡¨ç´¢å¼•å¯¹è±¡è‡³æ‰€å±çš„è¡¨å¯¹è±¡ä¸­
+	// Ìí¼ÓËùÓĞµÄ±íË÷Òı¶ÔÏóÖÁËùÊôµÄ±í¶ÔÏóÖĞ
 	std::list<TBL_IDX*>::iterator idx_it = tbl_idxes_.begin();
 	for (; idx_it != tbl_idxes_.end(); idx_it++)
 	{
@@ -693,7 +693,7 @@ void db_ctl::add_tbl(database* db, DB_TBL* dbTbl)
 		{
 			db_idx* idx = new db_idx(tbl, nt->name,
 				nt->id, (*idx_it)->type);
-			tbl->add_idx(idx);  // æ·»åŠ ç´¢å¼•å¯¹è±¡è‡³æ•°æ®è¡¨ä¸­
+			tbl->add_idx(idx);  // Ìí¼ÓË÷Òı¶ÔÏóÖÁÊı¾İ±íÖĞ
 		}
 	}
 }

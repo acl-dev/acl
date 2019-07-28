@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "connect_client.h"
 #include "connect_pool.h"
 

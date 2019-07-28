@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "check_sync.h"
 
 check_sync::check_sync(void)

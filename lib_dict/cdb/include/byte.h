@@ -1,4 +1,4 @@
-﻿#ifndef BYTE_H
+#ifndef BYTE_H
 #define BYTE_H
 
 extern unsigned int byte_chr();

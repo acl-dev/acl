@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stream/aio_istream.hpp"
 #endif
@@ -46,12 +46,12 @@ aio_istream::aio_istream(aio_handle* handle, ACL_SOCKET fd)
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
-	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
+	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
 	hook_error();
 
-	// åªæœ‰å½“æµè¿æ¥æˆåŠŸåæ‰å¯ hook IO è¯»å†™çŠ¶æ€
-	// hook è¯»å›è°ƒè¿‡ç¨‹
+	// Ö»ÓĞµ±Á÷Á¬½Ó³É¹¦ºó²Å¿É hook IO ¶ÁĞ´×´Ì¬
+	// hook ¶Á»Øµ÷¹ı³Ì
 	hook_read();
 }
 
@@ -78,7 +78,7 @@ void aio_istream::add_read_callback(aio_callback* callback)
 {
 	acl_assert(callback);
 
-	// å…ˆæŸ¥è¯¢è¯¥å›è°ƒå¯¹è±¡å·²ç»å­˜åœ¨
+	// ÏÈ²éÑ¯¸Ã»Øµ÷¶ÔÏóÒÑ¾­´æÔÚ
 	std::list<AIO_CALLBACK*>::iterator it = read_callbacks_.begin();
 	for (; it != read_callbacks_.end(); ++it) {
 		if ((*it)->callback == callback) {
@@ -89,7 +89,7 @@ void aio_istream::add_read_callback(aio_callback* callback)
 		}
 	}
 
-	// æ‰¾ä¸€ä¸ªç©ºä½
+	// ÕÒÒ»¸ö¿ÕÎ»
 	it = read_callbacks_.begin();
 	for (; it != read_callbacks_.end(); ++it) {
 		if ((*it)->callback == NULL) {
@@ -99,12 +99,12 @@ void aio_istream::add_read_callback(aio_callback* callback)
 		}
 	}
 
-	// åˆ†é…ä¸€ä¸ªæ–°çš„ä½ç½®
+	// ·ÖÅäÒ»¸öĞÂµÄÎ»ÖÃ
 	AIO_CALLBACK* ac = (AIO_CALLBACK*) acl_mycalloc(1, sizeof(AIO_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
-	// æ·»åŠ è¿›å›è°ƒå¯¹è±¡é˜Ÿåˆ—ä¸­
+	// Ìí¼Ó½ø»Øµ÷¶ÔÏó¶ÓÁĞÖĞ
 	read_callbacks_.push_back(ac);
 }
 
@@ -234,7 +234,7 @@ void aio_istream::gets(int timeout /* = 0 */, bool nonl /* = true */,
 	acl_int64 delay /* = 0 */, aio_timer_reader* callback /* = NULL */)
 {
 	if (delay > 0) {
-		// è®¾ç½®æ–°çš„æˆ–é‡ç½®è¯»å»¶è¿Ÿå®šæ—¶å™¨
+		// ÉèÖÃĞÂµÄ»òÖØÖÃ¶ÁÑÓ³Ù¶¨Ê±Æ÷
 
 		disable_read();
 
@@ -249,23 +249,23 @@ void aio_istream::gets(int timeout /* = 0 */, bool nonl /* = true */,
 		if (timer_reader_ == NULL) {
 			timer_reader_ = NEW aio_timer_reader();
 		}
-		// è®¾ç½® timer_reader_ å¯¹è±¡çš„æˆå‘˜å˜é‡
+		// ÉèÖÃ timer_reader_ ¶ÔÏóµÄ³ÉÔ±±äÁ¿
 		timer_reader_->in_            = this;
 		timer_reader_->delay_gets_    = true;
 		timer_reader_->delay_timeout_ = timeout;
 		timer_reader_->delay_nonl_    = nonl;
 
-		// è®¾ç½®å¼‚æ­¥è¯»å®šæ—¶å™¨
+		// ÉèÖÃÒì²½¶Á¶¨Ê±Æ÷
 		handle_->set_timer(timer_reader_, delay);
 		return;
 	} else if (timer_reader_ != NULL) {
-		// ç«‹å³å–æ¶ˆä¹‹å‰è®¾ç½®çš„å¼‚æ­¥è¯»å®šæ—¶å™¨
+		// Á¢¼´È¡ÏûÖ®Ç°ÉèÖÃµÄÒì²½¶Á¶¨Ê±Æ÷
 		handle_->del_timer(timer_reader_);
 		timer_reader_->destroy();
 		timer_reader_ = NULL;
 	}
 
-	// è®¾ç½®æµçš„å¼‚æ­¥è¯»è¶…æ—¶æ—¶é—´
+	// ÉèÖÃÁ÷µÄÒì²½¶Á³¬Ê±Ê±¼ä
 	if (timeout >= 0) {
 		ACL_AIO_SET_TIMEOUT(stream_, timeout);
 	}
@@ -280,7 +280,7 @@ void aio_istream::read(int count /* = 0 */, int timeout /* = 0 */,
 	acl_int64 delay /* = 0 */, aio_timer_reader* callback /* = NULL */)
 {
 	if (delay > 0) {
-		// è®¾ç½®æ–°çš„æˆ–é‡ç½®è¯»å»¶è¿Ÿå®šæ—¶å™¨
+		// ÉèÖÃĞÂµÄ»òÖØÖÃ¶ÁÑÓ³Ù¶¨Ê±Æ÷
 
 		disable_read();
 
@@ -295,23 +295,23 @@ void aio_istream::read(int count /* = 0 */, int timeout /* = 0 */,
 		if (timer_reader_ == NULL) {
 			timer_reader_ = NEW aio_timer_reader();
 		}
-		// è®¾ç½® timer_reader_ å¯¹è±¡çš„æˆå‘˜å˜é‡
+		// ÉèÖÃ timer_reader_ ¶ÔÏóµÄ³ÉÔ±±äÁ¿
 		timer_reader_->in_            = this;
 		timer_reader_->delay_gets_    = false;
 		timer_reader_->delay_timeout_ = timeout;
 		timer_reader_->delay_count_   = count;
 
-		// è®¾ç½®å¼‚æ­¥è¯»å®šæ—¶å™¨
+		// ÉèÖÃÒì²½¶Á¶¨Ê±Æ÷
 		handle_->set_timer(timer_reader_, delay);
 		return;
 	} else if (timer_reader_ != NULL) {
-		// ç«‹å³å–æ¶ˆä¹‹å‰è®¾ç½®çš„å¼‚æ­¥è¯»å®šæ—¶å™¨
+		// Á¢¼´È¡ÏûÖ®Ç°ÉèÖÃµÄÒì²½¶Á¶¨Ê±Æ÷
 		handle_->del_timer(timer_reader_);
 		timer_reader_->destroy();
 		timer_reader_ = NULL;
 	}
 
-	// è®¾ç½®æµçš„å¼‚æ­¥è¯»è¶…æ—¶æ—¶é—´
+	// ÉèÖÃÁ÷µÄÒì²½¶Á³¬Ê±Ê±¼ä
 	if (timeout >= 0) {
 		ACL_AIO_SET_TIMEOUT(stream_, timeout);
 	}
@@ -324,7 +324,7 @@ void aio_istream::read(int count /* = 0 */, int timeout /* = 0 */,
 
 void aio_istream::read_wait(int timeout /* = 0 */)
 {
-	// è®¾ç½®æµçš„å¼‚æ­¥è¯»è¶…æ—¶æ—¶é—´
+	// ÉèÖÃÁ÷µÄÒì²½¶Á³¬Ê±Ê±¼ä
 	if (timeout >= 0) {
 		ACL_AIO_SET_TIMEOUT(stream_, timeout);
 	}

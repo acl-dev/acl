@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "struct.h"
 #include "struct.gson.h"
 

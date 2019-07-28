@@ -1,4 +1,4 @@
-﻿/* crypto/conf/conf.h */
+/* crypto/conf/conf.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "logger_servlet.h"
 
 logger_servlet::logger_servlet()

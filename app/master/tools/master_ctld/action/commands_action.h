@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "base_action.h"
 
 class commands_action : public base_action

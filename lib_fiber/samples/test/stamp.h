@@ -1,4 +1,4 @@
-﻿#ifndef __STAMP_INCLUDE_H__
+#ifndef __STAMP_INCLUDE_H__
 #define __STAMP_INCLUDE_H__
 
 #ifdef __cplusplus

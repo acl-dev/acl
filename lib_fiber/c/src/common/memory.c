@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "memory.h"
 
 #ifdef	FIBER_STACK_GUARD

@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 
@@ -11,15 +11,15 @@ class ACL_CPP_API redis_slot
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
+	 * ¹¹Ôìº¯Êı
 	 * constructor
-	 * @param slot_min {size_t} æœ€å°å“ˆå¸Œæ§½å€¼
+	 * @param slot_min {size_t} ×îĞ¡¹şÏ£²ÛÖµ
 	 *  the min hash-slot
-	 * @param slot_max {size_t} æœ€å¤§å“ˆå¸Œæ§½å€¼
+	 * @param slot_max {size_t} ×î´ó¹şÏ£²ÛÖµ
 	 *  the max hash-slot
-	 * @param ip {const char*} å½“å‰ redis-server çš„ IP åœ°å€
+	 * @param ip {const char*} µ±Ç° redis-server µÄ IP µØÖ·
 	 *  the given redis-server's ip
-	 * @param port {int} å½“å‰ redis-server çš„ç›‘å¬ç«¯å£
+	 * @param port {int} µ±Ç° redis-server µÄ¼àÌı¶Ë¿Ú
 	 *  the listening port of the given redis-server
 	 * 
 	 */
@@ -30,15 +30,15 @@ public:
 	~redis_slot(void);
 
 	/**
-	 * å°†ä¸€ä¸ª redis å“ˆå¸Œæ§½ä»ç»“ç‚¹æ·»åŠ è‡³å½“å‰ç»“ç‚¹ä¸­
+	 * ½«Ò»¸ö redis ¹şÏ£²Û´Ó½áµãÌí¼ÓÖÁµ±Ç°½áµãÖĞ
 	 * add a slave slot node to the current node
-	 * @param node {redis_slot*} ä¸€ä¸ªå­˜å‚¨å“ˆå¸Œæ§½çš„ä»ç»“ç‚¹
+	 * @param node {redis_slot*} Ò»¸ö´æ´¢¹şÏ£²ÛµÄ´Ó½áµã
 	 *  the slave slot node
 	 */
 	redis_slot& add_slave(redis_slot* node);
 
 	/**
-	 * è·å¾—å½“å‰å“ˆå¸Œæ§½ç»“ç‚¹çš„æ‰€æœ‰ä»ç»“ç‚¹
+	 * »ñµÃµ±Ç°¹şÏ£²Û½áµãµÄËùÓĞ´Ó½áµã
 	 * get the slave nodes of the current node
 	 * @return {const std::vector<redis_slot*>&}
 	 */
@@ -48,7 +48,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰ç»“ç‚¹çš„ IP åœ°å€
+	 * »ñµÃµ±Ç°½áµãµÄ IP µØÖ·
 	 * get the ip of the current node
 	 * @return {const char*}
 	 */
@@ -58,7 +58,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰ç»“ç‚¹çš„ç«¯å£å·
+	 * »ñµÃµ±Ç°½áµãµÄ¶Ë¿ÚºÅ
 	 * get the port of the current node
 	 * @return {int}
 	 */
@@ -68,7 +68,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰å“ˆå¸Œæ§½ç»“ç‚¹çš„æœ€å°å€¼
+	 * »ñµÃµ±Ç°¹şÏ£²Û½áµãµÄ×îĞ¡Öµ
 	 * get the min hash slot of the current node
 	 * @return {size_t}
 	 */
@@ -78,7 +78,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰å“ˆå¸Œæ§½ç»“ç‚¹çš„æœ€å¤§å€¼
+	 * »ñµÃµ±Ç°¹şÏ£²Û½áµãµÄ×î´óÖµ
 	 * get the max hash slot of the current node
 	 * @return {size_t}
 	 */

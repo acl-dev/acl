@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tls_mgr 3
  * SUMMARY

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "udp.h"
 
 static bool host_port(char *buf, char **host, char **port)

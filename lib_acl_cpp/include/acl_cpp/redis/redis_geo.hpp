@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <map>
@@ -116,19 +116,19 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * æ·»åŠ ä¸€ä¸ªæŒ‡å®šçš„åœ°ç†ä½ç½®åæ ‡è‡³æŒ‡å®šçš„ key ä¸­
+	 * Ìí¼ÓÒ»¸öÖ¸¶¨µÄµØÀíÎ»ÖÃ×ø±êÖÁÖ¸¶¨µÄ key ÖĞ
 	 * Add the specified geospatial item (latitude, logitude, name)
 	 * to the specified key.
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param member {const char*} è¯¥åœ°ç†åæ ‡çš„æ ‡è¯†ç¬¦
+	 * @param member {const char*} ¸ÃµØÀí×ø±êµÄ±êÊ¶·û
 	 *  the geospatial's identifier
-	 * @param loginitude {double} ç»åº¦
+	 * @param loginitude {double} ¾­¶È
 	 *  the geospatial's loginitude
-	 * @param latitude {double} çº¬åº¦
+	 * @param latitude {double} Î³¶È
 	 *  the geospatial's latitude
-	 * @return {int} 1ï¼šæ·»åŠ æˆåŠŸï¼Œ0ï¼šè¯¥åœ°ç†åæ ‡æ ‡è¯†ç¬¦å·²å­˜åœ¨ï¼Œå³ä½¿å¯¹å…¶å€¼è¿›è¡Œäº†ä¿®æ”¹ï¼Œ
-	 *  ä¹Ÿå°†è¿”å› 0ï¼Œ-1ï¼šè¡¨ç¤ºå‡ºé”™ã€‚
+	 * @return {int} 1£ºÌí¼Ó³É¹¦£¬0£º¸ÃµØÀí×ø±ê±êÊ¶·ûÒÑ´æÔÚ£¬¼´Ê¹¶ÔÆäÖµ½øĞĞÁËĞŞ¸Ä£¬
+	 *  Ò²½«·µ»Ø 0£¬-1£º±íÊ¾³ö´í¡£
 	 *  the return value as below:
 	 *  1: add one new member successfully
 	 *  0: the member already existed, and the geospatial may be changed
@@ -138,26 +138,26 @@ public:
 		double longitude, double latitude);
 
 	/**
-	 * ç»™æŒ‡å®š key æ·»åŠ ä¸€ç»„åœ°å€ä½ç½®åæ ‡æ•°æ®
+	 * ¸øÖ¸¶¨ key Ìí¼ÓÒ»×éµØÖ·Î»ÖÃ×ø±êÊı¾İ
 	 * Add the specified geospatial items (latitude, logitude, name)
 	 * to the specified key.
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param size {size_t} æ•°ç»„çš„é•¿åº¦
+	 * @param size {size_t} Êı×éµÄ³¤¶È
 	 *  the array's size
-	 * @param memebers {const char* []} æˆå‘˜æ•°ç»„ï¼Œå…¶é•¿åº¦ç”± size æŒ‡å®š
+	 * @param memebers {const char* []} ³ÉÔ±Êı×é£¬Æä³¤¶ÈÓÉ size Ö¸¶¨
 	 *  the members array, which's length was specified by size parameter
-	 * @param longitudes {const double[]} ç»åº¦æ•°æ®æ•°ç»„ï¼Œå…¶é•¿åº¦ç”± size æŒ‡å®š
+	 * @param longitudes {const double[]} ¾­¶ÈÊı¾İÊı×é£¬Æä³¤¶ÈÓÉ size Ö¸¶¨
 	 *  the logintitudes array, which's length was specifed by size parameter
-	 * @param latitudes {const double[]} çº¬åº¦æ•°æ®æ•°ç»„ï¼Œå…¶é•¿åº¦ç”± size æŒ‡å®š
+	 * @param latitudes {const double[]} Î³¶ÈÊı¾İÊı×é£¬Æä³¤¶ÈÓÉ size Ö¸¶¨
 	 *  the lattitudes array, which's length was specifed by size parameter
-	 * @return {int} æ·»åŠ æˆåŠŸçš„æˆå‘˜æ•°é‡ï¼Œè¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} Ìí¼Ó³É¹¦µÄ³ÉÔ±ÊıÁ¿£¬·µ»ØÖµº¬ÒåÈçÏÂ£º
 	 *  return the successfully added members's count:
-	 *  > 0: è¡¨ç¤ºæˆåŠŸæ·»åŠ çš„æˆå‘˜æ•°é‡ï¼›
+	 *  > 0: ±íÊ¾³É¹¦Ìí¼ÓµÄ³ÉÔ±ÊıÁ¿£»
 	 *       represent the successfully added memebers's count
-	 *    0: è¿™äº›æˆå‘˜éƒ½å·²ç»å­˜åœ¨
+	 *    0: ÕâĞ©³ÉÔ±¶¼ÒÑ¾­´æÔÚ
 	 *       the members's belong the key already existing
-	 *   -1: è¡¨ç¤ºå‡ºé”™ï¼Œå¯ä»¥é€šè¿‡ result_error å‡½æ•°æŸ¥çœ‹å‡ºé”™åŸå› 
+	 *   -1: ±íÊ¾³ö´í£¬¿ÉÒÔÍ¨¹ı result_error º¯Êı²é¿´³ö´íÔ­Òò
 	 *       some error happened, the result_error function can be used
 	 *       to find the error's reason
 	 */
@@ -165,27 +165,27 @@ public:
 		const double longitudes[], const double latitudes[]);
 
 	/**
-	 * ç»™æŒ‡å®š key æ·»åŠ ä¸€ç»„åœ°å€ä½ç½®åæ ‡æ•°æ®
+	 * ¸øÖ¸¶¨ key Ìí¼ÓÒ»×éµØÖ·Î»ÖÃ×ø±êÊı¾İ
 	 * Add the specified geospatial items (latitude, logitude, name)
 	 * to the specified key.
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param memebers {const std::vector<string>&} æˆå‘˜æ•°ç»„
+	 * @param memebers {const std::vector<string>&} ³ÉÔ±Êı×é
 	 *  the members array
-	 * @param longitudes {const std::vector<double>&} ç»åº¦æ•°æ®æ•°ç»„
+	 * @param longitudes {const std::vector<double>&} ¾­¶ÈÊı¾İÊı×é
 	 *  the logintitudes array
-	 * @param latitudes {const std::vector<double>&} çº¬åº¦æ•°æ®æ•°ç»„
+	 * @param latitudes {const std::vector<double>&} Î³¶ÈÊı¾İÊı×é
 	 *  the lattitudes array
-	 * @return {int} æ·»åŠ æˆåŠŸçš„æˆå‘˜æ•°é‡ï¼Œè¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} Ìí¼Ó³É¹¦µÄ³ÉÔ±ÊıÁ¿£¬·µ»ØÖµº¬ÒåÈçÏÂ£º
 	 *  return the successfully added members's count:
-	 *  > 0: è¡¨ç¤ºæˆåŠŸæ·»åŠ çš„æˆå‘˜æ•°é‡ï¼›
+	 *  > 0: ±íÊ¾³É¹¦Ìí¼ÓµÄ³ÉÔ±ÊıÁ¿£»
 	 *       represent the successfully added memebers's count
-	 *    0: è¿™äº›æˆå‘˜éƒ½å·²ç»å­˜åœ¨
+	 *    0: ÕâĞ©³ÉÔ±¶¼ÒÑ¾­´æÔÚ
 	 *       the members's belong the key already existing
-	 *   -1: è¡¨ç¤ºå‡ºé”™ï¼Œå¯ä»¥é€šè¿‡ result_error å‡½æ•°æŸ¥çœ‹å‡ºé”™åŸå› 
+	 *   -1: ±íÊ¾³ö´í£¬¿ÉÒÔÍ¨¹ı result_error º¯Êı²é¿´³ö´íÔ­Òò
 	 *       some error happened, the result_error function can be used
 	 *       to find the error's reason
-	 *  æ³¨æ„ï¼šä¸‰ä¸ªæ•°ç»„(members, longitudes, latitudes)çš„æ•°ç»„é•¿åº¦å¿…é¡»ç›¸ç­‰
+	 *  ×¢Òâ£ºÈı¸öÊı×é(members, longitudes, latitudes)µÄÊı×é³¤¶È±ØĞëÏàµÈ
 	 *  Notice: the three array's length must be equal between members,
 	 *    longitudes and latitudes
 	 */
@@ -194,76 +194,76 @@ public:
 		const std::vector<double>& latitudes);
 
 	/**
-	 * ä»¥å­—ç¬¦ä¸²æ–¹å¼è¿”å›æŒ‡å®šæˆå‘˜çš„ GEOHASH å€¼
+	 * ÒÔ×Ö·û´®·½Ê½·µ»ØÖ¸¶¨³ÉÔ±µÄ GEOHASH Öµ
 	 * Returns members of a geospatial index as standard geohash strings.
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param memebers {const std::vector<string>&} æˆå‘˜æ•°ç»„
+	 * @param memebers {const std::vector<string>&} ³ÉÔ±Êı×é
 	 *  the members array
-	 * @param results {std::vector<string>&} å­˜å‚¨ç»“æœé›†åˆ
+	 * @param results {std::vector<string>&} ´æ´¢½á¹û¼¯ºÏ
 	 *  store the result
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation was successful.
 	 */
 	bool geohash(const char* key, const std::vector<string>& members,
 		std::vector<string>& results);
 
 	/**
-	 * ä»¥å­—ç¬¦ä¸²æ–¹å¼è¿”å›æŒ‡å®šæˆå‘˜çš„ GEOHASH å€¼
+	 * ÒÔ×Ö·û´®·½Ê½·µ»ØÖ¸¶¨³ÉÔ±µÄ GEOHASH Öµ
 	 * Returns members of a geospatial index as standard geohash strings.
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param memeber {const char*} æˆå‘˜å
+	 * @param memeber {const char*} ³ÉÔ±Ãû
 	 *  the member of a geospatial index
-	 * @param result {std::vector<string>&} å­˜å‚¨ç»“æœ
+	 * @param result {std::vector<string>&} ´æ´¢½á¹û
 	 *  store the result
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation was successful.
 	 */
 	bool geohash(const char* key, const char* member, string& result);
 
 	/**
-	 * è·å¾—æŒ‡å®šæˆå‘˜çš„åœ°ç†ä½ç½®åæ ‡
+	 * »ñµÃÖ¸¶¨³ÉÔ±µÄµØÀíÎ»ÖÃ×ø±ê
 	 * Returns longitude and latitude of members of a geospatial index
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param memebers {const std::vector<string>&} æˆå‘˜æ•°ç»„
+	 * @param memebers {const std::vector<string>&} ³ÉÔ±Êı×é
 	 *  the members array
-	 * @param results {std::vector<std::pair<double, double> >&} å­˜å‚¨ç»“æœé›†
+	 * @param results {std::vector<std::pair<double, double> >&} ´æ´¢½á¹û¼¯
 	 *  store the results
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation was successful. 
 	 */
 	bool geopos(const char* key, const std::vector<string>& members,
 		std::vector<std::pair<double, double> >& results);
 
 	/**
-	 * è·å¾—æŸä¸ªæŒ‡å®šæˆå‘˜çš„åœ°ç†ä½ç½®åæ ‡
+	 * »ñµÃÄ³¸öÖ¸¶¨³ÉÔ±µÄµØÀíÎ»ÖÃ×ø±ê
 	 * Returns longitude and latitude of the one member of
 	 * a geospatial index
-	 * @param key {const char*} æŒ‡å®šé”®å€¼
+	 * @param key {const char*} Ö¸¶¨¼üÖµ
 	 *  the specifed key
-	 * @param member {const char*} æŒ‡å®šæˆå‘˜å
+	 * @param member {const char*} Ö¸¶¨³ÉÔ±Ãû
 	 *  the specified member
-	 * @param result {std::pair<double, double>&} å­˜å‚¨åæ ‡ç‚¹ç»“æœ
+	 * @param result {std::pair<double, double>&} ´æ´¢×ø±êµã½á¹û
 	 *  store the result of longitude and latitude of the member
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
 	 *  if the operation was successful.
 	 */
 	bool geopos(const char* key, const char* member,
 		std::pair<double, double>& result);
 
 	/**
-	 * è·å¾—ä¸¤ä¸ªåœ°ç†ä½ç½®åæ ‡ä¹‹é—´çš„è·ç¦»
+	 * »ñµÃÁ½¸öµØÀíÎ»ÖÃ×ø±êÖ®¼äµÄ¾àÀë
 	 * Returns the distance between two members of a geospatial index
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param member1 {const char*} åœ°ç†åæ ‡æˆå‘˜
+	 * @param member1 {const char*} µØÀí×ø±ê³ÉÔ±
 	 *  one member of a geospatial index
-	 * @param member2 {const char*} åœ°ç†åæ ‡æˆå‘˜
+	 * @param member2 {const char*} µØÀí×ø±ê³ÉÔ±
 	 *  another member of a geospatial index
-	 * @param unit {int} è¿”å›çš„è·ç¦»çš„å•ä½å€¼
-	 * @return {double} ä¸¤ä¸ªåæ ‡ä¹‹é—´çš„é•¿åº¦ï¼Œè¿”å›å€¼ < 0 è¡¨ç¤ºå‡ºé”™
+	 * @param unit {int} ·µ»ØµÄ¾àÀëµÄµ¥Î»Öµ
+	 * @return {double} Á½¸ö×ø±êÖ®¼äµÄ³¤¶È£¬·µ»ØÖµ < 0 ±íÊ¾³ö´í
 	 *  returns the distance between two members, which was less than 0
 	 *  if some error happened.
 	 */
@@ -271,24 +271,24 @@ public:
 		const char* member2, int unit = GEO_UNIT_M);
 
 	/**
-	 * è·å¾—è·ç¦»æŸæŒ‡å®šåæ ‡ä½ç½®åœ¨ç»™å®šè·ç¦»èŒƒå›´å†…çš„æ‰€æœ‰åæ ‡ç‚¹
+	 * »ñµÃ¾àÀëÄ³Ö¸¶¨×ø±êÎ»ÖÃÔÚ¸ø¶¨¾àÀë·¶Î§ÄÚµÄËùÓĞ×ø±êµã
 	 * Query a sorted set representing a geospatial index to fetch
 	 * members matching a given maximum distance from a point
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param longitude {double} æŒ‡å®šåæ ‡ç‚¹çš„ç»åº¦å€¼
+	 * @param longitude {double} Ö¸¶¨×ø±êµãµÄ¾­¶ÈÖµ
 	 *  the longitude of the specified geospatial coordinate
-	 * @param latitude {double} æŒ‡å®šåæ ‡ç‚¹çš„çº¬åº¦å€¼
+	 * @param latitude {double} Ö¸¶¨×ø±êµãµÄÎ³¶ÈÖµ
 	 *  the latitude of the specified geospatial coordinate
-	 * @param radius {double} é™å®šçš„è·ç¦»èŒƒå›´å¤§å°
+	 * @param radius {double} ÏŞ¶¨µÄ¾àÀë·¶Î§´óĞ¡
 	 *  the distance from the specified coordinate
-	 * @param unit {int} radius è·ç¦»çš„å•ä½ç±»å‹
+	 * @param unit {int} radius ¾àÀëµÄµ¥Î»ÀàĞÍ
 	 *  the unit type of the raidus
-	 * @param with {int} æŸ¥è¯¢æ¡ä»¶é€‰é¡¹ï¼Œå‚è§ä¸Šé¢çš„å®šä¹‰ï¼šGEO_WITH_XXX
+	 * @param with {int} ²éÑ¯Ìõ¼şÑ¡Ïî£¬²Î¼ûÉÏÃæµÄ¶¨Òå£ºGEO_WITH_XXX
 	 *  the serach operations, defined as GEO_WITH_XXX above
-	 * @param sort {int} æŸ¥è¯¢ç»“æœçš„æ’åºæ–¹å¼ï¼Œå®šä¹‰å‚è§ï¼šGEO_SORT_XXX
+	 * @param sort {int} ²éÑ¯½á¹ûµÄÅÅĞò·½Ê½£¬¶¨Òå²Î¼û£ºGEO_SORT_XXX
 	 *  the sorted type of the results, defined as GEO_SORT_XXX above
-	 * @return {const std::vector<geo_member>&} ç¬¦åˆæ¡ä»¶çš„åæ ‡ç‚¹çš„ç»“æœé›†
+	 * @return {const std::vector<geo_member>&} ·ûºÏÌõ¼şµÄ×ø±êµãµÄ½á¹û¼¯
 	 *  Returns the results according the searching conditions.
 	 */
 	const std::vector<geo_member>& georadius(const char* key,
@@ -298,22 +298,22 @@ public:
 		int sort = GEO_SORT_ASC);
 
 	/**
-	 * è·å¾—è·ç¦»æŸæŒ‡å®šåæ ‡ä½ç½®åœ¨ç»™å®šè·ç¦»èŒƒå›´å†…çš„æ‰€æœ‰åæ ‡ç‚¹
+	 * »ñµÃ¾àÀëÄ³Ö¸¶¨×ø±êÎ»ÖÃÔÚ¸ø¶¨¾àÀë·¶Î§ÄÚµÄËùÓĞ×ø±êµã
 	 * Query a sorted set representing a geospatial index to fetch
 	 * members matching a given maximum distance from a member
-	 * @param key {const char*} å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} ¶ÔÓ¦µÄ¼üÖµ
 	 *  the specified key
-	 * @param member {const char*} æŸä¸ªæŒ‡å®šçš„åæ ‡ç‚¹æˆå‘˜
+	 * @param member {const char*} Ä³¸öÖ¸¶¨µÄ×ø±êµã³ÉÔ±
 	 *  the specified member of a geospatial index
-	 * @param radius {double} é™å®šçš„è·ç¦»èŒƒå›´å¤§å°
+	 * @param radius {double} ÏŞ¶¨µÄ¾àÀë·¶Î§´óĞ¡
 	 *  the distance from the specified coordinate
-	 * @param unit {int} radius è·ç¦»çš„å•ä½ç±»å‹
+	 * @param unit {int} radius ¾àÀëµÄµ¥Î»ÀàĞÍ
 	 *  the unit type of the raidus
-	 * @param with {int} æŸ¥è¯¢æ¡ä»¶é€‰é¡¹ï¼Œå‚è§ä¸Šé¢çš„å®šä¹‰ï¼šGEO_WITH_XXX
+	 * @param with {int} ²éÑ¯Ìõ¼şÑ¡Ïî£¬²Î¼ûÉÏÃæµÄ¶¨Òå£ºGEO_WITH_XXX
 	 *  the serach operations, defined as GEO_WITH_XXX above
-	 * @param sort {int} æŸ¥è¯¢ç»“æœçš„æ’åºæ–¹å¼ï¼Œå®šä¹‰å‚è§ï¼šGEO_SORT_XXX
+	 * @param sort {int} ²éÑ¯½á¹ûµÄÅÅĞò·½Ê½£¬¶¨Òå²Î¼û£ºGEO_SORT_XXX
 	 *  the sorted type of the results, defined as GEO_SORT_XXX above
-	 * @return {const std::vector<geo_member>&} ç¬¦åˆæ¡ä»¶çš„åæ ‡ç‚¹çš„ç»“æœé›†
+	 * @return {const std::vector<geo_member>&} ·ûºÏÌõ¼şµÄ×ø±êµãµÄ½á¹û¼¯
 	 *  Returns the results according the searching conditions.
 	 */
 	const std::vector<geo_member>& georadiusbymember(const char* key,

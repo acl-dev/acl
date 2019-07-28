@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <list>
 #include "../stream/aio_socket_stream.hpp"
@@ -28,7 +28,7 @@ class aio_socket_stream;
 class socket_stream;
 
 /**
- * å¼‚æ­¥IPæ¶ˆæ¯ç±»
+ * Òì²½IPÏûÏ¢Àà
  */
 class ACL_CPP_API ipc_client : private aio_open_callback
 {
@@ -41,7 +41,7 @@ public:
 	virtual ~ipc_client();
 
 	/**
-	 * ç›´æ¥é”€æ¯æ¥å£ï¼Œå­ç±»å¯ä»¥é‡è½½è¯¥æ¥å£
+	 * Ö±½ÓÏú»Ù½Ó¿Ú£¬×ÓÀà¿ÉÒÔÖØÔØ¸Ã½Ó¿Ú
 	 */
 	virtual void destroy()
 	{
@@ -49,110 +49,110 @@ public:
 	}
 
 	/**
-	 * å½“è°ƒç”¨ open å‡½æ•°è¿æ¥æ¶ˆæ¯æœåŠ¡å™¨æˆåŠŸæ—¶è°ƒç”¨æ­¤å‡½æ•°
+	 * µ±µ÷ÓÃ open º¯ÊıÁ¬½ÓÏûÏ¢·şÎñÆ÷³É¹¦Ê±µ÷ÓÃ´Ëº¯Êı
 	 */
 	virtual void on_open() {}
 
 	/**
-	 * å½“å¼‚æ­¥æµå…³é—­æ—¶çš„å›è°ƒæ¥å£
+	 * µ±Òì²½Á÷¹Ø±ÕÊ±µÄ»Øµ÷½Ó¿Ú
 	 */
 	virtual void on_close() {}
 
 	/**
-	 * å½“æ”¶åˆ°æ¶ˆæ¯æ—¶çš„å›è°ƒå‡½æ•°ï¼Œå­ç±»å¿…é¡»å®ç°è¯¥æ¥å£
-	 * @param nMsg {int} ç”¨æˆ·æ·»åŠ çš„è‡ªå®šä¹‰æ¶ˆæ¯å€¼
-	 * @param data {void*} æ¶ˆæ¯æ•°æ®
-	 * @param dlen {int} æ¶ˆæ¯æ•°æ®çš„é•¿åº¦
+	 * µ±ÊÕµ½ÏûÏ¢Ê±µÄ»Øµ÷º¯Êı£¬×ÓÀà±ØĞëÊµÏÖ¸Ã½Ó¿Ú
+	 * @param nMsg {int} ÓÃ»§Ìí¼ÓµÄ×Ô¶¨ÒåÏûÏ¢Öµ
+	 * @param data {void*} ÏûÏ¢Êı¾İ
+	 * @param dlen {int} ÏûÏ¢Êı¾İµÄ³¤¶È
 	 */
 	virtual void on_message(int nMsg, void* data, int dlen);
 
 	/**
-	 * ä¸æ¶ˆæ¯æœåŠ¡å™¨ä¹‹é—´å»ºç«‹è¿æ¥å¹¶åˆ›å»ºå¼‚æ­¥æµ
-	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
-	 * @param addr {const char*} æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ä¸º:
-	 *  IP:PORT(æ”¯æŒ_WIN32/UNIX)ï¼Œunix_path (ä»…æ”¯æŒUNIX)
-	 * @param timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´
+	 * ÓëÏûÏ¢·şÎñÆ÷Ö®¼ä½¨Á¢Á¬½Ó²¢´´½¨Òì²½Á÷
+	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú
+	 * @param addr {const char*} ÏûÏ¢·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½Îª:
+	 *  IP:PORT(Ö§³Ö_WIN32/UNIX)£¬unix_path (½öÖ§³ÖUNIX)
+	 * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä
 	 */
 	bool open(aio_handle* handle, const char* addr, int timeout);
 
 	/**
-	 * å¼‚æ­¥æµå·²ç»å»ºç«‹ï¼Œè°ƒç”¨æ­¤å‡½æ•°å®Œæˆ ipc_client è¿æ¥è¿‡ç¨‹
-	 * @param client {aio_socket_stream*} å¼‚æ­¥è¿æ¥æµ
+	 * Òì²½Á÷ÒÑ¾­½¨Á¢£¬µ÷ÓÃ´Ëº¯ÊıÍê³É ipc_client Á¬½Ó¹ı³Ì
+	 * @param client {aio_socket_stream*} Òì²½Á¬½ÓÁ÷
 	 */
 	void open(aio_socket_stream* client);
 
 	/**
-	 * ä¸æ¶ˆæ¯æœåŠ¡å™¨ä¹‹é—´å»ºç«‹è¿æ¥å¹¶åˆ›å»ºåŒæ­¥æµ
-	 * @param addr {const char*} æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ä¸º:
-	 *  IP:PORT(æ”¯æŒ_WIN32/UNIX)ï¼Œunix_path (ä»…æ”¯æŒUNIX)
-	 * @param timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´
+	 * ÓëÏûÏ¢·şÎñÆ÷Ö®¼ä½¨Á¢Á¬½Ó²¢´´½¨Í¬²½Á÷
+	 * @param addr {const char*} ÏûÏ¢·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½Îª:
+	 *  IP:PORT(Ö§³Ö_WIN32/UNIX)£¬unix_path (½öÖ§³ÖUNIX)
+	 * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä
 	 */
 	bool open(const char* addr, int timeout);
 
 	/**
-	 * åŒæ­¥æµå·²ç»å»ºç«‹ï¼Œè°ƒç”¨æ­¤å‡½æ•°å®Œæˆ ipc_client è¿æ¥è¿‡ç¨‹
-	 * @param client {socket_stream*} å¼‚æ­¥è¿æ¥æµ
+	 * Í¬²½Á÷ÒÑ¾­½¨Á¢£¬µ÷ÓÃ´Ëº¯ÊıÍê³É ipc_client Á¬½Ó¹ı³Ì
+	 * @param client {socket_stream*} Òì²½Á¬½ÓÁ÷
 	 */
 	void open(socket_stream* client);
 
 	/**
-	 * æ¶ˆæ¯æµå·²ç»åˆ›å»ºï¼Œè°ƒç”¨æ­¤å‡½æ•°æ‰“å¼€ IPC é€šé“
+	 * ÏûÏ¢Á÷ÒÑ¾­´´½¨£¬µ÷ÓÃ´Ëº¯Êı´ò¿ª IPC Í¨µÀ
 	 */
 	void wait();
 
 	/**
-	 * ä¸»åŠ¨å…³é—­æ¶ˆæ¯æµ
+	 * Ö÷¶¯¹Ø±ÕÏûÏ¢Á÷
 	 */
 	void close();
 
 	/**
-	 * è¿æ¥æµæ˜¯å¦æ­£å¸¸æ‰“å¼€ç€
+	 * Á¬½ÓÁ÷ÊÇ·ñÕı³£´ò¿ª×Å
 	 * @return {bool}
 	 */
 	bool active() const;
 
 	/**
-	 * æ·»åŠ æŒ‡å®šæ¶ˆæ¯çš„å›è°ƒè¿‡ç¨‹å¯¹è±¡
-	 * @param nMsg {int} æ¶ˆæ¯å·
+	 * Ìí¼ÓÖ¸¶¨ÏûÏ¢µÄ»Øµ÷¹ı³Ì¶ÔÏó
+	 * @param nMsg {int} ÏûÏ¢ºÅ
 	 */
 	void append_message(int nMsg);
 
 	/**
-	 * åˆ é™¤æŒ‡å®šæ¶ˆæ¯çš„å›è°ƒè¿‡ç¨‹å¯¹è±¡
-	 * @param nMsg {int} æ¶ˆæ¯å·
+	 * É¾³ıÖ¸¶¨ÏûÏ¢µÄ»Øµ÷¹ı³Ì¶ÔÏó
+	 * @param nMsg {int} ÏûÏ¢ºÅ
 	 */
 	void delete_message(int nMsg);
 
 	/**
-	 * å‘é€æ¶ˆæ¯
-	 * @param nMsg {int} æ¶ˆæ¯å·
-	 * @param data {const void*} æ•°æ®
-	 * @param dlen {int} æ•°æ®é•¿åº¦
+	 * ·¢ËÍÏûÏ¢
+	 * @param nMsg {int} ÏûÏ¢ºÅ
+	 * @param data {const void*} Êı¾İ
+	 * @param dlen {int} Êı¾İ³¤¶È
 	 */
 	void send_message(int nMsg, const void* data, int dlen);
 
 	/**
-	 * è·å¾—å¼‚æ­¥æµå¥æŸ„
+	 * »ñµÃÒì²½Á÷¾ä±ú
 	 * @return {aio_socket_stream*}
 	 */
 	aio_socket_stream* get_async_stream() const;
 
 	/**
-	 * è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„
+	 * »ñµÃÒì²½ÒıÇæ¾ä±ú
 	 */
 	aio_handle& get_handle() const;
 
 	/**
-	 * è·å¾—åŒæ­¥æµå¤Ÿæœ¬
+	 * »ñµÃÍ¬²½Á÷¹»±¾
 	 * @return {socket_stream*}
 	 */
 	socket_stream* get_sync_stream() const;
 protected:
 	/**
-	 * è§¦å‘æ¶ˆæ¯è¿‡ç¨‹
-	 * @param nMsg {int} æ¶ˆæ¯ID
-	 * @param data {void*} æ¥æ”¶åˆ°çš„æ¶ˆæ¯æ•°æ®åœ°å€
-	 * @param dlen {int} æ¥æ”¶åˆ°çš„æ¶ˆæ¯æ•°æ®é•¿åº¦
+	 * ´¥·¢ÏûÏ¢¹ı³Ì
+	 * @param nMsg {int} ÏûÏ¢ID
+	 * @param data {void*} ½ÓÊÕµ½µÄÏûÏ¢Êı¾İµØÖ·
+	 * @param dlen {int} ½ÓÊÕµ½µÄÏûÏ¢Êı¾İ³¤¶È
 	 */
 	void trigger(int nMsg, void* data, int dlen);
 private:
@@ -172,7 +172,7 @@ private:
 	io_status status_;
 	MSG_HDR hdr_;
 
-	// åŸºç±»è™šå‡½æ•°
+	// »ùÀàĞéº¯Êı
 
 	virtual bool read_callback(char* data, int len);
 	virtual bool write_callback();

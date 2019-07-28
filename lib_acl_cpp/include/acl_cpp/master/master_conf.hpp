@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
@@ -60,46 +60,46 @@ public:
 	~master_conf();
 
 	/**
-	 * è®¾ç½® bool ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ bool ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_bool_tbl*}
 	 */
 	void set_cfg_bool(master_bool_tbl* table);
 
 	/**
-	 * è®¾ç½® int ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ int ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_int_tbl*}
 	 */
 	void set_cfg_int(master_int_tbl* table);
 
 	/**
-	 * è®¾ç½® int64 ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ int64 ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_int64_tbl*}
 	 */
 	void set_cfg_int64(master_int64_tbl* table);
 
 	/**
-	 * è®¾ç½® å­—ç¬¦ä¸² ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ ×Ö·û´® ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_str_tbl*}
 	 */
 	void set_cfg_str(master_str_tbl* table);
 
 	/**
-	 * åŠ è½½é…ç½®æ–‡ä»¶
-	 * @param path {const char*} é…ç½®æ–‡ä»¶å…¨è·¯å¾„
+	 * ¼ÓÔØÅäÖÃÎÄ¼ş
+	 * @param path {const char*} ÅäÖÃÎÄ¼şÈ«Â·¾¶
 	 */
 	void load(const char* path);
 
 	/**
-	 * è·å¾—ç”± load è®¾ç½®çš„é…ç½®æ–‡ä»¶è·¯å¾„
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºæ²¡æœ‰è®¾ç½®é…ç½®æ–‡ä»¶è·¯å¾„
+	 * »ñµÃÓÉ load ÉèÖÃµÄÅäÖÃÎÄ¼şÂ·¾¶
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾Ã»ÓĞÉèÖÃÅäÖÃÎÄ¼şÂ·¾¶
 	 */
 	const char* get_path(void) const;
 
 	/**
-	 * é‡ç½®é…ç½®è§£æå™¨çŠ¶æ€ï¼Œé‡Šæ”¾ä¹‹å‰åˆ†é…çš„èµ„æºï¼Œè°ƒç”¨æ­¤å‡½æ•°åï¼Œ
-	 * ä¹‹å‰è·å¾—çš„å­—ç¬¦ä¸²é…ç½®é¡¹çš„å†…å­˜å°†ä¼šè¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ç¦æ­¢å†ç”¨ï¼›
-	 * è°ƒç”¨è¯¥å‡½æ•°åï¼Œåˆ™è¯¥é…ç½®è§£æå™¨å¯¹è±¡å¯ä»¥å†æ¬¡ä½¿ç”¨è§£æå…¶å®ƒ
-	 * é…ç½®æ–‡ä»¶
+	 * ÖØÖÃÅäÖÃ½âÎöÆ÷×´Ì¬£¬ÊÍ·ÅÖ®Ç°·ÖÅäµÄ×ÊÔ´£¬µ÷ÓÃ´Ëº¯Êıºó£¬
+	 * Ö®Ç°»ñµÃµÄ×Ö·û´®ÅäÖÃÏîµÄÄÚ´æ½«»á±»ÊÍ·Å£¬ËùÒÔ½ûÖ¹ÔÙÓÃ£»
+	 * µ÷ÓÃ¸Ãº¯Êıºó£¬Ôò¸ÃÅäÖÃ½âÎöÆ÷¶ÔÏó¿ÉÒÔÔÙ´ÎÊ¹ÓÃ½âÎöÆäËü
+	 * ÅäÖÃÎÄ¼ş
 	 */
 	void reset(void);
 

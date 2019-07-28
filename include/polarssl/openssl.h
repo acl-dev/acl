@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file openssl.h
  *
  * \brief OpenSSL wrapper (definitions, inline functions).

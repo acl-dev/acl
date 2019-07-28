@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_ostream.hpp"
@@ -60,12 +60,12 @@ aio_ostream::aio_ostream(aio_handle* handle, ACL_SOCKET fd)
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
-	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
+	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
 	hook_error();
 
-	// åªæœ‰å½“æµè¿æ¥æˆåŠŸåæ‰å¯ hook IO å†™çŠ¶æ€
-	// hook å†™å›è°ƒè¿‡ç¨‹
+	// Ö»ÓĞµ±Á÷Á¬½Ó³É¹¦ºó²Å¿É hook IO Ğ´×´Ì¬
+	// hook Ğ´»Øµ÷¹ı³Ì
 	hook_write();
 }
 
@@ -95,7 +95,7 @@ void aio_ostream::add_write_callback(aio_callback* callback)
 {
 	acl_assert(callback);
 
-	// å…ˆæŸ¥è¯¢è¯¥å›è°ƒå¯¹è±¡å·²ç»å­˜åœ¨
+	// ÏÈ²éÑ¯¸Ã»Øµ÷¶ÔÏóÒÑ¾­´æÔÚ
 	std::list<AIO_CALLBACK*>::iterator it = write_callbacks_.begin();
 	for (; it != write_callbacks_.end(); ++it) {
 		if ((*it)->callback == callback) {
@@ -106,7 +106,7 @@ void aio_ostream::add_write_callback(aio_callback* callback)
 		}
 	}
 
-	// æ‰¾ä¸€ä¸ªç©ºä½
+	// ÕÒÒ»¸ö¿ÕÎ»
 	it = write_callbacks_.begin();
 	for (; it != write_callbacks_.end(); ++it) {
 		if ((*it)->callback == NULL) {
@@ -116,12 +116,12 @@ void aio_ostream::add_write_callback(aio_callback* callback)
 		}
 	}
 
-	// åˆ†é…ä¸€ä¸ªæ–°çš„ä½ç½®
+	// ·ÖÅäÒ»¸öĞÂµÄÎ»ÖÃ
 	AIO_CALLBACK* ac = (AIO_CALLBACK*) acl_mycalloc(1, sizeof(AIO_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
-	// æ·»åŠ è¿›å›è°ƒå¯¹è±¡é˜Ÿåˆ—ä¸­
+	// Ìí¼Ó½ø»Øµ÷¶ÔÏó¶ÓÁĞÖĞ
 	write_callbacks_.push_back(ac);
 }
 
@@ -237,13 +237,13 @@ void aio_ostream::write(const void* data, int len,
 			timer_writer = NEW aio_timer_writer();
 		}
 
-		// è®¾ç½® timer_writer_ å¯¹è±¡çš„æˆå‘˜å˜é‡
+		// ÉèÖÃ timer_writer_ ¶ÔÏóµÄ³ÉÔ±±äÁ¿
 		timer_writer->out_ = this;
 		timer_writer->buf_.copy(data, len);
 
-		// å°†è¯¥å†™æ“ä½œæ”¾å…¥å»¶è¿Ÿå¼‚æ­¥å†™çš„é˜Ÿåˆ—ä¸­
+		// ½«¸ÃĞ´²Ù×÷·ÅÈëÑÓ³ÙÒì²½Ğ´µÄ¶ÓÁĞÖĞ
 		timer_writers_.push_back(timer_writer);
-		// è®¾ç½®å®šæ—¶å™¨
+		// ÉèÖÃ¶¨Ê±Æ÷
 		handle_->set_timer(timer_writer, delay);
 		return;
 	}
@@ -267,7 +267,7 @@ void aio_ostream::vformat(const char* fmt, va_list ap)
 
 void aio_ostream::write_wait(int timeout /* = 0 */)
 {
-	// è®¾ç½®æµçš„å¼‚æ­¥è¯»è¶…æ—¶æ—¶é—´
+	// ÉèÖÃÁ÷µÄÒì²½¶Á³¬Ê±Ê±¼ä
 	if (timeout >= 0) {
 		ACL_AIO_SET_TIMEOUT(stream_, timeout);
 	}

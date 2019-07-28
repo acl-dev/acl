@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 extern char *var_cfg_manager_addr;
 extern char *var_cfg_access_url;

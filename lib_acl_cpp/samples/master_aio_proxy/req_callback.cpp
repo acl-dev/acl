@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "res_callback.h"
 #include "req_callback.h"
 
@@ -25,11 +25,11 @@ bool req_callback::read_callback(char* data, int len)
 		return false;
 	}
 
-	// å–å¾—æœåŠ¡ç«¯è¿æ¥ï¼Œå¹¶å°†æ•°æ®å†™å…¥
+	// È¡µÃ·şÎñ¶ËÁ¬½Ó£¬²¢½«Êı¾İĞ´Èë
 	acl::aio_socket_stream& peer = res_->get_conn();
 	peer.write(data, len);
 
-	// å°†æ•°æ®å†™å…¥æœ¬åœ°è¯·æ±‚æ–‡ä»¶
+	// ½«Êı¾İĞ´Èë±¾µØÇëÇóÎÄ¼ş
 	if (req_fp_)
 		req_fp_->write(data, len);
 
@@ -47,26 +47,26 @@ void req_callback::close_callback()
 		res->disconnect();
 	}
 
-	// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²  
+	// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶  
 
 	delete this;
 }
 
 void req_callback::start(const char* server_addr)
 {
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
 	conn_->add_read_callback(this);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
 	conn_->add_write_callback(this);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
 	conn_->add_close_callback(this);
 
-	// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
 	conn_->add_timeout_callback(this);
 
-	// å¼€å§‹è¿æ¥è¿œç¨‹æœåŠ¡å™¨
+	// ¿ªÊ¼Á¬½ÓÔ¶³Ì·şÎñÆ÷
 	acl::aio_handle& handle = conn_->get_handle();
 	res_ = new res_callback(this, res_fp_);
 	if (res_->start(handle, server_addr) == false)
@@ -87,7 +87,7 @@ acl::aio_socket_stream& req_callback::get_conn()
 
 void req_callback::on_connected()
 {
-	// å½“è¿æ¥æœåŠ¡ç«¯æˆåŠŸåè°ƒç”¨æ­¤å‡½æ•°å¼€å§‹ä»å®¢æˆ·ç«¯è¯»å–æ•°æ®
+	// µ±Á¬½Ó·şÎñ¶Ë³É¹¦ºóµ÷ÓÃ´Ëº¯Êı¿ªÊ¼´Ó¿Í»§¶Ë¶ÁÈ¡Êı¾İ
 	conn_->read();
 }
 

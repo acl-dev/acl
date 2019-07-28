@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class connect_pool : public acl::connect_pool
 {
@@ -9,7 +9,7 @@ public:
 	void set_timeout(int conn_timeout, int rw_timeout);
 
 protected:
-	// åŸºç±»çº¯è™šå‡½æ•°çš„å®ç°
+	// »ùÀà´¿Ğéº¯ÊıµÄÊµÏÖ
 	acl::connect_client* create_connect();
 
 private:

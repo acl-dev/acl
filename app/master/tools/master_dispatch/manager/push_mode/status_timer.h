@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class status_timer : public acl::event_timer
 {
@@ -6,12 +6,12 @@ public:
 	status_timer();
 
 	/**
-	 * å®šæ—¶å™¨è¢«é”€æ¯æ—¶çš„å›è°ƒå‡½æ•° 
+	 * ¶¨Ê±Æ÷±»Ïú»ÙÊ±µÄ»Øµ÷º¯Êı 
 	 */
 	virtual void destroy();
 
 protected:
-	// å®šæ—¶å™¨æ—¶é—´åˆ°åˆ°è¾¾æ—¶çš„å›è°ƒå‡½æ•° 
+	// ¶¨Ê±Æ÷Ê±¼äµ½µ½´ïÊ±µÄ»Øµ÷º¯Êı 
 	virtual void timer_callback(unsigned int id);
 
 private:

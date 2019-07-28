@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file rsa.h
  *
  * \brief The RSA public-key cryptosystem

@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/aliyun/oss/model/Bucket.hpp"
 #include "oss_macro.hpp"

@@ -1,18 +1,18 @@
-ï»¿// net_tools.h : PROJECT_NAME åº”ç”¨ç¨‹åºçš„ä¸»å¤´æ–‡ä»¶
+// net_tools.h : PROJECT_NAME Ó¦ÓÃ³ÌĞòµÄÖ÷Í·ÎÄ¼ş
 //
 
 #pragma once
 
 #ifndef __AFXWIN_H__
-	#error åœ¨åŒ…å«ç”¨äº PCH çš„æ­¤æ–‡ä»¶ä¹‹å‰åŒ…å«â€œstdafx.hâ€
+	#error ÔÚ°üº¬ÓÃÓÚ PCH µÄ´ËÎÄ¼şÖ®Ç°°üº¬¡°stdafx.h¡±
 #endif
 
 #include "SingleCtrl.h"
-#include "resource.h"		// ä¸»ç¬¦å·
+#include "resource.h"		// Ö÷·ûºÅ
 
 
 // Cnet_toolsApp:
-// æœ‰å…³æ­¤ç±»çš„å®ç°ï¼Œè¯·å‚é˜… net_tools.cpp
+// ÓĞ¹Ø´ËÀàµÄÊµÏÖ£¬Çë²ÎÔÄ net_tools.cpp
 //
 
 class Cnet_toolsApp : public CWinApp
@@ -20,11 +20,11 @@ class Cnet_toolsApp : public CWinApp
 public:
 	Cnet_toolsApp();
 
-// é‡å†™
+// ÖØĞ´
 public:
 	virtual BOOL InitInstance();
 
-// å®ç°
+// ÊµÏÖ
 
 	DECLARE_MESSAGE_MAP()
 

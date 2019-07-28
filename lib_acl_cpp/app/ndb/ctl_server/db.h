@@ -1,32 +1,32 @@
-ï»¿#pragma once
+#pragma once
 
 class acl::locker;
 class db_tbl;
 class idx_host;
 class database;
 
-// ç´¢å¼•å­—æ®µçš„ç±»å‹
+// Ë÷Òı×Ö¶ÎµÄÀàĞÍ
 typedef enum
 {
-	IDX_TYPE_STR = 0,	// å­—ç¬¦ä¸²ç±»å‹
-	IDX_TYPE_BOOL,		// å¸ƒå°”ç±»å‹
-	IDX_TYPE_INT16,		// 16ä½æ•´æ•°
-	IDX_TYPE_INT32,		// 32ä½æ•´æ•°
-	IDX_TYPE_INT64		// 64ä½æ•´æ•°
+	IDX_TYPE_STR = 0,	// ×Ö·û´®ÀàĞÍ
+	IDX_TYPE_BOOL,		// ²¼¶ûÀàĞÍ
+	IDX_TYPE_INT16,		// 16Î»ÕûÊı
+	IDX_TYPE_INT32,		// 32Î»ÕûÊı
+	IDX_TYPE_INT64		// 64Î»ÕûÊı
 } idx_type_t;
 
 /**
- * æ•°æ®åº“è¡¨å¯¹è±¡ä¸­çš„ç´¢å¼•å¯¹è±¡
+ * Êı¾İ¿â±í¶ÔÏóÖĞµÄË÷Òı¶ÔÏó
  */
 class db_idx
 {
 public:
 	/**
-	 * è¡¨ç´¢å¼•å¯¹è±¡æ„é€ å‡½æ•°
-	 * @param tbl {db_tbl*} è¡¨å¯¹è±¡
-	 * @param name {const char*} ç´¢å¼•åç§°
-	 * @param id {unsigned int} ç´¢å¼•å¯¹åº”çš„IDå·
-	 * @param type {idx_type_t} ç´¢å¼•å­—æ®µçš„æ•°æ®ç±»å‹
+	 * ±íË÷Òı¶ÔÏó¹¹Ôìº¯Êı
+	 * @param tbl {db_tbl*} ±í¶ÔÏó
+	 * @param name {const char*} Ë÷ÒıÃû³Æ
+	 * @param id {unsigned int} Ë÷Òı¶ÔÓ¦µÄIDºÅ
+	 * @param type {idx_type_t} Ë÷Òı×Ö¶ÎµÄÊı¾İÀàĞÍ
 	 */
 	db_idx(db_tbl* tbl, const char* name, unsigned int id, idx_type_t type);
 	~db_idx();
@@ -52,20 +52,20 @@ public:
 	}
 protected:
 private:
-	db_tbl* tbl_; // æ‰€å±çš„æ•°æ®è¡¨å¯¹è±¡
-	char* name_;  // ç´¢å¼•å
-	unsigned int id_;  // ç´¢å¼•IDå·
-	idx_type_t type_;  // ç´¢å¼•å­—æ®µçš„æ•°æ®ç±»å‹
+	db_tbl* tbl_; // ËùÊôµÄÊı¾İ±í¶ÔÏó
+	char* name_;  // Ë÷ÒıÃû
+	unsigned int id_;  // Ë÷ÒıIDºÅ
+	idx_type_t type_;  // Ë÷Òı×Ö¶ÎµÄÊı¾İÀàĞÍ
 };
 
 class db_tbl
 {
 public:
 	/**
-	 * è¡¨å¯¹è±¡æ„é€ å‡½æ•°
-	 * @param db {database*} æ•°æ®åº“å¯¹è±¡
-	 * @param name {const char*} æ•°æ®è¡¨å
-	 * @param id {unsigned int} æ•°æ®è¡¨å¯¹åº”çš„IDå·
+	 * ±í¶ÔÏó¹¹Ôìº¯Êı
+	 * @param db {database*} Êı¾İ¿â¶ÔÏó
+	 * @param name {const char*} Êı¾İ±íÃû
+	 * @param id {unsigned int} Êı¾İ±í¶ÔÓ¦µÄIDºÅ
 	 */
 	db_tbl(database* db, const char* name, unsigned int id);
 	~db_tbl();
@@ -87,19 +87,19 @@ public:
 
 	void add_idx(db_idx* idx);
 private:
-	database* db_; // æ‰€å±çš„æ•°æ®åº“å¯¹è±¡
-	char* name_;  // æ•°æ®è¡¨å
-	unsigned int id_;  // æ•°æ®è¡¨çš„IDå·
-	std::list<db_idx*> idxes_;  // è¡¨ç´¢å¼•é›†åˆ
+	database* db_; // ËùÊôµÄÊı¾İ¿â¶ÔÏó
+	char* name_;  // Êı¾İ±íÃû
+	unsigned int id_;  // Êı¾İ±íµÄIDºÅ
+	std::list<db_idx*> idxes_;  // ±íË÷Òı¼¯ºÏ
 };
 
 class database
 {
 public:
 	/**
-	 * æ•°æ®åº“å¯¹è±¡æ„é€ å‡½æ•°
-	 * @param name {const char*} æ•°æ®åº“åç§°
-	 * @param id {unsigned int} æ•°æ®åº“å¯¹åº”çš„IDå·
+	 * Êı¾İ¿â¶ÔÏó¹¹Ôìº¯Êı
+	 * @param name {const char*} Êı¾İ¿âÃû³Æ
+	 * @param id {unsigned int} Êı¾İ¿â¶ÔÓ¦µÄIDºÅ
 	 */
 	database(const char* name, unsigned int id);
 	~database();
@@ -118,10 +118,10 @@ public:
 	void add_idx_host(idx_host* host);
 protected:
 private:
-	char* name_;  // æ•°æ®åº“å
-	unsigned int id_;  // æ•°æ®åº“çš„IDå·
-	std::map<std::string, db_tbl*> tables_;  // æ•°æ®è¡¨é›†åˆ
-	std::vector<idx_host*> idx_hosts_;  // æ‰€å¯¹åº”çš„ç´¢å¼•æœåŠ¡å™¨çš„é›†åˆ
+	char* name_;  // Êı¾İ¿âÃû
+	unsigned int id_;  // Êı¾İ¿âµÄIDºÅ
+	std::map<std::string, db_tbl*> tables_;  // Êı¾İ±í¼¯ºÏ
+	std::vector<idx_host*> idx_hosts_;  // Ëù¶ÔÓ¦µÄË÷Òı·şÎñÆ÷µÄ¼¯ºÏ
 
-	acl::locker* lock_;  // æ•°æ®åº“é”
+	acl::locker* lock_;  // Êı¾İ¿âËø
 };

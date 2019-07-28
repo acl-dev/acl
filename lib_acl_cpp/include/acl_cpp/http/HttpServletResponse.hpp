@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
@@ -16,22 +16,22 @@ class HttpCookie;
 class HttpServletRequest;
 
 /**
- * ä¸ HTTP å®¢æˆ·ç«¯å“åº”ç›¸å…³çš„ç±»ï¼Œè¯¥ç±»ä¸åº”è¢«ç»§æ‰¿ï¼Œç”¨æˆ·ä¹Ÿä¸éœ€è¦
- * å®šä¹‰æˆ–åˆ›å»ºè¯¥ç±»å¯¹è±¡
+ * Óë HTTP ¿Í»§¶ËÏìÓ¦Ïà¹ØµÄÀà£¬¸ÃÀà²»Ó¦±»¼Ì³Ğ£¬ÓÃ»§Ò²²»ĞèÒª
+ * ¶¨Òå»ò´´½¨¸ÃÀà¶ÔÏó
  */
 class ACL_CPP_API HttpServletResponse : public noncopyable
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param stream {socket_stream&} æ•°æ®æµï¼Œå†…éƒ¨ä¸ä¼šè‡ªåŠ¨å…³é—­æµ
+	 * ¹¹Ôìº¯Êı
+	 * @param stream {socket_stream&} Êı¾İÁ÷£¬ÄÚ²¿²»»á×Ô¶¯¹Ø±ÕÁ÷
 	 */
 	HttpServletResponse(socket_stream& stream);
 	~HttpServletResponse(void);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”æ•°æ®ä½“çš„é•¿åº¦
-	 * @param n {acl_int64} æ•°æ®ä½“é•¿åº¦
+	 * ÉèÖÃ HTTP ÏìÓ¦Êı¾İÌåµÄ³¤¶È
+	 * @param n {acl_int64} Êı¾İÌå³¤¶È
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	HttpServletResponse& setContentLength(__int64 n);
@@ -40,71 +40,71 @@ public:
 #endif
 
 	/**
-	 * è®¾ç½® HTTP chunked ä¼ è¾“æ¨¡å¼
-	 * @param on {bool} å¦‚æœä¸º trueï¼Œå³ä½¿è®¾ç½®äº† setContentLengthï¼Œ
-	 *  åˆ™å†…éƒ¨ä¹Ÿä¼šé‡‡ç”¨ chunked ä¼ è¾“æ–¹å¼ï¼Œæ ¹æ® HTTP RFC è§„èŒƒè¦æ±‚ï¼Œ
-	 *  chunked ä¼ è¾“çš„ä¼˜å…ˆçº§é«˜çº§ conteng-length æ–¹å¼
+	 * ÉèÖÃ HTTP chunked ´«ÊäÄ£Ê½
+	 * @param on {bool} Èç¹ûÎª true£¬¼´Ê¹ÉèÖÃÁË setContentLength£¬
+	 *  ÔòÄÚ²¿Ò²»á²ÉÓÃ chunked ´«Êä·½Ê½£¬¸ù¾İ HTTP RFC ¹æ·¶ÒªÇó£¬
+	 *  chunked ´«ÊäµÄÓÅÏÈ¼¶¸ß¼¶ conteng-length ·½Ê½
 	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setChunkedTransferEncoding(bool on);
 
 	/**
-	 * è®¾ç½®ä¸ HTTP å®¢æˆ·ç«¯ä¿æŒè”ç³»é•¿è¿æ¥
+	 * ÉèÖÃÓë HTTP ¿Í»§¶Ë±£³ÖÁªÏµ³¤Á¬½Ó
 	 * @param on {bool}
 	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setKeepAlive(bool on);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”æ•°æ®ä½“çš„ Content-Type å­—æ®µå€¼ï¼Œå¯å­—æ®µå€¼å¯ä»¥ä¸ºï¼š
-	 * text/html æˆ– text/html; charset=utf8 æ ¼å¼
-	 * @param value {const char*} å­—æ®µå€¼
+	 * ÉèÖÃ HTTP ÏìÓ¦Êı¾İÌåµÄ Content-Type ×Ö¶ÎÖµ£¬¿É×Ö¶ÎÖµ¿ÉÒÔÎª£º
+	 * text/html »ò text/html; charset=utf8 ¸ñÊ½
+	 * @param value {const char*} ×Ö¶ÎÖµ
 	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setContentType(const char* value);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”æ•°æ®ä½“é‡‡ç”¨ gzip å‹ç¼©æ ¼å¼
-	 * @param gzip {bool} æ˜¯å¦é‡‡ç”¨ gzip å‹ç¼©æ ¼å¼
+	 * ÉèÖÃ HTTP ÏìÓ¦Êı¾İÌå²ÉÓÃ gzip Ñ¹Ëõ¸ñÊ½
+	 * @param gzip {bool} ÊÇ·ñ²ÉÓÃ gzip Ñ¹Ëõ¸ñÊ½
 	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setContentEncoding(bool gzip);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”æ•°æ®ä½“ä¸­å­—ç¬¦é›†ï¼Œå½“å·²ç»åœ¨ setContentType è®¾ç½®
-	 * äº†å­—ç¬¦é›†ï¼Œåˆ™å°±ä¸å¿…å†è°ƒç”¨æœ¬å‡½æ•°è®¾ç½®å­—ç¬¦é›†
-	 * @param charset {const char*} å“åº”ä½“æ•°æ®çš„å­—ç¬¦é›†
+	 * ÉèÖÃ HTTP ÏìÓ¦Êı¾İÌåÖĞ×Ö·û¼¯£¬µ±ÒÑ¾­ÔÚ setContentType ÉèÖÃ
+	 * ÁË×Ö·û¼¯£¬Ôò¾Í²»±ØÔÙµ÷ÓÃ±¾º¯ÊıÉèÖÃ×Ö·û¼¯
+	 * @param charset {const char*} ÏìÓ¦ÌåÊı¾İµÄ×Ö·û¼¯
 	 * @return {HttpServletResponse&}
 	 */
 	HttpServletResponse& setCharacterEncoding(const char* charset);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„æ—¥æœŸæ ¼å¼çš„å­—æ®µ
-	 * @param name {const char*} HTTP å“åº”å¤´ä¸­çš„å­—æ®µå
-	 * @param value {time_t} æ—¶é—´å€¼
+	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄÈÕÆÚ¸ñÊ½µÄ×Ö¶Î
+	 * @param name {const char*} HTTP ÏìÓ¦Í·ÖĞµÄ×Ö¶ÎÃû
+	 * @param value {time_t} Ê±¼äÖµ
 	 */
 	HttpServletResponse& setDateHeader(const char* name, time_t value);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„å­—ç¬¦ä¸²æ ¼å¼å­—æ®µ
-	 * @param name {const char*} HTTP å“åº”å¤´ä¸­çš„å­—æ®µå
-	 * @param value {const char*} å­—æ®µå€¼
+	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄ×Ö·û´®¸ñÊ½×Ö¶Î
+	 * @param name {const char*} HTTP ÏìÓ¦Í·ÖĞµÄ×Ö¶ÎÃû
+	 * @param value {const char*} ×Ö¶ÎÖµ
 	 */
 	HttpServletResponse& setHeader(const char* name, const char* value);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„æ•´æ•°æ ¼å¼å­—æ®µ
-	 * @param name {const char*} HTTP å“åº”å¤´ä¸­çš„å­—æ®µå
-	 * @param value {int} å­—æ®µå€¼
+	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄÕûÊı¸ñÊ½×Ö¶Î
+	 * @param name {const char*} HTTP ÏìÓ¦Í·ÖĞµÄ×Ö¶ÎÃû
+	 * @param value {int} ×Ö¶ÎÖµ
 	 */
 	HttpServletResponse& setHeader(const char* name, int value);
 
 	/**
-	 * å¯¹äºåˆ†åŒºä¸‹è½½ï¼Œè°ƒç”¨æœ¬å‡½æ•°è®¾ç½®æ•°æ®ä¸‹è½½çš„åç§»ä½ç½®ï¼ˆä¸‹æ ‡ä» 0 å¼€å§‹ï¼‰
-	 * @param from {http_off_t} æ•°æ®åŒºé—´èµ·å§‹åç§»ä½ç½®ï¼ˆä¸‹æ ‡ä» 0 å¼€å§‹è®¡ç®—ï¼‰
-	 * @param to {http_off_t} æ•°æ®åŒºé—´ç»“æŸä½ç½®ï¼ˆè¯¥å€¼éœ€å°äºæ€»æ•°æ®é•¿åº¦ï¼‰
-	 * @param total {http_off_t} æ€»æ•°æ®é•¿åº¦ï¼Œå½“æ•°æ®æºä¸ºä¸€ä¸ªé™æ€æ–‡ä»¶æ—¶è¯¥å€¼
-	 *  åº”ç­‰äºè¯¥æ–‡ä»¶çš„æ€»é•¿åº¦å¤§å°
+	 * ¶ÔÓÚ·ÖÇøÏÂÔØ£¬µ÷ÓÃ±¾º¯ÊıÉèÖÃÊı¾İÏÂÔØµÄÆ«ÒÆÎ»ÖÃ£¨ÏÂ±ê´Ó 0 ¿ªÊ¼£©
+	 * @param from {http_off_t} Êı¾İÇø¼äÆğÊ¼Æ«ÒÆÎ»ÖÃ£¨ÏÂ±ê´Ó 0 ¿ªÊ¼¼ÆËã£©
+	 * @param to {http_off_t} Êı¾İÇø¼ä½áÊøÎ»ÖÃ£¨¸ÃÖµĞèĞ¡ÓÚ×ÜÊı¾İ³¤¶È£©
+	 * @param total {http_off_t} ×ÜÊı¾İ³¤¶È£¬µ±Êı¾İÔ´ÎªÒ»¸ö¾²Ì¬ÎÄ¼şÊ±¸ÃÖµ
+	 *  Ó¦µÈÓÚ¸ÃÎÄ¼şµÄ×Ü³¤¶È´óĞ¡
 	 * @return {HttpServletResponse&}
 	 */
 #if  defined(_WIN32) || defined(_WIN64)
@@ -116,129 +116,129 @@ public:
 #endif
 
 	/**
-	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„çŠ¶æ€ç ï¼š1xx, 2xx, 3xx, 4xx, 5xx
-	 * @param status {int} HTTP å“åº”çŠ¶æ€ç , å¦‚ï¼š200
+	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄ×´Ì¬Âë£º1xx, 2xx, 3xx, 4xx, 5xx
+	 * @param status {int} HTTP ÏìÓ¦×´Ì¬Âë, Èç£º200
 	 */
 	HttpServletResponse& setStatus(int status);
 
 	/**
-	 * è®¾ç½®ä¸º CGI æ¨¡å¼ï¼Œç”¨æˆ·ä¸€èˆ¬ä¸éœ€æ‰‹å·¥è®¾ç½®ï¼Œå› ä¸º HttpServlet ç±»
-	 * ä¼šè‡ªåŠ¨è®¾ç½®æ˜¯å¦æ˜¯ CGI æ¨¡å¼
-	 * @param on {bool} æ˜¯å¦æ˜¯ CGI æ¨¡å¼
+	 * ÉèÖÃÎª CGI Ä£Ê½£¬ÓÃ»§Ò»°ã²»ĞèÊÖ¹¤ÉèÖÃ£¬ÒòÎª HttpServlet Àà
+	 * »á×Ô¶¯ÉèÖÃÊÇ·ñÊÇ CGI Ä£Ê½
+	 * @param on {bool} ÊÇ·ñÊÇ CGI Ä£Ê½
 	 */
 	HttpServletResponse& setCgiMode(bool on);
 
 	/**
-	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„é‡å®šå‘ location å­—æ®µ
-	 * @param location {const char*} URLï¼Œéç©º
-	 * @param status {int} HTTP å“åº”çŠ¶æ€ç ï¼Œä¸€èˆ¬ä¸º 3xx ç±»
+	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄÖØ¶¨Ïò location ×Ö¶Î
+	 * @param location {const char*} URL£¬·Ç¿Õ
+	 * @param status {int} HTTP ÏìÓ¦×´Ì¬Âë£¬Ò»°ãÎª 3xx Àà
 	 */
 	HttpServletResponse& setRedirect(const char* location, int status = 302);
 
 	/**
-	 * æ·»åŠ  cookie å¯¹è±¡ï¼Œè¯¥å¯¹è±¡å¿…é¡»æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œä¸”ç”¨æˆ·è‡ªå·±ä¸èƒ½
-	 * å†æ˜¾ç¤ºé‡Šæ”¾è¯¥å¯¹è±¡ï¼Œå› ä¸ºå†…éƒ¨ä¼šè‡ªåŠ¨é‡Šæ”¾
+	 * Ìí¼Ó cookie ¶ÔÏó£¬¸Ã¶ÔÏó±ØĞëÊÇ¶¯Ì¬·ÖÅäµÄ£¬ÇÒÓÃ»§×Ô¼º²»ÄÜ
+	 * ÔÙÏÔÊ¾ÊÍ·Å¸Ã¶ÔÏó£¬ÒòÎªÄÚ²¿»á×Ô¶¯ÊÍ·Å
 	 * @param cookie {HttpCookie*}
 	 */
 	HttpServletResponse& addCookie(HttpCookie* cookie);
 
 	/**
-	 * æ·»åŠ  cookie
-	 * @param name {const char*} cookie å
-	 * @param value {const char*} cookie å€¼
-	 * @param domain {const char*} cookie å­˜å‚¨åŸŸ
-	 * @param path {const char*} cookie å­˜å‚¨è·¯å¾„
-	 * @param expires {time_t} cookie è¿‡æœŸæ—¶é—´é—´éš”ï¼Œå½“å½“å‰æ—¶é—´åŠ 
-	 *  è¯¥å€¼ä¸º cookie çš„è¿‡æœŸæ—¶é—´æˆª(ç§’)
+	 * Ìí¼Ó cookie
+	 * @param name {const char*} cookie Ãû
+	 * @param value {const char*} cookie Öµ
+	 * @param domain {const char*} cookie ´æ´¢Óò
+	 * @param path {const char*} cookie ´æ´¢Â·¾¶
+	 * @param expires {time_t} cookie ¹ıÆÚÊ±¼ä¼ä¸ô£¬µ±µ±Ç°Ê±¼ä¼Ó
+	 *  ¸ÃÖµÎª cookie µÄ¹ıÆÚÊ±¼ä½Ø(Ãë)
 	 */
 	HttpServletResponse& addCookie(const char* name, const char* value,
 		const char* domain = NULL, const char* path = NULL,
 		time_t expires = 0);
 
 	/**
-	 * å°† url è¿›è¡Œ url ç¼–ç 
-	 * @param out {string&} å­˜å‚¨ç¼–ç åçš„ç»“æœ
-	 * @param url {const char*} æœªç¼–ç å‰åŸå§‹çš„ url
+	 * ½« url ½øĞĞ url ±àÂë
+	 * @param out {string&} ´æ´¢±àÂëºóµÄ½á¹û
+	 * @param url {const char*} Î´±àÂëÇ°Ô­Ê¼µÄ url
 	 */
 	void encodeUrl(string& out, const char* url);
 
 	/**
-	 * è·å¾— HTTP å“åº”å¤´
+	 * »ñµÃ HTTP ÏìÓ¦Í·
 	 * @return {http_header&}
 	 */
 	http_header& getHttpHeader(void) const;
 
 	/**
-	 * å‘å®¢æˆ·ç«¯å‘é€ HTTP æ•°æ®ä½“å“åº”æ•°æ®ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æ­¤å‡½æ•°ï¼Œ
-	 * å½“é€šè¿‡ setChunkedTransferEncoding è®¾ç½®äº† chunked ä¼ è¾“æ–¹å¼åï¼Œ
-	 * å†…éƒ¨è‡ªåŠ¨é‡‡ç”¨ chunked ä¼ è¾“æ–¹å¼ï¼›è°ƒç”¨æ­¤å‡½æ•°ä¸å¿…æ˜¾å¼è°ƒç”¨
-	 * sendHeader å‡½æ•°æ¥å‘é€ HTTP å“åº”å¤´ï¼Œå› ä¸ºå†…éƒ¨ä¼šè‡ªåŠ¨åœ¨ç¬¬ä¸€æ¬¡
-	 * å†™æ—¶å‘é€ HTTP å“åº”å¤´ï¼›å¦å¤–ï¼Œåœ¨ä½¿ç”¨ chunked æ–¹å¼ä¼ è¾“æ•°æ®æ—¶ï¼Œ
-	 * åº”è¯¥åº”è¯¥æœ€åå†è°ƒç”¨ä¸€æ¬¡æœ¬å‡½æ•°ï¼Œä¸”å‚æ•°å‡è®¾ä¸º 0 è¡¨ç¤ºæ•°æ®ç»“æŸ
-	 * @param data {const void*} æ•°æ®åœ°å€
-	 * @param len {size_t} data æ•°æ®é•¿åº¦
-	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸï¼Œå¦‚æœè¿”å› false è¡¨ç¤ºè¿æ¥ä¸­æ–­
+	 * Ïò¿Í»§¶Ë·¢ËÍ HTTP Êı¾İÌåÏìÓ¦Êı¾İ£¬¿ÉÒÔÑ­»·µ÷ÓÃ´Ëº¯Êı£¬
+	 * µ±Í¨¹ı setChunkedTransferEncoding ÉèÖÃÁË chunked ´«Êä·½Ê½ºó£¬
+	 * ÄÚ²¿×Ô¶¯²ÉÓÃ chunked ´«Êä·½Ê½£»µ÷ÓÃ´Ëº¯Êı²»±ØÏÔÊ½µ÷ÓÃ
+	 * sendHeader º¯ÊıÀ´·¢ËÍ HTTP ÏìÓ¦Í·£¬ÒòÎªÄÚ²¿»á×Ô¶¯ÔÚµÚÒ»´Î
+	 * Ğ´Ê±·¢ËÍ HTTP ÏìÓ¦Í·£»ÁíÍâ£¬ÔÚÊ¹ÓÃ chunked ·½Ê½´«ÊäÊı¾İÊ±£¬
+	 * Ó¦¸ÃÓ¦¸Ã×îºóÔÙµ÷ÓÃÒ»´Î±¾º¯Êı£¬ÇÒ²ÎÊı¾ùÉèÎª 0 ±íÊ¾Êı¾İ½áÊø
+	 * @param data {const void*} Êı¾İµØÖ·
+	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦£¬Èç¹û·µ»Ø false ±íÊ¾Á¬½ÓÖĞ¶Ï
 	 */
 	bool write(const void* data, size_t len);
 
 	/**
-	 * å‘å®¢æˆ·ç«¯å‘é€ HTTP æ•°æ®ä½“å“åº”æ•°æ®ï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æ­¤å‡½æ•°ï¼Œè¯¥å‡½æ•°
-	 * å†…éƒ¨è°ƒç”¨ HttpServletResponse::write(const void*, size_t) è¿‡ç¨‹ï¼Œ
-	 * å¦å¤–ï¼Œåœ¨ä½¿ç”¨ chunked æ–¹å¼ä¼ è¾“æ•°æ®æ—¶ï¼Œåº”è¯¥åº”è¯¥æœ€åå†è°ƒç”¨ä¸€æ¬¡æœ¬å‡½æ•°ï¼Œ
-	 * ä¸”è¾“å…¥ç©ºä¸²ï¼Œå³ buf.empty() == true
-	 * @param buf {const string&} æ•°æ®ç¼“å†²åŒº
-	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸï¼Œå¦‚æœè¿”å› false è¡¨ç¤ºè¿æ¥ä¸­æ–­
+	 * Ïò¿Í»§¶Ë·¢ËÍ HTTP Êı¾İÌåÏìÓ¦Êı¾İ£¬¿ÉÒÔÑ­»·µ÷ÓÃ´Ëº¯Êı£¬¸Ãº¯Êı
+	 * ÄÚ²¿µ÷ÓÃ HttpServletResponse::write(const void*, size_t) ¹ı³Ì£¬
+	 * ÁíÍâ£¬ÔÚÊ¹ÓÃ chunked ·½Ê½´«ÊäÊı¾İÊ±£¬Ó¦¸ÃÓ¦¸Ã×îºóÔÙµ÷ÓÃÒ»´Î±¾º¯Êı£¬
+	 * ÇÒÊäÈë¿Õ´®£¬¼´ buf.empty() == true
+	 * @param buf {const string&} Êı¾İ»º³åÇø
+	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦£¬Èç¹û·µ»Ø false ±íÊ¾Á¬½ÓÖĞ¶Ï
 	 */
 	bool write(const string& buf);
 
 	/**
-	 * å¸¦æ ¼å¼æ–¹å¼å‘ HTTP å®¢æˆ·ç«¯å‘é€å“åº”æ•°æ®ï¼Œå†…éƒ¨è‡ªåŠ¨è°ƒç”¨
-	 * HttpServletResponse::write(const void*, size_t) è¿‡ç¨‹ï¼Œåœ¨ä½¿ç”¨
-	 * chunked æ–¹å¼ä¼ è¾“æ•°æ®æ—¶ï¼Œåº”è¯¥åº”è¯¥æœ€åå†è°ƒç”¨ write(NULL, 0)
-	 * è¡¨ç¤ºæ•°æ®ç»“æŸ
-	 * @param fmt {const char*} å˜å‚æ ¼å¼å­—ç¬¦ä¸²
-	 * @return {int} æˆåŠŸåˆ™è¿”å›å€¼ > 0ï¼Œå¦åˆ™è¿”å› -1
+	 * ´ø¸ñÊ½·½Ê½Ïò HTTP ¿Í»§¶Ë·¢ËÍÏìÓ¦Êı¾İ£¬ÄÚ²¿×Ô¶¯µ÷ÓÃ
+	 * HttpServletResponse::write(const void*, size_t) ¹ı³Ì£¬ÔÚÊ¹ÓÃ
+	 * chunked ·½Ê½´«ÊäÊı¾İÊ±£¬Ó¦¸ÃÓ¦¸Ã×îºóÔÙµ÷ÓÃ write(NULL, 0)
+	 * ±íÊ¾Êı¾İ½áÊø
+	 * @param fmt {const char*} ±ä²Î¸ñÊ½×Ö·û´®
+	 * @return {int} ³É¹¦Ôò·µ»ØÖµ > 0£¬·ñÔò·µ»Ø -1
 	 */
 	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * å¸¦æ ¼å¼æ–¹å¼å‘ HTTP å®¢æˆ·ç«¯å‘é€å“åº”æ•°æ®ï¼Œå†…éƒ¨è‡ªåŠ¨è°ƒç”¨
-	 * HttpServletResponse::write(const string&) è¿‡ç¨‹ï¼Œåœ¨ä½¿ç”¨ chunked
-	 * æ–¹å¼ä¼ è¾“æ•°æ®æ—¶ï¼Œåº”è¯¥åº”è¯¥æœ€åå†è°ƒç”¨ write(NULL, 0) è¡¨ç¤ºæ•°æ®ç»“æŸ
-	 * @param fmt {const char*} å˜å‚æ ¼å¼å­—ç¬¦ä¸²
-	 * @param ap {va_list} å˜å‚åˆ—è¡¨
-	 * @return {int} æˆåŠŸåˆ™è¿”å›å€¼ > 0ï¼Œå¦åˆ™è¿”å› -1
+	 * ´ø¸ñÊ½·½Ê½Ïò HTTP ¿Í»§¶Ë·¢ËÍÏìÓ¦Êı¾İ£¬ÄÚ²¿×Ô¶¯µ÷ÓÃ
+	 * HttpServletResponse::write(const string&) ¹ı³Ì£¬ÔÚÊ¹ÓÃ chunked
+	 * ·½Ê½´«ÊäÊı¾İÊ±£¬Ó¦¸ÃÓ¦¸Ã×îºóÔÙµ÷ÓÃ write(NULL, 0) ±íÊ¾Êı¾İ½áÊø
+	 * @param fmt {const char*} ±ä²Î¸ñÊ½×Ö·û´®
+	 * @param ap {va_list} ±ä²ÎÁĞ±í
+	 * @return {int} ³É¹¦Ôò·µ»ØÖµ > 0£¬·ñÔò·µ»Ø -1
 	 */
 	int vformat(const char* fmt, va_list ap);
 
 	///////////////////////////////////////////////////////////////////
 
 	/**
-	 * å‘é€ HTTP å“åº”å¤´ï¼Œç”¨æˆ·åº”è¯¥å‘é€æ•°æ®ä½“å‰è°ƒç”¨æ­¤å‡½æ•°å°† HTTP
-	 * å“åº”å¤´å‘é€ç»™å®¢æˆ·ç«¯
-	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸï¼Œè‹¥è¿”å› false åˆ™è¡¨ç¤ºè¿æ¥ä¸­æ–­ï¼Œ
-	 *  å½“è°ƒç”¨ä»¥ä¸Šå‡ ä¸ªå†™çš„å‡½æ•°æ—¶ï¼Œæœ¬å‡½æ•°ä¸å¿…æ˜¾å¼è¢«è°ƒç”¨ï¼Œå¦‚æœæ˜¯
-	 *  é€šè¿‡ä» getOutputStream è·å¾—çš„ socket æµå†™æ•°æ®æ—¶ï¼Œåˆ™æœ¬å‡½æ•°
-	 *  å¿…é¡»æ˜¾å¼è¢«è°ƒç”¨
+	 * ·¢ËÍ HTTP ÏìÓ¦Í·£¬ÓÃ»§Ó¦¸Ã·¢ËÍÊı¾İÌåÇ°µ÷ÓÃ´Ëº¯Êı½« HTTP
+	 * ÏìÓ¦Í··¢ËÍ¸ø¿Í»§¶Ë
+	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦£¬Èô·µ»Ø false Ôò±íÊ¾Á¬½ÓÖĞ¶Ï£¬
+	 *  µ±µ÷ÓÃÒÔÉÏ¼¸¸öĞ´µÄº¯ÊıÊ±£¬±¾º¯Êı²»±ØÏÔÊ½±»µ÷ÓÃ£¬Èç¹ûÊÇ
+	 *  Í¨¹ı´Ó getOutputStream »ñµÃµÄ socket Á÷Ğ´Êı¾İÊ±£¬Ôò±¾º¯Êı
+	 *  ±ØĞëÏÔÊ½±»µ÷ÓÃ
 	 */
 	bool sendHeader(void);
 
 	/**
-	 * è·å¾— HTTP å“åº”å¯¹è±¡çš„è¾“å‡ºæµå¯¹è±¡ï¼Œç”¨æˆ·åœ¨è°ƒç”¨ sendHeader å‘é€
-	 * å®Œ HTTP å“åº”å¤´åï¼Œé€šè¿‡è¯¥è¾“å‡ºæµæ¥å‘é€ HTTP æ•°æ®ä½“
+	 * »ñµÃ HTTP ÏìÓ¦¶ÔÏóµÄÊä³öÁ÷¶ÔÏó£¬ÓÃ»§ÔÚµ÷ÓÃ sendHeader ·¢ËÍ
+	 * Íê HTTP ÏìÓ¦Í·ºó£¬Í¨¹ı¸ÃÊä³öÁ÷À´·¢ËÍ HTTP Êı¾İÌå
 	 * @return {ostream&}
 	 */
 	ostream& getOutputStream(void) const;
 
 	/**
-	 * è·å¾— HTTP åŒå‘æµå¯¹è±¡ï¼Œç”±æ„é€ å‡½æ•°çš„å‚æ•°è¾“å…¥
+	 * »ñµÃ HTTP Ë«ÏòÁ÷¶ÔÏó£¬ÓÉ¹¹Ôìº¯ÊıµÄ²ÎÊıÊäÈë
 	 * @return {socket_stream&}
 	 */
 	socket_stream& getSocketStream(void) const;
 
 	/**
-	 * è·å¾—åº•å±‚çš„ http_client é€šä¿¡å¯¹è±¡
-	 * @return {http_client*} é NULL
+	 * »ñµÃµ×²ãµÄ http_client Í¨ĞÅ¶ÔÏó
+	 * @return {http_client*} ·Ç NULL
 	 */
 	http_client* getClient() const
 	{
@@ -246,7 +246,7 @@ public:
 	}
 
 	/**
-	 * è®¾ç½® http è¯·æ±‚å¯¹è±¡ï¼Œè¯¥å‡½æ•°ç›®å‰åªåº”è¢« HttpServlet ç±»å†…éƒ¨è°ƒç”¨
+	 * ÉèÖÃ http ÇëÇó¶ÔÏó£¬¸Ãº¯ÊıÄ¿Ç°Ö»Ó¦±» HttpServlet ÀàÄÚ²¿µ÷ÓÃ
 	 * @param request {HttpServletRequest*}
 	 */
 	void setHttpServletRequest(HttpServletRequest* request);
@@ -254,13 +254,13 @@ public:
 private:
 	dbuf_guard* dbuf_internal_;
 	dbuf_guard* dbuf_;
-	socket_stream& stream_;		// å®¢æˆ·ç«¯è¿æ¥æµ
-	HttpServletRequest* request_;	// http è¯·æ±‚å¯¹è±¡
-	http_client* client_;		// http å“åº”æµå¯¹è±¡
-	http_header* header_;		// http å“åº”å¤´
-	char  charset_[32];		// å­—ç¬¦é›†
-	char  content_type_[32];	// content-type ç±»å‹
-	bool  head_sent_;		// æ˜¯å¦å·²ç»å‘é€äº† HTTP å“åº”å¤´
+	socket_stream& stream_;		// ¿Í»§¶ËÁ¬½ÓÁ÷
+	HttpServletRequest* request_;	// http ÇëÇó¶ÔÏó
+	http_client* client_;		// http ÏìÓ¦Á÷¶ÔÏó
+	http_header* header_;		// http ÏìÓ¦Í·
+	char  charset_[32];		// ×Ö·û¼¯
+	char  content_type_[32];	// content-type ÀàĞÍ
+	bool  head_sent_;		// ÊÇ·ñÒÑ¾­·¢ËÍÁË HTTP ÏìÓ¦Í·
 };
 
 }  // namespace acl

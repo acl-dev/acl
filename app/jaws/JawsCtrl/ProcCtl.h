@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 #include "lib_acl.h"
 
@@ -9,7 +9,7 @@ class CProcCtl : public CWinThread
 	DECLARE_DYNCREATE(CProcCtl)
 
 protected:
-	CProcCtl();           // åŠ¨æ€åˆ›å»ºæ‰€ä½¿ç”¨çš„å—ä¿æŠ¤çš„æ„é€ å‡½æ•°
+	CProcCtl();           // ¶¯Ì¬´´½¨ËùÊ¹ÓÃµÄÊÜ±£»¤µÄ¹¹Ôìº¯Êı
 	virtual ~CProcCtl();
 
 public:

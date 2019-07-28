@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -12,16 +12,16 @@
 #endif
 
 typedef struct {
-	ACL_CACHE2  cache;		/**< å°è£…äº† ACL_CACHE2 */
-	ACL_HTABLE *table;		/**< å“ˆå¸Œè¡¨ç”¨äºŽæŒ‰é”®å€¼æŸ¥è¯¢ */
-	avl_tree_t  avl;		/**< ç”¨äºŽæŒ‰æ—¶é—´æŽ’åºçš„å¹³è¡¡äºŒå‰æ ‘ */
+	ACL_CACHE2  cache;		/**< ·â×°ÁË ACL_CACHE2 */
+	ACL_HTABLE *table;		/**< ¹þÏ£±íÓÃÓÚ°´¼üÖµ²éÑ¯ */
+	avl_tree_t  avl;		/**< ÓÃÓÚ°´Ê±¼äÅÅÐòµÄÆ½ºâ¶þ²æÊ÷ */
 
-	acl_pthread_mutex_t lock;       /**< ç¼“å­˜æ± é” */
+	acl_pthread_mutex_t lock;       /**< »º´æ³ØËø */
 } CACHE;
 
 typedef struct CACHE_INFO CACHE_INFO;
 
-/* å…·æœ‰ç›¸åŒè¿‡æœŸæ—¶é—´æˆªçš„å…ƒç´ å­˜æ”¾é‡Œè¯¥æ ‘èŠ‚ç‚¹ä¸Š */
+/* ¾ßÓÐÏàÍ¬¹ýÆÚÊ±¼ä½ØµÄÔªËØ´æ·ÅÀï¸ÃÊ÷½ÚµãÉÏ */
 typedef struct TREE_NODE {
 	CACHE_INFO *head;
 	CACHE_INFO *tail;
@@ -30,7 +30,7 @@ typedef struct TREE_NODE {
 	time_t when_timeout;
 } TREE_NODE;
 
-/* æ¯ä¸ªå…ƒç´ çš„å†…éƒ¨å¯¹è±¡ï¼Œæ‰€æœ‰å…ƒç´ è¿žæŽ¥åœ¨ä¸€èµ·ï¼ŒåŒæ—¶è¡¨æ˜Žè¯¥å…ƒç´ æ‰€å±žçš„æ ‘èŠ‚ç‚¹ */
+/* Ã¿¸öÔªËØµÄÄÚ²¿¶ÔÏó£¬ËùÓÐÔªËØÁ¬½ÓÔÚÒ»Æð£¬Í¬Ê±±íÃ÷¸ÃÔªËØËùÊôµÄÊ÷½Úµã */
 struct CACHE_INFO {
 	ACL_CACHE2_INFO info;
 
@@ -161,7 +161,7 @@ static ACL_CACHE2_INFO *cache_iter_info(ACL_ITER *iter,
 }
 
 /**
- * AVL ç”¨çš„æ¯”è¾ƒå›žè°ƒå‡½æ•°
+ * AVL ÓÃµÄ±È½Ï»Øµ÷º¯Êý
  */
 static int avl_cmp_fn(const void *v1, const void *v2)
 {
@@ -258,15 +258,15 @@ static ACL_CACHE2_INFO *cache2_enter(CACHE *cache, const char *key,
 	info->info.value = value;
 	info->info.key   = acl_mystrdup(key);
 
-	/* å°†è¯¥å…ƒç´ æ·»åŠ è¿›å“ˆå¸Œè¡¨ä¸­ï¼Œä»¥ä¾¿å¯ä»¥é€šè¿‡å…ƒç´ é”®å€¼è¿›è¡ŒæŸ¥æ‰¾*/
+	/* ½«¸ÃÔªËØÌí¼Ó½ø¹þÏ£±íÖÐ£¬ÒÔ±ã¿ÉÒÔÍ¨¹ýÔªËØ¼üÖµ½øÐÐ²éÕÒ*/
 
 	if (acl_htable_enter(cache->table, key, info) == NULL) {
 		acl_msg_fatal("%s(%d): add key(%s) to htable error(%s)",
 			__FUNCTION__, __LINE__, key, acl_last_serror());
 	}
 
-	/* å…ˆä»Žå¹³è¡¡äºŒå‰æ ‘ä¸­æŸ¥æ‰¾å¯¹åº”æ—¶é—´æˆªçš„èŠ‚ç‚¹ï¼Œå¦‚æžœæŸ¥åˆ°å¯¹åº”èŠ‚ç‚¹ï¼Œéœ€è¦å°†è¯¥
-	 * å…ƒç´ åŠ å…¥è¯¥æ ‘èŠ‚ç‚¹ï¼Œå¦åˆ™åˆ›å»ºæ–°çš„æ ‘èŠ‚ç‚¹å¹¶æ·»åŠ è¯¥å…ƒç´ è‡³æ ‘èŠ‚ç‚¹
+	/* ÏÈ´ÓÆ½ºâ¶þ²æÊ÷ÖÐ²éÕÒ¶ÔÓ¦Ê±¼ä½ØµÄ½Úµã£¬Èç¹û²éµ½¶ÔÓ¦½Úµã£¬ÐèÒª½«¸Ã
+	 * ÔªËØ¼ÓÈë¸ÃÊ÷½Úµã£¬·ñÔò´´½¨ÐÂµÄÊ÷½Úµã²¢Ìí¼Ó¸ÃÔªËØÖÁÊ÷½Úµã
 	 */
 
 	iter.when_timeout = timeout > 0 ? when_timeout : 0;
@@ -277,7 +277,7 @@ static ACL_CACHE2_INFO *cache2_enter(CACHE *cache, const char *key,
 		avl_add(&cache->avl, node);
 	}
 
-	/* å°†å…·æœ‰ç›¸åŒè¿‡æœŸæ—¶é—´æˆªçš„å…ƒç´ ç”¨åŒå‘é“¾è¡¨è¿žæŽ¥èµ·æ¥ */
+	/* ½«¾ßÓÐÏàÍ¬¹ýÆÚÊ±¼ä½ØµÄÔªËØÓÃË«ÏòÁ´±íÁ¬½ÓÆðÀ´ */
 
 	if (node->tail == NULL) {
 		info->prev = info->next = NULL;
@@ -322,7 +322,7 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 		return &info->info;
 	}
 
-	/* å¦‚æžœç¼“å­˜æ± æ»¡ï¼Œåˆ™ä¼˜å…ˆé‡‡ç”¨è¿‡æœŸç­–ç•¥ */
+	/* Èç¹û»º´æ³ØÂú£¬ÔòÓÅÏÈ²ÉÓÃ¹ýÆÚ²ßÂÔ */
 
 	if (cache2->size >= cache2->max_size) {
 		(void) acl_cache2_timeout(cache2);
@@ -332,7 +332,7 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 		return cache2_enter(cache, key, value, timeout);
 	}
 
-	/* å¦‚æžœç¼“å­˜æ± ä¾ç„¶æ»¡ï¼Œåˆ™é‡‡ç”¨ LRU ç­–ç•¥åˆ é™¤æœ€æ—§çš„æ•°æ® */
+	/* Èç¹û»º´æ³ØÒÀÈ»Âú£¬Ôò²ÉÓÃ LRU ²ßÂÔÉ¾³ý×î¾ÉµÄÊý¾Ý */
 
 	node = (TREE_NODE*) avl_first(&cache->avl);
 	while (node && cache2->size >= cache2->max_size) {
@@ -344,7 +344,7 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 		info = node->head;
 		node = AVL_NEXT(&cache->avl, node);
 
-		/* å°è¯•åˆ é™¤åŒä¸€è¿‡æœŸæ—¶é—´æˆªçš„æ ‘èŠ‚ç‚¹ä¸‹çš„å¤šä¸ªå…ƒç´  */
+		/* ³¢ÊÔÉ¾³ýÍ¬Ò»¹ýÆÚÊ±¼ä½ØµÄÊ÷½ÚµãÏÂµÄ¶à¸öÔªËØ */
 
 		while (info && cache2->size >= cache2->max_size) {
 			ACL_CACHE2_INFO *info2 = (ACL_CACHE2_INFO*) info;
@@ -357,7 +357,7 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 		}
 	}
 
-	/* å¦‚æžœç¼“å­˜æ± è¿˜æ˜¯å¤„äºŽæ»¡çŠ¶æ€ï¼Œåˆ™ç›´æŽ¥è¿”å›žä¸è¿›è¡Œä»»åŠ¡æ·»åŠ  */
+	/* Èç¹û»º´æ³Ø»¹ÊÇ´¦ÓÚÂú×´Ì¬£¬ÔòÖ±½Ó·µ»Ø²»½øÐÐÈÎÎñÌí¼Ó */
 	if (cache2->size >= cache2->max_size) {
 		acl_msg_error("%s(%d): size(%d) >= max_size(%d), key=%s",
 			__FUNCTION__, __LINE__, cache2->size,
@@ -416,7 +416,7 @@ int acl_cache2_delete(ACL_CACHE2 *cache2, ACL_CACHE2_INFO *info2)
 		return -1;
 	}
 
-	/* ä»Žå“ˆå¸Œè¡¨ä¸­åˆ é™¤å¯¹åº”å…ƒç´ é”®çš„å¯¹è±¡ï¼Œå¦‚æžœè¯¥å…ƒç´ ä¸å­˜åœ¨ï¼Œåˆ™ç›´æŽ¥è¿”å›ž */
+	/* ´Ó¹þÏ£±íÖÐÉ¾³ý¶ÔÓ¦ÔªËØ¼üµÄ¶ÔÏó£¬Èç¹û¸ÃÔªËØ²»´æÔÚ£¬ÔòÖ±½Ó·µ»Ø */
 	if (acl_htable_delete(cache->table, info2->key, NULL) < 0) {
 		return -1;
 	}
@@ -439,7 +439,7 @@ int acl_cache2_delete(ACL_CACHE2 *cache2, ACL_CACHE2_INFO *info2)
 	acl_myfree(info2);
 	cache2->size--;
 
-	/* å½“å…·æœ‰ç›¸åŒè¿‡æœŸæ—¶é—´æˆªçš„èŠ‚ç‚¹é‡Œçš„å…ƒç´ ä¸ºç©ºæ—¶ï¼Œåˆ™å¯å°†è¯¥èŠ‚ç‚¹åˆ é™¤ */
+	/* µ±¾ßÓÐÏàÍ¬¹ýÆÚÊ±¼ä½ØµÄ½ÚµãÀïµÄÔªËØÎª¿ÕÊ±£¬Ôò¿É½«¸Ã½ÚµãÉ¾³ý */
 	if (node->head == NULL) {
 		avl_remove(&cache->avl, node);
 		acl_myfree(node);

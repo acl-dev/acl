@@ -1,4 +1,4 @@
-﻿#include "app_main.h"
+#include "app_main.h"
 #include "app_log.h"
 #include "service_main.h"
 

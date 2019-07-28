@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class check_async : public acl::aio_callback
 {
@@ -6,30 +6,30 @@ public:
 	check_async(acl::check_client& checker);
 
 protected:
-	// é‡è½½çˆ¶ç±» aio_callback ä¸­çš„è™šå‡½æ•°
+	// ÖØÔØ¸¸Àà aio_callback ÖĞµÄĞéº¯Êı
 
 	/**
-	 * å®¢æˆ·ç«¯æµçš„è¯»æˆåŠŸå›è°ƒè¿‡ç¨‹
-	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
-	 * @param len {int} è¯»åˆ°çš„æ•°æ®é•¿åº¦
-	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
+	 * ¿Í»§¶ËÁ÷µÄ¶Á³É¹¦»Øµ÷¹ı³Ì
+	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
+	 * @param len {int} ¶Áµ½µÄÊı¾İ³¤¶È
+	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
 	 */
 	bool read_callback(char* data, int len);
 
 	/**
-	 * å®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
-	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
+	 * ¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
 	 */
 	bool timeout_callback();
 
 	/**
-	 * å®¢æˆ·ç«¯æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
+	 * ¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ı³Ì
 	 */
 	void close_callback();
 
 private:
 	acl::check_client& checker_;
 
-	// ææ„å‡½æ•°å£°æ˜ä¸ºç§æœ‰æ–¹æ³•ï¼Œä»è€Œè¦æ±‚è¯¥å¯¹è±¡åœ¨åˆ›å»ºæ—¶æ˜¯å †å¯¹è±¡
+	// Îö¹¹º¯ÊıÉùÃ÷ÎªË½ÓĞ·½·¨£¬´Ó¶øÒªÇó¸Ã¶ÔÏóÔÚ´´½¨Ê±ÊÇ¶Ñ¶ÔÏó
 	~check_async(void);
 };

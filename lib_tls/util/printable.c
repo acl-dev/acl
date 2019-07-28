@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "stringops.h"
 
 char   *printable(char *string, int replacement)

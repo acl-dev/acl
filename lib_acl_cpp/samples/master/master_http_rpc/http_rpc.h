@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 class http_rpc : public acl::rpc_request
 {
@@ -7,18 +7,18 @@ public:
 	~http_rpc();
 
 protected:
-	// å­çº¿ç¨‹å¤„ç†å‡½æ•°
+	// ×ÓÏß³Ì´¦Àíº¯Êı
 	virtual void rpc_run();
 
-	// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
+	// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
 	virtual void rpc_onover();
 
 private:
-	acl::aio_socket_stream* client_;  // å®¢æˆ·ç«¯è¿æ¥æµ
-	bool keep_alive_; // æ˜¯å¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥
-	char* res_buf_;  // å­˜æ”¾è¿”å›ç»™å®¢æˆ·ç«¯æ•°æ®çš„ç¼“å†²åŒº
-	unsigned buf_size_; // res_buf_ çš„ç©ºé—´å¤§å°
+	acl::aio_socket_stream* client_;  // ¿Í»§¶ËÁ¬½ÓÁ÷
+	bool keep_alive_; // ÊÇ·ñÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó
+	char* res_buf_;  // ´æ·Å·µ»Ø¸ø¿Í»§¶ËÊı¾İµÄ»º³åÇø
+	unsigned buf_size_; // res_buf_ µÄ¿Õ¼ä´óĞ¡
 
-	// åœ¨å­çº¿ç¨‹ä¸­ä»¥é˜»å¡æ–¹å¼å¤„ç†å®¢æˆ·ç«¯è¯·æ±‚
+	// ÔÚ×ÓÏß³ÌÖĞÒÔ×èÈû·½Ê½´¦Àí¿Í»§¶ËÇëÇó
 	void handle_conn(acl::socket_stream* stream);
 };

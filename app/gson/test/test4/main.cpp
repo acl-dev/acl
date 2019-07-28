@@ -1,14 +1,14 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <list>
 #include <vector>
 #include <map>
 #include <stdio.h>
 #include <iostream>
 #include <time.h>
-#include "struct.h"  // 鐢� gson 宸ュ叿鏍规嵁 struct.stub 杞崲鑰屾垚
-#include "struct.gson.h"    // 鐢� gson 宸ュ叿鏍规嵁 struct.stub 鐢熸垚
+#include "struct.h"  // 由 gson 工具根据 struct.stub 转换而成
+#include "struct.gson.h"    // 由 gson 工具根据 struct.stub 生成
 
-// 搴忓垪鍖栬繃绋�
+// 序列化过程
 static void serialize(void)
 {
 	user u;
@@ -37,7 +37,7 @@ static void serialize(void)
 
 	acl::json json;
 
-	// 灏� user 瀵硅薄杞崲涓� json 瀵硅薄
+	// 将 user 对象转换为 json 对象
 	acl::json_node& node = acl::gson(json, u);
 
 	printf(">> serialize:\r\n");
@@ -45,7 +45,7 @@ static void serialize(void)
 	printf("\r\n");
 }
 
-// 鍙嶅簭鍒楀寲杩囩▼
+// 反序列化过程
 static void deserialize(void)
 {
 	const char *s = "{\"name\": \"zsxxsz\", \"domain\": \"263.net\", \"age\": 11, \"male\": true, \"names\": [{\"zsx1\": [\"zsx11\", \"zsx12\", \"zsx13\", \"zsx14\"]}, {\"zsx2\": [\"zsx21\", \"zsx22\", \"zsx23\", \"zsx24\"]}], \"values5\": [100, 1000, 10000]}";
@@ -56,10 +56,10 @@ static void deserialize(void)
 
 	printf(">> deserialize:\r\n");
 
-	// 灏� json 瀵硅薄杞崲涓� user 瀵硅薄
+	// 将 json 对象转换为 user 对象
 	std::pair<bool, std::string> ret = acl::gson(json.get_root(), u);
 
-	// 濡傛灉杞崲澶辫触锛屽垯鎵撳嵃杞崲澶辫触鍘熷洜
+	// 如果转换失败，则打印转换失败原因
 	if (ret.first == false)
 	{
 		printf("error: %s\r\n", ret.second.c_str());

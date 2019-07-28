@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 
@@ -27,7 +27,7 @@ CHttpDownload::~CHttpDownload(void)
 	else
 		handle_->stop();
 #else
-	// é€šçŸ¥å¼‚æ­¥äº‹ä»¶å¼•æ“å®Œå…¨é€€å‡º
+	// Í¨ÖªÒì²½ÊÂ¼şÒıÇæÍêÈ«ÍË³ö
 	handle_->stop();
 #endif
 }
@@ -75,7 +75,7 @@ void CHttpDownload::on_body(const char* data, size_t dlen)
 		printf("\n>> http reply body over, total: %lld, %lld\n",
 			content_length_, read_length_);
 #endif
-		// å‡ºé”™åï¼Œå› ä¸ºæœ¬ç±»å¯¹è±¡æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥éœ€è¦åœ¨æ­¤å¤„é‡Šæ”¾
+		// ³ö´íºó£¬ÒòÎª±¾Àà¶ÔÏóÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔĞèÒªÔÚ´Ë´¦ÊÍ·Å
 		time_t end = time(NULL);
 		printf(">>spent %d seconds\n", (int)(end - begin_));
 		return;

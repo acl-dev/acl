@@ -1,4 +1,4 @@
-﻿/* DO NOT EDIT: automatically built by dist/s_include. */
+/* DO NOT EDIT: automatically built by dist/s_include. */
 #ifndef	_btree_ext_h_
 #define	_btree_ext_h_
 

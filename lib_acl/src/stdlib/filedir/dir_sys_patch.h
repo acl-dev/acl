@@ -1,4 +1,4 @@
-﻿#ifndef __DIR_SYS_PATCH_INCLUDE_H__
+#ifndef __DIR_SYS_PATCH_INCLUDE_H__
 #define __DIR_SYS_PATCH_INCLUDE_H__
 
 #ifdef __cplusplus

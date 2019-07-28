@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file md5.h
  *
  * \brief MD5 message digest algorithm (hash function)

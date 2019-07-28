@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
@@ -151,7 +151,7 @@ void mime_code::decode_finish(string* out)
 {
 	decode(out);
 
-	/* å¦‚æžœç¼“å†²åŒºå†…è¿˜æœ‰æ•°æ®, åˆ™å› å…¶ä¸å¤Ÿ4ä¸ªå­—èŠ‚è€Œç…§åŽŸæ ·æ‹·è´ */
+	/* Èç¹û»º³åÇøÄÚ»¹ÓÐÊý¾Ý, ÔòÒòÆä²»¹»4¸ö×Ö½Ú¶øÕÕÔ­Ñù¿½±´ */
 
 	if (m_addInvalid) {
 		if (m_decodeCnt == 1) {
@@ -177,10 +177,10 @@ void mime_code::decode(string* out)
 		return;
 	}
 
-	/* å¿…é¡»ç¼“å†²åˆ° 4 ä¸ªå­—èŠ‚æ‰å¼€å§‹è§£æž */
+	/* ±ØÐë»º³åµ½ 4 ¸ö×Ö½Ú²Å¿ªÊ¼½âÎö */
 
 	for (cp = (const unsigned char *) m_decodeBuf; m_decodeCnt >= 4;) {
-		/* è·³è¿‡æ‰€æœ‰çš„å›žè½¦æ¢è¡Œç¬¦åŠè¡¥é½å­—èŠ‚ '=' */
+		/* Ìø¹ýËùÓÐµÄ»Ø³µ»»ÐÐ·û¼°²¹Æë×Ö½Ú '=' */
 
 		if (*cp == '\r' || *cp == '\n' || *cp == m_fillChar) {
 			cp++;
@@ -188,10 +188,10 @@ void mime_code::decode(string* out)
 			continue;
 		}
 
-		/* ç¬¬ä¸€ä¸ªå­—èŠ‚ */
+		/* µÚÒ»¸ö×Ö½Ú */
 
 		if ((ch0 = m_unTab[*cp])== INVALID) {
-			/* å¦‚æžœéžæ³•, åˆ™æ‹·è´åŽŸå­—ç¬¦ */
+			/* Èç¹û·Ç·¨, Ôò¿½±´Ô­×Ö·û */
 			if(m_addInvalid) {
 				out->push_back(*cp);
 			}
@@ -202,10 +202,10 @@ void mime_code::decode(string* out)
 		cp++;
 		m_decodeCnt--;
 
-		/* ç¬¬äºŒä¸ªå­—èŠ‚ */
+		/* µÚ¶þ¸ö×Ö½Ú */
 
 		if ((ch1 = m_unTab[*cp])== INVALID) {
-			/* å¦‚æžœéžæ³•, åˆ™æ‹·è´åŽŸå­—ç¬¦ */
+			/* Èç¹û·Ç·¨, Ôò¿½±´Ô­×Ö·û */
 			if (m_addInvalid) {
 				out->push_back((char) (*cp));
 			}
@@ -218,7 +218,7 @@ void mime_code::decode(string* out)
 
 		out->push_back((char) (ch0 << 2 | ch1 >> 4));
 
-		/* ç¬¬ä¸‰ä¸ªå­—èŠ‚ */
+		/* µÚÈý¸ö×Ö½Ú */
 
 		ch2 = *cp;
 		if (ch2 == m_fillChar) {
@@ -228,7 +228,7 @@ void mime_code::decode(string* out)
 		}
 
 		if ((ch2 = m_unTab[ch2]) == INVALID) {
-			/* å¦‚æžœéžæ³•, åˆ™æ‹·è´åŽŸå­—ç¬¦ */
+			/* Èç¹û·Ç·¨, Ôò¿½±´Ô­×Ö·û */
 			if (m_addInvalid) {
 				out->push_back((char) (*cp));
 			}
@@ -241,19 +241,19 @@ void mime_code::decode(string* out)
 
 		out->push_back((char) (ch1 << 4 | ch2 >> 2));
 
-		/* ç¬¬å››ä¸ªå­—èŠ‚ */
+		/* µÚËÄ¸ö×Ö½Ú */
 
 		ch3 = *cp;
 		if (ch3 == m_fillChar) {
-			/* ç¬¬ä¸‰ä¸ªå­—èŠ‚éž '=' è€Œç¬¬å››ä¸ªå­—èŠ‚ä¸º '=',
-			* åˆ™è¯´æ˜Žç¬¬å››ä¸ªå­—èŠ‚ä¸ºè¡¥é½ç”¨çš„
+			/* µÚÈý¸ö×Ö½Ú·Ç '=' ¶øµÚËÄ¸ö×Ö½ÚÎª '=',
+			* ÔòËµÃ÷µÚËÄ¸ö×Ö½ÚÎª²¹ÆëÓÃµÄ
 			*/
 			cp++;
 			m_decodeCnt--;
 			continue;
 		}
 		if ((ch3 = m_unTab[ch3]) == INVALID) {
-			/* å¦‚æžœéžæ³•, åˆ™æ‹·è´åŽŸå­—ç¬¦ */
+			/* Èç¹û·Ç·¨, Ôò¿½±´Ô­×Ö·û */
 			if (m_addInvalid) {
 				out->push_back((char) (*cp));
 			}

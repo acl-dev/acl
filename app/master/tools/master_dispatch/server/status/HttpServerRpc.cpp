@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "status/StatusServlet.h"
 #include "status/HttpServerRpc.h"
 
@@ -12,28 +12,28 @@ HttpServerRpc::~HttpServerRpc()
 {
 }
 
-// 鍦ㄥ瓙绾跨▼涓鐞�
+// 在子线程中处理
 void HttpServerRpc::rpc_run()
 {
-	// 鎵撳紑闃诲娴佸璞�
+	// 打开阻塞流对象
 	acl::socket_stream stream;
 
-	// 蹇呴』鐢� get_vstream() 鑾峰緱鐨� ACL_VSTREAM 娴佸璞″仛鍙傛暟
-	// 鏉ユ墦寮€ stream 瀵硅薄锛屽洜涓哄湪 acl_cpp 鍜� acl 涓殑闃诲娴�
-	// 鍜岄潪闃诲娴佹渶缁堥兘鏄熀浜� ACL_VSTREAM锛岃€� ACL_VSTREAM 娴�
-	// 鍐呴儴缁存姢鐫€浜嗕竴涓/鍐欑紦鍐插尯锛屾墍浠ュ湪闀胯繛鎺ョ殑鏁版嵁澶勭悊涓紝
-	// 蹇呴』姣忔灏� ACL_VSTREAM 鍋氫负鍐呴儴娴佺殑缂撳啿娴佹潵瀵瑰緟
+	// 必须用 get_vstream() 获得的 ACL_VSTREAM 流对象做参数
+	// 来打开 stream 对象，因为在 acl_cpp 和 acl 中的阻塞流
+	// 和非阻塞流最终都是基于 ACL_VSTREAM，而 ACL_VSTREAM 流
+	// 内部维护着了一个读/写缓冲区，所以在长连接的数据处理中，
+	// 必须每次将 ACL_VSTREAM 做为内部流的缓冲流来对待
 	ACL_VSTREAM* vstream = client_->get_vstream();
 	ACL_VSTREAM_SET_RWTIMO(vstream, var_cfg_rw_timeout);
 
 	(void) stream.open(vstream);
 
-	// 寮€濮嬪鐞嗚 HTTP 璇锋眰
+	// 开始处理该 HTTP 请求
 	handle_http(stream);
 
-	// 灏� ACL_VSTREAM 涓庨樆濉炴祦瀵硅薄瑙ｇ粦瀹氾紝杩欐牱鎵嶈兘淇濊瘉褰撻噴鏀鹃樆濉炴祦瀵硅薄鏃�
-	// 涓嶄細鍏抽棴涓庤姹傝€呯殑杩炴帴锛屽洜涓鸿杩炴帴鏈韩鏄睘浜庨潪闃诲娴佸璞＄殑锛岄渶瑕侀噰
-	// 鐢ㄥ紓姝ユ祦鍏抽棴鏂瑰紡杩涜鍏抽棴
+	// 将 ACL_VSTREAM 与阻塞流对象解绑定，这样才能保证当释放阻塞流对象时
+	// 不会关闭与请求者的连接，因为该连接本身是属于非阻塞流对象的，需要采
+	// 用异步流关闭方式进行关闭
 	stream.unbind();
 }
 
@@ -44,14 +44,14 @@ void HttpServerRpc::handle_http(acl::socket_stream& stream)
 
 	servlet.setLocalCharset("gb2312");
 
-	// 鏄惁鍏佽涓庡鎴风涔嬮棿淇濇寔闀胯繛鎺�
+	// 是否允许与客户端之间保持长连接
 	if (servlet.doRun(session, &stream) == true && servlet.keep_alive())
 		keep_alive_ = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
-// 鍦ㄤ富绾跨▼涓鐞�
+// 在主线程中处理
 void HttpServerRpc::rpc_onover()
 {
 	if (keep_alive_)

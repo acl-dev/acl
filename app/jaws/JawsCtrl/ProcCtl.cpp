@@ -1,4 +1,4 @@
-﻿// ProcCtl.cpp : 实现文件
+// ProcCtl.cpp : ʵ���ļ�
 //
 
 #include "stdafx.h"
@@ -21,13 +21,13 @@ CProcCtl::~CProcCtl()
 
 BOOL CProcCtl::InitInstance()
 {
-	// TODO: 在此执行任意逐线程初始化
+	// TODO: �ڴ�ִ���������̳߳�ʼ��
 	return TRUE;
 }
 
 int CProcCtl::ExitInstance()
 {
-	// TODO: 在此执行任意逐线程清理
+	// TODO: �ڴ�ִ���������߳�����
 	return CWinThread::ExitInstance();
 }
 
@@ -35,11 +35,11 @@ BEGIN_MESSAGE_MAP(CProcCtl, CWinThread)
 END_MESSAGE_MAP()
 
 
-// CProcCtl 消息处理程序
+// CProcCtl ��Ϣ��������
 
 int CProcCtl::Run()
 {
-	// TODO: 在此添加专用代码和/或调用基类
+	// TODO: �ڴ�����ר�ô����/����û���
 
 	return CWinThread::Run();
 }

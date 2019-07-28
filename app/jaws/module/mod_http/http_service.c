@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 #include "dns_lookup.h"
 #include "service.h"
@@ -48,10 +48,10 @@ HTTP_SERVICE *http_service_new()
 	service = (HTTP_SERVICE *) service_alloc("http", sizeof(HTTP_SERVICE));
 	service->file_path = acl_vstring_alloc(256);
 
-	/* å°†åŠ¨æ€æ’ä»¶çš„å›žè°ƒå‡½æ•°èµ‹ç»™æœåŠ¡å¯¹è±¡ */
+	/* ½«¶¯Ì¬²å¼þµÄ»Øµ÷º¯Êý¸³¸ø·þÎñ¶ÔÏó */
 	http_plugin_set_callback(service);
 
-	/* é’ˆå¯¹HTTPæœåŠ¡å™¨è¿è¡Œæ¨¡å¼ï¼Œåˆå§‹åŒ–æ–‡ä»¶ç¼“å­˜ */
+	/* Õë¶ÔHTTP·þÎñÆ÷ÔËÐÐÄ£Ê½£¬³õÊ¼»¯ÎÄ¼þ»º´æ */
 	file_cache_init();
 
 	return (service);

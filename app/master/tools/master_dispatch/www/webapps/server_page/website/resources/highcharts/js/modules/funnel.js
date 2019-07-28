@@ -1,4 +1,4 @@
-﻿/*
+/*
  
  Highcharts funnel module
 

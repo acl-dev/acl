@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	attr_scan_plain 3
  * SUMMARY

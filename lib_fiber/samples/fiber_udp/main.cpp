@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "../stamp.h"
 
 static void fiber_client(acl::socket_stream& stream, int max, bool echo)

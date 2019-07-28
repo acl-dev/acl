@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "lib_acl.h"
 #include ".\procservice.h"
 

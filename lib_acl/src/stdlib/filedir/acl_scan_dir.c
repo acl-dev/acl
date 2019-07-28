@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -619,17 +619,17 @@ acl_int64 acl_scan_dir_rm2(ACL_SCAN_DIR *scan, int *ndir, int *nfile)
 				path[0] = 0;
 			}
 
-			/* å¿…é¡»é€€å‡ºè¯¥ç©ºç›®å½•åæ‰å¯ä»¥åˆ é™¤è¯¥ç›®å½• */
+			/* ±ØĞëÍË³ö¸Ã¿ÕÄ¿Â¼ºó²Å¿ÉÒÔÉ¾³ı¸ÃÄ¿Â¼ */
 
 			if (acl_scan_dir_pop(scan) == 0) {
-				/* åˆ é™¤æœ€é¡¶å±‚ç©ºç›®å½• */
+				/* É¾³ı×î¶¥²ã¿ÕÄ¿Â¼ */
 				if (path[0] != 0 && SANE_RMDIR(path) == 0) {
 					scan->ndirs++;
 				}
 				break;
 			}
 
-			/* åˆ é™¤ç©ºç›®å½• */
+			/* É¾³ı¿ÕÄ¿Â¼ */
 			if (path[0] != 0 && SANE_RMDIR(path) == 0) {
 				scan->ndirs++;
 			}

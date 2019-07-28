@@ -1,12 +1,12 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <list>
 #include <vector>
 #include <map>
 #include <stdio.h>
 #include <iostream>
 #include <time.h>
-#include "struct.h"  // 鐢� gson 宸ュ叿鏍规嵁 struct.stub 杞崲鑰屾垚
-#include "struct.gson.h"    // 鐢� gson 宸ュ叿鏍规嵁 struct.stub 鐢熸垚
+#include "struct.h"  // 由 gson 工具根据 struct.stub 转换而成
+#include "struct.gson.h"    // 由 gson 工具根据 struct.stub 生成
 
 static void parse(const char* s)
 {

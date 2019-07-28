@@ -1,4 +1,4 @@
-ï»¿// http_aio.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// http_aio.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -20,9 +20,9 @@ static int on_close(ACL_ASTREAM *stream acl_unused, void *context)
 
 	http_hdr_req_free(ctx->hdr_req);
 
-	// å½“è¯»åˆ°å®Œæ•´ HTTP å“åº”å¤´æ—¶ï¼ŒHTTP å“åº”ä½“å¯¹è±¡åº”è¯¥ä¹Ÿåˆ›å»ºï¼Œå½“é‡Šæ”¾å“åº”ä½“
-	// å¯¹è±¡æ—¶ï¼Œå“åº”å¤´å¯¹è±¡ä¼šä¸€èµ·è¢«é‡Šæ”¾ï¼›å¦‚æœåœ¨è¯»å“åº”å¤´æ—¶å‡ºé”™ï¼Œåˆ™å“åº”ä½“å¯¹è±¡
-	// å¹¶æœªåˆ›å»ºï¼Œæ‰€ä»¥åªéœ€é‡Šæ”¾å“åº”å¤´å¯¹è±¡
+	// µ±¶Áµ½ÍêÕû HTTP ÏìÓ¦Í·Ê±£¬HTTP ÏìÓ¦Ìå¶ÔÏóÓ¦¸ÃÒ²´´½¨£¬µ±ÊÍ·ÅÏìÓ¦Ìå
+	// ¶ÔÏóÊ±£¬ÏìÓ¦Í·¶ÔÏó»áÒ»Æğ±»ÊÍ·Å£»Èç¹ûÔÚ¶ÁÏìÓ¦Í·Ê±³ö´í£¬ÔòÏìÓ¦Ìå¶ÔÏó
+	// ²¢Î´´´½¨£¬ËùÒÔÖ»ĞèÊÍ·ÅÏìÓ¦Í·¶ÔÏó
 	if (ctx->http_res) {
 		http_res_free(ctx->http_res);
 	} else if (ctx->hdr_res) {
@@ -63,10 +63,10 @@ static int on_http_hdr(int status, void *arg)
 
 	http_hdr_print(&ctx->hdr_res->hdr, "---respond---");
 
-	// æ„å»º HTTP å“åº”ä½“
+	// ¹¹½¨ HTTP ÏìÓ¦Ìå
 	ctx->http_res = http_res_new(ctx->hdr_res);
 
-	// å¼‚æ­¥è¯»å– HTTP æœåŠ¡ç«¯çš„å“åº”ä½“
+	// Òì²½¶ÁÈ¡ HTTP ·şÎñ¶ËµÄÏìÓ¦Ìå
 	http_res_body_get_async(ctx->http_res, ctx->stream,
 		read_respond_body_ready, ctx, 0);
 
@@ -90,34 +90,34 @@ static int on_connect(ACL_ASTREAM *stream, void *context)
 	CTX *ctx = (CTX*) acl_mycalloc(1, sizeof(CTX));
 	ctx->stream = stream;
 
-	// æ„å»º HTTP è¯·æ±‚å¤´
+	// ¹¹½¨ HTTP ÇëÇóÍ·
 	ctx->hdr_req = http_hdr_req_create("/", "GET", "HTTP/1.1");
-	// è®¾ç½®çŸ­è¿æ¥æ¨¡å¼
+	// ÉèÖÃ¶ÌÁ¬½ÓÄ£Ê½
 	http_hdr_entry_replace(&ctx->hdr_req->hdr, "Connection", "Close", 1);
-	// è®¾ç½®å†…å®¹ç±»å‹
+	// ÉèÖÃÄÚÈİÀàĞÍ
 	http_hdr_put_str(&ctx->hdr_req->hdr, "Content-Type", "text/plain");
-	// è®¾ç½®ä¸»æœºå­—æ®µ
+	// ÉèÖÃÖ÷»ú×Ö¶Î
 	http_hdr_put_str(&ctx->hdr_req->hdr, "Host", __server_addr);
 
-	// è®¾ç½®è¯»è¶…æ—¶å›è°ƒå‡½æ•°
+	// ÉèÖÃ¶Á³¬Ê±»Øµ÷º¯Êı
 	acl_aio_add_timeo_hook(stream, on_timeout, ctx);
-	// è®¾ç½®å…³é—­å›è°ƒå‡½æ•°
+	// ÉèÖÃ¹Ø±Õ»Øµ÷º¯Êı
 	acl_aio_add_close_hook(stream, on_close, ctx);
 
-	// åˆ›å»ºåŠ¨æ€å†…å­˜å¹¶å°† HTTP è¯·æ±‚å¤´æ‹·è´è‡³å…¶ä¸­
+	// ´´½¨¶¯Ì¬ÄÚ´æ²¢½« HTTP ÇëÇóÍ·¿½±´ÖÁÆäÖĞ
 	ACL_VSTRING *buf = acl_vstring_alloc(1024);
 	http_hdr_build_request(ctx->hdr_req, buf);
 
-	// å‘é€ HTTP è¯·æ±‚
+	// ·¢ËÍ HTTP ÇëÇó
 	acl_aio_writen(stream, acl_vstring_str(buf), ACL_VSTRING_LEN(buf));
 
-	// é‡Šæ”¾åŠ¨æ€å†…å­˜
+	// ÊÍ·Å¶¯Ì¬ÄÚ´æ
 	acl_vstring_free(buf);
 
-	// åˆ›å»º HTTP å“åº”å¯¹è±¡
+	// ´´½¨ HTTP ÏìÓ¦¶ÔÏó
 	ctx->hdr_res = http_hdr_res_new();
 
-	// å¼‚æ­¥è¯»å–æœåŠ¡ç«¯å“åº”çš„ HTTP å¤´
+	// Òì²½¶ÁÈ¡·şÎñ¶ËÏìÓ¦µÄ HTTP Í·
 	http_hdr_res_get_async(ctx->hdr_res, stream, on_http_hdr, ctx, 0);
 
 	return 0;
@@ -167,10 +167,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// è®¾ç½®åŸŸåè§£ææœåŠ¡å™¨åœ°å€
+	// ÉèÖÃÓòÃû½âÎö·şÎñÆ÷µØÖ·
 	acl_aio_set_dns(aio, name_server, dns_timeout);
 
-	// å¼‚æ­¥è¿æ¥æŒ‡å®š WEB æœåŠ¡å™¨
+	// Òì²½Á¬½ÓÖ¸¶¨ WEB ·şÎñÆ÷
 	if (acl_aio_connect_addr(aio, __server_addr, connect_timeout,
 		on_connect, __server_addr) == -1) {
 
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// å¼‚æ­¥äº‹ä»¶å¾ªç¯
+	// Òì²½ÊÂ¼şÑ­»·
 	while (!__stop) {
 		acl_aio_loop(aio);
 	}

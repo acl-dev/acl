@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <string.h>
 #include "lib_tpl.h"
 #include "service_var.h"
@@ -120,12 +120,12 @@ int notify(ACL_CACHE *smtp_notify_cache, ACL_CACHE *sms_notify_cache, const char
 			*p++ = 0;
 		to_mails->push_back(to_mails, to);
 
-		/* ç®€å•åœ°åˆ¤æ–­æ˜¯å¦æ˜¯æ‰‹æœºå· */
+		/* ¼òµ¥µØÅÐ¶ÏÊÇ·ñÊÇÊÖ»úºÅ */
 		if (p && strlen(p) == 11)
 			to_phones->push_back(to_phones, p);
 	}
 
-	/* é‚®ä»¶é€šçŸ¥ */
+	/* ÓÊ¼þÍ¨Öª */
 	if (can_notify(smtp_notify_cache, proc, data))
 		(void) smtp_notify(proc, to_mails, pid,
 			info == NULL ? "program exception!" : info);
@@ -133,7 +133,7 @@ int notify(ACL_CACHE *smtp_notify_cache, ACL_CACHE *sms_notify_cache, const char
 		acl_msg_info("%s(%d): data(%s) not be send to smtp!",
 			__FUNCTION__, __LINE__, data);
 
-	/* æ‰‹æœºçŸ­ä¿¡é€šçŸ¥ */
+	/* ÊÖ»ú¶ÌÐÅÍ¨Öª */
 	if (can_notify_sms(sms_notify_cache, proc, data))
 		(void) sms_notify(proc, to_phones, pid,
 			info == NULL ? "program exception!" : info);

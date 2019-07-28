@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_SEM_INCLUDE_H
+#ifndef	ACL_SEM_INCLUDE_H
 #define	ACL_SEM_INCLUDE_H
 
 #ifdef	__cplusplus

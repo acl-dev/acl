@@ -1,4 +1,4 @@
-﻿/* Public domain. */
+/* Public domain. */
 
 #ifndef CDB_MAKE_H
 #define CDB_MAKE_H

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "util.h"
 
 double util::stamp_sub(const struct timeval *from, const struct timeval *sub_by)

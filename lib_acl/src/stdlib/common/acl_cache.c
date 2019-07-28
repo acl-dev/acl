@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -186,16 +186,16 @@ ACL_CACHE_INFO *acl_cache_enter(ACL_CACHE *cache, const char *key, void *value)
 		return (info);
 	}
 
-	/* å¦‚æžœå‘çŽ°ç¼“å­˜æ± æº¢å‡ºï¼Œåˆ™ä¼˜å…ˆé‡‡ç”¨è¿‡æœŸç­–ç•¥ */
+	/* Èç¹û·¢ÏÖ»º´æ³ØÒç³ö£¬ÔòÓÅÏÈ²ÉÓÃ¹ýÆÚ²ßÂÔ */
 	if (cache->size >= cache->max_size) {
 		(void) acl_cache_timeout(cache);
 	}
 
-	/* å¦‚æžœä¾ç„¶å‘çŽ°ç¼“å­˜æ± æº¢å‡ºï¼Œåˆ™é‡‡ç”¨åˆ é™¤æœ€æ—§çš„æ•°æ®ç­–ç•¥ */
+	/* Èç¹ûÒÀÈ»·¢ÏÖ»º´æ³ØÒç³ö£¬Ôò²ÉÓÃÉ¾³ý×î¾ÉµÄÊý¾Ý²ßÂÔ */
 	if (cache->size >= cache->max_size) {
 		ACL_RING_ITER iter;
 
-		/* å°½é‡åˆ é™¤ä¸€ä¸ªæœ€è€çš„å¯¹è±¡ */
+		/* ¾¡Á¿É¾³ýÒ»¸ö×îÀÏµÄ¶ÔÏó */
 		acl_ring_foreach(iter, &cache->ring) {
 			info = ACL_RING_TO_APPL(iter.ptr, ACL_CACHE_INFO, entry);
 			if (info->nrefer > 0 || info->when_timeout == 0)
@@ -205,7 +205,7 @@ ACL_CACHE_INFO *acl_cache_enter(ACL_CACHE *cache, const char *key, void *value)
 		}
 	}
 
-	/* å¦‚æžœç¼“å­˜æ± è¿˜æ˜¯å¤„äºŽæº¢å‡ºçŠ¶æ€ï¼Œåˆ™ç›´æŽ¥è¿”å›žä¸è¿›è¡Œä»»åŠ¡æ·»åŠ  */
+	/* Èç¹û»º´æ³Ø»¹ÊÇ´¦ÓÚÒç³ö×´Ì¬£¬ÔòÖ±½Ó·µ»Ø²»½øÐÐÈÎÎñÌí¼Ó */
 	if (cache->size >= cache->max_size) {
 		acl_msg_error("%s(%d), %s: cache->size(%d) >= cache->max_size(%d)"
 			", add key(%s) error", __FILE__, __LINE__, myname,
@@ -225,8 +225,8 @@ ACL_CACHE_INFO *acl_cache_enter(ACL_CACHE *cache, const char *key, void *value)
 
 	info->value = value;
 	info->when_timeout = cache->timeout > 0 ? (time(NULL) + cache->timeout) : 0;
-	/* å°†æœ€æ–°çš„æ•°æ®æ·»åŠ åœ¨è¿‡æœŸæ•°æ®é“¾çš„å°¾éƒ¨, å½“ç”±é“¾å¤´å‘é“¾å°¾æ–¹å‘éåŽ†æ—¶ï¼Œæ•°æ®æ€»æ˜¯
-	 * ç”±æœ€æ—§çš„æ•°æ®å‘æœ€æ–°çš„æ•°æ®å¼€å§‹ï¼Œå³ï¼šacl_ring_succ: æ—§ --> æ–°
+	/* ½«×îÐÂµÄÊý¾ÝÌí¼ÓÔÚ¹ýÆÚÊý¾ÝÁ´µÄÎ²²¿, µ±ÓÉÁ´Í·ÏòÁ´Î²·½Ïò±éÀúÊ±£¬Êý¾Ý×ÜÊÇ
+	 * ÓÉ×î¾ÉµÄÊý¾ÝÏò×îÐÂµÄÊý¾Ý¿ªÊ¼£¬¼´£ºacl_ring_succ: ¾É --> ÐÂ
 	 */
 	acl_ring_prepend(&cache->ring, &info->entry);
 	return (info);
@@ -303,7 +303,7 @@ int acl_cache_timeout(ACL_CACHE *cache)
 	if (cache == NULL || cache->max_size <= 0)
 		return (n);
 
-	/* å› ä¸ºæ•°æ®é“¾çš„æ·»åŠ æ˜¯å°¾éƒ¨æ·»åŠ çš„ï¼Œæ‰€ä»¥ä»Žé¦–éƒ¨è‡³å°¾éƒ¨æ•°æ®ä¾æ¬¡ç”±æ—§å˜æ–° */
+	/* ÒòÎªÊý¾ÝÁ´µÄÌí¼ÓÊÇÎ²²¿Ìí¼ÓµÄ£¬ËùÒÔ´ÓÊ×²¿ÖÁÎ²²¿Êý¾ÝÒÀ´ÎÓÉ¾É±äÐÂ */
 	for (iter = acl_ring_succ(&cache->ring); iter != &cache->ring;) {
 		info = ACL_RING_TO_APPL(iter, ACL_CACHE_INFO, entry);
 		if (info->when_timeout > now)
@@ -331,8 +331,8 @@ void acl_cache_update2(ACL_CACHE *cache, ACL_CACHE_INFO *info, int timeout)
 
 	acl_ring_detach(&info->entry);
 	info->when_timeout = timeout > 0 ? (time(NULL) + timeout) : 0;
-	/* å°†æœ€æ–°çš„æ•°æ®æ·»åŠ åœ¨è¿‡æœŸæ•°æ®é“¾çš„å°¾éƒ¨, å½“ç”±é“¾å¤´å‘é“¾å°¾æ–¹å‘éåŽ†æ—¶ï¼Œæ•°æ®æ€»æ˜¯
-	 * ç”±æœ€æ—§çš„æ•°æ®å‘æœ€æ–°çš„æ•°æ®å¼€å§‹ï¼Œå³ï¼šacl_ring_succ: æ—§ --> æ–°
+	/* ½«×îÐÂµÄÊý¾ÝÌí¼ÓÔÚ¹ýÆÚÊý¾ÝÁ´µÄÎ²²¿, µ±ÓÉÁ´Í·ÏòÁ´Î²·½Ïò±éÀúÊ±£¬Êý¾Ý×ÜÊÇ
+	 * ÓÉ×î¾ÉµÄÊý¾ÝÏò×îÐÂµÄÊý¾Ý¿ªÊ¼£¬¼´£ºacl_ring_succ: ¾É --> ÐÂ
 	 */
 	acl_ring_prepend(&cache->ring, &info->entry);
 }

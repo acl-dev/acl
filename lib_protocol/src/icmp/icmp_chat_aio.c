@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "icmp/lib_icmp.h"
 #include "icmp_struct.h"
 #include "icmp_private.h"
@@ -22,23 +22,23 @@ static void check_timer(int event_type acl_unused,
 		if (pkt == NULL)
 			break;
 
-		/* æ±‡æŠ¥è¯·æ±‚åŒ…è¶…æ—¶ */
+		/* »ã±¨ÇëÇó°ü³¬Ê± */
 		icmp_stat_timeout(host, pkt);
 
 		if (host->ipkt >= host->npkt) {
-			/* å¦‚æœå¯¹è¯¥ä¸»æœºçš„åŒ…å‘é€å®Œæ¯•ï¼Œåˆ™å›è°ƒçŠ¶æ€æ±‡æŠ¥å‡½æ•° */
+			/* Èç¹û¶Ô¸ÃÖ÷»úµÄ°ü·¢ËÍÍê±Ï£¬Ôò»Øµ÷×´Ì¬»ã±¨º¯Êı */
 			if (host->stat_finish)
 				host->stat_finish(host, host->arg);
 
-			/* å·²å®Œæˆä¸»æœºæ£€æµ‹æ•°åŠ 1 */
+			/* ÒÑÍê³ÉÖ÷»ú¼ì²âÊı¼Ó1 */
 			chat->cnt++;
 		}
 
-		/* å®šæ—¶å‘é€ä¸‹ä¸€ä¸ªè¯·æ±‚æ•°æ®åŒ… */
+		/* ¶¨Ê±·¢ËÍÏÂÒ»¸öÇëÇóÊı¾İ°ü */
 		delay_send_pkt(host, host->pkts[host->ipkt++], 0);
 	}
 
-	/* å¯åŠ¨ä¸‹ä¸€æ¬¡å®šæ—¶å™¨ */
+	/* Æô¶¯ÏÂÒ»´Î¶¨Ê±Æ÷ */
 	acl_aio_request_timer(chat->aio, check_timer,
 		host, chat->check_inter, 0);
 }
@@ -50,35 +50,35 @@ static void send_pkt(ICMP_HOST *host, ICMP_PKT *pkt)
 	ACL_VSTREAM *vstream = acl_aio_vstream(astream);
 	int  ret;
 
-	/* ç»„å»ºå‘é€æ•°æ®åŒ… */
+	/* ×é½¨·¢ËÍÊı¾İ°ü */
 	icmp_pkt_build(pkt, chat->seq++);
 
-	/* æŒ‡å®šå½“å‰åŒ…ç›®çš„ä¸»æœºåœ°å€ */
+	/* Ö¸¶¨µ±Ç°°üÄ¿µÄÖ÷»úµØÖ· */
 	chat->is->dest = host->dest;
-	/* é‡‡ç”¨åŒæ­¥å‘é€çš„æ¨¡å¼ */
+	/* ²ÉÓÃÍ¬²½·¢ËÍµÄÄ£Ê½ */
 	ret = acl_vstream_writen(vstream, (const char*) pkt, (int) pkt->wlen);
 	host->nsent++;
 
 	if (ret == ACL_VSTREAM_EOF) {
-		/* æ±‡æŠ¥ä¸»æœºä¸å¯è¾¾ä¿¡æ¯ */
+		/* »ã±¨Ö÷»ú²»¿É´ïĞÅÏ¢ */
 		icmp_stat_unreach(host, pkt);
 
 		if (host->ipkt >= host->npkt) {
-			/* ICMP_HOST å¯¹è±¡çš„ ICMP åŒ…å·²å‘å®Œ, å°† count å€¼åŠ  1 */
+			/* ICMP_HOST ¶ÔÏóµÄ ICMP °üÒÑ·¢Íê, ½« count Öµ¼Ó 1 */
 			chat->cnt++;
 
-			/* æ±‡æŠ¥è¯¥ ICMP_HOST å¯¹è±¡çš„ ICMP åŒ…å¯è¾¾çŠ¶æ€ */
+			/* »ã±¨¸Ã ICMP_HOST ¶ÔÏóµÄ ICMP °ü¿É´ï×´Ì¬ */
 			if (host->stat_finish)
 				host->stat_finish(host, host->arg);
 		} else {
 			ICMP_PKT *pkt_next = host->pkts[host->ipkt++];
 
-			/* å»¶è¿Ÿå‘é€ä¸‹ä¸€ä¸ªæ•°æ®åŒ… */
+			/* ÑÓ³Ù·¢ËÍÏÂÒ»¸öÊı¾İ°ü */
 			delay_send_pkt(host, pkt_next, host->delay);
 		}
 
 	} else {
-		/* å°†è¯¥åŒ…ç½®å…¥è¶…æ—¶é˜Ÿåˆ—ä¸­ */
+		/* ½«¸Ã°üÖÃÈë³¬Ê±¶ÓÁĞÖĞ */
 		chat->timer->request(chat->timer, pkt, host->timeout);
 	}
 }
@@ -88,17 +88,17 @@ void icmp_chat_aio(ICMP_HOST* host)
 	if (host->ipkt >= host->npkt)
 		return;
 
-	/* å‘é€çš„ç¬¬ä¸€ä¸ªè¯·æ±‚åŒ…ä¸éœ€è¦å¯åŠ¨å†™å®šæ—¶å™¨ */
+	/* ·¢ËÍµÄµÚÒ»¸öÇëÇó°ü²»ĞèÒªÆô¶¯Ğ´¶¨Ê±Æ÷ */
 	send_pkt(host, host->pkts[host->ipkt++]);
 }
 
-/* æŸä¸ªåŒ…çš„å‘é€å®šæ—¶å™¨åˆ°è¾¾çš„å›è°ƒå‡½æ•° */
+/* Ä³¸ö°üµÄ·¢ËÍ¶¨Ê±Æ÷µ½´ïµÄ»Øµ÷º¯Êı */
 static void delay_send_timer(int event_type acl_unused,
 	ACL_EVENT *event acl_unused, void *context)
 {
 	ICMP_PKT *pkt = (ICMP_PKT*) context;
 
-	/* å‘é€è¯¥ ICMP åŒ… */
+	/* ·¢ËÍ¸Ã ICMP °ü */
 	send_pkt(pkt->host, pkt);
 }
 
@@ -109,8 +109,8 @@ static void delay_send_pkt(ICMP_HOST *host, ICMP_PKT *pkt, int delay)
 	if (pkt == NULL)
 		acl_msg_fatal("%s(%d): pkt null", myname, __LINE__);
 
-	/* å¯åŠ¨å†™å®šæ—¶å™¨ï¼Œå› ä¸ºä¼ å…¥çš„ delay æ˜¯æ¯«ç§’çº§ï¼Œè€Œ acl_aio_request_timer
-	 * çš„æ—¶é—´å•ä½æ˜¯å¾®ç§’, æ‰€ä»¥éœ€è¦å°† dely ç”±æ¯«ç§’è½¬ä¸ºå¾®ç§’
+	/* Æô¶¯Ğ´¶¨Ê±Æ÷£¬ÒòÎª´«ÈëµÄ delay ÊÇºÁÃë¼¶£¬¶ø acl_aio_request_timer
+	 * µÄÊ±¼äµ¥Î»ÊÇÎ¢Ãë, ËùÒÔĞèÒª½« dely ÓÉºÁÃë×ªÎªÎ¢Ãë
 	 */
 	acl_aio_request_timer(host->chat->aio, delay_send_timer,
 		pkt, delay * 1000, 0);
@@ -121,17 +121,17 @@ static int read_close_fn(ACL_ASTREAM *astream acl_unused, void *arg)
 	const char *myname = "read_close_fn";
 	ICMP_CHAT *chat = (ICMP_CHAT*) arg;
 
-	/* å½“è¯¥å‡½æ•°è¢«è°ƒç”¨æ—¶ï¼Œå°±å·²ç»è¡¨æ˜è¯¥å¥—æ¥å­—æœ‰é—®é¢˜ï¼Œæ‰€ä»¥éœ€è¦é‡å¯ä¸€ä¸ªæµ */
+	/* µ±¸Ãº¯Êı±»µ÷ÓÃÊ±£¬¾ÍÒÑ¾­±íÃ÷¸ÃÌ×½Ó×ÖÓĞÎÊÌâ£¬ËùÒÔĞèÒªÖØÆôÒ»¸öÁ÷ */
 
 	acl_msg_warn("%s(%d): sock read error", myname, __LINE__);
 	icmp_stream_reopen(chat->aio, chat->is);
 
-	/* é‡æ–°å¯åŠ¨å¼‚æ­¥è¯»è¿‡ç¨‹ï¼Œæ³¨ï¼šæ­¤æ—¶chat->is->astream å·²ç»ä¸åŒäº
-	 * è¯¥å‡½æ•°çš„å‚æ•° astream äº†!
+	/* ÖØĞÂÆô¶¯Òì²½¶Á¹ı³Ì£¬×¢£º´ËÊ±chat->is->astream ÒÑ¾­²»Í¬ÓÚ
+	 * ¸Ãº¯ÊıµÄ²ÎÊı astream ÁË!
 	 */
 	acl_aio_read(chat->is->astream);
 
-	/* è¿”å›-1ï¼Œä½¿æœ¬å¼‚æ­¥æµè¢«è‡ªåŠ¨å…³é—­ */
+	/* ·µ»Ø-1£¬Ê¹±¾Òì²½Á÷±»×Ô¶¯¹Ø±Õ */
 	return (-1);
 }
 
@@ -160,7 +160,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 	if (chat->check_id && pkt.body.gid != chat->gid)
 		READ_RETURN(0);
 
-	/* è¯»åˆ°æ‰€éœ€æ•°æ®ï¼Œå–æ¶ˆè¯¥å‘é€åŒ…çš„è¯»è¶…æ—¶å®šæ—¶å™¨ */
+	/* ¶Áµ½ËùĞèÊı¾İ£¬È¡Ïû¸Ã·¢ËÍ°üµÄ¶Á³¬Ê±¶¨Ê±Æ÷ */
 	pkt_src = chat->timer->find_delete(chat->timer, pkt.hdr.seq);
 
 	if (pkt_src == NULL) {
@@ -171,7 +171,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 
 	icmp_pkt_save_status(pkt_src, &pkt);
 
-	/* æ±‡æŠ¥çŠ¶æ€ */
+	/* »ã±¨×´Ì¬ */
 	icmp_stat_report(host, pkt_src);
 
 	if (host->ipkt >= host->npkt) {
@@ -181,7 +181,7 @@ static int read_ready_fn(ACL_ASTREAM *astream, void *arg,
 		READ_RETURN(0);
 	}
 
-	/* å®šæ—¶å‘é€ä¸‹ä¸€ä¸ªè¯·æ±‚æ•°æ®åŒ… */
+	/* ¶¨Ê±·¢ËÍÏÂÒ»¸öÇëÇóÊı¾İ°ü */
 	delay_send_pkt(host, host->pkts[host->ipkt++], host->delay);
 	READ_RETURN(0);
 }
@@ -214,7 +214,7 @@ void icmp_chat_aio_add(ICMP_CHAT *chat, ICMP_HOST *host)
 		ACL_AIO_CTL_WRITE_HOOK_ADD, write_ready_fn, host,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, read_close_fn, host,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, timeout_fn, host,
-		ACL_AIO_CTL_TIMEOUT, 0,  /* åˆå§‹åŒ–æ—¶å…ˆè®¾ç½®è¯»è¶…æ—¶ä¸º 0 */
+		ACL_AIO_CTL_TIMEOUT, 0,  /* ³õÊ¼»¯Ê±ÏÈÉèÖÃ¶Á³¬Ê±Îª 0 */
 		ACL_AIO_CTL_END);
 
 	chat->timer = icmp_timer_new();
@@ -223,7 +223,7 @@ void icmp_chat_aio_add(ICMP_CHAT *chat, ICMP_HOST *host)
 	acl_aio_request_timer(chat->aio, check_timer, host,
 		chat->check_inter, 0);
 
-	/* å¼€å§‹å¼‚æ­¥è¯»è¯¥åŒ…çš„å“åº”æ•°æ® */
+	/* ¿ªÊ¼Òì²½¶Á¸Ã°üµÄÏìÓ¦Êı¾İ */
 	acl_aio_read(chat->is->astream);
 }
 

@@ -1,4 +1,4 @@
-﻿/* Copyright (c) 2005 Russ Cox, MIT; see COPYRIGHT */
+/* Copyright (c) 2005 Russ Cox, MIT; see COPYRIGHT */
 
 #include "stdafx.h"
 #include "fiber.h"

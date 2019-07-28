@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_HEX_CODE_INCLUDE_H
+#ifndef ACL_HEX_CODE_INCLUDE_H
 #define ACL_HEX_CODE_INCLUDE_H
 
 #ifdef  __cplusplus
@@ -9,20 +9,20 @@ extern "C" {
 #include "acl_vstring.h"
 
 /**
- * å°†äºŒè¿›åˆ¶æ•°æ®è¿›è¡Œç¼–ç ï¼Œä¸€ä¸ªå­—èŠ‚è½¬æ¢æˆä¸¤ä¸ªå­—èŠ‚åï¼Œä»è€Œè½¬ä¸ºæ–‡æœ¬å­—ç¬¦ä¸²
- * @param buf {ACL_VSTRING*} å­˜å‚¨è½¬æ¢ç»“æœ
- * @param ptr {const char*} äºŒè¿›åˆ¶æ•°æ®
- * @param len {int} ptr æ•°æ®çš„é•¿åº¦
- * @return {ACL_VSTRING*} å¦‚æœè½¬æ¢æˆåŠŸï¼Œåˆ™ä¸ buf ç›¸åŒ
+ * ½«¶ş½øÖÆÊı¾İ½øĞĞ±àÂë£¬Ò»¸ö×Ö½Ú×ª»»³ÉÁ½¸ö×Ö½Úºó£¬´Ó¶ø×ªÎªÎÄ±¾×Ö·û´®
+ * @param buf {ACL_VSTRING*} ´æ´¢×ª»»½á¹û
+ * @param ptr {const char*} ¶ş½øÖÆÊı¾İ
+ * @param len {int} ptr Êı¾İµÄ³¤¶È
+ * @return {ACL_VSTRING*} Èç¹û×ª»»³É¹¦£¬ÔòÓë buf ÏàÍ¬
  */
 ACL_API ACL_VSTRING *acl_hex_encode(ACL_VSTRING *buf, const char *ptr, int len);
 
 /**
- * å°†ç¼–ç åçš„æ•°æ®è¿›è¡Œè§£ç 
- * @param buf {ACL_VSTRING*} å­˜å‚¨è½¬æ¢ç»“æœ
- * @param ptr {const char*} ç¼–ç æ•°æ®
- * @param len {int} ptr æ•°æ®é•¿åº¦
- * @return {ACL_VSTRING*} å¦‚æœè§£ç æˆåŠŸï¼Œåˆ™ä¸ buf ç›¸åŒ, å¦åˆ™è¿”å› NULL
+ * ½«±àÂëºóµÄÊı¾İ½øĞĞ½âÂë
+ * @param buf {ACL_VSTRING*} ´æ´¢×ª»»½á¹û
+ * @param ptr {const char*} ±àÂëÊı¾İ
+ * @param len {int} ptr Êı¾İ³¤¶È
+ * @return {ACL_VSTRING*} Èç¹û½âÂë³É¹¦£¬ÔòÓë buf ÏàÍ¬, ·ñÔò·µ»Ø NULL
  */
 ACL_API ACL_VSTRING *acl_hex_decode(ACL_VSTRING *buf, const char *ptr, int len);
 

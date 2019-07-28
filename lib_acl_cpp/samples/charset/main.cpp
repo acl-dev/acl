@@ -1,11 +1,11 @@
-ï»¿#include <assert.h>
+#include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 #include <stdio.h>
 
 static int test1(void)
 {
-	const char* s = "ä¸­å›½äººæ°‘å…±å’Œå›½";
+	const char* s = "ÖĞ¹úÈËÃñ¹²ºÍ¹ú";
 	acl::charset_conv conv;
 	acl::string out, out2, out3;
 	acl::fstream out_fp;
@@ -102,7 +102,7 @@ static int test1(void)
 	}
 	printf("ok, hz to gb2312: %s, len: %d\n", out2.c_str(), (int) out2.length());
 
-	///////////////////////    æµå¼è§£æè¿‡ç¨‹æµ‹è¯•   ///////////////////////
+	///////////////////////    Á÷Ê½½âÎö¹ı³Ì²âÊÔ   ///////////////////////
 
 	/////////////////////////////////////////////////////////////////////
 

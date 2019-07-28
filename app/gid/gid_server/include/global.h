@@ -1,7 +1,7 @@
-ï»¿#ifndef	__GLOBAL_INCLUDE_H__
+#ifndef	__GLOBAL_INCLUDE_H__
 #define	__GLOBAL_INCLUDE_H__
 
-/* é…ç½®æ–‡ä»¶é¡¹ */
+/* ÅäÖÃÎÄ¼şÏî */
 
 extern int   var_cfg_debug_mem;
 extern int   var_cfg_loop_enable;
@@ -19,7 +19,7 @@ extern char *var_cfg_gid_path;
 extern char *var_cfg_proto_list;
 extern ACL_CONFIG_STR_TABLE service_conf_str_tab[];
 
-/* æœåŠ¡å™¨ä¹‹é—´ä¼ è¾“çš„å‘½ä»¤å­—å®šä¹‰ */
+/* ·şÎñÆ÷Ö®¼ä´«ÊäµÄÃüÁî×Ö¶¨Òå */
 #define	CMD_NEW_GID	"new_gid"
 #define CMD_TEST_GID	"test_gid"
 	

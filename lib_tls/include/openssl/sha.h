@@ -1,4 +1,4 @@
-﻿/* crypto/sha/sha.h */
+/* crypto/sha/sha.h */
 /* Copyright (C) 1995-1998 Eric Young (eay@cryptsoft.com)
  * All rights reserved.
  *

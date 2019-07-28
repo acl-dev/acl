@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "../mime/internal/header_token.hpp"
 #include "../mime/internal/mime_state.hpp"
 #ifndef ACL_PREPARE_COMPILE
@@ -107,7 +107,7 @@ bool http_ctype::parse(const char* cp)
 				if (bound_ == NULL) {
 					bound_ = NEW string(64);
 				}
-				/* éœ€è¦æ·»åŠ  "--" åšä¸ºåˆ†éš”ç¬¦çš„å‰å¯¼ç¬¦ */
+				/* ĞèÒªÌí¼Ó "--" ×öÎª·Ö¸ô·ûµÄÇ°µ¼·û */
 				*bound_ = "--";
 				*bound_ += token[2].u.value;
 				break;

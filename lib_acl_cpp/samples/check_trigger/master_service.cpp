@@ -1,10 +1,10 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_job.h"
 #include "db_store.h"
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// é…ç½®å†…å®¹é¡¹
+// ÅäÖÃÄÚÈİÏî
 
 char* var_cfg_http_url_list;
 char* var_cfg_dns_ip;
@@ -63,20 +63,20 @@ void master_service::on_trigger()
 		const char* url = (*cit).c_str();
 		for (int i = 0; i < var_cfg_http_cocurrent; i++)
 		{
-			// åˆ›å»ºä¸€ä¸ªå·¥ä½œçº¿ç¨‹ä»»åŠ¡ï¼Œå¹¶äº¤ç”±çº¿ç¨‹æ± å»æ‰§è¡Œ
+			// ´´½¨Ò»¸ö¹¤×÷Ïß³ÌÈÎÎñ£¬²¢½»ÓÉÏß³Ì³ØÈ¥Ö´ĞĞ
 			acl::thread_job* job = new http_job(*var_thrpool, url,
 				var_cfg_dns_ip, var_cfg_dns_port);
 			var_thrpool->execute(job);
 		}
 	}
 
-	// ç­‰å¾…çº¿ç¨‹æ± ç»“æŸ
+	// µÈ´ıÏß³Ì³Ø½áÊø
 	var_thrpool->wait();
 }
 
 void master_service::proc_on_init()
 {
-	// å–å¾—éœ€è¦æ¢æµ‹çš„ URL åˆ—è¡¨
+	// È¡µÃĞèÒªÌ½²âµÄ URL ÁĞ±í
 	acl::string buf(var_cfg_http_url_list);
 	const std::list<acl::string>& tokens = buf.split(",; \t");
 	std::list<acl::string>::const_iterator cit = tokens.begin();
@@ -86,29 +86,29 @@ void master_service::proc_on_init()
 		logger("add url: %s", (*cit).c_str());
 	}
 
-	// åˆ›å»ºæ•°æ®åº“è¿æ¥æ± 
+	// ´´½¨Êı¾İ¿âÁ¬½Ó³Ø
 	var_dbpool = new acl::sqlite_pool(var_cfg_dbpath,
 		var_cfg_http_cocurrent * url_list_.size());
 
-	// åˆ›å»ºæˆ–æ‰“å¼€æ•°æ®åº“
+	// ´´½¨»ò´ò¿ªÊı¾İ¿â
 	db_store store;
 	if (store.db_create() == false)
 		logger_fatal("create db failed!");
 
-	// åˆ›å»ºçº¿ç¨‹æ± å¹¶è®¾ç½®å‚æ•°
+	// ´´½¨Ïß³Ì³Ø²¢ÉèÖÃ²ÎÊı
 	var_thrpool = new acl::thread_pool;
 	var_thrpool->set_limit(var_cfg_http_cocurrent);
 	var_thrpool->set_idle(300);
 
-	// å¯åŠ¨çº¿ç¨‹æ± è¿‡ç¨‹
+	// Æô¶¯Ïß³Ì³Ø¹ı³Ì
 	var_thrpool->start();
 }
 
 void master_service::proc_on_exit()
 {
-	// é”€æ¯çº¿ç¨‹æ± 
+	// Ïú»ÙÏß³Ì³Ø
 	delete var_thrpool;
 
-	// é”€æ¯æ•°æ®åº“è¿æ¥æ± 
+	// Ïú»ÙÊı¾İ¿âÁ¬½Ó³Ø
 	delete var_dbpool;
 }

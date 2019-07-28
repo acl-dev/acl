@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "ipc_monitor.h"
 
 ipc_monitor::ipc_monitor(acl::tcp_ipc& ipc, int ttl, bool& service_exit)

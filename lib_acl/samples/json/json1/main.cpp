@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 #define STR	acl_vstring_str
 
@@ -70,27 +70,27 @@ static void test_json_foreach2(ACL_JSON* json)
 
 	printf("------------ in %s ------------\r\n", __FUNCTION__);
 
-	/* ä¸€çº§ç»“ç‚¹ */
+	/* Ò»¼¶½áµã */
 	acl_foreach(iter1, json->root) {
 		node1 = (ACL_JSON_NODE*) iter1.data;
 		print_json_node(json, node1);
 
-		/* äºŒçº§ç»“ç‚¹ */
+		/* ¶ş¼¶½áµã */
 		acl_foreach(iter2, node1) {
 			node2 = (ACL_JSON_NODE*) iter2.data;
 			print_json_node(json, node2);
 
-			/* ä¸‰çº§ç»“ç‚¹ */
+			/* Èı¼¶½áµã */
 			acl_foreach(iter3, node2) {
 				node3 = (ACL_JSON_NODE*) iter3.data;
 				print_json_node(json, node3);
 
-				/* å››çº§ç»“ç‚¹ */
+				/* ËÄ¼¶½áµã */
 				acl_foreach(iter4, node3) {
 					node4 = (ACL_JSON_NODE*) iter4.data;
 					print_json_node(json, node4);
 
-					/* äº”çº§ç»“ç‚¹ */
+					/* Îå¼¶½áµã */
 					acl_foreach(iter5, node4) {
 						node5 = (ACL_JSON_NODE*) iter5.data;
 						print_json_node(json, node5);
@@ -125,11 +125,11 @@ static void test_json_find1(ACL_JSON* json)
 		ACL_JSON_NODE* node1 = (ACL_JSON_NODE*) iter1.data;
 		printf("%s: %s\r\n", tags, STR(node1->text));
 
-		/* éå† node1 ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹ */
+		/* ±éÀú node1 ½áµãµÄÒ»¼¶×Ó½áµã */
 		acl_foreach(iter2, node1) {
 			ACL_JSON_NODE* node2 = (ACL_JSON_NODE*) iter2.data;
 
-			/* éå† node2 ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹ */
+			/* ±éÀú node2 ½áµãµÄÒ»¼¶×Ó½áµã */
 			acl_foreach(iter3, node2) {
 				ACL_JSON_NODE* node3 =
 					(ACL_JSON_NODE*) iter3.data;
@@ -304,7 +304,7 @@ static void test_json_benchmark(bool once, int max)
 			acl_json_update(json, ptr);
 		else
 		{
-			/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æ json æ•°æ® */
+			/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö json Êı¾İ */
 			while (*ptr != 0) {
 				char  ch2[2];
 
@@ -333,8 +333,8 @@ static void usage(const char* program)
 int main(int argc, char** argv)
 {
 #if 0
-//	const char* pp = "èª \";
-	const char* pp = "éŒ¦\";
+//	const char* pp = "Õ\\";
+	const char* pp = "å\\";
 	while (*pp)
 	{
 		printf("ch: %d\r\n", *pp);

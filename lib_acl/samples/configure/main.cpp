@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <assert.h>
 #include <errno.h>
 #include <string.h>

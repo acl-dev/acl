@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #ifdef WIN32
 #include <io.h>
 #include <direct.h>
@@ -14,7 +14,7 @@
 #define SEP	'/'
 #endif
 
-// å»å¹´è·¯å¾„å‰çš„ "./" æˆ– ".\"ï¼Œå› ä¸ºåœ¨ WIN32 ä¸‹
+// È¥ÄêÂ·¾¶Ç°µÄ "./" »ò ".\"£¬ÒòÎªÔÚ WIN32 ÏÂ
 #define SKIP(ptr) do  \
 {  \
 	if (*ptr == '.' && *(ptr + 1) == '/')  \

@@ -1,4 +1,4 @@
-﻿#ifndef __SQUID_ALLOCATOR_INCLUDE_H__
+#ifndef __SQUID_ALLOCATOR_INCLUDE_H__
 #define __SQUID_ALLOCATOR_INCLUDE_H__
 
 #ifdef __cplusplus

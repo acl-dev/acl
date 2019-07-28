@@ -1,4 +1,4 @@
-ï»¿#include <string>
+#include <string>
 #include "acl_cpp/mime/mime_code.hpp"
 #include "acl_cpp/stream/fstream.hpp"
 #include "acl_cpp/mime/mime_quoted_printable.hpp"
@@ -11,13 +11,13 @@ int main(void)
 
 #if 1
 	const char *text =
-		"å¾åˆšè¾‰ <xuganghui> changed: \r\n"
+		"Ğì¸Õ»Ô <xuganghui> changed: \r\n"
 		"What    |Removed             |Added\r\n"
 		"-------------------------------------\r\n"
 		"Status|NEW                   |ASSIGNED\r\n"
 		"AssignedTo|xuganghui         |zhengshuxin\r\n";
 #else
-	const char *text = "ç¼ºé™· 410";
+	const char *text = "È±Ïİ 410";
 #endif
 
 	ptr = text;

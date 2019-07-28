@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -44,7 +44,7 @@ void acl_dbsql_free_result(ACL_DB_HANDLE *handle, ACL_SQL_RES *res)
 	handle->free_result(res);
 }
 
-/* ç”¨äºŽæœ‰è¿”å›žç»“æžœé›†çš„æŸ¥è¯¢ */
+/* ÓÃÓÚÓÐ·µ»Ø½á¹û¼¯µÄ²éÑ¯ */
 
 int acl_dbsql_results(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	int (*walk_fn)(const void** result_row, void *arg), void *arg)
@@ -65,7 +65,7 @@ int acl_dbsql_results(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	return (n);
 }
 
-/* ç”¨äºŽä»…æŸ¥è¯¢ä¸€ä¸ªç»“æžœçš„æƒ…å†µ */
+/* ÓÃÓÚ½ö²éÑ¯Ò»¸ö½á¹ûµÄÇé¿ö */
 
 int acl_dbsql_result(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	int (*walk_fn)(const void** result_row, void *arg), void *arg)

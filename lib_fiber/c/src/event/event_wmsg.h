@@ -1,4 +1,4 @@
-﻿#ifndef EVENT_WMSG_INCLUDE_H
+#ifndef EVENT_WMSG_INCLUDE_H
 #define EVENT_WMSG_INCLUDE_H
 
 #include "event.h"

@@ -1,4 +1,4 @@
-﻿#ifndef __STD_AFX_INCLUDE_H__
+#ifndef __STD_AFX_INCLUDE_H__
 #define __STD_AFX_INCLUDE_H__
 
 # ifdef	WIN32

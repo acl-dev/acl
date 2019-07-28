@@ -1,4 +1,4 @@
-﻿#ifndef __ACL_MASTER_FLOW_INCLUDED_H__
+#ifndef __ACL_MASTER_FLOW_INCLUDED_H__
 #define __ACL_MASTER_FLOW_INCLUDED_H__
 
 #include "../stdlib/acl_define.h"

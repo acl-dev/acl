@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <getopt.h>
 
 static void handle_request(acl::socket_stream* conn)

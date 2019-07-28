@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -119,7 +119,7 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *sstream,
 		connfd = sstream->iocp_sock;
 		sstream->iocp_sock = ACL_SOCKET_INVALID;
 
-		/* iocp æ–¹å¼ä¸‹ï¼Œéœ€è°ƒç”¨ä¸‹é¢è¿‡ç¨‹ä»¥å…è®¸è°ƒç”¨
+		/* iocp ·½Ê½ÏÂ£¬Ğèµ÷ÓÃÏÂÃæ¹ı³ÌÒÔÔÊĞíµ÷ÓÃ
 		 * getpeername/getsockname
 		 */
 		ret = setsockopt(connfd, SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT,
@@ -146,7 +146,7 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *sstream,
 			sstream->rw_timeout,
 			ACL_VSTREAM_TYPE_SOCK);
 
-		/* è®© cstream çš„ context æˆå‘˜ç»§æ‰¿ sstream çš„ context æˆå‘˜. */
+		/* ÈÃ cstream µÄ context ³ÉÔ±¼Ì³Ğ sstream µÄ context ³ÉÔ±. */
 		cstream->context = sstream->context;
 	} else {
 		acl_vstream_reset(cstream);
@@ -289,11 +289,11 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, 0, ACL_VSTREAM_TYPE_SOCK);
 	stream->rw_timeout = rw_timeout;
 
-	/* è®¾ç½®æœ¬åœ°ç»‘å®šåœ°å€ */
+	/* ÉèÖÃ±¾µØ°ó¶¨µØÖ· */
 	if (getsockname(sock, &saddr.sa, &len) == 0)
 		acl_vstream_set_local_addr(stream, &saddr.sa);
 
-	/* æ³¨å†Œæµè¯»å†™å›è°ƒå‡½æ•° */
+	/* ×¢²áÁ÷¶ÁĞ´»Øµ÷º¯Êı */
 	acl_vstream_ctl(stream,
 		ACL_VSTREAM_CTL_READ_FN, udp_read,
 		ACL_VSTREAM_CTL_WRITE_FN, udp_write,

@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "pull_mode/server_manager.h"
 
 bool server_manager::init(const char* server_list)
@@ -27,7 +27,7 @@ bool server_manager::init(const char* server_list)
 
 bool server_manager::get_addr(const char* addr, acl::string& buf)
 {
-	// æ•°æ®æ ¼å¼ï¼šIP:PORT[:CONNECT_COUNT]
+	// Êý¾Ý¸ñÊ½£ºIP:PORT[:CONNECT_COUNT]
 	ACL_ARGV* tokens = acl_argv_split(addr, ":|");
 	if (tokens->argc < 2)
 	{

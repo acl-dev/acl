@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include "lib_protocol.h"
 #include "http_access.h"
 #include "html_template.h"
@@ -58,7 +58,7 @@ void http_request_forward(ACL_VSTREAM *client, HTTP_HDR_REQ *hdr_req, void *ctx)
 
 	buf = acl_vstring_alloc(256);
 
-	/* ç”Ÿæˆæ–°çš„ url åœ°å€ */
+	/* Éú³ÉÐÂµÄ url µØÖ· */
 	n = (int) strlen(host_ptr) - hdm->size_from;
 	acl_vstring_strcpy(buf, "http://");
 	if (n > 0)
@@ -66,12 +66,12 @@ void http_request_forward(ACL_VSTREAM *client, HTTP_HDR_REQ *hdr_req, void *ctx)
 	acl_vstring_strcat(buf, hdm->domain_to);
 	acl_vstring_strcat(buf, acl_vstring_str(hdr_req->url_part));
 
-	/* äº§ç”Ÿé‡å®šå‘å¤´ */
+	/* ²úÉúÖØ¶¨ÏòÍ· */
 	hdr_res = http_hdr_res_static(302);
 	http_hdr_put_str(&hdr_res->hdr, "Location", acl_vstring_str(buf));
 	http_hdr_put_str(&hdr_res->hdr, "Connection", "close");
 	
-	/* ç”Ÿæˆå“åº”æ•°æ®åŒ… */
+	/* Éú³ÉÏìÓ¦Êý¾Ý°ü */
 	http_hdr_build(&hdr_res->hdr, buf);
 
 	acl_vstream_writen(client, acl_vstring_str(buf), ACL_VSTRING_LEN(buf));

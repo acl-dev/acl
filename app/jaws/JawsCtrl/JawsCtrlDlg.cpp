@@ -1,4 +1,4 @@
-ï»¿// JawsCtrlDlg.cpp : å®ç°æ–‡ä»¶
+// JawsCtrlDlg.cpp : ÊµÏÖÎÄ¼ş
 //
 
 #include "stdafx.h"
@@ -12,20 +12,20 @@
 #endif
 
 
-// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
+// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -43,7 +43,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CJawsCtrlDlg å¯¹è¯æ¡†
+// CJawsCtrlDlg ¶Ô»°¿ò
 
 CJawsCtrlDlg::CJawsCtrlDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CJawsCtrlDlg::IDD, pParent)
@@ -110,15 +110,15 @@ BEGIN_MESSAGE_MAP(CJawsCtrlDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CJawsCtrlDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
+// CJawsCtrlDlg ÏûÏ¢´¦Àí³ÌĞò
 
 BOOL CJawsCtrlDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
+	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
 
-	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
+	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -134,12 +134,12 @@ BOOL CJawsCtrlDlg::OnInitDialog()
 		}
 	}
 
-	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
-	//  æ‰§è¡Œæ­¤æ“ä½œ
-	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
-	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
+	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
+	//  Ö´ĞĞ´Ë²Ù×÷
+	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
+	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
 
-	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
 	m_dVerticalExpand.Init(this, IDC_DIVIDER, TRUE);
 	ExpandDialog(FALSE);
 
@@ -148,14 +148,14 @@ BOOL CJawsCtrlDlg::OnInitDialog()
 	CheckRadioButton(IDC_RADIO_HTTPD, IDC_RADIO_HTTP_PROXY, IDC_RADIO_HTTP_PROXY);
 	GetDlgItem(IDC_BUTTON_STOP)->EnableWindow(FALSE);
 
-	// å¯åŠ¨ Jaws.exe
+	// Æô¶¯ Jaws.exe
 	if (m_regRun.IfAutoRun()) {
 		OnBnClickedButtonStart();
 		CheckDlgButton(IDC_AUTO_RUN, 1);
 	} else
 		CheckDlgButton(IDC_AUTO_RUN, 0);
 
-	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
+	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
 }
 
 void CJawsCtrlDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -171,19 +171,19 @@ void CJawsCtrlDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
-//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
-//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
+// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
+//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
+//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
 
 void CJawsCtrlDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
+		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
+		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -191,7 +191,7 @@ void CJawsCtrlDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ç»˜åˆ¶å›¾æ ‡
+		// »æÖÆÍ¼±ê
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -200,7 +200,7 @@ void CJawsCtrlDlg::OnPaint()
 	}
 }
 
-//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
+//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
 HCURSOR CJawsCtrlDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -211,7 +211,7 @@ int CJawsCtrlDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CDialog::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	// TODO:  åœ¨æ­¤æ·»åŠ æ‚¨ä¸“ç”¨çš„åˆ›å»ºä»£ç 
+	// TODO:  ÔÚ´ËÌí¼ÓÄú×¨ÓÃµÄ´´½¨´úÂë
 	m_trayIcon.SetNotificationWnd(this, WM_MY_TRAY_NOTIFICATION);
 	m_trayIcon.SetIcon(IDI_MIN_ICON);
 	return 0;
@@ -219,13 +219,13 @@ int CJawsCtrlDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void CJawsCtrlDlg::OnOpenMain()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	ShowWindow(SW_NORMAL);
 }
 
 void CJawsCtrlDlg::OnQuit()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ å‘½ä»¤å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼ÓÃüÁî´¦Àí³ÌĞò´úÂë
 	m_bShutdown = TRUE;		// really exit
 	SendMessage(WM_CLOSE);
 }
@@ -237,8 +237,8 @@ afx_msg LRESULT CJawsCtrlDlg::OnTrayNotification(WPARAM uID, LPARAM lEvent)
 }
 void CJawsCtrlDlg::OnNcPaint()
 {
-	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
-	// ä¸ä¸ºç»˜å›¾æ¶ˆæ¯è°ƒç”¨ CDialog::OnNcPaint()
+	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
+	// ²»Îª»æÍ¼ÏûÏ¢µ÷ÓÃ CDialog::OnNcPaint()
 	static int i = 2;
 	if(i > 0)
 	{
@@ -252,7 +252,7 @@ void CJawsCtrlDlg::OnNcPaint()
 
 void CJawsCtrlDlg::OnClose()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç å’Œ/æˆ–è°ƒç”¨é»˜è®¤å€¼
+	// TODO: ÔÚ´ËÌí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂëºÍ/»òµ÷ÓÃÄ¬ÈÏÖµ
 
 	if (m_bShutdown) {
 		if (m_pService) {
@@ -271,13 +271,13 @@ void CJawsCtrlDlg::OnDestroy()
 {
 	CDialog::OnDestroy();
 
-	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
 	theApp.m_singleCtrl.Remove();
 }
 
 void CJawsCtrlDlg::OnBnClickedButtonStart()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CString addr;
 
 	addr.Format("%s:%d", m_listenIp, m_listenPort);
@@ -313,7 +313,7 @@ void CJawsCtrlDlg::OnBnClickedButtonStart()
 
 void CJawsCtrlDlg::OnBnClickedButtonStop()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	ASSERT(m_pService != NULL);
 	GetDlgItem(IDC_BUTTON_START)->EnableWindow(TRUE);
 	GetDlgItem(IDC_BUTTON_STOP)->EnableWindow(FALSE);
@@ -327,14 +327,14 @@ void CJawsCtrlDlg::OnBnClickedButtonStop()
 
 void CJawsCtrlDlg::OnBnClickedButtonQuit()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	m_bShutdown = TRUE;		// really exit
 	SendMessage(WM_CLOSE);
 }
 
 void CJawsCtrlDlg::OnBnClickedMore()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	static BOOL bExpand = TRUE;
 
 	ExpandDialog(bExpand);
@@ -347,9 +347,9 @@ void CJawsCtrlDlg::ExpandDialog(BOOL bExpand)
 
 	m_dVerticalExpand.Expand(bExpand);
 	if (bExpand) {
-		sExpand = "<<(&L)æ›´å°‘";
+		sExpand = "<<(&L)¸üÉÙ";
 	} else {
-		sExpand = "(&M)æ›´å¤š>>";
+		sExpand = "(&M)¸ü¶à>>";
 	}
 
 	SetDlgItemText(IDC_MORE, sExpand);
@@ -357,7 +357,7 @@ void CJawsCtrlDlg::ExpandDialog(BOOL bExpand)
 
 void CJawsCtrlDlg::OnBnClickedAutoRun()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	if (IsDlgButtonChecked(IDC_AUTO_RUN))
 		m_regRun.AutoRun(TRUE, m_sJawsCtrlName.GetString());
 	else

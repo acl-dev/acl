@@ -1,4 +1,4 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include <assert.h>
 #include "lib_acl.h"
 #include "acl_cpp/acl_cpp_init.hpp"
@@ -31,16 +31,16 @@ typedef struct
 static bool connect_server(IO_CTX* ctx, int id);
 
 /**
- * å®¢æˆ·ç«¯å¼‚æ­¥è¿æ¥æµå›è°ƒå‡½æ•°ç±»
+ * ¿Í»§¶ËÒì²½Á¬½ÓÁ÷»Øµ÷º¯ÊıÀà
  */
 class client_io_callback : public acl::aio_open_callback
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
+	 * ¹¹Ôìº¯Êı
 	 * @param ctx {IO_CTX*}
-	 * @param client {aio_socket_stream*} å¼‚æ­¥è¿æ¥æµ
-	 * @param id {int} æœ¬æµçš„IDå·
+	 * @param client {aio_socket_stream*} Òì²½Á¬½ÓÁ÷
+	 * @param id {int} ±¾Á÷µÄIDºÅ
 	 */
 	client_io_callback(IO_CTX* ctx, acl::aio_socket_stream* client, int id)
 	: client_(client)
@@ -56,10 +56,10 @@ public:
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµè¯»åˆ°æ‰€è¦æ±‚çš„æ•°æ®æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
-	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
-	 * @param len {intï½ è¯»åˆ°çš„æ•°æ®é•¿åº¦
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı, µ±Òì²½Á÷¶Áµ½ËùÒªÇóµÄÊı¾İÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı
+	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
+	 * @param len {int£ı ¶Áµ½µÄÊı¾İ³¤¶È
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool read_callback(char* data, int len)
 	{
@@ -75,11 +75,11 @@ public:
 			}
 		}
 
-		// å¦‚æœæ”¶åˆ°æœåŠ¡å™¨çš„é€€å‡ºæ¶ˆæ¯ï¼Œåˆ™ä¹Ÿåº”é€€å‡º
+		// Èç¹ûÊÕµ½·şÎñÆ÷µÄÍË³öÏûÏ¢£¬ÔòÒ²Ó¦ÍË³ö
 		if (acl::strncasecmp_(data, "quit", 4) == 0) {
-			// å‘æœåŠ¡å™¨å‘é€æ•°æ®
+			// Ïò·şÎñÆ÷·¢ËÍÊı¾İ
 			client_->format("Bye!\r\n");
-			// å…³é—­å¼‚æ­¥æµè¿æ¥
+			// ¹Ø±ÕÒì²½Á÷Á¬½Ó
 			client_->close();
 			return true;
 		}
@@ -92,7 +92,7 @@ public:
 					<< ", quiting ..." << std::endl;
 			}
 
-			// å‘æœåŠ¡å™¨å‘é€é€€å‡ºæ¶ˆæ¯
+			// Ïò·şÎñÆ÷·¢ËÍÍË³öÏûÏ¢
 			client_->format("quit\r\n");
 			client_->close();
 		} else {
@@ -100,7 +100,7 @@ public:
 			snprintf(buf, sizeof(buf), "hello world: %d\n", nwrite_);
 			client_->write(buf, (int) strlen(buf));
 
-			// å‘æœåŠ¡å™¨å‘é€æ•°æ®
+			// Ïò·şÎñÆ÷·¢ËÍÊı¾İ
 			//client_->format("hello world: %d\n", nwrite_);
 		}
 
@@ -108,21 +108,21 @@ public:
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµå†™æˆåŠŸæ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı, µ±Òì²½Á÷Ğ´³É¹¦Ê±µ÷ÓÃ´Ë»Øµ÷º¯Êı
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool write_callback(void)
 	{
 		ctx_->nwrite_total++;
 		nwrite_++;
 
-		// ä»æœåŠ¡å™¨è¯»ä¸€è¡Œæ•°æ®
+		// ´Ó·şÎñÆ÷¶ÁÒ»ĞĞÊı¾İ
 		client_->gets(ctx_->read_timeout, false);
 		return true;
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“è¯¥å¼‚æ­¥æµå…³é—­æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
+	 * »ùÀàĞéº¯Êı, µ±¸ÃÒì²½Á÷¹Ø±ÕÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı
 	 */
 	void close_callback(void)
 	{
@@ -131,10 +131,10 @@ public:
 				<< ctx_->addr << " error: "
 				<< acl::last_serror();
 
-			// å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡è¿æ¥å°±å¤±è´¥ï¼Œåˆ™é€€å‡º
+			// Èç¹ûÊÇµÚÒ»´ÎÁ¬½Ó¾ÍÊ§°Ü£¬ÔòÍË³ö
 			if (ctx_->nopen_total == 0) {
 				std::cout << ", first connect error, quit";
-				/* è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
+				/* »ñµÃÒì²½ÒıÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
 				client_->get_handle().stop();
 			}
 			std::cout << std::endl;
@@ -142,22 +142,22 @@ public:
 			return;
 		}
 
-		/* è·å¾—å¼‚æ­¥å¼•æ“ä¸­å—ç›‘æ§çš„å¼‚æ­¥æµä¸ªæ•° */
+		/* »ñµÃÒì²½ÒıÇæÖĞÊÜ¼à¿ØµÄÒì²½Á÷¸öÊı */
 		int nleft = client_->get_handle().length();
 		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1) {
 			std::cout << "Id: " << id_ << " stop now! nstream: "
 				<< nleft << std::endl;
-			/* è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
+			/* »ñµÃÒì²½ÒıÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
 			client_->get_handle().stop();
 		}
 
-		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
+		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
 		delete this;
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“å¼‚æ­¥æµè¶…æ—¶æ—¶è°ƒç”¨æ­¤å‡½æ•°
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı£¬µ±Òì²½Á÷³¬Ê±Ê±µ÷ÓÃ´Ëº¯Êı
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool timeout_callback(void)
 	{
@@ -167,34 +167,34 @@ public:
 	}
 
 	/**
-	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥è¿æ¥æˆåŠŸåè°ƒç”¨æ­¤å‡½æ•°
-	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
+	 * »ùÀàĞéº¯Êı, µ±Òì²½Á¬½Ó³É¹¦ºóµ÷ÓÃ´Ëº¯Êı
+	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
 	 */
 	bool open_callback(void)
 	{
-		// è¿æ¥æˆåŠŸï¼Œè®¾ç½®IOè¯»å†™å›è°ƒå‡½æ•°
+		// Á¬½Ó³É¹¦£¬ÉèÖÃIO¶ÁĞ´»Øµ÷º¯Êı
 		client_->add_read_callback(this);
 		client_->add_write_callback(this);
 		ctx_->nopen_total++;
 
 		acl::assert_(id_ > 0);
 		if (ctx_->nopen_total < ctx_->nopen_limit) {
-			// å¼€å§‹è¿›è¡Œä¸‹ä¸€ä¸ªè¿æ¥è¿‡ç¨‹
+			// ¿ªÊ¼½øĞĞÏÂÒ»¸öÁ¬½Ó¹ı³Ì
 			if (connect_server(ctx_, id_ + 1) == false) {
 				std::cout << "connect error!" << std::endl;
 			}
 		}
 
-		// å¼‚æ­¥å‘æœåŠ¡å™¨å‘é€æ•°æ®
+		// Òì²½Ïò·şÎñÆ÷·¢ËÍÊı¾İ
 		//client_->format("hello world: %d\n", nwrite_);
 		char  buf[256];
 		snprintf(buf, sizeof(buf), "hello world: %d\n", nwrite_);
 		client_->write(buf, (int) strlen(buf));
 
-		// å¼‚æ­¥ä»æœåŠ¡å™¨è¯»å–ä¸€è¡Œæ•°æ®
+		// Òì²½´Ó·şÎñÆ÷¶ÁÈ¡Ò»ĞĞÊı¾İ
 		client_->gets(ctx_->read_timeout, false);
 
-		// è¡¨ç¤ºç»§ç»­å¼‚æ­¥è¿‡ç¨‹
+		// ±íÊ¾¼ÌĞøÒì²½¹ı³Ì
 		return true;
 	}
 
@@ -207,7 +207,7 @@ private:
 
 static bool connect_server(IO_CTX* ctx, int id)
 {
-	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹æœåŠ¡å™¨
+	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì·şÎñÆ÷
 	acl::aio_socket_stream* stream = acl::aio_socket_stream::open
 		(ctx->handle, ctx->addr, ctx->connect_timeout);
 	if (stream == NULL) {
@@ -218,16 +218,16 @@ static bool connect_server(IO_CTX* ctx, int id)
 		return false;
 	}
 
-	// åˆ›å»ºè¿æ¥åçš„å›è°ƒå‡½æ•°ç±»
+	// ´´½¨Á¬½ÓºóµÄ»Øµ÷º¯ÊıÀà
 	client_io_callback* callback = new client_io_callback(ctx, stream, id);
 
-	// æ·»åŠ è¿æ¥æˆåŠŸçš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³É¹¦µÄ»Øµ÷º¯ÊıÀà
 	stream->add_open_callback(callback);
 
-	// æ·»åŠ è¿æ¥å¤±è´¥åå›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½ÓÊ§°Üºó»Øµ÷º¯ÊıÀà
 	stream->add_close_callback(callback);
 
-	// æ·»åŠ è¿æ¥è¶…æ—¶çš„å›è°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³¬Ê±µÄ»Øµ÷º¯ÊıÀà
 	stream->add_timeout_callback(callback);
 	return true;
 }
@@ -300,7 +300,7 @@ int main(int argc, char* argv[])
 	std::cout << "Connect " << ctx.addr << " ..." << std::endl;
 
 	while (true) {
-		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
+		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
 		if (handle.check() == false) {
 			break;
 		}

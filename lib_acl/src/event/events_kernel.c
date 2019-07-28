@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -55,8 +55,8 @@ typedef struct EVENT_KERNEL {
 } EVENT_KERNEL;
 
 /**
- * å¯¹äºŽ epoll/kqueue/devpoll è¿™äº›å†…æ ¸çº§æ“ä½œï¼Œå½“æè¿°ç¬¦å…³é—­æ—¶è¯¥æè¿°ç¬¦å°†
- * ä¼šè‡ªåŠ¨ä»Žå†…æ ¸ç›‘æŽ§ä¸­åŽ»é™¤
+ * ¶ÔÓÚ epoll/kqueue/devpoll ÕâÐ©ÄÚºË¼¶²Ù×÷£¬µ±ÃèÊö·û¹Ø±ÕÊ±¸ÃÃèÊö·û½«
+ * »á×Ô¶¯´ÓÄÚºË¼à¿ØÖÐÈ¥³ý
  */
 #undef	EVENT_AUTO_DEL
 
@@ -163,7 +163,7 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 
 		stream->fdp = (void *) fdp;
-		/* æ·»åŠ æµå…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
+		/* Ìí¼ÓÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 #ifdef	USE_FDMAP
 		acl_fdmap_add(ev->fdmap, sockfd, fdp);
@@ -172,12 +172,12 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		goto END;
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_DEL_READ)) {
 
-		/* åœæ­¢ç¦æ­¢è¯»ç›‘å¬è¿‡ç¨‹ */
+		/* Í£Ö¹½ûÖ¹¶Á¼àÌý¹ý³Ì */
 
 		acl_assert((fdp->flag & EVENT_FDTABLE_FLAG_READ));
 
-		/* é‡æ–°å¯ç”¨è¯»ç›‘å¬è¿‡ç¨‹, å› ä¸ºä¹‹å‰çš„è¿‡ç¨‹æ˜¯æ­£åœ¨æ‹†é™¤è¯»ç›‘å¬è¿‡ç¨‹ä½†
-		 * è¿˜æ²¡æœ‰æ­£å¼æ‹†é™¤ï¼Œæ‰€ä»¥åªéœ€è¦æ¸…é™¤æ‹†é™¤æ ‡å¿—ä½å³å¯
+		/* ÖØÐÂÆôÓÃ¶Á¼àÌý¹ý³Ì, ÒòÎªÖ®Ç°µÄ¹ý³ÌÊÇÕýÔÚ²ð³ý¶Á¼àÌý¹ý³Ìµ«
+		 * »¹Ã»ÓÐÕýÊ½²ð³ý£¬ËùÒÔÖ»ÐèÒªÇå³ý²ð³ý±êÖ¾Î»¼´¿É
 		 */
 
 		fdp->flag &= ~EVENT_FDTABLE_FLAG_DEL_READ;
@@ -251,7 +251,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		acl_ring_append(&ev->fdp_delay_list, &fdp->delay_entry);
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 		stream->fdp = (void *) fdp;
-		/* æ·»åŠ æµå…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
+		/* Ìí¼ÓÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 #ifdef	USE_FDMAP
 		acl_fdmap_add(ev->fdmap, sockfd, fdp);
@@ -613,7 +613,7 @@ static void event_set_all(ACL_EVENT *eventp)
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 
-	/* ä¼˜å…ˆå¤„ç†æ·»åŠ è¯»/å†™ç›‘æŽ§ä»»åŠ¡, è¿™æ ·å¯ä»¥æŠŠ ADD ä¸­é—´æ€è½¬æ¢æˆæ­£å¼çŠ¶æ€ */
+	/* ÓÅÏÈ´¦ÀíÌí¼Ó¶Á/Ð´¼à¿ØÈÎÎñ, ÕâÑù¿ÉÒÔ°Ñ ADD ÖÐ¼äÌ¬×ª»»³ÉÕýÊ½×´Ì¬ */
 
 	eventp->ready_cnt = 0;
 
@@ -625,7 +625,7 @@ static void event_set_all(ACL_EVENT *eventp)
 		event_check_fds(eventp);
 	}
 
-	/* å¤„ç†ä»»åŠ¡é¡¹ */
+	/* ´¦ÀíÈÎÎñÏî */
 
 	while (1) {
 		ACL_RING *r = acl_ring_pop_head(&ev->fdp_delay_list);
@@ -664,11 +664,11 @@ static void event_loop(ACL_EVENT *eventp)
 	if (delay < DELAY_MIN)
 		delay = DELAY_MIN;
 
-	/* è°ƒæ•´äº‹ä»¶å¼•æ“Žçš„æ—¶é—´æˆª */
+	/* µ÷ÕûÊÂ¼þÒýÇæµÄÊ±¼ä½Ø */
 
 	SET_TIME(eventp->present);
 
-	/* æ ¹æ®å®šæ—¶å™¨ä»»åŠ¡çš„æœ€è¿‘ä»»åŠ¡è®¡ç®— epoll/kqueue/devpoll çš„æ£€æµ‹è¶…æ—¶ä¸Šé™ */
+	/* ¸ù¾Ý¶¨Ê±Æ÷ÈÎÎñµÄ×î½üÈÎÎñ¼ÆËã epoll/kqueue/devpoll µÄ¼ì²â³¬Ê±ÉÏÏÞ */
 
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		acl_int64 n = timer->when - eventp->present;
@@ -678,7 +678,7 @@ static void event_loop(ACL_EVENT *eventp)
 			delay = n;
 	}
 
-	/* è®¾ç½®æè¿°å­—å¯¹è±¡çš„çŠ¶æ€ï¼Œæ·»åŠ /åˆ é™¤ä¹‹å‰è®¾ç½®çš„æè¿°å­—å¯¹è±¡ */
+	/* ÉèÖÃÃèÊö×Ö¶ÔÏóµÄ×´Ì¬£¬Ìí¼Ó/É¾³ýÖ®Ç°ÉèÖÃµÄÃèÊö×Ö¶ÔÏó */
 
 	event_set_all(eventp);
 
@@ -689,12 +689,12 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 	}
 
-	/* å¦‚æžœå·²ç»æœ‰æè¿°å­—å‡†å¤‡å¥½åˆ™æ£€æµ‹è¶…æ—¶æ—¶é—´ç½® 0 */
+	/* Èç¹ûÒÑ¾­ÓÐÃèÊö×Ö×¼±¸ºÃÔò¼ì²â³¬Ê±Ê±¼äÖÃ 0 */
 
 	if (eventp->ready_cnt > 0)
 		delay = 0;
 
-	/* è°ƒç”¨ epoll/kquque/devpoll ç³»ç»Ÿè°ƒç”¨æ£€æµ‹å¯ç”¨æè¿°å­— */
+	/* µ÷ÓÃ epoll/kquque/devpoll ÏµÍ³µ÷ÓÃ¼ì²â¿ÉÓÃÃèÊö×Ö */
 
 	EVENT_BUFFER_READ(nready, ev->event_fd, ev->event_buf,
 		ev->event_fdslots, (int) (delay / 1000));
@@ -715,7 +715,7 @@ static void event_loop(ACL_EVENT *eventp)
 	} else if (nready == 0)
 		goto TAG_DONE;
 
-	/* æ£€æŸ¥æ£€æµ‹ç»“æžœ */
+	/* ¼ì²é¼ì²â½á¹û */
 
 	for (bp = ev->event_buf; bp < ev->event_buf + nready; bp++) {
 #ifdef	USE_FDMAP
@@ -736,17 +736,17 @@ static void event_loop(ACL_EVENT *eventp)
 			continue;
 #endif
 
-		/* å¦‚æžœè¯¥æè¿°å­—å¯¹è±¡å·²ç»åœ¨è¢«è®¾ç½®ä¸ºå¼‚å¸¸æˆ–è¶…æ—¶çŠ¶æ€åˆ™ç»§ç»­ */
+		/* Èç¹û¸ÃÃèÊö×Ö¶ÔÏóÒÑ¾­ÔÚ±»ÉèÖÃÎªÒì³£»ò³¬Ê±×´Ì¬Ôò¼ÌÐø */
 
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
 			continue;
 
-		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å¯è¯» */
+		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿É¶Á */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
 			&& EVENT_TEST_READ(bp))
 		{
-			/* ç»™è¯¥æè¿°å­—å¯¹è±¡é™„åŠ å¯è¯»å±žæ€§ */
+			/* ¸ø¸ÃÃèÊö×Ö¶ÔÏó¸½¼Ó¿É¶ÁÊôÐÔ */
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0)
 			{
@@ -758,20 +758,20 @@ static void event_loop(ACL_EVENT *eventp)
 			if (fdp->listener)
 				fdp->event_type |= ACL_EVENT_ACCEPT;
 
-			/* è¯¥æè¿°å­—å¯è¯»åˆ™è®¾ç½® ACL_VSTREAM çš„ç³»ç»Ÿå¯è¯»æ ‡å¿—ä»Žè€Œ
-			 * è§¦å‘ ACL_VSTREAM æµåœ¨è¯»æ—¶è°ƒç”¨ç³»ç»Ÿçš„ read å‡½æ•°
+			/* ¸ÃÃèÊö×Ö¿É¶ÁÔòÉèÖÃ ACL_VSTREAM µÄÏµÍ³¿É¶Á±êÖ¾´Ó¶ø
+			 * ´¥·¢ ACL_VSTREAM Á÷ÔÚ¶ÁÊ±µ÷ÓÃÏµÍ³µÄ read º¯Êý
 			 */
 			else
 				fdp->stream->read_ready = 1;
 		}
 
-		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å¯å†™ */
+		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿ÉÐ´ */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 			&& EVENT_TEST_WRITE(bp))
 		{
 
-			/* ç»™è¯¥æè¿°å­—å¯¹è±¡é™„åŠ å¯å†™å±žæ€§ */
+			/* ¸ø¸ÃÃèÊö×Ö¶ÔÏó¸½¼Ó¿ÉÐ´ÊôÐÔ */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0)
@@ -784,7 +784,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 #ifdef	EVENT_TEST_ERROR
 		if (EVENT_TEST_ERROR(bp)) {
-			/* å¦‚æžœå‡ºçŽ°å¼‚å¸¸åˆ™è®¾ç½®å¼‚å¸¸å±žæ€§ */
+			/* Èç¹û³öÏÖÒì³£ÔòÉèÖÃÒì³£ÊôÐÔ */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0)
@@ -801,7 +801,7 @@ TAG_DONE:
 
 	event_timer_trigger(eventp);
 
-	/* å¤„ç†å‡†å¤‡å¥½çš„æè¿°å­—äº‹ä»¶ */
+	/* ´¦Àí×¼±¸ºÃµÄÃèÊö×ÖÊÂ¼þ */
 	if (eventp->ready_cnt > 0)
 		event_fire(eventp);
 

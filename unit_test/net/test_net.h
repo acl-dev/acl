@@ -1,4 +1,4 @@
-﻿
+
 #ifndef	__TEST_NET_INCLUDE_H__
 #define	__TEST_NET_INCLUDE_H__
 

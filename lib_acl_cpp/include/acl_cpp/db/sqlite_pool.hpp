@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../db/db_pool.hpp"
 
@@ -12,23 +12,23 @@ class ACL_CPP_API sqlite_pool : public db_pool
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param dbfile {const char*} sqlite æ•°æ®åº“çš„æ•°æ®æ–‡ä»¶
-	 * @param dblimit {size_t} æ•°æ®åº“è¿æ¥æ± æœ€å¤§è¿æ¥æ•°é™åˆ¶
-	 * @param charset {const char*} æ•°æ®æ–‡ä»¶åå­—ç¬¦é›†
+	 * ¹¹Ôìº¯Êı
+	 * @param dbfile {const char*} sqlite Êı¾İ¿âµÄÊı¾İÎÄ¼ş
+	 * @param dblimit {size_t} Êı¾İ¿âÁ¬½Ó³Ø×î´óÁ¬½ÓÊıÏŞÖÆ
+	 * @param charset {const char*} Êı¾İÎÄ¼şÃû×Ö·û¼¯
 	 */
 	sqlite_pool(const char* dbfile, size_t dblimit = 64,
 		const char* charset = "utf-8");
 	~sqlite_pool();
 
 protected:
-	// åŸºç±» connect_pool çº¯è™šå‡½æ•°ï¼šåˆ›å»ºæ•°æ®åº“è¿æ¥å¥æŸ„
+	// »ùÀà connect_pool ´¿Ğéº¯Êı£º´´½¨Êı¾İ¿âÁ¬½Ó¾ä±ú
 	connect_client* create_connect();
 
 private:
-	// sqlite æ•°æ®æ–‡ä»¶å
+	// sqlite Êı¾İÎÄ¼şÃû
 	char* dbfile_;
-	// sqlite æ•°æ®æ–‡ä»¶åçš„å­—ç¬¦é›†
+	// sqlite Êı¾İÎÄ¼şÃûµÄ×Ö·û¼¯
 	char* charset_;
 };
 

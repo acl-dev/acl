@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "db.h"
 
 class acl::db_handle;  // db_handle.hpp
@@ -34,67 +34,67 @@ public:
 	~db_ctl(void);
 
 	/**
-	 * åŠ è½½æ•°æ®åº“ä¿¡æ¯
+	 * ¼ÓÔØÊı¾İ¿âĞÅÏ¢
 	 */
 	void load();
 
 	/**
-	 * æ‰“å¼€æŒ‡å®šæ•°æ®åº“ä¸­çš„æ•°æ®åº“å¯¹è±¡ï¼Œå¦‚æœæ•°æ®åº“ä¸å­˜åœ¨ï¼Œè¿”å›NULL
-	 * @param dbname {const char*} æ•°æ®åº“åç§°
-	 * @param dbuser {const char*} ç”¨æˆ·å
-	 * @param dbpass {const char*} ç”¨æˆ·å¯†ç 
-	 * @return {database*} æ•°æ®åº“å¯¹è±¡ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤ºå¤±è´¥
+	 * ´ò¿ªÖ¸¶¨Êı¾İ¿âÖĞµÄÊı¾İ¿â¶ÔÏó£¬Èç¹ûÊı¾İ¿â²»´æÔÚ£¬·µ»ØNULL
+	 * @param dbname {const char*} Êı¾İ¿âÃû³Æ
+	 * @param dbuser {const char*} ÓÃ»§Ãû
+	 * @param dbpass {const char*} ÓÃ»§ÃÜÂë
+	 * @return {database*} Êı¾İ¿â¶ÔÏó£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾Ê§°Ü
 	 */
 	database* db_open(const char* dbname, const char* dbuser = NULL,
 		const char* dbpass = NULL);
 
 	/**
-	 * åˆ›å»ºæ•°æ®åº“
-	 * @param dbname {const char*} æ•°æ®åº“åç§°
-	 * @param dbuser {const char*} ç”¨æˆ·å
-	 * @param dbpass {const char*} ç”¨æˆ·å¯†ç 
-	 * @return {database*} æ•°æ®åº“å¯¹è±¡ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤ºå¤±è´¥
+	 * ´´½¨Êı¾İ¿â
+	 * @param dbname {const char*} Êı¾İ¿âÃû³Æ
+	 * @param dbuser {const char*} ÓÃ»§Ãû
+	 * @param dbpass {const char*} ÓÃ»§ÃÜÂë
+	 * @return {database*} Êı¾İ¿â¶ÔÏó£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾Ê§°Ü
 	 */
 	database* db_create(const char* dbname, const char* dbuser = NULL,
 		const char* dbpass = NULL);
 
 	/**
-	 * å…³é—­æ•°æ®åº“
+	 * ¹Ø±ÕÊı¾İ¿â
 	 * @param {database*} db
 	 */
 	void db_close(database* db);
 
 	/**
-	 * å‘æ•°æ®åº“ä¸­æ·»åŠ æ•°æ®è¡¨
-	 * @param db {database*} æ•°æ®åº“å
-	 * @param tbl_name {const char*} æ•°æ®è¡¨å
-	 * @return {db_tbl*} éç©ºå€¼è¡¨ç¤ºæ·»åŠ æˆåŠŸ
+	 * ÏòÊı¾İ¿âÖĞÌí¼ÓÊı¾İ±í
+	 * @param db {database*} Êı¾İ¿âÃû
+	 * @param tbl_name {const char*} Êı¾İ±íÃû
+	 * @return {db_tbl*} ·Ç¿ÕÖµ±íÊ¾Ìí¼Ó³É¹¦
 	 */
 	db_tbl* db_add_tbl(database* db, const char* tbl_name);
 
 	/**
-	 * å‘æ•°æ®è¡¨ä¸­æ·»åŠ ç´¢å¼•é¡¹
-	 * @param tbl {db_tbl*} æ•°æ®è¡¨å¯¹è±¡
-	 * @param tbl_idx {const char*} æ•°æ®è¡¨ç´¢å¼•å
-	 * @param idx_type {idx_type_t} è¡¨ç´¢å¼•çš„å­—æ®µç±»å‹
-	 * @return {db_idx*} éç©ºå€¼è¡¨ç¤ºæ·»åŠ æˆåŠŸ
+	 * ÏòÊı¾İ±íÖĞÌí¼ÓË÷ÒıÏî
+	 * @param tbl {db_tbl*} Êı¾İ±í¶ÔÏó
+	 * @param tbl_idx {const char*} Êı¾İ±íË÷ÒıÃû
+	 * @param idx_type {idx_type_t} ±íË÷ÒıµÄ×Ö¶ÎÀàĞÍ
+	 * @return {db_idx*} ·Ç¿ÕÖµ±íÊ¾Ìí¼Ó³É¹¦
 	 */
 	db_idx* db_add_idx(db_tbl* tbl, const char* tbl_idx, idx_type_t idx_type);
 
 	/**
-	 * å‘æ•°æ®è¡¨ä¸­æ·»åŠ ç´¢å¼•é¡¹
-	 * @param db {database*} æ•°æ®åº“å¯¹è±¡
-	 * @param tbl_name {const char*} æ•°æ®è¡¨å
-	 * @param tbl_idx {const char*} æ•°æ®è¡¨ç´¢å¼•å
-	 * @param idx_type {idx_type_t} è¡¨ç´¢å¼•çš„å­—æ®µç±»å‹
-	 * @return {db_idx*} éç©ºå€¼è¡¨ç¤ºæ·»åŠ æˆåŠŸ
+	 * ÏòÊı¾İ±íÖĞÌí¼ÓË÷ÒıÏî
+	 * @param db {database*} Êı¾İ¿â¶ÔÏó
+	 * @param tbl_name {const char*} Êı¾İ±íÃû
+	 * @param tbl_idx {const char*} Êı¾İ±íË÷ÒıÃû
+	 * @param idx_type {idx_type_t} ±íË÷ÒıµÄ×Ö¶ÎÀàĞÍ
+	 * @return {db_idx*} ·Ç¿ÕÖµ±íÊ¾Ìí¼Ó³É¹¦
 	 */
 	db_idx* db_add_idx(database* db, const char* tbl_name,
 		const char* tbl_idx, idx_type_t idx_type);
 
 protected:
 	/**
-	 * è®¾ç½®ç´¢å¼•æ•°æ®åº“çš„ä¸»æœºè‡³å¯¹åº”çš„æ•°æ®åº“å¯¹è±¡ä¸­ï¼Œå¹¶æ·»åŠ è¿›æ•°æ®åº“ä¸­
+	 * ÉèÖÃË÷ÒıÊı¾İ¿âµÄÖ÷»úÖÁ¶ÔÓ¦µÄÊı¾İ¿â¶ÔÏóÖĞ£¬²¢Ìí¼Ó½øÊı¾İ¿âÖĞ
 	 * @param db {database*}
 	 * @return {bool}
 	 */
@@ -102,58 +102,58 @@ protected:
 private:
 	int  errnum_;
 	db_driver* driver_;
-	acl::locker* lock_;  // db_ctl å¯¹è±¡çš„äº’æ–¥é”
-	acl::locker* ctl_conn_lock_; // ctl_conn_ æ•°æ®åº“è¿æ¥çš„äº’æ–¥é”
-	acl::db_handle* ctl_conn_;  // æ§åˆ¶æ•°æ®åº“çš„è¿æ¥
-	std::map<std::string, database*> dbs_;  // æ•°æ®åº“åˆ—è¡¨
-	std::vector<idx_host*> idx_hosts_;  // ç´¢å¼•æœåŠ¡å™¨åˆ—è¡¨
-	std::vector<dat_host*> dat_hosts_;  // æ•°æ®æœåŠ¡å™¨åˆ—è¡¨
+	acl::locker* lock_;  // db_ctl ¶ÔÏóµÄ»¥³âËø
+	acl::locker* ctl_conn_lock_; // ctl_conn_ Êı¾İ¿âÁ¬½ÓµÄ»¥³âËø
+	acl::db_handle* ctl_conn_;  // ¿ØÖÆÊı¾İ¿âµÄÁ¬½Ó
+	std::map<std::string, database*> dbs_;  // Êı¾İ¿âÁĞ±í
+	std::vector<idx_host*> idx_hosts_;  // Ë÷Òı·şÎñÆ÷ÁĞ±í
+	std::vector<dat_host*> dat_hosts_;  // Êı¾İ·şÎñÆ÷ÁĞ±í
 
 	std::list<NAME_TYPE*> names_;
 	std::list<DB_HOST*> db_hosts_;
 	std::list<DB_TBL*> db_tbls_;
 	std::list<TBL_IDX*> tbl_idxes_;
 
-	// åŠ è½½è¡¨ tbl_name_type
+	// ¼ÓÔØ±í tbl_name_type
 	int load_names(void);
 
-	// åŠ è½½è¡¨ tbl_idx_host
+	// ¼ÓÔØ±í tbl_idx_host
 	int load_idx_hosts(void);
 
-	// åŠ è½½è¡¨ tbl_dat_host
+	// ¼ÓÔØ±í tbl_dat_host
 	int load_dat_hosts(void);
 
-	// åŠ è½½è¡¨ tbl_db_host
+	// ¼ÓÔØ±í tbl_db_host
 	int load_db_hosts(void);
 
-	// åŠ è½½è¡¨ tbl_db_tbl
+	// ¼ÓÔØ±í tbl_db_tbl
 	int load_db_tbls(void);
 
-	// åŠ è½½è¡¨ tbl_tbl_idx
+	// ¼ÓÔØ±í tbl_tbl_idx
 	int load_tbl_idxes(void);
 
-	// ä» NAME_TYPE çš„é›†åˆä¸­æ ¹æ®IDå·åŠç±»å‹è·å¾—æŒ‡å®šçš„ NAME_TYPE ç»“æ„å¯¹è±¡
+	// ´Ó NAME_TYPE µÄ¼¯ºÏÖĞ¸ù¾İIDºÅ¼°ÀàĞÍ»ñµÃÖ¸¶¨µÄ NAME_TYPE ½á¹¹¶ÔÏó
 	NAME_TYPE* get_name(unsigned int id, name_type_t type) const;
 
-	// æ·»åŠ  NAME_TYPEå¯¹è±¡è‡³ names_ é›†åˆä¸­
+	// Ìí¼Ó NAME_TYPE¶ÔÏóÖÁ names_ ¼¯ºÏÖĞ
 	void add_name(const char* name, unsigned int id, name_type_t type);
 
-	// æ·»åŠ æ–°çš„åå­—è®°å½•è‡³æ•°æ®åº“ï¼Œå¹¶è¿”å›å…¶IDå·
+	// Ìí¼ÓĞÂµÄÃû×Ö¼ÇÂ¼ÖÁÊı¾İ¿â£¬²¢·µ»ØÆäIDºÅ
 	unsigned int db_add_name(const char* name, name_type_t type);
 
-	// æ„å»ºæ•°æ®è¡¨å…³è”ä¿¡æ¯
+	// ¹¹½¨Êı¾İ±í¹ØÁªĞÅÏ¢
 	void build_db(void);
 
-	// ä»æ•°æ®åº“é›†åˆä¸­æ ¹æ®IDå·è·å¾—æŒ‡å®šçš„æ•°æ®åº“å¯¹è±¡
+	// ´ÓÊı¾İ¿â¼¯ºÏÖĞ¸ù¾İIDºÅ»ñµÃÖ¸¶¨µÄÊı¾İ¿â¶ÔÏó
 	database* get_db(unsigned int id) const;
 
-	// ä»ç´¢å¼•æœåŠ¡å™¨é›†åˆä¸­å–å¾—å¯¹åº”IDå·çš„ç´¢å¼•æœåŠ¡å™¨å¯¹è±¡
+	// ´ÓË÷Òı·şÎñÆ÷¼¯ºÏÖĞÈ¡µÃ¶ÔÓ¦IDºÅµÄË÷Òı·şÎñÆ÷¶ÔÏó
 	idx_host* get_idx_host(unsigned int id) const;
 
-	// æ·»åŠ è¡¨ç»“æ„å¯¹è±¡è‡³æ•°æ®åº“å¯¹è±¡ä¸­
+	// Ìí¼Ó±í½á¹¹¶ÔÏóÖÁÊı¾İ¿â¶ÔÏóÖĞ
 	void add_tbl(database* db, DB_TBL* tbl);
 
-	// æ·»åŠ æ–°çš„è¡¨è®°å½•å¯¹è±¡è‡³ db_tbls_ é›†åˆä¸­
+	// Ìí¼ÓĞÂµÄ±í¼ÇÂ¼¶ÔÏóÖÁ db_tbls_ ¼¯ºÏÖĞ
 	void add_tbl(unsigned int id_db, unsigned int id_tbl,
 		long long int count);
 };

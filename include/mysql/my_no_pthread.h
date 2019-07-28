@@ -1,4 +1,4 @@
-﻿#ifndef MY_NO_PTHREAD_INCLUDED
+#ifndef MY_NO_PTHREAD_INCLUDED
 #define MY_NO_PTHREAD_INCLUDED
 
 /* Copyright (C) 2000 MySQL AB, 2008-2009 Sun Microsystems, Inc

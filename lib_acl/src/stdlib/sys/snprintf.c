@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifdef __STDC_WANT_SECURE_LIB__
 #include <stdarg.h>
 

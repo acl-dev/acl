@@ -1,25 +1,25 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include <assert.h>
 #include "http_download.h"
 
-// ç”±å­çº¿ç¨‹åŠ¨æ€åˆ›å»ºçš„ DOWN_CTX å¯¹è±¡çš„æ•°æ®ç±»å‹
+// ÓÉ×ÓÏß³Ì¶¯Ì¬´´½¨µÄ DOWN_CTX ¶ÔÏóµÄÊı¾İÀàĞÍ
 typedef enum
 {
-	CTX_T_REQ_HDR,		// ä¸º HTTP è¯·æ±‚å¤´æ•°æ®
-	CTX_T_RES_HDR,		// ä¸º HTTP å“åº”å¤´æ•°æ®
-	CTX_T_CONTENT_LENGTH,	// ä¸º HTTP å“åº”ä½“çš„é•¿åº¦
-	CTX_T_PARTIAL_LENGTH,	// ä¸º HTTP ä¸‹è½½æ•°æ®ä½“çš„é•¿åº¦
+	CTX_T_REQ_HDR,		// Îª HTTP ÇëÇóÍ·Êı¾İ
+	CTX_T_RES_HDR,		// Îª HTTP ÏìÓ¦Í·Êı¾İ
+	CTX_T_CONTENT_LENGTH,	// Îª HTTP ÏìÓ¦ÌåµÄ³¤¶È
+	CTX_T_PARTIAL_LENGTH,	// Îª HTTP ÏÂÔØÊı¾İÌåµÄ³¤¶È
 	CTX_T_END
 } ctx_t;
 
-// å­çº¿ç¨‹åŠ¨æ€åˆ›å»ºçš„æ•°æ®å¯¹è±¡ï¼Œä¸»çº¿ç¨‹æ¥æ”¶æ­¤æ•°æ®
+// ×ÓÏß³Ì¶¯Ì¬´´½¨µÄÊı¾İ¶ÔÏó£¬Ö÷Ïß³Ì½ÓÊÕ´ËÊı¾İ
 struct DOWN_CTX 
 {
 	ctx_t type;
 	long long int length;
 };
 
-// ç”¨æ¥ç²¾ç¡®è®¡ç®—æ—¶é—´æˆªé—´éš”çš„å‡½æ•°ï¼Œç²¾ç¡®åˆ°æ¯«ç§’çº§åˆ«
+// ÓÃÀ´¾«È·¼ÆËãÊ±¼ä½Ø¼ä¸ôµÄº¯Êı£¬¾«È·µ½ºÁÃë¼¶±ğ
 static double stamp_sub(const struct timeval *from,
 	const struct timeval *sub_by)
 {
@@ -40,11 +40,11 @@ static double stamp_sub(const struct timeval *from,
 
 //////////////////////////////////////////////////////////////////////////
 
-// å­çº¿ç¨‹å¤„ç†å‡½æ•°
+// ×ÓÏß³Ì´¦Àíº¯Êı
 void http_download::rpc_run()
 {
-	acl::http_request req(addr_);  // HTTP è¯·æ±‚å¯¹è±¡
-	// è®¾ç½® HTTP è¯·æ±‚å¤´ä¿¡æ¯
+	acl::http_request req(addr_);  // HTTP ÇëÇó¶ÔÏó
+	// ÉèÖÃ HTTP ÇëÇóÍ·ĞÅÏ¢
 	req.request_header().set_url(url_.c_str())
 		.set_content_type("text/html")
 		.set_host(addr_.c_str())
@@ -53,12 +53,12 @@ void http_download::rpc_run()
 	req.request_header().build_request(req_hdr_);
 	DOWN_CTX* ctx = new DOWN_CTX;
 	ctx->type = CTX_T_REQ_HDR;
-	rpc_signal(ctx);  // é€šçŸ¥ä¸»çº¿ç¨‹ HTTP è¯·æ±‚å¤´æ•°æ®
+	rpc_signal(ctx);  // Í¨ÖªÖ÷Ïß³Ì HTTP ÇëÇóÍ·Êı¾İ
 
 	struct timeval begin, end;;
 	gettimeofday(&begin, NULL);
 
-	// å‘é€ HTTP è¯·æ±‚æ•°æ®
+	// ·¢ËÍ HTTP ÇëÇóÊı¾İ
 	if (req.request(NULL, 0) == false)
 	{
 		logger_error("send request error");
@@ -68,48 +68,48 @@ void http_download::rpc_run()
 		return;
 	}
 
-	// è·å¾— HTTP è¯·æ±‚çš„è¿æ¥å¯¹è±¡
+	// »ñµÃ HTTP ÇëÇóµÄÁ¬½Ó¶ÔÏó
 	acl::http_client* conn = req.get_client();
 	assert(conn);
 
 	(void) conn->get_respond_head(&res_hdr_);
 	ctx = new DOWN_CTX;
 	ctx->type = CTX_T_RES_HDR;
-	rpc_signal(ctx);   // é€šçŸ¥ä¸»çº¿ç¨‹ HTTP å“åº”å¤´æ•°æ®
+	rpc_signal(ctx);   // Í¨ÖªÖ÷Ïß³Ì HTTP ÏìÓ¦Í·Êı¾İ
 
 	ctx = new DOWN_CTX;
 	ctx->type = CTX_T_CONTENT_LENGTH;
 	
-	ctx->length = conn->body_length();  // è·å¾— HTTP å“åº”æ•°æ®çš„æ•°æ®ä½“é•¿åº¦
+	ctx->length = conn->body_length();  // »ñµÃ HTTP ÏìÓ¦Êı¾İµÄÊı¾İÌå³¤¶È
 	content_length_ = ctx->length;
-	rpc_signal(ctx);  // é€šçŸ¥ä¸»çº¿ç¨‹ HTTP å“åº”ä½“æ•°æ®é•¿åº¦
+	rpc_signal(ctx);  // Í¨ÖªÖ÷Ïß³Ì HTTP ÏìÓ¦ÌåÊı¾İ³¤¶È
 
 	acl::string buf(8192);
 	int   real_size;
 	while (true)
 	{
-		// è¯» HTTP å“åº”æ•°æ®ä½“
+		// ¶Á HTTP ÏìÓ¦Êı¾İÌå
 		int ret = req.read_body(buf, true, &real_size);
 		if (ret <= 0)
 		{
 			ctx = new DOWN_CTX;
 			ctx->type = CTX_T_END;
 			ctx->length = ret;
-			rpc_signal(ctx);  // é€šçŸ¥ä¸»çº¿ç¨‹ä¸‹è½½å®Œæ¯•
+			rpc_signal(ctx);  // Í¨ÖªÖ÷Ïß³ÌÏÂÔØÍê±Ï
 			break;
 		}
 		ctx = new DOWN_CTX;
 		ctx->type = CTX_T_PARTIAL_LENGTH;
 		ctx->length = real_size;
-		// é€šçŸ¥ä¸»çº¿ç¨‹å½“å‰å·²ç»ä¸‹è½½çš„å¤§å°
+		// Í¨ÖªÖ÷Ïß³Ìµ±Ç°ÒÑ¾­ÏÂÔØµÄ´óĞ¡
 		rpc_signal(ctx);
 	}
 
-	// è®¡ç®—ä¸‹è½½è¿‡ç¨‹æ€»æ—¶é•¿
+	// ¼ÆËãÏÂÔØ¹ı³Ì×ÜÊ±³¤
 	gettimeofday(&end, NULL);
 	total_spent_ = stamp_sub(&end, &begin);
 
-	// è‡³æ­¤ï¼Œå­çº¿ç¨‹è¿è¡Œå®Œæ¯•ï¼Œä¸»çº¿ç¨‹çš„ rpc_onover è¿‡ç¨‹å°†è¢«è°ƒç”¨
+	// ÖÁ´Ë£¬×ÓÏß³ÌÔËĞĞÍê±Ï£¬Ö÷Ïß³ÌµÄ rpc_onover ¹ı³Ì½«±»µ÷ÓÃ
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -129,21 +129,21 @@ http_download::http_download(const char* addr, const char* url,
 
 //////////////////////////////////////////////////////////////////////////
 
-// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
+// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
 void http_download::rpc_onover()
 {
-	logger("http download(%s) over, å…± %I64d å­—èŠ‚ï¼Œè€—æ—¶ %.3f æ¯«ç§’",
+	logger("http download(%s) over, ¹² %I64d ×Ö½Ú£¬ºÄÊ± %.3f ºÁÃë",
 		url_.c_str(), total_read_, total_spent_);
 	callback_->OnDownloadOver(total_read_, total_spent_);
-	delete this;  // é”€æ¯æœ¬å¯¹è±¡
+	delete this;  // Ïú»Ù±¾¶ÔÏó
 }
 
-// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹çš„é€šçŸ¥æ¶ˆæ¯
+// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌµÄÍ¨ÖªÏûÏ¢
 void http_download::rpc_wakeup(void* ctx)
 {
 	DOWN_CTX* down_ctx = (DOWN_CTX*) ctx;
 
-	// æ ¹æ®å­çº¿ç¨‹ä¸­ä¼ æ¥çš„ä¸åŒçš„ä¸‹è½½é˜¶æ®µè¿›è¡Œå¤„ç†
+	// ¸ù¾İ×ÓÏß³ÌÖĞ´«À´µÄ²»Í¬µÄÏÂÔØ½×¶Î½øĞĞ´¦Àí
 
 	switch (down_ctx->type)
 	{
@@ -167,7 +167,7 @@ void http_download::rpc_wakeup(void* ctx)
 		break;
 	}
 
-	// åˆ é™¤åœ¨å­çº¿ç¨‹ä¸­åŠ¨æ€åˆ†é…çš„å¯¹è±¡
+	// É¾³ıÔÚ×ÓÏß³ÌÖĞ¶¯Ì¬·ÖÅäµÄ¶ÔÏó
 	delete down_ctx;
 }
 

@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <string.h>
 #ifdef STRCASECMP_IN_STRINGS_H
 #include <strings.h>

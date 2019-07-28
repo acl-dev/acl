@@ -1,4 +1,4 @@
-﻿
+
 #ifndef	__LIB_HTTP_STATUS_INCLUDE_H__
 #define	__LIB_HTTP_STATUS_INCLUDE_H__
 

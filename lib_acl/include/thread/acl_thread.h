@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_THREAD_INCLUDE_H
+#ifndef	ACL_THREAD_INCLUDE_H
 #define	ACL_THREAD_INCLUDE_H
 
 #ifdef	__cplusplus

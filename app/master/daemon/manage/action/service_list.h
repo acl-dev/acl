@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 struct ACL_MASTER_SERV;
 struct list_req_t;

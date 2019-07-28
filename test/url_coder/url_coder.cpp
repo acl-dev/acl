@@ -1,4 +1,4 @@
-ï»¿// url_coder.cpp : å®šä¹‰æŽ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// url_coder.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -14,7 +14,7 @@ int main(void)
 	coder1.set("name1", "value1");
 	coder1.set("name2", 2);
 	coder1.set("name3", true, "value%d", 3);
-	coder1.set("name4", "ä¸­å›½äºº");
+	coder1.set("name4", "ÖÐ¹úÈË");
 	printf("coder1 >> %s, name1: %s, name2: %s, name3: %s, name4: %s\r\n",
 		coder1.to_string().c_str(),
 		coder1["name1"], coder1["name2"], coder1["name3"], coder1["name4"]);
@@ -41,7 +41,7 @@ int main(void)
 	url_coder coder3(coder2);
 
 	coder3.set("name5", 5);
-	coder3.set("name6", "=&å¤–å›½äºº&=");
+	coder3.set("name6", "=&Íâ¹úÈË&=");
 	ptr = coder3["name1"];
 	printf("--------------------------------------------------------\r\n");
 	printf("coder3 >> %s, name1: %s, name2: %s, name3: %s, name4: %s, name5: %s, name6: %s\r\n",

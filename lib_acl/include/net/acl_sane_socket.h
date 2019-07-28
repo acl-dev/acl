@@ -1,4 +1,4 @@
-ï»¿#ifndef	ACL_SANE_SOCKET_INCLUDE_H
+#ifndef	ACL_SANE_SOCKET_INCLUDE_H
 #define	ACL_SANE_SOCKET_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -15,42 +15,42 @@ extern "C" {
 #endif
 
 /**
- * å–å¾—å¥—æ¥å­—è¿æ¥å¯¹æ–¹çš„ç½‘ç»œåœ°å€, åœ°å€æ ¼å¼ä¸º: IP:PORT
- * @param fd {ACL_SOCKET} ç½‘ç»œå¥—æ¥å­—
- * @param buf {char*} å­˜å‚¨åœ°å€çš„ç¼“å†²åŒºï¼Œä¸èƒ½ä¸ºç©º
- * @param bsize {size_t} buf ç©ºé—´å¤§å°
+ * È¡µÃÌ×½Ó×ÖÁ¬½Ó¶Ô·½µÄÍøÂçµØÖ·, µØÖ·¸ñÊ½Îª: IP:PORT
+ * @param fd {ACL_SOCKET} ÍøÂçÌ×½Ó×Ö
+ * @param buf {char*} ´æ´¢µØÖ·µÄ»º³åÇø£¬²»ÄÜÎª¿Õ
+ * @param bsize {size_t} buf ¿Õ¼ä´óĞ¡
  * @return {int} 0: ok; -1: error
  */
 ACL_API int acl_getpeername(ACL_SOCKET fd, char *buf, size_t bsize);
 
 /**
- * å–å¾—å¥—æ¥å­—è¿æ¥æœ¬åœ°çš„ç½‘ç»œåœ°å€, åœ°å€æ ¼å¼ä¸º: IP:PORT
- * @param fd {ACL_SOCKET} ç½‘ç»œå¥—æ¥å­—
- * @param buf {char*} å­˜å‚¨åœ°å€çš„ç¼“å†²åŒºï¼Œä¸èƒ½ä¸ºç©º
- * @param bsize {size_t} buf ç©ºé—´å¤§å°
+ * È¡µÃÌ×½Ó×ÖÁ¬½Ó±¾µØµÄÍøÂçµØÖ·, µØÖ·¸ñÊ½Îª: IP:PORT
+ * @param fd {ACL_SOCKET} ÍøÂçÌ×½Ó×Ö
+ * @param buf {char*} ´æ´¢µØÖ·µÄ»º³åÇø£¬²»ÄÜÎª¿Õ
+ * @param bsize {size_t} buf ¿Õ¼ä´óĞ¡
  * @return {int} 0: ok; -1: error
  */
 ACL_API int acl_getsockname(ACL_SOCKET fd, char *buf, size_t bsize);
 
 /**
- * å–å¾—å¥—æ¥å­—çš„ç±»å‹ï¼šæ˜¯ç½‘ç»œå¥—æ¥å­—è¿˜æ˜¯åŸŸå¥—æ¥å­—
- * @param fd {ACL_SOCKET} ç½‘ç»œå¥—æ¥å­—
- * @return {int} -1: è¡¨ç¤ºå‡ºé”™æˆ–è¾“å…¥éæ³•æˆ–éå¥—æ¥å­—; >= 0 è¡¨ç¤ºæˆåŠŸè·å¾—å¥—æ¥å­—
- *  ç±»å‹ï¼Œè¿”å›å€¼æœ‰ AF_INETã€AF_INET6 æˆ– AF_UNIX(ä»…é™ UNIX å¹³å°)
+ * È¡µÃÌ×½Ó×ÖµÄÀàĞÍ£ºÊÇÍøÂçÌ×½Ó×Ö»¹ÊÇÓòÌ×½Ó×Ö
+ * @param fd {ACL_SOCKET} ÍøÂçÌ×½Ó×Ö
+ * @return {int} -1: ±íÊ¾³ö´í»òÊäÈë·Ç·¨»ò·ÇÌ×½Ó×Ö; >= 0 ±íÊ¾³É¹¦»ñµÃÌ×½Ó×Ö
+ *  ÀàĞÍ£¬·µ»ØÖµÓĞ AF_INET¡¢AF_INET6 »ò AF_UNIX(½öÏŞ UNIX Æ½Ì¨)
  */
 ACL_API int acl_getsocktype(ACL_SOCKET fd);
 
 /**
- * æ£€æŸ¥å¥—æ¥å­—ï¼šæ˜¯ç›‘å¬å¥—æ¥å­—è¿˜æ˜¯ç½‘ç»œå¥—æ¥å­—
- * @param sockefd {ACL_SOCKET} å¥—æ¥å­—å¥æŸ„
- * @return {int} è¿”å› -1 è¡¨ç¤ºè¯¥å¥æŸ„éå¥—æ¥å­—ï¼Œ1 ä¸ºç›‘å¬å¥—æ¥å­—ï¼Œ0 ä¸ºéç›‘å¬å¥—æ¥å­—
+ * ¼ì²éÌ×½Ó×Ö£ºÊÇ¼àÌıÌ×½Ó×Ö»¹ÊÇÍøÂçÌ×½Ó×Ö
+ * @param sockefd {ACL_SOCKET} Ì×½Ó×Ö¾ä±ú
+ * @return {int} ·µ»Ø -1 ±íÊ¾¸Ã¾ä±ú·ÇÌ×½Ó×Ö£¬1 Îª¼àÌıÌ×½Ó×Ö£¬0 Îª·Ç¼àÌıÌ×½Ó×Ö
  */
 ACL_API int acl_check_socket(ACL_SOCKET fd);
 
 /**
- * åˆ¤æ–­å¥—æ¥å­—æ˜¯å¦ä¸ºç›‘å¬å¥—æ¥å­—
- * @param sockefd {ACL_SOCKET} å¥—æ¥å­—å¥æŸ„
- * @return {int} è¿”å›å€¼ 0 è¡¨ç¤ºéç›‘å¬å¥—æ¥å­—ï¼Œé 0 è¡¨ç¤ºä¸ºç›‘å¬å¥—æ¥å­—
+ * ÅĞ¶ÏÌ×½Ó×ÖÊÇ·ñÎª¼àÌıÌ×½Ó×Ö
+ * @param sockefd {ACL_SOCKET} Ì×½Ó×Ö¾ä±ú
+ * @return {int} ·µ»ØÖµ 0 ±íÊ¾·Ç¼àÌıÌ×½Ó×Ö£¬·Ç 0 ±íÊ¾Îª¼àÌıÌ×½Ó×Ö
  */
 ACL_API int acl_is_listening_socket(ACL_SOCKET fd);
 

@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include <vector>
 #include <set>
 
@@ -77,29 +77,29 @@ public:
 	~status_manager();
 
 	/**
-	 * è·å¾—å½“å‰æœåŠ¡å™¨é›†ç¾¤çš„æ‰€æœ‰ç»“ç‚¹çš„è¿è¡ŒçŠ¶æ€
-	 * @param out {acl::string&} å­˜å‚¨ç»“æœæ•°æ®ï¼Œå†…éƒ¨é‡‡ç”¨æ•°æ®æ·»åŠ æ–¹å¼ï¼Œå³
-	 *  å¹¶ä¸ä¼šæ¸…ç©º out åŸå§‹çš„æ•°æ®
+	 * »ñµÃµ±Ç°·şÎñÆ÷¼¯ÈºµÄËùÓĞ½áµãµÄÔËĞĞ×´Ì¬
+	 * @param out {acl::string&} ´æ´¢½á¹ûÊı¾İ£¬ÄÚ²¿²ÉÓÃÊı¾İÌí¼Ó·½Ê½£¬¼´
+	 *  ²¢²»»áÇå¿Õ out Ô­Ê¼µÄÊı¾İ
 	 * @return {acl::string&}
 	 */
 	acl::string& get_status(acl::string& out);
 
 	/**
-	 * è®¾ç½®æŸä¸ªæœåŠ¡å™¨ç»“ç‚¹çš„å½“å‰çŠ¶æ€æ•°æ®
-	 * @param key {const char*} æ ‡è¯†æŸä¸ªæœåŠ¡ç»“ç‚¹
-	 * @param data {const char*} è¯¥æœåŠ¡ç»“ç‚¹çš„çŠ¶æ€æ•°æ®
+	 * ÉèÖÃÄ³¸ö·şÎñÆ÷½áµãµÄµ±Ç°×´Ì¬Êı¾İ
+	 * @param key {const char*} ±êÊ¶Ä³¸ö·şÎñ½áµã
+	 * @param data {const char*} ¸Ã·şÎñ½áµãµÄ×´Ì¬Êı¾İ
 	 */
 	void set_status(const char* key, const char* data);
 
 	/**
-	 * åˆ é™¤æŸä¸ªæœåŠ¡å™¨ç»“ç‚¹çš„çŠ¶æ€æ•°æ®
-	 * @param key {const char*} æ ‡è¯†æŸä¸ªæœåŠ¡ç»“ç‚¹
+	 * É¾³ıÄ³¸ö·şÎñÆ÷½áµãµÄ×´Ì¬Êı¾İ
+	 * @param key {const char*} ±êÊ¶Ä³¸ö·şÎñ½áµã
 	 */
 	void del_status(const char* key);
 
 	/**
-	 * å°†è¿‡æœŸçš„æ•°æ®æ¸…é™¤
-	 * @return {int} è¢«æ¸…é™¤çš„æ•°æ®æ•°é‡
+	 * ½«¹ıÆÚµÄÊı¾İÇå³ı
+	 * @return {int} ±»Çå³ıµÄÊı¾İÊıÁ¿
 	 */
 	int check_timeout();
 

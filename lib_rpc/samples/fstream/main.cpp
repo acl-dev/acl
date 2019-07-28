@@ -1,4 +1,4 @@
-ï»¿// protobuf_client.cpp : Defines the entry point for the console application.
+// protobuf_client.cpp : Defines the entry point for the console application.
 //
 
 #include "stdafx.h"
@@ -41,9 +41,9 @@ int main(int argc, char* argv[])
 
 	const char* path = "test.txt";
 
-	// å°†ç”¨æˆ·çš„ä¿¡æ¯åºåˆ—åŒ–è¾“å‡ºè‡³æ–‡ä»¶ä¸­
+	// ½«ÓÃ»§µÄĞÅÏ¢ĞòÁĞ»¯Êä³öÖÁÎÄ¼şÖĞ
 
-	//æ‰“å¼€æœ¬åœ°æ–‡ä»¶è¿›è¡Œæ•°æ®å†™å…¥
+	//´ò¿ª±¾µØÎÄ¼ş½øĞĞÊı¾İĞ´Èë
 	acl::ofstream out_fp;
 	if (out_fp.open_write(path) == false)
 	{
@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// å°†æ–‡ä»¶è¾“å‡ºæµä¸ç³»åˆ—åŒ–è¾“å‡ºæµè¿›è¡Œå…³è”
+	// ½«ÎÄ¼şÊä³öÁ÷ÓëÏµÁĞ»¯Êä³öÁ÷½øĞĞ¹ØÁª
 	acl_ofstream output(&out_fp);
 
 	tutorial::AddressBook address;
@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
 
 	acl::string buf;
 
-	// ç»™åœ°å€ç°¿ä¸­æ·»åŠ ç”¨æˆ·åˆ—è¡¨
+	// ¸øµØÖ·²¾ÖĞÌí¼ÓÓÃ»§ÁĞ±í
 	for (size_t i = 0; i < person_count; i++)
 	{
 		tutorial::Person* person = address.add_person();
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 		person->set_email(buf.c_str());
 		person->set_id(i);
 
-		// ç»™ä¸€ä¸ªç”¨æˆ·æ·»åŠ å¤šä¸ªç”µè¯å·ç 
+		// ¸øÒ»¸öÓÃ»§Ìí¼Ó¶à¸öµç»°ºÅÂë
 		for (size_t j = 0; j < tutorial::Person::WORK; j++)
 		{
 			tutorial::Person::PhoneNumber* phone = person->add_phone();
@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// å°†åœ°å€ç°¿æ•°æ®åºåˆ—åŒ–è‡³ç£ç›˜æ–‡ä»¶æµä¸­
+	// ½«µØÖ·²¾Êı¾İĞòÁĞ»¯ÖÁ´ÅÅÌÎÄ¼şÁ÷ÖĞ
 	address.SerializeToZeroCopyStream(&output);
 	if (output.Flush() == false)
 	{
@@ -89,9 +89,9 @@ int main(int argc, char* argv[])
 
 	/////////////////////////////////////////////////////////////////////////
 
-	// ä»åºåˆ—åŒ–æ–‡ä»¶ä¸­è¯»å–ç”¨æˆ·ä¿¡æ¯
+	// ´ÓĞòÁĞ»¯ÎÄ¼şÖĞ¶ÁÈ¡ÓÃ»§ĞÅÏ¢
 
-	// æ‰“å¼€æœ¬åœ°æ–‡ä»¶è¾“å…¥æµ
+	// ´ò¿ª±¾µØÎÄ¼şÊäÈëÁ÷
 	acl::ifstream in_fp;
 	if (in_fp.open_read(path) == false)
 	{
@@ -99,19 +99,19 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// å°†æ–‡ä»¶è¾“å…¥æµä¸ç³»åˆ—åŒ–è¾“å…¥æµè¿›è¡Œå…³è”
+	// ½«ÎÄ¼şÊäÈëÁ÷ÓëÏµÁĞ»¯ÊäÈëÁ÷½øĞĞ¹ØÁª
 	acl_ifstream input(&in_fp);
 
 	address.Clear();
 
-	// ä»æ–‡ä»¶æµä¸­è§£æåœ°å€ç°¿ä¿¡æ¯
+	// ´ÓÎÄ¼şÁ÷ÖĞ½âÎöµØÖ·²¾ĞÅÏ¢
 	if (!address.ParseFromZeroCopyStream(&input))
 	{
 		printf("parse file %s failed\r\n", path);
 		return 1;
 	}
 
-	// åˆ—å‡ºåœ°å€ç°¿ä¸­æ‰€æœ‰ç”¨æˆ·ä¿¡æ¯
+	// ÁĞ³öµØÖ·²¾ÖĞËùÓĞÓÃ»§ĞÅÏ¢
 	for (int i = 0; i < address.person_size(); i++)
 	{
 		const tutorial::Person& person = address.person(i);
@@ -120,7 +120,7 @@ int main(int argc, char* argv[])
 		printf("person->email: %s\r\n", person.has_email() ?
 			person.email().c_str() : "null");
 
-		// åˆ—å‡ºè¯¥ç”¨æˆ·çš„æ‰€æœ‰ç”µè¯
+		// ÁĞ³ö¸ÃÓÃ»§µÄËùÓĞµç»°
 		for (int j = 0; j < person.phone_size(); j++)
 		{
 			const tutorial::Person::PhoneNumber& phone = person.phone(j);

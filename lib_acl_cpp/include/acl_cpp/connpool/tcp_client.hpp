@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "connect_client.hpp"
 
@@ -17,13 +17,13 @@ public:
 	virtual ~tcp_client(void);
 
 	/**
-	 * å‘æœåŠ¡å™¨å‘é€æŒ‡å®šé•¿åº¦çš„æ•°æ®åŒ…
-	 * @param {const void*} è¦å‘é€çš„æ•°æ®åŒ…åœ°å€
-	 * @param len {unsigned int} æ•°æ®é•¿åº¦
-	 * @param out {string*} å½“è¯¥å¯¹è±¡é NULL æ—¶è¡¨æ˜éœ€è¦ä»æœåŠ¡å™¨è¯»å–å“åº”æ•°æ®ï¼Œ
-	 *  å“åº”ç»“æœå°†è¢«å­˜æ”¾åœ¨è¯¥ç¼“å†²åŒºä¸­ï¼Œå¦‚æœè¯¥å¯¹è±¡ä¸º NULLï¼Œåˆ™è¡¨ç¤ºæ— éœ€è¯»å–
-	 *  æœåŠ¡å™¨çš„å“åº”æ•°æ®
-	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸ
+	 * Ïò·şÎñÆ÷·¢ËÍÖ¸¶¨³¤¶ÈµÄÊı¾İ°ü
+	 * @param {const void*} Òª·¢ËÍµÄÊı¾İ°üµØÖ·
+	 * @param len {unsigned int} Êı¾İ³¤¶È
+	 * @param out {string*} µ±¸Ã¶ÔÏó·Ç NULL Ê±±íÃ÷ĞèÒª´Ó·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Êı¾İ£¬
+	 *  ÏìÓ¦½á¹û½«±»´æ·ÅÔÚ¸Ã»º³åÇøÖĞ£¬Èç¹û¸Ã¶ÔÏóÎª NULL£¬Ôò±íÊ¾ÎŞĞè¶ÁÈ¡
+	 *  ·şÎñÆ÷µÄÏìÓ¦Êı¾İ
+	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦
 	 */
 	bool send(const void* data, unsigned int len, string* out = NULL);
 

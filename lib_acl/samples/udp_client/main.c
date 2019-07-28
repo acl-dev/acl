@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 
 static double stamp_sub(const struct timeval *from, const struct timeval *sub_by)
 {
@@ -23,7 +23,7 @@ static void run(const char *local_addr, const char *peer_addr,
 	int   ret, i;
 	char  buf[4096], data[4096];
 	struct timeval begin, end;
-	ACL_VSTREAM *stream = acl_vstream_bind(local_addr, 2, 0);  /* ç»‘å®š UDP å¥—æ¥å£ */
+	ACL_VSTREAM *stream = acl_vstream_bind(local_addr, 2, 0);  /* °ó¶¨ UDP Ì×½Ó¿Ú */
 
 	if (stream == NULL) {
 		printf("acl_vstream_bind %s error %s\r\n",
@@ -42,7 +42,7 @@ static void run(const char *local_addr, const char *peer_addr,
 	ACL_VSTREAM_SET_RWTIMO(stream, 1);
 
 	for (i = 0; i < count; i++) {
-		/* å¦‚æœæœåŠ¡ç«¯çš„åœ°å€æ˜¯å˜åŒ–çš„ï¼Œåˆ™åº”è¯¥åœ¨å†™æ¯æ¬¡å‰éƒ½éœ€è¦è°ƒç”¨
+		/* Èç¹û·şÎñ¶ËµÄµØÖ·ÊÇ±ä»¯µÄ£¬ÔòÓ¦¸ÃÔÚĞ´Ã¿´ÎÇ°¶¼ĞèÒªµ÷ÓÃ
 		 * acl_vstream_set_peer
 		 */
 		ret = acl_vstream_write(stream, data, dlen);

@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_MAKE_DIRS_INCLUDE_H
+#ifndef ACL_MAKE_DIRS_INCLUDE_H
 #define ACL_MAKE_DIRS_INCLUDE_H
 
 #ifdef	__cplusplus
@@ -8,10 +8,10 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * åŠŸèƒ½: åˆ›å»ºå¤šçº§ç›®å½•ç»“æ„
- *  å¦‚åˆ›å»º "/tmp/dir1/dir2" (for unix) æˆ– "C:\test\test1\test2" (for win32)
- * @param path: ä¸€çº§æˆ–å¤šçº§ç›®å½•è·¯å¾„
- * @param perms: åˆ›å»ºæƒé™(å¦‚: 0755, 0777, 0644 ...)
+ * ¹¦ÄÜ: ´´½¨¶à¼¶Ä¿Â¼½á¹¹
+ *  Èç´´½¨ "/tmp/dir1/dir2" (for unix) »ò "C:\test\test1\test2" (for win32)
+ * @param path: Ò»¼¶»ò¶à¼¶Ä¿Â¼Â·¾¶
+ * @param perms: ´´½¨È¨ÏŞ(Èç: 0755, 0777, 0644 ...)
  * @return == 0: OK;  == -1, Err
  */
 ACL_API int acl_make_dirs(const char *path, int perms);

@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <getopt.h>
 #include "mail_object.h"
 
@@ -43,14 +43,14 @@ static int load_objs(acl::diff_manager& manager, const char* filepath,
 {
 	acl::ifstream in;
 
-	// 浠ュ彧璇绘柟寮忔墦寮€鏁版嵁鏂囦欢
+	// 以只读方式打开数据文件
 	if (in.open_read(filepath) == false)
 	{
 		printf("open %s error %s\r\n", filepath, acl::last_serror());
 		return -1;
 	}
 
-	// 浠庢瘮杈冨櫒涓幏寰楀唴瀛樻睜瀵硅薄锛屼互渚夸簬涓嬮潰鍒嗛厤鍐呭瓨
+	// 从比较器中获得内存池对象，以便于下面分配内存
 	acl::dbuf_guard& dbuf = manager.get_dbuf();
 	int linenum = 0;
 	acl::string line;
@@ -61,17 +61,17 @@ static int load_objs(acl::diff_manager& manager, const char* filepath,
 	{
 		line.clear();
 
-		// 浠庢枃浠朵腑璇诲彇涓€琛屾暟鎹�
+		// 从文件中读取一行数据
 		if (in.gets(line) == false)
 			break;
 
 		linenum++;
 
-		// 鍒嗘瀽璇ヨ鏁版嵁锛屾彁鍙� key 鍜� value 鍊�
+		// 分析该行数据，提取 key 和 value 值
 		char* key = line.c_str();
 		char* val = strrchr(key, '|');
 
-		// 妫€鏌ユ暟鎹殑鏈夋晥鎬�
+		// 检查数据的有效性
 		if (val == NULL	|| val == key || *(val + 1) == 0)
 		{
 			printf("invalid line: %s in %s, linenum: %d\r\n",
@@ -80,7 +80,7 @@ static int load_objs(acl::diff_manager& manager, const char* filepath,
 		}
 		*val++ = 0;
 
-		// 鍒涘缓 diff 瀵硅薄锛屽苟缃叆瀵硅薄闆嗗悎涓�
+		// 创建 diff 对象，并置入对象集合中
 		mail_object* obj = new (dbuf.dbuf_alloc(sizeof(mail_object)))
 				mail_object(manager, key, val);
 		new_objs.push_back(obj);
@@ -93,14 +93,14 @@ static int load_objs(acl::diff_manager& manager, const char* filepath,
 static bool check_diff(const char* new_file, const char* old_file,
 	const DIFF_RES* res = NULL)
 {
-	// 棣栧厛瀹氫箟宸泦姣旇緝鍣�
+	// 首先定义差集比较器
 	acl::diff_manager manager;
-	// 瀛樻斁褰撳墠瀵硅薄
+	// 存放当前对象
 	std::vector<acl::diff_object*> cur_objs;
-	// 瀛樻斁鏃х殑瀵硅薄
+	// 存放旧的对象
 	std::vector<acl::diff_object*> old_objs;
 
-	// 鍏堜粠鏂囦欢涓鍙栧綋鍓嶇殑瀵硅薄鑷虫柊瀵硅薄闆嗗悎涓�
+	// 先从文件中读取当前的对象至新对象集合中
 	int n = load_objs(manager, new_file, cur_objs);
 	if (n < 0)
 	{
@@ -109,7 +109,7 @@ static bool check_diff(const char* new_file, const char* old_file,
 	}
 	printf("cur objs: %d\r\n", n);
 
-	// 鍐嶄粠鏂囦欢涓鍙栨棫鐨勫璞¤嚦鏃у璞￠泦鍚堜腑
+	// 再从文件中读取旧的对象至旧对象集合中
 	n = load_objs(manager, old_file, old_objs);
 	if (n < 0)
 	{
@@ -120,7 +120,7 @@ static bool check_diff(const char* new_file, const char* old_file,
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
 
-	// 寮€濮嬭繘琛屽樊闆嗘瘮杈冿紝骞惰幏寰楁渶缁堟柊澧炲璞′汉涓暟
+	// 开始进行差集比较，并获得最终新增对象人个数
 	manager.diff_changes(cur_objs, old_objs);
 
 	struct timeval end;
@@ -131,42 +131,42 @@ static bool check_diff(const char* new_file, const char* old_file,
 
 	printf("-------------------------------------------------------\r\n");
 
-	// 鑾峰緱鏂板瀵硅薄闆嗗悎
+	// 获得新增对象集合
 	const std::vector<acl::diff_object*>& new_objs = manager.get_new();
 
-	// 鎵撳嵃鏂板瀵硅薄鑷冲睆骞曪紝闄愬畾鏈€澶ц緭鍑� 10 涓�
+	// 打印新增对象至屏幕，限定最大输出 10 个
 	print_objs(new_objs, "new objs", 10);
 	printf("new nobjs: %d\r\n", (int) new_objs.size());
 
 	printf("-------------------------------------------------------\r\n");
 
-	// 鑾峰緱琚垹闄ょ殑瀵硅薄闆嗗悎
+	// 获得被删除的对象集合
 	const std::vector<acl::diff_object*>& del_objs = manager.get_deleted();
 
-	// 鎵撳嵃鍒犻櫎鐨勫璞¤嚦灞忓箷锛岄檺瀹氭渶澶ц緭鍑� 10 涓�
+	// 打印删除的对象至屏幕，限定最大输出 10 个
 	print_objs(del_objs, "deleted objs", 10);
 	printf("deleted objs: %d\r\n", (int) del_objs.size());
 
 	printf("-------------------------------------------------------\r\n");
 
-	// 鑾峰緱鍙樺寲鐨勫璞￠泦鍚�
+	// 获得变化的对象集合
 	const std::vector<std::pair<acl::diff_object*, acl::diff_object*> >&
 		upd_objs = manager.get_updated();
 
-	// 鎵撳嵃鍙樺寲鐨勫璞¤嚦灞忓箷锛岄檺瀹氭渶澶ц緭鍑� 10 涓�
+	// 打印变化的对象至屏幕，限定最大输出 10 个
 	print_objs(upd_objs, "updated objs", 10);
 	printf("updated objs: %d\r\n", (int) upd_objs.size());
 
 	printf("-------------------------------------------------------\r\n");
 
-	// 鑾峰緱鐩稿悓鐨勫璞￠泦鍚�
+	// 获得相同的对象集合
 	const std::vector<acl::diff_object*>& equ_objs = manager.get_same();
 	print_objs(equ_objs, "equal objs", 10);
 	printf("equal objs: %d\r\n", (int) equ_objs.size());
 
 	printf("-------------------------------------------------------\r\n");
 
-	// 鏈嚱鏁拌繑鍥炲垯 manager 瀵硅薄鍙婂唴閮ㄨ嚜寤哄唴瀛樻睜鑷姩閿€姣�
+	// 本函数返回则 manager 对象及内部自建内存池自动销毁
 
 	if (res == NULL)
 		return true;
@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
 		return -1;
 	}
 
-	// 濡傛灉璁剧疆浜嗗畬鏁寸殑鏈熸湜缁撴灉闆嗘暟鍊硷紝鍒欎紶鍏ユ牎楠屽樊闆嗙粨鏋�
+	// 如果设置了完整的期望结果集数值，则传入校验差集结果
 
 	if (check_diff(new_file, old_file,
 		res.updated >= 0 && res.deleted >= 0

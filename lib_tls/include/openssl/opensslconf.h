@@ -1,4 +1,4 @@
-﻿/* opensslconf.h */
+/* opensslconf.h */
 /* WARNING: Generated automatically from opensslconf.h.in by Configure. */
 
 /* OpenSSL was configured with the following options: */

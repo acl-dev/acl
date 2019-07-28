@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file ssl_cache.h
  *
  * \brief SSL session cache implementation

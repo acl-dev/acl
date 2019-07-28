@@ -1,30 +1,30 @@
-ï»¿#ifndef	__SERVICE_VAR_INCLUDE_H__
+#ifndef	__SERVICE_VAR_INCLUDE_H__
 #define	__SERVICE_VAR_INCLUDE_H__
 
 #include "lib_acl.h"
 
-/*------------- å­—ç¬¦ä¸²é…ç½®é¡¹ ----------------*/
+/*------------- ×Ö·û´®ÅäÖÃÏî ----------------*/
 
 extern ACL_CFG_STR_TABLE var_conf_str_tab[];
 
-/* æ—¥å¿—è°ƒè¯•è¾“å‡ºä¿¡æ¯ */
+/* ÈÕÖ¾µ÷ÊÔÊä³öĞÅÏ¢ */
 extern char *var_cfg_debug_msg;
 
-/*-------------- å¸ƒå°”å€¼é…ç½®é¡¹ ---------------*/
+/*-------------- ²¼¶ûÖµÅäÖÃÏî ---------------*/
 
 extern ACL_CFG_BOOL_TABLE var_conf_bool_tab[];
 
-/* æ˜¯å¦è¾“å‡ºæ—¥å¿—è°ƒè¯•ä¿¡æ¯ */
+/* ÊÇ·ñÊä³öÈÕÖ¾µ÷ÊÔĞÅÏ¢ */
 extern int var_cfg_debug_enable;
 
-/* æ˜¯å¦ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥ */
+/* ÊÇ·ñÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó */
 extern int var_cfg_keep_alive;
 
-/*-------------- æ•´æ•°é…ç½®é¡¹ -----------------*/
+/*-------------- ÕûÊıÅäÖÃÏî -----------------*/
 
 extern ACL_CFG_INT_TABLE var_conf_int_tab[];
 
-/* æ¯æ¬¡ä¸å®¢æˆ·ç«¯é€šä¿¡æ—¶ï¼Œè¯»è¶…æ—¶æ—¶é—´(ç§’) */
+/* Ã¿´ÎÓë¿Í»§¶ËÍ¨ĞÅÊ±£¬¶Á³¬Ê±Ê±¼ä(Ãë) */
 extern int  var_cfg_io_timeout;
 
 #endif

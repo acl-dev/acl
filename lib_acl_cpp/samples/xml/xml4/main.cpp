@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 
 static void attr_print(const acl::xml_attr& attr, int depth)
 {

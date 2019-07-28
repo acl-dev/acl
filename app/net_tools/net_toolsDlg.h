@@ -1,4 +1,4 @@
-ï»¿// net_toolsDlg.h : å¤´æ–‡ä»¶
+// net_toolsDlg.h : Í·ÎÄ¼ş
 //
 
 #pragma once
@@ -12,7 +12,7 @@
 #include "test_all.h"
 #include "net_store.h"
 
-// Cnet_toolsDlg å¯¹è¯æ¡†
+// Cnet_toolsDlg ¶Ô»°¿ò
 class Cnet_toolsDlg : public CDialog
 	, public ping_callback
 	, public nslookup_callback
@@ -22,25 +22,25 @@ class Cnet_toolsDlg : public CDialog
 	, public pop3_callback
 	, public test_callback
 {
-// æ„é€ 
+// ¹¹Ôì
 public:
-	Cnet_toolsDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
+	Cnet_toolsDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
 	~Cnet_toolsDlg();
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_NET_TOOLS_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
 
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	HICON m_hIcon;
 	CMeterBar m_wndMeterBar;
 	CTrayIcon m_trayIcon;
 	BOOL m_bShutdown;
 
-	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
+	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
@@ -55,7 +55,7 @@ public:
 private:
 	FILE* m_dosFp;
 
-	// ping ç›¸å…³å‚æ•°
+	// ping Ïà¹Ø²ÎÊı
 	UINT m_nPkt;
 	UINT m_delay;
 	UINT m_pingTimeout;
@@ -64,7 +64,7 @@ private:
 	CString m_ipFilePath;
 	CString m_pingDbPath;
 
-	// dns ç›¸å…³å‚æ•°
+	// dns Ïà¹Ø²ÎÊı
 	CString m_dnsIp;
 	UINT m_dnsPort;
 	UINT m_lookupTimeout;
@@ -72,7 +72,7 @@ private:
 	CString m_domainFilePath;
 	CString m_dnsDbPath;
 
-	// ä¸Šä¼ æ—¥å¿—ç›¸å…³å‚æ•°
+	// ÉÏ´«ÈÕÖ¾Ïà¹Ø²ÎÊı
 	CString m_smtpAddr;
 	int m_smtpPort;
 	int m_connecTimeout;

@@ -1,4 +1,4 @@
-﻿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "OSSMultipartOperation.hpp"
 
 namespace acl

@@ -1,4 +1,4 @@
-﻿#include <getopt.h>
+#include <getopt.h>
 #include "acl_cpp/lib_acl.hpp"
 
 static void usage(const char* procname)
@@ -63,8 +63,8 @@ int main(int argc, char* argv[])
 		else
 			rc = req.request(NULL, 0);
 
-		// 鍙墍浠ュ皢 build_request 鏀惧湪 req.request 鍚庨潰锛屾槸鍥犱负
-		// req.request 鍐呴儴鍙兘浼氫慨鏀硅姹傚ご涓殑瀛楁
+		// 只所以将 build_request 放在 req.request 后面，是因为
+		// req.request 内部可能会修改请求头中的字段
 		acl::string hdr;
 		header.build_request(hdr);
 		printf("request header:\r\n%s\r\n", hdr.c_str());

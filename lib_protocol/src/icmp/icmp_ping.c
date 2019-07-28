@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include <signal.h>
 #include "icmp_struct.h"
 #include "icmp_private.h"

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 template<typename TReq, typename TRes>
 bool http_request_run(const char* addr, TReq& req, TRes& res)

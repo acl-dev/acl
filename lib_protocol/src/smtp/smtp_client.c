@@ -1,10 +1,10 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "lib_acl.h"
 #include <assert.h>
 #include <string.h>
 #include "smtp/smtp_client.h"
 
-/* åˆ›å»º SMTP_CLIENT å¯¹è±¡å¹¶è¿æ¥è¿œç¨‹é‚®ä»¶æœåŠ¡å™¨åœ°å€ */
+/* ´´½¨ SMTP_CLIENT ¶ÔÏó²¢Á¬½ÓÔ¶³ÌÓÊ¼ş·şÎñÆ÷µØÖ· */
 
 SMTP_CLIENT *smtp_open(const char *addr, int conn_timeout,
 	int rw_timeout, int line_limit)
@@ -29,18 +29,18 @@ SMTP_CLIENT *smtp_open(const char *addr, int conn_timeout,
 	return client;
 }
 
-/* é‡Šæ”¾ SMTP_CLIENT èµ„æº */
+/* ÊÍ·Å SMTP_CLIENT ×ÊÔ´ */
 
 void smtp_close(SMTP_CLIENT *client)
 {
-	/* æ­¤å˜é‡æœ‰å¯èƒ½è¢«å¤–éƒ¨é‡Šæ”¾ç½®ç©º */
+	/* ´Ë±äÁ¿ÓĞ¿ÉÄÜ±»Íâ²¿ÊÍ·ÅÖÃ¿Õ */
 	if (client->conn)
 		acl_vstream_close(client->conn);
 	acl_myfree(client->buf);
 	acl_myfree(client);
 }
 
-/* æ¥æ”¶æœåŠ¡å™¨çš„æ¬¢è¿ä¿¡æ¯ */
+/* ½ÓÊÕ·şÎñÆ÷µÄ»¶Ó­ĞÅÏ¢ */
 
 int smtp_get_banner(SMTP_CLIENT *client)
 {
@@ -50,7 +50,7 @@ int smtp_get_banner(SMTP_CLIENT *client)
 	client->smtp_code = 0;
 	client->buf[0] = 0;
 
-	/* è¯»å–æ¬¢è¿ä¿¡æ¯ */
+	/* ¶ÁÈ¡»¶Ó­ĞÅÏ¢ */
 	ret = acl_vstream_gets_nonl(client->conn, client->buf, client->size);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): gets banner error",
@@ -68,7 +68,7 @@ int smtp_get_banner(SMTP_CLIENT *client)
 	}
 	*ptr = 0;
 	client->smtp_code = atoi(client->buf);
-	*ptr = ' '; /* æ¢å¤åŸå§‹å€¼ */
+	*ptr = ' '; /* »Ö¸´Ô­Ê¼Öµ */
 	if (client->smtp_code != 220) {
 		acl_msg_error("%s(%d): get banner code(%d) error(%s)",
 			__FUNCTION__, __LINE__, client->smtp_code, client->buf);
@@ -85,7 +85,7 @@ int smtp_greet(SMTP_CLIENT *client, const char* name, int ehlo)
 		return smtp_helo(client, name);
 }
 
-/* å‘æœåŠ¡å™¨å‘é€ HELO å‘½ä»¤ */
+/* Ïò·şÎñÆ÷·¢ËÍ HELO ÃüÁî */
 
 int smtp_helo(SMTP_CLIENT *client, const char *helo)
 {
@@ -95,7 +95,7 @@ int smtp_helo(SMTP_CLIENT *client, const char *helo)
 	client->smtp_code = 0;
 	client->buf[0] = 0;
 
-	/* å‘é€ helo ä¿¡æ¯ */
+	/* ·¢ËÍ helo ĞÅÏ¢ */
 	ret = acl_vstream_fprintf(client->conn, "HELO %s\r\n", helo);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): send helo error(%s)",
@@ -103,7 +103,7 @@ int smtp_helo(SMTP_CLIENT *client, const char *helo)
 		return -1;
 	}
 
-	/* è¯»å–å“åº”ä¿¡æ¯ */
+	/* ¶ÁÈ¡ÏìÓ¦ĞÅÏ¢ */
 	ret = acl_vstream_gets_nonl(client->conn, client->buf, client->size);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): gets helo's error(%s)",
@@ -150,7 +150,7 @@ static void smtp_ehlo_flag(SMTP_CLIENT *client, ACL_ARGV *tokens)
 	}
 }
 
-/* å‘æœåŠ¡å™¨å‘é€ EHLO å‘½ä»¤ */
+/* Ïò·şÎñÆ÷·¢ËÍ EHLO ÃüÁî */
 
 int smtp_ehlo(SMTP_CLIENT *client, const char *ehlo)
 {
@@ -207,7 +207,7 @@ int smtp_ehlo(SMTP_CLIENT *client, const char *ehlo)
 	return 0;
 }
 
-/* å‘æœåŠ¡å™¨å‘é€èº«ä»½è®¤è¯ä¿¡æ¯ */
+/* Ïò·şÎñÆ÷·¢ËÍÉí·İÈÏÖ¤ĞÅÏ¢ */
 
 int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass)
 {
@@ -229,7 +229,7 @@ int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass)
 	client->smtp_code = 0;
 	client->buf[0] = 0;
 
-	/* å‘é€è®¤è¯å‘½ä»¤ */
+	/* ·¢ËÍÈÏÖ¤ÃüÁî */
 
 	ret = acl_vstream_fprintf(client->conn, "AUTH LOGIN\r\n");
 	if (ret == ACL_VSTREAM_EOF) {
@@ -253,7 +253,7 @@ int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass)
 		RETURN (-1);
 	}
 
-	/* å‘é€é‚®ç®±å¸å· */
+	/* ·¢ËÍÓÊÏäÕÊºÅ */
 
 	user_encoded = (char*) acl_base64_encode(user, (int) strlen(user));
 	ret = acl_vstream_fprintf(client->conn, "%s\r\n", user_encoded);
@@ -278,7 +278,7 @@ int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass)
 		RETURN (-1);
 	}
 
-	/* å‘é€ password */
+	/* ·¢ËÍ password */
 
 	pass_encoded = (char*) acl_base64_encode(pass, (int) strlen(pass));
 	ret = acl_vstream_fprintf(client->conn, "%s\r\n", pass_encoded);
@@ -305,7 +305,7 @@ int smtp_auth(SMTP_CLIENT *client, const char *user, const char *pass)
 	RETURN (0);
 }
 
-/* å‘æœåŠ¡å™¨å‘é€ MAIL FROM å‘½ä»¤ */
+/* Ïò·şÎñÆ÷·¢ËÍ MAIL FROM ÃüÁî */
 
 int smtp_mail(SMTP_CLIENT *client, const char *from)
 {
@@ -315,7 +315,7 @@ int smtp_mail(SMTP_CLIENT *client, const char *from)
 	client->smtp_code = 0;
 	client->buf[0] = 0;
 
-	/* å‘é€ mail from ä¿¡æ¯ */
+	/* ·¢ËÍ mail from ĞÅÏ¢ */
 	ret = acl_vstream_fprintf(client->conn, "MAIL FROM: <%s>\r\n", from);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): send mail from error(%s)",
@@ -324,7 +324,7 @@ int smtp_mail(SMTP_CLIENT *client, const char *from)
 	}
 
 
-	/* è¯»å–å“åº”ä¿¡æ¯ */
+	/* ¶ÁÈ¡ÏìÓ¦ĞÅÏ¢ */
 	ret = acl_vstream_gets_nonl(client->conn, client->buf, client->size);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): gets mail from's reply error(%s)",
@@ -345,7 +345,7 @@ int smtp_mail(SMTP_CLIENT *client, const char *from)
 	return 0;
 }
 
-/* å‘æœåŠ¡å™¨å‘é€ä¸€ä¸ª RCPT TO å‘½ä»¤ */
+/* Ïò·şÎñÆ÷·¢ËÍÒ»¸ö RCPT TO ÃüÁî */
 
 int smtp_rcpt(SMTP_CLIENT *client, const char *to)
 {
@@ -382,7 +382,7 @@ int smtp_rcpt(SMTP_CLIENT *client, const char *to)
 	return 0;
 }
 
-/* å‘é€ DATA å‘½ä»¤ */
+/* ·¢ËÍ DATA ÃüÁî */
 
 int smtp_data(SMTP_CLIENT *client)
 {
@@ -419,7 +419,7 @@ int smtp_data(SMTP_CLIENT *client)
 	return 0;
 }
 
-/* å‘é€  \r\n.\r\n */
+/* ·¢ËÍ  \r\n.\r\n */
 
 int smtp_data_end(SMTP_CLIENT *client)
 {
@@ -479,7 +479,7 @@ int smtp_printf(SMTP_CLIENT *client, const char* fmt, ...)
 	return ret == ACL_VSTREAM_EOF ? -1 : 0;
 }
 
-/* å‘é€é‚®ä»¶å†…å®¹ */
+/* ·¢ËÍÓÊ¼şÄÚÈİ */
 
 int smtp_send_stream(SMTP_CLIENT *client, ACL_VSTREAM *in)
 {
@@ -507,7 +507,7 @@ int smtp_send_stream(SMTP_CLIENT *client, ACL_VSTREAM *in)
 	return 0;
 }
 
-/* å‘æœåŠ¡å™¨å‘é€é‚®ä»¶å†…å®¹ */
+/* Ïò·şÎñÆ÷·¢ËÍÓÊ¼şÄÚÈİ */
 
 int smtp_send_file(SMTP_CLIENT *client, const char* filepath)
 {
@@ -524,7 +524,7 @@ int smtp_send_file(SMTP_CLIENT *client, const char* filepath)
 	return ret;
 }
 
-/* å‘é€ QUIT å‘½ä»¤ */
+/* ·¢ËÍ QUIT ÃüÁî */
 
 int smtp_quit(SMTP_CLIENT *client)
 {
@@ -560,7 +560,7 @@ int smtp_quit(SMTP_CLIENT *client)
 	return 0;
 }
 
-/* å‘é€ NOOP å‘½ä»¤ */
+/* ·¢ËÍ NOOP ÃüÁî */
 
 int smtp_noop(SMTP_CLIENT *client)
 {
@@ -605,7 +605,7 @@ int smtp_noop(SMTP_CLIENT *client)
 	return 0;
 }
 
-/* å‘é€ RSET å‘½ä»¤ */
+/* ·¢ËÍ RSET ÃüÁî */
 
 int smtp_rset(SMTP_CLIENT *client)
 {

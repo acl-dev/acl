@@ -1,22 +1,22 @@
-ï»¿#pragma once
+#pragma once
 
 //////////////////////////////////////////////////////////////////////////
 
-// çº¯è™šç±»ï¼Œå­ç±»é¡»å®ç°è¯¥ç±»ä¸­çš„çº¯è™šæ¥å£
+// ´¿ĞéÀà£¬×ÓÀàĞëÊµÏÖ¸ÃÀàÖĞµÄ´¿Ğé½Ó¿Ú
 class rpc_callback
 {
 public:
 	rpc_callback() {}
 	virtual ~rpc_callback() {}
 
-	// è®¾ç½® HTTP è¯·æ±‚å¤´æ•°æ®è™šå‡½æ•°
+	// ÉèÖÃ HTTP ÇëÇóÍ·Êı¾İĞéº¯Êı
 	virtual void SetRequestHdr(const char* hdr) = 0;
-	// è®¾ç½® HTTP å“åº”å¤´æ•°æ®è™šå‡½æ•°
+	// ÉèÖÃ HTTP ÏìÓ¦Í·Êı¾İĞéº¯Êı
 	virtual void SetResponseHdr(const char* hdr) = 0;
-	// ä¸‹è½½è¿‡ç¨‹ä¸­çš„å›è°ƒå‡½æ•°è™šå‡½æ•°
+	// ÏÂÔØ¹ı³ÌÖĞµÄ»Øµ÷º¯ÊıĞéº¯Êı
 	virtual void OnDownloading(long long int content_length,
 		long long int total_read) = 0;
-	// ä¸‹è½½å®Œæˆæ—¶çš„å›è°ƒå‡½æ•°è™šå‡½æ•°
+	// ÏÂÔØÍê³ÉÊ±µÄ»Øµ÷º¯ÊıĞéº¯Êı
 	virtual void OnDownloadOver(long long int total_read,
 		double spent) = 0;
 };
@@ -24,31 +24,31 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * http è¯·æ±‚è¿‡ç¨‹ç±»ï¼Œè¯¥ç±»å¯¹è±¡åœ¨å­çº¿ç¨‹ä¸­å‘èµ·è¿œç¨‹ HTTP è¯·æ±‚è¿‡ç¨‹ï¼Œå°†å¤„ç†ç»“æœ
- * è¿”å›ç»™ä¸»çº¿ç¨‹
+ * http ÇëÇó¹ı³ÌÀà£¬¸ÃÀà¶ÔÏóÔÚ×ÓÏß³ÌÖĞ·¢ÆğÔ¶³Ì HTTP ÇëÇó¹ı³Ì£¬½«´¦Àí½á¹û
+ * ·µ»Ø¸øÖ÷Ïß³Ì
  */
 class http_download : public acl::rpc_request
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param addr {const char*} HTTP æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šdomain:port
-	 * @param url {const char*} http url åœ°å€
-	 * @param callback {rpc_callback*} http è¯·æ±‚ç»“æœé€šè¿‡æ­¤ç±»å¯¹è±¡
-	 *  é€šçŸ¥ä¸»çº¿ç¨‹è¿‡ç¨‹
+	 * ¹¹Ôìº¯Êı
+	 * @param addr {const char*} HTTP ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºdomain:port
+	 * @param url {const char*} http url µØÖ·
+	 * @param callback {rpc_callback*} http ÇëÇó½á¹ûÍ¨¹ı´ËÀà¶ÔÏó
+	 *  Í¨ÖªÖ÷Ïß³Ì¹ı³Ì
 	 */
 	http_download(const char* addr, const char* url,
 		rpc_callback* callback);
 protected:
 	~http_download() {}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šå­çº¿ç¨‹å¤„ç†å‡½æ•°
+	// »ùÀàĞéº¯Êı£º×ÓÏß³Ì´¦Àíº¯Êı
 	virtual void rpc_run();
 
-	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
+	// »ùÀàĞéº¯Êı£ºÖ÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
 	virtual void rpc_onover();
 
-	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹çš„é€šçŸ¥æ¶ˆæ¯
+	// »ùÀàĞéº¯Êı£ºÖ÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌµÄÍ¨ÖªÏûÏ¢
 	virtual void rpc_wakeup(void* ctx);
 private:
 	acl::string addr_;

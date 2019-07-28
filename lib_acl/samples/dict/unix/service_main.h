@@ -1,4 +1,4 @@
-ï»¿
+
 #ifndef	__SERVICE_MAIN_INCLUDE_H__
 #define	__SERVICE_MAIN_INCLUDE_H__
 
@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-/* é…ç½®æ–‡ä»¶é¡¹ */
+/* ÅäÖÃÎÄ¼şÏî */
 /* in service_main.c */
 extern char *var_cfg_mysql_dbaddr;
 extern char *var_cfg_mysql_dbuser;
@@ -30,21 +30,21 @@ extern ACL_CONFIG_INT_TABLE service_conf_int_tab[];
 extern ACL_CONFIG_STR_TABLE service_conf_str_tab[];
 
 /**
- * åˆå§‹åŒ–å‡½æ•°ï¼ŒæœåŠ¡å™¨æ¨¡æ¿æ¡†æ¶å¯åŠ¨åä»…è°ƒç”¨è¯¥å‡½æ•°ä¸€æ¬¡
- * @param init_ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
+ * ³õÊ¼»¯º¯Êı£¬·şÎñÆ÷Ä£°å¿ò¼ÜÆô¶¯ºó½öµ÷ÓÃ¸Ãº¯ÊıÒ»´Î
+ * @param init_ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
  */
 extern void service_init(void *init_ctx);
 
 /**
- * è¿›ç¨‹é€€å‡ºæ—¶çš„å›è°ƒå‡½æ•°
- * @param exist_ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
+ * ½ø³ÌÍË³öÊ±µÄ»Øµ÷º¯Êı
+ * @param exist_ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
  */
 extern void service_exit(void *exit_ctx);
 
 /**
- * åè®®å¤„ç†å‡½æ•°å…¥å£
- * @param stream {ACL_VSTREAM*} å®¢æˆ·ç«¯æ•°æ®è¿æ¥æµ
- * @param run_ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
+ * Ğ­Òé´¦Àíº¯ÊıÈë¿Ú
+ * @param stream {ACL_VSTREAM*} ¿Í»§¶ËÊı¾İÁ¬½ÓÁ÷
+ * @param run_ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
  */
 extern int service_main(ACL_VSTREAM *stream, void *run_ctx);
 

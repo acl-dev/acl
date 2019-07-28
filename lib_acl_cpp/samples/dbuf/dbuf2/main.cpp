@@ -1,10 +1,10 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #if !defined(_WIN32) && !defined(_WIN64)
 #include <sys/time.h>
 #endif
 
 /**
- * dbuf_obj å­ç±»ï¼Œåœ¨ dbuf_pool ä¸ŠåŠ¨æ€åˆ†é…ï¼Œç”± dbuf_guard ç»Ÿä¸€è¿›è¡Œç®¡ç†
+ * dbuf_obj ×ÓÀà£¬ÔÚ dbuf_pool ÉÏ¶¯Ì¬·ÖÅä£¬ÓÉ dbuf_guard Í³Ò»½øĞĞ¹ÜÀí
  */
 class myobj : public acl::dbuf_obj
 {
@@ -22,8 +22,8 @@ public:
 private:
 	char* ptr_;
 
-	// å°†ææ„å£°æ˜ä¸ºç§äººï¼Œä»¥å¼ºåˆ¶è¦æ±‚è¯¥å¯¹è±¡è¢«åŠ¨æ€åˆ†é…ï¼Œè¯¥ææ„å‡½æ•°å°†ç”±
-	// dbuf_guard ç»Ÿä¸€è°ƒç”¨ï¼Œä»¥é‡Šæ”¾æœ¬ç±»å¯¹è±¡ä¸­äº§ç”Ÿçš„åŠ¨æ€å†…å­˜(ptr_)
+	// ½«Îö¹¹ÉùÃ÷ÎªË½ÈË£¬ÒÔÇ¿ÖÆÒªÇó¸Ã¶ÔÏó±»¶¯Ì¬·ÖÅä£¬¸ÃÎö¹¹º¯Êı½«ÓÉ
+	// dbuf_guard Í³Ò»µ÷ÓÃ£¬ÒÔÊÍ·Å±¾Àà¶ÔÏóÖĞ²úÉúµÄ¶¯Ì¬ÄÚ´æ(ptr_)
 	~myobj()
 	{
 		free(ptr_);
@@ -34,20 +34,20 @@ static void test_dbuf(acl::dbuf_guard& dbuf)
 {
 	for (int i = 0; i < 102400; i++)
 	{
-		// åŠ¨æ€åˆ†é…å†…å­˜
+		// ¶¯Ì¬·ÖÅäÄÚ´æ
 		char* ptr = (char*) dbuf.dbuf_alloc(10);
 		(void) ptr;
 	}
 
 	for (int i = 0; i < 102400; i++)
 	{
-		// åŠ¨æ€åˆ†é…å­—ç¬¦ä¸²
+		// ¶¯Ì¬·ÖÅä×Ö·û´®
 		char* str = dbuf.dbuf_strdup("hello world");
 		if (i < 5)
 			printf(">>str->%s\r\n", str);
 	}
 
-	// åŠ¨æ€åˆ†é…å†…å­˜
+	// ¶¯Ì¬·ÖÅäÄÚ´æ
 
 	(void) dbuf.dbuf_alloc(1024);
 	(void) dbuf.dbuf_alloc(1024);
@@ -64,15 +64,15 @@ static void test_dbuf(acl::dbuf_guard& dbuf)
 
 	for (int i = 0; i < 10000; i++)
 	{
-		// åŠ¨æ€åˆ†é… dbuf_obj å­ç±»å¯¹è±¡ï¼Œå¹¶é€šè¿‡å°† dbuf_guard å¯¹è±¡ä¼ å…¥
-		// dbuf_obj çš„æ„é€ å‡½æ•°ï¼Œä»è€Œå°†ä¹‹ç”± dbuf_guard ç»Ÿä¸€ç®¡ç†ï¼Œ
+		// ¶¯Ì¬·ÖÅä dbuf_obj ×ÓÀà¶ÔÏó£¬²¢Í¨¹ı½« dbuf_guard ¶ÔÏó´«Èë
+		// dbuf_obj µÄ¹¹Ôìº¯Êı£¬´Ó¶ø½«Ö®ÓÉ dbuf_guard Í³Ò»¹ÜÀí£¬
 
 		myobj* obj = dbuf.create<myobj>(&dbuf);
 
-		// éªŒè¯ dbuf_obj å¯¹è±¡åœ¨ dbuf_guard ä¸­çš„åœ¨åœ¨ä¸€è‡´æ€§
+		// ÑéÖ¤ dbuf_obj ¶ÔÏóÔÚ dbuf_guard ÖĞµÄÔÚÔÚÒ»ÖÂĞÔ
 		assert(obj == dbuf[obj->pos()]);
 
-		// è°ƒç”¨ dbuf_obj å­ç±»å¯¹è±¡ myobj çš„å‡½æ•° run
+		// µ÷ÓÃ dbuf_obj ×ÓÀà¶ÔÏó myobj µÄº¯Êı run
 		if (i < 10)
 			obj->run();
 	}
@@ -91,8 +91,8 @@ static void test_dbuf(acl::dbuf_guard& dbuf)
 	{
 		myobj* obj = dbuf.create<myobj>(&dbuf);
 
-		// è™½ç„¶å¤šæ¬¡å°† dbuf_obj å¯¹è±¡ç½®å…¥ dbuf_guard ä¸­ï¼Œå› ä¸º dbuf_obj
-		// å†…éƒ¨çš„å¼•ç”¨è®¡æ•°ï¼Œæ‰€ä»¥å¯ä»¥é˜²æ­¢è¢«é‡å¤æ·»åŠ 
+		// ËäÈ»¶à´Î½« dbuf_obj ¶ÔÏóÖÃÈë dbuf_guard ÖĞ£¬ÒòÎª dbuf_obj
+		// ÄÚ²¿µÄÒıÓÃ¼ÆÊı£¬ËùÒÔ¿ÉÒÔ·ÀÖ¹±»ÖØ¸´Ìí¼Ó
 		(void) dbuf.push_back(obj);
 		(void) dbuf.push_back(obj);
 		(void) dbuf.push_back(obj);
@@ -113,7 +113,7 @@ static void wait_pause()
 
 static void test1()
 {
-	// dbuf_gaurd å¯¹è±¡åˆ›å»ºåœ¨æ ˆä¸Šï¼Œå‡½æ•°è¿”å›å‰è¯¥å¯¹è±¡è‡ªåŠ¨é”€æ¯
+	// dbuf_gaurd ¶ÔÏó´´½¨ÔÚÕ»ÉÏ£¬º¯Êı·µ»ØÇ°¸Ã¶ÔÏó×Ô¶¯Ïú»Ù
 	acl::dbuf_guard dbuf;
 
 	test_dbuf(dbuf);
@@ -121,19 +121,19 @@ static void test1()
 
 static void test2()
 {
-	// åŠ¨æ€åˆ›å»º dbuf_guard å¯¹è±¡ï¼Œéœ€è¦æ‰‹åŠ¨é”€æ¯è¯¥å¯¹è±¡
+	// ¶¯Ì¬´´½¨ dbuf_guard ¶ÔÏó£¬ĞèÒªÊÖ¶¯Ïú»Ù¸Ã¶ÔÏó
 	acl::dbuf_guard* dbuf = new acl::dbuf_guard;
 
 	test_dbuf(*dbuf);
 
-	// æ‰‹å·¥é”€æ¯è¯¥å¯¹è±¡
+	// ÊÖ¹¤Ïú»Ù¸Ã¶ÔÏó
 	delete dbuf;
 }
 
 static void test3()
 {
-	// å°†å†…å­˜æ± å¯¹è±¡ dbuf_pool åšä¸º dbuf_guard æ„é€ å‡½æ•°å‚æ•°ä¼ å…¥ï¼Œå½“
-	// dbuf_guard å¯¹è±¡é”€æ¯æ—¶ï¼Œdbuf_pool å¯¹è±¡ä¸€åŒè¢«é”€æ¯
+	// ½«ÄÚ´æ³Ø¶ÔÏó dbuf_pool ×öÎª dbuf_guard ¹¹Ôìº¯Êı²ÎÊı´«Èë£¬µ±
+	// dbuf_guard ¶ÔÏóÏú»ÙÊ±£¬dbuf_pool ¶ÔÏóÒ»Í¬±»Ïú»Ù
 	acl::dbuf_guard dbuf(new acl::dbuf_pool);
 
 	test_dbuf(dbuf);
@@ -141,9 +141,9 @@ static void test3()
 
 static void test4()
 {
-	// åŠ¨æ€åˆ›å»º dbuf_guard å¯¹è±¡ï¼ŒåŒæ—¶æŒ‡å®šå†…å­˜æ± ä¸­å†…å­˜å—çš„åˆ†é…å€æ•°ä¸º 10ï¼Œ
-	// å³æŒ‡å®šå†…éƒ¨æ¯ä¸ªå†…å­˜å—å¤§å°ä¸º 4096 * 10 = 40 KBï¼ŒåŒæ—¶
-	// æŒ‡å®šå†…éƒ¨åŠ¨æ€æ•°ç»„çš„åˆå§‹å®¹é‡å¤§å°
+	// ¶¯Ì¬´´½¨ dbuf_guard ¶ÔÏó£¬Í¬Ê±Ö¸¶¨ÄÚ´æ³ØÖĞÄÚ´æ¿éµÄ·ÖÅä±¶ÊıÎª 10£¬
+	// ¼´Ö¸¶¨ÄÚ²¿Ã¿¸öÄÚ´æ¿é´óĞ¡Îª 4096 * 10 = 40 KB£¬Í¬Ê±
+	// Ö¸¶¨ÄÚ²¿¶¯Ì¬Êı×éµÄ³õÊ¼ÈİÁ¿´óĞ¡
 	acl::dbuf_guard dbuf(10, 100);
 
 	test_dbuf(dbuf);
@@ -153,17 +153,17 @@ static void test5()
 {
 	acl::dbuf_pool* dp = new acl::dbuf_pool;
 
-	// åœ¨å†…å­˜æ± å¯¹è±¡ä¸ŠåŠ¨æ€åˆ›å»º dbuf_guard å¯¹è±¡ï¼Œè¿™æ ·å¯ä»¥å°†å†…å­˜åˆ†é…çš„æ¬¡æ•°
-	// è¿›ä¸€æ­¥å‡å°‘ä¸€æ¬¡
+	// ÔÚÄÚ´æ³Ø¶ÔÏóÉÏ¶¯Ì¬´´½¨ dbuf_guard ¶ÔÏó£¬ÕâÑù¿ÉÒÔ½«ÄÚ´æ·ÖÅäµÄ´ÎÊı
+	// ½øÒ»²½¼õÉÙÒ»´Î
 	acl::dbuf_guard* dbuf = new (dp->dbuf_alloc(sizeof(acl::dbuf_guard)))
 		acl::dbuf_guard(dp);
 
 	test_dbuf(*dbuf);
 
-	// å› ä¸º dbuf_gaurd å¯¹è±¡ä¹Ÿæ˜¯åœ¨ dbuf_pool å†…å­˜æ± å¯¹è±¡ä¸ŠåŠ¨æ€åˆ›å»ºçš„ï¼Œæ‰€ä»¥
-	// åªèƒ½é€šè¿‡ç›´æ¥è°ƒç”¨ dbuf_guard çš„ææ„å‡½æ•°æ¥é‡Šæ”¾æ‰€æœ‰çš„å†…å­˜å¯¹è±¡ï¼›
-	// æ—¢ä¸èƒ½ç›´æ¥ dbuf_pool->desotry()ï¼Œä¹Ÿä¸èƒ½ç›´æ¥ delete dbuf_guard æ¥
-	// é”€æ¯ dbuf_guard å¯¹è±¡
+	// ÒòÎª dbuf_gaurd ¶ÔÏóÒ²ÊÇÔÚ dbuf_pool ÄÚ´æ³Ø¶ÔÏóÉÏ¶¯Ì¬´´½¨µÄ£¬ËùÒÔ
+	// Ö»ÄÜÍ¨¹ıÖ±½Óµ÷ÓÃ dbuf_guard µÄÎö¹¹º¯ÊıÀ´ÊÍ·ÅËùÓĞµÄÄÚ´æ¶ÔÏó£»
+	// ¼È²»ÄÜÖ±½Ó dbuf_pool->desotry()£¬Ò²²»ÄÜÖ±½Ó delete dbuf_guard À´
+	// Ïú»Ù dbuf_guard ¶ÔÏó
 	dbuf->~dbuf_guard();
 }
 

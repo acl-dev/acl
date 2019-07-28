@@ -1,4 +1,4 @@
-ï»¿#ifndef ACL_BTREE_INCLUDE_H
+#ifndef ACL_BTREE_INCLUDE_H
 #define ACL_BTREE_INCLUDE_H
 
 #ifdef __cplusplus
@@ -8,77 +8,77 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * äºŒå‰æ ‘ç»“æ„ç±»å‹å®šä¹‰
+ * ¶ş²æÊ÷½á¹¹ÀàĞÍ¶¨Òå
  */
 typedef struct ACL_BTREE ACL_BTREE;
 
 /**
- * åˆ›å»ºä¸€ä¸ªäºŒå‰æ ‘å¯¹è±¡
- * @return {ACL_BTREE*} æ–°åˆ›å»ºçš„äºŒå‰æ ‘å¯¹è±¡
+ * ´´½¨Ò»¸ö¶ş²æÊ÷¶ÔÏó
+ * @return {ACL_BTREE*} ĞÂ´´½¨µÄ¶ş²æÊ÷¶ÔÏó
  */
 ACL_API ACL_BTREE *acl_btree_create(void);
 
 /**
- * é‡Šæ”¾ä¸€ä¸ªäºŒå‰æ ‘å¯¹è±¡
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @return {int} 0: æˆåŠŸ; -1: å¤±è´¥
+ * ÊÍ·ÅÒ»¸ö¶ş²æÊ÷¶ÔÏó
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @return {int} 0: ³É¹¦; -1: Ê§°Ü
  */
 ACL_API int acl_btree_destroy(ACL_BTREE *tree);
 
 /**
- * ä»äºŒå‰æ ‘ä¸­æŸ¥è¯¢
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @param key {unsigned int} æŸ¥è¯¢é”®
- * @return {void*} æŸ¥è¯¢ç»“æœ
+ * ´Ó¶ş²æÊ÷ÖĞ²éÑ¯
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @param key {unsigned int} ²éÑ¯¼ü
+ * @return {void*} ²éÑ¯½á¹û
  */
 ACL_API void *acl_btree_find(ACL_BTREE *tree, unsigned int key);
 
 /**
- * å‘äºŒå‰æ ‘ä¸­æ·»åŠ 
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @param key {unsigned int} é”®
- * @param data {void*} åŠ¨æ€å¯¹è±¡
+ * Ïò¶ş²æÊ÷ÖĞÌí¼Ó
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @param key {unsigned int} ¼ü
+ * @param data {void*} ¶¯Ì¬¶ÔÏó
  */
 ACL_API int acl_btree_add(ACL_BTREE *tree, unsigned int key, void *data);
 
 /**
- * ä»äºŒå‰æ ‘ä¸­åˆ é™¤
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @param key {unsigned int} é”®
- * @return {void*} è¢«åˆ é™¤çš„åŠ¨æ€å¯¹è±¡åœ°å€, å¦‚æœä¸å­˜åœ¨åˆ™è¿”å›NULL
+ * ´Ó¶ş²æÊ÷ÖĞÉ¾³ı
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @param key {unsigned int} ¼ü
+ * @return {void*} ±»É¾³ıµÄ¶¯Ì¬¶ÔÏóµØÖ·, Èç¹û²»´æÔÚÔò·µ»ØNULL
  */
 ACL_API void *acl_btree_remove(ACL_BTREE *tree, unsigned int key);
 
 /**
- * è¿”å›äºŒå‰æ ‘ä¸­æœ€å°çš„é”®
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @param key {unsigned int*} é”®æŒ‡é’ˆï¼Œå­˜å‚¨ç»“æœï¼Œä¸èƒ½ä¸ºç©º
- * @return {int} 0: è¡¨ç¤ºæ‰¾åˆ°æœ€å°é”®; -1: è¡¨ç¤ºå‡ºé”™æˆ–æœªæ‰¾åˆ°æœ€å°é”®
+ * ·µ»Ø¶ş²æÊ÷ÖĞ×îĞ¡µÄ¼ü
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @param key {unsigned int*} ¼üÖ¸Õë£¬´æ´¢½á¹û£¬²»ÄÜÎª¿Õ
+ * @return {int} 0: ±íÊ¾ÕÒµ½×îĞ¡¼ü; -1: ±íÊ¾³ö´í»òÎ´ÕÒµ½×îĞ¡¼ü
  */
 ACL_API int acl_btree_get_min_key(ACL_BTREE *tree, unsigned int *key);
 
 /**
- * è¿”å›äºŒå‰æ ‘ä¸­æœ€å¤§çš„é”®
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @param key {unsigned int*} é”®æŒ‡é’ˆï¼Œå­˜å‚¨ç»“æœï¼Œä¸èƒ½ä¸ºç©º
- * @return {int} 0: è¡¨ç¤ºæ‰¾åˆ°æœ€å¤§é”®; -1: è¡¨ç¤ºå‡ºé”™æˆ–æœªæ‰¾åˆ°æœ€å¤§é”®
+ * ·µ»Ø¶ş²æÊ÷ÖĞ×î´óµÄ¼ü
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @param key {unsigned int*} ¼üÖ¸Õë£¬´æ´¢½á¹û£¬²»ÄÜÎª¿Õ
+ * @return {int} 0: ±íÊ¾ÕÒµ½×î´ó¼ü; -1: ±íÊ¾³ö´í»òÎ´ÕÒµ½×î´ó¼ü
  */
 ACL_API int acl_btree_get_max_key(ACL_BTREE *tree, unsigned int *key);
 
 /**
- * ç”±ç»™å®šé”®ï¼Œè¿”å›å…¶åœ¨äºŒå‰æ ‘ä¸­çš„ä¸‹ä¸€ä¸ªé‚»è¿‘é”®
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @param cur_key {unsigned int} å½“å‰ç»™å®šé”®
- * @param next_key {unsigned int*} å­˜å‚¨ç»“æœé”®çš„æŒ‡é’ˆåœ°å€
- * @return {int} 0: è¡¨ç¤ºæ‰¾åˆ°; -1: è¡¨ç¤ºå‡ºé”™æˆ–æœªæ‰¾åˆ°
+ * ÓÉ¸ø¶¨¼ü£¬·µ»ØÆäÔÚ¶ş²æÊ÷ÖĞµÄÏÂÒ»¸öÁÚ½ü¼ü
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @param cur_key {unsigned int} µ±Ç°¸ø¶¨¼ü
+ * @param next_key {unsigned int*} ´æ´¢½á¹û¼üµÄÖ¸ÕëµØÖ·
+ * @return {int} 0: ±íÊ¾ÕÒµ½; -1: ±íÊ¾³ö´í»òÎ´ÕÒµ½
  */
 ACL_API int acl_btree_get_next_key(ACL_BTREE *tree,
 	unsigned int cur_key, unsigned int *next_key);
 
 /**
- * è®¡ç®—å½“å‰äºŒå‰æ ‘çš„æ·±åº¦
- * @param tree {ACL_BTREE*} äºŒå‰æ ‘å¯¹è±¡
- * @return {int} äºŒå‰æ ‘çš„æ·±åº¦
+ * ¼ÆËãµ±Ç°¶ş²æÊ÷µÄÉî¶È
+ * @param tree {ACL_BTREE*} ¶ş²æÊ÷¶ÔÏó
+ * @return {int} ¶ş²æÊ÷µÄÉî¶È
  */
 ACL_API int acl_btree_depth(ACL_BTREE *tree);
 ACL_API void acl_btree_dump(ACL_BTREE *b);

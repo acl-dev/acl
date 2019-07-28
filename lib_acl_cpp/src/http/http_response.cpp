@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/xml.hpp"
@@ -50,8 +50,8 @@ http_client* http_response::get_client() const
 bool http_response::read_header()
 {
 	if (client_) {
-		// åœ¨è¯» HTTP è¯·æ±‚å¤´æ—¶å°†æ­¤æ ‡å¿—é‡ç½®ï¼Œä»¥ä¾¿äºŽåœ¨é•¿è¿žæŽ¥çš„å“åº”
-		// è¿‡ç¨‹ä¸­å¯ä»¥é‡å¤å“åº” HTTP å¤´
+		// ÔÚ¶Á HTTP ÇëÇóÍ·Ê±½«´Ë±êÖ¾ÖØÖÃ£¬ÒÔ±ãÓÚÔÚ³¤Á¬½ÓµÄÏìÓ¦
+		// ¹ý³ÌÖÐ¿ÉÒÔÖØ¸´ÏìÓ¦ HTTP Í·
 		head_sent_ = false;
 		client_->reset();
 		header_.reset();
@@ -61,7 +61,7 @@ bool http_response::read_header()
 		return false;
 	}
 
-	// è¯»å–å®¢æˆ·ç«¯çš„è¯·æ±‚å¤´å¹¶è¿›è¡Œåˆ†æž
+	// ¶ÁÈ¡¿Í»§¶ËµÄÇëÇóÍ·²¢½øÐÐ·ÖÎö
 
 	if (!client_->read_head()) {
 		close();
@@ -78,7 +78,7 @@ http_pipe* http_response::get_pipe(const char* to_charset)
 		return NULL;
 	}
 
-	// éœ€è¦èŽ·å¾—å“åº”å¤´å­—ç¬¦é›†ä¿¡æ¯
+	// ÐèÒª»ñµÃÏìÓ¦Í·×Ö·û¼¯ÐÅÏ¢
 	const char* ptr = client_->header_value("Content-Type");
 	if (ptr == NULL || *ptr == 0) {
 		return NULL;
@@ -136,7 +136,7 @@ bool http_response::get_body(xml& out, const char* to_charset /* = NULL */)
 	int   ret;
 
 	while (true) {
-		// å¾ªçŽ¯è¯»å–å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®ä½“
+		// Ñ­»·¶ÁÈ¡¿Í»§¶ËÇëÇóÊý¾ÝÌå
 		ret = client_->read_body(buf);
 		if (ret == 0) {
 			break;
@@ -147,7 +147,7 @@ bool http_response::get_body(xml& out, const char* to_charset /* = NULL */)
 			return false;
 		}
 
-		// æµå¼åˆ†æž xml æ ¼å¼çš„æ•°æ®ä½“
+		// Á÷Ê½·ÖÎö xml ¸ñÊ½µÄÊý¾ÝÌå
 		if (hp) {
 			hp->update(buf.c_str(), ret);
 		} else {
@@ -199,7 +199,7 @@ bool http_response::get_body(json& out, const char* to_charset /* = NULL */)
 	int   ret;
 
 	while (true) {
-		// å¾ªçŽ¯è¯»å–å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®ä½“
+		// Ñ­»·¶ÁÈ¡¿Í»§¶ËÇëÇóÊý¾ÝÌå
 		ret = client_->read_body(buf);
 		if (ret == 0) {
 			break;
@@ -210,7 +210,7 @@ bool http_response::get_body(json& out, const char* to_charset /* = NULL */)
 			return false;
 		}
 
-		// æµå¼åˆ†æž json æ ¼å¼çš„æ•°æ®ä½“
+		// Á÷Ê½·ÖÎö json ¸ñÊ½µÄÊý¾ÝÌå
 		if (hp) {
 			hp->update(buf.c_str(), ret);
 		} else {
@@ -256,7 +256,7 @@ bool http_response::get_body(string& out, const char* to_charset /* = NULL */)
 
 	string buf;
 	int    ret;
-	// è¯» HTTP è¯·æ±‚ä½“
+	// ¶Á HTTP ÇëÇóÌå
 	while (true) {
 		ret = client_->read_body(buf);
 		if (ret < 0) {
@@ -295,7 +295,7 @@ bool http_response::response(const void* data, size_t len)
 		return false;
 	}
 
-	// ç¬¬ä¸€æ¬¡è°ƒç”¨æœ¬å‡½æ•°æ—¶åº”å…ˆå‘é€ HTTP å“åº”å¤´
+	// µÚÒ»´Îµ÷ÓÃ±¾º¯ÊýÊ±Ó¦ÏÈ·¢ËÍ HTTP ÏìÓ¦Í·
 	if (!head_sent_) {
 		if (!client_->write_head(header_)) {
 			close();
@@ -308,7 +308,7 @@ bool http_response::response(const void* data, size_t len)
 		head_sent_ = false;
 	}
 
-	// å‘é€ HTTP å“åº”ä½“æ•°æ®
+	// ·¢ËÍ HTTP ÏìÓ¦ÌåÊý¾Ý
 	if (!client_->write_body(data, len)) {
 		close();
 		return false;

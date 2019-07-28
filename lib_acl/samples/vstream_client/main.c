@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 
 static void usage(const char *proc)
 {
@@ -45,7 +45,7 @@ int   main(int argc, char *argv[])
 		return 1;
 	}
 
-	/* 杩炴帴鏈嶅姟鍣� */
+	/* 连接服务器 */
 	client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
 	if (client == NULL) {
 		printf("connect %s error %s\r\n", addr, acl_last_serror());
@@ -56,7 +56,7 @@ int   main(int argc, char *argv[])
 	buf = (char*) acl_mymalloc(len);
 	snprintf(buf, len, "%d\r\n", len);
 
-	/* 鍙戦€佷竴琛屾暟鎹€氱煡鏈嶅姟绔瘡娆℃暟鎹綋鐨勯暱搴� */
+	/* 发送一行数据通知服务端每次数据体的长度 */
 	if (acl_vstream_writen(client, buf, strlen(buf)) == ACL_VSTREAM_EOF)
 	if (n == ACL_VSTREAM_EOF)
 		goto END;

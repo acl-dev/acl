@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/string.hpp"
 #include "../db/db_service.hpp"
@@ -10,20 +10,20 @@ namespace acl {
 class ACL_CPP_API db_service_mysql : public db_service
 {
 	/**
-	 * å½“ä¸º mysql æ•°æ®åº“æ—¶çš„æ„é€ å‡½æ•°
-	 * @param dbaddr {const char*} mysql æœåŠ¡å™¨åœ°å€
-	 * @param dbname {const char*} æ•°æ®åº“å
-	 * @param dbuser {const char*} æ•°æ®åº“ç”¨æˆ·å
-	 * @param dbpass {const char*} æ•°æ®åº“ç”¨æˆ·å¯†ç 
-	 * @param dbflags {unsigned long} æ•°æ®åº“è¿æ¥æ ‡å¿—ä½
-	 * @param auto_commit {bool} æ•°æ®ä¿®æ”¹æ—¶æ˜¯å¦è‡ªåŠ¨æäº¤
-	 * @param conn_timeout {int} æ•°æ®åº“è¿æ¥è¶…æ—¶æ—¶é—´
-	 * @param rw_timeout {int} æ•°æ®åº“æ“ä½œæ—¶IOè¯»å†™è¶…æ—¶æ—¶é—´
-	 * @param dblimit {size_t} æ•°æ®åº“è¿æ¥æ± çš„ä¸ªæ•°é™åˆ¶
-	 * @param nthread {int} å­çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°
-	 * @param win32_gui {bool} æ˜¯å¦æ˜¯çª—å£ç±»çš„æ¶ˆæ¯ï¼Œå¦‚æœæ˜¯ï¼Œåˆ™å†…éƒ¨çš„
-	 *  é€šè®¯æ¨¡å¼è‡ªåŠ¨è®¾ç½®ä¸ºåŸºäº _WIN32 çš„æ¶ˆæ¯ï¼Œå¦åˆ™ä¾ç„¶é‡‡ç”¨é€šç”¨çš„å¥—æ¥
-	 *  å£é€šè®¯æ–¹å¼
+	 * µ±Îª mysql Êı¾İ¿âÊ±µÄ¹¹Ôìº¯Êı
+	 * @param dbaddr {const char*} mysql ·şÎñÆ÷µØÖ·
+	 * @param dbname {const char*} Êı¾İ¿âÃû
+	 * @param dbuser {const char*} Êı¾İ¿âÓÃ»§Ãû
+	 * @param dbpass {const char*} Êı¾İ¿âÓÃ»§ÃÜÂë
+	 * @param dbflags {unsigned long} Êı¾İ¿âÁ¬½Ó±êÖ¾Î»
+	 * @param auto_commit {bool} Êı¾İĞŞ¸ÄÊ±ÊÇ·ñ×Ô¶¯Ìá½»
+	 * @param conn_timeout {int} Êı¾İ¿âÁ¬½Ó³¬Ê±Ê±¼ä
+	 * @param rw_timeout {int} Êı¾İ¿â²Ù×÷Ê±IO¶ÁĞ´³¬Ê±Ê±¼ä
+	 * @param dblimit {size_t} Êı¾İ¿âÁ¬½Ó³ØµÄ¸öÊıÏŞÖÆ
+	 * @param nthread {int} ×ÓÏß³Ì³ØµÄ×î´óÏß³ÌÊı
+	 * @param win32_gui {bool} ÊÇ·ñÊÇ´°¿ÚÀàµÄÏûÏ¢£¬Èç¹ûÊÇ£¬ÔòÄÚ²¿µÄ
+	 *  Í¨Ñ¶Ä£Ê½×Ô¶¯ÉèÖÃÎª»ùÓÚ _WIN32 µÄÏûÏ¢£¬·ñÔòÒÀÈ»²ÉÓÃÍ¨ÓÃµÄÌ×½Ó
+	 *  ¿ÚÍ¨Ñ¶·½Ê½
 	 */
 	db_service_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -34,24 +34,24 @@ class ACL_CPP_API db_service_mysql : public db_service
 	~db_service_mysql(void);
 
 private:
-	// æ•°æ®åº“æœåŠ¡å™¨åœ°å€
+	// Êı¾İ¿â·şÎñÆ÷µØÖ·
 	string dbaddr_;
-	// æ•°æ®åº“å
+	// Êı¾İ¿âÃû
 	string dbname_;
-	// æ•°æ®åº“ç”¨æˆ·å
+	// Êı¾İ¿âÓÃ»§Ãû
 	string dbuser_;
-	// æ•°æ®åº“ç”¨æˆ·å¯†ç 
+	// Êı¾İ¿âÓÃ»§ÃÜÂë
 	string dbpass_;
-	// æ•°æ®åº“è¿æ¥æ ‡å¿—ä½
+	// Êı¾İ¿âÁ¬½Ó±êÖ¾Î»
 	unsigned long dbflags_;
-	// ä¿®æ”¹æ•°æ®æ—¶æ˜¯å¦è‡ªåŠ¨æäº¤æ•°æ®
+	// ĞŞ¸ÄÊı¾İÊ±ÊÇ·ñ×Ô¶¯Ìá½»Êı¾İ
 	bool auto_commit_;
-	// è¿æ¥æ•°æ®åº“è¶…æ—¶æ—¶é—´
+	// Á¬½ÓÊı¾İ¿â³¬Ê±Ê±¼ä
 	int conn_timeout_;
-	// æ•°æ®åº“æ“ä½œæ—¶çš„è¯»å†™è¶…æ—¶æ—¶é—´
+	// Êı¾İ¿â²Ù×÷Ê±µÄ¶ÁĞ´³¬Ê±Ê±¼ä
 	int rw_timeout_;
 
-	// åŸºç±»çº¯è™šå‡½æ•°
+	// »ùÀà´¿Ğéº¯Êı
 	virtual db_handle* db_create(void);
 };
 

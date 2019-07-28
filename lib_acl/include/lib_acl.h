@@ -1,4 +1,4 @@
-﻿#ifndef LIB_ACL_INCLUDE_H
+#ifndef LIB_ACL_INCLUDE_H
 #define LIB_ACL_INCLUDE_H
 
 #ifdef  __cplusplus

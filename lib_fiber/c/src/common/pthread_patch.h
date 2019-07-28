@@ -1,4 +1,4 @@
-﻿#ifndef	PTHREAD_INCLUDE_H
+#ifndef	PTHREAD_INCLUDE_H
 #define	PTHREAD_INCLUDE_H
 
 #ifdef	__cplusplus

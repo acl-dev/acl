@@ -1,4 +1,4 @@
-ï»¿#include "stdafx.h"
+#include "stdafx.h"
 #include "rpc_manager.h"
 #include "status/HttpServerRpc.h"
 #include "status/StatusConnection.h"
@@ -14,22 +14,22 @@ StatusIOCallback::~StatusIOCallback()
 	delete conn_;
 }
 
-// å½“ç®¡ç†è¿æ¥æœ‰æ•°æ®å¯è¯»æ—¶
+// µ±¹ÜÀíÁ¬½ÓÓĞÊı¾İ¿É¶ÁÊ±
 bool StatusIOCallback::read_wakeup()
 {
-	// å…ˆç¦æ­¢å¼‚æ­¥æµç›‘æ§
+	// ÏÈ½ûÖ¹Òì²½Á÷¼à¿Ø
 	conn_->get_conn()->disable_read();
 
-	// å‘èµ·ä¸€ä¸ª http æœåŠ¡ç«¯ä¼šè¯è¿‡ç¨‹ï¼Œå°†ä¹‹äº¤ç”±å­çº¿ç¨‹å»å¤„ç†
+	// ·¢ÆğÒ»¸ö http ·şÎñ¶Ë»á»°¹ı³Ì£¬½«Ö®½»ÓÉ×ÓÏß³ÌÈ¥´¦Àí
 	HttpServerRpc* rpc = new HttpServerRpc(conn_->get_conn());
 	rpc_manager::get_instance().fork(rpc);
 	return true;
 }
 
-// å½“éé˜»å¡æµè¢«å…³é—­æ—¶ï¼Œè¯¥å›è°ƒå‡½æ•°å°†è¢«è°ƒç”¨
+// µ±·Ç×èÈûÁ÷±»¹Ø±ÕÊ±£¬¸Ã»Øµ÷º¯Êı½«±»µ÷ÓÃ
 void StatusIOCallback::close_callback()
 {
-	// åˆ é™¤è‡ªå·±
+	// É¾³ı×Ô¼º
 	delete this;
 }
 

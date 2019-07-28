@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include <signal.h>
 #include "json/service_struct.h"
 #include "json/service_struct.gson.h"

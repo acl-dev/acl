@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +6,7 @@
 static void test(void)
 {
 	ACL_FILE *fp = acl_fopen("ft.txt", "w+");
-	const char *jt = "åœºç¡€è´°å°½é¦ˆè°©æ‹§ä¼žabcdefg0123456";
+	const char *jt = "³¡´¡·¡¾¡À¡Ã¡Å¡É¡abcdefg0123456";
 	char  buf[256], buf2[256];
 	unsigned short *ptr;
 

@@ -1,4 +1,4 @@
-﻿namespace acl
+namespace acl
 {
     //kill_req_data_t
     acl::string gson(const kill_req_data_t &$obj);

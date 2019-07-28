@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/atomic.hpp"
 #include "../stdlib/noncopyable.hpp"

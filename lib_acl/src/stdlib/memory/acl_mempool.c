@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -12,8 +12,8 @@
 
 #include "malloc_vars.h"
 
-/* xxx: å¦‚æœæƒ³è¦ä½¿ç”¨ pthread_spinlock_t åˆ™ä¸å¯å°† stdlib.h æ”¾åœ¨å‰é¢,
- * å¦åˆ™ç¼–è¯‘æŠ¥é”™
+/* xxx: Èç¹ûÏëÒªÊ¹ÓÃ pthread_spinlock_t Ôò²»¿É½« stdlib.h ·ÅÔÚÇ°Ãæ,
+ * ·ñÔò±àÒë±¨´í
  */
 
 #ifdef	ACL_UNIX

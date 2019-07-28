@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "fiber/libfiber.h"
 #include "sane_socket.h"
 

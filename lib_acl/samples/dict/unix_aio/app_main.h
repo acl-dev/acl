@@ -1,4 +1,4 @@
-ï»¿#ifndef	__APP_MAIN_INCLUDE_H__
+#ifndef	__APP_MAIN_INCLUDE_H__
 #define	__APP_MAIN_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -7,55 +7,55 @@
 extern "C" {
 #endif
 
-/* å®¢æˆ·ç«¯è¯»å†™è¶…æ—¶æ—¶é—´å€¼ */
+/* ¿Í»§¶Ë¶ÁÐ´³¬Ê±Ê±¼äÖµ */
 extern int app_var_client_idle_limit;
 
-/* ç”¨æˆ·çº§çš„è¿è¡Œå‡½æ•°ç±»åž‹, å½“è¯¥å‡½æ•°è¿”å›žå€¼ != 0 æ—¶, æ¡†æž¶ä¼šè‡ªåŠ¨å…³é—­å®¢æˆ·ç«¯æµ */
+/* ÓÃ»§¼¶µÄÔËÐÐº¯ÊýÀàÐÍ, µ±¸Ãº¯Êý·µ»ØÖµ != 0 Ê±, ¿ò¼Ü»á×Ô¶¯¹Ø±Õ¿Í»§¶ËÁ÷ */
 typedef int (*APP_RUN_FN)(ACL_ASTREAM *stream, void *run_ctx);
 
-/* ç”¨æˆ·çº§çš„åˆå§‹åŒ–å‡½æ•°ç±»åž‹ */
+/* ÓÃ»§¼¶µÄ³õÊ¼»¯º¯ÊýÀàÐÍ */
 typedef void (*APP_INIT_FN)(void*);
 typedef void (*APP_EXIT_FN)(void*);
 
 typedef ACL_MASTER_SERVER_THREAD_INIT_FN APP_THREAD_INIT_FN  /* void (*)(void*) */;
 typedef ACL_MASTER_SERVER_THREAD_EXIT_FN APP_THREAD_EXIT_FN;  /* void (*)(void*) */
 
-#define	APP_CTL_END			0	/* å‚æ•°æŽ§åˆ¶ç»“æŸæ ‡å¿— */
-#define	APP_CTL_INIT_FN			1	/* åˆå§‹åŒ–å‡½æ•° */
-#define	APP_CTL_INIT_CTX		2	/* åˆå§‹åŒ–å‡½æ•°æ‰€ç”¨çš„å‚æ•° */
-#define	APP_CTL_CFG_BOOL		3	/* æ•´æ•°ç±»åž‹çš„é…ç½®å‚æ•°è¡¨ */
-#define	APP_CTL_CFG_INT			4	/* æ•´æ•°ç±»åž‹çš„é…ç½®å‚æ•°è¡¨ */
-#define	APP_CTL_CFG_STR			5	/* å­—ç¬¦ä¸²ç±»åž‹çš„é…ç½®å‚æ•°è¡¨ */
-#define	APP_CTL_EXIT_FN			6	/* å½“è¿›ç¨‹é€€å‡ºæ—¶çš„å›žè°ƒå‡½æ•° */
-#define	APP_CTL_EXIT_CTX		7	/* è¿›ç¨‹é€€å‡ºæ—¶å›žè°ƒå‡½æ•°çš„å‚æ•° */
-#define	APP_CTL_THREAD_INIT		8	/* æ¯ä¸ªçº¿ç¨‹å¯åŠ¨æ—¶çš„å›žè°ƒå‡½æ•° */
-#define	APP_CTL_THREAD_INIT_CTX		9	/* çº¿ç¨‹å¯åŠ¨æ—¶å›žè°ƒå‡½æ•°çš„å‚æ•° */
-#define	APP_CTL_THREAD_EXIT		10	/* çº¿ç¨‹é€€å‡ºæ—¶çš„å›žè°ƒå‡½æ•° */
-#define	APP_CTL_THREAD_EXIT_CTX		11	/* çº¿ç¨‹é€€å‡ºæ—¶å›žè°ƒå‡½æ•°çš„å‚æ•° */
-#define	APP_CTL_DENY_INFO		12	/* å½“éžæ³•å®¢æˆ·ç«¯è®¿é—®æ—¶ç»™å‡ºçš„æç¤ºä¿¡æ¯ */
+#define	APP_CTL_END			0	/* ²ÎÊý¿ØÖÆ½áÊø±êÖ¾ */
+#define	APP_CTL_INIT_FN			1	/* ³õÊ¼»¯º¯Êý */
+#define	APP_CTL_INIT_CTX		2	/* ³õÊ¼»¯º¯ÊýËùÓÃµÄ²ÎÊý */
+#define	APP_CTL_CFG_BOOL		3	/* ÕûÊýÀàÐÍµÄÅäÖÃ²ÎÊý±í */
+#define	APP_CTL_CFG_INT			4	/* ÕûÊýÀàÐÍµÄÅäÖÃ²ÎÊý±í */
+#define	APP_CTL_CFG_STR			5	/* ×Ö·û´®ÀàÐÍµÄÅäÖÃ²ÎÊý±í */
+#define	APP_CTL_EXIT_FN			6	/* µ±½ø³ÌÍË³öÊ±µÄ»Øµ÷º¯Êý */
+#define	APP_CTL_EXIT_CTX		7	/* ½ø³ÌÍË³öÊ±»Øµ÷º¯ÊýµÄ²ÎÊý */
+#define	APP_CTL_THREAD_INIT		8	/* Ã¿¸öÏß³ÌÆô¶¯Ê±µÄ»Øµ÷º¯Êý */
+#define	APP_CTL_THREAD_INIT_CTX		9	/* Ïß³ÌÆô¶¯Ê±»Øµ÷º¯ÊýµÄ²ÎÊý */
+#define	APP_CTL_THREAD_EXIT		10	/* Ïß³ÌÍË³öÊ±µÄ»Øµ÷º¯Êý */
+#define	APP_CTL_THREAD_EXIT_CTX		11	/* Ïß³ÌÍË³öÊ±»Øµ÷º¯ÊýµÄ²ÎÊý */
+#define	APP_CTL_DENY_INFO		12	/* µ±·Ç·¨¿Í»§¶Ë·ÃÎÊÊ±¸ø³öµÄÌáÊ¾ÐÅÏ¢ */
 
 /*----------------------------------------------------------------------------*/
 /* in app_main.c */
 
 /**
- * ä¸»å‡½æ•°å…¥å£, ç”¨æˆ·çº§çš„åˆå§‹åŒ–å‡½æ•°æŒ‡é’ˆåŠè¿è¡Œå‡½æ•°æŒ‡é’ˆé€šè¿‡æŽ§åˆ¶å‚æ•°è¿›è¡Œæ³¨å†Œ, ä¸»å‡½æ•°å†…éƒ¨
- * ä¼šåœ¨åˆå§‹åŒ–æ—¶è‡ªåŠ¨è°ƒç”¨ç”¨æˆ·çº§åˆå§‹åŒ–å‡½æ•°(APP_INIT_FN ç±»åž‹), å½“æŽ¥æ”¶åˆ°å…è®¸è®¿é—®çš„å®¢æˆ·ç«¯
- * è¿žæŽ¥æ—¶ä¼šè‡ªåŠ¨è°ƒç”¨ç”¨æˆ·(APP_RUN_FN ç±»åž‹).
- * çº§çš„è¿è¡Œå‡½æ•°.
- * @param argc "int main(int argc, char *argv[])" ä¸­çš„ argc
- * @param argv "int main(int argc, char *argv[])" ä¸­çš„ argv
- * @param run_fn ç”¨æˆ·çº§è¿è¡Œä¸»å‡½æ•°
- * @param run_ctx run_fn() è¿è¡Œæ—¶çš„å‚æ•°ä¹‹ä¸€
- * @param name æŽ§åˆ¶å‚æ•°ä¸­çš„ç¬¬ä¸€ä¸ªæŽ§åˆ¶ç±»åž‹, æ‰€æ”¯æŒçš„ç±»åž‹å¦‚ä¸Šå®šä¹‰: APP_CTL_XXX
- *        è°ƒç”¨æ–¹å¼: APP_CTL_XXX, xxx; å…¶ä¸­ APP_CTL_END ä¸ºç‰¹æ®Šçš„æŽ§åˆ¶å‚æ•°, è¡¨ç¤ºæŽ§åˆ¶å‚æ•°
- *        ç»“æŸ.
+ * Ö÷º¯ÊýÈë¿Ú, ÓÃ»§¼¶µÄ³õÊ¼»¯º¯ÊýÖ¸Õë¼°ÔËÐÐº¯ÊýÖ¸ÕëÍ¨¹ý¿ØÖÆ²ÎÊý½øÐÐ×¢²á, Ö÷º¯ÊýÄÚ²¿
+ * »áÔÚ³õÊ¼»¯Ê±×Ô¶¯µ÷ÓÃÓÃ»§¼¶³õÊ¼»¯º¯Êý(APP_INIT_FN ÀàÐÍ), µ±½ÓÊÕµ½ÔÊÐí·ÃÎÊµÄ¿Í»§¶Ë
+ * Á¬½ÓÊ±»á×Ô¶¯µ÷ÓÃÓÃ»§(APP_RUN_FN ÀàÐÍ).
+ * ¼¶µÄÔËÐÐº¯Êý.
+ * @param argc "int main(int argc, char *argv[])" ÖÐµÄ argc
+ * @param argv "int main(int argc, char *argv[])" ÖÐµÄ argv
+ * @param run_fn ÓÃ»§¼¶ÔËÐÐÖ÷º¯Êý
+ * @param run_ctx run_fn() ÔËÐÐÊ±µÄ²ÎÊýÖ®Ò»
+ * @param name ¿ØÖÆ²ÎÊýÖÐµÄµÚÒ»¸ö¿ØÖÆÀàÐÍ, ËùÖ§³ÖµÄÀàÐÍÈçÉÏ¶¨Òå: APP_CTL_XXX
+ *        µ÷ÓÃ·½Ê½: APP_CTL_XXX, xxx; ÆäÖÐ APP_CTL_END ÎªÌØÊâµÄ¿ØÖÆ²ÎÊý, ±íÊ¾¿ØÖÆ²ÎÊý
+ *        ½áÊø.
  * @example:
  *   app_main(argc, argv, {run_fn}, {run_ctx},
  *		APP_CTL_INIT_FN, {run_init_fn},
  *		APP_CTL_INIT_CTX, {run_init_ctx},
  *		APP_CTL_END);
- * æ³¨: app_main() çš„æ‰€æœ‰å‚æ•°ä¸­, argc, argv, run_fn, run_ctx(å¯ä»¥ä¸ºNULL), APP_CTL_END
- *     éƒ½æ˜¯å¿…éœ€çš„.
+ * ×¢: app_main() µÄËùÓÐ²ÎÊýÖÐ, argc, argv, run_fn, run_ctx(¿ÉÒÔÎªNULL), APP_CTL_END
+ *     ¶¼ÊÇ±ØÐèµÄ.
  */
 
 extern void app_main(int argc, char *argv[], APP_RUN_FN run_fn, void *run_ctx, int name, ...);

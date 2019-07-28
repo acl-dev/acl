@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "polarssl/des.h"
 #include "passwd_crypt.h"
 

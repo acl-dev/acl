@@ -1,4 +1,4 @@
-ï»¿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "lib_acl.h"
 #include <iostream>
 #include <assert.h>
@@ -44,12 +44,12 @@ bool CConnectClientCallback::read_callback(char* data, int len)
 			<< nwrite_ << "; "<<  data;
 	}
 
-	// å¦‚æžœæ”¶åˆ°æœåŠ¡å™¨çš„é€€å‡ºæ¶ˆæ¯ï¼Œåˆ™ä¹Ÿåº”é€€å‡º
+	// Èç¹ûÊÕµ½·þÎñÆ÷µÄÍË³öÏûÏ¢£¬ÔòÒ²Ó¦ÍË³ö
 	if (strncasecmp(data, "quit", 4) == 0)
 	{
-		// å‘æœåŠ¡å™¨å‘é€æ•°æ®
+		// Ïò·þÎñÆ÷·¢ËÍÊý¾Ý
 		client_->format("Bye!\r\n");
-		// å…³é—­å¼‚æ­¥æµè¿žæŽ¥
+		// ¹Ø±ÕÒì²½Á÷Á¬½Ó
 		client_->close();
 		return (true);
 	}
@@ -62,7 +62,7 @@ bool CConnectClientCallback::read_callback(char* data, int len)
 			<< ", nwrite_limit: " << ctx_->nwrite_limit
 			<< ", quiting ..." << std::endl;
 
-		// å‘æœåŠ¡å™¨å‘é€é€€å‡ºæ¶ˆæ¯
+		// Ïò·þÎñÆ÷·¢ËÍÍË³öÏûÏ¢
 		client_->format("quit\r\n");
 		client_->close();
 	}
@@ -72,7 +72,7 @@ bool CConnectClientCallback::read_callback(char* data, int len)
 		snprintf(buf, sizeof(buf), "hello world: %d\n", nwrite_);
 		client_->write(buf, (int) strlen(buf));
 
-		// å‘æœåŠ¡å™¨å‘é€æ•°æ®
+		// Ïò·þÎñÆ÷·¢ËÍÊý¾Ý
 		//client_->format("hello world: %d\n", nwrite_);
 	}
 
@@ -84,7 +84,7 @@ bool CConnectClientCallback::write_callback()
 	ctx_->nwrite_total++;
 	nwrite_++;
 
-	// ä»ŽæœåŠ¡å™¨è¯»ä¸€è¡Œæ•°æ®
+	// ´Ó·þÎñÆ÷¶ÁÒ»ÐÐÊý¾Ý
 	client_->gets(ctx_->read_timeout, false);
 	return (true);
 }
@@ -97,11 +97,11 @@ void CConnectClientCallback::close_callback()
 			<< ctx_->addr << " error: "
 			<< acl_last_serror();
 
-		// å¦‚æžœæ˜¯ç¬¬ä¸€æ¬¡è¿žæŽ¥å°±å¤±è´¥ï¼Œåˆ™é€€å‡º
+		// Èç¹ûÊÇµÚÒ»´ÎÁ¬½Ó¾ÍÊ§°Ü£¬ÔòÍË³ö
 		if (ctx_->nopen_total == 0)
 		{
 			std::cout << ", first connect error, quit";
-			/* èŽ·å¾—å¼‚æ­¥å¼•æ“Žå¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
+			/* »ñµÃÒì²½ÒýÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
 			client_->get_handle().stop();
 		}
 		std::cout << std::endl;
@@ -109,7 +109,7 @@ void CConnectClientCallback::close_callback()
 		return;
 	}
 
-	// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›žè°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
+	// ±ØÐëÔÚ´Ë´¦É¾³ý¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æÐ¹Â¶
 	delete this;
 }
 
@@ -122,7 +122,7 @@ bool CConnectClientCallback::timeout_callback()
 
 bool CConnectClientCallback::open_callback()
 {
-	// è¿žæŽ¥æˆåŠŸï¼Œè®¾ç½®IOè¯»å†™å›žè°ƒå‡½æ•°
+	// Á¬½Ó³É¹¦£¬ÉèÖÃIO¶ÁÐ´»Øµ÷º¯Êý
 	client_->add_read_callback(this);
 	client_->add_write_callback(this);
 	ctx_->nopen_total++;
@@ -130,27 +130,27 @@ bool CConnectClientCallback::open_callback()
 	acl_assert(id_ > 0);
 	if (ctx_->nopen_total < ctx_->nopen_limit)
 	{
-		// å¼€å§‹è¿›è¡Œä¸‹ä¸€ä¸ªè¿žæŽ¥è¿‡ç¨‹
+		// ¿ªÊ¼½øÐÐÏÂÒ»¸öÁ¬½Ó¹ý³Ì
 		if (connect_server(ctx_, id_ + 1) == false)
 			std::cout << "connect error!" << std::endl;
 	}
 
-	// å¼‚æ­¥å‘æœåŠ¡å™¨å‘é€æ•°æ®
+	// Òì²½Ïò·þÎñÆ÷·¢ËÍÊý¾Ý
 	//client_->format("hello world: %d\n", nwrite_);
 	char  buf[256];
 	snprintf(buf, sizeof(buf), "hello world: %d\n", nwrite_);
 	client_->write(buf, (int) strlen(buf));
 
-	// å¼‚æ­¥ä»ŽæœåŠ¡å™¨è¯»å–ä¸€è¡Œæ•°æ®
+	// Òì²½´Ó·þÎñÆ÷¶ÁÈ¡Ò»ÐÐÊý¾Ý
 	client_->gets(ctx_->read_timeout, false);
 
-	// è¡¨ç¤ºç»§ç»­å¼‚æ­¥è¿‡ç¨‹
+	// ±íÊ¾¼ÌÐøÒì²½¹ý³Ì
 	return (true);
 }
 
 bool CConnectClientCallback::connect_server(IO_CTX* ctx, int id)
 {
-	// å¼€å§‹å¼‚æ­¥è¿žæŽ¥è¿œç¨‹æœåŠ¡å™¨
+	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì·þÎñÆ÷
 	// const char* addr = "221.194.139.155:18887";
 	// ctx->connect_timeout = 1;
 	aio_socket_stream* stream = aio_socket_stream::open(ctx->handle,
@@ -164,16 +164,16 @@ bool CConnectClientCallback::connect_server(IO_CTX* ctx, int id)
 		return (false);
 	}
 
-	// åˆ›å»ºè¿žæŽ¥åŽçš„å›žè°ƒå‡½æ•°ç±»
+	// ´´½¨Á¬½ÓºóµÄ»Øµ÷º¯ÊýÀà
 	CConnectClientCallback* callback = new CConnectClientCallback(ctx, stream, id);
 
-	// æ·»åŠ è¿žæŽ¥æˆåŠŸçš„å›žè°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³É¹¦µÄ»Øµ÷º¯ÊýÀà
 	stream->add_open_callback(callback);
 
-	// æ·»åŠ è¿žæŽ¥å¤±è´¥åŽå›žè°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½ÓÊ§°Üºó»Øµ÷º¯ÊýÀà
 	stream->add_close_callback(callback);
 
-	// æ·»åŠ è¿žæŽ¥è¶…æ—¶çš„å›žè°ƒå‡½æ•°ç±»
+	// Ìí¼ÓÁ¬½Ó³¬Ê±µÄ»Øµ÷º¯ÊýÀà
 	stream->add_timeout_callback(callback);
 	return (true);
 }

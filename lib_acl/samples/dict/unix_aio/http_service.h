@@ -1,4 +1,4 @@
-Ôªø#ifndef	__HTTP_SERVICE_INCLUDE_H__
+#ifndef	__HTTP_SERVICE_INCLUDE_H__
 #define	__HTTP_SERVICE_INCLUDE_H__
 
 #include "lib_acl.h"
@@ -13,7 +13,7 @@
 
 typedef struct HTTP_CLIENT {
 	ACL_ASTREAM *stream;
-	HTTP_HDR_REQ *hdr_req;                  /* HTTPÂçèËÆÆËØ∑Ê±ÇÂ§¥ÊåáÈíà */
+	HTTP_HDR_REQ *hdr_req;                  /* HTTP–≠“È«Î«ÛÕ∑÷∏’Î */
 	HTTP_REQ *http_req;
 	ACL_VSTRING *sbuf;
 	ACL_VSTRING *key;

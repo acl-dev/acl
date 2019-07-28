@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
@@ -8,7 +8,7 @@ namespace acl
 {
 
 /**
- * åœ¨æ·»åŠ ä»»åŠ¡æ—¶ï¼Œæ­¤ç±»æŒ‡å®šçš„ä»»åŠ¡çš„æ·»åŠ æ¡ä»¶é™å®š
+ * ÔÚÌí¼ÓÈÎÎñÊ±£¬´ËÀàÖ¸¶¨µÄÈÎÎñµÄÌí¼ÓÌõ¼şÏŞ¶¨
  */
 class ACL_CPP_API disque_cond : public noncopyable
 {

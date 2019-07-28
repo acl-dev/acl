@@ -1,4 +1,4 @@
-ï»¿// http_clientDlg.cpp : å®ç°æ–‡ä»¶
+// http_clientDlg.cpp : ÊµÏÖÎÄ¼ş
 //
 
 #include "stdafx.h"
@@ -13,20 +13,20 @@
 #endif
 
 
-// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
+// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// å¯¹è¯æ¡†æ•°æ®
+// ¶Ô»°¿òÊı¾İ
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
 
-// å®ç°
+// ÊµÏÖ
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -44,7 +44,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Chttp_clientDlg å¯¹è¯æ¡†
+// Chttp_clientDlg ¶Ô»°¿ò
 
 
 
@@ -93,15 +93,15 @@ BEGIN_MESSAGE_MAP(Chttp_clientDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// Chttp_clientDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
+// Chttp_clientDlg ÏûÏ¢´¦Àí³ÌĞò
 
 BOOL Chttp_clientDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
+	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
 
-	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
+	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -117,38 +117,38 @@ BOOL Chttp_clientDlg::OnInitDialog()
 		}
 	}
 
-	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
-	//  æ‰§è¡Œæ­¤æ“ä½œ
-	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
-	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
+	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
+	//  Ö´ĞĞ´Ë²Ù×÷
+	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
+	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
 
-	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
 	GetDlgItem(IDC_EDIT_FILE)->SetWindowText("result.txt");
 	CheckDlgButton(IDC_CHECK_SAVE, 0);
 	CheckDlgButton(IDC_CHECK_ECHO, 0);
 	m_resBodyCtlEdit.SetLimitText(0);
 
-	// æ·»åŠ çŠ¶æ€æ 
+	// Ìí¼Ó×´Ì¬À¸
 	int aWidths[3] = {50, 250, -1};
 	m_wndMeterBar.SetParts(3, aWidths);
 
 	m_wndMeterBar.Create(WS_CHILD | WS_VISIBLE | WS_BORDER
 		| CCS_BOTTOM | SBARS_SIZEGRIP,
 		CRect(0,0,0,0), this, 0); 
-	m_wndMeterBar.SetText("å°±ç»ª", 0, 0);
+	m_wndMeterBar.SetText("¾ÍĞ÷", 0, 0);
 	m_wndMeterBar.SetText("", 1, 0);
 	m_wndMeterBar.SetText("", 2, 0); //SBT_NOBORDERS);
-	//int strPartDim[3]= {100, 200, -1}; //åˆ†å‰²æ•°é‡
+	//int strPartDim[3]= {100, 200, -1}; //·Ö¸îÊıÁ¿
 	//m_StatusBar.SetParts(3, strPartDim);
-	////è®¾ç½®çŠ¶æ€æ æ–‡æœ¬
+	////ÉèÖÃ×´Ì¬À¸ÎÄ±¾
 	//m_StatusBar.SetText("", 0, 0);
 	//m_StatusBar.SetText("", 1, 0);
 	//m_StatusBar.SetText("", 2, 0);
-	//ä¸‹é¢æ˜¯åœ¨çŠ¶æ€æ ä¸­åŠ å…¥å›¾æ ‡
-	//ä¸ºç¬¬äºŒä¸ªåˆ†æ ä¸­åŠ çš„å›¾æ ‡
+	//ÏÂÃæÊÇÔÚ×´Ì¬À¸ÖĞ¼ÓÈëÍ¼±ê
+	//ÎªµÚ¶ş¸ö·ÖÀ¸ÖĞ¼ÓµÄÍ¼±ê
 	//m_StatusBar.SetIcon(0,	SetIcon(AfxGetApp()->LoadIcon(IDR_MAINFRAME), FALSE));
 
-	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
+	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
 }
 
 void Chttp_clientDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -164,19 +164,19 @@ void Chttp_clientDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
-//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
-//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
+// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
+//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
+//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
 
 void Chttp_clientDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
+		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
+		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -184,7 +184,7 @@ void Chttp_clientDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// ç»˜åˆ¶å›¾æ ‡
+		// »æÖÆÍ¼±ê
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -193,7 +193,7 @@ void Chttp_clientDlg::OnPaint()
 	}
 }
 
-//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
+//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
 HCURSOR Chttp_clientDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -201,8 +201,8 @@ HCURSOR Chttp_clientDlg::OnQueryDragIcon()
 
 void Chttp_clientDlg::OnBnClickedButtonBrowser()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
-	CFileDialog file(TRUE,"æ–‡ä»¶","result.txt",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	CFileDialog file(TRUE,"ÎÄ¼ş","result.txt",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 	if(file.DoModal()==IDOK)
 	{
 		CString pathname;
@@ -214,7 +214,7 @@ void Chttp_clientDlg::OnBnClickedButtonBrowser()
 
 void Chttp_clientDlg::OnBnClickedButtonOption()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CHttpOption option;
 
 	option.m_bHttp11 = m_bHttp11;
@@ -258,18 +258,18 @@ void Chttp_clientDlg::OnBnClickedButtonOption()
 
 void Chttp_clientDlg::OnBnClickedButtonGet()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	CString sLocalFile, sReqUrl;
 
 	GetDlgItem(IDC_EDIT_FILE)->GetWindowText(sLocalFile);
 	if (sLocalFile.GetLength() == 0) {
-		MessageBox("è¯·è¾“å…¥æ­£ç¡®çš„æ–‡ä»¶å!");
+		MessageBox("ÇëÊäÈëÕıÈ·µÄÎÄ¼şÃû!");
 		return;
 	}
 
 	GetDlgItem(IDC_EDIT_URL)->GetWindowText(sReqUrl);
 	if (sReqUrl.GetLength() == 0) {
-		MessageBox("è¯·è¾“å…¥æ­£ç¡®çš„ URL!");
+		MessageBox("ÇëÊäÈëÕıÈ·µÄ URL!");
 		return;
 	}
 
@@ -295,12 +295,12 @@ void Chttp_clientDlg::OnBnClickedButtonGet()
 	m_hClient.m_sCtype = m_sCType;
 	m_hClient.OnDataCallback(this->GetSafeHwnd(), WM_USER_DISPLAY);
 
-	// ä¸è¿›åº¦æ¡æœ‰å…³
+	// Óë½ø¶ÈÌõÓĞ¹Ø
 	m_nContentLength = -1;
 	m_nDownLen = 0;
 	m_wndMeterBar.GetProgressCtrl().SetPos(0);
 
-	m_wndMeterBar.SetText("è¿è¡Œ", 0, 0);
+	m_wndMeterBar.SetText("ÔËĞĞ", 0, 0);
 
 	m_hClient.GetUrl(sReqUrl);
 	GetDlgItem(IDC_BUTTON_GET)->EnableWindow(FALSE);
@@ -334,7 +334,7 @@ LRESULT Chttp_clientDlg::OnWriteDisplay(WPARAM wParam, LPARAM lParam)
 			m_wndMeterBar.GetProgressCtrl().SetPos((int) nStept);
 		}
 		CString msg;
-		msg.Format("å…± %I64d å­—èŠ‚, è€—æ—¶ %.3f æ¯«ç§’",
+		msg.Format("¹² %I64d ×Ö½Ú, ºÄÊ± %.3f ºÁÃë",
 			m_nDownLen, pReport->m_timeRes);
 		m_wndMeterBar.SetText(msg, 1, 0);
 	} else if (pReport->m_type == TYPE_ERROR_CONNECT) {
@@ -345,12 +345,12 @@ LRESULT Chttp_clientDlg::OnWriteDisplay(WPARAM wParam, LPARAM lParam)
 		//m_wndMeterBar.GetProgressCtrl.SetWindowText(msg);
 	} else if (pReport->m_type == TYPE_TIME_RES) {
 		CString msg;
-		msg.Format("å…± %I64d å­—èŠ‚, è€—æ—¶ %.3f æ¯«ç§’",
+		msg.Format("¹² %I64d ×Ö½Ú, ºÄÊ± %.3f ºÁÃë",
 			m_nDownLen, pReport->m_timeRes);
 		m_wndMeterBar.SetText(msg, 1, 0);
 	} else if (pReport->m_type == TYPE_COMPLETE) {
 		CString msg;
-		msg.Format("å®Œæˆ");
+		msg.Format("Íê³É");
 		m_wndMeterBar.SetText(msg, 0, 0);
 		GetDlgItem(IDC_BUTTON_GET)->EnableWindow(TRUE);
 	}
@@ -369,7 +369,7 @@ void Chttp_clientDlg::ClearWinText(void)
 	m_resCtlEdit.ReplaceSel("");
 	m_resBodyCtlEdit.SetSel(0, m_resBodyCtlEdit.GetWindowTextLength());
 	m_resBodyCtlEdit.ReplaceSel("");
-	m_wndMeterBar.SetText("å°±ç»ª", 0, 0);
+	m_wndMeterBar.SetText("¾ÍĞ÷", 0, 0);
 	m_wndMeterBar.SetText("", 1, 0);
 	m_wndMeterBar.GetProgressCtrl().SetPos(0);
 
@@ -380,19 +380,19 @@ void Chttp_clientDlg::ClearWinText(void)
 
 void Chttp_clientDlg::OnBnClickedButtonClear()
 {
-	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
 	ClearWinText();
 }
 void Chttp_clientDlg::OnSize(UINT nType, int cx, int cy)
 {
 	CDialog::OnSize(nType, cx, cy);
 
-	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
+	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌĞò´úÂë
 	if (m_wndMeterBar.GetSafeHwnd()) {
 		int aWidths[3] = {cx / 3, cx / 3, -1};
 		m_wndMeterBar.SetParts(3, aWidths);
-		m_wndMeterBar.SetText("å°±ç»ª", 0, 0);
-		m_wndMeterBar.SetText("å°±ç»ª2", 1, 0); //SBT_NOBORDERS);
+		m_wndMeterBar.SetText("¾ÍĞ÷", 0, 0);
+		m_wndMeterBar.SetText("¾ÍĞ÷2", 1, 0); //SBT_NOBORDERS);
 		m_wndMeterBar.SetText("", 2, SBT_NOBORDERS);
 
 		m_wndMeterBar.SendMessage(WM_SIZE, nType, MAKELONG(cy, cx));
@@ -404,7 +404,7 @@ int Chttp_clientDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CDialog::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	// TODO:  åœ¨æ­¤æ·»åŠ æ‚¨ä¸“ç”¨çš„åˆ›å»ºä»£ç 
+	// TODO:  ÔÚ´ËÌí¼ÓÄú×¨ÓÃµÄ´´½¨´úÂë
 
 	return 0;
 }

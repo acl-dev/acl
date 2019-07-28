@@ -1,4 +1,4 @@
-﻿#ifndef ACL_TOKEN_TREE_INCLUDE_H
+#ifndef ACL_TOKEN_TREE_INCLUDE_H
 #define ACL_TOKEN_TREE_INCLUDE_H
 
 #ifdef __cplusplus

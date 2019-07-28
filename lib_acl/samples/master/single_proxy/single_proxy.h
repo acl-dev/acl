@@ -1,4 +1,4 @@
-﻿
+
 #ifndef	__SINGLE_PROXY_INCLUDE_H_
 #define	__SINGLE_PROXY_INCLUDE_H_
 

@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright (C) 1999, 2000 Igor Khasilev, igor@paco.net
 Copyright (C) 2000 Andrey Igoshin, ai@vsu.ru
 

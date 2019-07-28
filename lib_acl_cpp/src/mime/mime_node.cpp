@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #include "internal/header_opts.hpp"
 #include "internal/mime_state.hpp"
 #ifndef ACL_PREPARE_COMPILE
@@ -137,7 +137,7 @@ bool mime_node::save(pipe_manager& out) const
 		return false;
 	}
 
-	// å½“éœ€è¦è§£ç æ—¶æŸ¥æ‰¾åŒ¹é…çš„è§£ç å™¨
+	// µ±ĞèÒª½âÂëÊ±²éÕÒÆ¥ÅäµÄ½âÂëÆ÷
 
 	mime_code* mime_decoder;
 	if (m_enableDecode) {
@@ -191,7 +191,7 @@ bool mime_node::save(pipe_manager& out, const char* src, int len) const
 		return true;
 	} 
 
-	// å½“éœ€è¦è§£ç æ—¶æŸ¥æ‰¾åŒ¹é…çš„è§£ç å™¨
+	// µ±ĞèÒª½âÂëÊ±²éÕÒÆ¥ÅäµÄ½âÂëÆ÷
 
 	mime_code* mime_decoder;
 	if (m_enableDecode) {

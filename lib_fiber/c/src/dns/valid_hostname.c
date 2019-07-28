@@ -1,4 +1,4 @@
-﻿/* System library. */
+/* System library. */
 #include "stdafx.h"
 #include "common.h"
 #include "valid_hostname.h"

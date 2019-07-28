@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "http_servlet.h"
 #include "configure.h"
 #include "master_service.h"

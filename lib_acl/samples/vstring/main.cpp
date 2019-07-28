@@ -1,4 +1,4 @@
-ï»¿#include "lib_acl.h"
+#include "lib_acl.h"
 
 static void end(void)
 {
@@ -177,7 +177,7 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	int   i;
 	size_t z;
 
-	acl_vstring_strcpy(vp, "å¤§å®¶å¥½ï¼Œä¸­å›½äººæ°‘ï¼ŒHiå¤§å®¶å¥½, Hello World! ä¸­å›½äººæ°‘é“¶è¡Œ!");
+	acl_vstring_strcpy(vp, "´ó¼ÒºÃ£¬ÖÐ¹úÈËÃñ£¬Hi´ó¼ÒºÃ, Hello World! ÖÐ¹úÈËÃñÒøÐÐ!");
 
 	printf(">>>%s\r\n", acl_vstring_str(vp));
 	ptr = acl_vstring_strstr(vp, "Hello");
@@ -192,13 +192,13 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	else
 		printf(">>error, no find it\r\n");
 
-	ptr = acl_vstring_strstr(vp, "ä¸­å›½");
+	ptr = acl_vstring_strstr(vp, "ÖÐ¹ú");
 	if (ptr)
 		printf(">>ok, find it, ptr = %s\r\n", ptr);
 	else
 		printf(">>error, no find it\r\n");
 
-	ptr = acl_vstring_strcasestr(vp, "Hiå¤§å®¶å¥½");
+	ptr = acl_vstring_strcasestr(vp, "Hi´ó¼ÒºÃ");
 	if (ptr)
 		printf(">>ok, find it, ptr = %s\r\n", ptr);
 	else

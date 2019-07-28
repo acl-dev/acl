@@ -1,4 +1,4 @@
-﻿#include "lib_acl.h"
+#include "lib_acl.h"
 #include <time.h>
 #ifdef	ACL_UNIX
 #include <pthread.h>

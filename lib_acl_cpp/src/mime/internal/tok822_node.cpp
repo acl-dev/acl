@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	tok822_node 3
  * SUMMARY

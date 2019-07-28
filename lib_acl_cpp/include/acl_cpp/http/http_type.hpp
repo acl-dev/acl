@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 
 namespace acl {
 
@@ -8,38 +8,38 @@ struct HTTP_PARAM
 	char* value;
 };
 
-// HTTP å“åº”çŠ¶æ€
+// HTTP ÏìÓ¦×´Ì¬
 typedef enum
 {
-	HTTP_OK,                // ä¸€åˆ‡æ­£å¸¸
-	HTTP_ERR_DNS,           // åŸŸåè§£æžå¤±è´¥
-	HTTP_ERR_CONN,          // è¿žæŽ¥æœåŠ¡å™¨å¤±è´¥
-	HTTP_ERR_REQ,           // åˆ›å»ºè¯·æ±‚åè®®å¤±è´¥
-	HTTP_ERR_READ,          // è¯»æ•°æ®å¤±è´¥
-	HTTP_ERR_SEND,          // å†™æ•°æ®å¤±è´¥
-	HTTP_ERR_TIMO,          // è¯»å†™æ•°æ®è¶…æ—¶
-	HTTP_ERR_READ_HDR,      // è¯» HTTP å“åº”å¤´å¤±è´¥
-	HTTP_ERR_READ_BODY,     // è¯» HTTP å“åº”ä½“å¤±è´¥
-	HTTP_ERR_INVALID_HDR,   // HTTP å“åº”å¤´æ— æ•ˆ
-	HTTP_ERR_UNKNOWN,       // å‡ºçŽ°äº†æœªçŸ¥é”™è¯¯
-	HTTP_ERR_REDIRECT_MAX,	// HTTP å“åº”å¤´ä¸­é‡å®šå‘æ¬¡æ•°å¤ªå¤š
+	HTTP_OK,                // Ò»ÇÐÕý³£
+	HTTP_ERR_DNS,           // ÓòÃû½âÎöÊ§°Ü
+	HTTP_ERR_CONN,          // Á¬½Ó·þÎñÆ÷Ê§°Ü
+	HTTP_ERR_REQ,           // ´´½¨ÇëÇóÐ­ÒéÊ§°Ü
+	HTTP_ERR_READ,          // ¶ÁÊý¾ÝÊ§°Ü
+	HTTP_ERR_SEND,          // Ð´Êý¾ÝÊ§°Ü
+	HTTP_ERR_TIMO,          // ¶ÁÐ´Êý¾Ý³¬Ê±
+	HTTP_ERR_READ_HDR,      // ¶Á HTTP ÏìÓ¦Í·Ê§°Ü
+	HTTP_ERR_READ_BODY,     // ¶Á HTTP ÏìÓ¦ÌåÊ§°Ü
+	HTTP_ERR_INVALID_HDR,   // HTTP ÏìÓ¦Í·ÎÞÐ§
+	HTTP_ERR_UNKNOWN,       // ³öÏÖÁËÎ´Öª´íÎó
+	HTTP_ERR_REDIRECT_MAX,	// HTTP ÏìÓ¦Í·ÖÐÖØ¶¨Ïò´ÎÊýÌ«¶à
 } http_status_t;
 
-// HTTP è¯·æ±‚æ–¹æ³•
+// HTTP ÇëÇó·½·¨
 typedef enum
 {
-	HTTP_METHOD_UNKNOWN,    // æœªçŸ¥æ–¹æ³•
-	HTTP_METHOD_GET,        // GET æ–¹æ³•
-	HTTP_METHOD_POST,       // POST æ–¹æ³•
-	HTTP_METHOD_PUT,        // PUT æ–¹æ³•
-	HTTP_METHOD_CONNECT,    // CONNECT æ–¹æ³•
-	HTTP_METHOD_PURGE,      // PURGE æ–¹æ³•
-	HTTP_METHOD_DELETE,     // DELETE æ–¹æ³•
-	HTTP_METHOD_HEAD,       // HEAD æ–¹æ³•
-	HTTP_METHOD_OPTION,     // OPTION æ–¹æ³•
-	HTTP_METHOD_PROPFIND,	// PROPFIND æ–¹æ³•
-	HTTP_METHOD_PATCH,	    // PATCH æ–¹æ³•
-	HTTP_METHOD_OTHER,	// å…¶å®ƒçš„æ–¹æ³•
+	HTTP_METHOD_UNKNOWN,    // Î´Öª·½·¨
+	HTTP_METHOD_GET,        // GET ·½·¨
+	HTTP_METHOD_POST,       // POST ·½·¨
+	HTTP_METHOD_PUT,        // PUT ·½·¨
+	HTTP_METHOD_CONNECT,    // CONNECT ·½·¨
+	HTTP_METHOD_PURGE,      // PURGE ·½·¨
+	HTTP_METHOD_DELETE,     // DELETE ·½·¨
+	HTTP_METHOD_HEAD,       // HEAD ·½·¨
+	HTTP_METHOD_OPTION,     // OPTION ·½·¨
+	HTTP_METHOD_PROPFIND,	// PROPFIND ·½·¨
+	HTTP_METHOD_PATCH,	    // PATCH ·½·¨
+	HTTP_METHOD_OTHER,	// ÆäËüµÄ·½·¨
 } http_method_t;
 
 typedef enum
@@ -53,13 +53,13 @@ typedef enum
 	// Content-Type: application/octet-stream
 	HTTP_REQUEST_OCTET_STREAM,
 
-	// Content-Type: text/xml æˆ– application/xml
+	// Content-Type: text/xml »ò application/xml
 	HTTP_REQUEST_TEXT_XML,
 
-	// Content-Type: text/json æˆ– application/json
+	// Content-Type: text/json »ò application/json
 	HTTP_REQUEST_TEXT_JSON,
 
-	// å…¶å®ƒç±»åž‹
+	// ÆäËüÀàÐÍ
 	HTTP_REQUEST_OTHER
 } http_request_t;
 
@@ -77,8 +77,8 @@ typedef enum
 
 typedef enum
 {
-	HTTP_MIME_PARAM,        // http mime ç»“ç‚¹ä¸ºå‚æ•°ç±»åž‹
-	HTTP_MIME_FILE          // http mime ç»“ç‚¹ä¸ºæ–‡ä»¶ç±»åž‹
+	HTTP_MIME_PARAM,        // http mime ½áµãÎª²ÎÊýÀàÐÍ
+	HTTP_MIME_FILE          // http mime ½áµãÎªÎÄ¼þÀàÐÍ
 } http_mime_t;
 
 } // namespace acl end

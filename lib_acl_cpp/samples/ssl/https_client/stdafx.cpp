@@ -1,8 +1,8 @@
-ï»¿// stdafx.cpp : åªåŒ…æ‹¬æ ‡å‡†åŒ…å«æ–‡ä»¶çš„æºæ–‡ä»¶
-// master_threads.pch å°†æˆä¸ºé¢„ç¼–è¯‘å¤´
-// stdafx.obj å°†åŒ…å«é¢„ç¼–è¯‘ç±»åž‹ä¿¡æ¯
+// stdafx.cpp : Ö»°üÀ¨±ê×¼°üº¬ÎÄ¼þµÄÔ´ÎÄ¼þ
+// master_threads.pch ½«³ÉÎªÔ¤±àÒëÍ·
+// stdafx.obj ½«°üº¬Ô¤±àÒëÀàÐÍÐÅÏ¢
 
 #include "stdafx.h"
 
 // TODO: Ô STDAFX.H Ö
-//å¼•ç”¨åœˆé¥°æ‰€éœ€çš„é™„åŠ å¤´æ–‡ä»¶ï¼Œè€Œä¸æ˜¯åœ¨æ­¤æ–‡ä»¶ä¸­å¼•ç”¨
+//ÒýÓÃÈ¦ÊÎËùÐèµÄ¸½¼ÓÍ·ÎÄ¼þ£¬¶ø²»ÊÇÔÚ´ËÎÄ¼þÖÐÒýÓÃ

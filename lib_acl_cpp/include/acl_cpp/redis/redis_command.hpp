@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include <map>
@@ -16,7 +16,7 @@ class redis_client_cluster;
 class redis_request;
 
 /**
- * redis å®¢æˆ·ç«¯å‘½ä»¤ç±»çš„çº¯è™šçˆ¶ç±»;
+ * redis ¿Í»§¶ËÃüÁîÀàµÄ´¿Ğé¸¸Àà;
  * the redis command classes's base virtual class, which includes the basic
  * functions for all sub-classes
  */
@@ -24,30 +24,30 @@ class ACL_CPP_API redis_command : public noncopyable
 {
 public:
 	/**
-	 * ç¼ºçœçš„æ„é€ å‡½æ•°ï¼Œå¦‚æœä½¿ç”¨æ­¤æ„é€ å‡½æ•°åˆå§‹åŒ–ç±»å¯¹è±¡ï¼Œåˆ™å¿…é¡»è°ƒç”¨ set_client æˆ–
-	 * set_cluster è®¾ç½® redis å®¢æˆ·ç«¯å‘½ä»¤ç±»å¯¹è±¡çš„é€šè®¯æ–¹å¼ã€‚
+	 * È±Ê¡µÄ¹¹Ôìº¯Êı£¬Èç¹ûÊ¹ÓÃ´Ë¹¹Ôìº¯Êı³õÊ¼»¯Àà¶ÔÏó£¬Ôò±ØĞëµ÷ÓÃ set_client »ò
+	 * set_cluster ÉèÖÃ redis ¿Í»§¶ËÃüÁîÀà¶ÔÏóµÄÍ¨Ñ¶·½Ê½¡£
 	 * default constructor. You must set the communication method by
 	 * set_client or set_cluster functions.
 	 */
 	redis_command(void);
 
 	/**
-	 * å½“ä½¿ç”¨éé›†ç¾¤æ¨¡å¼æ—¶çš„æ„é€ å‡½æ•°ï¼Œå¯ä»¥ä½¿ç”¨æ­¤æ„é€ å‡½æ•°è®¾ç½® redis é€šä¿¡ç±»å¯¹è±¡ã€‚
+	 * µ±Ê¹ÓÃ·Ç¼¯ÈºÄ£Ê½Ê±µÄ¹¹Ôìº¯Êı£¬¿ÉÒÔÊ¹ÓÃ´Ë¹¹Ôìº¯ÊıÉèÖÃ redis Í¨ĞÅÀà¶ÔÏó¡£
 	 * Using this constructor to set the redis communication mode,
 	 * usually in no-cluster mode.
-	 * @param conn {redis_client*} redis é€šä¿¡ç±»å¯¹è±¡
+	 * @param conn {redis_client*} redis Í¨ĞÅÀà¶ÔÏó
 	 *  the redis communication in no-cluster mode
 	 */
 	redis_command(redis_client* conn);
 
 	/**
-	 * é›†ç¾¤æ¨¡å¼çš„æ„é€ å‡½æ•°ï¼Œåœ¨æ„é€ ç±»å¯¹è±¡æ—¶æŒ‡å®šäº†é›†ç¾¤æ¨¡å¼çš„ redis_client_cluster å¯¹è±¡ã€‚
+	 * ¼¯ÈºÄ£Ê½µÄ¹¹Ôìº¯Êı£¬ÔÚ¹¹ÔìÀà¶ÔÏóÊ±Ö¸¶¨ÁË¼¯ÈºÄ£Ê½µÄ redis_client_cluster ¶ÔÏó¡£
 	 * Using this constructor to set the redis_client_cluster, usually in
 	 * cluster mode.
-	 * @param cluster {redis_client_cluster*} redis é›†ç¾¤è¿æ¥å¯¹è±¡
+	 * @param cluster {redis_client_cluster*} redis ¼¯ÈºÁ¬½Ó¶ÔÏó
 	 *  redis cluster object in cluster mode
-	 * @param max_conns {size_t} ä¸é›†ç¾¤ä¸­æ‰€æœ‰ç»“ç‚¹ä¹‹é—´çš„æ¯ä¸ªè¿æ¥æ± çš„æœ€å¤§è¿æ¥æ•°ï¼Œ
-	 *  å¦‚æœè¯¥å€¼ä¸º 0ï¼Œåˆ™åœ¨é›†ç¾¤æ–¹å¼ä¸‹è¿æ¥æ± ä¸è®¾è¿æ¥æ•°ä¸Šé™
+	 * @param max_conns {size_t} Óë¼¯ÈºÖĞËùÓĞ½áµãÖ®¼äµÄÃ¿¸öÁ¬½Ó³ØµÄ×î´óÁ¬½ÓÊı£¬
+	 *  Èç¹û¸ÃÖµÎª 0£¬ÔòÔÚ¼¯Èº·½Ê½ÏÂÁ¬½Ó³Ø²»ÉèÁ¬½ÓÊıÉÏÏŞ
 	 *  the max of every connection pool with all the redis nodes,
 	 *  if be set 0, then there is no connections limit in
 	 *  connections pool.
@@ -57,21 +57,21 @@ public:
 	virtual ~redis_command(void);
 
 	/**
-	 * åœ¨è¿›è¡Œæ¯ä¸ªå‘½ä»¤å¤„ç†å‰ï¼Œæ˜¯å¦è¦æ±‚æ£€æŸ¥ socket å¥æŸ„ä¸åœ°å€çš„åŒ¹é…æƒ…å†µï¼Œå½“
-	 * æ‰“å¼€è¯¥é€‰é¡¹æ—¶ï¼Œå°†ä¼šä¸¥æ ¼æ£€æŸ¥åŒ¹é…æƒ…å†µï¼Œä½†ä¼šå½±å“ä¸€å®šæ€§èƒ½ï¼Œå› æ­¤è¯¥è®¾ç½®ä»…
-	 * ç”¨åœ¨ DEBUG æ—¶çš„è¿è¡Œåœºæ™¯
+	 * ÔÚ½øĞĞÃ¿¸öÃüÁî´¦ÀíÇ°£¬ÊÇ·ñÒªÇó¼ì²é socket ¾ä±úÓëµØÖ·µÄÆ¥ÅäÇé¿ö£¬µ±
+	 * ´ò¿ª¸ÃÑ¡ÏîÊ±£¬½«»áÑÏ¸ñ¼ì²éÆ¥ÅäÇé¿ö£¬µ«»áÓ°ÏìÒ»¶¨ĞÔÄÜ£¬Òò´Ë¸ÃÉèÖÃ½ö
+	 * ÓÃÔÚ DEBUG Ê±µÄÔËĞĞ³¡¾°
 	 * @param on {bool}
 	 */
 	void set_check_addr(bool on);
 
 	/**
-	 * åœ¨é‡å¤ä½¿ç”¨ä¸€ä¸ªç»§æ‰¿äº redis_command çš„å­ç±»æ“ä½œ redis æ—¶ï¼Œéœ€è¦åœ¨
-	 * ä¸‹ä¸€æ¬¡è°ƒç”¨å‰è°ƒç”¨æœ¬æ–¹æ³•ä»¥é‡Šæ”¾ä¸Šæ¬¡æ“ä½œçš„ä¸´æ—¶å¯¹è±¡;
+	 * ÔÚÖØ¸´Ê¹ÓÃÒ»¸ö¼Ì³ĞÓÚ redis_command µÄ×ÓÀà²Ù×÷ redis Ê±£¬ĞèÒªÔÚ
+	 * ÏÂÒ»´Îµ÷ÓÃÇ°µ÷ÓÃ±¾·½·¨ÒÔÊÍ·ÅÉÏ´Î²Ù×÷µÄÁÙÊ±¶ÔÏó;
 	 * when reusing a redis command sub-class, the reset method should be
 	 * called first to rlease some resources in last command operation
-	 * @param save_slot {bool} å½“é‡‡ç”¨é›†ç¾¤æ¨¡å¼æ—¶ï¼Œè¯¥å‚æ•°å†³å®šæ˜¯å¦éœ€è¦é‡æ–°
-	 *  è®¡ç®—å“ˆå¸Œæ§½å€¼ï¼Œå¦‚æœåå¤è°ƒç”¨ redis å‘½ä»¤è¿‡ç¨‹ä¸­çš„ key å€¼ä¸å˜ï¼Œåˆ™å¯ä»¥ä¿ç•™æ­¤
-	 *  å“ˆå¸Œæ§½å€¼ä»¥å‡å°‘å†…éƒ¨é‡æ–°è¿›è¡Œè®¡ç®—çš„æ¬¡æ•°;
+	 * @param save_slot {bool} µ±²ÉÓÃ¼¯ÈºÄ£Ê½Ê±£¬¸Ã²ÎÊı¾ö¶¨ÊÇ·ñĞèÒªÖØĞÂ
+	 *  ¼ÆËã¹şÏ£²ÛÖµ£¬Èç¹û·´¸´µ÷ÓÃ redis ÃüÁî¹ı³ÌÖĞµÄ key Öµ²»±ä£¬Ôò¿ÉÒÔ±£Áô´Ë
+	 *  ¹şÏ£²ÛÖµÒÔ¼õÉÙÄÚ²¿ÖØĞÂ½øĞĞ¼ÆËãµÄ´ÎÊı;
 	 *  when in cluster mode, if your operations is on the same key, you
 	 *  can set the param save_slot to false which can reduse the times
 	 *  of compute the same key's hash-slot.
@@ -82,19 +82,19 @@ public:
 	void reset(bool save_slot = false);
 
 	/**
-	 * åœ¨ä½¿ç”¨éé›†ç¾¤æ–¹å¼æ—¶ï¼Œé€šè¿‡æœ¬å‡½æ•°å°†ä»è¿æ¥æ± è·å¾—çš„è¿æ¥å¯¹è±¡;
+	 * ÔÚÊ¹ÓÃ·Ç¼¯Èº·½Ê½Ê±£¬Í¨¹ı±¾º¯Êı½«´ÓÁ¬½Ó³Ø»ñµÃµÄÁ¬½Ó¶ÔÏó;
 	 * when not using cluster mode, the function is used
 	 * to set the connection for next redis command operation.
-	 * @param conn {redis_client*} ä¸ redis å®¢æˆ·ç«¯å‘½ä»¤è¿›è¡Œå…³è”;
+	 * @param conn {redis_client*} Óë redis ¿Í»§¶ËÃüÁî½øĞĞ¹ØÁª;
 	 *  the redis connection to be set in next redis operation
 	 */
 	void set_client(redis_client* conn);
 
 	/**
-	 * è·å¾—å½“å‰ redis å®¢æˆ·ç«¯å‘½ä»¤çš„è¿æ¥å¯¹è±¡;
+	 * »ñµÃµ±Ç° redis ¿Í»§¶ËÃüÁîµÄÁ¬½Ó¶ÔÏó;
 	 * get redis connection set by set_client function
-	 * @return {redis_client*} è¿”å› NULL è¡¨ç¤ºæ²¡æœ‰è¿æ¥å¯¹è±¡ä¸å½“å‰çš„å‘½ä»¤å¯¹è±¡
-	 *  è¿›è¡Œç»‘å®š;
+	 * @return {redis_client*} ·µ»Ø NULL ±íÊ¾Ã»ÓĞÁ¬½Ó¶ÔÏóÓëµ±Ç°µÄÃüÁî¶ÔÏó
+	 *  ½øĞĞ°ó¶¨;
 	 *  the internal redis connection be returned, NULL if no redis
 	 *  connection be set 
 	 */
@@ -104,31 +104,31 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰ redis å‘½ä»¤å¯¹è±¡æ‰€ç»‘å®šçš„æœåŠ¡å™¨åœ°å€ï¼Œåªæœ‰å½“è¯¥å¯¹è±¡ä¸ redis_client
-	 * ç»‘å®šæ—¶ï¼ˆå³è°ƒç”¨ set_client) æ‰å¯ä»¥è°ƒç”¨æœ¬å‡½æ•°
+	 * »ñµÃµ±Ç° redis ÃüÁî¶ÔÏóËù°ó¶¨µÄ·şÎñÆ÷µØÖ·£¬Ö»ÓĞµ±¸Ã¶ÔÏóÓë redis_client
+	 * °ó¶¨Ê±£¨¼´µ÷ÓÃ set_client) ²Å¿ÉÒÔµ÷ÓÃ±¾º¯Êı
 	 * get the redis-server's addr used by the current command. this
 	 * method can only be used only if the redis_client was set by
 	 * set_client method.
-	 * @return {const char*} è¿”å›ç©ºä¸² "" è¡¨ç¤ºæ²¡æœ‰ç»‘å®š redis è¿æ¥å¯¹è±¡
+	 * @return {const char*} ·µ»Ø¿Õ´® "" ±íÊ¾Ã»ÓĞ°ó¶¨ redis Á¬½Ó¶ÔÏó
 	 *  if "" was resturned, the redis connection was not set
 	 */
 	const char* get_client_addr() const;
 
 	/**
-	 * è®¾ç½®è¿æ¥æ± é›†ç¾¤ç®¡ç†å™¨;
+	 * ÉèÖÃÁ¬½Ó³Ø¼¯Èº¹ÜÀíÆ÷;
 	 * set the redis cluster object in redis cluster mode
-	 * @param cluster {redis_client_cluster*} redis é›†ç¾¤è¿æ¥å¯¹è±¡;
+	 * @param cluster {redis_client_cluster*} redis ¼¯ÈºÁ¬½Ó¶ÔÏó;
 	 *  the redis_cluster connection object which can connect to any
 	 *  redis-server and support connection pool
-	 * @param max_conns {size_t} å½“å†…éƒ¨åŠ¨æ€åˆ›å»ºè¿æ¥æ± å¯¹è±¡æ—¶ï¼Œè¯¥å€¼æŒ‡å®šæ¯ä¸ªåŠ¨æ€åˆ›å»º
-	 *  çš„è¿æ¥æ± çš„æœ€å¤§è¿æ¥æ•°é‡;
+	 * @param max_conns {size_t} µ±ÄÚ²¿¶¯Ì¬´´½¨Á¬½Ó³Ø¶ÔÏóÊ±£¬¸ÃÖµÖ¸¶¨Ã¿¸ö¶¯Ì¬´´½¨
+	 *  µÄÁ¬½Ó³ØµÄ×î´óÁ¬½ÓÊıÁ¿;
 	 *  when dynamicly creating connection pool to any redis-server, use
 	 *  this param to limit the max number for each connection pool
 	 */
 	void set_cluster(redis_client_cluster* cluster, size_t max_conns);
 
 	/**
-	 * è·å¾—æ‰€è®¾ç½®çš„è¿æ¥æ± é›†ç¾¤ç®¡ç†å™¨;
+	 * »ñµÃËùÉèÖÃµÄÁ¬½Ó³Ø¼¯Èº¹ÜÀíÆ÷;
 	 * get redis_cluster object set by set_cluster function
 	 * @return {redis_client_cluster*}
 	 */
@@ -138,7 +138,7 @@ public:
 	}
 
 	/**
-	 * è·å¾—å†…å­˜æ± å¥æŸ„ï¼Œè¯¥å†…å­˜æ± ç”± redis_command å†…éƒ¨äº§ç”Ÿ;
+	 * »ñµÃÄÚ´æ³Ø¾ä±ú£¬¸ÃÄÚ´æ³ØÓÉ redis_command ÄÚ²¿²úÉú;
 	 * get memory pool handle be set
 	 * @return {dbuf_pool*}
 	 */
@@ -148,41 +148,41 @@ public:
 	}
 
 	/**
-	 * è·å¾—å½“å‰ç»“æœç»“ç‚¹çš„æ•°æ®ç±»å‹;
+	 * »ñµÃµ±Ç°½á¹û½áµãµÄÊı¾İÀàĞÍ;
 	 * get the result type returned from redis-server
 	 * @return {redis_result_t}
 	 */
 	redis_result_t result_type() const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_STATUS ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›çŠ¶æ€ä¿¡æ¯;
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_STATUS ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø×´Ì¬ĞÅÏ¢;
 	 * when result type is REDIS_RESULT_STATUS, the status info can be
 	 * get by this function
-	 * @return {const char*} è¿”å› "" è¡¨ç¤ºå‡ºé”™;
+	 * @return {const char*} ·µ»Ø "" ±íÊ¾³ö´í;
 	 *  "" will be returned on error
 	 */
 	const char* result_status() const;
 
 	/**
-	 * å½“å‡ºé”™æ—¶è¿”å›å€¼ä¸º REDIS_RESULT_ERROR ç±»å‹ï¼Œæœ¬æ–¹æ³•è¿”å›å‡ºé”™ä¿¡æ¯;
+	 * µ±³ö´íÊ±·µ»ØÖµÎª REDIS_RESULT_ERROR ÀàĞÍ£¬±¾·½·¨·µ»Ø³ö´íĞÅÏ¢;
 	 * when result type is REDIS_RESULT_ERROR, the error info can be
 	 * get by this function
-	 * @return {const char*} è¿”å›ç©ºä¸² "" è¡¨ç¤ºæ²¡æœ‰å‡ºé”™ä¿¡æ¯;
+	 * @return {const char*} ·µ»Ø¿Õ´® "" ±íÊ¾Ã»ÓĞ³ö´íĞÅÏ¢;
 	 *  "" will be returned when no error info
 	 */
 	const char* result_error() const;
 
 	/**
-	 * è·å¾—å½“å‰ç»“æœç»“ç‚¹å­˜å‚¨çš„å¯¹è±¡çš„ä¸ªæ•°, è¯¥æ–¹æ³•å¯ä»¥è·å¾—ç»“æœä¸ºä¸‹é¢ä¸¤ä¸ªæ–¹æ³•
-	 * (result_child/result_value) æ‰€éœ€è¦çš„æ•°ç»„å…ƒç´ çš„ä¸ªæ•°;
+	 * »ñµÃµ±Ç°½á¹û½áµã´æ´¢µÄ¶ÔÏóµÄ¸öÊı, ¸Ã·½·¨¿ÉÒÔ»ñµÃ½á¹ûÎªÏÂÃæÁ½¸ö·½·¨
+	 * (result_child/result_value) ËùĞèÒªµÄÊı×éÔªËØµÄ¸öÊı;
 	 * get number of result objects, just for functions
 	 * result_child/result_value 
-	 * @return {size_t} è¿”å›å€¼ä¸å­˜å‚¨ç±»å‹çš„å¯¹åº”å…³ç³»å¦‚ä¸‹ï¼š
+	 * @return {size_t} ·µ»ØÖµÓë´æ´¢ÀàĞÍµÄ¶ÔÓ¦¹ØÏµÈçÏÂ£º
 	 *  the relation between return value and result type, as below:
 	 *  REDIS_RESULT_ERROR: 1
 	 *  REDIS_RESULT_STATUS: 1
 	 *  REDIS_RESULT_INTEGER: 1
-	 *  REDIS_RESULT_STRING: > 0 æ—¶è¡¨ç¤ºè¯¥å­—ç¬¦ä¸²æ•°æ®è¢«åˆ‡åˆ†æˆéè¿æ¥å†…å­˜å—çš„ä¸ªæ•°;
+	 *  REDIS_RESULT_STRING: > 0 Ê±±íÊ¾¸Ã×Ö·û´®Êı¾İ±»ÇĞ·Ö³É·ÇÁ¬½ÓÄÚ´æ¿éµÄ¸öÊı;
 	 *       when the result type is REDIS_RESULT_STRING and the the
 	 *       string is too large, the string was be cut into many small
 	 *       chunks, the returned value is the chunks number
@@ -191,9 +191,9 @@ public:
 	size_t result_size() const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_INTEGER ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›å¯¹åº”çš„ 32 ä½æ•´æ•°å€¼;
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_INTEGER ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø¶ÔÓ¦µÄ 32 Î»ÕûÊıÖµ;
 	 * get 32-bits number value if result type is REDIS_RESULT_INTERGER
-	 * @param success {bool*} æœ¬æŒ‡é’ˆé NULL æ—¶è®°å½•æ“ä½œè¿‡ç¨‹æ˜¯å¦æˆåŠŸ;
+	 * @param success {bool*} ±¾Ö¸Õë·Ç NULL Ê±¼ÇÂ¼²Ù×÷¹ı³ÌÊÇ·ñ³É¹¦;
 	 *  if the param pointer is not NULL, which will save status of
 	 *  success or not for result from redis-server
 	 * @return {int}
@@ -201,9 +201,9 @@ public:
 	int result_number(bool* success = NULL) const;
 
 	/**
-	 * å½“è¿”å›å€¼ä¸º REDIS_RESULT_INTEGER ç±»å‹æ—¶ï¼Œæœ¬æ–¹æ³•è¿”å›å¯¹åº”çš„ 64 ä½æ•´æ•°å€¼;
+	 * µ±·µ»ØÖµÎª REDIS_RESULT_INTEGER ÀàĞÍÊ±£¬±¾·½·¨·µ»Ø¶ÔÓ¦µÄ 64 Î»ÕûÊıÖµ;
 	 * get 64-bits number value if result type is REDIS_RESULT_INTERGER
-	 * @param success {bool*} æœ¬æŒ‡é’ˆé NULL æ—¶è®°å½•æ“ä½œè¿‡ç¨‹æ˜¯å¦æˆåŠŸ;
+	 * @param success {bool*} ±¾Ö¸Õë·Ç NULL Ê±¼ÇÂ¼²Ù×÷¹ı³ÌÊÇ·ñ³É¹¦;
 	 *  if the param pointer is not NULL, which will save status of
 	 *  success or not for result from redis-server
 	 * @return {long long int}
@@ -211,20 +211,20 @@ public:
 	long long int result_number64(bool* success = NULL) const;
 
 	/**
-	 * è¿”å›å¯¹åº”ä¸‹æ ‡çš„æ•°æ®(å½“æ•°æ®ç±»å‹é REDIS_RESULT_ARRAY æ—¶ï¼‰;
+	 * ·µ»Ø¶ÔÓ¦ÏÂ±êµÄÊı¾İ(µ±Êı¾İÀàĞÍ·Ç REDIS_RESULT_ARRAY Ê±£©;
 	 * get string result when result type isn't REDIS_RESULT_ARRAY
-	 * @param i {size_t} æ•°ç»„ä¸‹æ ‡;
+	 * @param i {size_t} Êı×éÏÂ±ê;
 	 *  the array index
-	 * @param len {size_t*} å½“ä¸ºé NULL æŒ‡é’ˆæ—¶å­˜å‚¨æ‰€è¿”å›æ•°æ®çš„é•¿åº¦;
+	 * @param len {size_t*} µ±Îª·Ç NULL Ö¸ÕëÊ±´æ´¢Ëù·µ»ØÊı¾İµÄ³¤¶È;
 	 *  *len will save the result's length if len is not NULL
-	 * @return {const char*} è¿”å› NULL è¡¨ç¤ºä¸‹æ ‡è¶Šç•Œ;
+	 * @return {const char*} ·µ»Ø NULL ±íÊ¾ÏÂ±êÔ½½ç;
 	 *  NULL will return if i beyonds the array's size
 	 */
 	const char* get_result(size_t i, size_t* len = NULL) const;
 
 	/**
-	 * åˆ¤æ–­å½“å‰æ‰€ç»‘å®šçš„ redis è¿æ¥æµå¯¹è±¡(redis_client) è¿æ¥æ˜¯å¦å·²ç»å…³é—­ï¼›
-	 * åªæœ‰å†…éƒ¨çš„ conn_ æµå¯¹è±¡éç©ºæ—¶è°ƒç”¨æ­¤å‡½æ•°æ‰æœ‰æ„ä¹‰;
+	 * ÅĞ¶Ïµ±Ç°Ëù°ó¶¨µÄ redis Á¬½ÓÁ÷¶ÔÏó(redis_client) Á¬½ÓÊÇ·ñÒÑ¾­¹Ø±Õ£»
+	 * Ö»ÓĞÄÚ²¿µÄ conn_ Á÷¶ÔÏó·Ç¿ÕÊ±µ÷ÓÃ´Ëº¯Êı²ÅÓĞÒâÒå;
 	 * to judge if the redis connection was be closed, only redis_client
 	 * object be set internal
 	 * @return {bool}
@@ -232,39 +232,39 @@ public:
 	bool eof() const;
 
 	/**
-	 * è·å¾—æœ¬æ¬¡ redis æ“ä½œè¿‡ç¨‹çš„ç»“æœ;
+	 * »ñµÃ±¾´Î redis ²Ù×÷¹ı³ÌµÄ½á¹û;
 	 * get result object of last redis operation
 	 * @return {redis_result*}
 	 */
 	const redis_result* get_result() const;
 
 	/**
-	 * å½“æŸ¥è¯¢ç»“æœä¸ºæ•°ç»„å¯¹è±¡æ—¶è°ƒç”¨æœ¬æ–¹æ³•è·å¾—ä¸€ä¸ªæ•°ç»„å…ƒç´ å¯¹è±¡;
+	 * µ±²éÑ¯½á¹ûÎªÊı×é¶ÔÏóÊ±µ÷ÓÃ±¾·½·¨»ñµÃÒ»¸öÊı×éÔªËØ¶ÔÏó;
 	 * get one result ojbect of array if result type is REDIS_RESULT_ARRAY
-	 * @param i {size_t} æ•°ç»„å¯¹è±¡çš„ä¸‹æ ‡å€¼;
+	 * @param i {size_t} Êı×é¶ÔÏóµÄÏÂ±êÖµ;
 	 *  the result array's index
-	 * @return {const redis_result*} å½“ç»“æœéæ•°ç»„å¯¹è±¡æˆ–ç»“æœä¸ºç©ºæˆ–å‡ºé”™æ—¶
-	 *  è¯¥æ–¹æ³•è¿”å› NULL;
+	 * @return {const redis_result*} µ±½á¹û·ÇÊı×é¶ÔÏó»ò½á¹ûÎª¿Õ»ò³ö´íÊ±
+	 *  ¸Ã·½·¨·µ»Ø NULL;
 	 *  NULL will be resturned when result is not REDIS_RESULT_ARRAY or
 	 *  array empty or error
 	 */
 	const redis_result* result_child(size_t i) const;
 
 	/**
-	 * å½“ä» redis-server è·å¾—çš„æ•°æ®æ˜¯ä¸€ç»„å­—ç¬¦ä¸²ç±»å‹çš„ç»“æœé›†æ—¶ï¼Œå¯ä»¥è°ƒç”¨
-	 * æœ¬å‡½æ•°è·å¾—æŸä¸ªæŒ‡å®šä¸‹æ ‡ä½ç½®çš„æ•°æ®;
+	 * µ±´Ó redis-server »ñµÃµÄÊı¾İÊÇÒ»×é×Ö·û´®ÀàĞÍµÄ½á¹û¼¯Ê±£¬¿ÉÒÔµ÷ÓÃ
+	 * ±¾º¯Êı»ñµÃÄ³¸öÖ¸¶¨ÏÂ±êÎ»ÖÃµÄÊı¾İ;
 	 * when the reply from redis-serveer are strings array, this
 	 * function can be used to get the string specified by a subscript
-	 * @param i {size_t} ä¸‹æ ‡ï¼ˆä» 0 å¼€å§‹ï¼‰
+	 * @param i {size_t} ÏÂ±ê£¨´Ó 0 ¿ªÊ¼£©
 	 *  the subscript of strings array
-	 * @param len {size_t*} è‹¥è¯¥æŒ‡é’ˆéç©ºï¼Œåˆ™å­˜å‚¨æ‰€è¿”å›ç»“æœçš„é•¿åº¦ï¼ˆä»…å½“è¯¥
-	 *  æ–¹æ³•è¿”å›éç©ºæŒ‡é’ˆæ—¶æœ‰æ•ˆï¼‰
+	 * @param len {size_t*} Èô¸ÃÖ¸Õë·Ç¿Õ£¬Ôò´æ´¢Ëù·µ»Ø½á¹ûµÄ³¤¶È£¨½öµ±¸Ã
+	 *  ·½·¨·µ»Ø·Ç¿ÕÖ¸ÕëÊ±ÓĞĞ§£©
 	 *  if len not a NULL pointer, it will store the length of string
 	 *  specified by the subscript
-	 * @return {const char*} è¿”å›å¯¹åº”ä¸‹æ ‡çš„å€¼ï¼Œå½“è¿”å› NULL æ—¶è¡¨ç¤ºè¯¥ä¸‹æ ‡æ²¡
-	 *  æœ‰å€¼ï¼Œä¸ºäº†ä¿è¯ä½¿ç”¨ä¸Šçš„å®‰å…¨æ€§ï¼Œè¿”å›çš„æ•°æ®æ€»èƒ½ä¿è¯æœ€åæ˜¯ä»¥ \0 ç»“å°¾ï¼Œ
-	 *  åœ¨è®¡ç®—æ•°æ®é•¿åº¦æ—¶ä¸åŒ…å«è¯¥ç»“å°¾ç¬¦ï¼Œä½†ä¸ºäº†å…¼å®¹äºŒè¿›åˆ¶æƒ…å½¢ï¼Œè°ƒç”¨è€…è¿˜æ˜¯
-	 *  åº”è¯¥é€šè¿‡è¿”å›çš„ len å­˜æ”¾çš„é•¿åº¦å€¼æ¥è·å¾—æ•°æ®çš„çœŸå®é•¿åº¦
+	 * @return {const char*} ·µ»Ø¶ÔÓ¦ÏÂ±êµÄÖµ£¬µ±·µ»Ø NULL Ê±±íÊ¾¸ÃÏÂ±êÃ»
+	 *  ÓĞÖµ£¬ÎªÁË±£Ö¤Ê¹ÓÃÉÏµÄ°²È«ĞÔ£¬·µ»ØµÄÊı¾İ×ÜÄÜ±£Ö¤×îºóÊÇÒÔ \0 ½áÎ²£¬
+	 *  ÔÚ¼ÆËãÊı¾İ³¤¶ÈÊ±²»°üº¬¸Ã½áÎ²·û£¬µ«ÎªÁË¼æÈİ¶ş½øÖÆÇéĞÎ£¬µ÷ÓÃÕß»¹ÊÇ
+	 *  Ó¦¸ÃÍ¨¹ı·µ»ØµÄ len ´æ·ÅµÄ³¤¶ÈÖµÀ´»ñµÃÊı¾İµÄÕæÊµ³¤¶È
 	 *  the string will be returned associate with the subscript, if there
 	 *  are nothing with the subscript, NULL will be returned
 	 */
@@ -272,22 +272,22 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 	/**
-	 * è®¾ç½®æ˜¯å¦å¯¹è¯·æ±‚æ•°æ®è¿›è¡Œåˆ†ç‰‡å¤„ç†ï¼Œå¦‚æœä¸º true åˆ™å†…éƒ¨åœ¨ç»„è£…è¯·æ±‚åè®®çš„æ—¶å€™ä¸ä¼š
-	 * å°†æ‰€æœ‰æ•°æ®å—é‡æ–°ç»„è£…æˆä¸€ä¸ªè¿ç»­çš„å¤§æ•°æ®å—
+	 * ÉèÖÃÊÇ·ñ¶ÔÇëÇóÊı¾İ½øĞĞ·ÖÆ¬´¦Àí£¬Èç¹ûÎª true ÔòÄÚ²¿ÔÚ×é×°ÇëÇóĞ­ÒéµÄÊ±ºò²»»á
+	 * ½«ËùÓĞÊı¾İ¿éÖØĞÂ×é×°³ÉÒ»¸öÁ¬ĞøµÄ´óÊı¾İ¿é
 	 * just for request package, setting flag for sending data with
 	 * multi data chunks; this is useful when the request data is large
-	 * @param on {bool} å†…éƒ¨é»˜è®¤å€¼ä¸º false
+	 * @param on {bool} ÄÚ²¿Ä¬ÈÏÖµÎª false
 	 *  if true the request data will not be combined one package,
 	 *  internal default is false
 	 */
 	void set_slice_request(bool on);
 
 	/**
-	 * è®¾ç½®æ˜¯å¦å¯¹å“åº”æ•°æ®è¿›è¡Œåˆ†ç‰‡å¤„ç†ï¼Œå¦‚æœä¸º true åˆ™å½“æœåŠ¡å™¨çš„è¿”å›æ•°æ®æ¯”è¾ƒå¤§æ—¶åˆ™
-	 * å°†æ•°æ®è¿›è¡Œåˆ†ç‰‡ï¼Œåˆ†æˆä¸€äº›ä¸è¿ç»­çš„æ•°æ®å—
+	 * ÉèÖÃÊÇ·ñ¶ÔÏìÓ¦Êı¾İ½øĞĞ·ÖÆ¬´¦Àí£¬Èç¹ûÎª true Ôòµ±·şÎñÆ÷µÄ·µ»ØÊı¾İ±È½Ï´óÊ±Ôò
+	 * ½«Êı¾İ½øĞĞ·ÖÆ¬£¬·Ö³ÉÒ»Ğ©²»Á¬ĞøµÄÊı¾İ¿é
 	 * just for response package, settint flag for receiving data
 	 * if split the large response data into multi little chunks
-	 * @param on {bool} å†…éƒ¨é»˜è®¤å€¼ä¸º false
+	 * @param on {bool} ÄÚ²¿Ä¬ÈÏÖµÎª false
 	 *  if true the response data will be splitted into multi little
 	 *  data, which is useful for large reponse data for avoiding
 	 *  malloc large continuously memory from system.
@@ -297,21 +297,21 @@ public:
 
 public:
 	/**
-	 * ç›´æ¥ç»„åˆ redis åè®®å‘½ä»¤æ–¹å¼ï¼Œä» redis æœåŠ¡å™¨è·å¾—ç»“æœ
-	 * @param argc {size_t} åé¢æ•°ç»„ä¸­æ•°ç»„å…ƒç´ ä¸ªæ•°
-	 * @param argv {const char*[]} redis å‘½ä»¤ç»„æˆçš„æ•°ç»„
-	 * @param lens {size_t[]} argv ä¸­æ•°ç»„å…ƒç´ çš„é•¿åº¦
-	 * @param nchild {size_t} æœ‰çš„ redis å‘½ä»¤éœ€è¦è·å–å¤šä¸ªç»“æœé›†ï¼Œå¦‚ï¼šsubop
-	 * @return {const redis_result*} è¿”å›çš„ç»“æœé›†
+	 * Ö±½Ó×éºÏ redis Ğ­ÒéÃüÁî·½Ê½£¬´Ó redis ·şÎñÆ÷»ñµÃ½á¹û
+	 * @param argc {size_t} ºóÃæÊı×éÖĞÊı×éÔªËØ¸öÊı
+	 * @param argv {const char*[]} redis ÃüÁî×é³ÉµÄÊı×é
+	 * @param lens {size_t[]} argv ÖĞÊı×éÔªËØµÄ³¤¶È
+	 * @param nchild {size_t} ÓĞµÄ redis ÃüÁîĞèÒª»ñÈ¡¶à¸ö½á¹û¼¯£¬Èç£ºsubop
+	 * @return {const redis_result*} ·µ»ØµÄ½á¹û¼¯
 	 */
 	const redis_result* request(size_t argc, const char* argv[],
 		size_t lens[], size_t nchild = 0);
 
 	/**
-	 * ç›´æ¥ç»„åˆ redis åè®®å‘½ä»¤æ–¹å¼ï¼Œä» redis æœåŠ¡å™¨è·å¾—ç»“æœ
-	 * @param args {const std::vector<string>&} redis å‘½ä»¤ç»„æˆçš„æ•°ç»„
-	 * @param nchild {size_t} æœ‰çš„ redis å‘½ä»¤éœ€è¦è·å–å¤šä¸ªç»“æœé›†ï¼Œå¦‚ï¼šsubop
-	 * @return {const redis_result*} è¿”å›çš„ç»“æœé›†
+	 * Ö±½Ó×éºÏ redis Ğ­ÒéÃüÁî·½Ê½£¬´Ó redis ·şÎñÆ÷»ñµÃ½á¹û
+	 * @param args {const std::vector<string>&} redis ÃüÁî×é³ÉµÄÊı×é
+	 * @param nchild {size_t} ÓĞµÄ redis ÃüÁîĞèÒª»ñÈ¡¶à¸ö½á¹û¼¯£¬Èç£ºsubop
+	 * @return {const redis_result*} ·µ»ØµÄ½á¹û¼¯
 	 */
 	const redis_result* request(const std::vector<string>& args,
 		size_t nchind = 0);
@@ -399,7 +399,7 @@ protected:
 protected:
 	dbuf_pool* dbuf_;
 
-	// æ ¹æ®é”®å€¼è®¡ç®—å“ˆå¸Œæ§½å€¼
+	// ¸ù¾İ¼üÖµ¼ÆËã¹şÏ£²ÛÖµ
 	void hash_slot(const char* key);
 	void hash_slot(const char* key, size_t len);
 

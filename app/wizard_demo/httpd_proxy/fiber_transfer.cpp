@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "fiber_transfer.h"
 
 fiber_transfer::fiber_transfer(acl::socket_stream& in, acl::socket_stream& out)

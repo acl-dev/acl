@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include <set>
 #include "acl_cpp/stream/aio_handle.hpp"
 
@@ -9,7 +9,7 @@ public:
 	~CAioTimer();
 
 protected:
-	// åŸºç±»çº¯è™šå‡½æ•°
+	// »ùÀà´¿Ðéº¯Êý
 	virtual void timer_callback(unsigned int id);
 	virtual void destroy(void);
 private:

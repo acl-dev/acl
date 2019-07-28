@@ -1,9 +1,9 @@
-ï»¿#pragma once
+#pragma once
 
 class StatusConnection;
 
 /**
- * æœåŠ¡ç«¯è¿æ¥ IO å¤„ç†çš„å›è°ƒå¤„ç†ç±»
+ * ·şÎñ¶ËÁ¬½Ó IO ´¦ÀíµÄ»Øµ÷´¦ÀíÀà
  */
 class StatusIOCallback : public acl::aio_callback
 {
@@ -11,7 +11,7 @@ public:
 	StatusIOCallback(StatusConnection* conn);
 
 protected:
-	// åŸºç±» aio_callback è™šå‡½æ•°
+	// »ùÀà aio_callback Ğéº¯Êı
 
 	bool read_wakeup();
 	void close_callback();

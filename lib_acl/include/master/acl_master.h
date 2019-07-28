@@ -1,4 +1,4 @@
-﻿#ifndef	ACL_MYMASTER_INCLUDE_H
+#ifndef	ACL_MYMASTER_INCLUDE_H
 #define	ACL_MYMASTER_INCLUDE_H
 
 #ifdef	__cplusplus

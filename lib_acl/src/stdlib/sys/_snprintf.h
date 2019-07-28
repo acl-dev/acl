@@ -1,4 +1,4 @@
-﻿#ifndef	__SNPRINTF_SAFE_INCLUDE_H__
+#ifndef	__SNPRINTF_SAFE_INCLUDE_H__
 #define	__SNPRINTF_SAFE_INCLUDE_H__
 
 #include <stdarg.h>

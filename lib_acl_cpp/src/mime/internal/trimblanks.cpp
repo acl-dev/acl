@@ -1,4 +1,4 @@
-﻿/*++
+/*++
  * NAME
  *	trimblanks 3
  * SUMMARY

@@ -1,4 +1,4 @@
-ï»¿// master_threads.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// master_threads.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -59,7 +59,7 @@ public:
 	}
 
 protected:
-	// åŸºç±»è™šå‡½æ•°
+	// »ùÀàĞéº¯Êı
 	virtual void timer_callback(unsigned int id)
 	{
 		format("timer callback, id: %u\r\n", id);
@@ -105,8 +105,8 @@ public:
 	}
 
 protected:
-	// åŸºç±»çº¯è™šå‡½æ•°ï¼šå½“å®¢æˆ·ç«¯è¿æ¥æœ‰æ•°æ®å¯è¯»æˆ–å…³é—­æ—¶å›è°ƒæ­¤å‡½æ•°ï¼Œè¿”å› true è¡¨ç¤º
-	// ç»§ç»­ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å®¢æˆ·ç«¯è¿æ¥
+	// »ùÀà´¿Ğéº¯Êı£ºµ±¿Í»§¶ËÁ¬½ÓÓĞÊı¾İ¿É¶Á»ò¹Ø±ÕÊ±»Øµ÷´Ëº¯Êı£¬·µ»Ø true ±íÊ¾
+	// ¼ÌĞøÓë¿Í»§¶Ë±£³Ö³¤Á¬½Ó£¬·ñÔò±íÊ¾ĞèÒª¹Ø±Õ¿Í»§¶ËÁ¬½Ó
 	virtual bool thread_on_read(acl::socket_stream* stream)
 	{
 		while (true)
@@ -151,7 +151,7 @@ protected:
 			max += 2;
 			timer->set_max(max);
 
-			// è°ƒç”¨åŸºç±»æ–¹æ³•è®¾ç½®å®šæ—¶å™¨ä»»åŠ¡
+			// µ÷ÓÃ»ùÀà·½·¨ÉèÖÃ¶¨Ê±Æ÷ÈÎÎñ
 			proc_set_timer(timer);
 			stream->format("set timer ok\r\n");
 			return true;
@@ -179,9 +179,9 @@ protected:
 		return true;
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šå½“æ¥æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯è¯·æ±‚æ—¶ï¼Œè°ƒç”¨æ­¤å‡½æ•°ï¼Œå…è®¸
-	// å­ç±»äº‹å…ˆå¯¹å®¢æˆ·ç«¯è¿æ¥è¿›è¡Œå¤„ç†ï¼Œè¿”å› true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™
-	// è¦æ±‚å…³é—­è¯¥å®¢æˆ·ç«¯è¿æ¥
+	// »ùÀàĞéº¯Êı£ºµ±½ÓÊÕµ½Ò»¸ö¿Í»§¶ËÇëÇóÊ±£¬µ÷ÓÃ´Ëº¯Êı£¬ÔÊĞí
+	// ×ÓÀàÊÂÏÈ¶Ô¿Í»§¶ËÁ¬½Ó½øĞĞ´¦Àí£¬·µ»Ø true ±íÊ¾¼ÌĞø£¬·ñÔò
+	// ÒªÇó¹Ø±Õ¸Ã¿Í»§¶ËÁ¬½Ó
 	virtual bool thread_on_accept(acl::socket_stream* stream)
 	{
 		stream->set_rw_timeout(2);
@@ -192,13 +192,13 @@ protected:
 		return true;
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šå½“å®¢æˆ·ç«¯è¿æ¥å…³é—­æ—¶è°ƒç”¨æ­¤å‡½æ•°
+	// »ùÀàĞéº¯Êı£ºµ±¿Í»§¶ËÁ¬½Ó¹Ø±ÕÊ±µ÷ÓÃ´Ëº¯Êı
 	virtual void thread_on_close(acl::socket_stream*)
 	{
 		format("client closed now\r\n");
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šå½“çº¿ç¨‹æ± åˆ›å»ºä¸€ä¸ªæ–°çº¿ç¨‹æ—¶è°ƒç”¨æ­¤å‡½æ•°
+	// »ùÀàĞéº¯Êı£ºµ±Ïß³Ì³Ø´´½¨Ò»¸öĞÂÏß³ÌÊ±µ÷ÓÃ´Ëº¯Êı
 	virtual void thread_on_init()
 	{
 #ifdef WIN32
@@ -208,7 +208,7 @@ protected:
 #endif
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šå½“çº¿ç¨‹æ± ä¸­çš„ä¸€ä¸ªçº¿ç¨‹é€€å‡ºæ—¶è°ƒç”¨æ­¤å‡½æ•°
+	// »ùÀàĞéº¯Êı£ºµ±Ïß³Ì³ØÖĞµÄÒ»¸öÏß³ÌÍË³öÊ±µ÷ÓÃ´Ëº¯Êı
 	virtual void thread_on_exit()
 	{
 #ifdef WIN32
@@ -218,19 +218,19 @@ protected:
 #endif
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½å‰è°ƒç”¨æ­¤å‡½æ•°
+	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İÇ°µ÷ÓÃ´Ëº¯Êı
 	virtual void proc_pre_jail()
 	{
 		format("proc_pre_jail\r\n");
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨æ­¤å‡½æ•°
+	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃ´Ëº¯Êı
 	virtual void proc_on_init()
 	{
 		format("proc init\r\n");
 	}
 
-	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨æ­¤å‡½æ•°
+	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÍË³öÇ°µ÷ÓÃ´Ëº¯Êı
 	virtual void proc_on_exit()
 	{
 		format("proc exit\r\n");
@@ -249,13 +249,13 @@ int main(int argc, char* argv[])
 
 	master_threads_test mt;
 
-	// è®¾ç½®é…ç½®å‚æ•°è¡¨
+	// ÉèÖÃÅäÖÃ²ÎÊı±í
 	mt.set_cfg_int(var_conf_int_tab);
 	mt.set_cfg_int64(NULL);
 	mt.set_cfg_str(var_conf_str_tab);
 	mt.set_cfg_bool(var_conf_bool_tab);
 
-	// å¼€å§‹è¿è¡Œ
+	// ¿ªÊ¼ÔËĞĞ
 
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
 	{
@@ -264,7 +264,7 @@ int main(int argc, char* argv[])
 		format("listen: 127.0.0.1:8888\r\n");
 		acl::log::stdout_open(true);
 
-		// å•ç‹¬è¿è¡Œæ–¹å¼
+		// µ¥¶ÀÔËĞĞ·½Ê½
 		if (argc >= 3)
 			mt.run_alone("127.0.0.1:8888", argv[2],
 				task_count, threads_count);
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
 				task_count, threads_count);
 	}
 
-	// acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
+	// acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
 	else
 	{
 #ifdef	WIN32
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 		format = (void (*)(const char*, ...)) printf;
 		format("listen: 127.0.0.1:8888\r\n");
 
-		// å•ç‹¬è¿è¡Œæ–¹å¼
+		// µ¥¶ÀÔËĞĞ·½Ê½
 		mt.run_alone("127.0.0.1:8888", NULL,
 			task_count, threads_count);
 #else

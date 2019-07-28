@@ -1,4 +1,4 @@
-ï»¿// md5.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
+// md5.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
 //
 
 #include "stdafx.h"
@@ -15,11 +15,11 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 
 	acl::smtp_client conn(addr, 60, 60);
 
-	// è®¾ç½®æ˜¯å¦é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
+	// ÉèÖÃÊÇ·ñ²ÉÓÃ SSL Í¨ĞÅ·½Ê½
 	if (use_ssl)
 		conn.set_ssl(&ssl_conf);
 
-	// å‘é€ä¿¡å°
+	// ·¢ËÍĞÅ·â
 	if (conn.send_envelope(message) == false)
 	{
 		printf("send envelope error: %d, %s\r\n",
@@ -27,20 +27,20 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 		return false;
 	}
 
-	// å¼€å§‹å‘é€é‚®ä»¶ä½“æ•°æ®
+	// ¿ªÊ¼·¢ËÍÓÊ¼şÌåÊı¾İ
 	if (conn.data_begin() == false)
 	{
 		printf("send data begin error: %d, %s\r\n",
 			conn.get_code(), conn.get_status());
 	}
 
-	const char* data = "From: \"éƒ‘æ ‘æ–°1\" <zsxxsz@263.net>\r\n"
-		"To: \"éƒ‘æ ‘æ–°2\" <zsxxsz@263.net>\r\n"
-		"Subject: æ‚¨å¥½ï¼Œhello, world!\r\n"
+	const char* data = "From: \"Ö£Ê÷ĞÂ1\" <zsxxsz@263.net>\r\n"
+		"To: \"Ö£Ê÷ĞÂ2\" <zsxxsz@263.net>\r\n"
+		"Subject: ÄúºÃ£¬hello, world!\r\n"
 		"\r\n"
 		"hello world!\r\n";
 
-	// å‘é€é‚®ä»¶ä½“æ•°æ®
+	// ·¢ËÍÓÊ¼şÌåÊı¾İ
 	if (conn.write(data, strlen(data)) == false)
 	{
 		printf("send data error: %d, %s\r\n",
@@ -48,7 +48,7 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 		return false;
 	}
 
-	// å‘é€å®Œæ¯•
+	// ·¢ËÍÍê±Ï
 	if (conn.data_end() == false)
 	{
 		printf("send data end error: %d, %s\r\n",
@@ -60,7 +60,7 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 		sender, recipients, conn.get_code(),
 		conn.get_status());
 
-	// å‘é€ QUIT å‘½ä»¤
+	// ·¢ËÍ QUIT ÃüÁî
 	if (conn.quit() == false)
 	{
 		printf("send quit error: %d, %s\r\n",
@@ -81,7 +81,7 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 
 	acl::smtp_client conn(addr, 60, 60);
 
-	// è®¾ç½®æ˜¯å¦é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
+	// ÉèÖÃÊÇ·ñ²ÉÓÃ SSL Í¨ĞÅ·½Ê½
 	if (use_ssl)
 		conn.set_ssl(&ssl_conf);
 

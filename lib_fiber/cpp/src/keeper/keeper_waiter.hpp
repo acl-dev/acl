@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <map>
 #include "fiber/fiber.hpp"
 #include "fiber/fiber_tbox.hpp"

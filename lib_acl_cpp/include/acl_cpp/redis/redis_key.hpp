@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stdlib/string.hpp"
@@ -11,7 +11,7 @@ namespace acl {
 class redis_client;
 class redis_client_cluster;
 
-// redis æœåŠ¡æ”¯æŒçš„æ•°æ®ç±»å‹åˆ†ç±»
+// redis ·şÎñÖ§³ÖµÄÊı¾İÀàĞÍ·ÖÀà
 // the data type supported by redis
 typedef enum
 {
@@ -44,14 +44,14 @@ public:
 	virtual ~redis_key(void);
 
 	/**
-	 * åˆ é™¤ä¸€ä¸ªæˆ–ä¸€ç»„ KEYï¼Œå¯¹äºå˜å‚çš„æ¥å£ï¼Œåˆ™è¦æ±‚æœ€åä¸€ä¸ªå‚æ•°å¿…é¡»ä»¥ NULL ç»“æŸ
+	 * É¾³ıÒ»¸ö»òÒ»×é KEY£¬¶ÔÓÚ±ä²ÎµÄ½Ó¿Ú£¬ÔòÒªÇó×îºóÒ»¸ö²ÎÊı±ØĞëÒÔ NULL ½áÊø
 	 * delete one or some keys from redis, for deleting a variable
 	 * number of keys, the last key must be NULL indicating the end
 	 * of the variable args
-	 * @return {int} è¿”å›æ‰€åˆ é™¤çš„ KEY çš„ä¸ªæ•°ï¼Œå¦‚ä¸‹ï¼š
-	 *  0: æœªåˆ é™¤ä»»ä½• KEY
-	 *  -1: å‡ºé”™
-	 *  >0: çœŸæ­£åˆ é™¤çš„ KEY çš„ä¸ªæ•°ï¼Œè¯¥å€¼æœ‰å¯èƒ½å°‘äºè¾“å…¥çš„ KEY çš„ä¸ªæ•°
+	 * @return {int} ·µ»ØËùÉ¾³ıµÄ KEY µÄ¸öÊı£¬ÈçÏÂ£º
+	 *  0: Î´É¾³ıÈÎºÎ KEY
+	 *  -1: ³ö´í
+	 *  >0: ÕæÕıÉ¾³ıµÄ KEY µÄ¸öÊı£¬¸ÃÖµÓĞ¿ÉÄÜÉÙÓÚÊäÈëµÄ KEY µÄ¸öÊı
 	 *  return the number of keys been deleted, return value as below:
 	 *  0: none key be deleted
 	 * -1: error happened
@@ -72,246 +72,246 @@ public:
 	int del_keys(const char* keys[], const size_t lens[], size_t argc);
 
 	/**
-	 * åºåˆ—åŒ–ç»™å®š key ï¼Œå¹¶è¿”å›è¢«åºåˆ—åŒ–çš„å€¼ï¼Œä½¿ç”¨ RESTORE å‘½ä»¤å¯ä»¥å°†è¿™ä¸ªå€¼ååºåˆ—åŒ–
-	 * ä¸º Redis é”®
+	 * ĞòÁĞ»¯¸ø¶¨ key £¬²¢·µ»Ø±»ĞòÁĞ»¯µÄÖµ£¬Ê¹ÓÃ RESTORE ÃüÁî¿ÉÒÔ½«Õâ¸öÖµ·´ĞòÁĞ»¯
+	 * Îª Redis ¼ü
 	 * serialize the object associate with the given key, and get the
 	 * value after serializing, RESTORE command can be used to
 	 * deserialize by the value
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key
-	 * @param out {string&} å­˜å‚¨åºåˆ—åŒ–çš„äºŒè¿›åˆ¶æ•°æ®
+	 * @param out {string&} ´æ´¢ĞòÁĞ»¯µÄ¶ş½øÖÆÊı¾İ
 	 *  buffur used to store the result
-	 * @return {int} åºåˆ—åŒ–åæ•°æ®é•¿åº¦
+	 * @return {int} ĞòÁĞ»¯ºóÊı¾İ³¤¶È
 	 *  the length of the data after serializing
 	 */
 	int dump(const char* key, string& out);
 
 	/**
-	 * åˆ¤æ–­ KEY æ˜¯å¦å­˜åœ¨
+	 * ÅĞ¶Ï KEY ÊÇ·ñ´æÔÚ
 	 * check if the key exists in redis
-	 * @param key {const char*} KEY å€¼
+	 * @param key {const char*} KEY Öµ
 	 *  the key
-	 * @return {bool} è¿”å› true è¡¨ç¤ºå­˜åœ¨ï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™æˆ–ä¸å­˜åœ¨
+	 * @return {bool} ·µ»Ø true ±íÊ¾´æÔÚ£¬·ñÔò±íÊ¾³ö´í»ò²»´æÔÚ
 	 *  true returned if key existing, false if error or not existing
 	 */
 	bool exists(const char* key);
 
 	/**
-	 * è®¾ç½® KEY çš„ç”Ÿå­˜å‘¨æœŸï¼Œå•ä½ï¼ˆç§’ï¼‰
+	 * ÉèÖÃ KEY µÄÉú´æÖÜÆÚ£¬µ¥Î»£¨Ãë£©
 	 * set a key's time to live in seconds
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key
-	 * @param n {int} ç”Ÿå­˜å‘¨æœŸï¼ˆç§’ï¼‰
+	 * @param n {int} Éú´æÖÜÆÚ£¨Ãë£©
 	 *  lief cycle in seconds
-	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
 	 *  return value as below:
-	 *  > 0: æˆåŠŸè®¾ç½®äº†ç”Ÿå­˜å‘¨æœŸ
+	 *  > 0: ³É¹¦ÉèÖÃÁËÉú´æÖÜÆÚ
 	 *       set successfully
-	 *  0ï¼šè¯¥ key ä¸å­˜åœ¨
+	 *  0£º¸Ã key ²»´æÔÚ
 	 *    the key doesn't exist
-	 *  < 0: å‡ºé”™
+	 *  < 0: ³ö´í
 	 *       error happened
 	 */
 	int expire(const char* key, int n);
 
 	/**
-	 * ç”¨ UNIX æ—¶é—´æˆªè®¾ç½® KEY çš„ç”Ÿå­˜å‘¨æœŸ
+	 * ÓÃ UNIX Ê±¼ä½ØÉèÖÃ KEY µÄÉú´æÖÜÆÚ
 	 * set the expiration for a key as a UNIX timestamp
-	 * @param key {const char*} å¯¹è±¡é”®å€¼
+	 * @param key {const char*} ¶ÔÏó¼üÖµ
 	 *  the key
-	 * @param stamp {time_t} UNIX æ—¶é—´æˆªï¼Œå³è‡ª 1970 å¹´ä»¥æ¥çš„ç§’æ•°
+	 * @param stamp {time_t} UNIX Ê±¼ä½Ø£¬¼´×Ô 1970 ÄêÒÔÀ´µÄÃëÊı
 	 *  an absolute Unix timestamp (seconds since January 1, 1970).
-	 * @return {int} è¿”å›å€¼çš„å«ä¹‰ï¼š
+	 * @return {int} ·µ»ØÖµµÄº¬Òå£º
 	 *  return value:
-	 *  1: è®¾ç½®æˆåŠŸ
+	 *  1: ÉèÖÃ³É¹¦
 	 *     the timeout was set
-	 *  0: è¯¥ key ä¸å­˜åœ¨
+	 *  0: ¸Ã key ²»´æÔÚ
 	 *     the key doesn't exist or the timeout couldn't be set
-	 * -1: å‡ºé”™
+	 * -1: ³ö´í
 	 *     error happened
 	 */
 	int expireat(const char* key, time_t stamp);
 
 	/**
-	 * æŸ¥æ‰¾æ‰€æœ‰ç¬¦åˆç»™å®šæ¨¡å¼ pattern çš„ key
+	 * ²éÕÒËùÓĞ·ûºÏ¸ø¶¨Ä£Ê½ pattern µÄ key
 	 * find all keys matching the given pattern
-	 * @param pattern {const char*} åŒ¹é…æ¨¡å¼
+	 * @param pattern {const char*} Æ¥ÅäÄ£Ê½
 	 *  the give matching pattern
-	 * @param out {std::vector<string>*} é NULL æ—¶ç”¨æ¥å­˜å‚¨ç»“æœé›†
+	 * @param out {std::vector<string>*} ·Ç NULL Ê±ÓÃÀ´´æ´¢½á¹û¼¯
 	 *  store the matched keys
-	 * @return {int} ç»“æœé›†çš„æ•°é‡ï¼Œ0--ä¸ºç©ºï¼Œ<0 -- è¡¨ç¤ºå‡ºé”™
+	 * @return {int} ½á¹û¼¯µÄÊıÁ¿£¬0--Îª¿Õ£¬<0 -- ±íÊ¾³ö´í
 	 *  return the number of the matched keys, 0 if none, < 0 if error
-	 *  åŒ¹é…æ¨¡å¼ä¸¾ä¾‹ï¼š
-	 *   KEYS * åŒ¹é…æ•°æ®åº“ä¸­æ‰€æœ‰ key ã€‚
-	 *   KEYS h?llo åŒ¹é… hello ï¼Œ hallo å’Œ hxllo ç­‰ã€‚
-	 *   KEYS h*llo åŒ¹é… hllo å’Œ heeeeello ç­‰ã€‚
-	 *   KEYS h[ae]llo åŒ¹é… hello å’Œ hallo ï¼Œä½†ä¸åŒ¹é… hillo ã€‚
+	 *  Æ¥ÅäÄ£Ê½¾ÙÀı£º
+	 *   KEYS * Æ¥ÅäÊı¾İ¿âÖĞËùÓĞ key ¡£
+	 *   KEYS h?llo Æ¥Åä hello £¬ hallo ºÍ hxllo µÈ¡£
+	 *   KEYS h*llo Æ¥Åä hllo ºÍ heeeeello µÈ¡£
+	 *   KEYS h[ae]llo Æ¥Åä hello ºÍ hallo £¬µ«²»Æ¥Åä hillo ¡£
 	 *
-	 *  æ“ä½œæˆåŠŸåå¯ä»¥é€šè¿‡ä»¥ä¸‹ä»»ä¸€æ–¹å¼è·å¾—æ•°æ®
-	 *  1ã€åŸºç±»æ–¹æ³• get_value è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ æ•°æ®
-	 *  2ã€åŸºç±»æ–¹æ³• get_child è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ å¯¹è±¡(redis_resultï¼‰ï¼Œç„¶åå†é€šè¿‡
-	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
-	 *  3ã€åŸºç±»æ–¹æ³• get_result æ–¹æ³•å–å¾—æ€»ç»“æœé›†å¯¹è±¡ redis_resultï¼Œç„¶åå†é€šè¿‡
-	 *     redis_result::get_child è·å¾—ä¸€ä¸ªå…ƒç´ å¯¹è±¡ï¼Œç„¶åå†é€šè¿‡æ–¹å¼ 2 ä¸­æŒ‡å®š
-	 *     çš„æ–¹æ³•è·å¾—è¯¥å…ƒç´ çš„æ•°æ®
-	 *  4ã€åŸºç±»æ–¹æ³• get_children è·å¾—ç»“æœå…ƒç´ æ•°ç»„å¯¹è±¡ï¼Œå†é€šè¿‡ redis_result ä¸­
-	 *     çš„æ–¹æ³• argv_to_string ä»æ¯ä¸€ä¸ªå…ƒç´ å¯¹è±¡ä¸­è·å¾—å…ƒç´ æ•°æ®
-	 *  5ã€åœ¨è°ƒç”¨æ–¹æ³•ä¸­ä¼ å…¥éç©ºçš„å­˜å‚¨ç»“æœå¯¹è±¡çš„åœ°å€
+	 *  ²Ù×÷³É¹¦ºó¿ÉÒÔÍ¨¹ıÒÔÏÂÈÎÒ»·½Ê½»ñµÃÊı¾İ
+	 *  1¡¢»ùÀà·½·¨ get_value »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØÊı¾İ
+	 *  2¡¢»ùÀà·½·¨ get_child »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØ¶ÔÏó(redis_result£©£¬È»ºóÔÙÍ¨¹ı
+	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
+	 *  3¡¢»ùÀà·½·¨ get_result ·½·¨È¡µÃ×Ü½á¹û¼¯¶ÔÏó redis_result£¬È»ºóÔÙÍ¨¹ı
+	 *     redis_result::get_child »ñµÃÒ»¸öÔªËØ¶ÔÏó£¬È»ºóÔÙÍ¨¹ı·½Ê½ 2 ÖĞÖ¸¶¨
+	 *     µÄ·½·¨»ñµÃ¸ÃÔªËØµÄÊı¾İ
+	 *  4¡¢»ùÀà·½·¨ get_children »ñµÃ½á¹ûÔªËØÊı×é¶ÔÏó£¬ÔÙÍ¨¹ı redis_result ÖĞ
+	 *     µÄ·½·¨ argv_to_string ´ÓÃ¿Ò»¸öÔªËØ¶ÔÏóÖĞ»ñµÃÔªËØÊı¾İ
+	 *  5¡¢ÔÚµ÷ÓÃ·½·¨ÖĞ´«Èë·Ç¿ÕµÄ´æ´¢½á¹û¶ÔÏóµÄµØÖ·
 	 */
 	int keys_pattern(const char* pattern, std::vector<string>* out);
 	
 	/**
-	 * å°†æ•°æ®ä»ä¸€ä¸ª redis-server è¿ç§»è‡³å¦ä¸€ä¸ª redis-server
+	 * ½«Êı¾İ´ÓÒ»¸ö redis-server Ç¨ÒÆÖÁÁíÒ»¸ö redis-server
 	 * atomically transfer a key from a redis instance to another one
-	 * @param key {const char*} æ•°æ®å¯¹åº”çš„é”®å€¼
+	 * @param key {const char*} Êı¾İ¶ÔÓ¦µÄ¼üÖµ
 	 *  the key
-	 * @param addr {const char*} ç›®æ ‡ redis-server æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šip:port
+	 * @param addr {const char*} Ä¿±ê redis-server ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºip:port
 	 *  the destination redis instance's address, format: ip:port
-	 * @param dest_db {unsigned} ç›®æ ‡ redis-server æœåŠ¡å™¨çš„æ•°æ®åº“ ID å·
+	 * @param dest_db {unsigned} Ä¿±ê redis-server ·şÎñÆ÷µÄÊı¾İ¿â ID ºÅ
 	 *  the databases ID in destination redis
-	 * @param timeout {unsigned} è¿ç§»è¿‡ç¨‹çš„è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§)
+	 * @param timeout {unsigned} Ç¨ÒÆ¹ı³ÌµÄ³¬Ê±Ê±¼ä(ºÁÃë¼¶)
 	 *  timeout(microseconds) in transfering
-	 * @param option {const char*} COPY æˆ– REPLACE
+	 * @param option {const char*} COPY »ò REPLACE
 	 *  transfer option: COPY or REPLACE
-	 * @return {bool} è¿ç§»æ˜¯å¦æˆåŠŸ
+	 * @return {bool} Ç¨ÒÆÊÇ·ñ³É¹¦
 	 *  if transfering successfully
 	 */
 	bool migrate(const char* key, const char* addr, unsigned dest_db,
 		unsigned timeout, const char* option = NULL);
 
 	/**
-	 * å°†æ•°æ®ç§»è‡³æœ¬ redis-server ä¸­çš„å¦ä¸€ä¸ªæ•°æ®åº“ä¸­
+	 * ½«Êı¾İÒÆÖÁ±¾ redis-server ÖĞµÄÁíÒ»¸öÊı¾İ¿âÖĞ
 	 * move a key to another database
-	 * @param key {const char*} æ•°æ®é”®å€¼
+	 * @param key {const char*} Êı¾İ¼üÖµ
 	 *  the key
-	 * @param dest_db {unsigned} ç›®æ ‡æ•°æ®åº“ ID å·
+	 * @param dest_db {unsigned} Ä¿±êÊı¾İ¿â ID ºÅ
 	 *  the destination database
-	 * @return {int} è¿ç§»æ˜¯å¦æˆåŠŸã€‚-1: è¡¨ç¤ºå‡ºé”™ï¼Œ0ï¼šè¿ç§»å¤±è´¥ï¼Œå› ä¸ºç›®æ ‡æ•°æ®åº“ä¸­å­˜åœ¨
-	 *  ç›¸åŒé”®å€¼ï¼Œ1ï¼šè¿ç§»æˆåŠŸ
+	 * @return {int} Ç¨ÒÆÊÇ·ñ³É¹¦¡£-1: ±íÊ¾³ö´í£¬0£ºÇ¨ÒÆÊ§°Ü£¬ÒòÎªÄ¿±êÊı¾İ¿âÖĞ´æÔÚ
+	 *  ÏàÍ¬¼üÖµ£¬1£ºÇ¨ÒÆ³É¹¦
 	 *  if moving succcessfully. -1 if error, 0 if moving failed because
 	 *  the same key already exists, 1 if successful
 	 */
 	int move(const char* key, unsigned dest_db);
 
 	/**
-	 * è¿”å›ç»™å®š key å¼•ç”¨æ‰€å‚¨å­˜çš„å€¼çš„æ¬¡æ•°ã€‚æ­¤å‘½ä»¤ä¸»è¦ç”¨äºé™¤é”™ã€‚
+	 * ·µ»Ø¸ø¶¨ key ÒıÓÃËù´¢´æµÄÖµµÄ´ÎÊı¡£´ËÃüÁîÖ÷ÒªÓÃÓÚ³ı´í¡£
 	 * get the referring count of the object, which just for debugging
-	 * @param key {const char*} æ•°æ®é”®å€¼
+	 * @param key {const char*} Êı¾İ¼üÖµ
 	 *  the key
-	 * @return {int} è¿”å› 0 è¡¨ç¤ºè¯¥ key ä¸å­˜åœ¨ï¼›< 0 è¡¨ç¤ºå‡ºé”™
+	 * @return {int} ·µ»Ø 0 ±íÊ¾¸Ã key ²»´æÔÚ£»< 0 ±íÊ¾³ö´í
 	 *  0 if key not exists, < 0 if error
 	 */
 	int object_refcount(const char* key);
 
 	/**
-	 * è¿”å›ç»™å®š key é”®å‚¨å­˜çš„å€¼æ‰€ä½¿ç”¨çš„å†…éƒ¨è¡¨ç¤º
+	 * ·µ»Ø¸ø¶¨ key ¼ü´¢´æµÄÖµËùÊ¹ÓÃµÄÄÚ²¿±íÊ¾
 	 * get the internal storing of the object assosicate with the key
-	 * @param key {const char*} æ•°æ®é”®å€¼
+	 * @param key {const char*} Êı¾İ¼üÖµ
 	 *  the key
-	 * @param out {string&} å­˜åœ¨ç»“æœ
+	 * @param out {string&} ´æÔÚ½á¹û
 	 *  store the result
-	 * @return {bool} æ˜¯å¦æˆåŠŸ
+	 * @return {bool} ÊÇ·ñ³É¹¦
 	 *  if successful
 	 */
 	bool object_encoding(const char* key, string& out);
 
 	/**
-	 * è¿”å›ç»™å®š key è‡ªå‚¨å­˜ä»¥æ¥çš„ç©ºé—²æ—¶é—´(idleï¼Œ æ²¡æœ‰è¢«è¯»å–ä¹Ÿæ²¡æœ‰è¢«å†™å…¥)ï¼Œä»¥ç§’ä¸ºå•ä½
+	 * ·µ»Ø¸ø¶¨ key ×Ô´¢´æÒÔÀ´µÄ¿ÕÏĞÊ±¼ä(idle£¬ Ã»ÓĞ±»¶ÁÈ¡Ò²Ã»ÓĞ±»Ğ´Èë)£¬ÒÔÃëÎªµ¥Î»
 	 * get the key's idle time in seconds since its first stored
-	 * @param key {const char*} æ•°æ®é”®å€¼
+	 * @param key {const char*} Êı¾İ¼üÖµ
 	 *  the key
-	 * @return {int} è¿”å›å€¼ < 0 è¡¨ç¤ºå‡ºé”™
+	 * @return {int} ·µ»ØÖµ < 0 ±íÊ¾³ö´í
 	 *  0 if error happened
 	 */
 	int object_idletime(const char* key);
 
 	/**
-	 * ç§»é™¤ç»™å®š key çš„ç”Ÿå­˜æ—¶é—´ï¼Œå°†è¿™ä¸ª key ä»"æ˜“å¤±çš„"(å¸¦ç”Ÿå­˜æ—¶é—´ key )è½¬æ¢æˆ
-	 * "æŒä¹…çš„"(ä¸€ä¸ªä¸å¸¦ç”Ÿå­˜æ—¶é—´ã€æ°¸ä¸è¿‡æœŸçš„ key )
+	 * ÒÆ³ı¸ø¶¨ key µÄÉú´æÊ±¼ä£¬½«Õâ¸ö key ´Ó"Ò×Ê§µÄ"(´øÉú´æÊ±¼ä key )×ª»»³É
+	 * "³Ö¾ÃµÄ"(Ò»¸ö²»´øÉú´æÊ±¼ä¡¢ÓÀ²»¹ıÆÚµÄ key )
 	 * remove the expiration from a key
-	 * @param key {const char*} å¯¹è±¡é”®å€¼
+	 * @param key {const char*} ¶ÔÏó¼üÖµ
 	 *  the key
-	 * @return {int} è¿”å›å€¼çš„å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ·µ»ØÖµµÄº¬ÒåÈçÏÂ£º
 	 *  the value returned as below:
-	 *  1 -- è®¾ç½®æˆåŠŸ
+	 *  1 -- ÉèÖÃ³É¹¦
 	 *       set ok
-	 *  0 -- è¯¥ key ä¸å­˜åœ¨æˆ–æœªè®¾ç½®è¿‡æœŸæ—¶é—´
+	 *  0 -- ¸Ã key ²»´æÔÚ»òÎ´ÉèÖÃ¹ıÆÚÊ±¼ä
 	 *       the key not exists or not be set expiration
-	 * -1 -- å‡ºé”™
+	 * -1 -- ³ö´í
 	 *       error happened
 	 */
 	int persist(const char* key);
 
 	/**
-	 * è®¾ç½® KEY çš„ç”Ÿå­˜å‘¨æœŸï¼Œå•ä½ï¼ˆæ¯«ç§’ï¼‰
+	 * ÉèÖÃ KEY µÄÉú´æÖÜÆÚ£¬µ¥Î»£¨ºÁÃë£©
 	 * set a key's time to live in milliseconds
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key
-	 * @param n {int} ç”Ÿå­˜å‘¨æœŸï¼ˆæ¯«ç§’ï¼‰
+	 * @param n {int} Éú´æÖÜÆÚ£¨ºÁÃë£©
 	 *  time to live in milliseconds
-	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
 	 *  value returned as below:
-	 *  > 0: æˆåŠŸè®¾ç½®äº†ç”Ÿå­˜å‘¨æœŸ
+	 *  > 0: ³É¹¦ÉèÖÃÁËÉú´æÖÜÆÚ
 	 *       set successfully
-	 *    0ï¼šè¯¥ key ä¸å­˜åœ¨
+	 *    0£º¸Ã key ²»´æÔÚ
 	 *       the key doesn't exist
-	 *  < 0: å‡ºé”™
+	 *  < 0: ³ö´í
 	 *       error happened
 	 */
 	int pexpire(const char* key, int n);
 
 	/**
-	 * ä»¥æ¯«ç§’ä¸ºå•ä½è®¾ç½® key çš„è¿‡æœŸ unix æ—¶é—´æˆ³
+	 * ÒÔºÁÃëÎªµ¥Î»ÉèÖÃ key µÄ¹ıÆÚ unix Ê±¼ä´Á
 	 * set the expiration for a key as UNIX timestamp specified
 	 * in milliseconds
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key
-	 * @param n {long long int} UNIX æ—¶é—´æˆªï¼Œå³è‡ª 1970 å¹´ä»¥æ¥çš„æ¯«ç§’æ•°
+	 * @param n {long long int} UNIX Ê±¼ä½Ø£¬¼´×Ô 1970 ÄêÒÔÀ´µÄºÁÃëÊı
 	 *  the UNIX timestamp in milliseconds from 1970.1.1
-	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
 	 *  value resturned as below:
-	 *  > 0: æˆåŠŸè®¾ç½®äº†ç”Ÿå­˜å‘¨æœŸ
+	 *  > 0: ³É¹¦ÉèÖÃÁËÉú´æÖÜÆÚ
 	 *       set successfully
-	 *    0ï¼šè¯¥ key ä¸å­˜åœ¨
+	 *    0£º¸Ã key ²»´æÔÚ
 	 *       the key doesn't exist
-	 *  < 0: å‡ºé”™
+	 *  < 0: ³ö´í
 	 *       error happened
 	 */
 	int pexpireat(const char* key, long long int n);
 
 	/**
-	 * è·å¾— KEY çš„å‰©ä½™ç”Ÿå­˜å‘¨æœŸï¼Œå•ä½ï¼ˆæ¯«ç§’ï¼‰
+	 * »ñµÃ KEY µÄÊ£ÓàÉú´æÖÜÆÚ£¬µ¥Î»£¨ºÁÃë£©
 	 * get the time to live for a key in milliseconds
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key
-	 * @return {int} è¿”å›å¯¹åº”é”®å€¼çš„ç”Ÿå­˜å‘¨æœŸ
+	 * @return {int} ·µ»Ø¶ÔÓ¦¼üÖµµÄÉú´æÖÜÆÚ
 	 *  value returned as below:
-	 *  >0: è¯¥ key å‰©ä½™çš„ç”Ÿå­˜å‘¨æœŸï¼ˆæ¯«ç§’ï¼‰
+	 *  >0: ¸Ã key Ê£ÓàµÄÉú´æÖÜÆÚ£¨ºÁÃë£©
 	 *      the time to live for a key in milliseconds
-	 *  -3ï¼šå‡ºé”™
+	 *  -3£º³ö´í
 	 *      error happened
-	 *  -2ï¼škey ä¸å­˜åœ¨
+	 *  -2£ºkey ²»´æÔÚ
 	 *      the key doesn't exist
-	 *  -1ï¼šå½“ key å­˜åœ¨ä½†æ²¡æœ‰è®¾ç½®å‰©ä½™æ—¶é—´
+	 *  -1£ºµ± key ´æÔÚµ«Ã»ÓĞÉèÖÃÊ£ÓàÊ±¼ä
 	 *      th key were not be set expiration
-	 * æ³¨ï¼šå¯¹äº redis-server 2.8 ä»¥å‰ç‰ˆæœ¬ï¼Œkey ä¸å­˜åœ¨æˆ–å­˜åœ¨ä½†æœªè®¾ç½®ç”Ÿå­˜æœŸåˆ™è¿”å› -1
+	 * ×¢£º¶ÔÓÚ redis-server 2.8 ÒÔÇ°°æ±¾£¬key ²»´æÔÚ»ò´æÔÚµ«Î´ÉèÖÃÉú´æÆÚÔò·µ»Ø -1
 	 * notice: for redis version before 2.8, -1 will be returned if the
 	 * key doesn't exist or the key were not be set expiration.
 	 */
 	long long int pttl(const char* key);
 
 	/**
-	 * ä»å½“å‰æ•°æ®åº“ä¸­éšæœºè¿”å›(ä¸ä¼šåˆ é™¤)ä¸€ä¸ª key
+	 * ´Óµ±Ç°Êı¾İ¿âÖĞËæ»ú·µ»Ø(²»»áÉ¾³ı)Ò»¸ö key
 	 * return a random key from the keyspace
-	 ï¼Š@param buf {string&} æˆåŠŸè·å¾—éšæœº KEY æ—¶å­˜å‚¨ç»“æœ
+	 £ª@param buf {string&} ³É¹¦»ñµÃËæ»ú KEY Ê±´æ´¢½á¹û
 	 *  store the key
-	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œå½“å‡ºé”™æˆ– key ä¸å­˜åœ¨æ—¶è¿”å› false
+	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬µ±³ö´í»ò key ²»´æÔÚÊ±·µ»Ø false
 	 *  true on success, or false be returned
 	 */
 	bool randmkey(string& buf);
 
 	/**
-	 * å°† key æ”¹åä¸º newkey
+	 * ½« key ¸ÄÃûÎª newkey
 	 * rename a key
 	 * @return {bool}
 	 *  true on success, or error happened
@@ -319,24 +319,24 @@ public:
 	bool rename_key(const char* key, const char* newkey);
 
 	/**
-	 * å½“ä¸”ä»…å½“ newkey ä¸å­˜åœ¨æ—¶ï¼Œå°† key æ”¹åä¸º newkey
+	 * µ±ÇÒ½öµ± newkey ²»´æÔÚÊ±£¬½« key ¸ÄÃûÎª newkey
 	 * rename a key only if the new key does not exist
-	 * @param key {const char*} æ—§ key
-	 * @param newkey {const char*} æ–° key
-	 * @return {int} è¿”å›å€¼ > 0: æˆåŠŸï¼Œ0ï¼š ç›®æ ‡ key å­˜åœ¨ï¼Œ< 0ï¼šå¤±è´¥
+	 * @param key {const char*} ¾É key
+	 * @param newkey {const char*} ĞÂ key
+	 * @return {int} ·µ»ØÖµ > 0: ³É¹¦£¬0£º Ä¿±ê key ´æÔÚ£¬< 0£ºÊ§°Ü
 	 *  return value > 0 on success, < 0 on error, == 0 when newkey exists
 	 */
 	int renamenx(const char* key, const char* newkey);
 
 	/**
-	 * ååºåˆ—åŒ–ç»™å®šçš„åºåˆ—åŒ–å€¼ï¼Œå¹¶å°†å®ƒå’Œç»™å®šçš„ key å…³è”
+	 * ·´ĞòÁĞ»¯¸ø¶¨µÄĞòÁĞ»¯Öµ£¬²¢½«ËüºÍ¸ø¶¨µÄ key ¹ØÁª
 	 * create a key using the provided serialized value, previously
 	 * obtained by using DUMP
-	 * @param ttl {int} ä»¥æ¯«ç§’ä¸ºå•ä½ä¸º key è®¾ç½®ç”Ÿå­˜æ—¶é—´ï¼Œå¦‚æœ ttl ä¸º 0ï¼Œ
-	 *  é‚£ä¹ˆä¸è®¾ç½®ç”Ÿå­˜æ—¶é—´
+	 * @param ttl {int} ÒÔºÁÃëÎªµ¥Î»Îª key ÉèÖÃÉú´æÊ±¼ä£¬Èç¹û ttl Îª 0£¬
+	 *  ÄÇÃ´²»ÉèÖÃÉú´æÊ±¼ä
 	 *  the time to live for the key in milliseconds, if tll is 0,
 	 *  expiration will not be set
-	 * @param replace {bool} å¦‚æœ key å­˜åœ¨æ˜¯å¦ç›´æ¥è¦†ç›–
+	 * @param replace {bool} Èç¹û key ´æÔÚÊÇ·ñÖ±½Ó¸²¸Ç
 	 *  if the key already exists, this parameter decides if replacing
 	 *  the existing key
 	 * @return {bool}
@@ -346,59 +346,59 @@ public:
 		int ttl, bool replace = false);
 
 	/**
-	 * è·å¾— KEY çš„å‰©ä½™ç”Ÿå­˜å‘¨æœŸï¼Œå•ä½ï¼ˆç§’ï¼‰
+	 * »ñµÃ KEY µÄÊ£ÓàÉú´æÖÜÆÚ£¬µ¥Î»£¨Ãë£©
 	 * get the time to live for a key in seconds
-	 * @param key {const char*} é”®å€¼
+	 * @param key {const char*} ¼üÖµ
 	 *  the key
-	 * @return {int} è¿”å›å¯¹åº”é”®å€¼çš„ç”Ÿå­˜å‘¨æœŸ
+	 * @return {int} ·µ»Ø¶ÔÓ¦¼üÖµµÄÉú´æÖÜÆÚ
 	 *  return value as below:
-	 *  > 0: è¯¥ key å‰©ä½™çš„ç”Ÿå­˜å‘¨æœŸï¼ˆç§’ï¼‰
+	 *  > 0: ¸Ã key Ê£ÓàµÄÉú´æÖÜÆÚ£¨Ãë£©
 	 *       the time to live for a key in seconds
-	 *   -3ï¼šå‡ºé”™
+	 *   -3£º³ö´í
 	 *       error happened
-	 *   -2ï¼škey ä¸å­˜åœ¨
+	 *   -2£ºkey ²»´æÔÚ
 	 *       the key doesn't exist
-	 *   -1ï¼šå½“ key å­˜åœ¨ä½†æ²¡æœ‰è®¾ç½®å‰©ä½™æ—¶é—´
+	 *   -1£ºµ± key ´æÔÚµ«Ã»ÓĞÉèÖÃÊ£ÓàÊ±¼ä
 	 *       the key were not be set expiration
-	 * æ³¨ï¼šå¯¹äº redis-server 2.8 ä»¥å‰ç‰ˆæœ¬ï¼Œkey ä¸å­˜åœ¨æˆ–å­˜åœ¨ä½†æœªè®¾ç½®ç”Ÿå­˜æœŸåˆ™è¿”å› -1
+	 * ×¢£º¶ÔÓÚ redis-server 2.8 ÒÔÇ°°æ±¾£¬key ²»´æÔÚ»ò´æÔÚµ«Î´ÉèÖÃÉú´æÆÚÔò·µ»Ø -1
 	 * notice: for the redis version before 2.8, -1 will be returned
 	 *  if the key doesn't exist or the key were not be set expiration
 	 */
 	int ttl(const char* key);
 
 	/**
-	 * è·å¾— KEY çš„å­˜å‚¨ç±»å‹
+	 * »ñµÃ KEY µÄ´æ´¢ÀàĞÍ
 	 * get the the type stored at key
-	 * @para key {const char*} KEY å€¼
+	 * @para key {const char*} KEY Öµ
 	 *  the key
-	 * @return {redis_key_t} è¿”å› KEY çš„å­˜å‚¨ç±»å‹
+	 * @return {redis_key_t} ·µ»Ø KEY µÄ´æ´¢ÀàĞÍ
 	 *  return redis_key_t defined above as REDIS_KEY_
 	 */
 	redis_key_t type(const char* key);
 
 	/**
-	 * å‘½ä»¤ç”¨äºè¿­ä»£å½“å‰æ•°æ®åº“ä¸­çš„æ•°æ®åº“é”®
+	 * ÃüÁîÓÃÓÚµü´úµ±Ç°Êı¾İ¿âÖĞµÄÊı¾İ¿â¼ü
 	 * incrementally iterate the keys space in the specified database
-	 * @param cursor {int} æ¸¸æ ‡å€¼ï¼Œå¼€å§‹éå†æ—¶è¯¥å€¼å†™ 0
+	 * @param cursor {int} ÓÎ±êÖµ£¬¿ªÊ¼±éÀúÊ±¸ÃÖµĞ´ 0
 	 *  the iterating cursor beginning with 0
-	 * @param out {std::vector<acl::string>&} å­˜å‚¨ç»“æœé›†ï¼Œå†…éƒ¨ä»¥è¿½åŠ æ–¹å¼å°†æœ¬æ¬¡
-	 *  éå†ç»“æœé›†åˆæ·»åŠ è¿›è¯¥æ•°ç»„ä¸­ï¼Œä¸ºé˜²æ­¢å› æ€»ç»“æœé›†è¿‡å¤§å¯¼è‡´è¯¥æ•°ç»„æº¢å‡ºï¼Œç”¨æˆ·å¯åœ¨
-	 *  è°ƒç”¨æœ¬å‡½æ•°å‰åæ¸…ç†è¯¥æ•°ç»„å¯¹è±¡
+	 * @param out {std::vector<acl::string>&} ´æ´¢½á¹û¼¯£¬ÄÚ²¿ÒÔ×·¼Ó·½Ê½½«±¾´Î
+	 *  ±éÀú½á¹û¼¯ºÏÌí¼Ó½ø¸ÃÊı×éÖĞ£¬Îª·ÀÖ¹Òò×Ü½á¹û¼¯¹ı´óµ¼ÖÂ¸ÃÊı×éÒç³ö£¬ÓÃ»§¿ÉÔÚ
+	 *  µ÷ÓÃ±¾º¯ÊıÇ°ºóÇåÀí¸ÃÊı×é¶ÔÏó
 	 *  string array storing the results, the array will be cleared
 	 *  internal and the string result will be appened to the array
-	 * @param pattern {const char*} åŒ¹é…æ¨¡å¼ï¼Œglob é£æ ¼ï¼Œéç©ºæ—¶æœ‰æ•ˆ
+	 * @param pattern {const char*} Æ¥ÅäÄ£Ê½£¬glob ·ç¸ñ£¬·Ç¿ÕÊ±ÓĞĞ§
 	 &  the matching pattern with glob style, only effective if not NULL
-	 * @param count {const size_t*} é™å®šçš„ç»“æœé›†æ•°é‡ï¼Œéç©ºæŒ‡é’ˆæ—¶æœ‰æ•ˆ
+	 * @param count {const size_t*} ÏŞ¶¨µÄ½á¹û¼¯ÊıÁ¿£¬·Ç¿ÕÖ¸ÕëÊ±ÓĞĞ§
 	 *  limit the max number of the results stored in array, only
 	 *  effective when not NULL
-	 * @return {int} ä¸‹ä¸€ä¸ªæ¸¸æ ‡ä½ç½®ï¼Œå«ä¹‰å¦‚ä¸‹ï¼š
+	 * @return {int} ÏÂÒ»¸öÓÎ±êÎ»ÖÃ£¬º¬ÒåÈçÏÂ£º
 	 *  return the next cursor value as follow:
-	 *   0ï¼šéå†ç»“æŸï¼Œå½“éå†ç»“æŸæ—¶è¿˜éœ€è¦æ£€æŸ¥ out ä¸­çš„ç»“æœé›†æ˜¯å¦ä¸ºç©ºï¼Œå¦‚æœ
-	 *      ä¸ä¸ºç©ºï¼Œåˆ™éœ€è¦ç»§ç»­è¿›è¡Œå¤„ç†
+	 *   0£º±éÀú½áÊø£¬µ±±éÀú½áÊøÊ±»¹ĞèÒª¼ì²é out ÖĞµÄ½á¹û¼¯ÊÇ·ñÎª¿Õ£¬Èç¹û
+	 *      ²»Îª¿Õ£¬ÔòĞèÒª¼ÌĞø½øĞĞ´¦Àí
 	 *      iterating is finished and the out should be checked if emtpy
-	 *  -1: å‡ºé”™
+	 *  -1: ³ö´í
 	 *      some error happened
-	 *  >0: æ¸¸æ ‡çš„ä¸‹ä¸€ä¸ªä½ç½®ï¼Œå³ä½¿è¿™æ ·ï¼Œå…·ä½“æœ‰å¤šå°‘ç»“æœè¿˜éœ€è¦æ£€æŸ¥ outï¼Œå› ä¸ºæœ‰å¯èƒ½ä¸ºç©º
+	 *  >0: ÓÎ±êµÄÏÂÒ»¸öÎ»ÖÃ£¬¼´Ê¹ÕâÑù£¬¾ßÌåÓĞ¶àÉÙ½á¹û»¹ĞèÒª¼ì²é out£¬ÒòÎªÓĞ¿ÉÄÜÎª¿Õ
 	 *      the next cursor value for iterating
 	 */
 	int scan(int cursor, std::vector<string>& out,

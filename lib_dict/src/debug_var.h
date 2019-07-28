@@ -1,4 +1,4 @@
-﻿#ifndef	__DEBUG_VAR_INCLUDE_H__
+#ifndef	__DEBUG_VAR_INCLUDE_H__
 
 #define	DEBUG_BASE		100
 #define	DEBUG_MAC		(DEBUG_BASE + 1)

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * \file des.h
  *
  * \brief DES block cipher

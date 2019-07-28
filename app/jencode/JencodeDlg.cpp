@@ -1,4 +1,4 @@
-﻿锘�// JencodeDlg.cpp : 瀹炵幇鏂囦欢
+﻿// JencodeDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -19,20 +19,20 @@
 #define WM_USER_TRANS_OVER	WM_USER + 100
 #define WM_USER_TRANS_OVER2	WM_USER + 101
 
-// 鐢ㄤ簬搴旂敤绋嬪簭鈥滃叧浜庘€濊彍鍗曢」鐨� CAboutDlg 瀵硅瘽妗�
+// 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// 瀵硅瘽妗嗘暟鎹�
+// 对话框数据
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 鏀寔
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 支持
 
-// 瀹炵幇
+// 实现
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -50,7 +50,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CJencodeDlg 瀵硅瘽妗�
+// CJencodeDlg 对话框
 
 
 
@@ -88,15 +88,15 @@ BEGIN_MESSAGE_MAP(CJencodeDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CJencodeDlg 娑堟伅澶勭悊绋嬪簭
+// CJencodeDlg 消息处理程序
 
 BOOL CJencodeDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// 灏哱鈥滃叧浜�...\鈥濊彍鍗曢」娣诲姞鍒扮郴缁熻彍鍗曚腑銆�
+	// 将\“关于...\”菜单项添加到系统菜单中。
 
-	// IDM_ABOUTBOX 蹇呴』鍦ㄧ郴缁熷懡浠よ寖鍥村唴銆�
+	// IDM_ABOUTBOX 必须在系统命令范围内。
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -110,26 +110,26 @@ BOOL CJencodeDlg::OnInitDialog()
 		}
 	}
 
-	// 璁剧疆姝ゅ璇濇鐨勫浘鏍囥€傚綋搴旂敤绋嬪簭涓荤獥鍙ｄ笉鏄璇濇鏃讹紝妗嗘灦灏嗚嚜鍔�
-	//  鎵ц姝ゆ搷浣�
-	SetIcon(m_hIcon, TRUE);			// 璁剧疆澶у浘鏍�
-	SetIcon(m_hIcon, FALSE);		// 璁剧疆灏忓浘鏍�
+	// 设置此对话框的图标。当应用程序主窗口不是对话框时，框架将自动
+	//  执行此操作
+	SetIcon(m_hIcon, TRUE);			// 设置大图标
+	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	// TODO: 鍦ㄦ娣诲姞棰濆鐨勫垵濮嬪寲浠ｇ爜
+	// TODO: 在此添加额外的初始化代码
 
 	acl::log::open("jencode.log", "jencode");
 	logger("started!");
 
 	//freopen("CONOUT$","w+t",stdout);
-	// 娣诲姞鐘舵€佹爮
+	// 添加状态栏
 	int aWidths[2] = {50, -1};
 	m_wndStatus.Create(WS_CHILD | WS_VISIBLE | WS_BORDER
 		| CCS_BOTTOM | SBARS_SIZEGRIP,
 		CRect(0,0,0,0), this, 0);
 	m_wndStatus.SetParts(2, aWidths);
-	m_wndStatus.SetText("灏辩华", 0, 0);
+	m_wndStatus.SetText("就绪", 0, 0);
 	m_wndStatus.SetText("", 1, 0);
-	return TRUE;  // 闄ら潪璁剧疆浜嗘帶浠剁殑鐒︾偣锛屽惁鍒欒繑鍥� TRUE
+	return TRUE;  // 除非设置了控件的焦点，否则返回 TRUE
 }
 
 void CJencodeDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -142,18 +142,18 @@ void CJencodeDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// 濡傛灉鍚戝璇濇娣诲姞鏈€灏忓寲鎸夐挳锛屽垯闇€瑕佷笅闈㈢殑浠ｇ爜
-//  鏉ョ粯鍒惰鍥炬爣銆傚浜庝娇鐢ㄦ枃妗�/瑙嗗浘妯″瀷鐨� MFC 搴旂敤绋嬪簭锛�
-//  杩欏皢鐢辨鏋惰嚜鍔ㄥ畬鎴愩€�
+// 如果向对话框添加最小化按钮，则需要下面的代码
+//  来绘制该图标。对于使用文档/视图模型的 MFC 应用程序，
+//  这将由框架自动完成。
 
 void CJencodeDlg::OnPaint() 
 {
 	if (IsIconic()) {
-		CPaintDC dc(this); // 鐢ㄤ簬缁樺埗鐨勮澶囦笂涓嬫枃
+		CPaintDC dc(this); // 用于绘制的设备上下文
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// 浣垮浘鏍囧湪宸ヤ綔鐭╁舰涓眳涓�
+		// 使图标在工作矩形中居中
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -161,14 +161,14 @@ void CJencodeDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// 缁樺埗鍥炬爣
+		// 绘制图标
 		dc.DrawIcon(x, y, m_hIcon);
 	} else {
 		CDialog::OnPaint();
 	}
 }
 
-//褰撶敤鎴锋嫋鍔ㄦ渶灏忓寲绐楀彛鏃剁郴缁熻皟鐢ㄦ鍑芥暟鍙栧緱鍏夋爣鏄剧ず銆�
+//当用户拖动最小化窗口时系统调用此函数取得光标显示。
 HCURSOR CJencodeDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -190,7 +190,7 @@ BOOL CJencodeDlg::CheckPath(void)
 	GetDlgItem(IDC_EDIT_SPATH)->GetWindowText(m_sPath);
 	//MessageBox(m_sPath);
 	if (m_sPath.GetLength() == 0) {
-		MessageBox("璇烽€夋嫨婧愮洰褰�...");
+		MessageBox("请选择源目录...");
 		return FALSE;
 	}
 
@@ -199,7 +199,7 @@ BOOL CJencodeDlg::CheckPath(void)
 	//GetDlgItem(IDC_EDIT_DPATH)->GetWindowText(m_dPath);
 	//if (m_dPath.GetLength() == 0)
 	//{
-	//	MessageBox("璇烽€夋嫨鐩殑鐩綍...");
+	//	MessageBox("请选择目的目录...");
 	//	return FALSE;
 	//}
 
@@ -218,7 +218,7 @@ void CJencodeDlg::ButtonsDisable(void)
 
 void CJencodeDlg::OnBnClickedButtonGb2utf()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		return;
 	}
@@ -228,14 +228,14 @@ void CJencodeDlg::OnBnClickedButtonGb2utf()
 	gb2Utf8.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
 	gb2Utf8.OnTransEnd(WM_USER_TRANS_OVER);
 	gb2Utf8.start();
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedButtonUtf2gb()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		MessageBox(m_sPath);
 		return;
@@ -246,14 +246,14 @@ void CJencodeDlg::OnBnClickedButtonUtf2gb()
 	utf2gb.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
 	utf2gb.OnTransEnd(WM_USER_TRANS_OVER);
 	utf2gb.start();
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedButtonGb2uni()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		MessageBox(m_sPath);
 		return;
@@ -266,14 +266,14 @@ void CJencodeDlg::OnBnClickedButtonGb2uni()
 	gb2uni.Init(this->GetSafeHwnd(), m_sPath, m_dPath);
 	gb2uni.OnTransEnd(WM_USER_TRANS_OVER);
 	gb2uni.start();
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedButton2()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	CString sPath;
 	BROWSEINFO   bi;
 	char name[MAX_PATH];
@@ -295,7 +295,7 @@ void CJencodeDlg::OnBnClickedButton2()
 	}
 
 	GetDlgItem(IDC_EDIT_SPATH)->SetWindowText(sPath);
-//	CFileDialog file(TRUE,"鏂囦欢","result.txt",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+//	CFileDialog file(TRUE,"文件","result.txt",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 //	if(file.DoModal()==IDOK)
 //	{
 //		CString pathname;
@@ -307,7 +307,7 @@ void CJencodeDlg::OnBnClickedButton2()
 
 void CJencodeDlg::OnBnClickedButton3()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	CString sPath;
 	BROWSEINFO   bi;
 	char name[MAX_PATH];
@@ -336,8 +336,8 @@ afx_msg LRESULT CJencodeDlg::OnTransOver(WPARAM uID, LPARAM lEvent)
 	CString msg;
 
 	ButtonsEnable();
-	msg.Format("鑰楁椂锛�%d 绉�", time(NULL) - m_nBegin);
-	m_wndStatus.SetText("瀹屾垚", 0, 0);
+	msg.Format("耗时：%d 秒", time(NULL) - m_nBegin);
+	m_wndStatus.SetText("完成", 0, 0);
 	m_wndStatus.SetText(msg, 1, 0);
 	return 0;
 }
@@ -347,15 +347,15 @@ afx_msg LRESULT CJencodeDlg::OnTransOver2(WPARAM uID, LPARAM lEvent)
 	CString msg;
 
 	GetDlgItem(IDC_TRANS_IDX)->EnableWindow(TRUE);
-	msg.Format("鑰楁椂锛�%d 绉�", time(NULL) - m_nBegin);
-	m_wndStatus.SetText("瀹屾垚!", 0, 0);
+	msg.Format("耗时：%d 秒", time(NULL) - m_nBegin);
+	m_wndStatus.SetText("完成!", 0, 0);
 	m_wndStatus.SetText(msg, 1, 0);
 	return 0;
 }
 
 void CJencodeDlg::OnBnClickedAclTrans()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		return;
 	}
@@ -365,14 +365,14 @@ void CJencodeDlg::OnBnClickedAclTrans()
 	aclTrans.Init(this->GetSafeHwnd(), m_sPath);
 	aclTrans.OnTransEnd(WM_USER_TRANS_OVER);
 	aclTrans.Run();
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedAclRestore()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		return;
 	}
@@ -382,14 +382,14 @@ void CJencodeDlg::OnBnClickedAclRestore()
 	aclTrans.Init(this->GetSafeHwnd(), m_sPath);
 	aclTrans.OnTransEnd(WM_USER_TRANS_OVER);
 	aclTrans.Run(FALSE);
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedDelBom()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		return;
 	}
@@ -399,14 +399,14 @@ void CJencodeDlg::OnBnClickedDelBom()
 	delBom.OnDeleted(WM_USER_TRANS_OVER);
 	delBom.start();
 
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedAddBom()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	if (!CheckPath()) {
 		return;
 	}
@@ -416,15 +416,15 @@ void CJencodeDlg::OnBnClickedAddBom()
 	addBom.OnAdded(WM_USER_TRANS_OVER);
 	addBom.start();
 
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 	ButtonsDisable();
 }
 
 void CJencodeDlg::OnBnClickedIdxSelect()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
-	CFileDialog file(TRUE,"鏂囦欢","search.idx",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	// TODO: 在此添加控件通知处理程序代码
+	CFileDialog file(TRUE,"文件","search.idx",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
 	if(file.DoModal()==IDOK) {
 		CString pathname;
 
@@ -435,13 +435,13 @@ void CJencodeDlg::OnBnClickedIdxSelect()
 
 void CJencodeDlg::OnBnClickedTransIdx()
 {
-	// TODO: 鍦ㄦ娣诲姞鎺т欢閫氱煡澶勭悊绋嬪簭浠ｇ爜
+	// TODO: 在此添加控件通知处理程序代码
 	static CIdxTrans idxTrans;
 
 	UpdateData(TRUE);
 	GetDlgItem(IDC_IDX_PATH)->GetWindowText(m_fsPath);
 	if (m_fsPath.GetLength() == 0) {
-		MessageBox("璇烽€夋嫨绱㈠紩鏂囦欢...");
+		MessageBox("请选择索引文件...");
 		return;
 	}
 
@@ -449,6 +449,6 @@ void CJencodeDlg::OnBnClickedTransIdx()
 	idxTrans.Init(this->GetSafeHwnd(), m_fsPath);
 	idxTrans.OnTransEnd(WM_USER_TRANS_OVER2);
 	idxTrans.Run();
-	m_wndStatus.SetText("杩愯", 0, 0);
+	m_wndStatus.SetText("运行", 0, 0);
 	m_nBegin = time(NULL);
 }

@@ -1,4 +1,4 @@
-﻿#ifndef LIB_ACL_FIBER_INCLUDE_H
+#ifndef LIB_ACL_FIBER_INCLUDE_H
 #define LIB_ACL_FIBER_INCLUDE_H
 
 #ifdef __cplusplus
@@ -11,28 +11,28 @@ extern "C" {
 //typedef struct ACL_VSTREAM ACL_VSTREAM;
 
 /**
- * 鍗忕▼缁撴瀯绫诲瀷
+ * 协程结构类型
  */
 typedef struct ACL_FIBER ACL_FIBER;
 
 /**
- * 璁剧疆鏄惁闇€瑕� hook 绯荤粺涓殑 IO 鐩稿叧鐨� API锛屽唴閮ㄧ己鐪佸€间负 1
- * @param onoff {int} 鏄惁闇€瑕� hook
+ * 设置是否需要 hook 系统中的 IO 相关的 API，内部缺省值为 1
+ * @param onoff {int} 是否需要 hook
  */
 void acl_fiber_hook_api(int onoff);
 
 /**
- * 鍒涘缓涓€涓崗绋�
- * @param fn {void (*)(ACL_FIBER*, void*)} 鍗忕▼杩愯鏃剁殑鍥炶皟鍑芥暟鍦板潃
- * @param arg {void*} 鍥炶皟 fn 鍑芥暟鏃剁殑绗簩涓弬鏁�
- * @param size {size_t} 鎵€鍒涘缓鍗忕▼鎵€鍗犳爤绌洪棿澶у皬
+ * 创建一个协程
+ * @param fn {void (*)(ACL_FIBER*, void*)} 协程运行时的回调函数地址
+ * @param arg {void*} 回调 fn 函数时的第二个参数
+ * @param size {size_t} 所创建协程所占栈空间大小
  * @return {ACL_FIBER*}
  */
 ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 	void* arg, size_t size);
 
 /**
- * 杩斿洖褰撳墠绾跨▼涓浜庢秷浜＄姸鎬佺殑鍗忕▼鏁�
+ * 返回当前线程中处于消亡状态的协程数
  * @retur {int}
  */
 int acl_fiber_ndead(void);
@@ -40,318 +40,318 @@ int acl_fiber_ndead(void);
 void acl_fiber_check_timer(size_t max);
 
 /**
- * 杩斿洖褰撳墠姝ｅ湪杩愯鐨勫崗绋嬪璞�
- * @retur {ACL_FIBER*} 杩斿洖 NULL 琛ㄧず褰撳墠娌℃湁姝ｅ湪杩愯鐨勫崗绋�
+ * 返回当前正在运行的协程对象
+ * @retur {ACL_FIBER*} 返回 NULL 表示当前没有正在运行的协程
  */
 ACL_FIBER* acl_fiber_running(void);
 
 /**
- * 鑾峰緱鎵€缁欏崗绋嬬殑鍗忕▼ ID 鍙�
- * @param fiber {const ACL_FIBER*} acl_fiber_create 鍒涘缓鐨勫崗绋嬪璞★紝蹇呴』闈炵┖
- * @return {unsigned int} 鍗忕▼ ID 鍙�
+ * 获得所给协程的协程 ID 号
+ * @param fiber {const ACL_FIBER*} acl_fiber_create 创建的协程对象，必须非空
+ * @return {unsigned int} 协程 ID 号
  */
 unsigned int acl_fiber_id(const ACL_FIBER* fiber);
 
 /**
- * 鑾峰緱褰撳墠鎵€杩愯鐨勫崗绋嬬殑 ID 鍙�
- * @return {unsigned int} 褰撳墠杩愯鍗忕▼鐨� ID 鍙�
+ * 获得当前所运行的协程的 ID 号
+ * @return {unsigned int} 当前运行协程的 ID 号
  */
 unsigned int acl_fiber_self(void);
 
 /**
- * 璁剧疆鎵€缁欏崗绋嬬殑閿欒鍙�
- * @param fiber {ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝涓� NULL 鍒欎娇鐢ㄥ綋鍓嶈繍琛岀殑鍗忕▼
- * @param errnum {int} 閿欒鍙�
+ * 设置所给协程的错误号
+ * @param fiber {ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前运行的协程
+ * @param errnum {int} 错误号
  */
 void acl_fiber_set_errno(ACL_FIBER* fiber, int errnum);
 
 /**
- * 鑾峰緱鎸囧畾鍗忕▼鐨勯敊璇彿
- * @param fiber {ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝鑻ヤ负 NULL 鍒欎娇鐢ㄥ綋鍓嶅崗绋嬪璞�
- * @return {int} 鎵€缁欏崗绋嬮敊璇彿
+ * 获得指定协程的错误号
+ * @param fiber {ACL_FIBER*} 指定的协程对象，若为 NULL 则使用当前协程对象
+ * @return {int} 所给协程错误号
  */
 int acl_fiber_errno(ACL_FIBER* fiber);
 
 /**
- * 鑾峰緱褰撳墠绯荤粺绾х殑 errno 鍙�
+ * 获得当前系统级的 errno 号
  * @return {int}
  */
 int acl_fiber_sys_errno(void);
 
 /**
- * 璁剧疆褰撳墠绯荤粺鐨� errno 鍙�
+ * 设置当前系统的 errno 号
  * @param errnum {int}
  */
 void acl_fiber_sys_errno_set(int errnum);
 
 /**
- * 鏄惁淇濇寔鎵€鎸囧畾鍗忕▼鐨勯敊璇彿锛屽綋璁剧疆涓衡€滀繚鎸佲€濆悗锛屽垯璇ュ崗绋嬩粎淇濇寔褰撳墠鐘舵€佷笅鐨�
- * 閿欒鍙凤紝涔嬪悗璇ュ崗绋嬬殑閿欒鍙� errno 灏嗕笉鍐嶆敼鍙橈紝璧板埌鍐嶆璋冪敤鏈嚱鏁板彇娑堜繚鎸�
- * @param fiber {ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝涓� NULL 鍒欎娇鐢ㄥ綋鍓嶈繍琛岀殑鍗忕▼
- * @param yesno {int} 鏄惁淇濇寔
+ * 是否保持所指定协程的错误号，当设置为“保持”后，则该协程仅保持当前状态下的
+ * 错误号，之后该协程的错误号 errno 将不再改变，走到再次调用本函数取消保持
+ * @param fiber {ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前运行的协程
+ * @param yesno {int} 是否保持
  */
 void acl_fiber_keep_errno(ACL_FIBER* fiber, int yesno);
 
 /**
- * 鑾峰緱鎸囧畾鍗忕▼鐨勫綋鍓嶇姸鎬�
- * @param fiber {const ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝涓� NULL 鍒欎娇鐢ㄥ綋鍓嶅崗绋�
- * @return {int} 鍗忕▼鐘舵€�
+ * 获得指定协程的当前状态
+ * @param fiber {const ACL_FIBER*} 指定的协程对象，为 NULL 则使用当前协程
+ * @return {int} 协程状态
  */
 int acl_fiber_status(const ACL_FIBER* fiber);
 
 /**
- * 閫氱煡澶勪簬浼戠湢鐘舵€佺殑鍗忕▼閫€鍑� 
- * @param fiber {const ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝蹇呴』闈� NULL
+ * 通知处于休眠状态的协程退出 
+ * @param fiber {const ACL_FIBER*} 指定的协程对象，必须非 NULL
  */
 void acl_fiber_kill(ACL_FIBER* fiber);
 
 /**
- * 妫€鏌ユ湰鍗忕▼鏄惁琚叾瀹冨崗绋嬮€氱煡閫€鍑�
- * @param fiber {const ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝鑻ヤ负 NULL 鍒欒嚜鍔ㄤ娇鐢ㄥ綋鍓�
- *  姝ｅ湪杩愯鐨勫崗绋�
- * @return {int} 杩斿洖鍊间负 0 琛ㄧず娌℃湁琚€氱煡閫€鍑猴紝闈� 0 琛ㄧず琚€氱煡閫€鍑�
+ * 检查本协程是否被其它协程通知退出
+ * @param fiber {const ACL_FIBER*} 指定的协程对象，若为 NULL 则自动使用当前
+ *  正在运行的协程
+ * @return {int} 返回值为 0 表示没有被通知退出，非 0 表示被通知退出
  */
 int acl_fiber_killed(ACL_FIBER* fiber);
 
 /**
- * 鍞ら啋鍥� IO 绛夊師鍥犲浜庝紤鐪犵殑鍗忕▼
- * @param fiber {const ACL_FIBER*} 鍗忕▼瀵硅薄锛屽繀椤婚潪 NULL
- * @param signum {int} SIGINT, SIGKILL, SIGTERM ... 鍙傝€冪郴缁熶腑 bits/signum.h
+ * 唤醒因 IO 等原因处于休眠的协程
+ * @param fiber {const ACL_FIBER*} 协程对象，必须非 NULL
+ * @param signum {int} SIGINT, SIGKILL, SIGTERM ... 参考系统中 bits/signum.h
  */
 void acl_fiber_signal(ACL_FIBER* fiber, int signum);
 
 /**
- * 鑾峰緱鍏跺畠鍗忕▼鍙戦€佺粰鎸囧畾鍗忕▼鐨勪俊鍙峰€�
- * @param fiber {const ACL_FIBER*} 鎸囧畾鐨勫崗绋嬪璞★紝涓� NULL 鏃跺垯浣跨敤褰撳墠鍗忕▼
- * @retur {int} 杩斿洖鎸囧畾鍗忕▼鏀跺埌鐨勪俊鍙峰€�
+ * 获得其它协程发送给指定协程的信号值
+ * @param fiber {const ACL_FIBER*} 指定的协程对象，为 NULL 时则使用当前协程
+ * @retur {int} 返回指定协程收到的信号值
  */
 int acl_fiber_signum(ACL_FIBER* fiber);
 
 /**
- * 灏嗗綋鍓嶈繍琛岀殑鍗忕▼鎸傝捣锛岀敱璋冨害鍣ㄩ€夋嫨涓嬩竴涓渶瑕佽繍琛岀殑鍗忕▼
+ * 将当前运行的协程挂起，由调度器选择下一个需要运行的协程
  * @return {int}
  */
 int acl_fiber_yield(void);
 
 /**
- * 灏嗘寚瀹氬崗绋嬪璞＄疆鍏ュ緟杩愯闃熷垪涓�
- * @param fiber {ACL_FIBER*} 鎸囧畾鍗忕▼锛屽繀椤婚潪 NULL
+ * 将指定协程对象置入待运行队列中
+ * @param fiber {ACL_FIBER*} 指定协程，必须非 NULL
  */
 void acl_fiber_ready(ACL_FIBER* fiber);
 
 /**
- * 灏嗗綋鍓嶈繍琛岀殑鍗忕▼鎸傝捣锛屽悓鏃舵墽琛岀瓑寰呴槦鍒椾笅涓€涓緟杩愯鐨勫崗绋�
+ * 将当前运行的协程挂起，同时执行等待队列下一个待运行的协程
  */
 void acl_fiber_switch(void);
 
 /**
- * 璋冪敤鏈嚱鏁板惎鍔ㄥ崗绋嬬殑璋冨害杩囩▼
+ * 调用本函数启动协程的调度过程
  */
 void acl_fiber_schedule(void);
 
 /**
- * 璋冪敤鏈嚱鏁版娴嬪綋鍓嶇嚎绋嬫槸鍚﹀浜庡崗绋嬭皟搴︾姸鎬�
- * @return {int} 0 琛ㄧず闈炲崗绋嬬姸鎬侊紝闈� 0 琛ㄧず澶勪簬鍗忕▼璋冨害鐘舵€�
+ * 调用本函数检测当前线程是否处于协程调度状态
+ * @return {int} 0 表示非协程状态，非 0 表示处于协程调度状态
  */
 int acl_fiber_scheduled(void);
 
 /**
- * 鍋滄鍗忕▼杩囩▼
+ * 停止协程过程
  */
 void acl_fiber_schedule_stop(void);
 
 /**
- * 浣垮綋鍓嶈繍琛岀殑鍗忕▼浼戠湢鎸囧畾姣鏁�
- * @param milliseconds {unsigned int} 鎸囧畾瑕佷紤鐪犵殑姣鏁�
- * @return {unsigned int} 鏈崗绋嬩紤鐪犲悗鍐嶆琚敜閱掑悗鍓╀綑鐨勬绉掓暟
+ * 使当前运行的协程休眠指定毫秒数
+ * @param milliseconds {unsigned int} 指定要休眠的毫秒数
+ * @return {unsigned int} 本协程休眠后再次被唤醒后剩余的毫秒数
  */
 unsigned int acl_fiber_delay(unsigned int milliseconds);
 
 /**
- * 浣垮綋鍓嶈繍琛岀殑鍗忕▼浼戠湢鎸囧畾绉掓暟
- * @param seconds {unsigned int} 鎸囧畾瑕佷紤鐪犵殑绉掓暟
- * @return {unsigned int} 鏈崗绋嬩紤鐪犲悗鍐嶆琚敜閱掑悗鍓╀綑鐨勭鏁�
+ * 使当前运行的协程休眠指定秒数
+ * @param seconds {unsigned int} 指定要休眠的秒数
+ * @return {unsigned int} 本协程休眠后再次被唤醒后剩余的秒数
  */
 unsigned int acl_fiber_sleep(unsigned int seconds);
 
 /**
- * 鍒涘缓涓€涓崗绋嬬敤浣滃畾鏃跺櫒
- * @param milliseconds {unsigned int} 鎵€鍒涘缓瀹氭椂鍣ㄨ鍞ら啋鐨勬绉掓暟
- * @param size {size_t} 鎵€鍒涘缓鍗忕▼鐨勬爤绌洪棿澶у皬
- * @param fn {void (*)(ACL_FIBER*, void*)} 瀹氭椂鍣ㄥ崗绋嬭鍞ら啋鏃剁殑鍥炶皟鍑芥暟
- * @param ctx {void*} 鍥炶皟 fn 鍑芥暟鏃剁殑绗簩涓弬鏁�
- * @return {ACL_FIBER*} 鏂板垱寤虹殑瀹氭椂鍣ㄥ崗绋�
+ * 创建一个协程用作定时器
+ * @param milliseconds {unsigned int} 所创建定时器被唤醒的毫秒数
+ * @param size {size_t} 所创建协程的栈空间大小
+ * @param fn {void (*)(ACL_FIBER*, void*)} 定时器协程被唤醒时的回调函数
+ * @param ctx {void*} 回调 fn 函数时的第二个参数
+ * @return {ACL_FIBER*} 新创建的定时器协程
  */
 ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	void (*fn)(ACL_FIBER*, void*), void* ctx);
 
 /**
- * 鍦ㄥ畾鏃跺櫒鍗忕▼鏈鍞ら啋鍓嶏紝鍙互閫氳繃鏈嚱鏁伴噸缃鍗忕▼琚敜閱掔殑鏃堕棿
- * @param timer {ACL_FIBER*} 鐢� acl_fiber_create_timer 鍒涘缓鐨勫畾鏃跺櫒鍗忕▼
- * @param milliseconds {unsigned int} 鎸囧畾璇ュ畾鏃跺櫒鍗忕▼琚敜閱掔殑姣鏁�
+ * 在定时器协程未被唤醒前，可以通过本函数重置该协程被唤醒的时间
+ * @param timer {ACL_FIBER*} 由 acl_fiber_create_timer 创建的定时器协程
+ * @param milliseconds {unsigned int} 指定该定时器协程被唤醒的毫秒数
  */
 void acl_fiber_reset_timer(ACL_FIBER* timer, unsigned int milliseconds);
 
 /**
- * 鏈嚱鏁拌缃� DNS 鏈嶅姟鍣ㄧ殑鍦板潃
- * @param ip {const char*} DNS 鏈嶅姟鍣� IP 鍦板潃
- * @param port {int} DNS 鏈嶅姟鍣ㄧ殑绔彛
+ * 本函数设置 DNS 服务器的地址
+ * @param ip {const char*} DNS 服务器 IP 地址
+ * @param port {int} DNS 服务器的端口
  */
 void acl_fiber_set_dns(const char* ip, int port);
 
 /* for fiber specific */
 
 /**
- * 璁惧畾褰撳墠鍗忕▼鐨勫眬閮ㄥ彉閲�
- * @param key {int*} 鍗忕▼灞€閮ㄥ彉閲忕殑绱㈠紩閿殑鍦板潃锛屽垵濮嬫椂璇ュ€煎簲 <= 0锛屽唴閮ㄤ細鑷姩
- *  鍒嗛厤涓€涓� > 0 鐨勭储寮曢敭锛屽苟缁欒鍦板潃璧嬪€硷紝鍚庨潰鐨勫崗绋嬪彲浠ュ鐢ㄨ鍊艰缃悇鑷殑
- *  灞€閮ㄥ彉閲忥紝璇ユ寚閽堝繀椤婚潪 NULL
- * @param ctx {void *} 鍗忕▼灞€閮ㄥ彉閲�
- * @param free_fn {void (*)(void*)} 褰撳崗绋嬮€€鍑烘椂浼氳皟鐢ㄦ鍑芥暟閲婃斁鍗忕▼灞€閮ㄥ彉閲�
- * @return {int} 杩斿洖鎵€璁剧疆鐨勫崗绋嬪眬閮ㄥ彉閲忕殑閿€硷紝杩斿洖 -1 琛ㄧず褰撳墠鍗忕▼涓嶅瓨鍦�
+ * 设定当前协程的局部变量
+ * @param key {int*} 协程局部变量的索引键的地址，初始时该值应 <= 0，内部会自动
+ *  分配一个 > 0 的索引键，并给该地址赋值，后面的协程可以复用该值设置各自的
+ *  局部变量，该指针必须非 NULL
+ * @param ctx {void *} 协程局部变量
+ * @param free_fn {void (*)(void*)} 当协程退出时会调用此函数释放协程局部变量
+ * @return {int} 返回所设置的协程局部变量的键值，返回 -1 表示当前协程不存在
  */
 int acl_fiber_set_specific(int* key, void* ctx, void (*free_fn)(void*));
 
 /**
- * 鑾峰緱褰撳墠鍗忕▼灞€閮ㄥ彉閲�
- * @param key {int} 鐢� acl_fiber_set_specific 杩斿洖鐨勯敭鍊�
- * @retur {void*} 杩斿洖 NULL 琛ㄧず涓嶅瓨鍦�
+ * 获得当前协程局部变量
+ * @param key {int} 由 acl_fiber_set_specific 返回的键值
+ * @retur {void*} 返回 NULL 表示不存在
  */
 void* acl_fiber_get_specific(int key);
 
 /* fiber locking */
 
 /**
- * 鍗忕▼浜掓枼閿侊紝绾跨▼闈炲畨鍏紝鍙兘鐢ㄥ湪鍚屼竴绾跨▼鍐�
+ * 协程互斥锁，线程非安全，只能用在同一线程内
  */
 typedef struct ACL_FIBER_MUTEX ACL_FIBER_MUTEX;
 
 /**
- * 鍗忕▼璇诲啓閿侊紝绾跨▼闈炲畨鍏紝鍙兘鐢ㄥ湪鍚屼竴绾跨▼鍐�
+ * 协程读写锁，线程非安全，只能用在同一线程内
  */
 typedef struct ACL_FIBER_RWLOCK ACL_FIBER_RWLOCK;
 
 /**
- * 鍒涘缓鍗忕▼浜掓枼閿侊紝绾跨▼闈炲畨鍏紝鍙兘鐢ㄥ湪鍚屼竴绾跨▼鍐�
+ * 创建协程互斥锁，线程非安全，只能用在同一线程内
  * @return {ACL_FIBER_MUTEX*}
  */
 ACL_FIBER_MUTEX* acl_fiber_mutex_create(void);
 
 /**
- * 閲婃斁鍗忕▼浜掓枼閿�
- * @param l {ACL_FIBER_MUTEX*} 鐢� acl_fiber_mutex_create 鍒涘缓鐨勫崗绋嬩簰鏂ラ攣
+ * 释放协程互斥锁
+ * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  */
 void acl_fiber_mutex_free(ACL_FIBER_MUTEX* l);
 
 /**
- * 瀵瑰崗绋嬩簰鏂ラ攣杩涜闃诲寮忓姞閿侊紝濡傛灉鍔犻攣鎴愬姛鍒欒繑鍥烇紝鍚﹀垯鍒欓樆濉�
- * @param l {ACL_FIBER_MUTEX*} 鐢� acl_fiber_mutex_create 鍒涘缓鐨勫崗绋嬩簰鏂ラ攣
+ * 对协程互斥锁进行阻塞式加锁，如果加锁成功则返回，否则则阻塞
+ * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  */
 void acl_fiber_mutex_lock(ACL_FIBER_MUTEX* l);
 
 /**
- * 瀵瑰崗绋嬩簰鏂ラ攣灏濊瘯鎬ц繘琛屽姞閿侊紝鏃犺鏄惁鎴愬姛鍔犻攣閮戒細绔嬪嵆杩斿洖
- * @param l {ACL_FIBER_MUTEX*} 鐢� acl_fiber_mutex_create 鍒涘缓鐨勫崗绋嬩簰鏂ラ攣
- * @return {int} 濡傛灉鍔犻攣鎴愬姛鍒欒繑鍥� 0 鍊硷紝鍚﹀垯杩斿洖 -1
+ * 对协程互斥锁尝试性进行加锁，无论是否成功加锁都会立即返回
+ * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
+ * @return {int} 如果加锁成功则返回 0 值，否则返回 -1
  */
 int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX* l);
 
 /**
- * 鍔犻攣鎴愬姛鐨勫崗绋嬭皟鐢ㄦ湰鍑芥暟杩涜瑙ｉ攣锛岃皟鐢ㄦ湰鍑芥暟鐨勫崗绋嬪繀椤绘槸璇ラ攣鐨勫睘涓伙紝鍚﹀垯
- * 鍐呴儴浼氫骇鐢熸柇瑷€
- * @param l {ACL_FIBER_MUTEX*} 鐢� acl_fiber_mutex_create 鍒涘缓鐨勫崗绋嬩簰鏂ラ攣
+ * 加锁成功的协程调用本函数进行解锁，调用本函数的协程必须是该锁的属主，否则
+ * 内部会产生断言
+ * @param l {ACL_FIBER_MUTEX*} 由 acl_fiber_mutex_create 创建的协程互斥锁
  */
 void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX* l);
 
 /**
- * 鍒涘缓鍗忕▼璇诲啓閿侊紝绾跨▼闈炲畨鍏紝鍙兘鐢ㄥ湪鍚屼竴绾跨▼鍐�
+ * 创建协程读写锁，线程非安全，只能用在同一线程内
  * @return {ACL_FIBER_RWLOCK*}
  */
 ACL_FIBER_RWLOCK* acl_fiber_rwlock_create(void);
 
 /**
- * 閲婃斁鍗忕▼璇诲啓閿�
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
+ * 释放协程读写锁
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
 void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK* l);
 
 /**
- * 瀵瑰崗绋嬭鍐欓攣鍔犺閿侊紝濡傛灉璇ラ攣褰撳墠姝ｈ鍏跺畠鍗忕▼鍔犱簡璇婚攣锛屽垯鏈崗绋嬩緷鐒跺彲浠�
- * 姝ｅ父鍔犺閿侊紝濡傛灉璇ラ攣褰撳墠姝ｈ鍏跺畠鍗忕▼鍔犱簡鍐欓攣锛屽垯鏈崗绋嬭繘鍏ラ樆濉炵姸鎬侊紝鐩磋嚦
- * 鍐欓攣閲婃斁
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
+ * 对协程读写锁加读锁，如果该锁当前正被其它协程加了读锁，则本协程依然可以
+ * 正常加读锁，如果该锁当前正被其它协程加了写锁，则本协程进入阻塞状态，直至
+ * 写锁释放
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
 void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * 瀵瑰崗绋嬭鍐欓攣灏濊瘯鎬у姞璇婚攣锛屽姞閿佹棤璁烘槸鍚︽垚鍔熼兘浼氱珛鍗宠繑鍥�
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
- * @retur {int} 杩斿洖 1 琛ㄧず鍔犻攣鎴愬姛锛岃繑鍥� 0 琛ㄧず鍔犻攣澶辫触
+ * 对协程读写锁尝试性加读锁，加锁无论是否成功都会立即返回
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
+ * @retur {int} 返回 1 表示加锁成功，返回 0 表示加锁失败
  */
 int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * 瀵瑰崗绋嬭鍐欓攣鍔犲啓閿侊紝鍙湁褰撹閿佹湭琚换浣曞崗绋嬪姞璇�/鍐欓攣鏃舵墠浼氳繑鍥烇紝鍚﹀垯闃诲锛�
- * 鐩磋嚦璇ラ攣鍙姞鍐欓攣
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
+ * 对协程读写锁加写锁，只有当该锁未被任何协程加读/写锁时才会返回，否则阻塞，
+ * 直至该锁可加写锁
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
 void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * 瀵瑰崗绋嬭鍐欓攣灏濊瘯鎬у姞鍐欓攣锛屾棤璁烘槸鍚﹀姞閿佹垚鍔熼兘浼氱珛鍗宠繑鍥�
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
- * @return {int} 杩斿洖 1 琛ㄧず鍔犲啓閿佹垚鍔燂紝杩斿洖 0 琛ㄧず鍔犻攣澶辫触
+ * 对协程读写锁尝试性加写锁，无论是否加锁成功都会立即返回
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
+ * @return {int} 返回 1 表示加写锁成功，返回 0 表示加锁失败
  */
 int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK* l);
 
 /**
- * 瀵瑰崗绋嬭鍐欓攣鎴愬姛鍔犺閿佺殑鍗忕▼璋冪敤鏈嚱鏁拌В璇婚攣锛岃皟鐢ㄨ€呭繀椤绘槸涔嬪墠宸叉垚鍔熷姞璇�
- * 閿佹垚鍔熺殑鍗忕▼
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
+ * 对协程读写锁成功加读锁的协程调用本函数解读锁，调用者必须是之前已成功加读
+ * 锁成功的协程
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
 void acl_fiber_rwlock_runlock(ACL_FIBER_RWLOCK* l);
 /**
- * 瀵瑰崗绋嬭鍐欓攣鎴愬姛鍔犲啓閿佺殑鍗忕▼璋冪敤鏈嚱鏁拌В鍐欓攣锛岃皟鐢ㄨ€呭繀椤绘槸涔嬪墠宸叉垚鍔熷姞鍐�
- * 閿佹垚鍔熺殑鍗忕▼
- * @param l {ACL_FIBER_RWLOCK*} 鐢� acl_fiber_rwlock_create 鍒涘缓鐨勮鍐欓攣
+ * 对协程读写锁成功加写锁的协程调用本函数解写锁，调用者必须是之前已成功加写
+ * 锁成功的协程
+ * @param l {ACL_FIBER_RWLOCK*} 由 acl_fiber_rwlock_create 创建的读写锁
  */
 void acl_fiber_rwlock_wunlock(ACL_FIBER_RWLOCK* l);
 
 /* fiber_event.c */
 
-/* 绾跨▼瀹夊叏鐨勫崗绋嬮攣锛屽彲浠ョ敤鍦ㄤ笉鍚岀嚎绋嬬殑鍗忕▼涔嬮棿鍙婁笉鍚岀嚎绋嬩箣闂寸殑浜掓枼 */
+/* 线程安全的协程锁，可以用在不同线程的协程之间及不同线程之间的互斥 */
 typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
 
 /**
- * 鍒涘缓鍩轰簬浜嬩欢鐨勫崗绋�/绾跨▼娣峰悎閿�
+ * 创建基于事件的协程/线程混合锁
  * @return {ACL_FIBER_EVENT *}
  */
 ACL_FIBER_EVENT *acl_fiber_event_create(void);
 
 /**
- * 閲婃斁浜嬩欢閿�
+ * 释放事件锁
  * @param {ACL_FIBER_EVENT *}
  */
 void acl_fiber_event_free(ACL_FIBER_EVENT *event);
 
 /**
- * 绛夊緟浜嬩欢閿佸彲鐢�
+ * 等待事件锁可用
  * @param {ACL_FIBER_EVENT *}
- * @return {int} 杩斿洖 0 琛ㄧず鎴愬姛锛�-1 琛ㄧず鍑洪敊
+ * @return {int} 返回 0 表示成功，-1 表示出错
  */
 int acl_fiber_event_wait(ACL_FIBER_EVENT *event);
 
 /**
- * 灏濊瘯绛夊緟浜嬩欢閿佸彲鐢�
+ * 尝试等待事件锁可用
  * @param {ACL_FIBER_EVENT *}
- * @return {int} 杩斿洖 0 琛ㄧず鎴愬姛锛�-1 琛ㄧず閿佽鍗犵敤
+ * @return {int} 返回 0 表示成功，-1 表示锁被占用
  */
 int acl_fiber_event_trywait(ACL_FIBER_EVENT *event);
 
 /**
- * 浜嬩欢閿佹嫢鏈夎€呴€氱煡绛夊緟鑰呬簨浠堕攣鍙敤锛屽垯绛夊緟鑰呮敹鍒伴€氱煡鍚庡垯鍙幏寰椾簨浠堕攣
+ * 事件锁拥有者通知等待者事件锁可用，则等待者收到通知后则可获得事件锁
  * @param {ACL_FIBER_EVENT *}
- * @return {int} 杩斿洖 0 琛ㄧず鎴愬姛锛�-1 琛ㄧず鍑洪敊
+ * @return {int} 返回 0 表示成功，-1 表示出错
  */
 int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 
@@ -360,59 +360,59 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event);
 typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 
 /**
- * 鍒涘缓鍗忕▼淇″彿閲忥紝鍚屾椂鍐呴儴浼氬皢褰撳墠绾跨▼涓庤淇″彿閲忕粦瀹�
- * @param num {int} 淇″彿閲忓垵濮嬪€硷紙蹇呴』 >= 0锛�
+ * 创建协程信号量，同时内部会将当前线程与该信号量绑定
+ * @param num {int} 信号量初始值（必须 >= 0）
  * @return {ACL_FIBER_SEM *}
  */
 ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 
 /**
- * 閲婃斁鍗忕▼淇″彿閲�
+ * 释放协程信号量
  * @param {ACL_FIBER_SEM *}
  */
 void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 
 /**
- * 鑾峰緱褰撳墠鍗忕▼淇″彿閲忔墍缁戝畾鐨勭嚎绋� ID
- * @param sem {ACL_FIBER_SEM*} 鍗忕▼淇″彿閲忓璞�
+ * 获得当前协程信号量所绑定的线程 ID
+ * @param sem {ACL_FIBER_SEM*} 协程信号量对象
  * @return {acl_pthread_t}
  */
 acl_pthread_t acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
 
 /**
- * 璁剧疆鎸囧畾鍗忕▼淇″彿閲忕殑鐨勭嚎绋� ID锛屽綋鏀瑰彉鏈崗绋嬩俊鍙烽噺鎵€灞炵殑绾跨▼鏃跺鏋滅瓑寰呯殑鍗忕▼
- * 鏁版嵁闈� 0 鍒欏唴閮ㄨ嚜鍔� fatal锛屽嵆褰撳崗绋嬩俊鍙烽噺涓婄瓑寰呭崗绋嬮潪绌烘椂绂佹璋冪敤鏈柟娉�
- * @param sem {ACL_FIBER_SEM*} 鍗忕▼淇″彿閲忓璞�
- * @param {acl_pthread_t} 绾跨▼ ID
+ * 设置指定协程信号量的的线程 ID，当改变本协程信号量所属的线程时如果等待的协程
+ * 数据非 0 则内部自动 fatal，即当协程信号量上等待协程非空时禁止调用本方法
+ * @param sem {ACL_FIBER_SEM*} 协程信号量对象
+ * @param {acl_pthread_t} 线程 ID
  */
 void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, acl_pthread_t tid);
 
 /**
- * 褰撳崗绋嬩俊鍙烽噺 > 0 鏃朵娇淇″彿閲忓噺 1锛屽惁鍒欑瓑寰呬俊鍙烽噺 > 0
+ * 当协程信号量 > 0 时使信号量减 1，否则等待信号量 > 0
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} 杩斿洖淇″彿閲忓綋鍓嶅€硷紝濡傛灉杩斿洖 -1 琛ㄦ槑褰撳墠绾跨▼涓庡崗绋嬩俊鍙烽噺鎵€灞炵嚎绋�
- *  涓嶆槸鍚屼竴绾跨▼锛屾鏃惰鏂规硶涓嶇瓑寰呯珛鍗宠繑鍥�
+ * @retur {int} 返回信号量当前值，如果返回 -1 表明当前线程与协程信号量所属线程
+ *  不是同一线程，此时该方法不等待立即返回
  */
 int acl_fiber_sem_wait(ACL_FIBER_SEM* sem);
 
 /**
- * 灏濊瘯浣垮崗绋嬩俊鍙烽噺鍑� 1
+ * 尝试使协程信号量减 1
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} 鎴愬姛鍑� 1 鏃惰繑鍥炲€� >= 0锛岃繑鍥� -1 琛ㄧず褰撳墠淇″彿閲忎笉鍙敤锛屾垨褰撳墠
- *  璋冪敤鑰呯嚎绋嬩笌鍗忕▼淇″彿閲忔墍灞炵嚎绋嬩笉鏄悓涓€绾跨▼
+ * @retur {int} 成功减 1 时返回值 >= 0，返回 -1 表示当前信号量不可用，或当前
+ *  调用者线程与协程信号量所属线程不是同一线程
  */
 int acl_fiber_sem_trywait(ACL_FIBER_SEM* sem);
 
 /**
- * 浣垮崗绋嬩俊鍙烽噺鍔� 1
+ * 使协程信号量加 1
  * @param sem {ACL_FIBER_SEM *}
- * @retur {int} 杩斿洖淇″彿閲忓綋鍓嶅€硷紝杩斿洖 -1 琛ㄧず褰撳墠璋冪敤鑰呯嚎绋嬩笌鍗忕▼淇″彿閲忔墍灞�
- *  绾跨▼涓嶆槸鍚屼竴绾跨▼
+ * @retur {int} 返回信号量当前值，返回 -1 表示当前调用者线程与协程信号量所属
+ *  线程不是同一线程
  */
 int acl_fiber_sem_post(ACL_FIBER_SEM* sem);
 
 /**
- * 鑾峰緱鎸囧畾鍗忕▼淇″彿閲忕殑褰撳墠鍊硷紝璇ュ€煎弽鏄犱簡鐩墠绛夊緟璇ヤ俊鍙烽噺鐨勬暟閲�
+ * 获得指定协程信号量的当前值，该值反映了目前等待该信号量的数量
  * @param sem {ACL_FIBER_SEM*}
  * @retur {int}
  */
@@ -421,114 +421,114 @@ int acl_fiber_sem_num(ACL_FIBER_SEM* sem);
 /* channel communication */
 
 /**
- * 鍗忕▼闂撮€氫俊鐨勭閬�
+ * 协程间通信的管道
  */
 typedef struct ACL_CHANNEL ACL_CHANNEL;
 
 /**
- * 鍒涘缓鍗忕▼閫氫俊绠￠亾
- * @param elemsize {int} 鍦� ACL_CHANNEL 杩涜浼犺緭鐨勫璞＄殑鍥哄畾灏哄澶у皬锛堝瓧鑺傦級
- * @param bufsize {int} ACL_CHANNEL 鍐呴儴缂撳啿鍖哄ぇ灏忥紝鍗冲彲浠ョ紦瀛� elemsize 灏哄澶у皬
- *  瀵硅薄鐨勪釜鏁�
+ * 创建协程通信管道
+ * @param elemsize {int} 在 ACL_CHANNEL 进行传输的对象的固定尺寸大小（字节）
+ * @param bufsize {int} ACL_CHANNEL 内部缓冲区大小，即可以缓存 elemsize 尺寸大小
+ *  对象的个数
  * @return {CHANNNEL*}
  */
 ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize);
 
 /**
- * 閲婃斁鐢� acl_channel_create 鍒涘缓鐨勫崗绋嬮€氫俊绠￠亾瀵硅薄
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
+ * 释放由 acl_channel_create 创建的协程通信管道对象
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  */
 void acl_channel_free(ACL_CHANNEL* c);
 
 /**
- * 闃诲寮忓悜鎸囧畾 ACL_CHANNEL 涓彂閫佹寚瀹氱殑瀵硅薄鍦板潃
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param v {void*} 琚彂閫佺殑瀵硅薄鍦板潃
- * @return {int} 杩斿洖鍊� >= 0
+ * 阻塞式向指定 ACL_CHANNEL 中发送指定的对象地址
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param v {void*} 被发送的对象地址
+ * @return {int} 返回值 >= 0
  */
 int acl_channel_send(ACL_CHANNEL* c, void* v);
 
 /**
- * 闈為樆濉炲紡鍚戞寚瀹� ACL_CHANNEL 涓彂閫佹寚瀹氱殑瀵硅薄锛屽唴閮ㄤ細鏍规嵁 acl_channel_create 涓寚瀹�
- * 鐨� elemsize 瀵硅薄澶у皬杩涜鏁版嵁鎷疯礉
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param v {void*} 琚彂閫佺殑瀵硅薄鍦板潃
+ * 非阻塞式向指定 ACL_CHANNEL 中发送指定的对象，内部会根据 acl_channel_create 中指定
+ * 的 elemsize 对象大小进行数据拷贝
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param v {void*} 被发送的对象地址
  */
 int acl_channel_send_nb(ACL_CHANNEL* c, void* v);
 
 /**
- * 浠庢寚瀹氱殑 ACL_CHANNEL 涓樆濉炲紡璇诲彇瀵硅薄锛�
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param v {void*} 瀛樻斁缁撴灉鍐呭
- * @return {int} 杩斿洖鍊� >= 0 琛ㄧず鎴愬姛璇诲埌鏁版嵁
+ * 从指定的 ACL_CHANNEL 中阻塞式读取对象，
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param v {void*} 存放结果内容
+ * @return {int} 返回值 >= 0 表示成功读到数据
  */
 int acl_channel_recv(ACL_CHANNEL* c, void* v);
 
 /**
- * 浠庢寚瀹氱殑 ACL_CHANNEL 涓潪闃诲寮忚鍙栧璞★紝鏃犺鏄惁璇诲埌鏁版嵁閮戒細绔嬪嵆杩斿洖
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param v {void*} 瀛樻斁缁撴灉鍐呭
- * @return {int} 杩斿洖鍊� >= 0 琛ㄧず鎴愬姛璇诲埌鏁版嵁锛屽惁鍒欒〃绀烘湭璇诲埌鏁版嵁
+ * 从指定的 ACL_CHANNEL 中非阻塞式读取对象，无论是否读到数据都会立即返回
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param v {void*} 存放结果内容
+ * @return {int} 返回值 >= 0 表示成功读到数据，否则表示未读到数据
  */
 int acl_channel_recv_nb(ACL_CHANNEL* c, void* v);
 
 /**
- * 鍚戞寚瀹氱殑 ACL_CHANNEL 涓樆濉炲紡鍙戦€佹寚瀹氬璞＄殑鍦板潃
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param v {void*} 琚彂閫佸璞＄殑鍦板潃
- * @return {int} 杩斿洖鍊� >= 0
+ * 向指定的 ACL_CHANNEL 中阻塞式发送指定对象的地址
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param v {void*} 被发送对象的地址
+ * @return {int} 返回值 >= 0
  */
 int acl_channel_sendp(ACL_CHANNEL* c, void* v);
 
 /**
- * 浠庢寚瀹氱殑 CHANNLE 涓樆濉炲紡鎺ユ敹鐢� acl_channel_sendp 鍙戦€佺殑瀵硅薄鐨勫湴鍧€
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @return {void*} 杩斿洖闈� NULL锛屾寚瀹氭帴鏀跺埌鐨勫璞＄殑鍦板潃
+ * 从指定的 CHANNLE 中阻塞式接收由 acl_channel_sendp 发送的对象的地址
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @return {void*} 返回非 NULL，指定接收到的对象的地址
  */
 void* acl_channel_recvp(ACL_CHANNEL* c);
 
 /**
- * 鍚戞寚瀹氱殑 ACL_CHANNEL 涓潪闃诲寮忓彂閫佹寚瀹氬璞＄殑鍦板潃
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param v {void*} 琚彂閫佸璞＄殑鍦板潃
- * @return {int} 杩斿洖鍊� >= 0
+ * 向指定的 ACL_CHANNEL 中非阻塞式发送指定对象的地址
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param v {void*} 被发送对象的地址
+ * @return {int} 返回值 >= 0
  */
 int acl_channel_sendp_nb(ACL_CHANNEL* c, void* v);
 
 /**
- * 浠庢寚瀹氱殑 CHANNLE 涓樆濉炲紡鎺ユ敹鐢� acl_channel_sendp 鍙戦€佺殑瀵硅薄鐨勫湴鍧€
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @return {void*} 杩斿洖闈� NULL锛屾寚瀹氭帴鏀跺埌鐨勫璞＄殑鍦板潃锛屽鏋滆繑鍥� NULL 琛ㄧず
- *  娌℃湁璇诲埌浠讳綍瀵硅薄
+ * 从指定的 CHANNLE 中阻塞式接收由 acl_channel_sendp 发送的对象的地址
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @return {void*} 返回非 NULL，指定接收到的对象的地址，如果返回 NULL 表示
+ *  没有读到任何对象
  */
 void* acl_channel_recvp_nb(ACL_CHANNEL* c);
 
 /**
- * 鍚戞寚瀹氱殑 ACL_CHANNEL 涓彂閫佹棤绗﹀彿闀挎暣褰㈡暟鍊�
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param val {unsigned long} 瑕佸彂閫佺殑鏁板€�
- * @return {int} 杩斿洖鍊� >= 0
+ * 向指定的 ACL_CHANNEL 中发送无符号长整形数值
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param val {unsigned long} 要发送的数值
+ * @return {int} 返回值 >= 0
  */
 int acl_channel_sendul(ACL_CHANNEL* c, unsigned long val);
 
 /**
- * 浠庢寚瀹氱殑 ACL_CHANNEL 涓帴鏀舵棤绗﹀彿闀挎暣褰㈡暟鍊�
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
+ * 从指定的 ACL_CHANNEL 中接收无符号长整形数值
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  * @return {unsigned long}
  */
 unsigned long acl_channel_recvul(ACL_CHANNEL* c);
 
 /**
- * 鍚戞寚瀹氱殑 ACL_CHANNEL 涓互闈為樆濉炴柟寮忓彂閫佹棤绗﹀彿闀挎暣褰㈡暟鍊�
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
- * @param val {unsigned long} 瑕佸彂閫佺殑鏁板€�
- * @return {int} 杩斿洖鍊� >= 0
+ * 向指定的 ACL_CHANNEL 中以非阻塞方式发送无符号长整形数值
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
+ * @param val {unsigned long} 要发送的数值
+ * @return {int} 返回值 >= 0
  */
 int acl_channel_sendul_nb(ACL_CHANNEL* c, unsigned long val);
 
 /**
- * 浠庢寚瀹氱殑 ACL_CHANNEL 涓互闈為樆濉炴柟寮忔帴鏀舵棤绗﹀彿闀挎暣褰㈡暟鍊�
- * @param c {ACL_CHANNEL*} 鐢� acl_channel_create 鍒涘缓鐨勭閬撳璞�
+ * 从指定的 ACL_CHANNEL 中以非阻塞方式接收无符号长整形数值
+ * @param c {ACL_CHANNEL*} 由 acl_channel_create 创建的管道对象
  * @return {unsigned long}
  */
 unsigned long acl_channel_recvul_nb(ACL_CHANNEL* c);
@@ -536,13 +536,13 @@ unsigned long acl_channel_recvul_nb(ACL_CHANNEL* c);
 /* master fibers server */
 
 /**
- * 鍩轰簬鍗忕▼鐨勬湇鍔″櫒涓诲嚱鏁板叆鍙ｏ紝璇ユā鍧楀彲浠ュ湪 acl_master 鏈嶅姟鍣ㄦ帶鍒舵鏋朵笅杩愯
- * @param argc {int} 浣跨敤鑰呬紶鍏ョ殑鍙傛暟鏁扮粍 argv 鐨勫ぇ灏�
- * @param argv {char*[]} 鍙傛暟鏁扮粍澶у皬
- * @param service {void (*)(ACL_VSTREAM*, void*)} 鎺ユ敹鍒颁竴涓柊瀹㈡埛绔繛鎺ヨ姹�
- *  鍚庡垱寤轰竴涓崗绋嬪洖璋冩湰鍑芥暟
- * @param ctx {void*} service 鍥炶皟鍑芥暟鐨勭浜屼釜鍙傛暟
- * @param name {int} 鎺у埗鍙傛暟鍒楄〃涓殑绗竴涓帶鍒跺弬鏁�
+ * 基于协程的服务器主函数入口，该模块可以在 acl_master 服务器控制框架下运行
+ * @param argc {int} 使用者传入的参数数组 argv 的大小
+ * @param argv {char*[]} 参数数组大小
+ * @param service {void (*)(ACL_VSTREAM*, void*)} 接收到一个新客户端连接请求
+ *  后创建一个协程回调本函数
+ * @param ctx {void*} service 回调函数的第二个参数
+ * @param name {int} 控制参数列表中的第一个控制参数
  */
 void acl_fiber_server_main(int argc, char* argv[],
 	void (*service)(void*, ACL_VSTREAM*), void* ctx, int name, ...);

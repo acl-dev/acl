@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include "master_conf.hpp"
@@ -19,31 +19,31 @@ class ACL_CPP_API master_base : public noncopyable
 {
 public:
 	/**
-	 * è®¾ç½® bool ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ bool ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_bool_tbl*}
 	 */
 	void set_cfg_bool(master_bool_tbl* table);
 
 	/**
-	 * è®¾ç½® int ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ int ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_int_tbl*}
 	 */
 	void set_cfg_int(master_int_tbl* table);
 
 	/**
-	 * è®¾ç½® int64 ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ int64 ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_int64_tbl*}
 	 */
 	void set_cfg_int64(master_int64_tbl* table);
 
 	/**
-	 * è®¾ç½® å­—ç¬¦ä¸² ç±»å‹çš„é…ç½®é¡¹
+	 * ÉèÖÃ ×Ö·û´® ÀàĞÍµÄÅäÖÃÏî
 	 * @param table {master_str_tbl*}
 	 */
 	void set_cfg_str(master_str_tbl* table);
 
 	/**
-	 * åˆ¤æ–­æ˜¯å¦æ˜¯ç”± acl_master æ§åˆ¶çš„ daemon æ¨¡å¼
+	 * ÅĞ¶ÏÊÇ·ñÊÇÓÉ acl_master ¿ØÖÆµÄ daemon Ä£Ê½
 	 * @return {bool}
 	 */
 	bool daemon_mode(void) const;
@@ -51,17 +51,17 @@ public:
 	/////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * è®¾ç½®è¿›ç¨‹çº§åˆ«çš„å®šæ—¶å™¨ï¼Œè¯¥å‡½æ•°åªå¯åœ¨ä¸»çº¿ç¨‹çš„è¿è¡Œç©ºé—´ (å¦‚åœ¨å‡½æ•°
-	 * proc_on_init) ä¸­è¢«è®¾ç½®ï¼Œå½“è¯¥å®šæ—¶å™¨ä»»åŠ¡éƒ½æ‰§è¡Œå®Œæ¯•åä¼šè‡ªåŠ¨è¢«
-	 * é”€æ¯(å³å†…éƒ¨ä¼šè‡ªåŠ¨è°ƒç”¨ master_timer::destroy æ–¹æ³•)
-	 * @param timer {event_timer*} å®šæ—¶ä»»åŠ¡
-	 * @return {bool} è®¾ç½®å®šæ—¶å™¨æ˜¯å¦æˆåŠŸ
+	 * ÉèÖÃ½ø³Ì¼¶±ğµÄ¶¨Ê±Æ÷£¬¸Ãº¯ÊıÖ»¿ÉÔÚÖ÷Ïß³ÌµÄÔËĞĞ¿Õ¼ä (ÈçÔÚº¯Êı
+	 * proc_on_init) ÖĞ±»ÉèÖÃ£¬µ±¸Ã¶¨Ê±Æ÷ÈÎÎñ¶¼Ö´ĞĞÍê±Ïºó»á×Ô¶¯±»
+	 * Ïú»Ù(¼´ÄÚ²¿»á×Ô¶¯µ÷ÓÃ master_timer::destroy ·½·¨)
+	 * @param timer {event_timer*} ¶¨Ê±ÈÎÎñ
+	 * @return {bool} ÉèÖÃ¶¨Ê±Æ÷ÊÇ·ñ³É¹¦
 	 */
 	bool proc_set_timer(event_timer* timer);
 
 	/**
-	 * åˆ é™¤è¿›ç¨‹çº§åˆ«å®šæ—¶å™¨
-	 * @param timer {event_timer*} ç”± proc_set_timer è®¾ç½®çš„å®šæ—¶ä»»åŠ¡
+	 * É¾³ı½ø³Ì¼¶±ğ¶¨Ê±Æ÷
+	 * @param timer {event_timer*} ÓÉ proc_set_timer ÉèÖÃµÄ¶¨Ê±ÈÎÎñ
 	 */
 	void proc_del_timer(event_timer* timer);
 
@@ -74,42 +74,42 @@ protected:
 	virtual ~master_base();
 
 	/**
-	 * åœ¨è¿›ç¨‹å¯åŠ¨æ—¶ï¼ŒæœåŠ¡è¿›ç¨‹æ¯æˆåŠŸç›‘å¬ä¸€ä¸ªæœ¬åœ°åœ°å€ï¼Œä¾¿è°ƒç”¨æœ¬å‡½æ•°
-	 * @param ss {const server_socket&} ç›‘å¬å¯¹è±¡
+	 * ÔÚ½ø³ÌÆô¶¯Ê±£¬·şÎñ½ø³ÌÃ¿³É¹¦¼àÌıÒ»¸ö±¾µØµØÖ·£¬±ãµ÷ÓÃ±¾º¯Êı
+	 * @param ss {const server_socket&} ¼àÌı¶ÔÏó
 	 */
 	virtual void proc_on_listen(server_socket& ss) { (void) ss; }
 
 	/**
-	 * å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½å‰è°ƒç”¨çš„å›è°ƒå‡½æ•°ï¼Œå¯ä»¥åœ¨æ­¤å‡½æ•°ä¸­åšä¸€äº›
-	 * ç”¨æˆ·èº«ä»½ä¸º root çš„æƒé™æ“ä½œ
+	 * µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İÇ°µ÷ÓÃµÄ»Øµ÷º¯Êı£¬¿ÉÒÔÔÚ´Ëº¯ÊıÖĞ×öÒ»Ğ©
+	 * ÓÃ»§Éí·İÎª root µÄÈ¨ÏŞ²Ù×÷
 	 */
 	virtual void proc_pre_jail() {}
 
 	/**
-	 * å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨çš„å›è°ƒå‡½æ•°ï¼Œæ­¤å‡½æ•°è¢«è°ƒç”¨æ—¶ï¼Œè¿›ç¨‹
-	 * çš„æƒé™ä¸ºæ™®é€šå—é™çº§åˆ«
+	 * µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃµÄ»Øµ÷º¯Êı£¬´Ëº¯Êı±»µ÷ÓÃÊ±£¬½ø³Ì
+	 * µÄÈ¨ÏŞÎªÆÕÍ¨ÊÜÏŞ¼¶±ğ
 	 */
 	virtual void proc_on_init() {}
 
 	/**
-	 * å½“è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨çš„å›è°ƒå‡½æ•°
+	 * µ±½ø³ÌÍË³öÇ°µ÷ÓÃµÄ»Øµ÷º¯Êı
 	 */
 	virtual void proc_on_exit() {}
 
 	/**
-	 * å½“æ”¶åˆ° SIGHUP ä¿¡å·æ—¶çš„å›è°ƒè™šæ–¹æ³•
+	 * µ±ÊÕµ½ SIGHUP ĞÅºÅÊ±µÄ»Øµ÷Ğé·½·¨
 	 */
 	virtual bool proc_on_sighup(string&) { return true; }
 
-	// é…ç½®å¯¹è±¡
+	// ÅäÖÃ¶ÔÏó
 	master_conf conf_;
 
 protected:
-	// å­ç±»å¿…é¡»è°ƒç”¨æœ¬æ–¹æ³•è®¾ç½®äº‹ä»¶å¼•æ“å¥æŸ„
+	// ×ÓÀà±ØĞëµ÷ÓÃ±¾·½·¨ÉèÖÃÊÂ¼şÒıÇæ¾ä±ú
 	void set_event(ACL_EVENT* event);
 
 	/**
-	 * è·å¾—äº‹ä»¶å¼•æ“å¤Ÿæœ¬
+	 * »ñµÃÊÂ¼şÒıÇæ¹»±¾
 	 * @return {ACL_EVENT*}
 	 */
 	ACL_EVENT* get_event(void) const

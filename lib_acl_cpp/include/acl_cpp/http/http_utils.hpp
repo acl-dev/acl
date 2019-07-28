@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "../acl_cpp_define.hpp"
 
 namespace acl {
@@ -10,21 +10,21 @@ public:
 	~http_utils() {}
 
 	/**
-	 * ä»å®Œæ•´çš„ url ä¸­è·å¾— WEB æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šdomain:port
-	 * @param url {const char*} HTTP urlï¼Œéç©º
-	 * @param addr {char*} å­˜å‚¨ç»“æœï¼Œå­˜å‚¨æ ¼å¼ï¼šdomain:port
-	 * @param size {size_t} out ç¼“å†²åŒºå¤§å°
-	 * @return {bool} æ˜¯å¦æˆåŠŸè·å¾—
+	 * ´ÓÍêÕûµÄ url ÖĞ»ñµÃ WEB ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºdomain:port
+	 * @param url {const char*} HTTP url£¬·Ç¿Õ
+	 * @param addr {char*} ´æ´¢½á¹û£¬´æ´¢¸ñÊ½£ºdomain:port
+	 * @param size {size_t} out »º³åÇø´óĞ¡
+	 * @return {bool} ÊÇ·ñ³É¹¦»ñµÃ
 	 */
 	static bool get_addr(const char* url, char* addr, size_t size);
 
 	/**
-	 * ä»å®Œæ•´çš„ url ä¸­è·å¾— WEB æœåŠ¡å™¨ IP åœ°å€åŠç«¯å£å·
-	 * @param url {const char*} HTTP urlï¼Œéç©º
-	 * @param domain {char*} å­˜å‚¨åŸŸå
-	 * @param size {size_t} domain å†…å­˜å¤§å°
-	 * @param port {unsigned short*} å­˜å‚¨ç«¯å£å·å¤§å°
-	 * @return {bool} æ˜¯å¦æˆåŠŸè·å¾—
+	 * ´ÓÍêÕûµÄ url ÖĞ»ñµÃ WEB ·şÎñÆ÷ IP µØÖ·¼°¶Ë¿ÚºÅ
+	 * @param url {const char*} HTTP url£¬·Ç¿Õ
+	 * @param domain {char*} ´æ´¢ÓòÃû
+	 * @param size {size_t} domain ÄÚ´æ´óĞ¡
+	 * @param port {unsigned short*} ´æ´¢¶Ë¿ÚºÅ´óĞ¡
+	 * @return {bool} ÊÇ·ñ³É¹¦»ñµÃ
 	 */
 	static bool get_addr(const char* url, char* domain, size_t size,
 		unsigned short* port);

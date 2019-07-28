@@ -1,4 +1,4 @@
-﻿#ifndef EVENT_SELECT_INCLUDE_H
+#ifndef EVENT_SELECT_INCLUDE_H
 #define EVENT_SELECT_INCLUDE_H
 
 #include "event.h"

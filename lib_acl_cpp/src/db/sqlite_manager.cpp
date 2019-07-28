@@ -1,4 +1,4 @@
-ï»¿#include "acl_stdafx.hpp"
+#include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/db/sqlite_pool.hpp"
 #include "acl_cpp/db/sqlite_manager.hpp"
@@ -27,7 +27,7 @@ sqlite_manager::~sqlite_manager()
 
 sqlite_manager& sqlite_manager::add(const char* dbfile, size_t dblimit)
 {
-	// è°ƒç”¨åŸºç±» connect_manager::set æ–¹æ³•æ·»åŠ 
+	// µ÷ÓÃ»ùÀà connect_manager::set ·½·¨Ìí¼Ó
 	set(dbfile, dblimit);
 	return *this;
 }
