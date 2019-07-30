@@ -1,417 +1,417 @@
 
 108) 2019.7.30
-108.1) performance: ´Ó DPDK ÕªÈ¡´úÂëÓÃÒÔÊµÏÖ getimeofday() ´Ó¶ø»ñµÃ¸ü¸ßµÄĞÔÄÜ
+108.1) performance: ä» DPDK æ‘˜å–ä»£ç ç”¨ä»¥å®ç° getimeofday() ä»è€Œè·å¾—æ›´é«˜çš„æ€§èƒ½
 
 107) 2019.5.16
-107.1) bugifx: fiber_sem.c/fiber_lock.c µ±ÊÍ·Å×ÊÔ´Ê±£¬Ó¦¸ÃÏÈÈÃ³öÀ´µ÷¶ÈÈ¨£¬ÒÔ±ãÓÚ
-µÈ´ıÕß»ñµÃ±»µ÷¶È»ú»á
+107.1) bugifx: fiber_sem.c/fiber_lock.c å½“é‡Šæ”¾èµ„æºæ—¶ï¼Œåº”è¯¥å…ˆè®©å‡ºæ¥è°ƒåº¦æƒï¼Œä»¥ä¾¿äº
+ç­‰å¾…è€…è·å¾—è¢«è°ƒåº¦æœºä¼š
 
 106) 2019.5.9
-106.1) safety & feature: Îª·ÀÖ¹ÓÃ´í£¬¶ÔÓÚÒ»Ğ©ÀàÔö¼ÓÁË½ûÖ¹¿½±´¸´ÖÆÏŞÖÆ
+106.1) safety & feature: ä¸ºé˜²æ­¢ç”¨é”™ï¼Œå¯¹äºä¸€äº›ç±»å¢åŠ äº†ç¦æ­¢æ‹·è´å¤åˆ¶é™åˆ¶
 
 105) 2019.4.30
-105.1) feature: tcp_keeper::peek Ôö¼ÓÖ±Á¬¿ØÖÆ²ÎÊı sync£¬µ±¸Ã²ÎÊıÎª true Ê±£¬Ôò
-ÄÚ²¿²»»áÕë¶ÔËù¸øµØÖ·´´½¨Á¬½Ó³Ø
+105.1) feature: tcp_keeper::peek å¢åŠ ç›´è¿æ§åˆ¶å‚æ•° syncï¼Œå½“è¯¥å‚æ•°ä¸º true æ—¶ï¼Œåˆ™
+å†…éƒ¨ä¸ä¼šé’ˆå¯¹æ‰€ç»™åœ°å€åˆ›å»ºè¿æ¥æ± 
 
 104) 2019.4.28
-104.1) bugfix: keeper_conn.cpp ÖĞÔÚµ± fd dup ºó´´½¨ socket_stream Á÷¶ÔÏóÊ±£¬
-ÓĞ¿ÉÄÜÄÚ²¿ÉèÖÃµÄ peer µØÖ·Îª¿Õ£¬ÏÖÔÚÍ¨¹ıÔ´ socket_stream »ñµÃ peer µØÖ·ÔÙ
-¸ø dup ºóµÄ socket_stream ¸³ÖµÀ´½â¾ö´ËÀàÎÊÌâ
+104.1) bugfix: keeper_conn.cpp ä¸­åœ¨å½“ fd dup ååˆ›å»º socket_stream æµå¯¹è±¡æ—¶ï¼Œ
+æœ‰å¯èƒ½å†…éƒ¨è®¾ç½®çš„ peer åœ°å€ä¸ºç©ºï¼Œç°åœ¨é€šè¿‡æº socket_stream è·å¾— peer åœ°å€å†
+ç»™ dup åçš„ socket_stream èµ‹å€¼æ¥è§£å†³æ­¤ç±»é—®é¢˜
 
 ------------------------------------------------------------------------------
 
 103) 2019.1.15
-103.1) feature: tcp_keeper ¼°Ïà¹Ø¹¦ÄÜÀà²âÊÔ OK
+103.1) feature: tcp_keeper åŠç›¸å…³åŠŸèƒ½ç±»æµ‹è¯• OK
 
 102) 2019.1.2
-102.1) workaround: fiber_tbox.hpp ½« free_obj È±Ê¡ÖµÉèÎª true£¬ÒÔ±ãÓë mbox.hpp
-ºÍ tbox.hpp ÖĞµÄÈ±Ê¡²ÎÊı±£³ÖÒ»ÖÂ
+102.1) workaround: fiber_tbox.hpp å°† free_obj ç¼ºçœå€¼è®¾ä¸º trueï¼Œä»¥ä¾¿ä¸ mbox.hpp
+å’Œ tbox.hpp ä¸­çš„ç¼ºçœå‚æ•°ä¿æŒä¸€è‡´
 
 101) 2018.12.28
-101.1) feature: libfiber_cpp Ä£¿éĞÂ tcp_keeper Àà
+101.1) feature: libfiber_cpp æ¨¡å—æ–° tcp_keeper ç±»
 
 100) 2018.12.27
-100.1) bugfix: acl_fiber_cond.c ÖĞ acl_fiber_cond_timedwait ºÍ acl_fiber_cond_wait
-ÔÚÊÍ·Å fbase ¶ÔÏóÊ±£¬±ØĞëÔÚµ÷ÓÃ acl_fiber_event_wait Ö®Ç°£¬·ñÔò»áÒıÆğ¾ä±ú±»
-ÌáÇ°¹Ø±ÕÎÊÌâ
+100.1) bugfix: acl_fiber_cond.c ä¸­ acl_fiber_cond_timedwait å’Œ acl_fiber_cond_wait
+åœ¨é‡Šæ”¾ fbase å¯¹è±¡æ—¶ï¼Œå¿…é¡»åœ¨è°ƒç”¨ acl_fiber_event_wait ä¹‹å‰ï¼Œå¦åˆ™ä¼šå¼•èµ·å¥æŸ„è¢«
+æå‰å…³é—­é—®é¢˜
 
 99) 2018.12.25
-99.1) bugfix: acl_fiber_cond.c ÖĞÈç¹û¶à¸öÏß³Ìµ÷ÓÃÍ¬Ò»¸öÌõ¼ş±äÁ¿µÄµÄ
-acl_fiber_cond_timedwait ·½·¨Ê±£¬¿ÉÄÜ»á´æÔÚ³¬Ê±ÖµÊ§Ğ§µÄÇé¿ö
-99.2) workaround: fiber_tbox::push Ôö¼Ó bool ·µ»ØÖµ
+99.1) bugfix: acl_fiber_cond.c ä¸­å¦‚æœå¤šä¸ªçº¿ç¨‹è°ƒç”¨åŒä¸€ä¸ªæ¡ä»¶å˜é‡çš„çš„
+acl_fiber_cond_timedwait æ–¹æ³•æ—¶ï¼Œå¯èƒ½ä¼šå­˜åœ¨è¶…æ—¶å€¼å¤±æ•ˆçš„æƒ…å†µ
+99.2) workaround: fiber_tbox::push å¢åŠ  bool è¿”å›å€¼
 
 98) 2018.12.20
-98.1) buffix: fiber_server.cpp µ±ÓĞÁ¬½ÓÎ´¶Ï¿ªÊ±£¬½ø³ÌÎŞ·¨Õı³£ÍË³ö
+98.1) buffix: fiber_server.cpp å½“æœ‰è¿æ¥æœªæ–­å¼€æ—¶ï¼Œè¿›ç¨‹æ— æ³•æ­£å¸¸é€€å‡º
 
 97) 2018.11.29
-97.1) bugfix: fbase_event.c ÖĞ fbase_event_wakeup/fbase_event_wait IO Èç¹ûÓöµ½
-ÖĞ¶ÏĞÅºÅ£¬Ó¦¸ÃĞèÒªÖØÆô IO ¹ı³Ì
-97.2) bugfix: fiber_event.c µÄ·½·¨ acl_fiber_event_notify ÖĞĞèÒªÓÃÏß³ÌËø¶ÔµÈ´ı
-¶ÓÁĞ(event->waiters)ºÍÔ­×ÓÊı(event->atomic)½øĞĞ±£»¤£¬·ñÔòÖĞ¼ä»áÓĞÊ±¼ä¼äÏ¶£¬µ¼ÖÂ
-¼ÓËøµÈ´ıÕß(µ÷ÓÃacl_fiber_event_wait)ÓÀ¾ÃµÈ´ı
+97.1) bugfix: fbase_event.c ä¸­ fbase_event_wakeup/fbase_event_wait IO å¦‚æœé‡åˆ°
+ä¸­æ–­ä¿¡å·ï¼Œåº”è¯¥éœ€è¦é‡å¯ IO è¿‡ç¨‹
+97.2) bugfix: fiber_event.c çš„æ–¹æ³• acl_fiber_event_notify ä¸­éœ€è¦ç”¨çº¿ç¨‹é”å¯¹ç­‰å¾…
+é˜Ÿåˆ—(event->waiters)å’ŒåŸå­æ•°(event->atomic)è¿›è¡Œä¿æŠ¤ï¼Œå¦åˆ™ä¸­é—´ä¼šæœ‰æ—¶é—´é—´éš™ï¼Œå¯¼è‡´
+åŠ é”ç­‰å¾…è€…(è°ƒç”¨acl_fiber_event_wait)æ°¸ä¹…ç­‰å¾…
 
 96) 2018.11.28
-96.1) bugfix: fiber_event.c ĞŞ¸´Ëø¾ºÕùÎÊÌâ
-96.2) feature: Ìí¼Ó fiber_cond.c ¿ÉÓÃÓÚĞ­³ÌºÍÏß³ÌÖ®¼äµÄÌõ¼ş±äÁ¿
+96.1) bugfix: fiber_event.c ä¿®å¤é”ç«äº‰é—®é¢˜
+96.2) feature: æ·»åŠ  fiber_cond.c å¯ç”¨äºåç¨‹å’Œçº¿ç¨‹ä¹‹é—´çš„æ¡ä»¶å˜é‡
 
 95) 2018.11.27
-95.1) bugfix: fiber_event.c ÖĞµÄËø´æÔÚ¼¸´¦Ëø¾ºÕùÊ§Ğ§ÎÊÌâ
+95.1) bugfix: fiber_event.c ä¸­çš„é”å­˜åœ¨å‡ å¤„é”ç«äº‰å¤±æ•ˆé—®é¢˜
 
 94) 2018.11.26
-94.1) bugfix: event_iocp.c ÖĞµÄ iocp_check ·½·¨ÖĞµÄÒ»´¦¶ÏÑÔÓĞÎÊÌâ
+94.1) bugfix: event_iocp.c ä¸­çš„ iocp_check æ–¹æ³•ä¸­çš„ä¸€å¤„æ–­è¨€æœ‰é—®é¢˜
 -- program_code@sohu.com
 
 93) 2018.11.25
-93.1) feature: fiber_event.c Ôö¼Ó¿ØÖÆ²ÎÊı
+93.1) feature: fiber_event.c å¢åŠ æ§åˆ¶å‚æ•°
 
 92) 2018.10.31
-92.1) compile: acl_set_core_limit ½ö¿ÉÓÃÔÚ UNIX-like Æ½Ì¨
+92.1) compile: acl_set_core_limit ä»…å¯ç”¨åœ¨ UNIX-like å¹³å°
 
 91) 2018.10.23
-91.1) feature: fiber_server.c Ö§³ÖËùÉú³É core ÎÄ¼şµÄ´óĞ¡¼°½ø³ÌÍË³öÊ±²»²úÉú core
+91.1) feature: fiber_server.c æ”¯æŒæ‰€ç”Ÿæˆ core æ–‡ä»¶çš„å¤§å°åŠè¿›ç¨‹é€€å‡ºæ—¶ä¸äº§ç”Ÿ core
 
 90) 2018.9.20
-90.1) bugfix: getaddrinfo.c ĞŞ¸´Ò»´¦ IPV6 Ïà¹ØÎÊÌâ
+90.1) bugfix: getaddrinfo.c ä¿®å¤ä¸€å¤„ IPV6 ç›¸å…³é—®é¢˜
 
 89) 2018.5.17
-89.1) bugfix: Ê¹ÓÃ poll ·½·¨Ê±£¬ÔÚ³õÊ¼»¯²ÎÊıÊ±²»ĞèÒªÉèÖÃ POLLERR, POLLHUP
+89.1) bugfix: ä½¿ç”¨ poll æ–¹æ³•æ—¶ï¼Œåœ¨åˆå§‹åŒ–å‚æ•°æ—¶ä¸éœ€è¦è®¾ç½® POLLERR, POLLHUP
 
 88) 2018.4.24
-88.1) feature: acl Ğ­³Ì¿â¿ÉÒÔÔËĞĞÔÚ MacOS ÉÏÁË
+88.1) feature: acl åç¨‹åº“å¯ä»¥è¿è¡Œåœ¨ MacOS ä¸Šäº†
 
 87) 2018.4.17
-87.1) bugfix: µ±ËùÓĞĞ­³Ì»¹Î´Ö´ĞĞÍê±Ï¶øµ÷ÓÃ acl_fiber_stop Ê±£¬ÔòĞèÒª½«»º´æµÄ
-Ğ­³Ì¶ÔÏó¼°ÕıÔÚÔËĞĞµÄĞ­³Ì¶ÔÏóµÄÄÚ´æÊÍ·Åµô
+87.1) bugfix: å½“æ‰€æœ‰åç¨‹è¿˜æœªæ‰§è¡Œå®Œæ¯•è€Œè°ƒç”¨ acl_fiber_stop æ—¶ï¼Œåˆ™éœ€è¦å°†ç¼“å­˜çš„
+åç¨‹å¯¹è±¡åŠæ­£åœ¨è¿è¡Œçš„åç¨‹å¯¹è±¡çš„å†…å­˜é‡Šæ”¾æ‰
 
 86) 2018.3.5
-86.1) bugfix: acl_fiber_gethostbyname ÔÚĞ­³ÌÄ£Ê½ÏÂÊÇ²»°²È«µÄ£¬»á´æÔÚ¶à¸öĞ­³Ì
-¹²ÓÃÒ»¸öÏß³Ì¾Ö²¿±äÁ¿µÄÎÊÌâ£¬´Ó¶øµ¼ÖÂÄÚ´æ½âÎöÊ§°Ü£¬½â¾ö·½Ê½ÊÇÊ¹ÓÃĞ­³Ì¾Ö²¿±äÁ¿
+86.1) bugfix: acl_fiber_gethostbyname åœ¨åç¨‹æ¨¡å¼ä¸‹æ˜¯ä¸å®‰å…¨çš„ï¼Œä¼šå­˜åœ¨å¤šä¸ªåç¨‹
+å…±ç”¨ä¸€ä¸ªçº¿ç¨‹å±€éƒ¨å˜é‡çš„é—®é¢˜ï¼Œä»è€Œå¯¼è‡´å†…å­˜è§£æå¤±è´¥ï¼Œè§£å†³æ–¹å¼æ˜¯ä½¿ç”¨åç¨‹å±€éƒ¨å˜é‡
 
 ------------------------------------------------------------------------------
 
 85) 2018.2.6
-85.1) bugfix: ĞŞ¸´ÁË FreeBSD kqueue µÄÎÊÌâ
+85.1) bugfix: ä¿®å¤äº† FreeBSD kqueue çš„é—®é¢˜
 
 84) 2018.2.5
-84.1) feature: fiber_server.cpp Ö§³ÖĞ­³Ìµ÷¶ÈÊ±Ñ¡Ôñ²»Í¬µÄÊÂ¼şÒıÇæ
+84.1) feature: fiber_server.cpp æ”¯æŒåç¨‹è°ƒåº¦æ—¶é€‰æ‹©ä¸åŒçš„äº‹ä»¶å¼•æ“
 
 83) 2018.2.1
-83.1) feature: Ğ­³ÌÊÂ¼şÒıÇæÔö¼ÓÕë¶Ô Winsock IOCP µÄÖ§³Ö
+83.1) feature: åç¨‹äº‹ä»¶å¼•æ“å¢åŠ é’ˆå¯¹ Winsock IOCP çš„æ”¯æŒ
 
 82) 2018.1.28
-82.1) feature: Ôö¼Ó API acl_fiber_schedule_init() ¿ÉÒÔÉèÖÃĞ­³Ìµ÷¶ÈÆ÷Îª×ÔÆô¶¯Ä£Ê½
-82.2) feature: Ôö¼Ó API acl_fiber_schedule_set_event() ¿ÉÒÔÏÔÊ½µØÉèÖÃĞ­³ÌÊÂ¼şÒıÇæ
+82.1) feature: å¢åŠ  API acl_fiber_schedule_init() å¯ä»¥è®¾ç½®åç¨‹è°ƒåº¦å™¨ä¸ºè‡ªå¯åŠ¨æ¨¡å¼
+82.2) feature: å¢åŠ  API acl_fiber_schedule_set_event() å¯ä»¥æ˜¾å¼åœ°è®¾ç½®åç¨‹äº‹ä»¶å¼•æ“
 
 81) 2018.1.23
-81.1) bugfix: event_epoll.c µÄ º¯Êı epoll_event_wait ÖĞÃ»ÓĞ´¦Àí EPOLLERR|EPOLLHUP
-µÄ´íÎóÇé¿ö£¬»áµ¼ÖÂ³ÌĞò½øÈëËÀÑ­»·
+81.1) bugfix: event_epoll.c çš„ å‡½æ•° epoll_event_wait ä¸­æ²¡æœ‰å¤„ç† EPOLLERR|EPOLLHUP
+çš„é”™è¯¯æƒ…å†µï¼Œä¼šå¯¼è‡´ç¨‹åºè¿›å…¥æ­»å¾ªç¯
 
 80) 2018.1.22
-80.1) feature: fiber_io.c µ±Ã»ÓĞ¼à¿ØÍøÂç¾ä±ú²¢ÇÒÃ»ÓĞ¶¨Ê±Æ÷ÈÎÎñÊ±£¬¸Ã IO Ğ­³Ì
-»á×Ô¶¯ÍË³ö
-80.2) bugfix: event_select.c/event_poll.c µ±Ã»ÓĞÍøÂç¾ä±ú±»¼à¿ØÊ±£¬Ó¦µ÷ÓÃ Sleep£¬ÒòÎª
-Windows ÏÂµÄ select/WSAPoll ²»ÔÊĞíÊäÈëµÄ¾ä±úÎª¿Õ
+80.1) feature: fiber_io.c å½“æ²¡æœ‰ç›‘æ§ç½‘ç»œå¥æŸ„å¹¶ä¸”æ²¡æœ‰å®šæ—¶å™¨ä»»åŠ¡æ—¶ï¼Œè¯¥ IO åç¨‹
+ä¼šè‡ªåŠ¨é€€å‡º
+80.2) bugfix: event_select.c/event_poll.c å½“æ²¡æœ‰ç½‘ç»œå¥æŸ„è¢«ç›‘æ§æ—¶ï¼Œåº”è°ƒç”¨ Sleepï¼Œå› ä¸º
+Windows ä¸‹çš„ select/WSAPoll ä¸å…è®¸è¾“å…¥çš„å¥æŸ„ä¸ºç©º
 
 79) 2018.1.21
-79.1) bugfix: event_poll.c ÖĞÓ¦¸Ã´¦ÀíÒì³£Çé¿ö£¨POLLERR | POLLHUP | POLLNVAL£©
+79.1) bugfix: event_poll.c ä¸­åº”è¯¥å¤„ç†å¼‚å¸¸æƒ…å†µï¼ˆPOLLERR | POLLHUP | POLLNVALï¼‰
 
 78) 2018.1.17
-78.1) performance: win32 ´°¿ÚÏûÏ¢ÒıÇæ´¦ÀíĞÔÄÜÓÅ»¯£¬Ã¿´Îµ÷¶ÈÑ­»·¹ı³Ì¿ÉÒÔ¾¡Á¿¶àµÄÌáÈ¡ÏûÏ¢£¬
-´Ó¶øÌáÉıÏûÏ¢´¦ÀíÄÜÁ¦
+78.1) performance: win32 çª—å£æ¶ˆæ¯å¼•æ“å¤„ç†æ€§èƒ½ä¼˜åŒ–ï¼Œæ¯æ¬¡è°ƒåº¦å¾ªç¯è¿‡ç¨‹å¯ä»¥å°½é‡å¤šçš„æå–æ¶ˆæ¯ï¼Œ
+ä»è€Œæå‡æ¶ˆæ¯å¤„ç†èƒ½åŠ›
 
 77) 2018.1.16
-77.1) performance: Õë¶Ô³¬Ê±¶Á/Ğ´²Ù×÷Ê±£¬µ±µ÷ÓÃ poll/select ºóÔÙµ÷ÓÃ¶Á/Ğ´£¬»áÊ×ÏÈ¼ì²é
-µ±Ç°¾ä±ú×´Ì¬£¬Èç¹û¿É¶Á£¬Ôò²»±ØÔÙ´Îµ÷ÓÃ IO µÈ´ı¹ı³Ì
+77.1) performance: é’ˆå¯¹è¶…æ—¶è¯»/å†™æ“ä½œæ—¶ï¼Œå½“è°ƒç”¨ poll/select åå†è°ƒç”¨è¯»/å†™ï¼Œä¼šé¦–å…ˆæ£€æŸ¥
+å½“å‰å¥æŸ„çŠ¶æ€ï¼Œå¦‚æœå¯è¯»ï¼Œåˆ™ä¸å¿…å†æ¬¡è°ƒç”¨ IO ç­‰å¾…è¿‡ç¨‹
 
 76) 2018.1.14
-76.1) feature: Ğ­³ÌÄ£¿é¿ÉÒÔÖ§³Ö WIN32 ´°¿ÚÏûÏ¢ÒıÇæ£¬´Ó¶ø¿ÉÒÔÓë½çÃæ±à³ÌÎŞ·ìÕûºÏ
-76.2) feature: acl_fiber_poll/acl_fiber_select Ö§³Ö win32 Æ½Ì¨
+76.1) feature: åç¨‹æ¨¡å—å¯ä»¥æ”¯æŒ WIN32 çª—å£æ¶ˆæ¯å¼•æ“ï¼Œä»è€Œå¯ä»¥ä¸ç•Œé¢ç¼–ç¨‹æ— ç¼æ•´åˆ
+76.2) feature: acl_fiber_poll/acl_fiber_select æ”¯æŒ win32 å¹³å°
 
 75) 2017.12.28
-75.1) feature: Ôö¼Ó kqueue ÊÂ¼şÒıÇæÒÔÖ§³Ö FreeBSD£¬´Ó¶øÊ¹ acl Ğ­³ÌÖ§³Ö FreeBSD
+75.1) feature: å¢åŠ  kqueue äº‹ä»¶å¼•æ“ä»¥æ”¯æŒ FreeBSDï¼Œä»è€Œä½¿ acl åç¨‹æ”¯æŒ FreeBSD
 
 74) 2017.12.19
-74.1) bugfix: ½â¾öÁË hook poll Ê±µÄÒ»¸ö¹Ø¼üĞÔÎÊÌâ
+74.1) bugfix: è§£å†³äº† hook poll æ—¶çš„ä¸€ä¸ªå…³é”®æ€§é—®é¢˜
 
 73) 2017.11.23
-73.1) feature: fiber_event.c ĞÂÔöÍ¬Ê±Ö§³ÖĞ­³Ì/Ïß³Ì»¥³âµÄËø£¬ĞÔÄÜ¿É´ïÇ§Íò¼¶±ğ QPS
+73.1) feature: fiber_event.c æ–°å¢åŒæ—¶æ”¯æŒåç¨‹/çº¿ç¨‹äº’æ–¥çš„é”ï¼Œæ€§èƒ½å¯è¾¾åƒä¸‡çº§åˆ« QPS
 
 72) 2017.11.2
-72.1) feature: fiber.c, fiber_alloc ÖĞĞèÒªÔö¼ÓÕë¶ÔĞÅºÅµÄ´¦Àí¹ı³Ì
-72.2) bugfix: fiber_io.c, fiber_io_loop ÖĞÈİÒ×²úÉú 32 Î»ÕûÊıÒç³öÎÊÌâ£¬»áµ¼ÖÂ
-¶¨Ê±Æ÷ÎŞ·¨´¥·¢
+72.1) feature: fiber.c, fiber_alloc ä¸­éœ€è¦å¢åŠ é’ˆå¯¹ä¿¡å·çš„å¤„ç†è¿‡ç¨‹
+72.2) bugfix: fiber_io.c, fiber_io_loop ä¸­å®¹æ˜“äº§ç”Ÿ 32 ä½æ•´æ•°æº¢å‡ºé—®é¢˜ï¼Œä¼šå¯¼è‡´
+å®šæ—¶å™¨æ— æ³•è§¦å‘
 
 71) 2017.10.27
-71.1) bugfix: fiber.c£¬__thread_fiber->switched Ô­À´ÎªÓĞ·ûºÅ int ĞÍ£¬ÓĞ¿ÉÄÜ»á
-ÒòÒç³öÎÊÌâÔì³ÉĞ­³Ìµ÷¶È³öÎÊÌâ
+71.1) bugfix: fiber.cï¼Œ__thread_fiber->switched åŸæ¥ä¸ºæœ‰ç¬¦å· int å‹ï¼Œæœ‰å¯èƒ½ä¼š
+å› æº¢å‡ºé—®é¢˜é€ æˆåç¨‹è°ƒåº¦å‡ºé—®é¢˜
 
 70) 2017.10.20
-70.1) feature: EVENT::poll_list, epoll_list ¿ÉÒÔ²ÉÓÃ FIFO »ò STACK
+70.1) feature: EVENT::poll_list, epoll_list å¯ä»¥é‡‡ç”¨ FIFO æˆ– STACK
 70.2) feature: hook sendfile/sendfile64
 
 69) 2017.10.17
-69.1) feature: Ôö¼Ó acl_fiber_sys_errno/acl_fiber_sys_errno_set/
-acl::fiber::get_sys_errno/acl::fiber_set_sys_errno API ¿ÉÓÃÓÚ»ñµÃ/ÉèÖÃµ±Ç°Ïß³Ì
-µÄÏµÍ³µÄ errno
+69.1) feature: å¢åŠ  acl_fiber_sys_errno/acl_fiber_sys_errno_set/
+acl::fiber::get_sys_errno/acl::fiber_set_sys_errno API å¯ç”¨äºè·å¾—/è®¾ç½®å½“å‰çº¿ç¨‹
+çš„ç³»ç»Ÿçš„ errno
 
 68) 2017.10.16
 68.1) feature: hook sendfile API
 
 67) 2017.10.10
-67.1) bugfix: fiber_mutex µ±ÆôÓÃÏß³Ì°²È«·½Ê½Ê±£¬IO ²Ù×÷¹ı³Ì»á²úÉú·Ç·¨ÄÚ´æ·ÃÎÊ
-ÎÊÌâ¶øµ¼ÖÂÊÂ¼ş½øÈëËÀÑ­»·£¬Ô­ÒòÊÇ¶à¸öÏß³ÌÖĞµÄ¶à¸öÏß³ÌÈç¹ûÍ¬Ê±×èÈûÔÚÍ¬Ò» fd ÉÏ
-Ê±»áÈİÒ×²úÉú´ËÎÊÌâ£¬ÏÖĞŞ¸ÄÎªµ±½øÈë IO ¶ÁÊ±£¬dup ³öÒ»¸öĞÂµÄ fd ²¢Ê¹Ïß³ÌÖĞµÄĞ­³Ì
-×èÈûÔÚ¸Ã fd ÉÏ
+67.1) bugfix: fiber_mutex å½“å¯ç”¨çº¿ç¨‹å®‰å…¨æ–¹å¼æ—¶ï¼ŒIO æ“ä½œè¿‡ç¨‹ä¼šäº§ç”Ÿéæ³•å†…å­˜è®¿é—®
+é—®é¢˜è€Œå¯¼è‡´äº‹ä»¶è¿›å…¥æ­»å¾ªç¯ï¼ŒåŸå› æ˜¯å¤šä¸ªçº¿ç¨‹ä¸­çš„å¤šä¸ªçº¿ç¨‹å¦‚æœåŒæ—¶é˜»å¡åœ¨åŒä¸€ fd ä¸Š
+æ—¶ä¼šå®¹æ˜“äº§ç”Ÿæ­¤é—®é¢˜ï¼Œç°ä¿®æ”¹ä¸ºå½“è¿›å…¥ IO è¯»æ—¶ï¼Œdup å‡ºä¸€ä¸ªæ–°çš„ fd å¹¶ä½¿çº¿ç¨‹ä¸­çš„åç¨‹
+é˜»å¡åœ¨è¯¥ fd ä¸Š
 
 66) 2017.9.29
-66.1) feature: fiber_mutex ¿ÉÒÔÍ¬Ê±Ö§³ÖÏß³ÌËøºÍĞ­³ÌËø
+66.1) feature: fiber_mutex å¯ä»¥åŒæ—¶æ”¯æŒçº¿ç¨‹é”å’Œåç¨‹é”
 
 65) 2017.9.28
-65.1) valgrind: fiber_server.c µ±½ø³ÌÍË³öÇ°ĞèÒªÊÍ·ÅµôÒ»Ğ©È«¾Ö¶ÔÏó£¬ÒÔÃâ¸ÉÈÅ
-valgrind ²úÉúÒ»Ğ©Îó±¨
+65.1) valgrind: fiber_server.c å½“è¿›ç¨‹é€€å‡ºå‰éœ€è¦é‡Šæ”¾æ‰ä¸€äº›å…¨å±€å¯¹è±¡ï¼Œä»¥å…å¹²æ‰°
+valgrind äº§ç”Ÿä¸€äº›è¯¯æŠ¥
 
 64) 2017.9.27
-64.1) workaround: Îª·½±ãÊ¹ÓÃ valgrind ¼ì²éÄÚ´æÎÊÌâ£¬½«ÄÚ²¿Ò»Ğ©¾²Ì¬»òÈ«¾Ö¶¯Ì¬
-¶ÔÏóÊÖ¶¯ÊÍ·Å£¬ÒÔÃâ¸ÉÈÅÓ¦ÓÃ²é¿´ÕæÕıµÄÄÚ´æÎÊÌâ
+64.1) workaround: ä¸ºæ–¹ä¾¿ä½¿ç”¨ valgrind æ£€æŸ¥å†…å­˜é—®é¢˜ï¼Œå°†å†…éƒ¨ä¸€äº›é™æ€æˆ–å…¨å±€åŠ¨æ€
+å¯¹è±¡æ‰‹åŠ¨é‡Šæ”¾ï¼Œä»¥å…å¹²æ‰°åº”ç”¨æŸ¥çœ‹çœŸæ­£çš„å†…å­˜é—®é¢˜
 
 63) 2017.9.23
-63.1) feature: hook_io.c Ö§³Ö hook mkdir
+63.1) feature: hook_io.c æ”¯æŒ hook mkdir
 
 62) 2017.9.22
-62.1) feature: hook_io.c Ö§³Ö hook stat/fstat/lstat
+62.1) feature: hook_io.c æ”¯æŒ hook stat/fstat/lstat
 
 61) 2017.9.20
-61.1) feature: hook_net.c Ö§³Ö epoll_create1 API
+61.1) feature: hook_net.c æ”¯æŒ epoll_create1 API
 
 60) 2017.9.18
-60.1) feature: Ôö¼Ó fiber_trigger ÀàÓÃÓÚ°´Ê±¼ä´¥·¢²Ù×÷
+60.1) feature: å¢åŠ  fiber_trigger ç±»ç”¨äºæŒ‰æ—¶é—´è§¦å‘æ“ä½œ
 
 59) 2017.9.10
-59.1) feature: Ğ­³Ì·şÎñÆ÷Ä£°åÔÚÖ´ĞĞÍê reload ºó¿ÉÒÔ½«Ö´ĞĞ×´Ì¬·´À¡¸ø master
+59.1) feature: åç¨‹æœåŠ¡å™¨æ¨¡æ¿åœ¨æ‰§è¡Œå®Œ reload åå¯ä»¥å°†æ‰§è¡ŒçŠ¶æ€åé¦ˆç»™ master
 
 58) 2017.8.25
-58.1) feature: Ìí¼Ó C++ °æ±¾µÄĞ­³Ì¶¨Ê±Æ÷Àà fiber_timer
-58.2) feature: acl_fiber_create_timer ÖĞÔö¼ÓĞ­³ÌÕ»´óĞ¡²ÎÊı
+58.1) feature: æ·»åŠ  C++ ç‰ˆæœ¬çš„åç¨‹å®šæ—¶å™¨ç±» fiber_timer
+58.2) feature: acl_fiber_create_timer ä¸­å¢åŠ åç¨‹æ ˆå¤§å°å‚æ•°
 
 57) 2017.8.21
-57.1) feature: fiber_server.c µ±ÔÚ¶ÀÁ¢ÔËĞĞÊ±Ò²¿ÉÒÔÍ¨¹ıÅäÖÃÎÄ¼şÖ¸¶¨ master_reuseport
-Ñ¡Ïî
+57.1) feature: fiber_server.c å½“åœ¨ç‹¬ç«‹è¿è¡Œæ—¶ä¹Ÿå¯ä»¥é€šè¿‡é…ç½®æ–‡ä»¶æŒ‡å®š master_reuseport
+é€‰é¡¹
 
 56) 2017.7.27
-56.1) compile: master_fiber.hpp ÖĞÈ¥µôÁË¶Ô master_base.hpp µÄ°üº¬£¬ÒªÇóÓ¦ÓÃ
-ĞèÒªÊ×ÏÈ°üº¬¸ÃÍ·ÎÄ¼ş
-56.2) compile: lib_fiber.h ÖĞÈ¥ÄêÁË¶Ô lib_acl.h µÄ°üº¬
+56.1) compile: master_fiber.hpp ä¸­å»æ‰äº†å¯¹ master_base.hpp çš„åŒ…å«ï¼Œè¦æ±‚åº”ç”¨
+éœ€è¦é¦–å…ˆåŒ…å«è¯¥å¤´æ–‡ä»¶
+56.2) compile: lib_fiber.h ä¸­å»å¹´äº†å¯¹ lib_acl.h çš„åŒ…å«
 
 55) 2017.7.22
-55.1) feature: master_fiber Ôö¼Ó get_conf_path, acl_fiber_server.cpp ÖĞÔö¼Ó
-acl_fiber_server_conf£¬´Ë¶ş·½·¨ÓÃÓÚ»ñµÃµ±Ç°µÄ·şÎñÅäÖÃÎÄ¼şÂ·¾¶
+55.1) feature: master_fiber å¢åŠ  get_conf_path, acl_fiber_server.cpp ä¸­å¢åŠ 
+acl_fiber_server_confï¼Œæ­¤äºŒæ–¹æ³•ç”¨äºè·å¾—å½“å‰çš„æœåŠ¡é…ç½®æ–‡ä»¶è·¯å¾„
 
 54) 2017.7.7
-54.1) feature: master/fiber_server.c ÖĞ½« fiber_sleep Ğ­³ÌµÄÕ»´óĞ¡ÔÊĞíÊÜÅäÖÃÏî
-¿ØÖÆ£»Í¬Ê±½«ÄÚ²¿µÄ STACK_SIZE È±Ê¡ÖµÓÉ 64 K ¸ÄÎª 128 K£¬¸ÃÖµÒ²ÊÇÓÃ»§¼¶Ëù´´½¨
-Ğ­³ÌµÄÕ»È±Ê¡´óĞ¡
+54.1) feature: master/fiber_server.c ä¸­å°† fiber_sleep åç¨‹çš„æ ˆå¤§å°å…è®¸å—é…ç½®é¡¹
+æ§åˆ¶ï¼›åŒæ—¶å°†å†…éƒ¨çš„ STACK_SIZE ç¼ºçœå€¼ç”± 64 K æ”¹ä¸º 128 Kï¼Œè¯¥å€¼ä¹Ÿæ˜¯ç”¨æˆ·çº§æ‰€åˆ›å»º
+åç¨‹çš„æ ˆç¼ºçœå¤§å°
 
 53) 2017.7.4
-53.1) feature: fiber_server.c/master_fiber.cpp Ö§³Ö SIGHUP ĞÅºÅ»Øµ÷¹ı³Ì
-53.2) ÖØ¹¹ fiber_server.c/master_fiber.cpp ´úÂë
+53.1) feature: fiber_server.c/master_fiber.cpp æ”¯æŒ SIGHUP ä¿¡å·å›è°ƒè¿‡ç¨‹
+53.2) é‡æ„ fiber_server.c/master_fiber.cpp ä»£ç 
 
 52) 2017.7.2
-52.1) feature: fiber_server.c Ö§³Ö¶àÏß³ÌÔËĞĞÄ£Ê½
+52.1) feature: fiber_server.c æ”¯æŒå¤šçº¿ç¨‹è¿è¡Œæ¨¡å¼
 
 51) 2017.6.6
-51.1) feature: fiber_server.c ÔÚÆô¶¯Ğ­³Ìµ÷¶ÈÇ°µÄ¹ı³Ì·ÅÔÚÖ÷Ïß³ÌÖĞ½øĞĞ£¬´Ó¶øÊ¹
-¸Ã¶Î´úÂëµÄÔËĞĞÕ»´óĞ¡²»ÊÜĞ­³ÌÕ»´óĞ¡µÄÏŞÖÆ
+51.1) feature: fiber_server.c åœ¨å¯åŠ¨åç¨‹è°ƒåº¦å‰çš„è¿‡ç¨‹æ”¾åœ¨ä¸»çº¿ç¨‹ä¸­è¿›è¡Œï¼Œä»è€Œä½¿
+è¯¥æ®µä»£ç çš„è¿è¡Œæ ˆå¤§å°ä¸å—åç¨‹æ ˆå¤§å°çš„é™åˆ¶
 
 50) 2017.5.16
-50.1) feature: fiber_server.c Ğ­³Ì·şÎñÆ÷Ä£°åÔö¼ÓÁËÆ½»¬ÍË³ö»úÖÆ
+50.1) feature: fiber_server.c åç¨‹æœåŠ¡å™¨æ¨¡æ¿å¢åŠ äº†å¹³æ»‘é€€å‡ºæœºåˆ¶
 
 49) 2017.5.1
-49.1) samples/pgsql: Ìí¼Ó²âÊÔ postgresql µÄ¿Í»§¶ËÀı×Ó
+49.1) samples/pgsql: æ·»åŠ æµ‹è¯• postgresql çš„å®¢æˆ·ç«¯ä¾‹å­
 
 48) 2017.4.24
-48.1) bugfix: fiber.s ÖĞ acl_fiber_set_specific ÔÚµ÷ÓÃ realloc ÖØĞÂ·ÖÅäÄÚ´æ²Û
-Ê±Ó¦¸Ã½«¿ÕÏĞµÄ²ÛÖÃ NULL
+48.1) bugfix: fiber.s ä¸­ acl_fiber_set_specific åœ¨è°ƒç”¨ realloc é‡æ–°åˆ†é…å†…å­˜æ§½
+æ—¶åº”è¯¥å°†ç©ºé—²çš„æ§½ç½® NULL
 
 ------------------------------------------------------------------------------
 
 47) 2017.4.13
-47.1) feature: hook_net.c ÖĞĞÂÔö¶Ô getaddrinfo µÄÖ§³Ö
+47.1) feature: hook_net.c ä¸­æ–°å¢å¯¹ getaddrinfo çš„æ”¯æŒ
 
 46) 2017.4.10
-46.1) feature: Ğ­³ÌĞÅºÅÁ¿µ±±»¿çÏß³ÌÊ¹ÓÃÊ±£¬½ûÖ¹³öÏÖÍ¬Ò»ĞÅºÅÁ¿±»²»Í¬Ïß³ÌÊ¹ÓÃ
+46.1) feature: åç¨‹ä¿¡å·é‡å½“è¢«è·¨çº¿ç¨‹ä½¿ç”¨æ—¶ï¼Œç¦æ­¢å‡ºç°åŒä¸€ä¿¡å·é‡è¢«ä¸åŒçº¿ç¨‹ä½¿ç”¨
 
 45) 2017.3.29
-45.1) bugfix: µ±Ò»¸öĞ­³Ì´¦ÓÚ poll wait ×´Ì¬Ê±±»ÁíÒ»¸öĞ­³Ì kill µôÊ±£¬»áÔì³ÉÄÚ´æ
-·Ç·¨·ÃÎÊ£¬ĞŞ¸´·½Ê½ÊÇÔÚ event.c ÖĞ¶Ô poll list µÄ±éÀú·ÃÎÊ²ÉÓÃ pop ·½Ê½£¬Í¬Ê±ÔÚ
-hook_net.c ÖĞµÄ poll º¯ÊıÖĞµ±±» kill Ê±×Ô¶¯ÇåÀí×ÔÉí£¬Óë±¾ BUG Ïà¹ØµÄÎÄ¼şÓĞ
-fiber.c, hook_net.c, event.c£¬ÆäÖĞ hook_net.c ¼° event.c ÖĞµÄĞŞ¸´ÊÇ×î¹Ø¼üµÄ
+45.1) bugfix: å½“ä¸€ä¸ªåç¨‹å¤„äº poll wait çŠ¶æ€æ—¶è¢«å¦ä¸€ä¸ªåç¨‹ kill æ‰æ—¶ï¼Œä¼šé€ æˆå†…å­˜
+éæ³•è®¿é—®ï¼Œä¿®å¤æ–¹å¼æ˜¯åœ¨ event.c ä¸­å¯¹ poll list çš„éå†è®¿é—®é‡‡ç”¨ pop æ–¹å¼ï¼ŒåŒæ—¶åœ¨
+hook_net.c ä¸­çš„ poll å‡½æ•°ä¸­å½“è¢« kill æ—¶è‡ªåŠ¨æ¸…ç†è‡ªèº«ï¼Œä¸æœ¬ BUG ç›¸å…³çš„æ–‡ä»¶æœ‰
+fiber.c, hook_net.c, event.cï¼Œå…¶ä¸­ hook_net.c åŠ event.c ä¸­çš„ä¿®å¤æ˜¯æœ€å…³é”®çš„
 
 44) 2017.3.28
-44.1) feature: fiber.c ÖĞ fiber_alloc º¯Êıµ±¸´ÓÃ»º´æµÄĞ­³ÌÄÚ´æ¶ÔÏóÊ±£¬Ó¦µ÷ÓÃ
-free->malloc£¬¶ø²»ÊÇµ÷ÓÃ realloc£¬ÕâÑùÒ»·½Ãæ¿ÉÒÔ±ÜÃâÊ¹ÓÃ tcmalloc Ê±µÄ valgrind
-µÄÄÚ´æ¾¯¸æ£¬ÁíÒ»·½Ãæ£¬¿ÉÒÔÓĞĞ§µØÊ¹ÓÃĞé´æ
+44.1) feature: fiber.c ä¸­ fiber_alloc å‡½æ•°å½“å¤ç”¨ç¼“å­˜çš„åç¨‹å†…å­˜å¯¹è±¡æ—¶ï¼Œåº”è°ƒç”¨
+free->mallocï¼Œè€Œä¸æ˜¯è°ƒç”¨ reallocï¼Œè¿™æ ·ä¸€æ–¹é¢å¯ä»¥é¿å…ä½¿ç”¨ tcmalloc æ—¶çš„ valgrind
+çš„å†…å­˜è­¦å‘Šï¼Œå¦ä¸€æ–¹é¢ï¼Œå¯ä»¥æœ‰æ•ˆåœ°ä½¿ç”¨è™šå­˜
 
 43) 2017.3.23
-43.1) feature: fiber.c ÖĞ acl_fiber_signal/acl_fiber_kill ÖĞ£¬ĞèÒªÉèÖÃ errno
-Îª ECANCELED
+43.1) feature: fiber.c ä¸­ acl_fiber_signal/acl_fiber_kill ä¸­ï¼Œéœ€è¦è®¾ç½® errno
+ä¸º ECANCELED
 
 42) 2017.3.9
-42.1) compile: ?µ±´ò¿ª valgrind ±àÒëÑ¡ÏîÊ±£¬ÓĞÒ»´¦±àÒë¾¯¸æ
-42.2) workaround: master_fiber ÀàÖĞµÄ·½·¨ run_alone È¥µô×îºóÒ»¸ö²ÎÊı£¬ÆäÔ­À´ÓÃ
-À´¿ØÖÆ´¦Àí´ÎÊı£¬¸ÄÓÉ´ÓÅäÖÃÎÄ¼şÖĞ¶ÁÈ¡
+42.1) compile: ?å½“æ‰“å¼€ valgrind ç¼–è¯‘é€‰é¡¹æ—¶ï¼Œæœ‰ä¸€å¤„ç¼–è¯‘è­¦å‘Š
+42.2) workaround: master_fiber ç±»ä¸­çš„æ–¹æ³• run_alone å»æ‰æœ€åä¸€ä¸ªå‚æ•°ï¼Œå…¶åŸæ¥ç”¨
+æ¥æ§åˆ¶å¤„ç†æ¬¡æ•°ï¼Œæ”¹ç”±ä»é…ç½®æ–‡ä»¶ä¸­è¯»å–
 
 41) 2017.2.9
-41.1) bugfix: fiber.c ÖĞ£¬fiber_init º¯ÊıÓ¦¸Ã±ØĞë±£Ö¤ __sys_errno Îª NULL Ê±
-±»µ÷ÓÃ£¬·ñÔò»áÒıÆğÒ»Ğ©¾²Ì¬³õÊ¼»¯ĞèÒª __sys_errno µÄÊ¹ÓÃ
+41.1) bugfix: fiber.c ä¸­ï¼Œfiber_init å‡½æ•°åº”è¯¥å¿…é¡»ä¿è¯ __sys_errno ä¸º NULL æ—¶
+è¢«è°ƒç”¨ï¼Œå¦åˆ™ä¼šå¼•èµ·ä¸€äº›é™æ€åˆå§‹åŒ–éœ€è¦ __sys_errno çš„ä½¿ç”¨
 
 40) 2017.1.23
-40.1) workaround: Ğ­³ÌºÅÍ³Ò»¸Ä³ÉÎŞ·ûºÅ 32 Î»ÕûÊı
+40.1) workaround: åç¨‹å·ç»Ÿä¸€æ”¹æˆæ— ç¬¦å· 32 ä½æ•´æ•°
 
 39) 2017.1.12
-39.1) bugfix: Ğ­³ÌÔÚË«Í¨Ä£Ê½ÏÂ£¬Èç¹ûĞ´Ê±¶ÂÈû»áµ¼ÖÂ¶ÁÒ²¶ÂÈû£¬ÊÇÒòÎªÑÓ³Ù¹Ø±Õ
-¼°ÊÂ¼şÉèÖÃ²»ºÏÀí
+39.1) bugfix: åç¨‹åœ¨åŒé€šæ¨¡å¼ä¸‹ï¼Œå¦‚æœå†™æ—¶å µå¡ä¼šå¯¼è‡´è¯»ä¹Ÿå µå¡ï¼Œæ˜¯å› ä¸ºå»¶è¿Ÿå…³é—­
+åŠäº‹ä»¶è®¾ç½®ä¸åˆç†
 
 38) 2017.1.5
-38.1) bugfix: fiber.c ÖĞº¯Êı acl_fiber_killed ÖĞµÄÅĞ¶ÏÓĞÎó
+38.1) bugfix: fiber.c ä¸­å‡½æ•° acl_fiber_killed ä¸­çš„åˆ¤æ–­æœ‰è¯¯
 
 37) 2016.12.31
-37.1) feature: Ôö¼Ó acl_fiber_signal º¯Êı£¬ÔÊĞíĞ­³Ì¸øÆäËüĞ­³Ì·¢ËÍ»½ĞÑĞÅºÅ
+37.1) feature: å¢åŠ  acl_fiber_signal å‡½æ•°ï¼Œå…è®¸åç¨‹ç»™å…¶å®ƒåç¨‹å‘é€å”¤é†’ä¿¡å·
 
 36) 2016.12.27
-36.1) bugfix: fiber.cpp ÖĞ kill ·½·¨Ğè½« f_ ³ÉÔ±ÖÃ NULL£¬·ÀÖ¹Ç¶Ì×·ÃÎÊ·Ç·¨µØÖ·
-36.2) feature: fiber.cpp ÔÊĞí½«µ±Ç°ÔËĞĞµÄĞ­³ÌÓë fiber Àà¶ÔÏó°ó¶¨(Ö»ĞèÔÚ¹¹Ôì
-º¯ÊıÖĞ½«¹¹Ôì²ÎÊıÉèÎª true)£¬´Ó¶ø¿ÉÒÔ·½±ãÊ¹ÓÃÀà fiber ÖĞµÄ·½·¨
+36.1) bugfix: fiber.cpp ä¸­ kill æ–¹æ³•éœ€å°† f_ æˆå‘˜ç½® NULLï¼Œé˜²æ­¢åµŒå¥—è®¿é—®éæ³•åœ°å€
+36.2) feature: fiber.cpp å…è®¸å°†å½“å‰è¿è¡Œçš„åç¨‹ä¸ fiber ç±»å¯¹è±¡ç»‘å®š(åªéœ€åœ¨æ„é€ 
+å‡½æ•°ä¸­å°†æ„é€ å‚æ•°è®¾ä¸º true)ï¼Œä»è€Œå¯ä»¥æ–¹ä¾¿ä½¿ç”¨ç±» fiber ä¸­çš„æ–¹æ³•
 
 35) 2016.12.19
-35.1) feature: fiber.c ÖĞÓĞ¹ØĞ­³Ì¾Ö²¿±äÁ¿µÄ½Ó¿Úµ÷Õû£¬¸ü·ûºÏÊµ¼ÊÓ¦ÓÃ³¡¾°
-35.2) bugfix: fiber.c ÖĞµ±Ğ­³ÌÍË³öÊ±£¬Ğ­³Ì¾Ö²¿±äÁ¿µÄ¶ÔÏóÎ´ÊÍ·ÅÔì³ÉÄÚ´æĞ¹Â¶
-35.3) sample: samples/fiber_local£¬¸ÃÊ¾ÀıÓÃÓÚ²âÊÔĞ­³Ì¾Ö²¿±äÁ¿
+35.1) feature: fiber.c ä¸­æœ‰å…³åç¨‹å±€éƒ¨å˜é‡çš„æ¥å£è°ƒæ•´ï¼Œæ›´ç¬¦åˆå®é™…åº”ç”¨åœºæ™¯
+35.2) bugfix: fiber.c ä¸­å½“åç¨‹é€€å‡ºæ—¶ï¼Œåç¨‹å±€éƒ¨å˜é‡çš„å¯¹è±¡æœªé‡Šæ”¾é€ æˆå†…å­˜æ³„éœ²
+35.3) sample: samples/fiber_localï¼Œè¯¥ç¤ºä¾‹ç”¨äºæµ‹è¯•åç¨‹å±€éƒ¨å˜é‡
 
 34) 2016.12.16
-34.1) bugfix: hook_net.c, hook_io.c, event_epoll.c ÆäÖĞÒòÎª hook ÁËºÜ¶àÏµÍ³µÄ
-API£¬µ±¸ö±ğÓ¦ÓÃÔÚ main º¯ÊıÖ´ĞĞÇ°ĞèÒªµ÷ÓÃÕâĞ© API Ê±¿ÉÄÜ»áÒòÎª hook ²Ù×÷»¹Î´
-½øĞĞ¶øÔì³Éº¯ÊıÖ¸ÕëÎª NULL£¬´Ó¶øµ¼ÖÂ³ÌĞò±ÀÀ£
+34.1) bugfix: hook_net.c, hook_io.c, event_epoll.c å…¶ä¸­å› ä¸º hook äº†å¾ˆå¤šç³»ç»Ÿçš„
+APIï¼Œå½“ä¸ªåˆ«åº”ç”¨åœ¨ main å‡½æ•°æ‰§è¡Œå‰éœ€è¦è°ƒç”¨è¿™äº› API æ—¶å¯èƒ½ä¼šå› ä¸º hook æ“ä½œè¿˜æœª
+è¿›è¡Œè€Œé€ æˆå‡½æ•°æŒ‡é’ˆä¸º NULLï¼Œä»è€Œå¯¼è‡´ç¨‹åºå´©æºƒ
 
 33) 2016.12.8
-33.1) bugfix: hook_net.c ÖĞ£¬µ±·ÇĞ­³ÌÄ£Ê½ÏÂ£¬hook epoll Ïà¹Ø API Ó¦¸Ã¼ÓÒÔÇø±ğ
+33.1) bugfix: hook_net.c ä¸­ï¼Œå½“éåç¨‹æ¨¡å¼ä¸‹ï¼Œhook epoll ç›¸å…³ API åº”è¯¥åŠ ä»¥åŒºåˆ«
 
 32) 2016.12.3
-32.1) feature: acl_fiber_kill ¿ÉÒÔÖ§³ÖÒòµ÷ÓÃ acl_fiber_sleep, acl_fiber_sem,
-acl_fiber_mutex_lock ¶ø×èÈûµÄĞ­³Ì
+32.1) feature: acl_fiber_kill å¯ä»¥æ”¯æŒå› è°ƒç”¨ acl_fiber_sleep, acl_fiber_sem,
+acl_fiber_mutex_lock è€Œé˜»å¡çš„åç¨‹
 
 31) 2016.11.28
-31.1) feature: fiber.cpp ÖĞ£¬fiber ÀàÔö¼ÓÁË kill ºÍ killed ·½·¨ÓÃÀ´¡±É±ËÀ¡°Ğ­³Ì
-ºÍÅĞ¶ÏÖ¸¶¨Ğ­³ÌÊÇ·ñÒÑ¾­ÍË³ö
+31.1) feature: fiber.cpp ä¸­ï¼Œfiber ç±»å¢åŠ äº† kill å’Œ killed æ–¹æ³•ç”¨æ¥â€æ€æ­»â€œåç¨‹
+å’Œåˆ¤æ–­æŒ‡å®šåç¨‹æ˜¯å¦å·²ç»é€€å‡º
 
 30) 2016.11.27
-30.1) bugfix: fiber.c ÖĞº¯Êı acl_fiber_create ÖĞ´æÔÚÔËĞĞÊ±ÄÚ´æÔö³¤ÎÊÌâ£¬¼´
-__thread_fiber->fibers ¶ÔÏóÔÚ realloc ¹ı³ÌÖĞÄÚ´æ²»¶ÏÔö³¤£¬ÒòÎª __thread_fier->size
-¼ÆËã·½·¨ÓĞÎÊÌâ
+30.1) bugfix: fiber.c ä¸­å‡½æ•° acl_fiber_create ä¸­å­˜åœ¨è¿è¡Œæ—¶å†…å­˜å¢é•¿é—®é¢˜ï¼Œå³
+__thread_fiber->fibers å¯¹è±¡åœ¨ realloc è¿‡ç¨‹ä¸­å†…å­˜ä¸æ–­å¢é•¿ï¼Œå› ä¸º __thread_fier->size
+è®¡ç®—æ–¹æ³•æœ‰é—®é¢˜
 
 29) 2016.11.24
-29.1) feature: Ôö¼Ó acl_fiber_kill ½Ó¿ÚÓÃÀ´Í¨ÖªÖ¸¶¨Ğ­³ÌÍË³ö
+29.1) feature: å¢åŠ  acl_fiber_kill æ¥å£ç”¨æ¥é€šçŸ¥æŒ‡å®šåç¨‹é€€å‡º
 
 28) 2016.10.31
-28.1) feature: fiber.c ÖĞÊµÏÖÁË __i386__ ÏÂ SETJMP£¬LONGJMP µÄ»ã±à·½Ê½£¬´Ó
-libdill ½è¼ø¶øÀ´
+28.1) feature: fiber.c ä¸­å®ç°äº† __i386__ ä¸‹ SETJMPï¼ŒLONGJMP çš„æ±‡ç¼–æ–¹å¼ï¼Œä»
+libdill å€Ÿé‰´è€Œæ¥
 
 27) 2016.10.19
-27.1) bugfix: fiber_io.c ÖĞµÄ __thread_fiber->loop_fn Ã»ÓĞ¸³³õÖµ
+27.1) bugfix: fiber_io.c ä¸­çš„ __thread_fiber->loop_fn æ²¡æœ‰èµ‹åˆå€¼
 
 26) 2016.9.25
-26.1) feature: Ôö¼Ó acl_fiber_post_event º¯Êı£¬ÔÚÃ¿´ÎÊÂ¼şÑ­»·¹ı³ÌÖĞ¿ÉÒÔµ÷ÓÃÓÉ
-¸Ãº¯ÊıÉèÖÃµÄ»Øµ÷º¯Êı
+26.1) feature: å¢åŠ  acl_fiber_post_event å‡½æ•°ï¼Œåœ¨æ¯æ¬¡äº‹ä»¶å¾ªç¯è¿‡ç¨‹ä¸­å¯ä»¥è°ƒç”¨ç”±
+è¯¥å‡½æ•°è®¾ç½®çš„å›è°ƒå‡½æ•°
 
 25) 2016.9.22
-25.1) º¯Êı¸ÄÃû£º acl_fiber_stop --> acl_fiber_schedule_stop,
+25.1) å‡½æ•°æ”¹åï¼š acl_fiber_stop --> acl_fiber_schedule_stop,
 acl::fiber::stop --> acl::fiber::schedule_stop
 
 24) 2016.9.21
-24.1) bugfix: hook_io.c ÖĞµÄ writev() º¯ÊıÓ¦¸Ãµ÷ÓÃ fiber_writev()
+24.1) bugfix: hook_io.c ä¸­çš„ writev() å‡½æ•°åº”è¯¥è°ƒç”¨ fiber_writev()
 
 23) 2016.9.1
-23.1) feature: Ö§³Ö C++11 ¹¦ÄÜ£¬Ê¹ÓÃ lambda ±í´ïÊ½´´½¨Ğ­³Ì¸ü¼Ó·½±ã¼ò½à
+23.1) feature: æ”¯æŒ C++11 åŠŸèƒ½ï¼Œä½¿ç”¨ lambda è¡¨è¾¾å¼åˆ›å»ºåç¨‹æ›´åŠ æ–¹ä¾¿ç®€æ´
 
 ------------------------------------------------------------------------------
 
 22) 2016.8.25
-22.1) feature: hook_io.c ÖĞÌá¹©ÁËµ¥¶ÀµÄ fiber_xxx IO ½Ó¿Ú
+22.1) feature: hook_io.c ä¸­æä¾›äº†å•ç‹¬çš„ fiber_xxx IO æ¥å£
 
 21) 2016.8.17
-21.1) performance: fiber.c ÖĞº¯Êı fiber_alloc ÔÚ´´½¨Ğ­³ÌÕ»Ê±Ê¹ÓÃ malloc ´úÌæÁË
-Ô­À´µÄ calloc£¬±ÜÃâÄÚ´æÌá½»£¬½öÊ¹ÓÃĞé´æ£¬´Ó¶øÓĞĞ§¿ØÖÆÁËĞ­³ÌµÄÊµ¼ÊÕ¼ÓÃÄÚ´æ´óĞ¡
-21.2) bugfix: hook_io.c ÖĞµÄ read µÈ¶Áº¯ÊıÖ»ÓĞµ±¶Á·µ»Ø < 0 Ê±²ÅĞèÒªÉèÖÃ errno
-21.3) bugfix: fiber_io.c, acl_fiber_delay º¯ÊıĞèÒªºÏÀíÉèÖÃ ev->timeout Öµ
-21.4) performance: hook_net.c ÖĞ hook µÄÏµÍ³ accept API ÓÅ»¯ÁË½ÓÊÕÁ¬½ÓµÄË³Ğò£¬
-´Ó¶øÊ¹ accept ËÙ¶È¸ü¿ì
+21.1) performance: fiber.c ä¸­å‡½æ•° fiber_alloc åœ¨åˆ›å»ºåç¨‹æ ˆæ—¶ä½¿ç”¨ malloc ä»£æ›¿äº†
+åŸæ¥çš„ callocï¼Œé¿å…å†…å­˜æäº¤ï¼Œä»…ä½¿ç”¨è™šå­˜ï¼Œä»è€Œæœ‰æ•ˆæ§åˆ¶äº†åç¨‹çš„å®é™…å ç”¨å†…å­˜å¤§å°
+21.2) bugfix: hook_io.c ä¸­çš„ read ç­‰è¯»å‡½æ•°åªæœ‰å½“è¯»è¿”å› < 0 æ—¶æ‰éœ€è¦è®¾ç½® errno
+21.3) bugfix: fiber_io.c, acl_fiber_delay å‡½æ•°éœ€è¦åˆç†è®¾ç½® ev->timeout å€¼
+21.4) performance: hook_net.c ä¸­ hook çš„ç³»ç»Ÿ accept API ä¼˜åŒ–äº†æ¥æ”¶è¿æ¥çš„é¡ºåºï¼Œ
+ä»è€Œä½¿ accept é€Ÿåº¦æ›´å¿«
 
 20) 2016.8.16
-20.1) portable: fiber.c ÖĞÔöÇ¿ÁË SETJMP »ã±à´úÂëÒÆÖ²ĞÔ
+20.1) portable: fiber.c ä¸­å¢å¼ºäº† SETJMP æ±‡ç¼–ä»£ç ç§»æ¤æ€§
 
 19) 2016.8.10
-19.1) performance&feature: ÔÊĞíÊ¹ÓÃ setjmp/longjmp ½øĞĞÕ»µÄÌø×ª£¬ĞÔÄÜ¸üºÃ
+19.1) performance&feature: å…è®¸ä½¿ç”¨ setjmp/longjmp è¿›è¡Œæ ˆçš„è·³è½¬ï¼Œæ€§èƒ½æ›´å¥½
 
 18) 2016.8.7
-18.1) feature: fiber.c ÖĞÔÚ acl_fiber_schedule ½áÊøÇ°×Ô¶¯½« acl_var_hook_sys_api
-ÖÃ 0£¬´Ó¶ø»Ö¸´ÏµÍ³ API µ÷ÓÃ¹ı³Ì
+18.1) feature: fiber.c ä¸­åœ¨ acl_fiber_schedule ç»“æŸå‰è‡ªåŠ¨å°† acl_var_hook_sys_api
+ç½® 0ï¼Œä»è€Œæ¢å¤ç³»ç»Ÿ API è°ƒç”¨è¿‡ç¨‹
 
 17) 2016.8.5
-17.1) feature: hook_io.c ÖĞÔö¼ÓÏµÍ³ API sleep µÄ hook º¯Êı
+17.1) feature: hook_io.c ä¸­å¢åŠ ç³»ç»Ÿ API sleep çš„ hook å‡½æ•°
 
 16) 2016.8.4
-16.1) bugfix: hook_net.c ÖĞµÄ gethostbyname_r ÔÚ½âÎöÓòÃûÊ±µÄµØÖ·ËùÓÃ×Ö½ÚĞòÓĞÎó
---- found by ³ÂÏşÓÂ
+16.1) bugfix: hook_net.c ä¸­çš„ gethostbyname_r åœ¨è§£æåŸŸåæ—¶çš„åœ°å€æ‰€ç”¨å­—èŠ‚åºæœ‰è¯¯
+--- found by é™ˆæ™“å‹‡
 
 15) 2016.7.28
-15.1) bugfix: hook_net.c ÖĞµÄ poll/epoll_wait ¶ÔÓÚ³¬Ê±µÄ¼ÆÊıÓĞÎó£¬»áµ¼ÖÂ³¬Ê±
-Ê±¼äÌáÇ°
+15.1) bugfix: hook_net.c ä¸­çš„ poll/epoll_wait å¯¹äºè¶…æ—¶çš„è®¡æ•°æœ‰è¯¯ï¼Œä¼šå¯¼è‡´è¶…æ—¶
+æ—¶é—´æå‰
 
 14) 2016.7.26
-14.1) feature: hook_net.c ÖĞµÄ connect º¯ÊıÔö¼ÓÁË³ö´í´¦Àí
+14.1) feature: hook_net.c ä¸­çš„ connect å‡½æ•°å¢åŠ äº†å‡ºé”™å¤„ç†
 
 13) 2016.7.22
-13.1) bugfix: poll/epoll_wait API µÄ³¬Ê±ÖµÉèÖÃµÄ²»¶Ô
-13.1) performance: fiber.c ÖĞ acl_fiber_yield º¯ÊıÊ×ÏÈÅĞ¶ÏÊÇ·ñÓĞ´ı´¦ÀíĞ­³Ì£¬
-È»ºóÔÙ¾ö¶¨ÊÇ·ñĞèÒªÇĞ»»Ğ­³ÌÉÏÏÂÎÄ£¬´Ó¶ø¼õÉÙÉÏÏÂÎÄµÄÇĞ»»´ÎÊı
+13.1) bugfix: poll/epoll_wait API çš„è¶…æ—¶å€¼è®¾ç½®çš„ä¸å¯¹
+13.1) performance: fiber.c ä¸­ acl_fiber_yield å‡½æ•°é¦–å…ˆåˆ¤æ–­æ˜¯å¦æœ‰å¾…å¤„ç†åç¨‹ï¼Œ
+ç„¶åå†å†³å®šæ˜¯å¦éœ€è¦åˆ‡æ¢åç¨‹ä¸Šä¸‹æ–‡ï¼Œä»è€Œå‡å°‘ä¸Šä¸‹æ–‡çš„åˆ‡æ¢æ¬¡æ•°
 
 12) 2016.7.14
-12.1) feature: hook_net.c Ôö¼ÓÁË epoll µÄ hook Ö§³Ö
+12.1) feature: hook_net.c å¢åŠ äº† epoll çš„ hook æ”¯æŒ
 
 11) 2016.7.9
-11.1) feature: fiber_sem.c Ôö¼ÓĞ­³ÌĞÅºÅÁ¿
+11.1) feature: fiber_sem.c å¢åŠ åç¨‹ä¿¡å·é‡
 
 10) 2016.6.22
-10.1) feature: fiber_server.c ·şÎñÄ£¿éÖ§³Ö¿ÕÏĞ³¬Ê±ÍË³ö¼°´¦ÀíÁ¬½ÓÊı´ïÉÏÏŞÍË³ö
+10.1) feature: fiber_server.c æœåŠ¡æ¨¡å—æ”¯æŒç©ºé—²è¶…æ—¶é€€å‡ºåŠå¤„ç†è¿æ¥æ•°è¾¾ä¸Šé™é€€å‡º
 
 9) 2016.6.21
-9.1) feature: ½«·Ç socket ÀàĞÍµÄ fd ²ÉÓÃÍ¬²½Ä£Ê½
-9.2) feature: master_fiber.c Ö§³Ö dispatch ·½Ê½»ñµÃ¿Í»§¶ËÁ¬½Ó
+9.1) feature: å°†é socket ç±»å‹çš„ fd é‡‡ç”¨åŒæ­¥æ¨¡å¼
+9.2) feature: master_fiber.c æ”¯æŒ dispatch æ–¹å¼è·å¾—å®¢æˆ·ç«¯è¿æ¥
 
 8) 2016.6.19
-8.1) feature: Ôö¼ÓÁË FIBER Ëø¹¦ÄÜ
-8.2) feature: Ôö¼Ó fiber_server.c Ä£¿é£¬¿ÉÓÉ acl_master ·şÎñÆ÷¿ò¼Ü¿ØÖÆ
+8.1) feature: å¢åŠ äº† FIBER é”åŠŸèƒ½
+8.2) feature: å¢åŠ  fiber_server.c æ¨¡å—ï¼Œå¯ç”± acl_master æœåŠ¡å™¨æ¡†æ¶æ§åˆ¶
 
 7) 2016.6.18
-7.1) feature: Ôö¼ÓÁË FIBER_CHANNEL ÓÃÓÚĞ­³Ì¼äµÄ½»»¥Í¨ĞÅ
+7.1) feature: å¢åŠ äº† FIBER_CHANNEL ç”¨äºåç¨‹é—´çš„äº¤äº’é€šä¿¡
 
 6) 2016.6.15
-6.1) feature: Ôö¼Ó¶¨Ê±Æ÷¹¦ÄÜ -- fiber_create_timer()
+6.1) feature: å¢åŠ å®šæ—¶å™¨åŠŸèƒ½ -- fiber_create_timer()
 
 5) 2016.6.14
-5.1) feature: hook ÁË errno ËùÒÀÀµµÄº¯Êı __errno_location£¬´Ó¶øÊ¹ errno Õë¶Ô
-Ã¿¸öĞ­³ÌÊÇ°²È«µÄ
+5.1) feature: hook äº† errno æ‰€ä¾èµ–çš„å‡½æ•° __errno_locationï¼Œä»è€Œä½¿ errno é’ˆå¯¹
+æ¯ä¸ªåç¨‹æ˜¯å®‰å…¨çš„
 
 4) 2016.6.11
-4.1) valgrind: Ôö¼Ó±àÒë¿ª¹ØÒÔ·ÀÖ¹ valgrind ¹¤¾ß¶Ô swapcontext Ìø×ªµÄÎó±¨
+4.1) valgrind: å¢åŠ ç¼–è¯‘å¼€å…³ä»¥é˜²æ­¢ valgrind å·¥å…·å¯¹ swapcontext è·³è½¬çš„è¯¯æŠ¥
 
 3) 2016.6.9
-3.1) performance: fiber_schedule.c£¬ÓÉĞÇĞÎÇĞ»»¸ÄÎª»·ĞÎÇĞ»»£¬´Ó¶øÌáÉıÁËÉÏÏÂÎÄ¼ş
-ÇĞ»»µÄĞ§ÂÊ --- by niukey@qq.com
+3.1) performance: fiber_schedule.cï¼Œç”±æ˜Ÿå½¢åˆ‡æ¢æ”¹ä¸ºç¯å½¢åˆ‡æ¢ï¼Œä»è€Œæå‡äº†ä¸Šä¸‹æ–‡ä»¶
+åˆ‡æ¢çš„æ•ˆç‡ --- by niukey@qq.com
 
 2) 2016.6.5
-2.1) feature: ½« fiber_schedule.c, fiber_io.c ÖĞµÄÈ«¾Ö¾²Ì¬±äÁ¿µ÷ÕûÎªÏß³Ì¾Ö²¿
-±äÁ¿£¬ÎªÊµÏÖ¶àÏß³Ì»¯Ğ­³Ì×ö×¼±¸
+2.1) feature: å°† fiber_schedule.c, fiber_io.c ä¸­çš„å…¨å±€é™æ€å˜é‡è°ƒæ•´ä¸ºçº¿ç¨‹å±€éƒ¨
+å˜é‡ï¼Œä¸ºå®ç°å¤šçº¿ç¨‹åŒ–åç¨‹åšå‡†å¤‡
 
 1) 2016.6.4
-1.1) µ±Ç°µÄĞ­³ÌÖ§³Ö hook: read/redv/redv/recvfrom/recvmsg,
+1.1) å½“å‰çš„åç¨‹æ”¯æŒ hook: read/redv/redv/recvfrom/recvmsg,
 write/writev/send/sendto/sendmsg, poll/select/sleep/gethostbyname/gethostbyname_r
