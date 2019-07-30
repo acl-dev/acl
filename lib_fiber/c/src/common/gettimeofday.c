@@ -140,4 +140,56 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 	return (0);
 }
 
+#elif defined(USE_FAST_TIME)
+
+static inline uint64_t rte_rdtsc(void)
+{
+	union {
+		uint64_t tsc_64;
+		struct {
+			uint32_t lo_32;
+			uint32_t hi_32;
+		};
+	} tsc;
+
+	asm volatile("rdtsc" :
+			"=a" (tsc.lo_32),
+			"=d" (tsc.hi_32));
+	return tsc.tsc_64;
+}
+
+static __thread unsigned long long __one_msec;
+static __thread unsigned long long __one_sec;
+
+static void set_time_metric(void)
+{
+	uint64_t end;
+	uint64_t begin = rte_rdtsc();
+
+#define MSEC_ONE 1000
+
+	usleep(MSEC_ONE);
+	end = rte_rdtsc();
+	__one_msec = end - begin;
+	__one_sec  = __one_msec * 1000;
+}
+
+static __thread unsigned long long __startup;
+int gettimeofday(struct timeval *tv, struct timezone *tz fiber_unused)
+{
+	unsigned long long diff;
+
+	if (__one_msec == 0) {
+		set_time_metric();
+	}
+
+	if (__startup == 0) {
+		__startup = rte_rdtsc();
+	}
+	diff = rte_rdtsc() - __startup;
+	tv->tv_sec  = diff / __one_sec;
+	tv->tv_usec = (1000 * (diff % __one_sec) / __one_msec);
+	return 0;
+}
+
 #endif

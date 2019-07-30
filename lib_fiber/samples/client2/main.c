@@ -27,7 +27,6 @@ static int __total_error_clients   = 0;
 
 static int __fiber_delay  = 0;
 static int __conn_timeout = 0;
-static int __rw_timeout   = 0;
 static int __max_loop     = 10000;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
@@ -154,12 +153,23 @@ static void usage(const char *procname)
 		" -s server_ip\r\n"
 		" -p server_port\r\n"
 		" -t connt_timeout\r\n"
-		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
 		" -S [if using single IO, dafault: no]\r\n"
 		" -d fiber_delay_ms\r\n"
 		" -z stack_size\r\n"
 		" -n max_loop\r\n", procname);
+}
+
+static void test_time(void)
+{
+	struct timeval begin, end;
+	double diff;
+
+	gettimeofday(&begin, NULL);
+	usleep(1000);
+	gettimeofday(&end, NULL);
+	diff = stamp_sub(&end, &begin);
+	printf("usleep 1000 diff=%.2f\r\n", diff);
 }
 
 int main(int argc, char *argv[])
@@ -175,7 +185,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:e:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:p:t:Sd:z:e:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -186,9 +196,6 @@ int main(int argc, char *argv[])
 			break;
 		case 't':
 			__conn_timeout = atoi(optarg);
-			break;
-		case 'r':
-			__rw_timeout = atoi(optarg);
 			break;
 		case 'n':
 			__max_loop = atoi(optarg);
@@ -229,6 +236,8 @@ int main(int argc, char *argv[])
 	printf("call fiber_schedule with=%d\r\n", event_mode);
 
 	acl_fiber_schedule_with(event_mode);
+
+	test_time();
 
 	return 0;
 }

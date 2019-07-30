@@ -1,4 +1,7 @@
 
+108) 2019.7.30
+108.1) performance: 从 DPDK 摘取代码用以实现 getimeofday() 从而获得更高的性能
+
 107) 2019.5.16
 107.1) bugifx: fiber_sem.c/fiber_lock.c 当释放资源时，应该先让出来调度权，以便于
 等待者获得被调度机会
