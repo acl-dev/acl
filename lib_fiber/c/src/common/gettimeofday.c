@@ -146,7 +146,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 static inline unsigned long long rte_rdtsc(void)
 {
 	union {
-		uint64_t tsc_64;
+		unsigned long long tsc_64;
 		struct {
 			unsigned lo_32;
 			unsigned hi_32;
