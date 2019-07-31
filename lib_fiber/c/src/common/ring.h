@@ -28,48 +28,133 @@ typedef struct RING_ITER {
  * 初始化数据环
  * @param ring {RING*} 数据环
  */
+#ifdef USE_FAST_RING
+#define ring_init(__ring) do { \
+	RING *_ring   = __ring; \
+	_ring->pred   = _ring->succ = _ring; \
+	_ring->parent = _ring; \
+	_ring->len    = 0; \
+} while (0)
+#else
 void ring_init(RING *ring);
+#endif
 
 /**
  * 获得当前数据环内元素个数
  * @param ring {RING*} 数据环
  * @return {int} 数据环内元素个数
  */
+#ifdef USE_FAST_RING
+#define ring_size(r) (((RING*)(r))->len)
+#else
 int  ring_size(const RING *ring);
-
-/**
- * 将一个新元素添加进环的头部
- * @param ring {RING*} 数据环
- * @param entry {RING*} 新的元素
- */
-void ring_prepend(RING *ring, RING *entry);
+#endif
 
 /**
  * 将一个新元素添加进环的尾部
  * @param ring {RING*} 数据环
  * @param entry {RING*} 新的元素
  */
+#ifdef USE_FAST_RING
+#define ring_append(r, e) do { \
+	((RING*)(e))->succ       = ((RING*)(r))->succ; \
+	((RING*)(e))->pred       = (RING*)(r); \
+	((RING*)(e))->parent     = ((RING*)(r))->parent; \
+	((RING*)(r))->succ->pred = (RING*)(e); \
+	((RING*)(r))->succ       = (RING*)(e); \
+	((RING*)(r))->parent->len++; \
+} while (0)
+
+#else
 void ring_append(RING *ring, RING *entry);
+#endif
+
+/**
+ * 将一个新元素添加进环的头部
+ * @param ring {RING*} 数据环
+ * @param entry {RING*} 新的元素
+ */
+#ifdef USE_FAST_RING
+#define ring_prepend(r, e) do { \
+	((RING*)(e))->pred       = ((RING*)(r))->pred; \
+	((RING*)(e))->succ       = (RING*)(r); \
+	((RING*)(e))->parent     = ((RING*)(r))->parent; \
+	((RING*)(r))->pred->succ = (RING*)(e); \
+	((RING*)(r))->pred       = (RING*)(e); \
+	((RING*)(r))->parent->len++; \
+} while (0)
+#else
+void ring_prepend(RING *ring, RING *entry);
+#endif
 
 /**
  * 将一个环元素从数据环中删除
  * @param entry {RING*} 环元素
  */
+#ifdef USE_FAST_RING
+#define ring_detach(e) do { \
+	RING *_succ, *_pred; \
+	if (((RING*)(e))->parent != (RING*)(e)) { \
+		_succ = ((RING*)(e))->succ; \
+		_pred = ((RING*)(e))->pred; \
+		if (_succ && _pred) { \
+			_pred->succ = _succ; \
+			_succ->pred = _pred; \
+			((RING*)(e))->parent->len--; \
+			((RING*)(e))->succ   = (RING*)(e); \
+			((RING*)(e))->pred   = (RING*)(e); \
+			((RING*)(e))->parent = (RING*)(e); \
+			((RING*)(e))->len    = 0; \
+		} \
+	} \
+} while (0)
+#else
 void ring_detach(RING *entry);
+#endif
 
 /**
  * 从环中弹出头部环元素
  * @param ring {RING*} 数据环
  * @return {RING*} 头部环元素，如果返回空则表示该数据环为空
  */
+#ifdef USE_FAST_RING
+static inline RING *ring_pop_head(RING *ring)
+{
+	RING *succ;
+
+	succ = ring->succ;
+	if (succ == ring) {
+		return NULL;
+	}
+
+	ring_detach(succ);
+	return succ;
+}
+#else
 RING *ring_pop_head(RING *ring);
+#endif
 
 /**
  * 从环中弹出尾部环元素
  * @param ring {RING*} 数据环
  * @return {RING*} 尾部环元素，如果返回空则表示该数据环为空
  */
+#ifdef USE_FAST_RING
+static inline RING *ring_pop_tail(RING *ring)
+{
+	RING *pred;
+
+	pred = ring->pred;
+	if (pred == ring) {
+		return NULL;
+	}
+
+	ring_detach(pred);
+	return pred;
+}
+#else
 RING *ring_pop_tail(RING *ring);
+#endif
 
 /*--------------------  一些方便快捷的宏操作 --------------------------------*/
 

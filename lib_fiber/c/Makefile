@@ -22,6 +22,7 @@ CFLAGS = -c -g -W \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_TIME \
+-DUSE_FAST_RING \
 #-DUSE_VALGRIND \
 #-I/usr/local/include
 #-DUSE_PRINTF_MACRO
