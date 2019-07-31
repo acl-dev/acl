@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "fiber/fiber_base.h"
 #include "pthread_patch.h"
 #include "msg.h"
 #include "init.h"
@@ -142,13 +143,13 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 #elif defined(USE_FAST_TIME)
 
-static inline uint64_t rte_rdtsc(void)
+static inline unsigned long long rte_rdtsc(void)
 {
 	union {
 		uint64_t tsc_64;
 		struct {
-			uint32_t lo_32;
-			uint32_t hi_32;
+			unsigned lo_32;
+			unsigned hi_32;
 		};
 	} tsc;
 
@@ -160,36 +161,47 @@ static inline uint64_t rte_rdtsc(void)
 
 static __thread unsigned long long __one_msec;
 static __thread unsigned long long __one_sec;
+static __thread unsigned long long __metric_diff;
 
 static void set_time_metric(void)
 {
-	uint64_t end;
-	uint64_t begin = rte_rdtsc();
+	unsigned long long now, startup, end;
+	unsigned long long begin = rte_rdtsc();
 
 #define MSEC_ONE 1000
 
 	usleep(MSEC_ONE);
-	end = rte_rdtsc();
-	__one_msec = end - begin;
-	__one_sec  = __one_msec * 1000;
+
+	end           = rte_rdtsc();
+	__one_msec    = end - begin;
+	__one_sec     = __one_msec * 1000;
+
+	startup       = rte_rdtsc();
+	now           = time(NULL) * __one_sec;
+	if (now > startup) {
+		__metric_diff = now - startup;
+	} else {
+		__metric_diff = 0;
+	}
 }
 
-static __thread unsigned long long __startup;
-int gettimeofday(struct timeval *tv, struct timezone *tz fiber_unused)
+int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz fiber_unused)
 {
-	unsigned long long diff;
+	unsigned long long now;
 
 	if (__one_msec == 0) {
 		set_time_metric();
 	}
 
-	if (__startup == 0) {
-		__startup = rte_rdtsc();
-	}
-	diff = rte_rdtsc() - __startup;
-	tv->tv_sec  = diff / __one_sec;
-	tv->tv_usec = (1000 * (diff % __one_sec) / __one_msec);
+	now = rte_rdtsc() + __metric_diff;
+	tv->tv_sec  = now / __one_sec;
+	tv->tv_usec = (1000 * (now % __one_sec) / __one_msec);
 	return 0;
+}
+
+int gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	return acl_fiber_gettimeofday(tv, tz);
 }
 
 #endif
