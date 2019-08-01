@@ -12,7 +12,7 @@ void* atomic_cas(void*, void*, void*);
 void* atomic_xchg(void*, void*);
 
 template<typename T>
-class atomic
+class ACL_CPP_API atomic
 {
 public:
 	atomic(T* t)
