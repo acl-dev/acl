@@ -24,7 +24,7 @@ typedef struct TASKQ {
 	sem_t sem_full;
 } TASKQ;
 
-static void *thread_waiter(void *ctx);
+static void *taskq_pop(void *ctx);
 
 TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 {
@@ -41,8 +41,7 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 	taskq->tasks    = (TASK*) acl_mycalloc(qsize, sizeof(TASK));
 	taskq->qsize    = qsize;
 	taskq->nthreads = nthreads;
-	taskq->threads  = (acl_pthread_t*)
-		acl_mycalloc(nthreads, sizeof(acl_pthread_t));
+	taskq->threads  = (acl_pthread_t*) acl_mycalloc(nthreads, sizeof(acl_pthread_t));
 
 	ret = sem_init(&taskq->sem_empty, 0, qsize);
 	assert(ret == 0);
@@ -56,14 +55,13 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 	assert(ret == 0);
 
 	for (i = 0; i < (int) nthreads; i++) {
-		ret = pthread_create(&taskq->threads[i], &attr, thread_waiter,
-				taskq);
+		ret = pthread_create(&taskq->threads[i], &attr, taskq_pop, taskq);
 		assert(ret == 0);
 	}
 	return taskq;
 }
 
-void taskq_free(TASKQ *taskq)
+void taskq_destroy(TASKQ *taskq)
 {
 	size_t i;
 
@@ -72,15 +70,15 @@ void taskq_free(TASKQ *taskq)
 		(void) acl_pthread_join(taskq->threads[i], NULL);
 	}
 
-	sem_destroy(&taskq->sem_empty);
-	sem_destroy(&taskq->sem_full);
-	acl_pthread_mutex_destroy(&taskq->lock);
+	(void) sem_destroy(&taskq->sem_empty);
+	(void) sem_destroy(&taskq->sem_full);
+	(void) acl_pthread_mutex_destroy(&taskq->lock);
 	acl_myfree(taskq->threads);
 	acl_myfree(taskq->tasks);
 	acl_myfree(taskq);
 }
 
-static void *thread_waiter(void *ctx)
+static void *taskq_pop(void *ctx)
 {
 	TASKQ *taskq = (TASKQ*) ctx;
 	TASK   task;

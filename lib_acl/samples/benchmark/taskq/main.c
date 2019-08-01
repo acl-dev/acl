@@ -6,10 +6,12 @@ static int __max = 10000;
 
 static void consumer(void *ctx acl_unused)
 {
+	//int *o = (int*) ctx;
 	long long n = acl_atomic_int64_add_fetch(__counter, 1);
 	if (n <= 10) {
 		printf("thread: %ld, n=%lld\r\n", acl_pthread_self(), n);
 	}
+	//free(o);
 }
 
 static void *producer(void *ctx)
@@ -18,6 +20,8 @@ static void *producer(void *ctx)
 	int i;
 
 	for (i = 0; i <__max; i++) {
+		//int *o = (int*) malloc(sizeof(int));
+		//*o = i;
 		taskq_push(taskq, consumer, NULL);
 	}
 
@@ -92,7 +96,7 @@ int main(int argc, char *argv[])
 	printf("at last, counter=%lld, loop=%lld\r\n", value, counter);
 
 	acl_atomic_free(__counter);
-	taskq_free(taskq);
+	taskq_destroy(taskq);
 	acl_myfree(producers);
 
 	return 0;
