@@ -43,7 +43,7 @@ private:
 	atomic(const atomic&);
 };
 
-class atomic_long : public atomic<long long>
+class ACL_CPP_API atomic_long : public atomic<long long>
 {
 public:
 	atomic_long(long long n = 0);
