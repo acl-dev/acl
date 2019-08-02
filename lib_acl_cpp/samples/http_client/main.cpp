@@ -3,11 +3,7 @@
 
 #include "lib_acl.h"
 #include "lib_protocol.h"  // http 协议相关
-#include "acl_cpp/stream/aio_handle.hpp"
-#include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stream/ofstream.hpp"
-#include "acl_cpp/acl_cpp_init.hpp"
-#include "acl_cpp/http/http_service.hpp"
+#include "acl_cpp/lib_acl.hpp"
 
 class http_request : public acl::http_service_request
 {
@@ -107,6 +103,10 @@ int main()
 #ifdef WIN32
 	acl::acl_cpp_init();
 #endif
+	acl::atomic_long n;
+	n++;
+	printf("n=%lld\r\n", n.value());
+	getchar();
 
 	acl::aio_handle handle(acl::ENGINE_SELECT);
 	acl::http_service* service = new acl::http_service();

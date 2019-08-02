@@ -129,6 +129,9 @@ BOOL CHttpClientDlg::OnInitDialog()
 	//	service_ = NULL;
 	//}
 	
+	acl::atomic_long n;
+	n++;
+	printf("n=%lld\r\n", n.value());
 	return TRUE;  // 除非设置了控件的焦点，否则返回 TRUE
 }
 

@@ -1,5 +1,9 @@
 修改历史列表：
 
+659) 2019.8.2
+659.1) bugfix: acl_myloc.c 中的函数 init_log_mutex() 去掉 PTHREAD_MUTEX_RECURSIVE 宏
+的条件编译，可能会造成一些未知问题
+
 658) 2019.7.26
 658.1) bugfix: acl_vstream.c 中 acl_vstream_clean_close_handle() 函数有存在死
 循环问题 -- by liqiang

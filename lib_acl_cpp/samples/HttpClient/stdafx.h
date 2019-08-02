@@ -126,3 +126,5 @@
 # else
 #  define NEW new
 #endif // _DEBUG
+
+#include "acl_cpp/lib_acl.hpp"

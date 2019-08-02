@@ -263,6 +263,13 @@
       <Culture>0x0804</Culture>
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.pdb $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
     <ClCompile>

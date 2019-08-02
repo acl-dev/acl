@@ -206,6 +206,13 @@
       </IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmtd</IgnoreSpecificDefaultLibraries>
     </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\..\dist\lib\win32\lib_acl_d.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_acl_cpp_d.pdb $(OutDir) /Y
+copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debugdll|x64'">
     <ClCompile>

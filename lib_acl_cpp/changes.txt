@@ -1,5 +1,8 @@
 修改历史列表：
 
+584) 2019.8.2
+584.1) bugfix: atomic_long 整型原子数使用方法在 Windows 存在问题
+
 583) 2019.7.27
 583.1) bugfix: redis_set::spop 当键不存在或集合为空时应该返回 false
 

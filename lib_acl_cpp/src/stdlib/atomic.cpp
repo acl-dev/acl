@@ -36,17 +36,20 @@ void* atomic_xchg(void* atomic, void* value)
 atomic_long::atomic_long(long long n)
 : atomic<long long>(&n_)
 {
-	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
+	n_ = n;
+	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n_);
 }
 
 atomic_long::atomic_long(const atomic_long& n)
 : atomic<long long>(&n_)
 {
-	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n.value());
+	n_ = n.value();
+	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n_);
 }
 
 void atomic_long::set(long long n)
 {
+	n_ = n;
 	acl_atomic_int64_set((ACL_ATOMIC*) atomic_, n);
 }
 
