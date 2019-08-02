@@ -1,4 +1,4 @@
-%define release_id 5
+%define release_id 6
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,12 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Fri Aug 02 2019 shuxin.zheng@qq.com 3.5.0-6-20190802.19
+- bugfix: fixed bug in atomic_long for Windows
+- bugfix: don't use PTHREAD_MUTEX_RECURSIVE macro as compiling condition in acl_mylog.c
+- performance: improve the gettimeofday's performance in lib_fiber lib
+- feature: don's use body_parse_ in HttpServletRequest
 
 * Mon Jul 22 2019 shuxin.zheng@qq.com 3.5.0-5-20190722.15
 - workaroud: format c++ code style
