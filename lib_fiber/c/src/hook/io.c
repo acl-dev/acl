@@ -222,13 +222,14 @@ static void hook_init(void)
 #ifdef SYS_UNIX
 unsigned int sleep(unsigned int seconds)
 {
-	if (!var_hook_sys_api) {
+	if (var_hook_sys_api) {
 #ifndef USE_SYSCALL
 		if (__sys_sleep == NULL) {
 			hook_init();
 		}
 #endif
 
+		printf("use system gettimeofday\r\n");
 		return __sys_sleep(seconds);
 	}
 

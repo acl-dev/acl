@@ -1,6 +1,7 @@
 #ifndef FIBER_INCLUDE_H
 #define FIBER_INCLUDE_H
 
+#include "common/ring.h"
 #include "event.h"
 
 #ifdef ACL_ARM_LINUX

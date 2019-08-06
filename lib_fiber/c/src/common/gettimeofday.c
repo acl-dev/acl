@@ -143,6 +143,26 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 #elif defined(USE_FAST_TIME)
 
+#include "fiber.h"
+
+typedef int (*gettimeofday_fn)(struct timeval *, struct timezone *);
+static gettimeofday_fn __gettimeofday = NULL;
+
+static void hook_api(void)
+{
+	__gettimeofday = (gettimeofday_fn) dlsym(RTLD_NEXT, "gettimeofday");
+	assert(__gettimeofday);
+}
+
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+static void hook_init(void)
+{
+	if (pthread_once(&__once_control, hook_api) != 0) {
+		abort();
+	}
+}
+
 static inline unsigned long long rte_rdtsc(void)
 {
 	union {
@@ -168,12 +188,13 @@ static void set_time_metric(void)
 	unsigned long long now, startup, end;
 	unsigned long long begin = rte_rdtsc();
 
-#define MSEC_ONE 1000
+#define MSEC_ONE 	1000
+#define METRIC		50
 
-	usleep(MSEC_ONE);
+	usleep(MSEC_ONE * METRIC);
 
 	end           = rte_rdtsc();
-	__one_msec    = end - begin;
+	__one_msec    = (end - begin) / METRIC;
 	__one_sec     = __one_msec * 1000;
 
 	startup       = rte_rdtsc();
@@ -201,6 +222,13 @@ int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz fiber_unused)
 
 int gettimeofday(struct timeval *tv, struct timezone *tz)
 {
+	if (!var_hook_sys_api) {
+		if (__gettimeofday == NULL) {
+			hook_init();
+		}
+		return __gettimeofday(tv, tz);
+	}
+
 	return acl_fiber_gettimeofday(tv, tz);
 }
 
