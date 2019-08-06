@@ -1,4 +1,4 @@
-#include <getopt.h>
+#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
 static void usage(const char* procname)
@@ -15,6 +15,8 @@ int main(int argc, char* argv[])
 	int  ch, max = 10;
 	bool accept_gzip = false, send_body = false;
 	acl::string addr("127.0.0.1:8194");
+
+	acl::acl_cpp_init();
 
 	while ((ch = getopt(argc, argv, "hs:n:zB")) > 0)
 	{
@@ -105,5 +107,10 @@ int main(int argc, char* argv[])
 		printf("===============================================\r\n");
 	}
 
+#if defined(_WIN32) || defined(_WIN64)
+	printf("Enter any key to exit ...");
+	fflush(stdout);
+	getchar();
+#endif
 	return 0;
 }
