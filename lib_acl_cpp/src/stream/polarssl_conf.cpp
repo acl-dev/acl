@@ -232,7 +232,7 @@ static void polarssl_dll_load(void)
 namespace acl
 {
 
-void polarssl_conf::set_libpath(const char* path)
+void polarssl_conf::set_libpath(const char* path acl_unused)
 {
 #ifdef HAS_POLARSSL_DLL
 	if (__polarssl_path_buf == NULL) {
