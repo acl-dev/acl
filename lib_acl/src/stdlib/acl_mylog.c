@@ -610,7 +610,8 @@ static void fork_in_child(void)
 		acl_foreach(iter, __loggers) {
 			ACL_LOG *log = (ACL_LOG *) iter.data;
 			if (log->lock) {
-				init_log_mutex(log->lock);
+				thread_mutex_unlock(log->lock);
+				/* init_log_mutex(log->lock); */
 			}
 		}
 	}
