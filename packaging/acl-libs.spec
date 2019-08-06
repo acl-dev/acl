@@ -1,4 +1,4 @@
-%define release_id 6
+%define release_id 7
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Tue Aug 06 2019 shuxin.zheng@qq.com 3.5.0-7-20190806.14
+- bugfix: the system API gettimeofday been hooked in lib_fiber wasn't accurate
+- bugfix: init_log_mutex() in acl_mylog.c has one bug when process forks one child
 
 * Fri Aug 02 2019 shuxin.zheng@qq.com 3.5.0-6-20190802.19
 - bugfix: fixed bug in atomic_long for Windows

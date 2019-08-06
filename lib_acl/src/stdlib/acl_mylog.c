@@ -120,13 +120,16 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 
 	n1 = pthread_mutexattr_init(&attr);
 
-	// 不应将 PTHREAD_MUTEX_RECURSIVE 宏定义做为判定条件 ---zsx 2019.8.2
-//# ifdef PTHREAD_MUTEX_RECURSIVE
+	/* 使用了 pthread_atfork() 来避免 fork 后的死锁，因为在 fork 前调用过
+	 * 加锁过程，所以需将此锁设为递归锁 --- zsx, 2019.8.6
+	 */
+# if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX)
 	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-//# else
-//	n2 = 0;
-//# endif
-
+# elif defined(MINGW)
+	n2 = 0
+# else
+	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+# endif
 	thread_mutex_init(lock, !n1 && !n2 ? &attr : NULL);
 #else
 	thread_mutex_init(lock, NULL);
