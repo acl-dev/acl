@@ -407,6 +407,15 @@ public:
 	http_header& set_status(int status);
 
 	/**
+	 * 获得响应头中的 HTTP 状态字
+	 * @return {int} HTTP 响应状态码：1xx, 2xx, 3xx, 4xx, 5xx
+	 */
+	int get_status(void) const
+	{
+		return status_;
+	}
+
+	/**
 	 * 设置 HTTP 响应头中的 chunked 传输标志
 	 * @param on {bool}
 	 * @return {http_header&}
