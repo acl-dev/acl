@@ -310,6 +310,12 @@ protected:
 	}
 
 	// @override
+	void on_read_timeout(void)
+	{
+		printf("read timeout\r\n");
+	}
+
+	// @override
 	bool on_http_res_hdr(const acl::http_header& header)
 	{
 		acl::string buf;
