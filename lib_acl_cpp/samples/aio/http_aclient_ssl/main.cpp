@@ -428,7 +428,7 @@ static void usage(const char* procname)
 		" -t connect_timeout[default: 5]\r\n"
 		" -i rw_timeout[default: 5]\r\n"
 		" -Z [enable_gzip, default: false]\r\n"
-		" -U [enable_ungip response, default: false]\r\n"
+		" -U [enable_unzip response, default: false]\r\n"
 		" -K [keep_alive, default: false]\r\n"
 		" -S polarssl_lib_path[default: none]\n"
 		" -N name_server[default: 8.8.8.8:53]\r\n"
@@ -443,7 +443,7 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
 	acl::string host("www.baidu.com"), ssl_lib_path;
 	bool enable_gzip = false, keep_alive = false, debug = false;
-	bool ws_enable = false, enable_ungip = false;
+	bool ws_enable = false, enable_unzip = false;
 
 	while ((ch = getopt(argc, argv, "hs:S:N:H:t:i:ZUKDW")) > 0) {
 		switch (ch) {
@@ -472,7 +472,7 @@ int main(int argc, char* argv[])
 			enable_gzip = true;
 			break;
 		case 'U':
-			enable_ungip = true;
+			enable_unzip = true;
 			break;
 		case 'K':
 			keep_alive = true;
@@ -556,7 +556,7 @@ int main(int argc, char* argv[])
 
 	(*conn).enable_debug(debug)		// 是否启用调试方式
 		.enable_websocket(ws_enable);	// 是否启用 websocket
-	conn->unzip_body(enable_ungip);		// 针对 HTTP 是否自动解压
+	conn->unzip_body(enable_unzip);		// 针对 HTTP 是否自动解压
 
 	// 设置 HTTP 请求头，也可将此过程放在 conn->on_connect() 里
 	acl::http_header& head = conn->request_header();

@@ -157,8 +157,7 @@ static int hdr_can_read(ACL_ASTREAM *astream, void *context)
 	void *arg = ctx->arg;
 	ACL_VSTRING *sbuf;
 	char *data;
-	int   dlen;
-	int   ret;
+	int   dlen, ret;
 
 	while (1) {
 		if ((ret = acl_aio_can_read(astream)) == ACL_VSTREAM_EOF) {
@@ -182,7 +181,7 @@ static int hdr_can_read(ACL_ASTREAM *astream, void *context)
 		case HTTP_CHAT_OK:
 			DISABLE_READ(astream);
 			if (notify(ret, arg) < 0) {
-				return 0;
+				return -1;
 			}
 			return 0;
 		default:
@@ -497,7 +496,8 @@ void http_req_body_get_async(HTTP_REQ *request, ACL_ASTREAM *astream,
 
 	hdr = &(request->hdr_req->hdr);
 	if (hdr->content_length <= 0) {
-		acl_msg_warn("%s: content_length(%lld)", myname, hdr->content_length);
+		acl_msg_warn("%s: content_length(%lld)",
+			myname, hdr->content_length);
 	}
 
 	ctx                     = request->hdr_req->hdr.chat_ctx;
@@ -522,7 +522,8 @@ void http_res_body_get_async(HTTP_RES *respond, ACL_ASTREAM *astream,
 	HTTP_HDR *hdr;
 
 	if (respond == NULL || astream == NULL || notify == NULL) {
-		acl_msg_fatal("%s, %s(%d): input invalid", myname, __FILE__, __LINE__);
+		acl_msg_fatal("%s, %s(%d): input invalid",
+			myname, __FILE__, __LINE__);
 	}
 	if (respond->hdr_res == NULL) {
 		acl_msg_fatal("%s: hdr null", myname);
@@ -531,8 +532,8 @@ void http_res_body_get_async(HTTP_RES *respond, ACL_ASTREAM *astream,
 	hdr = &(respond->hdr_res->hdr);
 	if (hdr->debug && hdr->content_length <= 0 && !hdr->chunked) {
 		acl_msg_warn("%s, %s(%d): content_length(%lld), status(%d)",
-			__FILE__, myname, __LINE__,
-			hdr->content_length, respond->hdr_res->reply_status);
+			__FILE__, myname, __LINE__, hdr->content_length,
+			respond->hdr_res->reply_status);
 	}
 
 	ctx                     = respond->hdr_res->hdr.chat_ctx;
