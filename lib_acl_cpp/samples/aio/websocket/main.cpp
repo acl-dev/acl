@@ -101,6 +101,7 @@ protected:
 		return true;
 	}
 
+#if 0
 	// @override
 	bool on_http_res_body(char* data, size_t dlen)
 	{
@@ -123,6 +124,7 @@ protected:
 
 		return keep_alive_;
 	}
+#endif
 
 protected:
 	// @override
