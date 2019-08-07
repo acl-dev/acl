@@ -145,7 +145,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 #include "fiber.h"
 
-#ifdef ACL_MACOSX
+#ifdef __APPLE__
 typedef int (*gettimeofday_fn)(struct timeval *, void *);
 #else
 typedef int (*gettimeofday_fn)(struct timeval *, struct timezone *);
@@ -225,7 +225,7 @@ int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz fiber_unused)
 	return 0;
 }
 
-#ifdef ACL_MACOSX
+#ifdef __APPLE__
 int gettimeofday(struct timeval *tv, void *tz)
 #else
 int gettimeofday(struct timeval *tv, struct timezone *tz)
