@@ -145,7 +145,12 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 
 #include "fiber.h"
 
+#ifdef ACL_MACOSX
+typedef int (*gettimeofday_fn)(struct timeval *, void *);
+#else
 typedef int (*gettimeofday_fn)(struct timeval *, struct timezone *);
+#endif
+
 static gettimeofday_fn __gettimeofday = NULL;
 
 static void hook_api(void)
@@ -220,7 +225,11 @@ int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz fiber_unused)
 	return 0;
 }
 
+#ifdef ACL_MACOSX
+int gettimeofday(struct timeval *tv, void *tz)
+#else
 int gettimeofday(struct timeval *tv, struct timezone *tz)
+#endif
 {
 	if (!var_hook_sys_api) {
 		if (__gettimeofday == NULL) {
@@ -229,7 +238,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 		return __gettimeofday(tv, tz);
 	}
 
-	return acl_fiber_gettimeofday(tv, tz);
+	return acl_fiber_gettimeofday(tv, (struct timezone*) tz);
 }
 
 #endif
