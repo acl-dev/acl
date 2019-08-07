@@ -186,7 +186,9 @@ static int hdr_can_read(ACL_ASTREAM *astream, void *context)
 			return 0;
 		default:
 			DISABLE_READ(astream);
-			(void) notify(ret, arg);
+			if (notify(ret, arg) < 0) {
+				return -1;
+			}
 			return 0;
 		}
 	}
