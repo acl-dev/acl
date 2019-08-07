@@ -51,9 +51,9 @@ public:
 	: handle_(handle)
 	{
 #ifdef USE_AIO_OSTREAM
-		out_ = new acl::aio_ostream(&handle, fd);
+		out_ = new acl::aio_ostream(&handle_, fd);
 #else
-		out_ = new pipe_ostream(handle, fd);
+		out_ = new pipe_ostream(handle_, fd);
 #endif
 		++__aio_refer;
 	}
