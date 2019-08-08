@@ -30,7 +30,7 @@ public:
 	 */
 	url_coder(const url_coder& coder, dbuf_guard* dbuf = NULL);
 
-	~url_coder();
+	~url_coder(void);
 
 	/**
 	 * 将存储于 params_ 数组中的数据进行 url 编码
@@ -43,7 +43,7 @@ public:
 	 * 获得将数组对象转换为编码后的字符串对象
 	 * @return {const string&}
 	 */
-	const string& to_string() const;
+	const string& to_string(void) const;
 
 	/**
 	 * 解析以 URL 编码的字符串
@@ -69,14 +69,17 @@ public:
 	/**
 	 * 获得 URL 解码后 params_ 数组中某个变量名的值
 	 * @param name {const char*} 变量名
+	 * @param found {bool*} 该指针非 NULL 时，将存储 name 是否存在，主要
+	 *  用在 name 的值为空的情形
 	 * @return {const char*} 返回 NULL 表示不存在
 	 */
-	const char* get(const char* name) const;
+	const char* get(const char* name, bool* found = NULL) const;
 
 	/**
 	 * 获得 URL 解码后 params_ 数组中某个变量名的值
 	 * @param name {const char*} 变量名
-	 * @return {const char*} 返回 NULL 表示不存在
+	 * @return {const char*} 返回 NULL 表示不存在或 name 的值为空
+	 *  注：如果 name 的值为空，则不能正确判断 name 是否存在
 	 */
 	const char* operator[](const char* name) const;
 
@@ -91,7 +94,7 @@ public:
 	 * 获得参数数组对象
 	 * @return {std::vector<URL_NV*>&}
 	 */
-	const std::vector<URL_NV*>& get_params() const
+	const std::vector<URL_NV*>& get_params(void) const
 	{
 		return params_;
 	}
@@ -106,7 +109,7 @@ public:
 	/**
 	 * 重置解析器状态，清除内部缓存
 	 */
-	void reset();
+	void reset(void);
 
 private:
 	bool nocase_;

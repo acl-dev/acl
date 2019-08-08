@@ -81,9 +81,10 @@ protected:
 	}
 
 	// @override
-	void on_read_timeout(void)
+	bool on_read_timeout(void)
 	{
 		printf("read timeout\r\n");
+		return true;
 	}
 
 	// @override
@@ -270,7 +271,11 @@ int main(int argc, char* argv[])
 
 	// 设置 HTTP 请求头，也可将此过程放在 conn->on_connect() 里
 	acl::http_header& head = conn->request_header();
-	head.set_url("/")
+	head.set_url("/path?name1&name2")
+		.add_param("name3", "")
+		.add_param("n1", "v1")
+		.add_param("n2", "v2")
+		.add_param("n3", "")
 		.set_content_length(0)
 		.set_host(host)
 		.accept_gzip(true)

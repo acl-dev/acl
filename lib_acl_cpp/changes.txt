@@ -1,5 +1,8 @@
 修改历史列表：
 
+585) 2019.8.8
+585.1) feature: url_coder 支持值为空的场景
+
 584) 2019.8.2
 584.1) bugfix: atomic_long 整型原子数使用方法在 Windows 存在问题
 

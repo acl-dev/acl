@@ -86,6 +86,13 @@ bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout)
 	return true;
 }
 
+void http_aclient::close(void)
+{
+	if (conn_) {
+		conn_->close();
+	}
+}
+
 bool http_aclient::handle_connect(ACL_ASTREAM *stream)
 {
 	if (stream == NULL) {
@@ -138,8 +145,7 @@ int http_aclient::connect_callback(ACL_ASTREAM *stream, void *ctx)
 
 bool http_aclient::timeout_callback(void)
 {
-	this->on_read_timeout();
-	return false;
+	return this->on_read_timeout();
 }
 
 void http_aclient::close_callback(void)

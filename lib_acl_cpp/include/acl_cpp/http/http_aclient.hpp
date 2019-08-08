@@ -77,6 +77,11 @@ public:
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
+	/**
+	 * 异步关闭连接
+	 */
+	void close(void);
+
 protected:
 	/**
 	 * 当连接成功后的回调方法，子类必须实现，子类应在该方法里构造 HTTP 请求
@@ -97,11 +102,14 @@ protected:
 
 	/**
 	 * 当网络读超时时的回调方法
+	 * @return {bool} 当读超时回调方法返回 true，则内部会继续读数据，如果
+	 *  返回 false，则该连接将会被关闭，接着回调 on_disconnect() 虚方法
 	 */
-	virtual void on_read_timeout(void) {}
+	virtual bool on_read_timeout(void) { return false; }
 
 	/**
-	 * 对于连接成功后连接关闭后的回调方法
+	 * 对于连接成功后连接关闭后的回调方法，内部调用此方法后便立即回调
+	 * destroy() 方法
 	 */
 	virtual void on_disconnect(void) {};
 
@@ -210,7 +218,13 @@ public:
 
 	/**
 	 * 开始异步读 websocket 数据
-	 * @param timeout {int} 读超时时间
+	 * @param timeout {int} 读超时时间，如果该值 <= 0，则不设读超时时间，
+	 *  否则当读超时时，超时回调方法便会被调用；
+	 *  注意：
+	 *  该值与 open() 中的 rw_timeout 有所不同，open() 方法中的读超时仅限
+	 *  定标准 HTTP IO 过程及 SSL 握手过程的读超时，而此处的读超时则用来
+	 *  限制与 websocket 相关的读超时，这主要是考虑到 websocket 应用很多
+	 *  都是长连接场景
 	 */
 	void ws_read_wait(int timeout = 0);
 

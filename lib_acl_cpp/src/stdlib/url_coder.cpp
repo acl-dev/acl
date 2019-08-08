@@ -63,7 +63,7 @@ const url_coder& url_coder::operator =(const url_coder& coder)
 	return *this;
 }
 
-void url_coder::reset()
+void url_coder::reset(void)
 {
 	params_.clear();
 	buf_->clear();
@@ -85,10 +85,14 @@ void url_coder::encode(string& buf, bool clean /* = true */) const
 			buf << '&';
 		}
 		name = acl_url_encode((*cit)->name, dbuf);
-		value = acl_url_encode((*cit)->value, dbuf);
-		buf << name << '=' << value;
+		if ((*cit)->value && *(*cit)->value) {
+			value = acl_url_encode((*cit)->value, dbuf);
+			buf << name << '=' << value;
+			dbuf_->dbuf_free(value);
+		} else {
+			buf << name;
+		}
 		dbuf_->dbuf_free(name);
-		dbuf_->dbuf_free(value);
 	}
 }
 
@@ -105,14 +109,15 @@ void url_coder::decode(const char* str)
 	ACL_ITER iter;
 
 	acl_foreach(iter, tokens) {
-		char* name = (char*) iter.data;
+		char* name  = (char*) iter.data;
 		char* value = strchr(name, '=');
 		if (value == NULL || *(value + 1) == 0) {
-			continue;
+			value = NULL;
+		} else {
+			*value++ = 0;
+			value = acl_url_decode(value, dbuf);
 		}
-		*value++ = 0;
 		name = acl_url_decode(name, dbuf);
-		value = acl_url_decode(value, dbuf);
 		URL_NV* param = (URL_NV*) dbuf_->dbuf_alloc(sizeof(URL_NV));
 		param->name = name;
 		param->value = value;
@@ -123,7 +128,7 @@ void url_coder::decode(const char* str)
 url_coder& url_coder::set(const char* name, const char* value,
 	bool override /* = true */)
 {
-	if (name == NULL || *name == 0 || value == NULL || *value == 0) {
+	if (name == NULL || *name == 0) {
 		//logger_error("invalid input: name: [%s], value: [%s]",
 		//	name ? name : "null", value ? value : "null");
 		return *this;
@@ -143,7 +148,11 @@ url_coder& url_coder::set(const char* name, const char* value,
 
 	URL_NV* param = (URL_NV*) dbuf_->dbuf_alloc(sizeof(URL_NV));
 	param->name = dbuf_->dbuf_strdup(name);
-	param->value = dbuf_->dbuf_strdup(value);
+	if (value && *value) {
+		param->value = dbuf_->dbuf_strdup(value);
+	} else {
+		param->value = NULL;
+	}
 	params_.push_back(param);
 	return *this;
 }
@@ -181,23 +190,29 @@ url_coder& url_coder::set(const char* name, const char* fmt, va_list ap,
 	return set(name, buf.c_str(), override);
 }
 
-const char* url_coder::get(const char* name) const
+const char* url_coder::get(const char* name, bool* found /* = NULL */) const
 {
 	int (*cmp)(const char*, const char*) = nocase_ ? strcasecmp : strcmp;
 	std::vector<URL_NV*>::const_iterator cit = params_.begin();
 
 	for (; cit != params_.end(); ++cit) {
 		if (cmp((*cit)->name, name) == 0) {
+			if (found) {
+				*found = true;
+			}
 			return (*cit)->value;
 		}
 	}
 
+	if (found) {
+		*found = false;
+	}
 	return NULL;
 }
 
 const char* url_coder::operator [](const char* name) const
 {
-	return get(name);
+	return get(name, NULL);
 }
 
 bool url_coder::del(const char* name)

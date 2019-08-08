@@ -310,9 +310,10 @@ protected:
 	}
 
 	// @override
-	void on_read_timeout(void)
+	bool on_read_timeout(void)
 	{
 		printf("read timeout\r\n");
+		return true;
 	}
 
 	// @override

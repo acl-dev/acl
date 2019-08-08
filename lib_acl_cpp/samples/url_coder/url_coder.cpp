@@ -59,6 +59,22 @@ int main(void)
 		coder4.to_string().c_str(),
 		coder4["name1"], coder4["name2"], coder4["name3"], coder4["name4"]);
 
+	//////////////////////////////////////////////////////////////////////////
+
+	printf("--------------------------------------------------------\r\n");
+	acl::url_coder coder5;
+	coder5.set("n0", "").set("n1", "v1").set("n2", "");
+	acl::string s5 = coder5.to_string();
+	coder5.reset();
+
+	coder5.decode(s5);
+	bool found0, found3;
+	const char* v0 = coder5.get("n0", &found0);
+	const char* v3 = coder5.get("n3", &found3);
+	printf(">>>url=%s, n0=%s, %s, n1=%s, n3=%s, %s\r\n", s5.c_str(),
+		v0, found0 ? "found it" : "not found", coder5.get("n1"),
+		v3, found3 ? "found it" : "not found");
+
 #ifdef WIN32
 	printf("enter any key to exit ...\r\n");
 	getchar();
