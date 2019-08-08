@@ -9,7 +9,7 @@
 
 static acl::atomic_long __aio_refer = 0;
 static int __success = 0, __nconnect = 0, __ndestroy = 0, __ndisconnect = 0;
-static int __nheader = 0;
+static int __nheader = 0, __ntimeout = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -91,7 +91,8 @@ protected:
 	bool on_read_timeout(void)
 	{
 		printf("read timeout\r\n");
-		return true;
+		__ntimeout++;
+		return false;
 	}
 
 	// @override
@@ -166,8 +167,8 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, conn_timeout = 5, rw_timeout = 5, cocurrent = 1;
-	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
-	acl::string host("www.baidu.com"), url("/20160528212429_c2HAm.jpeg");
+	acl::string addr("pvwu8bubc.bkt.clouddn.com:80"), name_server("8.8.8.8:53");
+	acl::string host("pvwu8bubc.bkt.clouddn.com"), url("/20160528212429_c2HAm.jpeg");
 	bool debug = false, kernel_event = false, keep_alive = false;
 
 	while ((ch = getopt(argc, argv, "hkKc:s:N:U:H:t:i:D")) > 0) {
@@ -263,7 +264,7 @@ int main(int argc, char* argv[])
 
 	handle.check();
 	printf("\r\n---------------------------------------------------\r\n");
-	printf("all over, success=%d, header=%d, connect=%d, disconnect=%d, destroy=%d\r\n",
-		__success, __nheader, __nconnect, __ndisconnect, __ndestroy);
+	printf("all over, success=%d, header=%d, timeout=%d, connect=%d, disconnect=%d, destroy=%d\r\n",
+		__success, __nheader, __ntimeout, __nconnect, __ndisconnect, __ndestroy);
 	return 0;
 }
