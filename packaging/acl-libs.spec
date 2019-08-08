@@ -1,4 +1,4 @@
-%define release_id 7
+%define release_id 8
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,11 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Aug 08 2019 shuxin.zheng@qq.com 3.5.0-8-20190808.16
+- bugfix: fixed one bug in the hooked API sleep in lib_fiber
+- feature: url_coder permits the value of name is null or empty
+- feature: http_aclient will check the resturned value by on_read_timeout
 
 * Tue Aug 06 2019 shuxin.zheng@qq.com 3.5.0-7-20190806.14
 - bugfix: the system API gettimeofday been hooked in lib_fiber wasn't accurate
