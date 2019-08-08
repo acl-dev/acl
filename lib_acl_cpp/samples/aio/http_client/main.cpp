@@ -8,6 +8,8 @@
 #include "acl_cpp/lib_acl.hpp"
 
 static acl::atomic_long __aio_refer = 0;
+static int __success = 0, __nconnect = 0, __ndestroy = 0, __ndisconnect = 0;
+static int __nheader = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -45,6 +47,7 @@ protected:
 		printf("http_client will be deleted!\r\n");
 		fflush(stdout);
 
+		__ndestroy++;
 		delete this;
 	}
 
@@ -57,6 +60,8 @@ protected:
 		printf(">>> begin send_request\r\n");
 		//this->ws_handshake();
 		this->send_request(NULL, 0);
+
+		__nconnect++;
 		return true;
 	}
 
@@ -65,6 +70,7 @@ protected:
 	{
 		printf("disconnect from server\r\n");
 		fflush(stdout);
+		__ndisconnect++;
 	}
 
 	// @override
@@ -95,7 +101,11 @@ protected:
 		header.build_response(buf);
 
 		compressed_ = header.is_transfer_gzip();
+		__nheader++;
 
+		if (!debug_) {
+			return true;
+		}
 		printf("-----------%s: response header----\r\n", __FUNCTION__);
 		printf("[%s]\r\n", buf.c_str());
 		fflush(stdout);
@@ -106,7 +116,11 @@ protected:
 	// @override
 	bool on_http_res_body(char* data, size_t dlen)
 	{
-		if (debug_ && (!compressed_ || this->is_unzip_body())) {
+		if (!debug_) {
+			return true;
+		}
+
+		if (!compressed_ || this->is_unzip_body()) {
 			(void) write(1, data, dlen);
 		} else {
 			printf(">>>read body: %ld\r\n", dlen);
@@ -122,6 +136,7 @@ protected:
 			keep_alive_ ? "true" : "false",
 			success ? "ok" : "failed");
 		fflush(stdout);
+		__success++;
 
 		return keep_alive_;
 	}
@@ -136,12 +151,14 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		" -s server_addr\r\n"
+		" -k [use kernel event]\r\n"
 		" -D [if in debug mode, default: false]\r\n"
 		" -c cocorrent\r\n"
 		" -t connect_timeout[default: 5]\r\n"
 		" -i rw_timeout[default: 5]\r\n"
 		" -U url\r\n"
 		" -H host\r\n"
+		" -K [http keep_alive true]\r\n"
 		" -N name_server[default: 8.8.8.8:53]\r\n"
 		, procname);
 }
@@ -151,13 +168,19 @@ int main(int argc, char* argv[])
 	int  ch, conn_timeout = 5, rw_timeout = 5, cocurrent = 1;
 	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
 	acl::string host("www.baidu.com"), url("/20160528212429_c2HAm.jpeg");
-	bool debug = false;
+	bool debug = false, kernel_event = false, keep_alive = false;
 
-	while ((ch = getopt(argc, argv, "hc:s:N:U:H:t:i:D")) > 0) {
+	while ((ch = getopt(argc, argv, "hkKc:s:N:U:H:t:i:D")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return (0);
+		case 'k':
+			kernel_event = true;
+			break;
+		case 'K':
+			keep_alive = true;
+			break;
 		case 'c':
 			cocurrent = atoi(optarg);
 			break;
@@ -191,7 +214,7 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 	// 定义 AIO 事件引擎
-	acl::aio_handle handle(acl::ENGINE_KERNEL);
+	acl::aio_handle handle(kernel_event ? acl::ENGINE_KERNEL : acl::ENGINE_POLL);
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -217,7 +240,7 @@ int main(int argc, char* argv[])
 		head.set_url(url)
 			.set_host(host)
 			.accept_gzip(true)
-			.set_keep_alive(false);
+			.set_keep_alive(keep_alive);
 
 		if (i > 0) {
 			continue;
@@ -239,5 +262,8 @@ int main(int argc, char* argv[])
 	}
 
 	handle.check();
+	printf("\r\n---------------------------------------------------\r\n");
+	printf("all over, success=%d, header=%d, connect=%d, disconnect=%d, destroy=%d\r\n",
+		__success, __nheader, __nconnect, __ndisconnect, __ndestroy);
 	return 0;
 }
