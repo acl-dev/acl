@@ -1,4 +1,7 @@
 
+111) 2019.8.8
+111.1) bugfix: io.c 中 hook API sleep 有误
+
 110) 2019.8.6
 110.1) bugfix: gettimeofday 内部在进行时间校准时休眠 50 毫秒，之前是休眠 1 毫秒造成较大误差
 
