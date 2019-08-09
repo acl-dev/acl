@@ -173,6 +173,11 @@ bool http_aclient::handle_ws_ping(void)
 			}
 			return true;
 		case 0:
+			this->on_ws_frame_ping(*buff_);
+			if (buff_->empty()) {
+				return true;
+			}
+
 			// 异步发送 pong 数据
 			res = ws_out_->send_frame_pong(*conn_,
 				(void*) buff_->c_str(), buff_->size());
@@ -200,6 +205,7 @@ bool http_aclient::handle_ws_pong(void)
 			}
 			return true;
 		case 0:
+			this->on_ws_frame_pong(*buff_);
 			buff_->clear();
 			return true;
 		default:
@@ -582,15 +588,23 @@ void http_aclient::send_request(const void* body, size_t len)
 		http_res_hdr_cllback, this, rw_timeout_);
 }
 
-void http_aclient::ws_handshake(void)
+void http_aclient::ws_handshake(const char* key)
 {
+	acl_assert(key && *key);
+	return ws_handshake(key, strlen(key));
+}
+
+void http_aclient::ws_handshake(const void* key, size_t len)
+{
+	acl_assert(key && len > 0);
 	acl_assert(stream_ == NULL);
+
 	ACL_VSTREAM* vs = conn_->get_vstream();
 	stream_ = new socket_stream;
 	(void) stream_->open(vs);
 
 	http_header& hdr = request_header();
-	hdr.set_ws_key("123456789")
+	hdr.set_ws_key(key, len)
 		.set_ws_version(13)
 		.set_upgrade("websocket")
 		.set_keep_alive(true);

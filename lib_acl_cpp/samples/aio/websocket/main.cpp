@@ -42,7 +42,8 @@ protected:
 	// @override
 	void destroy(void)
 	{
-		printf("websocket_client will be deleted!\r\n");
+		printf("%s(%d): websocket_client will be deleted!\r\n",
+			__FUNCTION__, __LINE__);
 		fflush(stdout);
 
 		delete this;
@@ -62,7 +63,8 @@ protected:
 	// @override
 	void on_disconnect(void)
 	{
-		printf("disconnect from server\r\n");
+		printf("%s(%d): disconnect from server\r\n",
+			__FUNCTION__, __LINE__);
 		fflush(stdout);
 	}
 

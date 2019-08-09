@@ -783,12 +783,24 @@ http_header& http_header::set_ws_origin(const char* url)
 	return *this;
 }
 
+http_header& http_header::set_ws_key(const void* key, size_t len)
+{
+	if (key && len > 0) {
+		string buf;
+		buf.base64_encode(key, len);
+		ws_sec_key_ = dbuf_->dbuf_strdup(buf.c_str());
+	}
+
+	return *this;
+}
+
 http_header& http_header::set_ws_key(const char* key)
 {
 	if (key && *key) {
-		ws_sec_key_ = dbuf_->dbuf_strdup(key);
+		return set_ws_key(key, strlen(key));
+	} else {
+		return *this;
 	}
-	return *this;
 }
 
 http_header& http_header::set_ws_protocol(const char* proto)

@@ -12,6 +12,7 @@ struct ACL_ASTREAM;
 
 namespace acl {
 
+class string;
 class aio_handle;
 class aio_socket_stream;
 class socket_stream;
@@ -202,6 +203,26 @@ protected:
 	 */
 	virtual bool on_ws_frame_finish(void) { return true; }
 
+	/**
+	 * 当收到 ping 数据包时的回调方法，当该回调方法返回后，如果用户没有将
+	 * data 数据清理，则内部会自动给对端写入 pong 信息，如果用户将 data 缓
+	 * 冲区清理掉，则该方法返回后不会给对接发 pong 信息
+	 * @param data {string&} 读到的数据
+	 */
+	virtual void on_ws_frame_ping(string& data)
+	{
+		(void) data;
+	}
+
+	/**
+	 * 收到 pong 数据时的回调方法
+	 * @param data {string&} 读到的数据
+	 */
+	virtual void on_ws_frame_pong(string& data)
+	{
+		(void) data;
+	}
+
 public:
 	/**
 	 * 向 WEB 服务器发送 HTTP 请求，内部在发送后会自动开始读 HTTP 响应过程
@@ -214,7 +235,8 @@ public:
 	/**
 	 * 与服务器进行 WEBSOCKET 握手
 	 */
-	void ws_handshake(void);
+	void ws_handshake(const void* key, size_t len);
+	void ws_handshake(const char* key = "123456789");
 
 	/**
 	 * 开始异步读 websocket 数据

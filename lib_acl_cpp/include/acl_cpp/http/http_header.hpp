@@ -330,6 +330,7 @@ public:
 #endif
 
 	http_header& set_ws_origin(const char* url);
+	http_header& set_ws_key(const void* key, size_t len);
 	http_header& set_ws_key(const char* key);
 	http_header& set_ws_protocol(const char* proto);
 	http_header& set_ws_version(int ver);
