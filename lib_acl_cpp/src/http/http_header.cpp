@@ -1119,7 +1119,8 @@ void http_header::append_accept_key(const char* sec_key, string& out) const
 	sha1 sha;
 	sha.input(tmp.c_str(), (unsigned int) tmp.size());
 	unsigned char digest[20];
-	sha.result2((unsigned*) digest);
+	//sha.result2((unsigned*) digest);
+	sha.result((unsigned char*) digest);
 
 	//little endian to big endian
 	for (int i = 0; i < 20; i += 4) {
