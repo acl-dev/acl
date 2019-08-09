@@ -281,11 +281,13 @@ int main(int argc, char* argv[])
 		.set_content_length(0)
 		.set_host(host)
 		.accept_gzip(true)
-		.set_keep_alive(true)
+		.set_keep_alive(true);
+	/*
 		.set_ws_key("123456789")
 		.set_ws_version(13)
 		.set_upgrade("websocket")
 		.set_keep_alive(true);
+		*/
 
 	acl::string buf;
 	head.build_request(buf);
