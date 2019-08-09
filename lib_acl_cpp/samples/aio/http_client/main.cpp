@@ -217,6 +217,9 @@ int main(int argc, char* argv[])
 	// 定义 AIO 事件引擎
 	acl::aio_handle handle(kernel_event ? acl::ENGINE_KERNEL : acl::ENGINE_POLL);
 
+	handle.set_delay_sec(0);
+	handle.set_delay_usec(1000000);
+
 	//////////////////////////////////////////////////////////////////////
 
 	// 设置 DNS 域名服务器地址
@@ -254,12 +257,18 @@ int main(int argc, char* argv[])
 		fflush(stdout);
 	}
 
+	time_t last = time(NULL), now;
 	// 开始 AIO 事件循环过程
 	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
 		if (!handle.check()) {
 			break;
 		}
+		(void) time(&now);
+		if (now - last > 0) {
+			printf("continue check %ld seconds...\r\n", now - last);
+		}
+		last = now;
 	}
 
 	handle.check();

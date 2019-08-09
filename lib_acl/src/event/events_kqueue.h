@@ -87,8 +87,8 @@ typedef struct kevent EVENT_BUFFER;
 	    tsp = 0; \
 	} else { \
 	    tsp = &ts; \
-	    ts.tv_nsec = 0; \
-	    ts.tv_sec = (delay); \
+	    ts.tv_nsec = ((delay) % 1000) * 1000000; \
+	    ts.tv_sec = (delay) / 1000; \
 	} \
 	(ev_cnt) = kevent(eh, (struct kevent *) 0, 0, (ev_buf), (buflen), (tsp)); \
 } while (0)
