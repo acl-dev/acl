@@ -61,6 +61,16 @@ protected:
 	}
 
 	// @override
+	void ws_handshake_before(acl::http_header& reqhdr)
+	{
+		acl::string buf;
+		reqhdr.build_request(buf);
+		printf("---------------websocket request header---------\r\n");
+		printf("[%s]\r\n", buf.c_str());
+		fflush(stdout);
+	}
+
+	// @override
 	void on_disconnect(void)
 	{
 		printf("%s(%d): disconnect from server\r\n",
@@ -282,12 +292,6 @@ int main(int argc, char* argv[])
 		.set_host(host)
 		.accept_gzip(true)
 		.set_keep_alive(true);
-	/*
-		.set_ws_key("123456789")
-		.set_ws_version(13)
-		.set_upgrade("websocket")
-		.set_keep_alive(true);
-		*/
 
 	acl::string buf;
 	head.build_request(buf);

@@ -609,6 +609,8 @@ void http_aclient::ws_handshake(const void* key, size_t len)
 		.set_upgrade("websocket")
 		.set_keep_alive(true);
 
+	this->ws_handshake_before(hdr);
+
 	// 创建 websocket 输入输出流对象，并以此做为由 HTTP 协程切换至
 	// websocket 的依据
 	ws_in_  = NEW websocket(*stream_);

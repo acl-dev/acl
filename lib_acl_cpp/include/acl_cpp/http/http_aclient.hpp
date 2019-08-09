@@ -236,7 +236,16 @@ public:
 	 * 与服务器进行 WEBSOCKET 握手
 	 */
 	void ws_handshake(const void* key, size_t len);
-	void ws_handshake(const char* key = "123456789");
+	void ws_handshake(const char* key = "123456789xxx");
+
+	/**
+	 * 当调用 ws_handshake() 时，内部会填充与 websocket 相关的请求头信息，
+	 * 同时通过此回调告之调用者最终发给 websocket 服务器完整的请求头信息
+	 */
+	virtual void ws_handshake_before(http_header& reqhdr)
+	{
+		(void) reqhdr;
+	}
 
 	/**
 	 * 开始异步读 websocket 数据

@@ -786,9 +786,10 @@ http_header& http_header::set_ws_origin(const char* url)
 http_header& http_header::set_ws_key(const void* key, size_t len)
 {
 	if (key && len > 0) {
-		unsigned char* s = create_ws_key(key, len);
-		ws_sec_key_ = dbuf_->dbuf_strdup((char*) s);
-		acl_myfree(s);
+		acl_uint64 n = acl_hash_crc64(key, len);
+		string buf(16);
+		buf.hex_encode(&n, sizeof(n)).base64_encode();
+		ws_sec_key_ = dbuf_->dbuf_strdup(buf.c_str());
 	}
 
 	return *this;
