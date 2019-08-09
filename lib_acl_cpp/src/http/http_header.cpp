@@ -786,9 +786,9 @@ http_header& http_header::set_ws_origin(const char* url)
 http_header& http_header::set_ws_key(const void* key, size_t len)
 {
 	if (key && len > 0) {
-		string buf;
-		create_ws_key(key, len, buf);
-		ws_sec_key_ = dbuf_->dbuf_strdup(buf.c_str());
+		unsigned char* s = create_ws_key(key, len);
+		ws_sec_key_ = dbuf_->dbuf_strdup((char*) s);
+		acl_myfree(s);
 	}
 
 	return *this;
@@ -1124,10 +1124,12 @@ static const char *http_status(int status)
 
 void http_header::append_accept_key(const char* sec_key, string& out) const
 {
-	create_ws_key(sec_key, strlen(sec_key), out);
+	unsigned char* s = create_ws_key(sec_key, strlen(sec_key));
+	out << "Sec-WebSocket-Accept: " << (char*) s << "\r\n";
+	acl_myfree(s);
 }
 
-void http_header::create_ws_key(const void* key, size_t len, string& out) const
+unsigned char* http_header::create_ws_key(const void* key, size_t len) const
 {
 	string tmp(key, len);
 	tmp += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
@@ -1152,8 +1154,7 @@ void http_header::create_ws_key(const void* key, size_t len, string& out) const
 	}
 
 	unsigned char* s = acl_base64_encode((char*) digest, 20);
-	out << "Sec-WebSocket-Accept: " << (char*) s << "\r\n";
-	acl_myfree(s);
+	return s;
 }
 
 bool http_header::build_response(string& out) const
