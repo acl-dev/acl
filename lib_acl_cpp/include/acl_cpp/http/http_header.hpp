@@ -356,7 +356,6 @@ public:
 	}
 
 	http_header& set_ws_accept(const char* key);
-	http_header& set_ws_accept(const void* key, size_t len);
 	const char* get_ws_accept(void) const
 	{
 		return ws_sec_accept_;

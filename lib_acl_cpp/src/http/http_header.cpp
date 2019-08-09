@@ -821,18 +821,7 @@ http_header& http_header::set_ws_version(int ver)
 http_header& http_header::set_ws_accept(const char* key)
 {
 	if (key && *key) {
-		return set_ws_accept(key, strlen(key));
-	} else {
-		return *this;
-	}
-}
-
-http_header& http_header::set_ws_accept(const void* key, size_t len)
-{
-	if (key) {
-		string buf;
-		buf.base64_encode(key, len);
-		ws_sec_key_ = dbuf_->dbuf_strdup(buf.c_str());
+		ws_sec_key_ = dbuf_->dbuf_strdup(key);
 	}
 	return *this;
 }
