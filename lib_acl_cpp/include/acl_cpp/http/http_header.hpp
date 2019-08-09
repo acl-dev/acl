@@ -356,6 +356,7 @@ public:
 	}
 
 	http_header& set_ws_accept(const char* key);
+	http_header& set_ws_accept(const void* key, size_t len);
 	const char* get_ws_accept(void) const
 	{
 		return ws_sec_accept_;
@@ -511,6 +512,7 @@ private:
 
 	void add_res_cookie(const HTTP_HDR_ENTRY& entry);
 	void append_accept_key(const char* sec_key, string& out) const;
+	void create_ws_key(const void* key, size_t len, string& out) const;
 };
 
 }  // namespace acl end

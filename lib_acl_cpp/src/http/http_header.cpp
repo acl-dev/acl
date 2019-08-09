@@ -787,7 +787,7 @@ http_header& http_header::set_ws_key(const void* key, size_t len)
 {
 	if (key && len > 0) {
 		string buf;
-		buf.base64_encode(key, len);
+		create_ws_key(key, len, buf);
 		ws_sec_key_ = dbuf_->dbuf_strdup(buf.c_str());
 	}
 
@@ -820,7 +820,18 @@ http_header& http_header::set_ws_version(int ver)
 http_header& http_header::set_ws_accept(const char* key)
 {
 	if (key && *key) {
-		ws_sec_key_ = dbuf_->dbuf_strdup(key);
+		return set_ws_accept(key, strlen(key));
+	} else {
+		return *this;
+	}
+}
+
+http_header& http_header::set_ws_accept(const void* key, size_t len)
+{
+	if (key) {
+		string buf;
+		buf.base64_encode(key, len);
+		ws_sec_key_ = dbuf_->dbuf_strdup(buf.c_str());
 	}
 	return *this;
 }
@@ -1113,14 +1124,19 @@ static const char *http_status(int status)
 
 void http_header::append_accept_key(const char* sec_key, string& out) const
 {
-	string tmp(sec_key);
+	create_ws_key(sec_key, strlen(sec_key), out);
+}
+
+void http_header::create_ws_key(const void* key, size_t len, string& out) const
+{
+	string tmp(key, len);
 	tmp += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
 	sha1 sha;
 	sha.input(tmp.c_str(), (unsigned int) tmp.size());
 	unsigned char digest[20];
-	//sha.result2((unsigned*) digest);
-	sha.result((unsigned char*) digest);
+	sha.result2((unsigned*) digest);
+	//sha.result((unsigned char*) digest);
 
 	//little endian to big endian
 	for (int i = 0; i < 20; i += 4) {
