@@ -152,7 +152,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		" -s server_addr\r\n"
-		" -k [use kernel event]\r\n"
+		" -e event_type[kernel|select|poll, default: kernel]\r\n"
 		" -D [if in debug mode, default: false]\r\n"
 		" -c cocorrent\r\n"
 		" -t connect_timeout[default: 5]\r\n"
@@ -169,15 +169,17 @@ int main(int argc, char* argv[])
 	int  ch, conn_timeout = 5, rw_timeout = 5, cocurrent = 1;
 	acl::string addr("pvwu8bubc.bkt.clouddn.com:80"), name_server("8.8.8.8:53");
 	acl::string host("pvwu8bubc.bkt.clouddn.com"), url("/20160528212429_c2HAm.jpeg");
-	bool debug = false, kernel_event = false, keep_alive = false;
+	bool debug = false, keep_alive = false;
+	acl::string event("kernel");
+	acl::aio_handle_type event_type;
 
-	while ((ch = getopt(argc, argv, "hkKc:s:N:U:H:t:i:D")) > 0) {
+	while ((ch = getopt(argc, argv, "he:Kc:s:N:U:H:t:i:D")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return (0);
-		case 'k':
-			kernel_event = true;
+		case 'e':
+			event = optarg;
 			break;
 		case 'K':
 			keep_alive = true;
@@ -214,8 +216,19 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
+	if (event == "select") {
+		event_type = acl::ENGINE_SELECT;
+		printf("use select event\r\n");
+	} else if (event == "poll") {
+		event_type = acl::ENGINE_POLL;
+		printf("use poll event\r\n");
+	} else {
+		event_type = acl::ENGINE_KERNEL;
+		printf("use kernel event\r\n");
+	}
+
 	// 定义 AIO 事件引擎
-	acl::aio_handle handle(kernel_event ? acl::ENGINE_KERNEL : acl::ENGINE_POLL);
+	acl::aio_handle handle(event_type);
 
 	handle.set_delay_sec(0);
 	handle.set_delay_usec(1000000);
@@ -272,8 +285,10 @@ int main(int argc, char* argv[])
 	}
 
 	handle.check();
+
 	printf("\r\n---------------------------------------------------\r\n");
-	printf("all over, success=%d, header=%d, timeout=%d, connect=%d, disconnect=%d, destroy=%d\r\n",
-		__success, __nheader, __ntimeout, __nconnect, __ndisconnect, __ndestroy);
+	printf("all over, success=%d, header=%d, timeout=%d, connect=%d,"
+		" disconnect=%d, destroy=%d\r\n", __success, __nheader,
+		__ntimeout, __nconnect, __ndisconnect, __ndestroy);
 	return 0;
 }
