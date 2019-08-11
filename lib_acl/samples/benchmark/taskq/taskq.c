@@ -35,7 +35,7 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 	TASKQ *taskq = (TASKQ*) acl_mycalloc(1, sizeof(TASKQ));
 	acl_pthread_attr_t attr;
 #if defined(__APPLE__)
-	const char *path = ".";
+	const char *path = "/tmp";
 #endif
 	int    ret, i;
 
@@ -52,7 +52,7 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 
 #if defined(__APPLE__)
 	assert(path && *path);
-	taskq->path_empty = acl_concatenate(path, "/", "sem_empty", NULL);
+	taskq->path_empty = acl_concatenate(path, "_", "sem_empty", NULL);
 	taskq->sem_empty = sem_open(taskq->path_empty, O_CREAT, S_IRUSR | S_IWUSR, qsize);
 	assert(taskq->sem_empty != SEM_FAILED);
 #else
@@ -61,7 +61,7 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 	assert(ret == 0);
 #endif
 #if defined(__APPLE__)
-	taskq->path_full = acl_concatenate(path, "/", "sem_full", NULL);
+	taskq->path_full = acl_concatenate(path, "_", "sem_full", NULL);
 	taskq->sem_full = sem_open(taskq->path_full, O_CREAT, S_IRUSR | S_IWUSR, 0);
 	assert(taskq->sem_full != SEM_FAILED);
 #else
@@ -80,7 +80,6 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 		ret = pthread_create(&taskq->threads[i], &attr, taskq_pop, taskq);
 		assert(ret == 0);
 	}
-	printf("ok\n");
 	return taskq;
 }
 
@@ -96,6 +95,14 @@ void taskq_destroy(TASKQ *taskq)
 #if defined(__APPLE__)
 	sem_close(taskq->sem_empty);
 	sem_close(taskq->sem_full);
+	if (sem_unlink(taskq->path_empty) == -1) {
+		printf("sem_unlink %s error %s\r\n", taskq->path_empty,
+			acl_last_serror());
+	}
+	if (sem_unlink(taskq->path_full) == -1) {
+		printf("sem_unlink %s error %s\r\n", taskq->path_full,
+			acl_last_serror());
+	}
 	acl_myfree(taskq->path_empty);
 	acl_myfree(taskq->path_full);
 #else
