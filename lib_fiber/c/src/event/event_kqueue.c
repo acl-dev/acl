@@ -215,8 +215,9 @@ EVENT *event_kqueue_create(int size)
 		hook_init();
 	}
 
-	if (size <= 0 || size > 1024)
+	if (size <= 0 || size > 1024) {
 		size = 1024;
+	}
 	ek->changes  = (struct kevent *) malloc(sizeof(struct kevent) * size);
 	ek->setsize  = size;
 	ek->nchanges = 0;
