@@ -20,8 +20,12 @@ typedef struct TASKQ {
 	unsigned slot_full;
 	unsigned nthreads;
 	acl_pthread_t *threads;
-	sem_t sem_empty;
-	sem_t sem_full;
+#if defined(__APPLE__)
+	char  *path_empty;
+	char  *path_full;
+#endif
+	sem_t *sem_empty;
+	sem_t *sem_full;
 } TASKQ;
 
 static void *taskq_pop(void *ctx);
@@ -30,6 +34,9 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 {
 	TASKQ *taskq = (TASKQ*) acl_mycalloc(1, sizeof(TASKQ));
 	acl_pthread_attr_t attr;
+#if defined(__APPLE__)
+	const char *path = ".";
+#endif
 	int    ret, i;
 
 	ret = acl_pthread_mutex_init(&taskq->lock, NULL);
@@ -43,10 +50,25 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 	taskq->nthreads = nthreads;
 	taskq->threads  = (acl_pthread_t*) acl_mycalloc(nthreads, sizeof(acl_pthread_t));
 
-	ret = sem_init(&taskq->sem_empty, 0, qsize);
+#if defined(__APPLE__)
+	assert(path && *path);
+	taskq->path_empty = acl_concatenate(path, "/", "sem_empty", NULL);
+	taskq->sem_empty = sem_open(taskq->path_empty, O_CREAT, S_IRUSR | S_IWUSR, qsize);
+	assert(taskq->sem_empty != SEM_FAILED);
+#else
+	taskq->sem_empty = (sem_t*) acl_mycalloc(1, sizeof(sem_t));
+	ret = sem_init(taskq->sem_empty, 0, qsize);
 	assert(ret == 0);
-	ret = sem_init(&taskq->sem_full, 0, 0);
+#endif
+#if defined(__APPLE__)
+	taskq->path_full = acl_concatenate(path, "/", "sem_full", NULL);
+	taskq->sem_full = sem_open(taskq->path_full, O_CREAT, S_IRUSR | S_IWUSR, 0);
+	assert(taskq->sem_full != SEM_FAILED);
+#else
+	taskq->sem_full = (sem_t*) acl_mycalloc(1, sizeof(sem_t));
+	ret = sem_init(taskq->sem_full, 0, 0);
 	assert(ret == 0);
+#endif
 
 	taskq->slot_empty = 0;
 	taskq->slot_full  = 0;
@@ -58,6 +80,7 @@ TASKQ *taskq_create(unsigned qsize, unsigned nthreads)
 		ret = pthread_create(&taskq->threads[i], &attr, taskq_pop, taskq);
 		assert(ret == 0);
 	}
+	printf("ok\n");
 	return taskq;
 }
 
@@ -70,8 +93,17 @@ void taskq_destroy(TASKQ *taskq)
 		(void) acl_pthread_join(taskq->threads[i], NULL);
 	}
 
-	(void) sem_destroy(&taskq->sem_empty);
-	(void) sem_destroy(&taskq->sem_full);
+#if defined(__APPLE__)
+	sem_close(taskq->sem_empty);
+	sem_close(taskq->sem_full);
+	acl_myfree(taskq->path_empty);
+	acl_myfree(taskq->path_full);
+#else
+	(void) sem_destroy(taskq->sem_empty);
+	(void) sem_destroy(taskq->sem_full);
+	acl_myfree(taskq->sem_empty);
+	acl_myfree(taskq->sem_full);
+#endif
 	(void) acl_pthread_mutex_destroy(&taskq->lock);
 	acl_myfree(taskq->threads);
 	acl_myfree(taskq->tasks);
@@ -84,7 +116,7 @@ static void *taskq_pop(void *ctx)
 	TASK   task;
 
 	while (1) {
-		int ret = sem_wait(&taskq->sem_full);
+		int ret = sem_wait(taskq->sem_full);
 		if (ret != 0) {
 			if (errno == EINTR) {
 				continue;
@@ -103,7 +135,7 @@ static void *taskq_pop(void *ctx)
 		ret = acl_pthread_mutex_unlock(&taskq->lock);
 		assert(ret == 0);
 
-		ret = sem_post(&taskq->sem_empty);
+		ret = sem_post(taskq->sem_empty);
 		assert(ret == 0);
 
 		task.callback(task.ctx);
@@ -114,7 +146,7 @@ static void *taskq_pop(void *ctx)
 
 void taskq_push(TASKQ *taskq, void (*callback)(void*), void *ctx)
 {
-	int ret = sem_wait(&taskq->sem_empty);
+	int ret = sem_wait(taskq->sem_empty);
 	assert(ret == 0);
 
 	ret = acl_pthread_mutex_lock(&taskq->lock);
@@ -127,6 +159,6 @@ void taskq_push(TASKQ *taskq, void (*callback)(void*), void *ctx)
 	ret = acl_pthread_mutex_unlock(&taskq->lock);
 	assert(ret == 0);
 
-	ret = sem_post(&taskq->sem_full);
+	ret = sem_post(taskq->sem_full);
 	assert(ret == 0);
 }

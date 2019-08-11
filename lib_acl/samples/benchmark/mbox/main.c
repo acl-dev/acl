@@ -1,4 +1,5 @@
 #include "lib_acl.h"
+#include "../stamp.h"
 
 static ACL_ATOMIC *__counter;
 static unsigned __nproducers = 5;
@@ -15,7 +16,7 @@ static void* consumer(void *ctx)
 		n = acl_atomic_int64_add_fetch(__counter, 1);
 
 		if (n <= 10) {
-			printf("thread: %ld, n=%lld\r\n", acl_pthread_self(), n);
+			printf("thread: %ld, n=%lld\r\n", (long) acl_pthread_self(), n);
 		}
 
 		o = (void*) acl_mbox_read(box, 0, &succ);
@@ -51,6 +52,8 @@ int main(int argc, char *argv[])
 	acl_pthread_t *producers, consumer_tid;
 	acl_pthread_attr_t attr;
 	static long long value = 0, counter;
+	struct timeval begin, end;
+	double spent, speed;
 	ACL_MBOX *box;
 	int ch, ret;
 
@@ -81,6 +84,8 @@ int main(int argc, char *argv[])
 
 	acl_pthread_attr_init(&attr);
 
+	gettimeofday(&begin, NULL);
+
 	ret = acl_pthread_create(&consumer_tid, &attr, consumer, box);
 
 	for (i = 0; i < __nproducers; i++) {
@@ -97,7 +102,11 @@ int main(int argc, char *argv[])
 		usleep(100);
 	}
 
-	printf("at last, counter=%lld, loop=%lld\r\n", value, counter);
+	gettimeofday(&end, NULL);
+	spent = stamp_sub(&end, &begin);
+	speed = (counter * 1000) / (spent >= 1.0 ? spent : 1.0);
+	printf("counter=%lld, loop=%lld, spent=%.2f ms, speed=%.2f\r\n",
+		value, counter, spent, speed);
 
 	acl_atomic_free(__counter);
 	acl_pthread_join(consumer_tid, NULL);

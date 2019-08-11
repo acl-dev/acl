@@ -1,4 +1,5 @@
 #include "lib_acl.h"
+#include "../stamp.h"
 #include "taskq.h"
 
 static ACL_ATOMIC *__counter;
@@ -9,7 +10,7 @@ static void consumer(void *ctx acl_unused)
 	//int *o = (int*) ctx;
 	long long n = acl_atomic_int64_add_fetch(__counter, 1);
 	if (n <= 10) {
-		printf("thread: %ld, n=%lld\r\n", acl_pthread_self(), n);
+		printf("thread: %ld, n=%lld\r\n", (long)acl_pthread_self(), n);
 	}
 	//free(o);
 }
@@ -44,6 +45,8 @@ int main(int argc, char *argv[])
 	TASKQ* taskq;
 	acl_pthread_t *producers;
 	acl_pthread_attr_t attr;
+	struct timeval begin, end;
+	double spent, speed;
 	static long long value = 0, counter;
 	int ch;
 
@@ -79,6 +82,8 @@ int main(int argc, char *argv[])
 
 	acl_pthread_attr_init(&attr);
 
+	gettimeofday(&begin, NULL);
+
 	for (i = 0; i < nproducers; i++) {
 		int ret = acl_pthread_create(&producers[i], &attr, producer, taskq);
 		assert(ret == 0);
@@ -93,7 +98,11 @@ int main(int argc, char *argv[])
 		usleep(100);
 	}
 
-	printf("at last, counter=%lld, loop=%lld\r\n", value, counter);
+	gettimeofday(&end, NULL);
+	spent = stamp_sub(&end, &begin);
+	speed = (counter * 1000) / (spent >= 1.0 ? spent : 1);
+	printf("counter=%lld, loop=%lld, spent %.2f ms ,speed=%.2f\r\n",
+		value, counter, spent, speed);
 
 	acl_atomic_free(__counter);
 	taskq_destroy(taskq);
