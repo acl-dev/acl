@@ -66,7 +66,7 @@ static int kqueue_fflush(EVENT_KQUEUE *ek)
 
 	ts.tv_sec  = 0;
 	ts.tv_nsec = 0;
-	if (kevent(ek->kqfd, ek->changes, ek->nchanges, NULL, 0, &ts) == -1) {
+	if (__sys_kevent(ek->kqfd, ek->changes, ek->nchanges, NULL, 0, &ts) == -1) {
 		msg_error("%s(%d): kevent error %s, kqfd=%d",
 			__FUNCTION__, __LINE__, last_serror(), ek->kqfd);
 		return -1;
