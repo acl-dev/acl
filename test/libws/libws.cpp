@@ -218,7 +218,7 @@ static void usage(const char* procname)
 		, procname);
 }
 
-int main(int argc, char* argv[])
+int test_websocket_main(int argc, char* argv[])
 {
 	int  ch, conn_timeout = 5, rw_timeout = 5;
 	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
