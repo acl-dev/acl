@@ -47,16 +47,16 @@ typedef struct rfc1035_message {
 } rfc1035_message;
 
 const char *rfc1035Strerror(int errnum);
-ssize_t rfc1035BuildAQuery(const char *hostname, char *buf, size_t sz,
+size_t rfc1035BuildAQuery(const char *hostname, char *buf, size_t sz,
 	unsigned short qid, rfc1035_query * query);
-ssize_t rfc1035BuildPTRQuery(const struct in_addr, char *buf, size_t sz,
+size_t rfc1035BuildPTRQuery(const struct in_addr, char *buf, size_t sz,
 	unsigned short qid, rfc1035_query * query);
 void rfc1035SetQueryID(char *, unsigned short qid);
 int rfc1035MessageUnpack(const char *buf, size_t sz,
 	rfc1035_message ** answer);
 int rfc1035QueryCompare(const rfc1035_query *, const rfc1035_query *);
 void rfc1035MessageDestroy(rfc1035_message * message);
-ssize_t rfc1035BuildAReply(const char *hostname, const ACL_ARGV *ip_argv,
+size_t rfc1035BuildAReply(const char *hostname, const ACL_ARGV *ip_argv,
 	const char *domain_root, const char *dnsname, const char *dns_ip,
 	unsigned short qid, char *buf, size_t sz);
 

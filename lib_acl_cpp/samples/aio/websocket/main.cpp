@@ -221,8 +221,9 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, conn_timeout = 5, rw_timeout = 5;
-	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
+	acl::string addr("127.0.0.1:80");
 	acl::string host("www.baidu.com");
+	std::vector<acl::string> name_servers;
 	bool debug = false;
 
 	while ((ch = getopt(argc, argv, "hs:N:H:t:i:D")) > 0) {
@@ -234,7 +235,7 @@ int main(int argc, char* argv[])
 			addr = optarg;
 			break;
 		case 'N':
-			name_server = optarg;
+			name_servers.push_back(optarg);
 			break;
 		case 'H':
 			host = optarg;
@@ -261,8 +262,17 @@ int main(int argc, char* argv[])
 
 	//////////////////////////////////////////////////////////////////////
 
-	// 设置 DNS 域名服务器地址
-	handle.set_dns(name_server.c_str(), 5);
+	if (name_servers.empty()) {
+		name_servers.push_back("8.8.8.8:53");
+	}
+
+	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
+		cit != name_servers.end(); ++cit) {
+
+		// 设置 DNS 域名服务器地址
+		handle.set_dns((*cit).c_str(), 5);
+	}
+
 
 	// 开始异步连接远程 WEB 服务器
 	websocket_client* conn = new websocket_client(handle, host);
