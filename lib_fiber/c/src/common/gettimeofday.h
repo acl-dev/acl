@@ -7,4 +7,8 @@
 int gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif
 
+#if defined(USE_FAST_TIME)
+void set_time_metric(int ms);
+#endif
+
 #endif

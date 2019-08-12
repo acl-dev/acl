@@ -713,6 +713,10 @@ void acl_fiber_schedule(void)
 		return;
 	}
 
+#if defined(USE_FAST_TIME)
+	set_time_metric(1000);
+#endif
+
 	fiber_check();
 	acl_fiber_hook_api(1);
 	__scheduled = 1;

@@ -1,4 +1,7 @@
 
+112) 2019.8.12
+112.1) workaroud: gettimeofday() 增加条件编译开关
+
 111) 2019.8.8
 111.1) bugfix: io.c 中 hook API sleep 有误
 

@@ -11,7 +11,7 @@
 
 #define SET_TIME(x) do { \
     struct timeval _tv; \
-    gettimeofday(&_tv, NULL); \
+    acl_fiber_gettimeofday(&_tv, NULL); \
     (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
 } while (0)
 
