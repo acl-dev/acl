@@ -34,6 +34,19 @@ public:
 		return *this;
 	}
 
+private:
+	void show_ns_addr(void)
+	{
+		acl::string buf;
+		if (this->get_ns_addr(buf)) {
+			printf(">>> current ns addr: %s\r\n", buf.c_str());
+		} else {
+			printf(">>> current ns addr NULL\r\n");
+		}
+
+		fflush(stdout);
+	}
+
 protected:
 	// @override
 	void destroy(void)
@@ -49,9 +62,10 @@ protected:
 	bool on_connect(void)
 	{
 		printf("--------------- connect server ok ------------\r\n");
+		show_ns_addr();
+		printf(">>> begin ws_handshake\r\n");
 		fflush(stdout);
 
-		printf(">>> begin ws_handshake\r\n");
 		this->ws_handshake();
 		return true;
 	}
@@ -78,6 +92,7 @@ protected:
 	void on_connect_timeout(void)
 	{
 		printf("connect timeout\r\n");
+		show_ns_addr();
 		fflush(stdout);
 	}
 
@@ -85,6 +100,7 @@ protected:
 	void on_connect_failed(void)
 	{
 		printf("connect failed\r\n");
+		show_ns_addr();
 		fflush(stdout);
 	}
 
@@ -218,6 +234,17 @@ static void usage(const char* procname)
 		, procname);
 }
 
+static void add_dns(std::vector<acl::string>& name_servers, const char* s)
+{
+	acl::string buf(s);
+	const std::vector<acl::string>& tokens = buf.split2(",; \t");
+	for (std::vector<acl::string>::const_iterator cit = tokens.begin();
+		cit != tokens.end(); ++cit) {
+
+		name_servers.push_back(*cit);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	int  ch, conn_timeout = 5, rw_timeout = 5;
@@ -235,7 +262,7 @@ int main(int argc, char* argv[])
 			addr = optarg;
 			break;
 		case 'N':
-			name_servers.push_back(optarg);
+			add_dns(name_servers, optarg);
 			break;
 		case 'H':
 			host = optarg;

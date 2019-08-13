@@ -233,10 +233,17 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 
 /*--------------------------------------------------------------------------*/
 
+struct ACL_ASTREAM_CTX {
+	ACL_SOCKADDR ns_addr;
+	ACL_ASTREAM *conn;
+	void *ctx;
+};
+
 typedef struct {
 	ACL_AIO *aio;
+	ACL_SOCKADDR ns_addr;
 	ACL_ASTREAM *conn;
-	ACL_AIO_CONNECT_FN callback;
+	ACL_AIO_CONNECT_ADDR_FN callback;
 	void *context;
 	int   port;
 	int   timeout;
@@ -257,6 +264,7 @@ static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx);
 static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
+	ACL_ASTREAM_CTX conn_ctx;
 
 	/* 因为在 connect_callback 和 connect_timeout 清除了关闭回调，所以当 
 	 * 本函数被调用时，一定是连接失败所导致的，而不是由连接超时所致。
@@ -264,11 +272,17 @@ static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 
 	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
 	if (try_connect_one(ctx) != NULL) {
-		return -1;
+		return 0;
 	}
 
 	acl_set_error(ACL_ECONNREFUSED);
-	ctx->callback(NULL, ctx->context);
+
+	memset(&conn_ctx, 0, sizeof(conn_ctx));
+	conn_ctx.conn = NULL;
+	conn_ctx.ctx  = ctx->context;
+	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(conn_ctx.ns_addr));
+
+	ctx->callback(&conn_ctx);
 	resolve_ctx_free(ctx);
 	return -1;
 }
@@ -276,6 +290,7 @@ static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 static int connect_timeout(ACL_ASTREAM *conn, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
+	ACL_ASTREAM_CTX conn_ctx;
 
 	 /* 按 acl aio 的设计，当超时回调函数被调用且返回 -1 时，则所注册的
 	  * 关闭回调接着会被调用，通过在此处清除域名解析后异步连接所注册的关
@@ -285,11 +300,17 @@ static int connect_timeout(ACL_ASTREAM *conn, void *context)
 
 	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
 	if (try_connect_one(ctx) != NULL) {
-		return -1;
+		return 0;
 	}
 
 	acl_set_error(ACL_ETIMEDOUT);
-	ctx->callback(NULL, ctx->context);
+
+	memset(&conn_ctx, 0, sizeof(conn_ctx));
+	conn_ctx.conn = NULL;
+	conn_ctx.ctx  = ctx->context;
+	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(conn_ctx.ns_addr));
+
+	ctx->callback(&conn_ctx);
 	resolve_ctx_free(ctx);
 	return -1;
 }
@@ -297,6 +318,7 @@ static int connect_timeout(ACL_ASTREAM *conn, void *context)
 static int connect_callback(ACL_ASTREAM *conn, void *context)
 {
 	RESOLVE_CTX *ctx = (RESOLVE_CTX *) context;
+	ACL_ASTREAM_CTX conn_ctx;
 
 	/* 清除在域名解析后进行连接时注册的回调函数，这样当 IO 超时或关闭时
 	 * 只回调应用注册的回调函数
@@ -306,7 +328,13 @@ static int connect_callback(ACL_ASTREAM *conn, void *context)
 	acl_aio_del_close_hook(conn, connect_failed, context);
 
 	acl_set_error(0);
-	ctx->callback(conn, ctx->context);
+
+	memset(&conn_ctx, 0, sizeof(conn_ctx));
+	conn_ctx.conn = conn;
+	conn_ctx.ctx  = ctx->context;
+	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(conn_ctx.ns_addr));
+
+	ctx->callback(&conn_ctx);
 	resolve_ctx_free(ctx);
 	return 0;
 }
@@ -317,7 +345,8 @@ static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx)
 
 	while (ctx->ip_next < n) {
 		char  addr[128];
-		const char *ip = acl_argv_index(ctx->ip_list,  ctx->ip_next++);
+		const char *ip = acl_argv_index(ctx->ip_list,  ctx->ip_next);
+		ctx->ip_next++;
 		acl_assert(ip && *ip);
 
 		snprintf(addr, sizeof(addr), "%s|%d", ip, ctx->port);
@@ -339,13 +368,20 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 {
 	RESOLVE_CTX *ctx  = (RESOLVE_CTX *) context;
 	ACL_ITER     iter;
+	ACL_ASTREAM_CTX conn_ctx;
+
+	memset(&conn_ctx, 0, sizeof(conn_ctx));
+	conn_ctx.ctx = ctx->context;
 
 	if (db == NULL) {
 		acl_set_error(errnum);
-		ctx->callback(NULL, ctx->context);
+		ctx->callback(&conn_ctx);
 		resolve_ctx_free(ctx);
 		return;
 	}
+
+	memcpy(&conn_ctx.ns_addr, &db->ns_addr, sizeof(conn_ctx.ns_addr));
+	memcpy(&ctx->ns_addr, &db->ns_addr, sizeof(ctx->ns_addr));
 
 	acl_foreach(iter, db) {
 		const ACL_HOST_INFO *info = (const ACL_HOST_INFO *) iter.data;
@@ -354,20 +390,20 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 
 	if (acl_argv_size(ctx->ip_list) <= 0) {
 		acl_set_error(errnum);
-		ctx->callback(NULL, ctx->context);
+		ctx->callback(&conn_ctx);
 		resolve_ctx_free(ctx);
 		return;
 	}
 
 	if (try_connect_one(ctx) == NULL) {
 		acl_set_error(ACL_ECONNREFUSED);
-		ctx->callback(NULL, ctx->context);
+		ctx->callback(&conn_ctx);
 		resolve_ctx_free(ctx);
 	}
 }
 
 int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
-	ACL_AIO_CONNECT_FN callback, void *context)
+	ACL_AIO_CONNECT_ADDR_FN callback, void *context)
 {
 	char buf[128], *ptr;
 	int  port;
@@ -421,4 +457,19 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 	}
 
 	return 0;
+}
+
+const ACL_SOCKADDR *acl_astream_get_ns_addr(const ACL_ASTREAM_CTX *ctx)
+{
+	return ctx ? &ctx->ns_addr : NULL;
+}
+
+ACL_ASTREAM *acl_astream_get_conn(const ACL_ASTREAM_CTX *ctx)
+{
+	return ctx ? ctx->conn : NULL;
+}
+
+void *acl_astream_get_ctx(const ACL_ASTREAM_CTX *ctx)
+{
+	return ctx ? ctx->ctx : NULL;
 }

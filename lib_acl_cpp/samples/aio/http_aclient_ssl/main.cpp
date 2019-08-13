@@ -443,11 +443,23 @@ static void usage(const char* procname)
 		, procname);
 }
 
+static void add_dns(std::vector<acl::string>& name_servers, const char* s)
+{
+	acl::string buf(s);
+	const std::vector<acl::string>& tokens = buf.split2(",; \t");
+	for (std::vector<acl::string>::const_iterator cit = tokens.begin();
+		cit != tokens.end(); ++cit) {
+
+		name_servers.push_back(*cit);
+	}
+}
+
 int main(int argc, char* argv[])
 {
 	acl::polarssl_conf* ssl_conf = NULL;
 	int  ch, conn_timeout = 5, rw_timeout = 5;
-	acl::string addr("127.0.0.1:80"), name_server("8.8.8.8:53");
+	std::vector<acl::string> name_servers;
+	acl::string addr("127.0.0.1:80");
 	acl::string host("www.baidu.com"), ssl_lib_path;
 	bool enable_gzip = false, keep_alive = false, debug = false;
 	bool ws_enable = false, enable_unzip = false;
@@ -464,7 +476,7 @@ int main(int argc, char* argv[])
 			ssl_lib_path = optarg;
 			break;
 		case 'N':
-			name_server = optarg;
+			add_dns(name_servers, optarg);
 			break;
 		case 'H':
 			host = optarg;
@@ -493,6 +505,10 @@ int main(int argc, char* argv[])
 		default:
 			break;
 		}
+	}
+
+	if (name_servers.empty()) {
+		name_servers.push_back("8.8.8.8:53");
 	}
 
 	acl::acl_cpp_init();
@@ -548,8 +564,12 @@ int main(int argc, char* argv[])
 
 	//////////////////////////////////////////////////////////////////////
 
-	// 设置 DNS 域名服务器地址
-	handle.set_dns(name_server.c_str(), 5);
+	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
+		cit != name_servers.end(); ++cit) {
+
+		// 设置 DNS 域名服务器地址
+		handle.set_dns((*cit).c_str(), 5);
+	}
 
 	// 开始异步连接远程 WEB 服务器
 	http_aio_client* conn = new http_aio_client(handle, ssl_conf, host);

@@ -111,7 +111,7 @@ void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
 
 	if (aio->dns == NULL) {
 		aio->dns = acl_dns_create(aio, timeout);
-		acl_dns_check_dns_ip(aio->dns);
+		/* acl_dns_check_dns_ip(aio->dns); */
 	}
 
 	acl_foreach(iter, tokens) {

@@ -21,6 +21,7 @@ extern "C" {
 
 #include "../stdlib/acl_stdlib.h"
 #include "../event/acl_events.h"
+#include "../net/acl_netdb.h"
 
 /*------------------------------- 数据结构类型定义 ---------------------------*/
 
@@ -93,6 +94,19 @@ typedef int (*ACL_AIO_LISTEN_FN)(ACL_ASTREAM *sstream, void *context);
  * @return {int} 若调用该函数返回-1则需要关闭该异步连接流
  */
 typedef int (*ACL_AIO_CONNECT_FN)(ACL_ASTREAM *cstream, void *context);
+
+typedef struct ACL_ASTREAM_CTX ACL_ASTREAM_CTX;
+
+ACL_API const ACL_SOCKADDR *acl_astream_get_ns_addr(const ACL_ASTREAM_CTX *ctx);
+ACL_API ACL_ASTREAM *acl_astream_get_conn(const ACL_ASTREAM_CTX *ctx);
+ACL_API void *acl_astream_get_ctx(const ACL_ASTREAM_CTX *ctx);
+
+/**
+ * 异步连接远程服务器时的回调函数定义，该类型由 acl_aio_connect_addr() 使用
+ * @param ctx {ACL_ASTREAM_CTX*} 回调函数的参数，可以由 acl_astream_get_xxx
+ *  获得该对象中包含的对象指针
+ */
+typedef int (*ACL_AIO_CONNECT_ADDR_FN)(const ACL_ASTREAM_CTX *ctx);
 
 /**
  * “读、写、监听”超时的回调函数指针
@@ -779,13 +793,13 @@ ACL_API ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout
  * @param aio {ACL_AIO*} 异步框架引擎句柄
  * @param addr {const char*} 服务器地址，格式：domain:port，如：www.sina.com:80
  * @param timeout {int} 连接超时的时间值，单位为秒
- * @param callback {ACL_AIO_CONNECT_FN}
+ * @param callback {ACL_AIO_CONNECT_ADDR_FN}
  * @param context {void*} 传递给 callback 回调函数的参数
  * @return {int} 返回 0 表示开始异步域名解析及异步连接过程，返回 < 0 表示传入的
  *  参数有误或在创建 ACL_AIO 句柄后没有通过 acl_aio_set_dns 函数设置域名服务器
  */
 ACL_API int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
-		ACL_AIO_CONNECT_FN callback, void *context);
+		ACL_AIO_CONNECT_ADDR_FN callback, void *context);
 
 /*---------------------------- 其它通用异步操作接口 --------------------------*/
 

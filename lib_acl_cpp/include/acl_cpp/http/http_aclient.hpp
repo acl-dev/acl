@@ -1,6 +1,9 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stream/aio_socket_stream.hpp"
+#if !defined(_WIN32) && !defined(_WIN64)
+#include <netinet/in.h>  // just for "struct sockaddr_storage"
+#endif
 
 struct HTTP_HDR;
 struct HTTP_HDR_RES;
@@ -8,7 +11,7 @@ struct HTTP_RES;
 struct HTTP_HDR_REQ;
 struct HTTP_REQ;
 
-struct ACL_ASTREAM;
+struct ACL_ASTREAM_CTX;
 
 namespace acl {
 
@@ -82,6 +85,22 @@ public:
 	 * 异步关闭连接
 	 */
 	void close(void);
+
+	/**
+	 * 获得本次连接（无论成功或失败）所使用的 DNS 服务地址
+	 * @param out {string&} 存储结果
+	 * @return {bool} 是否成功获得
+	 */
+	bool get_ns_addr(string& out);
+
+	/**
+	 * 连接成功后可调用本方法获得异步连接对象
+	 * @return {aio_socket_stream*}
+	 */
+	aio_socket_stream* get_conn(void) const
+	{
+		return conn_;
+	}
 
 protected:
 	/**
@@ -324,8 +343,9 @@ protected:
 	bool               unzip_;		// 是否自动解压响应体数据
 	zlib_stream*       zstream_;		// 解压对象
 	int                gzip_header_left_;	// gzip 传输时压缩头部长度
+	struct sockaddr_storage ns_addr_;
 
-	bool handle_connect(ACL_ASTREAM* stream);
+	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
 	bool handle_ssl_handshake(void);
 
 	bool handle_res_hdr(int status);
@@ -345,7 +365,7 @@ protected:
 	bool handle_ws_other(void);
 
 private:
-	static int connect_callback(ACL_ASTREAM* stream, void* ctx);
+	static int connect_callback(const ACL_ASTREAM_CTX* ctx);
 	static int http_res_hdr_cllback(int status, void* ctx);
 	static int http_res_callback(int status, char* data, int dlen, void* ctx);
 };

@@ -40,6 +40,7 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 , gzip_header_left_(0)
 {
 	header_ = NEW http_header;
+	memset(&ns_addr_, 0, sizeof(ns_addr_));
 }
 
 http_aclient::~http_aclient(void)
@@ -93,9 +94,27 @@ void http_aclient::close(void)
 	}
 }
 
-bool http_aclient::handle_connect(ACL_ASTREAM *stream)
+bool http_aclient::get_ns_addr(string& out)
 {
-	if (stream == NULL) {
+	char buf[256];
+	const struct sockaddr* sa = (const struct sockaddr*) &ns_addr_;
+	size_t ret = acl_inet_ntop(sa, buf, sizeof(buf));
+	if (ret == 0) {
+		return false;
+	}
+	out = buf;
+	return true;
+}
+
+bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
+{
+	const ACL_SOCKADDR *ns_addr = acl_astream_get_ns_addr(ctx);
+	if (ns_addr) {
+		memcpy(&ns_addr_, &ns_addr->ss, sizeof(ns_addr_));
+	}
+
+	ACL_ASTREAM* astream = acl_astream_get_conn(ctx);
+	if (astream == NULL) {
 		if (last_error() == ACL_ETIMEDOUT) {
 			this->on_connect_timeout();
 			this->destroy();
@@ -107,7 +126,7 @@ bool http_aclient::handle_connect(ACL_ASTREAM *stream)
 	}
 
 	// 连接成功，创建 C++ AIO 连接对象
-	conn_ = new aio_socket_stream(&handle_, stream, true);
+	conn_ = new aio_socket_stream(&handle_, astream, true);
 
 	// 注册连接关闭回调处理对象
 	conn_->add_close_callback(this);
@@ -137,10 +156,12 @@ bool http_aclient::handle_connect(ACL_ASTREAM *stream)
 	return true;
 }
 
-int http_aclient::connect_callback(ACL_ASTREAM *stream, void *ctx)
+int http_aclient::connect_callback(const ACL_ASTREAM_CTX *ctx)
 {
-	http_aclient* me = (http_aclient*) ctx;
-	return me->handle_connect(stream) ? 0 : -1;
+	assert(ctx);
+
+	http_aclient* me = (http_aclient*) acl_astream_get_ctx(ctx);
+	return me->handle_connect(ctx) ? 0 : -1;
 }
 
 bool http_aclient::timeout_callback(void)

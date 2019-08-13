@@ -187,6 +187,11 @@ static const ACL_HOST_INFO *netdb_iter_info(ACL_ITER *iter,
 	return iter->ptr ? (ACL_HOST_INFO*) iter->ptr : NULL;
 }
 
+void acl_netdb_set_ns(ACL_DNS_DB *db, ACL_SOCKADDR *sa)
+{
+	memcpy(&db->ns_addr, sa, sizeof(db->ns_addr));
+}
+
 ACL_DNS_DB *acl_netdb_new(const char *domain)
 {
 	ACL_DNS_DB *db;
@@ -284,6 +289,7 @@ ACL_DNS_DB *acl_netdb_clone(const ACL_DNS_DB *db)
 	}
 
 	dbp = acl_netdb_new(db->name);
+	memcpy(&dbp->ns_addr, &db->ns_addr, sizeof(db->ns_addr));
 
 	for (i = 0; i < n; i++) {
 		phost = (ACL_HOSTNAME *) acl_array_index(db->h_db, i);

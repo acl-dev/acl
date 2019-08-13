@@ -52,7 +52,7 @@ typedef struct ACL_DNS {
 
 	ACL_ARRAY *groups;		/* 域名组列表 */
 	ACL_ARRAY *dns_list;		/* DNS 服务器地址列表 */
-	int   dns_idx;			/* 当前使用的 dns_list 数组下标 */
+	unsigned   dns_idx;		/* 当前使用的 dns_list 数组下标 */
 	ACL_DNS_ADDR addr_from;		/* 来源 DNS 地址 */
 	ACL_HTABLE *lookup_table;	/* 查询对象表 */
 	ACL_CACHE2 *dns_cache;		/* 用于缓存DNS查询结果 */
@@ -139,7 +139,7 @@ ACL_API void acl_dns_set_retry_limit(ACL_DNS *dns, int retry_limit);
  * @return {ACL_DNS_REQ*} 返回本次DNS查询的事件对象, 若为NULL则表示出错
  */
 ACL_API ACL_DNS_REQ *acl_dns_lookup(ACL_DNS *dns, const char *domain,
-	void (*callback)(ACL_DNS_DB *, void *, int), void *ctx);
+	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx);
 
 /**
  * 向DNS查询对象中添加静态主机信息

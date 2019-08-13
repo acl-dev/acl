@@ -29,19 +29,20 @@ typedef struct ACL_DNS_DB {
 	ACL_ARRAY *h_db;
 	int   size;
 	char  name[256];
+	ACL_SOCKADDR ns_addr;
 
 	/* for acl_iterator */
 
 	/* 取迭代器头函数 */
-	const ACL_HOST_INFO *(*iter_head)(ACL_ITER*, struct ACL_DNS_DB*);
+	const ACL_HOSTNAME *(*iter_head)(ACL_ITER*, struct ACL_DNS_DB*);
 	/* 取迭代器下一个函数 */
-	const ACL_HOST_INFO *(*iter_next)(ACL_ITER*, struct ACL_DNS_DB*);
+	const ACL_HOSTNAME *(*iter_next)(ACL_ITER*, struct ACL_DNS_DB*);
 	/* 取迭代器尾函数 */
-	const ACL_HOST_INFO *(*iter_tail)(ACL_ITER*, struct ACL_DNS_DB*);
+	const ACL_HOSTNAME *(*iter_tail)(ACL_ITER*, struct ACL_DNS_DB*);
 	/* 取迭代器上一个函数 */
-	const ACL_HOST_INFO *(*iter_prev)(ACL_ITER*, struct ACL_DNS_DB*);
+	const ACL_HOSTNAME *(*iter_prev)(ACL_ITER*, struct ACL_DNS_DB*);
 	/* 取迭代器关联的当前容器成员结构对象 */
-	const ACL_HOST_INFO *(*iter_info)(ACL_ITER*, struct ACL_DNS_DB*);
+	const ACL_HOSTNAME *(*iter_info)(ACL_ITER*, struct ACL_DNS_DB*);
 } ACL_DNS_DB;
 
 /* in acl_netdb.c */
@@ -111,6 +112,13 @@ ACL_API void acl_netdb_free(ACL_DNS_DB *h_dns_db);
  * @return {ACL_DNS_DB*} 创建的结果集对象
  */
 ACL_API ACL_DNS_DB *acl_netdb_new(const char *domain);
+
+/**
+ * 设置该 DNS 查询对象所绑定的 DNS 服务器地址
+ * @param db {ACL_DNS_DB*} 由 acl_netdb_new 或 acl_netdb_clone 创建
+ * @param sa {ACL_SOCKADDR*} DNS 服务器地址
+ */
+ACL_API void acl_netdb_set_ns(ACL_DNS_DB *db, ACL_SOCKADDR *sa);
 
 /**
  * 向结果集中添加IP地址
