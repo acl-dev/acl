@@ -221,6 +221,14 @@ ACL_API ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg);
 ACL_API ACL_AIO *acl_aio_create3(ACL_EVENT *event);
 
 /**
+ * 获得本 aio 句柄所绑定的 DNS 查询对象
+ * @param aio {ACL_AIO*}
+ * @return {ACL_DNS*} 返回 NULL 表示没有绑定 DNS 查询对象，当返回值非 NULL 时，应用可
+ *  以直接将返回值转换为 ACL_DNS 对象（XXX：因为循环引用头文件的问题，所以暂且如此）
+ */
+ACL_API void *acl_aio_dns(ACL_AIO *aio);
+
+/**
  * 设置 DNS 服务器地址列表，只有设置了 DNS 服务器地址，内部才会支持域名解析并
  * 异步连接服务器地址
  * @param aio {ACL_AIO*}
@@ -228,6 +236,19 @@ ACL_API ACL_AIO *acl_aio_create3(ACL_EVENT *event);
  * @param timeout {int} 域名解析超时时间（秒）
  */
 ACL_API void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout);
+
+/**
+ * 删除 DNS 服务器地址列表
+ * @param aio {ACL_AIO*}
+ * @param dns_list {const char*} DNS 服务器地址列表，格式：ip1:port,ip2:port...
+ */
+ACL_API void acl_aio_del_dns(ACL_AIO *aio, const char *dns_list);
+
+/**
+ * 将 aio 句柄中绑定的 DNS 地址清理掉
+ * @param aio {ACL_AIO*}
+ */
+ACL_API void acl_aio_clear_dns(ACL_AIO *aio);
 
 /**
  * 释放一个异步通信异步框架实例句柄，同时会释放掉非空的 aio->event 对象

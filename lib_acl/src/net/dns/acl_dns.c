@@ -187,7 +187,6 @@ static int dns_safe_addr_check(ACL_DNS *dns)
 		}
 	}
 
-
 	inet_ntop(AF_INET, &dns->addr_from.addr.in.sin_addr, from, sizeof(from));
 	acl_msg_warn("%s(%d): invalid from=%s", __FUNCTION__, __LINE__, from);
 
@@ -566,8 +565,42 @@ void acl_dns_add_dns(ACL_DNS *dns, const char *dns_ip,
 		sizeof(addr->in.s_addr), mask_length);
 
 	/* 将该DNS地址添加进数组中 */
-
 	(void) acl_array_append(dns->dns_list, addr);
+}
+
+void acl_dns_del_dns(ACL_DNS *dns, const char *ip, unsigned short port)
+{
+	int size = acl_array_size(dns->dns_list), i;
+
+	for (i = 0; i < size; i++) {
+		ACL_DNS_ADDR *addr = (ACL_DNS_ADDR*)
+			acl_array_index(dns->dns_list, i);
+		if (strcmp(addr->ip, ip) && addr->port == port) {
+			acl_array_delete(dns->dns_list, i, NULL);
+			acl_myfree(addr);
+			break;
+		}
+	}
+}
+
+void acl_dns_clear_dns(ACL_DNS *dns)
+{
+	acl_array_clean(dns->dns_list, acl_myfree_fn);
+}
+
+ACL_ARRAY *acl_dns_list(ACL_DNS *dns)
+{
+	return dns->dns_list;
+}
+
+size_t acl_dns_size(ACL_DNS *dns)
+{
+	return (size_t) acl_array_size(dns->dns_list);
+}
+
+int acl_dns_empty(ACL_DNS *dns)
+{
+	return acl_dns_size(dns) == 0;
 }
 
 void acl_dns_add_host(ACL_DNS *dns, const char *domain, const char *ip_list)

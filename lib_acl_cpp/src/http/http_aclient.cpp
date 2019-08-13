@@ -159,8 +159,8 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 int http_aclient::connect_callback(const ACL_ASTREAM_CTX *ctx)
 {
 	assert(ctx);
-
 	http_aclient* me = (http_aclient*) acl_astream_get_ctx(ctx);
+	assert(me);
 	return me->handle_connect(ctx) ? 0 : -1;
 }
 

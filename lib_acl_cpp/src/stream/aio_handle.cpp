@@ -246,7 +246,50 @@ void aio_handle::reset(void)
 
 void aio_handle::set_dns(const char* addrs, int timeout)
 {
+	dns_add(addrs, timeout);
+}
+
+void aio_handle::dns_add(const char* addrs, int timeout)
+{
 	acl_aio_set_dns(aio_, addrs, timeout);
+}
+
+void aio_handle::dns_del(const char* addrs)
+{
+	acl_aio_del_dns(aio_, addrs);
+}
+
+void aio_handle::dns_clear(void)
+{
+	acl_aio_clear_dns(aio_);
+}
+
+size_t aio_handle::dns_size(void) const
+{
+	ACL_DNS* dns = (ACL_DNS*) acl_aio_dns(aio_);
+	return dns ? acl_dns_size(dns) : 0;
+}
+
+bool aio_handle::dns_empty(void) const
+{
+	ACL_DNS* dns = (ACL_DNS*) acl_aio_dns(aio_);
+	if (dns == NULL) {
+		return false;
+	}
+	return acl_dns_empty(dns) ? true : false;
+}
+
+void aio_handle::dns_list(std::vector<std::pair<string, unsigned short> >& out)
+{
+	ACL_DNS* dns = (ACL_DNS*) acl_aio_dns(aio_);
+	if (dns == NULL) {
+		return;
+	}
+	ACL_ITER iter;
+	acl_foreach(iter, dns->dns_list) {
+		ACL_DNS_ADDR* addr = (ACL_DNS_ADDR*) iter.data;
+		out.push_back(std::make_pair(addr->ip, addr->port));
+	}
 }
 
 void aio_handle::increase(void)

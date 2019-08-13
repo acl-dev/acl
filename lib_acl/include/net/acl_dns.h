@@ -101,6 +101,42 @@ ACL_API void acl_dns_open_cache(ACL_DNS *dns, int limit);
  */
 ACL_API void acl_dns_add_dns(ACL_DNS *dns, const char *dns_ip,
 	unsigned short dns_port, int mask_length);
+
+/**
+ * 清除 DNS 服务器地址列表
+ * @param dns {ACL_DNS*} DNS异步查询句柄
+ */
+ACL_API void acl_dns_clear_dns(ACL_DNS *dns);
+
+/**
+ * 获得 DNS 对象数组列表
+ * @param dns {ACL_DNS*} DNS异步查询句柄
+ * @return {ACL_ARRAY*} 容纳 ACL_DNS_ADDR 对象的数组对象，返回值永远非 NULL
+ */
+ACL_API ACL_ARRAY *acl_dns_list(ACL_DNS *dns);
+
+/**
+ * 获得 DNS 服务器地址列表的数量
+ * @param dns {ACL_DNS*} DNS异步查询句柄
+ * @return {size_t}
+ */
+ACL_API size_t acl_dns_size(ACL_DNS *dns);
+
+/**
+ * 判断 DNS 服务器地址列表是否为空
+ * @param dns {ACL_DNS*} DNS异步查询句柄
+ * @retrn {int} 返回值非 0 表示为空
+ */
+ACL_API int acl_dns_empty(ACL_DNS *dns);
+
+/**
+ * 删除一个DNS服务器地址
+ * @param dns {ACL_DNS*} DNS异步查询句柄
+ * @param dns_ip {const char*} DNS服务器IP地址
+ * @param dns_port {unsigned short} DNS服务器端口
+ */
+ACL_API void acl_dns_del_dns(ACL_DNS *dns, const char *ip, unsigned short port);
+
 /**
  * 关闭异步查询句柄同时释放所有资源
  * @param dns {ACL_DNS*} DNS异步查询句柄

@@ -14,6 +14,7 @@
 #include "stdlib/acl_stdlib.h"
 #include "net/acl_net.h"
 #include "aio/acl_aio.h"
+#include "net/acl_dns.h"
 
 #endif
 #include "stdlib/acl_array.h"
@@ -96,6 +97,11 @@ ACL_AIO *acl_aio_create3(ACL_EVENT *event)
 	return aio;
 }
 
+void *acl_aio_dns(ACL_AIO *aio)
+{
+	return aio->dns;
+}
+
 void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
 {
 	ACL_ARGV *tokens;
@@ -132,6 +138,50 @@ void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
 	}
 
 	acl_argv_free(tokens);
+}
+
+void acl_aio_del_dns(ACL_AIO *aio, const char *dns_list)
+{
+	ACL_ARGV *tokens;
+	ACL_ITER  iter;
+
+	if (aio->dns == NULL) {
+		return;
+	}
+
+	acl_assert(dns_list && *dns_list);
+	tokens = acl_argv_split(dns_list, ",; \t\r\n");
+	if (tokens == NULL) {
+		acl_msg_error("%s(%d), %s: invalid dns_list=%s",
+			__FILE__, __LINE__, __FUNCTION__, dns_list);
+		return;
+	}
+
+	acl_foreach(iter, tokens) {
+		char *ip = (char *) iter.data;
+		char *ptr = strrchr(ip, '|');
+		int   port;
+
+		if (ptr == NULL) {
+			ptr = strrchr(ip, ':');
+		}
+		if (ptr && *(ptr + 1) != 0) {
+			*ptr = 0;
+			port = atoi(++ptr);
+		} else {
+			port = 53;
+		}
+		acl_dns_del_dns(aio->dns, ip, port);
+	}
+
+	acl_argv_free(tokens);
+}
+
+void acl_aio_clear_dns(ACL_AIO *aio)
+{
+	if (aio->dns) {
+		acl_dns_clear_dns(aio->dns);
+	}
 }
 
 int acl_aio_event_mode(ACL_AIO *aio)
