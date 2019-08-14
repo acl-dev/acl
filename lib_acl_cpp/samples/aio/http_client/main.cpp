@@ -165,15 +165,28 @@ static void usage(const char* procname)
 		" -U url\r\n"
 		" -H host\r\n"
 		" -K [http keep_alive true]\r\n"
-		" -N name_server[default: 8.8.8.8:53]\r\n"
+		" -N name_server_list[default: 8.8.8.8:53]\r\n"
 		, procname);
+}
+
+static void add_name_servers(std::vector<acl::string>& addrs, const char* s)
+{
+	acl::string buf(s);
+	const std::vector<acl::string>& tokens = buf.split2(",; \t");
+
+	for (std::vector<acl::string>::const_iterator cit = tokens.begin();
+		cit != tokens.end(); ++cit) {
+
+		addrs.push_back(*cit);
+	}
 }
 
 int main(int argc, char* argv[])
 {
 	int  ch, conn_timeout = 5, rw_timeout = 5, cocurrent = 1;
-	acl::string addr("pvwu8bubc.bkt.clouddn.com:80"), name_server("8.8.8.8:53");
+	acl::string addr("pvwu8bubc.bkt.clouddn.com:80");
 	acl::string host("pvwu8bubc.bkt.clouddn.com"), url("/20160528212429_c2HAm.jpeg");
+	std::vector<acl::string> name_servers;
 	bool debug = false, keep_alive = false;
 	acl::string event("kernel");
 	acl::aio_handle_type event_type;
@@ -196,7 +209,7 @@ int main(int argc, char* argv[])
 			addr = optarg;
 			break;
 		case 'N':
-			name_server = optarg;
+			add_name_servers(name_servers, optarg);
 			break;
 		case 'U':
 			url = optarg;
@@ -216,6 +229,10 @@ int main(int argc, char* argv[])
 		default:
 			break;
 		}
+	}
+
+	if (name_servers.empty()) {
+		name_servers.push_back("8.8.8.8:53");
 	}
 
 	acl::acl_cpp_init();
@@ -238,10 +255,13 @@ int main(int argc, char* argv[])
 	handle.set_delay_sec(0);
 	handle.set_delay_usec(1000000);
 
-	//////////////////////////////////////////////////////////////////////
-
 	// 设置 DNS 域名服务器地址
-	handle.set_dns(name_server.c_str(), 5);
+	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
+		cit != name_servers.end(); ++cit) {
+		handle.set_dns(*cit, 5);
+	}
+
+	//////////////////////////////////////////////////////////////////////
 
 	// 开始异步连接远程 WEB 服务器
 	for (int i = 0; i < cocurrent; i++) {

@@ -430,6 +430,8 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		" -s server_addr\r\n"
+		" -H host[default: www.baidu.com]\r\n"
+		" -L url[default: /]\r\n"
 		" -D [if in debug mode, default: false]\r\n"
 		" -c cocorrent\r\n"
 		" -t connect_timeout[default: 5]\r\n"
@@ -460,11 +462,11 @@ int main(int argc, char* argv[])
 	int  ch, conn_timeout = 5, rw_timeout = 5;
 	std::vector<acl::string> name_servers;
 	acl::string addr("127.0.0.1:80");
-	acl::string host("www.baidu.com"), ssl_lib_path;
+	acl::string host("www.baidu.com"), url("/"), ssl_lib_path;
 	bool enable_gzip = false, keep_alive = false, debug = false;
 	bool ws_enable = false, enable_unzip = false;
 
-	while ((ch = getopt(argc, argv, "hs:S:N:H:t:i:ZUKDW")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:S:N:H:L:t:i:ZUKDW")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -474,6 +476,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'S':
 			ssl_lib_path = optarg;
+			break;
+		case 'L':
+			url = optarg;
 			break;
 		case 'N':
 			add_dns(name_servers, optarg);
@@ -587,7 +592,7 @@ int main(int argc, char* argv[])
 
 	// 设置 HTTP 请求头，也可将此过程放在 conn->on_connect() 里
 	acl::http_header& head = conn->request_header();
-	head.set_url("/")
+	head.set_url(url)
 		.set_content_length(0)
 		.set_host(host)
 		.accept_gzip(enable_gzip)
