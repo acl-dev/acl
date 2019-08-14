@@ -6,13 +6,11 @@ static void test(const char* addr)
 {
 	std::list<ACL_VSTREAM*> conns;
 
-	for (int i = 0; i < 1; i++)
-	{
+	for (int i = 0; i < 1; i++) {
 		ACL_VSTREAM* client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
-		if (client == NULL)
+		if (client == NULL) {
 			printf("connect addr: %s error\r\n", addr);
-		else
-		{
+		} else {
 			printf("connect addr: %s ok, i: %d\r\n", addr, i);
 			conns.push_back(client);
 		}
@@ -22,8 +20,9 @@ static void test(const char* addr)
 	getchar();
 
 	std::list<ACL_VSTREAM*>::iterator it = conns.begin();
-	for (; it != conns.end(); ++it)
+	for (; it != conns.end(); ++it) {
 		acl_vstream_close(*it);
+	}
 	printf("Exit now ok\r\n");
 }
 
@@ -75,8 +74,7 @@ int main(int argc, char *argv[])
 	printf("connecting %s ...\n", argv[1]);
 
 	//acl_poll_prefered(1);
-	for (int i = 0; i < 1; i++)
-	{
+	for (int i = 0; i < 1; i++) {
 		client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
 		if (client == NULL) {
 			printf("connect %s error(%s)\n", addr, acl_last_serror());
