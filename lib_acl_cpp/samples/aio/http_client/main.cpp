@@ -55,6 +55,11 @@ protected:
 	bool on_connect(void)
 	{
 		printf("--------------- connect server ok ------------\r\n");
+		acl::string addr;
+		if (this->get_ns_addr(addr)) {
+			printf(">>>ns server: %s\r\n", addr.c_str());
+		}
+
 		fflush(stdout);
 
 		printf(">>> begin send_request\r\n");
