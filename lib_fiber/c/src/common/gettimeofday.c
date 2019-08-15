@@ -46,8 +46,9 @@ static void once_init(void)
 	if (__pthread_self() == main_thread_self()) {
 		pthread_key_create(&once_key, dummy);
 		atexit(main_free_tls);
-	} else
+	} else {
 		pthread_key_create(&once_key, free_tls);
+	}
 }
 
 static pthread_once_t once_control = PTHREAD_ONCE_INIT;
@@ -60,8 +61,9 @@ static void *tls_calloc(size_t len)
 	if (ptr == NULL) {
 		ptr = calloc(1, len);
 		pthread_setspecific(once_key, ptr);
-		if (__pthread_self() == main_thread_self())
+		if (__pthread_self() == main_thread_self()) {
 			__tls = ptr;
+		}
 	}
 	return ptr;
 }
@@ -94,9 +96,10 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 		ctx->last_init = now;
 
 		/* 获得CPU的时钟频率 */
-		if (!QueryPerformanceFrequency(&ctx->frequency))
+		if (!QueryPerformanceFrequency(&ctx->frequency)) {
 			msg_fatal("%s(%d): Unable to get System Frequency(%s)",
 				__FILE__, __LINE__, last_serror());
+		}
 		/* 获得系统时间(自 1970 至今) */
 		GetSystemTimeAsFileTime(&ft);
 		li.LowPart  = ft.dwLowDateTime;
@@ -110,21 +113,24 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 		ctx->tvbase.tv_usec = (long)(t % 1000000);
 
 		/* 获得本次开机后到现在的时钟计数 */
-		if (!QueryPerformanceCounter(&ctx->stamp))
+		if (!QueryPerformanceCounter(&ctx->stamp)) {
 			msg_fatal("%s(%d): unable to get System time(%s)",
 				__FILE__, __LINE__, last_serror());
+		}
 	}
 
 	/* 开始获得现在的时间截 */
 
 	if (tv) {
 		/* 获得本次开机后至现在的时钟计数  */
-		if (!QueryPerformanceCounter(&stamp))
+		if (!QueryPerformanceCounter(&stamp)) {
 			msg_fatal("%s(%d): unable to get System time(%s)",
 				__FILE__, __LINE__, last_serror());
+		}
 
 		/* 计算当前精确时间截 */
-		t = (stamp.QuadPart - ctx->stamp.QuadPart) * 1000000 / ctx->frequency.QuadPart;
+		t = (stamp.QuadPart - ctx->stamp.QuadPart) * 1000000
+			/ ctx->frequency.QuadPart;
 		tv->tv_sec = ctx->tvbase.tv_sec + (long)(t / 1000000);
 		tv->tv_usec = ctx->tvbase.tv_usec + (long)(t % 1000000);
 	}

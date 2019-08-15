@@ -9,11 +9,19 @@
 #endif
 #include "fiber/libfiber.h"
 
+#if defined(USE_FAST_TIME)
 #define SET_TIME(x) do { \
     struct timeval _tv; \
     acl_fiber_gettimeofday(&_tv, NULL); \
     (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
 } while (0)
+#else
+#define SET_TIME(x) do { \
+struct timeval _tv; \
+    gettimeofday(&_tv, NULL); \
+    (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
+} while (0)
+#endif
 
 typedef struct FILE_EVENT   FILE_EVENT;
 typedef struct EVENT        EVENT;
