@@ -50,9 +50,9 @@ static void kqueue_free(EVENT *ev)
 	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) ev;
 
 	close(ek->kqfd);
-	free(ek->changes);
-	free(ek->events);
-	free(ek);
+	mem_free(ek->changes);
+	mem_free(ek->events);
+	mem_free(ek);
 }
 
 static int kqueue_fflush(EVENT_KQUEUE *ek)
@@ -209,7 +209,7 @@ static const char *kqueue_name(void)
 
 EVENT *event_kqueue_create(int size)
 {
-	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) calloc(1, sizeof(EVENT_KQUEUE));
+	EVENT_KQUEUE *ek = (EVENT_KQUEUE *) mem_calloc(1, sizeof(EVENT_KQUEUE));
 
 	if (__sys_kqueue == NULL) {
 		hook_init();
@@ -218,12 +218,12 @@ EVENT *event_kqueue_create(int size)
 	if (size <= 0 || size > 1024) {
 		size = 1024;
 	}
-	ek->changes  = (struct kevent *) malloc(sizeof(struct kevent) * size);
+	ek->changes  = (struct kevent *) mem_malloc(sizeof(struct kevent) * size);
 	ek->setsize  = size;
 	ek->nchanges = 0;
 
 	ek->nevents  = 100;
-	ek->events   = (struct kevent *) malloc(sizeof(struct kevent) * ek->nevents);
+	ek->events   = (struct kevent *) mem_malloc(sizeof(struct kevent) * ek->nevents);
 
 	ek->kqfd     = __sys_kqueue();
 	assert(ek->kqfd >= 0);

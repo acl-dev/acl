@@ -150,7 +150,7 @@ static void fiber_unix_free(ACL_FIBER *fiber)
 		stack_free(fb->context);
 	}
 	stack_free(fb->buff);
-	free(fb);
+	mem_free(fb);
 }
 
 union cc_arg
@@ -236,7 +236,7 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 
 ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
 {
-	FIBER_UNIX *fb = (FIBER_UNIX *) calloc(1, sizeof(*fb));
+	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
 
 	/* no using calloc just avoiding using real memory */
 	fb->buff           = (char *) stack_alloc(size);
@@ -251,7 +251,7 @@ ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
 
 ACL_FIBER *fiber_unix_origin(void)
 {
-	FIBER_UNIX *fb = (FIBER_UNIX *)calloc(1, sizeof(*fb));
+	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
 
 #ifdef	USE_JMP
 	/* set context NULL when using setjmp that setcontext will not be

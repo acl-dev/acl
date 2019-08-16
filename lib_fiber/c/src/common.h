@@ -2,6 +2,7 @@
 #define __COMMON_INCLUDE_H__
 
 #include "common/init.h"
+#include "common/memory.h"
 #include "common/ring.h"
 #include "common/msg.h"
 #include "common/atomic.h"

@@ -31,12 +31,12 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 
 FILE_EVENT *file_event_alloc(socket_t fd)
 {
-	FILE_EVENT *fe = (FILE_EVENT *) calloc(1, sizeof(FILE_EVENT));
+	FILE_EVENT *fe = (FILE_EVENT *) mem_calloc(1, sizeof(FILE_EVENT));
 	file_event_init(fe, fd);
 	return fe;
 }
 
 void file_event_free(FILE_EVENT *fe)
 {
-	free(fe);
+	mem_free(fe);
 }

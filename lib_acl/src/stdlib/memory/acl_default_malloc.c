@@ -128,13 +128,13 @@ static char empty_string[] = "";
 
 /* #define DEBUG_MEM */
 #ifdef	DEBUG_MEM
-static __thread int __nmalloc   = 0;
-static __thread int __ncalloc   = 0;
-static __thread int __nrealloc  = 0;
-static __thread int __nfree     = 0;
-static __thread int __nstrdup   = 0;
-static __thread int __nstrndup  = 0;
-static __thread int __nmemdup   = 0;
+static __thread unsigned long long __nmalloc   = 0;
+static __thread unsigned long long __ncalloc   = 0;
+static __thread unsigned long long __nrealloc  = 0;
+static __thread unsigned long long __nfree     = 0;
+static __thread unsigned long long __nstrdup   = 0;
+static __thread unsigned long long __nstrndup  = 0;
+static __thread unsigned long long __nmemdup   = 0;
 static __thread ssize_t __nsize = 0;
 #endif
 
@@ -160,10 +160,10 @@ void acl_default_memstat(const char *filename, int line,
 void acl_default_meminfo(void)
 {
 #ifdef DEBUG_MEM
-	printf("%s(%d): __nmalloc: %d, __ncalloc: %d, __nrealloc: %d, "
-		"__nfree: %d, diff: %d, __nsize: %ld\r\n",
+	printf("%s(%d): __nmalloc: %llu, __ncalloc: %llu, __nrealloc: %llu, "
+		"__nfree: %llu, diff: %llu, __nsize: %lu\r\n",
 		__FUNCTION__, __LINE__, __nmalloc, __ncalloc, __nrealloc,
-		__nfree, __nmalloc + __nrealloc - __nfree,
+		__nfree, __nmalloc - __nfree,
 		(unsigned long) __nsize);
 #endif
 }
@@ -217,6 +217,7 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 #ifdef 	DEBUG_MEM
 	__nmalloc++;
 	__nsize += len;
+	//printf("malloc: %llu, filename=%s, line=%d\r\n", __nmalloc, filename, line);
 #endif
 
 #ifdef	_USE_GLIB
@@ -246,6 +247,7 @@ void *acl_default_calloc(const char *filename, int line,
 
 #ifdef 	DEBUG_MEM
 	__ncalloc++;
+	//printf("calloc: %llu, file=%s, line=%d\r\n", __ncalloc, filename, line);
 #endif
 	n = (int) (nmemb * size);
 	ptr = acl_default_malloc(filename, line, n);
@@ -296,7 +298,10 @@ void *acl_default_realloc(const char *filename, int line,
 	}
 
 #ifdef 	DEBUG_MEM
-	__nrealloc++;
+	if (ptr)
+		__nrealloc++;
+	else
+		__nmalloc++;
 	__nsize += len;
 	__nsize -= old_len;
 #endif
@@ -349,6 +354,7 @@ void acl_default_free(const char *filename, int line, void *ptr)
 #ifdef 	DEBUG_MEM
 		__nfree++;
 		__nsize -= len;
+		//printf("free: %llu, filename=%s, line=%d\n", __nfree, filename, line);
 #endif
 
 #ifdef	_USE_GLIB

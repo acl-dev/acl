@@ -48,10 +48,10 @@ static void poll_free(EVENT *ev)
 {
 	EVENT_POLL *ep = (EVENT_POLL *) ev;
 
-	free(ep->files);
-	free(ep->pfds);
+	mem_free(ep->files);
+	mem_free(ep->pfds);
 	array_free(ep->ready, NULL);
-	free(ep);
+	mem_free(ep);
 }
 
 static int poll_add_read(EVENT_POLL *ep, FILE_EVENT *fe)
@@ -229,7 +229,7 @@ static const char *poll_name(void)
 
 EVENT *event_poll_create(int size)
 {
-	EVENT_POLL *ep = (EVENT_POLL *) calloc(1, sizeof(EVENT_POLL));
+	EVENT_POLL *ep = (EVENT_POLL *) mem_calloc(1, sizeof(EVENT_POLL));
 
 	if (__sys_poll == NULL) {
 		hook_init();
@@ -238,8 +238,8 @@ EVENT *event_poll_create(int size)
 	// override size with system open limit setting
 	size      = open_limit(0);
 	ep->size  = size;
-	ep->pfds  = (struct pollfd *) calloc(size, sizeof(struct pollfd));
-	ep->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
+	ep->pfds  = (struct pollfd *) mem_calloc(size, sizeof(struct pollfd));
+	ep->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	ep->ready = array_create(100);
 	ep->count = 0;
 

@@ -93,17 +93,17 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 		*nfds = exceptfds->fd_count;
 	}
 
-	fds = (struct pollfd *) calloc(*nfds + 1, sizeof(struct pollfd));
+	fds = (struct pollfd *) mem_calloc(*nfds + 1, sizeof(struct pollfd));
 	if (readfds && set_fdset(fds, *nfds, &cnt, readfds, POLLIN) == -1) {
-		free(fds);
+		mem_free(fds);
 		return NULL;
 	}
 	if (writefds && set_fdset(fds, *nfds, &cnt, writefds, POLLOUT) == -1) {
-		free(fds);
+		mem_free(fds);
 		return NULL;
 	}
 	if (exceptfds && set_fdset(fds, *nfds, &cnt, exceptfds, POLLERR) == -1) {
-		free(fds);
+		mem_free(fds);
 		return NULL;
 	}
 
@@ -116,7 +116,7 @@ static struct pollfd *pfds_create(int *nfds, fd_set *readfds,
 	int fd;
 	struct pollfd *fds;
 
-	fds = (struct pollfd *) calloc(*nfds + 1, sizeof(struct pollfd));
+	fds = (struct pollfd *) mem_calloc(*nfds + 1, sizeof(struct pollfd));
 
 	for (fd = 0; fd < *nfds; fd++) {
 		if (readfds && FD_ISSET(fd, readfds)) {
@@ -201,7 +201,7 @@ int acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
 		}
 	}
 
-	free(fds);
+	mem_free(fds);
 	return nready;
 }
 

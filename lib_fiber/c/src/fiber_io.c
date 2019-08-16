@@ -60,10 +60,10 @@ static void thread_free(void *ctx)
 #ifdef SYS_WIN
 	htable_free(tf->events, NULL);
 #else
-	free(tf->events);
+	mem_free(tf->events);
 #endif
 
-	free(tf);
+	mem_free(tf);
 
 	if (__main_fiber == __thread_fiber) {
 		__main_fiber = NULL;
@@ -117,7 +117,7 @@ void fiber_io_check(void)
 		var_maxfd = MAXFD;
 	}
 
-	__thread_fiber = (FIBER_TLS *) malloc(sizeof(FIBER_TLS));
+	__thread_fiber = (FIBER_TLS *) mem_malloc(sizeof(FIBER_TLS));
 	__thread_fiber->event = event_create(var_maxfd);
 	__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
 			__thread_fiber->event, STACK_SIZE);
@@ -130,7 +130,7 @@ void fiber_io_check(void)
 	__thread_fiber->events = htable_create(var_maxfd);
 #else
 	__thread_fiber->events = (FILE_EVENT **)
-		calloc(var_maxfd, sizeof(FILE_EVENT*));
+		mem_calloc(var_maxfd, sizeof(FILE_EVENT*));
 #endif
 
 	if (__pthread_self() == main_thread_self()) {

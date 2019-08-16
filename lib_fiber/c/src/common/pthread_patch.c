@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "fifo.h"
+#include "memory.h"
 #include "msg.h"
 #include "iterator.h"
 #include "pthread_patch.h"
@@ -95,7 +96,7 @@ static FIFO *tls_value_list_get(void)
 
 static void tls_value_list_on_free(void *ctx)
 {
-	free(ctx);
+	mem_free(ctx);
 }
 
 static void tls_value_list_free(void)
@@ -210,7 +211,7 @@ int pthread_setspecific(pthread_key_t key, void *value)
 	}
 
 	if (TlsSetValue(key, value)) {
-		TLS_VALUE *tls_value = (TLS_VALUE*) malloc(sizeof(TLS_VALUE));
+		TLS_VALUE *tls_value = (TLS_VALUE*) mem_malloc(sizeof(TLS_VALUE));
 		tls_value->tls_key = &__tls_key_list[key];
 		tls_value->value = value;
 		fifo_push(tls_value_list_ptr, tls_value);
@@ -252,7 +253,7 @@ int pthread_mutex_init(pthread_mutex_t *mutex, const pthread_mutexattr_t *mattr)
 	if (!mutex->id) {
 		msg_error("%s, %s(%d): CreateMutex error(%s)",
 			__FILE__, myname, __LINE__, last_serror());
-		free(mutex);
+		mem_free(mutex);
 		return -1;
 	}
 

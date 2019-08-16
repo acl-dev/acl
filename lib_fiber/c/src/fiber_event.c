@@ -46,7 +46,7 @@ static void event_ferror(ACL_FIBER_EVENT* event, const char* fmt, ...)
 ACL_FIBER_EVENT *acl_fiber_event_create(unsigned flag)
 {
 	ACL_FIBER_EVENT *event = (ACL_FIBER_EVENT *)
-		calloc(1, sizeof(ACL_FIBER_EVENT));
+		mem_calloc(1, sizeof(ACL_FIBER_EVENT));
 
 	event->owner = NULL;
 	event->tid   = 0;
@@ -81,7 +81,7 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 		atomic_free(event->lock.atomic.alock);
 	}
 
-	free(event);
+	mem_free(event);
 }
 
 static inline void __ll_lock(ACL_FIBER_EVENT *event)

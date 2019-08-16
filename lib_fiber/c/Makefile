@@ -23,6 +23,7 @@ CFLAGS = -c -g -W \
 -Wcast-qual \
 -DUSE_FAST_TIME \
 -DUSE_FAST_RING \
+#-DDEBUG_MEM \
 #-DUSE_VALGRIND \
 #-I/usr/local/include
 #-DUSE_PRINTF_MACRO

@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "memory.h"
 #include "iterator.h"
 #include "fifo.h"
 
@@ -104,7 +105,7 @@ FIFO *fifo_new(void)
 {
 	FIFO *fifo;
 
-	fifo = (FIFO *) malloc(sizeof(*fifo));
+	fifo = (FIFO *) mem_malloc(sizeof(*fifo));
 	fifo->head = NULL;
 	fifo->tail = NULL;
 	fifo->cnt = 0;
@@ -129,14 +130,14 @@ void fifo_free(FIFO *fifo, void (*free_fn)(void *))
 		if (free_fn)
 			free_fn(data);
 	}
-	free(fifo);
+	mem_free(fifo);
 }
 
 FIFO_INFO *fifo_push_back(FIFO *fifo, void *data)
 {
 	FIFO_INFO *info;
 
-	info = (FIFO_INFO *) malloc(sizeof(*info));
+	info = (FIFO_INFO *) mem_malloc(sizeof(*info));
 	info->data = data;
 
 	if (fifo->tail == NULL) {
@@ -157,7 +158,7 @@ FIFO_INFO *fifo_push_front(FIFO *fifo, void *data)
 {
 	FIFO_INFO *info;
 
-	info = (FIFO_INFO*) malloc(sizeof(*info));
+	info = (FIFO_INFO*) mem_malloc(sizeof(*info));
 	info->data = data;
 
 	if (fifo->head == NULL) {
@@ -190,7 +191,7 @@ void *fifo_pop_front(FIFO *fifo)
 		fifo->head = fifo->tail = NULL;
 	}
 	data = info->data;
-	free(info);
+	mem_free(info);
 	fifo->cnt--;
 	return data;
 }
@@ -211,7 +212,7 @@ void *fifo_pop_back(FIFO *fifo)
 		fifo->head = fifo->tail = NULL;
 	}
 	data = info->data;
-	free(info);
+	mem_free(info);
 	fifo->cnt--;
 	return data;
 }
@@ -230,7 +231,7 @@ int fifo_delete(FIFO *fifo, const void *data)
 				iter->next->prev = iter->prev;
 			else
 				fifo->tail = iter->prev;
-			free(iter);
+			mem_free(iter);
 			fifo->cnt--;
 			return 1;
 		}
@@ -264,7 +265,7 @@ void fifo_free2(FIFO *fifo, void (*free_fn)(FIFO_INFO *))
 		if (free_fn)
 			free_fn(info);
 	}
-	free(fifo);
+	mem_free(fifo);
 }
 
 void fifo_push_info_back(FIFO *fifo, FIFO_INFO *info)
@@ -312,7 +313,7 @@ void fifo_delete_info(FIFO *fifo, FIFO_INFO *info)
 	else
 		fifo->tail = info->prev;
 
-	free(info);
+	mem_free(info);
 	fifo->cnt--;
 }
 

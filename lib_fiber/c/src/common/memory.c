@@ -61,19 +61,19 @@ void stack_free(void *ptr)
 		msg_fatal("%s(%d), %s: mprotect error=%s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
-	free(ptr);
+	mem_free(ptr);
 }
 
 #else
 
 void *stack_alloc(size_t size)
 {
-	return malloc(size);
+	return mem_malloc(size);
 }
 
 void stack_free(void *ptr)
 {
-	free(ptr);
+	mem_free(ptr);
 }
 
 #endif
@@ -86,4 +86,62 @@ void *stack_calloc(size_t size)
 		memset(ptr, 0, size);
 	}
 	return ptr;
+}
+
+//#define DEBUG_MEM
+#ifdef DEBUG_MEM
+static __thread unsigned long long __nmalloc  = 0;
+static __thread unsigned long long __ncalloc  = 0;
+static __thread unsigned long long __nstrdup  = 0;
+static __thread unsigned long long __nrealloc = 0;
+static __thread unsigned long long __nfree    = 0;
+#endif
+
+void *mem_malloc(size_t size)
+{
+#ifdef DEBUG_MEM
+	__nmalloc++;
+#endif
+	return malloc(size);
+}
+
+void mem_free(void *ptr)
+{
+#ifdef DEBUG_MEM
+	__nfree++;
+#endif
+	return free(ptr);
+}
+
+void *mem_calloc(size_t nmemb, size_t size)
+{
+#ifdef DEBUG_MEM
+	__ncalloc++;
+#endif
+	return calloc(nmemb, size);
+}
+
+void *mem_realloc(void *ptr, size_t size)
+{
+#ifdef DEBUG_MEM
+	__nrealloc++;
+#endif
+	return realloc(ptr, size);
+}
+
+char *mem_strdup(const char *s)
+{
+#ifdef DEBUG_MEM
+	__nstrdup++;
+#endif
+	return strdup(s);
+}
+
+void mem_stat(void)
+{
+#ifdef DEBUG_MEM
+	printf("malloc=%llu, calloc=%llu, strdup=%llu, realloc=%llu, "
+		"free=%llu, diff=%llu\r\n", __nmalloc, __ncalloc, __nstrdup,
+		__nrealloc, __nfree, __nmalloc + __ncalloc + __nstrdup - __nfree);
+#endif
 }

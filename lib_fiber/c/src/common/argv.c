@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "memory.h"
 #include "strops.h"
 #include "argv.h"
 
@@ -11,7 +12,7 @@ static void argv_extend(ARGV *argvp)
 	int new_len;
 
 	new_len = argvp->len * 2;
-	argvp->argv = (char **) realloc((char *) argvp->argv,
+	argvp->argv = (char **) mem_realloc((char *) argvp->argv,
 			(new_len + 1) * sizeof(char *));
 	argvp->len = new_len;
 }
@@ -129,10 +130,10 @@ ARGV   *argv_free(ARGV *argvp)
 	char  **cpp;
 
 	for (cpp = argvp->argv; cpp < argvp->argv + argvp->argc; cpp++) {
-		free(*cpp);
+		mem_free(*cpp);
 	}
-	free(argvp->argv);
-	free(argvp);
+	mem_free(argvp->argv);
+	mem_free(argvp);
 	return NULL;
 }
 
@@ -145,10 +146,10 @@ ARGV   *argv_alloc(int size)
 
 	/* Make sure that always argvp->argc < argvp->len. */
 
-	argvp          = (ARGV *) malloc(sizeof(*argvp));
+	argvp          = (ARGV *) mem_malloc(sizeof(*argvp));
 	argvp->len     = 0;
 	sane_len       = (size < 2 ? 2 : size);
-	argvp->argv    = (char **) malloc((sane_len + 1) * sizeof(char *));
+	argvp->argv    = (char **) mem_malloc((sane_len + 1) * sizeof(char *));
 	argvp->len     = sane_len;
 	argvp->argc    = 0;
 	argvp->argv[0] = 0;
@@ -230,6 +231,6 @@ ARGV *argv_split(const char *str, const char *delim)
 	while ((arg = mystrtok(&bp, delim)) != 0)
 		argv_add(argvp, arg, (char *) 0);
 	argv_terminate(argvp);
-	free(saved_string);
+	mem_free(saved_string);
 	return argvp;
 }

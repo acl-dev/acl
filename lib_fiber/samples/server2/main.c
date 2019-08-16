@@ -67,7 +67,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	int   ret;
 
 	__socket_count++;
-	printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), fd);
+	//printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), fd);
 
 	while (1) {
 		if (__rw_timeout > 0) {
@@ -188,7 +188,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	exit(0);
 }
 
-#define SCHEDULE_AUTO
+//#define SCHEDULE_AUTO
 
 #ifndef	SCHEDULE_AUTO
 static void fiber_memcheck(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
@@ -200,6 +200,7 @@ static void fiber_memcheck(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		sleep(1);
 #endif
 		acl_default_meminfo();
+		acl_fiber_memstat();
 	}
 }
 #endif

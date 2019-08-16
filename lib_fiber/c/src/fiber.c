@@ -110,11 +110,11 @@ static void thread_free(void *ctx)
 	}
 
 	if (tf->fibers) {
-		free(tf->fibers);
+		mem_free(tf->fibers);
 	}
 
 	tf->original->free_fn(tf->original);
-	free(tf);
+	mem_free(tf);
 
 	if (__main_fiber == __thread_fiber) {
 		__main_fiber = NULL;
@@ -155,7 +155,7 @@ static void fiber_check(void)
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
 
-	__thread_fiber = (THREAD *) calloc(1, sizeof(THREAD));
+	__thread_fiber = (THREAD *) mem_calloc(1, sizeof(THREAD));
 
 	__thread_fiber->original = __fiber_origin_fn();
 	__thread_fiber->fibers   = NULL;
@@ -383,7 +383,7 @@ static void check_timer(ACL_FIBER *fiber fiber_unused, void *ctx)
 	size_t *intptr = (size_t *) ctx;
 	size_t  max = *intptr;
 
-	free(intptr);
+	mem_free(intptr);
 	while (1) {
 #ifdef SYS_WIN
 		Sleep(1000);
@@ -396,7 +396,7 @@ static void check_timer(ACL_FIBER *fiber fiber_unused, void *ctx)
 
 void acl_fiber_check_timer(size_t max)
 {
-	size_t *intptr = (size_t *) malloc(sizeof(int));
+	size_t *intptr = (size_t *) mem_malloc(sizeof(int));
 
 	*intptr = max;
 	acl_fiber_create(check_timer, intptr, 64000);
@@ -556,7 +556,7 @@ static void fbase_finish(FIBER_BASE *fbase)
 
 FIBER_BASE *fbase_alloc(void)
 {
-	FIBER_BASE *fbase = (FIBER_BASE *) calloc(1, sizeof(FIBER_BASE));
+	FIBER_BASE *fbase = (FIBER_BASE *) mem_calloc(1, sizeof(FIBER_BASE));
 
 	fbase_init(fbase, FBASE_F_BASE);
 	return fbase;
@@ -565,7 +565,7 @@ FIBER_BASE *fbase_alloc(void)
 void fbase_free(FIBER_BASE *fbase)
 {
 	fbase_finish(fbase);
-	free(fbase);
+	mem_free(fbase);
 }
 
 void fiber_free(ACL_FIBER *fiber)
@@ -587,11 +587,11 @@ static void fiber_start(ACL_FIBER *fiber)
 		if (fiber->locals[i]->free_fn) {
 			fiber->locals[i]->free_fn(fiber->locals[i]->ctx);
 		}
-		free(fiber->locals[i]);
+		mem_free(fiber->locals[i]);
 	}
 
 	if (fiber->locals) {
-		free(fiber->locals);
+		mem_free(fiber->locals);
 		fiber->locals = NULL;
 		fiber->nlocal = 0;
 	}
@@ -601,7 +601,7 @@ static void fiber_start(ACL_FIBER *fiber)
 
 ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr)
 {
-	ACL_FIBER *fiber = (ACL_FIBER *) calloc(1, sizeof(ACL_FIBER) + size);
+	ACL_FIBER *fiber = (ACL_FIBER *) mem_calloc(1, sizeof(ACL_FIBER) + size);
 	*pptr = ((char*) fiber) + sizeof(ACL_FIBER);
 	return fiber;
 }
@@ -659,7 +659,7 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 
 	if (__thread_fiber->slot >= __thread_fiber->size) {
 		__thread_fiber->size  += 128;
-		__thread_fiber->fibers = (ACL_FIBER **) realloc(
+		__thread_fiber->fibers = (ACL_FIBER **) mem_realloc(
 			__thread_fiber->fibers, 
 			__thread_fiber->size * sizeof(ACL_FIBER *));
 	}
@@ -825,13 +825,13 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 	if (curr->nlocal < __thread_fiber->nlocal) {
 		int i, n = curr->nlocal;
 		curr->nlocal = __thread_fiber->nlocal;
-		curr->locals = (FIBER_LOCAL **) realloc(curr->locals,
+		curr->locals = (FIBER_LOCAL **) mem_realloc(curr->locals,
 			curr->nlocal * sizeof(FIBER_LOCAL*));
 		for (i = n; i < curr->nlocal; i++)
 			curr->locals[i] = NULL;
 	}
 
-	local = (FIBER_LOCAL *) calloc(1, sizeof(FIBER_LOCAL));
+	local = (FIBER_LOCAL *) mem_calloc(1, sizeof(FIBER_LOCAL));
 	local->ctx = ctx;
 	local->free_fn = free_fn;
 	curr->locals[*key - 1] = local;
@@ -887,4 +887,9 @@ void acl_fiber_set_error(int errnum)
 	WSASetLastError(errnum);
 #endif
 	errno = errnum;
+}
+
+void acl_fiber_memstat(void)
+{
+	mem_stat();
 }

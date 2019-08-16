@@ -12,7 +12,7 @@ struct ACL_FIBER_SEM {
 
 ACL_FIBER_SEM *acl_fiber_sem_create(int num)
 {
-	ACL_FIBER_SEM *sem = (ACL_FIBER_SEM *) malloc(sizeof(ACL_FIBER_SEM));
+	ACL_FIBER_SEM *sem = (ACL_FIBER_SEM *) mem_malloc(sizeof(ACL_FIBER_SEM));
 
 	sem->tid = 0;
 	sem->num = num;
@@ -22,7 +22,7 @@ ACL_FIBER_SEM *acl_fiber_sem_create(int num)
 
 void acl_fiber_sem_free(ACL_FIBER_SEM *sem)
 {
-	free(sem);
+	mem_free(sem);
 }
 
 unsigned long acl_fiber_sem_get_tid(ACL_FIBER_SEM *sem)

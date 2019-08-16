@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "memory.h"
 #include "msg.h"
 #include "atomic.h"
 
@@ -11,7 +12,7 @@ struct ATOMIC {
 
 ATOMIC *atomic_new(void)
 {
-	ATOMIC *self = (ATOMIC*) malloc(sizeof(ATOMIC));
+	ATOMIC *self = (ATOMIC*) mem_malloc(sizeof(ATOMIC));
 
 	self->value = NULL;
 	return self;
@@ -20,7 +21,7 @@ ATOMIC *atomic_new(void)
 void atomic_free(ATOMIC *self)
 {
 	self->value = NULL;
-	free(self);
+	mem_free(self);
 }
 
 void atomic_set(ATOMIC *self, void *value)

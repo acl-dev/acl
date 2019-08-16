@@ -19,7 +19,7 @@ struct ACL_FIBER_RWLOCK {
 
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 {
-	ACL_FIBER_MUTEX *lk = (ACL_FIBER_MUTEX *) malloc(sizeof(ACL_FIBER_MUTEX));
+	ACL_FIBER_MUTEX *lk = (ACL_FIBER_MUTEX *) mem_malloc(sizeof(ACL_FIBER_MUTEX));
 
 	lk->owner = NULL;
 	ring_init(&lk->me);
@@ -29,7 +29,7 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 
 void acl_fiber_mutex_free(ACL_FIBER_MUTEX *lk)
 {
-	free(lk);
+	mem_free(lk);
 }
 
 static int __lock(ACL_FIBER_MUTEX *lk, int block)
@@ -119,7 +119,7 @@ void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *lk)
 ACL_FIBER_RWLOCK *acl_fiber_rwlock_create(void)
 {
 	ACL_FIBER_RWLOCK *lk = (ACL_FIBER_RWLOCK *)
-		malloc(sizeof(ACL_FIBER_RWLOCK));
+		mem_malloc(sizeof(ACL_FIBER_RWLOCK));
 
 	lk->readers = 0;
 	lk->writer  = NULL;
@@ -131,7 +131,7 @@ ACL_FIBER_RWLOCK *acl_fiber_rwlock_create(void)
 
 void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK *lk)
 {
-	free(lk);
+	mem_free(lk);
 }
 
 static int __rlock(ACL_FIBER_RWLOCK *lk, int block)

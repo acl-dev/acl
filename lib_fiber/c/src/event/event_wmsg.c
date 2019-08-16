@@ -59,8 +59,8 @@ static void wmsg_free(EVENT *ev)
 		}
 	}
 	htable_free(ew->tbl, NULL);
-	free(ew->files);
-	free(ew);
+	mem_free(ew->files);
+	mem_free(ew);
 }
 
 static void wmsg_fdmap_set(EVENT_WMSG *ev, FILE_EVENT *fe)
@@ -420,11 +420,11 @@ static const char *__class_name = "__AclFiberEventsMainWClass";
 
 EVENT *event_wmsg_create(int size)
 {
-	EVENT_WMSG *ew = (EVENT_WMSG *) calloc(1, sizeof(EVENT_WMSG));
+	EVENT_WMSG *ew = (EVENT_WMSG *) mem_calloc(1, sizeof(EVENT_WMSG));
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	HWND hWnd = CreateSockWindow(__class_name, hInstance);
 
-	ew->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
+	ew->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	ew->size  = size;
 	ew->count = 0;
 

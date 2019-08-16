@@ -179,6 +179,9 @@ static bool connect_server(IO_CTX* ctx, int id)
 		return false;
 	}
 
+	ACL_VSTREAM *fp = stream->get_vstream();
+	acl_tcp_so_linger(ACL_VSTREAM_SOCK(fp), 1, 0);
+
 	// 创建连接后的回调函数类
 	client_io_callback* callback = new client_io_callback(ctx, stream, id);
 

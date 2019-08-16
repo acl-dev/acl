@@ -88,7 +88,7 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		 * the GetQueuedCompletionStatus process.
 		 */
 		if (ok) {
-			free(fe->reader);
+			mem_free(fe->reader);
 		} else {
 			fe->reader->type = IOCP_EVENT_DEAD;
 			fe->reader->fe   = NULL;
@@ -102,7 +102,7 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		 * the GetQueuedCompletionStatus process.
 		 */
 		if (HasOverlappedIoCompleted(&fe->writer->overlapped)) {
-			free(fe->writer);
+			mem_free(fe->writer);
 		} else {
 			fe->writer->type = IOCP_EVENT_DEAD;
 			fe->writer->fe   = NULL;
@@ -180,7 +180,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	iocp_check(ev, fe);
 
 	if (fe->reader == NULL) {
-		fe->reader     = (IOCP_EVENT*) malloc(sizeof(IOCP_EVENT));
+		fe->reader     = (IOCP_EVENT*) mem_malloc(sizeof(IOCP_EVENT));
 		fe->reader->fe = fe;
 	}
 
@@ -282,7 +282,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 	iocp_check(ev, fe);
 
 	if (fe->writer == NULL) {
-		fe->writer     = (IOCP_EVENT*) malloc(sizeof(IOCP_EVENT));
+		fe->writer     = (IOCP_EVENT*) mem_malloc(sizeof(IOCP_EVENT));
 		fe->writer->fe = fe;
 	}
 
@@ -378,7 +378,7 @@ static int iocp_wait(EVENT *ev, int timeout)
 			}
 
 			if (event->type & IOCP_EVENT_DEAD) {
-				free(event);
+				mem_free(event);
 				continue;
 			}
 
@@ -421,8 +421,8 @@ static void iocp_free(EVENT *ev)
 	}
 	array_free(ei->readers, NULL);
 	array_free(ei->writers, NULL);
-	free(ei->files);
-	free(ei);
+	mem_free(ei->files);
+	mem_free(ei);
 }
 
 static int iocp_checkfd(EVENT_IOCP *ev, FILE_EVENT *fe)
@@ -444,7 +444,7 @@ static const char *iocp_name(void)
 
 EVENT *event_iocp_create(int size)
 {
-	EVENT_IOCP *ei = (EVENT_IOCP *) calloc(1, sizeof(EVENT_IOCP));
+	EVENT_IOCP *ei = (EVENT_IOCP *) mem_calloc(1, sizeof(EVENT_IOCP));
 
 	ei->h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 	if (ei->h_iocp == NULL) {
@@ -454,7 +454,7 @@ EVENT *event_iocp_create(int size)
 	ei->readers = array_create(100);
 	ei->writers = array_create(100);
 
-	ei->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
+	ei->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	ei->size  = size;
 	ei->count = 0;
 

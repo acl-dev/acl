@@ -52,9 +52,9 @@ typedef struct EVENT_SELECT {
 static void select_free(EVENT *ev)
 {
 	EVENT_SELECT *es = (EVENT_SELECT *) ev;
-	free(es->files);
+	mem_free(es->files);
 	array_free(es->ready, NULL);
-	free(es);
+	mem_free(es);
 }
 
 static int select_add_read(EVENT_SELECT *es, FILE_EVENT *fe)
@@ -234,7 +234,7 @@ static const char *select_name(void)
 
 EVENT *event_select_create(int size)
 {
-	EVENT_SELECT *es = (EVENT_SELECT *) calloc(1, sizeof(EVENT_SELECT));
+	EVENT_SELECT *es = (EVENT_SELECT *) mem_calloc(1, sizeof(EVENT_SELECT));
 
 	if (__sys_select == NULL) {
 		hook_init();
@@ -244,7 +244,7 @@ EVENT *event_select_create(int size)
 	size      = open_limit(0);
 	es->maxfd = -1;
 	es->dirty = 0;
-	es->files = (FILE_EVENT**) calloc(size, sizeof(FILE_EVENT*));
+	es->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	es->size  = size;
 	es->ready = array_create(100);
 	es->count = 0;

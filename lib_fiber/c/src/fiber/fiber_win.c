@@ -43,7 +43,7 @@ static void fiber_win_init(FIBER_WIN *fb, size_t size)
 
 ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
 {
-	FIBER_WIN *fb = (FIBER_WIN *) calloc(1, sizeof(*fb));
+	FIBER_WIN *fb = (FIBER_WIN *) mem_calloc(1, sizeof(*fb));
 
 	fb->fiber.init_fn  = (void (*)(ACL_FIBER*, size_t)) fiber_win_init;
 	fb->fiber.free_fn  = fiber_win_free;
@@ -56,7 +56,7 @@ ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
 
 ACL_FIBER *fiber_win_origin(void)
 {
-	FIBER_WIN *fb = (FIBER_WIN *) calloc(1, sizeof(*fb));
+	FIBER_WIN *fb = (FIBER_WIN *) mem_calloc(1, sizeof(*fb));
 
 	fb->context = ConvertThreadToFiberEx(NULL, FIBER_FLAG_FLOAT_SWITCH);
 	fb->fiber.free_fn = fiber_win_free;

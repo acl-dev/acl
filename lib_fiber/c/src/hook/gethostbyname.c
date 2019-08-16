@@ -42,7 +42,7 @@ static void hook_init(void)
 
 static void free_fn(void *ctx)
 {
-	free(ctx);
+	mem_free(ctx);
 }
 
 struct hostent *acl_fiber_gethostbyname(const char *name)
@@ -64,14 +64,14 @@ struct hostent *acl_fiber_gethostbyname(const char *name)
 
 	fiber_buf = (char *) acl_fiber_get_specific(__fiber_buf_key);
 	if (fiber_buf == NULL) {
-		fiber_buf = (char *) malloc(BUF_LEN);
+		fiber_buf = (char *) mem_malloc(BUF_LEN);
 		acl_fiber_set_specific(&__fiber_buf_key, fiber_buf, free_fn);
 	}
 	assert(fiber_buf);
 
 	fiber_res = (struct hostent *) acl_fiber_get_specific(__fiber_res_key);
 	if (fiber_res == NULL) {
-		fiber_res = (struct hostent *) malloc(sizeof(struct hostent));
+		fiber_res = (struct hostent *) mem_malloc(sizeof(struct hostent));
 		acl_fiber_set_specific(&__fiber_res_key, fiber_res, free_fn);
 	}
 	assert(fiber_res);

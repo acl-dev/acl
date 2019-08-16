@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "memory.h"
 #include "msg.h"
 #include "array.h"
 
@@ -125,9 +126,9 @@ static void array_grow(ARRAY *a, int min_capacity)
 	a->capacity += delta;
 
 	if (a->items == NULL) {
-		a->items = (void**) malloc(a->capacity * sizeof(void*));
+		a->items = (void**) mem_malloc(a->capacity * sizeof(void*));
 	} else {
-		a->items = (void**) realloc(a->items, a->capacity * sizeof(void*));
+		a->items = (void**) mem_realloc(a->items, a->capacity * sizeof(void*));
 	}
 
 	/* reset, just in case */
@@ -139,7 +140,7 @@ ARRAY *array_create(int init_size)
 {
 	ARRAY *a;
 
-	a = (ARRAY *) calloc(1, sizeof(ARRAY));
+	a = (ARRAY *) mem_calloc(1, sizeof(ARRAY));
 
 	a->push_back  = array_push_back;
 	a->push_front = array_push_front;
@@ -176,9 +177,9 @@ void array_free(ARRAY *a, void (*free_fn)(void *))
 {
 	array_clean(a, free_fn);
 	if (a->items) {
-		free(a->items);
+		mem_free(a->items);
 	}
-	free(a);
+	mem_free(a);
 }
 
 int array_append(ARRAY *a, void *obj)

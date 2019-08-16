@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "memory.h"
 #include "msg.h"
 #include "htable.h"
 
@@ -175,7 +176,7 @@ static int __htable_size(HTABLE *table, unsigned size)
 
 	size |= 1;
 
-	table->data = h = (HTABLE_INFO **) malloc(size * sizeof(HTABLE_INFO *));
+	table->data = h = (HTABLE_INFO **) mem_malloc(size * sizeof(HTABLE_INFO *));
 	if(table->data == NULL) {
 		return -1;
 	}
@@ -215,7 +216,7 @@ static int htable_grow(HTABLE *table)
 		}
 	}
 
-	free(old_entries);
+	mem_free(old_entries);
 	return 0;
 }
 
@@ -224,7 +225,7 @@ HTABLE *htable_create(int size)
 	HTABLE *table;
 	int	ret;
 
-	table =	(HTABLE *) calloc(1, sizeof(HTABLE));
+	table =	(HTABLE *) mem_calloc(1, sizeof(HTABLE));
 	if (table == NULL) {
 		return NULL;
 	}
@@ -232,7 +233,7 @@ HTABLE *htable_create(int size)
 	table->init_size = size;
 	ret = __htable_size(table, size < 13 ? 13 : size);
 	if(ret < 0) {
-		free(table);
+		mem_free(table);
 		return NULL;
 	}
 
@@ -291,7 +292,7 @@ HTABLE_INFO *htable_enter(HTABLE *table, const char *key, void *value)
 		}
 	}
 
-	ht = (HTABLE_INFO *) malloc(sizeof(HTABLE_INFO));
+	ht = (HTABLE_INFO *) mem_malloc(sizeof(HTABLE_INFO));
 	if (ht == NULL) {
 		msg_error("%s(%d): alloc error", __FUNCTION__, __LINE__);
 		return NULL;
@@ -300,11 +301,11 @@ HTABLE_INFO *htable_enter(HTABLE *table, const char *key, void *value)
 #if defined(_WIN32) || defined(_WIN64)
 	ht->key = _strdup(key);
 #else
-	ht->key = strdup(key);
+	ht->key = mem_strdup(key);
 #endif
 	if (ht->key == NULL) {
 		msg_error("%s(%d): alloc error", __FUNCTION__, __LINE__);
-		free(ht);
+		mem_free(ht);
 		return NULL;
 	}
 	ht->hash  = hash;
@@ -355,10 +356,10 @@ void htable_delete_entry(HTABLE *table, HTABLE_INFO *ht,
 	else
 		*h = ht->next;
 
-	free(ht->key);
+	mem_free(ht->key);
 	if (free_fn && ht->value)
 		(*free_fn) (ht->value);
-	free(ht);
+	mem_free(ht);
 	table->used--;
 }
 
@@ -395,16 +396,16 @@ void htable_free(HTABLE *table, void (*free_fn) (void *))
 	while (i-- > 0) {
 		for (ht = *h++; ht; ht = next) {
 			next = ht->next;
-			free(ht->key);
+			mem_free(ht->key);
 			if (free_fn && ht->value)
 				(*free_fn) (ht->value);
-			free(ht);
+			mem_free(ht);
 		}
 	}
 
-	free(table->data);
+	mem_free(table->data);
 	table->data = 0;
-	free(table);
+	mem_free(table);
 }
 
 int htable_reset(HTABLE *table, void (*free_fn) (void *))
@@ -420,14 +421,14 @@ int htable_reset(HTABLE *table, void (*free_fn) (void *))
 	while (i-- > 0) {
 		for (ht = *h++; ht; ht = next) {
 			next = ht->next;
-			free(ht->key);
+			mem_free(ht->key);
 			if (free_fn && ht->value) {
 				(*free_fn) (ht->value);
 			}
-			free(ht);
+			mem_free(ht);
 		}
 	}
-	free(table->data);
+	mem_free(table->data);
 	ret = __htable_size(table, table->init_size < 13 ? 13 : table->init_size);
 	return ret;
 }
@@ -482,7 +483,7 @@ HTABLE_INFO **htable_list(const HTABLE *table)
 	int     i;
 
 	if (table != 0) {
-		list = (HTABLE_INFO **) malloc(sizeof(*list) * (table->used + 1));
+		list = (HTABLE_INFO **) mem_malloc(sizeof(*list) * (table->used + 1));
 		for (i = 0; i < table->size; i++) {
 			for (member = table->data[i]; member != 0;
 				member = member->next) {
@@ -490,7 +491,7 @@ HTABLE_INFO **htable_list(const HTABLE *table)
 			}
 		}
 	} else {
-		list = (HTABLE_INFO **) malloc(sizeof(*list));
+		list = (HTABLE_INFO **) mem_malloc(sizeof(*list));
 	}
 	list[count] = 0;
 	return list;

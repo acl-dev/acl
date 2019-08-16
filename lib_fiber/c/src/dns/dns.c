@@ -1724,7 +1724,7 @@ struct dns_packet *dns_p_make(size_t len, int *error) {
 	struct dns_packet *P;
 	size_t size = dns_p_calcsize(len);
 
-	if (!(P = dns_p_init(malloc(size), size)))
+	if (!(P = dns_p_init(mem_malloc(size), size)))
 		*error = dns_syerr();
 
 	return P;
@@ -1732,7 +1732,7 @@ struct dns_packet *dns_p_make(size_t len, int *error) {
 
 
 static void dns_p_free(struct dns_packet *P) {
-	free(P);
+	mem_free(P);
 } /* dns_p_free() */
 
 
@@ -1777,7 +1777,7 @@ int dns_p_grow(struct dns_packet **P) {
 	if (size > 65536)
 		return DNS_ENOBUFS;
 
-	if (!(tmp = realloc(*P, dns_p_calcsize(size))))
+	if (!(tmp = mem_realloc(*P, dns_p_calcsize(size))))
 		return dns_syerr();
 
 	tmp->size = size;
@@ -4265,7 +4265,7 @@ struct dns_hosts *dns_hosts_open(int *error) {
 	static const struct dns_hosts hosts_initializer	= { .refcount = 1 };
 	struct dns_hosts *hosts;
 
-	if (!(hosts = malloc(sizeof *hosts)))
+	if (!(hosts = mem_malloc(sizeof *hosts)))
 		goto syerr;
 
 	*hosts	= hosts_initializer;
@@ -4276,7 +4276,7 @@ struct dns_hosts *dns_hosts_open(int *error) {
 syerr:
 	*error	= dns_syerr();
 
-	free(hosts);
+	mem_free(hosts);
 
 	return 0;
 } /* dns_hosts_open() */
@@ -4291,10 +4291,10 @@ void dns_hosts_close(struct dns_hosts *hosts) {
 	for (ent = hosts->head; ent; ent = xnt) {
 		xnt	= ent->next;
 
-		free(ent);
+		mem_free(ent);
 	}
 
-	free(hosts);
+	mem_free(hosts);
 
 	return;
 } /* dns_hosts_close() */
@@ -4447,7 +4447,7 @@ int dns_hosts_insert(struct dns_hosts *hosts, int af, const void *addr, const vo
 	struct dns_hosts_entry *ent;
 	int error;
 
-	if (!(ent = malloc(sizeof *ent)))
+	if (!(ent = mem_malloc(sizeof *ent)))
 		goto syerr;
 
 	dns_d_anchor(ent->host, sizeof ent->host, host, strlen(host));
@@ -4481,7 +4481,7 @@ int dns_hosts_insert(struct dns_hosts *hosts, int af, const void *addr, const vo
 syerr:
 	error	= dns_syerr();
 error:
-	free(ent);
+	mem_free(ent);
 
 	return error;
 } /* dns_hosts_insert() */
@@ -4569,7 +4569,7 @@ struct dns_resolv_conf *dns_resconf_open(int *error) {
 	struct dns_resolv_conf *resconf;
 	struct sockaddr_in *sin;
 
-	if (!(resconf = malloc(sizeof *resconf)))
+	if (!(resconf = mem_malloc(sizeof *resconf)))
 		goto syerr;
 
 	*resconf = resconf_initializer;
@@ -4599,7 +4599,7 @@ struct dns_resolv_conf *dns_resconf_open(int *error) {
 syerr:
 	*error	= dns_syerr();
 
-	free(resconf);
+	mem_free(resconf);
 
 	return 0;
 } /* dns_resconf_open() */
@@ -4609,7 +4609,7 @@ void dns_resconf_close(struct dns_resolv_conf *resconf) {
 	if (!resconf || 1 != dns_resconf_release(resconf))
 		return /* void */;
 
-	free(resconf);
+	mem_free(resconf);
 } /* dns_resconf_close() */
 
 
@@ -5709,7 +5709,7 @@ struct dns_hints *dns_hints_open(struct dns_resolv_conf *resconf, int *error) {
 
 	(void)resconf;
 
-	if (!(H = malloc(sizeof *H)))
+	if (!(H = mem_malloc(sizeof *H)))
 		goto syerr;
 
 	*H	= H_initializer;
@@ -5720,7 +5720,7 @@ struct dns_hints *dns_hints_open(struct dns_resolv_conf *resconf, int *error) {
 syerr:
 	*error	= dns_syerr();
 
-	free(H);
+	mem_free(H);
 
 	return 0;
 } /* dns_hints_open() */
@@ -5735,10 +5735,10 @@ void dns_hints_close(struct dns_hints *H) {
 	for (soa = H->head; soa; soa = nxt) {
 		nxt	= soa->next;
 
-		free(soa);
+		mem_free(soa);
 	}
 
-	free(H);
+	mem_free(H);
 
 	return /* void */;
 } /* dns_hints_close() */
@@ -5871,7 +5871,7 @@ int dns_hints_insert(struct dns_hints *H, const char *zone, const struct sockadd
 	unsigned i;
 
 	if (!(soa = dns_hints_fetch(H, zone))) {
-		if (!(soa = malloc(sizeof *soa)))
+		if (!(soa = mem_malloc(sizeof *soa)))
 			return dns_syerr();
 		*soa = soa_initializer;
 		dns_strlcpy((char *)soa->zone, zone, sizeof soa->zone);
@@ -6442,7 +6442,7 @@ static int dns_so_closefd(struct dns_socket *so, int *fd) {
 		unsigned olim = DNS_PP_MAX(4, so->olim * 2);
 		void *old;
 
-		if (!(old = realloc(so->old, sizeof so->old[0] * olim)))
+		if (!(old = mem_realloc(so->old, sizeof so->old[0] * olim)))
 			return dns_syerr();
 
 		so->old  = old;
@@ -6471,7 +6471,7 @@ static void dns_so_closefds(struct dns_socket *so, int which) {
 		for (i = 0; i < so->onum; i++)
 			dns_socketclose(&so->old[i], &so->opts);
 		so->onum = 0;
-		free(so->old);
+		mem_free(so->old);
 		so->old  = 0;
 		so->olim = 0;
 	}
@@ -6508,7 +6508,7 @@ error:
 struct dns_socket *dns_so_open(const struct sockaddr *local, int type, const struct dns_options *opts, int *error) {
 	struct dns_socket *so;
 
-	if (!(so = malloc(sizeof *so)))
+	if (!(so = mem_malloc(sizeof *so)))
 		goto syerr;
 
 	if (!dns_so_init(so, local, type, opts, error))
@@ -6536,7 +6536,7 @@ void dns_so_close(struct dns_socket *so) {
 
 	dns_so_destroy(so);
 
-	free(so);
+	mem_free(so);
 } /* dns_so_close() */
 
 
@@ -6558,7 +6558,7 @@ static int dns_so_newanswer(struct dns_socket *so, size_t len) {
 	size_t size	= offsetof(struct dns_packet, data) + DNS_PP_MAX(len, DNS_SO_MINBUF);
 	void *p;
 
-	if (!(p = realloc(so->answer, size)))
+	if (!(p = mem_realloc(so->answer, size)))
 		return dns_syerr();
 
 	so->answer	= dns_p_init(p, size);
@@ -7105,7 +7105,7 @@ struct dns_resolver *dns_res_open(struct dns_resolv_conf *resconf, struct dns_ho
 		goto _error;
 	}
 
-	if (!(R = malloc(sizeof *R)))
+	if (!(R = mem_malloc(sizeof *R)))
 		goto syerr;
 
 	*R	= R_initializer;
@@ -7237,7 +7237,7 @@ void dns_res_close(struct dns_resolver *R) {
 	dns_resconf_close(R->resconf);
 	dns_cache_close(R->cache);
 
-	free(R);
+	mem_free(R);
 } /* dns_res_close() */
 
 
@@ -8274,7 +8274,7 @@ struct dns_addrinfo *dns_ai_open(const char *host, const char *serv, enum dns_ty
 		return NULL;
 	}
 
-	if (!(ai = malloc(sizeof *ai)))
+	if (!(ai = mem_malloc(sizeof *ai)))
 		goto syerr;
 
 	*ai = ai_initializer;
@@ -8345,7 +8345,7 @@ void dns_ai_close(struct dns_addrinfo *ai) {
 		dns_p_free(ai->glue);
 
 	dns_p_free(ai->answer);
-	free(ai);
+	mem_free(ai);
 } /* dns_ai_close() */
 
 
@@ -8387,7 +8387,7 @@ static int dns_ai_setent(struct addrinfo **ent, union dns_any *any, enum dns_typ
 		clen	= 0;
 	}
 
-	if (!(*ent = malloc(sizeof **ent + dns_sa_len(saddr) + ((ai->hints.ai_flags & AI_CANONNAME)? clen + 1 : 0))))
+	if (!(*ent = mem_malloc(sizeof **ent + dns_sa_len(saddr) + ((ai->hints.ai_flags & AI_CANONNAME)? clen + 1 : 0))))
 		return dns_syerr();
 
 	memset(*ent, '\0', sizeof **ent);
@@ -9050,7 +9050,7 @@ DNS_NORETURN static void panic(const char *fmt, ...) {
 static void *grow(unsigned char *p, size_t size) {
 	void *tmp;
 
-	if (!(tmp = realloc(p, size)))
+	if (!(tmp = mem_realloc(p, size)))
 		panic("realloc(%"PRIuZ"): %s", size,
 			dns_strerror(acl_fiber_last_error()));
 
@@ -9356,9 +9356,9 @@ static int expand_domain(int argc, char *argv[]) {
 	fwrite(dst, 1, len, stdout);
 	fflush(stdout);
 
-	free(src);
-	free(dst);
-	free(pkt);
+	mem_free(src);
+	mem_free(dst);
+	mem_free(pkt);
 
 	return 0;
 } /* expand_domain() */
@@ -9457,7 +9457,7 @@ static int query_hosts(int argc, char *argv[]) {
 
 	print_packet(A, stdout);
 
-	free(A);
+	mem_free(A);
 
 	return 0;
 } /* query_hosts() */
@@ -9648,7 +9648,7 @@ static int show_hints(int argc, char *argv[]) {
 
 		print_packet(answer, stdout);
 
-		free(answer);
+		mem_free(answer);
 	}
 
 	dns_hints_close(hints);
@@ -9689,7 +9689,7 @@ static int resolve_query(int argc DNS_NOTUSED, char *argv[]) {
 
 	ans = dns_res_fetch(R, &error);
 	print_packet(ans, stdout);
-	free(ans);
+	mem_free(ans);
 
 	st = dns_res_stat(R);
 	putchar('\n');
@@ -9734,7 +9734,7 @@ static int resolve_addrinfo(int argc DNS_NOTUSED, char *argv[]) {
 
 			fputs(pretty, stdout);
 
-			free(ent);
+			mem_free(ent);
 
 			break;
 		case ENOENT:

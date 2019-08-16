@@ -18,7 +18,7 @@ ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
 {
 	pthread_mutexattr_t attr;
 	ACL_FIBER_COND *cond = (ACL_FIBER_COND *)
-		calloc(1, sizeof(ACL_FIBER_COND));
+		mem_calloc(1, sizeof(ACL_FIBER_COND));
 
 	ring_init(&cond->waiters);
 	cond->atomic = atomic_new();
@@ -37,7 +37,7 @@ void acl_fiber_cond_free(ACL_FIBER_COND *cond)
 {
 	pthread_mutex_destroy(&cond->mutex);
 	atomic_free(cond->atomic);
-	free(cond);
+	mem_free(cond);
 }
 
 static void __ll_lock(ACL_FIBER_COND *cond)

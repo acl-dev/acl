@@ -84,7 +84,7 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 		return NULL;
 	}
 
-	res = (struct addrinfo *) calloc(1, sizeof(*res) + addrlen);
+	res = (struct addrinfo *) mem_calloc(1, sizeof(*res) + addrlen);
 	res->ai_family   = sa.sa.sa_family;
 	res->ai_socktype = socktype;
 	res->ai_flags    = flags;
@@ -110,7 +110,7 @@ static void saveaddrinfo(struct dns_addrinfo *ai, struct addrinfo **res)
 			&& ent->ai_family != AF_INET6)
 #endif
 		{
-			free(ent);
+			mem_free(ent);
 			continue;
 		}
 
@@ -230,7 +230,7 @@ void acl_fiber_freeaddrinfo(struct addrinfo *res)
 	while (res) {
 		struct addrinfo *tmp = res;
 		res = res->ai_next;
-		free(tmp);
+		mem_free(tmp);
 	}
 }
 

@@ -334,6 +334,8 @@ FIBER_API int acl_fiber_set_fdlimit(int limit);
 FIBER_API int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz);
 #endif
 
+FIBER_API void acl_fiber_memstat(void);
+
 /****************************************************************************/
 
 #ifdef __cplusplus

@@ -129,7 +129,7 @@ static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
 
 static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 {
-	POLLFD *pfds = (POLLFD *) malloc(nfds * sizeof(POLLFD));
+	POLLFD *pfds = (POLLFD *) mem_malloc(nfds * sizeof(POLLFD));
 	nfds_t  i;
 
 	for (i = 0; i < nfds; i++) {
@@ -143,7 +143,7 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 
 static void pollfd_free(POLLFD *pfds)
 {
-	free(pfds);
+	mem_free(pfds);
 }
 
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)

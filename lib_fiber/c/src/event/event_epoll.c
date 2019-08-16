@@ -54,8 +54,8 @@ static void epoll_free(EVENT *ev)
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 
 	close(ep->epfd);
-	free(ep->events);
-	free(ep);
+	mem_free(ep->events);
+	mem_free(ep);
 }
 
 static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
@@ -258,14 +258,14 @@ static const char *epoll_name(void)
 
 EVENT *event_epoll_create(int size)
 {
-	EVENT_EPOLL *ep = (EVENT_EPOLL *) calloc(1, sizeof(EVENT_EPOLL));
+	EVENT_EPOLL *ep = (EVENT_EPOLL *) mem_calloc(1, sizeof(EVENT_EPOLL));
 
 	if (__sys_epoll_create == NULL) {
 		hook_init();
 	}
 
 	ep->events = (struct epoll_event *)
-		malloc(sizeof(struct epoll_event) * size);
+		mem_malloc(sizeof(struct epoll_event) * size);
 	ep->size   = size;
 
 	ep->epfd = __sys_epoll_create(1024);

@@ -28,14 +28,14 @@ static void dummy(void *ptr fiber_unused)
 
 static void free_tls(void *ptr)
 {
-	free(ptr);
+	mem_free(ptr);
 }
 
 static void *__tls = NULL;
 static void main_free_tls(void)
 {
 	if (__tls) {
-		free(__tls);
+		mem_free(__tls);
 		__tls = NULL;
 	}
 }
@@ -59,7 +59,7 @@ static void *tls_calloc(size_t len)
 	(void) pthread_once(&once_control, once_init);
 	ptr = (void*) pthread_getspecific(once_key);
 	if (ptr == NULL) {
-		ptr = calloc(1, len);
+		ptr = mem_calloc(1, len);
 		pthread_setspecific(once_key, ptr);
 		if (__pthread_self() == main_thread_self()) {
 			__tls = ptr;

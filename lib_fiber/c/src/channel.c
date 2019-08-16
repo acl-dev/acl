@@ -45,7 +45,7 @@ ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize)
 {
 	ACL_CHANNEL *c;
 
-	c = (ACL_CHANNEL *) calloc(1, sizeof(*c) + bufsize * elemsize);
+	c = (ACL_CHANNEL *) mem_calloc(1, sizeof(*c) + bufsize * elemsize);
 	c->elemsize = elemsize;
 	c->bufsize  = bufsize;
 	c->nbuf     = 0;
@@ -57,13 +57,16 @@ ACL_CHANNEL* acl_channel_create(int elemsize, int bufsize)
 void acl_channel_free(ACL_CHANNEL *c)
 {
 	if(c != NULL) {
-		if (c->name)
-			free(c->name);
-		if (c->arecv.a)
-			free(c->arecv.a);
-		if (c->asend.a)
-			free(c->asend.a);
-		free(c);
+		if (c->name) {
+			mem_free(c->name);
+		}
+		if (c->arecv.a) {
+			mem_free(c->arecv.a);
+		}
+		if (c->asend.a) {
+			mem_free(c->asend.a);
+		}
+		mem_free(c);
 	}
 }
 
@@ -71,7 +74,7 @@ static void array_add(FIBER_ALT_ARRAY *a, FIBER_ALT *alt)
 {
 	if (a->n == a->m) {
 		a->m += 16;
-		a->a = (FIBER_ALT**) realloc(a->a, a->m * sizeof(a->a[0]));
+		a->a = (FIBER_ALT**) mem_realloc(a->a, a->m * sizeof(a->a[0]));
 	}
 
 	a->a[a->n++] = alt;
