@@ -110,7 +110,7 @@ void mem_free(void *ptr)
 #ifdef DEBUG_MEM
 	__nfree++;
 #endif
-	return free(ptr);
+	free(ptr);
 }
 
 void *mem_calloc(size_t nmemb, size_t size)
@@ -134,7 +134,11 @@ char *mem_strdup(const char *s)
 #ifdef DEBUG_MEM
 	__nstrdup++;
 #endif
+#if defined(_WIN32) || defined(_WIN64)
+	return _strdup(s);
+#else
 	return strdup(s);
+#endif
 }
 
 void mem_stat(void)

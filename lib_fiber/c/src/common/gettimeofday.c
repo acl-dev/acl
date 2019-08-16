@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "fiber/fiber_base.h"
 #include "pthread_patch.h"
+#include "memory.h"
 #include "msg.h"
 #include "init.h"
 #include "gettimeofday.h"
