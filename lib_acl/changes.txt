@@ -1,5 +1,8 @@
 修改历史列表：
 
+662) 2019.8.16
+662.1) feature: inet_connect_one() 函数支持客户端连接时设置 SO_REUSEADDR
+
 661) 2019.8.12
 661.1) feature: acl_dns.c 中域名查询函数 acl_dns_lookup() 支持一次性向多个域名
 服务器发送查询请求，使用最先到达的查询结果

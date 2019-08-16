@@ -59,7 +59,8 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 	const struct addrinfo *local0, int blocking, int timeout)
 {
 	const char *myname = "inet_connect_one";
-	ACL_SOCKET sock;
+	ACL_SOCKET  sock;
+	int         on;
 
 	sock = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol);
 
@@ -71,6 +72,14 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 
 	acl_tcp_set_rcvbuf(sock, ACL_SOCKET_RBUF_SIZE);
 	acl_tcp_set_sndbuf(sock, ACL_SOCKET_WBUF_SIZE);
+
+	on = 1;
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
+		(const void *) &on, sizeof(on)) < 0) {
+
+		acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
+			__FILE__, __LINE__, acl_last_serror());
+	}
 
 	if (local0 != NULL && bind_local(sock, peer->ai_family, local0) < 0) {
 		acl_msg_error("%s(%d): bind local error %s, fd=%d",
