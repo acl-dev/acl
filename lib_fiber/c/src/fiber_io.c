@@ -229,8 +229,17 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 	msg_info("%s(%d), tid=%lu: IO fiber exit now",
 		__FUNCTION__, __LINE__, __pthread_self());
 
-	// don't set ev_fiber NULL here
+	// don't set ev_fiber NULL here, using fiber_io_clear() to set it NULL
+	// in acl_fiber_schedule() after scheduling finished.
+	// 
 	// __thread_fiber->ev_fiber = NULL;
+}
+
+void fiber_io_clear(void)
+{
+	if (__thread_fiber) {
+		__thread_fiber->ev_fiber = NULL;
+	}
 }
 
 #define CHECK_MIN

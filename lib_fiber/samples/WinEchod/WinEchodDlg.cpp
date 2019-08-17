@@ -48,22 +48,21 @@ END_MESSAGE_MAP()
 // CWinEchodDlg 对话框
 
 CWinEchodDlg::CWinEchodDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(CWinEchodDlg::IDD, pParent)
-	, m_dosFp(NULL)
-	, m_listenPort(9001)
-	, m_listenIP(_T("127.0.0.1"))
-	, m_listenAddr("127.0.0.1:9001")
-	, m_fiberListen(NULL)
-	, m_cocurrent(1)
-	, m_count(100)
+: CDialogEx(CWinEchodDlg::IDD, pParent)
+, m_dosFp(NULL)
+, m_listenPort(9001)
+, m_listenIP(_T("127.0.0.1"))
+, m_listenAddr("127.0.0.1:9001")
+, m_fiberListen(NULL)
+, m_cocurrent(1)
+, m_count(100)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
 CWinEchodDlg::~CWinEchodDlg()
 {
-	if (m_dosFp)
-	{
+	if (m_dosFp) {
 		fclose(m_dosFp);
 		FreeConsole();
 		m_dosFp = NULL;
@@ -108,14 +107,12 @@ BOOL CWinEchodDlg::OnInitDialog()
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
 	CMenu* pSysMenu = GetSystemMenu(FALSE);
-	if (pSysMenu != NULL)
-	{
+	if (pSysMenu != NULL) {
 		BOOL bNameValid;
 		CString strAboutMenu;
 		bNameValid = strAboutMenu.LoadString(IDS_ABOUTBOX);
 		ASSERT(bNameValid);
-		if (!strAboutMenu.IsEmpty())
-		{
+		if (!strAboutMenu.IsEmpty()) {
 			pSysMenu->AppendMenu(MF_SEPARATOR);
 			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 		}
@@ -135,13 +132,10 @@ BOOL CWinEchodDlg::OnInitDialog()
 
 void CWinEchodDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
+	if ((nID & 0xFFF0) == IDM_ABOUTBOX) {
 		CAboutDlg dlgAbout;
 		dlgAbout.DoModal();
-	}
-	else
-	{
+	} else {
 		CDialogEx::OnSysCommand(nID, lParam);
 	}
 }
@@ -152,8 +146,7 @@ void CWinEchodDlg::OnSysCommand(UINT nID, LPARAM lParam)
 
 void CWinEchodDlg::OnPaint()
 {
-	if (IsIconic())
-	{
+	if (IsIconic()) {
 		CPaintDC dc(this); // 用于绘制的设备上下文
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
@@ -168,9 +161,7 @@ void CWinEchodDlg::OnPaint()
 
 		// 绘制图标
 		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
+	} else {
 		CDialogEx::OnPaint();
 	}
 }
@@ -185,8 +176,7 @@ HCURSOR CWinEchodDlg::OnQueryDragIcon()
 void CWinEchodDlg::OnBnClickedOpenDos()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if (m_dosFp == NULL)
-	{
+	if (m_dosFp == NULL) {
 		//GetDlgItem(IDC_OPEN_DOS)->EnableWindow(FALSE);
 		UpdateData();
 		AllocConsole();
@@ -195,9 +185,7 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 			m_listenIP.GetString(), m_listenPort);
 		CString info(_T("关闭 DOS 窗口 "));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
-	}
-	else
-	{
+	} else {
 		fclose(m_dosFp);
 		m_dosFp = NULL;
 		FreeConsole();
@@ -221,7 +209,8 @@ void CWinEchodDlg::Uni2Str(const CString& in, acl::string& out)
 
 void CWinEchodDlg::InitFiber(void)
 {
-	// 设置协程调度的事件引擎，同时将协程调度设为自动启动模式
+	// 设置协程调度的事件引擎，同时将协程调度设为自动启动模式，不能在进程初始化时启动
+	// 协程调试器，必须在界面消息引擎正常运行后才启动协程调度器！
 	acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
 	// HOOK ACL 库中的网络 IO 过程
 	acl::fiber::acl_io_hook();
@@ -230,25 +219,21 @@ void CWinEchodDlg::InitFiber(void)
 void CWinEchodDlg::OnBnClickedListen()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if (m_fiberListen == NULL)
-	{
+	if (m_fiberListen == NULL) {
 		UpdateData();
 		Uni2Str(m_listenIP, m_listenAddr);
 		m_listenAddr.format_append(":%d", m_listenPort);
-		if (m_listen.open(m_listenAddr) == false)
-		{
+		if (m_listen.open(m_listenAddr) == false) {
 			printf("listen %s error %s\r\n", m_listenAddr.c_str());
 			return;
 		}
-		CString info(_T("停止监听"));
+		CString info(_T("Stop Listen"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 
 		printf("listen %s ok\r\n", m_listenAddr.c_str());
 		m_fiberListen = new CFiberListener(m_listen);
 		m_fiberListen->start();
-	}
-	else if (acl::fiber::scheduled())
-	{
+	} else if (acl::fiber::scheduled()) {
 		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
 		m_fiberListen->kill();
 		printf("listening fiber was killed\r\n");
@@ -256,12 +241,10 @@ void CWinEchodDlg::OnBnClickedListen()
 		printf("listening socket was closed\r\n");
 		m_fiberListen = NULL;
 		printf("fiber schedule stopped!\r\n");
-		CString info(_T("开始监听"));
+		CString info(_T("Begin Listen"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
-	}
-	else
-	{
+	} else {
 		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
 		m_listen.close();
 		printf("listening socket was closed\r\n");
@@ -286,8 +269,7 @@ void CWinEchodDlg::OnBnClickedConnect()
 	GetDlgItem(IDC_CONNECT)->EnableWindow(FALSE);
 
 	UINT n = m_cocurrent;
-	for (UINT i = 0; i < n; i++)
-	{
+	for (UINT i = 0; i < n; i++) {
 		acl::fiber* fb = new CFiberConnect(
 			*this, m_listenAddr.c_str(), m_count);
 		fb->start();
@@ -296,8 +278,7 @@ void CWinEchodDlg::OnBnClickedConnect()
 
 void CWinEchodDlg::OnFiberConnectExit(void)
 {
-	if (--m_cocurrent == 0)
-	{
+	if (--m_cocurrent == 0) {
 		GetDlgItem(IDC_CONNECT)->EnableWindow(TRUE);
 		printf("All connect fibers finished now!\r\n");
 	}
@@ -307,12 +288,10 @@ void CWinEchodDlg::OnFiberConnectExit(void)
 void CWinEchodDlg::OnBnClickedOk()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	if (acl::fiber::scheduled())
-	{
+	if (acl::fiber::scheduled()) {
 		acl::fiber::schedule_stop();
 	}
-	if (m_cocurrent > 0)
-	{
+	if (m_cocurrent > 0) {
 		printf("there %d fibers connected\r\n", m_cocurrent);
 	}
 

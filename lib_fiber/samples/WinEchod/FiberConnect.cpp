@@ -5,9 +5,9 @@
 #include "FiberConnect.h"
 
 CFiberConnect::CFiberConnect(CWinEchodDlg& hWin, const char* serverAddr, int count)
-	: m_hWin(hWin)
-	, m_serverAddr(serverAddr)
-	, m_count(count)
+: m_hWin(hWin)
+, m_serverAddr(serverAddr)
+, m_count(count)
 {
 }
 
@@ -43,7 +43,7 @@ void CFiberConnect::run(void)
 	acl_fiber_close(m_sock);
 #else
 	acl::socket_stream conn;
-	if (conn.open(m_serverAddr, 10, 0) == false)
+	if (conn.open(m_serverAddr, 2, 0) == false)
 		printf("connect %s error %s\r\n", m_serverAddr.c_str(),
 			acl::last_serror());
 	else
@@ -58,16 +58,13 @@ void CFiberConnect::doEcho(socket_t sock)
 	char buf[1024];
 	const char* s = "hello world\r\n";
 
-	for (int i = 0; i < m_count; i++)
-	{
-		if (acl_fiber_send(sock, s, (int) strlen(s), 0) < 0)
-		{
+	for (int i = 0; i < m_count; i++) {
+		if (acl_fiber_send(sock, s, (int) strlen(s), 0) < 0) {
 			printf("send error %s\r\n", acl::last_serror());
 			break;
 		}
 		int n = acl_fiber_recv(sock, buf, sizeof(buf) - 1, 0);
-		if (n <= 0)
-		{
+		if (n <= 0) {
 			printf("read error %s\r\n", acl::last_serror());
 			break;
 		}
@@ -81,16 +78,13 @@ void CFiberConnect::doEcho(acl::socket_stream& conn)
 	char buf[1024];
 	const char* s = "hello world\r\n";
 
-	for (int i = 0; i < m_count; i++)
-	{
-		if (conn.write(s, strlen(s)) == -1)
-		{
+	for (int i = 0; i < m_count; i++) {
+		if (conn.write(s, strlen(s)) == -1) {
 			printf("write error %s\r\n", acl::last_serror());
 			break;
 		}
 		int n = conn.read(buf, sizeof(buf) - 1, false);
-		if (n == -1)
-		{
+		if (n == -1) {
 			printf("read error %s\r\n", acl::last_serror());
 			break;
 		}

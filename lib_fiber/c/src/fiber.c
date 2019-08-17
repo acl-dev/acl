@@ -744,6 +744,7 @@ void acl_fiber_schedule(void)
 		fiber_free(fiber);
 	}
 
+	fiber_io_clear();
 	acl_fiber_hook_api(0);
 	__scheduled = 0;
 }

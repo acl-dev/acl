@@ -1,4 +1,8 @@
 
+113) 2019.8.17
+113.1) bugfix: fiber_io.c 中 fiber_io_loop() 当 IO 调度退出无法再次重启 IO 调度过程，
+解决方法是在 acl_fiber_schedule() 结尾处重置 IO 调度器状态
+
 112) 2019.8.12
 112.1) workaroud: gettimeofday() 增加条件编译开关
 
