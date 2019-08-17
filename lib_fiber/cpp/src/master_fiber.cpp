@@ -12,13 +12,12 @@ static bool has_called = false;
 
 const char* master_fiber::get_conf_path(void) const
 {
-	if (daemon_mode_)
-	{
+	if (daemon_mode_) {
 		const char* ptr = acl_fiber_server_conf();
 		return ptr && *ptr ? ptr : NULL;
-	}
-	else
+	} else {
 		return conf_.get_path();
+	}
 }
 
 void master_fiber::run(int argc, char** argv)
@@ -61,8 +60,7 @@ bool master_fiber::run_alone(const char* addrs, const char* path /* = NULL */)
 	argv[argc++] = file_path ? file_path : "unknown";
 	argv[argc++] = "-L";
 	argv[argc++] = addrs;
-	if (path && *path)
-	{
+	if (path && *path) {
 		argv[argc++] = "-f";
 		argv[argc++] = path;
 	}
@@ -111,8 +109,7 @@ void master_fiber::service_on_accept(void* ctx, ACL_VSTREAM *client)
 	acl_assert(mf != NULL);
 
 	socket_stream stream;
-	if (stream.open(client) == false)
-	{
+	if (!stream.open(client)) {
 		logger_error("open stream error(%s)", acl_last_serror());
 		return;
 	}
@@ -134,8 +131,9 @@ int master_fiber::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 	acl_assert(mf);
 	string s;
 	bool ret = mf->proc_on_sighup(s);
-	if (buf)
+	if (buf) {
 		acl_vstring_strcpy(buf, s.c_str());
+	}
 	return ret ? 0 : -1;
 }
 

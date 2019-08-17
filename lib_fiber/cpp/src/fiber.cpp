@@ -5,15 +5,15 @@ namespace acl {
 
 fiber::fiber(bool running /* = false */)
 {
-	if (running)
-	{
+	if (running) {
 		f_ = acl_fiber_running();
-		if (f_ == NULL)
+		if (f_ == NULL) {
 			acl_msg_fatal("%s(%d), %s: current fiber not running!",
 				__FILE__, __LINE__, __FUNCTION__);
-	}
-	else
+		}
+	} else {
 		f_ = NULL;
+	}
 }
 
 fiber::~fiber(void)
@@ -37,8 +37,9 @@ int fiber::get_errno(void) const
 
 void fiber::set_errno(int errnum)
 {
-	if (f_)
+	if (f_) {
 		acl_fiber_set_errno(f_, errnum);
+	}
 }
 
 const char* fiber::last_serror(void)
@@ -70,8 +71,9 @@ void fiber::ready(fiber& f)
 {
 	ACL_FIBER *fb = f.get_fiber();
 
-	if (fb)
+	if (fb) {
 		acl_fiber_ready(f.get_fiber());
+	}
 }
 
 unsigned int fiber::delay(unsigned int milliseconds)
@@ -138,10 +140,10 @@ void fiber::run(void)
 
 void fiber::start(size_t stack_size /* = 64000 */)
 {
-	if (f_ != NULL)
+	if (f_ != NULL) {
 		acl_msg_fatal("%s(%d), %s: fiber-%u, already running!",
 			__FILE__, __LINE__, __FUNCTION__, self());
-
+	}
 	acl_fiber_create(fiber_callback, this, stack_size);
 }
 
@@ -154,19 +156,20 @@ void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 
 bool fiber::kill(void)
 {
-	if (f_ == NULL)
+	if (f_ == NULL) {
 		return false;
-	else if (acl_fiber_killed(f_))
+	} else if (acl_fiber_killed(f_)) {
 		return true;
+	}
 	acl_fiber_kill(f_);
 	return true;
 }
 
 bool fiber::killed(void) const
 {
-	if (f_ != NULL)
+	if (f_ != NULL) {
 		return acl_fiber_killed(f_) != 0;
-
+	}
 	acl_msg_error("%s(%d), %s: f_ NULL", __FILE__, __LINE__, __FUNCTION__);
 	return true;
 }
@@ -174,8 +177,9 @@ bool fiber::killed(void) const
 bool fiber::self_killed(void)
 {
 	ACL_FIBER* curr = acl_fiber_running();
-	if (curr == NULL)
+	if (curr == NULL) {
 		return false;
+	}
 	return acl_fiber_killed(curr) ? true : false;
 }
 
@@ -183,8 +187,7 @@ void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
 {
 	int etype;
 
-	switch (type)
-	{
+	switch (type) {
 	case FIBER_EVENT_T_POLL:
 		etype = FIBER_EVENT_POLL;
 		break;
@@ -213,8 +216,7 @@ void fiber::schedule_with(fiber_event_t type)
 {
 	int etype;
 
-	switch (type)
-	{
+	switch (type) {
 	case FIBER_EVENT_T_POLL:
 		etype = FIBER_EVENT_POLL;
 		break;
