@@ -181,15 +181,14 @@ void CWinEchodDlg::OnBnClickedOpenDos()
 		UpdateData();
 		AllocConsole();
 		m_dosFp = freopen("CONOUT$","w+t",stdout);
-		printf("DOS opened now, listen=%s:%d\r\n",
-			m_listenIP.GetString(), m_listenPort);
-		CString info(_T("关闭 DOS 窗口 "));
+		printf("DOS opened, listen=%s\r\n", m_listenAddr.c_str());
+		CString info(_T("Close DOS"));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
 	} else {
 		fclose(m_dosFp);
 		m_dosFp = NULL;
 		FreeConsole();
-		CString info(_T("打开 DOS 窗口"));
+		CString info(_T("Open DOS"));
 		GetDlgItem(IDC_OPEN_DOS)->SetWindowText(info);
 	}
 }
@@ -249,7 +248,7 @@ void CWinEchodDlg::OnBnClickedListen()
 		m_listen.close();
 		printf("listening socket was closed\r\n");
 		m_fiberListen = NULL;
-		CString info(_T("开始监听"));
+		CString info(_T("Begin Listen"));
 		GetDlgItem(IDC_LISTEN)->SetWindowText(info);
 		GetDlgItem(IDC_LISTEN)->EnableWindow(TRUE);
 	}

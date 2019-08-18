@@ -14,8 +14,9 @@ CFiberListener::~CFiberListener(void)
 void CFiberListener::run(void)
 {
 	printf("listener fiber run ...\r\n");
+	printf("Listener sleep 1000 ms\r\n");
 	acl_fiber_delay(1000);
-	printf("wakeup now\r\n");
+	printf("Listener wakeup now\r\n");
 
 #if 0
 	socket_t lfd = m_listener.sock_handle();
