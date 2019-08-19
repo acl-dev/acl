@@ -102,6 +102,8 @@ struct	ACL_EVENT {
 	int   fdsize;
 	/* 当前套接字个数 */
 	int   fdcnt;
+	/* 上一次做全量检查时的下标位置 */
+	int   fdpos;
 	/* 事件循环时准备好的套接字个数 */
 	int   ready_cnt;
 	/* 套接字事件对象表集合 */

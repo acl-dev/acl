@@ -12,8 +12,12 @@ void event_check_fds(ACL_EVENT *ev)
 	ACL_EVENT_FDTABLE *fdp;
 	int   i;
 
-	for (i = 0; i < ev->fdcnt; i++) {
-		fdp = ev->fdtabs[i];
+	if (ev->fdpos >= ev->fdcnt) {
+		ev->fdpos = 0;
+	}
+
+	for (i = 0; i < 5000 && ev->fdpos < ev->fdcnt; i++, ev->fdpos++) {
+		fdp = ev->fdtabs[ev->fdpos];
 		if ((fdp->stream->flag & ACL_VSTREAM_FLAG_BAD) != 0) {
 			fdp->stream->flag &= ~ACL_VSTREAM_FLAG_BAD;
 			fdp->event_type |= ACL_EVENT_XCPT;
