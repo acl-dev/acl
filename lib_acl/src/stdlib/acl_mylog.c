@@ -584,6 +584,7 @@ static void fork_prepare(void)
 		acl_foreach(iter, __loggers) {
 			ACL_LOG *log = (ACL_LOG *) iter.data;
 			if (log->lock) {
+				thread_mutex_unlock(log->lock);
 				thread_mutex_lock(log->lock);
 			}
 		}
