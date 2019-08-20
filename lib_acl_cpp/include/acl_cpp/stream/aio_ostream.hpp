@@ -171,9 +171,8 @@ protected:
 
 private:
 	friend class aio_timer_writer;
-	std::list<aio_timer_writer*> timer_writers_;
+	std::list<aio_timer_writer*>* timer_writers_;
 	std::list<AIO_CALLBACK*> write_callbacks_;
-	bool write_hooked_;
 
 	static int write_callback(ACL_ASTREAM*, void*);
 	static int write_wakup(ACL_ASTREAM*, void*);

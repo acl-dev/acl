@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include <list>
 #include "aio_handle.hpp"
 #include "aio_timer_callback.hpp"
 #include "aio_stream.hpp"
@@ -213,7 +214,6 @@ private:
 	friend class aio_timer_reader;
 	aio_timer_reader* timer_reader_;
 	std::list<AIO_CALLBACK*> read_callbacks_;
-	bool read_hooked_;
 
 	static int read_callback(ACL_ASTREAM*,  void*, char*, int);
 	static int read_wakeup(ACL_ASTREAM* stream, void* ctx);

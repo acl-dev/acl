@@ -1286,14 +1286,14 @@ public:
 	}
 
 private:
-	bool use_bin_;
 	ACL_VSTRING* vbf_;
 	char* scan_ptr_;
 	std::list<string>* list_tmp_;
 	std::vector<string>* vector_tmp_;
 	std::pair<string, string>* pair_tmp_;
 	ACL_LINE_STATE* line_state_;
-	int   line_state_offset_;
+	int  line_state_offset_;
+	bool use_bin_;
 
 	void init(size_t len);
 };

@@ -1,5 +1,9 @@
 修改历史列表：
 
+587) 2019.8.20
+587.1) optimize: 优化 aio_socket_stream/aio_istream/aio_ostream/aio_stream,
+socket_stream/istream/ostream/stream 等类的成员变量，以降低类对象的尺寸大小
+
 586) 2019.8.9
 586.1) bugfix: http_aclient.cpp 通过 set_ws_key() 设置的 key 应该做 Base64 编码
 

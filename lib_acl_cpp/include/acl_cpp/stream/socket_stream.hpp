@@ -3,6 +3,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 #endif
+#include <string>
 #include "istream.hpp"
 #include "ostream.hpp"
 
@@ -239,10 +240,8 @@ public:
 	bool get_tcp_non_blocking(void);
 
 private:
-	char  dummy_[1];
-	char  peer_ip_[256];
-	char  local_ip_[256];
-	const char* get_ip(const char* addr, char* buf, size_t size);
+	std::string ipbuf_;
+	const char* get_ip(const char* addr, std::string& out);
 };
 
 } // namespace acl

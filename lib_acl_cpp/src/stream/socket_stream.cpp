@@ -9,9 +9,6 @@ namespace acl {
 
 socket_stream::socket_stream(void)
 {
-	dummy_[0] = 0;
-	peer_ip_[0] = 0;
-	local_ip_[0] = 0;
 }
 
 socket_stream::~socket_stream(void)
@@ -140,7 +137,7 @@ int socket_stream::sock_type(void) const
 const char* socket_stream::get_peer(bool full /* = false */) const
 {
 	if (stream_ == NULL) {
-		return dummy_;
+		return "";
 	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
@@ -150,7 +147,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1) {
 
-			return dummy_;
+			return "";
 		}
 		acl_vstream_set_peer(stream_, buf);
 	}
@@ -165,11 +162,8 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 const char* socket_stream::get_peer_ip(void) const
 {
 	if (stream_ == NULL) {
-		return dummy_;
+		return "";
 	}
-
-	//if (peer_ip_[0] != 0)
-	//	return peer_ip_;
 
 	char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0) {
@@ -177,15 +171,14 @@ const char* socket_stream::get_peer_ip(void) const
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1) {
 
-			return dummy_;
+			return "";
 		}
 		acl_vstream_set_peer(stream_, buf);
 	}
 
-	return const_cast<socket_stream*> (this)->get_ip(
-		ACL_VSTREAM_PEER(stream_),
-		const_cast<socket_stream*> (this)->peer_ip_,
-		sizeof(peer_ip_));
+	return const_cast<socket_stream*>
+		(this)->get_ip(ACL_VSTREAM_PEER(stream_),
+			const_cast<socket_stream*> (this)->ipbuf_);
 }
 
 bool socket_stream::set_peer(const char* addr)
@@ -202,7 +195,7 @@ bool socket_stream::set_peer(const char* addr)
 const char* socket_stream::get_local(bool full /* = false */) const
 {
 	if (stream_ == NULL) {
-		return dummy_;
+		return "";
 	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
@@ -212,7 +205,7 @@ const char* socket_stream::get_local(bool full /* = false */) const
 		if (acl_getsockname(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1) {
 
-			return dummy_;
+			return "";
 		}
 		acl_vstream_set_local(stream_, buf);
 	}
@@ -227,12 +220,8 @@ const char* socket_stream::get_local(bool full /* = false */) const
 const char* socket_stream::get_local_ip(void) const
 {
 	if (stream_ == NULL) {
-		return dummy_;
+		return "";
 	}
-
-	// xxx: acl_vstream 中没有对此地址赋值
-	//if (local_ip_[0] != 0)
-	//	return local_ip_;
 
 	char* ptr = ACL_VSTREAM_LOCAL(stream_);
 	if (ptr == NULL || *ptr == 0) {
@@ -240,15 +229,14 @@ const char* socket_stream::get_local_ip(void) const
 		if (acl_getsockname(ACL_VSTREAM_SOCK(stream_),
 			buf, sizeof(buf)) == -1) {
 
-			return dummy_;
+			return "";
 		}
 		acl_vstream_set_local(stream_, buf);
 	}
 
-	return const_cast<socket_stream*>(this)->get_ip(
-		ACL_VSTREAM_LOCAL(stream_),
-		const_cast<socket_stream*>(this)->local_ip_,
-		sizeof(local_ip_));
+	return const_cast<socket_stream*>
+		(this)->get_ip(ACL_VSTREAM_LOCAL(stream_),
+			const_cast<socket_stream*>(this)->ipbuf_);
 }
 
 bool socket_stream::set_local(const char* addr)
@@ -262,14 +250,16 @@ bool socket_stream::set_local(const char* addr)
 	return true;
 }
 
-const char* socket_stream::get_ip(const char* addr, char* buf, size_t size)
+const char* socket_stream::get_ip(const char* addr, std::string& out)
 {
-	safe_snprintf(buf, size, "%s", addr);
+	char buf[256];
+	safe_snprintf(buf, sizeof(buf), "%s", addr);
 	char* ptr = strchr(buf, ':');
 	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':'))) {
 		*ptr = 0;
 	}
-	return buf;
+	out = ptr;
+	return out.c_str();
 }
 
 bool socket_stream::alive(void) const

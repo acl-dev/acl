@@ -11,9 +11,10 @@ namespace acl {
 stream::stream(void)
 : hook_(NULL)
 , stream_(NULL)
+, default_ctx_(NULL)
+, ctx_table_(NULL)
 , eof_(true)
 , opened_(false)
-, default_ctx_(NULL)
 {
 }
 
@@ -25,6 +26,7 @@ stream::~stream(void)
 	if (stream_) {
 		acl_vstream_free(stream_);
 	}
+	delete ctx_table_;
 }
 
 bool stream::eof(void) const
@@ -123,16 +125,21 @@ bool stream::set_ctx(void* ctx, const char* key /* = NULL */,
 		default_ctx_ = ctx;
 		return true;
 	}
+
+	if (ctx_table_ == NULL) {
+		ctx_table_ = NEW std::map<string, void*>;
+	}
+
 	if (replace) {
-		ctx_table_[key] = ctx;
+		(*ctx_table_)[key] = ctx;
 		return true;
 	}
 
-	std::map<string, void*>::const_iterator cit = ctx_table_.find(key);
-	if (cit != ctx_table_.end()) {
+	std::map<string, void*>::const_iterator cit = ctx_table_->find(key);
+	if (cit != ctx_table_->end()) {
 		return false;
 	}
-	ctx_table_[key] = ctx;
+	(*ctx_table_)[key] = ctx;
 	return true;
 }
 
@@ -141,8 +148,11 @@ void* stream::get_ctx(const char* key /* = NULL */) const
 	if (key == NULL || *key == 0) {
 		return default_ctx_;
 	}
-	std::map<string, void*>::const_iterator it = ctx_table_.find(key);
-	if (it != ctx_table_.end()) {
+	if (ctx_table_ == NULL) {
+		return NULL;
+	}
+	std::map<string, void*>::const_iterator it = ctx_table_->find(key);
+	if (it != ctx_table_->end()) {
 		return it->second;
 	} else {
 		return NULL;
@@ -160,12 +170,16 @@ void* stream::del_ctx(const char* key /* = NULL */)
 		return ctx;
 	}
 
-	std::map<string, void*>::iterator it = ctx_table_.find(key);
-	if (it == ctx_table_.end()) {
+	if (ctx_table_ == NULL) {
+		return NULL;
+	}
+
+	std::map<string, void*>::iterator it = ctx_table_->find(key);
+	if (it == ctx_table_->end()) {
 		return NULL;
 	}
 	void *ctx = it->second;
-	ctx_table_.erase(it);
+	ctx_table_->erase(it);
 	return ctx;
 }
 

@@ -25,13 +25,16 @@ void aio_timer_writer::timer_callback(unsigned int id acl_unused)
 	}
 
 	bool findit = false;
-	std::list<aio_timer_writer*>::iterator it =
-		out_->timer_writers_.begin();
-	for (; it != out_->timer_writers_.end(); ++it) {
-		if ((*it) == this) {
-			out_->timer_writers_.erase(it);
-			findit = true;
-			break;
+
+	if (out_->timer_writers_) {
+		std::list<aio_timer_writer*>::iterator it =
+			out_->timer_writers_->begin();
+		for (; it != out_->timer_writers_->end(); ++it) {
+			if ((*it) == this) {
+				out_->timer_writers_->erase(it);
+				findit = true;
+				break;
+			}
 		}
 	}
 
@@ -46,13 +49,12 @@ void aio_timer_writer::timer_callback(unsigned int id acl_unused)
 
 aio_ostream::aio_ostream(aio_handle* handle)
 : aio_stream(handle)
-, write_hooked_(false)
+, timer_writers_(NULL)
 {
 }
 
 aio_ostream::aio_ostream(aio_handle* handle, ACL_SOCKET fd)
 : aio_stream(handle)
-, write_hooked_(false)
 {
 	acl_assert(handle);
 
@@ -71,19 +73,20 @@ aio_ostream::aio_ostream(aio_handle* handle, ACL_SOCKET fd)
 
 aio_ostream::~aio_ostream(void)
 {
-	std::list<aio_timer_writer*>::iterator it = timer_writers_.begin();
-
-	for (; it != timer_writers_.end(); ++it) {
-		handle_->del_timer(*it);
-		(*it)->destroy();
+	if (timer_writers_) {
+		std::list<aio_timer_writer*>::iterator it =
+			timer_writers_->begin();
+		for (; it != timer_writers_->end(); ++it) {
+			handle_->del_timer(*it);
+			(*it)->destroy();
+		}
+		delete timer_writers_;
 	}
-	timer_writers_.clear();
 
-	std::list<AIO_CALLBACK*>::iterator it2 = write_callbacks_.begin();
-	for (; it2 != write_callbacks_.end(); ++it2) {
-		acl_myfree((*it2));
+	std::list<AIO_CALLBACK*>::iterator it = write_callbacks_.begin();
+	for (; it != write_callbacks_.end(); ++it) {
+		acl_myfree(*it);
 	}
-	write_callbacks_.clear();
 }
 
 void aio_ostream::destroy(void)
@@ -208,10 +211,11 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 void aio_ostream::hook_write(void)
 {
 	acl_assert(stream_);
-	if (write_hooked_) {
+
+	if ((status_ & STATUS_HOOKED_WRITE)) {
 		return;
 	}
-	write_hooked_ = true;
+	status_ |= STATUS_HOOKED_WRITE;
 
 	acl_aio_add_write_hook(stream_, write_callback, this);
 }
@@ -242,7 +246,10 @@ void aio_ostream::write(const void* data, int len,
 		timer_writer->buf_.copy(data, len);
 
 		// 将该写操作放入延迟异步写的队列中
-		timer_writers_.push_back(timer_writer);
+		if (timer_writers_ == NULL) {
+			timer_writers_ = NEW std::list<aio_timer_writer*>;
+		}
+		timer_writers_->push_back(timer_writer);
 		// 设置定时器
 		handle_->set_timer(timer_writer, delay);
 		return;

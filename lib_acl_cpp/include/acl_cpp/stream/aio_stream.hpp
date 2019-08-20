@@ -2,6 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 #include <list>
+#include <string>
 #if defined(_WIN32) || defined(_WIN64)
 #include <WinSock2.h>
 #endif
@@ -70,8 +71,6 @@ public:
 	{
 		return true;
 	}
-protected:
-private:
 };
 
 struct AIO_CALLBACK 
@@ -239,7 +238,7 @@ public:
 	stream_hook* remove_hook(void);
 
 protected:
-	aio_handle* handle_;
+	aio_handle*  handle_;
 	ACL_ASTREAM* stream_;
 	stream_hook* hook_;
 
@@ -256,19 +255,29 @@ protected:
 	 */
 	void hook_error(void);
 
+protected:
+	enum {
+		// 是否调用了 hook_xxx 函数对应的标志位
+		STATUS_HOOKED_ERROR = 1,
+		STATUS_HOOKED_READ  = 1 << 1,
+		STATUS_HOOKED_WRITE = 1 << 2,
+		STATUS_HOOKED_OPEN  = 1 << 3,
+
+		// 对于 aio_socket_stream 流表示是否连接已建立
+		STATUS_CONN_OPENED  = 1 << 4,
+	};
+	unsigned status_;
 private:
-	bool error_hooked_;
-	std::list<AIO_CALLBACK*> close_callbacks_;
-	std::list<AIO_CALLBACK*> timeout_callbacks_;
+	std::list<AIO_CALLBACK*>* close_callbacks_;
+	std::list<AIO_CALLBACK*>* timeout_callbacks_;
 
 	static int close_callback(ACL_ASTREAM*, void*);
 	static int timeout_callback(ACL_ASTREAM*, void*);
 
 private:
-	char  dummy_[1];
-	char  peer_ip_[33];
-	char  local_ip_[33];
-	const char* get_ip(const char* addr, char* buf, size_t size);
+	std::string ipbuf_;
+
+	const char* get_ip(const char* addr, std::string& out);
 
 private:
 #if defined(_WIN32) || defined(_WIN64)

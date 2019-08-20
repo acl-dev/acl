@@ -10,11 +10,14 @@ namespace acl
 aio_socket_stream::aio_socket_stream(aio_handle* handle,
 	ACL_ASTREAM* stream, bool opened /* = false */)
 : aio_stream(handle), aio_istream(handle), aio_ostream(handle)
-, opened_(opened)
-, open_hooked_(false)
+, open_callbacks_(NULL)
 {
 	acl_assert(handle);
 	acl_assert(stream);
+
+	if (opened) {
+		status_ |= STATUS_CONN_OPENED;
+	}
 
 	stream_ = stream;
 
@@ -34,10 +37,11 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle,
 
 aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 : aio_stream(handle), aio_istream(handle), aio_ostream(handle)
-, opened_(true)
-, open_hooked_(false)
+, open_callbacks_(NULL)
 {
 	acl_assert(handle);
+
+	status_ |= STATUS_CONN_OPENED;
 
 	ACL_VSTREAM* vstream = acl_vstream_fdopen(fd, O_RDWR, 8192, 0,
 					ACL_VSTREAM_TYPE_SOCK);
@@ -57,11 +61,14 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 
 aio_socket_stream::~aio_socket_stream(void)
 {
-	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_.begin();
-	for (; it != open_callbacks_.end(); ++it) {
-		acl_myfree((*it));
+	if (open_callbacks_) {
+		std::list<AIO_OPEN_CALLBACK*>::iterator
+			it = open_callbacks_->begin();
+		for (; it != open_callbacks_->end(); ++it) {
+			acl_myfree(*it);
+		}
+		delete open_callbacks_;
 	}
-	open_callbacks_.clear();
 }
 
 void aio_socket_stream::destroy(void)
@@ -71,9 +78,13 @@ void aio_socket_stream::destroy(void)
 
 void aio_socket_stream::add_open_callback(aio_open_callback* callback)
 {
+	if (open_callbacks_ == NULL) {
+		open_callbacks_ = NEW std::list<AIO_OPEN_CALLBACK*>;
+	}
+
 	// 先查询该回调对象已经存在
-	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_.begin();
-	for (; it != open_callbacks_.end(); ++it) {
+	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_->begin();
+	for (; it != open_callbacks_->end(); ++it) {
 		if ((*it)->callback == callback) {
 			if ((*it)->enable == false) {
 				(*it)->enable = true;
@@ -83,8 +94,8 @@ void aio_socket_stream::add_open_callback(aio_open_callback* callback)
 	}
 
 	// 找一个空位
-	it = open_callbacks_.begin();
-	for (; it != open_callbacks_.end(); ++it) {
+	it = open_callbacks_->begin();
+	for (; it != open_callbacks_->end(); ++it) {
 		if ((*it)->callback == NULL) {
 			(*it)->enable = true;
 			(*it)->callback = callback;
@@ -99,16 +110,20 @@ void aio_socket_stream::add_open_callback(aio_open_callback* callback)
 	ac->callback = callback;
 
 	// 添加进回调对象队列中
-	open_callbacks_.push_back(ac);
+	open_callbacks_->push_back(ac);
 }
 
 int aio_socket_stream::del_open_callback(aio_open_callback* callback /* = NULL */)
 {
-	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_.begin();
+	if (open_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != open_callbacks_.end(); ++it) {
+		for (; it != open_callbacks_->end(); ++it) {
 			if ((*it)->callback == NULL) {
 				continue;
 			}
@@ -117,7 +132,7 @@ int aio_socket_stream::del_open_callback(aio_open_callback* callback /* = NULL *
 			n++;
 		}
 	} else {
-		for (; it != open_callbacks_.end(); ++it) {
+		for (; it != open_callbacks_->end(); ++it) {
 			if ((*it)->callback != callback) {
 				continue;
 			}
@@ -133,11 +148,15 @@ int aio_socket_stream::del_open_callback(aio_open_callback* callback /* = NULL *
 
 int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NULL */)
 {
-	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_.begin();
+	if (open_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != open_callbacks_.end(); ++it) {
+		for (; it != open_callbacks_->end(); ++it) {
 			if ((*it)->callback == NULL || !(*it)->enable) {
 				continue;
 			}
@@ -145,7 +164,7 @@ int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NU
 			n++;
 		}
 	} else {
-		for (; it != open_callbacks_.end(); ++it) {
+		for (; it != open_callbacks_->end(); ++it) {
 			if ((*it)->callback != callback || !(*it)->enable) {
 				continue;
 			}
@@ -160,18 +179,22 @@ int aio_socket_stream::disable_open_callback(aio_open_callback* callback /* = NU
 
 int aio_socket_stream::enable_open_callback(aio_open_callback* callback /* = NULL */)
 {
-	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_.begin();
+	if (open_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_OPEN_CALLBACK*>::iterator it = open_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != open_callbacks_.end(); ++it) {
+		for (; it != open_callbacks_->end(); ++it) {
 			if (!(*it)->enable && (*it)->callback != NULL) {
 				(*it)->enable = true;
 				n++;
 			}
 		}
 	} else {
-		for (; it != open_callbacks_.end(); ++it) {
+		for (; it != open_callbacks_->end(); ++it) {
 			if (!(*it)->enable && (*it)->callback == callback) {
 				(*it)->enable = true;
 				n++;
@@ -207,16 +230,17 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 
 bool aio_socket_stream::is_opened(void) const
 {
-	return opened_;
+	return (status_ & STATUS_CONN_OPENED) ? true : false;
 }
 
 void aio_socket_stream::hook_open(void)
 {
 	acl_assert(stream_);
-	if (open_hooked_) {
+
+	if ((status_ & STATUS_HOOKED_OPEN)) {
 		return;
 	}
-	open_hooked_ = true;
+	status_ |= STATUS_HOOKED_OPEN;
 
 	acl_aio_ctl(stream_,
 		ACL_AIO_CTL_CONNECT_HOOK_ADD, open_callback, this,
@@ -228,7 +252,7 @@ int aio_socket_stream::open_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 	aio_socket_stream* ss = (aio_socket_stream*) ctx;
 
 	// 设置状态，表明已经连接成功
-	ss->opened_ = true;
+	ss->status_ |= STATUS_CONN_OPENED;
 
 	// hook 读回调过程
 	ss->hook_read();
@@ -236,10 +260,13 @@ int aio_socket_stream::open_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 	// hook 写回调过程
 	ss->hook_write();
 
+	if (ss->open_callbacks_ == NULL) {
+		return 0;
+	}
+
 	// 遍历所有的打开回调对象，并调用之
-	std::list<AIO_OPEN_CALLBACK*>::iterator it =
-		ss->open_callbacks_.begin();
-	for (; it != ss->open_callbacks_.end(); ++it) {
+	std::list<AIO_OPEN_CALLBACK*>::iterator it = ss->open_callbacks_->begin();
+	for (; it != ss->open_callbacks_->end(); ++it) {
 		if (!(*it)->enable || (*it)->callback == NULL) {
 			continue;
 		}

@@ -31,14 +31,12 @@ void aio_timer_reader::timer_callback(unsigned int id acl_unused)
 aio_istream::aio_istream(aio_handle* handle)
 : aio_stream(handle)
 , timer_reader_(NULL)
-, read_hooked_(false)
 {
 }
 
 aio_istream::aio_istream(aio_handle* handle, ACL_SOCKET fd)
 : aio_stream(handle)
 , timer_reader_(NULL)
-, read_hooked_(false)
 {
 	acl_assert(handle);
 
@@ -66,7 +64,6 @@ aio_istream::~aio_istream(void)
 	for (; it != read_callbacks_.end(); ++it) {
 		acl_myfree((*it));
 	}
-	read_callbacks_.clear();
 }
 
 void aio_istream::destroy(void)
@@ -191,10 +188,11 @@ int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
 void aio_istream::hook_read(void)
 {
 	acl_assert(stream_);
-	if (read_hooked_) {
+
+	if ((status_ & STATUS_HOOKED_READ)) {
 		return;
 	}
-	read_hooked_ = true;
+	status_ |= STATUS_HOOKED_READ;
 
 	acl_aio_add_read_hook(stream_, read_callback, this);
 }

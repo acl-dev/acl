@@ -127,9 +127,7 @@ protected:
 	void hook_open(void);
 
 private:
-	bool opened_;  // 针对 open 函数而言表示连接是否成功
-	bool open_hooked_;
-	std::list<AIO_OPEN_CALLBACK*> open_callbacks_;
+	std::list<AIO_OPEN_CALLBACK*>* open_callbacks_;
 
 	static int open_callback(ACL_ASTREAM*, void*);
 };

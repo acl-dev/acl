@@ -14,12 +14,11 @@ aio_stream::aio_stream(aio_handle* handle)
 : handle_(handle)
 , stream_(NULL)
 , hook_(NULL)
-, error_hooked_(false)
+, status_(0)
+, close_callbacks_(NULL)
+, timeout_callbacks_(NULL)
 {
 	acl_assert(handle);
-	dummy_[0]    = 0;
-	peer_ip_[0]  = 0;
-	local_ip_[0] = 0;
 }
 
 aio_stream::~aio_stream(void)
@@ -33,17 +32,23 @@ aio_stream::~aio_stream(void)
 		acl_aio_iocp_close(stream_);
 	}
 
-	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_.begin();
-	for (; it != close_callbacks_.end(); ++it) {
-		acl_myfree((*it));
+	if (close_callbacks_) {
+		std::list<AIO_CALLBACK*>::iterator it =
+			close_callbacks_->begin();
+		for (; it != close_callbacks_->end(); ++it) {
+			acl_myfree((*it));
+		}
+		delete close_callbacks_;
 	}
-	close_callbacks_.clear();
 
-	it = timeout_callbacks_.begin();
-	for (; it != timeout_callbacks_.end(); ++it) {
-		acl_myfree((*it));
+	if (timeout_callbacks_) {
+		std::list<AIO_CALLBACK*>::iterator it =
+			timeout_callbacks_->begin();
+		for (; it != timeout_callbacks_->end(); ++it) {
+			acl_myfree((*it));
+		}
+		delete timeout_callbacks_;
 	}
-	timeout_callbacks_.clear();
 }
 
 void aio_stream::destroy(void)
@@ -60,7 +65,7 @@ void aio_stream::close(void)
 const char* aio_stream::get_peer(bool full /* = false */) const
 {
 	if (stream_ == NULL) {
-		return dummy_;
+		return "";
 	}
 
 	ACL_VSTREAM* vs = acl_aio_vstream(stream_);
@@ -71,7 +76,7 @@ const char* aio_stream::get_peer(bool full /* = false */) const
 		ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
 
 		if (acl_getpeername(fd, buf, sizeof(buf)) == -1) {
-			return dummy_;
+			return "";
 		}
 		acl_vstream_set_peer(vs, buf);
 	}
@@ -79,18 +84,16 @@ const char* aio_stream::get_peer(bool full /* = false */) const
 	ptr = ACL_VSTREAM_PEER(vs);
 	if (full) {
 		return ptr;
-	} else if (peer_ip_[0] != 0) {
-		return peer_ip_;
 	}
 
-	return const_cast<aio_stream*> (this)->get_ip(ptr,
-		const_cast<aio_stream*>(this)->peer_ip_, sizeof(peer_ip_));
+	return const_cast<aio_stream*>
+		(this)->get_ip(ptr, const_cast<aio_stream*>(this)->ipbuf_);
 }
 
 const char* aio_stream::get_local(bool full /* = false */) const
 {
 	if (stream_ == NULL) {
-		return dummy_;
+		return "";
 	}
 
 	ACL_VSTREAM* vs = acl_aio_vstream(stream_);
@@ -99,7 +102,7 @@ const char* aio_stream::get_local(bool full /* = false */) const
 	if (ptr == NULL || *ptr == 0) {
 		char  buf[256];
 		if (acl_getsockname(fd, buf, sizeof(buf)) == -1) {
-			return dummy_;
+			return "";
 		}
 		acl_vstream_set_local(vs, buf);
 	}
@@ -107,22 +110,22 @@ const char* aio_stream::get_local(bool full /* = false */) const
 	ptr = ACL_VSTREAM_LOCAL(vs);
 	if (full) {
 		return ptr;
-	} else if (local_ip_[0] != 0) {
-		return local_ip_;
 	}
 
-	return const_cast<aio_stream*> (this)->get_ip(ptr,
-		const_cast<aio_stream*>(this)->local_ip_, sizeof(local_ip_));
+	return const_cast<aio_stream*>
+		(this)->get_ip(ptr, const_cast<aio_stream*>(this)->ipbuf_);
 }
 
-const char* aio_stream::get_ip(const char* addr, char* buf, size_t size)
+const char* aio_stream::get_ip(const char* addr, std::string& out)
 {
-	safe_snprintf(buf, size, "%s", addr);
+	char buf[256];
+	safe_snprintf(buf, sizeof(buf), "%s", addr);
 	char* ptr = strchr(buf, ':');
 	if (ptr) {
 		*ptr = 0;
 	}
-	return buf;
+	out = ptr;
+	return out.c_str();
 }
 
 aio_handle& aio_stream::get_handle(void) const
@@ -156,10 +159,14 @@ void aio_stream::add_close_callback(aio_callback* callback)
 {
 	acl_assert(callback);
 
+	// copy on write
+	if (close_callbacks_ == NULL) {
+		close_callbacks_ = NEW std::list<AIO_CALLBACK*>;
+	}
+
 	// 先查询该回调对象已经存在
-	std::list<AIO_CALLBACK*>::iterator it =
-		close_callbacks_.begin();
-	for (; it != close_callbacks_.end(); ++it) {
+	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_->begin();
+	for (; it != close_callbacks_->end(); ++it) {
 		if ((*it)->callback == callback) {
 			if ((*it)->enable == false) {
 				(*it)->enable = true;
@@ -169,33 +176,35 @@ void aio_stream::add_close_callback(aio_callback* callback)
 	}
 
 	// 找一个空位
-	it = close_callbacks_.begin();
-	for (; it != close_callbacks_.end(); ++it) {
+	it = close_callbacks_->begin();
+	for (; it != close_callbacks_->end(); ++it) {
 		if ((*it)->callback == NULL) {
-			(*it)->enable = true;
+			(*it)->enable   = true;
 			(*it)->callback = callback;
 			return;
 		}
 	}
 
 	// 分配一个新的位置
-	AIO_CALLBACK* ac = (AIO_CALLBACK*)
-		acl_mycalloc(1, sizeof(AIO_CALLBACK));
+	AIO_CALLBACK* ac = (AIO_CALLBACK*) acl_mycalloc(1, sizeof(AIO_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
 	// 添加进回调对象队列中
-	close_callbacks_.push_back(ac);
+	close_callbacks_->push_back(ac);
 }
 
 void aio_stream::add_timeout_callback(aio_callback* callback)
 {
 	acl_assert(callback);
 
+	if (timeout_callbacks_ == NULL) {
+		timeout_callbacks_ = NEW std::list<AIO_CALLBACK*>;
+	}
+
 	// 先查询该回调对象已经存在
-	std::list<AIO_CALLBACK*>::iterator it =
-		timeout_callbacks_.begin();
-	for (; it != timeout_callbacks_.end(); ++it) {
+	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_->begin();
+	for (; it != timeout_callbacks_->end(); ++it) {
 		if ((*it)->callback == callback) {
 			if ((*it)->enable == false) {
 				(*it)->enable = true;
@@ -205,32 +214,35 @@ void aio_stream::add_timeout_callback(aio_callback* callback)
 	}
 
 	// 找一个空位
-	it = timeout_callbacks_.begin();
-	for (; it != timeout_callbacks_.end(); ++it) {
+	it = timeout_callbacks_->begin();
+	for (; it != timeout_callbacks_->end(); ++it) {
 		if ((*it)->callback == NULL) {
-			(*it)->enable = true;
+			(*it)->enable   = true;
 			(*it)->callback = callback;
 			return;
 		}
 	}
 
 	// 分配一个新的位置
-	AIO_CALLBACK* ac = (AIO_CALLBACK*)
-		acl_mycalloc(1, sizeof(AIO_CALLBACK));
+	AIO_CALLBACK* ac = (AIO_CALLBACK*) acl_mycalloc(1, sizeof(AIO_CALLBACK));
 	ac->enable   = true;
 	ac->callback = callback;
 
 	// 添加进回调对象队列中
-	timeout_callbacks_.push_back(ac);
+	timeout_callbacks_->push_back(ac);
 }
 
 int aio_stream::del_close_callback(aio_callback* callback)
 {
-	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_.begin();
+	if (close_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != close_callbacks_.end(); ++it) {
+		for (; it != close_callbacks_->end(); ++it) {
 			if ((*it)->callback == NULL) {
 				continue;
 			}
@@ -239,7 +251,7 @@ int aio_stream::del_close_callback(aio_callback* callback)
 			n++;
 		}
 	} else {
-		for (; it != close_callbacks_.end(); ++it) {
+		for (; it != close_callbacks_->end(); ++it) {
 			if ((*it)->callback != callback) {
 				continue;
 			}
@@ -255,11 +267,15 @@ int aio_stream::del_close_callback(aio_callback* callback)
 
 int aio_stream::del_timeout_callback(aio_callback* callback)
 {
-	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_.begin();
+	if (timeout_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != timeout_callbacks_.end(); ++it) {
+		for (; it != timeout_callbacks_->end(); ++it) {
 			if ((*it)->callback == NULL) {
 				continue;
 			}
@@ -268,7 +284,7 @@ int aio_stream::del_timeout_callback(aio_callback* callback)
 			n++;
 		}
 	} else {
-		for (; it != timeout_callbacks_.end(); ++it) {
+		for (; it != timeout_callbacks_->end(); ++it) {
 			if ((*it)->callback != callback) {
 				continue;
 			}
@@ -284,11 +300,15 @@ int aio_stream::del_timeout_callback(aio_callback* callback)
 
 int aio_stream::disable_close_callback(aio_callback* callback)
 {
-	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_.begin();
+	if (close_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != close_callbacks_.end(); ++it) {
+		for (; it != close_callbacks_->end(); ++it) {
 			if ((*it)->callback == NULL || !(*it)->enable) {
 				continue;
 			}
@@ -296,7 +316,7 @@ int aio_stream::disable_close_callback(aio_callback* callback)
 			n++;
 		}
 	} else {
-		for (; it != close_callbacks_.end(); ++it) {
+		for (; it != close_callbacks_->end(); ++it) {
 			if ((*it)->callback != callback || !(*it)->enable) {
 				continue;
 			}
@@ -311,11 +331,15 @@ int aio_stream::disable_close_callback(aio_callback* callback)
 
 int aio_stream::disable_timeout_callback(aio_callback* callback)
 {
-	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_.begin();
+	if (timeout_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != timeout_callbacks_.end(); ++it) {
+		for (; it != timeout_callbacks_->end(); ++it) {
 			if ((*it)->callback == NULL || !(*it)->enable) {
 				continue;
 			}
@@ -323,7 +347,7 @@ int aio_stream::disable_timeout_callback(aio_callback* callback)
 			n++;
 		}
 	} else {
-		for (; it != timeout_callbacks_.end(); ++it) {
+		for (; it != timeout_callbacks_->end(); ++it) {
 			if ((*it)->callback != callback || !(*it)->enable) {
 				continue;
 			}
@@ -338,18 +362,22 @@ int aio_stream::disable_timeout_callback(aio_callback* callback)
 
 int aio_stream::enable_close_callback(aio_callback* callback /* = NULL */)
 {
-	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_.begin();
+	if (close_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_CALLBACK*>::iterator it = close_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != close_callbacks_.end(); ++it) {
+		for (; it != close_callbacks_->end(); ++it) {
 			if (!(*it)->enable && (*it)->callback != NULL) {
 				(*it)->enable = true;
 				n++;
 			}
 		}
 	} else {
-		for (; it != close_callbacks_.end(); ++it) {
+		for (; it != close_callbacks_->end(); ++it) {
 			if (!(*it)->enable && (*it)->callback == callback) {
 				(*it)->enable = true;
 				n++;
@@ -362,18 +390,22 @@ int aio_stream::enable_close_callback(aio_callback* callback /* = NULL */)
 
 int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 {
-	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_.begin();
+	if (timeout_callbacks_ == NULL) {
+		return 0;
+	}
+
+	std::list<AIO_CALLBACK*>::iterator it = timeout_callbacks_->begin();
 	int   n = 0;
 
 	if (callback == NULL) {
-		for (; it != timeout_callbacks_.end(); ++it) {
+		for (; it != timeout_callbacks_->end(); ++it) {
 			if (!(*it)->enable && (*it)->callback != NULL) {
 				(*it)->enable = true;
 				n++;
 			}
 		}
 	} else {
-		for (; it != timeout_callbacks_.end(); ++it) {
+		for (; it != timeout_callbacks_->end(); ++it) {
 			if (!(*it)->enable && (*it)->callback == callback) {
 				(*it)->enable = true;
 				n++;
@@ -387,11 +419,12 @@ int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 void aio_stream::hook_error(void)
 {
 	acl_assert(stream_);
-	if (error_hooked_) {
+
+	if ((status_ & STATUS_HOOKED_ERROR)) {
 		return;
 	}
+	status_ |= STATUS_HOOKED_ERROR;
 
-	error_hooked_ = true;
 	handle_->increase();  // 增加异步流计数
 
 	// 注册回调函数以截获关闭时的过程
@@ -404,13 +437,17 @@ void aio_stream::hook_error(void)
 int aio_stream::close_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 {
 	aio_stream* as = (aio_stream*) ctx;
-	std::list<AIO_CALLBACK*>::iterator it = as->close_callbacks_.begin();
-	for (; it != as->close_callbacks_.end(); ++it) {
-		if ((*it)->enable == false || (*it)->callback == NULL) {
-			continue;
-		}
 
-		(*it)->callback->close_callback();
+	if (as->close_callbacks_) {
+		std::list<AIO_CALLBACK*>::iterator it =
+			as->close_callbacks_->begin();
+		for (; it != as->close_callbacks_->end(); ++it) {
+			if (!(*it)->enable || (*it)->callback == NULL) {
+				continue;
+			}
+
+			(*it)->callback->close_callback();
+		}
 	}
 
 	as->destroy();
@@ -420,14 +457,17 @@ int aio_stream::close_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 int aio_stream::timeout_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 {
 	aio_stream* as = (aio_stream*) ctx;
-	std::list<AIO_CALLBACK*>::iterator it = as->timeout_callbacks_.begin();
-	for (; it != as->timeout_callbacks_.end(); ++it) {
-		if ((*it)->enable == false || (*it)->callback == NULL) {
-			continue;
-		}
+	if (as->timeout_callbacks_) {
+		std::list<AIO_CALLBACK*>::iterator it =
+			as->timeout_callbacks_->begin();
+		for (; it != as->timeout_callbacks_->end(); ++it) {
+			if (!(*it)->enable || (*it)->callback == NULL) {
+				continue;
+			}
 
-		if ((*it)->callback->timeout_callback() == false) {
-			return -1;
+			if (!(*it)->callback->timeout_callback()) {
+				return -1;
+			}
 		}
 	}
 
