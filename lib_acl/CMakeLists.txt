@@ -149,6 +149,8 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
+	add_library(acl_static STATIC ${lib_src})
+	SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
 	link_directories(${lib_output_path})
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
