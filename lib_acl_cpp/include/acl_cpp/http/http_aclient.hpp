@@ -340,21 +340,21 @@ protected:
 
 protected:
 	unsigned           status_;
+	int                rw_timeout_;
+	int                gzip_header_left_;	// gzip 传输时压缩头部长度
+	bool               keep_alive_;
+	bool               unzip_;		// 是否自动解压响应体数据
 	aio_handle&        handle_;
 	polarssl_conf*     ssl_conf_;
-	int                rw_timeout_;
 	aio_socket_stream* conn_;
 	socket_stream*     stream_;
 	http_header*       header_;
 	HTTP_HDR_RES*      hdr_res_;
 	HTTP_RES*          http_res_;
-	bool               keep_alive_;
 	websocket*         ws_in_;
 	websocket*         ws_out_;
 	string*            buff_;
-	bool               unzip_;		// 是否自动解压响应体数据
 	zlib_stream*       zstream_;		// 解压对象
-	int                gzip_header_left_;	// gzip 传输时压缩头部长度
 	struct sockaddr_storage ns_addr_;	// 所使用的 DNS 服务器地址
 	struct sockaddr_storage serv_addr_;	// 所连接的应用服务器地址
 

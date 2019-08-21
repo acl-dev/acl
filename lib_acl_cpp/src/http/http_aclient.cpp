@@ -24,20 +24,20 @@ enum {
 
 http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL */)
 : status_(HTTP_ACLIENT_STATUS_NONE)
+, rw_timeout_(0)
+, gzip_header_left_(0)
+, keep_alive_(false)
+, unzip_(false)
 , handle_(handle)
 , ssl_conf_(ssl_conf)
-, rw_timeout_(0)
 , conn_(NULL)
 , stream_(NULL)
 , hdr_res_(NULL)
 , http_res_(NULL)
-, keep_alive_(false)
 , ws_in_(NULL)
 , ws_out_(NULL)
 , buff_(NULL)
-, unzip_(false)
 , zstream_(NULL)
-, gzip_header_left_(0)
 {
 	header_ = NEW http_header;
 	memset(&ns_addr_, 0, sizeof(ns_addr_));
