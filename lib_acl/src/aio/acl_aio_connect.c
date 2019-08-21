@@ -235,13 +235,16 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 
 struct ACL_ASTREAM_CTX {
 	ACL_SOCKADDR ns_addr;
+	ACL_SOCKADDR serv_addr;
 	ACL_ASTREAM *conn;
+	int status;
 	void *ctx;
 };
 
 typedef struct {
 	ACL_AIO *aio;
 	ACL_SOCKADDR ns_addr;
+	ACL_SOCKADDR serv_addr;
 	ACL_ASTREAM *conn;
 	ACL_AIO_CONNECT_ADDR_FN callback;
 	void *context;
@@ -280,7 +283,9 @@ static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 	memset(&conn_ctx, 0, sizeof(conn_ctx));
 	conn_ctx.conn = NULL;
 	conn_ctx.ctx  = ctx->context;
-	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(conn_ctx.ns_addr));
+	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(ACL_SOCKADDR));
+	memcpy(&conn_ctx.serv_addr, &ctx->serv_addr, sizeof(ACL_SOCKADDR));
+	conn_ctx.status = ACL_ASTREAM_STATUS_CONNECT_ERROR;
 
 	ctx->callback(&conn_ctx);
 	resolve_ctx_free(ctx);
@@ -308,7 +313,9 @@ static int connect_timeout(ACL_ASTREAM *conn, void *context)
 	memset(&conn_ctx, 0, sizeof(conn_ctx));
 	conn_ctx.conn = NULL;
 	conn_ctx.ctx  = ctx->context;
-	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(conn_ctx.ns_addr));
+	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(ACL_SOCKADDR));
+	memcpy(&conn_ctx.serv_addr, &ctx->serv_addr, sizeof(ACL_SOCKADDR));
+	conn_ctx.status = ACL_ASTREAM_STATUS_CONNECT_TIMEOUT;
 
 	ctx->callback(&conn_ctx);
 	resolve_ctx_free(ctx);
@@ -332,7 +339,9 @@ static int connect_callback(ACL_ASTREAM *conn, void *context)
 	memset(&conn_ctx, 0, sizeof(conn_ctx));
 	conn_ctx.conn = conn;
 	conn_ctx.ctx  = ctx->context;
-	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(conn_ctx.ns_addr));
+	memcpy(&conn_ctx.ns_addr, &ctx->ns_addr, sizeof(ACL_SOCKADDR));
+	memcpy(&conn_ctx.serv_addr, &ctx->serv_addr, sizeof(ACL_SOCKADDR));
+	conn_ctx.status = ACL_ASTREAM_STATUS_OK;
 
 	ctx->callback(&conn_ctx);
 	resolve_ctx_free(ctx);
@@ -346,10 +355,16 @@ static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx)
 	while (ctx->ip_next < n) {
 		char  addr[128];
 		const char *ip = acl_argv_index(ctx->ip_list,  ctx->ip_next);
+		ACL_SOCKADDR sa;
+
 		ctx->ip_next++;
 		acl_assert(ip && *ip);
-
 		snprintf(addr, sizeof(addr), "%s|%d", ip, ctx->port);
+		if (acl_sane_pton(addr, (struct sockaddr *)&sa) == 0) {
+			continue;
+		}
+
+		memcpy(&ctx->serv_addr, &sa, sizeof(sa));
 		ctx->conn = acl_aio_connect(ctx->aio, addr, ctx->timeout);
 		if (ctx->conn == NULL) {
 			continue;
@@ -375,6 +390,7 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 
 	if (db == NULL) {
 		acl_set_error(errnum);
+		conn_ctx.status = ACL_ASTREAM_STATUS_NS_ERROR;
 		ctx->callback(&conn_ctx);
 		resolve_ctx_free(ctx);
 		return;
@@ -390,6 +406,7 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 
 	if (acl_argv_size(ctx->ip_list) <= 0) {
 		acl_set_error(errnum);
+		conn_ctx.status = ACL_ASTREAM_STATUS_NS_ERROR;
 		ctx->callback(&conn_ctx);
 		resolve_ctx_free(ctx);
 		return;
@@ -397,6 +414,7 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
 
 	if (try_connect_one(ctx) == NULL) {
 		acl_set_error(ACL_ECONNREFUSED);
+		conn_ctx.status = ACL_ASTREAM_STATUS_CONNECT_ERROR;
 		ctx->callback(&conn_ctx);
 		resolve_ctx_free(ctx);
 	}
@@ -436,12 +454,22 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 	ctx->ip_list  = acl_argv_alloc(5);
 
 	if (acl_is_ip(buf) || acl_valid_unix(buf)) {
-		ACL_ASTREAM *conn = acl_aio_connect(aio, addr, timeout);
+		ACL_SOCKADDR sa;
+		ACL_ASTREAM *conn;
 
-		if (conn == NULL) {
+		if (acl_sane_pton(addr, (struct sockaddr *)&sa) == 0) {
+			acl_msg_error("%s(%d): invalid addr=%s",
+				__FUNCTION__, __LINE__, addr);
 			resolve_ctx_free(ctx);
 			return -1;
 		}
+
+		if ((conn = acl_aio_connect(aio, addr, timeout)) == NULL) {
+			resolve_ctx_free(ctx);
+			return -1;
+		}
+
+		memcpy(&ctx->serv_addr, &sa, sizeof(ACL_SOCKADDR));
 
 		acl_aio_add_connect_hook(conn, connect_callback, ctx);
 		acl_aio_add_timeo_hook(conn, connect_timeout, ctx);
@@ -459,9 +487,19 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 	return 0;
 }
 
+int acl_astream_get_status(const ACL_ASTREAM_CTX *ctx)
+{
+	return ctx ? ctx->status : ACL_ASTREAM_STATUS_INVALID;
+}
+
 const ACL_SOCKADDR *acl_astream_get_ns_addr(const ACL_ASTREAM_CTX *ctx)
 {
 	return ctx ? &ctx->ns_addr : NULL;
+}
+
+const ACL_SOCKADDR *acl_astream_get_serv_addr(const ACL_ASTREAM_CTX *ctx)
+{
+	return ctx ? &ctx->serv_addr : NULL;
 }
 
 ACL_ASTREAM *acl_astream_get_conn(const ACL_ASTREAM_CTX *ctx)

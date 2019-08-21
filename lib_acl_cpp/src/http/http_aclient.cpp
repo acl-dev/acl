@@ -41,6 +41,7 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 {
 	header_ = NEW http_header;
 	memset(&ns_addr_, 0, sizeof(ns_addr_));
+	memset(&serv_addr_, 0, sizeof(serv_addr_));
 }
 
 http_aclient::~http_aclient(void)
@@ -106,21 +107,45 @@ bool http_aclient::get_ns_addr(string& out)
 	return true;
 }
 
+bool http_aclient::get_server_addr(string& out)
+{
+	char buf[256];
+	const struct sockaddr* sa = (const struct sockaddr*) &serv_addr_;
+	size_t ret = acl_inet_ntop(sa, buf, sizeof(buf));
+	if (ret == 0) {
+		return false;
+	}
+	out = buf;
+	return true;
+}
+
 bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 {
 	const ACL_SOCKADDR *ns_addr = acl_astream_get_ns_addr(ctx);
 	if (ns_addr) {
 		memcpy(&ns_addr_, &ns_addr->ss, sizeof(ns_addr_));
 	}
+	const ACL_SOCKADDR* serv_addr = acl_astream_get_serv_addr(ctx);
+	if (serv_addr) {
+		memcpy(&serv_addr_, &serv_addr->ss, sizeof(serv_addr_));
+	}
 
 	ACL_ASTREAM* astream = acl_astream_get_conn(ctx);
 	if (astream == NULL) {
-		if (last_error() == ACL_ETIMEDOUT) {
+		int status = acl_astream_get_status(ctx);
+		switch (status) {
+		case ACL_ASTREAM_STATUS_NS_ERROR:
+			this->on_ns_failed();
+			this->destroy();
+			break;
+		case ACL_ASTREAM_STATUS_CONNECT_TIMEOUT:
 			this->on_connect_timeout();
 			this->destroy();
-		} else {
+			break;
+		default:
 			this->on_connect_failed();
 			this->destroy();
+			break;
 		}
 		return false;
 	}

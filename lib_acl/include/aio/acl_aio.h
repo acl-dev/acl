@@ -97,7 +97,15 @@ typedef int (*ACL_AIO_CONNECT_FN)(ACL_ASTREAM *cstream, void *context);
 
 typedef struct ACL_ASTREAM_CTX ACL_ASTREAM_CTX;
 
+ACL_API int acl_astream_get_status(const ACL_ASTREAM_CTX *ctx);
+#define ACL_ASTREAM_STATUS_INVALID		-1
+#define ACL_ASTREAM_STATUS_OK			0
+#define ACL_ASTREAM_STATUS_NS_ERROR		1
+#define ACL_ASTREAM_STATUS_CONNECT_ERROR	2
+#define ACL_ASTREAM_STATUS_CONNECT_TIMEOUT	3
+
 ACL_API const ACL_SOCKADDR *acl_astream_get_ns_addr(const ACL_ASTREAM_CTX *ctx);
+ACL_API const ACL_SOCKADDR *acl_astream_get_serv_addr(const ACL_ASTREAM_CTX *ctx);
 ACL_API ACL_ASTREAM *acl_astream_get_conn(const ACL_ASTREAM_CTX *ctx);
 ACL_API void *acl_astream_get_ctx(const ACL_ASTREAM_CTX *ctx);
 

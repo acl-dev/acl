@@ -89,9 +89,16 @@ public:
 	/**
 	 * 获得本次连接（无论成功或失败）所使用的 DNS 服务地址
 	 * @param out {string&} 存储结果
-	 * @return {bool} 是否成功获得
+	 * @return {bool} 返回 false 表示没有可用的 DNS 地址
 	 */
 	bool get_ns_addr(string& out);
+
+	/**
+	 * 当连接成功、连接失败或连接超时时可调用此方法获得当前所连接用的应用服务器地址
+	 * @param out {string&} 存储结果
+	 * @return {bool} 返回 false 表示还没有设置所连接服务器的地址
+	 */
+	bool get_server_addr(string& out);
 
 	/**
 	 * 连接成功后可调用本方法获得异步连接对象
@@ -111,12 +118,17 @@ protected:
 	virtual bool on_connect(void) = 0;
 
 	/**
-	 * 当连接超时后的回调方法
+	 * 当域名解析失败时的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
+	 */
+	virtual void on_ns_failed(void) {}
+
+	/**
+	 * 当连接超时后的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
 	 */
 	virtual void on_connect_timeout(void) {}
 
 	/**
-	 * 当连接失败后的回调方法
+	 * 当连接失败后的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
 	 */
 	virtual void on_connect_failed(void) {}
 
@@ -343,7 +355,8 @@ protected:
 	bool               unzip_;		// 是否自动解压响应体数据
 	zlib_stream*       zstream_;		// 解压对象
 	int                gzip_header_left_;	// gzip 传输时压缩头部长度
-	struct sockaddr_storage ns_addr_;
+	struct sockaddr_storage ns_addr_;	// 所使用的 DNS 服务器地址
+	struct sockaddr_storage serv_addr_;	// 所连接的应用服务器地址
 
 	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
 	bool handle_ssl_handshake(void);

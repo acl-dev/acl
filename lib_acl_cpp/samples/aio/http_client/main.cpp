@@ -79,6 +79,13 @@ protected:
 	}
 
 	// @override
+	void on_ns_failed(void)
+	{
+		printf("dns lookup failed\r\n");
+		fflush(stdout);
+	}
+
+	// @override
 	void on_connect_timeout(void)
 	{
 		printf("connect timeout\r\n");
@@ -100,6 +107,7 @@ protected:
 		return false;
 	}
 
+protected:
 	// @override
 	bool on_http_res_hdr(const acl::http_header& header)
 	{
