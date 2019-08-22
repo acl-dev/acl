@@ -1,5 +1,9 @@
 修改历史列表：
 
+588) 2019.8.22
+588.1) bugfix: socket_stream.cpp 中 get_ip() 方法在使用 std::string 时应该对
+源串判空，否则会引起崩溃
+
 587) 2019.8.20
 587.1) optimize: 优化 aio_socket_stream/aio_istream/aio_ostream/aio_stream,
 socket_stream/istream/ostream/stream 等类的成员变量，以降低类对象的尺寸大小

@@ -1,4 +1,4 @@
-%define release_id 9
+%define release_id 10
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -133,7 +133,10 @@ fi
 
 %changelog
 
-* Thu Aug 21 2019 shuxin.zheng@qq.com 3.5.0-9-20190821.11
+* Thu Aug 22 2019 shuxin.zheng@qq.com 3.5.0-10-20190822.11
+- release 3.5.0-10 for bugfix
+
+* Wed Aug 21 2019 shuxin.zheng@qq.com 3.5.0-9-20190821.11
 - release 3.5.0-9
 
 * Thu Aug 08 2019 shuxin.zheng@qq.com 3.5.0-8-20190808.16

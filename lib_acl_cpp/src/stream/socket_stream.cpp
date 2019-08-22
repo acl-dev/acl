@@ -258,7 +258,10 @@ const char* socket_stream::get_ip(const char* addr, std::string& out)
 	if ((ptr = strrchr(buf, ACL_ADDR_SEP)) || (ptr = strrchr(buf, ':'))) {
 		*ptr = 0;
 	}
-	out = ptr;
+	if (buf[0] == 0) {
+		return "";
+	}
+	out = buf;
 	return out.c_str();
 }
 
