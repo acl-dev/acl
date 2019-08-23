@@ -178,6 +178,7 @@ static void usage(const char* procname)
 		" -H host\r\n"
 		" -K [http keep_alive true]\r\n"
 		" -N name_server_list[default: 8.8.8.8:53]\r\n"
+		" -T ns_lookup_timeout[default: 5]\r\n"
 		, procname);
 }
 
@@ -195,7 +196,7 @@ static void add_name_servers(std::vector<acl::string>& addrs, const char* s)
 
 int main(int argc, char* argv[])
 {
-	int  ch, conn_timeout = 5, rw_timeout = 5, cocurrent = 1;
+	int  ch, ns_timeout = 5, conn_timeout = 5, rw_timeout = 5, cocurrent = 1;
 	acl::string addr("pvwu8bubc.bkt.clouddn.com:80");
 	acl::string host("pvwu8bubc.bkt.clouddn.com"), url("/20160528212429_c2HAm.jpeg");
 	std::vector<acl::string> name_servers;
@@ -203,7 +204,7 @@ int main(int argc, char* argv[])
 	acl::string event("kernel");
 	acl::aio_handle_type event_type;
 
-	while ((ch = getopt(argc, argv, "he:Kc:s:N:U:H:t:i:D")) > 0) {
+	while ((ch = getopt(argc, argv, "he:Kc:s:N:U:H:t:i:DT:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -238,6 +239,9 @@ int main(int argc, char* argv[])
 		case 'D':
 			debug = true;
 			break;
+		case 'T':
+			ns_timeout = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -270,7 +274,7 @@ int main(int argc, char* argv[])
 	// 设置 DNS 域名服务器地址
 	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
 		cit != name_servers.end(); ++cit) {
-		handle.set_dns(*cit, 5);
+		handle.set_dns(*cit, ns_timeout);
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -307,7 +311,7 @@ int main(int argc, char* argv[])
 		fflush(stdout);
 	}
 
-	time_t last = time(NULL), now;
+	time_t last = time(NULL), now, begin = last;
 	// 开始 AIO 事件循环过程
 	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
@@ -320,6 +324,9 @@ int main(int argc, char* argv[])
 		}
 		last = now;
 	}
+
+	(void) time(&now);
+	printf("\r\ntime spent: %ld seconds\r\n", now - begin);
 
 	handle.check();
 
