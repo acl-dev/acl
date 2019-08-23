@@ -10,6 +10,8 @@ int main(int argc, char* argv[])
 	if (argc >= 2)
 		addr = argv[1];
 
+	acl::acl_cpp_init();
+
 	if (server.open(addr) == false)
 	{
 		printf("open %s error\r\n", addr.c_str());

@@ -37,6 +37,7 @@ int main(int argc, char* argv[])
 	acl::server_socket server;
 	acl::string addr = "127.0.0.1:9001";
 
+	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
 	if (argc >= 2)

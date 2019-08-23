@@ -38,6 +38,8 @@ int main(int argc, char* argv[])
 	if (argc >= 2)
 		addr = argv[1];
 
+	acl::acl_cpp_init();
+
 	int  max = 100;
 	std::vector<acl::socket_stream*> conns;
 	std::vector<acl::thread*> threads;

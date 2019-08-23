@@ -85,6 +85,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
 	std::vector<acl::thread*> threads;
