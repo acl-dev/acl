@@ -141,7 +141,7 @@ protected:
 		if (!compressed_ || this->is_unzip_body()) {
 			(void) write(1, data, dlen);
 		} else {
-			printf(">>>read body: %ld\r\n", dlen);
+			printf(">>>read body: %ld\r\n", (long) dlen);
 		}
 		return true;
 	}
