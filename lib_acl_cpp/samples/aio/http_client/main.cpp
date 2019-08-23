@@ -8,8 +8,9 @@
 #include "acl_cpp/lib_acl.hpp"
 
 static acl::atomic_long __aio_refer = 0;
-static int __success = 0, __nconnect = 0, __ndestroy = 0, __ndisconnect = 0;
-static int __nheader = 0, __ntimeout = 0;
+static int __success = 0, __destroy = 0, __disconnect = 0, __ns_failed = 0;
+static int __connect_ok = 0, __connect_timeout = 0, __connect_failed = 0;
+static int __header_ok = 0, __read_timeout = 0;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +48,7 @@ protected:
 		printf("http_client will be deleted!\r\n");
 		fflush(stdout);
 
-		__ndestroy++;
+		__destroy++;
 		delete this;
 	}
 
@@ -66,7 +67,7 @@ protected:
 		//this->ws_handshake();
 		this->send_request(NULL, 0);
 
-		__nconnect++;
+		__connect_ok++;
 		return true;
 	}
 
@@ -75,7 +76,7 @@ protected:
 	{
 		printf("disconnect from server\r\n");
 		fflush(stdout);
-		__ndisconnect++;
+		__disconnect++;
 	}
 
 	// @override
@@ -83,6 +84,7 @@ protected:
 	{
 		printf("dns lookup failed\r\n");
 		fflush(stdout);
+		__ns_failed++;
 	}
 
 	// @override
@@ -90,6 +92,7 @@ protected:
 	{
 		printf("connect timeout\r\n");
 		fflush(stdout);
+		__connect_timeout++;
 	}
 
 	// @override
@@ -97,13 +100,14 @@ protected:
 	{
 		printf("connect failed\r\n");
 		fflush(stdout);
+		__connect_failed++;
 	}
 
 	// @override
 	bool on_read_timeout(void)
 	{
 		printf("read timeout\r\n");
-		__ntimeout++;
+		__read_timeout++;
 		return false;
 	}
 
@@ -115,7 +119,7 @@ protected:
 		header.build_response(buf);
 
 		compressed_ = header.is_transfer_gzip();
-		__nheader++;
+		__header_ok++;
 
 		if (!debug_) {
 			return true;
@@ -320,8 +324,14 @@ int main(int argc, char* argv[])
 	handle.check();
 
 	printf("\r\n---------------------------------------------------\r\n");
-	printf("all over, success=%d, header=%d, timeout=%d, connect=%d,"
-		" disconnect=%d, destroy=%d\r\n", __success, __nheader,
-		__ntimeout, __nconnect, __ndisconnect, __ndestroy);
+
+	printf("all over, destroy=%d\r\n\r\n", __destroy);
+	printf("ns_failed=%d, connect_ok=%d, disconnect=%d, connect_timeout=%d,"
+		" connect_faile=%d\r\n\r\n", __ns_failed, __connect_ok,
+		__disconnect, __connect_timeout, __connect_failed);
+	printf("success=%d, header_ok=%d, read_timeout=%d\r\n",
+		__success, __header_ok, __read_timeout);
+
+	printf("---------------------------------------------------\r\n");
 	return 0;
 }
