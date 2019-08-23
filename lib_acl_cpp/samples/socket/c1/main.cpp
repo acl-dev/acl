@@ -48,7 +48,8 @@ int main(int argc, char* argv[])
 		acl::socket_stream* client = new acl::socket_stream;
 		if (client->open(addr, 2, 10) == false)
 		{
-			printf("open %s error\n", addr.c_str());
+			printf("open %s error %s\n",
+				addr.c_str(), acl::last_serror());
 			return 1;
 		}
 		else

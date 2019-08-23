@@ -23,7 +23,8 @@ public:
 		acl::socket_stream* conn = new acl::socket_stream;
 		if (conn->open(addr_, 10, 10) == false)
 		{
-			printf("open %s error\r\n", addr_.c_str());
+			printf("open %s error %s\r\n", addr_.c_str(),
+				acl::last_serror());
 			return false;
 		}
 
@@ -104,5 +105,5 @@ int main(int argc, char* argv[])
 		delete threads[i];
 	}
 
-	return (0);
+	return 0;
 }

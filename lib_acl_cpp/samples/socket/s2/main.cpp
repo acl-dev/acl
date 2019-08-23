@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
 
 	if (server.open(addr) == false)
 	{
-		printf("open %s error\r\n", addr.c_str());
+		printf("open %s error %s\r\n", addr.c_str(), acl::last_serror());
 		return 1;
 	}
 	else
