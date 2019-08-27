@@ -96,7 +96,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(CMAKE_SHARED_LINKER_FLAGS "-shared")
 	add_definitions("-Wno-invalid-source-encoding")
 
-	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
+	set(lib_output_path ${CMAKE_CURRENT_SOURCE_DIR}/../android/lib/${ANDROID_ABI})
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
@@ -105,10 +105,8 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	link_directories(${lib_output_path})
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
-
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	add_library(protocol_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
+	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
 	if (${UNIX_OS})
 		set(CMAKE_SHARED_LINKER_FLAGS "-shared -Wl,-rpath,. -L${lib_output_path} -lacl")
@@ -116,7 +114,8 @@ else()
 		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib")
 	endif()
 
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
+	add_library(protocol_static STATIC ${lib_src})
+	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
 	link_directories(${lib_output_path})
 endif()
 
