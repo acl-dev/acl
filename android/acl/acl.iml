@@ -10,7 +10,7 @@
     </facet>
     <facet type="native-android-gradle" name="Native-Android-Gradle">
       <configuration>
-        <option name="SELECTED_BUILD_VARIANT" value="debug-armeabi-v7a" />
+        <option name="SELECTED_BUILD_VARIANT" value="debug-x86" />
       </configuration>
     </facet>
     <facet type="android" name="Android">
@@ -54,6 +54,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/debug/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/debug/shaders" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/res" type="java-test-resource" />
@@ -61,6 +62,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/res" type="java-test-resource" />
@@ -68,6 +70,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/testDebug/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/res" type="java-resource" />
@@ -75,6 +78,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/src/main/jni" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/main/shaders" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
@@ -82,6 +86,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/res" type="java-test-resource" />
@@ -89,8 +94,11 @@
       <sourceFolder url="file://$MODULE_DIR$/src/test/assets" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/aidl" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/test/jni" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/.cxx" />
+      <excludeFolder url="file://$MODULE_DIR$/.externalNativeBuild" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl/src">
@@ -194,24 +202,62 @@
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/beanstalk">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/beanstalk" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/connpool">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/connpool" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/db">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/db" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/disque">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/disque" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/event">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/event" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/hsocket">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/hsocket" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/http">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/http" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/ipc">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/ipc" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/master">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/master" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/memcache">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/memcache" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/mime">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/mime" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/mime/internal">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/mime/internal" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/queue">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/queue" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/redis">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/redis" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/serialize">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/serialize" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/session">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/session" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/smtp">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/smtp" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/stdlib">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/stdlib" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/stream">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/stream" isTestSource="false" />
     </content>
     <content url="file://$MODULE_DIR$/../../lib_protocol/src">
