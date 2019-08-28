@@ -1,235 +1,18 @@
-#include <iostream>
-#include <assert.h>
-#include <getopt.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include "lib_acl.h"
-#include "acl_cpp/lib_acl.hpp"
+#include "stdafx.h"
+#include "http_client.h"
 
-static acl::atomic_long __aio_refer = 0;
-static int __success = 0, __destroy = 0, __disconnect = 0, __ns_failed = 0;
-static int __connect_ok = 0, __connect_timeout = 0, __connect_failed = 0;
-static int __header_ok = 0, __read_timeout = 0;
+acl::atomic_long __aio_refer = 0;
+int __success         = 0;
+int __destroy         = 0;
+int __disconnect      = 0;
+int __ns_failed       = 0;
+int __connect_ok      = 0;
+int __connect_timeout = 0;
+int __connect_failed  = 0;
+int __header_ok       = 0;
+int __read_timeout    = 0;
 
 //////////////////////////////////////////////////////////////////////////////
-
-class http_client : public acl::http_aclient
-{
-public:
-	http_client(acl::aio_handle& handle, const char* host)
-	: http_aclient(handle, NULL)
-	, host_(host)
-	, debug_(false)
-	, compressed_(false)
-	, conn_timeout_(5)
-	, rw_timeout_(5)
-	, keep_alive_(false)
-	{
-		++__aio_refer;
-	}
-
-	~http_client(void)
-	{
-		printf("delete http_client!\r\n");
-		if (--__aio_refer == 0) {
-			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
-			handle_.stop();
-		}
-	}
-
-	http_client& set_timeout(int conn_timeout, int rw_timeout)
-	{
-		conn_timeout_ = conn_timeout;
-		rw_timeout_   = rw_timeout;
-		return *this;
-	}
-
-	http_client& set_keep_alive(bool keep_alive)
-	{
-		keep_alive_ = keep_alive;
-		return *this;
-	}
-
-	http_client& enable_debug(bool on)
-	{
-		debug_ = on;
-		return *this;
-	}
-
-protected:
-	// @override
-	void destroy(void)
-	{
-		printf("http_client will be deleted!\r\n");
-		fflush(stdout);
-
-		__destroy++;
-		delete this;
-	}
-
-	// @override
-	bool on_connect(void)
-	{
-		printf("--------------- connect server ok ------------\r\n");
-		acl::string addr;
-		if (this->get_ns_addr(addr)) {
-			printf(">>>ns server: %s\r\n", addr.c_str());
-		}
-
-		fflush(stdout);
-
-		printf(">>> begin send_request\r\n");
-		//this->ws_handshake();
-		this->send_request(NULL, 0);
-
-		__connect_ok++;
-		return true;
-	}
-
-	// @override
-	void on_disconnect(void)
-	{
-		printf("disconnect from server\r\n");
-		fflush(stdout);
-		__disconnect++;
-	}
-
-	// @override
-	void on_ns_failed(void)
-	{
-		printf("dns lookup failed\r\n");
-		fflush(stdout);
-		__ns_failed++;
-	}
-
-	// @override
-	void on_connect_timeout(void)
-	{
-		printf("connect timeout\r\n");
-		fflush(stdout);
-		__connect_timeout++;
-	}
-
-	// @override
-	void on_connect_failed(void)
-	{
-		printf("connect failed\r\n");
-		fflush(stdout);
-		__connect_failed++;
-	}
-
-	// @override
-	bool on_read_timeout(void)
-	{
-		printf("read timeout\r\n");
-		__read_timeout++;
-		return false;
-	}
-
-protected:
-	// @override
-	bool on_http_res_hdr(const acl::http_header& header)
-	{
-		acl::string buf;
-		header.build_response(buf);
-
-		compressed_ = header.is_transfer_gzip();
-		__header_ok++;
-
-		int http_status = header.get_status();
-
-		if (debug_) {
-			printf("-----------%s: response header(status=%d)----\r\n",
-				__FUNCTION__, http_status);
-			printf("[%s]\r\n", buf.c_str());
-			fflush(stdout);
-		}
-
-		if (http_status == 301 || http_status == 302) {
-			const char* location = header.get_entry("Location");
-			if (location == NULL || *location == 0) {
-				printf("Location null\r\n");
-				return false;
-			}
-
-			redirect(location);
-			// 返回 false 以使当前连接关闭
-			return false;
-		}
-
-		return true;
-	}
-
-	// @override
-	bool on_http_res_body(char* data, size_t dlen)
-	{
-		if (!debug_) {
-			return true;
-		}
-
-		if (!compressed_ || this->is_unzip_body()) {
-			(void) write(1, data, dlen);
-		} else {
-			printf(">>>read body: %ld\r\n", (long) dlen);
-		}
-		return true;
-	}
-
-	// @override
-	bool on_http_res_finish(bool success)
-	{
-		printf("\r\n---------------response over----------------\r\n");
-		printf("http finish: keep_alive=%s, success=%s\r\n",
-			keep_alive_ ? "true" : "false",
-			success ? "ok" : "failed");
-		fflush(stdout);
-		__success++;
-
-		return keep_alive_;
-	}
-
-private:
-	bool redirect(const char* url)
-	{
-		char domain[256];
-		unsigned short port;
-		if (!acl::http_utils::get_addr(url, domain, sizeof(domain), &port)) {
-			printf("parse url=%s error\r\n", url);
-			return false;
-		}
-
-		http_client* conn = new http_client(handle_, domain);
-		acl::string addr;
-		addr.format("%s:%d", domain, port);
-		if (!conn->open(addr, conn_timeout_, rw_timeout_)) {
-			printf("connect %s error\r\n", addr.c_str());
-			delete conn;
-			return false;
-		}
-
-		(*conn).set_timeout(conn_timeout_, rw_timeout_)
-			.enable_debug(debug_)
-			.unzip_body(true);
-
-		acl::http_header& head = conn->request_header();
-		head.set_url(url)
-			.set_host(domain)
-			.accept_gzip(true)
-			.set_keep_alive(keep_alive_);
-
-		printf("--- begin redirect to url=%s----\r\n", url);
-		return true;
-	}
-
-private:
-	acl::string host_;
-	bool debug_;
-	bool compressed_;
-	int  conn_timeout_;
-	int  rw_timeout_;
-	bool keep_alive_;
-};
 
 static void usage(const char* procname)
 {
@@ -347,35 +130,21 @@ int main(int argc, char* argv[])
 
 	// 开始异步连接远程 WEB 服务器
 	for (int i = 0; i < cocurrent; i++) {
-		http_client* conn = new http_client(handle, host);
-		if (!conn->open(addr, conn_timeout, rw_timeout)) {
-			printf("connect %s error\r\n", addr.c_str());
-			fflush(stdout);
-
-			delete conn;
-			return 1;
-		}
-
-		conn->set_timeout(conn_timeout, rw_timeout);
-		conn->enable_debug(debug);		// 是否启用调试方式
-		conn->unzip_body(true);			// 针对 HTTP 自动解压
-
-		// 设置 HTTP 请求头，也可将此过程放在 conn->on_connect() 里
-		acl::http_header& head = conn->request_header();
-		head.set_url(url)
+		http_client* conn = new http_client(handle);
+		(*conn).set_addr(addr)
+			.set_timeout(conn_timeout, rw_timeout)
+			.set_url(url)
+			.set_debug(debug)
 			.set_host(host)
-			.accept_gzip(true)
 			.set_keep_alive(keep_alive);
 
-		if (i > 0) {
-			continue;
-		}
+		// 设置重定向最大次数，如果此值为 0 则禁止重定向功能
+		conn->set_redirect_limit(3);
 
-		acl::string buf;
-		head.build_request(buf);
-		printf("---------------request header-----------------\r\n");
-		printf("[%s]\r\n", buf.c_str());
-		fflush(stdout);
+		if (!conn->start()) {
+			printf("connect %s error\r\n", addr.c_str());
+			return 1;
+		}
 	}
 
 	time_t last = time(NULL), now, begin = last;
