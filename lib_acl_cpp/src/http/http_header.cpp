@@ -282,6 +282,19 @@ http_header& http_header::add_entry(const char* name, const char* value,
 	return *this;
 }
 
+const char* http_header::get_entry(const char* name) const
+{
+	for (std::list<HTTP_HDR_ENTRY*>::const_iterator cit = entries_.begin();
+		cit != entries_.end(); ++cit) {
+
+		if (strcasecmp((*cit)->name, name) == 0) {
+			return (*cit)->value;
+		}
+	}
+
+	return NULL;
+}
+
 http_header& http_header::set_content_length(acl_int64 n)
 {
 	content_length_ = n;

@@ -92,6 +92,13 @@ public:
 			bool replace = true);
 	
 	/**
+	 * 从 HTTP 头中获得指定的头部字段
+	 * @param name {const char*} 字段名，非空指针
+	 * @return {const char*} 返回值 NULL 表示不存在
+	 */
+	const char* get_entry(const char* name) const;
+
+	/**
 	 * 设置 HTTP 头中的 Content-Length 字段
 	 * @param n {int64} 设置值
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作

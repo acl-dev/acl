@@ -22,6 +22,9 @@ public:
 	, host_(host)
 	, debug_(false)
 	, compressed_(false)
+	, conn_timeout_(5)
+	, rw_timeout_(5)
+	, keep_alive_(false)
 	{
 		++__aio_refer;
 	}
@@ -33,6 +36,19 @@ public:
 			printf("%s: stop aio engine now!\r\n", __FUNCTION__);
 			handle_.stop();
 		}
+	}
+
+	http_client& set_timeout(int conn_timeout, int rw_timeout)
+	{
+		conn_timeout_ = conn_timeout;
+		rw_timeout_   = rw_timeout;
+		return *this;
+	}
+
+	http_client& set_keep_alive(bool keep_alive)
+	{
+		keep_alive_ = keep_alive;
+		return *this;
 	}
 
 	http_client& enable_debug(bool on)
@@ -121,12 +137,26 @@ protected:
 		compressed_ = header.is_transfer_gzip();
 		__header_ok++;
 
-		if (!debug_) {
-			return true;
+		int http_status = header.get_status();
+
+		if (debug_) {
+			printf("-----------%s: response header(status=%d)----\r\n",
+				__FUNCTION__, http_status);
+			printf("[%s]\r\n", buf.c_str());
+			fflush(stdout);
 		}
-		printf("-----------%s: response header----\r\n", __FUNCTION__);
-		printf("[%s]\r\n", buf.c_str());
-		fflush(stdout);
+
+		if (http_status == 301 || http_status == 302) {
+			const char* location = header.get_entry("Location");
+			if (location == NULL || *location == 0) {
+				printf("Location null\r\n");
+				return false;
+			}
+
+			redirect(location);
+			// 返回 false 以使当前连接关闭
+			return false;
+		}
 
 		return true;
 	}
@@ -149,7 +179,7 @@ protected:
 	// @override
 	bool on_http_res_finish(bool success)
 	{
-		printf("---------------response over-------------------\r\n");
+		printf("\r\n---------------response over----------------\r\n");
 		printf("http finish: keep_alive=%s, success=%s\r\n",
 			keep_alive_ ? "true" : "false",
 			success ? "ok" : "failed");
@@ -160,9 +190,45 @@ protected:
 	}
 
 private:
+	bool redirect(const char* url)
+	{
+		char domain[256];
+		unsigned short port;
+		if (!acl::http_utils::get_addr(url, domain, sizeof(domain), &port)) {
+			printf("parse url=%s error\r\n", url);
+			return false;
+		}
+
+		http_client* conn = new http_client(handle_, domain);
+		acl::string addr;
+		addr.format("%s:%d", domain, port);
+		if (!conn->open(addr, conn_timeout_, rw_timeout_)) {
+			printf("connect %s error\r\n", addr.c_str());
+			delete conn;
+			return false;
+		}
+
+		(*conn).set_timeout(conn_timeout_, rw_timeout_)
+			.enable_debug(debug_)
+			.unzip_body(true);
+
+		acl::http_header& head = conn->request_header();
+		head.set_url(url)
+			.set_host(domain)
+			.accept_gzip(true)
+			.set_keep_alive(keep_alive_);
+
+		printf("--- begin redirect to url=%s----\r\n", url);
+		return true;
+	}
+
+private:
 	acl::string host_;
 	bool debug_;
 	bool compressed_;
+	int  conn_timeout_;
+	int  rw_timeout_;
+	bool keep_alive_;
 };
 
 static void usage(const char* procname)
@@ -290,7 +356,8 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 
-		(*conn).enable_debug(debug);		// 是否启用调试方式
+		conn->set_timeout(conn_timeout, rw_timeout);
+		conn->enable_debug(debug);		// 是否启用调试方式
 		conn->unzip_body(true);			// 针对 HTTP 自动解压
 
 		// 设置 HTTP 请求头，也可将此过程放在 conn->on_connect() 里
