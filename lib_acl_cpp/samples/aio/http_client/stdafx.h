@@ -1,12 +1,21 @@
-// stdafx.h : 标准系统包含文件的包含文件，
-// 或是常用但不常更改的项目特定的包含文件
-//
-
 #pragma once
 
+#include <iostream>
+#include <assert.h>
+#include <getopt.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
-//#include <iostream>
-//#include <tchar.h>
-
-// TODO: 在此处引用程序要求的附加头文件
 #include "acl_cpp/lib_acl.hpp"
+
+extern acl::atomic_long __aio_refer;
+extern int __success;
+extern int __destroy;
+extern int __disconnect;
+extern int __ns_failed;
+extern int __connect_ok;
+extern int __connect_timeout;
+extern int __connect_failed;
+extern int __header_ok;
+extern int __read_timeout;
