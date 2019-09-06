@@ -97,12 +97,16 @@ bool thread_mutex::unlock(void)
 thread_mutex_guard::thread_mutex_guard(thread_mutex& mutex)
 : mutex_(mutex)
 {
-	acl_assert(mutex_.lock());
+	if (!mutex_.lock()) {
+		logger_fatal("lock error=%s", last_serror());
+	}
 }
 
 thread_mutex_guard::~thread_mutex_guard(void)
 {
-	acl_assert(mutex_.unlock());
+	if (!mutex_.unlock()) {
+		logger_fatal("unlock error=%s", last_serror());
+	}
 }
 
 } // namespace acl
