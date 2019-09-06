@@ -75,11 +75,11 @@ endforeach()
 
 ##############################################################################
 
-if (CMAKE_BUILD_TYPE STREQUAL "")
-	set(CMAKE_BUILD_TYPE "DEBUG")
-else()
-	string(TOUPPER CMAKE_BUILD_TYPE CMAKE_BUILD_TYPE)
-endif()
+#if (CMAKE_BUILD_TYPE STREQUAL "")
+#	set(CMAKE_BUILD_TYPE "DEBUG")
+#else()
+#	string(TOUPPER CMAKE_BUILD_TYPE CMAKE_BUILD_TYPE)
+#endif()
 
 if (${UNIX_OS})
 	add_definitions(

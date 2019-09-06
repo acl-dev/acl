@@ -48,7 +48,7 @@ redis_command::redis_command(redis_client* conn)
 , max_conns_(0)
 , slot_(-1)
 , redirect_max_(15)
-, redirect_sleep_(1)
+, redirect_sleep_(100)
 , slice_req_(false)
 , request_buf_(NULL)
 , request_obj_(NULL)
@@ -90,7 +90,7 @@ redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
 		redirect_sleep_ = cluster->get_redirect_sleep();
 	} else {
 		redirect_max_ = 15;
-		redirect_sleep_ = 1;
+		redirect_sleep_ = 100;
 	}
 }
 

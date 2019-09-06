@@ -71,7 +71,7 @@ public:
 
 protected:
 	// @override
-	bool add_write_callback(void)
+	bool write_callback(void)
 	{
 		return true;
 	}
