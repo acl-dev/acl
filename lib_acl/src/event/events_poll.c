@@ -372,8 +372,9 @@ static void event_loop(ACL_EVENT *eventp)
 	ACL_EVENT_FDTABLE *fdp;
 
 	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
-	if (delay < DELAY_MIN)
+	if (delay < DELAY_MIN) {
 		delay = DELAY_MIN;
+	}
 
 	/* 调整事件引擎的时间截 */
 
@@ -383,10 +384,11 @@ static void event_loop(ACL_EVENT *eventp)
 
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		acl_int64 n = timer->when - eventp->present;
-		if (n <= 0)
+		if (n <= 0) {
 			delay = 0;
-		else if (n < delay)
+		} else if (n < delay) {
 			delay = n;
+		}
 	}
 
 	/* 调用 event_prepare 检查有多少个描述字需要通过 poll 进行检测 */
@@ -394,24 +396,27 @@ static void event_loop(ACL_EVENT *eventp)
 	if (event_prepare(eventp) == 0) {
 		/* 说明无须 poll 检测 */
 
-		if (eventp->ready_cnt == 0)
+		if (eventp->ready_cnt == 0) {
 			/* 为避免循环过快，休眠一下 */
 			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 1);
+		}
 
 		goto TAG_DONE;
 	}
 
 	/* 如果已经有描述字准备好则 poll 检测超时时间置 0 */
 
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		delay = 0;
+	}
 
 	/* 调用 poll 系统调用检测可用描述字 */
 
 	nready = poll(ev->fds, eventp->fdcnt, (int) (delay / 1000));
 
 	if (eventp->nested++ > 0) {
-		acl_msg_error("%s(%d): recursive call", myname, __LINE__);
+		acl_msg_error("%s(%d): recursive call, nested=%d, pid=%d",
+			myname, __LINE__, eventp->nested, getpid());
 		exit (1);
 	}
 	if (nready < 0) {
@@ -421,20 +426,23 @@ static void event_loop(ACL_EVENT *eventp)
 			exit (1);
 		}
 		goto TAG_DONE;
-	} else if (nready == 0)
+	} else if (nready == 0) {
 		goto TAG_DONE;
+	}
 
 	/* 检查 poll 的检测结果集合 */
 
 	for (i = 0; i < eventp->fdcnt; i++) {
 		fdp = acl_fdmap_ctx(ev->fdmap, ev->fds[i].fd);
-		if (fdp == NULL || fdp->stream == NULL)
+		if (fdp == NULL || fdp->stream == NULL) {
 			continue;
+		}
 
 		/* 如果该描述字对象已经在被设置为异常或超时状态则继续 */
 
-		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
+		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
+		}
 
 		revents = ev->fds[i].revents;
 
@@ -449,39 +457,39 @@ static void event_loop(ACL_EVENT *eventp)
 
 		/* 检查描述字是否可读 */
 
-		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-			&& (revents & POLLIN) )
-		{
+		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) && (revents & POLLIN) ) {
+
 			/* 给该描述字对象附加可读属性 */
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+				| ACL_EVENT_WRITE)) == 0) {
+
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
 
-			if (fdp->listener)
+			if (fdp->listener) {
 				fdp->event_type |= ACL_EVENT_ACCEPT;
+			}
 
 			/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而
 			 * 触发 ACL_VSTREAM 流在读时调用系统的 read 函数
 			 */
-			else
+			else {
 				fdp->stream->read_ready = 1;
+			}
 		}
 
 		/* 检查描述字是否可写 */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-			&& (revents & POLLOUT))
-		{
+			&& (revents & POLLOUT)) {
 
 			/* 给该描述字对象附加可写属性 */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+				| ACL_EVENT_WRITE)) == 0) {
+
 				fdp->event_type |= ACL_EVENT_WRITE;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
@@ -494,8 +502,9 @@ TAG_DONE:
 	event_timer_trigger(eventp);
 
 	/* 处理准备好的描述字事件 */
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		event_fire(eventp);
+	}
 
 	eventp->nested--;
 }

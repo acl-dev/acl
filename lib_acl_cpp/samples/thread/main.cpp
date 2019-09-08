@@ -96,11 +96,13 @@ int main(void)
 	acl::acl_cpp_init();
 
 	test_thread();
+	if (0)
 	test_thread2();
 
 	printf("enter any key to exit ...\r\n");
 	getchar();
 
+	if (0)
 	test_thread3();
 
 	return 0;
