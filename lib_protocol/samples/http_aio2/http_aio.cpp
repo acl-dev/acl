@@ -73,19 +73,20 @@ static int on_http_hdr(int status, void *arg)
 	return 0;
 }
 
-static int on_connect(ACL_ASTREAM *stream, void *context)
+static int on_connect(const ACL_ASTREAM_CTX *context)
 {
-	const char *addr = (const char*) context;
+	ACL_ASTREAM *stream = acl_astream_get_conn(context);
+//	const ACL_SOCKADDR *addr = acl_astream_get_serv_addr(context);
 
 	if (stream == NULL) {
-		int err = acl_last_error();
-		printf("connect %s failed, errno=%d, %s\r\n", addr, err,
-			err < 0 ? acl_dns_serror(err) : acl_last_serror());
+//		int err = acl_last_error();
+//		printf("connect %s failed, errno=%d, %s\r\n", addr, err,
+//			err < 0 ? acl_dns_serror(err) : acl_last_serror());
 		__stop = true;
 		return -1;
 	}
 
-	printf(">>>> connect %s ok!\r\n", addr);
+//	printf(">>>> connect %s ok!\r\n", addr);
 
 	CTX *ctx = (CTX*) acl_mycalloc(1, sizeof(CTX));
 	ctx->stream = stream;
