@@ -24,7 +24,7 @@ typedef struct ACL_FILE {
 
 /**
  * 打开或创建一个文件进行读写操作
- * @param filenme {const char*} 文件名
+ * @param filename {const char*} 文件名
  * @param mode {const char*} 打开标志.
  *  r or rb: 只读方式打开已经存在文件
  *  w or wb: 只写方式打开已存在文件并清空或只写方式创建新文件

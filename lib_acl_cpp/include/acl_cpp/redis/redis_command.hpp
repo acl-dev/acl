@@ -314,7 +314,7 @@ public:
 	 * @return {const redis_result*} 返回的结果集
 	 */
 	const redis_result* request(const std::vector<string>& args,
-		size_t nchind = 0);
+		size_t nchild = 0);
 
 	const string* request_buf(void) const
 	{

@@ -16,7 +16,7 @@ ACL_API int acl_alldig(const char *str);
 
 /**
  * ÅÐ¶Ï¸ø¶¨×Ö·û´®ÊÇ·ñÎª¸¡µãÊý
- * @param str {const char*} ×Ö·û´®
+ * @param s {const char*} ×Ö·û´®
  * @return {int} 0: ·ñ; 1: ÊÇ
  */
 ACL_API int acl_is_double(const char *s);

@@ -51,7 +51,6 @@ public:
 	/**
 	 * 调用本函数设置连接 redis 服务的连接密码
 	 * @param pass {const char*}
-	 * @return {redis_client&}
 	 */
 	void set_password(const char* pass);
 

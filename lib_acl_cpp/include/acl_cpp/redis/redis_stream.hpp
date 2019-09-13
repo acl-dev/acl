@@ -165,7 +165,7 @@ public:
 	 *  one ID internal. When the user specified and explicit ID, the ID's
 	 *  format is look like 1526919030474-55 that includes two numbers
 	 *  separated by '-', the minimum valid ID is 0-1
-	 * @param maxlen {size_t} if > 0, limit the size of the stream
+	 *  param maxlen {size_t} if > 0, limit the size of the stream
 	 * @return {bool} return true if entry was added successfully, or some
 	 *  error happened which the error reason can be acquied by calling
 	 *  result_error() of the base class redis_command.
@@ -275,7 +275,7 @@ public:
 	 *  equivalent to acknowledging the message when it is read.
 	 * @return {bool} return the status of xreadgroup command
 	 */
-	bool xreadgroup(redis_stream_messages& messsages, const char* group,
+	bool xreadgroup(redis_stream_messages& messages, const char* group,
 		const char* consumer, const std::map<string, string>& streams,
 		size_t count = 1000, ssize_t block = 0, bool noack = false);
 
@@ -289,7 +289,7 @@ public:
 	 * @param block {ssize_t}
 	 * @return {bool}
 	 */
-	bool xreadgroup_with_noack(redis_stream_messages& messsages,
+	bool xreadgroup_with_noack(redis_stream_messages& messages,
 		const char* group, const char* consumer,
 		const std::map<string, string>& streams,
 		size_t count = 1000, ssize_t block = 0);
@@ -376,7 +376,7 @@ public:
 	 * @param key {const char*}
 	 * @param group {const char*}
 	 * @param ids {const std::vector<string>&}
-	 * @return {int} return count of messsages been acked, return -1 if error
+	 * @return {int} return count of messages been acked, return -1 if error
 	 */
 	int  xack(const char* key, const char* group,
 		const std::vector<string>& ids);

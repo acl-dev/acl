@@ -894,7 +894,7 @@ ACL_API acl_int64 acl_aio_cancel_timer(ACL_AIO *aio,
  * @param context {void*} timer_fn 的参数之一.
  * @param onoff {int} 是否重复定时器任务
  */
-ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
+ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn,
 		void *context, int onoff);
 
 /**
@@ -904,7 +904,7 @@ ACL_API void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
  * @param context {void*} timer_fn 的参数之一.
  * @return {int} !0 表示所设置的定时器都处于重复使用状态
  */
-ACL_API int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
+ACL_API int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn,
 		void *context);
 
 #ifdef	__cplusplus

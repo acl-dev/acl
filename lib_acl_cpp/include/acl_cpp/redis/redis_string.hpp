@@ -140,8 +140,8 @@ public:
 	 *  if the GET was executed correctly, false if error happened or
 	 *  is is not a string of the key
 	 */
-	bool get(const char* key, string& buf);
 	bool get(const char* key, size_t len, string& buf);
+	bool get(const char* key, string& buf);
 
 	/**
 	 * 返回 key 所关联的字符串值，当返回的字符串值比较大时，内部会自动进行切片，即将
@@ -149,7 +149,6 @@ public:
 	 * 组装，比如可以调用： redis_result::get(size_t, size_t*) 函数获得某个切
 	 * 片的片断数据，根据 redis_result::get_size() 获得分片数组的长度
 	 * @param key {const char*} 字符串对象的 key
-	 * @param buf {string&} 操作成功后存储字符串对象的值
 	 * @return {bool} 操作是否成功，返回 false 表示出错或 key 非字符串对象
 	 */
 	const redis_result* get(const char* key);

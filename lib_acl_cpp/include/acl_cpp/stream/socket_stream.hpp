@@ -211,7 +211,6 @@ public:
 
 	/**
 	 * 获得 TCP 套接字的 linger 值
-	 * @param fd {ACL_SOCKET} 套接字
 	 * @return {int} 返回 -1 表示未设置 linger 选项或内部出错，>= 0
 	 *  表示设置了 linger 选项且该值表示套接字关闭后该 TCP 连接在内核中
 	 *  维持 TIME_WAIT 状态的逗留时间(秒)
@@ -220,14 +219,12 @@ public:
 
 	/**
 	 * 获取 TCP 套接字的写缓冲区大小
-	 * @param fd {ACL_SOCKET} 套接字
 	 * @return {int} 缓冲区大小
 	 */
 	int get_tcp_sendbuf(void);
 
 	/**
 	 * 获取 TCP 套接字的读缓冲区大小
-	 * @param fd {ACL_SOCKET} 套接字
 	 * @return {int} 缓冲区大小
 	 */
 	int get_tcp_recvbuf(void);

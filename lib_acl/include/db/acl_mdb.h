@@ -39,7 +39,7 @@ ACL_API ACL_MDB *acl_mdb_create(const char *dbname, const char *dbtype);
 
 /**
  * 关闭并释放一个内存数据库
- * @param {ACL_MDB*} 数据库句柄
+ * @param mdb {ACL_MDB*} 数据库句柄
  */
 ACL_API void acl_mdb_free(ACL_MDB *mdb);
 
@@ -47,7 +47,7 @@ ACL_API void acl_mdb_free(ACL_MDB *mdb);
  * 在给定数据库上创建一个数据表
  * @param mdb {ACL_MDB*} 数据库句柄
  * @param tbl_name {const char*} 表名
- * @param tlb_flag {unsigned int} 表的属性标志位
+ * @param tbl_flag {unsigned int} 表的属性标志位
  * @param init_capacity {size_t} 数据表内针对每个索引键的内部哈希表的初始化容量
  * @param key_labels {const char *[]} 数据表字段名数组
  * @param flags {unsigned int[]} 与 key_labels 相对应的约束标志位
@@ -149,7 +149,7 @@ ACL_API int acl_mdb_cnt(ACL_MDB *mdb, const char *tbl_name);
  * 创建一个数据表
  * @param dbtype {const char *} 表类型: hash/avl
  * @param tbl_name {const char*} 表名
- * @param tlb_flag {unsigned int} 表的属性标志位
+ * @param tbl_flag {unsigned int} 表的属性标志位
  * @param init_capacity {size_t} 每个内部哈希表的初始化容量
  * @param key_labels {const char *[]} 表中的各个字段名数组，最后以NULL结束
  * @param flags {unsigned int[]} 与 key_labels 相对应的约束标志位

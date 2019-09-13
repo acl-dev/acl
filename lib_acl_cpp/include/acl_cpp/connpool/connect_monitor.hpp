@@ -102,9 +102,10 @@ public:
 	 * @param checker {check_client&}
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_connected(const check_client& /* checker */,
-		double /* cost */)
+	virtual void on_connected(const check_client& checker, double cost)
 	{
+		(void) checker;
+		(void) cost;
 	}
 
 	/**
@@ -112,8 +113,10 @@ public:
 	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_timeout(const char* /* addr */, double /* cost */)
+	virtual void on_timeout(const char* addr, double cost)
 	{
+		(void) addr;
+		(void) cost;
 	}
 
 	/**
@@ -121,8 +124,10 @@ public:
 	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到被断开的时间间隔（秒）
 	 */
-	virtual void on_refused(const char* /* addr */, double /* cost */)
+	virtual void on_refused(const char* addr, double cost)
 	{
+		(void) addr;
+		(void) cost;
 	}
 
 public:

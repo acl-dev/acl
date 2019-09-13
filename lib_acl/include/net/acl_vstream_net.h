@@ -14,7 +14,7 @@ extern "C" {
  *  如：127.0.0.1:80; 或域套接字(UNIX平台) 如：/tmp/test.sock
  * @param qlen {int} 监听队列的长度
  * @param flag {unsigned} 监听标志位，参见：ACL_INET_FLAG_XXX
- * @param bufsize {int} 接收的新的客户端套接字的IO缓冲区大小
+ * @param io_bufsize {int} 接收的新的客户端套接字的IO缓冲区大小
  * @param rw_timeout {int} 接收的新的客户端套接字的IO读写超时时间，单位为秒
  * @return {ACL_VSTREAM*} 监听流指针
  */

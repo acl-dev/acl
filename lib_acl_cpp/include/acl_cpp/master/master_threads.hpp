@@ -165,7 +165,7 @@ protected:
 	 * 3) 查看配置文件中的配置项(ioctl_quick_abort)，如果该配置项非 0 则
 	 *    子进程立即退出，否则：
 	 * 4) 等所有客户端连接关闭后才退出
-	 * @param ncleints {size_t} 当前连接的客户端个数
+	 * @param nclients {size_t} 当前连接的客户端个数
 	 * @param nthreads {size_t} 当前线程池中繁忙的工作线程个数
 	 * @return {bool} 返回 false 表示当前子进程还不能退出，否则表示当前
 	 *  子进程可以退出了

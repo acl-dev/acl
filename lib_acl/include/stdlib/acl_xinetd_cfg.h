@@ -15,26 +15,26 @@ typedef struct ACL_XINETD_CFG_PARSER ACL_XINETD_CFG_PARSER;
 
 /**
  * 功能: 获得所需要的配置 项的内容
- * @param xcp: 结构指针, 不能为空
- * @param name: 配置项的变量名
+ * @param xcp 结构指针, 不能为空
+ * @param name 配置项的变量名
  * @return 配置文件中配置项的内容
  */
 ACL_API const char *acl_xinetd_cfg_get(const ACL_XINETD_CFG_PARSER *xcp, const char *name);
 
 /**
  * 功能: 获得所需要的配置项的数组，对于一个变量名对应多个变量值时有用
- * @param xcp: 结构指针, 不能为空
- * @param name: 配置项的变量名
+ * @param xcp 结构指针, 不能为空
+ * @param name 配置项的变量名
  * @return 配置文件中配置项的内容动态数组
  */
 ACL_API const ACL_ARRAY *acl_xinetd_cfg_get_ex(const ACL_XINETD_CFG_PARSER *xcp, const char *name);
 
 /**
  * 功能: 从配置文件中获得对应在于某一个索引值位置的内容
- * @param xcp: 结构指针, 不能为空
- * @param idx: 索引位置值
- * @param ppname: 指向指针的地址的变量
- * @param ppvalue: 指向指针的地址的变量
+ * @param xcp 结构指针, 不能为空
+ * @param idx 索引位置值
+ * @param ppname 指向指针的地址的变量
+ * @param ppvalue 指向指针的地址的变量
  * @return  0: OK, -1: ERR
  */
 ACL_API int acl_xinetd_cfg_index(const ACL_XINETD_CFG_PARSER *xcp,
@@ -44,20 +44,20 @@ ACL_API int acl_xinetd_cfg_index(const ACL_XINETD_CFG_PARSER *xcp,
 
 /**
  * 功能: 配置文件中配置项的条数
- * @param xcp: 结构指针, 不能为空
+ * @param xcp 结构指针, 不能为空
  * @return 配置文件中配置项的条数
  */
 ACL_API int acl_xinetd_cfg_size(const ACL_XINETD_CFG_PARSER *xcp);
 
 /**
  * 功能: 释放由结构指针所指向的内存空间
- * @param xcp: 结构指针
+ * @param xcp 结构指针
  */
 ACL_API void acl_xinetd_cfg_free(ACL_XINETD_CFG_PARSER *xcp);
 
 /**
  * 功能: 读取配置文件并进行解析
- * @param pathname: 配置文件的文件名
+ * @param pathname 配置文件的文件名
  * @return 已经解析了配置文件的结构指针
  */
 ACL_API ACL_XINETD_CFG_PARSER *acl_xinetd_cfg_load(const char *pathname);
