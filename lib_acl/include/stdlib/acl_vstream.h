@@ -310,7 +310,7 @@ ACL_API acl_off_t acl_vstream_fseek(ACL_VSTREAM *fp, acl_off_t offset, int whenc
  * @param whence {int} 移动方向：SEEK_SET（从文件起始位置后移动）,
  *  SEEK_CUR（从当前文件指针位置向后移动）, SEEK_END（从文件尾向前移动）
  * @return ret {acl_off_t}, ret >= 0: 正确, ret < 0: 出错
- * @deprecated 该函数的效率较低
+ * @DEPRECATED 该函数的效率较低
  */
 ACL_API acl_off_t acl_vstream_fseek2(ACL_VSTREAM *fp, acl_off_t offset, int whence);
 
@@ -562,7 +562,7 @@ ACL_API void acl_vstream_buffed_space(ACL_VSTREAM *fp);
 
 /**
  * 刷新写缓冲区里的数据
- * @param fp: socket 数据流
+ * @param fp socket 数据流
  * @return 刷新写缓冲区里的数据量或出错 ACL_VSTREAM_EOF
  */
 ACL_API int acl_vstream_fflush(ACL_VSTREAM *fp);
