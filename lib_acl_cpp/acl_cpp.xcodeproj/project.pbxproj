@@ -60,7 +60,6 @@
 		07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467081E6FCCF1002C9B3C /* mysql_manager.cpp */; };
 		07A467DF1E6FCCF1002C9B3C /* mysql_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467091E6FCCF1002C9B3C /* mysql_pool.cpp */; };
 		07A467E01E6FCCF1002C9B3C /* query.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670A1E6FCCF1002C9B3C /* query.cpp */; };
-		07A467E11E6FCCF1002C9B3C /* sqlite_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */; };
 		07A467E21E6FCCF1002C9B3C /* sqlite_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670C1E6FCCF1002C9B3C /* sqlite_pool.cpp */; };
 		07A467E31E6FCCF1002C9B3C /* disque.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670E1E6FCCF1002C9B3C /* disque.cpp */; };
 		07A467E41E6FCCF1002C9B3C /* disque_cond.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670F1E6FCCF1002C9B3C /* disque_cond.cpp */; };
@@ -151,7 +150,6 @@
 		07A4683A1E6FCCF1002C9B3C /* redis_server.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677B1E6FCCF1002C9B3C /* redis_server.cpp */; };
 		07A4683B1E6FCCF1002C9B3C /* redis_set.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677C1E6FCCF1002C9B3C /* redis_set.cpp */; };
 		07A4683C1E6FCCF1002C9B3C /* redis_slot.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677D1E6FCCF1002C9B3C /* redis_slot.cpp */; };
-		07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
 		07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677F1E6FCCF1002C9B3C /* redis_transaction.cpp */; };
 		07A4683F1E6FCCF1002C9B3C /* redis_zset.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467801E6FCCF1002C9B3C /* redis_zset.cpp */; };
 		07A468401E6FCCF1002C9B3C /* gsoner.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467821E6FCCF1002C9B3C /* gsoner.cpp */; };
@@ -179,7 +177,6 @@
 		07A468561E6FCCF1002C9B3C /* string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4679D1E6FCCF1002C9B3C /* string.cpp */; };
 		07A468571E6FCCF1002C9B3C /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4679E1E6FCCF1002C9B3C /* thread.cpp */; };
 		07A468581E6FCCF1002C9B3C /* thread_pool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4679F1E6FCCF1002C9B3C /* thread_pool.cpp */; };
-		07A468591E6FCCF1002C9B3C /* token_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A01E6FCCF1002C9B3C /* token_tree.cpp */; };
 		07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A11E6FCCF1002C9B3C /* url_coder.cpp */; };
 		07A4685B1E6FCCF1002C9B3C /* util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A21E6FCCF1002C9B3C /* util.cpp */; };
 		07A4685C1E6FCCF1002C9B3C /* xml.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A31E6FCCF1002C9B3C /* xml.cpp */; };
@@ -210,6 +207,9 @@
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
 		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
 		07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */; };
+		70BD6B8C232B933D00E4C798 /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
+		70BD6B8D232B933D00E4C798 /* token_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A01E6FCCF1002C9B3C /* token_tree.cpp */; };
+		70BD6B8E232B933D00E4C798 /* sqlite_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -1544,7 +1544,7 @@
 		07A458291E6FCCB4002C9B3C /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0830;
+				LastUpgradeCheck = 1030;
 				ORGANIZATIONNAME = zsx;
 				TargetAttributes = {
 					07A458301E6FCCB4002C9B3C = {
@@ -1554,10 +1554,11 @@
 			};
 			buildConfigurationList = 07A4582C1E6FCCB4002C9B3C /* Build configuration list for PBXProject "acl_cpp" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
+				Base,
 			);
 			mainGroup = 07A458281E6FCCB4002C9B3C;
 			productRefGroup = 07A458321E6FCCB4002C9B3C /* Products */;
@@ -1620,8 +1621,7 @@
 				07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */,
 				07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */,
 				07A467DA1E6FCCF1002C9B3C /* db_service_mysql.cpp in Sources */,
-				07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */,
-				07A4683D1E6FCCF1002C9B3C /* redis_stream.cpp in Sources */,
+				70BD6B8C232B933D00E4C798 /* redis_stream.cpp in Sources */,
 				07A468051E6FCCF1002C9B3C /* master_conf.cpp in Sources */,
 				0778DAEE1F78D3FC0011B753 /* event_mutex.cpp in Sources */,
 				07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */,
@@ -1636,8 +1636,7 @@
 				0778DADB1F1CB2AB0011B753 /* tcp_manager.cpp in Sources */,
 				07A4681B1E6FCCF1002C9B3C /* mime_attach.cpp in Sources */,
 				07A468191E6FCCF1002C9B3C /* trimblanks.cpp in Sources */,
-				07A467E11E6FCCF1002C9B3C /* sqlite_manager.cpp in Sources */,
-				07A467E11E6FCCF1002C9B3C /* sqlite_manager.cpp in Sources */,
+				70BD6B8E232B933D00E4C798 /* sqlite_manager.cpp in Sources */,
 				07A467D61E6FCCF1002C9B3C /* db_handle.cpp in Sources */,
 				07A467EF1E6FCCF1002C9B3C /* http_download.cpp in Sources */,
 				07A468391E6FCCF1002C9B3C /* redis_script.cpp in Sources */,
@@ -1678,8 +1677,7 @@
 				07A467F41E6FCCF1002C9B3C /* http_request_manager.cpp in Sources */,
 				07A468621E6FCCF1002C9B3C /* aio_handle.cpp in Sources */,
 				07A467FA1E6FCCF1002C9B3C /* HttpServlet.cpp in Sources */,
-				07A468591E6FCCF1002C9B3C /* token_tree.cpp in Sources */,
-				07A468591E6FCCF1002C9B3C /* token_tree.cpp in Sources */,
+				70BD6B8D232B933D00E4C798 /* token_tree.cpp in Sources */,
 				07A4686C1E6FCCF1002C9B3C /* istream.cpp in Sources */,
 				0778DADE1F1CB2AB0011B753 /* tcp_sender.cpp in Sources */,
 				07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */,
@@ -1789,19 +1787,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1851,19 +1858,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -1929,6 +1945,7 @@
 					"$(inherited)",
 					/Users/zsx/work/github/acl/test/url_coder,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1958,6 +1975,7 @@
 					"$(inherited)",
 					/Users/zsx/work/github/acl/test/url_coder,
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
