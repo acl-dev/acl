@@ -47,7 +47,7 @@ void acl_msg_register(ACL_MSG_OPEN_FN open_fn, ACL_MSG_CLOSE_FN close_fn,
 		return;
 
 	__open_fn = open_fn;
-	__close_fn = close_fn,
+    __close_fn = close_fn;
 	__write_fn = write_fn;
 	__msg_ctx = ctx;
 }
