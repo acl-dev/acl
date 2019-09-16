@@ -87,7 +87,7 @@ const char* aio_stream::get_peer(bool full /* = false */) const
 	}
 
 	return const_cast<aio_stream*>
-		(this)->get_ip(ptr, const_cast<aio_stream*>(this)->ipbuf_);
+		(this)->get_ip(ptr, const_cast<aio_stream*>(this)->ip_peer_);
 }
 
 const char* aio_stream::get_local(bool full /* = false */) const
@@ -113,7 +113,7 @@ const char* aio_stream::get_local(bool full /* = false */) const
 	}
 
 	return const_cast<aio_stream*>
-		(this)->get_ip(ptr, const_cast<aio_stream*>(this)->ipbuf_);
+		(this)->get_ip(ptr, const_cast<aio_stream*>(this)->ip_local_);
 }
 
 const char* aio_stream::get_ip(const char* addr, std::string& out)
@@ -124,7 +124,7 @@ const char* aio_stream::get_ip(const char* addr, std::string& out)
 	if (ptr) {
 		*ptr = 0;
 	}
-	out = ptr;
+	out = buf;
 	return out.c_str();
 }
 
