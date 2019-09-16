@@ -303,11 +303,12 @@ int redis_pubsub::check_channel(const redis_result* obj, const char* cmd,
 }
 
 bool redis_pubsub::get_message(string& channel, string& msg,
-	string* message_type /* = NULL */, string* pattern /* = NULL */)
+	string* message_type /* = NULL */, string* pattern /* = NULL */,
+	int timeout /* = -1 */)
 {
 	clear_request();
 	int rw_timeout = -1;
-	const redis_result* result = run(0, &rw_timeout);
+	const redis_result* result = run(0, timeout >= 0 ? &timeout : &rw_timeout);
 	if (result == NULL)
 		return false;
 	if (result->get_type() != REDIS_RESULT_ARRAY)
