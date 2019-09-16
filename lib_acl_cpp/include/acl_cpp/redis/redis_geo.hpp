@@ -123,7 +123,7 @@ public:
 	 *  the specified key
 	 * @param member {const char*} 该地理坐标的标识符
 	 *  the geospatial's identifier
-	 * @param loginitude {double} 经度
+	 * @param longitude {double} 经度
 	 *  the geospatial's loginitude
 	 * @param latitude {double} 纬度
 	 *  the geospatial's latitude
@@ -145,7 +145,7 @@ public:
 	 *  the specified key
 	 * @param size {size_t} 数组的长度
 	 *  the array's size
-	 * @param memebers {const char* []} 成员数组，其长度由 size 指定
+	 * @param members {const char* []} 成员数组，其长度由 size 指定
 	 *  the members array, which's length was specified by size parameter
 	 * @param longitudes {const double[]} 经度数据数组，其长度由 size 指定
 	 *  the logintitudes array, which's length was specifed by size parameter
@@ -154,14 +154,14 @@ public:
 	 * @return {int} 添加成功的成员数量，返回值含义如下：
 	 *  return the successfully added members's count:
 	 *  > 0: 表示成功添加的成员数量；
-	 *       represent the successfully added memebers's count
+	 *       represent the successfully added members's count
 	 *    0: 这些成员都已经存在
 	 *       the members's belong the key already existing
 	 *   -1: 表示出错，可以通过 result_error 函数查看出错原因
 	 *       some error happened, the result_error function can be used
 	 *       to find the error's reason
 	 */
-	int geoadd(const char* key, size_t size, const char* memebers[],
+	int geoadd(const char* key, size_t size, const char* members[],
 		const double longitudes[], const double latitudes[]);
 
 	/**
@@ -170,7 +170,7 @@ public:
 	 * to the specified key.
 	 * @param key {const char*} 对应的键值
 	 *  the specified key
-	 * @param memebers {const std::vector<string>&} 成员数组
+	 * @param members {const std::vector<string>&} 成员数组
 	 *  the members array
 	 * @param longitudes {const std::vector<double>&} 经度数据数组
 	 *  the logintitudes array
@@ -179,7 +179,7 @@ public:
 	 * @return {int} 添加成功的成员数量，返回值含义如下：
 	 *  return the successfully added members's count:
 	 *  > 0: 表示成功添加的成员数量；
-	 *       represent the successfully added memebers's count
+	 *       represent the successfully added members's count
 	 *    0: 这些成员都已经存在
 	 *       the members's belong the key already existing
 	 *   -1: 表示出错，可以通过 result_error 函数查看出错原因
@@ -198,7 +198,7 @@ public:
 	 * Returns members of a geospatial index as standard geohash strings.
 	 * @param key {const char*} 对应的键值
 	 *  the specified key
-	 * @param memebers {const std::vector<string>&} 成员数组
+	 * @param members {const std::vector<string>&} 成员数组
 	 *  the members array
 	 * @param results {std::vector<string>&} 存储结果集合
 	 *  store the result
@@ -213,7 +213,7 @@ public:
 	 * Returns members of a geospatial index as standard geohash strings.
 	 * @param key {const char*} 对应的键值
 	 *  the specified key
-	 * @param memeber {const char*} 成员名
+	 * @param member {const char*} 成员名
 	 *  the member of a geospatial index
 	 * @param result {std::vector<string>&} 存储结果
 	 *  store the result
@@ -227,7 +227,7 @@ public:
 	 * Returns longitude and latitude of members of a geospatial index
 	 * @param key {const char*} 对应的键值
 	 *  the specified key
-	 * @param memebers {const std::vector<string>&} 成员数组
+	 * @param members {const std::vector<string>&} 成员数组
 	 *  the members array
 	 * @param results {std::vector<std::pair<double, double> >&} 存储结果集
 	 *  store the results

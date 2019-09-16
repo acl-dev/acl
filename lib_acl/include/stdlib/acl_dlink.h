@@ -146,7 +146,7 @@ ACL_API int acl_dlink_delete_by_item(ACL_DLINK *plink, ACL_DITEM *pitem);
 
 /**
  * 功能同 acl_dlink_insert
- * @deprecated 此函数将来也许不再提供
+ * @DEPRECATED 此函数将来也许不再提供
  */
 ACL_API ACL_DITEM *acl_dlink_modify(ACL_DLINK *plink,
 	acl_int64 begin, acl_int64 end);

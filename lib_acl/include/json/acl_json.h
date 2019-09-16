@@ -350,7 +350,7 @@ ACL_API ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json,
 /**
  * 构建 json 对象的数值节点，按 json 规范，该节点只能加入至数组对象中
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param text {acl_int64}
+ * @param value {acl_int64}
  * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
  *  一起被释放，所以不需要单独释放
  */
@@ -359,7 +359,7 @@ ACL_API ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json,
 /**
  * 构建 json 对象的数值节点，按 json 规范，该节点只能加入至数组对象中
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
- * @param text {double}
+ * @param value {double}
  * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
  *  一起被释放，所以不需要单独释放
  */
@@ -428,7 +428,7 @@ ACL_API void acl_json_node_append_child(ACL_JSON_NODE *parent,
  *  返回的 ACL_VSTRING 指针如果为该函数内部创建的，则用户名必须用
  *  acl_vstring_free 进行释放
  */
-ACL_API ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *json, ACL_VSTRING *buf);
+ACL_API ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *node, ACL_VSTRING *buf);
 
 /**
  * 将 json 对象转成字符串内容

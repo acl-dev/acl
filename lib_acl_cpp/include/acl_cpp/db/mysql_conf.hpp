@@ -69,7 +69,7 @@ public:
 
 	/**
 	 * 设置读取数据库结果的超时时间
-	 * @param int {timeout}
+	 * @param timeout {int}
 	 * @return {mysql_conf&}
 	 */
 	mysql_conf& set_rw_timeout(int timeout);

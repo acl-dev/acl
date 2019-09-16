@@ -27,9 +27,9 @@ public:
 	 *  则当调用 += int|int64|short|char 或调用 << int|int64|short|char
 	 *  时，则按二进制方式处理，否则按文本方式处理
 	 */
-	string(void);
-	explicit string(size_t n);
 	string(size_t n, bool bin);
+	explicit string(size_t n);
+	string(void);
 
 	/**
 	 * 构造函数

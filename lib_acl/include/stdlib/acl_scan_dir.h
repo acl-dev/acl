@@ -109,7 +109,7 @@ ACL_API acl_int64 acl_scan_dir_nsize(ACL_SCAN_DIR *scan);
 /**
  * 取得当前扫描到的文件或目录的属性信息，类似于标准的 stat() 函数
  * @param scan {ACL_SCAN_DIR*} 类型指针
- * @param sbuf: {struct acl_stat*} 类型指针
+ * @param sbuf {struct acl_stat*} 类型指针
  * @return {int} 0: Ok, -1: Error
  */
 ACL_API int acl_scan_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf);
@@ -117,7 +117,7 @@ ACL_API int acl_scan_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf);
 /**
  * 取得当前正在扫描的目录节点的属性信息，该 API 不同于 acl_scan_stat
  * @param scan {ACL_SCAN_DIR*} 类型指针
- * @param sbuf: {struct acl_stat*} 类型指针
+ * @param sbuf {struct acl_stat*} 类型指针
  * @return {int} 0: Ok, -1: Error
  */
 ACL_API int acl_scan_dir_stat(ACL_SCAN_DIR *scan, struct acl_stat *sbuf);

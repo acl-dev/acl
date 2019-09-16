@@ -186,7 +186,7 @@ public:
 
 	/**
 	 * 设置接收缓冲区的最大长度，以避免缓冲区溢出，默认值为 0 表示不限制
-	 * @param int {max}
+	 * @param max {int}
 	 * @return {aio_istream&}
 	 */
 	aio_istream& set_buf_max(int max);

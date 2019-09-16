@@ -170,7 +170,7 @@ public:
 	 * @param out {std::map<string, int>&} 存储查询结果，其中 out->first 存放
 	 *  频道名，out->second 在座该频道的订阅者数量
 	 *  store the results
-	 * @param first_pattern {const char*} 作为附加的匹配模式第一个匹配字符串，
+	 * @param first_channel {const char*} 第一个频道
 	 *  该指针可以为 NULL，此时获取指所有的活跃频道；对于变参而言最后一个参数需为 NULL
 	 *  the first pattern in a variable args ending with NULL arg, and
 	 *  the first arg can be NULL.

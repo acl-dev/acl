@@ -63,7 +63,7 @@ ACL_API int acl_mempool_total_allocated(void);
  * @param line {int} 调用该函数所在源文件中的行数
  * @param ptr {void*} 动态分配的内存外部地址
  * @param len {size_t*} 存储该内存的外部可用大小
- * @param read_len {size*} 存储该内存的实际大小(因为内部有一些控制字节)
+ * @param real_len {size*} 存储该内存的实际大小(因为内部有一些控制字节)
  */
 ACL_API void acl_default_memstat(const char *filename, int line,
         void *ptr, size_t *len, size_t *real_len);

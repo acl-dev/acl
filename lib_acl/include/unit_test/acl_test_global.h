@@ -76,44 +76,44 @@ ACL_API AUT_LINE *aut_index(int idx);
 
 /**
  * 功能: 比较所给的命令是否与  test_line 中所记录的命令相同
- * @param test_line: 与某一有效配置行相关的结构指针
- * @param cmd_name: 待查询的命令
+ * @param test_line 与某一有效配置行相关的结构指针
+ * @param cmd_name 待查询的命令
  * @return 如果相等则返回 0, 如果不等则返回非 0
  */
 ACL_API int aut_line_cmdcmp(const AUT_LINE *test_line, const char *cmd_name);
 
 /**
  * 功能: 比较所给的执行结果值是否与配置文件中所期望的结果值相等
- * @param test_line: 与某一有效配置行相关的结构指针
- * @param result: 程序某个任务函数的执行结果值
+ * @param test_line 与某一有效配置行相关的结构指针
+ * @param result 程序某个任务函数的执行结果值
  * @return 相等则返回 0, 不相等则返回非 0
  */
 ACL_API int aut_line_resultcmp(const AUT_LINE *test_line, int result);
 
 /**
  * 功能: 取得该有效配置行在配置文件中的行号位置
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 成功: >=0, 该值即为行号, 失败: < 0
  */
 ACL_API int aut_line_number(const AUT_LINE *test_line);
 
 /**
  * 功能: 取得所给命令行的有效行号
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 成功: >=0, 该值即为行号, 失败: < 0
  */
 ACL_API int aut_line_valid_linenum(const AUT_LINE *test_line);
 
 /**
  * 功能: 获得该配置行的命令字
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 相等返回 0, 不等则返回非 0
  */
 ACL_API const char *aut_line_cmdname(const AUT_LINE *test_line);
 
 /**
  * 功能: 返回该配置行中参数的个数
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 成功: >= 0, 失败: -1
  */
 ACL_API int aut_line_argc(const AUT_LINE *test_line);
@@ -128,14 +128,14 @@ ACL_API const char *aut_line_getvalue(const AUT_LINE *test_line, const char *nam
 
 /**
  * 功能: 返回该配置行的内容
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 成功: 非空指针, 失败: 空指针
  */
 ACL_API const char *aut_line_argstr(const AUT_LINE *test_line);
 
 /**
  * 功能: 返回该配置行中期望的执行结果值
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 期望的执行结果值
  * 说明: 没有出错的情况, 如果传入的参数非法则返回 -1, 但无法区分该 -1 值是
  *       非法值还是期望的执行结果值
@@ -144,36 +144,36 @@ ACL_API int aut_line_result(const AUT_LINE *test_line);
 
 /**
  * 功能: 是否遇到了配置行中的结束字段
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 是: 1, 否: 0
  */
 ACL_API int aut_line_stop(const AUT_LINE *test_line);
 
 /**
  * 功能: 内部保留字段, 遇到此内部保留配置行则需要跳过
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 是: 1, 否: 0
  */
 ACL_API int aut_line_reserved(AUT_LINE *test_line);
 
 /**
  * 功能: 调用者可以把自己的参数添加到 test_line 之中
- * @param test_line: 与某一有效配置行相关的结构指针
- * @param arg: 用户要添加的参数
+ * @param test_line 与某一有效配置行相关的结构指针
+ * @param arg 用户要添加的参数
  * @return 成功: 0, 失败: -1
  */
 ACL_API int aut_line_add_arg(AUT_LINE *test_line, void *arg);
 
 /**
  * 功能: 从 test_line 删除用户自己的参数
- * @param test_line: 与某一有效配置行相关的结构指针
- * @param free_fn: 用户自己的析构函数
+ * @param test_line 与某一有效配置行相关的结构指针
+ * @param free_fn 用户自己的析构函数
  */
 ACL_API void aut_line_del_arg(AUT_LINE *test_line, void (*free_fn) (void *));
 
 /**
  * 功能: 从 test_line 中取出用户自己的参数
- * @param test_line: 与某一有效配置行相关的结构指针
+ * @param test_line 与某一有效配置行相关的结构指针
  * @return 成功: 非空指针, 如果返回指针为空则有可能是内部错误或本来就是空
  */
 ACL_API void *aut_line_get_arg(const AUT_LINE *test_line);
@@ -188,8 +188,8 @@ ACL_API int aut_end_linenum(int start_linenum);
 /**
  * 功能: 从当前所提供的 test_line 起, 一直向下找到某个与所提供标志位相同的
  *       test_line.
- * @param test_line: 与某一有效配置行相关的结构指针
- * @param flag: defined as AUT_FLAG_ in acl_test_struct.h
+ * @param test_line 与某一有效配置行相关的结构指针
+ * @param flag defined as AUT_FLAG_ in acl_test_struct.h
  * @return != NULL, ok find it; == NULL, not found.
  */
 ACL_API const AUT_LINE *aut_lookup_from_line(const AUT_LINE *test_line, int flag);

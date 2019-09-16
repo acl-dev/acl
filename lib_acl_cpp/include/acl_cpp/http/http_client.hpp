@@ -215,7 +215,7 @@ public:
 	 * @param name {const char*} HTTP 头的字段名，如：Content-Length，
 	 *   该字段不区分大小写
 	 * @param value {const char*} 该头部字段的值
-	 * @param force {bool} 如果该头部字段不存在是否需要强制添加
+	 * @param force_add {bool} 如果该头部字段不存在是否需要强制添加
 	 * @return {bool} 返回 false 表示输入出错，或头部字段名不存在且参数
 	 *  force_add 为 false
 	 */

@@ -127,7 +127,7 @@ ACL_API int acl_timed_write(ACL_SOCKET fd, void *buf, unsigned len,
  * @param buf {void*} 数据存储区，不能为空
  * @param len {unsigned} 数据长度大小
  * @param timeout {int} 超时时间，单位为秒
- * @param {int} 成功写入的长度
+ * @return {int} 成功写入的长度
  */
 ACL_API int acl_write_buf(ACL_SOCKET fd, const char *buf, int len, int timeout);
 

@@ -42,8 +42,6 @@ public:
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
 	 * 该函数首先会调用 start 过程，然后根据 start 的返回结果及请求/响应
 	 * 对象是否要求保持长连接来决定是否需要与客户端保持长连接.
-	 * @return {bool} 返回处理结果，返回 false 表示处理失败或处理成功且
-	 *  不保持长连接，应关闭连接
 	 */
 
 	virtual ~WebSocketServlet(void);
@@ -59,36 +57,36 @@ public:
 
 	/**
 	 * 发送二进制数据.
-	 * @param rw_timeout {const char *} 发送的数据
-	 * @return {bool} 错误 false.否则 true
+	 * @param buf {const char *} 发送的数据
+	 * @param len {int} buf 数据长度
+	 * @return {bool} 错误 false, 否则 true
 	 */
 	bool sendBinary(const char *buf, int len);
 
 	/**
 	 * 发送文本数据.
-	 * @param rw_timeout {const char *} 发送的数据
-	 * @return {bool} 错误 false.否则 true
+	 * @param text {const char *} 发送的数据
+	 * @return {bool} 错误 false, 否则 true
 	 */
 	bool sendText(const char *text);
 
 	/**
 	 * 发送pong 消息.
-	 * @param rw_timeout {const char *} 发送的数据
-	 * @return {bool} 错误 false.否则 true
+	 * @param buffer {const char *} 发送的数据
+	 * @return {bool} 错误 false, 否则 true
 	 */
 	bool sendPong(const char *buffer = NULL);
 
 	/**
 	 * 发送pong 消息.
-	 * @param rw_timeout {const char *} 发送的数据
-	 * @return {bool} 错误 false.否则 true
+	 * @param buffer {const char *} 发送的数据
+	 * @return {bool} 错误 false, 否则 true
 	 */
 	bool sendPing(const char *buffer = NULL);
 
 protected:
 	/**
 	 * websocket 关闭消息回调
-	 * @return {void}
 	 */
 	virtual void onClose(void) {}
 

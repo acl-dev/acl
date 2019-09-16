@@ -132,8 +132,8 @@ ACL_API int acl_dns_empty(ACL_DNS *dns);
 /**
  * 删除一个DNS服务器地址
  * @param dns {ACL_DNS*} DNS异步查询句柄
- * @param dns_ip {const char*} DNS服务器IP地址
- * @param dns_port {unsigned short} DNS服务器端口
+ * @param ip {const char*} DNS服务器IP地址
+ * @param port {unsigned short} DNS服务器端口
  */
 ACL_API void acl_dns_del_dns(ACL_DNS *dns, const char *ip, unsigned short port);
 

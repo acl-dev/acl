@@ -84,7 +84,7 @@ public:
 	/**
 	 * 向服务器发送指定长度的数据包
 	 * @param addr {const char*} 指定的目标服务器地址
-	 * @param {const void*} 要发送的数据包地址
+	 * @param data {const void*} 要发送的数据包地址
 	 * @param len {unsigned int} 数据长度
 	 * @param out {string*} 当该对象非 NULL 时表明需要从服务器读取响应数据，
 	 *  响应结果将被存放在该缓冲区中，如果该对象为 NULL，则表示无需读取
@@ -96,7 +96,7 @@ public:
 
 	/**
 	 * 向所有服务器发送数据包
-	 * @param {const void*} 要发送的数据包地址
+	 * @param data {const void*} 要发送的数据包地址
 	 * @param len {unsigned int} 数据长度
 	 * @param exclusive {bool} 发送广播包时，是否加线程锁以防止其它线程
 	 *  竞争内部连接池资源

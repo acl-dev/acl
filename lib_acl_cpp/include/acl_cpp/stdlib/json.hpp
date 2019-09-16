@@ -43,7 +43,7 @@ public:
 
 	/**
 	 * 当该 json 节点存在子节点时，返回本 json 节点标签对应的 json 子节点
-	 * @param {const json_node*} 返回 NULL 说明不存在子节点
+	 * @return {const json_node*} 返回 NULL 说明不存在子节点
 	 *  注：get_text 与 get_obj 不会同时返回非 NULL
 	 */
 	json_node* get_obj(void) const;
@@ -172,8 +172,8 @@ public:
 	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
 	 *  否则返回本 json 节点对象的引用
 	 */
-	json_node& add_array(bool return_child = false);
 	json_node& add_child(bool as_array = false, bool return_child = false);
+	json_node& add_array(bool return_child = false);
 
 	/**
 	 * 创建一个 json 节点对象，并将之添加为本 json 节点的子节点

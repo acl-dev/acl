@@ -42,14 +42,14 @@ ACL_API int acl_getsocktype(ACL_SOCKET fd);
 
 /**
  * 检查套接字：是监听套接字还是网络套接字
- * @param sockefd {ACL_SOCKET} 套接字句柄
+ * @param fd {ACL_SOCKET} 套接字句柄
  * @return {int} 返回 -1 表示该句柄非套接字，1 为监听套接字，0 为非监听套接字
  */
 ACL_API int acl_check_socket(ACL_SOCKET fd);
 
 /**
  * 判断套接字是否为监听套接字
- * @param sockefd {ACL_SOCKET} 套接字句柄
+ * @param fd {ACL_SOCKET} 套接字句柄
  * @return {int} 返回值 0 表示非监听套接字，非 0 表示为监听套接字
  */
 ACL_API int acl_is_listening_socket(ACL_SOCKET fd);

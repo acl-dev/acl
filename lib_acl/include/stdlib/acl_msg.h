@@ -74,7 +74,7 @@ ACL_API void acl_msg_pre_write(ACL_MSG_PRE_WRITE_FN pre_write, void *ctx);
 
 /**
  * 全局变量，表示调试级别
- * @deprecated 将来该参数将只会内部使用，外部应用不应用它
+ * @DEPRECATED 将来该参数将只会内部使用，外部应用不应用它
  */
 extern ACL_API int acl_msg_verbose;
 
@@ -100,7 +100,6 @@ ACL_API void acl_msg_trace_enable(int onoff);
  *  /tmp/test.log|UDP:127.0.0.1:12345|TCP:127.0.0.1:12345|UNIX:/tmp/test.sock
  *  该配置要求将所有日志同时发给 /tmp/test.log, UDP:127.0.0.1:12345,
  *  TCP:127.0.0.1:12345 和 UNIX:/tmp/test.sock 四个日志接收器对象
- * @param plog_pre {const char*} 日志记录信息前的提示信息，建议用进程
  * @param info_pre {const char*} 日志记录信息前的提示信息
  */
 ACL_API void acl_msg_open(const char *log_file, const char *info_pre);

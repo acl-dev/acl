@@ -107,7 +107,7 @@ public:
 	 *  the key of the sorted set
 	 * @param inc {double} 增量值
 	 *  the value to be increased
-	 * @param member{const char*} 有序集中成员名
+	 * @param member {const char*} 有序集中成员名
 	 *  the specified memeber of a sorted set
 	 * @param result {double*} 非空时存储结果值
 	 *  if not null, it will store the score result after increment
@@ -175,7 +175,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result 存储 "成员名-分值对"结果集，内部先调用 out.clear()
+	 * @param out 存储 "成员名-分值对"结果集，内部先调用 out.clear()
 	 * @return {int} 结果集中成员的数量
 	 *  0: 表示结果集为空或 key 不存在
 	 * -1: 表示出错或 key 对象非有序集对象
@@ -355,7 +355,7 @@ public:
 	 * @param key {const char*} 有序集键值
 	 * @param start {int} 起始下标位置
 	 * @param stop {int} 结束下标位置（结果集同时含该位置）
-	 * @param result 存储 "成员名-分值对"结果集，内部先调用 out.clear()
+	 * @param out 存储 "成员名-分值对"结果集，内部先调用 out.clear()
 	 *  注：对于下标位置，0 表示第一个成员，1 表示第二个成员；-1 表示最后一个成员，
 	 *     -2 表示倒数第二个成员，以此类推
 	 * @return {int} 结果集数量，-1 表示出错

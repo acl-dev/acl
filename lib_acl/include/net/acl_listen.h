@@ -104,8 +104,8 @@ ACL_API ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag);
  *  AF_INET, AF_INET6, AF_UNIX
  * @return {ACL_SOCKET} 返回 ACL_SOCKET_INVALID 表示绑定失败
  */
-ACL_API ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag);
 ACL_API ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family);
+ACL_API ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag);
 
 #ifdef ACL_UNIX
 
@@ -121,7 +121,7 @@ ACL_API ACL_SOCKET acl_unix_listen(const char *addr, int backlog, unsigned flag)
 
 /**
  * 从域套接字上接收一个客户端连接
- * @param listen_fd {ACL_SOCKET} 监听套接字
+ * @param fd {ACL_SOCKET} 监听套接字
  * @return {ACL_SOCKET} 客户端连接，ACL_SOCKET_INVALID 表示接收客户端连接出错
  */
 ACL_API ACL_SOCKET acl_unix_accept(ACL_SOCKET fd);

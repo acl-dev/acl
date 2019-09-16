@@ -93,7 +93,6 @@ ACL_API void acl_slice_stat(ACL_SLICE *slice, ACL_SLICE_STAT *sbuf);
 /**
  * 手工将内存片池不用的内存进行释放
  * @param slice {ACL_SLICE*} 内存片池对象
- * @param {int} 是否已经将所有内存片释放完毕, 0: 否; 1: 是
  */
 ACL_API int acl_slice_gc(ACL_SLICE *slice);
 

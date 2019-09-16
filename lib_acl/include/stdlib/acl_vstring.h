@@ -55,7 +55,6 @@ ACL_API ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len);
 /**
  * 动态分配一个 ACL_VSTRING 对象并指定内部缓冲区的初始化大小，
  * 同时指定内存池对象，优化内存分配
- * @param slice {ACL_SLICE_POOL*} 切片内存池管理对象
  * @param len {size_t} 初始时缓冲区大小
  * @return {ACL_VSTRING*} 新分配的 ACL_VSTRING 对象
  */

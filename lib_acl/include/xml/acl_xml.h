@@ -498,7 +498,7 @@ ACL_API void acl_xml_node_add_text(ACL_XML_NODE *node, const char *text);
 /**
  * 用文件流中的内容给一个 xml 节点添加文本内容
  * @param node {ACL_XML_NODE*} 由 acl_xml_create_node 创建的节点 
- * @param in {ACL_VSTREAM*} 输入流对象
+ * @param fp {ACL_VSTREAM*} 输入流对象
  * @param off {size_t} 当 in 为文件流，指定在文件中的起始位置
  * @param len {size_t} 要拷贝的最大数据长度，当为 0 时则一直拷贝至流结束
  */

@@ -59,7 +59,7 @@ public:
 
 	/**
 	 * 设置读取数据库结果的超时时间
-	 * @param int {timeout}
+	 * @param timeout {int}
 	 * @return {pgsql_conf&}
 	 */
 	pgsql_conf& set_rw_timeout(int timeout);
