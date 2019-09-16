@@ -2,6 +2,7 @@
 
 589) 2019.9.16
 589.1) bugfix: aio_stream 类中 get_peer() / get_local() 返回有误
+589.2) bugfix: redis_pubsub::get_message() 添加读超时时间
 
 588) 2019.8.22
 588.1) bugfix: socket_stream.cpp 中 get_ip() 方法在使用 std::string 时应该对
