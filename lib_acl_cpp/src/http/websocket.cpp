@@ -50,9 +50,9 @@ websocket& websocket::reset(void)
 	header_.rsv2        = false;
 	header_.rsv3        = false;
 	header_.opcode      = FRAME_TEXT;
-	header_.mask        = false;
+//	header_.mask        = false;
 	header_.payload_len = 0;
-	header_.masking_key = 0;
+//	header_.masking_key = 0;
 
 	payload_nread_      = 0;
 	payload_nsent_      = 0;
