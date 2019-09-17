@@ -105,7 +105,7 @@ websocket& websocket::set_frame_payload_len(unsigned long long len)
 websocket& websocket::set_frame_masking_key(unsigned int mask)
 {
 	header_.masking_key = mask;
-	header_.mask = true;
+	header_.mask = mask != 0 ? true : false;
 	return *this;
 }
 

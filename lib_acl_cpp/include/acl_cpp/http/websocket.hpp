@@ -124,7 +124,7 @@ public:
 	websocket& set_frame_payload_len(unsigned long long len);
 
 	/**
-	 * 设置数据帧数据的掩码值
+	 * 设置数据帧数据的掩码值，客户端模式下必须设置此项
 	 * @param mask {unsigned int}
 	 * @return {websocket&}
 	 */

@@ -1,5 +1,9 @@
 修改历史列表：
 
+590) 2019.9.17
+590.1) bugfix: 在客户端模式下，需要在 http_aclient::ws_handshake() 中需要调用
+set_frame_masking_key() 设置客户端发送数据的掩码
+
 589) 2019.9.16
 589.1) bugfix: aio_stream 类中 get_peer() / get_local() 返回有误
 589.2) bugfix: redis_pubsub::get_message() 添加读超时时间

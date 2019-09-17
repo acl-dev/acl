@@ -103,6 +103,7 @@ public:
 	 */
 	virtual void on_connected(const check_client&, double cost)
 	{
+		(void) cost;
 	}
 
 	/**
