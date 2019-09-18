@@ -125,11 +125,13 @@ public:
 	 *  store the message posted to the channel
 	 * @param message_type {string*} will store messsage or pmessage
 	 * @param pattern {string*} will store pattern set by psubscribe
-	 * @return {bool} 是否成功，如果返回 false 则表示出错
-	 *  true on success, false on error
+	 * @param timeout {int} 当该值 >= 0 时，表示等待消息超时时间(秒)
+     *  when timeout >= 0, which was used as the waiting time for reading(second)
+	 * @return {bool} 是否成功，如果返回 false 则表示出错或超时
+	 *  true on success, false on error or waiting timeout
 	 */
-	bool get_message(string& channel, string& msg,
-		string* message_type = NULL, string* pattern = NULL);
+	bool get_message(string& channel, string& msg, string* message_type = NULL,
+		string* pattern = NULL, int timeout = -1);
 
 	/**
 	 * 列出当前的活跃频道：活跃频道指的是那些至少有一个订阅者的频道， 订阅模式的

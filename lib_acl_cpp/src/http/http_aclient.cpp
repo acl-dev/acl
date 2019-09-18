@@ -662,6 +662,9 @@ void http_aclient::ws_handshake(const void* key, size_t len)
 	ws_in_  = NEW websocket(*stream_);
 	ws_out_ = NEW websocket(*stream_);
 
+	unsigned mask = ~0;
+	ws_out_->set_frame_masking_key(mask);
+
 	status_ = HTTP_ACLIENT_STATUS_WS_HANDSHAKE;
 	send_request(NULL, 0);
 }
