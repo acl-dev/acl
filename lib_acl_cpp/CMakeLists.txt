@@ -9,13 +9,17 @@ endif()
 #string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
+	add_definitions("-Os")
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set(UNIX_OS true)
+	add_definitions("-O2")
 elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 	set(UNIX_OS true)
+	add_definitions("-O2")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(UNIX_OS true)
+	add_definitions("-Os")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
 	set(WIN_OS true)
 else()
@@ -84,7 +88,6 @@ endforeach()
 if (${UNIX_OS})
 	add_definitions(
 		"-W"
-		"-O2"
 		"-fPIC"
 		"-Wall"
 		"-Werror"
@@ -114,9 +117,7 @@ if (${UNIX_OS})
 #		string(TOUPPER CMAKE_BUILD_TYPE CMAKE_BUILD_TYPE)
 #	endif()
 
-	if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-		add_definitions("-O2")
-	else()
+	if (!CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 		add_definitions("-g")
 	endif()
 

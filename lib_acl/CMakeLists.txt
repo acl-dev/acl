@@ -12,13 +12,17 @@ endif()
 #string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
+	add_definitions("-Os")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 	set(UNIX_OS true)
+	add_definitions("-O2")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(UNIX_OS true)
+	add_definitions("-Os")
 elseif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 	set(UNIX_OS true)
+	add_definitions("-O2")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
 	set(WIN_OS true)
 else()
@@ -84,7 +88,6 @@ endforeach()
 if (${UNIX_OS})
 	add_definitions(
 		"-W"
-		"-O2"
 		"-fPIC"
 		"-Wall"
 		"-Werror"
@@ -100,6 +103,7 @@ if (${UNIX_OS})
 		"-D_POSIX_PTHREAD_SEMANTICS"
 		"-DACL_PREPARE_COMPILE"
 		"-Wstrict-prototypes"
+		"-fvisibility=hidden"
 	)
 
 	if (CMAKE_COMPILER_IS_GNUCC)
@@ -122,9 +126,7 @@ if (${UNIX_OS})
 		add_definitions("-Wno-invalid-source-encoding")
 	endif()
 
-	if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-		add_definitions("-O2")
-	else()
+	if (!CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 		add_definitions("-g")
 	endif()
 elseif (${WIN_OS})
@@ -157,6 +159,7 @@ else()
 		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib IPHlpApi.lib")
 	endif()
 
+#	set(CMAKE_SHARED_LINKER_FLAGS "-fvisibility=hidden")
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
