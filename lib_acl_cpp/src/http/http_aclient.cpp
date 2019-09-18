@@ -42,6 +42,9 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 	header_ = NEW http_header;
 	memset(&ns_addr_, 0, sizeof(ns_addr_));
 	memset(&serv_addr_, 0, sizeof(serv_addr_));
+#if !defined(HAS_POLARSSL_DLL) && !defined(HAS_POLARSSL)
+    (void) ssl_conf_; // just avoiding compiling warning
+#endif
 }
 
 http_aclient::~http_aclient(void)
@@ -159,6 +162,7 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	// 注册 IO 超时回调处理对象
 	conn_->add_timeout_callback(this);
 
+#if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
 	if (!ssl_conf_) {
 		return this->on_connect();
 	}
@@ -179,6 +183,9 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	conn_->add_read_callback(this);
 	conn_->read_wait(rw_timeout_);
 	return true;
+#else
+	return this->on_connect();
+#endif
 }
 
 int http_aclient::connect_callback(const ACL_ASTREAM_CTX *ctx)
@@ -362,6 +369,7 @@ bool http_aclient::handle_websocket(void)
 // 在 SSL 握手阶段，该方法会多次调用，直至 SSL 握手成功或失败
 bool http_aclient::read_wakeup(void)
 {
+#if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
 	// 如果 websocket 非 NULL，则说明进入到 websocket 通信方式，
 	// 该触发条件在 http_res_hdr_cllback 中注册
 	switch (status_) {
@@ -374,10 +382,15 @@ bool http_aclient::read_wakeup(void)
 		logger_error("invalid status=%u", status_);
 		return false;
 	}
+#else
+	logger_error("shouldn't come here in no SSL mode!");
+	return false;
+#endif
 }
 
 bool http_aclient::handle_ssl_handshake(void)
 {
+#if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
 	// 否则，则是第一次进行 SSL 握手阶段的 IO 过程
 	polarssl_io* ssl_io = (polarssl_io*) conn_->get_hook();
 	if (ssl_io == NULL) {
@@ -399,6 +412,10 @@ bool http_aclient::handle_ssl_handshake(void)
 
 	// 继续 SSL 握手过程
 	return true;
+#else
+	logger_error("shouldn't come here in no SSL mode!");
+	return false;
+#endif
 }
 
 bool http_aclient::read_callback(char* data, int len)
