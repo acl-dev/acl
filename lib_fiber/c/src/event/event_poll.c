@@ -179,7 +179,7 @@ static int poll_wait(EVENT *ev, int timeout)
 #else
 	if (n == -1) {
 #endif
-		if (errno == EINTR) {
+		if (acl_fiber_last_error() == FIBER_EINTR) {
 			return 0;
 		}
 		msg_fatal("%s: poll error %s", __FUNCTION__, last_serror());

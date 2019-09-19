@@ -1,4 +1,4 @@
-%define release_id 10
+%define release_id 11
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Sep 19 2019 shuxin.zheng@qq.com 3.5.0-11-20190919.10
+- optimize: many optimizing for decrease libs' size for mobile platom
+- bugfix: fixed one bug in event_epoll.c of fiber lib
 
 * Thu Aug 22 2019 shuxin.zheng@qq.com 3.5.0-10-20190822.11
 - release 3.5.0-10 for bugfix

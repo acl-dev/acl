@@ -205,12 +205,14 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 
 	n = __sys_epoll_wait(ep->epfd, ep->events, ep->size, timeout);
 
-	if (n == 0) {
-		return n;
-	} else if (n < 0) {
-		msg_error("%s(%d): epoll_wait error %s",
-			__FUNCTION__, __LINE__, last_serror());
-		return n;
+	if (n < 0) {
+		if (acl_fiber_last_error() == FIBER_EINTR) {
+			return 0;
+		}
+		msg_fatal("%s: epoll_wait error %s",
+			__FUNCTION__, last_serror());
+	} else if (n == 0) {
+		return 0;
 	}
 
 	for (i = 0; i < n; i++) {
