@@ -1,4 +1,8 @@
 
+114) 2019.9.19
+114.1) bugfix: event_epoll.c 中当 epoll_wait 返回 -1 时应该判断 errno 是否为
+中断信号再决定是否需要记录日志
+
 113) 2019.8.17
 113.1) bugfix: fiber_io.c 中 fiber_io_loop() 当 IO 调度退出无法再次重启 IO 调度过程，
 解决方法是在 acl_fiber_schedule() 结尾处重置 IO 调度器状态
