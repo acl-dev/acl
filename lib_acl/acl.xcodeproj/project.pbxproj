@@ -244,6 +244,7 @@
 		0779D5F01DBE073000449438 /* acl_xml_parse.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4B21DBE070E00449438 /* acl_xml_parse.c */; };
 		0779D5F11DBE073000449438 /* acl_xml_util.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4B31DBE070E00449438 /* acl_xml_util.c */; };
 		70BD6B8B232B931700E4C798 /* acl_sane_bind.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D3F91DBE070E00449438 /* acl_sane_bind.c */; };
+		70BD6CA8233520C600E4C798 /* acl_sane_accept.c in Sources */ = {isa = PBXBuildFile; fileRef = 70BD6CA7233520C600E4C798 /* acl_sane_accept.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -650,6 +651,7 @@
 		07A469F61E6FD4FA002C9B3C /* acl_xml.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_xml.h; sourceTree = "<group>"; };
 		07A469F71E6FD4FA002C9B3C /* acl_xml2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_xml2.h; sourceTree = "<group>"; };
 		07A469F81E6FD4FA002C9B3C /* acl_xml3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_xml3.h; sourceTree = "<group>"; };
+		70BD6CA7233520C600E4C798 /* acl_sane_accept.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = acl_sane_accept.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -932,6 +934,7 @@
 		0779D3F61DBE070E00449438 /* listen */ = {
 			isa = PBXGroup;
 			children = (
+				70BD6CA7233520C600E4C798 /* acl_sane_accept.c */,
 				0779D3F71DBE070E00449438 /* acl_fifo_listen.c */,
 				0779D3F81DBE070E00449438 /* acl_inet_listen.c */,
 				0779D3F91DBE070E00449438 /* acl_sane_bind.c */,
@@ -1716,6 +1719,7 @@
 				0779D5A31DBE073000449438 /* acl_write_wait.c in Sources */,
 				0779D5A41DBE073000449438 /* acl_allocator.c in Sources */,
 				0779D5A51DBE073000449438 /* acl_dbuf_pool.c in Sources */,
+				70BD6CA8233520C600E4C798 /* acl_sane_accept.c in Sources */,
 				0779D5A61DBE073000449438 /* acl_default_malloc.c in Sources */,
 				0779D5A71DBE073000449438 /* acl_malloc_glue.c in Sources */,
 				0779D5A81DBE073000449438 /* acl_mem_hook.c in Sources */,
