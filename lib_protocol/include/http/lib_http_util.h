@@ -150,7 +150,7 @@ HTTP_API int http_util_req_open(HTTP_UTIL *http_util);
  * @param http_util {HTTP_UTIL*}
  * @param data {const char*} 本次发送的数据地址，必须非空
  * @param dlen {size_t} data 数据长度, 必须大于 0
- * @param {int} > 0 表示本次成功发送的数据; -1: 表示发送数据失败, 应调用
+ * @return {int} > 0 表示本次成功发送的数据; -1: 表示发送数据失败, 应调用
  *  http_util_free 关闭网络流且释放内存资源
  */
 HTTP_API int http_util_put_req_data(HTTP_UTIL *http_util, const char *data, size_t dlen);
@@ -215,7 +215,7 @@ HTTP_API int http_util_get_res_body(HTTP_UTIL *http_util, char *buf, size_t size
  * 将某个 url 的响应体数据转储至某个文件中
  * @param url {const char*} 完整请求 url, 如: http://www.g.cn
  * @param dump {const char*} 转储文件名
- * @param {int} 读到的响应体数据长度, >=0: 表示成功, -1: 表示失败
+ * @return {int} 读到的响应体数据长度, >=0: 表示成功, -1: 表示失败
  */
 HTTP_API int http_util_dump_url(const char *url, const char *dump);
 
@@ -223,7 +223,7 @@ HTTP_API int http_util_dump_url(const char *url, const char *dump);
  * 将某个 url 的响应体数据转储至某个流中
  * @param url {const char*} 完整请求 url, 如: http://www.g.cn
  * @param stream {ACL_VSTREAM *} 转储流
- * @param {int} 读到的响应体数据长度, >=0: 表示成功, -1: 表示失败
+ * @return {int} 读到的响应体数据长度, >=0: 表示成功, -1: 表示失败
  */
 HTTP_API int http_util_dump_url_to_stream(const char *url, ACL_VSTREAM *stream);
 
