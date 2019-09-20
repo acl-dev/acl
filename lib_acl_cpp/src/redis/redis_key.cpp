@@ -299,7 +299,7 @@ long long int redis_key::pttl(const char* key)
 		return ret;
 }
 
-bool redis_key::randmkey(string& buf)
+bool redis_key::randomkey(string& buf)
 {
 	const char* argv[1];
 	size_t lens[1];
