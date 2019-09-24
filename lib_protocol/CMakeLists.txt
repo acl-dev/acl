@@ -74,7 +74,6 @@ if (${UNIX_OS})
 		"-D_POSIX_PTHREAD_SEMANTICS"
 		"-DACL_PREPARE_COMPILE"
 		"-Wstrict-prototypes"
-		"-fvisibility=hidden"
 		)
 
 #	if (CMAKE_BUILD_TYPE STREQUAL "")

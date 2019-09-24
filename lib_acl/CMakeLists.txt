@@ -108,7 +108,6 @@ if (${UNIX_OS})
 		"-D_POSIX_PTHREAD_SEMANTICS"
 		"-DACL_PREPARE_COMPILE"
 		"-Wstrict-prototypes"
-		"-fvisibility=hidden"
 	)
 
 	if (CMAKE_COMPILER_IS_GNUCC)
@@ -158,7 +157,6 @@ else()
 		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib IPHlpApi.lib")
 	endif()
 
-#	set(CMAKE_SHARED_LINKER_FLAGS "-fvisibility=hidden")
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
 	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})

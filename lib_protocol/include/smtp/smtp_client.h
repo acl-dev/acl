@@ -169,7 +169,7 @@ SMTP_API int smtp_send_file(SMTP_CLIENT *client, const char *filepath);
 /**
  * 向 SMTP 服务器发送给定文件流的邮件内容
  * @param client {SMTP_CLIENT*} SMTP 连接对象
- * @param int {ACL_VSTREAM*} 邮件文件输入流
+ * @param in {ACL_VSTREAM*} 邮件文件输入流
  * @return {int} 0 表示成功(SMTP_CLIENT::smtp_code 表示返回码，
  *  SMTP_CLIENT::buf 存储响应内容)，否则表示出错，应该关闭连接对象
  */

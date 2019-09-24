@@ -958,6 +958,11 @@ bool db_mysql::commit(void)
 	return false;
 }
 
+bool db_mysql::rollback(void)
+{
+	return false;
+}
+
 int db_mysql::affect_count(void) const
 {
 	return 0;

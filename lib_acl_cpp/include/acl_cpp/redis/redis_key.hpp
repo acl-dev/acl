@@ -308,7 +308,7 @@ public:
 	 * @return {bool} 操作是否成功，当出错或 key 不存在时返回 false
 	 *  true on success, or false be returned
 	 */
-	bool randmkey(string& buf);
+	bool randomkey(string& buf);
 
 	/**
 	 * 将 key 改名为 newkey
