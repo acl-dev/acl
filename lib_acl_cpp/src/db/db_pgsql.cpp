@@ -691,6 +691,11 @@ bool db_pgsql::commit()
 	return false;
 }
 
+bool db_pgsql::rollback(void)
+{
+	return false;
+}
+
 int db_pgsql::affect_count() const
 {
 	return 0;

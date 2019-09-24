@@ -785,6 +785,8 @@ bool db_sqlite::set_conf(const char*) { return false; }
 const char* db_sqlite::get_conf(const char*, string&) { return NULL; }
 void db_sqlite::show_conf(const char*) {}
 int db_sqlite::affect_total_count() const { return 0; }
+bool db_sqlite::begin_transaction(void) { return false; }
+bool db_sqlite::commit(void) { return false; }
 const char* db_sqlite::dbtype() const { return NULL; }
 bool db_sqlite::dbopen(const char*) { return false; }
 bool db_sqlite::is_opened() const { return false; }
