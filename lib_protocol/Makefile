@@ -71,8 +71,6 @@ endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
-		  -fvisibility=hidden \
-		  -fvisibility-inlines-hidden \
 		  -fdata-sections \
 		  -ffunction-sections \
 		  -flto \

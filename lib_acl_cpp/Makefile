@@ -94,8 +94,6 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
 		  -Wno-unused-private-field \
-		  -fvisibility=hidden \
-		  -fvisibility-inlines-hidden \
 		  -fdata-sections \
 		  -ffunction-sections \
 		  -flto \
