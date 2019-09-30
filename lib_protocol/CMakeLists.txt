@@ -117,7 +117,7 @@ link_directories(${lib_output_path})
 
 if (${UNIX_OS})
 	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
-	set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,. -L${lib_output_path} -lacl")
+	set(CMAKE_SHARED_LINKER_FLAGS "${lib_output_path}/libacl.a")
 	target_compile_options(protocol_static PRIVATE
 		-fvisibility=hidden
 		-fvisibility-inlines-hidden)
