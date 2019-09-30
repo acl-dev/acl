@@ -37,6 +37,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 	add_definitions("-O2")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib IPHlpApi.lib")
 	set(WIN_OS true)
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
@@ -151,36 +152,23 @@ if (ACL_CLIENT_ONLY MATCHES "YES")
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
-
 	set(lib_output_path ${CMAKE_CURRENT_SOURCE_DIR}/../android/lib/${ANDROID_ABI})
-	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
-
-	add_library(acl_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
-	link_directories(${lib_output_path})
 else()
-	if (${WIN_OS})
-		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib IPHlpApi.lib")
-	endif()
-
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
-	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
+endif()
 
-	add_library(acl_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
+set(LIBRARY_OUTPUT_PATH ${lib_output_path})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
-	if (${UNIX_OS})
-		target_compile_options(acl_static PRIVATE
-			-fvisibility=hidden
-			-fvisibility-inlines-hidden)
-	elseif (${WIN_OS})
-		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib")
-	endif()
+add_library(acl_static STATIC ${lib_src})
+SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
+link_directories(${lib_output_path})
 
-	link_directories(${lib_output_path})
+if (${UNIX_OS})
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
+	target_compile_options(acl_static PRIVATE
+		-fvisibility=hidden
+		-fvisibility-inlines-hidden)
 endif()
 
 add_library(acl SHARED ${lib_src})

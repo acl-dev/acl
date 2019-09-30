@@ -33,6 +33,7 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	add_definitions("-Os")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib")
 	set(WIN_OS true)
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
@@ -102,32 +103,24 @@ elseif (${WIN_OS})
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
-
 	set(lib_output_path ${CMAKE_CURRENT_SOURCE_DIR}/../android/lib/${ANDROID_ABI})
-	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
-
-	add_library(protocol_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
-	link_directories(${lib_output_path})
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
-	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
+endif()
 
-	add_library(protocol_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
-	if (${UNIX_OS})
-		set(CMAKE_SHARED_LINKER_FLAGS "-shared -Wl,-rpath,. -L${lib_output_path} -lacl")
-		target_compile_options(protocol_static PRIVATE
-			-fvisibility=hidden
-			-fvisibility-inlines-hidden)
-	elseif (${WIN_OS})
-		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib")
-	endif()
+set(LIBRARY_OUTPUT_PATH ${lib_output_path})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
-	link_directories(${lib_output_path})
+add_library(protocol_static STATIC ${lib_src})
+SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
+link_directories(${lib_output_path})
+
+if (${UNIX_OS})
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
+	set(CMAKE_SHARED_LINKER_FLAGS "-Wl,-rpath,. -L${lib_output_path} -lacl")
+	target_compile_options(protocol_static PRIVATE
+		-fvisibility=hidden
+		-fvisibility-inlines-hidden)
 endif()
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
