@@ -9,7 +9,6 @@ RANLIB  = ${ENV_RANLIB}
 FLAGS   = ${ENV_FLAGS}
 
 CFLAGS = -c -g -W \
--O3 \
 -fPIC \
 -Wall \
 -Werror \
@@ -94,7 +93,13 @@ endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
-		  -Wno-unused-private-field
+		  -Wno-unused-private-field \
+		  -fvisibility=hidden \
+		  -fvisibility-inlines-hidden \
+		  -fdata-sections \
+		  -ffunction-sections \
+		  -flto \
+		  -Os
 	CFLAGS += -Wshadow
 	UNIXTYPE = MACOSX
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
@@ -104,6 +109,7 @@ endif
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -Wshadow
+	CFLAGS += -O3
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 

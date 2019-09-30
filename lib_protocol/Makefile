@@ -8,7 +8,6 @@ ARFL    = rv
 RANLIB  = ${ENV_RANLIB}
 
 CFLAGS = -c -g -W \
--O3 \
 -fPIC \
 -Wall \
 -Werror \
@@ -71,13 +70,20 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -Wno-invalid-source-encoding \
-		  -Wno-invalid-offsetof
+		  -Wno-invalid-offsetof \
+		  -fvisibility=hidden \
+		  -fvisibility-inlines-hidden \
+		  -fdata-sections \
+		  -ffunction-sections \
+		  -flto \
+		  -Os
 	UNIXTYPE = MACOSX
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
+	CFLAGS += -O3
 endif
 
 # For MINGW
