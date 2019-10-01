@@ -22,7 +22,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions("-O2")
-	add_definitions("-Wno-invalid-source-encoding")
+#	add_definitions("-Wno-invalid-source-encoding")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	add_definitions("-O3")
@@ -167,8 +167,7 @@ link_directories(${lib_output_path})
 if (${UNIX_OS})
 	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
 	target_compile_options(acl_static PRIVATE
-		-fvisibility=hidden
-		-fvisibility-inlines-hidden)
+		-fvisibility=hidden)
 endif()
 
 add_library(acl SHARED ${lib_src})

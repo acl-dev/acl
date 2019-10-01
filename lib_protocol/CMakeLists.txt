@@ -18,7 +18,7 @@ if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	string(APPEND CMAKE_C_FLAGS " -Qunused-arguments")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Linux")
-	add_definitions("-Wno-invalid-source-encoding")
+#	add_definitions("-Wno-invalid-source-encoding")
 	add_definitions("-O2")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
@@ -119,8 +119,7 @@ if (${UNIX_OS})
 	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
 	set(CMAKE_SHARED_LINKER_FLAGS "${lib_output_path}/libacl.a")
 	target_compile_options(protocol_static PRIVATE
-		-fvisibility=hidden
-		-fvisibility-inlines-hidden)
+		-fvisibility=hidden)
 endif()
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
