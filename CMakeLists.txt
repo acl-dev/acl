@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.0)
-project(acl)
+project(Acl)
 #message(${CMAKE_SYSTEM_NAME})
 
 #if(COMMAND CMAKE_POLICY)
