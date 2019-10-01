@@ -214,6 +214,7 @@ endif()
 if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	set(CMAKE_SHARED_LINKER_FLAGS
 		"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -liconv -lz -lpthread")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Android")
 elseif (${UNIX_OS})
 	set(CMAKE_SHARED_LINKER_FLAGS
 		"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -lz -lpthread")
