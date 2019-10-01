@@ -1913,6 +1913,13 @@
 					../lib_acl/include,
 					../lib_acl,
 				);
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1925,6 +1932,13 @@
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_acl,
+				);
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

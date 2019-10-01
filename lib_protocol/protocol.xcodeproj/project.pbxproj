@@ -427,6 +427,14 @@
 					../lib_protocol/include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -442,6 +450,14 @@
 					../lib_protocol/include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
