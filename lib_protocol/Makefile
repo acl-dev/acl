@@ -65,6 +65,7 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
+	CFLAGS += -O3
 endif
 
 # For Darwin
@@ -88,12 +89,14 @@ endif
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
+	CFLAGS += -O3
 endif
 
 # For MSYS
 ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
+	CFLAGS += -O3
 endif
 
 # For SunOS
@@ -105,12 +108,14 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 		SYSLIB = -lsocket -lnsl -lrt
 	endif
 	CFLAGS += -DSUNOS5
+	CFLAGS += -O3
 	UNIXTYPE = SUNOS5
 endif
 
 # For HP-UX
 ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -DHP_UX -DHPUX11
+	CFLAGS += -O3
 	UNIXTYPE = HPUX
 endif
 
