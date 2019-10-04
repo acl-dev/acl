@@ -420,7 +420,10 @@
 		07A457141E6FC3D3002C9B3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited) ";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					ACL_CLIENT_ONLY,
+				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/src,
@@ -433,6 +436,7 @@
 					"-fdata-sections",
 					"-ffunction-sections",
 					"-flto",
+					"-Os",
 				);
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
@@ -444,6 +448,7 @@
 		07A457151E6FC3D3002C9B3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = ACL_CLIENT_ONLY;
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/src,
@@ -456,6 +461,7 @@
 					"-fdata-sections",
 					"-ffunction-sections",
 					"-flto",
+					"-Os",
 				);
 				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
