@@ -53,6 +53,7 @@ ACL_AIO *acl_aio_create(int event_mode)
 
 ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg)
 {
+#if defined(ACL_CLIENT_ONLY)
 	const char *myname = "acl_aio_create";
 	ACL_EVENT *event;
 
@@ -75,7 +76,11 @@ ACL_AIO *acl_aio_create2(int event_mode, unsigned int nMsg)
 		event = NULL; /* avoid compiling warning */
 		break;
 	}
-
+#else
+    ACL_EVENT *event = acl_event_new_poll(1, 0);
+    (void) event_mode;
+    (void) nMsg;
+#endif
 	return acl_aio_create3(event);
 }
 

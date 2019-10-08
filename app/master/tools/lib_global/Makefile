@@ -134,7 +134,9 @@ static: $(OBJS_DST)
 	@echo 'create $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
 # src
-$(OBJ_PATH_DST)/%.o: ./*/%.cpp
+$(OBJ_PATH_DST)/%.o: ./src/%.cpp
+	$(COMPILE_OBJ)
+$(OBJ_PATH_DST)/%.o: ./json/%.cpp
 	$(COMPILE_OBJ)
 clean cl:
 	rm -f $(LIB_PATH_DST)/$(STATIC_LIBNAME)

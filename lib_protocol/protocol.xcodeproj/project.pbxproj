@@ -420,13 +420,25 @@
 		07A457141E6FC3D3002C9B3C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited) ";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					ACL_CLIENT_ONLY,
+				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/src,
 					../lib_protocol/include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -436,12 +448,22 @@
 		07A457151E6FC3D3002C9B3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = ACL_CLIENT_ONLY;
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/src,
 					../lib_protocol/include,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
+				OTHER_CPLUSPLUSFLAGS = "";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;

@@ -10,11 +10,8 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-flto")
 	add_definitions("-DANDROID")
-	add_definitions("-DACL_CLIENT_ONLY")
 	add_definitions("-Wno-unused-command-line-argument")
 	add_definitions("-Wno-invalid-source-encoding")
-	add_definitions("-fvisibility=hidden")
-	add_definitions("-fvisibility-inlines-hidden")
 	string(APPEND CMAKE_CXX_FLAGS " -Qunused-arguments")
 set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
@@ -26,12 +23,20 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	add_definitions("-Wno-invalid-source-encoding")
+	add_definitions("-fdata-sections -ffunction-sections")
+	add_definitions("-flto")
 	add_definitions("-Os")
 	set(UNIX_OS true)
 elseif (CMAKE_SYSTEM_NAME MATCHES "Windows")
+	set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib")
 	set(WIN_OS true)
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
+endif()
+
+if (ACL_CLIENT_ONLY MATCHES "YES")
+	message(STATUS "acl_cpp: ACL_CLIENT_ONLY been set")
+	add_definitions("-DACL_CLIENT_ONLY")
 endif()
 
 ##############################################################################
@@ -118,12 +123,6 @@ if (${UNIX_OS})
 			)
 	endif()
 
-#	if (CMAKE_BUILD_TYPE STREQUAL "")
-#		set(CMAKE_BUILD_TYPE "DEBUG")
-#	else()
-#		string(TOUPPER CMAKE_BUILD_TYPE CMAKE_BUILD_TYPE)
-#	endif()
-
 	if (!CMAKE_BUILD_TYPE STREQUAL "RELEASE")
 		add_definitions("-g")
 	endif()
@@ -188,39 +187,35 @@ elseif (${WIN_OS})
 	aux_source_directory(${src}/stdlib/internal lib_src)
 endif()
 
-if (ACL_CLIENT_ONLY MATCHES "YES")
-	message(STATUS "acl_cpp: ACL_CLIENT_ONLY been set")
-endif()
-
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -lz -flto")
-
 	set(lib_output_path ${CMAKE_CURRENT_SOURCE_DIR}/../android/lib/${ANDROID_ABI})
-	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
-
-	add_library(acl_cpp_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(acl_cpp_static PROPERTIES OUTPUT_NAME "acl_cpp")
-	link_directories(${lib_output_path})
 else()
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
-	set(LIBRARY_OUTPUT_PATH ${lib_output_path})
-	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
-
-	if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
-		set(CMAKE_SHARED_LINKER_FLAGS
-			"-shared -Wl,-rpath,. -L${lib_output_path} -lprotocol -lacl -liconv -lz -lpthread")
-	elseif (${UNIX_OS})
-		set(CMAKE_SHARED_LINKER_FLAGS
-			"-shared -Wl,-rpath,. -L${lib_output_path} -lprotocol -lacl -lz -lpthread")
-	elseif (${WIN_OS})
-		set(CMAKE_SHARED_LINKER_FLAGS "/DYNAMICBASE ws2_32.lib")
-	endif()
-
-	add_library(acl_cpp_static STATIC ${lib_src})
-	SET_TARGET_PROPERTIES(acl_cpp_static PROPERTIES OUTPUT_NAME "acl_cpp")
-	link_directories(${lib_output_path})
 endif()
+
+set(LIBRARY_OUTPUT_PATH ${lib_output_path})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
+
+add_library(acl_cpp_static STATIC ${lib_src})
+SET_TARGET_PROPERTIES(acl_cpp_static PROPERTIES OUTPUT_NAME "acl_cpp")
+link_directories(${lib_output_path})
+
+if (${UNIX_OS})
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared -lz -flto")
+	target_compile_options(acl_cpp_static PRIVATE
+		-fvisibility=hidden
+		-fvisibility-inlines-hidden)
+endif()
+
+if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	set(CMAKE_SHARED_LINKER_FLAGS
+		"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -liconv -lz -lpthread")
+elseif (CMAKE_SYSTEM_NAME MATCHES "Android")
+elseif (${UNIX_OS})
+	set(CMAKE_SHARED_LINKER_FLAGS
+		"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -lz -lpthread")
+endif()
+
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 	add_library(acl_cpp SHARED ${lib_src})

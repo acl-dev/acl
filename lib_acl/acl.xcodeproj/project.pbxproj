@@ -1913,6 +1913,14 @@
 					../lib_acl/include,
 					../lib_acl,
 				);
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1922,9 +1930,21 @@
 		0779D3391DBE054C00449438 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					ACL_PREPARE_COMPILE,
+					ACL_CLIENT_ONLY,
+				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_acl,
+				);
+				OTHER_CFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";

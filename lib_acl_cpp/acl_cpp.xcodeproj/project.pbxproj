@@ -1926,10 +1926,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					ACL_CLIENT_ONLY,
 					"$(inherited)",
-					HAS_MYSQL,
-					HAS_PGSQL,
-					HAS_SQLITE,
 				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
@@ -1946,6 +1944,15 @@
 					/Users/zsx/work/github/acl/test/url_coder,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
@@ -1956,10 +1963,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				GCC_PREPROCESSOR_DEFINITIONS = (
+					ACL_CLIENT_ONLY,
 					"$(inherited)",
-					HAS_MYSQL,
-					HAS_PGSQL,
-					HAS_SQLITE,
 				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
@@ -1976,6 +1981,16 @@
 					/Users/zsx/work/github/acl/test/url_coder,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_CPLUSPLUSFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
