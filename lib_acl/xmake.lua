@@ -11,8 +11,8 @@ target("acl")
     add_includedirs(".", "include")
 
     -- add headers
-    add_headers("include/(**.h)")
-    set_headerdir("$(buildir)/include/acl")
+    add_headerfiles("include/(**.h)")
+    -- set_headerdir("$(buildir)/include/acl")
 
     -- add defines
     add_defines("USE_REUSEPORT")

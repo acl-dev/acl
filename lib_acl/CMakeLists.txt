@@ -10,7 +10,7 @@ if (${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
-	add_definitions("-flto")
+	add_definitions("-O3 -flto")
 	add_definitions("-DANDROID")
 	add_definitions("-DACL_CLIENT_ONLY")
 	add_definitions("-Wno-invalid-source-encoding")

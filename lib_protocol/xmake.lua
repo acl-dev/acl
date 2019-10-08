@@ -12,10 +12,11 @@ target("protocol")
 
     -- add include directories
     add_includedirs("src", "include")
+    add_includedirs("$(projectdir)/lib_acl/include")
 
     -- add headers
-    add_headers("include/(**.h)")
-    set_headerdir("$(buildir)/include/protocol")
+    add_headerfiles("include/(**.h)")
+    -- set_headerdir("$(buildir)/include/protocol")
 
 
 

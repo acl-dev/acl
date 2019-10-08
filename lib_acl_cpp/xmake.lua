@@ -16,11 +16,13 @@ target("acl_cpp")
     add_includedirs("$(projectdir)/include/mysql")
     add_includedirs("$(projectdir)/include/pgsql")
     add_includedirs("$(projectdir)/include/sqlite")
+    add_includedirs("$(projectdir)/lib_acl/include")
+    add_includedirs("$(projectdir)/lib_protocol/include")
     add_includedirs("src", "include")
 
     -- add headers
-    add_headers("include/(**.h)", "include/(**.hpp)", "include/(**.ipp)")
-    set_headerdir("$(buildir)/include/acl_cpp")
+    add_headerfiles("include/(**.h)", "include/(**.hpp)", "include/(**.ipp)")
+    -- set_headerdir("$(buildir)/include/acl_cpp")
 
     -- set precompile header
     set_pcxxheader("src/acl_stdafx.hpp")
@@ -30,6 +32,6 @@ target("acl_cpp")
     if is_plat("windows") then
         add_defines("HAS_ZLIB_DLL", "USE_WIN_ICONV")
     else
-        add_links("iconv")
+        -- add_links("iconv")
     end
 

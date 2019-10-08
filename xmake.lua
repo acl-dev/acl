@@ -2,7 +2,7 @@
 set_project("acl")
 
 -- version
-set_version("3.3.1.rc1")
+set_version("3.5.0")
 set_xmakever("2.1.6")
 
 -- set warning all as error
