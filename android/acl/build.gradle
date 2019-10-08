@@ -27,9 +27,9 @@ android {
         // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                //arguments "-DANDROID_STL=gnustl_shared"
+                arguments "-DANDROID_STL=gnustl_shared"
                 //arguments "-DANDROID_STL=stl_shared"
-                arguments "-DANDROID_STL=c++_shared"
+                //arguments "-DANDROID_STL=c++_shared"
                 arguments "-DCMAKE_BUILD_TYPE=RELEASE"
                 arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
                 arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
@@ -67,10 +67,10 @@ android {
         }
     }
     packagingOptions {
-        //exclude 'lib/arm64-v8a/libgnustl_shared.so'
-        //exclude 'lib/armeabi-v7a/libgnustl_shared.so'
-        //exclude 'lib/armeabi/libgnustl_shared.so'
-        //exclude 'lib/x86/libgnustl_shared.so'
+        exclude 'lib/arm64-v8a/libgnustl_shared.so'
+        exclude 'lib/armeabi-v7a/libgnustl_shared.so'
+        exclude 'lib/armeabi/libgnustl_shared.so'
+        exclude 'lib/x86/libgnustl_shared.so'
         exclude 'lib/arm64-v8a/libc++_shared.so'
         exclude 'lib/armeabi-v7a/libc++_shared.so'
         exclude 'lib/armeabi/libc++_shared.so'
