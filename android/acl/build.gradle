@@ -27,9 +27,9 @@ android {
         // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_STL=gnustl_shared"
+                //arguments "-DANDROID_STL=gnustl_shared"
                 //arguments "-DANDROID_STL=stl_shared"
-                //arguments "-DANDROID_STL=c++_shared"
+                arguments "-DANDROID_STL=c++_shared"
                 arguments "-DCMAKE_BUILD_TYPE=RELEASE"
                 arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
                 arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
