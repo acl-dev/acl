@@ -14,8 +14,8 @@ target("fiber")
     add_includedirs("src", "include")
 
     -- add headers
-    add_headers("include/(**.h)")
-    set_headerdir("$(buildir)/include/fiber")
+    add_headerfiles("include/(**.h)")
+    -- set_headerdir("$(buildir)/include/fiber")
 
     -- add flags
     add_cxflags("-std=gnu99")

@@ -2,7 +2,7 @@
 set_project("acl")
 
 -- version
-set_version("3.3.1.rc1")
+set_version("3.5.0")
 set_xmakever("2.1.6")
 
 -- set warning all as error
@@ -89,7 +89,10 @@ end
 
 -- for all non-windows platforms
 if not is_plat("windows") then
-    add_cflags("-Wshadow", "-Wpointer-arith", "-Waggregate-return", "-Wmissing-prototypes", "-Wno-long-long", "-Wuninitialized", "-Wstrict-prototypes")
+    add_cflags("-Wshadow", "-Wpointer-arith", "-Waggregate-return", "-Wmissing-prototypes", "-Wno-long-long", "-Wuninitialized", "-Wstrict-prototypes", "-fPIC", "-Os")
+    if is_kind("static") then
+    	add_cflags("-fvisibility=hidden", "-flto")
+    end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
 end
 

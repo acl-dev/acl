@@ -8,7 +8,7 @@ endif()
 
 #string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
-	add_definitions("-flto")
+	add_definitions("-O3 -flto")
 	add_definitions("-DANDROID")
 	add_definitions("-Wno-unused-command-line-argument")
 	add_definitions("-Wno-invalid-source-encoding")
