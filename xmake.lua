@@ -118,7 +118,7 @@ if not is_plat("windows") then
         end
     end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
-    add_defines("ACL_CLIENT_ONLY")
+    --add_defines("ACL_CLIENT_ONLY")
 end
 
 -- include project sources
