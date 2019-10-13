@@ -99,7 +99,7 @@ if not is_plat("windows") then
             "-fdata-sections",
             "-ffunction-sections",
             "-fPIC",
-            "-Os")
+            "-Oz")
     add_cxxflags("-Wshadow",
             "-Wpointer-arith",
             "-Wno-long-long",
@@ -107,13 +107,15 @@ if not is_plat("windows") then
             "-fdata-sections",
             "-ffunction-sections",
             "-fPIC",
-            "-Os")
+            "-Oz")
 
     if is_kind("static") then
-    	--add_cflags("-fvisibility=hidden", "-flto")
-    	--add_cxxflags("-fvisibility=hidden", "-flto")
     	add_cflags("-fvisibility=hidden")
     	add_cxxflags("-fvisibility=hidden", "-fvisibility-inlines-hidden")
+        if not is_plat("android") then
+            add_cflags("-flto")
+            add_cxxflags("-flto")
+        end
     end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
     add_defines("ACL_CLIENT_ONLY")
