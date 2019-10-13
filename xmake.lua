@@ -2,8 +2,8 @@
 set_project("acl")
 
 -- version
-set_version("3.5.0")
-set_xmakever("2.1.6")
+--set_version("3.5.0")
+--set_xmakever("2.1.6")
 
 -- set warning all as error
 set_warnings("all", "error")
@@ -29,7 +29,7 @@ if is_mode("debug") then
 elseif is_mode("release") then
 
     -- set the symbols visibility: hidden
-    if not is_kind("shared") then
+    if is_kind("static") then
         set_symbols("hidden")
     end
 
@@ -89,11 +89,34 @@ end
 
 -- for all non-windows platforms
 if not is_plat("windows") then
-    add_cflags("-Wshadow", "-Wpointer-arith", "-Waggregate-return", "-Wmissing-prototypes", "-Wno-long-long", "-Wuninitialized", "-Wstrict-prototypes", "-fPIC", "-Os")
+    add_cflags("-Wshadow",
+            "-Wpointer-arith",
+            "-Waggregate-return",
+            "-Wmissing-prototypes",
+            "-Wno-long-long",
+            "-Wuninitialized",
+            "-Wstrict-prototypes",
+            "-fdata-sections",
+            "-ffunction-sections",
+            "-fPIC",
+            "-Os")
+    add_cxxflags("-Wshadow",
+            "-Wpointer-arith",
+            "-Wno-long-long",
+            "-Wuninitialized",
+            "-fdata-sections",
+            "-ffunction-sections",
+            "-fPIC",
+            "-Os")
+
     if is_kind("static") then
-    	add_cflags("-fvisibility=hidden", "-flto")
+    	--add_cflags("-fvisibility=hidden", "-flto")
+    	--add_cxxflags("-fvisibility=hidden", "-flto")
+    	add_cflags("-fvisibility=hidden")
+    	add_cxxflags("-fvisibility=hidden", "-fvisibility-inlines-hidden")
     end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
+    add_defines("ACL_CLIENT_ONLY")
 end
 
 -- include project sources

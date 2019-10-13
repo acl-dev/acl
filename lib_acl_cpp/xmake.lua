@@ -28,7 +28,7 @@ target("acl_cpp")
     set_pcxxheader("src/acl_stdafx.hpp")
 
     -- add defines and links
-    add_defines("HAS_MYSQL_DLL", "HAS_PGSQL_DLL", "HAS_SQLITE_DLL", "HAS_POLARSSL_DLL")
+    -- add_defines("HAS_MYSQL_DLL", "HAS_PGSQL_DLL", "HAS_SQLITE_DLL", "HAS_POLARSSL_DLL")
     if is_plat("windows") then
         add_defines("HAS_ZLIB_DLL", "USE_WIN_ICONV")
     else
