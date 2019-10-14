@@ -8,41 +8,10 @@ set_project("acl")
 -- set warning all as error
 set_warnings("all", "error")
 
--- set the object files directory
-set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-set_targetdir("$(buildir)/$(mode)/$(arch)")
-
 -- the debug or release mode
-if is_mode("debug") then
-    
-    -- enable the debug symbols
-    set_symbols("debug")
-
-    -- disable optimization
-    set_optimize("none")
-
-    -- link libcmtd.lib
-    if is_plat("windows") then 
-        add_cxflags("-MTd") 
-    end
-
-elseif is_mode("release") then
-
-    -- set the symbols visibility: hidden
-    if is_kind("static") then
-        set_symbols("hidden")
-    end
-
-    -- strip all symbols
-    set_strip("all")
-
-    -- enable fastest optimization
-    set_optimize("fastest")
-
-    -- link libcmt.lib
-    if is_plat("windows") then 
-        add_cxflags("-MT") 
-    end
+add_rules("mode.debug", "mode.release")
+if is_mode("release") and is_plat("android", "iphoneos") then
+    set_optimize("smallest")
 end
 
 -- add common flags and macros
@@ -50,9 +19,17 @@ add_defines("ACL_WRITEABLE_CHECK", "ACL_PREPARE_COMPILE")
 
 -- for the windows platform (msvc)
 if is_plat("windows") then 
-    add_cxxflags("-EHsc")
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
-	add_links("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
+end
+-- for the windows platform (msvc)
+if is_plat("windows") then 
+    if is_mode("release") then
+        add_cxflags("-MT") 
+    elseif is_mode("debug") then
+        add_cxflags("-MTd") 
+    end
+    add_cxxflags("-EHsc")
+	add_syslinks("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
 end
 
 -- for the android platform
@@ -98,20 +75,17 @@ if not is_plat("windows") then
             "-Wstrict-prototypes",
             "-fdata-sections",
             "-ffunction-sections",
-            "-fPIC",
-            "-Oz")
+            "-fPIC")
     add_cxxflags("-Wshadow",
             "-Wpointer-arith",
             "-Wno-long-long",
             "-Wuninitialized",
             "-fdata-sections",
             "-ffunction-sections",
-            "-fPIC",
-            "-Oz")
+            "-fPIC")
 
     if is_kind("static") then
-    	add_cflags("-fvisibility=hidden")
-    	add_cxxflags("-fvisibility=hidden", "-fvisibility-inlines-hidden")
+    	add_cxflags("-fvisibility-inlines-hidden")
         if not is_plat("android") then
             add_cflags("-flto")
             add_cxxflags("-flto")
