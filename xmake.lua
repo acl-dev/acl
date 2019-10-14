@@ -8,10 +8,6 @@ set_project("acl")
 -- set warning all as error
 set_warnings("all", "error")
 
--- set the object files directory
-set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-set_targetdir("$(buildir)/$(mode)/$(arch)")
-
 -- the debug or release mode
 if is_mode("debug") then
     
@@ -98,20 +94,18 @@ if not is_plat("windows") then
             "-Wstrict-prototypes",
             "-fdata-sections",
             "-ffunction-sections",
-            "-fPIC",
-            "-Oz")
+            "-fPIC")
     add_cxxflags("-Wshadow",
             "-Wpointer-arith",
             "-Wno-long-long",
             "-Wuninitialized",
             "-fdata-sections",
             "-ffunction-sections",
-            "-fPIC",
-            "-Oz")
+            "-fPIC")
+    set_optimize("smallest")
 
     if is_kind("static") then
-    	add_cflags("-fvisibility=hidden")
-    	add_cxxflags("-fvisibility=hidden", "-fvisibility-inlines-hidden")
+    	add_cxflags("-fvisibility-inlines-hidden")
         if not is_plat("android") then
             add_cflags("-flto")
             add_cxxflags("-flto")
