@@ -8,11 +8,11 @@ target("acl")
     add_files("src/**.c|*/bak/*.c")
 
     -- add include directories
-    add_includedirs(".", "include")
+    add_includedirs(".")
+    add_includedirs("include", {public = true})
 
     -- add headers
     add_headerfiles("include/(**.h)")
-    -- set_headerdir("$(buildir)/include/acl")
 
     -- add defines
     add_defines("USE_REUSEPORT")
