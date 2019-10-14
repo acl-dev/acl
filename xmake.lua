@@ -9,36 +9,9 @@ set_project("acl")
 set_warnings("all", "error")
 
 -- the debug or release mode
-if is_mode("debug") then
-    
-    -- enable the debug symbols
-    set_symbols("debug")
-
-    -- disable optimization
-    set_optimize("none")
-
-    -- link libcmtd.lib
-    if is_plat("windows") then 
-        add_cxflags("-MTd") 
-    end
-
-elseif is_mode("release") then
-
-    -- set the symbols visibility: hidden
-    if is_kind("static") then
-        set_symbols("hidden")
-    end
-
-    -- strip all symbols
-    set_strip("all")
-
-    -- enable fastest optimization
-    set_optimize("fastest")
-
-    -- link libcmt.lib
-    if is_plat("windows") then 
-        add_cxflags("-MT") 
-    end
+add_rules("mode.debug", "mode.release")
+if is_mode("release") and is_plat("android", "iphoneos") then
+    set_optimize("smallest")
 end
 
 -- add common flags and macros
@@ -46,9 +19,17 @@ add_defines("ACL_WRITEABLE_CHECK", "ACL_PREPARE_COMPILE")
 
 -- for the windows platform (msvc)
 if is_plat("windows") then 
-    add_cxxflags("-EHsc")
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
-	add_links("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
+end
+-- for the windows platform (msvc)
+if is_plat("windows") then 
+    if is_mode("release") then
+        add_cxflags("-MT") 
+    elseif is_mode("debug") then
+        add_cxflags("-MTd") 
+    end
+    add_cxxflags("-EHsc")
+	add_syslinks("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
 end
 
 -- for the android platform
@@ -102,7 +83,6 @@ if not is_plat("windows") then
             "-fdata-sections",
             "-ffunction-sections",
             "-fPIC")
-    set_optimize("smallest")
 
     if is_kind("static") then
     	add_cxflags("-fvisibility-inlines-hidden")
