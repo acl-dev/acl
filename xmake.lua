@@ -86,6 +86,8 @@ if not is_plat("windows") then
 
     if is_kind("static") then
     	add_cxflags("-fvisibility-inlines-hidden")
+            add_cflags("-flto")
+            add_cxxflags("-flto")
         if not is_plat("android") then
             add_cflags("-flto")
             add_cxxflags("-flto")
@@ -93,6 +95,18 @@ if not is_plat("windows") then
     end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
     --add_defines("ACL_CLIENT_ONLY")
+    add_defines("ACL_PREPARE_COMPILE")
+    add_defines("ANDROID")
+    add_defines("NDEBUG")
+    add_defines("acl_cpp_EXPORTS")
+    add_cflags("fno-addrsig")
+    add_cxxflags("fno-addrsig")
+    add_cflags("-MD", "-MT", "-MF")
+    add_cxxflags("-MD", "-MT", "-MF")
+    add_cflags("-no-canonical-prefixes")
+    add_cxxflags("-no-canonical-prefixes")
+    add_cflags("-fno-addrsig")
+    add_cxxflags("-fno-addrsig")
 end
 
 -- include project sources

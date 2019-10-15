@@ -116,11 +116,11 @@ SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
 link_directories(${lib_output_path})
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared -O3 -flto")
 	target_compile_options(protocol_static PRIVATE
 		-fvisibility=hidden)
 elseif (${UNIX_OS})
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared -O3 -flto")
 	set(CMAKE_SHARED_LINKER_FLAGS "${lib_output_path}/libacl.a")
 	target_compile_options(protocol_static PRIVATE
 		-fvisibility=hidden)

@@ -12,13 +12,14 @@
 #HAS_POLARSSL
 #HAS_POLARSSL_DLL
 
-cmake -DCMAKE_TOOLCHAIN_FILE=/data/zsx/android-ndk-r20/build/cmake/android.toolchain.cmake \
+cmake -DCMAKE_TOOLCHAIN_FILE=~/Library/Android/ndk-bundle-r20/build/cmake/android.toolchain.cmake \
 	-DANDROID_ABI="armeabi-v7a" \
 	-DANDROID_ARM_NEON=ON \
 	-DANDROID_PLATFORM=android-14 \
-	-DCMAKE_BUILD_TYPE=RELEASE \
 	-DCMAKE_SYSTEM_NAME=Android \
 	-DACL_CLIENT_ONLY=YES \
 	-DDISABLE_DB=YES \
-	-DHAS_POLARSSL_DLL=YES \
+	-DHAS_POLARSSL_DLL=NO \
+	-DCMAKE_BUILD_TYPE=RELEASE \
+	-DCMAKE_VERBOSE_MAKEFILE=ON \
 	..
