@@ -79,14 +79,22 @@ if not is_plat("windows") then
             "-Wstrict-prototypes",
             "-fdata-sections",
             "-ffunction-sections",
-            "-fPIC")
+            "-fPIC",
+            "-fno-rtti",
+            "-fno-exceptions",
+            "-fomit-frame-pointer"
+            )
     add_cxxflags("-Wshadow",
             "-Wpointer-arith",
             "-Wno-long-long",
             "-Wuninitialized",
             "-fdata-sections",
             "-ffunction-sections",
-            "-fPIC")
+            "-fPIC",
+            "-fno-rtti",
+            "-fno-exceptions",
+            "-fomit-frame-pointer"
+            )
 
     if is_kind("static") then
     	add_cxflags("-fvisibility-inlines-hidden")
@@ -100,7 +108,9 @@ if not is_plat("windows") then
         end
     end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
-    --add_defines("ACL_CLIENT_ONLY")
+    if is_plat("android") then
+        add_defines("ACL_CLIENT_ONLY")
+    end
     add_defines("ACL_PREPARE_COMPILE")
     add_defines("ANDROID")
     add_defines("NDEBUG")
@@ -117,7 +127,7 @@ end
 
 -- include project sources
 includes("app/**/xmake.lua", "lib_acl", "lib_protocol", "lib_acl_cpp") 
-if is_plat("linux") then
+if is_plat("linux") and not is_plat("android") then
     includes("lib_fiber/c", "lib_fiber/cpp")
 end
 
