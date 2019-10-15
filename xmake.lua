@@ -32,6 +32,10 @@ if is_plat("windows") then
 	add_syslinks("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
 end
 
+if is_mode("release") then
+    set_symbols("debug")
+end
+
 -- for the android platform
 if is_plat("android") then
     add_defines("ANDROID")
@@ -86,8 +90,10 @@ if not is_plat("windows") then
 
     if is_kind("static") then
     	add_cxflags("-fvisibility-inlines-hidden")
-            add_cflags("-flto")
-            add_cxxflags("-flto")
+
+        --add_cflags("-flto")
+        --add_cxxflags("-flto")
+
         if not is_plat("android") then
             add_cflags("-flto")
             add_cxxflags("-flto")
