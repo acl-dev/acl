@@ -160,7 +160,7 @@ SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
 link_directories(${lib_output_path})
 
 if (${UNIX_OS})
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -flto")
+	set(CMAKE_SHARED_LINKER_FLAGS "-shared -O3 -flto")
 	target_compile_options(acl_static PRIVATE
 		-fvisibility=hidden)
 endif()

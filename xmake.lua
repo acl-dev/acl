@@ -2,47 +2,16 @@
 set_project("acl")
 
 -- version
-set_version("3.5.0")
-set_xmakever("2.1.6")
+--set_version("3.5.0")
+--set_xmakever("2.1.6")
 
 -- set warning all as error
 set_warnings("all", "error")
 
--- set the object files directory
-set_objectdir("$(buildir)/$(mode)/$(arch)/.objs")
-set_targetdir("$(buildir)/$(mode)/$(arch)")
-
 -- the debug or release mode
-if is_mode("debug") then
-    
-    -- enable the debug symbols
-    set_symbols("debug")
-
-    -- disable optimization
-    set_optimize("none")
-
-    -- link libcmtd.lib
-    if is_plat("windows") then 
-        add_cxflags("-MTd") 
-    end
-
-elseif is_mode("release") then
-
-    -- set the symbols visibility: hidden
-    if not is_kind("shared") then
-        set_symbols("hidden")
-    end
-
-    -- strip all symbols
-    set_strip("all")
-
-    -- enable fastest optimization
-    set_optimize("fastest")
-
-    -- link libcmt.lib
-    if is_plat("windows") then 
-        add_cxflags("-MT") 
-    end
+add_rules("mode.debug", "mode.release")
+if is_mode("release") and is_plat("android", "iphoneos") then
+    set_optimize("smallest")
 end
 
 -- add common flags and macros
@@ -50,9 +19,21 @@ add_defines("ACL_WRITEABLE_CHECK", "ACL_PREPARE_COMPILE")
 
 -- for the windows platform (msvc)
 if is_plat("windows") then 
-    add_cxxflags("-EHsc")
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
-	add_links("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
+end
+-- for the windows platform (msvc)
+if is_plat("windows") then 
+    if is_mode("release") then
+        add_cxflags("-MT") 
+    elseif is_mode("debug") then
+        add_cxflags("-MTd") 
+    end
+    add_cxxflags("-EHsc")
+	add_syslinks("ws2_32", "IPHlpApi", "kernel32", "user32", "gdi32")
+end
+
+if is_mode("release") then
+    set_symbols("debug")
 end
 
 -- for the android platform
@@ -89,16 +70,64 @@ end
 
 -- for all non-windows platforms
 if not is_plat("windows") then
-    add_cflags("-Wshadow", "-Wpointer-arith", "-Waggregate-return", "-Wmissing-prototypes", "-Wno-long-long", "-Wuninitialized", "-Wstrict-prototypes", "-fPIC", "-Os")
+    add_cflags("-Wshadow",
+            "-Wpointer-arith",
+            "-Waggregate-return",
+            "-Wmissing-prototypes",
+            "-Wno-long-long",
+            "-Wuninitialized",
+            "-Wstrict-prototypes",
+            "-fdata-sections",
+            "-ffunction-sections",
+            "-fPIC",
+            "-fno-rtti",
+            "-fno-exceptions",
+            "-fomit-frame-pointer"
+            )
+    add_cxxflags("-Wshadow",
+            "-Wpointer-arith",
+            "-Wno-long-long",
+            "-Wuninitialized",
+            "-fdata-sections",
+            "-ffunction-sections",
+            "-fPIC",
+            "-fno-rtti",
+            "-fno-exceptions",
+            "-fomit-frame-pointer"
+            )
+
     if is_kind("static") then
-    	add_cflags("-fvisibility=hidden", "-flto")
+    	add_cxflags("-fvisibility-inlines-hidden")
+
+        --add_cflags("-flto")
+        --add_cxxflags("-flto")
+
+        if not is_plat("android") then
+            add_cflags("-flto")
+            add_cxxflags("-flto")
+        end
     end
     add_defines("_REENTRANT", "_USE_FAST_MACRO", "_POSIX_PTHREAD_SEMANTICS", "_GNU_SOURCE=1")
+    if is_plat("android") then
+        add_defines("ACL_CLIENT_ONLY")
+    end
+    add_defines("ACL_PREPARE_COMPILE")
+    add_defines("ANDROID")
+    add_defines("NDEBUG")
+    add_defines("acl_cpp_EXPORTS")
+    add_cflags("fno-addrsig")
+    add_cxxflags("fno-addrsig")
+    add_cflags("-MD", "-MT", "-MF")
+    add_cxxflags("-MD", "-MT", "-MF")
+    add_cflags("-no-canonical-prefixes")
+    add_cxxflags("-no-canonical-prefixes")
+    add_cflags("-fno-addrsig")
+    add_cxxflags("-fno-addrsig")
 end
 
 -- include project sources
 includes("app/**/xmake.lua", "lib_acl", "lib_protocol", "lib_acl_cpp") 
-if is_plat("linux") then
+if is_plat("linux") and not is_plat("android") then
     includes("lib_fiber/c", "lib_fiber/cpp")
 end
 
