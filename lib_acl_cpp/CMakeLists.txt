@@ -8,12 +8,19 @@ endif()
 
 #string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
-	add_definitions("-O3 -flto")
+	# xxx: -flto can't be used on NDK with gnustl_shared
+	if (ANDROID_STL MATCHES "gnustl_shared")
+		add_definitions("-Oz")
+	else()
+		add_definitions("-O3 -flto")
+	endif()
+
 	add_definitions("-DANDROID")
 	add_definitions("-Wno-unused-command-line-argument")
 	add_definitions("-Wno-invalid-source-encoding")
-	string(APPEND CMAKE_CXX_FLAGS " -Qunused-arguments")
-set(UNIX_OS true)
+	add_definitions("-fdata-sections -ffunction-sections")
+	string(APPEND CMAKE_CXX_FLAGS "-Qunused-arguments")
+	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions("-Wno-invalid-source-encoding")
 	add_definitions("-O2")
@@ -201,10 +208,11 @@ SET_TARGET_PROPERTIES(acl_cpp_static PROPERTIES OUTPUT_NAME "acl_cpp")
 link_directories(${lib_output_path})
 
 if (${UNIX_OS})
-	set(CMAKE_SHARED_LINKER_FLAGS "-shared -lz -O3 -flto")
+	if (NOT ANDROID_STL MATCHES "gnustl_shared")
+		set(CMAKE_SHARED_LINKER_FLAGS "-shared -lz -O3 -flto")
+	endif()
 	target_compile_options(acl_cpp_static PRIVATE
-		-fvisibility=hidden
-		-fvisibility-inlines-hidden)
+		-fvisibility=hidden -fvisibility-inlines-hidden)
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
@@ -212,10 +220,11 @@ if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 		"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -liconv -lz -lpthread")
 elseif (CMAKE_SYSTEM_NAME MATCHES "Android")
 elseif (${UNIX_OS})
-	set(CMAKE_SHARED_LINKER_FLAGS
-		"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -lz -lpthread")
+	if (NOT ANDROID_STL MATCHES "gnustl_shared")
+		set(CMAKE_SHARED_LINKER_FLAGS
+			"${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a -lz -lpthread")
+	endif()
 endif()
-
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 	add_library(acl_cpp SHARED ${lib_src})
