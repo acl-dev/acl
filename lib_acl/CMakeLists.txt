@@ -171,6 +171,8 @@ if (${UNIX_OS})
 	target_compile_options(acl_static PRIVATE -fvisibility=hidden)
 endif()
 
-add_library(acl SHARED ${lib_src})
+if (ACL_BUILD_SHARED MATCHES "YES")
+	add_library(acl SHARED ${lib_src})
+endif()
 
 ##############################################################################

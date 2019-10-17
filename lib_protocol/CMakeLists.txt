@@ -132,8 +132,10 @@ elseif (${UNIX_OS})
 endif()
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-	add_library(protocol SHARED ${lib_src})
-	target_link_libraries(protocol acl)
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		add_library(protocol SHARED ${lib_src})
+		target_link_libraries(protocol acl)
+	endif()
 endif()
 
 ##############################################################################

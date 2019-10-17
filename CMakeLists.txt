@@ -78,9 +78,11 @@ endif()
 
 add_subdirectory(lib_acl acl)
 add_subdirectory(lib_protocol protocol)
-add_dependencies(protocol acl)
 add_subdirectory(lib_acl_cpp acl_cpp)
-add_dependencies(acl_cpp protocol acl)
+if (ACL_BUILD_SHARED MATCHES "YES")
+	add_dependencies(protocol acl)
+	add_dependencies(acl_cpp protocol acl)
+endif()
 
 #if (CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Android")
 if (CMAKE_SYSTEM_NAME MATCHES "Linux")
