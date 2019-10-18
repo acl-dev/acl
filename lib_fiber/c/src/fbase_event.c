@@ -43,6 +43,11 @@ void fbase_event_open(FIBER_BASE *fbase)
 	fbase->event_in  = fds[0];
 	fbase->event_out = fds[1];
 #endif
+
+	if (fbase->event_in < 0) {
+		msg_fatal("%s(%d), %s event_in(%d) invalid",
+			__FILE__, __LINE__, __FUNCTION__, fbase->event_in);
+	}
 }
 
 void fbase_event_close(FIBER_BASE *fbase)
