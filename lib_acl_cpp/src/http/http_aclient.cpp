@@ -44,6 +44,9 @@ http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL *
 	memset(&serv_addr_, 0, sizeof(serv_addr_));
 #if !defined(HAS_POLARSSL_DLL) && !defined(HAS_POLARSSL)
     (void) ssl_conf_; // just avoiding compiling warning
+    ssl_enable_ = false;
+#else
+    ssl_enable_ = true;
 #endif
 }
 
@@ -75,6 +78,18 @@ http_header& http_aclient::request_header(void)
 http_aclient& http_aclient::unzip_body(bool on)
 {
 	unzip_ = on;
+	return *this;
+}
+
+http_aclient& http_aclient::set_ssl_conf(polarssl_conf* ssl_conf)
+{
+	ssl_conf_ = ssl_conf;
+	return *this;
+}
+
+http_aclient& http_aclient::enable_ssl(bool yes)
+{
+	ssl_enable_ = yes;
 	return *this;
 }
 
@@ -163,7 +178,7 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	conn_->add_timeout_callback(this);
 
 #if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
-	if (!ssl_conf_) {
+	if (!ssl_conf_ || !ssl_enable_) {
 		return this->on_connect();
 	}
 

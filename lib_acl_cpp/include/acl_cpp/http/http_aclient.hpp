@@ -70,6 +70,43 @@ public:
 	}
 
 	/**
+	 * 除可以在构造函数中设置 SSL conf 外，还可以通过此方法设置，如果在
+	 * 构造函数中设置的 ssl_conf 为 NULL，则内部自动将 ssl_enable_ 置为
+	 * false，通过本方法设置了 ssl_conf 后还需调用下面的 enable_ssl()
+	 * 方法以启用 ssl 功能
+	 * @param ssl_conf {polarssl_conf*} 为 NULL 时将取消 SSL功能
+	 * @return {http_aclient&}
+	 */
+	http_aclient& set_ssl_conf(polarssl_conf* ssl_conf);
+
+	/**
+	 * 获得设置的 SSL 配置
+	 * @return {polarssl_conf*} 为 NULL 表示未设置
+	 */
+	polarssl_conf* get_ssl_conf(void) const
+	{
+		return ssl_conf_;
+	}
+
+	/**
+	 * 当构造函数中 ssl_conf 参数非空时，可以调用此方法来设置是否启用 SSL
+	 * 功能，如果 ssl_conf 非空，则内部 ssl_enable_ 缺省值为 true，可以通
+	 * 过本方法关闭或开启 ssl 功能
+	 * @param yes {bool}
+	 * @return {http_aclient&}
+	 */
+	http_aclient& enable_ssl(bool yes);
+
+	/**
+	 * 判断内部是否启用了 ssl 功能
+	 * @return {bool}
+	 */
+	bool is_enable_ssl(void) const
+	{
+		return ssl_enable_ && !ssl_conf_;
+	}
+
+	/**
 	 * 开始异步连接远程 WEB 服务器
 	 * @param addr {const char*} 远程 WEB 服务器地址，格式为：
 	 *  domain:port 或 ip:port, 当地址为域名时，内部自动进行异步域名解析
@@ -265,6 +302,8 @@ public:
 
 	/**
 	 * 与服务器进行 WEBSOCKET 握手
+	 * @param key {const void*} 设置的 key 值
+	 * @param len {size_t} key 值的长度
 	 */
 	void ws_handshake(const void* key, size_t len);
 	void ws_handshake(const char* key = "123456789xxx");
@@ -345,7 +384,8 @@ protected:
 	bool               keep_alive_;
 	bool               unzip_;		// 是否自动解压响应体数据
 	aio_handle&        handle_;
-	polarssl_conf*     ssl_conf_;
+	polarssl_conf*     ssl_conf_;		// 非空时才允许启用 SSL 功能
+	bool               ssl_enable_;		// 是否启用 SSL 功能
 	aio_socket_stream* conn_;
 	socket_stream*     stream_;
 	http_header*       header_;
