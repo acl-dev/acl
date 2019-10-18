@@ -103,7 +103,7 @@ public:
 	 */
 	bool is_enable_ssl(void) const
 	{
-		return ssl_enable_ && !ssl_conf_;
+		return ssl_enable_ && ssl_conf_;
 	}
 
 	/**
