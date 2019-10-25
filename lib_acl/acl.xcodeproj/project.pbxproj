@@ -1908,11 +1908,16 @@
 		0779D3381DBE054C00449438 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited) ";
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					ACL_CLIENT_ONLY,
+				);
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_acl,
 				);
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
@@ -1930,6 +1935,9 @@
 		0779D3391DBE054C00449438 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "";
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					ACL_PREPARE_COMPILE,
 					ACL_CLIENT_ONLY,
@@ -1938,6 +1946,7 @@
 					../lib_acl/include,
 					../lib_acl,
 				);
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
