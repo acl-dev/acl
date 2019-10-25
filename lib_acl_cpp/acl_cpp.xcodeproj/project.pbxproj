@@ -1826,9 +1826,7 @@
 					"DEBUG=1",
 					"$(inherited)",
 					ACL_PREPARE_COMPILE,
-					HAS_MYSQL,
-					HAS_PGSQL,
-					HAS_SQLITE,
+					ACL_CLIENT_ONLY,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1850,6 +1848,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1893,9 +1899,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					ACL_PREPARE_COMPILE,
-					HAS_MYSQL,
-					HAS_PGSQL,
-					HAS_SQLITE,
+					ACL_CLIENT_ONLY,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -1917,6 +1921,14 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CPLUSPLUSFLAGS = (
+					"-fvisibility=hidden",
+					"-fvisibility-inlines-hidden",
+					"-fdata-sections",
+					"-ffunction-sections",
+					"-flto",
+					"-Os",
+				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -1926,10 +1938,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					ACL_CLIENT_ONLY,
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/include,
@@ -1964,10 +1973,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					ACL_CLIENT_ONLY,
-					"$(inherited)",
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
 				HEADER_SEARCH_PATHS = (
 					../lib_acl/include,
 					../lib_protocol/include,
