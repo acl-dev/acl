@@ -1946,7 +1946,7 @@
 					../lib_acl/include,
 					../lib_acl,
 				);
-				ONLY_ACTIVE_ARCH = YES;
+				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
