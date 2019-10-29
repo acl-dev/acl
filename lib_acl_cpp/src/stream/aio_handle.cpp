@@ -274,7 +274,7 @@ bool aio_handle::dns_empty(void) const
 {
 	ACL_DNS* dns = (ACL_DNS*) acl_aio_dns(aio_);
 	if (dns == NULL) {
-		return false;
+		return true;
 	}
 	return acl_dns_empty(dns) ? true : false;
 }
