@@ -1,5 +1,9 @@
 修改历史列表：
 
+592) 2019.10.31
+592.1) bugfix: http_aclient.cpp 中当 HTTP 连接被重复使用时存在内存泄露问题，因为
+http_res_ 及 hdr_res_ 未被及时释放
+
 591) 2019.9.24
 591.1) compile: 使用 cmake 编译的 .so 库不能正常使用，原因是使用了 -fvisibility=hidden
 编译选项

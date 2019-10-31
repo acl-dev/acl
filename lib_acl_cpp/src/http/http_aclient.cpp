@@ -602,6 +602,9 @@ bool http_aclient::handle_res_hdr(int status)
 
 	// 否则，走正常的 HTTP 处理过程
 
+	if (http_res_) {
+		http_res_free(http_res_);
+	}
 	http_res_ = http_res_new(hdr_res_);
 
 	// 如果响应数据为 GZIP 压缩数据，且用户设置了自动解压功能，则需要创建
@@ -658,6 +661,16 @@ void http_aclient::send_request(const void* body, size_t len)
 	if (body && len > 0) {
 		// 发送 HTTP 请求体
 		conn_->write(body, (int) len);
+	}
+
+	// 当 HTTP 长连接被复用时，需要将前一次创建的临时对象释放，以免引起
+	// 内存泄露，同时要把 http_res_ 对象中的成员 hdr_res 置NULL，这样在
+	// 后面释放 http_res_ 时可以避免 hdr_res 被重复释放
+	if (hdr_res_) {
+		http_hdr_res_free(hdr_res_);
+		if (http_res_) {
+			http_res_->hdr_res = NULL;
+		}
 	}
 
 	// 开始读取 HTTP 响应头
