@@ -12,7 +12,7 @@ endif()
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	# xxx: -flto can't be used on NDK with gnustl_shared
 	if (ANDROID_STL MATCHES "gnustl_shared")
-		add_definitions("-Oz")
+		add_definitions("-Oz -g")
 	else()
 		add_definitions("-O3 -flto")
 	endif()

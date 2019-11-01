@@ -1835,15 +1835,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../include/zlib,
-					../include/polarssl,
-					../include/sqlite,
-					../include/pgsql,
-					../include/mysql,
-					../lib_acl_cpp/src,
-					../lib_acl_cpp/include,
-					../lib_protocol/include,
 					../lib_acl/include,
+					../lib_protocol/include,
+					../lib_acl_cpp/include,
+					../lib_acl_cpp/src,
+					../include/mysql,
+					../include/pgsql,
+					../include/polarssl,
+					../include/zlib,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
@@ -1855,8 +1854,10 @@
 					"-ffunction-sections",
 					"-flto",
 					"-Os",
+					"-fembed-bitcode",
 				);
 				SDKROOT = iphoneos;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
 			};
 			name = Debug;
 		};
@@ -1908,15 +1909,14 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					../include/zlib,
-					../include/polarssl,
-					../include/sqlite,
-					../include/pgsql,
-					../include/mysql,
-					../lib_acl_cpp/src,
-					../lib_acl_cpp/include,
-					../lib_protocol/include,
 					../lib_acl/include,
+					../lib_protocol/include,
+					../lib_acl_cpp/include,
+					../lib_acl_cpp/src,
+					../include/mysql,
+					../include/pgsql,
+					../include/polarssl,
+					../include/zlib,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
@@ -1928,9 +1928,11 @@
 					"-ffunction-sections",
 					"-flto",
 					"-Os",
+					"-fembed-bitcode",
 				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
+				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
 			};
 			name = Release;
 		};
@@ -1939,52 +1941,28 @@
 			buildSettings = {
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					../lib_acl/include,
-					../lib_protocol/include,
-					../lib_acl_cpp/include,
-					../lib_acl_cpp/src,
-					../include/mysql,
-					../include/pgsql,
-					../include/polarssl,
-					../include/zlib,
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/zsx/work/github/acl/test/url_coder,
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				ONLY_ACTIVE_ARCH = NO;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-fvisibility=hidden",
-					"-fvisibility-inlines-hidden",
-					"-fdata-sections",
-					"-ffunction-sections",
-					"-flto",
-					"-Os",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "$(inherited)";
 			};
 			name = Debug;
 		};
 		07A4583C1E6FCCB4002C9B3C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEBUG_INFORMATION_FORMAT = "";
+				DEBUG_INFORMATION_FORMAT = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited)";
-				HEADER_SEARCH_PATHS = (
-					../lib_acl/include,
-					../lib_protocol/include,
-					../lib_acl_cpp/include,
-					../lib_acl_cpp/src,
-					../include/mysql,
-					../include/pgsql,
-					../include/polarssl,
-					../include/zlib,
-				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/zsx/work/github/acl/test/url_coder,
@@ -1992,17 +1970,11 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = "";
-				OTHER_CPLUSPLUSFLAGS = (
-					"-fvisibility=hidden",
-					"-fvisibility-inlines-hidden",
-					"-fdata-sections",
-					"-ffunction-sections",
-					"-flto",
-					"-Os",
-				);
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				VALID_ARCHS = "$(inherited)";
 			};
 			name = Release;
 		};
