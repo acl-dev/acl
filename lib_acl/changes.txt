@@ -1,5 +1,12 @@
 修改历史列表：
 
+663) 2019.11.1
+663.1) bugfix: 在 Android 平台上，如果使用 NDK r16b 及以下版本时，如果使用到了
+atomic 原子操作功能，则会引入 Android 内核中标准库 Bionic 中的 bug，参见：
+https://android.googlesource.com/toolchain/gcc/+/refs/heads/master/gcc-4.9/libgcc/config/arm/linux-atomic-64bit.c#64
+所以为了兼容起见，在 acl_atomic.c 中增加条件编译，在 Android 平台上不使用 atomic 原子操作，
+使用线程锁进行替换。
+
 662) 2019.8.16
 662.1) feature: inet_connect_one() 函数支持客户端连接时设置 SO_REUSEADDR
 

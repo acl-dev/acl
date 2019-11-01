@@ -9,7 +9,9 @@
 
 #endif
 
-#if	defined(ACL_WINDOWS) || defined(ACL_LINUX)
+#if defined(ACL_ANDROID)
+# undef  HAS_ATOMIC
+#elif	defined(ACL_WINDOWS) || defined(ACL_LINUX)
 # define HAS_ATOMIC
 #else
 # undef  HAS_ATOMIC
