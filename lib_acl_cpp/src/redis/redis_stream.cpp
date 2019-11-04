@@ -222,17 +222,18 @@ void redis_stream::build(const std::map<string, string>& streams, size_t i,
 	argv_lens_[i] = sizeof("STREAMS") - 1;
 	i++;
 
+        size_t streams_n = streams.size();
 	for (std::map<string, string>::const_iterator cit = streams.begin();
 		cit != streams.end(); ++cit) {
 
 		argv_[i] = cit->first.c_str();
 		argv_lens_[i] = cit->first.size();
-		i++;
 
-		argv_[i] = cit->second.c_str();
-		argv_lens_[i] = cit->second.size();
+		argv_[i+streams_n] = cit->second.c_str();
+		argv_lens_[i+streams_n] = cit->second.size();
 		i++;
 	}
+        i+=streams_n;
 
 	build_request(i, argv_, argv_lens_);
 }
