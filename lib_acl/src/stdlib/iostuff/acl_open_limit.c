@@ -34,15 +34,6 @@
 
 #include <stdio.h>
 
-#ifdef ACL_ANDROID
-int acl_open_limit(int limit)
-{
-	/* xxx: just limit to 1024 */
-	if (limit <= 0 || limit > 1024)
-		return 1024;
-	return limit;
-}
-#else
 int acl_open_limit(int limit)
 {
 	const char *myname = "acl_open_limit";
@@ -52,10 +43,14 @@ int acl_open_limit(int limit)
 	struct rlimit rl;
 
 	if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
+#ifdef ACL_ANDROID
+		return 10240;
+#else
 		rlim_cur = getdtablesize();
 		acl_msg_warn("%s(%d): getrlimit error: %s, use: %d",
 			myname, __LINE__, acl_last_serror(), rlim_cur);
 		return rlim_cur;
+#endif
 	}
 
 	if (rl.rlim_max <= 0)
@@ -99,6 +94,5 @@ int acl_open_limit(int limit)
 #endif
 }
 
-#endif /* !ACL_ANDROID */
 #endif /* !ACL_UNIX */
 

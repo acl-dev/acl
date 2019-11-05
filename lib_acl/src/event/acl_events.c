@@ -110,7 +110,7 @@ ACL_EVENT *acl_event_new_poll(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	fdsize = event_limit(0);
+	fdsize = event_limit(102400);
 	eventp = event_new_poll(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
 	return eventp;
@@ -130,7 +130,7 @@ ACL_EVENT *acl_event_new_poll_thr(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	fdsize = event_limit(0);
+	fdsize = event_limit(102400);
 	eventp = event_poll_alloc_thr(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
 	return eventp;
@@ -150,7 +150,7 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	fdsize = event_limit(0);
+	fdsize = event_limit(102400);
 	eventp = event_new_kernel(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
 	return eventp;
@@ -158,7 +158,7 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	/* ÔÚ ACL_WINDOWS ÏÂµÄ iocp ¿ÉÒÔÖ§³Å¸ü´óµÄÁ¬½Ó£¬Ä¬ÈÏÉèÎª 102400 ¸öÁ¬½Ó
+	/* ï¿½ï¿½ ACL_WINDOWS ï¿½Âµï¿½ iocp ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó£ï¿½Ä¬ï¿½ï¿½ï¿½ï¿½Îª 102400 ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	 */
 	fdsize = 102400;
 	eventp = event_new_iocp(fdsize);
@@ -180,7 +180,7 @@ ACL_EVENT *acl_event_new_kernel_thr(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	fdsize = event_limit(0);
+	fdsize = event_limit(102400);
 #if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
 	eventp = event_epoll_alloc_thr(fdsize);
 #else
@@ -253,7 +253,7 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr,
 			eventp = acl_event_new_poll(delay_sec, delay_usec);
 			break;
 		case ACL_EVENT_WMSG:
-			/* Ê¹ÓÃ¸ÃÖµ×÷ÎªÏûÏ¢ºÅ */
+			/* Ê¹ï¿½Ã¸ï¿½Öµï¿½ï¿½Îªï¿½ï¿½Ï¢ï¿½ï¿½ */
 			eventp = acl_event_new_wmsg((unsigned int) delay_sec);
 			break;
 		default:
