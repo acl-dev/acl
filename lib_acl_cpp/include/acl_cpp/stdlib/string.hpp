@@ -782,7 +782,7 @@ public:
 	int find(char n) const;
 
 	/**
-	 * 查找指定字符吕在当前对象缓冲区的起始位置（下标从 0 开始）
+	 * 查找指定字符串在当前对象缓冲区的起始位置（下标从 0 开始）
 	 * @param needle {const char*} 要查找的有符号字符串
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
 	 * @return {char*} 字符串在缓冲区中的起始位置，返回空指针则表示不存在
@@ -790,7 +790,7 @@ public:
 	char* find(const char* needle, bool case_sensitive=true) const;
 
 	/**
-	 * 从尾部向前查找指定字符吕在当前对象缓冲区的起始位置（下标从 0 开始）
+	 * 从尾部向前查找指定字符串在当前对象缓冲区的起始位置（下标从 0 开始）
 	 * @param needle {const char*} 要查找的有符号字符串
 	 * @param case_sensitive {bool} 为 true 表示区分大小写
 	 * @return {char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
