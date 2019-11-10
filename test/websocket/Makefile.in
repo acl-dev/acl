@@ -53,6 +53,7 @@ $(OBJ_PATH)/%.o: %.cpp
 .PHONY = all clean
 all: RM $(OBJ)
 	$(LINK) -o $(PROG)
+	$(shell cp ../libws/libws.so .)
 	@echo ""
 	@echo "All ok! Output:$(PROG)"
 	@echo ""
@@ -62,6 +63,7 @@ RM:
 clean cl:
 	rm -f $(PROG)
 	rm -f $(OBJ)
+	rm -f libws.so
 
 rebuild rb: clean all
 ###########################################################

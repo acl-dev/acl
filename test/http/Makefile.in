@@ -34,8 +34,8 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 SRC =
-CFLAGS += -I. -I../liburl
-LDFLAGS = -L../liburl -lurl -Wl,-rpath,../liburl $(EXTLIBS) $(SYSLIB)
+CFLAGS += -I. -I../libhttp
+LDFLAGS = -L../libhttp -lhttp -Wl,-rpath,../libhttp $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
@@ -53,7 +53,7 @@ $(OBJ_PATH)/%.o: %.cpp
 .PHONY = all clean
 all: RM $(OBJ)
 	$(LINK) -o $(PROG)
-	$(shell cp ../liburl/liburl.so .)
+	$(shell cp ../libhttp/libhttp.so .)
 	@echo ""
 	@echo "All ok! Output:$(PROG)"
 	@echo ""
@@ -63,7 +63,7 @@ RM:
 clean cl:
 	rm -f $(PROG)
 	rm -f $(OBJ)
-	rm -f liburl.so
+	rm -f libhttp.so
 
 rebuild rb: clean all
 ###########################################################
