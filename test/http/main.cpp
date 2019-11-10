@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "http.h"
 
 int main(int argc, char *argv[])
