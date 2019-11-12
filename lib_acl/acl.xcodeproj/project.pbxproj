@@ -1851,17 +1851,19 @@
 					../lib_acl,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
-					"-fdata-sections",
-					"-ffunction-sections",
-					"-flto",
 					"-Os",
-					"-fembed-bitcode\n-fvisibility=hidden",
+					"-fembed-bitcode",
+					"-flto",
+					"-fno-fat-lto-objects",
+					"-fdata-sections",
+					"-ffunction-sections\n-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-fdata-sections",
 					"-ffunction-sections",
@@ -1924,17 +1926,19 @@
 					../lib_acl,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LLVM_LTO = YES_THIN;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
-					"-fdata-sections",
-					"-ffunction-sections",
-					"-flto",
 					"-Os",
-					"-fembed-bitcode\n-fvisibility=hidden",
+					"-fembed-bitcode",
+					"-flto",
+					"-fno-fat-lto-objects",
+					"-fdata-sections",
+					"-ffunction-sections\n-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
 					"-fdata-sections",
 					"-ffunction-sections",

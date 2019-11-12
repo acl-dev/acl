@@ -1845,16 +1845,18 @@
 					../include/zlib,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LLVM_LTO = YES_THIN;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
-					"-fdata-sections",
-					"-ffunction-sections",
-					"-flto",
 					"-Os",
 					"-fembed-bitcode",
+					"-flto",
+					"-fno-fat-lto-objects",
+					"-fdata-sections",
+					"-ffunction-sections",
 				);
 				SDKROOT = iphoneos;
 				VALID_ARCHS = "arm64 arm64e armv7 armv7s i386 x86_64";
@@ -1919,16 +1921,18 @@
 					../include/zlib,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				LLVM_LTO = YES_THIN;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				ONLY_ACTIVE_ARCH = NO;
 				OTHER_CPLUSPLUSFLAGS = (
 					"-fvisibility=hidden",
 					"-fvisibility-inlines-hidden",
-					"-fdata-sections",
-					"-ffunction-sections",
-					"-flto",
 					"-Os",
 					"-fembed-bitcode",
+					"-flto",
+					"-fno-fat-lto-objects",
+					"-fdata-sections",
+					"-ffunction-sections",
 				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
