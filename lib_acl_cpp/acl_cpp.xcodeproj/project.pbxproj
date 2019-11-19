@@ -1853,8 +1853,7 @@
 					"-fvisibility-inlines-hidden",
 					"-Os",
 					"-fembed-bitcode",
-					"-flto",
-					"-fno-fat-lto-objects",
+					"-flto=thin",
 					"-fdata-sections",
 					"-ffunction-sections",
 				);
@@ -1929,8 +1928,7 @@
 					"-fvisibility-inlines-hidden",
 					"-Os",
 					"-fembed-bitcode",
-					"-flto",
-					"-fno-fat-lto-objects",
+					"-flto=thin",
 					"-fdata-sections",
 					"-ffunction-sections",
 				);
