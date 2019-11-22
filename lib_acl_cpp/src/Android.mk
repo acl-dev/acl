@@ -35,6 +35,6 @@ LOCAL_CPPFLAGS += -I. -I../include \
 		-I../../include/zlib \
 		-I../../include/pgsql \
 		-DACL_CLIENT_ONLY
-LOCAL_CPPFLAGS += -fvisibility=hidden -fvisibility-inlines-hidden \
+LOCAL_CPPFLAGS += -Os -fvisibility=hidden -fvisibility-inlines-hidden \
 		-fdata-sections -ffunction-sections
 include $(BUILD_STATIC_LIBRARY)
