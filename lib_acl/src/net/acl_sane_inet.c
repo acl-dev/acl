@@ -179,6 +179,10 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		return sizeof(struct sockaddr_in);
 #ifdef AF_INET6
 	} else if (sa->sa_family == AF_INET6) {
+#ifndef IF_NAMESIZE
+#define IF_NAMESIZE 256
+#endif
+
 		int    port;
 		char   ip[IPLEN], ifname[IF_NAMESIZE], *ptr;
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6*) sa;
@@ -187,7 +191,7 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 			return 0;
 		}
 
-		ptr = if_indextoname(in6->sin6_scope_id, ifname);
+		ptr = (char*) if_indextoname(in6->sin6_scope_id, ifname);
 		if (ptr == NULL) {
 			ifname[0] = 0;
 		}

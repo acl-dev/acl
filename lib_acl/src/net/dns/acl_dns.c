@@ -357,7 +357,8 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 
 static void dns_stream_open(ACL_DNS *dns)
 {
-	ACL_VSTREAM *stream = acl_vstream_bind("0.0.0.0:0", 0, 0);
+	/* ndk9 居然要求 acl_vstream_bind 前加返回类型？*/
+	ACL_VSTREAM *stream = (ACL_VSTREAM*) acl_vstream_bind("0.0.0.0:0", 0, 0);
 	acl_assert(stream);
 
 	/* 创建异步流 */

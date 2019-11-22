@@ -38,7 +38,7 @@
 #ifdef ACL_UNIX
 static acl_read_fn   __sys_read   = read;
 static acl_write_fn  __sys_write  = write;
-static acl_writev_fn __sys_writev = writev;
+static acl_writev_fn __sys_writev = (acl_writev_fn) writev;
 
 void acl_set_read(acl_read_fn fn)
 {
@@ -60,8 +60,8 @@ static acl_close_socket_fn  __sys_close = close;
 static acl_close_socket_fn  __sys_close = closesocket;
 #endif
 
-static acl_recv_fn   __sys_recv   = recv;
-static acl_send_fn   __sys_send   = send;
+static acl_recv_fn   __sys_recv   = (acl_recv_fn) recv;
+static acl_send_fn   __sys_send   = (acl_send_fn) send;
 
 void acl_set_close_socket(acl_close_socket_fn fn)
 {

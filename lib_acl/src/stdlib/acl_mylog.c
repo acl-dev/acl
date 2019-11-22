@@ -576,7 +576,7 @@ static int open_log(const char *recipient, const char *logpre)
 		return open_file_log(recipient, logpre);
 }
 
-#ifdef	ACL_UNIX
+#if defined(ACL_UNIX) && !defined(ACL_ANDROID)
 static void fork_prepare(void)
 {
 	if (__loggers != NULL) {
@@ -658,7 +658,7 @@ int acl_open_log(const char *recipients, const char *logpre)
 
 	acl_argv_free(argv);
 
-#ifdef	ACL_UNIX
+#if defined(ACL_UNIX) && !defined(ACL_ANDROID)
 	pthread_atfork(fork_prepare, fork_in_parent, fork_in_child);
 #endif
 	return 0;
