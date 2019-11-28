@@ -158,8 +158,6 @@ ACL_EVENT *acl_event_new_kernel(int delay_sec, int delay_usec)
 	ACL_EVENT *eventp;
 	int   fdsize;
 
-	/* �� ACL_WINDOWS �µ� iocp ����֧�Ÿ�������ӣ�Ĭ����Ϊ 102400 ������
-	 */
 	fdsize = 102400;
 	eventp = event_new_iocp(fdsize);
 	event_init(eventp, fdsize, delay_sec, delay_usec);
