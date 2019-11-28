@@ -126,7 +126,7 @@ ACL_EVENT *acl_event_new_poll(int delay_sec, int delay_usec)
 
 ACL_EVENT *acl_event_new_poll_thr(int delay_sec, int delay_usec)
 {
-#ifdef	ACL_EVENTS_POLL_STYLE
+#if defined(ACL_EVENTS_POLL_STYLE) && defined(ACL_UNIX)
 	ACL_EVENT *eventp;
 	int   fdsize;
 

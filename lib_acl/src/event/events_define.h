@@ -35,7 +35,7 @@ extern "C" {
 # undef	ACL_EVENTS_KERNEL_STYLE
 #endif
 
-#ifdef	ACL_UNIX
+#if	defined(ACL_UNIX) || defined(_WIN32) || defined(_WIN64)
 # define	ACL_EVENTS_POLL_STYLE	5
 #else
 # undef		ACL_EVENTS_POLL_STYLE

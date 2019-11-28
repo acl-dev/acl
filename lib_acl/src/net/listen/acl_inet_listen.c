@@ -110,7 +110,7 @@ ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf, size_t size)
 	if (fd == ACL_SOCKET_INVALID)
 		return fd;
 
-	if (ipbuf == NULL && size == 0 && !acl_inet_ntop(&sa.sa, ipbuf, size))
+	if (ipbuf != NULL && size > 0 && !acl_inet_ntop(&sa.sa, ipbuf, size))
 		ipbuf[0] = 0;
 
 	return fd;

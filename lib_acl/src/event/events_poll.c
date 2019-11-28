@@ -28,8 +28,10 @@
 #include "events_define.h"
 
 #ifdef	ACL_EVENTS_POLL_STYLE
+#if !defined(ACL_WINDOWS)
 #include <sys/poll.h>
 #include <unistd.h>
+#endif
 
 #include "events_fdtable.h"
 #include "events.h"
@@ -411,15 +413,22 @@ static void event_loop(ACL_EVENT *eventp)
 	}
 
 	/* 调用 poll 系统调用检测可用描述字 */
-
+#if defined(ACL_WINDOWS)
+	nready = WSAPoll(ev->fds, eventp->fdcnt, (int) (delay / 1000));
+#else
 	nready = poll(ev->fds, eventp->fdcnt, (int) (delay / 1000));
+#endif
 
 	if (eventp->nested++ > 0) {
-		acl_msg_error("%s(%d): recursive call, nested=%d, pid=%d",
-			myname, __LINE__, eventp->nested, getpid());
+		acl_msg_error("%s(%d): recursive call, nested=%d",
+			myname, __LINE__, eventp->nested);
 		exit (1);
 	}
+#if defined(ACL_WINDOWS)
+	if (nready == SOCKET_ERROR) {
+#else
 	if (nready < 0) {
+#endif
 		if (acl_last_error() != ACL_EINTR) {
 			acl_msg_error("%s(%d), %s: select: %s", __FILE__,
 				__LINE__, myname, acl_last_serror());

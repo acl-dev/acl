@@ -26,7 +26,7 @@
 
 #include "events_define.h"
 
-#ifdef	ACL_EVENTS_POLL_STYLE
+#if defined(ACL_EVENTS_POLL_STYLE) && !defined(ACL_WINDOWS)
 #include <sys/poll.h>
 #include <unistd.h>
 #include "events_fdtable.h"
