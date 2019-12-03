@@ -25,8 +25,6 @@ public:
 	 *  一般不应返回 false
 	 */
 	virtual bool accept_callback(aio_socket_stream* client) = 0;
-protected:
-private:
 };
 
 /**
@@ -62,14 +60,44 @@ public:
 	bool open(const char* addr, unsigned flag = 0);
 
 	/**
+	 * 使用套接字创建监听对象，该套接字句柄必须已经调用了 bind/listen 过程
+	 * @param fd {int}
+	 * @return {bool} 是否成功
+	 */
+#if defined(_WIN32) || defined(_WIN64)
+	bool open(SOCKET fd);
+#else
+	bool open(int fd);
+#endif
+
+	/**
+	 * 使用同步流对象创建非阻塞监听对象
+	 * @param vstream {ACL_VSTREAM*} 非空对象
+	 * @return {bool} 是否成功
+	 */
+	bool open(ACL_VSTREAM* vstream);
+
+	/**
+	 * 使用非阻塞流对象创建非阻塞监听对象
+	 * @param astream {ACL_ASTREAM*} 非空对象
+	 * @return {bool} 是否成功
+	 */
+	bool open(ACL_ASTREAM* astream);
+
+	/**
 	 * 获得服务器监听地址
 	 * @return {const char*}
 	 */
 	const char* get_addr(void) const;
 
+	/**
+	 * 重载基类方法，当异步流对象销毁时回调此方法
+	 */
 	virtual void destroy(void);
+
 protected:
 	virtual ~aio_listen_stream(void);
+
 private:
 	bool accept_hooked_;
 	char  addr_[256];

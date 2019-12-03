@@ -48,15 +48,62 @@ bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 	if (flag & OPEN_FLAG_EXCLUSIVE) {
 		oflag |= ACL_INET_FLAG_EXCLUSIVE;
 	}
-	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, 0, 0);
+	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, -1, 0);
 	if (sstream == NULL) {
 		return false;
 	}
 
-	safe_snprintf(addr_, sizeof(addr_), "%s", ACL_VSTREAM_LOCAL(sstream));
+	return open(sstream);
+}
 
-	stream_ = acl_aio_open(handle_->get_handle(), sstream);
+bool aio_listen_stream::open(ACL_SOCKET fd)
+{
+	unsigned fdtype = 0;
+	int type = acl_getsocktype(fd);
+	switch (type) {
+#ifdef ACL_UNIX
+	case AF_UNIX:
+		fdtype |= ACL_VSTREAM_TYPE_LISTEN_UNIX;
+		break;
+#endif
+	case AF_INET:
+#ifdef AF_INET6
+	case AF_INET6:
+#endif
+		fdtype |= ACL_VSTREAM_TYPE_LISTEN_INET;
+		break;
+	default: // xxx?
+		fdtype |= ACL_VSTREAM_TYPE_LISTEN_INET;
+		break;
+	}
 
+	ACL_VSTREAM* vstream = acl_vstream_fdopen(fd, 0, 0, -1, fdtype);
+	return open(vstream);
+}
+
+bool aio_listen_stream::open(ACL_VSTREAM* vstream)
+{
+	ACL_ASTREAM* astream = acl_aio_open(handle_->get_handle(), vstream);
+	return open(astream);
+}
+
+bool aio_listen_stream::open(ACL_ASTREAM* astream)
+{
+	if (astream == NULL) {
+		return false;
+	}
+
+	ACL_VSTREAM* vstream = acl_aio_vstream(astream);
+	if (vstream == NULL) {
+		return false;
+	}
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vstream);
+	if (fd == ACL_SOCKET_INVALID) {
+		return false;
+	}
+	(void) acl_getsockname(fd, addr_, sizeof(addr_));
+
+	stream_ = astream;
 	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
 	// 同时 hook 关闭及超时回调过程
 	hook_error();
