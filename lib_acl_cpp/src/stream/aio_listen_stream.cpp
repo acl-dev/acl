@@ -48,7 +48,7 @@ bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 	if (flag & OPEN_FLAG_EXCLUSIVE) {
 		oflag |= ACL_INET_FLAG_EXCLUSIVE;
 	}
-	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, -1, 0);
+	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, 0, 0);
 	if (sstream == NULL) {
 		return false;
 	}
