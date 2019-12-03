@@ -21,8 +21,8 @@ CFLAGS = -c -g -W \
 -DUSE_JMP \
 -Wmissing-prototypes \
 -Wcast-qual \
--DUSE_FAST_TIME \
 -DUSE_FAST_RING \
+#-DUSE_FAST_TIME \
 #-DDEBUG_MEM \
 #-DUSE_VALGRIND \
 #-I/usr/local/include

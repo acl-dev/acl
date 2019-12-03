@@ -256,4 +256,9 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 	return acl_fiber_gettimeofday(tv, (struct timezone*) tz);
 }
 # endif /* HOOK_GETTIMEOFDAY */
+#else
+int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz)
+{
+	return gettimeofday(tv, tz);
+}
 #endif /* USE_FAST_TIME */

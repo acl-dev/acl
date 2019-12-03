@@ -72,6 +72,11 @@
 #if defined(__linux__)
 # include <sys/sendfile.h>
 # include <sys/epoll.h>
+
+# if !defined(__aarch64__)
+#  define USE_FAST_TIME
+# endif
+
 #elif defined(__FreeBSD__)
 # include <sys/uio.h>
 # include <pthread_np.h>
