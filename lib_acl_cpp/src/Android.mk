@@ -35,5 +35,5 @@ LOCAL_CPPFLAGS += -I. -I../include \
 		-I../../include/zlib \
 		-I../../include/pgsql
 LOCAL_CPPFLAGS += -Os -fvisibility=hidden -fvisibility-inlines-hidden \
-		-fdata-sections -ffunction-sections
+		-fdata-sections -ffunction-sections -fexceptions
 include $(BUILD_STATIC_LIBRARY)
