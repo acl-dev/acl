@@ -33,8 +33,7 @@ LOCAL_CPPFLAGS += -I. -I../include \
 		-I../../include/sqlite \
 		-I../../include/mysql \
 		-I../../include/zlib \
-		-I../../include/pgsql \
-		-DACL_CLIENT_ONLY
+		-I../../include/pgsql
 LOCAL_CPPFLAGS += -Os -fvisibility=hidden -fvisibility-inlines-hidden \
 		-fdata-sections -ffunction-sections
 include $(BUILD_STATIC_LIBRARY)
