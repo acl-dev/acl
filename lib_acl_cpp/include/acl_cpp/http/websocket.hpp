@@ -50,6 +50,17 @@ struct frame_header
 	bool mask;
 	unsigned long long payload_len;
 	unsigned int masking_key;
+
+	frame_header(void) {
+		fin         = false;
+		rsv1        = false;
+		rsv2        = false;
+		rsv3        = false;
+		opcode      = FRAME_TEXT;
+		mask        = false;
+		payload_len = 0;
+		masking_key = 0;
+	}
 };
 
 class string;
