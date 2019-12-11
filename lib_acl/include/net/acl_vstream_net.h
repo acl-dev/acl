@@ -11,7 +11,8 @@ extern "C" {
 /**
  * 监听某个地址（对于UNIX，还可以监听域套接字）
  * @param addr {const char*} 监听地址,
- *  如：127.0.0.1:80; 或域套接字(UNIX平台) 如：/tmp/test.sock
+ *  如：127.0.0.1:80 或域套接字(UNIX平台) 如：/tmp/test.sock，在 Linux 平台下，
+ *  如果 addr 的首字母为 '@'，则当作 astract unix domain path.
  * @param qlen {int} 监听队列的长度
  * @param flag {unsigned} 监听标志位，参见：ACL_INET_FLAG_XXX
  * @param io_bufsize {int} 接收的新的客户端套接字的IO缓冲区大小
@@ -24,8 +25,8 @@ ACL_API ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 /**
  * 监听某个地址（对于UNIX，还可以监听域套接字）
  * @param addr {const char*} 监听地址
- *  如：127.0.0.1:80, 或域套接字, 如：/tmp/test.sock，当地址为 ip:0 时则监听端口号
- *  由操作系统自动分配
+ *  如：127.0.0.1:80, 或域套接字, 如：/tmp/test.sock，当地址为 ip:0 时则监听
+ *  端口号由操作系统自动分配
  * @param qlen {int} 监听队列的长度
  * @return {ACL_VSTREAM*} 监听流指针
  */
@@ -57,9 +58,9 @@ ACL_API ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *listen_stream,
  * 远程连接服务器
  * @param addr {const char*} 服务器地址, 如果连接一个域套接口服务器(仅UNIX平台),
  *  域套接地址：/tmp/test.sock; 如果连接一个TCP服务器，则地址格式为:
- *  [${local_ip}@]${remote_addr}, 如: 60.28.250.199@www.sina.com:80, 意思是绑定本的
- *  网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80 端口, 如果由OS自动绑定本地
- *  IP 地址，则可以写为：www.sina.com:80
+ *  [${local_ip}@]${remote_addr}, 如: 60.28.250.199@www.sina.com:80, 意思是绑定
+ *  本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80 端口, 如果由OS
+ *  自动绑定本地 IP 地址，则可以写为：www.sina.com:80
  * @param block_mode {int} 阻塞连接还是非阻塞连接，ACL_BLOCKING, ACL_NON_BLOCKING
  * @param conn_timeout {int} 连接超时时间(秒)
  * @param rw_timeout {int} 连接流成功后的读写超时时间，单位为秒
@@ -73,7 +74,8 @@ ACL_API ACL_VSTREAM *acl_vstream_connect_ex(const char *addr, int block_mode,
 /**
  * 远程连接服务器
  * @param addr {const char*} 服务器地址，格式如：127.0.0.1，
- *  或 域套接地址：/tmp/test.sock
+ *  或域套接地址：/tmp/test.sock，对于 Linux 平台，如果首字母为 '@'，则认为是
+ *  Linux abstract unix domain path.
  * @param block_mode {int} 阻塞连接还是非阻塞连接，ACL_BLOCKING, ACL_NON_BLOCKING
  * @param connect_timeout {int} 连接超时时间(秒)
  * @param rw_timeout {int} 连接流成功后的读写超时时间，单位为秒
@@ -86,8 +88,8 @@ ACL_API ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
 /**
  * 针对 UDP 通信，该函数用来绑定本地 UDP 地址，如果绑定成功，则创建
  * ACL_VSTREAM 对象, 用户可以象调用 ACL_VSTREAM 对象的读写接口
- * @param addr {const char*} 本地 UDP 地址，格式：ip:port，可以输入地址 ip:0 来让
- *  操作系统自动分配本地端口号，此外还支持在 UNIX 平台下绑定 UNIX 域套接口，
+ * @param addr {const char*} 本地 UDP 地址，格式：ip:port，可以输入地址 ip:0
+ *  来让操作系统自动分配本地端口号，此外还支持在 UNIX 平台下绑定 UNIX 域套接口，
  *  UNIX 域套接口的地址格式为：{path}@udp，其中 {path} 为域套接口路径，@udp 为
  *  UDP 后缀
  * @param rw_timeout {int} 读写超时时间(秒)

@@ -1,5 +1,8 @@
 修改历史列表：
 
+664) 2019.12.11
+664.1) feature: 支持 Linux 平台下的 abstract unix domain 抽象域套接字。
+
 663) 2019.11.1
 663.1) bugfix: 在 Android 平台上，如果使用 NDK r16b 及以下版本时，如果使用到了
 atomic 原子操作功能，则会引入 Android 内核中标准库 Bionic 中的 bug，参见：

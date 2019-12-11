@@ -86,23 +86,39 @@ ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag)
 ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 {
 	struct sockaddr_un sun;
-	int len = (int) strlen(addr);
+	size_t len, size;
+	char  *path = sun.sun_path;
 	ACL_SOCKET sock;
-
-	/*
-	 * Translate address information to internal form.
-	 */
-	if (len >= (int) sizeof(sun.sun_path)) {
-		acl_msg_error("%s: addr too long: %s", __FUNCTION__, addr);
-		return ACL_SOCKET_INVALID;
-	}
 
 	memset((char *) &sun, 0, sizeof(sun));
 	sun.sun_family = AF_UNIX;
-#ifdef HAS_SUN_LEN
-	sun.sun_len    = len + 1;
+	size = sizeof(sun.sun_path);
+
+#ifdef	ACL_LINUX
+	/* for Linux abstract unix path, we should skip first '@' which was
+	 * marked astract unix in the first of the path by acl.
+	 */
+	if (*addr == '@') {
+		addr++;
+		size--;
+		*path++ = 0;
+	}
+	len = strlen(addr);
+#else
+	len = strlen(addr);
 #endif
-	memcpy(sun.sun_path, addr, len + 1);
+
+	/* Translate address information to internal form. */
+	if (len >= size || len == 0) {
+		acl_msg_error("%s(%d), %s: invalid addr len=%ld, unix path=%s",
+			__FILE__, __LINE__, __FUNCTION__, (long) len, addr);
+		return ACL_SOCKET_INVALID;
+	}
+
+#ifdef HAS_SUN_LEN
+	sun.sun_len = len + 1;
+#endif
+	memcpy(path, addr, len + 1);
 
 	/*
 	 * Create a listener socket. Do whatever we can so we don't run into
@@ -114,7 +130,9 @@ ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 		return ACL_SOCKET_INVALID;
 	}
 
-	(void) unlink(addr);
+	if (path == sun.sun_path) {
+		(void) unlink(addr);
+	}
 
 	if (bind(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0) {
 		acl_msg_error("%s: bind %s error %s",
@@ -124,14 +142,14 @@ ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 	}
 
 #ifdef FCHMOD_UNIX_SOCKETS
-	if (fchmod(sock, 0666) < 0) {
+	if (path == sun.sun_path && fchmod(sock, 0666) < 0) {
 		acl_msg_fatal("%s: fchmod socket %s: %s",
 			__FUNCTION__, addr, acl_last_serror());
 		acl_socket_close(sock);
 		return ACL_SOCKET_INVALID;
 	}
 #else
-	if (chmod(addr, 0666) < 0) {
+	if (path == sun.sun_path && chmod(addr, 0666) < 0) {
 		acl_msg_error("%s: chmod socket error %s, addr=%s",
 			__FUNCTION__, acl_last_serror(), addr);
 		acl_socket_close(sock);
@@ -155,16 +173,18 @@ ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 	struct addrinfo *res0, *res;
 	ACL_SOCKET fd;
 
-	if (family)
+	if (family) {
 		*family = 0;
+	}
 
 #ifdef ACL_UNIX
 	if (!acl_valid_ipv4_hostaddr(addr, 0)
 		&& !acl_valid_ipv6_hostaddr(addr, 0)) {
 
 		fd = acl_unix_dgram_bind(addr, flag);
-		if (fd >= 0 && family)
+		if (fd >= 0 && family) {
 			*family = AF_UNIX;
+		}
 		return fd;
 	}
 #endif
@@ -181,8 +201,9 @@ ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 	for (res = res0; res != NULL; res = res->ai_next) {
 		fd = acl_inet_bind(res, flag);
 		if (fd != ACL_SOCKET_INVALID) {
-			if (family)
+			if (family) {
 				*family = res->ai_family;
+			}
 			break;
 		}
 	}

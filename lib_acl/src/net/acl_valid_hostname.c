@@ -104,10 +104,32 @@ int acl_valid_hostname(const char *name, int gripe)
 
 int acl_valid_unix(const char *addr)
 {
-	if (strchr(addr, '/') != NULL)
-		return 1;
+	size_t nslash = 0, nchars = 0;
+	char lastch = 0;
 
-	return 0;
+	if (addr == NULL || strlen(addr) < 2) {
+		return 0;
+	}
+
+#ifdef ACL_LINUX
+	/* We use '@' as the first char in path for abstract unix for Linux */
+	if (*addr == '@') {
+		return 1;
+	}
+#endif
+	while (*addr != 0) {
+		if (*addr == '/') {
+			nslash++;
+		} else {
+			nchars++;
+		}
+		lastch = *addr++;
+	}
+
+	if (nslash == 0 || nchars == 0 || lastch == 0 || lastch == '/') {
+		return 0;
+	}
+	return 1;
 }
 
 /* acl_valid_hostaddr - verify numerical address syntax */

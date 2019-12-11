@@ -87,7 +87,8 @@ ACL_API ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag);
 
 /**
  * 以 UDP 报文方式绑定本地 UNIX 域套接口
- * @param addr {const char*} UNIX 域套接口地址路径
+ * @param addr {const char*} UNIX 域套接口地址路径，在 Linux 平台下，如果首字母
+ *  为 '@'，则认为是 Linux 下的 abstract unix domain path.
  * @param flag {unsigned} 标志位
  * @return {ACL_SOCKET} 返回域套接口，如果返回 ACL_SOCKET_INVALID 表示失败
  */

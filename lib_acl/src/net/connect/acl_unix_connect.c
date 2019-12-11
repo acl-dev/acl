@@ -30,23 +30,42 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 {
 #undef sun
 	struct sockaddr_un sun;
-	int     len = (int) strlen(addr);
+	size_t len, size;
+	char  *path = sun.sun_path;
 	ACL_SOCKET  sock;
 
-	/* Translate address information to internal form. */
-	if (len >= (int) sizeof(sun.sun_path))
-		acl_msg_fatal("unix-domain name too long: %s", addr);
 	memset((char *) &sun, 0, sizeof(sun));
 	sun.sun_family = AF_UNIX;
+	size = sizeof(sun.sun_path);
+
+#ifdef ACL_LINUX
+	if (*addr == '@') {
+		addr++;
+		size--;
+		*path++ = 0;
+	}
+	len = strlen(addr);
+#else
+	len = strlen(addr);
+#endif
+
+	/* Translate address information to internal form. */
+	if (len >= size || len == 0) {
+		acl_msg_error("%s(%d), %s: invalid addr len=%ld, unix path=%s",
+			__FILE__, __LINE__, __FUNCTION__, (long) len, addr);
+		return ACL_SOCKET_INVALID;
+	}
+
 #ifdef HAS_SUN_LEN
 	sun.sun_len = len + 1;
 #endif
-	memcpy(sun.sun_path, addr, len + 1);
+	memcpy(path, addr, len + 1);
 
 	/* Create a client socket. */
 	if ((sock = socket(AF_UNIX, SOCK_STREAM, 0)) < 0) {
-		acl_msg_fatal("%s(%d): socket: %s",
+		acl_msg_error("%s(%d): socket: %s",
 			__FUNCTION__, __LINE__, acl_last_serror());
+		return ACL_SOCKET_INVALID;
 	}
 
 	/* Timed connect. */
@@ -54,12 +73,13 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 		if (acl_timed_connect(sock, (struct sockaddr *) & sun,
 					sizeof(sun), timeout) < 0) {
-			close(sock);
-			return (-1);
+			acl_socket_close(sock);
+			return ACL_SOCKET_INVALID;
 		}
-		if (block_mode != ACL_NON_BLOCKING)
+		if (block_mode != ACL_NON_BLOCKING) {
 			acl_non_blocking(sock, block_mode);
-		return (sock);
+		}
+		return sock;
 	}
 
 	/* Maybe block until connected. */
@@ -67,9 +87,9 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 	if (acl_sane_connect(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0
 		&& acl_last_error() != EINPROGRESS) {
 
-		close(sock);
-		return (-1);
+		acl_socket_close(sock);
+		return ACL_SOCKET_INVALID;
 	}
-	return (sock);
+	return sock;
 }
 #endif
