@@ -84,7 +84,9 @@ ACL_SOCKET acl_unix_listen(const char *addr, int backlog, unsigned flag)
 		(void) unlink(addr);
 	}
 
-	if (bind(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0) {
+	size= (sizeof(sun.sun_family) + strlen(addr)) + 1;
+
+	if (bind(sock, (struct sockaddr *) & sun, (socklen_t) size) < 0) {
 		acl_msg_error("%s(%d), %s: bind: %s: %s", __FILE__, __LINE__,
 			__FUNCTION__, addr, acl_last_serror());
 		return ACL_SOCKET_INVALID;

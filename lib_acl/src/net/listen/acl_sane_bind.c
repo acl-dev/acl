@@ -134,7 +134,8 @@ ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 		(void) unlink(addr);
 	}
 
-	if (bind(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0) {
+	size = sizeof(sun.sun_family) + strlen(addr) + 1;
+	if (bind(sock, (struct sockaddr *) & sun, (socklen_t) size) < 0) {
 		acl_msg_error("%s: bind %s error %s",
 			__FUNCTION__, addr, acl_last_serror());
 		acl_socket_close(sock);

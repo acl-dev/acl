@@ -68,11 +68,13 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 		return ACL_SOCKET_INVALID;
 	}
 
+	size = sizeof(sun.sun_family) + strlen(addr) + 1;
 	/* Timed connect. */
 	if (timeout > 0) {
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 		if (acl_timed_connect(sock, (struct sockaddr *) & sun,
-					sizeof(sun), timeout) < 0) {
+			(socklen_t) size, timeout) < 0) {
+
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
 		}
@@ -84,8 +86,8 @@ ACL_SOCKET acl_unix_connect(const char *addr, int block_mode, int timeout)
 
 	/* Maybe block until connected. */
 	acl_non_blocking(sock, block_mode);
-	if (acl_sane_connect(sock, (struct sockaddr *) & sun, sizeof(sun)) < 0
-		&& acl_last_error() != EINPROGRESS) {
+	if (acl_sane_connect(sock, (struct sockaddr *) & sun,
+		(socklen_t) size) < 0 && acl_last_error() != EINPROGRESS) {
 
 		acl_socket_close(sock);
 		return ACL_SOCKET_INVALID;
