@@ -63,8 +63,9 @@ public:
 	/**
 	 * 开始监听给定服务端地址
 	 * @param addr {const char*} 服务器监听地址，格式为：
-	 *  ip:port；在 unix 环境下，还可以是域套接口，格式为：
-	 *   /path/xxx
+	 *  ip:port；在 unix 环境下，还可以是域套接口，格式为：/path/xxx，在
+	 *  Linux 平台下，如果域套接口地址为：@xxx 格式，即第一个字母为 @ 则
+	 *  内部自动启用 Linux 下的抽象域套接字方式（abstract unix socket）
 	 * @return {bool} 监听是否成功
 	 */
 	bool open(const char* addr);

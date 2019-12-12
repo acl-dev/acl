@@ -41,9 +41,14 @@ public:
 
 	/**
 	 * 连接远程服务器并打开网络连接流
-	 * @param addr {const char*} 服务器地址, 若连接域套接口服务器(仅UNIX平台),
-	 *  域套接地址：/tmp/test.sock; 如果连接一个TCP服务器，则地址格式为:
-	 *  [${local_ip}@]${remote_addr}, 如: 60.28.250.199@www.sina.com:80,
+	 * @param addr {const char*} 服务器地址, 若连接域套接口服务器(UNIX平台),
+	 *  域套接地址：/tmp/test.sock，在Linux 平台下还可连接抽象域套接字，即
+	 *  abastract unix socket，为了与普通基于文件路径的unix域套接地址区别，
+	 *  在 acl 库中规定如果地址第一个字节为 @，则认为是 Linux 抽象域套接字
+	 *  （abstract unix domain socket）不过需注意该功能仅有 Linux 平台支持,
+	 *  举例，如：@/tmp/test.sock；;
+	 *  如果连接一个TCP服务器，则地址格式为: [${local_ip}@]${remote_addr},
+	 *  如: 60.28.250.199@www.sina.com:80,
 	 *  意思是绑定本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80,
 	 *  如果由OS自动绑定本地 IP 地址，则可以写为：www.sina.com:80
 	 * @param conn_timeout {int} 连接超时时间(秒)
@@ -54,7 +59,8 @@ public:
 
 	/**
 	 * 绑定本地 UDP 地址，创建 UDP 网络流对象
-	 * @param addr {const char*} 本机地址，格式：ip:port
+	 * @param addr {const char*} 本机地址，格式：ip:port；该地址也可以为
+	 *  UNIX 域套接字或 Linux 抽象域套接字（Linux abstract unix socket）
 	 * @param rw_timeout {int} 读写超时时间(秒)
 	 * @param flag {unsigned}
 	 * @return {bool} 绑定是否成功
