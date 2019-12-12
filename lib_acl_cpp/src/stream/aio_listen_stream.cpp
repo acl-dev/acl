@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -11,8 +12,8 @@ namespace acl
 {
 
 aio_listen_stream::aio_listen_stream(aio_handle *handle)
-	: aio_stream(handle)
-	, accept_hooked_(false)
+: aio_stream(handle)
+, listen_hooked_(false)
 {
 	addr_[0] = 0;
 }
@@ -37,6 +38,18 @@ void aio_listen_stream::add_accept_callback(aio_accept_callback* callback)
 		}
 	}
 	accept_callbacks_.push_back(callback);
+}
+
+void aio_listen_stream::add_listen_callback(aio_listen_callback* callback)
+{
+	std::list<aio_listen_callback*>::iterator it =
+		listen_callbacks_.begin();
+	for (; it != listen_callbacks_.end(); ++it) {
+		if (*it == callback) {
+			return;
+		}
+	}
+	listen_callbacks_.push_back(callback);
 }
 
 bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
@@ -104,12 +117,14 @@ bool aio_listen_stream::open(ACL_ASTREAM* astream)
 	(void) acl_getsockname(fd, addr_, sizeof(addr_));
 
 	stream_ = astream;
+
 	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
 	// 同时 hook 关闭及超时回调过程
 	hook_error();
 
-	// hook 监听的回调过程
-	hook_accept();
+	// hook 监听通知过程
+	hook_listen();
+
 	return true;
 }
 
@@ -118,35 +133,81 @@ const char* aio_listen_stream::get_addr(void) const
 	return addr_;
 }
 
-void aio_listen_stream::hook_accept(void)
+void aio_listen_stream::hook_listen(void)
 {
 	acl_assert(stream_);
-	if (accept_hooked_) {
+	if (listen_hooked_) {
 		return;
 	}
-	accept_hooked_ = true;
+	listen_hooked_ = true;
 
 	acl_aio_ctl(stream_,
-		ACL_AIO_CTL_ACCEPT_FN, accept_callback,
+		ACL_AIO_CTL_LISTEN_FN, listen_callback,
 		ACL_AIO_CTL_CTX, this,
 		ACL_AIO_CTL_END);
-	acl_aio_accept(stream_);
+	acl_aio_listen(stream_);
 }
 
-int aio_listen_stream::accept_callback(ACL_ASTREAM* stream, void* ctx)
+int aio_listen_stream::accept_callback(aio_socket_stream* conn)
 {
-	aio_listen_stream* as = (aio_listen_stream*) ctx;
-	std::list<aio_accept_callback*>::iterator it =
-		as->accept_callbacks_.begin();
-	aio_socket_stream* ss = NEW aio_socket_stream(as->handle_,
-			stream, true);
+	std::list<aio_accept_callback*>::iterator it = accept_callbacks_.begin();
 
-	for (; it != as->accept_callbacks_.end(); ++it) {
-		if ((*it)->accept_callback(ss) == false) {
+	for (; it != accept_callbacks_.end(); ++it) {
+		if (!(*it)->accept_callback(conn)) {
 			return -1;
 		}
 	}
 	return 0;
+}
+
+int aio_listen_stream::listen_callback(ACL_ASTREAM*, void* ctx)
+{
+	aio_listen_stream* ss = (aio_listen_stream*) ctx;
+
+	// first, we use proactor mode.
+
+	if (!ss->accept_callbacks_.empty()) {
+		aio_socket_stream* conn = ss->accept();
+		if (conn != NULL) {
+			return ss->accept_callback(conn);
+		}
+		int ret = last_error();
+		if (ret == ACL_EAGAIN || ret == ACL_ECONNABORTED) {
+			return 0;
+		}
+		logger_error("accept error=%s", last_serror());
+		return -1;
+	}
+
+	// then use reactor mode
+
+	std::list<aio_listen_callback*>::iterator it =
+		ss->listen_callbacks_.begin();
+	for (; it != ss->listen_callbacks_.end(); ++it) {
+		if (!(*it)->listen_callback(*ss)) {
+			return -1;
+		}
+	}
+	return 0;
+}
+
+aio_socket_stream* aio_listen_stream::accept(void)
+{
+	acl_assert(stream_);
+
+	ACL_VSTREAM* ss = acl_aio_vstream(stream_);
+	if (ss == NULL) {
+		return NULL;
+	}
+
+	ACL_VSTREAM* cs = acl_vstream_accept(ss, NULL, 0);
+	if (cs == NULL) {
+		return NULL;
+	}
+
+	ACL_ASTREAM* as = acl_aio_open(handle_->get_handle(), cs);
+	aio_socket_stream* conn = NEW aio_socket_stream(handle_, as, true);
+	return conn;
 }
 
 }  // namespace acl

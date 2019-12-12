@@ -1,5 +1,9 @@
 修改历史列表：
 
+593) 2019.12.12
+593.1) feature: aio_listen_stream 增加了 reactor 模式，即 aio_listen_stream
+可以同时支持 proactor 和 reactor 模式
+
 592) 2019.10.31
 592.1) bugfix: http_aclient.cpp 中当 HTTP 连接被重复使用时存在内存泄露问题，因为
 http_res_ 及 hdr_res_ 未被及时释放

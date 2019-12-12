@@ -1,6 +1,7 @@
 #include <iostream>
 #include <assert.h>
 #include "lib_acl.h" // just for getopt on Windows
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -112,7 +113,7 @@ protected:
 	bool read_callback(char* data, int len)
 	{
 		i_++;
-		if (i_ < 10) {
+		if (i_ < 5) {
 			std::cout << ">>gets(i:" << i_ << "): "
 				<< data << std::endl;
 		}
@@ -200,13 +201,14 @@ protected:
 
 private:
 	acl::aio_socket_stream* client_;
-	int   i_;
+	int  i_;
 };
 
 /**
  * 异步监听流的回调类的子类
  */
 class io_accept_callback : public acl::aio_accept_callback
+			 , public acl::aio_listen_callback
 {
 public:
 	io_accept_callback(void) {}
@@ -216,11 +218,36 @@ public:
 	}
 
 	/**
-	 * 基类虚函数，当有新连接到达后调用此回调过程
+	 * 基类 aio_accept_callback 虚函数，当有新连接到达后调用此回调过程
 	 * @param client {aio_socket_stream*} 异步客户端流
 	 * @return {bool} 返回 true 以通知监听流继续监听
 	 */
 	bool accept_callback(acl::aio_socket_stream* client)
+	{
+		printf("proactor accept one\r\n");
+		return handle_client(client);
+	}
+
+	/**
+	 * 基类 aio_listen_callback 虚函数，当有新连接到达后调用此回调过程
+	 * @param server {acl::aio_listen_stream&} 异步监听流
+	 * @return {bool}
+	 */
+	bool listen_callback(acl::aio_listen_stream& server)
+	{
+		// reactor 模式下需要用户自己调用 accept 方法
+		acl::aio_socket_stream* client = server.accept();
+		if (client == NULL) {
+			printf("accept error %s\r\n", acl::last_serror());
+			return false;
+		}
+
+		printf("reactor accept one\r\n");
+		return handle_client(client);
+	}
+
+private:
+	bool handle_client(acl::aio_socket_stream* client)
 	{
 		// 创建异步客户端流的回调对象并与该异步流进行绑定
 		io_callback* callback = new io_callback(client);
@@ -254,17 +281,18 @@ static void usage(const char* procname)
 		"	-l ip:port\r\n"
 		"	-L line_max_length\r\n"
 		"	-t timeout\r\n"
+		"	-r [use reactor mode other proactor mode, default: proactor mode]\r\n"
 		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n",
 		procname);
 }
 
 int main(int argc, char* argv[])
 {
-	bool use_kernel = false;
+	bool use_kernel = false, use_reactor = false;
 	int  ch;
 	acl::string addr(":9001");
 
-	while ((ch = getopt(argc, argv, "l:hkL:t:")) > 0) {
+	while ((ch = getopt(argc, argv, "l:hkL:t:r")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -280,6 +308,9 @@ int main(int argc, char* argv[])
 			break;
 		case 't':
 			__timeout = atoi(optarg);
+			break;
+		case 'r':
+			use_reactor = true;
 			break;
 		default:
 			break;
@@ -310,7 +341,13 @@ int main(int argc, char* argv[])
 
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
 	io_accept_callback callback;
-	sstream->add_accept_callback(&callback);
+
+	if (use_reactor) {
+		sstream->add_listen_callback(&callback);
+	} else {
+		sstream->add_accept_callback(&callback);
+	}
+
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	while (true) {
