@@ -212,7 +212,12 @@ protected:
 	// @override
 	bool on_ws_frame_data(char* data, size_t dlen)
 	{
-		(void) write(1, data, dlen);
+		acl::string buf;
+		buf.copy(data, dlen);
+		printf("%s", buf.c_str());
+		fflush(stdout);
+
+		//(void) write(1, data, dlen);
 		return true;
 	}
 

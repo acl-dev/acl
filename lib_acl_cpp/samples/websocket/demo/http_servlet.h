@@ -34,4 +34,5 @@ private:
 	bool doPong(acl::websocket&, acl::websocket&);
 	bool doClose(acl::websocket&, acl::websocket&);
 	bool doMsg(acl::websocket&, acl::websocket&);
+	bool sendBannder(acl::websocket&);
 };
