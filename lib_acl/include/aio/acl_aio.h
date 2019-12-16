@@ -242,8 +242,10 @@ ACL_API void *acl_aio_dns(ACL_AIO *aio);
  * @param aio {ACL_AIO*}
  * @param dns_list {const char*} DNS 服务器地址列表，格式：ip1:port,ip2:port...
  * @param timeout {int} 域名解析超时时间（秒）
+ * @return {int} 设置 DNS 查询对象是否成功，0 表示成功，-1 表示失败，失败原因
+ *  有：无法创建 UDP 套接字或绑定 UDP 套接字失败
  */
-ACL_API void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout);
+ACL_API int acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout);
 
 /**
  * 删除 DNS 服务器地址列表

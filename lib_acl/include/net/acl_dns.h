@@ -74,14 +74,15 @@ typedef struct ACL_DNS_REQ ACL_DNS_REQ;
  * @param dns {ACL_DNS*} DNS异步查询句柄
  * @param aio {ACL_AIO*} 异步句柄
  * @param timeout {int} 每次DNS查询时的超时值
+ * @return {int} 初始化是否成功，返回 0 表示成功，-1 表示失败
  */
-ACL_API void acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout);
+ACL_API int acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout);
 
 /**
  * 创建一个DNS异步查询对象并同时进行初始化
  * @param aio {ACL_AIO*} 异步句柄
  * @param timeout {int} 每次DNS查询时的超时值
- * @return {ACL_DNS*} DNS异步查询句柄
+ * @return {ACL_DNS*} DNS异步查询句柄，返回 NULL 表示创建 DNS 查询对象失败
  */
 ACL_API ACL_DNS *acl_dns_create(ACL_AIO *aio, int timeout);
 

@@ -43,7 +43,7 @@ struct ACL_DNS_REQ{
 
 #define SAFE_COPY ACL_SAFE_STRNCPY
 
-static void dns_stream_open(ACL_DNS *dns);
+static int dns_stream_open(ACL_DNS *dns);
 
 /* ACL_VSTREAM: 从数据流读取数据的回调函数 */
 
@@ -355,11 +355,16 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 
 /* 创建DNS查询的异步流 */
 
-static void dns_stream_open(ACL_DNS *dns)
+static int dns_stream_open(ACL_DNS *dns)
 {
 	/* ndk9 居然要求 acl_vstream_bind 前加返回类型？*/
 	ACL_VSTREAM *stream = (ACL_VSTREAM*) acl_vstream_bind("0.0.0.0:0", 0, 0);
-	acl_assert(stream);
+
+	if (stream == NULL) {
+		acl_msg_error("%s(%d), %s: acl_vstream_bind error=%s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return -1;
+	}
 
 	/* 创建异步流 */
 	dns->astream = acl_aio_open(dns->aio, stream);
@@ -375,6 +380,7 @@ static void dns_stream_open(ACL_DNS *dns)
 
 	/* 设置该异步流为持续读状态 */
 	dns->astream->keep_read = 1;
+	return 0;
 }
 
 static void dns_lookup_send(ACL_DNS *dns, const char *domain, unsigned short qid)
@@ -434,7 +440,7 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 	acl_myfree(req);
 }
 
-void acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout)
+int acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout)
 {
 	dns->flag       &= ~ACL_DNS_FLAG_ALLOC;  /* 默认为栈空间 */
 	dns->aio         = aio;
@@ -453,17 +459,27 @@ void acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout)
 	dns->lookup_timeout = dns_lookup_timeout;
 
 	/* 打开异步读取DNS服务器响应的数据流 */
-	dns_stream_open(dns);
+	if (dns_stream_open(dns) == -1) {
+		acl_msg_error("%s(%d), %s: dns_stream_open error=%s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return -1;
+	}
 
 	/* 开始异步读查询结果 */
 	acl_aio_read(dns->astream);
+	return 0;
 }
 
 ACL_DNS *acl_dns_create(ACL_AIO *aio, int timeout)
 {
 	ACL_DNS *dns = (ACL_DNS*) acl_mycalloc(1, sizeof(ACL_DNS));
 
-	acl_dns_init(dns, aio, timeout);
+	if (acl_dns_init(dns, aio, timeout) == -1) {
+		acl_myfree(dns);
+		acl_msg_error("%s(%d), %s: acl_dns_init error",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
 	dns->flag |= ACL_DNS_FLAG_ALLOC;  /* 设置为堆分配的变量 */
 	return dns;
 }

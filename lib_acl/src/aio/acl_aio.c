@@ -101,7 +101,7 @@ void *acl_aio_dns(ACL_AIO *aio)
 	return aio->dns;
 }
 
-void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
+int acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
 {
 	ACL_ARGV *tokens;
 	ACL_ITER  iter;
@@ -111,11 +111,17 @@ void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
 	if (tokens == NULL) {
 		acl_msg_error("%s(%d), %s: invalid dns_list=%s",
 			__FILE__, __LINE__, __FUNCTION__, dns_list);
-		return;
+		return -1;
 	}
 
 	if (aio->dns == NULL) {
 		aio->dns = acl_dns_create(aio, timeout);
+		if (aio->dns == NULL) {
+			acl_msg_error("%s(%d), %s: acl_dns_create error=%s",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_last_serror());
+			return -1;
+		}
 		/* acl_dns_check_dns_ip(aio->dns); */
 	}
 
@@ -137,6 +143,7 @@ void acl_aio_set_dns(ACL_AIO *aio, const char *dns_list, int timeout)
 	}
 
 	acl_argv_free(tokens);
+	return 0;
 }
 
 void acl_aio_del_dns(ACL_AIO *aio, const char *dns_list)

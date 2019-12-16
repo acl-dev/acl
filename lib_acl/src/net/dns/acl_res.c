@@ -34,13 +34,17 @@ void acl_res_set_timeout(int conn_timeout, int rw_timeout)
 
 ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port)
 {
-	const char *myname = "acl_res_new";
 	ACL_RES *res;
 
-	if (dns_ip == NULL || *dns_ip == 0)
-		acl_msg_fatal("%s: dns_ip invalid", myname);
-	if (dns_port <= 0)
+	if (dns_ip == NULL || *dns_ip == 0) {
+		acl_msg_error("%s(%d), %s: dns_ip invalid",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
+
+	if (dns_port <= 0) {
 		dns_port = 53;
+	}
 
 	res = acl_mycalloc(1, sizeof(ACL_RES));
 	res->cur_qid = (unsigned short) time(NULL);
@@ -52,25 +56,29 @@ ACL_RES *acl_res_new(const char *dns_ip, unsigned short dns_port)
 	res->rw_timeout   = __rw_timeout;
 	res->transfer     = ACL_RES_USE_UDP;
 
-	return (res);
+	return res;
 }
 
 void acl_res_free(ACL_RES *res)
 {
-	if (res)
+	if (res) {
 		acl_myfree(res);
+	}
 }
 
-static int udp_res_lookup(ACL_RES *res, const char *data, int dlen, char *buf, int size)
+static int udp_res_lookup(ACL_RES *res, const char *data, int dlen,
+	char *buf, int size)
 {
-	const char *myname = "udp_res_lookup";
 	ssize_t    ret;
 	ACL_SOCKET fd;
 	struct sockaddr_in addr;
 
 	fd = socket(PF_INET, SOCK_DGRAM, 0);
-	if (fd == ACL_SOCKET_INVALID)
-		acl_msg_fatal("%s: socket create error", myname);
+	if (fd == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d), %s: socket create error=%s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return -1;
+	}
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family      = AF_INET;
@@ -122,7 +130,7 @@ static int tcp_res_lookup(ACL_RES *res, const char *data,
 
 	snprintf(addr, sizeof(addr), "%s:%d", res->dns_ip, res->dns_port);
 	stream = acl_vstream_connect(addr, ACL_BLOCKING, res->conn_timeout,
-				res->rw_timeout, 1024);
+			res->rw_timeout, 1024);
 	if (stream == NULL) {
 		res->errnum = ACL_RES_ERR_CONN;
 		RETURN (-1);
@@ -167,15 +175,15 @@ static int tcp_res_lookup(ACL_RES *res, const char *data,
 static int res_lookup(ACL_RES *res, const char *data, int dlen,
 	char *buf, int size)
 {
-	if (res->transfer == ACL_RES_USE_TCP)
+	if (res->transfer == ACL_RES_USE_TCP) {
 		return tcp_res_lookup(res, data, dlen, buf, size);
-	else
+	} else {
 		return udp_res_lookup(res, data, dlen, buf, size);
+	}
 }
 
 ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 {
-	const char *myname = "acl_res_lookup";
 	ACL_DNS_DB *dns_db;
 	char  buf[1024];
 	ssize_t ret, i;
@@ -183,10 +191,14 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	ACL_HOSTNAME *phost;
 	time_t  begin;
 
-	if (res == NULL)
-		acl_msg_fatal("%s: res NULL", myname);
+	if (res == NULL) {
+		acl_msg_error("%s(%d), %s: res NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
 	if (domain == NULL || *domain == 0) {
-		acl_msg_error("%s: domain %s", myname, domain ? "empty" : "null");
+		acl_msg_error("%s(%d), %s: domain %s", __FILE__, __LINE__,
+			__FUNCTION__, domain ? "empty" : "null");
 		return NULL;
 	}
 
@@ -197,8 +209,9 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	ret = res_lookup(res, buf, (int) ret, buf, sizeof(buf));
 	res->tm_spent = time(NULL) - begin;
 
-	if (ret <= 0)
+	if (ret <= 0) {
 		return NULL;
+	}
 
 	ret = rfc1035MessageUnpack(buf, ret, &answers);
 	if (ret < 0) {
@@ -226,8 +239,9 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
 		} else if (acl_msg_verbose) {
-			acl_msg_error("%s: can't print answer type %d, domain %s",
-				myname, (int) answers->answer[i].type, domain);
+			acl_msg_error("%s(%d), %s: answer type %d, domain %s",
+				__FILE__, __LINE__, __FUNCTION__,
+				(int) answers->answer[i].type, domain);
 		}
 	}
 
@@ -252,8 +266,9 @@ const char *acl_res_strerror(int errnum)
 	};
 
 	for (i = 0; errmsg[i].errnum != 0; i++) {
-		if (errmsg[i].errnum == errnum)
+		if (errmsg[i].errnum == errnum) {
 			return errmsg[i].msg;
+		}
 	}
 
 	return rfc1035Strerror(errnum);
@@ -261,10 +276,10 @@ const char *acl_res_strerror(int errnum)
 
 const char *acl_res_errmsg(const ACL_RES *res)
 {
-	const char *myname = "acl_res_errmsg";
-
-	if (res == NULL)
-		acl_msg_fatal("%s: res null", myname);
+	if (res == NULL) {
+		acl_msg_error("%s: res null", __FUNCTION__);
+		return "res NULL";
+	}
 
 	return acl_res_strerror(res->errnum);
 }

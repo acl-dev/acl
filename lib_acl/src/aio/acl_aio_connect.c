@@ -474,17 +474,16 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 		acl_aio_add_connect_hook(conn, connect_callback, ctx);
 		acl_aio_add_timeo_hook(conn, connect_timeout, ctx);
 		acl_aio_add_close_hook(conn, connect_failed, ctx);
+
+		return 0;
+	} else if (aio->dns == NULL) {
+		acl_msg_error("%s(%d), %s: call acl_aio_set_dns first",
+			__FILE__, __LINE__, __FUNCTION__);
+		return -1;
 	} else {
-		if (aio->dns == NULL) {
-			acl_msg_error("%s(%d), %s: call acl_aio_set_dns first",
-				__FILE__, __LINE__, __FUNCTION__);
-			return -1;
-		}
-
 		acl_dns_lookup(aio->dns, buf, dns_lookup_callback, ctx);
+		return 0;
 	}
-
-	return 0;
 }
 
 int acl_astream_get_status(const ACL_ASTREAM_CTX *ctx)

@@ -1,5 +1,8 @@
 修改历史列表：
 
+665) 2019.12.16
+665.1) safety: add more safety protection for dns module.
+
 664) 2019.12.11
 664.1) feature: 支持 Linux 平台下的 abstract unix domain 抽象域套接字。
 
