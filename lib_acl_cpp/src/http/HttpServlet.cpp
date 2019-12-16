@@ -211,7 +211,7 @@ bool HttpServlet::start(void)
 	case HTTP_METHOD_DELETE:
 		ret = doDelete(*req_, *res_);
 		break;
-	case  HTTP_METHOD_HEAD:
+	case HTTP_METHOD_HEAD:
 		ret = doHead(*req_, *res_);
 		break;
 	case HTTP_METHOD_OPTION:

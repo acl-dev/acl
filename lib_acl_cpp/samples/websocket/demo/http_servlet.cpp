@@ -134,6 +134,12 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 		}
 	}
 
+#if 1
+	if (!sendBannder(out)) {
+		return false;
+	}
+#endif
+
 	sleep(1);
 	char info[256];
 	snprintf(info, sizeof(info), "hello world!\r\n");
@@ -168,11 +174,35 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 	return true;
 }
 
+bool http_servlet::sendBannder(acl::websocket& out)
+{
+	char banner[256];
+	snprintf(banner, sizeof(banner), "Welcome!\r\n");
+
+	for (int i = 0; i < 5; i++) {
+		out.reset().set_frame_fin(true)
+			.set_frame_opcode(acl::FRAME_TEXT)
+			.set_frame_payload_len(strlen(banner));
+		if (!out.send_frame_data(banner, strlen(banner))) {
+			printf("send_frame_data error\r\n");
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool http_servlet::doWebSocket(acl::HttpServletRequest& req,
 	acl::HttpServletResponse&)
 {
 	acl::socket_stream& ss = req.getSocketStream();
 	acl::websocket in(ss), out(ss);
+
+#if 1
+	if (!sendBannder(out)) {
+		return false;
+	}
+#endif
 
 	while (true) {
 		if (in.read_frame_head() == false) {
@@ -196,6 +226,8 @@ bool http_servlet::doWebSocket(acl::HttpServletRequest& req,
 			ret = doClose(in, out);
 			break;
 		case acl::FRAME_TEXT:
+			ret = doMsg(in, out);
+			break;
 		case acl::FRAME_BINARY:
 			ret = doMsg(in, out);
 			break;
@@ -203,6 +235,7 @@ bool http_servlet::doWebSocket(acl::HttpServletRequest& req,
 			ret = false;
 			break;
 		default:
+			printf(">>got invalid\r\n");
 			ret = false;
 			break;
 		}
