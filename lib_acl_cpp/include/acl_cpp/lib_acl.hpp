@@ -77,6 +77,8 @@
 
 #include "stream/polarssl_conf.hpp"
 #include "stream/polarssl_io.hpp"
+#include "stream/mbedtls_conf.hpp"
+#include "stream/mbedtls_io.hpp"
 
 #include "ipc/ipc_client.hpp"
 #include "ipc/ipc_server.hpp"

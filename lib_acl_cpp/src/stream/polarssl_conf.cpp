@@ -19,18 +19,19 @@
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
-#include "acl_cpp/stdlib/log.hpp"
-#include "acl_cpp/stream/polarssl_conf.hpp"
+# include "acl_cpp/stdlib/log.hpp"
+# include "acl_cpp/stream/polarssl_io.hpp"
+# include "acl_cpp/stream/polarssl_conf.hpp"
 #endif
 
 #if defined(HAS_POLARSSL)
 
 # ifdef POLARSSL_1_3_X
-#  define X509_CRT		x509_crt
-#  define PKEY			pk_context
+#  define X509_CRT			x509_crt
+#  define PKEY				pk_context
 # else
-#  define X509_CRT		x509_cert
-#  define PKEY			rsa_context
+#  define X509_CRT			x509_cert
+#  define PKEY				rsa_context
 # endif
 
 # ifdef HAS_POLARSSL_DLL
@@ -544,6 +545,11 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 	logger_error("HAS_POLARSSL not defined!");
 	return false;
 #endif
+}
+
+polarssl_io* polarssl_conf::create_io(bool server_side, bool nblock)
+{
+	return new polarssl_io(*this, server_side, nblock);
 }
 
 } // namespace acl

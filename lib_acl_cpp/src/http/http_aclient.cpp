@@ -183,7 +183,7 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	}
 
 	// 因为配置了 SSL 通信方式，所以需要创建 SSL IO 过程，开始 SSL 握手
-	polarssl_io* ssl_io = new polarssl_io(*ssl_conf_, false, true);
+	polarssl_io* ssl_io = ssl_conf_->create_io(false, true);
 	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
 		logger_error("open ssl failed");
 		conn_->remove_hook();

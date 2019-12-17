@@ -113,7 +113,7 @@ bool redis_client::open(void)
 
 	// 如果 SSL 配置项非空，则自动进行 SSL 握手
 	if (ssl_conf_) {
-		polarssl_io* ssl = NEW polarssl_io(*ssl_conf_, false, false);
+		polarssl_io* ssl = ssl_conf_->create_io(false, false);
 		if (conn_.setup_hook(ssl) == ssl) {
 			logger_error("open ssl failed, addr=%s", addr_);
 			ssl->destroy();

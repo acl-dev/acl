@@ -436,6 +436,12 @@
     <ClCompile Include="src\stdlib\scan_dir.cpp">
       <Filter>src\stdlib</Filter>
     </ClCompile>
+    <ClCompile Include="src\stream\mbedtls_conf.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\mbedtls_io.cpp">
+      <Filter>src\stream</Filter>
+    </ClCompile>
     <ClCompile Include="src\stream\polarssl_conf.cpp">
       <Filter>src\stream</Filter>
     </ClCompile>
@@ -1049,6 +1055,12 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp">
       <Filter>include\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\mbedtls_conf.hpp">
+      <Filter>include\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\mbedtls_io.hpp">
+      <Filter>include\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp">
       <Filter>include\stream</Filter>
