@@ -44,7 +44,6 @@ public:
 	client_io_callback(IO_CTX* ctx, acl::aio_socket_stream* client, int id)
 	: client_(client)
 	, ctx_(ctx)
-	, nwrite_(0)
 	, id_(id) {}
 
 	~client_io_callback(void)
@@ -161,7 +160,6 @@ public:
 private:
 	acl::aio_socket_stream* client_;
 	IO_CTX* ctx_;
-	int     nwrite_;
 	int     id_;
 };
 

@@ -107,7 +107,7 @@ struct acl_pthread_mutexattr_t {
 struct acl_pthread_cond_t {
 	acl_pthread_mutex_t *lock;
 	int waiting;
-	int signals;
+	int nsignal;
 	ACL_SEM *wait_sem;
 	ACL_SEM *wait_done;
 	char  dynamic;	

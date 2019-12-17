@@ -35,7 +35,7 @@ int acl_pthread_cond_init(acl_pthread_cond_t *cond,
 	cond->dynamic   = 0;
 	cond->wait_sem  = acl_sem_create(0);
 	cond->wait_done = acl_sem_create(0);
-	cond->waiting   = cond->signals = 0;
+	cond->waiting   = cond->nsignal = 0;
 
 	if (!cond->lock || !cond->wait_sem || !cond->wait_done)
 		return -1;
@@ -102,8 +102,8 @@ int acl_pthread_cond_signal(acl_pthread_cond_t *cond)
 	 *  signal the condition and wait for the thread to respond.
 	 */
 	acl_pthread_mutex_lock(cond->lock);
-	if (cond->waiting > cond->signals) {
-		++cond->signals;
+	if (cond->waiting > cond->nsignal) {
+		++cond->nsignal;
 		acl_sem_post(cond->wait_sem);
 		acl_pthread_mutex_unlock(cond->lock);
 		acl_sem_wait(cond->wait_done);
@@ -128,11 +128,11 @@ int acl_pthread_cond_broadcast(acl_pthread_cond_t *cond)
 	 * signal the condition and wait for the thread to respond.
 	 */
 	acl_pthread_mutex_lock(cond->lock);
-	if (cond->waiting > cond->signals) {
+	if (cond->waiting > cond->nsignal) {
 		int i, num_waiting;
 
-		num_waiting = (cond->waiting - cond->signals);
-		cond->signals = cond->waiting;
+		num_waiting = (cond->waiting - cond->nsignal);
+		cond->nsignal = cond->waiting;
 		for (i = 0; i < num_waiting; ++i)
 			acl_sem_post(cond->wait_sem);
 
@@ -213,7 +213,7 @@ int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond,
          * http://www-classic.be.com/aboutbe/benewsletter/volume_III/Issue40.html
 	 */
 	acl_pthread_mutex_lock(cond->lock);
-	if (cond->signals > 0) {
+	if (cond->nsignal > 0) {
 		/* If we timed out, we need to eat a condition signal */
 		if (retval > 0)
 			acl_sem_wait(cond->wait_sem);
@@ -222,7 +222,7 @@ int acl_pthread_cond_timedwait(acl_pthread_cond_t *cond,
 		acl_sem_post(cond->wait_done);
 
 		/* Signal handshake complete */
-		--cond->signals;
+		--cond->nsignal;
 	}
 	--cond->waiting;
 	acl_pthread_mutex_unlock(cond->lock);
