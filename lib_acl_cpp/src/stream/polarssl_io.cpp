@@ -13,12 +13,12 @@
 # include "polarssl/entropy.h"
 #endif
 #ifndef ACL_PREPARE_COMPILE
-#include "acl_cpp/stdlib/snprintf.hpp"
-#include "acl_cpp/stdlib/log.hpp"
-#include "acl_cpp/stdlib/util.hpp"
-#include "acl_cpp/stream/stream.hpp"
-#include "acl_cpp/stream/polarssl_conf.hpp"
-#include "acl_cpp/stream/polarssl_io.hpp"
+# include "acl_cpp/stdlib/snprintf.hpp"
+# include "acl_cpp/stdlib/log.hpp"
+# include "acl_cpp/stdlib/util.hpp"
+# include "acl_cpp/stream/stream.hpp"
+# include "acl_cpp/stream/polarssl_conf.hpp"
+# include "acl_cpp/stream/polarssl_io.hpp"
 #endif
 
 #if defined(HAS_POLARSSL_DLL)
@@ -212,33 +212,24 @@ namespace acl {
 
 polarssl_io::polarssl_io(polarssl_conf& conf, bool server_side,
 	bool nblock /* = false */)
-: conf_(conf)
-, server_side_(server_side)
-, nblock_(nblock)
-, handshake_ok_(false)
+: sslbase_io(conf, server_side, nblock)
+, conf_(conf)
 , ssl_(NULL)
 , ssn_(NULL)
 , rnd_(NULL)
-, stream_(NULL)
 {
-	refers_ = NEW atomic_long(0);
 #ifdef HAS_POLARSSL
 	conf.init_once();
 #else
 	(void) conf_;
-	(void) server_side_;
-	(void) nblock_;
-	(void) handshake_ok_;
 	(void) ssl_;
 	(void) ssn_;
 	(void) rnd_;
-	(void) stream_;
 #endif
 }
 
 polarssl_io::~polarssl_io(void)
 {
-	delete refers_;
 #ifdef HAS_POLARSSL
 	if (ssl_) {
 		__ssl_free((ssl_context*) ssl_);
@@ -284,14 +275,6 @@ static void my_debug( void *ctx, int level acl_unused, const char *str )
 	fflush((FILE *) ctx);
 }
 #endif
-
-void polarssl_io::set_non_blocking(bool yes)
-{
-	// 此处仅设置非阻塞 IO 标志位，至于套接字是否被设置了非阻塞模式
-	// 由应用自己来决定
-
-	nblock_ = yes;
-}
 
 bool polarssl_io::open(ACL_VSTREAM* s)
 {

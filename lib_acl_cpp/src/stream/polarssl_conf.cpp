@@ -547,7 +547,7 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 #endif
 }
 
-polarssl_io* polarssl_conf::create_io(bool server_side, bool nblock)
+sslbase_io* polarssl_conf::open(bool server_side, bool nblock)
 {
 	return new polarssl_io(*this, server_side, nblock);
 }

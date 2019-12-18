@@ -205,6 +205,9 @@
     <ClCompile Include="src\stream\socket_stream.cpp">
       <Filter>Source Files\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\stream\sslbase_io.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
     <ClCompile Include="src\mime\internal\header_opts.cpp">
       <Filter>Source Files\mime\internal</Filter>
     </ClCompile>
@@ -931,6 +934,12 @@
       <Filter>Header Files\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\sslbase_conf.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\sslbase_io.hpp">
       <Filter>Header Files\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\lib_acl.hpp">

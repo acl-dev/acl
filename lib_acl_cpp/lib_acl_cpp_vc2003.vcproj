@@ -342,6 +342,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stream\socket_stream.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stream\sslbase_io.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stream\stdin_stream.cpp">
 				</File>
 				<File
@@ -1100,6 +1103,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\sslbase_conf.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\sslbase_io.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\stdin_stream.hpp">

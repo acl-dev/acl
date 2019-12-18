@@ -205,7 +205,11 @@ namespace acl {
 
 mbedtls_io::mbedtls_io(mbedtls_conf& conf, bool server_side,
 	bool nblock /* = false */)
-: polarssl_io(conf, server_side, nblock)
+: sslbase_io(conf, server_side, nblock)
+, conf_(conf)
+, ssl_(NULL)
+, ssn_(NULL)
+, rnd_(NULL)
 {
 #ifdef HAS_MBEDTLS
 	conf.init_once();
@@ -214,8 +218,6 @@ mbedtls_io::mbedtls_io(mbedtls_conf& conf, bool server_side,
 
 mbedtls_io::~mbedtls_io(void)
 {
-	// xxx: 在本析构函数释放的对象必须置 NULL，以避免这些对象在基类中
-	// 再次被释放！
 #ifdef HAS_MBEDTLS
 	if (ssl_) {
 		__ssl_free((mbedtls_ssl_context*) ssl_);

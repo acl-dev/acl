@@ -155,7 +155,7 @@ bool http_request::try_open(bool* reuse_conn)
 		return true;
 	}
 
-	polarssl_io* ssl = ssl_conf_->create_io(false, false);
+	sslbase_io* ssl = ssl_conf_->open(false, false);
 	if (client_->get_stream().setup_hook(ssl) == ssl) {
 		logger_error("open client ssl error to: %s", addr_);
 		ssl->destroy();

@@ -75,6 +75,8 @@
 #include "stream/stdin_stream.hpp"
 #include "stream/stdout_stream.hpp"
 
+#include "stream/sslbase_conf.hpp"
+#include "stream/sslbase_io.hpp"
 #include "stream/polarssl_conf.hpp"
 #include "stream/polarssl_io.hpp"
 #include "stream/mbedtls_conf.hpp"

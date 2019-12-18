@@ -132,7 +132,7 @@ bool smtp_client::open(void)
 
 	// 如果设置了 SSL 通信方式，则需要打开 SSL 通信接口
 	if (ssl_conf_) {
-		polarssl_io* ssl = ssl_conf_->create_io(false, false);
+		sslbase_io* ssl = ssl_conf_->open(false, false);
 		if (stream_.setup_hook(ssl) == ssl) {
 			logger_error("open ssl client error!");
 			ssl->destroy();

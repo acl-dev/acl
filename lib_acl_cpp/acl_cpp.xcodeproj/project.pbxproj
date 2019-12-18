@@ -207,6 +207,7 @@
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
 		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
 		07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */; };
+		7029CC2F23A9D075001B3EDB /* sslbase_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */; };
 		702B9D9023A8E31200079240 /* mbedtls_conf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */; };
 		702B9D9123A8E31200079240 /* mbedtls_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 702B9D8F23A8E31200079240 /* mbedtls_io.cpp */; };
 		70BD6B8C232B933D00E4C798 /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
@@ -664,6 +665,9 @@
 		07BEA6C3214F79E20060BBE4 /* WebSocketServlet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WebSocketServlet.hpp; sourceTree = "<group>"; };
 		07BED4D922AFC5710060BBE4 /* http_aclient.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_aclient.hpp; sourceTree = "<group>"; };
 		07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_aclient.cpp; sourceTree = "<group>"; };
+		7029CC2C23A9D05D001B3EDB /* sslbase_conf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sslbase_conf.hpp; sourceTree = "<group>"; };
+		7029CC2D23A9D05D001B3EDB /* sslbase_io.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sslbase_io.hpp; sourceTree = "<group>"; };
+		7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sslbase_io.cpp; sourceTree = "<group>"; };
 		702B9D8C23A8E2FB00079240 /* mbedtls_conf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mbedtls_conf.hpp; sourceTree = "<group>"; };
 		702B9D8D23A8E2FB00079240 /* mbedtls_io.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mbedtls_io.hpp; sourceTree = "<group>"; };
 		702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mbedtls_conf.cpp; sourceTree = "<group>"; };
@@ -1092,6 +1096,7 @@
 		07A467A81E6FCCF1002C9B3C /* stream */ = {
 			isa = PBXGroup;
 			children = (
+				7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */,
 				702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */,
 				702B9D8F23A8E31200079240 /* mbedtls_io.cpp */,
 				07A467A91E6FCCF1002C9B3C /* aio_delay_free.cpp */,
@@ -1500,6 +1505,8 @@
 		07A469361E6FD404002C9B3C /* stream */ = {
 			isa = PBXGroup;
 			children = (
+				7029CC2C23A9D05D001B3EDB /* sslbase_conf.hpp */,
+				7029CC2D23A9D05D001B3EDB /* sslbase_io.hpp */,
 				702B9D8C23A8E2FB00079240 /* mbedtls_conf.hpp */,
 				702B9D8D23A8E2FB00079240 /* mbedtls_io.hpp */,
 				07A469371E6FD404002C9B3C /* aio_delay_free.hpp */,
@@ -1695,6 +1702,7 @@
 				07A4682C1E6FCCF1002C9B3C /* redis_client_pool.cpp in Sources */,
 				07A468731E6FCCF1002C9B3C /* stdin_stream.cpp in Sources */,
 				07A468681E6FCCF1002C9B3C /* aio_timer_callback.cpp in Sources */,
+				7029CC2F23A9D075001B3EDB /* sslbase_io.cpp in Sources */,
 				07A468601E6FCCF1002C9B3C /* aio_delay_free.cpp in Sources */,
 				07A467D11E6FCCF1002C9B3C /* check_rpc.cpp in Sources */,
 				07A468261E6FCCF1002C9B3C /* rfc822.cpp in Sources */,

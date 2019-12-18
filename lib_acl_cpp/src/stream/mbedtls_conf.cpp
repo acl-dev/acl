@@ -255,7 +255,7 @@ mbedtls_conf::mbedtls_conf(void)
 	
 	cache_       = NULL;
 	pkey_        = NULL;
-	verify_mode_ = POLARSSL_VERIFY_NONE;
+	verify_mode_ = MBEDTLS_VERIFY_NONE;
 #else
 	(void) entropy_;
 	(void) cacert_;
@@ -451,13 +451,13 @@ bool mbedtls_conf::setup_certs(void* ssl_in, bool server_side)
 	mbedtls_ssl_context* ssl = (mbedtls_ssl_context*) ssl_in;
 
 	switch (verify_mode_) {
-	case POLARSSL_VERIFY_NONE:
+	case MBEDTLS_VERIFY_NONE:
 		__ssl_set_authmode((mbedtls_ssl_context*) ssl, MBEDTLS_SSL_VERIFY_NONE);
 		break;
-	case POLARSSL_VERIFY_OPT:
+	case MBEDTLS_VERIFY_OPT:
 		__ssl_set_authmode((mbedtls_ssl_context*) ssl, MBEDTLS_SSL_VERIFY_OPTIONAL);
 		break;
-	case POLARSSL_VERIFY_REQ:
+	case MBEDTLS_VERIFY_REQ:
 		__ssl_set_authmode((mbedtls_ssl_context*) ssl, MBEDTLS_SSL_VERIFY_REQUIRED);
 		break;
 	default:
@@ -511,7 +511,7 @@ bool mbedtls_conf::setup_certs(void* ssl_in, bool server_side)
 #endif
 }
 
-polarssl_io* mbedtls_conf::create_io(bool server_side, bool nblock)
+sslbase_io* mbedtls_conf::open(bool server_side, bool nblock)
 {
 	return new mbedtls_io(*this, server_side, nblock);
 }

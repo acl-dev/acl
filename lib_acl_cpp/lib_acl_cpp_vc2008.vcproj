@@ -1234,6 +1234,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stream\sslbase_io.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stream\stdin_stream.cpp"
 					>
 				</File>
@@ -2081,6 +2085,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\socket_stream.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\sslbase_conf.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\sslbase_io.hpp"
 					>
 				</File>
 				<File
