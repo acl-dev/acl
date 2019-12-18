@@ -21,8 +21,8 @@ class aio_socket_stream;
 class socket_stream;
 class zlib_stream;
 class websocket;
-class polarssl_conf;
-class polarssl_io;
+class sslbase_conf;
+class sslbase_io;
 class http_header;
 
 /**
@@ -37,9 +37,9 @@ public:
 	/**
 	 * 构造函数
 	 * @param handle {aio_handle&} 异步通信事件引擎句柄
-	 * @param ssl_conf {polarssl_conf*} 非 NULL 时自动采用 SSL 通信方式
+	 * @param ssl_conf {sslbase_conf*} 非 NULL 时自动采用 SSL 通信方式
 	 */
-	http_aclient(aio_handle& handle, polarssl_conf* ssl_conf = NULL);
+	http_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
 	virtual ~http_aclient(void);
 
 	/**
@@ -74,16 +74,16 @@ public:
 	 * 构造函数中设置的 ssl_conf 为 NULL，则内部自动将 ssl_enable_ 置为
 	 * false，通过本方法设置了 ssl_conf 后还需调用下面的 enable_ssl()
 	 * 方法以启用 ssl 功能
-	 * @param ssl_conf {polarssl_conf*} 为 NULL 时将取消 SSL功能
+	 * @param ssl_conf {sslbase_conf*} 为 NULL 时将取消 SSL功能
 	 * @return {http_aclient&}
 	 */
-	http_aclient& set_ssl_conf(polarssl_conf* ssl_conf);
+	http_aclient& set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
 	 * 获得设置的 SSL 配置
-	 * @return {polarssl_conf*} 为 NULL 表示未设置
+	 * @return {sslbase_conf*} 为 NULL 表示未设置
 	 */
-	polarssl_conf* get_ssl_conf(void) const
+	sslbase_conf* get_ssl_conf(void) const
 	{
 		return ssl_conf_;
 	}
@@ -384,7 +384,7 @@ protected:
 	bool               keep_alive_;
 	bool               unzip_;		// 是否自动解压响应体数据
 	aio_handle&        handle_;
-	polarssl_conf*     ssl_conf_;		// 非空时才允许启用 SSL 功能
+	sslbase_conf*      ssl_conf_;		// 非空时才允许启用 SSL 功能
 	bool               ssl_enable_;		// 是否启用 SSL 功能
 	aio_socket_stream* conn_;
 	socket_stream*     stream_;

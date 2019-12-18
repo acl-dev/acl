@@ -5,8 +5,8 @@
 #include "acl_cpp/stdlib/xml.hpp"
 #include "acl_cpp/stdlib/json.hpp"
 #include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stream/polarssl_conf.hpp"
-#include "acl_cpp/stream/polarssl_io.hpp"
+#include "acl_cpp/stream/sslbase_conf.hpp"
+#include "acl_cpp/stream/sslbase_io.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stdlib/charset_conv.hpp"
 #include "acl_cpp/stdlib/pipe_stream.hpp"
@@ -120,7 +120,7 @@ http_request& http_request::set_unzip(bool on)
 	return *this;
 }
 
-http_request& http_request::set_ssl(polarssl_conf* ssl_conf)
+http_request& http_request::set_ssl(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 	return *this;

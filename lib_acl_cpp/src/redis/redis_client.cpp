@@ -5,8 +5,8 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
-#include "acl_cpp/stream/polarssl_conf.hpp"
-#include "acl_cpp/stream/polarssl_io.hpp"
+#include "acl_cpp/stream/sslbase_conf.hpp"
+#include "acl_cpp/stream/sslbase_io.hpp"
 #include "acl_cpp/redis/redis_result.hpp"
 #include "acl_cpp/redis/redis_connection.hpp"
 #include "acl_cpp/redis/redis_client.hpp"
@@ -50,7 +50,7 @@ void redis_client::set_check_addr(bool on)
 	check_addr_ = on;
 }
 
-void redis_client::set_ssl_conf(polarssl_conf* ssl_conf)
+void redis_client::set_ssl_conf(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 }

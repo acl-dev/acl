@@ -24,7 +24,7 @@ redis_client_pool::~redis_client_pool(void)
 		acl_myfree(pass_);
 }
 
-redis_client_pool& redis_client_pool::set_ssl_conf(polarssl_conf* ssl_conf)
+redis_client_pool& redis_client_pool::set_ssl_conf(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 	return *this;

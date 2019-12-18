@@ -5,7 +5,7 @@
 namespace acl
 {
 
-class polarssl_conf;
+class sslbase_conf;
 
 /**
  * http 客户端连接池类，该类父类为 connect_pool，该类只需实现父类中的虚函数
@@ -29,16 +29,16 @@ public:
 
 	/**
 	 * 调用本函数设置 SSL 的客户端模式
-	 * @param ssl_conf {polarssl_conf*}
+	 * @param ssl_conf {sslbase_conf*}
 	 */
-	void set_ssl(polarssl_conf* ssl_conf);
+	void set_ssl(sslbase_conf* ssl_conf);
 
 protected:
 	// 基类纯虚函数，该函数返回后由基类设置该连接池的网络连接及网络 IO 超时时间
 	virtual connect_client* create_connect();
 
 private:
-	polarssl_conf* ssl_conf_;
+	sslbase_conf* ssl_conf_;
 };
 
 class ACL_CPP_API http_guard : public connect_guard

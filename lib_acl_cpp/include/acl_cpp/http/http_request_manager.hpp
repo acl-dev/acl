@@ -5,7 +5,7 @@
 namespace acl
 {
 
-class polarssl_conf;
+class sslbase_conf;
 
 /**
  * HTTP 客户端请求连接池管理类
@@ -18,9 +18,9 @@ public:
 
 	/**
 	 * 调用本函数设置 SSL 的客户端模式
-	 * @param ssl_conf {polarssl_conf*}
+	 * @param ssl_conf {sslbase_conf*}
 	 */
-	void set_ssl(polarssl_conf* ssl_conf);
+	void set_ssl(sslbase_conf* ssl_conf);
 
 protected:
 	/**
@@ -34,7 +34,7 @@ protected:
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	polarssl_conf* ssl_conf_;
+	sslbase_conf* ssl_conf_;
 };
 
 } // namespace acl

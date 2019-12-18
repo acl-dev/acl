@@ -16,7 +16,7 @@ http_request_manager::~http_request_manager()
 {
 }
 
-void http_request_manager::set_ssl(polarssl_conf* ssl_conf)
+void http_request_manager::set_ssl(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 }

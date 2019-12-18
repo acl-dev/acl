@@ -5,8 +5,8 @@
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
-#include "acl_cpp/stream/polarssl_conf.hpp"
-#include "acl_cpp/stream/polarssl_io.hpp"
+#include "acl_cpp/stream/sslbase_conf.hpp"
+#include "acl_cpp/stream/sslbase_io.hpp"
 #include "acl_cpp/http/http_header.hpp"
 #include "acl_cpp/http/websocket.hpp"
 #include "acl_cpp/http/http_aclient.hpp"
@@ -22,7 +22,7 @@ enum {
 	HTTP_ACLIENT_STATUS_WS_READING,
 };
 
-http_aclient::http_aclient(aio_handle& handle, polarssl_conf* ssl_conf /* NULL */)
+http_aclient::http_aclient(aio_handle& handle, sslbase_conf* ssl_conf /* NULL */)
 : status_(HTTP_ACLIENT_STATUS_NONE)
 , rw_timeout_(0)
 , gzip_header_left_(0)
@@ -81,7 +81,7 @@ http_aclient& http_aclient::unzip_body(bool on)
 	return *this;
 }
 
-http_aclient& http_aclient::set_ssl_conf(polarssl_conf* ssl_conf)
+http_aclient& http_aclient::set_ssl_conf(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 	return *this;
@@ -407,7 +407,7 @@ bool http_aclient::handle_ssl_handshake(void)
 {
 #if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
 	// 否则，则是第一次进行 SSL 握手阶段的 IO 过程
-	polarssl_io* ssl_io = (polarssl_io*) conn_->get_hook();
+	sslbase_io* ssl_io = (sslbase_io*) conn_->get_hook();
 	if (ssl_io == NULL) {
 		logger_error("no ssl_io hooked!");
 		return false;

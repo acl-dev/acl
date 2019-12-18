@@ -11,7 +11,7 @@ struct SMTP_CLIENT;
 namespace acl {
 
 class istream;
-class polarssl_conf;
+class sslbase_conf;
 class mail_message;
 
 /**
@@ -60,10 +60,10 @@ public:
 
 	/**
 	 * 设置 SSL 数据传输模式
-	 * @param ssl_conf {polarssl_conf*} 非空时，指定采用 SSL 传输模式
+	 * @param ssl_conf {sslbase_conf*} 非空时，指定采用 SSL 传输模式
 	 * @return {smtp_client&}
 	 */
-	smtp_client& set_ssl(polarssl_conf* ssl_conf);
+	smtp_client& set_ssl(sslbase_conf* ssl_conf);
 
 	/**
 	 * 获得上次 SMTP 交互过程服务端返回的状态码
@@ -207,7 +207,7 @@ public:
 	}
 
 private:
-	polarssl_conf* ssl_conf_;
+	sslbase_conf* ssl_conf_;
 	char* addr_;
 	int   conn_timeout_;
 	int   rw_timeout_;

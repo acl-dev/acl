@@ -18,7 +18,7 @@ http_request_pool::~http_request_pool()
 {
 }
 
-void http_request_pool::set_ssl(polarssl_conf* ssl_conf)
+void http_request_pool::set_ssl(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 }

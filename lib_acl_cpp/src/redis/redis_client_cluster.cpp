@@ -171,7 +171,7 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 	}
 }
 
-redis_client_cluster& redis_client_cluster::set_ssl_conf(polarssl_conf* ssl_conf)
+redis_client_cluster& redis_client_cluster::set_ssl_conf(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 	return *this;

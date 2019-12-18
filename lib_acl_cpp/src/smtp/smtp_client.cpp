@@ -3,8 +3,8 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/istream.hpp"
-#include "acl_cpp/stream/polarssl_conf.hpp"
-#include "acl_cpp/stream/polarssl_io.hpp"
+#include "acl_cpp/stream/sslbase_conf.hpp"
+#include "acl_cpp/stream/sslbase_io.hpp"
 #include "acl_cpp/mime/rfc822.hpp"
 #include "acl_cpp/smtp/mail_message.hpp"
 #include "acl_cpp/smtp/smtp_client.hpp"
@@ -33,7 +33,7 @@ smtp_client::~smtp_client(void)
 	close();
 }
 
-smtp_client& smtp_client::set_ssl(polarssl_conf* ssl_conf)
+smtp_client& smtp_client::set_ssl(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
 	return *this;
