@@ -343,7 +343,7 @@ bool polarssl_conf::load_ca(const char* ca_file, const char* ca_path)
 		ret = __x509_parse_crtpath((X509_CRT*) cacert_, ca_path);
 		if (ret != 0) {
 			logger_error("x509_crt_parse_path(%s) error: -0x%04x",
-				ca_path, ret);
+				ca_path, -ret);
 			free_ca();
 			return false;
 		}
@@ -358,7 +358,7 @@ bool polarssl_conf::load_ca(const char* ca_file, const char* ca_path)
 	ret = __x509_parse_crtfile((X509_CRT*) cacert_, ca_file);
 	if (ret != 0) {
 		logger_error("x509_crt_parse_path(%s) error: -0x%04x",
-			ca_path, ret);
+			ca_path, -ret);
 		free_ca();
 		return false;
 	} else {
@@ -391,7 +391,7 @@ bool polarssl_conf::add_cert(const char* crt_file)
 	int ret = __x509_parse_crtfile((X509_CRT*) cert_chain_, crt_file);
 	if (ret != 0) {
 		logger_error("x509_crt_parse_file(%s) error: -0x%04x",
-			crt_file, ret);
+			crt_file, -ret);
 
 		__x509_free((X509_CRT*) cert_chain_);
 		acl_myfree(cert_chain_);
@@ -430,7 +430,7 @@ bool polarssl_conf::set_key(const char* key_file,
 			key_pass ? key_pass : "");
 	if (ret != 0) {
 		logger_error("pk_parse_keyfile(%s) error: -0x%04x",
-			key_file, ret);
+			key_file, -ret);
 
 		__pkey_free((PKEY*) pkey_);
 		acl_myfree(pkey_);
@@ -530,7 +530,7 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 		int ret = __ssl_set_own_cert(ssl, (X509_CRT*) cert_chain_,
 				(PKEY*) pkey_);
 		if (ret != 0) {
-			logger_error("ssl_set_own_cert error: -0x%04x", ret);
+			logger_error("ssl_set_own_cert error: -0x%04x", -ret);
 			return false;
 		}
 # else

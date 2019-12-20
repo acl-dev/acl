@@ -37,3 +37,7 @@ sleep 2
 ./http_aclient_ssl  -s 127.0.0.1:8885 -D -W
 echo ""
 echo ""
+
+./http_aclient_ssl -s echo.websocket.org:443 -H echo.websocket.org -D -Z -U -S ../libmbedtls_all.dylib -N 8.8.8.8:53
+echo ""
+echo ""

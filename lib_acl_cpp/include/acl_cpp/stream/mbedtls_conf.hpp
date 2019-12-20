@@ -27,7 +27,12 @@ class mbedtls_io;
 class ACL_CPP_API mbedtls_conf : public sslbase_conf
 {
 public:
-	mbedtls_conf(void);
+	/**
+	 * 构造函数
+	 * @param server_side {bool} 用来指定是服务端还是客户端，当为 true 时
+	 *  为服务端模式，否则为客户端模式
+	 */
+	mbedtls_conf(bool server_side);
 	~mbedtls_conf(void);
 
 	/**
@@ -73,17 +78,16 @@ public:
 	/**
 	 * mbedtls_io::open 内部会调用本方法用来安装当前 SSL 连接对象的证书
 	 * @param ssl {void*} SSL 连接对象，为 ssl_context 类型
-	 * @param server_side {bool} 该连接对象是否为服务端连接
 	 * @return {bool} 配置 SSL 对象是否成功
 	 */
-	bool setup_certs(void* ssl, bool server_side);
+	bool setup_certs(void* ssl);
 
 public:
 	/**
-	 * 必须首先调用此函数设置 libpolarssl.so 的全路径
-	 * @param path {const char*} libpolarssl.so 的全路径
+	 * 必须首先调用此函数设置 libmbedtls_all.so 的全路径
+	 * @param path {const char*} libmbedtls_all.so 的全路径
 	 */
-	static void set_libpath(const char* path);
+	static void set_libpath(const char* libmbedtls);
 
 	/**
 	 * 可以显式调用本方法，动态加载 polarssl 动态库
@@ -100,7 +104,11 @@ private:
 	bool has_inited_;
 	thread_mutex lock_;
 
+	bool server_side_;
+
+	void* conf_;
 	void* entropy_;
+	void* rnd_;
 	void* cacert_;
 	void* pkey_;
 	void* cert_chain_;
@@ -108,7 +116,8 @@ private:
 	mbedtls_verify_t verify_mode_;
 
 private:
-	void init_once(void);
+	bool init_once(void);
+	bool init_rand(void);
 	void free_ca(void);
 };
 

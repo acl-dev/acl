@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "https_request.h"
 
-https_request::https_request(const char* addr, acl::polarssl_conf* ssl_conf)
+https_request::https_request(const char* addr, acl::sslbase_conf* ssl_conf)
 	: request_(addr)
 	, to_charset_("utf-8")
 {
@@ -50,7 +50,7 @@ void* https_request::run(void)
 		ret = do_plain(request_);
 
 	if (ret == true)
-		printf("read ok!\r\n");
+		printf("%s(%d): read ok!\r\n", __FILE__, __LINE__);
 	else
 	{
 		printf("read error\r\n");

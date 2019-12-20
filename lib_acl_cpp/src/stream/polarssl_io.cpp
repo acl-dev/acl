@@ -309,7 +309,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 
 	// 初始化 SSL 对象
 	if ((ret = __ssl_init((ssl_context*) ssl_)) != 0) {
-		logger_error("failed, ssl_init error: -0x%04x\n", ret);
+		logger_error("failed, ssl_init error: -0x%04x\n", -ret);
 		acl_myfree(ssl_);
 		ssl_ = NULL;
 		return false;
@@ -341,7 +341,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 			(entropy_context*) conf_.get_entropy(),
 			(const unsigned char *) pers, strlen(pers));
 	if (ret != 0) {
-		logger_error("ctr_drbg_init error: -0x%04x\n", ret);
+		logger_error("ctr_drbg_init error: -0x%04x\n", -ret);
 		return false;
 	}
 
@@ -361,7 +361,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 		ret = __ssl_set_session((ssl_context*) ssl_,
 			(ssl_session*) ssn_);
 		if (ret != 0) {
-			logger_error("ssl_set_session error: -0x%04x\n", ret);
+			logger_error("ssl_set_session error: -0x%04x\n", -ret);
 			acl_myfree(ssn_);
 			ssn_ = NULL;
 		}
@@ -440,7 +440,7 @@ bool polarssl_io::handshake(void)
 		if (ret != POLARSSL_ERR_NET_WANT_READ
 			&& ret != POLARSSL_ERR_NET_WANT_WRITE) {
 
-			logger_error("ssl_handshake failed: -0x%04x", ret);
+			logger_error("ssl_handshake failed: -0x%04x", -ret);
 			return false;
 		}
 

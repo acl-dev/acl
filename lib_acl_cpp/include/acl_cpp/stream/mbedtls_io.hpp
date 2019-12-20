@@ -71,7 +71,6 @@ private:
 	mbedtls_conf& conf_;
 	void* ssl_;
 	void* ssn_;
-	void* rnd_;
 
 private:
 	static int sock_read(void *ctx, unsigned char *buf, size_t len);

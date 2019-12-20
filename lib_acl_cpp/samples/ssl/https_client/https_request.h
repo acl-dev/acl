@@ -3,7 +3,7 @@
 class https_request : public acl::thread
 {
 public:
-	https_request(const char* addr, acl::polarssl_conf* ssl_conf);
+	https_request(const char* addr, acl::sslbase_conf* ssl_conf);
 	~https_request(void);
 
 public:

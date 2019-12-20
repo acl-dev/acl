@@ -14,13 +14,14 @@ https_client::https_client(const char* server_addr, const char* domain,
 , length_(length)
 , ssl_conf_(NULL)
 {
+	(void) length_;
 }
 
 https_client::~https_client()
 {
 }
 
-void https_client::set_ssl_conf(acl::polarssl_conf *conf)
+void https_client::set_ssl_conf(acl::sslbase_conf *conf)
 {
 	ssl_conf_ = conf;
 }
@@ -41,7 +42,7 @@ bool https_client::connect_server(acl::http_client& client)
 	{
 		logger("begin open ssl");
 
-		acl::polarssl_io* ssl = new acl::polarssl_io(*ssl_conf_, false);
+		acl::sslbase_io* ssl = ssl_conf_->open(false, false);
 		if (client.get_stream().setup_hook(ssl) == ssl)
 		{
 			logger_error("open ssl client error");

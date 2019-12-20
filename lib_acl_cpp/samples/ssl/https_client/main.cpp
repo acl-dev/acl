@@ -58,13 +58,22 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	acl::polarssl_conf::set_libpath(libpath);
-	acl::polarssl_conf::load();
+	acl::sslbase_conf* ssl_conf = NULL;;
+	if (libpath.find("mbedtls") && access(libpath.c_str(), R_OK) == 0) {
+		ssl_conf = new acl::mbedtls_conf;
+		acl::mbedtls_conf::set_libpath(libpath);
+		acl::mbedtls_conf::load();
+	} else if (libpath.find("polarssl") && access(libpath.c_str(), R_OK) == 0) {
+		ssl_conf = new acl::polarssl_conf;
+		acl::polarssl_conf::set_libpath(libpath);
+		acl::polarssl_conf::load();
+	} else {
+		use_ssl = false;
+	}
+
 
 	if (domain.empty())
 		domain = server_addr;
-
-	static acl::polarssl_conf ssl_conf;
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
@@ -78,7 +87,7 @@ int main(int argc, char* argv[])
 				keep_alive, count, length);
 
 		if (use_ssl)
-			thread->set_ssl_conf(&ssl_conf);
+			thread->set_ssl_conf(ssl_conf);
 
 		thread->set_detachable(false);
 
@@ -108,18 +117,13 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < cocurrent; i++)
 	{
-		// ?????߳?
 		https_request* thread = new https_request(server_addr,
-				use_ssl ? &ssl_conf : NULL);
+				use_ssl ? ssl_conf : NULL);
 
-		// ???ô??????߳?Ϊ?Ƿ???ģʽ???Ա??????????Ե?? thread::wait
-		// ?ȴ??߳̽???
 		thread->set_detachable(false);
 
-		// ???̷߳??ڶ?????
 		threads.push_back(thread);
 
-		// ?????߳?
 		thread->start();
 	}
 
@@ -128,14 +132,12 @@ int main(int argc, char* argv[])
 	std::list<https_request*>::iterator it = threads.begin();
 	for (; it != threads.end(); ++it)
 	{
-		// ?ȴ??߳̽???
 		if ((*it)->wait(NULL) == false)
 			printf("wait one thread(%lu) error\r\n",
 				(*it)->thread_id());
 		else
 			printf("wait one thread(%lu) ok\r\n",
 				(*it)->thread_id());
-		// ɾ????̬???????̶߳???
 		delete *it;
 
 	}
@@ -151,5 +153,6 @@ int main(int argc, char* argv[])
 	printf("enter any key to exit\r\n");
 	getchar();
 
+	delete ssl_conf;
 	return 0;
 }

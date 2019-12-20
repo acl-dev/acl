@@ -230,7 +230,7 @@ private:
 class http_aio_client : public acl::http_aclient
 {
 public:
-	http_aio_client(acl::aio_handle& handle, acl::polarssl_conf* ssl_conf,
+	http_aio_client(acl::aio_handle& handle, acl::sslbase_conf* ssl_conf,
 		const char* host)
 	: http_aclient(handle, ssl_conf)
 	, host_(host)
@@ -466,7 +466,7 @@ static void add_dns(std::vector<acl::string>& name_servers, const char* s)
 
 int main(int argc, char* argv[])
 {
-	acl::polarssl_conf* ssl_conf = NULL;
+	acl::sslbase_conf* ssl_conf = NULL;
 	int  ch, conn_timeout = 5, rw_timeout = 5;
 	std::vector<acl::string> name_servers;
 	acl::string addr("127.0.0.1:80");
@@ -530,14 +530,28 @@ int main(int argc, char* argv[])
 	// 如果设置了 SSL 连接库，则启用 SSL 连接模式
 	if (!ssl_lib_path.empty()) {
 		if (access(ssl_lib_path.c_str(), R_OK) == 0) {
-			// 设置 libpolarssl.so 库全路径
-			acl::polarssl_conf::set_libpath(ssl_lib_path);
+			if (ssl_lib_path.find("mbedtls") != NULL) {
+				// 设置 libmbedtls_all.so 库全路径
+				acl::mbedtls_conf::set_libpath(ssl_lib_path);
 
-			// 动态加载 libpolarssl.so 库
-			acl::polarssl_conf::load();
+				// 动态加载 libmbedtls_all.so 库
+				acl::mbedtls_conf::load();
 
-			// 创建全局 SSL 配置项
-			ssl_conf = new acl::polarssl_conf;
+				// 创建全局 SSL 配置项
+				ssl_conf = new acl::mbedtls_conf;
+				printf(">>>use mbedtls<<<\r\n");
+
+			} else {
+				// 设置 libpolarssl.so 库全路径
+				acl::polarssl_conf::set_libpath(ssl_lib_path);
+
+				// 动态加载 libpolarssl.so 库
+				acl::polarssl_conf::load();
+
+				// 创建全局 SSL 配置项
+				ssl_conf = new acl::polarssl_conf;
+				printf(">>>use polarssl<<<\r\n");
+			}
 		} else {
 			printf("disable ssl, %s not found\r\n",
 				ssl_lib_path.c_str());
