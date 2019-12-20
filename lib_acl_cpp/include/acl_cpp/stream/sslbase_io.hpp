@@ -13,30 +13,30 @@ class sslbase_io : public stream_hook
 {
 public:
 	/**
-	 * æ„é€ å‡½æ•°
-	 * @param conf {sslbase_conf&} å¯¹æ¯ä¸€ä¸ª SSL è¿æ¥è¿›è¡Œé…ç½®çš„ç±»å¯¹è±¡
-	 * @param server_side {bool} æ˜¯å¦ä¸ºæœåŠ¡ç«¯æ¨¡å¼ï¼Œå› ä¸ºå®¢æˆ·ç«¯æ¨¡å¼ä¸æœåŠ¡ç«¯
-	 *  æ¨¡å¼çš„æ¡æ‰‹æ–¹æ³•ä¸åŒï¼Œæ‰€ä»¥é€šè¿‡æ­¤å‚æ•°æ¥è¿›è¡ŒåŒºåˆ†
-	 * @param nblock {bool} æ˜¯å¦ä¸ºéé˜»å¡æ¨¡å¼
+	 * ¹¹Ôìº¯Êı
+	 * @param conf {sslbase_conf&} ¶ÔÃ¿Ò»¸ö SSL Á¬½Ó½øĞĞÅäÖÃµÄÀà¶ÔÏó
+	 * @param server_side {bool} ÊÇ·ñÎª·şÎñ¶ËÄ£Ê½£¬ÒòÎª¿Í»§¶ËÄ£Ê½Óë·şÎñ¶Ë
+	 *  Ä£Ê½µÄÎÕÊÖ·½·¨²»Í¬£¬ËùÒÔÍ¨¹ı´Ë²ÎÊıÀ´½øĞĞÇø·Ö
+	 * @param nblock {bool} ÊÇ·ñÎª·Ç×èÈûÄ£Ê½
 	 */
 	sslbase_io(sslbase_conf& conf, bool server_side, bool nblock = false);
 	virtual ~sslbase_io(void);
 
 	/**
-	 * ssl æ¡æ‰‹çº¯è™šæ–¹æ³•
+	 * ssl ÎÕÊÖ´¿Ğé·½·¨
 	 * @return {bool}
 	 */
 	virtual bool handshake(void) = 0;
 
 	/**
-	 * è®¾ç½®å¥—æ¥å­—ä¸ºé˜»å¡æ¨¡å¼/éé˜»å¡æ¨¡å¼
-	 * @param yes {bool} å½“ä¸º false æ—¶åˆ™è®¾ä¸ºé˜»å¡æ¨¡å¼ï¼Œå¦åˆ™è®¾ä¸ºéé˜»å¡æ¨¡å¼
+	 * ÉèÖÃÌ×½Ó×ÖÎª×èÈûÄ£Ê½/·Ç×èÈûÄ£Ê½
+	 * @param yes {bool} µ±Îª false Ê±ÔòÉèÎª×èÈûÄ£Ê½£¬·ñÔòÉèÎª·Ç×èÈûÄ£Ê½
 	 */
 	void set_non_blocking(bool yes);
 
 	/**
-	 * åˆ¤æ–­å½“å‰è®¾ç½®çš„ SSL IO æ˜¯å¦é˜»å¡æ¨¡å¼è¿˜æ˜¯éé˜»å¡æ¨¡å¼
-	 * @return {bool} è¿”å› true åˆ™è¡¨ç¤ºä¸ºéé˜»å¡æ¨¡å¼ï¼Œå¦åˆ™ä¸ºé˜»å¡æ¨¡å¼
+	 * ÅĞ¶Ïµ±Ç°ÉèÖÃµÄ SSL IO ÊÇ·ñ×èÈûÄ£Ê½»¹ÊÇ·Ç×èÈûÄ£Ê½
+	 * @return {bool} ·µ»Ø true Ôò±íÊ¾Îª·Ç×èÈûÄ£Ê½£¬·ñÔòÎª×èÈûÄ£Ê½
 	 */
 	bool is_non_blocking(void) const
 	{
@@ -44,7 +44,7 @@ public:
 	}
 
 	/**
-	 * åˆ¤æ–­ SSL æ¡æ‰‹æ˜¯å¦æˆåŠŸ
+	 * ÅĞ¶Ï SSL ÎÕÊÖÊÇ·ñ³É¹¦
 	 * @return {bool}
 	 */
 	bool handshake_ok(void)

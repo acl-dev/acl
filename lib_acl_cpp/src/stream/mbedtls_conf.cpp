@@ -174,9 +174,9 @@ static ssl_setup_fn			__ssl_setup;
 
 static acl_pthread_once_t __mbedtls_once = ACL_PTHREAD_ONCE_INIT;
 static acl::string* __mbedtls_path_buf = NULL;
-# ifdef	ACL_WINDOWS
+# if defined(_WIN32) || defined(_WIN64)
 static const char* __mbedtls_path      = "libmbedtls_all.dll";
-#elseif defined(ACL_MACOSX)
+# elif defined(ACL_MACOSX)
 static const char* __mbedtls_path      = "./libmbedtls_all.dylib";
 # else
 static const char* __mbedtls_path      = "./libmbedtls_all.so";
@@ -342,6 +342,7 @@ void mbedtls_conf::load(void)
 #endif
 }
 
+#ifdef HAS_MBEDTLS
 static void set_authmode(mbedtls_ssl_config* conf, mbedtls_verify_t verify_mode)
 {
 	switch (verify_mode) {
@@ -359,9 +360,11 @@ static void set_authmode(mbedtls_ssl_config* conf, mbedtls_verify_t verify_mode)
 		break;
 	}
 }
+#endif
 
 bool mbedtls_conf::init_rand(void)
 {
+#ifdef HAS_MBEDTLS
 	char pers[50];
 	safe_snprintf(pers, sizeof(pers), "SSL Pthread Thread %lu",
 		(unsigned long) acl_pthread_self());
@@ -374,10 +377,13 @@ bool mbedtls_conf::init_rand(void)
 		return false;
 	}
 
-	// è®¾ç½®éšæœºæ•°ç”Ÿæˆå™¨
+	// ÉèÖÃËæ»úÊıÉú³ÉÆ÷
 	__ssl_conf_rng((mbedtls_ssl_config*) conf_, __ctr_drbg_random,
 		(mbedtls_ctr_drbg_context*) rnd_);
 	return true;
+#else
+	return false;
+#endif
 }
 
 #ifdef DEBUG_SSL
@@ -517,8 +523,8 @@ mbedtls_conf::~mbedtls_conf(void)
 	acl_myfree(conf_);
 	acl_myfree(entropy_);
 
-	// ä½¿ç”¨ havege_random éšæœºæ•°ç”Ÿæˆå™¨æ—¶ï¼Œåœ¨ä¸€äº›è™šæœºä¸Šå¹¶ä¸èƒ½ä¿è¯éšæœºæ€§,
-	// å»ºè®®ä½¿ç”¨ ctr_drbg_random éšæœºæ•°ç”Ÿæˆå™¨
+	// Ê¹ÓÃ havege_random Ëæ»úÊıÉú³ÉÆ÷Ê±£¬ÔÚÒ»Ğ©Ğé»úÉÏ²¢²»ÄÜ±£Ö¤Ëæ»úĞÔ,
+	// ½¨ÒéÊ¹ÓÃ ctr_drbg_random Ëæ»úÊıÉú³ÉÆ÷
 #ifdef HAS_HAVEGE
 	acl_myfree(rnd_);
 #else

@@ -14,10 +14,10 @@ public:
 	virtual ~sslbase_conf(void) {}
 
 	/**
-	 * çº¯è™šæ–¹æ³•ï¼Œåˆ›å»º SSL IO å¯¹è±¡
-	 * @param server_side {bool} æ˜¯å¦ä¸ºæœåŠ¡ç«¯æ¨¡å¼ï¼Œå› ä¸ºå®¢æˆ·ç«¯æ¨¡å¼ä¸æœåŠ¡ç«¯
-	 *  æ¨¡å¼çš„æ¡æ‰‹æ–¹æ³•ä¸åŒï¼Œæ‰€ä»¥é€šè¿‡æ­¤å‚æ•°æ¥è¿›è¡ŒåŒºåˆ†
-	 * @param nblock {bool} æ˜¯å¦ä¸ºéé˜»å¡æ¨¡å¼
+	 * ´¿Ğé·½·¨£¬´´½¨ SSL IO ¶ÔÏó
+	 * @param server_side {bool} ÊÇ·ñÎª·şÎñ¶ËÄ£Ê½£¬ÒòÎª¿Í»§¶ËÄ£Ê½Óë·şÎñ¶Ë
+	 *  Ä£Ê½µÄÎÕÊÖ·½·¨²»Í¬£¬ËùÒÔÍ¨¹ı´Ë²ÎÊıÀ´½øĞĞÇø·Ö
+	 * @param nblock {bool} ÊÇ·ñÎª·Ç×èÈûÄ£Ê½
 	 * @return {sslbase_io*}
 	 */
 	virtual sslbase_io* open(bool server_side, bool nblock) = 0;
