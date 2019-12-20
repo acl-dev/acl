@@ -114,7 +114,7 @@ ACL_VSTREAM *acl_vstream_accept_ex(ACL_VSTREAM *sstream,
 		connfd = acl_accept(servfd, buf, sizeof(buf), NULL);
 	} else if (sstream->iocp_sock == ACL_SOCKET_INVALID) {
 		return NULL;
-	else {
+	} else {
 		int   ret;
 
 		connfd = sstream->iocp_sock;
