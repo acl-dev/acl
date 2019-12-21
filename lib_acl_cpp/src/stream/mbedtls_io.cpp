@@ -192,7 +192,7 @@ bool mbedtls_io::open(ACL_VSTREAM* s)
 
 	char* ptr = ACL_VSTREAM_PEER(s);
 	if (ptr && *ptr) {
-		safe_snprintf(host, sizeof(host), ptr);
+		safe_snprintf(host, sizeof(host), "%s", ptr);
 	} else if (acl_getpeername(ACL_VSTREAM_SOCK(s), host, sizeof(host))) {
 		logger_error("can't acl_getpeername error=%s", last_serror());
 		return false;

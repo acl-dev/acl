@@ -434,7 +434,6 @@ bool mbedtls_conf::init_once(void)
 		return false;
 	}
 
-	printf(">>>server_side_=%s\n", server_side_ ? "server":"client");
 	set_authmode((mbedtls_ssl_config*) conf_, verify_mode_);
 	__ssl_conf_endpoint((mbedtls_ssl_config*) conf_, server_side_ ?
 		MBEDTLS_SSL_IS_SERVER : MBEDTLS_SSL_IS_CLIENT);
