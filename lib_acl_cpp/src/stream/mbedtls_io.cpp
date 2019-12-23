@@ -131,6 +131,10 @@ mbedtls_io::mbedtls_io(mbedtls_conf& conf, bool server_side,
 {
 #ifdef HAS_MBEDTLS
 	conf.init_once();
+#else
+	(void) conf_;
+	(void) ssl_;
+	(void) ssn_;
 #endif
 }
 

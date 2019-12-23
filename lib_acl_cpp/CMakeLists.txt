@@ -172,9 +172,15 @@ if (${UNIX_OS})
 	if (HAS_POLARSSL MATCHES "YES")
 		add_definitions("-DHAS_POLARSSL")
 		message(STATUS "HAS_POLARSSL been set, polarssl enable!")
+	elseif (HAS_MBEDTSL MATCHES "YES")
+		add_definitions("-DHAS_MBEDTLS")
+		message(STATUS "HAS_MBEDTLS been set, mbedtls enable!")
 	elseif (HAS_POLARSSL_DLL MATCHES "YES")
 		add_definitions("-DHAS_POLARSSL_DLL")
 		message(STATUS "HAS_POLARSSL_DLL been set, polarssl enable!")
+	elseif (HAS_MBEDTLS_DLL MATCHES "YES")
+		add_definitions("-DHAS_MBEDTLS_DLL")
+		message(STATUS "HAS_MBEDTLS_DLL been set, mbedtls enable!")
 	else()
 		message(STATUS "polarssl disable!")
 	endif()
@@ -190,6 +196,7 @@ elseif (${WIN_OS})
 		"-DHAS_SQLITE_DLL"
 		"-DHAS_PGSQL_DLL"
 		"-DHAS_POLARSSL_DLL"
+		"-DHAS_MBEDTLS_DLL"
 		"-DUSE_WIN_ICONV")
 	aux_source_directory(${src}/stdlib/internal lib_src)
 endif()

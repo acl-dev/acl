@@ -498,7 +498,10 @@ bool http_aclient::res_unzip_finish(zlib_stream& zstream, char* data, int dlen)
 bool http_aclient::handle_res_body_finish(char* data, int dlen)
 {
 	if (zstream_) {
-		return res_unzip_finish(*zstream_, data, dlen);
+		bool ret = res_unzip_finish(*zstream_, data, dlen);
+		delete zstream_;
+		zstream_ = NULL;
+		return ret;
 	} else {
 		return res_plain_finish(data, dlen);
 	}

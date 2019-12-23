@@ -6,7 +6,7 @@
 # endif
 #endif
 
-#define DEBUG_SSL
+//#define DEBUG_SSL
 
 #ifdef HAS_MBEDTLS
 # include "mbedtls/ssl.h"
@@ -386,13 +386,15 @@ bool mbedtls_conf::init_rand(void)
 #endif
 }
 
-#ifdef DEBUG_SSL
+#ifdef HAS_MBEDTLS
+# ifdef DEBUG_SSL
 static void my_debug( void *ctx, int level, const char* fname, int line,
 	const char* str)
 {
 	fprintf((FILE *) ctx, "%s(%d): level=%d, %s", fname, line, level, str);
 	fflush((FILE *) ctx);
 }
+# endif
 #endif
 
 bool mbedtls_conf::init_once(void)
@@ -408,9 +410,9 @@ bool mbedtls_conf::init_once(void)
 	__entropy_init((mbedtls_entropy_context*) entropy_);
 	__ssl_config_init((mbedtls_ssl_config*) conf_);
 
-#ifdef DEBUG_SSL
+# ifdef DEBUG_SSL
 	__ssl_conf_dbg((mbedtls_ssl_config*) conf_, my_debug, stdout);
-#endif
+# endif
 
 	int ret;
 	if (server_side_) {
