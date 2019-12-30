@@ -1,5 +1,10 @@
 修改历史列表：
 
+666) 2019.12.30
+666.1) bugfix: 在 net/dns/rfc1035.c 的 rfc1035MessageUnpack() 函数中，当调用
+rfc1035MessageDestroy() 后不应再释放临时内存对象 msg 和 msg->query，否则引起
+内存被重复释放问题，引起程序崩溃.
+
 665) 2019.12.16
 665.1) safety: add more safety protection for dns module.
 

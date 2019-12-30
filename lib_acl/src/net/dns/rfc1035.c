@@ -561,8 +561,6 @@ int rfc1035MessageUnpack(const char *buf, size_t sz, rfc1035_message **answer)
 			RFC1035_UNPACK_DEBUG;
 			rfc1035SetErrno(rfc1035_unpack_error);
 			rfc1035MessageDestroy(msg);
-			acl_myfree(msg->query);
-			acl_myfree(msg);
 			return -rfc1035_unpack_error;
 		}
 	}
@@ -602,8 +600,6 @@ int rfc1035MessageUnpack(const char *buf, size_t sz, rfc1035_message **answer)
 		* didn't actually get any.
 		*/
 		rfc1035MessageDestroy(msg);
-		acl_myfree(msg->query);
-		acl_myfree(msg);
 		*answer = NULL;
 		rfc1035SetErrno(rfc1035_unpack_error);
 		return -rfc1035_unpack_error;
