@@ -432,8 +432,8 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 #ifdef USE_MBEDTLS
-	const char* libssl_path = "../libmbedtls_all.dylib";
 # ifdef __APPLE__
+	const char* libssl_path = "../libmbedtls_all.dylib";
 	acl::mbedtls_conf::set_libpath(libssl_path);
 # else
 	const char* libssl_path = "../libmbedtls_all.so";
