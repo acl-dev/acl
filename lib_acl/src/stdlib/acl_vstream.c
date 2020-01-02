@@ -340,13 +340,26 @@ AGAIN:
 	return -1;
 }
 
+/**
+ * 将数据读入至指定的缓冲区中
+ * @param fp {ACL_VSTREAM*}
+ * @param buf {void*} 目标缓冲区
+ * @param size {size_t} buf 缓冲区大小
+ * @return {int} 返回读到的数据，返回值如下：
+ *   > 0 当前读到缓冲区中的数据长度
+ *  == 0 对端连接关闭
+ *   < 0 在阻塞方式下表示读出错，采用非阻塞方式时也会返回 -1
+ */
 static int read_to_buffer(ACL_VSTREAM *fp, void *buf, size_t size)
 {
 	int n = sys_read(fp, buf, size);
 
+	/* 返回值应该分三种情形，以便于上层调用者知道出错的明确原因 */
+#if 0
 	if (n <= 0) {
 		return -1;
 	}
+#endif
 	return n;
 }
 
@@ -355,12 +368,8 @@ static int read_buffed(ACL_VSTREAM *fp)
 	int  n;
 
 	fp->read_ptr = fp->read_buf;
-	n =  read_to_buffer(fp, fp->read_buf, (size_t) fp->read_buf_len);
-	if (n >= 0) {
-		fp->read_cnt = n;
-	} else {
-		fp->read_cnt = 0;
-	}
+	n = read_to_buffer(fp, fp->read_buf, (size_t) fp->read_buf_len);
+	fp->read_cnt = n > 0 ? n : 0;
 	return n;
 }
 
@@ -368,11 +377,8 @@ static int read_char(ACL_VSTREAM *fp)
 {
 	int n = read_buffed(fp);
 
-	if (n >= 0) {
-		fp->read_cnt = n;
-	} else {
-		fp->read_cnt = 0;
-	}
+	fp->read_cnt = n > 0 ? n : 0;
+
 	if (n <= 0) {
 		return ACL_VSTREAM_EOF;
 	} else {
@@ -1006,8 +1012,8 @@ int acl_vstream_read(ACL_VSTREAM *fp, void *buf, size_t size)
 	}
 	/* 否则将数据读到流缓冲区中，然后再拷贝，从而减少 read 次数 */
 	else {
-		int   read_cnt = read_buffed(fp);
-		if (read_cnt <= 0) {
+		int n = read_buffed(fp);
+		if (n <= 0) {
 			return ACL_VSTREAM_EOF;
 		}
 		return acl_vstream_bfcp_some(fp, (unsigned char*) buf, size);
@@ -1094,7 +1100,7 @@ int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	if (fp->read_ready) {
 		if (read_buffed(fp) <= 0) {
 			n = (int) LEN(buf) - n;
-			return n >= 0 ? n : ACL_VSTREAM_EOF;
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1171,8 +1177,7 @@ int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
 	if (fp->read_ready) {
 		if (read_buffed(fp) <= 0) {
 			n = (int) LEN(buf) - n;
-
-			return n >= 0 ? n : ACL_VSTREAM_EOF;
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1244,8 +1249,8 @@ int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf,
 
 	if (fp->read_ready) {
 		if (read_buffed(fp) <= 0) {
-			int   n = cnt_saved - cnt;
-			return n >= 0 ? n : ACL_VSTREAM_EOF;
+			int n = cnt_saved - cnt;
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1300,7 +1305,7 @@ int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf)
 	if (fp->read_ready) {
 		if (read_buffed(fp) <= 0) {
 			n = (int) LEN(buf) - n;
-			return n >= 0 ? n : ACL_VSTREAM_EOF;
+			return n > 0 ? n : ACL_VSTREAM_EOF;
 		}
 	}
 
@@ -1394,12 +1399,10 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 		return 1;
 	} else if (fp->read_ready == 0) {
 		return 0;
-	} else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) != 0) {
-		if (read_buffed(fp) <= 0) {
-			return ACL_VSTREAM_EOF;
-		} else {
-			return 1;
-		}
+	} else if ((fp->flag & ACL_VSTREAM_FLAG_PREREAD) == 0) {
+		return 1;
+	} else if (read_buffed(fp) <= 0) {
+		return ACL_VSTREAM_EOF;
 	} else {
 		return 1;
 	}

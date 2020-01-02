@@ -136,14 +136,16 @@ static void polarssl_dll_unload(void)
 	__polarssl_path_buf = NULL;
 }
 
-extern void polarssl_dll_load_io(void); // defined in polarssl_io.cpp
+extern bool polarssl_dll_load_io(void); // defined in polarssl_io.cpp
 
-static void polarssl_dll_load_conf(void)
+static bool polarssl_dll_load_conf(void)
 {
 #define LOAD(name, type, fn) do {					\
 	(fn) = (type) acl_dlsym(__polarssl_dll, (name));		\
-	if ((fn) == NULL)						\
-		logger_fatal("dlsym %s error %s", name, acl_dlerror());	\
+	if ((fn) == NULL) {						\
+		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		return false;						\
+	}								\
 } while (0)
 
 #if defined(POLARSSL_1_3_X)
@@ -168,6 +170,7 @@ static void polarssl_dll_load_conf(void)
 	LOAD(SSL_CACHE_FREE_NAME, ssl_cache_free_fn, __ssl_cache_free);
 	LOAD(SSL_CACHE_SET_NAME, ssl_cache_set_fn, __ssl_cache_set);
 	LOAD(SSL_CACHE_GET_NAME, ssl_cache_get_fn, __ssl_cache_get);
+	return true;
 }
 
 static void polarssl_dll_load(void)
@@ -183,11 +186,22 @@ static void polarssl_dll_load(void)
 
 	__polarssl_dll = acl_dlopen(__polarssl_path);
 	if (__polarssl_dll == NULL) {
-		logger_fatal("load %s error %s", __polarssl_path, acl_dlerror());
+		logger_error("load %s error %s", __polarssl_path, acl_dlerror());
+		return;
 	}
 
-	polarssl_dll_load_conf();
-	polarssl_dll_load_io();
+	if (!polarssl_dll_load_conf()) {
+		logger_error("load %s error", __polarssl_path);
+		acl_dlclose(__polarssl_dll);
+		__polarssl_dll = NULL;
+		return;
+	}
+	if (!polarssl_dll_load_io()) {
+		logger_error("load %s error", __polarssl_path);
+		acl_dlclose(__polarssl_dll);
+		__polarssl_dll = NULL;
+		return;
+	}
 
 	logger("%s loaded!", __polarssl_path);
 	atexit(polarssl_dll_unload);
@@ -243,12 +257,18 @@ void polarssl_conf::set_libpath(const char* path acl_unused)
 #endif
 }
 
-void polarssl_conf::load(void)
+bool polarssl_conf::load(void)
 {
 #ifdef HAS_POLARSSL_DLL
 	acl_pthread_once(&__polarssl_once, polarssl_dll_load);
+	if (__polarssl_dll == NULL) {
+		logger_error("load polarssl error");
+		return false;
+	}
+	return true;
 #else
 	logger_warn("link polarssl library in statis way!");
+	return false;
 #endif
 }
 

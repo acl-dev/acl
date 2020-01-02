@@ -332,6 +332,7 @@ protected:
 	void on_accept(acl::socket_stream* stream)
 	{
 		stream->set_rw_timeout(60);
+		printf("accept one fd=%d\r\n", stream->sock_handle());
 
 		if (conf_) {
 			// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
@@ -431,19 +432,29 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 #ifdef USE_MBEDTLS
+	const char* libssl_path = "../libmbedtls_all.dylib";
 # ifdef __APPLE__
-	acl::mbedtls_conf::set_libpath("../libmbedtls_all.dylib");
+	acl::mbedtls_conf::set_libpath(libssl_path);
 # else
-	acl::mbedtls_conf::set_libpath("../libmbedtls_all.so");
+	const char* libssl_path = "../libmbedtls_all.so";
+	acl::mbedtls_conf::set_libpath(libssl_path);
 # endif
-	acl::mbedtls_conf::load();
+	if (!acl::mbedtls_conf::load()) {
+		printf("load %s error\r\n", libssl_path);
+		return 1;
+	}
 #else
 # ifdef __APPLE__
-	acl::polarssl_conf::set_libpath("../libpolarssl.dylib");
+	const char* libssl_path = "../libpolarssl.dylib";
+	acl::polarssl_conf::set_libpath(libssl_path);
 # else
-	acl::polarssl_conf::set_libpath("../libpolarssl.so");
+	const char* libssl_path = "../libpolarssl.so";
+	acl::polarssl_conf::set_libpath(libssl_path);
 # endif
-	acl::polarssl_conf::load();
+	if (!acl::polarssl_conf::load()) {
+		printf("load %s error\r\n", libssl_path);
+		return 1;
+	}
 #endif
 
 	// 开始运行

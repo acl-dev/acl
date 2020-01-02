@@ -9,13 +9,13 @@
 //#define DEBUG_SSL
 
 #ifdef HAS_MBEDTLS
-# include "mbedtls/ssl.h"
-# include "mbedtls/ctr_drbg.h"
-# include "mbedtls/entropy.h"
-# include "mbedtls/certs.h"
-# include "mbedtls/x509_crt.h"
-# include "mbedtls/x509.h"
-# include "mbedtls/ssl_cache.h"
+# include "mbedtls-2.7.12/ssl.h"
+# include "mbedtls-2.7.12/ctr_drbg.h"
+# include "mbedtls-2.7.12/entropy.h"
+# include "mbedtls-2.7.12/certs.h"
+# include "mbedtls-2.7.12/x509_crt.h"
+# include "mbedtls-2.7.12/x509.h"
+# include "mbedtls-2.7.12/ssl_cache.h"
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
@@ -196,14 +196,16 @@ static void mbedtls_dll_unload(void)
 	__mbedtls_path_buf = NULL;
 }
 
-extern void mbedtls_dll_load_io(void); // defined in mbedtls_io.cpp
+extern bool mbedtls_dll_load_io(void); // defined in mbedtls_io.cpp
 
-static void mbedtls_dll_load_conf(void)
+static bool mbedtls_dll_load_conf(void)
 {
 #define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__mbedtls_dll, (name));		\
-	if ((fn) == NULL)						\
-		logger_fatal("dlsym %s error %s", name, acl_dlerror());	\
+	(fn) = (type) acl_dlsym(__mbedtls_dll, (name));			\
+	if ((fn) == NULL) {						\
+		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		return false;						\
+	}								\
 } while (0)
 
 	LOAD(PK_INIT_NAME, pk_init_fn, __pk_init);
@@ -250,6 +252,7 @@ static void mbedtls_dll_load_conf(void)
 	LOAD(SSL_CACHE_GET_NAME, ssl_cache_get_fn, __ssl_cache_get);
 
 	LOAD(SSL_SETUP_NAME, ssl_setup_fn, __ssl_setup);
+	return true;
 }
 
 static void mbedtls_dll_load(void)
@@ -265,11 +268,22 @@ static void mbedtls_dll_load(void)
 
 	__mbedtls_dll = acl_dlopen(__mbedtls_path);
 	if (__mbedtls_dll == NULL) {
-		logger_fatal("load %s error %s", __mbedtls_path, acl_dlerror());
+		logger_error("load %s error %s", __mbedtls_path, acl_dlerror());
+		return;
 	}
 
-	mbedtls_dll_load_conf();
-	mbedtls_dll_load_io();
+	if (!mbedtls_dll_load_conf()) {
+		logger_error("mbedtls_dll_load_conf %s error", __mbedtls_path);
+		acl_dlclose(__mbedtls_dll);
+		__mbedtls_dll = NULL;
+		return;
+	}
+	if (!mbedtls_dll_load_io()) {
+		logger_error("mbedtls_dll_load_io %s error", __mbedtls_path);
+		acl_dlclose(__mbedtls_dll);
+		__mbedtls_dll = NULL;
+		return;
+	}
 
 	logger("%s loaded!", __mbedtls_path);
 	atexit(mbedtls_dll_unload);
@@ -333,12 +347,18 @@ void mbedtls_conf::set_libpath(const char* libmbedtls)
 #endif
 }
 
-void mbedtls_conf::load(void)
+bool mbedtls_conf::load(void)
 {
 #ifdef HAS_MBEDTLS_DLL
 	acl_pthread_once(&__mbedtls_once, mbedtls_dll_load);
+	if (__mbedtls_dll == NULL) {
+		logger_error("load mbedtls error");
+		return false;
+	}
+	return true;
 #else
 	logger_warn("link mbedtls library in statis way!");
+	return false;
 #endif
 }
 
@@ -397,18 +417,27 @@ static void my_debug( void *ctx, int level, const char* fname, int line,
 # endif
 #endif
 
+#define CONF_INIT_NIL	0
+#define CONF_INIT_OK	1
+#define CONF_INIT_ERR	2
+
 bool mbedtls_conf::init_once(void)
 {
-	load();
-	lock_.lock();
-	if (has_inited_) {
-		lock_.unlock();
-		return true;
+	if (!load()) {
+		return false;
 	}
+
+	thread_mutex_guard guard(lock_);
+	if (init_status_ == CONF_INIT_OK) {
+		return true;
+	} else if (init_status_ == CONF_INIT_ERR) {
+		return false;
+	}
+
 #ifdef HAS_MBEDTLS
-	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
-	__entropy_init((mbedtls_entropy_context*) entropy_);
 	__ssl_config_init((mbedtls_ssl_config*) conf_);
+	__entropy_init((mbedtls_entropy_context*) entropy_);
+	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
 
 # ifdef DEBUG_SSL
 	__ssl_conf_dbg((mbedtls_ssl_config*) conf_, my_debug, stdout);
@@ -427,12 +456,14 @@ bool mbedtls_conf::init_once(void)
 			MBEDTLS_SSL_PRESET_DEFAULT);
 	}
 	if (ret != 0) {
+		init_status_ = CONF_INIT_ERR;
 		logger_error("ssl_config_defaults error=-0x%04x, side=%s",
 			ret, server_side_ ? "server" : "client");
 		return false;
 	}
 
 	if (!init_rand()) {
+		init_status_ = CONF_INIT_ERR;
 		return false;
 	}
 
@@ -443,6 +474,7 @@ bool mbedtls_conf::init_once(void)
 	// Setup cipher_suites
 	const int* cipher_suites = __ssl_list_ciphersuites();
 	if (cipher_suites == NULL) {
+		init_status_ = CONF_INIT_ERR;
 		logger_error("ssl_list_ciphersuites null");
 		return false;
 	}
@@ -454,33 +486,21 @@ bool mbedtls_conf::init_once(void)
 		__ssl_conf_session_cache((mbedtls_ssl_config*) conf_, cache_,
 			__ssl_cache_get, __ssl_cache_set);
 	}
-
-	// Setup ca cert
-	if (cacert_) {
-		__ssl_conf_ca_chain((mbedtls_ssl_config*) conf_,
-			(X509_CRT*) cacert_, NULL);
-	}
-
-	// Setup own's cert chain and private key
-	if (cert_chain_ && pkey_) {
-		ret = __ssl_conf_own_cert((mbedtls_ssl_config*) conf_,
-				(X509_CRT*) cert_chain_, (PKEY*) pkey_);
-		if (ret != 0) {
-			logger_error("ssl_conf_own_cert error: -0x%04x", -ret);
-			return false;
-		}
-	}
 #endif
-	has_inited_ = true;
-	lock_.unlock();
+	init_status_ = CONF_INIT_OK;
 	return true;
 }
+
+#define CONF_OWN_CERT_NIL	0
+#define CONF_OWN_CERT_OK	1
+#define CONF_OWN_CERT_ERR	2
 
 mbedtls_conf::mbedtls_conf(bool server_side)
 {
 	server_side_ = server_side;
 #ifdef HAS_MBEDTLS
-	has_inited_  = false;
+	init_status_ = CONF_INIT_NIL;
+	cert_status_ = CONF_OWN_CERT_NIL;
 	conf_        = acl_mycalloc(1, sizeof(mbedtls_ssl_config));
 	entropy_     = acl_mycalloc(1, sizeof(mbedtls_entropy_context));
 	rnd_         = acl_mycalloc(1, sizeof(mbedtls_ctr_drbg_context));
@@ -518,7 +538,7 @@ mbedtls_conf::~mbedtls_conf(void)
 		acl_myfree(pkey_);
 	}
 
-	if (has_inited_) {
+	if (init_status_ != CONF_INIT_NIL) {
 		__entropy_free((mbedtls_entropy_context*) entropy_);
 	}
 	acl_myfree(conf_);
@@ -588,6 +608,9 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 		free_ca();
 		return false;
 	} else {
+		// Setup ca cert
+		__ssl_conf_ca_chain((mbedtls_ssl_config*) conf_,
+			((X509_CRT*) cacert_)->next, NULL);
 		return true;
 	}
 #else
@@ -627,7 +650,6 @@ bool mbedtls_conf::add_cert(const char* crt_file)
 		cert_chain_ = NULL;
 		return false;
 	}
-	printf("%s(%d): add cert %s ok\n", __FUNCTION__, __LINE__, crt_file);
 
 	return true;
 #else
@@ -667,7 +689,6 @@ bool mbedtls_conf::set_key(const char* key_file,
 		return false;
 	}
 
-	printf("%s(%d): set key %s ok\r\n", __FUNCTION__, __LINE__, key_file);
 	return true;
 #else
 	(void) key_file;
@@ -716,6 +737,27 @@ bool mbedtls_conf::setup_certs(void* ssl)
 		logger_error("ssl_setup error:-0x%04x", -ret);
 		return false;
 	}
+
+	if (cert_chain_ == NULL || pkey_ == NULL) {
+		return true;
+	}
+
+	thread_mutex_guard guard(lock_);
+	if (cert_status_ == CONF_OWN_CERT_OK) {
+		return true;
+	} else if (cert_status_ == CONF_OWN_CERT_ERR) {
+		return false;
+	}
+
+	// Setup own's cert chain and private key
+	ret = __ssl_conf_own_cert((mbedtls_ssl_config*) conf_,
+			(X509_CRT*) cert_chain_, (PKEY*) pkey_);
+	if (ret != 0) {
+		cert_status_ = CONF_OWN_CERT_ERR;
+		logger_error("ssl_conf_own_cert error: -0x%04x", -ret);
+		return false;
+	}
+	cert_status_ = CONF_OWN_CERT_OK;
 	return true;
 #else
 	(void) ssl;

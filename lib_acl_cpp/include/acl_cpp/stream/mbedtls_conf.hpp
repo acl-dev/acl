@@ -36,35 +36,32 @@ public:
 	~mbedtls_conf(void);
 
 	/**
-	 * 加载 CA 根证书(每个配置实例只需调用一次本方法)
-	 * @param ca_file {const char*} CA 证书文件全路径
-	 * @param ca_path {const char*} 多个 CA 证书文件所在目录
-	 * @return {bool} 加载  CA 根证书是否成功
-	 * 注：如果 ca_file、ca_path 均非空，则会依次加载所有证书
+	 * @override
 	 */
 	bool load_ca(const char* ca_file, const char* ca_path);
 
 	/**
-	 * 添加一个服务端/客户端自己的证书，可以多次调用本方法加载多个证书
-	 * @param crt_file {const char*} 证书文件全路径，非空
-	 * @return {bool} 添加证书是否成功
+	 * @override
 	 */
 	bool add_cert(const char* crt_file);
 
 	/**
-	 * 添加服务端/客户端的密钥(每个配置实例只需调用一次本方法)
-	 * @param key_file {const char*} 密钥文件全路径，非空
-	 * @param key_pass {const char*} 密钥文件的密码，没有密钥密码可写 NULL
-	 * @return {bool} 设置是否成功
+	 * @override
 	 */
 	bool set_key(const char* key_file, const char* key_pass = NULL);
 
 	/**
-	 * 当为服务端模式时是否启用会话缓存功能，有助于提高 SSL 握手效率
-	 * @param on {bool}
-	 * 注：该函数仅对服务端模式有效
+	 * @override
 	 */
 	void enable_cache(bool on);
+
+public:
+	/**
+	 * mbedtls_io::open 内部会调用本方法用来安装当前 SSL 连接对象的证书
+	 * @param ssl {void*} SSL 连接对象，为 ssl_context 类型
+	 * @return {bool} 配置 SSL 对象是否成功
+	 */
+	bool setup_certs(void* ssl);
 
 	/**
 	 * 获得随机数生成器的熵对象
@@ -75,13 +72,6 @@ public:
 		return entropy_;
 	}
 
-	/**
-	 * mbedtls_io::open 内部会调用本方法用来安装当前 SSL 连接对象的证书
-	 * @param ssl {void*} SSL 连接对象，为 ssl_context 类型
-	 * @return {bool} 配置 SSL 对象是否成功
-	 */
-	bool setup_certs(void* ssl);
-
 public:
 	/**
 	 * 必须首先调用此函数设置 libmbedtls_all.so 的全路径
@@ -90,9 +80,10 @@ public:
 	static void set_libpath(const char* libmbedtls);
 
 	/**
-	 * 可以显式调用本方法，动态加载 polarssl 动态库
+	 * 可以显式调用本方法，动态加载 mbedtls 动态库
+	 * @return {bool} 加载是否成功
 	 */
-	static void load(void);
+	static bool load(void);
 
 public:
 	// @override sslbase_conf
@@ -101,7 +92,8 @@ public:
 private:
 	friend class mbedtls_io;
 
-	bool has_inited_;
+	unsigned init_status_;
+	unsigned cert_status_;
 	thread_mutex lock_;
 
 	bool server_side_;

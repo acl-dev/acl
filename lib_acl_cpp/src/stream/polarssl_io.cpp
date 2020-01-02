@@ -129,12 +129,14 @@ static ssl_get_bytes_avail_fn		__ssl_get_bytes_avail;
 
 extern ACL_DLL_HANDLE __polarssl_dll;  // defined in polarssl_conf.cpp
 
-void polarssl_dll_load_io(void)
+bool polarssl_dll_load_io(void)
 {
 #define LOAD(name, type, fn) do {					\
 	(fn) = (type) acl_dlsym(__polarssl_dll, (name));		\
-	if ((fn) == NULL)						\
-		logger_fatal("dlsym %s error %s", name, acl_dlerror());	\
+	if ((fn) == NULL) {						\
+		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		return false;						\
+	}								\
 } while (0)
 
 	acl_assert(__polarssl_dll);
@@ -170,6 +172,8 @@ void polarssl_dll_load_io(void)
 	LOAD(SSL_READ_NAME, ssl_read_fn, __ssl_read);
 	LOAD(SSL_WRITE_NAME, ssl_write_fn, __ssl_write);
 	LOAD(SSL_GET_BYTES_AVAIL_NAME, ssl_get_bytes_avail_fn, __ssl_get_bytes_avail);
+
+	return true;
 }
 
 #elif defined(HAS_POLARSSL)

@@ -56,9 +56,9 @@ service http_server {
 #	是否允许产生 core 文件
 #	ioctl_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
-	ioctl_use_limit = 100
+	ioctl_use_limit = 0
 #	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
-	ioctl_idle_limit = 120
+	ioctl_idle_limit = 0
 #	记录进程PID的位置(对于多进程实例来说没有意义)
 	ioctl_pid_dir =  {install_path}/var/pid
 #	进程运行时所在的路径
@@ -110,10 +110,16 @@ service http_server {
 ############################################################################
 #	应用自己的配置选项
 
-	ssl_path = ../libpolarssl.so
+	use_mbedtls = 1
+#	for Mac OS
+#	ssl_path = ../libmbedtls_all.dylib
+#	ssl_path = ../libpolarssl.dylib
+#	for Linux OS
+#	ssl_path = ../libmbedtls_all.so
+#	ssl_path = ../libpolarssl.so
 #	crt_file = {install_path}/conf/ssl/imap.crt
 #	key_file = {install_path}/conf/ssl/imap.key
-	crt_file = ssl_crt.pem
-	key_file = ssl_key.pem
+	crt_file = ../ssl_crt.pem
+	key_file = ../ssl_key.pem
 }
 

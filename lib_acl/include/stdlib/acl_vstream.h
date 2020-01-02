@@ -487,7 +487,9 @@ ACL_API int acl_vstream_read(ACL_VSTREAM *fp, void *vptr, size_t maxlen);
  *  函数也会返回，且会将 ready 置 1，调用者需调用 fp->flag 标志位中是否包含
  *  ACL_VSTREAM_FLAG_TAGYES 来判断是否读到一行数据
  * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
+ *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
+ *  表示出错，应该关闭该流对象；
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据
  */
 ACL_API int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready);
@@ -502,7 +504,9 @@ ACL_API int acl_vstream_gets_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *ready)
  *  函数也会返回，且会将 ready 置 1，调用者需调用 fp->flag 标志位中是否包含
  *  ACL_VSTREAM_FLAG_TAGYES 来判断是否读到一行数据
  * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
+ *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
+ *  表示出错，应该关闭该流对象；
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 如果仅
  *  读到了一个空行, 则 ret == 0.
  */
@@ -515,7 +519,9 @@ ACL_API int acl_vstream_gets_nonl_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int *r
  * @param buf {ACL_VSTRING*} 数据缓冲区
  * @param cnt {int} 所需要读的数据的长度
  * @param ready {int*} 是否按要求读到所需数据的标志位指针, 不能为空
- * @return ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
+ *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
+ *  表示出错，应该关闭该流对象；
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据, 
  *  (*ready) != 0: 表示读到了所要求长度的数据.
  */
@@ -525,7 +531,9 @@ ACL_API int acl_vstream_readn_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf, int cnt, i
  * 一次性从 ACL_VSTREAM 流或系统缓存区中读取不固定长度的数据
  * @param fp {ACL_VSTREAM*} 数据流 
  * @param buf {ACL_VSTRING*} 数据缓冲区
- * @return  ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
+ *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
+ *  表示出错，应该关闭该流对象；
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
  */
 ACL_API int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf);
@@ -535,7 +543,9 @@ ACL_API int acl_vstream_read_peek(ACL_VSTREAM *fp, ACL_VSTRING *buf);
  * @param fp {ACL_VSTREAM*} 数据流 
  * @param buf {void*} 数据缓冲区
  * @param size {size_t} buf 长度
- * @return  ret {int}, ret == ACL_VSTREAM_EOF: 表示出错, 应该关闭本地数据流,
+ * @return ret {int}, ret == ACL_VSTREAM_EOF 时，如果 acl_last_error() 系统错误
+ *  号为 ACL_EWOULDBLOCK 或 ACL_EAGAIN，则表示在非阻塞套接字上未读到数据，否则，
+ *  表示出错，应该关闭该流对象；
  *  ret >= 0: 成功从 fp 数据流的缓冲区中读取了 ret 个字节的数据.
  */
 ACL_API int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size);

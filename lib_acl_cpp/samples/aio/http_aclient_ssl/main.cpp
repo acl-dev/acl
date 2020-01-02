@@ -538,7 +538,7 @@ int main(int argc, char* argv[])
 				acl::mbedtls_conf::load();
 
 				// 创建全局 SSL 配置项
-				ssl_conf = new acl::mbedtls_conf;
+				ssl_conf = new acl::mbedtls_conf(false);
 				printf(">>>use mbedtls<<<\r\n");
 
 			} else {

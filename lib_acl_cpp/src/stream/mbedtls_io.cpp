@@ -7,11 +7,11 @@
 #endif
 
 #ifdef HAS_MBEDTLS
-# include "mbedtls/ssl.h"
-# include "mbedtls/havege.h"
-# include "mbedtls/ctr_drbg.h"
-# include "mbedtls/entropy.h"
-# include "mbedtls/net_sockets.h"
+# include "mbedtls-2.7.12/ssl.h"
+# include "mbedtls-2.7.12/havege.h"
+# include "mbedtls-2.7.12/ctr_drbg.h"
+# include "mbedtls-2.7.12/entropy.h"
+# include "mbedtls-2.7.12/net_sockets.h"
 #endif
  
 #ifndef ACL_PREPARE_COMPILE
@@ -75,12 +75,14 @@ static ssl_get_bytes_avail_fn		__ssl_get_bytes_avail;
 
 extern ACL_DLL_HANDLE __mbedtls_dll;  // defined in mbedtls_conf.cpp
 
-void mbedtls_dll_load_io(void)
+bool mbedtls_dll_load_io(void)
 {
 #define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__mbedtls_dll, (name));		\
-	if ((fn) == NULL)						\
-		logger_fatal("dlsym %s error %s", name, acl_dlerror());	\
+	(fn) = (type) acl_dlsym(__mbedtls_dll, (name));			\
+	if ((fn) == NULL) {						\
+		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		return false;						\
+	}								\
 } while (0)
 
 	acl_assert(__mbedtls_dll);
@@ -99,6 +101,7 @@ void mbedtls_dll_load_io(void)
 	LOAD(SSL_GET_VERIFY_RESULT_NAME, ssl_get_verify_result_fn, __ssl_get_verify_result);
 	LOAD(SSL_GET_PEER_CERT_NAME, ssl_get_peer_cert_fn, __ssl_get_peer_cert);
 	LOAD(SSL_GET_BYTES_AVAIL_NAME, ssl_get_bytes_avail_fn, __ssl_get_bytes_avail);
+	return true;
 }
 
 #elif defined(HAS_MBEDTLS)
@@ -348,9 +351,12 @@ int mbedtls_io::read(void* buf, size_t len)
 	while ((ret = __ssl_read((mbedtls_ssl_context*) ssl_,
 		(unsigned char*) buf, len)) < 0) {
 
+		if (ret == MBEDTLS_ERR_SSL_PEER_CLOSE_NOTIFY) {
+			//acl_set_error(ACL_ENOTCONN);
+			return ACL_VSTREAM_EOF;
+		}
 		if (ret != MBEDTLS_ERR_SSL_WANT_READ
 			&& ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-
 			return ACL_VSTREAM_EOF;
 		}
 		if (nblock_) {
@@ -453,6 +459,7 @@ int mbedtls_io::sock_read(void *ctx, unsigned char *buf, size_t len)
 			return MBEDTLS_ERR_NET_RECV_FAILED;
 		}
 	}
+
 
 	return ret;
 #else

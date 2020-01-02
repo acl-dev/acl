@@ -1,5 +1,9 @@
 修改历史列表：
 
+667) 2020.1.2
+667.1) bugfix: acl_vstream.c 中函数 read_to_buffer() 的返回值应区分 0 和 -1，
+否则下面的 acl_vstream_xxx_peek() 函数集不好处理
+
 666) 2019.12.30
 666.1) bugfix: 在 net/dns/rfc1035.c 的 rfc1035MessageUnpack() 函数中，当调用
 rfc1035MessageDestroy() 后不应再释放临时内存对象 msg 和 msg->query，否则引起
