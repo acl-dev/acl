@@ -386,22 +386,27 @@ int mbedtls_io::read(void* buf, size_t len)
 int mbedtls_io::send(const void* buf, size_t len)
 {
 #ifdef HAS_MBEDTLS
-	int   ret;
+	size_t total_bytes = 0;
+	int bytes_written = 0;
 
-	while ((ret = __ssl_write((mbedtls_ssl_context*) ssl_,
-		(unsigned char*) buf, len)) < 0) {
-
-		if (ret != MBEDTLS_ERR_SSL_WANT_READ
-			&& ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
-
+	while (total_bytes < len) {
+		bytes_written = __ssl_write((mbedtls_ssl_context*) ssl_,
+			(unsigned char*) buf + total_bytes, len - total_bytes);
+		if (bytes_written == MBEDTLS_ERR_SSL_WANT_READ ||
+			bytes_written == MBEDTLS_ERR_SSL_WANT_WRITE) {
+			if (nblock_) {
+				return ACL_VSTREAM_EOF;
+			}
+			continue;
+		} else if (bytes_written < 0) {
 			return ACL_VSTREAM_EOF;
 		}
-		if (nblock_) {
-			return ACL_VSTREAM_EOF;
-		}
+
+		total_bytes += bytes_written;
 	}
 
-	return ret;
+	return total_bytes;
+
 #else
 	(void) buf;
 	(void) len;

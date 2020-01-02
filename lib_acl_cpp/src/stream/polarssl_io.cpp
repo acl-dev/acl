@@ -543,8 +543,7 @@ int polarssl_io::send(const void* buf, size_t len)
 				return ACL_VSTREAM_EOF;
 			}
 			continue;
-		}
-		else if (bytes_written < 0) {
+		} else if (bytes_written < 0) {
 			return ACL_VSTREAM_EOF;
 		}
 
