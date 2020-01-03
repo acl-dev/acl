@@ -511,7 +511,8 @@ mbedtls_conf::mbedtls_conf(bool server_side)
 	pkey_        = NULL;
 	verify_mode_ = MBEDTLS_VERIFY_NONE;
 #else
-	(void) has_inited_;
+	(void) init_status_;
+	(void) cert_status_;
 	(void) conf_;
 	(void) entropy_;
 	(void) rnd_;

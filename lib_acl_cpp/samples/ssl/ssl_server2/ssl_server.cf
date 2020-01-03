@@ -92,7 +92,7 @@ service http_server {
 #	ioctl_dispatch_type = default
 
 #	线程池的最大线程数
-	ioctl_max_threads = 1
+	ioctl_max_threads = 20
 #	线程池中工作线程等待任务时间间隔(毫秒)
 #	ioctl_schedule_wait = 50
 #	线程任务调度的时间间隔大于此值(毫秒)后记警告日志

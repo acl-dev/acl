@@ -7,6 +7,8 @@
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/stream/polarssl_io.hpp"
+#include "acl_cpp/stream/mbedtls_conf.hpp"
+#include "acl_cpp/stream/mbedtls_io.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_istream.hpp"
 #include "acl_cpp/stream/aio_listen_stream.hpp"
@@ -18,7 +20,7 @@ static int   __max_used = 0;
 static int   __cur_used = 0;
 
 // SSL 模式下的 SSL 配置对象
-static acl::polarssl_conf* __ssl_conf;
+static acl::sslbase_conf* __ssl_conf;
 
 /**
  * 异步客户端流的回调类的子类
@@ -27,9 +29,9 @@ class io_callback : public acl::aio_callback
 {
 public:
 	io_callback(acl::aio_socket_stream* client)
-		: client_(client)
-		, nread_cnt_(0)
-		, nread_(0)
+	: client_(client)
+	, nread_cnt_(0)
+	, nread_(0)
 	{
 	}
 
@@ -49,9 +51,8 @@ public:
 	 */
 	bool read_wakeup()
 	{
-		acl::polarssl_io* hook = (acl::polarssl_io*) client_->get_hook();
-		if (hook == NULL)
-		{
+		acl::sslbase_io* hook = (acl::sslbase_io*) client_->get_hook();
+		if (hook == NULL) {
 			// 非 SSL 模式，异步读取数据
 			//client_->read(__timeout);
 			client_->gets(__timeout, false);
@@ -59,15 +60,13 @@ public:
 		}
 
 		// 尝试进行 SSL 握手
-		if (hook->handshake() == false)
-		{
+		if (!hook->handshake()) {
 			printf("ssl handshake failed\r\n");
 			return false;
 		}
 
 		// 如果 SSL 握手已经成功，则开始按行读数据
-		if (hook->handshake_ok())
-		{
+		if (hook->handshake_ok()) {
 			// 由 reactor 模式转为 proactor 模式，从而取消
 			// read_wakeup 回调过程
 			client_->disable_read();
@@ -93,8 +92,7 @@ public:
 		nread_cnt_++;
 		nread_ += len;
 
-		if (nread_cnt_ <= 100 || nread_cnt_ % 1000 == 0)
-		{
+		if (nread_cnt_ <= 100 || nread_cnt_ % 1000 == 0) {
 			char  buf[256];
 			acl::safe_snprintf(buf, sizeof(buf),
 				"read len: %d, total read: %d, nread_cnt: %d",
@@ -103,16 +101,14 @@ public:
 		}
 
 		// 如果远程客户端希望退出，则关闭之
-		if (strncasecmp(data, "quit", 4) == 0)
-		{
+		if (strncasecmp(data, "quit", 4) == 0) {
 			client_->format("Bye!\r\n");
 			client_->close();
 			return true;
 		}
 
 		// 如果远程客户端希望服务端也关闭，则中止异步事件过程
-		if (strncasecmp(data, "stop", 4) == 0)
-		{
+		if (strncasecmp(data, "stop", 4) == 0) {
 			client_->format("Stop now!\r\n");
 			client_->close();  // 关闭远程异步流
 
@@ -201,14 +197,11 @@ public:
 			client->set_buf_max(__max);
 
 		// SSL 模式下，等待客户端发送握手信息
-		if (__ssl_conf != NULL)
-		{
-			// 注册 SSL IO 过程的钩子
-			acl::polarssl_io* ssl = new
-				acl::polarssl_io(*__ssl_conf, true, true);
+		if (__ssl_conf != NULL) {
+			acl::sslbase_io* ssl = __ssl_conf->open(true, true);
 
-			if (client->setup_hook(ssl) == ssl)
-			{
+			// 注册 SSL IO 过程的钩子
+			if (client->setup_hook(ssl) == ssl) {
 				std::cout << "setup_hook error" << std::endl;
 				ssl->destroy();
 				return false;
@@ -220,8 +213,7 @@ public:
 		}
 
 		// 非 SSL 模式下，从异步流读一行数据
-		else
-		{
+		else {
 			//client->read(__timeout);
 			client->gets(__timeout, false);
 		}
@@ -233,15 +225,15 @@ public:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"	-d path_to_polarssl\r\n"
-		"	-l server_addr[ip:port, default: 127.0.0.1:9800]\r\n"
-		"	-L line_max_length\r\n"
-		"	-t timeout\r\n"
-		"	-n conn_used_limit\r\n"
-		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n"
-		"	-M delay_ms\r\n"
-		"	-I check_fds_inter\r\n"
-		"	-K ssl_key_file -C ssl_cert_file [in SSL mode]\r\n",
+		"  -d path_to_polarssl\r\n"
+		"  -l server_addr[ip:port, default: 127.0.0.1:9800]\r\n"
+		"  -L line_max_length\r\n"
+		"  -t timeout\r\n"
+		"  -n conn_used_limit\r\n"
+		"  -k[use kernel event: epoll/iocp/kqueue/devpool]\r\n"
+		"  -M delay_ms\r\n"
+		"  -I check_fds_inter\r\n"
+		"  -K ssl_key_file -C ssl_cert_file [in SSL mode]\r\n",
 		procname);
 }
 
@@ -253,10 +245,8 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:9800");
 	int  ch, delay_ms = 100, check_fds_inter = 10;
 
-	while ((ch = getopt(argc, argv, "ld::hkL:t:K:C:n:M:I:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "ld::hkL:t:K:C:n:M:I:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -297,17 +287,38 @@ int main(int argc, char* argv[])
 
 	acl::log::stdout_open(true);
 
+	if (libpath.find("mbedtls") != NULL) {
+		acl::mbedtls_conf::set_libpath(libpath);
+
+		if (acl::mbedtls_conf::load()) {
+			__ssl_conf = new acl::mbedtls_conf(true);
+			printf("load %s ok\r\n", libpath.c_str());
+		} else {
+			key_file.clear();
+			cert_file.clear();
+			printf("load %s error\r\n", libpath.c_str());
+		}
+	} else if (libpath.find("polarssl") != NULL) {
+		acl::polarssl_conf::set_libpath(libpath);
+
+		if (acl::polarssl_conf::load()) {
+			__ssl_conf = new acl::polarssl_conf();
+			printf("load %s ok\r\n", libpath.c_str());
+		} else {
+			key_file.clear();
+			cert_file.clear();
+			printf("load %s error\r\n", libpath.c_str());
+		}
+	}
+
 	// 当私钥及证书都存在时才采用 SSL 通信方式
-	if (!key_file.empty() && !cert_file.empty())
-	{
-		__ssl_conf = new acl::polarssl_conf();
+	if (!key_file.empty() && !cert_file.empty() && __ssl_conf) {
 
 		// 允许服务端的 SSL 会话缓存功能
 		__ssl_conf->enable_cache(true);
 
 		// 添加本地服务的证书
-		if (__ssl_conf->add_cert(cert_file.c_str()) == false)
-		{
+		if (!__ssl_conf->add_cert(cert_file.c_str())) {
 			delete __ssl_conf;
 			__ssl_conf = NULL;
 			std::cout << "add_cert error: " << cert_file.c_str()
@@ -315,21 +326,17 @@ int main(int argc, char* argv[])
 		}
 
 		// 添加本地服务密钥
-		else if (__ssl_conf->set_key(key_file.c_str()) == false)
-		{
+		else if (!__ssl_conf->set_key(key_file.c_str())) {
 			delete __ssl_conf;
 			__ssl_conf = NULL;
 			std::cout << "set_key error: " << key_file.c_str()
 				<< std::endl;
-		}
-		else
+		} else {
 			std::cout << "Load cert&key OK!" << std::endl;
+		}
 	}
 
-	if (__ssl_conf)
-	{
-		acl::polarssl_conf::set_libpath(libpath);
-		acl::polarssl_conf::load();
+	if (__ssl_conf) {
 	}
 
 	// 构建异步引擎类对象
@@ -349,8 +356,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 
 	// 监听指定的地址
-	if (sstream->open(addr.c_str()) == false)
-	{
+	if (!sstream->open(addr.c_str())) {
 		std::cout << "open " << addr.c_str() << " error!" << std::endl;
 		sstream->close();
 		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
@@ -365,17 +371,16 @@ int main(int argc, char* argv[])
 	sstream->add_accept_callback(&callback);
 	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
-	while (true)
-	{
+	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false)
-		{
+		if (!handle.check()) {
 			std::cout << "aio_server stop now ..." << std::endl;
 			break;
 		}
 
-		if (__max_used > 0 && __cur_used >= __max_used)
+		if (__max_used > 0 && __cur_used >= __max_used) {
 			break;
+		}
 	}
 
 	// 关闭监听流并释放流对象
@@ -386,6 +391,5 @@ int main(int argc, char* argv[])
 
 	// 删除 acl::polarssl_conf 动态对象
 	delete __ssl_conf;
-
 	return 0;
 }

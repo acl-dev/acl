@@ -13,14 +13,14 @@ static bool test(const char* addr, int k, int nloop)
 	acl::socket_stream client;
 	if (!client.open(addr, 60, 60)) {
 		std::cout << "connect " << addr << " error!" << std::endl;
-		return false;
+		exit (1);
 	}
 
 	acl::sslbase_io* ssl = __ssl_conf->open(false, false);
 	if (client.setup_hook(ssl) == ssl) {
 		std::cout << "open ssl " << addr << " error!" << std::endl;
 		ssl->destroy();
-		return false;
+		exit (1);
 	}
 
 	std::cout << "ssl handshake ok, k: " << k << std::endl;

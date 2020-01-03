@@ -19,7 +19,7 @@ typedef struct
 	int   dlen;
 } IO_CTX;
 
-static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id);
+static bool connect_server(acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id);
 
 /**
  * 客户端异步连接流回调函数类
@@ -30,18 +30,18 @@ public:
 	/**
 	 * 构造函数
 	 * @param client {aio_socket_stream*} 异步连接流
-	 * @param ssl_conf {acl::polarssl_conf*} 非空时指定 SSL 连接方式
+	 * @param ssl_conf {acl::sslbase_conf*} 非空时指定 SSL 连接方式
 	 * @param ctx {IO_CTX*}
 	 * @param id {int} 本流的ID号
 	 */
 	client_io_callback(acl::aio_socket_stream* client,
-			acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
-		: client_(client)
-		, ssl_conf_(ssl_conf)
-		, ctx_(ctx)
-		, nwrite_(0)
-		, nread_(0)
-		, id_(id)
+		acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id)
+	: client_(client)
+	, ssl_conf_(ssl_conf)
+	, ctx_(ctx)
+	, nwrite_(0)
+	, nread_(0)
+	, id_(id)
 	{
 		dlen_ = ctx->dlen;
 		buff_ = (char*) malloc(dlen_);
@@ -68,8 +68,7 @@ public:
 		nread_ += len;
 		ctx_->nread_total++;
 
-		if (nwrite_ < 100 || nwrite_ % 1000 == 0)
-		{
+		if (nwrite_ < 100 || nwrite_ % 1000 == 0) {
 			char buf[256];
 
 			acl::safe_snprintf(buf, sizeof(buf),
@@ -99,15 +98,13 @@ public:
 	 */
 	void close_callback()
 	{
-		if (client_->is_opened() == false)
-		{
+		if (!client_->is_opened()) {
 			std::cout << "Id: " << id_ << " connect "
 				<< ctx_->addr << " error: "
 				<< acl::last_serror();
 
 			// 如果是第一次连接就失败，则退出
-			if (ctx_->nopen_total == 0)
-			{
+			if (ctx_->nopen_total == 0) {
 				std::cout << ", first connect error, quit";
 				/* 获得异步引擎句柄，并设置为退出状态 */
 				client_->get_handle().stop();
@@ -119,8 +116,7 @@ public:
 
 		/* 获得异步引擎中受监控的异步流个数 */
 		int nleft = client_->get_handle().length();
-		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1)
-		{
+		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1) {
 			std::cout << "Id: " << id_ << " stop now! nstream: "
 				<< nleft << std::endl;
 			/* 获得异步引擎句柄，并设置为退出状态 */
@@ -146,25 +142,23 @@ public:
 	bool read_wakeup()
 	{
 		// 取得之前通过 setup_hook 注册的 SSL IO句柄
-		acl::polarssl_io* hook =
-			(acl::polarssl_io*) client_->get_hook();
+		acl::sslbase_io* hook = (acl::sslbase_io*) client_->get_hook();
 
-		if (hook == NULL)
-		{
+		if (hook == NULL) {
 			std::cout << "get hook error"<< std::endl;
 			return false;
 		}
 
 		// 尝试进行 SSL 握手
-		if (hook->handshake() == false)
-		{
+		if (!hook->handshake()) {
 			logger_error("ssl handshake failed");
 			return false;
 		}
 
 		// SSL 握手还未完成，等待本函数再次被触发
-		if (hook->handshake_ok() == false)
+		if (!hook->handshake_ok()) {
 			return true;
+		}
 
 		// 如果 SSL 握手已经成功，则开始读数据
 		
@@ -190,25 +184,27 @@ public:
 		ctx_->nopen_total++;
 
 		acl::assert_(id_ > 0);
-		if (ctx_->nopen_total < ctx_->nopen_limit)
-		{
+		if (ctx_->nopen_total < ctx_->nopen_limit) {
 			// 开始进行下一个连接过程
-			if (connect_server(ssl_conf_, ctx_, id_ + 1) == false)
+			if (!connect_server(ssl_conf_, ctx_, id_ + 1)) {
 				std::cout << "connect error!" << std::endl;
+			}
 		}
 
 		// 设置 SSL 方式
-		if (ssl_conf_)
+		if (ssl_conf_) {
 			return setup_ssl(*ssl_conf_);
+		}
 
 		// 开始与服务端的读写过程
-		else
+		else {
 			return begin_run();
+		}
 	}
 
 private:
 	acl::aio_socket_stream* client_;
-	acl::polarssl_conf* ssl_conf_;
+	acl::sslbase_conf* ssl_conf_;
 	IO_CTX* ctx_;
 	int   nwrite_;
 	int   nread_;
@@ -216,22 +212,19 @@ private:
 	char *buff_;
 	int   dlen_;
 
-	bool setup_ssl(acl::polarssl_conf& ssl_conf)
+	bool setup_ssl(acl::sslbase_conf& ssl_conf)
 	{
-		acl::polarssl_io* ssl =
-			new acl::polarssl_io(ssl_conf, false, true);
+		acl::sslbase_io* ssl = ssl_conf.open(false, true);
 
 		// 将 SSL IO 过程注册至异步流中
-		if (client_->setup_hook(ssl) == ssl)
-		{
+		if (client_->setup_hook(ssl) == ssl) {
 			std::cout << "open ssl error!" << std::endl;
 			ssl->destroy();
 			return false;
 		}
 
 		// 开始 SSL 握手过程
-		if (ssl->handshake() == false)
-		{
+		if (!ssl->handshake()) {
 			client_->remove_hook();
 			ssl->destroy();
 			return false;
@@ -258,12 +251,13 @@ private:
 		// 异步向服务器发送数据
 		client_->write(buff_, dlen_);
 
-		if (nwrite_ >= ctx_->nwrite_limit)
+		if (nwrite_ >= ctx_->nwrite_limit) {
 			client_->close();
+		}
 	}
 };
 
-static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
+static bool connect_server(acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id)
 {
 	// 开始异步连接远程服务器
 	acl::aio_socket_stream* stream = acl::aio_socket_stream::open(
@@ -272,8 +266,9 @@ static bool connect_server(acl::polarssl_conf* ssl_conf, IO_CTX* ctx, int id)
 	{
 		std::cout << "connect " << ctx->addr << " error!" << std::endl;
 		std::cout << "stoping ..." << std::endl;
-		if (id == 0)
+		if (id == 0) {
 			ctx->handle->stop();
+		}
 		return false;
 	}
 
@@ -311,10 +306,10 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	bool use_kernel = false;
+	bool use_kernel = false, use_ssl = false;
 	IO_CTX ctx;
 	acl::string libpath("../libpolarssl.so");
-	acl::polarssl_conf* ssl_conf = NULL;
+	acl::sslbase_conf* ssl_conf = NULL;
 	int   ch;
 	int   check_fds_inter = 10, delay_ms = 100;
 
@@ -326,22 +321,22 @@ int main(int argc, char* argv[])
 	ctx.dlen = 8193;
 	acl::safe_snprintf(ctx.addr, sizeof(ctx.addr), "127.0.0.1:9800");
 
-	while ((ch = getopt(argc, argv, "hd:c:n:kl:t:SL:I:M:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hd:c:n:kl:t:SL:I:M:")) > 0) {
+		switch (ch) {
 		case 'c':
 			ctx.nopen_limit = atoi(optarg);
-			if (ctx.nopen_limit <= 0)
+			if (ctx.nopen_limit <= 0) {
 				ctx.nopen_limit = 10;
+			}
 			break;
 		case 'd':
 			libpath = optarg;
 			break;
 		case 'n':
 			ctx.nwrite_limit = atoi(optarg);
-			if (ctx.nwrite_limit <= 0)
+			if (ctx.nwrite_limit <= 0) {
 				ctx.nwrite_limit = 10;
+			}
 			break;
 		case 'h':
 			usage(argv[0]);
@@ -350,14 +345,13 @@ int main(int argc, char* argv[])
 			use_kernel = true;
 			break;
 		case 'l':
-			acl::safe_snprintf(ctx.addr, sizeof(ctx.addr),
-				"%s", optarg);
+			acl::safe_snprintf(ctx.addr, sizeof(ctx.addr), "%s", optarg);
 			break;
 		case 't':
 			ctx.connect_timeout = atoi(optarg);
 			break;
 		case 'S':
-			ssl_conf = new acl::polarssl_conf();
+			use_ssl = true;
 			break;
 		case 'L':
 			ctx.dlen = atoi(optarg);
@@ -391,16 +385,27 @@ int main(int argc, char* argv[])
 	printf("Enter any key to continue ...\r\n");
 	getchar();
 
-	if (ssl_conf)
-	{
-		acl::polarssl_conf::set_libpath(libpath);
-		acl::polarssl_conf::load();
+	if (use_ssl) {
+		if (libpath.find("mbedtls") != NULL) {
+			acl::mbedtls_conf::set_libpath(libpath);
+			if (acl::mbedtls_conf::load()) {
+				ssl_conf = new acl::mbedtls_conf(false);
+			} else {
+				printf("load %s error\r\n", libpath.c_str());
+			}
+		} else if (libpath.find("polarssl") != NULL) {
+			acl::polarssl_conf::set_libpath(libpath);
+			if (acl::polarssl_conf::load()) {
+				ssl_conf = new acl::polarssl_conf;
+			} else {
+				printf("load %s error\r\n", libpath.c_str());
+			}
+		}
 	}
 
 	ctx.handle = &handle;
 
-	if (connect_server(ssl_conf, &ctx, ctx.id_begin) == false)
-	{
+	if (!connect_server(ssl_conf, &ctx, ctx.id_begin)) {
 		std::cout << "enter any key to exit." << std::endl;
 		getchar();
 		return 1;
@@ -411,11 +416,11 @@ int main(int argc, char* argv[])
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
 
-	while (true)
-	{
+	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false)
+		if (!handle.check()) {
 			break;
+		}
 	}
 
 	struct timeval end;
@@ -429,7 +434,5 @@ int main(int argc, char* argv[])
 		spent, (ctx.nread_total * 1000) / (spent > 1 ? spent : 1));
 
 	delete ssl_conf;
-
 	return 0;
 }
-
