@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:9800");
 	int  ch, delay_ms = 100, check_fds_inter = 10;
 
-	while ((ch = getopt(argc, argv, "ld::hkL:t:K:C:n:M:I:")) > 0) {
+	while ((ch = getopt(argc, argv, "l:d:hkL:t:K:C:n:M:I:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);

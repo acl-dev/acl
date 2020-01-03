@@ -5,11 +5,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 // 配置内容项
 
-char *var_cfg_polarssl_path;
+char *var_cfg_libssl_path;
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "polarssl_path", "./libpolarssl.so", &var_cfg_polarssl_path },
+	{ "libssl_path", "./libpolarssl.so", &var_cfg_libssl_path },
 	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
 	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
 
@@ -48,12 +48,12 @@ master_service::~master_service()
 		delete conf_;
 }
 
-static acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
-	acl::polarssl_conf& conf)
+static acl::sslbase_io* setup_ssl(acl::socket_stream& conn, acl::sslbase_conf& conf)
 {
-	acl::polarssl_io* hook = (acl::polarssl_io*) conn.get_hook();
-	if (hook != NULL)
+	acl::sslbase_io* hook = (acl::sslbase_io*) conn.get_hook();
+	if (hook != NULL) {
 		return hook;
+	}
 
 	// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 	// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
@@ -61,22 +61,19 @@ static acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
 	//logger("begin setup ssl hook...");
 
 	// 采用阻塞 SSL 握手方式
-	acl::polarssl_io* ssl = new acl::polarssl_io(conf, true, false);
-	if (conn.setup_hook(ssl) == ssl)
-	{
+	acl::sslbase_io* ssl = conf.open(true, false);
+	if (conn.setup_hook(ssl) == ssl) {
 		logger_error("setup_hook error!");
 		ssl->destroy();
 		return NULL;
 	}
 
-	if (ssl->handshake() == false)
-	{
+	if (!ssl->handshake()) {
 		logger_error("ssl handshake failed");
 		return NULL;
 	}
 
-	if (ssl->handshake_ok() == false)
-	{
+	if (!ssl->handshake_ok()) {
 		logger("handshake trying again...");
 		return NULL;
 	}
@@ -95,7 +92,7 @@ bool master_service::thread_on_read(acl::socket_stream* conn)
 	if (conf_ == NULL)
 		return servlet->doRun("127.0.0.1:11211", conn);
 
-	acl::polarssl_io* ssl = setup_ssl(*conn, *conf_);
+	acl::sslbase_io* ssl = setup_ssl(*conn, *conf_);
 	if (ssl == NULL)
 		return false;
 
@@ -143,22 +140,33 @@ void master_service::thread_on_exit()
 void master_service::proc_on_init()
 {
 	if (var_cfg_crt_file == NULL || *var_cfg_crt_file == 0
-		|| var_cfg_key_file == NULL || *var_cfg_key_file == 0)
-	{
+		|| var_cfg_key_file == NULL || *var_cfg_key_file == 0) {
 		return;
 	}
 
-	acl::polarssl_conf::set_libpath(var_cfg_polarssl_path);
-	acl::polarssl_conf::load();
+	if (strstr(var_cfg_libssl_path, "mbedtls")) {
+		acl::mbedtls_conf::set_libpath(var_cfg_libssl_path);
+		if (!acl::mbedtls_conf::load()) {
+			logger_error("load %s error", var_cfg_libssl_path);
+			return;
+		}
 
-	conf_ = new acl::polarssl_conf();
+		conf_ = new acl::mbedtls_conf(true);
+	} else if (strstr(var_cfg_libssl_path, "polarssl")) {
+		acl::polarssl_conf::set_libpath(var_cfg_libssl_path);
+		if (!acl::polarssl_conf::load()) {
+			logger_error("load %s error", var_cfg_libssl_path);
+			return;
+		}
+
+		conf_ = new acl::polarssl_conf();
+	}
 
 	// 允许服务端的 SSL 会话缓存功能
 	conf_->enable_cache(var_cfg_session_cache);
 
 	// 添加本地服务的证书
-	if (conf_->add_cert(var_cfg_crt_file) == false)
-	{
+	if (!conf_->add_cert(var_cfg_crt_file)) {
 		logger_error("add cert failed, crt: %s, key: %s",
 			var_cfg_crt_file, var_cfg_key_file);
 		delete conf_;
@@ -169,8 +177,7 @@ void master_service::proc_on_init()
 		var_cfg_crt_file, var_cfg_key_file);
 
 	// 添加本地服务密钥
-	if (conf_->set_key(var_cfg_key_file) == false)
-	{
+	if (!conf_->set_key(var_cfg_key_file)) {
 		logger_error("set private key error");
 		delete conf_;
 		conf_ = NULL;

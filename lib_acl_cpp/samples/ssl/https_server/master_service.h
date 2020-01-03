@@ -80,5 +80,5 @@ protected:
 	virtual void proc_on_exit();
 
 private:
-	acl::polarssl_conf* conf_;
+	acl::sslbase_conf* conf_;
 };
