@@ -44,8 +44,9 @@ master_service::master_service()
 
 master_service::~master_service()
 {
-	if (conf_)
+	if (conf_) {
 		delete conf_;
+	}
 }
 
 static acl::sslbase_io* setup_ssl(acl::socket_stream& conn, acl::sslbase_conf& conf)
@@ -86,15 +87,18 @@ static acl::sslbase_io* setup_ssl(acl::socket_stream& conn, acl::sslbase_conf& c
 bool master_service::thread_on_read(acl::socket_stream* conn)
 {
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
-	if (servlet == NULL)
+	if (servlet == NULL) {
 		logger_fatal("servlet null!");
+	}
 
-	if (conf_ == NULL)
+	if (conf_ == NULL) {
 		return servlet->doRun("127.0.0.1:11211", conn);
+	}
 
 	acl::sslbase_io* ssl = setup_ssl(*conn, *conf_);
-	if (ssl == NULL)
+	if (ssl == NULL) {
 		return false;
+	}
 
 	return servlet->doRun("127.0.0.1:11211", conn);
 }
@@ -125,8 +129,7 @@ void master_service::thread_on_close(acl::socket_stream* conn)
 		conn->sock_handle());
 
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
-	if (servlet)
-		delete servlet;
+	delete servlet;
 }
 
 void master_service::thread_on_init()
