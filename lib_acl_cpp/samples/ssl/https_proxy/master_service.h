@@ -82,13 +82,13 @@ protected:
 	virtual void proc_on_exit();
 
 private:
-	acl::polarssl_conf* server_ssl_conf_;
-	acl::polarssl_conf* client_ssl_conf_;
+	acl::sslbase_conf* server_ssl_conf_;
+	acl::sslbase_conf* client_ssl_conf_;
 	std::map<acl::string, acl::string> addrs_map_;
 	acl::ofstream out_;
 
-	acl::polarssl_io* setup_ssl(acl::socket_stream& conn,
-			acl::polarssl_conf& conf);
+	acl::sslbase_io* setup_ssl(acl::socket_stream& conn,
+			acl::sslbase_conf& conf);
 
 	void create_addrs_map();
 };

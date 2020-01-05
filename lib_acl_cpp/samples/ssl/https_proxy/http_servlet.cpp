@@ -2,10 +2,10 @@
 #include "https_client.h"
 #include "http_servlet.h"
 
-http_servlet::http_servlet(acl::ostream& out, acl::polarssl_conf* conf)
-	: handled_(false)
-	, out_(out)
-	, client_ssl_conf_(conf)
+http_servlet::http_servlet(acl::ostream& out, acl::sslbase_conf* conf)
+: handled_(false)
+, out_(out)
+, client_ssl_conf_(conf)
 {
 
 }
