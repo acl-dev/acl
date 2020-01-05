@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "stamp.h"
 
-#define	 STACK_SIZE	32000
+#define	 STACK_SIZE	128000
 
 static int __rw_timeout = 0;
 static int __conn_timeout = 0;
@@ -12,7 +12,7 @@ static int __left_fibers  = 100;
 static int __max_loop     = 100;
 static struct timeval __begin;
 
-static acl::polarssl_conf *__ssl_conf = NULL;
+static acl::sslbase_conf *__ssl_conf = NULL;
 static bool __check_ssl = false;
 
 static long long int __total_count = 0;
@@ -23,29 +23,25 @@ static bool ssl_init(acl::socket_stream& conn)
 {
 	assert(__ssl_conf);
 
-	acl::polarssl_io* ssl = new acl::polarssl_io(*__ssl_conf, false);
+	acl::sslbase_io* ssl = __ssl_conf->open(false, false);
 
-	if (conn.setup_hook(ssl) == ssl)
-	{
+	if (conn.setup_hook(ssl) == ssl) {
 		printf("setup_hook error\r\n");
 		ssl->destroy();
 		return false;
 	}
 
-	if (!__check_ssl)
-	{
+	if (!__check_ssl) {
 		printf("ssl handshake_ok\r\n");
 		return true;
 	}
 
-	if (ssl->handshake() == false)
-	{
+	if (!ssl->handshake()) {
 		printf("ssl handshake error\r\n");
 		ssl->destroy();
 		return false;
 	}
-	if (ssl->handshake_ok() == false)
-	{
+	if (!ssl->handshake_ok()) {
 		printf("ssl handshake error\r\n");
 		ssl->destroy();
 		return false;
@@ -59,15 +55,15 @@ static void run(const char* addr)
 {
 	acl::socket_stream conn;
 
-	if (conn.open(addr, __conn_timeout, __rw_timeout) == false)
-	{
+	if (!conn.open(addr, __conn_timeout, __rw_timeout)) {
 		printf("connect %s error %s\r\n", addr, acl::last_serror());
 		__total_error_clients++;
 		return;
 	}
 
-	if (__ssl_conf != NULL && ssl_init(conn) == false)
+	if (__ssl_conf != NULL && !ssl_init(conn)) {
 		return;
+	}
 
 	__total_clients++;
 	printf("fiber-%d: connect %s ok, clients: %d, fd: %d\r\n",
@@ -76,16 +72,13 @@ static void run(const char* addr)
 	acl::string buf;
 	const char req[] = "hello world\r\n";
 
-	for (int i = 0; i < __max_loop; i++)
-	{
-		if (conn.write(req, sizeof(req) - 1) == -1)
-		{
+	for (int i = 0; i < __max_loop; i++) {
+		if (conn.write(req, sizeof(req) - 1) == -1) {
 			printf("write error: %s\r\n", acl::last_serror());
 			break;
 		}
 
-		if (conn.gets(buf, false) == false)
-		{
+		if (!conn.gets(buf, false)) {
 			printf("gets error: %s\r\n", acl::last_serror());
 			break;
 		}
@@ -119,7 +112,7 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx)
 			__total_count, spent,
 			(__total_count * 1000) / (spent > 0 ? spent : 1));
 
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -128,9 +121,8 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 	char *addr = (char *) ctx;
 	int i;
 
-	for (i = 0; i < __max_fibers; i++)
-	{
-		acl_fiber_create(fiber_connect, addr, 32768);
+	for (i = 0; i < __max_fibers; i++) {
+		acl_fiber_create(fiber_connect, addr, STACK_SIZE);
 		//acl_fiber_sleep(1);
 	}
 }
@@ -138,7 +130,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -l path_to_polarssl\r\n"
+		" -l path_to_ssl\r\n"
 		" -s listen_addr\r\n"
 		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
@@ -148,14 +140,17 @@ static void usage(const char* procname)
 
 int main(int argc, char *argv[])
 {
-	acl::string addr("127.0.0.1:9001"), libpath("../libpolarssl.so");
+	acl::string addr("127.0.0.1:9001");
+#if defined(__APPLE__)
+	acl::string libpath("../libmbedtls_all.dylib");
+#else
+	acl::string libpath("../libmbedtls_all.so");
+#endif
 	bool use_ssl = true;
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hl:s:r:Pc:n:C")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hl:s:r:Pc:n:C")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -188,18 +183,29 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	if (use_ssl)
-	{
+	if (!use_ssl) {
+		/* do nothing */
+	} else if (libpath.find("mbedtls") != NULL) {
+		acl::mbedtls_conf::set_libpath(libpath);
+		if (acl::mbedtls_conf::load()) {
+			__ssl_conf = new acl::mbedtls_conf(false);
+		} else {
+			printf("load %s error\r\n", libpath.c_str());
+		}
+	} else if (libpath.find("polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(libpath);
-		__ssl_conf = new acl::polarssl_conf;
+		if (!acl::polarssl_conf::load()) {
+			__ssl_conf = new acl::polarssl_conf;
+		} else {
+			printf("load %s error\r\n", libpath.c_str());
+		}
 	}
 
 	gettimeofday(&__begin, NULL);
-	acl_fiber_create(fiber_main, addr.c_str(), 32768);
+	acl_fiber_create(fiber_main, addr.c_str(), STACK_SIZE);
 
 	acl_fiber_schedule();
 
 	delete __ssl_conf;
-
 	return 0;
 }

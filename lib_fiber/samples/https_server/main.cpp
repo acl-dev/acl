@@ -3,12 +3,12 @@
 #include <stdio.h>
 #include "http_servlet.h"
 
-#define	 STACK_SIZE	32000
+#define	 STACK_SIZE	128000
 
 static int __rw_timeout = 0;
 static acl::string __ssl_crt("./ssl_crt.pem");
 static acl::string __ssl_key("./ssl_key.pem");
-static acl::polarssl_conf __ssl_conf;
+static acl::sslbase_conf* __ssl_conf;
 
 static void http_server(ACL_FIBER *, void *ctx)
 {
@@ -16,10 +16,9 @@ static void http_server(ACL_FIBER *, void *ctx)
 
 	printf("start one http_server\r\n");
 
-	acl::polarssl_io* ssl = new acl::polarssl_io(__ssl_conf, true, false);
+	acl::sslbase_io* ssl = __ssl_conf->open(true, false);
 
-	if (conn->setup_hook(ssl) == ssl)
-	{
+	if (conn->setup_hook(ssl) == ssl) {
 		printf("setup_hook error\r\n");
 		ssl->destroy();
 		delete conn;
@@ -27,15 +26,13 @@ static void http_server(ACL_FIBER *, void *ctx)
 	}
 
 #if 0
-	if (ssl->handshake() == false)
-	{
+	if (!ssl->handshake()) {
 		printf("ssl handshake error\r\n");
 		ssl->destroy();
 		delete conn;
 		return;
 	}
-	if (ssl->handshake_ok() == false)
-	{
+	if (!ssl->handshake_ok()) {
 		printf("ssl handshake error\r\n");
 		ssl->destroy();
 		delete conn;
@@ -49,10 +46,10 @@ static void http_server(ACL_FIBER *, void *ctx)
 	http_servlet servlet(conn, &session);
 	servlet.setLocalCharset("gb2312");
 
-	while (true)
-	{
-		if (servlet.doRun() == false)
+	while (true) {
+		if (!servlet.doRun()) {
 			break;
+		}
 	}
 
 	printf("close one connection: %d, %s\r\n", conn->sock_handle(),
@@ -60,19 +57,17 @@ static void http_server(ACL_FIBER *, void *ctx)
 	delete conn;
 }
 
-static void ssl_init(acl::polarssl_conf& conf, const acl::string& crt,
+static void ssl_init(acl::sslbase_conf& conf, const acl::string& crt,
 	const acl::string& key)
 {
 	conf.enable_cache(1);
 
-	if (conf.add_cert(crt) == false)
-	{
+	if (!conf.add_cert(crt)) {
 		printf("load %s error\r\n", crt.c_str());
 		exit (1);
 	}
 
-	if (conf.set_key(key) == false)
-	{
+	if (!conf.set_key(key)) {
 		printf("set_key %s error\r\n", key.c_str());
 		exit (1);
 	}
@@ -86,21 +81,18 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 	const char* addr = (const char* ) ctx;
 	acl::server_socket server;
 
-	ssl_init(__ssl_conf, __ssl_crt, __ssl_key);
+	ssl_init(*__ssl_conf, __ssl_crt, __ssl_key);
 
-	if (server.open(addr) == false)
-	{
+	if (!server.open(addr)) {
 		printf("open %s error\r\n", addr);
 		exit (1);
-	}
-	else
+	} else {
 		printf(">>> listen %s ok\r\n", addr);
+	}
 
-	while (true)
-	{
+	while (true) {
 		acl::socket_stream* client = server.accept();
-		if (client == NULL)
-		{
+		if (client == NULL) {
 			printf("accept failed: %s\r\n", acl::last_serror());
 			break;
 		}
@@ -116,7 +108,7 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -l polarss_lib_path\r\n"
+		" -l ssl_lib_path\r\n"
 		" -s listen_addr\r\n"
 		" -r rw_timeout\r\n"
 		" -c ssl_crt.pem\r\n"
@@ -125,16 +117,19 @@ static void usage(const char* procname)
 
 int main(int argc, char *argv[])
 {
-	acl::string addr(":9001"), libpath;
+	acl::string addr(":9001");
+#ifdef __APPLE__
+	acl::string libpath("../libmbedtls_all.dylib");
+#else
+	acl::string libpath("../libmbedtls_all.so");
+#endif
 	int  ch;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:r:c:k:l:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:r:c:k:l:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -158,10 +153,29 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	if (!libpath.empty())
+	if (libpath.find("mbedtls") != NULL) {
+		acl::mbedtls_conf::set_libpath(libpath);
+		if (acl::mbedtls_conf::load()) {
+			__ssl_conf = new acl::mbedtls_conf(true);
+		} else {
+			printf("load %s error\r\n", libpath.c_str());
+			return 1;
+		}
+	} else if (libpath.find("polarlssl") != NULL) {
 		acl::polarssl_conf::set_libpath(libpath);
+		if (acl::polarssl_conf::load()) {
+			__ssl_conf = new acl::polarssl_conf;
+		} else {
+			printf("load %s error\r\n", libpath.c_str());
+			return 1;
+		}
+	} else {
+		printf("invalid ssl lib=%s\r\n", libpath.c_str());
+		return 1;
+	}
 
 	acl_fiber_create(fiber_accept, addr.c_str(), STACK_SIZE);
 	acl_fiber_schedule();
+	delete __ssl_conf;
 	return 0;
 }
