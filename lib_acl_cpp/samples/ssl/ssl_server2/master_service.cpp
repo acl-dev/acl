@@ -11,7 +11,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 #ifdef __APPLE__
 	{ "ssl_path", "../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib", &var_cfg_ssl_path },
 #else
-	{ "ssl_path", "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls_all.so", &var_cfg_ssl_path },
+	{ "ssl_path", "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so", &var_cfg_ssl_path },
 #endif
 	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
 	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
