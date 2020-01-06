@@ -447,7 +447,7 @@ static void usage(const char* procname)
 		" -Z [enable_gzip, default: false]\r\n"
 		" -U [enable_unzip response, default: false]\r\n"
 		" -K [keep_alive, default: false]\r\n"
-		" -S polarssl_lib_path[default: none]\n"
+		" -S ssl_path[default: none]\n"
 		" -N name_server[default: 8.8.8.8:53]\r\n"
 		" -W [if using websocket, default: no]\r\n"
 		, procname);
@@ -470,7 +470,7 @@ int main(int argc, char* argv[])
 	int  ch, conn_timeout = 5, rw_timeout = 5;
 	std::vector<acl::string> name_servers;
 	acl::string addr("127.0.0.1:80");
-	acl::string host("www.baidu.com"), url("/"), ssl_lib_path;
+	acl::string host("www.baidu.com"), url("/"), ssl_path;
 	bool enable_gzip = false, keep_alive = false, debug = false;
 	bool ws_enable = false, enable_unzip = false;
 
@@ -483,7 +483,7 @@ int main(int argc, char* argv[])
 			addr = optarg;
 			break;
 		case 'S':
-			ssl_lib_path = optarg;
+			ssl_path = optarg;
 			break;
 		case 'L':
 			url = optarg;
@@ -528,34 +528,32 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 	// 如果设置了 SSL 连接库，则启用 SSL 连接模式
-	if (!ssl_lib_path.empty()) {
-		if (access(ssl_lib_path.c_str(), R_OK) == 0) {
-			if (ssl_lib_path.find("mbedtls") != NULL) {
-				// 设置 libmbedtls_all.so 库全路径
-				acl::mbedtls_conf::set_libpath(ssl_lib_path);
+	if (ssl_path.empty()) {
+		/* do nothing */
+	} else if (ssl_path.find("mbedtls") != NULL) {
+		// 设置 libmbedtls 库全路径
+		const std::vector<acl::string>& libs = ssl_path.split2("; \r");
+		if (libs.size() == 3) {
+			acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 
-				// 动态加载 libmbedtls_all.so 库
-				acl::mbedtls_conf::load();
+			// 动态加载 libmbedtls_all.so 库
+			acl::mbedtls_conf::load();
 
-				// 创建全局 SSL 配置项
-				ssl_conf = new acl::mbedtls_conf(false);
-				printf(">>>use mbedtls<<<\r\n");
-
-			} else {
-				// 设置 libpolarssl.so 库全路径
-				acl::polarssl_conf::set_libpath(ssl_lib_path);
-
-				// 动态加载 libpolarssl.so 库
-				acl::polarssl_conf::load();
-
-				// 创建全局 SSL 配置项
-				ssl_conf = new acl::polarssl_conf;
-				printf(">>>use polarssl<<<\r\n");
-			}
-		} else {
-			printf("disable ssl, %s not found\r\n",
-				ssl_lib_path.c_str());
+			// 创建全局 SSL 配置项
+			ssl_conf = new acl::mbedtls_conf(false);
+			printf(">>>use mbedtls<<<\r\n");
 		}
+
+	} else {
+		// 设置 libpolarssl.so 库全路径
+		acl::polarssl_conf::set_libpath(ssl_path);
+
+		// 动态加载 libpolarssl.so 库
+		acl::polarssl_conf::load();
+
+		// 创建全局 SSL 配置项
+		ssl_conf = new acl::polarssl_conf;
+		printf(">>>use polarssl<<<\r\n");
 	}
 
 	// 定义 AIO 事件引擎

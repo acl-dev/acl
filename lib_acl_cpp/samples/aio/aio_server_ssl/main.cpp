@@ -3,6 +3,8 @@
 #include "lib_acl.h"
 #include "acl_cpp/acl_cpp_init.hpp"
 #include "acl_cpp/stdlib/log.hpp"
+#include "acl_cpp/stream/mbedtls_conf.hpp"
+#include "acl_cpp/stream/mbedtls_io.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/stream/polarssl_io.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
@@ -16,7 +18,7 @@ static int   __max_used = 0;
 static int   __cur_used = 0;
 
 // SSL 模式下的 SSL 配置对象
-static acl::polarssl_conf* __ssl_conf;
+static acl::sslbase_conf* __ssl_conf;
 
 /**
  * 延迟读回调处理类
@@ -289,8 +291,7 @@ public:
 		// SSL 模式下，等待客户端发送握手信息
 		if (__ssl_conf != NULL) {
 			// 注册 SSL IO 过程的钩子
-			acl::polarssl_io* ssl = new
-				acl::polarssl_io(*__ssl_conf, true, true);
+			acl::sslbase_io* ssl = __ssl_conf->open(true, true);
 
 			if (client->setup_hook(ssl) == ssl) {
 				std::cout << "setup_hook error" << std::endl;
@@ -315,12 +316,13 @@ public:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"	-l server_addr[ip:port, default: 127.0.0.1:9001]\r\n"
-		"	-L line_max_length\r\n"
-		"	-t timeout\r\n"
-		"	-n conn_used_limit\r\n"
-		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n"
-		"	-K ssl_key_file -C ssl_cert_file [in SSL mode]\r\n",
+		" -l server_addr[ip:port, default: 127.0.0.1:9001]\r\n"
+		" -S libssl_path\r\n"
+		" -L line_max_length\r\n"
+		" -t timeout\r\n"
+		" -n conn_used_limit\r\n"
+		" -k[use kernel event: epoll/iocp/kqueue/devpool]\r\n"
+		" -K ssl_key_file -C ssl_cert_file [in SSL mode]\r\n",
 		procname);
 }
 
@@ -371,18 +373,32 @@ int main(int argc, char* argv[])
 
 	acl::log::stdout_open(true);
 
-	if (!libssl_path.empty()) {
+	// 当私钥及证书都存在时才采用 SSL 通信方式
+	if (key_file.empty() || cert_file.empty()) {
+		/* do nothing */
+	} else if (libssl_path.find("mbedtls") != NULL) {
+		const std::vector<acl::string>& libs = libssl_path.split2("; \t\r\n");
+		if (libs.size() == 3) {
+			acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
+			if (acl::mbedtls_conf::load()) {
+				__ssl_conf = new acl::mbedtls_conf(true);
+			} else {
+				printf("load %s error\r\n", libssl_path.c_str());
+			}
+		}
+	} else if (!libssl_path.empty()) {
 		// 设置 libpolarssl.so 库全路径
 		acl::polarssl_conf::set_libpath(libssl_path);
 
 		// 动态加载 libpolarssl.so 库
-		acl::polarssl_conf::load();
+		if (acl::polarssl_conf::load()) {
+			__ssl_conf = new acl::polarssl_conf();
+		} else {
+			printf("load %s error\r\n", libssl_path.c_str());
+		}
 	}
 
-	// 当私钥及证书都存在时才采用 SSL 通信方式
-	if (!key_file.empty() && !cert_file.empty()) {
-		__ssl_conf = new acl::polarssl_conf();
-
+	if (__ssl_conf) {
 		// 允许服务端的 SSL 会话缓存功能
 		__ssl_conf->enable_cache(true);
 
@@ -445,7 +461,7 @@ int main(int argc, char* argv[])
 	// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 	handle.check();
 
-	// 删除 acl::polarssl_conf 动态对象
+	// 删除 acl::sslbase_conf 动态对象
 	delete __ssl_conf;
 
 	return 0;

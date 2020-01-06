@@ -5,7 +5,7 @@
 
 #define	 STACK_SIZE	128000
 
-static int __rw_timeout = 0;
+static int __rw_timeout   = 0;
 static int __conn_timeout = 0;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
@@ -183,10 +183,18 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
+	__left_fibers = __max_fibers;
+
 	if (!use_ssl) {
 		/* do nothing */
 	} else if (libpath.find("mbedtls") != NULL) {
-		acl::mbedtls_conf::set_libpath(libpath);
+		const std::vector<acl::string>& libs = libpath.split2("; \t");
+		if (libs.size() != 3) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+
+		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 		if (acl::mbedtls_conf::load()) {
 			__ssl_conf = new acl::mbedtls_conf(false);
 		} else {

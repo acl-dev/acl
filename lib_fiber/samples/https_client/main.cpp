@@ -91,7 +91,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -l ssl_libpath\r\n"
+		" -l libpath\r\n"
 		" -s addr\r\n"
 		" -t connt_timeout\r\n"
 		" -r rw_timeout\r\n"
@@ -104,9 +104,9 @@ int main(int argc, char *argv[])
 	int   ch;
 	char  addr[256];
 #ifdef __APPLE__
-	acl::string ssl_libpath("../libmbedtls_all.dylib");
+	acl::string libpath("../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib");
 #else
-	acl::string ssl_libpath("../libmbedtls_all.so");
+	acl::string libpath("../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so");
 #endif
        
 	acl_msg_stdout_enable(1);
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
 			snprintf(addr, sizeof(addr), "%s", optarg);
 			break;
 		case 'l':
-			ssl_libpath = optarg;
+			libpath = optarg;
 			break;
 		default:
 			break;
@@ -144,22 +144,27 @@ int main(int argc, char *argv[])
 
 	gettimeofday(&__begin, NULL);
 
-	if (ssl_libpath.find("mbedtls") != NULL) {
-		acl::mbedtls_conf::set_libpath(ssl_libpath);
+	if (libpath.find("mbedtls") != NULL) {
+		const std::vector<acl::string>& libs = libpath.split2("; \t");
+		if (libs.size() != 3) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 		if (!acl::mbedtls_conf::load()) {
-			printf("load %s error\r\n", ssl_libpath.c_str());
+			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
 		__ssl_conf = new acl::mbedtls_conf(false);
-	} else if (ssl_libpath.find("polarssl") != NULL) {
-		acl::polarssl_conf::set_libpath(ssl_libpath);
+	} else if (libpath.find("polarssl") != NULL) {
+		acl::polarssl_conf::set_libpath(libpath);
 		if (!acl::polarssl_conf::load()) {
-			printf("load %s error\n", ssl_libpath.c_str());
+			printf("load %s error\n", libpath.c_str());
 			return 1;
 		}
 		__ssl_conf = new acl::polarssl_conf;
 	} else {
-		printf("invalid ssl lib=%s\r\n", ssl_libpath.c_str());
+		printf("invalid ssl lib=%s\r\n", libpath.c_str());
 		return 1;
 	}
 

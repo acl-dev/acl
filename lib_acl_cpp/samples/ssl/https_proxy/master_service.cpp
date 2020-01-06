@@ -11,7 +11,11 @@ char *var_cfg_key_file;
 char *var_cfg_log_file;
 char *var_cfg_addrs_map;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "ssl_path", "../libpolarssl.so", &var_cfg_ssl_path },
+#ifdef __APPLE__
+	{ "ssl_path", "../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib", &var_cfg_ssl_path },
+#else
+	{ "ssl_path", "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so", &var_cfg_ssl_path },
+#endif
 	{ "crt_file", "", &var_cfg_crt_file },
 	{ "key_file", "", &var_cfg_key_file },
 	{ "log_file", "./log.txt", &var_cfg_log_file },
@@ -204,12 +208,18 @@ void master_service::proc_on_init()
 	if (!var_cfg_client_ssl) {
 		/* do nothing */
 	} else if (strstr(var_cfg_ssl_path, "mbedtls") != NULL) {
-		acl::mbedtls_conf::set_libpath(var_cfg_ssl_path);
-		if (acl::mbedtls_conf::load()) {
-			client_ssl_conf_ = new acl::mbedtls_conf(false);
-			use_mbedtls = true;
+		acl::string buf(var_cfg_ssl_path);
+		const std::vector<acl::string>& libs = buf.split2("; \r\r\n");
+		if (libs.size() != 3) {
+			logger_error("invalid ssl_path=%s", var_cfg_ssl_path);
 		} else {
-			logger_error("load %s error", var_cfg_ssl_path);
+			acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
+			if (acl::mbedtls_conf::load()) {
+				client_ssl_conf_ = new acl::mbedtls_conf(false);
+				use_mbedtls = true;
+			} else {
+				logger_error("load %s error", var_cfg_ssl_path);
+			}
 		}
 	} else if (strstr(var_cfg_ssl_path, "polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(var_cfg_ssl_path);

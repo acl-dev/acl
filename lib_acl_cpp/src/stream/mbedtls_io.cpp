@@ -73,19 +73,19 @@ static ssl_get_verify_result_fn		__ssl_get_verify_result;
 static ssl_get_peer_cert_fn		__ssl_get_peer_cert;
 static ssl_get_bytes_avail_fn		__ssl_get_bytes_avail;
 
-extern ACL_DLL_HANDLE __mbedtls_dll;  // defined in mbedtls_conf.cpp
+extern ACL_DLL_HANDLE __tls_dll;  // defined in mbedtls_conf.cpp
 
 bool mbedtls_dll_load_io(void)
 {
 #define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__mbedtls_dll, (name));			\
+	(fn) = (type) acl_dlsym(__tls_dll, (name));			\
 	if ((fn) == NULL) {						\
 		logger_error("dlsym %s error %s", name, acl_dlerror());	\
 		return false;						\
 	}								\
 } while (0)
 
-	acl_assert(__mbedtls_dll);
+	acl_assert(__tls_dll);
 
 	LOAD(SSL_INIT_NAME, ssl_init_fn, __ssl_init);
 	LOAD(SSL_FREE_NAME, ssl_free_fn, __ssl_free);

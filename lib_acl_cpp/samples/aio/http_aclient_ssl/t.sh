@@ -38,6 +38,13 @@ sleep 2
 echo ""
 echo ""
 
-./http_aclient_ssl -s echo.websocket.org:443 -H echo.websocket.org -D -Z -U -S ../libmbedtls_all.dylib -N 8.8.8.8:53
+os=$(echo `uname -s`)
+if [ $os == "Darwin" ]; then
+	./http_aclient_ssl -s echo.websocket.org:443 -H echo.websocket.org -D -Z -U \
+		-S "../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib" -N 8.8.8.8:53
+else
+	./http_aclient_ssl -s echo.websocket.org:443 -H echo.websocket.org -D -Z -U \
+		-S "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so" -N 8.8.8.8:53
+fi
 echo ""
 echo ""

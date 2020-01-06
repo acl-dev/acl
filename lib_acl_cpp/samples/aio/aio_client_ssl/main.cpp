@@ -10,6 +10,8 @@
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stream/polarssl_conf.hpp"
 #include "acl_cpp/stream/polarssl_io.hpp"
+#include "acl_cpp/stream/mbedtls_conf.hpp"
+#include "acl_cpp/stream/mbedtls_io.hpp"
 #include "acl_cpp/stream/aio_handle.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 
@@ -19,7 +21,7 @@
 # endif
 #endif
 
-static acl::polarssl_conf* __ssl_conf;
+static acl::sslbase_conf* __ssl_conf;
 
 typedef struct
 {
@@ -232,8 +234,7 @@ public:
 
 		// 设置 SSL 方式
 		if (__ssl_conf) {
-			acl::polarssl_io* ssl =
-				new acl::polarssl_io(*__ssl_conf, false, true);
+			acl::sslbase_io* ssl = __ssl_conf->open(false, true);
 			if (client_->setup_hook(ssl) == ssl) {
 				std::cout << "open ssl error!" << std::endl;
 				ssl->destroy();
@@ -307,13 +308,13 @@ static void usage(const char* procname)
 		" -k[use kernel event: epoll/kqueue/devpoll\r\n"
 		" -t connect_timeout\r\n"
 		" -d[debug]\r\n"
-		" -S libpolarssl.so [if set the ssl will be used]\n",
+		" -S libssl_path [if set the ssl will be used]\n",
 		procname);
 }
 
 int main(int argc, char* argv[])
 {
-	bool use_kernel = false;
+	bool  use_kernel = false;
 	int   ch;
 	IO_CTX ctx;
 	acl::string libssl_path;
@@ -330,17 +331,19 @@ int main(int argc, char* argv[])
 		switch (ch) {
 		case 'c':
 			ctx.nopen_limit = atoi(optarg);
-			if (ctx.nopen_limit <= 0)
+			if (ctx.nopen_limit <= 0) {
 				ctx.nopen_limit = 10;
+			}
 			break;
 		case 'n':
 			ctx.nwrite_limit = atoi(optarg);
-			if (ctx.nwrite_limit <= 0)
+			if (ctx.nwrite_limit <= 0) {
 				ctx.nwrite_limit = 10;
+			}
 			break;
 		case 'h':
 			usage(argv[0]);
-			return (0);
+			return 0;
 		case 'k':
 			use_kernel = true;
 			break;
@@ -365,12 +368,23 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	if (!libssl_path.empty()
-#if defined(_WIN32) || defined(_WIN64)
-		&& !_access(libssl_path.c_str(), 00)) {
-#else
-		&& !access(libssl_path.c_str(), R_OK)) {
-#endif
+	__ssl_conf = NULL;
+
+	if (libssl_path.empty()) {
+		/* do nothing */
+	} else if (libssl_path.find("mbedtls") != NULL) {
+		const std::vector<acl::string>& libs = libssl_path.split2("; \t\r\n");
+		if (libs.size() == 3) {
+			acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
+			if (acl::mbedtls_conf::load()) {
+				__ssl_conf = new acl::mbedtls_conf(false);
+			} else {
+				printf("load %s error\r\n", libssl_path.c_str());
+			}
+		} else {
+			printf("invalid libssl_path=%s\r\n", libssl_path.c_str());
+		}
+	} else {
 		// 设置 libpolarssl.so 库全路径
 		acl::polarssl_conf::set_libpath(libssl_path);
 
@@ -379,8 +393,6 @@ int main(int argc, char* argv[])
 
 		// 创建全局 SSL 配置项
 		__ssl_conf = new acl::polarssl_conf();
-	} else {
-		__ssl_conf = NULL;
 	}
 
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
@@ -389,14 +401,14 @@ int main(int argc, char* argv[])
 	if (!connect_server(&ctx, ctx.id_begin)) {
 		std::cout << "enter any key to exit." << std::endl;
 		getchar();
-		return (1);
+		return 1;
 	}
 
 	std::cout << "Connect " << ctx.addr << " ..." << std::endl;
 
 	while (true) {
 		// 如果返回 false 则表示不再继续，需要退出
-		if (handle.check() == false) {
+		if (!handle.check()) {
 			break;
 		}
 	}
@@ -410,7 +422,6 @@ int main(int argc, char* argv[])
 	acl::meter_time(__FUNCTION__, __LINE__, buf.c_str());
 
 	delete __ssl_conf;
-
-	return (0);
+	return 0;
 }
 

@@ -59,14 +59,19 @@ int main(int argc, char* argv[])
 	(void) keep_alive;
 
 	acl::sslbase_conf* ssl_conf = NULL;
-	if (libpath.find("mbedtls") && access(libpath.c_str(), R_OK) == 0) {
+	if (libpath.find("mbedtls")) {
 		ssl_conf = new acl::mbedtls_conf(false);
-		acl::mbedtls_conf::set_libpath(libpath);
+		const std::vector<acl::string>& libs = libpath.split2(";");
+		if (libs.size() != 3) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 		if (!acl::mbedtls_conf::load()) {
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
-	} else if (libpath.find("polarssl") && access(libpath.c_str(), R_OK) == 0) {
+	} else if (libpath.find("polarssl")) {
 		ssl_conf = new acl::polarssl_conf;
 		acl::polarssl_conf::set_libpath(libpath);
 		if (!acl::polarssl_conf::load()) {

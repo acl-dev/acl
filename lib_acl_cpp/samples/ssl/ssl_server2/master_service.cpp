@@ -9,9 +9,9 @@ char *var_cfg_crt_file;
 char *var_cfg_key_file;
 acl::master_str_tbl var_conf_str_tab[] = {
 #ifdef __APPLE__
-	{ "ssl_path", "../libmbedtls_all.dylib", &var_cfg_ssl_path },
+	{ "ssl_path", "../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib", &var_cfg_ssl_path },
 #else
-	{ "ssl_path", "../libmbedtls_all.so", &var_cfg_ssl_path },
+	{ "ssl_path", "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls_all.so", &var_cfg_ssl_path },
 #endif
 	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
 	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
@@ -174,7 +174,13 @@ void master_service::proc_on_init()
 	}
 
 	if (var_cfg_use_mbedtls) {
-		acl::mbedtls_conf::set_libpath(var_cfg_ssl_path);
+		acl::string buf(var_cfg_ssl_path);
+		const std::vector<acl::string>& libs = buf.split2("; \t\r\n");
+		if (libs.size() != 3) {
+			logger_error("invalid ssl_path=%s", var_cfg_ssl_path);
+			return;
+		}
+		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 		if (!acl::mbedtls_conf::load()) {
 			logger_error("load %s error", var_cfg_ssl_path);
 			return;

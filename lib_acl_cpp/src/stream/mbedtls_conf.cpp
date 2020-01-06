@@ -35,11 +35,6 @@
 #  define PK_FREE_NAME			"mbedtls_pk_free"
 #  define PK_PARSE_KEYFILE_NAME		"mbedtls_pk_parse_keyfile"
 
-#  define X509_INIT_NAME		"mbedtls_x509_crt_init"
-#  define X509_FREE_NAME		"mbedtls_x509_crt_free"
-#  define X509_PARSE_CRT_PATH_NAME	"mbedtls_x509_crt_parse_path"
-#  define X509_PARSE_CRT_FILE_NAME	"mbedtls_x509_crt_parse_file"
-
 #  ifdef HAS_HAVEGE
 #   define HAVEGE_INIT_NAME		"mbedtls_havege_init"
 #   define HAVEGE_RANDOM_NAME		"mbedtls_havege_random"
@@ -53,6 +48,11 @@
 #  define ENTROPY_INIT_NAME		"mbedtls_entropy_init"
 #  define ENTROPY_FREE_NAME		"mbedtls_entropy_free"
 #  define ENTROPY_FUNC_NAME		"mbedtls_entropy_func"
+
+#  define X509_INIT_NAME		"mbedtls_x509_crt_init"
+#  define X509_FREE_NAME		"mbedtls_x509_crt_free"
+#  define X509_PARSE_CRT_PATH_NAME	"mbedtls_x509_crt_parse_path"
+#  define X509_PARSE_CRT_FILE_NAME	"mbedtls_x509_crt_parse_file"
 
 #  define SSL_LIST_CIPHERSUITES_NAME	"mbedtls_ssl_list_ciphersuites"
 
@@ -80,11 +80,6 @@ typedef void (*pk_init_fn)(PKEY*);
 typedef void (*pk_free_fn)(PKEY*);
 typedef int  (*pk_parse_keyfile_fn)(PKEY*, const char*, const char*);
 
-typedef void (*x509_crt_init_fn)(X509_CRT*);
-typedef void (*x509_crt_free_fn)(X509_CRT*);
-typedef int  (*x509_crt_parse_path_fn)(X509_CRT*, const char*);
-typedef int  (*x509_crt_parse_file_fn)(X509_CRT*, const char*);
-
 # ifdef HAS_HAVEGE
 typedef void (*havege_init_fn)(mbedtls_havege_state*);
 typedef int  (*havege_random_fn)(void*, unsigned char*, size_t);
@@ -100,6 +95,11 @@ typedef int  (*ctr_drbg_random_fn)(void*, unsigned char*, size_t);
 typedef void (*entropy_init_fn)(mbedtls_entropy_context*);
 typedef void (*entropy_free_fn)(mbedtls_entropy_context*);
 typedef int  (*entropy_func_fn)(void*, unsigned char*, size_t);
+
+typedef void (*x509_crt_init_fn)(X509_CRT*);
+typedef void (*x509_crt_free_fn)(X509_CRT*);
+typedef int  (*x509_crt_parse_path_fn)(X509_CRT*, const char*);
+typedef int  (*x509_crt_parse_file_fn)(X509_CRT*, const char*);
 
 typedef const int* (*ssl_list_ciphersuites_fn)(void);
 
@@ -131,11 +131,6 @@ static pk_init_fn			__pk_init;
 static pk_free_fn			__pk_free;
 static pk_parse_keyfile_fn		__pk_parse_keyfile;
 
-static x509_crt_init_fn			__x509_crt_init;
-static x509_crt_free_fn			__x509_crt_free;
-static x509_crt_parse_path_fn		__x509_crt_parse_path;
-static x509_crt_parse_file_fn		__x509_crt_parse_file;
-
 # ifdef HAS_HAVEGE
 static havege_init_fn			__havege_init;
 static havege_random_fn			__havege_random;
@@ -149,6 +144,11 @@ static ctr_drbg_random_fn		__ctr_drbg_random;
 static entropy_init_fn			__entropy_init;
 static entropy_free_fn			__entropy_free;
 static entropy_func_fn			__entropy_func;
+
+static x509_crt_init_fn			__x509_crt_init;
+static x509_crt_free_fn			__x509_crt_free;
+static x509_crt_parse_path_fn		__x509_crt_parse_path;
+static x509_crt_parse_file_fn		__x509_crt_parse_file;
 
 static ssl_list_ciphersuites_fn		__ssl_list_ciphersuites;
 
@@ -173,119 +173,202 @@ static ssl_cache_get_fn			__ssl_cache_get;
 static ssl_setup_fn			__ssl_setup;
 
 static acl_pthread_once_t __mbedtls_once = ACL_PTHREAD_ONCE_INIT;
-static acl::string* __mbedtls_path_buf = NULL;
+static acl::string* __crypto_path_buf  = NULL;
+static acl::string* __x509_path_buf    = NULL;
+static acl::string* __tls_path_buf     = NULL;
+
 # if defined(_WIN32) || defined(_WIN64)
-static const char* __mbedtls_path      = "libmbedtls_all.dll";
+static const char* __crypto_path       = "libmbedcrypto.dll";
+static const char* __x509_path         = "libmbedx509.dll";
+static const char* __tls_path          = "libmbedtls.dll";
 # elif defined(ACL_MACOSX)
-static const char* __mbedtls_path      = "./libmbedtls_all.dylib";
+static const char* __crypto_path       = "./libmbedcrypto.dylib";
+static const char* __x509_path         = "./libmbedx509.dylib";
+static const char* __tls_path          = "./libmbedtls_all.dylib";
 # else
-static const char* __mbedtls_path      = "./libmbedtls_all.so";
+static const char* __crypto_path       = "./libmbedcrypto.so";
+static const char* __x509_path         = "./libmbedx509.so";
+static const char* __tls_path          = "./libmbedtls_all.so";
 # endif
 
-ACL_DLL_HANDLE __mbedtls_dll           = NULL;
+ACL_DLL_HANDLE __crypto_dll            = NULL;
+ACL_DLL_HANDLE __x509_dll              = NULL;
+ACL_DLL_HANDLE __tls_dll               = NULL;
 
 static void mbedtls_dll_unload(void)
 {
-	if (__mbedtls_dll) {
-		acl_dlclose(__mbedtls_dll);
-		__mbedtls_dll = NULL;
-		logger("%s unload ok", __mbedtls_path);
+	if (__crypto_dll) {
+		acl_dlclose(__crypto_dll);
+		__crypto_dll = NULL;
+		logger("%s unload ok", __crypto_path);
+	}
+	if (__x509_dll) {
+		acl_dlclose(__x509_dll);
+		__x509_dll = NULL;
+		logger("%s unload ok", __x509_path);
+	}
+	if (__tls_dll) {
+		acl_dlclose(__tls_dll);
+		__tls_dll = NULL;
+		logger("%s unload ok", __tls_path);
 	}
 
-	delete __mbedtls_path_buf;
-	__mbedtls_path_buf = NULL;
+	delete __crypto_path_buf;
+	delete __x509_path_buf;
+	delete __tls_path_buf;
+
+	__crypto_path_buf = NULL;
+	__x509_path_buf   = NULL;
+	__tls_path_buf    = NULL;
 }
 
 extern bool mbedtls_dll_load_io(void); // defined in mbedtls_io.cpp
 
-static bool mbedtls_dll_load_conf(void)
-{
-#define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__mbedtls_dll, (name));			\
+#define LOAD_CRYPTO(name, type, fn) do {				\
+	(fn) = (type) acl_dlsym(__crypto_dll, (name));			\
 	if ((fn) == NULL) {						\
 		logger_error("dlsym %s error %s", name, acl_dlerror());	\
 		return false;						\
 	}								\
 } while (0)
 
-	LOAD(PK_INIT_NAME, pk_init_fn, __pk_init);
-	LOAD(PK_FREE_NAME, pk_free_fn, __pk_free);
-	LOAD(PK_PARSE_KEYFILE_NAME, pk_parse_keyfile_fn, __pk_parse_keyfile);
+#define LOAD_X509(name, type, fn) do {					\
+	(fn) = (type) acl_dlsym(__x509_dll, (name));			\
+	if ((fn) == NULL) {						\
+		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		return false;						\
+	}								\
+} while (0)
 
-	LOAD(X509_INIT_NAME, x509_crt_init_fn, __x509_crt_init);
-	LOAD(X509_FREE_NAME, x509_crt_free_fn, __x509_crt_free);
-	LOAD(X509_PARSE_CRT_PATH_NAME, x509_crt_parse_path_fn, __x509_crt_parse_path);
-	LOAD(X509_PARSE_CRT_FILE_NAME, x509_crt_parse_file_fn, __x509_crt_parse_file);
+#define LOAD_SSL(name, type, fn) do {					\
+	(fn) = (type) acl_dlsym(__tls_dll, (name));			\
+	if ((fn) == NULL) {						\
+		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		return false;						\
+	}								\
+} while (0)
+
+static bool load_from_crypto(void)
+{
+	LOAD_CRYPTO(PK_INIT_NAME, pk_init_fn, __pk_init);
+	LOAD_CRYPTO(PK_FREE_NAME, pk_free_fn, __pk_free);
+	LOAD_CRYPTO(PK_PARSE_KEYFILE_NAME, pk_parse_keyfile_fn, __pk_parse_keyfile);
 
 # ifdef HAS_HAVEGE
-	LOAD(HAVEGE_INIT_NAME, havege_init_fn, __havege_init);
-	LOAD(HAVEGE_RANDOM_NAME, havege_random_fn, __havege_random);
+	LOAD_CRYPTO(HAVEGE_INIT_NAME, havege_init_fn, __havege_init);
+	LOAD_CRYPTO(HAVEGE_RANDOM_NAME, havege_random_fn, __havege_random);
 # else
-	LOAD(CTR_DRBG_INIT_NAME, ctr_drbg_init_fn, __ctr_drbg_init);
-	LOAD(CTR_DRBG_FREE_NAME, ctr_drbg_free_fn, __ctr_drbg_free);
-	LOAD(CTR_DRBG_SEED_NAME, ctr_drbg_seed_fn, __ctr_drbg_seed);
-	LOAD(CTR_DRBG_RANDOM_NAME, ctr_drbg_random_fn, __ctr_drbg_random);
+	LOAD_CRYPTO(CTR_DRBG_INIT_NAME, ctr_drbg_init_fn, __ctr_drbg_init);
+	LOAD_CRYPTO(CTR_DRBG_FREE_NAME, ctr_drbg_free_fn, __ctr_drbg_free);
+	LOAD_CRYPTO(CTR_DRBG_SEED_NAME, ctr_drbg_seed_fn, __ctr_drbg_seed);
+	LOAD_CRYPTO(CTR_DRBG_RANDOM_NAME, ctr_drbg_random_fn, __ctr_drbg_random);
 # endif
 
-	LOAD(ENTROPY_INIT_NAME, entropy_init_fn, __entropy_init);
-	LOAD(ENTROPY_FREE_NAME, entropy_free_fn, __entropy_free);
-	LOAD(ENTROPY_FUNC_NAME, entropy_func_fn, __entropy_func);
+	LOAD_CRYPTO(ENTROPY_INIT_NAME, entropy_init_fn, __entropy_init);
+	LOAD_CRYPTO(ENTROPY_FREE_NAME, entropy_free_fn, __entropy_free);
+	LOAD_CRYPTO(ENTROPY_FUNC_NAME, entropy_func_fn, __entropy_func);
 
-	LOAD(SSL_LIST_CIPHERSUITES_NAME, ssl_list_ciphersuites_fn, __ssl_list_ciphersuites);
-
-	LOAD(SSL_CONF_INIT_NAME, ssl_config_init_fn, __ssl_config_init);
-	LOAD(SSL_CONF_DEFAULTS_NAME, ssl_config_defaults_fn, __ssl_config_defaults);
-	LOAD(SSL_CONF_RNG_NAME, ssl_conf_rng_fn, __ssl_conf_rng);
-	LOAD(SSL_CONF_ENDPOINT_NAME, ssl_conf_endpoint_fn, __ssl_conf_endpoint);
-	LOAD(SSL_CONF_CIPHERSUITES_NAME, ssl_conf_ciphersuites_fn, __ssl_conf_ciphersuites);
-	LOAD(SSL_CONF_SESSION_CACHE_NAME, ssl_conf_session_cache_fn, __ssl_conf_session_cache);
-	LOAD(SSL_CONF_CA_CHAIN_NAME, ssl_conf_ca_chain_fn, __ssl_conf_ca_chain);
-	LOAD(SSL_CONF_OWN_CERT_NAME, ssl_conf_own_cert_fn, __ssl_conf_own_cert);
-	LOAD(SSL_CONF_AUTHMODE_NAME, ssl_conf_authmode_fn, __ssl_conf_authmode);
-# ifdef DEBUG_SSL
-	LOAD(SSL_CONF_DBG_NAME, ssl_conf_dbg_fn, __ssl_conf_dbg);
-# endif
-
-	LOAD(SSL_CACHE_INIT_NAME, ssl_cache_init_fn, __ssl_cache_init);
-	LOAD(SSL_CACHE_FREE_NAME, ssl_cache_free_fn, __ssl_cache_free);
-	LOAD(SSL_CACHE_SET_NAME, ssl_cache_set_fn, __ssl_cache_set);
-	LOAD(SSL_CACHE_GET_NAME, ssl_cache_get_fn, __ssl_cache_get);
-
-	LOAD(SSL_SETUP_NAME, ssl_setup_fn, __ssl_setup);
 	return true;
+}
+
+static bool load_from_x509(void)
+{
+	LOAD_X509(X509_INIT_NAME, x509_crt_init_fn, __x509_crt_init);
+	LOAD_X509(X509_FREE_NAME, x509_crt_free_fn, __x509_crt_free);
+	LOAD_X509(X509_PARSE_CRT_PATH_NAME, x509_crt_parse_path_fn, __x509_crt_parse_path);
+	LOAD_X509(X509_PARSE_CRT_FILE_NAME, x509_crt_parse_file_fn, __x509_crt_parse_file);
+
+	return true;
+}
+
+static bool load_from_ssl(void)
+{
+	LOAD_SSL(SSL_LIST_CIPHERSUITES_NAME, ssl_list_ciphersuites_fn, __ssl_list_ciphersuites);
+
+	LOAD_SSL(SSL_CONF_INIT_NAME, ssl_config_init_fn, __ssl_config_init);
+	LOAD_SSL(SSL_CONF_DEFAULTS_NAME, ssl_config_defaults_fn, __ssl_config_defaults);
+	LOAD_SSL(SSL_CONF_RNG_NAME, ssl_conf_rng_fn, __ssl_conf_rng);
+	LOAD_SSL(SSL_CONF_ENDPOINT_NAME, ssl_conf_endpoint_fn, __ssl_conf_endpoint);
+	LOAD_SSL(SSL_CONF_CIPHERSUITES_NAME, ssl_conf_ciphersuites_fn, __ssl_conf_ciphersuites);
+	LOAD_SSL(SSL_CONF_SESSION_CACHE_NAME, ssl_conf_session_cache_fn, __ssl_conf_session_cache);
+	LOAD_SSL(SSL_CONF_CA_CHAIN_NAME, ssl_conf_ca_chain_fn, __ssl_conf_ca_chain);
+	LOAD_SSL(SSL_CONF_OWN_CERT_NAME, ssl_conf_own_cert_fn, __ssl_conf_own_cert);
+	LOAD_SSL(SSL_CONF_AUTHMODE_NAME, ssl_conf_authmode_fn, __ssl_conf_authmode);
+# ifdef DEBUG_SSL
+	LOAD_SSL(SSL_CONF_DBG_NAME, ssl_conf_dbg_fn, __ssl_conf_dbg);
+# endif
+
+	LOAD_SSL(SSL_CACHE_INIT_NAME, ssl_cache_init_fn, __ssl_cache_init);
+	LOAD_SSL(SSL_CACHE_FREE_NAME, ssl_cache_free_fn, __ssl_cache_free);
+	LOAD_SSL(SSL_CACHE_SET_NAME, ssl_cache_set_fn, __ssl_cache_set);
+	LOAD_SSL(SSL_CACHE_GET_NAME, ssl_cache_get_fn, __ssl_cache_get);
+
+	LOAD_SSL(SSL_SETUP_NAME, ssl_setup_fn, __ssl_setup);
+	return true;
+}
+
+static bool mbedtls_dll_load_conf(void)
+{
+	if (__crypto_path_buf && !__crypto_path_buf->empty()) {
+		__crypto_path = __crypto_path_buf->c_str();
+	}
+	if (__x509_path_buf && !__x509_path_buf->empty()) {
+		__x509_path = __x509_path_buf->c_str();
+	}
+	if (__tls_path_buf && !__tls_path_buf->empty()) {
+		__tls_path = __tls_path_buf->c_str();
+	}
+
+	__crypto_dll = acl_dlopen(__crypto_path);
+	if (__crypto_dll == NULL) {
+		logger_error("load %s error %s", __crypto_path, acl_dlerror());
+		return false;
+	}
+
+	__x509_dll = acl_dlopen(__x509_path);
+	if (__x509_dll == NULL) {
+		logger_error("load %s error %s", __x509_path, acl_dlerror());
+		return false;
+	}
+
+	__tls_dll = acl_dlopen(__tls_path);
+	if (__tls_dll == NULL) {
+		logger_error("load %s error %s", __tls_path, acl_dlerror());
+		return false;
+	}
+
+	if (!load_from_crypto()) {
+		return false;
+	}
+	if (!load_from_x509()) {
+		return false;
+	}
+	return load_from_ssl();
 }
 
 static void mbedtls_dll_load(void)
 {
-	if (__mbedtls_dll) {
-		logger("mbedtls(%s) has been loaded!", __mbedtls_path);
-		return;
-	}
-
-	if (__mbedtls_path_buf && !__mbedtls_path_buf->empty()) {
-		__mbedtls_path = __mbedtls_path_buf->c_str();
-	}
-
-	__mbedtls_dll = acl_dlopen(__mbedtls_path);
-	if (__mbedtls_dll == NULL) {
-		logger_error("load %s error %s", __mbedtls_path, acl_dlerror());
+	if (__tls_dll) {
+		logger("mbedtls(%s) has been loaded!", __tls_path);
 		return;
 	}
 
 	if (!mbedtls_dll_load_conf()) {
-		logger_error("mbedtls_dll_load_conf %s error", __mbedtls_path);
-		acl_dlclose(__mbedtls_dll);
-		__mbedtls_dll = NULL;
+		logger_error("mbedtls_dll_load_conf %s error", __tls_path);
+		acl_dlclose(__tls_dll);
+		__tls_dll = NULL;
 		return;
 	}
 	if (!mbedtls_dll_load_io()) {
-		logger_error("mbedtls_dll_load_io %s error", __mbedtls_path);
-		acl_dlclose(__mbedtls_dll);
-		__mbedtls_dll = NULL;
+		logger_error("mbedtls_dll_load_io %s error", __tls_path);
+		acl_dlclose(__tls_dll);
+		__tls_dll = NULL;
 		return;
 	}
 
-	logger("%s loaded!", __mbedtls_path);
+	logger("%s loaded!", __crypto_path);
+	logger("%s loaded!", __x509_path);
+	logger("%s loaded!", __tls_path);
 	atexit(mbedtls_dll_unload);
 }
 
@@ -294,10 +377,6 @@ static void mbedtls_dll_load(void)
 #  define __pk_init			::mbedtls_pk_init
 #  define __pk_free			::mbedtls_pk_free
 #  define __pk_parse_keyfile		::mbedtls_pk_parse_keyfile
-#  define __x509_crt_init		::mbedtls_x509_crt_init
-#  define __x509_crt_free		::mbedtls_x509_crt_free
-#  define __x509_crt_parse_path		::mbedtls_x509_crt_parse_path
-#  define __x509_crt_parse_file		::mbedtls_x509_crt_parse_file
 #  ifdef HAS_HAVEGE
 #   define __havege_init		::mbedtls_havege_init
 #   define __havege_random		::mbedtls_havege_random
@@ -310,6 +389,12 @@ static void mbedtls_dll_load(void)
 #  define __entropy_init		::mbedtls_entropy_init
 #  define __entropy_free		::mbedtls_entropy_free
 #  define __entropy_func		::mbedtls_entropy_func
+
+#  define __x509_crt_init		::mbedtls_x509_crt_init
+#  define __x509_crt_free		::mbedtls_x509_crt_free
+#  define __x509_crt_parse_path		::mbedtls_x509_crt_parse_path
+#  define __x509_crt_parse_file		::mbedtls_x509_crt_parse_file
+
 #  define __ssl_list_ciphersuites	::mbedtls_ssl_list_ciphersuites
 #  define __ssl_config_init		::mbedtls_ssl_config_init
 #  define __ssl_config_defaults		::mbedtls_ssl_config_defaults
@@ -335,14 +420,27 @@ static void mbedtls_dll_load(void)
 namespace acl
 {
 
-void mbedtls_conf::set_libpath(const char* libmbedtls)
+void mbedtls_conf::set_libpath(const char* libmbedcrypto,
+	const char* libmbedx509, const char* libmbedtls)
 {
 #ifdef HAS_MBEDTLS_DLL
-	if (__mbedtls_path_buf == NULL) {
-		__mbedtls_path_buf = NEW string;
+	if (__crypto_path_buf == NULL) {
+		__crypto_path_buf = NEW string;
 	}
-	*__mbedtls_path_buf = libmbedtls;
+	* __crypto_path_buf = libmbedcrypto;
+
+	if (__x509_path_buf == NULL) {
+		__x509_path_buf = NEW string;
+	}
+	*__x509_path_buf = libmbedx509;
+
+	if (__tls_path_buf == NULL) {
+		__tls_path_buf = NEW string;
+	}
+	*__tls_path_buf = libmbedtls;
 #else
+	(void) libmbedcrypto;
+	(void) libmbedx509;
 	(void) libmbedtls;
 #endif
 }
@@ -351,7 +449,7 @@ bool mbedtls_conf::load(void)
 {
 #ifdef HAS_MBEDTLS_DLL
 	acl_pthread_once(&__mbedtls_once, mbedtls_dll_load);
-	if (__mbedtls_dll == NULL) {
+	if (__crypto_dll == NULL || __x509_dll == NULL || __tls_dll == NULL) {
 		logger_error("load mbedtls error");
 		return false;
 	}

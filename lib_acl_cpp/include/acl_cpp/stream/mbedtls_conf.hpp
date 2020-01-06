@@ -75,9 +75,12 @@ public:
 public:
 	/**
 	 * 必须首先调用此函数设置 libmbedtls_all.so 的全路径
-	 * @param path {const char*} libmbedtls_all.so 的全路径
+	 * @param libmbedcrypto {const char*} libmbedcrypto 动态库的全路径
+	 * @param libmbedx509 {const char*} libmbedx509 动态库的全路径
+	 * @param libmbedtls {const char*} libmbedtls 动态库的全路径
 	 */
-	static void set_libpath(const char* libmbedtls);
+	static void set_libpath(const char* libmbedcrypto,
+		const char* libmbedx509, const char* libmbedtls);
 
 	/**
 	 * 可以显式调用本方法，动态加载 mbedtls 动态库

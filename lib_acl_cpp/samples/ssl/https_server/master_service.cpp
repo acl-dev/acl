@@ -5,11 +5,21 @@
 ////////////////////////////////////////////////////////////////////////////////
 // ≈‰÷√ƒ⁄»›œÓ
 
+char *var_cfg_libcrypto_path;
+char *var_cfg_libx509_path;
 char *var_cfg_libssl_path;
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "libssl_path", "./libpolarssl.so", &var_cfg_libssl_path },
+#ifdef __APPLE__
+	{ "libcrypto_path", "./libmbedcrypto.dylib", &var_cfg_libcrypto_path },
+	{ "libx509_path", "./libmbedx509.dylib", &var_cfg_libx509_path },
+	{ "libssl_path", "./libmbedtls.dylib", &var_cfg_libssl_path },
+#else
+	{ "libcrypto_path", "./libmbedcrypto.so", &var_cfg_libcrypto_path },
+	{ "libx509_path", "./libmbedx509.so", &var_cfg_libx509_path },
+	{ "libssl_path", "./lib.so", &var_cfg_libssl_path },
+#endif
 	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
 	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
 
@@ -148,7 +158,8 @@ void master_service::proc_on_init()
 	}
 
 	if (strstr(var_cfg_libssl_path, "mbedtls")) {
-		acl::mbedtls_conf::set_libpath(var_cfg_libssl_path);
+		acl::mbedtls_conf::set_libpath(var_cfg_libcrypto_path,
+			var_cfg_libx509_path, var_cfg_libssl_path);
 		if (!acl::mbedtls_conf::load()) {
 			logger_error("load %s error", var_cfg_libssl_path);
 			return;

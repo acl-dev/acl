@@ -335,16 +335,13 @@ protected:
 		printf("accept one fd=%d\r\n", stream->sock_handle());
 
 		if (conf_) {
-			// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
-			// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
+			// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册
+			// 至网络连接流对象中，即用 ssl io 替换 stream 中默认
+			// 的底层 IO 过程
 
 			logger("begin setup ssl hook...");
 
-#ifdef USE_MBEDTLS
-			acl::sslbase_io* ssl = new acl::mbedtls_io(*conf_, true);
-#else
-			acl::sslbase_io* ssl = new acl::polarssl_io(*conf_, true);
-#endif
+			acl::sslbase_io* ssl = conf_->open(true, false);
 			if (stream->setup_hook(ssl) == ssl) {
 				logger_error("setup_hook error!");
 				ssl->destroy();
@@ -352,6 +349,7 @@ protected:
 				logger("setup ssl hook ok");
 			}
 		}
+
 		do_run(stream);
 	}
 
@@ -433,12 +431,15 @@ int main(int argc, char* argv[])
 
 #ifdef USE_MBEDTLS
 # ifdef __APPLE__
-	const char* libssl_path = "../libmbedtls_all.dylib";
-	acl::mbedtls_conf::set_libpath(libssl_path);
+	const char* libcrypto_path = "../libmbedcrypto.dylib";
+	const char* libx509_path   = "../libmbedx509.dylib";
+	const char* libssl_path    = "../libmbedtls.dylib";
 # else
-	const char* libssl_path = "../libmbedtls_all.so";
-	acl::mbedtls_conf::set_libpath(libssl_path);
+	const char* libcrypto_path = "../libmbedcrypto.so";
+	const char* libx509_path   = "../libmbedx509.so";
+	const char* libssl_path    = "../libmbedtls.so";
 # endif
+	acl::mbedtls_conf::set_libpath(libcrypto_path, libx509_path, libssl_path);
 	if (!acl::mbedtls_conf::load()) {
 		printf("load %s error\r\n", libssl_path);
 		return 1;

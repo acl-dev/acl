@@ -119,7 +119,12 @@ int main(int argc, char* argv[])
 	}
 
 	if (libpath.find("mbedtls") != NULL) {
-		acl::mbedtls_conf::set_libpath(libpath);
+		const std::vector<acl::string>& libs = libpath.split2(";");
+		if (libs.size() != 3) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 		if (!acl::mbedtls_conf::load()) {
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;

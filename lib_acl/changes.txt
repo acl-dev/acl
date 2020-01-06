@@ -1,5 +1,8 @@
 修改历史列表：
 
+668) 2020.1.6
+668.1) feature: acl::mbedtls_conf 支持动态加载 mbedtls 的三个动态库
+
 667) 2020.1.2
 667.1) bugfix: acl_vstream.c 中函数 read_to_buffer() 的返回值应区分 0 和 -1，
 否则下面的 acl_vstream_xxx_peek() 函数集不好处理
