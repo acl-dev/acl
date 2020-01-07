@@ -21,6 +21,7 @@ CFLAGS = -c -g -W \
 -DUSE_JMP \
 -Wmissing-prototypes \
 -Wcast-qual \
+-Wno-absolute-value \
 -DUSE_FAST_RING \
 #-DUSE_FAST_TIME \
 #-DDEBUG_MEM \

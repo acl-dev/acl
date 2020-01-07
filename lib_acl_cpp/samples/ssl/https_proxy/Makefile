@@ -1,5 +1,6 @@
 base_path = ../../..
 include ../../Makefile.in
+CFLAGS += -Wno-deprecated-declarations
 #Path for SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	EXTLIBS = -liconv
