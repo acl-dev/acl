@@ -74,7 +74,7 @@ public:
 
 public:
 	/**
-	 * 必须首先调用此函数设置 libmbedtls_all.so 的全路径
+	 * 如果 mbedtls 分成三个库，可以调用本函数设置三个动态库的全路径
 	 * @param libmbedcrypto {const char*} libmbedcrypto 动态库的全路径
 	 * @param libmbedx509 {const char*} libmbedx509 动态库的全路径
 	 * @param libmbedtls {const char*} libmbedtls 动态库的全路径
@@ -83,7 +83,13 @@ public:
 		const char* libmbedx509, const char* libmbedtls);
 
 	/**
-	 * 可以显式调用本方法，动态加载 mbedtls 动态库
+	 * 如果 mbedtls 合成一个库，可以调用本函数设置一个动态库的全路径
+	 * @param libmbedtls_all {const char*} libmbedtls_all 动态库的全路径
+	 */
+	static void set_libpath(const char* libmbedtls);
+
+	/**
+	 * 显式调用本方法，动态加载 mbedtls 动态库
 	 * @return {bool} 加载是否成功
 	 */
 	static bool load(void);

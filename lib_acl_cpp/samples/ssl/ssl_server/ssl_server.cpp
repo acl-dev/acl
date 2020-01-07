@@ -146,7 +146,7 @@ public:
 	{
 		param1_ = req.getParameter("name1");
 		param2_ = req.getParameter("name2");
-		param3_ = req.getParameter("name2");
+		param3_ = req.getParameter("name3");
 		return doResponse(req, res);
 	}
 
@@ -361,7 +361,7 @@ protected:
 		}
 
 		// 允许服务端的 SSL 会话缓存功能
-		conf_->enable_cache(true);
+		//conf_->enable_cache(true);
 
 		// 添加本地服务的证书
 		if (conf_->add_cert(crt_file_.c_str()) == false) {
@@ -434,12 +434,16 @@ int main(int argc, char* argv[])
 	const char* libcrypto_path = "../libmbedcrypto.dylib";
 	const char* libx509_path   = "../libmbedx509.dylib";
 	const char* libssl_path    = "../libmbedtls.dylib";
-# else
+	acl::mbedtls_conf::set_libpath(libcrypto_path, libx509_path, libssl_path);
+# elif defined(_WIN32) || defined(_WIN64)
+	const char* libssl_path    = "../mbedtls.dll";
+	acl::mbedtls_conf::set_libpath(libssl_path);  // 一个总的动态库
+# else defined(__linux__)
 	const char* libcrypto_path = "../libmbedcrypto.so";
 	const char* libx509_path   = "../libmbedx509.so";
 	const char* libssl_path    = "../libmbedtls.so";
-# endif
 	acl::mbedtls_conf::set_libpath(libcrypto_path, libx509_path, libssl_path);
+# endif
 	if (!acl::mbedtls_conf::load()) {
 		printf("load %s error\r\n", libssl_path);
 		return 1;

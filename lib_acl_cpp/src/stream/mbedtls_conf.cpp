@@ -454,6 +454,11 @@ void mbedtls_conf::set_libpath(const char* libmbedcrypto,
 #endif
 }
 
+void mbedtls_conf::set_libpath(const char* libmbedtls)
+{
+	set_libpath(libmbedtls, libmbedtls, libmbedtls);
+}
+
 bool mbedtls_conf::load(void)
 {
 #ifdef HAS_MBEDTLS_DLL
