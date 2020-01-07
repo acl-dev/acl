@@ -439,7 +439,7 @@ int main(int argc, char* argv[])
 	const char* libssl_path    = "../mbedtls.dll";
 	acl::mbedtls_conf::set_libpath(libssl_path);  // 一个总的动态库
 # elif defined(__linux__)
-#define USE_ONE
+#  define USE_ONE
 #  ifdef USE_ONE
 	const char* libssl_path    = "../libmbedtls_all.so";
 	acl::mbedtls_conf::set_libpath(libssl_path);
