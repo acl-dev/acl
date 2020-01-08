@@ -229,7 +229,7 @@ static void mbedtls_dll_unload(void)
 	__tls_path_buf    = NULL;
 }
 
-extern bool mbedtls_dll_load_io(void); // defined in mbedtls_io.cpp
+extern bool mbedtls_load_io(void); // defined in mbedtls_io.cpp
 
 #define LOAD_CRYPTO(name, type, fn) do {				\
 	(fn) = (type) acl_dlsym(__crypto_dll, (name));			\
@@ -315,7 +315,7 @@ static bool load_from_ssl(void)
 	return true;
 }
 
-static bool mbedtls_dll_load_conf(void)
+static bool load_all_dlls(void)
 {
 	if (__crypto_path_buf && !__crypto_path_buf->empty()) {
 		__crypto_path = __crypto_path_buf->c_str();
@@ -333,18 +333,24 @@ static bool mbedtls_dll_load_conf(void)
 		return false;
 	}
 
-	__x509_dll = acl_dlopen(__x509_path);
-	if (__x509_dll == NULL) {
+	if (strcmp(__x509_path, __crypto_path) == 0) {
+		__x509_dll = __crypto_dll;
+	} else if ((__x509_dll = acl_dlopen(__x509_path)) == NULL) {
 		logger_error("load %s error %s", __x509_path, acl_dlerror());
 		return false;
 	}
 
-	__tls_dll = acl_dlopen(__tls_path);
-	if (__tls_dll == NULL) {
+	if (strcmp(__tls_path, __crypto_path) == 0) {
+		__tls_dll = __crypto_dll;
+	} else if ((__tls_dll = acl_dlopen(__tls_path)) == NULL) {
 		logger_error("load %s error %s", __tls_path, acl_dlerror());
 		return false;
 	}
+	return true;
+}
 
+static bool mbedtls_load_conf(void)
+{
 	if (!load_from_crypto()) {
 		return false;
 	}
@@ -361,13 +367,17 @@ static void mbedtls_dll_load(void)
 		return;
 	}
 
-	if (!mbedtls_dll_load_conf()) {
+	if (!load_all_dlls()) {
+		return;
+	}
+
+	if (!mbedtls_load_conf()) {
 		logger_error("mbedtls_dll_load_conf %s error", __tls_path);
 		acl_dlclose(__tls_dll);
 		__tls_dll = NULL;
 		return;
 	}
-	if (!mbedtls_dll_load_io()) {
+	if (!mbedtls_load_io()) {
 		logger_error("mbedtls_dll_load_io %s error", __tls_path);
 		acl_dlclose(__tls_dll);
 		__tls_dll = NULL;
@@ -375,8 +385,12 @@ static void mbedtls_dll_load(void)
 	}
 
 	logger("%s loaded!", __crypto_path);
-	logger("%s loaded!", __x509_path);
-	logger("%s loaded!", __tls_path);
+	if (strcmp(__crypto_path, __x509_path) != 0) {
+		logger("%s loaded!", __x509_path);
+	}
+	if (strcmp(__crypto_path, __tls_path) != 0) {
+		logger("%s loaded!", __tls_path);
+	}
 	atexit(mbedtls_dll_unload);
 }
 
@@ -618,12 +632,6 @@ bool mbedtls_conf::init_once(void)
 	}
 
 	__ssl_conf_ciphersuites((mbedtls_ssl_config*) conf_, cipher_suites);
-
-	// Setup cache only for server-side
-	if (server_side_ && cache_ != NULL) {
-		__ssl_conf_session_cache((mbedtls_ssl_config*) conf_, cache_,
-			__ssl_cache_get, __ssl_cache_set);
-	}
 #endif
 	init_status_ = CONF_INIT_OK;
 	return true;
@@ -856,6 +864,11 @@ void mbedtls_conf::enable_cache(bool on)
 		__ssl_cache_free((mbedtls_ssl_cache_context*) cache_);
 		acl_myfree(cache_);
 		cache_ = NULL;
+	}
+	// Setup cache only for server-side
+	if (server_side_ && cache_ != NULL) {
+		__ssl_conf_session_cache((mbedtls_ssl_config*) conf_, cache_,
+			__ssl_cache_get, __ssl_cache_set);
 	}
 #else
 	(void) on;

@@ -361,7 +361,7 @@ protected:
 		}
 
 		// 允许服务端的 SSL 会话缓存功能
-		//conf_->enable_cache(true);
+		conf_->enable_cache(true);
 
 		// 添加本地服务的证书
 		if (conf_->add_cert(crt_file_.c_str()) == false) {

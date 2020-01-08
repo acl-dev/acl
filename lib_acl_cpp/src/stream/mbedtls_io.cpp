@@ -75,7 +75,7 @@ static ssl_get_bytes_avail_fn		__ssl_get_bytes_avail;
 
 extern ACL_DLL_HANDLE __tls_dll;  // defined in mbedtls_conf.cpp
 
-bool mbedtls_dll_load_io(void)
+bool mbedtls_load_io(void)
 {
 #define LOAD(name, type, fn) do {					\
 	(fn) = (type) acl_dlsym(__tls_dll, (name));			\
