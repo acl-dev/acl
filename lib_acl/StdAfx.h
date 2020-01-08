@@ -23,7 +23,9 @@
 #  endif
 
 #  include <ws2tcpip.h> /* for getaddrinfo */
-#  include <netioapi.h>
+#  if _MSC_VER >= 1500
+#   include <netioapi.h>
+#  endif
 
 #  ifdef __STDC_WANT_SECURE_LIB__
 int acl_secure_snprintf(char *buf, size_t size, const char *fmt, ...);

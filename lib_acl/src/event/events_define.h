@@ -35,8 +35,14 @@ extern "C" {
 # undef	ACL_EVENTS_KERNEL_STYLE
 #endif
 
-#if	defined(ACL_UNIX) || defined(_WIN32) || defined(_WIN64)
+#if	defined(ACL_UNIX)
 # define	ACL_EVENTS_POLL_STYLE	5
+#elif defined(_WIN32) || defined(_WIN64)
+# if _MSC_VER >= 1600
+#  define	ACL_EVENTS_POLL_STYLE	5
+# else
+#  undef	ACL_EVENTS_POLL_STYLE
+# endif
 #else
 # undef		ACL_EVENTS_POLL_STYLE
 #endif
