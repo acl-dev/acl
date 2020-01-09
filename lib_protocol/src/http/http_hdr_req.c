@@ -187,7 +187,7 @@ HTTP_HDR_REQ *http_hdr_req_create(const char *url,
 	char proto[32];
 	const char *ptr;
 	static char *__user_agent = "Mozilla/5.0 (Windows; U; Windows NT 5.0"
-		"; zh-CN; rv:1.9.0.3) Gecko/2008092417 ACL/3.0.6";
+		"; zh-CN; rv:1.9.0.3) Gecko/2008092417 ACL/3.5.0-12";
 
 	if (url == NULL || *url == 0) {
 		acl_msg_error("%s(%d): url invalid", myname, __LINE__);
