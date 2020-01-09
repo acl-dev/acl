@@ -73,7 +73,7 @@
 # include <sys/sendfile.h>
 # include <sys/epoll.h>
 
-# if !defined(__aarch64__)
+# if !defined(__aarch64__) && !defined(__arm__)
 #  define USE_FAST_TIME
 # endif
 
