@@ -21,7 +21,6 @@ CFLAGS = -c -g -W \
 -DUSE_JMP \
 -Wmissing-prototypes \
 -Wcast-qual \
--Wno-absolute-value \
 -DUSE_FAST_RING \
 #-DUSE_FAST_TIME \
 #-DDEBUG_MEM \
@@ -66,6 +65,7 @@ ifeq ($(findstring gcc, $(CC)), gcc)
 	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
 	ifeq ($(GCC_VER), true)
 		CFLAGS += -Wno-implicit-fallthrough
+		CFLAGS += -Wno-absolute-value
 	endif
 endif
 
