@@ -1,4 +1,4 @@
-%define release_id 11
+%define release_id 12
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,10 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Thu Jan 09 2020 shuxin.zheng@qq.com 3.5.0-12-20200109.09
+- many optimization in acl
+- acl-master start up with keep mask
 
 * Thu Sep 19 2019 shuxin.zheng@qq.com 3.5.0-11-20190919.10
 - optimize: many optimizing for decrease libs' size for mobile platom
