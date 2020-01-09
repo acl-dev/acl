@@ -550,7 +550,7 @@ int polarssl_io::send(const void* buf, size_t len)
 		total_bytes += bytes_written;
 	}
 
-	return total_bytes;
+	return (int) total_bytes;
 #else
 	(void) buf;
 	(void) len;
