@@ -341,7 +341,7 @@ protected:
 
 			logger("begin setup ssl hook...");
 
-			acl::sslbase_io* ssl = conf_->open(true, false);
+			acl::sslbase_io* ssl = conf_->open(false);
 			if (stream->setup_hook(ssl) == ssl) {
 				logger_error("setup_hook error!");
 				ssl->destroy();

@@ -214,7 +214,7 @@ private:
 
 	bool setup_ssl(acl::sslbase_conf& ssl_conf)
 	{
-		acl::sslbase_io* ssl = ssl_conf.open(false, true);
+		acl::sslbase_io* ssl = ssl_conf.open(true);
 
 		// 将 SSL IO 过程注册至异步流中
 		if (client_->setup_hook(ssl) == ssl) {

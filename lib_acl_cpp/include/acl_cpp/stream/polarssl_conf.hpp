@@ -27,7 +27,14 @@ class polarssl_io;
 class ACL_CPP_API polarssl_conf : public sslbase_conf
 {
 public:
-	polarssl_conf(void);
+	/**
+	 * 构造函数
+	 * @param server_side {bool} 用来指定是服务端还是客户端，当为 true 时
+	 *  为服务端模式，否则为客户端模式
+	 * @param verify_mode {polarssl_verify_t} SSL 证书校验级别
+	 */
+	polarssl_conf(bool server_side = false,
+		polarssl_verify_t verify_mode = POLARSSL_VERIFY_NONE);
 	virtual ~polarssl_conf(void);
 
 	/**
@@ -89,7 +96,7 @@ public:
 
 public:
 	// @override sslbase_conf
-	sslbase_io* open(bool server_side, bool nblock);
+	sslbase_io* open(bool nblock);
 
 private:
 	friend class polarssl_io;
@@ -97,6 +104,7 @@ private:
 	bool has_inited_;
 	thread_mutex lock_;
 
+	bool  server_side_;
 	void* entropy_;
 	void* cacert_;
 	void* pkey_;

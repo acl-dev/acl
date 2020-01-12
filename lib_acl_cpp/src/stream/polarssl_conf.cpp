@@ -288,9 +288,10 @@ void polarssl_conf::init_once(void)
 	lock_.unlock();
 }
 
-polarssl_conf::polarssl_conf(void)
+polarssl_conf::polarssl_conf(bool server_side, polarssl_verify_t verify_mode)
 {
 #ifdef HAS_POLARSSL
+	server_side_ = server_side;
 	has_inited_  = false;
 	entropy_     = acl_mycalloc(1, sizeof(entropy_context));
 	cacert_      = NULL;
@@ -298,8 +299,9 @@ polarssl_conf::polarssl_conf(void)
 	
 	cache_       = NULL;
 	pkey_        = NULL;
-	verify_mode_ = POLARSSL_VERIFY_NONE;
+	verify_mode_ = verify_mode;
 #else
+	(void) server_side_;
 	(void) entropy_;
 	(void) cacert_;
 	(void) cert_chain_;
@@ -567,9 +569,9 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 #endif
 }
 
-sslbase_io* polarssl_conf::open(bool server_side, bool nblock)
+sslbase_io* polarssl_conf::open(bool nblock)
 {
-	return new polarssl_io(*this, server_side, nblock);
+	return new polarssl_io(*this, server_side_, nblock);
 }
 
 } // namespace acl

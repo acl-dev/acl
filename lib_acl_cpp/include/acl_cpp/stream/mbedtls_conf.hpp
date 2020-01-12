@@ -31,8 +31,10 @@ public:
 	 * 构造函数
 	 * @param server_side {bool} 用来指定是服务端还是客户端，当为 true 时
 	 *  为服务端模式，否则为客户端模式
+	 * @param verify_mode {mbedtls_verify_t} SSL 证书校验级别
 	 */
-	mbedtls_conf(bool server_side);
+	mbedtls_conf(bool server_side = false,
+		mbedtls_verify_t verify_mode = MBEDTLS_VERIFY_NONE);
 	~mbedtls_conf(void);
 
 	/**
@@ -96,7 +98,7 @@ public:
 
 public:
 	// @override sslbase_conf
-	sslbase_io* open(bool server_side, bool nblock);
+	sslbase_io* open(bool nblock);
 
 private:
 	friend class mbedtls_io;
@@ -105,7 +107,7 @@ private:
 	unsigned cert_status_;
 	thread_mutex lock_;
 
-	bool server_side_;
+	bool  server_side_;
 
 	void* conf_;
 	void* entropy_;

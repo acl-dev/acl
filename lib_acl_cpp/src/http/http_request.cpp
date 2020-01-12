@@ -155,7 +155,7 @@ bool http_request::try_open(bool* reuse_conn)
 		return true;
 	}
 
-	sslbase_io* ssl = ssl_conf_->open(false, false);
+	sslbase_io* ssl = ssl_conf_->open(false);
 	if (client_->get_stream().setup_hook(ssl) == ssl) {
 		logger_error("open client ssl error to: %s", addr_);
 		ssl->destroy();

@@ -643,10 +643,10 @@ bool mbedtls_conf::init_once(void)
 #define CONF_OWN_CERT_OK	1
 #define CONF_OWN_CERT_ERR	2
 
-mbedtls_conf::mbedtls_conf(bool server_side)
+mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 {
-	server_side_ = server_side;
 #ifdef HAS_MBEDTLS
+	server_side_ = server_side;
 	init_status_ = CONF_INIT_NIL;
 	cert_status_ = CONF_OWN_CERT_NIL;
 	conf_        = acl_mycalloc(1, sizeof(mbedtls_ssl_config));
@@ -657,8 +657,9 @@ mbedtls_conf::mbedtls_conf(bool server_side)
 	
 	cache_       = NULL;
 	pkey_        = NULL;
-	verify_mode_ = MBEDTLS_VERIFY_NONE;
+	verify_mode_ = verify_mode;
 #else
+	(void) server_side_;
 	(void) init_status_;
 	(void) cert_status_;
 	(void) conf_;
@@ -920,9 +921,9 @@ bool mbedtls_conf::setup_certs(void* ssl)
 #endif
 }
 
-sslbase_io* mbedtls_conf::open(bool server_side, bool nblock)
+sslbase_io* mbedtls_conf::open(bool nblock)
 {
-	return new mbedtls_io(*this, server_side, nblock);
+	return new mbedtls_io(*this, server_side_, nblock);
 }
 
 } // namespace acl

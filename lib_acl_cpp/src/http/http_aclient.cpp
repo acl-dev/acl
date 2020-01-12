@@ -183,7 +183,7 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	}
 
 	// 因为配置了 SSL 通信方式，所以需要创建 SSL IO 过程，开始 SSL 握手
-	sslbase_io* ssl_io = ssl_conf_->open(false, true);
+	sslbase_io* ssl_io = ssl_conf_->open(true);
 	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
 		logger_error("open ssl failed");
 		conn_->remove_hook();
