@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -132,6 +132,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Sun Jan 12 2020 shuxin.zheng@qq.com 3.5.1-1-20200112.22
+- release acl3.5.1-1 for making ssl method more easily to use.
 
 * Thu Jan 09 2020 shuxin.zheng@qq.com 3.5.1-0-20200109.09
 - release acl 3.5.1 version

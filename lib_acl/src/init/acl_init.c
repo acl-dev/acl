@@ -24,11 +24,11 @@
 
 #include "init.h"
 
-static char *version = "3.5.1 20200109";
+static char *version = "3.5.1-1 20200112";
 
 const char *acl_version(void)
 {
-	return (version);
+	return version;
 }
 
 #ifdef ACL_UNIX
