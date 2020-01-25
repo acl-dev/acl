@@ -60,7 +60,8 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 			acl_fiber_self(), __server_ip, __server_port,
 			__total_clients, fd);
 
-		echo_client(fd);
+		//echo_client(fd);
+		sleep(1000);
 	}
 
 	--__left_fibers;
