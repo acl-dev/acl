@@ -25,7 +25,7 @@ static int do_echo(ACL_VSTREAM *conn)
 	conn->rw_timeout = __rw_timeout;
 	ret = acl_vstream_gets_nonl(conn, buf, sizeof(buf) - 1);
 	if (ret == ACL_VSTREAM_EOF) {
-		printf("gets error %s\r\n", acl_last_serror());
+		//printf("gets error %s\r\n", acl_last_serror());
 		return -1;
 	}
 	buf[ret] = 0;
@@ -60,6 +60,7 @@ static void client_callback(int type acl_unused, ACL_EVENT *event,
 	conn->context = event;
 	acl_event_disable_readwrite(event, conn);
 
+	printf(">>>client_callback called, fd=%d\n", ACL_VSTREAM_SOCK(conn));
 	acl_fiber_create(echo_client, conn, 160000);
 }
 
@@ -116,7 +117,7 @@ int main(int argc, char *argv[])
 	ACL_VSTREAM *sstream;
 	int  ch;
 
-	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:7001");
+	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:8282");
 
 	while ((ch = getopt(argc, argv, "hs:r:k")) > 0) {
 		switch (ch) {

@@ -263,14 +263,18 @@ static void read_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	EPOLL_EVENT *ee = epx->ee;
 
 	assert(ee);
-	assert(ee->nready < ee->maxevents);
 	assert(epx->mask & EVENT_READ);
+
+	if (ee->nready >= ee->maxevents) {
+		return;
+	}
 
 	ee->events[ee->nready].events |= EPOLLIN;
 	memcpy(&ee->events[ee->nready].data, &ee->fds[epx->fd]->data,
 		sizeof(ee->fds[epx->fd]->data));
-	if (!(ee->events[ee->nready].events & EPOLLOUT))
+	if (!(ee->events[ee->nready].events & EPOLLOUT)) {
 		ee->nready++;
+	}
 	SET_READABLE(fe);
 }
 
@@ -280,14 +284,17 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	EPOLL_EVENT *ee = epx->ee;
 
 	assert(ee);
-	assert(ee->nready < ee->maxevents);
 	assert(epx->mask & EVENT_WRITE);
+	if (ee->nready >= ee->maxevents) {
+		return;
+	}
 
 	ee->events[ee->nready].events |= EPOLLOUT;
 	memcpy(&ee->events[ee->nready].data, &ee->fds[epx->fd]->data,
 		sizeof(ee->fds[epx->fd]->data));
-	if (!(ee->events[ee->nready].events & EPOLLIN))
+	if (!(ee->events[ee->nready].events & EPOLLIN)) {
 		ee->nready++;
+	}
 	SET_WRITABLE(fe);
 }
 
@@ -320,10 +327,12 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 
 static void epoll_ctl_del(EVENT *ev, EPOLL_EVENT *ee, int fd)
 {
-	if (ee->fds[fd]->mask & EVENT_READ)
+	if (ee->fds[fd]->mask & EVENT_READ) {
 		event_del_read(ev, ee->fds[fd]->fe);
-	if (ee->fds[fd]->mask & EVENT_WRITE)
+	}
+	if (ee->fds[fd]->mask & EVENT_WRITE) {
 		event_del_write(ev, ee->fds[fd]->fe);
+	}
 
 	ee->fds[fd]->fd      = -1;
 	ee->fds[fd]->op      = 0;

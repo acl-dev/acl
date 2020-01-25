@@ -18,6 +18,7 @@ static int __max_fibers   = 100;
 static int __left_fibers  = 100;
 static int __stack_size   = 320000;
 
+#ifdef DO_ECHO
 static void echo_client(int fd)
 {
 	char  buf[8192];
@@ -30,6 +31,7 @@ static void echo_client(int fd)
 
 	close(fd);
 }
+#endif
 
 static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
@@ -60,23 +62,32 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 			acl_fiber_self(), __server_ip, __server_port,
 			__total_clients, fd);
 
-		//echo_client(fd);
+#ifdef DO_ECHO
+		echo_client(fd);
+#else
 		sleep(1000);
+#endif
 	}
 
 	--__left_fibers;
 	printf("max_fibers: %d, left: %d\r\n", __max_fibers, __left_fibers);
 
-	if (__left_fibers == 0)
+	if (__left_fibers == 0) {
 		acl_fiber_schedule_stop();
+	}
 }
 
-static void create_fibers(void)
+static void fiber_connector(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	int i;
 
-	for (i = 0; i < __max_fibers; i++)
+	for (i = 0; i < __max_fibers; i++) {
 		acl_fiber_create(fiber_connect, NULL, __stack_size);
+		if (i > 0 && i % 200 == 0) {
+			printf("============i=%d=============\r\n", i);
+			acl_fiber_delay(500);
+		}
+	}
 }
 
 static void usage(const char *procname)
@@ -124,7 +135,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	create_fibers();
+	acl_fiber_create(fiber_connector, NULL, __stack_size);
 
 	printf("call fiber_schedule\r\n");
 

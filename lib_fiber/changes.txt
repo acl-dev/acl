@@ -1,4 +1,10 @@
 
+115) 2020.1.25
+115.1) bugfix: hook/epoll.c，在 read_callback/write_callback 中如果 nready
+超过了 maxevents，则会引起崩溃，原因是用户在调用 epoll_wait 时可能给定的值
+maxevents 会比较小，所以在 read_callback/write_callback 就增加判断，如果发现
+准备好的句柄数大于 maxevents 值，则直接返回，准备在下次再处理
+
 114) 2019.9.19
 114.1) bugfix: event_epoll.c 中当 epoll_wait 返回 -1 时应该判断 errno 是否为
 中断信号再决定是否需要记录日志
