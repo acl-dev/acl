@@ -78,8 +78,10 @@ typedef unsigned long u_long;
 #ifndef	WIN32
 #ifdef _WIN64
 typedef int64_t ssize_t;
+/*
 #else
-//typedef int32_t ssize_t;
+typedef int32_t ssize_t;
+*/
 #endif
 #endif
 
@@ -107,7 +109,7 @@ typedef u_int64_t uintmax_t;
 
 #ifdef _WIN64
 typedef u_int64_t uintptr_t;
-#elif !defined(__APPLE__)
+#elif !defined(__APPLE__) && !defined(__linux__)
 typedef u_int32_t uintptr_t;
 #endif
 
