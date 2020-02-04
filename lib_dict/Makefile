@@ -87,16 +87,16 @@ endif
 
 OUT_PATH = .
 OBJ_PATH_DST = $(OUT_PATH)/debug
-LIB_PATH_DST = $(OUT_PATH)/lib
+LIB_PATH_DST = $(OUT_PATH)
 
 BASE_PATH  = .
 INC_PATH_SRC = $(BASE_PATH)/include
 SRC_PATH_SRC = $(BASE_PATH)/src
 
-INC_COMPILE  = -I$(INC_PATH_SRC) -I./cdb/include -I./tc/include
-CFLAGS += $(INC_COMPILE) -DHAS_BDB
+INC_COMPILE  = -I$(INC_PATH_SRC) -I./bdb/include -I./cdb/include -I./tc/include
+#CFLAGS += $(INC_COMPILE) -DHAS_BDB
 #CFLAGS += $(INC_COMPILE)
-#CFLAGS += $(INC_COMPILE) -DHAS_DB -DHAS_TC -DHAS_CDB
+CFLAGS += $(INC_COMPILE) -DHAS_DB -DHAS_TC -DHAS_CDB
 
 #Project's objs
 DICT_SRC   = $(wildcard $(SRC_PATH_SRC)/*.c)

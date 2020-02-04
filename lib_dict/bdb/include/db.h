@@ -64,8 +64,8 @@ typedef short int16_t;
 typedef unsigned short u_int16_t;
 typedef int int32_t;
 typedef unsigned int u_int32_t;
-typedef __int64 int64_t;
-typedef unsigned __int64 u_int64_t;
+typedef long long int64_t;
+typedef unsigned long long u_int64_t;
 #endif
 
 #ifndef _WINSOCKAPI_
@@ -79,7 +79,7 @@ typedef unsigned long u_long;
 #ifdef _WIN64
 typedef int64_t ssize_t;
 #else
-typedef int32_t ssize_t;
+//typedef int32_t ssize_t;
 #endif
 #endif
 
@@ -101,10 +101,13 @@ typedef int32_t ssize_t;
  * get upset about that.  So far we haven't run on any machine where there's
  * no unsigned type the same size as a pointer -- here's hoping.
  */
+#if !defined(__APPLE__)
 typedef u_int64_t uintmax_t;
+#endif
+
 #ifdef _WIN64
 typedef u_int64_t uintptr_t;
-#else
+#elif !defined(__APPLE__)
 typedef u_int32_t uintptr_t;
 #endif
 

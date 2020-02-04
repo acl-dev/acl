@@ -19,7 +19,7 @@ typedef struct {
 
 /* mac_expand_callback - callback for mac_parse */
 
-static int mac_expand_callback(int type, ACL_VSTRING *buf, char *ptr)
+static int mac_expand_callback(int type, ACL_VSTRING *buf, void *ptr)
 {
     MAC_EXP *mc = (MAC_EXP *) ptr;
     int     lookup_mode;
@@ -27,7 +27,7 @@ static int mac_expand_callback(int type, ACL_VSTRING *buf, char *ptr)
     char   *cp, *pp = NULL;
     int     ch;
     ssize_t len;
-	size_t  size;
+    size_t  size;
 
     /*
      * Sanity check.
@@ -79,11 +79,11 @@ static int mac_expand_callback(int type, ACL_VSTRING *buf, char *ptr)
 	switch (ch) {
 	case '?':
 	    if (text != 0 && *text != 0)
-		mac_parse(cp, mac_expand_callback, (char *) mc);
+		mac_parse(cp, mac_expand_callback, mc);
 	    break;
 	case ':':
 	    if (text == 0 || *text == 0)
-		mac_parse(cp, mac_expand_callback, (char *) mc);
+		mac_parse(cp, mac_expand_callback, mc);
 	    break;
 	default:
 	    if (text == 0) {
@@ -92,7 +92,7 @@ static int mac_expand_callback(int type, ACL_VSTRING *buf, char *ptr)
 		 /* void */ ;
 	    } else if (mc->flags & MAC_EXP_FLAG_RECURSE) {
 		acl_vstring_strcpy(buf, text);
-		mac_parse(acl_vstring_str(buf), mac_expand_callback, (char *) mc);
+		mac_parse(acl_vstring_str(buf), mac_expand_callback, mc);
 	    } else {
 		len = (int) ACL_VSTRING_LEN(mc->result);
 		acl_vstring_strcat(mc->result, text);
@@ -140,7 +140,7 @@ int     mac_expand(ACL_VSTRING *result, const char *pattern, int flags,
     mc.status = 0;
     mc.level = 0;
     ACL_VSTRING_RESET(result);
-    status = mac_parse(pattern, mac_expand_callback, (char *) &mc);
+    status = mac_parse(pattern, mac_expand_callback, &mc);
     ACL_VSTRING_TERMINATE(result);
 
     return (status);

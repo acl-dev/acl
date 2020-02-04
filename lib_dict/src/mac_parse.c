@@ -16,7 +16,7 @@
 
 /* mac_parse - split string into literal text and macro references */
 
-int     mac_parse(const char *value, MAC_PARSE_FN action, char *context)
+int     mac_parse(const char *value, MAC_PARSE_FN action, void *context)
 {
     const char *myname = "mac_parse";
     ACL_VSTRING *buf = acl_vstring_alloc(1);	/* result buffer */
