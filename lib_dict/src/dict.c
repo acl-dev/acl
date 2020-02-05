@@ -72,7 +72,7 @@ DICT   *dict_handle(const char *dict_name)
 {
 	DICT_NODE *node;
 
-	return ((node = dict_node(dict_name)) != 0 ? node->dict : 0);
+	return (node = dict_node(dict_name)) != 0 ? node->dict : 0;
 }
 
 /* dict_node_free - dict_unregister() callback */
@@ -115,7 +115,8 @@ void    dict_update(const char *dict_name, char *key, char *value, size_t len)
 		acl_msg_fatal("%s(%d): call dict_init first", myname, __LINE__);
 	if ((node = dict_node(dict_name)) == 0) {
 		if (dict_unknown_allowed == 0)
-			acl_msg_fatal("%s: unknown dictionary: %s", myname, dict_name);
+			acl_msg_fatal("%s: unknown dictionary: %s",
+				myname, dict_name);
 		dict = dict_ht_open(dict_name,
 				acl_htable_create(0, 0),
 				(void (*)(void*)) acl_myfree_fn);
@@ -140,15 +141,18 @@ const char *dict_lookup(const char *dict_name, char *key,
 		acl_msg_fatal("%s(%d): call dict_init first", myname, __LINE__);
 	if ((node = dict_node(dict_name)) == 0) {
 		if (dict_unknown_allowed == 0)
-			acl_msg_fatal("%s: unknown dictionary: %s", myname, dict_name);
+			acl_msg_fatal("%s: unknown dictionary: %s",
+				myname, dict_name);
 	} else {
 		dict = node->dict;
 		ret = dict->lookup(dict, key, strlen(key), value, size);
 		if (ret == 0 && dict_unknown_allowed == 0)
-			acl_msg_fatal("dictionary %s: unknown member: %s", dict_name, key);
+			acl_msg_fatal("dictionary %s: unknown member: %s",
+				dict_name, key);
 	}
-	acl_debug(DEBUG_DICT, 2)("%s: %s = %s", myname, key, ret ? ret : "(not found)");
-	return (ret);
+	acl_debug(DEBUG_DICT, 2)("%s: %s = %s", myname, key,
+		ret ? ret : "(not found)");
+	return ret;
 }
 
 /* dict_delete - delete dictionary entry */
@@ -164,7 +168,8 @@ int     dict_delete(const char *dict_name, char *key)
 		acl_msg_fatal("%s(%d): call dict_init first", myname, __LINE__);
 	if ((node = dict_node(dict_name)) == 0) {
 		if (dict_unknown_allowed == 0)
-			acl_msg_fatal("%s: unknown dictionary: %s", myname, dict_name);
+			acl_msg_fatal("%s: unknown dictionary: %s",
+				myname, dict_name);
 		dict = dict_ht_open(dict_name,
 				acl_htable_create(0, 0),
 				(void (*)(void*)) acl_myfree_fn);
@@ -172,10 +177,11 @@ int     dict_delete(const char *dict_name, char *key)
 	} else
 		dict = node->dict;
 	acl_debug(DEBUG_DICT, 2)("%s: delete %s", myname, key);
-	if ((result = dict->delete_it(dict, key, strlen(key))) != 0 && dict_unknown_allowed == 0)
+	if ((result = dict->delete_it(dict, key, strlen(key))) != 0
+			&& dict_unknown_allowed == 0)
 		acl_msg_fatal("%s: dictionary %s: unknown member: %s",
 			myname, dict_name, key);
-	return (result);
+	return result;
 }
 
 /* dict_sequence_reset - close the sequence cursor */
@@ -190,9 +196,9 @@ void dict_sequence_reset(const char *dict_name)
 		acl_msg_fatal("%s(%d): call dict_init first", myname, __LINE__);
 	if ((node = dict_node(dict_name)) == 0) {
 		if (dict_unknown_allowed == 0)
-			acl_msg_fatal("%s: unknown dictionary: %s", myname, dict_name);
-		dict = dict_ht_open(dict_name,
-				acl_htable_create(0, 0),
+			acl_msg_fatal("%s: unknown dictionary: %s",
+				myname, dict_name);
+		dict = dict_ht_open(dict_name, acl_htable_create(0, 0),
 				(void (*)(void*)) acl_myfree_fn);
 		dict_register(dict_name, dict);
 	} else
@@ -214,24 +220,24 @@ int dict_sequence_delcur(const char *dict_name)
 		acl_msg_fatal("%s(%d): call dict_init first", myname, __LINE__);
 	if ((node = dict_node(dict_name)) == 0) {
 		if (dict_unknown_allowed == 0)
-			acl_msg_fatal("%s: unknown dictionary: %s", myname, dict_name);
-		dict = dict_ht_open(dict_name,
-				acl_htable_create(0, 0),
+			acl_msg_fatal("%s: unknown dictionary: %s",
+				myname, dict_name);
+		dict = dict_ht_open(dict_name, acl_htable_create(0, 0),
 				(void (*)(void*)) acl_myfree_fn);
 		dict_register(dict_name, dict);
 	} else
 		dict = node->dict;
 
 	if (dict->sequence_delcur != NULL)
-		return (dict->sequence_delcur(dict));
+		return dict->sequence_delcur(dict);
 
-	return (-1);
+	return -1;
 }
 
 /* dict_sequence - traverse dictionary */
 
 int     dict_sequence(const char *dict_name, const int func,
-		char **key, size_t *key_size, char **value, size_t *value_size)
+	char **key, size_t *key_size, char **value, size_t *value_size)
 {
 	const char *myname = "dict_sequence";
 	DICT_NODE *node;
@@ -241,15 +247,15 @@ int     dict_sequence(const char *dict_name, const int func,
 		acl_msg_fatal("%s(%d): call dict_init first", myname, __LINE__);
 	if ((node = dict_node(dict_name)) == 0) {
 		if (dict_unknown_allowed == 0)
-			acl_msg_fatal("%s: unknown dictionary: %s", myname, dict_name);
-		dict = dict_ht_open(dict_name,
-				acl_htable_create(0, 0),
+			acl_msg_fatal("%s: unknown dictionary: %s",
+				myname, dict_name);
+		dict = dict_ht_open(dict_name, acl_htable_create(0, 0),
 				(void (*)(void*)) acl_myfree_fn);
 		dict_register(dict_name, dict);
 	} else
 		dict = node->dict;
 	acl_debug(DEBUG_DICT, 2)("%s: sequence func %d", myname, func);
-	return (dict->sequence(dict, func, key, key_size, value, value_size));
+	return dict->sequence(dict, func, key, key_size, value, value_size);
 }
 
 /* dict_load_file - read entries from text file */
@@ -257,13 +263,13 @@ int     dict_sequence(const char *dict_name, const int func,
 void    dict_load_file(const char *dict_name, const char *path)
 {
 	ACL_VSTREAM *fp;
-	struct acl_stat st;
+	struct  acl_stat st;
 	time_t  before;
 	time_t  after;
 
 	/*
-	 * Read the file again if it is hot. This may result in reading a partial
-	 * parameter name when a file changes in the middle of a read.
+	 * Read the file again if it is hot. This may result in reading a
+	 * partial parameter name when a file changes in the middle of a read.
 	 */
 	for (before = time((time_t *) 0); /* see below */ ; before = after) {
 		if ((fp = acl_vstream_fopen(path, O_RDONLY, 0600, 0)) == 0)
@@ -295,7 +301,7 @@ void    dict_load_fp(const char *dict_name, ACL_VSTREAM *fp)
 	while (acl_readlline(buf, fp, &lineno)) {
 		if ((err = acl_split_nameval(STR(buf), &member, &val)) != 0)
 			acl_msg_fatal("%s, line %d: %s: \"%s\"",
-					ACL_VSTREAM_PATH(fp), lineno, err, STR(buf));
+				ACL_VSTREAM_PATH(fp), lineno, err, STR(buf));
 		dict_update(dict_name, member, val, strlen(val));
 	}
 	acl_vstring_free(buf);
@@ -304,15 +310,16 @@ void    dict_load_fp(const char *dict_name, ACL_VSTREAM *fp)
 /* dict_eval_lookup - macro parser call-back routine */
 
 static const char *dict_eval_lookup(char *key, int type acl_unused,
-		const char *dict_name, char **value, size_t *size)
+	const char *dict_name, char **value, size_t *size)
 {
 	/*
 	 * XXX how would one recover?
 	 */
 	if (dict_lookup(dict_name, key, value, size) == 0 && dict_errno != 0)
-		acl_msg_fatal("dictionary %s: lookup %s: temporary error", dict_name, key);
+		acl_msg_fatal("dictionary %s: lookup %s: temporary error",
+			dict_name, key);
 
-	return (*value);
+	return *value;
 }
 
 static void free_vstring_fn(void *arg)
@@ -354,7 +361,7 @@ const char *dict_eval(char *dict_name, const char *value, int recursive)
 		else
 			acl_msg_info("%s: const  %s", myname, value);
 	}
-	return (STR(buf));
+	return STR(buf);
 }
 
 /* dict_walk - iterate over all dictionaries in arbitrary order */
@@ -395,7 +402,8 @@ const char *dict_changed_name(void)
 		if (dict->stat_fd < 0)			/* not file-based */
 			continue;
 		if (dict->mtime == 0)			/* not bloody likely */
-			acl_msg_warn("%s: table %s: null time stamp", myname, h->key.c_key);
+			acl_msg_warn("%s: table %s: null time stamp",
+				myname, h->key.c_key);
 		if (acl_stat(dict->db_path, &st) < 0)
 			acl_msg_fatal("%s: fstat: %s",
 				myname, acl_last_strerror(ebuf, sizeof(ebuf)));
@@ -403,7 +411,7 @@ const char *dict_changed_name(void)
 			status = h->key.c_key;
 	}
 	acl_myfree(ht_info_list);
-	return (status);
+	return status;
 }
 
 /* dict_changed - backwards compatibility */
@@ -445,6 +453,6 @@ const char *dict_flags_str(int dict_flags)
 		acl_pthread_atexit_add(buf, free_vstring_fn);
 	}
 
-	return (str_name_mask_opt(buf, "dictionary flags", dict_mask, dict_flags,
-				NAME_MASK_RETURN | NAME_MASK_PIPE));
+	return (str_name_mask_opt(buf, "dictionary flags", dict_mask,
+			dict_flags, NAME_MASK_RETURN | NAME_MASK_PIPE));
 }
