@@ -64,6 +64,10 @@ static void client_callback(int type acl_unused, ACL_EVENT *event,
 	acl_fiber_create(echo_client, conn, 160000);
 }
 
+//#define LISTEN_REACTOR
+
+#ifdef LISTEN_REACTOR
+
 static void listen_callback(int type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *sstream, void *ctx acl_unused)
 {
@@ -72,17 +76,48 @@ static void listen_callback(int type acl_unused, ACL_EVENT *event,
 
 	if (conn == NULL) {
 		printf("accept error %s\r\n", acl_last_serror());
+		acl_fiber_schedule_stop();
 		return;
 	}
 
 	printf(">>>accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(conn));
-
 	acl_event_enable_read(event, conn, 120, client_callback, NULL);
 }
 
-static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
+#else
+
+static ACL_EVENT *__event;
+
+static void fiber_listen(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
+
+	while (1) {
+		char ip[64];
+		ACL_VSTREAM *conn = acl_vstream_accept(sstream, ip, sizeof(ip));
+
+		if (conn == NULL) {
+			printf("accept error %s\r\n", acl_last_serror());
+			break;
+		}
+
+		printf("%s: accept one, fd: %d\r\n",
+			__FUNCTION__, ACL_VSTREAM_SOCK(conn));
+		acl_event_enable_read(__event, conn, 120, client_callback, NULL);
+	}
+
+	acl_fiber_schedule_stop();
+}
+
+#endif
+
+static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
+{
+#ifdef LISTEN_REACTOR
+	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
+#else
+	(void) ctx;
+#endif
 	ACL_EVENT *event;
 
 	if (__use_kernel) {
@@ -91,14 +126,22 @@ static void fiber_event(ACL_FIBER *fiber acl_unused, void *ctx)
 		event = acl_event_new(ACL_EVENT_POLL, 0, 0, 200);
 	}
 
+#ifndef LISTEN_REACTOR
+	__event = event;
+#endif
+
+#ifdef LISTEN_REACTOR
 	printf(">>>enable listen fd: %d\r\n", ACL_VSTREAM_SOCK(sstream));
 	acl_event_enable_listen(event, sstream, 0, listen_callback, NULL);
+#endif
 
 	while (!__stop) {
 		acl_event_loop(event);
 	}
 
+#ifdef LISTEN_REACTOR
 	acl_vstream_close(sstream);
+#endif
 	acl_event_free(event);
 
 	acl_fiber_schedule_stop();
@@ -138,7 +181,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	sstream = acl_vstream_listen(addr, 1024);
+	sstream = acl_vstream_listen(addr, 10240);
 	if (sstream == NULL) {
 		printf("acl_vstream_listen error %s\r\n", acl_last_serror());
 		return 1;
@@ -146,7 +189,9 @@ int main(int argc, char *argv[])
 
 	printf("listen %s ok\r\n", addr);
 
-	printf("%s: call fiber_creater\r\n", __FUNCTION__);
+#ifndef LISTEN_REACTOR
+	acl_fiber_create(fiber_listen, sstream, STACK_SIZE);
+#endif
 	acl_fiber_create(fiber_event, sstream, STACK_SIZE);
 
 	printf("call fiber_schedule\r\n");
