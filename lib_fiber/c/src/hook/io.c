@@ -298,6 +298,55 @@ int acl_fiber_close(socket_t fd)
 #endif
 
 #ifdef SYS_UNIX
+
+//# define READ_FIRST
+
+# ifdef READ_FIRST
+ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
+{
+	FILE_EVENT* fe;
+
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
+#ifndef	USE_SYSCALL
+	if (__sys_read == NULL) {
+		hook_init();
+	}
+#endif
+
+	if (!var_hook_sys_api) {
+		return __sys_read(fd, buf, count);
+	}
+
+	fe = fiber_file_open(fd);
+
+	while (1) {
+		ssize_t n;
+		int err;
+
+		n = __sys_read(fd, buf, count);
+		if (n >= 0) {
+			return n;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+
+		if (acl_fiber_killed(fe->fiber)) {
+			msg_info("%s(%d), %s: fiber-%u is existing",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_id(fe->fiber));
+			return -1;
+		}
+		if (!error_again(err)) {
+			return -1;
+		}
+	}
+}
+# else
 ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 {
 	FILE_EVENT* fe;
@@ -349,6 +398,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		}
 	}
 }
+# endif // READ_FIRST
 
 ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 {
