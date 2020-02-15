@@ -77,7 +77,7 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof \
+		  -Wno-invalid-offsetof \
 		  -Wno-unused-private-field
 	UNIXTYPE = MACOSX
 	shared_ldflags = -lacl_cpp -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
