@@ -78,6 +78,15 @@ void* thread::thread_run(void* arg)
 	thr->thread_id_ = (unsigned long) pthread_self();
 #endif
 
+	// 先将之前 push 到队列里可能还未清除的消息清除，以免该线程对象
+	// 再被重复使用启动线程时造成运行时内存泄露
+	while (true) {
+		bool found;
+		thr->sync_->pop(0, &found);
+		if (!found) {
+			break;
+		}
+	}
 	thr->sync_->push(NULL);
 
 	// 如果线程创建时为分离模式，则当 run 运行时用户有可能
