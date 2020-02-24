@@ -184,17 +184,6 @@ ACL_CACHE2 *acl_cache2_create(int max_size,
 	ACL_CACHE2 *cache2;
 	CACHE      *cache;
 
-	if (max_size <= 0) {
-		acl_msg_info("%s(%d): max_size(%d), no need cache",
-			__FUNCTION__, __LINE__, max_size);
-		return NULL;
-	}
-
-	if (free_fn == NULL) {
-		acl_msg_info("%s(%d), %s: free_fn null",
-			__FILE__, __LINE__, __FUNCTION__);
-	}
-
 	cache = (CACHE *) acl_mycalloc(1, sizeof(CACHE));
 	cache->table = acl_htable_create(max_size, 0);
 	avl_create(&cache->avl, avl_cmp_fn, sizeof(TREE_NODE),
@@ -202,7 +191,7 @@ ACL_CACHE2 *acl_cache2_create(int max_size,
 	acl_pthread_mutex_init(&cache->lock, NULL);
 
 	cache2            = (ACL_CACHE2*) cache;
-	cache2->max_size  = max_size < 1 ? 1 : max_size;
+	cache2->max_size  = max_size;
 	cache2->free_fn   = free_fn;
 	cache2->iter_head = cache_iter_head;
 	cache2->iter_next = cache_iter_next;
@@ -324,13 +313,15 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 
 	/* 如果缓存池满，则优先采用过期策略 */
 
-	if (cache2->size >= cache2->max_size) {
+	if (cache2->max_size > 0 && cache2->size >= cache2->max_size) {
 		(void) acl_cache2_timeout(cache2);
 	}
 
-	if (cache2->size < cache2->max_size) {
+    /* 如果没有限定缓存数量或缓存量未达限制则直接添加新缓存对象 */
+	if (cache2->max_size <= 0 || cache2->size < cache2->max_size) {
 		return cache2_enter(cache, key, value, timeout);
 	}
+    /* else: cache2->max_size > 0 && cache2->size >= cache2->max_size */
 
 	/* 如果缓存池依然满，则采用 LRU 策略删除最旧的数据 */
 
@@ -373,7 +364,7 @@ void *acl_cache2_find(ACL_CACHE2 *cache2, const char *key)
 	CACHE           *cache = (CACHE*) cache2;
 	ACL_CACHE2_INFO *info;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return NULL;
 	}
 
@@ -390,7 +381,7 @@ ACL_CACHE2_INFO *acl_cache2_locate(ACL_CACHE2 *cache2, const char *key)
 	CACHE           *cache = (CACHE*) cache2;
 	ACL_CACHE2_INFO *info;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return NULL;
 	}
 
@@ -408,7 +399,7 @@ int acl_cache2_delete(ACL_CACHE2 *cache2, ACL_CACHE2_INFO *info2)
 	TREE_NODE  *node  = info->tree_node;
 	CACHE      *cache = (CACHE*) cache2;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return 0;
 	}
 
@@ -452,7 +443,7 @@ int acl_cache2_delete2(ACL_CACHE2 *cache2, const char *key)
 	CACHE           *cache = (CACHE*) cache2;
 	ACL_CACHE2_INFO *info2;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return 0;
 	}
 
@@ -475,7 +466,7 @@ int acl_cache2_timeout(ACL_CACHE2 *cache2)
 	time_t now = time(NULL);
 	int    n   = 0;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return n;
 	}
 
@@ -514,7 +505,7 @@ ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
 	CACHE_INFO *info  = (CACHE_INFO*) info2;
 	TREE_NODE  *node  = info->tree_node, iter;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		acl_msg_error("%s(%d): invalid parameters, max_size=%d",
 			__FUNCTION__, __LINE__, cache2 ? cache2->max_size : -1);
 		return NULL;
@@ -564,7 +555,7 @@ ACL_CACHE2_INFO *acl_cache2_update(ACL_CACHE2 *cache2,
 	CACHE           *cache = (CACHE*) cache2;
 	ACL_CACHE2_INFO *info2;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return NULL;
 	}
 
@@ -619,7 +610,7 @@ void acl_cache2_refer2(ACL_CACHE2 *cache2, const char *key)
 	CACHE           *cache = (CACHE*) cache2;
 	ACL_CACHE2_INFO *info2;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return;
 	}
 
@@ -634,7 +625,7 @@ void acl_cache2_unrefer2(ACL_CACHE2 *cache2, const char *key)
 	CACHE           *cache = (CACHE*) cache2;
 	ACL_CACHE2_INFO *info2;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return;
 	}
 
@@ -656,7 +647,7 @@ void acl_cache2_unrefer(ACL_CACHE2_INFO *info2)
 void acl_cache2_lock(ACL_CACHE2 *cache2)
 {
 	CACHE *cache = (CACHE*) cache2;
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return;
 	}
 
@@ -667,7 +658,7 @@ void acl_cache2_unlock(ACL_CACHE2 *cache2)
 {
 	CACHE *cache = (CACHE*) cache2;
 	
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return;
 	}
 
@@ -682,7 +673,7 @@ void acl_cache2_walk(ACL_CACHE2 *cache2,
 	CACHE_INFO      *info;
 	TREE_NODE       *node;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return;
 	}
 
@@ -709,7 +700,7 @@ int acl_cache2_clean(ACL_CACHE2 *cache2, int force)
 	TREE_NODE       *node;
 	int              n = 0;
 
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return 0;
 	}
 
@@ -733,7 +724,7 @@ int acl_cache2_clean(ACL_CACHE2 *cache2, int force)
 
 int acl_cache2_size(ACL_CACHE2 *cache2)
 {
-	if (cache2 == NULL || cache2->max_size <= 0) {
+	if (cache2 == NULL) {
 		return 0;
 	}
 	return cache2->size;

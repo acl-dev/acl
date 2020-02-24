@@ -43,7 +43,7 @@ typedef struct ACL_CACHE2 {
 
 /**
  * 创建一个缓存池，并设置每个缓存对象的最大缓存时长及该缓存池的空间容量限制
- * @param max_size {int} 该缓存池的容量限制
+ * @param max_size {int} 该缓存池的容量限制，若该值 <= 0，则内部不会限制缓存量
  * @param free_fn {void (*)(void*)} 用户级的释放缓存对象的函数
  * @return {ACL_CACHE2*} 缓存池对象句柄
  */
@@ -114,7 +114,7 @@ ACL_API int acl_cache2_timeout(ACL_CACHE2 *cache2);
  * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
  * @param info {ACL_CACHE2_INFO*} 缓存对象
  * @param timeout {int} 缓存时长(秒)
- * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示出错
+ * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示 key 不存在
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
 	ACL_CACHE2_INFO *info, int timeout);
@@ -124,7 +124,7 @@ ACL_API ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
  * @param cache2 {ACL_CACHE2*} 缓存池对象句柄
  * @param key {const char*} 健值
  * @param timeout {int} 缓存时长(秒)
- * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示出错
+ * @return {ACL_CACHE2_INFO*} 返回非 NULL 表示正常，为 NULL 表示 key 不存在
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_update(ACL_CACHE2 *cache2,
 	const char *key, int timeout);
@@ -137,7 +137,7 @@ ACL_API ACL_CACHE2_INFO *acl_cache2_update(ACL_CACHE2 *cache2,
  * @param exist {int*} 非 NULL 时，如果新 key 存在则被置 1，否则置 0
  * @return {ACL_CACHE2_INFO*} 缓存对象所依附的结构对象，其中的 value 与用户的
  *  对象相同；如果该 key 不存在则添加新对象，如果存在则更新旧对象；返回 NULL
- * 表示更新添加失败；如果是更新方式，则调用者应注意释放临时创建的动态对象
+ *  表示更新添加失败；如果是更新方式，则调用者应注意释放临时创建的动态对象
  */
 ACL_API ACL_CACHE2_INFO *acl_cache2_upsert(ACL_CACHE2 *cache2,
 	const char *key, void *value, int timeout, int *exist);
