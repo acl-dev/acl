@@ -16,6 +16,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	endif()
 
 	add_definitions("-DANDROID")
+	add_definitions("-DACL_CPP_LOG_SKIP_FILE")
 	add_definitions("-Wno-unused-command-line-argument")
 	add_definitions("-Wno-invalid-source-encoding")
 	add_definitions("-fdata-sections -ffunction-sections")
