@@ -8,36 +8,49 @@
 #if defined(_WIN32) || defined(_WIN64)
 
 # if _MSC_VER >= 1500
-#define logger(fmt, ...)  \
+#  define logger(fmt, ...)  \
 	acl::log::msg4(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
-#define logger_warn(fmt, ...)  \
+#  define logger_warn(fmt, ...)  \
 	acl::log::warn4(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
-#define logger_error(fmt, ...)  \
+#  define logger_error(fmt, ...)  \
 	acl::log::error4(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
-#define logger_fatal(fmt, ...)  \
+#  define logger_fatal(fmt, ...)  \
 	acl::log::fatal4(__FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
-#define logger_debug(section, level, fmt, ...)  \
+#  define logger_debug(section, level, fmt, ...)  \
 	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, __VA_ARGS__)
 # else
-#define logger		acl::log::msg1
-#define logger_warn    acl::log::warn1
-#define logger_error    acl::log::error1
-#define logger_fatal    acl::log::fatal1
-#define logger_debug    acl::log::msg3
+#  define logger	acl::log::msg1
+#  define logger_warn	acl::log::warn1
+#  define logger_error	acl::log::error1
+#  define logger_fatal	acl::log::fatal1
+#  define logger_debug	acl::log::msg3
 # endif
 
 #else
 
-#define logger(fmt, args...)  \
+# ifdef ACL_CPP_LOG_SKIP_FILE
+#  define logger(fmt, args...)  \
+	acl::log::msg4("none", __LINE__, __FUNCTION__, fmt, ##args)
+#  define logger_warn(fmt, args...)  \
+	acl::log::warn4("none", __LINE__, __FUNCTION__, fmt, ##args)
+#  define logger_error(fmt, args...)  \
+	acl::log::error4("none", __LINE__, __FUNCTION__, fmt, ##args)
+#  define logger_fatal(fmt, args...)  \
+	acl::log::fatal4("none", __LINE__, __FUNCTION__, fmt, ##args)
+#  define logger_debug(section, level, fmt, args...)  \
+	acl::log::msg6(section, level, __FUNCTION__, __LINE__, __FUNCTION__, fmt, ##args)
+# else
+#  define logger(fmt, args...)  \
 	acl::log::msg4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
-#define logger_warn(fmt, args...)  \
+#  define logger_warn(fmt, args...)  \
 	acl::log::warn4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
-#define logger_error(fmt, args...)  \
+#  define logger_error(fmt, args...)  \
 	acl::log::error4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
-#define logger_fatal(fmt, args...)  \
+#  define logger_fatal(fmt, args...)  \
 	acl::log::fatal4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
-#define logger_debug(section, level, fmt, args...)  \
-	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
+#  define logger_debug(section, level, fmt, args...)  \
+	acl::log::msg6(section, level, __FUNCTION__, __LINE__, __FUNCTION__, fmt, ##args)
+# endif
 
 #endif
 

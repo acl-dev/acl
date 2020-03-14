@@ -16,7 +16,7 @@ android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
     repositories {
-        maven { url 'http://repo1.maven.org/maven2' }
+        maven { url 'https://repo1.maven.org/maven2' }
     }
     defaultConfig {
         minSdkVersion 14
@@ -28,17 +28,17 @@ android {
         externalNativeBuild {
             cmake {
                 //arguments "-DANDROID_STL=stl_shared"
-                arguments "-DANDROID_STL=gnustl_shared"
-                //arguments "-DANDROID_STL=c++_shared"
+                //arguments "-DANDROID_STL=gnustl_shared"
+                arguments "-DANDROID_STL=c++_shared"
                 arguments "-DCMAKE_BUILD_TYPE=RELEASE"
                 arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
                 arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
                 //arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
                 arguments "-DACL_CLIENT_ONLY=YES"
                 //cppFlags "-fexceptions"
-                abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a'
-                //abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
             }
             cmake {
                 //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
