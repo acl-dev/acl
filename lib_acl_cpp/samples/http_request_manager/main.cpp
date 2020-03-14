@@ -6,11 +6,11 @@ static int __loop_count = 10;
 static connect_manager* __conn_manager = NULL;
 static acl_pthread_pool_t* __thr_pool = NULL;
 static bool __unzip = false;
+static bool __debug = false;
 
 static void sleep_while(int n)
 {
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		putchar('.');
 		fflush(stdout);
 		sleep(1);
@@ -39,7 +39,7 @@ static void init(const char* addrs, int count)
 	__conn_manager->start_monitor(monitor);
 
 
-	int   n = 10;
+	int   n = 2;
 	printf(">>>sleep %d seconds for monitor check\r\n", n);
 	sleep_while(n);
 
@@ -64,8 +64,7 @@ static void end(void)
 	printf("\r\n");
 	std::vector<connect_pool*>& pools = __conn_manager->get_pools();
 	std::vector<connect_pool*>::const_iterator cit = pools.begin();
-	for (; cit != pools.end(); ++cit)
-	{
+	for (; cit != pools.end(); ++cit) {
 		printf(">>>server: %s, %s\r\n",
 			(*cit)->get_addr(), (*cit)->aliving()
 			? "alive" : "dead");
@@ -84,8 +83,9 @@ static void end(void)
 // HTTP 请求过程，向服务器发送请求后从服务器读取响应数据
 static bool http_get(http_request* conn, const char* addr, int n)
 {
-	if (0)
-	printf(">>>check addr: %s, n: %d\r\n", addr, n);
+	if (__debug) {
+		printf(">>>check addr: %s, n: %d\r\n", addr, n);
+	}
 
 	// 创建 HTTP 请求头数据
 	http_header& header = conn->request_header();
@@ -95,12 +95,12 @@ static bool http_get(http_request* conn, const char* addr, int n)
 		.set_method(HTTP_METHOD_GET)
 		.accept_gzip(__unzip);
 
-	if (0)
-	printf("%lu--%d: begin send request\r\n",
-		(unsigned long) acl_pthread_self(), n);
+	if (__debug) {
+		printf("%lu--%d: begin send request\r\n",
+			(unsigned long) acl_pthread_self(), n);
+	}
 	// 发送 HTTP 请求数据同时接收 HTTP 响应头
-	if (conn->request(NULL, 0) == false)
-	{
+	if (conn->request(NULL, 0) == false) {
 		printf("%lu--%d: send GET request error\r\n",
 			(unsigned long) acl_pthread_self(), n);
 		return false;
@@ -110,27 +110,30 @@ static bool http_get(http_request* conn, const char* addr, int n)
 	int   ret, length = 0;
 
 	// 接收 HTTP 响应体数据
-	while (true)
-	{
-		ret = conn->read_body(buf, sizeof(buf));
-		if (ret == 0)
+	while (true) {
+		ret = conn->read_body(buf, sizeof(buf) - 1);
+		if (ret == 0) {
 			break;
-		else if (ret < 0)
-		{
+		} else if (ret < 0) {
 			printf("%lu--%d: error, length: %d\r\n",
 				(unsigned long) acl_pthread_self(),
 				n, length);
 			return false;
 		}
+		//buf[ret] = 0;
+		//printf("%s", buf);fflush(stdout);
+
 		length += ret;
-		if (0)
+		if (__debug) {
 			printf("%lu--%d: read length: %d, %d\r\n",
 				(unsigned long) acl_pthread_self(),
 				n, length, ret);
+		}
 	}
-	if (0)
+	if (__debug) {
 		printf("%lu--%d: read body over, length: %d\r\n",
 			(unsigned long) acl_pthread_self(), n, length);
+	}
 	return true;
 }
 
@@ -138,20 +141,19 @@ static void check_all_connections(void)
 {
 	std::vector<connect_pool*>& pools = __conn_manager->get_pools();
 	std::vector<connect_pool*>::const_iterator cit = pools.begin();
-	for (; cit != pools.end(); ++cit)
+	for (; cit != pools.end(); ++cit) {
 		printf(">>>addr: %s %s\r\n", (*cit)->get_addr(),
 			(*cit)->aliving() ? "alive" : "dead");
+	}
 }
 
 // 线程处理过程
 static void thread_main(void*)
 {
-	for (int i = 0; i < __loop_count; i++)
-	{
+	for (int i = 0; i < __loop_count; i++) {
 		http_request_pool* pool = (http_request_pool*)
 			__conn_manager->peek();
-		if (pool == NULL)
-		{
+		if (pool == NULL) {
 			printf("\r\n>>>%lu(%d): peek pool failed<<<\r\n",
 				(unsigned long) acl_pthread_self(), __LINE__);
 			check_all_connections();
@@ -160,8 +162,7 @@ static void thread_main(void*)
 
 		// 从连接池中获取一个 HTTP 连接
 		http_request* conn = (http_request*) pool->peek();
-		if (conn == NULL)
-		{
+		if (conn == NULL) {
 			printf("\r\n>>>%lu: peek connect failed from %s<<<\r\n",
 				(unsigned long) acl_pthread_self(),
 				pool->get_addr());
@@ -170,30 +171,32 @@ static void thread_main(void*)
 		}
 
 		// 需要对获得的连接重置状态，以清除上次请求过程的临时数据
-		else
+		else {
 			conn->reset();
+		}
 
 		// 开始新的 HTTP 请求过程
-		if (http_get(conn, pool->get_addr(), i) == false)
-		{
+		if (http_get(conn, pool->get_addr(), i) == false) {
 			printf("one request failed, close connection\r\n");
 			// 错误连接需要关闭
 			pool->put(conn, false);
-		}
-		else
+		} else {
 			pool->put(conn, true);
+		}
 	}
 
-	if (0)
+	if (__debug) {
 		printf(">>>>thread: %lu OVER<<<<\r\n",
 			(unsigned long) acl_pthread_self());
+	}
 }
 
 static void run(int cocurrent)
 {
 	// 向线程池中添加任务
-	for (int i = 0; i < cocurrent; i++)
+	for (int i = 0; i < cocurrent; i++) {
 		acl_pthread_pool_add(__thr_pool, thread_main, NULL);
+	}
 }
 
 static void usage(const char* procname)
@@ -202,6 +205,7 @@ static void usage(const char* procname)
 		"	-s http_server_addrs [www.sina.com.cn:80;www.263.net:80;www.qq.com:80]\r\n"
 		"	-z [unzip response body, default: false]\r\n"
 		"	-c cocurrent [default: 10]\r\n"
+		"	-D [if using debug mode]\r\n"
 		"	-n loop_count[default: 10]\r\n", procname);
 }
 
@@ -216,10 +220,8 @@ int main(int argc, char* argv[])
 	// 日志输出至标准输出
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:c:z")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:Dn:c:z")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -228,6 +230,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'c':
 			cocurrent = atoi(optarg);
+			break;
+		case 'D':
+			__debug = true;
 			break;
 		case 'n':
 			__loop_count = atoi(optarg);

@@ -178,7 +178,7 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 			if (!entry->off) {
 				add_entry(entry->name, entry->value);
 			}
-	}
+		}
 	}
 
 	if (hdr_req.params_table) {
