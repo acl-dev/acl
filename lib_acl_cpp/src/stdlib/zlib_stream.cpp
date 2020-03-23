@@ -44,6 +44,7 @@ static ACL_DLL_HANDLE __zlib_dll = NULL;
 static acl::string __zlib_path;
 
 // 程序退出时释放动态加载的 zlib.dll 库
+#ifndef HAVE_NO_ATEXIT
 static void __zlib_dll_unload(void)
 {
 	if (__zlib_dll != NULL) {
@@ -52,6 +53,7 @@ static void __zlib_dll_unload(void)
 		logger("%s unload ok", __zlib_path.c_str());
 	}
 }
+#endif
 
 // 动态加载 zlib.dll 库
 static void __zlib_dll_load(void)
@@ -141,7 +143,9 @@ static void __zlib_dll_load(void)
 	}
 
 	logger("%s loaded", path);
+#ifndef HAVE_NO_ATEXIT
 	atexit(__zlib_dll_unload);
+#endif
 }
 
 # else

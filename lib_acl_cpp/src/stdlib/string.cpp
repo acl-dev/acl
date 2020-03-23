@@ -1805,9 +1805,11 @@ string& string::dirname(const char* path)
 	return *this;
 }
 
+#ifndef HAVE_NO_ATEXIT
 static void dummy_free(void*)
 {
 }
+#endif
 
 static void buf_free(void* arg)
 {
@@ -1817,20 +1819,24 @@ static void buf_free(void* arg)
 
 static string* __main_buf = NULL;
 
+#ifndef HAVE_NO_ATEXIT
 static void main_buf_free(void)
 {
 	if (__main_buf) {
 		delete __main_buf;
 	}
 }
+#endif
 
 static acl_pthread_key_t __buf_key;
 
 static void prepare_once(void)
 {
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
+#ifndef HAVE_NO_ATEXIT
 		acl_pthread_key_create(&__buf_key, dummy_free);
 		atexit(main_buf_free);
+#endif
 	} else {
 		acl_pthread_key_create(&__buf_key, buf_free);
 	}

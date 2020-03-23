@@ -124,6 +124,7 @@ static const char* __polarssl_path = "./libpolarssl.so";
 
 ACL_DLL_HANDLE			__polarssl_dll  = NULL;
 
+#ifndef HAVE_NO_ATEXIT
 static void polarssl_dll_unload(void)
 {
 	if (__polarssl_dll) {
@@ -135,6 +136,7 @@ static void polarssl_dll_unload(void)
 	delete __polarssl_path_buf;
 	__polarssl_path_buf = NULL;
 }
+#endif
 
 extern bool polarssl_dll_load_io(void); // defined in polarssl_io.cpp
 
@@ -204,7 +206,9 @@ static void polarssl_dll_load(void)
 	}
 
 	logger("%s loaded!", __polarssl_path);
+#ifndef HAVE_NO_ATEXIT
 	atexit(polarssl_dll_unload);
+#endif
 }
 
 # else // !HAS_POLARSSL_DLL && HAS_POLARSSL

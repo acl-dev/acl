@@ -34,6 +34,7 @@ typedef struct EPOLL_CTX
 	int  epfd;
 } EPOLL_CTX;
 
+#ifndef HAVE_NO_ATEXIT
 static EPOLL_CTX *main_epoll_ctx = NULL;
 
 static void main_epoll_end(void)
@@ -50,6 +51,7 @@ static void main_epoll_end(void)
 		main_epoll_ctx = NULL;
 	}
 }
+#endif
 
 static acl_pthread_key_t epoll_key;
 static acl_pthread_once_t epoll_once = ACL_PTHREAD_ONCE_INIT;
@@ -90,8 +92,10 @@ static EPOLL_CTX *thread_epoll_init(void)
 	}
 
 	if ((unsigned int) acl_pthread_self() == acl_main_thread_self()) {
+#ifndef HAVE_NO_ATEXIT
 		main_epoll_ctx = epoll_ctx;
 		atexit(main_epoll_end);
+#endif
 		acl_msg_info("%s(%d): %s, create epoll_fd: %d, tid: %lu, %lu",
 			__FILE__, __LINE__, myname, epoll_ctx->epfd,
 			epoll_ctx->tid, acl_pthread_self());

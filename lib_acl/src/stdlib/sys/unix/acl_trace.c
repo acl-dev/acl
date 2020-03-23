@@ -47,11 +47,13 @@ static void trace_buf_free(void *buf)
 		free(buf);
 }
 
+#ifndef HAVE_NO_ATEXIT
 static void main_buf_free(void)
 {
 	if (__main_buf)
 		free(__main_buf);
 }
+#endif
 
 static void trace_buf_init(void)
 {
@@ -79,7 +81,9 @@ void acl_trace_info(void)
 			== acl_main_thread_self())
 		{
 			__main_buf = intbuf;
+#ifndef HAVE_NO_ATEXIT
 			atexit(main_buf_free);
+#endif
 		}
 	}
 

@@ -653,11 +653,13 @@ static void tls_ctx_free(void *ctx)
 
 /* 主线程退出时释放局部变量 */
 
+#ifndef HAVE_NO_ATEXIT
 static void main_tls_ctx_free(void)
 {
 	if (__main_tls_ctx)
 		tls_ctx_free(__main_tls_ctx);
 }
+#endif
 
 static void dummy_free(void *ctx acl_unused)
 {
@@ -669,7 +671,9 @@ static void tls_ctx_once_init(void)
 		(unsigned long) acl_main_thread_self())
 	{
 		acl_pthread_key_create(&__tls_ctx_key, dummy_free);
+#ifndef HAVE_NO_ATEXIT
 		atexit(main_tls_ctx_free);
+#endif
 	} else
 		acl_pthread_key_create(&__tls_ctx_key, tls_ctx_free);
 }

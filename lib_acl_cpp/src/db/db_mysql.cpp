@@ -86,6 +86,7 @@ static ACL_DLL_HANDLE __mysql_dll = NULL;
 static acl::string __mysql_path;
 
 // 程序退出释放动态加载的库
+#ifndef HAVE_NO_ATEXIT
 static void __mysql_dll_unload(void)
 {
 	if (__mysql_dll != NULL) {
@@ -108,6 +109,7 @@ static void __mysql_dll_unload(void)
 		logger("%s unload ok", __mysql_path.c_str());
 	}
 }
+#endif
 
 // 动态加载 libmysql.dll 库
 static void __mysql_dll_load(void)
@@ -306,7 +308,9 @@ static void __mysql_dll_load(void)
 	}
 
 	logger("%s loaded!", path);
+#ifndef HAVE_NO_ATEXIT
 	atexit(__mysql_dll_unload);
+#endif
 }
 
 # else  // if !HAS_MYSQL_DLL
@@ -538,6 +542,7 @@ static void thread_free_dummy(void* ctx)
 }
 
 static int* __main_dummy = NULL;
+#ifndef HAVE_NO_ATEXIT
 static void main_free_dummy(void)
 {
 	if (__main_dummy) {
@@ -551,6 +556,7 @@ static void main_free_dummy(void)
 	}
 #endif
 }
+#endif
 
 static acl_pthread_once_t __thread_once_control = ACL_PTHREAD_ONCE_INIT;
 
@@ -612,7 +618,9 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 
 		if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
 			__main_dummy = dummy;
+#ifndef HAVE_NO_ATEXIT
 			atexit(main_free_dummy);
+#endif
 		}
 	}
 

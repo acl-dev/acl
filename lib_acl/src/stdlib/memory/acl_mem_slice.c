@@ -196,6 +196,7 @@ static void mem_slice_free(ACL_MEM_SLICE *mem_slice)
 
 static ACL_MEM_SLICE *__main_mem_slice = NULL;
 
+#ifndef HAVE_NO_ATEXIT
 static void main_thread_slice_free(void)
 {
 	if (__main_mem_slice) {
@@ -203,7 +204,9 @@ static void main_thread_slice_free(void)
 		__main_mem_slice = NULL;
 	}
 }
+#endif
 
+#ifndef HAVE_NO_ATEXIT
 static void free_global_ctx(void)
 {
 	if (__mem_slice_list) {
@@ -215,6 +218,7 @@ static void free_global_ctx(void)
 		__mem_slice_list_lock = NULL;
 	}
 }
+#endif
 
 static void slice_key_init(void)
 {
@@ -223,7 +227,9 @@ static void slice_key_init(void)
 
 	if (curr_tid == main_tid) {
 		acl_pthread_key_create(&__mem_slice_key, NULL);
+#ifndef HAVE_NO_ATEXIT
 		atexit(main_thread_slice_free);
+#endif
 	} else
 		acl_pthread_key_create(&__mem_slice_key, (void (*)(void*)) mem_slice_free);
 }
@@ -507,7 +513,9 @@ ACL_MEM_SLICE *acl_mem_slice_init(int base, int nslice,
 	if (__mem_slice_list_lock == NULL)
 		acl_msg_fatal("%s(%d): __mem_slice_list_lock null", myname, __LINE__);
 
+#ifndef HAVE_NO_ATEXIT
 	atexit(free_global_ctx);
+#endif
 
 	mem_slice->tls_key  = __mem_slice_key;
 

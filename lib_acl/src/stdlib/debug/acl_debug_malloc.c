@@ -206,10 +206,12 @@ static void walk_fn(DEBUG_HTABLE_INFO *info, char *arg acl_unused)
 	fprintf(__debug_mem->dump_fp, "leak%c%s\n", SEP, value);
 }
 
+#ifndef HAVE_NO_ATEXIT
 static void __free_fn(char *value)
 {
 	free(value);
 }
+#endif
 
 void acl_debug_dump(void)
 {
@@ -227,6 +229,7 @@ void acl_debug_dump(void)
 	fflush(__debug_mem->dump_fp);
 }
 
+#ifndef HAVE_NO_ATEXIT
 static void debug_dump_atexit(void)
 {
 	if (__debug_mem == NULL)
@@ -239,6 +242,7 @@ static void debug_dump_atexit(void)
 	free(__debug_mem);
 	__debug_mem = NULL;
 }
+#endif
 
 ACL_DEBUG_MEM *acl_debug_malloc_init(ACL_DEBUG_MEM *debug_mem_ptr, const char *dump_file)
 {
@@ -253,7 +257,9 @@ ACL_DEBUG_MEM *acl_debug_malloc_init(ACL_DEBUG_MEM *debug_mem_ptr, const char *d
 		__debug_mem->table = debug_htable_create(1000);
 		ASSERT(__debug_mem->table);
 		acl_pthread_mutex_init(&__debug_mem->lock, NULL);
+#ifndef HAVE_NO_ATEXIT
 		atexit(debug_dump_atexit);
+#endif
 		fprintf(__debug_mem->dump_fp, "begin set mem_hook\n");
 		fflush(__debug_mem->dump_fp);
 	}

@@ -47,6 +47,7 @@ static acl_pthread_once_t __iconv_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __iconv_dll = NULL;
 
 // 程序退出时释放动态加载的 iconv.dll 库
+#ifndef HAVE_NO_ATEXIT
 static void __iconv_dll_unload(void)
 {
 	if (__iconv_dll != NULL) {
@@ -55,6 +56,7 @@ static void __iconv_dll_unload(void)
 		logger("iconv.dll unload ok");
 	}
 }
+#endif
 
 // 动态加载 iconv.dll 库
 static void __iconv_dll_load(void)
@@ -91,7 +93,9 @@ static void __iconv_dll_load(void)
 	}
 
 	logger("iconv.dll loaded");
+#ifndef HAVE_NO_ATEXIT
 	atexit(__iconv_dll_unload);
+#endif
 }
 
 # else

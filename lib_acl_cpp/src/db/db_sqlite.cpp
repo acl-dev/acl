@@ -71,6 +71,7 @@
  static acl::string __sqlite_path;
 
  // 程序退出释放动态加载的库
+#ifndef HAVE_NO_ATEXIT
  static void __sqlite_dll_unload(void)
  {
 	 if (__sqlite_dll != NULL) {
@@ -79,6 +80,7 @@
 		 logger("%s unload ok", __sqlite_path.c_str());
 	 }
  }
+#endif
 
  // 动态加载 sqlite3.dll 库
  static void __sqlite_dll_load(void)
@@ -256,7 +258,9 @@
 	}
 
 	logger("%s loaded", path);
+#ifndef HAVE_NO_ATEXIT
 	atexit(__sqlite_dll_unload);
+#endif
  }
 # else
 #  define __sqlite3_libversion sqlite3_libversion

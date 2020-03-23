@@ -44,6 +44,7 @@ static void free_tls(void *ptr)
 }
 
 static void *__tls = NULL;
+#ifndef HAVE_NO_ATEXIT
 static void main_free_tls(void)
 {
 	if (__tls) {
@@ -51,13 +52,16 @@ static void main_free_tls(void)
 		__tls = NULL;
 	}
 }
+#endif
 
 static acl_pthread_key_t  once_key;
 static void once_init(void)
 {
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
 		acl_pthread_key_create(&once_key, dummy);
+#ifndef HAVE_NO_ATEXIT
 		atexit(main_free_tls);
+#endif
 	} else
 		acl_pthread_key_create(&once_key, free_tls);
 }

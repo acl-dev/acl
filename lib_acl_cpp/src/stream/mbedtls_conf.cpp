@@ -203,6 +203,7 @@ ACL_DLL_HANDLE __crypto_dll            = NULL;
 ACL_DLL_HANDLE __x509_dll              = NULL;
 ACL_DLL_HANDLE __tls_dll               = NULL;
 
+#ifndef HAVE_NO_ATEXIT
 static void mbedtls_dll_unload(void)
 {
 	if (__crypto_dll) {
@@ -229,6 +230,7 @@ static void mbedtls_dll_unload(void)
 	__x509_path_buf   = NULL;
 	__tls_path_buf    = NULL;
 }
+#endif
 
 extern bool mbedtls_load_io(void); // defined in mbedtls_io.cpp
 
@@ -392,7 +394,9 @@ static void mbedtls_dll_load(void)
 	if (strcmp(__crypto_path, __tls_path) != 0) {
 		logger("%s loaded!", __tls_path);
 	}
+#ifndef HAVE_NO_ATEXIT
 	atexit(mbedtls_dll_unload);
+#endif
 }
 
 # else // !HAS_MBEDTLS_DLL && HAS_MBEDTLS

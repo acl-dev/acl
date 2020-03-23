@@ -539,7 +539,6 @@ const char *acl_last_strerror(char *buffer, int size)
 }
 
 static acl_pthread_key_t __errbuf_key;
-static char *__main_buf = NULL;
 
 static void thread_free_buf(void *buf)
 {
@@ -547,11 +546,14 @@ static void thread_free_buf(void *buf)
 		acl_myfree(buf);
 }
 
+#if !defined(HAVE_NO_ATEXIT)
+static char *__main_buf = NULL;
 static void main_free_buf(void)
 {
 	if (__main_buf)
 		acl_myfree(__main_buf);
 }
+#endif
 
 static void thread_buf_init(void)
 {
@@ -575,12 +577,14 @@ const char *acl_last_serror(void)
 		buf = acl_mymalloc(__buf_size);
 		if (acl_pthread_setspecific(__errbuf_key, buf) != 0)
 			abort();
+#if !defined(HAVE_NO_ATEXIT)
 		if ((unsigned long) acl_pthread_self()
 			== acl_main_thread_self())
 		{
 			__main_buf = buf;
 			atexit(main_free_buf);
 		}
+#endif
 	}
 	return acl_strerror(error, buf, __buf_size);
 }

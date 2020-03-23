@@ -59,6 +59,7 @@ static ACL_DLL_HANDLE __pgsql_dll = NULL;
 static acl::string __pgsql_path;
 
 // 程序退出释放动态加载的库
+#ifndef HAVE_NO_ATEXIT
 static void __pgsql_dll_unload(void)
 {
 	if (__pgsql_dll != NULL) {
@@ -67,6 +68,7 @@ static void __pgsql_dll_unload(void)
 		logger("%s unload ok", __pgsql_path.c_str());
 	}
 }
+#endif
 
 // 动态加载 libpg.dll 库
 static void __pgsql_dll_load(void)
@@ -178,7 +180,9 @@ static void __pgsql_dll_load(void)
 	}
 
 	logger("%s loaded!", path);
+#ifndef HAVE_NO_ATEXIT
 	atexit(__pgsql_dll_unload);
+#endif
 }
 
 # else  // if !HAS_PGSQL_DLL
@@ -362,6 +366,7 @@ static void thread_free_dummy(void* ctx)
 }
 
 static int* __main_dummy = NULL;
+#ifndef HAVE_NO_ATEXIT
 static void main_free_dummy(void)
 {
 	if (__main_dummy) {
@@ -369,6 +374,7 @@ static void main_free_dummy(void)
 		__main_dummy = NULL;
 	}
 }
+#endif
 
 static acl_pthread_once_t __thread_once_control = ACL_PTHREAD_ONCE_INIT;
 
@@ -428,7 +434,9 @@ bool db_pgsql::dbopen(const char* /* charset = NULL */)
 			== acl_main_thread_self()) {
 
 			__main_dummy = dummy;
+#ifndef HAVE_NO_ATEXIT
 			atexit(main_free_dummy);
+#endif
 		}
 	}
 
