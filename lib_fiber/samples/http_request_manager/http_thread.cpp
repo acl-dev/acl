@@ -35,12 +35,14 @@ static bool http_request(acl::http_request_pool& pool)
 		.accept_gzip(true);
 	header.set_host(pool.get_addr());
 	if (!conn->request(NULL, 0)) {
+		guard.set_keep(false);
 		printf("send request failed!\r\n");
 		return false;
 	}
 
 	acl::string body;
 	if (!conn->get_body(body)) {
+		guard.set_keep(false);
 		return false;
 	}
 
