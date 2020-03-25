@@ -7,6 +7,8 @@ extern "C" {
 #include "acl_define.h"
 #include <time.h>
 
+typedef struct ACL_CACHE2 ACL_CACHE2;
+
 /**
  * 缓存池中存储的缓存对象
  */
@@ -15,14 +17,16 @@ typedef struct ACL_CACHE2_INFO {
 	void  *value;		/**< 用户动态对象 */
 	int    nrefer;		/**< 引用计数 */
 	time_t when_timeout;	/**< 过期时间截 */
+	ACL_CACHE2* cache;	/**< 引用缓存对象 */
 } ACL_CACHE2_INFO;
 
 /**
  * 缓冲池
  */
-typedef struct ACL_CACHE2 { 
+struct ACL_CACHE2 { 
 	int   max_size;		/**< 缓存池容量大小限制值 */
 	int   size;		/**< 当前缓存池中的缓存对象个数 */
+	void *ctx;		/**< 外部引用对象 */
 
 	/**< 释放用户动态对象的释放回调函数 */
 	void  (*free_fn)(const ACL_CACHE2_INFO*, void *);
@@ -39,7 +43,7 @@ typedef struct ACL_CACHE2 {
 	void *(*iter_prev)(ACL_ITER*, struct ACL_CACHE2*);
 	/* 取迭代器关联的当前容器成员结构对象 */
 	ACL_CACHE2_INFO *(*iter_info)(ACL_ITER*, struct ACL_CACHE2*);
-} ACL_CACHE2;
+};
 
 /**
  * 创建一个缓存池，并设置每个缓存对象的最大缓存时长及该缓存池的空间容量限制

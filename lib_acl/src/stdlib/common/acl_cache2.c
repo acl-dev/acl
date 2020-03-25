@@ -246,6 +246,7 @@ static ACL_CACHE2_INFO *cache2_enter(CACHE *cache, const char *key,
 
 	info->info.value = value;
 	info->info.key   = acl_mystrdup(key);
+	info->info.cache = &cache->cache;
 
 	/* 将该元素添加进哈希表中，以便可以通过元素键值进行查找*/
 
@@ -317,11 +318,11 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 		(void) acl_cache2_timeout(cache2);
 	}
 
-    /* 如果没有限定缓存数量或缓存量未达限制则直接添加新缓存对象 */
+	/* 如果没有限定缓存数量或缓存量未达限制则直接添加新缓存对象 */
 	if (cache2->max_size <= 0 || cache2->size < cache2->max_size) {
 		return cache2_enter(cache, key, value, timeout);
 	}
-    /* else: cache2->max_size > 0 && cache2->size >= cache2->max_size */
+	/* else: cache2->max_size > 0 && cache2->size >= cache2->max_size */
 
 	/* 如果缓存池依然满，则采用 LRU 策略删除最旧的数据 */
 
