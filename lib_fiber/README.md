@@ -1,5 +1,29 @@
 # 高性能网络协程库，支持 Linux/BSD/Mac/Windows
 
+[English](README_en.md)  
+
+* [1、概述](#1概述)
+* [2、支持的事件引擎](#2支持的事件引擎)
+* [3、示例](#3、示例)
+    * [3.1、基于协程的网络服务器](#31基于协程的网络服务器)
+    * [3.2、基于协程的客户端程序](#32基于协程的客户端程序)
+    * [3.3、使用 acl 网络库例子](#33使用-acl-网络库例子)
+    * [3.4、使用C++11示例](#34使用C++11示例)
+    * [3.5、基于协程的 Windows 界面网络程序](#35基于协程的-Windows-界面网络程序)
+    * [3.6、更多例子](#36更多例子)
+* [4、编译协程库](#4编译协程库)
+    * [4.1、在 Unix 平台编译](#41在-Unix-平台编译)
+    * [4.2、在 Windows 平台编译](#42在-Windows-平台编译)
+* [5、性能测试](#5性能测试)
+* [6、API 列表](#6API-列表)
+    * [6.1、Base API](#61Base-API)
+    * [6.2、IO API](#62IO-API)
+    * [6.3、Net API](#63Net-API)
+    * [6.4、Channel API](#64Channel-API)
+    * [6.5、Sync API](#65Sync-API)
+    * [6.6、关于 API Hook](#66关于-API-Hook)
+* [7、更多参考](#7更多参考)
+
 ## 1、概述
 
 本协程库为 [acl 工程](#https://github.com/acl-dev/acl) 的协程模块，该模块提供了 C 库和 C++ 库，其中 C 库实现了有关协程的核心功能，C++ 库是对 C 库的封装，从而更方便使用者快速开发协程类应用。目前支持的操作系统有：Linux，FreeBSD，MacOS 和 Windows，支持的事件类型有：select，poll，epoll，kqueue，iocp 及 Windows GUI 窗口消息。通过 libfiber 网络协程库，用户可以非常容易地写出高性能、高可靠的网络通信服务。因为使用了同步顺序编程的思维方式，相对于异步模式（无论是 reactor 模型还是 proactor 模型），编写网络应用更加简单。  
@@ -318,7 +342,7 @@ int main(int argc, char *argv[])
 }
 ```
 
-### 3.4、使用C++11f示例
+### 3.4、使用C++11示例
 
 如果使用C++11的特性，则示上面例更为简单，如下：
 
@@ -443,6 +467,7 @@ fiber_server: fiber_server.cpp
 ```
 
 ### 4.2、在 Windows 平台编译
+
 目前可以使用 vc2012/vc2013/vc2015 分别打开 [fiber_vc2012.sln](fiber_vc2012.sln) /[fiber_vc2013.sln](fiber_vc2013.sln)/[fiber_vc2015.sln](fiber_vc2015.sln) 编译 libfiber 库。
 
 ## 5、性能测试
@@ -501,7 +526,7 @@ fiber_server: fiber_server.cpp
 - acl_fiber_getaddrinfo
 - acl_fiber_freeaddrinfo
 
-### 6.4、Channel API  
+### 6.4、Channel API
 - acl_channel_create  
 - acl_channel_free  
 - acl_channel_send  
