@@ -53,7 +53,7 @@ Event|Linux|BSD|Mac|Windows
 #include <stdlib.h>
 #include <assert.h>
 #include "fiber/lib_fiber.h"
-#include "patch.h" // in the samples path
+#include "patch.h" // in lib_fiber/samples/patch.h
 
 static size_t      __stack_size  = 128000;
 static const char *__listen_ip   = "127.0.0.1";
@@ -155,7 +155,7 @@ int main(void)
 #include <string.h>
 #include <assert.h>
 #include "fiber/lib_fiber.h"
-#include "patch.h" // in the samples path
+#include "patch.h" // in lib_fiber/samples/patch.h
 
 static const char *__server_ip   = "127.0.0.1";
 static int         __server_port = 9001;
@@ -246,13 +246,14 @@ protected:
 		printf("fiber-%d-%d running\r\n", get_id(), acl::fiber::self());
 
 		char buf[8192];
-		while (true)
-		{
+		while (true) {
 			int ret = conn_->read(buf, sizeof(buf), false);
-			if (ret == -1)
+			if (ret == -1) {
 				break;
-			if (conn_->write(buf, ret) == -1)
+			}
+			if (conn_->write(buf, ret) == -1) {
 				break;
+			}
 		}
 
 		delete conn_;
@@ -275,11 +276,9 @@ protected:
 	// @override
 	void run(void)
 	{
-		while (true)
-		{
+		while (true) {
 			acl::socket_stream* conn = ss_.accept();
-			if (conn == NULL)
-			{
+			if (conn == NULL) {
 				printf("accept error %s\r\n", acl::last_serror());
 				break;
 			}
@@ -289,7 +288,6 @@ protected:
 			fiber_client* fc = new fiber_client(conn);
 			// start the fiber
 			fc->start();
-			continue;
 		}
 	}
 
@@ -310,10 +308,8 @@ int main(int argc, char *argv[])
 	acl::string addr("127.0.0.1:9006");
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -326,8 +322,7 @@ int main(int argc, char *argv[])
 	}
 
 	acl::server_socket ss;
-	if (ss.open(addr) == false)
-	{
+	if (ss.open(addr) == false) {
 		printf("listen %s error %s\r\n", addr.c_str(), acl::last_serror());
 		return 1;
 	}
@@ -358,10 +353,12 @@ static void fiber_client(acl::socket_stream* conn)
 	char buf[8192];
 	while (true) {
 		int ret = conn->read(buf, sizeof(buf), false);
-		if (ret == -1)
+		if (ret == -1) {
 			break;
-		if (conn->write(buf, ret) == -1)
+		}
+		if (conn->write(buf, ret) == -1) {
 			break;
+		}
 	}
 
 	delete conn;
