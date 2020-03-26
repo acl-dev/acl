@@ -462,6 +462,8 @@ fiber_client: fiber_client.c
 fiber_server: fiber_server.cpp
 	g++ -o fiber_server fiber_server.cpp -lfiber_cpp -lacl_cpp -lprotocol -lacl -lfiber
 ```
+在该 Makefile 中，-lfiber_cpp 放到最前面，是因为其依赖于其它几个库，而 -lfiber 放在最后，是因为该库需要 hook 系统 IO 操作。
+
 
 ### 4.2、在 Windows 平台编译
 
