@@ -552,7 +552,7 @@ static void my_debug( void *ctx, int level, const char* fname, int line,
 #define CONF_INIT_OK	1
 #define CONF_INIT_ERR	2
 
-#ifdef HAS_MBEDTLS
+#if defined(HAS_MBEDTLS) && defined(MBEDTLS_THREADING_ALT)
 static void mutex_init(mbedtls_threading_mutex_t* mutex)
 {
 	acl_pthread_mutex_t* m = (acl_pthread_mutex_t*) mutex;
@@ -591,12 +591,13 @@ bool mbedtls_conf::init_once(void)
 		return false;
 	}
 
-#ifdef HAS_MBEDTLS
+#if defined(HAS_MBEDTLS)
+# if defined(MBEDTLS_THREADING_ALT)
 	__threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
+# endif
 	__ssl_config_init((mbedtls_ssl_config*) conf_);
 	__entropy_init((mbedtls_entropy_context*) entropy_);
 	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
-
 # ifdef DEBUG_SSL
 	__ssl_conf_dbg((mbedtls_ssl_config*) conf_, my_debug, stdout);
 # endif

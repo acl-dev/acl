@@ -1477,7 +1477,9 @@
  *
  * Uncomment this to allow your own alternate threading implementation.
  */
-#define MBEDTLS_THREADING_ALT
+#if defined(_WIN32) || defined(_WIN64)
+# define MBEDTLS_THREADING_ALT
+#endif
 
 /**
  * \def MBEDTLS_THREADING_PTHREAD
@@ -1488,7 +1490,9 @@
  *
  * Uncomment this to enable pthread mutexes.
  */
-//#define MBEDTLS_THREADING_PTHREAD
+#if defined(__linux__) || defined(ANDROID) || defined(__APPLE__) || defined(__FreeBSD__)
+# define MBEDTLS_THREADING_PTHREAD
+#endif
 
 /**
  * \def MBEDTLS_VERSION_FEATURES
