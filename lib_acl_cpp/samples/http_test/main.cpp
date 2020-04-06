@@ -29,5 +29,13 @@ int main(void)
 		printf(">>%s=%s\r\n", (*cit)->name, (*cit)->value);
 
 	cookie->destroy();
+
+	const char* s = "encrypted/json";
+	acl::http_ctype hc;
+	if (hc.parse(s)) {
+		const char* ctype = hc.get_ctype();
+		const char* stype = hc.get_stype();
+		printf("ctype=%s, stype=%s\r\n", ctype, stype);
+	}
 	return 0;
 }

@@ -157,7 +157,7 @@ bool http_ctype::parse(const char* cp)
 			}
 		}
 	} else if (tok_count >= 3 && token[1].type == '/') {
-		stype_ = acl_mystrdup(token[1].u.value);
+		stype_ = acl_mystrdup(token[2].u.value);
 	}
 
 	acl_vstring_free(buffer);
