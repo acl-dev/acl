@@ -118,8 +118,8 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * 当发送完请求数据后，内部会自动调用读 HTTP 响应头过程，可以通过此函数获得服务端
-	 * 响应的 HTTP 状态字(2xx, 3xx, 4xx, 5xx)；
+	 * 当发送完请求数据后，内部会自动调用读 HTTP 响应头过程，可以通过此函数
+	 * 获得服务端响应的 HTTP 状态字(2xx, 3xx, 4xx, 5xx)；
 	 * 其实该函数内部只是调用了 http_client::response_status 方法
 	 * @return {int}
 	 */
@@ -175,7 +175,7 @@ public:
 	 */
 	bool get_body(json& out, const char* to_charset = NULL);
 
-	/*
+	/**
 	 * 当调用 request 成功后调用本函数，读取服务器全部响应数据
 	 * 存储于输入的缓冲区中
 	 * @param out {string&} 存储响应数据体
@@ -185,7 +185,7 @@ public:
 	 */
 	bool get_body(string& out, const char* to_charset = NULL);
 
-	/*
+	/**
 	 * 当调用 request 成功后调用本函数，读取服务器响应数据并
 	 * 存储于输入的缓冲区中，可以循环调用本函数，直至数据读完了，
 	 * @param buf {char*} 存储部分响应数据体
