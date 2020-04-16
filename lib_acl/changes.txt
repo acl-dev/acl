@@ -1,5 +1,8 @@
 修改历史列表：
 
+669) 2020.4.16
+669.1) feature: acl_get_ifaddrs() work ok on MacOS
+
 668) 2020.1.6
 668.1) feature: acl::mbedtls_conf 支持动态加载 mbedtls 的三个动态库
 

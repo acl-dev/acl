@@ -140,7 +140,7 @@ static ACL_IFCONF *ifconf_create(int max)
 #include <sys/sockio.h>
 #endif
 
-# if defined(ACL_LINUX) && !defined(ACL_ANDROID)
+# if (defined(ACL_LINUX) || defined(ACL_MACOSX)) && !defined(ACL_ANDROID)
 #include <ifaddrs.h>
 
 ACL_IFCONF *acl_get_ifaddrs(void)
@@ -252,8 +252,9 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 			acl_myfree(ifaces);
 			return NULL;
 		}
-		if (param.ifc_len < ifaces_size)
+		if (param.ifc_len < ifaces_size) {
 			break;
+		}
 		acl_myfree(ifaces);
 		ifaces_size *= 2;
 		ifaces = acl_mymalloc(ifaces_size);
@@ -268,8 +269,9 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 		size_t size;
 
 		size = acl_inet_ntop(&saddr->sa, ifa->addr, sizeof(ifa->addr));
-		if (size == 0)
+		if (size == 0) {
 			continue;
+		}
 
 		SAFE_COPY(ifconf->addrs[j].name, ifaces[i].ifr_name);
 		memcpy(&ifconf->addrs[j].saddr, saddr, size);
