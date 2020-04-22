@@ -1,135 +1,15 @@
-
-service httpd_upload {
-#	½ø³ÌÊÇ·ñ½ûÖ¹ÔËĞĞ
-	master_disable = no
-#	·şÎñµØÖ·¼°¶Ë¿ÚºÅ
-#	for master_type = inet
-#	master_service = 127.0.0.1:5001
-#	for master_type = unix
-#	master_service = echo.sock
-#	for master_type = sock
-	master_service = 8888
-
-#	·şÎñ¼àÌıÎªÓòÌ×½Ó¿Ú
-#	master_service = aio_echo.sock
-#	·şÎñÀàĞÍ
-#	master_type = inet
-#	master_type = unix
-	master_type = sock
-
-#	µ±×Ó½ø³ÌÒì³£ÍË³öÊ±£¬Èç¹û¸ÃÖµ·Ç¿Õ£¬Ôò½«×Ó½ø³ÌÒì³£ÍË³öµÄÏûÏ¢Í¨Öª¸Ã·şÎñ
-#	master_notify_addr = 127.0.0.1:5801
-#	ÓÊ¼şÍ¨Öª½ÓÊÕÕß
-#	master_notify_recipients = zhengshuxin@hotmail.com
-
-#	ÊÇ·ñÔÊĞíÑÓ³Ù½ÓÊÜ¿Í»§¶ËÁ¬½Ó£¬Èç¹ûÎª0Ôò±íÊ¾¹Ø±Õ¸Ã¹¦ÄÜ£¬Èç¹û´óÓÚ0Ôò±íÊ¾´ò¿ª´Ë¹¦ÄÜ
-#	²¢ÇÒ´ËÖµ´ú±íÑÓ³Ù½ÓÊÜÁ¬½ÓµÄ³¬Ê±Öµ£¬³¬¹ı´ËÖµÊ±Èç¹û¿Í»§¶ËÒÀÈ»Ã»ÓĞ·¢À´Êı¾İ£¬Ôò²Ù×÷
-#	ÏµÍ³»áÔÚÏµÍ³²ãÖ±½Ó¹Ø±Õ¸ÃÁ¬½Ó
-#	master_defer_accept = 0
-#	ÊÇ·ñÖ»ÔÊĞíË½ÓĞ·ÃÎÊ, Èç¹ûÎª y, ÔòÓòÌ×½Ó¿Ú´´½¨ÔÚ {install_path}/var/log/private/ Ä¿Â¼ÏÂ,
-#	Èç¹ûÎª n, ÔòÓòÌ×½Ó¿Ú´´½¨ÔÚ {install_path}/var/log/public/ Ä¿Â¼ÏÂ,
-	master_private = n
-	master_unpriv = n
-#	ÊÇ·ñĞèÒª chroot: n -- no, y -- yes
-	master_chroot = n
-#	Ã¿¸ô¶à³¤Ê±¼ä´¥·¢Ò»´Î£¬µ¥Î»ÎªÃë(½ö¶Ô trigger Ä£Ê½ÓĞĞ§)
-	master_wakeup = -
-#	×î´ó½ø³ÌÊı
-	master_maxproc = 1
-#	Ô¤Æô¶¯½ø³ÌÊı£¬¸ÃÖµ²»µÃ´óÓÚ master_maxproc
-#	master_prefork = 0
-#	½ø³Ì³ÌĞòÃû
-	master_command = httpd_upload
-#	½ø³ÌÈÕÖ¾¼ÇÂ¼ÎÄ¼ş
-	master_log = {install_path}/var/log/httpd_upload
-#	µ÷ÊÔÈÕÖ¾·½Ê½£¬¸ñÊ½£ºtag:level; tag:level; tab:level, Èç£ºall:1; 101:2
-#	master_debug =
-#	½ø³ÌÆô¶¯²ÎÊı£¬Ö»ÄÜÎª: -u [ÊÇ·ñÔÊĞíÒÔÄ³ÆÕÍ¨ÓÃ»§µÄÉí·İÔËĞĞ]
-#	master_args =
-#	´«µİ¸ø·şÎñ×Ó½ø³ÌµÄ»·¾³±äÁ¿, ¿ÉÒÔÍ¨¹ı getenv("SERVICE_ENV") »ñµÃ´ËÖµ
-#	master_env = mempool_limit:512000000
-#	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
-#			sync_action:E_LOG_SEM, sem_name:/tmp/ioctl_echo.sem
-
-#	µ±Æô¶¯¶à¸ö×Ó½ø³ÌÊµÀıÊ±£¬¸Ã¿ª¹Ø¿ØÖÆ¶à¸ö×Ó½ø³ÌÔÚ½ÓÊÕÁ¬½ÓÊ±ÊÇ·ñÏò acl_master ·¢ËÍÏûÏ¢±¨¸æ×Ô¼ºµÄ×´Ì¬
-#	master_status_notify = 1
-#	ÊÇ·ñÔÊĞí²úÉú core ÎÄ¼ş
-#	ioctl_enable_core = 1
-#	Ã¿¸ö½ø³ÌÊµÀı´¦ÀíÁ¬½ÓÊıµÄ×î´ó´ÎÊı£¬³¬¹ı´ËÖµºó½ø³ÌÊµÀıÖ÷¶¯ÍË³ö
-	ioctl_use_limit = 100
-#	Ã¿¸ö½ø³ÌÊµÀıµÄ¿ÕÏĞ³¬Ê±Ê±¼ä£¬³¬¹ı´ËÖµºó½ø³ÌÊµÀıÖ÷¶¯ÍË³ö
-	ioctl_idle_limit = 120
-#	¼ÇÂ¼½ø³ÌPIDµÄÎ»ÖÃ(¶ÔÓÚ¶à½ø³ÌÊµÀıÀ´ËµÃ»ÓĞÒâÒå)
-	ioctl_pid_dir =  {install_path}/var/pid
-#	½ø³ÌÔËĞĞÊ±ËùÔÚµÄÂ·¾¶
-	ioctl_queue_dir = {install_path}/var
-#	¶ÁĞ´³¬Ê±Ê±¼ä, µ¥Î»ÎªÃë
-	ioctl_rw_timeout = 120
-#	¶Á»º³åÇøµÄ»º³åÇø´óĞ¡
-	ioctl_buf_size = 8192
-#	Ã¿´Î accept Ê±µÄÑ­»·½ÓÊÕµÄ×î´ó´ÎÊı
-	ioctl_max_accept = 25
-#	ÔÚ²¢·¢·ÃÎÊÁ¿·Ç³£µÍµÄÇé¿öÏÂ£¬Èç·ÃÎÊÁ¿ÔÚ 10 ´Î/Ãë ÒÔÏÂÊ±£¬¿ÉÒÔÕÒ¿ª´ËÖµ(¼´¸³Îª1)£¬
-#	ÒÔ¼ÓËÙÊÂ¼şÑ­»·¹ı³Ì, ´Ó¶ø·ÀÖ¹·şÎñ½ø³Ì×èÈûÔÚ select ÉÏµÄÊ±¼ä¹ı³¤¶øÓ°Ïì·ÃÎÊËÙ¶È
-#	ioctl_enable_dog = 1
-#	½ø³ÌÔËĞĞÊ±µÄÓÃ»§Éí·İ
-	ioctl_owner = root
-
-#	ÓÃ select ½øĞĞÑ­»·Ê±µÄÊ±¼ä¼ä¸ô
-#	µ¥Î»ÎªÃë
-	ioctl_delay_sec = 1
-#	µ¥Î»ÎªÎ¢Ãë
-	ioctl_delay_usec = 500
-
-#       ²ÉÓÃÊÂ¼şÑ­»·µÄ·½Ê½: select(default), poll, kernel(epoll/devpoll/kqueue)
-	ioctl_event_mode = kernel
-#	ÊÂ¼şÒıÇæ¼ì²éËùÓĞ¿ÕÏĞÃèÊö·ûµÄÊ±¼ä¼ä¸ô(ºÁÃë)
-#	ioctl_check_inter = 100
-#	µ±ÆôÓÃ master_dispatch Á¬½Ó·Ö¿ª·şÎñºó£¬¸ÃÅäÖÃÖ¸¶¨ master_dispatch Ëù¼àÌıµÄ
-#	ÓòÌ×½Ó¿ÚµÄÈ«Â·¾¶£¬ÕâÑù±¾×Ó½ø³Ì¾Í¿ÉÒÔ´Ó master_dispatch »ñµÃ¿Í»§¶ËÁ¬½Ó
-#	ioctl_dispatch_addr = {install_path}/var/private/dispatch.sock
-#	µ± ioctl_dispatch_addr ¿ªÆôºó£¬ÏÂÃæ²ÎÊı¿ØÖÆ±¾·şÎñ½ø³Ì·¢¸øÇ°¶Ë master_dispatch µÄ·şÎñ±êÊ¶ĞÅÏ¢
-#	ioctl_dispatch_type = default
-
-#	Ïß³Ì³ØµÄ×î´óÏß³ÌÊı
-	ioctl_max_threads = 250
-#	Ïß³Ì³ØÖĞ¹¤×÷Ïß³ÌµÈ´ıÈÎÎñÊ±¼ä¼ä¸ô(ºÁÃë)
-#	ioctl_schedule_wait = 50
-#	Ïß³ÌÈÎÎñµ÷¶ÈµÄÊ±¼ä¼ä¸ô´óÓÚ´ËÖµ(ºÁÃë)ºó¼Ç¾¯¸æÈÕÖ¾
-#	ioctl_schedule_warn = 100
-#	Ïß³Ì´¦ÀíÈÎÎñÓµ¶ÂÊı³¬¹ı´Ë·§Öµºó¼Ç¾¯¸æÈÕÖ¾£¬ÉèÎª 0 ÔòÄÚ²¿Ö»ÓĞµ±Óµ¶ÂÈÎÎñÊı³¬¹ı×ÜÏß³ÌÊıµÄ 10 ±¶Ê±²Å±¨¾¯
-#	ioctl_qlen_warn = 0
-#	Ïß³ÌµÄ¶ÑÕ»¿Õ¼ä´óĞ¡£¬µ¥Î»Îª×Ö½Ú£¬0±íÊ¾Ê¹ÓÃÏµÍ³È±Ê¡Öµ
-	ioctl_stacksize = 0
-#	ÔÊĞí·ÃÎÊ udserver µÄ¿Í»§¶ËIPµØÖ··¶Î§
-#	ioctl_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
-	ioctl_access_allow = all
-
-#	µ± acl_master ÍË³öÊ±£¬Èç¹û¸ÃÖµÖÃ1Ôò¸Ã³ÌĞò²»µÈËùÓĞÁ¬½Ó´¦ÀíÍê±Ï±ãÁ¢¼´ÍË³ö
-	ioctl_quick_abort = 1
-
-############################################################################
-#	Ó¦ÓÃ×Ô¼ºµÄÅäÖÃÑ¡Ïî
-
-#	mysql ·şÎñµØÖ·
-#	mysql_dbaddr = /tmp/mysql.sock
-#	mysql_dbaddr = 10.0.250.199:3306
-#	Á¬½Ó mysql Êı¾İ¿âµÄÁ¬½Ó³ØµÄ×î´óÖµ
-#	mysql_dbmax  = 200
-#	ping mysql Á¬½ÓµÄ¼ä¸ôÊ±¼ä, ÒÔÃëÎªµ¥Î»
-#	mysql_dbping = 10
-#	mysql Á¬½Ó¿ÕÏĞµÄÊ±¼ä¼ä¸ô, ÒÔÃëÎªµ¥Î»
-#	mysql_dbtimeout = 30
-
-#	Êı¾İ¿âÃû³Æ
-#	mysql_dbname = ioctl_db
-#	Êı¾İ¿â·ÃÎÊÓÃ»§
-#	mysql_dbuser = ioctl_user
-#	Êı¾İ¿âÓÃ»§·ÃÎÊÃÜÂë
-#	mysql_dbpass = 111111
-
-#	ÊÇ·ñÊä³öµ±Ç°ÄÚ´æµÄ×´Ì¬ĞÅÏ¢
-#	debug_mem = 1
-#	ÊÇ·ñÔÚÒ»¸öÏß³ÌÖĞÁ¬½Ó¶Á
-#	loop_read = 1
-}
+<html>
+<head>
+<meta content="text/html; charset=gb2312" http-equiv="Content-Type">
+</head>
+<body>
+<form enctype="multipart/form-data" method=POST action="/upload?name1=ä¸­å›½äºº">
+<input type=hidden name="name2" value="ç¾å›½äºº"><br>
+<input type=hidden name="name3" value="è‹±å›½äºº"><br>
+æ–‡ä»¶ä¸€ï¼š<input type=file name="file1" value=""><br>
+æ–‡ä»¶äºŒï¼š<input type=file name="file2" value=""><br>
+æ–‡ä»¶ä¸‰ï¼š<input type=file name="file3" value=""><br>
+<br><input type=submit name="submit", value="æäº¤"><br>
+</form>
+</body>
+</html>
