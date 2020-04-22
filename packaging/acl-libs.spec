@@ -110,7 +110,8 @@ fi
 %files -n acl-master
 %defattr(-,root,root)
 /opt/soft/acl-master/conf/main.cf
-/opt/soft/acl-master/conf/service/samples
+#/opt/soft/acl-master/conf/service/samples
+/opt/soft/acl-master/conf/service
 /opt/soft/acl-master/libexec/acl_master
 /opt/soft/acl-master/sbin
 # just including master.sh  reload.sh  start.sh  stop.sh
