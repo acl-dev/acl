@@ -51,6 +51,7 @@ ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	endif
 	CFLAGS += -DFREEBSD -D_REENTRANT
 	SYSLIB = -lcrypt -lpthread -L/usr/local/lib -liconv -lz
+	RPATH = freebsd
 endif
 
 # For Darwin
@@ -59,6 +60,7 @@ ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
 		  -Wno-extended-offsetof
 	UNIXTYPE = MACOSX
 	SYSLIB +=  -liconv -rdynamic
+	RPATH = macos
 endif
 
 #Path for Linux
