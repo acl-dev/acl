@@ -156,7 +156,7 @@ create_all_path()
 	create_path $SH_PATH
 	create_path $CONF_PATH
 	create_path $SERVICE_PATH
-	create_path $SERVICE_PATH/samples
+#	create_path $SERVICE_PATH/samples
 	create_path $VAR_PATH
 	create_path $VAR_PATH/log
 	create_path $VAR_PATH/pid
@@ -182,7 +182,7 @@ copy_all_file()
 	install_file a+x,go-wrx sh $SH_PATH
 	install_file a+x,go-wrx conf $CONF_PATH
 	install_file a+x,go-wrx conf/service $SERVICE_PATH
-	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
+#	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
 	install_file a+x,go-wrx init.d/ $INIT_PATH
 }
 
