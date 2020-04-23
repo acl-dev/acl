@@ -27,8 +27,16 @@ static void print_name(const char* name, int tabs = 1)
 	printf("%-s", name);
 #endif
 
-	for (int i = 0; i < tabs; i++)
-		printf("\t");
+	int len = (int) strlen(name);
+	int n = tabs * 8;
+	if (len >= n) {
+		n = 0;
+	} else {
+		n -= len;
+	}
+	char fmt[64];
+	snprintf(fmt, sizeof(fmt), "%%-%ds", n);
+	printf(fmt, "");
 }
 
 static void print_value(const char* value, int tabs = 1)
@@ -39,8 +47,16 @@ static void print_value(const char* value, int tabs = 1)
 	printf("%-s", value);
 #endif
 
-	for (int i = 0; i < tabs; i++)
-		printf("\t");
+	int len = (int) strlen(value);
+	int n = tabs * 8;
+	if (len >= n) {
+		n = 0;
+	} else {
+		n -= len;
+	}
+	char fmt[64];
+	snprintf(fmt, sizeof(fmt), "%%-%ds", n);
+	printf(fmt, "");
 }
 
 static void print_value(int value, int tabs = 1)
@@ -53,9 +69,9 @@ static void print_value(int value, int tabs = 1)
 static void print_head(void)
 {
 	print_name("status");
-	print_name("service", 2);
+	print_name("service", 6);
 	print_name("type");
-	print_name("proc_count", 1);
+	print_name("proc", 1);
 	print_name("owner");
 	print_name("conf");
 	printf("\r\n");
@@ -64,9 +80,9 @@ static void print_head(void)
 static void print_server(const serv_info_t& server)
 {
 	print_value(server.status);
-	print_value(server.name, 2);
+	print_value(server.name, 6);
 	print_value(server.type);
-	print_value(server.proc_total, 2);
+	print_value(server.proc_total, 1);
 	print_value(server.owner);
 	print_value(server.conf);
 	printf("\r\n");
