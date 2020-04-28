@@ -102,15 +102,17 @@ static int read_complete_callback(ACL_ASTREAM *astream, char *data, int len)
 		while (1) {
 			handle = astream->read_handles->pop_back(
 				astream->read_handles);
-			if (handle == NULL)
+			if (handle == NULL) {
 				break;
+			}
 			astream->reader_fifo.push_back(&astream->reader_fifo, handle);
 		}
 
 		acl_foreach_reverse(iter, &astream->reader_fifo) {
 			handle = (AIO_READ_HOOK*) iter.data;
-			if (handle->disable)
+			if (handle->disable) {
 				continue;
+			}
 			ret = handle->callback(astream, handle->ctx, data, len);
 			if (ret != 0) {
 				astream->nrefer--;
@@ -194,8 +196,9 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 {
 	const char *myname = "__gets_notify_callback";
 
-	if (astream->keep_read == 0)
+	if (astream->keep_read == 0) {
 		READ_SAFE_DISABLE(astream);
+	}
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 该流出错，但是有可能关闭的事件通知到达时流依然可读，
@@ -208,8 +211,9 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 		do {
 			astream->stream->read_ready = 1;
 			ret = __gets_peek(astream);
-			if (astream->keep_read == 0)
+			if (astream->keep_read == 0) {
 				break;
+			}
 		} while (ret > 0);
 		READ_IOCP_CLOSE(astream);
 		return;
@@ -231,13 +235,15 @@ static void __gets_notify_callback(int event_type, ACL_ASTREAM *astream)
 		return;
 	}
 
-	if ((event_type & ACL_EVENT_READ) == 0)
+	if ((event_type & ACL_EVENT_READ) == 0) {
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
+	}
 
 	/* 尝试性地读数据 */
 	while (1) {
-		if (__gets_peek(astream) <= 0 || astream->keep_read == 0)
+		if (__gets_peek(astream) <= 0 || astream->keep_read == 0) {
 			break;
+		}
 	}
 }
 
@@ -250,19 +256,23 @@ static void __aio_gets(ACL_ASTREAM *astream, int nonl)
 {
 	const char *myname = "__aio_gets";
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return;
-	if (astream->stream == NULL)
+	}
+	if (astream->stream == NULL) {
 		acl_msg_fatal("%s: astream->stream null", myname);
+	}
 
 	/* 设置读流函数 */
-	if (nonl)
+	if (nonl) {
 		astream->read_ready_fn = acl_vstream_gets_nonl_peek;
-	else
+	} else {
 		astream->read_ready_fn = acl_vstream_gets_peek;
+	}
 
-	if (astream->line_length > 0)
+	if (astream->line_length > 0) {
 		astream->strbuf.maxlen = astream->line_length;
+	}
 
 	astream->event_read_callback = __gets_notify_callback;
 
@@ -276,15 +286,17 @@ static void __aio_gets(ACL_ASTREAM *astream, int nonl)
 	 * 缓冲区中无数据时，而无法监控该流的系统缓冲区，所以对于持续流的读
 	 * 操作，必须保证流处于读监听状态
 	 */ 
-	if (astream->keep_read)
+	if (astream->keep_read) {
 		READ_SAFE_ENABLE(astream, main_read_callback);
+	}
 
 	/* 如果嵌套调用次数小于阀值，则允许进行嵌套调用 */
 	if (astream->read_nested < astream->read_nested_limit) {
 		/* 尝试性地读数据 */
 		while (1) {
-			if (__gets_peek(astream) <= 0 || astream->keep_read == 0)
+			if (__gets_peek(astream) <= 0 || astream->keep_read == 0) {
 				break;
+			}
 		}
 		astream->read_nested--;
 		return;
@@ -293,9 +305,10 @@ static void __aio_gets(ACL_ASTREAM *astream, int nonl)
 	/* 递归嵌套读次数达到了规定的阀值，
 	 * 只需记个警告信息即可，因为有嵌套限制
 	 */
-	if (acl_msg_verbose)
+	if (acl_msg_verbose) {
 		acl_msg_warn("%s: read_nested(%d) >= max(%d)", myname,
 			astream->read_nested, astream->read_nested_limit);
+	}
 	/* 否则，不允许继续嵌套，将读事件置于事件监控循环中，以减少嵌套层次 */
 
 	astream->read_nested--;
@@ -384,8 +397,9 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 {
 	const char *myname = "__read_notify_callback";
 
-	if (astream->keep_read == 0)
+	if (astream->keep_read == 0) {
 		READ_SAFE_DISABLE(astream);
+	}
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 该流出错，但是有可能关闭的事件通知到达时流依然可读，
@@ -421,13 +435,15 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 		return;
 	}
 
-	if ((event_type & ACL_EVENT_READ) == 0)
+	if ((event_type & ACL_EVENT_READ) == 0) {
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
+	}
 
 	/* 尝试性地读数据 */
 	while (1) {
-		if (__read_peek(astream) <= 0 || astream->keep_read == 0)
+		 if (__read_peek(astream) <= 0 || astream->keep_read == 0) {
 			break;
+		 }
 	}
 }
 
@@ -435,11 +451,13 @@ void acl_aio_read(ACL_ASTREAM *astream)
 {
 	const char *myname = "acl_aio_read";
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return;
-	if (astream->stream == NULL)
+	}
+	if (astream->stream == NULL) {
 		acl_msg_fatal("%s: astream(%p)->stream null",
 			myname, astream);
+	}
 
 	astream->event_read_callback = __read_notify_callback;
 	/* XXX: 必须将缓冲区重置 */
@@ -450,8 +468,9 @@ void acl_aio_read(ACL_ASTREAM *astream)
 	 * 缓冲区中无数据时，而无法监控该流的系统缓冲区，所以对于持续流的读
 	 * 操作，必须保证流处于读监听状态
 	 */ 
-	if (astream->keep_read)
+	if (astream->keep_read) {
 		READ_SAFE_ENABLE(astream, main_read_callback);
+	}
 
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->read_nested++;
@@ -460,17 +479,19 @@ void acl_aio_read(ACL_ASTREAM *astream)
 	if (astream->read_nested < astream->read_nested_limit) {
 		/* 尝试性地读数据 */
 		while (1) {
-			if (__read_peek(astream) <= 0 || astream->keep_read == 0)
+			if (__read_peek(astream) <= 0 || astream->keep_read == 0) {
 				break;
+			}
 		}
 		astream->read_nested--;
 		return;
 	}
 
 	/* 递归嵌套读次数达到了规定的阀值，只需记个警告信息，因为有嵌套限制 */
-	if (acl_msg_verbose)
+	if (acl_msg_verbose) {
 		acl_msg_warn("%s: read_nested(%d) >= max(%d)", myname,
 			astream->read_nested, astream->read_nested_limit);
+	}
 
 	/* 否则，不允许继续嵌套，将读事件置于事件监控循环中，减少嵌套层次 */
 
@@ -495,9 +516,10 @@ static int __readn_peek(ACL_ASTREAM *astream)
 
 	n = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
-	if (astream->count <= n)
+	if (astream->count <= n) {
 		acl_msg_fatal("%s: count(%d) < strlen(%d), read_netsted(%d)",
 			myname, astream->count, n, astream->read_nested);
+	}
 
 	/* 尝试性地读数据 */
 	n = acl_vstream_readn_peek(astream->stream, &astream->strbuf,
@@ -534,9 +556,10 @@ static int __readn_peek(ACL_ASTREAM *astream)
 		char *ptr = acl_vstring_str(&astream->strbuf);
 		int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
-		if (len != astream->count)
+		if (len != astream->count) {
 			acl_msg_fatal("%s: len: %d != count: %d",
 				myname, len, astream->count);
+		}
 
 		/* 回调用户的读成功处理函数 */
 		n = read_complete_callback(astream, ptr, len);
@@ -562,8 +585,9 @@ static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 {
 	const char *myname = "__readn_notify_callback";
 
-	if (astream->keep_read == 0)
+	if (astream->keep_read == 0) {
 		READ_SAFE_DISABLE(astream);
+	}
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		/* 该流出错，但是有可能关闭的事件通知到达时流依然可读，
@@ -597,15 +621,18 @@ static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 		return;
 	}
 
-	if ((event_type & ACL_EVENT_READ) == 0)
+	if ((event_type & ACL_EVENT_READ) == 0) {
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
+	}
 
-	if (astream->stream == NULL)
+	if (astream->stream == NULL) {
 		acl_msg_fatal("%s: stream null", myname);
+	}
 
 	while (1) {
-		if (__readn_peek(astream) <= 0 || astream->keep_read == 0)
+		if (__readn_peek(astream) <= 0 || astream->keep_read == 0) {
 			break;
+		}
 	}
 }
 
@@ -613,10 +640,12 @@ void acl_aio_readn(ACL_ASTREAM *astream, int count)
 {
 	const char *myname = "acl_aio_readn";
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return;
-	if (count <= 0)
+	}
+	if (count <= 0) {
 		acl_msg_fatal("%s: count(%d) <= 0", myname, count);
+	}
 
 	/* 设置回调函数 */
 	astream->event_read_callback = __readn_notify_callback;
@@ -630,8 +659,9 @@ void acl_aio_readn(ACL_ASTREAM *astream, int count)
 	 * 缓冲区中无数据时，而无法监控该流的系统缓冲区，所以对于持续流的读
 	 * 操作，必须保证流处于读监听状态
 	 */ 
-	if (astream->keep_read)
+	if (astream->keep_read) {
 		READ_SAFE_ENABLE(astream, main_read_callback);
+	}
 
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->read_nested++;
@@ -640,17 +670,19 @@ void acl_aio_readn(ACL_ASTREAM *astream, int count)
 	if (astream->read_nested < astream->read_nested_limit) {
 		/* 尝试性地读数据 */
 		while (1) {
-			if (__readn_peek(astream) <= 0 || astream->keep_read == 0)
+			if (__readn_peek(astream) <= 0 || astream->keep_read == 0) {
 				break;
+			}
 		}
 		astream->read_nested--;
 		return;
 	}
 
 	/* 递归嵌套读次数达到了规定的阀值，只需记个警告信息，因为有嵌套限制 */
-	if (acl_msg_verbose)
+	if (acl_msg_verbose) {
 		acl_msg_warn("%s: read_nested(%d) >= max(%d)", myname,
 			astream->read_nested, astream->read_nested_limit);
+	}
 
 	/* 否则，不允许继续嵌套，将读事件置于事件监控循环中，减少嵌套层次 */
 
@@ -691,8 +723,9 @@ ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
 {
 	int   ready = 0;
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return NULL;
+	}
 	if (acl_vstream_gets_nonl_peek(astream->stream,
 		&astream->strbuf, &ready) == ACL_VSTREAM_EOF
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
@@ -701,14 +734,16 @@ ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
 		&& astream->stream->errnum != ACL_EWOULDBLOCK)
 	{
 		astream->flag |= ACL_AIO_FLAG_DEAD;
-		if (ACL_VSTRING_LEN(&astream->strbuf) > 0)
+		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			return &astream->strbuf;
-		else
+		} else {
 			return NULL;
-	} else if (ready)
+		}
+	} else if (ready) {
 		return &astream->strbuf;
-	else
+	} else {
 		return NULL;
+	}
 }
 
 ACL_VSTRING *acl_aio_read_peek(ACL_ASTREAM *astream, int *count)
@@ -792,8 +827,9 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 {
 	ACL_ASTREAM *astream = (ACL_ASTREAM*) context;
 
-	if (astream->keep_read == 0)
+	if (astream->keep_read == 0) {
 		READ_SAFE_DISABLE(astream);
+	}
 
 	if ((event_type & ACL_EVENT_XCPT) != 0) {
 		READ_IOCP_CLOSE(astream);
@@ -829,8 +865,9 @@ void acl_aio_enable_read(ACL_ASTREAM *astream,
 {
 	int   ret;
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return;
+	}
 
 	READ_SAFE_ENABLE(astream, can_read_callback);
 
@@ -852,19 +889,22 @@ void acl_aio_enable_read(ACL_ASTREAM *astream,
 
 void acl_aio_disable_read(ACL_ASTREAM *astream)
 {
-	if ((astream->flag & ACL_AIO_FLAG_ISRD) == 0)
+	if ((astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
 		return;
+	}
 	astream->flag &= ~ACL_AIO_FLAG_ISRD;
 	astream->can_read_fn = NULL;
 	astream->can_read_ctx = NULL;
-	if (astream->stream)
+	if (astream->stream) {
 		acl_event_disable_read(astream->aio->event, astream->stream);
+	}
 }
 
 int acl_aio_isrset(ACL_ASTREAM *astream)
 {
-	if (astream->stream == NULL)
+	if (astream->stream == NULL) {
 		return 0;
+	}
 
 	return acl_event_isrset(astream->aio->event, astream->stream);
 }
