@@ -28,8 +28,9 @@ android {
         externalNativeBuild {
             cmake {
                 //arguments "-DANDROID_STL=stl_shared"
-                //arguments "-DANDROID_STL=gnustl_shared"
-                arguments "-DANDROID_STL=c++_shared"
+                //arguments "-DANDROID_STL=gnustl_shared" // for ndk16b
+                arguments "-DANDROID_STL=c++_shared"      // for ndk20 or above
+
                 arguments "-DCMAKE_BUILD_TYPE=RELEASE"
                 arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
                 arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
@@ -37,14 +38,15 @@ android {
                 arguments "-DACL_CLIENT_ONLY=YES"
                 arguments "-DACL_BUILD_SHARED=YES"
                 //cppFlags "-fexceptions"
+
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
-                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a'
-                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
             }
             cmake {
                 //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
-                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'acl', 'protocol', 'acl_cpp'
-                //targets 'acl_static', 'protocol_static', 'acl_cpp_static'
+                //targets 'acl_static', 'protocol_static', 'acl_cpp_static'                              // for ndk16b
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'acl', 'protocol', 'acl_cpp'  // for ndk20 or above
             }
         }
     }
