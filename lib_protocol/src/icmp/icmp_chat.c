@@ -13,6 +13,7 @@ static unsigned long __unique_id = 0;
 static ACL_ATOMIC *__unique_lock = NULL;
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 
+#ifndef HAVE_NO_ATEXIT
 static void proc_on_exit(void)
 {
 	if (__unique_lock) {
@@ -20,6 +21,7 @@ static void proc_on_exit(void)
 		__unique_lock = NULL;
 	}
 }
+#endif
 
 static void icmp_once(void)
 {
