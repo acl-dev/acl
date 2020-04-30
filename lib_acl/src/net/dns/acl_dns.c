@@ -19,6 +19,7 @@
 #include "net/acl_sane_socket.h"
 #include "net/acl_sane_inet.h"
 #include "net/acl_mask_addr.h"
+#include "net/acl_vstream_net.h"
 #include "net/acl_dns.h"
 
 #endif
@@ -358,7 +359,7 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 static int dns_stream_open(ACL_DNS *dns)
 {
 	/* ndk9 居然要求 acl_vstream_bind 前加返回类型？*/
-	ACL_VSTREAM *stream = (ACL_VSTREAM*) acl_vstream_bind("0.0.0.0:0", 0, 0);
+	ACL_VSTREAM *stream = acl_vstream_bind("0.0.0.0:0", 0, 0);
 
 	if (stream == NULL) {
 		acl_msg_error("%s(%d), %s: acl_vstream_bind error=%s",

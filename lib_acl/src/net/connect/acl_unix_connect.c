@@ -22,6 +22,7 @@
 
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_iostuff.h"
+#include "stdlib/acl_sys_patch.h"
 #include "net/acl_connect.h"
 
 /* acl_unix_connect - connect to UNIX-domain listener */

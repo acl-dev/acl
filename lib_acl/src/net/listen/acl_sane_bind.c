@@ -20,6 +20,7 @@
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_host_port.h"
+#include "net/acl_valid_hostname.h"
 #include "net/acl_listen.h"
 #endif
 

@@ -27,6 +27,7 @@
 #include "net/acl_connect.h"
 #include "net/acl_listen.h"
 #include "net/acl_host_port.h"
+#include "net/acl_valid_hostname.h"
 #include "net/acl_vstream_net.h"
 
 #endif

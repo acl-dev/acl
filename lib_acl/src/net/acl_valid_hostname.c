@@ -15,6 +15,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_argv.h"
 #include "stdlib/acl_mystring.h"
+#include "stdlib/acl_stringops.h"
 #include "net/acl_valid_hostname.h"
 
 #endif
