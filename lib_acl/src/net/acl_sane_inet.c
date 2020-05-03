@@ -4,10 +4,6 @@
 #pragma comment(lib, "Iphlpapi.lib")
 #endif
 
-#ifdef ACL_UNIX
-#include <net/if.h>
-#endif
-
 #ifndef ACL_PREPARE_COMPILE
 
 #include "stdlib/acl_define.h"
@@ -20,6 +16,7 @@
 #endif
 
 #ifdef	ACL_UNIX
+#include <net/if.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

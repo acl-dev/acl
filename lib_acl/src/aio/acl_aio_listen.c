@@ -17,6 +17,7 @@
 
 #endif
 
+#include "../event/events.h"
 #include "aio.h"
 
 static void __accept_notify_callback(int event_type,
@@ -39,8 +40,9 @@ static void __accept_notify_callback(int event_type,
 		return;
 	}
 
-	if ((event_type & ACL_EVENT_READ) == 0)
+	if ((event_type & ACL_EVENT_READ) == 0) {
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
+	}
 
 	for (i = 0; i < astream->accept_nloop; i++) {
 		/* cstream read_buf 的长度 read_buf_len 继承自监听流的
@@ -51,10 +53,16 @@ static void __accept_notify_callback(int event_type,
 			int   ret;
 
 			ret = acl_last_error();
-			if (ret == ACL_EAGAIN || ret == ACL_ECONNABORTED)
+			if (ret == ACL_EAGAIN || ret == ACL_ECONNABORTED) {
 				break;
-			acl_msg_fatal("%s: listen exception, error(%s)",
+			}
+
+			acl_msg_error("%s: listen exception, error(%s)",
 				myname,	acl_last_serror());
+
+			/* TODO: the listener should be restart again */
+			astream->aio->event->disable_read_fn(
+				astream->aio->event, astream->stream);
 			break;
 		}
 
@@ -73,8 +81,9 @@ void acl_aio_accept(ACL_ASTREAM *astream)
 {
 	const char *myname = "acl_aio_accept";
 
-	if (astream == NULL)
+	if (astream == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
+	}
 
 	astream->flag |= ACL_AIO_FLAG_ISRD;
 	acl_event_enable_listen(astream->aio->event, astream->stream,
@@ -100,8 +109,9 @@ static void __listen_notify_callback(int event_type,
 	}
 
 	for (i = 0; i < astream->accept_nloop; i++) {
-		if (astream->listen_fn(astream,	astream->context) < 0)
+		if (astream->listen_fn(astream,	astream->context) < 0) {
 			break;
+		}
 	}
 }
 
@@ -109,8 +119,9 @@ void acl_aio_listen(ACL_ASTREAM *astream)
 {
 	const char *myname = "acl_aio_listen";
 
-	if (astream == NULL)
+	if (astream == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
+	}
 
 	astream->flag |= ACL_AIO_FLAG_ISRD;
 	acl_event_enable_listen(astream->aio->event, astream->stream,

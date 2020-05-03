@@ -218,6 +218,8 @@ link_directories(${lib_output_path})
 if (${UNIX_OS})
 	if (NOT ANDROID_STL MATCHES "gnustl_shared")
 		set(CMAKE_SHARED_LINKER_FLAGS "-shared -lz -O3 -flto")
+	else()
+		set(CMAKE_SHARED_LINKER_FLAGS "-shared -lz -O3")
 	endif()
 	target_compile_options(acl_cpp_static PRIVATE
 		-fvisibility=hidden -fvisibility-inlines-hidden)

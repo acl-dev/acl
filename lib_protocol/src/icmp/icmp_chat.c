@@ -13,6 +13,7 @@ static unsigned long __unique_id = 0;
 static ACL_ATOMIC *__unique_lock = NULL;
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 
+#ifndef HAVE_NO_ATEXIT
 static void proc_on_exit(void)
 {
 	if (__unique_lock) {
@@ -20,12 +21,15 @@ static void proc_on_exit(void)
 		__unique_lock = NULL;
 	}
 }
+#endif
 
 static void icmp_once(void)
 {
 	__unique_lock = acl_atomic_new();
 	acl_atomic_set(__unique_lock, &__unique_id);
+#ifndef HAVE_NO_ATEXIT
 	atexit(proc_on_exit);
+#endif
 }
 
 ICMP_CHAT *icmp_chat_create(ACL_AIO* aio, int check_id)
