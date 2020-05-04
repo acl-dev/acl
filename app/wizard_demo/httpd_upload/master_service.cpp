@@ -7,9 +7,11 @@
 
 char *var_cfg_var_path;
 char *var_cfg_redis_addrs;
+char *var_cfg_page_html;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "var_path",  "var", &var_cfg_var_path },
 	{ "redis_addrs", "127.0.0.1:6379", &var_cfg_redis_addrs },
+	{ "page_html", "./upload.html", &var_cfg_page_html },
 
 	{ 0, 0, 0 }
 };

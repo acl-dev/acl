@@ -99,11 +99,10 @@ bool http_servlet::onPage(request_t& req, response_t& res)
 		.setContentEncoding(true)		// 自动支持压缩传输
 		.setChunkedTransferEncoding(true);	// 采用 chunk 传输方式
 
-	const char* page_html = "upload.html";
 	acl::string buf;
-
-	if (!acl::ifstream::load(page_html, &buf)) {
-		buf.format("load %s error %s", page_html, acl::last_serror());
+	if (!acl::ifstream::load(var_cfg_page_html, &buf)) {
+		buf.format("load %s error %s",
+			var_cfg_page_html, acl::last_serror());
 	}
 
 	res.setContentLength(buf.size());
