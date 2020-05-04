@@ -52,9 +52,6 @@
 #include <netdb.h>		/* struct addrinfo */
 #endif
 
-#ifdef SYS_WIN
-//typedef int _Bool;
-#endif
 
 /*
  * V I S I B I L I T Y
@@ -163,12 +160,15 @@ DNS_PUBLIC int *dns_debug_p(void);
 
 #define dns_quietinit(...) \
 	DNS_PRAGMA_PUSH DNS_PRAGMA_QUIET __VA_ARGS__ DNS_PRAGMA_POP
-#elif (__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4
+#elif (__GNUC__ < 9) && ((__GNUC__ == 4 && __GNUC_MINOR__ >= 6) || __GNUC__ > 4)
 #define DNS_PRAGMA_PUSH _Pragma("GCC diagnostic push")
 #define DNS_PRAGMA_QUIET _Pragma("GCC diagnostic ignored \"-Woverride-init\"")
 #define DNS_PRAGMA_POP _Pragma("GCC diagnostic pop")
 
-/* GCC parses the _Pragma operator less elegantly than clang. */
+/*
+ * GCC parses the _Pragma operator less elegantly than clang.
+ * This only works up to GCC 9
+ */
 #define dns_quietinit(...) \
 	__extension__ ({ DNS_PRAGMA_PUSH DNS_PRAGMA_QUIET __VA_ARGS__; DNS_PRAGMA_POP })
 #else
@@ -180,7 +180,6 @@ DNS_PUBLIC int *dns_debug_p(void);
 
 #if defined __GNUC__
 #define DNS_PRAGMA_EXTENSION __extension__
-#pragma GCC diagnostic ignored "-Wstrict-prototypes"
 #else
 #define DNS_PRAGMA_EXTENSION
 #endif
@@ -1256,11 +1255,6 @@ int get_read_timeout(void);
 #define DNS_PP_D10 9
 #define DNS_PP_D11 10
 #define DNS_PP_DEC(N) DNS_PP_XPASTE(DNS_PP_D, N)
-
-#if __GNUC__
-//#pragma GCC diagnostic pop // add by zsx, 2017-12-20
-DNS_PRAGMA_POP  // add by zsx, 2017.12.30
-#endif
 
 #endif /* DNS_H */
 
