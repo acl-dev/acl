@@ -180,6 +180,7 @@ DNS_PUBLIC int *dns_debug_p(void);
 
 #if defined __GNUC__
 #define DNS_PRAGMA_EXTENSION __extension__
+#pragma GCC diagnostic ignored "-Wstrict-prototypes"
 #else
 #define DNS_PRAGMA_EXTENSION
 #endif
@@ -450,7 +451,7 @@ DNS_PUBLIC enum dns_rcode dns_p_rcode(struct dns_packet *);
 
 DNS_PUBLIC unsigned dns_p_count(struct dns_packet *, enum dns_section);
 
-DNS_PUBLIC int dns_p_push(struct dns_packet *, enum dns_section, const void *, size_t, enum dns_type, enum dns_class, unsigned, const void *);
+DNS_PUBLIC int dns_p_push(struct dns_packet *, enum dns_section, void *, size_t, enum dns_type, enum dns_class, unsigned, void *);
 
 DNS_PUBLIC void dns_p_dictadd(struct dns_packet *, unsigned short);
 
@@ -484,13 +485,13 @@ DNS_PUBLIC size_t dns_d_anchor(void *, size_t, const void *, size_t);
 
 DNS_PUBLIC size_t dns_d_cleave(void *, size_t, const void *, size_t);
 
-DNS_PUBLIC size_t dns_d_comp(void *, size_t, const void *, size_t, struct dns_packet *, int *);
+DNS_PUBLIC size_t dns_d_comp(void *, size_t, void *, size_t, struct dns_packet *, int *);
 
 DNS_PUBLIC size_t dns_d_expand(void *, size_t, unsigned short, struct dns_packet *, int *);
 
 DNS_PUBLIC unsigned short dns_d_skip(unsigned short, struct dns_packet *);
 
-DNS_PUBLIC int dns_d_push(struct dns_packet *, const void *, size_t);
+DNS_PUBLIC int dns_d_push(struct dns_packet *, void *, size_t);
 
 DNS_PUBLIC size_t dns_d_cname(void *, size_t, const void *, size_t, struct dns_packet *, int *error);
 
@@ -989,7 +990,7 @@ DNS_PUBLIC struct dns_hints *dns_hints_mortal(struct dns_hints *);
 
 DNS_PUBLIC int dns_hints_insert(struct dns_hints *, const char *, const struct sockaddr *, unsigned);
 
-DNS_PUBLIC unsigned dns_hints_insert_resconf(struct dns_hints *, const char *, const struct dns_resolv_conf *, int *);
+DNS_PUBLIC unsigned dns_hints_insert_resconf(struct dns_hints *, const char *, struct dns_resolv_conf *, int *);
 
 DNS_PUBLIC struct dns_hints *dns_hints_local(struct dns_resolv_conf *, int *);
 

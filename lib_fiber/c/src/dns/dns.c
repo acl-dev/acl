@@ -811,9 +811,10 @@ static size_t dns_af_len(int af) {
 	return table[af];
 } /* dns_af_len() */
 
+#define c_dns_sa_family(sa)	(((const struct sockaddr *)(sa))->sa_family)
 #define dns_sa_family(sa)	(((struct sockaddr *)(sa))->sa_family)
 
-#define dns_sa_len(sa)		dns_af_len(dns_sa_family(sa))
+#define dns_sa_len(sa)		dns_af_len(c_dns_sa_family(sa))
 
 
 #define DNS_SA_NOPORT	&dns_sa_noport
@@ -831,7 +832,7 @@ static unsigned short *dns_sa_port(int af, void *sa) {
 } /* dns_sa_port() */
 
 
-static void *dns_sa_addr(int af, const void *sa, socklen_t *size) {
+static void *dns_sa_addr(int af, void *sa, socklen_t *size) {
 	switch (af) {
 	case AF_INET6: {
 		struct in6_addr *in6 = &((struct sockaddr_in6 *)sa)->sin6_addr;
@@ -891,7 +892,7 @@ static int dns_sa_cmp(void *a, void *b) {
 
 	switch ((af = dns_sa_family(a))) {
 	case AF_INET: {
-		struct in_addr *a4, *b4;
+		const struct in_addr *a4, *b4;
 
 		if ((cmp = htons(*dns_sa_port(af, a)) - htons(*dns_sa_port(af, b))))
 			return cmp;
@@ -907,7 +908,7 @@ static int dns_sa_cmp(void *a, void *b) {
 		return 0;
 	}
 	case AF_INET6: {
-		struct in6_addr *a6, *b6;
+		const struct in6_addr *a6, *b6;
 		size_t i;
 
 		if ((cmp = htons(*dns_sa_port(af, a)) - htons(*dns_sa_port(af, b))))
@@ -1394,7 +1395,7 @@ error:
 #define DNS_B_INTO(src, n) DNS_B_INIT((src), (n))
 
 struct dns_buf {
-	const unsigned char *base;
+	unsigned char *base;
 	unsigned char *p;
 	const unsigned char *pe;
 	dns_error_t error;
@@ -1582,7 +1583,7 @@ dns_b_strllen(struct dns_buf *b)
 }
 
 DNS_NOTUSED static const struct dns_buf *
-dns_b_from(const struct dns_buf *b, const void *src, size_t n)
+dns_b_from(struct dns_buf *b, void *src, size_t n)
 {
 	*(struct dns_buf *)b = (struct dns_buf)DNS_B_FROM(src, n);
 
@@ -1590,7 +1591,7 @@ dns_b_from(const struct dns_buf *b, const void *src, size_t n)
 }
 
 static inline int
-dns_b_getc(const struct dns_buf *_b, const int eof)
+dns_b_getc(struct dns_buf *_b, int eof)
 {
 	struct dns_buf *b = (struct dns_buf *)_b;
 
@@ -1601,7 +1602,7 @@ dns_b_getc(const struct dns_buf *_b, const int eof)
 }
 
 static inline intmax_t
-dns_b_get16(const struct dns_buf *b, const intmax_t eof)
+dns_b_get16(struct dns_buf *b, intmax_t eof)
 {
 	intmax_t n;
 
@@ -1612,7 +1613,7 @@ dns_b_get16(const struct dns_buf *b, const intmax_t eof)
 }
 
 DNS_NOTUSED static inline intmax_t
-dns_b_get32(const struct dns_buf *b, const intmax_t eof)
+dns_b_get32(struct dns_buf *b, intmax_t eof)
 {
 	intmax_t n;
 
@@ -1623,7 +1624,7 @@ dns_b_get32(const struct dns_buf *b, const intmax_t eof)
 }
 
 static inline dns_error_t
-dns_b_move(struct dns_buf *dst, const struct dns_buf *_src, size_t n)
+dns_b_move(struct dns_buf *dst, struct dns_buf *_src, size_t n)
 {
 	struct dns_buf *src = (struct dns_buf *)_src;
 	size_t src_n = DNS_PP_MIN((size_t)(src->pe - src->p), n);
@@ -1883,7 +1884,7 @@ void dns_p_dictadd(struct dns_packet *P, unsigned short dn) {
 } /* dns_p_dictadd() */
 
 
-int dns_p_push(struct dns_packet *P, enum dns_section section, const void *dn, size_t dnlen, enum dns_type type, enum dns_class class, unsigned ttl, const void *any) {
+int dns_p_push(struct dns_packet *P, enum dns_section section, void *dn, size_t dnlen, enum dns_type type, enum dns_class class, unsigned ttl, void *any) {
 	size_t end = P->end;
 	int error;
 
@@ -2115,7 +2116,7 @@ enum dns_rcode dns_p_rcode(struct dns_packet *P) {
 #define DNS_Q_EDNS0 0x2 /* include OPT RR */
 
 static dns_error_t
-dns_q_make2(struct dns_packet **_Q, const char *qname, size_t qlen, enum dns_type qtype, enum dns_class qclass, int qflags)
+dns_q_make2(struct dns_packet **_Q, char *qname, size_t qlen, enum dns_type qtype, enum dns_class qclass, int qflags)
 {
 	struct dns_packet *Q = NULL;
 	int error;
@@ -2151,7 +2152,7 @@ error:
 }
 
 static dns_error_t
-dns_q_make(struct dns_packet **Q, const char *qname, enum dns_type qtype, enum dns_class qclass, int qflags)
+dns_q_make(struct dns_packet **Q, char *qname, enum dns_type qtype, enum dns_class qclass, int qflags)
 {
 	return dns_q_make2(Q, qname, strlen(qname), qtype, qclass, qflags);
 }
@@ -2374,7 +2375,7 @@ size_t dns_d_cleave(void *dst, size_t lim, const void *src, size_t len) {
 } /* dns_d_cleave() */
 
 
-size_t dns_d_comp(void *dst_, size_t lim, const void *src_, size_t len, struct dns_packet *P, int *error) {
+size_t dns_d_comp(void *dst_, size_t lim, void *src_, size_t len, struct dns_packet *P, int *error) {
 	struct { unsigned char *b; size_t p, x; } dst, src;
 	unsigned char ch	= '.';
 
@@ -2583,7 +2584,7 @@ reserved:
 } /* dns_d_expand() */
 
 
-int dns_d_push(struct dns_packet *P, const void *dn, size_t len) {
+int dns_d_push(struct dns_packet *P, void *dn, size_t len) {
 	size_t lim	= P->size - P->end;
 	unsigned dp	= P->end;
 	int error	= DNS_EILLEGAL; /* silence compiler */
@@ -3737,7 +3738,7 @@ static union dns_any *dns_opt_initany(union dns_any *any, size_t size) {
 
 
 int dns_opt_parse(struct dns_opt *opt, struct dns_rr *rr, struct dns_packet *P) {
-	const struct dns_buf src = DNS_B_FROM(&P->data[rr->rd.p], rr->rd.len);
+	struct dns_buf src = DNS_B_FROM(&P->data[rr->rd.p], rr->rd.len);
 	struct dns_buf dst = DNS_B_INTO(opt->data, opt->size);
 	int error;
 
@@ -3769,7 +3770,7 @@ int dns_opt_parse(struct dns_opt *opt, struct dns_rr *rr, struct dns_packet *P) 
 
 
 int dns_opt_push(struct dns_packet *P, struct dns_opt *opt) {
-	const struct dns_buf src = DNS_B_FROM(opt->data, opt->len);
+	struct dns_buf src = DNS_B_FROM(opt->data, opt->len);
 	struct dns_buf dst = DNS_B_INTO(&P->data[P->end], (P->size - P->end));
 	int error;
 
@@ -5886,7 +5887,7 @@ int dns_hints_insert(struct dns_hints *H, const char *zone, const struct sockadd
 } /* dns_hints_insert() */
 
 
-static _Bool dns_hints_isinaddr_any(const void *sa) {
+static _Bool dns_hints_isinaddr_any(void *sa) {
 	struct in_addr *addr;
 
 	if (dns_sa_family(sa) != AF_INET)
@@ -5896,7 +5897,7 @@ static _Bool dns_hints_isinaddr_any(const void *sa) {
 	return addr->s_addr == htonl(INADDR_ANY);
 }
 
-unsigned dns_hints_insert_resconf(struct dns_hints *H, const char *zone, const struct dns_resolv_conf *resconf, int *error_) {
+unsigned dns_hints_insert_resconf(struct dns_hints *H, const char *zone, struct dns_resolv_conf *resconf, int *error_) {
 	unsigned i, n, p;
 	int error;
 
@@ -7204,7 +7205,7 @@ static void dns_res_frame_reset(struct dns_resolver *R, struct dns_res_frame *fr
 } /* dns_res_frame_reset() */
 
 
-static dns_error_t dns_res_frame_prepare(struct dns_resolver *R, struct dns_res_frame *F, const char *qname, enum dns_type qtype, enum dns_class qclass) {
+static dns_error_t dns_res_frame_prepare(struct dns_resolver *R, struct dns_res_frame *F, char *qname, enum dns_type qtype, enum dns_class qclass) {
 	struct dns_packet *P = NULL;
 
 	if (!(F < endof(R->stack)))
@@ -7822,7 +7823,7 @@ exec:
 				struct dns_mx mx;
 				struct dns_srv srv;
 			} rd;
-			const char *qname;
+			char *qname;
 			enum dns_type qtype;
 			enum dns_class qclass;
 
@@ -8371,7 +8372,8 @@ void dns_ai_close(struct dns_addrinfo *ai) {
 
 
 static int dns_ai_setent(struct addrinfo **ent, union dns_any *any, enum dns_type type, struct dns_addrinfo *ai) {
-	union { struct sockaddr saddr; struct sockaddr_in sin; struct sockaddr_in6 sin6; } saddr = {0};
+	union { struct sockaddr saddr; struct sockaddr_in sin; struct sockaddr_in6 sin6; } saddr;
+	memset(&saddr, 0, sizeof(saddr));
 	const char *cname;
 	size_t clen;
 
@@ -8889,7 +8891,7 @@ static char dns_opcodes[16][16] = {
 	[DNS_OP_UPDATE] = "UPDATE",
 };
 
-static const char *dns__strcode(int code, volatile char *dst, size_t lim) {
+static char *dns__strcode(int code, char *dst, size_t lim) {
 	char _tmp[48] = "";
 	struct dns_buf tmp;
 	size_t p;
@@ -8903,7 +8905,7 @@ static const char *dns__strcode(int code, volatile char *dst, size_t lim) {
 	while (p--)
 		dst[p] = _tmp[p];
 
-	return (const char *)dst;
+	return (char *)dst;
 }
 
 const char *dns_stropcode(enum dns_opcode opcode) {
