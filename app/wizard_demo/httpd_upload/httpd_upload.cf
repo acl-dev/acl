@@ -111,25 +111,6 @@ service httpd_upload {
 ############################################################################
 #	应用自己的配置选项
 
-#	mysql 服务地址
-#	mysql_dbaddr = /tmp/mysql.sock
-#	mysql_dbaddr = 10.0.250.199:3306
-#	连接 mysql 数据库的连接池的最大值
-#	mysql_dbmax  = 200
-#	ping mysql 连接的间隔时间, 以秒为单位
-#	mysql_dbping = 10
-#	mysql 连接空闲的时间间隔, 以秒为单位
-#	mysql_dbtimeout = 30
-
-#	数据库名称
-#	mysql_dbname = ioctl_db
-#	数据库访问用户
-#	mysql_dbuser = ioctl_user
-#	数据库用户访问密码
-#	mysql_dbpass = 111111
-
-#	是否输出当前内存的状态信息
-#	debug_mem = 1
-#	是否在一个线程中连接读
-#	loop_read = 1
+	page_html = ./upload.html
+	var_path = ./var
 }
