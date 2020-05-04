@@ -58,8 +58,10 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	--__count;
 
-	if (__count == 0)
-		acl_fiber_schedule_stop();
+	if (__count == 0) {
+		printf("OVER NOW!\r\n");
+		//acl_fiber_schedule_stop();
+	}
 }
 
 static void usage(const char *procname)
