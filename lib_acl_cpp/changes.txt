@@ -1,5 +1,11 @@
 修改历史列表：
 
+601) 2020.5.5
+601.1) bugfix: mbedtls_cond.cpp 中没有完全按 mbedtls 中的 config.h 的编译选项
+MBEDTLS_THREADING_ALT 进行条件编译
+601.2) feature: redis 模块支持 Redis6 的 SSL 加密通信方式，示例参见：
+samples/redis/redis_ssl.
+
 600) 2020.4.6
 601.1) bugfix: http_ctype.cpp 中在分析 content-type 时，当为扩展类型时不能正确
 地分析出 stype，原因是下标值取的不对。
