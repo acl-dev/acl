@@ -314,7 +314,7 @@ public:
 #ifdef USE_MBEDTLS
 			conf_ = new acl::mbedtls_conf(true);
 #else
-			conf_ = new acl::polarssl_conf;
+			conf_ = new acl::polarssl_conf(true);
 #endif
 		} else {
 			conf_ = NULL;

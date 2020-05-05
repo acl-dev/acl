@@ -32,7 +32,9 @@
 
 # ifdef HAS_MBEDTLS_DLL
 
-#  define THREADING_SET_ALT_NAME	"mbedtls_threading_set_alt"
+#  ifdef MBEDTLS_THREADING_ALT
+#   define THREADING_SET_ALT_NAME	"mbedtls_threading_set_alt"
+#  endif
 #  define PK_INIT_NAME			"mbedtls_pk_init"
 #  define PK_FREE_NAME			"mbedtls_pk_free"
 #  define PK_PARSE_KEYFILE_NAME		"mbedtls_pk_parse_keyfile"
@@ -78,11 +80,14 @@
 
 #  define SSL_SETUP_NAME		"mbedtls_ssl_setup"
 
+#  ifdef MBEDTLS_THREADING_ALT
 typedef void (*threading_set_alt_fn)(
 	void (*init)(mbedtls_threading_mutex_t *),
 	void (*free)(mbedtls_threading_mutex_t *),
 	int (*lock)(mbedtls_threading_mutex_t *),
 	int (*unlock)( mbedtls_threading_mutex_t *));
+#  endif // MBEDTLS_THREADING_ALT
+
 typedef void (*pk_init_fn)(PKEY*);
 typedef void (*pk_free_fn)(PKEY*);
 typedef int  (*pk_parse_keyfile_fn)(PKEY*, const char*, const char*);
@@ -134,7 +139,10 @@ typedef int  (*ssl_cache_get_fn)(void*, mbedtls_ssl_session*);
 
 typedef int  (*ssl_setup_fn)(mbedtls_ssl_context*, mbedtls_ssl_config*);
 
+# ifdef MBEDTLS_THREADING_ALT
 static threading_set_alt_fn		__threading_set_alt;
+# endif
+
 static pk_init_fn			__pk_init;
 static pk_free_fn			__pk_free;
 static pk_parse_keyfile_fn		__pk_parse_keyfile;
@@ -208,19 +216,20 @@ static void mbedtls_dll_unload(void)
 {
 	if (__crypto_dll) {
 		acl_dlclose(__crypto_dll);
-		__crypto_dll = NULL;
 		logger("%s unload ok", __crypto_path);
 	}
-	if (__x509_dll) {
+	if (__x509_dll && __x509_dll != __crypto_dll) {
 		acl_dlclose(__x509_dll);
-		__x509_dll = NULL;
 		logger("%s unload ok", __x509_path);
 	}
-	if (__tls_dll) {
+	if (__tls_dll && __tls_dll != __crypto_dll) {
 		acl_dlclose(__tls_dll);
-		__tls_dll = NULL;
 		logger("%s unload ok", __tls_path);
 	}
+
+	__crypto_dll = NULL;
+	__x509_dll = NULL;
+	__tls_dll = NULL;
 
 	delete __crypto_path_buf;
 	delete __x509_path_buf;
@@ -260,7 +269,9 @@ extern bool mbedtls_load_io(void); // defined in mbedtls_io.cpp
 
 static bool load_from_crypto(void)
 {
+# ifdef MBEDTLS_THREADING_ALT
 	LOAD_CRYPTO(THREADING_SET_ALT_NAME, threading_set_alt_fn, __threading_set_alt);
+#endif
 	LOAD_CRYPTO(PK_INIT_NAME, pk_init_fn, __pk_init);
 	LOAD_CRYPTO(PK_FREE_NAME, pk_free_fn, __pk_free);
 	LOAD_CRYPTO(PK_PARSE_KEYFILE_NAME, pk_parse_keyfile_fn, __pk_parse_keyfile);
@@ -401,7 +412,10 @@ static void mbedtls_dll_load(void)
 
 # else // !HAS_MBEDTLS_DLL && HAS_MBEDTLS
 
-#  define __threading_set_alt		::mbedtls_threading_set_alt
+#  ifdef MBEDTLS_THREADING_ALT
+#   define __threading_set_alt		::mbedtls_threading_set_alt
+#  endif // MBEDTLS_THREADING_ALT
+
 #  define __pk_init			::mbedtls_pk_init
 #  define __pk_free			::mbedtls_pk_free
 #  define __pk_parse_keyfile		::mbedtls_pk_parse_keyfile
