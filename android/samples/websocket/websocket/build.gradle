@@ -4,7 +4,7 @@ android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
     defaultConfig {
-        applicationId "com.example.http"
+        applicationId "com.example.websocket"
         minSdkVersion 15
         targetSdkVersion 29
         versionCode 1
@@ -36,7 +36,6 @@ android {
             version "3.10.2"
         }
     }
-
     packagingOptions {
         doNotStrip "*/armeabi/*.so"
         doNotStrip "*/arm64-v8a/*.so"
@@ -54,7 +53,7 @@ repositories {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    //implementation(name:'acl-debug', ext:'aar')
+    //implementation(name:'lib-debug', ext:'aar')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'
