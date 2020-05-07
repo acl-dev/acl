@@ -186,7 +186,7 @@ ACL_IFCONF *acl_get_ifaddrs(void)
 			continue;
 		}
 
-		n = getnameinfo(ifa->ifa_addr, len, host, NI_MAXHOST,
+		n = getnameinfo(ifa->ifa_addr, (socklen_t) len, host, NI_MAXHOST,
 				NULL, 0, NI_NUMERICHOST);
 		if (n != 0) {
 			acl_msg_error("%s(%d): getnameinfo error=%s, "

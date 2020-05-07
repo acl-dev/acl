@@ -86,7 +86,7 @@ public:
 
 	/**
 	 * 如果 mbedtls 合成一个库，可以调用本函数设置一个动态库的全路径
-	 * @param libmbedtls_all {const char*} libmbedtls_all 动态库的全路径
+	 * @param libmbedtls {const char*} libmbedtls 动态库的全路径
 	 */
 	static void set_libpath(const char* libmbedtls);
 
