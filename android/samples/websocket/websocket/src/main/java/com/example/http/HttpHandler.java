@@ -4,8 +4,7 @@ import android.os.Handler;
 import android.os.Message;
 
 public final class HttpHandler extends Handler {
-    final public static int BODY_OK = 0;
-    final public static int BODY_ERR = 1;
+    final public static int DATA_OK = 0;
     private final MainActivity mainActivity;
 
     public HttpHandler(MainActivity mainActivity) {
@@ -15,11 +14,8 @@ public final class HttpHandler extends Handler {
     @Override
     public void handleMessage(Message message) {
         switch (message.what) {
-        case BODY_OK:
-            mainActivity.onBody((String) message.obj);
-            break;
-        case BODY_ERR:
-            mainActivity.onError((String) message.obj);
+        case DATA_OK:
+            mainActivity.onData((String) message.obj);
             break;
         default:
             break;
@@ -27,26 +23,13 @@ public final class HttpHandler extends Handler {
     }
 
     /**
-     * 成功获得 HTTP 数据体的回调方法
-     * @param body {String} 响应的 HTTP 数据体
+     * 在 Websocket 线程空间中的回调方法，用来传递消息
+     * @param data {String} 响应的 HTTP 数据体
      */
-    public void onBody(String body) {
+    public void onData(String data) {
         Message message = new Message();
-        message.what = BODY_OK;
-        message.obj  = body;
-        this.sendMessage(message);
-    }
-
-    /**
-     * 获取 HTTP 结果失败时的回调方法
-     * @param domain {String} 请求的域名
-     * @param url {String} 请求的 URL
-     */
-    public void onError(String domain, String url) {
-        String error = "Domain: domain, " + "url: url";
-        Message message = new Message();
-        message.what = BODY_ERR;
-        message.obj = error;
+        message.what = DATA_OK;
+        message.obj  = data;
         this.sendMessage(message);
     }
 }

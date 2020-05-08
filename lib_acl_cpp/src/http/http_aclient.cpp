@@ -381,26 +381,25 @@ bool http_aclient::handle_websocket(void)
 	}
 }
 
-// 在 SSL 握手阶段，该方法会多次调用，直至 SSL 握手成功或失败
+// SSL 握手和读 Websocket 数据帧阶段，该方法都会被多次调用。
+// 当启用 SSL 模式时，在 SSL 握手阶段，该方法会被多次调用，直至 SSL 握手成功
+// 或失败；在读取 Websocket 数据帧阶段，该方法也会被多次调用，用来一直读取数据帧
 bool http_aclient::read_wakeup(void)
 {
-#if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
 	// 如果 websocket 非 NULL，则说明进入到 websocket 通信方式，
 	// 该触发条件在 http_res_hdr_cllback 中注册
 	switch (status_) {
 	case HTTP_ACLIENT_STATUS_WS_READING:
 		acl_assert(ws_in_);
 		return handle_websocket();
+#if defined(HAS_POLARSSL_DLL) || defined(HAS_POLARSSL)
 	case HTTP_ACLIENT_STATUS_SSL_HANDSHAKE:
 		return handle_ssl_handshake();
+#endif
 	default:
 		logger_error("invalid status=%u", status_);
 		return false;
 	}
-#else
-	logger_error("shouldn't come here in no SSL mode!");
-	return false;
-#endif
 }
 
 bool http_aclient::handle_ssl_handshake(void)

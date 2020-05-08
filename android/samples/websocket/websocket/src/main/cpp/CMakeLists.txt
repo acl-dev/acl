@@ -121,8 +121,8 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
     set(lib_all ${lib_acl_cpp} ${lib_protocol} ${lib_acl} -lz)
 endif()
 
-add_library(native-lib SHARED ${lib_src})
-target_link_libraries(native-lib ${lib_all} ${log-lib})
+add_library(ws SHARED ${lib_src})
+target_link_libraries(ws ${lib_all} ${log-lib})
 
 ###############################################################################
 

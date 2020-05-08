@@ -9,9 +9,13 @@ static acl::atomic_long __aio_refer = 0;
 class websocket_client : public acl::http_aclient
 {
 public:
-	websocket_client(acl::aio_handle& handle, const char* host)
+	websocket_client(acl::aio_handle& handle, const char* host,
+			void (*callback)(void*, void*, const char*), void* env, void* obj)
 	: http_aclient(handle, NULL)
 	, host_(host)
+	, callback_(callback)
+	, env_(env)
+	, obj_(obj)
 	, debug_(false)
 	, compressed_(false)
 	{
@@ -50,6 +54,7 @@ protected:
 	{
 		log_info("%s(%d): websocket_client will be deleted!\r\n",
 			__FUNCTION__, __LINE__);
+		on_message("websocket will be deleted");
 
 		delete this;
 	}
@@ -58,8 +63,10 @@ protected:
 	bool on_connect(void)
 	{
 		log_info("--------------- connect server ok ------------\r\n");
+		on_message("connect server ok");
 		show_ns_addr();
 		log_info(">>> begin ws_handshake\r\n");
+		on_message("begin ws handshake");
 
 		this->ws_handshake();
 		return true;
@@ -72,6 +79,8 @@ protected:
 		reqhdr.build_request(buf);
 		log_info("---------------websocket request header---------\r\n");
 		log_info("[%s]\r\n", buf.c_str());
+		on_message("ws request header");
+		on_message(buf.c_str());
 	}
 
 	// @override
@@ -79,18 +88,21 @@ protected:
 	{
 		log_info("%s(%d): disconnect from server\r\n",
 			__FUNCTION__, __LINE__);
+		on_message("disconnect from server");
 	}
 
 	// @override
 	void on_ns_failed(void)
 	{
 		log_info("dns lookup failed\r\n");
+		on_message("dns lookup failed");
 	}
 
 	// @override
 	void on_connect_timeout(void)
 	{
 		log_info("connect timeout\r\n");
+		on_message("connect timeout");
 		show_ns_addr();
 	}
 
@@ -98,6 +110,7 @@ protected:
 	void on_connect_failed(void)
 	{
 		log_info("connect failed\r\n");
+		on_message("connect failed");
 		show_ns_addr();
 	}
 
@@ -105,6 +118,7 @@ protected:
 	bool on_read_timeout(void)
 	{
 		log_info("read timeout\r\n");
+		on_message("read timeout");
 		return true;
 	}
 
@@ -119,6 +133,8 @@ protected:
 
 		log_info("-----------%s: response header----\r\n", __FUNCTION__);
 		log_info("[%s]\r\n", buf.c_str());
+		on_message("response header");
+		on_message(buf.c_str());
 
 		return true;
 	}
@@ -153,6 +169,7 @@ protected:
 	bool on_ws_handshake(void)
 	{
 		log_info(">>> websocket handshake ok\r\n");
+		on_message("websocket handshake ok");
 
 		char buf[128];
 		snprintf(buf, sizeof(buf), "hello, myname is zsx\r\n");
@@ -162,6 +179,8 @@ protected:
 			return false;
 		}
 
+		log_info("send ok\r\n");
+		on_message("send ok");
 		// 开始进入 websocket 异步读过程
 		this->ws_read_wait(5);
 		return true;
@@ -171,26 +190,30 @@ protected:
 	void on_ws_handshake_failed(int status)
 	{
 		log_info(">>> websocket handshake failed, status=%d\r\n", status);
+		on_message("websocket handshake failed");
 	}
 
 	// @override
 	bool on_ws_frame_text(void)
 	{
-		log_info(">>> got frame text type\r\n");
+		log_info(">>> got frame text\r\n");
+		on_message("got fame text");
 		return true;
 	}
 
 	// @override
 	bool on_ws_frame_binary(void)
 	{
-		log_info(">>> got frame binaray type\r\n");
+		log_info(">>> got frame binaray\r\n");
+		on_message("got frame binary");
 		return true;
 	}
 
 	// @override
 	void on_ws_frame_closed(void)
 	{
-		log_info(">>> got frame closed type\r\n");
+		log_info(">>> got frame closed\r\n");
+		on_message("got frame closed");
 	}
 
 	// @override
@@ -199,6 +222,7 @@ protected:
 		acl::string buf;
 		buf.copy(data, dlen);
 		log_info("%s", buf.c_str());
+		on_message(buf.c_str());
 
 		//(void) write(1, data, dlen);
 		return true;
@@ -208,20 +232,35 @@ protected:
 	bool on_ws_frame_finish(void)
 	{
 		log_info(">>> frame finish\r\n");
+		on_message("frame finished");
 		return true;
 	}
 
 private:
 	acl::string host_;
+	void (*callback_)(void*, void*, const char*);
+	void* env_;
+	void* obj_;
 	bool debug_;
 	bool compressed_;
+
+	void on_message(const char* fmt, ...)
+	{
+		acl::string buf;
+
+		va_list  ap;
+		va_start(ap, fmt);
+		buf.vformat(fmt, ap);
+		va_end(ap);
+		callback_(env_, obj_, buf.c_str());
+	}
 };
 
-bool websocket_run(void)
+bool websocket_run(const char* addr, void (*callback)(void*, void*, const char*),
+		void* env, void* obj)
 {
 	int  conn_timeout = 5, rw_timeout = 5;
-	acl::string addr("10.110.28.210:8885");
-	acl::string host("www.baidu.com");
+	acl::string host("www.test.com");
 	std::vector<acl::string> name_servers;
 	bool debug = false;
 
@@ -243,9 +282,9 @@ bool websocket_run(void)
 
 
 	// 开始异步连接远程 WEB 服务器
-	websocket_client* conn = new websocket_client(handle, host);
+	websocket_client* conn = new websocket_client(handle, host, callback, env, obj);
 	if (!conn->open(addr, conn_timeout, rw_timeout)) {
-		log_info("connect %s error\r\n", addr.c_str());
+		log_info("connect %s error\r\n", addr);
 
 		delete conn;
 		return false;
@@ -279,6 +318,7 @@ bool websocket_run(void)
 		}
 	}
 
+	// 再检测一次，以便于将可能漏掉的非阻塞连接对象释放
 	handle.check();
 	return true;
 }

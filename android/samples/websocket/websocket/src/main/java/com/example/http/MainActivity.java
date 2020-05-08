@@ -3,6 +3,7 @@ package com.example.http;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,10 +12,11 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private EditText domain;
     private TextView result;
+    StringBuffer text = new StringBuffer();
 
     // Used to load the 'native-lib' library on application startup.
     static {
-        System.loadLibrary("native-lib");
+        System.loadLibrary("ws");
     }
 
     /**
@@ -22,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
      * @param info
      */
     public void onError(String info) {
-        StringBuffer text = new StringBuffer();
         text.append("httpGet error\r\n");
         text.append(info + "\r\n");
         result.setText(text);
@@ -30,30 +31,34 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * 获得 HTTP 数据体成功的回调方法
-     * @param body
+     * @param data
      */
-    public void onBody(String body) {
-        result.setText(body);
+    public void onData(String data) {
+        result.append(data);
+        result.append("\r\n");
+        int offset = result.getLineCount() * result.getLineHeight();
+        if (offset > result.getHeight()){
+            result.scrollTo(0,offset - result.getHeight());
+        }
     }
 
     /**
-     * 从 HTTP 服务器获得数据
+     * 从 HTTP Websocket 服务器获得数据
      */
-    private void httpGet() {
-        String host = domain.getText().toString().trim();
-        if (host.isEmpty()) {
+    private void websocketStart() {
+        String addr = domain.getText().toString().trim();
+        if (addr.isEmpty()) {
             return;
         }
 
-        System.out.println("host is " + host);
+        System.out.println("addr is " + addr);
         try {
             HttpHandler handler = new HttpHandler(this);
-            String addr = host + ":80", url = "/";
-            HttpThread httpThread = new HttpThread(handler, addr, host, url);
+            HttpThread httpThread = new HttpThread(handler, addr);
             httpThread.start();
         } catch (Exception e) {
             e.printStackTrace();
-            onError(host);
+            onError(addr);
         }
     }
 
@@ -64,13 +69,15 @@ public class MainActivity extends AppCompatActivity {
 
         domain = (EditText) findViewById(R.id.domain);
         result = findViewById(R.id.result);
+        result.setMovementMethod(ScrollingMovementMethod.getInstance());
+        result.setScrollbarFadingEnabled(false);
 
         // 绑定 HTTP 请求事件
         Button get = (Button) findViewById(R.id.http_get);
         get.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                httpGet();
+                websocketStart();
             }
         });
 
