@@ -34,7 +34,7 @@ LOCAL_CPPFLAGS += -I. -I../include \
 		-I../../include/mysql \
 		-I../../include/zlib \
 		-I../../include/pgsql
-LOCAL_CPPFLAGS += -Os -fvisibility=hidden -fvisibility-inlines-hidden \
+LOCAL_CPPFLAGS += -Os -fPIC -g -fvisibility=hidden -fvisibility-inlines-hidden \
 		-fdata-sections -ffunction-sections -fexceptions \
 		-DACL_CPP_LOG_SKIP_FILE -DACL_CLIENT_ONLY
 include $(BUILD_STATIC_LIBRARY)

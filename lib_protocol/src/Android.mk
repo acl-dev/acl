@@ -17,6 +17,6 @@ SMTP_SRC    := $(wildcard $(SRC_PATH_SRC)/smtp/*.c)
 ###########################################################
 
 LOCAL_SRC_FILES := $(HTTP_SRC) $(ICMP_SRC) $(SMTP_SRC)
-LOCAL_CFLAGS += -Os -I.. -I../include -I../../lib_acl/include -fvisibility=hidden \
+LOCAL_CFLAGS += -Os -fPIC -g -I.. -I../include -I../../lib_acl/include -fvisibility=hidden \
 		-fdata-sections -ffunction-sections
 include $(BUILD_STATIC_LIBRARY)

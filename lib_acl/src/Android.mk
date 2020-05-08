@@ -51,5 +51,5 @@ LOCAL_SRC_FILES := $(INIT_SRC) $(PRIV_SRC) $(STDLIB_SRC) $(NET_SRC) \
 		$(MASTER_SRC) $(PROCTL_SRC) $(XML_SRC) $(JSON_SRC) \
 		$(UTEST_SRC)
 
-LOCAL_CFLAGS  += -Os -I.. -I../include -fvisibility=hidden -fdata-sections -ffunction-sections
+LOCAL_CFLAGS  += -Os -fPIC -g -I.. -I../include -fvisibility=hidden -fdata-sections -ffunction-sections
 include $(BUILD_STATIC_LIBRARY)
