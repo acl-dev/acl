@@ -171,7 +171,7 @@ bool http_servlet::doMsg(acl::websocket& in, acl::websocket& out)
 		return false;
 	}
 
-	return true;
+	return false;
 }
 
 bool http_servlet::sendBannder(acl::websocket& out)
