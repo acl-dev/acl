@@ -83,13 +83,13 @@ bool redis_string::set(const char* key, size_t key_len, const char* value, size_
 
 	if ( timeout > 0)
 	{
-		if (SETFLAG_EX == ( flag & SETFLAG_EX))
+		if (SETFLAG_EX == ( flag & 0x03))
 		{
 			argv[n] = "EX";
 			lens[n] = sizeof("EX") - 1;
 			n++;
 		}
-		else if ( SETFLAG_PX == (flag & SETFLAG_PX))
+		else if ( SETFLAG_PX == (flag & 0x03))
 		{
 			argv[n] = "PX";
 			lens[n] = sizeof("PX") - 1;
@@ -106,13 +106,13 @@ bool redis_string::set(const char* key, size_t key_len, const char* value, size_
 	}
 
 NEXT_X:
-	if (SETFLAG_NX == ( flag & SETFLAG_NX))
+	if (SETFLAG_NX == ( flag & 0x0c))
 	{
 		argv[n] = "NX";
 		lens[n] = sizeof("NX") - 1;
 		n++;
 	}
-	else if (SETFLAG_XX == ( flag & SETFLAG_XX))
+	else if (SETFLAG_XX == ( flag & 0x0c))
 	{
 		argv[n] = "XX";
 		lens[n] = sizeof("XX") - 1;
