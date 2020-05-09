@@ -66,7 +66,8 @@ bool redis_string::set(const char* key, const char* value, int timeout, int flag
 	return set(key, strlen(key), value, strlen(value), timeout, flag);
 }
 
-bool redis_string::set(const char* key, size_t key_len, const char* value, size_t value_len, int timeout, int flag)
+bool redis_string::set(const char* key, size_t key_len, const char* value,
+	size_t value_len, int timeout, int flag)
 {
 	const char* argv[6];
 	size_t lens[6];
@@ -81,22 +82,18 @@ bool redis_string::set(const char* key, size_t key_len, const char* value, size_
 	argv[2] = value;
 	lens[2] = value_len;
 
-	if ( timeout > 0)
-	{
-		if (SETFLAG_EX == ( flag & 0x03))
-		{
+	if (timeout > 0) {
+		if (SETFLAG_EX == (flag & 0x03)) {
 			argv[n] = "EX";
 			lens[n] = sizeof("EX") - 1;
 			n++;
-		}
-		else if ( SETFLAG_PX == (flag & 0x03))
-		{
+		} else if (SETFLAG_PX == (flag & 0x03)) {
 			argv[n] = "PX";
 			lens[n] = sizeof("PX") - 1;
 			n++;
-		}
-		else
+		} else {
 			goto NEXT_X;
+		}
 
 		char buf[INT_LEN];
 		(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
@@ -106,14 +103,11 @@ bool redis_string::set(const char* key, size_t key_len, const char* value, size_
 	}
 
 NEXT_X:
-	if (SETFLAG_NX == ( flag & 0x0c))
-	{
+	if (SETFLAG_NX == (flag & 0x0c)) {
 		argv[n] = "NX";
 		lens[n] = sizeof("NX") - 1;
 		n++;
-	}
-	else if (SETFLAG_XX == ( flag & 0x0c))
-	{
+	} else if (SETFLAG_XX == (flag & 0x0c)) {
 		argv[n] = "XX";
 		lens[n] = sizeof("XX") - 1;
 		n++;
