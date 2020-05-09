@@ -61,6 +61,69 @@ bool redis_string::set(const char* key, size_t key_len,
 	return check_status();
 }
 
+bool redis_string::set(const char* key, const char* value, int timeout, int flag)
+{
+	return set(key, strlen(key), value, strlen(value), timeout, flag);
+}
+
+bool redis_string::set(const char* key, size_t key_len, const char* value, size_t value_len, int timeout, int flag)
+{
+	const char* argv[6];
+	size_t lens[6];
+	int n = 3;
+
+	argv[0] = "SET";
+	lens[0] = sizeof("SET") - 1;
+
+	argv[1] = key;
+	lens[1] = key_len;
+
+	argv[2] = value;
+	lens[2] = value_len;
+
+	if ( timeout > 0)
+	{
+		if (SETFLAG_EX == ( flag & SETFLAG_EX))
+		{
+			argv[n] = "EX";
+			lens[n] = sizeof("EX") - 1;
+			n++;
+		}
+		else if ( SETFLAG_PX == (flag & SETFLAG_PX))
+		{
+			argv[n] = "PX";
+			lens[n] = sizeof("PX") - 1;
+			n++;
+		}
+		else
+			goto NEXT_X;
+
+		char buf[INT_LEN];
+		(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
+		argv[n] = buf;
+		lens[n] = strlen(buf);
+		n++;
+	}
+
+NEXT_X:
+	if (SETFLAG_NX == ( flag & SETFLAG_NX))
+	{
+		argv[n] = "NX";
+		lens[n] = sizeof("NX") - 1;
+		n++;
+	}
+	else if (SETFLAG_XX == ( flag & SETFLAG_XX))
+	{
+		argv[n] = "XX";
+		lens[n] = sizeof("XX") - 1;
+		n++;
+	}
+
+	hash_slot(key, key_len);
+	build_request(n, argv, lens);
+	return check_status();
+}
+
 bool redis_string::setex(const char* key, const char* value, int timeout)
 {
 	return setex(key, strlen(key), value, strlen(value), timeout);
