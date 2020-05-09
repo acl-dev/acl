@@ -15,7 +15,7 @@ static bool test_set(acl::redis_string& redis, int n)
 
 		redis.clear();
 		redis.set_check_addr(__check_addr);
-		if (redis.set(key.c_str(), value.c_str()) == false)
+		if (redis.set(key.c_str(), value.c_str(), 100, SETFLAG_EX | SETFLAG_NX) == false)
 		{
 			printf("set key: %s error: %s\r\n",
 				key.c_str(), redis.result_error());
