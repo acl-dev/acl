@@ -37,9 +37,10 @@
 
 #include <time.h>		/* time_t */
 
-#if _WIN32
+#if _WIN32 || _WIN64
 #include <winsock2.h>
 #include <ws2tcpip.h>
+typedef int _Bool;
 #else
 #include <sys/param.h>		/* BYTE_ORDER BIG_ENDIAN _BIG_ENDIAN */
 #include <sys/types.h>		/* socklen_t */
@@ -1257,6 +1258,5 @@ int get_read_timeout(void);
 #define DNS_PP_D11 10
 #define DNS_PP_DEC(N) DNS_PP_XPASTE(DNS_PP_D, N)
 
+#endif // SYS_UNIX
 #endif /* DNS_H */
-
-#endif
