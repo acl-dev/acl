@@ -37,10 +37,9 @@
 
 #include <time.h>		/* time_t */
 
-#if _WIN32 || _WIN64
+#if _WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
-typedef int _Bool;
 #else
 #include <sys/param.h>		/* BYTE_ORDER BIG_ENDIAN _BIG_ENDIAN */
 #include <sys/types.h>		/* socklen_t */
@@ -361,37 +360,37 @@ DNS_PUBLIC dns_random_f **dns_random_p(void);
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 struct dns_header {
-		unsigned qid:16;
+	unsigned qid:16;
 
 #if (defined BYTE_ORDER && BYTE_ORDER == BIG_ENDIAN) || (defined __sun && defined _BIG_ENDIAN)
-		unsigned qr:1;
-		unsigned opcode:4;
-		unsigned aa:1;
-		unsigned tc:1;
-		unsigned rd:1;
+	unsigned qr:1;
+	unsigned opcode:4;
+	unsigned aa:1;
+	unsigned tc:1;
+	unsigned rd:1;
 
-		unsigned ra:1;
-		unsigned unused:3;
-		unsigned rcode:4;
+	unsigned ra:1;
+	unsigned unused:3;
+	unsigned rcode:4;
 #else
-		unsigned rd:1;
-		unsigned tc:1;
-		unsigned aa:1;
-		unsigned opcode:4;
-		unsigned qr:1;
+	unsigned rd:1;
+	unsigned tc:1;
+	unsigned aa:1;
+	unsigned opcode:4;
+	unsigned qr:1;
 
-		unsigned rcode:4;
-		unsigned unused:3;
-		unsigned ra:1;
+	unsigned rcode:4;
+	unsigned unused:3;
+	unsigned ra:1;
 #endif
 
-		unsigned qdcount:16;
-		unsigned ancount:16;
-		unsigned nscount:16;
-		unsigned arcount:16;
+	unsigned qdcount:16;
+	unsigned ancount:16;
+	unsigned nscount:16;
+	unsigned arcount:16;
 }; /* struct dns_header */
 
-#define dns_header(p)	(&(p)->header)
+#define DNS_HEADER(_p_)	(&(_p_)->header)
 
 
 #ifndef DNS_P_QBUFSIZ
@@ -1258,5 +1257,5 @@ int get_read_timeout(void);
 #define DNS_PP_D11 10
 #define DNS_PP_DEC(N) DNS_PP_XPASTE(DNS_PP_D, N)
 
-#endif // SYS_UNIX
+#endif  /* SYS_UNIX */
 #endif /* DNS_H */
