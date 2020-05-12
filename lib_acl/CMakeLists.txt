@@ -126,12 +126,15 @@ if (${UNIX_OS})
 		list(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
 		list(GET GCC_VERSION_COMPONENTS 1 GCC_MINOR)
 
-		if(CMAKE_VERSION GREATER "3.0")
-			if ((GCC_MAJOR GREATER_EQUAL 4) AND (GCC_MINOR GREATER_EQUAL 8))
-				message(STATUS "gcc version major=${GCC_MAJOR}")
-				message(STATUS "gcc version minor=${GCC_MINOR}")
-				add_definitions("-Wno-implicit-fallthrough")
-			endif()
+		message(STATUS "cmake version=${CMAKE_VERSION}")
+
+		set(GCC_VERSION "${GCC_MAJOR}.${GCC_MINOR}")
+		message(STATUS "gcc version=${GCC_VERSION}")
+
+		if (GCC_VERSION GREATER "4.7")
+			message(STATUS "gcc version major=${GCC_MAJOR}")
+			message(STATUS "gcc version minor=${GCC_MINOR}")
+			add_definitions("-Wno-implicit-fallthrough")
 		endif()
 	endif()
 
