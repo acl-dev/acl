@@ -24,6 +24,7 @@
  * ==========================================================================
  */
 #include "stdafx.h"
+
 #ifdef SYS_UNIX
 
 #include "fiber/libfiber.h"
@@ -57,9 +58,7 @@
 #include <stdlib.h>		/* malloc(3) realloc(3) free(3) rand(3) random(3) arc4random(3) */
 #include <stdio.h>		/* FILE fopen(3) fclose(3) getc(3) rewind(3) */
 #include <string.h>		/* memcpy(3) strlen(3) memmove(3) memchr(3) memcmp(3) strchr(3) strsep(3) strcspn(3) */
-#ifdef SYS_UNIX
 #include <strings.h>		/* strcasecmp(3) strncasecmp(3) */
-#endif
 #include <ctype.h>		/* isspace(3) isdigit(3) */
 #include <time.h>		/* time_t time(2) difftime(3) */
 #include <signal.h>		/* SIGPIPE sigemptyset(3) sigaddset(3) sigpending(2) sigprocmask(2) pthread_sigmask(3) sigtimedwait(2) */
@@ -413,12 +412,12 @@ const char *dns_strerror(int error) {
 #endif
 #endif
 
-static unsigned dns_atomic_fetch_add(dns_atomic_t *i) {
+static inline unsigned dns_atomic_fetch_add(dns_atomic_t *i) {
 	return DNS_ATOMIC_FETCH_ADD(i);
 } /* dns_atomic_fetch_add() */
 
 
-static unsigned dns_atomic_fetch_sub(dns_atomic_t *i) {
+static inline unsigned dns_atomic_fetch_sub(dns_atomic_t *i) {
 	return DNS_ATOMIC_FETCH_SUB(i);
 } /* dns_atomic_fetch_sub() */
 
@@ -547,7 +546,7 @@ struct dns_k_permutor {
 }; /* struct dns_k_permutor */
 
 
-static unsigned dns_k_permutor_powof(unsigned n) {
+static inline unsigned dns_k_permutor_powof(unsigned n) {
 	unsigned m, i = 0;
 
 	for (m = 1; m < n; m <<= 1, i++)
@@ -803,9 +802,7 @@ DNS_NOTUSED static size_t dns_strnlcpy(char *dst, size_t lim, const char *src, s
 
 static size_t dns_af_len(int af) {
 	static const size_t table[AF_MAX]	= {
-#ifdef AF_INET6
 		[AF_INET6]	= sizeof (struct sockaddr_in6),
-#endif
 		[AF_INET]	= sizeof (struct sockaddr_in),
 #if DNS_HAVE_SOCKADDR_UN
 		[AF_UNIX]	= sizeof (struct sockaddr_un),
@@ -1091,19 +1088,19 @@ static char *dns_strsep(char **sp, const char *delim) {
 #endif
 
 
-static _Bool dns_isalpha(unsigned char c) {
+static inline _Bool dns_isalpha(unsigned char c) {
 	return isalpha(c);
 } /* dns_isalpha() */
 
-static _Bool dns_isdigit(unsigned char c) {
+static inline _Bool dns_isdigit(unsigned char c) {
 	return isdigit(c);
 } /* dns_isdigit() */
 
-static _Bool dns_isalnum(unsigned char c) {
+static inline _Bool dns_isalnum(unsigned char c) {
 	return isalnum(c);
 } /* dns_isalnum() */
 
-static _Bool dns_isspace(unsigned char c) {
+static inline _Bool dns_isspace(unsigned char c) {
 	return isspace(c);
 } /* dns_isspace() */
 
@@ -1393,6 +1390,7 @@ error:
 	(unsigned char *)(src), \
 	(unsigned char *)(src), \
 	(unsigned char *)(src) + (n), \
+	DNS_EUNKNOWN, 0  \
 }
 
 #define DNS_B_FROM(src, n) DNS_B_INIT((src), (n))
@@ -1406,12 +1404,13 @@ struct dns_buf {
 	size_t overflow;
 }; /* struct dns_buf */
 
-static size_t dns_b_tell(struct dns_buf *b)
+static inline size_t
+dns_b_tell(struct dns_buf *b)
 {
 	return b->p - b->base;
 }
 
-static dns_error_t
+static inline dns_error_t
 dns_b_setoverflow(struct dns_buf *b, size_t n, dns_error_t error)
 {
 	b->overflow += n;
@@ -1449,13 +1448,13 @@ dns_b_pputc(struct dns_buf *b, unsigned char uc, size_t p)
 	return 0;
 }
 
-static dns_error_t
+static inline dns_error_t
 dns_b_put16(struct dns_buf *b, uint16_t u)
 {
 	return dns_b_putc(b, u >> 8), dns_b_putc(b, u >> 0);
 }
 
-static dns_error_t
+static inline dns_error_t
 dns_b_pput16(struct dns_buf *b, uint16_t u, size_t p)
 {
 	if (dns_b_pputc(b, u >> 8, p) || dns_b_pputc(b, u >> 0, p + 1))
@@ -1464,7 +1463,8 @@ dns_b_pput16(struct dns_buf *b, uint16_t u, size_t p)
 	return 0;
 }
 
-DNS_NOTUSED static dns_error_t dns_b_put32(struct dns_buf *b, uint32_t u)
+DNS_NOTUSED static inline dns_error_t
+dns_b_put32(struct dns_buf *b, uint32_t u)
 {
 	return dns_b_putc(b, u >> 24), dns_b_putc(b, u >> 16),
 	    dns_b_putc(b, u >> 8), dns_b_putc(b, u >> 0);
@@ -1490,7 +1490,7 @@ dns_b_puts(struct dns_buf *b, const void *src)
 	return dns_b_put(b, src, strlen(src));
 }
 
-DNS_NOTUSED static dns_error_t
+DNS_NOTUSED static inline dns_error_t
 dns_b_fmtju(struct dns_buf *b, const uintmax_t u, const unsigned width)
 {
 	size_t digits, padding, overflow;
@@ -1530,7 +1530,8 @@ dns_b_fmtju(struct dns_buf *b, const uintmax_t u, const unsigned width)
 	return b->error;
 }
 
-static void dns_b_popc(struct dns_buf *b)
+static void
+dns_b_popc(struct dns_buf *b)
 {
 	if (b->overflow && !--b->overflow)
 		b->error = 0;
@@ -1538,7 +1539,8 @@ static void dns_b_popc(struct dns_buf *b)
 		b->p--;
 }
 
-static const char *dns_b_tolstring(struct dns_buf *b, size_t *n)
+static inline const char *
+dns_b_tolstring(struct dns_buf *b, size_t *n)
 {
 	if (b->p < b->pe) {
 		*b->p = '\0';
@@ -1560,20 +1562,23 @@ static const char *dns_b_tolstring(struct dns_buf *b, size_t *n)
 	}
 }
 
-static const char *dns_b_tostring(struct dns_buf *b)
+static inline const char *
+dns_b_tostring(struct dns_buf *b)
 {
 	size_t n;
 	return dns_b_tolstring(b, &n);
 }
 
-static size_t dns_b_strlen(struct dns_buf *b)
+static inline size_t
+dns_b_strlen(struct dns_buf *b)
 {
 	size_t n;
 	dns_b_tolstring(b, &n);
 	return n;
 }
 
-static size_t dns_b_strllen(struct dns_buf *b)
+static inline size_t
+dns_b_strllen(struct dns_buf *b)
 {
 	size_t n = dns_b_strlen(b);
 	return n + b->overflow;
@@ -1587,7 +1592,8 @@ dns_b_from(struct dns_buf *b, void *src, size_t n)
 	return b;
 }
 
-static int dns_b_getc(struct dns_buf *_b, int eof)
+static inline int
+dns_b_getc(struct dns_buf *_b, int eof)
 {
 	struct dns_buf *b = (struct dns_buf *)_b;
 
@@ -1597,7 +1603,8 @@ static int dns_b_getc(struct dns_buf *_b, int eof)
 	return *b->p++;
 }
 
-static intmax_t dns_b_get16(struct dns_buf *b, intmax_t eof)
+static inline intmax_t
+dns_b_get16(struct dns_buf *b, intmax_t eof)
 {
 	intmax_t n;
 
@@ -1607,7 +1614,8 @@ static intmax_t dns_b_get16(struct dns_buf *b, intmax_t eof)
 	return (!b->overflow)? n : eof;
 }
 
-DNS_NOTUSED static intmax_t dns_b_get32(struct dns_buf *b, intmax_t eof)
+DNS_NOTUSED static inline intmax_t
+dns_b_get32(struct dns_buf *b, intmax_t eof)
 {
 	intmax_t n;
 
@@ -1617,7 +1625,8 @@ DNS_NOTUSED static intmax_t dns_b_get32(struct dns_buf *b, intmax_t eof)
 	return (!b->overflow)? n : eof;
 }
 
-static dns_error_t dns_b_move(struct dns_buf *dst, struct dns_buf *_src, size_t n)
+static inline dns_error_t
+dns_b_move(struct dns_buf *dst, struct dns_buf *_src, size_t n)
 {
 	struct dns_buf *src = (struct dns_buf *)_src;
 	size_t src_n = DNS_PP_MIN((size_t)(src->pe - src->p), n);
@@ -1643,24 +1652,24 @@ unsigned dns_p_count(struct dns_packet *P, enum dns_section section) {
 
 	switch (section) {
 	case DNS_S_QD:
-		return ntohs(dns_header(P)->qdcount);
+		return ntohs(DNS_HEADER(P)->qdcount);
 	case DNS_S_AN:
-		return ntohs(dns_header(P)->ancount);
+		return ntohs(DNS_HEADER(P)->ancount);
 	case DNS_S_NS:
-		return ntohs(dns_header(P)->nscount);
+		return ntohs(DNS_HEADER(P)->nscount);
 	case DNS_S_AR:
-		return ntohs(dns_header(P)->arcount);
+		return ntohs(DNS_HEADER(P)->arcount);
 	default:
 		count = 0;
 
 		if (section & DNS_S_QD)
-			count += ntohs(dns_header(P)->qdcount);
+			count += ntohs(DNS_HEADER(P)->qdcount);
 		if (section & DNS_S_AN)
-			count += ntohs(dns_header(P)->ancount);
+			count += ntohs(DNS_HEADER(P)->ancount);
 		if (section & DNS_S_NS)
-			count += ntohs(dns_header(P)->nscount);
+			count += ntohs(DNS_HEADER(P)->nscount);
 		if (section & DNS_S_AR)
-			count += ntohs(dns_header(P)->arcount);
+			count += ntohs(DNS_HEADER(P)->arcount);
 
 		return count;
 	}
@@ -1877,7 +1886,11 @@ void dns_p_dictadd(struct dns_packet *P, unsigned short dn) {
 } /* dns_p_dictadd() */
 
 
-int dns_p_push(struct dns_packet *P, enum dns_section section, void *dn, size_t dnlen, enum dns_type type, enum dns_class class, unsigned ttl, void *any) {
+int dns_p_push(struct dns_packet *P, enum dns_section section, void *dn,
+	size_t dnlen, enum dns_type type, enum dns_class class,
+	unsigned ttl, void *any) {
+
+	unsigned n;
 	size_t end = P->end;
 	int error;
 
@@ -1918,7 +1931,8 @@ update:
 		if (!P->memo.qd.base && (error = dns_p_study(P)))
 			goto error;
 
-		dns_header(P)->qdcount = htons(ntohs(dns_header(P)->qdcount) + 1);
+		n = ntohs(DNS_HEADER(P)->qdcount) + 1;
+		DNS_HEADER(P)->qdcount = htons(n);
 
 		P->memo.qd.end  = P->end;
 		P->memo.an.base = P->end;
@@ -1936,7 +1950,8 @@ update:
 		if (!P->memo.an.base && (error = dns_p_study(P)))
 			goto error;
 
-		dns_header(P)->ancount = htons(ntohs(dns_header(P)->ancount) + 1);
+		n = ntohs(DNS_HEADER(P)->ancount) + 1;
+		DNS_HEADER(P)->ancount = htons(n);
 
 		P->memo.an.end  = P->end;
 		P->memo.ns.base = P->end;
@@ -1952,7 +1967,8 @@ update:
 		if (!P->memo.ns.base && (error = dns_p_study(P)))
 			goto error;
 
-		dns_header(P)->nscount = htons(ntohs(dns_header(P)->nscount) + 1);
+		n = ntohs(DNS_HEADER(P)->nscount) + 1;
+		DNS_HEADER(P)->nscount = htons(n);
 
 		P->memo.ns.end  = P->end;
 		P->memo.ar.base = P->end;
@@ -1963,7 +1979,8 @@ update:
 		if (!P->memo.ar.base && (error = dns_p_study(P)))
 			goto error;
 
-		dns_header(P)->arcount = htons(ntohs(dns_header(P)->arcount) + 1);
+		n = ntohs(DNS_HEADER(P)->arcount) + 1;
+		DNS_HEADER(P)->arcount = htons(n);
 
 		P->memo.ar.end = P->end;
 
@@ -2005,13 +2022,13 @@ static void dns_p_dump3(struct dns_packet *P, struct dns_rr_i *I, FILE *fp) {
 	size_t len;
 
 	fputs(";; [HEADER]\n", fp);
-	fprintf(fp, ";;    qid : %d\n", ntohs(dns_header(P)->qid));
-	fprintf(fp, ";;     qr : %s(%d)\n", (dns_header(P)->qr)? "RESPONSE" : "QUERY", dns_header(P)->qr);
-	fprintf(fp, ";; opcode : %s(%d)\n", dns_stropcode(dns_header(P)->opcode), dns_header(P)->opcode);
-	fprintf(fp, ";;     aa : %s(%d)\n", (dns_header(P)->aa)? "AUTHORITATIVE" : "NON-AUTHORITATIVE", dns_header(P)->aa);
-	fprintf(fp, ";;     tc : %s(%d)\n", (dns_header(P)->tc)? "TRUNCATED" : "NOT-TRUNCATED", dns_header(P)->tc);
-	fprintf(fp, ";;     rd : %s(%d)\n", (dns_header(P)->rd)? "RECURSION-DESIRED" : "RECURSION-NOT-DESIRED", dns_header(P)->rd);
-	fprintf(fp, ";;     ra : %s(%d)\n", (dns_header(P)->ra)? "RECURSION-ALLOWED" : "RECURSION-NOT-ALLOWED", dns_header(P)->ra);
+	fprintf(fp, ";;    qid : %d\n", ntohs(DNS_HEADER(P)->qid));
+	fprintf(fp, ";;     qr : %s(%d)\n", (DNS_HEADER(P)->qr)? "RESPONSE" : "QUERY", DNS_HEADER(P)->qr);
+	fprintf(fp, ";; opcode : %s(%d)\n", dns_stropcode(DNS_HEADER(P)->opcode), DNS_HEADER(P)->opcode);
+	fprintf(fp, ";;     aa : %s(%d)\n", (DNS_HEADER(P)->aa)? "AUTHORITATIVE" : "NON-AUTHORITATIVE", DNS_HEADER(P)->aa);
+	fprintf(fp, ";;     tc : %s(%d)\n", (DNS_HEADER(P)->tc)? "TRUNCATED" : "NOT-TRUNCATED", DNS_HEADER(P)->tc);
+	fprintf(fp, ";;     rd : %s(%d)\n", (DNS_HEADER(P)->rd)? "RECURSION-DESIRED" : "RECURSION-NOT-DESIRED", DNS_HEADER(P)->rd);
+	fprintf(fp, ";;     ra : %s(%d)\n", (DNS_HEADER(P)->ra)? "RECURSION-ALLOWED" : "RECURSION-NOT-ALLOWED", DNS_HEADER(P)->ra);
 	fprintf(fp, ";;  rcode : %s(%d)\n", dns_strrcode(dns_p_rcode(P)), dns_p_rcode(P));
 
 	section	= 0;
@@ -2096,7 +2113,7 @@ int dns_p_study(struct dns_packet *P) {
 
 
 enum dns_rcode dns_p_rcode(struct dns_packet *P) {
-	return 0xfff & ((P->memo.opt.ttl >> 20) | dns_header(P)->rcode);
+	return 0xfff & ((P->memo.opt.ttl >> 20) | DNS_HEADER(P)->rcode);
 } /* dns_p_rcode() */
 
 
@@ -2123,7 +2140,7 @@ dns_q_make2(struct dns_packet **_Q, char *qname, size_t qlen, enum dns_type qtyp
 	if ((error = dns_p_push(Q, DNS_S_QD, qname, qlen, qtype, qclass, 0, 0)))
 		goto error;
 
-	dns_header(Q)->rd = !!(qflags & DNS_Q_RD);
+	DNS_HEADER(Q)->rd = !!(qflags & DNS_Q_RD);
 
 	if (qflags & DNS_Q_EDNS0) {
 		struct dns_opt opt = DNS_OPT_INIT(&opt);
@@ -3735,7 +3752,7 @@ int dns_opt_parse(struct dns_opt *opt, struct dns_rr *rr, struct dns_packet *P) 
 	struct dns_buf dst = DNS_B_INTO(opt->data, opt->size);
 	int error;
 
-	opt->rcode = 0xfff & ((rr->ttl >> 20) | dns_header(P)->rcode);
+	opt->rcode = 0xfff & ((rr->ttl >> 20) | DNS_HEADER(P)->rcode);
 	opt->version = 0xff & (rr->ttl >> 16);
 	opt->flags = 0xffff & rr->ttl;
 	opt->maxudp = 0xffff & rr->class;
@@ -5391,7 +5408,7 @@ struct dns_nssconf_source {
 
 typedef unsigned dns_nssconf_i;
 
-static int dns_nssconf_peek(const struct dns_resolv_conf *resconf, dns_nssconf_i state) {
+static inline int dns_nssconf_peek(const struct dns_resolv_conf *resconf, dns_nssconf_i state) {
 	return (state < lengthof(resconf->lookup) && resconf->lookup[state])? resconf->lookup[state] : 0;
 } /* dns_nssconf_peek() */
 
@@ -6045,7 +6062,7 @@ struct dns_packet *dns_hints_query(struct dns_hints *hints, struct dns_packet *Q
 		goto toolong;
 
 	P			= dns_p_new(512);
-	dns_header(P)->qr	= 1;
+	DNS_HEADER(P)->qr	= 1;
 
 	if ((error = dns_rr_copy(P, &rr, Q)))
 		goto error;
@@ -6592,10 +6609,10 @@ int dns_so_submit(struct dns_socket *so, struct dns_packet *Q, struct sockaddr *
 
 	dns_begin(&so->elapsed);
 
-	if (dns_header(so->query)->qid == 0)
-		dns_header(so->query)->qid	= dns_so_mkqid(so);
+	if (DNS_HEADER(so->query)->qid == 0)
+		DNS_HEADER(so->query)->qid	= dns_so_mkqid(so);
 
-	so->qid		= dns_header(so->query)->qid;
+	so->qid		= DNS_HEADER(so->query)->qid;
 	so->state	= (so->type == SOCK_STREAM)? DNS_SO_TCP_INIT : DNS_SO_UDP_INIT;
 
 	so->stat.queries++;
@@ -6616,7 +6633,7 @@ static int dns_so_verify(struct dns_socket *so, struct dns_packet *P) {
 	struct dns_rr rr;
 	int error = -1;
 
-	if (so->qid != dns_header(so->answer)->qid)
+	if (so->qid != DNS_HEADER(so->answer)->qid)
 		goto reject;
 
 	if (!dns_p_count(so->answer, DNS_S_QD))
@@ -6777,7 +6794,7 @@ retry:
 		so->state++;
 		/* FALL THROUGH */
 	case DNS_SO_UDP_DONE:
-		if (!dns_header(so->answer)->tc || so->type == SOCK_DGRAM)
+		if (!DNS_HEADER(so->answer)->tc || so->type == SOCK_DGRAM)
 			return 0;
 
 		so->state++;
@@ -7385,9 +7402,12 @@ copy:
  */
 static int dns_res_nameserv_cmp(struct dns_rr *a, struct dns_rr *b, struct dns_rr_i *i, struct dns_packet *P) {
 	_Bool glued[2] = { 0 };
-	struct dns_rr x = { 0 }, y = { 0 };
+	struct dns_rr x, y;
 	struct dns_ns ns;
 	int cmp, error;
+
+	memset(&x, 0, sizeof(x));
+	memset(&y, 0, sizeof(y));
 
 	if (!(error = dns_ns_parse(&ns, a, P)))
 		glued[0] = !!dns_rr_grep(&x, 1, dns_rr_i_new(P, .section = (DNS_S_ALL & ~DNS_S_QD), .name = ns.host, .type = DNS_T_A), P, &error);
@@ -7692,7 +7712,7 @@ exec:
 		if (DNS_DEBUG) {
 			char addr[INET_ADDRSTRLEN + 1];
 			dns_a_print(addr, sizeof addr, &a);
-			dns_header(F->query)->qid = dns_so_mkqid(&R->so);
+			DNS_HEADER(F->query)->qid = dns_so_mkqid(&R->so);
 			DNS_SHOW(F->query, "ASKING: %s/%s @ DEPTH: %u)", u.ns.host, addr, R->sp);
 		}
 
@@ -7767,7 +7787,7 @@ exec:
 		}
 
 		/* XXX: Should this go further up? */
-		if (dns_header(F->answer)->aa)
+		if (DNS_HEADER(F->answer)->aa)
 			dgoto(R->sp, DNS_R_FINISH);
 
 		/* XXX: Should we copy F->answer to R->nodata? */
@@ -7913,8 +7933,8 @@ exec:
 		if (!dns_p_setptr(&F->answer, dns_p_make(DNS_P_QBUFSIZ, &error)))
 			goto error;
 
-		dns_header(F->answer)->qr	= 1;
-		dns_header(F->answer)->rcode	= DNS_RC_SERVFAIL;
+		DNS_HEADER(F->answer)->qr	= 1;
+		DNS_HEADER(F->answer)->rcode	= DNS_RC_SERVFAIL;
 
 		if ((error = dns_p_push(F->answer, DNS_S_QD, R->qname, strlen(R->qname), R->qtype, R->qclass, 0, 0)))
 			goto error;
@@ -8166,7 +8186,7 @@ struct dns_addrinfo {
 #define DNS_AI_AFMAX 32
 #define DNS_AI_AF2INDEX(af) (1UL << ((af) - 1))
 
-static unsigned long dns_ai_af2index(int af) {
+static inline unsigned long dns_ai_af2index(int af) {
 	dns_static_assert(dns_same_type(unsigned long, DNS_AI_AF2INDEX(1), 1), "internal type mismatch");
 	dns_static_assert(dns_same_type(unsigned long, ((struct dns_addrinfo *)0)->af.todo, 1), "internal type mismatch");
 
@@ -9256,12 +9276,12 @@ static int parse_packet(int argc DNS_NOTUSED, char *argv[] DNS_NOTUSED) {
 	P->end	= fread(P->data, 1, P->size, stdin);
 
 	fputs(";; [HEADER]\n", stdout);
-	fprintf(stdout, ";;     qr : %s(%d)\n", (dns_header(P)->qr)? "RESPONSE" : "QUERY", dns_header(P)->qr);
-	fprintf(stdout, ";; opcode : %s(%d)\n", dns_stropcode(dns_header(P)->opcode), dns_header(P)->opcode);
-	fprintf(stdout, ";;     aa : %s(%d)\n", (dns_header(P)->aa)? "AUTHORITATIVE" : "NON-AUTHORITATIVE", dns_header(P)->aa);
-	fprintf(stdout, ";;     tc : %s(%d)\n", (dns_header(P)->tc)? "TRUNCATED" : "NOT-TRUNCATED", dns_header(P)->tc);
-	fprintf(stdout, ";;     rd : %s(%d)\n", (dns_header(P)->rd)? "RECURSION-DESIRED" : "RECURSION-NOT-DESIRED", dns_header(P)->rd);
-	fprintf(stdout, ";;     ra : %s(%d)\n", (dns_header(P)->ra)? "RECURSION-ALLOWED" : "RECURSION-NOT-ALLOWED", dns_header(P)->ra);
+	fprintf(stdout, ";;     qr : %s(%d)\n", (DNS_HEADER(P)->qr)? "RESPONSE" : "QUERY", DNS_HEADER(P)->qr);
+	fprintf(stdout, ";; opcode : %s(%d)\n", dns_stropcode(DNS_HEADER(P)->opcode), DNS_HEADER(P)->opcode);
+	fprintf(stdout, ";;     aa : %s(%d)\n", (DNS_HEADER(P)->aa)? "AUTHORITATIVE" : "NON-AUTHORITATIVE", DNS_HEADER(P)->aa);
+	fprintf(stdout, ";;     tc : %s(%d)\n", (DNS_HEADER(P)->tc)? "TRUNCATED" : "NOT-TRUNCATED", DNS_HEADER(P)->tc);
+	fprintf(stdout, ";;     rd : %s(%d)\n", (DNS_HEADER(P)->rd)? "RECURSION-DESIRED" : "RECURSION-NOT-DESIRED", DNS_HEADER(P)->rd);
+	fprintf(stdout, ";;     ra : %s(%d)\n", (DNS_HEADER(P)->ra)? "RECURSION-ALLOWED" : "RECURSION-NOT-ALLOWED", DNS_HEADER(P)->ra);
 	fprintf(stdout, ";;  rcode : %s(%d)\n", dns_strrcode(dns_p_rcode(P)), dns_p_rcode(P));
 
 	section	= 0;
@@ -9590,7 +9610,7 @@ static int send_query(int argc, char *argv[]) {
 	if ((error = dns_p_push(Q, DNS_S_QD, MAIN.qname, strlen(MAIN.qname), MAIN.qtype, DNS_C_IN, 0, 0)))
 		panic("dns_p_push: %s", dns_strerror(error));
 
-	dns_header(Q)->rd	= 1;
+	DNS_HEADER(Q)->rd	= 1;
 
 	if (strstr(argv[0], "udp"))
 		type	= SOCK_DGRAM;
@@ -10106,5 +10126,4 @@ int main(int argc, char **argv) {
 #pragma GCC diagnostic pop
 #endif
 
-#endif // SYS_UNIX
-
+#endif /* SYS_UNIX */
