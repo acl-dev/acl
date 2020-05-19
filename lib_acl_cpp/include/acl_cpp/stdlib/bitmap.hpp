@@ -86,6 +86,15 @@ public:
 	 */
 	bool full(void) const;
 
+public:
+	const unsigned char* get_bmp(void) const {
+		return bmp_;
+	}
+
+	unsigned char* get_bmp(void) {
+		return bmp_;
+	}
+
 private:
 	unsigned char *bmp_;
 	size_t size_;
