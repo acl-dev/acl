@@ -19,7 +19,7 @@ public:
 	 */
 	bitmap(size_t len);
 
-	~bitmap();
+	~bitmap(void);
 
 	/**
 	 * 将所给数值映射在位集合中
@@ -33,7 +33,7 @@ public:
 	 * @param n {size_t}
 	 * @return {bool} 判断指定数值是否存在于位映射集合中
 	 */
-	bool bit_isset(size_t n);
+	bool bit_isset(size_t n) const;
 
 	/**
 	 * 将指定数值从位集合中去除
@@ -48,7 +48,7 @@ public:
 	 * @param len {size_t} buf的最大长度
 	 * @return {size_t} 返回成功拷贝的内存长度，返回 0 表示 buf 太小
 	 */
-	size_t tobuf(void* buf, size_t len);
+	size_t tobuf(void* buf, size_t len) const;
 
 	/**
 	 * 从buf中设置当前bitmap信息
@@ -64,22 +64,27 @@ public:
 	void reset(void);
 
 	/**
-	 * 获取当前位映射存储空间的大小
+	 * 获取当前位映射存储空间可以存储的位的个数
 	 * @return {size_t}
 	 */
-	size_t size(void);
+	size_t size(void) const;
+
+	/**
+	 * 获得内部存储空间大小（字节）
+	 */
+	size_t space(void) const;
 
 	/**
 	 * 获取当前已经设置的个数
 	 * @return {size_t}
 	 */
-	size_t count(void);
+	size_t count(void) const;
 
 	/**
 	 * 当前bitmap是否已满
 	 * @return {bool}
 	 */
-	bool full(void);
+	bool full(void) const;
 
 private:
 	unsigned char *bmp_;

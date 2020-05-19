@@ -32,7 +32,7 @@ bitmap::~bitmap(void)
 	delete[] bmp_;
 }
 
-bool bitmap::bit_isset(size_t n)
+bool bitmap::bit_isset(size_t n) const
 {
 	if (n < size_) {
 		return (bmp_[n / 8] >> n % 8) & 1;
@@ -65,7 +65,7 @@ bool bitmap::bit_unset(size_t n)
 	}
 }
 
-size_t bitmap::tobuf(void* buf, size_t len)
+size_t bitmap::tobuf(void* buf, size_t len) const
 {
 	if (len >= (size_ + 7) / 8) {
 		memcpy(buf, bmp_, (size_ + 7) / 8);
@@ -90,17 +90,22 @@ void bitmap::reset(void)
 	count_ = 0;
 }
 
-size_t bitmap::size(void)
+size_t bitmap::size(void) const
 {
 	return size_;
 }
 
-size_t bitmap::count(void)
+size_t bitmap::space(void) const
+{                                                                                   
+	return (size_ + 7) / 8;                                                    
+}
+
+size_t bitmap::count(void) const
 {
 	return count_;
 }
 
-bool bitmap::full(void)
+bool bitmap::full(void) const
 {
 	return size_ == count_;
 }
