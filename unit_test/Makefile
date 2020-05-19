@@ -45,7 +45,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-extended-offsetof
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding -Wno-invalid-offsetof
 	UNIXTYPE = MACOSX
 endif
 

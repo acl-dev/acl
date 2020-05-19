@@ -25,7 +25,7 @@ ifeq ($(CC),)
 endif
 
 ifeq ($(findstring clang++, $(CC)), clang++)
-	CFLAGS += -Wno-invalid-source-encoding -Wno-extended-offsetof
+	CFLAGS += -Wno-invalid-source-encoding -Wno-invalid-offsetof
 endif
 
 #Find system type.

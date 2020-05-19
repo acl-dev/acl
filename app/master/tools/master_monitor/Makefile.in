@@ -30,7 +30,7 @@ endif
 # For Darwin
 ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-extended-offsetof
+		  -Wno-invalid-offsetof
 	UNIXTYPE = MACOSX
 	RPATH = macos
 	SYSLIB +=  -liconv -rdynamic
