@@ -130,6 +130,11 @@ int redis_key::del_keys(const char* keys[], const size_t lens[], size_t argc)
 
 int redis_key::dump(const char* key, string& out)
 {
+	return dump(key, strlen(key), out);
+}
+
+int redis_key::dump(const char* key, size_t len, string& out)
+{
 	const char* argv[2];
 	size_t lens[2];
 
@@ -137,7 +142,7 @@ int redis_key::dump(const char* key, string& out)
 	lens[0] = sizeof("DUMP") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	hash_slot(key);
 	build_request(2, argv, lens);
@@ -146,6 +151,11 @@ int redis_key::dump(const char* key, string& out)
 
 bool redis_key::exists(const char* key)
 {
+	return exists(key, strlen(key));
+}
+
+bool redis_key::exists(const char* key, size_t len)
+{
 	const char* argv[2];
 	size_t lens[2];
 
@@ -153,7 +163,7 @@ bool redis_key::exists(const char* key)
 	lens[0] = sizeof("EXISTS") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	hash_slot(key);
 	build_request(2, argv, lens);
@@ -162,6 +172,11 @@ bool redis_key::exists(const char* key)
 
 int redis_key::expire(const char* key, int n)
 {
+	return expire(key, strlen(key), n);
+}
+
+int redis_key::expire(const char* key, size_t len, int n)
+{
 	const char* argv[3];
 	size_t lens[3];
 
@@ -169,7 +184,7 @@ int redis_key::expire(const char* key, int n)
 	lens[0] = sizeof("EXPIRE") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	char buf[INT_LEN];
 	(void) safe_snprintf(buf, INT_LEN, "%d", n);
@@ -183,6 +198,11 @@ int redis_key::expire(const char* key, int n)
 
 int redis_key::expireat(const char* key, time_t stamp)
 {
+	return expireat(key, strlen(key), stamp);
+}
+
+int redis_key::expireat(const char* key, size_t len, time_t stamp)
+{
 	const char* argv[3];
 	size_t lens[3];
 
@@ -190,7 +210,7 @@ int redis_key::expireat(const char* key, time_t stamp)
 	lens[0] = sizeof("EXPIREAT") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	char stamp_s[LONG_LEN];
 	safe_snprintf(stamp_s, sizeof(stamp_s), "%lu", (unsigned long) stamp);
@@ -220,6 +240,11 @@ int redis_key::keys_pattern(const char* pattern, std::vector<string>* out)
 
 int redis_key::persist(const char* key)
 {
+	return persist(key, strlen(key));
+}
+
+int redis_key::persist(const char* key, size_t len)
+{
 	const char* argv[2];
 	size_t lens[2];
 
@@ -227,7 +252,7 @@ int redis_key::persist(const char* key)
 	lens[0] = sizeof("PERSIST") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	hash_slot(key);
 	build_request(2, argv, lens);
@@ -236,6 +261,11 @@ int redis_key::persist(const char* key)
 
 int redis_key::pexpire(const char* key, int n)
 {
+	return pexpire(key, strlen(key), n);
+}
+
+int redis_key::pexpire(const char* key, size_t len, int n)
+{
 	const char* argv[3];
 	size_t lens[3];
 
@@ -243,7 +273,7 @@ int redis_key::pexpire(const char* key, int n)
 	lens[0] = sizeof("PEXPIRE") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	char buf[INT_LEN];
 	(void) safe_snprintf(buf, INT_LEN, "%d", n);
@@ -257,6 +287,11 @@ int redis_key::pexpire(const char* key, int n)
 
 int redis_key::pexpireat(const char* key, long long int stamp)
 {
+	return pexpireat(key, strlen(key), stamp);
+}
+
+int redis_key::pexpireat(const char* key, size_t len, long long int stamp)
+{
 	const char* argv[3];
 	size_t lens[3];
 
@@ -264,7 +299,7 @@ int redis_key::pexpireat(const char* key, long long int stamp)
 	lens[0] = sizeof("PEXPIREAT") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	char stamp_s[LONG_LEN];
 	acl_i64toa(stamp, stamp_s, sizeof(stamp_s));
@@ -279,6 +314,11 @@ int redis_key::pexpireat(const char* key, long long int stamp)
 
 long long int redis_key::pttl(const char* key)
 {
+	return pttl(key, strlen(key));
+}
+
+long long int redis_key::pttl(const char* key, size_t len)
+{
 	const char* argv[2];
 	size_t lens[2];
 
@@ -286,7 +326,7 @@ long long int redis_key::pttl(const char* key)
 	lens[0] = sizeof("PTTL") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	hash_slot(key);
 	build_request(2, argv, lens);
@@ -395,6 +435,11 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 
 int redis_key::ttl(const char* key)
 {
+	return ttl(key, strlen(key));
+}
+
+int redis_key::ttl(const char* key, size_t len)
+{
 	const char* argv[2];
 	size_t lens[2];
 
@@ -402,21 +447,26 @@ int redis_key::ttl(const char* key)
 	lens[0] = sizeof("TTL") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	hash_slot(key);
 	build_request(2, argv, lens);
 
 	bool success;
 	int ret = get_number(&success);
-	if (success == false)
+	if (success == false) {
 		return -3;
-	else
+	} else {
 		return ret;
+	}
 }
 
-
 redis_key_t redis_key::type(const char* key)
+{
+	return type(key, strlen(key));
+}
+
+redis_key_t redis_key::type(const char* key, size_t len)
 {
 	const char* argv[2];
 	size_t lens[2];
@@ -425,7 +475,7 @@ redis_key_t redis_key::type(const char* key)
 	lens[0] = sizeof("TYPE") - 1;
 
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	hash_slot(key);
 	build_request(2, argv, lens);
@@ -452,6 +502,12 @@ redis_key_t redis_key::type(const char* key)
 bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 	unsigned timeout, const char* option /* = NULL */)
 {
+	return migrate(key, strlen(key), addr, dest_db, timeout, option);
+}
+
+bool redis_key::migrate(const char* key, size_t len, const char* addr,
+	unsigned dest_db, unsigned timeout, const char* option /* = NULL */)
+{
 	char addrbuf[64];
 	safe_snprintf(addrbuf, sizeof(addrbuf), "%s", addr);
 	char* at = strchr(addrbuf, ':');
@@ -473,7 +529,7 @@ bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 	argv[2] = at;
 	lens[2] = strlen(at);
 	argv[3] = key;
-	lens[3] = strlen(key);
+	lens[3] = len;
 
 	char db_s[11];
 	safe_snprintf(db_s, sizeof(db_s), "%u", dest_db);
@@ -497,13 +553,18 @@ bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 
 int redis_key::move(const char* key, unsigned dest_db)
 {
+	return move(key, strlen(key), dest_db);
+}
+
+int redis_key::move(const char* key, size_t len, unsigned dest_db)
+{
 	const char* argv[3];
 	size_t lens[3];
 
 	argv[0] = "MOVE";
 	lens[0] = sizeof("MOVE") - 1;
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = len;
 
 	char db_s[11];
 	safe_snprintf(db_s, sizeof(db_s), "%u", dest_db);
@@ -516,6 +577,11 @@ int redis_key::move(const char* key, unsigned dest_db)
 
 int redis_key::object_refcount(const char* key)
 {
+	return object_refcount(key, strlen(key));
+}
+
+int redis_key::object_refcount(const char* key, size_t len)
+{
 	const char* argv[3];
 	size_t lens[3];
 
@@ -526,7 +592,7 @@ int redis_key::object_refcount(const char* key)
 	lens[1] = sizeof("REFCOUNT") - 1;
 
 	argv[2] = key;
-	lens[2] = strlen(key);
+	lens[2] = len;
 
 	hash_slot(key);
 	build_request(3, argv, lens);
@@ -534,6 +600,11 @@ int redis_key::object_refcount(const char* key)
 }
 
 bool redis_key::object_encoding(const char* key, string& out)
+{
+	return object_encoding(key, strlen(key), out);
+}
+
+bool redis_key::object_encoding(const char* key, size_t len, string& out)
 {
 	const char* argv[3];
 	size_t lens[3];
@@ -545,7 +616,7 @@ bool redis_key::object_encoding(const char* key, string& out)
 	lens[1] = sizeof("ENCODING") - 1;
 
 	argv[2] = key;
-	lens[2] = strlen(key);
+	lens[2] = len;
 
 	hash_slot(key);
 	build_request(3, argv, lens);
@@ -553,6 +624,11 @@ bool redis_key::object_encoding(const char* key, string& out)
 }
 
 int redis_key::object_idletime(const char* key)
+{
+	return object_idletime(key, strlen(key));
+}
+
+int redis_key::object_idletime(const char* key, size_t len)
 {
 	const char* argv[3];
 	size_t lens[3];
@@ -564,7 +640,7 @@ int redis_key::object_idletime(const char* key)
 	lens[1] = sizeof("IDLETIME") - 1;
 
 	argv[2] = key;
-	lens[2] = strlen(key);
+	lens[2] = len;
 
 	hash_slot(key);
 	build_request(3, argv, lens);

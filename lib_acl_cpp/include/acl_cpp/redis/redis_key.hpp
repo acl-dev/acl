@@ -79,11 +79,14 @@ public:
 	 * deserialize by the value
 	 * @param key {const char*} 键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param out {string&} 存储序列化的二进制数据
 	 *  buffur used to store the result
 	 * @return {int} 序列化后数据长度
 	 *  the length of the data after serializing
 	 */
+	int dump(const char* key, size_t len, string& out);
 	int dump(const char* key, string& out);
 
 	/**
@@ -91,9 +94,12 @@ public:
 	 * check if the key exists in redis
 	 * @param key {const char*} KEY 值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {bool} 返回 true 表示存在，否则表示出错或不存在
 	 *  true returned if key existing, false if error or not existing
 	 */
+	bool exists(const char* key, size_t len);
 	bool exists(const char* key);
 
 	/**
@@ -101,6 +107,8 @@ public:
 	 * set a key's time to live in seconds
 	 * @param key {const char*} 键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param n {int} 生存周期（秒）
 	 *  lief cycle in seconds
 	 * @return {int} 返回值含义如下：
@@ -112,6 +120,7 @@ public:
 	 *  < 0: 出错
 	 *       error happened
 	 */
+	int expire(const char* key, size_t len, int n);
 	int expire(const char* key, int n);
 
 	/**
@@ -119,6 +128,8 @@ public:
 	 * set the expiration for a key as a UNIX timestamp
 	 * @param key {const char*} 对象键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param stamp {time_t} UNIX 时间截，即自 1970 年以来的秒数
 	 *  an absolute Unix timestamp (seconds since January 1, 1970).
 	 * @return {int} 返回值的含义：
@@ -130,6 +141,7 @@ public:
 	 * -1: 出错
 	 *     error happened
 	 */
+	int expireat(const char* key, size_t len, time_t stamp);
 	int expireat(const char* key, time_t stamp);
 
 	/**
@@ -149,13 +161,13 @@ public:
 	 *
 	 *  操作成功后可以通过以下任一方式获得数据
 	 *  1、基类方法 get_value 获得指定下标的元素数据
-	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后再通过
-	 *     redis_result::argv_to_string 方法获得元素数据
-	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再通过
-	 *     redis_result::get_child 获得一个元素对象，然后再通过方式 2 中指定
-	 *     的方法获得该元素的数据
-	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result 中
-	 *     的方法 argv_to_string 从每一个元素对象中获得元素数据
+	 *  2、基类方法 get_child 获得指定下标的元素对象(redis_result），然后
+	 *     再通过 redis_result::argv_to_string 方法获得元素数据
+	 *  3、基类方法 get_result 方法取得总结果集对象 redis_result，然后再
+	 *     通过 redis_result::get_child 获得一个元素对象，然后再通过方式 2
+	 *     中指定的方法获得该元素的数据
+	 *  4、基类方法 get_children 获得结果元素数组对象，再通过 redis_result
+	 *     中的方法 argv_to_string 从每一个元素对象中获得元素数据
 	 *  5、在调用方法中传入非空的存储结果对象的地址
 	 */
 	int keys_pattern(const char* pattern, std::vector<string>* out);
@@ -165,6 +177,8 @@ public:
 	 * atomically transfer a key from a redis instance to another one
 	 * @param key {const char*} 数据对应的键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param addr {const char*} 目标 redis-server 服务器地址，格式：ip:port
 	 *  the destination redis instance's address, format: ip:port
 	 * @param dest_db {unsigned} 目标 redis-server 服务器的数据库 ID 号
@@ -176,6 +190,8 @@ public:
 	 * @return {bool} 迁移是否成功
 	 *  if transfering successfully
 	 */
+	bool migrate(const char* key, size_t len, const char* addr,
+		unsigned dest_db, unsigned timeout, const char* option = NULL);
 	bool migrate(const char* key, const char* addr, unsigned dest_db,
 		unsigned timeout, const char* option = NULL);
 
@@ -184,6 +200,8 @@ public:
 	 * move a key to another database
 	 * @param key {const char*} 数据键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param dest_db {unsigned} 目标数据库 ID 号
 	 *  the destination database
 	 * @return {int} 迁移是否成功。-1: 表示出错，0：迁移失败，因为目标数据库中存在
@@ -191,6 +209,7 @@ public:
 	 *  if moving succcessfully. -1 if error, 0 if moving failed because
 	 *  the same key already exists, 1 if successful
 	 */
+	int move(const char* key, size_t len, unsigned dest_db);
 	int move(const char* key, unsigned dest_db);
 
 	/**
@@ -198,9 +217,12 @@ public:
 	 * get the referring count of the object, which just for debugging
 	 * @param key {const char*} 数据键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {int} 返回 0 表示该 key 不存在；< 0 表示出错
 	 *  0 if key not exists, < 0 if error
 	 */
+	int object_refcount(const char* key, size_t len);
 	int object_refcount(const char* key);
 
 	/**
@@ -208,11 +230,13 @@ public:
 	 * get the internal storing of the object assosicate with the key
 	 * @param key {const char*} 数据键值
 	 *  the key
+	 * @param len {size_t} key 长度
 	 * @param out {string&} 存在结果
 	 *  store the result
 	 * @return {bool} 是否成功
 	 *  if successful
 	 */
+	bool object_encoding(const char* key, size_t len, string& out);
 	bool object_encoding(const char* key, string& out);
 
 	/**
@@ -220,9 +244,12 @@ public:
 	 * get the key's idle time in seconds since its first stored
 	 * @param key {const char*} 数据键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {int} 返回值 < 0 表示出错
 	 *  0 if error happened
 	 */
+	int object_idletime(const char* key, size_t len);
 	int object_idletime(const char* key);
 
 	/**
@@ -231,6 +258,8 @@ public:
 	 * remove the expiration from a key
 	 * @param key {const char*} 对象键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {int} 返回值的含义如下：
 	 *  the value returned as below:
 	 *  1 -- 设置成功
@@ -240,6 +269,7 @@ public:
 	 * -1 -- 出错
 	 *       error happened
 	 */
+	int persist(const char* key, size_t len);
 	int persist(const char* key);
 
 	/**
@@ -247,6 +277,8 @@ public:
 	 * set a key's time to live in milliseconds
 	 * @param key {const char*} 键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param n {int} 生存周期（毫秒）
 	 *  time to live in milliseconds
 	 * @return {int} 返回值含义如下：
@@ -258,6 +290,7 @@ public:
 	 *  < 0: 出错
 	 *       error happened
 	 */
+	int pexpire(const char* key, size_t len, int n);
 	int pexpire(const char* key, int n);
 
 	/**
@@ -266,6 +299,8 @@ public:
 	 * in milliseconds
 	 * @param key {const char*} 键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @param n {long long int} UNIX 时间截，即自 1970 年以来的毫秒数
 	 *  the UNIX timestamp in milliseconds from 1970.1.1
 	 * @return {int} 返回值含义如下：
@@ -277,6 +312,7 @@ public:
 	 *  < 0: 出错
 	 *       error happened
 	 */
+	int pexpireat(const char* key, size_t len, long long int n);
 	int pexpireat(const char* key, long long int n);
 
 	/**
@@ -284,6 +320,8 @@ public:
 	 * get the time to live for a key in milliseconds
 	 * @param key {const char*} 键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {int} 返回对应键值的生存周期
 	 *  value returned as below:
 	 *  >0: 该 key 剩余的生存周期（毫秒）
@@ -298,6 +336,7 @@ public:
 	 * notice: for redis version before 2.8, -1 will be returned if the
 	 * key doesn't exist or the key were not be set expiration.
 	 */
+	long long int pttl(const char* key, size_t len);
 	long long int pttl(const char* key);
 
 	/**
@@ -350,6 +389,8 @@ public:
 	 * get the time to live for a key in seconds
 	 * @param key {const char*} 键值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {int} 返回对应键值的生存周期
 	 *  return value as below:
 	 *  > 0: 该 key 剩余的生存周期（秒）
@@ -364,6 +405,7 @@ public:
 	 * notice: for the redis version before 2.8, -1 will be returned
 	 *  if the key doesn't exist or the key were not be set expiration
 	 */
+	int ttl(const char* key, size_t len);;
 	int ttl(const char* key);
 
 	/**
@@ -371,9 +413,12 @@ public:
 	 * get the the type stored at key
 	 * @para key {const char*} KEY 值
 	 *  the key
+	 * @param len {size_t} key 长度
+	 *  the key's length
 	 * @return {redis_key_t} 返回 KEY 的存储类型
 	 *  return redis_key_t defined above as REDIS_KEY_
 	 */
+	redis_key_t type(const char* key, size_t len);
 	redis_key_t type(const char* key);
 
 	/**
