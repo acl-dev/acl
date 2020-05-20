@@ -216,7 +216,7 @@ char& string::operator [](int n)
 
 string& string::operator =(const char* s)
 {
-	if (s != NULL) {
+	if (s != NULL && *s) {
 		SCP(vbf_, s);
 	}
 
@@ -225,39 +225,38 @@ string& string::operator =(const char* s)
 
 string& string::operator =(const string& s)
 {
-	MCP(vbf_, STR(s.vbf_), LEN(s.vbf_));
-	TERM(vbf_);
+	if (!s.empty()) {
+		MCP(vbf_, STR(s.vbf_), LEN(s.vbf_));
+		TERM(vbf_);
+	}
 
 	return *this;
 }
 
 string& string::operator =(const string* s)
 {
-	if (s == NULL) {
-		return *this;
+	if (s != NULL && !s->empty()) {
+		MCP(vbf_, STR(s->vbf_), LEN(s->vbf_));
+		TERM(vbf_);
 	}
-
-	MCP(vbf_, STR(s->vbf_), LEN(s->vbf_));
-	TERM(vbf_);
 	return *this;
 }
 
 string& string::operator =(const std::string& s)
 {
-	MCP(vbf_, s.c_str(), s.size());
-	TERM(vbf_);
-
+	if (!s.empty()) {
+		MCP(vbf_, s.c_str(), s.size());
+		TERM(vbf_);
+	}
 	return *this;
 }
 
 string& string::operator =(const std::string* s)
 {
-	if (s == NULL) {
-		return *this;
+	if (s != NULL && !s->empty()) {
+		MCP(vbf_, s->c_str(), s->size());
+		TERM(vbf_);
 	}
-
-	MCP(vbf_, s->c_str(), s->size());
-	TERM(vbf_);
 	return *this;
 }
 
