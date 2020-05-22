@@ -301,6 +301,18 @@ public:
 	bool hexists(const char* key, const char* name, size_t name_len);
 
 	/**
+	 * 获得指定 key 的所有字段值
+	 * get all fields' values with the specified key
+	 * @param key {const char*} key 键值
+	 *  the hash key
+	 * @param values {std::vector<string>&} 存储结果
+	 *  store the results
+	 * @return {bool} 操作是否成功
+	 *  return true on success, or failed when error happened
+	 */
+	bool hvals(const char* key, std::vector<string>& values);
+
+	/**
 	 * 获得某个 key 对象中所有域字段的数量
 	 * get the count of fields in hash stored at key
 	 * @param key {const char*} key 键值

@@ -359,6 +359,34 @@ static bool test_hlen(acl::redis_hash& redis, int n)
 	return true;
 }
 
+static bool test_hvals(acl::redis_hash& redis, int n)
+{
+	acl::string key;
+
+	for (int i = 0; i < n; i++)
+	{
+		key.format("%s_%d", __keypre.c_str(), i);
+		redis.clear();
+		std::vector<acl::string> values;
+		bool ret = redis.hvals(key, values);
+		if (ret == false) {
+			printf("hvals error: %s, key: %s\r\n",
+				redis.result_error(), key.c_str());
+			return false;
+		}
+		else if (i < 10) {
+			printf("key: %s\r\n", key.c_str());
+			for (std::vector<acl::string>::const_iterator cit
+				= values.begin(); cit != values.end(); ++cit) {
+				printf("  %s\r\n", (*cit).c_str());
+			}
+			printf("\r\n");
+		}
+	}
+
+	return true;
+}
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
@@ -368,7 +396,7 @@ static void usage(const char* procname)
 		"-I rw_timeout[default: 10]\r\n"
 		"-S [if slice request, default: no]\r\n"
 		"-c [cluster mode]\r\n"
-		"-a cmd[hmset|hmget|hset|hsetnx|hget|hgetall|hincrby|hincrbyfloat|hkeys|hexists|hlen|hdel]\r\n",
+		"-a cmd[hmset|hmget|hset|hsetnx|hget|hgetall|hincrby|hincrbyfloat|hkeys|hexists|hlen|hdel|hvals]\r\n",
 		procname);
 }
 
@@ -452,6 +480,8 @@ int main(int argc, char* argv[])
 		ret = test_hexists(redis, n);
 	else if (cmd == "hlen")
 		ret = test_hlen(redis, n);
+	else if (cmd == "hvals")
+		ret = test_hvals(redis, n);
 	else if (cmd == "all")
 	{
 		ret = test_hmset(redis, n)
@@ -466,6 +496,7 @@ int main(int argc, char* argv[])
 			&& test_hexists(redis, n)
 			&& test_hlen(redis, n)
 			&& test_hdel(redis, n);
+			&& test_hvals(redis, n);
 	}
 	else
 	{
