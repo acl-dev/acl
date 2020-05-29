@@ -67,9 +67,10 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
 	BOOL is_completed;
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		acl_msg_fatal("%s(%d): fdp null, sockfd(%d)",
 			myname, __LINE__, sockfd);
+	}
 
 	if (fdp->h_iocp != NULL) {
 		fdp->h_iocp = NULL;
@@ -79,20 +80,19 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	/* windows xp 环境下，必须在关闭套接字之前调用此宏判断重叠 IO
 	 * 是否处于 STATUS_PENDING 状态
 	 */
-	if (fdp->event_read != NULL)
+	if (fdp->event_read != NULL) {
 		is_completed = HasOverlappedIoCompleted(
 			&fdp->event_read->overlapped);
-	else
+	} else {
 		is_completed = FALSE;
+	}
 
 	/* 必须在释放 fdp->event_read/fdp->event_write 前关闭套接口句柄 */
 	if (ACL_VSTREAM_SOCK(stream) != ACL_SOCKET_INVALID
-		&& stream->close_fn)
-	{
+		&& stream->close_fn) {
 		(void) stream->close_fn(ACL_VSTREAM_SOCK(stream));
 	} else if (ACL_VSTREAM_FILE(stream) != ACL_FILE_INVALID
-		&& stream->fclose_fn)
-	{
+		&& stream->fclose_fn) {
 		(void) stream->fclose_fn(ACL_VSTREAM_FILE(stream));
 	}
 
@@ -103,9 +103,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		/* 如果完成端口处于未决状态，则不能释放重叠结构，需在主循环的
 		 * GetQueuedCompletionStatus 调用后来释放
 		 */
-		if (is_completed)
+		if (is_completed) {
 			acl_myfree(fdp->event_read);
-		else {
+		} else {
 			fdp->event_read->type = IOCP_EVENT_DEAD;
 			fdp->event_read->fdp = NULL;
 		}
@@ -115,9 +115,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		/* 如果完成端口处于未决状态，则不能释放重叠结构，需在主循环的
 		 * GetQueuedCompletionStatus 调用后来释放
 		 */
-		if (HasOverlappedIoCompleted(&fdp->event_write->overlapped))
+		if (HasOverlappedIoCompleted(&fdp->event_write->overlapped)) {
 			acl_myfree(fdp->event_write);
-		else {
+		} else {
 			fdp->event_write->type = IOCP_EVENT_DEAD;
 			fdp->event_write->fdp = NULL;
 		}
@@ -130,8 +130,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		acl_ring_detach(&fdp->delay_entry);
 	}
 
-	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream))
+	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream)) {
 		ev->event.maxfd = ACL_SOCKET_INVALID;
+	}
 	if (fdp->fdidx >= 0 && fdp->fdidx < --ev->event.fdcnt) {
 		ev->event.fdtabs[fdp->fdidx] = ev->event.fdtabs[ev->event.fdcnt];
 		ev->event.fdtabs[fdp->fdidx]->fdidx = fdp->fdidx;
@@ -140,8 +141,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < ev->event.ready_cnt
-		&& ev->event.ready[fdp->fdidx_ready] == fdp)
-	{
+		&& ev->event.ready[fdp->fdidx_ready] == fdp) {
 		ev->event.ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -194,8 +194,9 @@ END:
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->r_callback != callback || fdp->r_context != context) {
 		fdp->r_callback = callback;
@@ -267,8 +268,9 @@ END:
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->w_callback != callback || fdp->w_context != context) {
 		fdp->w_callback = callback;
@@ -329,13 +331,13 @@ DEL_READ_TAG:
 	fdp->event_type &= ~(ACL_EVENT_READ | ACL_EVENT_ACCEPT);
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_WRITE))
-	{
+		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_WRITE)) {
 		return;
 	}
 
-	if (eventp->maxfd == ACL_VSTREAM_SOCK(fdp->stream))
+	if (eventp->maxfd == ACL_VSTREAM_SOCK(fdp->stream)) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -345,8 +347,7 @@ DEL_READ_TAG:
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -396,13 +397,13 @@ DEL_WRITE_TAG:
 	fdp->event_type &= ~(ACL_EVENT_WRITE | ACL_EVENT_CONNECT);
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ))
-	{
+		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
 		return;
 	}
 
-	if (eventp->maxfd == ACL_VSTREAM_SOCK(stream))
+	if (eventp->maxfd == ACL_VSTREAM_SOCK(stream)) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -412,8 +413,7 @@ DEL_WRITE_TAG:
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -446,8 +446,7 @@ static void enable_listen(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		fdp->event_read->myAddrBlock, 0,
 		ACCEPT_ADDRESS_LENGTH, ACCEPT_ADDRESS_LENGTH,
 		&ReceiveLen, &fdp->event_read->overlapped) == FALSE
-		&& acl_last_error() !=ERROR_IO_PENDING)
-	{
+		&& acl_last_error() !=ERROR_IO_PENDING) {
 		acl_msg_warn("%s(%d): AcceptEx error(%s)",
 			myname, __LINE__, acl_last_serror());
 	}
@@ -465,9 +464,10 @@ static void enable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	if (fdp->h_iocp == NULL) {
 		fdp->h_iocp = CreateIoCompletionPort((HANDLE) sockfd,
 			ev->h_iocp, (ULONG_PTR) fdp, 0);
-		if (fdp->h_iocp != ev->h_iocp)
+		if (fdp->h_iocp != ev->h_iocp) {
 			acl_msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
 				myname, __LINE__, acl_last_serror());
+		}
 		fdp->flag |= EVENT_FDTABLE_FLAG_IOCP;
 	}
 
@@ -490,8 +490,7 @@ static void enable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 
 	if (ReadFile((HANDLE) sockfd, NULL, 0,
 			&recvBytes, &fdp->event_read->overlapped) == FALSE
-		&& acl_last_error() != ERROR_IO_PENDING)
-	{
+		&& acl_last_error() != ERROR_IO_PENDING) {
 		acl_msg_warn("%s(%d): ReadFile error(%s)",
 			myname, __LINE__, acl_last_serror());
 	}
@@ -504,15 +503,17 @@ static void parse_addr(char *addr, unsigned short *port,
 	char *ptr;
 
 	ptr = strchr(addr, ':');
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		acl_msg_fatal("%s, %s(%d): invalid addr(%s)",
 			__FILE__, myname, __LINE__, addr);
+	}
 
 	*ptr++ = 0;
 	*port = atoi(ptr);
-	if (*port <= 0)
+	if (*port <= 0) {
 		acl_msg_fatal("%s, %s(%d): invalid port(%d)",
 			__FILE__, myname, __LINE__, *port);
+	}
 
 	ptr = strchr(addr, '@');
 	if (ptr != NULL) {
@@ -524,9 +525,10 @@ static void parse_addr(char *addr, unsigned short *port,
 		*remote = addr;
 	}
 
-	if (strlen(*remote) == 0)
+	if (strlen(*remote) == 0) {
 		acl_msg_fatal("%s, %s(%d): ip buf's length is 0",
 			__FILE__, myname, __LINE__);
+	}
 }
 
 static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
@@ -548,8 +550,9 @@ static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	ACL_SAFE_STRNCPY(buf, ACL_VSTREAM_PEER(fdp->stream), sizeof(buf));
 	parse_addr(buf, &port, &local_ip, &remote);
 
-	if (!local_ip || !*local_ip)
+	if (!local_ip || !*local_ip) {
 		local_ip = any_ip;
+	}
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family = AF_INET;
@@ -575,9 +578,10 @@ static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 			&dwBytes,
 			NULL,
 			NULL);
-	if(dwErr  ==  SOCKET_ERROR)
+	if(dwErr  ==  SOCKET_ERROR) {
 		acl_msg_fatal("%s(%d): WSAIoctl error(%s)",
 			myname, __LINE__, acl_last_serror());
+	}
 
 	if (lpfnConnectEx(sock,
 			(const struct sockaddr *) &addr,
@@ -586,8 +590,7 @@ static void enable_connect(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 			0,
 			NULL,
 			&fdp->event_write->overlapped) == FALSE
-		&& acl_last_error() !=ERROR_IO_PENDING)
-	{
+		&& acl_last_error() !=ERROR_IO_PENDING) {
 		acl_msg_warn("%s(%d): ConnectEx error(%s), sock(%d)",
 			myname, __LINE__, acl_last_serror(), sock);
 	}
@@ -605,9 +608,10 @@ static void enable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	if (fdp->h_iocp == NULL) {
 		fdp->h_iocp = CreateIoCompletionPort((HANDLE) sockfd,
 			ev->h_iocp, (ULONG_PTR) fdp, 0);
-		if (fdp->h_iocp != ev->h_iocp)
+		if (fdp->h_iocp != ev->h_iocp) {
 			acl_msg_fatal("%s(%d): CreateIoCompletionPort error(%s)",
 				myname, __LINE__, acl_last_serror());
+		}
 		fdp->flag |= EVENT_FDTABLE_FLAG_IOCP;
 	}
 
@@ -631,8 +635,7 @@ static void enable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 
 	if (WriteFile((HANDLE) sockfd, NULL, 0,
 			&sendBytes, &fdp->event_write->overlapped) == FALSE
-		&& acl_last_error() != ERROR_IO_PENDING)
-	{
+		&& acl_last_error() != ERROR_IO_PENDING) {
 		acl_msg_warn("%s(%d): WriteFile error(%s), sockfd(%d)",
 			myname, __LINE__, acl_last_serror(), sockfd);
 	}
@@ -669,8 +672,7 @@ static void event_set_all(ACL_EVENT *eventp)
 	eventp->ready_cnt = 0;
 
 	if (eventp->present - eventp->last_check >= eventp->check_inter
-		|| eventp->read_ready > 0)
-	{
+		|| eventp->read_ready > 0) {
 		eventp->last_check = eventp->present;
 		event_check_fds(eventp);
 	}
@@ -679,8 +681,9 @@ static void event_set_all(ACL_EVENT *eventp)
 
 	while (1) {
 		ACL_RING *r = acl_ring_pop_head(&ev->fdp_delay_list);
-		if (r == NULL)
+		if (r == NULL) {
 			break;
+		}
 		fdp = acl_ring_to_appl(r, ACL_EVENT_FDTABLE, delay_entry);
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
@@ -701,16 +704,15 @@ static void event_set_all(ACL_EVENT *eventp)
 
 	for (i = 0; i < eventp->fdcnt; i++) {
 		fdp = eventp->fdtabs[i];
-		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
+		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
+		}
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-			&& (fdp->event_read == NULL || fdp->event_read->type == 0))
-		{
+			&& (fdp->event_read == NULL || fdp->event_read->type == 0)) {
 			enable_read(ev, fdp);
 		}
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-			&& (fdp->event_write == NULL || fdp->event_write->type == 0))
-		{
+			&& (fdp->event_write == NULL || fdp->event_write->type == 0)) {
 			enable_write(ev, fdp);
 		}
 	}
@@ -736,10 +738,11 @@ static void event_loop(ACL_EVENT *eventp)
 	 */
 	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
 		acl_int64 n = timer->when - eventp->present;
-		if (n <= 0)
+		if (n <= 0) {
 			delay = 1;
-		else if (n < delay)
+		} else if (n < delay) {
 			delay = n;
+		}
 	}
 
 	eventp->nested++;
@@ -747,13 +750,15 @@ static void event_loop(ACL_EVENT *eventp)
 	event_set_all(eventp);
 
 	if (eventp->fdcnt == 0) {
-		if (eventp->ready_cnt == 0)
+		if (eventp->ready_cnt == 0) {
 			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 1);
+		}
 		goto TAG_DONE;
 	}
 
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		delay = 0;
+	}
 
 TAG_DONE:
 
@@ -770,20 +775,20 @@ TAG_DONE:
 
 		if (!isSuccess) {
 
-			if (iocp_event == NULL)
+			if (iocp_event == NULL) {
 				break;
-			if (iocp_event->type == IOCP_EVENT_DEAD)
+			}
+			if (iocp_event->type == IOCP_EVENT_DEAD) {
 				acl_myfree(iocp_event);
-			else if (iocp_event->fdp == NULL) {
+			} else if (iocp_event->fdp == NULL) {
 				acl_msg_warn("%s(%d): fdp null",
 					myname, __LINE__);
 				acl_myfree(iocp_event);
-			} else if (iocp_event->fdp != fdp)
+			} else if (iocp_event->fdp != fdp) {
 				acl_msg_fatal("%s(%d): invalid fdp",
 					myname, __LINE__);
-			else if (!(fdp->event_type & (ACL_EVENT_XCPT
-				| ACL_EVENT_RW_TIMEOUT)))
-			{
+			} else if (!(fdp->event_type & (ACL_EVENT_XCPT
+				| ACL_EVENT_RW_TIMEOUT))) {
 				fdp->event_type |= ACL_EVENT_XCPT;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt] = fdp;
@@ -792,11 +797,13 @@ TAG_DONE:
 			continue;
 		}
 
+		/* if the close message got after stream_on_close above ? */
+		if (iocp_event->fdp == NULL) {
+			continue;
+		}
 		acl_assert(fdp == iocp_event->fdp);
 
-		if ((fdp->event_type & (ACL_EVENT_XCPT
-			| ACL_EVENT_RW_TIMEOUT)))
-		{
+		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
 		}
 
@@ -804,25 +811,24 @@ TAG_DONE:
 			acl_assert(fdp->event_read == iocp_event);
 			iocp_event->type &= ~IOCP_EVENT_READ;
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+				| ACL_EVENT_WRITE)) == 0) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt] = fdp;
 				eventp->ready_cnt++;
 			}
 
-			if (fdp->listener)
+			if (fdp->listener) {
 				fdp->event_type |= ACL_EVENT_ACCEPT;
-			else
+			} else {
 				fdp->stream->read_ready = 1;
+			}
 		}
 		if (iocp_event->type == IOCP_EVENT_WRITE) {
 			acl_assert(fdp->event_write == iocp_event);
 			iocp_event->type &= ~IOCP_EVENT_WRITE;
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+				| ACL_EVENT_WRITE)) == 0) {
 				fdp->event_type |= ACL_EVENT_WRITE;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt] = fdp;
@@ -832,8 +838,9 @@ TAG_DONE:
 		delay = 0;
 	}
 
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		event_fire(eventp);
+	}
 	eventp->nested--;
 }
 
