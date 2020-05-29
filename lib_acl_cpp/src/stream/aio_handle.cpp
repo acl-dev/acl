@@ -117,13 +117,13 @@ void aio_handle::on_timer_callback(int, ACL_EVENT*,
 	// 如果定时器中的任务为空或未设置定时器的重复使用，则删除定时器
 
 	if (callback->empty()) {
-		logger("timer empty, delete it");
+		//logger("timer empty, delete it");
 		handle->del_timer(callback);
 		return;
 	}
 
 	if (!callback->keep_timer()) {
-		logger("timer no keep delete it");
+		//logger("timer no keep delete it");
 		handle->del_timer(callback);
 		return;
 	}
