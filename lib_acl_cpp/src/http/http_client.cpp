@@ -516,22 +516,38 @@ bool http_client::read_response_head(void)
 		}
 	}
 
-	const char* ptr = http_hdr_entry_value(&hdr_res_->hdr,
-			"Content-Encoding");
-	if (ptr && unzip_) {
-		// 目前仅支持 gzip 数据的解压
-		if (strcasecmp(ptr, "gzip") == 0) {
-			zstream_ = NEW zlib_stream();
-			if (!zstream_->unzip_begin(false)) {
-				logger_error("unzip_begin error");
-				delete zstream_;
-				zstream_ = NULL;
-			}
+	if (!unzip_) {
+		return true;
+	}
 
-			// gzip 响应数据体前会有 10 字节的头部字段
-			gzip_header_left_ = 10;
+#define	EQ(x, y) !strcasecmp((x), (y))
+
+	bool gzipped = false;
+	const char* ptr = http_hdr_entry_value(&hdr_res_->hdr, "Content-Encoding");
+	if (ptr) {
+		if (EQ(ptr, "gzip") || EQ(ptr, "x-gzip")) {
+			gzipped = true;
 		} else {
 			logger_warn("unknown compress format: %s", ptr);
+		}
+	} else if ((ptr = http_hdr_entry_value(&hdr_res_->hdr, "Content-Type"))) {
+		if (EQ(ptr, "application/x-gzip")) {
+			gzipped = true;
+		} else {
+			logger_warn("unknown compress format: %s", ptr);
+		}
+	}
+
+	// 目前仅支持 gzip 数据的解压
+	if (gzipped) {
+		zstream_ = NEW zlib_stream();
+		if (!zstream_->unzip_begin(false)) {
+			logger_error("unzip_begin error");
+			delete zstream_;
+			zstream_ = NULL;
+		} else {
+			// gzip 响应数据体前会有 10 字节的头部字段
+			gzip_header_left_ = 10;
 		}
 	}
 
