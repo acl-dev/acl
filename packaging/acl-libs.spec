@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary:        The powerful c/c++ library and server framework
 Name:           acl-libs
@@ -133,6 +133,9 @@ fi
 #/opt/soft/services/acl-tools.json
 
 %changelog
+
+* Mon Jun 01 2020 shuxin.zheng@qq.com 3.5.1-3-20200601.16
+- support "application/x-gzip" from http response header in http_client.cpp
 
 * Thu May 28 2020 shuxin.zheng@qq.com 3.5.1-2-20200528.16
 - release acl3.5.1-2 release new version for edge schedule
