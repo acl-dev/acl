@@ -42,7 +42,11 @@ int acl_readable(ACL_SOCKET fd)
 	struct pollfd fds;
 	int    delay = 0;
 
+#ifdef ACL_WINDOWS
+	fds.events = POLLIN;
+#else
 	fds.events = POLLIN | POLLPRI;
+#endif
 	fds.fd = fd;
 
 	acl_set_error(0);
@@ -54,8 +58,9 @@ int acl_readable(ACL_SOCKET fd)
 #else
 		case -1:
 #endif
-			if (acl_last_error() == ACL_EINTR)
+			if (acl_last_error() == ACL_EINTR) {
 				continue;
+			}
 
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
 				__FILE__, __LINE__, __FUNCTION__,
@@ -115,13 +120,13 @@ int acl_readable(ACL_SOCKET fd)
 #ifdef	ACL_WINDOWS
 			if (errnum == WSAEINPROGRESS
 				|| errnum == WSAEWOULDBLOCK
-				|| errnum == ACL_EINTR)
-			{
+				|| errnum == ACL_EINTR) {
 				continue;
 			}
 #else
-			if (errnum == ACL_EINTR)
+			if (errnum == ACL_EINTR) {
 				continue;
+			}
 #endif
 			acl_msg_error("%s(%d), %s: select error(%s), fd: %d",
 				__FILE__, __LINE__, __FUNCTION__,
