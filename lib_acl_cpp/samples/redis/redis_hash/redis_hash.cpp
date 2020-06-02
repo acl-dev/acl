@@ -495,7 +495,7 @@ int main(int argc, char* argv[])
 			&& test_hkeys(redis, n)
 			&& test_hexists(redis, n)
 			&& test_hlen(redis, n)
-			&& test_hdel(redis, n);
+			&& test_hdel(redis, n)
 			&& test_hvals(redis, n);
 	}
 	else
