@@ -23,6 +23,8 @@ add_definitions(
 	"-DACL_WRITEABLE_CHECK"
 	"-Wno-long-long"
 	"-Wuninitialized"
+	"-DUSE_JMP"
+	"-DUSE_FAST_RING"
 	"-D_POSIX_PTHREAD_SEMANTICS"
 	"-DACL_PREPARE_COMPILE"
 #	"-Wno-invalid-source-encoding"
@@ -62,6 +64,7 @@ include_directories(
 
 set(sources
 	${src}
+	${src}/fiber
 	${src}/common
 	${src}/event
 	${src}/hook

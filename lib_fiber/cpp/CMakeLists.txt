@@ -83,16 +83,18 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_library(fiber_cpp_static STATIC ${lib_src})
 	SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "fiber_cpp")
 
-	set(CMAKE_SHARED_LINKER_FLAGS
-		-Wl,-rpath,. -L${lib_output_path}
-		-lacl_cpp -lprotocol -lfiber -lacl)
 	set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 	link_directories(${lib_output_path})
 endif()
 
 if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-	add_library(fiber_cpp SHARED ${lib_src})
-	target_link_libraries(fiber_cpp acl_cpp protocol fiber acl)
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		set(CMAKE_SHARED_LINKER_FLAGS
+			-Wl,-rpath,. -L${lib_output_path}
+			-lacl_cpp -lprotocol -lfiber -lacl)
+		add_library(fiber_cpp SHARED ${lib_src})
+		target_link_libraries(fiber_cpp acl_cpp protocol fiber acl)
+	endif()
 endif()
 
 ##############################################################################
