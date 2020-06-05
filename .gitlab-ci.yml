@@ -20,7 +20,7 @@ variables:
     stage: build
     script:
         - yum install -y zlib-devel
-        - cd packaging && make rpm && rm x86_64/acl-tools*.rpm
+        - cd packaging && make rpm 
     artifacts:
         paths:
             - packaging/x86_64/acl-libs-*.rpm
@@ -50,7 +50,7 @@ variables:
     stage: publish
     script:
         - yum install -y zlib-devel
-        - cd packaging && make rpm && rm x86_64/acl-tools*.rpm
+        - cd packaging && make rpm 
         - cd ${CI_PROJECT_DIR} && /tools/publish.sh -t prerelease
     coverage: '/lines......: \d+\.\d+%/'
     only:
