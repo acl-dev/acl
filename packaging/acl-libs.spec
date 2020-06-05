@@ -120,7 +120,7 @@ fi
 /opt/soft/acl-master/var
 #/opt/soft/services/acl-master.json
 /etc/init.d/master
-%exclude /opt/soft/acl-master/conf/service/master_*
+#%exclude /opt/soft/acl-master/conf/service/master_*
 
 #%files -n acl-tools
 #%defattr(-,root,root)
