@@ -124,10 +124,7 @@ clean cl:
 acl_master: all_lib
 	@(cd app/master/daemon; make $(MAKE_ARGS); make install)
 	@(cd app/master/tools/lib_global; make $(MAKE_ARGS);)
-	@(cd app/master/tools/master_ctld; make $(MAKE_ARGS); make install)
 	@(cd app/master/tools/master_ctl; make $(MAKE_ARGS); make install)
-	@(cd app/master/tools/master_guard; make $(MAKE_ARGS); make install)
-	@(cd app/master/tools/master_monitor; make $(MAKE_ARGS); make install)
 
 packinstall:
 	@(echo "")
@@ -141,10 +138,7 @@ packinstall:
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
-	@(cd app/master/tools/master_ctld; make install)
 	@(cd app/master/tools/master_ctl; make install)
-	@(cd app/master/tools/master_guard; make install)
-	@(cd app/master/tools/master_monitor; make install)
 	@(cd lib_fiber; make)
 	@echo "copying app/master/daemon/acl_master $(BIN_PATH)"
 	@cp -f app/master/daemon/acl_master $(BIN_PATH)
