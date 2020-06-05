@@ -132,17 +132,7 @@ packinstall:
 	$(shell mkdir -p $(INC_ACL)/acl)
 	$(shell mkdir -p $(INC_ACL)/acl_cpp)
 	$(shell mkdir -p $(INC_ACL)/protocol)
-	$(shell mkdir -p $(BIN_PATH))
 	$(shell mkdir -p $(LIB_ACL))
-	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master)
-	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
-	$(shell mkdir -p ./dist/master/bin/$(RPATH))
-	@(cd app/master/daemon; make install)
-	@(cd app/master/tools/master_ctl; make install)
-	@(cd lib_fiber; make)
-	@echo "copying app/master/daemon/acl_master $(BIN_PATH)"
-	@cp -f app/master/daemon/acl_master $(BIN_PATH)
-	(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 	@echo "copying lib_acl/include/* $(INC_ACL)/acl/"
 	@cp -Rf lib_acl/include/* $(INC_ACL)/acl/
 	@echo "copying lib_acl_cpp/include/acl_cpp/* $(INC_ACL)/acl_cpp/"
@@ -162,6 +152,18 @@ packinstall:
 		echo "copying lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a"; \
 		cp -f lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a; \
 	fi
+
+install_master:
+	$(shell mkdir -p $(BIN_PATH))
+	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master)
+	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
+	$(shell mkdir -p ./dist/master/bin/$(RPATH))
+	@(cd app/master/daemon; make install)
+	@(cd app/master/tools/master_ctl; make install)
+	@(cd lib_fiber; make)
+	#@echo "copying app/master/daemon/acl_master $(BIN_PATH)"
+	#@cp -f app/master/daemon/acl_master $(BIN_PATH)
+	@(cd dist/master && ./setup.sh $(DESTDIR) /opt/soft/acl-master)
 
 install:
 	@(echo "")

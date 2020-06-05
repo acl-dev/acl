@@ -60,6 +60,20 @@ variables:
             - packaging/x86_64/acl-libs-*.rpm
             - packaging/x86_64/acl-master-*.rpm
 
+.framerelease: &FRAMERELEASE
+    image: ${BUILDIMAGES}
+    stage: publish
+    script:
+        - yum install -y zlib-devel
+        - cd packaging && make PKG_NAME=acl-master
+        - cd ${CI_PROJECT_DIR} && /tools/publish.sh -t prerelease
+    coverage: '/lines......: \d+\.\d+%/'
+    only:
+        - /^master-.*$/
+    artifacts:
+        paths:
+            - packaging/x86_64/*.rpm
+
 stages:
     - test
     - publish
@@ -154,3 +168,45 @@ prerelease:centos7.2:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
     }
     <<: *PRERELEASE
+
+prerelease:centos5.8:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:5.8"
+    }
+    <<: *FRAMERELEASE
+
+prerelease:centos5.9:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:5.9"
+    }
+    <<: *FRAMERELEASE
+
+prerelease:centos6.4:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
+    }
+    <<: *FRAMERELEASE
+
+prerelease:centos6.6:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
+    }
+    <<: *FRAMERELEASE
+
+prerelease:centos7.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
+    }
+    <<: *FRAMERELEASE
+
+prerelease:centos7.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
+    }
+    <<: *FRAMERELEASE

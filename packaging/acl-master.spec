@@ -1,19 +1,20 @@
 %define release_id 3
 
-Summary:        The powerful c/c++ library
-Name:           acl-libs
+Summary: acl master framework
+Name:           acl-master
 Version:        3.5.1
 Release:        %{release_id}
-Group:          System/Libs
+Group:          System Environment/Tools
 License:        IBM
 URL:            https://github.com/acl-dev/
 Packager:       Zhang Qiang <155281969@qq.com>, Wang Haibin <634648088@qq.com>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
 Source:         http://example.com/%{name}-%{version}.tar.gz
+Requires(post):   /sbin/ldconfig
+Requires(postun): /sbin/ldconfig
 
 %description
-
-One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://blog.csdn.net/zsxxsz/.
+acl master framework
 
 %prep
 %setup -q
@@ -23,26 +24,45 @@ make -j 4
 make -C lib_fiber
 
 %install
-
-make packinstall  DESTDIR=$RPM_BUILD_ROOT
-make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
+make install_master  DESTDIR=$RPM_BUILD_ROOT
+#make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
 
 %clean
 rm -rf %{buildroot}
 
+%post
+/sbin/chkconfig --add master
+if [ "$1" == "1" ]; then
+    echo "starting acl_master ..."
+    service master start > /dev/null 2>&1 ||:
+fi
+
+%preun
+if [ "$1" == "0" ]; then
+    service master stop >/dev/null 2>&1 ||:
+    /sbin/chkconfig --del master
+fi
+
+%postun
+if [ "$1" -ge "1" ]; then
+    # TODO: upgrade should be support
+    echo "prepare restarting acl_master ..."
+    service master masterrestart > /dev/null 2>&1 ||:
+fi
+
 %files
-%defattr(-,root,root,-)
-# TODO: should be renamed
-#%{_bindir}/acl_master
-%{_includedir}/acl-lib/acl
-%{_includedir}/acl-lib/acl_cpp
-%{_includedir}/acl-lib/fiber
-%{_includedir}/acl-lib/protocol
-/usr/lib/libacl_all.a
-/usr/lib/libfiber.a
-/usr/lib/libfiber_cpp.a
+%defattr(-,root,root)
+/opt/soft/acl-master/bin/master_ctl
+/opt/soft/acl-master/conf/main.cf
+/opt/soft/acl-master/conf/service
+/opt/soft/acl-master/libexec/acl_master
+/opt/soft/acl-master/sbin
+/opt/soft/acl-master/sh
+/opt/soft/acl-master/var
+#/opt/soft/services/acl-master.json
+/etc/init.d/master
 
 %changelog
 
