@@ -28,15 +28,15 @@ Requires(postun): /sbin/ldconfig
 %description -n acl-master
 acl master framework
 
-%package -n acl-tools
-Summary: acl tools
-Release: %{release_id}
-License: IBM
-Group:   System Environment/Tools
-Requires: acl-master
-
-%description -n acl-tools
-acl tools
+#%package -n acl-tools
+#Summary: acl tools
+#Release: %{release_id}
+#License: IBM
+#Group:   System Environment/Tools
+#Requires: acl-master
+#
+#%description -n acl-tools
+#acl tools
 
 %prep
 %setup -q
@@ -80,15 +80,15 @@ if [ "$1" -ge "1" ]; then
     service master masterrestart > /dev/null 2>&1 ||:
 fi
 
-%post -n acl-tools
-if [ "$1" == "1" ]; then
-    /opt/soft/acl-master/sh/tools-ctl start
-fi
-
-%preun -n acl-tools
-if [ "$1" == "0" ]; then
-    /opt/soft/acl-master/sh/tools-ctl stop
-fi
+#%post -n acl-tools
+#if [ "$1" == "1" ]; then
+#    /opt/soft/acl-master/sh/tools-ctl start
+#fi
+#
+#%preun -n acl-tools
+#if [ "$1" == "0" ]; then
+#    /opt/soft/acl-master/sh/tools-ctl stop
+#fi
 
 #%postun -n acl-tools
 #if [ "$1" -ge "1" ]; then
@@ -109,27 +109,25 @@ fi
 
 %files -n acl-master
 %defattr(-,root,root)
+/opt/soft/acl-master/bin/master_ctl
 /opt/soft/acl-master/conf/main.cf
 #/opt/soft/acl-master/conf/service/samples
 /opt/soft/acl-master/conf/service
 /opt/soft/acl-master/libexec/acl_master
 /opt/soft/acl-master/sbin
 # just including master.sh  reload.sh  start.sh  stop.sh
-/opt/soft/acl-master/sh/master.sh
-/opt/soft/acl-master/sh/reload.sh
-/opt/soft/acl-master/sh/start.sh
-/opt/soft/acl-master/sh/stop.sh
+/opt/soft/acl-master/sh
 /opt/soft/acl-master/var
 #/opt/soft/services/acl-master.json
 /etc/init.d/master
 %exclude /opt/soft/acl-master/conf/service/master_*
 
-%files -n acl-tools
-%defattr(-,root,root)
-/opt/soft/acl-master/bin/master_ctl
-/opt/soft/acl-master/sh/tools-ctl
-/opt/soft/acl-master/conf/service/master_*
-/opt/soft/acl-master/libexec/master_*
+#%files -n acl-tools
+#%defattr(-,root,root)
+#/opt/soft/acl-master/bin/master_ctl
+#/opt/soft/acl-master/sh/tools-ctl
+#/opt/soft/acl-master/conf/service/master_*
+#/opt/soft/acl-master/libexec/master_*
 #/opt/soft/services/acl-tools.json
 
 %changelog
