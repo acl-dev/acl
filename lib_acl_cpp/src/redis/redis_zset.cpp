@@ -34,9 +34,15 @@ redis_zset::~redis_zset()
 {
 }
 
-int redis_zset::zadd(const char* key, const std::map<string, double>& members)
+int redis_zset::zadd(const char* key,
+	const std::map<string, double>& members,
+	const std::vector<string>* options /* = NULL */)
 {
 	size_t argc = 2 + members.size() * 2;
+	if (options) {
+		argc += options->size();
+	}
+
 	const char** argv = (const char**)
 		dbuf_->dbuf_alloc(argc * sizeof(char*));
 	size_t *lens = (size_t*) dbuf_->dbuf_alloc(argc * sizeof(size_t));
@@ -47,8 +53,18 @@ int redis_zset::zadd(const char* key, const std::map<string, double>& members)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char* buf;
 	size_t i = 2;
+
+	if (options) {
+		for (std::vector<string>::const_iterator cit = options->begin();
+			cit != options->end(); ++cit) {
+			argv[i] = (*cit).c_str();
+			lens[i] = (*cit).size();
+			i++;
+		}
+	}
+
+	char* buf;
 	std::map<string, double>::const_iterator cit = members.begin();
 	for (; cit != members.end(); ++cit) {
 		buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
@@ -282,6 +298,82 @@ int redis_zset::zadd(const char* key, const char* members[],
 	return get_number();
 }
 
+int redis_zset::zadd_with_ch_xx(const char* key,
+	const std::map<string, double>& members)
+{
+	std::vector<string> options;
+	options.push_back("XX");
+	options.push_back("CH");
+	return zadd(key, members, &options);
+}
+
+int redis_zset::zadd_with_ch_nx(const char* key,
+	const std::map<string, double>& members)
+{
+	std::vector<string> options;
+	options.push_back("NX");
+	options.push_back("CH");
+	return zadd(key, members, &options);
+}
+
+bool redis_zset::zadd_with_incr(const char* key, const char* member,
+	size_t len, double score, double* result, const char* option)
+{
+	const char* argv[5];
+	size_t lens[5];
+
+	argv[0] = "ZADD";
+	lens[0] = sizeof("ZADD") - 1;
+
+	argv[1] = key;
+	lens[1] = strlen(key);
+
+	size_t i = 2;
+	if (option && *option) {
+		argv[i] = option;
+		lens[i] = strlen(option);
+		i++;
+	}
+
+	char score_s[BUFLEN];
+	safe_snprintf(score_s, sizeof(score_s), "%.8f", score);
+	argv[i] = score_s;
+	lens[i] = strlen(score_s);
+	i++;
+
+	argv[i] = member;
+	lens[i] = len;
+	i++;
+
+	hash_slot(key);
+	build_request(i, argv, lens);
+
+	int ret = get_string(score_s, sizeof(score_s));
+	if (ret <= 0)
+		return false;
+	if (result)
+		*result = atof(score_s);
+	return true;
+}
+
+bool redis_zset::zadd_with_incr(const char* key, const char* member,
+	double score, double* result, const char* option)
+{
+	return zadd_with_incr(key, member, strlen(member),score, result, option);
+}
+
+bool redis_zset::zadd_with_incr_xx(const char* key, const char* member,
+	double score, double* result /* NULL */)
+{
+	return zadd_with_incr(key, member, score, result, "XX");
+}
+
+bool redis_zset::zadd_with_incr_nx(const char* key, const char* member,
+	double score, double* result /* NULL */)
+{
+	return zadd_with_incr(key, member, score, result, "NX");
+}
+
 int redis_zset::zcard(const char* key)
 {
 	const char* argv[2];
@@ -352,6 +444,7 @@ bool redis_zset::zincrby(const char* key, double inc,
 
 	hash_slot(key);
 	build_request(4, argv, lens);
+
 	int ret = get_string(score, sizeof(score));
 	if (ret <= 0)
 		return false;
