@@ -51,7 +51,8 @@ public:
 	 * >0：新添加的成员数量
 	 *     the number of elements added
 	 */
-	int zadd(const char* key, const std::map<string, double>& members);
+	int zadd(const char* key, const std::map<string, double>& members,
+		const std::vector<string>* options = NULL);
 	int zadd(const char* key,
 		const std::vector<std::pair<string, double> >&members);
 	int zadd(const char* key,
@@ -64,6 +65,18 @@ public:
 		size_t size);
 	int zadd(const char* key, const char* members[], size_t members_len[],
 		double scores[], size_t size);
+
+	int zadd_with_ch_xx(const char* key, const std::map<string, double>& members);
+	int zadd_with_ch_nx(const char* key, const std::map<string, double>& members);
+
+	bool zadd_with_incr(const char* key, const char* member, size_t len,
+		double score, double* result = NULL, const char* option = NULL);
+	bool zadd_with_incr(const char* key, const char* member,
+		double score, double* result = NULL, const char* option = NULL);
+	bool zadd_with_incr_xx(const char* key, const char* member,
+		double score, double* result = NULL);
+	bool zadd_with_incr_nx(const char* key, const char* member,
+		double score, double* result = NULL);
 
 	/**
 	 * 获得相应键的有序集的成员数量

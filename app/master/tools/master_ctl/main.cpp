@@ -692,7 +692,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	acl::string filepath, action, addr("127.0.0.1:8290");
+	acl::string filepath, action, addr("/opt/soft/acl-master/var/public/master.sock");
 	int  ch;
 
 	while ((ch = getopt(argc, argv, "hs:f:a:t:e:")) > 0)

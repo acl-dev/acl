@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -45,6 +45,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Fri Jun 05 2020 shuxin.zheng@qq.com 3.5.1-4-20200605.18
+- release 3.5.1-4 version
+- add master_ctl to rpm package
+- master_ctl using unix domain socket as the channel to acl_master
 
 * Mon Jun 01 2020 shuxin.zheng@qq.com 3.5.1-3-20200601.16
 - support "application/x-gzip" from http response header in http_client.cpp
