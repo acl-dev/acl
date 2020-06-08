@@ -24,10 +24,9 @@ make -j 4
 make -C lib_fiber
 
 %install
+mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
 make install_master  DESTDIR=$RPM_BUILD_ROOT
 #make -C lib_fiber packinstall  DESTDIR=$RPM_BUILD_ROOT
-
-mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
 
 %clean
 rm -rf %{buildroot}
@@ -61,7 +60,6 @@ fi
 /opt/soft/acl-master/sbin
 /opt/soft/acl-master/sh
 /opt/soft/acl-master/var
-#/opt/soft/services/acl-master.json
 /etc/init.d/master
 
 %changelog

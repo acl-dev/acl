@@ -155,7 +155,8 @@ packinstall:
 
 install_master:
 	$(shell mkdir -p $(BIN_PATH))
-	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master)
+	$(shell mkdir -p $(DESTDIR)/opt/soft/services/)
+	$(shell mkdir -p $(DESTDIR)/opt/soft/acl-master/conf/service)
 	$(shell mkdir -p ./dist/master/libexec/$(RPATH))
 	$(shell mkdir -p ./dist/master/bin/$(RPATH))
 	@(cd app/master/daemon; make install)
