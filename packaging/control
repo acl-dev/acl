@@ -4,16 +4,14 @@ set -x
 set -euo pipefail
 IFS=$'\n\t'
 
-TAG=HEAD
-PKG_NAME=acl-libs
-PKG_VERSION=$(grep '^Version:' ${PKG_NAME}.spec | awk '{print $2}')
-
 function pack() {
+    PKG_NAME=${1}
+    PKG_VERSION=$(grep '^Version:' ${PKG_NAME}.spec | awk '{print $2}')
     cd ..
-	git archive --format=tar --prefix=${PKG_NAME}-${PKG_VERSION}/ ${TAG} | tar xpf -
-	#git show ${TAG} --oneline | head -1 > ${PKG_NAME}-${PKG_VERSION}/commit-id
-	tar zcpf ${PKG_NAME}-${PKG_VERSION}.tar.gz ${PKG_NAME}-${PKG_VERSION}
-	/bin/mv -f ${PKG_NAME}-${PKG_VERSION}.tar.gz packaging
+    PROJECT_NAME="${PKG_NAME}-${PKG_VERSION}"
+    git archive --format=tar --prefix=$PROJECT_NAME/ HEAD | (tar xpf -) #归档父项目后解压到指定目录
+	tar zcpf ${PROJECT_NAME}.tar.gz ${PROJECT_NAME}
+	/bin/mv -f ${PROJECT_NAME}.tar.gz packaging
     rm -rf ${PKG_NAME}-${PKG_VERSION}
     cd -
 }
@@ -22,10 +20,15 @@ function help() {
     echo "$0 build|pack"
 }
 
+
+function help() {
+    echo "$0 build|pack"
+}
+
 if [ "$1" == "" ]; then
     help
 elif [ "$1" == "pack" ];then
-    pack
+    pack $2
 elif [ "$1" == "test" ];then
     run_test
 else
