@@ -45,7 +45,7 @@ variables:
             - packaging/x86_64/acl-libs-*.rpm
             - packaging/x86_64/acl-master-*.rpm
 
-.basepublishprerelease: &PRERELEASE
+.lib_release: &LIB_RELEASE
     image: ${BUILDIMAGES}
     stage: publish
     script:
@@ -60,7 +60,7 @@ variables:
             - packaging/x86_64/acl-libs-*.rpm
             - packaging/x86_64/acl-master-*.rpm
 
-.framerelease: &FRAMERELEASE
+.frame_release: &FRAME_RELEASE
     image: ${BUILDIMAGES}
     stage: publish
     script:
@@ -127,86 +127,86 @@ devel:centos7.2:
     }
     <<: *DEVEL
 
-prerelease:centos5.8:
+lib_release:centos5.8:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:5.8"
     }
-    <<: *PRERELEASE
+    <<: *LIB_RELEASE
 
-prerelease:centos5.9:
+lib_release:centos5.9:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:5.9"
     }
-    <<: *PRERELEASE
+    <<: *LIB_RELEASE
 
-prerelease:centos6.4:
+lib_release:centos6.4:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
     }
-    <<: *PRERELEASE
+    <<: *LIB_RELEASE
 
-prerelease:centos6.6:
+lib_release:centos6.6:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
     }
-    <<: *PRERELEASE
+    <<: *LIB_RELEASE
 
-prerelease:centos7.0:
+lib_release:centos7.0:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
     }
-    <<: *PRERELEASE
+    <<: *LIB_RELEASE
 
-prerelease:centos7.2:
+lib_release:centos7.2:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
     }
-    <<: *PRERELEASE
+    <<: *LIB_RELEASE
 
-prerelease:centos5.8:
+frame_release:centos5.8:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:5.8"
     }
-    <<: *FRAMERELEASE
+    <<: *FRAME_RELEASE
 
-prerelease:centos5.9:
+frame_release:centos5.9:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:5.9"
     }
-    <<: *FRAMERELEASE
+    <<: *FRAME_RELEASE
 
-prerelease:centos6.4:
+frame_release:centos6.4:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:6.4"
     }
-    <<: *FRAMERELEASE
+    <<: *FRAME_RELEASE
 
-prerelease:centos6.6:
+frame_release:centos6.6:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:6.6"
     }
-    <<: *FRAMERELEASE
+    <<: *FRAME_RELEASE
 
-prerelease:centos7.0:
+frame_release:centos7.0:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:7.0"
     }
-    <<: *FRAMERELEASE
+    <<: *FRAME_RELEASE
 
-prerelease:centos7.2:
+frame_release:centos7.2:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/portal-process/centos-builder:7.2"
     }
-    <<: *FRAMERELEASE
+    <<: *FRAME_RELEASE
