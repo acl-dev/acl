@@ -35,9 +35,43 @@ void  operator delete(void *p) throw()
 
 #elif defined(ACL_CPP_DEBUG_MEM)
 
+class mem_debug_lock {
+public:
+	mem_debug_lock(void) {
+		mutex_ = (acl_pthread_mutex_t*)
+			calloc(1, sizeof(acl_pthread_mutex_t));
+
+#ifdef	ACL_UNIX
+		pthread_mutexattr_init(&mutex_attr_);
+		pthread_mutexattr_settype(&mutex_attr_, PTHREAD_MUTEX_RECURSIVE);
+		(void) acl_pthread_mutex_init(mutex_, &mutex_attr_);
+#else
+		(void) acl_pthread_mutex_init(mutex_, NULL);
+#endif
+	}
+
+	~mem_debug_lock(void) {
+		// xxx: don't free mutex_ here !!!
+	}
+
+	void lock(void) {
+		(void) acl_pthread_mutex_lock(mutex_);
+	}
+
+	void unlock(void) {
+		(void) acl_pthread_mutex_unlock(mutex_);
+	}
+
+private:
+	acl_pthread_mutex_t* mutex_;
+#if !defined(_WIN32) && !defined(_WIN64)
+	pthread_mutexattr_t  mutex_attr_;
+#endif
+};
+
 static ACL_HTABLE* __addrs = NULL;
 static ACL_HTABLE* __mapper = NULL;
-static acl_pthread_mutex_t* __lock = NULL;
+static mem_debug_lock __lock;
 
 void* operator new(size_t size, const char* file, const char* func,
 	int line) throw()
@@ -52,14 +86,10 @@ void* operator new(size_t size, const char* file, const char* func,
 	char* val = (char*) malloc(LEN);
 	snprintf(val, LEN, "%s(%d),%s", file, line, func);
 
-	if (__lock) {  // xxx
-		acl_pthread_mutex_lock(__lock);
-	}
+	__lock.lock();
 
 	if (__addrs == NULL || __mapper == NULL) {
-		if (__lock) {
-			acl_pthread_mutex_unlock(__lock);
-		}
+		__lock.unlock();
 		return ptr;
 	}
 
@@ -74,9 +104,7 @@ void* operator new(size_t size, const char* file, const char* func,
 		acl_htable_enter(__mapper, val, counter);
 	}
 
-	if (__lock) {
-		acl_pthread_mutex_unlock(__lock);
-	}
+	__lock.unlock();
 	return ptr;
 }
 
@@ -90,14 +118,10 @@ static void free_mem(void* ptr)
 	snprintf(key, sizeof(key), "%p", ptr);
 	free(ptr);
 
-	if (__lock) {
-		acl_pthread_mutex_lock(__lock);
-	}
+	__lock.lock();
 
 	if (__addrs == NULL || __mapper == NULL) {
-		if (__lock) {
-			acl_pthread_mutex_unlock(__lock);
-		}
+		__lock.unlock();
 		return;
 	}
 
@@ -119,9 +143,7 @@ static void free_mem(void* ptr)
 		free(val);
 	}
 
-	if (__lock) {
-		acl_pthread_mutex_unlock(__lock);
-	}
+	__lock.unlock();
 }
 
 void operator delete(void* ptr) throw()
@@ -145,40 +167,27 @@ void debug_mem_show(void)
 	printf("\r\n");
 	ACL_ITER iter;
 
-	if (__lock) {
-		acl_pthread_mutex_lock(__lock);
-	}
+	__lock.lock();
 
 	acl_foreach(iter, __mapper) {
-		const char* key = (const char*) iter.key;
+		const char* key    = (const char*) iter.key;
 		const int* counter = (const int*) iter.data;
 		printf("%s --> %d\r\n", key, *counter);
 	}
 
-	if (__lock) {
-		acl_pthread_mutex_lock(__lock);
-	}
+	__lock.unlock();
 
 	printf("\r\n");
 }
 
 void debug_mem_start(void)
 {
-	acl_pthread_mutex_t* lock = (acl_pthread_mutex_t*)
-		calloc(1, sizeof(acl_pthread_mutex_t));
-	acl_pthread_mutex_init(lock, NULL);
+	__lock.lock();
 
-	acl_pthread_mutex_lock(lock);
-	__lock = lock;
+	__addrs  = acl_htable_create(100000, 0);
+	__mapper = acl_htable_create(100000, 0);
 
-	if (__addrs == NULL) {
-		__addrs = acl_htable_create(100000, 0);
-	}
-	if (__mapper == NULL) {
-		__mapper = acl_htable_create(100000, 0);
-	}
-
-	acl_pthread_mutex_unlock(__lock);
+	__lock.unlock();
 }
 
 } // namespace acl
