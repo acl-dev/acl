@@ -33,7 +33,7 @@ void  operator delete(void *p) throw()
 
 # endif  // !ACL_WINDOWS
 
-#elif defined(ACL_DEBUG_MEM)
+#elif defined(ACL_CPP_DEBUG_MEM)
 
 #include "acl_cpp/stdlib/thread_mutex.hpp"
 

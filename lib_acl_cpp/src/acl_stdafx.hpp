@@ -26,11 +26,9 @@
 #include <string>
 #include <utility>
 
-//#define ACL_DEBUG_MEM
-
 #include "acl_cpp/stdlib/malloc.hpp"
 
-#ifndef ACL_DEBUG_MEM
+#ifndef ACL_CPP_DEBUG_MEM
 
 # if defined(_WIN32) || defined(_WIN64)
 #  include "acl_cpp/stdlib/snprintf.hpp"
@@ -50,7 +48,7 @@
 #  define NEW new
 #endif
 
-#endif  // ACL_DEBUG_MEM
+#endif  // ACL_CPP_DEBUG_MEM
 
 #if defined(ACL_UNIX)
 #include <pthread.h>

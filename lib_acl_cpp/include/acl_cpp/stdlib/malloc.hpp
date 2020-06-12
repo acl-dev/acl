@@ -14,18 +14,18 @@ void* operator new(size_t n)  throw (std::bad_alloc);
 void  operator delete(void *p) throw();
 # endif
 
-#elif defined(ACL_DEBUG_MEM)
+#elif defined(ACL_CPP_DEBUG_MEM)
 
 /**
  * 当需要检查 acl 库中的内存分配中是否存在内存泄露问题时，通过重载 new/delete
  * 将对象的创建与销毁过记录下来，如果对象被创建后没有被释放，则内部就会标记为
  * 一次内存泄露，使用者可以定时输出这些地址信息，查看在哪个文件创建的对象没有
- * 被释放，要想使用此功能，需要在 lib_acl_cpp/src/acl_stdafx.hpp 中将条件编译
- * 宏 "//#defineACL_DEBUG_MEM" 打开，同时应用需要在自己的源代码中包含头文件：
- * "#include "acl_cpp/stdlib/malloc.hpp"，并在在此包含位置前增加条件编译宏：
- * "#define ACL_DEBUG_MEM"；此外，应用程序在创建对象时应使用 NEW 来替代 new.
+ * 被释放，要想使用此功能，需在 lib_acl_cpp/include/acl_cpp/acl_cpp_define.hpp
+ * 中的宏 "//#define ACL_CPP_DEBUG_MEM" 打开，同时应用需要在自己的源代码中包含
+ * 头文件：
+ * #include "acl_cpp/stdlib/malloc.hpp
+ * 最后，应用程序在创建对象时应使用 NEW 来替代 new.
  */
-
 void* operator new(size_t size, const char* file, const char* func, int line)
 	throw(std::bad_alloc);
 void operator delete(void* ptr) throw();
