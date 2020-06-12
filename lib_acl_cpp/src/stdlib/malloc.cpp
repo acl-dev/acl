@@ -35,11 +35,9 @@ void  operator delete(void *p) throw()
 
 #elif defined(ACL_CPP_DEBUG_MEM)
 
-#include "acl_cpp/stdlib/thread_mutex.hpp"
-
 static ACL_HTABLE* __addrs = NULL;
 static ACL_HTABLE* __mapper = NULL;
-static acl::thread_mutex __lock;
+static acl_pthread_mutex_t* __lock = NULL;
 
 void* operator new(size_t size, const char* file, const char* func,
 	int line) throw()
@@ -54,10 +52,14 @@ void* operator new(size_t size, const char* file, const char* func,
 	char* val = (char*) malloc(LEN);
 	snprintf(val, LEN, "%s(%d),%s", file, line, func);
 
-	__lock.lock();
+	if (__lock) {  // xxx
+		acl_pthread_mutex_lock(__lock);
+	}
 
 	if (__addrs == NULL || __mapper == NULL) {
-		__lock.unlock();
+		if (__lock) {
+			acl_pthread_mutex_unlock(__lock);
+		}
 		return ptr;
 	}
 
@@ -72,7 +74,9 @@ void* operator new(size_t size, const char* file, const char* func,
 		acl_htable_enter(__mapper, val, counter);
 	}
 
-	__lock.unlock();
+	if (__lock) {
+		acl_pthread_mutex_unlock(__lock);
+	}
 	return ptr;
 }
 
@@ -86,10 +90,14 @@ static void free_mem(void* ptr)
 	snprintf(key, sizeof(key), "%p", ptr);
 	free(ptr);
 
-	__lock.lock();
+	if (__lock) {
+		acl_pthread_mutex_lock(__lock);
+	}
 
 	if (__addrs == NULL || __mapper == NULL) {
-		__lock.unlock();
+		if (__lock) {
+			acl_pthread_mutex_unlock(__lock);
+		}
 		return;
 	}
 
@@ -111,7 +119,9 @@ static void free_mem(void* ptr)
 		free(val);
 	}
 
-	__lock.unlock();
+	if (__lock) {
+		acl_pthread_mutex_unlock(__lock);
+	}
 }
 
 void operator delete(void* ptr) throw()
@@ -134,26 +144,41 @@ void debug_mem_show(void)
 
 	printf("\r\n");
 	ACL_ITER iter;
-	__lock.lock();
+
+	if (__lock) {
+		acl_pthread_mutex_lock(__lock);
+	}
+
 	acl_foreach(iter, __mapper) {
 		const char* key = (const char*) iter.key;
 		const int* counter = (const int*) iter.data;
 		printf("%s --> %d\r\n", key, *counter);
 	}
-	__lock.unlock();
+
+	if (__lock) {
+		acl_pthread_mutex_lock(__lock);
+	}
+
 	printf("\r\n");
 }
 
 void debug_mem_start(void)
 {
-	__lock.lock();
+	acl_pthread_mutex_t* lock = (acl_pthread_mutex_t*)
+		calloc(1, sizeof(acl_pthread_mutex_t));
+	acl_pthread_mutex_init(lock, NULL);
+
+	acl_pthread_mutex_lock(lock);
+	__lock = lock;
+
 	if (__addrs == NULL) {
 		__addrs = acl_htable_create(100000, 0);
 	}
 	if (__mapper == NULL) {
 		__mapper = acl_htable_create(100000, 0);
 	}
-	__lock.lock();
+
+	acl_pthread_mutex_unlock(__lock);
 }
 
 } // namespace acl
