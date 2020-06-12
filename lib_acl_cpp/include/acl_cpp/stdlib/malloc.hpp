@@ -26,9 +26,9 @@ void  operator delete(void *p) throw();
  * #include "acl_cpp/stdlib/malloc.hpp
  * 最后，应用程序在创建对象时应使用 NEW 来替代 new.
  */
-void* operator new(size_t size, const char* file, const char* func, int line)
-	throw(std::bad_alloc);
-void operator delete(void* ptr) throw();
+void* operator new(size_t, const char*, const char*, int) throw();
+void operator delete(void*) throw();
+void operator delete(void*, size_t) throw();
 
 #define NEW new(__FILE__, __FUNCTION__, __LINE__)
 

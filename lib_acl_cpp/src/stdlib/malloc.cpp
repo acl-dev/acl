@@ -42,7 +42,7 @@ static ACL_HTABLE* __mapper = NULL;
 static acl::thread_mutex __lock;
 
 void* operator new(size_t size, const char* file, const char* func,
-	int line) throw(std::bad_alloc)
+	int line) throw()
 {
 
 	void* ptr = malloc(size);
@@ -76,7 +76,7 @@ void* operator new(size_t size, const char* file, const char* func,
 	return ptr;
 }
 
-void operator delete(void* ptr) throw()
+static void free_mem(void* ptr)
 {
 	if (ptr == NULL) {
 		return;
@@ -112,6 +112,16 @@ void operator delete(void* ptr) throw()
 	}
 
 	__lock.unlock();
+}
+
+void operator delete(void* ptr) throw()
+{
+	free_mem(ptr);
+}
+
+void operator delete(void* ptr, size_t) throw()
+{
+	free_mem(ptr);
 }
 
 namespace acl {
