@@ -36,7 +36,7 @@ redis_command::redis_command()
 , slice_res_(false)
 , result_(NULL)
 {
-	dbuf_ = new dbuf_pool();
+	dbuf_ = NEW dbuf_pool();
 	addr_[0] = 0;
 }
 
@@ -58,7 +58,7 @@ redis_command::redis_command(redis_client* conn)
 , slice_res_(false)
 , result_(NULL)
 {
-	dbuf_ = new dbuf_pool();
+	dbuf_ = NEW dbuf_pool();
 	if (conn != NULL)
 		set_client_addr(*conn);
 	else
@@ -80,7 +80,7 @@ redis_command::redis_command(redis_client_cluster* cluster, size_t max_conns)
 , slice_res_(false)
 , result_(NULL)
 {
-	dbuf_ = new dbuf_pool();
+	dbuf_ = NEW dbuf_pool();
 	addr_[0] = 0;
 
 	if (cluster != NULL) {

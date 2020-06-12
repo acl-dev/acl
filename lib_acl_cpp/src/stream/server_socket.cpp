@@ -187,7 +187,7 @@ socket_stream* server_socket::accept(int timeout /* = 0 */,
 		return NULL;
 	}
 
-	socket_stream* client = new socket_stream();
+	socket_stream* client = NEW socket_stream();
 	if (client->open(fd) == false) {
 		logger_error("create socket_stream error!");
 		return NULL;

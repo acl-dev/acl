@@ -169,7 +169,7 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	}
 
 	// 连接成功，创建 C++ AIO 连接对象
-	conn_ = new aio_socket_stream(&handle_, astream, true);
+	conn_ = NEW aio_socket_stream(&handle_, astream, true);
 
 	// 注册连接关闭回调处理对象
 	conn_->add_close_callback(this);
@@ -693,7 +693,7 @@ void http_aclient::ws_handshake(const void* key, size_t len)
 	acl_assert(stream_ == NULL);
 
 	ACL_VSTREAM* vs = conn_->get_vstream();
-	stream_ = new socket_stream;
+	stream_ = NEW socket_stream;
 	(void) stream_->open(vs);
 
 	http_header& hdr = request_header();

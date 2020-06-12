@@ -303,7 +303,7 @@ void master_threads::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
 {
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt != NULL);
-	server_socket* ss = new server_socket(sstream);
+	server_socket* ss = NEW server_socket(sstream);
 	mt->push_back(ss);
 	mt->proc_on_listen(*ss);
 }

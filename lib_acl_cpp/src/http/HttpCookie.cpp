@@ -16,7 +16,7 @@ HttpCookie::HttpCookie(const char* name, const char* value,
 		dbuf_          = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_          = dbuf_internal_;
 	}
 
@@ -32,7 +32,7 @@ HttpCookie::HttpCookie(dbuf_guard* dbuf /* = NULL */)
 		dbuf_          = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_          = dbuf_internal_;
 	}
 
@@ -47,7 +47,7 @@ HttpCookie::HttpCookie(const HttpCookie* cookie, dbuf_guard* dbuf /* = NULL */)
 		dbuf_          = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_          = dbuf_internal_;
 	}
 

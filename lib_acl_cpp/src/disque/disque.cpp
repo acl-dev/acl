@@ -293,7 +293,7 @@ const std::vector<disque_job*>* disque::get_jobs(const char* name)
 				continue;
 			}
 
-			disque_job* job = new disque_job;
+			disque_job* job = NEW disque_job;
 			jobs_.push_back(job);
 
 			jobs[0]->argv_to_string(buf);
@@ -308,7 +308,7 @@ const std::vector<disque_job*>* disque::get_jobs(const char* name)
 			job->set_body(buf.c_str(), buf.length());
 			buf.clear();
 		} else {
-			disque_job* job = new disque_job;
+			disque_job* job = NEW disque_job;
 			jobs_.push_back(job);
 
 			job->set_queue(name);

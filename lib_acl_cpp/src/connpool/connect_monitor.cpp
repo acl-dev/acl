@@ -98,7 +98,7 @@ void connect_monitor::on_open(check_client& checker)
 		checker.set_blocked(true);
 
 		// 创建 rpc 请求对象，将其放入线程池中运行，采用阻塞 IO 过程
-		check_rpc* req = new check_rpc(*this, checker);
+		check_rpc* req = NEW check_rpc(*this, checker);
 		rpc_service_->rpc_fork(req);
 	}
 }

@@ -18,7 +18,7 @@ tcp_pool::~tcp_pool(void)
 
 connect_client* tcp_pool::create_connect(void)
 {
-	tcp_client* conn = new tcp_client(addr_, conn_timeout_, rw_timeout_);
+	tcp_client* conn = NEW tcp_client(addr_, conn_timeout_, rw_timeout_);
 	return conn;
 }
 

@@ -262,7 +262,7 @@ rpc_service::rpc_service(int nthread, bool ipc_keep /* = true */)
 void rpc_service::on_accept(aio_socket_stream* client)
 {
 	// 创建接收来自于子线程消息的 IPC 连接对象
-	ipc_client* ipc = new rpc_client(magic_);
+	ipc_client* ipc = NEW rpc_client(magic_);
 	ipc->open(client);
 
 	// 添加消息回调对象
