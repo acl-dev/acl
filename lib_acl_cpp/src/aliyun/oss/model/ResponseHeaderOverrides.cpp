@@ -27,7 +27,7 @@ ResponseHeaderOverrides::~ResponseHeaderOverrides()
 { \
 	if (pool_ == NULL) \
 	{ \
-		pool_internal_ = NEW dbuf_pool(); \
+		pool_internal_ = new dbuf_pool(); \
 		pool_ = pool_internal_; \
 	} \
 } while (0)

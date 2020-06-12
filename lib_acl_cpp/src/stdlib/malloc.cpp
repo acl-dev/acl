@@ -86,13 +86,11 @@ void* operator new(size_t size, const char* file, const char* func,
 	char* val = (char*) malloc(LEN);
 	snprintf(val, LEN, "%s(%d),%s", file, line, func);
 
-	__lock.lock();
-
 	if (__addrs == NULL || __mapper == NULL) {
-		__lock.unlock();
 		return ptr;
 	}
 
+	__lock.lock();
 	acl_htable_enter(__addrs, key, val);
 
 	int* counter = (int*) acl_htable_find(__mapper, val);
@@ -118,12 +116,11 @@ static void free_mem(void* ptr)
 	snprintf(key, sizeof(key), "%p", ptr);
 	free(ptr);
 
-	__lock.lock();
-
 	if (__addrs == NULL || __mapper == NULL) {
-		__lock.unlock();
 		return;
 	}
+
+	__lock.lock();
 
 	char* val = (char*) acl_htable_find(__addrs, key);
 	if (val != NULL) {
