@@ -23,7 +23,7 @@ namespace acl
 
 mail_message::mail_message(const char* charset /* = "utf-8"*/)
 {
-	dbuf_ = NEW dbuf_pool;
+	dbuf_ = new dbuf_pool;
 	if (charset == NULL || *charset == 0) {
 		charset = "utf-8";
 	}
