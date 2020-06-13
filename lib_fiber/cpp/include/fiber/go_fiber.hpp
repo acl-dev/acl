@@ -1,6 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <thread>
+#include <functional>
 #include "fiber.hpp"
 #include "fiber_tbox.hpp"
 
