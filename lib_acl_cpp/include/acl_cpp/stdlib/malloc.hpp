@@ -37,12 +37,12 @@ namespace acl {
 /**
  * 启动内存监控过程
  */
-ACL_CPP_API void debug_mem_start(void);
+ACL_CPP_API void mem_checker_start(void);
 
 /**
  * 将当前内存状态显示至屏幕，使用者可以自己增加定时器定时调用此函数
  */
-ACL_CPP_API void debug_mem_show(void);
+ACL_CPP_API void mem_checker_show(void);
 }
 
 #endif

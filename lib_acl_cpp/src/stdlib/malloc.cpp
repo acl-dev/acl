@@ -35,43 +35,49 @@ void  operator delete(void *p) throw()
 
 #elif defined(ACL_CPP_DEBUG_MEM)
 
-class mem_debug_lock {
-public:
-	mem_debug_lock(void) {
-		mutex_ = (acl_pthread_mutex_t*)
-			calloc(1, sizeof(acl_pthread_mutex_t));
-
-#ifdef	ACL_UNIX
-		pthread_mutexattr_init(&mutex_attr_);
-		pthread_mutexattr_settype(&mutex_attr_, PTHREAD_MUTEX_RECURSIVE);
-		(void) acl_pthread_mutex_init(mutex_, &mutex_attr_);
-#else
-		(void) acl_pthread_mutex_init(mutex_, NULL);
-#endif
-	}
-
-	~mem_debug_lock(void) {
-		// xxx: don't free mutex_ here !!!
-	}
-
-	void lock(void) {
-		(void) acl_pthread_mutex_lock(mutex_);
-	}
-
-	void unlock(void) {
-		(void) acl_pthread_mutex_unlock(mutex_);
-	}
-
-private:
-	acl_pthread_mutex_t* mutex_;
-#if !defined(_WIN32) && !defined(_WIN64)
-	pthread_mutexattr_t  mutex_attr_;
-#endif
-};
-
 static ACL_HTABLE* __addrs = NULL;
 static ACL_HTABLE* __mapper = NULL;
-static mem_debug_lock __lock;
+static acl_pthread_mutex_t* __lock = NULL;
+
+static acl_pthread_once_t __checker_once = ACL_PTHREAD_ONCE_INIT;
+
+static void init_checker_once(void)
+{
+	__lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
+	if (acl_pthread_mutex_init(__lock, NULL) != 0) {
+		printf("%s: pthread_mutex_init error", __FUNCTION__);
+		abort();
+	}
+}
+
+static void mem_checker_once(void)
+{
+	if (acl_pthread_once(&__checker_once, init_checker_once) != 0) {
+		printf("%s: pthread_once error\r\n", __FUNCTION__);
+		abort();
+	}
+
+	if (__lock == NULL) {
+		printf("%s: __lock NULL\r\n", __FUNCTION__);
+		abort();
+	}
+}
+
+static void mem_checker_lock(void)
+{
+	if (acl_pthread_mutex_lock(__lock) != 0) {
+		printf("%s: pthread_mutex_lock error", __FUNCTION__);
+		abort();
+	}
+}
+
+static void mem_checker_unlock(void)
+{
+	if (acl_pthread_mutex_unlock(__lock) != 0) {
+		printf("%s: pthread_mutex_unlock error", __FUNCTION__);
+		abort();
+	}
+}
 
 void* operator new(size_t size, const char* file, const char* func,
 	int line) throw()
@@ -86,11 +92,14 @@ void* operator new(size_t size, const char* file, const char* func,
 	char* val = (char*) malloc(LEN);
 	snprintf(val, LEN, "%s(%d),%s", file, line, func);
 
+	mem_checker_once();
+	mem_checker_lock();
+
 	if (__addrs == NULL || __mapper == NULL) {
+		mem_checker_unlock();
 		return ptr;
 	}
 
-	__lock.lock();
 	acl_htable_enter(__addrs, key, val);
 
 	int* counter = (int*) acl_htable_find(__mapper, val);
@@ -102,7 +111,7 @@ void* operator new(size_t size, const char* file, const char* func,
 		acl_htable_enter(__mapper, val, counter);
 	}
 
-	__lock.unlock();
+	mem_checker_unlock();
 	return ptr;
 }
 
@@ -116,11 +125,13 @@ static void free_mem(void* ptr)
 	snprintf(key, sizeof(key), "%p", ptr);
 	free(ptr);
 
+	mem_checker_once();
+	mem_checker_lock();
+
 	if (__addrs == NULL || __mapper == NULL) {
+		mem_checker_unlock();
 		return;
 	}
-
-	__lock.lock();
 
 	char* val = (char*) acl_htable_find(__addrs, key);
 	if (val != NULL) {
@@ -140,7 +151,7 @@ static void free_mem(void* ptr)
 		free(val);
 	}
 
-	__lock.unlock();
+	mem_checker_unlock();
 }
 
 void operator delete(void* ptr) throw()
@@ -155,36 +166,42 @@ void operator delete(void* ptr, size_t) throw()
 
 namespace acl {
 
-void debug_mem_show(void)
+void mem_checker_show(void)
 {
+	ACL_ITER iter;
+
+	mem_checker_once();
+	mem_checker_lock();
+
 	if (__addrs == NULL) {
+		mem_checker_unlock();
 		return;
 	}
 
 	printf("\r\n");
-	ACL_ITER iter;
-
-	__lock.lock();
-
 	acl_foreach(iter, __mapper) {
 		const char* key    = (const char*) iter.key;
 		const int* counter = (const int*) iter.data;
 		printf("%s --> %d\r\n", key, *counter);
 	}
 
-	__lock.unlock();
-
+	mem_checker_unlock();
 	printf("\r\n");
 }
 
-void debug_mem_start(void)
+void mem_checker_start(void)
 {
-	__lock.lock();
+	mem_checker_once();
+	mem_checker_lock();
 
-	__addrs  = acl_htable_create(100000, 0);
-	__mapper = acl_htable_create(100000, 0);
+	if (__addrs == NULL) {
+		__addrs  = acl_htable_create(100000, 0);
+	}
+	if (__mapper == NULL) {
+		__mapper = acl_htable_create(100000, 0);
+	}
 
-	__lock.unlock();
+	mem_checker_unlock();
 }
 
 } // namespace acl

@@ -111,13 +111,14 @@ public:
 	static void stdout_open(bool on);
 
 	/**
-	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当创建协程后不必
-	 * 显式调用 schedule 或 schedule_with 来启动协程调度器
+	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当
+	 * 创建协程后不必显式调用 schedule 或 schedule_with 来启动协程调度器
 	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
-	 * @param schedule_auto {bool} 如果为 true，则创建协程对象后并运行该协程
-	 *  对象后不必显式调用 schedule/schedule_with 来启动所有的协程过程，内部会
-	 *  自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用 schedule 或
-	 *  schedule_with 方式来启动协程调度器以运行所的协程过程；内部缺省状态为 false
+	 * @param schedule_auto {bool} 若为 true，则创建协程对象后并运行该协程
+	 *  对象后不必显式调用 schedule/schedule_with 来启动所有的协程过程，内
+	 *  部会自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用
+	 *  schedule 或 schedule_with 方式来启动协程调度器以运行所的协程过程；
+	 *  内部缺省状态为 false
 	 */
 	static void init(fiber_event_t type, bool schedule_auto = false);
 
@@ -188,8 +189,8 @@ public:
 	static void hook_api(bool on);
 
 	/**
-	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式调用
-	 * 本函数，因为内部会自动 HOOK IO API
+	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
+	 * 调用本函数，因为内部会自动 HOOK IO API
 	 */
 	static void acl_io_hook(void);
 
