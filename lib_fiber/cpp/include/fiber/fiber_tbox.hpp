@@ -7,8 +7,7 @@
 
 #if !defined(_WIN32) && !defined(_WIN64)
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 用于协程之间，线程之间以及协程与线程之间的消息通信，通过协程条件变量

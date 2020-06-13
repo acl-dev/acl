@@ -218,6 +218,14 @@ public:
 	 */
 	ACL_FIBER* get_fiber(void) const;
 
+	/**
+	 * 底层调用 C API 创建协程
+	 * @param fn {void (*)(ACL_FIBER*, void*)} 协程函数执行入口
+	 * @param ctx {void*} 传递给协程执行函数的参数
+	 * @param size {size_t} 协程栈大小
+	 */
+	static void fiber_create(void (*fn)(ACL_FIBER*, void*),
+			void* ctx, size_t size);
 protected:
 	/**
 	 * 虚函数，子类须实现本函数，当通过调用 start 方法启动协程后，本
@@ -320,71 +328,3 @@ private:
 };
 
 } // namespace acl
-
-#if defined(__GNUC__) && (__GNUC__ > 6 ||(__GNUC__ == 6 && __GNUC_MINOR__ >= 0))
-# ifndef   ACL_USE_CPP11
-#  define  ACL_USE_CPP11
-# endif
-#endif
-
-#ifdef	ACL_USE_CPP11
-
-#include <functional>
-
-namespace acl
-{
-
-class FIBER_CPP_API go_fiber
-{
-public:
-	go_fiber(void) {}
-	go_fiber(size_t stack_size) : stack_size_(stack_size) {}
-
-	void operator=(std::function<void()> fn);
-
-private:
-	size_t stack_size_ = 320000;
-};
-
-} // namespace acl
-
-#define	go		acl::go_fiber()=
-#define	go_stack(size)	acl::go_fiber(size)=
-
-/**
- * static void fiber1(void)
- * {
- * 	printf("fiber: %d\r\n", acl::fiber::self());
- * }
- *
- * static void fiber2(acl::string& buf)
- * {
- * 	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
- * 	buf = "world";
- * }
- *
- * static void fiber3(const acl::string& buf)
- * {
- * 	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
- * }
- *
- * static test(void)
- * {
- * 	go fiber1;
- * 	
- * 	acl::string buf("hello");
- *
- * 	go[&] {
- * 		fiber2(buf);
- * 	};
- * 	
- * 	go[=] {
- * 		fiber3(buf);
- * 	};
- * 
- * 	go[&] {
- * 		fiber3(buf);
- * 	};
- * }
- */
-#endif
