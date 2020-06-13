@@ -97,4 +97,4 @@ typedef long ssize_t;
 # endif
 #endif // __GNUC__
 
-#define ACL_CPP_DEBUG_MEM
+//#define ACL_CPP_DEBUG_MEM
