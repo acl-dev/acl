@@ -82,15 +82,7 @@ static void mem_checker_unlock(void)
 void* operator new(size_t size, const char* file, const char* func,
 	int line) throw()
 {
-
 	void* ptr = malloc(size);
-	char key[64];
-	snprintf(key, sizeof(key), "%p", ptr);
-
-#define LEN 256
-
-	char* val = (char*) malloc(LEN);
-	snprintf(val, LEN, "%s(%d),%s", file, line, func);
 
 	mem_checker_once();
 	mem_checker_lock();
@@ -99,6 +91,14 @@ void* operator new(size_t size, const char* file, const char* func,
 		mem_checker_unlock();
 		return ptr;
 	}
+
+#define LEN 256
+
+	char key[64];
+	snprintf(key, sizeof(key), "%p", ptr);
+
+	char* val = (char*) malloc(LEN);
+	snprintf(val, LEN, "%s(%d),%s", file, line, func);
 
 	acl_htable_enter(__addrs, key, val);
 
