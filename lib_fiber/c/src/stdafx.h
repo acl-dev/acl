@@ -73,9 +73,11 @@
 # include <sys/sendfile.h>
 # include <sys/epoll.h>
 
+/*
 # if !defined(__aarch64__) && !defined(__arm__)
 #  define USE_FAST_TIME
 # endif
+*/
 
 #elif defined(__FreeBSD__)
 # include <sys/uio.h>
