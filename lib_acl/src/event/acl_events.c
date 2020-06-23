@@ -66,8 +66,9 @@ static int event_limit(int fdsize)
 
 #if defined(ACL_UNIX) && !defined(MINGW)
 	if ((fdsize = acl_open_limit(fdsize)) < 0) {
-		acl_msg_fatal("%s: unable to determine open file limit, err=%s",
+		acl_msg_error("%s: unable to determine open file limit, err=%s",
 			myname, acl_last_serror());
+		fdsize = 10240;
 	}
 #else
 	if (fdsize == 0)
