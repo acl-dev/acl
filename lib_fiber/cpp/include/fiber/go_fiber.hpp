@@ -12,7 +12,10 @@ namespace acl {
 class FIBER_CPP_API fiber_ctx
 {
 public:
-	fiber_ctx(std::function<void()> fn) : fn_(fn) {}
+	fiber_ctx(std::function<void()> fn) {
+		fn_ = std::move(fn);
+	}
+
 	~fiber_ctx() = default;
 
 	std::function<void()> fn_;
