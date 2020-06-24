@@ -7,7 +7,7 @@ struct ACL_FIBER_SEM;
 
 namespace acl {
 
-class FIBER_CPP_API fiber_sem : public noncopyable
+class FIBER_CPP_API fiber_sem
 {
 public:
 	fiber_sem(int max);
@@ -23,7 +23,7 @@ private:
 	const fiber_sem& operator=(const fiber_sem&);
 };
 
-class FIBER_CPP_API fiber_sem_guard : public noncopyable
+class FIBER_CPP_API fiber_sem_guard
 {
 public:
 	fiber_sem_guard(fiber_sem& sem) : sem_(sem)
@@ -38,10 +38,13 @@ public:
 
 private:
 	fiber_sem& sem_;
+
+	fiber_sem_guard(const fiber_sem_guard&);
+	void operator=(const fiber_sem_guard&);
 };
 
 template<typename T>
-class fiber_sbox : public noncopyable
+class fiber_sbox
 {
 public:
 	fiber_sbox(bool free_obj = true)
@@ -84,6 +87,9 @@ private:
 	std::list<T*> sbox_;
 	size_t        size_;
 	bool          free_obj_;
+
+	fiber_sbox(const fiber_sbox&);
+	void operator=(const fiber_sbox&);
 
 	T* peek(bool& found_flag)
 	{

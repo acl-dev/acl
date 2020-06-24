@@ -9,7 +9,7 @@ namespace acl {
 /**
  * 仅能用于同一线程内部的协程之间进行互斥的互斥锁
  */
-class FIBER_CPP_API fiber_mutex : public noncopyable
+class FIBER_CPP_API fiber_mutex
 {
 public:
 	fiber_mutex(void);
@@ -35,12 +35,15 @@ public:
 
 private:
 	ACL_FIBER_MUTEX* lock_;
+
+	fiber_mutex(const fiber_mutex&);
+	void operator=(const fiber_mutex&);
 };
 
 /**
  * 仅能用在同一线程内的协程之间进行互斥的读写锁
  */
-class FIBER_CPP_API fiber_rwlock : public noncopyable
+class FIBER_CPP_API fiber_rwlock
 {
 public:
 	fiber_rwlock(void);
@@ -80,6 +83,9 @@ public:
 
 private:
 	ACL_FIBER_RWLOCK* rwlk_;
+
+	fiber_rwlock(const fiber_rwlock&);
+	void operator=(const fiber_rwlock&);
 };
 
 } // namespace acl

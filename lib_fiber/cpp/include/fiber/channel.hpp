@@ -12,7 +12,7 @@ int channel_send(ACL_CHANNEL *c, void *v);
 int channel_recv(ACL_CHANNEL *c, void *v);
 
 template <typename T>
-class channel : public noncopyable
+class channel
 {
 public:
 	channel(void)
@@ -43,6 +43,9 @@ public:
 
 private:
 	ACL_CHANNEL* chan_;
+
+	channel(const channel&);
+	void operator=(const channel&);
 };
 
 } // namespace acl

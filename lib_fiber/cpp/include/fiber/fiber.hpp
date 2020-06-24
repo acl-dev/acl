@@ -17,7 +17,7 @@ typedef enum
 /**
  * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
  */
-class FIBER_CPP_API fiber : public noncopyable
+class FIBER_CPP_API fiber
 {
 public:
 	/**
@@ -237,13 +237,16 @@ protected:
 private:
 	ACL_FIBER* f_;
 
+	fiber(const fiber&);
+	void operator = (const fiber&);
+
 	static void fiber_callback(ACL_FIBER* f, void* ctx);
 };
 
 /**
  * 可用作定时器的协程类
  */
-class FIBER_CPP_API fiber_timer : public noncopyable
+class FIBER_CPP_API fiber_timer
 {
 public:
 	fiber_timer(void);
@@ -265,8 +268,13 @@ protected:
 private:
 	ACL_FIBER* f_;
 
+	fiber_timer(const fiber_timer&);
+	void operator = (const fiber_timer&);
+
 	static void timer_callback(ACL_FIBER* f, void* ctx);
 };
+
+#if defined(ACL_CPP_API)
 
 /**
  * 定时器管理协程
@@ -326,5 +334,7 @@ private:
 	timer_trigger<T>& timer_;
 	mbox<T> mbox_;
 };
+
+#endif // ACL_CPP_API
 
 } // namespace acl

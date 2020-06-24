@@ -41,7 +41,7 @@ namespace acl {
  */
 
 template<typename T>
-class fiber_tbox : public noncopyable
+class fiber_tbox
 {
 public:
 	/**

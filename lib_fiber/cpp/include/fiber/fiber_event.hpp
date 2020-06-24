@@ -11,7 +11,7 @@ namespace acl {
  * 可用于协程之间、线程之间以及协程与线程之间，通过事件等待/通知方式进行同步的
  * 的事件混合锁
  */
-class FIBER_CPP_API fiber_event : public noncopyable
+class FIBER_CPP_API fiber_event
 {
 public:
 	/**
@@ -58,6 +58,9 @@ public:
 
 private:
 	ACL_FIBER_EVENT* event_;
+
+	fiber_event(const fiber_event&);
+	void operator=(const fiber_event&);
 };
 
 } // namespace acl
