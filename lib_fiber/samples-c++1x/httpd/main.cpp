@@ -49,6 +49,6 @@ int main(int argc, char *argv[]) {
 		return res.write(buf.c_str(), buf.size());
 	});
 
-	server.run(2);
+	server.run(nthreads);
 	return 0;
 }
