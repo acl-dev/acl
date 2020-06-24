@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include "detail//http_server_impl.hpp"
+#include "detail/http_server_impl.hpp"
 
 namespace acl {
 
@@ -16,11 +16,11 @@ public:
 
 public:
 	void get(const std::string path, handler_t fn) {
-		this->Service(path, fn);
+		this->service(path, fn);
 	}
 
 	void post(const std::string& path, handler_t fn) {
-		this->Service(path, fn);
+		this->service(path, fn);
 	}
 };
 

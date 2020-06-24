@@ -17,7 +17,7 @@ public:
 	virtual ~http_server_impl(void) {}
 
 	void run(int nthreads) {
-#if !defined(__linux__)
+#if !defined(SO_REUSEPORT)
 		server_socket* ss = new server_socket;
 		if (!ss->open(addr_.c_str())) {
 			printf("open %s error\r\n", addr_.c_str());
@@ -30,7 +30,7 @@ public:
 		std::vector<std::thread*> threads;
 		std::thread* thread;
 		for (int i = 0; i < nthreads; i++) {
-#if defined(__linux__)
+#if defined(SO_REUSEPORT)
 			thread = new std::thread(thread_main, this);
 #else
 			thread = new std::thread(thread_main2, this, ss);
@@ -46,24 +46,32 @@ public:
 	}
 
 public:
-	void Service(const std::string& path, handler_t fn) {
-		if (!path.empty()) {
-			if (path[path.size() - 1] == '/') {
-				handlers_[path] = std::move(fn);
-			} else {
-				std::string buf(path);
+	void service(const std::string& path, handler_t fn) {
+		service(path.c_str(), fn);
+	}
+
+	void service(const char* path, handler_t fn) {
+		if (path && *path) {
+			acl::string buf(path);
+			if (buf[buf.size() - 1] != '/') {
 				buf += '/';
-				handlers_[buf] = std::move(fn);
 			}
+			buf.lower();
+			handlers_[buf] = std::move(fn);
 		}
 	}
 
 protected:
 	std::string addr_;
-	std::map<std::string, handler_t> handlers_;
+	std::map<acl::string, handler_t> handlers_;
 
 	static void thread_main(http_server_impl* server) {
-		server_socket* ss = new server_socket;
+		unsigned flag = 0;
+
+#if defined(SO_REUSEPORT)
+		flag |= OPEN_FLAG_REUSEPORT;
+#endif
+		server_socket* ss = new server_socket(flag, 128);
 		if (!ss->open(server->addr_.c_str())) {
 			printf("open %s error\r\n", server->addr_.c_str());
 			delete ss;

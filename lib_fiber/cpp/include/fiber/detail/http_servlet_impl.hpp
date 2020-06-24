@@ -17,7 +17,7 @@ typedef std::function<bool(request_t&, response_t&)> handler_t;
 
 class http_servlet_impl : public HttpServlet {
 public:
-	http_servlet_impl(std::map<std::string, handler_t>& handlers,
+	http_servlet_impl(std::map<acl::string, handler_t>& handlers,
 		socket_stream* stream, session* session)
 	: HttpServlet(stream, session), handlers_(handlers) {}
 
@@ -37,32 +37,35 @@ protected:
 		const char* path = req.getPathInfo();
 		if (path == NULL || *path == 0) {
 			res.setStatus(400);
-			std::string buf("404 bad request\r\n");
+			acl::string buf("404 bad request\r\n");
+			res.setContentLength(buf.size());
 			return res.write(buf.c_str(), buf.size()) && keep;
 		}
 
 		size_t len = strlen(path);
-		std::map<std::string, handler_t>::iterator it;
-		if (path[len - 1] == '/') {
-			it = handlers_.find(path);
-		} else {
-			std::string buf(path);
+		acl::string buf(path);
+		if (path[len - 1] != '/') {
 			buf += '/';
-			it = handlers_.find(buf);
 		}
+		buf.lower();
+
+		std::map<acl::string, handler_t>::iterator it
+			= handlers_.find(buf);
+
 		if (it != handlers_.end()) {
 			return it->second(req, res) && keep;
 		}
 
 		res.setStatus(404);
-		std::stringstream ss;
-		ss << "404 " << path << " not found\r\n";
-		std::string buf = ss.str();
+		buf = "404 ";
+		buf += path;
+		buf += " not found\r\n";
+		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size()) && keep;
 	}
 
 private:
-	std::map<std::string, handler_t>& handlers_;
+	std::map<acl::string, handler_t> handlers_;
 };
 
 } // namespace acl
