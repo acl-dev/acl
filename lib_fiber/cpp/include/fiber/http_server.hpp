@@ -46,6 +46,11 @@ public:
 		this->thread_init_ = fn;
 		return *this;
 	}
+
+	http_server& on_thread_accept(thread_accept_t fn) {
+		this->thread_accept_ = fn;
+		return *this;
+	}
 };
 
 } // namespace acl

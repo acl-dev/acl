@@ -37,10 +37,10 @@ int main(int argc, char *argv[]) {
 
 	// set the configure variables
 
-	server.set_cfg_int(var_conf_int_tab);
-	server.set_cfg_int64(NULL);
-	server.set_cfg_str(var_conf_str_tab);
-	server.set_cfg_bool(var_conf_bool_tab);
+	server.set_cfg_int(var_conf_int_tab)
+		.set_cfg_int64(NULL)
+		.set_cfg_str(var_conf_str_tab)
+		.set_cfg_bool(var_conf_bool_tab);
 
 	// set process running status callback
 
@@ -58,7 +58,11 @@ int main(int argc, char *argv[]) {
 		printf("---> process got sighup\r\n");
 		return true;
 	}).on_thread_init([] {
-		printf("---> on thread-%lu init\r\n", acl::thread::self());
+		printf("---> thread-%lu on init\r\n", acl::thread::self());
+	}).on_thread_accept([] (acl::socket_stream& conn) {
+		printf("---> thread-%lu on accept %d\r\n",
+			acl::thread::self(), conn.sock_handle());
+		return true;
 	});
 
 	// set http route

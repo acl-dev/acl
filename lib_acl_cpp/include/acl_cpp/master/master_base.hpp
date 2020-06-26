@@ -21,26 +21,30 @@ public:
 	/**
 	 * 设置 bool 类型的配置项
 	 * @param table {master_bool_tbl*}
+	 * @return {master_base&}
 	 */
-	void set_cfg_bool(master_bool_tbl* table);
+	master_base& set_cfg_bool(master_bool_tbl* table);
 
 	/**
 	 * 设置 int 类型的配置项
 	 * @param table {master_int_tbl*}
+	 * @return {master_base&}
 	 */
-	void set_cfg_int(master_int_tbl* table);
+	master_base& set_cfg_int(master_int_tbl* table);
 
 	/**
 	 * 设置 int64 类型的配置项
 	 * @param table {master_int64_tbl*}
+	 * @return {master_base&}
 	 */
-	void set_cfg_int64(master_int64_tbl* table);
+	master_base& set_cfg_int64(master_int64_tbl* table);
 
 	/**
 	 * 设置 字符串 类型的配置项
 	 * @param table {master_str_tbl*}
+	 * @return {master_base&}
 	 */
-	void set_cfg_str(master_str_tbl* table);
+	master_base& set_cfg_str(master_str_tbl* table);
 
 	/**
 	 * 判断是否是由 acl_master 控制的 daemon 模式

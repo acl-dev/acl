@@ -11,6 +11,7 @@ typedef std::function<void()> proc_init_t;
 typedef std::function<void()> proc_exit_t;
 typedef std::function<bool(acl::string&)> proc_sighup_t;
 typedef std::function<void()> thread_init_t;
+typedef std::function<bool(acl::socket_stream&)> thread_accept_t;
 
 class http_server_impl : public master_fiber {
 public:
@@ -36,14 +37,20 @@ public:
 
 protected:
 	std::map<acl::string, handler_t> handlers_;
-	proc_jail_t proc_jail_ = nullptr;
-	proc_init_t proc_init_ = nullptr;
-	proc_exit_t proc_exit_ = nullptr;
-	proc_sighup_t proc_sighup_ = nullptr;
-	thread_init_t thread_init_ = nullptr;
+	proc_jail_t     proc_jail_     = nullptr;
+	proc_init_t     proc_init_     = nullptr;
+	proc_exit_t     proc_exit_     = nullptr;
+	proc_sighup_t   proc_sighup_   = nullptr;
+	thread_init_t   thread_init_   = nullptr;
+	thread_accept_t thread_accept_ = nullptr;
 
 	// @override
 	void on_accept(socket_stream& conn) {
+		if (thread_accept_) {
+			if (!thread_accept_(conn)) {
+				return;
+			}
+		}
 		memcache_session session("127.0.0.1:11211");
 		http_servlet servlet(handlers_, &conn, &session);
 		servlet.setLocalCharset("gb2312");
