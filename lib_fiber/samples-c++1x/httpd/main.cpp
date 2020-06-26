@@ -29,6 +29,12 @@ static acl::master_int_tbl var_conf_int_tab[] = {
 	{ 0, 0 , 0 , 0, 0 }
 };
 
+static bool http_test(acl::HttpRequest&, acl::HttpResponse& res) {
+	acl::string buf("hello test!\r\n");
+	res.setContentLength(buf.size());
+	return res.write(buf);
+}
+
 int main(int argc, char *argv[]) {
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
@@ -91,7 +97,7 @@ int main(int argc, char *argv[]) {
 					.add_bool("success", true)
 					.add_number("number", 100));
 		return res.write(json);
-	});
+	}).Get("/test", http_test);
 
 	// start the server in alone or daemon mode
 
