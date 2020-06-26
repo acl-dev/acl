@@ -3,6 +3,8 @@
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/xml.hpp"
+#include "acl_cpp/stdlib/json.hpp"
 #include "acl_cpp/stream/ostream.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
 #include "acl_cpp/http/http_header.hpp"
@@ -221,6 +223,39 @@ int HttpServletResponse::format(const char* fmt, ...)
 	int ret = vformat(fmt, ap);
 	va_end(ap);
 	return ret;
+}
+
+bool HttpServletResponse::write(const xml& body, const char* charset /* utf-8 */)
+{
+	if (charset && *charset) {
+		setCharacterEncoding(charset);
+	}
+	setContentType("application/xml");
+
+	const string& buf = body.to_string();
+	if (!header_->chunked_transfer()) {
+		setContentLength(buf.size());
+		return write(buf.c_str(), buf.size());
+	}
+
+	return write(buf.c_str(), buf.size()) && write(NULL, 0);
+}
+
+bool HttpServletResponse::write(const json& body, const char* charset /* utf-8 */)
+{
+	if (charset && *charset) {
+		setCharacterEncoding(charset);
+	}
+	setContentType("application/json");
+
+	const string& buf = body.to_string();
+
+	if (!header_->chunked_transfer()) {
+		setContentLength(buf.size());
+		return write(buf.c_str(), buf.size());
+	}
+
+	return write(buf.c_str(), buf.size()) && write(NULL, 0);
 }
 
 void HttpServletResponse::encodeUrl(string& out, const char* url)

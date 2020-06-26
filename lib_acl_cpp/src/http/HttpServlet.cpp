@@ -24,7 +24,7 @@ HttpServlet::HttpServlet(socket_stream* stream, session* session)
 	init();
 
 	if (session == NULL) {
-		session_ = NEW memcache_session("127.0.0.1");
+		session_ = NEW memcache_session("127.0.0.1|11211");
 		session_ptr_ = session_;
 	} else {
 		session_ = session;

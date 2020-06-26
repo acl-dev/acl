@@ -434,7 +434,7 @@ public:
 	 * 判断当前 HTTP 传输是否采用 chunked 传输方式
 	 * @return {bool}
 	 */
-	bool chunked_transfer() const
+	bool chunked_transfer(void) const
 	{
 		return chunked_transfer_;
 	}

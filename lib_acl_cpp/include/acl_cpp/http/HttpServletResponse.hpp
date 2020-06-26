@@ -8,6 +8,8 @@ namespace acl {
 
 class dbuf_guard;
 class string;
+class xml;
+class json;
 class ostream;
 class socket_stream;
 class http_header;
@@ -190,6 +192,22 @@ public:
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
 	bool write(const string& buf);
+
+	/**
+	 * 向客户端发送 HTTP Xml 响应数据体
+	 * @param buf {const xml&} 数据缓冲区
+	 * @param charset {const char*} 数据体字符集
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool write(const xml& body, const char* charset = "utf-8");
+
+	/**
+	 * 向客户端发送 HTTP Json 响应数据体
+	 * @param buf {const json&} 数据缓冲区
+	 * @param charset {const char*} 数据体字符集
+	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
+	 */
+	bool write(const json& body, const char* charset = "utf-8");
 
 	/**
 	 * 带格式方式向 HTTP 客户端发送响应数据，内部自动调用

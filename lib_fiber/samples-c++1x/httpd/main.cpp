@@ -67,19 +67,30 @@ int main(int argc, char *argv[]) {
 
 	// set http route
 
-	server.get("/", [](acl::request_t&, acl::response_t& res) {
+	server.onGet("/", [](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::string buf("hello world1!\r\n");
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
-	}).get("/hello", [](acl::request_t&, acl::response_t& res) {
+	}).onGet("/hello", [](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::string buf("hello world2!\r\n");
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
-	}).post("/ok", [](acl::request_t& req, acl::response_t& res) {
+	}).onPost("/ok", [](acl::HttpRequest& req, acl::HttpResponse& res) {
 		acl::string buf;
 		req.getBody(buf);
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
+	}).onGet("/json", [](acl::HttpRequest&, acl::HttpResponse& res) {
+		acl::json json;
+		acl::json_node& root = json.get_root();
+		root.add_number("code", 200)
+			.add_text("status", "+ok")
+			.add_child("data",
+				json.create_node()
+					.add_text("name", "value")
+					.add_bool("success", true)
+					.add_number("number", 100));
+		return res.write(json);
 	});
 
 	// start the server in alone or daemon mode
