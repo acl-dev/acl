@@ -12,62 +12,62 @@ public:
 
 public:
 	http_server& Get(const char* path, http_handler_t fn) {
-		this->onService(http_handler_get, path, fn);
+		this->Service(http_handler_get, path, fn);
 		return *this;
 	}
 
 	http_server& Post(const char* path, http_handler_t fn) {
-		this->onService(http_handler_post, path, fn);
+		this->Service(http_handler_post, path, fn);
 		return *this;
 	}
 
 	http_server& Head(const char* path, http_handler_t fn) {
-		this->onService(http_handler_head, path, fn);
+		this->Service(http_handler_head, path, fn);
 		return *this;
 	}
 
 	http_server& Put(const char* path, http_handler_t fn) {
-		this->onService(http_handler_put, path, fn);
+		this->Service(http_handler_put, path, fn);
 		return *this;
 	}
 
 	http_server& Patch(const char* path, http_handler_t fn) {
-		this->onService(http_handler_patch, path, fn);
+		this->Service(http_handler_patch, path, fn);
 		return *this;
 	}
 
 	http_server& Connect(const char* path, http_handler_t fn) {
-		this->onService(http_handler_connect, path, fn);
+		this->Service(http_handler_connect, path, fn);
 		return *this;
 	}
 
 	http_server& Purge(const char* path, http_handler_t fn) {
-		this->onService(http_handler_purge, path, fn);
+		this->Service(http_handler_purge, path, fn);
 		return *this;
 	}
 
 	http_server& Delete(const char* path, http_handler_t fn) {
-		this->onService(http_handler_delete, path, fn);
+		this->Service(http_handler_delete, path, fn);
 		return *this;
 	}
 
 	http_server& Options(const char* path, http_handler_t fn) {
-		this->onService(http_handler_options, path, fn);
+		this->Service(http_handler_options, path, fn);
 		return *this;
 	}
 
 	http_server& Propfind(const char* path, http_handler_t fn) {
-		this->onService(http_handler_profind, path, fn);
+		this->Service(http_handler_profind, path, fn);
 		return *this;
 	}
 
 	http_server& Error(const char* path, http_handler_t fn) {
-		this->onService(http_handler_error, path, fn);
+		this->Service(http_handler_error, path, fn);
 		return *this;
 	}
 
 	http_server& Websocket(const char* path, http_handler_t fn) {
-		this->onService(http_handler_websocket, path, fn);
+		this->Service(http_handler_websocket, path, fn);
 		return *this;
 	}
 
