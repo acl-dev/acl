@@ -67,20 +67,20 @@ int main(int argc, char *argv[]) {
 
 	// set http route
 
-	server.onGet("/", [](acl::HttpRequest&, acl::HttpResponse& res) {
+	server.Get("/", [](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::string buf("hello world1!\r\n");
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
-	}).onGet("/hello", [](acl::HttpRequest&, acl::HttpResponse& res) {
+	}).Get("/hello", [](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::string buf("hello world2!\r\n");
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
-	}).onPost("/ok", [](acl::HttpRequest& req, acl::HttpResponse& res) {
+	}).Post("/ok", [](acl::HttpRequest& req, acl::HttpResponse& res) {
 		acl::string buf;
 		req.getBody(buf);
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
-	}).onGet("/json", [](acl::HttpRequest&, acl::HttpResponse& res) {
+	}).Get("/json", [](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::json json;
 		acl::json_node& root = json.get_root();
 		root.add_number("code", 200)
