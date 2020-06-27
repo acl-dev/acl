@@ -1,4 +1,4 @@
-%define release_id 4
+%define release_id 5
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -45,6 +45,12 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Sat Jun 27 2020 shuxin.zheng@qq.com 3.5.1-5-20200627.14
+- release 3.5.1-5 version
+- add memory checking module for c++
+- add http module written by c++11 in libfiber
+- don't fatal in event_limit() for IOS14.beta
 
 * Fri Jun 05 2020 shuxin.zheng@qq.com 3.5.1-4-20200605.18
 - release 3.5.1-4 version
