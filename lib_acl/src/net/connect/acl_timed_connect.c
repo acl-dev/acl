@@ -30,31 +30,36 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 	 * Sanity check. Just like with timed_wait(), the timeout must be a
 	 * positive number.
 	 */
-	if (timeout < 0)
+	if (timeout < 0) {
 		acl_msg_panic("timed_connect: bad timeout: %d", timeout);
+	}
 
 	/*
 	 * Start the connection, and handle all possible results.
 	 */
-	if (acl_sane_connect(sock, sa, len) == 0)
+	if (acl_sane_connect(sock, sa, len) == 0) {
 		return 0;
+	}
 
 	errno = acl_last_error();
 
 #ifdef	ACL_UNIX
-	if (errno != ACL_EINPROGRESS)
+	if (errno != ACL_EINPROGRESS) {
 		return -1;
+	}
 #elif defined(ACL_WINDOWS)
-	if (errno != ACL_EINPROGRESS && errno != ACL_EWOULDBLOCK)
+	if (errno != ACL_EINPROGRESS && errno != ACL_EWOULDBLOCK) {
 		return -1;
+	}
 #endif
 
 	/*
 	 * A connection is in progress. Wait for a limited amount of time for
 	 * something to happen. If nothing happens, report an error.
 	 */
-	if (acl_write_wait(sock, timeout) < 0)
+	if (acl_write_wait(sock, timeout) < 0) {
 		return -1;
+	}
 
 	/*
 	 * Something happened. Some Solaris 2 versions have getsockopt() itself
@@ -69,8 +74,9 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 	 * connect and just returns EPIPE.  Create a fake
 	 * error message for connect.   -- fenner@parc.xerox.com
 	 */
-		if (errno == EPIPE)
+		if (errno == EPIPE) {
 			acl_set_error(ACL_ENOTCONN);
+		}
 #endif
 		return -1;
 	}
@@ -78,6 +84,7 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 	if (err != 0) {
 		acl_set_error(err);
 		return -1;
-	} else
+	} else {
 		return 0;
+	}
 }

@@ -39,15 +39,17 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 	const struct addrinfo *res;
 
 	for (res = res0; res != NULL; res = res->ai_next) {
-		if (res->ai_family != family)
+		if (res->ai_family != family) {
 			continue;
+		}
 
 #ifdef ACL_WINDOWS
-		if (bind(sock, res->ai_addr, (int) res->ai_addrlen) == 0)
+		if (bind(sock, res->ai_addr, (int) res->ai_addrlen) == 0) {
 #else
-		if (bind(sock, res->ai_addr, res->ai_addrlen) == 0)
+		if (bind(sock, res->ai_addr, res->ai_addrlen) == 0) {
 #endif
 			return 0;
+		}
 	}
 
 	return -1;
@@ -70,8 +72,10 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		return ACL_SOCKET_INVALID;
 	}
 
+	/*
 	acl_tcp_set_rcvbuf(sock, ACL_SOCKET_RBUF_SIZE);
 	acl_tcp_set_sndbuf(sock, ACL_SOCKET_WBUF_SIZE);
+	*/
 
 	on = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
@@ -93,12 +97,11 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 #ifdef ACL_WINDOWS
 		if (acl_timed_connect(sock, peer->ai_addr,
-			(socklen_t) peer->ai_addrlen, timeout) < 0)
+			(socklen_t) peer->ai_addrlen, timeout) < 0) {
 #else
 		if (acl_timed_connect(sock, peer->ai_addr,
-			peer->ai_addrlen, timeout) < 0)
+			peer->ai_addrlen, timeout) < 0) {
 #endif
-		{
 #ifdef ACL_WINDOWS
 			int err = acl_last_error();
 #endif
@@ -108,8 +111,9 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 #endif
 			return ACL_SOCKET_INVALID;
 		}
-		if (blocking != ACL_NON_BLOCKING)
+		if (blocking != ACL_NON_BLOCKING) {
 			acl_non_blocking(sock, blocking);
+		}
 		return sock;
 	}
 
@@ -135,8 +139,9 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 			 * connect and just returns EPIPE.  Create a fake
 			 * error message for connect. -- fenner@parc.xerox.com
 			 */
-			if (errno == EPIPE)
+			if (errno == EPIPE) {
 				acl_set_error(ACL_ENOTCONN);
+			}
 #endif
 #ifdef ACL_WINDOWS
 			err = acl_last_error();
@@ -152,11 +157,12 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		}
 
 #ifdef	ACL_WINDOWS
-		if (errnum == ACL_EINPROGRESS || errnum == ACL_EWOULDBLOCK)
+		if (errnum == ACL_EINPROGRESS || errnum == ACL_EWOULDBLOCK) {
 			return sock;
 #elif defined(ACL_UNIX)
-		if (errnum == ACL_EINPROGRESS || errnum == EISCONN)
+		if (errnum == ACL_EINPROGRESS || errnum == EISCONN) {
 			return sock;
+		}
 #endif
 		acl_socket_close(sock);
 #ifdef ACL_WINDOWS
@@ -185,17 +191,27 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 	const char *peer, *local, *port;
 	struct addrinfo hints, *peer_res0, *res, *local_res0;
 
-	if (h_error)
+	if (h_error) {
 		*h_error = 0;
+	}
 
 	snprintf(buf, sizeof(buf) - 1, "%s", addr);
+	peer = buf;
+	ptr  = strchr(buf, '@');
+	if (ptr != NULL) {
+		*ptr  = 0;
+		local = *++ptr == 0 ? NULL : ptr;
+	} else {
+		local = NULL;
+	}
 
-	if (acl_valid_ipv6_hostaddr(buf, 0)) {
-		ptr = strrchr(buf, ACL_ADDR_SEP);
-	} else if (acl_valid_ipv4_hostaddr(buf, 0)) {
-		ptr = strrchr(buf, ACL_ADDR_SEP);
-		if (ptr == NULL)
-			ptr = strrchr(buf, ':');
+	if (acl_valid_ipv6_hostaddr(peer, 0)) {
+		ptr = strrchr(peer, ACL_ADDR_SEP);
+	} else if (acl_valid_ipv4_hostaddr(peer, 0)) {
+		ptr = strrchr(peer, ACL_ADDR_SEP);
+		if (ptr == NULL) {
+			ptr = strrchr(peer, ':');
+		}
 	} else if (!(ptr = strrchr(buf, ACL_ADDR_SEP))) {
 		ptr = strrchr(buf, ':');
 	}
@@ -213,16 +229,6 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 		acl_msg_error("%s, %s(%d): invalid port(%s)",
 			__FILE__, myname, __LINE__, port);
 		return ACL_SOCKET_INVALID;
-	}
-
-	ptr = strchr(buf, '@');
-	if (ptr != NULL) {
-		*ptr++ = 0;
-		local  = buf;
-		peer   = ptr; 
-	} else {
-		local  = NULL;
-		peer   = buf;
 	}
 
 	if (strlen(peer) == 0) {
@@ -255,9 +261,9 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 		return ACL_SOCKET_INVALID;
 	}
 
-	if (local == NULL)
+	if (local == NULL) {
 		local_res0 = NULL;
-	else if ((err = getaddrinfo(local, "0", &hints, &local_res0))) {
+	} else if ((err = getaddrinfo(local, "0", &hints, &local_res0))) {
 		acl_msg_error("%s(%d), %s: getaddrinfo error %s, local=%s",
 			__FILE__, __LINE__, myname, gai_strerror(err), local);
 		return ACL_SOCKET_INVALID;
@@ -267,18 +273,22 @@ ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
 
 	for (res = peer_res0; res != NULL ; res = res->ai_next) {
 		sock = inet_connect_one(res, local_res0, blocking, timeout);
-		if (sock != ACL_SOCKET_INVALID)
+		if (sock != ACL_SOCKET_INVALID) {
 			break;
+		}
 	}
 
-	if (sock == ACL_SOCKET_INVALID)
+	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d) %s: connect error %s, addr=%s",
 			__FILE__, __LINE__, myname, acl_last_serror(), addr);
+	}
 
-	if (peer_res0)
+	if (peer_res0) {
 		freeaddrinfo(peer_res0);
-	if (local_res0)
+	}
+	if (local_res0) {
 		freeaddrinfo(local_res0);
+	}
 
 	return sock;
 }
