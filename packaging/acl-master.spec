@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 5
 
 Summary: acl master framework
 Name:           acl-master
@@ -63,6 +63,9 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Sun Jun 28 2020 shuxin.zheng@qq.com 3.5.1-5-20200628.11
+- release 3.5.1-5: just for releasing new version.
 
 * Mon Jun 01 2020 shuxin.zheng@qq.com 3.5.1-3-20200601.16
 - support "application/x-gzip" from http response header in http_client.cpp
