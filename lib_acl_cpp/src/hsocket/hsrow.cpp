@@ -16,7 +16,7 @@ hsrow::hsrow(int ncolum)
 : ncolum_(ncolum)
 , icolum_(0)
 {
-	colums_ = NEW string[ncolum_];
+	colums_ = new string[ncolum_];
 }
 
 hsrow::~hsrow(void)
@@ -33,7 +33,7 @@ void hsrow::reset(int ncolum)
 	}
 	delete[] colums_;
 	ncolum_ = ncolum;
-	colums_ = NEW string[ncolum_];
+	colums_ = new string[ncolum_];
 }
 
 void hsrow::push_back(const char* value, size_t dlen)

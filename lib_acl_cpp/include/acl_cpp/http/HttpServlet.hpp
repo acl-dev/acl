@@ -37,7 +37,7 @@ public:
 	 * @param memcache_addr {const char*}
 	 */
 	HttpServlet(socket_stream* stream,
-		const char* memcache_addr = "127.0.0.1:11211");
+		const char* memcache_addr = "127.0.0.1|11211");
 
 	HttpServlet(void);
 	virtual ~HttpServlet(void) = 0;

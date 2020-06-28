@@ -199,7 +199,7 @@ void master_proc::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
 	master_proc* mp = (master_proc *) ctx;
 	acl_assert(mp != NULL);
 
-	server_socket* ss = new server_socket(sstream);
+	server_socket* ss = NEW server_socket(sstream);
 	mp->servers_.push_back(ss);
 	server_socket m(sstream);
 	mp->proc_on_listen(*ss);

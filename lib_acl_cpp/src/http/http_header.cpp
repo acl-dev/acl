@@ -22,7 +22,7 @@ http_header::http_header(dbuf_guard* dbuf /* = NULL */)
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 	init();
@@ -35,7 +35,7 @@ http_header::http_header(const char* url, dbuf_guard* dbuf /* = NULL */)
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 	init();
@@ -51,7 +51,7 @@ http_header::http_header(int status, dbuf_guard* dbuf /* = NULL */)
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 	init();
@@ -65,7 +65,7 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 
@@ -125,7 +125,7 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 

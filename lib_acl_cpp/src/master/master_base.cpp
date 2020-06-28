@@ -33,32 +33,36 @@ master_base::~master_base(void)
 	acl_msg_close();
 }
 
-void master_base::set_cfg_bool(master_bool_tbl* table)
+master_base& master_base::set_cfg_bool(master_bool_tbl* table)
 {
 	if (table) {
 		conf_.set_cfg_bool(table);
 	}
+	return *this;
 }
 
-void master_base::set_cfg_int(master_int_tbl* table)
+master_base& master_base::set_cfg_int(master_int_tbl* table)
 {
 	if (table) {
 		conf_.set_cfg_int(table);
 	}
+	return *this;
 }
 
-void master_base::set_cfg_int64(master_int64_tbl* table)
+master_base& master_base::set_cfg_int64(master_int64_tbl* table)
 {
 	if (table) {
 		conf_.set_cfg_int64(table);
 	}
+	return *this;
 }
 
-void master_base::set_cfg_str(master_str_tbl* table)
+master_base& master_base::set_cfg_str(master_str_tbl* table)
 {
 	if (table) {
 		conf_.set_cfg_str(table);
 	}
+	return *this;
 }
 
 bool master_base::daemon_mode(void) const

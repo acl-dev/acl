@@ -575,7 +575,7 @@ bool polarssl_conf::setup_certs(void* ssl_in, bool server_side)
 
 sslbase_io* polarssl_conf::open(bool nblock)
 {
-	return new polarssl_io(*this, server_side_, nblock);
+	return NEW polarssl_io(*this, server_side_, nblock);
 }
 
 } // namespace acl

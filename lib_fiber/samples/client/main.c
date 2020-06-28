@@ -99,8 +99,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 	char *addr = (char *) ctx;
 	int i;
 
-	for (i = 0; i < __max_fibers; i++)
-	{
+	for (i = 0; i < __max_fibers; i++) {
 		acl_fiber_create(fiber_connect, addr, 327680);
 		//acl_fiber_sleep(1);
 	}

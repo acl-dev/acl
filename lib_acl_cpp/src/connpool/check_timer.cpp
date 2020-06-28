@@ -89,7 +89,7 @@ void check_timer::timer_callback(unsigned int id)
 			manager.set_pools_status(addr, false);
 			addrs_.erase(cit);
 		} else {
-			check_client* checker = new check_client(*this,
+			check_client* checker = NEW check_client(*this,
 				addr, *conn, begin);
 			conn->add_open_callback(checker);
 			conn->add_close_callback(checker);

@@ -942,7 +942,7 @@ bool mbedtls_conf::setup_certs(void* ssl)
 
 sslbase_io* mbedtls_conf::open(bool nblock)
 {
-	return new mbedtls_io(*this, server_side_, nblock);
+	return NEW mbedtls_io(*this, server_side_, nblock);
 }
 
 } // namespace acl

@@ -57,8 +57,10 @@ ACL_API ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *listen_stream,
 /**
  * 远程连接服务器
  * @param addr {const char*} 服务器地址, 如果连接一个域套接口服务器(仅UNIX平台),
- *  域套接地址：/tmp/test.sock; 如果连接一个TCP服务器，则地址格式为:
- *  [${local_ip}@]${remote_addr}, 如: 60.28.250.199@www.sina.com:80, 意思是绑定
+ *  域套接地址：/tmp/test.sock，对于 Linux 平台，如果首字母为 '@' 则表示连接本
+ *  地的抽象UNIX域套接口(Linux abstract unix domain socket)；
+ *  如果连接一个TCP服务器，则地址格式为:
+ *  remote_addr[@local_ip], 如: www.sina.com|80@60.28.250.199, 意思是绑定
  *  本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80 端口, 如果由OS
  *  自动绑定本地 IP 地址，则可以写为：www.sina.com:80
  * @param block_mode {int} 阻塞连接还是非阻塞连接，ACL_BLOCKING, ACL_NON_BLOCKING
@@ -73,9 +75,7 @@ ACL_API ACL_VSTREAM *acl_vstream_connect_ex(const char *addr, int block_mode,
 
 /**
  * 远程连接服务器
- * @param addr {const char*} 服务器地址，格式如：127.0.0.1，
- *  或域套接地址：/tmp/test.sock，对于 Linux 平台，如果首字母为 '@'，则认为是
- *  Linux abstract unix domain path.
+ * @param addr {const char*} 服务器地址，含义同上
  * @param block_mode {int} 阻塞连接还是非阻塞连接，ACL_BLOCKING, ACL_NON_BLOCKING
  * @param connect_timeout {int} 连接超时时间(秒)
  * @param rw_timeout {int} 连接流成功后的读写超时时间，单位为秒

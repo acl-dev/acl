@@ -59,24 +59,28 @@ int acl_stream_connect(const char *path, int block_mode, int unused_timeout)
 	 * The requested file system object must exist, otherwise we can't reach
 	 * the server.
 	 */
-	if ((fifo = open(path, O_WRONLY | O_NONBLOCK, 0)) < 0)
+	if ((fifo = open(path, O_WRONLY | O_NONBLOCK, 0)) < 0) {
 		return -1;
+	}
 
 	/*
 	 * Create a pipe, and send one pipe end to the server.
 	 */
-	if (pipe(pair) < 0)
+	if (pipe(pair) < 0) {
 		acl_msg_fatal("%s: pipe: %s", myname, acl_last_serror());
-	if (ioctl(fifo, I_SENDFD, pair[1]) < 0)
+	}
+	if (ioctl(fifo, I_SENDFD, pair[1]) < 0) {
 		acl_msg_fatal("%s: send file descriptor: %s",
 			myname, acl_last_serror());
+	}
 	close(pair[1]);
 
 	/*
 	 * This is for {unix,inet}_connect() compatibility.
 	 */
-	if (block_mode == ACL_NON_BLOCKING)
+	if (block_mode == ACL_NON_BLOCKING) {
 		acl_non_blocking(pair[0], ACL_NON_BLOCKING);
+	}
 
 	/*
 	 * Cleanup.

@@ -14,6 +14,10 @@
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/fiber.hpp"
 
+#ifdef	ACL_USE_CPP11
+#include "fiber/go_fiber.hpp"
+#endif
+
 #ifdef	WIN32
 #define	snprintf _snprintf
 #endif

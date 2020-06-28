@@ -17,7 +17,7 @@ typedef enum
 /**
  * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
  */
-class FIBER_CPP_API fiber : public noncopyable
+class FIBER_CPP_API fiber
 {
 public:
 	/**
@@ -111,13 +111,14 @@ public:
 	static void stdout_open(bool on);
 
 	/**
-	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当创建协程后不必
-	 * 显式调用 schedule 或 schedule_with 来启动协程调度器
+	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当
+	 * 创建协程后不必显式调用 schedule 或 schedule_with 来启动协程调度器
 	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
-	 * @param schedule_auto {bool} 如果为 true，则创建协程对象后并运行该协程
-	 *  对象后不必显式调用 schedule/schedule_with 来启动所有的协程过程，内部会
-	 *  自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用 schedule 或
-	 *  schedule_with 方式来启动协程调度器以运行所的协程过程；内部缺省状态为 false
+	 * @param schedule_auto {bool} 若为 true，则创建协程对象后并运行该协程
+	 *  对象后不必显式调用 schedule/schedule_with 来启动所有的协程过程，内
+	 *  部会自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用
+	 *  schedule 或 schedule_with 方式来启动协程调度器以运行所的协程过程；
+	 *  内部缺省状态为 false
 	 */
 	static void init(fiber_event_t type, bool schedule_auto = false);
 
@@ -188,8 +189,8 @@ public:
 	static void hook_api(bool on);
 
 	/**
-	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式调用
-	 * 本函数，因为内部会自动 HOOK IO API
+	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
+	 * 调用本函数，因为内部会自动 HOOK IO API
 	 */
 	static void acl_io_hook(void);
 
@@ -217,6 +218,14 @@ public:
 	 */
 	ACL_FIBER* get_fiber(void) const;
 
+	/**
+	 * 底层调用 C API 创建协程
+	 * @param fn {void (*)(ACL_FIBER*, void*)} 协程函数执行入口
+	 * @param ctx {void*} 传递给协程执行函数的参数
+	 * @param size {size_t} 协程栈大小
+	 */
+	static void fiber_create(void (*fn)(ACL_FIBER*, void*),
+			void* ctx, size_t size);
 protected:
 	/**
 	 * 虚函数，子类须实现本函数，当通过调用 start 方法启动协程后，本
@@ -228,13 +237,16 @@ protected:
 private:
 	ACL_FIBER* f_;
 
+	fiber(const fiber&);
+	void operator = (const fiber&);
+
 	static void fiber_callback(ACL_FIBER* f, void* ctx);
 };
 
 /**
  * 可用作定时器的协程类
  */
-class FIBER_CPP_API fiber_timer : public noncopyable
+class FIBER_CPP_API fiber_timer
 {
 public:
 	fiber_timer(void);
@@ -256,8 +268,13 @@ protected:
 private:
 	ACL_FIBER* f_;
 
+	fiber_timer(const fiber_timer&);
+	void operator = (const fiber_timer&);
+
 	static void timer_callback(ACL_FIBER* f, void* ctx);
 };
+
+#if defined(ACL_CPP_API)
 
 /**
  * 定时器管理协程
@@ -318,72 +335,6 @@ private:
 	mbox<T> mbox_;
 };
 
-} // namespace acl
-
-#if defined(__GNUC__) && (__GNUC__ > 6 ||(__GNUC__ == 6 && __GNUC_MINOR__ >= 0))
-# ifndef   ACL_USE_CPP11
-#  define  ACL_USE_CPP11
-# endif
-#endif
-
-#ifdef	ACL_USE_CPP11
-
-#include <functional>
-
-namespace acl
-{
-
-class FIBER_CPP_API go_fiber
-{
-public:
-	go_fiber(void) {}
-	go_fiber(size_t stack_size) : stack_size_(stack_size) {}
-
-	void operator=(std::function<void()> fn);
-
-private:
-	size_t stack_size_ = 320000;
-};
+#endif // ACL_CPP_API
 
 } // namespace acl
-
-#define	go		acl::go_fiber()=
-#define	go_stack(size)	acl::go_fiber(size)=
-
-/**
- * static void fiber1(void)
- * {
- * 	printf("fiber: %d\r\n", acl::fiber::self());
- * }
- *
- * static void fiber2(acl::string& buf)
- * {
- * 	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
- * 	buf = "world";
- * }
- *
- * static void fiber3(const acl::string& buf)
- * {
- * 	printf("in fiber: %d, buf: %s\r\n", acl::fiber::self(), buf.c_str());
- * }
- *
- * static test(void)
- * {
- * 	go fiber1;
- * 	
- * 	acl::string buf("hello");
- *
- * 	go[&] {
- * 		fiber2(buf);
- * 	};
- * 	
- * 	go[=] {
- * 		fiber3(buf);
- * 	};
- * 
- * 	go[&] {
- * 		fiber3(buf);
- * 	};
- * }
- */
-#endif

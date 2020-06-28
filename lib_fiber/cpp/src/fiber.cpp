@@ -260,6 +260,11 @@ void fiber::stdout_open(bool on)
 	acl_fiber_msg_stdout_enable(on ? 1 : 0);
 }
 
+void fiber::fiber_create(void (*fn)(ACL_FIBER*, void*), void* ctx, size_t size)
+{
+	acl_fiber_create(fn, (void*) ctx, size);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer(void)
@@ -279,38 +284,3 @@ void fiber_timer::timer_callback(ACL_FIBER* f, void* ctx)
 }
 
 } // namespace acl
-
-//////////////////////////////////////////////////////////////////////////////
-
-#ifdef	ACL_USE_CPP11
-
-namespace acl
-{
-
-class fiber_ctx
-{
-public:
-	fiber_ctx(std::function<void()> fn) : fn_(fn) {}
-	~fiber_ctx() = default;
-
-	std::function<void()> fn_;
-};
-
-static void fiber_main(ACL_FIBER*, void* ctx)
-{
-	fiber_ctx* fc = (fiber_ctx *) ctx;
-	std::function<void()> fn = fc->fn_;
-	delete fc;
-
-	fn();
-}
-
-void go_fiber::operator=(std::function<void()> fn)
-{
-	fiber_ctx* ctx = new fiber_ctx(fn);
-	acl_fiber_create(fiber_main, (void*) ctx, stack_size_);
-}
-
-} // namespace acl
-
-#endif // ACL_USE_CPP11

@@ -49,7 +49,7 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
 , xml_(NULL)
 , readHeaderCalled_(false)
 {
-	dbuf_internal_ = new dbuf_guard;
+	dbuf_internal_ = NEW dbuf_guard;
 	dbuf_ = dbuf_internal_;
 
 	COPY(cookie_name_, "ACL_SESSION_ID");

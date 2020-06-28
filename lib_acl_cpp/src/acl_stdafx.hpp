@@ -28,23 +28,27 @@
 
 #include "acl_cpp/stdlib/malloc.hpp"
 
-#if defined(_WIN32) || defined(_WIN64)
-# include "acl_cpp/stdlib/snprintf.hpp"
-# ifdef _DEBUG
-#  ifndef _CRTDBG_MAP_ALLOC
-#   define _CRTDBG_MAP_ALLOC
-#   include <crtdbg.h>
-#   include <stdlib.h>
-#  endif
-#   undef NEW
-#   define NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#ifndef ACL_CPP_DEBUG_MEM
+
+# if defined(_WIN32) || defined(_WIN64)
+#  include "acl_cpp/stdlib/snprintf.hpp"
+#  ifdef _DEBUG
+#   ifndef _CRTDBG_MAP_ALLOC
+#    define _CRTDBG_MAP_ALLOC
+#    include <crtdbg.h>
+#    include <stdlib.h>
+#   endif
+#    undef NEW
+#    define NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+#  else
+#    undef NEW
+#    define NEW new
+#  endif // _DEBUG
 # else
-#   undef NEW
-#   define NEW new
-# endif // _DEBUG
-#else
-# define NEW new
+#  define NEW new
 #endif
+
+#endif  // ACL_CPP_DEBUG_MEM
 
 #if defined(ACL_UNIX)
 #include <pthread.h>
@@ -60,3 +64,4 @@
 #define ACL_CPP_DEBUG_MIN 		40
 #define ACL_CPP_DEBUG_CONN_MANAGER	41
 #define ACL_CPP_DEBUG_MAX 		70
+

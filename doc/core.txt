@@ -1,1 +1,7 @@
+# for linux
 echo 'core.%e.%t.%p' > /proc/sys/kernel/core_pattern
+
+# for macos
+$ lldb --core "/cores/core.xxxxx"
+(lldb) bt all
+

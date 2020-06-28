@@ -60,7 +60,7 @@ public:
 
 	/**
 	 * 连接远程 HTTP 服务器
-	 * @param addr {const char*} 服务器地址，格式：IP:PORT 或 DOMAIN:PORT
+	 * @param addr {const char*} 服务器地址，格式：IP|PORT 或 DOMAIN|PORT
 	 * @param conn_timeout {int} 连接超时时间(秒)
 	 * @param rw_timeout {int} 读写超时时间(秒)
 	 * @param unzip {bool} 当服务器返回的数据体为压缩数据时是否自动解压缩

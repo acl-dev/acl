@@ -17,7 +17,7 @@ tcp_ipc::tcp_ipc(void)
 , conn_timeout_(10)
 , rw_timeout_(10)
 {
-	manager_ = new tcp_manager;
+	manager_ = NEW tcp_manager;
 }
 
 tcp_ipc::~tcp_ipc(void)

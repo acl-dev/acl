@@ -15,7 +15,7 @@ void url_coder::init_dbuf(dbuf_guard* dbuf)
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
 	} else {
-		dbuf_internal_ = new dbuf_guard;
+		dbuf_internal_ = NEW dbuf_guard;
 		dbuf_ = dbuf_internal_;
 	}
 }

@@ -236,7 +236,7 @@ void master_aio::service_on_listen(void* ctx, ACL_VSTREAM *sstream)
 {
 	master_aio* ma = (master_aio *) ctx;
 	acl_assert(ma);
-	server_socket* ss = new server_socket(sstream);
+	server_socket* ss = NEW server_socket(sstream);
 	ma->push_back(ss);
 	ma->proc_on_listen(*ss);
 }

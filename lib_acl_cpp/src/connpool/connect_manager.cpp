@@ -239,7 +239,7 @@ conns_pools& connect_manager::get_pools_by_id(unsigned long id)
 		return *mit->second;
 	}
 
-	conns_pools* pools  = new conns_pools;
+	conns_pools* pools  = NEW conns_pools;
 	manager_[id] = pools;
 	//printf("thread id=%lu create pools, %lu\r\n", id, pthread_self());
 

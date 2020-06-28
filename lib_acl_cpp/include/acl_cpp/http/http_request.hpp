@@ -41,7 +41,8 @@ public:
 
 	/**
 	 * 构造函数：该构造函数内部创建的 socket_stream 流会自行关闭
-	 * @param addr {const char*} WEB 服务器地址
+	 * @param addr {const char*} WEB 服务器地址，地址格式：domain|port，
+	 *  如：www.baidu.com|80
 	 * @param conn_timeout {int} 远程连接服务器超时时间(秒)
 	 * @param rw_timeout {int} IO 读写超时时间(秒)
 	 * @param unzip {bool} 是否对服务器响应的数据自动进行解压

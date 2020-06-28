@@ -17,8 +17,8 @@ tcp_client::tcp_client(const char* addr, int conn_timeout, int rw_timeout)
 , rw_timeout_(rw_timeout)
 {
 	addr_   = acl_mystrdup(addr);
-	conn_   = new socket_stream;
-	sender_ = new tcp_sender(*conn_);
+	conn_   = NEW socket_stream;
+	sender_ = NEW tcp_sender(*conn_);
 	reader_ = NULL;
 }
 
