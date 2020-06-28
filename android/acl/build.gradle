@@ -28,8 +28,9 @@ android {
         externalNativeBuild {
             cmake {
                 //arguments "-DANDROID_STL=stl_shared"
-                //arguments "-DANDROID_STL=gnustl_shared" // for ndk16b
-                arguments "-DANDROID_STL=c++_shared"      // for ndk20 or above
+                //arguments "-DANDROID_STL=gnustl_shared"   // for ndk16b
+                arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
+                arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
 
                 arguments "-DCMAKE_BUILD_TYPE=RELEASE"
                 arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
