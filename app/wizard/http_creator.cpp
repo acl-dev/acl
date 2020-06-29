@@ -35,8 +35,10 @@ static bool create_threads(file_tmpl& tmpl)
 	const char* name = "master_threads";
 	const FILE_FROM_TO tab[] = {
 		{ "main_threads.cpp",	"main.cpp"		},
-		{ "master_threads.h",	"http_service.h"	},
-		{ "master_threads.cpp",	"http_service.cpp"	},
+		{ "master_threads.h",	"master_service.h"	},
+		{ "master_threads.cpp",	"master_service.cpp"	},
+		{ "http_service.h",	"http_service.h"	},
+		{ "http_service.cpp",	"http_service.cpp"	},
 		{ "http_servlet.h",	"http_servlet.h"	},
 		{ NULL, NULL }
 	};
@@ -53,10 +55,12 @@ static bool create_fiber(file_tmpl& tmpl)
 
 	const char* name = "master_fiber";
 	const FILE_FROM_TO tab[] = {
-		{ "main_fiber.cpp",	"main.cpp"		},
-		{ "master_fiber.h",	"http_service.h"	},
-		{ "master_fiber.cpp",	"http_service.cpp"	},
 		{ "stdafx_fiber.h",	"stdafx.h"		},
+		{ "main_fiber.cpp",	"main.cpp"		},
+		{ "master_fiber.h",	"master_service.h"	},
+		{ "master_fiber.cpp",	"master_service.cpp"	},
+		{ "http_service.h",	"http_service.h"	},
+		{ "http_service.cpp",	"http_service.cpp"	},
 		{ "http_servlet.h",	"http_servlet.h"	},
 		{ NULL, NULL }
 	};
@@ -77,8 +81,10 @@ static bool create_proc(file_tmpl& tmpl)
 	const char* name = "master_proc";
 	const FILE_FROM_TO tab[] = {
 		{ "main_proc.cpp",	"main.cpp"		},
-		{ "master_proc.h",	"http_service.h"	},
-		{ "master_proc.cpp",	"http_service.cpp"	},
+		{ "master_proc.h",	"master_service.h"	},
+		{ "master_proc.cpp",	"master_service.cpp"	},
+		{ "http_service.h",	"http_service.h"	},
+		{ "http_service.cpp",	"http_service.cpp"	},
 		{ "http_servlet.h",	"http_servlet.h"	},
 		{ NULL, NULL }
 	};

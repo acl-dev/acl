@@ -343,6 +343,10 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\http_service.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\http_servlet.cpp"
 				>
 			</File>
@@ -351,7 +355,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\http_service.cpp"
+				RelativePath=".\master_service.cpp"
 				>
 			</File>
 			<File
@@ -397,11 +401,15 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath=".\http_service.h"
+				>
+			</File>
+			<File
 				RelativePath=".\http_servlet.h"
 				>
 			</File>
 			<File
-				RelativePath=".\http_service.h"
+				RelativePath=".\master_service.h"
 				>
 			</File>
 			<File

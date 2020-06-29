@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "master_service.h"
 #include "http_service.h"
 
 static bool http_get_default(HttpRequest&, HttpResponse& res)
@@ -74,10 +75,11 @@ int main(int argc, char* argv[])
 	// 初始化 acl 库
 	acl::acl_cpp_init();
 
-	http_service service;
+	master_service ms;
+	http_service& service = ms.get_service();;
 
 	// 设置配置参数表
-	service.set_cfg_int(var_conf_int_tab)
+	ms.set_cfg_int(var_conf_int_tab)
 		.set_cfg_int64(var_conf_int64_tab)
 		.set_cfg_str(var_conf_str_tab)
 		.set_cfg_bool(var_conf_bool_tab);
@@ -111,9 +113,9 @@ int main(int argc, char* argv[])
 		// 单独运行方式
 
 		if (argc >= 3) {
-			service.run_alone(addrs, argv[2], count, max_threads);
+			ms.run_alone(addrs, argv[2], count, max_threads);
 		} else {
-			service.run_alone(addrs, NULL, count, max_threads);
+			ms.run_alone(addrs, NULL, count, max_threads);
 		}
 
 		printf("Enter any key to exit now\r\n");
@@ -137,12 +139,12 @@ int main(int argc, char* argv[])
 		unsigned int max_threads = 100;
 
 		// 单独运行方式
-		service.run_alone(addrs, NULL, count, max_threads);
+		ms.run_alone(addrs, NULL, count, max_threads);
 		printf("Enter any key to exit now\r\n");
 		getchar();
 #else
 		// acl_master 控制模式运行
-		service.run_daemon(argc, argv);
+		ms.run_daemon(argc, argv);
 #endif
 	}
 

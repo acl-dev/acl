@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "http_servlet.h"
 #include "http_service.h"
+#include "http_servlet.h"
+#include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
 // ÅäÖÃÄÚÈÝÏî
@@ -38,16 +39,23 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 //////////////////////////////////////////////////////////////////////////////
 
-http_service::http_service(void)
+master_service::master_service(void)
 {
-	redis_ = NULL;
+	redis_   = NULL;
+	service_ = new http_service;
 }
 
-http_service::~http_service(void)
+master_service::~master_service(void)
 {
+	delete service_;
 }
 
-bool http_service::thread_on_read(acl::socket_stream* conn)
+http_service& master_service::get_service(void) const
+{
+	return *service_;
+}
+
+bool master_service::thread_on_read(acl::socket_stream* conn)
 {
 	http_servlet* servlet = (http_servlet*) conn->get_ctx();
 	if (servlet == NULL) {
@@ -57,7 +65,7 @@ bool http_service::thread_on_read(acl::socket_stream* conn)
 	return servlet->doRun();
 }
 
-bool http_service::thread_on_accept(acl::socket_stream* conn)
+bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
@@ -74,20 +82,21 @@ bool http_service::thread_on_accept(acl::socket_stream* conn)
 		session = new acl::memcache_session("127.0.0.1:11211");
 	}
 
-	http_servlet* servlet = new http_servlet(handlers_, conn, session);
+	http_servlet* servlet = new http_servlet(service_->get_handlers(),
+					conn, session);
 	conn->set_ctx(servlet);
 
 	return true;
 }
 
-bool http_service::thread_on_timeout(acl::socket_stream* conn)
+bool master_service::thread_on_timeout(acl::socket_stream* conn)
 {
 	logger("read timeout from %s, fd: %d", conn->get_peer(),
 		conn->sock_handle());
 	return false;
 }
 
-void http_service::thread_on_close(acl::socket_stream* conn)
+void master_service::thread_on_close(acl::socket_stream* conn)
 {
 	logger("disconnect from %s, fd: %d", conn->get_peer(),
 		conn->sock_handle());
@@ -98,20 +107,20 @@ void http_service::thread_on_close(acl::socket_stream* conn)
 	delete servlet;
 }
 
-void http_service::thread_on_init(void)
+void master_service::thread_on_init(void)
 {
 }
 
-void http_service::thread_on_exit(void)
+void master_service::thread_on_exit(void)
 {
 }
 
-void http_service::proc_on_listen(acl::server_socket& ss)
+void master_service::proc_on_listen(acl::server_socket& ss)
 {
 	logger(">>>listen %s ok<<<", ss.get_addr());
 }
 
-void http_service::proc_on_init(void)
+void master_service::proc_on_init(void)
 {
 	// create redis cluster for session cluster
 	redis_ = new acl::redis_client_cluster;
@@ -119,12 +128,12 @@ void http_service::proc_on_init(void)
 		var_cfg_conn_timeout, var_cfg_rw_timeout);
 }
 
-void http_service::proc_on_exit(void)
+void master_service::proc_on_exit(void)
 {
 	delete redis_;
 }
 
-bool http_service::proc_exit_timer(size_t nclients, size_t nthreads)
+bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 {
 	if (nclients == 0) {
 		logger("clients count: %d, threads count: %d",
@@ -135,105 +144,8 @@ bool http_service::proc_exit_timer(size_t nclients, size_t nthreads)
 	return false;
 }
 
-bool http_service::proc_on_sighup(acl::string&)
+bool master_service::proc_on_sighup(acl::string&)
 {
 	logger(">>>proc_on_sighup<<<");
 	return true;
-}
-
-//////////////////////////////////////////////////////////////////////////
-
-http_service& http_service::Get(const char* path, http_handler_t fn)
-{
-	Service(http_handler_get, path, fn);
-	return *this;
-}
-
-http_service& http_service::Post(const char* path, http_handler_t fn)
-{
-	Service(http_handler_post, path, fn);
-	return *this;
-}
-
-http_service& http_service::Head(const char* path, http_handler_t fn)
-{
-	Service(http_handler_head, path, fn);
-	return *this;
-}
-
-http_service& http_service::Put(const char* path, http_handler_t fn)
-{
-	Service(http_handler_put, path, fn);
-	return *this;
-}
-
-http_service& http_service::Patch(const char* path, http_handler_t fn)
-{
-	Service(http_handler_patch, path, fn);
-	return *this;
-}
-
-http_service& http_service::Connect(const char* path, http_handler_t fn)
-{
-	Service(http_handler_connect, path, fn);
-	return *this;
-}
-
-http_service& http_service::Purge(const char* path, http_handler_t fn)
-{
-	Service(http_handler_purge, path, fn);
-	return *this;
-}
-
-http_service& http_service::Delete(const char* path, http_handler_t fn)
-{
-	Service(http_handler_delete, path, fn);
-	return *this;
-}
-
-http_service& http_service::Options(const char* path, http_handler_t fn)
-{
-	Service(http_handler_options, path, fn);
-	return *this;
-}
-
-http_service& http_service::Propfind(const char* path, http_handler_t fn)
-{
-	Service(http_handler_profind, path, fn);
-	return *this;
-}
-
-http_service& http_service::Websocket(const char* path, http_handler_t fn)
-{
-	Service(http_handler_websocket, path, fn);
-	return *this;
-}
-
-http_service& http_service::Unknown(const char* path, http_handler_t fn)
-{
-	Service(http_handler_unknown, path, fn);
-	return *this;
-}
-
-http_service& http_service::Error(const char* path, http_handler_t fn)
-{
-	Service(http_handler_error, path, fn);
-	return *this;
-}
-
-void http_service::Service(int type, const char* path, http_handler_t fn)
-{
-	if (type >= http_handler_get && type < http_handler_max
-		&& path && *path) {
-
-		// The path should lookup like as "/xxx/" with
-		// lower charactors.
-
-		acl::string buf(path);
-		if (buf[buf.size() - 1] != '/') {
-			buf += '/';
-		}
-		buf.lower();
-		handlers_[type][buf] = fn;
-	}
 }

@@ -225,13 +225,16 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y"/>
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
+				RelativePath=".\http_service.cpp">
+			</File>
+			<File
 				RelativePath=".\http_servlet.cpp">
 			</File>
 			<File
 				RelativePath=".\main.cpp">
 			</File>
 			<File
-				RelativePath=".\http_service.cpp">
+				RelativePath=".\master_service.cpp">
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp">
@@ -266,10 +269,13 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y"/>
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
+				RelativePath=".\http_service.h">
+			</File>
+			<File
 				RelativePath=".\http_servlet.h">
 			</File>
 			<File
-				RelativePath=".\http_service.h">
+				RelativePath=".\master_service.h">
 			</File>
 			<File
 				RelativePath=".\stdafx.h">
