@@ -231,7 +231,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y"/>
 				RelativePath=".\main.cpp">
 			</File>
 			<File
-				RelativePath=".\master_service.cpp">
+				RelativePath=".\http_service.cpp">
 			</File>
 			<File
 				RelativePath=".\stdafx.cpp">
@@ -269,7 +269,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)\ /Y"/>
 				RelativePath=".\http_servlet.h">
 			</File>
 			<File
-				RelativePath=".\master_service.h">
+				RelativePath=".\http_service.h">
 			</File>
 			<File
 				RelativePath=".\stdafx.h">

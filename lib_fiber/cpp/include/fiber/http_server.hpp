@@ -62,13 +62,18 @@ public:
 		return *this;
 	}
 
-	http_server& Error(const char* path, http_handler_t fn) {
-		this->Service(http_handler_error, path, fn);
+	http_server& Websocket(const char* path, http_handler_t fn) {
+		this->Service(http_handler_websocket, path, fn);
 		return *this;
 	}
 
-	http_server& Websocket(const char* path, http_handler_t fn) {
-		this->Service(http_handler_websocket, path, fn);
+	http_server& Unknown(const char* path, http_handler_t fn) {
+		this->Service(http_handler_unknown, path, fn);
+		return *this;
+	}
+
+	http_server& Error(const char* path, http_handler_t fn) {
+		this->Service(http_handler_error, path, fn);
 		return *this;
 	}
 

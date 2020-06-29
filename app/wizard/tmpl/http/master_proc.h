@@ -1,30 +1,33 @@
 #pragma once
 
-////////////////////////////////////////////////////////////////////////////////
-// 配置内容项
-
-extern char *var_cfg_str;
-extern acl::master_str_tbl var_conf_str_tab[];
-
-extern int  var_cfg_bool;
-extern acl::master_bool_tbl var_conf_bool_tab[];
-
-extern acl::master_int_tbl var_conf_int_tab[];
-
-extern long long int  var_cfg_int64;
-extern acl::master_int64_tbl var_conf_int64_tab[];
-
-////////////////////////////////////////////////////////////////////////////////
-
-//class acl::socket_stream;
-
-class master_service : public acl::master_proc
+class http_service : public acl::master_proc
 {
 public:
-	master_service(void);
-	~master_service(void);
+	http_service(void);
+	~http_service(void);
 
-	static void do_cgi(void);
+public:
+	// Register all Http handlers with the http url path
+
+	http_service& Get(const char* path, http_handler_t fn);
+	http_service& Post(const char* path, http_handler_t fn);
+	http_service& Head(const char* path, http_handler_t fn);
+	http_service& Put(const char* path, http_handler_t fn);
+	http_service& Patch(const char* path, http_handler_t fn);
+	http_service& Connect(const char* path, http_handler_t fn);
+	http_service& Purge(const char* path, http_handler_t fn);
+	http_service& Delete(const char* path, http_handler_t fn);
+	http_service& Options(const char* path, http_handler_t fn);
+	http_service& Propfind(const char* path, http_handler_t fn);
+	http_service& Websocket(const char* path, http_handler_t fn);
+	http_service& Unknown(const char* path, http_handler_t fn);
+	http_service& Error(const char* path, http_handler_t fn);
+
+public:
+	/**
+	 * 当以 CGI 方式运行时的入口
+	 */
+	void do_cgi(void);
 
 protected:
 	/**
@@ -60,4 +63,9 @@ protected:
 	 * 当进程收到 SIGHUP 信号后的回调函数
 	 */
 	bool proc_on_sighup(acl::string&);
+
+private:
+	http_handlers_t handlers_[http_handler_max];
+
+	void Service(int type, const char* path, http_handler_t fn);
 };

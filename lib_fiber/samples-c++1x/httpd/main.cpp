@@ -73,6 +73,7 @@ int main(int argc, char *argv[]) {
 
 	// set http route
 
+	int i = 0;
 	server.Get("/", [](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::string buf("hello world1!\r\n");
 		res.setContentLength(buf.size());
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
 		req.getBody(buf);
 		res.setContentLength(buf.size());
 		return res.write(buf.c_str(), buf.size());
-	}).Get("/json", [](acl::HttpRequest&, acl::HttpResponse& res) {
+	}).Get("/json", [=](acl::HttpRequest&, acl::HttpResponse& res) {
 		acl::json json;
 		acl::json_node& root = json.get_root();
 		root.add_number("code", 200)
@@ -95,7 +96,7 @@ int main(int argc, char *argv[]) {
 				json.create_node()
 					.add_text("name", "value")
 					.add_bool("success", true)
-					.add_number("number", 100));
+					.add_number("number", i));
 		return res.write(json);
 	}).Get("/test", http_test);
 

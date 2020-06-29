@@ -339,7 +339,7 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
   <ItemGroup>
     <ClCompile Include="http_servlet.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="master_service.cpp" />
+    <ClCompile Include="http_service.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">Create</PrecompiledHeader>
@@ -353,7 +353,7 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="http_servlet.h" />
-    <ClInclude Include="master_service.h" />
+    <ClInclude Include="http_service.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>

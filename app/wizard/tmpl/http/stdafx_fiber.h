@@ -19,8 +19,31 @@
 #define	snprintf _snprintf
 #endif
 
-typedef acl::HttpServletRequest  request_t;
-typedef acl::HttpServletResponse response_t;
+typedef acl::HttpServletRequest  HttpRequest;
+typedef acl::HttpServletResponse HttpResponse;
+
+typedef bool (*http_handler_t)(HttpRequest&, HttpResponse&);
+//#include <functional>
+//typedef std::function<bool(HttpRequest&, HttpResponse&)> http_handler_t;
+
+typedef std::map<acl::string, http_handler_t> http_handlers_t;
+
+enum {
+	http_handler_get = 0,
+	http_handler_post,
+	http_handler_head,
+	http_handler_put,
+	http_handler_patch,
+	http_handler_connect,
+	http_handler_purge,
+	http_handler_delete,
+	http_handler_options,
+	http_handler_profind,
+	http_handler_websocket,
+	http_handler_error,
+	http_handler_unknown,
+	http_handler_max,
+};
 
 #undef logger
 #undef logger_warn
@@ -60,3 +83,8 @@ typedef acl::HttpServletResponse response_t;
 # define logger_debug(section, level, fmt, args...)  \
 	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 #endif // !_WIN32 && !_WIN64
+
+extern acl::master_str_tbl var_conf_str_tab[];
+extern acl::master_bool_tbl var_conf_bool_tab[];
+extern acl::master_int_tbl var_conf_int_tab[];
+extern acl::master_int64_tbl var_conf_int64_tab[];

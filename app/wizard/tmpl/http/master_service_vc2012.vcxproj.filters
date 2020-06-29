@@ -21,7 +21,7 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="master_service.cpp">
+    <ClCompile Include="http_service.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
@@ -32,7 +32,7 @@
     <ClInclude Include="http_servlet.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="master_service.h">
+    <ClInclude Include="http_service.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">

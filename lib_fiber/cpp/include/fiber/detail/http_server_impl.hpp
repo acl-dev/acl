@@ -25,7 +25,7 @@ public:
 
 	virtual ~http_server_impl(void) {}
 
-public:
+protected:
 	void Service(int type, const char* path, http_handler_t fn) {
 		if (type >= http_handler_get && type < http_handler_max
 				&& path && *path) {
