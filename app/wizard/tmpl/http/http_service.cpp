@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "http_servlet.h"
 #include "http_service.h"
 
 http_service::http_service(void)
