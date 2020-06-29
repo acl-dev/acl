@@ -234,6 +234,6 @@ void http_service::Service(int type, const char* path, http_handler_t fn)
 			buf += '/';
 		}
 		buf.lower();
-		handlers_[type][buf] = std::move(fn);
+		handlers_[type][buf] = fn;
 	}
 }
