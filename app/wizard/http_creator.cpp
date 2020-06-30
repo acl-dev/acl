@@ -38,8 +38,7 @@ static bool create_threads(file_tmpl& tmpl)
 		{ "master_threads.h",	"master_service.h"	},
 		{ "master_threads.cpp",	"master_service.cpp"	},
 		{ "http_service.h",	"http_service.h"	},
-		{ "http_service.cpp",	"http_service.cpp"	},
-		{ "http_servlet.h",	"http_servlet.h"	},
+
 		{ NULL, NULL }
 	};
 
@@ -60,8 +59,7 @@ static bool create_fiber(file_tmpl& tmpl)
 		{ "master_fiber.h",	"master_service.h"	},
 		{ "master_fiber.cpp",	"master_service.cpp"	},
 		{ "http_service.h",	"http_service.h"	},
-		{ "http_service.cpp",	"http_service.cpp"	},
-		{ "http_servlet.h",	"http_servlet.h"	},
+
 		{ NULL, NULL }
 	};
 
@@ -84,8 +82,7 @@ static bool create_proc(file_tmpl& tmpl)
 		{ "master_proc.h",	"master_service.h"	},
 		{ "master_proc.cpp",	"master_service.cpp"	},
 		{ "http_service.h",	"http_service.h"	},
-		{ "http_service.cpp",	"http_service.cpp"	},
-		{ "http_servlet.h",	"http_servlet.h"	},
+
 		{ NULL, NULL }
 	};
 
@@ -122,7 +119,7 @@ static bool create_service(file_tmpl& tmpl)
 
 static bool create_http_servlet(file_tmpl& tmpl)
 {
-	tpl_t* tpl = tmpl.open_tpl("http_servlet.cpp");
+	tpl_t* tpl = tmpl.open_tpl("http_servlet.h");
 	if (tpl == NULL)
 		return false;
 
@@ -132,7 +129,7 @@ static bool create_http_servlet(file_tmpl& tmpl)
 		set_cookies(tpl);
 
 	string filepath;
-	filepath.format("%s/http_servlet.cpp", tmpl.get_project_name());
+	filepath.format("%s/http_servlet.h", tmpl.get_project_name());
 	if (tpl_save_as(tpl, filepath.c_str()) != TPL_OK)
 	{
 		printf("save to %s error: %s\r\n", filepath.c_str(),

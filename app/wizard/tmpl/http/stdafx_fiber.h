@@ -22,9 +22,15 @@
 typedef acl::HttpServletRequest  HttpRequest;
 typedef acl::HttpServletResponse HttpResponse;
 
+// __cplusplus show c++ version as below:
+// 199711L: c++98, 201103L: c++11, 201402L: c++14, 201703L: c++17
+
+#if __cplusplus >= 201103L
+#include <functional>
+typedef std::function<bool(HttpRequest&, HttpResponse&)> http_handler_t;
+#else
 typedef bool (*http_handler_t)(HttpRequest&, HttpResponse&);
-//#include <functional>
-//typedef std::function<bool(HttpRequest&, HttpResponse&)> http_handler_t;
+#endif
 
 typedef std::map<acl::string, http_handler_t> http_handlers_t;
 

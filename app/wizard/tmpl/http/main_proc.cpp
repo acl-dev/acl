@@ -89,7 +89,21 @@ int main(int argc, char* argv[])
 		.Get("/ok", http_get_ok)
 		.Post("/ok", http_post_ok)
 		.Get("/json", http_get_json)
-		.Get("/xml", http_get_xml);
+		.Get("/xml", http_get_xml)
+#if __cplusplus >= 201103L	// Support c++11 ?
+		.Get("/test1", [](HttpRequest&, HttpResponse& res) {
+			acl::string buf("test1: hello world!\r\n");
+			res.setContentLength(buf.size());
+			return res.write(buf);
+		})
+		.Get("/test2", [&](HttpRequest&, HttpResponse& res) {
+			acl::string buf("test2: hello world!\r\n");
+			res.setContentLength(buf.size());
+			return res.write(buf);
+		});
+#else
+		;
+#endif
 
 	// 开始运行
 	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {

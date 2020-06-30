@@ -26,6 +26,17 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+ifeq ($(findstring g++, $(CC)), g++)
+	GCC_VERSION=$(shell g++ --version | grep ^g++ | sed 's/^.* //g')
+	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
+	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 7 \) ] && echo true)
+	ifeq ($(GCC_VER), true)
+		CFLAGS += --std=c++11
+	endif
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)
