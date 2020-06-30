@@ -23,7 +23,7 @@ typedef acl::HttpServletResponse HttpResponse;
 // __cplusplus show c++ version as below:
 // 199711L: c++98, 201103L: c++11, 201402L: c++14, 201703L: c++17
 
-#if __cplusplus >= 201103L
+#if defined(__cplusplus) && __cplusplus >= 201103L
 #include <functional>
 typedef std::function<bool(HttpRequest&, HttpResponse&)> http_handler_t;
 #else
