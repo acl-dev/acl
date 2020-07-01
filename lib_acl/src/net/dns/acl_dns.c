@@ -357,8 +357,8 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 	acl_msg_warn("%s(%d): dns socket closed - %s",
 		myname, __LINE__, acl_last_serror());
 
-	/* 设置 UDP 句柄为 NULL，以防止在重新打开前被使用，因为本函数返回后该异步流
-	 * 对象将会被关闭
+	/* 设置 UDP 句柄为 NULL，以防止在重新打开前被使用，因为本函数返回后该
+	 * 异步流对象将会被关闭
 	 */
 	dns->astream = NULL;
 

@@ -221,7 +221,9 @@ bool mbedtls_io::open(ACL_VSTREAM* s)
 	// 初始化 SSL 对象
 	__ssl_init((mbedtls_ssl_context*) ssl_);
 
-	if (host[0]) {
+	if (!sni_host_.empty()) {
+		__ssl_set_hostname((mbedtls_ssl_context*) ssl_, sni_host_.c_str());
+	} else if (host[0]) {
 		__ssl_set_hostname((mbedtls_ssl_context*) ssl_, host);
 	}
 

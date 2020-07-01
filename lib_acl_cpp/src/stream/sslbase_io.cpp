@@ -34,4 +34,11 @@ void sslbase_io::set_non_blocking(bool yes)
 	nblock_ = yes;
 }
 
+void sslbase_io::set_sni_host(const char *host)
+{
+	if (host && *host) {
+		sni_host_ = host;
+	}
+}
+
 } // namespace acl

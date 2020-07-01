@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include "../stdlib/string.hpp"
 #include "stream_hook.hpp"
 
 struct ACL_VSTREAM;
@@ -52,6 +53,12 @@ public:
 		return handshake_ok_;
 	}
 
+	/**
+	 * …Ë÷√ SNI HOST ◊÷∂Œ
+	 * @param host {const char*}
+	 */
+	void set_sni_host(const char* host);
+
 protected:
 	sslbase_conf& base_conf_;
 	bool server_side_;
@@ -59,6 +66,7 @@ protected:
 	bool handshake_ok_;
 	atomic_long* refers_;
 	ACL_VSTREAM* stream_;
+	string sni_host_;	// just for SNI
 };
 
 } // namespace acl
