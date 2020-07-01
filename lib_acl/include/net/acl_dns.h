@@ -173,9 +173,8 @@ ACL_API void acl_dns_set_retry_limit(ACL_DNS *dns, int retry_limit);
  *  若返回给 callback 的 ACL_DNS_DB 为空则表示查询失败, 第二个参数为用户设置
  *  的参数, 第三个参数为查询失败时的错误号
  * @param ctx {void*} callback 的参数之一
- * @return {ACL_DNS_REQ*} 返回本次DNS查询的事件对象, 若为NULL则表示出错
  */
-ACL_API ACL_DNS_REQ *acl_dns_lookup(ACL_DNS *dns, const char *domain,
+ACL_API void acl_dns_lookup(ACL_DNS *dns, const char *domain,
 	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx);
 
 /**

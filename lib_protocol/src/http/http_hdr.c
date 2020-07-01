@@ -299,9 +299,11 @@ int http_hdr_entry_replace(HTTP_HDR *hh, const char *name,
 	const char *myname = "http_hdr_entry_replace";
 	HTTP_HDR_ENTRY *entry;
 
-	if (hh == NULL || name == NULL || value == NULL)
-		acl_msg_fatal("%s, %s(%d): input invalid",
+	if (hh == NULL || name == NULL || value == NULL) {
+		acl_msg_error("%s, %s(%d): input invalid",
 			__FILE__, myname, __LINE__);
+		return -1;
+	}
 
 	entry = __get_hdr_entry(hh, name);
 	if (entry == NULL) {

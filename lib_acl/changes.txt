@@ -1,5 +1,9 @@
 修改历史列表：
 
+670) 2020.7.1
+670.1) bugfix: acl_dns.c 模块当 udp socket 读出错时，需要重新打开，同时在发送
+DNS UDP 请求时需要判断 udp socket 是否准备好。
+
 669) 2020.4.16
 669.1) feature: acl_get_ifaddrs() work ok on MacOS
 

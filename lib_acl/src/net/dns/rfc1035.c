@@ -182,8 +182,10 @@ static int rfc1035HeaderUnpack(const char *buf, size_t sz, int *off,
 	unsigned short s;
 	unsigned short t;
 
-	if (*off != 0)
-		acl_msg_fatal("%s: *off(%d) != 0", myname, *off);
+	if (*off != 0) {
+		acl_msg_error("%s: *off(%d) != 0", myname, *off);
+		return -rfc1035_unpack_error;
+	}
 
 	/*
 	* The header is 12 octets.  This is a bogus message if the size
@@ -222,8 +224,10 @@ static int rfc1035HeaderUnpack(const char *buf, size_t sz, int *off,
 	(*off) += sizeof(s);
 	h->arcount = ntohs(s);
 
-	if (*off != 12)
-		acl_msg_fatal("%s: *off(%d) != 12", myname, *off);
+	if (*off != 12) {
+		acl_msg_error("%s: *off(%d) != 12", myname, *off);
+		return -rfc1035_unpack_error;
+	}
 	return 0;
 }
 
@@ -250,11 +254,15 @@ static int rfc1035NameUnpack(const char *buf, size_t sz, int *off,
 	unsigned char c;
 	size_t len;
 
-	if (ns <= 0)
-		acl_msg_fatal("%s: ns(%d) <= 0", myname, (int) ns);
+	if (ns <= 0) {
+		acl_msg_error("%s: ns(%d) <= 0", myname, (int) ns);
+		return -rfc1035_unpack_error;
+	}
 	do {
-		if (*off >= (int) sz)
-			acl_msg_fatal("%s: *off(%d) >= sz(%d)", myname, *off, (int) sz);
+		if (*off >= (int) sz) {
+			acl_msg_error("%s: *off(%d) >= sz(%d)", myname, *off, (int) sz);
+			return -rfc1035_unpack_error;
+		}
 		c = *(buf + (*off));
 		if (c > 191) {
 			/* blasted compression */
@@ -301,8 +309,10 @@ static int rfc1035NameUnpack(const char *buf, size_t sz, int *off,
 	else
 		*name = '\0';
 	/* make sure we didn't allow someone to overflow the name buffer */
-	if (no > (int) ns)
-		acl_msg_fatal("%s: no(%d) > ns(%d)", myname, no, (int) ns);
+	if (no > (int) ns) {
+		acl_msg_error("%s: no(%d) > ns(%d)", myname, no, (int) ns);
+		return -rfc1035_unpack_error;
+	}
 	return 0;
 }
 
@@ -387,8 +397,10 @@ static int rfc1035RRUnpack(const char *buf, size_t sz, int *off, rfc1035_rr * RR
 		break;
 	}
 	(*off) += rdlength;
-	if (*off > (int) sz)
-		acl_msg_fatal("%s: *off(%d) > sz(%d)", myname, *off, (int) sz);
+	if (*off > (int) sz) {
+		acl_msg_error("%s: *off(%d) > sz(%d)", myname, *off, (int) sz);
+		return -rfc1035_unpack_error;
+	}
 	return 0;
 }
 

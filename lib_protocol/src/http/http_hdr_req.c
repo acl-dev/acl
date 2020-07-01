@@ -196,14 +196,17 @@ HTTP_HDR_REQ *http_hdr_req_create(const char *url,
 
 	if (url == NULL || *url == 0) {
 		acl_msg_error("%s(%d): url invalid", myname, __LINE__);
+		acl_vstring_free(req_line);
 		return NULL;
 	}
 	if (method == NULL || *method == 0) {
 		acl_msg_error("%s(%d): method invalid", myname, __LINE__);
+		acl_vstring_free(req_line);
 		return NULL;
 	}
 	if (version == NULL || *version == 0) {
 		acl_msg_error("%s(%d): version invalid", myname, __LINE__);
+		acl_vstring_free(req_line);
 		return NULL;
 	}
 

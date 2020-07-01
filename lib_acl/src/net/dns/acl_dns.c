@@ -331,26 +331,40 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 	return 0;
 }
 
+static void dns_stream_reopen_timer(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *ctx)
+{
+	ACL_DNS *dns = (ACL_DNS*) ctx;
+
+	/* 创建一个新的套接口 */
+	if (dns_stream_open(dns) == 0) {
+		/* 异步读DNS服务器响应数据 */
+		acl_aio_read(dns->astream);
+	} else {
+		/* 设置定时器重新打开 UDP 套接字 */
+		acl_aio_request_timer(dns->aio, dns_stream_reopen_timer, dns,
+		2 * 1000000, 0);
+	}
+}
+
 /* 数据流出错时的回调函数 */
 
 static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused)
 {
 	const char *myname = "dns_lookup_close";
-#if 0
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 
-	acl_msg_warn("%s(%d): error(%s), re-open a new socket",
+	acl_msg_warn("%s(%d): dns socket closed - %s",
 		myname, __LINE__, acl_last_serror());
 
-	/* 创建一个新的套接口 */
-	dns_stream_open(dns);
+	/* 设置 UDP 句柄为 NULL，以防止在重新打开前被使用，因为本函数返回后该异步流
+	 * 对象将会被关闭
+	 */
+	dns->astream = NULL;
 
-	/* 异步读DNS服务器响应数据 */
-	acl_aio_read(dns->astream);
-#else
-	acl_msg_info("%s(%d): dns_lookup stream closed(%s)",
-		myname, __LINE__, acl_last_serror());
-#endif
+	/* 设置定时器重新打开 UDP 套接字，不应立即打开 socket，以防止频繁关闭 */
+	acl_aio_request_timer(dns->aio, dns_stream_reopen_timer, dns,
+	2* 1000000, 0);
 	return -1;
 }
 
@@ -364,6 +378,7 @@ static int dns_stream_open(ACL_DNS *dns)
 	if (stream == NULL) {
 		acl_msg_error("%s(%d), %s: acl_vstream_bind error=%s",
 			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		dns->astream = NULL;
 		return -1;
 	}
 
@@ -395,7 +410,12 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain, unsigned short qid
 	ret = rfc1035BuildAQuery(domain, buf, sizeof(buf), qid, NULL);
 
 	/* 发送请求DNS包 */
-	acl_aio_writen(dns->astream, buf, (int) ret);
+	if (dns->astream != NULL) {
+		acl_aio_writen(dns->astream, buf, (int) ret);
+	} else {
+		acl_msg_warn("%s(%d), %s: astream null, wait for a while",
+			__FILE__, __LINE__, __FUNCTION__);
+	}
 }
 
 /* 查询超时的回调函数 */
@@ -500,9 +520,11 @@ void acl_dns_close(ACL_DNS *dns)
 		acl_cache2_free(dns->dns_cache);
 		dns->dns_cache = NULL;
 	}
-	acl_aio_iocp_close(dns->astream);
-	dns->aio     = NULL;
-	dns->astream = NULL;
+	if (dns->astream != NULL) {
+		acl_aio_iocp_close(dns->astream);
+		dns->astream = NULL;
+	}
+	dns->aio = NULL;
 	acl_array_destroy(dns->dns_list, acl_myfree_fn);
 
 	if (dns->groups) {
@@ -697,7 +719,7 @@ void acl_dns_add_group(ACL_DNS *dns, const char *group, const char *refer,
 	}
 }
 
-ACL_DNS_REQ *acl_dns_lookup(ACL_DNS *dns, const char *domain_in,
+void acl_dns_lookup(ACL_DNS *dns, const char *domain_in,
 	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx)
 {
 	char  key[RFC1035_MAXHOSTNAMESZ + 16], domain[RFC1035_MAXHOSTNAMESZ];
@@ -749,7 +771,7 @@ END_FOREACH_TAG:
 		dns_db = acl_cache2_find(dns->dns_cache, domain);
 		if (dns_db) {
 			callback(dns_db, ctx, ACL_DNS_OK_CACHE);
-			return NULL;
+			return;
 		}
 	}
 
@@ -762,7 +784,7 @@ END_FOREACH_TAG:
 		acl_msg_warn("%s(%d): key(%s) exist",
 			__FUNCTION__, __LINE__, key);
 		callback(NULL, ctx, ACL_DNS_ERR_EXIST);
-		return NULL;
+		return;
 	}
 
 	/* 分配新的查询对象 */
@@ -786,7 +808,6 @@ END_FOREACH_TAG:
 	/* 设置定时器 */
 	acl_aio_request_timer(dns->aio, dns->lookup_timeout,
 		req, dns->timeout * 1000000, 0);
-	return req;
 }
 
 void acl_dns_cancel(ACL_DNS_REQ *req)
