@@ -18,7 +18,7 @@ public:
 	 * @param nblock {bool} 是否为非阻塞模式
 	 * @return {sslbase_io*}
 	 */
-	virtual sslbase_io* open(bool nblock) = 0;
+	virtual sslbase_io* create(bool nblock) = 0;
 
 public:
 	/**

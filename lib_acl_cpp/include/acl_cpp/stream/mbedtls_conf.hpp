@@ -98,7 +98,7 @@ public:
 
 public:
 	// @override sslbase_conf
-	sslbase_io* open(bool nblock);
+	sslbase_io* create(bool nblock);
 
 private:
 	friend class mbedtls_io;

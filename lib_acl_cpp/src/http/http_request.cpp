@@ -155,7 +155,11 @@ bool http_request::try_open(bool* reuse_conn)
 		return true;
 	}
 
-	sslbase_io* ssl = ssl_conf_->open(false);
+	sslbase_io* ssl = ssl_conf_->create(false);
+	const char* host = header_.get_host();
+	if (host && *host) {
+		ssl->set_sni_host(host);
+	}
 	if (client_->get_stream().setup_hook(ssl) == ssl) {
 		logger_error("open client ssl error to: %s", addr_);
 		ssl->destroy();

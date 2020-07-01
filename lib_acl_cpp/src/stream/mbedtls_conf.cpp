@@ -940,7 +940,7 @@ bool mbedtls_conf::setup_certs(void* ssl)
 #endif
 }
 
-sslbase_io* mbedtls_conf::open(bool nblock)
+sslbase_io* mbedtls_conf::create(bool nblock)
 {
 	return NEW mbedtls_io(*this, server_side_, nblock);
 }
