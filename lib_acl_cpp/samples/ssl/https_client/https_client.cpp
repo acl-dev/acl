@@ -42,7 +42,7 @@ bool https_client::connect_server(acl::http_client& client)
 	{
 		logger("begin open ssl");
 
-		acl::sslbase_io* ssl = ssl_conf_->open(false);
+		acl::sslbase_io* ssl = ssl_conf_->create(false);
 		if (client.get_stream().setup_hook(ssl) == ssl)
 		{
 			logger_error("open ssl client error");

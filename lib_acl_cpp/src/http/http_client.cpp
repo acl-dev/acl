@@ -533,8 +533,6 @@ bool http_client::read_response_head(void)
 	} else if ((ptr = http_hdr_entry_value(&hdr_res_->hdr, "Content-Type"))) {
 		if (EQ(ptr, "application/x-gzip")) {
 			gzipped = true;
-		} else {
-			logger_warn("unknown compress format: %s", ptr);
 		}
 	}
 
