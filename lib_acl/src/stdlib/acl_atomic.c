@@ -19,9 +19,40 @@
 # endif
 #endif
 
-#if defined(ACL_MACOSX) || defined(ACL_FREEBSD)
+#if defined(ACL_FREEBSD)
 # define HAS_ATOMIC
 #endif
+
+/*
+#ifdef arm64
+#error "arm64"
+#endif
+
+#ifdef arm64e
+#error "arm64e"
+#endif
+
+#ifdef armv7
+#error "armv7"
+#endif
+
+#ifdef armv7s
+#error "arm7s"
+#endif
+
+#ifdef i386
+#error "i386"
+#endif
+
+#ifdef x86_64
+#error "x86_64"
+#endif
+
+// don't use atomic for IOS and MacOS
+#if defined(ACL_MACOSX)
+#  define HAS_ATOMIC
+#endif
+*/
 
 #if defined(ACL_WINDOWS)
 # define HAS_ATOMIC
