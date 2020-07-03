@@ -275,7 +275,8 @@ static int connect_failed(ACL_ASTREAM *conn acl_unused, void *context)
 
 	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
 	if (try_connect_one(ctx) != NULL) {
-		return 0;
+		/* 返回 -1 仅关闭当前超时的连接对象流，用新的连接流继续等待连接成功 */
+		return -1;
 	}
 
 	acl_set_error(ACL_ECONNREFUSED);
@@ -300,12 +301,13 @@ static int connect_timeout(ACL_ASTREAM *conn, void *context)
 	 /* 按 acl aio 的设计，当超时回调函数被调用且返回 -1 时，则所注册的
 	  * 关闭回调接着会被调用，通过在此处清除域名解析后异步连接所注册的关
 	  * 闭回调，从而禁止 connect_failed 再被调用。
-	 */
+	  */
 	acl_aio_del_close_hook(conn, connect_failed, context);
 
 	/* 如果 DNS 解析出多个 IP 地址，则尝试连接下一个 IP 地址 */
 	if (try_connect_one(ctx) != NULL) {
-		return 0;
+		/* 返回 -1 仅关闭当前超时的连接对象流，用新的连接流继续等待连接成功 */
+		return -1;
 	}
 
 	acl_set_error(ACL_ETIMEDOUT);
