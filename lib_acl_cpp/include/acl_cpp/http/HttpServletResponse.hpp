@@ -195,7 +195,7 @@ public:
 
 	/**
 	 * 向客户端发送 HTTP Xml 响应数据体
-	 * @param buf {const xml&} 数据缓冲区
+	 * @param body {const xml&} 数据缓冲区
 	 * @param charset {const char*} 数据体字符集
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
@@ -203,7 +203,7 @@ public:
 
 	/**
 	 * 向客户端发送 HTTP Json 响应数据体
-	 * @param buf {const json&} 数据缓冲区
+	 * @param body {const json&} 数据缓冲区
 	 * @param charset {const char*} 数据体字符集
 	 * @return {bool} 发送是否成功，如果返回 false 表示连接中断
 	 */
