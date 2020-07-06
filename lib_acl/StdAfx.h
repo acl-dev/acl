@@ -79,6 +79,7 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 # if _MSC_VER <= 1310
 int inet_pton(int af, const char *src, void *dst);
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+int WSAAPI WSAPoll(LPWSAPOLLFD fdArray, ULONG fds, INT timeout);
 # endif
 #endif
 
