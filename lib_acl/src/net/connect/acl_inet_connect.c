@@ -159,6 +159,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 #ifdef	ACL_WINDOWS
 		if (errnum == ACL_EINPROGRESS || errnum == ACL_EWOULDBLOCK) {
 			return sock;
+		}
 #elif defined(ACL_UNIX)
 		if (errnum == ACL_EINPROGRESS || errnum == EISCONN) {
 			return sock;
