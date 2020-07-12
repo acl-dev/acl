@@ -107,6 +107,7 @@ static int checkfd(EVENT *ev, FILE_EVENT *fe)
 #else
 static int checkfd(EVENT *ev, FILE_EVENT *fe)
 {
+#if 0
 	struct stat s;
 
 	if (fstat(fe->fd, &s) < 0) {
@@ -130,6 +131,17 @@ static int checkfd(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	return ev->checkfd(ev, fe);
+#else
+	(void) ev;
+	/* If we cannot seek, it must be a pipe, socket or fifo, else it
+	 * should be a file.
+	 */
+	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1 && errno == ESPIPE) {
+		return 0;
+	} else {
+		return -1;
+	}
+#endif
 }
 #endif
 
