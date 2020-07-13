@@ -48,19 +48,21 @@
 #error "x86_64"
 #endif
 
-// don't use atomic for IOS and MacOS
-#if defined(ACL_MACOSX)
-#  define HAS_ATOMIC
-#endif
 */
+/* don't use atomic for IOS and MacOS */
+#if defined(ACL_MACOSX)
+#  undef HAS_ATOMIC
+#endif
 
 #if defined(ACL_WINDOWS)
 # define HAS_ATOMIC
 #endif
 
+/*
 #if !defined(HAS_ATOMIC)
 # pragma message "Atomic not support, using thread mutex instead!"
 #endif
+*/
 
 struct ACL_ATOMIC {
 	void *value;
