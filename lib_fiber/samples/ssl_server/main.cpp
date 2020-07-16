@@ -17,7 +17,7 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 	printf("start one server\r\n");
 
 	if (__ssl_conf != NULL) {
-		acl::sslbase_io* ssl = __ssl_conf->open(true, false);
+		acl::sslbase_io* ssl = __ssl_conf->create(false);
 
 		if (conn->setup_hook(ssl) == ssl) {
 			printf("setup_hook error\r\n");

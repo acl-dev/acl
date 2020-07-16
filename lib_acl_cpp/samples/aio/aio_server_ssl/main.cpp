@@ -291,7 +291,7 @@ public:
 		// SSL 模式下，等待客户端发送握手信息
 		if (__ssl_conf != NULL) {
 			// 注册 SSL IO 过程的钩子
-			acl::sslbase_io* ssl = __ssl_conf->open(true, true);
+			acl::sslbase_io* ssl = __ssl_conf->create(true);
 
 			if (client->setup_hook(ssl) == ssl) {
 				std::cout << "setup_hook error" << std::endl;

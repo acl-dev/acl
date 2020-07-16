@@ -68,7 +68,7 @@ static acl::sslbase_io* setup_ssl(acl::socket_stream& conn,
 	//logger("begin setup ssl hook...");
 
 	// 采用非阻塞 SSL 握手方式
-	acl::sslbase_io* ssl = conf.open(true);
+	acl::sslbase_io* ssl = conf.create(true);
 	if (conn.setup_hook(ssl) == ssl) {
 		logger_error("setup_hook error!");
 		ssl->destroy();

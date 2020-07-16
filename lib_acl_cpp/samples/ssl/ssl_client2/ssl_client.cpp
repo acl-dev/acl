@@ -16,7 +16,7 @@ static bool test(const char* addr, int k, int nloop)
 		exit (1);
 	}
 
-	acl::sslbase_io* ssl = __ssl_conf->open(false);
+	acl::sslbase_io* ssl = __ssl_conf->create(false);
 	if (client.setup_hook(ssl) == ssl) {
 		std::cout << "open ssl " << addr << " error!" << std::endl;
 		ssl->destroy();

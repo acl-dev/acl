@@ -234,7 +234,7 @@ public:
 
 		// ÉèÖÃ SSL ·½Ê½
 		if (__ssl_conf) {
-			acl::sslbase_io* ssl = __ssl_conf->open(true);
+			acl::sslbase_io* ssl = __ssl_conf->create(true);
 			if (client_->setup_hook(ssl) == ssl) {
 				std::cout << "open ssl error!" << std::endl;
 				ssl->destroy();
