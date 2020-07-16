@@ -287,7 +287,8 @@ acl_int64 acl_aio_request_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn,
 	const char *myname = "acl_aio_request_timer";
 
 	if (aio == NULL || aio->event == NULL || timer_fn == NULL) {
-		acl_msg_fatal("%s: input invalid", myname);
+		acl_msg_error("%s: input invalid", myname);
+		return -1;
 	}
 
 	return acl_event_request_timer(aio->event, timer_fn, context,
@@ -299,7 +300,8 @@ acl_int64 acl_aio_cancel_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME timer_fn, voi
 	const char *myname = "acl_aio_cancel_timer";
 
 	if (aio == NULL || aio->event == NULL || timer_fn == NULL) {
-		acl_msg_fatal("%s: input invalid", myname);
+		acl_msg_error("%s: input invalid", myname);
+		return -1;
 	}
 
 	return acl_event_cancel_timer(aio->event, timer_fn, context);
@@ -311,7 +313,8 @@ void acl_aio_keep_timer(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback,
 	const char *myname = "acl_aio_keep_timer";
 
 	if (aio == NULL || aio->event == NULL) {
-		acl_msg_fatal("%s: input invalid", myname);
+		acl_msg_error("%s: input invalid", myname);
+		return;
 	}
 	acl_event_keep_timer(aio->event, callback, context, onoff);
 }
@@ -321,7 +324,8 @@ int acl_aio_timer_ifkeep(ACL_AIO *aio, ACL_EVENT_NOTIFY_TIME callback, void *con
 	const char *myname = "acl_aio_timer_ifkeep";
 
 	if (aio == NULL || aio->event == NULL) {
-		acl_msg_fatal("%s: input invalid", myname);
+		acl_msg_error("%s: input invalid", myname);
+		return 0;
 	}
 	return acl_event_timer_ifkeep(aio->event, callback, context);
 }
