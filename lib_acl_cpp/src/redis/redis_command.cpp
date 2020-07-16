@@ -1066,6 +1066,13 @@ int redis_command::get_strings(std::vector<const char*>& names,
 const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	int& cursor, size_t& size, const char* pattern, const size_t* count)
 {
+	return scan_keys(cmd, key, strlen(key), cursor, size, pattern, count);
+}
+
+const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
+	size_t klen, int& cursor, size_t& size, const char* pattern,
+	const size_t* count)
+{
 	size = 0;
 	if (cursor < 0)
 		return NULL;
@@ -1078,9 +1085,9 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	lens[argc] = strlen(cmd);
 	argc++;
 
-	if (key && *key) {
+	if (key && *key && klen > 0) {
 		argv[argc] = key;
-		lens[argc] = strlen(key);
+		lens[argc] = klen;
 		argc++;
 	}
 
@@ -1249,6 +1256,12 @@ void redis_command::build_request2(size_t argc, const char* argv[], size_t lens[
 void redis_command::build(const char* cmd, const char* key,
 	const std::map<string, string>& attrs)
 {
+	build(cmd, key, key ? strlen(key) : 0, attrs);
+}
+
+void redis_command::build(const char* cmd, const char* key, size_t klen,
+	const std::map<string, string>& attrs)
+{
 	argc_ = 1 + attrs.size() * 2;
 	if (key != NULL)
 		argc_++;
@@ -1259,9 +1272,9 @@ void redis_command::build(const char* cmd, const char* key,
 	argv_lens_[i] = strlen(cmd);
 	i++;
 
-	if (key) {
+	if (key && klen > 0) {
 		argv_[i] = key;
-		argv_lens_[i] = strlen(key);
+		argv_lens_[i] = klen;
 		i++;
 	}
 
@@ -1317,6 +1330,12 @@ void redis_command::build(const char* cmd, const char* key,
 void redis_command::build(const char* cmd, const char* key,
 	const std::vector<string>& names, const std::vector<string>& values)
 {
+	build(cmd, key, key ? strlen(key) : 0, names, values);
+}
+
+void redis_command::build(const char* cmd, const char* key, size_t klen,
+	const std::vector<string>& names, const std::vector<string>& values)
+{
 	if (names.size() != values.size()) {
 		logger_fatal("names's size: %lu, values's size: %lu",
 			(unsigned long) names.size(),
@@ -1333,9 +1352,9 @@ void redis_command::build(const char* cmd, const char* key,
 	argv_lens_[i] = strlen(cmd);
 	i++;
 
-	if (key != NULL) {
+	if (key != NULL && klen > 0) {
 		argv_[i] = key;
-		argv_lens_[i] = strlen(key);
+		argv_lens_[i] = klen;
 		i++;
 	}
 
@@ -1466,6 +1485,14 @@ void redis_command::build(const char* cmd, const char* key,
 	const char* names[], const size_t names_len[],
 	const char* values[], const size_t values_len[], size_t argc)
 {
+	build(cmd, key, key ? strlen(key) : 0, names, names_len,
+		values, values_len, argc);
+}
+
+void redis_command::build(const char* cmd, const char* key, size_t klen,
+	const char* names[], const size_t names_len[],
+	const char* values[], const size_t values_len[], size_t argc)
+{
 	argc_ = 1 + argc * 2;
 	if (key != NULL)
 		argc_++;
@@ -1476,9 +1503,9 @@ void redis_command::build(const char* cmd, const char* key,
 	argv_lens_[i] = strlen(cmd);
 	i++;
 
-	if (key != NULL) {
+	if (key != NULL && klen > 0) {
 		argv_[i] = key;
-		argv_lens_[i] = strlen(key);
+		argv_lens_[i] = klen;
 		i++;
 	}
 
@@ -1500,6 +1527,12 @@ void redis_command::build(const char* cmd, const char* key,
 void redis_command::build(const char* cmd, const char* key,
 	const std::vector<string>& names)
 {
+	build(cmd, key, key ? strlen(key) : 0, names);
+}
+
+void redis_command::build(const char* cmd, const char* key, size_t klen,
+	const std::vector<string>& names)
+{
 	size_t argc = names.size();
 	argc_ = 1 + argc;
 	if (key != NULL)
@@ -1511,9 +1544,9 @@ void redis_command::build(const char* cmd, const char* key,
 	argv_lens_[i] = strlen(cmd);
 	i++;
 
-	if (key != NULL) {
+	if (key != NULL && klen > 0) {
 		argv_[i] = key;
-		argv_lens_[i] = strlen(key);
+		argv_lens_[i] = klen;
 		i++;
 	}
 
@@ -1615,7 +1648,14 @@ void redis_command::build(const char* cmd, const char* key,
 	build_request(argc_, argv_, argv_lens_);
 }
 
+
 void redis_command::build(const char* cmd, const char* key,
+	const char* names[], const size_t lens[], size_t argc)
+{
+	build(cmd, key, key ? strlen(key) : 0, names, lens, argc);
+}
+
+void redis_command::build(const char* cmd, const char* key, size_t klen,
 	const char* names[], const size_t lens[], size_t argc)
 {
 	argc_ = 1 + argc;
@@ -1628,9 +1668,9 @@ void redis_command::build(const char* cmd, const char* key,
 	argv_lens_[i] = strlen(cmd);
 	i++;
 
-	if (key != NULL) {
+	if (key != NULL && klen > 0) {
 		argv_[i] = key;
-		argv_lens_[i] = strlen(key);
+		argv_lens_[i] = klen;
 		i++;
 	}
 

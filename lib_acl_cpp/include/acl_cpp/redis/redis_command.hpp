@@ -331,15 +331,23 @@ protected:
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);
+	const redis_result** scan_keys(const char* cmd, const char* key,
+		size_t klen, int& cursor, size_t& size, const char* pattern,
+		const size_t* count);
 
 	/*******************************************************************/
 
 	void build(const char* cmd, const char* key,
 		const std::map<string, string>& attrs);
+	void build(const char* cmd, const char* key, size_t klen,
+		const std::map<string, string>& attrs);
 	void build(const char* cmd, const char* key,
 		const std::map<string, const char*>& attrs);
 
 	void build(const char* cmd, const char* key,
+		const std::vector<string>& names,
+		const std::vector<string>& values);
+	void build(const char* cmd, const char* key, size_t klen,
 		const std::vector<string>& names,
 		const std::vector<string>& values);
 	void build(const char* cmd, const char* key,
@@ -353,10 +361,15 @@ protected:
 	void build(const char* cmd, const char* key,
 		const char* names[], const size_t names_len[],
 		const char* values[], const size_t values_len[], size_t argc);
+	void build(const char* cmd, const char* key, size_t klen,
+		const char* names[], const size_t names_len[],
+		const char* values[], const size_t values_len[], size_t argc);
 
 	/*******************************************************************/
 
 	void build(const char* cmd, const char* key,
+		const std::vector<string>& names);
+	void build(const char* cmd, const char* key, size_t klen,
 		const std::vector<string>& names);
 	void build(const char* cmd, const char* key,
 		const std::vector<const char*>& names);
@@ -366,6 +379,8 @@ protected:
 	void build(const char* cmd, const char* key,
 		const char* names[], size_t argc);
 	void build(const char* cmd, const char* key,
+		const char* names[], const size_t lens[], size_t argc);
+	void build(const char* cmd, const char* key, size_t klen,
 		const char* names[], const size_t lens[], size_t argc);
 	void build(const char* cmd, const char* key,
 		const int names[], size_t argc);

@@ -42,6 +42,14 @@ bool redis_hash::hmset(const char* key, const std::map<string, string>& attrs)
 	return check_status();
 }
 
+bool redis_hash::hmset(const char* key,size_t klen,
+	const std::map<string, string>& attrs)
+{
+	hash_slot(key, klen);
+	build("HMSET", key, klen, attrs);
+	return check_status();
+}
+
 bool redis_hash::hmset(const char* key, const std::map<string, const char*>& attrs)
 {
 	hash_slot(key);
@@ -56,6 +64,16 @@ bool redis_hash::hmset(const char* key, const std::vector<string>& names,
 
 	hash_slot(key);
 	build("HMSET", key, names, values);
+	return check_status();
+}
+
+bool redis_hash::hmset(const char* key, size_t klen,
+	const std::vector<string>& names, const std::vector<string>& values)
+{
+	acl_assert(names.size() == values.size());
+
+	hash_slot(key, klen);
+	build("HMSET", key, klen, names, values);
 	return check_status();
 }
 
@@ -86,6 +104,15 @@ bool redis_hash::hmset(const char* key, const char* names[],
 	return check_status();
 }
 
+bool redis_hash::hmset(const char* key, size_t klen, const char* names[],
+	const size_t names_len[], const char* values[],
+	const size_t values_len[], size_t argc)
+{
+	hash_slot(key, klen);
+	build("HMSET", key, klen, names, names_len, values, values_len, argc);
+	return check_status();
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 bool redis_hash::hmget(const char* key, const std::vector<string>& names,
@@ -93,6 +120,15 @@ bool redis_hash::hmget(const char* key, const std::vector<string>& names,
 {
 	hash_slot(key);
 	build("HMGET", key, names);
+	return get_strings(result) >= 0 ? true : false;
+}
+
+bool redis_hash::hmget(const char* key, size_t klen,
+	const std::vector<string>& names,
+	std::vector<string>* result /* = NULL */)
+{
+	hash_slot(key, klen);
+	build("HMGET", key, klen, names);
 	return get_strings(result) >= 0 ? true : false;
 }
 
@@ -120,6 +156,14 @@ bool redis_hash::hmget(const char* key, const char* names[],
 	return get_strings(result) >= 0 ? true : false;
 }
 
+bool redis_hash::hmget(const char* key, size_t klen, const char* names[],
+	const size_t lens[], size_t argc, std::vector<string>* result /* = NULL */)
+{
+	hash_slot(key, klen);
+	build("HMGET", key, klen, names, lens, argc);
+	return get_strings(result) >= 0 ? true : false;
+}
+
 /////////////////////////////////////////////////////////////////////////////
 
 int redis_hash::hset(const char* key, const char* name, const char* value)
@@ -136,19 +180,25 @@ int redis_hash::hset(const char* key, const char* name,
 int redis_hash::hset(const char* key, const char* name, size_t name_len,
 	const char* value, size_t value_len)
 {
+	return hset(key, strlen(key), name, name_len, value, value_len);
+}
+
+int redis_hash::hset(const char* key, size_t klen, const char* name,
+	size_t name_len, const char* value, size_t value_len)
+{
 	const char* argv[4];
 	size_t lens[4];
 
 	argv[0] = "HSET";
 	lens[0] = sizeof("HSET") - 1;
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = klen;
 	argv[2] = name;
 	lens[2] = name_len;
 	argv[3] = value;
 	lens[3] = value_len;
 
-	hash_slot(key);
+	hash_slot(key, klen);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -167,19 +217,25 @@ int redis_hash::hsetnx(const char* key, const char* name,
 int redis_hash::hsetnx(const char* key, const char* name, size_t name_len,
 	const char* value, size_t value_len)
 {
+	return hsetnx(key, strlen(key), name, name_len, value, value_len);
+}
+
+int redis_hash::hsetnx(const char* key, size_t klen, const char* name,
+	size_t name_len, const char* value, size_t value_len)
+{
 	const char* argv[4];
 	size_t lens[4];
 
 	argv[0] = "HSETNX";
 	lens[0] = sizeof("HSETNX") - 1;
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = klen;
 	argv[2] = name;
 	lens[2] = name_len;
 	argv[3] = value;
 	lens[3] = value_len;
 
-	hash_slot(key);
+	hash_slot(key, klen);
 	build_request(4, argv, lens);
 	return get_number();
 }
@@ -192,28 +248,42 @@ bool redis_hash::hget(const char* key, const char* name, string& result)
 bool redis_hash::hget(const char* key, const char* name,
 	size_t name_len, string& result)
 {
+	return hget(key, strlen(key), name, name_len, result);
+}
+
+bool redis_hash::hget(const char* key, size_t klen, const char* name,
+	size_t name_len, string& result)
+{
 	const char* argv[3];
 	size_t lens[3];
 
 	argv[0] = "HGET";
 	lens[0] = sizeof("HGET") - 1;
 	argv[1] = key;
-	lens[1] = strlen(key);
+	lens[1] = klen;
 	argv[2] = name;
 	lens[2] = name_len;
 
-	hash_slot(key);
+	hash_slot(key, klen);
 	build_request(3, argv, lens);
 	return get_string(result) >= 0 ? true : false;
 }
 
 bool redis_hash::hgetall(const char* key, std::map<string, string>& result)
 {
+	return hgetall(key, strlen(key), result);
+}
+
+bool redis_hash::hgetall(const char* key, size_t klen,
+	std::map<string, string>& result)
+{
 	const char* keys[1];
 	keys[0] = key;
+	size_t klens[1];
+	klens[0] = klen;
 
-	hash_slot(key);
-	build("HGETALL", NULL, keys, 1);
+	hash_slot(key, klen);
+	build("HGETALL", NULL, keys, klens, 1);
 	return get_strings(result) < 0 ? false : true;
 }
 
@@ -271,26 +341,50 @@ int redis_hash::hdel_fields(const char* key, const char* names[], size_t argc)
 int redis_hash::hdel(const char* key, const char* names[],
 	const size_t names_len[], size_t argc)
 {
-	return hdel_fields(key, names, names_len, argc);
+	return hdel(key, strlen(key), names, names_len, argc);
+}
+
+int redis_hash::hdel(const char* key, size_t klen,
+	const char* names[], const size_t names_len[], size_t argc)
+{
+	return hdel_fields(key, klen, names, names_len, argc);
 }
 
 int redis_hash::hdel_fields(const char* key, const char* names[],
 	const size_t names_len[], size_t argc)
 {
-	hash_slot(key);
-	build("HDEL", key, names, names_len, argc);
+	return hdel_fields(key, strlen(key), names, names_len, argc);
+}
+
+int redis_hash::hdel_fields(const char* key, size_t klen,
+	const char* names[], const size_t names_len[], size_t argc)
+{
+	hash_slot(key, klen);
+	build("HDEL", key, klen, names, names_len, argc);
 	return get_number();;
 }
 
 int redis_hash::hdel(const char* key, const std::vector<string>& names)
 {
-	return hdel_fields(key, names);
+	return hdel(key, strlen(key), names);
+}
+
+int redis_hash::hdel(const char* key, size_t klen,
+	const std::vector<string>& names)
+{
+	return hdel_fields(key, klen, names);
 }
 
 int redis_hash::hdel_fields(const char* key, const std::vector<string>& names)
 {
-	hash_slot(key);
-	build("HDEL", key, names);
+	return hdel_fields(key, strlen(key), names);
+}
+
+int redis_hash::hdel_fields(const char* key, size_t klen,
+	const std::vector<string>& names)
+{
+	hash_slot(key, klen);
+	build("HDEL", key, klen, names);
 	return get_number();
 }
 
@@ -355,11 +449,19 @@ bool redis_hash::hincrbyfloat(const char* key, const char* name,
 
 bool redis_hash::hkeys(const char* key, std::vector<string>& names)
 {
+	return hkeys(key, strlen(key), names);
+}
+
+bool redis_hash::hkeys(const char* key, size_t klen, std::vector<string>& names)
+{
 	const char* keys[1];
 	keys[0] = key;
 
-	hash_slot(key);
-	build("HKEYS", NULL, keys, 1);
+	size_t lens[1];
+	lens[0] = klen;
+
+	hash_slot(key, klen);
+	build("HKEYS", NULL, keys, lens, 1);
 	return get_strings(names) < 0 ? false : true;
 }
 
@@ -370,23 +472,36 @@ bool redis_hash::hexists(const char* key, const char* name)
 
 bool redis_hash::hexists(const char* key, const char* name, size_t name_len)
 {
+	return hexists(key, strlen(key), name, name_len);
+}
+
+bool redis_hash::hexists(const char* key, size_t klen,
+	const char* name, size_t name_len)
+{
 	const char* names[1];
 	names[0] = name;
 	size_t names_len[1];
 	names_len[0] = name_len;
 
-	hash_slot(key);
-	build("HEXISTS", key, names, names_len, 1);
+	hash_slot(key, klen);
+	build("HEXISTS", key, klen, names, names_len, 1);
 	return get_number() > 0 ? true : false;
 }
 
 int redis_hash::hlen(const char* key)
 {
+	return hlen(key, strlen(key));
+}
+
+int redis_hash::hlen(const char* key, size_t klen)
+{
 	const char* keys[1];
 	keys[0] = key;
+	size_t klens[1];
+	klens[0] = klen;
 
-	hash_slot(key);
-	build("HLEN", NULL, keys, 1);
+	hash_slot(key, klen);
+	build("HLEN", NULL, keys, klens, 1);
 	return get_number();
 }
 
@@ -397,34 +512,57 @@ int redis_hash::hstrlen(const char* key, const char* name)
 
 int redis_hash::hstrlen(const char* key, const char* name, size_t name_len)
 {
+	return hstrlen(key, strlen(key), name, name_len);
+}
+
+int redis_hash::hstrlen(const char* key, size_t klen,
+	const char* name, size_t name_len)
+{
 	const char* names[1];
 	names[0] = name;
 	size_t names_len[1];
 	names_len[0] = name_len;
 
-	hash_slot(key);
-	build("HSTRLEN", key, names, names_len, 1);
+	hash_slot(key, klen);
+	build("HSTRLEN", key, klen, names, names_len, 1);
 	return get_number();
 }
 
 bool redis_hash::hvals(const char* key, std::vector<string>& values)
 {
+	return hvals(key, strlen(key), values);
+}
+
+bool redis_hash::hvals(const char* key, size_t klen,
+	std::vector<string>& values)
+{
 	const char* keys[1];
 	keys[0] = key;
 
+	size_t klens[1];
+	klens[0] = klen;
+
 	hash_slot(key);
-	build("HVALS", NULL, keys, 1);
+	build("HVALS", NULL, keys, klens, 1);
 	return get_strings(values) >= 0 ? true : false;
 }
 
-int redis_hash::hscan(const char* key, int cursor, std::map<string, string>& out,
-	  const char* pattern /* = NULL */, const size_t* count /* = NULL */)
+int redis_hash::hscan(const char* key, int cursor,
+	std::map<string, string>& out, const char* pattern /* = NULL */,
+	const size_t* count /* = NULL */)
 {
-	if (key == NULL || *key == 0 || cursor < 0)
+	return hscan(key, strlen(key), cursor, out, pattern, count);
+}
+
+int redis_hash::hscan(const char* key, size_t klen, int cursor,
+	std::map<string, string>& out, const char* pattern /* = NULL */,
+	const size_t* count /* = NULL */)
+{
+	if (key == NULL || *key == 0 || klen == 0 || cursor < 0)
 		return -1;
 
 	size_t size;
-	const redis_result** children = scan_keys("HSCAN", key, cursor,
+	const redis_result** children = scan_keys("HSCAN", key, klen, cursor,
 		size, pattern, count);
 	if (children == NULL)
 		return cursor;
