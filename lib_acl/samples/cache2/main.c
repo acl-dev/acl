@@ -106,6 +106,7 @@ static void test1(int n, int timeout)
 	}
 
 	printf("\nfree cache, size: %d\n", acl_cache2_size(cache));
+	printf("\r\n>>>>free all cache nodes(%d)\r\n", __LINE__); 
 	acl_cache2_free(cache);
 }
 
@@ -131,6 +132,7 @@ static void test2(int n, int timeout)
 
 	printf(">>>call acl_cache2_walk\n");
 	acl_cache2_walk(cache, walk_fn, NULL);
+	printf("\r\n>>>>free all cache nodes(%d)\r\n", __LINE__); 
 	acl_cache2_free(cache);
 }
 
@@ -200,8 +202,9 @@ static void test3(int n, int timeout)
 	}
 
 
-	printf("\r\n>>>>free all cache nodes\r\n"); 
+	printf("\r\n>>>>free all cache nodes(%d)\r\n", __LINE__); 
 	acl_cache2_free(cache);
+	printf("\r\n>>>>free all cache nodes(%d)\r\n", __LINE__); 
 }
 
 static void test4_upsert(ACL_CACHE2 *cache, int timeout)
@@ -275,7 +278,7 @@ static void test4(int n, int timeout)
 		}
 	}
 
-	printf("\r\n>>>>free all cache nodes\r\n"); 
+	printf("\r\n>>>>free all cache nodes(%d)\r\n", __LINE__); 
 	acl_cache2_free(cache);
 }
 
@@ -313,8 +316,10 @@ int main(int argc, char *argv[])
 		}
 	}
 
+#if 0
 	(void) acl_mem_slice_init(8, 10240, 100000,
 		ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF);
+#endif
 	if (strcasecmp(cmd, "test1") == 0)
 		test1(n, timeout);
 	else if (strcasecmp(cmd, "test2") == 0)
@@ -326,7 +331,10 @@ int main(int argc, char *argv[])
 	else
 		usage(argv[0]);
 
+#if 0
 	acl_mem_slice_destroy();
+#endif
+
 #ifdef ACL_MS_WINDOWS
 	printf("Enter any key to exit...\n");
 	getchar();
