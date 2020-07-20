@@ -7,10 +7,18 @@ static int __oper_count = 100;
 static struct timeval __begin;
 static struct timeval __finish;
 
+#define USE_PIPELINE
+
 static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 {
+#ifdef USE_PIPELINE
+	acl::redis_client_pipeline* pipeline = (acl::redis_client_pipeline*) ctx;
+	acl::redis cmd;
+	cmd.set_pipeline(pipeline);
+#else
 	acl::redis_client_cluster *cluster = (acl::redis_client_cluster *) ctx;
 	acl::redis cmd(cluster);
+#endif
 
 	acl::string key, val;
 
@@ -134,14 +142,26 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 
 	acl_fiber_msg_stdout_enable(1);
+
+#ifdef USE_PIPELINE
+	acl::redis_client_pipeline pipeline(addr.c_str(), conn_timeout,
+		rw_timeout);
+	pipeline.start();
+#else
 	acl::redis_client_cluster cluster;
 	cluster.set_password("default", passwd);
 	cluster.set(addr.c_str(), 0, conn_timeout, rw_timeout);
+#endif
 
 	gettimeofday(&__begin, NULL);
 
-	for (i = 0; i < __fibers_count; i++)
+	for (i = 0; i < __fibers_count; i++) {
+#ifdef USE_PIPELINE
+		acl_fiber_create(fiber_redis, &pipeline, 327680);
+#else
 		acl_fiber_create(fiber_redis, &cluster, 327680);
+#endif
+	}
 
 	acl_fiber_schedule();
 

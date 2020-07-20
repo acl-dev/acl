@@ -3,18 +3,28 @@
 #include "../stdlib/thread.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/tbox.hpp"
+#include "../stdlib/mbox.hpp"
 #include "redis_command.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl {
 
+//#define DEBUG_BOX
+#define USE_MBOX
+
+#ifdef USE_MBOX
+# define BOX	mbox
+#else
+# define BOX	tbox
+#endif
+
 class redis_client;
 
 class redis_pipeline_message {
 public:
 	redis_pipeline_message(redis_command* cmd, size_t nchild,
-		int* timeout, tbox<redis_pipeline_message>& box)
+		int* timeout, BOX<redis_pipeline_message>& box)
 	: cmd_(cmd)
 	, nchild_(nchild)
 	, timeout_(timeout)
@@ -27,7 +37,7 @@ public:
 	redis_command* cmd_;
 	size_t nchild_;
 	int* timeout_;
-	tbox<redis_pipeline_message>& box_;
+	BOX<redis_pipeline_message>& box_;
 
 	const redis_result* result_;
 };
@@ -44,7 +54,7 @@ protected:
 	void* run(void);
 
 private:
-	tbox<redis_pipeline_message> box_;
+	BOX<redis_pipeline_message> box_;
 	redis_client& conn_;
 };
 
@@ -71,7 +81,7 @@ private:
 
 	redis_reader* reader_;
 
-	tbox<redis_pipeline_message> box_;
+	BOX<redis_pipeline_message> box_;
 
 	void send(std::vector<redis_pipeline_message*>& msgs);
 };
