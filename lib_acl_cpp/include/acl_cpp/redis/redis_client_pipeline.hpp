@@ -11,7 +11,7 @@
 namespace acl {
 
 //#define DEBUG_BOX
-#define USE_MBOX
+//#define USE_MBOX
 
 #ifdef USE_MBOX
 # define BOX	mbox
@@ -24,7 +24,7 @@ class redis_client;
 class redis_pipeline_message {
 public:
 	redis_pipeline_message(redis_command* cmd, size_t nchild,
-		int* timeout, BOX<redis_pipeline_message>& box)
+		int* timeout, mbox<redis_pipeline_message>& box)
 	: cmd_(cmd)
 	, nchild_(nchild)
 	, timeout_(timeout)
@@ -37,7 +37,7 @@ public:
 	redis_command* cmd_;
 	size_t nchild_;
 	int* timeout_;
-	BOX<redis_pipeline_message>& box_;
+	mbox<redis_pipeline_message>& box_;
 
 	const redis_result* result_;
 };

@@ -43,11 +43,11 @@ void* redis_reader::run(void)
 
 		dbuf_pool* dbuf = msg->cmd_->get_dbuf();
 		msg->result_ = conn_.get_object(*conn, dbuf);
-#ifdef USE_MBOX
+//#ifdef USE_MBOX
 		msg->box_.push(msg);
-#else
-		msg->box_.push(msg, false);
-#endif
+//#else
+//		msg->box_.push(msg, false);
+//#endif
 	}
 
 	return NULL;
@@ -85,7 +85,7 @@ const redis_result* redis_client_pipeline::run(redis_command* cmd,
 	//printf(">>>>box get result, msg=%p\r\n", msg);
 	return msg->result_;
 #else
-	BOX<redis_pipeline_message> box(false);
+	mbox<redis_pipeline_message> box(false);
 	redis_pipeline_message msg(cmd, nchild, timeout, box);
 
 #ifdef USE_MBOX
