@@ -237,7 +237,6 @@ static void usage(const char* procname)
 		"-c max_threads[default: 10]\r\n"
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
-		"-p [preset all hash-slots of the cluster]\r\n"
 		"-P password [set the password of redis cluster]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
@@ -246,11 +245,10 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	int  max_threads = 10, nsleep = 500, nretry = 10;
+	int  max_threads = 10;
 	acl::string addrs("127.0.0.1:6379"), cmd, passwd;
-	bool preset = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:w:r:pP:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:P:")) > 0)
 	{
 		switch (ch)
 		{
@@ -275,15 +273,6 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
-		case 'w':
-			nsleep = atoi(optarg);
-			break;
-		case 'r':
-			nretry = atoi(optarg);
-			break;
-		case 'p':
-			preset = true;
-			break;
 		case 'P':
 			passwd = optarg;
 			break;;
@@ -295,7 +284,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_pipeline pipeline(addrs);
+	acl::redis_client_pipeline pipeline(addrs, conn_timeout, rw_timeout);
 	pipeline.start();
 
 	struct timeval begin;

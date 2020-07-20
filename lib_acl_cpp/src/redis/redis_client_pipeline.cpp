@@ -17,7 +17,7 @@ redis_reader::~redis_reader(void) {}
 
 void redis_reader::push(redis_pipeline_message* msg)
 {
-	box_.push(msg);
+	box_.push(msg, false);
 }
 
 void* redis_reader::run(void)
@@ -36,7 +36,7 @@ void* redis_reader::run(void)
 
 		dbuf_pool* dbuf = msg->cmd_->get_dbuf();
 		msg->result_ = conn_.get_object(*conn, dbuf);
-		msg->box_.push(msg);
+		msg->box_.push(msg, false);
 	}
 
 	return NULL;
@@ -77,9 +77,12 @@ const redis_result* redis_client_pipeline::run(redis_command* cmd,
 	tbox<redis_pipeline_message> box(false);
 	redis_pipeline_message msg(cmd, nchild, timeout, box);
 
-	box_.push(&msg);
+	box_.push(&msg, false);
 
 	redis_pipeline_message* m = box.pop();
+	if (m == NULL) {
+		exit(1);
+	}
 	//printf(">>>>box get result, msg=%p\r\n", m);
 	return m->result_;
 #endif
@@ -120,7 +123,7 @@ void* redis_client_pipeline::run(void)
 
 void redis_client_pipeline::send(std::vector<redis_pipeline_message*>& msgs)
 {
-	acl::string buf(8192);
+	acl::string buf(81920);
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs.begin();
 		it != msgs.end(); ++it) {
 		string* req = (*it)->cmd_->get_request_buf();
