@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/dbuf.hpp"
 #include "acl_cpp/stream/stream_hook.hpp"
 #include "acl_cpp/stream/stream.hpp"
 #endif
@@ -11,6 +12,8 @@ namespace acl {
 stream::stream(void)
 : hook_(NULL)
 , stream_(NULL)
+, buf_(NULL)
+, dbuf_(NULL)
 , default_ctx_(NULL)
 , ctx_table_(NULL)
 , eof_(true)
@@ -26,7 +29,25 @@ stream::~stream(void)
 	if (stream_) {
 		acl_vstream_free(stream_);
 	}
+	delete buf_;
+	delete dbuf_;
 	delete ctx_table_;
+}
+
+string& stream::get_buf(void)
+{
+	if (buf_ == NULL) {
+		buf_ = NEW string;
+	}
+	return *buf_;
+}
+
+dbuf_pool& stream::get_dbuf(void)
+{
+	if (dbuf_ == NULL) {
+		dbuf_ = new dbuf_pool;
+	}
+	return *dbuf_;
 }
 
 bool stream::eof(void) const

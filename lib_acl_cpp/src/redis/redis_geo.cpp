@@ -62,7 +62,6 @@ void geo_member::set_coordinate(double longitude, double latitude)
 /////////////////////////////////////////////////////////////////////////////
 
 redis_geo::redis_geo()
-: redis_command(NULL)
 {
 }
 
@@ -71,8 +70,13 @@ redis_geo::redis_geo(redis_client* conn)
 {
 }
 
-redis_geo::redis_geo(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_geo::redis_geo(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_geo::redis_geo(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

@@ -9,6 +9,7 @@ struct ACL_VSTREAM;
 namespace acl {
 
 class stream_hook;
+class dbuf_pool;
 
 class ACL_CPP_API stream : public noncopyable
 {
@@ -115,6 +116,20 @@ public:
 	 */
 	stream_hook* remove_hook(void);
 
+public:
+	/**
+	 * 因为 stream 的生命周期较长，使用者使用 stream 对象中的内部缓存区可以
+	 * 适当减少缓存区的频繁创建与释放
+	 * @return {string&}
+	 */
+	string& get_buf(void);
+
+	/**
+	 * 获得与 stream 生命周期相同的 dbuf 内存分配器
+	 * @return {dbuf_pool&}
+	 */
+	dbuf_pool& get_dbuf(void);
+
 protected:
 	/**
 	 * 打开流对象，如果流已经打开，则不会重复打开
@@ -129,6 +144,8 @@ protected:
 protected:
 	stream_hook* hook_;
 	ACL_VSTREAM *stream_;
+	string* buf_;
+	dbuf_pool* dbuf_;
 
 	void* default_ctx_;
 	std::map<string, void*>* ctx_table_;

@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
 	cluster.set(addr.c_str(), 100, conn_timeout, rw_timeout);
 
 	acl::redis redis;
-	redis.set_cluster(&cluster, 100);
+	redis.set_cluster(&cluster);
 
 	bool ret;
 

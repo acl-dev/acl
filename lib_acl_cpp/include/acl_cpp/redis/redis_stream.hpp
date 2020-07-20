@@ -147,7 +147,10 @@ class ACL_CPP_API redis_stream : virtual public redis_command
 public:
 	redis_stream(void);
 	redis_stream(redis_client* conn);
-	redis_stream(redis_client_cluster* cluster, size_t max_conns = 0);
+	redis_stream(redis_client_cluster* cluster);
+
+	ACL_CPP_DEPRECATED
+	redis_stream(redis_client_cluster* cluster, size_t max_conns);
 
 	virtual ~redis_stream(void);
 

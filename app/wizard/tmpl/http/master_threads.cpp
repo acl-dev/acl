@@ -77,7 +77,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 
 	acl::session* session;
 	if (var_cfg_use_redis_session) {
-		session = new acl::redis_session(*redis_, var_cfg_max_threads);
+		session = new acl::redis_session(*redis_);
 	} else {
 		session = new acl::memcache_session("127.0.0.1:11211");
 	}

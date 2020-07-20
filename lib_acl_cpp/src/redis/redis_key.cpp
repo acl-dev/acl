@@ -16,7 +16,6 @@ namespace acl
 #define LONG_LEN	21
 
 redis_key::redis_key()
-: redis_command(NULL)
 {
 }
 
@@ -25,8 +24,13 @@ redis_key::redis_key(redis_client* conn)
 {
 }
 
-redis_key::redis_key(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_key::redis_key(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_key::redis_key(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

@@ -178,6 +178,9 @@ public:
 	 */
 	const char* get_password(const char* addr) const;
 
+	redis_client* redirect(const char* addr, size_t max_conns);
+	redis_client* peek_conn(int slot);
+
 protected:
 	/**
 	 * 基类纯虚函数，用来创建连接池对象，该函数返回后由基类设置网络连接及IO 超时时间
@@ -201,6 +204,20 @@ private:
 	int redirect_sleep_;
 	std::map<string, string> passwds_;
 	sslbase_conf* ssl_conf_;
+
+	const char* get_addr(dbuf_pool* dbuf, const char* info);
+
+	redis_client* reopen(redis_command& cmd, redis_client* conn);
+	redis_client* move(redis_command& cd, redis_client* conn, 
+			const char* ptr, int nretried);
+	redis_client* ask(redis_command& cd, redis_client* conn, 
+			const char* ptr, int nretried);
+	redis_client* cluster_down(redis_command& cd, redis_client* conn, 
+			const char* ptr, int nretried);
+
+public:
+	const redis_result* run(redis_command& cmd, size_t nchild,
+			int* timeout = NULL);
 };
 
 } // namespace acl

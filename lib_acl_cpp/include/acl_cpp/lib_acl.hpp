@@ -185,6 +185,7 @@
 #include "redis/redis_client.hpp"
 #include "redis/redis_client_pool.hpp"
 #include "redis/redis_client_cluster.hpp"
+#include "redis/redis_client_pipeline.hpp"
 #include "redis/redis_result.hpp"
 #include "redis/redis_key.hpp"
 #include "redis/redis_hash.hpp"

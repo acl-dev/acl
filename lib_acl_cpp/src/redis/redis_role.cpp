@@ -14,7 +14,6 @@ namespace acl
 {
 
 redis_role::redis_role(void)
-: redis_command(NULL)
 {
 }
 

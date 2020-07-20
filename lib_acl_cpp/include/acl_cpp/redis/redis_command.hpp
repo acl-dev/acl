@@ -11,9 +11,10 @@
 namespace acl
 {
 
+class redis_request;
 class redis_client;
 class redis_client_cluster;
-class redis_request;
+class redis_client_pipeline;
 
 /**
  * redis 客户端命令类的纯虚父类;
@@ -24,15 +25,15 @@ class ACL_CPP_API redis_command : public noncopyable
 {
 public:
 	/**
-	 * 缺省的构造函数，如果使用此构造函数初始化类对象，则必须调用 set_client 或
-	 * set_cluster 设置 redis 客户端命令类对象的通讯方式。
+	 * 缺省的构造函数，如果使用此构造函数初始化类对象，则必须调用
+	 * set_client 或 set_cluster 设置 redis 客户端命令类对象的通讯方式。
 	 * default constructor. You must set the communication method by
 	 * set_client or set_cluster functions.
 	 */
 	redis_command(void);
 
 	/**
-	 * 当使用非集群模式时的构造函数，可以使用此构造函数设置 redis 通信类对象。
+	 * 当使用非集群模式时，可以使用此构造函数设置 redis 通信对象。
 	 * Using this constructor to set the redis communication mode,
 	 * usually in no-cluster mode.
 	 * @param conn {redis_client*} redis 通信类对象
@@ -41,18 +42,22 @@ public:
 	redis_command(redis_client* conn);
 
 	/**
-	 * 集群模式的构造函数，在构造类对象时指定了集群模式的 redis_client_cluster 对象。
+	 * 集群模式的构造函数，在构造类对象时指定了集群模式的
+	 * redis_client_cluster 对象。
 	 * Using this constructor to set the redis_client_cluster, usually in
 	 * cluster mode.
 	 * @param cluster {redis_client_cluster*} redis 集群连接对象
 	 *  redis cluster object in cluster mode
-	 * @param max_conns {size_t} 与集群中所有结点之间的每个连接池的最大连接数，
-	 *  如果该值为 0，则在集群方式下连接池不设连接数上限
 	 *  the max of every connection pool with all the redis nodes,
 	 *  if be set 0, then there is no connections limit in
 	 *  connections pool.
 	 */
+	redis_command(redis_client_cluster* cluster);
+
+	ACL_CPP_DEPRECATED
 	redis_command(redis_client_cluster* cluster, size_t max_conns);
+
+	redis_command(redis_client_pipeline* pipeline);
 
 	virtual ~redis_command(void);
 
@@ -70,8 +75,8 @@ public:
 	 * when reusing a redis command sub-class, the reset method should be
 	 * called first to rlease some resources in last command operation
 	 * @param save_slot {bool} 当采用集群模式时，该参数决定是否需要重新
-	 *  计算哈希槽值，如果反复调用 redis 命令过程中的 key 值不变，则可以保留此
-	 *  哈希槽值以减少内部重新进行计算的次数;
+	 *  计算哈希槽值，如果反复调用 redis 命令过程中的 key 值不变，则可以保
+	 *  留此哈希槽值以减少内部重新进行计算的次数;
 	 *  when in cluster mode, if your operations is on the same key, you
 	 *  can set the param save_slot to false which can reduse the times
 	 *  of compute the same key's hash-slot.
@@ -120,11 +125,12 @@ public:
 	 * @param cluster {redis_client_cluster*} redis 集群连接对象;
 	 *  the redis_cluster connection object which can connect to any
 	 *  redis-server and support connection pool
-	 * @param max_conns {size_t} 当内部动态创建连接池对象时，该值指定每个动态创建
-	 *  的连接池的最大连接数量;
 	 *  when dynamicly creating connection pool to any redis-server, use
 	 *  this param to limit the max number for each connection pool
 	 */
+	void set_cluster(redis_client_cluster* cluster);
+
+	ACL_CPP_DEPRECATED
 	void set_cluster(redis_client_cluster* cluster, size_t max_conns);
 
 	/**
@@ -139,7 +145,7 @@ public:
 
 	/**
 	 * 获得内存池句柄，该内存池由 redis_command 内部产生;
-	 * get memory pool handle be set
+	 * get memory pool handle been set
 	 * @return {dbuf_pool*}
 	 */
 	dbuf_pool* get_dbuf() const
@@ -272,8 +278,8 @@ public:
 
 	/////////////////////////////////////////////////////////////////////
 	/**
-	 * 设置是否对请求数据进行分片处理，如果为 true 则内部在组装请求协议的时候不会
-	 * 将所有数据块重新组装成一个连续的大数据块
+	 * 设置是否对请求数据进行分片处理，如果为 true 则内部在组装请求协议的
+	 * 时候不会将所有数据块重新组装成一个连续的大数据块
 	 * just for request package, setting flag for sending data with
 	 * multi data chunks; this is useful when the request data is large
 	 * @param on {bool} 内部默认值为 false
@@ -283,8 +289,8 @@ public:
 	void set_slice_request(bool on);
 
 	/**
-	 * 设置是否对响应数据进行分片处理，如果为 true 则当服务器的返回数据比较大时则
-	 * 将数据进行分片，分成一些不连续的数据块
+	 * 设置是否对响应数据进行分片处理，如果为 true 则当服务器的返回数据
+	 * 比较大时则将数据进行分片，分成一些不连续的数据块
 	 * just for response package, settint flag for receiving data
 	 * if split the large response data into multi little chunks
 	 * @param on {bool} 内部默认值为 false
@@ -323,8 +329,6 @@ public:
 
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
-	const redis_result* run(redis_client_cluster* cluster,
-		size_t nchild, int* timeout = NULL);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
 	void clear_request();
@@ -418,21 +422,45 @@ protected:
 	void hash_slot(const char* key);
 	void hash_slot(const char* key, size_t len);
 
+private:
+	void init(void);
+
+public:
+	int get_slot(void) const {
+		return slot_;
+	}
+
+	bool is_check_addr(void) const {
+		return check_addr_;
+	}
+
 protected:
 	bool check_addr_;
 	char addr_[32];
 	redis_client* conn_;
 	redis_client_cluster* cluster_;
-	size_t max_conns_;
+	redis_client_pipeline* pipeline_;
 	int  slot_;
 	int  redirect_max_;
 	int  redirect_sleep_;
 
-	redis_client* peek_conn(redis_client_cluster* cluster, int slot);
-	redis_client* redirect(redis_client_cluster* cluster, const char* addr);
+public:
 	const char* get_addr(const char* info);
 	void set_client_addr(const char* addr);
 	void set_client_addr(redis_client& conn);
+
+public:
+	redis_request* get_request_obj(void) const {
+		return request_obj_;
+	}
+
+	string* get_request_buf(void) const {
+		return request_buf_;
+	}
+
+	bool is_slice_req(void) const {
+		return slice_req_;
+	}
 
 protected:
 	/************************** request ********************************/

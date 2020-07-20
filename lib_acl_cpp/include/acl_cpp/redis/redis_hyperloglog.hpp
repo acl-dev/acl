@@ -26,9 +26,12 @@ public:
 	redis_hyperloglog(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_client_cluster*, size_t)
+	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
-	redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns = 0);
+	redis_hyperloglog(redis_client_cluster* cluster);
+
+	ACL_CPP_DEPRECATED
+	redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns);
 
 	virtual ~redis_hyperloglog(void);
 

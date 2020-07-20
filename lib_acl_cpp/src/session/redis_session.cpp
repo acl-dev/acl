@@ -10,13 +10,13 @@
 namespace acl
 {
 
-redis_session::redis_session(redis_client_cluster& cluster, size_t max_conns,
+redis_session::redis_session(redis_client_cluster& cluster,
 	time_t ttl /* = 0 */, const char* sid /* = NULL */)
 : session(ttl, sid)
 , cluster_(cluster)
 {
 	command_ = NEW redis;
-	command_->set_cluster(&cluster_, max_conns == 0 ? 128 : max_conns);
+	command_->set_cluster(&cluster_);
 }
 
 redis_session::~redis_session(void)

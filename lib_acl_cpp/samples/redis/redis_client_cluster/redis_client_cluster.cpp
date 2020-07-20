@@ -138,10 +138,9 @@ class test_thread : public acl::thread
 {
 public:
 	test_thread(acl::locker& locker, acl::redis_client_cluster& cluster,
-		int max_conns, const char* cmd, int n)
+		const char* cmd, int n)
 	: locker_(locker)
 	, cluster_(cluster)
-	, max_conns_(max_conns)
 	, cmd_(cmd)
 	, n_(n)
 	{}
@@ -154,8 +153,8 @@ protected:
 		bool ret;
 		acl::redis_key cmd_key;
 		acl::redis_string cmd_string;
-		cmd_key.set_cluster(&cluster_, max_conns_);
-		cmd_string.set_cluster(&cluster_, max_conns_);
+		cmd_key.set_cluster(&cluster_);
+		cmd_string.set_cluster(&cluster_);
 
 		for (int i = 0; i < n_; i++)
 		{
@@ -219,7 +218,6 @@ protected:
 private:
 	acl::locker& locker_;
 	acl::redis_client_cluster& cluster_;
-	int max_conns_;
 	acl::string cmd_;
 	int n_;
 };
@@ -328,7 +326,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < max_threads; i++)
 	{
 		test_thread* thread = new test_thread(locker, cluster,
-			max_threads, cmd.c_str(), n);
+			cmd.c_str(), n);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();

@@ -713,7 +713,7 @@ int main(int argc, char* argv[])
 	acl::redis_string redis;
 
 	if (cluster_mode)
-		redis.set_cluster(&cluster, 100);
+		redis.set_cluster(&cluster);
 	else
 		redis.set_client(&client);
 

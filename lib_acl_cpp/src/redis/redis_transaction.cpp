@@ -12,7 +12,6 @@ namespace acl
 {
 
 redis_transaction::redis_transaction()
-: redis_command(NULL)
 {
 }
 
@@ -21,8 +20,13 @@ redis_transaction::redis_transaction(redis_client* conn)
 {
 }
 
-redis_transaction::redis_transaction(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_transaction::redis_transaction(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_transaction::redis_transaction(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

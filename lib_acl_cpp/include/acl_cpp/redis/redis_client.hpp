@@ -2,7 +2,6 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include "../stream/socket_stream.hpp"
-#include "../stdlib/string.hpp"
 #include "../connpool/connect_client.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
@@ -10,9 +9,11 @@
 namespace acl
 {
 
+class string;
 class dbuf_pool;
 class redis_result;
 class redis_request;
+class redis_command;
 class sslbase_conf;
 
 /**
@@ -38,7 +39,7 @@ public:
 	 */
 	redis_client(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 30, bool retry = true);
-	~redis_client(void);
+	virtual ~redis_client(void);
 
 	/**
 	 * 设置 SSL 通信方式下的配置句柄，内部缺省值为 NULL，如果设置了 SSL 连
@@ -164,32 +165,37 @@ public:
 	const redis_result* run(dbuf_pool* pool, const redis_request& req,
 		size_t nchildren, int* rw_timeout = NULL);
 
+	const redis_result* run(redis_command* cmd, size_t nchildren,
+		int* rw_timeout = NULL);
+
 protected:
 	// 基类虚函数
 	// @override
 	bool open(void);
 
-private:
+protected:
 	socket_stream conn_;
 	bool   check_addr_;
 	char*  addr_;
 	char*  pass_;
 	bool   retry_;
 	bool   authing_;
-	string buf_;
 	bool   slice_req_;
 	bool   slice_res_;
 	int    dbnum_;
 	sslbase_conf* ssl_conf_;
 
-	redis_result* get_redis_objects(dbuf_pool* pool, size_t nobjs);
-	redis_result* get_redis_object(dbuf_pool* pool);
-	redis_result* get_redis_error(dbuf_pool* pool);
-	redis_result* get_redis_status(dbuf_pool* pool);
-	redis_result* get_redis_integer(dbuf_pool* pool);
-	redis_result* get_redis_string(dbuf_pool* pool);
-	redis_result* get_redis_array(dbuf_pool* pool);
+public:
+	redis_result* get_objects(socket_stream& conn,
+	 	dbuf_pool* pool, size_t nobjs);
+	redis_result* get_object(socket_stream& conn, dbuf_pool* pool);
+	redis_result* get_error(socket_stream& conn, dbuf_pool* pool);
+	redis_result* get_status(socket_stream& conn, dbuf_pool* pool);
+	redis_result* get_integer(socket_stream& conn, dbuf_pool* pool);
+	redis_result* get_string(socket_stream& conn, dbuf_pool* pool);
+	redis_result* get_array(socket_stream& conn, dbuf_pool* pool);
 
+private:
 	void put_data(dbuf_pool* pool, redis_result* rr,
 		const char* data, size_t len);
 	bool check_connection(socket_stream& conn);

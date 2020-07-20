@@ -14,7 +14,6 @@ namespace acl
 #define INT_LEN		11
 
 redis_server::redis_server()
-: redis_command(NULL)
 {
 }
 
@@ -23,8 +22,13 @@ redis_server::redis_server(redis_client* conn)
 {
 }
 
-redis_server::redis_server(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_server::redis_server(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_server::redis_server(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

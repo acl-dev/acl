@@ -818,6 +818,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\redis\redis_client_cluster.cpp">
 				</File>
 				<File
+					RelativePath=".\src\redis\redis_client_pipeline.cpp">
+				</File>
+				<File
 					RelativePath=".\src\redis\redis_client_pool.cpp">
 				</File>
 				<File
@@ -1499,6 +1502,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_client_cluster.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\redis\redis_client_pipeline.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\redis\redis_client_pool.hpp">

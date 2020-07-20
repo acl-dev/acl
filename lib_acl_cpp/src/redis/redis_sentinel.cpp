@@ -15,7 +15,6 @@ namespace acl
 {
 
 redis_sentinel::redis_sentinel(void)
-: redis_command(NULL)
 {
 }
 

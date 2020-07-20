@@ -526,6 +526,9 @@
     <ClCompile Include="src\redis\redis_client_cluster.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
+    <ClCompile Include="src\redis\redis_client_pipeline.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
     <ClCompile Include="src\redis\redis_client_pool.cpp">
       <Filter>Source Files\redis</Filter>
     </ClCompile>
@@ -1168,6 +1171,9 @@
       <Filter>Header Files\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_client_cluster.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client_pipeline.hpp">
       <Filter>Header Files\redis</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\redis\redis_client_pool.hpp">

@@ -177,15 +177,29 @@ void connect_manager::set(const char* addr, size_t count,
 	buf.lower();
 
 	lock_guard guard(lock_);
-	std::map<string, conn_config>::const_iterator cit = addrs_.find(buf);
-	if (cit == addrs_.end()) {
+	std::map<string, conn_config>::iterator it = addrs_.find(buf);
+	if (it == addrs_.end()) {
 		conn_config config;
 		config.addr         = addr;
 		config.count        = count;
 		config.conn_timeout = conn_timeout;
 		config.rw_timeout   = rw_timeout;
 		addrs_[buf]         = config;
+	} else {
+		it->second.count          = count;
+		it->second.conn_timeout   = conn_timeout;
+		it->second.rw_timeout     = rw_timeout;
 	}
+}
+
+const conn_config* connect_manager::get_config(const char* addr)
+{
+	string buf(addr);
+	buf.lower();
+
+	lock_guard guard(lock_);
+	std::map<string, conn_config>::const_iterator cit = addrs_.find(buf);
+	return cit != addrs_.end() ? &cit->second : NULL;
 }
 
 #define DEFAULT_ID	0

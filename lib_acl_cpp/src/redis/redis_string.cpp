@@ -18,7 +18,6 @@ namespace acl
 #define FLOAT_LEN	32
 
 redis_string::redis_string()
-: redis_command(NULL)
 {
 }
 
@@ -27,8 +26,13 @@ redis_string::redis_string(redis_client* conn)
 {
 }
 
-redis_string::redis_string(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_string::redis_string(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_string::redis_string(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

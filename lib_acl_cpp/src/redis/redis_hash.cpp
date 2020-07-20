@@ -15,7 +15,6 @@ namespace acl
 #define FLOAT_LEN	32
 
 redis_hash::redis_hash(void)
-: redis_command(NULL)
 {
 }
 
@@ -24,8 +23,13 @@ redis_hash::redis_hash(redis_client* conn)
 {
 }
 
-redis_hash::redis_hash(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_hash::redis_hash(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_hash::redis_hash(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

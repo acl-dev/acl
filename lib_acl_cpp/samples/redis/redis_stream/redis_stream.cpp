@@ -600,7 +600,7 @@ int main(int argc, char* argv[])
 	if (single_mode) {
 		redis.set_client(&client);
 	} else {
-		redis.set_cluster(&cluster, 0);
+		redis.set_cluster(&cluster);
 	}
 
 	cmd.lower();

@@ -10,7 +10,6 @@ namespace acl
 {
 
 redis_hyperloglog::redis_hyperloglog()
-: redis_command(NULL)
 {
 }
 
@@ -19,8 +18,13 @@ redis_hyperloglog::redis_hyperloglog(redis_client* conn)
 {
 }
 
-redis_hyperloglog::redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_hyperloglog::redis_hyperloglog(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_hyperloglog::redis_hyperloglog(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

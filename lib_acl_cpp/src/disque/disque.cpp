@@ -17,8 +17,7 @@ namespace acl
 #define INT_LEN		11
 
 disque::disque(void)
-: redis_command(NULL)
-, job_(NULL)
+: job_(NULL)
 , version_(0)
 {
 }
@@ -30,8 +29,15 @@ disque::disque(redis_client* conn)
 {
 }
 
-disque::disque(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+disque::disque(redis_client_cluster* cluster)
+: redis_command(cluster)
+, job_(NULL)
+, version_(0)
+{
+}
+
+disque::disque(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 , job_(NULL)
 , version_(0)
 {

@@ -26,9 +26,12 @@ public:
 	redis_script(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_client_cluster*, size_t)
+	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
-	redis_script(redis_client_cluster* cluster, size_t max_conns = 0);
+	redis_script(redis_client_cluster* cluster);
+
+	ACL_CPP_DEPRECATED
+	redis_script(redis_client_cluster* cluster, size_t max_conns);
 
 	virtual ~redis_script(void);
 

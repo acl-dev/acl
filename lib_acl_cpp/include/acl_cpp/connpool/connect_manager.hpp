@@ -26,6 +26,19 @@ struct conns_pools {
 	}
 };
 
+struct conn_config {
+	string addr;
+	size_t count;
+	int    conn_timeout;
+	int    rw_timeout;
+
+	conn_config(void) {
+		count        = 0;
+		conn_timeout = 5;
+		rw_timeout   = 5;
+	}
+};
+
 /**
  * connect pool 服务管理器，有获取连接池等功能
  */
@@ -70,6 +83,8 @@ public:
 	 */
 	void set(const char* addr, size_t count,
 		int conn_timeout = 30, int rw_timeout = 30);
+
+	const conn_config* get_config(const char* addr);
 
 	/**
 	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被
@@ -226,13 +241,7 @@ protected:
 	string default_addr_;			// 缺省的服务地址
 	connect_pool* default_pool_;		// 缺省的服务连接池
 
-	struct conn_config {
-		string addr;
-		size_t count;
-		int    conn_timeout;
-		int    rw_timeout;
-	};
-	std::map<string, conn_config> addrs_;// 所有的服务端地址
+	std::map<string, conn_config> addrs_;	// 所有的服务端地址
 	manager_t  manager_;
 
 	locker lock_;				// 访问 pools_ 时的互斥锁

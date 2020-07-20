@@ -15,7 +15,7 @@ class redis_client_cluster;
 class ACL_CPP_API redis_session : public session
 {
 public:
-	redis_session(redis_client_cluster& cluster, size_t max_conns,
+	redis_session(redis_client_cluster& cluster,
 		time_t ttl = 0, const char* sid = NULL);
 	~redis_session();
 

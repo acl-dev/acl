@@ -282,7 +282,7 @@ int main(int argc, char* argv[])
 	//////////////////////////////////////////////////////////////////////
 
 	if (cluster_mode) {
-		cmd.set_cluster(&cluster, 0);
+		cmd.set_cluster(&cluster);
 	} else  {
 		cmd.set_client(&client);
 	}

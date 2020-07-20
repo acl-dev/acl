@@ -34,8 +34,11 @@ public:
 	disque(redis_client* conn);
 
 	/**
-	 * see redis_command::redis_command(redis_client_cluster*£¬ size_t)
+	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
+	disque(redis_client_cluster* cluster);
+
+	ACL_CPP_DEPRECATED
 	disque(redis_client_cluster* cluster, size_t max_conns);
 
 	virtual ~disque();

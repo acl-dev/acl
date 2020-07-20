@@ -15,7 +15,6 @@ namespace acl
 {
 
 redis_stream::redis_stream(void)
-: redis_command(NULL)
 {
 }
 
@@ -24,8 +23,13 @@ redis_stream::redis_stream(redis_client* conn)
 {
 }
 
-redis_stream::redis_stream(redis_client_cluster* cluster, size_t max_conns)
-: redis_command(cluster, max_conns)
+redis_stream::redis_stream(redis_client_cluster* cluster)
+: redis_command(cluster)
+{
+}
+
+redis_stream::redis_stream(redis_client_cluster* cluster, size_t)
+: redis_command(cluster)
 {
 }
 

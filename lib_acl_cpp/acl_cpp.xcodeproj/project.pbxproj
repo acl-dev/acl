@@ -207,6 +207,12 @@
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
 		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
 		07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */; };
+		7017904424C542140016B873 /* redis_role.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017903E24C542140016B873 /* redis_role.cpp */; };
+		7017904524C542140016B873 /* redis_master.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017903F24C542140016B873 /* redis_master.cpp */; };
+		7017904624C542140016B873 /* redis_sentinel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017904024C542140016B873 /* redis_sentinel.cpp */; };
+		7017904724C542140016B873 /* redis_slave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017904124C542140016B873 /* redis_slave.cpp */; };
+		7017904824C542140016B873 /* redis_client_pipeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017904224C542140016B873 /* redis_client_pipeline.cpp */; };
+		7017904924C542140016B873 /* redis_string.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017904324C542140016B873 /* redis_string.cpp */; };
 		7029CC2F23A9D075001B3EDB /* sslbase_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */; };
 		702B9D9023A8E31200079240 /* mbedtls_conf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */; };
 		702B9D9123A8E31200079240 /* mbedtls_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 702B9D8F23A8E31200079240 /* mbedtls_io.cpp */; };
@@ -665,6 +671,14 @@
 		07BEA6C3214F79E20060BBE4 /* WebSocketServlet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WebSocketServlet.hpp; sourceTree = "<group>"; };
 		07BED4D922AFC5710060BBE4 /* http_aclient.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_aclient.hpp; sourceTree = "<group>"; };
 		07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_aclient.cpp; sourceTree = "<group>"; };
+		7017903E24C542140016B873 /* redis_role.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_role.cpp; sourceTree = "<group>"; };
+		7017903F24C542140016B873 /* redis_master.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_master.cpp; sourceTree = "<group>"; };
+		7017904024C542140016B873 /* redis_sentinel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_sentinel.cpp; sourceTree = "<group>"; };
+		7017904124C542140016B873 /* redis_slave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_slave.cpp; sourceTree = "<group>"; };
+		7017904224C542140016B873 /* redis_client_pipeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_client_pipeline.cpp; sourceTree = "<group>"; };
+		7017904324C542140016B873 /* redis_string.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_string.cpp; sourceTree = "<group>"; };
+		7017904A24C542380016B873 /* redis_client_pipeline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_client_pipeline.hpp; sourceTree = "<group>"; };
+		7017904B24C542380016B873 /* redis_string.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = redis_string.hpp; sourceTree = "<group>"; };
 		7029CC2C23A9D05D001B3EDB /* sslbase_conf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sslbase_conf.hpp; sourceTree = "<group>"; };
 		7029CC2D23A9D05D001B3EDB /* sslbase_io.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = sslbase_io.hpp; sourceTree = "<group>"; };
 		7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sslbase_io.cpp; sourceTree = "<group>"; };
@@ -989,6 +1003,12 @@
 		07A467681E6FCCF1002C9B3C /* redis */ = {
 			isa = PBXGroup;
 			children = (
+				7017904224C542140016B873 /* redis_client_pipeline.cpp */,
+				7017903F24C542140016B873 /* redis_master.cpp */,
+				7017903E24C542140016B873 /* redis_role.cpp */,
+				7017904024C542140016B873 /* redis_sentinel.cpp */,
+				7017904124C542140016B873 /* redis_slave.cpp */,
+				7017904324C542140016B873 /* redis_string.cpp */,
 				07A467691E6FCCF1002C9B3C /* redis.cpp */,
 				07A4676A1E6FCCF1002C9B3C /* redis_client.cpp */,
 				07A4676B1E6FCCF1002C9B3C /* redis_client_cluster.cpp */,
@@ -1397,6 +1417,8 @@
 		07A468F61E6FD404002C9B3C /* redis */ = {
 			isa = PBXGroup;
 			children = (
+				7017904A24C542380016B873 /* redis_client_pipeline.hpp */,
+				7017904B24C542380016B873 /* redis_string.hpp */,
 				07BEA6BD214F793F0060BBE4 /* redis_master.hpp */,
 				07BEA6BE214F793F0060BBE4 /* redis_role.hpp */,
 				07BEA6BF214F793F0060BBE4 /* redis_sentinel.hpp */,
@@ -1606,6 +1628,7 @@
 				07A468541E6FCCF1002C9B3C /* sha1.cpp in Sources */,
 				070F351420901EE100672EDC /* diff_manager.cpp in Sources */,
 				07A468011E6FCCF1002C9B3C /* ipc_service.cpp in Sources */,
+				7017904724C542140016B873 /* redis_slave.cpp in Sources */,
 				07A468631E6FCCF1002C9B3C /* aio_istream.cpp in Sources */,
 				07A467E71E6FCCF1002C9B3C /* hsclient.cpp in Sources */,
 				07A467EE1E6FCCF1002C9B3C /* http_ctype.cpp in Sources */,
@@ -1635,6 +1658,7 @@
 				07A467C11E6FCCF1002C9B3C /* acl_cpp_test.cpp in Sources */,
 				07A4684D1E6FCCF1002C9B3C /* json.cpp in Sources */,
 				07A468201E6FCCF1002C9B3C /* mime_image.cpp in Sources */,
+				7017904824C542140016B873 /* redis_client_pipeline.cpp in Sources */,
 				07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */,
 				07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */,
 				07A467DA1E6FCCF1002C9B3C /* db_service_mysql.cpp in Sources */,
@@ -1683,6 +1707,7 @@
 				07A467DC1E6FCCF1002C9B3C /* db_sqlite.cpp in Sources */,
 				07A467CC1E6FCCF1002C9B3C /* ResponseHeaderOverrides.cpp in Sources */,
 				07A468321E6FCCF1002C9B3C /* redis_hyperloglog.cpp in Sources */,
+				7017904624C542140016B873 /* redis_sentinel.cpp in Sources */,
 				07A468161E6FCCF1002C9B3C /* tok822_node.cpp in Sources */,
 				07A468531E6FCCF1002C9B3C /* scan_dir.cpp in Sources */,
 				07A467E01E6FCCF1002C9B3C /* query.cpp in Sources */,
@@ -1699,6 +1724,7 @@
 				0778DADE1F1CB2AB0011B753 /* tcp_sender.cpp in Sources */,
 				07A467DE1E6FCCF1002C9B3C /* mysql_manager.cpp in Sources */,
 				07384F411EB99FFF00084CAD /* pgsql_pool.cpp in Sources */,
+				7017904924C542140016B873 /* redis_string.cpp in Sources */,
 				07A4682C1E6FCCF1002C9B3C /* redis_client_pool.cpp in Sources */,
 				07A468731E6FCCF1002C9B3C /* stdin_stream.cpp in Sources */,
 				07A468681E6FCCF1002C9B3C /* aio_timer_callback.cpp in Sources */,
@@ -1721,6 +1747,7 @@
 				07A4684E1E6FCCF1002C9B3C /* locker.cpp in Sources */,
 				07A467F91E6FCCF1002C9B3C /* HttpCookie.cpp in Sources */,
 				07384F401EB99FFF00084CAD /* pgsql_manager.cpp in Sources */,
+				7017904424C542140016B873 /* redis_role.cpp in Sources */,
 				07A467D51E6FCCF1002C9B3C /* connect_pool.cpp in Sources */,
 				07A468511E6FCCF1002C9B3C /* md5.cpp in Sources */,
 				07A467CF1E6FCCF1002C9B3C /* beanstalk_pool.cpp in Sources */,
@@ -1745,6 +1772,7 @@
 				0778DAEA1F1CB8EB0011B753 /* bitmap.cpp in Sources */,
 				07A467C51E6FCCF1002C9B3C /* OSSMultipartOperation.cpp in Sources */,
 				07A4684C1E6FCCF1002C9B3C /* win_iconv.cpp in Sources */,
+				7017904524C542140016B873 /* redis_master.cpp in Sources */,
 				07A468131E6FCCF1002C9B3C /* quote_822_local.cpp in Sources */,
 				07A468001E6FCCF1002C9B3C /* ipc_server.cpp in Sources */,
 				07A4685B1E6FCCF1002C9B3C /* util.cpp in Sources */,

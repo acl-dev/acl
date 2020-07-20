@@ -1,5 +1,8 @@
 修改历史列表：
 
+603) 2020.7.18 - 7.20
+603.1) redis: 重构 redis_client_cluster/redis_command 类。
+
 602) 2020.7.1
 602.1) feature: ssl 模块及 http_request 支持 ssl SNI
 
