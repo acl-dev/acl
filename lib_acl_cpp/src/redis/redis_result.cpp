@@ -29,13 +29,14 @@ redis_result::~redis_result()
 {
 }
 
-void *redis_result::operator new(size_t size, dbuf_pool* pool)
+void *redis_result::operator new(size_t size, dbuf_pool* dbuf)
 {
-	return pool->dbuf_alloc(size);
+	void* ptr = dbuf->dbuf_alloc(size);
+	return ptr;
 }
 
 void redis_result::operator delete(void* ptr acl_unused,
-	dbuf_pool* pool acl_unused)
+	dbuf_pool* dbuf acl_unused)
 {
 	logger_error("DELETE NOW!");
 }

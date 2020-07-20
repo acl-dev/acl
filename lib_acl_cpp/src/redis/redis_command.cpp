@@ -174,6 +174,11 @@ void redis_command::set_cluster(redis_client_cluster* cluster)
 	redirect_sleep_ = cluster->get_redirect_sleep();
 }
 
+void redis_command::set_pipeline(redis_client_pipeline* pipeline)
+{
+	pipeline_ = pipeline;
+}
+
 bool redis_command::eof() const
 {
 	return conn_ == NULL ? false : conn_->eof();
@@ -299,7 +304,8 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	int* timeout /* = NULL */)
 {
 	if (pipeline_ != NULL) {
-		;//result_ =  pipeline_->run(*this, nchild, timeout);
+		result_ =  pipeline_->run(this, nchild, timeout);
+		return result_;
 	} else if (cluster_ != NULL) {
 		result_ = cluster_->run(*this, nchild, timeout);
 		return result_;

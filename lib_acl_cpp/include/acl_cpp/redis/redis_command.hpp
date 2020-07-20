@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
+#include "../stdlib/tbox.hpp"
 #include <map>
 #include <list>
 #include <vector>
@@ -141,6 +142,12 @@ public:
 	redis_client_cluster* get_cluster() const
 	{
 		return cluster_;
+	}
+
+	void set_pipeline(redis_client_pipeline* pipeline);
+	redis_client_pipeline* get_pipeline(void) const
+	{
+		return pipeline_;
 	}
 
 	/**
