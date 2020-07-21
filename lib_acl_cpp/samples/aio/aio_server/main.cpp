@@ -275,6 +275,36 @@ private:
 	}
 };
 
+class mytimer : public acl::aio_timer_callback {
+public:
+	mytimer(long long delay) : id_(0), last_(time(NULL)), delay_(delay) {}
+	~mytimer(void) {}
+
+protected:
+	// @override
+	void destroy(void) {
+		delete this;
+	}
+
+	// @override
+	void timer_callback(unsigned int id) {
+		time_t now = time(NULL);
+		delay_ += 1000000;
+		this->set_task(id_, delay_);
+
+		printf("timer id=%u, delay=%ld, next delay=%lld\r\n",
+			id, (long) (now - last_), delay_);
+
+		last_ = now;
+		id_ = id;
+	}
+
+private:
+	unsigned int id_;
+	time_t last_;
+	long long delay_;
+};
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
@@ -324,6 +354,11 @@ int main(int argc, char* argv[])
 
 	// 构建异步引擎类对象
 	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
+
+	long long delay = 1000000;
+	mytimer* timer = new mytimer(delay);
+	timer->keep_timer(true);
+	handle.set_timer(timer, delay);
 
 	// 创建监听异步流
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
