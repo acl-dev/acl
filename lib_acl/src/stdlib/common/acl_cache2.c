@@ -6,7 +6,7 @@
 #include "stdlib/acl_htable.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_msg.h"
-#include "stdlib/avl.h"
+#include "stdlib/acl_avl.h"
 #include "stdlib/acl_cache2.h"
 
 #endif

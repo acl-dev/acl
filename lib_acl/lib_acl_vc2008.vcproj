@@ -596,7 +596,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\stdlib\common\avl.c"
+						RelativePath=".\src\stdlib\common\acl_avl.c"
 						>
 					</File>
 				</Filter>
@@ -684,15 +684,15 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\stdlib\sys\gettimeofday.c"
+						RelativePath=".\src\stdlib\sys\acl_gettimeofday.c"
 						>
 					</File>
 					<File
-						RelativePath=".\src\stdlib\sys\sleep.c"
+						RelativePath=".\src\stdlib\sys\acl_sleep.c"
 						>
 					</File>
 					<File
-						RelativePath=".\src\stdlib\sys\snprintf.c"
+						RelativePath=".\src\stdlib\sys\acl_snprintf.c"
 						>
 					</File>
 					<Filter
@@ -792,11 +792,11 @@
 						>
 					</File>
 					<File
-						RelativePath=".\src\stdlib\string\strcasecmp.c"
+						RelativePath=".\src\stdlib\string\acl_strcasecmp.c"
 						>
 					</File>
 					<File
-						RelativePath=".\src\stdlib\string\strcasestr.c"
+						RelativePath=".\src\stdlib\string\acl_strcasestr.c"
 						>
 					</File>
 				</Filter>
@@ -1577,7 +1577,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\src\private\thread_mutex.c"
+					RelativePath=".\src\private\private_thread_mutex.c"
 					>
 				</File>
 			</Filter>
@@ -1950,7 +1950,7 @@
 					>
 				</File>
 				<File
-					RelativePath=".\include\stdlib\avl.h"
+					RelativePath=".\include\stdlib\acl_avl.h"
 					>
 				</File>
 				<File

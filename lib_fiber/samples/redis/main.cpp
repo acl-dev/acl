@@ -7,7 +7,7 @@ static int __oper_count = 100;
 static struct timeval __begin;
 static struct timeval __finish;
 
-#define USE_PIPELINE
+//#define USE_PIPELINE
 
 static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 {

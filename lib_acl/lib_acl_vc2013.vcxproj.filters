@@ -314,7 +314,7 @@
     <ClCompile Include=".\src\stdlib\common\acl_token_tree.c">
       <Filter>Source Files\stdlib\common</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\stdlib\common\avl.c">
+    <ClCompile Include=".\src\stdlib\common\acl_avl.c">
       <Filter>Source Files\stdlib\common</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\configure\acl_loadcfg.c">
@@ -365,13 +365,13 @@
     <ClCompile Include=".\src\stdlib\sys\acl_unsafe.c">
       <Filter>Source Files\stdlib\sys</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\stdlib\sys\gettimeofday.c">
+    <ClCompile Include=".\src\stdlib\sys\acl_gettimeofday.c">
       <Filter>Source Files\stdlib\sys</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\stdlib\sys\sleep.c">
+    <ClCompile Include=".\src\stdlib\sys\acl_sleep.c">
       <Filter>Source Files\stdlib\sys</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\stdlib\sys\snprintf.c">
+    <ClCompile Include=".\src\stdlib\sys\acl_snprintf.c">
       <Filter>Source Files\stdlib\sys</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\sys\unix\acl_chroot_uid.c">
@@ -434,10 +434,10 @@
     <ClCompile Include=".\src\stdlib\string\acl_str2time.c">
       <Filter>Source Files\stdlib\string</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\stdlib\string\strcasecmp.c">
+    <ClCompile Include=".\src\stdlib\string\acl_strcasecmp.c">
       <Filter>Source Files\stdlib\string</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\stdlib\string\strcasestr.c">
+    <ClCompile Include=".\src\stdlib\string\acl_strcasestr.c">
       <Filter>Source Files\stdlib\string</Filter>
     </ClCompile>
     <ClCompile Include=".\src\stdlib\memory\acl_allocator.c">
@@ -809,7 +809,7 @@
     <ClCompile Include=".\src\private\sem.c">
       <Filter>Source Files\private</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\private\thread_mutex.c">
+    <ClCompile Include=".\src\private\private_thread_mutex.c">
       <Filter>Source Files\private</Filter>
     </ClCompile>
     <ClCompile Include=".\src\json\acl_json.c">
@@ -1227,7 +1227,7 @@
     <ClInclude Include=".\include\stdlib\acl_xinetd_cfg.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
-    <ClInclude Include=".\include\stdlib\avl.h">
+    <ClInclude Include=".\include\stdlib\acl_avl.h">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include=".\include\stdlib\avl_impl.h">

@@ -21,7 +21,7 @@ extern "C" {
 #include "acl_btree.h"
 #include "acl_cache.h"
 #include "acl_cache2.h"
-#include "avl.h"
+#include "acl_avl.h"
 #include "acl_token_tree.h"
 #include "acl_iterator.h"
 

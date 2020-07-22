@@ -93,13 +93,8 @@
 
 #include "stdlib/acl_define.h"
 #include <sys/types.h>
-/*
-#include <sys/param.h>
-#include <sys/debug.h>
-#include <sys/avl.h>
-#include <sys/cmn_err.h>
-*/
-#include "stdlib/avl.h"
+
+#include "stdlib/acl_avl.h"
 
 #endif
 

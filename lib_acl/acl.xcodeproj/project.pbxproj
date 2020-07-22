@@ -104,7 +104,7 @@
 		0779D5521DBE073000449438 /* private_fifo.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4061DBE070E00449438 /* private_fifo.c */; };
 		0779D5541DBE073000449438 /* private_vstream.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4081DBE070E00449438 /* private_vstream.c */; };
 		0779D5561DBE073000449438 /* sem.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D40A1DBE070E00449438 /* sem.c */; };
-		0779D5591DBE073000449438 /* thread_mutex.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D40D1DBE070E00449438 /* thread_mutex.c */; };
+		0779D5591DBE073000449438 /* private_thread_mutex.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D40D1DBE070E00449438 /* private_thread_mutex.c */; };
 		0779D55A1DBE073000449438 /* acl_proctl.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D40F1DBE070E00449438 /* acl_proctl.c */; };
 		0779D55B1DBE073000449438 /* proctl_child.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4101DBE070E00449438 /* proctl_child.c */; };
 		0779D55D1DBE073000449438 /* proctl_monitor.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4121DBE070E00449438 /* proctl_monitor.c */; };
@@ -145,7 +145,7 @@
 		0779D5841DBE073000449438 /* acl_token_tree.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D43B1DBE070E00449438 /* acl_token_tree.c */; };
 		0779D5851DBE073000449438 /* acl_ypipe.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D43C1DBE070E00449438 /* acl_ypipe.c */; };
 		0779D5861DBE073000449438 /* acl_yqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D43D1DBE070E00449438 /* acl_yqueue.c */; };
-		0779D5871DBE073000449438 /* avl.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D43E1DBE070E00449438 /* avl.c */; };
+		0779D5871DBE073000449438 /* acl_avl.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D43E1DBE070E00449438 /* acl_avl.c */; };
 		0779D5881DBE073000449438 /* acl_loadcfg.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4401DBE070E00449438 /* acl_loadcfg.c */; };
 		0779D5891DBE073000449438 /* acl_xinetd_cfg.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4411DBE070E00449438 /* acl_xinetd_cfg.c */; };
 		0779D58A1DBE073000449438 /* acl_xinetd_params.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4421DBE070E00449438 /* acl_xinetd_params.c */; };
@@ -192,8 +192,8 @@
 		0779D5B91DBE073000449438 /* acl_split_at.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4761DBE070E00449438 /* acl_split_at.c */; };
 		0779D5BA1DBE073000449438 /* acl_split_nameval.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4771DBE070E00449438 /* acl_split_nameval.c */; };
 		0779D5BB1DBE073000449438 /* acl_str2time.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4781DBE070E00449438 /* acl_str2time.c */; };
-		0779D5BC1DBE073000449438 /* strcasecmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4791DBE070E00449438 /* strcasecmp.c */; };
-		0779D5BD1DBE073000449438 /* strcasestr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D47A1DBE070E00449438 /* strcasestr.c */; };
+		0779D5BC1DBE073000449438 /* acl_strcasecmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4791DBE070E00449438 /* acl_strcasecmp.c */; };
+		0779D5BD1DBE073000449438 /* acl_strcasestr.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D47A1DBE070E00449438 /* acl_strcasestr.c */; };
 		0779D5BF1DBE073000449438 /* acl_dll.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D47D1DBE070E00449438 /* acl_dll.c */; };
 		0779D5C01DBE073000449438 /* acl_env.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D47E1DBE070E00449438 /* acl_env.c */; };
 		0779D5C11DBE073000449438 /* acl_exec_command.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D47F1DBE070E00449438 /* acl_exec_command.c */; };
@@ -203,9 +203,9 @@
 		0779D5C51DBE073000449438 /* acl_sys_file.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4831DBE070E00449438 /* acl_sys_file.c */; };
 		0779D5C61DBE073000449438 /* acl_sys_socket.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4841DBE070E00449438 /* acl_sys_socket.c */; };
 		0779D5C71DBE073000449438 /* acl_unsafe.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4851DBE070E00449438 /* acl_unsafe.c */; };
-		0779D5C81DBE073000449438 /* gettimeofday.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4861DBE070E00449438 /* gettimeofday.c */; };
-		0779D5C91DBE073000449438 /* sleep.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4871DBE070E00449438 /* sleep.c */; };
-		0779D5CA1DBE073000449438 /* snprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4881DBE070E00449438 /* snprintf.c */; };
+		0779D5C81DBE073000449438 /* acl_gettimeofday.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4861DBE070E00449438 /* acl_gettimeofday.c */; };
+		0779D5C91DBE073000449438 /* acl_sleep.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4871DBE070E00449438 /* acl_sleep.c */; };
+		0779D5CA1DBE073000449438 /* acl_snprintf.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D4881DBE070E00449438 /* acl_snprintf.c */; };
 		0779D5CB1DBE073000449438 /* acl_chroot_uid.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D48A1DBE070E00449438 /* acl_chroot_uid.c */; };
 		0779D5CC1DBE073000449438 /* acl_core_limit.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D48B1DBE070E00449438 /* acl_core_limit.c */; };
 		0779D5CD1DBE073000449438 /* acl_mychown.c in Sources */ = {isa = PBXBuildFile; fileRef = 0779D48C1DBE070E00449438 /* acl_mychown.c */; };
@@ -360,7 +360,7 @@
 		0779D4061DBE070E00449438 /* private_fifo.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = private_fifo.c; sourceTree = "<group>"; };
 		0779D4081DBE070E00449438 /* private_vstream.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = private_vstream.c; sourceTree = "<group>"; };
 		0779D40A1DBE070E00449438 /* sem.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sem.c; sourceTree = "<group>"; };
-		0779D40D1DBE070E00449438 /* thread_mutex.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = thread_mutex.c; sourceTree = "<group>"; };
+		0779D40D1DBE070E00449438 /* private_thread_mutex.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = private_thread_mutex.c; sourceTree = "<group>"; };
 		0779D40F1DBE070E00449438 /* acl_proctl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_proctl.c; sourceTree = "<group>"; };
 		0779D4101DBE070E00449438 /* proctl_child.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = proctl_child.c; sourceTree = "<group>"; };
 		0779D4121DBE070E00449438 /* proctl_monitor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = proctl_monitor.c; sourceTree = "<group>"; };
@@ -401,7 +401,7 @@
 		0779D43B1DBE070E00449438 /* acl_token_tree.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_token_tree.c; sourceTree = "<group>"; };
 		0779D43C1DBE070E00449438 /* acl_ypipe.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_ypipe.c; sourceTree = "<group>"; };
 		0779D43D1DBE070E00449438 /* acl_yqueue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_yqueue.c; sourceTree = "<group>"; };
-		0779D43E1DBE070E00449438 /* avl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = avl.c; sourceTree = "<group>"; };
+		0779D43E1DBE070E00449438 /* acl_avl.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_avl.c; sourceTree = "<group>"; };
 		0779D4401DBE070E00449438 /* acl_loadcfg.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_loadcfg.c; sourceTree = "<group>"; };
 		0779D4411DBE070E00449438 /* acl_xinetd_cfg.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_xinetd_cfg.c; sourceTree = "<group>"; };
 		0779D4421DBE070E00449438 /* acl_xinetd_params.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_xinetd_params.c; sourceTree = "<group>"; };
@@ -448,8 +448,8 @@
 		0779D4761DBE070E00449438 /* acl_split_at.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_split_at.c; sourceTree = "<group>"; };
 		0779D4771DBE070E00449438 /* acl_split_nameval.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_split_nameval.c; sourceTree = "<group>"; };
 		0779D4781DBE070E00449438 /* acl_str2time.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_str2time.c; sourceTree = "<group>"; };
-		0779D4791DBE070E00449438 /* strcasecmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = strcasecmp.c; sourceTree = "<group>"; };
-		0779D47A1DBE070E00449438 /* strcasestr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = strcasestr.c; sourceTree = "<group>"; };
+		0779D4791DBE070E00449438 /* acl_strcasecmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_strcasecmp.c; sourceTree = "<group>"; };
+		0779D47A1DBE070E00449438 /* acl_strcasestr.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_strcasestr.c; sourceTree = "<group>"; };
 		0779D47D1DBE070E00449438 /* acl_dll.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_dll.c; sourceTree = "<group>"; };
 		0779D47E1DBE070E00449438 /* acl_env.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_env.c; sourceTree = "<group>"; };
 		0779D47F1DBE070E00449438 /* acl_exec_command.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_exec_command.c; sourceTree = "<group>"; };
@@ -459,9 +459,9 @@
 		0779D4831DBE070E00449438 /* acl_sys_file.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_sys_file.c; sourceTree = "<group>"; };
 		0779D4841DBE070E00449438 /* acl_sys_socket.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_sys_socket.c; sourceTree = "<group>"; };
 		0779D4851DBE070E00449438 /* acl_unsafe.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_unsafe.c; sourceTree = "<group>"; };
-		0779D4861DBE070E00449438 /* gettimeofday.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gettimeofday.c; sourceTree = "<group>"; };
-		0779D4871DBE070E00449438 /* sleep.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = sleep.c; sourceTree = "<group>"; };
-		0779D4881DBE070E00449438 /* snprintf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = snprintf.c; sourceTree = "<group>"; };
+		0779D4861DBE070E00449438 /* acl_gettimeofday.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_gettimeofday.c; sourceTree = "<group>"; };
+		0779D4871DBE070E00449438 /* acl_sleep.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_sleep.c; sourceTree = "<group>"; };
+		0779D4881DBE070E00449438 /* acl_snprintf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_snprintf.c; sourceTree = "<group>"; };
 		0779D48A1DBE070E00449438 /* acl_chroot_uid.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_chroot_uid.c; sourceTree = "<group>"; };
 		0779D48B1DBE070E00449438 /* acl_core_limit.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_core_limit.c; sourceTree = "<group>"; };
 		0779D48C1DBE070E00449438 /* acl_mychown.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = acl_mychown.c; sourceTree = "<group>"; };
@@ -622,7 +622,7 @@
 		07A469D51E6FD4FA002C9B3C /* acl_xinetd_cfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_xinetd_cfg.h; sourceTree = "<group>"; };
 		07A469D61E6FD4FA002C9B3C /* acl_ypipe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_ypipe.h; sourceTree = "<group>"; };
 		07A469D71E6FD4FA002C9B3C /* acl_yqueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_yqueue.h; sourceTree = "<group>"; };
-		07A469D81E6FD4FA002C9B3C /* avl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avl.h; sourceTree = "<group>"; };
+		07A469D81E6FD4FA002C9B3C /* acl_avl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_avl.h; sourceTree = "<group>"; };
 		07A469D91E6FD4FA002C9B3C /* avl_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avl_impl.h; sourceTree = "<group>"; };
 		07A469DB1E6FD4FA002C9B3C /* acl_chroot_uid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_chroot_uid.h; sourceTree = "<group>"; };
 		07A469DC1E6FD4FA002C9B3C /* acl_core_limit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = acl_core_limit.h; sourceTree = "<group>"; };
@@ -950,7 +950,7 @@
 				0779D4061DBE070E00449438 /* private_fifo.c */,
 				0779D4081DBE070E00449438 /* private_vstream.c */,
 				0779D40A1DBE070E00449438 /* sem.c */,
-				0779D40D1DBE070E00449438 /* thread_mutex.c */,
+				0779D40D1DBE070E00449438 /* private_thread_mutex.c */,
 			);
 			path = private;
 			sourceTree = "<group>";
@@ -1021,7 +1021,7 @@
 				0779D43B1DBE070E00449438 /* acl_token_tree.c */,
 				0779D43C1DBE070E00449438 /* acl_ypipe.c */,
 				0779D43D1DBE070E00449438 /* acl_yqueue.c */,
-				0779D43E1DBE070E00449438 /* avl.c */,
+				0779D43E1DBE070E00449438 /* acl_avl.c */,
 			);
 			path = common;
 			sourceTree = "<group>";
@@ -1109,8 +1109,8 @@
 				0779D4761DBE070E00449438 /* acl_split_at.c */,
 				0779D4771DBE070E00449438 /* acl_split_nameval.c */,
 				0779D4781DBE070E00449438 /* acl_str2time.c */,
-				0779D4791DBE070E00449438 /* strcasecmp.c */,
-				0779D47A1DBE070E00449438 /* strcasestr.c */,
+				0779D4791DBE070E00449438 /* acl_strcasecmp.c */,
+				0779D47A1DBE070E00449438 /* acl_strcasestr.c */,
 			);
 			path = string;
 			sourceTree = "<group>";
@@ -1127,9 +1127,9 @@
 				0779D4831DBE070E00449438 /* acl_sys_file.c */,
 				0779D4841DBE070E00449438 /* acl_sys_socket.c */,
 				0779D4851DBE070E00449438 /* acl_unsafe.c */,
-				0779D4861DBE070E00449438 /* gettimeofday.c */,
-				0779D4871DBE070E00449438 /* sleep.c */,
-				0779D4881DBE070E00449438 /* snprintf.c */,
+				0779D4861DBE070E00449438 /* acl_gettimeofday.c */,
+				0779D4871DBE070E00449438 /* acl_sleep.c */,
+				0779D4881DBE070E00449438 /* acl_snprintf.c */,
 				0779D4891DBE070E00449438 /* unix */,
 			);
 			path = sys;
@@ -1435,7 +1435,7 @@
 				07A469D51E6FD4FA002C9B3C /* acl_xinetd_cfg.h */,
 				07A469D61E6FD4FA002C9B3C /* acl_ypipe.h */,
 				07A469D71E6FD4FA002C9B3C /* acl_yqueue.h */,
-				07A469D81E6FD4FA002C9B3C /* avl.h */,
+				07A469D81E6FD4FA002C9B3C /* acl_avl.h */,
 				07A469D91E6FD4FA002C9B3C /* avl_impl.h */,
 				07A469DA1E6FD4FA002C9B3C /* unix */,
 			);
@@ -1649,7 +1649,7 @@
 				0779D5521DBE073000449438 /* private_fifo.c in Sources */,
 				0779D5541DBE073000449438 /* private_vstream.c in Sources */,
 				0779D5561DBE073000449438 /* sem.c in Sources */,
-				0779D5591DBE073000449438 /* thread_mutex.c in Sources */,
+				0779D5591DBE073000449438 /* private_thread_mutex.c in Sources */,
 				0779D55A1DBE073000449438 /* acl_proctl.c in Sources */,
 				0779D55B1DBE073000449438 /* proctl_child.c in Sources */,
 				0779D55D1DBE073000449438 /* proctl_monitor.c in Sources */,
@@ -1690,7 +1690,7 @@
 				0779D5841DBE073000449438 /* acl_token_tree.c in Sources */,
 				0779D5851DBE073000449438 /* acl_ypipe.c in Sources */,
 				0779D5861DBE073000449438 /* acl_yqueue.c in Sources */,
-				0779D5871DBE073000449438 /* avl.c in Sources */,
+				0779D5871DBE073000449438 /* acl_avl.c in Sources */,
 				0779D5881DBE073000449438 /* acl_loadcfg.c in Sources */,
 				0779D5891DBE073000449438 /* acl_xinetd_cfg.c in Sources */,
 				0779D58A1DBE073000449438 /* acl_xinetd_params.c in Sources */,
@@ -1738,8 +1738,8 @@
 				0779D5B91DBE073000449438 /* acl_split_at.c in Sources */,
 				0779D5BA1DBE073000449438 /* acl_split_nameval.c in Sources */,
 				0779D5BB1DBE073000449438 /* acl_str2time.c in Sources */,
-				0779D5BC1DBE073000449438 /* strcasecmp.c in Sources */,
-				0779D5BD1DBE073000449438 /* strcasestr.c in Sources */,
+				0779D5BC1DBE073000449438 /* acl_strcasecmp.c in Sources */,
+				0779D5BD1DBE073000449438 /* acl_strcasestr.c in Sources */,
 				0779D5BF1DBE073000449438 /* acl_dll.c in Sources */,
 				0779D5C01DBE073000449438 /* acl_env.c in Sources */,
 				0779D5C11DBE073000449438 /* acl_exec_command.c in Sources */,
@@ -1749,9 +1749,9 @@
 				0779D5C51DBE073000449438 /* acl_sys_file.c in Sources */,
 				0779D5C61DBE073000449438 /* acl_sys_socket.c in Sources */,
 				0779D5C71DBE073000449438 /* acl_unsafe.c in Sources */,
-				0779D5C81DBE073000449438 /* gettimeofday.c in Sources */,
-				0779D5C91DBE073000449438 /* sleep.c in Sources */,
-				0779D5CA1DBE073000449438 /* snprintf.c in Sources */,
+				0779D5C81DBE073000449438 /* acl_gettimeofday.c in Sources */,
+				0779D5C91DBE073000449438 /* acl_sleep.c in Sources */,
+				0779D5CA1DBE073000449438 /* acl_snprintf.c in Sources */,
 				0779D5CB1DBE073000449438 /* acl_chroot_uid.c in Sources */,
 				0779D5CC1DBE073000449438 /* acl_core_limit.c in Sources */,
 				0779D5CD1DBE073000449438 /* acl_mychown.c in Sources */,

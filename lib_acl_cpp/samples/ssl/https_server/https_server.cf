@@ -112,8 +112,10 @@ service http_server {
 
 #	crt_file = {install_path}/conf/ssl/mm263com1.crt
 #	key_file = {install_path}/conf/ssl/mm263com.key
-	crt_file = ../ssl_crt.pem
-	key_file = ../ssl_key.pem
+#	crt_file = ./4233173_xys.lonpeak.com.pem
+#	key_file = ./4233173_xys.lonpeak.com.pem
+	crt_file = ./ssl_crt.pem
+	key_file = ./ssl_key.pem
 
 	libcrypto_path = ../libmbedcrypto.so
 	libx509_path   = ../libmbedx509.so

@@ -478,7 +478,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\common\acl_token_tree.c" />
     <ClCompile Include=".\src\stdlib\common\acl_ypipe.c" />
     <ClCompile Include=".\src\stdlib\common\acl_yqueue.c" />
-    <ClCompile Include=".\src\stdlib\common\avl.c" />
+    <ClCompile Include=".\src\stdlib\common\acl_avl.c" />
     <ClCompile Include=".\src\stdlib\configure\acl_loadcfg.c" />
     <ClCompile Include=".\src\stdlib\configure\acl_xinetd_cfg.c" />
     <ClCompile Include=".\src\stdlib\configure\acl_xinetd_params.c" />
@@ -496,9 +496,9 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\sys\acl_sys_file.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_sys_socket.c" />
     <ClCompile Include=".\src\stdlib\sys\acl_unsafe.c" />
-    <ClCompile Include=".\src\stdlib\sys\gettimeofday.c" />
-    <ClCompile Include=".\src\stdlib\sys\sleep.c" />
-    <ClCompile Include=".\src\stdlib\sys\snprintf.c" />
+    <ClCompile Include=".\src\stdlib\sys\acl_gettimeofday.c" />
+    <ClCompile Include=".\src\stdlib\sys\acl_sleep.c" />
+    <ClCompile Include=".\src\stdlib\sys\acl_snprintf.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_chroot_uid.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_core_limit.c" />
     <ClCompile Include=".\src\stdlib\sys\unix\acl_mychown.c" />
@@ -519,8 +519,8 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\string\acl_split_at.c" />
     <ClCompile Include=".\src\stdlib\string\acl_split_nameval.c" />
     <ClCompile Include=".\src\stdlib\string\acl_str2time.c" />
-    <ClCompile Include=".\src\stdlib\string\strcasecmp.c" />
-    <ClCompile Include=".\src\stdlib\string\strcasestr.c" />
+    <ClCompile Include=".\src\stdlib\string\acl_strcasecmp.c" />
+    <ClCompile Include=".\src\stdlib\string\acl_strcasestr.c" />
     <ClCompile Include=".\src\stdlib\memory\acl_allocator.c" />
     <ClCompile Include=".\src\stdlib\memory\acl_dbuf_pool.c" />
     <ClCompile Include=".\src\stdlib\memory\acl_default_malloc.c" />
@@ -645,7 +645,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\private\private_fifo.c" />
     <ClCompile Include=".\src\private\private_vstream.c" />
     <ClCompile Include=".\src\private\sem.c" />
-    <ClCompile Include=".\src\private\thread_mutex.c" />
+    <ClCompile Include=".\src\private\private_thread_mutex.c" />
     <ClCompile Include=".\src\json\acl_json.c" />
     <ClCompile Include=".\src\json\acl_json_parse.c" />
     <ClCompile Include=".\src\json\acl_json_util.c" />
@@ -785,7 +785,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include=".\include\stdlib\acl_xinetd_cfg.h" />
     <ClInclude Include=".\include\stdlib\acl_ypipe.h" />
     <ClInclude Include=".\include\stdlib\acl_yqueue.h" />
-    <ClInclude Include=".\include\stdlib\avl.h" />
+    <ClInclude Include=".\include\stdlib\acl_avl.h" />
     <ClInclude Include=".\include\stdlib\avl_impl.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_chroot_uid.h" />
     <ClInclude Include=".\include\stdlib\unix\acl_core_limit.h" />

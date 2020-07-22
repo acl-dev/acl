@@ -15,7 +15,7 @@
 #include "thread/acl_thread.h"
 #include "stdlib/acl_vstring.h"
 #include "stdlib/acl_mystring.h"
-#include "stdlib/avl.h"
+#include "stdlib/acl_avl.h"
 
 #endif
 

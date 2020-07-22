@@ -4,7 +4,7 @@
 #include "stdlib/acl_define.h"
 
 #include <string.h>
-#include "stdlib/avl.h"
+#include "stdlib/acl_avl.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_cache.h"
 #include "stdlib/acl_vstring.h"

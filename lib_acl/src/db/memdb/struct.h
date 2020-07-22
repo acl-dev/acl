@@ -9,7 +9,7 @@ extern "C" {
 #include "stdlib/acl_array.h"
 #include "stdlib/acl_htable.h"
 #include "db/acl_mdb.h"
-#include "stdlib/avl.h"
+#include "stdlib/acl_avl.h"
 #include "stdlib/acl_slice.h"
 #include "stdlib/acl_htable.h"
 #include "stdlib/acl_binhash.h"
