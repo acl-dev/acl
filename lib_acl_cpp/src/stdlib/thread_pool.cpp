@@ -39,6 +39,15 @@ thread_pool& thread_pool::set_limit(size_t n)
 	return *this;
 }
 
+size_t thread_pool::get_limit(void) const
+{
+	if (thr_pool_) {
+		return acl_pthread_pool_limit(thr_pool_);
+	} else {
+		return threads_limit_;
+	}
+}
+
 thread_pool& thread_pool::set_idle(int ttl)
 {
 	thread_idle_ = ttl;

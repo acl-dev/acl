@@ -70,6 +70,12 @@ public:
 	thread_pool& set_limit(size_t max);
 
 	/**
+	 * 获得当前线程池最大线程数量限制
+	 * @return {size_t}
+	 */
+	size_t get_limit(void) const;
+
+	/**
 	 * 设置线程池中空闲线程的超时退出时间
 	 * @param ttl {int} 空闲超时时间(秒)，如果不调用此函数，则内部缺省为 0
 	 * @return {thread_pool&}
