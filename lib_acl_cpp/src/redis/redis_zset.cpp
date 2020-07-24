@@ -930,7 +930,6 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	for (; cit != keys.end(); ++cit, i++) {
 		argv[i] = cit->first.c_str();
 		lens[i] = cit->first.length();
-		i++;
 	}
 
 	argv[i] = "WEIGHTS";
