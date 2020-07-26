@@ -47,8 +47,8 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		.setChunkedTransferEncoding(true);	// chunked 传输模式
 
 	// 发送 http 响应体
-
-	if (res.write("first line\r\nsecond line\r\nthird line\r\n\r\n") == false)
+	acl::string buf("first line\r\nsecond line\r\nthird line\r\n\r\n");
+	if (res.write(buf) == false)
 	{
 		logger_error("write error!");
 		return false;
@@ -56,22 +56,23 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	for (int i = 0; i < 10; i++)
 	{
-		if (res.write("hello") == false)
+		acl::string buf("hello");
+		if (res.write(buf) == false)
 		{
 			logger_error("write error!");
 			return false;
 		}
-		if (res.write(" ") == false)
+		if (res.write((acl::string)" ") == false)
 		{
 			logger_error("write error!");
 			return false;
 		}
-		if (res.write("world") == false)
+		if (res.write((acl::string)"world") == false)
 		{
 			logger_error("write error!");
 			return false;
 		}
-		if (res.write("\r\n") == false)
+		if (res.write((acl::string)"\r\n") == false)
 		{
 			logger_error("write error!");
 			return false;
@@ -82,14 +83,14 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	{
 		for (int i = 0; i < 10; i++)
 		{
-			if (res.write("X") == false)
+			if (res.write((acl::string)"X") == false)
 			{
 				logger_error("write error!");
 				return false;
 			}
 		}
 
-		if (res.write("\r\n") == false)
+		if (res.write((acl::string)"\r\n") == false)
 		{
 			logger_error("write error!");
 			return false;
@@ -97,7 +98,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	}
 
 	// 最后一行不写 \r\n
-	if (res.write("Bye") == false)
+	if (res.write((acl::string)"Bye") == false)
 	{
 		logger_error("write error!");
 		return false;

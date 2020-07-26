@@ -170,7 +170,8 @@ static void test_time(void)
 	double diff;
 
 	gettimeofday(&begin, NULL);
-	usleep(1000);
+	//usleep(1000);
+	acl_doze(1);
 	gettimeofday(&end, NULL);
 	diff = stamp_sub(&end, &begin);
 	printf("usleep 1000 diff=%.2f\r\n", diff);

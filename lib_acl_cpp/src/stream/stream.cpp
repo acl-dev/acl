@@ -2,7 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
-#include "acl_cpp/stdlib/dbuf.hpp"
+#include "acl_cpp/stdlib/dbuf_pool.hpp"
 #include "acl_cpp/stream/stream_hook.hpp"
 #include "acl_cpp/stream/stream.hpp"
 #endif

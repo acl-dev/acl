@@ -154,8 +154,8 @@ protected:
 	{
 		bool ret;
 		acl::disque cmd;
-		int max_conns = 1000, i;
-		cmd.set_cluster(&cluster_, max_conns);
+		int i;
+		cmd.set_cluster(&cluster_);
 
 		struct timeval begin;
 		gettimeofday(&begin, NULL);

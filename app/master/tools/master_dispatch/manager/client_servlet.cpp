@@ -368,7 +368,7 @@ bool client_servlet::doAction(acl::HttpServletRequest& req,
 		return false;
 
 	// 输出 XML 结尾标记
-	if (res.write("</servers>") == false)
+	if (res.write((acl::string)"</servers>") == false)
 	{
 		logger_error("write html end failed");
 		return false;
