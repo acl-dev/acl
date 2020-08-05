@@ -1,4 +1,4 @@
-%define release_id 5
+%define release_id 6
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -45,6 +45,12 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Aug 05 2020 shuxin.zheng@qq.com 3.5.1-6-20200805.11
+- add some function in redis module for supporting binary data
+- rewrite and optimize redis module
+- optimize fiber module for checking if a fd is socket/pipe/fifo type
+- optimize for mobile development
 
 * Sat Jun 27 2020 shuxin.zheng@qq.com 3.5.1-5-20200627.14
 - release 3.5.1-5 version
