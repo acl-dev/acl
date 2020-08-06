@@ -161,7 +161,7 @@ LIB_PATH_DST = ./lib
 DEF_PATH_DST = ./Debug
 
 CFLAGS += -I./src -I./include -I../lib_acl/include -I../lib_protocol/include \
-	  -I../include/sqlite -I../include/mysql -I../include/zlib -I../include \
+	  -I../include/sqlite -I../include/mysql -I../include \
 	  -I../include/pgsql
 
 #Project's objs

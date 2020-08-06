@@ -1,5 +1,11 @@
 #include "acl_stdafx.hpp"
-#include <zlib.h>
+
+#if defined(_WIN32) || defined(_WIN64)
+# include "zlib-1.2.11/zlib.h"
+#else
+# include <zlib.h>
+#endif
+
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"

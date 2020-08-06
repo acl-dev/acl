@@ -173,7 +173,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -198,7 +198,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -221,7 +221,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -241,7 +241,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -262,7 +262,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -295,7 +295,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -327,7 +327,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;.\src;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;.\src;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -357,7 +357,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\zlib;..\include\mysql;..\include\pgsql;.\src;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;.\src;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>

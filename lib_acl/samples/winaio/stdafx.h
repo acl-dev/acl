@@ -4,6 +4,8 @@
 
 #pragma once
 
+#define _AFXDLL
+
 #ifndef VC_EXTRALEAN
 #define VC_EXTRALEAN		// 从 Windows 标头中排除不常使用的资料
 #endif
