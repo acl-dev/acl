@@ -177,7 +177,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
@@ -201,7 +201,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
       <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
       <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
@@ -223,7 +223,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
     <ClCompile>
       <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_vc2013.pdb</ProgramDataBaseFileName>
@@ -243,7 +243,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
     <ClCompile>
       <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
       <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_vc2013.pdb</ProgramDataBaseFileName>

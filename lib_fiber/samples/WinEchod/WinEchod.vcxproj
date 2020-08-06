@@ -241,7 +241,7 @@ copy ..\..\..\lib_fiber\cpp\libfiber_cpp.dll .\ /Y</Command>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\..\..\lib_fiber\c\include;..\..\..\lib_fiber\cpp\include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -272,7 +272,7 @@ copy ..\..\..\lib_fiber\cpp\libfiber_cpp.dll .\ /Y</Command>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\..\..\lib_fiber\c\include;..\..\..\lib_fiber\cpp\include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -379,7 +379,7 @@ copy ..\..\..\lib_fiber\cpp\libfiber_cpp.dll .\ /Y</Command>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\..\..\lib_fiber\c\include;..\..\..\lib_fiber\cpp\include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -414,7 +414,7 @@ copy ..\..\..\lib_fiber\cpp\libfiber_cpp.dll .\ /Y</Command>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\..\lib_acl_cpp\include;..\..\..\lib_acl\include;..\..\..\lib_fiber\c\include;..\..\..\lib_fiber\cpp\include</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
