@@ -124,7 +124,7 @@ copy ..\..\lib\win32\sqlite3.dll $(OutDir) /Y
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <Link>
-      <AdditionalDependencies>uxtheme.lib;polarssl.lib;Iphlpapi.lib;lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>uxtheme.lib;Iphlpapi.lib;lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\..\lib\win32;..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
