@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "struct.h"
 #include "struct.gson.h"
-#include "acl_cpp/serialize/gson_helper.ipp"
 namespace acl
 {
     acl::json_node& gson(acl::json &$json, const base &$obj)
