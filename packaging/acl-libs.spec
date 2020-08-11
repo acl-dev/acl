@@ -1,4 +1,4 @@
-%define release_id 6
+%define release_id 7
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,7 +46,12 @@ rm -rf %{buildroot}
 
 %changelog
 
-* Tue Aug 05 2020 shuxin.zheng@qq.com 3.5.1-6-20200805.11
+* Tue Aug 11 2020 shuxin.zheng@qq.com 3.5.1-7-20200811.17
+- fixed one important bug in event_timer.c/event_timer_thr.c: when one timer
+  cancel another timer, if the other timer has been in schedule queue, the
+  memory will be corrupted and process will be crashed.
+
+* Tue Wed 05 2020 shuxin.zheng@qq.com 3.5.1-6-20200805.11
 - add some function in redis module for supporting binary data
 - rewrite and optimize redis module
 - optimize fiber module for checking if a fd is socket/pipe/fifo type
