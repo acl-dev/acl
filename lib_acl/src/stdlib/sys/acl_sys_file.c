@@ -105,13 +105,13 @@ acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 	LARGE_INTEGER li;
 	DWORD method;
 
-	if (whence == SEEK_CUR)
+	if (whence == SEEK_CUR) {
 		method = FILE_CURRENT;
-	else if (whence == SEEK_SET)
+	} else if (whence == SEEK_SET) {
 		method = FILE_BEGIN;
-	else if (whence == SEEK_END)
+	} else if (whence == SEEK_END) {
 		method = FILE_END;
-	else {
+	} else {
 		acl_msg_error("%s(%d): invalid whence(%d)",
 			myname, __LINE__, whence);
 		return -1;
@@ -128,13 +128,16 @@ acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 }
 
 int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp, void *arg acl_unused)
 {
 	DWORD nRead = 0;
 
-	if (!ReadFile(fh, buf, (DWORD) size, &nRead, NULL))
+	if (fp != NULL && fp->read_ready) {
+		fp->read_ready = 0;
+	}
+	if (!ReadFile(fh, buf, (DWORD) size, &nRead, NULL)) {
 		return ACL_VSTREAM_EOF;
+	}
 
 	return nRead;
 }
@@ -145,8 +148,9 @@ int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
 {
 	DWORD nWritten = 0;
 
-	if (!WriteFile(fh, buf, (DWORD) size, &nWritten, NULL))
+	if (!WriteFile(fh, buf, (DWORD) size, &nWritten, NULL)) {
 		return ACL_VSTREAM_EOF;
+	}
 
 	return nWritten;
 }
@@ -164,8 +168,7 @@ int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector,
 			(DWORD) vector[i].iov_len, &nWritten, NULL))
 		{
 			return ACL_VSTREAM_EOF;
-		}
-		else if (nWritten != vector[i].iov_len) {
+		} else if (nWritten != vector[i].iov_len) {
 			n += nWritten;
 			break;
 		}
@@ -177,8 +180,9 @@ int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vector,
 int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 	void *arg acl_unused)
 {
-	if (FlushFileBuffers(fh))
+	if (FlushFileBuffers(fh)) {
 		return 0;
+	}
 	return -1;
 }
 
@@ -186,8 +190,9 @@ acl_int64 acl_file_size(const char *filename)
 {
 	struct acl_stat sbuf;
 
-	if (acl_stat(filename, &sbuf) == -1)
+	if (acl_stat(filename, &sbuf) == -1) {
 		return -1;
+	}
 	return sbuf.st_size;
 }
 
@@ -198,8 +203,9 @@ acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 	acl_int64 n;
 
 	nLow = GetFileSize(fh, &nHigh);
-	if (nLow == 0xFFFFFFFF)
+	if (nLow == 0xFFFFFFFF) {
 		return -1;
+	}
 	n = nHigh;
 	return nLow + (n << 32);
 }
@@ -218,10 +224,11 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 	isdev = GetFileType(fh) & ~FILE_TYPE_REMOTE;
 	if (isdev != FILE_TYPE_DISK) {
 		if (isdev == FILE_TYPE_CHAR || isdev == FILE_TYPE_PIPE) {
-			if (isdev == FILE_TYPE_CHAR)
+			if (isdev == FILE_TYPE_CHAR) {
 				buf->st_mode = _S_IFCHR;
-			else
+			} else {
 				buf->st_mode = _S_IFIFO;
+			}
 
 			buf->st_rdev = buf->st_dev = 0;
 			buf->st_nlink = 1;
@@ -263,12 +270,13 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 		goto done;
 	}
 
-	if (bhfi.dwFileAttributes & FILE_ATTRIBUTE_READONLY)
+	if (bhfi.dwFileAttributes & FILE_ATTRIBUTE_READONLY) {
 		buf->st_mode |= (_S_IREAD + (_S_IREAD >> 3) + (_S_IREAD >> 6));
-	else
+	} else {
 		buf->st_mode |= ((_S_IREAD|_S_IWRITE)
 			+ ((_S_IREAD|_S_IWRITE) >> 3)
 			+ ((_S_IREAD|_S_IWRITE) >> 6));
+	}
 
 	/* set file date fields */
 	if (!FileTimeToLocalFileTime(&(bhfi.ftLastWriteTime), &LocalFTime)
@@ -305,13 +313,11 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 		t.tm_min = SystemTime.wMinute;
 		t.tm_sec = SystemTime.wSecond;
 		buf->st_atime = mktime(&t);
-	}
-	else
+	} else {
 		buf->st_atime = buf->st_mtime;
+	}
 
-	if (bhfi.ftCreationTime.dwLowDateTime
-		|| bhfi.ftCreationTime.dwHighDateTime)
-	{
+	if (bhfi.ftCreationTime.dwLowDateTime || bhfi.ftCreationTime.dwHighDateTime) {
 		if (!FileTimeToLocalFileTime(&(bhfi.ftCreationTime), &LocalFTime)
 			|| !FileTimeToSystemTime(&LocalFTime, &SystemTime))
 		{
@@ -326,9 +332,9 @@ int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf)
 		t.tm_min = SystemTime.wMinute;
 		t.tm_sec = SystemTime.wSecond;
 		buf->st_ctime = mktime(&t);
-	}
-	else
+	} else {
 		buf->st_ctime = buf->st_mtime;
+	}
 
 	buf->st_size = ((__int64)(bhfi.nFileSizeHigh)) * (0x100000000i64)
 					+ (__int64)(bhfi.nFileSizeLow);
@@ -372,9 +378,11 @@ acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence)
 }
 
 int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused,
-	void *arg acl_unused)
+	int timeout acl_unused, ACL_VSTREAM *fp, void *arg acl_unused)
 {
+	if (fp != NULL && fp->read_ready) {
+		fp->read_ready = 0;
+	}
 	return (int) read(fh, buf, size);
 }
 
@@ -402,8 +410,9 @@ acl_int64 acl_file_size(const char *filename)
 {
 	struct acl_stat sbuf;
 
-	if (acl_stat(filename, &sbuf) == -1)
+	if (acl_stat(filename, &sbuf) == -1) {
 		return -1;
+	}
 	return sbuf.st_size;
 }
 
@@ -412,8 +421,9 @@ acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp acl_unused,
 {
 	struct acl_stat sbuf;
 
-	if (acl_fstat(fh, &sbuf) == -1)
+	if (acl_fstat(fh, &sbuf) == -1) {
 		return -1;
+	}
 	return sbuf.st_size;
 }
 
