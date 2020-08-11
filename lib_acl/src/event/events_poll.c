@@ -116,8 +116,9 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	ev->fds[fdp->fdidx].fd = sockfd;
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->r_callback != callback || fdp->r_context != context) {
 		fdp->r_callback = callback;
@@ -240,8 +241,9 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		ev->fds[fdp->fdidx] = ev->fds[eventp->fdcnt];
@@ -298,8 +300,9 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		ev->fds[fdp->fdidx] = ev->fds[eventp->fdcnt];
@@ -341,8 +344,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		ev->fds[fdp->fdidx] = ev->fds[eventp->fdcnt];
