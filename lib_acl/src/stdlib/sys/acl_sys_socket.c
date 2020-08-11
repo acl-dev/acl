@@ -154,16 +154,19 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	wsaData.len = (u_long) size;
 	wsaData.buf = (char*) buf;
 	ret = WSARecv(fd, &wsaData, 1, &dwBytes, &flags, NULL, NULL);
-	if (ret == SOCKET_ERROR)
+	if (ret == SOCKET_ERROR) {
 		return -1;
-	if (dwBytes == 0)
+	}
+	if (dwBytes == 0) {
 		return -1;
+	}
 	return dwBytes;
 #else
-	if (fp != NULL && fp->read_ready)
+	if (fp != NULL && fp->read_ready) {
 		fp->read_ready = 0;
-	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
+	} else if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
 		return -1;
+	}
 
 	return __sys_recv(fd, buf, (int) size, 0);
 #endif
@@ -181,8 +184,9 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	wsaData.buf = (char*) buf;
 
 	ret = WSASend(fd, &wsaData, 1, &dwBytes, 0, NULL, NULL);
-	if (ret == SOCKET_ERROR)
+	if (ret == SOCKET_ERROR) {
 		return (-1);
+	}
 	return dwBytes;
 #else
 	int   ret;
@@ -197,8 +201,9 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 #endif
 
 	ret = __sys_send(fd, buf, (int) size, 0);
-	if (ret <= 0)
+	if (ret <= 0) {
 		errno = acl_last_error();
+	}
 	return ret;
 #endif
 }
@@ -369,23 +374,27 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	}
 
 	ret = read(fd, buf, size);
-	if (ret > 0)
+	if (ret > 0) {
 		return ret;
+	}
 
-	if (timeout <= 0)
+	if (timeout <= 0) {
 		return ret;
+	}
 
 	error = acl_last_error();
 
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
-	if (error != ACL_EWOULDBLOCK)
+	if (error != ACL_EWOULDBLOCK) {
 #else
-	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN)
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
 #endif
 		return ret;
+	}
 
-	if (acl_read_wait(fd, timeout) < 0)
+	if (acl_read_wait(fd, timeout) < 0) {
 		return -1;
+	}
 
 	return read(fd, buf, size);
 }
@@ -395,10 +404,11 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
-	if (fp != NULL && fp->read_ready)
+	if (fp != NULL && fp->read_ready) {
 		fp->read_ready = 0;
-	else if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
+	} else if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
 		return -1;
+	}
 
 	return (int) __sys_read(fd, buf, size);
 }
@@ -411,24 +421,28 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int ret, error;
 
 	ret = (int) __sys_write(fd, buf, size);
-	if (ret > 0)
+	if (ret > 0) {
 		return ret;
+	}
 
-	if (timeout <= 0)
+	if (timeout <= 0) {
 		return ret;
+	}
 
 	error = acl_last_error();
 
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
-	if (error != ACL_EWOULDBLOCK)
+	if (error != ACL_EWOULDBLOCK) {
 #else
-	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN)
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
 #endif
 		return ret;
+	}
 
 #ifdef ACL_WRITEABLE_CHECK
-	if (acl_write_wait(fd, timeout) < 0)
+	if (acl_write_wait(fd, timeout) < 0) {
 		return -1;
+	}
 
 	ret = __sys_write(fd, buf, size);
 #endif
@@ -442,24 +456,28 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 	int ret, error;
 
 	ret = (int) __sys_writev(fd, vec, count);
-	if (ret > 0)
+	if (ret > 0) {
 		return ret;
+	}
 
-	if (timeout <= 0)
+	if (timeout <= 0) {
 		return ret;
+	}
 
 	error = acl_last_error();
 
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
-	if (error != ACL_EWOULDBLOCK)
+	if (error != ACL_EWOULDBLOCK) {
 #else
-	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN)
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
 #endif
 		return ret;
+	}
 
 #ifdef ACL_WRITEABLE_CHECK
-	if (acl_write_wait(fd, timeout) < 0)
+	if (acl_write_wait(fd, timeout) < 0) {
 		return -1;
+	}
 
 	ret = __sys_writev(fd, vec, count);
 #endif
@@ -481,12 +499,15 @@ int acl_socket_alive(ACL_SOCKET fd)
 	char  buf[16];
 	int   ret = acl_readable(fd);
 
-	if (ret == -1)
+	if (ret == -1) {
 		return 0;
-	if (ret == 0)
+	}
+	if (ret == 0) {
 		return 1;
+	}
 	ret = (int) __sys_recv(fd, buf, sizeof(buf), MSG_PEEK);
-	if (ret == 0 || (ret < 0 && acl_last_error() != ACL_EWOULDBLOCK))
+	if (ret == 0 || (ret < 0 && acl_last_error() != ACL_EWOULDBLOCK)) {
 		return 0;
+	}
 	return 1;
 }
