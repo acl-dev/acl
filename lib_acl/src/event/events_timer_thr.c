@@ -47,7 +47,7 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 	 * right place.
 	 */
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			timer->when = eventp->present + delay;
 			acl_ring_detach(iter.ptr);
@@ -60,12 +60,13 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 	 */
 	if (iter.ptr == &eventp->timer_head) {
 		timer = (ACL_EVENT_TIMER *) acl_mymalloc(sizeof(ACL_EVENT_TIMER));
-		if (timer == NULL)
+		if (timer == NULL) {
 			acl_msg_panic("%s: can't mymalloc for timer", myname);
-		timer->when = eventp->present + delay;
-		timer->delay = delay;
-		timer->callback = callback;
-		timer->context = context;
+		}
+		timer->when       = eventp->present + delay;
+		timer->delay      = delay;
+		timer->callback   = callback;
+		timer->context    = context;
 		timer->event_type = ACL_EVENT_TIME;
 	}
 
@@ -73,13 +74,15 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 	 * Insert the request at the right place. Timer requests are kept sorted
 	 * to reduce lookup overhead in the event loop.
 	 */
-	acl_ring_foreach(iter, &eventp->timer_head)
-		if (timer->when < ACL_RING_TO_TIMER(iter.ptr)->when)
+	acl_ring_foreach(iter, &eventp->timer_head) {
+		if (timer->when < RING_TO_TIMER(iter.ptr)->when) {
 			break;
-	acl_ring_prepend(iter.ptr, &timer->ring);
+		}
+	}
 
+	acl_ring_prepend(iter.ptr, &timer->ring);
 	THREAD_UNLOCK(&event_thr->tm_mutex);
-	return (timer->when);
+	return timer->when;
 }
 
 /* event_timer_cancel_thr - cancel timer */
@@ -103,11 +106,13 @@ acl_int64 event_timer_cancel_thr(ACL_EVENT *eventp,
 	SET_TIME(eventp->present);
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
-			if ((time_left = timer->when - eventp->present) < 0)
+			if ((time_left = timer->when - eventp->present) < 0) {
 				time_left = 0;
+			}
 			acl_ring_detach(&timer->ring);
+			acl_ring_detach(&timer->tmp);
 			acl_myfree(timer);
 			break;
 		}
@@ -127,7 +132,7 @@ void event_timer_keep_thr(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 
 	THREAD_LOCK(&event_thr->tm_mutex);
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			timer->keep = keep;
 			break;
@@ -145,7 +150,7 @@ int  event_timer_ifkeep_thr(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 
 	THREAD_LOCK(&event_thr->tm_mutex);
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			THREAD_UNLOCK(&event_thr->tm_mutex);
 			return timer->keep;
@@ -167,6 +172,7 @@ void event_timer_trigger_thr(EVENT_THR *event)
 	ACL_EVENT *eventp = &event->event;
 	ACL_EVENT_TIMER *timer;
 	ACL_RING_ITER iter;
+	ACL_RING *ring;
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void *timer_arg;
 
@@ -175,16 +181,18 @@ void event_timer_trigger_thr(EVENT_THR *event)
 	THREAD_LOCK(&event->tm_mutex);
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
-		if (timer->when > eventp->present)
+		timer = RING_TO_TIMER(iter.ptr);
+		if (timer->when > eventp->present) {
 			break;
+		}
 
-		acl_fifo_push(eventp->timers, timer);
+		acl_ring_prepend(&eventp->timers, &timer->tmp);
 	}
 
 	THREAD_UNLOCK(&event->tm_mutex);
 
-	while ((timer = (ACL_EVENT_TIMER* ) acl_fifo_pop(eventp->timers))) {
+	while ((ring = acl_ring_pop_head(&eventp->timers)) != NULL) {
+		timer     = TMP_TO_TIMER(ring);
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 

@@ -41,7 +41,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	 * right place.
 	 */
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			timer->when = eventp->present + delay;
 			timer->keep = keep;
@@ -76,7 +76,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	 */
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		if (timer->when < ACL_RING_TO_TIMER(iter.ptr)->when) {
+		if (timer->when < RING_TO_TIMER(iter.ptr)->when) {
 			break;
 		}
 	}
@@ -107,12 +107,13 @@ acl_int64 event_timer_cancel(ACL_EVENT *eventp,
 	SET_TIME(eventp->present);
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			if ((time_left = timer->when - eventp->present) < 0) {
 				time_left = 0;
 			}
 			acl_ring_detach(&timer->ring);
+			acl_ring_detach(&timer->tmp);
 			timer->nrefer--;
 			if (timer->nrefer != 0) {
 				acl_msg_fatal("%s(%d): timer's nrefer(%d) != 0",
@@ -126,7 +127,7 @@ acl_int64 event_timer_cancel(ACL_EVENT *eventp,
 		acl_msg_info("%s: 0x%p 0x%p %lld", myname,
 			callback, context, time_left);
 	}
-	return (time_left);
+	return time_left;
 }
 
 void event_timer_keep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
@@ -136,7 +137,7 @@ void event_timer_keep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	ACL_EVENT_TIMER *timer;
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			timer->keep = keep;
 			break;
@@ -151,7 +152,7 @@ int  event_timer_ifkeep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	ACL_EVENT_TIMER *timer;
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->callback == callback && timer->context == context) {
 			return timer->keep;
 		}
@@ -164,6 +165,7 @@ void event_timer_trigger(ACL_EVENT *eventp)
 {
 	ACL_EVENT_TIMER *timer;
 	ACL_RING_ITER iter;
+	ACL_RING *ring;
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void *timer_arg;
 
@@ -174,15 +176,16 @@ void event_timer_trigger(ACL_EVENT *eventp)
 	/* 优先处理定时器中的任务 */
 
 	acl_ring_foreach(iter, &eventp->timer_head) {
-		timer = ACL_RING_TO_TIMER(iter.ptr);
+		timer = RING_TO_TIMER(iter.ptr);
 		if (timer->when > eventp->present) {
 			break;
 		}
 
-		acl_fifo_push(eventp->timers, timer);
+		acl_ring_prepend(&eventp->timers, &timer->tmp);
 	}
 
-	while ((timer = (ACL_EVENT_TIMER* ) acl_fifo_pop(eventp->timers))) {
+	while ((ring = acl_ring_pop_head(&eventp->timers)) != NULL) {
+		timer     = TMP_TO_TIMER(ring);
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 

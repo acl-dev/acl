@@ -11,11 +11,11 @@
 
 #include "events.h"
 
-#define RING_TO_TIMER(r) \
+#define ring_to_timer(r) \
 	((ACL_TIMER_INFO *) ((char *) (r) - offsetof(ACL_TIMER_INFO, entry)))
 
-#define FIRST_TIMER(head) \
-	(acl_ring_succ(head) != (head) ? RING_TO_TIMER(acl_ring_succ(head)) : 0)
+#define first_timer(head) \
+	(acl_ring_succ(head) != (head) ? ring_to_timer(acl_ring_succ(head)) : 0)
 
 acl_int64 acl_timer_request(ACL_TIMER* timer, void *obj, acl_int64 delay)
 {
@@ -25,7 +25,7 @@ acl_int64 acl_timer_request(ACL_TIMER* timer, void *obj, acl_int64 delay)
 	SET_TIME(timer->present);
 
 	acl_ring_foreach(iter, &timer->timer_header) {
-		pTimerItem = RING_TO_TIMER(iter.ptr);
+		pTimerItem = ring_to_timer(iter.ptr);
 		if (pTimerItem->obj == obj) {
 			pTimerItem->when = timer->present + delay;
 			acl_ring_detach(iter.ptr);
@@ -42,7 +42,7 @@ acl_int64 acl_timer_request(ACL_TIMER* timer, void *obj, acl_int64 delay)
 	}
 
 	acl_ring_foreach(iter, &timer->timer_header) {
-		ACL_TIMER_INFO *pItem = RING_TO_TIMER(iter.ptr);
+		ACL_TIMER_INFO *pItem = ring_to_timer(iter.ptr);
 		if (pTimerItem->when < pItem->when)
 			break;
 	}
@@ -59,7 +59,7 @@ acl_int64 acl_timer_cancel(ACL_TIMER* timer, void *obj)
 	SET_TIME(timer->present);
 
 	acl_ring_foreach(iter, &timer->timer_header) {
-		ACL_TIMER_INFO *pItem = RING_TO_TIMER(iter.ptr);
+		ACL_TIMER_INFO *pItem = ring_to_timer(iter.ptr);
 		if (pItem->obj == obj) {
 			if ((time_left = pItem->when - timer->present) < 0)
 				time_left = 0;
@@ -80,7 +80,7 @@ void *acl_timer_popup(ACL_TIMER* timer)
 
 	SET_TIME(timer->present);
 
-	pTimerItem = FIRST_TIMER(&timer->timer_header);
+	pTimerItem = first_timer(&timer->timer_header);
 	if (pTimerItem == NULL)
 		return (NULL);
 
@@ -101,7 +101,7 @@ acl_int64 acl_timer_left(ACL_TIMER* timer)
 
 	SET_TIME(timer->present);
 
-	pTimerItem = FIRST_TIMER(&timer->timer_header);
+	pTimerItem = first_timer(&timer->timer_header);
 	if (pTimerItem != NULL) {
 		time_left = pTimerItem->when - timer->present;
 		/* 如果下一个定时任务已经到期，则将剩余时间设定为0，
@@ -123,7 +123,7 @@ void acl_timer_walk(ACL_TIMER *timer, void (*action)(ACL_TIMER_INFO *, void *), 
 	ACL_RING_ITER iter;
 
 	acl_ring_foreach(iter, &timer->timer_header) {
-		info = RING_TO_TIMER(iter.ptr);
+		info = ring_to_timer(iter.ptr);
 		action(info, arg);
 	}
 }
@@ -142,7 +142,7 @@ static const void *timer_iter_head(ACL_ITER *iter, struct ACL_TIMER *timer)
 		iter->data = iter->ptr = NULL;
 		return (NULL);
 	}
-	info = RING_TO_TIMER(iter->ptr);
+	info = ring_to_timer(iter->ptr);
 	iter->data = info->obj;
 	return (iter->ptr);
 }
@@ -157,7 +157,7 @@ static const void *timer_iter_next(ACL_ITER *iter, struct ACL_TIMER *timer)
 		iter->data = iter->ptr = NULL;
 		return (NULL);
 	}
-	info = RING_TO_TIMER(iter->ptr);
+	info = ring_to_timer(iter->ptr);
 	iter->data = info->obj;
 	return (iter->ptr);
 }
@@ -176,7 +176,7 @@ static const void *timer_iter_tail(ACL_ITER *iter, struct ACL_TIMER *timer)
 		iter->data = iter->ptr = NULL;
 		return (NULL);
 	}
-	info = RING_TO_TIMER(iter->ptr);
+	info = ring_to_timer(iter->ptr);
 	iter->data = info->obj;
 	return (iter->ptr);
 
@@ -192,7 +192,7 @@ static const void *timer_iter_prev(ACL_ITER *iter, struct ACL_TIMER *timer)
 		iter->data = iter->ptr = NULL;
 		return (NULL);
 	}
-	info = RING_TO_TIMER(iter->ptr);
+	info = ring_to_timer(iter->ptr);
 	iter->data = info->obj;
 	return (iter->ptr);
 }
@@ -204,7 +204,7 @@ static const ACL_TIMER_INFO *timer_iter_info(ACL_ITER *iter, struct ACL_TIMER *t
 	if (iter->ptr == NULL || iter->ptr == &timer->timer_header)
 		return (NULL);
 
-	info = RING_TO_TIMER(iter->ptr);
+	info = ring_to_timer(iter->ptr);
 	return (info);
 }
 
@@ -232,7 +232,7 @@ void acl_timer_free(ACL_TIMER* timer, void (*free_fn)(void *))
 {
 	ACL_TIMER_INFO *info;
 
-	while ((info = FIRST_TIMER(&timer->timer_header)) != NULL) {
+	while ((info = first_timer(&timer->timer_header)) != NULL) {
 		if (free_fn)
 			free_fn(info->obj);
 		acl_ring_detach(&info->entry);
