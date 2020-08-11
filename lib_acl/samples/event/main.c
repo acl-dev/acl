@@ -1,3 +1,5 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "lib_acl.h"
 
 typedef struct {
@@ -6,13 +8,17 @@ typedef struct {
 	ACL_EVENT *event;
 } STREAM_IN;
 
-static void trigger_event(int event_type acl_unused,
+static void trigger_event2(int event_type acl_unused,
 	ACL_EVENT *event acl_unused, void *context acl_unused)
 {
-	printf("timer trigger now\r\n");
+	printf("%s: please input: \r\n", __FUNCTION__);
+}
 
-	printf("please input: ");
-	fflush(stdout);
+static void trigger_event1(int event_type acl_unused,
+	ACL_EVENT *event acl_unused, void *context acl_unused)
+{
+	printf("%s: please input: \r\n", __FUNCTION__);
+	acl_event_cancel_timer(event, trigger_event2, NULL);
 }
 
 static int __stop_event = 0;
@@ -21,8 +27,9 @@ static STREAM_IN *create_stream(ACL_EVENT *eventp)
 {
 	STREAM_IN *in = (STREAM_IN*) acl_mymalloc(sizeof(STREAM_IN));
 
-	in->in = acl_vstream_fhopen(fileno(stdin), 0);  /* 用标准输入做为输入流 */
-	in->buf = acl_vstring_alloc(256);
+	/* 用标准输入做为输入流 */
+	in->in    = acl_vstream_fhopen(fileno(stdin), 0);
+	in->buf   = acl_vstring_alloc(256);
 	in->event = eventp;
 	return in;
 }
@@ -38,14 +45,14 @@ static void read_callback(int event_type acl_unused, ACL_EVENT *event,
 	ACL_VSTREAM *stream, void *context)
 {
 	STREAM_IN *in = (STREAM_IN *) context;
-	int   ready;
+	int   ready, ret;
 
 	acl_assert(in->in == stream);
 	acl_assert(in->event == event);
 
 	/* 尝试从输入流中读取一行数据，并且要求去掉尾部的回车换行符 */
-	if (acl_vstream_gets_nonl_peek(stream, in->buf, &ready) == ACL_VSTREAM_EOF)
-	{
+	ret = acl_vstream_gets_nonl_peek(stream, in->buf, &ready);
+	if (ret == ACL_VSTREAM_EOF) {
 		acl_event_disable_read(event, stream);
 		printf(">>>>gets error\r\n");
 		free_stream(in);
@@ -60,8 +67,6 @@ static void read_callback(int event_type acl_unused, ACL_EVENT *event,
 			__stop_event = 1;
 			free_stream(in);
 		} else {
-			printf("please input: ");
-			fflush(stdout);
 			ACL_VSTRING_RESET(in->buf); /* 清空缓冲区 */
 		}
 	}
@@ -105,13 +110,15 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 			break;
 		case 's':
 			delay_sec = atoi(optarg);
-			if (delay_sec < 0)
+			if (delay_sec < 0) {
 				delay_sec = 0;
+			}
 			break;
 		case 'u':
 			delay_usec = atoi(optarg);
-			if (delay_usec < 0)
+			if (delay_usec < 0) {
 				delay_usec = 0;
+			}
 			break;
 		case 'm':
 			timer_delay = atoi(optarg);
@@ -128,16 +135,20 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 	}
 
 	/* 创建非阻塞事件引擎 */
-	if (strcasecmp(event_type, "kernel") == 0)
+	if (strcasecmp(event_type, "kernel") == 0) {
 		eventp = acl_event_new_kernel(delay_sec, delay_usec);
-	else if (strcasecmp(event_type, "poll") == 0)
+	} else if (strcasecmp(event_type, "poll") == 0) {
 		eventp = acl_event_new_poll(delay_sec, delay_usec);
-	else
+	} else {
 		eventp = acl_event_new_select(delay_sec, delay_usec);
+	}
 
-	if (timer_delay >= 0)
-		acl_event_request_timer(eventp, trigger_event, NULL,
+	if (timer_delay >= 0) {
+		acl_event_request_timer(eventp, trigger_event1, NULL,
 			timer_delay, timer_keep);
+		acl_event_request_timer(eventp, trigger_event2, NULL,
+			timer_delay, timer_keep);
+	}
 
 	/* 创建输入流对象 */
 	in = create_stream(eventp);
@@ -149,16 +160,18 @@ int main(int argc acl_unused, char *argv[] acl_unused)
 
 	/* 进行事件循环中 */
 	while (!__stop_event) {
-		if (meter)
+		if (meter) {
 			ACL_METER_TIME("begin event");
+		}
 		acl_event_loop(eventp);
-		if (meter)
+		if (meter) {
 			ACL_METER_TIME("end event");
+		}
 	}
 
 	/* 释放事件引擎 */
 	acl_event_free(eventp);
 
 	printf("event stopped!\r\n");
-	return (0);
+	return 0;
 }
