@@ -68,11 +68,11 @@ static void *fifo_iter_tail(ACL_ITER *iter, struct ACL_FIFO *fifo)
 	ACL_FIFO_INFO *ptr;
 
 	iter->dlen = -1;
-	iter->key = NULL;
+	iter->key  = NULL;
 	iter->klen = -1;
-	iter->i = fifo->cnt - 1;
+	iter->i    = fifo->cnt - 1;
 	iter->size = fifo->cnt;
-	iter->ptr = ptr = fifo->tail;
+	iter->ptr  = ptr = fifo->tail;
 	iter->data = ptr ? ptr->data : NULL;
 	return iter->ptr;
 }
@@ -99,10 +99,10 @@ static ACL_FIFO_INFO *fifo_iter_info(ACL_ITER *iter, struct ACL_FIFO *fifo acl_u
 
 void acl_fifo_init(ACL_FIFO *fifo)
 {
-	fifo->head = NULL;
-	fifo->tail = NULL;
-	fifo->cnt = 0;
-	fifo->slice = NULL;
+	fifo->head       = NULL;
+	fifo->tail       = NULL;
+	fifo->cnt        = 0;
+	fifo->slice      = NULL;
 
 	fifo->push_back  = fifo_push_back;
 	fifo->push_front = fifo_push_front;
@@ -134,7 +134,7 @@ ACL_FIFO *acl_fifo_new1(ACL_SLICE_POOL *slice)
 	}
 	fifo->head = NULL;
 	fifo->tail = NULL;
-	fifo->cnt = 0;
+	fifo->cnt  = 0;
 
 	fifo->push_back  = fifo_push_back;
 	fifo->push_front = fifo_push_front;
@@ -262,10 +262,11 @@ void *acl_fifo_pop_back(ACL_FIFO *fifo)
 		fifo->head = fifo->tail = NULL;
 	}
 	data = info->data;
-	if (fifo->slice)
+	if (fifo->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, info);
-	else
+	} else {
 		acl_myfree(info);
+	}
 	fifo->cnt--;
 	return data;
 }
