@@ -51,7 +51,7 @@ rm -rf %{buildroot}
   cancel another timer, if the other timer has been in schedule queue, the
   memory will be corrupted and process will be crashed.
 
-* Tue Wed 05 2020 shuxin.zheng@qq.com 3.5.1-6-20200805.11
+* Wed Aug 05 2020 shuxin.zheng@qq.com 3.5.1-6-20200805.11
 - add some function in redis module for supporting binary data
 - rewrite and optimize redis module
 - optimize fiber module for checking if a fd is socket/pipe/fifo type
