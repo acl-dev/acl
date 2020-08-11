@@ -26,12 +26,12 @@ static void fifo_push_front(ACL_FIFO *fifo, void *data)
 
 static void* fifo_pop_back(ACL_FIFO *fifo)
 {
-	return (acl_fifo_pop_back(fifo));
+	return acl_fifo_pop_back(fifo);
 }
 
 static void* fifo_pop_front(ACL_FIFO *fifo)
 {
-	return (acl_fifo_pop_front(fifo));
+	return acl_fifo_pop_front(fifo);
 }
 
 static void *fifo_iter_head(ACL_ITER *iter, struct ACL_FIFO *fifo)
@@ -45,7 +45,7 @@ static void *fifo_iter_head(ACL_ITER *iter, struct ACL_FIFO *fifo)
 	iter->size = fifo->cnt;
 	iter->ptr = ptr = fifo->head;
 	iter->data = ptr ? ptr->data : NULL;
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 static void *fifo_iter_next(ACL_ITER *iter, struct ACL_FIFO *fifo acl_unused)
@@ -57,9 +57,10 @@ static void *fifo_iter_next(ACL_ITER *iter, struct ACL_FIFO *fifo acl_unused)
 	if (ptr) {
 		iter->data = ptr->data;
 		iter->i++;
-	} else
+	} else {
 		iter->data = NULL;
-	return (iter);
+	}
+	return iter;
 }
 
 static void *fifo_iter_tail(ACL_ITER *iter, struct ACL_FIFO *fifo)
@@ -73,7 +74,7 @@ static void *fifo_iter_tail(ACL_ITER *iter, struct ACL_FIFO *fifo)
 	iter->size = fifo->cnt;
 	iter->ptr = ptr = fifo->tail;
 	iter->data = ptr ? ptr->data : NULL;
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 static void *fifo_iter_prev(ACL_ITER *iter, struct ACL_FIFO *fifo acl_unused)
@@ -85,14 +86,15 @@ static void *fifo_iter_prev(ACL_ITER *iter, struct ACL_FIFO *fifo acl_unused)
 	if (ptr) {
 		iter->data = ptr->data;
 		iter->i--;
-	} else
+	} else {
 		iter->data = NULL;
-	return (iter);
+	}
+	return iter;
 }
 
 static ACL_FIFO_INFO *fifo_iter_info(ACL_ITER *iter, struct ACL_FIFO *fifo acl_unused)
 {
-	return (iter->ptr ? (ACL_FIFO_INFO*) iter->ptr : NULL);
+	return iter->ptr ? (ACL_FIFO_INFO*) iter->ptr : NULL;
 }
 
 void acl_fifo_init(ACL_FIFO *fifo)
@@ -115,7 +117,7 @@ void acl_fifo_init(ACL_FIFO *fifo)
 
 ACL_FIFO *acl_fifo_new(void)
 {
-	return (acl_fifo_new1(NULL));
+	return acl_fifo_new1(NULL);
 }
 
 ACL_FIFO *acl_fifo_new1(ACL_SLICE_POOL *slice)
@@ -143,7 +145,7 @@ ACL_FIFO *acl_fifo_new1(ACL_SLICE_POOL *slice)
 	fifo->iter_tail  = fifo_iter_tail;
 	fifo->iter_prev  = fifo_iter_prev;
 
-	return (fifo);
+	return fifo;
 }
 
 void acl_fifo_free(ACL_FIFO *fifo, void (*free_fn)(void *))
@@ -151,24 +153,27 @@ void acl_fifo_free(ACL_FIFO *fifo, void (*free_fn)(void *))
 	void *data;
 
 	while ((data = acl_fifo_pop(fifo)) != NULL) {
-		if (free_fn)
+		if (free_fn) {
 			free_fn(data);
+		}
 	}
-	if (fifo->slice)
+	if (fifo->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, fifo);
-	else
+	} else {
 		acl_myfree(fifo);
+	}
 }
 
 ACL_FIFO_INFO *acl_fifo_push_back(ACL_FIFO *fifo, void *data)
 {
 	ACL_FIFO_INFO *info;
 
-	if (fifo->slice)
+	if (fifo->slice) {
 		info = (ACL_FIFO_INFO *) acl_slice_pool_alloc(__FILE__, __LINE__,
 				fifo->slice, sizeof(*info));
-	else
+	} else {
 		info = (ACL_FIFO_INFO *) acl_mymalloc(sizeof(*info));
+	}
 	info->data = data;
 
 	if (fifo->tail == NULL) {
@@ -182,18 +187,19 @@ ACL_FIFO_INFO *acl_fifo_push_back(ACL_FIFO *fifo, void *data)
 	}
 
 	fifo->cnt++;
-	return (info);
+	return info;
 }
 
 ACL_FIFO_INFO *acl_fifo_push_front(ACL_FIFO *fifo, void *data)
 {
 	ACL_FIFO_INFO *info;
 
-	if (fifo->slice)
+	if (fifo->slice) {
 		info = (ACL_FIFO_INFO *) acl_slice_pool_alloc(__FILE__, __LINE__,
 				fifo->slice, sizeof(*info));
-	else
+	} else {
 		info = (ACL_FIFO_INFO*) acl_mymalloc(sizeof(*info));
+	}
 	info->data = data;
 
 	if (fifo->head == NULL) {
@@ -207,7 +213,7 @@ ACL_FIFO_INFO *acl_fifo_push_front(ACL_FIFO *fifo, void *data)
 	}
 
 	fifo->cnt++;
-	return (info);
+	return info;
 }
 
 void *acl_fifo_pop_front(ACL_FIFO *fifo)
@@ -215,8 +221,9 @@ void *acl_fifo_pop_front(ACL_FIFO *fifo)
 	ACL_FIFO_INFO *info;
 	void *data;
 
-	if (fifo->head == NULL)
-		return (NULL);
+	if (fifo->head == NULL) {
+		return NULL;
+	}
 
 	info = fifo->head;
 	if (fifo->head->next) {
@@ -225,13 +232,17 @@ void *acl_fifo_pop_front(ACL_FIFO *fifo)
 	} else {
 		fifo->head = fifo->tail = NULL;
 	}
+
 	data = info->data;
-	if (fifo->slice)
+
+	if (fifo->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, info);
-	else
+	} else {
 		acl_myfree(info);
+	}
+
 	fifo->cnt--;
-	return (data);
+	return data;
 }
 
 void *acl_fifo_pop_back(ACL_FIFO *fifo)
@@ -239,8 +250,9 @@ void *acl_fifo_pop_back(ACL_FIFO *fifo)
 	ACL_FIFO_INFO *info;
 	void *data;
 
-	if (fifo->tail == NULL)
-		return (NULL);
+	if (fifo->tail == NULL) {
+		return NULL;
+	}
 
 	info = fifo->tail;
 	if (fifo->tail->prev) {
@@ -255,7 +267,7 @@ void *acl_fifo_pop_back(ACL_FIFO *fifo)
 	else
 		acl_myfree(info);
 	fifo->cnt--;
-	return (data);
+	return data;
 }
 
 int acl_fifo_delete(ACL_FIFO *fifo, const void *data)
@@ -264,41 +276,46 @@ int acl_fifo_delete(ACL_FIFO *fifo, const void *data)
 
 	while (iter) {
 		if (iter->data == data) {
-			if (iter->prev)
+			if (iter->prev) {
 				iter->prev->next = iter->next;
-			else
+			} else {
 				fifo->head = iter->next;
-			if (iter->next)
+			}
+			if (iter->next) {
 				iter->next->prev = iter->prev;
-			else
+			} else {
 				fifo->tail = iter->prev;
-			if (fifo->slice)
+			}
+			if (fifo->slice) {
 				acl_slice_pool_free(__FILE__, __LINE__, iter);
-			else
+			} else {
 				acl_myfree(iter);
+			}
 			fifo->cnt--;
-			return (1);
+			return 1;
 		}
 
 		iter = iter->next;
 	}
-	return (0);
+	return 0;
 }
 
 void *acl_fifo_head(ACL_FIFO *fifo)
 {
-	if (fifo->head)
-		return (fifo->head->data);
-	else
-		return (NULL);
+	if (fifo->head) {
+		return fifo->head->data;
+	} else {
+		return NULL;
+	}
 }
 
 void *acl_fifo_tail(ACL_FIFO *fifo)
 {
-	if (fifo->tail)
-		return (fifo->tail->data);
-	else
-		return (NULL);
+	if (fifo->tail) {
+		return fifo->tail->data;
+	} else {
+		return NULL;
+	}
 }
 
 void acl_fifo_free2(ACL_FIFO *fifo, void (*free_fn)(ACL_FIFO_INFO *))
@@ -306,13 +323,15 @@ void acl_fifo_free2(ACL_FIFO *fifo, void (*free_fn)(ACL_FIFO_INFO *))
 	ACL_FIFO_INFO *info;
 
 	while ((info = acl_fifo_pop_info(fifo)) != NULL) {
-		if (free_fn)
+		if (free_fn) {
 			free_fn(info);
+		}
 	}
-	if (fifo->slice)
+	if (fifo->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, fifo);
-	else
+	} else {
 		acl_myfree(fifo);
+	}
 }
 
 void acl_fifo_push_info_back(ACL_FIFO *fifo, ACL_FIFO_INFO *info)
@@ -334,8 +353,9 @@ ACL_FIFO_INFO *acl_fifo_pop_info(ACL_FIFO *fifo)
 {
 	ACL_FIFO_INFO *info;
 
-	if (fifo->head == NULL)
-		return (NULL);
+	if (fifo->head == NULL) {
+		return NULL;
+	}
 
 	info = fifo->head;
 	if (fifo->head->next) {
@@ -346,47 +366,53 @@ ACL_FIFO_INFO *acl_fifo_pop_info(ACL_FIFO *fifo)
 	}
 
 	fifo->cnt--;
-	return (info);
+	return info;
 }
 
 void acl_fifo_delete_info(ACL_FIFO *fifo, ACL_FIFO_INFO *info)
 {
-	if (info->prev)
+	if (info->prev) {
 		info->prev->next = info->next;
-	else
+	} else {
 		fifo->head = info->next;
-	if (info->next)
+	}
+	if (info->next) {
 		info->next->prev = info->prev;
-	else
+	} else {
 		fifo->tail = info->prev;
+	}
 
-	if (fifo->slice)
+	if (fifo->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, info);
-	else
+	} else {
 		acl_myfree(info);
+	}
 	fifo->cnt--;
 }
 
 ACL_FIFO_INFO *acl_fifo_head_info(ACL_FIFO *fifo)
 {
-	if (fifo->head)
-		return (fifo->head);
-	else
-		return (NULL);
+	if (fifo->head) {
+		return fifo->head;
+	} else {
+		return NULL;
+	}
 }
 
 ACL_FIFO_INFO *acl_fifo_tail_info(ACL_FIFO *fifo)
 {
-	if (fifo->tail)
-		return (fifo->tail);
-	else
-		return (NULL);
+	if (fifo->tail) {
+		return fifo->tail;
+	} else {
+		return NULL;
+	}
 }
 
 int acl_fifo_size(ACL_FIFO *fifo)
 {
-	if (fifo)
-		return (fifo->cnt);
-	else
-		return (0);
+	if (fifo) {
+		return fifo->cnt;
+	} else {
+		return 0;
+	}
 }
