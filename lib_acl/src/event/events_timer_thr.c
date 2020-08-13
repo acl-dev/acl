@@ -68,6 +68,7 @@ acl_int64 event_timer_request_thr(ACL_EVENT *eventp,
 		timer->callback   = callback;
 		timer->context    = context;
 		timer->event_type = ACL_EVENT_TIME;
+		acl_ring_init(&timer->tmp);
 	}
 
 	/*

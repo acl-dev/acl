@@ -1,4 +1,4 @@
-%define release_id 7
+%define release_id 8
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -45,6 +45,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Aug 13 2020 shuxin.zheng@qq.com 3.5.1-8-20200813.11
+- fixed bug in events_timer.c/events_timer_thr.c
 
 * Tue Aug 11 2020 shuxin.zheng@qq.com 3.5.1-7-20200811.17
 - fixed one important bug in event_timer.c/event_timer_thr.c: when one timer

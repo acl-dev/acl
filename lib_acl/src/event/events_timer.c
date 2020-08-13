@@ -68,6 +68,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 		timer->nrefer = 1;
 		timer->ncount = 0;
 		timer->keep = keep;
+		acl_ring_init(&timer->tmp);
 	}
 
 	/*
