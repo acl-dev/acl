@@ -239,8 +239,9 @@ redis_client* redis_client_cluster::redirect(const char* addr, size_t max_conns)
 		conns = (redis_client_pool*) this->get(addr);
 	}
 
-	if (conns == NULL)
+	if (conns == NULL) {
 		return NULL;
+	}
 
 	redis_client* conn;
 
@@ -248,8 +249,9 @@ redis_client* redis_client_cluster::redirect(const char* addr, size_t max_conns)
 
 	while (i++ < 5) {
 		conn = (redis_client*) conns->peek();
-		if (conn != NULL)
+		if (conn != NULL) {
 			return conn;
+		}
 
 #ifdef AUTO_SET_ALIVE
 		conns->set_alive(false);

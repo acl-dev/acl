@@ -178,7 +178,19 @@ public:
 	 */
 	const char* get_password(const char* addr) const;
 
+	/**
+	 * 重定向至目标 redis 节点
+	 * @param addr {const char*} 目标 redis 服务地址
+	 * @param max_conns {size_t} 连接池最大连接数
+	 * @return {redis_client*} 获得与目标 redis 节点的连接通信对象
+	 */
 	redis_client* redirect(const char* addr, size_t max_conns);
+
+	/**
+	 * 根据 redis 集群的槽号获得连接对象
+	 * @param slot {int} redis 集群键值对应的存储槽槽号
+	 * @return {redis_client*} 获得与目标 redis 节点的连接通信对象
+	 */
 	redis_client* peek_conn(int slot);
 
 protected:
