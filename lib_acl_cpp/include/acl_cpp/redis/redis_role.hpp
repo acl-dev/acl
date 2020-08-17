@@ -69,7 +69,7 @@ public:
 	{
 		off_ = off;
 	}
-	long long get_off(void) const
+	long long get_offset(void) const
 	{
 		return off_;
 	}
@@ -102,6 +102,11 @@ public:
 	const redis_role4slave& get_role4slave(void) const
 	{
 		return role4slave_;
+	}
+
+	const char* get_role_name(void) const
+	{
+		return role_name_.c_str();
 	}
 
 private:

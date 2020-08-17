@@ -32,23 +32,26 @@ bool redis_role::role(void)
 
 	build_request(1, argv, lens);
 	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY) {
 		return false;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return false;
+	}
 
 	const redis_result* first = children[0];
 	first->argv_to_string(role_name_);
-	if (role_name_.equal("sentinel", false))
+
+	if (role_name_.equal("sentinel", false)) {
 		return role_sentinel(children, size);
-	else if (role_name_.equal("master", false))
+	} else if (role_name_.equal("master", false)) {
 		return role_master(children, size);
-	else if (role_name_.equal("slave", false))
+	} else if (role_name_.equal("slave", false)) {
 		return role_slave(children, size);
-	else {
+	} else {
 		logger_error("unknown role name=%s", role_name_.c_str());
 		return false;
 	}
@@ -69,9 +72,26 @@ bool redis_role::role_sentinel(const redis_result** a, size_t n)
 
 bool redis_role::role_master(const redis_result** a, size_t n)
 {
-	for (size_t i = 1; i < n; i++) {
-		if (add_one_slave(a[i], role4master_) == false)
+	if (n < 3) {
+		logger_error("tool small, n=%ld", (long) n);
+		return false;
+	}
+
+	const redis_result* rr = a[1];
+	bool ok;
+	long long off = rr->get_integer64(&ok);
+	if (!ok) {
+		logger_error("can't get offset");
+		return false;
+	}
+	role4master_.set_offset(off);
+
+	rr = a[2];
+	const redis_result** aa = rr->get_children(&n);
+	for (size_t i = 0; i < n; i++) {
+		if (add_one_slave(aa[i], role4master_) == false) {
 			return false;
+		}
 	}
 
 	return true;
