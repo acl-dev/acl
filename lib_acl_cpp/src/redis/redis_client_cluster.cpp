@@ -373,6 +373,8 @@ redis_client* redis_client_cluster::move(redis_command& cmd,
 		return NULL;
 	}
 
+	// 从连接池集合中提取目标redis节点的配置项，如果不存在，则默认使用
+	// 所设置的第一个redis节点的配置项
 	const conn_config* conf = this->get_config(addr, true);
 	if (conf == NULL) {
 		logger_error("no conn_config for addr=%s", addr);
@@ -413,7 +415,9 @@ redis_client* redis_client_cluster::ask(redis_command& cmd,
 		return NULL;
 	}
 
-	const conn_config* conf = this->get_config(addr);
+	// 从连接池集合中提取目标redis节点的配置项，如果不存在，则默认使用
+	// 所设置的第一个redis节点的配置项
+	const conn_config* conf = this->get_config(addr, true);
 	if (conf == NULL) {
 		logger_error("no conn_config for addr=%s", addr);
 		return NULL;
