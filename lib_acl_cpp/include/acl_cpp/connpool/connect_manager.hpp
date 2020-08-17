@@ -84,7 +84,14 @@ public:
 	void set(const char* addr, size_t count,
 		int conn_timeout = 30, int rw_timeout = 30);
 
-	const conn_config* get_config(const char* addr);
+	/**
+	 * 根据指定地址获取该地址对应的连接池配置对象
+	 * @param addr {const char*} 目标连接池地址
+	 * @param use_first {bool} 如果目标地址的配置对象不存在，是否允许使用
+	 *  第一个地址配置对象
+	 * @return {const conn_config*} 返回 NULL 表示不存在
+	 */
+	const conn_config* get_config(const char* addr, bool use_first = false);
 
 	/**
 	 * 设置连接池失败后重试的时间时间隔（秒），该函数可以在程序运行时被

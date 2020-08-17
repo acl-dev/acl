@@ -192,14 +192,22 @@ void connect_manager::set(const char* addr, size_t count,
 	}
 }
 
-const conn_config* connect_manager::get_config(const char* addr)
+const conn_config* connect_manager::get_config(const char* addr,
+	bool use_first /* false */)
 {
 	string buf(addr);
 	buf.lower();
 
 	lock_guard guard(lock_);
 	std::map<string, conn_config>::const_iterator cit = addrs_.find(buf);
-	return cit != addrs_.end() ? &cit->second : NULL;
+	if (cit != addrs_.end()) {
+		return &cit->second;
+	}
+	if (!use_first || addrs_.empty()) {
+		return NULL;
+	}
+	cit = addrs_.begin();
+	return &cit->second;
 }
 
 #define DEFAULT_ID	0

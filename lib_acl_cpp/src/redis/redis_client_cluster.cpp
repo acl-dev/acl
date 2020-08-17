@@ -373,7 +373,7 @@ redis_client* redis_client_cluster::move(redis_command& cmd,
 		return NULL;
 	}
 
-	const conn_config* conf = this->get_config(addr);
+	const conn_config* conf = this->get_config(addr, true);
 	if (conf == NULL) {
 		logger_error("no conn_config for addr=%s", addr);
 		return NULL;
