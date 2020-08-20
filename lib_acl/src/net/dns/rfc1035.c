@@ -45,8 +45,9 @@ static int rfc1035HeaderPack(char *buf, size_t sz, rfc1035_message * hdr)
 	unsigned short s;
 	unsigned short t;
 
-	if (sz < 12)
+	if (sz < 12) {
 		acl_msg_fatal("%s: sz(%d) < 12", myname, (int) sz);
+	}
 
 	s = htons(hdr->id);
 	memcpy(buf + off, &s, sizeof(s));
@@ -74,8 +75,9 @@ static int rfc1035HeaderPack(char *buf, size_t sz, rfc1035_message * hdr)
 	s = htons(hdr->arcount);
 	memcpy(buf + off, &s, sizeof(s));
 	off += sizeof(s);
-	if (off != 12)
+	if (off != 12) {
 		acl_msg_fatal("%s: off(%d) != 12", myname, off);
+	}
 	return off;
 }
 
@@ -94,14 +96,17 @@ static int rfc1035LabelPack(char *buf, size_t sz, const char *label)
 	size_t len = label ? strlen(label) : 0;
 
 	if (label) {
-		if (strchr(label, '.') != NULL)
+		if (strchr(label, '.') != NULL) {
 			acl_msg_fatal("%s: '.' exist in label(%s)", myname, label);
+		}
 	}
 
-	if (len > RFC1035_MAXLABELSZ)
+	if (len > RFC1035_MAXLABELSZ) {
 		len = RFC1035_MAXLABELSZ;
-	if (sz < len + 1)
+	}
+	if (sz < len + 1) {
 		acl_msg_fatal("%s: sz(%d) < len(%d) + 1", myname, (int) sz, (int) len);
+	}
 	*(buf + off) = (char) len;
 	off++;
 	memcpy(buf + off, label, len);
@@ -129,12 +134,14 @@ static int rfc1035NamePack(char *buf, size_t sz, const char *name)
 	* NOTE: use of strtok here makes names like foo....com valid.
 	*/
 	ptr = copy;
-	for (t = acl_mystrtok(&ptr, "."); t; t = acl_mystrtok(&ptr, "."))
+	for (t = acl_mystrtok(&ptr, "."); t; t = acl_mystrtok(&ptr, ".")) {
 		off += rfc1035LabelPack(buf + off, sz - off, t);
+	}
 	acl_myfree(copy);
 	off += rfc1035LabelPack(buf + off, sz - off, NULL);
-	if (off > (int) sz)
+	if (off > (int) sz) {
 		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, (int) sz);
+	}
 	return off;
 }
 
@@ -158,8 +165,9 @@ static int rfc1035QuestionPack(char *buf, size_t sz, const char *name,
 	s = htons(tclass);
 	memcpy(buf + off, &s, sizeof(s));
 	off += sizeof(s);
-	if (off > (int) sz)
+	if (off > (int) sz) {
 		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, (int) sz);
+	}
 
 	return off;
 }
@@ -191,8 +199,9 @@ static int rfc1035HeaderUnpack(const char *buf, size_t sz, int *off,
 	* The header is 12 octets.  This is a bogus message if the size
 	* is less than that.
 	*/
-	if (sz < 12)
+	if (sz < 12) {
 		return 1;
+	}
 	memcpy(&s, buf + (*off), sizeof(s));
 	(*off) += sizeof(s);
 	h->id = ntohs(s);
@@ -268,18 +277,21 @@ static int rfc1035NameUnpack(const char *buf, size_t sz, int *off,
 			/* blasted compression */
 			unsigned short s;
 			int ptr;
-			if (rdepth > 64)	/* infinite pointer loop */
+			if (rdepth > 64) {	/* infinite pointer loop */
 				return 1;
+			}
 			memcpy(&s, buf + (*off), sizeof(s));
 			s = ntohs(s);
 			(*off) += sizeof(s);
 			/* Sanity check */
-			if ((*off) >= (int) sz)
+			if ((*off) >= (int) sz) {
 				return 1;
+			}
 			ptr = s & 0x3FFF;
 			/* Make sure the pointer is inside this message */
-			if (ptr >= (int) sz)
+			if (ptr >= (int) sz) {
 				return 1;
+			}
 			return rfc1035NameUnpack(buf, sz, &ptr, rdlength, name + no,
 						ns - no, rdepth + 1);
 		} else if (c > RFC1035_MAXLABELSZ) {
@@ -290,24 +302,30 @@ static int rfc1035NameUnpack(const char *buf, size_t sz, int *off,
 		} else {
 			(*off)++;
 			len = (size_t) c;
-			if (len == 0)
+			if (len == 0) {
 				break;
-			if (len > (ns - no - 1))	/* label won't fit */
+			}
+			if (len > (ns - no - 1)) { /* label won't fit */
 				return 1;
-			if ((*off) + len >= sz)	/* message is too short */
+			}
+			if ((*off) + len >= sz)	{ /* message is too short */
 				return 1;
+			}
 			memcpy(name + no, buf + (*off), len);
 			(*off) += (int) len;
 			no += (int) len;
 			*(name + (no++)) = '.';
-			if (rdlength)
+			if (rdlength) {
 				*rdlength += (unsigned short) len + 1;
+			}
 		}
 	} while (c > 0 && no < (int) ns);
-	if (no)
+
+	if (no) {
 		*(name + no - 1) = '\0';
-	else
+	} else {
 		*name = '\0';
+	}
 	/* make sure we didn't allow someone to overflow the name buffer */
 	if (no > (int) ns) {
 		acl_msg_error("%s: no(%d) > ns(%d)", myname, no, (int) ns);
@@ -371,13 +389,16 @@ static int rfc1035RRUnpack(const char *buf, size_t sz, int *off, rfc1035_rr * RR
 	}
 	RR->rdlength = rdlength;
 	switch (RR->type) {
+	case RFC1035_TYPE_CNAME:
 	case RFC1035_TYPE_PTR:
 		RR->rdata = (char*) acl_mymalloc(RFC1035_MAXHOSTNAMESZ);
 		rdata_off = *off;
 		RR->rdlength = 0;	/* Filled in by rfc1035NameUnpack */
 		if (rfc1035NameUnpack(buf, sz, &rdata_off, &RR->rdlength,
-				RR->rdata, RFC1035_MAXHOSTNAMESZ, 0))
+			RR->rdata, RFC1035_MAXHOSTNAMESZ, 0))
+		{
 			return 1;
+		}
 		if (rdata_off > ((*off) + rdlength)) {
 			/*
 			* This probably doesn't happen for valid packets, but
@@ -429,8 +450,9 @@ const char *rfc1035Strerror(int errnum)
 	int   i;
 
 	for (i = 0; errmsg[i].msg != NULL; i++) {
-		if (errmsg[i].errnum == -errnum)
+		if (errmsg[i].errnum == -errnum) {
 			return (errmsg[i].msg);
+		}
 	}
 
 	return (unknown);
@@ -445,13 +467,16 @@ static void rfc1035RRDestroy(rfc1035_rr * rr, int n)
 {
 	const char *myname = "rfc1035RRDestroy";
 
-	if (rr == NULL)
+	if (rr == NULL) {
 		return;
-	if (n <= 0)
+	}
+	if (n <= 0) {
 		acl_msg_fatal("%s: n(%d) <= 0", myname, n);
+	}
 	while (n--) {
-		if (rr[n].rdata)
+		if (rr[n].rdata) {
 			acl_myfree(rr[n].rdata);
+		}
 	}
 	acl_myfree(rr);
 }
@@ -491,12 +516,15 @@ static int rfc1035QueryUnpack(const char *buf, size_t sz, int *off,
 
 void rfc1035MessageDestroy(rfc1035_message * msg)
 {
-	if (!msg)
+	if (!msg) {
 		return;
-	if (msg->query)
+	}
+	if (msg->query) {
 		acl_myfree(msg->query);
-	if (msg->answer)
+	}
+	if (msg->answer) {
 		rfc1035RRDestroy(msg->answer, msg->ancount);
+	}
 	acl_myfree(msg);
 }
 
@@ -511,21 +539,26 @@ int rfc1035QueryCompare(const rfc1035_query * a, const rfc1035_query * b)
 {
 	size_t la, lb;
 
-	if (a->qtype != b->qtype)
+	if (a->qtype != b->qtype) {
 		return 1;
-	if (a->qclass != b->qclass)
+	}
+	if (a->qclass != b->qclass) {
 		return 1;
+	}
 	la = strlen(a->name);
 	lb = strlen(b->name);
 	if (la != lb) {
 		/* Trim root label(s) */
-		while (la > 0 && a->name[la - 1] == '.')
+		while (la > 0 && a->name[la - 1] == '.') {
 			la--;
-		while (lb > 0 && b->name[lb - 1] == '.')
+		}
+		while (lb > 0 && b->name[lb - 1] == '.') {
 			lb--;
+		}
 	}
-	if (la != lb)
+	if (la != lb) {
 		return 1;
+	}
 
 	return strncasecmp(a->name, b->name, la);
 }
@@ -661,8 +694,9 @@ static int rfc1035RRPack(const rfc1035_rr *RR, char *buf, size_t sz)
 	switch (RR->type) {
 	case RFC1035_TYPE_PTR:
 	case RFC1035_TYPE_NS:
-		if (strlen(RR->rdata) > RFC1035_MAXHOSTNAMESZ)
+		if (strlen(RR->rdata) > RFC1035_MAXHOSTNAMESZ) {
 			return (0);
+		}
 		off_saved = off;
 		off += sizeof(s);
 		off += rfc1035NamePack(buf + off, sz, RR->rdata);
@@ -679,10 +713,11 @@ static int rfc1035RRPack(const rfc1035_rr *RR, char *buf, size_t sz)
 		break;
 	}
 
-	if ((unsigned) off > sz)
+	if ((unsigned) off > sz) {
 		acl_msg_fatal("%s: off(%d) > sz(%d)", myname, off, (int) sz);
+	}
 
-	return (off);
+	return off;
 }
 
 size_t rfc1035BuildAReply(const char *hostname, const ACL_ARGV *ip_argv,
@@ -786,8 +821,9 @@ size_t rfc1035BuildAQuery(const char *hostname, char *buf, size_t sz,
 		ACL_SAFE_STRNCPY(query->name, hostname, sizeof(query->name));
 	}
 
-	if (offset > sz)
+	if (offset > sz) {
 		acl_msg_fatal("%s: offset(%d) > sz(%d)", myname, (int) offset, (int) sz);
+	}
 	return offset;
 }
 
@@ -827,8 +863,9 @@ size_t rfc1035BuildPTRQuery(const struct in_addr addr, char *buf,
 		query->qclass = RFC1035_CLASS_IN;
 		ACL_SAFE_STRNCPY(query->name, rev, sizeof(query->name));
 	}
-	if (offset > sz)
+	if (offset > sz) {
 		acl_msg_fatal("%s: offset(%d) > sz(%d)", myname, (int) offset, (int) sz);
+	}
 	return offset;
 }
 
