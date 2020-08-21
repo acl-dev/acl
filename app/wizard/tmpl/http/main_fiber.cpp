@@ -100,9 +100,14 @@ int main(int argc, char *argv[])
 			acl::string buf("test2: hello world!\r\n");
 			res.setContentLength(buf.size());
 			return res.write(buf);
+		})
+		.Default([](HttpRequest&, HttpResponse& res) {
+			acl::string buf("Default: hello world!\r\n");
+			res.setContentLength(buf.size());
+			return res.write(buf);
 		});
 #else
-		;
+		.Default(http_get_default);
 #endif
 
 	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0) {

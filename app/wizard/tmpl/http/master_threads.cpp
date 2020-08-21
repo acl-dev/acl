@@ -82,8 +82,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 		session = new acl::memcache_session("127.0.0.1:11211");
 	}
 
-	http_servlet* servlet = new http_servlet(service_->get_handlers(),
-					conn, session);
+	http_servlet* servlet = new http_servlet(*service_, conn, session);
 	conn->set_ctx(servlet);
 
 	return true;

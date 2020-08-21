@@ -56,7 +56,7 @@ void master_service::on_accept(acl::socket_stream& conn)
 	conn.set_rw_timeout(120);
 
 	acl::memcache_session session("127.0.0.1:11211");
-	http_servlet servlet(service_->get_handlers(), &conn, &session);
+	http_servlet servlet(*service_, &conn, &session);
 
 	// charset: big5, gb2312, gb18030, gbk, utf-8
 	servlet.setLocalCharset("utf-8");

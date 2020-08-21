@@ -343,6 +343,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\http_service.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\http_servlet.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\main.cpp"
 				>
 			</File>

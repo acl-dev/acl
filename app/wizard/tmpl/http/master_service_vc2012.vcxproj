@@ -337,6 +337,8 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="http_service.cpp" />
+    <ClCompile Include="http_servlet.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="master_service.cpp" />
     <ClCompile Include="stdafx.cpp">
