@@ -136,6 +136,8 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 	for (i = 0; i < count; i++) {
 		if (res->answer[i].type == RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
+			phost->type = ACL_HOSTNAME_TYPE_IPADDR;
+
 			saddr = &phost->saddr;
 
 #if defined(ACL_UNIX)
@@ -159,6 +161,20 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 
 				continue;
 			}
+
+			phost->ttl = res->answer[i].ttl;
+			if (ttl_min && *ttl_min > phost->ttl) {
+				*ttl_min = phost->ttl;
+			}
+
+			(void) acl_array_append(dns_db->h_db, phost);
+			dns_db->size++;
+		} else if (res->answer[i].type == RFC1035_TYPE_CNAME) {
+			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
+			phost->type = ACL_HOSTNAME_TYPE_CNAME;
+
+			acl_snprintf(phost->ip, sizeof(phost->ip), "%s",
+				res->answer[i].rdata);
 
 			phost->ttl = res->answer[i].ttl;
 			if (ttl_min && *ttl_min > phost->ttl) {

@@ -24,7 +24,18 @@ static void dns_lookup_callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
 		const ACL_HOST_INFO *info;
 
 		info = (const ACL_HOST_INFO*) iter.data;
-		printf("\tip=%s, ttl=%d\n", info->ip, info->ttl);
+		const char *name = "unknown";
+		switch (info->type) {
+		case ACL_HOSTNAME_TYPE_IPADDR:
+			name = "ipaddr";
+			break;
+		case ACL_HOSTNAME_TYPE_CNAME:
+			name = "cname";
+			break;
+		default:
+			break;
+		}
+		printf("\t%s: addr=%s, ttl=%d\n", name, info->ip, info->ttl);
 	}     
 
 	__nresult++;
@@ -105,8 +116,11 @@ int main(int argc, char *argv[])
 
 	acl_lib_init();
 
-	while ((ch = getopt(argc, argv, "s:p:d:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:p:d:")) > 0) {
 		switch (ch) {
+		case 'h':
+			usage(argv[0]);
+			return 0;
 		case 's':
 			ACL_SAFE_STRNCPY(dns_ips, optarg, sizeof(dns_ips));
 			break;
@@ -118,13 +132,13 @@ int main(int argc, char *argv[])
 			break;
 		default:
 			usage(argv[0]);
-			return (0);
+			return 0;
 		}
 	}
 
 	if (dns_ips[0] == 0 || domains[0] == 0) {
 		usage(argv[0]);
-		return (0);
+		return 0;
 	}
 
 	acl_msg_stdout_enable(1);
@@ -133,6 +147,6 @@ int main(int argc, char *argv[])
 	printf("Enter any key to exit\n");
 	getchar();
 #endif
-	return (0);
+	return 0;
 }
 
