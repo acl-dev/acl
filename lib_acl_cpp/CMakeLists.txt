@@ -47,6 +47,11 @@ if (ACL_CLIENT_ONLY MATCHES "YES")
 	add_definitions("-DACL_CLIENT_ONLY")
 endif()
 
+if (HAS_MBEDTLS MATCHES "YES")
+	message(STATUS "acl_cpp: HAS_MBEDTLS been set")
+	add_definitions("-DHAS_MBEDTLS")
+endif()
+
 ##############################################################################
 
 set(acl_path ${CMAKE_CURRENT_SOURCE_DIR}/../lib_acl)

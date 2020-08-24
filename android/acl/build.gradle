@@ -37,6 +37,7 @@ android {
                 arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
                 //arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
                 arguments "-DACL_CLIENT_ONLY=YES"
+                arguments "-DHAS_MBEDTLS=YES"
                 arguments "-DACL_BUILD_SHARED=YES"
                 //cppFlags "-fexceptions"
 
