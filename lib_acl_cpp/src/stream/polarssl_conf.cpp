@@ -271,8 +271,8 @@ bool polarssl_conf::load(void)
 	}
 	return true;
 #else
-	logger_warn("link polarssl library in statis way!");
-	return false;
+	logger_warn("link polarssl library in static way!");
+	return true;
 #endif
 }
 
