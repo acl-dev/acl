@@ -278,7 +278,9 @@ bool polarssl_conf::load(void)
 
 void polarssl_conf::init_once(void)
 {
+#ifdef HAS_POLARSSL_DLL
 	load();
+#endif
 
 	lock_.lock();
 	if (has_inited_) {
