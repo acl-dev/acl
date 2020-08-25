@@ -502,8 +502,8 @@ bool mbedtls_conf::load(void)
 	}
 	return true;
 #else
-	logger_warn("link mbedtls library in statis way!");
-	return false;
+	logger_warn("link mbedtls library in static way!");
+	return true;
 #endif
 }
 
@@ -594,9 +594,11 @@ static int mutex_unlock(mbedtls_threading_mutex_t* mutex)
 
 bool mbedtls_conf::init_once(void)
 {
+#ifdef HAS_MBEDTLS_DLL
 	if (!load()) {
 		return false;
 	}
+#endif
 
 	thread_mutex_guard guard(lock_);
 	if (init_status_ == CONF_INIT_OK) {
@@ -604,6 +606,7 @@ bool mbedtls_conf::init_once(void)
 	} else if (init_status_ == CONF_INIT_ERR) {
 		return false;
 	}
+	assert(init_status_ == CONF_INIT_NIL);
 
 #if defined(HAS_MBEDTLS)
 # if defined(MBEDTLS_THREADING_ALT)
