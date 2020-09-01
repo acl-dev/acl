@@ -19,27 +19,27 @@ extern "C" {
 
 /* DNS 查询时的错误码定义 */
 
-#define	ACL_DNS_OK			0
+#define	ACL_DNS_OK			    0
 #define	ACL_DNS_OK_CACHE		1
 #define	ACL_DNS_ERR_FMT			-1
 #define	ACL_DNS_ERR_SVR			-2
-#define	ACL_DNS_ERR_NO_EXIST		-3
-#define	ACL_DNS_ERR_NO_SUPPORT		-4
+#define	ACL_DNS_ERR_NO_EXIST	-3
+#define	ACL_DNS_ERR_NO_SUPPORT	-4
 #define	ACL_DNS_ERR_DENY		-5
 #define	ACL_DNS_ERR_YX			-6
 #define	ACL_DNS_ERR_YXRR		-7
 #define	ACL_DNS_ERR_NXRR		-8
 #define	ACL_DNS_ERR_NO_AUTH		-9
-#define	ACL_DNS_ERR_NOT_ZONE		-10
+#define	ACL_DNS_ERR_NOT_ZONE	-10
 #define	ACL_DNS_ERR_UNPACK		-15
 #define	ACL_DNS_ERR_TIMEOUT		-16
 #define	ACL_DNS_ERR_EXIST		-17
-#define	ACL_DNS_ERR_BUILD_REQ		-18
+#define	ACL_DNS_ERR_BUILD_REQ	-18
 
 typedef struct ACL_DNS_ADDR {
 	char  ip[64];			/* DNS 服务器地址 */
-	unsigned short port;		/* DNS 服务器端口 */
-	ACL_SOCKADDR   addr;		/* DNS 地址 */
+	unsigned short port;	/* DNS 服务器端口 */
+	ACL_SOCKADDR   addr;	/* DNS 地址 */
 	int   addr_len;			/* addr 大小 */
 	int   mask_length;		/* DNS 服务器所在网络的掩码长度(> 0 && < 32) */
 	struct in_addr in;		/* addr 的网段地址 */
@@ -48,10 +48,10 @@ typedef struct ACL_DNS_ADDR {
 typedef struct ACL_DNS {
 	ACL_AIO *aio;			/* 异步IO句柄 */
 	unsigned short qid;		/* 发送请求的ID标识号 */
-	ACL_ASTREAM *astream;		/* 异步流 */
+	ACL_ASTREAM *astream;	/* 异步流 */
 
 	ACL_ARRAY *groups;		/* 域名组列表 */
-	ACL_ARRAY *dns_list;		/* DNS 服务器地址列表 */
+	ACL_ARRAY *dns_list;	/* DNS 服务器地址列表 */
 	unsigned   dns_idx;		/* 当前使用的 dns_list 数组下标 */
 	ACL_DNS_ADDR addr_from;		/* 来源 DNS 地址 */
 	ACL_HTABLE *lookup_table;	/* 查询对象表 */
@@ -59,7 +59,7 @@ typedef struct ACL_DNS {
 	int   timeout;			/* 每次查询的超时时间值(秒) */
 	int   retry_limit;		/* 查询超时时重试的次数限制 */
 	unsigned int flag;		/* 标志位 */
-#define	ACL_DNS_FLAG_ALLOC		(1 << 0)	/* 该异步句柄是动态分配的 */
+#define	ACL_DNS_FLAG_ALLOC	    	(1 << 0)	/* 该异步句柄是动态分配的 */
 #define	ACL_DNS_FLAG_CHECK_DNS_IP	(1 << 1)	/* 检查DNS地址是否匹配 */
 #define	ACL_DNS_FLAG_CHECK_DNS_NET	(1 << 2)	/* 检查DNS网络是否匹配 */
 
