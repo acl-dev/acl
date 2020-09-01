@@ -54,13 +54,13 @@ static void parse_result(const char *filepath)
 			struct in_addr sin_addr;
 			memcpy(&sin_addr, answers->answer[i].rdata, 4);
 			inet_ntop(AF_INET, &sin_addr, ip, sizeof(ip));
-			printf(">>ip=%s\r\n", ip);
+			printf(">>ip=%s, ttl=%d\r\n", ip, answers->answer[i].ttl);
 		} else if (answers->answer[i].type == RFC1035_TYPE_CNAME) {
 			char name[128];
 			size_t n = sizeof(name) > answers->answer[i].rdlength
 				? answers->answer[i].rdlength : sizeof(name);
 			ACL_SAFE_STRNCPY(name, answers->answer[i].rdata, n);
-			printf(">>cname=%s\r\n", name);
+			printf(">>cname=%s, ttl=%d\r\n", name, answers->answer[i].ttl);
 		} else {
 			printf("not support type=%d\n", answers->answer[i].type);
 		}
