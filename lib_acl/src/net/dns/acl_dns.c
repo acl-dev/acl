@@ -51,7 +51,7 @@ static int dns_stream_open(ACL_DNS *dns);
 
 static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
-{       
+{
 	ACL_DNS *dns = (ACL_DNS*) arg;
 	int      ret;
 
@@ -68,7 +68,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 			(struct sockaddr*) &dns->addr_from.addr,
 			&dns->addr_from.addr_len);
 #else
-#error "unknown OS"     
+#error "unknown OS"
 #endif
 	if (ret < 0) {
 		acl_msg_error("%s, %s(%d): recvfrom error %s",
@@ -81,7 +81,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 
 static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
-{       
+{
 	ACL_DNS *dns = (ACL_DNS*) arg;
 	int      ret;
 	unsigned short i;
@@ -239,10 +239,10 @@ static void dns_lookup_error(ACL_DNS *dns, rfc1035_message *res)
 	char  key[RFC1035_MAXHOSTNAMESZ + 16];
 	ACL_DNS_REQ *req;
 
-    if (dns->aio == NULL) {
-        acl_msg_info("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
-        return;
-    }
+	if (dns->aio == NULL) {
+		acl_msg_info("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
+		return;
+	}
 
 	snprintf(key, sizeof(key), "%s:%d", res->query->name, res->id);
 	acl_lowercase(key);
@@ -279,11 +279,11 @@ static void dns_lookup_ok(ACL_DNS *dns, rfc1035_message *res, int len)
 	}
 
 	/* 取消定时器 */
-    if (dns->aio == NULL) {
-	    acl_aio_cancel_timer(dns->aio, dns->lookup_timeout, req);
-    } else {
-        acl_msg_warn("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
-    }
+	if (dns->aio == NULL) {
+		acl_aio_cancel_timer(dns->aio, dns->lookup_timeout, req);
+	} else {
+		acl_msg_warn("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
+	}
 
 	/* 从查询列表删除该查询对象 */
 	acl_htable_delete(dns->lookup_table, req->key, NULL);
@@ -369,10 +369,10 @@ static void dns_stream_reopen_timer(int event_type acl_unused,
 	} else if (dns->aio) {
 		/* 设置定时器重新打开 UDP 套接字 */
 		acl_aio_request_timer(dns->aio, dns_stream_reopen_timer, dns,
-		2 * 1000000, 0);
+			2 * 1000000, 0);
 	} else {
-        acl_msg_warn("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
-    }
+		acl_msg_warn("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
+	}
 }
 
 /* 数据流出错时的回调函数 */
@@ -391,10 +391,10 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 	/* 设置定时器重新打开 UDP 套接字，不应立即打开 socket，以防止频繁关闭 */
 	if (dns->aio) {
 		acl_msg_warn("%s(%d): dns socket closed %s, re-open it in timer",
-				myname, __LINE__, acl_last_serror());
+			myname, __LINE__, acl_last_serror());
 		acl_aio_request_timer(dns->aio, dns_stream_reopen_timer, dns,
 			2* 1000000, 0);
-    }
+	}
 	return -1;
 }
 
@@ -551,9 +551,11 @@ void acl_dns_close(ACL_DNS *dns)
 		acl_myfree(req);
 	}
 
-    if (dns->aio) {
+	if (dns->aio) {
 		dns->aio->dns = NULL;
-		dns->aio = NULL; /* 置空后，为后续过程提示当前对象正在关闭过程中 */
+
+		/* 置空后，为后续过程提示当前对象正在关闭过程中 */
+		dns->aio = NULL;
 	}
 
 	acl_htable_free(dns->lookup_table, NULL);
