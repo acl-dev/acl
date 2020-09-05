@@ -124,7 +124,6 @@ struct ACL_VSTREAM {
 #define	ACL_VSTREAM_FLAG_CONNECTING     (1 << 18) /* 正在连接过程中 */
 #define	ACL_VSTREAM_FLAG_PREREAD	(1 << 19) /* 对于 acl_vstream_can_read 调用过程是否允许预读 */
 
-	char  errbuf[128];              /**< error info */
 	int   errnum;                   /**< record the system errno here */
 	int   rw_timeout;               /**< read/write timeout */
 	char *addr_local;               /**< the local addr of the fp */

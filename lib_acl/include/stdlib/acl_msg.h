@@ -241,6 +241,7 @@ ACL_API void acl_msg_panic2(const char *fmt, va_list ap);
  * @return {const char*} 返回的地址应与 buffer 相同
  */
 ACL_API const char *acl_strerror(unsigned int errnum, char *buffer, int size);
+ACL_API const char *acl_strerror1(unsigned int errnum);
 
 /**
  * 获得上次系统调用出错时的错误描述信息

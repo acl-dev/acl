@@ -108,13 +108,9 @@ AGAIN:
 		stream->errnum = acl_last_error();
 
 		if (stream->errnum != ACL_ETIMEDOUT) {
-			(void) acl_strerror(stream->errnum, stream->errbuf,
-				    sizeof(stream->errbuf));
 			stream->flag |= ACL_VSTREAM_FLAG_ERR;
 		} else {
 			stream->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-			ACL_SAFE_STRNCPY(stream->errbuf, "read timeout",
-				sizeof(stream->errbuf));
 		}
 
 		return (-1);
@@ -138,14 +134,10 @@ AGAIN:
 			goto AGAIN;
 		} else if (stream->errnum == ACL_ETIMEDOUT) {
 			stream->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-			ACL_SAFE_STRNCPY(stream->errbuf, "read timeout",
-				sizeof(stream->errbuf));
 		} else if (stream->errnum != ACL_EWOULDBLOCK
 			&& stream->errnum != ACL_EAGAIN)
 		{
 			stream->flag |= ACL_VSTREAM_FLAG_ERR;
-			acl_strerror(stream->errnum, stream->errbuf,
-				sizeof(stream->errbuf));
 		}
 		/* XXX: should do something where, 2009.12.25 -- zsx */
 
@@ -154,8 +146,6 @@ AGAIN:
 	} else if (stream->read_cnt == 0) { /* closed by peer */
 		stream->flag = ACL_VSTREAM_FLAG_EOF;
 		stream->errnum = 0;
-		snprintf(stream->errbuf, sizeof(stream->errbuf),
-			"closed by peer(%s)", acl_last_serror());
 
 		return (0);
 	}
@@ -163,7 +153,6 @@ AGAIN:
 	stream->read_ptr = stream->read_buf;
 	stream->flag &= ~ACL_VSTREAM_FLAG_BAD;
 	stream->errnum = 0;
-	stream->errbuf[0] = 0;
 	stream->total_read_cnt += stream->read_cnt;
 
 	return ((int) stream->read_cnt);
@@ -327,9 +316,6 @@ int private_vstream_readn(ACL_VSTREAM *stream, void *vptr, size_t maxlen)
 	}
 
 	if (n != (int) maxlen) {
-		snprintf(stream->errbuf, sizeof(stream->errbuf),
-			"nread=%d, nneed=%d, errmsg=not read the needed data",
-			n, (int) maxlen);
 		stream->flag |= ACL_VSTREAM_FLAG_RDSHORT;
 
 		return (ACL_VSTREAM_EOF);
@@ -584,7 +570,6 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 
 	stream->read_ptr         = stream->read_buf;
 	stream->oflags           = oflags;
-	ACL_SAFE_STRNCPY(stream->errbuf, "OK", sizeof(stream->errbuf));
 
 	if (rw_timeo > 0)
 		stream->rw_timeout = rw_timeo;
