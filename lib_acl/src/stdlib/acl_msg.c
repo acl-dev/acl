@@ -563,30 +563,36 @@ static void thread_buf_init(void)
 
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 
-const char *acl_last_serror(void)
+const char *acl_strerror1(unsigned int errnum)
 {
 	char *buf;
-	int   error = acl_last_error();
 	static int __buf_size = 4096;
 
-	if (acl_pthread_once(&once_control, thread_buf_init) != 0)
+	if (acl_pthread_once(&once_control, thread_buf_init) != 0) {
 		abort();
+	}
 
 	buf = acl_pthread_getspecific(__errbuf_key);
 	if (buf == NULL) {
 		buf = acl_mymalloc(__buf_size);
-		if (acl_pthread_setspecific(__errbuf_key, buf) != 0)
+		if (acl_pthread_setspecific(__errbuf_key, buf) != 0) {
 			abort();
+		}
 #if !defined(HAVE_NO_ATEXIT)
 		if ((unsigned long) acl_pthread_self()
-			== acl_main_thread_self())
-		{
+			== acl_main_thread_self()) {
 			__main_buf = buf;
 			atexit(main_free_buf);
 		}
 #endif
 	}
-	return acl_strerror(error, buf, __buf_size);
+	return acl_strerror(errnum, buf, __buf_size);
+}
+
+const char *acl_last_serror(void)
+{
+	int errnum = acl_last_error();
+	return acl_strerror1(errnum);
 }
 
 int acl_last_error(void)

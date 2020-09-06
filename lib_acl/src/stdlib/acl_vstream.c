@@ -82,7 +82,6 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* ioctl_write_ctx */
 		NULL,                           /* fdp */
 		ACL_VSTREAM_FLAG_READ,          /* flag */
-		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
 		NULL,                           /* addr_local */
@@ -140,7 +139,6 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* ioctl_write_ctx */
 		NULL,                           /* fdp */
 		ACL_VSTREAM_FLAG_WRITE,         /* flag */
-		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
 		NULL,                           /* addr_local */
@@ -197,7 +195,6 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* ioctl_write_ctx */
 		NULL,                           /* fdp */
 		ACL_VSTREAM_FLAG_WRITE,         /* flag */
-		"\0",                           /* errbuf */
 		0,                              /* errnum */
 		0,                              /* rw_timeout */
 		NULL,                           /* addr_local */
@@ -293,15 +290,12 @@ AGAIN:
 	if (read_cnt > 0) {
 		in->flag &= ~ACL_VSTREAM_FLAG_BAD;
 		in->errnum = 0;
-		in->errbuf[0] = 0;
 		in->total_read_cnt += read_cnt;
 
 		return read_cnt;
 	} else if (read_cnt == 0) {
 		in->flag = ACL_VSTREAM_FLAG_EOF;
 		in->errnum = 0;
-		snprintf(in->errbuf, sizeof(in->errbuf), "closed by perr(%s)",
-			acl_last_serror());
 
 		return 0;
 	}
@@ -326,7 +320,6 @@ AGAIN:
 #endif
 	} else if (in->errnum == ACL_ETIMEDOUT) {
 		in->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-		SAFE_COPY(in->errbuf, "read timeout");
 		acl_set_error(ACL_ETIMEDOUT);
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 	} else if (in->errnum != ACL_EWOULDBLOCK) {
@@ -334,7 +327,6 @@ AGAIN:
 	} else if (in->errnum != ACL_EWOULDBLOCK && in->errnum != ACL_EAGAIN) {
 #endif
 		in->flag |= ACL_VSTREAM_FLAG_ERR;
-		acl_strerror(in->errnum, in->errbuf, sizeof(in->errbuf));
 	}
 
 	return -1;
@@ -1522,7 +1514,6 @@ TAG_AGAIN:
 		acl_set_error(ACL_EAGAIN);
 	} else if (fp->errnum == ACL_ETIMEDOUT) {
 		fp->flag |= ACL_VSTREAM_FLAG_TIMEOUT;
-		SAFE_COPY(fp->errbuf, "write timeout");
 	} else {
 		fp->flag |= ACL_VSTREAM_FLAG_ERR;
 	}
@@ -2282,7 +2273,6 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	fp->oflags           = oflags;
 	fp->omode            = 0600;
 	fp->close_handle_lnk = acl_array_create(8);
-	ACL_SAFE_STRNCPY(fp->errbuf, "OK", sizeof(fp->errbuf));
 
 	if (rw_timeout > 0) {
 		fp->rw_timeout = rw_timeout;
@@ -2957,7 +2947,7 @@ void acl_vstream_reset(ACL_VSTREAM *fp)
 		fp->offset = 0;
 		fp->nrefer = 0;
 		fp->read_buf_len = 0;
-		ACL_SAFE_STRNCPY(fp->errbuf, "OK", sizeof(fp->errbuf));
+		fp->errnum = 0;
 		acl_vstream_clean_close_handle(fp);
 		if (fp->fdp != NULL) {
 			event_fdtable_reset(fp->fdp);
@@ -3483,7 +3473,7 @@ const char *acl_vstream_strerror(ACL_VSTREAM *fp)
 		return err;
 	}
 
-	return fp->errbuf;
+	return acl_strerror1((unsigned int) fp->errnum);
 }
 
 int acl_vstream_add_object(ACL_VSTREAM *fp, const char *key, void *obj)

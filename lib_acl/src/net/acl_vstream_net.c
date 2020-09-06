@@ -66,8 +66,6 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		}
 
 		acl_vstream_set_local(sstream, addr);
-
-		sprintf(sstream->errbuf, "+OK");
 		return sstream;
 	}
 #endif
@@ -89,7 +87,6 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		acl_vstream_set_local(sstream, buf);
 	}
 
-	sprintf(sstream->errbuf, "+OK");
 	return sstream;
 }
 
