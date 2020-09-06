@@ -17,6 +17,7 @@
 # include "mbedtls-2.7.12/x509_crt.h"
 # include "mbedtls-2.7.12/x509.h"
 # include "mbedtls-2.7.12/ssl_cache.h"
+# include "mbedtls-2.7.12/platform.h"
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
@@ -69,6 +70,7 @@
 #  define SSL_CONF_CA_CHAIN_NAME	"mbedtls_ssl_conf_ca_chain"
 #  define SSL_CONF_OWN_CERT_NAME	"mbedtls_ssl_conf_own_cert"
 #  define SSL_CONF_AUTHMODE_NAME	"mbedtls_ssl_conf_authmode"
+#  define SSL_CONF_INIT_FREE		"mbedtls_ssl_config_free"
 #  ifdef DEBUG_SSL
 #   define SSL_CONF_DBG_NAME		"mbedtls_ssl_conf_dbg"
 #  endif
@@ -316,6 +318,7 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_CONF_CA_CHAIN_NAME, ssl_conf_ca_chain_fn, __ssl_conf_ca_chain);
 	LOAD_SSL(SSL_CONF_OWN_CERT_NAME, ssl_conf_own_cert_fn, __ssl_conf_own_cert);
 	LOAD_SSL(SSL_CONF_AUTHMODE_NAME, ssl_conf_authmode_fn, __ssl_conf_authmode);
+	LOAD_SSL(SSL_CONF_INIT_FREE, ssl_config_init_fn, __ssl_config_free);
 # ifdef DEBUG_SSL
 	LOAD_SSL(SSL_CONF_DBG_NAME, ssl_conf_dbg_fn, __ssl_conf_dbg);
 # endif
@@ -447,6 +450,7 @@ static void mbedtls_dll_load(void)
 #  define __ssl_conf_ca_chain		::mbedtls_ssl_conf_ca_chain
 #  define __ssl_conf_own_cert		::mbedtls_ssl_conf_own_cert
 #  define __ssl_conf_authmode		::mbedtls_ssl_conf_authmode
+#  define __ssl_config_free		::mbedtls_ssl_config_free
 #  ifdef DEBUG_SSL
 #   define __ssl_conf_dbg		::mbedtls_ssl_conf_dbg
 #  endif
@@ -713,6 +717,8 @@ mbedtls_conf::~mbedtls_conf(void)
 	if (init_status_ != CONF_INIT_NIL) {
 		__entropy_free((mbedtls_entropy_context*) entropy_);
 	}
+
+	__ssl_config_free((mbedtls_ssl_config*)conf_);
 	acl_myfree(conf_);
 	acl_myfree(entropy_);
 
@@ -788,6 +794,68 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 #else
 	(void) ca_file;
 	(void) ca_path;
+
+	logger_error("HAS_MBEDTLS not defined!");
+	return false;
+#endif
+}
+
+bool mbedtls_conf::append_key_cert(const char* crt_file, const char* key_file, const char* key_pass)
+{
+	if (crt_file == NULL || crt_file[0] == '\0' ||
+		key_file == NULL || key_file[0] == '\0') {
+		logger_error("crt_file or key_file null");
+		return false;
+	}
+
+#ifdef HAS_MBEDTLS
+	int ret = 0;
+	X509_CRT *cert = NULL;
+	PKEY *pkey = NULL;
+	if (!init_once()) {
+		logger_error("init_once error");
+		return false;
+	}
+
+	// cert will be managed by mbedtls
+	cert = static_cast<X509_CRT*>(mbedtls_calloc(1, sizeof(X509_CRT)));
+	__x509_crt_init(cert);
+	ret = __x509_crt_parse_file(cert, crt_file);
+	if (ret != 0) {
+		goto ERR;
+	}
+
+	// pkey will be managed by mbedtls
+	pkey = static_cast<PKEY*>(mbedtls_calloc(1, sizeof(PKEY)));
+	__pk_init(pkey);
+	ret = __pk_parse_keyfile(pkey, key_file, key_pass ? key_pass : "");
+	if (ret != 0) {
+		goto ERR;
+	}
+
+	ret = __ssl_conf_own_cert((mbedtls_ssl_config*)conf_, cert, pkey);
+	if (ret != 0) {
+		goto ERR;
+	}
+
+	cert_status_ = CONF_OWN_CERT_OK;
+	return true;
+ERR:
+	logger_error("append_key_cert(%s:%s) error: -0x%04x", crt_file, key_file, -ret);
+	if (cert) {
+		__x509_crt_free(cert);
+		mbedtls_free(cert);
+	}
+
+	if (pkey) {
+		__pk_free(pkey);
+		mbedtls_free(pkey);
+	}
+	return false;
+#else
+	(void) crt_file;
+	(void) key_file;
+	(void) key_pass;
 
 	logger_error("HAS_MBEDTLS not defined!");
 	return false;
