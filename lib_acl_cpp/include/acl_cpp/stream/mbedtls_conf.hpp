@@ -122,6 +122,7 @@ private:
 	void* cert_chain_;
 	void* cache_;
 	mbedtls_verify_t verify_mode_;
+	std::vector<std::pair<void*, void*>> cert_keys_;
 
 private:
 	bool init_once(void);
