@@ -1,17 +1,9 @@
 #include "stdafx.h"
 #include "http_service.h"
 
-static bool http_not_found(HttpRequest& req, HttpResponse& res)
+static bool http_not_found(const char* path, HttpRequest& req, HttpResponse& res)
 {
 	bool keep = req.isKeepAlive();
-	const char* path = req.getPathInfo();
-	if (path == NULL || *path == 0) {
-		logger_error("path null");
-		res.setStatus(400);
-		acl::string buf("400 bad request\r\n");
-		res.setContentLength(buf.size());
-		return res.write(buf.c_str(), buf.size()) && keep;
-	}
 
 	res.setStatus(404);
 	acl::string buf  = "404 ";
@@ -24,7 +16,7 @@ static bool http_not_found(HttpRequest& req, HttpResponse& res)
 http_service::http_service(void) : handler_default_(http_not_found) {}
 http_service::~http_service(void) {}
 
-http_service& http_service::Default(http_handler_t fn)
+http_service& http_service::Default(http_default_handler_t fn)
 {
 	handler_default_ = fn;
 	return *this;
@@ -155,5 +147,5 @@ bool http_service::doService(int type, HttpRequest& req, HttpResponse& res)
 		return it->second(req, res) && keep;
 	}
 
-	return handler_default_(req, res);
+	return handler_default_(buf, req, res) && keep;
 }

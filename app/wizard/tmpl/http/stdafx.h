@@ -26,8 +26,11 @@ typedef acl::HttpServletResponse HttpResponse;
 #if defined(__cplusplus) && __cplusplus >= 201103L
 #include <functional>
 typedef std::function<bool(HttpRequest&, HttpResponse&)> http_handler_t;
+typedef std::function<bool(const char*, HttpRequest&, HttpResponse&)>
+	http_default_handler_t;
 #else
 typedef bool (*http_handler_t)(HttpRequest&, HttpResponse&);
+typedef bool (*http_default_handler_t)(const char*, HttpRequest&, HttpResponse&);
 #endif
 
 typedef std::map<acl::string, http_handler_t> http_handlers_t;

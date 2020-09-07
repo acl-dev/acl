@@ -22,7 +22,7 @@ public:
 	http_service& Websocket(const char* path, http_handler_t fn);
 	http_service& Unknown(const char* path, http_handler_t fn);
 	http_service& Error(const char* path, http_handler_t fn);
-	http_service& Default(http_handler_t fn);
+	http_service& Default(http_default_handler_t fn);
 
 public:
 	bool doService(int type, HttpRequest& req, HttpResponse& res);
@@ -35,7 +35,7 @@ public:
 
 private:
 	http_handlers_t handlers_[http_handler_max];
-	http_handler_t  handler_default_;
+	http_default_handler_t  handler_default_;
 
 	void Service(int type, const char* path, http_handler_t fn);
 };

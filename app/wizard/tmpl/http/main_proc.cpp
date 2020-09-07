@@ -2,9 +2,23 @@
 #include "master_service.h"
 #include "http_service.h"
 
-static bool http_get_default(HttpRequest&, HttpResponse& res)
+#if __cplusplus >= 201103L	// Support c++11 ?
+# define USE_LAMBDA
+#endif
+
+#ifndef USE_LAMBDA
+static bool http_get_default(const char* path, HttpRequest&, HttpResponse& res)
 {
-	acl::string buf("default: hello world!\r\n");
+	acl::string buf;
+	buf.format("%s: hello world!\r\n", path);
+	res.setContentLength(buf.size());
+	return res.write(buf);
+}
+#endif
+
+static bool http_get_root(HttpRequest&, HttpResponse& res)
+{
+	acl::string buf("hello world!\r\n");
 	res.setContentLength(buf.size());
 	return res.write(buf);
 }
@@ -85,12 +99,12 @@ int main(int argc, char* argv[])
 		.set_cfg_bool(var_conf_bool_tab);
 
 	// Register http handlers according different url path
-	service.Get("/", http_get_default)
+	service.Get("/", http_get_root)
 		.Get("/ok", http_get_ok)
 		.Post("/ok", http_post_ok)
 		.Get("/json", http_get_json)
 		.Get("/xml", http_get_xml)
-#if __cplusplus >= 201103L	// Support c++11 ?
+#ifdef USE_LAMBDA
 		.Get("/test1", [](HttpRequest&, HttpResponse& res) {
 			acl::string buf("test1: hello world!\r\n");
 			res.setContentLength(buf.size());
@@ -101,8 +115,9 @@ int main(int argc, char* argv[])
 			res.setContentLength(buf.size());
 			return res.write(buf);
 		})
-		.Default([](HttpRequest&, HttpResponse& res) {
-			acl::string buf("Default: hello world!\r\n");
+		.Default([](const char* path, HttpRequest&, HttpResponse& res) {
+			acl::string buf;
+			buf.format("Default(%s): hello world!\r\n", path);
 			res.setContentLength(buf.size());
 			return res.write(buf);
 		});
