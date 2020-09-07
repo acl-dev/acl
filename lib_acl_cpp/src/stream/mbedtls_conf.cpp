@@ -17,7 +17,6 @@
 # include "mbedtls-2.7.12/x509_crt.h"
 # include "mbedtls-2.7.12/x509.h"
 # include "mbedtls-2.7.12/ssl_cache.h"
-# include "mbedtls-2.7.12/platform.h"
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
@@ -720,6 +719,15 @@ mbedtls_conf::~mbedtls_conf(void)
 		__entropy_free((mbedtls_entropy_context*) entropy_);
 	}
 
+	for (size_t i = 0; i != cert_keys_.size(); i++) {
+		void* cert = cert_keys_[i].first;
+		__x509_crt_free((X509_CRT*) cert);
+		acl_myfree(cert);
+
+		void* pkey = cert_keys_[i].second;
+		__pk_free((PKEY*) pkey);
+		acl_myfree(pkey);
+	}
 	__ssl_config_free((mbedtls_ssl_config*) conf_);
 	acl_myfree(conf_);
 	acl_myfree(entropy_);
@@ -821,16 +829,14 @@ bool mbedtls_conf::append_key_cert(const char* crt_file, const char* key_file,
 		return false;
 	}
 
-	// cert will be managed by mbedtls
-	cert = static_cast<X509_CRT*>(mbedtls_calloc(1, sizeof(X509_CRT)));
+	cert = static_cast<X509_CRT*>(acl_mycalloc(1, sizeof(X509_CRT)));
 	__x509_crt_init(cert);
 	ret = __x509_crt_parse_file(cert, crt_file);
 	if (ret != 0) {
 		goto ERR;
 	}
 
-	// pkey will be managed by mbedtls
-	pkey = static_cast<PKEY*>(mbedtls_calloc(1, sizeof(PKEY)));
+	pkey = static_cast<PKEY*>(acl_mycalloc(1, sizeof(PKEY)));
 	__pk_init(pkey);
 	ret = __pk_parse_keyfile(pkey, key_file, key_pass ? key_pass : "");
 	if (ret != 0) {
@@ -842,6 +848,7 @@ bool mbedtls_conf::append_key_cert(const char* crt_file, const char* key_file,
 		goto ERR;
 	}
 
+	cert_keys_.push_back(std::make_pair(cert, pkey));
 	cert_status_ = CONF_OWN_CERT_OK;
 	return true;
 ERR:
@@ -849,12 +856,12 @@ ERR:
 		crt_file, key_file, -ret);
 	if (cert) {
 		__x509_crt_free(cert);
-		mbedtls_free(cert);
+		acl_myfree(cert);
 	}
 
 	if (pkey) {
 		__pk_free(pkey);
-		mbedtls_free(pkey);
+		acl_myfree(pkey);
 	}
 	return false;
 #else
