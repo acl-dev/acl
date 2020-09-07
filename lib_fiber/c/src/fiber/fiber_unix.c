@@ -107,10 +107,8 @@ typedef struct FIBER_UNIX {
 
 #else
 
-# define SETJMP(ctx) \
-	sigsetjmp(ctx, 0)
-# define LONGJMP(ctx) \
-	siglongjmp(ctx, 1)
+# define SETJMP(ctx) sigsetjmp(ctx, 0)
+# define LONGJMP(ctx) siglongjmp(ctx, 1)
 #endif
 
 static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
@@ -120,14 +118,13 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 	 * a stack, but continue with longjmp() as it's much faster.
 	 */
 	if (SETJMP(from->env) == 0) {
-		/* context just be used once for set up a stack, which will
-		 * be freed in fiber_start. The context in __thread_fiber
-		 * was set NULL.
+		/* The context just be used once for setting up the new fiber's
+		 * starting stack and jumping to it, which will be freed in
+		 * fiber_unix_start after the fiber started.
 		 */
 		if (to->context != NULL) {
 			setcontext(to->context);
-		}
-		else {
+		} else {
 			LONGJMP(to->env);
 		}
 	}
@@ -221,7 +218,7 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 #ifdef	USE_JMP
 	fb->context->uc_link = NULL;
 #else
-	fb->context->uc_link = __thread_fiber->original->context;
+	fb->context->uc_link = NULL; //__thread_fiber->original->context;
 #endif
 
 #ifdef USE_VALGRIND
