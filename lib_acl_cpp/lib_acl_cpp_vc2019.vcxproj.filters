@@ -1260,7 +1260,7 @@
     <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp">
       <Filter>Header Files\serialize</Filter>
     </ClInclude>
-    <ClInclude Include="resource_vc2017.h" />
+    <ClInclude Include="resource_vc2019.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1399,6 +1399,6 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="lib_acl_cpp_vc2017.rc" />
+    <ResourceCompile Include="lib_acl_cpp_vc2019.rc" />
   </ItemGroup>
 </Project>

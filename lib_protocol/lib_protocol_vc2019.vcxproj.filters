@@ -156,7 +156,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="lib_protocol_vc2017.rc">
+    <ResourceCompile Include="lib_protocol_vc2019.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>

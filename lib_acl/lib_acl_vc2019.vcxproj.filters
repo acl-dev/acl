@@ -1490,7 +1490,7 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="lib_acl_vc2017.rc">
+    <ResourceCompile Include="lib_acl_vc2019.rc">
       <Filter>Source Files</Filter>
     </ResourceCompile>
   </ItemGroup>
