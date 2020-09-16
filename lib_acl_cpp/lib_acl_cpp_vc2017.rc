@@ -27,7 +27,7 @@
 
 1 TEXTINCLUDE 
 BEGIN
-    "resource_vc2015.h\0"
+    "resource_vc2017.h\0"
 END
 
 2 TEXTINCLUDE 

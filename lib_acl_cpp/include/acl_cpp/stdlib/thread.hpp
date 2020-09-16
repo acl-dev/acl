@@ -19,6 +19,13 @@ public:
 	 * @return {void*} 线程退出前返回的参数
 	 */
 	virtual void* run(void) = 0;
+
+	/**
+	 * 虚方法，在新创建的子线程中的 run() 方法被调用前调用，在同步创建
+	 * 线程方式下，子线程被创建后调用该虚方法，然后再通知创建这线程，
+	 * 从而保证在创建线程的 start() 方法返回前子线程执行初始化过程。
+	 */
+	virtual void init(void) {}
 };
 
 template<typename T> class tbox;

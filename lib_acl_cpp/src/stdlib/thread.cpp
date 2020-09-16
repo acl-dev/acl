@@ -87,6 +87,9 @@ void* thread::thread_run(void* arg)
 			break;
 		}
 	}
+
+	thr->init();
+
 	thr->sync_->push(NULL);
 
 	// 如果线程创建时为分离模式，则当 run 运行时用户有可能
