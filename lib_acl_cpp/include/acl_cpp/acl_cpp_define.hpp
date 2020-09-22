@@ -42,8 +42,14 @@
 //extern "C" { FILE _iob[3]; }
 //# endif
 # ifndef	HAS_SSIZE_T
-# define	HAS_SSIZE_T
+#  define	HAS_SSIZE_T
+#  if defined(_WIN32)
+typedef int ssize_t;
+#  elif defined(_WIN64)
+typedef __int64 ssize_t;
+#  else
 typedef long ssize_t;
+#  endif
 # endif
 # if(_MSC_VER >= 1300)
 #  include <winsock2.h>
