@@ -203,7 +203,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	}
 
 	memset(buf, 0, sizeof(buf));
-	ret = rfc1035BuildAQuery(domain, buf, sizeof(buf), res->cur_qid++, NULL);
+	ret = (ssize_t) rfc1035BuildAQuery(domain, buf, sizeof(buf), res->cur_qid++, NULL);
 
 	(void) time(&begin);
 	ret = res_lookup(res, buf, (int) ret, buf, sizeof(buf));

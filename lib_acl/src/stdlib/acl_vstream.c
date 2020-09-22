@@ -1319,7 +1319,7 @@ static size_t bfread3(ACL_VSTREAM *fp, void *buf, size_t size)
 	memcpy(buf, fp->read_ptr, n);
 
 	fp->offset   += n;
-	fp->read_cnt -= n;
+	fp->read_cnt -= (int) n;
 	if (fp->read_cnt == 0) {
 		fp->read_ptr  = fp->read_buf;
 	} else {

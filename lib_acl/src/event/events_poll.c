@@ -63,7 +63,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 
 	if (ret) {
-		acl_fdmap_del(ev->fdmap, sockfd);
+		acl_fdmap_del(ev->fdmap, (int) sockfd);
 	}
 
 	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream))
@@ -98,7 +98,7 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->stream = stream;
 		stream->fdp = (void *) fdp;
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
-		acl_fdmap_add(ev->fdmap, sockfd, fdp);
+		acl_fdmap_add(ev->fdmap, (int) sockfd, fdp);
 	}
 
 	if (fdp->fdidx == -1) {
@@ -169,7 +169,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->stream = stream;
 		stream->fdp = (void *) fdp;
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
-		acl_fdmap_add(ev->fdmap, sockfd, fdp);
+		acl_fdmap_add(ev->fdmap, (int) sockfd, fdp);
 	}
 
 	if (fdp->fdidx == -1) {
@@ -260,7 +260,7 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	}
 	fdp->fdidx_ready = -1;
 
-	acl_fdmap_del(ev->fdmap, sockfd);
+	acl_fdmap_del(ev->fdmap, (int) sockfd);
 }
 
 /* event_disable_write - disable request for write events */
@@ -319,7 +319,7 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	}
 	fdp->fdidx_ready = -1;
 
-	acl_fdmap_del(ev->fdmap, sockfd);
+	acl_fdmap_del(ev->fdmap, (int) sockfd);
 }
 
 /* event_disable_readwrite - disable request for read or write events */
@@ -338,7 +338,7 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	if (fdp->flag == 0 || fdp->fdidx < 0 || fdp->fdidx >= eventp->fdcnt) {
 		acl_msg_warn("%s(%d): sockfd(%d) no set, fdp no null",
 			myname, __LINE__, sockfd);
-		acl_fdmap_del(ev->fdmap, sockfd);
+		acl_fdmap_del(ev->fdmap, (int) sockfd);
 		event_fdtable_free(fdp);
 		stream->fdp = NULL;
 		return;
@@ -363,7 +363,7 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	}
 	fdp->fdidx_ready = -1;
 
-	acl_fdmap_del(ev->fdmap, sockfd);
+	acl_fdmap_del(ev->fdmap, (int) sockfd);
 	event_fdtable_free(fdp);
 	stream->fdp = NULL;
 }
@@ -446,7 +446,7 @@ static void event_loop(ACL_EVENT *eventp)
 	/* 检查 poll 的检测结果集合 */
 
 	for (i = 0; i < eventp->fdcnt; i++) {
-		fdp = acl_fdmap_ctx(ev->fdmap, ev->fds[i].fd);
+		fdp = acl_fdmap_ctx(ev->fdmap, (int) ev->fds[i].fd);
 		if (fdp == NULL || fdp->stream == NULL) {
 			continue;
 		}
