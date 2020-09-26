@@ -11,18 +11,19 @@ CFLAGS = -c -g -W \
 -std=gnu99 \
 -fPIC \
 -Wall \
--Waggregate-return \
 -Wpointer-arith \
 -Wshadow \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO \
 -Wno-long-long \
--DUSE_JMP \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_RING \
+-DUSE_JMP_DEF \
+#-DUSE_BOOST_JMP \
 #-DUSE_FAST_TIME \
+#-Waggregate-return \
 #-DDEBUG_MEM \
 #-DUSE_VALGRIND \
 #-I/usr/local/include
@@ -147,7 +148,9 @@ SRC = $(wildcard $(SRC_PATH_SRC)/*.c) \
       $(wildcard $(SRC_PATH_SRC)/event/*.c) \
       $(wildcard $(SRC_PATH_SRC)/hook/*.c)
 
-OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
+#ASM_OBJ=$(OBJ_PATH_DST)/setjmp.o $(OBJ_PATH_DST)/make_gas.o $(OBJ_PATH_DST)/jump_gas.o
+ASM_OBJ=$(OBJ_PATH_DST)/make_gas.o $(OBJ_PATH_DST)/jump_gas.o
+OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC))) $(ASM_OBJ)
 
 ###########################################################
 
@@ -210,6 +213,12 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/common/%.c
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/dns/%.c
 	$(COMPILE) $< -o $@
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/fiber/%.c
+	$(COMPILE) $< -o $@
+#$(OBJ_PATH_DST)/setjmp.o: $(SRC_PATH_SRC)/fiber/exp/setjmp.S
+#	$(COMPILE) $< -o $@
+$(OBJ_PATH_DST)/make_gas.o: $(SRC_PATH_SRC)/fiber/boost/make_gas.S
+	$(COMPILE) $< -o $@
+$(OBJ_PATH_DST)/jump_gas.o: $(SRC_PATH_SRC)/fiber/boost/jump_gas.S
 	$(COMPILE) $< -o $@
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/event/%.c
 	$(COMPILE) $< -o $@

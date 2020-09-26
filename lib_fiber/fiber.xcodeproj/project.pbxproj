@@ -96,6 +96,11 @@
 		07BED4CC21BA270A0060BBE4 /* fiber_cond.c in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4CB21BA270A0060BBE4 /* fiber_cond.c */; };
 		07BED4CE21BA271F0060BBE4 /* fbase_event.c in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4CD21BA271F0060BBE4 /* fbase_event.c */; };
 		07BED4D021BA27530060BBE4 /* fiber_cond.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4CF21BA27530060BBE4 /* fiber_cond.h */; };
+		70753A3D251F8F67005B6E56 /* unix_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3A251F8F67005B6E56 /* unix_jmp.h */; };
+		70753A3E251F8F67005B6E56 /* boost_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3B251F8F67005B6E56 /* boost_jmp.h */; };
+		70753A3F251F8F67005B6E56 /* exp_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3C251F8F67005B6E56 /* exp_jmp.h */; };
+		70753B03251F91E9005B6E56 /* jump_gas.S in Sources */ = {isa = PBXBuildFile; fileRef = 70753B01251F91E9005B6E56 /* jump_gas.S */; };
+		70753B04251F91E9005B6E56 /* make_gas.S in Sources */ = {isa = PBXBuildFile; fileRef = 70753B02251F91E9005B6E56 /* make_gas.S */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -189,6 +194,11 @@
 		07BED4CB21BA270A0060BBE4 /* fiber_cond.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fiber_cond.c; path = c/src/fiber_cond.c; sourceTree = "<group>"; };
 		07BED4CD21BA271F0060BBE4 /* fbase_event.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fbase_event.c; path = c/src/fbase_event.c; sourceTree = "<group>"; };
 		07BED4CF21BA27530060BBE4 /* fiber_cond.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fiber_cond.h; path = c/include/fiber/fiber_cond.h; sourceTree = "<group>"; };
+		70753A3A251F8F67005B6E56 /* unix_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unix_jmp.h; sourceTree = "<group>"; };
+		70753A3B251F8F67005B6E56 /* boost_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = boost_jmp.h; sourceTree = "<group>"; };
+		70753A3C251F8F67005B6E56 /* exp_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exp_jmp.h; sourceTree = "<group>"; };
+		70753B01251F91E9005B6E56 /* jump_gas.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = jump_gas.S; path = boost/jump_gas.S; sourceTree = "<group>"; };
+		70753B02251F91E9005B6E56 /* make_gas.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = make_gas.S; path = boost/make_gas.S; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -334,6 +344,10 @@
 		070F35772090225C00672EDC /* fiber */ = {
 			isa = PBXGroup;
 			children = (
+				70753B00251F91C2005B6E56 /* boost */,
+				70753A3B251F8F67005B6E56 /* boost_jmp.h */,
+				70753A3C251F8F67005B6E56 /* exp_jmp.h */,
+				70753A3A251F8F67005B6E56 /* unix_jmp.h */,
 				070F35782090225C00672EDC /* fiber_unix.c */,
 				070F35792090225C00672EDC /* fiber_win.c */,
 			);
@@ -375,6 +389,15 @@
 			name = fiber;
 			sourceTree = "<group>";
 		};
+		70753B00251F91C2005B6E56 /* boost */ = {
+			isa = PBXGroup;
+			children = (
+				70753B01251F91E9005B6E56 /* jump_gas.S */,
+				70753B02251F91E9005B6E56 /* make_gas.S */,
+			);
+			name = boost;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -394,6 +417,7 @@
 				070F35B12090225C00672EDC /* define.h in Headers */,
 				070F35A72090225C00672EDC /* pthread_patch.h in Headers */,
 				070F35992090225C00672EDC /* gettimeofday.h in Headers */,
+				70753A3E251F8F67005B6E56 /* boost_jmp.h in Headers */,
 				070F35A32090225C00672EDC /* msg.h in Headers */,
 				07BED4D021BA27530060BBE4 /* fiber_cond.h in Headers */,
 				070F35A92090225C00672EDC /* ring.h in Headers */,
@@ -411,10 +435,12 @@
 				070F35BD2090225C00672EDC /* event_kqueue.h in Headers */,
 				070F35BB2090225C00672EDC /* event_iocp.h in Headers */,
 				070F35C12090225C00672EDC /* event_select.h in Headers */,
+				70753A3D251F8F67005B6E56 /* unix_jmp.h in Headers */,
 				070F35B52090225C00672EDC /* sane_inet.h in Headers */,
 				070F35322090220400672EDC /* fiber_base.h in Headers */,
 				070F35AB2090225C00672EDC /* sane_socket.h in Headers */,
 				070F35BF2090225C00672EDC /* event_poll.h in Headers */,
+				70753A3F251F8F67005B6E56 /* exp_jmp.h in Headers */,
 				070F35332090220400672EDC /* fiber_channel.h in Headers */,
 				070F353A2090220400672EDC /* libfiber.h in Headers */,
 				070F35B02090225C00672EDC /* common.h in Headers */,
@@ -531,6 +557,8 @@
 				070F35952090225C00672EDC /* doze.c in Sources */,
 				070F35CE2090225C00672EDC /* file_event.c in Sources */,
 				070F35CC2090225C00672EDC /* fiber.c in Sources */,
+				70753B03251F91E9005B6E56 /* jump_gas.S in Sources */,
+				70753B04251F91E9005B6E56 /* make_gas.S in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -574,7 +602,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
-					"$(inherited)",
+					USE_BOOST_JMP,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -624,6 +652,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = USE_BOOST_JMP;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -641,11 +670,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				EXECUTABLE_PREFIX = lib;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-					USE_JMP,
-				);
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited) ";
 				HEADER_SEARCH_PATHS = (
 					../lib_fiber/c/include,
 					../lib_fiber/c/src,
@@ -673,7 +698,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				EXECUTABLE_PREFIX = lib;
-				GCC_PREPROCESSOR_DEFINITIONS = USE_JMP;
+				GCC_PREPROCESSOR_DEFINITIONS = "$(inherited) ";
 				HEADER_SEARCH_PATHS = (
 					../lib_fiber/c/include,
 					../lib_fiber/c/src,

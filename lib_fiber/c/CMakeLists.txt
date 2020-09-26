@@ -23,12 +23,14 @@ add_definitions(
 	"-DACL_WRITEABLE_CHECK"
 	"-Wno-long-long"
 	"-Wuninitialized"
-	"-DUSE_JMP"
+#	"-DUSE_JMP"
 	"-DUSE_FAST_RING"
 	"-D_POSIX_PTHREAD_SEMANTICS"
 	"-DACL_PREPARE_COMPILE"
 #	"-Wno-invalid-source-encoding"
 	"-Wstrict-prototypes"
+#	"-DUSE_JMP_DEF"
+	"-DUSE_BOOST_JMP"
 )
 
 if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -73,7 +75,11 @@ set(sources
 
 foreach(iter ${sources})
 	aux_source_directory(${iter} lib_src)
+	message(STATUS ">>add dir "${iter})
 endforeach()
+
+list(APPEND lib_src ${src}/fiber/boost/make_gas.S
+	${src}/fiber/boost/jump_gas.S)
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "ANDROID")
 	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
