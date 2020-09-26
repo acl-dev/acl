@@ -1,131 +1,88 @@
 #include "stdafx.h"
 #include "common.h"
+
 #include "fiber.h"
 
 #ifdef SYS_UNIX
 
-#ifdef USE_VALGRIND
-#include <valgrind/valgrind.h>
-#endif
+# if defined(USE_BOOST_JMP)
+#  include "boost_jmp.h"
+# elif defined(USE_JMP_DEF)
+#  define USE_JMP
+#  include "unix_jmp.h"
+# elif defined(USE_JMP_EXP)
+#  define USE_JMP
+#  include "exp_jmp.h"
+# else
+#  define SETJMP(ctx) sigsetjmp(ctx, 0)
+#  define LONGJMP(ctx) siglongjmp(ctx, 1)
+# endif
+
+# ifdef USE_VALGRIND
+#  include <valgrind/valgrind.h>
+# endif
 
 typedef struct FIBER_UNIX {
 	ACL_FIBER fiber;
-#ifdef USE_VALGRIND
+# ifdef USE_VALGRIND
 	unsigned int vid;
-#endif
-
-#ifdef	USE_JMP
-# if defined(__x86_64__)
-	unsigned long long env[10];
-# else
-	sigjmp_buf env;
 # endif
-#endif
+
+# if	defined(USE_BOOST_JMP)
+	fcontext_t fcontext;
+	char      *stack;
+# else
+#  if	defined(USE_JMP_DEF)
+#   if defined(__x86_64__)
+	unsigned long long env[10];
+#   else
+	sigjmp_buf env;
+#   endif
+#  elif	defined(USE_JMP_EXP)
+	label_t env;
+#  endif
 	ucontext_t *context;
+# endif
 	size_t size;
 	char  *buff;
 } FIBER_UNIX;
 
-#if defined(__x86_64__)
-# if defined(__AVX__)
-#  define CLOBBER \
-	, "ymm0", "ymm1", "ymm2", "ymm3", "ymm4", "ymm5", "ymm6", "ymm7", \
-	"ymm8", "ymm9", "ymm10", "ymm11", "ymm12", "ymm13", "ymm14", "ymm15"
-# else
-#  define CLOBBER
-# endif
+#if	defined(USE_BOOST_JMP)
+typedef struct {
+	FIBER_UNIX *from;
+	FIBER_UNIX *to;
+} s_jump_t;
 
-//	asm(".cfi_undefined rip;\r\n")
-# define SETJMP(ctx) ({\
-	int ret; \
-	asm("lea     LJMPRET%=(%%rip), %%rcx\n\t"\
-	"xor     %%rax, %%rax\n\t"\
-	"mov     %%rbx, (%%rdx)\n\t"\
-	"mov     %%rbp, 8(%%rdx)\n\t"\
-	"mov     %%r12, 16(%%rdx)\n\t"\
-	"mov     %%rsp, 24(%%rdx)\n\t"\
-	"mov     %%r13, 32(%%rdx)\n\t"\
-	"mov     %%r14, 40(%%rdx)\n\t"\
-	"mov     %%r15, 48(%%rdx)\n\t"\
-	"mov     %%rcx, 56(%%rdx)\n\t"\
-	"mov     %%rdi, 64(%%rdx)\n\t"\
-	"mov     %%rsi, 72(%%rdx)\n\t"\
-	"LJMPRET%=:\n\t"\
-	: "=a" (ret)\
-	: "d" (ctx)\
-	: "memory", "rcx", "r8", "r9", "r10", "r11", \
-	"xmm0", "xmm1", "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7", \
-	"xmm8", "xmm9", "xmm10", "xmm11", "xmm12", "xmm13", "xmm14", "xmm15"\
-	CLOBBER\
-	); \
-	ret; \
-})
-
-# define LONGJMP(ctx) \
-	asm("movq   (%%rax), %%rbx\n\t"\
-	"movq   8(%%rax), %%rbp\n\t"\
-	"movq   16(%%rax), %%r12\n\t"\
-	"movq   24(%%rax), %%rdx\n\t"\
-	"movq   32(%%rax), %%r13\n\t"\
-	"movq   40(%%rax), %%r14\n\t"\
-	"mov    %%rdx, %%rsp\n\t"\
-	"movq   48(%%rax), %%r15\n\t"\
-	"movq   56(%%rax), %%rdx\n\t"\
-	"movq   64(%%rax), %%rdi\n\t"\
-	"movq   72(%%rax), %%rsi\n\t"\
-	"jmp    *%%rdx\n\t"\
-	: : "a" (ctx) : "rdx" \
-	)
-
-#elif defined(__i386__)
-
-# define SETJMP(ctx) ({\
-	int ret; \
-	asm("movl   $LJMPRET%=, %%eax\n\t"\
-	"movl   %%eax, (%%edx)\n\t"\
-	"movl   %%ebx, 4(%%edx)\n\t"\
-	"movl   %%esi, 8(%%edx)\n\t"\
-	"movl   %%edi, 12(%%edx)\n\t"\
-	"movl   %%ebp, 16(%%edx)\n\t"\
-	"movl   %%esp, 20(%%edx)\n\t"\
-	"xorl   %%eax, %%eax\n\t"\
-	"LJMPRET%=:\n\t"\
-	: "=a" (ret) : "d" (ctx) : "memory"); \
-	ret; \
-	})
-
-# define LONGJMP(ctx) \
-	asm("movl   (%%eax), %%edx\n\t"\
-	"movl   4(%%eax), %%ebx\n\t"\
-	"movl   8(%%eax), %%esi\n\t"\
-	"movl   12(%%eax), %%edi\n\t"\
-	"movl   16(%%eax), %%ebp\n\t"\
-	"movl   20(%%eax), %%esp\n\t"\
-	"jmp    *%%edx\n\t"\
-	: : "a" (ctx) : "edx" \
-	)
-
-#else
-
-# define SETJMP(ctx) sigsetjmp(ctx, 0)
-# define LONGJMP(ctx) siglongjmp(ctx, 1)
+static void swap_fcontext(FIBER_UNIX *from, FIBER_UNIX *to)
+{
+	s_jump_t jump, *jmp;
+	transfer_t trans;
+	
+	jump.from  = from;
+	jump.to    = to;
+	trans      = jump_fcontext(to->fcontext, &jump);
+	jmp        = (s_jump_t*) trans.data;
+	jmp->from->fcontext = trans.fctx;
+}
 #endif
 
 static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 {
-#ifdef	USE_JMP
+#if	defined(USE_BOOST_JMP)
+	swap_fcontext(from, to);
+#elif	defined(USE_JMP)
 	/* use setcontext() for the initial jump, as it allows us to set up
 	 * a stack, but continue with longjmp() as it's much faster.
 	 */
-	if (SETJMP(from->env) == 0) {
-		/* The context just be used once for setting up the new fiber's
-		 * starting stack and jumping to it, which will be freed in
-		 * fiber_unix_start after the fiber started.
+	if (SETJMP(&from->env) == 0) {
+		/* context just be used once for set up a stack, which will
+		 * be freed in fiber_start. The context in __thread_fiber
+		 * was set NULL.
 		 */
 		if (to->context != NULL) {
 			setcontext(to->context);
 		} else {
-			LONGJMP(to->env);
+			LONGJMP(&to->env);
 		}
 	}
 #else
@@ -143,13 +100,24 @@ static void fiber_unix_free(ACL_FIBER *fiber)
 #ifdef USE_VALGRIND
 	VALGRIND_STACK_DEREGISTER(fb->vid);
 #endif
+
+#if	!defined(USE_BOOST_JMP)
 	if (fb->context) {
 		stack_free(fb->context);
 	}
+#endif
 	stack_free(fb->buff);
 	mem_free(fb);
 }
 
+#if	defined(USE_BOOST_JMP)
+static void fiber_unix_start(transfer_t arg)
+{
+	s_jump_t *jmp = (s_jump_t*) arg.data;
+	jmp->from->fcontext = arg.fctx;
+	jmp->to->fiber.start_fn(&jmp->to->fiber);
+}
+#else
 union cc_arg
 {
 	void *p;
@@ -175,12 +143,15 @@ static void fiber_unix_start(unsigned int x, unsigned int y)
 #endif
 	fb->fiber.start_fn(&fb->fiber);
 }
+#endif // USE_BOOST_JMP
 
 static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
+#if	!defined(USE_BOOST_JMP)
 	union cc_arg carg;
 	sigset_t zero;
+#endif
 	
 	if (fb->size < size) {
 		/* if using realloc, real memory will be used, when we first
@@ -192,11 +163,17 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 		fb->size = size;
 	}
 
+#if	defined(USE_BOOST_JMP)
+	fb->stack = fb->buff + fb->size;
+	fb->fcontext = make_fcontext(fb->stack, fb->size,
+		(void(*)(transfer_t)) fiber_unix_start);
+#else
 	carg.p = fiber;
 
 	if (fb->context == NULL) {
 		fb->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
 	}
+
 	memset(fb->context, 0, sizeof(ucontext_t));
 
 	sigemptyset(&zero);
@@ -214,21 +191,21 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 
 	fb->context->uc_stack.ss_sp   = fb->buff + 8;
 	fb->context->uc_stack.ss_size = fb->size - 64;
-
-#ifdef	USE_JMP
 	fb->context->uc_link = NULL;
-#else
-	fb->context->uc_link = NULL; //__thread_fiber->original->context;
+	makecontext(fb->context, (void(*)(void)) fiber_unix_start,
+		2, carg.i[0], carg.i[1]);
 #endif
 
 #ifdef USE_VALGRIND
-	/* avoding the valgrind's warning */
+	/* avoid the valgrind warning */
+# if	defined(USE_BOOST_JMP)
+	fb->vid = VALGRIND_STACK_REGISTER(fb->buff, fb->stack);
+# else
 	fb->vid = VALGRIND_STACK_REGISTER(fb->context->uc_stack.ss_sp,
 		(char*)fb->context->uc_stack.ss_sp
 		+ fb->context->uc_stack.ss_size);
+# endif
 #endif
-	makecontext(fb->context, (void(*)(void)) fiber_unix_start,
-		2, carg.i[0], carg.i[1]);
 }
 
 ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
@@ -250,7 +227,15 @@ ACL_FIBER *fiber_unix_origin(void)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
 
-#ifdef	USE_JMP
+#ifdef	USE_BOOST_JMP
+	fb->size           = 32 * 1024;
+	fb->buff           = (char *) stack_alloc(fb->size);
+	fb->fiber.init_fn  = fiber_unix_init;
+	fb->fiber.free_fn  = fiber_unix_free;
+	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
+	fb->fiber.start_fn = NULL;
+
+#elif	defined(USE_JMP)
 	/* set context NULL when using setjmp that setcontext will not be
 	 * called in fiber_swap.
 	 */
