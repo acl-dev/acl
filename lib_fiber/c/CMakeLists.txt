@@ -16,7 +16,7 @@ add_definitions(
 #	"-Werror"
 	"-Wshadow"
 	"-Wpointer-arith"
-	"-Waggregate-return"
+#	"-Waggregate-return"
 	"-Wmissing-prototypes"
 	"-D_REENTRANT"
 	"-D_USE_FAST_MACRO"
