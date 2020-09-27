@@ -232,7 +232,7 @@ EVENT *event_kqueue_create(int size)
 	assert(ek->kqfd >= 0);
 
 	ek->event.name   = kqueue_name;
-	ek->event.handle = kqueue_handle;
+	ek->event.handle = (acl_handle_t (*)(EVENT *)) kqueue_handle;
 	ek->event.free   = kqueue_free;
 
 	ek->event.event_fflush = (int (*)(EVENT*)) kqueue_fflush;

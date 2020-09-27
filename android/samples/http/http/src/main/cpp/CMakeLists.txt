@@ -79,14 +79,14 @@ set(acl_c_path ${acl_home}/lib_acl)
 set(acl_c_include ${acl_c_path}/include)
 set(acl_cpp_path ${acl_home}/lib_acl_cpp)
 set(acl_cpp_include ${acl_cpp_path}/include)
-
-set(dns_path ${home_path}/src/libdns)
-set(dns_include ${dns_path}/include)
+set(fiber_path ${acl_home}/lib_fiber)
+set(fiber_include ${fiber_path}/cpp/include)
 
 include_directories(
         "./"
         ${acl_c_include}
         ${acl_cpp_include}
+        ${fiber_include}
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
@@ -114,11 +114,14 @@ find_library( # Sets the name of the path variable.
 
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
     set(lib_acl_path ${acl_home}/android/lib/${ANDROID_ABI})
-    set(lib_acl ${lib_acl_path}/libacl.a)
-    set(lib_acl_cpp ${lib_acl_path}/libacl_cpp.a)
-    set(lib_protocol ${lib_acl_path}/libprotocol.a)
+    set(libacl ${lib_acl_path}/libacl.a)
+    set(libacl_cpp ${lib_acl_path}/libacl_cpp.a)
+    set(libprotocol ${lib_acl_path}/libprotocol.a)
+    set(libfiber ${lib_acl_path}/libfiber.a)
+    set(libfiber_cpp ${lib_acl_path}/libfiber_cpp.a)
 
-    set(lib_all ${lib_acl_cpp} ${lib_protocol} ${lib_acl} -lz)
+    set(lib_all ${libfiber_cpp} ${libacl_cpp} ${libprotocol} ${libacl} ${libfiber} -lz)
+#    set(lib_all ${libacl_cpp} ${libprotocol} ${libacl} -lz)
 endif()
 
 add_library(native-lib SHARED ${lib_src})

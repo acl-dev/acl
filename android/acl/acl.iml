@@ -260,6 +260,33 @@
     <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src/stream">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src/stream" isTestSource="false" />
     </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src/common">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src/common" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src/dns">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src/dns" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src/event">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src/event" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src/fiber">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src/fiber" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src/fiber/boost">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src/fiber/boost" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/c/src/hook">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/c/src/hook" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/cpp/src">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/cpp/src" isTestSource="false" />
+    </content>
+    <content url="file://$MODULE_DIR$/../../lib_fiber/cpp/src/keeper">
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_fiber/cpp/src/keeper" isTestSource="false" />
+    </content>
     <content url="file://$MODULE_DIR$/../../lib_protocol/src">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_protocol/src" isTestSource="false" />
     </content>

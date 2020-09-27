@@ -274,7 +274,7 @@ EVENT *event_epoll_create(int size)
 	assert(ep->epfd >= 0);
 
 	ep->event.name   = epoll_name;
-	ep->event.handle = epoll_handle;
+	ep->event.handle = (acl_handle_t (*)(EVENT *)) epoll_handle;
 	ep->event.free   = epoll_free;
 
 	ep->event.event_wait = epoll_event_wait;

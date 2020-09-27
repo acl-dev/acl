@@ -43,7 +43,11 @@ int open_limit(int limit)
 	struct rlimit rl;
 
 	if (getrlimit(RLIMIT_NOFILE, &rl) < 0) {
+#ifdef	ANDROID
+		return 10240; /* xxx */
+#else
 		rlim_cur = getdtablesize();
+#endif
 		msg_warn("%s(%d): getrlimit error: %s, use: %d",
 			__FUNCTION__, __LINE__, last_serror(), rlim_cur);
 		return rlim_cur;

@@ -47,8 +47,8 @@ android {
             }
             cmake {
                 //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
-                //targets 'acl_static', 'protocol_static', 'acl_cpp_static'                              // for ndk16b
-                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'acl', 'protocol', 'acl_cpp'  // for ndk20 or above
+                //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk16b
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
             }
         }
     }
