@@ -80,6 +80,8 @@ unsigned char *acl_base64_encode(const char *in, int len)
 
 int acl_base64_decode(const char *in, char **pptr_in)
 {
+	unsigned int in_len;
+	const unsigned char *in_end;
 	const unsigned char *code = (const unsigned char*) in;
 	unsigned char **pptr = (unsigned char**) pptr_in;
 	register int x, y;
@@ -93,13 +95,15 @@ int acl_base64_decode(const char *in, char **pptr_in)
 	return (x); \
 }
 
-	result_saved = result = acl_mymalloc(3 * (strlen((const char *) code) / 4) + 1);
+	in_len = strlen((const char *) code);
+	in_end = code + in_len;
+	result_saved = result = acl_mymalloc(3 * (in_len / 4) + 1);
 	*pptr = result;
 
 	/* Each cycle of the loop handles a quantum of 4 input bytes. For the last
 	   quantum this may decode to 1, 2, or 3 output bytes. */
 
-	while ((x = (*code++)) != 0) {
+	while (in_end - code >= 4 && (x = (*code++)) != 0) {
 		if (x > 127 || (x = un_b64_tab[x]) == 255)
 			ERETURN (-1);
 		if ((y = (*code++)) == 0 || (y = un_b64_tab[y]) == 255)
