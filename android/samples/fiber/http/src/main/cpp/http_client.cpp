@@ -4,8 +4,6 @@
 
 #include "stdafx.h"
 #include "log.h"
-#include "jobject_create.h"
-#include "jobject_call.h"
 
 static void JString2String(JNIEnv *env, jstring js, std::string &out)
 {
@@ -22,14 +20,17 @@ static jstring String2JString(JNIEnv *env, const char *s)
 
 ////////////////////////////////////////////////////////////////////////////////
 
-static bool HttpGet(
+static bool http_get(
         const std::string& server_addr,
         const std::string& server_host,
         const std::string& server_url,
         acl::string& out)
 {
-    //acl::http_request request(server_addr.c_str());
+#if 0
+    acl::http_request request(server_addr.c_str());
+#else
     acl::http_request request("61.135.185.32:80");
+#endif
     acl::http_header& header = request.request_header();
     header.set_url(server_url.c_str())
         .set_host(server_host.c_str())
@@ -52,162 +53,183 @@ static bool HttpGet(
     return true;
 }
 
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_http_HttpClient_HttpGet(
-        JNIEnv* env,
-        jobject me,
-        jstring addr,
-        jstring host,
-        jstring url)
-{
-    std::string server_addr, server_host, server_url;
-    JString2String(env, addr, server_addr);
-    JString2String(env, host, server_host);
-    JString2String(env, url, server_url);
+////////////////////////////////////////////////////////////////////////////////
 
-    acl::string body;
-    if (!HttpGet(server_addr, server_host, server_url, body)) {
-        return NULL;
+class task {
+public:
+    task(JNIEnv* env, const char* addr, const char* host, const char* url)
+    : env_(env)
+    , server_addr_(addr)
+    , server_host_(host)
+    , server_url_(url)
+    , body_(NULL) {}
+    ~task(void) {
+        delete body_;
     }
 
-    return String2JString(env, body);
+    void push_result() {
+        box_.push(this);
+    }
+
+    task* wait_result() {
+        return box_.pop();
+    }
+
+    void set_body(acl::string* body) {
+        body_ = body;
+    }
+
+    acl::string* get_body(void) {
+        return body_;
+    }
+
+    JNIEnv* get_env(void) {
+        return env_;
+    }
+
+    const std::string& get_server_addr(void) const {
+        return server_addr_;
+    }
+
+    const std::string& get_server_host(void) const {
+        return server_host_;
+    }
+
+    const std::string& get_server_url(void) const {
+        return server_url_;
+    }
+
+public:
+    void debug(void) const {
+        log_info(">>task=%p: addr=%s, host=%s, url=%s<<", this,
+                server_addr_.c_str(), server_host_.c_str(), server_url_.c_str());
+        const char* name = "com/example/http/HttpFiberThread";
+        jclass clazz = env_->FindClass(name);
+        log_info(">>task=%p, env=%p, clazz=%p<<", this, env_, clazz);
+    }
+
+private:
+    JNIEnv* env_;
+    std::string server_addr_;
+    std::string server_host_;
+    std::string server_url_;
+
+private:
+    acl::tbox<task> box_;
+    acl::string* body_;
+};
+
+static void http_get(task* t) {
+    acl::string* body = new acl::string;
+
+    //t->debug();
+
+    log_info("http_get(%d): addr=%s, host=%s, url=%s", __LINE__,
+            t->get_server_addr().c_str(),
+            t->get_server_host().c_str(), t->get_server_url().c_str());
+
+    if (http_get(t->get_server_addr(), t->get_server_host(),
+            t->get_server_url(), *body)) {
+        t->set_body(body);
+    } else {
+        delete body;
+    }
+
+    t->push_result();
 }
+
+class fiber_waiter : public acl::fiber {
+public:
+    fiber_waiter(void) {
+        box_ = new acl::fiber_tbox<task>;
+    }
+    ~fiber_waiter(void) {}
+
+    void push(task* t) {
+        box_->push(t);
+    }
+
+protected:
+    // @override
+    void run(void) {
+        while (true) {
+            log_info(">>>waiter fiber started!");
+            task* t = box_->pop();
+            go[=] {
+                http_get(t);
+            };
+        }
+    }
+
+private:
+    acl::fiber_tbox<task>* box_;
+};
 
 class fiber_sleep : public acl::fiber {
 public:
     fiber_sleep(void) {}
-
-protected:
     ~fiber_sleep(void) {}
 
-    // @override
+protected:
     void run(void) {
-        for (int i = 0; i < 1; i++) {
-            log_info("begin sleep ...");
+        while (true) {
             sleep(2);
-            log_info("sleep wakeup...");
+            //log_info(">>sleep wakeup<<<");
         }
-        delete this;
     }
 };
 
-static JavaVM* g_jvm    = NULL;
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_http_HttpFiberThread_FiberSchedule(
-        JNIEnv* env,
-        jobject me)
-{
-    env->GetJavaVM(&g_jvm);
+static void fiber_thread_run(acl::fiber* waiter, acl::fiber* sleeper) {
+    waiter->start(256000);
+    sleeper->start(128000);
 
     log_info(">>>>>>fiber schedule now<<<<");
-    acl::fiber* fb = new fiber_sleep;
-    fb->start();
     acl::fiber::schedule();
     log_info("===============fiber schedule stopped==========");
 }
 
-class http_fiber : public acl::fiber {
-public:
-    http_fiber(const char* addr, const char* host, const char* url)
-    : addr_(addr), host_(host), url_(url)
-    {}
+extern "C" JNIEXPORT jlong JNICALL
+Java_com_example_http_HttpFiberThread_FiberSchedule(
+        JNIEnv* env,
+        jobject me)
+{
+    log_open();
 
-protected:
-    // @override
-    void run(void) {
-        acl::string body;
-        log_info("in fiber HttpGet: addr=%s, host=%s, url=%s",
-                addr_.c_str(), host_.c_str(), url_.c_str());
+    acl::fiber* waiter = new fiber_waiter;
+    acl::fiber* sleeper = new fiber_sleep;
+    std::thread* thread = new std::thread(fiber_thread_run, waiter, sleeper);
+    thread->detach();
+    return (jlong) waiter;
+}
 
-        if (HttpGet(addr_, host_, url_, body)) {
-            //log_info("%s", body.c_str());
-            log_info("get one, body size=%ld", (long) body.size());
-        } else {
-            log_error("HttpGet error, addr=%s, host=%s, url=%s",
-                    addr_.c_str(), host_.c_str(), url_.c_str());
-        }
-
-        delete this;
-    }
-
-private:
-    std::string addr_;
-    std::string host_;
-    std::string url_;
-
-    ~http_fiber(void) {}
-};
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_http_HttpFiberThread_HttpFiberGet(
+extern "C" JNIEXPORT jstring JNICALL
+Java_com_example_http_HttpFiberThread_HttpGet(
         JNIEnv* env,
         jobject me,
+        jlong o,
         jstring addr,
         jstring host,
         jstring url)
 {
+    fiber_waiter* waiter = (fiber_waiter*) o;
+
     std::string server_addr, server_host, server_url;
     JString2String(env, addr, server_addr);
     JString2String(env, host, server_host);
     JString2String(env, url, server_url);
-    acl::fiber* fb = new http_fiber(server_addr.c_str(),
-            server_host.c_str(), server_url.c_str());
-    fb->start();
-}
 
-class fiber_ctx {
-public:
-    fiber_ctx(JNIEnv* env, jobject o) : env_(env), o_(o) {}
-    ~fiber_ctx(void) {}
+    log_info(">>>HttpGet: addr=%s, host=%s, url=%s",
+            server_addr.c_str(), server_host.c_str(), server_url.c_str());
 
-    JNIEnv* env_;
-    jobject o_;
-};
+    task t(env, server_addr.c_str(), server_host.c_str(), server_url.c_str());
+    t.debug();
 
-static void fiber_start(ACL_FIBER*, void* arg)
-{
-    fiber_ctx* ctx = (fiber_ctx*) arg;
-    JNIEnv* env = ctx->env_;
-    jobject o   = ctx->o_;
-    delete ctx;
-
-#if 0
-    log_info(">>>>%s: curr thread=%ld<<", __func__, acl::thread::self());
-    jobject_call caller(*env, o);
-    caller.call("onCreate");
-    //env->DeleteLocalRef(o);
-#else
-    if (g_jvm->AttachCurrentThread(&env, NULL) != JNI_OK) {
-        return;
+    waiter->push(&t);
+    t.wait_result();
+    acl::string* s = t.get_body();
+    if (s == NULL) {
+        return NULL;
     }
 
-    jobject_create creater(*env);
-    const char* clzname = "com/example/http/HttpClientFiber";
-    //clzname = "java/lang/String";
-    o = creater.create(clzname);
-    log_info(">>>>create jobject=%p<<<", o);
-    jobject_call caller(*env, o);
-    caller.call("onCreate");
-#endif
-}
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_http_Fiber_FiberStart(
-        JNIEnv* env,
-        jobject me)
-{
-    fiber_ctx* ctx = new fiber_ctx(env, me);
-
-    log_info(">>>>%s: curr thread=%ld<<", __func__, acl::thread::self());
-#if 0
-    fiber_start(NULL, ctx);
-#else
-    env->NewGlobalRef(me);
-    env->NewLocalRef(me);
-    env->NewWeakGlobalRef(me);
-
-    log_info(">>>me=%p<<<", me);
-    acl_fiber_create(fiber_start, ctx, 256000);
-#endif
+    return String2JString(env, s->c_str());
 }

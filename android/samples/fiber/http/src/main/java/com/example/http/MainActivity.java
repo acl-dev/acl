@@ -11,6 +11,7 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private EditText domain;
     private TextView result;
+    private HttpFiberThread httpThread;
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -47,10 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("host is " + host);
         try {
-            HttpHandler handler = new HttpHandler(this);
             String addr = host + ":80", url = "/";
-            HttpThread httpThread = new HttpThread(handler, addr, host, url);
-            httpThread.start();
+            httpThread.httpGet(addr, host, url);
         } catch (Exception e) {
             e.printStackTrace();
             onError(host);
@@ -84,7 +83,9 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // 创建协程调度线程
-        HttpFiberThread fiberThread = new HttpFiberThread();
-        fiberThread.start();
+
+        HttpHandler handler = new HttpHandler(this);
+        httpThread = new HttpFiberThread(handler);
+        httpThread.start();
     }
 }

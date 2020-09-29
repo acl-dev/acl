@@ -17,6 +17,7 @@
 #include <jni.h>
 #include <android/log.h>
 #include <string>
+#include <thread>
 
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
