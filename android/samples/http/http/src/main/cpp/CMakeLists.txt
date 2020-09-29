@@ -80,13 +80,15 @@ set(acl_c_include ${acl_c_path}/include)
 set(acl_cpp_path ${acl_home}/lib_acl_cpp)
 set(acl_cpp_include ${acl_cpp_path}/include)
 set(fiber_path ${acl_home}/lib_fiber)
-set(fiber_include ${fiber_path}/cpp/include)
+set(fiber_c_include ${fiber_path}/c/include)
+set(fiber_cpp_include ${fiber_path}/cpp/include)
 
 include_directories(
         "./"
         ${acl_c_include}
         ${acl_cpp_include}
-        ${fiber_include}
+        ${fiber_c_include}
+        ${fiber_cpp_include}
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 

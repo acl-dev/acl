@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+#include "log.h"
 
 static void JString2String(JNIEnv *env, jstring js, std::string &out)
 {
@@ -15,22 +16,6 @@ static jstring String2JString(JNIEnv *env, const char *s)
 {
     jstring js = env->NewStringUTF(s);
     return js;
-}
-
-static void log_info(const char* fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    __android_log_vprint(ANDROID_LOG_INFO, "dns-info", fmt, ap);
-    va_end(ap);
-}
-
-static void log_error(const char* fmt, ...)
-{
-    va_list  ap;
-    va_start(ap, fmt);
-    __android_log_vprint(ANDROID_LOG_ERROR, "dns-error", fmt, ap);
-    va_end(ap);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -84,83 +69,4 @@ Java_com_example_http_HttpClient_HttpGet(
     }
 
     return String2JString(env, body);
-}
-
-class fiber_sleep : public acl::fiber {
-public:
-    fiber_sleep(void) {}
-
-protected:
-    ~fiber_sleep(void) {}
-
-    // @override
-    void run(void) {
-        for (int i = 0; i < 1; i++) {
-            log_info("begin sleep ...");
-            sleep(2);
-            log_info("sleep wakeup...");
-        }
-        delete this;
-    }
-};
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_http_HttpFiberThread_FiberSchedule(
-        JNIEnv* env,
-        jobject me)
-{
-    log_info(">>>>>>fiber schedule now<<<<");
-    acl::fiber* fb = new fiber_sleep;
-    fb->start();
-    acl::fiber::schedule();
-    log_info("===============fiber schedule stopped==========");
-}
-
-class http_fiber : public acl::fiber {
-public:
-    http_fiber(const char* addr, const char* host, const char* url)
-    : addr_(addr), host_(host), url_(url)
-    {}
-
-protected:
-    // @override
-    void run(void) {
-        acl::string body;
-        log_info("in fiber HttpGet: addr=%s, host=%s, url=%s",
-                addr_.c_str(), host_.c_str(), url_.c_str());
-
-        if (HttpGet(addr_, host_, url_, body)) {
-            //log_info("%s", body.c_str());
-            log_info("get one, body size=%ld", (long) body.size());
-        } else {
-            log_error("HttpGet error, addr=%s, host=%s, url=%s",
-                    addr_.c_str(), host_.c_str(), url_.c_str());
-        }
-
-        delete this;
-    }
-
-private:
-    std::string addr_;
-    std::string host_;
-    std::string url_;
-
-    ~http_fiber(void) {}
-};
-
-extern "C" JNIEXPORT void JNICALL
-Java_com_example_http_HttpFiberThread_HttpFiberGet(
-        JNIEnv* env,
-        jobject me,
-        jstring addr,
-        jstring host,
-        jstring url)
-{
-    std::string server_addr, server_host, server_url;
-    JString2String(env, addr, server_addr);
-    JString2String(env, host, server_host);
-    JString2String(env, url, server_url);
-    acl::fiber* fb = new http_fiber(server_addr.c_str(),
-            server_host.c_str(), server_url.c_str());
-    fb->start();
 }

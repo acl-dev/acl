@@ -78,13 +78,9 @@ public class MainActivity extends AppCompatActivity {
         clear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-            // 清空结果显示区域
-            result.setText("");
+                // 清空结果显示区域
+                result.setText("");
             }
         });
-
-        // 创建协程调度线程
-        HttpFiberThread fiberThread = new HttpFiberThread();
-        fiberThread.start();
     }
 }

@@ -18,7 +18,6 @@ public final class HttpClient {
     }
 
     ////////////////////////////////////////////////////////////////////////////
-
     // Jni Native method
     private native String HttpGet(String serverAddr, String host, String url);
 }
