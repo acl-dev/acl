@@ -3,6 +3,7 @@ package com.example.http;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,8 +49,8 @@ public class MainActivity extends AppCompatActivity {
 
         System.out.println("host is " + host);
         try {
-            String addr = host + ":80", url = "/";
-            httpThread.httpGet(addr, host, url);
+            String url = "/";
+            httpThread.httpGet(host, 80, url);
         } catch (Exception e) {
             e.printStackTrace();
             onError(host);
@@ -63,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
         domain = (EditText) findViewById(R.id.domain);
         result = findViewById(R.id.result);
+        result.setMovementMethod(ScrollingMovementMethod.getInstance());
 
         // 绑定 HTTP 请求事件
         Button get = (Button) findViewById(R.id.http_get);
