@@ -28,7 +28,7 @@ public class HttpFiberThread {
             public void run() {
                 String body = HttpGet(waiter, host, port, url);
                 if (body != null) {
-                    System.out.println("body: " + body);
+                    System.out.println("response body length: " + body.length());
                     handler.onBody(body);
                 } else {
                     System.out.println("body null");
@@ -45,5 +45,6 @@ public class HttpFiberThread {
 
     // Jni Native method
     private native long FiberSchedule();
+    private native void Test();
     private native String HttpGet(long o, String addr, int port, String url);
 }
