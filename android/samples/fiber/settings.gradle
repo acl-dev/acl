@@ -1,2 +1,2 @@
-include ':http'
+include ':http', ':HttpFiber'
 rootProject.name='fiber'

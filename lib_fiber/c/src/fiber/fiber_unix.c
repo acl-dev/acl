@@ -43,6 +43,12 @@ typedef struct FIBER_UNIX {
 #  endif
 	ucontext_t *context;
 # endif
+	char   status;
+#define	FIBER_READY	1
+#define	FIBER_SUSPEND	2
+#define	FIBER_RUNNING	3
+
+	size_t stack_size;
 	size_t size;
 	char  *buff;
 } FIBER_UNIX;
@@ -66,6 +72,39 @@ static void swap_fcontext(FIBER_UNIX *from, FIBER_UNIX *to)
 }
 #endif
 
+#define	STACK_SIZE	(1024 * 1024)
+static char __stack[STACK_SIZE];
+
+static void stack_save(FIBER_UNIX *fb)
+{
+	char  dummy = 0;
+	char *top   = __stack + STACK_SIZE;
+	size_t size = top - &dummy;
+
+	if (fb->size < size) {
+		stack_free(fb->buff);
+		fb->size = size;
+		fb->buff = stack_alloc(fb->size);
+	}
+	fb->stack_size = size;
+	memcpy(fb->buff, &dummy, size);
+}
+
+static void stack_restore(FIBER_UNIX *fb)
+{
+	printf(">>>stack_size=%lu, buff=%p\n", fb->stack_size, fb->buff);
+	memcpy(__stack + STACK_SIZE - fb->stack_size, fb->buff, fb->stack_size);
+	printf(">>>restore ok<<<\n");
+}
+
+union cc_arg
+{
+	void *p;
+	int   i[2];
+};
+
+static void fiber_unix_start(unsigned int x, unsigned int y);
+
 static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 {
 #if	defined(USE_BOOST_JMP)
@@ -86,6 +125,36 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 		}
 	}
 #else
+	printf("from id=%d, status=%d, to id=%d, status=%d\r\n",
+		acl_fiber_id(from), from->status, acl_fiber_id(to), to->status);
+	if (from->status == FIBER_RUNNING && from->fiber.status != FIBER_STATUS_EXITING) {
+		printf("%d\n", __LINE__);
+		stack_save(from);
+		printf("%d\n", __LINE__);
+		from->status = FIBER_SUSPEND;
+	}
+
+	if (to->status == FIBER_READY) {
+		union cc_arg carg;
+		carg.p = to;
+		printf("%d\n", __LINE__);
+		getcontext(to->context);
+		printf("%d\n", __LINE__);
+		to->context->uc_stack.ss_sp   = __stack;
+		to->context->uc_stack.ss_size = STACK_SIZE;
+		makecontext(to->context, (void(*)(void)) fiber_unix_start,
+			2, carg.i[0], carg.i[1]);
+		printf("%d\n", __LINE__);
+	} else if (to->status == FIBER_SUSPEND && to->fiber.status != FIBER_STATUS_EXITING) {
+		printf("%d, to=%p, %d, from=%d, \n", __LINE__, to, acl_fiber_id(to), acl_fiber_id(from));
+		to->status = FIBER_RUNNING;
+		stack_restore(to);
+		printf("%d, to=%p\n", __LINE__, to);
+	}
+	to->status = FIBER_RUNNING;
+	printf("from fb=%d, to fb=%d\r\n", acl_fiber_id(from), acl_fiber_id(to));
+	printf("\r\n");
+
 	if (swapcontext(from->context, to->context) < 0) {
 		msg_fatal("%s(%d), %s: swapcontext error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
@@ -118,11 +187,13 @@ static void fiber_unix_start(transfer_t arg)
 	jmp->to->fiber.start_fn(&jmp->to->fiber);
 }
 #else
+/*
 union cc_arg
 {
 	void *p;
 	int   i[2];
 };
+*/
 
 static void fiber_unix_start(unsigned int x, unsigned int y)
 {
@@ -189,11 +260,17 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
 
-	fb->context->uc_stack.ss_sp   = fb->buff + 8;
-	fb->context->uc_stack.ss_size = fb->size - 64;
+#if 0
+	fb->context->uc_stack.ss_sp   = fb->buff;
+	fb->context->uc_stack.ss_size = fb->size;
+#else
+	fb->context->uc_stack.ss_sp   = __stack;
+	fb->context->uc_stack.ss_size = STACK_SIZE;
+#endif
 	fb->context->uc_link = NULL;
 	makecontext(fb->context, (void(*)(void)) fiber_unix_start,
 		2, carg.i[0], carg.i[1]);
+	fb->status = FIBER_READY;
 #endif
 
 #ifdef USE_VALGRIND

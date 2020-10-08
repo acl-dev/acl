@@ -45,6 +45,5 @@ public class HttpFiberThread {
 
     // Jni Native method
     private native long FiberSchedule();
-    private native void Test();
     private native String HttpGet(long o, String addr, int port, String url);
 }
