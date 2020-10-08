@@ -306,7 +306,7 @@ private:
 	long long delay_;
 };
 
-static void fiber_aio_run(bool use_reactor, acl::aio_handle& handle,
+static void aio_run(bool use_reactor, acl::aio_handle& handle,
 	acl::aio_listen_stream* sstream)
 {
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
@@ -333,6 +333,27 @@ static void fiber_aio_run(bool use_reactor, acl::aio_handle& handle,
 
 	// XXX: 为了保证能关闭监听流，应在此处再 check 一下
 	handle.check();
+}
+
+static acl::aio_listen_stream* bind_addr(acl::aio_handle& handle,
+	const acl::string& addr)
+{
+	// 创建监听异步流
+	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
+
+	// 监听指定的地址
+	if (!sstream->open(addr.c_str())) {
+		std::cout << "open " << addr.c_str() << " error!" << std::endl;
+		sstream->close();
+		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
+		handle.check();
+
+		getchar();
+		return NULL;
+	}
+
+	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
+	return sstream;
 }
 
 static void usage(const char* procname)
@@ -386,47 +407,48 @@ int main(int argc, char* argv[])
 
 	acl::log::stdout_open(true);
 
-	// 构建异步引擎类对象
-	acl::aio_handle handle(use_kernel ? acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
-
-	long long delay = 1000000;
-	mytimer* timer = new mytimer(delay);
-	timer->keep_timer(true);
-	handle.set_timer(timer, delay);
-
-	// 创建监听异步流
-	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
-
-	// 监听指定的地址
-	if (!sstream->open(addr.c_str())) {
-		std::cout << "open " << addr.c_str() << " error!" << std::endl;
-		sstream->close();
-		// XXX: 为了保证能关闭监听流，应在此处再 check 一下
-		handle.check();
-
-		getchar();
-		return 1;
-	}
-
-	std::cout << "Listen: " << addr.c_str() << " ok!" << std::endl;
 
 	if (use_fiber) {
 		go[&] {
-			printf(">>>begin run use fiber mode<<<\r\n");
-			fiber_aio_run(use_reactor, std::ref(handle), sstream);
+			// 构建异步引擎类对象
+			acl::aio_handle handle(use_kernel ?
+				acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
+
+			long long delay = 1000000;
+			mytimer* timer = new mytimer(delay);
+			timer->keep_timer(true);
+			handle.set_timer(timer, delay);
+
+			acl::aio_listen_stream* sstream = bind_addr(handle, addr);
+			if (sstream) {
+				printf(">>>begin run use fiber mode<<<\r\n");
+				aio_run(use_reactor, std::ref(handle), sstream);
+			}
 		};
+
+		go[=] {
+			while (true) {
+				sleep(2);
+				printf("---wakeup---\r\n");
+			}
+		};
+
+		acl::fiber::schedule();
 	} else {
-		printf(">>>begin run not use fiber mode\r\n");
-		fiber_aio_run(use_reactor, std::ref(handle), sstream);
+		acl::aio_handle handle(use_kernel ?
+			acl::ENGINE_KERNEL : acl::ENGINE_SELECT);
+
+		long long delay = 1000000;
+		mytimer* timer = new mytimer(delay);
+		timer->keep_timer(true);
+		handle.set_timer(timer, delay);
+
+		acl::aio_listen_stream* sstream = bind_addr(handle, addr);
+		if (sstream) {
+			printf(">>>begin run not use fiber mode\r\n");
+			aio_run(use_reactor, std::ref(handle), sstream);
+		}
 	}
 
-	go[=] {
-		while (true) {
-			sleep(2);
-			printf("---wakeup---\r\n");
-		}
-	};
-
-	acl::fiber::schedule();
 	return 0;
 }
