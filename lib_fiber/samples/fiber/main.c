@@ -32,8 +32,6 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 
 	errno = acl_fiber_errno(fiber);
 	for (i = 0; i < __max_loop; i++) {
-		printf("fiber-%d, errno: %d\r\n",
-				acl_fiber_id(fiber), errno);
 		acl_fiber_yield();
 		if (!__display)
 			continue;
@@ -42,8 +40,6 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 			printf("fiber-%d, errno: %d\r\n",
 				acl_fiber_id(fiber), errno);
 	}
-
-	printf(">>>fiber-%d exit now<<<\r\n", acl_fiber_id(fiber));
 
 	if (--__left_fiber == 0) {
 		long long count = __max_fiber * __max_loop;

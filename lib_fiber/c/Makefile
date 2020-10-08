@@ -20,7 +20,7 @@ CFLAGS = -c -g -W \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_RING \
-#-DUSE_JMP_DEF \
+-DUSE_JMP_DEF \
 #-DUSE_BOOST_JMP \
 #-DUSE_FAST_TIME \
 #-Waggregate-return \
