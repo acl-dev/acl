@@ -9,7 +9,7 @@ struct dns_resolv_conf *var_dns_conf = NULL;
 struct dns_hosts *var_dns_hosts      = NULL;
 struct dns_hints *var_dns_hints      = NULL;
 
-void dns_set_read_wait(int timeout)
+void fiber_dns_set_read_wait(int timeout)
 {
 	set_read_timeout(timeout);
 }
@@ -32,7 +32,7 @@ static void dns_on_exit(void)
 	}
 }
 
-void dns_init(void)
+void fiber_dns_init(void)
 {
 #ifdef SYS_WIN
 	static pthread_mutex_t __lock;

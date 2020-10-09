@@ -149,7 +149,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 	}
 
 	if (var_dns_conf == NULL || var_dns_hosts == NULL) {
-		dns_init();
+		fiber_dns_init();
 	}
 
 	*res = NULL;

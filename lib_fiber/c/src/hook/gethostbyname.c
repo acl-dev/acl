@@ -170,7 +170,7 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 	}
 
 	if (var_dns_conf == NULL || var_dns_hosts == NULL) {
-		dns_init();
+		fiber_dns_init();
 	}
 
 	memset(ent, 0, sizeof(struct hostent));
