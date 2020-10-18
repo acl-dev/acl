@@ -63,12 +63,44 @@ const char *acl_inet_ntop4(const unsigned char *src, char *dst, size_t size)
 	return (dst);
 }
 
-const char *acl_inet_ntoa(struct in_addr in, char *dst, size_t size)
+const char *acl_inet_ntoa(const struct in_addr in, char *buf, size_t size)
 {
+#if 0
 	unsigned char *src = (unsigned char *) &in.s_addr;
 
-	return (acl_inet_ntop4(src, dst, size));
+	return acl_inet_ntop4(src, buf, size);
+#else
+	struct sockaddr_in sin;
+
+	memset(&sin, 0, sizeof(sin));
+	sin.sin_family = AF_INET;
+	memcpy(&sin.sin_addr, &in, sizeof(sin.sin_addr));
+
+	if (!acl_inet_ntop((const struct sockaddr*) &sin, buf, size)) {
+		return NULL;
+	} else {
+		return buf;
+	}
+
+#endif
 }
+
+#ifdef AF_INET6
+const char *acl_inet6_ntoa(const struct in6_addr in6, char *buf, size_t size)
+{
+	struct sockaddr_in6 sin6;
+
+	memset(&sin6, 0, sizeof(sin6));
+	sin6.sin6_family = AF_INET6;
+	memcpy(&sin6.sin6_addr, &in6, sizeof(sin6.sin6_addr));
+
+	if (!acl_inet_ntop((const struct sockaddr*) &sin6, buf, size)) {
+		return NULL;
+	} else {
+		return buf;
+	}
+}
+#endif
 
 int acl_is_ipv4(const char *ip)
 {       

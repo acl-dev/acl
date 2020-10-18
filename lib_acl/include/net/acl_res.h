@@ -9,6 +9,11 @@ extern "C" {
 #include "acl_netdb.h"
 #include <time.h>
 
+#ifdef	ACL_UNIX
+#include <netinet/in.h>
+#include <sys/un.h>
+#endif
+
 /**
  * DNS返回结果的存储结构
  */
@@ -60,6 +65,10 @@ ACL_API void acl_res_free(ACL_RES *res);
  * @return {ACL_DNS_DB*} 查询的结果集
  */
 ACL_API ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain);
+
+#ifdef AF_INET6
+ACL_API ACL_DNS_DB *acl_res_lookup6(ACL_RES *res, const char *domain);
+#endif
 
 /**
  * 根据错误号获得查询失败的原因

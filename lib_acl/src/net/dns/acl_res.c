@@ -182,7 +182,8 @@ static int res_lookup(ACL_RES *res, const char *data, int dlen,
 	}
 }
 
-ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
+static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
+	const char *domain, int type)
 {
 	ACL_DNS_DB *dns_db;
 	char  buf[1024];
@@ -203,8 +204,21 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	}
 
 	memset(buf, 0, sizeof(buf));
+
+#ifdef	AF_INET6
+	if (type == AF_INET6) {
+		ret = (ssize_t) rfc1035_build_query4aaaa(domain, buf,
+			sizeof(buf), res->cur_qid++, NULL);
+	} else {
+		ret = (ssize_t) rfc1035_build_query4a(domain, buf,
+			sizeof(buf), res->cur_qid++, NULL);
+	}
+#else
+	(void) type;
 	ret = (ssize_t) rfc1035_build_query4a(domain, buf, sizeof(buf),
 		res->cur_qid++, NULL);
+#endif
+
 	if (ret == 0) {
 		acl_msg_error("%s(%d), %s: build a query error",
 			__FILE__, __LINE__, __FUNCTION__);
@@ -244,6 +258,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 				continue;
 			}
 
+			phost->saddr.sa.sa_family = AF_INET;
 			phost->ttl = answers->answer[i].ttl;
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
@@ -260,6 +275,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 				continue;
 			}
 
+			phost->saddr.sa.sa_family = AF_INET6;
 			phost->ttl = answers->answer[i].ttl;
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
@@ -274,6 +290,18 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	rfc1035_message_destroy(answers);
 	return dns_db;
 }
+
+ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
+{
+	return acl_res_lookup_with_type(res, domain, AF_INET);
+}
+
+#ifdef	AF_INET6
+ACL_DNS_DB *acl_res_lookup6(ACL_RES *res, const char *domain)
+{
+	return acl_res_lookup_with_type(res, domain, AF_INET6);
+}
+#endif
 
 const char *acl_res_strerror(int errnum)
 {
