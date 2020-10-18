@@ -187,7 +187,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	ACL_DNS_DB *dns_db;
 	char  buf[1024];
 	ssize_t ret, i;
-	rfc1035_message *answers;
+	RFC1035_MESSAGE *answers;
 	ACL_HOSTNAME *phost;
 	time_t  begin;
 
@@ -203,7 +203,13 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 	}
 
 	memset(buf, 0, sizeof(buf));
-	ret = (ssize_t) rfc1035BuildAQuery(domain, buf, sizeof(buf), res->cur_qid++, NULL);
+	ret = (ssize_t) rfc1035_build_query4a(domain, buf, sizeof(buf),
+		res->cur_qid++, NULL);
+	if (ret == 0) {
+		acl_msg_error("%s(%d), %s: build a query error",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
 
 	(void) time(&begin);
 	ret = res_lookup(res, buf, (int) ret, buf, sizeof(buf));
@@ -213,12 +219,12 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 		return NULL;
 	}
 
-	ret = rfc1035MessageUnpack(buf, ret, &answers);
+	ret = rfc1035_message_unpack(buf, ret, &answers);
 	if (ret < 0) {
 		res->errnum = (int) ret;
 		return NULL;
 	} else if (ret == 0) {
-		rfc1035MessageDestroy(answers);
+		rfc1035_message_destroy(answers);
 		res->errnum = ACL_RES_ERR_NULL;
 		return NULL;
 	}
@@ -231,13 +237,33 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 
 			memcpy(&phost->saddr.in.sin_addr,
 				answers->answer[i].rdata, 4);
-			inet_ntop(AF_INET, &phost->saddr.in.sin_addr,
-				phost->ip, sizeof(phost->ip));
+			if (!inet_ntop(AF_INET, &phost->saddr.in.sin_addr,
+				phost->ip, sizeof(phost->ip))) {
+
+				acl_myfree(phost);
+				continue;
+			}
 
 			phost->ttl = answers->answer[i].ttl;
-
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
+#ifdef	AF_INET6
+		} else if (answers->answer[i].type == RFC1035_TYPE_AAAA) {
+			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
+
+			memcpy(&phost->saddr.in6.sin6_addr,
+				answers->answer[i].rdata, 16);
+			if (!inet_ntop(AF_INET6, &phost->saddr.in6.sin6_addr,
+				phost->ip, sizeof(phost->ip))) {
+
+				acl_myfree(phost);
+				continue;
+			}
+
+			phost->ttl = answers->answer[i].ttl;
+			(void) acl_array_append(dns_db->h_db, phost);
+			dns_db->size++;
+#endif
 		} else if (acl_msg_verbose) {
 			acl_msg_error("%s(%d), %s: answer type %d, domain %s",
 				__FILE__, __LINE__, __FUNCTION__,
@@ -245,7 +271,7 @@ ACL_DNS_DB *acl_res_lookup(ACL_RES *res, const char *domain)
 		}
 	}
 
-	rfc1035MessageDestroy(answers);
+	rfc1035_message_destroy(answers);
 	return dns_db;
 }
 
@@ -271,7 +297,7 @@ const char *acl_res_strerror(int errnum)
 		}
 	}
 
-	return rfc1035Strerror(errnum);
+	return rfc1035_strerror(errnum);
 }
 
 const char *acl_res_errmsg(const ACL_RES *res)
