@@ -259,6 +259,7 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 
 			phost->saddr.sa.sa_family = AF_INET;
 			phost->ttl = answers->answer[i].ttl;
+			phost->type = ACL_HOSTNAME_TYPE_IPV4;
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
 #ifdef	AF_INET6
@@ -276,6 +277,7 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 
 			phost->saddr.sa.sa_family = AF_INET6;
 			phost->ttl = answers->answer[i].ttl;
+			phost->type = ACL_HOSTNAME_TYPE_IPV6;
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
 #endif

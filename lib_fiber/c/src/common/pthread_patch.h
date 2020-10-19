@@ -13,7 +13,6 @@ extern "C" {
 //#define	TLS_OUT_OF_INDEXES         0xffffffff
 #define	PTHREAD_KEYS_MAX           1024
 #define PTHREAD_ONCE_INIT          0
-#define PTHREAD_ONCE_INIT          0
 typedef unsigned long pthread_t;
 typedef struct pthread_mutex_t pthread_mutex_t;
 typedef struct pthread_mutexattr_t pthread_mutexattr_t;
