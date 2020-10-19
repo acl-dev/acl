@@ -1,35 +1,36 @@
-#ifndef __MY_RFC1035_INCLUDE_H__
-#define __MY_RFC1035_INCLUDE_H__
+#ifndef __ACL_RFC1035_INCLUDE_H__
+#define __ACL_RFC1035_INCLUDE_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "stdlib/acl_define.h"
-#include "stdlib/acl_argv.h"
+#include "../stdlib/acl_define.h"
+#include "../stdlib/acl_argv.h"
+
 #ifdef	ACL_UNIX
 #include <netinet/in.h>
 #endif
 
 /* RFC1035 - DNS */
-#define RFC1035_MAXHOSTNAMESZ 256
+#define ACL_RFC1035_MAXHOSTNAMESZ 256
 
-typedef struct RFC1035_RR {
-    char name[RFC1035_MAXHOSTNAMESZ];
+typedef struct ACL_RFC1035_RR {
+    char name[ACL_RFC1035_MAXHOSTNAMESZ];
     unsigned short type;
     unsigned short tclass;	/* class */
     unsigned int ttl;
     unsigned short rdlength;
     char *rdata;
-} RFC1035_RR;
+} ACL_RFC1035_RR;
 
-typedef struct RFC1035_QUERY {
-    char name[RFC1035_MAXHOSTNAMESZ];
+typedef struct ACL_RFC1035_QUERY {
+    char name[ACL_RFC1035_MAXHOSTNAMESZ];
     unsigned short qtype;
     unsigned short qclass;
-} RFC1035_QUERY;
+} ACL_RFC1035_QUERY;
 
-typedef struct RFC1035_MESSAGE {
+typedef struct ACL_RFC1035_MESSAGE {
     unsigned short id;		/* A 16 bit identifier */
     unsigned int qr:1;		/* This message is a query (0), or a response (1) */
     unsigned int opcode:4;	/* Query kind:
@@ -55,18 +56,18 @@ typedef struct RFC1035_MESSAGE {
     unsigned short ancount;	/* the number of resource records in the answer section */
     unsigned short nscount;	/* the number of name server resource records in the authority records */
     unsigned short arcount;	/* the number of resource records in the additional records section */
-    RFC1035_QUERY *query;
-    RFC1035_RR    *answer;
-    RFC1035_RR    *authority;
-    RFC1035_RR    *additional;
-} RFC1035_MESSAGE;
+    ACL_RFC1035_QUERY *query;
+    ACL_RFC1035_RR    *answer;
+    ACL_RFC1035_RR    *authority;
+    ACL_RFC1035_RR    *additional;
+} ACL_RFC1035_MESSAGE;
 
 /**
  * Get error description with the specifed error number
  * @param errnum {int}
  * @return {const char*}
  */
-const char *rfc1035_strerror(int errnum);
+ACL_API const char *acl_rfc1035_strerror(int errnum);
 
 /**
  * Builds a message buffer with a QUESTION to lookup A records
@@ -78,13 +79,13 @@ const char *rfc1035_strerror(int errnum);
  * @param buf {char*} the buffer for holding the query content
  * @param sz {size_t} the buffer's size
  * @param qid {unsigned short} the unique ID number for thie quering
- * @param query {RFC1035_QUERY*} if not null, it's qtype, qclass and
+ * @param query {ACL_RFC1035_QUERY*} if not null, it's qtype, qclass and
  * 	hostname will be set.
  * @return {size_t} return the size of the query in the buf, 0 return
  * 	if some error happened.
  */
-size_t rfc1035_build_query4a(const char *hostname, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query);
+ACL_API size_t acl_rfc1035_build_query4a(const char *hostname, char *buf,
+		size_t sz, unsigned short qid, ACL_RFC1035_QUERY *query);
 
 /**
  * Builds a message buffer with a QUESTION to lookup AAAA records
@@ -93,11 +94,11 @@ size_t rfc1035_build_query4a(const char *hostname, char *buf, size_t sz,
  * @param buf  {char*}
  * @param sz {size_t}
  * @param qid {unsigned short}
- * @param query {RFC1035_QUERY*}
+ * @param query {ACL_RFC1035_QUERY*}
  * @return {size_t}
  */
-size_t rfc1035_build_query4aaaa(const char *hostname, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query);
+ACL_API size_t acl_rfc1035_build_query4aaaa(const char *hostname, char *buf,
+		size_t sz, unsigned short qid, ACL_RFC1035_QUERY *query);
 
 /**
  * Builds a message buffer with a QUESTION to lookup MX records
@@ -106,11 +107,11 @@ size_t rfc1035_build_query4aaaa(const char *hostname, char *buf, size_t sz,
  * @param buf {char*}
  * @param sz {size_t}
  * @param qid {unsigned short}
- * @param query {RFC1035_QUERY*}
+ * @param query {ACL_RFC1035_QUERY*}
  * @return {size_t}
  */
-size_t rfc1035_build_query4mx(const char *hostname, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query);
+ACL_API size_t acl_rfc1035_build_query4mx(const char *hostname, char *buf,
+		size_t sz, unsigned short qid, ACL_RFC1035_QUERY *query);
 
 /**
  * Builds a message buffer with a QUESTION to lookup PTR records
@@ -122,11 +123,11 @@ size_t rfc1035_build_query4mx(const char *hostname, char *buf, size_t sz,
  * @param buf {char*} hold the query package
  * @param sz {size_t} the buf's size at least 512 octets
  * @param qid {unsigned short} the query ID
- * @param query {RFC1035_QUERY*} if no null, it's some member variable
+ * @param query {ACL_RFC1035_QUERY*} if no null, it's some member variable
  * @return {size_t} Returns the size of the query in the buff
 */
-size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query);
+ACL_API size_t acl_rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
+		size_t sz, unsigned short qid, ACL_RFC1035_QUERY *query);
 
 /**
  * We're going to retry a former query, but we
@@ -136,15 +137,16 @@ size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf, size_t sz,
  * @param sz {size_t} the buf's size
  * @param qid {unsigned short} the query ID
  */
-void rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid);
+ACL_API void acl_rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid);
 
 /**
  * Compares two RFC1035_QUERY entries
- * @param a {const RFC1035_QUERY *}
- * @param b {const RFC1035_QUERY *}
+ * @param a {const ACL_RFC1035_QUERY *}
+ * @param b {const ACL_RFC1035_QUERY *}
  * @return Returns 0 (equal) or !=0 (different)
  */
-int rfc1035_query_compare(const RFC1035_QUERY *a, const RFC1035_QUERY *b);
+ACL_API  int acl_rfc1035_query_compare(const ACL_RFC1035_QUERY *a,
+		const ACL_RFC1035_QUERY *b);
 
 /**
  * Takes the contents of a DNS reply and fills in an array
@@ -152,17 +154,18 @@ int rfc1035_query_compare(const RFC1035_QUERY *a, const RFC1035_QUERY *b);
  * here, and should be freed by calling RFC1035RRDestroy().
  * @param buf {const char*} the data of the DNS reply
  * @param sz {size_t} the buf's size
- * @param answer {RFC1035_MESSAGE*} store the parsing result
+ * @param answer {ACL_RFC1035_MESSAGE*} store the parsing result
  * @return {int} Returns number of records unpacked, zero if DNS reply
  * 	indicates zero answers, or an error number < 0.
  */
-int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer);
+ACL_API int acl_rfc1035_message_unpack(const char *buf, size_t sz,
+		ACL_RFC1035_MESSAGE **answer);
 
 /**
  * destroy and free the message created by RFC1035MessageUnpack()
- * @param message {RFC1035_MESSAGE*}
+ * @param message {ACL_RFC1035_MESSAGE*}
  */
-void rfc1035_message_destroy(RFC1035_MESSAGE *message);
+ACL_API void acl_rfc1035_message_destroy(ACL_RFC1035_MESSAGE *message);
 
 /**
  * Builds a response message for the query client.
@@ -176,57 +179,57 @@ void rfc1035_message_destroy(RFC1035_MESSAGE *message);
  * @param sz {size_t} the buf's size
  * @return {size_t} content size in buf
  */
-size_t rfc1035_build_reply4a(const char *hostname, const ACL_ARGV *ips,
-	const char *domain_root, const char *dnsname, const char *dnsip,
-	unsigned short qid, char *buf, size_t sz);
+ACL_API size_t acl_rfc1035_build_reply4a(const char *hostname, const ACL_ARGV *ips,
+		const char *domain_root, const char *dnsname, const char *dnsip,
+		unsigned short qid, char *buf, size_t sz);
 
-size_t rfc1035_build_reply4aaaa(const char *hostname, const ACL_ARGV *ips,
-	const char *domain_root, const char *dnsname, const char *dnsip,
-	unsigned short qid, char *buf, size_t sz);
+ACL_API size_t acl_rfc1035_build_reply4aaaa(const char *hostname, const ACL_ARGV *ips,
+		const char *domain_root, const char *dnsname, const char *dnsip,
+		unsigned short qid, char *buf, size_t sz);
 
-typedef struct RFC1035_REPLY {
+typedef struct ACL_RFC1035_REPLY {
 	const char *hostname;
 	const ACL_ARGV *ips;
 	const char *domain_root;
 	const char *dns_name;
 	const char *dns_ip;
-	int ip_type;
+	int ip_type;		/* RFC1035_TYPE_A, RFC1035_TYPE_AAAA */
 	int ttl;
 	unsigned short qid;
-} RFC1035_REPLY;
+} ACL_RFC1035_REPLY;
 
-size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz);
+ACL_API size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply,
+		char *buf, size_t sz);
 
-#define RFC1035_TYPE_A		1	/* a host address */
-#define RFC1035_TYPE_NS		2	/* an authoritative name server */
-#define RFC1035_TYPE_MD		3	/* a mail destination (Obsolete - use MX) */
-#define RFC1035_TYPE_MF		4	/* a mail forwarder (Obsolete - use MX) */
-#define RFC1035_TYPE_CNAME	5	/* the canonical name for an alias */
-#define RFC1035_TYPE_SOA	6	/* marks the start of a zone of authority */
-#define RFC1035_TYPE_MB		7	/* a mailbox domain name (EXPERIMENTAL) */
-#define RFC1035_TYPE_MG		8	/* a mail group member (EXPERIMENTAL) */
-#define RFC1035_TYPE_MR		9	/* a mail rename domain name (EXPERIMENTAL) */
-#define RFC1035_TYPE_NULL	10	/* a null RR (EXPERIMENTAL) */
-#define RFC1035_TYPE_WKS	11	/* a well known service description */
-#define RFC1035_TYPE_PTR	12	/* a domain name pointer */
-#define RFC1035_TYPE_HINFO	13	/* host information */
-#define RFC1035_TYPE_MINFO	14	/* mailbox or mail list information */
-#define RFC1035_TYPE_MX		15	/* mail exchange */
-#define RFC1035_TYPE_TXT	16	/* text strings */
-#define RFC1035_TYPE_AAAA	28	/* a IPv6 address of host */
-#define RFC1035_TYPE_AXFR	252	/* a request for a transfer of an entire zone */
-#define RFC1035_TYPE_MAILB	253	/* a request for mailbox-related records (MB, MG or MR) */
-#define RFC1035_TYPE_MAILA	253	/* a request for mail agent RRs (Obsolete - see MX) */
-#define RFC1035_TYPE_ALL	255	/* a request for all records */
+#define ACL_RFC1035_TYPE_A	1	/* a host address */
+#define ACL_RFC1035_TYPE_NS	2	/* an authoritative name server */
+#define ACL_RFC1035_TYPE_MD	3	/* a mail destination (Obsolete - use MX) */
+#define ACL_RFC1035_TYPE_MF	4	/* a mail forwarder (Obsolete - use MX) */
+#define ACL_RFC1035_TYPE_CNAME	5	/* the canonical name for an alias */
+#define ACL_RFC1035_TYPE_SOA	6	/* marks the start of a zone of authority */
+#define ACL_RFC1035_TYPE_MB	7	/* a mailbox domain name (EXPERIMENTAL) */
+#define ACL_RFC1035_TYPE_MG	8	/* a mail group member (EXPERIMENTAL) */
+#define ACL_RFC1035_TYPE_MR	9	/* a mail rename domain name (EXPERIMENTAL) */
+#define ACL_RFC1035_TYPE_NULL	10	/* a null RR (EXPERIMENTAL) */
+#define ACL_RFC1035_TYPE_WKS	11	/* a well known service description */
+#define ACL_RFC1035_TYPE_PTR	12	/* a domain name pointer */
+#define ACL_RFC1035_TYPE_HINFO	13	/* host information */
+#define ACL_RFC1035_TYPE_MINFO	14	/* mailbox or mail list information */
+#define ACL_RFC1035_TYPE_MX	15	/* mail exchange */
+#define ACL_RFC1035_TYPE_TXT	16	/* text strings */
+#define ACL_RFC1035_TYPE_AAAA	28	/* a IPv6 address of host */
+#define ACL_RFC1035_TYPE_AXFR	252	/* a request for a transfer of an entire zone */
+#define ACL_RFC1035_TYPE_MAILB	253	/* a request for mailbox-related records (MB, MG or MR) */
+#define ACL_RFC1035_TYPE_MAILA	253	/* a request for mail agent RRs (Obsolete - see MX) */
+#define ACL_RFC1035_TYPE_ALL	255	/* a request for all records */
 
-#define RFC1035_CLASS_IN        1	/* the Internet */
-#define RFC1035_CLASS_CS        2	/* the CSNET class (Obsolete - used only for examples in some obsolete RFCs */
-#define RFC1035_CLASS_CH        3	/* the CHAOS class */
-#define RFC1035_CLASS_HS        4	/* Hesiod [Dyer 87] */
+#define ACL_RFC1035_CLASS_IN	1	/* the Internet */
+#define ACL_RFC1035_CLASS_CS	2	/* the CSNET class (Obsolete - used only for examples in some obsolete RFCs */
+#define ACL_RFC1035_CLASS_CH	3	/* the CHAOS class */
+#define ACL_RFC1035_CLASS_HS	4	/* Hesiod [Dyer 87] */
 
 #ifdef __cplusplus
 }
 #endif
 
 #endif
-

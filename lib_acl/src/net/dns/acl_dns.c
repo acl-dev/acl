@@ -21,21 +21,21 @@
 #include "net/acl_mask_addr.h"
 #include "net/acl_vstream_net.h"
 #include "net/acl_dns.h"
+#include "net/acl_rfc1035.h"
 
 #endif
 
 #include "../../aio/aio.h"
-#include "rfc1035.h"
 
 typedef struct ACL_DOMAIN_GROUP {
-	char  group[RFC1035_MAXHOSTNAMESZ];
+	char  group[ACL_RFC1035_MAXHOSTNAMESZ];
 	int   group_len;
-	char  domain[RFC1035_MAXHOSTNAMESZ];
+	char  domain[ACL_RFC1035_MAXHOSTNAMESZ];
 	ACL_ARGV *excepts;
 } ACL_DOMAIN_GROUP;
 
 struct ACL_DNS_REQ{
-	char  key[RFC1035_MAXHOSTNAMESZ + 16];
+	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
 	void (*callback)(ACL_DNS_DB*, void*, int);
 	void *ctx;
 	int   nretry;
@@ -122,7 +122,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 
 /* 根据DNS查询结果生成 ACL_DNS_DB 对象 */
 
-static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
+static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res, int count,
 	unsigned int *ttl_min)
 {
 	ACL_DNS_DB *dns_db = acl_netdb_new(res->query->name);
@@ -135,9 +135,9 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 	}
 
 	for (i = 0; i < count; i++) {
-		if (res->answer[i].type == RFC1035_TYPE_A) {
+		if (res->answer[i].type == ACL_RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
-			phost->type = ACL_HOSTNAME_TYPE_IPADDR;
+			phost->type = ACL_HOSTNAME_TYPE_IPV4;
 
 			saddr = &phost->saddr;
 
@@ -170,7 +170,32 @@ static ACL_DNS_DB *build_dns_db(const rfc1035_message *res, int count,
 
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
-		} else if (res->answer[i].type == RFC1035_TYPE_CNAME) {
+#ifdef AF_INET6
+		} else if (res->answer[i].type == ACL_RFC1035_TYPE_AAAA) {
+			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
+			phost->type = ACL_HOSTNAME_TYPE_IPV6;
+
+			memcpy(&phost->saddr.in6.sin6_addr,
+				res->answer[i].rdata, 16);
+			if (!inet_ntop(AF_INET6, &phost->saddr.in6.sin6_addr,
+				phost->ip, sizeof(phost->ip))) {
+
+				acl_myfree(phost);
+				continue;
+			}
+
+			/* 目前该模块仅支持 IPV4 */
+            phost->saddr.sa.sa_family = AF_INET6;
+
+			phost->ttl = res->answer[i].ttl;
+			if (ttl_min && *ttl_min > phost->ttl) {
+				*ttl_min = phost->ttl;
+			}
+
+			(void) acl_array_append(dns_db->h_db, phost);
+			dns_db->size++;
+#endif
+		} else if (res->answer[i].type == ACL_RFC1035_TYPE_CNAME) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 			phost->type = ACL_HOSTNAME_TYPE_CNAME;
 
@@ -234,9 +259,9 @@ static int dns_safe_net_check(ACL_DNS *dns)
 	return -1;
 }
 
-static void dns_lookup_error(ACL_DNS *dns, rfc1035_message *res)
+static void dns_lookup_error(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 {
-	char  key[RFC1035_MAXHOSTNAMESZ + 16];
+	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
 	ACL_DNS_REQ *req;
 
 	if (dns->aio == NULL) {
@@ -263,9 +288,9 @@ static void dns_lookup_error(ACL_DNS *dns, rfc1035_message *res)
 	}
 }
 
-static void dns_lookup_ok(ACL_DNS *dns, rfc1035_message *res, int len)
+static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res, int len)
 {
-	char  key[RFC1035_MAXHOSTNAMESZ + 16];
+	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
 	int   ttl_min;
 	ACL_DNS_REQ *req;
 	ACL_DNS_DB  *dns_db;
@@ -316,21 +341,21 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 	char *data, int dlen)
 {
 	ACL_DNS *dns = (ACL_DNS*) ctx;
-	rfc1035_message *res;
+	ACL_RFC1035_MESSAGE *res;
 	int  ret;
 
 	/* 解析DNS响应数据包 */
-	ret = rfc1035MessageUnpack(data, dlen, &res);
+	ret = acl_rfc1035_message_unpack(data, dlen, &res);
 	if (ret < 0) {
 		if (res == NULL) {
 			return 0;
 		}
 
 		dns_lookup_error(dns, res);
-		rfc1035MessageDestroy(res);
+		acl_rfc1035_message_destroy(res);
 		return 0;
 	} else if (ret == 0) {
-		rfc1035MessageDestroy(res);
+		acl_rfc1035_message_destroy(res);
 		return 0;
 	}
 
@@ -338,7 +363,7 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 
 	if ((dns->flag & ACL_DNS_FLAG_CHECK_DNS_IP)) {
 		if (dns_safe_addr_check(dns) < 0) {
-			rfc1035MessageDestroy(res);
+			acl_rfc1035_message_destroy(res);
 			return 0;
 		}
 	}
@@ -347,13 +372,13 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 
 	if ((dns->flag & ACL_DNS_FLAG_CHECK_DNS_NET)) {
 		if (dns_safe_net_check(dns) < 0) {
-			rfc1035MessageDestroy(res);
+			acl_rfc1035_message_destroy(res);
 			return 0;
 		}
 	}
 
 	dns_lookup_ok(dns, res, ret);
-	rfc1035MessageDestroy(res);
+	acl_rfc1035_message_destroy(res);
 	return 0;
 }
 
@@ -440,7 +465,7 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain, unsigned short qid
 	memset(buf, 0, sizeof(buf));
 
 	/* 创建DNS查询数据包 */
-	ret = rfc1035BuildAQuery(domain, buf, sizeof(buf), qid, NULL);
+	ret = acl_rfc1035_build_query4a(domain, buf, sizeof(buf), qid, NULL);
 
 	/* 发送请求DNS包 */
 	if (dns->astream != NULL) {
@@ -465,7 +490,7 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 	}
 
 	if (++req->nretry <= dns->retry_limit) {
-		char  domain[RFC1035_MAXHOSTNAMESZ + 16], *ptr;
+		char  domain[ACL_RFC1035_MAXHOSTNAMESZ + 16], *ptr;
 		int   i;
 
 		SAFE_COPY(domain, req->key, sizeof(domain));
@@ -765,7 +790,7 @@ void acl_dns_add_group(ACL_DNS *dns, const char *group, const char *refer,
 void acl_dns_lookup(ACL_DNS *dns, const char *domain_in,
 	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx)
 {
-	char  key[RFC1035_MAXHOSTNAMESZ + 16], domain[RFC1035_MAXHOSTNAMESZ];
+	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16], domain[ACL_RFC1035_MAXHOSTNAMESZ];
 	ACL_DNS_REQ *req;
 	int i;
 

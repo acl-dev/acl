@@ -101,6 +101,10 @@
 		70753A3F251F8F67005B6E56 /* exp_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3C251F8F67005B6E56 /* exp_jmp.h */; };
 		70753B03251F91E9005B6E56 /* jump_gas.S in Sources */ = {isa = PBXBuildFile; fileRef = 70753B01251F91E9005B6E56 /* jump_gas.S */; };
 		70753B04251F91E9005B6E56 /* make_gas.S in Sources */ = {isa = PBXBuildFile; fileRef = 70753B02251F91E9005B6E56 /* make_gas.S */; };
+		70C9841D253D4BAE003A9689 /* resolver.h in Headers */ = {isa = PBXBuildFile; fileRef = 70C98419253D4BAE003A9689 /* resolver.h */; };
+		70C9841E253D4BAE003A9689 /* rfc1035.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C9841A253D4BAE003A9689 /* rfc1035.c */; };
+		70C9841F253D4BAE003A9689 /* rfc1035.h in Headers */ = {isa = PBXBuildFile; fileRef = 70C9841B253D4BAE003A9689 /* rfc1035.h */; };
+		70C98420253D4BAE003A9689 /* resolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C9841C253D4BAE003A9689 /* resolver.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -199,6 +203,10 @@
 		70753A3C251F8F67005B6E56 /* exp_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exp_jmp.h; sourceTree = "<group>"; };
 		70753B01251F91E9005B6E56 /* jump_gas.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = jump_gas.S; path = boost/jump_gas.S; sourceTree = "<group>"; };
 		70753B02251F91E9005B6E56 /* make_gas.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = make_gas.S; path = boost/make_gas.S; sourceTree = "<group>"; };
+		70C98419253D4BAE003A9689 /* resolver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = resolver.h; sourceTree = "<group>"; };
+		70C9841A253D4BAE003A9689 /* rfc1035.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rfc1035.c; sourceTree = "<group>"; };
+		70C9841B253D4BAE003A9689 /* rfc1035.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rfc1035.h; sourceTree = "<group>"; };
+		70C9841C253D4BAE003A9689 /* resolver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = resolver.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -310,6 +318,10 @@
 		070F35612090225C00672EDC /* dns */ = {
 			isa = PBXGroup;
 			children = (
+				70C9841C253D4BAE003A9689 /* resolver.c */,
+				70C98419253D4BAE003A9689 /* resolver.h */,
+				70C9841A253D4BAE003A9689 /* rfc1035.c */,
+				70C9841B253D4BAE003A9689 /* rfc1035.h */,
 				070F35622090225C00672EDC /* dns.c */,
 				070F35632090225C00672EDC /* dns.h */,
 				070F35642090225C00672EDC /* sane_inet.c */,
@@ -433,8 +445,10 @@
 				070F35372090220400672EDC /* fiber_lock.h in Headers */,
 				070F35912090225C00672EDC /* array.h in Headers */,
 				070F35BD2090225C00672EDC /* event_kqueue.h in Headers */,
+				70C9841F253D4BAE003A9689 /* rfc1035.h in Headers */,
 				070F35BB2090225C00672EDC /* event_iocp.h in Headers */,
 				070F35C12090225C00672EDC /* event_select.h in Headers */,
+				70C9841D253D4BAE003A9689 /* resolver.h in Headers */,
 				70753A3D251F8F67005B6E56 /* unix_jmp.h in Headers */,
 				070F35B52090225C00672EDC /* sane_inet.h in Headers */,
 				070F35322090220400672EDC /* fiber_base.h in Headers */,
@@ -521,6 +535,7 @@
 				070F35C22090225C00672EDC /* event_wmsg.c in Sources */,
 				070F35CB2090225C00672EDC /* fiber_sem.c in Sources */,
 				070F35A42090225C00672EDC /* non_blocking.c in Sources */,
+				70C98420253D4BAE003A9689 /* resolver.c in Sources */,
 				070F35D62090225C00672EDC /* select.c in Sources */,
 				070F35BA2090225C00672EDC /* event_iocp.c in Sources */,
 				070F35A62090225C00672EDC /* pthread_patch.c in Sources */,
@@ -546,6 +561,7 @@
 				070F35CF2090225C00672EDC /* dns_init.c in Sources */,
 				070F35D82090225C00672EDC /* stdafx.c in Sources */,
 				070F35B22090225C00672EDC /* dns.c in Sources */,
+				70C9841E253D4BAE003A9689 /* rfc1035.c in Sources */,
 				070F35D52090225C00672EDC /* poll.c in Sources */,
 				070F35942090225C00672EDC /* close_on_exec.c in Sources */,
 				070F35C42090225C00672EDC /* event.c in Sources */,

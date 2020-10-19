@@ -554,7 +554,7 @@
     <ClCompile Include=".\src\net\dns\res_util.c">
       <Filter>Source Files\net\dns</Filter>
     </ClCompile>
-    <ClCompile Include=".\src\net\dns\rfc1035.c">
+    <ClCompile Include=".\src\net\dns\acl_rfc1035.c">
       <Filter>Source Files\net\dns</Filter>
     </ClCompile>
     <ClCompile Include=".\src\thread\acl_pthread.c">
@@ -920,9 +920,6 @@
     </ClInclude>
     <ClInclude Include=".\src\net\IPTypes.h">
       <Filter>Source Files\net</Filter>
-    </ClInclude>
-    <ClInclude Include=".\src\net\dns\rfc1035.h">
-      <Filter>Source Files\net\dns</Filter>
     </ClInclude>
     <ClInclude Include=".\src\net\dns\util.h">
       <Filter>Source Files\net\dns</Filter>
@@ -1297,6 +1294,9 @@
       <Filter>Header Files\net</Filter>
     </ClInclude>
     <ClInclude Include=".\include\net\acl_res.h">
+      <Filter>Header Files\net</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\net\acl_rfc1035.h">
       <Filter>Header Files\net</Filter>
     </ClInclude>
     <ClInclude Include=".\include\net\acl_sane_inet.h">

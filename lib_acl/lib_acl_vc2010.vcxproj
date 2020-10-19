@@ -348,8 +348,8 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClCompile Include=".\src\net\dns\acl_netdb.c" />
     <ClCompile Include=".\src\net\dns\acl_netdb_cache.c" />
     <ClCompile Include=".\src\net\dns\acl_res.c" />
+    <ClCompile Include=".\src\net\dns\acl_rfc1035.c" />
     <ClCompile Include=".\src\net\dns\res_util.c" />
-    <ClCompile Include=".\src\net\dns\rfc1035.c" />
     <ClCompile Include=".\src\thread\acl_pthread.c" />
     <ClCompile Include=".\src\thread\acl_pthread_cond.c" />
     <ClCompile Include=".\src\thread\acl_pthread_mutex.c" />
@@ -470,7 +470,6 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\src\stdlib\debug\htable.h" />
     <ClInclude Include=".\src\net\Ipifcons.h" />
     <ClInclude Include=".\src\net\IPTypes.h" />
-    <ClInclude Include=".\src\net\dns\rfc1035.h" />
     <ClInclude Include=".\src\net\dns\util.h" />
     <ClInclude Include=".\src\event\events.h" />
     <ClInclude Include=".\src\event\events_define.h" />
@@ -603,6 +602,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include=".\include\net\acl_net.h" />
     <ClInclude Include=".\include\net\acl_netdb.h" />
     <ClInclude Include=".\include\net\acl_res.h" />
+    <ClInclude Include=".\include\net\acl_rfc1035.h" />
     <ClInclude Include=".\include\net\acl_sane_inet.h" />
     <ClInclude Include=".\include\net\acl_sane_socket.h" />
     <ClInclude Include=".\include\net\acl_tcp_ctl.h" />

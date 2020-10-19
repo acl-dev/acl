@@ -17,11 +17,10 @@
 #include "stdlib/acl_stdlib.h"
 #include "net/acl_vstream_net.h"
 #include "net/acl_sane_inet.h"
+#include "net/rfc1035.h"
 #include "net/acl_res.h"
 
 #endif
-
-#include "rfc1035.h"
 
 static int __conn_timeout = 10;
 static int __rw_timeout   = 10;
@@ -188,7 +187,7 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 	ACL_DNS_DB *dns_db;
 	char  buf[1024];
 	ssize_t ret, i;
-	RFC1035_MESSAGE *answers;
+	ACL_RFC1035_MESSAGE *answers;
 	ACL_HOSTNAME *phost;
 	time_t  begin;
 
@@ -207,15 +206,15 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 
 #ifdef	AF_INET6
 	if (type == AF_INET6) {
-		ret = (ssize_t) rfc1035_build_query4aaaa(domain, buf,
+		ret = (ssize_t) acl_rfc1035_build_query4aaaa(domain, buf,
 			sizeof(buf), res->cur_qid++, NULL);
 	} else {
-		ret = (ssize_t) rfc1035_build_query4a(domain, buf,
+		ret = (ssize_t) acl_rfc1035_build_query4a(domain, buf,
 			sizeof(buf), res->cur_qid++, NULL);
 	}
 #else
 	(void) type;
-	ret = (ssize_t) rfc1035_build_query4a(domain, buf, sizeof(buf),
+	ret = (ssize_t) acl_rfc1035_build_query4a(domain, buf, sizeof(buf),
 		res->cur_qid++, NULL);
 #endif
 
@@ -233,12 +232,12 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 		return NULL;
 	}
 
-	ret = rfc1035_message_unpack(buf, ret, &answers);
+	ret = acl_rfc1035_message_unpack(buf, ret, &answers);
 	if (ret < 0) {
 		res->errnum = (int) ret;
 		return NULL;
 	} else if (ret == 0) {
-		rfc1035_message_destroy(answers);
+		acl_rfc1035_message_destroy(answers);
 		res->errnum = ACL_RES_ERR_NULL;
 		return NULL;
 	}
@@ -246,7 +245,7 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 	dns_db = acl_netdb_new(domain);
 
 	for (i = 0; i < ret; i++) {
-		if (answers->answer[i].type == RFC1035_TYPE_A) {
+		if (answers->answer[i].type == ACL_RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
 			memcpy(&phost->saddr.in.sin_addr,
@@ -263,7 +262,7 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 			(void) acl_array_append(dns_db->h_db, phost);
 			dns_db->size++;
 #ifdef	AF_INET6
-		} else if (answers->answer[i].type == RFC1035_TYPE_AAAA) {
+		} else if (answers->answer[i].type == ACL_RFC1035_TYPE_AAAA) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 
 			memcpy(&phost->saddr.in6.sin6_addr,
@@ -287,7 +286,7 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 		}
 	}
 
-	rfc1035_message_destroy(answers);
+	acl_rfc1035_message_destroy(answers);
 	return dns_db;
 }
 
@@ -325,7 +324,7 @@ const char *acl_res_strerror(int errnum)
 		}
 	}
 
-	return rfc1035_strerror(errnum);
+	return acl_rfc1035_strerror(errnum);
 }
 
 const char *acl_res_errmsg(const ACL_RES *res)

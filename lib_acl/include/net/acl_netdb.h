@@ -21,8 +21,9 @@ typedef struct ACL_HOSTNAME {
 	int   hport;
 	unsigned int nrefer;            /**< refer number to this HOST */
 	unsigned int type;		/**< the content type in ip buf */
-#define	ACL_HOSTNAME_TYPE_IPADDR	0
-#define	ACL_HOSTNAME_TYPE_CNAME		1
+#define	ACL_HOSTNAME_TYPE_IPV4		0
+#define	ACL_HOSTNAME_TYPE_IPV6		1
+#define	ACL_HOSTNAME_TYPE_CNAME		2
 } ACL_HOSTNAME;
 
 /**

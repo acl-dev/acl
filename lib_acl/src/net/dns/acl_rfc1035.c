@@ -18,27 +18,26 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_mystring.h"
+#include "net/rfc1035.h"
 
 #endif
 
-#include "rfc1035.h"
-
-#define RFC1035_MAXLABELSZ	63
-#define RFC1035_unpack_error	15
+#define ACL_RFC1035_MAXLABELSZ		63
+#define ACL_RFC1035_UNPACK_ERROR	15
 
 #if 0
-#define RFC1035_UNPACK_DEBUG  acl_msg_error("unpack error at %s:%d", __FILE__,__LINE__)
+ #define ACL_RFC1035_UNPACK_DEBUG  acl_msg_error("unpack error at %s:%d", __FILE__,__LINE__)
 #else
-#define RFC1035_UNPACK_DEBUG  (void)0
+ #define ACL_RFC1035_UNPACK_DEBUG  (void) 0
 #endif
 
 /**
  * rfc1035_header_pack()
  *
- * Packs a RFC1035_header structure into a buffer.
+ * Packs a ACL_RFC1035_header structure into a buffer.
  * Returns number of octets packed (should always be 12)
  */
-static size_t rfc1035_header_pack(char *buf, size_t sz, RFC1035_MESSAGE * hdr)
+static size_t rfc1035_header_pack(char *buf, size_t sz, ACL_RFC1035_MESSAGE * hdr)
 {
 	const char *myname = "rfc1035_header_pack";
 	size_t off = 0;
@@ -102,8 +101,8 @@ static int rfc1035_label_pack(char *buf, size_t sz, const char *label)
 		}
 	}
 
-	if (len > RFC1035_MAXLABELSZ) {
-		len = RFC1035_MAXLABELSZ;
+	if (len > ACL_RFC1035_MAXLABELSZ) {
+		len = ACL_RFC1035_MAXLABELSZ;
 	}
 	if (sz < len + 1) {
 		acl_msg_fatal("%s: sz(%d) < len(%d) + 1",
@@ -203,13 +202,13 @@ static int rfc1035_name_unpack(const char *buf, size_t sz, size_t *off,
 
 	if (ns <= 0) {
 		acl_msg_error("%s: ns(%d) <= 0", myname, (int) ns);
-		return -RFC1035_unpack_error;
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 	do {
 		if (*off >= sz) {
 			acl_msg_error("%s: *off(%d) >= sz(%d)",
 				myname, (int) *off, (int) sz);
-			return -RFC1035_unpack_error;
+			return -ACL_RFC1035_UNPACK_ERROR;
 		}
 		c = *(buf + (*off));
 		if (c > 191) {
@@ -233,7 +232,7 @@ static int rfc1035_name_unpack(const char *buf, size_t sz, size_t *off,
 			}
 			return rfc1035_name_unpack(buf, sz, &ptr, rdlength,
 				name + no, ns - no, rdepth + 1);
-		} else if (c > RFC1035_MAXLABELSZ) {
+		} else if (c > ACL_RFC1035_MAXLABELSZ) {
 			/*
 			 * "(The 10 and 01 combinations are reserved for future use.)"
 			 */
@@ -268,12 +267,12 @@ static int rfc1035_name_unpack(const char *buf, size_t sz, size_t *off,
 	/* make sure we didn't allow someone to overflow the name buffer */
 	if (no > (int) ns) {
 		acl_msg_error("%s: no(%d) > ns(%d)", myname, no, (int) ns);
-		return -RFC1035_unpack_error;
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 	return 0;
 }
 
-const char *rfc1035_strerror(int errnum)
+const char *acl_rfc1035_strerror(int errnum)
 {
 	struct __ERRMSG{
 		int   errnum;
@@ -290,7 +289,7 @@ const char *rfc1035_strerror(int errnum)
 				"not support the requested kind of query." },
 		{ 5, "Refused: The name server refuses to "
 				"perform the specified operation." },
-		{ RFC1035_unpack_error, "The DNS reply message is corrupt or could "
+		{ ACL_RFC1035_UNPACK_ERROR, "The DNS reply message is corrupt or could "
 			"not be safely parsed." },
 		{ -1, NULL },
 	};
@@ -311,7 +310,7 @@ static void rfc1035_set_errno(int n)
 	errno = n;
 }
 
-int rfc1035_query_compare(const RFC1035_QUERY * a, const RFC1035_QUERY * b)
+int acl_rfc1035_query_compare(const ACL_RFC1035_QUERY * a, const ACL_RFC1035_QUERY * b)
 {
 	size_t la, lb;
 
@@ -353,7 +352,7 @@ int rfc1035_query_compare(const RFC1035_QUERY * a, const RFC1035_QUERY * b)
  *
  * Returns > 0 (success) or 0 (error)
  */
-static int rfc1035_rr_pack(const RFC1035_RR *RR, char *buf, size_t sz)
+static int rfc1035_rr_pack(const ACL_RFC1035_RR *RR, char *buf, size_t sz)
 {
 	const char *myname = "rfc1035_rr_pack";
 	unsigned short s;
@@ -374,11 +373,11 @@ static int rfc1035_rr_pack(const RFC1035_RR *RR, char *buf, size_t sz)
 	off += sizeof(i);
 
 	switch (RR->type) {
-	case RFC1035_TYPE_PTR:
-	case RFC1035_TYPE_NS:
-	case RFC1035_TYPE_CNAME:
-	case RFC1035_TYPE_TXT:
-		if (strlen(RR->rdata) > RFC1035_MAXHOSTNAMESZ) {
+	case ACL_RFC1035_TYPE_PTR:
+	case ACL_RFC1035_TYPE_NS:
+	case ACL_RFC1035_TYPE_CNAME:
+	case ACL_RFC1035_TYPE_TXT:
+		if (strlen(RR->rdata) > ACL_RFC1035_MAXHOSTNAMESZ) {
 			return 0;
 		}
 
@@ -407,10 +406,10 @@ static int rfc1035_rr_pack(const RFC1035_RR *RR, char *buf, size_t sz)
 
 static size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
 	unsigned short qid, unsigned short qtype, unsigned short qclass,
-	RFC1035_QUERY *query)
+	ACL_RFC1035_QUERY *query)
 {
 	const char *myname = "rfc1035_build_query";
-	RFC1035_MESSAGE h;
+	ACL_RFC1035_MESSAGE h;
 	size_t offset = 0;
 
 	if (sz < 512) {
@@ -442,34 +441,34 @@ static size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
 	return offset;
 }
 
-size_t rfc1035_build_query4a(const char *hostname, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query)
+size_t acl_rfc1035_build_query4a(const char *hostname, char *buf, size_t sz,
+	unsigned short qid, ACL_RFC1035_QUERY *query)
 {
-	return rfc1035_build_query(hostname, buf, sz, qid, RFC1035_TYPE_A,
-			 RFC1035_CLASS_IN, query);
+	return rfc1035_build_query(hostname, buf, sz, qid, ACL_RFC1035_TYPE_A,
+			 ACL_RFC1035_CLASS_IN, query);
 }
 
-size_t rfc1035_build_query4aaaa(const char *hostname, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query)
+size_t acl_rfc1035_build_query4aaaa(const char *hostname, char *buf, size_t sz,
+	unsigned short qid, ACL_RFC1035_QUERY *query)
 {
-	return rfc1035_build_query(hostname, buf, sz, qid, RFC1035_TYPE_AAAA,
-			RFC1035_CLASS_IN, query);
+	return rfc1035_build_query(hostname, buf, sz, qid, ACL_RFC1035_TYPE_AAAA,
+			ACL_RFC1035_CLASS_IN, query);
 }
 
-size_t rfc1035_build_query4mx(const char *hostname, char *buf, size_t sz,
-	unsigned short qid, RFC1035_QUERY *query)
+size_t acl_rfc1035_build_query4mx(const char *hostname, char *buf, size_t sz,
+	unsigned short qid, ACL_RFC1035_QUERY *query)
 {
-	return rfc1035_build_query(hostname, buf, sz, qid, RFC1035_TYPE_MX,
-			RFC1035_CLASS_IN, query);
+	return rfc1035_build_query(hostname, buf, sz, qid, ACL_RFC1035_TYPE_MX,
+			ACL_RFC1035_CLASS_IN, query);
 }
 
-size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
-	size_t sz, unsigned short qid, RFC1035_QUERY * query)
+size_t acl_rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
+	size_t sz, unsigned short qid, ACL_RFC1035_QUERY * query)
 {
 	const char *myname = "RFC1035BuildPTRQuery";
-	RFC1035_MESSAGE h;
+	ACL_RFC1035_MESSAGE h;
 	size_t offset = 0;
-	static char rev[32];
+	char rev[32];
 	unsigned int i;
 
 	memset(&h, '\0', sizeof(h));
@@ -485,11 +484,11 @@ size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
 
 	offset += rfc1035_header_pack(buf + offset, sz - offset, &h);
 	offset += rfc1035_question_pack(buf + offset, sz - offset, rev,
-			RFC1035_TYPE_PTR, RFC1035_CLASS_IN);
+			ACL_RFC1035_TYPE_PTR, ACL_RFC1035_CLASS_IN);
 
 	if (query) {
-		query->qtype = RFC1035_TYPE_PTR;
-		query->qclass = RFC1035_CLASS_IN;
+		query->qtype = ACL_RFC1035_TYPE_PTR;
+		query->qclass = ACL_RFC1035_CLASS_IN;
 		ACL_SAFE_STRNCPY(query->name, rev, sizeof(query->name));
 	}
 
@@ -501,7 +500,7 @@ size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
 	return offset;
 }
 
-void rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid)
+void acl_rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid)
 {
 	unsigned short s = htons(qid);
 
@@ -517,7 +516,7 @@ void rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid)
  * rfc1035_header_unpack()
  *
  * Unpacks a RFC1035 message header buffer into the header fields
- * of the RFC1035_MESSAGE structure.
+ * of the ACL_RFC1035_MESSAGE structure.
  *
  * Updates the buffer offset, which is the same as number of
  * octects unpacked since the header starts at offset 0.
@@ -525,7 +524,7 @@ void rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid)
  * Returns 0 (success) or 1 (error)
  */
 static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
-	RFC1035_MESSAGE *h)
+	ACL_RFC1035_MESSAGE *h)
 {
 	const char *myname = "rfc1035_header_unpack";
 	unsigned short s;
@@ -533,7 +532,7 @@ static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
 
 	if (*off != 0) {
 		acl_msg_error("%s: *off(%d) != 0", myname, (int) *off);
-		return -RFC1035_unpack_error;
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 
 	/*
@@ -583,7 +582,7 @@ static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
 
 	if (*off != 12) {
 		acl_msg_error("%s: *off(%d) != 12", myname, (int) *off);
-		return -RFC1035_unpack_error;
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 	return 0;
 }
@@ -598,20 +597,20 @@ static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
  * Returns 0 (success) or 1 (error)
 */
 static int rfc1035_query_unpack(const char *buf, size_t sz, size_t *off,
-	RFC1035_QUERY *query)
+	ACL_RFC1035_QUERY *query)
 {
 	unsigned short s;
 
 	if (rfc1035_name_unpack(buf, sz, off, NULL, query->name,
-		RFC1035_MAXHOSTNAMESZ, 0)) {
+		ACL_RFC1035_MAXHOSTNAMESZ, 0)) {
 
-		RFC1035_UNPACK_DEBUG;
+		ACL_RFC1035_UNPACK_DEBUG;
 		memset(query, '\0', sizeof(*query));
 		return 1;
 	}
 
 	if (*off + 4 > sz) {
-		RFC1035_UNPACK_DEBUG;
+		ACL_RFC1035_UNPACK_DEBUG;
 		memset(query, '\0', sizeof(*query));
 		return 1;
 	}
@@ -637,7 +636,7 @@ static int rfc1035_query_unpack(const char *buf, size_t sz, size_t *off,
  *
  * Returns 0 (success) or 1 (error)
  */
-static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR *RR)
+static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, ACL_RFC1035_RR *RR)
 {
 	const char *myname = "rfc1035_rr_unpack";
 	unsigned short s;
@@ -646,9 +645,9 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	size_t rdata_off;
 
 	if (rfc1035_name_unpack(buf, sz, off, NULL, RR->name,
-		RFC1035_MAXHOSTNAMESZ, 0)) {
+		ACL_RFC1035_MAXHOSTNAMESZ, 0)) {
 
-		RFC1035_UNPACK_DEBUG;
+		ACL_RFC1035_UNPACK_DEBUG;
 		memset(RR, '\0', sizeof(*RR));
 		return 1;
 	}
@@ -657,7 +656,7 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	* rest of the RR fields.
 	*/
 	if ((*off) + 10 > sz) {
-		RFC1035_UNPACK_DEBUG;
+		ACL_RFC1035_UNPACK_DEBUG;
 		memset(RR, '\0', sizeof(*RR));
 		return 1;
 	}
@@ -682,7 +681,7 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 		/* We got a truncated packet.  'dnscache' truncates UDP
 		 * replies at 512 octets, as per RFC 1035.
 		 */
-		RFC1035_UNPACK_DEBUG;
+		ACL_RFC1035_UNPACK_DEBUG;
 		memset(RR, '\0', sizeof(*RR));
 		return 1;
 	}
@@ -690,17 +689,17 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	RR->rdlength = rdlength;
 
 	switch (RR->type) {
-	case RFC1035_TYPE_CNAME:
-	case RFC1035_TYPE_NS:
-	case RFC1035_TYPE_TXT:
-	case RFC1035_TYPE_PTR:
-	case RFC1035_TYPE_WKS:
-		RR->rdata = (char*) acl_mymalloc(RFC1035_MAXHOSTNAMESZ);
+	case ACL_RFC1035_TYPE_CNAME:
+	case ACL_RFC1035_TYPE_NS:
+	case ACL_RFC1035_TYPE_TXT:
+	case ACL_RFC1035_TYPE_PTR:
+	case ACL_RFC1035_TYPE_WKS:
+		RR->rdata = (char*) acl_mymalloc(ACL_RFC1035_MAXHOSTNAMESZ);
 		rdata_off = *off;
 		RR->rdlength = 0;	/* Filled in by rfc1035_name_unpack */
 
 		if (rfc1035_name_unpack(buf, sz, &rdata_off, &RR->rdlength,
-			RR->rdata, RFC1035_MAXHOSTNAMESZ, 0)) {
+			RR->rdata, ACL_RFC1035_MAXHOSTNAMESZ, 0)) {
 			return 1;
 		}
 
@@ -709,15 +708,15 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 			 * I want to make sure that NameUnpack doesn't go beyond
 			 * the RDATA area.
 			 */
-			RFC1035_UNPACK_DEBUG;
+			ACL_RFC1035_UNPACK_DEBUG;
 			acl_myfree(RR->rdata);
 			memset(RR, '\0', sizeof(*RR));
 			return 1;
 		}
 		break;
-	case RFC1035_TYPE_A:
-	case RFC1035_TYPE_AAAA:
-	case RFC1035_TYPE_MX:
+	case ACL_RFC1035_TYPE_A:
+	case ACL_RFC1035_TYPE_AAAA:
+	case ACL_RFC1035_TYPE_MX:
 	default:
 		RR->rdata = (char*) acl_mymalloc(rdlength);
 		memcpy(RR->rdata, buf + (*off), rdlength);
@@ -728,17 +727,17 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	if (*off > sz) {
 		acl_msg_error("%s: *off(%d) > sz(%d)",
 			myname, (int) *off, (int) sz);
-		return -RFC1035_unpack_error;
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 
 	return 0;
 }
 
-static RFC1035_RR *rfc1035_unpack2rr(const char *buf, size_t sz,
+static ACL_RFC1035_RR *rfc1035_unpack2rr(const char *buf, size_t sz,
 	size_t *off, size_t count, int *nr)
 {
 	size_t i;
-	RFC1035_RR *rr;
+	ACL_RFC1035_RR *rr;
 
 	*nr = 0;
 
@@ -746,15 +745,15 @@ static RFC1035_RR *rfc1035_unpack2rr(const char *buf, size_t sz,
 		return NULL;
 	}
 
-	rr = (RFC1035_RR*) acl_mycalloc(count, sizeof(RFC1035_RR));
+	rr = (ACL_RFC1035_RR*) acl_mycalloc(count, sizeof(ACL_RFC1035_RR));
 	for (i = 0; i < count; i++) {
 		if (*off >= sz) {	/* corrupt packet */
-			RFC1035_UNPACK_DEBUG;
+			ACL_RFC1035_UNPACK_DEBUG;
 			break;
 		}
 
 		if (rfc1035_rr_unpack(buf, sz, off, &rr[i])) {
-			RFC1035_UNPACK_DEBUG;
+			ACL_RFC1035_UNPACK_DEBUG;
 			break;
 		}
 		(*nr)++;
@@ -768,56 +767,56 @@ static RFC1035_RR *rfc1035_unpack2rr(const char *buf, size_t sz,
 	return rr;
 }
 
-int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
+int acl_rfc1035_message_unpack(const char *buf, size_t sz, ACL_RFC1035_MESSAGE **answer)
 {
 	int i, nr;
 	size_t off = 0;
-	RFC1035_MESSAGE *msg;
+	ACL_RFC1035_MESSAGE *msg;
 
 	errno = 0;
 	*answer = NULL;
-	msg = (RFC1035_MESSAGE*) acl_mycalloc(1, sizeof(*msg));
+	msg = (ACL_RFC1035_MESSAGE*) acl_mycalloc(1, sizeof(*msg));
 
 	if (rfc1035_header_unpack(buf + off, sz - off, &off, msg)) {
-		RFC1035_UNPACK_DEBUG;
-		rfc1035_set_errno(RFC1035_unpack_error);
-		rfc1035_message_destroy(msg);
+		ACL_RFC1035_UNPACK_DEBUG;
+		rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+		acl_rfc1035_message_destroy(msg);
 		*answer = NULL;
-		return -RFC1035_unpack_error;
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 
 	if (msg->rcode) {
 		int ret = -((int) msg->rcode);
-		RFC1035_UNPACK_DEBUG;
+		ACL_RFC1035_UNPACK_DEBUG;
 		rfc1035_set_errno((int) msg->rcode);
-		rfc1035_message_destroy(msg);
+		acl_rfc1035_message_destroy(msg);
 		*answer = NULL;
 		return ret;
 	}
 
 	if (msg->ancount == 0) {
-		rfc1035_message_destroy(msg);
+		acl_rfc1035_message_destroy(msg);
 		*answer = NULL;
 		return 0;
 	}
 
 	if (msg->qdcount != 1) {
 		/* This can not be an answer to our queries.. */
-		RFC1035_UNPACK_DEBUG;
-		rfc1035_set_errno(RFC1035_unpack_error);
-		rfc1035_message_destroy(msg);
-		return -RFC1035_unpack_error;
+		ACL_RFC1035_UNPACK_DEBUG;
+		rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+		acl_rfc1035_message_destroy(msg);
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 
-	msg->query = (RFC1035_QUERY*) acl_mycalloc((int) msg->qdcount,
-			sizeof(RFC1035_QUERY));
+	msg->query = (ACL_RFC1035_QUERY*) acl_mycalloc((int) msg->qdcount,
+			sizeof(ACL_RFC1035_QUERY));
 
 	for (i = 0; i < (int) msg->qdcount; i++) {
 		if (rfc1035_query_unpack(buf, sz, &off, &msg->query[i])) {
-			RFC1035_UNPACK_DEBUG;
-			rfc1035_set_errno(RFC1035_unpack_error);
-			rfc1035_message_destroy(msg);
-			return -RFC1035_unpack_error;
+			ACL_RFC1035_UNPACK_DEBUG;
+			rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+			acl_rfc1035_message_destroy(msg);
+			return -ACL_RFC1035_UNPACK_ERROR;
 		}
 	}
 
@@ -826,22 +825,22 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 		/* we expected to unpack some answers (ancount != 0), but
 		 * didn't actually get any.
 		 */
-		RFC1035_UNPACK_DEBUG;
-		rfc1035_message_destroy(msg);
+		ACL_RFC1035_UNPACK_DEBUG;
+		acl_rfc1035_message_destroy(msg);
 		*answer = NULL;
-		rfc1035_set_errno(RFC1035_unpack_error);
-		return -RFC1035_unpack_error;
+		rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+		return -ACL_RFC1035_UNPACK_ERROR;
 	}
 
 	if (msg->nscount > 0) {
 		msg->authority = rfc1035_unpack2rr(buf, sz, &off,
 			msg->nscount, &nr);
 		if (msg->authority == NULL) {
-			RFC1035_UNPACK_DEBUG;
-			rfc1035_message_destroy(msg);
+			ACL_RFC1035_UNPACK_DEBUG;
+			acl_rfc1035_message_destroy(msg);
 			*answer = NULL;
-			rfc1035_set_errno(RFC1035_unpack_error);
-			return -RFC1035_unpack_error;
+			rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+			return -ACL_RFC1035_UNPACK_ERROR;
 		}
 	}
 
@@ -849,11 +848,11 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 		msg->additional = rfc1035_unpack2rr(buf, sz, &off,
 			msg->arcount, &nr);
 		if (msg->additional == NULL) {
-			RFC1035_UNPACK_DEBUG;
-			rfc1035_message_destroy(msg);
+			ACL_RFC1035_UNPACK_DEBUG;
+			acl_rfc1035_message_destroy(msg);
 			*answer = NULL;
-			rfc1035_set_errno(RFC1035_unpack_error);
-			return -RFC1035_unpack_error;
+			rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+			return -ACL_RFC1035_UNPACK_ERROR;
 		}
 	}
 
@@ -863,7 +862,7 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 
 /****************************************************************************/
 
-static void rfc1035_rr_destroy(RFC1035_RR * rr, int n)
+static void rfc1035_rr_destroy(ACL_RFC1035_RR * rr, int n)
 {
 	const char *myname = "rfc1035_rr_destroy";
 
@@ -886,7 +885,7 @@ static void rfc1035_rr_destroy(RFC1035_RR * rr, int n)
 	acl_myfree(rr);
 }
 
-void rfc1035_message_destroy(RFC1035_MESSAGE *msg)
+void acl_rfc1035_message_destroy(ACL_RFC1035_MESSAGE *msg)
 {
 	if (!msg) {
 		return;
@@ -913,11 +912,11 @@ void rfc1035_message_destroy(RFC1035_MESSAGE *msg)
 
 /****************************************************************************/
 
-size_t rfc1035_build_reply4a(const char *hostname, const ACL_ARGV *ips,
+size_t acl_rfc1035_build_reply4a(const char *hostname, const ACL_ARGV *ips,
 	const char *domain_root, const char *dnsname, const char *dnsip,
 	unsigned short qid, char *buf, size_t sz)
 {
-	RFC1035_REPLY reply;
+	ACL_RFC1035_REPLY reply;
 
 	memset(&reply, 0, sizeof(reply));
 	reply.hostname = hostname;
@@ -925,18 +924,18 @@ size_t rfc1035_build_reply4a(const char *hostname, const ACL_ARGV *ips,
 	reply.domain_root = domain_root;
 	reply.dns_name = dnsname;
 	reply.dns_ip = dnsip;
-	reply.ip_type = RFC1035_TYPE_A;
+	reply.ip_type = ACL_RFC1035_TYPE_A;
 	reply.ttl = 600;
 	reply.qid = qid;
 
-	return rfc1035_build_reply(&reply, buf, sz);
+	return acl_rfc1035_build_reply(&reply, buf, sz);
 }
 
-size_t rfc1035_build_reply4aaaa(const char *hostname, const ACL_ARGV *ips,
+size_t acl_rfc1035_build_reply4aaaa(const char *hostname, const ACL_ARGV *ips,
 	const char *domain_root, const char *dnsname, const char *dnsip,
 	unsigned short qid, char *buf, size_t sz)
 {
-	RFC1035_REPLY reply;
+	ACL_RFC1035_REPLY reply;
 
 	memset(&reply, 0, sizeof(reply));
 	reply.hostname = hostname;
@@ -944,16 +943,16 @@ size_t rfc1035_build_reply4aaaa(const char *hostname, const ACL_ARGV *ips,
 	reply.domain_root = domain_root;
 	reply.dns_name = dnsname;
 	reply.dns_ip = dnsip;
-	reply.ip_type = RFC1035_TYPE_AAAA;
+	reply.ip_type = ACL_RFC1035_TYPE_AAAA;
 	reply.ttl = 600;
 	reply.qid = qid;
 
-	return rfc1035_build_reply(&reply, buf, sz);
+	return acl_rfc1035_build_reply(&reply, buf, sz);
 }
 
-static size_t save_addr2rr(int type, const char *src, RFC1035_RR *rr)
+static size_t save_addr2rr(int type, const char *src, ACL_RFC1035_RR *rr)
 {
-	if (type == RFC1035_TYPE_A) {
+	if (type == ACL_RFC1035_TYPE_A) {
 		unsigned int nip;
 		rr->rdlength = 4;
 		nip = inet_addr(src);
@@ -962,7 +961,7 @@ static size_t save_addr2rr(int type, const char *src, RFC1035_RR *rr)
 
 		return rr->rdlength;
 #ifdef AF_INET6
-	} else if (type == RFC1035_TYPE_AAAA) {
+	} else if (type == ACL_RFC1035_TYPE_AAAA) {
 		char buf[256], *ptr;
 		struct sockaddr_in6 in6;
 
@@ -1003,10 +1002,10 @@ static size_t save_addr2rr(int type, const char *src, RFC1035_RR *rr)
 	}
 }
 
-size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
+size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t sz)
 {
-	RFC1035_MESSAGE h;
-	RFC1035_RR rr;
+	ACL_RFC1035_MESSAGE h;
+	ACL_RFC1035_RR rr;
 	size_t offset = 0;
 	int   i;
 
@@ -1026,13 +1025,13 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 
 	offset += rfc1035_header_pack(buf + offset, sz - offset, &h);
 	offset += rfc1035_question_pack(buf + offset, sz - offset,
-			reply->hostname, reply->ip_type, RFC1035_CLASS_IN);
+			reply->hostname, reply->ip_type, ACL_RFC1035_CLASS_IN);
 
 	for (i = 0; i < reply->ips->argc; i++) {
 		memset(&rr, 0, sizeof(rr));
 		snprintf(rr.name, sizeof(rr.name), "%s", reply->hostname);
 		rr.type = reply->ip_type;
-		rr.tclass = htons(RFC1035_CLASS_IN);
+		rr.tclass = htons(ACL_RFC1035_CLASS_IN);
 		rr.ttl = reply->ttl;
 
 		if (!save_addr2rr(reply->ip_type, reply->ips->argv[i], &rr)) {
@@ -1048,8 +1047,8 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 	if (h.nscount) {
 		memset(&rr, 0, sizeof(rr));
 		snprintf(rr.name, sizeof(rr.name), "%s", reply->domain_root);
-		rr.type = RFC1035_TYPE_NS;
-		rr.tclass = RFC1035_CLASS_IN;
+		rr.type = ACL_RFC1035_TYPE_NS;
+		rr.tclass = ACL_RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
 		rr.rdlength = (unsigned short) strlen(reply->dns_name);
 		rr.rdata = acl_mystrdup(reply->dns_name);
@@ -1061,7 +1060,7 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 		memset(&rr, 0, sizeof(rr));
 		snprintf(rr.name, sizeof(rr.name), "%s", reply->dns_name);
 		rr.type = reply->ip_type;
-		rr.tclass = RFC1035_CLASS_IN;
+		rr.tclass = ACL_RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
 
 		if (!save_addr2rr(reply->ip_type, reply->dns_ip, &rr)) {

@@ -455,7 +455,7 @@ size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
 	const char *myname = "RFC1035BuildPTRQuery";
 	RFC1035_MESSAGE h;
 	size_t offset = 0;
-	static char rev[32];
+	char rev[32];
 	unsigned int i;
 
 	memset(&h, '\0', sizeof(h));

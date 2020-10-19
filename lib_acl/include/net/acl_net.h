@@ -19,6 +19,7 @@ extern "C" {
 #include "acl_valid_hostname.h"
 #include "acl_host_port.h"
 #include "acl_ifconf.h"
+#include "acl_rfc1035.h"
 
 #ifdef	__cplusplus
 }

@@ -750,13 +750,10 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\net\dns\acl_res.c">
 					</File>
 					<File
+						RelativePath=".\src\net\dns\acl_rfc1035.c">
+					</File>
+					<File
 						RelativePath=".\src\net\dns\res_util.c">
-					</File>
-					<File
-						RelativePath=".\src\net\dns\rfc1035.c">
-					</File>
-					<File
-						RelativePath=".\src\net\dns\rfc1035.h">
 					</File>
 					<File
 						RelativePath=".\src\net\dns\util.h">
@@ -1568,6 +1565,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\net\acl_res.h">
+				</File>
+				<File
+					RelativePath=".\include\net\acl_rfc1035.h">
 				</File>
 				<File
 					RelativePath=".\include\net\acl_sane_inet.h">

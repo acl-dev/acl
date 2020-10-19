@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-ACL_ARGV *res_a_create(const rfc1035_rr *answer, int n);
+ACL_ARGV *res_a_create(const ACL_RFC1035_RR *answer, int n);
 
 #ifdef __cplusplus
 }

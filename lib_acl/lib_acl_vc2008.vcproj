@@ -1000,15 +1000,11 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\net\dns\acl_rfc1035.c"
+						>
+					</File>
+					<File
 						RelativePath=".\src\net\dns\res_util.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\net\dns\rfc1035.c"
-						>
-					</File>
-					<File
-						RelativePath=".\src\net\dns\rfc1035.h"
 						>
 					</File>
 					<File
@@ -2055,6 +2051,10 @@
 				</File>
 				<File
 					RelativePath=".\include\net\acl_res.h"
+					>
+				</File>
+				<File
+					RelativePath=".\include\net\acl_rfc1035.h"
 					>
 				</File>
 				<File
