@@ -235,16 +235,21 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 	ret = acl_rfc1035_message_unpack(buf, ret, &answers);
 	if (ret < 0) {
 		res->errnum = (int) ret;
+		if (answers) {
+			acl_rfc1035_message_destroy(answers);
+		}
 		return NULL;
 	} else if (ret == 0) {
-		acl_rfc1035_message_destroy(answers);
+		if (answers) {
+			acl_rfc1035_message_destroy(answers);
+		}
 		res->errnum = ACL_RES_ERR_NULL;
 		return NULL;
 	}
 
 	dns_db = acl_netdb_new(domain);
 
-	for (i = 0; i < ret; i++) {
+	for (i = 0; i < answers->ancount; i++) {
 		if (answers->answer[i].type == ACL_RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 

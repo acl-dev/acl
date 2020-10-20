@@ -122,7 +122,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 
 /* 根据DNS查询结果生成 ACL_DNS_DB 对象 */
 
-static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res, int count,
+static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 	unsigned int *ttl_min)
 {
 	ACL_DNS_DB *dns_db = acl_netdb_new(res->query->name);
@@ -134,7 +134,7 @@ static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res, int count,
 		*ttl_min = 100000000;
 	}
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < res->ancount; i++) {
 		if (res->answer[i].type == ACL_RFC1035_TYPE_A) {
 			phost = acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 			phost->type = ACL_HOSTNAME_TYPE_IPV4;
@@ -288,7 +288,7 @@ static void dns_lookup_error(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 	}
 }
 
-static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res, int len)
+static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 {
 	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
 	int   ttl_min;
@@ -314,7 +314,7 @@ static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res, int len)
 	acl_htable_delete(dns->lookup_table, req->key, NULL);
 
 	/* 创建 DNS 查询结果缓存对象，并加入本地缓存中 */
-	dns_db = build_dns_db(res, len, (unsigned int*) &ttl_min);
+	dns_db = build_dns_db(res, (unsigned int*) &ttl_min);
 
 	/* 设置返回本次查询结果所使用的 DNS 服务器地址*/
 	acl_netdb_set_ns(dns_db, &dns->addr_from.addr);
@@ -341,7 +341,7 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 	char *data, int dlen)
 {
 	ACL_DNS *dns = (ACL_DNS*) ctx;
-	ACL_RFC1035_MESSAGE *res;
+	ACL_RFC1035_MESSAGE *res = NULL;
 	int  ret;
 
 	/* 解析DNS响应数据包 */
@@ -352,10 +352,14 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 		}
 
 		dns_lookup_error(dns, res);
-		acl_rfc1035_message_destroy(res);
+		if (res) {
+			acl_rfc1035_message_destroy(res);
+		}
 		return 0;
 	} else if (ret == 0) {
-		acl_rfc1035_message_destroy(res);
+		if (res) {
+			acl_rfc1035_message_destroy(res);
+		}
 		return 0;
 	}
 
@@ -377,7 +381,7 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 		}
 	}
 
-	dns_lookup_ok(dns, res, ret);
+	dns_lookup_ok(dns, res);
 	acl_rfc1035_message_destroy(res);
 	return 0;
 }

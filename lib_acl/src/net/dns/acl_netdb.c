@@ -318,8 +318,9 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 	
 	/* lookup the local dns cache first */
 	db = acl_netdb_cache_lookup(name);
-	if (db)
+	if (db) {
 		return db;
+	}
 
 	db = acl_netdb_new(name);
 
@@ -334,8 +335,10 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 	}
 
 	res0 = acl_host_addrinfo(name, SOCK_DGRAM);
-	if (res0 == NULL)
+	if (res0 == NULL) {
+		acl_netdb_free(db);
 		return NULL;
+	}
 
 	for (res = res0; res != NULL; res = res->ai_next) {
 		ACL_SOCKADDR *sa = (ACL_SOCKADDR *) res->ai_addr;
@@ -377,8 +380,9 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 
 	freeaddrinfo(res0);
 
-	if (acl_netdb_size(db) > 0)
+	if (acl_netdb_size(db) > 0) {
 		return db;
+	}
 
 	acl_netdb_free(db);
 	return NULL;

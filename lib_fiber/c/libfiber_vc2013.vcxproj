@@ -317,7 +317,8 @@
     <ClInclude Include="src\common\sane_socket.h" />
     <ClInclude Include="src\common\strops.h" />
     <ClInclude Include="src\define.h" />
-    <ClInclude Include="src\dns\dns.h" />
+    <ClInclude Include="src\dns\resolver.h" />
+    <ClInclude Include="src\dns\rfc1035.h" />
     <ClInclude Include="src\dns\sane_inet.h" />
     <ClInclude Include="src\dns\valid_hostname.h" />
     <ClInclude Include="src\event.h" />
@@ -353,7 +354,8 @@
     <ClCompile Include="src\common\socketpair.c" />
     <ClCompile Include="src\common\strops.c" />
     <ClCompile Include="src\common\tcp_nodelay.c" />
-    <ClCompile Include="src\dns\dns.c" />
+    <ClCompile Include="src\dns\resolver.c" />
+    <ClCompile Include="src\dns\rfc1035.c" />
     <ClCompile Include="src\dns\sane_inet.c" />
     <ClCompile Include="src\dns\valid_hostname.c" />
     <ClCompile Include="src\event.c" />
@@ -373,7 +375,6 @@
     <ClCompile Include="src\fiber_lock.c" />
     <ClCompile Include="src\fiber_sem.c" />
     <ClCompile Include="src\file_event.c" />
-    <ClCompile Include="src\hook\dns_init.c" />
     <ClCompile Include="src\hook\epoll.c" />
     <ClCompile Include="src\hook\getaddrinfo.c" />
     <ClCompile Include="src\hook\gethostbyname.c" />

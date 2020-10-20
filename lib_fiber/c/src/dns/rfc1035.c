@@ -808,6 +808,8 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 	}
 
 	msg->answer = rfc1035_unpack2rr(buf, sz, &off, msg->ancount, &nr);
+	msg->ancount = (unsigned short) nr;  /* reset the valid ancount */
+
 	if (msg->answer == NULL) {
 		/* we expected to unpack some answers (ancount != 0), but
 		 * didn't actually get any.
@@ -819,9 +821,11 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 		return -RFC1035_unpack_error;
 	}
 
+
 	if (msg->nscount > 0) {
 		msg->authority = rfc1035_unpack2rr(buf, sz, &off,
 			msg->nscount, &nr);
+		msg->nscount = (unsigned short) nr;
 		if (msg->authority == NULL) {
 			RFC1035_UNPACK_DEBUG;
 			rfc1035_message_destroy(msg);
@@ -834,6 +838,7 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 	if (msg->arcount > 0) {
 		msg->additional = rfc1035_unpack2rr(buf, sz, &off,
 			msg->arcount, &nr);
+		msg->arcount = (unsigned short) nr;
 		if (msg->additional == NULL) {
 			RFC1035_UNPACK_DEBUG;
 			rfc1035_message_destroy(msg);
@@ -844,7 +849,7 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 	}
 
 	*answer = msg;
-	return nr;
+	return (int) msg->ancount;
 }
 
 /****************************************************************************/

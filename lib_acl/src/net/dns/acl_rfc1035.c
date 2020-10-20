@@ -821,6 +821,8 @@ int acl_rfc1035_message_unpack(const char *buf, size_t sz, ACL_RFC1035_MESSAGE *
 	}
 
 	msg->answer = rfc1035_unpack2rr(buf, sz, &off, msg->ancount, &nr);
+	msg->ancount = (unsigned short) nr;  /* reset the valid ancount */
+
 	if (msg->answer == NULL) {
 		/* we expected to unpack some answers (ancount != 0), but
 		 * didn't actually get any.
@@ -835,6 +837,7 @@ int acl_rfc1035_message_unpack(const char *buf, size_t sz, ACL_RFC1035_MESSAGE *
 	if (msg->nscount > 0) {
 		msg->authority = rfc1035_unpack2rr(buf, sz, &off,
 			msg->nscount, &nr);
+		msg->nscount = (unsigned short) nr;
 		if (msg->authority == NULL) {
 			ACL_RFC1035_UNPACK_DEBUG;
 			acl_rfc1035_message_destroy(msg);
@@ -847,6 +850,7 @@ int acl_rfc1035_message_unpack(const char *buf, size_t sz, ACL_RFC1035_MESSAGE *
 	if (msg->arcount > 0) {
 		msg->additional = rfc1035_unpack2rr(buf, sz, &off,
 			msg->arcount, &nr);
+		msg->arcount = (unsigned short) nr;
 		if (msg->additional == NULL) {
 			ACL_RFC1035_UNPACK_DEBUG;
 			acl_rfc1035_message_destroy(msg);

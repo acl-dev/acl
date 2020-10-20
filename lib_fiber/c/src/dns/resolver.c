@@ -371,12 +371,12 @@ static int udp_request(const char *ip, unsigned short port,
 }
 
 static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
-	int count, unsigned short service_port)
+	unsigned short service_port)
 {
 	int i;
 	struct addrinfo *res = NULL, *ent;
 
-	for (i = 0; i < count; i++) {
+	for (i = 0; i < message->ancount; i++) {
 		if (message->answer[i].type == RFC1035_TYPE_A) {
 			struct sockaddr_in *in = (struct sockaddr_in*)
 				calloc(1, sizeof(struct sockaddr_in));
@@ -389,7 +389,7 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 			memcpy(&in->sin_addr, message->answer[i].rdata, 4);
 			in->sin_family = AF_INET;
 			in->sin_port = htons(service_port);
-			in->sin_len  = sizeof(struct sockaddr_in);
+			//in->sin_len  = sizeof(struct sockaddr_in);
 #ifdef	AF_INET6
 		} else if (message->answer[i].type == RFC1035_TYPE_AAAA) {
 			struct sockaddr_in6 *in = (struct sockaddr_in6*)
@@ -403,7 +403,7 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 			memcpy(&in->sin6_addr, message->answer[i].rdata, 16);
 			in->sin6_family = AF_INET6;
 			in->sin6_port = htons(service_port);
-			in->sin6_len = sizeof(struct sockaddr_in6);
+			//in->sin6_len = sizeof(struct sockaddr_in6);
 #endif
 		} else {
 			continue;
@@ -438,7 +438,7 @@ static struct addrinfo *ns_lookup(const char *ip, unsigned short port,
 		return NULL;
 	}
 
-	res = rfc1035_to_addrinfo(message, ret, service_port);
+	res = rfc1035_to_addrinfo(message, service_port);
 	rfc1035_message_destroy(message);
 	return res;
 }
