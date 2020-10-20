@@ -19,6 +19,7 @@
 # define HAS_KQUEUE
 # define _XOPEN_SOURCE
 #elif defined(_WIN32) || defined(_WIN64)
+
 # if(_MSC_VER >= 1300)
 #  undef FD_SETSIZE
 #  define FD_SETSIZE 10240
@@ -27,6 +28,15 @@
 # else
 #  include <winsock.h>
 # endif
+
+# if _MSC_VER >= 1500
+#  include <netioapi.h>
+# endif
+
+# include <ws2tcpip.h> /* for getaddrinfo */
+# include <process.h>
+# include <stdint.h>
+
 # define SYS_WIN
 # define HAS_SELECT
 # if(_WIN32_WINNT >= 0x0600)

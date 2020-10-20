@@ -118,7 +118,12 @@ static int rfc1035_name_pack(char *buf, size_t sz, const char *name)
 	char *copy, *ptr;
 	char *t;
 
+#ifdef SYS_WIN
+	copy = _strdup(name);
+#else
 	copy = strdup(name);
+#endif
+
 	/*
 	 * NOTE: use of strtok here makes names like foo....com valid.
 	 */
@@ -460,7 +465,12 @@ size_t rfc1035_build_query4ptr(const struct in_addr addr, char *buf,
 
 	memset(&h, '\0', sizeof(h));
 	i = (unsigned int) ntohl(addr.s_addr);
+
+#ifdef SYS_WIN
+	_snprintf(rev, 32, "%u.%u.%u.%u.in-addr.arpa.",
+#else
 	snprintf(rev, 32, "%u.%u.%u.%u.in-addr.arpa.",
+#endif
 		i & 255, (i >> 8) & 255, (i >> 16) & 255, (i >> 24) & 255);
 
 	h.id = qid;
@@ -967,7 +977,7 @@ static size_t save_addr2rr(int type, const char *src, RFC1035_RR *rr)
 		in6.sin6_family = AF_INET6;
 		in6.sin6_port   = htons(0);
 
-#if defined(SYS_UNIX) || ((defined(_WIN32) || defined(_WIN64)) && _MSC_VER >= 1600)
+#if defined(SYS_UNIX) || (defined(SYS_WIN) && _MSC_VER >= 1600)
 		if (ptr && *ptr && !(in6.sin6_scope_id = if_nametoindex(ptr))) {
 			msg_error("%s(%d): if_nametoindex error %s",
 				__FUNCTION__, __LINE__, last_serror());
@@ -1021,7 +1031,11 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 
 	for (i = 0; i < reply->ips->argc; i++) {
 		memset(&rr, 0, sizeof(rr));
+#ifdef SYS_WIN
+		_snprintf(rr.name, sizeof(rr.name), "%s", reply->hostname);
+#else
 		snprintf(rr.name, sizeof(rr.name), "%s", reply->hostname);
+#endif
 		rr.type = reply->ip_type;
 		rr.tclass = htons(RFC1035_CLASS_IN);
 		rr.ttl = reply->ttl;
@@ -1038,19 +1052,31 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 
 	if (h.nscount) {
 		memset(&rr, 0, sizeof(rr));
+#ifdef SYS_WIN
+		_snprintf(rr.name, sizeof(rr.name), "%s", reply->domain_root);
+#else
 		snprintf(rr.name, sizeof(rr.name), "%s", reply->domain_root);
+#endif
 		rr.type = RFC1035_TYPE_NS;
 		rr.tclass = RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
 		rr.rdlength = (unsigned short) strlen(reply->dns_name);
+#ifdef SYS_WIN
+		rr.rdata = _strdup(reply->dns_name);
+#else
 		rr.rdata = strdup(reply->dns_name);
+#endif
 		offset += rfc1035_rr_pack(&rr, buf + offset, sz - offset);
 		free(rr.rdata);
 	}
 
 	if (h.arcount) {
 		memset(&rr, 0, sizeof(rr));
+#ifdef SYS_WIN
+		_snprintf(rr.name, sizeof(rr.name), "%s", reply->dns_name);
+#else
 		snprintf(rr.name, sizeof(rr.name), "%s", reply->dns_name);
+#endif
 		rr.type = reply->ip_type;
 		rr.tclass = RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;

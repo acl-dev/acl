@@ -69,7 +69,12 @@ static void resolver_end(void)
 
 #define SKIP_WHILE(cond, ptr) { while(*ptr && (cond)) ptr++; }
 #define IS_SPACE(x) ((x) == ' ' || (x) == '\t' || (x) == '\r' || (x) == '\n')
-#define EQ(x, y) !strcasecmp((x), (y))
+
+#ifdef SYS_WIN
+# define EQ(x, y) !_stricmp((x), (y))
+#else
+# define EQ(x, y) !strcasecmp((x), (y))
+#endif
 
 static void load_reolv_conf(const char *file, resolv_conf *conf)
 {

@@ -1,6 +1,8 @@
 #ifndef __STROPS_HEADER_H__
 #define __STROPS_HEADER_H__
 
+#include "define.h"
+
 #ifndef SAFE_STRNCPY
 #define SAFE_STRNCPY(_obj, _src, _size) do {                \
     if (_size > 0) {                                            \
@@ -10,6 +12,10 @@
         _obj[_n] = 0;                                           \
     }                                                           \
 } while (0)
+#endif
+
+#ifdef SYS_WIN
+int strncasecmp(const char *s1, const char *s2, size_t n);
 #endif
 
 char *mystrtok(char **src, const char *sep);

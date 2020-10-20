@@ -55,15 +55,6 @@
 #define GETPID getpid
 
 #elif defined(SYS_WIN)
-# if(_MSC_VER >= 1300)
-#  include <winsock2.h>
-#  include <mswsock.h>
-# else
-#  include <winsock.h>
-# endif
-# include <ws2tcpip.h> /* for getaddrinfo */
-# include <process.h>
-# include <stdint.h>
 
 #define STRDUP _strdup
 #define GETPID _getpid
