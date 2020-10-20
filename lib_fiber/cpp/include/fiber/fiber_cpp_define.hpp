@@ -2,7 +2,17 @@
 
 #if defined(_WIN32) || defined (_WIN64)
 /* typedef intptr_t ssize_t; */
+# ifndef	HAS_SSIZE_T
+#  define	HAS_SSIZE_T
+/* typedef intptr_t ssize_t; */
+#  if defined(_WIN64)
+typedef __int64 ssize_t;
+#  elif defined(_WIN32)
+typedef int ssize_t;
+#  else
 typedef long ssize_t;
+#  endif
+# endif
 #else
 #include <sys/types.h>
 #include <sys/socket.h>
