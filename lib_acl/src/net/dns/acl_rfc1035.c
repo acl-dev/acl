@@ -414,7 +414,7 @@ static size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
 
 	if (sz < 512) {
 		acl_msg_error("%s: sz(%d) < 512, too small", myname, (int) sz);
-		return -1;
+		return 0;
 	}
 
 	memset(&h, '\0', sizeof(h));

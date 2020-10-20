@@ -112,6 +112,10 @@ size_t rfc1035_build_query4aaaa(const char *hostname, char *buf, size_t sz,
 size_t rfc1035_build_query4mx(const char *hostname, char *buf, size_t sz,
 	unsigned short qid, RFC1035_QUERY *query);
 
+size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
+	unsigned short qid, unsigned short qtype, unsigned short qclass,
+	RFC1035_QUERY *query);
+
 /**
  * Builds a message buffer with a QUESTION to lookup PTR records
  * for an address.  Caller must allocate 'buf' which should

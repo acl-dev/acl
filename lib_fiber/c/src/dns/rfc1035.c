@@ -392,7 +392,7 @@ static int rfc1035_rr_pack(const RFC1035_RR *RR, char *buf, size_t sz)
 	return off;
 }
 
-static size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
+size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
 	unsigned short qid, unsigned short qtype, unsigned short qclass,
 	RFC1035_QUERY *query)
 {
@@ -402,7 +402,7 @@ static size_t rfc1035_build_query(const char *hostname, char *buf, size_t sz,
 
 	if (sz < 512) {
 		msg_error("%s: sz(%d) < 512, too small", myname, (int) sz);
-		return -1;
+		return 0;
 	}
 
 	memset(&h, '\0', sizeof(h));

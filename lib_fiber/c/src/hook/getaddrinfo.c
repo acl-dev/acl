@@ -1,8 +1,7 @@
 #include "stdafx.h"
-#include "dns/dns.h"
 #include "dns/sane_inet.h"
+#include "dns/resolver.h"
 #include "common.h"
-#include "hook.h"
 #include "fiber.h"
 
 #ifdef SYS_UNIX
@@ -35,20 +34,20 @@ static void hook_init(void)
 /****************************************************************************/
 
 static struct addrinfo *create_addrinfo(const char *ip, short port,
-	int socktype, int flags)
+	int iptype, int socktype, int flags)
 {
 	struct addrinfo *res;
 	size_t addrlen;
 	SOCK_ADDR sa;
 
-	if (is_ipv4(ip)) {
+	if (iptype == AF_INET) {
 		sa.in.sin_family      = AF_INET;
 		sa.in.sin_addr.s_addr = inet_addr(ip);
 		sa.in.sin_port        = htons(port);
 		addrlen               = sizeof(struct sockaddr_in);
 	}
 #ifdef AF_INET6
-	else if (is_ipv6(ip)) {
+	else if (iptype == AF_INET6) {
 		char   buf[256], *ptr;
 		struct sockaddr_in6 *in6;
 
@@ -81,6 +80,7 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	}
 #endif
 	else {
+		msg_error("%s: unknown ip type=%d", __FUNCTION__ , iptype);
 		return NULL;
 	}
 
@@ -95,42 +95,57 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	return res;
 }
 
-static void saveaddrinfo(struct dns_addrinfo *ai, struct addrinfo **res)
+static struct addrinfo *check_local(const char *node, const char *service,
+	const struct addrinfo *hints)
 {
-	struct addrinfo *ent = NULL;
+	const HOST_LOCAL *host;
+	const char *ipaddr;
+	int iptype;
 
-	while (1) {
-		int err = dns_ai_nextent(&ent, ai);
-		if (err != 0 || ent == NULL) {
-			break;
-		}
-
-		if (ent->ai_family != AF_INET
-#ifdef AF_INET6
-			&& ent->ai_family != AF_INET6)
+	if (is_ipv4(node)) {
+		iptype = AF_INET;
+		ipaddr = node;
+#ifdef	AF_INET6
+	} else if (is_ipv6(node)) {
+		iptype = AF_INET6;
+		ipaddr = node;
 #endif
-		{
-			mem_free(ent);
-			continue;
-		}
+	} else if ((host = find_from_localhost(node)) == NULL) {
+		return NULL;
+#ifdef	AF_INET6
+	} else if (hints->ai_family == AF_INET6 && host->ipv6[0]) {
+		iptype = hints->ai_family;
+		ipaddr = host->ipv6;
+#endif
+	} else if (host->ipv4[0]) {
+		iptype = AF_INET;
+		ipaddr = host->ipv4;
+#ifdef	AF_INET6
+	} else if (host->ipv6[0]) {
+		iptype = AF_INET6;
+		ipaddr = host->ipv6;
+#endif
+	} else {
+		return NULL;
+	}
 
-		if (*res == NULL) {
-			*res = ent;
-			(*res)->ai_next = NULL;
-		} else {
-			ent->ai_next = *res;
-			*res = ent;
+	if (ipaddr && *ipaddr) {
+		int  port = get_service_port(service);
+		int  socktype = hints ? hints->ai_socktype : SOCK_STREAM;
+		struct addrinfo *ai = create_addrinfo(ipaddr, port, iptype,
+		      socktype, hints ? hints->ai_flags : 0);
+		if (ai) {
+			ai->ai_next = NULL;
+			return ai;
 		}
 	}
+	return NULL;
 }
 
 int acl_fiber_getaddrinfo(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res)
 {
-	struct dns_addrinfo *dai;
-	struct dns_resolver *resolver;
 	struct addrinfo hints_tmp;
-	int err;
 
 	if (__sys_getaddrinfo == NULL) {
 		hook_init();
@@ -148,65 +163,34 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 			(node, service, hints, res) : EAI_NODATA;
 	}
 
-	if (var_dns_conf == NULL || var_dns_hosts == NULL) {
-		fiber_dns_init();
-	}
+	resolver_init_once();
 
-	*res = NULL;
-	if (is_ip(node)) {
-		int  port = service ? atoi(service) : -1;
-		int  socktype = hints ? hints->ai_socktype : SOCK_STREAM;
-		struct addrinfo *ai = create_addrinfo(node, port, socktype,
-			hints ? hints->ai_flags : 0);
-		if (ai) {
-			ai->ai_next = NULL;
-			*res = ai;
-			return 0;
-		} else {
-			return EAI_NODATA;
-		}
-	}
-
-	if (!(resolver = dns_res_open(var_dns_conf, var_dns_hosts,
-		var_dns_hints, NULL, dns_opts(), &err))) {
-
-		msg_error("%s(%d): dns_res_open error=%s",
-			__FUNCTION__, __LINE__, dns_strerror(err));
-		return EAI_SYSTEM;
-	}
-
-	memset(&hints_tmp, 0, sizeof(hints_tmp));
-	hints_tmp.ai_family   = PF_UNSPEC;
-	hints_tmp.ai_socktype = 0;
+	if (hints == NULL) {
+		memset(&hints_tmp, 0, sizeof(hints_tmp));
+		hints_tmp.ai_family   = PF_UNSPEC;
+		hints_tmp.ai_socktype = 0;
 #ifdef	__APPLE__
-	hints_tmp.ai_flags    = AI_DEFAULT;
+		hints_tmp.ai_flags    = AI_DEFAULT;
 #elif	defined(ANDROID)
-	hints_tmp.ai_flags    = AI_ADDRCONFIG;
+		hints_tmp.ai_flags    = AI_ADDRCONFIG;
 #elif	defined(SYS_WIN)
-	hints_tmp.ai_protocol = type == SOCK_DGRAM ? IPPROTO_UDP : IPPROTO_TCP;
+		hints_tmp.ai_protocol = type == SOCK_DGRAM
+			? IPPROTO_UDP : IPPROTO_TCP;
 # if _MSC_VER >= 1500
-	hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+		hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 # endif
 #elif	!defined(__FreeBSD__)
-	hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
+		hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
-	if (hints == NULL) {
 		hints = &hints_tmp;
 	}
 
-	dai = dns_ai_open(node, service, DNS_T_A, hints, resolver, &err);
-	if (dai == NULL) {
-		dns_res_close(resolver);
-		msg_error("%s(%d): dns_res_close error=%s",
-			__FUNCTION__, __LINE__, dns_strerror(err));
-		return EAI_SERVICE;
+	*res = check_local(node, service, hints);
+	if (*res != NULL) {
+		return 0;
 	}
 
-	saveaddrinfo(dai, res);
-
-	dns_res_close(resolver);
-	dns_ai_close(dai);
-
+	*res = resolver_getaddrinfo(node, service, hints);
 	if (*res == NULL) {
 		return EAI_NODATA;
 	}
@@ -227,11 +211,7 @@ void acl_fiber_freeaddrinfo(struct addrinfo *res)
 		return;
 	}
 
-	while (res) {
-		struct addrinfo *tmp = res;
-		res = res->ai_next;
-		mem_free(tmp);
-	}
+	resolver_freeaddrinfo(res);
 }
 
 int getaddrinfo(const char *node, const char *service,
