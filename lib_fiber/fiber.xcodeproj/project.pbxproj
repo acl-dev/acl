@@ -53,8 +53,6 @@
 		070F35AF2090225C00672EDC /* tcp_nodelay.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F355E2090225C00672EDC /* tcp_nodelay.c */; };
 		070F35B02090225C00672EDC /* common.h in Headers */ = {isa = PBXBuildFile; fileRef = 070F355F2090225C00672EDC /* common.h */; };
 		070F35B12090225C00672EDC /* define.h in Headers */ = {isa = PBXBuildFile; fileRef = 070F35602090225C00672EDC /* define.h */; };
-		070F35B22090225C00672EDC /* dns.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35622090225C00672EDC /* dns.c */; };
-		070F35B32090225C00672EDC /* dns.h in Headers */ = {isa = PBXBuildFile; fileRef = 070F35632090225C00672EDC /* dns.h */; };
 		070F35B42090225C00672EDC /* sane_inet.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35642090225C00672EDC /* sane_inet.c */; };
 		070F35B52090225C00672EDC /* sane_inet.h in Headers */ = {isa = PBXBuildFile; fileRef = 070F35652090225C00672EDC /* sane_inet.h */; };
 		070F35B62090225C00672EDC /* valid_hostname.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35662090225C00672EDC /* valid_hostname.c */; };
@@ -82,7 +80,6 @@
 		070F35CC2090225C00672EDC /* fiber.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F357E2090225C00672EDC /* fiber.c */; };
 		070F35CD2090225C00672EDC /* fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = 070F357F2090225C00672EDC /* fiber.h */; };
 		070F35CE2090225C00672EDC /* file_event.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35802090225C00672EDC /* file_event.c */; };
-		070F35CF2090225C00672EDC /* dns_init.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35822090225C00672EDC /* dns_init.c */; };
 		070F35D02090225C00672EDC /* epoll.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35832090225C00672EDC /* epoll.c */; };
 		070F35D12090225C00672EDC /* getaddrinfo.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35842090225C00672EDC /* getaddrinfo.c */; };
 		070F35D22090225C00672EDC /* gethostbyname.c in Sources */ = {isa = PBXBuildFile; fileRef = 070F35852090225C00672EDC /* gethostbyname.c */; };
@@ -155,8 +152,6 @@
 		070F355E2090225C00672EDC /* tcp_nodelay.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tcp_nodelay.c; sourceTree = "<group>"; };
 		070F355F2090225C00672EDC /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common.h; path = ../lib_fiber/c/src/common.h; sourceTree = "<group>"; };
 		070F35602090225C00672EDC /* define.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = define.h; path = ../lib_fiber/c/src/define.h; sourceTree = "<group>"; };
-		070F35622090225C00672EDC /* dns.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dns.c; sourceTree = "<group>"; };
-		070F35632090225C00672EDC /* dns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dns.h; sourceTree = "<group>"; };
 		070F35642090225C00672EDC /* sane_inet.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sane_inet.c; sourceTree = "<group>"; };
 		070F35652090225C00672EDC /* sane_inet.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sane_inet.h; sourceTree = "<group>"; };
 		070F35662090225C00672EDC /* valid_hostname.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = valid_hostname.c; sourceTree = "<group>"; };
@@ -184,7 +179,6 @@
 		070F357E2090225C00672EDC /* fiber.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fiber.c; path = ../lib_fiber/c/src/fiber.c; sourceTree = "<group>"; };
 		070F357F2090225C00672EDC /* fiber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fiber.h; path = ../lib_fiber/c/src/fiber.h; sourceTree = "<group>"; };
 		070F35802090225C00672EDC /* file_event.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = file_event.c; path = ../lib_fiber/c/src/file_event.c; sourceTree = "<group>"; };
-		070F35822090225C00672EDC /* dns_init.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dns_init.c; sourceTree = "<group>"; };
 		070F35832090225C00672EDC /* epoll.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = epoll.c; sourceTree = "<group>"; };
 		070F35842090225C00672EDC /* getaddrinfo.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = getaddrinfo.c; sourceTree = "<group>"; };
 		070F35852090225C00672EDC /* gethostbyname.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = gethostbyname.c; sourceTree = "<group>"; };
@@ -322,8 +316,6 @@
 				70C98419253D4BAE003A9689 /* resolver.h */,
 				70C9841A253D4BAE003A9689 /* rfc1035.c */,
 				70C9841B253D4BAE003A9689 /* rfc1035.h */,
-				070F35622090225C00672EDC /* dns.c */,
-				070F35632090225C00672EDC /* dns.h */,
 				070F35642090225C00672EDC /* sane_inet.c */,
 				070F35652090225C00672EDC /* sane_inet.h */,
 				070F35662090225C00672EDC /* valid_hostname.c */,
@@ -370,7 +362,6 @@
 		070F35812090225C00672EDC /* hook */ = {
 			isa = PBXGroup;
 			children = (
-				070F35822090225C00672EDC /* dns_init.c */,
 				070F35832090225C00672EDC /* epoll.c */,
 				070F35842090225C00672EDC /* getaddrinfo.c */,
 				070F35852090225C00672EDC /* gethostbyname.c */,
@@ -440,7 +431,6 @@
 				070F35352090220400672EDC /* fiber_event.h in Headers */,
 				070F359F2090225C00672EDC /* iterator.h in Headers */,
 				070F35A12090225C00672EDC /* memory.h in Headers */,
-				070F35B32090225C00672EDC /* dns.h in Headers */,
 				070F35932090225C00672EDC /* atomic.h in Headers */,
 				070F35372090220400672EDC /* fiber_lock.h in Headers */,
 				070F35912090225C00672EDC /* array.h in Headers */,
@@ -558,9 +548,7 @@
 				070F35C62090225C00672EDC /* fiber_unix.c in Sources */,
 				070F35962090225C00672EDC /* fifo.c in Sources */,
 				070F35AC2090225C00672EDC /* socketpair.c in Sources */,
-				070F35CF2090225C00672EDC /* dns_init.c in Sources */,
 				070F35D82090225C00672EDC /* stdafx.c in Sources */,
-				070F35B22090225C00672EDC /* dns.c in Sources */,
 				70C9841E253D4BAE003A9689 /* rfc1035.c in Sources */,
 				070F35D52090225C00672EDC /* poll.c in Sources */,
 				070F35942090225C00672EDC /* close_on_exec.c in Sources */,
