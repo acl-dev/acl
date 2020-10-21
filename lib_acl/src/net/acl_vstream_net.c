@@ -257,6 +257,9 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	if (stream->read_ready) {
 		stream->read_ready = 0;
+	} else if (stream->rw_timeout > 0
+		&& acl_read_wait(fd, stream->rw_timeout) < 0) {
+		return -1;
 	}
 
 	ret = (int) recvfrom(fd, buf, (int) size, 0,
