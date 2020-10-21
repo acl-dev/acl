@@ -11,6 +11,8 @@
 #include "common/argv.h"
 #include "common/htable.h"
 #include "common/strops.h"
+#include "common/iostuff.h"
+
 #include "rfc1035.h"
 #include "sane_inet.h"
 #include "resolver.h"
@@ -335,6 +337,8 @@ static unsigned short get_next_qid(void)
 	return __qid++;
 }
 
+static int __wait_timeout = 5000;
+
 static int udp_request(const char *ip, unsigned short port,
 	const char *data, size_t dlen, char *buf, size_t size)
 {
@@ -354,12 +358,19 @@ static int udp_request(const char *ip, unsigned short port,
 	addr.sin_port        = htons(port);
 	addr.sin_addr.s_addr = inet_addr(ip);
 
-	ret = sendto(sock, data, dlen, 0, (struct sockaddr *) &addr,
+	ret = acl_fiber_sendto(sock, data, dlen, 0, (struct sockaddr *) &addr,
 		     (socklen_t) sizeof(addr));
 	if (ret < 0) {
 		msg_error("%s(%d): send error %s",
 			__FUNCTION__ , __LINE__, last_serror());
 		acl_fiber_close(sock);
+		return -1;
+	}
+
+	if (read_wait(sock, __wait_timeout) < 0) {
+		acl_fiber_close(sock);
+		msg_warn("%s(%d), %s: read timeout",
+			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
 	}
 
@@ -376,10 +387,10 @@ static int udp_request(const char *ip, unsigned short port,
 }
 
 static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
-	unsigned short service_port)
+	unsigned short service_port, struct addrinfo *res, ARGV *cnames)
 {
-	int i;
-	struct addrinfo *res = NULL, *ent;
+	unsigned short i;
+	struct addrinfo *ent;
 
 	for (i = 0; i < message->ancount; i++) {
 		if (message->answer[i].type == RFC1035_TYPE_A) {
@@ -401,7 +412,7 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 				calloc(1, sizeof(struct sockaddr_in6));
 			ent = (struct addrinfo*) calloc(1, sizeof(ent));
 
-			ent->ai_family = AF_INET6;
+			ent->ai_family = AF_INET6; PF_INET6;
 			ent->ai_addrlen = sizeof(struct sockaddr_in6);
 			ent->ai_addr = (struct sockaddr*) in;
 
@@ -410,8 +421,26 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 			in->sin6_port = htons(service_port);
 			//in->sin6_len = sizeof(struct sockaddr_in6);
 #endif
+		} else if (message->answer[i].type == RFC1035_TYPE_CNAME) {
+			char cname[256];
+			size_t len = sizeof(cname) - 1;
+			if (len > message->answer[i].rdlength) {
+				len = message->answer[i].rdlength;
+			}
+			memcpy(cname, message->answer[i].rdata, len);
+			cname[len] = 0;
+			argv_add(cnames, cname, NULL);
+			continue;
 		} else {
 			continue;
+		}
+
+		if (message->answer[i].name[0]) {
+#ifdef	SYS_WIN
+			ent->ai_canonname = _strdup(message->answer[i].name);
+#else
+			ent->ai_canonname = strdup(message->answer[i].name);
+#endif
 		}
 		ent->ai_flags = 0;
 		ent->ai_socktype = SOCK_DGRAM;
@@ -423,35 +452,65 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 	return res;
 }
 
-static struct addrinfo *ns_lookup(const char *ip, unsigned short port,
-	const char *data, size_t dlen, unsigned short service_port)
+static size_t build_request(const ARGV *names, char *buf, size_t size, int type)
 {
-	RFC1035_MESSAGE *message;
-	struct addrinfo *res;
-	char buf[1000];
-	int ret;
-
-	ret = udp_request(ip, port, data, dlen, buf, sizeof(buf));
-	if (ret == -1) {
-		return NULL;
-	}
-	ret = rfc1035_message_unpack(buf, ret, &message);
-	if (ret <= 0) {
-		if (message) {
-			rfc1035_message_destroy(message);
+	int i;
+	for (i = 0; i < names->argc; i++) {
+		size_t dlen = rfc1035_build_query(names->argv[i], buf, size,
+			  get_next_qid(), type, RFC1035_CLASS_IN, NULL);
+		if (dlen > 0) {
+			return dlen;
 		}
-		return NULL;
 	}
+	return 0;
+}
 
-	res = rfc1035_to_addrinfo(message, service_port);
-	rfc1035_message_destroy(message);
+static struct addrinfo *ns_lookup(const char *ip, unsigned short port,
+	const char *data, size_t dlen, unsigned short service_port, int type)
+{
+	const char *req = data;
+	struct addrinfo *res = NULL;
+	int i;
+
+	/* limit the recursivly searching count */
+	for (i = 0; i < 5; i++) {
+		RFC1035_MESSAGE *message;
+		ARGV *cnames;
+		char buf[1000];
+		int ret = udp_request(ip, port, req, dlen, buf, sizeof(buf));
+
+		if (ret == -1) {
+			break;
+		}
+		ret = rfc1035_message_unpack(buf, ret, &message);
+		if (ret <= 0) {
+			if (message) {
+				rfc1035_message_destroy(message);
+			}
+			break;
+		}
+
+		cnames = argv_alloc(1);
+		res = rfc1035_to_addrinfo(message, service_port, res, cnames);
+		rfc1035_message_destroy(message);
+		if (res) {
+			argv_free(cnames);
+			return res;
+		}
+
+		dlen = build_request(cnames, buf, sizeof(buf), type);
+		argv_free(cnames);
+		if (dlen == 0) {
+			break;
+		}
+		req = buf;
+	}
 	return res;
 }
 
 struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 	const struct addrinfo* hints)
 {
-	RFC1035_QUERY query;
 	char buf[1000];
 	size_t size;
 	int type, i;
@@ -476,7 +535,7 @@ struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 	}
 
 	size = rfc1035_build_query(name, buf, sizeof(buf), get_next_qid(), type,
-			RFC1035_CLASS_IN, &query);
+			RFC1035_CLASS_IN, NULL);
 	if (size == 0) {
 		msg_error("%s(%d): rfc1035_build_query4a error, name=%s",
 			  __FUNCTION__ , __LINE__, name);
@@ -487,7 +546,8 @@ struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 
 	for (i = 0; i < __resolv->nameservers->argc; i++) {
 		const char *ip = __resolv->nameservers->argv[i];
-		struct addrinfo *res = ns_lookup(ip, 53, buf, size, service_port);
+		struct addrinfo *res = ns_lookup(ip, 53, buf, size,
+			service_port, type);
 		if (res != NULL) {
 			return res;
 		}
@@ -500,6 +560,9 @@ void resolver_freeaddrinfo(struct addrinfo *res)
 {
 	while (res) {
 		struct addrinfo *ent = res;
+		if (res->ai_canonname) {
+			free(res->ai_canonname);
+		}
 		res = res->ai_next;
 		free(ent->ai_addr);
 		free(ent);

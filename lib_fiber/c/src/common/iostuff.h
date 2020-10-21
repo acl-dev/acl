@@ -51,6 +51,9 @@ int issock(int fd);
 //int read_wait(int fd, int timeout);
 void tcp_nodelay(socket_t fd, int onoff);
 
+// in read_wait.c
+int read_wait(socket_t fd, int delay);
+
 #ifdef SYS_UNIX
 int sane_socketpair(int domain, int type, int protocol, int result[2]);
 #endif

@@ -349,6 +349,7 @@
     <ClCompile Include="src\common\non_blocking.c" />
     <ClCompile Include="src\common\open_limit.c" />
     <ClCompile Include="src\common\pthread_patch.c" />
+    <ClCompile Include="src\common\read_wait.c" />
     <ClCompile Include="src\common\ring.c" />
     <ClCompile Include="src\common\sane_socket.c" />
     <ClCompile Include="src\common\socketpair.c" />

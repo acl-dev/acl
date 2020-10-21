@@ -8,6 +8,33 @@ static char  __dns_ip[256];
 static int   __dns_port = 53;
 static int   __count = 0;
 
+static void test_gethostbyname(const char *name)
+{
+	struct hostent *ent = gethostbyname(name);
+	int i;
+
+	printf("\r\n");
+	printf("------------------------------------------\r\n");
+
+	if (ent == NULL) {
+		printf("gethostbyname error, name=%s\r\n", name);
+		return;
+	}
+
+	printf("gethostbyname: h_name=%s, h_length=%d, h_addrtype=%d\r\n",
+		ent->h_name, ent->h_length, ent->h_addrtype);
+	for (i = 0; ent->h_addr_list[i]; i++) {
+		char *addr = ent->h_addr_list[i];
+		char  ip[64];
+		const char *ptr;
+
+		ptr = inet_ntop(ent->h_addrtype, addr, ip, sizeof(ip));
+		printf(">>>addr: %s\r\n", ptr);
+	}
+
+	printf("------------------------------------------\r\n\r\n");
+}
+
 static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *name = (const char *)ctx;
@@ -43,6 +70,8 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	--__count;
 	printf("__count: %d\r\n", __count);
+
+	test_gethostbyname(name);
 
 	if (__count == 0) {
 		printf("All are over!\r\n");
@@ -96,7 +125,9 @@ int main(int argc, char *argv[])
 
 	acl_foreach(iter, tokens) {
 		char* addr = (char* ) iter.data;
+
 		acl_fiber_create(nslookup, addr, 320000);
+		test_gethostbyname(addr);
 	}
 
 	acl_fiber_schedule();

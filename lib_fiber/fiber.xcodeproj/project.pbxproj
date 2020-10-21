@@ -102,6 +102,7 @@
 		70C9841E253D4BAE003A9689 /* rfc1035.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C9841A253D4BAE003A9689 /* rfc1035.c */; };
 		70C9841F253D4BAE003A9689 /* rfc1035.h in Headers */ = {isa = PBXBuildFile; fileRef = 70C9841B253D4BAE003A9689 /* rfc1035.h */; };
 		70C98420253D4BAE003A9689 /* resolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C9841C253D4BAE003A9689 /* resolver.c */; };
+		70C98422253FEE12003A9689 /* read_wait.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C98421253FEE12003A9689 /* read_wait.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -201,6 +202,7 @@
 		70C9841A253D4BAE003A9689 /* rfc1035.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = rfc1035.c; sourceTree = "<group>"; };
 		70C9841B253D4BAE003A9689 /* rfc1035.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rfc1035.h; sourceTree = "<group>"; };
 		70C9841C253D4BAE003A9689 /* resolver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = resolver.c; sourceTree = "<group>"; };
+		70C98421253FEE12003A9689 /* read_wait.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_wait.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -270,6 +272,7 @@
 		070F353C2090225C00672EDC /* common */ = {
 			isa = PBXGroup;
 			children = (
+				70C98421253FEE12003A9689 /* read_wait.c */,
 				070F353D2090225C00672EDC /* argv.c */,
 				070F353E2090225C00672EDC /* argv.h */,
 				070F353F2090225C00672EDC /* array.c */,
@@ -532,6 +535,7 @@
 				070F35A52090225C00672EDC /* open_limit.c in Sources */,
 				070F35C92090225C00672EDC /* fiber_io.c in Sources */,
 				070F35BC2090225C00672EDC /* event_kqueue.c in Sources */,
+				70C98422253FEE12003A9689 /* read_wait.c in Sources */,
 				070F35A82090225C00672EDC /* ring.c in Sources */,
 				070F35C02090225C00672EDC /* event_select.c in Sources */,
 				070F35AD2090225C00672EDC /* strops.c in Sources */,

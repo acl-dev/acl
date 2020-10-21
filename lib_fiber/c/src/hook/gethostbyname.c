@@ -99,29 +99,44 @@ static struct addrinfo *get_addrinfo(const char *name)
 
 #define MAX_COUNT	64
 
-static int save_result(struct hostent *ent, struct addrinfo *res,
+static int save_result(struct hostent *ent, const struct addrinfo *res,
 	char *buf, size_t buflen, size_t ncopied)
 {
-	struct addrinfo *ai;
+	const struct addrinfo *ai;
 	size_t len, i;
 
+	if (res->ai_canonname && *res->ai_canonname) {
+		size_t n = strlen(res->ai_canonname) + 1;
+
+		if (n >= buflen) {
+			return 0;
+		}
+		SAFE_STRNCPY(buf, res->ai_canonname, n);
+		ent->h_name = buf;
+		buf += n;
+	} else {
+		ent->h_name = "";
+	}
+
 	for (ai = res, i = 0; ai != NULL; ai = ai->ai_next) {
+		SOCK_ADDR *sa = (SOCK_ADDR *) ai->ai_addr;
+
 		len = sizeof(struct in6_addr) > sizeof(struct in_addr) ?
 			sizeof(struct in6_addr) : sizeof(struct in_addr);
-		len = sizeof(struct in_addr);
+		//len = sizeof(struct in_addr);
 		ncopied += len;
 		if (ncopied > buflen) {
 			break;
 		}
 
-		SOCK_ADDR *sa = (SOCK_ADDR *) ai->ai_addr;
-
 		if (ai->ai_family == AF_INET) {
 			len = sizeof(struct in_addr);
 			memcpy((void *) buf, &sa->in.sin_addr, len);
+			ent->h_length = 4;
 		} else if (ai->ai_family == AF_INET6) {
 			len = sizeof(struct in6_addr);
 			memcpy((void *) buf, &sa->in6.sin6_addr, len);
+			ent->h_length = 16;
 		} else {
 			continue;
 		}
@@ -130,8 +145,8 @@ static int save_result(struct hostent *ent, struct addrinfo *res,
 			break;
 		}
 
+		ent->h_addrtype = ai->ai_family;
 		ent->h_addr_list[i] = buf;
-		ent->h_length      += len;
 		buf                += len;
 		i++;
 	}
@@ -169,10 +184,6 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 #endif
 	}
 
-	if (var_dns_conf == NULL || var_dns_hosts == NULL) {
-		fiber_dns_init();
-	}
-
 	memset(ent, 0, sizeof(struct hostent));
 	memset(buf, 0, buflen);
 
@@ -189,11 +200,6 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 		}
 		return -1;
 	}
-
-	memcpy(buf, name, len);
-	buf[len]    = 0;
-	ent->h_name = buf;
-	buf        += len + 1;
 
 	/********************************************************************/
 
@@ -221,7 +227,6 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 	buf += len;
 
 	n = save_result(ent, res, buf, buflen, ncopied);
-
 	freeaddrinfo(res);
 
 	if (n > 0) {

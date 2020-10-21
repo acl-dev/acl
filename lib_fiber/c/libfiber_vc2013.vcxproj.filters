@@ -188,6 +188,9 @@
     <ClCompile Include="src\common\open_limit.c">
       <Filter>源文件\common</Filter>
     </ClCompile>
+    <ClCompile Include="src\common\read_wait.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
     <ClCompile Include="src\common\ring.c">
       <Filter>源文件\common</Filter>
     </ClCompile>
