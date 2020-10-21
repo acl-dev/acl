@@ -390,36 +390,31 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 	unsigned short service_port, struct addrinfo *res, ARGV *cnames)
 {
 	unsigned short i;
-	struct addrinfo *ent;
 
 	for (i = 0; i < message->ancount; i++) {
+		struct addrinfo *ai;
+
 		if (message->answer[i].type == RFC1035_TYPE_A) {
-			struct sockaddr_in *in = (struct sockaddr_in*)
-				calloc(1, sizeof(struct sockaddr_in));
-			ent = (struct addrinfo*) calloc(1, sizeof(*ent));
+			struct sockaddr_in in;
+			size_t n = message->answer[i].rdlength > 4
+				? 4 : message->answer[i].rdlength;
 
-			ent->ai_family = AF_INET;
-			ent->ai_addrlen = sizeof(struct sockaddr_in);
-			ent->ai_addr = (struct sockaddr*) in;
-
-			memcpy(&in->sin_addr, message->answer[i].rdata, 4);
-			in->sin_family = AF_INET;
-			in->sin_port = htons(service_port);
-			//in->sin_len  = sizeof(struct sockaddr_in);
+			memcpy(&in.sin_addr, message->answer[i].rdata, n);
+			in.sin_family = AF_INET;
+			in.sin_port = htons(service_port);
+			//in.sin_len  = sizeof(struct sockaddr_in);
+			ai = resolver_addrinfo_alloc((struct sockaddr*) &in);
 #ifdef	AF_INET6
 		} else if (message->answer[i].type == RFC1035_TYPE_AAAA) {
-			struct sockaddr_in6 *in = (struct sockaddr_in6*)
-				calloc(1, sizeof(struct sockaddr_in6));
-			ent = (struct addrinfo*) calloc(1, sizeof(ent));
+			struct sockaddr_in6 in;
+			size_t n = message->answer[i].rdlength > 16
+				? 16 : message->answer[i].rdlength;
 
-			ent->ai_family = AF_INET6; PF_INET6;
-			ent->ai_addrlen = sizeof(struct sockaddr_in6);
-			ent->ai_addr = (struct sockaddr*) in;
-
-			memcpy(&in->sin6_addr, message->answer[i].rdata, 16);
-			in->sin6_family = AF_INET6;
-			in->sin6_port = htons(service_port);
-			//in->sin6_len = sizeof(struct sockaddr_in6);
+			memcpy(&in.sin6_addr, message->answer[i].rdata, n);
+			in.sin6_family = AF_INET6;
+			in.sin6_port = htons(service_port);
+			//in.sin6_len = sizeof(struct sockaddr_in6);
+			ai = resolver_addrinfo_alloc((struct sockaddr*) &in);
 #endif
 		} else if (message->answer[i].type == RFC1035_TYPE_CNAME) {
 			char cname[256];
@@ -437,16 +432,16 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 
 		if (message->answer[i].name[0]) {
 #ifdef	SYS_WIN
-			ent->ai_canonname = _strdup(message->answer[i].name);
+			ai->ai_canonname = _strdup(message->answer[i].name);
 #else
-			ent->ai_canonname = strdup(message->answer[i].name);
+			ai->ai_canonname = strdup(message->answer[i].name);
 #endif
 		}
-		ent->ai_flags = 0;
-		ent->ai_socktype = SOCK_DGRAM;
-		ent->ai_protocol = 0;
-		ent->ai_next = res;
-		res = ent;
+
+		ai->ai_socktype = SOCK_DGRAM;
+		ai->ai_protocol = 0;
+		ai->ai_next = res;
+		res = ai;
 	}
 
 	return res;
@@ -556,6 +551,29 @@ struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 	return NULL;
 }
 
+struct addrinfo *resolver_addrinfo_alloc(const struct sockaddr *sa)
+{
+	struct addrinfo *ai;
+	socklen_t addrlen;
+
+	if (sa->sa_family == AF_INET) {
+		addrlen = (socklen_t) sizeof(struct sockaddr_in);
+	} else if (sa->sa_family == AF_INET6) {
+		addrlen = (socklen_t) sizeof(struct sockaddr_in6);
+	} else {
+		return NULL;
+	}
+
+	ai = (struct addrinfo*) calloc(1, sizeof(*ai) + addrlen);
+	ai->ai_flags = 0;
+	ai->ai_family = sa->sa_family;
+	ai->ai_addrlen = addrlen;
+	ai->ai_next = NULL;
+	ai->ai_addr = (struct sockaddr*)((unsigned char *) ai + sizeof(*ai));
+	memcpy(ai->ai_addr, sa, addrlen);
+	return ai;
+}
+
 void resolver_freeaddrinfo(struct addrinfo *res)
 {
 	while (res) {
@@ -564,7 +582,6 @@ void resolver_freeaddrinfo(struct addrinfo *res)
 			free(res->ai_canonname);
 		}
 		res = res->ai_next;
-		free(ent->ai_addr);
 		free(ent);
 	}
 }

@@ -22,6 +22,7 @@ void resolver_init_once(void);
 struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 	const struct addrinfo* hints);
 void resolver_freeaddrinfo(struct addrinfo *res);
+struct addrinfo *resolver_addrinfo_alloc(const struct sockaddr *sa);
 
 unsigned short get_service_port(const char *name);
 const HOST_LOCAL *find_from_localhost(const char *name);

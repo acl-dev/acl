@@ -37,17 +37,14 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 	int iptype, int socktype, int flags)
 {
 	struct addrinfo *res;
-	size_t addrlen;
 	SOCK_ADDR sa;
 
 	if (iptype == AF_INET) {
 		sa.in.sin_family      = AF_INET;
 		sa.in.sin_addr.s_addr = inet_addr(ip);
 		sa.in.sin_port        = htons(port);
-		addrlen               = sizeof(struct sockaddr_in);
-	}
 #ifdef AF_INET6
-	else if (iptype == AF_INET6) {
+	} else if (iptype == AF_INET6) {
 		char   buf[256], *ptr;
 		struct sockaddr_in6 *in6;
 
@@ -76,21 +73,15 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 		if (inet_pton(AF_INET6, buf, &sa.in6.sin6_addr) <= 0) {
 			return NULL;
 		}
-		addrlen = sizeof(struct sockaddr_in6);
-	}
 #endif
-	else {
+	} else {
 		msg_error("%s: unknown ip type=%d", __FUNCTION__ , iptype);
 		return NULL;
 	}
 
-	res = (struct addrinfo *) mem_calloc(1, sizeof(*res) + addrlen);
-	res->ai_family   = sa.sa.sa_family;
+	res = resolver_addrinfo_alloc(&sa.sa);
 	res->ai_socktype = socktype;
 	res->ai_flags    = flags;
-	res->ai_addrlen  = (socklen_t) addrlen;
-	res->ai_addr     = (struct sockaddr *) 
-		memcpy((unsigned char *) res + sizeof(*res), &sa, addrlen);
 
 	return res;
 }

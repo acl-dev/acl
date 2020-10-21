@@ -99,24 +99,24 @@ static struct addrinfo *get_addrinfo(const char *name)
 
 #define MAX_COUNT	64
 
-static int save_result(struct hostent *ent, const struct addrinfo *res,
-	char *buf, size_t buflen, size_t ncopied)
+static int save_result(const char *name, struct hostent *ent,
+	const struct addrinfo *res, char *buf, size_t buflen, size_t ncopied)
 {
 	const struct addrinfo *ai;
 	size_t len, i;
 
 	if (res->ai_canonname && *res->ai_canonname) {
-		size_t n = strlen(res->ai_canonname) + 1;
-
-		if (n >= buflen) {
-			return 0;
-		}
-		SAFE_STRNCPY(buf, res->ai_canonname, n);
-		ent->h_name = buf;
-		buf += n;
-	} else {
-		ent->h_name = "";
+		name = res->ai_canonname;
 	}
+
+	len = strlen(name) + 1;
+	if (len >= buflen) {
+		return 0;
+	}
+
+	SAFE_STRNCPY(buf, name, len);
+	ent->h_name = buf;
+	buf += len;
 
 	for (ai = res, i = 0; ai != NULL; ai = ai->ai_next) {
 		SOCK_ADDR *sa = (SOCK_ADDR *) ai->ai_addr;
@@ -226,7 +226,8 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 	ent->h_addr_list = (char**) buf;
 	buf += len;
 
-	n = save_result(ent, res, buf, buflen, ncopied);
+	n = save_result(name, ent, res, buf, buflen, ncopied);
+
 	freeaddrinfo(res);
 
 	if (n > 0) {
