@@ -387,7 +387,8 @@ static int udp_request(const char *ip, unsigned short port,
 }
 
 static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
-	unsigned short service_port, struct addrinfo *res, ARGV *cnames)
+	unsigned short service_port, struct addrinfo *res,
+	const struct addrinfo *hints, ARGV *cnames)
 {
 	unsigned short i;
 
@@ -438,8 +439,8 @@ static struct addrinfo * rfc1035_to_addrinfo(const RFC1035_MESSAGE *message,
 #endif
 		}
 
-		ai->ai_socktype = SOCK_DGRAM;
-		ai->ai_protocol = 0;
+		ai->ai_socktype = hints ? hints->ai_socktype : 0;
+		ai->ai_protocol = hints ? hints->ai_protocol : 0;
 		ai->ai_next = res;
 		res = ai;
 	}
@@ -461,7 +462,8 @@ static size_t build_request(const ARGV *names, char *buf, size_t size, int type)
 }
 
 static struct addrinfo *ns_lookup(const char *ip, unsigned short port,
-	const char *data, size_t dlen, unsigned short service_port, int type)
+	const char *data, size_t dlen, unsigned short service_port,
+	const struct addrinfo *hints, int type)
 {
 	const char *req = data;
 	struct addrinfo *res = NULL;
@@ -486,7 +488,8 @@ static struct addrinfo *ns_lookup(const char *ip, unsigned short port,
 		}
 
 		cnames = argv_alloc(1);
-		res = rfc1035_to_addrinfo(message, service_port, res, cnames);
+		res = rfc1035_to_addrinfo(message, service_port, res,
+			hints, cnames);
 		rfc1035_message_destroy(message);
 		if (res) {
 			argv_free(cnames);
@@ -508,7 +511,7 @@ struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 {
 	char buf[1000];
 	size_t size;
-	int type, i;
+	int i, type;
 	unsigned short service_port;
 
 	if (__resolv == NULL || __resolv->nameservers->argc <= 0) {
@@ -542,7 +545,7 @@ struct addrinfo *resolver_getaddrinfo(const char *name, const char *service,
 	for (i = 0; i < __resolv->nameservers->argc; i++) {
 		const char *ip = __resolv->nameservers->argv[i];
 		struct addrinfo *res = ns_lookup(ip, 53, buf, size,
-			service_port, type);
+			service_port, hints, type);
 		if (res != NULL) {
 			return res;
 		}
@@ -558,8 +561,10 @@ struct addrinfo *resolver_addrinfo_alloc(const struct sockaddr *sa)
 
 	if (sa->sa_family == AF_INET) {
 		addrlen = (socklen_t) sizeof(struct sockaddr_in);
+#ifdef	AF_INET6
 	} else if (sa->sa_family == AF_INET6) {
 		addrlen = (socklen_t) sizeof(struct sockaddr_in6);
+#endif
 	} else {
 		return NULL;
 	}

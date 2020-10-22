@@ -26,8 +26,11 @@ static void dns_lookup_callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
 		info = (const ACL_HOST_INFO*) iter.data;
 		const char *name = "unknown";
 		switch (info->type) {
-		case ACL_HOSTNAME_TYPE_IPADDR:
-			name = "ipaddr";
+		case ACL_HOSTNAME_TYPE_IPV4:
+			name = "ipv4";
+			break;
+		case ACL_HOSTNAME_TYPE_IPV6:
+			name = "ipv6";
 			break;
 		case ACL_HOSTNAME_TYPE_CNAME:
 			name = "cname";

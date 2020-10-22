@@ -86,8 +86,8 @@ static struct addrinfo *get_addrinfo(const char *name)
 
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family   = PF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_protocol = IPPROTO_UDP;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
 
 	if (getaddrinfo(name, NULL, &hints, &res) != 0) {
 		msg_error("%s(%d): getaddrinfo error", __FUNCTION__, __LINE__);
@@ -133,10 +133,12 @@ static int save_result(const char *name, struct hostent *ent,
 			len = sizeof(struct in_addr);
 			memcpy((void *) buf, &sa->in.sin_addr, len);
 			ent->h_length = 4;
+#ifdef	AF_INET6
 		} else if (ai->ai_family == AF_INET6) {
 			len = sizeof(struct in6_addr);
 			memcpy((void *) buf, &sa->in6.sin6_addr, len);
 			ent->h_length = 16;
+#endif
 		} else {
 			continue;
 		}

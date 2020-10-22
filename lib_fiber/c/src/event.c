@@ -137,8 +137,10 @@ static int checkfd(EVENT *ev, FILE_EVENT *fe)
 	 * should be a file.
 	 */
 	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1 && errno == ESPIPE) {
+		acl_fiber_set_error(0);
 		return 0;
 	} else {
+		acl_fiber_set_error(0);
 		return -1;
 	}
 #endif

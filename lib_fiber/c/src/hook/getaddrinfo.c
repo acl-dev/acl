@@ -159,14 +159,13 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 	if (hints == NULL) {
 		memset(&hints_tmp, 0, sizeof(hints_tmp));
 		hints_tmp.ai_family   = PF_UNSPEC;
-		hints_tmp.ai_socktype = 0;
+		hints_tmp.ai_socktype = SOCK_STREAM;  /* use TCP as default */
 #ifdef	__APPLE__
 		hints_tmp.ai_flags    = AI_DEFAULT;
 #elif	defined(ANDROID)
 		hints_tmp.ai_flags    = AI_ADDRCONFIG;
 #elif	defined(SYS_WIN)
-		hints_tmp.ai_protocol = type == SOCK_DGRAM
-			? IPPROTO_UDP : IPPROTO_TCP;
+		hints_tmp.ai_protocol = IPPROTO_TCP;
 # if _MSC_VER >= 1500
 		hints_tmp.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 # endif
