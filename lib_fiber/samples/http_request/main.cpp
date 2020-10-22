@@ -77,15 +77,17 @@ private:
 				return false;
 			}
 			buf[ret] = 0;
+			n += ret;
+
 			if (__count > 10) {
 				continue;
 			}
 
-			n += ret;
 			if (__show) {
 				printf(">>>%s<<<\r\n", buf);
 			}
 		}
+
 		printf(">>>response body=%d\r\n", n);
 		return n > 0 ? true : false;
 	}
@@ -144,6 +146,8 @@ int main(int argc, char *argv[])
 	if (run_alone) {
 		fiber_http* http= new fiber_http(addr, url);
 		http->start_alone();
+		printf("run alone over\r\n");
+		return 0;
 	}
 
 	//gettimeofday(&__begin, NULL);
