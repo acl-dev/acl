@@ -49,7 +49,7 @@ endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof
-	SYSLIB +=  -rdynamic
+	SYSLIB += -liconv -rdynamic
 	UNIXTYPE = MACOSX
 	RPATH = macos
 endif
