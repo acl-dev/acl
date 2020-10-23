@@ -154,12 +154,19 @@ ACL_API  int acl_rfc1035_query_compare(const ACL_RFC1035_QUERY *a,
  * here, and should be freed by calling RFC1035RRDestroy().
  * @param buf {const char*} the data of the DNS reply
  * @param sz {size_t} the buf's size
- * @param answer {ACL_RFC1035_MESSAGE*} store the parsing result
- * @return {int} Returns number of records unpacked, zero if DNS reply
- * 	indicates zero answers, or an error number < 0.
+ * @return {ACL_RFC1035_MESSAGE*} return the parsing result
  */
-ACL_API int acl_rfc1035_message_unpack(const char *buf, size_t sz,
-		ACL_RFC1035_MESSAGE **answer);
+ACL_API ACL_RFC1035_MESSAGE *acl_rfc1035_response_unpack(const char *buf, size_t sz);
+
+/**
+ * Takes the contents of a DNS request and fills in an array
+ * of resource record structures.  The records array is allocated
+ * here, and should be freed by calling RFC1035RRDestroy().
+ * @param buf {const char*} the data of the DNS reply
+ * @param sz {size_t} the buf's size
+ * @return {ACL_RFC1035_MESSAGE*} return the parsing result
+ */
+ACL_API ACL_RFC1035_MESSAGE *acl_rfc1035_request_unpack(const char *buf, size_t sz);
 
 /**
  * destroy and free the message created by RFC1035MessageUnpack()

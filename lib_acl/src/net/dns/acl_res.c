@@ -232,17 +232,12 @@ static ACL_DNS_DB *acl_res_lookup_with_type(ACL_RES *res,
 		return NULL;
 	}
 
-	ret = acl_rfc1035_message_unpack(buf, ret, &answers);
-	if (ret < 0) {
-		res->errnum = (int) ret;
-		if (answers) {
-			acl_rfc1035_message_destroy(answers);
-		}
+	answers = acl_rfc1035_response_unpack(buf, ret);
+	if (answers == NULL) {
+		res->errnum = ACL_RES_ERR_NULL;
 		return NULL;
-	} else if (ret == 0) {
-		if (answers) {
-			acl_rfc1035_message_destroy(answers);
-		}
+	} else if (answers->ancount == 0) {
+		acl_rfc1035_message_destroy(answers);
 		res->errnum = ACL_RES_ERR_NULL;
 		return NULL;
 	}

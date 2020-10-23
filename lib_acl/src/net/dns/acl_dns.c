@@ -341,25 +341,15 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 	char *data, int dlen)
 {
 	ACL_DNS *dns = (ACL_DNS*) ctx;
-	ACL_RFC1035_MESSAGE *res = NULL;
-	int  ret;
+	ACL_RFC1035_MESSAGE *res;
 
 	/* 解析DNS响应数据包 */
-	ret = acl_rfc1035_message_unpack(data, dlen, &res);
-	if (ret < 0) {
-		if (res == NULL) {
-			return 0;
-		}
-
-		dns_lookup_error(dns, res);
-		if (res) {
-			acl_rfc1035_message_destroy(res);
-		}
+	res = acl_rfc1035_response_unpack(data, dlen);
+	if (res == NULL) {
 		return 0;
-	} else if (ret == 0) {
-		if (res) {
-			acl_rfc1035_message_destroy(res);
-		}
+	} else if (res->ancount == 0) {
+		dns_lookup_error(dns, res);
+		acl_rfc1035_message_destroy(res);
 		return 0;
 	}
 
