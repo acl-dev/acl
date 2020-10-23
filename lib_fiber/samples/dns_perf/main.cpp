@@ -1,18 +1,21 @@
-#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <vector>
+#include <thread>
+#include "lib_acl.h"
+#include "acl_cpp/lib_acl.hpp"
 #include "fiber/libfiber.h"
+#include "fiber/go_fiber.hpp"
 
 static char   __dns_ip[256];
 static int    __dns_port = 53;
 static int    __nloop = 10;
-static size_t __count = 0;
+static acl::atomic_long __count = 0;
 static int    __unit = 1000;
 
-static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
+static void nslookup(const char* name)
 {
-	const char *name = (const char *)ctx;
 
 	ACL_DNS_DB *res;
 	ACL_ITER iter;
@@ -31,7 +34,7 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 
 		if (++__count % __unit == 0) {
 			char buf[128];
-			snprintf(buf, sizeof(buf), "count=%lu", __count);
+			snprintf(buf, sizeof(buf), "count=%llu", __count.value());
 			acl_meter_time(__FUNCTION__, __LINE__, buf);
 		}
 
@@ -52,10 +55,23 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 	acl_res_free(ns);
 }
 
+static void thread_main(char* domain, int cocurrent)
+{
+	for (int i = 0; i < cocurrent; i++) {
+		go_stack(256000) [=] {
+			nslookup(domain);
+		};
+	}
+
+	acl::fiber::schedule();
+
+}
+
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -N domain\r\n"
+		" -t threads_count\r\n"
 		" -c cocurrent\r\n"
 		" -n loop\r\n"
 		" -u show_unit\r\n"
@@ -66,17 +82,20 @@ static void usage(const char *procname)
 
 int main(int argc, char *argv[])
 {
-	int   ch, i, cocurrent = 1;
+	int   ch, i, cocurrent = 1, nthreads = 1;
 	char  domain[1024];
 
 	domain[0] = 0;
 	__dns_ip[0] = 0;
 
-	while ((ch = getopt(argc, argv, "hn:c:u:N:s:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:t:c:u:N:s:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 't':
+			nthreads = atoi(optarg);
+			break;
 		case 'c':
 			cocurrent = atoi(optarg);
 			break;
@@ -107,13 +126,32 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
+	acl_msg_stdout_enable(1);
 	acl_fiber_msg_stdout_enable(1);
 
-	for (i = 0; i < cocurrent; i++) {
-		acl_fiber_create(nslookup, domain, 320000);
+	struct timeval begin;
+	gettimeofday(&begin, NULL);
+
+	std::vector<std::thread*> threads;
+	for (i = 0; i < nthreads; i++) {
+		std::thread* thread = new std::thread(thread_main,
+			domain, cocurrent);
+		threads.push_back(thread);
 	}
 
-	acl_fiber_schedule();
+	for (std::vector<std::thread*>::iterator it = threads.begin();
+		it != threads.end(); ++it) {
+		(*it)->join();
+		delete *it;
+	}
+
+	struct timeval end;
+	gettimeofday(&end, NULL);
+
+	double cost = acl::stamp_sub(end, begin);
+	double speed = (__count.value() * 1000) / (cost > 0 ? cost : 0.1);
+	printf(">>>total count=%lld, cost=%.2f ms, speed=%.2f\r\n",
+		__count.value(), cost, speed);
 
 	return 0;
 }
