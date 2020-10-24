@@ -479,11 +479,8 @@ static struct addrinfo *ns_lookup(const char *ip, unsigned short port,
 		if (ret == -1) {
 			break;
 		}
-		ret = rfc1035_message_unpack(buf, ret, &message);
-		if (ret <= 0) {
-			if (message) {
-				rfc1035_message_destroy(message);
-			}
+		message = rfc1035_response_unpack(buf, ret);
+		if (message == NULL) {
 			break;
 		}
 

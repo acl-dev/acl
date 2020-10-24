@@ -5,11 +5,11 @@
 extern "C" {
 #endif
 
-#include "common/argv.h"
-
 #ifdef	ACL_UNIX
 #include <netinet/in.h>
 #endif
+
+struct ARGV;
 
 /* RFC1035 - DNS */
 #define RFC1035_MAXHOSTNAMESZ 256
@@ -151,16 +151,24 @@ void rfc1035_set_query_id(char *buf, size_t sz, unsigned short qid);
 int rfc1035_query_compare(const RFC1035_QUERY *a, const RFC1035_QUERY *b);
 
 /**
- * Takes the contents of a DNS reply and fills in an array
+ * Takes the contents of a DNS request and fills in an array
  * of resource record structures.  The records array is allocated
- * here, and should be freed by calling RFC1035RRDestroy().
+ * here, and should be freed by calling rfc1035_messager_destroy().
  * @param buf {const char*} the data of the DNS reply
  * @param sz {size_t} the buf's size
- * @param answer {RFC1035_MESSAGE*} store the parsing result
- * @return {int} Returns number of records unpacked, zero if DNS reply
- * 	indicates zero answers, or an error number < 0.
+ * @return {RFC1035_MESSAGE*} return the parsing result
  */
-int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer);
+RFC1035_MESSAGE *rfc1035_request_unpack(const char *buf, size_t sz);
+
+/**
+ * Takes the contents of a DNS reply and fills in an array
+ * of resource record structures.  The records array is allocated
+ * here, and should be freed by calling rfc1035_messager_destroy().
+ * @param buf {const char*} the data of the DNS reply
+ * @param sz {size_t} the buf's size
+ * @return {RFC1035_MESSAGE*} return the parsing result
+ */
+RFC1035_MESSAGE *rfc1035_response_unpack(const char *buf, size_t sz);
 
 /**
  * destroy and free the message created by RFC1035MessageUnpack()

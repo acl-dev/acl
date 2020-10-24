@@ -10,10 +10,11 @@
 
 #include "common/strops.h"
 #include "common/msg.h"
+#include "common/argv.h"
 #include "rfc1035.h"
 
 #define RFC1035_MAXLABELSZ	63
-#define RFC1035_unpack_error	15
+#define RFC1035_UNPACK_ERROR	15
 
 #if 0
 #define RFC1035_UNPACK_DEBUG  msg_error("unpack error at %s:%d", __FILE__,__LINE__)
@@ -195,13 +196,13 @@ static int rfc1035_name_unpack(const char *buf, size_t sz, size_t *off,
 
 	if (ns <= 0) {
 		msg_error("%s: ns(%d) <= 0", myname, (int) ns);
-		return -RFC1035_unpack_error;
+		return -RFC1035_UNPACK_ERROR;
 	}
 	do {
 		if (*off >= sz) {
 			msg_error("%s: *off(%d) >= sz(%d)",
 				myname, (int) *off, (int) sz);
-			return -RFC1035_unpack_error;
+			return -RFC1035_UNPACK_ERROR;
 		}
 		c = *(buf + (*off));
 		if (c > 191) {
@@ -260,7 +261,7 @@ static int rfc1035_name_unpack(const char *buf, size_t sz, size_t *off,
 	/* make sure we didn't allow someone to overflow the name buffer */
 	if (no > (int) ns) {
 		msg_error("%s: no(%d) > ns(%d)", myname, no, (int) ns);
-		return -RFC1035_unpack_error;
+		return -RFC1035_UNPACK_ERROR;
 	}
 	return 0;
 }
@@ -282,7 +283,7 @@ const char *rfc1035_strerror(int errnum)
 				"not support the requested kind of query." },
 		{ 5, "Refused: The name server refuses to "
 				"perform the specified operation." },
-		{ RFC1035_unpack_error, "The DNS reply message is corrupt or could "
+		{ RFC1035_UNPACK_ERROR, "The DNS reply message is corrupt or could "
 			"not be safely parsed." },
 		{ -1, NULL },
 	};
@@ -345,48 +346,48 @@ int rfc1035_query_compare(const RFC1035_QUERY * a, const RFC1035_QUERY * b)
  *
  * Returns > 0 (success) or 0 (error)
  */
-static int rfc1035_rr_pack(const RFC1035_RR *RR, char *buf, size_t sz)
+static int rfc1035_rr_pack(const RFC1035_RR *rr, char *buf, size_t sz)
 {
 	const char *myname = "rfc1035_rr_pack";
 	unsigned short s;
 	unsigned int i;
 	int off = 0, off_saved;
 
-	off = rfc1035_name_pack(buf + off, sz, RR->name);
-	s = htons(RR->type);
+	off = rfc1035_name_pack(buf + off, sz, rr->name);
+	s = htons(rr->type);
 	memcpy(buf + off, &s,sizeof(s));
 	off += sizeof(s);
 
-	s = htons(RR->tclass);
+	s = htons(rr->tclass);
 	memcpy(buf + off, &s ,sizeof(s));
 	off += sizeof(s);
     
-	i = htonl(RR->ttl);
+	i = htonl(rr->ttl);
 	memcpy(buf + off, &i ,sizeof(i));
 	off += sizeof(i);
 
-	switch (RR->type) {
+	switch (rr->type) {
 	case RFC1035_TYPE_PTR:
 	case RFC1035_TYPE_NS:
 	case RFC1035_TYPE_CNAME:
 	case RFC1035_TYPE_TXT:
-		if (strlen(RR->rdata) > RFC1035_MAXHOSTNAMESZ) {
+		if (strlen(rr->rdata) > RFC1035_MAXHOSTNAMESZ) {
 			return 0;
 		}
 
 		off_saved = off;
 		off += sizeof(s);
-		off += rfc1035_name_pack(buf + off, sz, RR->rdata);
+		off += rfc1035_name_pack(buf + off, sz, rr->rdata);
 		s = off - off_saved - (unsigned short) sizeof(s);
 		s = htons(s);
 		memcpy(buf + off_saved, &s ,sizeof(s));
 		break;
 	default:
-		s = htons(RR->rdlength);
+		s = htons(rr->rdlength);
 		memcpy(buf + off, &s ,sizeof(s));
 		off += sizeof(s);
-		memcpy(buf + off, RR->rdata, RR->rdlength);
-		off += RR->rdlength;
+		memcpy(buf + off, rr->rdata, rr->rdlength);
+		off += rr->rdlength;
 		break;
 	}
 
@@ -529,7 +530,7 @@ static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
 
 	if (*off != 0) {
 		msg_error("%s: *off(%d) != 0", myname, (int) *off);
-		return -RFC1035_unpack_error;
+		return -RFC1035_UNPACK_ERROR;
 	}
 
 	/*
@@ -579,7 +580,7 @@ static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
 
 	if (*off != 12) {
 		msg_error("%s: *off(%d) != 12", myname, (int) *off);
-		return -RFC1035_unpack_error;
+		return -RFC1035_UNPACK_ERROR;
 	}
 	return 0;
 }
@@ -724,7 +725,7 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	if (*off > sz) {
 		msg_error("%s: *off(%d) > sz(%d)",
 			myname, (int) *off, (int) sz);
-		return -RFC1035_unpack_error;
+		return -RFC1035_UNPACK_ERROR;
 	}
 
 	return 0;
@@ -764,45 +765,40 @@ static RFC1035_RR *rfc1035_unpack2rr(const char *buf, size_t sz,
 	return rr;
 }
 
-int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
+RFC1035_MESSAGE *rfc1035_response_unpack(const char *buf, size_t sz)
 {
 	int i, nr;
 	size_t off = 0;
 	RFC1035_MESSAGE *msg;
 
 	errno = 0;
-	*answer = NULL;
 	msg = (RFC1035_MESSAGE*) calloc(1, sizeof(*msg));
 
 	if (rfc1035_header_unpack(buf + off, sz - off, &off, msg)) {
 		RFC1035_UNPACK_DEBUG;
-		rfc1035_set_errno(RFC1035_unpack_error);
+		rfc1035_set_errno(RFC1035_UNPACK_ERROR);
 		rfc1035_message_destroy(msg);
-		*answer = NULL;
-		return -RFC1035_unpack_error;
+		return NULL;
 	}
 
 	if (msg->rcode) {
-		int ret = -((int) msg->rcode);
 		RFC1035_UNPACK_DEBUG;
 		rfc1035_set_errno((int) msg->rcode);
 		rfc1035_message_destroy(msg);
-		*answer = NULL;
-		return ret;
+		return NULL;
 	}
 
 	if (msg->ancount == 0) {
 		rfc1035_message_destroy(msg);
-		*answer = NULL;
-		return 0;
+		return NULL;
 	}
 
 	if (msg->qdcount != 1) {
 		/* This can not be an answer to our queries.. */
 		RFC1035_UNPACK_DEBUG;
-		rfc1035_set_errno(RFC1035_unpack_error);
+		rfc1035_set_errno(RFC1035_UNPACK_ERROR);
 		rfc1035_message_destroy(msg);
-		return -RFC1035_unpack_error;
+		return NULL;
 	}
 
 	msg->query = (RFC1035_QUERY*) calloc((int) msg->qdcount,
@@ -811,9 +807,9 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 	for (i = 0; i < (int) msg->qdcount; i++) {
 		if (rfc1035_query_unpack(buf, sz, &off, &msg->query[i])) {
 			RFC1035_UNPACK_DEBUG;
-			rfc1035_set_errno(RFC1035_unpack_error);
+			rfc1035_set_errno(RFC1035_UNPACK_ERROR);
 			rfc1035_message_destroy(msg);
-			return -RFC1035_unpack_error;
+			return NULL;
 		}
 	}
 
@@ -826,11 +822,9 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 		 */
 		RFC1035_UNPACK_DEBUG;
 		rfc1035_message_destroy(msg);
-		*answer = NULL;
-		rfc1035_set_errno(RFC1035_unpack_error);
-		return -RFC1035_unpack_error;
+		rfc1035_set_errno(RFC1035_UNPACK_ERROR);
+		return NULL;
 	}
-
 
 	if (msg->nscount > 0) {
 		msg->authority = rfc1035_unpack2rr(buf, sz, &off,
@@ -839,9 +833,8 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 		if (msg->authority == NULL) {
 			RFC1035_UNPACK_DEBUG;
 			rfc1035_message_destroy(msg);
-			*answer = NULL;
-			rfc1035_set_errno(RFC1035_unpack_error);
-			return -RFC1035_unpack_error;
+			rfc1035_set_errno(RFC1035_UNPACK_ERROR);
+			return NULL;
 		}
 	}
 
@@ -852,14 +845,57 @@ int rfc1035_message_unpack(const char *buf, size_t sz, RFC1035_MESSAGE **answer)
 		if (msg->additional == NULL) {
 			RFC1035_UNPACK_DEBUG;
 			rfc1035_message_destroy(msg);
-			*answer = NULL;
-			rfc1035_set_errno(RFC1035_unpack_error);
-			return -RFC1035_unpack_error;
+			rfc1035_set_errno(RFC1035_UNPACK_ERROR);
+			return NULL;
 		}
 	}
 
-	*answer = msg;
-	return (int) msg->ancount;
+	return msg;
+}
+
+RFC1035_MESSAGE *rfc1035_request_unpack(const char *buf, size_t sz)
+{
+	int i;
+	size_t off = 0;
+	RFC1035_MESSAGE *msg;
+
+	errno = 0;
+	msg = (RFC1035_MESSAGE*) calloc(1, sizeof(*msg));
+
+	if (rfc1035_header_unpack(buf + off, sz - off, &off, msg)) {
+		RFC1035_UNPACK_DEBUG;
+		rfc1035_set_errno(RFC1035_UNPACK_ERROR);
+		rfc1035_message_destroy(msg);
+		return NULL;
+	}
+
+	if (msg->rcode) {
+		RFC1035_UNPACK_DEBUG;
+		rfc1035_set_errno((int) msg->rcode);
+		rfc1035_message_destroy(msg);
+		return NULL;
+	}
+
+	if (msg->qdcount != 1) {
+		/* This can not be an answer to our queries.. */
+		RFC1035_UNPACK_DEBUG;
+		rfc1035_set_errno(RFC1035_UNPACK_ERROR);
+		rfc1035_message_destroy(msg);
+		return NULL;
+	}
+
+	msg->query = (RFC1035_QUERY*) calloc((int) msg->qdcount,
+			sizeof(RFC1035_QUERY));
+
+	for (i = 0; i < (int) msg->qdcount; i++) {
+		if (rfc1035_query_unpack(buf, sz, &off, &msg->query[i])) {
+			RFC1035_UNPACK_DEBUG;
+			rfc1035_set_errno(RFC1035_UNPACK_ERROR);
+			rfc1035_message_destroy(msg);
+		}
+	}
+
+	return msg;
 }
 
 /****************************************************************************/
@@ -1004,12 +1040,19 @@ static size_t save_addr2rr(int type, const char *src, RFC1035_RR *rr)
 	}
 }
 
+#define SAFE_FREE(x) do { if ((x)) free ((x)); } while(0)
+
 size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 {
 	RFC1035_MESSAGE h;
 	RFC1035_RR rr;
 	size_t offset = 0;
 	int   i;
+
+	if (reply->ips == NULL || reply->ips->argc <= 0) {
+		msg_error("ips null");
+		return 0;
+	}
 
 	memset(&h, '\0', sizeof(h));
 	h.id = reply->qid;
@@ -1031,11 +1074,7 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 
 	for (i = 0; i < reply->ips->argc; i++) {
 		memset(&rr, 0, sizeof(rr));
-#ifdef SYS_WIN
-		_snprintf(rr.name, sizeof(rr.name), "%s", reply->hostname);
-#else
-		snprintf(rr.name, sizeof(rr.name), "%s", reply->hostname);
-#endif
+		SAFE_STRNCPY(rr.name, reply->hostname, sizeof(rr.name));
 		rr.type = reply->ip_type;
 		rr.tclass = htons(RFC1035_CLASS_IN);
 		rr.ttl = reply->ttl;
@@ -1047,16 +1086,12 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 		}
 
 		offset += rfc1035_rr_pack(&rr, buf + offset, sz - offset);
-		free(rr.rdata);
+		SAFE_FREE(rr.rdata);
 	}
 
 	if (h.nscount) {
 		memset(&rr, 0, sizeof(rr));
-#ifdef SYS_WIN
-		_snprintf(rr.name, sizeof(rr.name), "%s", reply->domain_root);
-#else
-		snprintf(rr.name, sizeof(rr.name), "%s", reply->domain_root);
-#endif
+		SAFE_STRNCPY(rr.name, reply->domain_root, sizeof(rr.name));
 		rr.type = RFC1035_TYPE_NS;
 		rr.tclass = RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
@@ -1067,16 +1102,12 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 		rr.rdata = strdup(reply->dns_name);
 #endif
 		offset += rfc1035_rr_pack(&rr, buf + offset, sz - offset);
-		free(rr.rdata);
+		SAFE_FREE(rr.rdata);
 	}
 
 	if (h.arcount) {
 		memset(&rr, 0, sizeof(rr));
-#ifdef SYS_WIN
-		_snprintf(rr.name, sizeof(rr.name), "%s", reply->dns_name);
-#else
-		snprintf(rr.name, sizeof(rr.name), "%s", reply->dns_name);
-#endif
+		SAFE_STRNCPY(rr.name, reply->dns_name, sizeof(rr.name));
 		rr.type = reply->ip_type;
 		rr.tclass = RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
@@ -1088,7 +1119,7 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 		}
 
 		offset += rfc1035_rr_pack(&rr, buf + offset, sz - offset);
-		free(rr.rdata);
+		SAFE_FREE(rr.rdata);
 	}
 
 	return offset;

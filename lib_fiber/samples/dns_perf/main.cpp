@@ -5,7 +5,6 @@
 #include <thread>
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
-#include "fiber/libfiber.h"
 #include "fiber/go_fiber.hpp"
 
 static char   __dns_ip[256];
@@ -127,7 +126,7 @@ int main(int argc, char *argv[])
 	}
 
 	acl_msg_stdout_enable(1);
-	acl_fiber_msg_stdout_enable(1);
+	acl::fiber::stdout_open(true);
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);

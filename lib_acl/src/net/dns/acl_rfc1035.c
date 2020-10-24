@@ -898,7 +898,6 @@ ACL_RFC1035_MESSAGE *acl_rfc1035_request_unpack(const char *buf, size_t sz)
 	}
 
 	return msg;
-
 }
 
 /****************************************************************************/
@@ -1075,7 +1074,7 @@ size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t
 
 	for (i = 0; i < reply->ips->argc; i++) {
 		memset(&rr, 0, sizeof(rr));
-		snprintf(rr.name, sizeof(rr.name), "%s", reply->hostname);
+		ACL_SAFE_STRNCPY(rr.name, reply->hostname, sizeof(rr.name));
 		rr.type = reply->ip_type;
 		rr.tclass = ACL_RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
@@ -1092,7 +1091,7 @@ size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t
 
 	if (h.nscount) {
 		memset(&rr, 0, sizeof(rr));
-		snprintf(rr.name, sizeof(rr.name), "%s", reply->domain_root);
+		ACL_SAFE_STRNCPY(rr.name, reply->domain_root, sizeof(rr.name));
 		rr.type = ACL_RFC1035_TYPE_NS;
 		rr.tclass = ACL_RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
@@ -1104,7 +1103,7 @@ size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t
 
 	if (h.arcount) {
 		memset(&rr, 0, sizeof(rr));
-		snprintf(rr.name, sizeof(rr.name), "%s", reply->dns_name);
+		ACL_SAFE_STRNCPY(rr.name, reply->dns_name, sizeof(rr.name));
 		rr.type = reply->ip_type;
 		rr.tclass = ACL_RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
