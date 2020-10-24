@@ -1076,7 +1076,7 @@ size_t rfc1035_build_reply(const RFC1035_REPLY *reply, char *buf, size_t sz)
 		memset(&rr, 0, sizeof(rr));
 		SAFE_STRNCPY(rr.name, reply->hostname, sizeof(rr.name));
 		rr.type = reply->ip_type;
-		rr.tclass = htons(RFC1035_CLASS_IN);
+		rr.tclass = RFC1035_CLASS_IN;
 		rr.ttl = reply->ttl;
 
 		if (!save_addr2rr(reply->ip_type, reply->ips->argv[i], &rr)) {

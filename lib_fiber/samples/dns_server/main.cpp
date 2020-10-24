@@ -51,9 +51,17 @@ static size_t build_reply(const RFC1035_MESSAGE* request, char* buf, size_t size
 
 	RFC1035_REPLY reply;
 	reply.hostname = request->query->name;
+
+#if 1
+	reply.domain_root = "test.com";
+	reply.dns_name = "ipv6-static.dns.test.com";
+	reply.dns_ip = "127.0.0.1";
+#else
 	reply.domain_root = NULL;
 	reply.dns_name = NULL;
 	reply.dns_ip = NULL;
+#endif
+
 	reply.ips = ips;
 
 	reply.ip_type = RFC1035_TYPE_A;
