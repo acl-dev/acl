@@ -1,4 +1,4 @@
-%define release_id 9
+%define release_id 10
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -45,6 +45,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Oct 28 2020 shuxin.zheng@qq.com 3.5.1-10-20201028.16
+- fixed bugs and optimize operation in acl::string
 
 * Tue Oct 27 2020 shuxin.zheng@qq.com 3.5.1-9-20201027.15
 - rewrite rfc1035 protocol for DNS module.

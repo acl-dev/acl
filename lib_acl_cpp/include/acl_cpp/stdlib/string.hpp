@@ -1279,10 +1279,11 @@ public:
 	 * s1 = s2 + v;
 	 */
 	template<typename T>
-	string& operator+(T v)
+	string operator+(T v)
 	{
-		*this += v;
-		return *this;
+		string s(*this);
+		s += v;
+		return s;
 	}
 
 private:
