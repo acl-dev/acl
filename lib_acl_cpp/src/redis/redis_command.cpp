@@ -789,7 +789,8 @@ int redis_command::get_strings(std::vector<const char*>& names,
 const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	int& cursor, size_t& size, const char* pattern, const size_t* count)
 {
-	return scan_keys(cmd, key, strlen(key), cursor, size, pattern, count);
+	size_t klen = key ? strlen(key) : 0;
+	return scan_keys(cmd, key, klen, cursor, size, pattern, count);
 }
 
 const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
