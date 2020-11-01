@@ -8,23 +8,31 @@ static char  __dns_ip[256];
 static int   __dns_port = 53;
 static int   __count = 0;
 
-static void getip(struct addrinfo *res, char *ip, size_t size)
+static int getip(const struct addrinfo *res, char *ip, size_t size)
 {
+	const void *addr;
+
 	ip[0] = 0;
 
 	if (res->ai_family == AF_INET) {
-		struct sockaddr_in *in = (struct sockaddr_in *) res->ai_addr;
-		if (!inet_ntop(res->ai_family, &in->sin_addr.s_addr,
-			ip, size))
-		{
-			printf(">>>inet_ntop for ipv4 error\r\n");
-		}
+		const struct sockaddr_in *in =
+			(const struct sockaddr_in *) res->ai_addr;
+		addr = (const void *) &in->sin_addr;
 	} else if (res->ai_family == AF_INET6) {
-		struct sockaddr_in6 *in6 = (struct sockaddr_in6 *) res->ai_addr;
-		if (!inet_ntop(res->ai_family, &in6->sin6_addr, ip, size)) {
-			printf(">>>inet_ntop for ipv6 error\r\n");
-		}
+		const struct sockaddr_in6 *in6 =
+			(const struct sockaddr_in6 *) res->ai_addr;
+		addr = (const void *) &in6->sin6_addr;
+	} else {
+		printf("invalid ai_family=%d\r\n", res->ai_family);
+		return -1;
 	}
+
+	if (!inet_ntop(res->ai_family, addr, ip, size)) {
+		printf(">>>inet_ntop for ipv4 error\r\n");
+		return -1;
+	}
+
+	return 0;
 }
 
 static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
@@ -47,7 +55,9 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 		struct addrinfo *res;
 		for (res = res0; res; res = res->ai_next) {
 			char ip[64];
-			getip(res, ip, sizeof(ip));
+			if (getip(res, ip, sizeof(ip)) == -1) {
+				continue;
+			}
 
 			printf(">>> result: host: %s, ai_family: %d, ip: %s\r\n",
 				addr, res->ai_family, ip);
@@ -60,7 +70,6 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	if (__count == 0) {
 		printf("OVER NOW!\r\n");
-		//acl_fiber_schedule_stop();
 	}
 }
 
