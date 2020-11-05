@@ -4,7 +4,7 @@
 # ifndef ACL_CPP_API
 #  define ACL_CPP_API
 # endif
-#elif defined(ACL_CPP_DLL) || defined(_WINDLL)
+#elif defined(ACL_CPP_DLL) // || defined(_WINDLL)
 # if defined(ACL_CPP_EXPORTS) || defined(acl_cpp_EXPORTS)
 #  ifndef ACL_CPP_API
 #   define ACL_CPP_API __declspec(dllexport)

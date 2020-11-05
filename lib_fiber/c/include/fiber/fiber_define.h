@@ -82,7 +82,7 @@ typedef int socket_t;
 # ifndef FIBER_API
 #  define FIBER_API
 # endif
-#elif defined(FIBER_DLL) || defined(_WINDLL)
+#elif defined(FIBER_DLL) // || defined(_WINDLL)
 # if defined(FIBER_EXPORTS) || defined(fiber_EXPORTS)
 #  ifndef FIBER_API
 #   define FIBER_API __declspec(dllexport)
