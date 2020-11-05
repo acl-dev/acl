@@ -77,8 +77,8 @@ class string;
 class ACL_CPP_API zlib_stream : public pipe_stream
 {
 public:
-	zlib_stream();
-	~zlib_stream();
+	zlib_stream(void);
+	~zlib_stream(void);
 
 	/**
 	 * 非流式压缩
@@ -164,7 +164,7 @@ public:
 	 * 重置压缩器状态，一般只有当压缩过程出错时才会调用本函数
 	 * @return {bool} 是否成功
 	 */
-	bool zip_reset();
+	bool zip_reset(void);
 
 	/**
 	 * 在压缩过程中可使用此函数计算数据的 crc32 校验值
@@ -222,13 +222,13 @@ public:
 	 * 重置解压缩器状态，一般只有当解压缩过程出错时才会调用本函数
 	 * @return {bool} 是否成功
 	 */
-	bool unzip_reset();
+	bool unzip_reset(void);
 
 	/**
 	 * 获得当前的 zstream 对象
 	 * @return {z_stream*}
 	 */
-	z_stream* get_zstream() const
+	z_stream* get_zstream(void) const
 	{
 		return zstream_;
 	}
@@ -242,7 +242,17 @@ public:
 	 * 当设置了动态库的动态加载全路径时，可以通过本函数获得动态库加载全路径
 	 * @return {const char*} 当未设置时则返回 NULL
 	 */
-	static const char* get_loadpath();
+	static const char* get_loadpath(void);
+
+	/**
+	 * 手动调用动态加载 zlib 库方法，如果为静态链接，则无需调用本方法，
+	 * 此外，如果 zlib 动态库不在程序运行目录下时，需要先调用上面的
+	 * set_loadpath() 方法设置 zlib 动态库的全路径；
+	 * 该方法内部通过 pthread_once() 保证互斥调用，所以即使同时被多个
+	 * 线程调用也是安全的
+	 * @return {bool} 加载是否成功
+	 */
+	static bool zlib_load_once(void);
 
 	///////////////////////////////////////////////////////////////
 
@@ -255,7 +265,7 @@ public:
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear();
+	virtual void clear(void);
 
 private:
 	z_stream* zstream_;

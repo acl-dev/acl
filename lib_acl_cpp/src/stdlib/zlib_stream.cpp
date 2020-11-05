@@ -61,11 +61,95 @@ static void __zlib_dll_unload(void)
 }
 #endif
 
+// 加载 zlib 动态库中的函数符号
+static bool __zlib_dll_load_symbols(void)
+{
+	if (__zlib_dll == NULL) {
+		logger_error("__zlib_dll null, zlib hasn't been loaded");
+		return false;
+	}
+
+	const char* path = __zlib_path.c_str();
+
+	//__deflateInit = (deflateInit_fn) acl_dlsym(__zlib_dll, "deflateInit_");
+	//if (__deflateInit == NULL) {
+	//	logger_fatal("load deflateInit from %s error: %s",
+	//		path, acl_dlerror());
+	//	return false;
+	//}
+
+	__deflateInit2 = (deflateInit2_fn) acl_dlsym(__zlib_dll, "deflateInit2_");
+	if (__deflateInit2 == NULL) {
+		logger_error("load deflateInit from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__deflate = (deflate_fn) acl_dlsym(__zlib_dll, "deflate");
+	if (__deflate == NULL) {
+		logger_error("load deflate from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__deflateReset = (deflateReset_fn) acl_dlsym(__zlib_dll, "deflateReset");
+	if (__deflateReset == NULL) {
+		logger_error("load deflateReset from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__deflateEnd = (deflateEnd_fn) acl_dlsym(__zlib_dll, "deflateEnd");
+	if (__deflateEnd == NULL) {
+		logger_error("load deflateEnd from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__inflateInit2 = (inflateInit2_fn) acl_dlsym(__zlib_dll, "inflateInit2_");
+	if (__inflateInit2 == NULL) {
+		logger_error("load inflateInit from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__inflate = (inflate_fn) acl_dlsym(__zlib_dll, "inflate");
+	if (__inflate == NULL) {
+		logger_error("load inflate from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__inflateReset = (inflateReset_fn) acl_dlsym(__zlib_dll, "inflateReset");
+	if (__inflateReset == NULL) {
+		logger_error("load inflateReset from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__inflateEnd = (inflateEnd_fn) acl_dlsym(__zlib_dll, "inflateEnd");
+	if (__inflateEnd == NULL) {
+		logger_error("load inflateEnd from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	__crc32 = (crc32_fn) acl_dlsym(__zlib_dll, "crc32");
+	if (__crc32 == NULL) {
+		logger_error("load __crc32 from %s error: %s",
+			path, acl_dlerror());
+		return false;
+	}
+
+	return true;
+}
+
 // 动态加载 zlib.dll 库
 static void __zlib_dll_load(void)
 {
 	if (__zlib_dll != NULL) {
-		logger_fatal("__zlib_dll not null");
+		logger_warn("__zlib_dll not null, zlib has been loaded");
+		return;
 	}
 
 	const char* path;
@@ -81,71 +165,18 @@ static void __zlib_dll_load(void)
 	}
 
 	__zlib_dll = acl_dlopen(path);
-
 	if (__zlib_dll == NULL) {
-		logger_fatal("load %s error: %s", path, acl_dlerror());
+		logger_error("load %s error: %s", path, acl_dlerror());
+		return;
 	}
 
 	// 记录动态库路径，以便于在动态库卸载时输出库路径名
 	__zlib_path = path;
 
-	//__deflateInit = (deflateInit_fn) acl_dlsym(__zlib_dll, "deflateInit_");
-	//if (__deflateInit == NULL)
-	//	logger_fatal("load deflateInit from %s error: %s",
-	//		path, acl_dlerror());
-
-	__deflateInit2 = (deflateInit2_fn) acl_dlsym(__zlib_dll, "deflateInit2_");
-	if (__deflateInit2 == NULL) {
-		logger_fatal("load deflateInit from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__deflate = (deflate_fn) acl_dlsym(__zlib_dll, "deflate");
-	if (__deflate == NULL) {
-		logger_fatal("load deflate from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__deflateReset = (deflateReset_fn) acl_dlsym(__zlib_dll, "deflateReset");
-	if (__deflateReset == NULL) {
-		logger_fatal("load deflateReset from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__deflateEnd = (deflateEnd_fn) acl_dlsym(__zlib_dll, "deflateEnd");
-	if (__deflateEnd == NULL) {
-		logger_fatal("load deflateEnd from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__inflateInit2 = (inflateInit2_fn) acl_dlsym(__zlib_dll, "inflateInit2_");
-	if (__inflateInit2 == NULL) {
-		logger_fatal("load inflateInit from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__inflate = (inflate_fn) acl_dlsym(__zlib_dll, "inflate");
-	if (__inflate == NULL) {
-		logger_fatal("load inflate from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__inflateReset = (inflateReset_fn) acl_dlsym(__zlib_dll, "inflateReset");
-	if (__inflateReset == NULL) {
-		logger_fatal("load inflateReset from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__inflateEnd = (inflateEnd_fn) acl_dlsym(__zlib_dll, "inflateEnd");
-	if (__inflateEnd == NULL) {
-		logger_fatal("load inflateEnd from %s error: %s",
-			path, acl_dlerror());
-	}
-
-	__crc32 = (crc32_fn) acl_dlsym(__zlib_dll, "crc32");
-	if (__crc32 == NULL) {
-		logger_fatal("load __crc32 from %s error: %s",
-			path, acl_dlerror());
+	if (!__zlib_dll_load_symbols()) {
+		logger_error("load zlib functions symbols error");
+		__zlib_dll_unload();
+		return;
 	}
 
 	logger("%s loaded", path);
@@ -195,6 +226,24 @@ const char* zlib_stream::get_loadpath(void)
 	return __loadpath.empty() ? NULL : __loadpath.c_str();
 }
 
+bool zlib_stream::zlib_load_once(void)
+{
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	// 当需要加载 zlib 动态库时，需要保证加载过程的唯一性
+	acl_pthread_once(&__zlib_once, __zlib_dll_load);
+	if (__zlib_dll != NULL) {
+		return true;
+	}
+	return false;
+# else
+	return true;  // 对于静态库，则直接返回成功即可
+# endif
+	logger_warn("zlib not support!");
+	return false;
+#endif
+}
+
 zlib_stream::zlib_stream(void)
 {
 	finished_        = false;
@@ -208,7 +257,7 @@ zlib_stream::zlib_stream(void)
 
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
-	acl_pthread_once(&__zlib_once, __zlib_dll_load);
+	zlib_load_once();
 # endif
 #endif
 }
@@ -255,6 +304,11 @@ bool zlib_stream::zlib_uncompress(const char* in, int len, string* out,
 bool zlib_stream::update(int (*func)(z_stream*, int),
 	zlib_flush_t flag, const char* in, int len, string* out)
 {
+	if (func == NULL) {
+		logger_warn("func null, zlib maybe not loaded yet");
+		return false;
+	}
+
 	if (finished_) {
 		return true;
 	}
@@ -338,6 +392,11 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 	zlib_flush_t flag, string* out)
 {
+	if (func == NULL) {
+		logger_warn("func null, zlib maybe not loaded yet");
+		return false;
+	}
+
 	if (finished_) {
 		return true;
 	}
@@ -415,6 +474,15 @@ bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */,
 	int wbits /* = zlib_wbits_15 */,
 	zlib_mlevel_t mlevel /* = zlib_memlevel_9 */)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__deflateInit2 == NULL) {
+		logger_warn("__deflateInit2 null, zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
+
 	is_compress_ = true;
 //	int   ret = __deflateInit(zstream_, level,
 //		ZLIB_VERSION, sizeof(z_stream));
@@ -432,11 +500,27 @@ bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */,
 bool zlib_stream::zip_update(const char* in, int len, string* out,
 	zlib_flush_t flag /* = zlib_flush_off */)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__deflate == NULL) {
+		logger_warn("__deflate null, zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	return update(__deflate, flag, in, len, out);
 }
 
 bool zlib_stream::zip_finish(string* out)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__deflate == NULL || __deflateEnd == NULL) {
+		logger_warn("zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	bool ret = flush_out(__deflate, zlib_flush_finish, out);
 	//(void) __deflateReset(zstream_);
 	__deflateEnd(zstream_);
@@ -446,17 +530,41 @@ bool zlib_stream::zip_finish(string* out)
 
 bool zlib_stream::zip_reset(void)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__deflateEnd == NULL) {
+		logger_warn("__deflateEnd null, zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	return __deflateEnd(zstream_) == Z_OK ? true : false;
 }
 
 unsigned zlib_stream::crc32_update(unsigned n, const void* buf, size_t dlen)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__crc32 == NULL) {
+		logger_warn("__crc32 null, zlib maybe not loaded yet");
+		return 0;
+	}
+# endif
+#endif
 	return (unsigned) __crc32(n, (const Bytef*) buf, (unsigned) dlen);
 }
 
 bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,
 	int wsize /* = 15 */)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__inflateInit2 == NULL) {
+		logger_warn("__inflateInit2 null, zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	is_compress_ = false;
 	int   ret = __inflateInit2(zstream_, have_zlib_header ?
 		wsize : -wsize, ZLIB_VERSION, sizeof(z_stream));
@@ -470,11 +578,27 @@ bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,
 bool zlib_stream::unzip_update(const char* in, int len, string* out,
 	zlib_flush_t flag /* = zlib_flush_off */)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__inflate == NULL) {
+		logger_warn("__inflate null, zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	return update(__inflate, flag, in, len, out);
 }
 
 bool zlib_stream::unzip_finish(string* out)
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__inflate == NULL || __inflateEnd == NULL) {
+		logger_warn("zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	bool ret = flush_out(__inflate, zlib_flush_finish, out);
 	//(void) __inflateReset(zstream_);
 	__inflateEnd(zstream_);
@@ -484,6 +608,14 @@ bool zlib_stream::unzip_finish(string* out)
 
 bool zlib_stream::unzip_reset()
 {
+#ifdef  HAS_ZLIB
+# if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
+	if (__inflateEnd == NULL) {
+		logger_warn("__inflate null, zlib maybe not loaded yet");
+		return false;
+	}
+# endif
+#endif
 	return __inflateEnd(zstream_) == Z_OK ? true : false;
 }
 

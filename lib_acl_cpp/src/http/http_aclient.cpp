@@ -601,7 +601,7 @@ bool http_aclient::handle_res_hdr(int status)
 
 	// 如果响应数据为 GZIP 压缩数据，且用户设置了自动解压功能，则需要创建
 	// 解压流对象，针对响应数据进行解压
-	if (unzip_ && header.is_transfer_gzip()) {
+	if (unzip_ && header.is_transfer_gzip() && zlib_stream::zlib_load_once()) {
 		zstream_ = NEW zlib_stream();
 		if (!zstream_->unzip_begin(false)) {
 			logger_error("unzip_begin error");

@@ -101,10 +101,8 @@ void http_client::reset(void)
 		hdr_req_ = NULL;
 	}
 
-	if (zstream_) {
-		delete zstream_;
-		zstream_ = NULL;
-	}
+	delete zstream_;
+	zstream_ = NULL;
 
 	last_ret_         = -1;
 	head_sent_        = false;
@@ -331,16 +329,15 @@ bool http_client::write_head(const http_header& header)
 	// 先保留是否为块传输的状态
 	chunked_transfer_ = header.chunked_transfer();
 
-	// 如果设置了 gzip 传输方式，则需要先初始化 zlib 流对象
+	// 如果响应数据时设置了 gzip 传输方式，则需要先初始化 zlib 流对象
 	if (header.is_transfer_gzip()) {
-		if (zstream_ != NULL) {
-			delete zstream_;
-		}
-
+		delete zstream_;
 		zstream_ = NEW zlib_stream;
 		if (zstream_->zip_begin(zlib_default, -zlib_wbits_15,
-			zlib_mlevel_9) == false) {
-
+			zlib_mlevel_9)) {
+			// 初始化 crc32 校验和
+			gzip_crc32_ = zstream_->crc32_update(0, Z_NULL, 0);
+		} else {
 			logger_error("zip_begin error!");
 			delete zstream_;
 			zstream_ = NULL;
@@ -350,8 +347,6 @@ bool http_client::write_head(const http_header& header)
 				(&header)->set_transfer_gzip(false);
 		}
 
-		// 初始化 crc32 校验和
-		gzip_crc32_ = zstream_->crc32_update(0, Z_NULL, 0);
 		// 初始化非压缩数据总长度
 		gzip_total_in_ = 0;
 	}
@@ -542,8 +537,9 @@ bool http_client::read_response_head(void)
 		}
 	}
 
-	// 目前仅支持 gzip 数据的解压
-	if (gzipped) {
+	// 目前仅支持 gzip 数据的解压，如果服务器返回 gzip 数据且初始化 zlib 成功，
+	// 则创建 zlib_stream 解压对象并初始化
+	if (gzipped && zlib_stream::zlib_load_once()) {
 		zstream_ = NEW zlib_stream();
 		if (!zstream_->unzip_begin(false)) {
 			logger_error("unzip_begin error");
