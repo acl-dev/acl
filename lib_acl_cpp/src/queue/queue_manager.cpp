@@ -27,7 +27,7 @@ queue_manager::queue_manager(const char* home, const char* queueName,
 		sub_width_ = sub_width;
 	}
 
-	string buf = home;
+	string buf(home);
 	buf << PATH_SEP << queueName;
 
 	// 先创建根目录
@@ -357,7 +357,7 @@ bool queue_manager::remove(queue_file* fp)
 
 bool queue_manager::scan_open(bool scanSub /* = true */)
 {
-	string path = m_home.c_str();
+	string path(m_home.c_str());
 	path << PATH_SEP << m_queueName.c_str();
 	m_scanDir = acl_scan_dir_open(path.c_str(), scanSub ? 1 : 0);
 	if (m_scanDir == NULL) {

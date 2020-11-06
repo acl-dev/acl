@@ -5,7 +5,6 @@
 #include <string>
 #include <stdarg.h>
 #include <utility>
-#include "dbuf_pool.hpp"
 
 struct ACL_VSTRING;
 struct ACL_LINE_STATE;
@@ -18,7 +17,7 @@ class dbuf_pool;
  * 该类为字符串处理类，支持大部分 std::string 中的功能，同时支持其不支持的一些
  * 功能；该类内部自动保证最后一个字符为 \0
  */
-class ACL_CPP_API string : public dbuf_obj
+class ACL_CPP_API string
 {
 public:
 	/**
@@ -800,21 +799,21 @@ public:
 
 	/**
 	 * 返回从当前字符串对象中缓冲区指定位置以左的内容
-	 * @param npos {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
+	 * @param n {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
 	 *  则返回整个字符串对象；返回值不包含该值指定位置的字符内容
 	 * @return {string} 返回值为一完整的对象，不需要单独释放，该函数的效率
 	 *  可能并不太高
 	 */
-	string left(size_t npos);
+	string left(size_t n);
 
 	/**
 	 * 返回从当前字符串对象中缓冲区指定位置以右的内容
-	 * @param npos {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
+	 * @param n {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
 	 *  则返回的字符串对象内容为空；返回值不包含该值指定位置的字符内容
 	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该
 	 *  函数的效率可能并不太高
 	 */
-	string right(size_t npos);
+	string right(size_t n);
 
 	/**
 	 * 将当前对象的缓冲内容拷贝一部分数据至目标缓冲内
@@ -1145,13 +1144,13 @@ public:
 	/**
 	 * 从当前缓冲区中将指定偏移量指定长度的数据拷贝至目标缓冲区中
 	 * @param out {string&} 目标缓冲区，内部采用追加方式，并不清空该对象
-	 * @param pos {size_t} 当前缓冲区的起始位置
-	 * @param len {size_t} 从 pos 起始位置开始拷贝的数据量，当该值为 0 时
-	 *  则拷贝指定 pos 位置后所有的数据，否则拷贝指定长度的数据，若指定的
+	 * @param p {size_t} 当前缓冲区的起始位置
+	 * @param len {size_t} 从 p 起始位置开始拷贝的数据量，当该值为 0 时
+	 *  则拷贝指定 p 位置后所有的数据，否则拷贝指定长度的数据，若指定的
 	 *  数据长度大于实际要拷贝的长度，则仅拷贝实际存在的数据
-	 * @return {size_t} 返回拷贝的实际数据长度，pos 越界时则该返回值为 0
+	 * @return {size_t} 返回拷贝的实际数据长度，p 越界时则该返回值为 0
 	 */
-	size_t substr(string& out, size_t pos = 0, size_t len = 0) const;
+	size_t substr(string& out, size_t p = 0, size_t len = 0) const;
 
 	/**
 	 * 将当前对象的数据缓冲区中的数据进行 base64 转码

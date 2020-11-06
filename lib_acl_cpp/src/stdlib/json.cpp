@@ -25,6 +25,7 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 json_node::~json_node(void)
 {
 	delete children_;
+	delete buf_;
 }
 
 const char* json_node::tag_name(void) const
@@ -215,8 +216,7 @@ const string& json_node::to_string(string* out /* = NULL */) const
 {
 	if (out == NULL) {
 		if (buf_ == NULL) {
-			const_cast<json_node*>(this)->buf_ =
-				dbuf_->create<string>(256);
+			const_cast<json_node*>(this)->buf_ = NEW string(256);
 		} else {
 			const_cast<json_node*>(this)->buf_->clear();
 		}
@@ -432,6 +432,9 @@ void json_node::clear(void)
 	if (children_) {
 		children_->clear();
 	}
+	if (buf_) {
+		buf_->clear();
+	}
 }
 
 json& json_node::get_json(void) const
@@ -487,6 +490,7 @@ json::json(const json_node& node, dbuf_guard* dbuf /* NULL */)
 json::~json(void)
 {
 	delete dbuf_internal_;
+	delete buf_;
 }
 
 json& json::part_word(bool on)
@@ -754,7 +758,7 @@ const string& json::to_string(string* out /* = NULL */,
 {
 	if (out == NULL) {
 		if (buf_ == NULL) {
-			const_cast<json*>(this)->buf_ = dbuf_->create<string>(256);
+			const_cast<json*>(this)->buf_ = NEW string(256);
 		} else {
 			const_cast<json*>(this)->buf_->clear();
 		}
@@ -791,7 +795,6 @@ void json::reset(void)
 	dbuf_->dbuf_reset();
 	json_ = acl_json_dbuf_alloc(dbuf_->get_dbuf().get_dbuf());
 	root_ = NULL;
-	buf_  = NULL;
 	iter_ = NULL;
 }
 
