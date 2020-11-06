@@ -409,13 +409,11 @@ private:
 	json* json_;
 	dbuf_guard* dbuf_;
 	json_node* parent_;
-	std::vector<json_node*>* children_;
 	ACL_ITER* iter_;
 	string* buf_;
 	json_node* obj_;
 
-	union
-	{
+	union {
 #if defined(_WIN32) || defined(_WIN64)
 		__int64 n;
 #else
@@ -424,8 +422,6 @@ private:
 		bool   b;
 		double d;
 	} node_val_;
-
-	void prepare_iter(void);
 };
 
 class ACL_CPP_API json : public pipe_stream, public dbuf_obj

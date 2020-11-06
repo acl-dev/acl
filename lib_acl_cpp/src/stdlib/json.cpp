@@ -13,7 +13,6 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 , json_(json_ptr)
 , dbuf_(json_ptr->get_dbuf())
 , parent_(NULL)
-, children_(NULL)
 , iter_(NULL)
 , buf_(NULL)
 , obj_(NULL)
@@ -24,7 +23,6 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 
 json_node::~json_node(void)
 {
-	delete children_;
 	delete buf_;
 }
 
@@ -364,18 +362,13 @@ json_node* json_node::first_child(void)
 		return NULL;
 	}
 
-	prepare_iter();
-
 	json_node* child = dbuf_->create<json_node>(node, json_);
-	children_->push_back(child);
-
 	return child;
 }
 
 json_node* json_node::next_child(void)
 {
 	acl_assert(iter_);
-	acl_assert(children_);
 
 	ACL_JSON_NODE* node = node_me_->iter_next(iter_, node_me_);
 	if (node == NULL) {
@@ -383,8 +376,6 @@ json_node* json_node::next_child(void)
 	}
 
 	json_node* child = dbuf_->create<json_node>(node, json_);
-	children_->push_back(child);
-
 	return child;
 }
 
@@ -412,26 +403,8 @@ int json_node::children_count(void) const
 	return acl_ring_size(&node_me_->children);
 }
 
-void json_node::prepare_iter(void)
-{
-	if (children_ == NULL) {
-		children_ = NEW std::vector<json_node*>;
-		int  n = children_count();
-		if (n < 0) {
-			logger_error("invalid children_count: %d", n);
-			n = 1;
-		} else {
-			n++;
-		}
-		children_->reserve(n);
-	}
-}
-
 void json_node::clear(void)
 {
-	if (children_) {
-		children_->clear();
-	}
 	if (buf_) {
 		buf_->clear();
 	}
