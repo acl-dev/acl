@@ -5,6 +5,7 @@
 #include <string>
 #include <stdarg.h>
 #include <utility>
+#include "dbuf_pool.hpp"
 
 struct ACL_VSTRING;
 struct ACL_LINE_STATE;
@@ -17,7 +18,7 @@ class dbuf_pool;
  * 该类为字符串处理类，支持大部分 std::string 中的功能，同时支持其不支持的一些
  * 功能；该类内部自动保证最后一个字符为 \0
  */
-class ACL_CPP_API string
+class ACL_CPP_API string : public dbuf_obj
 {
 public:
 	/**

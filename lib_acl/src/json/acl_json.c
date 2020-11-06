@@ -391,13 +391,21 @@ ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from)
 
 ACL_JSON *acl_json_create(ACL_JSON_NODE *node)
 {
+    ACL_DBUF_POOL *dbuf = acl_dbuf_pool_create(8192);
+    ACL_JSON *json = acl_json_dbuf_create(dbuf, node);
+
+    json->dbuf_inner = dbuf;
+    return json;
+}
+
+ACL_JSON *acl_json_dbuf_create(ACL_DBUF_POOL *dbuf, ACL_JSON_NODE *node)
+{
 	ACL_JSON *json;
 	ACL_JSON_NODE *root = node->json->root;
-	ACL_DBUF_POOL *dbuf = acl_dbuf_pool_create(8192);
 
 	json = (ACL_JSON*) acl_dbuf_pool_calloc(dbuf, sizeof(ACL_JSON));
 	json->dbuf = dbuf;
-	json->dbuf_inner = dbuf;
+    json->dbuf_inner = NULL;
 
 	/* 如果传入的节点为 root 节点，则直接赋值创建 root 即可 */
 	if (node == root) {

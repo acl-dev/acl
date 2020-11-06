@@ -385,6 +385,8 @@ public:
 
 private:
 	friend class json;
+	friend class dbuf_guard;
+
 	/**
 	 * 构造函数，要求该对象必须只能由 json 对象创建
 	 * @param node {ACL_JSON_NODE*} ACL 库中的 ACL_JSON_NODE 结构对象
@@ -405,8 +407,8 @@ private:
 private:
 	ACL_JSON_NODE* node_me_;
 	json* json_;
+	dbuf_guard* dbuf_;
 	json_node* parent_;
-	json_node* parent_saved_;
 	std::vector<json_node*>* children_;
 	ACL_ITER* iter_;
 	string* buf_;
@@ -436,14 +438,18 @@ public:
 	 *  无论如何，用户依然可以用部分或完整的 json 字符串调用 update
 	 *  函数，在调用 update 过程中解析 json；其实，当构造函数的
 	 *  的 data 参数非空时，它也会调用 update
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存池管理对象，否则内部
+	 *  会自动创建一个内存池管理对象
 	 */
-	json(const char* data = NULL);
+	json(const char* data = NULL, dbuf_guard* dbuf = NULL);
 
 	/**
 	 * 根据一个 json 对象中的一个 json 节点构造一个新的 json 对象
 	 * @param node {const json_node&} 源 json 对象中的一个 json 节点
+	 * @param dbuf {dbuf_guard*} 非空时将做为内存池管理对象，否则内部
+	 *  会自动创建一个内存池管理对象
 	 */
-	json(const json_node& node);
+	json(const json_node& node, dbuf_guard* dbuf = NULL);
 
 	~json(void);
 
@@ -754,6 +760,14 @@ public:
 	 */
 	const string& to_string(string* out = NULL, bool add_space = false) const;
 
+	/**
+	 * 获得内存池对象指针
+	 * @return {dbuf_guard*}
+	 */
+	dbuf_guard* get_dbuf(void) const {
+		return dbuf_;
+	}
+
 	// pipe_stream 虚函数重载
 
 	virtual int push_pop(const char* in, size_t len,
@@ -762,14 +776,16 @@ public:
 	virtual void clear(void);
 
 private:
+	// 内存池管理对象，适合管理大量小内存
+	dbuf_guard* dbuf_;
+	dbuf_guard* dbuf_internal_;
+
 	// 对应于 acl 库中的 ACL_JSON 对象
 	ACL_JSON *json_;
 	// json 对象树中的根节点对象
 	json_node* root_;
 	// 临时的 json 节点查询结果集
 	std::vector<json_node*> nodes_query_;
-	// 由该 json 容器分配的 json 节点集合
-	std::list<json_node*> nodes_tmp_;
 	// 缓冲区
 	string* buf_;
 	ACL_ITER* iter_;

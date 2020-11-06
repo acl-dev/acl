@@ -194,6 +194,15 @@ ACL_API ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf);
 ACL_API ACL_JSON *acl_json_create(ACL_JSON_NODE *node);
 
 /**
+ * 根据一个 JSON 对象的一个 JSON 节点创建一个新的 JSON 对象
+ * @param dbuf {ACL_DBUF_POOL*} 内存池对象，当该针对非 NULL 时，则 json 对象
+ *  及所属节点内存在其基础上进行分配，否则，内部自动创建隶属于 json 的内存池
+ * @param node {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 节点
+ * @return {ACL_JSON*} 新创建的 JSON 对象
+ */
+ACL_API ACL_JSON *acl_json_dbuf_create(ACL_DBUF_POOL *dbuf, ACL_JSON_NODE *node);
+
+/**
  * 将某一个 ACL_JSON_NODE 节点作为一个 json 对象的根节点，
  * 从而可以方便地遍历出该节点的各级子节点(在遍历过程中的所有
  * 节点不含本节点自身)，该遍历方式有别于单独
