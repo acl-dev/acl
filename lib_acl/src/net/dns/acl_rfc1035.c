@@ -18,7 +18,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_mymalloc.h"
 #include "stdlib/acl_mystring.h"
-#include "net/rfc1035.h"
+#include "net/acl_rfc1035.h"
 
 #endif
 

@@ -757,7 +757,6 @@ void json::build_json(string& out, bool add_space /* = false */) const
 		const_cast<json*>(this)->json_->flag &= ~ACL_JSON_FLAG_ADD_SPACE;
 	}
 
-
 	ACL_VSTRING* buf = out.vstring();
 	(void) acl_json_build(json_, buf);
 }

@@ -4,7 +4,7 @@
 #include <string.h>
 #include "stdlib/acl_argv.h"
 #include "net/acl_sane_inet.h"
-#include "net/rfc1035.h"
+#include "net/acl_rfc1035.h"
 
 #endif
 

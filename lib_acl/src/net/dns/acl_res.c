@@ -17,7 +17,7 @@
 #include "stdlib/acl_stdlib.h"
 #include "net/acl_vstream_net.h"
 #include "net/acl_sane_inet.h"
-#include "net/rfc1035.h"
+#include "net/acl_rfc1035.h"
 #include "net/acl_res.h"
 
 #endif
