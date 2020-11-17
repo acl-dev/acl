@@ -1,7 +1,7 @@
 CC	= ${ENV_CPP}
 FLAGS   = ${ENV_FLAGS}
 
-CFLAGS = -c -g -W \
+CFLAGS = -c -g -W -O3 \
 -Wall \
 -Werror \
 -Wshadow \
