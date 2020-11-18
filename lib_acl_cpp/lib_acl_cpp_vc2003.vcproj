@@ -489,6 +489,13 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</Filter>
 			</Filter>
 			<Filter
+				Name="net"
+				Filter="">
+				<File
+					RelativePath=".\src\net\rfc1035.cpp">
+				</File>
+			</Filter>
+			<Filter
 				Name="mime"
 				Filter="">
 				<File
@@ -1239,6 +1246,13 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\zlib_stream.hpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="net"
+				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\net\rfc1035.hpp">
 				</File>
 			</Filter>
 			<Filter

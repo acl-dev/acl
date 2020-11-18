@@ -216,6 +216,7 @@
 		7029CC2F23A9D075001B3EDB /* sslbase_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */; };
 		702B9D9023A8E31200079240 /* mbedtls_conf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */; };
 		702B9D9123A8E31200079240 /* mbedtls_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 702B9D8F23A8E31200079240 /* mbedtls_io.cpp */; };
+		7035839225626D94006ABBA5 /* rfc1035.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7035839125626D94006ABBA5 /* rfc1035.cpp */; };
 		70BD6B8C232B933D00E4C798 /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
 		70BD6B8D232B933D00E4C798 /* token_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A01E6FCCF1002C9B3C /* token_tree.cpp */; };
 		70BD6B8E232B933D00E4C798 /* sqlite_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */; };
@@ -686,6 +687,8 @@
 		702B9D8D23A8E2FB00079240 /* mbedtls_io.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = mbedtls_io.hpp; sourceTree = "<group>"; };
 		702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mbedtls_conf.cpp; sourceTree = "<group>"; };
 		702B9D8F23A8E31200079240 /* mbedtls_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mbedtls_io.cpp; sourceTree = "<group>"; };
+		7035839025626D84006ABBA5 /* rfc1035.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = rfc1035.hpp; path = net/rfc1035.hpp; sourceTree = "<group>"; };
+		7035839125626D94006ABBA5 /* rfc1035.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rfc1035.cpp; path = net/rfc1035.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -729,6 +732,7 @@
 		07A466D91E6FCCF1002C9B3C /* src */ = {
 			isa = PBXGroup;
 			children = (
+				7035838E25626D66006ABBA5 /* net */,
 				07A466DA1E6FCCF1002C9B3C /* acl_cpp_init.cpp */,
 				07A466DB1E6FCCF1002C9B3C /* acl_cpp_test.cpp */,
 				07A466DC1E6FCCF1002C9B3C /* acl_stdafx.cpp */,
@@ -1158,6 +1162,7 @@
 		07A468771E6FD404002C9B3C /* acl_cpp */ = {
 			isa = PBXGroup;
 			children = (
+				7035838F25626D74006ABBA5 /* net */,
 				07A468781E6FD404002C9B3C /* acl_cpp_define.hpp */,
 				07A468791E6FD404002C9B3C /* acl_cpp_init.hpp */,
 				07A4687A1E6FD404002C9B3C /* acl_cpp_test.hpp */,
@@ -1557,6 +1562,22 @@
 			path = stream;
 			sourceTree = "<group>";
 		};
+		7035838E25626D66006ABBA5 /* net */ = {
+			isa = PBXGroup;
+			children = (
+				7035839125626D94006ABBA5 /* rfc1035.cpp */,
+			);
+			name = net;
+			sourceTree = "<group>";
+		};
+		7035838F25626D74006ABBA5 /* net */ = {
+			isa = PBXGroup;
+			children = (
+				7035839025626D84006ABBA5 /* rfc1035.hpp */,
+			);
+			name = net;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -1678,6 +1699,7 @@
 				07A4681B1E6FCCF1002C9B3C /* mime_attach.cpp in Sources */,
 				07A468191E6FCCF1002C9B3C /* trimblanks.cpp in Sources */,
 				70BD6B8E232B933D00E4C798 /* sqlite_manager.cpp in Sources */,
+				7035839225626D94006ABBA5 /* rfc1035.cpp in Sources */,
 				07A467D61E6FCCF1002C9B3C /* db_handle.cpp in Sources */,
 				07A467EF1E6FCCF1002C9B3C /* http_download.cpp in Sources */,
 				07A468391E6FCCF1002C9B3C /* redis_script.cpp in Sources */,

@@ -21,6 +21,7 @@ LOCAL_SRC_FILES := $(wildcard ./*.cpp) \
 	   $(wildcard $(SRC_PATH)/smtp/*.cpp) \
 	   $(wildcard $(SRC_PATH)/mime/*.cpp) \
 	   $(wildcard $(SRC_PATH)/mime/internal/*.cpp) \
+	   $(wildcard $(SRC_PATH)/net/*.cpp) \
 	   $(wildcard $(SRC_PATH)/connpool/*.cpp) \
 	   $(wildcard $(SRC_PATH)/redis/*.cpp) \
 	   $(wildcard $(SRC_PATH)/disque/*.cpp) \

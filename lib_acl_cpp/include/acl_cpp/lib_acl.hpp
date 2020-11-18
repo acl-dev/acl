@@ -54,6 +54,8 @@
 #include "session/redis_session.hpp"
 #include "session/memcache_session.hpp"
 
+#include "net/rfc1035.hpp"
+
 #include "stream/stream.hpp"
 #include "stream/istream.hpp"
 #include "stream/ostream.hpp"

@@ -862,6 +862,15 @@
 					>
 				</File>
 			</Filter>
+
+			<Filter
+				Name="net"
+				>
+				<File
+					RelativePath=".\src\net\rfc1035.cpp"
+					>
+				</File>
+			</Filter>
 			<Filter
 				Name="redis"
 				>
@@ -1721,6 +1730,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\queue\queue_manager.hpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="net"
+				>
+				<File
+					RelativePath=".\include\acl_cpp\net\rfc1035.hpp"
 					>
 				</File>
 			</Filter>

@@ -182,6 +182,7 @@ OBJS_DST = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/*.cpp)
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/smtp/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/mime/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/mime/internal/*.cpp))) \
+	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/net/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/connpool/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/redis/*.cpp))) \
 	   $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard src/disque/*.cpp))) \
@@ -203,6 +204,7 @@ OBJS_DEF = $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/*.cp
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/smtp/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/mime/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/mime/internal/*.cpp))) \
+	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/net/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/connpool/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/redis/*.cpp))) \
 	   $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/disque/*.cpp))) \
@@ -323,6 +325,8 @@ $(OBJ_PATH_DST)/%.o: ./src/smtp/%.cpp
 $(OBJ_PATH_DST)/%.o: ./src/mime/%.cpp
 	$(COMPILE_OBJ)
 $(OBJ_PATH_DST)/%.o: ./src/mime/internal/%.cpp
+	$(COMPILE_OBJ)
+$(OBJ_PATH_DST)/%.o: ./src/net/%.cpp
 	$(COMPILE_OBJ)
 $(OBJ_PATH_DST)/%.o: ./src/redis/%.cpp
 	$(COMPILE_OBJ)

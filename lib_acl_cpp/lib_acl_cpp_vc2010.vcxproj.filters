@@ -49,6 +49,9 @@
     <ClCompile Include="src\mime\rfc822.cpp">
       <Filter>src\mime</Filter>
     </ClCompile>
+    <ClCompile Include="src\net\rfc1035.cpp">
+      <Filter>src\net</Filter>
+    </ClCompile>
     <ClCompile Include="src\master\master_trigger.cpp">
       <Filter>src\master</Filter>
     </ClCompile>
@@ -821,6 +824,9 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mime\rfc822.hpp">
       <Filter>include\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\net\rfc1035.hpp">
+      <Filter>include\net</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\session\session.hpp">
       <Filter>include\session</Filter>
