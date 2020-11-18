@@ -158,7 +158,7 @@ class dbuf_guard;
 /**
  * 在会话内存池对象上分配的对象基础类
  */
-class ACL_CPP_API dbuf_obj : public noncopyable
+class ACL_CPP_API dbuf_obj //: public noncopyable
 {
 public:
 	/**
