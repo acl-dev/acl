@@ -53,6 +53,16 @@ static void test1(int nblock, int capacity, int incr, int max, int pos) {
 		printf("ok, max: %d, pos: %d\r\n", max, pos);
 	}
 
+	printf("\r\n----------------walk the list------------\r\n");
+	int n = 0;
+	for (std::list<myobj*, acl::dbuf_allocator<myobj*> >::iterator
+		it = objs.begin(); it != objs.end(); ++it) {
+		(*it)->run();
+		if (++n >= 10) {
+			break;
+		}
+	}
+
 	objs.clear();
 	dbuf.dbuf_reset();
 
@@ -100,8 +110,8 @@ static void test2(void) {
 
 	printf("objs count is %ld\r\n", (long) objs.size());
 
-	for (std::vector<myobj>::iterator it = objs.begin();
-		it != objs.end(); ++it) {
+	for (std::vector<myobj, acl::dbuf_allocator<myobj> >::iterator
+		it = objs.begin(); it != objs.end(); ++it) {
 		(*it).run();
 	}
 }
