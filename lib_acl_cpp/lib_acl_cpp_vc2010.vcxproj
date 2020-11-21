@@ -502,7 +502,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\mime\mime_xxcode.hpp" />
     <ClInclude Include="include\acl_cpp\mime\rfc2047.hpp" />
     <ClInclude Include="include\acl_cpp\mime\rfc822.hpp" />
-    <ClInclude Include="include\acl_cpp\mime\rfc1035.hpp" />
+    <ClInclude Include="include\acl_cpp\net\rfc1035.hpp" />
     <ClInclude Include="include\acl_cpp\queue\queue_file.hpp" />
     <ClInclude Include="include\acl_cpp\queue\queue_manager.hpp" />
     <ClInclude Include="include\acl_cpp\redis\redis.hpp" />
