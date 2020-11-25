@@ -467,15 +467,6 @@ static void event_loop(ACL_EVENT *eventp)
 
 		sockfd = ACL_VSTREAM_SOCK(fdp->stream);
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ³öÏÖÒì³£ */
-
-		if (FD_ISSET(sockfd, &xmask)) {
-			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = eventp->ready_cnt;
-			eventp->ready[eventp->ready_cnt++] = fdp;
-			continue;
-		}
-
 		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿É¶Á */
 
 		if (FD_ISSET(sockfd, &rmask)) {
@@ -511,6 +502,14 @@ static void event_loop(ACL_EVENT *eventp)
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
+		}
+
+		/* ¼ì²éÃèÊö×ÖÊÇ·ñ³öÏÖÒì³£ */
+
+		if (!fdp->event_type && FD_ISSET(sockfd, &xmask)) {
+			fdp->event_type |= ACL_EVENT_XCPT;
+			fdp->fdidx_ready = eventp->ready_cnt;
+			eventp->ready[eventp->ready_cnt++] = fdp;
 		}
 	}
 

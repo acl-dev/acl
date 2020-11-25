@@ -459,15 +459,6 @@ static void event_loop(ACL_EVENT *eventp)
 
 		revents = ev->fds[i].revents;
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ³öÏÖÒì³£ */
-
-		if ((revents & (POLLHUP | POLLERR)) != 0) {
-			fdp->event_type |= ACL_EVENT_XCPT;
-			fdp->fdidx_ready = eventp->ready_cnt;
-			eventp->ready[eventp->ready_cnt++] = fdp;
-			continue;
-		}
-
 		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿É¶Á */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) && (revents & POLLIN) ) {
@@ -507,6 +498,14 @@ static void event_loop(ACL_EVENT *eventp)
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
+		}
+
+		/* ¼ì²éÃèÊö×ÖÊÇ·ñ³öÏÖÒì³£ */
+
+		if (!fdp->event_type && (revents & (POLLHUP | POLLERR)) != 0) {
+			fdp->event_type |= ACL_EVENT_XCPT;
+			fdp->fdidx_ready = eventp->ready_cnt;
+			eventp->ready[eventp->ready_cnt++] = fdp;
 		}
 	}
 
