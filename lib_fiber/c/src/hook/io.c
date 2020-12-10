@@ -891,7 +891,7 @@ ssize_t readv(socket_t fd, const struct iovec *iov, int iovcnt)
 }
 #endif
 
-#ifdef ACL_ARM_LINUX
+#ifdef ANDROID
 
 ssize_t recv(socket_t sockfd, void *buf, size_t len, unsigned int flags)
 {
@@ -942,7 +942,7 @@ ssize_t writev(socket_t fd, const struct iovec *iov, int iovcnt)
 }
 #endif
 
-#ifdef ACL_ARM_LINUX
+#ifdef ANDROID
 
 ssize_t send(socket_t sockfd, const void *buf, size_t len, unsigned int flags)
 {

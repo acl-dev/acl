@@ -28,9 +28,9 @@ android {
         externalNativeBuild {
             cmake {
                 //arguments "-DANDROID_STL=stl_shared"
-                //arguments "-DANDROID_STL=gnustl_shared"   // for ndk16b
-                arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
-                arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
+                arguments "-DANDROID_STL=gnustl_shared"   // for ndk12b, ndk16b
+                //arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
+                //arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
 
                 arguments "-DCMAKE_BUILD_TYPE=RELEASE"
                 arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
@@ -42,13 +42,14 @@ android {
                 //cppFlags "-fexceptions"
 
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                abiFilters 'armeabi', 'armeabi-v7a', 'x86'               // for ndk12b
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
-                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
+                //abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
             }
             cmake {
                 //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
-                //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk16b
-                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk12b, ndk16b
+                //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
             }
         }
     }

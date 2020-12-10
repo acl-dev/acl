@@ -4,7 +4,7 @@
 #include "common/ring.h"
 #include "event.h"
 
-#ifdef ACL_ARM_LINUX
+#ifdef ANDROID
 extern int getcontext(ucontext_t *ucp);
 extern int setcontext(const ucontext_t *ucp);
 extern int swapcontext(struct ucontext *old_ctx, struct ucontext *new_ctx);

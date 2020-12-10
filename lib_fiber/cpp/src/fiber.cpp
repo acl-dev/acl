@@ -120,8 +120,8 @@ void fiber::acl_io_unlock(void)
 {
 	acl_set_accept(accept);
 	acl_set_connect(connect);
-	acl_set_recv(recv);
-	acl_set_send(send);
+	acl_set_recv((acl_recv_fn) recv);
+	acl_set_send((acl_send_fn) send);
 #if defined(_WIN32) || defined(_WIN64)
 	acl_set_poll(WSAPoll);
 	acl_set_close_socket(closesocket);

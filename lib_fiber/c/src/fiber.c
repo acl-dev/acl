@@ -194,7 +194,7 @@ static void fiber_init(void)
 
 	__called++;
 
-#ifdef ACL_ARM_LINUX
+#ifdef ANDROID
 	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno");
 #else
 	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
@@ -206,7 +206,7 @@ static void fiber_init(void)
 }
 
 /* see /usr/include/bits/errno.h for __errno_location */
-#ifdef ACL_ARM_LINUX
+#ifdef ANDROID
 volatile int*   __errno(void)
 #else
 int *__errno_location(void)
