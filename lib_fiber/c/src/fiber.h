@@ -4,12 +4,14 @@
 #include "common/ring.h"
 #include "event.h"
 
+/*
 #ifdef ANDROID
 extern int getcontext(ucontext_t *ucp);
 extern int setcontext(const ucontext_t *ucp);
 extern int swapcontext(struct ucontext *old_ctx, struct ucontext *new_ctx);
 extern void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
 #endif
+*/
 
 typedef enum {
 	FIBER_STATUS_READY,

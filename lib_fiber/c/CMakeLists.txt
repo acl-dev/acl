@@ -88,6 +88,12 @@ else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
 
+# for lower version ndk such add ndk12b, the read/write functions have confusions in the ndk's header,
+# so we should disable hook io in io.c
+if (ACL_DISABLE_HOOK_IO  MATCHES "YES")
+	add_definitions("-DDISABLE_HOOK_IO")
+endif()
+
 ##############################################################################
 
 set(src ${CMAKE_CURRENT_SOURCE_DIR}/src)
