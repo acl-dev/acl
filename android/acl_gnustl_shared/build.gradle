@@ -28,7 +28,7 @@ android {
         externalNativeBuild {
             cmake {
                 //arguments "-DANDROID_STL=stl_shared"
-                arguments "-DANDROID_STL=gnustl_shared"   // for ndk12b, ndk16b
+                arguments "-DANDROID_STL=gnustl_shared"       // for ndk12b, ndk16b
                 //arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
                 //arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
 
@@ -42,8 +42,8 @@ android {
                 //cppFlags "-fexceptions"
 
                 //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
-                abiFilters 'armeabi', 'armeabi-v7a', 'x86'               // for ndk12b, ndk16b
-                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
+                abiFilters 'armeabi', 'armeabi-v7a', 'x86'                   // for ndk12b, ndk16b
+                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'    // for ndk16b
                 //abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
             }
             cmake {
