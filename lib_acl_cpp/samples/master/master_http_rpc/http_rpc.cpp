@@ -82,7 +82,10 @@ void http_rpc::handle_conn(acl::socket_stream* stream)
 
 	// 返回数据给客户端
 
-	res.response_header().set_status(200).set_keep_alive(keep_alive_);
+	res.response_header()
+		.set_status(200)
+		.set_keep_alive(keep_alive_)
+		.set_content_length(buf_size_);;
 	res.response(res_buf_, buf_size_);
 }
 
