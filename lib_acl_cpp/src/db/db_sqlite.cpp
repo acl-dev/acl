@@ -35,14 +35,27 @@
  typedef int   (STDCALL *sqlite3_prepare_v2_fn)(sqlite3*, const char*, int,
 	 sqlite3_stmt**, const char**);
  typedef int   (STDCALL *sqlite3_step_fn)(sqlite3_stmt*);
+ typedef int   (STDCALL *sqlite3_exec_fn)(sqlite3*, const char *sql,
+         int(*)(void*,int,char**,char**), void*, char**);
+ typedef int   (STDCALL *sqlite3_reset_fn)(sqlite3_stmt*);
+ typedef int   (STDCALL *sqlite3_bind_blob_fn)(sqlite3_stmt*, int,
+         const void *, int, void(*)(void*));
+ typedef int   (STDCALL *sqlite3_bind_int_fn)(sqlite3_stmt*, int, int);
+ typedef int   (STDCALL *sqlite3_bind_int64_fn)(sqlite3_stmt*, int, sqlite3_int64);
+ typedef int   (STDCALL *sqlite3_bind_text_fn)(sqlite3_stmt*, int,
+        const char*, int, void(*)(void*));
  typedef int   (STDCALL *sqlite3_column_count_fn)(sqlite3_stmt*);
  typedef int   (STDCALL *sqlite3_column_type_fn)(sqlite3_stmt*, int);
+ typedef int   (STDCALL *sqlite3_column_bytes_fn)(sqlite3_stmt*, int);
  typedef const char* (STDCALL *sqlite3_column_name_fn)(sqlite3_stmt*, int);
  typedef int   (STDCALL *sqlite3_data_count_fn)(sqlite3_stmt*);
- typedef int   (STDCALL *sqlite3_column_int64_fn)(sqlite3_stmt*, int);
+ typedef int   (STDCALL *sqlite3_column_int_fn)(sqlite3_stmt*, int);
+ typedef int64_t   (STDCALL *sqlite3_column_int64_fn)(sqlite3_stmt*, int);
  typedef int   (STDCALL *sqlite3_column_double_fn)(sqlite3_stmt*, int);
+ typedef const void*   (STDCALL *sqlite3_column_blob_fn)(sqlite3_stmt*, int);
  typedef const unsigned char* (STDCALL *sqlite3_column_text_fn)(sqlite3_stmt*, int);
  typedef int   (STDCALL *sqlite3_finalize_fn)(sqlite3_stmt*);
+ typedef void   (STDCALL *sqlite3_free_fn)(void*);
 
  static sqlite3_libversion_fn __sqlite3_libversion = NULL;
  static sqlite3_open_fn __sqlite3_open = NULL;
@@ -57,14 +70,24 @@
  static sqlite3_busy_timeout_fn __sqlite3_busy_timeout = NULL;
  static sqlite3_prepare_v2_fn __sqlite3_prepare_v2 = NULL;
  static sqlite3_step_fn __sqlite3_step = NULL;
+ static sqlite3_exec_fn __sqlite3_exec = NULL;
+ static sqlite3_reset_fn __sqlite3_reset = NULL;
+ static sqlite3_bind_blob_fn __sqlite3_bind_blob = NULL;
+ static sqlite3_bind_int_fn __sqlite3_bind_int = NULL;
+ static sqlite3_bind_int64_fn __sqlite3_bind_int64 = NULL;
+ static sqlite3_bind_text_fn __sqlite3_bind_text = NULL;
  static sqlite3_column_count_fn __sqlite3_column_count = NULL;
  static sqlite3_column_type_fn __sqlite3_column_type = NULL;
+ static sqlite3_column_bytes_fn __sqlite3_column_bytes = NULL;
  static sqlite3_column_name_fn __sqlite3_column_name = NULL;
  static sqlite3_data_count_fn __sqlite3_data_count = NULL;
+ static sqlite3_column_int_fn __sqlite3_column_int = NULL;
  static sqlite3_column_int64_fn __sqlite3_column_int64 = NULL;
  static sqlite3_column_double_fn __sqlite3_column_double = NULL;
+ static sqlite3_column_blob_fn __sqlite3_column_blob = NULL;
  static sqlite3_column_text_fn __sqlite3_column_text = NULL;
  static sqlite3_finalize_fn __sqlite3_finalize = NULL;
+ static sqlite3_free_fn __sqlite3_free = NULL;
 
  static acl_pthread_once_t __sqlite_once = ACL_PTHREAD_ONCE_INIT;
  static ACL_DLL_HANDLE __sqlite_dll = NULL;
@@ -201,6 +224,47 @@
 			path, acl_last_serror());
 	}
 
+	__sqlite3_exec = (sqlite3_exec_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_exec");
+	if (__sqlite3_exec == NULL) {
+		logger_fatal("load sqlite3_exec from %s error: %s",
+			path, acl_last_serror());
+	}
+	__sqlite3_reset = (sqlite3_reset_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_reset");
+	if (__sqlite3_reset == NULL) {
+		logger_fatal("load sqlite3_reset from %s error: %s",
+			path, acl_last_serror());
+	}
+
+	__sqlite3_bind_blob = (sqlite3_bind_blob_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_bind_blob");
+	if (__sqlite3_bind_blob == NULL) {
+		logger_fatal("load sqlite3_bind_blob from %s error: %s",
+			path, acl_last_serror());
+	}
+
+	__sqlite3_bind_int = (sqlite3_bind_int_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_bind_int");
+	if (__sqlite3_bind_int == NULL) {
+		logger_fatal("load sqlite3_bind_int from %s error: %s",
+			path, acl_last_serror());
+	}
+
+	__sqlite3_bind_int64 = (sqlite3_bind_int64_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_bind_int64");
+	if (__sqlite3_bind_int64 == NULL) {
+		logger_fatal("load sqlite3_bind_int64 from %s error: %s",
+			path, acl_last_serror());
+	}
+
+	__sqlite3_bind_text = (sqlite3_bind_text_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_bind_text");
+	if (__sqlite3_bind_text == NULL) {
+		logger_fatal("load sqlite3_bind_text from %s error: %s",
+			path, acl_last_serror());
+	}
+
 	__sqlite3_column_count = (sqlite3_column_count_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_count");
 	if (__sqlite3_column_count == NULL) {
@@ -212,6 +276,13 @@
 		acl_dlsym(__sqlite_dll, "sqlite3_column_type");
 	if (__sqlite3_column_type == NULL) {
 		logger_fatal("load sqlite3_column_type from %s error: %s",
+			path, acl_last_serror());
+	}
+
+	__sqlite3_column_bytes = (sqlite3_column_bytes_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_column_bytes");
+	if (__sqlite3_column_bytes == NULL) {
+		logger_fatal("load sqlite3_column_bytes from %s error: %s",
 			path, acl_last_serror());
 	}
 
@@ -229,6 +300,13 @@
 			path, acl_last_serror());
 	}
 
+	__sqlite3_column_int = (sqlite3_column_int_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_column_int");
+	if (__sqlite3_column_int == NULL) {
+		logger_fatal("load sqlite3_column_int from %s error: %s",
+			path, acl_last_serror());
+	}
+
 	__sqlite3_column_int64 = (sqlite3_column_int64_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_int64");
 	if (__sqlite3_column_int64 == NULL) {
@@ -243,6 +321,13 @@
 			path, acl_last_serror());
 	}
 
+	__sqlite3_column_blob = (sqlite3_column_blob_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_column_blob");
+	if (__sqlite3_column_blob == NULL) {
+		logger_fatal("load sqlite3_column_blob from %s error: %s",
+			path, acl_last_serror());
+	}
+
 	__sqlite3_column_text = (sqlite3_column_text_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_text");
 	if (__sqlite3_column_text == NULL) {
@@ -254,6 +339,13 @@
 		acl_dlsym(__sqlite_dll, "sqlite3_finalize");
 	if (__sqlite3_finalize == NULL) {
 		logger_fatal("load sqlite3_finalize from %s error: %s",
+			path, acl_last_serror());
+	}
+
+	__sqlite3_free = (sqlite3_free_fn)
+		acl_dlsym(__sqlite_dll, "sqlite3_free");
+	if (__sqlite3_free == NULL) {
+		logger_fatal("load sqlite3_free from %s error: %s",
 			path, acl_last_serror());
 	}
 
@@ -276,14 +368,24 @@
 #  define __sqlite3_busy_timeout sqlite3_busy_timeout
 #  define __sqlite3_prepare_v2 sqlite3_prepare_v2
 #  define __sqlite3_step sqlite3_step
+#  define __sqlite3_exec sqlite3_exec
+#  define __sqlite3_reset sqlite3_reset
+#  define __sqlite3_bind_blob sqlite3_bind_blob
+#  define __sqlite3_bind_int sqlite3_bind_int
+#  define __sqlite3_bind_int64 sqlite3_bind_int64
+#  define __sqlite3_bind_text sqlite3_bind_text
 #  define __sqlite3_column_count sqlite3_column_count
 #  define __sqlite3_column_type sqlite3_column_type
+#  define __sqlite3_column_bytes sqlite3_column_bytes
 #  define __sqlite3_column_name sqlite3_column_name
 #  define __sqlite3_data_count sqlite3_data_count
+#  define __sqlite3_column_int sqlite3_column_int
 #  define __sqlite3_column_int64 sqlite3_column_int64
 #  define __sqlite3_column_double sqlite3_column_double
+#  define __sqlite3_column_blob sqlite3_column_blob
 #  define __sqlite3_column_text sqlite3_column_text
 #  define __sqlite3_finalize sqlite3_finalize
+#  define __sqlite3_free sqlite3_free
 # endif // HAS_SQLITE && !HAS_SQLITE_DLL
 
 namespace acl
@@ -774,6 +876,92 @@ bool db_sqlite::next(sqlite_cursor& cursor, bool* done)
 	}
 	return true;
 }
+int db_sqlite::sqlite3_prepare_v2(const char *zSql,
+            int nByte, sqlite3_stmt **ppStmt, const char **pzTail)
+{
+    return __sqlite3_prepare_v2(db_, zSql, nByte, ppStmt, pzTail);
+}
+
+int db_sqlite::sqlite3_step(sqlite3_stmt *stmt)
+{
+    return __sqlite3_step(stmt);
+}
+
+int db_sqlite::sqlite3_reset(sqlite3_stmt *pStmt)
+{
+    return __sqlite3_reset(pStmt);
+}
+
+int db_sqlite::sqlite3_finalize(sqlite3_stmt *pStmt)
+{
+    return __sqlite3_finalize(pStmt);
+}
+
+int db_sqlite::sqlite3_bind_blob(sqlite3_stmt *stmt, int iCol,
+        const void *value, int n, void(*destory)(void*))
+{
+    return __sqlite3_bind_blob(stmt, iCol, value, n, destory);
+}
+
+int db_sqlite::sqlite3_bind_int(sqlite3_stmt *stmt, int iCol, int value)
+{
+    return __sqlite3_bind_int(stmt, iCol, value);
+}
+
+int db_sqlite::sqlite3_bind_int64(sqlite3_stmt *stmt, int iCol, int64_t value)
+{
+    return __sqlite3_bind_int64(stmt, iCol, value);
+}
+
+int db_sqlite::sqlite3_bind_text(sqlite3_stmt *stmt, int iCol,
+        const char *value, int n, void(*destory)(void*))
+{
+    return __sqlite3_bind_text(stmt, iCol, value, n, destory);
+}
+
+int db_sqlite::sqlite3_column_count(sqlite3_stmt *pStmt) {
+    return __sqlite3_column_count(pStmt);
+}
+
+const void* db_sqlite::sqlite3_column_blob(sqlite3_stmt *stmt, int iCol)
+{
+    return __sqlite3_column_blob(stmt, iCol);
+}
+
+int db_sqlite::sqlite3_column_int(sqlite3_stmt *stmt, int iCol)
+{
+    return __sqlite3_column_int(stmt, iCol);
+}
+
+int64_t db_sqlite::sqlite3_column_int64(sqlite3_stmt *stmt, int iCol)
+{
+    return __sqlite3_column_int64(stmt, iCol);
+}
+
+const unsigned char* db_sqlite::sqlite3_column_text(
+        sqlite3_stmt *stmt, int iCol)
+{
+    return __sqlite3_column_text(stmt, iCol);
+}
+
+int db_sqlite::sqlite3_column_bytes(sqlite3_stmt *stmt, int iCol)
+{
+    return __sqlite3_column_bytes(stmt, iCol);
+}
+
+const char* db_sqlite::sqlite3_column_name(sqlite3_stmt *stmt, int iCol)
+{
+    return __sqlite3_column_name(stmt, iCol);
+}
+
+int db_sqlite::sqlite3_exec(const char *sql,
+        int(*callback)(void*,int,char**,char**), void *arg, char **errmsg)
+{
+    return __sqlite3_exec(db_, sql, callback, arg, errmsg);
+}
+void db_sqlite::sqlite3_free(void* ptr) {
+    __sqlite3_free(ptr);
+}
 
 } // namespace acl
 
@@ -803,7 +991,30 @@ int db_sqlite::get_errno() const { return -1; }
 const char* db_sqlite::get_error() const { return "unknown"; }
 bool db_sqlite::prepare(sqlite_cursor&) { return false; }
 bool db_sqlite::next(sqlite_cursor&, bool*) { return false; }
-
+int db_sqlite::sqlite3_prepare_v2(const char, int,
+        sqlite3_stmt**, const char**){ return SQLITE_ERROR; }
+int db_sqlite::sqlite3_step(sqlite3_stmt*) { return SQLITE_ERROR; }
+int db_sqlite::sqlite3_reset(sqlite3_stmt*) { return SQLITE_ERROR;  }
+int db_sqlite::sqlite3_finalize(sqlite3_stmt*){ return SQLITE_ERROR; }
+int db_sqlite::sqlite3_bind_blob(sqlite3_stmt*, int,
+        const void*, int, void(*)(void*)) { return SQLITE_ERROR; }
+int db_sqlite::sqlite3_bind_int(sqlite3_stmt*, int, int) {
+    return SQLITE_ERROR; }
+int db_sqlite::sqlite3_bind_int64(sqlite3_stmt*, int, int64_t){
+    return SQLITE_ERROR; }
+int db_sqlite::sqlite3_bind_text(sqlite3_stmt*, int,
+        const char*, int, void(*)(void*)) { return SQLITE_ERROR; }
+int db_sqlite::sqlite3_column_count(sqlite3_stmt *pStmt) { return 0; }
+const void* db_sqlite::sqlite3_column_blob(sqlite3_stmt*, int) { return NULL; }
+int db_sqlite::sqlite3_column_int(sqlite3_stmt *stmt, int iCol) { return -1; }
+int64_t db_sqlite::sqlite3_column_int64(sqlite3_stmt*, int) { return -1; }
+const unsigned char* db_sqlite::sqlite3_column_text(
+        sqlite3_stmt *, int) { return NULL; }
+int db_sqlite::sqlite3_column_bytes(sqlite3_stmt *, int) { return 0; }
+const char* db_sqlite::sqlite3_column_name(sqlite3_stmt*, int) { return NULL; }
+int db_sqlite::sqlite3_exec(const char*,int(*)(void*,int,char**,char**),
+        void *, char **) { return SQLITE_ERROR; }
+void db_sqlite::sqlite3_free(void* ptr) {  }
 }  // namespace acl
 
 #endif // !HAS_SQLITE && !HAS_SQLITE_DLL
