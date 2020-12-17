@@ -1,4 +1,4 @@
-%define release_id 10
+%define release_id 11
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -45,6 +45,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Dec 17 2020 shuxin.zheng@qq.com 3.5.1-11-20201117.09
+- feature: add more API for db_sqlite module by Vhdsih
 
 * Wed Oct 28 2020 shuxin.zheng@qq.com 3.5.1-10-20201028.16
 - fixed bugs and optimize operation in acl::string

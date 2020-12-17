@@ -876,91 +876,94 @@ bool db_sqlite::next(sqlite_cursor& cursor, bool* done)
 	}
 	return true;
 }
+
 int db_sqlite::sqlite3_prepare_v2(const char *zSql,
-            int nByte, sqlite3_stmt **ppStmt, const char **pzTail)
+	int nByte, sqlite3_stmt **ppStmt, const char **pzTail)
 {
-    return __sqlite3_prepare_v2(db_, zSql, nByte, ppStmt, pzTail);
+	return __sqlite3_prepare_v2(db_, zSql, nByte, ppStmt, pzTail);
 }
 
 int db_sqlite::sqlite3_step(sqlite3_stmt *stmt)
 {
-    return __sqlite3_step(stmt);
+	return __sqlite3_step(stmt);
 }
 
 int db_sqlite::sqlite3_reset(sqlite3_stmt *pStmt)
 {
-    return __sqlite3_reset(pStmt);
+	return __sqlite3_reset(pStmt);
 }
 
 int db_sqlite::sqlite3_finalize(sqlite3_stmt *pStmt)
 {
-    return __sqlite3_finalize(pStmt);
+	return __sqlite3_finalize(pStmt);
 }
 
 int db_sqlite::sqlite3_bind_blob(sqlite3_stmt *stmt, int iCol,
-        const void *value, int n, void(*destory)(void*))
+	const void *value, int n, void(*destory)(void*))
 {
-    return __sqlite3_bind_blob(stmt, iCol, value, n, destory);
+	return __sqlite3_bind_blob(stmt, iCol, value, n, destory);
 }
 
 int db_sqlite::sqlite3_bind_int(sqlite3_stmt *stmt, int iCol, int value)
 {
-    return __sqlite3_bind_int(stmt, iCol, value);
+	return __sqlite3_bind_int(stmt, iCol, value);
 }
 
 int db_sqlite::sqlite3_bind_int64(sqlite3_stmt *stmt, int iCol, int64_t value)
 {
-    return __sqlite3_bind_int64(stmt, iCol, value);
+	return __sqlite3_bind_int64(stmt, iCol, value);
 }
 
 int db_sqlite::sqlite3_bind_text(sqlite3_stmt *stmt, int iCol,
-        const char *value, int n, void(*destory)(void*))
+	const char *value, int n, void(*destory)(void*))
 {
-    return __sqlite3_bind_text(stmt, iCol, value, n, destory);
+	return __sqlite3_bind_text(stmt, iCol, value, n, destory);
 }
 
-int db_sqlite::sqlite3_column_count(sqlite3_stmt *pStmt) {
-    return __sqlite3_column_count(pStmt);
+int db_sqlite::sqlite3_column_count(sqlite3_stmt *pStmt)
+{
+	return __sqlite3_column_count(pStmt);
 }
 
 const void* db_sqlite::sqlite3_column_blob(sqlite3_stmt *stmt, int iCol)
 {
-    return __sqlite3_column_blob(stmt, iCol);
+	return __sqlite3_column_blob(stmt, iCol);
 }
 
 int db_sqlite::sqlite3_column_int(sqlite3_stmt *stmt, int iCol)
 {
-    return __sqlite3_column_int(stmt, iCol);
+	return __sqlite3_column_int(stmt, iCol);
 }
 
 int64_t db_sqlite::sqlite3_column_int64(sqlite3_stmt *stmt, int iCol)
 {
-    return __sqlite3_column_int64(stmt, iCol);
+	return __sqlite3_column_int64(stmt, iCol);
 }
 
-const unsigned char* db_sqlite::sqlite3_column_text(
-        sqlite3_stmt *stmt, int iCol)
+const unsigned char* db_sqlite::sqlite3_column_text( sqlite3_stmt *stmt, int iCol)
 {
-    return __sqlite3_column_text(stmt, iCol);
+	return __sqlite3_column_text(stmt, iCol);
 }
 
 int db_sqlite::sqlite3_column_bytes(sqlite3_stmt *stmt, int iCol)
 {
-    return __sqlite3_column_bytes(stmt, iCol);
+	return __sqlite3_column_bytes(stmt, iCol);
 }
 
 const char* db_sqlite::sqlite3_column_name(sqlite3_stmt *stmt, int iCol)
 {
-    return __sqlite3_column_name(stmt, iCol);
+	return __sqlite3_column_name(stmt, iCol);
 }
 
 int db_sqlite::sqlite3_exec(const char *sql,
-        int(*callback)(void*,int,char**,char**), void *arg, char **errmsg)
+	int(*callback)(void*,int,char**,char**), void *arg, char **errmsg)
 {
-    return __sqlite3_exec(db_, sql, callback, arg, errmsg);
+	return __sqlite3_exec(db_, sql, callback, arg, errmsg);
 }
-void db_sqlite::sqlite3_free(void* ptr) {
-    __sqlite3_free(ptr);
+
+void db_sqlite::sqlite3_free(void* ptr)
+{
+	__sqlite3_free(ptr);
 }
 
 } // namespace acl
