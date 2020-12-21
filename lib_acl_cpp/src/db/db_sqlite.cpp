@@ -994,7 +994,7 @@ int db_sqlite::get_errno() const { return -1; }
 const char* db_sqlite::get_error() const { return "unknown"; }
 bool db_sqlite::prepare(sqlite_cursor&) { return false; }
 bool db_sqlite::next(sqlite_cursor&, bool*) { return false; }
-int db_sqlite::sqlite3_prepare_v2(const char, int,
+int db_sqlite::sqlite3_prepare_v2(const char*, int,
         sqlite3_stmt**, const char**){ return SQLITE_ERROR; }
 int db_sqlite::sqlite3_step(sqlite3_stmt*) { return SQLITE_ERROR; }
 int db_sqlite::sqlite3_reset(sqlite3_stmt*) { return SQLITE_ERROR;  }
