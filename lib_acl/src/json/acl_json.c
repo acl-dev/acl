@@ -88,22 +88,31 @@ ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json)
 {
 	ACL_JSON_NODE *node;
 
-	node = (ACL_JSON_NODE*) acl_dbuf_pool_calloc(
+	node = (ACL_JSON_NODE*) acl_dbuf_pool_alloc(
 			json->dbuf, sizeof(ACL_JSON_NODE));
 
 	acl_ring_init(&node->children);
 	acl_ring_init(&node->node);
 
-	node->json = json;
-	node->ltag = acl_vstring_dbuf_alloc(json->dbuf, 16);
-	node->text = acl_vstring_dbuf_alloc(json->dbuf, 16);
+	node->ltag      = acl_vstring_dbuf_alloc(json->dbuf, 16);
+	node->text      = acl_vstring_dbuf_alloc(json->dbuf, 16);
+	node->tag_node  = NULL;
+	node->parent    = NULL;
+	node->type      = 0;
+	node->depth     = 0;
+	node->quote     = 0;
+	node->left_ch   = 0;
+	node->right_ch  = 0;
+	node->backslash = 0;
 	node->part_word = 0;
-	json->node_cnt++;
+	node->json      = json;
 
 	node->iter_head = node_iter_head;
 	node->iter_next = node_iter_next;
 	node->iter_tail = node_iter_tail;
 	node->iter_prev = node_iter_prev;
+
+	json->node_cnt++;
 	return node;
 }
 

@@ -151,7 +151,7 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 static const char *json_tag(ACL_JSON *json, const char *data)
 {
 	ACL_JSON_NODE *node = json->curr_node;
-	int   ch;
+	char ch;
 
 	while ((ch = *data) != 0) {
 		/* 如果前面有引号，则需要找到结尾引号 */
@@ -187,7 +187,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 
 				parent = acl_json_node_parent(node);
 
-				acl_assert(parent);
+				//acl_assert(parent);
 
 				/* 数组对象的子节点允许为单独的字符串或对象 */
 				if (parent->left_ch == '[')
