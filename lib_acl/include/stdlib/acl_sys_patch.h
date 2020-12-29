@@ -38,6 +38,10 @@ ACL_API void sleep(int sec);
  * @param tz {struct timezone*} Ê±Çø
  */
 ACL_API int gettimeofday(struct timeval *tv, struct timezone *tz);
+ACL_API int gettimeofday1(struct timeval *tv, struct timezone *tz);
+ACL_API int gettimeofday2(struct timeval *tv, struct timezone *tz);
+ACL_API int gettimeofday3(struct timeval *tv, struct timezone *tz);
+ACL_API int gettimeofday4(struct timeval *tv, struct timezone *tz);
 
 #endif  /* _WIN32 */
 #ifdef	ACL_UNIX

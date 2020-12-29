@@ -20,13 +20,27 @@
 
 #ifdef ACL_WINDOWS
 
-#if 1
-
 # ifndef __GNUC__
 #   define EPOCHFILETIME (116444736000000000i64)
 # else
 #  define EPOCHFILETIME (116444736000000000LL)
 # endif
+
+/* FILETIME of Jan 1 1970 00:00:00. */
+# if 0
+#define UINT64CONST	(x)	((__int64) x)
+static const unsigned __int64 epoch = UINT64CONST(116444736000000000);
+# endif
+static const unsigned __int64 epoch = 116444736000000000LL;
+
+/*
+# ifndef __GNUC__
+#   define EPOCHFILETIME (116444736000000000i64)
+# else
+#  define EPOCHFILETIME (116444736000000000LL)
+# endif
+*/
+
 /*
 #ifndef ACL_DLL
 int _daylight;
@@ -90,7 +104,7 @@ typedef struct {
 	int tzflag;
 } TIME_CTX_T;
 
-int gettimeofday(struct timeval *tv, struct timezone *tz)
+int gettimeofday1(struct timeval *tv, struct timezone *tz)
 {
 	FILETIME        ft;
 	LARGE_INTEGER   li;
@@ -157,18 +171,10 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 	return (0);
 }
 
-#elif 1
+//int _daylight;
+//long _timezone;
 
-# ifndef __GNUC__
-#   define EPOCHFILETIME (116444736000000000i64)
-# else
-#  define EPOCHFILETIME (116444736000000000LL)
-# endif
-
-int _daylight;
-long _timezone;
-
-int gettimeofday(struct timeval *tv, struct timezone *tz)
+int gettimeofday2(struct timeval *tv, struct timezone *tz)
 {
 	FILETIME        ft;
 	LARGE_INTEGER   li;
@@ -198,16 +204,7 @@ int gettimeofday(struct timeval *tv, struct timezone *tz)
 	return (0);
 }
 
-#else
-
 /* Postgresql's implement */
-
-/* FILETIME of Jan 1 1970 00:00:00. */
-# if 0
-#define UINT64CONST	(x)	((__int64) x)
-static const unsigned __int64 epoch = UINT64CONST(116444736000000000);
-# endif
-static const unsigned __int64 epoch = 116444736000000000LL;
 
  /*
  * timezone information is stored outside the kernel so tzp isn't used anymore.
@@ -215,7 +212,7 @@ static const unsigned __int64 epoch = 116444736000000000LL;
  * Note: this function is not for Win32 high precision timing purpose. See
  * elapsed_time().
  */
-int gettimeofday(struct timeval * tp, struct timezone * tzp)
+int gettimeofday3(struct timeval * tp, struct timezone * tzp)
  {
 	FILETIME    file_time;
 	SYSTEMTIME  system_time;
@@ -232,5 +229,28 @@ int gettimeofday(struct timeval * tp, struct timezone * tzp)
     return 0;
 }
 
-#endif  /* end if 0 */
+int gettimeofday4(struct timeval *tp, struct timezone *tzp)
+{
+	time_t clock;
+	struct tm tm;
+	SYSTEMTIME wtm;
+	GetLocalTime(&wtm);
+	tm.tm_year   = wtm.wYear - 1900;
+	tm.tm_mon    = wtm.wMonth - 1;
+	tm.tm_mday   = wtm.wDay;
+	tm.tm_hour   = wtm.wHour;
+	tm.tm_min    = wtm.wMinute;
+	tm.tm_sec    = wtm.wSecond;
+	tm. tm_isdst = -1;
+	clock = mktime(&tm);
+	tp->tv_sec = (long) clock;
+	tp->tv_usec = wtm.wMilliseconds * 1000;
+	return (0);
+}
+
+int gettimeofday(struct timeval * tp, struct timezone * tzp)
+{
+	return gettimeofday3(tp, tzp);
+}
+
 #endif  /* ACL_WINDOWS */
