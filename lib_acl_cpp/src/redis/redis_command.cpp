@@ -37,6 +37,7 @@ void redis_command::init(void)
 	argv_lens_      = NULL;
 	slice_res_      = false;
 	result_         = NULL;
+	pipe_msg_       = NULL;
 	addr_[0]        = 0;
 	dbuf_           = new dbuf_pool();
 }
@@ -105,6 +106,7 @@ redis_command::~redis_command()
 	}
 	delete request_buf_;
 	delete request_obj_;
+	delete pipe_msg_;
 	dbuf_->destroy();
 }
 
@@ -190,6 +192,14 @@ void redis_command::set_pipeline(redis_client_pipeline* pipeline)
 bool redis_command::eof(void) const
 {
 	return conn_ == NULL ? false : conn_->eof();
+}
+
+redis_pipeline_message& redis_command::get_pipeline_message(void)
+{
+	if (pipe_msg_ == NULL) {
+		pipe_msg_ = NEW redis_pipeline_message(this);
+	}
+	return *pipe_msg_;
 }
 
 void redis_command::argv_space(size_t n)
@@ -322,7 +332,9 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	int* timeout /* = NULL */)
 {
 	if (pipeline_ != NULL) {
-		result_ =  pipeline_->run(this, nchild, timeout);
+		redis_pipeline_message& msg = get_pipeline_message();
+		msg.set_option(nchild, timeout);
+		result_ = pipeline_->run(msg);
 		return result_;
 	} else if (cluster_ != NULL) {
 		result_ = cluster_->run(*this, nchild, timeout);

@@ -16,6 +16,7 @@ class redis_request;
 class redis_client;
 class redis_client_cluster;
 class redis_client_pipeline;
+class redis_pipeline_message;
 
 /**
  * redis 客户端命令类的纯虚父类;
@@ -469,6 +470,8 @@ public:
 		return slice_req_;
 	}
 
+	redis_pipeline_message& get_pipeline_message(void);
+
 protected:
 	/************************** request ********************************/
 	bool slice_req_;
@@ -486,6 +489,7 @@ protected:
 protected:
 	/************************** respond ********************************/
 	bool slice_res_;
+	redis_pipeline_message* pipe_msg_;
 	const redis_result* result_;
 
 	void logger_result(const redis_result* result);

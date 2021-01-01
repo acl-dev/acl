@@ -23,50 +23,62 @@ class redis_client;
 
 class redis_pipeline_message {
 public:
-	redis_pipeline_message(redis_command* cmd, size_t nchild,
-		int* timeout, mbox<redis_pipeline_message>& box)
+	redis_pipeline_message(redis_command* cmd)
 	: cmd_(cmd)
-	, nchild_(nchild)
-	, timeout_(timeout)
-	, box_(box)
+	, nchild_(0)
+	, timeout_(NULL)
+	, box_(false)
 	, result_(NULL)
 	{}
 
 	~redis_pipeline_message(void) {}
 
+	redis_command& get_cmd(void) {
+		return *cmd_;
+	}
+
+	void set_option(size_t nchild, int* timeout) {
+		nchild_ = nchild;
+		timeout_ = timeout;
+	}
+
+	size_t get_nchild(void) const {
+		return nchild_;
+	}
+
+	int* get_timeout(void) const {
+		return timeout_;
+	}
+
+	void push(const redis_result* result) {
+		result_ = result;
+		box_.push(this);
+	}
+
+	const redis_result* wait(void) {
+		box_.pop();
+		return result_;
+	}
+
+private:
 	redis_command* cmd_;
 	size_t nchild_;
 	int* timeout_;
-	mbox<redis_pipeline_message>& box_;
+	mbox<redis_pipeline_message> box_;
 
 	const redis_result* result_;
 };
 
-class redis_reader : public thread {
+class redis_pipeline_channel : public thread {
 public:
-	redis_reader(redis_client& conn);
-	~redis_reader(void);
+	redis_pipeline_channel(const char* addr, int conn_timeout,
+		int rw_timeout, bool retry);
+	~redis_pipeline_channel(void);
 
 	void push(redis_pipeline_message* msg);
+	void flush(void);
 
-protected:
-	// @override
-	void* run(void);
-
-private:
-	BOX<redis_pipeline_message> box_;
-	redis_client& conn_;
-};
-
-class ACL_CPP_API redis_client_pipeline : public thread {
-public:
-	redis_client_pipeline(const char* addr, int conn_timeout = 60,
-		int rw_timeout = 30, bool retry = true);
-	~redis_client_pipeline(void);
-
-	void push(redis_pipeline_message* msg);
-
-	const redis_result* run(redis_command* cmd, size_t nchild, int* timeout);
+	bool start_thread(void);
 
 protected:
 	// @override
@@ -74,16 +86,41 @@ protected:
 
 private:
 	string addr_;
-	int conn_timeout_;
-	int rw_timeout_;
-	bool retry_;
+	string buf_;
 	redis_client* conn_;
+	BOX<redis_pipeline_message> box_;
+	std::vector<redis_pipeline_message*> msgs_;
+};
 
-	redis_reader* reader_;
+class ACL_CPP_API redis_client_pipeline : public thread {
+public:
+	redis_client_pipeline(const char* addr);
+	~redis_client_pipeline(void);
 
+	void push(redis_pipeline_message* msg);
+
+	const redis_result* run(redis_pipeline_message& msg);
+
+public:
+	redis_client_pipeline& set_timeout(int conn_timeout, int rw_timeout);
+	redis_client_pipeline& set_retry(bool on);
+	redis_client_pipeline& set_channels(size_t n);
+
+protected:
+	// @override
+	void* run(void);
+
+private:
+	string addr_;
+	int    conn_timeout_;
+	int    rw_timeout_;
+	bool   retry_;
+	size_t nchannels_;
+
+	std::vector<redis_pipeline_channel*> channels_;
 	BOX<redis_pipeline_message> box_;
 
-	void send(std::vector<redis_pipeline_message*>& msgs);
+	void flush_all(void);
 };
 
 } // namespace acl

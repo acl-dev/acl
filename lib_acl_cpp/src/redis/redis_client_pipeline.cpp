@@ -8,15 +8,33 @@
 
 namespace acl {
 
-redis_reader::redis_reader(redis_client& conn)
-: conn_(conn)
+redis_pipeline_channel::redis_pipeline_channel(const char* addr,
+	int conn_timeout, int rw_timeout, bool retry)
+: addr_(addr)
+, buf_(81920)
 {
+	conn_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
 }
 
-redis_reader::~redis_reader(void) {}
-
-void redis_reader::push(redis_pipeline_message* msg)
+redis_pipeline_channel::~redis_pipeline_channel(void)
 {
+	delete conn_;
+}
+
+bool redis_pipeline_channel::start_thread(void)
+{
+	if (!((connect_client*) conn_)->open()) {
+		logger_error("open %s error %s", addr_.c_str(), last_serror());
+		return false;
+	}
+
+	this->start();
+	return true;
+}
+
+void redis_pipeline_channel::push(redis_pipeline_message* msg)
+{
+	msgs_.push_back(msg);
 #ifdef USE_MBOX
 	box_.push(msg);
 #else
@@ -24,9 +42,49 @@ void redis_reader::push(redis_pipeline_message* msg)
 #endif
 }
 
-void* redis_reader::run(void)
+void redis_pipeline_channel::flush(void)
 {
-	while (!conn_.eof()) {
+	if (msgs_.empty()) {
+		return;
+	}
+
+	buf_.clear();
+	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
+		it != msgs_.end(); ++it) {
+		string* req = (*it)->get_cmd().get_request_buf();
+		buf_.append(req->c_str(), req->size());
+	}
+	msgs_.clear();
+
+#ifdef DEBUG_BOX
+	printf(">>>%s<<<\r\n", buf_.c_str());
+#endif
+
+	socket_stream* conn = conn_->get_stream();
+	if (conn == NULL) {
+		printf("conn NULL\r\n");
+		exit(1);
+	}
+
+	if (conn->write(buf_) == -1) {
+		printf("write error, addr=%s, buf=%s\r\n",
+			addr_.c_str(), buf_.c_str());
+		exit(1);
+	}
+#ifdef DEBUG_BOX
+	printf("write ok, nmsg=%ld\n", msgs.size());
+#endif
+
+}
+
+void* redis_pipeline_channel::run(void)
+{
+	dbuf_pool* dbuf;
+	const redis_result* result;
+	size_t nchild;
+	int* timeout;
+
+	while (!conn_->eof()) {
 		redis_pipeline_message* msg = box_.pop();
 		if (msg == NULL) {
 			break;
@@ -35,19 +93,25 @@ void* redis_reader::run(void)
 #ifdef DEBUG_BOX
 		printf("reader: get msg\r\n");
 #endif
-		socket_stream* conn = conn_.get_stream();
+		socket_stream* conn = conn_->get_stream();
 		if (conn == NULL) {
 			printf("get_stream null\r\n");
 			break;
 		}
 
-		dbuf_pool* dbuf = msg->cmd_->get_dbuf();
-		msg->result_ = conn_.get_object(*conn, dbuf);
-//#ifdef USE_MBOX
-		msg->box_.push(msg);
-//#else
-//		msg->box_.push(msg, false);
-//#endif
+		dbuf = msg->get_cmd().get_dbuf();
+		timeout = msg->get_timeout();
+		if (timeout) {
+			conn->set_rw_timeout(*timeout);
+		}
+
+		nchild = msg->get_nchild();
+		if (nchild >= 1) {
+			result = conn_->get_objects(*conn, dbuf, nchild);
+		} else {
+			result = conn_->get_object(*conn, dbuf);
+		}
+		msg->push(result);
 	}
 
 	return NULL;
@@ -55,67 +119,69 @@ void* redis_reader::run(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-redis_client_pipeline::redis_client_pipeline(const char* addr, int conn_timeout,
-	int rw_timeout, bool retry)
+redis_client_pipeline::redis_client_pipeline(const char* addr)
 : addr_(addr)
-, conn_timeout_(conn_timeout)
-, rw_timeout_(rw_timeout)
-, retry_(retry)
+, conn_timeout_(10)
+, rw_timeout_(10)
+, retry_(true)
+, nchannels_(1)
 {
-	conn_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
 }
 
 redis_client_pipeline::~redis_client_pipeline(void)
 {
-	delete conn_;
 }
 
-const redis_result* redis_client_pipeline::run(redis_command* cmd,
-	size_t nchild, int* timeout)
+redis_client_pipeline& redis_client_pipeline::set_timeout(int conn_timeout,
+	int rw_timeout)
 {
-#if 0
-	BOX<redis_pipeline_message> box(false);
-	dbuf_pool* dbuf = cmd->get_dbuf();
-	redis_pipeline_message* msg = new(dbuf)
-		redis_pipeline_message(cmd, nchild, timeout, box);
+	conn_timeout_ = conn_timeout;
+	rw_timeout_   = rw_timeout;
+	return *this;
+}
 
-	box_.push(msg);
+redis_client_pipeline& redis_client_pipeline::set_retry(bool on)
+{
+	retry_ = on;
+	return *this;
+}
 
-	msg = box.pop();
-	//printf(">>>>box get result, msg=%p\r\n", msg);
-	return msg->result_;
-#else
-	mbox<redis_pipeline_message> box(false);
-	redis_pipeline_message msg(cmd, nchild, timeout, box);
+redis_client_pipeline& redis_client_pipeline::set_channels(size_t n)
+{
+	nchannels_ = n;
+	return *this;
+}
 
+const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
+{
 #ifdef USE_MBOX
 	box_.push(&msg);
 #else
 	box_.push(&msg, false);
 #endif
 
-	redis_pipeline_message* m = box.pop();
-	if (m == NULL) {
-		exit(1);
-	}
-#ifdef DEBUG_BOX
-	printf(">>>>box get result, msg=%p\r\n", m);
-#endif
-	return m->result_;
-#endif
+	return msg.wait();
 }
 
 void* redis_client_pipeline::run(void)
 {
-	if (!((connect_client*) conn_)->open()) {
-		logger_error("open %s error %s", addr_.c_str(), last_serror());
+	for (size_t i = 0; i < 4; i++) {
+		redis_pipeline_channel* channel = NEW redis_pipeline_channel(
+			addr_, conn_timeout_, rw_timeout_, retry_);
+		if (channel->start_thread()) {
+			channels_.push_back(channel);
+		} else {
+			delete channel;
+		}
+	}
+
+	if (channels_.empty()) {
+		logger_error("no channel created!");
 		return NULL;
 	}
 
-	reader_ = NEW redis_reader(*conn_);
-	reader_->start();
-
-	std::vector<redis_pipeline_message*> msgs;
+	size_t size = channels_.size(), count = 0;
+	redis_pipeline_channel* channel;
 	int  timeout = -1;
 #ifdef USE_MBOX
 	bool success;
@@ -134,8 +200,8 @@ void* redis_client_pipeline::run(void)
 		printf("peek one msg=%p, timeout=%d\r\n", msg, timeout);
 #endif
 		if (msg != NULL) {
-			msgs.push_back(msg);
-			reader_->push(msg);
+			channel = channels_[count++ % size];
+			channel->push(msg);
 			timeout = 0;
 #ifdef USE_MBOX
 		} else if (!success) {
@@ -143,12 +209,9 @@ void* redis_client_pipeline::run(void)
 		} else if (found) {
 #endif
 			break;
-		} else if (msgs.empty()) {
-			timeout = -1;
 		} else {
 			timeout = -1;
-			send(msgs);
-			msgs.clear();
+			flush_all();
 		}
 	}
 
@@ -156,33 +219,12 @@ void* redis_client_pipeline::run(void)
 	return NULL;
 }
 
-void redis_client_pipeline::send(std::vector<redis_pipeline_message*>& msgs)
+void redis_client_pipeline::flush_all(void)
 {
-	acl::string buf(81920);
-	for (std::vector<redis_pipeline_message*>::iterator it = msgs.begin();
-		it != msgs.end(); ++it) {
-		string* req = (*it)->cmd_->get_request_buf();
-		buf.append(req->c_str(), req->size());
+	for (std::vector<redis_pipeline_channel*>::iterator
+		it = channels_.begin(); it != channels_.end(); ++it) {
+		(*it)->flush();
 	}
-
-#ifdef DEBUG_BOX
-	printf(">>>%s<<<\r\n", buf.c_str());
-#endif
-
-	socket_stream* conn = conn_->get_stream();
-	if (conn == NULL) {
-		printf("conn NULL\r\n");
-		exit(1);
-	}
-
-	if (conn->write(buf) == -1) {
-		printf("write error, addr=%s, buf=%s\r\n",
-			addr_.c_str(), buf.c_str());
-		exit(1);
-	}
-#ifdef DEBUG_BOX
-	printf("write ok, nmsg=%ld\n", msgs.size());
-#endif
 }
 
 } // namespace acl
