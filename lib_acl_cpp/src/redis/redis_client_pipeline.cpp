@@ -33,12 +33,12 @@ redis_pipeline_channel & redis_pipeline_channel::set_passwd(const char *passwd) 
 
 bool redis_pipeline_channel::start_thread(void)
 {
+	if (!passwd_.empty()) {
+		conn_->set_password(passwd_);
+	}
 	if (!((connect_client*) conn_)->open()) {
 		logger_error("open %s error %s", addr_.c_str(), last_serror());
 		return false;
-	}
-	if (!passwd_.empty()) {
-		conn_->set_password(passwd_);
 	}
 	this->start();
 	return true;
@@ -170,6 +170,14 @@ redis_client_pipeline& redis_client_pipeline::set_retry(bool on)
 redis_client_pipeline& redis_client_pipeline::set_channels(size_t n)
 {
 	nchannels_ = n;
+	return *this;
+}
+
+redis_client_pipeline& redis_client_pipeline::set_password(const char* passwd)
+{
+	if (passwd && *passwd) {
+		passwd_ = passwd;
+	}
 	return *this;
 }
 
@@ -324,6 +332,9 @@ void redis_client_pipeline::start_channels(void) {
 		cit != addrs_.end(); ++cit) {
 		redis_pipeline_channel* channel = NEW redis_pipeline_channel(
 			*cit, conn_timeout_, rw_timeout_, retry_);
+		if (!passwd_.empty()) {
+			channel->set_passwd(passwd_);
+		}
 		if (channel->start_thread()) {
 			channels_->insert(*cit, channel);
 		} else {
@@ -337,6 +348,9 @@ void redis_client_pipeline::start_channels(void) {
 
 	redis_pipeline_channel* channel = NEW redis_pipeline_channel(
 		addr_, conn_timeout_, rw_timeout_, retry_);
+	if (!passwd_.empty()) {
+		channel->set_passwd(passwd_);
+	}
 	if (channel->start_thread()) {
 		channels_->insert(addr_, channel);
 	} else {

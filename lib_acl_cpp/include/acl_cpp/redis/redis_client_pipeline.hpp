@@ -107,6 +107,7 @@ public:
 	const redis_result* run(redis_pipeline_message& msg);
 
 public:
+	redis_client_pipeline& set_password(const char* passwd);
 	redis_client_pipeline& set_timeout(int conn_timeout, int rw_timeout);
 	redis_client_pipeline& set_retry(bool on);
 	redis_client_pipeline& set_channels(size_t n);

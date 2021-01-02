@@ -191,7 +191,7 @@ protected:
 				break;
 			}
 
-			if (i > 0 && i % 1000 == 0) {
+			if (i > 0 && i % 5000 == 0) {
 				char tmp[128];
 				acl::safe_snprintf(tmp, sizeof(tmp), "%d", i);
 				acl::meter_time(__FILE__, __LINE__, tmp);
@@ -319,6 +319,9 @@ int main(int argc, char* argv[])
 	acl::redis_client_pipeline pipeline(addrs);
 	pipeline.set_timeout(conn_timeout, rw_timeout)
 		.set_channels((size_t) pipe_channels);
+	if (!passwd.empty()) {
+		pipeline.set_password(passwd);
+	}
 	pipeline.start();
 
 	struct timeval begin;
