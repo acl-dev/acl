@@ -246,7 +246,7 @@ void redis_client_pipeline::flush_all(void)
 
 void redis_client_pipeline::set_slot(size_t slot, const char* addr)
 {
-	if (slot < 0 || slot >= max_slot_ || addr == NULL || *addr == 0) {
+	if (slot >= max_slot_ || addr == NULL || *addr == 0) {
 		return;
 	}
 
