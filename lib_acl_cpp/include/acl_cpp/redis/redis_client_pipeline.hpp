@@ -19,6 +19,7 @@ namespace acl {
 # define BOX	tbox
 #endif
 
+class token_tree;
 class redis_client;
 
 class redis_pipeline_message {
@@ -105,6 +106,10 @@ public:
 	redis_client_pipeline& set_timeout(int conn_timeout, int rw_timeout);
 	redis_client_pipeline& set_retry(bool on);
 	redis_client_pipeline& set_channels(size_t n);
+	redis_client_pipeline& set_max_slot(size_t max_slot);
+	size_t get_max_slot(void) const {
+		return max_slot_;
+	}
 
 protected:
 	// @override
@@ -112,15 +117,24 @@ protected:
 
 private:
 	string addr_;
+	string passwd_;
+	size_t max_slot_;
 	int    conn_timeout_;
 	int    rw_timeout_;
 	bool   retry_;
 	size_t nchannels_;
 
-	std::vector<redis_pipeline_channel*> channels_;
+	token_tree* channels_;
 	BOX<redis_pipeline_message> box_;
 
+	std::vector<char*> addrs_;
+	const char** slot_addrs_;
+
 	void flush_all(void);
+	void set_slot(size_t slot, const char* addr);
+	void set_all_slot(void);
+	void start_channels(void);
+	redis_pipeline_channel* get_channel(int slot);
 };
 
 } // namespace acl

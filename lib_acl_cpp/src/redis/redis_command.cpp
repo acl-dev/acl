@@ -225,12 +225,17 @@ void redis_command::hash_slot(const char* key)
 
 void redis_command::hash_slot(const char* key, size_t len)
 {
+	int max_slot;
+
 	// 只有集群模式才需要计算哈希槽值
-	if (cluster_ == NULL) {
+	if (cluster_ != NULL) {
+		max_slot = cluster_->get_max_slot();
+	} else if (pipeline_ != NULL) {
+		max_slot = pipeline_->get_max_slot();
+	} else {
 		return;
 	}
 
-	int max_slot = cluster_->get_max_slot();
 	if (max_slot <= 0) {
 		return;
 	}
