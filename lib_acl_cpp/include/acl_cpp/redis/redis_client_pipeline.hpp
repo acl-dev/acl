@@ -81,6 +81,9 @@ public:
 
 	bool start_thread(void);
 
+public:
+	redis_pipeline_channel& set_passwd(const char* passwd);
+
 protected:
 	// @override
 	void* run(void);
@@ -88,6 +91,7 @@ protected:
 private:
 	string addr_;
 	string buf_;
+	string passwd_;
 	redis_client* conn_;
 	BOX<redis_pipeline_message> box_;
 	std::vector<redis_pipeline_message*> msgs_;

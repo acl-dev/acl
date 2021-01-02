@@ -24,13 +24,22 @@ redis_pipeline_channel::~redis_pipeline_channel(void)
 	delete conn_;
 }
 
+redis_pipeline_channel & redis_pipeline_channel::set_passwd(const char *passwd) {
+	if (passwd && *passwd) {
+		passwd_ = passwd;
+	}
+	return *this;
+}
+
 bool redis_pipeline_channel::start_thread(void)
 {
 	if (!((connect_client*) conn_)->open()) {
 		logger_error("open %s error %s", addr_.c_str(), last_serror());
 		return false;
 	}
-
+	if (!passwd_.empty()) {
+		conn_->set_password(passwd_);
+	}
 	this->start();
 	return true;
 }
