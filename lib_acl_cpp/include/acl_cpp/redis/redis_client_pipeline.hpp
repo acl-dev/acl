@@ -11,7 +11,7 @@
 namespace acl {
 
 //#define DEBUG_BOX
-//#define USE_MBOX
+#define USE_MBOX
 
 #ifdef USE_MBOX
 # define BOX	mbox
