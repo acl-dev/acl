@@ -13,7 +13,9 @@ static void usage(const char *procname)
 		" -c fibers count\r\n"
 		" -m threads_count\r\n"
 		" -t conn_timeout\r\n"
-		" -r rw_timeout\r\n", procname);
+		" -r rw_timeout\r\n"
+		" -a command[set|get|del|all]\r\n"
+		, procname);
 }
 
 int main(int argc, char *argv[])
@@ -22,9 +24,9 @@ int main(int argc, char *argv[])
 	acl::string addr("127.0.0.1:6379"), passwd;
 	int conn_timeout = 2, rw_timeout = 2;
 	bool use_global_cluster = false;
+	acl::string cmd = "del";
 
-	while ((ch = getopt(argc, argv, "hs:n:c:r:t:m:p:g")) > 0)
-	{
+	while ((ch = getopt(argc, argv, "hs:n:c:r:t:m:p:ga:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -53,6 +55,9 @@ int main(int argc, char *argv[])
 		case 'g':
 			use_global_cluster = true;
 			break;
+		case 'a':
+			cmd = optarg;
+			break;
 		default:
 			break;
 		}
@@ -70,16 +75,15 @@ int main(int argc, char *argv[])
 	cluster.set(addr, 0, conn_timeout, rw_timeout);
 	cluster.set_password("default", passwd);
 
-	for (int i = 0; i < nthreads; i++)
-	{
+	for (int i = 0; i < nthreads; i++) {
 		redis_thread* thread;
 		if (use_global_cluster) {
-			thread = new redis_thread(cluster,
-				fibers_max, stack_size, oper_count);
+			thread = new redis_thread(cluster, fibers_max,
+				stack_size, oper_count, cmd);
 		} else {
-			thread = new redis_thread(addr, passwd,
-				conn_timeout, rw_timeout, fibers_max,
-				stack_size, oper_count);
+			thread = new redis_thread(addr, passwd, conn_timeout,
+				rw_timeout, fibers_max, stack_size,
+				oper_count, cmd);
 		}
 		thread->set_detachable(false);
 		thread->set_stacksize(stack_size * (fibers_max + 6400));
@@ -88,8 +92,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (std::vector<acl::thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it)
-	{
+		it != threads.end(); ++it) {
 		(*it)->wait(NULL);
 		delete (*it);
 	}

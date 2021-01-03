@@ -2,9 +2,10 @@ class redis_thread : public acl::thread
 {
 public:
 	redis_thread(const char* addr, const char* passwd, int conn_timeout,
-		int rw_timeout, int fibers_max, int stack_size, int oper_count);
-	redis_thread(acl::redis_client_cluster& cluster,
-		int fibers_max, int stack_size, int oper_count);
+		int rw_timeout, int fibers_max, int stack_size,
+		int oper_count, const char* cmd);
+	redis_thread(acl::redis_client_cluster& cluster, int fibers_max,
+		int stack_size, int oper_count, const char* cmd);
 
 	~redis_thread(void);
 
@@ -29,13 +30,14 @@ private:
 		return begin_;
 	}
 
+	const acl::string& get_cmd(void) const {
+		return cmd_;
+	}
+
 	void fiber_dec(int cnt);
 
 protected:
 	void *run(void);
-
-	static double stamp_sub(const struct timeval *from,
-		const struct timeval *sub_by);
 
 private:
 	acl::string addr_;
@@ -46,6 +48,8 @@ private:
 	int fibers_cnt_;
 	int stack_size_;
 	int oper_count_;
+	acl::string cmd_;
+
 	struct timeval begin_;
 	acl::redis_client_cluster* cluster_;
 	acl::redis_client_cluster* cluster_internal_;
