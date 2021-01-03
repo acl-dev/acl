@@ -96,7 +96,7 @@ redis_command::redis_command(redis_client_pipeline* pipeline)
 	pipeline_ = pipeline;
 }
 
-redis_command::~redis_command()
+redis_command::~redis_command(void)
 {
 	if (argv_ != NULL) {
 		acl_myfree(argv_);
@@ -187,6 +187,27 @@ void redis_command::set_cluster(redis_client_cluster* cluster)
 void redis_command::set_pipeline(redis_client_pipeline* pipeline)
 {
 	pipeline_ = pipeline;
+}
+
+// 分析重定向信息，获得重定向的服务器地址
+const char* redis_command::get_addr(const char* info)
+{
+	char* cmd = dbuf_->dbuf_strdup(info);
+	char* slot = strchr(cmd, ' ');
+	if (slot == NULL) {
+		return NULL;
+	}
+	*slot++ = 0;
+	char* addr = strchr(slot, ' ');
+	if (addr == NULL) {
+		return NULL;
+	}
+	*addr++ = 0;
+	if (*addr == 0) {
+		return NULL;
+	}
+
+	return addr;
 }
 
 bool redis_command::eof(void) const
@@ -328,7 +349,7 @@ const char* redis_command::result_value(size_t i, size_t* len /* = NULL */) cons
 	return buf;
 }
 
-const redis_result* redis_command::get_result() const
+const redis_result* redis_command::get_result(void) const
 {
 	return result_;
 }
@@ -340,6 +361,7 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 		redis_pipeline_message& msg = get_pipeline_message();
 		msg.set_option(nchild, timeout);
 		result_ = pipeline_->run(msg);
+
 		return result_;
 	} else if (cluster_ != NULL) {
 		result_ = cluster_->run(*this, nchild, timeout);
@@ -505,7 +527,7 @@ int redis_command::get_status(std::vector<bool>& out)
 	return (int) size;
 }
 
-const char* redis_command::get_status()
+const char* redis_command::get_status(void)
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS) {
@@ -908,7 +930,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	return children;
 }
 
-void redis_command::clear_request()
+void redis_command::clear_request(void)
 {
 	if (request_buf_) {
 		request_buf_->clear();

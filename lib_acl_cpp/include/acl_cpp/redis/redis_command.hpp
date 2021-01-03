@@ -105,7 +105,7 @@ public:
 	 *  the internal redis connection be returned, NULL if no redis
 	 *  connection be set 
 	 */
-	redis_client* get_client() const
+	redis_client* get_client(void) const
 	{
 		return conn_;
 	}
@@ -119,7 +119,7 @@ public:
 	 * @return {const char*} 返回空串 "" 表示没有绑定 redis 连接对象
 	 *  if "" was resturned, the redis connection was not set
 	 */
-	const char* get_client_addr() const;
+	const char* get_client_addr(void) const;
 
 	/**
 	 * 设置连接池集群管理器;
@@ -140,7 +140,7 @@ public:
 	 * get redis_cluster object set by set_cluster function
 	 * @return {redis_client_cluster*}
 	 */
-	redis_client_cluster* get_cluster() const
+	redis_client_cluster* get_cluster(void) const
 	{
 		return cluster_;
 	}
@@ -156,7 +156,7 @@ public:
 	 * get memory pool handle been set
 	 * @return {dbuf_pool*}
 	 */
-	dbuf_pool* get_dbuf() const
+	dbuf_pool* get_dbuf(void) const
 	{
 		return dbuf_;
 	}
@@ -166,7 +166,7 @@ public:
 	 * get the result type returned from redis-server
 	 * @return {redis_result_t}
 	 */
-	redis_result_t result_type() const;
+	redis_result_t result_type(void) const;
 
 	/**
 	 * 当返回值为 REDIS_RESULT_STATUS 类型时，本方法返回状态信息;
@@ -175,7 +175,7 @@ public:
 	 * @return {const char*} 返回 "" 表示出错;
 	 *  "" will be returned on error
 	 */
-	const char* result_status() const;
+	const char* result_status(void) const;
 
 	/**
 	 * 当出错时返回值为 REDIS_RESULT_ERROR 类型，本方法返回出错信息;
@@ -184,7 +184,7 @@ public:
 	 * @return {const char*} 返回空串 "" 表示没有出错信息;
 	 *  "" will be returned when no error info
 	 */
-	const char* result_error() const;
+	const char* result_error(void) const;
 
 	/**
 	 * 获得当前结果结点存储的对象的个数, 该方法可以获得结果为下面两个方法
@@ -202,7 +202,7 @@ public:
 	 *       chunks, the returned value is the chunks number
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
-	size_t result_size() const;
+	size_t result_size(void) const;
 
 	/**
 	 * 当返回值为 REDIS_RESULT_INTEGER 类型时，本方法返回对应的 32 位整数值;
@@ -243,14 +243,14 @@ public:
 	 * object be set internal
 	 * @return {bool}
 	 */
-	bool eof() const;
+	bool eof(void) const;
 
 	/**
 	 * 获得本次 redis 操作过程的结果;
 	 * get result object of last redis operation
 	 * @return {redis_result*}
 	 */
-	const redis_result* get_result() const;
+	const redis_result* get_result(void) const;
 
 	/**
 	 * 当查询结果为数组对象时调用本方法获得一个数组元素对象;
@@ -339,7 +339,7 @@ protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 
 	void build_request(size_t argc, const char* argv[], size_t lens[]);
-	void clear_request();
+	void clear_request(void);
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);
@@ -407,7 +407,7 @@ protected:
 	bool check_status(const char* success = "OK");
 
 	int get_status(std::vector<bool>& out);
-	const char* get_status();
+	const char* get_status(void);
 
 	int get_string(string& buf);
 	int get_string(string* buf);

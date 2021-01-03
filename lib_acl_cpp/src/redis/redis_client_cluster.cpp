@@ -340,34 +340,13 @@ redis_client* redis_client_cluster::reopen(redis_command& cmd,
 	return conn;
 }
 
-// 分析重定向信息，获得重定向的服务器地址
-const char* redis_client_cluster::get_addr(dbuf_pool* dbuf, const char* info)
-{
-	char* cmd = dbuf->dbuf_strdup(info);
-	char* slot = strchr(cmd, ' ');
-	if (slot == NULL) {
-		return NULL;
-	}
-	*slot++ = 0;
-	char* addr = strchr(slot, ' ');
-	if (addr == NULL) {
-		return NULL;
-	}
-	*addr++ = 0;
-	if (*addr == 0) {
-		return NULL;
-	}
-
-	return addr;
-}
-
 redis_client* redis_client_cluster::move(redis_command& cmd,
 	redis_client* conn, const char* ptr, int ntried)
 {
 	// 将旧连接对象归还给连接池对象
 	conn->get_pool()->put(conn, true);
 
-	const char* addr = get_addr(cmd.get_dbuf(), ptr);
+	const char* addr = cmd.get_addr(ptr);
 	if (addr == NULL) {
 		logger_warn("MOVED invalid, ptr: %s", ptr);
 		return NULL;
@@ -408,8 +387,7 @@ redis_client* redis_client_cluster::ask(redis_command& cmd,
 	// 将旧连接对象归还给连接池对象
 	conn->get_pool()->put(conn, true);
 
-	dbuf_pool* dbuf = cmd.get_dbuf();
-	const char* addr = get_addr(dbuf, ptr);
+	const char* addr = cmd.get_addr(ptr);
 	if (addr == NULL) {
 		logger_warn("ASK invalid, ptr: %s", ptr);
 		return NULL;
@@ -439,6 +417,7 @@ redis_client* redis_client_cluster::ask(redis_command& cmd,
 		acl_doze(redirect_sleep_);
 	}
 
+	dbuf_pool* dbuf = cmd.get_dbuf();
 	const redis_result* result = conn->run(dbuf, "ASKING\r\n", 0);
 	if (result == NULL) {
 		logger_error("ASKING's reply null");

@@ -11,9 +11,10 @@
 
 namespace acl {
 
-redis_pipeline_channel::redis_pipeline_channel(const char* addr,
-	int conn_timeout, int rw_timeout, bool retry)
-: addr_(addr)
+redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
+	const char* addr, int conn_timeout, int rw_timeout, bool retry)
+: pipeline_(pipeline)
+, addr_(addr)
 , buf_(81920)
 {
 	conn_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
@@ -86,7 +87,6 @@ void redis_pipeline_channel::flush(void)
 #ifdef DEBUG_BOX
 	printf("write ok, nmsg=%ld\n", msgs.size());
 #endif
-
 }
 
 void* redis_pipeline_channel::run(void)
@@ -123,7 +123,32 @@ void* redis_pipeline_channel::run(void)
 		} else {
 			result = conn_->get_object(*conn, dbuf);
 		}
-		msg->push(result);
+		int type = result->get_type();
+		if (type == REDIS_RESULT_UNKOWN || type != REDIS_RESULT_ERROR) {
+			msg->push(result);
+			continue;
+		}
+
+#define	EQ(x, y) !strncasecmp((x), (y), sizeof(y) -1)
+
+		const char* ptr = result->get_error();
+		if (ptr == NULL || *ptr == 0) {
+			msg->push(result);
+		} else if (EQ(ptr, "MOVED")) {
+			const char* addr = msg->get_cmd().get_addr(ptr);
+			if (addr == NULL || msg->get_redirect_count() >= 5) {
+				msg->push(result);
+			} else {
+				msg->set_redirect_addr(addr);
+				pipeline_.push(msg);
+			}
+		} else if (EQ(ptr, "ASK")) {
+
+		} else if (EQ(ptr, "CLUSTERDOWN")) {
+
+		} else {
+			msg->push(result);
+		}
 	}
 
 	return NULL;
@@ -197,6 +222,15 @@ const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
 	return msg.wait();
 }
 
+void redis_client_pipeline::push(redis_pipeline_message *msg)
+{
+#ifdef USE_MBOX
+	box_.push(msg);
+#else
+	box_.push(msg, false);
+#endif
+}
+
 void* redis_client_pipeline::run(void)
 {
 	set_all_slot();
@@ -227,6 +261,10 @@ void* redis_client_pipeline::run(void)
 #endif
 		if (msg != NULL) {
 			int slot = msg->get_cmd().get_slot();
+			const char* redirect_addr = msg->get_redirect_addr();
+			if (redirect_addr) {
+				set_slot(slot, redirect_addr);
+			}
 			channel = get_channel(slot);
 			if (channel == NULL) {
 				printf("channel null, slot=%d\r\n", slot);
@@ -301,6 +339,7 @@ void redis_client_pipeline::set_all_slot(void)
 
 	const std::vector<redis_slot*>* slots = cluster.cluster_slots();
 	if (slots == NULL) {
+		logger("can't get cluster slots");
 		return;
 	}
 
@@ -330,31 +369,29 @@ void redis_client_pipeline::set_all_slot(void)
 void redis_client_pipeline::start_channels(void) {
 	for (std::vector<char*>::const_iterator cit = addrs_.begin();
 		cit != addrs_.end(); ++cit) {
-		redis_pipeline_channel* channel = NEW redis_pipeline_channel(
-			*cit, conn_timeout_, rw_timeout_, retry_);
-		if (!passwd_.empty()) {
-			channel->set_passwd(passwd_);
-		}
-		if (channel->start_thread()) {
-			channels_->insert(*cit, channel);
-		} else {
-			delete channel;
-		}
+		(void) start_channel(*cit);
 	}
 
+	// 如果已经成功添加了集群节点，则说明为集群模式，按集群方式对待，
+	// 否则，按单点方式对待
 	if (channels_->first_node() == NULL) {
-		return;
+		(void) start_channel(addr_);
 	}
+}
 
+redis_pipeline_channel* redis_client_pipeline::start_channel(const char *addr)
+{
 	redis_pipeline_channel* channel = NEW redis_pipeline_channel(
-		addr_, conn_timeout_, rw_timeout_, retry_);
+		*this, addr, conn_timeout_, rw_timeout_, retry_);
 	if (!passwd_.empty()) {
 		channel->set_passwd(passwd_);
 	}
 	if (channel->start_thread()) {
-		channels_->insert(addr_, channel);
+		channels_->insert(addr, channel);
+		return channel;
 	} else {
 		delete channel;
+		return NULL;
 	}
 }
 
@@ -370,7 +407,11 @@ redis_pipeline_channel* redis_client_pipeline::get_channel(int slot) {
 	}
 
 	const token_node* node = channels_->find(addr);
-	return node == NULL ? NULL : (redis_pipeline_channel*) node->get_ctx();
+	if (node) {
+		return (redis_pipeline_channel*) node->get_ctx();
+	}
+
+	return start_channel(addr);
 }
 
 } // namespace acl

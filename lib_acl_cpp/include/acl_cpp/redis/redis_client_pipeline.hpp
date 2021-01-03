@@ -30,6 +30,8 @@ public:
 	, timeout_(NULL)
 	, box_(false)
 	, result_(NULL)
+	, redirect_addr_(NULL)
+	, redirect_count_(0)
 	{}
 
 	~redis_pipeline_message(void) {}
@@ -39,8 +41,18 @@ public:
 	}
 
 	void set_option(size_t nchild, int* timeout) {
-		nchild_ = nchild;
+		nchild_  = nchild;
 		timeout_ = timeout;
+		result_  = NULL;
+		redirect_addr_  = NULL;
+		redirect_count_ = 0;
+	}
+
+	void set_redirect_addr(const char* addr) {
+		redirect_addr_ = addr;
+		if (addr) {
+			redirect_count_++;
+		}
 	}
 
 	size_t get_nchild(void) const {
@@ -61,6 +73,14 @@ public:
 		return result_;
 	}
 
+	const char* get_redirect_addr(void) const {
+		return redirect_addr_;
+	}
+
+	size_t get_redirect_count(void) const {
+		return redirect_count_;
+	}
+
 private:
 	redis_command* cmd_;
 	size_t nchild_;
@@ -68,12 +88,15 @@ private:
 	mbox<redis_pipeline_message> box_;
 
 	const redis_result* result_;
+	const char* redirect_addr_;
+	size_t redirect_count_;
 };
 
+class redis_client_pipeline;
 class redis_pipeline_channel : public thread {
 public:
-	redis_pipeline_channel(const char* addr, int conn_timeout,
-		int rw_timeout, bool retry);
+	redis_pipeline_channel(redis_client_pipeline& pipeline,
+		const char* addr, int conn_timeout, int rw_timeout, bool retry);
 	~redis_pipeline_channel(void);
 
 	void push(redis_pipeline_message* msg);
@@ -83,12 +106,16 @@ public:
 
 public:
 	redis_pipeline_channel& set_passwd(const char* passwd);
+	const char* get_addr(void) const {
+		return addr_.c_str();
+	}
 
 protected:
 	// @override
 	void* run(void);
 
 private:
+	redis_client_pipeline& pipeline_;
 	string addr_;
 	string buf_;
 	string passwd_;
@@ -139,6 +166,7 @@ private:
 	void set_slot(size_t slot, const char* addr);
 	void set_all_slot(void);
 	void start_channels(void);
+	redis_pipeline_channel* start_channel(const char* addr);
 	redis_pipeline_channel* get_channel(int slot);
 };
 

@@ -217,8 +217,6 @@ private:
 	std::map<string, string> passwds_;
 	sslbase_conf* ssl_conf_;
 
-	const char* get_addr(dbuf_pool* dbuf, const char* info);
-
 	redis_client* reopen(redis_command& cmd, redis_client* conn);
 	redis_client* move(redis_command& cd, redis_client* conn, 
 			const char* ptr, int nretried);
