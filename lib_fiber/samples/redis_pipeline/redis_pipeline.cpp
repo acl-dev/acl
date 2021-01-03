@@ -361,7 +361,7 @@ int main(int argc, char* argv[])
 	struct timeval end;
 	gettimeofday(&end, NULL);
 
-	long long int total = max_threads * n;
+	long long int total = max_threads * n * nfibers;
 	double inter = acl::stamp_sub(end, begin);
 	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", cmd.c_str(),
 		total, inter, (total * 1000) /(inter > 0 ? inter : 1));
