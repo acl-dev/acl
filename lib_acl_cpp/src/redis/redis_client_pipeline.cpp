@@ -61,11 +61,29 @@ void redis_pipeline_channel::flush(void)
 		return;
 	}
 
+	char buf[64];
 	buf_.clear();
+
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
 		it != msgs_.end(); ++it) {
+#if 0
 		string* req = (*it)->get_cmd().get_request_buf();
 		buf_.append(req->c_str(), req->size());
+#else
+		acl_ui64toa_radix((acl_uint64) (*it)->argc_, buf, sizeof(buf), 10);
+		buf_.append("*");
+		buf_.append(buf);
+		buf_.append("\r\n");
+
+		for (size_t i = 0; i < (*it)->argc_; i++) {
+			acl_ui64toa_radix((acl_uint64) (*it)->lens_[i], buf, sizeof(buf), 10);
+			buf_.append("$");
+			buf_.append(buf);
+			buf_.append("\r\n");
+			buf_.append((*it)->argv_[i], (*it)->lens_[i]);
+			buf_.append("\r\n");
+		}
+#endif
 	}
 	msgs_.clear();
 

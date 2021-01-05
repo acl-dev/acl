@@ -942,7 +942,10 @@ void redis_command::clear_request(void)
 
 void redis_command::build_request(size_t argc, const char* argv[], size_t lens[])
 {
-	if (slice_req_) {
+	if (pipeline_) {
+		redis_pipeline_message& msg = get_pipeline_message();
+		msg.set_request(argc, argv, lens);
+	} else if (slice_req_) {
 		build_request2(argc, argv, lens);
 	} else {
 		build_request1(argc, argv, lens);

@@ -32,6 +32,9 @@ public:
 	, result_(NULL)
 	, redirect_addr_(NULL)
 	, redirect_count_(0)
+	, argc_(0)
+	, argv_(NULL)
+	, lens_(NULL)
 	{}
 
 	~redis_pipeline_message(void) {}
@@ -46,6 +49,12 @@ public:
 		result_  = NULL;
 		redirect_addr_  = NULL;
 		redirect_count_ = 0;
+	}
+
+	void set_request(size_t argc, const char** argv, size_t* lens) {
+		argc_    = argc;
+		argv_    = argv;
+		lens_    = lens;
 	}
 
 	void set_redirect_addr(const char* addr) {
@@ -90,6 +99,11 @@ private:
 	const redis_result* result_;
 	const char* redirect_addr_;
 	size_t redirect_count_;
+
+public:
+	size_t       argc_;
+	const char** argv_;
+	size_t*      lens_;
 };
 
 class redis_client_pipeline;
