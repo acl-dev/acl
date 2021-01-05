@@ -146,8 +146,9 @@ private:
 	redis_client* client_;
 	BOX<redis_pipeline_message> box_;
 	std::vector<redis_pipeline_message*> msgs_;
-
+public:
 	bool flush(void);
+	void handle_all(void);
 };
 
 class ACL_CPP_API redis_client_pipeline : public thread {

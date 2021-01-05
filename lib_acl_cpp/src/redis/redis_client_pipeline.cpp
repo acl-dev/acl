@@ -44,7 +44,6 @@ bool redis_pipeline_channel::start_thread(void)
 
 void redis_pipeline_channel::push(redis_pipeline_message* msg)
 {
-	msgs_.push_back(msg);
 #ifdef USE_MBOX
 	box_.push(msg);
 #else
@@ -62,15 +61,14 @@ bool redis_pipeline_channel::flush(void)
 
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
 		it != msgs_.end(); ++it) {
-#if 0
-		string* req = (*it)->get_cmd().get_request_buf();
+#if 1
+		string* req = (*it)->get_cmd()->get_request_buf();
 		buf_.append(req->c_str(), req->size());
 #else
 		redis_command::build_request((*it)->argc_, (*it)->argv_,
 			(*it)->lens_, buf_);
 #endif
 	}
-	msgs_.clear();
 
 	socket_stream* conn = client_->get_stream(false);
 	if (conn == NULL) {
@@ -85,37 +83,20 @@ bool redis_pipeline_channel::flush(void)
 	return true;
 }
 
-void* redis_pipeline_channel::run(void)
-{
+void redis_pipeline_channel::handle_all(void) {
+	socket_stream* conn = client_->get_stream();
+	if (conn == NULL) {
+		printf("get_stream null\r\n");
+		return;
+	}
 	dbuf_pool* dbuf;
 	const redis_result* result;
 	size_t nchild;
 	int* timeout;
 
-	while (!client_->eof()) {
-		redis_pipeline_message* msg = box_.pop();
-		if (msg == NULL) {
-			break;
-		}
-
-		switch (msg->get_type()) {
-		case redis_pipeline_t_cmd:
-			break;
-		case redis_pipeline_t_flush:
-			flush();
-			continue;
-		case redis_pipeline_t_stop:
-			goto END;
-		default:
-			break;
-		}
-
-		socket_stream* conn = client_->get_stream();
-		if (conn == NULL) {
-			printf("get_stream null\r\n");
-			break;
-		}
-
+	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
+			it != msgs_.end(); ++it) {
+		redis_pipeline_message* msg = *it;
 		dbuf = msg->get_cmd()->get_dbuf();
 		timeout = msg->get_timeout();
 		if (timeout) {
@@ -153,6 +134,32 @@ void* redis_pipeline_channel::run(void)
 
 		} else {
 			msg->push(result);
+		}
+	}
+	msgs_.clear();
+}
+
+void* redis_pipeline_channel::run(void)
+{
+
+	while (!client_->eof()) {
+		redis_pipeline_message* msg = box_.pop();
+		if (msg == NULL) {
+			break;
+		}
+
+		switch (msg->get_type()) {
+		case redis_pipeline_t_cmd:
+			msgs_.push_back(msg);
+			break;
+		case redis_pipeline_t_flush:
+			flush();
+			handle_all();
+			break;
+		case redis_pipeline_t_stop:
+			goto END;
+		default:
+			break;
 		}
 	}
 
@@ -302,6 +309,7 @@ void redis_client_pipeline::flush_all(void)
 		redis_pipeline_channel* channel = (redis_pipeline_channel*)
 			iter->get_ctx();
 		channel->push(&message_flush_);
+		//channel->flush();
 		iter = channels_->next_node();
 	}
 }
