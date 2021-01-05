@@ -17,27 +17,24 @@ redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 , addr_(addr)
 , buf_(81920)
 {
-	conn_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
+	client_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
 }
 
 redis_pipeline_channel::~redis_pipeline_channel(void)
 {
-	delete conn_;
+	delete client_;
 }
 
 redis_pipeline_channel & redis_pipeline_channel::set_passwd(const char *passwd) {
 	if (passwd && *passwd) {
-		passwd_ = passwd;
+		client_->set_password(passwd);
 	}
 	return *this;
 }
 
 bool redis_pipeline_channel::start_thread(void)
 {
-	if (!passwd_.empty()) {
-		conn_->set_password(passwd_);
-	}
-	if (!((connect_client*) conn_)->open()) {
+	if (!((connect_client*) client_)->open()) {
 		logger_error("open %s error %s", addr_.c_str(), last_serror());
 		return false;
 	}
@@ -55,10 +52,10 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg)
 #endif
 }
 
-void redis_pipeline_channel::flush(void)
+bool redis_pipeline_channel::flush(void)
 {
 	if (msgs_.empty()) {
-		return;
+		return true;
 	}
 
 	buf_.clear();
@@ -75,24 +72,17 @@ void redis_pipeline_channel::flush(void)
 	}
 	msgs_.clear();
 
-#ifdef DEBUG_BOX
-	printf(">>>%s<<<\r\n", buf_.c_str());
-#endif
-
-	socket_stream* conn = conn_->get_stream();
+	socket_stream* conn = client_->get_stream(false);
 	if (conn == NULL) {
-		printf("conn NULL\r\n");
-		exit(1);
+		return false;
 	}
 
 	if (conn->write(buf_) == -1) {
-		printf("write error, addr=%s, buf=%s\r\n",
-			addr_.c_str(), buf_.c_str());
-		exit(1);
+		logger_error("write error, addr=%s, buf=%s",
+		       addr_.c_str(), buf_.c_str());
+		return false;
 	}
-#ifdef DEBUG_BOX
-	printf("write ok, nmsg=%ld\n", msgs.size());
-#endif
+	return true;
 }
 
 void* redis_pipeline_channel::run(void)
@@ -102,22 +92,31 @@ void* redis_pipeline_channel::run(void)
 	size_t nchild;
 	int* timeout;
 
-	while (!conn_->eof()) {
+	while (!client_->eof()) {
 		redis_pipeline_message* msg = box_.pop();
 		if (msg == NULL) {
 			break;
 		}
 
-#ifdef DEBUG_BOX
-		printf("reader: get msg\r\n");
-#endif
-		socket_stream* conn = conn_->get_stream();
+		switch (msg->get_type()) {
+		case redis_pipeline_t_cmd:
+			break;
+		case redis_pipeline_t_flush:
+			flush();
+			continue;
+		case redis_pipeline_t_stop:
+			goto END;
+		default:
+			break;
+		}
+
+		socket_stream* conn = client_->get_stream();
 		if (conn == NULL) {
 			printf("get_stream null\r\n");
 			break;
 		}
 
-		dbuf = msg->get_cmd().get_dbuf();
+		dbuf = msg->get_cmd()->get_dbuf();
 		timeout = msg->get_timeout();
 		if (timeout) {
 			conn->set_rw_timeout(*timeout);
@@ -125,9 +124,9 @@ void* redis_pipeline_channel::run(void)
 
 		nchild = msg->get_nchild();
 		if (nchild >= 1) {
-			result = conn_->get_objects(*conn, dbuf, nchild);
+			result = client_->get_objects(*conn, dbuf, nchild);
 		} else {
-			result = conn_->get_object(*conn, dbuf);
+			result = client_->get_object(*conn, dbuf);
 		}
 		int type = result->get_type();
 		if (type == REDIS_RESULT_UNKOWN || type != REDIS_RESULT_ERROR) {
@@ -141,7 +140,7 @@ void* redis_pipeline_channel::run(void)
 		if (ptr == NULL || *ptr == 0) {
 			msg->push(result);
 		} else if (EQ(ptr, "MOVED")) {
-			const char* addr = msg->get_cmd().get_addr(ptr);
+			const char* addr = msg->get_cmd()->get_addr(ptr);
 			if (addr == NULL || msg->get_redirect_count() >= 5) {
 				msg->push(result);
 			} else {
@@ -157,6 +156,7 @@ void* redis_pipeline_channel::run(void)
 		}
 	}
 
+END:
 	return NULL;
 }
 
@@ -169,6 +169,7 @@ redis_client_pipeline::redis_client_pipeline(const char* addr)
 , rw_timeout_(10)
 , retry_(true)
 , nchannels_(1)
+, message_flush_(NULL, redis_pipeline_t_flush)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 	channels_   = NEW token_tree;
@@ -239,7 +240,7 @@ void redis_client_pipeline::push(redis_pipeline_message *msg)
 
 void* redis_client_pipeline::run(void)
 {
-	set_all_slot();
+	//set_all_slot();
 	start_channels();
 
 	if (channels_->first_node() == NULL) {
@@ -266,7 +267,7 @@ void* redis_client_pipeline::run(void)
 		printf("peek one msg=%p, timeout=%d\r\n", msg, timeout);
 #endif
 		if (msg != NULL) {
-			int slot = msg->get_cmd().get_slot();
+			int slot = msg->get_cmd()->get_slot();
 			const char* redirect_addr = msg->get_redirect_addr();
 			if (redirect_addr) {
 				set_slot(slot, redirect_addr);
@@ -300,7 +301,7 @@ void redis_client_pipeline::flush_all(void)
 	while (iter) {
 		redis_pipeline_channel* channel = (redis_pipeline_channel*)
 			iter->get_ctx();
-		channel->flush();
+		channel->push(&message_flush_);
 		iter = channels_->next_node();
 	}
 }

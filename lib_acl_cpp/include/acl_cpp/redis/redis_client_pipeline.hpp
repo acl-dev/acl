@@ -22,10 +22,17 @@ namespace acl {
 class token_tree;
 class redis_client;
 
+typedef enum {
+	redis_pipeline_t_cmd,
+	redis_pipeline_t_flush,
+	redis_pipeline_t_stop,
+} redis_pipeline_type_t;
+
 class redis_pipeline_message {
 public:
-	redis_pipeline_message(redis_command* cmd)
+	redis_pipeline_message(redis_command* cmd, redis_pipeline_type_t type)
 	: cmd_(cmd)
+	, type_(type)
 	, nchild_(0)
 	, timeout_(NULL)
 	, box_(false)
@@ -39,8 +46,12 @@ public:
 
 	~redis_pipeline_message(void) {}
 
-	redis_command& get_cmd(void) {
-		return *cmd_;
+	redis_pipeline_type_t get_type(void) const {
+		return type_;
+	}
+
+	redis_command* get_cmd(void) {
+		return cmd_;
 	}
 
 	void set_option(size_t nchild, int* timeout) {
@@ -92,6 +103,7 @@ public:
 
 private:
 	redis_command* cmd_;
+	redis_pipeline_type_t type_;
 	size_t nchild_;
 	int* timeout_;
 	mbox<redis_pipeline_message> box_;
@@ -114,7 +126,6 @@ public:
 	~redis_pipeline_channel(void);
 
 	void push(redis_pipeline_message* msg);
-	void flush(void);
 
 	bool start_thread(void);
 
@@ -132,10 +143,11 @@ private:
 	redis_client_pipeline& pipeline_;
 	string addr_;
 	string buf_;
-	string passwd_;
-	redis_client* conn_;
+	redis_client* client_;
 	BOX<redis_pipeline_message> box_;
 	std::vector<redis_pipeline_message*> msgs_;
+
+	bool flush(void);
 };
 
 class ACL_CPP_API redis_client_pipeline : public thread {
@@ -169,6 +181,7 @@ private:
 	int    rw_timeout_;
 	bool   retry_;
 	size_t nchannels_;
+	redis_pipeline_message message_flush_;
 
 	token_tree* channels_;
 	BOX<redis_pipeline_message> box_;

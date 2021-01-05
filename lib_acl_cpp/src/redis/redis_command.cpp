@@ -218,7 +218,8 @@ bool redis_command::eof(void) const
 redis_pipeline_message& redis_command::get_pipeline_message(void)
 {
 	if (pipe_msg_ == NULL) {
-		pipe_msg_ = NEW redis_pipeline_message(this);
+		pipe_msg_ = NEW redis_pipeline_message(
+			this, redis_pipeline_t_cmd);
 	}
 	return *pipe_msg_;
 }

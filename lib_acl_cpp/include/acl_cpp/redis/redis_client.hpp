@@ -105,12 +105,14 @@ public:
 	void close(void);
 
 	/**
-	 * 获得网络连接流
+	 * 获得网络连接流，当连接关闭时内部会自动重连一次
 	 * get acl::socket_stream from the connection
+	 * @param auto_connect {bool} 内部是否需要自动连接服务端
+	 *  if we should connect the redis server automaticlly
 	 * @return {acl::socket_stream*} 如果连接已经关闭则返回 NULL
 	 *  NULL will be returned if the connectioin has been closed
 	 */
-	socket_stream* get_stream(void);
+	socket_stream* get_stream(bool auto_connect = true);
 
 	/**
 	 * 对于请求数据包，此函数设置在组装请求数据包的时候合成一个数据包发送

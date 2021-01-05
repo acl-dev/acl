@@ -335,6 +335,16 @@ public:
 		return request_buf_;
 	}
 
+	/**
+	 * 根据请求命令字列表创建 redis 请求协议数据
+	 * @param argc {size_t} 命令参数个数
+	 * @param argv {const char* []} 命令参数数组
+	 * @param lens {size_t []} 每个命令参数长度数组
+	 * @param out {string&} 存放创建结果
+	 */
+	static void build_request(size_t argc, const char* argv[],
+		size_t lens[], string& out);
+
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 
@@ -471,9 +481,6 @@ public:
 	}
 
 	redis_pipeline_message& get_pipeline_message(void);
-
-	static void build_request(size_t argc, const char* argv[],
-		size_t lens[], string& out);
 
 protected:
 	/************************** request ********************************/
