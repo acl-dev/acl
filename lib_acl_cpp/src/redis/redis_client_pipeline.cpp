@@ -114,18 +114,15 @@ void redis_pipeline_channel::wait_all(void) {
 
 void redis_pipeline_channel::wait_one(socket_stream& conn,
 	redis_pipeline_message& msg) {
-	dbuf_pool* dbuf;
-	const redis_result* result;
-	size_t nchild;
-	int* timeout;
 
-	dbuf = msg.get_cmd()->get_dbuf();
-	timeout = msg.get_timeout();
+	dbuf_pool* dbuf = msg.get_cmd()->get_dbuf();
+	int* timeout = msg.get_timeout();
 	if (timeout) {
 		conn.set_rw_timeout(*timeout);
 	}
 
-	nchild = msg.get_nchild();
+	const redis_result* result;
+	size_t nchild = msg.get_nchild();
 	if (nchild >= 1) {
 		result = client_->get_objects(conn, dbuf, nchild);
 	} else {
