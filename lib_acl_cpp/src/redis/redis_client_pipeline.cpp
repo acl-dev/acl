@@ -14,6 +14,7 @@ namespace acl {
 redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 	const char* addr, int conn_timeout, int rw_timeout, bool retry)
 : pipeline_(pipeline)
+, message_flush_(NULL, redis_pipeline_t_flush)
 , addr_(addr)
 , buf_(81920)
 {
@@ -51,7 +52,16 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg)
 #endif
 }
 
-bool redis_pipeline_channel::flush(void)
+void redis_pipeline_channel::flush(void)
+{
+#ifdef USE_MBOX
+	box_.push(&message_flush_);
+#else
+	box_.push(&message_flush_, false);
+#endif
+}
+
+bool redis_pipeline_channel::flush_all(void)
 {
 	if (msgs_.empty()) {
 		return true;
@@ -61,7 +71,7 @@ bool redis_pipeline_channel::flush(void)
 
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
 		it != msgs_.end(); ++it) {
-#if 1
+#if 0
 		string* req = (*it)->get_cmd()->get_request_buf();
 		buf_.append(req->c_str(), req->size());
 #else
@@ -83,65 +93,68 @@ bool redis_pipeline_channel::flush(void)
 	return true;
 }
 
-void redis_pipeline_channel::handle_all(void) {
+void redis_pipeline_channel::wait_all(void) {
 	socket_stream* conn = client_->get_stream();
 	if (conn == NULL) {
 		printf("get_stream null\r\n");
 		return;
 	}
+	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
+	     it != msgs_.end(); ++it) {
+		wait_one(*conn, **it);
+	}
+	msgs_.clear();
+}
+
+void redis_pipeline_channel::wait_one(socket_stream& conn,
+	redis_pipeline_message& msg) {
 	dbuf_pool* dbuf;
 	const redis_result* result;
 	size_t nchild;
 	int* timeout;
 
-	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
-			it != msgs_.end(); ++it) {
-		redis_pipeline_message* msg = *it;
-		dbuf = msg->get_cmd()->get_dbuf();
-		timeout = msg->get_timeout();
-		if (timeout) {
-			conn->set_rw_timeout(*timeout);
-		}
+	dbuf = msg.get_cmd()->get_dbuf();
+	timeout = msg.get_timeout();
+	if (timeout) {
+		conn.set_rw_timeout(*timeout);
+	}
 
-		nchild = msg->get_nchild();
-		if (nchild >= 1) {
-			result = client_->get_objects(*conn, dbuf, nchild);
-		} else {
-			result = client_->get_object(*conn, dbuf);
-		}
-		int type = result->get_type();
-		if (type == REDIS_RESULT_UNKOWN || type != REDIS_RESULT_ERROR) {
-			msg->push(result);
-			continue;
-		}
+	nchild = msg.get_nchild();
+	if (nchild >= 1) {
+		result = client_->get_objects(conn, dbuf, nchild);
+	} else {
+		result = client_->get_object(conn, dbuf);
+	}
+	int type = result->get_type();
+	if (type == REDIS_RESULT_UNKOWN || type != REDIS_RESULT_ERROR) {
+		msg.push(result);
+		return;
+	}
 
 #define	EQ(x, y) !strncasecmp((x), (y), sizeof(y) -1)
 
-		const char* ptr = result->get_error();
-		if (ptr == NULL || *ptr == 0) {
-			msg->push(result);
-		} else if (EQ(ptr, "MOVED")) {
-			const char* addr = msg->get_cmd()->get_addr(ptr);
-			if (addr == NULL || msg->get_redirect_count() >= 5) {
-				msg->push(result);
-			} else {
-				msg->set_redirect_addr(addr);
-				pipeline_.push(msg);
-			}
-		} else if (EQ(ptr, "ASK")) {
-
-		} else if (EQ(ptr, "CLUSTERDOWN")) {
-
+	const char* ptr = result->get_error();
+	if (ptr == NULL || *ptr == 0) {
+		msg.push(result);
+	} else if (EQ(ptr, "MOVED")) {
+		const char* addr = msg.get_cmd()->get_addr(ptr);
+		if (addr == NULL || msg.get_redirect_count() >= 5) {
+			msg.push(result);
 		} else {
-			msg->push(result);
+			msg.set_redirect_addr(addr);
+			pipeline_.push(&msg);
 		}
+	} else if (EQ(ptr, "ASK")) {
+
+	} else if (EQ(ptr, "CLUSTERDOWN")) {
+
+	} else {
+		msg.push(result);
 	}
-	msgs_.clear();
 }
 
 void* redis_pipeline_channel::run(void)
 {
-
 	while (!client_->eof()) {
 		redis_pipeline_message* msg = box_.pop();
 		if (msg == NULL) {
@@ -153,8 +166,8 @@ void* redis_pipeline_channel::run(void)
 			msgs_.push_back(msg);
 			break;
 		case redis_pipeline_t_flush:
-			flush();
-			handle_all();
+			flush_all();
+			wait_all();
 			break;
 		case redis_pipeline_t_stop:
 			goto END;
@@ -176,7 +189,6 @@ redis_client_pipeline::redis_client_pipeline(const char* addr)
 , rw_timeout_(10)
 , retry_(true)
 , nchannels_(1)
-, message_flush_(NULL, redis_pipeline_t_flush)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 	channels_   = NEW token_tree;
@@ -247,7 +259,7 @@ void redis_client_pipeline::push(redis_pipeline_message *msg)
 
 void* redis_client_pipeline::run(void)
 {
-	//set_all_slot();
+	set_all_slot();
 	start_channels();
 
 	if (channels_->first_node() == NULL) {
@@ -308,8 +320,7 @@ void redis_client_pipeline::flush_all(void)
 	while (iter) {
 		redis_pipeline_channel* channel = (redis_pipeline_channel*)
 			iter->get_ctx();
-		channel->push(&message_flush_);
-		//channel->flush();
+		channel->flush();
 		iter = channels_->next_node();
 	}
 }

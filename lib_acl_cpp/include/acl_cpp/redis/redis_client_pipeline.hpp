@@ -141,14 +141,19 @@ protected:
 
 private:
 	redis_client_pipeline& pipeline_;
+	redis_pipeline_message message_flush_;
 	string addr_;
 	string buf_;
 	redis_client* client_;
 	BOX<redis_pipeline_message> box_;
 	std::vector<redis_pipeline_message*> msgs_;
 public:
-	bool flush(void);
-	void handle_all(void);
+	void flush(void);
+
+private:
+	bool flush_all(void);
+	void wait_all(void);
+	void wait_one(socket_stream& conn, redis_pipeline_message& msg);
 };
 
 class ACL_CPP_API redis_client_pipeline : public thread {
@@ -182,7 +187,6 @@ private:
 	int    rw_timeout_;
 	bool   retry_;
 	size_t nchannels_;
-	redis_pipeline_message message_flush_;
 
 	token_tree* channels_;
 	BOX<redis_pipeline_message> box_;
