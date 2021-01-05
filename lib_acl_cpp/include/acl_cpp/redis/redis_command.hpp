@@ -472,6 +472,9 @@ public:
 
 	redis_pipeline_message& get_pipeline_message(void);
 
+	static void build_request(size_t argc, const char* argv[],
+		size_t lens[], string& out);
+
 protected:
 	/************************** request ********************************/
 	bool slice_req_;

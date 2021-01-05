@@ -191,11 +191,13 @@ protected:
 				break;
 			}
 
+			/*
 			if (i > 0 && i % 50000 == 0) {
 				char tmp[128];
 				acl::safe_snprintf(tmp, sizeof(tmp), "%d", i);
 				acl::meter_time(__FILE__, __LINE__, tmp);
 			}
+			*/
 
 			cmd_string.clear();
 			cmd_key.clear();
