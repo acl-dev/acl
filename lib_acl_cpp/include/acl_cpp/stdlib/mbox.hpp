@@ -72,10 +72,12 @@ public:
 	/**
 	 * 发送消息对象
 	 * @param t {T*} 非空消息对象
+	 * @param dummy {bool} 目前无任何用处，仅是为了与 tbox 接口一致
 	 * @return {bool} 发送是否成功
 	 */
-	bool push(T* t)
+	bool push(T* t, bool dummy = false)
 	{
+		(void) dummy;
 		return mbox_send(mbox_, t);
 	}
 

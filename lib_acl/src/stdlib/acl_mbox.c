@@ -137,9 +137,9 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 	mbox->nread++;
 
 #ifdef ACL_UNIX
-	if (timeout >= 0 && acl_read_poll_wait(mbox->in, timeout) < 0)
+	if (timeout > 0 && acl_read_poll_wait(mbox->in, timeout) < 0)
 #else
-	if (timeout >= 0 && acl_read_select_wait(mbox->in, timeout) < 0)
+	if (timeout > 0 && acl_read_select_wait(mbox->in, timeout) < 0)
 #endif
 	{
 		if (acl_last_error() == ACL_ETIMEDOUT) {

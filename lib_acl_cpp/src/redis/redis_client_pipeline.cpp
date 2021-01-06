@@ -14,10 +14,8 @@ namespace acl {
 redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 	const char* addr, int conn_timeout, int rw_timeout, bool retry)
 : pipeline_(pipeline)
-, message_flush_(NULL, redis_pipeline_t_flush)
 , addr_(addr)
 , buf_(81920)
-, has_messages_(false)
 {
 	client_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
 }
@@ -49,36 +47,17 @@ bool redis_pipeline_channel::start_thread(void)
 
 void redis_pipeline_channel::push(redis_pipeline_message* msg)
 {
-#ifdef	FLUSH_ALONE
-	if (!has_messages_) {
-		has_messages_ = true;
-	}
-#else
+#ifndef	FLUSH_ALONE
 	msgs_.push_back(msg);
 #endif
 
-#ifdef USE_MBOX
-	box_.push(msg);
-#else
 	box_.push(msg, false);
-#endif
 }
 
 void redis_pipeline_channel::flush(void)
 {
-#ifdef	FLUSH_ALONE
-	if (has_messages_) {
-# ifdef USE_MBOX
-		box_.push(&message_flush_);
-# else
-		box_.push(&message_flush_, false);
-# endif
-		has_messages_ = false;
-	}
-#else
 	flush_all();
 	msgs_.clear();
-#endif
 }
 
 bool redis_pipeline_channel::flush_all(void)
@@ -111,21 +90,6 @@ bool redis_pipeline_channel::flush_all(void)
 		return false;
 	}
 	return true;
-}
-
-void redis_pipeline_channel::wait_all(void)
-{
-	socket_stream* conn = client_->get_stream();
-	if (conn == NULL) {
-		printf("get_stream null\r\n");
-		return;
-	}
-
-	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
-		it != msgs_.end(); ++it) {
-		wait_one(*conn, **it);
-	}
-	msgs_.clear();
 }
 
 void redis_pipeline_channel::wait_one(socket_stream& conn,
@@ -172,6 +136,21 @@ void redis_pipeline_channel::wait_one(socket_stream& conn,
 	}
 }
 
+void redis_pipeline_channel::wait_all(void)
+{
+	socket_stream* conn = client_->get_stream();
+	if (conn == NULL) {
+		printf("get_stream null\r\n");
+		return;
+	}
+
+	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
+	     it != msgs_.end(); ++it) {
+		wait_one(*conn, **it);
+	}
+	msgs_.clear();
+}
+
 void* redis_pipeline_channel::run(void)
 {
 	socket_stream* conn = client_->get_stream();
@@ -190,8 +169,10 @@ void* redis_pipeline_channel::run(void)
 				break;
 			}
 			timeout = -1;
+#ifdef	FLUSH_ALONE
 			flush_all();
 			wait_all();
+#endif
 			continue;
 		}
 
@@ -201,10 +182,6 @@ void* redis_pipeline_channel::run(void)
 		switch (msg->get_type()) {
 		case redis_pipeline_t_cmd:
 			msgs_.push_back(msg);
-			break;
-		case redis_pipeline_t_flush:
-			flush_all();
-			wait_all();
 			break;
 		default:
 			break;
@@ -277,22 +254,13 @@ redis_client_pipeline & redis_client_pipeline::set_max_slot(size_t max_slot)
 
 const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
 {
-#ifdef USE_MBOX
-	box_.push(&msg);
-#else
 	box_.push(&msg, false);
-#endif
-
 	return msg.wait();
 }
 
 void redis_client_pipeline::push(redis_pipeline_message *msg)
 {
-#ifdef USE_MBOX
-	box_.push(msg);
-#else
 	box_.push(msg, false);
-#endif
 }
 
 void* redis_client_pipeline::run(void)
@@ -340,7 +308,9 @@ void* redis_client_pipeline::run(void)
 			break;
 		} else {
 			timeout = -1;
-			//flush_all();
+#ifndef	FLUSH_ALONE
+			flush_all();
+#endif
 		}
 	}
 

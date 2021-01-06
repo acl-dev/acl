@@ -23,7 +23,6 @@ class redis_client;
 
 typedef enum {
 	redis_pipeline_t_cmd,
-	redis_pipeline_t_flush,
 	redis_pipeline_t_stop,
 } redis_pipeline_type_t;
 
@@ -125,8 +124,6 @@ public:
 		const char* addr, int conn_timeout, int rw_timeout, bool retry);
 	~redis_pipeline_channel(void);
 
-	void push(redis_pipeline_message* msg);
-
 	bool start_thread(void);
 
 public:
@@ -141,15 +138,14 @@ protected:
 
 private:
 	redis_client_pipeline& pipeline_;
-	redis_pipeline_message message_flush_;
 	string addr_;
 	string buf_;
 	redis_client* client_;
 	BOX<redis_pipeline_message> box_;
 	std::vector<redis_pipeline_message*> msgs_;
 public:
+	void push(redis_pipeline_message* msg);
 	void flush(void);
-	bool has_messages_;
 
 private:
 	bool flush_all(void);
@@ -162,9 +158,10 @@ public:
 	redis_client_pipeline(const char* addr);
 	~redis_client_pipeline(void);
 
-	void push(redis_pipeline_message* msg);
-
 	const redis_result* run(redis_pipeline_message& msg);
+
+public:
+	void push(redis_pipeline_message* msg);
 
 public:
 	redis_client_pipeline& set_password(const char* passwd);
