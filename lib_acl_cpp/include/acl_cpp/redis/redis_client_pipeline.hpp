@@ -145,12 +145,12 @@ private:
 	std::vector<redis_pipeline_message*> msgs_;
 public:
 	void push(redis_pipeline_message* msg);
-	void flush(void);
 
 private:
 	bool flush_all(void);
-	void wait_all(void);
-	void wait_one(socket_stream& conn, redis_pipeline_message& msg);
+	bool wait_all(void);
+	bool wait_one(socket_stream& conn, redis_pipeline_message& msg);
+	void all_failed(void);
 };
 
 class ACL_CPP_API redis_client_pipeline : public thread {
@@ -192,7 +192,6 @@ private:
 	std::vector<char*> addrs_;
 	const char** slot_addrs_;
 
-	void flush_all(void);
 	void set_slot(size_t slot, const char* addr);
 	void set_all_slot(void);
 	void start_channels(void);
