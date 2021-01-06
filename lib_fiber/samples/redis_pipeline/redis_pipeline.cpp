@@ -267,7 +267,7 @@ static void usage(const char* procname)
 		"-o pipeline_channels[dfault: 5]\r\n"
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
-		"-P password [set the password of redis cluster]\r\n"
+		"-p password [set the password of redis cluster]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
 	int  max_threads = 10, nfibers = 50, pipe_channels = 5;
 	acl::string addrs("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:o:a:P:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:o:a:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -307,11 +307,12 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
-		case 'P':
+		case 'p':
 			passwd = optarg;
 			break;;
 		default:
-			break;
+			usage(argv[0]);
+			return 1;
 		}
 	}
 

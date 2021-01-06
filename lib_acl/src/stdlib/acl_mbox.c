@@ -128,6 +128,10 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 		if (success)
 			*success = 1;
 		return msg;
+	} else if (timeout == 0) {
+		if (success)
+			*success = 1;
+		return NULL;
 	}
 
 	mbox->nread++;

@@ -10,7 +10,6 @@
 
 namespace acl {
 
-//#define DEBUG_BOX
 #define USE_MBOX
 
 #ifdef USE_MBOX
@@ -119,6 +118,7 @@ public:
 };
 
 class redis_client_pipeline;
+
 class redis_pipeline_channel : public thread {
 public:
 	redis_pipeline_channel(redis_client_pipeline& pipeline,
@@ -149,6 +149,7 @@ private:
 	std::vector<redis_pipeline_message*> msgs_;
 public:
 	void flush(void);
+	bool has_messages_;
 
 private:
 	bool flush_all(void);

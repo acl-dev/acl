@@ -17,6 +17,7 @@ redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 , message_flush_(NULL, redis_pipeline_t_flush)
 , addr_(addr)
 , buf_(81920)
+, has_messages_(false)
 {
 	client_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
 }
@@ -26,7 +27,8 @@ redis_pipeline_channel::~redis_pipeline_channel(void)
 	delete client_;
 }
 
-redis_pipeline_channel & redis_pipeline_channel::set_passwd(const char *passwd) {
+redis_pipeline_channel& redis_pipeline_channel::set_passwd(const char *passwd)
+{
 	if (passwd && *passwd) {
 		client_->set_password(passwd);
 	}
@@ -43,9 +45,18 @@ bool redis_pipeline_channel::start_thread(void)
 	return true;
 }
 
+#define	FLUSH_ALONE
+
 void redis_pipeline_channel::push(redis_pipeline_message* msg)
 {
+#ifdef	FLUSH_ALONE
+	if (!has_messages_) {
+		has_messages_ = true;
+	}
+#else
 	msgs_.push_back(msg);
+#endif
+
 #ifdef USE_MBOX
 	box_.push(msg);
 #else
@@ -55,15 +66,18 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg)
 
 void redis_pipeline_channel::flush(void)
 {
-#if 1
+#ifdef	FLUSH_ALONE
+	if (has_messages_) {
+# ifdef USE_MBOX
+		box_.push(&message_flush_);
+# else
+		box_.push(&message_flush_, false);
+# endif
+		has_messages_ = false;
+	}
+#else
 	flush_all();
 	msgs_.clear();
-#else
-# ifdef USE_MBOX
-	box_.push(&message_flush_);
-# else
-	box_.push(&message_flush_, false);
-# endif
 #endif
 }
 
@@ -93,28 +107,30 @@ bool redis_pipeline_channel::flush_all(void)
 
 	if (conn->write(buf_) == -1) {
 		logger_error("write error, addr=%s, buf=%s",
-		       addr_.c_str(), buf_.c_str());
+			addr_.c_str(), buf_.c_str());
 		return false;
 	}
 	return true;
 }
 
-void redis_pipeline_channel::wait_all(void) {
+void redis_pipeline_channel::wait_all(void)
+{
 	socket_stream* conn = client_->get_stream();
 	if (conn == NULL) {
 		printf("get_stream null\r\n");
 		return;
 	}
+
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
-	     it != msgs_.end(); ++it) {
+		it != msgs_.end(); ++it) {
 		wait_one(*conn, **it);
 	}
 	msgs_.clear();
 }
 
 void redis_pipeline_channel::wait_one(socket_stream& conn,
-	redis_pipeline_message& msg) {
-
+	redis_pipeline_message& msg)
+{
 	dbuf_pool* dbuf = msg.get_cmd()->get_dbuf();
 	int* timeout = msg.get_timeout();
 	if (timeout) {
@@ -164,15 +180,24 @@ void* redis_pipeline_channel::run(void)
 		return NULL;
 	}
 
+	bool success;
+	int timeout = -1;
+
 	while (!client_->eof()) {
-		redis_pipeline_message* msg = box_.pop();
+		redis_pipeline_message* msg = box_.pop(timeout, &success);
 		if (msg == NULL) {
-			break;
+			if (!success) {
+				break;
+			}
+			timeout = -1;
+			flush_all();
+			wait_all();
+			continue;
 		}
 
-#if 1
-		wait_one(*conn, *msg);
-#else
+		timeout = 0;
+
+#ifdef	FLUSH_ALONE
 		switch (msg->get_type()) {
 		case redis_pipeline_t_cmd:
 			msgs_.push_back(msg);
@@ -184,6 +209,8 @@ void* redis_pipeline_channel::run(void)
 		default:
 			break;
 		}
+#else
+		wait_one(*conn, *msg);
 #endif
 	}
 
@@ -242,7 +269,8 @@ redis_client_pipeline& redis_client_pipeline::set_password(const char* passwd)
 	return *this;
 }
 
-redis_client_pipeline & redis_client_pipeline::set_max_slot(size_t max_slot) {
+redis_client_pipeline & redis_client_pipeline::set_max_slot(size_t max_slot)
+{
 	max_slot_ = max_slot;
 	return *this;
 }
@@ -291,10 +319,6 @@ void* redis_client_pipeline::run(void)
 #else
 		redis_pipeline_message* msg = box_.pop(timeout, &found);
 #endif
-
-#ifdef DEBUG_BOX
-		printf("peek one msg=%p, timeout=%d\r\n", msg, timeout);
-#endif
 		if (msg != NULL) {
 			int slot = msg->get_cmd()->get_slot();
 			const char* redirect_addr = msg->get_redirect_addr();
@@ -316,7 +340,7 @@ void* redis_client_pipeline::run(void)
 			break;
 		} else {
 			timeout = -1;
-			flush_all();
+			//flush_all();
 		}
 	}
 
@@ -402,7 +426,8 @@ void redis_client_pipeline::set_all_slot(void)
 	}
 }
 
-void redis_client_pipeline::start_channels(void) {
+void redis_client_pipeline::start_channels(void)
+{
 	for (std::vector<char*>::const_iterator cit = addrs_.begin();
 		cit != addrs_.end(); ++cit) {
 		(void) start_channel(*cit);
@@ -431,7 +456,8 @@ redis_pipeline_channel* redis_client_pipeline::start_channel(const char *addr)
 	}
 }
 
-redis_pipeline_channel* redis_client_pipeline::get_channel(int slot) {
+redis_pipeline_channel* redis_client_pipeline::get_channel(int slot)
+{
 	const char* addr;
 	if (slot >= 0 && slot < (int) max_slot_) {
 		addr = slot_addrs_[slot];
