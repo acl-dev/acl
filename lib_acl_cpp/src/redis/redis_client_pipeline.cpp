@@ -67,17 +67,41 @@ bool redis_pipeline_channel::flush_all(void)
 #endif
 	}
 
-	socket_stream* conn = client_->get_stream(false);
-	if (conn == NULL) {
-		return false;
-	}
+	bool retried = false;
+	while (true) {
+		socket_stream* conn = client_->get_stream(false);
+		if (conn) {
+			if (conn->write(buf_) == (int) buf_.size()) {
+				return true;
+			}
 
-	if (conn->write(buf_) == -1) {
-		logger_error("write error, addr=%s, buf=%s",
-			addr_.c_str(), buf_.c_str());
-		return false;
+			logger_error("write error=%s, addr=%s, buf=%s",
+				last_serror(), addr_.c_str(), buf_.c_str());
+		}
+
+		// return false if we have retried
+		if (retried) {
+			return false;
+		}
+
+		// close the old connection
+		client_->close();
+
+		// reopen the new connection
+		if (!((connect_client*) client_)->open()) {
+			logger_error("reopen connection failed!");
+			return false;
+		}
+		retried = true;
 	}
-	return true;
+}
+
+void redis_pipeline_channel::all_failed()
+{
+	std::vector<redis_pipeline_message*>::iterator it;
+	for (it = msgs_.begin(); it != msgs_.end(); ++it) {
+		(*it)->push(NULL);
+	}
 }
 
 bool redis_pipeline_channel::wait_one(socket_stream& conn,
@@ -129,21 +153,15 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 	return true;
 }
 
-void redis_pipeline_channel::all_failed()
+bool redis_pipeline_channel::wait_results(void)
 {
-	std::vector<redis_pipeline_message*>::iterator it;
-	for (it = msgs_.begin(); it != msgs_.end(); ++it) {
-		(*it)->push(NULL);
+	if (msgs_.empty()) {
+		return true;
 	}
-	msgs_.clear();
-}
 
-bool redis_pipeline_channel::wait_all(void)
-{
-	socket_stream* conn = client_->get_stream();
+	socket_stream* conn = client_->get_stream(false);
 	if (conn == NULL) {
 		logger_error("get_stream null");
-		all_failed();
 		return false;
 	}
 
@@ -154,12 +172,52 @@ bool redis_pipeline_channel::wait_all(void)
 		}
 	}
 
+	// if we can't get the first result, the socket maybe be disconnected,
+	// so we should return false and retry again.
+	if (it == msgs_.begin()) {
+		logger_error("get the first result failed");
+		return false;
+	}
+
+	// return NULL for the left failed results
 	for (; it != msgs_.end(); ++it) {
 		(*it)->push(NULL);
 	}
 
-	msgs_.clear();
 	return true;
+}
+
+bool redis_pipeline_channel::handle_all(void)
+{
+	bool retried = false;
+
+	while (true) {
+		if (!flush_all()) {
+			logger_error("all failed ...");
+			break;
+		}
+
+		if (wait_results()) {
+			msgs_.clear();
+			return true;
+		}
+
+		if (retried) {
+			logger_error("retried failed");
+			break;
+		}
+		retried = true;
+
+		client_->close();
+		if (!((connect_client*) client_)->open()) {
+			logger_error("reopen failed");
+			break;
+		}
+	}
+
+	all_failed();
+	msgs_.clear();
+	return false;
 }
 
 void* redis_pipeline_channel::run(void)
@@ -169,27 +227,25 @@ void* redis_pipeline_channel::run(void)
 
 	while (!client_->eof()) {
 		redis_pipeline_message* msg = box_.pop(timeout, &success);
-		if (msg == NULL) {
-			if (!success) {
+		if (msg != NULL) {
+			timeout = 0;
+
+			switch (msg->get_type()) {
+			case redis_pipeline_t_cmd:
+				msgs_.push_back(msg);
 				break;
-			}
-			timeout = -1;
-			if (!flush_all() || !wait_all()) {
-				logger_error("failed ...");
+			default:
 				break;
 			}
 			continue;
 		}
 
-		timeout = 0;
-
-		switch (msg->get_type()) {
-		case redis_pipeline_t_cmd:
-			msgs_.push_back(msg);
-			break;
-		default:
+		if (!success) {
 			break;
 		}
+
+		timeout = -1;
+		handle_all();
 	}
 
 	return NULL;

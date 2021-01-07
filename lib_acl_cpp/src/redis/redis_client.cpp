@@ -76,9 +76,9 @@ socket_stream* redis_client::get_stream(bool auto_connect /* true */)
 {
 	if (conn_.opened())
 		return (socket_stream*) &conn_;
-    else if (!auto_connect)
-        return NULL;
-    else if (open())
+	else if (!auto_connect)
+		return NULL;
+	else if (open())
 		return (socket_stream*) &conn_;
 	else
 		return NULL;

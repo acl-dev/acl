@@ -147,8 +147,9 @@ public:
 	void push(redis_pipeline_message* msg);
 
 private:
+	bool handle_all(void);
 	bool flush_all(void);
-	bool wait_all(void);
+	bool wait_results(void);
 	bool wait_one(socket_stream& conn, redis_pipeline_message& msg);
 	void all_failed(void);
 };

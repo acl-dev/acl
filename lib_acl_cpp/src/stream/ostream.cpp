@@ -78,7 +78,7 @@ int ostream::write(char ch)
 	return write(&ch, sizeof(ch), false);
 }
 
-int ostream::write(const acl::string& s, bool loop)
+int ostream::write(const acl::string& s, bool loop /* = true */)
 {
 	return write(s.c_str(), s.length(), loop);
 }
