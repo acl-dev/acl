@@ -23,6 +23,8 @@ class redis_client;
 
 typedef enum {
 	redis_pipeline_t_cmd,
+	redis_pipeline_t_redirect,
+	redis_pipeline_t_clusterdonw,
 	redis_pipeline_t_stop,
 } redis_pipeline_type_t;
 
@@ -35,7 +37,7 @@ public:
 	, timeout_(NULL)
 	, box_(false)
 	, result_(NULL)
-	, redirect_addr_(NULL)
+	, addr_(NULL)
 	, redirect_count_(0)
 	, argc_(0)
 	, argv_(NULL)
@@ -43,6 +45,11 @@ public:
 	{}
 
 	~redis_pipeline_message(void) {}
+
+	redis_pipeline_message& set_type(redis_pipeline_type_t type) {
+		type_ = type;
+		return *this;
+	}
 
 	redis_pipeline_type_t get_type(void) const {
 		return type_;
@@ -56,7 +63,7 @@ public:
 		nchild_  = nchild;
 		timeout_ = timeout;
 		result_  = NULL;
-		redirect_addr_  = NULL;
+		addr_    = NULL;
 		redirect_count_ = 0;
 	}
 
@@ -66,8 +73,8 @@ public:
 		lens_    = lens;
 	}
 
-	void set_redirect_addr(const char* addr) {
-		redirect_addr_ = addr;
+	void set_addr(const char* addr) {
+		addr_ = addr;
 		if (addr) {
 			redirect_count_++;
 		}
@@ -91,8 +98,8 @@ public:
 		return result_;
 	}
 
-	const char* get_redirect_addr(void) const {
-		return redirect_addr_;
+	const char* get_addr(void) const {
+		return addr_;
 	}
 
 	size_t get_redirect_count(void) const {
@@ -107,7 +114,7 @@ private:
 	mbox<redis_pipeline_message> box_;
 
 	const redis_result* result_;
-	const char* redirect_addr_;
+	const char* addr_;
 	size_t redirect_count_;
 
 public:
@@ -125,7 +132,7 @@ public:
 	~redis_pipeline_channel(void);
 
 	bool start_thread(void);
-
+	void stop_thread(void);
 public:
 	redis_pipeline_channel& set_passwd(const char* passwd);
 	const char* get_addr(void) const {
@@ -147,7 +154,7 @@ public:
 	void push(redis_pipeline_message* msg);
 
 private:
-	bool handle_all(void);
+	bool handle_messages(void);
 	bool flush_all(void);
 	bool wait_results(void);
 	bool wait_one(socket_stream& conn, redis_pipeline_message& msg);
@@ -159,9 +166,14 @@ public:
 	redis_client_pipeline(const char* addr);
 	~redis_client_pipeline(void);
 
-	const redis_result* run(redis_pipeline_message& msg);
+	void start_thread(void);
+	void stop_thread(void);
 
 public:
+	// called by redis_command in pipeline mode
+	const redis_result* run(redis_pipeline_message& msg);
+
+	// called by redis_pipeline_channel
 	void push(redis_pipeline_message* msg);
 
 public:
@@ -195,9 +207,15 @@ private:
 
 	void set_slot(size_t slot, const char* addr);
 	void set_all_slot(void);
+
 	void start_channels(void);
+	void stop_channels(void);
 	redis_pipeline_channel* start_channel(const char* addr);
+	void stop_channel(const char* addr);
 	redis_pipeline_channel* get_channel(int slot);
+
+	void redirect(const redis_pipeline_message& msg, int slot);
+	void cluster_down(const redis_pipeline_message& msg);
 };
 
 } // namespace acl

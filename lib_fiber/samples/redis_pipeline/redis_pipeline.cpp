@@ -325,7 +325,9 @@ int main(int argc, char* argv[])
 	if (!passwd.empty()) {
 		pipeline.set_password(passwd);
 	}
-	pipeline.start();
+
+	// start pipeline thread to handle all redis command messages
+	pipeline.start_thread();
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
@@ -355,19 +357,23 @@ int main(int argc, char* argv[])
 		sleep(1);
 	}
 
-	std::vector<test_thread*>::iterator it = threads.begin();
-	for (; it != threads.end(); ++it) {
-		//(*it)->wait();
-		delete (*it);
-	}
-
+	long long int total = max_threads * n * nfibers;
 	struct timeval end;
 	gettimeofday(&end, NULL);
 
-	long long int total = max_threads * n * nfibers;
 	double inter = acl::stamp_sub(end, begin);
 	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", cmd.c_str(),
 		total, inter, (total * 1000) /(inter > 0 ? inter : 1));
+
+	std::vector<test_thread*>::iterator it = threads.begin();
+	for (; it != threads.end(); ++it) {
+		// don't wait for the thread to exit because it has beeen
+		// detached when started.
+		delete (*it);
+	}
+
+	// stop pipeline thread
+	pipeline.stop_thread();
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

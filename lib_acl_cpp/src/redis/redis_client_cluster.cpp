@@ -411,7 +411,6 @@ redis_client* redis_client_cluster::ask(redis_command& cmd,
 	cmd.set_client_addr(ptr);
 
 	if (ntried >= 2 && redirect_sleep_ > 0 && strcmp(ptr, addr) != 0) {
-
 		logger("redirect %d, curr %s, waiting %s ...",
 			ntried, ptr, addr);
 		acl_doze(redirect_sleep_);
@@ -449,8 +448,11 @@ redis_client* redis_client_cluster::cluster_down(redis_command& cmd,
 		acl_doze(redirect_sleep_);
 	}
 
-	// 将旧连接对象归还给连接池对象
-	conn->get_pool()->put(conn, true);
+	// 将旧连接对象归还给连接池对象，并设置该连接池为不可用状态
+	connect_pool* conns = conn->get_pool();
+	conns->put(conn, false);
+	conns->set_alive(false);
+
 	conn = peek_conn(-1);
 	if (conn == NULL) {
 		logger_error("peek_conn NULL");

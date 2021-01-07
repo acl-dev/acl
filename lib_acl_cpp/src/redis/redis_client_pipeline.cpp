@@ -43,6 +43,13 @@ bool redis_pipeline_channel::start_thread(void)
 	return true;
 }
 
+void redis_pipeline_channel::stop_thread(void)
+{
+	redis_pipeline_message message(NULL, redis_pipeline_t_stop);
+	push(&message);
+	this->wait();
+}
+
 void redis_pipeline_channel::push(redis_pipeline_message* msg)
 {
 	box_.push(msg, false);
@@ -120,12 +127,18 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 	} else {
 		result = client_->get_object(conn, dbuf);
 	}
+
 	if (result == NULL) {
+		logger_error("can't get result");
 		return false;
 	}
 
 	int type = result->get_type();
-	if (type == REDIS_RESULT_UNKOWN || type != REDIS_RESULT_ERROR) {
+	if (type == REDIS_RESULT_UNKOWN) {
+		logger_warn("unknown type=%d", (int) type);
+		msg.push(result);
+		return true;
+	} else if (type != REDIS_RESULT_ERROR) {
 		msg.push(result);
 		return true;
 	}
@@ -134,20 +147,30 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 
 	const char* ptr = result->get_error();
 	if (ptr == NULL || *ptr == 0) {
+		logger_error("error info null");
 		msg.push(result);
-	} else if (EQ(ptr, "MOVED")) {
+	} else if (EQ(ptr, "MOVED") || EQ(ptr, "ASK")) {
 		const char* addr = msg.get_cmd()->get_addr(ptr);
-		if (addr == NULL || msg.get_redirect_count() >= 5) {
+		if (addr == NULL) {
+			logger_error("no redirect addr got");
+			msg.push(result);
+		} if (msg.get_redirect_count() >= 5) {
+			logger_error("redirect count(%d) exceed limit(5)",
+				(int) msg.get_redirect_count());
 			msg.push(result);
 		} else {
-			msg.set_redirect_addr(addr);
+			msg.set_addr(addr);
+			msg.set_type(redis_pipeline_t_redirect);
+			// transfer to pipeline processs again
 			pipeline_.push(&msg);
 		}
-	} else if (EQ(ptr, "ASK")) {
-
 	} else if (EQ(ptr, "CLUSTERDOWN")) {
-
+		msg.set_addr(this->get_addr());
+		msg.set_type(redis_pipeline_t_clusterdonw);
+		// transfer to pipeline processs again
+		pipeline_.push(&msg);
 	} else {
+		logger_error("unknown error");
 		msg.push(result);
 	}
 	return true;
@@ -187,7 +210,7 @@ bool redis_pipeline_channel::wait_results(void)
 	return true;
 }
 
-bool redis_pipeline_channel::handle_all(void)
+bool redis_pipeline_channel::handle_messages(void)
 {
 	bool retried = false;
 
@@ -234,18 +257,19 @@ void* redis_pipeline_channel::run(void)
 			case redis_pipeline_t_cmd:
 				msgs_.push_back(msg);
 				break;
+			case redis_pipeline_t_stop:
+				// handle left messages and stop the channel.
+				handle_messages();
+				return NULL;
 			default:
 				break;
 			}
-			continue;
-		}
-
-		if (!success) {
+		} else if (!success) {
 			break;
+		} else {
+			timeout = -1;
+			handle_messages();
 		}
-
-		timeout = -1;
-		handle_all();
 	}
 
 	return NULL;
@@ -309,6 +333,18 @@ redis_client_pipeline & redis_client_pipeline::set_max_slot(size_t max_slot)
 	return *this;
 }
 
+void redis_client_pipeline::start_thread(void)
+{
+	this->start();
+}
+
+void redis_client_pipeline::stop_thread(void)
+{
+	redis_pipeline_message message(NULL, redis_pipeline_t_stop);
+	push(&message);
+	this->wait();  // wait for the thread to exit
+}
+
 const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
 {
 	box_.push(&msg, false);
@@ -345,18 +381,28 @@ void* redis_client_pipeline::run(void)
 		redis_pipeline_message* msg = box_.pop(timeout, &found);
 #endif
 		if (msg != NULL) {
-			int slot = msg->get_cmd()->get_slot();
-			const char* redirect_addr = msg->get_redirect_addr();
-			if (redirect_addr) {
-				set_slot(slot, redirect_addr);
+			redis_pipeline_type_t type = msg->get_type();
+			if (type == redis_pipeline_t_stop) {
+				break;
 			}
+
+			int slot = msg->get_cmd()->get_slot();
+			if (type == redis_pipeline_t_redirect) {
+				redirect(*msg, slot);
+			} else if (type == redis_pipeline_t_clusterdonw) {
+				cluster_down(*msg);
+				break;
+			}
+
 			channel = get_channel(slot);
 			if (channel == NULL) {
-				printf("channel null, slot=%d\r\n", slot);
-				exit(1);
+				logger_error("channel null, slot=%d", slot);
+				msg->push(NULL);
+				timeout = -1;
+			} else {
+				channel->push(msg);
+				timeout = 0;
 			}
-			channel->push(msg);
-			timeout = 0;
 #ifdef USE_MBOX
 		} else if (!success) {
 #else
@@ -368,8 +414,45 @@ void* redis_client_pipeline::run(void)
 		}
 	}
 
-	printf("Exiting ...\r\n");
+	stop_channels();
 	return NULL;
+}
+
+void redis_client_pipeline::redirect(const redis_pipeline_message &msg, int slot)
+{
+	const char* addr = msg.get_addr();
+	if (addr) {
+		set_slot(slot, addr);
+	}
+}
+
+void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
+{
+	const char* addr = msg.get_addr();
+	if (addr == NULL) {
+		return;
+	}
+
+	// clear all slots' addrs same as the dead addr
+	for (size_t i = 0; i < max_slot_; i++) {
+		if (strcmp(slot_addrs_[i], addr) == 0) {
+			slot_addrs_[i] = NULL;
+		}
+	}
+
+	// reset the default addr which different the the dead addr
+	if (addr_ == addr) {
+		for (std::vector<char*>::const_iterator it = addrs_.begin();
+		     it != addrs_.end(); ++it) {
+			if (strcmp(*it, addr) != 0) {
+				addr_ = *it;
+				break;
+			}
+		}
+
+		// stop and remove the dead node
+		stop_channel(addr);
+	}
 }
 
 void redis_client_pipeline::set_slot(size_t slot, const char* addr)
@@ -439,6 +522,28 @@ void redis_client_pipeline::set_all_slot(void)
 	}
 }
 
+void redis_client_pipeline::stop_channels(void)
+{
+	const token_node* iter = channels_->first_node();
+	std::vector<redis_pipeline_channel*> channels;
+	while (iter) {
+		redis_pipeline_channel* channel = (redis_pipeline_channel*)
+			iter->get_ctx();
+		// notify and wait for the channel thread to exit
+		channel->stop_thread();
+		channels.push_back(channel);
+		iter = channels_->next_node();
+	}
+
+	// delete all channels threads
+	for (std::vector<redis_pipeline_channel*>::iterator
+		     it = channels.begin(); it != channels.end(); ++it) {
+		channels_->remove(((*it)->get_addr()));
+		delete *it;
+	}
+	logger("all channels in pipeline have been stopped!");
+}
+
 void redis_client_pipeline::start_channels(void)
 {
 	for (std::vector<char*>::const_iterator cit = addrs_.begin();
@@ -469,15 +574,30 @@ redis_pipeline_channel* redis_client_pipeline::start_channel(const char *addr)
 	}
 }
 
+void redis_client_pipeline::stop_channel(const char *addr)
+{
+	const token_node* node = channels_->find(addr);
+	if (node) {
+		redis_pipeline_channel* channel = (redis_pipeline_channel*)
+			node->get_ctx();
+		channels_->remove(addr);
+		channel->stop_thread();
+
+	}
+}
+
 redis_pipeline_channel* redis_client_pipeline::get_channel(int slot)
 {
 	const char* addr;
+	// first, get one addr of cluster mode when slot is valid
 	if (slot >= 0 && slot < (int) max_slot_) {
 		addr = slot_addrs_[slot];
 		if (addr == NULL) {
 			addr = addr_.c_str();
 		}
-	} else {
+	}
+	// then, use the default addr for mode in cluster or alone
+	else {
 		addr = addr_.c_str();
 	}
 
