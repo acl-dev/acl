@@ -194,11 +194,13 @@ protected:
 				break;
 			}
 
+			/*
 			if (i > 0 && i % 1000 == 0) {
 				char tmp[128];
 				acl::safe_snprintf(tmp, sizeof(tmp), "%d", i);
 				acl::meter_time(__FILE__, __LINE__, tmp);
 			}
+			*/
 
 			cmd_string.clear();
 			cmd_key.clear();
@@ -221,7 +223,7 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr_list[127.0.0.1:6379]\r\n"
+		"-s one_redis_addr[127.0.0.1:6379]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
@@ -237,15 +239,15 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	int  max_threads = 10;
-	acl::string addrs("127.0.0.1:6379"), cmd, passwd;
+	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:P:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
-			addrs = optarg;
+			addr = optarg;
 			break;
 		case 'n':
 			n = atoi(optarg);
@@ -262,7 +264,7 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
-		case 'P':
+		case 'p':
 			passwd = optarg;
 			break;;
 		default:
@@ -273,8 +275,8 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_pipeline pipeline(addrs, conn_timeout, rw_timeout);
-	pipeline.start();
+	acl::redis_client_pipeline pipeline(addr);
+	pipeline.start_thread();
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);

@@ -283,7 +283,7 @@ redis_client_pipeline::redis_client_pipeline(const char* addr)
 , conn_timeout_(10)
 , rw_timeout_(10)
 , retry_(true)
-, nchannels_(1)
+, preconn_(true)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 	channels_   = NEW token_tree;
@@ -313,12 +313,6 @@ redis_client_pipeline& redis_client_pipeline::set_retry(bool on)
 	return *this;
 }
 
-redis_client_pipeline& redis_client_pipeline::set_channels(size_t n)
-{
-	nchannels_ = n;
-	return *this;
-}
-
 redis_client_pipeline& redis_client_pipeline::set_password(const char* passwd)
 {
 	if (passwd && *passwd) {
@@ -330,6 +324,12 @@ redis_client_pipeline& redis_client_pipeline::set_password(const char* passwd)
 redis_client_pipeline & redis_client_pipeline::set_max_slot(size_t max_slot)
 {
 	max_slot_ = max_slot;
+	return *this;
+}
+
+redis_client_pipeline & redis_client_pipeline::set_preconnect(bool yes)
+{
+	preconn_ = yes;
 	return *this;
 }
 
@@ -359,7 +359,9 @@ void redis_client_pipeline::push(redis_pipeline_message *msg)
 void* redis_client_pipeline::run(void)
 {
 	set_all_slot();
-	start_channels();
+	if (preconn_) {
+		start_channels();
+	}
 
 	if (channels_->first_node() == NULL) {
 		logger_error("no channel created!");
@@ -433,14 +435,14 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 		return;
 	}
 
-	// clear all slots' addrs same as the dead addr
+	// clear all slots' addrs same as the dead node
 	for (size_t i = 0; i < max_slot_; i++) {
 		if (strcmp(slot_addrs_[i], addr) == 0) {
 			slot_addrs_[i] = NULL;
 		}
 	}
 
-	// reset the default addr which different the the dead addr
+	// reset the default addr which different from the the dead node
 	if (addr_ == addr) {
 		for (std::vector<char*>::const_iterator it = addrs_.begin();
 		     it != addrs_.end(); ++it) {
@@ -582,7 +584,6 @@ void redis_client_pipeline::stop_channel(const char *addr)
 			node->get_ctx();
 		channels_->remove(addr);
 		channel->stop_thread();
-
 	}
 }
 

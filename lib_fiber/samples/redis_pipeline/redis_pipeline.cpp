@@ -258,13 +258,12 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"-s redis_addr_list[127.0.0.1:6379]\r\n"
+		"-s one_redis_addr[127.0.0.1:6379]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-t max_threads[default: 10]\r\n"
 		"-c fibers_count[default: 50]]\r\n"
-		"-o pipeline_channels[dfault: 5]\r\n"
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
@@ -275,16 +274,16 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	int  max_threads = 10, nfibers = 50, pipe_channels = 5;
-	acl::string addrs("127.0.0.1:6379"), cmd, passwd;
+	int  max_threads = 10, nfibers = 50;
+	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:o:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:a:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
-			addrs = optarg;
+			addr = optarg;
 			break;
 		case 'n':
 			n = atoi(optarg);
@@ -301,9 +300,6 @@ int main(int argc, char* argv[])
 		case 'c':
 			nfibers = atoi(optarg);
 			break;
-		case 'o':
-			pipe_channels = atoi(optarg);
-			break;
 		case 'a':
 			cmd = optarg;
 			break;
@@ -319,9 +315,8 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_pipeline pipeline(addrs);
-	pipeline.set_timeout(conn_timeout, rw_timeout)
-		.set_channels((size_t) pipe_channels);
+	acl::redis_client_pipeline pipeline(addr);
+	pipeline.set_timeout(conn_timeout, rw_timeout);
 	if (!passwd.empty()) {
 		pipeline.set_password(passwd);
 	}

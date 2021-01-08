@@ -133,6 +133,7 @@ public:
 
 	bool start_thread(void);
 	void stop_thread(void);
+
 public:
 	redis_pipeline_channel& set_passwd(const char* passwd);
 	const char* get_addr(void) const {
@@ -140,7 +141,7 @@ public:
 	}
 
 protected:
-	// @override
+	// @override from acl::thread
 	void* run(void);
 
 private:
@@ -161,12 +162,22 @@ private:
 	void all_failed(void);
 };
 
+/**
+ * redis pipline communication, be set and used in redis_command to
+ * improve the performance of redis commands, but not all redis commands
+ * in acl can be used in pipeline mode, such as below:
+ * 1. multiple keys operation
+ * 2. blocked operation such as SUBSCRIBE in pubsub, BLPOP in list
+ */
 class ACL_CPP_API redis_client_pipeline : public thread {
 public:
 	redis_client_pipeline(const char* addr);
 	~redis_client_pipeline(void);
 
+	// start the pipeline thread
 	void start_thread(void);
+
+	// stop the pipeline thread
 	void stop_thread(void);
 
 public:
@@ -177,47 +188,92 @@ public:
 	void push(redis_pipeline_message* msg);
 
 public:
+	// set the password for connecting the redis server
 	redis_client_pipeline& set_password(const char* passwd);
+
+	// set network IO timeout
 	redis_client_pipeline& set_timeout(int conn_timeout, int rw_timeout);
+
+	// set if retry on IO failed in redis_client
 	redis_client_pipeline& set_retry(bool on);
-	redis_client_pipeline& set_channels(size_t n);
+
+	// set the max hash slot of redis, the default valud is 16384
 	redis_client_pipeline& set_max_slot(size_t max_slot);
+
+	// set if connecting all the redis nodes after starting
+	redis_client_pipeline& set_preconnect(bool yes);
+
+	// get the max hash slot of redis
 	size_t get_max_slot(void) const {
 		return max_slot_;
 	}
 
 protected:
-	// @override
+	// @override from acl::thread
 	void* run(void);
 
 private:
-	string addr_;
-	string passwd_;
-	size_t max_slot_;
-	int    conn_timeout_;
-	int    rw_timeout_;
-	bool   retry_;
-	size_t nchannels_;
+	string addr_;		// the default redis address
+	string passwd_;		// password for connecting redis
+	size_t max_slot_;	// the max hash slot for redis cluster
+	int    conn_timeout_;	// timeout to connect redis
+	int    rw_timeout_;	// IO timeout with redis
+	bool   retry_;		// if try again when disconnect from redis
+	bool   preconn_;	// if connecting all redis nodes when starting
 
-	token_tree* channels_;
+	token_tree* channels_;	// holds and manage all pipeline channels
+
+	// the message queue for receiving redis message from other threads
 	BOX<redis_pipeline_message> box_;
 
-	std::vector<char*> addrs_;
-	const char** slot_addrs_;
+	std::vector<char*> addrs_;	// hold all redises addresses
+	const char** slot_addrs_;	// map hash slot with address
 
+	// set the hash slot with the specified redis address
 	void set_slot(size_t slot, const char* addr);
+
+	// set all hash slots' addresses of all redises
 	void set_all_slot(void);
 
+	// start all pipeline channels threads
 	void start_channels(void);
+
+	// stop all pipeline channels threads
 	void stop_channels(void);
+
+	// start one pipeline channel thread with the specified redis address
 	redis_pipeline_channel* start_channel(const char* addr);
+
+	// stop one pipeline channel thread with the specified redis address
 	void stop_channel(const char* addr);
+
+	// get one pipeline channel thread with the specified hash slot
 	redis_pipeline_channel* get_channel(int slot);
 
+	// redirect one slot to another redis address
 	void redirect(const redis_pipeline_message& msg, int slot);
+
+	// when one redis node down, we should clear the node's hash slot map
+	// and stop the pipeline channel thread
 	void cluster_down(const redis_pipeline_message& msg);
 };
 
+/**
+ * sample:
+ * void main_thread(void) {
+ *	acl::redis_client_pipeline pipeline("127.0.0.1:6379");
+ *	pipeline.start_thread();
+ *	// start some threads
+ *	...
+ * }
+ * // execute redis command in one thread
+ * void test_thread(acl::redis_client_pipeline& pipeline) {
+ *	acl::redis cmd;
+ *	cmd.set_pipeline(&pipeline);
+ *	for (size_t i = 0; i < 100000; i++) {
+ *		cmd.del("test_key");
+ *	}
+ */
 } // namespace acl
 
 #endif // !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
