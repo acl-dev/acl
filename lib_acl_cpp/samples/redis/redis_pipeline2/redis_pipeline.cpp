@@ -105,22 +105,20 @@ static void usage(const char* procname) {
 	printf("usage: %s -h[help]\r\n"
 		"-s one_redis_addr[127.0.0.1:6379]\r\n"
 		"-n count[default: 10]\r\n"
-		"-C connect_timeout[default: 10]\r\n"
-		"-I rw_timeout[default: 10]\r\n"
 		"-c max_threads[default: 10]\r\n"
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
-		"-P password [set the password of redis cluster]\r\n"
+		"-p password [set the password of redis cluster]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
 
 int main(int argc, char* argv[]) {
-	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
+	int  ch, n = 1;
 	int  max_threads = 10;
 	acl::string addr("127.0.0.1:6379"), cmd("del"), passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:c:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:a:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -130,12 +128,6 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'n':
 			n = atoi(optarg);
-			break;
-		case 'C':
-			conn_timeout = atoi(optarg);
-			break;
-		case 'I':
-			rw_timeout = atoi(optarg);
 			break;
 		case 'c':
 			max_threads = atoi(optarg);
@@ -155,6 +147,9 @@ int main(int argc, char* argv[]) {
 	acl::log::stdout_open(true);
 
 	acl::redis_client_pipeline pipeline(addr);
+	if (!passwd.empty()) {
+		pipeline.set_password(passwd);
+	}
 	pipeline.start_thread();
 
 	struct timeval begin;
@@ -199,6 +194,7 @@ int main(int argc, char* argv[]) {
 	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", cmd.c_str(),
 		total, inter, (total * 1000) /(inter > 0 ? inter : 1));
 
+	pipeline.stop_thread();
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
 	getchar();

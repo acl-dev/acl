@@ -170,7 +170,7 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		// transfer to pipeline processs again
 		pipeline_.push(&msg);
 	} else {
-		logger_error("unknown error");
+		logger_error("unknown error: %s", ptr);
 		msg.push(result);
 	}
 	return true;
