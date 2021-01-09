@@ -239,7 +239,7 @@ int main(int argc, char* argv[])
 	int  max_threads = 10;
 	acl::string addr("127.0.0.1:6379"), cmd("del"), passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:c:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:t:a:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -250,7 +250,7 @@ int main(int argc, char* argv[])
 		case 'n':
 			n = atoi(optarg);
 			break;
-		case 'c':
+		case 't':
 			max_threads = atoi(optarg);
 			break;
 		case 'a':

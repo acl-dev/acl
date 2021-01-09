@@ -35,13 +35,12 @@ private:
 class test_thread : public acl::thread {
 public:
 	test_thread(acl::locker& locker, acl::redis_client_pipeline& pipeline,
-		const char* cmd, int n)
+		int once_count, int count)
 	: locker_(locker)
 	, pipeline_(pipeline)
-	, cmd_(cmd)
-	, n_(n)
+	, once_count_(once_count)
+	, count_(count)
 	{
-		(void) cmd_;
 	}
 
 	~test_thread(void) {}
@@ -50,12 +49,12 @@ protected:
 	// @override
 	void* run(void) {
 		std::vector<redis_command*> commands;
-		for (size_t i = 0; i < 10; i++) {
+		for (size_t i = 0; i < (size_t) once_count_; i++) {
 			redis_command* command = new redis_command(pipeline_);
 			commands.push_back(command);
 		}
 
-		for (int i = 0; i < n_; i++) {
+		for (size_t i = 0; i < (size_t) count_; i++) {
 			request(commands);
 		}
 
@@ -98,14 +97,16 @@ private:
 	acl::locker& locker_;
 	acl::redis_client_pipeline& pipeline_;
 	acl::string cmd_;
-	int n_;
+	int once_count_;
+	int count_;
 };
 
 static void usage(const char* procname) {
 	printf("usage: %s -h[help]\r\n"
 		"-s one_redis_addr[127.0.0.1:6379]\r\n"
-		"-n count[default: 10]\r\n"
-		"-c max_threads[default: 10]\r\n"
+		"-N once_count[default: 10]\r\n"
+		"-n loop_count[default: 10]\r\n"
+		"-t max_threads[default: 10]\r\n"
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
@@ -114,26 +115,30 @@ static void usage(const char* procname) {
 }
 
 int main(int argc, char* argv[]) {
-	int  ch, n = 1;
+	int  ch, n = 10, once_count = 10;
 	int  max_threads = 10;
-	acl::string addr("127.0.0.1:6379"), cmd("del"), passwd;
+	acl::string addr("127.0.0.1:6379"), passwd;
+	acl::string cmd("del");
 
-	while ((ch = getopt(argc, argv, "hs:n:c:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "ha:s:N:n:t:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'a':
+			cmd = optarg;
+			break;
 		case 's':
 			addr = optarg;
+			break;
+		case 'N':
+			once_count = atoi(optarg);
 			break;
 		case 'n':
 			n = atoi(optarg);
 			break;
-		case 'c':
+		case 't':
 			max_threads = atoi(optarg);
-			break;
-		case 'a':
-			cmd = optarg;
 			break;
 		case 'p':
 			passwd = optarg;
@@ -160,7 +165,7 @@ int main(int argc, char* argv[]) {
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
 		test_thread* thread = new test_thread(locker, pipeline,
-			cmd.c_str(), n);
+			once_count, n);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();
