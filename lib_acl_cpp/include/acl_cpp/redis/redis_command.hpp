@@ -345,10 +345,17 @@ public:
 	static void build_request(size_t argc, const char* argv[],
 		size_t lens[], string& out);
 
+	/**
+	 * 根据命令字列表创建 redis 请求协议并存储于 redis_command 中，以备在请求时使用
+	 * @param argc {size_t} 命令参数个数
+	 * @param argv {const char* []} 命令参数数组
+	 * @param lens {size_t []} 每个命令参数长度数组
+	 */
+	void build_request(size_t argc, const char* argv[], size_t lens[]);
+
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 
-	void build_request(size_t argc, const char* argv[], size_t lens[]);
 	void clear_request(void);
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
@@ -480,6 +487,7 @@ public:
 		return slice_req_;
 	}
 
+	// get pipline message bound with the current command
 	redis_pipeline_message& get_pipeline_message(void);
 
 protected:
@@ -492,8 +500,13 @@ protected:
 	size_t* argv_lens_;
 	size_t  argc_;
 
+	// reserve the argv space with the specified value at least
 	void argv_space(size_t n);
+
+	// build request in one request buffer
 	void build_request1(size_t argc, const char* argv[], size_t lens[]);
+
+	// build request with slice request obj
 	void build_request2(size_t argc, const char* argv[], size_t lens[]);
 
 protected:
@@ -502,6 +515,7 @@ protected:
 	redis_pipeline_message* pipe_msg_;
 	const redis_result* result_;
 
+	// save the error info into log
 	void logger_result(const redis_result* result);
 };
 

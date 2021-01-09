@@ -356,6 +356,8 @@ void redis_client_pipeline::push(redis_pipeline_message *msg)
 	box_.push(msg, false);
 }
 
+// called after the thread started
+// @override from acl::thread
 void* redis_client_pipeline::run(void)
 {
 	set_all_slot();

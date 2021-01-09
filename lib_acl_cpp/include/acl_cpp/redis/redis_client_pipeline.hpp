@@ -22,12 +22,16 @@ class token_tree;
 class redis_client;
 
 typedef enum {
-	redis_pipeline_t_cmd,
-	redis_pipeline_t_redirect,
-	redis_pipeline_t_clusterdonw,
-	redis_pipeline_t_stop,
+	redis_pipeline_t_cmd,		// redis command type
+	redis_pipeline_t_redirect,	// should redirect to another node
+ 	redis_pipeline_t_clusterdonw,	// the redis node has been down
+	redis_pipeline_t_stop,		// the current channel should stop
 } redis_pipeline_type_t;
 
+/**
+ * the message for transfering between redis command, redis client pipline
+ * and redis pipeline channel, which holds the redis command or not.
+ */
 class redis_pipeline_message {
 public:
 	redis_pipeline_message(redis_command* cmd, redis_pipeline_type_t type)
