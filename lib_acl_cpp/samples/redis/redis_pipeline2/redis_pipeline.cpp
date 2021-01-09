@@ -135,7 +135,7 @@ static void usage(const char* procname) {
 }
 
 int main(int argc, char* argv[]) {
-	int  ch, n = 10, once_count = 10;
+	int  ch, count = 10, once_count = 10;
 	int  max_threads = 10;
 	acl::string addr("127.0.0.1:6379"), passwd;
 	acl::string cmd("del");
@@ -155,7 +155,7 @@ int main(int argc, char* argv[]) {
 			once_count = atoi(optarg);
 			break;
 		case 'n':
-			n = atoi(optarg);
+			count = atoi(optarg);
 			break;
 		case 't':
 			max_threads = atoi(optarg);
@@ -185,7 +185,7 @@ int main(int argc, char* argv[]) {
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
 		test_thread* thread = new test_thread(locker, pipeline,
-			once_count, n);
+			once_count, count);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
 	struct timeval end;
 	gettimeofday(&end, NULL);
 
-	long long int total = max_threads * n;
+	long long int total = max_threads * once_count * count;
 	double inter = util::stamp_sub(&end, &begin);
 	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", cmd.c_str(),
 		total, inter, (total * 1000) /(inter > 0 ? inter : 1));
