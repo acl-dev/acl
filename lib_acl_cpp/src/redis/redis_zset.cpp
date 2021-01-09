@@ -34,6 +34,11 @@ redis_zset::redis_zset(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_zset::redis_zset(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_zset::~redis_zset()
 {
 }

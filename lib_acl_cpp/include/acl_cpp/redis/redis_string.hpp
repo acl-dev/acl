@@ -9,10 +9,6 @@
 namespace acl
 {
 
-class string;
-class redis_client;
-class redis_result;
-
 /**
  * 所有的字符串对象的命令都已实现
  * all the commands in redis Strings are be implemented.
@@ -34,6 +30,8 @@ public:
 	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
 	redis_string(redis_client_cluster* cluster);
+
+	redis_string(redis_client_pipeline* pipeline);
 
 	ACL_CPP_DEPRECATED
 	redis_string(redis_client_cluster* cluster, size_t max_conns);

@@ -36,6 +36,8 @@ public:
 	ACL_CPP_DEPRECATED
 	redis_cluster(redis_client_cluster* cluster, size_t max_conns);
 
+	redis_cluster(redis_client_pipeline* pipeline);
+
 	virtual ~redis_cluster(void);
 
 	/**

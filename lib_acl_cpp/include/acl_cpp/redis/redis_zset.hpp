@@ -10,8 +10,6 @@
 namespace acl
 {
 
-class redis_client;
-
 class ACL_CPP_API redis_zset : virtual public redis_command
 {
 public:
@@ -29,6 +27,8 @@ public:
 	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
 	redis_zset(redis_client_cluster* cluster);
+
+	redis_zset(redis_client_pipeline* pipeline);
 
 	ACL_CPP_DEPRECATED
 	redis_zset(redis_client_cluster* cluster, size_t max_conns);

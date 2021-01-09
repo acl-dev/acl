@@ -31,6 +31,11 @@ redis_pubsub::redis_pubsub(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_pubsub::redis_pubsub(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_pubsub::~redis_pubsub(void)
 {
 }

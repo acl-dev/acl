@@ -9,9 +9,6 @@
 namespace acl
 {
 
-class redis_client;
-class redis_result;
-
 class ACL_CPP_API redis_transaction : virtual public redis_command
 {
 public:
@@ -29,6 +26,8 @@ public:
 	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
 	redis_transaction(redis_client_cluster* cluster);
+
+	redis_transaction(redis_client_pipeline* pipeline);
 
 	ACL_CPP_DEPRECATED
 	redis_transaction(redis_client_cluster* cluster, size_t max_conns);

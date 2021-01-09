@@ -10,8 +10,6 @@
 namespace acl
 {
 
-class redis_client;
-
 /**
  * redis Hash(哈希表) 类，本类的实现的主要命令：
  * redis Hash class, include commands as below:
@@ -38,6 +36,8 @@ public:
 
 	ACL_CPP_DEPRECATED
 	redis_hash(redis_client_cluster* cluster, size_t max_conns);
+
+	redis_hash(redis_client_pipeline* pipeline);
 
 	virtual ~redis_hash(void);
 

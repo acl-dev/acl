@@ -92,8 +92,6 @@ private:
 	double latitude_;
 };
 
-class redis_client;
-
 class ACL_CPP_API redis_geo : virtual public redis_command
 {
 public:
@@ -114,6 +112,9 @@ public:
 
 	ACL_CPP_DEPRECATED
 	redis_geo(redis_client_cluster* cluster, size_t max_conns);
+
+	redis_geo(redis_client_pipeline* pipeline);
+
 	virtual ~redis_geo();
 
 	/////////////////////////////////////////////////////////////////////

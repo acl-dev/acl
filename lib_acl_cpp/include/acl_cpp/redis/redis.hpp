@@ -61,6 +61,14 @@ public:
 	 */
 	redis(redis_client_cluster* cluster);
 
+	/**
+	 * pipeline 方式的构造函数
+	 * the constructor in redis pipeline mode
+	 * @param pipeline {redis_client_pipeline*} pipeline 对象
+	 *  the redis pipeline object
+	 */
+	redis(redis_client_pipeline* pipeline);
+
 	ACL_CPP_DEPRECATED
 	redis(redis_client_cluster* cluster, size_t max_conns);
 

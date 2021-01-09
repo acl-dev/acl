@@ -9,9 +9,6 @@
 namespace acl
 {
 
-class redis_client;
-class redis_client_cluster;
-
 class ACL_CPP_API redis_hyperloglog : virtual public redis_command
 {
 public:
@@ -32,6 +29,8 @@ public:
 
 	ACL_CPP_DEPRECATED
 	redis_hyperloglog(redis_client_cluster* cluster, size_t max_conns);
+
+	redis_hyperloglog(redis_client_pipeline* pipeline);
 
 	virtual ~redis_hyperloglog(void);
 

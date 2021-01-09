@@ -33,6 +33,11 @@ redis_stream::redis_stream(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_stream::redis_stream(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_stream::~redis_stream(void)
 {
 }

@@ -9,10 +9,6 @@
 namespace acl
 {
 
-class redis_client;
-class redis_result;
-class string;
-
 class ACL_CPP_API redis_pubsub : virtual public redis_command
 {
 public:
@@ -33,6 +29,8 @@ public:
 
 	ACL_CPP_DEPRECATED
 	redis_pubsub(redis_client_cluster* cluster, size_t max_conns);
+
+	redis_pubsub(redis_client_pipeline* pipeline);
 
 	virtual ~redis_pubsub(void);
 

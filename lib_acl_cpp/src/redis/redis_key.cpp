@@ -34,6 +34,11 @@ redis_key::redis_key(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_key::redis_key(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_key::~redis_key()
 {
 }

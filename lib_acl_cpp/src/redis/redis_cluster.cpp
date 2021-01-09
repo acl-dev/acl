@@ -29,6 +29,11 @@ redis_cluster::redis_cluster(redis_client_cluster* cluster)
 {
 }
 
+redis_cluster::redis_cluster(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_cluster::redis_cluster(redis_client_cluster* cluster, size_t)
 : redis_command(cluster)
 {

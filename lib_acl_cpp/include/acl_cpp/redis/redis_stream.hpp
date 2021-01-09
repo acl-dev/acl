@@ -8,9 +8,6 @@
 namespace acl
 {
 
-class redis_client;
-class redis_client_cluster;
-
 struct redis_stream_field
 {
 	string name;
@@ -148,6 +145,7 @@ public:
 	redis_stream(void);
 	redis_stream(redis_client* conn);
 	redis_stream(redis_client_cluster* cluster);
+	redis_stream(redis_client_pipeline* pipeline);
 
 	ACL_CPP_DEPRECATED
 	redis_stream(redis_client_cluster* cluster, size_t max_conns);

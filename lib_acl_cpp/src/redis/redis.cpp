@@ -44,6 +44,25 @@ redis::redis(redis_client_cluster* cluster)
 {
 }
 
+redis::redis(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+, redis_connection(pipeline)
+, redis_hash(pipeline)
+, redis_hyperloglog(pipeline)
+, redis_key(pipeline)
+, redis_list(pipeline)
+, redis_pubsub(pipeline)
+, redis_script(pipeline)
+, redis_server(pipeline)
+, redis_set(pipeline)
+, redis_string(pipeline)
+, redis_transaction(pipeline)
+, redis_zset(pipeline)
+, redis_cluster(pipeline)
+{
+}
+
+
 redis::redis(redis_client_cluster* cluster, size_t)
 : redis_command(cluster)
 , redis_connection(cluster)

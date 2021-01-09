@@ -35,6 +35,11 @@ redis_list::redis_list(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_list::redis_list(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_list::~redis_list()
 {
 }

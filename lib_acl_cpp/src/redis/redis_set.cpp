@@ -33,6 +33,11 @@ redis_set::redis_set(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_set::redis_set(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_set::~redis_set()
 {
 }

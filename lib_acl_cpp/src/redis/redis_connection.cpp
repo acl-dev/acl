@@ -30,6 +30,11 @@ redis_connection::redis_connection(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_connection::redis_connection(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_connection::~redis_connection()
 {
 }

@@ -33,6 +33,11 @@ redis_hash::redis_hash(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_hash::redis_hash(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_hash::~redis_hash(void)
 {
 }

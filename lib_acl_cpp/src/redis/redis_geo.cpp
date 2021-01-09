@@ -80,6 +80,11 @@ redis_geo::redis_geo(redis_client_cluster* cluster, size_t)
 {
 }
 
+redis_geo::redis_geo(redis_client_pipeline* pipeline)
+: redis_command(pipeline)
+{
+}
+
 redis_geo::~redis_geo()
 {
 }

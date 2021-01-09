@@ -8,9 +8,6 @@
 
 namespace acl {
 
-class redis_client;
-class redis_client_cluster;
-
 // redis 服务支持的数据类型分类
 // the data type supported by redis
 typedef enum
@@ -43,6 +40,8 @@ public:
 
 	ACL_CPP_DEPRECATED
 	redis_key(redis_client_cluster* cluster, size_t max_conns);
+
+	redis_key(redis_client_pipeline* pipeline);
 
 	virtual ~redis_key(void);
 
