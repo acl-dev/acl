@@ -5,13 +5,14 @@ static int __threads_exit = 0;
 
 class redis_command {
 public:
-	redis_command(acl::redis_client_pipeline& pipeline)
-	: msg_(cmd_.get_pipeline_message())
+	redis_command(acl::redis_client_pipeline& pipeline, const char* key)
+	: key_(key)
+	, msg_(cmd_.get_pipeline_message())
 	{
 		cmd_.set_pipeline(&pipeline);
 		argc_ = 2;
 		argv_[0] = "del";
-		argv_[1] = "test-key";
+		argv_[1] = key_;
 		lens_[0] = strlen(argv_[0]);
 		lens_[1] = strlen(argv_[1]);
 
@@ -35,7 +36,8 @@ public:
 	}
 
 private:
-	acl::redis cmd_;
+	acl::string key_;
+	acl::redis  cmd_;
 	acl::redis_pipeline_message& msg_;
 	size_t argc_;
 	const char* argv_[2];
@@ -59,10 +61,12 @@ public:
 protected:
 	// @override
 	void* run(void) {
+		acl::string key;
 		// parepare for a lot of redis commands in one request
 		std::vector<redis_command*> commands;
 		for (size_t i = 0; i < (size_t) once_count_; i++) {
-			redis_command* command = new redis_command(pipeline_);
+			key.format("test-key-%d", (int) i);
+			redis_command* command = new redis_command(pipeline_, key);
 			commands.push_back(command);
 		}
 
