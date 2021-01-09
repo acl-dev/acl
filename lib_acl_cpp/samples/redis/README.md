@@ -29,8 +29,7 @@ static void test_redis_string(acl::redis_string& cmd, const char* key)
 	acl::string val("test_value");
 
 	// call redis-server: SET key value
-	if (cmd.set(key, val.c_str()) == false)
-	{
+	if (cmd.set(key, val.c_str()) == false) {
 		printf("redis set error\r\n");
 		return;
 	}
@@ -54,7 +53,7 @@ static void test_redis_key(acl::redis_key& cmd, const char* key)
 		printf("key exists\r\n");
 }
 
-int main()
+int main(void)
 {
 	// init socket module for windows
 	acl::acl_cpp_init();
@@ -122,8 +121,7 @@ static void test_redis_string(acl::redis& cmd, const char* key)
 	acl::string val("test_value");
 
 	// call redis-server: SET key value
-	if (cmd.set(key, val.c_str()) == false)
-	{
+	if (cmd.set(key, val.c_str()) == false) {
 		printf("redis set error\r\n");
 		return;
 	}
@@ -173,7 +171,7 @@ int main(void)
 }
 ```
 
-### redis client cluster running in multi-threads
+### use redis client cluster in multi-threads
 ```c++
 static int __max_conns = 100;
 
@@ -182,12 +180,11 @@ static void* thread_main(void* arg)
 	acl::redis_client_cluster* cluster = (acl::redis_client_cluster*) arg;
 
 	acl::redis cmd;
-	cmd.set_cluster(cluster, __max_conns);
+	cmd.set_cluster(cluster);
 
 	const char* key = "test_key";
 
-	for (int i = 0; i < 100000; i++)
-	{
+	for (int i = 0; i < 100000; i++) {
 		test_redis_string(cmd, key);
 		test_redis_key(cmd, key);
 	}
@@ -221,6 +218,66 @@ int main(void)
 	pthread_join(id1, NULL);
 	pthread_join(id2, NULL);
 
+	return 0;
+}
+```
+
+### use redis pipeline in multi-threads
+```c++
+
+static void* thread_main(void* arg)
+{
+	acl::redis_client_pipeline* pipeline = (acl::redis_client_pipeline*) arg;
+
+	acl::redis cmd;
+	cmd.set_pipeline(pipeline);
+
+	acl::string key;
+
+	for (int i = 0; i < 100000; i++) {
+		key.format("test-key-%d", i);
+		test_redis_string(cmd, key);
+		test_redis_key(cmd, key);
+	}
+
+	return NULL;
+}
+
+int main(void)
+{
+	// init socket module for windows
+	acl::acl_cpp_init();
+
+	const char* redis_addr = "127.0.0.1:6379";
+
+	// declare redis pipeline ojbect
+	acl::redis_client_pipeline pipeline(redis_addr);
+
+	// start the pipeline thread
+	pipeline.start_thread();
+
+	pthread_attr_t attr;
+	pthread_attr_init(&attr);
+	
+	std::vector<pthread_t> threads;
+	// start some threads to execute redis operations
+	for (size_t i = 0; i < 100; i++) {
+		pthread_t id;
+		int ret = pthread_create(&id, &attr, thread_main, &pipeline);
+		if (ret == 0) {
+			threads.push_back(id);
+		}
+	}
+
+	// wait for all threads to exit
+	for (std::vector<pthread_t>::iterator it = threads.begin();
+		it != threads.end(); ++it) {
+
+		pthread_join(*it, NULL);
+	}
+
+	// stop the pipeline thread
+	pipeline.stop_thread();
 	return 0;
 }
 ```

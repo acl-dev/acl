@@ -269,13 +269,17 @@ private:
  *	pipeline.start_thread();
  *	// start some threads
  *	...
+ *	// wait for thease threads to exit and stop pipeline thread.
+ *	pipeline.stop_thread();
  * }
  * // execute redis command in one thread
  * void test_thread(acl::redis_client_pipeline& pipeline) {
  *	acl::redis cmd;
  *	cmd.set_pipeline(&pipeline);
+ *	acl::string key;
  *	for (size_t i = 0; i < 100000; i++) {
- *		cmd.del("test_key");
+ *		key.format("test-key-%d", (int) i);
+ *		cmd.del(key);
  *	}
  */
 } // namespace acl
