@@ -443,14 +443,16 @@ protected:
 protected:
 	dbuf_pool* dbuf_;
 
-	// 根据键值计算哈希槽值
-	void hash_slot(const char* key);
-	void hash_slot(const char* key, size_t len);
-
 private:
 	void init(void);
 
 public:
+	// compute hash slot of the given key and store it in the current
+	// redis command will be used in the next operation for redis cluster.
+	void hash_slot(const char* key);
+	void hash_slot(const char* key, size_t len);
+
+	// get the current hash slot stored internal
 	int get_slot(void) const {
 		return slot_;
 	}

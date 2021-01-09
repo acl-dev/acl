@@ -14,6 +14,11 @@ public:
 		argv_[1] = "test-key";
 		lens_[0] = strlen(argv_[0]);
 		lens_[1] = strlen(argv_[1]);
+
+		// computer the hash slot for redis cluster node
+		cmd_.hash_slot(argv_[1]);
+
+		// build redis request command with the given args.
 		cmd_.build_request(argc_, argv_, lens_);
 	}
 
@@ -21,6 +26,12 @@ public:
 
 	acl::redis_pipeline_message& get_message(void) {
 		return msg_;
+	}
+
+	void clear(void) {
+		// we want to reuse the hash slot in next operation,
+		// so the parameter save_slot was set to true.
+		cmd_.clear(true);
 	}
 
 private:
@@ -48,6 +59,7 @@ public:
 protected:
 	// @override
 	void* run(void) {
+		// parepare for a lot of redis commands in one request
 		std::vector<redis_command*> commands;
 		for (size_t i = 0; i < (size_t) once_count_; i++) {
 			redis_command* command = new redis_command(pipeline_);
@@ -58,6 +70,7 @@ protected:
 			request(commands);
 		}
 
+		// free all requests commands
 		for (std::vector<redis_command*>::iterator it = commands.begin();
 			    it != commands.end(); ++it) {
 			delete *it;
@@ -90,6 +103,9 @@ private:
 				printf("wait result error\r\n");
 				break;
 			}
+
+			// clear the temp memroy internal allocated by dbuf
+			(*it)->clear();
 		}
 	}
 
