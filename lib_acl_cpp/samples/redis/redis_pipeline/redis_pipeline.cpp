@@ -226,7 +226,6 @@ static void usage(const char* procname)
 		"-s one_redis_addr[127.0.0.1:6379]\r\n"
 		"-n count[default: 10]\r\n"
 		"-t max_threads[default: 10]\r\n"
-		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
