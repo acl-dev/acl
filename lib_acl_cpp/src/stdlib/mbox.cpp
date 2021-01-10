@@ -8,9 +8,9 @@
 namespace acl
 {
 
-void* mbox_create(void)
+void* mbox_create(bool mpsc)
 {
-	return acl_mbox_create();
+	return acl_mbox_create2(mpsc ? ACL_MBOX_T_MPSC : ACL_MBOX_T_SPSC);
 }
 
 void mbox_free(void* mbox, void (*free_fn)(void*))

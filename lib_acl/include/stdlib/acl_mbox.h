@@ -15,6 +15,11 @@ typedef struct ACL_MBOX ACL_MBOX;
  */
 ACL_API ACL_MBOX *acl_mbox_create(void);
 
+#define	ACL_MBOX_T_SPSC		0	/* 单生产者单消费者 */
+#define	ACL_MBOX_T_MPSC		1	/* 多生产者单消费者 */
+
+ACL_API ACL_MBOX *acl_mbox_create2(unsigned type);
+
 /**
  * 释放无锁消息队列对象
  * @param mbox {ACL_MBOX*} 消息队列对象

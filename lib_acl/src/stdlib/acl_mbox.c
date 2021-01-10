@@ -38,6 +38,11 @@ struct ACL_MBOX {
 
 ACL_MBOX *acl_mbox_create(void)
 {
+	return acl_mbox_create2(ACL_MBOX_T_MPSC);
+}
+
+ACL_MBOX *acl_mbox_create2(unsigned type)
+{
 	ACL_MBOX *mbox;
 	ACL_SOCKET fds[2];
 
@@ -63,12 +68,18 @@ ACL_MBOX *acl_mbox_create(void)
 	mbox->nsend = 0;
 	mbox->nread = 0;
 	mbox->ypipe = acl_ypipe_new();
-	mbox->lock  = (acl_pthread_mutex_t *)
-		acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
 
-	if (acl_pthread_mutex_init(mbox->lock, NULL) != 0)
-		acl_msg_fatal("%s(%d), %s: acl_pthread_mutex_init error",
-			__FILE__, __LINE__, __FUNCTION__);
+	if (type == ACL_MBOX_T_MPSC) {
+		mbox->lock  = (acl_pthread_mutex_t *)
+			acl_mycalloc(1, sizeof(acl_pthread_mutex_t));
+
+		if (acl_pthread_mutex_init(mbox->lock, NULL) != 0) {
+			acl_msg_fatal("%s(%d), %s: pthread_mutex_init error",
+				__FILE__, __LINE__, __FUNCTION__);
+		}
+	} else {
+		mbox->lock = NULL;
+	}
 
 	return mbox;
 }
@@ -76,11 +87,14 @@ ACL_MBOX *acl_mbox_create(void)
 void acl_mbox_free(ACL_MBOX *mbox, void (*free_fn)(void*))
 {
 	acl_socket_close(mbox->in);
-	if (mbox->out != mbox->in)
+	if (mbox->out != mbox->in) {
 		acl_socket_close(mbox->out);
+	}
 	acl_ypipe_free(mbox->ypipe, free_fn);
-	acl_pthread_mutex_destroy(mbox->lock);
-	acl_myfree(mbox->lock);
+	if (mbox->lock != NULL) {
+		acl_pthread_mutex_destroy(mbox->lock);
+		acl_myfree(mbox->lock);
+	}
 	acl_myfree(mbox);
 }
 
@@ -88,16 +102,23 @@ int acl_mbox_send(ACL_MBOX *mbox, void *msg)
 {
 	int ret;
 	long long n = 1;
+	acl_pthread_mutex_t *lock = mbox->lock;
 
-	acl_pthread_mutex_lock(mbox->lock);
+	if (lock) {
+		acl_pthread_mutex_lock(lock);
+	}
 	acl_ypipe_write(mbox->ypipe, msg);
 	ret = acl_ypipe_flush(mbox->ypipe);
 #if defined(HAS_EVENTFD)
-	acl_pthread_mutex_unlock(mbox->lock);
+	if (lock) {
+		acl_pthread_mutex_unlock(lock);
+	}
 #endif
 	if (ret == 0) {
 #if !defined(HAS_EVENTFD)
-		acl_pthread_mutex_unlock(mbox->lock);
+		if (lock) {
+			acl_pthread_mutex_unlock(lock);
+		}
 #endif
 		return 0;
 	}
@@ -106,7 +127,9 @@ int acl_mbox_send(ACL_MBOX *mbox, void *msg)
 
 	ret = acl_socket_write(mbox->out, &n, sizeof(n), 0, NULL, NULL);
 #if !defined(HAS_EVENTFD)
-	acl_pthread_mutex_unlock(mbox->lock);
+	if (lock) {
+		acl_pthread_mutex_unlock(lock);
+	}
 #endif
 
 	if (ret == -1) {
@@ -125,40 +148,45 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 	void *msg = acl_ypipe_read(mbox->ypipe);
 
 	if (msg != NULL) {
-		if (success)
+		if (success) {
 			*success = 1;
+		}
 		return msg;
 	} else if (timeout == 0) {
-		if (success)
+		if (success) {
 			*success = 1;
+		}
 		return NULL;
 	}
 
 	mbox->nread++;
 
 #ifdef ACL_UNIX
-	if (timeout > 0 && acl_read_poll_wait(mbox->in, timeout) < 0)
+	if (timeout > 0 && acl_read_poll_wait(mbox->in, timeout) < 0) {
 #else
-	if (timeout > 0 && acl_read_select_wait(mbox->in, timeout) < 0)
+	if (timeout > 0 && acl_read_select_wait(mbox->in, timeout) < 0) {
 #endif
-	{
 		if (acl_last_error() == ACL_ETIMEDOUT) {
-			if (success)
+			if (success) {
 				*success = 1;
-		} else if (success)
+			}
+		} else if (success) {
 			*success = 0;
+		}
 		return NULL;
 	}
 
 	ret = acl_socket_read(mbox->in, &n, sizeof(n), 0, NULL, NULL);
 	if (ret == -1) {
-		if (success)
+		if (success) {
 			*success = 0;
+		}
 		return NULL;
 	}
 
-	if (success)
+	if (success) {
 		*success = 1;
+	}
 
 	return acl_ypipe_read(mbox->ypipe);
 }

@@ -7,7 +7,7 @@ namespace acl
 {
 
 // internal functions being used
-void*  mbox_create(void);
+void*  mbox_create(bool mpsc);
 void   mbox_free(void*, void (*free_fn)(void*));
 bool   mbox_send(void*, void*);
 void*  mbox_read(void*, int, bool*);
@@ -56,11 +56,12 @@ public:
 	 * 构造方法
 	 * @param free_obj {bool} 当 tbox 销毁时，是否自动检查并释放
 	 *  未被消费的动态对象
+	 * @param mpsc {bool} 是否为多生产者-单消费者模式
 	 */
-	mbox(bool free_obj = true)
+	mbox(bool free_obj = true, bool mpsc = true)
 	: free_obj_(free_obj)
 	{
-		mbox_ = mbox_create();
+		mbox_ = mbox_create(mpsc);
 		assert(mbox_);
 	}
 

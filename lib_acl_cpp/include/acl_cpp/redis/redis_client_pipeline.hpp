@@ -39,7 +39,7 @@ public:
 	, type_(type)
 	, nchild_(0)
 	, timeout_(NULL)
-	, box_(false)
+	, box_(false, false)
 	, result_(NULL)
 	, addr_(NULL)
 	, redirect_count_(0)
