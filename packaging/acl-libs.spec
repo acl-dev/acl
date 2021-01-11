@@ -1,8 +1,8 @@
-%define release_id 11
+%define release_id 0
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.5.1
+Version:        3.5.2
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
@@ -45,6 +45,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Mon Jan 11 2021 shuxin.zheng@qq.com 3.5.2-0-20210111.18
+- feature: redis module has supported pipeline with very high performance!
 
 * Thu Dec 17 2020 shuxin.zheng@qq.com 3.5.1-11-20201117.09
 - feature: add more API for db_sqlite module by Vhdsih
