@@ -1,0 +1,312 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="源文件\common">
+      <UniqueIdentifier>{02aaa36c-e182-4878-aea8-17c9c7d99f41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\event">
+      <UniqueIdentifier>{356538fb-5e38-4d2d-9519-4cf6ac50944c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\hook">
+      <UniqueIdentifier>{08cf9220-1c0c-4cc0-b340-6f3f2f00b0f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\dns">
+      <UniqueIdentifier>{db249318-674e-46ed-8d7b-05382163acdd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\fiber">
+      <UniqueIdentifier>{baaeb113-34bc-4df8-9649-b024ec495a95}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\common\argv.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\array.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\atomic.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\init.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\iostuff.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\iterator.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\msg.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\ring.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\strops.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_epoll.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_kqueue.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hook\hook.h">
+      <Filter>源文件\hook</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dns\resolver.h">
+      <Filter>源文件\dns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dns\rfc1035.h">
+      <Filter>源文件\dns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dns\sane_inet.h">
+      <Filter>源文件\dns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dns\valid_hostname.h">
+      <Filter>源文件\dns</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\define.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\fiber.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stdafx.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_base.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_channel.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_define.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_cond.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_event.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_hook.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_lock.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_sem.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\libfiber.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\fifo.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\gettimeofday.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\memory.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\pthread_patch.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_select.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_poll.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_wmsg.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\htable.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\sane_socket.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\event\event_iocp.h">
+      <Filter>源文件\event</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\stdafx.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\argv.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\array.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\atomic.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\close_on_exec.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\doze.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\init.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\msg.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\non_blocking.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\open_limit.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\read_wait.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\ring.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\socketpair.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\strops.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\tcp_nodelay.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_epoll.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_kqueue.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\epoll.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\getaddrinfo.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\gethostbyname.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\io.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\poll.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\select.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\socket.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dns\resolver.c">
+      <Filter>源文件\dns</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dns\rfc1035.c">
+      <Filter>源文件\dns</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dns\sane_inet.c">
+      <Filter>源文件\dns</Filter>
+    </ClCompile>
+    <ClCompile Include="src\dns\valid_hostname.c">
+      <Filter>源文件\dns</Filter>
+    </ClCompile>
+    <ClCompile Include="src\channel.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fbase_event.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_cond.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_event.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_io.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_lock.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_sem.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file_event.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\fifo.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\gettimeofday.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber\fiber_unix.c">
+      <Filter>源文件\fiber</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber\fiber_win.c">
+      <Filter>源文件\fiber</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\memory.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\pthread_patch.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_select.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_poll.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_wmsg.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\htable.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\sane_socket.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_iocp.c">
+      <Filter>源文件\event</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
