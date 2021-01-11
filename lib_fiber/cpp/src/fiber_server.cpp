@@ -72,8 +72,6 @@ static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ 0, 0, 0 },
 };
 
-static int    __argc;
-static char **__argv;
 static int    __daemon_mode = 0;
 static void (*__service)(void*, ACL_VSTREAM*) = NULL;
 static void  *__service_ctx = NULL;
@@ -983,9 +981,6 @@ void acl_fiber_server_main(int argc, char *argv[],
 	va_list ap;
 #endif
 
-	__argc = argc;
-	__argv = argv;
-
 	/* Set up call-back info. */
 	__service     = service;
 	__service_ctx = ctx;
@@ -994,7 +989,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 #if !defined(_WIN32) && !defined(_WIN64)
 	va_start(ap, name);
 	va_copy(__ap_dest, ap);
-	master_log_open(__argv[0]);
+	master_log_open(argv[0]);
 	va_end(ap);
 #endif
 
@@ -1009,10 +1004,10 @@ void acl_fiber_server_main(int argc, char *argv[],
 	optarg = 0;
 #endif
 
-	while ((c = getopt(__argc, __argv, "Hc:n:s:t:uf:L:")) > 0) {
+	while ((c = getopt(argc, argv, "Hc:n:s:t:uf:L:")) > 0) {
 		switch (c) {
 		case 'H':
-			usage(__argc, __argv);
+			usage(argc, argv);
 			exit (0);
 		case 'f':
 			acl_app_conf_load(optarg);
@@ -1068,7 +1063,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	/* load configure, set signal */
 
-	server_init(__argv[0]);
+	server_init(argv[0]);
 
 	parse_args();
 
