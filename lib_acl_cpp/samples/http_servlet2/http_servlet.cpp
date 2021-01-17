@@ -2,7 +2,7 @@
 #include "http_servlet.h"
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
-	: acl::HttpServlet(stream, session)
+: acl::HttpServlet(stream, session)
 {
 
 }
@@ -56,7 +56,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 
 	for (int i = 0; i < 10; i++)
 	{
-		acl::string buf("hello");
+		buf = "hello";
 		if (res.write(buf) == false)
 		{
 			logger_error("write error!");

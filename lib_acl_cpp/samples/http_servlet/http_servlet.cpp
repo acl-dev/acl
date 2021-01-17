@@ -122,18 +122,18 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
+	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
 		format = (void (*)(const char*, ...)) printf;
-		printf("listen: 0.0.0.0:8888 ...\r\n");
-		service.run_alone("0.0.0.0:8888", NULL, 0);  // 单独运行方式
+		printf("listen: 0.0.0.0|8888 ...\r\n");
+		service.run_alone("0.0.0.0|8888", NULL, 0);  // 单独运行方式
 	}
 	else
 	{
 #ifdef	WIN32
 		format = (void (*)(const char*, ...)) printf;
-		printf("listen: 0.0.0.0:8888 ...\r\n");
-		service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
+		printf("listen: 0.0.0.0|8888 ...\r\n");
+		service.run_alone("0.0.0.0|8888", NULL, 1);  // 单独运行方式
 #else
 		service.run_daemon(argc, argv);  // acl_master 控制模式运行
 #endif

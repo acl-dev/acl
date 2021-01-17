@@ -109,13 +109,11 @@ int main(int argc, char *argv[])
 			acl::string buf("test1: hello world!\r\n");
 			res.setContentLength(buf.size());
 			return res.write(buf);
-		})
-		.Get("/test2", [&](HttpRequest&, HttpResponse& res) {
+		}).Get("/test2", [&](HttpRequest&, HttpResponse& res) {
 			acl::string buf("test2: hello world!\r\n");
 			res.setContentLength(buf.size());
 			return res.write(buf);
-		})
-		.Default([](const char* path, HttpRequest&, HttpResponse& res) {
+		}).Default([](const char* path, HttpRequest&, HttpResponse& res) {
 			acl::string buf;
 			buf.format("Default(%s): hello world!\r\n", path);
 			res.setContentLength(buf.size());
@@ -125,7 +123,7 @@ int main(int argc, char *argv[])
 		.Default(http_get_default);
 #endif
 
-	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0) {
+	if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
 		const char* addr = "|8888";
 
 		acl::log::stdout_open(true);

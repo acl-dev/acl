@@ -23,16 +23,16 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
+	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
-		const char* addr = ":8888";
+		const char* addr = "|8888";
 		printf("listen on: %s\r\n", addr);
 		ms.run_alone(addr, NULL, 0, 256);  // 单独运行方式
 	}
 	else
 	{
 #ifdef	WIN32
-		const char* addr = ":8888";
+		const char* addr = "|8888";
 		printf("listen on: %s\r\n", addr);
 		ms.run_alone(addr, NULL, 0, 256);  // 单独运行方式
 #else

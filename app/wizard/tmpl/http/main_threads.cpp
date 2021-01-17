@@ -109,13 +109,11 @@ int main(int argc, char* argv[])
 			acl::string buf("test1: hello world!\r\n");
 			res.setContentLength(buf.size());
 			return res.write(buf);
-		})
-		.Get("/test2", [&](HttpRequest&, HttpResponse& res) {
+		}).Get("/test2", [&](HttpRequest&, HttpResponse& res) {
 			acl::string buf("test2: hello world!\r\n");
 			res.setContentLength(buf.size());
 			return res.write(buf);
-		})
-		.Default([](const char* path, HttpRequest&, HttpResponse& res) {
+		}).Default([](const char* path, HttpRequest&, HttpResponse& res) {
 			acl::string buf;
 			buf.format("Default(%s): hello world!\r\n", path);
 			res.setContentLength(buf.size());
@@ -127,7 +125,7 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {
+	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0)) {
 		// 日志输出至标准输出
 		acl::log::stdout_open(true);
 
