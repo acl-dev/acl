@@ -123,7 +123,7 @@ if (${UNIX_OS})
 	)
 
 	if (CMAKE_COMPILER_IS_GNUCC)
-		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion
+		execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpfullversion -dumpversion
 			OUTPUT_VARIABLE GCC_VERSION)
 		string(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONENTS ${GCC_VERSION})
 		list(GET GCC_VERSION_COMPONENTS 0 GCC_MAJOR)
