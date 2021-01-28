@@ -530,6 +530,10 @@ int fiber_file_close(socket_t fd, int *closed)
 		*closed = event->close_sock(event, fe);
 	}
 
-	file_event_free(fe);
+	if (fe->fiber == acl_fiber_running()) {
+		file_event_free(fe);
+	} else {
+		acl_fiber_ready(fe->fiber);
+	}
 	return 1;
 }
