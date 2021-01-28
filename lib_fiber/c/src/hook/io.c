@@ -336,7 +336,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -387,7 +387,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -439,7 +439,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -470,7 +470,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -528,7 +528,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -592,7 +592,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -645,7 +645,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		fiber_save_errno(err);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -693,7 +693,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -733,7 +733,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -780,7 +780,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -827,7 +827,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -868,7 +868,7 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;
@@ -964,7 +964,7 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is existing",
+			msg_info("%s(%d), %s: fiber-%u is killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(fe->fiber));
 			return -1;

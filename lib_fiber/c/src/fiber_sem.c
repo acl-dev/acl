@@ -80,6 +80,11 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 	 */
 	ring_detach(&curr->me);
 
+	if (acl_fiber_killed(curr)) {
+		msg_info("%s(%d): fiber-%d be killed",
+			__FUNCTION__, __LINE__, acl_fiber_id(curr));
+		return -1;
+	}
 	return sem->num;
 }
 
