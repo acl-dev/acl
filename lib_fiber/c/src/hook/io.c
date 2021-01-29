@@ -327,6 +327,12 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		ssize_t n;
 		int err;
 
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
+			return -1;
+		}
+
 		n = __sys_read(fd, buf, count);
 		if (n >= 0) {
 			return n;
@@ -335,15 +341,11 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
 		if (!error_again(err)) {
 			return -1;
 		}
+
+		fiber_wait_read(fe);
 	}
 }
 # else
@@ -378,6 +380,12 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 			fiber_wait_read(fe);
 		}
 
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
+			return -1;
+		}
+
 		ret = __sys_read(fd, buf, count);
 		if (ret >= 0) {
 			return ret;
@@ -385,13 +393,6 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
 
 		if (!error_again(err)) {
 			return -1;
@@ -430,6 +431,12 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 			fiber_wait_read(fe);
 		}
 
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
+			return -1;
+		}
+
 		ret = __sys_readv(fd, iov, iovcnt);
 		if (ret >= 0) {
 			return ret;
@@ -438,19 +445,12 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
-
 		if (!error_again(err)) {
 			return -1;
 		}
 	}
 }
-#endif
+#endif // SYS_UNIX
 
 static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
@@ -466,15 +466,14 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 			return -1;
 		}
 
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
 
 		return fe->len;
 	}
@@ -519,6 +518,12 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 			fiber_wait_read(fe);
 		}
 
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
+			return -1;
+		}
+
 		ret = (int) __sys_recv(sockfd, buf, len, flags);
 		if (ret >= 0) {
 			return ret;
@@ -526,13 +531,6 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
 
 		if (!error_again(err)) {
 			return -1;
@@ -582,6 +580,12 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 			fiber_wait_read(fe);
 		}
 
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
+			return -1;
+		}
+
 		ret = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
 		if (ret >= 0) {
@@ -590,13 +594,6 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
 
 		if (!error_again(err)) {
 			return -1;
@@ -636,6 +633,12 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 			fiber_wait_read(fe);
 		}
 
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
+			return -1;
+		}
+
 		ret = __sys_recvmsg(sockfd, msg, flags);
 		if (ret >= 0) {
 			return ret;
@@ -643,13 +646,6 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
-
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
-			return -1;
-		}
 
 		if (!error_again(err)) {
 			return -1;
@@ -692,10 +688,9 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		fe = fiber_file_open(fd);
 		fiber_wait_write(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
 	}
@@ -732,10 +727,9 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		fe = fiber_file_open(fd);
 		fiber_wait_write(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
 	}
@@ -779,10 +773,9 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		fe = fiber_file_open(sockfd);
 		fiber_wait_write(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
 	}
@@ -826,10 +819,9 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		fe = fiber_file_open(sockfd);
 		fiber_wait_write(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
 	}
@@ -867,10 +859,9 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		fe = fiber_file_open(sockfd);
 		fiber_wait_write(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
 	}
@@ -963,10 +954,9 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		fe = fiber_file_open(out_fd);
 		fiber_wait_write(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
-			msg_info("%s(%d), %s: fiber-%u is killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(fe->fiber));
+		if (acl_fiber_canceled(fe->fiber)) {
+			fiber_save_errno(ECANCELED);
+			acl_fiber_set_error(ECANCELED);
 			return -1;
 		}
 	}

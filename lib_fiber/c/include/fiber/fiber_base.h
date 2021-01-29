@@ -106,11 +106,32 @@ FIBER_API int acl_fiber_status(const ACL_FIBER* fiber);
 FIBER_API void acl_fiber_kill(ACL_FIBER* fiber);
 
 /**
- * check if the current fiber has been killed
+ * check if the specified fiber has been killed
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @return {int} non zero returned if been killed
  */
 FIBER_API int acl_fiber_killed(ACL_FIBER* fiber);
+
+/**
+ * check if the specified fiber has been signaled
+ * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
+ * @return {int} non zero returned if been signed
+ */
+FIBER_API int acl_fiber_signaled(ACL_FIBER* fiber);
+
+/**
+ * check if the specified fiber's socket has been closed by another fiber
+ * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
+ * @return {int} non zero returned if been closed
+ */
+FIBER_API int acl_fiber_closed(ACL_FIBER* fiber);
+
+/**
+ * check if the specified fiber has been canceled
+ * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
+ * @return {int} non zero returned if been canceled
+ */
+FIBER_API int acl_fiber_canceled(ACL_FIBER* fiber);
 
 /**
  * wakeup the suspended fiber with the assosiated signal number

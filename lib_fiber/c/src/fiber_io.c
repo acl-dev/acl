@@ -533,6 +533,9 @@ int fiber_file_close(socket_t fd, int *closed)
 	if (fe->fiber == acl_fiber_running()) {
 		file_event_free(fe);
 	} else {
+		fe->fiber->errnum = ECANCELED;
+		fe->fiber->flag  |= FIBER_F_CLOSED;
+		ring_detach(&fe->fiber->me);
 		acl_fiber_ready(fe->fiber);
 	}
 	return 1;

@@ -7,7 +7,11 @@ static std::map<acl::string, fiber_client*> __users;
 
 class fiber_client : public acl::fiber {
 public:
-	fiber_client(acl::socket_stream* conn) : conn_(conn), kicked_(false) {}
+	fiber_client(acl::socket_stream* conn, bool use_kill)
+	: conn_(conn)
+	, kicked_(false)
+	, use_kill_(use_kill)
+	{}
 
 	acl::socket_stream& get_conn(void) {
 		return *conn_;
@@ -59,6 +63,7 @@ private:
 	acl::socket_stream* conn_;
 	acl::string name_;
 	bool kicked_;
+	bool use_kill_;
 
 	bool user_login(void) {
 		if (!conn_->gets(name_)) {
@@ -84,8 +89,13 @@ private:
 
 		acl::socket_stream& conn = it->second->get_conn();
 		int fd = conn.sock_handle();
-		conn.unbind_sock();
-		close(fd);
+
+		if (use_kill_) {
+			it->second->kill();
+		} else {
+			conn.unbind_sock();
+			close(fd);
+		}
 
 		printf("Kick old %s, fd=%d\r\n", name_.c_str(), fd);
 
@@ -106,7 +116,11 @@ private:
 
 class fiber_server : public acl::fiber {
 public:
-	fiber_server(acl::server_socket& ss) : ss_(ss) {}
+	fiber_server(acl::server_socket& ss, bool use_kill)
+	: ss_(ss)
+	, use_kill_(use_kill)
+	{}
+
 	~fiber_server(void) {}
 
 protected:
@@ -121,7 +135,7 @@ protected:
 
 			printf("accept ok, fd: %d\r\n", conn->sock_handle());
 			// create one fiber for one connection
-			fiber_client* fc = new fiber_client(conn);
+			fiber_client* fc = new fiber_client(conn, use_kill_);
 			// start the client fiber
 			fc->start();
 		}
@@ -129,12 +143,14 @@ protected:
 
 private:
 	acl::server_socket& ss_;
+	bool use_kill_;
 };
 
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
 		" -e event_type[select|poll|kernel, default: kernel]\r\n"
+		" -k [use kill, default: false]\r\n"
 		, procname);
 }
 
@@ -145,8 +161,9 @@ int main(int argc, char *argv[]) {
 	acl::acl_cpp_init();
 	acl::string addr("127.0.0.1:9006");
 	acl::log::stdout_open(true);
+	bool use_kill = false;
 
-	while ((ch = getopt(argc, argv, "hs:e:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:e:k")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -160,6 +177,9 @@ int main(int argc, char *argv[]) {
 			} else if (strcmp(optarg, "select") == 0) {
 				event = acl::FIBER_EVENT_T_SELECT;
 			}
+			break;
+		case 'k':
+			use_kill = true;
 			break;
 		default:
 			break;
@@ -188,7 +208,7 @@ int main(int argc, char *argv[]) {
 	}
 	printf("listen %s ok\r\n", addr.c_str());
 
-	fiber_server fs(ss);
+	fiber_server fs(ss, use_kill);
 	fs.start();
 
 	acl::fiber::schedule_with(event);
