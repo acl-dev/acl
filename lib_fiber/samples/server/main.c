@@ -13,17 +13,20 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
-	int   ret, count = 0;
+	int   ret, count = 0, timeout = 2;
 
-	cstream->rw_timeout = __rw_timeout;
+	//cstream->rw_timeout = __rw_timeout;
 
 #define	SOCK ACL_VSTREAM_SOCK
 
 	while (1) {
+		setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET, SO_RCVTIMEO,
+			&timeout, sizeof(timeout));
+
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
-			//printf("gets error: %s, fd: %d, count: %d\r\n",
-			//	acl_last_serror(), SOCK(cstream), count);
+			printf("gets error: %s, fd: %d, count: %d\r\n",
+				acl_last_serror(), SOCK(cstream), count);
 			break;
 		}
 		buf[ret] = 0;

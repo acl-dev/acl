@@ -408,11 +408,6 @@ ACL_FIBER *acl_fiber_running(void)
 	return __thread_fiber->running;
 }
 
-void acl_fiber_kill(ACL_FIBER *fiber)
-{
-	acl_fiber_signal(fiber, SIGTERM);
-}
-
 int acl_fiber_killed(ACL_FIBER *fiber)
 {
 	if (!fiber) {
@@ -445,6 +440,12 @@ int acl_fiber_canceled(ACL_FIBER *fiber)
 	return fiber && (fiber->flag & FIBER_F_CANCELED);
 }
 
+void acl_fiber_kill(ACL_FIBER *fiber)
+{
+	fiber->errnum = ECANCELED;
+	acl_fiber_signal(fiber, SIGTERM);
+}
+
 void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 {
 	ACL_FIBER *curr = __thread_fiber->running;
@@ -471,7 +472,6 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 		fiber->flag |= FIBER_F_SIGNALED;
 	}
 
-	fiber->errnum = ECANCELED;
 	fiber->signum = signum;
 
 	if (fiber == curr) { // just return if kill myself

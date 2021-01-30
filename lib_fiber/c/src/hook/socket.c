@@ -14,12 +14,17 @@ typedef socket_t (*socket_fn)(int, int, int);
 typedef int (*listen_fn)(socket_t, int);
 typedef socket_t (*accept_fn)(socket_t, struct sockaddr *, socklen_t *);
 typedef int (*connect_fn)(socket_t, const struct sockaddr *, socklen_t);
+typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 #endif
 
-static socket_fn  __sys_socket  = NULL;
-static listen_fn  __sys_listen  = NULL;
-static accept_fn  __sys_accept  = NULL;
-static connect_fn __sys_connect = NULL;
+static socket_fn     __sys_socket     = NULL;
+static listen_fn     __sys_listen     = NULL;
+static accept_fn     __sys_accept     = NULL;
+static connect_fn    __sys_connect    = NULL;
+
+#ifdef SYS_UNIX
+static setsockopt_fn __sys_setsockopt = NULL;
+#endif
 
 static void hook_api(void)
 {
@@ -35,11 +40,17 @@ static void hook_api(void)
 
 	__sys_connect    = (connect_fn) dlsym(RTLD_NEXT, "connect");
 	assert(__sys_connect);
+
+# ifdef SYS_UNIX
+	__sys_setsockopt = (setsockopt_fn) dlsym(RTLD_NEXT, "setsockopt");
+	assert(__sys_setsockopt);
+# endif
 #elif defined(SYS_WIN)
-	__sys_socket  = socket;
-	__sys_listen  = listen;
-	__sys_accept  = accept;
-	__sys_connect = connect;
+	__sys_socket     = socket;
+	__sys_listen     = listen;
+	__sys_accept     = accept;
+	__sys_connect    = connect;
+	__sys_setsockopt = setsockopt;
 #endif
 }
 
@@ -249,8 +260,9 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	FILE_EVENT *fe;
 	time_t begin, end;
 
-	if (__sys_connect == NULL)
+	if (__sys_connect == NULL) {
 		hook_init();
+	}
 
 	if (!var_hook_sys_api) {
 		return __sys_connect ? __sys_connect(sockfd, addr, addrlen) : -1;
@@ -381,6 +393,86 @@ int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
 int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 {
 	return acl_fiber_connect(sockfd, addr, addrlen);
+}
+
+typedef struct TIMEOUT_CTX {
+	ACL_FIBER *fiber;
+	int        sockfd;
+	unsigned   id;
+} TIMEOUT_CTX;
+
+static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
+{
+	TIMEOUT_CTX *tc = (TIMEOUT_CTX*) ctx;
+	FILE_EVENT *fe = fiber_file_get(tc->sockfd);
+
+	// we must check the fiber carefully here.
+	if (fe == NULL || tc->fiber != fe->fiber
+		|| tc->fiber->id != fe->fiber->id) {
+
+		mem_free(ctx);
+		return;
+	}
+
+	// we can kill the fiber only if the fiber is waiting
+	// for readable ore writable of IO process.
+	if (fe->fiber->status == FIBER_STATUS_WAIT_READ
+		|| fe->fiber->status == FIBER_STATUS_WAIT_WRITE) {
+
+		tc->fiber->errnum = FIBER_EAGAIN;
+		acl_fiber_signal(tc->fiber, SIGINT);
+	}
+
+	mem_free(ctx);
+}
+
+int setsockopt(int sockfd, int level, int optname,
+	const void *optval, socklen_t optlen)
+{
+	size_t val;
+	TIMEOUT_CTX *ctx;
+
+	if (__sys_setsockopt == NULL) {
+		hook_init();
+	}
+
+	if (!var_hook_sys_api || (optname != SO_RCVTIMEO
+				&& optname != SO_SNDTIMEO)) {
+		return __sys_setsockopt ? __sys_setsockopt(sockfd, level,
+			optname, optval, optlen) : -1;
+	}
+
+	if (__sys_setsockopt == NULL) {
+		msg_error("__sys_setsockopt null");
+		return -1;
+	}
+
+	switch (optlen) {
+	case 0:
+		msg_error("optlen is 0");
+		return -1;
+	case 1:
+		val = *((const char*) optval);
+		break;
+	case 2:
+		val = *((const short*) optval);
+		break;
+	case 4:
+		val = *((const int*) optval);
+		break;
+	case 8:
+		val = *((const long long*) optval);
+		break;
+	default:
+		msg_error("invalid optlen=%d", (int) optlen);
+		return -1;
+	}
+
+	ctx = (TIMEOUT_CTX*) mem_malloc(sizeof(TIMEOUT_CTX));
+	ctx->fiber  = acl_fiber_running();
+	ctx->sockfd = sockfd;
+	acl_fiber_create_timer((unsigned) val * 1000, 64000, fiber_timeout, ctx);
+	return 0;
 }
 
 #endif

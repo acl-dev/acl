@@ -328,8 +328,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		int err;
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -381,8 +380,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		}
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -432,8 +430,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		}
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -467,8 +464,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		}
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -519,8 +515,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		}
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -581,8 +576,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		}
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -634,8 +628,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		}
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 
@@ -689,8 +682,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 	}
@@ -728,8 +720,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 	}
@@ -774,8 +765,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 	}
@@ -820,8 +810,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 	}
@@ -860,8 +849,7 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 	}
@@ -955,8 +943,7 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
-			fiber_save_errno(ECANCELED);
-			acl_fiber_set_error(ECANCELED);
+			acl_fiber_set_error(fe->fiber->errnum);
 			return -1;
 		}
 	}
