@@ -38,6 +38,7 @@ void redis_command::init(void)
 	slice_res_      = false;
 	result_         = NULL;
 	pipe_msg_       = NULL;
+	pipe_use_mbox_  = true;
 	addr_[0]        = 0;
 	dbuf_           = new dbuf_pool();
 }
@@ -184,9 +185,11 @@ void redis_command::set_cluster(redis_client_cluster* cluster)
 	redirect_sleep_ = cluster->get_redirect_sleep();
 }
 
-void redis_command::set_pipeline(redis_client_pipeline* pipeline)
+void redis_command::set_pipeline(redis_client_pipeline* pipeline,
+	bool use_mbox /* true */)
 {
 	pipeline_ = pipeline;
+	pipe_use_mbox_ = use_mbox;
 }
 
 // 分析重定向信息，获得重定向的服务器地址
@@ -219,7 +222,7 @@ redis_pipeline_message& redis_command::get_pipeline_message(void)
 {
 	if (pipe_msg_ == NULL) {
 		pipe_msg_ = NEW redis_pipeline_message(
-			this, redis_pipeline_t_cmd);
+			this, redis_pipeline_t_cmd, pipe_use_mbox_);
 	}
 	return *pipe_msg_;
 }

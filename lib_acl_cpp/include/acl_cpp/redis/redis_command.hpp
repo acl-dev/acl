@@ -145,7 +145,20 @@ public:
 		return cluster_;
 	}
 
-	void set_pipeline(redis_client_pipeline* pipeline);
+	/**
+	 * 设置pipeline通信对象，使用pipeline模式
+	 * set the redis communication in pipeline mode
+	 * @param pipline {redis_client_pipeline*} pipline communication object
+	 * @param use_mbox {bool} if using acl::mbox to get the result,
+	 *  acl::tbox will be used if use_mbox is set to false; acl::mbox
+	 *  will be used as default internal.
+	 */
+	void set_pipeline(redis_client_pipeline* pipeline, bool use_mbox = true);
+
+	/**
+	 * get the redis pipline communication object been set before
+	 * @return {redis_client_pipeline*} return NULL if not set
+	 */
 	redis_client_pipeline* get_pipeline(void) const
 	{
 		return pipeline_;
@@ -467,6 +480,7 @@ protected:
 	redis_client* conn_;
 	redis_client_cluster* cluster_;
 	redis_client_pipeline* pipeline_;
+	bool pipe_use_mbox_;
 	int  slot_;
 	int  redirect_max_;
 	int  redirect_sleep_;

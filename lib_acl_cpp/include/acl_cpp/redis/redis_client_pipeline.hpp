@@ -34,21 +34,32 @@ typedef enum {
  */
 class redis_pipeline_message {
 public:
-	redis_pipeline_message(redis_command* cmd, redis_pipeline_type_t type)
+	redis_pipeline_message(redis_command* cmd, redis_pipeline_type_t type,
+		bool use_mbox = true)
 	: cmd_(cmd)
 	, type_(type)
 	, nchild_(0)
 	, timeout_(NULL)
-	, box_(false, false)
 	, result_(NULL)
 	, addr_(NULL)
 	, redirect_count_(0)
 	, argc_(0)
 	, argv_(NULL)
 	, lens_(NULL)
-	{}
+	{
+		if (use_mbox) {
+			mbox_ = new mbox<redis_pipeline_message>(false, false);
+			tbox_ = NULL;
+		} else {
+			tbox_ = new tbox<redis_pipeline_message>(false);
+			mbox_ = NULL;
+		}
+	}
 
-	~redis_pipeline_message(void) {}
+	~redis_pipeline_message(void) {
+		delete mbox_;
+		delete tbox_;
+	}
 
 	redis_pipeline_message& set_type(redis_pipeline_type_t type) {
 		type_ = type;
@@ -94,11 +105,19 @@ public:
 
 	void push(const redis_result* result) {
 		result_ = result;
-		box_.push(this);
+		if (mbox_) {
+			mbox_->push(this, false);
+		} else {
+			tbox_->push(this, false);
+		}
 	}
 
 	const redis_result* wait(void) {
-		box_.pop();
+		if (mbox_) {
+			mbox_->pop();
+		} else {
+			tbox_->pop();
+		}
 		return result_;
 	}
 
@@ -115,7 +134,8 @@ private:
 	redis_pipeline_type_t type_;
 	size_t nchild_;
 	int* timeout_;
-	mbox<redis_pipeline_message> box_;
+	mbox<redis_pipeline_message>* mbox_;
+	tbox<redis_pipeline_message>* tbox_;
 
 	const redis_result* result_;
 	const char* addr_;

@@ -3,7 +3,7 @@
 
 static acl::string __keypre("test_key_cluster");
 
-static bool test_del(acl::redis_key& cmd, int i)
+static bool test_del(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -21,7 +21,7 @@ static bool test_del(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_expire(acl::redis_key& cmd, int i)
+static bool test_expire(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -39,7 +39,7 @@ static bool test_expire(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_ttl(acl::redis_key& cmd, int i)
+static bool test_ttl(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -57,7 +57,7 @@ static bool test_ttl(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_exists(acl::redis_key& cmd, int i)
+static bool test_exists(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -76,7 +76,7 @@ static bool test_exists(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_type(acl::redis_key& cmd, int i)
+static bool test_type(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -93,7 +93,7 @@ static bool test_type(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_set(acl::redis_string& cmd, int i)
+static bool test_set(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -112,7 +112,7 @@ static bool test_set(acl::redis_string& cmd, int i)
 	return ret;
 }
 
-static bool test_get(acl::redis_string& cmd, int i)
+static bool test_get(acl::redis& cmd, int i)
 {
 	cmd.clear();
 
@@ -136,9 +136,10 @@ class test_thread : public acl::thread
 {
 public:
 	test_thread(acl::locker& locker, acl::redis_client_pipeline& conns,
-		const char* cmd, int n)
+		bool pipeline_use_mbox, const char* cmd, int n)
 	: locker_(locker)
 	, conns_(conns)
+	, pipeline_use_mbox_(pipeline_use_mbox)
 	, cmd_(cmd)
 	, n_(n)
 	{}
@@ -150,11 +151,11 @@ protected:
 	void* run(void)
 	{
 		bool ret;
-		acl::redis_key cmd_key;
-		cmd_key.set_pipeline(&conns_);
+		acl::redis cmd_key;
+		cmd_key.set_pipeline(&conns_, pipeline_use_mbox_);
 
-		acl::redis_string cmd_string;
-		cmd_string.set_pipeline(&conns_);
+		acl::redis cmd_string;
+		cmd_string.set_pipeline(&conns_, pipeline_use_mbox_);
 
 		for (int i = 0; i < n_; i++) {
 			if (cmd_ == "set") {
@@ -216,8 +217,9 @@ protected:
 private:
 	acl::locker& locker_;
 	acl::redis_client_pipeline& conns_;
+	bool pipeline_use_mbox_;
 	acl::string cmd_;
-	int n_;
+	int  n_;
 };
 
 static void usage(const char* procname)
@@ -228,6 +230,7 @@ static void usage(const char* procname)
 		"-t max_threads[default: 10]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
+		"-m [if use mbox in pipeline mode, default: false]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
@@ -236,9 +239,10 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1;
 	int  max_threads = 10;
+	bool pipeline_use_mbox = false;
 	acl::string addr("127.0.0.1:6379"), cmd("del"), passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:t:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:t:a:p:m")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -257,7 +261,10 @@ int main(int argc, char* argv[])
 			break;
 		case 'p':
 			passwd = optarg;
-			break;;
+			break;
+		case 'm':
+			pipeline_use_mbox = true;
+			break;
 		default:
 			break;
 		}
@@ -280,7 +287,7 @@ int main(int argc, char* argv[])
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
 		test_thread* thread = new test_thread(locker, pipeline,
-			cmd.c_str(), n);
+			pipeline_use_mbox, cmd.c_str(), n);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();
