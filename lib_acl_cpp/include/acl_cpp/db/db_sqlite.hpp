@@ -147,10 +147,10 @@ public:
 	 * 绑定int64数据
 	 * @param {sqlite3 *stmt} prepared statement
 	 * @param {int iCol} 待绑定到sql中的参数索引
-	 * @param {int64_t value} 待绑定到sql中的参数数值
+	 * @param {long long int} 待绑定到sql中的参数数值
 	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
 	 */
-	int sqlite3_bind_int64(sqlite3_stmt*, int iCol, int64_t value);
+	int sqlite3_bind_int64(sqlite3_stmt*, int iCol, long long int value);
 
 	/**
 	 * 绑定text数据
@@ -191,9 +191,9 @@ public:
 	 * 返回查询结果的对应列的int64结果信息
 	 * @param {sqlite3_stmt *stmt} prepared statement
 	 * @param {int iCol} 列索引
-	 * @return {int64_t} 数据
+	 * @return {long long int} 数据
 	 */
-	int64_t sqlite3_column_int64(sqlite3_stmt*, int iCol);
+	long long int sqlite3_column_int64(sqlite3_stmt*, int iCol);
 
 	/**
 	 * 返回查询结果的对应列的 utf-8 text 结果信息

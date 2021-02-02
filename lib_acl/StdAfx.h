@@ -79,6 +79,26 @@ int acl_secure_vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 # if _MSC_VER <= 1310
 int inet_pton(int af, const char *src, void *dst);
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+
+#define POLLRDNORM  0x0100
+#define POLLRDBAND  0x0200
+#define POLLIN      (POLLRDNORM | POLLRDBAND)
+#define POLLPRI     0x0400
+
+#define POLLWRNORM  0x0010
+#define POLLOUT     (POLLWRNORM)
+#define POLLWRBAND  0x0020
+
+#define POLLERR     0x0001
+#define POLLHUP     0x0002
+#define POLLNVAL    0x0004
+
+typedef struct pollfd {
+	SOCKET fd;
+	short  events;
+	short  revents;
+} WSAPOLLFD, *PWSAPOLLFD, *LPWSAPOLLFD;
+
 int WSAAPI WSAPoll(LPWSAPOLLFD fdArray, ULONG fds, INT timeout);
 # endif
 #endif

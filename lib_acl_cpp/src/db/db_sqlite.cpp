@@ -50,7 +50,7 @@
  typedef const char* (STDCALL *sqlite3_column_name_fn)(sqlite3_stmt*, int);
  typedef int   (STDCALL *sqlite3_data_count_fn)(sqlite3_stmt*);
  typedef int   (STDCALL *sqlite3_column_int_fn)(sqlite3_stmt*, int);
- typedef int64_t   (STDCALL *sqlite3_column_int64_fn)(sqlite3_stmt*, int);
+ typedef long long int (STDCALL *sqlite3_column_int64_fn)(sqlite3_stmt*, int);
  typedef int   (STDCALL *sqlite3_column_double_fn)(sqlite3_stmt*, int);
  typedef const void*   (STDCALL *sqlite3_column_blob_fn)(sqlite3_stmt*, int);
  typedef const unsigned char* (STDCALL *sqlite3_column_text_fn)(sqlite3_stmt*, int);
@@ -909,7 +909,7 @@ int db_sqlite::sqlite3_bind_int(sqlite3_stmt *stmt, int iCol, int value)
 	return __sqlite3_bind_int(stmt, iCol, value);
 }
 
-int db_sqlite::sqlite3_bind_int64(sqlite3_stmt *stmt, int iCol, int64_t value)
+int db_sqlite::sqlite3_bind_int64(sqlite3_stmt *stmt, int iCol, long long int value)
 {
 	return __sqlite3_bind_int64(stmt, iCol, value);
 }
@@ -935,7 +935,7 @@ int db_sqlite::sqlite3_column_int(sqlite3_stmt *stmt, int iCol)
 	return __sqlite3_column_int(stmt, iCol);
 }
 
-int64_t db_sqlite::sqlite3_column_int64(sqlite3_stmt *stmt, int iCol)
+long long int db_sqlite::sqlite3_column_int64(sqlite3_stmt *stmt, int iCol)
 {
 	return __sqlite3_column_int64(stmt, iCol);
 }
@@ -1003,14 +1003,14 @@ int db_sqlite::sqlite3_bind_blob(sqlite3_stmt*, int,
         const void*, int, void(*)(void*)) { return SQLITE_ERROR; }
 int db_sqlite::sqlite3_bind_int(sqlite3_stmt*, int, int) {
     return SQLITE_ERROR; }
-int db_sqlite::sqlite3_bind_int64(sqlite3_stmt*, int, int64_t){
+int db_sqlite::sqlite3_bind_int64(sqlite3_stmt*, int, long long int){
     return SQLITE_ERROR; }
 int db_sqlite::sqlite3_bind_text(sqlite3_stmt*, int,
         const char*, int, void(*)(void*)) { return SQLITE_ERROR; }
 int db_sqlite::sqlite3_column_count(sqlite3_stmt *pStmt) { return 0; }
 const void* db_sqlite::sqlite3_column_blob(sqlite3_stmt*, int) { return NULL; }
 int db_sqlite::sqlite3_column_int(sqlite3_stmt *stmt, int iCol) { return -1; }
-int64_t db_sqlite::sqlite3_column_int64(sqlite3_stmt*, int) { return -1; }
+long long int db_sqlite::sqlite3_column_int64(sqlite3_stmt*, int) { return -1; }
 const unsigned char* db_sqlite::sqlite3_column_text(
         sqlite3_stmt *, int) { return NULL; }
 int db_sqlite::sqlite3_column_bytes(sqlite3_stmt *, int) { return 0; }
