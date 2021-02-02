@@ -31,12 +31,13 @@ static int __max_loop     = 10000;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
 static int __read_data    = 1;
-static int __stack_size   = 320000;
+static int __stack_size   = 32000;
 static struct timeval __begin;
 
 static void echo_client(SOCKET fd)
 {
-	char  buf[8192];
+#define BUF_SIZE 8192
+	char *buf = malloc(BUF_SIZE);
 	int   ret, i;
 	const char *str = "hello world\r\n";
 
@@ -63,9 +64,9 @@ static void echo_client(SOCKET fd)
 		}
 
 #if defined(_WIN32) || defined(_WIN64)
-		ret = acl_fiber_recv(fd, buf, sizeof(buf), 0);
+		ret = acl_fiber_recv(fd, buf, BUF_SIZE, 0);
 #else
-		ret = read(fd, buf, sizeof(buf));
+		ret = read(fd, buf, BUF_SIZE);
 #endif
 		if (ret <= 0) {
 			printf("read error: %s\r\n", acl_last_serror());
@@ -75,6 +76,7 @@ static void echo_client(SOCKET fd)
 		__total_count++;
 	}
 
+	free(buf);
 #if defined(_WIN32) || defined(_WIN64)
 	acl_fiber_close(fd);
 #else
