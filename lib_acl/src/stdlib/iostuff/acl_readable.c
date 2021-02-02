@@ -42,12 +42,13 @@ int acl_readable(ACL_SOCKET fd)
 	struct pollfd fds;
 	int    delay = 0;
 
-#ifdef ACL_WINDOWS
-	fds.events = POLLIN;
-#else
-	fds.events = POLLIN | POLLPRI;
-#endif
 	fds.fd = fd;
+#ifdef ACL_WINDOWS
+	fds.events = POLLIN | POLLHUP | POLLERR;
+#else
+	fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
+#endif
+	fds.revents = 0;
 
 	acl_set_error(0);
 

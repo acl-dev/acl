@@ -275,8 +275,13 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 	struct pollfd fds;
 	time_t begin;
 
-	fds.events = POLLIN;
 	fds.fd = fd;
+#ifdef ACL_WINDOWS
+	fds.events = POLLIN | POLLHUP | POLLERR;
+#else
+	fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
+#endif
+	fds.revents = 0;
 
 	acl_set_error(0);
 
