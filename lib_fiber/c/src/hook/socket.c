@@ -50,7 +50,6 @@ static void hook_api(void)
 	__sys_listen     = listen;
 	__sys_accept     = accept;
 	__sys_connect    = connect;
-	__sys_setsockopt = setsockopt;
 #endif
 }
 
