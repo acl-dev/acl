@@ -307,6 +307,8 @@ polarssl_conf::polarssl_conf(bool server_side, polarssl_verify_t verify_mode)
 	pkey_        = NULL;
 	verify_mode_ = verify_mode;
 #else
+	(void) server_side;
+	(void) verify_mode;
 	(void) server_side_;
 	(void) entropy_;
 	(void) cacert_;

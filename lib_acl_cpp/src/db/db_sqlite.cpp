@@ -1007,9 +1007,9 @@ int db_sqlite::sqlite3_bind_int64(sqlite3_stmt*, int, long long int){
     return SQLITE_ERROR; }
 int db_sqlite::sqlite3_bind_text(sqlite3_stmt*, int,
         const char*, int, void(*)(void*)) { return SQLITE_ERROR; }
-int db_sqlite::sqlite3_column_count(sqlite3_stmt *pStmt) { return 0; }
+int db_sqlite::sqlite3_column_count(sqlite3_stmt*) { return 0; }
 const void* db_sqlite::sqlite3_column_blob(sqlite3_stmt*, int) { return NULL; }
-int db_sqlite::sqlite3_column_int(sqlite3_stmt *stmt, int iCol) { return -1; }
+int db_sqlite::sqlite3_column_int(sqlite3_stmt*, int) { return -1; }
 long long int db_sqlite::sqlite3_column_int64(sqlite3_stmt*, int) { return -1; }
 const unsigned char* db_sqlite::sqlite3_column_text(
         sqlite3_stmt *, int) { return NULL; }
@@ -1017,7 +1017,7 @@ int db_sqlite::sqlite3_column_bytes(sqlite3_stmt *, int) { return 0; }
 const char* db_sqlite::sqlite3_column_name(sqlite3_stmt*, int) { return NULL; }
 int db_sqlite::sqlite3_exec(const char*,int(*)(void*,int,char**,char**),
         void *, char **) { return SQLITE_ERROR; }
-void db_sqlite::sqlite3_free(void* ptr) {  }
+void db_sqlite::sqlite3_free(void*) {  }
 }  // namespace acl
 
 #endif // !HAS_SQLITE && !HAS_SQLITE_DLL

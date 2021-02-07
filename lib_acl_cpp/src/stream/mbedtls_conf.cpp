@@ -686,6 +686,8 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	pkey_        = NULL;
 	verify_mode_ = verify_mode;
 #else
+	(void) server_side;
+	(void) verify_mode;
 	(void) server_side_;
 	(void) init_status_;
 	(void) cert_status_;
