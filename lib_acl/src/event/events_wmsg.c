@@ -84,8 +84,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < ev->event.ready_cnt
-		&& ev->event.ready[fdp->fdidx_ready] == fdp)
-	{
+		&& ev->event.ready[fdp->fdidx_ready] == fdp) {
+
 		ev->event.ready[fdp->fdidx_ready] = NULL;
 		fdp->fdidx_ready = -1;
 	}
@@ -105,9 +105,10 @@ static ACL_EVENT_FDTABLE *stream_on_open(EVENT_WMSG *ev, ACL_VSTREAM *stream)
 	acl_vstream_add_close_handle(stream, stream_on_close, ev);
 
 	snprintf(key, sizeof(key), "%d", sockfd);
-	if (acl_htable_enter(ev->htbl, key, fdp) == NULL)
+	if (acl_htable_enter(ev->htbl, key, fdp) == NULL) {
 		acl_msg_fatal("%s(%d): add key(%s) error",
 			myname, __LINE__, key);
+	}
 
 	return fdp;
 }
@@ -121,8 +122,9 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
 	long lEvent;
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		fdp = stream_on_open(ev, stream);
+	}
 
 	if (fdp->fdidx == -1) {
 		fdp->fdidx = eventp->fdcnt;
@@ -140,12 +142,14 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		lEvent = FD_READ | FD_CLOSE;
 	}
 
-	if (WSAAsyncSelect(sockfd, ev->hWnd, ev->nMsg, lEvent) != 0)
+	if (WSAAsyncSelect(sockfd, ev->hWnd, ev->nMsg, lEvent) != 0) {
 		acl_msg_fatal("%s(%d): set read error: %s",
 			myname, __LINE__, acl_last_serror());
+	}
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->r_callback != callback || fdp->r_context != context) {
 		fdp->r_callback = callback;
@@ -188,8 +192,9 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
 	long lEvent;
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		fdp = stream_on_open(ev, stream);
+	}
 
 	if (fdp->fdidx == -1) {
 		fdp->fdidx = eventp->fdcnt;
@@ -207,12 +212,14 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		lEvent = FD_WRITE | FD_CLOSE;
 	}
 
-	if (WSAAsyncSelect(sockfd, ev->hWnd, ev->nMsg, lEvent) != 0)
+	if (WSAAsyncSelect(sockfd, ev->hWnd, ev->nMsg, lEvent) != 0) {
 		acl_msg_fatal("%s(%d): set read error: %s",
 			myname, __LINE__, acl_last_serror());
+	}
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->w_callback != callback || fdp->w_context != context) {
 		fdp->w_callback = callback;
@@ -263,8 +270,9 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -274,8 +282,8 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -320,8 +328,9 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -331,8 +340,8 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -349,8 +358,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		return;
+	}
 
 	if (fdp->flag == 0 || fdp->fdidx < 0 || fdp->fdidx >= eventp->fdcnt) {
 		acl_msg_warn("%s(%d): sockfd(%d) no set, fdp no null",
@@ -361,8 +371,8 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	}
 
 	if (!eventp->isrset_fn(eventp, stream)
-		&& !eventp->iswset_fn(eventp, stream))
-	{
+		&& !eventp->iswset_fn(eventp, stream)) {
+
 		acl_msg_error("%s(%d): sockfd(%d) no set, fdp no null",
 			myname, __LINE__, sockfd);
 		event_fdtable_free(fdp);
@@ -370,8 +380,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -383,8 +394,8 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -447,7 +458,6 @@ static EVENT_WMSG *get_hwnd_event(HWND hWnd acl_unused)
 
 static void finish_thread_event(void *arg acl_unused)
 {
-
 }
 
 static void init_thread_event(void)
@@ -496,14 +506,15 @@ static void handleClose(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	const char *myname = "handleClose";
 	ACL_EVENT_FDTABLE *fdp = event_fdtable_find(ev, sockfd);
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		return;
-	else if (fdp->r_callback)
+	} else if (fdp->r_callback) {
 		fdp->r_callback(ACL_EVENT_XCPT, &ev->event,
 			fdp->stream, fdp->r_context);
-	else if (fdp->w_callback)
+	} else if (fdp->w_callback) {
 		fdp->w_callback(ACL_EVENT_XCPT, &ev->event,
 			fdp->stream, fdp->w_context);
+	}
 	/*
 	else
 		acl_msg_error("%s(%d): w_callback and r_callback null"
@@ -516,13 +527,13 @@ static void handleConnect(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	const char *myname = "handleConnect";
 	ACL_EVENT_FDTABLE *fdp = event_fdtable_find(ev, sockfd);
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		acl_msg_error("%s(%d): fdp null for sockfd(%d)",
 			myname, __LINE__, (int) sockfd);
-	else if (fdp->w_callback == NULL)
+	} else if (fdp->w_callback == NULL) {
 		acl_msg_error("%s(%d): fdp->w_callback null for sockfd(%d)",
 			myname, __LINE__, (int) sockfd);
-	else {
+	} else {
 		fdp->stream->flag &= ~ACL_VSTREAM_FLAG_CONNECTING;
 		fdp->w_callback(ACL_EVENT_WRITE | ACL_EVENT_CONNECT,
 			&ev->event, fdp->stream, fdp->w_context);
@@ -534,10 +545,11 @@ static void handleAccept(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	const char *myname = "handleAccept";
 	ACL_EVENT_FDTABLE *fdp = event_fdtable_find(ev, sockfd);
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		acl_msg_fatal("%s(%d): fdp null", myname, __LINE__);
-	else if (fdp->r_callback == NULL)
+	} else if (fdp->r_callback == NULL) {
 		acl_msg_fatal("%s(%d): fdp callback null", myname, __LINE__);
+	}
 
 	fdp->r_callback(ACL_EVENT_READ | ACL_EVENT_ACCEPT, &ev->event,
 		fdp->stream, fdp->r_context);
@@ -548,13 +560,13 @@ static void handleRead(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	const char *myname = "handleRead";
 	ACL_EVENT_FDTABLE *fdp = event_fdtable_find(ev, sockfd);
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		acl_msg_error("%s(%d): fdp null for sockfd(%d)",
 			myname, __LINE__, (int) sockfd);
-	else if ((fdp->stream->type & ACL_VSTREAM_TYPE_LISTEN))
+	} else if ((fdp->stream->type & ACL_VSTREAM_TYPE_LISTEN)) {
 		fdp->r_callback(ACL_EVENT_READ, &ev->event,
 			fdp->stream, fdp->r_context);
-	else if (fdp->r_callback != NULL) {
+	} else if (fdp->r_callback != NULL) {
 		/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而触发
 		 * ACL_VSTREAM 流在读时调用系统的 read 函数
 		 */
@@ -573,14 +585,15 @@ static void handleWrite(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 	const char *myname = "handleWrite";
 	ACL_EVENT_FDTABLE *fdp = event_fdtable_find(ev, sockfd);
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		acl_msg_error("%s(%d): fdp null for sockfd(%d)",
 			myname, __LINE__, (int) sockfd);
-	else if ((fdp->stream->flag & ACL_VSTREAM_FLAG_CONNECTING))
+	} else if ((fdp->stream->flag & ACL_VSTREAM_FLAG_CONNECTING)) {
 		handleConnect(ev, sockfd);
-	else if (fdp->w_callback != NULL)
+	} else if (fdp->w_callback != NULL) {
 		fdp->w_callback(ACL_EVENT_WRITE, &ev->event,
 			fdp->stream, fdp->w_context);
+	}
 	/*
 	else
 		acl_msg_error("%s(%d): fdp->w_callback null for sockfd(%d)",
@@ -593,8 +606,9 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 	ACL_SOCKET sockfd;
 	EVENT_WMSG *ev = get_hwnd_event(hWnd);
 
-	if (ev == NULL)
-		return (DefWindowProc(hWnd, msg, wParam, lParam));
+	if (ev == NULL) {
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
 
 	if (msg == WM_SOCKET_NOTIFY) {
 		sockfd = wParam;
@@ -619,7 +633,7 @@ static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lPara
 		}
 	}
 
-	return (DefWindowProc(hWnd, msg, wParam, lParam));
+	return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 static BOOL InitApplication(const char *class_name, HINSTANCE hInstance) 
@@ -627,8 +641,7 @@ static BOOL InitApplication(const char *class_name, HINSTANCE hInstance)
 	const char *myname = "InitApplication";
 	WNDCLASSEX wcx;
 
-	if (GetClassInfoEx(hInstance, class_name, &wcx))
-	{
+	if (GetClassInfoEx(hInstance, class_name, &wcx)) {
 		/* class already registered */
 		acl_msg_info("%s(%d): class(%s) already registered",
 			myname, __LINE__, class_name);
@@ -664,9 +677,10 @@ static BOOL InitApplication(const char *class_name, HINSTANCE hInstance)
 	if (RegisterClassEx(&wcx) == 0) {
 		acl_msg_error("%s(%d): RegisterClassEx error(%d, %s)",
 			myname, __LINE__, acl_last_error(), acl_last_serror());
-		return (FALSE);
-	} else
-		return (TRUE);
+		return FALSE;
+	} else {
+		return TRUE;
+	}
 }
 
 static HWND InitInstance(const char *class_name, HINSTANCE hInstance)
@@ -699,14 +713,14 @@ static HWND InitInstance(const char *class_name, HINSTANCE hInstance)
 
 static HWND CreateSockWindow(const char *class_name, HINSTANCE hInstance)
 {
-	if (InitApplication(class_name, hInstance) == FALSE)
-		return (FALSE);
+	if (InitApplication(class_name, hInstance) == FALSE) {
+		return FALSE;
+	}
 	return InitInstance(class_name, hInstance);
 }
 
 static void event_loop(ACL_EVENT *eventp acl_unused)
 {
-
 }
 
 static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
@@ -719,12 +733,14 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void    *timer_arg;
 
-	if (ev == NULL)
+	if (ev == NULL) {
 		acl_msg_fatal("%s(%d): ev null", myname, __LINE__);
-	if (ev->tid != idEvent)
+	}
+	if (ev->tid != idEvent) {
 		acl_msg_fatal("%s(%d): ev->tid(%u) != idEvent(%u)",
 			myname, __LINE__, (unsigned int) ev->tid,
 			(unsigned int) idEvent);
+	}
 
 	eventp = &ev->event;
 	SET_TIME(eventp->present);
@@ -743,9 +759,10 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		} else {
 			acl_ring_detach(&timer->ring);		/* first this */
 			timer->nrefer--;
-			if (timer->nrefer != 0)
+			if (timer->nrefer != 0) {
 				acl_msg_fatal("%s(%d): nrefer(%d) != 0",
 					myname, __LINE__, timer->nrefer);
+			}
 			acl_myfree(timer);
 		}
 		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
@@ -761,8 +778,9 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		delay = (int) (timer->when - eventp->present + 999) / 1000;
 
 		/* 要求时间定时器的间隔最少是 1 毫秒 */
-		if (delay < 1000)
+		if (delay < 1000) {
 			delay = 1000;
+		}
 		SetTimer(ev->hWnd, ev->tid, delay, event_timer_callback);
 	}
 }
@@ -780,9 +798,9 @@ static acl_int64 event_set_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callba
 		delay = 1000;
 
 	timer = ACL_FIRST_TIMER(&eventp->timer_head);
-	if (timer == NULL)
+	if (timer == NULL) {
 		first_delay = -1;
-	else {
+	} else {
 		SET_TIME(eventp->present);
 		first_delay = timer->when - eventp->present;
 		if (first_delay < 0)
@@ -823,16 +841,17 @@ static void event_free(ACL_EVENT *eventp)
 	const char *myname = "event_free";
 	EVENT_WMSG *ev = (EVENT_WMSG *) eventp;
 
-	if (eventp == NULL)
+	if (eventp == NULL) {
 		acl_msg_fatal("%s(%d): eventp null", myname, __LINE__);
+	}
 
 	if (ev->hWnd != NULL) {
 		WNDCLASSEX wcx;
 
 		DestroyWindow(ev->hWnd);
 		if (ev->class_name && GetClassInfoEx(ev->hInstance,
-			ev->class_name, &wcx))
-		{
+			ev->class_name, &wcx)) {
+
 			acl_msg_info("unregister class: %s", ev->class_name);
 			UnregisterClass(ev->class_name, ev->hInstance);
 		}
@@ -850,8 +869,9 @@ ACL_EVENT *event_new_wmsg(UINT nMsg)
 	HINSTANCE hInstance = GetModuleHandle(NULL);
 	HWND hWnd = CreateSockWindow(__class_name, hInstance);
 
-	if (hWnd == NULL)
-		return (NULL);
+	if (hWnd == NULL) {
+		return NULL;
+	}
 
 	eventp = event_alloc(sizeof(EVENT_WMSG));
 

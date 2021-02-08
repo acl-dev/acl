@@ -10,6 +10,7 @@ extern "C" {
 #include "stdlib/acl_ring.h"
 #include "stdlib/acl_vstream.h"
 #include "stdlib/acl_fifo.h"
+#include "stdlib/acl_avl.h"
 #include "thread/acl_thread.h"
 #include "event/acl_events.h"
 
@@ -67,6 +68,8 @@ struct ACL_EVENT_FDTABLE {
 #endif
 };
 
+typedef struct EVENT_TIMERS EVENT_TIMERS;
+
 struct	ACL_EVENT {
 	/* 事件引擎名称标识 */
 	char  name[128];
@@ -97,6 +100,9 @@ struct	ACL_EVENT {
 	ACL_RING timer_head;
 	/* 需要被触发的定时器容器 */
 	ACL_RING timers;
+
+	/* 定时器树 */
+	EVENT_TIMERS *timers2;
 
 	/* 套接字最大个数 */
 	int   fdsize;
@@ -332,6 +338,8 @@ struct ACL_EVENT_TIMER {
 }
 
 /* in events_timer.c */
+void event_timer_init(ACL_EVENT *eventp);
+acl_int64 event_timer_when(ACL_EVENT *eventp);
 acl_int64 event_timer_request(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, acl_int64 delay, int keep);
 acl_int64 event_timer_cancel(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,

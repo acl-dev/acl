@@ -372,9 +372,8 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_POLL *ev = (EVENT_POLL *) eventp;
-	ACL_EVENT_TIMER *timer;
 	int   nready, i, revents;
-	acl_int64 delay;
+	acl_int64 delay, when;
 	ACL_EVENT_FDTABLE *fdp;
 
 	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
@@ -387,9 +386,9 @@ static void event_loop(ACL_EVENT *eventp)
 	SET_TIME(eventp->present);
 
 	/* 根据定时器任务的最近任务计算 poll 的检测超时上限 */
-
-	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = timer->when - eventp->present;
+	when = event_timer_when(eventp);
+	if (when >= 0) {
+		acl_int64 n = when - eventp->present;
 		if (n <= 0) {
 			delay = 0;
 		} else if (n < delay) {

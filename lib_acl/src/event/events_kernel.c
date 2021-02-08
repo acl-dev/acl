@@ -70,8 +70,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
 	int   err = 0, ret = 0;
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		return;
+	}
 
 #ifdef EVENT_REG_DEL_BOTH
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
@@ -86,8 +87,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 #else
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		&& (fdp->flag & EVENT_FDTABLE_FLAG_WRITE))
-	{
+		&& (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
+
 # ifndef EVENT_AUTO_DEL
 		EVENT_REG_DEL_READ(err, ev->event_fd, sockfd);
 		EVENT_REG_DEL_WRITE(err, ev->event_fd, sockfd);
@@ -112,10 +113,11 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 #endif
 
-	if (err < 0)
+	if (err < 0) {
 		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
 			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
 			err, sockfd, ret);
+	}
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_DELAY_OPER)) {
 		fdp->flag &= ~EVENT_FDTABLE_FLAG_DELAY_OPER;
@@ -128,8 +130,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 #endif
 	}
 
-	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream))
+	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream)) {
 		ev->event.maxfd = ACL_SOCKET_INVALID;
+	}
 	if (fdp->fdidx >= 0 && fdp->fdidx < --ev->event.fdcnt) {
 		ev->event.fdtabs[fdp->fdidx] = ev->event.fdtabs[ev->event.fdcnt];
 		ev->event.fdtabs[fdp->fdidx]->fdidx = fdp->fdidx;
@@ -138,8 +141,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < ev->event.ready_cnt
-		&& ev->event.ready[fdp->fdidx_ready] == fdp)
-	{
+		&& ev->event.ready[fdp->fdidx_ready] == fdp) {
+
 		ev->event.ready[fdp->fdidx_ready] = NULL;
 	}
 
@@ -194,8 +197,9 @@ END:
 		fdp->fdidx = eventp->fdcnt;
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->r_callback != callback || fdp->r_context != context) {
 		fdp->r_callback = callback;
@@ -276,8 +280,9 @@ END:
 		eventp->fdtabs[eventp->fdcnt++] = fdp;
 	}
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->w_callback != callback || fdp->w_context != context) {
 		fdp->w_callback = callback;
@@ -338,13 +343,14 @@ DEL_READ_TAG:
 	fdp->event_type &= ~(ACL_EVENT_READ | ACL_EVENT_ACCEPT);
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_WRITE))
-	{
+		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_WRITE)) {
+
 		return;
 	}
 
-	if (eventp->maxfd == ACL_VSTREAM_SOCK(fdp->stream))
+	if (eventp->maxfd == ACL_VSTREAM_SOCK(fdp->stream)) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -354,8 +360,8 @@ DEL_READ_TAG:
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -405,13 +411,13 @@ DEL_WRITE_TAG:
 	fdp->event_type &= ~(ACL_EVENT_WRITE | ACL_EVENT_CONNECT);
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ))
-	{
+		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
 		return;
 	}
 
-	if (eventp->maxfd == ACL_VSTREAM_SOCK(stream))
+	if (eventp->maxfd == ACL_VSTREAM_SOCK(stream)) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
@@ -421,8 +427,8 @@ DEL_WRITE_TAG:
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -438,8 +444,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	ACL_EVENT_FDTABLE *fdp = (ACL_EVENT_FDTABLE *) stream->fdp;
 	int   err = 0;
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		return;
+	}
 
 	if (fdp->flag == 0 || fdp->fdidx < 0 || fdp->fdidx >= eventp->fdcnt) {
 		acl_msg_warn("%s(%d): sockfd(%d) no set, fdp no null",
@@ -449,8 +456,9 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 		return;
 	}
 
-	if (eventp->maxfd == sockfd)
+	if (eventp->maxfd == sockfd) {
 		eventp->maxfd = ACL_SOCKET_INVALID;
+	}
 	if (fdp->fdidx < --eventp->fdcnt) {
 		eventp->fdtabs[fdp->fdidx] = eventp->fdtabs[eventp->fdcnt];
 		eventp->fdtabs[fdp->fdidx]->fdidx = fdp->fdidx;
@@ -468,17 +476,18 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	}
 #endif
 
-	if (err < 0)
+	if (err < 0) {
 		acl_msg_error("%s: %s: %s", myname, EVENT_REG_DEL_TEXT,
 			acl_last_serror());
+	}
 
 #ifdef	USE_FDMAP
 	acl_fdmap_del(ev->fdmap, sockfd);
 #endif
 	if (fdp->fdidx_ready >= 0
 	    && fdp->fdidx_ready < eventp->ready_cnt
-	    && eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+	    && eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -530,10 +539,11 @@ static void enable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		EVENT_REG_ADD_WRITE(err, ev->event_fd, sockfd, fdp);
 	}
 
-	if (err < 0)
+	if (err < 0) {
 		acl_msg_error("%s: %s: %s, err(%d), fd(%d)",
 			myname, EVENT_REG_ADD_TEXT,
 			acl_last_serror(), err, sockfd);
+	}
 }
 
 static int disable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
@@ -565,10 +575,11 @@ static int disable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		ret = 1;
 	}
 
-	if (err < 0)
+	if (err < 0) {
 		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
 			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
 			err, sockfd, ret);
+	}
 	return ret;
 }
 
@@ -601,10 +612,11 @@ static int disable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		ret = 1;
 	}
 
-	if (err < 0)
+	if (err < 0) {
 		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
 			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
 			err, sockfd, ret);
+	}
 	return (ret);
 }
 
@@ -618,8 +630,7 @@ static void event_set_all(ACL_EVENT *eventp)
 	eventp->ready_cnt = 0;
 
 	if (eventp->present - eventp->last_check >= eventp->check_inter
-		|| eventp->read_ready > 0)
-	{
+		|| eventp->read_ready > 0) {
 		eventp->read_ready = 0;
 		eventp->last_check = eventp->present;
 		event_check_fds(eventp);
@@ -654,15 +665,15 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
-	ACL_EVENT_TIMER *timer;
 	int   nready;
-	acl_int64 delay;
+	acl_int64 delay, when;
 	ACL_EVENT_FDTABLE *fdp;
 	EVENT_BUFFER *bp;
 
 	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
-	if (delay < DELAY_MIN)
+	if (delay < DELAY_MIN) {
 		delay = DELAY_MIN;
+	}
 
 	/* 调整事件引擎的时间截 */
 
@@ -670,12 +681,14 @@ static void event_loop(ACL_EVENT *eventp)
 
 	/* 根据定时器任务的最近任务计算 epoll/kqueue/devpoll 的检测超时上限 */
 
-	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = timer->when - eventp->present;
-		if (n <= 0)
+	when = event_timer_when(eventp);
+	if (when > 0) {
+		acl_int64 n = when - eventp->present;
+		if (n <= 0) {
 			delay = 0;
-		else if (n < delay)
+		} else if (n < delay) {
 			delay = n;
+		}
 	}
 
 	/* 设置描述字对象的状态，添加/删除之前设置的描述字对象 */
@@ -683,16 +696,18 @@ static void event_loop(ACL_EVENT *eventp)
 	event_set_all(eventp);
 
 	if (eventp->fdcnt == 0) {
-		if (eventp->ready_cnt == 0)
+		if (eventp->ready_cnt == 0) {
 			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 10);
+		}
 
 		goto TAG_DONE;
 	}
 
 	/* 如果已经有描述字准备好则检测超时时间置 0 */
 
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		delay = 0;
+	}
 
 	/* 调用 epoll/kquque/devpoll 系统调用检测可用描述字 */
 
@@ -712,8 +727,9 @@ static void event_loop(ACL_EVENT *eventp)
 		}
 
 		goto TAG_DONE;
-	} else if (nready == 0)
+	} else if (nready == 0) {
 		goto TAG_DONE;
+	}
 
 	/* 检查检测结果 */
 
@@ -732,50 +748,52 @@ static void event_loop(ACL_EVENT *eventp)
 		}
 #else
 		fdp = (ACL_EVENT_FDTABLE *) EVENT_GET_CTX(bp);
-		if (fdp == NULL || fdp->stream == NULL)
+		if (fdp == NULL || fdp->stream == NULL) {
 			continue;
+		}
 #endif
 
 		/* 如果该描述字对象已经在被设置为异常或超时状态则继续 */
 
-		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
+		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
+		}
 
 		/* 检查描述字是否可读 */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-			&& EVENT_TEST_READ(bp))
-		{
+			&& EVENT_TEST_READ(bp)) {
+
 			/* 给该描述字对象附加可读属性 */
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+				| ACL_EVENT_WRITE)) == 0) {
+
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
 			}
 
-			if (fdp->listener)
+			if (fdp->listener) {
 				fdp->event_type |= ACL_EVENT_ACCEPT;
-
+			}
 			/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而
 			 * 触发 ACL_VSTREAM 流在读时调用系统的 read 函数
 			 */
-			else
+			else {
 				fdp->stream->read_ready = 1;
+			}
 		}
 
 		/* 检查描述字是否可写 */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-			&& EVENT_TEST_WRITE(bp))
-		{
+			&& EVENT_TEST_WRITE(bp)) {
 
 			/* 给该描述字对象附加可写属性 */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+				| ACL_EVENT_WRITE)) == 0) {
+
 				fdp->event_type |= ACL_EVENT_WRITE;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
@@ -802,8 +820,9 @@ TAG_DONE:
 	event_timer_trigger(eventp);
 
 	/* 处理准备好的描述字事件 */
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		event_fire(eventp);
+	}
 
 	eventp->nested--;
 }

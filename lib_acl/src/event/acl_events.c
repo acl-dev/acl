@@ -49,6 +49,7 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 
 	acl_ring_init(&eventp->timer_head);
 	acl_ring_init(&eventp->timers);
+	event_timer_init(eventp);
 
 	SET_TIME(eventp->present);
 	SET_TIME(eventp->last_debug);

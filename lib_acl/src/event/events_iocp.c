@@ -722,13 +722,13 @@ static void event_loop(ACL_EVENT *eventp)
 {
 	const char *myname = "event_loop";
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
-	ACL_EVENT_TIMER *timer;
-	acl_int64  delay;
+	acl_int64  delay, when;
 	ACL_EVENT_FDTABLE *fdp;
 
 	delay = eventp->delay_sec * 1000000 + eventp->delay_usec;
-	if (delay < DELAY_MIN)
+	if (delay < DELAY_MIN) {
 		delay = DELAY_MIN;
+	}
 
 	SET_TIME(eventp->present);
 
@@ -736,8 +736,9 @@ static void event_loop(ACL_EVENT *eventp)
 	 * Find out when the next timer would go off. Timer requests are sorted.
 	 * If any timer is scheduled, adjust the delay appropriately.
 	 */
-	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = timer->when - eventp->present;
+	when = event_timer_when(eventp);
+	if (when > 0) {
+		acl_int64 n = when - eventp->present;
 		if (n <= 0) {
 			delay = 1;
 		} else if (n < delay) {
@@ -774,7 +775,6 @@ TAG_DONE:
 			(OVERLAPPED**) &iocp_event, (int) (delay / 1000));
 
 		if (!isSuccess) {
-
 			if (iocp_event == NULL) {
 				break;
 			}
