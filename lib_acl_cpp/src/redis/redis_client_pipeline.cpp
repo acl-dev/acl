@@ -438,7 +438,7 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 	}
 
 	// clear all slots' addrs same as the dead node
-	for (size_t i = 0; i < max_slot_; i++) {
+	for (int i = 0; i < max_slot_; i++) {
 		if (strcmp(slot_addrs_[i], addr) == 0) {
 			slot_addrs_[i] = NULL;
 		}
@@ -459,9 +459,9 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 	}
 }
 
-void redis_client_pipeline::set_slot(size_t slot, const char* addr)
+void redis_client_pipeline::set_slot(int slot, const char* addr)
 {
-	if (slot >= max_slot_ || addr == NULL || *addr == 0) {
+	if (slot < 0 || slot >= max_slot_ || addr == NULL || *addr == 0) {
 		return;
 	}
 
@@ -514,13 +514,13 @@ void redis_client_pipeline::set_all_slot(void)
 
 		size_t slot_min = slot->get_slot_min();
 		size_t slot_max = slot->get_slot_max();
-		if (slot_max >= max_slot_ || slot_max < slot_min) {
+		if ((int) slot_max >= max_slot_ || slot_max < slot_min) {
 			continue;
 		}
 
 		char buf[128];
 		safe_snprintf(buf, sizeof(buf), "%s:%d", ip, port);
-		for (size_t i = slot_min; i <= slot_max; i++) {
+		for (int i = slot_min; i <= (int) slot_max; i++) {
 			set_slot(i, buf);
 		}
 	}
