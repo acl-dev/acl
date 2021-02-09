@@ -55,8 +55,9 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 #else
 		case -1:
 #endif
-			if (acl_last_error() == ACL_EINTR)
+			if (acl_last_error() == ACL_EINTR) {
 				continue;
+			}
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
 				__FILE__, __LINE__, myname,
 				acl_last_serror(), (int) fd);
