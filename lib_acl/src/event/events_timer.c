@@ -298,7 +298,7 @@ void event_timer_trigger(ACL_EVENT *eventp)
 			event_timer_request(eventp, timer_fn,
 				timer_arg, info->delay, info->keep);
 		} else {
-			//timer_cancel(eventp, info);
+			timer_cancel(eventp, info);
 		}
 
 		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
