@@ -34,6 +34,7 @@ struct TIMER_INFO {
 	TIMER_NODE *node;
 	TIMER_INFO *prev;
 	TIMER_INFO *next;
+	ACL_HTABLE_INFO *entry;
 
 	ACL_EVENT_NOTIFY_TIME callback; /* callback function      */
 	void *context;                  /* callback context       */
@@ -50,6 +51,10 @@ struct TIMER_NODE {
 	TIMER_INFO *head;
 	TIMER_INFO *tail;
 };
+
+#define BUILD_KEY(x1, x2) \
+	char key[128];    \
+	snprintf(key, sizeof(key), "%p.%p", x1, x2);
 
 /**
  * AVL 用的比较回调函数
@@ -130,7 +135,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 {
 	TIMER_INFO *info;
 	TIMER_NODE *node, iter;
-	char key[128];
+	BUILD_KEY(callback, context);
 
 	/* Make sure we schedule this event at the right time. */
 	SET_TIME(eventp->present);
@@ -141,9 +146,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	 * right place.
 	 */
 
-	acl_snprintf(key, sizeof(key), "%p.%p", callback, context);
 	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
-
 	if (info == NULL) {
 		/* If not found, schedule a new timer request. */
 		info = (TIMER_INFO *) acl_mycalloc(1, sizeof(TIMER_INFO));
@@ -154,7 +157,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 		info->context    = context;
 		info->event_type = ACL_EVENT_TIME;
 		acl_ring_init(&info->tmp);
-		acl_htable_enter(eventp->timers2->table, key, info);
+		info->entry = acl_htable_enter(eventp->timers2->table, key, info);
 	} else {
 		info->delay = delay;
 		info->keep  = keep;
@@ -179,12 +182,9 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 
 /* event_timer_cancel - cancel timer */
 
-acl_int64 event_timer_cancel(ACL_EVENT *eventp,
-	ACL_EVENT_NOTIFY_TIME callback, void *context)
+static acl_int64 timer_cancel(ACL_EVENT *eventp, TIMER_INFO *info)
 {
-	acl_int64  time_left = -1;
-	char key[128];
-	TIMER_INFO *info;
+	acl_int64   time_left = -1;
 	TIMER_NODE *first, *node;
 
 	/**
@@ -195,15 +195,9 @@ acl_int64 event_timer_cancel(ACL_EVENT *eventp,
 
 	SET_TIME(eventp->present);
 
-	acl_snprintf(key, sizeof(key), "%p.%p", callback, context);
-
-	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
-	if (info == NULL) {
-		acl_msg_error("%s(%d): not found key=%s",
-			__FUNCTION__ , __LINE__, key);
-		return -1;
-	}
+	acl_htable_delete_entry(eventp->timers2->table, info->entry, NULL);
 	acl_assert(info->node);
+
 	node = info->node;
 	first = avl_first(&eventp->timers2->avl);
 	if (first == node) {
@@ -228,13 +222,26 @@ acl_int64 event_timer_cancel(ACL_EVENT *eventp,
 	return time_left;
 }
 
+acl_int64 event_timer_cancel(ACL_EVENT *eventp,
+	ACL_EVENT_NOTIFY_TIME callback, void *context)
+{
+	TIMER_INFO *info;
+	BUILD_KEY(callback, context);
+
+	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
+	if (info == NULL) {
+		return -1;
+	}
+
+	return timer_cancel(eventp, info);
+}
+
 void event_timer_keep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, int keep)
 {
 	TIMER_INFO *info;
-	char key[128];
+	BUILD_KEY(callback, context);
 
-	acl_snprintf(key, sizeof(key), "%p.%p", callback, context);
 	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
 	if (info) {
 		info->keep = keep;
@@ -245,9 +252,8 @@ int  event_timer_ifkeep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	void *context)
 {
 	TIMER_INFO *info;
-	char key[128];
+	BUILD_KEY(callback, context);
 
-	acl_snprintf(key, sizeof(key), "%p.%p", callback, context);
 	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
 	return info ? info->keep : 0;
 }
@@ -288,12 +294,11 @@ void event_timer_trigger(ACL_EVENT *eventp)
 		timer_arg = info->context;
 
 		if (info->delay > 0 && info->keep) {
-			eventp->timer_request(eventp, info->callback,
-				info->context, info->delay, info->keep);
-		} else {
-			node_unlink(eventp, info);
 			acl_ring_detach(&info->tmp);
-			acl_myfree(info);
+			event_timer_request(eventp, timer_fn,
+				timer_arg, info->delay, info->keep);
+		} else {
+			//timer_cancel(eventp, info);
 		}
 
 		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
