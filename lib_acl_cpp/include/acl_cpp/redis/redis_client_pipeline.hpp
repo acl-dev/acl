@@ -222,7 +222,7 @@ public:
 	redis_client_pipeline& set_retry(bool on);
 
 	// set the max hash slot of redis, the default valud is 16384
-	redis_client_pipeline& set_max_slot(size_t max_slot);
+	redis_client_pipeline& set_max_slot(int max_slot);
 
 	// set if connecting all the redis nodes after starting
 	redis_client_pipeline& set_preconnect(bool yes);

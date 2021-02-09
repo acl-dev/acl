@@ -583,7 +583,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		ret = __sys_recvfrom(sockfd, buf, len, flags,
 				src_addr, addrlen);
 		if (ret >= 0) {
-			return ret;
+			return (int) ret;
 		}
 
 		err = acl_fiber_last_error();
