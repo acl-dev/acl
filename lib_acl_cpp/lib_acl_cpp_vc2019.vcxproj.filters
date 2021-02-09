@@ -49,9 +49,6 @@
     <ClCompile Include="src\mime\rfc822.cpp">
       <Filter>Source Files\mime</Filter>
     </ClCompile>
-    <ClCompile Include="src\net\rfc1035.cpp">
-      <Filter>Source Files\net</Filter>
-    </ClCompile>
     <ClCompile Include="src\master\master_trigger.cpp">
       <Filter>Source Files\master</Filter>
     </ClCompile>
@@ -613,6 +610,7 @@
     <ClCompile Include="src\serialize\gsoner.cpp">
       <Filter>Source Files\serialize</Filter>
     </ClCompile>
+    <ClCompile Include="src\net\rfc1035.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -818,9 +816,6 @@
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mime\rfc822.hpp">
       <Filter>Header Files\mime</Filter>
-    </ClInclude>
-    <ClInclude Include="include\acl_cpp\net\rfc1035.hpp">
-      <Filter>Header Files\net</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\session\memcache_session.hpp">
       <Filter>Header Files\session</Filter>
@@ -1267,6 +1262,7 @@
       <Filter>Header Files\serialize</Filter>
     </ClInclude>
     <ClInclude Include="resource_vc2019.h" />
+    <ClInclude Include="include\acl_cpp\net\rfc1035.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />

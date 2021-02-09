@@ -321,7 +321,7 @@ redis_client_pipeline& redis_client_pipeline::set_password(const char* passwd)
 	return *this;
 }
 
-redis_client_pipeline & redis_client_pipeline::set_max_slot(size_t max_slot)
+redis_client_pipeline & redis_client_pipeline::set_max_slot(int max_slot)
 {
 	max_slot_ = max_slot;
 	return *this;
@@ -520,7 +520,7 @@ void redis_client_pipeline::set_all_slot(void)
 
 		char buf[128];
 		safe_snprintf(buf, sizeof(buf), "%s:%d", ip, port);
-		for (int i = slot_min; i <= (int) slot_max; i++) {
+		for (int i = (int) slot_min; i <= (int) slot_max; i++) {
 			set_slot(i, buf);
 		}
 	}
