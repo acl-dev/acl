@@ -44,17 +44,18 @@ int acl_timed_write(ACL_SOCKET fd, void *buf, unsigned len,
 	 * are fighting for access to the same resource.
 	 */
 	for (;;) {
-		if (timeout > 0 && acl_write_wait(fd, timeout) < 0)
+		if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
 			return -1;
+		}
 		ret = acl_socket_write(fd, buf, len, 0, NULL, NULL);
-		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN)
-		{
+		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN) {
 			acl_msg_warn("write() returns EAGAIN on"
 				" a writable file descriptor!");
 			acl_msg_warn("pausing to avoid going into"
 				" a tight select/write loop!");
 			sleep(1);
-		} else
+		} else {
 			return ret;
+		}
 	}
 }

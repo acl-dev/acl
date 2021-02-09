@@ -53,8 +53,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		return;
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		&& (fdp->flag & EVENT_FDTABLE_FLAG_WRITE))
-	{
+		&& (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 		ret = 1;
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 		ret = 2;
@@ -66,8 +65,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		acl_fdmap_del(ev->fdmap, (int) sockfd);
 	}
 
-	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream))
+	if (ev->event.maxfd == ACL_VSTREAM_SOCK(fdp->stream)) {
 		ev->event.maxfd = ACL_SOCKET_INVALID;
+	}
 	if (fdp->fdidx >= 0 && fdp->fdidx < --ev->event.fdcnt) {
 		ev->fds[fdp->fdidx] = ev->fds[ev->event.fdcnt];
 		ev->event.fdtabs[fdp->fdidx] = ev->event.fdtabs[ev->event.fdcnt];
@@ -77,8 +77,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < ev->event.ready_cnt
-		&& ev->event.ready[fdp->fdidx_ready] == fdp)
-	{
+		&& ev->event.ready[fdp->fdidx_ready] == fdp) {
+
 		ev->event.ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -108,10 +108,18 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 		fdp->flag |= EVENT_FDTABLE_FLAG_READ;
+#if defined(ACL_WINDOWS)
+		ev->fds[fdp->fdidx].events |= POLLIN;
+#else
 		ev->fds[fdp->fdidx].events |= POLLIN | POLLHUP | POLLERR;
+#endif
 	} else {
 		fdp->flag = EVENT_FDTABLE_FLAG_READ | EVENT_FDTABLE_FLAG_EXPT;
+#if defined(ACL_WINDOWS)
+		ev->fds[fdp->fdidx].events = POLLIN;
+#else	
 		ev->fds[fdp->fdidx].events = POLLIN | POLLHUP | POLLERR;
+#endif
 	}
 
 	ev->fds[fdp->fdidx].fd = sockfd;
@@ -179,10 +187,18 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
 		fdp->flag |= EVENT_FDTABLE_FLAG_WRITE;
+#if defined(ACL_WINDOWS)
+		ev->fds[fdp->fdidx].events |= POLLOUT;
+#else
 		ev->fds[fdp->fdidx].events |= POLLOUT | POLLHUP | POLLERR;
+#endif
 	} else {
 		fdp->flag = EVENT_FDTABLE_FLAG_WRITE | EVENT_FDTABLE_FLAG_EXPT;
+#if defined(ACL_WINDOWS)
+		ev->fds[fdp->fdidx].events = POLLOUT;
+#else
 		ev->fds[fdp->fdidx].events = POLLOUT | POLLHUP | POLLERR;
+#endif
 	}
 
 	ev->fds[fdp->fdidx].fd = sockfd;
@@ -237,7 +253,11 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->flag &= ~EVENT_FDTABLE_FLAG_READ;
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
+#if defined(ACL_WINDOWS)
+		ev->fds[fdp->fdidx].events = POLLOUT;
+#else
 		ev->fds[fdp->fdidx].events = POLLOUT | POLLHUP | POLLERR;
+#endif
 		return;
 	}
 
@@ -296,7 +316,11 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->flag &= ~EVENT_FDTABLE_FLAG_WRITE;
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
+#if defined(ACL_WINDOWS)
+		ev->fds[fdp->fdidx].events = POLLIN;
+#else
 		ev->fds[fdp->fdidx].events = POLLIN | POLLHUP | POLLERR;
+#endif
 		return;
 	}
 
@@ -313,8 +337,8 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
+
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -357,8 +381,7 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 
 	if (fdp->fdidx_ready >= 0
 		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+		&& eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
