@@ -380,8 +380,8 @@ static void event_loop(ACL_EVENT *eventp)
 	const char *myname = "event_loop";
 	EVENT_SELECT *ev = (EVENT_SELECT *) eventp;
 	ACL_SOCKET sockfd;
-	int   nready, when, i;
-	acl_int64 delay;
+	int   nready, i;
+	acl_int64 delay, when;
 	ACL_EVENT_FDTABLE *fdp;
 	struct timeval tv, *tvp;
 	fd_set rmask;  /* enabled read events */
@@ -402,10 +402,11 @@ static void event_loop(ACL_EVENT *eventp)
 	when = event_timer_when(eventp);
 	if (when >= 0) {
 		acl_int64 n = when - eventp->present;
-		if (n <= 0)
+		if (n <= 0) {
 			delay = 0;
-		else if (n < delay)
+		} else if (n < delay) {
 			delay = n;
+		}
 	}
 
 	/* 调用 event_prepare 检查有多少个描述字需要通过 select 进行检测 */

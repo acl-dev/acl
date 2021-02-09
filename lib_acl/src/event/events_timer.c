@@ -72,8 +72,9 @@ static int avl_cmp_fn(const void *v1, const void *v2)
 void event_timer_init(ACL_EVENT *eventp)
 {
 	eventp->timers2 = (EVENT_TIMERS*) acl_mymalloc(sizeof(EVENT_TIMERS));
+	eventp->timers2->table = acl_htable_create(1024, 0);
 	avl_create(&eventp->timers2->avl, avl_cmp_fn, sizeof(TIMER_INFO),
-		   offsetof(TIMER_INFO, node));
+		   offsetof(TIMER_NODE, node));
 }
 
 acl_int64 event_timer_when(ACL_EVENT *eventp)
@@ -145,7 +146,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 
 	if (info == NULL) {
 		/* If not found, schedule a new timer request. */
-		info = (TIMER_INFO *) acl_mymalloc(sizeof(TIMER_INFO));
+		info = (TIMER_INFO *) acl_mycalloc(1, sizeof(TIMER_INFO));
 		acl_assert(info);
 		info->delay      = delay;
 		info->keep       = keep;
