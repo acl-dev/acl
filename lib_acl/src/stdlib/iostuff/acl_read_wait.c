@@ -277,7 +277,7 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 
 	fds.fd = fd;
 #ifdef ACL_WINDOWS
-	fds.events = POLLIN | POLLHUP | POLLERR;
+	fds.events = POLLIN /* | POLLHUP | POLLERR */;  /* bugfix, POLLHUP, pollerr can't be set for windows */
 #else
 	fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
 #endif
