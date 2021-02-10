@@ -301,7 +301,6 @@ void event_timer_trigger(ACL_EVENT *eventp)
 		iter = AVL_NEXT(&eventp->timers2->avl, iter);
 	}
 
-	printf("timers: %d\n", n);
 #define TMP_TO_INFO(r) \
 	((TIMER_INFO *) ((char *) (r) - offsetof(TIMER_INFO, tmp)))
 
