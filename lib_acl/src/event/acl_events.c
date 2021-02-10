@@ -49,7 +49,7 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 
 	acl_ring_init(&eventp->timer_head);
 	acl_ring_init(&eventp->timers);
-	event_timer_init(eventp);
+	event_timer_create(eventp);
 
 	SET_TIME(eventp->present);
 	SET_TIME(eventp->last_debug);
@@ -57,8 +57,9 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 	eventp->check_inter = 100000;  /* default: 100 ms */
 	eventp->read_ready = 0;
 
-	if (eventp->init_fn)
+	if (eventp->init_fn) {
 		eventp->init_fn(eventp);
+	}
 }
 
 static int event_limit(int fdsize)
@@ -72,15 +73,16 @@ static int event_limit(int fdsize)
 		fdsize = 10240;
 	}
 #else
-	if (fdsize == 0)
+	if (fdsize == 0) {
 		fdsize = 1024;
+	}
 #endif
-	if ((unsigned) (fdsize) < FD_SETSIZE / 2 && fdsize < 256)
+	if ((unsigned) (fdsize) < FD_SETSIZE / 2 && fdsize < 256) {
 		acl_msg_warn("%s: could allocate space for only %d open files",
 			myname, fdsize);
+	}
 
 	acl_msg_info("%s: max fdsize: %d", myname, fdsize);
-
 	return fdsize;
 }
 
@@ -267,8 +269,9 @@ ACL_EVENT *acl_event_new(int event_mode, int use_thr,
 
 void acl_event_set_check_inter(ACL_EVENT *eventp, int n)
 {
-	if (n >= 0)
+	if (n >= 0) {
 		eventp->check_inter = ((acl_int64) n) * 1000;
+	}
 }
 
 void acl_event_set_fire_hook(ACL_EVENT *eventp,
@@ -295,6 +298,7 @@ void acl_event_free(ACL_EVENT *eventp)
 		acl_myfree(timer);
 	}
 
+	event_timer_free(eventp);
 	acl_myfree(eventp->fdtabs);
 	acl_myfree(eventp->ready);
 	free_fn(eventp);
@@ -310,9 +314,10 @@ void acl_event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 {
 	const char *myname = "acl_event_enable_read";
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
-	if (sockfd == ACL_SOCKET_INVALID)
+	if (sockfd == ACL_SOCKET_INVALID) {
 		acl_msg_fatal("%s(%d): sockfd(%d) invalid",
 			myname, __LINE__, sockfd);
+	}
 	eventp->enable_read_fn(eventp, stream, read_timeout,
 			callback, context);
 }
@@ -322,9 +327,10 @@ void acl_event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 {
 	const char *myname = "acl_event_enable_write";
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
-	if (sockfd == ACL_SOCKET_INVALID)
+	if (sockfd == ACL_SOCKET_INVALID) {
 		acl_msg_fatal("%s(%d): sockfd(%d) invalid",
 			myname, __LINE__, sockfd);
+	}
 	eventp->enable_write_fn(eventp, stream, write_timeout,
 			callback, context);
 }
@@ -340,9 +346,10 @@ void acl_event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 {
 	const char *myname = "acl_event_disable_read";
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
-	if (sockfd == ACL_SOCKET_INVALID)
+	if (sockfd == ACL_SOCKET_INVALID) {
 		acl_msg_fatal("%s(%d): sockfd(%d) invalid",
 			myname, __LINE__, sockfd);
+	}
 	eventp->disable_read_fn(eventp, stream);
 }
 
@@ -350,9 +357,10 @@ void acl_event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 {
 	const char *myname = "acl_event_disable_write";
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
-	if (sockfd == ACL_SOCKET_INVALID)
+	if (sockfd == ACL_SOCKET_INVALID) {
 		acl_msg_fatal("%s(%d): sockfd(%d) invalid",
 			myname, __LINE__, sockfd);
+	}
 	eventp->disable_write_fn(eventp, stream);
 }
 
@@ -388,8 +396,9 @@ acl_int64 acl_event_request_timer(ACL_EVENT *eventp,
 {
 	const char *myname = "acl_event_request_timer";
 
-	if (delay < 0)
+	if (delay < 0) {
 		acl_msg_panic("%s: invalid delay: %lld", myname, delay);
+	}
 
 	return eventp->timer_request(eventp, callback, context, delay, keep);
 }

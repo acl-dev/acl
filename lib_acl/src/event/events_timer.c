@@ -74,7 +74,7 @@ static int avl_cmp_fn(const void *v1, const void *v2)
 	}
 }
 
-void event_timer_init(ACL_EVENT *eventp)
+void event_timer_create(ACL_EVENT *eventp)
 {
 	eventp->timers2 = (EVENT_TIMERS*) acl_mymalloc(sizeof(EVENT_TIMERS));
 	eventp->timers2->table = acl_htable_create(1024, 0);
@@ -86,6 +86,20 @@ acl_int64 event_timer_when(ACL_EVENT *eventp)
 {
 	TIMER_NODE *node = avl_first(&eventp->timers2->avl);
 	return node ? node->when : -1;
+}
+
+void event_timer_free(ACL_EVENT *eventp)
+{
+	TIMER_NODE *node, *next;
+
+	node = (TIMER_NODE*) avl_first(&eventp->timers2->avl);
+	while (node) {
+		next = AVL_NEXT(&eventp->timers2->avl, node);
+		acl_myfree(node);
+		node = next;
+	}
+
+	acl_htable_free(eventp->timers2->table, acl_myfree_fn);
 }
 
 /* event_timer_request - (re)set timer */
@@ -265,6 +279,7 @@ void event_timer_trigger(ACL_EVENT *eventp)
 	void *timer_arg;
 	TIMER_NODE *iter;
 	TIMER_INFO *info;
+	int n = 0;
 
 	/* 调整事件引擎的时间截 */
 
@@ -281,10 +296,12 @@ void event_timer_trigger(ACL_EVENT *eventp)
 		while (info) {
 			acl_ring_prepend(&eventp->timers, &info->tmp);
 			info = info->next;
+			n++;
 		}
 		iter = AVL_NEXT(&eventp->timers2->avl, iter);
 	}
 
+	printf("timers: %d\n", n);
 #define TMP_TO_INFO(r) \
 	((TIMER_INFO *) ((char *) (r) - offsetof(TIMER_INFO, tmp)))
 

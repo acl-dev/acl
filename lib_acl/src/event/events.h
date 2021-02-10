@@ -338,7 +338,8 @@ struct ACL_EVENT_TIMER {
 }
 
 /* in events_timer.c */
-void event_timer_init(ACL_EVENT *eventp);
+void event_timer_create(ACL_EVENT *eventp);
+void event_timer_free(ACL_EVENT *eventp);
 acl_int64 event_timer_when(ACL_EVENT *eventp);
 acl_int64 event_timer_request(ACL_EVENT *ev, ACL_EVENT_NOTIFY_TIME callback,
 	void *context, acl_int64 delay, int keep);
