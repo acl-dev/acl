@@ -39,7 +39,7 @@ struct TIMER_INFO {
 	ACL_EVENT_NOTIFY_TIME callback; /* callback function      */
 	void *context;                  /* callback context       */
 	int   event_type;		/* event type             */
-	int   delay;
+	acl_int64 delay;
 	int   keep;
 	ACL_RING tmp;
 };

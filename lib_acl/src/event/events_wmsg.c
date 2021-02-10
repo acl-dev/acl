@@ -919,6 +919,8 @@ ACL_EVENT *event_new_wmsg(UINT nMsg)
 	eventp->timer_keep           = event_timer_keep;
 	eventp->timer_ifkeep         = event_timer_ifkeep;
 
+	acl_ring_init(&eventp->timer_head);
+
 	ev = (EVENT_WMSG*) eventp;
 	ev->nMsg = nMsg > 0 ? nMsg : WM_SOCKET_NOTIFY;
 	ev->htbl = acl_htable_create(100, 0);

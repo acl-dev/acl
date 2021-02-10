@@ -102,6 +102,9 @@ struct	ACL_EVENT {
 	/* 需要被触发的定时器容器 */
 	ACL_RING timers_ready;
 
+#if defined(_WIN32) || defined(_WIN64)
+	ACL_RING timer_head;
+#endif
 
 	/* 套接字最大个数 */
 	int   fdsize;
