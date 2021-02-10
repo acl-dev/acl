@@ -31,6 +31,31 @@
 #include "events.h"
 #include "events_wmsg.h"
 
+/*
+ * Timer events. Timer requests are kept sorted, in a circular list. We use
+ * the RING abstraction, so we get to use a couple ugly macros.
+ */
+typedef struct EVENT_TIMER {
+	acl_int64  when;                /* when event is wanted   */
+	acl_int64  delay;               /* timer deley            */
+	ACL_EVENT_NOTIFY_TIME callback; /* callback function      */
+	int   event_type;
+	void *context;                  /* callback context       */
+	ACL_RING ring;                  /* linked in timer_header */
+	ACL_RING tmp;                   /* linked in timers       */
+	int   nrefer;                   /* refered's count        */
+	int   ncount;                   /* timer callback count   */
+	int   keep;                     /* if timer call restart  */
+} EVENT_TIMER;
+
+#define RING_TO_TIMER(r) \
+	((EVENT_TIMER *) ((char *) (r) - offsetof(EVENT_TIMER, ring)))
+#define TMP_TO_TIMER(r) \
+	((EVENT_TIMER *) ((char *) (r) - offsetof(EVENT_TIMER, tmp)))
+
+#define FIRST_TIMER(head) \
+	(acl_ring_succ(head) != (head) ? RING_TO_TIMER(acl_ring_succ(head)) : 0)
+
 typedef struct EVENT_WMSG {
 	ACL_EVENT event;
 	UINT nMsg;
@@ -729,7 +754,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 	const char *myname = "event_timer_callback";
 	EVENT_WMSG *ev = get_hwnd_event(hwnd);
 	ACL_EVENT *eventp;
-	ACL_EVENT_TIMER *timer;
+	EVENT_TIMER *timer;
 	ACL_EVENT_NOTIFY_TIME timer_fn;
 	void    *timer_arg;
 
@@ -745,7 +770,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 	eventp = &ev->event;
 	SET_TIME(eventp->present);
 
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
+	while ((timer = FIRST_TIMER(&eventp->timer_head)) != 0) {
 		if (timer->when > eventp->present)
 			break;
 		timer_fn  = timer->callback;
@@ -768,7 +793,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		timer_fn(ACL_EVENT_TIME, eventp, timer_arg);
 	}
 
-	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) == 0) {
+	if ((timer = FIRST_TIMER(&eventp->timer_head)) == 0) {
 		KillTimer(hwnd, idEvent);
 		ev->timer_active = 0;
 	} else {
@@ -789,7 +814,7 @@ static acl_int64 event_set_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callba
 	void *context, acl_int64 delay, int keep)
 {
 	EVENT_WMSG *ev = (EVENT_WMSG*) eventp;
-	ACL_EVENT_TIMER *timer;
+	EVENT_TIMER *timer;
 	acl_int64 when;
 	acl_int64 first_delay;
 
@@ -797,7 +822,7 @@ static acl_int64 event_set_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callba
 	if (delay < 1000)
 		delay = 1000;
 
-	timer = ACL_FIRST_TIMER(&eventp->timer_head);
+	timer = FIRST_TIMER(&eventp->timer_head);
 	if (timer == NULL) {
 		first_delay = -1;
 	} else {
@@ -829,7 +854,7 @@ static acl_int64 event_del_timer(ACL_EVENT *eventp,
 	EVENT_WMSG *ev = (EVENT_WMSG*) eventp;
 	acl_int64 when = event_timer_cancel(eventp, callback, context);
 
-	if (ev->timer_active && ACL_FIRST_TIMER(&eventp->timer_head) == 0) {
+	if (ev->timer_active && FIRST_TIMER(&eventp->timer_head) == 0) {
 		KillTimer(ev->hWnd, ev->tid);
 		ev->timer_active = 0;
 	}

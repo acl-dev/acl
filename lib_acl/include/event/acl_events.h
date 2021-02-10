@@ -39,11 +39,6 @@ extern "C" {
 
 
 /* in acl_events.c */
-/*
- * Timer events. Timer requests are kept sorted, in a circular list. We use
- * the RING abstraction, so we get to use a couple ugly macros.
- */
-typedef struct ACL_EVENT_TIMER ACL_EVENT_TIMER;
 
 typedef	struct	ACL_EVENT		ACL_EVENT;
 typedef	struct	ACL_EVENT_FDTABLE	ACL_EVENT_FDTABLE;

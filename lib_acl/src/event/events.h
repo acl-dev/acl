@@ -245,27 +245,6 @@ ACL_EVENT *event_new_kernel_thr(int fdsize);
 ACL_EVENT *event_epoll_alloc_thr(int fdsize);
 #endif
 
-struct ACL_EVENT_TIMER {
-	acl_int64  when;                /* when event is wanted   */
-	acl_int64  delay;               /* timer deley            */
-	ACL_EVENT_NOTIFY_TIME callback; /* callback function      */
-	int   event_type;
-	void *context;                  /* callback context       */
-	ACL_RING ring;                  /* linked in timer_header */
-	ACL_RING tmp;                   /* linked in timers       */
-	int   nrefer;                   /* refered's count        */
-	int   ncount;                   /* timer callback count   */
-	int   keep;                     /* if timer call restart  */
-};
-
-#define RING_TO_TIMER(r) \
-	((ACL_EVENT_TIMER *) ((char *) (r) - offsetof(ACL_EVENT_TIMER, ring)))
-#define TMP_TO_TIMER(r) \
-	((ACL_EVENT_TIMER *) ((char *) (r) - offsetof(ACL_EVENT_TIMER, tmp)))
-
-#define ACL_FIRST_TIMER(head) \
-	(acl_ring_succ(head) != (head) ? RING_TO_TIMER(acl_ring_succ(head)) : 0)
-
 #ifdef	EVENT_USE_SPINLOCK
 
 # define LOCK_INIT(mutex_in) do { \
