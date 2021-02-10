@@ -435,8 +435,7 @@ static void event_loop(ACL_EVENT *eventp)
 	const char *myname = "event_loop";
 	EVENT_EPOLL_THR *event_thr = (EVENT_EPOLL_THR *) eventp;
 	int   nready;
-	acl_int64 delay;
-	ACL_EVENT_TIMER *timer;
+	acl_int64 delay, when;
 	ACL_EVENT_FDTABLE *fdp;
 	EVENT_BUFFER *bp;
 
@@ -448,16 +447,19 @@ static void event_loop(ACL_EVENT *eventp)
 
 	THREAD_LOCK(&event_thr->event.tm_mutex);
 
+	when = event_timer_when(eventp);
+
 	/*
 	 * Find out when the next timer would go off. Timer requests are
 	 * sorted. If any timer is scheduled, adjust the delay appropriately.
 	 */
-	if ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_int64 n = timer->when - eventp->present;
-		if (n <= 0)
+	if (when >= 0) {
+		acl_int64 n = when - eventp->present;
+		if (n <= 0) {
 			delay = 0;
-		else if (n < delay)
+		} else if (n < delay) {
 			delay = n;
+		}
 	}
 
 	THREAD_UNLOCK(&event_thr->event.tm_mutex);
@@ -476,8 +478,9 @@ static void event_loop(ACL_EVENT *eventp)
 
 			THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-			if (eventp->ready_cnt == 0)
+			if (eventp->ready_cnt == 0) {
 				acl_doze(delay > DELAY_MIN ? delay / 1000 : 1);
+			}
 
 			nready = 0;
 			goto TAG_DONE;
@@ -485,10 +488,12 @@ static void event_loop(ACL_EVENT *eventp)
 
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-		if (eventp->ready_cnt > 0)
+		if (eventp->ready_cnt > 0) {
 			delay = 0;
-	} else
+		}
+	} else {
 		THREAD_UNLOCK(&event_thr->event.tb_mutex);
+	}
 
 	event_thr->event.blocked = 1;
 	nready = epoll_wait(event_thr->handle, event_thr->ebuf,
@@ -496,17 +501,20 @@ static void event_loop(ACL_EVENT *eventp)
 	event_thr->event.blocked = 0;
 
 	if (nready < 0) {
-		if (acl_last_error() != ACL_EINTR)
+		if (acl_last_error() != ACL_EINTR) {
 			acl_msg_fatal("%s(%d), %s: event_loop: epoll: %s",
 				__FILE__, __LINE__, myname, acl_last_serror());
+		}
 		goto TAG_DONE;
-	} else if (nready == 0)
+	} else if (nready == 0) {
 		goto TAG_DONE;
+	}
 
 	for (bp = event_thr->ebuf; bp < event_thr->ebuf + nready; bp++) {
 		fdp = (ACL_EVENT_FDTABLE *) bp->data.ptr;
-		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT)))
+		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
+		}
 
 		if ((bp->events & EPOLLIN) != 0) {
 			if ((fdp->event_type & ACL_EVENT_READ) == 0) {
@@ -515,8 +523,9 @@ static void event_loop(ACL_EVENT *eventp)
 				eventp->ready[eventp->ready_cnt] = fdp;
 				eventp->ready_cnt++;
 			}
-			if (fdp->listener)
+			if (fdp->listener) {
 				fdp->event_type |= ACL_EVENT_ACCEPT;
+			}
 			fdp->stream->read_ready = 1;
 		} else if ((bp->events & EPOLLOUT) != 0) {
 			fdp->event_type |= ACL_EVENT_WRITE;
@@ -534,8 +543,9 @@ TAG_DONE:
 	/* Deliver timer events */
 	event_timer_trigger_thr(&event_thr->event);
 
-	if (eventp->ready_cnt > 0)
+	if (eventp->ready_cnt > 0) {
 		event_thr_fire(eventp);
+	}
 }
 
 static void event_add_dog(ACL_EVENT *eventp)

@@ -47,9 +47,8 @@ static void event_init(ACL_EVENT *eventp, int fdsize,
 	eventp->delay_sec  = delay_sec + delay_usec / 1000000;
 	eventp->delay_usec = delay_usec % 1000000;
 
-	acl_ring_init(&eventp->timer_head);
-	acl_ring_init(&eventp->timers);
 	event_timer_create(eventp);
+	acl_ring_init(&eventp->timers_ready);
 
 	SET_TIME(eventp->present);
 	SET_TIME(eventp->last_debug);
@@ -291,12 +290,6 @@ void acl_event_add_dog(ACL_EVENT *eventp)
 void acl_event_free(ACL_EVENT *eventp)
 {
 	void (*free_fn)(ACL_EVENT *) = eventp->free_fn;
-	ACL_EVENT_TIMER *timer;
-
-	while ((timer = ACL_FIRST_TIMER(&eventp->timer_head)) != 0) {
-		acl_ring_detach(&timer->ring);
-		acl_myfree(timer);
-	}
 
 	event_timer_free(eventp);
 	acl_myfree(eventp->fdtabs);

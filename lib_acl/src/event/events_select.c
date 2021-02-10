@@ -243,9 +243,8 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp) {
-
+	    && fdp->fdidx_ready < eventp->ready_cnt
+	    && eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 
@@ -303,9 +302,8 @@ static void event_disable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp) {
-
+	    && fdp->fdidx_ready < eventp->ready_cnt
+	    && eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 
@@ -364,9 +362,8 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	FD_CLR(sockfd, &ev->xmask);
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp) {
-
+	    && fdp->fdidx_ready < eventp->ready_cnt
+	    && eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 

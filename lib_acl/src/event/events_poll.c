@@ -49,8 +49,9 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	ACL_SOCKET sockfd = ACL_VSTREAM_SOCK(stream);
 	int   ret = 0;
 
-	if (fdp == NULL)
+	if (fdp == NULL) {
 		return;
+	}
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
 		&& (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
@@ -76,9 +77,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < ev->event.ready_cnt
-		&& ev->event.ready[fdp->fdidx_ready] == fdp) {
-
+	    && fdp->fdidx_ready < ev->event.ready_cnt
+	    && ev->event.ready[fdp->fdidx_ready] == fdp) {
 		ev->event.ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -203,8 +203,9 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	ev->fds[fdp->fdidx].fd = sockfd;
 
-	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd)
+	if (eventp->maxfd != ACL_SOCKET_INVALID && eventp->maxfd < sockfd) {
 		eventp->maxfd = sockfd;
+	}
 
 	if (fdp->w_callback != callback || fdp->w_context != context) {
 		fdp->w_callback = callback;
@@ -273,9 +274,8 @@ static void event_disable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < eventp->ready_cnt
-		&& eventp->ready[fdp->fdidx_ready] == fdp)
-	{
+	    && fdp->fdidx_ready < eventp->ready_cnt
+	    && eventp->ready[fdp->fdidx_ready] == fdp) {
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;

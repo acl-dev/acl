@@ -76,8 +76,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 
 #ifdef EVENT_REG_DEL_BOTH
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		|| (fdp->flag & EVENT_FDTABLE_FLAG_WRITE))
-	{
+	     || (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 # ifndef EVENT_AUTO_DEL
 		EVENT_REG_DEL_BOTH(err, ev->event_fd, sockfd);
 		ret = 1;
@@ -87,7 +86,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	}
 #else
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		&& (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
+	    && (fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 
 # ifndef EVENT_AUTO_DEL
 		EVENT_REG_DEL_READ(err, ev->event_fd, sockfd);
@@ -140,9 +139,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	fdp->fdidx = -1;
 
 	if (fdp->fdidx_ready >= 0
-		&& fdp->fdidx_ready < ev->event.ready_cnt
-		&& ev->event.ready[fdp->fdidx_ready] == fdp) {
-
+	    && fdp->fdidx_ready < ev->event.ready_cnt
+	    && ev->event.ready[fdp->fdidx_ready] == fdp) {
 		ev->event.ready[fdp->fdidx_ready] = NULL;
 	}
 
@@ -411,7 +409,7 @@ DEL_WRITE_TAG:
 	fdp->event_type &= ~(ACL_EVENT_WRITE | ACL_EVENT_CONNECT);
 
 	if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-		|| (fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
+	    || (fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
 		return;
 	}
 
@@ -487,7 +485,6 @@ static void event_disable_readwrite(ACL_EVENT *eventp, ACL_VSTREAM *stream)
 	if (fdp->fdidx_ready >= 0
 	    && fdp->fdidx_ready < eventp->ready_cnt
 	    && eventp->ready[fdp->fdidx_ready] == fdp) {
-
 		eventp->ready[fdp->fdidx_ready] = NULL;
 	}
 	fdp->fdidx_ready = -1;
@@ -514,9 +511,8 @@ static void enable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 		EVENT_REG_ADD_READ(err, ev->event_fd, sockfd, fdp);
 	}
 	if (err < 0) {
-		acl_msg_error("%s: %s: %s, err(%d), fd(%d)",
-			myname, EVENT_REG_ADD_TEXT,
-			acl_last_serror(), err, sockfd);
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d)", myname,
+			EVENT_REG_ADD_TEXT, acl_last_serror(), err, sockfd);
 	}
 }
 
@@ -540,9 +536,8 @@ static void enable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	}
 
 	if (err < 0) {
-		acl_msg_error("%s: %s: %s, err(%d), fd(%d)",
-			myname, EVENT_REG_ADD_TEXT,
-			acl_last_serror(), err, sockfd);
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d)", myname,
+			EVENT_REG_ADD_TEXT, acl_last_serror(), err, sockfd);
 	}
 }
 
@@ -576,9 +571,8 @@ static int disable_read(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	}
 
 	if (err < 0) {
-		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
-			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
-			err, sockfd, ret);
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)", myname,
+			EVENT_REG_DEL_TEXT, acl_last_serror(), err, sockfd, ret);
 	}
 	return ret;
 }
@@ -613,9 +607,8 @@ static int disable_write(EVENT_KERNEL *ev, ACL_EVENT_FDTABLE *fdp)
 	}
 
 	if (err < 0) {
-		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)",
-			myname, EVENT_REG_DEL_TEXT, acl_last_serror(),
-			err, sockfd, ret);
+		acl_msg_error("%s: %s: %s, err(%d), fd(%d), ret(%d)", myname,
+			EVENT_REG_DEL_TEXT, acl_last_serror(), err, sockfd, ret);
 	}
 	return (ret);
 }
@@ -762,8 +755,7 @@ static void event_loop(ACL_EVENT *eventp)
 		/* 检查描述字是否可读 */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
-			&& EVENT_TEST_READ(bp)) {
-
+		    && EVENT_TEST_READ(bp)) {
 			/* 给该描述字对象附加可读属性 */
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0) {
@@ -787,13 +779,11 @@ static void event_loop(ACL_EVENT *eventp)
 		/* 检查描述字是否可写 */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
-			&& EVENT_TEST_WRITE(bp)) {
-
+		    && EVENT_TEST_WRITE(bp)) {
 			/* 给该描述字对象附加可写属性 */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0) {
-
+			    | ACL_EVENT_WRITE)) == 0) {
 				fdp->event_type |= ACL_EVENT_WRITE;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;
@@ -805,8 +795,7 @@ static void event_loop(ACL_EVENT *eventp)
 			/* 如果出现异常则设置异常属性 */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
-				| ACL_EVENT_WRITE)) == 0)
-			{
+			    | ACL_EVENT_WRITE)) == 0) {
 				fdp->event_type |= ACL_EVENT_XCPT;
 				fdp->fdidx_ready = eventp->ready_cnt;
 				eventp->ready[eventp->ready_cnt++] = fdp;

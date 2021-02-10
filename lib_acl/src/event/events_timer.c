@@ -76,15 +76,15 @@ static int avl_cmp_fn(const void *v1, const void *v2)
 
 void event_timer_create(ACL_EVENT *eventp)
 {
-	eventp->timers2 = (EVENT_TIMERS*) acl_mymalloc(sizeof(EVENT_TIMERS));
-	eventp->timers2->table = acl_htable_create(1024, 0);
-	avl_create(&eventp->timers2->avl, avl_cmp_fn, sizeof(TIMER_INFO),
+	eventp->timers = (EVENT_TIMERS*) acl_mymalloc(sizeof(EVENT_TIMERS));
+	eventp->timers->table = acl_htable_create(1024, 0);
+	avl_create(&eventp->timers->avl, avl_cmp_fn, sizeof(TIMER_INFO),
 		   offsetof(TIMER_NODE, node));
 }
 
 acl_int64 event_timer_when(ACL_EVENT *eventp)
 {
-	TIMER_NODE *node = avl_first(&eventp->timers2->avl);
+	TIMER_NODE *node = avl_first(&eventp->timers->avl);
 	return node ? node->when : -1;
 }
 
@@ -92,14 +92,14 @@ void event_timer_free(ACL_EVENT *eventp)
 {
 	TIMER_NODE *node, *next;
 
-	node = (TIMER_NODE*) avl_first(&eventp->timers2->avl);
+	node = (TIMER_NODE*) avl_first(&eventp->timers->avl);
 	while (node) {
-		next = AVL_NEXT(&eventp->timers2->avl, node);
+		next = AVL_NEXT(&eventp->timers->avl, node);
 		acl_myfree(node);
 		node = next;
 	}
 
-	acl_htable_free(eventp->timers2->table, acl_myfree_fn);
+	acl_htable_free(eventp->timers->table, acl_myfree_fn);
 }
 
 /* event_timer_request - (re)set timer */
@@ -137,7 +137,7 @@ static int node_unlink(ACL_EVENT *eventp, TIMER_INFO *info)
 	info->node = NULL;
 
 	if (node->head == NULL) {
-		avl_remove(&eventp->timers2->avl, node);
+		avl_remove(&eventp->timers->avl, node);
 		acl_myfree(node);
 		return 1;
 	}
@@ -160,7 +160,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	 * right place.
 	 */
 
-	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
+	info = (TIMER_INFO*) acl_htable_find(eventp->timers->table, key);
 	if (info == NULL) {
 		/* If not found, schedule a new timer request. */
 		info = (TIMER_INFO *) acl_mycalloc(1, sizeof(TIMER_INFO));
@@ -171,7 +171,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 		info->context    = context;
 		info->event_type = ACL_EVENT_TIME;
 		acl_ring_init(&info->tmp);
-		info->entry = acl_htable_enter(eventp->timers2->table, key, info);
+		info->entry = acl_htable_enter(eventp->timers->table, key, info);
 	} else {
 		info->delay = delay;
 		info->keep  = keep;
@@ -179,7 +179,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	}
 
 	iter.when = eventp->present + delay;
-	node = (TIMER_NODE*) avl_find(&eventp->timers2->avl, &iter, NULL);
+	node = (TIMER_NODE*) avl_find(&eventp->timers->avl, &iter, NULL);
 	if (node == NULL) {
 		node = (TIMER_NODE*) acl_mycalloc(1, sizeof(TIMER_NODE));
 		node->when = iter.when;
@@ -187,7 +187,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 		 * Insert the request at the right place. Timer requests are
 		 * kept sorted to reduce lookup overhead in the event loop.
 		 */
-		avl_add(&eventp->timers2->avl, node);
+		avl_add(&eventp->timers->avl, node);
 	}
 
 	node_link(node, info);
@@ -209,13 +209,13 @@ static acl_int64 timer_cancel(ACL_EVENT *eventp, TIMER_INFO *info)
 
 	SET_TIME(eventp->present);
 
-	acl_htable_delete_entry(eventp->timers2->table, info->entry, NULL);
+	acl_htable_delete_entry(eventp->timers->table, info->entry, NULL);
 	acl_assert(info->node);
 
 	node = info->node;
-	first = avl_first(&eventp->timers2->avl);
+	first = avl_first(&eventp->timers->avl);
 	if (first == node) {
-		first = AVL_NEXT(&eventp->timers2->avl, first);
+		first = AVL_NEXT(&eventp->timers->avl, first);
 		if (node_unlink(eventp, info) == 0) {
 			first = node;
 		}
@@ -242,7 +242,7 @@ acl_int64 event_timer_cancel(ACL_EVENT *eventp,
 	TIMER_INFO *info;
 	BUILD_KEY(callback, context);
 
-	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
+	info = (TIMER_INFO*) acl_htable_find(eventp->timers->table, key);
 	if (info == NULL) {
 		return -1;
 	}
@@ -256,7 +256,7 @@ void event_timer_keep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	TIMER_INFO *info;
 	BUILD_KEY(callback, context);
 
-	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
+	info = (TIMER_INFO*) acl_htable_find(eventp->timers->table, key);
 	if (info) {
 		info->keep = keep;
 	}
@@ -268,7 +268,7 @@ int  event_timer_ifkeep(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	TIMER_INFO *info;
 	BUILD_KEY(callback, context);
 
-	info = (TIMER_INFO*) acl_htable_find(eventp->timers2->table, key);
+	info = (TIMER_INFO*) acl_htable_find(eventp->timers->table, key);
 	return info ? info->keep : 0;
 }
 
@@ -281,30 +281,27 @@ void event_timer_trigger(ACL_EVENT *eventp)
 	TIMER_INFO *info;
 	int n = 0;
 
-	/* 调整事件引擎的时间截 */
-
 	SET_TIME(eventp->present);
 
-	/* 优先处理定时器中的任务 */
-
-	iter = avl_first(&eventp->timers2->avl);
+	/* collect all the timers that should be triggered */
+	iter = avl_first(&eventp->timers->avl);
 	while (iter) {
 		if (iter->when > eventp->present) {
 			break;
 		}
 		info = iter->head;
 		while (info) {
-			acl_ring_prepend(&eventp->timers, &info->tmp);
+			acl_ring_prepend(&eventp->timers_ready, &info->tmp);
 			info = info->next;
 			n++;
 		}
-		iter = AVL_NEXT(&eventp->timers2->avl, iter);
+		iter = AVL_NEXT(&eventp->timers->avl, iter);
 	}
 
 #define TMP_TO_INFO(r) \
 	((TIMER_INFO *) ((char *) (r) - offsetof(TIMER_INFO, tmp)))
 
-	while ((ring = acl_ring_pop_head(&eventp->timers)) != NULL) {
+	while ((ring = acl_ring_pop_head(&eventp->timers_ready)) != NULL) {
 		info      = TMP_TO_INFO(ring);
 		timer_fn  = info->callback;
 		timer_arg = info->context;

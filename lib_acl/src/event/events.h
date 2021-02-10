@@ -96,13 +96,12 @@ struct	ACL_EVENT {
 	int   delay_usec;
 	/* 本次循环前缓冲区有数据可读的描述字个数 */
 	int   read_ready;
-	/* 定时器任务列表头 */
-	ACL_RING timer_head;
-	/* 需要被触发的定时器容器 */
-	ACL_RING timers;
 
-	/* 定时器树 */
-	EVENT_TIMERS *timers2;
+	/* 定时器集合 */
+	EVENT_TIMERS *timers;
+	/* 需要被触发的定时器容器 */
+	ACL_RING timers_ready;
+
 
 	/* 套接字最大个数 */
 	int   fdsize;
