@@ -59,6 +59,7 @@ EVENT *event_create(int size)
 		break;
 	}
 
+	assert(ev);
 	ring_init(&ev->events);
 	ev->timeout = -1;
 	ev->setsize = size;

@@ -499,8 +499,7 @@ int private_vstream_fflush(ACL_VSTREAM *stream)
 		n = __vstream_sys_write(stream, ptr, (int) stream->wbuf_dlen);
 		if (n <= 0) {
 			if (acl_last_error() == ACL_EINTR
-				|| acl_last_error() == ACL_EAGAIN)
-			{
+			    || acl_last_error() == ACL_EAGAIN) {
 				continue;
 			}
 			return (ACL_VSTREAM_EOF);
@@ -541,7 +540,7 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	ACL_VSTREAM *stream = NULL;
 
 	stream = (ACL_VSTREAM *) calloc(1, sizeof(ACL_VSTREAM));
-	acl_assert(stream);
+	assert(stream);
 
 	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
 		buflen = ACL_VSTREAM_DEF_MAXLEN;
@@ -549,14 +548,13 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	/* XXX: 只有非监听流才需要有读缓冲区 */
 
 	if ((fdtype & ACL_VSTREAM_TYPE_LISTEN_INET)
-	    || (fdtype & ACL_VSTREAM_TYPE_LISTEN_UNIX))
-	{
+	    || (fdtype & ACL_VSTREAM_TYPE_LISTEN_UNIX)) {
 		fdtype |= ACL_VSTREAM_TYPE_LISTEN;
 		stream->read_buf = NULL;
-	} else {
-		stream->read_buf = (unsigned char *) malloc(buflen + 1);
-		acl_assert(stream->read_buf != NULL);
 	}
+
+	stream->read_buf = (unsigned char *) malloc(buflen + 1);
+	assert(stream->read_buf);
 
 	if (fdtype == 0)
 		fdtype = ACL_VSTREAM_TYPE_SOCK;
@@ -594,13 +592,9 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	stream->path       = NULL;
 
 	stream->close_handle_lnk = private_array_create(5);
-	if (stream->close_handle_lnk == NULL) {
-		free(stream->read_buf);
-		free(stream);
-		return (NULL);
-	}
+	assert(stream->close_handle_lnk);
 
-	return (stream);
+	return stream;
 }
 
 ACL_VSTREAM *private_vstream_fopen(const char *path, unsigned int oflags,
@@ -747,8 +741,9 @@ void private_vstream_free(ACL_VSTREAM *stream)
 				break;
 			if (close_handle->close_fn == NULL)
 				continue;
-			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在 close_fn
-			 * 里调用了删除回调函数的操作而造成对同一内存的多次释放
+			/* 只所将此调用放在 close_fn 前面，是为了防止有人误在
+			 * close_fn 里调用了删除回调函数的操作而造成对同一内存
+			 * 的多次释放
 			 */
 			private_array_delete(stream->close_handle_lnk, i, NULL);
 			close_handle->close_fn(stream, close_handle->context);

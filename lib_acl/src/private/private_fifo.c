@@ -91,6 +91,8 @@ ACL_FIFO *private_fifo_new(void)
 	ACL_FIFO *fifo;
 
 	fifo = (ACL_FIFO *) malloc(sizeof(*fifo));
+	assert(fifo);
+
 	fifo->head = NULL;
 	fifo->tail = NULL;
 	fifo->cnt = 0;
@@ -119,6 +121,8 @@ ACL_FIFO_INFO *private_fifo_push(ACL_FIFO *fifo, void *data)
 	ACL_FIFO_INFO *info;
 
 	info = (ACL_FIFO_INFO *) malloc(sizeof(*info));
+	assert(info);
+
 	info->data = data;
 
 	if (fifo->tail == NULL) {

@@ -41,12 +41,15 @@ static int __mem_stack = 0;
 #define	MSTAT_LOCK	thread_mutex_lock(&__fastmutex_stat)
 #define	MSTAT_UNLOCK	thread_mutex_unlock(&__fastmutex_stat)
 
-void acl_memory_debug_start(void)
+int *acl_memory_debug_start(void)
 {
-	__alloc_stat = calloc(__alloc_max, sizeof(int));
-	acl_assert(__alloc_stat);
+	int *ptr;
+	ptr = calloc(__alloc_max, sizeof(int));
+	__alloc_stat = ptr;
+	assert(__alloc_stat);
 	thread_mutex_init(&__fastmutex_stat, NULL);
 	__debug_mem = 1;
+	return ptr;
 }
 
 void acl_memory_debug_stop(void)

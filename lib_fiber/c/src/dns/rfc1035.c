@@ -528,6 +528,8 @@ static int rfc1035_header_unpack(const char *buf, size_t sz, size_t *off,
 	unsigned short s;
 	unsigned short t;
 
+	assert(h);
+
 	if (*off != 0) {
 		msg_error("%s: *off(%d) != 0", myname, (int) *off);
 		return -RFC1035_UNPACK_ERROR;
@@ -634,7 +636,7 @@ static int rfc1035_query_unpack(const char *buf, size_t sz, size_t *off,
  *
  * Returns 0 (success) or 1 (error)
  */
-static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR *RR)
+static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR *rr)
 {
 	const char *myname = "rfc1035_rr_unpack";
 	unsigned short s;
@@ -642,11 +644,11 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	unsigned short rdlength;
 	size_t rdata_off;
 
-	if (rfc1035_name_unpack(buf, sz, off, NULL, RR->name,
+	if (rfc1035_name_unpack(buf, sz, off, NULL, rr->name,
 		RFC1035_MAXHOSTNAMESZ, 0)) {
 
 		RFC1035_UNPACK_DEBUG;
-		memset(RR, '\0', sizeof(*RR));
+		memset(rr, '\0', sizeof(*rr));
 		return 1;
 	}
 
@@ -655,21 +657,21 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	*/
 	if ((*off) + 10 > sz) {
 		RFC1035_UNPACK_DEBUG;
-		memset(RR, '\0', sizeof(*RR));
+		memset(rr, '\0', sizeof(*rr));
 		return 1;
 	}
 
 	memcpy(&s, buf + (*off), sizeof(s));
 	(*off) += sizeof(s);
-	RR->type = ntohs(s);
+	rr->type = ntohs(s);
 
 	memcpy(&s, buf + (*off), sizeof(s));
 	(*off) += sizeof(s);
-	RR->tclass = ntohs(s);
+	rr->tclass = ntohs(s);
 
 	memcpy(&i, buf + (*off), sizeof(i));
 	(*off) += sizeof(i);
-	RR->ttl = ntohl(i);
+	rr->ttl = ntohl(i);
 
 	memcpy(&s, buf + (*off), sizeof(s));
 	(*off) += sizeof(s);
@@ -680,24 +682,24 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 		 * replies at 512 octets, as per RFC 1035.
 		 */
 		RFC1035_UNPACK_DEBUG;
-		memset(RR, '\0', sizeof(*RR));
+		memset(rr, '\0', sizeof(*rr));
 		return 1;
 	}
 
-	RR->rdlength = rdlength;
+	rr->rdlength = rdlength;
 
-	switch (RR->type) {
+	switch (rr->type) {
 	case RFC1035_TYPE_CNAME:
 	case RFC1035_TYPE_NS:
 	case RFC1035_TYPE_TXT:
 	case RFC1035_TYPE_PTR:
 	case RFC1035_TYPE_WKS:
-		RR->rdata = (char*) malloc(RFC1035_MAXHOSTNAMESZ);
+		rr->rdata = (char*) malloc(RFC1035_MAXHOSTNAMESZ);
 		rdata_off = *off;
-		RR->rdlength = 0;	/* Filled in by rfc1035_name_unpack */
+		rr->rdlength = 0;	/* Filled in by rfc1035_name_unpack */
 
-		if (rfc1035_name_unpack(buf, sz, &rdata_off, &RR->rdlength,
-			RR->rdata, RFC1035_MAXHOSTNAMESZ, 0)) {
+		if (rfc1035_name_unpack(buf, sz, &rdata_off, &rr->rdlength,
+			rr->rdata, RFC1035_MAXHOSTNAMESZ, 0)) {
 			return 1;
 		}
 
@@ -707,8 +709,8 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 			 * the RDATA area.
 			 */
 			RFC1035_UNPACK_DEBUG;
-			free(RR->rdata);
-			memset(RR, '\0', sizeof(*RR));
+			free(rr->rdata);
+			memset(rr, '\0', sizeof(*rr));
 			return 1;
 		}
 		break;
@@ -716,8 +718,8 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, RFC1035_RR
 	case RFC1035_TYPE_AAAA:
 	case RFC1035_TYPE_MX:
 	default:
-		RR->rdata = (char*) malloc(rdlength);
-		memcpy(RR->rdata, buf + (*off), rdlength);
+		rr->rdata = (char*) malloc(rdlength);
+		memcpy(rr->rdata, buf + (*off), rdlength);
 		break;
 	}
 
@@ -900,7 +902,7 @@ RFC1035_MESSAGE *rfc1035_request_unpack(const char *buf, size_t sz)
 
 /****************************************************************************/
 
-static void rfc1035_rr_destroy(RFC1035_RR * rr, int n)
+static void rfc1035_rr_destroy(RFC1035_RR *rr, int n)
 {
 	const char *myname = "rfc1035_rr_destroy";
 

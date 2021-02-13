@@ -118,6 +118,8 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 	int n1, n2;
 	pthread_mutexattr_t attr;
 
+	assert(lock);
+
 	n1 = pthread_mutexattr_init(&attr);
 
 	/* 使用了 pthread_atfork() 来避免 fork 后的死锁，因为在 fork 前调用过
@@ -232,6 +234,7 @@ static int open_file_log(const char *filename, const char *logpre)
 #endif
 
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
+	assert(log);
 	log->last_open = time(NULL);
 	log->fp = fp;
 	log->path = strdup(filename);

@@ -22,7 +22,7 @@ extern "C" {
 # endif
 #endif
 
-ACL_API void acl_memory_debug_start(void);
+ACL_API int *acl_memory_debug_start(void);
 ACL_API void acl_memory_debug_stop(void);
 ACL_API void acl_memory_debug_stack(int onoff);
 ACL_API void acl_memory_stat(void);

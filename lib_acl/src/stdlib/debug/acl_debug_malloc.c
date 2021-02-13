@@ -246,12 +246,15 @@ static void debug_dump_atexit(void)
 
 ACL_DEBUG_MEM *acl_debug_malloc_init(ACL_DEBUG_MEM *debug_mem_ptr, const char *dump_file)
 {
+	ACL_DEBUG_MEM *mem;
 	if (debug_mem_ptr != NULL) {
-		__debug_mem = debug_mem_ptr;
+		__debug_mem = mem = debug_mem_ptr;
 	} else {
 		ASSERT(dump_file && *dump_file);
 
-		__debug_mem = (ACL_DEBUG_MEM*) calloc(1, sizeof(ACL_DEBUG_MEM));
+		mem = (ACL_DEBUG_MEM*) calloc(1, sizeof(ACL_DEBUG_MEM));
+		assert(mem);
+		__debug_mem = mem;
 		__debug_mem->dump_fp = fopen(dump_file, "wb+");
 		ASSERT(__debug_mem->dump_fp);
 		__debug_mem->table = debug_htable_create(1000);
@@ -272,5 +275,5 @@ ACL_DEBUG_MEM *acl_debug_malloc_init(ACL_DEBUG_MEM *debug_mem_ptr, const char *d
 		acl_debug_memdup,
 		acl_debug_free);
 
-	return (__debug_mem);
+	return mem;
 }

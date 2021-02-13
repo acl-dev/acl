@@ -1127,7 +1127,9 @@ ACL_SLICE *acl_slice_create(const char *name, int page_size,
 
 void acl_slice_destroy(ACL_SLICE *slice)
 {
-	slice->slice_destroy(slice);
+	if (slice) {
+		slice->slice_destroy(slice);
+	}
 }
 
 int acl_slice_used(ACL_SLICE *slice)

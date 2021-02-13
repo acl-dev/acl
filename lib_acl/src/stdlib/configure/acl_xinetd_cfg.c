@@ -56,6 +56,7 @@ static ACL_XINETD_NV_PAIR *__nv_pair_new(const char *name, const char *value)
 			acl_array_destroy(pair->values, acl_myfree_fn); \
 		acl_myfree(pair); \
 	} \
+	return (x); \
 }
 
 	pair = (ACL_XINETD_NV_PAIR *) acl_mycalloc(1, sizeof(ACL_XINETD_NV_PAIR));
