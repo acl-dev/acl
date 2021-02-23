@@ -540,7 +540,7 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	ACL_VSTREAM *stream = NULL;
 
 	stream = (ACL_VSTREAM *) calloc(1, sizeof(ACL_VSTREAM));
-	assert(stream);
+	acl_assert(stream);
 
 	if (buflen < ACL_VSTREAM_DEF_MAXLEN)
 		buflen = ACL_VSTREAM_DEF_MAXLEN;
@@ -554,7 +554,7 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	}
 
 	stream->read_buf = (unsigned char *) malloc(buflen + 1);
-	assert(stream->read_buf);
+	acl_assert(stream->read_buf);
 
 	if (fdtype == 0)
 		fdtype = ACL_VSTREAM_TYPE_SOCK;
@@ -592,7 +592,7 @@ ACL_VSTREAM *private_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	stream->path       = NULL;
 
 	stream->close_handle_lnk = private_array_create(5);
-	assert(stream->close_handle_lnk);
+	acl_assert(stream->close_handle_lnk);
 
 	return stream;
 }

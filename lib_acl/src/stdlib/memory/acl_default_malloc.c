@@ -251,7 +251,7 @@ void *acl_default_calloc(const char *filename, int line,
 #endif
 	n = (int) (nmemb * size);
 	ptr = acl_default_malloc(filename, line, n);
-	assert(ptr);
+	acl_assert(ptr);
 	memset(ptr, FILLER, n);
 	return ptr;
 }

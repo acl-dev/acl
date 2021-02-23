@@ -46,7 +46,7 @@ int *acl_memory_debug_start(void)
 	int *ptr;
 	ptr = calloc(__alloc_max, sizeof(int));
 	__alloc_stat = ptr;
-	assert(__alloc_stat);
+	acl_assert(__alloc_stat);
 	thread_mutex_init(&__fastmutex_stat, NULL);
 	__debug_mem = 1;
 	return ptr;

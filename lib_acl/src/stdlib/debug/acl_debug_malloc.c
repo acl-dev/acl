@@ -253,7 +253,7 @@ ACL_DEBUG_MEM *acl_debug_malloc_init(ACL_DEBUG_MEM *debug_mem_ptr, const char *d
 		ASSERT(dump_file && *dump_file);
 
 		mem = (ACL_DEBUG_MEM*) calloc(1, sizeof(ACL_DEBUG_MEM));
-		assert(mem);
+		acl_assert(mem);
 		__debug_mem = mem;
 		__debug_mem->dump_fp = fopen(dump_file, "wb+");
 		ASSERT(__debug_mem->dump_fp);

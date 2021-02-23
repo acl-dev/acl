@@ -234,7 +234,7 @@ static int open_file_log(const char *filename, const char *logpre)
 #endif
 
 	log = (ACL_LOG*) calloc(1, sizeof(ACL_LOG));
-	assert(log);
+	acl_assert(log);
 	log->last_open = time(NULL);
 	log->fp = fp;
 	log->path = strdup(filename);
