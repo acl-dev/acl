@@ -71,8 +71,9 @@ static void thread_epoll_end(void *ctx)
 
 static void thread_epoll_once(void)
 {
-	if (acl_pthread_key_create(&epoll_key, thread_epoll_end) != 0)
+	if (acl_pthread_key_create(&epoll_key, thread_epoll_end) != 0) {
 		abort();
+	}
 }
 
 static EPOLL_CTX *thread_epoll_init(void)
@@ -130,8 +131,9 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 	struct epoll_event ee, events[1];
 	time_t begin;
 
-	if (acl_pthread_once(&epoll_once, thread_epoll_once) != 0)
+	if (acl_pthread_once(&epoll_once, thread_epoll_once) != 0) {
 		abort();
+	}
 	epoll_ctx = (EPOLL_CTX*) acl_pthread_getspecific(epoll_key);
 	if (epoll_ctx == NULL) {
 		epoll_ctx = thread_epoll_init();
@@ -152,12 +154,14 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 
 		ret = acl_last_error();
 
-		if (ret == EEXIST)
+		if (ret == EEXIST) {
 			break;
+		}
 
 		if (ret == EBADF || ret == EINVAL) {
-			if (retried)
+			if (retried) {
 				return -1;
+			}
 			if (thread_epoll_reopen(epoll_ctx) == -1)
 				return -1;
 			retried = 1;
@@ -277,7 +281,8 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 
 	fds.fd = fd;
 #ifdef ACL_WINDOWS
-	fds.events = POLLIN /* | POLLHUP | POLLERR */;  /* bugfix, POLLHUP, pollerr can't be set for windows */
+	/* bugfix, POLLHUP, pollerr can't be set for windows */
+	fds.events = POLLIN /* | POLLHUP | POLLERR */;
 #else
 	fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
 #endif
@@ -294,8 +299,9 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 #else
 		case -1:
 #endif
-			if (acl_last_error() == ACL_EINTR)
+			if (acl_last_error() == ACL_EINTR) {
 				continue;
+			}
 
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
 				__FILE__, __LINE__, myname,
@@ -349,9 +355,10 @@ int acl_read_iocp_wait(ACL_SOCKET fd, int timeout)
 	DWORD delay = timeout;
 	HANDLE h2;
 
-	if (__handle == NULL)
+	if (__handle == NULL) {
 		__handle = CreateIoCompletionPort(INVALID_HANDLE_VALUE,
 				NULL, 0, 0);
+	}
 	if (__handle == NULL) {
 		acl_msg_error("CreateIoCompletionPort: %s",
 			acl_last_serror());
@@ -362,9 +369,9 @@ int acl_read_iocp_wait(ACL_SOCKET fd, int timeout)
 
 	h2  = CreateIoCompletionPort((HANDLE) fd, __handle,
 		(DWORD) overlapped, 0);
-	if (h2 == NULL)
+	if (h2 == NULL) {
 		acl_myfree(overlapped);
-	else if (h2 != __handle) {
+	} else if (h2 != __handle) {
 		acl_msg_error("invalid h2 by CreateIoCompletionPort: %s",
 			acl_last_serror());
 		CloseHandle(h2);
@@ -372,8 +379,7 @@ int acl_read_iocp_wait(ACL_SOCKET fd, int timeout)
 	}
 
 	if (ReadFile((HANDLE) fd, NULL, 0, &recvBytes, overlapped) == FALSE
-		&& acl_last_error() != ERROR_IO_PENDING)
-	{
+		  && acl_last_error() != ERROR_IO_PENDING) {
 		acl_msg_warn("%s(%d): ReadFile error(%s)",
 			myname, __LINE__, acl_last_serror());
 		return -1;
@@ -381,21 +387,23 @@ int acl_read_iocp_wait(ACL_SOCKET fd, int timeout)
 
 	delay = 6000;
 
-	while (1)
-	{
+	while (1) {
 		isSuccess = GetQueuedCompletionStatus(__handle,
 				&bytesTransferred,
 				(DWORD*) &fd2,
 				(OVERLAPPED**) &lpOverlapped,
 				delay);
-		if (lpOverlapped == NULL)
+		if (lpOverlapped == NULL) {
 			break;
+		}
 
-		if (HasOverlappedIoCompleted(lpOverlapped))
+		if (HasOverlappedIoCompleted(lpOverlapped)) {
 			acl_myfree(lpOverlapped);
+		}
 
-		if (isSuccess)
+		if (isSuccess) {
 			return 0;
+		}
 	}
 
 	acl_msg_warn("timeout error: %s", acl_last_serror());
@@ -445,8 +453,9 @@ int acl_read_select_wait(ACL_SOCKET fd, int delay)
 		tv.tv_usec = 0;
 		tv.tv_sec  = delay / 1000;
 		tp = &tv;
-	} else
+	} else {
 		tp = 0;
+	}
 
 	acl_set_error(0);
 
@@ -463,13 +472,14 @@ int acl_read_select_wait(ACL_SOCKET fd, int delay)
 #ifdef	ACL_WINDOWS
 			if (errnum == WSAEINPROGRESS
 				|| errnum == WSAEWOULDBLOCK
-				|| errnum == ACL_EINTR)
-			{
+				|| errnum == ACL_EINTR) {
+
 				continue;
 			}
 #else
-			if (errnum == ACL_EINTR)
+			if (errnum == ACL_EINTR) {
 				continue;
+			}
 #endif
 			acl_msg_error("%s(%d), %s: select error(%s), fd: %d",
 				__FILE__, __LINE__, myname,

@@ -44,7 +44,7 @@ int acl_readable(ACL_SOCKET fd)
 
 	fds.fd = fd;
 #ifdef ACL_WINDOWS
-	fds.events = POLLIN | POLLHUP | POLLERR;
+	fds.events = POLLIN /* | POLLHUP | POLLERR */;
 #else
 	fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
 #endif

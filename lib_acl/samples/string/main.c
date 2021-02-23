@@ -34,6 +34,34 @@ static void test_quote_split(void)
 		quote_split(data[i].str, data[i].delim);
 }
 
+static void test_path_correct(void)
+{
+	const char *path[] = {
+		"/home/avwall/",
+		"/home/avwall/a.txt",
+		"/home//////avwall/",
+		"/home/avwall",
+		"/////home/avwall///",
+		"/home/avwall////",
+		"/home///avwall///",
+		"///home///avwall///",
+		"/////",
+		".",
+		"",
+		NULL,
+	};
+	size_t i;
+	char buf[256];
+
+	for (i = 0; path[i]; i++) {
+		if (acl_dir_correct(path[i], buf, sizeof(buf)) == 0) {
+			printf("%s ==> %s\r\n", path[i], buf);
+		} else {
+			printf("failed, path: |%s|\r\n", path[i]);
+		}
+	}
+}
+
 int main(void)
 {
 	char *src = acl_mystrdup("hello \tworld! you're  welcome to China!");
@@ -79,6 +107,8 @@ int main(void)
 	getchar();
 
 	test_quote_split();
+
+	test_path_correct();
 
 	return 0;
 }
