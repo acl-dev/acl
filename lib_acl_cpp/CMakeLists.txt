@@ -94,6 +94,7 @@ set(sources
 	${src}/memcache
 	${src}/mime
 	${src}/mime/internal
+	${src}/mqtt
 	${src}/net
 	${src}/queue
 	${src}/redis
