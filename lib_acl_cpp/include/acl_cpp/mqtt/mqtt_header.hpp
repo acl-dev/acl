@@ -23,19 +23,14 @@ typedef enum {
 	MQTT_RESERVED_MAX	= 15,
 } mqtt_type_t;
 
-typedef enum {
+enum {
 	MQTT_STAT_HDR_TYPE	= 0,
 	MQTT_STAT_HDR_LEN	= 1,
 	MQTT_STAT_HDR_VAR	= 2,
 	MQTT_STAT_STR_LEN	= 4,
 	MQTT_STAT_STR_VAL	= 5,
-
-	MQTT_STAT_CID		= 6,
-	MQTT_STAT_USERNAME	= 7,
-	MQTT_STAT_PASSWD	= 8,
-	MQTT_STAT_WILL_TOPIC	= 9,
-	MQTT_STAT_WILL_MSG	= 9,
-} mqtt_status_t;
+	MQTT_STAT_HDR_END	= 6,
+};
 
 typedef enum {
 	MQTT_NONE,
@@ -65,7 +60,7 @@ public:
 	virtual ~mqtt_message(void);
 
 protected:
-	mqtt_status_t status_;
+	int status_;
 
 	mqtt_type_t type_;
 
@@ -86,7 +81,7 @@ protected:
 
 	int unpack_header(const char* data, unsigned dlen);
 
-	void unpack_string_await(string& buf, mqtt_status_t next);
+	void unpack_string_await(string& buf, int next);
 
 	bool unpack_char(const char* data, size_t len, unsigned char& out);
 	bool unpack_short(const char* data, size_t len, unsigned short& out);
@@ -98,7 +93,7 @@ private:
 	unsigned hlen_;
 	unsigned dlen_;
 
-	mqtt_status_t next_;
+	int status_next_;
 	string* buff_;
 	unsigned short vlen_;
 

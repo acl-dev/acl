@@ -217,12 +217,12 @@ int mqtt_message::unpack_header(const char* data, unsigned dlen) {
 	}
 }
 
-void mqtt_message::unpack_string_await(string& out, mqtt_status_t next) {
+void mqtt_message::unpack_string_await(string& out, int next) {
 	out.clear();
-	buff_   = &out;
-	next_   = next;
-	hlen_   = 0;
-	status_ = MQTT_STAT_STR_LEN;
+	buff_        = &out;
+	status_next_ = next;
+	hlen_        = 0;
+	status_      = MQTT_STAT_STR_LEN;
 }
 
 #define	HDR_LEN_LEN	2
@@ -261,7 +261,7 @@ int mqtt_message::unpack_string_val(const char* data, unsigned dlen) {
 	}
 
 	if (buff_->size() == (size_t) vlen_) {
-		status_ = next_;
+		status_ = status_next_;
 		return dlen;
 	}
 	assert(dlen == 0);
@@ -393,8 +393,17 @@ bool mqtt_connect::to_string(string& out) {
 	return true;
 }
 
+enum {
+	MQTT_STAT_CID = MQTT_STAT_HDR_END,
+	MQTT_STAT_USERNAME,
+	MQTT_STAT_PASSWD,
+	MQTT_STAT_WILL_TOPIC,
+	MQTT_STAT_WILL_MSG,
+	MQTT_STAT_END,
+};
+
 static struct {
-	mqtt_status_t status;
+	int status;
 	int (mqtt_connect::*handler)(const char*, unsigned);
 } handlers[] = {
 	{ MQTT_STAT_HDR_TYPE,	&mqtt_connect::unpack_header_type	},
@@ -402,11 +411,13 @@ static struct {
 	{ MQTT_STAT_HDR_VAR,	&mqtt_connect::unpack_header_var	},
 	{ MQTT_STAT_STR_LEN,	&mqtt_connect::unpack_string_len	},
 	{ MQTT_STAT_STR_VAL,	&mqtt_connect::unpack_string_val	},
+
 	{ MQTT_STAT_CID,	&mqtt_connect::unpack_cid		},
 	{ MQTT_STAT_USERNAME,	&mqtt_connect::unpack_username		},
 	{ MQTT_STAT_PASSWD,	&mqtt_connect::unpack_passwd		},
 	{ MQTT_STAT_WILL_TOPIC,	&mqtt_connect::unpack_will_topic	},
 	{ MQTT_STAT_WILL_MSG,	&mqtt_connect::unpack_will_msg		},
+	{ MQTT_STAT_END,	NULL					},
 };
 
 int mqtt_connect::update(const char* data, unsigned dlen) {
@@ -474,7 +485,7 @@ int mqtt_connect::unpack_cid(const char* data, unsigned dlen) {
 		return 0;
 	}
 
-	mqtt_status_t next;
+	int next;
 	if ((conn_flags_ & 0x80)) {
 		next = MQTT_STAT_USERNAME;
 	} else if ((conn_flags_ & 0x40)) {
@@ -495,7 +506,7 @@ int mqtt_connect::unpack_username(const char* data, unsigned dlen) {
 		return 0;
 	}
 
-	mqtt_status_t next;
+	int next;
 	if ((conn_flags_ & 0x40)) {
 		next = MQTT_STAT_PASSWD;
 	} else if ((conn_flags_ & 0x04)) {
@@ -514,7 +525,7 @@ int mqtt_connect::unpack_passwd(const char* data, unsigned dlen) {
 		return 0;
 	}
 
-	mqtt_status_t next;
+	int next;
 	if ((conn_flags_ & 0x04)) {
 		next = MQTT_STAT_WILL_TOPIC;
 	} else {
@@ -531,7 +542,7 @@ int mqtt_connect::unpack_will_topic(const char* data, unsigned dlen) {
 		return 0;
 	}
 
-	mqtt_status_t next = MQTT_STAT_WILL_MSG;
+	int next = MQTT_STAT_WILL_MSG;
 
 	this->unpack_string_await(will_topic_, next);
 	return dlen;
@@ -542,7 +553,7 @@ int mqtt_connect::unpack_will_msg(const char* data, unsigned dlen) {
 		return 0;
 	}
 
-	mqtt_status_t next = MQTT_STAT_WILL_MSG;
+	int next = MQTT_STAT_WILL_MSG;
 
 	this->unpack_string_await(will_msg_, next);
 	return dlen;
