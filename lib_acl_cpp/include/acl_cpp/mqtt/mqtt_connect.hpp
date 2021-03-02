@@ -21,7 +21,7 @@ public:
 	void set_keep_alive(unsigned short keep_alive);
 	void set_username(const char* name);
 	void set_passwd(const char* passwd);
-	void set_qos(mqtt_qos_t qos);
+	void set_will_qos(mqtt_qos_t qos);
 	void set_will_topic(const char* topic);
 	void set_will_msg(const char* msg);
 
@@ -45,8 +45,8 @@ public:
 		return passwd_.empty() ? NULL : passwd_.c_str();
 	}
 
-	mqtt_qos_t get_qos(void) const {
-		return qos_;
+	mqtt_qos_t get_will_qos(void) const {
+		return will_qos_;
 	}
 
 	const char* get_will_topic(void) const {
@@ -62,7 +62,7 @@ private:
 	char hbuf_[10];
 	unsigned hlen_;
 
-	mqtt_qos_t qos_;
+	mqtt_qos_t will_qos_;
 	unsigned char conn_flags_;
 	unsigned short keep_alive_;
 
@@ -79,6 +79,7 @@ public:
 	int unpack_passwd(const char* data, unsigned dlen);
 	int unpack_will_topic(const char* data, unsigned dlen);
 	int unpack_will_msg(const char* data, unsigned dlen);
+	int unpack_done(const char* data, unsigned dlen);
 };
 
 } // namespace acl

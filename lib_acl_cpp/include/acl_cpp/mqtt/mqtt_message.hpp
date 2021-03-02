@@ -36,6 +36,12 @@ typedef enum {
 	MQTT_MAYBE,
 } mqtt_option_t;
 
+typedef enum {
+	MQTT_QOS0	= 0x0,
+	MQTT_QOS1	= 0x1,
+	MQTT_QOS2	= 0x2,
+} mqtt_qos_t;
+
 struct mqtt_constrain {
 	mqtt_type_t type;
 	unsigned char flags:4;
@@ -57,6 +63,14 @@ public:
 	mqtt_message(mqtt_type_t type);
 	virtual ~mqtt_message(void);
 
+	/* for MQTT_PUBLISH */
+
+	void set_dup(bool yes);
+	void set_qos(mqtt_qos_t qos);
+	void set_retain(bool yes);
+
+	/* end */
+
 	int header_update(const char* data, unsigned dlen);
 
 	bool header_finish(void) const {
@@ -67,13 +81,29 @@ public:
 		return type_;
 	}
 
+	bool is_dup(void) const {
+		return qos_ != MQTT_QOS0 && dup_;
+	}
+
+	mqtt_qos_t get_qos(void) const {
+		return qos_;
+	}
+
+	bool is_retain(void) const {
+		return retain_;
+	}
+
 	unsigned get_data_length(void) const {
 		return dlen_;
 	}
 
 protected:
 	unsigned status_;
-	mqtt_type_t type_;
+
+	mqtt_type_t type_;	// All
+	bool dup_;		// MQTT_PUBLISH
+	mqtt_qos_t qos_;	// MQTT_PUBLISH
+	bool retain_;		// MQTT_PUBLISH
 
 	void set_data_length(unsigned len);
 
@@ -105,11 +135,5 @@ public:
 	int unpack_header_type(const char* data, unsigned dlen);
 	int unpack_header_len(const char* data, unsigned dlen);
 };
-
-typedef enum {
-	MQTT_QOS0	= 0x00,
-	MQTT_QOS1	= 0x01,
-	MQTT_QOS2	= 0x02,
-} mqtt_qos_t;
 
 } // namespace acl

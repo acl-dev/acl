@@ -7,7 +7,7 @@ mqtt_connect::mqtt_connect(void)
 : mqtt_message(MQTT_CONNACK)
 , finished_(false)
 , hlen_(0)
-, qos_(MQTT_QOS0)
+, will_qos_(MQTT_QOS0)
 , conn_flags_(0)
 , keep_alive_(300)
 {
@@ -34,8 +34,8 @@ void mqtt_connect::set_passwd(const char* passwd) {
 	}
 }
 
-void mqtt_connect::set_qos(mqtt_qos_t qos) {
-	qos_ = qos;
+void mqtt_connect::set_will_qos(mqtt_qos_t qos) {
+	will_qos_ = qos;
 
 	switch (qos) {
 	case MQTT_QOS0:
@@ -95,6 +95,7 @@ bool mqtt_connect::to_string(string& out) {
 	}
 
 	this->set_data_length(len);
+
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
 		return false;
@@ -135,7 +136,7 @@ enum {
 	MQTT_STAT_PASSWD,
 	MQTT_STAT_WILL_TOPIC,
 	MQTT_STAT_WILL_MSG,
-	MQTT_STAT_END,
+	MQTT_STAT_DONE,
 };
 
 static struct {
@@ -152,7 +153,7 @@ static struct {
 	{ MQTT_STAT_PASSWD,	&mqtt_connect::unpack_passwd		},
 	{ MQTT_STAT_WILL_TOPIC,	&mqtt_connect::unpack_will_topic	},
 	{ MQTT_STAT_WILL_MSG,	&mqtt_connect::unpack_will_msg		},
-	{ MQTT_STAT_END,	NULL					},
+	{ MQTT_STAT_DONE,	&mqtt_connect::unpack_done		},
 };
 
 int mqtt_connect::update(const char* data, unsigned dlen) {
@@ -289,9 +290,14 @@ int mqtt_connect::unpack_will_msg(const char* data, unsigned dlen) {
 		return 0;
 	}
 
-	int next = MQTT_STAT_WILL_MSG;
+	int next = MQTT_STAT_DONE;
 
 	this->unpack_string_await(will_msg_, next);
+	return dlen;
+}
+
+int mqtt_connect::unpack_done(const char*, unsigned dlen) {
+	finished_ = true;
 	return dlen;
 }
 
