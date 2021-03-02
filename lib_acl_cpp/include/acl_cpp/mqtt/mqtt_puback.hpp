@@ -10,6 +10,7 @@ public:
 	virtual ~mqtt_puback(void);
 
 	void set_pkt_id(unsigned short id);
+
 	unsigned short get_pkt_id(void) const {
 		return pkt_id_;
 	}

@@ -37,9 +37,6 @@ enum {
 mqtt_message::mqtt_message(mqtt_type_t type)
 : status_(MQTT_STAT_HDR_TYPE)
 , type_(type)
-, dup_(false)
-, qos_(MQTT_QOS0)
-, retain_(false)
 , header_finished_(false)
 , hflags_(0)
 , dlen_(0)
@@ -53,18 +50,6 @@ mqtt_message::mqtt_message(mqtt_type_t type)
 }
 
 mqtt_message::~mqtt_message(void) {}
-
-void mqtt_message::set_dup(bool yes) {
-	dup_ = yes;
-}
-
-void mqtt_message::set_qos(mqtt_qos_t qos) {
-	qos_ = qos;
-}
-
-void mqtt_message::set_retain(bool yes) {
-	retain_ = yes;
-}
 
 void mqtt_message::set_data_length(unsigned len) {
 	if (len == 0) {
@@ -84,12 +69,8 @@ bool mqtt_message::pack_header(string& out) {
 
 	memset(header, 0, sizeof(header));
 
-	hflags_ |= qos_;
-	if (qos_ == MQTT_QOS0) {
-		dup_ = false;
-	} else if (dup_) {
-		hflags_ |= 0x8;
-	}
+	unsigned char flags = this->get_header_flags();
+	hflags_ |= (flags & 0x0f);
 
 	header[len] = ((((char) type_) << 4) & 0xff) | hflags_;
 	len++;

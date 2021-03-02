@@ -63,14 +63,6 @@ public:
 	mqtt_message(mqtt_type_t type);
 	virtual ~mqtt_message(void);
 
-	/* for MQTT_PUBLISH */
-
-	void set_dup(bool yes);
-	void set_qos(mqtt_qos_t qos);
-	void set_retain(bool yes);
-
-	/* end */
-
 	int header_update(const char* data, unsigned dlen);
 
 	bool header_finish(void) const {
@@ -81,18 +73,6 @@ public:
 		return type_;
 	}
 
-	bool is_dup(void) const {
-		return qos_ != MQTT_QOS0 && dup_;
-	}
-
-	mqtt_qos_t get_qos(void) const {
-		return qos_;
-	}
-
-	bool is_retain(void) const {
-		return retain_;
-	}
-
 	unsigned get_data_length(void) const {
 		return dlen_;
 	}
@@ -100,10 +80,11 @@ public:
 protected:
 	unsigned status_;
 
-	mqtt_type_t type_;	// All
-	bool dup_;		// MQTT_PUBLISH
-	mqtt_qos_t qos_;	// MQTT_PUBLISH
-	bool retain_;		// MQTT_PUBLISH
+	mqtt_type_t type_;
+
+	virtual unsigned char get_header_flags(void) const {
+		return 0x00;
+	}
 
 	void set_data_length(unsigned len);
 

@@ -8,6 +8,9 @@ mqtt_publish::mqtt_publish(bool parse_payload /* true */)
 , finished_(false)
 , parse_payload_(parse_payload)
 , hlen_(0)
+, dup_(false)
+, qos_(MQTT_QOS0)
+, retain_(false)
 , pkt_id_(0)
 , payload_len_(0)
 {
@@ -15,6 +18,18 @@ mqtt_publish::mqtt_publish(bool parse_payload /* true */)
 }
 
 mqtt_publish::~mqtt_publish(void) {}
+
+void mqtt_publish::set_dup(bool yes) {
+	dup_ = yes;
+}
+
+void mqtt_publish::set_qos(mqtt_qos_t qos) {
+	qos_ = qos;
+}
+
+void mqtt_publish::set_retain(bool yes) {
+	retain_ = yes;
+}
 
 void mqtt_publish::set_topic(const char* topic) {
 	topic_ = topic;
@@ -29,6 +44,14 @@ void mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
 	if (data && payload_len_ > 0) {
 		payload_.copy(data, len);
 	}
+}
+
+unsigned char mqtt_publish::get_header_flags(void) const {
+	unsigned char flags = qos_;
+	if (qos_ != MQTT_QOS0 && dup_) {
+		flags |= 0x8;
+	}
+	return flags;
 }
 
 bool mqtt_publish::to_string(string& out) {
