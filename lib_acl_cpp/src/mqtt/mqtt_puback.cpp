@@ -3,8 +3,8 @@
 
 namespace acl {
 
-mqtt_puback::mqtt_puback(void)
-: mqtt_message(MQTT_PUBACK)
+mqtt_puback::mqtt_puback(mqtt_type_t type /* MQTT_PUBACK */)
+: mqtt_message(type)
 , finished_(false)
 , hlen_(0)
 , pkt_id_(0)

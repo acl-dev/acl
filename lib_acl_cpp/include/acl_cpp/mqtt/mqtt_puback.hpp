@@ -6,8 +6,8 @@ namespace acl {
 
 class mqtt_puback : public mqtt_message {
 public:
-	mqtt_puback(void);
-	~mqtt_puback(void);
+	mqtt_puback(mqtt_type_t type = MQTT_PUBACK);
+	virtual ~mqtt_puback(void);
 
 	void set_pkt_id(unsigned short id);
 	unsigned short get_pkt_id(void) const {
