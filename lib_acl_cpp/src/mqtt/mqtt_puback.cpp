@@ -1,37 +1,24 @@
 #include "acl_stdafx.hpp"
-#include "acl_cpp/mqtt/mqtt_connack.hpp"
+#include "acl_cpp/mqtt/mqtt_puback.hpp"
 
 namespace acl {
 
-mqtt_connack::mqtt_connack(void)
-: mqtt_message(MQTT_CONNACK)
+mqtt_puback::mqtt_puback(void)
+: mqtt_message(MQTT_PUBACK)
 , finished_(false)
 , hlen_(0)
-, session_(false)
-, conn_flags_(0)
-, connack_code_(MQTT_CONNACK_OK)
+, pkt_id_(0)
 {
-	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
-mqtt_connack::~mqtt_connack(void) {}
+mqtt_puback::~mqtt_puback(void) {}
 
-void mqtt_connack::set_session(bool on) {
-	session_ = on;
-	if (on) {
-		conn_flags_ = 0x01;
-	} else {
-		conn_flags_ = 0x00;
-	}
+void mqtt_puback::set_pkt_id(unsigned short id) {
+	pkt_id_ = id;
 }
 
-void mqtt_connack::set_connack_code(unsigned char code) {
-	connack_code_ = code;
-}
-
-bool mqtt_connack::to_string(string& out) {
+bool mqtt_puback::to_string(string& out) {
 	bool old_mode = out.get_bin();
-	out.set_bin(true);
 
 	this->set_data_length(2);
 
@@ -40,8 +27,7 @@ bool mqtt_connack::to_string(string& out) {
 		return false;
 	}
 
-	this->pack_add((unsigned char) conn_flags_, out);
-	this->pack_add((unsigned char) connack_code_, out);
+	this->pack_add((unsigned short) pkt_id_, out);
 
 	out.set_bin(old_mode);
 	return true;
@@ -49,22 +35,22 @@ bool mqtt_connack::to_string(string& out) {
 
 static struct {
 	int status;
-	int (mqtt_connack::*handler)(const char*, unsigned);
-} connack_handlers[] = {
+	int (mqtt_puback::*handler)(const char*, unsigned);
+} puback_handlers[] = {
 	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
 	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
 
-	{ MQTT_STAT_HDR_VAR,	&mqtt_connack::unpack_header_var	},
+	{ MQTT_STAT_HDR_VAR,	&mqtt_puback::unpack_header_var		},
 };
 
-int mqtt_connack::update(const char* data, unsigned dlen) {
+int mqtt_puback::update(const char* data, unsigned dlen) {
 	if (data == NULL || dlen  == 0) {
 		logger_error("invalid input");
 		return -1;
 	}
 
 	while (dlen > 0 && !finished_) {
-		int ret = (this->*connack_handlers[status_].handler)(data, dlen);
+		int ret = (this->*puback_handlers[status_].handler)(data, dlen);
 		if (ret < 0) {
 			return -1;
 		}
@@ -76,7 +62,7 @@ int mqtt_connack::update(const char* data, unsigned dlen) {
 
 #define	HDR_VAR_LEN	2
 
-int mqtt_connack::unpack_header_var(const char* data, unsigned dlen) {
+int mqtt_puback::unpack_header_var(const char* data, unsigned dlen) {
 	if (data == NULL || dlen == 0) {
 		return 0;
 	}
@@ -97,9 +83,10 @@ int mqtt_connack::unpack_header_var(const char* data, unsigned dlen) {
 		return dlen;
 	}
 
-	conn_flags_   = hbuf_[0];
-	connack_code_ = hbuf_[1];
-
+	if (!this->unpack_short(&hbuf_[0], 2, pkt_id_)) {
+		logger_error("unpack pkt id error");
+		return false;
+	}
 	finished_ = true;
 	return dlen;
 }

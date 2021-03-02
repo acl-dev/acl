@@ -135,15 +135,6 @@ void mqtt_message::pack_add(const string& s, string& out) {
 	}
 }
 
-bool mqtt_message::unpack_char(const char* in, size_t len, unsigned char& out) {
-	if (len < 1) {
-		logger_error("too short: %ld", (long) len);
-		return false;
-	}
-	out = (unsigned char) in[0];
-	return true;
-}
-
 bool mqtt_message::unpack_short(const char* in, size_t len, unsigned short& out) {
 	if (len < 2) {
 		logger_error("too short: %ld", (long) len);

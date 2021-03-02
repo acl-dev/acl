@@ -112,7 +112,6 @@ protected:
 	void pack_add(unsigned short n, string& out);
 	void pack_add(const string& s, string& out);
 
-	bool unpack_char(const char* data, size_t len, unsigned char& out);
 	bool unpack_short(const char* data, size_t len, unsigned short& out);
 	void unpack_string_await(string& buf, int next);
 
