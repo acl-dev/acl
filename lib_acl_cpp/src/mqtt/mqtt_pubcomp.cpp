@@ -1,0 +1,13 @@
+#include "acl_stdafx.hpp"
+#include "acl_cpp/mqtt/mqtt_pubcomp.hpp"
+
+namespace acl {
+
+mqtt_pubcomp::mqtt_pubcomp(void)
+: mqtt_puback(MQTT_PUBCOMP)
+{
+}
+
+mqtt_pubcomp::~mqtt_pubcomp(void) {}
+
+} // namespace acl
