@@ -51,7 +51,7 @@ mqtt_message::mqtt_message(mqtt_type_t type)
 
 mqtt_message::~mqtt_message(void) {}
 
-void mqtt_message::set_data_length(unsigned len) {
+void mqtt_message::set_payload_length(unsigned len) {
 	if (len == 0) {
 		return;
 	}
@@ -125,6 +125,33 @@ bool mqtt_message::unpack_short(const char* in, size_t len, unsigned short& out)
 	out = (unsigned short) (((unsigned short) (in[0] & 0xff) << 8)
 			| (unsigned short) (in[1] & 0xff));
 	return true;
+}
+
+static struct {
+	int status;
+	int (mqtt_message::*handler)(const char*, unsigned);
+} handlers[] = {
+	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
+	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
+	{ MQTT_STAT_HDR_TYPE,	&mqtt_message::unpack_header_type	},
+	{ MQTT_STAT_HDR_LEN,	&mqtt_message::unpack_header_len	},
+};
+
+int mqtt_message::header_update(const char* data, unsigned dlen) {
+	if (data == NULL || dlen == 0) {
+		logger_error("invalid input");
+		return -1;
+	}
+
+	while (dlen > 0 && !header_finished_) {
+		int ret = (this->*handlers[status_].handler)(data, dlen);
+		if (ret < 0) {
+			return -1;
+		}
+		dlen = (unsigned) ret;
+		data += ret;
+	}
+	return dlen;
 }
 
 int mqtt_message::unpack_header_type(const char* data, unsigned dlen) {
@@ -243,33 +270,6 @@ int mqtt_message::unpack_string_val(const char* data, unsigned dlen) {
 		return dlen;
 	}
 	assert(dlen == 0);
-	return dlen;
-}
-
-static struct {
-	int status;
-	int (mqtt_message::*handler)(const char*, unsigned);
-} message_handlers[] = {
-	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
-	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
-	{ MQTT_STAT_HDR_TYPE,	&mqtt_message::unpack_header_type	},
-	{ MQTT_STAT_HDR_LEN,	&mqtt_message::unpack_header_len	},
-};
-
-int mqtt_message::header_update(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		logger_error("invalid input");
-		return -1;
-	}
-
-	while (dlen > 0 && !header_finished_) {
-		int ret = (this->*message_handlers[status_].handler)(data, dlen);
-		if (ret < 0) {
-			return -1;
-		}
-		dlen = (unsigned) ret;
-		data += ret;
-	}
 	return dlen;
 }
 

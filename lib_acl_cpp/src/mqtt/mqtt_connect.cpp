@@ -94,7 +94,7 @@ bool mqtt_connect::to_string(string& out) {
 		will_msg_.clear();
 	}
 
-	this->set_data_length(len);
+	this->set_payload_length(len);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -142,7 +142,7 @@ enum {
 static struct {
 	int status;
 	int (mqtt_connect::*handler)(const char*, unsigned);
-} connect_handlers[] = {
+} handlers[] = {
 	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
 	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
 
@@ -163,7 +163,7 @@ int mqtt_connect::update(const char* data, unsigned dlen) {
 	}
 
 	while (dlen > 0 && !finished_) {
-		int ret = (this->*connect_handlers[status_].handler)(data, dlen);
+		int ret = (this->*handlers[status_].handler)(data, dlen);
 		if (ret < 0) {
 			return -1;
 		}

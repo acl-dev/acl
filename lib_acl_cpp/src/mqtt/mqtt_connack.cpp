@@ -33,7 +33,7 @@ bool mqtt_connack::to_string(string& out) {
 	bool old_mode = out.get_bin();
 	out.set_bin(true);
 
-	this->set_data_length(2);
+	this->set_payload_length(2);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -50,7 +50,7 @@ bool mqtt_connack::to_string(string& out) {
 static struct {
 	int status;
 	int (mqtt_connack::*handler)(const char*, unsigned);
-} connack_handlers[] = {
+} handlers[] = {
 	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
 	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
 
@@ -64,7 +64,7 @@ int mqtt_connack::update(const char* data, unsigned dlen) {
 	}
 
 	while (dlen > 0 && !finished_) {
-		int ret = (this->*connack_handlers[status_].handler)(data, dlen);
+		int ret = (this->*handlers[status_].handler)(data, dlen);
 		if (ret < 0) {
 			return -1;
 		}

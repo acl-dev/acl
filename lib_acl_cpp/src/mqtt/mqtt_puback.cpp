@@ -20,7 +20,7 @@ void mqtt_puback::set_pkt_id(unsigned short id) {
 bool mqtt_puback::to_string(string& out) {
 	bool old_mode = out.get_bin();
 
-	this->set_data_length(2);
+	this->set_payload_length(2);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -36,7 +36,7 @@ bool mqtt_puback::to_string(string& out) {
 static struct {
 	int status;
 	int (mqtt_puback::*handler)(const char*, unsigned);
-} puback_handlers[] = {
+} handlers[] = {
 	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
 	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
 
@@ -50,7 +50,7 @@ int mqtt_puback::update(const char* data, unsigned dlen) {
 	}
 
 	while (dlen > 0 && !finished_) {
-		int ret = (this->*puback_handlers[status_].handler)(data, dlen);
+		int ret = (this->*handlers[status_].handler)(data, dlen);
 		if (ret < 0) {
 			return -1;
 		}

@@ -73,7 +73,7 @@ public:
 		return type_;
 	}
 
-	unsigned get_data_length(void) const {
+	unsigned get_payload_length(void) const {
 		return dlen_;
 	}
 
@@ -86,7 +86,7 @@ protected:
 		return 0x00;
 	}
 
-	void set_data_length(unsigned len);
+	void set_payload_length(unsigned len);
 
 	bool pack_header(string& out);
 	void pack_add(unsigned char ch, string& out);

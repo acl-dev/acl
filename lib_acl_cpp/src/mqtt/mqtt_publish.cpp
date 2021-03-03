@@ -59,7 +59,7 @@ bool mqtt_publish::to_string(string& out) {
 	out.set_bin(true);
 
 	unsigned len = 2 + (unsigned) topic_.size() + 2 + payload_len_;
-	this->set_data_length(len);
+	this->set_payload_length(len);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -85,11 +85,12 @@ enum {
 static struct {
 	int status;
 	int (mqtt_publish::*handler)(const char*, unsigned);
-} publish_handlers[] = {
+} handlers[] = {
 	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
 	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
 
 	{ MQTT_STAT_HDR_VAR,	&mqtt_publish::unpack_header_var	},
+
 	{ MQTT_STAT_HDR_PKTID,	&mqtt_publish::unpack_header_pktid	},
 	{ MQTT_STAT_DONE,	&mqtt_publish::unpack_done		},
 };
@@ -101,7 +102,7 @@ int mqtt_publish::update(const char* data, unsigned dlen) {
 	}
 
 	while (dlen > 0 && !finished_) {
-		int ret = (this->*publish_handlers[status_].handler)(data, dlen);
+		int ret = (this->*handlers[status_].handler)(data, dlen);
 		if (ret < 0) {
 			return -1;
 		}
