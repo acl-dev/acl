@@ -276,9 +276,35 @@ int mqtt_message::unpack_string_val(const char* data, unsigned dlen) {
 void mqtt_message::unpack_string_await(string& out, int next) {
 	out.clear();
 	buff_        = &out;
-	status_next_ = next;
 	hlen_        = 0;
 	status_      = MQTT_STAT_STR_LEN;
+	status_next_ = next;
+}
+
+#define	MESSAGE_I16_LEN	2
+
+int mqtt_message::unpack_i16(const char* data, unsigned dlen) {
+	if (data == NULL || dlen == 0) {
+		return 0;
+	}
+
+	for (; hlen_ < MESSAGE_I16_LEN && dlen > 0;) {
+		hbuf_[hlen_++] = *data++;
+		dlen--;
+	}
+
+	if (hlen_ < MESSAGE_I16_LEN) {
+		assert(dlen == 0);
+		return dlen;
+	}
+
+}
+
+void mqtt_message::unpack_short_await(unsigned short& out, int next) {
+	i16_         = &out;
+	hlen_        = 0;
+	status_      = MQTT_STAT_INT16;
+	status_next_ = next;
 }
 
 } //namespace acl

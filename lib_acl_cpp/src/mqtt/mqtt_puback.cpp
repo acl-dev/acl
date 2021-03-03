@@ -85,7 +85,7 @@ int mqtt_puback::unpack_header_var(const char* data, unsigned dlen) {
 
 	if (!this->unpack_short(&hbuf_[0], 2, pkt_id_)) {
 		logger_error("unpack pkt id error");
-		return false;
+		return -1;
 	}
 	finished_ = true;
 	return dlen;

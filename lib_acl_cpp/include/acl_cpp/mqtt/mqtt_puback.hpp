@@ -21,6 +21,7 @@ public:
 
 public:
 	int unpack_header_var(const char* data, unsigned dlen);
+	int unpack_topic_qos(const char* data, unsigned dlen);
 
 private:
 	bool finished_;

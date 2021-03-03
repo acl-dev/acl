@@ -31,12 +31,16 @@ bool mqtt_subscribe::to_string(string& out) {
 	}
 
 	bool old_mode = out.get_bin();
+
+	payload_len_ += sizeof(pkt_id_);
 	this->set_payload_length(payload_len_);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
 		return false;
 	}
+
+	this->pack_add((unsigned short) pkt_id_, out);
 
 	size_t n = topics_.size();
 	for (size_t i = 0; i < n; i++) {
@@ -60,6 +64,7 @@ static struct {
 	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
 
 	{ MQTT_STAT_HDR_VAR,	&mqtt_subscribe::unpack_header_var	},
+
 	{ MQTT_STAT_TOPIC_DONE,	&mqtt_subscribe::unpack_topic_done	},
 };
 
@@ -78,9 +83,33 @@ int mqtt_subscribe::update(const char* data, unsigned dlen) {
 	}
 	return dlen;
 }
+
+#define	HDR_VAR_LEN	2
+
 int mqtt_subscribe::unpack_header_var(const char* data, unsigned dlen) {
 	if (data == NULL || dlen == 0) {
 		return 0;
+	}
+	assert(sizeof(hbuf_) >= HDR_VAR_LEN);
+
+	if (nread_ >= HDR_VAR_LEN) {
+		logger_error("invalid header var");
+		return -1;
+	}
+
+	for (; nread_ < HDR_VAR_LEN && dlen > 0) {
+		hbuf_[nread_++] = *data++;
+		dlen--;
+	}
+
+	if (hlen_ < HDR_VAR_LEN) {
+		assert(dlen == 0);
+		return dlen;
+	}
+
+	if (!this->unpack_short(&hbuf_[0], 2, pkt_id_)) {
+		logger_error("unpack pkt id error");
+		return -1;
 	}
 
 	int next = MQTT_STAT_TOPIC_DONE;
@@ -106,6 +135,8 @@ int mqtt_subscribe::unpack_topic_done(const char* data, unsigned dlen) {
 	}
 
 	topics_.push_back(topic_);
+	topic_.clear();
+
 	qoses_.push_back((mqtt_qos_t) qos);
 
 	nread_ += (unsigned) topic_.size() + 1;
