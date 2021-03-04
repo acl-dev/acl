@@ -1,5 +1,5 @@
 #include "acl_stdafx.hpp"
-#include "acl_cpp/mqtt/mqtt_subscribe.hpp"
+#include "acl_cpp/mqtt/mqtt_unsubscribe.hpp"
 
 namespace acl {
 
@@ -7,11 +7,10 @@ enum {
 	MQTT_STAT_HDR_VAR,
 	MQTT_STAT_TOPIC_LEN,
 	MQTT_STAT_TOPIC_VAL,
-	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_subscribe::mqtt_subscribe(unsigned payload_len /* 0 */)
-: mqtt_message(MQTT_SUBSCRIBE)
+mqtt_unsubscribe::mqtt_unsubscribe(unsigned payload_len /* 0 */)
+: mqtt_message(MQTT_UNSUBSCRIBE)
 , finished_(false)
 , dlen_(0)
 , pkt_id_(0)
@@ -21,19 +20,18 @@ mqtt_subscribe::mqtt_subscribe(unsigned payload_len /* 0 */)
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
 }
 
-mqtt_subscribe::~mqtt_subscribe(void) {}
+mqtt_unsubscribe::~mqtt_unsubscribe(void) {}
 
-void mqtt_subscribe::set_pkt_id(unsigned short id) {
+void mqtt_unsubscribe::set_pkt_id(unsigned short id) {
 	pkt_id_ = id;
 }
 
-void mqtt_subscribe::add_topic(const char* topic, mqtt_qos_t qos) {
+void mqtt_unsubscribe::add_topic(const char* topic) {
 	topics_.push_back(topic);
-	qoses_.push_back(qos);
-	payload_len_ += strlen(topic) + 1;
+	payload_len_ += strlen(topic);
 }
 
-bool mqtt_subscribe::to_string(string& out) {
+bool mqtt_unsubscribe::to_string(string& out) {
 	if (topics_.empty()) {
 		logger_error("no topic available!");
 		return false;
@@ -54,7 +52,6 @@ bool mqtt_subscribe::to_string(string& out) {
 	size_t n = topics_.size();
 	for (size_t i = 0; i < n; i++) {
 		this->pack_add(topics_[i], out);
-		this->pack_add((unsigned char) qoses_[i], out);
 	}
 
 	out.set_bin(old_mode);
@@ -63,16 +60,15 @@ bool mqtt_subscribe::to_string(string& out) {
 
 static struct {
 	int status;
-	int (mqtt_subscribe::*handler)(const char*, int);
+	int (mqtt_unsubscribe::*handler)(const char*, int);
 } handlers[] = {
-	{ MQTT_STAT_HDR_VAR,	&mqtt_subscribe::update_header_var	},
+	{ MQTT_STAT_HDR_VAR,	&mqtt_unsubscribe::update_header_var	},
 
-	{ MQTT_STAT_TOPIC_LEN,	&mqtt_subscribe::update_topic_len	},
-	{ MQTT_STAT_TOPIC_VAL,	&mqtt_subscribe::update_topic_val	},
-	{ MQTT_STAT_TOPIC_QOS,	&mqtt_subscribe::update_topic_qos	},
+	{ MQTT_STAT_TOPIC_LEN,	&mqtt_unsubscribe::update_topic_len	},
+	{ MQTT_STAT_TOPIC_VAL,	&mqtt_unsubscribe::update_topic_val	},
 };
 
-int mqtt_subscribe::update(const char* data, int dlen) {
+int mqtt_unsubscribe::update(const char* data, int dlen) {
 	if (data == NULL || dlen <= 0) {
 		logger_error("invalid input");
 		return -1;
@@ -91,7 +87,7 @@ int mqtt_subscribe::update(const char* data, int dlen) {
 
 #define	HDR_VAR_LEN	2
 
-int mqtt_subscribe::update_header_var(const char* data, int dlen) {
+int mqtt_unsubscribe::update_header_var(const char* data, int dlen) {
 	assert(data && dlen > 0);
 	assert(sizeof(buff_) >= HDR_VAR_LEN);
 
@@ -128,7 +124,7 @@ int mqtt_subscribe::update_header_var(const char* data, int dlen) {
 
 #define	HDR_LEN_LEN	2
 
-int mqtt_subscribe::update_topic_len(const char* data, int dlen) {
+int mqtt_unsubscribe::update_topic_len(const char* data, int dlen) {
 	assert(data && dlen > 0);
 	assert(sizeof(buff_) >= HDR_LEN_LEN);
 
@@ -166,7 +162,7 @@ int mqtt_subscribe::update_topic_len(const char* data, int dlen) {
 	return dlen;
 }
 
-int mqtt_subscribe::update_topic_val(const char* data, int dlen) {
+int mqtt_unsubscribe::update_topic_val(const char* data, int dlen) {
 	assert(data && dlen > 0 && dlen_ > 0);
 
 	for (; dlen_ > 0 && dlen > 0;) {
@@ -181,33 +177,6 @@ int mqtt_subscribe::update_topic_val(const char* data, int dlen) {
 	} 
 
 	nread_ += (unsigned) topic_.size();
-	dlen_   = 0;
-	status_ = MQTT_STAT_TOPIC_QOS;
-
-	return dlen;
-}
-
-int mqtt_subscribe::update_topic_qos(const char* data, int dlen) {
-	assert(data && dlen > 0);
-
-	if (topic_.empty()) {
-		logger_error("no topic got");
-		return -1;
-	}
-
-	char qos = *data++;
-	dlen--;
-	nread_++;
-
-	if (qos < (char) MQTT_QOS0 || qos > (char) MQTT_QOS2) {
-		logger_warn("invalid qos=%d, topic=%s", qos, topic_.c_str());
-		qos = MQTT_QOS0;
-	}
-
-	topics_.push_back(topic_);
-	topic_.clear();
-
-	qoses_.push_back((mqtt_qos_t) qos);
 
 	if (nread_ >= payload_len_) {
 		finished_ = true;

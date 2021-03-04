@@ -4,10 +4,10 @@
 
 namespace acl {
 
-class mqtt_pubrec : public mqtt_ack {
+class mqtt_unsuback : public mqtt_ack {
 public:
-	mqtt_pubrec(void);
-	~mqtt_pubrec(void);
+	mqtt_unsuback(void);
+	~mqtt_unsuback(void);
 };
 
 } // namespace acl

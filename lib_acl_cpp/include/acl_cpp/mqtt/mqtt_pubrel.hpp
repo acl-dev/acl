@@ -1,10 +1,10 @@
 #pragma once
 
-#include "mqtt_puback.hpp"
+#include "mqtt_ack.hpp"
 
 namespace acl {
 
-class mqtt_pubrel : public mqtt_puback {
+class mqtt_pubrel : public mqtt_ack {
 public:
 	mqtt_pubrel(void);
 	~mqtt_pubrel(void);
