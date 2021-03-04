@@ -39,19 +39,17 @@ mqtt_message::mqtt_message(mqtt_type_t type)
 , type_(type)
 , header_finished_(false)
 , hflags_(0)
+, hlen_(0)
 , dlen_(0)
 {
 	assert(type > MQTT_CONNACK && type < MQTT_RESERVED_MAX);
 	if (__constrains[type].id == MQTT_NEED) {
-		hlen_ = 2;
-	} else {
-		hlen_ = 0;
 	}
 }
 
 mqtt_message::~mqtt_message(void) {}
 
-void mqtt_message::set_payload_length(unsigned len) {
+void mqtt_message::set_data_length(unsigned len) {
 	if (len == 0) {
 		return;
 	}
@@ -129,16 +127,14 @@ bool mqtt_message::unpack_short(const char* in, size_t len, unsigned short& out)
 
 static struct {
 	int status;
-	int (mqtt_message::*handler)(const char*, unsigned);
+	int (mqtt_message::*handler)(const char*, int);
 } handlers[] = {
-	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
-	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
-	{ MQTT_STAT_HDR_TYPE,	&mqtt_message::unpack_header_type	},
-	{ MQTT_STAT_HDR_LEN,	&mqtt_message::unpack_header_len	},
+	{ MQTT_STAT_HDR_TYPE,	&mqtt_message::update_header_type	},
+	{ MQTT_STAT_HDR_LEN,	&mqtt_message::update_header_len	},
 };
 
-int mqtt_message::header_update(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
+int mqtt_message::header_update(const char* data, int dlen) {
+	if (data == NULL || dlen <= 0) {
 		logger_error("invalid input");
 		return -1;
 	}
@@ -148,16 +144,14 @@ int mqtt_message::header_update(const char* data, unsigned dlen) {
 		if (ret < 0) {
 			return -1;
 		}
-		dlen = (unsigned) ret;
-		data += ret;
+		data += dlen - ret;
+		dlen  = ret;
 	}
 	return dlen;
 }
 
-int mqtt_message::unpack_header_type(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		return 0;
-	}
+int mqtt_message::update_header_type(const char* data, int dlen) {
+	assert(data && dlen > 0);
 
 	char ch = *data++;
 	char type = (ch &0xff) >> 4;
@@ -173,10 +167,8 @@ int mqtt_message::unpack_header_type(const char* data, unsigned dlen) {
 	return --dlen;
 }
 
-int mqtt_message::unpack_header_len(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		return 0;
-	}
+int mqtt_message::update_header_len(const char* data, int dlen) {
+	assert(data && dlen > 0);
 
 	if (hlen_ >= sizeof(hbuf_)) {
 		logger_error("invalid header len");
@@ -202,8 +194,6 @@ int mqtt_message::unpack_header_len(const char* data, unsigned dlen) {
 		return dlen;
 	}
 
-	status_ = MQTT_STAT_HDR_VAR;
-
 #if 1
 	dlen_ = 0;
 	for (unsigned i = 0; i < hlen_; i++) {
@@ -227,84 +217,8 @@ int mqtt_message::unpack_header_len(const char* data, unsigned dlen) {
 	}
 #endif
 
+	header_finished_ = true;
 	return dlen;
-}
-
-#define	HDR_LEN_LEN	2
-
-int mqtt_message::unpack_string_len(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		return 0;
-	}
-
-	for (; hlen_ < HDR_LEN_LEN && dlen > 0;) {
-		hbuf_[hlen_++] = *data++;
-		dlen--;
-	}
-
-	if (hlen_ < HDR_LEN_LEN) {
-		assert(dlen == 0);
-		return dlen;
-	}
-
-	if (!unpack_short(&hbuf_[0], 2, vlen_)) {
-		logger_error("unpack cid len error");
-		return -1;
-	}
-
-	status_ = MQTT_STAT_STR_VAL;
-	return dlen;
-}
-
-int mqtt_message::unpack_string_val(const char* data, unsigned dlen) {
-	assert(buff_->size() <= (size_t) vlen_);
-
-	size_t i, left = (size_t) vlen_ - buff_->size();
-	for (i = 0; i < left && dlen > 0; i++) {
-		(*buff_) += *data++;
-		dlen--;
-	}
-
-	if (buff_->size() == (size_t) vlen_) {
-		status_ = status_next_;
-		return dlen;
-	}
-	assert(dlen == 0);
-	return dlen;
-}
-
-void mqtt_message::unpack_string_await(string& out, int next) {
-	out.clear();
-	buff_        = &out;
-	hlen_        = 0;
-	status_      = MQTT_STAT_STR_LEN;
-	status_next_ = next;
-}
-
-#define	MESSAGE_I16_LEN	2
-
-int mqtt_message::unpack_i16(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		return 0;
-	}
-
-	for (; hlen_ < MESSAGE_I16_LEN && dlen > 0;) {
-		hbuf_[hlen_++] = *data++;
-		dlen--;
-	}
-
-	if (hlen_ < MESSAGE_I16_LEN) {
-		assert(dlen == 0);
-		return dlen;
-	}
-
-}
-
-void mqtt_message::unpack_short_await(unsigned short& out, int next) {
-	i16_         = &out;
-	hlen_        = 0;
-	status_      = MQTT_STAT_INT16;
-	status_next_ = next;
 }
 
 } //namespace acl

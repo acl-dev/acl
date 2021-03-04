@@ -3,10 +3,14 @@
 
 namespace acl {
 
+enum {
+	MQTT_STAT_HDR_VAR,
+};
+
 mqtt_connack::mqtt_connack(void)
 : mqtt_message(MQTT_CONNACK)
 , finished_(false)
-, hlen_(0)
+, dlen_(0)
 , session_(false)
 , conn_flags_(0)
 , connack_code_(MQTT_CONNACK_OK)
@@ -33,7 +37,7 @@ bool mqtt_connack::to_string(string& out) {
 	bool old_mode = out.get_bin();
 	out.set_bin(true);
 
-	this->set_payload_length(2);
+	this->set_data_length(2);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -49,16 +53,13 @@ bool mqtt_connack::to_string(string& out) {
 
 static struct {
 	int status;
-	int (mqtt_connack::*handler)(const char*, unsigned);
+	int (mqtt_connack::*handler)(const char*, int);
 } handlers[] = {
-	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
-	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
-
-	{ MQTT_STAT_HDR_VAR,	&mqtt_connack::unpack_header_var	},
+	{ MQTT_STAT_HDR_VAR,	&mqtt_connack::update_header_var	},
 };
 
-int mqtt_connack::update(const char* data, unsigned dlen) {
-	if (data == NULL || dlen  == 0) {
+int mqtt_connack::update(const char* data, int dlen) {
+	if (data == NULL || dlen  <= 0) {
 		logger_error("invalid input");
 		return -1;
 	}
@@ -68,37 +69,35 @@ int mqtt_connack::update(const char* data, unsigned dlen) {
 		if (ret < 0) {
 			return -1;
 		}
-		dlen = (unsigned) ret;
-		data += ret;
+		data += dlen - ret;
+		dlen  = ret;
 	}
 	return dlen;
 }
 
 #define	HDR_VAR_LEN	2
 
-int mqtt_connack::unpack_header_var(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		return 0;
-	}
-	assert(sizeof(hbuf_) >= HDR_VAR_LEN);
+int mqtt_connack::update_header_var(const char* data, int dlen) {
+	assert(data && dlen > 0);
+	assert(sizeof(buff_) >= HDR_VAR_LEN);
 
-	if (hlen_ >= HDR_VAR_LEN) {
+	if (dlen_ >= HDR_VAR_LEN) {
 		logger_error("invalid header var");
 		return -1;
 	}
 
-	for (; hlen_ < HDR_VAR_LEN && dlen > 0;) {
-		hbuf_[hlen_++] = *data++;
+	for (; dlen_ < HDR_VAR_LEN && dlen > 0;) {
+		buff_[dlen_++] = *data++;
 		dlen --;
 	}
 
-	if (hlen_ < HDR_VAR_LEN) {
+	if (dlen_ < HDR_VAR_LEN) {
 		assert(dlen == 0);
 		return dlen;
 	}
 
-	conn_flags_   = hbuf_[0];
-	connack_code_ = hbuf_[1];
+	conn_flags_   = buff_[0];
+	connack_code_ = buff_[1];
 
 	finished_ = true;
 	return dlen;

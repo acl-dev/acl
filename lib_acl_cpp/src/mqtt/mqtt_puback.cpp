@@ -3,12 +3,17 @@
 
 namespace acl {
 
+enum {
+	MQTT_STAT_HDR_VAR,
+};
+
 mqtt_puback::mqtt_puback(mqtt_type_t type /* MQTT_PUBACK */)
 : mqtt_message(type)
 , finished_(false)
 , hlen_(0)
 , pkt_id_(0)
 {
+	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
 mqtt_puback::~mqtt_puback(void) {}
@@ -20,7 +25,7 @@ void mqtt_puback::set_pkt_id(unsigned short id) {
 bool mqtt_puback::to_string(string& out) {
 	bool old_mode = out.get_bin();
 
-	this->set_payload_length(2);
+	this->set_data_length(2);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -35,16 +40,13 @@ bool mqtt_puback::to_string(string& out) {
 
 static struct {
 	int status;
-	int (mqtt_puback::*handler)(const char*, unsigned);
+	int (mqtt_puback::*handler)(const char*, int);
 } handlers[] = {
-	{ MQTT_STAT_STR_LEN,	&mqtt_message::unpack_string_len	},
-	{ MQTT_STAT_STR_VAL,	&mqtt_message::unpack_string_val	},
-
-	{ MQTT_STAT_HDR_VAR,	&mqtt_puback::unpack_header_var		},
+	{ MQTT_STAT_HDR_VAR,	&mqtt_puback::update_header_var		},
 };
 
-int mqtt_puback::update(const char* data, unsigned dlen) {
-	if (data == NULL || dlen  == 0) {
+int mqtt_puback::update(const char* data, int dlen) {
+	if (data == NULL || dlen  <= 0) {
 		logger_error("invalid input");
 		return -1;
 	}
@@ -54,18 +56,16 @@ int mqtt_puback::update(const char* data, unsigned dlen) {
 		if (ret < 0) {
 			return -1;
 		}
-		dlen = (unsigned) ret;
-		data += ret;
+		data += dlen - ret;
+		dlen  = ret;
 	}
 	return dlen;
 }
 
 #define	HDR_VAR_LEN	2
 
-int mqtt_puback::unpack_header_var(const char* data, unsigned dlen) {
-	if (data == NULL || dlen == 0) {
-		return 0;
-	}
+int mqtt_puback::update_header_var(const char* data, int dlen) {
+	assert(data && dlen > 0);
 	assert(sizeof(hbuf_) >= HDR_VAR_LEN);
 
 	if (hlen_ >= HDR_VAR_LEN) {

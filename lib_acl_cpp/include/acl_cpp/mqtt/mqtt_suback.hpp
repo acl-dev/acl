@@ -4,16 +4,13 @@
 
 namespace acl {
 
-class mqtt_puback : public mqtt_message {
+class mqtt_suback : public mqtt_message {
 public:
-	mqtt_puback(mqtt_type_t type = MQTT_PUBACK);
-	virtual ~mqtt_puback(void);
+	mqtt_suback(unsigned payload_len = 0);
+	~mqtt_suback(void);
 
 	void set_pkt_id(unsigned short id);
-
-	unsigned short get_pkt_id(void) const {
-		return pkt_id_;
-	}
+	void add_topic_qos(mqtt_qos_t qos);
 
 	bool to_string(string& out);
 
@@ -25,10 +22,15 @@ public:
 
 private:
 	bool finished_;
-	char hbuf_[2];
-	unsigned hlen_;
+	char buff_[2];
+	unsigned dlen_;
 
 	unsigned short pkt_id_;
+	std::vector<mqtt_qos_t> qoses_;
+
+	unsigned payload_len_;
+	unsigned nread_;
+
 };
 
 } // namespace acl

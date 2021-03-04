@@ -6,7 +6,7 @@ namespace acl {
 
 class mqtt_publish : public mqtt_message {
 public:
-	mqtt_publish(bool parse_payload = true);
+	mqtt_publish(unsigned payload_len);
 	~mqtt_publish(void);
 
 	void set_dup(bool yes);
@@ -43,16 +43,22 @@ public:
 
 	bool to_string(string& out);
 
-	int update(const char* data, unsigned dlen);
+	int update(const char* data, int dlen);
 
 	bool is_finished(void) const {
 		return finished_;
 	}
 
+	const string& get_payload(void) const {
+		return payload_;
+	}
+
 public:
-	int unpack_header_var(const char* data, unsigned dlen);
-	int unpack_header_pktid(const char* data, unsigned dlen);
-	int unpack_done(const char* data, unsigned dlen);
+	int update_header_var(const char* data, int dlen);
+	int update_topic_len(const char* data, int dlen);
+	int update_topic_val(const char* data, int dlen);
+	int update_header_pktid(const char* data, int dlen);
+	int update_payload(const char* data, int dlen);
 
 protected:
 	// @override
@@ -60,9 +66,9 @@ protected:
 
 private:
 	bool finished_;
-	bool parse_payload_;
-	char hbuf_[2];
-	unsigned hlen_;
+	char buff_[2];
+	int  dlen_;
+	unsigned hlen_var_;
 
 	bool dup_;
 	mqtt_qos_t qos_;

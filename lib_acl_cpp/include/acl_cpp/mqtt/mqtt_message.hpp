@@ -23,13 +23,6 @@ typedef enum {
 	MQTT_RESERVED_MAX	= 15,
 } mqtt_type_t;
 
-enum {
-	MQTT_STAT_STR_LEN	= 0,
-	MQTT_STAT_STR_VAL	= 1,
-	MQTT_STAT_HDR_VAR	= 2,
-	MQTT_STAT_HDR_END	= 3,
-};
-
 typedef enum {
 	MQTT_NONE,
 	MQTT_NEED,
@@ -63,7 +56,7 @@ public:
 	mqtt_message(mqtt_type_t type);
 	virtual ~mqtt_message(void);
 
-	int header_update(const char* data, unsigned dlen);
+	int header_update(const char* data, int dlen);
 
 	bool header_finish(void) const {
 		return header_finished_;
@@ -73,7 +66,7 @@ public:
 		return type_;
 	}
 
-	unsigned get_payload_length(void) const {
+	unsigned get_data_length(void) const {
 		return dlen_;
 	}
 
@@ -86,7 +79,7 @@ protected:
 		return 0x00;
 	}
 
-	void set_payload_length(unsigned len);
+	void set_data_length(unsigned len);
 
 	bool pack_header(string& out);
 	void pack_add(unsigned char ch, string& out);
@@ -94,7 +87,6 @@ protected:
 	void pack_add(const string& s, string& out);
 
 	bool unpack_short(const char* data, size_t len, unsigned short& out);
-	void unpack_string_await(string& buf, int next);
 
 private:
 	bool header_finished_;
@@ -104,16 +96,9 @@ private:
 	unsigned hlen_;
 	unsigned dlen_;
 
-	int status_next_;
-	string* buff_;
-	unsigned short vlen_;
-
 public:
-	int unpack_string_len(const char* data, unsigned dlen);
-	int unpack_string_val(const char* data, unsigned dlen);
-
-	int unpack_header_type(const char* data, unsigned dlen);
-	int unpack_header_len(const char* data, unsigned dlen);
+	int update_header_type(const char* data, int dlen);
+	int update_header_len(const char* data, int dlen);
 };
 
 } // namespace acl

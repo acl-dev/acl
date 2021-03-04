@@ -31,15 +31,15 @@ public:
 
 	bool to_string(string& out);
 
-	int update(const char* data, unsigned dlen);
+	int update(const char* data, int dlen);
 
 public:
-	int unpack_header_var(const char* data, unsigned dlen);
+	int update_header_var(const char* data, int dlen);
 
 private:
 	bool finished_;
-	char hbuf_[2];
-	unsigned hlen_;
+	char buff_[2];
+	int  dlen_;
 
 	bool session_;
 	unsigned char conn_flags_;

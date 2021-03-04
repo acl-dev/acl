@@ -27,7 +27,7 @@ public:
 
 	bool to_string(string& out);
 
-	int update(const char* data, unsigned dlen);
+	int update(const char* data, int dlen);
 
 	bool is_finished(void) const {
 		return finished_;
@@ -59,8 +59,8 @@ public:
 
 private:
 	bool finished_;
-	char hbuf_[10];
-	unsigned hlen_;
+	char buff_[10];
+	int  dlen_;
 
 	mqtt_qos_t will_qos_;
 	unsigned char conn_flags_;
@@ -73,13 +73,17 @@ private:
 	string will_msg_;
 
 public:
-	int unpack_header_var(const char* data, unsigned dlen);
-	int unpack_cid(const char* data, unsigned dlen);
-	int unpack_username(const char* data, unsigned dlen);
-	int unpack_passwd(const char* data, unsigned dlen);
-	int unpack_will_topic(const char* data, unsigned dlen);
-	int unpack_will_msg(const char* data, unsigned dlen);
-	int unpack_done(const char* data, unsigned dlen);
+	int update_header_var(const char* data, int dlen);
+	int update_cid_len(const char* data, int dlen);
+	int update_cid_val(const char* data, int dlen);
+	int update_username_len(const char* data, int dlen);
+	int update_username_val(const char* data, int dlen);
+	int update_passwd_len(const char* data, int dlen);
+	int update_passwd_val(const char* data, int dlen);
+	int update_will_topic_len(const char* data, int dlen);
+	int update_will_topic_val(const char* data, int dlen);
+	int update_will_msg_len(const char* data, int dlen);
+	int update_will_msg_val(const char* data, int dlen);
 };
 
 } // namespace acl

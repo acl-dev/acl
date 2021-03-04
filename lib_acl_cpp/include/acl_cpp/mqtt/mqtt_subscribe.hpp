@@ -18,11 +18,13 @@ public:
 
 	bool to_string(string& out);
 
-	int update(const char* data, unsigned dlen);
+	int update(const char* data, int dlen);
 
 public:
-	int unpack_header_var(const char* data, unsigned dlen);
-	int unpack_topic_done(const char* data, unsigned dlen);
+	int update_header_var(const char* data, int dlen);
+	int update_topic_len(const char* data, int dlen);
+	int update_topic_val(const char* data, int dlen);
+	int update_topic_qos(const char* data, int dlen);
 
 protected:
 	// @override
@@ -32,7 +34,8 @@ protected:
 
 private:
 	bool finished_;
-	char hbuf_[2];
+	char buff_[2];
+	unsigned dlen_;
 
 	unsigned short          pkt_id_;
 	std::vector<string>     topics_;
