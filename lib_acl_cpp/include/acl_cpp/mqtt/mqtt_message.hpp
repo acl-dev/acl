@@ -70,6 +70,21 @@ public:
 		return dlen_;
 	}
 
+public:
+	virtual bool to_string(string& out) {
+		(void) out;
+		return false;
+	}
+
+	virtual int update(const char* data, int dlen) {
+		(void) data;
+		return dlen;
+	}
+
+	virtual bool is_finished(void) const {
+		return false;
+	}
+
 protected:
 	unsigned status_;
 

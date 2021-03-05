@@ -6,15 +6,23 @@ namespace acl {
 
 class mqtt_unsubscribe : public mqtt_message {
 public:
-	mqtt_unsubscribe(unsigned payload_len = 0);
+	mqtt_unsubscribe(unsigned body_len = 0);
 	~mqtt_unsubscribe(void);
 
 	void set_pkt_id(unsigned short id);
 	void add_topic(const char* topic);
 
+protected:
+	// @override
 	bool to_string(string& out);
 
+	// @override
 	int update(const char* data, int dlen);
+
+	// @override
+	bool is_finished(void) const {
+		return finished_;
+	}
 
 public:
 	int update_header_var(const char* data, int dlen);
@@ -29,7 +37,7 @@ private:
 	unsigned short  pkt_id_;
 	std::vector<string> topics_;
 
-	unsigned payload_len_;
+	unsigned body_len_;
 	unsigned nread_;
 
 	string topic_;

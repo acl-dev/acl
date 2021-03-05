@@ -29,9 +29,17 @@ public:
 		return connack_code_;
 	}
 
+protected:
+	// @override
 	bool to_string(string& out);
 
+	// @override
 	int update(const char* data, int dlen);
+
+	// @override
+	bool is_finished(void) const {
+		return finished_;
+	}
 
 public:
 	int update_header_var(const char* data, int dlen);

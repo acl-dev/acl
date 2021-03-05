@@ -25,14 +25,19 @@ public:
 	void set_will_topic(const char* topic);
 	void set_will_msg(const char* msg);
 
+protected:
+	// @override
 	bool to_string(string& out);
 
+	// @override
 	int update(const char* data, int dlen);
 
+	// @override
 	bool is_finished(void) const {
 		return finished_;
 	}
 
+public:
 	unsigned short get_keep_alive(void) const {
 		return keep_alive_;
 	}

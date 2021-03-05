@@ -7,11 +7,11 @@ enum {
 	MQTT_STAT_HDR_VAR,
 	MQTT_STAT_TOPIC_LEN,
 	MQTT_STAT_TOPIC_VAL,
-	MQTT_STAT_HDR_PKTID,
+	MQTT_STAT_PKTID,
 	MQTT_STAT_PAYLOAD,
 };
 
-mqtt_publish::mqtt_publish(unsigned payload_len /* 0 */)
+mqtt_publish::mqtt_publish(unsigned body_len /* 0 */)
 : mqtt_message(MQTT_PUBLISH)
 , finished_(false)
 , dlen_(0)
@@ -20,7 +20,7 @@ mqtt_publish::mqtt_publish(unsigned payload_len /* 0 */)
 , qos_(MQTT_QOS0)
 , retain_(false)
 , pkt_id_(0)
-, payload_len_(payload_len)
+, payload_len_(body_len)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
@@ -93,7 +93,7 @@ static struct {
 
 	{ MQTT_STAT_TOPIC_LEN,	&mqtt_publish::update_topic_len		},
 	{ MQTT_STAT_TOPIC_VAL,	&mqtt_publish::update_topic_val		},
-	{ MQTT_STAT_HDR_PKTID,	&mqtt_publish::update_header_pktid	},
+	{ MQTT_STAT_PKTID,	&mqtt_publish::update_pktid	},
 	{ MQTT_STAT_PAYLOAD,	&mqtt_publish::update_payload		},
 };
 
@@ -167,14 +167,14 @@ int mqtt_publish::update_topic_val(const char* data, int dlen) {
 	} 
 
 	dlen_   = 0;
-	status_ = MQTT_STAT_HDR_PKTID;
+	status_ = MQTT_STAT_PKTID;
 
 	return dlen;
 }
 
 #define	HDR_PKTID_LEN	2
 
-int mqtt_publish::update_header_pktid(const char* data, int dlen) {
+int mqtt_publish::update_pktid(const char* data, int dlen) {
 	assert(data && dlen > 0);
 	assert(sizeof(buff_) >= HDR_PKTID_LEN);
 

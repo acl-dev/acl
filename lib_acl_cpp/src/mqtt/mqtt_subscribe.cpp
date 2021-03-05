@@ -10,12 +10,12 @@ enum {
 	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_subscribe::mqtt_subscribe(unsigned payload_len /* 0 */)
+mqtt_subscribe::mqtt_subscribe(unsigned body_len /* 0 */)
 : mqtt_message(MQTT_SUBSCRIBE)
 , finished_(false)
 , dlen_(0)
 , pkt_id_(0)
-, payload_len_(payload_len)
+, body_len_(body_len)
 , nread_(0)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
@@ -30,7 +30,7 @@ void mqtt_subscribe::set_pkt_id(unsigned short id) {
 void mqtt_subscribe::add_topic(const char* topic, mqtt_qos_t qos) {
 	topics_.push_back(topic);
 	qoses_.push_back(qos);
-	payload_len_ += strlen(topic) + 1;
+	body_len_ += strlen(topic) + 1;
 }
 
 bool mqtt_subscribe::to_string(string& out) {
@@ -41,8 +41,8 @@ bool mqtt_subscribe::to_string(string& out) {
 
 	bool old_mode = out.get_bin();
 
-	payload_len_ += sizeof(pkt_id_);
-	this->set_data_length(payload_len_);
+	body_len_ += sizeof(pkt_id_);
+	this->set_data_length(body_len_);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -115,7 +115,7 @@ int mqtt_subscribe::update_header_var(const char* data, int dlen) {
 		return -1;
 	}
 
-	if (nread_ >= payload_len_) {
+	if (nread_ >= body_len_) {
 		logger_error("no payload!");
 		return -1;
 	}
@@ -154,9 +154,9 @@ int mqtt_subscribe::update_topic_len(const char* data, int dlen) {
 		return -1;
 	}
 
-	if (nread_ >= payload_len_) {
+	if (nread_ >= body_len_) {
 		logger_error("overflow, nread=%u, payload_len=%u",
-			nread_, payload_len_);
+			nread_, body_len_);
 		return -1;
 	}
 
@@ -209,7 +209,7 @@ int mqtt_subscribe::update_topic_qos(const char* data, int dlen) {
 
 	qoses_.push_back((mqtt_qos_t) qos);
 
-	if (nread_ >= payload_len_) {
+	if (nread_ >= body_len_) {
 		finished_ = true;
 		return dlen;
 	}

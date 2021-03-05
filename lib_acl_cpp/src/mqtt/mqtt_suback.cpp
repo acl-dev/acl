@@ -8,12 +8,12 @@ enum {
 	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_suback::mqtt_suback(unsigned payload_len /* 0 */)
+mqtt_suback::mqtt_suback(unsigned body_len /* 0 */)
 : mqtt_message(MQTT_SUBACK)
 , finished_(false)
 , dlen_(0)
 , pkt_id_(0)
-, payload_len_(payload_len)
+, body_len_(body_len)
 , nread_(0)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
@@ -27,7 +27,7 @@ void mqtt_suback::set_pkt_id(unsigned short id) {
 
 void mqtt_suback::add_topic_qos(mqtt_qos_t qos) {
 	qoses_.push_back(qos);
-	payload_len_ += 1;
+	body_len_ += 1;
 }
 
 bool mqtt_suback::to_string(string& out) {
@@ -38,8 +38,8 @@ bool mqtt_suback::to_string(string& out) {
 
 	bool old_mode = out.get_bin();
 
-	payload_len_ += sizeof(pkt_id_);
-	this->set_data_length(payload_len_);
+	body_len_ += sizeof(pkt_id_);
+	this->set_data_length(body_len_);
 
 	if (!this->pack_header(out)) {
 		out.set_bin(old_mode);
@@ -110,7 +110,7 @@ int mqtt_suback::update_header_var(const char* data, int dlen) {
 		return -1;
 	}
 
-	if (nread_ >= payload_len_) {
+	if (nread_ >= body_len_) {
 		logger_warn("no payload!");
 		finished_ = true;
 		return dlen;
@@ -135,7 +135,7 @@ int mqtt_suback::update_topic_qos(const char* data, int dlen) {
 
 	qoses_.push_back((mqtt_qos_t) qos);
 
-	if (nread_ >= payload_len_) {
+	if (nread_ >= body_len_) {
 		finished_ = true;
 		return dlen;
 	}

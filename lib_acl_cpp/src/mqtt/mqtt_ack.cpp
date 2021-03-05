@@ -87,6 +87,7 @@ int mqtt_ack::update_header_var(const char* data, int dlen) {
 		logger_error("unpack pkt id error");
 		return -1;
 	}
+
 	finished_ = true;
 	return dlen;
 }

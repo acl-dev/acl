@@ -12,9 +12,17 @@ public:
 	void set_pkt_id(unsigned short id);
 	void add_topic_qos(mqtt_qos_t qos);
 
+protected:
+	// @override
 	bool to_string(string& out);
 
+	// @override
 	int update(const char* data, int dlen);
+
+	// @override
+	bool is_finished(void) const {
+		return finished_;
+	}
 
 public:
 	int update_header_var(const char* data, int dlen);
@@ -28,7 +36,7 @@ private:
 	unsigned short pkt_id_;
 	std::vector<mqtt_qos_t> qoses_;
 
-	unsigned payload_len_;
+	unsigned body_len_;
 	unsigned nread_;
 
 };

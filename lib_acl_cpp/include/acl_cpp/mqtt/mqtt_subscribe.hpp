@@ -6,7 +6,7 @@ namespace acl {
 
 class mqtt_subscribe : public mqtt_message {
 public:
-	mqtt_subscribe(unsigned payload_len = 0);
+	mqtt_subscribe(unsigned body_dlen = 0);
 	~mqtt_subscribe(void);
 
 	void set_pkt_id(unsigned short id);
@@ -16,9 +16,17 @@ public:
 		return pkt_id_;
 	}
 
+protected:
+	// @override
 	bool to_string(string& out);
 
+	// @override
 	int update(const char* data, int dlen);
+
+	// @override
+	bool is_finished(void) const {
+		return finished_;
+	}
 
 public:
 	int update_header_var(const char* data, int dlen);
@@ -41,7 +49,7 @@ private:
 	std::vector<string>     topics_;
 	std::vector<mqtt_qos_t> qoses_;
 
-	unsigned payload_len_;
+	unsigned body_len_;
 	unsigned nread_;
 
 	string topic_;
