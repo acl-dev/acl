@@ -19,11 +19,13 @@ public:
 	~mqtt_connect(void);
 
 	void set_keep_alive(unsigned short keep_alive);
+	void set_cid(const char* cid);
 	void set_username(const char* name);
 	void set_passwd(const char* passwd);
 	void set_will_qos(mqtt_qos_t qos);
 	void set_will_topic(const char* topic);
 	void set_will_msg(const char* msg);
+	void set_session_clean(void);
 
 protected:
 	// @override

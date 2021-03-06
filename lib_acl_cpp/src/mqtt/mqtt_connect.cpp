@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_connect.hpp"
+#endif
 
 namespace acl {
 
@@ -18,7 +20,7 @@ enum {
 };
 
 mqtt_connect::mqtt_connect(void)
-: mqtt_message(MQTT_CONNACK)
+: mqtt_message(MQTT_CONNECT)
 , finished_(false)
 , dlen_(0)
 , will_qos_(MQTT_QOS0)
@@ -34,17 +36,21 @@ void mqtt_connect::set_keep_alive(unsigned short keep_alive) {
 	keep_alive_ = keep_alive;
 }
 
+void mqtt_connect::set_cid(const char* cid) {
+	if (cid && *cid) {
+		cid_ = cid;
+	}
+}
+
 void mqtt_connect::set_username(const char* name) {
 	if (name && *name) {
 		username_ = name;
-		conn_flags_ |= 1 << 7;
 	}
 }
 
 void mqtt_connect::set_passwd(const char* passwd) {
 	if (passwd && *passwd) {
 		passwd_ = passwd;
-		conn_flags_ |= 1 << 6;
 	}
 }
 
@@ -80,18 +86,25 @@ void mqtt_connect::set_will_msg(const char* msg) {
 	}
 }
 
+void mqtt_connect::set_session_clean(void) {
+	conn_flags_ |= 1 << 1;
+}
+
 bool mqtt_connect::to_string(string& out) {
 	bool old_mode = out.get_bin();
 	out.set_bin(true);
 
-	unsigned len = 10;
+	unsigned len = 10;  // length of the body's header
+
 	len += 2;
 	len += (unsigned) cid_.size();
 	if (!username_.empty()) {
+		conn_flags_ |= 1 << 7;
 		len += 2;
 		len += (unsigned) username_.size();
 	}
 	if (!passwd_.empty()) {
+		conn_flags_ |= 1 << 6;
 		len += 2;
 		len += (unsigned) passwd_.size();
 	}
@@ -127,17 +140,17 @@ bool mqtt_connect::to_string(string& out) {
 
 	this->pack_add(cid_, out);
 
+	if (!will_topic_.empty() && !will_msg_.empty()) {
+		this->pack_add(will_topic_, out);
+		this->pack_add(will_msg_, out);
+	}
+
 	if (!username_.empty()) {
 		this->pack_add(username_, out);
 	}
 
 	if (!passwd_.empty()) {
 		this->pack_add(passwd_, out);
-	}
-
-	if (!will_topic_.empty() && !will_msg_.empty()) {
-		this->pack_add(will_topic_, out);
-		this->pack_add(will_msg_, out);
 	}
 
 	out.set_bin(old_mode);

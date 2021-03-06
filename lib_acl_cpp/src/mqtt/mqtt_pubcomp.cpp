@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_pubcomp.hpp"
+#endif
 
 namespace acl {
 

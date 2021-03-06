@@ -6,7 +6,7 @@ namespace acl {
 
 class mqtt_publish : public mqtt_message {
 public:
-	mqtt_publish(unsigned body_len = 0);
+	mqtt_publish(unsigned body_len = 0, mqtt_qos_t qos = MQTT_QOS0);
 	~mqtt_publish(void);
 
 	void set_dup(bool yes);

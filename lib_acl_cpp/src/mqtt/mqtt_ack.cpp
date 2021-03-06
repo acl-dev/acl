@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_ack.hpp"
+#endif
 
 namespace acl {
 
@@ -24,6 +26,7 @@ void mqtt_ack::set_pkt_id(unsigned short id) {
 
 bool mqtt_ack::to_string(string& out) {
 	bool old_mode = out.get_bin();
+	out.set_bin(true);
 
 	this->set_data_length(2);
 

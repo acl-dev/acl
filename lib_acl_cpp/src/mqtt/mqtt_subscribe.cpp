@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_subscribe.hpp"
+#endif
 
 namespace acl {
 
@@ -30,7 +32,7 @@ void mqtt_subscribe::set_pkt_id(unsigned short id) {
 void mqtt_subscribe::add_topic(const char* topic, mqtt_qos_t qos) {
 	topics_.push_back(topic);
 	qoses_.push_back(qos);
-	body_len_ += strlen(topic) + 1;
+	body_len_ += 2 + strlen(topic) + 1;
 }
 
 bool mqtt_subscribe::to_string(string& out) {
@@ -40,8 +42,10 @@ bool mqtt_subscribe::to_string(string& out) {
 	}
 
 	bool old_mode = out.get_bin();
+	out.set_bin(true);
 
 	body_len_ += sizeof(pkt_id_);
+
 	this->set_data_length(body_len_);
 
 	if (!this->pack_header(out)) {

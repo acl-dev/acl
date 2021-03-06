@@ -1,11 +1,13 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_message.hpp"
+#endif
 
 namespace acl {
 
 static const struct mqtt_constrain __constrains[] = {
 	{ MQTT_RESERVED_MIN,	0x0,	MQTT_NONE,	MQTT_NONE,	"RESERVED"	},
-	{ MQTT_CONNECT,		0x0,	MQTT_NONE,	MQTT_NONE,	"CONNECT"	},
+	{ MQTT_CONNECT,		0x0,	MQTT_NONE,	MQTT_NEED,	"CONNECT"	},
 	{ MQTT_CONNACK,		0x0,	MQTT_NONE,	MQTT_NONE,	"CONNACK"	},
 	{ MQTT_PUBLISH,		0xf,	MQTT_MAYBE,	MQTT_MAYBE,	"PUBLISH"	},
 	{ MQTT_PUBACK,		0x0,	MQTT_NEED,	MQTT_NONE,	"PUBACK"	},
@@ -42,7 +44,7 @@ mqtt_message::mqtt_message(mqtt_type_t type)
 , hlen_(0)
 , dlen_(0)
 {
-	assert(type > MQTT_CONNACK && type < MQTT_RESERVED_MAX);
+	assert(type >= MQTT_RESERVED_MIN && type < MQTT_RESERVED_MAX);
 	if (__constrains[type].id == MQTT_NEED) {
 	}
 }
@@ -100,15 +102,29 @@ void mqtt_message::pack_add(unsigned char ch, string& out) {
 	out += (unsigned char) ch;
 }
 
+//#define MOSQ_MSB(x) (unsigned char)((x & 0xff00) >> 8)
+//#define MOSQ_LSB(x) (unsigned char)(x & 0x00ff)
+
+#define	MOSQ_MSB(x) (unsigned char) ((x >> 8) & 0xff)
+#define MOSQ_LSB(x) (unsigned char) (x & 0xff)
+
 void mqtt_message::pack_add(unsigned short n, string& out) {
-	out += (unsigned char) (n >> 8) & 0xff;
-	out += (unsigned char) (n & 0xff);
+	unsigned char ch = MOSQ_MSB(n);
+	out.append(&ch, 1);
+
+	ch = MOSQ_LSB(n);
+	out.append(&ch, 1);
 }
 
 void mqtt_message::pack_add(const string& s, string& out) {
 	unsigned short n = (unsigned short) s.size();
-	out += (unsigned char) (n >> 8) & 0xff;
-	out += (unsigned char) (n & 0xff);
+
+	unsigned char ch = MOSQ_MSB(n);
+	out.append(&ch, 1);
+
+	ch = MOSQ_LSB(n);
+	out.append(&ch, 1);
+
 	if (n > 0) {
 		out += s;
 	}

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <vector>
 #include "mqtt_message.hpp"
 
 namespace acl {
@@ -11,6 +12,14 @@ public:
 
 	void set_pkt_id(unsigned short id);
 	void add_topic_qos(mqtt_qos_t qos);
+
+	unsigned short get_pkt_id(void) const {
+		return pkt_id_;
+	}
+
+	const std::vector<mqtt_qos_t>& get_qoses(void) const {
+		return qoses_;
+	}
 
 protected:
 	// @override
@@ -38,7 +47,6 @@ private:
 
 	unsigned body_len_;
 	unsigned nread_;
-
 };
 
 } // namespace acl

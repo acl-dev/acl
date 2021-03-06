@@ -1,4 +1,5 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/mqtt/mqtt_message.hpp"
 #include "acl_cpp/mqtt/mqtt_connect.hpp"
@@ -16,6 +17,7 @@
 #include "acl_cpp/mqtt/mqtt_pingresp.hpp"
 #include "acl_cpp/mqtt/mqtt_disconnect.hpp"
 #include "acl_cpp/mqtt/mqtt_client.hpp"
+#endif
 
 namespace acl {
 
@@ -43,6 +45,11 @@ bool mqtt_client::open(void) {
 }
 
 bool mqtt_client::send(mqtt_message& message) {
+	if (!open()) {
+		logger_error("connect server error: %s", last_serror());
+		return false;
+	}
+
 	string buff;
 	if (!message.to_string(buff)) {
 		logger_error("build mqtt message error");
@@ -64,6 +71,7 @@ bool mqtt_client::send(mqtt_message& message) {
 		return false;
 	}
 
+	printf(">>>>send ok, buff size=%zd\r\n", buff.size());
 	return true;
 }
 
@@ -95,6 +103,8 @@ bool mqtt_client::read_header(mqtt_message& header) {
 		logger_error("read header type error: %s", last_serror());
 		return false;
 	}
+	printf(">>>read type=%d\n", ch);
+
 	if (header.header_update(&ch, 1) != 0) {
 		logger_error("invalid header type=%d", (int) ch);
 		return false;
@@ -137,6 +147,7 @@ bool mqtt_client::read_body(const mqtt_message& header, mqtt_message& body) {
 			logger_error("read body error: %s", last_serror());
 			return false;
 		}
+
 		len -= n;
 
 		n = body.update(buf, (int) size);

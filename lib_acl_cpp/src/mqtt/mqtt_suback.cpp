@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_suback.hpp"
+#endif
 
 namespace acl {
 
@@ -37,6 +39,7 @@ bool mqtt_suback::to_string(string& out) {
 	}
 
 	bool old_mode = out.get_bin();
+	out.set_bin(true);
 
 	body_len_ += sizeof(pkt_id_);
 	this->set_data_length(body_len_);

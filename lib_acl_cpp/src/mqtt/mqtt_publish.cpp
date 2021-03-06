@@ -1,5 +1,7 @@
 #include "acl_stdafx.hpp"
+#ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/mqtt/mqtt_publish.hpp"
+#endif
 
 namespace acl {
 
@@ -11,13 +13,13 @@ enum {
 	MQTT_STAT_PAYLOAD,
 };
 
-mqtt_publish::mqtt_publish(unsigned body_len /* 0 */)
+mqtt_publish::mqtt_publish(unsigned body_len /* 0 */, mqtt_qos_t qos /* MQTT_QOS0 */)
 : mqtt_message(MQTT_PUBLISH)
 , finished_(false)
 , dlen_(0)
 , hlen_var_(0)
 , dup_(false)
-, qos_(MQTT_QOS0)
+, qos_(qos)
 , retain_(false)
 , pkt_id_(0)
 , payload_len_(body_len)
@@ -155,8 +157,10 @@ int mqtt_publish::update_topic_len(const char* data, int dlen) {
 int mqtt_publish::update_topic_val(const char* data, int dlen) {
 	assert(data && dlen > 0 && dlen_ > 0);
 
+	char ch;
 	for (; dlen_ > 0 && dlen > 0;) {
-		topic_ += data++;
+		ch = *data++;
+		topic_ += ch;
 		--dlen_;
 		--dlen;
 	}
@@ -167,7 +171,12 @@ int mqtt_publish::update_topic_val(const char* data, int dlen) {
 	} 
 
 	dlen_   = 0;
-	status_ = MQTT_STAT_PKTID;
+	if (qos_ == MQTT_QOS1 || qos_ == MQTT_QOS2) {
+		status_ = MQTT_STAT_PKTID;
+	} else {
+		payload_len_ -= hlen_var_;
+		status_ = MQTT_STAT_PAYLOAD;
+	}
 
 	return dlen;
 }
@@ -225,9 +234,11 @@ int mqtt_publish::update_payload(const char* data, int dlen) {
 	assert(data && dlen > 0);
 	assert((size_t) payload_len_ > payload_.size());
 
+	char ch;
 	size_t i, left = (size_t) payload_len_ - payload_.size();
 	for (i = 0; i < left && dlen > 0; i++) {
-		payload_ += *data++;
+		ch = *data++;
+		payload_ += ch;
 		dlen--;
 	}
 

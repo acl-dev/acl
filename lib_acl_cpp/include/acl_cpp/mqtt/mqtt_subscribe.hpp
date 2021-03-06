@@ -16,6 +16,14 @@ public:
 		return pkt_id_;
 	}
 
+	const std::vector<string>& get_topics(void) const {
+		return topics_;
+	}
+
+	const std::vector<mqtt_qos_t>& get_qoses(void) const {
+		return qoses_;
+	}
+
 protected:
 	// @override
 	bool to_string(string& out);
