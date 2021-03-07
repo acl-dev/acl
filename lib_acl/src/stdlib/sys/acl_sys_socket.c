@@ -237,6 +237,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 	return n;
 }
 
+# if 0  /* defined in StdAfx.h */
 /* for vc2003 */
 
 #if _MSC_VER <= 1310
@@ -261,6 +262,8 @@ typedef struct pollfd {
 	short  events;
 	short  revents;
 } WSAPOLLFD, *PWSAPOLLFD, *LPWSAPOLLFD;
+
+#endif
 
 int WSAAPI WSAPoll(LPWSAPOLLFD fds, ULONG nfds, INT timeout) {
 	int ret;

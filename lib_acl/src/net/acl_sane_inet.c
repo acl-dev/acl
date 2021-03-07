@@ -216,6 +216,8 @@ size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size)
 		char   ip[IPLEN], ifname[IF_NAMESIZE], *ptr;
 		struct sockaddr_in6 *in6 = (struct sockaddr_in6*) sa;
 
+		(void) ptr;
+
 		if (!inet_ntop(sa->sa_family, &in6->sin6_addr, ip, IPLEN)) {
 			return 0;
 		}
