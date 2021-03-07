@@ -598,6 +598,23 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stream\stdin_stream.cpp" />
     <ClCompile Include="src\stream\stdout_stream.cpp" />
     <ClCompile Include="src\stream\stream.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_ack.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_client.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_connack.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_connect.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_disconnect.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_message.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pingreq.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pingresp.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_puback.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pubcomp.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_publish.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pubrec.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pubrel.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_suback.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_subscribe.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_unsuback.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_unsubscribe.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\acl_cpp\acl_cpp_define.hpp" />
@@ -800,6 +817,23 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\stdout_stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connack.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connect.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_disconnect.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_message.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingreq.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingresp.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_puback.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubcomp.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_publish.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrec.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrel.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_suback.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_subscribe.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsuback.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsubscribe.hpp" />
     <ClInclude Include="resource_vc2015.h" />
     <ClInclude Include="src\acl_stdafx.hpp" />
     <ClInclude Include="src\connpool\check_rpc.hpp" />

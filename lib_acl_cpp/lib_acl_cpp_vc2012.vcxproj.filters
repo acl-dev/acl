@@ -619,6 +619,57 @@
     <ClCompile Include="src\db\sqlite_cursor.cpp">
       <Filter>Source Files\db</Filter>
     </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_ack.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_client.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_connack.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_connect.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_disconnect.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_message.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pingreq.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pingresp.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_puback.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pubcomp.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_publish.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pubrec.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pubrel.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_suback.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_subscribe.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_unsuback.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_unsubscribe.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\acl_stdafx.hpp">
@@ -1281,6 +1332,57 @@
     <ClInclude Include="include\acl_cpp\db\sqlite_cursor.hpp">
       <Filter>Header Files\db</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connack.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connect.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_disconnect.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_message.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingreq.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingresp.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_puback.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubcomp.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_publish.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrec.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrel.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_suback.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_subscribe.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsuback.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsubscribe.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -1343,6 +1445,9 @@
     <Filter Include="Header Files\disque">
       <UniqueIdentifier>{b1614f78-4c4d-476b-a687-30b643e8eae8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\net">
+      <UniqueIdentifier>{0018e60b-eb12-4931-bacc-sfdfsfsdf5f6}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Source Files">
       <UniqueIdentifier>{b32c2c23-ff56-49c9-b06e-111bf76f87d6}</UniqueIdentifier>
     </Filter>
@@ -1360,6 +1465,12 @@
     </Filter>
     <Filter Include="Source Files\mime\internal">
       <UniqueIdentifier>{7602c164-8abb-437a-9d62-2ef30121b955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mqtt">
+      <UniqueIdentifier>{d7d5c4e2-0bc4-4bb0-8a3f-fsdsfsfsfsd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mqtt">
+      <UniqueIdentifier>{b1614f78-4c4d-476b-a687-fsdfsfsfsfsf}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\master">
       <UniqueIdentifier>{d1887d6c-21ec-475b-bd00-1cdcc9a7638c}</UniqueIdentifier>

@@ -1031,6 +1031,62 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\serialize\gsoner.cpp">
 				</File>
 			</Filter>
+			<Filter
+				Name="mqtt"
+				Filter="">
+				<File
+					RelativePath=".\src\mqtt\mqtt_ack.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_client.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_connack.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_connect.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_disconnect.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_message.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_pingreq.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_pingresp.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_puback.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_pubcomp.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_publish.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_pubrec.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_pubrel.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_suback.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_subscribe.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_unsuback.cpp">
+				</File>
+				<File
+					RelativePath=".\src\mqtt\mqtt_unsubscribe.cpp">
+				</File>
+			</Filter>
+
 		</Filter>
 		<Filter
 			Name="Í·ÎÄ¼þ"
@@ -1373,7 +1429,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\http\http_request_manager.hpp">
 				</File>
 				<File
-					RelativePath=".\include\acl_cpp\http\http_request_pool.h">
+					RelativePath=".\include\acl_cpp\http\http_request_pool.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\http\http_response.hpp">
@@ -1710,6 +1766,61 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\acl_cpp\serialize\gsoner.hpp">
+				</File>
+			</Filter>
+			<Filter
+				Name="mqtt"
+				Filter="">
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_ack.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_client.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_connack.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_connect.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_disconnect.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_message.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_pingreq.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_pingresp.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_puback.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_pubcomp.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_publish.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_pubrec.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_pubrel.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_suback.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_subscribe.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_unsuback.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_unsubscribe.hpp">
 				</File>
 			</Filter>
 		</Filter>
