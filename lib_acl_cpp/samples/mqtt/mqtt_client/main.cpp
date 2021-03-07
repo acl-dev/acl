@@ -115,7 +115,6 @@ int main(int argc, char* argv[]) {
 
 	acl::mqtt_connect message;
 	message.set_cid("client-id-test-xxx");
-	//message.set_cid("auto-E0858AC4-DB2D-560E-C200-1FC0D2DF1131");
 	message.set_username("user-zsx");
 	//message.set_passwd("pass");
 #if 0
@@ -139,8 +138,8 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 
-		printf("-----------------------------------------------\r\n");
-		printf("read one message\r\n");
+		//printf("-----------------------------------------------\r\n");
+		//printf("read one message\r\n");
 		if (!handle_message(conn, *res)) {
 			delete res;
 			break;

@@ -52,15 +52,7 @@ mqtt_message::mqtt_message(mqtt_type_t type)
 mqtt_message::~mqtt_message(void) {}
 
 void mqtt_message::set_data_length(unsigned len) {
-	if (len == 0) {
-		return;
-	}
-
-	if (__constrains[type_].payload != MQTT_NEED) {
-		logger_error("%s: needn't payload", mqtt_type_desc(type_));
-	} else {
-		dlen_ = len;
-	}
+	dlen_ = len;
 }
 
 bool mqtt_message::pack_header(string& out) {

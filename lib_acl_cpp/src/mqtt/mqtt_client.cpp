@@ -71,7 +71,6 @@ bool mqtt_client::send(mqtt_message& message) {
 		return false;
 	}
 
-	printf(">>>>send ok, buff size=%zd\r\n", buff.size());
 	return true;
 }
 
@@ -103,7 +102,6 @@ bool mqtt_client::read_header(mqtt_message& header) {
 		logger_error("read header type error: %s", last_serror());
 		return false;
 	}
-	printf(">>>read type=%d\n", ch);
 
 	if (header.header_update(&ch, 1) != 0) {
 		logger_error("invalid header type=%d", (int) ch);

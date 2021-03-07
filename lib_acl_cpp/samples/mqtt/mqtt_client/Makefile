@@ -1,3 +1,3 @@
 base_path = ../../..
-PROG = mqtt_connect
+PROG = mqtt_client
 include ../../Makefile.in

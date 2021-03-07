@@ -34,7 +34,16 @@ void mqtt_publish::set_dup(bool yes) {
 }
 
 void mqtt_publish::set_qos(mqtt_qos_t qos) {
-	qos_ = qos;
+	switch (qos) {
+	case MQTT_QOS0:
+	case MQTT_QOS1:
+	case MQTT_QOS2:
+		qos_ = qos;
+		break;
+	default:
+		logger_error("invalid qos=%d", (int) qos);
+		break;
+	}
 }
 
 void mqtt_publish::set_retain(bool yes) {
@@ -57,7 +66,20 @@ void mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
 }
 
 unsigned char mqtt_publish::get_header_flags(void) const {
-	unsigned char flags = qos_;
+	unsigned char flags = 0;
+	switch (qos_) {
+	case MQTT_QOS0:
+		break;
+	case MQTT_QOS1:
+		flags |= 0x02;
+		break;
+	case MQTT_QOS2:
+		flags |= 0x04;
+		break;
+	default:
+		break;
+	}
+
 	if (qos_ != MQTT_QOS0 && dup_) {
 		flags |= 0x8;
 	}
@@ -68,7 +90,11 @@ bool mqtt_publish::to_string(string& out) {
 	bool old_mode = out.get_bin();
 	out.set_bin(true);
 
-	unsigned len = 2 + (unsigned) topic_.size() + 2 + payload_len_;
+	unsigned len = (unsigned) topic_.size() + 2 + payload_len_;
+	if (qos_ != MQTT_QOS0) {
+		len += 2;
+	}
+
 	this->set_data_length(len);
 
 	if (!this->pack_header(out)) {
@@ -77,7 +103,10 @@ bool mqtt_publish::to_string(string& out) {
 	}
 
 	this->pack_add(topic_, out);
-	this->pack_add((unsigned short) pkt_id_, out);
+
+	if (qos_ != MQTT_QOS0) {
+		this->pack_add((unsigned short) pkt_id_, out);
+	}
 
 	if (payload_len_ > 0 && !payload_.empty()) {
 		out.append(payload_, payload_len_);
@@ -171,7 +200,7 @@ int mqtt_publish::update_topic_val(const char* data, int dlen) {
 	} 
 
 	dlen_   = 0;
-	if (qos_ == MQTT_QOS1 || qos_ == MQTT_QOS2) {
+	if (qos_ != MQTT_QOS0) {
 		status_ = MQTT_STAT_PKTID;
 	} else {
 		payload_len_ -= hlen_var_;
