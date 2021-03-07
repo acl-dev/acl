@@ -32,7 +32,7 @@ void mqtt_subscribe::set_pkt_id(unsigned short id) {
 void mqtt_subscribe::add_topic(const char* topic, mqtt_qos_t qos) {
 	topics_.push_back(topic);
 	qoses_.push_back(qos);
-	body_len_ += 2 + strlen(topic) + 1;
+	body_len_ += 2 + (unsigned) strlen(topic) + 1;
 }
 
 bool mqtt_subscribe::to_string(string& out) {

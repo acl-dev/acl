@@ -30,7 +30,7 @@ void mqtt_unsubscribe::set_pkt_id(unsigned short id) {
 
 void mqtt_unsubscribe::add_topic(const char* topic) {
 	topics_.push_back(topic);
-	body_len_ += strlen(topic);
+	body_len_ += (unsigned) strlen(topic);
 }
 
 bool mqtt_unsubscribe::to_string(string& out) {
