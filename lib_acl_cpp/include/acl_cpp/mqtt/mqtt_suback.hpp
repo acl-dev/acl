@@ -5,7 +5,7 @@
 
 namespace acl {
 
-class mqtt_suback : public mqtt_message {
+class ACL_CPP_API mqtt_suback : public mqtt_message {
 public:
 	mqtt_suback(unsigned payload_len = 0);
 	~mqtt_suback(void);

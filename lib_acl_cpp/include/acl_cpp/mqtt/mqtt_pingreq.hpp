@@ -4,7 +4,7 @@
 
 namespace acl {
 
-class mqtt_pingreq : public mqtt_message {
+class ACL_CPP_API mqtt_pingreq : public mqtt_message {
 public:
 	mqtt_pingreq(void);
 	~mqtt_pingreq(void);

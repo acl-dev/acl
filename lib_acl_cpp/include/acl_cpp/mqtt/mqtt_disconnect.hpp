@@ -4,7 +4,7 @@
 
 namespace acl {
 
-class mqtt_disconnect : public mqtt_message {
+class ACL_CPP_API mqtt_disconnect : public mqtt_message {
 public:
 	mqtt_disconnect(void);
 	~mqtt_disconnect(void);

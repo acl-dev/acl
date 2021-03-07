@@ -13,7 +13,7 @@ enum {
 	MQTT_CONNACK_ERR_DENY = 0x05,
 };
 
-class mqtt_connack : public mqtt_message {
+class ACL_CPP_API mqtt_connack : public mqtt_message {
 public:
 	mqtt_connack(void);
 	~mqtt_connack(void);

@@ -8,7 +8,7 @@ namespace acl {
 
 class mqtt_message;
 
-class mqtt_client : public connect_client {
+class ACL_CPP_API mqtt_client : public connect_client {
 public:
 	mqtt_client(const char* addr, int conn_timeout = 10, int rw_timeout = 10);
 	~mqtt_client(void);

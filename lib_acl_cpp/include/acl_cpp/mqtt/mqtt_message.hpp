@@ -51,7 +51,7 @@ struct mqtt_header {
 
 const char* mqtt_type_desc(mqtt_type_t type);
 
-class mqtt_message {
+class ACL_CPP_API mqtt_message {
 public:
 	mqtt_message(mqtt_type_t type);
 	virtual ~mqtt_message(void);

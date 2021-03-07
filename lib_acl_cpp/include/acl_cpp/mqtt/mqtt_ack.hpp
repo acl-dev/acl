@@ -4,7 +4,7 @@
 
 namespace acl {
 
-class mqtt_ack : public mqtt_message {
+class ACL_CPP_API mqtt_ack : public mqtt_message {
 public:
 	mqtt_ack(mqtt_type_t type);
 	virtual ~mqtt_ack(void);

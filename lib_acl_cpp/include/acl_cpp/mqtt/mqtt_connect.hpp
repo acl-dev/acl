@@ -13,7 +13,7 @@ typedef enum {
 	CONNECT_NO_AUTHORITY	= 0x05,
 } mqtt_conn_status_t;
 
-class mqtt_connect : public mqtt_message {
+class ACL_CPP_API mqtt_connect : public mqtt_message {
 public:
 	mqtt_connect(void);
 	~mqtt_connect(void);

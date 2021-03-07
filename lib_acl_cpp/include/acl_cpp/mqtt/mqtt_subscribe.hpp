@@ -4,7 +4,7 @@
 
 namespace acl {
 
-class mqtt_subscribe : public mqtt_message {
+class ACL_CPP_API mqtt_subscribe : public mqtt_message {
 public:
 	mqtt_subscribe(unsigned body_dlen = 0);
 	~mqtt_subscribe(void);
