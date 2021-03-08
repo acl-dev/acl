@@ -30,6 +30,10 @@ public:
 		return header_;
 	}
 
+	const mqtt_header& get_header(void) const {
+		return header_;
+	}
+
 protected:
 	mqtt_header header_;
 

@@ -18,9 +18,6 @@ mqtt_publish::mqtt_publish(void)
 , finished_(false)
 , dlen_(0)
 , hlen_var_(0)
-, dup_(false)
-, qos_(MQTT_QOS0)
-, retain_(false)
 , pkt_id_(0)
 , payload_len_(0)
 {
@@ -28,13 +25,10 @@ mqtt_publish::mqtt_publish(void)
 }
 
 mqtt_publish::mqtt_publish(const mqtt_header& header)
-: mqtt_message(MQTT_PUBLISH)
+: mqtt_message(header)
 , finished_(false)
 , dlen_(0)
 , hlen_var_(0)
-, dup_(false)
-, qos_(MQTT_QOS0)
-, retain_(false)
 , pkt_id_(0)
 {
 	status_      = MQTT_STAT_HDR_VAR;  // just for update()
@@ -42,27 +36,6 @@ mqtt_publish::mqtt_publish(const mqtt_header& header)
 }
 
 mqtt_publish::~mqtt_publish(void) {}
-
-void mqtt_publish::set_dup(bool yes) {
-	dup_ = yes;
-}
-
-void mqtt_publish::set_qos(mqtt_qos_t qos) {
-	switch (qos) {
-	case MQTT_QOS0:
-	case MQTT_QOS1:
-	case MQTT_QOS2:
-		qos_ = qos;
-		break;
-	default:
-		logger_error("invalid qos=%d", (int) qos);
-		break;
-	}
-}
-
-void mqtt_publish::set_retain(bool yes) {
-	retain_ = yes;
-}
 
 void mqtt_publish::set_topic(const char* topic) {
 	topic_ = topic;
@@ -79,35 +52,15 @@ void mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
 	}
 }
 
-unsigned char mqtt_publish::get_header_flags(void) const {
-	unsigned char flags = 0;
-	switch (qos_) {
-	case MQTT_QOS0:
-		break;
-	case MQTT_QOS1:
-		flags |= 0x02;
-		break;
-	case MQTT_QOS2:
-		flags |= 0x04;
-		break;
-	default:
-		break;
-	}
-
-	if (qos_ != MQTT_QOS0 && dup_) {
-		flags |= 0x8;
-	}
-	return flags;
-}
-
 bool mqtt_publish::to_string(string& out) {
 	unsigned len = (unsigned) topic_.size() + 2 + payload_len_;
-	if (qos_ != MQTT_QOS0) {
+	mqtt_qos_t qos = this->get_header().get_qos();
+	if (qos != MQTT_QOS0) {
 		len += 2;
 	}
 
 	mqtt_header& header = this->get_header();
-	header.set_header_flags(get_header_flags());
+	//header.set_header_flags(get_header_flags());
 	header.set_remaing_length(len);
 
 	if (!header.build_header(out)) {
@@ -116,7 +69,7 @@ bool mqtt_publish::to_string(string& out) {
 
 	this->pack_add(topic_, out);
 
-	if (qos_ != MQTT_QOS0) {
+	if (qos != MQTT_QOS0) {
 		this->pack_add((unsigned short) pkt_id_, out);
 	}
 
@@ -211,7 +164,7 @@ int mqtt_publish::update_topic_val(const char* data, int dlen) {
 	} 
 
 	dlen_   = 0;
-	if (qos_ != MQTT_QOS0) {
+	if (this->get_header().get_qos() != MQTT_QOS0) {
 		status_ = MQTT_STAT_PKTID;
 	} else {
 		payload_len_ -= hlen_var_;

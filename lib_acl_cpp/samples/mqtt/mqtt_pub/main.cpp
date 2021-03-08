@@ -15,9 +15,10 @@ static bool handle_puback(acl::mqtt_client&, const acl::mqtt_message&) {
 }
 
 static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
+	++id;  // packet id must > 0
 	acl::mqtt_publish publish;
 
-	publish.set_qos(acl::MQTT_QOS0);
+	publish.get_header().set_qos(acl::MQTT_QOS1);
 	publish.set_pkt_id(id);
 
 	const char* topic = "test/topic";
@@ -32,7 +33,7 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
 		return false;
 	}
 
-	if (publish.get_qos() == acl::MQTT_QOS0) {
+	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
 	}
 
@@ -54,6 +55,7 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
 		delete res;
 		return false;
 	}
+	printf("%s => puback ok\r\n", __FUNCTION__);
 
 	delete res;
 	return true;

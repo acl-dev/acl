@@ -3,6 +3,8 @@
 #include <getopt.h>
 #include "acl_cpp/lib_acl.hpp"
 
+static std::vector<acl::string> __topics;
+
 static bool handle_connack(acl::mqtt_client& conn,
 		const acl::mqtt_message& message) {
 	const acl::mqtt_connack& connack = (const acl::mqtt_connack&) message;
@@ -12,14 +14,18 @@ static bool handle_connack(acl::mqtt_client& conn,
 
 	subscribe.set_pkt_id(100);
 
-	const char* topic = "test/topic";
-	subscribe.add_topic(topic, acl::MQTT_QOS1);
+	for (std::vector<acl::string>::const_iterator cit = __topics.begin();
+		  cit != __topics.end(); ++cit) {
+		subscribe.add_topic(*cit, acl::MQTT_QOS1);
+		printf("  %s: add topic -> %s\r\n", __FUNCTION__, (*cit).c_str());
+	}
+
 	if (conn.send(subscribe)) {
-		printf("send subscribe ok, topic==%s\r\n", topic);
+		printf("send subscribe ok\r\n");
 		return true;
 	}
 
-	printf("send subscribe error, topic=%s\r\n", topic);
+	printf("send subscribe error\r\n");
 	return false;
 }
 
@@ -45,12 +51,26 @@ static bool handle_suback(acl::mqtt_client& conn,
 	return true;
 }
 
-static bool handle_publish(const acl::mqtt_message& message) {
+static bool handle_publish(acl::mqtt_client& conn,
+		const acl::mqtt_message& message) {
 	const acl::mqtt_publish& publish = (const acl::mqtt_publish&) message;
 	const acl::string& payload = publish.get_payload();
 	printf("topic: %s, qos: %d, pkt_id: %d, payload: %s\r\n",
-		publish.get_topic(), (int) publish.get_qos(),
+		publish.get_topic(), (int) publish.get_header().get_qos(),
 		publish.get_pkt_id(), payload.c_str());
+
+	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
+		return true;
+	}
+
+	acl::mqtt_puback puback;
+	puback.set_pkt_id(publish.get_pkt_id());
+	if (!conn.send(puback)) {
+		printf("%s => puback error, pkt_id=%d\r\n",
+			__FUNCTION__, puback.get_pkt_id());
+		return false;
+	}
+	printf("%s => puback ok, pkt_id=%d\r\n", __FUNCTION__, puback.get_pkt_id());
 	return true;
 }
 
@@ -87,7 +107,7 @@ static bool handle_message(acl::mqtt_client& conn, acl::mqtt_message& message) {
 	case acl::MQTT_SUBACK:
 		return handle_suback(conn, message);
 	case acl::MQTT_PUBLISH:
-		return handle_publish(message);
+		return handle_publish(conn, message);
 	default:
 		printf("unknown type=%d\r\n", (int) type);
 		return false;
@@ -121,6 +141,16 @@ int main(int argc, char* argv[]) {
 	}
 
 	acl::log::stdout_open(true);
+
+	printf("optind: %d, argc: %d\n", optind, argc);
+	for (int i = optind; i < argc; i++) {
+		printf("add one topic: %s\r\n", argv[i]);
+		__topics.push_back(argv[i]);
+	}
+
+	if (__topics.empty()) {
+		__topics.push_back("test/topic");
+	}
 
 	acl::mqtt_connect message;
 	message.set_cid("client-id-test-xxx");
