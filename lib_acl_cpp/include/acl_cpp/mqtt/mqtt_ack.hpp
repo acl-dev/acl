@@ -7,6 +7,7 @@ namespace acl {
 class ACL_CPP_API mqtt_ack : public mqtt_message {
 public:
 	mqtt_ack(mqtt_type_t type);
+	mqtt_ack(const mqtt_header& header);
 	virtual ~mqtt_ack(void);
 
 	void set_pkt_id(unsigned short id);
@@ -31,6 +32,7 @@ public:
 	int update_header_var(const char* data, int dlen);
 
 private:
+	unsigned status_;
 	bool finished_;
 	char hbuf_[2];
 	unsigned hlen_;

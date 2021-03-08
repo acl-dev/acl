@@ -6,6 +6,7 @@
 
 namespace acl {
 
+class mqtt_header;
 class mqtt_message;
 
 class ACL_CPP_API mqtt_client : public connect_client {
@@ -18,9 +19,9 @@ public:
 	mqtt_message* get_message(void);
 
 public:
-	bool read_header(mqtt_message& header);
-	bool read_body(const mqtt_message& header, mqtt_message& body);
-	mqtt_message* create_body(const mqtt_message& header);
+	bool read_header(mqtt_header& header);
+	bool read_message(const mqtt_header& header, mqtt_message& body);
+	mqtt_message* create_message(const mqtt_header& header);
 
 protected:
 	// @override

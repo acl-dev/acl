@@ -16,16 +16,8 @@ typedef enum {
 class ACL_CPP_API mqtt_connect : public mqtt_message {
 public:
 	mqtt_connect(void);
+	mqtt_connect(const mqtt_header& header);
 	~mqtt_connect(void);
-
-	void set_keep_alive(unsigned short keep_alive);
-	void set_cid(const char* cid);
-	void set_username(const char* name);
-	void set_passwd(const char* passwd);
-	void set_will_qos(mqtt_qos_t qos);
-	void set_will_topic(const char* topic);
-	void set_will_msg(const char* msg);
-	void set_session_clean(void);
 
 protected:
 	// @override
@@ -40,8 +32,21 @@ protected:
 	}
 
 public:
+	void set_keep_alive(unsigned short keep_alive);
+	void set_cid(const char* cid);
+	void set_username(const char* name);
+	void set_passwd(const char* passwd);
+	void set_will_qos(mqtt_qos_t qos);
+	void set_will_topic(const char* topic);
+	void set_will_msg(const char* msg);
+	void clean_session(void);
+
 	unsigned short get_keep_alive(void) const {
 		return keep_alive_;
+	}
+
+	const char* get_cid(void) const {
+		return cid_.empty() ? NULL : cid_.c_str();;
 	}
 
 	const char* get_username(void) const {
@@ -64,13 +69,16 @@ public:
 		return will_msg_.empty() ? NULL : will_msg_.c_str();
 	}
 
+	bool has_session(void) const;
+
 private:
+	unsigned status_;
 	bool finished_;
 	char buff_[10];
 	int  dlen_;
 
 	mqtt_qos_t will_qos_;
-	unsigned char conn_flags_;
+	unsigned char  conn_flags_;
 	unsigned short keep_alive_;
 
 	string cid_;

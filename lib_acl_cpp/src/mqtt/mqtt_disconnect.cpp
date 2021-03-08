@@ -5,25 +5,25 @@
 
 namespace acl {
 
-mqtt_disconnect::mqtt_disconnect()
+mqtt_disconnect::mqtt_disconnect(void)
 : mqtt_message(MQTT_DISCONNECT)
+{
+}
+
+mqtt_disconnect::mqtt_disconnect(const mqtt_header& header)
+: mqtt_message(header)
 {
 }
 
 mqtt_disconnect::~mqtt_disconnect(void) {}
 
 bool mqtt_disconnect::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(0);
 
-	this->set_data_length(0);
-
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
-
-	out.set_bin(old_mode);
 	return true;
 }
 

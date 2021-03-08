@@ -12,15 +12,26 @@ enum {
 	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_subscribe::mqtt_subscribe(unsigned body_len /* 0 */)
+mqtt_subscribe::mqtt_subscribe(void)
 : mqtt_message(MQTT_SUBSCRIBE)
 , finished_(false)
 , dlen_(0)
 , pkt_id_(0)
-, body_len_(body_len)
+, body_len_(0)
 , nread_(0)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
+}
+
+mqtt_subscribe::mqtt_subscribe(const mqtt_header& header)
+: mqtt_message(MQTT_SUBSCRIBE)
+, finished_(false)
+, dlen_(0)
+, pkt_id_(0)
+, nread_(0)
+{
+	status_   = MQTT_STAT_HDR_VAR; /* just for update */
+	body_len_ = header.get_remaining_length();
 }
 
 mqtt_subscribe::~mqtt_subscribe(void) {}
@@ -41,15 +52,14 @@ bool mqtt_subscribe::to_string(string& out) {
 		return false;
 	}
 
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
-
 	body_len_ += sizeof(pkt_id_);
 
-	this->set_data_length(body_len_);
+	mqtt_header& header = this->get_header();
 
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	header.set_header_flags(0x02)
+		.set_remaing_length(body_len_);
+
+	if (!header.build_header(out)) {
 		return false;
 	}
 
@@ -61,7 +71,6 @@ bool mqtt_subscribe::to_string(string& out) {
 		this->pack_add((unsigned char) qoses_[i], out);
 	}
 
-	out.set_bin(old_mode);
 	return true;
 }
 

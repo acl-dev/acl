@@ -20,6 +20,17 @@ mqtt_connack::mqtt_connack(void)
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
+mqtt_connack::mqtt_connack(const mqtt_header& header)
+: mqtt_message(header)
+, finished_(false)
+, dlen_(0)
+, session_(false)
+, conn_flags_(0)
+, connack_code_(MQTT_CONNACK_OK)
+{
+	status_ = MQTT_STAT_HDR_VAR;  // just for update()
+}
+
 mqtt_connack::~mqtt_connack(void) {}
 
 void mqtt_connack::set_session(bool on) {
@@ -36,20 +47,15 @@ void mqtt_connack::set_connack_code(unsigned char code) {
 }
 
 bool mqtt_connack::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(2);
 
-	this->set_data_length(2);
-
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
 
 	this->pack_add((unsigned char) conn_flags_, out);
 	this->pack_add((unsigned char) connack_code_, out);
-
-	out.set_bin(old_mode);
 	return true;
 }
 

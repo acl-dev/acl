@@ -6,7 +6,8 @@ namespace acl {
 
 class ACL_CPP_API mqtt_subscribe : public mqtt_message {
 public:
-	mqtt_subscribe(unsigned body_dlen = 0);
+	mqtt_subscribe(void);
+	mqtt_subscribe(const mqtt_header& header);
 	~mqtt_subscribe(void);
 
 	void set_pkt_id(unsigned short id);
@@ -42,13 +43,8 @@ public:
 	int update_topic_val(const char* data, int dlen);
 	int update_topic_qos(const char* data, int dlen);
 
-protected:
-	// @override
-	unsigned char get_header_flags(void) const {
-		return 0x02;
-	}
-
 private:
+	unsigned status_;
 	bool finished_;
 	char buff_[2];
 	unsigned dlen_;

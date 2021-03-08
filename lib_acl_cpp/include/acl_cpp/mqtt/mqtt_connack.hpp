@@ -16,6 +16,7 @@ enum {
 class ACL_CPP_API mqtt_connack : public mqtt_message {
 public:
 	mqtt_connack(void);
+	mqtt_connack(const mqtt_header& header);
 	~mqtt_connack(void);
 
 	void set_session(bool on);
@@ -45,6 +46,7 @@ public:
 	int update_header_var(const char* data, int dlen);
 
 private:
+	unsigned status_;
 	bool finished_;
 	char buff_[2];
 	int  dlen_;

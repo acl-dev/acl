@@ -18,6 +18,15 @@ mqtt_ack::mqtt_ack(mqtt_type_t type)
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
+mqtt_ack::mqtt_ack(const mqtt_header& header)
+: mqtt_message(header)
+, finished_(false)
+, hlen_(0)
+, pkt_id_(0)
+{
+	status_ = MQTT_STAT_HDR_VAR;  // just for update()
+}
+
 mqtt_ack::~mqtt_ack(void) {}
 
 void mqtt_ack::set_pkt_id(unsigned short id) {
@@ -25,19 +34,14 @@ void mqtt_ack::set_pkt_id(unsigned short id) {
 }
 
 bool mqtt_ack::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(2);
 
-	this->set_data_length(2);
-
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
 
 	this->pack_add((unsigned short) pkt_id_, out);
-
-	out.set_bin(old_mode);
 	return true;
 }
 

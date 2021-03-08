@@ -10,15 +10,26 @@ enum {
 	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_suback::mqtt_suback(unsigned body_len /* 0 */)
+mqtt_suback::mqtt_suback(void)
 : mqtt_message(MQTT_SUBACK)
 , finished_(false)
 , dlen_(0)
 , pkt_id_(0)
-, body_len_(body_len)
+, body_len_(0)
 , nread_(0)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
+}
+
+mqtt_suback::mqtt_suback(const mqtt_header& header)
+: mqtt_message(MQTT_SUBACK)
+, finished_(false)
+, dlen_(0)
+, pkt_id_(0)
+, nread_(0)
+{
+	status_   = MQTT_STAT_HDR_VAR; /* just for update */
+	body_len_ = header.get_remaining_length();
 }
 
 mqtt_suback::~mqtt_suback(void) {}
@@ -38,14 +49,12 @@ bool mqtt_suback::to_string(string& out) {
 		return false;
 	}
 
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
-
 	body_len_ += sizeof(pkt_id_);
-	this->set_data_length(body_len_);
 
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(body_len_);
+
+	if (!header.build_header(out)) {
 		return false;
 	}
 
@@ -56,7 +65,6 @@ bool mqtt_suback::to_string(string& out) {
 		this->pack_add((unsigned char) (*cit), out);
 	}
 
-	out.set_bin(old_mode);
 	return true;
 }
 

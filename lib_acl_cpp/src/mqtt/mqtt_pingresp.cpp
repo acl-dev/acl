@@ -5,25 +5,25 @@
 
 namespace acl {
 
-mqtt_pingresp::mqtt_pingresp()
+mqtt_pingresp::mqtt_pingresp(void)
 : mqtt_message(MQTT_PINGRESP)
+{
+}
+
+mqtt_pingresp::mqtt_pingresp(const mqtt_header& header)
+: mqtt_message(header)
 {
 }
 
 mqtt_pingresp::~mqtt_pingresp(void) {}
 
 bool mqtt_pingresp::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(0);
 
-	this->set_data_length(0);
-
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
-
-	out.set_bin(old_mode);
 	return true;
 }
 

@@ -5,8 +5,13 @@
 
 namespace acl {
 
-mqtt_unsuback::mqtt_unsuback()
+mqtt_unsuback::mqtt_unsuback(void)
 : mqtt_ack(MQTT_PUBACK)
+{
+}
+
+mqtt_unsuback::mqtt_unsuback(const mqtt_header& header)
+: mqtt_ack(header)
 {
 }
 

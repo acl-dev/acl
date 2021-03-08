@@ -75,7 +75,7 @@ bool mqtt_client::send(mqtt_message& message) {
 }
 
 mqtt_message* mqtt_client::get_message(void) {
-	mqtt_message header(MQTT_RESERVED_MIN);
+	mqtt_header header(MQTT_RESERVED_MIN);
 
 	if (!read_header(header)) {
 		conn_.close();
@@ -83,27 +83,28 @@ mqtt_message* mqtt_client::get_message(void) {
 		return NULL;
 	}
 
-	mqtt_message* body = create_body(header);
-	if (body == NULL) {
+	mqtt_message* message = create_message(header);
+	if (message == NULL) {
 		logger_error("create_message error");
 		return NULL;
 	}
 
-	if (!read_body(header, *body)) {
-		delete body;
+	if (!read_message(header, *message)) {
+		delete message;
 		return NULL;
 	}
-	return body;
+	return message;
 }
 
-bool mqtt_client::read_header(mqtt_message& header) {
+bool mqtt_client::read_header(mqtt_header& header) {
 	char ch;
 	if (!conn_.read(ch)) {
 		logger_error("read header type error: %s", last_serror());
 		return false;
 	}
 
-	if (header.header_update(&ch, 1) != 0) {
+	// update the first char for mqtt_type_t
+	if (header.update(&ch, 1) != 0) {
 		logger_error("invalid header type=%d", (int) ch);
 		return false;
 	}
@@ -114,16 +115,16 @@ bool mqtt_client::read_header(mqtt_message& header) {
 				last_serror(), i);
 			return false;
 		}
-		if (header.header_update(&ch, 1) != 0) {
+		if (header.update(&ch, 1) != 0) {
 			logger_error("header_update error, ch=%d", (int) ch);
 			return false;
 		}
-		if (header.header_finish()) {
+		if (header.update_finished()) {
 			break;
 		}
 	}
 
-	if (!header.header_finish()) {
+	if (!header.update_finished()) {
 		logger_error("get mqtt header error");
 		return false;
 	}
@@ -131,8 +132,8 @@ bool mqtt_client::read_header(mqtt_message& header) {
 	return true;
 }
 
-bool mqtt_client::read_body(const mqtt_message& header, mqtt_message& body) {
-	unsigned len = header.get_data_length();
+bool mqtt_client::read_message(const mqtt_header& header, mqtt_message& body) {
+	unsigned len = header.get_remaining_length();
 	if (len == 0) {
 		return true;
 	}
@@ -165,53 +166,52 @@ bool mqtt_client::read_body(const mqtt_message& header, mqtt_message& body) {
 	return true;
 }
 
-mqtt_message* mqtt_client::create_body(const mqtt_message& header) {
+mqtt_message* mqtt_client::create_message(const mqtt_header& header) {
 	mqtt_type_t type = header.get_type();
 	mqtt_message* message;
-	unsigned dlen = header.get_data_length();
 
 	switch (type) {
 	case MQTT_CONNECT:
-		message = NEW mqtt_connect();
+		message = NEW mqtt_connect(header);
 		break;
 	case MQTT_CONNACK:
-		message = NEW mqtt_connack();
+		message = NEW mqtt_connack(header);
 		break;
 	case MQTT_PUBLISH:
-		message = NEW mqtt_publish(dlen);
+		message = NEW mqtt_publish(header);
 		break;
 	case MQTT_PUBACK:
-		message = NEW mqtt_puback();
+		message = NEW mqtt_puback(header);
 		break;
 	case MQTT_PUBREC:
-		message = NEW mqtt_pubrec();
+		message = NEW mqtt_pubrec(header);
 		break;
 	case MQTT_PUBREL:
-		message = NEW mqtt_pubrel();
+		message = NEW mqtt_pubrel(header);
 		break;
 	case MQTT_PUBCOMP:
-		message = NEW mqtt_pubcomp();
+		message = NEW mqtt_pubcomp(header);
 		break;
 	case MQTT_SUBSCRIBE:
-		message = NEW mqtt_subscribe(dlen);
+		message = NEW mqtt_subscribe(header);
 		break;
 	case MQTT_SUBACK:
-		message = NEW mqtt_suback(dlen);
+		message = NEW mqtt_suback(header);
 		break;
 	case MQTT_UNSUBSCRIBE:
-		message = NEW mqtt_unsubscribe(dlen);
+		message = NEW mqtt_unsubscribe(header);
 		break;
 	case MQTT_UNSUBACK:
-		message = NEW mqtt_unsuback();
+		message = NEW mqtt_unsuback(header);
 		break;
 	case MQTT_PINGREQ:
-		message = NEW mqtt_pingreq();
+		message = NEW mqtt_pingreq(header);
 		break;
 	case MQTT_PINGRESP:
-		message = NEW mqtt_pingresp();
+		message = NEW mqtt_pingresp(header);
 		break;
 	case MQTT_DISCONNECT:
-		message = NEW mqtt_disconnect();
+		message = NEW mqtt_disconnect(header);
 		break;
 	default:
 		logger_error("unknown mqtt type=%d", (int) type);

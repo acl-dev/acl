@@ -7,7 +7,8 @@ namespace acl {
 
 class ACL_CPP_API mqtt_suback : public mqtt_message {
 public:
-	mqtt_suback(unsigned payload_len = 0);
+	mqtt_suback(void);
+	mqtt_suback(const mqtt_header& header);
 	~mqtt_suback(void);
 
 	void set_pkt_id(unsigned short id);
@@ -38,6 +39,7 @@ public:
 	int update_topic_qos(const char* data, int dlen);
 
 private:
+	unsigned status_;
 	bool finished_;
 	char buff_[2];
 	unsigned dlen_;

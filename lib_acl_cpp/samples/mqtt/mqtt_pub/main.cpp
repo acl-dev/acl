@@ -42,8 +42,9 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
 		return false;
 	}
 
-	if (res->get_type() != acl::MQTT_PUBACK) {
-		printf("not puback type, type=%d\r\n", (int) res->get_type());
+	if (res->get_header().get_type() != acl::MQTT_PUBACK) {
+		printf("not puback type, type=%d\r\n",
+			(int) res->get_header().get_type());
 		delete res;
 		return false;
 	}
@@ -113,7 +114,7 @@ int main(int argc, char* argv[]) {
 		printf("read CONNACK error\r\n");
 		return 1;
 	}
-	acl::mqtt_type_t type = res->get_type();
+	acl::mqtt_type_t type = res->get_header().get_type();
 	if (type != acl::MQTT_CONNACK) {
 		printf("invalid message type=%d\r\n", (int) type);
 		delete res;

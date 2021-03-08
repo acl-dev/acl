@@ -13,18 +13,32 @@ enum {
 	MQTT_STAT_PAYLOAD,
 };
 
-mqtt_publish::mqtt_publish(unsigned body_len /* 0 */, mqtt_qos_t qos /* MQTT_QOS0 */)
+mqtt_publish::mqtt_publish(void)
 : mqtt_message(MQTT_PUBLISH)
 , finished_(false)
 , dlen_(0)
 , hlen_var_(0)
 , dup_(false)
-, qos_(qos)
+, qos_(MQTT_QOS0)
 , retain_(false)
 , pkt_id_(0)
-, payload_len_(body_len)
+, payload_len_(0)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
+}
+
+mqtt_publish::mqtt_publish(const mqtt_header& header)
+: mqtt_message(MQTT_PUBLISH)
+, finished_(false)
+, dlen_(0)
+, hlen_var_(0)
+, dup_(false)
+, qos_(MQTT_QOS0)
+, retain_(false)
+, pkt_id_(0)
+{
+	status_      = MQTT_STAT_HDR_VAR;  // just for update()
+	payload_len_ = header.get_remaining_length();
 }
 
 mqtt_publish::~mqtt_publish(void) {}
@@ -87,18 +101,16 @@ unsigned char mqtt_publish::get_header_flags(void) const {
 }
 
 bool mqtt_publish::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
-
 	unsigned len = (unsigned) topic_.size() + 2 + payload_len_;
 	if (qos_ != MQTT_QOS0) {
 		len += 2;
 	}
 
-	this->set_data_length(len);
+	mqtt_header& header = this->get_header();
+	header.set_header_flags(get_header_flags());
+	header.set_remaing_length(len);
 
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
 
@@ -112,7 +124,6 @@ bool mqtt_publish::to_string(string& out) {
 		out.append(payload_, payload_len_);
 	}
 
-	out.set_bin(old_mode);
 	return true;
 }
 

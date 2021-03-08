@@ -10,6 +10,11 @@ mqtt_pubcomp::mqtt_pubcomp(void)
 {
 }
 
+mqtt_pubcomp::mqtt_pubcomp(const mqtt_header& header)
+: mqtt_ack(header)
+{
+}
+
 mqtt_pubcomp::~mqtt_pubcomp(void) {}
 
 } // namespace acl

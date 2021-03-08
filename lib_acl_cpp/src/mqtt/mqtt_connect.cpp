@@ -30,6 +30,17 @@ mqtt_connect::mqtt_connect(void)
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
+mqtt_connect::mqtt_connect(const mqtt_header& header)
+: mqtt_message(header)
+, finished_(false)
+, dlen_(0)
+, will_qos_(MQTT_QOS0)
+, conn_flags_(0)
+, keep_alive_(300)
+{
+	status_ = MQTT_STAT_HDR_VAR;  // just for update()
+}
+
 mqtt_connect::~mqtt_connect(void) {}
 
 void mqtt_connect::set_keep_alive(unsigned short keep_alive) {
@@ -86,14 +97,15 @@ void mqtt_connect::set_will_msg(const char* msg) {
 	}
 }
 
-void mqtt_connect::set_session_clean(void) {
-	conn_flags_ |= 1 << 1;
+void mqtt_connect::clean_session(void) {
+	conn_flags_ |= 0x02;
+}
+
+bool mqtt_connect::has_session(void) const {
+	return conn_flags_ & 0x02 ? true : false;
 }
 
 bool mqtt_connect::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
-
 	unsigned len = 10;  // length of the body's header
 
 	len += 2;
@@ -121,10 +133,10 @@ bool mqtt_connect::to_string(string& out) {
 		will_msg_.clear();
 	}
 
-	this->set_data_length(len);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(len);
 
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
 
@@ -153,7 +165,6 @@ bool mqtt_connect::to_string(string& out) {
 		this->pack_add(passwd_, out);
 	}
 
-	out.set_bin(old_mode);
 	return true;
 }
 

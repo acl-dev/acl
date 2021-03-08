@@ -6,7 +6,8 @@ namespace acl {
 
 class ACL_CPP_API mqtt_publish : public mqtt_message {
 public:
-	mqtt_publish(unsigned body_len = 0, mqtt_qos_t qos = MQTT_QOS0);
+	mqtt_publish(void);
+	mqtt_publish(const mqtt_header& header);
 	~mqtt_publish(void);
 
 	void set_dup(bool yes);
@@ -64,11 +65,11 @@ public:
 	int update_pktid(const char* data, int dlen);
 	int update_payload(const char* data, int dlen);
 
-protected:
-	// @override
+private:
 	unsigned char get_header_flags(void) const;
 
 private:
+	unsigned status_;
 	bool finished_;
 	char buff_[2];
 	int  dlen_;

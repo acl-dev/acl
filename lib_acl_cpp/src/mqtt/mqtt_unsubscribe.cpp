@@ -11,15 +11,26 @@ enum {
 	MQTT_STAT_TOPIC_VAL,
 };
 
-mqtt_unsubscribe::mqtt_unsubscribe(unsigned body_len /* 0 */)
+mqtt_unsubscribe::mqtt_unsubscribe(void)
 : mqtt_message(MQTT_UNSUBSCRIBE)
 , finished_(false)
 , dlen_(0)
 , pkt_id_(0)
-, body_len_(body_len)
+, body_len_(0)
 , nread_(0)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
+}
+
+mqtt_unsubscribe::mqtt_unsubscribe(const mqtt_header& header)
+: mqtt_message(header)
+, finished_(false)
+, dlen_(0)
+, pkt_id_(0)
+, nread_(0)
+{
+	status_   = MQTT_STAT_HDR_VAR; /* just for update */
+	body_len_ = header.get_remaining_length();
 }
 
 mqtt_unsubscribe::~mqtt_unsubscribe(void) {}
@@ -39,14 +50,12 @@ bool mqtt_unsubscribe::to_string(string& out) {
 		return false;
 	}
 
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
-
 	body_len_ += sizeof(pkt_id_);
-	this->set_data_length(body_len_);
 
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	mqtt_header& header = this->get_header();
+	header.set_remaing_length(body_len_);
+
+	if (!header.build_header(out)) {
 		return false;
 	}
 
@@ -57,7 +66,6 @@ bool mqtt_unsubscribe::to_string(string& out) {
 		this->pack_add(topics_[i], out);
 	}
 
-	out.set_bin(old_mode);
 	return true;
 }
 

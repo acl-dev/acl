@@ -3,9 +3,10 @@
 #include <getopt.h>
 #include "acl_cpp/lib_acl.hpp"
 
-static bool handle_connack(acl::mqtt_client& conn, const acl::mqtt_message& message) {
+static bool handle_connack(acl::mqtt_client& conn,
+		const acl::mqtt_message& message) {
 	const acl::mqtt_connack& connack = (const acl::mqtt_connack&) message;
-	printf("%s: connect code=%d\r\n", __FUNCTION__, connack.get_connack_code());
+	printf("%s => connect code=%d\r\n", __FUNCTION__, connack.get_connack_code());
 
 	acl::mqtt_subscribe subscribe;
 
@@ -22,11 +23,12 @@ static bool handle_connack(acl::mqtt_client& conn, const acl::mqtt_message& mess
 	return false;
 }
 
-static bool handle_suback(const acl::mqtt_message& message) {
+static bool handle_suback(acl::mqtt_client& conn,
+		const acl::mqtt_message& message) {
 	const acl::mqtt_suback& suback = (const acl::mqtt_suback&) message;
 	unsigned short pkt_id = suback.get_pkt_id();
 
-	printf("%s: pkt_id=%d\r\n", __FUNCTION__, pkt_id);
+	printf("%s => pkt_id=%d\r\n", __FUNCTION__, pkt_id);
 
 	const std::vector<acl::mqtt_qos_t>& qoses = suback.get_qoses();
 	for (std::vector<acl::mqtt_qos_t>::const_iterator cit = qoses.begin();
@@ -34,6 +36,12 @@ static bool handle_suback(const acl::mqtt_message& message) {
 		printf("  qos=%d\r\n", (int) *cit);
 	}
 
+	acl::mqtt_pingreq pingreq;
+	if (!conn.send(pingreq)) {
+		printf("send pingreq error\r\n");
+		return false;
+	}
+	printf("%s => send pingreq ok\r\n", __FUNCTION__);
 	return true;
 }
 
@@ -51,21 +59,22 @@ static bool handle_pingreq(acl::mqtt_client& conn) {
 	if (conn.send(pingresp)) {
 		return true;
 	}
-	printf("send pingresp error\r\n");
+	printf("%s => send pingresp error\r\n", __FUNCTION__);
 	return false;
 }
 
 static bool handle_pingresp(void) {
-	printf("got pingresp\r\n");
+	printf("%s => got pingresp\r\n", __FUNCTION__);
 	return true;
 }
 
 static bool handle_disconnect(acl::mqtt_message&) {
+	printf("%s => disconnect\r\n", __FUNCTION__);
 	return false;
 }
 
 static bool handle_message(acl::mqtt_client& conn, acl::mqtt_message& message) {
-	acl::mqtt_type_t type = message.get_type();
+	acl::mqtt_type_t type = message.get_header().get_type();
 	switch (type) {
 	case acl::MQTT_CONNACK:
 		return handle_connack(conn, message);
@@ -76,7 +85,7 @@ static bool handle_message(acl::mqtt_client& conn, acl::mqtt_message& message) {
 	case acl::MQTT_DISCONNECT:
 		return handle_disconnect(message);
 	case acl::MQTT_SUBACK:
-		return handle_suback(message);
+		return handle_suback(conn, message);
 	case acl::MQTT_PUBLISH:
 		return handle_publish(message);
 	default:

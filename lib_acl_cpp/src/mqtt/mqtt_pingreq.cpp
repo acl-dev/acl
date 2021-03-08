@@ -5,25 +5,26 @@
 
 namespace acl {
 
-mqtt_pingreq::mqtt_pingreq()
+mqtt_pingreq::mqtt_pingreq(void)
 : mqtt_message(MQTT_PINGREQ)
+{
+}
+
+mqtt_pingreq::mqtt_pingreq(const mqtt_header& header)
+: mqtt_message(header)
 {
 }
 
 mqtt_pingreq::~mqtt_pingreq(void) {}
 
 bool mqtt_pingreq::to_string(string& out) {
-	bool old_mode = out.get_bin();
-	out.set_bin(true);
+	mqtt_header& header = this->get_header();
 
-	this->set_data_length(0);
+	header.set_remaing_length(0);
 
-	if (!this->pack_header(out)) {
-		out.set_bin(old_mode);
+	if (!header.build_header(out)) {
 		return false;
 	}
-
-	out.set_bin(old_mode);
 	return true;
 }
 

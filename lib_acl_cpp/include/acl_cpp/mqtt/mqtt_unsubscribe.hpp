@@ -6,7 +6,8 @@ namespace acl {
 
 class ACL_CPP_API mqtt_unsubscribe : public mqtt_message {
 public:
-	mqtt_unsubscribe(unsigned body_len = 0);
+	mqtt_unsubscribe(void);
+	mqtt_unsubscribe(const mqtt_header& header);
 	~mqtt_unsubscribe(void);
 
 	void set_pkt_id(unsigned short id);
@@ -30,6 +31,7 @@ public:
 	int update_topic_val(const char* data, int dlen);
 
 private:
+	unsigned status_;
 	bool finished_;
 	char buff_[2];
 	unsigned dlen_;

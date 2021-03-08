@@ -7,6 +7,7 @@ namespace acl {
 class ACL_CPP_API mqtt_pubrec : public mqtt_ack {
 public:
 	mqtt_pubrec(void);
+	mqtt_pubrec(const mqtt_header& header);
 	~mqtt_pubrec(void);
 };
 
