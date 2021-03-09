@@ -874,6 +874,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\mqtt\mqtt_header.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\mqtt\mqtt_message.cpp"
 					>
 				</File>

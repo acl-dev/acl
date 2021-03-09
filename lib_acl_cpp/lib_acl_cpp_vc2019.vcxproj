@@ -603,6 +603,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\mqtt\mqtt_connack.cpp" />
     <ClCompile Include="src\mqtt\mqtt_connect.cpp" />
     <ClCompile Include="src\mqtt\mqtt_disconnect.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_header.cpp" />
     <ClCompile Include="src\mqtt\mqtt_message.cpp" />
     <ClCompile Include="src\mqtt\mqtt_pingreq.cpp" />
     <ClCompile Include="src\mqtt\mqtt_pingresp.cpp" />
@@ -822,6 +823,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_connack.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_connect.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_disconnect.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_header.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_message.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingreq.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingresp.hpp" />

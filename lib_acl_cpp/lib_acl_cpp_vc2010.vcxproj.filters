@@ -628,6 +628,9 @@
     <ClCompile Include="src\mqtt\mqtt_disconnect.cpp">
       <Filter>src\mqtt</Filter>
     </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_header.cpp">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
     <ClCompile Include="src\mqtt\mqtt_message.cpp">
       <Filter>src\mqtt</Filter>
     </ClCompile>
@@ -1330,6 +1333,9 @@
       <Filter>include\mqtt</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_disconnect.hpp">
+      <Filter>include\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_header.hpp">
       <Filter>include\mqtt</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_message.hpp">

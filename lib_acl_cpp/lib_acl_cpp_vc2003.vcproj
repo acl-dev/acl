@@ -1050,6 +1050,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\mqtt\mqtt_disconnect.cpp">
 				</File>
 				<File
+					RelativePath=".\src\mqtt\mqtt_header.cpp">
+				</File>
+				<File
 					RelativePath=".\src\mqtt\mqtt_message.cpp">
 				</File>
 				<File
@@ -1785,6 +1788,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\mqtt\mqtt_disconnect.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_header.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\mqtt\mqtt_message.hpp">
