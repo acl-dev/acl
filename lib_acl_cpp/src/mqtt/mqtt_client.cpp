@@ -1,21 +1,6 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
-#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/mqtt/mqtt_message.hpp"
-#include "acl_cpp/mqtt/mqtt_connect.hpp"
-#include "acl_cpp/mqtt/mqtt_connack.hpp"
-#include "acl_cpp/mqtt/mqtt_publish.hpp"
-#include "acl_cpp/mqtt/mqtt_puback.hpp"
-#include "acl_cpp/mqtt/mqtt_pubrec.hpp"
-#include "acl_cpp/mqtt/mqtt_pubrel.hpp"
-#include "acl_cpp/mqtt/mqtt_pubcomp.hpp"
-#include "acl_cpp/mqtt/mqtt_subscribe.hpp"
-#include "acl_cpp/mqtt/mqtt_suback.hpp"
-#include "acl_cpp/mqtt/mqtt_unsubscribe.hpp"
-#include "acl_cpp/mqtt/mqtt_unsuback.hpp"
-#include "acl_cpp/mqtt/mqtt_pingreq.hpp"
-#include "acl_cpp/mqtt/mqtt_pingresp.hpp"
-#include "acl_cpp/mqtt/mqtt_disconnect.hpp"
 #include "acl_cpp/mqtt/mqtt_client.hpp"
 #endif
 
@@ -66,8 +51,8 @@ bool mqtt_client::send(mqtt_message& message) {
 	}
 
 	if (conn_.write(buff) == -1) {
-		logger_error("send message error=%s", last_serror());
 		conn_.close();
+		logger_error("send message error=%s", last_serror());
 		return false;
 	}
 
@@ -83,7 +68,7 @@ mqtt_message* mqtt_client::get_message(void) {
 		return NULL;
 	}
 
-	mqtt_message* message = create_message(header);
+	mqtt_message* message = mqtt_message::create_message(header);
 	if (message == NULL) {
 		logger_error("create_message error");
 		return NULL;
@@ -164,61 +149,6 @@ bool mqtt_client::read_message(const mqtt_header& header, mqtt_message& body) {
 		return false;
 	}
 	return true;
-}
-
-mqtt_message* mqtt_client::create_message(const mqtt_header& header) {
-	mqtt_type_t type = header.get_type();
-	mqtt_message* message;
-
-	switch (type) {
-	case MQTT_CONNECT:
-		message = NEW mqtt_connect(header);
-		break;
-	case MQTT_CONNACK:
-		message = NEW mqtt_connack(header);
-		break;
-	case MQTT_PUBLISH:
-		message = NEW mqtt_publish(header);
-		break;
-	case MQTT_PUBACK:
-		message = NEW mqtt_puback(header);
-		break;
-	case MQTT_PUBREC:
-		message = NEW mqtt_pubrec(header);
-		break;
-	case MQTT_PUBREL:
-		message = NEW mqtt_pubrel(header);
-		break;
-	case MQTT_PUBCOMP:
-		message = NEW mqtt_pubcomp(header);
-		break;
-	case MQTT_SUBSCRIBE:
-		message = NEW mqtt_subscribe(header);
-		break;
-	case MQTT_SUBACK:
-		message = NEW mqtt_suback(header);
-		break;
-	case MQTT_UNSUBSCRIBE:
-		message = NEW mqtt_unsubscribe(header);
-		break;
-	case MQTT_UNSUBACK:
-		message = NEW mqtt_unsuback(header);
-		break;
-	case MQTT_PINGREQ:
-		message = NEW mqtt_pingreq(header);
-		break;
-	case MQTT_PINGRESP:
-		message = NEW mqtt_pingresp(header);
-		break;
-	case MQTT_DISCONNECT:
-		message = NEW mqtt_disconnect(header);
-		break;
-	default:
-		logger_error("unknown mqtt type=%d", (int) type);
-		message = NULL;
-		break;
-	}
-	return message;
 }
 
 } // namespace acl

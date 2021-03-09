@@ -60,7 +60,10 @@ bool mqtt_publish::to_string(string& out) {
 	}
 
 	mqtt_header& header = this->get_header();
-	//header.set_header_flags(get_header_flags());
+
+	if (header.is_dup() && header.get_qos() == MQTT_QOS0) {
+		header.set_dup(false);
+	}
 	header.set_remaing_length(len);
 
 	if (!header.build_header(out)) {

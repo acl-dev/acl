@@ -21,7 +21,6 @@ public:
 public:
 	bool read_header(mqtt_header& header);
 	bool read_message(const mqtt_header& header, mqtt_message& body);
-	mqtt_message* create_message(const mqtt_header& header);
 
 protected:
 	// @override

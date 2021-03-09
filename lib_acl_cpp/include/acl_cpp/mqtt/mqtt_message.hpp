@@ -34,6 +34,9 @@ public:
 		return header_;
 	}
 
+public:
+	static mqtt_message* create_message(const mqtt_header& header);
+
 protected:
 	mqtt_header header_;
 
