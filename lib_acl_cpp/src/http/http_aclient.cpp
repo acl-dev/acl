@@ -464,6 +464,16 @@ bool http_aclient::res_unzip_finish(zlib_stream& zstream, char* data, int dlen)
 		return this->on_http_res_finish(true) && keep_alive_;
 	}
 
+	if (gzip_header_left_ >= dlen) {
+		logger_error("data tool small, dlen=%d gzip_header=%d",
+			dlen, (int) gzip_header_left_);
+		return false;
+	}
+
+	dlen -= gzip_header_left_;
+	data += gzip_header_left_;
+	gzip_header_left_ = 0;
+
 	string buf(4096);
 	if (!zstream.unzip_update(data, dlen, &buf)) {
 		logger_error("unzip_update error");
