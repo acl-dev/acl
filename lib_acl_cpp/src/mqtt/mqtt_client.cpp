@@ -104,12 +104,12 @@ bool mqtt_client::read_header(mqtt_header& header) {
 			logger_error("header_update error, ch=%d", (int) ch);
 			return false;
 		}
-		if (header.update_finished()) {
+		if (header.finished()) {
 			break;
 		}
 	}
 
-	if (!header.update_finished()) {
+	if (!header.finished()) {
 		logger_error("get mqtt header error");
 		return false;
 	}
@@ -144,7 +144,7 @@ bool mqtt_client::read_message(const mqtt_header& header, mqtt_message& body) {
 		}
 	}
 
-	if (!body.is_finished()) {
+	if (!body.finished()) {
 		logger_error("body not finished!");
 		return false;
 	}

@@ -61,6 +61,15 @@ mqtt_header::mqtt_header(const mqtt_header& header)
 
 mqtt_header::~mqtt_header(void) {}
 
+void mqtt_header::reset(void) {
+	status_ = MQTT_STAT_HDR_TYPE;
+	finished_ = false;
+	type_   = MQTT_RESERVED_MIN;
+	hflags_ = 0;
+	dlen_   = 0;
+	hlen_   = 0;
+}
+
 mqtt_header& mqtt_header::set_type(mqtt_type_t type) {
 	if (type > MQTT_RESERVED_MIN && type < MQTT_RESERVED_MAX) {
 		type_ = type;

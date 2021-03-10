@@ -15,7 +15,7 @@ protected:
 	bool to_string(string& out);
 
 	// @override
-	bool is_finished(void) const {
+	bool finished(void) const {
 		return true;
 	}
 };

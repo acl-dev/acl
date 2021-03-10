@@ -22,7 +22,7 @@ public:
 		return dlen;
 	}
 
-	virtual bool is_finished(void) const {
+	virtual bool finished(void) const {
 		return false;
 	}
 

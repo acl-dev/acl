@@ -20,7 +20,7 @@ protected:
 	}
 
 	// @override
-	bool is_finished(void) const {
+	bool finished(void) const {
 		return true;
 	}
 };

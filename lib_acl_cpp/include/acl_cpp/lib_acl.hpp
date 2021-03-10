@@ -234,3 +234,4 @@
 #include "mqtt/mqtt_unsubscribe.hpp"
 #include "mqtt/mqtt_unsuback.hpp"
 #include "mqtt/mqtt_client.hpp"
+#include "mqtt/mqtt_aclient.hpp"

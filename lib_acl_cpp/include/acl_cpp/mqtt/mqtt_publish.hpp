@@ -39,7 +39,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool is_finished(void) const {
+	bool finished(void) const {
 		return finished_;
 	}
 

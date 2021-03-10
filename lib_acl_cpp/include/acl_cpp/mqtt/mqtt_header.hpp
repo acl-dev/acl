@@ -58,9 +58,11 @@ public:
 
 	int update(const char* data, int dlen);
 
-	bool update_finished(void) const {
+	bool finished(void) const {
 		return finished_;
 	}
+
+	void reset(void);
 
 public:
 	mqtt_header& set_type(mqtt_type_t type);
