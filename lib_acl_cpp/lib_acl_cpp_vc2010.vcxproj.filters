@@ -616,6 +616,9 @@
     <ClCompile Include="src\mqtt\mqtt_ack.cpp">
       <Filter>src\mqtt</Filter>
     </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_aclient.cpp">
+      <Filter>src\mqtt</Filter>
+    </ClCompile>
     <ClCompile Include="src\mqtt\mqtt_client.cpp">
       <Filter>src\mqtt</Filter>
     </ClCompile>
@@ -1321,6 +1324,9 @@
       <Filter>include\serialize</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp">
+      <Filter>include\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_aclient.hpp">
       <Filter>include\mqtt</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp">

@@ -622,6 +622,9 @@
     <ClCompile Include="src\mqtt\mqtt_ack.cpp">
       <Filter>Source Files\mqtt</Filter>
     </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_aclient.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
     <ClCompile Include="src\mqtt\mqtt_client.cpp">
       <Filter>Source Files\mqtt</Filter>
     </ClCompile>
@@ -1336,6 +1339,9 @@
       <Filter>Header Files\db</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_aclient.hpp">
       <Filter>Header Files\mqtt</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp">

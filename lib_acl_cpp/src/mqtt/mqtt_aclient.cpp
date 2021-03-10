@@ -230,8 +230,9 @@ bool mqtt_aclient::read_callback(char* data, int len) {
 	}
 
 	while (true) {
-		int left = handle_res_data(data, len);
+		int left = handle_data(data, len);
 		if (left < 0) {
+			header_->reset();
 			return false;
 		} else if (left > 0) {
 			data += len - left;
@@ -242,7 +243,7 @@ bool mqtt_aclient::read_callback(char* data, int len) {
 	}
 }
 
-int mqtt_aclient::handle_res_data(char* data, int len) {
+int mqtt_aclient::handle_data(char* data, int len) {
 	int left;
 
 	if (!header_->finished()) {
@@ -251,15 +252,15 @@ int mqtt_aclient::handle_res_data(char* data, int len) {
 		left = len;
 	}
 
-	if (left == 0) {
-		return 0;
-	} else if (left < 0) {
+	if (left < 0) {
 		logger_error("header update failed");
 		return -1;
 	}
 
-	assert(left > 0);
-	assert(header_->finished());
+	if (!header_->finished()) {
+		assert(left = 0);
+		return 0;
+	}
 
 	data += len - left;
 	len   = left;
@@ -272,19 +273,24 @@ int mqtt_aclient::handle_res_data(char* data, int len) {
 		}
 	}
 
-	left = body_->update(data, len);
-	if (left < 0) {
-		logger_error("message update failed");
-		return -1;
+	if (len > 0) {
+		left = body_->update(data, len);
+		if (left < 0) {
+			logger_error("message update failed");
+			return -1;
+		}
 	}
 
 	if (body_->finished()) {
-		if (!this->on_res_finished(true)) {
+		bool ret = this->on_body(*body_);
+		header_->reset();
+		delete body_;
+		body_ = NULL;
+
+		if (!ret) {
 			logger_error("subclass return false");
 			return -1;
 		}
-		delete body_;
-		body_ = NULL;
 	}
 
 	return left;

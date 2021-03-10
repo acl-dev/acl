@@ -1038,6 +1038,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\mqtt\mqtt_ack.cpp">
 				</File>
 				<File
+					RelativePath=".\src\mqtt\mqtt_aclient.cpp">
+				</File>
+				<File
 					RelativePath=".\src\mqtt\mqtt_client.cpp">
 				</File>
 				<File
@@ -1776,6 +1779,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				Filter="">
 				<File
 					RelativePath=".\include\acl_cpp\mqtt\mqtt_ack.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\mqtt\mqtt_aclient.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\mqtt\mqtt_client.hpp">

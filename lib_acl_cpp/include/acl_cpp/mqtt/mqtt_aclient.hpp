@@ -78,19 +78,11 @@ protected:
 	virtual void on_connect_failed(void) {}
 	virtual bool on_read_timeout(void) { return false; }
 	virtual void on_disconnect(void) {};
-	virtual bool on_res_header(const mqtt_header& header) {
+	virtual bool on_header(const mqtt_header& header) {
 		(void) header;
 		return true;
 	}
-	virtual bool on_res_body(char* data, size_t dlen) {
-		(void) data;
-		(void) dlen;
-		return true;
-	}
-	virtual bool on_res_finished(bool success) {
-		(void) success;
-		return true;
-	}
+	virtual bool on_body(const mqtt_message& message) = 0;
 
 private:
 	aio_handle&        handle_;
@@ -108,7 +100,7 @@ private:
 	bool connect_done(void);
 
 	bool handle_ssl_handshake(void);
-	int handle_res_data(char* data, int len);
+	int handle_data(char* data, int len);
 
 	static int connect_callback(const ACL_ASTREAM_CTX* ctx);
 };

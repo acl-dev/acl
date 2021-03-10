@@ -598,6 +598,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stream\stdout_stream.cpp" />
     <ClCompile Include="src\stream\stream.cpp" />
     <ClCompile Include="src\mqtt\mqtt_ack.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_aclient.cpp" />
     <ClCompile Include="src\mqtt\mqtt_client.cpp" />
     <ClCompile Include="src\mqtt\mqtt_connack.cpp" />
     <ClCompile Include="src\mqtt\mqtt_connect.cpp" />
@@ -818,6 +819,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\stream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_aclient.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_connack.hpp" />
     <ClInclude Include="include\acl_cpp\mqtt\mqtt_connect.hpp" />

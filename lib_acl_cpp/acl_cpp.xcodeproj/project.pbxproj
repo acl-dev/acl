@@ -207,6 +207,7 @@
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
 		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
 		07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */; };
+		700C4C1625F8E5A4004955AD /* mqtt_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 700C4C1525F8E5A4004955AD /* mqtt_aclient.cpp */; };
 		7017904424C542140016B873 /* redis_role.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017903E24C542140016B873 /* redis_role.cpp */; };
 		7017904524C542140016B873 /* redis_master.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017903F24C542140016B873 /* redis_master.cpp */; };
 		7017904624C542140016B873 /* redis_sentinel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017904024C542140016B873 /* redis_sentinel.cpp */; };
@@ -690,6 +691,8 @@
 		07BEA6C3214F79E20060BBE4 /* WebSocketServlet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WebSocketServlet.hpp; sourceTree = "<group>"; };
 		07BED4D922AFC5710060BBE4 /* http_aclient.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_aclient.hpp; sourceTree = "<group>"; };
 		07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_aclient.cpp; sourceTree = "<group>"; };
+		700C4C1425F8E594004955AD /* mqtt_aclient.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = mqtt_aclient.hpp; path = mqtt/mqtt_aclient.hpp; sourceTree = "<group>"; };
+		700C4C1525F8E5A4004955AD /* mqtt_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mqtt_aclient.cpp; path = mqtt/mqtt_aclient.cpp; sourceTree = "<group>"; };
 		7017903E24C542140016B873 /* redis_role.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_role.cpp; sourceTree = "<group>"; };
 		7017903F24C542140016B873 /* redis_master.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_master.cpp; sourceTree = "<group>"; };
 		7017904024C542140016B873 /* redis_sentinel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_sentinel.cpp; sourceTree = "<group>"; };
@@ -1637,6 +1640,7 @@
 		706D0F1725F4742F00BA5347 /* mqtt */ = {
 			isa = PBXGroup;
 			children = (
+				700C4C1425F8E594004955AD /* mqtt_aclient.hpp */,
 				7085631125F7161600EACC5B /* mqtt_header.hpp */,
 				706D0F2725F4746600BA5347 /* mqtt_ack.hpp */,
 				706D0F1825F4746500BA5347 /* mqtt_client.hpp */,
@@ -1662,6 +1666,7 @@
 		706D0F2925F4747600BA5347 /* mqtt */ = {
 			isa = PBXGroup;
 			children = (
+				700C4C1525F8E5A4004955AD /* mqtt_aclient.cpp */,
 				7085630E25F7160400EACC5B /* mqtt_header.cpp */,
 				706D0F3725F4749300BA5347 /* mqtt_ack.cpp */,
 				706D0F3125F4749300BA5347 /* mqtt_client.cpp */,
@@ -1800,6 +1805,7 @@
 				07A468051E6FCCF1002C9B3C /* master_conf.cpp in Sources */,
 				0778DAEE1F78D3FC0011B753 /* event_mutex.cpp in Sources */,
 				07A4683E1E6FCCF1002C9B3C /* redis_transaction.cpp in Sources */,
+				700C4C1625F8E5A4004955AD /* mqtt_aclient.cpp in Sources */,
 				07A467DD1E6FCCF1002C9B3C /* mysql_conf.cpp in Sources */,
 				07A4683A1E6FCCF1002C9B3C /* redis_server.cpp in Sources */,
 				706D0F4925F4749400BA5347 /* mqtt_pubcomp.cpp in Sources */,
