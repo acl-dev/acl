@@ -12,6 +12,7 @@ class mqtt_message;
 class ACL_CPP_API mqtt_client : public connect_client {
 public:
 	mqtt_client(const char* addr, int conn_timeout = 10, int rw_timeout = 10);
+	mqtt_client(acl::socket_stream& conn);
 	~mqtt_client(void);
 
 	bool send(mqtt_message& message);
@@ -31,7 +32,8 @@ private:
 	int conn_timeout_;
 	int rw_timeout_;
 
-	socket_stream conn_;
+	socket_stream* conn_;
+	socket_stream* conn_internal_;
 };
 
 } // namespace acl
