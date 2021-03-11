@@ -177,7 +177,7 @@ int mqtt_unsubscribe::update_topic_val(const char* data, int dlen) {
 	assert(data && dlen > 0 && dlen_ > 0);
 
 	for (; dlen_ > 0 && dlen > 0;) {
-		topic_ += data++;
+		topic_ += *data++;
 		--dlen_;
 		--dlen;
 	}

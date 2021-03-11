@@ -11,8 +11,17 @@ class mqtt_message;
 
 class ACL_CPP_API mqtt_aclient : public aio_open_callback {
 public:
+	/**
+	 * constructor
+	 * @param handle {aio_handle&}
+	 * @param ssl_conf {sslbase_conf*} if not NULL, ssl will be used
+	 */
 	mqtt_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
-	virtual ~mqtt_aclient(void);
+
+	/**
+	 * because the subclass object was created dynamically, the method will
+	 * be called when the subclass object is to be freed
+	 */
 	virtual void destroy(void) = 0;
 
 	sslbase_conf* get_ssl_conf(void) const {
@@ -26,9 +35,18 @@ public:
 	 *  ip|port, or domain|port
 	 * @param conn_timeout {int} the timeout for connecting to the server
 	 * @param rw_timeout {int} the timeout read/write with the server
-	 * @return bool {bool}
+	 * @return bool {bool} if return false, you should call destroy() to
+	 *  delete the subclass object
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
+
+	/**
+	 * called when connect or accept one connection
+	 * @param conn {aio_socket_stream*}
+	 * @return bool {bool} if return false, you should call destroy() to
+	 *  delete the subclass object
+	 */
+	bool open(aio_socket_stream* conn);
 
 	/**
 	 * close the connection with the mqtt server async
@@ -53,6 +71,9 @@ public:
 	bool send(mqtt_message& message);
 
 protected:
+	// the subclass should be created dynamically
+	virtual ~mqtt_aclient(void);
+
 	// @override dummy
 	bool open_callback(void) { return true; }
 
@@ -72,17 +93,15 @@ protected:
 	// wait for reading data from peer
 	bool message_await(void);
 
-	virtual bool on_connect(void) = 0;
 	virtual void on_ns_failed(void) {}
 	virtual void on_connect_timeout(void) {}
 	virtual void on_connect_failed(void) {}
 	virtual bool on_read_timeout(void) { return false; }
 	virtual void on_disconnect(void) {};
-	virtual bool on_header(const mqtt_header& header) {
-		(void) header;
-		return true;
-	}
-	virtual bool on_body(const mqtt_message& message) = 0;
+
+	virtual bool on_open(void) = 0;
+	virtual bool on_header(const mqtt_header&) { return true; };
+	virtual bool on_body(const mqtt_message&) = 0;
 
 private:
 	aio_handle&        handle_;
@@ -96,12 +115,12 @@ private:
 	mqtt_header*  header_;
 	mqtt_message* body_;
 
-	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
-	bool connect_done(void);
+	bool open_done(void);
 
 	bool handle_ssl_handshake(void);
 	int handle_data(char* data, int len);
 
+	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
 	static int connect_callback(const ACL_ASTREAM_CTX* ctx);
 };
 

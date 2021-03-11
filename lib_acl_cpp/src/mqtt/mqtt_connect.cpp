@@ -287,7 +287,7 @@ int mqtt_connect::update_cid_len(const char* data, int dlen) {
 #define SAVE_DATA(buff) do { \
 	assert(data && dlen > 0 && dlen_ > 0); \
 	for (; dlen_ > 0 && dlen > 0;) { \
-		buff += data++; \
+		buff += *data++; \
 		--dlen_; \
 		--dlen; \
 	} \

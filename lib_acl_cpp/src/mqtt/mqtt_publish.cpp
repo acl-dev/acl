@@ -153,10 +153,8 @@ int mqtt_publish::update_topic_len(const char* data, int dlen) {
 int mqtt_publish::update_topic_val(const char* data, int dlen) {
 	assert(data && dlen > 0 && dlen_ > 0);
 
-	char ch;
 	for (; dlen_ > 0 && dlen > 0;) {
-		ch = *data++;
-		topic_ += ch;
+		topic_ += *data++;
 		--dlen_;
 		--dlen;
 	}
@@ -230,11 +228,9 @@ int mqtt_publish::update_payload(const char* data, int dlen) {
 	assert(data && dlen > 0);
 	assert((size_t) payload_len_ > payload_.size());
 
-	char ch;
 	size_t i, left = (size_t) payload_len_ - payload_.size();
 	for (i = 0; i < left && dlen > 0; i++) {
-		ch = *data++;
-		payload_ += ch;
+		payload_ += *data++;
 		dlen--;
 	}
 

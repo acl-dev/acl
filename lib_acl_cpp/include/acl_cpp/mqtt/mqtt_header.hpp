@@ -44,6 +44,7 @@ struct mqtt_constrain {
 };
 
 const char* mqtt_type_desc(mqtt_type_t type);
+const char* mqtt_qos_desc(mqtt_qos_t qos);
 
 class string;
 

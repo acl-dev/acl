@@ -5,18 +5,18 @@
 
 static std::vector<acl::string> __topics;
 
-class mqtt_aclient : public acl::mqtt_aclient {
+class mqtt_client : public acl::mqtt_aclient {
 public:
-	mqtt_aclient(acl::aio_handle& handle);
+	mqtt_client(acl::aio_handle& handle);
 
 protected:
-	~mqtt_aclient(void);
+	~mqtt_client(void);
 
 	// @override
 	void destroy(void) { delete this; }
 
 	// @override
-	bool on_connect(void);
+	bool on_open(void);
 
 	// @override
 	void on_ns_failed(void) {}
@@ -45,14 +45,14 @@ private:
 	bool handle_publish(const acl::mqtt_message& body);
 };
 
-mqtt_aclient::mqtt_aclient(acl::aio_handle& handle)
+mqtt_client::mqtt_client(acl::aio_handle& handle)
 : acl::mqtt_aclient(handle) {}
 
-mqtt_aclient::~mqtt_aclient(void) {}
+mqtt_client::~mqtt_client(void) {}
 
-bool mqtt_aclient::on_connect(void) {
+bool mqtt_client::on_open(void) {
 	acl::mqtt_connect message;
-	message.set_cid("client-id-test-xxx");
+	message.set_cid("aclient-id-test-xxx");
 	message.set_username("user-zsx");
 	//message.set_passwd("pass");
 #if 0
@@ -69,13 +69,13 @@ bool mqtt_aclient::on_connect(void) {
 	return false;
 }
 
-bool mqtt_aclient::on_header(const acl::mqtt_header& header) {
+bool mqtt_client::on_header(const acl::mqtt_header& header) {
 	printf("got new mqtt header, type=%s\r\n",
 		acl::mqtt_type_desc(header.get_type()));
 	return true;
 }
 
-bool mqtt_aclient::on_body(const acl::mqtt_message& body) {
+bool mqtt_client::on_body(const acl::mqtt_message& body) {
 	acl::mqtt_type_t type = body.get_header().get_type();
 	switch (type) {
 	case acl::MQTT_CONNACK:
@@ -97,7 +97,7 @@ bool mqtt_aclient::on_body(const acl::mqtt_message& body) {
 	}
 }
 
-bool mqtt_aclient::handle_connack(const acl::mqtt_message& body) {
+bool mqtt_client::handle_connack(const acl::mqtt_message& body) {
 	(void) body;
 
 	acl::mqtt_subscribe subscribe;
@@ -114,7 +114,7 @@ bool mqtt_aclient::handle_connack(const acl::mqtt_message& body) {
 	return this->send(subscribe);
 }
 
-bool mqtt_aclient::handle_suback(const acl::mqtt_message& body) {
+bool mqtt_client::handle_suback(const acl::mqtt_message& body) {
 	const acl::mqtt_suback& suback = (const acl::mqtt_suback&) body;
 	unsigned short pkt_id = suback.get_pkt_id();
 
@@ -131,7 +131,7 @@ bool mqtt_aclient::handle_suback(const acl::mqtt_message& body) {
 	return this->send(pingreq);
 }
 
-bool mqtt_aclient::handle_pingreq(const acl::mqtt_message&) {
+bool mqtt_client::handle_pingreq(const acl::mqtt_message&) {
 	acl::mqtt_pingresp pingresp;
 	if (this->send(pingresp)) {
 		return true;
@@ -140,17 +140,17 @@ bool mqtt_aclient::handle_pingreq(const acl::mqtt_message&) {
 	return false;
 }
 
-bool mqtt_aclient::handle_pingresp(const acl::mqtt_message&) {
+bool mqtt_client::handle_pingresp(const acl::mqtt_message&) {
 	printf("%s => got pingresp\r\n", __FUNCTION__);
 	return true;
 }
 
-bool mqtt_aclient::handle_disconnect(const acl::mqtt_message&) {
+bool mqtt_client::handle_disconnect(const acl::mqtt_message&) {
 	printf("%s => disconnect\r\n", __FUNCTION__);
 	return false;
 }
 
-bool mqtt_aclient::handle_publish(const acl::mqtt_message& body) {
+bool mqtt_client::handle_publish(const acl::mqtt_message& body) {
 	const acl::mqtt_publish& publish = (const acl::mqtt_publish&) body;
 	const acl::string& payload = publish.get_payload();
 	printf("topic: %s, qos: %d, pkt_id: %d, payload: %s\r\n",
@@ -181,7 +181,7 @@ static void usage(const char* procname) {
 
 int main(int argc, char* argv[]) {
 	char ch;
-	acl::string addr;
+	acl::string addr("127.0.0.1|1883");
 
 	while ((ch = getopt(argc, argv, "hs:")) > 0) {
 		switch (ch) {
@@ -194,11 +194,6 @@ int main(int argc, char* argv[]) {
 		default:
 			break;
 		}
-	}
-
-	if (addr.empty()) {
-		usage(argv[0]);
-		return 1;
 	}
 
 	acl::log::stdout_open(true);
@@ -214,9 +209,9 @@ int main(int argc, char* argv[]) {
 	}
 
 	acl::aio_handle handle(acl::ENGINE_KERNEL);
-	acl::mqtt_aclient* conn = new mqtt_aclient(handle);
+	acl::mqtt_aclient* conn = new mqtt_client(handle);
 	if (conn->open(addr, 10, 0)) {
-		printf("continue\r\n");
+		printf("begin connect server continue\r\n");
 	} else {
 		printf("open %s error %s\r\n", addr.c_str(), acl::last_serror());
 		return 1;

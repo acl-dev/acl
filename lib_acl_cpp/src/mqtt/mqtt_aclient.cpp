@@ -32,13 +32,36 @@ void mqtt_aclient::set_host(const char* host) {
 bool mqtt_aclient::open(const char* addr, int conn_timeout, int rw_timeout) {
 	ACL_AIO* aio = handle_.get_handle();
 	if (acl_aio_connect_addr(aio, addr, conn_timeout,
-			connect_callback, this) == -1) {
-
+		  connect_callback, this) == -1) {
 		logger_error("connect %s error %s", addr, last_serror());
 		return false;
 	}
 	rw_timeout_ = rw_timeout;
 	return true;
+}
+
+bool mqtt_aclient::open(aio_socket_stream* conn) {
+	conn_ = conn;
+	conn_->add_close_callback(this);
+	conn_->add_timeout_callback(this);
+	if (!ssl_conf_) {
+		return open_done();
+	}
+
+	sslbase_io* ssl_io = ssl_conf_->create(true);
+
+	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
+		logger_error("open ssl failed");
+		conn_->remove_hook();
+		ssl_io->destroy();
+		return false;
+	}
+
+	// begin SSL handshake, read_wakeup will be called if some data arrived.
+	conn_->add_read_callback(this);
+	conn_->read_wait(rw_timeout_);
+	return true;
+
 }
 
 void mqtt_aclient::close(void) {
@@ -110,7 +133,7 @@ bool mqtt_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	conn_->add_timeout_callback(this);
 
 	if (!ssl_conf_) {
-		return connect_done();
+		return open_done();
 	}
 
 	// create one SSL IO for SSL communication mode, and begin to SSL
@@ -142,8 +165,8 @@ int mqtt_aclient::connect_callback(const ACL_ASTREAM_CTX* ctx) {
 	return me->handle_connect(ctx) ? 0 : -1;
 }
 
-bool mqtt_aclient::connect_done(void) {
-	if (!this->on_connect()) {
+bool mqtt_aclient::open_done(void) {
+	if (!this->on_open()) {
 		return false;
 	}
 
@@ -180,7 +203,7 @@ bool mqtt_aclient::handle_ssl_handshake(void) {
 	if (ssl_io->handshake_ok()) {
 		conn_->del_read_callback(this);
 		conn_->disable_read();
-		return connect_done();
+		return open_done();
 	}
 
 	// else continue to wait for the completion of ssl handshake

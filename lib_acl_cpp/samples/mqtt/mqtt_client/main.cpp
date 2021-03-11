@@ -120,7 +120,7 @@ static void usage(const char* procname) {
 
 int main(int argc, char* argv[]) {
 	char ch;
-	acl::string addr;
+	acl::string addr("127.0.0.1|1883");
 
 	while ((ch = getopt(argc, argv, "hs:")) > 0) {
 		switch (ch) {
@@ -133,11 +133,6 @@ int main(int argc, char* argv[]) {
 		default:
 			break;
 		}
-	}
-
-	if (addr.empty()) {
-		usage(argv[0]);
-		return 1;
 	}
 
 	acl::log::stdout_open(true);

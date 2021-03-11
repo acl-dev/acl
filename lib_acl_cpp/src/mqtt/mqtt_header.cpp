@@ -31,6 +31,19 @@ const char* mqtt_type_desc(mqtt_type_t type) {
 	return __constrains[type].desc;
 }
 
+const char* mqtt_qos_desc(mqtt_qos_t qos) {
+	switch (qos) {
+	case MQTT_QOS0:
+		return "QOS0";
+	case MQTT_QOS1:
+		return "QOS1";
+	case MQTT_QOS2:
+		return "QOS2";
+	default:
+		return "unknown";
+	}
+}
+
 enum {
 	MQTT_STAT_HDR_TYPE,
 	MQTT_STAT_HDR_LEN,

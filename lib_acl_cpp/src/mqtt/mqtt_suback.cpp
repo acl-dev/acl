@@ -34,13 +34,23 @@ mqtt_suback::mqtt_suback(const mqtt_header& header)
 
 mqtt_suback::~mqtt_suback(void) {}
 
-void mqtt_suback::set_pkt_id(unsigned short id) {
+mqtt_suback& mqtt_suback::set_pkt_id(unsigned short id) {
 	pkt_id_ = id;
+	return *this;
 }
 
-void mqtt_suback::add_topic_qos(mqtt_qos_t qos) {
+mqtt_suback& mqtt_suback::add_topic_qos(mqtt_qos_t qos) {
 	qoses_.push_back(qos);
 	body_len_ += 1;
+	return *this;
+}
+
+mqtt_suback& mqtt_suback::add_topic_qos(const std::vector<mqtt_qos_t>& qoses) {
+	for (std::vector<mqtt_qos_t>::const_iterator cit = qoses.begin();
+		 cit != qoses.end(); ++cit) {
+		add_topic_qos(*cit);
+	}
+	return *this;
 }
 
 bool mqtt_suback::to_string(string& out) {

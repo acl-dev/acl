@@ -11,8 +11,9 @@ public:
 	mqtt_suback(const mqtt_header& header);
 	~mqtt_suback(void);
 
-	void set_pkt_id(unsigned short id);
-	void add_topic_qos(mqtt_qos_t qos);
+	mqtt_suback& set_pkt_id(unsigned short id);
+	mqtt_suback& add_topic_qos(mqtt_qos_t qos);
+	mqtt_suback& add_topic_qos(const std::vector<mqtt_qos_t>& qoses);
 
 	unsigned short get_pkt_id(void) const {
 		return pkt_id_;
