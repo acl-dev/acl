@@ -30,8 +30,10 @@ mqtt_ack::mqtt_ack(const mqtt_header& header)
 mqtt_ack::~mqtt_ack(void) {}
 
 void mqtt_ack::set_pkt_id(unsigned short id) {
-	if (id > 0 && id <= 65535) {
+	if (id > 0) {
 		pkt_id_ = id;
+	} else {
+		logger_error("invalid pkt_id=%u", id);
 	}
 }
 

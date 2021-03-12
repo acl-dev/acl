@@ -37,10 +37,10 @@ mqtt_subscribe::mqtt_subscribe(const mqtt_header& header)
 mqtt_subscribe::~mqtt_subscribe(void) {}
 
 mqtt_subscribe& mqtt_subscribe::set_pkt_id(unsigned short id) {
-	if (id > 0 && id <= 65535) {
+	if (id > 0) {
 		pkt_id_ = id;
 	} else {
-		logger_error("ivnalid pkt id=0");
+		logger_error("ivnalid pkt id=%u", id);
 	}
 	return *this;
 }

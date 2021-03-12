@@ -36,10 +36,10 @@ mqtt_unsubscribe::mqtt_unsubscribe(const mqtt_header& header)
 mqtt_unsubscribe::~mqtt_unsubscribe(void) {}
 
 mqtt_unsubscribe& mqtt_unsubscribe::set_pkt_id(unsigned short id) {
-	if (id > 0 && id <= 65535) {
+	if (id > 0) {
 		pkt_id_ = id;
 	} else {
-		logger_error("invalid id=0");
+		logger_error("invalid id=%u", id);
 	}
 	return *this;
 }
