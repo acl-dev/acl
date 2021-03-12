@@ -36,14 +36,20 @@ mqtt_subscribe::mqtt_subscribe(const mqtt_header& header)
 
 mqtt_subscribe::~mqtt_subscribe(void) {}
 
-void mqtt_subscribe::set_pkt_id(unsigned short id) {
-	pkt_id_ = id;
+mqtt_subscribe& mqtt_subscribe::set_pkt_id(unsigned short id) {
+	if (id > 0 && id <= 65535) {
+		pkt_id_ = id;
+	} else {
+		logger_error("ivnalid pkt id=0");
+	}
+	return *this;
 }
 
-void mqtt_subscribe::add_topic(const char* topic, mqtt_qos_t qos) {
+mqtt_subscribe& mqtt_subscribe::add_topic(const char* topic, mqtt_qos_t qos) {
 	topics_.push_back(topic);
 	qoses_.push_back(qos);
 	body_len_ += 2 + (unsigned) strlen(topic) + 1;
+	return *this;
 }
 
 bool mqtt_subscribe::to_string(string& out) {

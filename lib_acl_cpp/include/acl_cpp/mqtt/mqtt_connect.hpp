@@ -13,10 +13,23 @@ typedef enum {
 	CONNECT_NO_AUTHORITY	= 0x05,
 } mqtt_conn_status_t;
 
+/**
+ * mqtt message object for the MQTT_CONNECT type.
+ */
 class ACL_CPP_API mqtt_connect : public mqtt_message {
 public:
+	/**
+	 * constructor for creating MQTT_CONNECT mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_connect(void);
+
+	/**
+	 * constructor for creating MQTT_CONNECT mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_connect(const mqtt_header& header);
+
 	~mqtt_connect(void);
 
 protected:
@@ -88,6 +101,9 @@ private:
 	string will_msg_;
 
 public:
+	// (internal)
+	// the methods below will be used to update mqtt message object when
+	// parsing mqtt body data.
 	int update_header_var(const char* data, int dlen);
 	int update_cid_len(const char* data, int dlen);
 	int update_cid_val(const char* data, int dlen);

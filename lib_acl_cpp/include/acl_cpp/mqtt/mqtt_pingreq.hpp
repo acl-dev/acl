@@ -4,10 +4,23 @@
 
 namespace acl {
 
+/**
+ * mqtt message object for MQTT_PINGREQ type.
+ */
 class ACL_CPP_API mqtt_pingreq : public mqtt_message {
 public:
+	/**
+	 * constructor for creating MQTT_PINGREQ mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_pingreq(void);
+
+	/**
+	 * constructor for creating MQTT_PINGREQ mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_pingreq(const mqtt_header& header);
+
 	~mqtt_pingreq(void);
 
 protected:

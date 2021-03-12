@@ -30,10 +30,16 @@ mqtt_ack::mqtt_ack(const mqtt_header& header)
 mqtt_ack::~mqtt_ack(void) {}
 
 void mqtt_ack::set_pkt_id(unsigned short id) {
-	pkt_id_ = id;
+	if (id > 0 && id <= 65535) {
+		pkt_id_ = id;
+	}
 }
 
 bool mqtt_ack::to_string(string& out) {
+	if (pkt_id_ == 0) {
+		logger_error("pkt_id=0 is invalid");
+		return false;
+	}
 	mqtt_header& header = this->get_header();
 	header.set_remaing_length(2);
 

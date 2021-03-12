@@ -37,23 +37,26 @@ mqtt_publish::mqtt_publish(const mqtt_header& header)
 
 mqtt_publish::~mqtt_publish(void) {}
 
-void mqtt_publish::set_topic(const char* topic) {
+mqtt_publish& mqtt_publish::set_topic(const char* topic) {
 	topic_ = topic;
+	return *this;
 }
 
-void mqtt_publish::set_pkt_id(unsigned short id) {
+mqtt_publish& mqtt_publish::set_pkt_id(unsigned short id) {
 	if (id > 0) {
 		pkt_id_ = id;
 	} else {
 		logger_warn("pkt id should > 0, id=%d", id);
 	}
+	return *this;
 }
 
-void mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
+mqtt_publish& mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
 	payload_len_ = len;
 	if (data && payload_len_ > 0) {
 		payload_.copy(data, len);
 	}
+	return *this;
 }
 
 bool mqtt_publish::to_string(string& out) {

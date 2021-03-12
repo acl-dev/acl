@@ -4,6 +4,9 @@
 
 namespace acl {
 
+/**
+ * the status of connection.
+ */
 enum {
 	MQTT_CONNACK_OK       = 0x00,
 	MQTT_CONNACK_ERR_VER  = 0x01,
@@ -13,19 +16,51 @@ enum {
 	MQTT_CONNACK_ERR_DENY = 0x05,
 };
 
+/**
+ * mqtt message object for the MQTT_CONNACK type.
+ */
 class ACL_CPP_API mqtt_connack : public mqtt_message {
 public:
+	/**
+	 * constructor for creating MQTT_CONNACK mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_connack(void);
+
+	/**
+	 * constructor for creating MQTT_CONNACK mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_connack(const mqtt_header& header);
+
 	~mqtt_connack(void);
 
-	void set_session(bool on);
-	void set_connack_code(unsigned char code);
+	/**
+	 * set the session control for the connection
+	 * @param on {bool}
+	 * @return {mqtt_connack&}
+	 */
+	mqtt_connack& set_session(bool on);
 
+	/**
+	 * set the connect return code
+	 * @param code {unsigned char} defined as MQTT_CONNACK_XXX above.
+	 * @return {mqtt_connack&}
+	 */
+	mqtt_connack& set_connack_code(unsigned char code);
+
+	/**
+	 * get the session control status
+	 * @return {bool}
+	 */
 	bool get_session(void) const {
 		return session_;
 	}
 
+	/**
+	 * get the connect resturn code
+	 * @return {unsigned char} defined as MQTT_CONNACK_XXX above.
+	 */
 	unsigned char get_connack_code(void) const {
 		return connack_code_;
 	}
@@ -43,6 +78,12 @@ protected:
 	}
 
 public:
+	/**
+	 * (internal) update mqtt header data for parsing mqtt data.
+	 * @param data {const char*} the data to be parsed.
+	 * @param dlen {int} the length of data.
+	 * @return {int} return the length of the left data.
+	 */
 	int update_header_var(const char* data, int dlen);
 
 private:

@@ -4,10 +4,23 @@
 
 namespace acl {
 
+/**
+ * mqtt message object for the MQTT_DISCONNECT type.
+ */
 class ACL_CPP_API mqtt_disconnect : public mqtt_message {
 public:
+	/**
+	 * constructor for creating MQTT_DISCONNECT mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_disconnect(void);
+
+	/**
+	 * constructor for creating MQTT_DISCONNECT mqtt message object.
+	 * @see mqtt_message
+	 */
 	mqtt_disconnect(const mqtt_header& header);
+
 	~mqtt_disconnect(void);
 
 protected:
@@ -23,7 +36,6 @@ protected:
 	bool finished(void) const {
 		return true;
 	}
-
 };
 
 } // namespace acl

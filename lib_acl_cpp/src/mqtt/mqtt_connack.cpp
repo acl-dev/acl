@@ -33,17 +33,19 @@ mqtt_connack::mqtt_connack(const mqtt_header& header)
 
 mqtt_connack::~mqtt_connack(void) {}
 
-void mqtt_connack::set_session(bool on) {
+mqtt_connack& mqtt_connack::set_session(bool on) {
 	session_ = on;
 	if (on) {
 		conn_flags_ = 0x01;
 	} else {
 		conn_flags_ = 0x00;
 	}
+	return *this;
 }
 
-void mqtt_connack::set_connack_code(unsigned char code) {
+mqtt_connack& mqtt_connack::set_connack_code(unsigned char code) {
 	connack_code_ = code;
+	return *this;
 }
 
 bool mqtt_connack::to_string(string& out) {

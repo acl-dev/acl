@@ -35,16 +35,26 @@ mqtt_unsubscribe::mqtt_unsubscribe(const mqtt_header& header)
 
 mqtt_unsubscribe::~mqtt_unsubscribe(void) {}
 
-void mqtt_unsubscribe::set_pkt_id(unsigned short id) {
-	pkt_id_ = id;
+mqtt_unsubscribe& mqtt_unsubscribe::set_pkt_id(unsigned short id) {
+	if (id > 0 && id <= 65535) {
+		pkt_id_ = id;
+	} else {
+		logger_error("invalid id=0");
+	}
+	return *this;
 }
 
-void mqtt_unsubscribe::add_topic(const char* topic) {
+mqtt_unsubscribe& mqtt_unsubscribe::add_topic(const char* topic) {
 	topics_.push_back(topic);
 	body_len_ += (unsigned) strlen(topic);
+	return *this;
 }
 
 bool mqtt_unsubscribe::to_string(string& out) {
+	if (pkt_id_ == 0) {
+		logger_error("pkt_id=0 invalid");
+		return false;
+	}
 	if (topics_.empty()) {
 		logger_error("no topic available!");
 		return false;
