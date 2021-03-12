@@ -281,7 +281,7 @@ int mqtt_aclient::handle_data(char* data, int len) {
 	}
 
 	if (!header_->finished()) {
-		assert(left = 0);
+		assert(left == 0);
 		return 0;
 	}
 
