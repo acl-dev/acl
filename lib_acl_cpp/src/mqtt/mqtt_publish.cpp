@@ -42,7 +42,11 @@ void mqtt_publish::set_topic(const char* topic) {
 }
 
 void mqtt_publish::set_pkt_id(unsigned short id) {
-	pkt_id_ = id;
+	if (id > 0) {
+		pkt_id_ = id;
+	} else {
+		logger_warn("pkt id should > 0, id=%d", d);
+	}
 }
 
 void mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
@@ -53,6 +57,11 @@ void mqtt_publish::set_payload(unsigned len, const char* data /* NULL */) {
 }
 
 bool mqtt_publish::to_string(string& out) {
+	if (pkt_id_ == 0) {
+		logger_error("pkt_id should > 0, pkt_id=%u", pkt_id_);
+		return false;
+	}
+
 	unsigned len = (unsigned) topic_.size() + 2 + payload_len_;
 	mqtt_qos_t qos = this->get_header().get_qos();
 	if (qos != MQTT_QOS0) {
@@ -64,9 +73,11 @@ bool mqtt_publish::to_string(string& out) {
 	if (header.is_dup() && header.get_qos() == MQTT_QOS0) {
 		header.set_dup(false);
 	}
+
 	header.set_remaing_length(len);
 
 	if (!header.build_header(out)) {
+		logger_error("build header error");
 		return false;
 	}
 
