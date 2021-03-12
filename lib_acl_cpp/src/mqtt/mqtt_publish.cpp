@@ -45,7 +45,7 @@ void mqtt_publish::set_pkt_id(unsigned short id) {
 	if (id > 0) {
 		pkt_id_ = id;
 	} else {
-		logger_warn("pkt id should > 0, id=%d", d);
+		logger_warn("pkt id should > 0, id=%d", id);
 	}
 }
 
