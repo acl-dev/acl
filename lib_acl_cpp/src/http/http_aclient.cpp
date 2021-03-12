@@ -108,7 +108,7 @@ void http_aclient::close(void)
 	}
 }
 
-bool http_aclient::get_ns_addr(string& out)
+bool http_aclient::get_ns_addr(string& out) const
 {
 	char buf[256];
 	const struct sockaddr* sa = (const struct sockaddr*) &ns_addr_;
@@ -120,7 +120,7 @@ bool http_aclient::get_ns_addr(string& out)
 	return true;
 }
 
-bool http_aclient::get_server_addr(string& out)
+bool http_aclient::get_server_addr(string& out) const
 {
 	char buf[256];
 	const struct sockaddr* sa = (const struct sockaddr*) &serv_addr_;

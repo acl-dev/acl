@@ -128,14 +128,14 @@ public:
 	 * @param out {string&} 存储结果
 	 * @return {bool} 返回 false 表示没有可用的 DNS 地址
 	 */
-	bool get_ns_addr(string& out);
+	bool get_ns_addr(string& out) const;
 
 	/**
 	 * 当连接成功、连接失败或连接超时时可调用此方法获得当前所连接用的应用服务器地址
 	 * @param out {string&} 存储结果
 	 * @return {bool} 返回 false 表示还没有设置所连接服务器的地址
 	 */
-	bool get_server_addr(string& out);
+	bool get_server_addr(string& out) const;
 
 	/**
 	 * 连接成功后可调用本方法获得异步连接对象

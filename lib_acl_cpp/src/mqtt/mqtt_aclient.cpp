@@ -70,7 +70,7 @@ void mqtt_aclient::close(void) {
 	}
 }
 
-bool http_aclient::get_ns_addr(string& out) {
+bool mqtt_aclient::get_ns_addr(string& out) const {
 	char buf[256];
 	const struct sockaddr* sa = (const struct sockaddr*) &ns_addr_;
 	size_t ret = acl_inet_ntop(sa, buf, sizeof(buf));
@@ -81,7 +81,7 @@ bool http_aclient::get_ns_addr(string& out) {
 	return true;
 }
 
-bool http_aclient::get_server_addr(string& out) {
+bool mqtt_aclient::get_server_addr(string& out) const {
 	char buf[256];
 	const struct sockaddr* sa = (const struct sockaddr*) &serv_addr_;
 	size_t ret = acl_inet_ntop(sa, buf, sizeof(buf));

@@ -70,6 +70,10 @@ public:
 public:
 	bool send(mqtt_message& message);
 
+public:
+	bool get_ns_addr(string& out) const;
+	bool get_server_addr(string& out) const;
+
 protected:
 	// the subclass should be created dynamically
 	virtual ~mqtt_aclient(void);
