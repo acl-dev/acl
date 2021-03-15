@@ -150,7 +150,6 @@ private:
 	aio_handle& handle_;
 	sslbase_conf* ssl_conf_;
 	aio_socket_stream* conn_;
-	int conn_timeout_;
 	int rw_timeout_;
 	string host_;
 	struct sockaddr_storage ns_addr_;
