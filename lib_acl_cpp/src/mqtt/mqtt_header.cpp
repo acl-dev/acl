@@ -151,17 +151,17 @@ bool mqtt_header::build_header(string& out) {
 	if (dlen_ < 128) {
 		header[len++] = dlen_ & 0x7f;
 	} else if (dlen_ < 16384) {
-		header[len++] = ((unsigned char) (dlen_ >> 8) & 0x7f) | 0x80;
 		header[len++] = (unsigned char) dlen_ & 0x7f;
+		header[len++] = ((unsigned char) (dlen_ >> 7) & 0x7f) | 0x80;
 	} else if (dlen_ < 2097152) {
-		header[len++] = ((unsigned char)(dlen_ >> 16) & 0x7f) | 0x80;
-		header[len++] = ((unsigned char)(dlen_ >> 8 ) & 0x7f) | 0x80;
 		header[len++] = (unsigned char)  dlen_ & 0x7f;
+		header[len++] = ((unsigned char)(dlen_ >> 7 ) & 0x7f) | 0x80;
+		header[len++] = ((unsigned char)(dlen_ >> 15) & 0x7f) | 0x80;
 	} else if (dlen_ < 268435456) {
-		header[len++] = ((unsigned char)(dlen_ >> 24) & 0x7f) | 0x80;
-		header[len++] = ((unsigned char)(dlen_ >> 16) & 0x7f) | 0x80;
-		header[len++] = ((unsigned char)(dlen_ >> 8 ) & 0x7f) | 0x80;
 		header[len++] = (unsigned char)  dlen_ & 0x7f;
+		header[len++] = ((unsigned char)(dlen_ >> 7 ) & 0x7f) | 0x80;
+		header[len++] = ((unsigned char)(dlen_ >> 15) & 0x7f) | 0x80;
+		header[len++] = ((unsigned char)(dlen_ >> 23) & 0x7f) | 0x80;
 	} else {
 		logger_error("invalid dlen_=%u", dlen_);
 		return false;
