@@ -148,16 +148,16 @@ bool mqtt_header::build_header(string& out) {
 	header[len] = ((((char) type_) << 4) & 0xff) | hflags_;
 	len++;
 
-	if (dlen_ <= 127) {
+	if (dlen_ < 128) {
 		header[len++] = dlen_ & 0x7f;
-	} else if (dlen_ <= 16383) {
+	} else if (dlen_ < 16384) {
 		header[len++] = ((unsigned char) (dlen_ >> 8) & 0x7f) | 0x80;
 		header[len++] = (unsigned char) dlen_ & 0x7f;
-	} else if (dlen_ <= 2097151) {
+	} else if (dlen_ < 2097152) {
 		header[len++] = ((unsigned char)(dlen_ >> 16) & 0x7f) | 0x80;
 		header[len++] = ((unsigned char)(dlen_ >> 8 ) & 0x7f) | 0x80;
 		header[len++] = (unsigned char)  dlen_ & 0x7f;
-	} else if (dlen_ <= 268435455) {
+	} else if (dlen_ < 268435456) {
 		header[len++] = ((unsigned char)(dlen_ >> 24) & 0x7f) | 0x80;
 		header[len++] = ((unsigned char)(dlen_ >> 16) & 0x7f) | 0x80;
 		header[len++] = ((unsigned char)(dlen_ >> 8 ) & 0x7f) | 0x80;
@@ -213,6 +213,7 @@ int mqtt_header::update(const char* data, int dlen) {
 		data += dlen - ret;
 		dlen  = ret;
 	}
+
 	return dlen;
 }
 
@@ -263,28 +264,10 @@ int mqtt_header::update_header_len(const char* data, int dlen) {
 		return dlen;
 	}
 
-#if 1
 	dlen_ = 0;
 	for (unsigned i = 0; i < hlen_; i++) {
-		dlen_ |= (unsigned) ((hbuf_[i] & 0x7f) << (8 * i));
+		dlen_ |= (unsigned) ((hbuf_[i] & 0x7f) << (7 * i));
 	}
-#else
-	if (hlen_ == 1) {
-		dlen_ = (unsigned) (hbuf_[0] & 0x7f);
-	} else if (hlen_ == 2) {
-		dlen_ = (unsigned) (((hbuf_[0] & 0x7f) << 8)
-				| (hbuf_[1] & 0x7f));
-	} else if (hlen_ == 3) {
-		dlen_ = (unsigned) (((hbuf_[0] & 0x7f) << 16)
-				| ((hbuf_[1] & 0x7f) << 8)
-				| (hbuf_[0] & 0x7f));
-	} else if (hlen_ == 4) {
-		dlen_ = (unsigned) (((hbuf_[0] & 0x7f) << 24)
-				| ((hbuf_[1] & 0x7f) << 16)
-				| ((hbuf_[2] & 0x7f) << 8)
-				| (hbuf_[0] & 0x7f));
-	}
-#endif
 
 	finished_ = true;
 	return dlen;
