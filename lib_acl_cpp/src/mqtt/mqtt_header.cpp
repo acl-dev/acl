@@ -156,12 +156,12 @@ bool mqtt_header::build_header(string& out) {
 	} else if (dlen_ < 2097152) {
 		header[len++] = (unsigned char)  dlen_ & 0x7f;
 		header[len++] = ((unsigned char)(dlen_ >> 7 ) & 0x7f) | 0x80;
-		header[len++] = ((unsigned char)(dlen_ >> 15) & 0x7f) | 0x80;
+		header[len++] = ((unsigned char)(dlen_ >> 14) & 0x7f) | 0x80;
 	} else if (dlen_ < 268435456) {
 		header[len++] = (unsigned char)  dlen_ & 0x7f;
 		header[len++] = ((unsigned char)(dlen_ >> 7 ) & 0x7f) | 0x80;
-		header[len++] = ((unsigned char)(dlen_ >> 15) & 0x7f) | 0x80;
-		header[len++] = ((unsigned char)(dlen_ >> 23) & 0x7f) | 0x80;
+		header[len++] = ((unsigned char)(dlen_ >> 14) & 0x7f) | 0x80;
+		header[len++] = ((unsigned char)(dlen_ >> 21) & 0x7f) | 0x80;
 	} else {
 		logger_error("invalid dlen_=%u", dlen_);
 		return false;
