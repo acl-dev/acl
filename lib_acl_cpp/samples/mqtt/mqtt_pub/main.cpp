@@ -24,7 +24,7 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
 	publish.set_topic(topic);
 
 	acl::string payload;
-	payload.format("payload-%d", id);
+	payload.format("payload-%ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", id);
 	publish.set_payload((unsigned) payload.size(), payload);
 
 	if (!conn.send(publish)) {
