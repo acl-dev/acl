@@ -1,0 +1,156 @@
+CC      = g++
+
+CFLAGS = -c -g -W \
+-Wall \
+-Wcast-qual \
+-Wcast-align \
+-Wno-long-long \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-O3 \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
+
+###########################################################
+#Check system:
+#       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
+SYSLIB = -lpthread -lz -ldl
+CHECKSYSRES = @echo "Unknow system type!";exit 1
+UNIXNAME = $(shell uname -s)
+OSTYPE = $(shell uname -m)
+RPATH = linux64
+
+ifeq ($(CC),)
+        CC = gcc
+endif
+
+ifeq ($(findstring g++, $(CC)), g++)
+	GCC_VERSION=$(shell g++ --version | grep ^g++ | sed 's/^.* //g')
+	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
+	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 7 \) ] && echo true)
+	ifeq ($(GCC_VER), true)
+		CFLAGS += --std=c++11
+	endif
+endif
+
+# For FreeBSD
+ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	ifeq ($(findstring gcc, $(CC)), gcc)
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DFREEBSD -D_REENTRANT
+	SYSLIB = -lcrypt -lpthread -lz
+	RPATH = freebsd
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-invalid-offsetof
+	UNIXTYPE = MACOSX
+	SYSLIB +=  -liconv -rdynamic
+	RPATH = macos
+endif
+
+#Path for Linux
+ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	ifeq ($(findstring i686, $(OSTYPE)), i686)
+		RPATH = linux32
+	endif
+	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
+		RPATH = linux64
+	endif
+	CFLAGS += -DLINUX2 -D_REENTRANT
+	SYSLIB += -lcrypt
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB = -lpthread-2 -liconv
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+#Path for SunOS
+ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
+	ifeq ($(findstring 86, $(UNIXNAME)), 86)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DSUNOS5 -D_REENTRANT
+	RPATH = sunos_x86
+endif
+
+#Path for HP-UX
+ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DHP_UX -DHPUX11
+	PLAT_NAME=hp-ux
+endif
+
+#Find system type.
+ifneq ($(SYSPATH),)
+	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+endif
+###########################################################
+
+ACL_PATH = ../../..
+CFLAGS += -I$(ACL_PATH)/lib_acl/include \
+	  -I$(ACL_PATH)/lib_protocol/include \
+	  -I$(ACL_PATH)/lib_acl_cpp/include
+EXTLIBS =
+LDFLAGS = -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
+	  -L$(ACL_PATH)/lib_protocol/lib -lprotocol \
+	  -L$(ACL_PATH)/lib_acl/lib -lacl \
+	  $(EXTLIBS) $(SYSLIB)
+
+COMPILE = $(CC) $(CFLAGS)
+LINK = $(CC) $(OBJ) $(LDFLAGS)
+###########################################################
+OBJ_PATH = .
+
+#Project's objs
+SRC = $(wildcard *.cpp)
+OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+
+$(shell mkdir -p ../../../dist/master/libexec/$(RPATH)/)
+
+$(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+
+.PHONY = all clean
+all: RM $(OBJ)
+	$(LINK) -o $(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+RM:
+	rm -f $(PROG)
+clean:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+install:
+	cp $(PROG) ../../../dist/master/libexec/$(RPATH)/
+	cp $(PROG).cf ../../../dist/master/conf/service/
+###########################################################
