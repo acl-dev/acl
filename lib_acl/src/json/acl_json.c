@@ -359,8 +359,12 @@ ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf)
 #if 0
 	json->status = ACL_JSON_S_OBJ;
 #else
+#if 0
 	json->root->left_ch = '{';
 	json->root->right_ch = '}';
+#endif
+	json->root->left_ch = 0;
+	json->root->right_ch = 0;
 	json->status = ACL_JSON_S_ROOT;
 #endif
 
@@ -469,8 +473,13 @@ void acl_json_reset(ACL_JSON *json)
 		acl_dbuf_pool_reset(json->dbuf, json->dbuf_keep);
 
 	json->root = acl_json_node_alloc(json);
+#if 0
 	json->root->left_ch = '{';
 	json->root->right_ch = '}';
+#else
+	json->root->left_ch = 0;
+	json->root->right_ch = 0;
+#endif
 	json->root->type = ACL_JSON_T_OBJ;
 
 	json->node_cnt = 1;

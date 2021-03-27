@@ -106,7 +106,7 @@ int main(void)
 	s = "{}";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
-		printf("%s\r\n", s);
+		printf("diff: %s, with: %s\r\n", s, buf.c_str());
 		printf("%s(%d): Error\r\n", __FUNCTION__, __LINE__);
 		return 1;
 	}
@@ -120,10 +120,10 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 
-	s = "{[]}";
+	s = "[]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
-		printf("%s\r\n", s);
+		printf("diff: %s, with: %s\r\n", s, buf.c_str());
 		printf("%s(%d): Error\r\n", __FUNCTION__, __LINE__);
 		return 1;
 	}
@@ -140,7 +140,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 
-	s = "{[10,100,1000]}";
+	s = "[10,100,1000]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
@@ -160,7 +160,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 	
-	s = "{[\"hello\",\"world\"]}";
+	s = "[\"hello\",\"world\"]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
@@ -183,7 +183,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 	
-	s = "{[[[[]]]]}";
+	s = "[[[[]]]]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
@@ -205,7 +205,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 
-	s = "{[{}]}";
+	s = "[{}]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
@@ -227,7 +227,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 
-	s = "{[{\"hello\":\"world\"}]}";
+	s = "[{\"hello\":\"world\"}]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
@@ -249,7 +249,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 	
-	s = "{[{},{}]}";
+	s = "[{},{}]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
@@ -274,7 +274,7 @@ int main(void)
 	json.build_json(buf);
 	printf("%s\r\n", buf.c_str());
 	
-	s = "{[\"hello\",\"world\",[[[]]],{},{}]}";
+	s = "[\"hello\",\"world\",[[[]]],{},{}]";
 	if (strcmp(s, buf.c_str()) != 0)
 	{
 		printf("%s\r\n", s);
