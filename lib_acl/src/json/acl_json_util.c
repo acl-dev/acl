@@ -287,6 +287,22 @@ void acl_json_building(ACL_JSON *json, size_t length,
 	ACL_ITER iter;
 	ACL_JSON_NODE *node, *prev;
 	ACL_VSTRING *buf = acl_vstring_alloc(256);
+	ACL_RING *ring_ptr = acl_ring_succ(&json->root->children);
+
+	/* 为了兼容历史的BUG，所以此处只能如此处理了--zsx, 2021.3.27 */
+
+	if (ring_ptr == &json->root->children) {
+		if (json->root->left_ch == 0) {
+			json->root->left_ch = '{';
+			json->root->right_ch = '}';
+		}
+	} else {
+		node = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
+		if (node->left_ch == 0 && json->root->left_ch == 0) {
+			json->root->left_ch = '{';
+			json->root->right_ch = '}';
+		}
+	}
 
 	if (json->root->left_ch > 0)
 		ACL_VSTRING_ADDCH(buf, json->root->left_ch);
@@ -438,14 +454,9 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			json->root->left_ch = '{';
 			json->root->right_ch = '}';
 		}
-	} else if (json->root->type != ACL_JSON_T_ARRAY) {
+	} else {
 		node = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
-		if (node != NULL && node->type == ACL_JSON_T_ARRAY
-			&& acl_ring_size(&json->root->children) == 1) {
-
-			json->root->left_ch = 0;
-			json->root->right_ch = 0;
-		} else {
+		if (node->left_ch == 0 && json->root->left_ch == 0) {
 			json->root->left_ch = '{';
 			json->root->right_ch = '}';
 		}
