@@ -52,9 +52,9 @@ int main(void)
 		printf("type: %s->%s\r\n", child->get_type(),
 			child->to_string().c_str());
 
-		const char* ptr = (*child)["test1"];
-		if (ptr)
-			printf(">>> found, test1: %s\r\n", ptr);
+		acl::json_node* o = (*child)["test1"];
+		if (o)
+			printf(">>> found, test1: %p\r\n", o);
 
 		acl::json_node* iter = child->first_child();
 		while (iter)
