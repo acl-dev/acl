@@ -296,12 +296,15 @@ void acl_json_building(ACL_JSON *json, size_t length,
 			json->root->left_ch = '{';
 			json->root->right_ch = '}';
 		}
-	} else {
+	} else if (acl_ring_size(&json->root->children) == 1) {
 		node = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 		if (node->left_ch == 0 && json->root->left_ch == 0) {
 			json->root->left_ch = '{';
 			json->root->right_ch = '}';
 		}
+	} else if (json->root->left_ch == 0) {
+		json->root->left_ch = '{';
+		json->root->right_ch = '}';
 	}
 
 	if (json->root->left_ch > 0)
@@ -454,12 +457,15 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			json->root->left_ch = '{';
 			json->root->right_ch = '}';
 		}
-	} else {
+	} else if (acl_ring_size(&json->root->children) == 1) {
 		node = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
 		if (node->left_ch == 0 && json->root->left_ch == 0) {
 			json->root->left_ch = '{';
 			json->root->right_ch = '}';
 		}
+	} else if (json->root->left_ch == 0) {
+		json->root->left_ch = '{';
+		json->root->right_ch = '}';
 	}
 
 	if (json->root->left_ch > 0)

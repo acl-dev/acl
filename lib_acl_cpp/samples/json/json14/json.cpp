@@ -69,6 +69,11 @@ int main(int argc, char* argv[]) {
 	json.reset();
 	json.get_root().add_child(false, true)
 		.add_text("name1", "value1");
+	acl::json_node& node = json.create_node("name2", "value2");
+	json.get_root().add_child(node);
+	node.set_tag("name3");
+	node.set_text("value3");
 	printf("build json: %s\r\n", json.to_string().c_str());
+
 	return 0;
 }

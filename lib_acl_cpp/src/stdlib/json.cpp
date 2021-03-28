@@ -203,7 +203,17 @@ bool json_node::set_text(const char* text)
 	if (text == NULL || *text == 0) {
 		return false;
 	}
-	if (!(node_me_->type & ACL_JSON_T_LEAF) || node_me_->text == NULL) {
+	if (node_me_->text == NULL) {
+		return false;
+	}
+	switch (node_me_->type) {
+	case ACL_JSON_T_NULL:
+	case ACL_JSON_T_BOOL:
+	case ACL_JSON_T_NUMBER:
+	case ACL_JSON_T_DOUBLE:
+	case ACL_JSON_T_STRING:
+		break;
+	default:
 		return false;
 	}
 	acl_vstring_strcpy(node_me_->text, text);
