@@ -53,7 +53,7 @@ bool beanstalk::beanstalk_open(void)
 		errbuf_.format("connect");
 		return false;
 	}
-	if (!tube_used_ && beanstalk_use()) {
+	if (tube_used_ && !beanstalk_use()) {
 		logger_error("use %s error: %s", tube_used_, last_serror());
 		conn_.close();
 		return false;

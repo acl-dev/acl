@@ -53,7 +53,7 @@ static void* consumer(void* ctx)
 	// 从指定消息队列中接收消息
 	if (conn.watch(__tube) == false)
 	{
-		printf("watch %s faile\r\n", __tube);
+		printf("%s: watch %s faile\r\n", __FUNCTION__, __tube);
 		return NULL;
 	}
 
@@ -142,6 +142,8 @@ int main(int argc, char* argv[])
 			break;
 		}
 	}
+
+	acl::log::stdout_open(true);
 
 	test1();
 
