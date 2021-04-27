@@ -53,11 +53,11 @@ void acl_fdmap_add(ACL_FD_MAP *map, int fd, void *ctx)
 	const char *myname = "acl_fdmap_add";
 
 	if (fd >= map->size) {
-		acl_msg_warn("%s(%d): fd(%d) >= map's size(%d), extend it",
-			myname, __LINE__, fd, map->size);
+		acl_msg_warn("%s(%d): fd(%d) >= map's size(%d), extend it to %d",
+			myname, __LINE__, fd, map->size, fd + 1024);
 		map->size = fd + 1024;
 		map->table = (FD_ENTRY *)
-			acl_myrealloc(map, map->size * sizeof(FD_ENTRY));
+			acl_myrealloc(map->table, map->size * sizeof(FD_ENTRY));
 	}
 	map->table[fd].fd = fd;
 	map->table[fd].ctx = ctx;
