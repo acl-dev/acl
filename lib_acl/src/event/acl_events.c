@@ -69,16 +69,11 @@ static int event_limit(int fdsize)
 	if ((fdsize = acl_open_limit(fdsize)) < 0) {
 		acl_msg_error("%s: unable to determine open file limit, err=%s",
 			myname, acl_last_serror());
-		fdsize = 10240;
-	}
-#else
-	if (fdsize == 0) {
-		fdsize = 1024;
 	}
 #endif
-	if ((unsigned) (fdsize) < FD_SETSIZE / 2 && fdsize < 256) {
-		acl_msg_warn("%s: could allocate space for only %d open files",
-			myname, fdsize);
+	if (fdsize < 10240) {
+		acl_msg_warn("%s: fdsize(%d) too small, extend it", myname, fdsize);
+		fdsize = 10240;
 	}
 
 	acl_msg_info("%s: max fdsize: %d", myname, fdsize);
