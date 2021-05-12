@@ -309,6 +309,12 @@ ACL_DNS_DB *acl_netdb_clone(const ACL_DNS_DB *db)
 
 ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 {
+	return acl_gethostbyname2(name, SOCK_DGRAM, PF_UNSPEC, h_error);
+}
+
+ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
+	int family, int *h_error)
+{
 	ACL_DNS_DB *db;
 	ACL_SOCKADDR saddr;
 	struct addrinfo *res0, *res;
@@ -334,7 +340,7 @@ ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error)
 		return db;
 	}
 
-	res0 = acl_host_addrinfo(name, SOCK_DGRAM);
+	res0 = acl_host_addrinfo2(name, socktype, family);
 	if (res0 == NULL) {
 		acl_netdb_free(db);
 		return NULL;

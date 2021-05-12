@@ -156,6 +156,20 @@ ACL_API ACL_DNS_DB *acl_netdb_clone(const ACL_DNS_DB *h_dns_db);
 ACL_API ACL_DNS_DB *acl_gethostbyname(const char *name, int *h_error);
 
 /**
+ * 查询某个域名的IP地址集
+ * @param name {const char*} 域名
+ * @param socktype {int} 查询域名服务器所采用的 socket 类型：
+ *  SOCK_DGRAM -- UDP 方式, SOCK_STREAM -- TCP 方式
+ * @param family {int} IP 地址簇类型：PF_INET -- IPV4, PF_INET6 -- IPV6,
+ *   PF_UNSPEC -- 由系统自动选择
+ * @param h_error {int*} 如果查询失败存储出错原因
+ * @return {ACL_DNS_DB*} 查询结果集, 如果为NULL则查询失败, 另外，即使返回不为空，
+ *  也得需要通过 acl_netdb_size()/1 获得结果集的数组长度
+ */
+ACL_API ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
+		int family, int *h_error);
+
+/**
  * 根据错误号获得出错提示信息
  * @param errnum {int} 错误号
  * @return {const char*} 出错信息

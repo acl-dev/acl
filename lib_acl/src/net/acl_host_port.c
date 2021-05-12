@@ -123,6 +123,11 @@ static int host_port(char *buf, char **host, char **port)
 
 struct addrinfo *acl_host_addrinfo(const char *addr, int type)
 {
+	return acl_host_addrinfo2(addr, type, PF_UNSPEC);
+}
+
+struct addrinfo *acl_host_addrinfo2(const char *addr, int type, int family)
+{
 	int    err;
 	struct addrinfo hints, *res0;
 	char  *buf = acl_mystrdup(addr);
@@ -134,7 +139,7 @@ struct addrinfo *acl_host_addrinfo(const char *addr, int type)
 	}
 
 	memset(&hints, 0, sizeof(hints));
-	hints.ai_family   = PF_UNSPEC;
+	hints.ai_family   = family;
 	hints.ai_socktype = type;
 #ifdef	ACL_MACOSX
 	hints.ai_flags    = AI_DEFAULT;

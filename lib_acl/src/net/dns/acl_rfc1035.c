@@ -1050,7 +1050,7 @@ size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t
 	int   i;
 
 	if (reply->ips == NULL || reply->ips->argc <= 0) {
-		acl_msg_error("ips null");
+		acl_msg_error("%s(%d): ips null", __FUNCTION__, __LINE__);
 		return 0;
 	}
 
