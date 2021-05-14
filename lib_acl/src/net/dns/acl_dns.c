@@ -304,7 +304,7 @@ static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 	}
 
 	/* 取消定时器 */
-	if (dns->aio == NULL) {
+	if (dns->aio != NULL) {
 		acl_aio_cancel_timer(dns->aio, dns->lookup_timeout, req);
 	} else {
 		acl_msg_warn("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
