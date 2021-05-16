@@ -163,7 +163,8 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 1. 支持 MQTT3.1.1 版本；
 2. 支持流式 MQTT 协议解析及构建；
 3. 可以用在客户端及服务端；
-4. 支持阻塞通信模式及非阻塞通信模式。
+4. 支持阻塞通信模式及非阻塞通信模式。  
+有关 Acl MQTT 编程使用示例参见：[Acl MQTT](lib_acl_cpp/samples/mqtt/README.md)。
 
 #### 1.2.8、MIME 协议库
 1. 支持流式 MIME 数据解析;
@@ -324,4 +325,4 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 - Oschina:  https://gitee.com/acl-dev/acl
 - Download: https://sourceforge.net/projects/acl
 - 微 博：   http://weibo.com/zsxxsz
-- QQ 群:    693868497
+- QQ 群:   242722074(已满)，693868497
