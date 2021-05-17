@@ -264,6 +264,11 @@ static void dns_lookup_error(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
 	ACL_DNS_REQ *req;
 
+    if (res == NULL) {
+		acl_msg_info("%s(%d): res NULL", __FUNCTION__, __LINE__);
+        return;
+    }
+
 	if (dns->aio == NULL) {
 		acl_msg_info("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
 		return;
@@ -342,7 +347,6 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 {
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 	ACL_RFC1035_MESSAGE *res;
-
 	/* 解析DNS响应数据包 */
 	res = acl_rfc1035_response_unpack(data, dlen);
 	if (res == NULL) {

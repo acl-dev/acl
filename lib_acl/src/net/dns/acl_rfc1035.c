@@ -784,23 +784,17 @@ ACL_RFC1035_MESSAGE *acl_rfc1035_response_unpack(const char *buf, size_t sz)
 	}
 
 	if (msg->rcode) {
-		ACL_RFC1035_UNPACK_DEBUG;
 		rfc1035_set_errno((int) msg->rcode);
-		acl_rfc1035_message_destroy(msg);
-		return NULL;
 	}
 
 	if (msg->ancount == 0) {
-		acl_rfc1035_message_destroy(msg);
-		return NULL;
+		/* do nothing */
 	}
 
 	if (msg->qdcount != 1) {
 		/* This can not be an answer to our queries.. */
-		ACL_RFC1035_UNPACK_DEBUG;
-		rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
-		acl_rfc1035_message_destroy(msg);
-		return NULL;
+		acl_msg_warn("%s(%d): invalid qdcount=%d > 0",
+			__FUNCTION__, __LINE__, (int) msg->qdcount);
 	}
 
 	msg->query = (ACL_RFC1035_QUERY*) acl_mycalloc((int) msg->qdcount,
@@ -808,8 +802,7 @@ ACL_RFC1035_MESSAGE *acl_rfc1035_response_unpack(const char *buf, size_t sz)
 
 	for (i = 0; i < (int) msg->qdcount; i++) {
 		if (rfc1035_query_unpack(buf, sz, &off, &msg->query[i])) {
-			ACL_RFC1035_UNPACK_DEBUG;
-			rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
+			acl_msg_error("%s(%d): unpack error", __FUNCTION__, __LINE__);
 			acl_rfc1035_message_destroy(msg);
 			return NULL;
 		}
@@ -818,24 +811,14 @@ ACL_RFC1035_MESSAGE *acl_rfc1035_response_unpack(const char *buf, size_t sz)
 	msg->answer = rfc1035_unpack2rr(buf, sz, &off, msg->ancount, &nr);
 	msg->ancount = (unsigned short) nr;  /* reset the valid ancount */
 
-	if (msg->answer == NULL) {
-		/* we expected to unpack some answers (ancount != 0), but
-		 * didn't actually get any.
-		 */
-		ACL_RFC1035_UNPACK_DEBUG;
-		acl_rfc1035_message_destroy(msg);
-		rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
-		return NULL;
-	}
-
 	if (msg->nscount > 0) {
 		msg->authority = rfc1035_unpack2rr(buf, sz, &off,
 			msg->nscount, &nr);
 		msg->nscount = (unsigned short) nr;
 		if (msg->authority == NULL) {
-			ACL_RFC1035_UNPACK_DEBUG;
+			acl_msg_error("%s(%d): nscount=%d, authority null",
+				__FUNCTION__, __LINE__, (int) msg->nscount);
 			acl_rfc1035_message_destroy(msg);
-			rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
 			return NULL;
 		}
 	}
@@ -845,9 +828,9 @@ ACL_RFC1035_MESSAGE *acl_rfc1035_response_unpack(const char *buf, size_t sz)
 			msg->arcount, &nr);
 		msg->arcount = (unsigned short) nr;
 		if (msg->additional == NULL) {
-			ACL_RFC1035_UNPACK_DEBUG;
+			acl_msg_error("%s(%d): arcount=%d, addrional null",
+				__FUNCTION__, __LINE__, (int) msg->arcount);
 			acl_rfc1035_message_destroy(msg);
-			rfc1035_set_errno(ACL_RFC1035_UNPACK_ERROR);
 			return NULL;
 		}
 	}
