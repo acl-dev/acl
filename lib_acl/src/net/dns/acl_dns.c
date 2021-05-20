@@ -34,12 +34,13 @@ typedef struct ACL_DOMAIN_GROUP {
 	ACL_ARGV *excepts;
 } ACL_DOMAIN_GROUP;
 
-struct ACL_DNS_REQ{
+struct ACL_DNS_REQ {
 	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
 	void (*callback)(ACL_DNS_DB*, void*, int);
 	void *ctx;
 	int   nretry;
 	ACL_DNS *dns;
+	unsigned short type;
 	unsigned short qid;
 };
 
@@ -185,7 +186,7 @@ static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 			}
 
 			/* 目前该模块仅支持 IPV4 */
-            phost->saddr.sa.sa_family = AF_INET6;
+			phost->saddr.sa.sa_family = AF_INET6;
 
 			phost->ttl = res->answer[i].ttl;
 			if (ttl_min && *ttl_min > phost->ttl) {
@@ -455,7 +456,8 @@ static int dns_stream_open(ACL_DNS *dns)
 	return 0;
 }
 
-static void dns_lookup_send(ACL_DNS *dns, const char *domain, unsigned short qid)
+static void dns_lookup_send(ACL_DNS *dns, const char *domain,
+	const ACL_DNS_REQ *req)
 {
 	char   buf[1024];
 	size_t ret;
@@ -463,7 +465,25 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain, unsigned short qid
 	memset(buf, 0, sizeof(buf));
 
 	/* 创建DNS查询数据包 */
-	ret = acl_rfc1035_build_query4a(domain, buf, sizeof(buf), qid, NULL);
+	switch (req->type) {
+	case ACL_RFC1035_TYPE_A:
+		ret = acl_rfc1035_build_query4a(domain, buf, sizeof(buf),
+				req->qid, NULL);
+		break;
+	case ACL_RFC1035_TYPE_AAAA:
+		ret = acl_rfc1035_build_query4aaaa(domain, buf, sizeof(buf),
+				req->qid, NULL);
+		break;
+	case ACL_RFC1035_TYPE_MX:
+		ret = acl_rfc1035_build_query4mx(domain, buf, sizeof(buf),
+				req->qid, NULL);
+		break;
+	default:
+		acl_msg_error("%s(%d): not support type=%d",
+			__FUNCTION__, __LINE__, req->type);
+		return;
+	}
+	ret = acl_rfc1035_build_query4a(domain, buf, sizeof(buf), req->qid, NULL);
 
 	/* 发送请求DNS包 */
 	if (dns->astream != NULL) {
@@ -498,7 +518,7 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 		}
 
 		for (i = 0; i < dns->dns_list->count; i++) {
-			dns_lookup_send(dns, domain, req->qid);
+			dns_lookup_send(dns, domain, req);
 		}
 
 		/* 设置定时器 */
@@ -788,6 +808,12 @@ void acl_dns_add_group(ACL_DNS *dns, const char *group, const char *refer,
 void acl_dns_lookup(ACL_DNS *dns, const char *domain_in,
 	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx)
 {
+	acl_dns_lookup2(dns, domain_in, ACL_RFC1035_TYPE_A, callback, ctx);
+}
+
+void acl_dns_lookup2(ACL_DNS *dns, const char *domain_in, unsigned short type,
+	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx)
+{
 	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16], domain[ACL_RFC1035_MAXHOSTNAMESZ];
 	ACL_DNS_REQ *req;
 	int i;
@@ -858,6 +884,7 @@ END_FOREACH_TAG:
 	req->dns      = dns;
 	req->callback = callback;
 	req->ctx      = ctx;
+	req->type     = type;
 	req->qid      = dns->qid++;
 	SAFE_COPY(req->key, key, sizeof(req->key));
 
@@ -868,7 +895,7 @@ END_FOREACH_TAG:
 	}
 
 	for (i = 0; i < dns->dns_list->count; i++) {
-		dns_lookup_send(dns, domain, req->qid);
+		dns_lookup_send(dns, domain, req);
 	}
 
 	/* 设置定时器 */
