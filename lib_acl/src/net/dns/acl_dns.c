@@ -483,7 +483,6 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain,
 			__FUNCTION__, __LINE__, req->type);
 		return;
 	}
-	ret = acl_rfc1035_build_query4a(domain, buf, sizeof(buf), req->qid, NULL);
 
 	/* ·¢ËÍÇëÇóDNS°ü */
 	if (dns->astream != NULL) {

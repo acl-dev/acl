@@ -690,6 +690,7 @@ static int rfc1035_rr_unpack(const char *buf, size_t sz, size_t *off, ACL_RFC103
 
 	switch (RR->type) {
 	case ACL_RFC1035_TYPE_CNAME:
+	case ACL_RFC1035_TYPE_SOA:
 	case ACL_RFC1035_TYPE_NS:
 	case ACL_RFC1035_TYPE_TXT:
 	case ACL_RFC1035_TYPE_PTR:
