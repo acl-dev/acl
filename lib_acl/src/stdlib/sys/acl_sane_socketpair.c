@@ -57,7 +57,7 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 
 int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2])
 {
-	ACL_SOCKET listener = acl_inet_listen("127.0.0.1:0", 1, 0);
+	ACL_SOCKET listener = acl_inet_listen("127.0.0.1:0", 10, 0);
 	char addr[64];
 
 	(void) domain;
@@ -79,7 +79,7 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 		return -1;
 	}
 
-	result[0] = acl_inet_connect(addr, ACL_BLOCKING, 0);
+	result[0] = acl_inet_connect(addr, ACL_BLOCKING, 2);
 	if (result[0] == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: connect %s error %s",
 			__FILE__, __LINE__, __FUNCTION__, addr, acl_last_serror());
@@ -87,8 +87,15 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 		return -1;
 	}
 
-	result[1] = acl_inet_accept(listener);
+	if (acl_read_wait(listener, 2) < 0) {
+		acl_msg_error("%s(%dP, %s: listener wait timeout",
+			__FILE__, __LINE__, __FUNCTION__);
+		acl_socket_close(result[0]);
+		acl_socket_close(listener);
+		return -1;
+	}
 
+	result[1] = acl_inet_accept(listener);
 	acl_socket_close(listener);
 
 	if (result[1] == ACL_SOCKET_INVALID) {

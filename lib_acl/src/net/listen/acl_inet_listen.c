@@ -75,15 +75,17 @@ ACL_SOCKET acl_inet_listen(const char *addr, int backlog, unsigned flag)
 	struct addrinfo *res0 = acl_host_addrinfo(addr, SOCK_STREAM), *res;
 	ACL_SOCKET sock;
 
-	if (res0 == NULL)
+	if (res0 == NULL) {
 		return ACL_SOCKET_INVALID;
+	}
 
 	sock = ACL_SOCKET_INVALID;
 
 	for (res = res0; res != NULL; res = res->ai_next) {
 		sock = inet_listen(addr, res, backlog, flag);
-		if (sock != ACL_SOCKET_INVALID)
+		if (sock != ACL_SOCKET_INVALID) {
 			break;
+		}
 	}
 
 	freeaddrinfo(res0);
