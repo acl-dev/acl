@@ -10,7 +10,12 @@ class connect_pool;
 class ACL_CPP_API connect_client : public noncopyable
 {
 public:
-	connect_client() : when_(0), pool_(NULL) {}
+	connect_client(void)
+	: conn_timeout_(5)
+	, rw_timeout_(5)
+	, when_(0)
+	, pool_(NULL) {}
+
 	virtual ~connect_client() {}
 
 	/**
