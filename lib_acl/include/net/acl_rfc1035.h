@@ -196,6 +196,7 @@ ACL_API size_t acl_rfc1035_build_reply4aaaa(const char *hostname, const ACL_ARGV
 
 typedef struct ACL_RFC1035_REPLY {
 	const char *hostname;
+	const char *cname;
 	const ACL_ARGV *ips;
 	const char *domain_root;
 	const char *dns_name;

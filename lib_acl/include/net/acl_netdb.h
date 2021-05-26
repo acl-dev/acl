@@ -18,12 +18,17 @@ typedef struct ACL_HOSTNAME {
 	char  ip[256];                  /**< hold ip or cname of the HOST */
 	ACL_SOCKADDR saddr;		/**< ip addr in ACL_SOCKADDR */
 	unsigned int ttl;               /**< the HOST's ip timeout(second) */
+	int   priority;			/**< the priority of mx record */
 	int   hport;
 	unsigned int nrefer;            /**< refer number to this HOST */
 	unsigned int type;		/**< the content type in ip buf */
 #define	ACL_HOSTNAME_TYPE_IPV4		0
 #define	ACL_HOSTNAME_TYPE_IPV6		1
 #define	ACL_HOSTNAME_TYPE_CNAME		2
+#define ACL_HOSTNAME_TYPE_MX		3
+#define ACL_HOSTNAME_TYPE_SOA		4
+#define ACL_HOSTNAME_TYPE_NS		5
+#define ACL_HOSTNAME_TYPE_TXT		6
 } ACL_HOSTNAME;
 
 /**

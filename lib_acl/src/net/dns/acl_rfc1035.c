@@ -1054,6 +1054,11 @@ size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t
 	offset += rfc1035_header_pack(buf + offset, sz - offset, &h);
 	offset += rfc1035_question_pack(buf + offset, sz - offset,
 			reply->hostname, reply->ip_type, ACL_RFC1035_CLASS_IN);
+	if (reply->cname && *reply->cname) {
+		offset += rfc1035_question_pack(buf + offset, sz - offset,
+			reply->cname, ACL_RFC1035_TYPE_CNAME,
+			ACL_RFC1035_CLASS_IN);
+	}
 
 	for (i = 0; i < reply->ips->argc; i++) {
 		memset(&rr, 0, sizeof(rr));
