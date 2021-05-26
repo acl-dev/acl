@@ -209,6 +209,7 @@ static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 			}
 
 			(void) acl_array_append(dns_db->h_db, phost);
+			dns_db->refer = phost;
 			dns_db->size++;
 		}
 	}
@@ -950,8 +951,9 @@ const char *acl_dns_serror(int errnum)
 	size_t i;
 
 	for (i = 0; errmsg[i].msg != NULL; ++i) {
-		if (errnum == errmsg[i].errnum)
+		if (errnum == errmsg[i].errnum) {
 			return errmsg[i].msg;
+		}
 	}
 	return unknown;
 }

@@ -19,21 +19,21 @@ extern "C" {
 
 /* DNS 查询时的错误码定义 */
 
-#define	ACL_DNS_OK			    0
-#define	ACL_DNS_OK_CACHE		1
-#define	ACL_DNS_ERR_FMT			-1
-#define	ACL_DNS_ERR_SVR			-2
+#define	ACL_DNS_OK		0
+#define	ACL_DNS_OK_CACHE	1
+#define	ACL_DNS_ERR_FMT		-1
+#define	ACL_DNS_ERR_SVR		-2
 #define	ACL_DNS_ERR_NO_EXIST	-3
 #define	ACL_DNS_ERR_NO_SUPPORT	-4
-#define	ACL_DNS_ERR_DENY		-5
-#define	ACL_DNS_ERR_YX			-6
-#define	ACL_DNS_ERR_YXRR		-7
-#define	ACL_DNS_ERR_NXRR		-8
-#define	ACL_DNS_ERR_NO_AUTH		-9
+#define	ACL_DNS_ERR_DENY	-5
+#define	ACL_DNS_ERR_YX		-6
+#define	ACL_DNS_ERR_YXRR	-7
+#define	ACL_DNS_ERR_NXRR	-8
+#define	ACL_DNS_ERR_NO_AUTH	-9
 #define	ACL_DNS_ERR_NOT_ZONE	-10
-#define	ACL_DNS_ERR_UNPACK		-15
-#define	ACL_DNS_ERR_TIMEOUT		-16
-#define	ACL_DNS_ERR_EXIST		-17
+#define	ACL_DNS_ERR_UNPACK	-15
+#define	ACL_DNS_ERR_TIMEOUT	-16
+#define	ACL_DNS_ERR_EXIST	-17
 #define	ACL_DNS_ERR_BUILD_REQ	-18
 
 typedef struct ACL_DNS_ADDR {

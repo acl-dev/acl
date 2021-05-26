@@ -15,7 +15,7 @@
  */
 typedef struct ACL_HOSTNAME ACL_HOST_INFO;
 typedef struct ACL_HOSTNAME {
-	char  ip[256];                  /**< the ip addr of the HOST */
+	char  ip[256];                  /**< hold ip or cname of the HOST */
 	ACL_SOCKADDR saddr;		/**< ip addr in ACL_SOCKADDR */
 	unsigned int ttl;               /**< the HOST's ip timeout(second) */
 	int   hport;
@@ -33,6 +33,7 @@ typedef struct ACL_DNS_DB {
 	ACL_ARRAY *h_db;
 	int   size;
 	char  name[256];
+	const ACL_HOSTNAME *refer;	/**< refer to the cname node in h_db */
 	ACL_SOCKADDR ns_addr;
 
 	/* for acl_iterator */
