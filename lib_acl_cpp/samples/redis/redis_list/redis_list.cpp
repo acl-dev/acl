@@ -62,7 +62,7 @@ static bool test_lpush2(acl::redis_list& redis, int n)
 		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
 
 	for (int i = 0; i < n; ++i)
-		delete value[i];
+		delete [] value[i];
 
 	delete [] value;
 
@@ -116,7 +116,7 @@ static bool test_lpush4(acl::redis_list &redis, int n)
 		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
 
 	for (int i = 0; i < n; ++i)
-		delete value[i];
+		delete [] value[i];
 
 	delete [] value;
 
@@ -145,7 +145,7 @@ static bool test_lpush5(acl::redis_list &redis, int n)
 		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
 
 	for (int i = 0; i < n; ++i)
-		delete value[i];
+		delete [] value[i];
 
 	delete [] value;
 
@@ -174,7 +174,7 @@ static bool test_lpush6(acl::redis_list &redis, int n)
 		printf("lpush key:%s ret : %d ok\r\n", __key, ret);
 
 	for (int i = 0; i < n; ++i)
-		delete values[i];
+		delete [] values[i];
 
 	delete [] values;
 
@@ -274,7 +274,7 @@ static bool test_rpush4(acl::redis_list &redis, int n)
 	{
 		const char *value = values.back();
 		values.pop_back();
-		delete value;
+		delete [] value;
 	}
 
 	return true;
@@ -301,7 +301,7 @@ static bool test_rpush5(acl::redis_list &redis, int n)
 	{
 		const char *value = values.back();
 		values.pop_back();
-		delete value;
+		delete [] value;
 	}
 
 	return ret > 0 ? true : false;
@@ -702,6 +702,7 @@ static void usage(const char* procname)
 		"-I rw_timeout[default: 10]\r\n"
 		"-S [if slice request, default: no]\r\n"
 		"-c [use cluster mode]\r\n"
+		"-p passwd[default: empty]\r\n" 
 		"-a cmd[lpush|rpush|lpushx|rpushx|lrange|rpop|lpop|blpop|brpop|rpoplpush|brpoplpush|lrem|ltrim|llen|lindex|lset|linsert_before|linsert_after]\r\n",
 		procname);
 }
@@ -709,12 +710,12 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 50, conn_timeout = 10, rw_timeout = 10;
-	acl::string addr("127.0.0.1:6379"), cmd("all");
+	acl::string addr("127.0.0.1:6379"), cmd("all"), passwd;
 	bool cluster_mode = false;
 
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:C:T:a:c")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:T:a:cp:")) > 0)
 	{
 		switch (ch)
 		{
@@ -739,6 +740,9 @@ int main(int argc, char* argv[])
 		case 'c':
 			cluster_mode = true;
 			break;
+		case 'p':
+			passwd = optarg;
+			break;
 		default:
 			break;
 		}
@@ -750,6 +754,12 @@ int main(int argc, char* argv[])
 	cluster.set(addr.c_str(), 100, conn_timeout, rw_timeout);
 
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
+
+	if (!passwd.empty())
+	{
+		cluster.set_password("default", passwd);
+		client.set_password(passwd);
+	}
 
 	acl::redis_list redis(&client);
 	
