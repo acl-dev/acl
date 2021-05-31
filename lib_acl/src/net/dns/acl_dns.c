@@ -36,7 +36,7 @@ typedef struct ACL_DOMAIN_GROUP {
 
 struct ACL_DNS_REQ {
 	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16];
-	void (*callback)(ACL_DNS_DB*, void*, int);
+	void (*callback)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*);
 	void *ctx;
 	int   nretry;
 	ACL_DNS *dns;
@@ -288,7 +288,7 @@ static void dns_lookup_error(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 		acl_htable_delete(dns->lookup_table, req->key, NULL);
 
 		/* 通知应用查询失败 */
-		req->callback(NULL, req->ctx, res->rcode);
+		req->callback(NULL, req->ctx, res->rcode, res);
 
 		/* 释放该查询对象 */
 		acl_myfree(req);
@@ -327,7 +327,7 @@ static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 	acl_netdb_set_ns(dns_db, &dns->addr_from.addr);
 
 	/* 回调函数用户的回调函数 */
-	req->callback(dns_db, req->ctx, res->rcode);
+	req->callback(dns_db, req->ctx, res->rcode, res);
 
 	/* 释放该查询对象 */
 	acl_myfree(req);
@@ -535,7 +535,7 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 	acl_htable_delete(req->dns->lookup_table, req->key, NULL);
 
 	/* 回调函数用户的回调函数 */
-	req->callback(NULL, req->ctx, ACL_DNS_ERR_TIMEOUT);
+	req->callback(NULL, req->ctx, ACL_DNS_ERR_TIMEOUT, NULL);
 
 	/* 释放该查询对象 */
 	acl_myfree(req);
@@ -806,13 +806,15 @@ void acl_dns_add_group(ACL_DNS *dns, const char *group, const char *refer,
 }
 
 void acl_dns_lookup(ACL_DNS *dns, const char *domain_in,
-	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx)
+	void (*callback)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*),
+	void *ctx)
 {
 	acl_dns_lookup2(dns, domain_in, ACL_RFC1035_TYPE_A, callback, ctx);
 }
 
 void acl_dns_lookup2(ACL_DNS *dns, const char *domain_in, unsigned short type,
-	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx)
+	void (*callback)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*),
+	void *ctx)
 {
 	char  key[ACL_RFC1035_MAXHOSTNAMESZ + 16], domain[ACL_RFC1035_MAXHOSTNAMESZ];
 	ACL_DNS_REQ *req;
@@ -862,7 +864,7 @@ END_FOREACH_TAG:
 		ACL_DNS_DB *dns_db;
 		dns_db = acl_cache2_find(dns->dns_cache, domain);
 		if (dns_db) {
-			callback(dns_db, ctx, ACL_DNS_OK_CACHE);
+			callback(dns_db, ctx, ACL_DNS_OK_CACHE, NULL);
 			return;
 		}
 	}
@@ -875,7 +877,7 @@ END_FOREACH_TAG:
 	if (req != NULL) {
 		acl_msg_warn("%s(%d): key(%s) exist",
 			__FUNCTION__, __LINE__, key);
-		callback(NULL, ctx, ACL_DNS_ERR_EXIST);
+		callback(NULL, ctx, ACL_DNS_ERR_EXIST, NULL);
 		return;
 	}
 

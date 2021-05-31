@@ -381,12 +381,14 @@ static ACL_ASTREAM *try_connect_one(RESOLVE_CTX *ctx)
 	return NULL;
 }
 
-static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum)
+static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum,
+	const ACL_RFC1035_MESSAGE *msg)
 {
 	RESOLVE_CTX *ctx  = (RESOLVE_CTX *) context;
 	ACL_ITER     iter;
 	ACL_ASTREAM_CTX conn_ctx;
 
+	(void) msg;
 	memset(&conn_ctx, 0, sizeof(conn_ctx));
 	conn_ctx.ctx = ctx->context;
 

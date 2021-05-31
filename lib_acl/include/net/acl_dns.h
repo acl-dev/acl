@@ -14,6 +14,7 @@ extern "C" {
 #endif
 #include "../event/acl_events.h"
 #include "../aio/acl_aio.h"
+#include "acl_rfc1035.h"
 #include "acl_sane_inet.h"
 #include "acl_netdb.h"
 
@@ -169,26 +170,28 @@ ACL_API void acl_dns_set_retry_limit(ACL_DNS *dns, int retry_limit);
  * 异步查询一个域所对应的A记录IP地址集合
  * @param dns {ACL_DNS*} DNS异步查询句柄
  * @param domain {const char*} 域名
- * @param callback {void (*)(ACL_DNS_DB*, void*)} 查询成功或失败的回调函数,
- *  若返回给 callback 的 ACL_DNS_DB 为空则表示查询失败, 第二个参数为用户设置
- *  的参数, 第三个参数为查询失败时的错误号
+ * @param callback {void (*)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*)}
+ *  查询成功或失败的回调函数, 若返回给 callback 的 ACL_DNS_DB 为空则表示查询失败,
+ *  第二个参数为用户设置的参数, 第三个参数为查询失败时的错误号
  * @param ctx {void*} callback 的参数之一
  */
 ACL_API void acl_dns_lookup(ACL_DNS *dns, const char *domain,
-	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx);
+	void (*callback)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*),
+	void *ctx);
 
 /**
  * 异步查询一个域所对应的记录类型的IP地址集合
  * @param dns {ACL_DNS*} DNS异步查询句柄
  * @param domain {const char*} 域名
  * @param type {unsigned short} 查询类型，参见 acl_rfc1035.h 中的 ACL_RFC1035_TYPE_XXX
- * @param callback {void (*)(ACL_DNS_DB*, void*)} 查询成功或失败的回调函数,
- *  若返回给 callback 的 ACL_DNS_DB 为空则表示查询失败, 第二个参数为用户设置
- *  的参数, 第三个参数为查询失败时的错误号
+ * @param callback {void (*)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*)}
+ *  查询成功或失败的回调函数, 若返回给 callback 的 ACL_DNS_DB 为空则表示查询失败,
+ *  第二个参数为用户设置的参数, 第三个参数为查询失败时的错误号
  * @param ctx {void*} callback 的参数之一
  */
 ACL_API void acl_dns_lookup2(ACL_DNS *dns, const char *domain, unsigned short type,
-	void (*callback)(ACL_DNS_DB*, void*, int), void *ctx);
+	void (*callback)(ACL_DNS_DB*, void*, int, const ACL_RFC1035_MESSAGE*),
+	void *ctx);
 
 /**
  * 向DNS查询对象中添加静态主机信息

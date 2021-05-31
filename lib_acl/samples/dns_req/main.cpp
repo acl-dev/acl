@@ -6,7 +6,8 @@
 
 static int __nresult = 0;
 
-static void dns_lookup_callback(ACL_DNS_DB *dns_db, void *ctx, int errnum)
+static void dns_lookup_callback(ACL_DNS_DB *dns_db, void *ctx, int errnum,
+	const ACL_RFC1035_MESSAGE*)
 {
 	ACL_ITER iter;
 	char *domain = (char*) ctx;
