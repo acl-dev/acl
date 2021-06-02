@@ -157,6 +157,7 @@ size_t rfc1035_response::build_reply(const std::vector<string>& addrs,
 	}
 
 	ACL_RFC1035_REPLY reply;
+	memset(&reply, 0, sizeof(reply));
 
 	reply.ip_type = type;
 	reply.hostname = name_;
@@ -165,10 +166,6 @@ size_t rfc1035_response::build_reply(const std::vector<string>& addrs,
 	reply.dns_name = "ipv6-static.dns.com";
 	reply.domain_root = reply.dns_name;
 	reply.dns_ip = "127.0.0.1";
-#else
-	reply.domain_root = NULL;
-	reply.dns_name = NULL;
-	reply.dns_ip = NULL;
 #endif
 	reply.ips = ips;
 	reply.ttl = ttl_;

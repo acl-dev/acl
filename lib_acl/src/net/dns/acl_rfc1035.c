@@ -1047,17 +1047,26 @@ size_t acl_rfc1035_build_reply(const ACL_RFC1035_REPLY *reply, char *buf, size_t
 	h.ra = 0;
 	h.rcode = 0;
 	h.qdcount = 1;
-	h.ancount = reply->ips->argc;
+	h.ancount = reply->cname && *reply->cname ?
+		reply->ips->argc + 1 : reply->ips->argc;
 	h.nscount = (reply->dns_name && *reply->dns_name) ? 1 : 0;
 	h.arcount = (h.nscount && reply->dns_ip && *reply->dns_ip) ? 1 : 0;
 
 	offset += rfc1035_header_pack(buf + offset, sz - offset, &h);
 	offset += rfc1035_question_pack(buf + offset, sz - offset,
 			reply->hostname, reply->ip_type, ACL_RFC1035_CLASS_IN);
+
 	if (reply->cname && *reply->cname) {
-		offset += rfc1035_question_pack(buf + offset, sz - offset,
-			reply->cname, ACL_RFC1035_TYPE_CNAME,
-			ACL_RFC1035_CLASS_IN);
+		memset(&rr, 0, sizeof(rr));
+		ACL_SAFE_STRNCPY(rr.name, reply->hostname, sizeof(rr.name));
+		rr.type = ACL_RFC1035_TYPE_CNAME;
+		rr.tclass = ACL_RFC1035_CLASS_IN;
+		rr.ttl = reply->ttl;
+		rr.rdlength = (unsigned short) strlen(reply->cname);
+		rr.rdata = acl_mystrdup(reply->cname);
+		offset += rfc1035_rr_pack(&rr, buf + offset, sz - offset);
+		acl_myfree(rr.rdata);
+		rr.rdata = NULL;
 	}
 
 	for (i = 0; i < reply->ips->argc; i++) {
