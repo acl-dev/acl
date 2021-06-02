@@ -831,10 +831,7 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 		READ_SAFE_DISABLE(astream);
 	}
 
-	if ((event_type & ACL_EVENT_XCPT) != 0) {
-		READ_IOCP_CLOSE(astream);
-		return;
-	} else if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
+	if ((event_type & ACL_EVENT_RW_TIMEOUT) != 0) {
 		if (aio_timeout_callback(astream) < 0) {
 			READ_IOCP_CLOSE(astream);
 		} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
@@ -853,6 +850,9 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
 	} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
+		astream->nrefer--;
+		READ_IOCP_CLOSE(astream);
+	} else if ((event_type & ACL_EVENT_XCPT) != 0) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
 	} else {
