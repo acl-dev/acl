@@ -852,10 +852,12 @@ static void can_read_callback(int event_type, ACL_EVENT *event acl_unused,
 	} else if (astream->flag & ACL_AIO_FLAG_IOCP_CLOSE) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
-	} else if ((event_type & ACL_EVENT_XCPT) != 0) {
+	}
+	/* else if ((event_type & ACL_EVENT_XCPT) != 0) {
 		astream->nrefer--;
 		READ_IOCP_CLOSE(astream);
-	} else {
+	} */
+	else {
 		astream->nrefer--;
 	}
 }
