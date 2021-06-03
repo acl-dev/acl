@@ -206,7 +206,7 @@ bool json_node::set_text(const char* text)
 	if (node_me_->text == NULL) {
 		return false;
 	}
-	switch (node_me_->type) {
+	switch ((node_me_->type & ~ACL_JSON_T_LEAF)) {
 	case ACL_JSON_T_NULL:
 	case ACL_JSON_T_BOOL:
 	case ACL_JSON_T_NUMBER:
