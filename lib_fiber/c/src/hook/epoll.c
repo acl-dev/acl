@@ -410,6 +410,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	EVENT *ev;
 	EPOLL_EVENT *ee;
 	long long begin, now;
+	int old_timeout;
 
 	if (__sys_epoll_wait == NULL) {
 		hook_init();
@@ -440,6 +441,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	ee->fiber     = acl_fiber_running();
 	ee->proc      = epoll_callback;
 
+	old_timeout = ev->timeout;
 	event_epoll_set(ev, ee, timeout);
 	SET_TIME(begin);
 	ev->waiter++;
@@ -449,6 +451,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 		fiber_io_inc();
 		acl_fiber_switch();
+		ev->timeout = old_timeout;
 
 		ev->timeout = -1;
 		if (acl_fiber_killed(ee->fiber)) {

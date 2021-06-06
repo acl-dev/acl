@@ -151,6 +151,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	long long begin, now;
 	POLL_EVENT pe;
 	EVENT *ev;
+	int old_timeout;
 
 	if (__sys_poll == NULL) {
 		hook_init();
@@ -167,6 +168,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	pe.proc   = poll_callback;
 	pe.nready = 0;
 
+	old_timeout = ev->timeout;
 	poll_event_set(ev, &pe, timeout);
 	SET_TIME(begin);
 	ev->waiter++;
@@ -177,6 +179,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 		fiber_io_inc();
 		acl_fiber_switch();
+		ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(pe.fiber)) {
 			ring_detach(&pe.me);

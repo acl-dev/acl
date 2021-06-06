@@ -406,7 +406,7 @@ int event_process(EVENT *ev, int timeout)
 	/* limit the event wait time just for fiber schedule exiting
 	 * quickly when no tasks left
 	 */
-	if (timeout > 1000 || timeout <= 0) {
+	if (timeout > 1000 || timeout < 0) {
 		timeout = 100;
 	}
 
