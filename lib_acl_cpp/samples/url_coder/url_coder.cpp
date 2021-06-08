@@ -4,6 +4,7 @@
 #include "stdafx.h"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/url_coder.hpp"
+#include "acl_cpp/http/http_utils.hpp"
 
 using namespace acl;
 
@@ -75,11 +76,45 @@ int main(void)
 		v0, found0 ? "found it" : "not found", coder5.get("n1"),
 		v3, found3 ? "found it" : "not found");
 
-#ifdef WIN32
-	printf("enter any key to exit ...\r\n");
+	printf("enter any key to continue ...\r\n");
+	getchar();
+
+	printf("\r\n");
+
+	acl::http_url hu;
+	const char* urls[] = {
+		"http://www.google.com/",
+		"https://www.google.com/",
+		"https://www.google.com/test",
+		"http://www.google.com/test?name=value&name2=value2",
+		"/test",
+		"/",
+		"/test?",
+		"/test?name1=value1&name2=value2",
+		"/path/test",
+		"/path/test?name=value",
+		NULL,
+	};
+
+	for (size_t i = 0; urls[i] != NULL; i++) {
+		if (!hu.parse(urls[i])) {
+			printf("parse url=%s failed\r\n", urls[i]);
+			break;
+		}
+
+		printf("url:%s\r\n", urls[i]);
+		printf("proto=%s, port=%d, domain=%s, path=%s, params=%s\r\n",
+			hu.get_proto(), hu.get_port(), hu.get_domain(),
+			hu.get_url_path(), hu.get_url_params());
+		printf("\r\n");
+
+		hu.reset();
+	}
+
+#if defined(_WIN32) || defined(_WIN64)
+	printf("Enter any key to exit ...\r\n");
 	getchar();
 #endif
-
 	return 0;
 }
 
