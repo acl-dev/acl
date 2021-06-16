@@ -43,7 +43,7 @@ typedef struct ACL_RFC1035_MESSAGE {
     unsigned int tc:1;		/* Response: Specifies that this message was truncated */
     unsigned int rd:1;		/* Query->Response: Recursion Desired, optional */
     unsigned int ra:1;		/* Response: Recursion Available  */
-    unsigned int z:4;		/* Reserved for future use */
+    unsigned int z:3;		/* Reserved for future use */
     unsigned int rcode:4;	/* Response code:
  				 * 0: No error condition
  				 * 1: Query format error
