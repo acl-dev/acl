@@ -49,9 +49,6 @@
     <ClCompile Include="src\mime\rfc822.cpp">
       <Filter>Source Files\mime</Filter>
     </ClCompile>
-    <ClCompile Include="src\net\rfc1035.cpp">
-      <Filter>Source Files\net</Filter>
-    </ClCompile>
     <ClCompile Include="src\master\master_trigger.cpp">
       <Filter>Source Files\master</Filter>
     </ClCompile>
@@ -675,6 +672,9 @@
     </ClCompile>
     <ClCompile Include="src\mqtt\mqtt_unsubscribe.cpp">
       <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\net\rfc1035.cpp">
+      <Filter>Source Files\net</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1534,6 +1534,9 @@
     </Filter>
     <Filter Include="Source Files\serialize">
       <UniqueIdentifier>{db7d254c-c170-46a0-9f09-4820d0565f66}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\net">
+      <UniqueIdentifier>{3f3b5272-7f06-4a69-b560-31483e389cde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
