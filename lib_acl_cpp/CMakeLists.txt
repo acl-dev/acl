@@ -52,6 +52,11 @@ if (HAS_MBEDTLS MATCHES "YES")
 	add_definitions("-DHAS_MBEDTLS")
 endif()
 
+if (ACL_HOOK_NEW MATCHES "YES")
+	message(STATUS "acl_cpp: ACL_HOOK_NEW been set")
+	add_definitions("-DACL_HOOK_NEW")
+endif()
+
 ##############################################################################
 
 set(acl_path ${CMAKE_CURRENT_SOURCE_DIR}/../lib_acl)

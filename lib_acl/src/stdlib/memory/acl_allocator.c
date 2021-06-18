@@ -235,6 +235,7 @@ void *acl_allocator_mem_alloc(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	CHECK_TYPE(type);
 	
 	pool = allocator->MemPools[type];
+	pool->nalloc++;
 	return allocator->mem_alloc_fn(allocator, pool);
 }
 
@@ -247,6 +248,7 @@ void acl_allocator_mem_free(ACL_ALLOCATOR *allocator,
 	CHECK_TYPE(type);
 
 	pool = allocator->MemPools[type];
+	pool->nfree++;
 	allocator->mem_free_fn(allocator, pool, obj);
 }
 

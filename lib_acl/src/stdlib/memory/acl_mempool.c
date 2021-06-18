@@ -10,6 +10,7 @@
 
 #endif
 
+#include "allocator.h"
 #include "malloc_vars.h"
 
 /* xxx: 如果想要使用 pthread_spinlock_t 则不可将 stdlib.h 放在前面,
@@ -300,4 +301,11 @@ int acl_mempool_total_allocated()
 		MUTEX_UNLOCK;
 
 	return (n);
+}
+
+void acl_mempool_status()
+{
+	if (__var_allocator) {
+		mem_pool_status(__var_allocator);
+	}
 }

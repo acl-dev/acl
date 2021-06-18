@@ -14,6 +14,8 @@ struct ACL_MEM_POOL {
 	const char *label;
 	size_t obj_size;
 	acl_mem_type type;
+	size_t nalloc;
+	size_t nfree;
 #if DEBUG_MEMPOOL
 	size_t real_obj_size;	/* with alignment */
 #endif
@@ -51,6 +53,7 @@ extern void vstring_pool_create(ACL_ALLOCATOR *allocator);
 
 /* in membuf_pool.c */
 extern void mem_pool_create(ACL_ALLOCATOR *allocator);
+extern void mem_pool_status(ACL_ALLOCATOR *allocator);
 
 #ifdef __cplusplus
 }
