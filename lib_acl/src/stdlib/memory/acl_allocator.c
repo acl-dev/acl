@@ -17,7 +17,7 @@
 #include "squid_allocator.h"
 #include "allocator.h"
 
-static size_t __min_gross_size = 8;		/* 8 byte */
+static size_t __min_gross_size = 0;			/* 8 byte */
 static size_t __max_gross_size = 1048576;	/* 1MB */
 
 #define CHECK_TYPE(_type) do { \
@@ -49,21 +49,22 @@ static void pool_clean(ACL_ALLOCATOR *allocator acl_unused)
 	acl_msg_fatal("%s: not supported!", myname);
 }
 
-static void *mem_alloc(ACL_ALLOCATOR *allocator acl_unused,
-	ACL_MEM_POOL * pool acl_unused)
+static void *mem_alloc(const char *filename, int line,
+	ACL_ALLOCATOR *allocator acl_unused, ACL_MEM_POOL * pool acl_unused)
 {
 	const char *myname = "mem_alloc";
 
-	acl_msg_fatal("%s: not supported!", myname);
+	acl_msg_fatal("%s: not supported, %s(%d)", myname, filename	, line);
 	return NULL;
 }
 
-static void mem_free(ACL_ALLOCATOR *allocator acl_unused,
+static void mem_free(const char *filename, int line,
+	ACL_ALLOCATOR *allocator acl_unused,
 	ACL_MEM_POOL *pool acl_unused, void *obj acl_unused)
 {
 	const char *myname = "mem_free";
 
-	acl_msg_fatal("%s: not supported!", myname);
+	acl_msg_fatal("%s: not supported, %s(%d)", myname, filename, line);
 }
 
 static int pool_ifused(const ACL_MEM_POOL *pool acl_unused)
@@ -227,7 +228,8 @@ void acl_allocator_pool_remove(ACL_ALLOCATOR *allocator, ACL_MEM_POOL *pool)
 	}
 }
 
-void *acl_allocator_mem_alloc(ACL_ALLOCATOR *allocator, acl_mem_type type)
+void *acl_allocator_mem_alloc(const char *filename, int line,
+	ACL_ALLOCATOR *allocator, acl_mem_type type)
 {
 	const char *myname = "acl_allocator_mem_alloc";
 	ACL_MEM_POOL *pool;
@@ -236,11 +238,11 @@ void *acl_allocator_mem_alloc(ACL_ALLOCATOR *allocator, acl_mem_type type)
 	
 	pool = allocator->MemPools[type];
 	pool->nalloc++;
-	return allocator->mem_alloc_fn(allocator, pool);
+	return allocator->mem_alloc_fn(filename, line, allocator, pool);
 }
 
-void acl_allocator_mem_free(ACL_ALLOCATOR *allocator,
-	acl_mem_type type, void *obj)
+void acl_allocator_mem_free(const char *filename, int line,
+	ACL_ALLOCATOR *allocator, acl_mem_type type, void *obj)
 {
 	const char *myname = "acl_allocator_mem_free";
 	ACL_MEM_POOL *pool;
@@ -249,7 +251,7 @@ void acl_allocator_mem_free(ACL_ALLOCATOR *allocator,
 
 	pool = allocator->MemPools[type];
 	pool->nfree++;
-	allocator->mem_free_fn(allocator, pool, obj);
+	allocator->mem_free_fn(filename, line, allocator, pool, obj);
 }
 
 /* Find the best fit ACL_MEM_TYPE_X_BUF type */
@@ -335,7 +337,7 @@ void *acl_allocator_membuf_alloc(const char *filename, int line,
 	acl_mem_type type = memBufFindSizeType(size, &gross_size);
 
 	if (type != ACL_MEM_TYPE_NONE)
-		return acl_allocator_mem_alloc(allocator, type);
+		return acl_allocator_mem_alloc(filename, line, allocator, type);
 	else
 		return acl_default_malloc(filename, line, size);
 }
@@ -367,7 +369,7 @@ void acl_allocator_membuf_free(const char *filename, int line,
 	type = memBufFindSizeType(gross_size, NULL);
 
 	if (type != ACL_MEM_TYPE_NONE)
-		acl_allocator_mem_free(allocator, type, buf);
+		acl_allocator_mem_free(filename, line, allocator, type, buf);
 	else
 		acl_default_free(filename, line, buf);
 }

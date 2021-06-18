@@ -132,19 +132,25 @@ ACL_API int acl_allocator_pool_total_allocated(ACL_ALLOCATOR *allocator);
 
 /**
  * 分配某种内存类型的内存
+ * @param filename {const char*}
+ * @param line {int}
  * @param allocator {ACL_ALLOCATOR*}
  * @param type {acl_mem_type} 内存类型
  * @return {void*} 新分配的内存的地址
  */
-ACL_API void *acl_allocator_mem_alloc(ACL_ALLOCATOR *allocator, acl_mem_type type);
+ACL_API void *acl_allocator_mem_alloc(const char *filename, int line,
+	ACL_ALLOCATOR *allocator, acl_mem_type type);
 
 /**
  * 释放某种内存类型的内存空间
+ * @param filename {const char*}
+ * @param line {int}
  * @param allocator {ACL_ALLOCATOR*}
  * @param type {acl_mem_type} 内存类型
  * @param obj {void*} 被释放的内存对象，不能为空
  */
-ACL_API void acl_allocator_mem_free(ACL_ALLOCATOR *allocator, acl_mem_type type, void *obj);
+ACL_API void acl_allocator_mem_free(const char *filename, int line,
+	ACL_ALLOCATOR *allocator, acl_mem_type type, void *obj);
 
 /**
  * 根据所要求的内存大小，自动进行内存分配类型匹配，若找到所匹配的类型，则采用内存池

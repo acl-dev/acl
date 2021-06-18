@@ -215,7 +215,8 @@ struct mempool_cookie {
 };
 #endif
 
-static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
+static void *memPoolAlloc(const char *filename, int line,
+	ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 {
 	SQUID_MEM_ALLOCATOR *squid_allocator =
 		(SQUID_MEM_ALLOCATOR *) allocator;
@@ -229,7 +230,7 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 	gb_inc(&squid_allocator->mem_traffic_volume, pool->obj_size);
 	allocator->mem_pool_alloc_calls++;
 
-	if (acl_stack_size(pool->pstack)) {
+	if (acl_stack_size(pool->pstack) > 0) {
 		acl_assert(squid_pool->meter.idle.level);
 		memMeterDec(squid_pool->meter.idle);
 		memMeterDel(squid_allocator->TheMeter.idle, pool->obj_size);
@@ -259,7 +260,7 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 #if DEBUG_MEMPOOL
 		{
 			struct mempool_cookie *cookie;
-			obj = acl_default_malloc(__FILE__, __LINE__,
+			obj = acl_default_malloc(filename, line,
 				pool->real_obj_size
 				+ sizeof(struct mempool_cookie));
 			cookie = (struct mempool_cookie *)
@@ -269,7 +270,7 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 			(void) VALGRIND_MAKE_NOACCESS(cookie, sizeof(cookie));
 		}
 #else
-		obj = acl_default_malloc(__FILE__, __LINE__, pool->obj_size);
+		obj = acl_default_malloc(filename, line, pool->obj_size);
 #endif
 	}
 
@@ -279,8 +280,8 @@ static void *memPoolAlloc(ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool)
 	return obj;
 }
 
-static void memPoolFree(ACL_ALLOCATOR *allocator,
-	ACL_MEM_POOL * pool, void *obj)
+static void memPoolFree(const char *filename, int line,
+	ACL_ALLOCATOR *allocator, ACL_MEM_POOL * pool, void *obj)
 {
 	SQUID_MEM_ALLOCATOR *squid_allocator =
 		(SQUID_MEM_ALLOCATOR *) allocator;
@@ -322,7 +323,7 @@ static void memPoolFree(ACL_ALLOCATOR *allocator,
 		memMeterDel(squid_allocator->TheMeter.alloc, pool->obj_size);
 		if (pool->before_free_fn)
 			pool->before_free_fn(obj, pool->pool_ctx);
-		acl_default_free(__FILE__, __LINE__, obj);
+		acl_default_free(filename, line, obj);
 	}
 	acl_assert(squid_pool->meter.idle.level
 		<= squid_pool->meter.alloc.level);

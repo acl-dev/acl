@@ -59,20 +59,20 @@ void mem_pool_status(ACL_ALLOCATOR *allocator)
 	int type = (int) ACL_MEM_TYPE_NONE;
 	ACL_MEM_POOL *pool;
 	
-	printf("----------------------------------------------------------------------------------\r\n");
-	acl_msg_info("%-20s%-26s%-25s%-10s", "Buffer type", "Allocated",
-		"Freed", "Diff");
-	printf("----------------------------------------------------------------------------------\r\n");
+	printf("-----------------------------------------------------------------------------------------------\r\n");
+	acl_msg_info("%-20s%-26s%-25s%-15s%-10s", "Buffer type", "Allocated",
+		"Freed", "Diff", "Buffered");
+	printf("-----------------------------------------------------------------------------------------------\r\n");
 
 	for (; type < (int) ACL_MEM_TYPE_MAX; type++) {
 		pool = allocator->MemPools[type];
 		if (pool) {
-			acl_msg_info("%-20salloc=%-20ldfree=%-20lddiff=%-10ld",
-				pool->label, (long) pool->nalloc,
-				(long) pool->nfree,
-				(long) (pool->nalloc - pool->nfree));
+			acl_msg_info("%-20salloc=%-20ldfree=%-20lddiff=%-10ldbuff=%-10d",
+				pool->label, (long) pool->nalloc, (long) pool->nfree,
+				(long) (pool->nalloc - pool->nfree),
+				(int) acl_stack_size(pool->pstack));
 		}
 	}
 
-	printf("----------------------------------------------------------------------------------\r\n");
+	printf("-----------------------------------------------------------------------------------------------\r\n");
 }

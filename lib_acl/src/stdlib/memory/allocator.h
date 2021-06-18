@@ -41,8 +41,8 @@ struct ACL_ALLOCATOR {
 	size_t (*pool_inuse_size)(const ACL_MEM_POOL *);
 	size_t (*pool_total_allocated)(ACL_ALLOCATOR *);
 
-	void *(*mem_alloc_fn)(ACL_ALLOCATOR *, ACL_MEM_POOL *);
-	void  (*mem_free_fn)(ACL_ALLOCATOR *, ACL_MEM_POOL *, void *);
+	void *(*mem_alloc_fn)(const char*, int, ACL_ALLOCATOR *, ACL_MEM_POOL *);
+	void  (*mem_free_fn)(const char*, int, ACL_ALLOCATOR *, ACL_MEM_POOL *, void *);
 };
 
 /* in acl_allocator.c */
