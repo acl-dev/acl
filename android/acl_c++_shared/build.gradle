@@ -26,7 +26,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        def HOOK_NEW = false
+        def HOOK_NEW = true
 
         // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
