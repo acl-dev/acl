@@ -28,56 +28,37 @@ android {
 
         def HOOK_NEW = false
 
-        if (HOOK_NEW) {
-            externalNativeBuild {
-                cmake {
-                    arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
-                    arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
-    
-                    arguments "-DCMAKE_BUILD_TYPE=RELEASE"
-                    arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
-                    arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
-                    arguments "-DACL_CLIENT_ONLY=YES"
-                    arguments "-DHAS_MBEDTLS=YES"
-                    arguments "-DACL_BUILD_SHARED=YES"
+        // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        externalNativeBuild {
+            cmake {
+                //arguments "-DANDROID_STL=stl_shared"
+                //arguments "-DANDROID_STL=gnustl_shared"   // for ndk12b, ndk16b
+                //arguments "-DACL_DISABLE_HOOK_IO=YES"     // for ndk12b
+
+                arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
+                arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
+
+                arguments "-DCMAKE_BUILD_TYPE=RELEASE"
+                arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
+                arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
+                //arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
+                arguments "-DACL_CLIENT_ONLY=YES"
+                arguments "-DHAS_MBEDTLS=YES"
+                arguments "-DACL_BUILD_SHARED=YES"
+                //cppFlags "-fexceptions"
+
+                if (HOOK_NEW) {
                     arguments "-DACL_HOOK_NEW=YES"
-                    //cppFlags "-fexceptions"
-    
-                    abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
                 }
-                cmake {
-                    targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
-                }
+
+                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
+                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
             }
-        } else {
-            // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-            externalNativeBuild {
-                cmake {
-                    //arguments "-DANDROID_STL=stl_shared"
-                    //arguments "-DANDROID_STL=gnustl_shared"   // for ndk12b, ndk16b
-                    //arguments "-DACL_DISABLE_HOOK_IO=YES"     // for ndk12b
-    
-                    arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
-                    arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
-    
-                    arguments "-DCMAKE_BUILD_TYPE=RELEASE"
-                    arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
-                    arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
-                    //arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
-                    arguments "-DACL_CLIENT_ONLY=YES"
-                    arguments "-DHAS_MBEDTLS=YES"
-                    arguments "-DACL_BUILD_SHARED=YES"
-                    //cppFlags "-fexceptions"
-    
-                    //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
-                    //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
-                    abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
-                }
-                cmake {
-                    //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
-                    //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk12b, ndk16b
-                    targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
-                }
+            cmake {
+                //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
+                //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk12b, ndk16b
+                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
             }
         }
     }
