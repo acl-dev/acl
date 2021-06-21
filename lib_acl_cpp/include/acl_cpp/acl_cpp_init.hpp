@@ -10,6 +10,12 @@ namespace acl
 	 */
 	ACL_CPP_API void acl_cpp_init(void);
 
+	/**
+	 * 获得当前 acl_cpp 库所开放的能力
+	 * @return {const char*} 返回非空字符串
+	 */
+	ACL_CPP_API const char* acl_cpp_verbose(void);
+
 #if defined(_WIN32) || defined(_WIN64)
 	/**
 	 * win32 下打开 DOS 窗口

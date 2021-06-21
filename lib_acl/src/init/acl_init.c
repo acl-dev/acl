@@ -8,6 +8,7 @@
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_vstream.h"
+#include "stdlib/acl_vstring.h"
 #include "thread/acl_pthread.h"
 #include "init/acl_init.h"
 
@@ -24,11 +25,33 @@
 
 #include "init.h"
 
-static char *version = "3.5.1-5 20200627";
+static char *version = "3.5.2-1 20210621";
 
 const char *acl_version(void)
 {
 	return version;
+}
+
+const char *acl_verbose(void)
+{
+	static ACL_VSTRING *buf = NULL;
+	if (buf) {
+		ACL_VSTRING_RESET(buf);
+	} else {
+		buf = acl_vstring_alloc(128);
+	}
+
+	acl_vstring_strcpy(buf, version);
+
+#ifdef HAS_ATOMIC
+	acl_vstring_strcat(buf, ", HAS_ATOMIC");
+#endif
+
+#ifdef HAVE_NO_ATEXIT
+	acl_vstring_strcat(buf, ", HAVE_NO_ATEXIT");
+#endif
+
+	return acl_vstring_str(buf);
 }
 
 #ifdef ACL_UNIX

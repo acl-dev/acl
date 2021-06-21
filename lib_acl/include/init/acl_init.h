@@ -29,6 +29,11 @@ ACL_API void acl_poll_prefered(int yesno);
  */
 ACL_API const char *acl_version(void);
 
+/**
+ * 获得当前 acl 库具备的相关能力
+ * @return {const char*} 返回非空字符串，该函数不是线程安全的
+ */
+ACL_API const char *acl_verbose(void);
 
 /**
  * 获得主线程的线程号
