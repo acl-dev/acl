@@ -15,45 +15,73 @@ buildscript {
 android {
     compileSdkVersion 28
     buildToolsVersion "28.0.3"
+
     repositories {
         maven { url 'https://repo1.maven.org/maven2' }
     }
+
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
 
-        // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        externalNativeBuild {
-            cmake {
-                //arguments "-DANDROID_STL=stl_shared"
-                //arguments "-DANDROID_STL=gnustl_shared"   // for ndk12b, ndk16b
-                //arguments "-DACL_DISABLE_HOOK_IO=YES"     // for ndk12b
+        def HOOK_NEW = false
 
-                arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
-                arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
-
-                arguments "-DCMAKE_BUILD_TYPE=RELEASE"
-                arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
-                arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
-                //arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
-                arguments "-DACL_CLIENT_ONLY=YES"
-                arguments "-DHAS_MBEDTLS=YES"
-                arguments "-DACL_BUILD_SHARED=YES"
-                //cppFlags "-fexceptions"
-
-                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
-                //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
-                abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
+        if (HOOK_NEW) {
+            externalNativeBuild {
+                cmake {
+                    arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
+                    arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
+    
+                    arguments "-DCMAKE_BUILD_TYPE=RELEASE"
+                    arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
+                    arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
+                    arguments "-DACL_CLIENT_ONLY=YES"
+                    arguments "-DHAS_MBEDTLS=YES"
+                    arguments "-DACL_BUILD_SHARED=YES"
+                    arguments "-DACL_HOOK_NEW=YES"
+                    //cppFlags "-fexceptions"
+    
+                    abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
+                }
+                cmake {
+                    targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
+                }
             }
-            cmake {
-                //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
-                //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk12b, ndk16b
-                targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
+        } else {
+            // testIstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+            externalNativeBuild {
+                cmake {
+                    //arguments "-DANDROID_STL=stl_shared"
+                    //arguments "-DANDROID_STL=gnustl_shared"   // for ndk12b, ndk16b
+                    //arguments "-DACL_DISABLE_HOOK_IO=YES"     // for ndk12b
+    
+                    arguments "-DANDROID_STL=c++_shared"        // for ndk20 or above
+                    arguments "-DHAS_ATOMIC=YES"                // for ndk20 or above
+    
+                    arguments "-DCMAKE_BUILD_TYPE=RELEASE"
+                    arguments "-DCMAKE_CXX_FLAGS_RELEASE=-O3"
+                    arguments "-DCMAKE_C_FLAGS_RELEASE=-O3"
+                    //arguments "-DCMAKE_VERBOSE_MAKEFILE=ON"
+                    arguments "-DACL_CLIENT_ONLY=YES"
+                    arguments "-DHAS_MBEDTLS=YES"
+                    arguments "-DACL_BUILD_SHARED=YES"
+                    //cppFlags "-fexceptions"
+    
+                    //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86', 'x86_64'
+                    //abiFilters 'armeabi', 'arm64-v8a', 'armeabi-v7a', 'x86'  // for ndk16b
+                    abiFilters 'arm64-v8a', 'armeabi-v7a', 'x86'               // for ndk20 or above
+                }
+                cmake {
+                    //arguments '-DANDROID_PLATFORM=android-14','-DANDROID_TOOLCHAIN=clang'
+                    //targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static'  // for ndk12b, ndk16b
+                    targets 'acl_static', 'protocol_static', 'acl_cpp_static', 'fiber_static', 'fiber_cpp_static', 'acl', 'protocol', 'acl_cpp', 'fiber', 'fiber_cpp'  // for ndk20 or above
+                }
             }
         }
     }
+
     buildTypes {
         release {
             minifyEnabled true
@@ -66,12 +94,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     externalNativeBuild {
         cmake {
             path '../../CMakeLists.txt'
             version "3.10.2"
         }
     }
+
     packagingOptions {
         exclude 'lib/arm64-v8a/libgnustl_shared.so'
         exclude 'lib/armeabi-v7a/libgnustl_shared.so'
@@ -82,6 +112,7 @@ android {
         exclude 'lib/armeabi/libc++_shared.so'
         exclude 'lib/x86/libc++_shared.so'
     }
+
     productFlavors {
     }
 }
