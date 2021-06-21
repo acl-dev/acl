@@ -55,6 +55,9 @@ ACL_API void acl_mempool_ctl(int name, ...);
  */
 ACL_API int acl_mempool_total_allocated(void);
 
+/**
+ * 将当前的内存池状态信息输出至日志或屏幕中
+ */
 ACL_API void acl_mempool_status(void);
 
 /*---------------- ACL库中缺省的内存分配、释放等管理接口 -------------------*/
