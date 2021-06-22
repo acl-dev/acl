@@ -34,7 +34,6 @@ public:
 	 * 解析输入的完整或部分 URL
 	 * @param url {const char*} 非空完整或部分 URL 字符串
 	 * @param domain {string&} 用来存放域名地址信息
-	 * @param size {size_t} domain 缓冲区大小
 	 * @param port {unsigned short*} 用来存放 url 中的端口号
 	 * @param url_path {string&} 用来存放 url 中不含域名和参数的部分，即针对类似
 	 *  于 URL：http://test.com.cn/cgi-bin/test?name=value 则只提取其中的字
