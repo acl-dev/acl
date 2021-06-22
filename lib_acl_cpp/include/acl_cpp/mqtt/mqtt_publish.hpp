@@ -26,7 +26,7 @@ public:
 	/**
 	 * set the message topic.
 	 * @param topic {const char*}
-	 * @param {mqtt_publish&}
+	 * @return {mqtt_publish&}
 	 */
 	mqtt_publish& set_topic(const char* topic);
 

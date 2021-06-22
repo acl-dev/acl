@@ -24,7 +24,7 @@ public:
 	 * because the mqtt message includes header and body, so we parse
 	 * the protocol data in two steps: frist parsing the mqtt header,
 	 * and then parsing the mqtt body.
-	 * @param heder {const mqtt_header&} created from the mqtt data and
+	 * @param header {const mqtt_header&} created from the mqtt data and
 	 * passed to the message object to be created.
 	 */
 	mqtt_message(const mqtt_header& header);
@@ -79,7 +79,7 @@ public:
 	/**
 	 * get the current mqtt message header in invariable mode, just for
 	 * getting some information from it.
-	 * @return
+	 * @return {const mqtt_header&}
 	 */
 	const mqtt_header& get_header(void) const {
 		return header_;
