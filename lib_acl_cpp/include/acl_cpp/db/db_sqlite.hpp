@@ -129,11 +129,11 @@ public:
 	 * @param iCol {int} 待绑定到sql中的参数索引
 	 * @param value {const void*} 待绑定到sql中的参数数值
 	 * @param n {int} 参数的字节长度
-	 * @param {void(*)(void*)} 传入参数的析构函数
+	 * @param destory {void(*)(void*)} 传入参数的析构函数
 	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
 	 */
 	int sqlite3_bind_blob(sqlite3_stmt *stmt, int iCol,
-		const void *value, int n, void(*)(void*));
+		const void *value, int n, void(*destory)(void*));
 
 	/**
 	 * 绑定int类型数据
@@ -159,11 +159,11 @@ public:
 	 * @param iCol {int} 待绑定到sql中的参数索引
 	 * @param value {const void*} 待绑定到sql中的参数数值
 	 * @param n {int} 参数的字节长度
-	 * @param {void(*)(void*)} 传入参数的析构函数
+	 * @param destory {void(*)(void*)} 传入参数的析构函数
 	 * @return {int} 成功返回 SQLITE_OK，否则返回相应的错误代码
 	 */
 	int sqlite3_bind_text(sqlite3_stmt *stmt, int iCol,
-		const char *value, int n, void(*)(void*));
+		const char *value, int n, void(*destory)(void*));
 
 	/**
 	 * 返回 prepared statement 结果集的列数
