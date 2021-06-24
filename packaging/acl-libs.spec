@@ -2,7 +2,7 @@
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.5.2
+Version:        3.5.3
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
@@ -45,6 +45,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Jun 24 2021 shuxin.zheng@qq.com 3.5.3-0-20210624.16
+- feature: mqtt module has been proved ok
+- optimize dns module for supporting IPV6, etc
+- fixed some bugs
 
 * Mon Jan 11 2021 shuxin.zheng@qq.com 3.5.2-0-20210111.18
 - feature: redis module has supported pipeline with very high performance!
