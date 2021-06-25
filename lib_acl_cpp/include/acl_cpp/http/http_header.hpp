@@ -75,6 +75,13 @@ public:
 	//////////////////////////////////////////////////////////////////////
 
 	/**
+	 * 设置 HTTP 协议版本号
+	 * @param version {const char*} HTTP 协议版本号，格式：1.0, 1.1
+	 * @return {http_header&}
+	 */
+	http_header& set_proto_version(const char* version);
+
+	/**
 	 * 设置 HTTP 头是客户端的请求头还是服务器的响应头
 	 * @param onoff {bool} true 表示是请求头，否则表示响应头
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
@@ -482,6 +489,7 @@ private:
 	std::list<HttpCookie*> cookies_;      // cookies 集合
 	std::list<HTTP_HDR_ENTRY*> entries_;  // HTTP 请求头中各字段集合
 	http_method_t method_;                // HTTP 请求的方法
+	char  version_[8];                    // HTTP 协议版本号
 	char  method_s_[64];                  // HTTP 请求方法以字符串表示
 	char  host_[256];                     // HTTP 请求头中的 HOST 字段
 	bool keep_alive_;                     // 是否保持长连接

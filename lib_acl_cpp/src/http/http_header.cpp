@@ -71,6 +71,7 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 	}
 
 	fixed_            = true;
+	version_[0]       = 0;
 	is_request_       = false;
 	url_              = NULL;
 	method_           = HTTP_METHOD_UNKNOWN;
@@ -131,6 +132,7 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 	}
 
 	fixed_            = true;
+	version_[0]       = 0;
 	is_request_       = true;
 	set_method(hdr_req.method);
 	if (hdr_req.host[0]) {
@@ -207,6 +209,7 @@ http_header::~http_header(void)
 
 void http_header::init()
 {
+	version_[0]       = 0;
 	is_request_       = true;
 	url_              = NULL;
 	method_           = HTTP_METHOD_GET;
@@ -251,6 +254,14 @@ void http_header::reset()
 
 //////////////////////////////////////////////////////////////////////////
 // 通用的函数
+
+http_header& http_header::set_proto_version(const char* version)
+{
+	if (version && *version) {
+		ACL_SAFE_STRNCPY(version_, version, sizeof(version_));
+	}
+	return *this;
+}
 
 http_header& http_header::set_request_mode(bool onoff)
 {
@@ -895,8 +906,11 @@ bool http_header::build_request(string& buf) const
 		}
 	}
 
+	// 优先使用用户设置的 HTTP 协议版本号；
 	// HTTP/1.1 要求必须有 Host 字段，当没有 Host 字段时，则采用 HTTP/1.0
-	if (host_[0] != 0) {
+	if (version_[0] != 0) {
+		buf << "HTTP/" << version_ << "\r\n";
+	} else if (host_[0] != 0) {
 		buf += " HTTP/1.1\r\n";
 	} else {
 		buf += " HTTP/1.0\r\n";
@@ -1179,7 +1193,11 @@ bool http_header::build_response(string& out) const
 		if (cgi_mode_) {
 			out.format("STATUS: %d\r\n", status_);
 		} else {
-			out = "HTTP/1.1 ";
+			if (version_[0] != 0) {
+				out << "HTTP/" << version_ << "\r\n";
+			} else {
+				out = "HTTP/1.1 ";
+			}
 			out << status_ << " " << http_status(status_) << "\r\n";
 
 			time_t now = time(NULL);
