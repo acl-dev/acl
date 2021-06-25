@@ -111,8 +111,11 @@ void url_coder::decode(const char* str)
 	acl_foreach(iter, tokens) {
 		char* name  = (char*) iter.data;
 		char* value = strchr(name, '=');
-		if (value == NULL || *(value + 1) == 0) {
+		if (value == NULL) {
 			value = NULL;
+		} else if (*(value + 1) == 0) {
+			*value = 0;
+			value = acl_url_decode(value, dbuf);
 		} else {
 			*value++ = 0;
 			value = acl_url_decode(value, dbuf);
