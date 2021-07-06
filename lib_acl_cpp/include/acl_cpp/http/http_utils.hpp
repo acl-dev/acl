@@ -53,26 +53,49 @@ public:
 	bool parse(const char* url);
 
 public:
+	/**
+	 * 返回 URL 中的协议类型：http 或 https
+	 * @return {const char*}
+	 */
 	const char* get_proto(void) const {
 		return proto_;
 	}
 
+	/**
+	 * 返回 URL 中的域名字段
+	 * @return {const char*} 返回空串则表示没有该字段
+	 */
 	const char* get_domain(void) const {
 		return domain_.c_str();
 	}
 
+	/**
+	 * 返回根据 URL 提取的 HTTP 协议服务端端口号，内部缺省值为 80
+	 * @return {unsigned short}
+	 */
 	unsigned short get_port(void) const {
 		return port_;
 	}
 
+	/**
+	 * 返回根据 URL 提取的相对路径部分（不含 ? 后面的参数）
+	 * @return {const char*}
+	 */
 	const char* get_url_path(void) const {
 		return url_path_.c_str();
 	}
 
+	/**
+	 * 返回从 URL 中提取的参数字段
+	 * @return {const char*}
+	 */
 	const char* get_url_params(void) const {
 		return url_params_.c_str();
 	}
 
+	/**
+	 * 清理解析过程中的中间状态，以便重复使用该类对象解析下一个 URL
+	 */
 	void reset(void);
 
 private:
