@@ -59,22 +59,26 @@ static int hdr_ready(HTTP_HDR *hdr, const char *line, int dlen)
 	HTTP_HDR_ENTRY *entry;
 
 	hdr->cur_lines++;
-	if (hdr->max_lines > 0 && hdr->cur_lines > hdr->max_lines)
+	if (hdr->max_lines > 0 && hdr->cur_lines > hdr->max_lines) {
 		return HTTP_CHAT_ERR_TOO_MANY_LINES;
+	}
 
-	if (dlen > 0)
+	if (dlen > 0) {
 		hdr->valid_lines++;
+	}
 
 	if (dlen == 0) {
-		if (hdr->valid_lines > 0)
+		if (hdr->valid_lines > 0) {
 			return HTTP_CHAT_OK;
-		else
+		} else {
 			return HTTP_CHAT_CONTINUE;
+		}
 	}
 
 	entry = http_hdr_entry_new(line);
-	if (entry == NULL)  /* ignore invalid entry line */
+	if (entry == NULL) {  /* ignore invalid entry line */
 		return HTTP_CHAT_CONTINUE;
+	}
 
 	http_hdr_append_entry(hdr, entry);
 	return HTTP_CHAT_CONTINUE;
@@ -91,12 +95,14 @@ static int hdr_get(HTTP_HDR *hdr, ACL_VSTREAM *stream, int timeout)
 
 	while (1) {
 		ret = acl_vstream_gets_nonl(stream, buf, sizeof(buf) - 1);
-		if (ret == ACL_VSTREAM_EOF)
+		if (ret == ACL_VSTREAM_EOF) {
 			return HTTP_CHAT_ERR_IO;
+		}
 
 		ret = hdr_ready(hdr, buf, ret);
-		if (ret != HTTP_CHAT_CONTINUE)
+		if (ret != HTTP_CHAT_CONTINUE) {
 			break;
+		}
 	}
 
 	/*  ret: HTTP_CHAT_OK or error */
@@ -116,9 +122,9 @@ int http_hdr_res_get_sync(HTTP_HDR_RES *hdr_res, ACL_VSTREAM *stream, int timeou
 
 static http_off_t chunked_data_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 {
-	if (ctx->chunk_len == 0)
+	if (ctx->chunk_len == 0) {
 		return 0;
-	else if (ctx->chunk_len > 0) {
+	} else if (ctx->chunk_len > 0) {
 		char *ptr = buf;
 		http_off_t ntotal = 0, ret, n;
 
@@ -127,8 +133,9 @@ static http_off_t chunked_data_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 		while (n > 0) {
 			ret = acl_vstream_read(ctx->stream, ptr, (size_t) n);
 			if (ret == ACL_VSTREAM_EOF) {
-				if (ntotal == 0)
+				if (ntotal == 0) {
 					ntotal = -1;
+				}
 				break;
 			}
 			ntotal += ret;
@@ -136,16 +143,18 @@ static http_off_t chunked_data_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 			ptr += ret;
 			ctx->body_len += ret;
 			ctx->read_cnt += ret;
-			if ((ctx->flag & HTTP_CHAT_FLAG_BUFFED) == 0)
+			if ((ctx->flag & HTTP_CHAT_FLAG_BUFFED) == 0) {
 				break;
+			}
 		}
 		return ntotal;
 	} else {
 		http_off_t   ret;
 
 		ret = acl_vstream_read(ctx->stream, buf, (size_t) size);
-		if (ret == ACL_VSTREAM_EOF)
+		if (ret == ACL_VSTREAM_EOF) {
 			return -1;
+		}
 		ctx->body_len += ret;
 		ctx->read_cnt += ret;
 		return ret;
@@ -164,8 +173,9 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 	int   ret, n, chunk_len;
 
 	n = acl_vstream_gets(ctx->stream, buf, sizeof(buf));
-	if (n == ACL_VSTREAM_EOF)
+	if (n == ACL_VSTREAM_EOF) {
 		return -1;
+	}
 
 	ctx->read_cnt = 0;  /* reset the len to be read */
 	ctx->body_len += n;
@@ -219,8 +229,9 @@ static int chunked_trailer_get(HTTP_CHAT_CTX *ctx)
 			return -1;
 		}
 		ctx->body_len += n;
-		if (strcmp(buf, "\r\n") == 0 || strcmp(buf, "\n") == 0)
+		if (strcmp(buf, "\r\n") == 0 || strcmp(buf, "\n") == 0) {
 			break;
+		}
 	}
 
 	return 0;
@@ -234,30 +245,35 @@ static http_off_t body_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 	/* Transfer-Encoding: chunked 的优先级要高于 Conteng-Length */
 
 	if (!ctx->chunked) {
-		if (ctx->chunk_len > 0 && ctx->read_cnt >= ctx->chunk_len)
-			return (0);
+		if (ctx->chunk_len > 0 && ctx->read_cnt >= ctx->chunk_len) {
+			return 0;
+		}
 		return chunked_data_get(ctx, buf, size);
 	}
 
 	while (1) {
 		if (ctx->chunk.chunk_oper == CHUNK_OPER_HEAD) {
 			ret = chunked_hdr_get(ctx);
-			if (ret < 0)
+			if (ret < 0) {
 				return -1;
-			if (ctx->chunk_len == 0)
+			}
+			if (ctx->chunk_len == 0) {
 				ctx->chunk.chunk_oper = CHUNK_OPER_TAIL;
-			else
+			} else {
 				ctx->chunk.chunk_oper = CHUNK_OPER_BODY;
+			}
 		} else if (ctx->chunk.chunk_oper == CHUNK_OPER_BODY) {
 			ret = chunked_data_get(ctx, buf, size);
-			if (ret < 0)
+			if (ret < 0) {
 				return -1;
+			}
 			if (ctx->read_cnt >= ctx->chunk_len) {
-				if (chunked_sep_gets(ctx) < 0)
+				if (chunked_sep_gets(ctx) < 0) {
 					return -1;
+				}
 				ctx->chunk.chunk_oper = CHUNK_OPER_HEAD;
 			}
-			return (ret);
+			return ret;
 		} else if (ctx->chunk.chunk_oper == CHUNK_OPER_TAIL) {
 			ret = chunked_trailer_get(ctx);
 			return ret;
@@ -276,8 +292,9 @@ http_off_t http_req_body_get_sync(HTTP_REQ *request, ACL_VSTREAM *stream,
 
 	if (request->hdr_req->hdr.content_length == 0) {
 		/* 扩展了HTTP请求协议部分, 允许请求数据为块传输 */
-		if (request->hdr_req->hdr.chunked == 0)
+		if (request->hdr_req->hdr.chunked == 0) {
 			return 0;
+		}
 	}
 
 	if (request->ctx == NULL) {
@@ -290,12 +307,14 @@ http_off_t http_req_body_get_sync(HTTP_REQ *request, ACL_VSTREAM *stream,
 		ctx->chunk_len = request->hdr_req->hdr.content_length;
 		ctx->body_len  = 0;
 		ctx->read_cnt  = 0;
-		if (ctx->chunked)
+		if (ctx->chunked) {
 			ctx->chunk.chunk_oper = CHUNK_OPER_HEAD;
+		}
 		request->ctx = (void*) ctx;
 		request->free_ctx = free_ctx;
-	} else
+	} else {
 		ctx = (HTTP_CHAT_CTX*) request->ctx;
+	}
 
 	ctx->flag = request->flag;
 	return body_get(ctx, buf, size);
@@ -306,10 +325,14 @@ http_off_t http_res_body_get_sync(HTTP_RES *respond, ACL_VSTREAM *stream,
 {
 	HTTP_CHAT_CTX *ctx;
 
-	if (respond->hdr_res->hdr.content_length == 0) {
+	if (respond->hdr_res->reply_status == 204) {
+		/* 如果服务器响应状态码为 204 则表示没有数据体 */
+		return 0;
+	} else if (respond->hdr_res->hdr.content_length == 0) {
 		/* 块传输协议优先于 content-length */
-		if (respond->hdr_res->hdr.chunked == 0)
+		if (respond->hdr_res->hdr.chunked == 0) {
 			return 0;
+		}
 	}
 
 	if (respond->ctx == NULL) {
@@ -324,8 +347,9 @@ http_off_t http_res_body_get_sync(HTTP_RES *respond, ACL_VSTREAM *stream,
 			ctx->chunk.chunk_oper = CHUNK_OPER_HEAD;
 		respond->ctx = (void*) ctx;
 		respond->free_ctx = free_ctx;
-	} else
+	} else {
 		ctx = (HTTP_CHAT_CTX*) respond->ctx;
+	}
 
 	ctx->flag = respond->flag;
 	return body_get(ctx, buf, size);
@@ -342,10 +366,11 @@ void http_chat_sync_reqctl(HTTP_REQ *request, int name, ...)
 		switch (name) {
 		case HTTP_CHAT_CTL_BUFF_ONOFF:
 			n = va_arg(ap, int);
-			if (n)
+			if (n) {
 				request->flag |= HTTP_CHAT_FLAG_BUFFED;
-			else
+			} else {
 				request->flag &= ~HTTP_CHAT_FLAG_BUFFED;
+			}
 			break;
 		default:
 			acl_msg_panic("%s, %s(%d): bad name %d",
@@ -367,10 +392,11 @@ void http_chat_sync_resctl(HTTP_RES *respond, int name, ...)
 		switch (name) {
 		case HTTP_CHAT_CTL_BUFF_ONOFF:
 			n = va_arg(ap, int);
-			if (n)
+			if (n) {
 				respond->flag |= HTTP_CHAT_FLAG_BUFFED;
-			else
+			} else {
 				respond->flag &= ~HTTP_CHAT_FLAG_BUFFED;
+			}
 			break;
 		default:
 			acl_msg_panic("%s, %s(%d): bad name %d",
