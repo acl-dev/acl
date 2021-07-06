@@ -516,24 +516,30 @@ ACL_VSTRING *acl_vstring_memcat(ACL_VSTRING *vp, const char *src, size_t len)
 	if (len > 0) {
 		ssize_t n;
 
-		ACL_VSTRING_SPACE(vp, (ssize_t) len);
+		if (len >= 100000000) {
+			acl_msg_warn("%s(%d): len=%ld maybe too large",
+				__FUNCTION__, __LINE__, (long) len);
+		}
 
+		ACL_VSTRING_SPACE(vp, (ssize_t) len);
 		n = acl_vstring_avail(vp);
 
-		if ((size_t) n >= len)
+		if ((size_t) n >= len) {
 			n = (ssize_t) len;
-		else
+		} else {
 			acl_msg_warn("%s(%d): space not enough, avail: %ld, "
 				"len: %ld", __FUNCTION__, __LINE__,
 				(long) n, (long) len);
+		}
 
 		if (n > 0 ) {
 			memcpy(acl_vstring_end(vp), src, n);
 			n += (ssize_t) ACL_VSTRING_LEN(vp);
 			ACL_VSTRING_AT_OFFSET(vp, n);
-		} else
+		} else {
 			acl_msg_warn("%s(%d): no space, avail: 0, len: %ld",
 				__FUNCTION__, __LINE__, (long) len);
+		}
 	}
 
 	ACL_VSTRING_TERMINATE(vp);
