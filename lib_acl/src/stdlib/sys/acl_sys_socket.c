@@ -428,8 +428,14 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 {
 	if (fp != NULL && fp->read_ready) {
 		fp->read_ready = 0;
-	} else if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
-		return -1;
+	} else if (timeout > 0) {
+		if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
+			if (acl_read_wait_ms(fd, timeout) < 0) {
+				return -1;
+			}
+		} else if (acl_read_wait(fd, timeout) < 0) {
+			return -1;
+		}
 	}
 
 	return (int) __sys_read(fd, buf, size);
@@ -462,7 +468,11 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	}
 
 #ifdef ACL_WRITEABLE_CHECK
-	if (acl_write_wait(fd, timeout) < 0) {
+	if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
+		if (acl_write_wait_ms(fd, timeout) < 0) {
+			return -1;
+		}
+	} else if (acl_write_wait(fd, timeout) < 0) {
 		return -1;
 	}
 

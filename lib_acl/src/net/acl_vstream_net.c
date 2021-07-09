@@ -167,11 +167,10 @@ ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *sstream, char *ipbuf, int bsize)
 	return acl_vstream_accept_ex(sstream, NULL, ipbuf, bsize);
 }
 
-ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
-	int block_mode, int connect_timeout, int rw_timeout,
-	int rw_bufsize, int *he_errorp)
+ACL_VSTREAM *acl_vstream_timed_connect(const char *addr, int block_mode,
+	int connect_timeout, int rw_timeout, int rw_bufsize, int *error)
 {
-	const char *myname = "acl_vstream_connect_ex";
+	const char *myname = "acl_vstream_timed_connect";
 	ACL_VSTREAM *client;
 	ACL_SOCKET connfd;
 	int  family = 0;
@@ -188,8 +187,8 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	} else
 #endif
 	{
-		connfd = acl_inet_connect_ex(addr, block_mode,
-			connect_timeout, he_errorp);
+		connfd = acl_inet_timed_connect(addr, block_mode,
+			     connect_timeout, error);
 	}
 
 	if (connfd == ACL_SOCKET_INVALID) {
@@ -197,11 +196,13 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	}
 
 	client = acl_vstream_fdopen(connfd, ACL_VSTREAM_FLAG_RW,
-			rw_bufsize, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
+		    rw_bufsize, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	if (client == NULL) {
 		acl_socket_close(connfd);
 		return NULL;
 	}
+
+	ACL_VSTREAM_SET_MS(client);
 
 	family = acl_getsocktype(connfd);
 
@@ -230,6 +231,15 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	}
 
 	return client;
+}
+
+ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
+	int block_mode, int connect_timeout, int rw_timeout,
+	int rw_bufsize, int *error)
+{
+	return acl_vstream_timed_connect(addr, block_mode,
+		 connect_timeout * 1000, rw_timeout * 1000,
+		rw_bufsize, error);
 }
 
 ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,

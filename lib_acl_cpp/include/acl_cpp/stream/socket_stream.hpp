@@ -51,11 +51,13 @@ public:
 	 *  如: www.sina.com:80@60.28.250.199,
 	 *  意思是绑定本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80,
 	 *  如果由OS自动绑定本地 IP 地址，则可以写为：www.sina.com:80
-	 * @param conn_timeout {int} 连接超时时间(秒)
-	 * @param rw_timeout {int} 读写超时时间(秒)
+	 * @param conn_timeout {int} 连接超时时间(单位值取决于 use_ms)
+	 * @param rw_timeout {int} 读写超时时间(单位值取决于 use_ms)
+	 * @param use_ms {bool} 超时时间的时间单位是否采用毫秒
 	 * @return {bool} 连接是否成功
 	 */
-	bool open(const char* addr, int conn_timeout, int rw_timeout);
+	bool open(const char* addr, int conn_timeout, int rw_timeout,
+		bool use_ms = false);
 
 	/**
 	 * 绑定本地 UDP 地址，创建 UDP 网络流对象

@@ -119,10 +119,35 @@ struct ACL_VSTREAM {
 #define	ACL_VSTREAM_FLAG_CONNECT        (1 << 15)
 #define	ACL_VSTREAM_FLAG_SOCKPAIR       (1 << 16)
 
-#define	ACL_VSTREAM_FLAG_TAGYES	        (1 << 17) /* 若读到要求的标志位则置位 */
+#define	ACL_VSTREAM_FLAG_TAGYES	        (1 << 17)	/* 若读到要求的标志位则置位 */
 
-#define	ACL_VSTREAM_FLAG_CONNECTING     (1 << 18) /* 正在连接过程中 */
-#define	ACL_VSTREAM_FLAG_PREREAD	(1 << 19) /* 对于 acl_vstream_can_read 调用过程是否允许预读 */
+#define	ACL_VSTREAM_FLAG_CONNECTING     (1 << 18)	/* 正在连接过程中 */
+#define	ACL_VSTREAM_FLAG_PREREAD	(1 << 19)	/* 对于 acl_vstream_can_read 调用过程是否允许预读 */
+
+#define ACL_VSTREAM_FLAG_MS		(1 << 20)	/**< 毫秒超时级别 */
+#define ACL_VSTREAM_FLAG_US		(1 << 21)	/**< 微秒超时级别 */
+#define ACL_VSTREAM_FLAG_NS		(1 << 22)	/**< 纳秒超时级别 */
+
+/* 设置毫秒级超时 */
+#define ACL_VSTREAM_SET_MS(x)	((x)->flag |= ACL_VSTREAM_FLAG_MS)
+/* 设置微秒级超时 */
+#define ACL_VSTREAM_SET_US(x)	((x)->flag |= ACL_VSTREAM_FLAG_US)
+/* 设置纳秒级超时 */
+#define ACL_VSTREAM_SET_NS(x)	((x)->flag |= ACL_VSTREAM_FLAG_NS)
+
+/* 清除毫秒级超时 */
+#define ACL_VSTREAM_CLR_MS(x)	((x)->flag &= ~ACL_VSTREAM_FLAG_MS)
+/* 清除微秒级超时 */
+#define ACL_VSTREAM_CLR_US(x)	((x)->flag &= ~ACL_VSTREAM_FLAG_US)
+/* 清除纳秒级超时 */
+#define ACL_VSTREAM_CLR_NS(x)	((x)->flag &= ~ACL_VSTREAM_FLAG_NS)
+
+/* 判断是否设置了毫秒级超时 */
+#define ACL_VSTREAM_IS_MS(x)	(((x)->flag & ACL_VSTREAM_FLAG_MS) != 0)
+/* 判断是否设置了微秒级超时 */
+#define ACL_VSTREAM_IS_US(x)	(((x)->flag & ACL_VSTREAM_FLAG_US) != 0)
+/* 判断是否设置了纳秒级超时 */
+#define ACL_VSTREAM_IS_NS(x)	(((x)->flag & ACL_VSTREAM_FLAG_NS) != 0)
 
 	int   errnum;                   /**< record the system errno here */
 	int   rw_timeout;               /**< read/write timeout */

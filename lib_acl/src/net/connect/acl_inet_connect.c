@@ -99,7 +99,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 		if (acl_timed_connect(sock, peer->ai_addr,
 			(socklen_t) peer->ai_addrlen, timeout) < 0) {
 #else
-		if (acl_timed_connect(sock, peer->ai_addr,
+		if (acl_timed_connect_ms(sock, peer->ai_addr,
 			peer->ai_addrlen, timeout) < 0) {
 #endif
 #ifdef ACL_WINDOWS
@@ -183,6 +183,12 @@ ACL_SOCKET acl_inet_connect(const char *addr, int blocking, int timeout)
 }
 
 ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
+	int timeout, int *h_error)
+{
+	return acl_inet_timed_connect(addr, blocking, timeout * 1000, h_error);
+}
+
+ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 	int timeout, int *h_error)
 {
 	const char *myname = "acl_inet_connect_ex";

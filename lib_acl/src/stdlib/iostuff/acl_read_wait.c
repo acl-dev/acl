@@ -501,11 +501,16 @@ int acl_read_select_wait(ACL_SOCKET fd, int delay)
 
 int acl_read_wait(ACL_SOCKET fd, int timeout)
 {
+	return acl_read_wait_ms(fd, timeout * 1000);
+}
+
+int acl_read_wait_ms(ACL_SOCKET fd, int timeout)
+{
 #if defined(ACL_LINUX) && !defined(MINGW) && defined(USE_EPOLL)
-	return acl_read_epoll_wait(fd, timeout * 1000);
+	return acl_read_epoll_wait(fd, timeout);
 #elif defined(ACL_HAS_POLL)
-	return acl_read_poll_wait(fd, timeout * 1000);
+	return acl_read_poll_wait(fd, timeout);
 #else
-	return acl_read_select_wait(fd, timeout * 1000);
+	return acl_read_select_wait(fd, timeout);
 #endif
 }

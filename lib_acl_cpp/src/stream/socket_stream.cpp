@@ -24,10 +24,17 @@ bool socket_stream::open(ACL_SOCKET fd, bool udp_mode /* = false */)
 	return open(conn, udp_mode);
 }
 
-bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout)
+bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout,
+	bool use_ms /* false */)
 {
-	ACL_VSTREAM* conn = acl_vstream_connect(addr, ACL_BLOCKING,
-		conn_timeout, rw_timeout, 8192);
+	ACL_VSTREAM* conn;
+	if (use_ms) {
+		conn = acl_vstream_timed_connect(addr, ACL_BLOCKING,
+			conn_timeout, rw_timeout, 8192, NULL);
+	} else {
+		conn = acl_vstream_connect(addr, ACL_BLOCKING,
+			conn_timeout, rw_timeout, 8192);
+	}
 	if (conn == NULL) {
 		return false;
 	}

@@ -6,19 +6,22 @@ static void usage(const char *proc)
 		"	-s server_addr[default: 127.0.0.1:8888]\r\n"
 		"	-n loop_count[default: 10]\r\n"
 		"	-i inter count to print\r\n"
-		"	-l data size[default: 4096]\r\n",
-		proc);
+		"	-l data size[default: 4096]\r\n"
+        "   -m [if timeout's unit using ms]\r\n"
+        "   -r [if read echo data from server]\r\n"
+		, proc);
 }
 
 int   main(int argc, char *argv[])
 {
 	ACL_VSTREAM *client;
-	char  addr[64], *buf = NULL, line[128];
+	char  addr[64], *buf, *buf2, line[128];
 	int   n, i, len = 4096, count = 10, inter = 1000;
+    int   set_ms = 0, read_result = 0;
 
 	snprintf(addr, sizeof(addr), "127.0.0.1:8888");
 
-	while ((n = getopt(argc, argv, "hs:l:n:i:")) > 0) {
+	while ((n = getopt(argc, argv, "hs:l:n:i:rm")) > 0) {
 		switch (n) {
 		case 'h':
 			usage(argv[0]);
@@ -35,6 +38,12 @@ int   main(int argc, char *argv[])
 		case 'i':
 			inter = atoi(optarg);
 			break;
+        case 'r':
+            read_result = 1;
+            break;
+        case 'm':
+            set_ms = 1;
+            break;
 		default:
 			break;
 		}
@@ -46,20 +55,24 @@ int   main(int argc, char *argv[])
 	}
 
 	/* 连接服务器 */
-	client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
+    if (set_ms) {
+        client = acl_vstream_timed_connect(addr, ACL_BLOCKING, 100, 100, 4096, NULL);
+    } else {
+        client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
+    }
+
 	if (client == NULL) {
 		printf("connect %s error %s\r\n", addr, acl_last_serror());
 		return 1;
 	}
+
+
 	printf("connect %s ok ...\r\n", addr);
 
 	buf = (char*) acl_mymalloc(len);
 	snprintf(buf, len, "%d\r\n", len);
 
-	/* 发送一行数据通知服务端每次数据体的长度 */
-	if (acl_vstream_writen(client, buf, strlen(buf)) == ACL_VSTREAM_EOF)
-	if (n == ACL_VSTREAM_EOF)
-		goto END;
+    buf2 = (char*) acl_mymalloc(len);
 
 	memset(buf, 'X', len);
 
@@ -73,13 +86,19 @@ int   main(int argc, char *argv[])
 			snprintf(line, sizeof(line), "curr: %d, total: %d", i, count);
 			ACL_METER_TIME(line);
 		}
+        if (read_result == 0) {
+            continue;
+        }
+
+        if (acl_vstream_readn(client, buf2, len) != len) {
+            printf("read echo from server error\r\n");
+            break;
+        }
 	}
 
-END:
-
-	if (buf)
-		acl_myfree(buf);
-	acl_vstream_close(client);
+    acl_myfree(buf);
+    acl_myfree(buf2);
+    acl_vstream_close(client);
 
 	return 0;
 }

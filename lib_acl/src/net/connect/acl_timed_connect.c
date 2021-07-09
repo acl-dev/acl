@@ -21,7 +21,13 @@
 
 #endif
 
-int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
+int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr *sa,
+	socklen_t len, int timeout)
+{
+	return acl_timed_connect_ms(sock, sa, len, timeout * 1000);
+}
+
+int acl_timed_connect_ms(ACL_SOCKET sock, const struct sockaddr *sa,
 	socklen_t len, int timeout)
 {
 	int   err;
@@ -57,7 +63,7 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 	 * A connection is in progress. Wait for a limited amount of time for
 	 * something to happen. If nothing happens, report an error.
 	 */
-	if (acl_write_wait(sock, timeout) < 0) {
+	if (acl_write_wait_ms(sock, timeout) < 0) {
 		return -1;
 	}
 

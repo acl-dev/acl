@@ -38,11 +38,11 @@ void set_poll4write(acl_poll_fn fn)
 	__sys_poll = fn;
 }
 
-int acl_write_wait(ACL_SOCKET fd, int timeout)
+int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 {
 	const char *myname = "acl_write_wait";
 	struct pollfd fds;
-	int   delay = timeout * 1000;
+	int delay = timeout;
 
 	fds.events = POLLOUT;
 	fds.revents = 0;
@@ -94,7 +94,7 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 
 #else
 
-int acl_write_wait(ACL_SOCKET fd, int timeout)
+int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 {
 	const char *myname = "acl_write_wait";
 	fd_set  wfds, xfds;
@@ -124,11 +124,12 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	FD_SET(fd, &xfds);
 
 	if (timeout >= 0) {
-		tv.tv_usec = 0;
-		tv.tv_sec = timeout;
+		tv.tv_sec  = timeout / 1000;
+		tv.tv_usec = (timeout * 1000) % 1000000;
 		tp = &tv;
-	} else
+	} else {
 		tp = 0;
+	}
 
 	for (;;) {
 #ifdef ACL_WINDOWS
@@ -162,4 +163,9 @@ int acl_write_wait(ACL_SOCKET fd, int timeout)
 	}
 }
 
-#endif
+#endif /* ACL_HAS_POLL */
+
+int acl_write_wait(ACL_SOCKET fd, int timeout)
+{
+	return acl_write_wait_ms(fd, timeout * 1000);
+}

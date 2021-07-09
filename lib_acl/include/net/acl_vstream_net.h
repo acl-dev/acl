@@ -67,11 +67,11 @@ ACL_API ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *listen_stream,
  * @param conn_timeout {int} 连接超时时间(秒)
  * @param rw_timeout {int} 连接流成功后的读写超时时间，单位为秒
  * @param bufsize {int} 连接流成功后的缓冲区大小
- * @param errorp {int*} 如果不为空，则存储连接失败后的错误号
+ * @param error {int*} 如果不为空，则存储连接失败后的错误号
  * @return {ACL_VSTREAM*} 如果不为空，则表示连接成功后的数据流
  */
 ACL_API ACL_VSTREAM *acl_vstream_connect_ex(const char *addr, int block_mode,
-		int conn_timeout, int rw_timeout, int bufsize, int *errorp);
+	int conn_timeout, int rw_timeout, int bufsize, int *error);
 
 /**
  * 远程连接服务器
@@ -83,7 +83,20 @@ ACL_API ACL_VSTREAM *acl_vstream_connect_ex(const char *addr, int block_mode,
  * @return {ACL_VSTREAM*} 如果不为空，则表示连接成功后的数据流
  */
 ACL_API ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
-		int connect_timeout, int rw_timeout, int rw_bufsize);
+	int connect_timeout, int rw_timeout, int rw_bufsize);
+
+/**
+ * 远程连接服务器
+ * @param addr {const char*} 服务器地址，含义同上
+ * @param block_mode {int} 阻塞连接还是非阻塞连接，ACL_BLOCKING, ACL_NON_BLOCKING
+ * @param connect_timeout {int} 连接超时时间(毫秒)
+ * @param rw_timeout {int} 连接流成功后的读写超时时间，单位为毫秒
+ * @param rw_bufsize {int} 连接流成功后的缓冲区大小
+ * @param error {int*} 如果不为空，则存储连接失败后的错误号
+ * @return {ACL_VSTREAM*} 如果不为空，则表示连接成功后的数据流
+ */
+ACL_API ACL_VSTREAM *acl_vstream_timed_connect(const char *addr, int block_mode,
+	int connect_timeout, int rw_timeout, int rw_bufsize, int *error);
 
 /**
  * 针对 UDP 通信，该函数用来绑定本地 UDP 地址，如果绑定成功，则创建

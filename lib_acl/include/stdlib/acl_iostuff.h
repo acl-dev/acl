@@ -42,6 +42,17 @@ ACL_API int acl_is_blocking(ACL_SOCKET fd);
 ACL_API int acl_write_wait(ACL_SOCKET fd, int timeout);
 
 /**
+ * 写等待操作，直到套接字可写、出错或超时
+ * @param fd {ACL_SOCKET} 描述符
+ * @param timeout {int} 超时时间，单位为毫秒，该值分下面三种情形：
+ *  > 0  : 表示最大超时时间的秒数，
+ *  == 0 : 表示不等待，检测完后立即返回
+ *  < 0  : 时表示直接该套接字可读或出错为止
+ * @return {int} 0: 可写; -1: 失败或超时
+ */
+ACL_API int acl_write_wait_ms(ACL_SOCKET fd, int timeout);
+
+/**
  * 读等待操作，直到套接字有数据可读、出错或超时
  * @param fd {ACL_SOCKET} 描述符
  * @param timeout {int} 超时时间，单位为秒，该值分下面三种情形：
@@ -51,6 +62,17 @@ ACL_API int acl_write_wait(ACL_SOCKET fd, int timeout);
  * @return {int} 0: 有数据可读或描述字出错; -1: 失败或超时
  */
 ACL_API int acl_read_wait(ACL_SOCKET fd, int timeout);
+
+/**
+ * 读等待操作，直到套接字有数据可读、出错或超时
+ * @param fd {ACL_SOCKET} 描述符
+ * @param timeout {int} 超时时间，单位为毫秒，该值分下面三种情形：
+ *  > 0  : 表示最大超时时间的秒数，
+ *  == 0 : 表示不等待，检测完后立即返回
+ *  < 0  : 时表示直接该套接字可读或出错为止
+ * @return {int} 0: 有数据可读或描述字出错; -1: 失败或超时
+ */
+ACL_API int acl_read_wait_ms(ACL_SOCKET fd, int timeout);
 
 #if defined(ACL_LINUX) && !defined(MINGW)
 /**
