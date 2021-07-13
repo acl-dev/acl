@@ -93,20 +93,31 @@ int http_hdr_set_keepalive(const HTTP_HDR_REQ *req, HTTP_HDR_RES *res)
 
 	return (1);
 #else
+	int keep;
 	const char *ptr;
 
 	ptr = http_hdr_entry_value(&req->hdr, "Connection");
-
-	if (ptr == NULL || strcasecmp(ptr, "keep-alive") != 0) {
-		http_hdr_put_str(&res->hdr, "Connection", "close");
-		res->hdr.keep_alive = 0;
-		return (0);
+	if (ptr != NULL) {
+		if (strcasecmp(ptr, "keep-alive") == 0) {
+			keep = 1;
+		} else {
+			keep = 0;
+		}
+	} else if (req->hdr.version.major == 1 && req->hdr.version.minor >= 1) {
+		keep = 1;
+	} else {
+		keep = 0;
 	}
 
-	http_hdr_put_str(&res->hdr, "Connection", "Keep-Alive");
-	res->hdr.keep_alive = 1;
-
-	return (1);
+	if (keep) {
+		http_hdr_put_str(&res->hdr, "Connection", "Keep-Alive");
+		res->hdr.keep_alive = 1;
+		return 1;
+	} else {
+		http_hdr_put_str(&res->hdr, "Connection", "close");
+		res->hdr.keep_alive = 0;
+		return 0;
+	}
 #endif
 }
 

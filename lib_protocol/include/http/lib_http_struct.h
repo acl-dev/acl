@@ -116,32 +116,30 @@ struct HTTP_HDR_ENTRY {
 
 struct HTTP_HDR {
 	/* 通用实体 */
-	char  proto[32];        /**< 支持的协议: HTTP */
+	char  proto[8];        /**< 支持的协议: HTTP */
 	struct {
-		unsigned int major; /**< 主版本号 */
-		unsigned int minor; /**< 次版本号 */
+		unsigned char major; /**< 主版本号 */
+		unsigned char minor; /**< 次版本号 */
 	} version;
 
+	http_off_t content_length; /**< HTTP协议体数据长度 */
+
 	/**< 是否保持长连接: 0 -> 不保持，> 0 -> 保持，< 0 -> 没有该字段 */
-	int   keep_alive;
-	http_off_t   content_length; /**< HTTP协议体数据长度 */
-	int   chunked;          /**
-                                 * 该字段本来对HTTP协议响应有意义,
-                                 * 为了将来的扩展, 故定义于此
-                                 */
+	char  keep_alive;
+	char  chunked; /* 该字段本来对HTTP协议响应有意义, 为了将来的扩展, 故定义于此 */
 
 	/* 内部变量 */
-	int   cur_lines;
-	int   max_lines;
-	int   valid_lines;
-	int   status;
-	int   keep_alive_count; /**< 处理次数 */
+	short  cur_lines;
+	short  max_lines;
+	short  valid_lines;
+	short  status;
+	short  keep_alive_count; /**< 处理次数 */
 
 	ACL_ARRAY  *entry_lnk;  /**< 存储着 HTTP_HDR_ENTRY 类型的元素 */
 	void *chat_ctx;
 	void (*chat_free_ctx_fn)(void*);
 
-	int   debug;            /**< 调试信息头的标志位 */
+	char  debug;            /**< 调试信息头的标志位 */
 };
 
 #define HDR_RESTORE(hdr_ptr, hdr_type, hdr_member) \
