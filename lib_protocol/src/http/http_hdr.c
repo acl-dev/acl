@@ -546,7 +546,13 @@ int http_hdr_parse(HTTP_HDR *hh)
 	 * 0：不保持长连接；1：保持长连接，-1：没有该字段
 	 * --zsx, 2019.7.4
 	 */
-	hh->keep_alive = keep_alive;
+	if (keep_alive >= 0) {
+		hh->keep_alive = keep_alive;
+	} else if (hh->version.major == 1 && hh->version.minor >= 1) {
+		hh->keep_alive = 1;
+	} else {
+		hh->keep_alive = -1;
+	}
 #endif
 
 	return 0;
