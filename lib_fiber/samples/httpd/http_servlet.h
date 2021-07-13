@@ -25,7 +25,7 @@ public:
 		size_t len = strlen(buf);
 
 		res.setContentLength(len);
-		res.setKeepAlive(true);
+//		res.setKeepAlive(true);
 
 		// ·¢ËÍ http ÏìÓ¦Ìå
 		return res.write(buf, len) && res.write(NULL, 0);

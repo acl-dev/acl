@@ -12,8 +12,9 @@ void http_hdr_put_str(HTTP_HDR *hdr, const char *name, const char *value)
 	HTTP_HDR_ENTRY *entry;
 
 	entry = http_hdr_entry_build(name, value);
-	if (entry)
+	if (entry) {
 		http_hdr_append_entry(hdr, entry);
+	}
 }
 
 void http_hdr_put_int(HTTP_HDR *hdr, const char *name, int value)
@@ -23,8 +24,9 @@ void http_hdr_put_int(HTTP_HDR *hdr, const char *name, int value)
 
 	snprintf(buf, sizeof(buf) - 1, "%d", value);
 	entry = http_hdr_entry_build(name, buf);
-	if (entry)
+	if (entry) {
 		http_hdr_append_entry(hdr, entry);
+	}
 }
 
 void http_hdr_put_fmt(HTTP_HDR *hdr, const char *name, const char *fmt, ...)
@@ -35,9 +37,8 @@ void http_hdr_put_fmt(HTTP_HDR *hdr, const char *name, const char *fmt, ...)
 	ACL_VSTRING *strbuf = acl_vstring_alloc(1024);
 
 	if (strbuf == NULL) {
-		char ebuf[256];
 		acl_msg_fatal("%s, %s(%d): calloc error(%s)",
-			__FILE__, myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
+			__FILE__, myname, __LINE__, acl_last_serror());
 	}
 
 	va_start(ap, fmt);
@@ -45,8 +46,9 @@ void http_hdr_put_fmt(HTTP_HDR *hdr, const char *name, const char *fmt, ...)
 	va_end(ap);
 
 	entry = http_hdr_entry_build(name, acl_vstring_str(strbuf));
-	if (entry)
+	if (entry) {
 		http_hdr_append_entry(hdr, entry);
+	}
 
 	acl_vstring_free(strbuf);
 }
@@ -60,8 +62,9 @@ void http_hdr_put_time(HTTP_HDR *hdr, const char *name, time_t t)
 
 	(void) http_mkrfc1123(buf, sizeof(buf) - 1, t);
 	entry = http_hdr_entry_build(name, buf);
-	if (entry)
+	if (entry) {
 		http_hdr_append_entry(hdr, entry);
+	}
 }
 
 int http_hdr_set_keepalive(const HTTP_HDR_REQ *req, HTTP_HDR_RES *res)
@@ -137,7 +140,7 @@ HTTP_HDR_RES *http_hdr_res_static(int status)
 	res_hdr = http_hdr_res_new();
 	http_hdr_res_init(res_hdr, status);
 	http_hdr_put_time(&res_hdr->hdr, "Date", time(NULL));
-	return (res_hdr);
+	return res_hdr;
 }
 
 HTTP_HDR_RES *http_hdr_res_error(int status)
@@ -154,7 +157,7 @@ HTTP_HDR_RES *http_hdr_res_error(int status)
 	n = http_tmpl_size(status);
 	http_hdr_put_int(&res_hdr->hdr, "Content-Length", n);
 
-	return (res_hdr);
+	return res_hdr;
 }
 
 void http_hdr_build(const HTTP_HDR *hdr, ACL_VSTRING *strbuf)
@@ -171,11 +174,14 @@ void http_hdr_build(const HTTP_HDR *hdr, ACL_VSTRING *strbuf)
 
 	for (i = 1; i < n; i++) {
 		entry = (HTTP_HDR_ENTRY *) acl_array_index(entries, i);
-		if (entry == NULL)
+		if (entry == NULL) {
 			break;
-		if (entry->off)
+		}
+		if (entry->off) {
 			continue;
-		acl_vstring_sprintf_append(strbuf, "%s: %s\r\n", entry->name, entry->value);
+		}
+		acl_vstring_sprintf_append(strbuf, "%s: %s\r\n",
+			entry->name, entry->value);
 	}
 
 	acl_vstring_strcat(strbuf, "\r\n");
@@ -201,11 +207,14 @@ void http_hdr_build_request(const HTTP_HDR_REQ *hdr_req, ACL_VSTRING *strbuf)
 
 	for (i = 1; i < n; i++) {
 		entry = (HTTP_HDR_ENTRY *) acl_array_index(entries, i);
-		if (entry == NULL)
+		if (entry == NULL) {
 			break;
-		if (entry->off)
+		}
+		if (entry->off) {
 			continue;
-		acl_vstring_sprintf_append(strbuf, "%s: %s\r\n", entry->name, entry->value);
+		}
+		acl_vstring_sprintf_append(strbuf, "%s: %s\r\n",
+			entry->name, entry->value);
 	}
 
 	acl_vstring_strcat(strbuf, "\r\n");
