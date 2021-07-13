@@ -80,7 +80,7 @@ unsigned char *acl_base64_encode(const char *in, int len)
 
 int acl_base64_decode(const char *in, char **pptr_in)
 {
-	unsigned int in_len;
+	size_t in_len;
 	const unsigned char *in_end;
 	const unsigned char *code = (const unsigned char*) in;
 	unsigned char **pptr = (unsigned char**) pptr_in;

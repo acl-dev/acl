@@ -247,7 +247,7 @@ int http_hdr_parse_version(HTTP_HDR *hh, const char *data)
 #if defined(ACL_WINDOWS) && _MSC_VER >= 1500
 	if (sscanf_s(data + 5, "%u.%u", &hh->version.major, &hh->version.minor) != 2)
 #else
-	if (sscanf(data + 5, "%c.%c", &hh->version.major, &hh->version.minor) != 2)
+	if (sscanf(data + 5, "%u.%u", &hh->version.major, &hh->version.minor) != 2)
 #endif
 		return -1;
 

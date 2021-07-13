@@ -118,8 +118,8 @@ struct HTTP_HDR {
 	/* 通用实体 */
 	char  proto[8];        /**< 支持的协议: HTTP */
 	struct {
-		unsigned char major; /**< 主版本号 */
-		unsigned char minor; /**< 次版本号 */
+		unsigned int major; /**< 主版本号 */
+		unsigned int minor; /**< 次版本号 */
 	} version;
 
 	http_off_t content_length; /**< HTTP协议体数据长度 */
