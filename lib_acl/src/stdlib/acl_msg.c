@@ -149,24 +149,28 @@ void acl_msg_info(const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("info", fmt, ap);
-	}
-
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_info->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_info->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("info", fmt, ap);
+		}
 	}
 
 	va_end (ap);
@@ -174,24 +178,28 @@ void acl_msg_info(const char *fmt,...)
 
 void acl_msg_info2(const char *fmt, va_list ap)
 {
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("info", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_info->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_info->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("info", fmt, ap);
+		}
 	}
 }
 
@@ -201,57 +209,67 @@ void acl_msg_warn(const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("warn", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_warn->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_warn->pid(%ld), ", getpid());
 #endif
 
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("warn", fmt, ap);
+		}
 	}
 
 	va_end (ap);
 
-	if (__trace_enable)
+	if (__trace_enable) {
 		acl_trace_info();
+	}
 }
 
 void acl_msg_warn2(const char *fmt, va_list ap)
 {
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("warn", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_warn->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_warn->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
 	}
 
-	if (__trace_enable)
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("warn", fmt, ap);
+		}
+	}
+
+	if (__trace_enable) {
 		acl_trace_info();
+	}
 }
 
 void acl_msg_error(const char *fmt,...)
@@ -260,56 +278,66 @@ void acl_msg_error(const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("error", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_error->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_error->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("error", fmt, ap);
+		}
 	}
 
 	va_end (ap);
 
-	if (__trace_enable)
+	if (__trace_enable) {
 		acl_trace_info();
+	}
 }
 
 void acl_msg_error2(const char *fmt, va_list ap)
 {
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("error", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_error->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_error->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
 	}
 
-	if (__trace_enable)
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("error", fmt, ap);
+		}
+	}
+
+	if (__trace_enable) {
 		acl_trace_info();
+	}
 }
 
 void acl_msg_fatal(const char *fmt,...)
@@ -318,25 +346,29 @@ void acl_msg_fatal(const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("fatal", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_fatal->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_fatal->pid(%ld), ", getpid());
 #endif
 		printf("fatal:");
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("fatal", fmt, ap);
+		}
 	}
 
 	va_end (ap);
@@ -347,24 +379,28 @@ void acl_msg_fatal(const char *fmt,...)
 
 void acl_msg_fatal2(const char *fmt, va_list ap)
 {
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("fatal", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_fatal->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_fatal->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("fatal", fmt, ap);
+		}
 	}
 
 	acl_trace_info();
@@ -380,21 +416,24 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("fatal", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_fatal_status->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_fatal_status->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("fatal", fmt, ap);
+		}
 	}
 
 	va_end (ap);
@@ -407,21 +446,24 @@ void acl_msg_fatal_status2(int status, const char *fmt, va_list ap)
 {
 	(void) status;
 
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("fatal", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_fatal_status->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_fatal_status->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("fatal", fmt, ap);
+		}
 	}
 
 	acl_trace_info();
@@ -435,24 +477,28 @@ void acl_msg_panic(const char *fmt,...)
 
 	va_start (ap, fmt);
 
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("panic", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_panic->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_panic->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("panic", fmt, ap);
+		}
 	}
 
 	va_end (ap);
@@ -463,24 +509,28 @@ void acl_msg_panic(const char *fmt,...)
 
 void acl_msg_panic2(const char *fmt, va_list ap)
 {
-	if (__pre_write_fn)
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
-
-	if (__log_open_flag) {
-		if (__write_fn != NULL)
-			__write_fn(__msg_ctx, fmt, ap);
-		else
-			acl_write_to_log2("panic", fmt, ap);
-	}
-	
 	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
 #ifdef LINUX
 		printf("acl_msg_panic->pid(%d), ", getpid());
 #elif defined(SOLARIS)
 		printf("acl_msg_panic->pid(%ld), ", getpid());
 #endif
-		vprintf(fmt, ap);
+		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+	}
+
+	if (__pre_write_fn) {
+		__pre_write_fn(__pre_write_ctx, fmt, ap);
+	}
+
+	if (__log_open_flag) {
+		if (__write_fn != NULL) {
+			__write_fn(__msg_ctx, fmt, ap);
+		} else {
+			acl_write_to_log2("panic", fmt, ap);
+		}
 	}
 
 	acl_trace_info();
@@ -510,8 +560,7 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 			size,
 			NULL);
 	while ((L > 0) && ((buffer[L - 1] >= 0 && buffer[L - 1] <= 32) || 
-		 (buffer[L - 1] == '.')))
-	{
+		 (buffer[L - 1] == '.'))) {
 		buffer[L - 1] = '\0';
 		L--;
 	}
@@ -521,7 +570,7 @@ const char *acl_strerror(unsigned int errnum, char *buffer, int size)
 #elif	defined(ACL_UNIX)
 	if (buffer == NULL || size <= 0) {
 		acl_msg_error("%s, %s(%d): input error",
-				__FILE__, myname, __LINE__);
+			__FILE__, myname, __LINE__);
 		return NULL;
 	}
 
@@ -542,23 +591,26 @@ static acl_pthread_key_t __errbuf_key;
 
 static void thread_free_buf(void *buf)
 {
-	if ((unsigned long) acl_pthread_self() != acl_main_thread_self())
+	if ((unsigned long) acl_pthread_self() != acl_main_thread_self()) {
 		acl_myfree(buf);
+	}
 }
 
 #if !defined(HAVE_NO_ATEXIT)
 static char *__main_buf = NULL;
 static void main_free_buf(void)
 {
-	if (__main_buf)
+	if (__main_buf) {
 		acl_myfree(__main_buf);
+	}
 }
 #endif
 
 static void thread_buf_init(void)
 {
-	if (acl_pthread_key_create(&__errbuf_key, thread_free_buf) != 0)
+	if (acl_pthread_key_create(&__errbuf_key, thread_free_buf) != 0) {
 		abort();
+	}
 }
 
 static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
