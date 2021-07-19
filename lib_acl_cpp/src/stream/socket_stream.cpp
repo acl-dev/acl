@@ -28,7 +28,7 @@ bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout,
     time_unit_t unit /* time_unit_s */)
 {
 	ACL_VSTREAM* conn;
-	if (unit == time_unit_s) {
+	if (unit == time_unit_ms) {
 		conn = acl_vstream_timed_connect(addr, ACL_BLOCKING,
 			conn_timeout, rw_timeout, 8192, NULL);
 	} else {
