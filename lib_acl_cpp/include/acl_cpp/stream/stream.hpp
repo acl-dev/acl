@@ -8,6 +8,16 @@ struct ACL_VSTREAM;
 
 namespace acl {
 
+/**
+ * 时间单位类型
+ */
+typedef enum {
+	time_unit_s,	// 秒
+	time_unit_ms,	// 毫秒
+	time_unit_us,	// 微秒
+	time_unit_ns,	// 纳秒
+} time_unit_t;
+
 class stream_hook;
 class dbuf_pool;
 
@@ -82,11 +92,17 @@ public:
 	void* del_ctx(const char* key = NULL);
 
 	/**
-	 * 设置流的读写超时时间
-	 * @param n {int} 超时时间(单位: 秒)，该值 > 0 则启用超时检测过程，否则将会
-	 *  一直阻塞直到可读或出错
+	 * 设置流的读写超时时间，只有当内部流对象建立后调用本方法才有效
+	 * @param n {int} 超时时间，该值 > 0 则启用超时检测过程，否则将会一直阻塞直到
+	 *  可读或出错，该值的单位取决 于第二个参数
 	 */
 	void set_rw_timeout(int n);
+
+	/**
+	 * 设置内部超时时间单位类型，只有当内部流对象建立后调用本方法才有效
+	 * @param unit {time_unit_t} 时间单位类型
+	 */
+	void set_time_unit(time_unit_t unit);
 
 	/**
 	 * 获得当前流的读写超时时间

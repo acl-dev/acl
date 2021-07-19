@@ -25,10 +25,10 @@ bool socket_stream::open(ACL_SOCKET fd, bool udp_mode /* = false */)
 }
 
 bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout,
-	bool use_ms /* false */)
+    time_unit_t unit /* time_unit_s */)
 {
 	ACL_VSTREAM* conn;
-	if (use_ms) {
+	if (unit == time_unit_s) {
 		conn = acl_vstream_timed_connect(addr, ACL_BLOCKING,
 			conn_timeout, rw_timeout, 8192, NULL);
 	} else {

@@ -53,11 +53,11 @@ public:
 	 *  如果由OS自动绑定本地 IP 地址，则可以写为：www.sina.com:80
 	 * @param conn_timeout {int} 连接超时时间(单位值取决于 use_ms)
 	 * @param rw_timeout {int} 读写超时时间(单位值取决于 use_ms)
-	 * @param use_ms {bool} 超时时间的时间单位是否采用毫秒
+	 * @param unit {time_unit_t} 超时时间的时间单位
 	 * @return {bool} 连接是否成功
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout,
-		bool use_ms = false);
+		time_unit_t unit = time_unit_s);
 
 	/**
 	 * 绑定本地 UDP 地址，创建 UDP 网络流对象

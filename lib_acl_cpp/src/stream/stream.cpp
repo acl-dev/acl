@@ -77,6 +77,28 @@ void stream::set_rw_timeout(int n)
 	}
 }
 
+void stream::set_time_unit(time_unit_t unit) {
+	if (stream_) {
+		switch (unit) {
+		case time_unit_ms:
+			ACL_VSTREAM_SET_MS(stream_);
+			break;
+		case time_unit_us:
+			ACL_VSTREAM_SET_US(stream_);
+			break;
+		case time_unit_ns:
+			ACL_VSTREAM_SET_NS(stream_);
+			break;
+		case time_unit_s:
+		default:
+			ACL_VSTREAM_CLR_MS(stream_);
+			ACL_VSTREAM_CLR_US(stream_);
+			ACL_VSTREAM_CLR_NS(stream_);
+			break;
+		}
+	}
+}
+
 int stream::get_rw_timeout(void) const
 {
 	if (stream_ == NULL) {
