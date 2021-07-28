@@ -219,15 +219,15 @@ static void mbedtls_dll_unload(void)
 {
 	if (__crypto_dll) {
 		acl_dlclose(__crypto_dll);
-		logger("%s unload ok", __crypto_path);
+		//logger("%s unload ok", __crypto_path);
 	}
 	if (__x509_dll && __x509_dll != __crypto_dll) {
 		acl_dlclose(__x509_dll);
-		logger("%s unload ok", __x509_path);
+		//logger("%s unload ok", __x509_path);
 	}
 	if (__tls_dll && __tls_dll != __crypto_dll) {
 		acl_dlclose(__tls_dll);
-		logger("%s unload ok", __tls_path);
+		//logger("%s unload ok", __tls_path);
 	}
 
 	__crypto_dll = NULL;

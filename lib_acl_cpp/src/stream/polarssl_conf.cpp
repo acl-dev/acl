@@ -130,7 +130,7 @@ static void polarssl_dll_unload(void)
 	if (__polarssl_dll) {
 		acl_dlclose(__polarssl_dll);
 		__polarssl_dll = NULL;
-		logger("%s unload ok", __polarssl_path);
+		//logger("%s unload ok", __polarssl_path);
 	}
 
 	delete __polarssl_path_buf;

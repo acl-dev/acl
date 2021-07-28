@@ -56,7 +56,7 @@ static void __zlib_dll_unload(void)
 	if (__zlib_dll != NULL) {
 		acl_dlclose(__zlib_dll);
 		__zlib_dll = NULL;
-		logger("%s unload ok", __zlib_path.c_str());
+		//logger("%s unload ok", __zlib_path.c_str());
 	}
 }
 #endif
