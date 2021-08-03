@@ -909,7 +909,7 @@ bool http_header::build_request(string& buf) const
 	// 优先使用用户设置的 HTTP 协议版本号；
 	// HTTP/1.1 要求必须有 Host 字段，当没有 Host 字段时，则采用 HTTP/1.0
 	if (version_[0] != 0) {
-		buf << "HTTP/" << version_ << "\r\n";
+		buf << " HTTP/" << version_ << "\r\n";
 	} else if (host_[0] != 0) {
 		buf += " HTTP/1.1\r\n";
 	} else {
