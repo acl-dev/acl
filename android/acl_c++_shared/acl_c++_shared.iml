@@ -105,13 +105,6 @@
     </content>
     <content url="file://$MODULE_DIR$/../../include">
       <sourceFolder url="file://$MODULE_DIR$/../../include" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include/pgsql" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include/sqlite" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include/mysql" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include/pgsql" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include/sqlite" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include/mysql" />
-      <sourceFolder url="file://$MODULE_DIR$/../../include" />
     </content>
     <content url="file://$MODULE_DIR$/../../include/mysql">
       <sourceFolder url="file://$MODULE_DIR$/../../include/mysql" isTestSource="false" />
@@ -124,11 +117,7 @@
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/include" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/src" />
-      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/include" />
-      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl" />
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl/include">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/include" isTestSource="false" />
@@ -138,7 +127,6 @@
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl_cpp/include">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/include" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/include" />
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl_cpp/src">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl_cpp/src" isTestSource="false" />
@@ -150,7 +138,6 @@
     </content>
     <content url="file://$MODULE_DIR$/../../lib_protocol/include">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_protocol/include" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../lib_protocol/include" />
     </content>
     <content url="file://$MODULE_DIR$/../../lib_protocol/src">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_protocol/src" isTestSource="false" />

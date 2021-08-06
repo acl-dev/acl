@@ -2027,6 +2027,7 @@
 					"$(inherited)",
 					ACL_PREPARE_COMPILE,
 					ACL_CLIENT_ONLY,
+					HAS_MBEDTLS,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -2043,6 +2044,7 @@
 					../include/pgsql,
 					../include/polarssl,
 					../include/zlib,
+					../include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LLVM_LTO = YES_THIN;
@@ -2102,6 +2104,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					ACL_PREPARE_COMPILE,
 					ACL_CLIENT_ONLY,
+					HAS_MBEDTLS,
 				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
@@ -2118,6 +2121,7 @@
 					../include/pgsql,
 					../include/polarssl,
 					../include/zlib,
+					../include,
 				);
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LLVM_LTO = YES_THIN;
