@@ -252,6 +252,14 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 
 #endif
 
+static int __poll_delay_slice = 100;
+
+void acl_set_delay_slice(int n) {
+	if (n > 0) {
+		__poll_delay_slice = n;
+	}
+}
+
 #if defined(ACL_HAS_POLL)
 
 # if defined(ACL_WINDOWS)
@@ -278,6 +286,7 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 	const char *myname = "acl_read_poll_wait";
 	struct pollfd fds;
 	time_t begin;
+	int left = delay;
 
 	fds.fd = fd;
 #ifdef ACL_WINDOWS
@@ -292,6 +301,22 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 
 	for (;;) {
 		time(&begin);
+
+#ifdef __APPLE__
+		/* 当本线程正在通过 poll 方法等待时，如果别的线程异步调用了 close 过程，
+		 * poll 应该立即返回错误才对，但在 MacOS/iOS 上的 poll 有个问题，会
+		 * 一直等待超时才返回，所以此处以 100 ms 为单位将时间进行切片，以尽可能
+		 * 早地感知到 close 行为。
+		 */
+		if (left > __poll_delay_slice) {
+			delay = __poll_delay_slice;
+		} else {
+			delay = left;
+		}
+#else
+		delay = left;
+#endif
+		left -= delay;
 
 		switch (__sys_poll(&fds, 1, delay)) {
 #ifdef ACL_WINDOWS
@@ -313,8 +338,12 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 				myname, acl_last_serror(), fd, delay,
 				(long) (time(NULL) - begin));
 			*/
-			acl_set_error(ACL_ETIMEDOUT);
-			return -1;
+			if (left == 0) {
+				acl_set_error(ACL_ETIMEDOUT);
+				return -1;
+			} else {
+				break;
+			}
 		default:
 			if ((fds.revents & POLLIN)) {
 				return 0;

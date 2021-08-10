@@ -212,6 +212,8 @@ ACL_API int acl_open_limit(int limit);
 ACL_API int acl_issock(int fd);
 #endif
 
+ACL_API void acl_set_delay_slice(int n);
+
 #if defined(_WIN32) || defined(_WIN64)
 typedef int (WINAPI *acl_select_fn)(int, fd_set*, fd_set*,
 	fd_set*, const struct timeval*);
