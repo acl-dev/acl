@@ -288,18 +288,18 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 	time_t begin;
 	int left = delay;
 
-	fds.fd = fd;
-#ifdef ACL_WINDOWS
-	/* bugfix, POLLHUP, pollerr can't be set for windows */
-	fds.events = POLLIN /* | POLLHUP | POLLERR */;
-#else
-	fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
-#endif
-	fds.revents = 0;
-
-	acl_set_error(0);
-
 	for (;;) {
+		fds.fd = fd;
+#ifdef ACL_WINDOWS
+		/* bugfix, POLLHUP, pollerr can't be set for windows */
+		fds.events = POLLIN /* | POLLHUP | POLLERR */;
+#else
+		fds.events = POLLIN | POLLHUP | POLLERR | POLLPRI;
+#endif
+		fds.revents = 0;
+
+		acl_set_error(0);
+
 		time(&begin);
 
 #ifdef __APPLE__
@@ -325,7 +325,7 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 		case -1:
 #endif
 			if (acl_last_error() == ACL_EINTR) {
-				continue;
+				break;
 			}
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
 				__FILE__, __LINE__, myname,
