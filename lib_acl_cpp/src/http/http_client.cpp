@@ -531,11 +531,14 @@ bool http_client::read_response_head(void)
 		} else {
 			logger_warn("unknown compress format: %s", ptr);
 		}
-	} else if ((ptr = http_hdr_entry_value(&hdr_res_->hdr, "Content-Type"))) {
+	}
+#if 0
+    else if ((ptr = http_hdr_entry_value(&hdr_res_->hdr, "Content-Type"))) {
 		if (EQ(ptr, "application/x-gzip")) {
 			gzipped = true;
 		}
 	}
+#endif
 
 	// 目前仅支持 gzip 数据的解压，如果服务器返回 gzip 数据且初始化 zlib 成功，
 	// 则创建 zlib_stream 解压对象并初始化
