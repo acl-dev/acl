@@ -265,9 +265,9 @@ static void worker_run(acl_pthread_pool_t *thr_pool,
 		SET_TIME(now);
 		now -= job->start;
 		if (now >= thr_pool->schedule_warn) {
-			acl_msg_warn("%s(%d), %s: schedule: %lld >= %lld",
+			acl_msg_warn("%s(%d), %s: schedule: %lld >= %lld, qlen=%d",
 				__FILE__, __LINE__, myname,
-				now, thr_pool->schedule_warn);
+				now, thr_pool->schedule_warn, thr_pool->qlen);
 		}
 	}
 

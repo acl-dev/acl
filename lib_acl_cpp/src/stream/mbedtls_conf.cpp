@@ -740,6 +740,7 @@ mbedtls_conf::~mbedtls_conf(void)
 	acl_myfree(rnd_);
 #else
 	__ctr_drbg_free((mbedtls_ctr_drbg_context*) rnd_);
+	acl_myfree(rnd_);
 #endif
 
 	if (cache_) {
