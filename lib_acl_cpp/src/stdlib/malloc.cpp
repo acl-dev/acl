@@ -45,7 +45,15 @@ static acl_pthread_once_t __checker_once = ACL_PTHREAD_ONCE_INIT;
 static void init_checker_once(void)
 {
 	__lock = (acl_pthread_mutex_t*) calloc(1, sizeof(acl_pthread_mutex_t));
+
+#ifdef  ACL_UNIX
+	pthread_mutexattr_t attr;
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	if (acl_pthread_mutex_init(__lock, &attr) != 0) {
+#else
 	if (acl_pthread_mutex_init(__lock, NULL) != 0) {
+#endif
 		printf("%s: pthread_mutex_init error", __FUNCTION__);
 		abort();
 	}
