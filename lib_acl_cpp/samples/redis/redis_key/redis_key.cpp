@@ -56,8 +56,8 @@ static bool test_ttl(acl::redis_key& redis, int n)
 		redis.clear();
 		if ((ttl = redis.ttl(key.c_str())) < 0)
 		{
-			printf("get ttl key: %s error: %s\r\n",
-				key.c_str(), redis.result_error());
+			printf("get ttl key: %s error: %s, ttl=%d\r\n",
+				key.c_str(), redis.result_error(), ttl);
 			return false;
 		}
 		else if (i < 10)
