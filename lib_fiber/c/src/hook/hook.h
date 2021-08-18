@@ -29,13 +29,13 @@ typedef int (WINAPI *select_fn)(int, fd_set *, fd_set *,
 	fd_set *, const struct timeval *);
 
 #elif defined(SYS_UNIX)
-
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
 typedef ssize_t  (*read_fn)(socket_t, void *, size_t);
 typedef ssize_t  (*readv_fn)(socket_t, const struct iovec *, int);
 typedef ssize_t  (*recv_fn)(socket_t, void *, size_t, int);
 typedef ssize_t  (*recvfrom_fn)(socket_t, void *, size_t, int,
+	struct sockaddr *, socklen_t *);
 typedef ssize_t  (*recvmsg_fn)(socket_t, struct msghdr *, int);
 typedef ssize_t  (*write_fn)(socket_t, const void *, size_t);
 typedef ssize_t  (*writev_fn)(socket_t, const struct iovec *, int);
@@ -76,6 +76,7 @@ extern accept_fn            __sys_accept;
 extern connect_fn           __sys_connect;
 
 extern recv_fn              __sys_recv;
+
 extern recvfrom_fn          __sys_recvfrom;
 
 extern send_fn              __sys_send;

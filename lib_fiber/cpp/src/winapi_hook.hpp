@@ -4,6 +4,10 @@
 extern "C" {
 #endif
 
+#if !defined(_WIN32) && !defined(_WIN64)
+# define WINAPI
+#endif
+
 typedef socket_t (WINAPI* SOCKET_FN)(int, int, int);
 typedef int (WINAPI* LISTEN_FN)(socket_t, int);
 typedef int (WINAPI* CLOSE_FN)(socket_t);

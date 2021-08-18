@@ -1,8 +1,8 @@
 #include "stdafx.hpp"
-#include "detours/detours.h"
 #include "winapi_hook.hpp"
 
 #if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER >= 1911
+#include "detours/detours.h"
 
 SOCKET_FN    __socket    = socket;
 LISTEN_FN    __listen    = listen;

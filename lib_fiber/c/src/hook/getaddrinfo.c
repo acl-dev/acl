@@ -3,6 +3,7 @@
 #include "dns/resolver.h"
 #include "common.h"
 #include "fiber.h"
+#include "hook.h"
 
 #ifdef SYS_UNIX
 
