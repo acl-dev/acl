@@ -321,6 +321,7 @@
     <ClInclude Include="include\fiber\master_fiber.hpp" />
     <ClInclude Include="src\fiber_server.hpp" />
     <ClInclude Include="src\stdafx.hpp" />
+    <ClInclude Include="src\winapi_hook.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\channel.cpp" />
@@ -341,6 +342,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\winapi_hook.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

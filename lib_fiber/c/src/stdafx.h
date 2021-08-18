@@ -93,4 +93,10 @@ typedef union {
 #endif
 */
 
+#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
+# define error_again(x) ((x) == FIBER_EAGAIN)
+#else
+# define error_again(x) ((x) == FIBER_EAGAIN || (x) == FIBER_EWOULDBLOCK)
+#endif
+
 #endif

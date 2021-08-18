@@ -150,15 +150,20 @@ void acl_msg_info(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_info->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_info->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -179,15 +184,20 @@ void acl_msg_info(const char *fmt,...)
 void acl_msg_info2(const char *fmt, va_list ap)
 {
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_info->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_info->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -210,16 +220,22 @@ void acl_msg_warn(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_warn->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_warn->pid(%ld), ", getpid());
-#endif
+# endif
 
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -244,15 +260,20 @@ void acl_msg_warn(const char *fmt,...)
 void acl_msg_warn2(const char *fmt, va_list ap)
 {
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_warn->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_warn->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -279,15 +300,20 @@ void acl_msg_error(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_error->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_error->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -312,15 +338,20 @@ void acl_msg_error(const char *fmt,...)
 void acl_msg_error2(const char *fmt, va_list ap)
 {
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_error->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_error->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -347,16 +378,22 @@ void acl_msg_fatal(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		printf("fatal:");
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_fatal->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_fatal->pid(%ld), ", getpid());
-#endif
+# endif
 		printf("fatal:");
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -380,15 +417,20 @@ void acl_msg_fatal(const char *fmt,...)
 void acl_msg_fatal2(const char *fmt, va_list ap)
 {
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_fatal->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_fatal->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -417,15 +459,20 @@ void acl_msg_fatal_status(int status, const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_fatal_status->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_fatal_status->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__log_open_flag) {
@@ -447,15 +494,20 @@ void acl_msg_fatal_status2(int status, const char *fmt, va_list ap)
 	(void) status;
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_fatal_status->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_fatal_status->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__log_open_flag) {
@@ -478,15 +530,20 @@ void acl_msg_panic(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_panic->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_panic->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {
@@ -510,15 +567,20 @@ void acl_msg_panic(const char *fmt,...)
 void acl_msg_panic2(const char *fmt, va_list ap)
 {
 	if (__stdout_enable) {
+#if (defined(_WIN32) || defined(_WIN64)) && _MSC_VER < 1900
+		vprintf(fmt, ap);
+		printf("\r\n");
+#else
 		va_list ap_tmp;
 		va_copy(ap_tmp, ap);
-#ifdef LINUX
+# ifdef LINUX
 		printf("acl_msg_panic->pid(%d), ", getpid());
-#elif defined(SOLARIS)
+# elif defined(SOLARIS)
 		printf("acl_msg_panic->pid(%ld), ", getpid());
-#endif
+# endif
 		vprintf(fmt, ap_tmp);
 		printf("\r\n");
+#endif
 	}
 
 	if (__pre_write_fn) {

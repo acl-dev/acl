@@ -3,73 +3,16 @@
 
 #include "event.h"
 #include "fiber.h"
-
-#ifdef SYS_WIN
-typedef socket_t (WINAPI *socket_fn)(int, int, int);
-typedef int (WINAPI *listen_fn)(socket_t, int);
-typedef socket_t (WINAPI *accept_fn)(socket_t, struct sockaddr *, socklen_t *);
-typedef int (WINAPI *connect_fn)(socket_t, const struct sockaddr *, socklen_t);
-#else
-typedef socket_t (*socket_fn)(int, int, int);
-typedef int (*listen_fn)(socket_t, int);
-typedef socket_t (*accept_fn)(socket_t, struct sockaddr *, socklen_t *);
-typedef int (*connect_fn)(socket_t, const struct sockaddr *, socklen_t);
-typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
-#endif
-
-static socket_fn     __sys_socket     = NULL;
-static listen_fn     __sys_listen     = NULL;
-static accept_fn     __sys_accept     = NULL;
-static connect_fn    __sys_connect    = NULL;
-
-#ifdef SYS_UNIX
-static setsockopt_fn __sys_setsockopt = NULL;
-#endif
-
-static void hook_api(void)
-{
-#ifdef SYS_UNIX
-	__sys_socket     = (socket_fn) dlsym(RTLD_NEXT, "socket");
-	assert(__sys_socket);
-
-	__sys_listen     = (listen_fn) dlsym(RTLD_NEXT, "listen");
-	assert(__sys_listen);
-
-	__sys_accept     = (accept_fn) dlsym(RTLD_NEXT, "accept");
-	assert(__sys_accept);
-
-	__sys_connect    = (connect_fn) dlsym(RTLD_NEXT, "connect");
-	assert(__sys_connect);
-
-# ifdef SYS_UNIX
-	__sys_setsockopt = (setsockopt_fn) dlsym(RTLD_NEXT, "setsockopt");
-	assert(__sys_setsockopt);
-# endif
-#elif defined(SYS_WIN)
-	__sys_socket     = socket;
-	__sys_listen     = listen;
-	__sys_accept     = accept;
-	__sys_connect    = connect;
-#endif
-}
-
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__once_control, hook_api) != 0) {
-		abort();
-	}
-}
+#include "hook.h"
 
 /***************************************************************************/
 
-socket_t acl_fiber_socket(int domain, int type, int protocol)
+socket_t WINAPI acl_fiber_socket(int domain, int type, int protocol)
 {
 	socket_t sockfd;
 
 	if (__sys_socket == NULL) {
-		hook_init();
+		hook_once();
 	} 
 
 	if (__sys_socket == NULL) {
@@ -91,10 +34,10 @@ socket_t acl_fiber_socket(int domain, int type, int protocol)
 	return sockfd;
 }
 
-int acl_fiber_listen(socket_t sockfd, int backlog)
+int WINAPI acl_fiber_listen(socket_t sockfd, int backlog)
 {
 	if (__sys_listen == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
@@ -109,12 +52,6 @@ int acl_fiber_listen(socket_t sockfd, int backlog)
 	fiber_save_errno(acl_fiber_last_error());
 	return -1;
 }
-
-#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
-# define error_again(x) ((x) == FIBER_EAGAIN)
-#else
-# define error_again(x) ((x) == FIBER_EAGAIN || (x) == FIBER_EWOULDBLOCK)
-#endif
 
 #define FAST_ACCEPT
 
@@ -131,7 +68,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 	}
 
 	if (__sys_accept == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
@@ -152,11 +89,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 	//fiber_save_errno();
 	err = acl_fiber_last_error();
-#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
-	if (err != FIBER_EAGAIN) {
-#else
-	if (err != FIBER_EAGAIN && err != FIBER_EWOULDBLOCK) {
-#endif
+	if (!error_again(err)) {
 		return INVALID_SOCKET;
 	}
 
@@ -260,7 +193,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	time_t begin, end;
 
 	if (__sys_connect == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
@@ -278,12 +211,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	err = acl_fiber_last_error();
 	fiber_save_errno(err);
 
-#if FIBER_EAGAIN == FIBER_EWOULDBLOCK
-	if (err != FIBER_EINPROGRESS && err != FIBER_EAGAIN) {
-#else
-	if (err != FIBER_EINPROGRESS && err != FIBER_EAGAIN
-		&& err != FIBER_EWOULDBLOCK) {
-#endif
+	if (err != FIBER_EINPROGRESS && !error_again(err)) {
 		if (err == FIBER_ECONNREFUSED) {
 			msg_error("%s(%d), %s: connect ECONNREFUSED",
 				__FILE__, __LINE__, __FUNCTION__);
@@ -432,7 +360,7 @@ int setsockopt(int sockfd, int level, int optname,
 	TIMEOUT_CTX *ctx;
 
 	if (__sys_setsockopt == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api || (optname != SO_RCVTIMEO

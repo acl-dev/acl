@@ -126,7 +126,7 @@ CFLAGS += -I./src -I../c/include  -I./include -I../../lib_acl/include -I../../li
 
 #Project's objs
 
-SRC = $(wildcard src/*.cpp) $(wildcard src/*/*.cpp)
+SRC = $(wildcard src/*.cpp) $(wildcard src/keeper/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
 
 ###########################################################

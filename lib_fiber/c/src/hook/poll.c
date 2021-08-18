@@ -3,35 +3,9 @@
 
 #include "event.h"
 #include "fiber.h"
+#include "hook.h"
 
 #ifdef HAS_POLL
-
-#ifdef SYS_WIN
-typedef int (WINAPI *poll_fn)(struct pollfd *, nfds_t, int);
-#else
-typedef int (*poll_fn)(struct pollfd *, nfds_t, int);
-#endif
-
-static poll_fn __sys_poll = NULL;
-
-static void hook_api(void)
-{
-#ifdef SYS_WIN
-	__sys_poll = WSAPoll;
-#else
-	__sys_poll = (poll_fn) dlsym(RTLD_NEXT, "poll");
-	assert(__sys_poll);
-#endif
-}
-
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__once_control, hook_api) != 0) {
-		abort();
-	}
-}
 
 /****************************************************************************/
 
@@ -154,7 +128,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	int old_timeout;
 
 	if (__sys_poll == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {

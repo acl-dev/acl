@@ -6,40 +6,7 @@
 #include "fiber/libfiber.h"
 #include "event.h"
 #include "fiber.h"
-
-typedef int (*close_fn)(int);
-typedef int (*epoll_create_fn)(int);
-typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
-typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
-
-static close_fn        __sys_close        = NULL;
-static epoll_create_fn __sys_epoll_create = NULL;
-static epoll_wait_fn   __sys_epoll_wait   = NULL;
-static epoll_ctl_fn    __sys_epoll_ctl    = NULL;
-
-static void hook_api(void)
-{
-	__sys_close = (close_fn) dlsym(RTLD_NEXT, "close");
-	assert(__sys_close);
-
-	__sys_epoll_create = (epoll_create_fn) dlsym(RTLD_NEXT, "epoll_create");
-	assert(__sys_epoll_create);
-
-	__sys_epoll_wait   = (epoll_wait_fn) dlsym(RTLD_NEXT, "epoll_wait");
-	assert(__sys_epoll_wait);
-
-	__sys_epoll_ctl    = (epoll_ctl_fn) dlsym(RTLD_NEXT, "epoll_ctl");
-	assert(__sys_epoll_ctl);
-}
-
-static pthread_once_t __hook_once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__hook_once_control, hook_api) != 0) {
-		abort();
-	}
-}
+#include "hook.h"
 
 /****************************************************************************/
 
@@ -220,7 +187,7 @@ int epoll_create(int size fiber_unused)
 	int    epfd;
 
 	if (__sys_epoll_create == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
@@ -352,7 +319,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 	EVENT *ev;
 
 	if (__sys_epoll_ctl == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
@@ -413,7 +380,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	int old_timeout;
 
 	if (__sys_epoll_wait == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
