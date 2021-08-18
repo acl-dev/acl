@@ -75,6 +75,7 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 	is_request_       = false;
 	url_              = NULL;
 	url_part_         = NULL;
+	param_override_   = false;
 	method_           = HTTP_METHOD_UNKNOWN;
 	CP(method_s_, "UNKNOWN");
 	host_[0]          = 0;
@@ -135,6 +136,8 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 	fixed_            = true;
 	version_[0]       = 0;
 	is_request_       = true;
+	url_part_         = NULL;
+	param_override_   = false;
 	set_method(hdr_req.method);
 	if (hdr_req.host[0]) {
 		CP(host_, hdr_req.host);
@@ -213,6 +216,7 @@ void http_header::init()
 	version_[0]       = 0;
 	is_request_       = true;
 	url_              = NULL;
+	url_part_         = NULL;
 	param_override_   = false;
 	method_           = HTTP_METHOD_GET;
 	CP(method_s_, "GET");
