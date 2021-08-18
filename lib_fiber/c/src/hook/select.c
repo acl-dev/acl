@@ -6,35 +6,7 @@
 
 #include "event.h"
 #include "fiber.h"
-
-#ifdef SYS_WIN
-typedef int (WINAPI *select_fn)(int, fd_set *, fd_set *,
-	fd_set *, const struct timeval *);
-#else
-typedef int (*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
-#endif
-
-static select_fn __sys_select = NULL;
-
-
-static void hook_api(void)
-{
-#ifdef SYS_UNIX
-	__sys_select = (select_fn) dlsym(RTLD_NEXT, "select");
-	assert(__sys_select);
-#else
-	__sys_select = select;
-#endif
-}
-
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__once_control, hook_api) != 0) {
-		abort();
-	}
-}
+#include "hook.h"
 
 /****************************************************************************/
 
@@ -153,8 +125,9 @@ int acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
 	struct pollfd *fds;
 	int i, timo, n, nready = 0;
 
-	if (__sys_select == NULL)
-		hook_init();
+	if (__sys_select == NULL) {
+		hook_once();
+	}
 
 	if (!var_hook_sys_api)
 		return __sys_select ? __sys_select

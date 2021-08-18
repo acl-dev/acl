@@ -23,8 +23,13 @@
 #define SPECIAL	32		/* 0x */
 #define LARGE	64		/* use 'ABCDEF' instead of 'abcdef' */
 
+#ifdef _WIN64
+static char * number(char * buf, char * end, long long int num,
+	int base, int size, int precision, int type)
+#else
 static char * number(char * buf, char * end, long int num,
 	int base, int size, int precision, int type)
+#endif
 {
 	char c,sign,tmp[66];
 	const char *digits;
@@ -63,9 +68,16 @@ static char * number(char * buf, char * end, long int num,
 		tmp[i++]='0';
 	else {
 		while (num != 0) {
+#ifdef _WIN64
+			long long int __res;
+			__res = ((unsigned long int) num) % (unsigned) base;
+			num = ((unsigned long int) num) / (unsigned) base;
+#else
 			long int __res;
 			__res = ((unsigned long int) num) % (unsigned) base;
 			num = ((unsigned long int) num) / (unsigned) base;
+#endif
+
 			tmp[i++] = digits[__res];
 		}
 	}
@@ -277,9 +289,16 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 				field_width = 2*sizeof(void *);
 				flags |= ZEROPAD;
 			}
+
+#ifdef _WIN64
+			str = number(str, end,
+					(unsigned long long) va_arg(args, void *),
+					16, field_width, precision, flags);
+#else
 			str = number(str, end,
 					(unsigned long) va_arg(args, void *),
 					16, field_width, precision, flags);
+#endif
 			continue;
 
 		case 'n':

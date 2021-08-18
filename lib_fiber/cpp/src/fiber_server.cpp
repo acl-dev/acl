@@ -8,6 +8,7 @@
 
 /* including the internal headers from lib_acl/src/master */
 #include "template/master_log.h"
+#include "winapi_hook.hpp"
 
 #define STACK_SIZE	128000
 
@@ -211,6 +212,24 @@ static void *thread_main(void *ctx)
 	FIBER_SERVER *server =(FIBER_SERVER *) ctx;
 	static int dummy;
 	int i;
+
+#if defined(_WIN32) || defined(_WIN64)
+#if 0
+	if (winapi_hook()) {
+		acl_msg_info("hook Win API ok");
+	} else {
+		acl_msg_error("hook Win API error: %s", acl_last_serror());
+	}
+#endif
+
+	SOCKET s = socket(PF_INET, SOCK_STREAM, 0);
+	if (s == INVALID_SOCKET) {
+		printf("invalid socket: %s\r\n", acl::last_serror());
+		return NULL;
+	} else {
+		printf("create socket ok\r\n");
+	}
+#endif
 
 	if (__thread_init) {
 		__thread_init(__thread_init_ctx);
@@ -800,6 +819,14 @@ static void servers_start(FIBER_SERVER **servers, int nthreads)
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
 
+#if defined(_WIN32) || defined(_WIN64)
+	if (winapi_hook()) {
+		acl_msg_info("hook Win API ok");
+	} else {
+		acl_msg_error("hook Win API error: %s", acl_last_serror());
+	}
+#endif
+
 	for (i = 0; i < nthreads; i++) {
 		acl_pthread_create(&servers[i]->tid, &attr,
 			thread_main, servers[i]);
@@ -978,20 +1005,20 @@ void acl_fiber_server_main(int argc, char *argv[],
 	int   c, socket_count = 1, fdtype = ACL_VSTREAM_TYPE_LISTEN;
 #if !defined(_WIN32) && !defined(_WIN64)
 	char *generation;
-	va_list ap;
 #endif
+	va_list ap;
 
 	/* Set up call-back info. */
 	__service     = service;
 	__service_ctx = ctx;
 	__first_name  = name;
 
-#if !defined(_WIN32) && !defined(_WIN64)
+//#if !defined(_WIN32) && !defined(_WIN64)
 	va_start(ap, name);
 	va_copy(__ap_dest, ap);
 	master_log_open(argv[0]);
 	va_end(ap);
-#endif
+//#endif
 
 	__conf_file[0] = 0;
 

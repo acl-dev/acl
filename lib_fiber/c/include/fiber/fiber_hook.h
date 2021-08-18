@@ -7,10 +7,10 @@
 extern "C" {
 #endif
 
-FIBER_API socket_t acl_fiber_socket(int domain, int type, int protocol);
-FIBER_API int acl_fiber_listen(socket_t, int backlog);
-
 #if defined(_WIN32) || defined(_WIN64)
+
+FIBER_API socket_t WINAPI acl_fiber_socket(int domain, int type, int protocol);
+FIBER_API int WINAPI acl_fiber_listen(socket_t, int backlog);
 
 FIBER_API int WINAPI acl_fiber_close(socket_t fd);
 FIBER_API socket_t WINAPI acl_fiber_accept(
@@ -35,6 +35,8 @@ FIBER_API int WINAPI acl_fiber_poll(struct pollfd *fds,
 
 #else
 
+FIBER_API socket_t acl_fiber_socket(int domain, int type, int protocol);
+FIBER_API int acl_fiber_listen(socket_t, int backlog);
 FIBER_API int acl_fiber_close(socket_t fd);
 FIBER_API socket_t acl_fiber_accept(socket_t , struct sockaddr *, socklen_t *);
 FIBER_API int acl_fiber_connect(socket_t , const struct sockaddr *, socklen_t );

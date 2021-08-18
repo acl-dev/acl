@@ -6,31 +6,6 @@
 
 #ifdef SYS_UNIX
 
-typedef int (*getaddrinfo_fn)(const char *node, const char *service,
-	const struct addrinfo* hints, struct addrinfo **res);
-typedef void (*freeaddrinfo_fn)(struct addrinfo *res);
-
-static getaddrinfo_fn  __sys_getaddrinfo  = NULL;
-static freeaddrinfo_fn __sys_freeaddrinfo = NULL;
-
-static void hook_api(void)
-{
-	__sys_getaddrinfo = (getaddrinfo_fn) dlsym(RTLD_NEXT, "getaddrinfo");
-	assert(__sys_getaddrinfo);
-
-	__sys_freeaddrinfo = (freeaddrinfo_fn) dlsym(RTLD_NEXT, "freeaddrinfo");
-	assert(__sys_freeaddrinfo);
-}
-
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__once_control, hook_api) != 0) {
-		abort();
-	}
-}
-
 /****************************************************************************/
 
 static struct addrinfo *create_addrinfo(const char *ip, short port,
@@ -139,7 +114,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 	struct addrinfo hints_tmp;
 
 	if (__sys_getaddrinfo == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 #ifndef	EAI_NODATA
@@ -191,7 +166,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 void acl_fiber_freeaddrinfo(struct addrinfo *res)
 {
 	if (__sys_freeaddrinfo == NULL) {
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {

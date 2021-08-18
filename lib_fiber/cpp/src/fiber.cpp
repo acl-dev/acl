@@ -1,5 +1,6 @@
 #include "stdafx.hpp"
 #include "fiber/fiber.hpp"
+#include "winapi_hook.hpp"
 
 namespace acl {
 
@@ -209,6 +210,9 @@ void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
 
 void fiber::schedule(void)
 {
+	if (!winapi_hook()) {
+		perror("hook API for windows error");
+	}
 	acl_fiber_schedule();
 }
 
@@ -232,6 +236,9 @@ void fiber::schedule_with(fiber_event_t type)
 		break;
 	}
 
+	if (!winapi_hook()) {
+		perror("hook API for windows error");
+	}
 	acl_fiber_schedule_with(etype);
 }
 

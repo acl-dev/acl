@@ -5,39 +5,6 @@
 
 #ifdef SYS_UNIX
 
-typedef struct hostent *(*gethostbyname_fn)(const char *);
-static gethostbyname_fn __sys_gethostbyname = NULL;
-
-#ifndef __APPLE__
-typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
-	size_t, struct hostent **, int *);
-
-static gethostbyname_r_fn __sys_gethostbyname_r = NULL;
-#endif
-
-
-static void hook_api(void)
-{
-	__sys_gethostbyname = (gethostbyname_fn) dlsym(RTLD_NEXT,
-			"gethostbyname");
-	assert(__sys_gethostbyname);
-
-#ifndef __APPLE__
-	__sys_gethostbyname_r = (gethostbyname_r_fn) dlsym(RTLD_NEXT,
-			"gethostbyname_r");
-	assert(__sys_gethostbyname_r);
-#endif
-}
-
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__once_control, hook_api) != 0) {
-		abort();
-	}
-}
-
 /****************************************************************************/
 
 static void free_fn(void *ctx)
@@ -167,7 +134,7 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 #else
 	if (__sys_gethostbyname_r == NULL) {
 #endif
-		hook_init();
+		hook_once();
 	}
 
 	if (!var_hook_sys_api) {

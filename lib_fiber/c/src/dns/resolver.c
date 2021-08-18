@@ -358,8 +358,14 @@ static int udp_request(const char *ip, unsigned short port,
 	addr.sin_port        = htons(port);
 	addr.sin_addr.s_addr = inet_addr(ip);
 
+#if defined(_WIN32) || defined(_WIN64)
+	ret = acl_fiber_sendto(sock, data, (int) dlen, 0, (struct sockaddr *) &addr,
+		     (socklen_t) sizeof(addr));
+#else
 	ret = acl_fiber_sendto(sock, data, dlen, 0, (struct sockaddr *) &addr,
 		     (socklen_t) sizeof(addr));
+#endif
+
 	if (ret < 0) {
 		msg_error("%s(%d): send error %s",
 			__FUNCTION__ , __LINE__, last_serror());
@@ -375,8 +381,15 @@ static int udp_request(const char *ip, unsigned short port,
 	}
 
 	len = (socklen_t) sizeof(from_addr);
+
+#if defined(_WIN32) || defined(_WIN64)
+	ret = acl_fiber_recvfrom(sock, buf, (int) size, 0,
+		(struct sockaddr*) &from_addr, &len);
+#else
 	ret = acl_fiber_recvfrom(sock, buf, size, 0,
 		(struct sockaddr*) &from_addr, &len);
+#endif
+
 	acl_fiber_close(sock);
 	if (ret <= 0) {
 		msg_error("%s(%d): read error %s",
