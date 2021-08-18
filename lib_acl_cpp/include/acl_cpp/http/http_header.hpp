@@ -268,9 +268,11 @@ public:
 	 * 单独添加参数名，应该调用 add_param 方法来添加
 	 * @param url {const char*} 请求的 url，非空指针
 	 * @param encoding {bool} 是否对存在于 url 中的参数进行 url 编码
+	 * @param keep {bool} 内部是否保持原始的 url 数据
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-	http_header& set_url(const char* url, bool encoding = true);
+	http_header& set_url(const char* url, bool encoding = true,
+		bool keep = true);
 
 	/**
 	 * 设置 HTTP 请求头的 HOST 字段
@@ -317,6 +319,13 @@ public:
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
 	http_header& accept_gzip(bool on);
+
+	/**
+	 * 在调用下面的 add_param 时，是否允许覆盖同名参数，内部缺省值为否
+	 * @param yes {bool}
+	 * @return {http_header&}
+	 */
+	http_header& set_param_override(bool yes);
 
 	/**
 	 * 向请求的 URL 中添加参数对，当只有参数名没有参数值时则：
@@ -485,7 +494,9 @@ private:
 	//char* domain_;  // HTTP 服务器域名
 	//unsigned short port_;               // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL
+	char* url_part_;                      // HTTP 请求 URL 中的相对路径
 	std::list<HTTP_PARAM*> params_;       // 请求参数集合
+	bool param_override_;                 // 在添加参数时是否覆盖同步参数
 	std::list<HttpCookie*> cookies_;      // cookies 集合
 	std::list<HTTP_HDR_ENTRY*> entries_;  // HTTP 请求头中各字段集合
 	http_method_t method_;                // HTTP 请求的方法

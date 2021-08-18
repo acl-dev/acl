@@ -74,6 +74,7 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 	version_[0]       = 0;
 	is_request_       = false;
 	url_              = NULL;
+	url_part_         = NULL;
 	method_           = HTTP_METHOD_UNKNOWN;
 	CP(method_s_, "UNKNOWN");
 	host_[0]          = 0;
@@ -212,6 +213,7 @@ void http_header::init()
 	version_[0]       = 0;
 	is_request_       = true;
 	url_              = NULL;
+	param_override_   = false;
 	method_           = HTTP_METHOD_GET;
 	CP(method_s_, "GET");
 	host_[0]          = 0;
@@ -473,7 +475,8 @@ void http_header::build_common(string& buf) const
 //////////////////////////////////////////////////////////////////////////
 // 与 HTTP 请求头相关的函数
 
-http_header& http_header::set_url(const char* url, bool encoding /* = true */)
+http_header& http_header::set_url(const char* url, bool encoding /* = true */,
+	 bool keep /* = true */)
 {
 	acl_assert(url && *url);
 
@@ -504,6 +507,9 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 
 	// 当 url 中只有相对路径时
 	if (ptr == url_) {
+		if (keep) {
+			url_part_ = dbuf_->dbuf_strdup(url_);
+		}
 		if (encoding) {
 			params = strchr(ptr, '?');
 		} else {
@@ -513,6 +519,9 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 
 	// 当 url 为绝对路径时
 	else if ((slash = strchr(ptr, '/')) != NULL && slash > ptr) {
+		if (keep) {
+			url_part_ = dbuf_->dbuf_strdup(slash);
+		}
 		size_t n = slash - ptr + 1;
 		if (n > sizeof(host_)) {
 			n = sizeof(host_);
@@ -534,7 +543,9 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 			url_[len] = '/';
 			url_[len + 1] = 0;
 		}
-
+		if (keep) {
+			url_part_ = dbuf_->dbuf_strdup("/");
+		}
 		if (encoding) {
 			params = strchr(ptr, '?');
 		} else {
@@ -542,11 +553,12 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 		}
 	}
 
-	if (params == NULL) {
+	// 如果参数部分为空或要求保持原始请求的URL，则不必再解析参数列表
+	if (params == NULL || keep) {
 		return *this;
 	}
 
-	*params++ = 0;
+	*params++ = 0; // 截断 url_ 后面的参数，url_ 中只保留相对路径而不保留参数
 	if (*params == 0) {
 		return *this;
 	}
@@ -690,15 +702,25 @@ http_header& http_header::accept_gzip(bool on)
 	return *this;
 }
 
+http_header& http_header::set_param_override(bool yes)
+{
+	param_override_ = yes;
+	return *this;
+}
+
 http_header& http_header::add_param(const char* name, const char* value)
 {
 	if (name == NULL || *name == 0) {
 		return *this;
 	}
 
-	std::list<HTTP_PARAM*>::iterator it = params_.begin();
-	for (; it != params_.end(); ++it) {
-		if (strcasecmp((*it)->name, name) == 0) {
+	if (param_override_) {
+		std::list<HTTP_PARAM*>::iterator it = params_.begin();
+		for (; it != params_.end(); ++it) {
+			if (strcasecmp((*it)->name, name) != 0) {
+				continue;
+			}
+
 			if (value) {
 				(*it)->value = dbuf_->dbuf_strdup(value);
 			} else {
@@ -865,12 +887,15 @@ bool http_header::build_request(string& buf) const
 		return true;
 	}
 
-	if (url_ == NULL || *url_ == 0) {
+	// 如果在 set_url() 选择了保持原有 url 格式，则直接创建请求行
+	if (url_part_ != NULL) {
+		buf.format("%s %s", method_s_, url_part_);
+	} else if (url_ == NULL || *url_ == 0) {
 		logger_error("url empty");
 		return false;
+	} else {
+		buf.format("%s %s", method_s_, url_);
 	}
-
-	buf.format("%s %s", method_s_, url_);
 
 	if (!params_.empty()) {
 		buf << '?';
