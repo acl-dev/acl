@@ -6,6 +6,7 @@
 
 typedef unsigned long nfds_t;
 #include "../../c/src/hook/hook.h"
+#include "../../c/src/common/pthread_patch.h"
 
 socket_fn    __socket    = socket;
 listen_fn    __listen    = listen;
@@ -23,19 +24,15 @@ poll_fn      __poll      = WSAPoll;
 	LONG ret = DetourAttach(&from, to); \
 	if (ret != 0) { \
 		logger("DetourAttach %s failed %s", #from, acl::last_serror()); \
-		return false; \
+		return; \
+	} else { \
+		action(&from); \
 	} \
-	action(&from); \
 } while (0)
 
-bool winapi_hook(void) {
-	static bool __called = false;
-	if (__called) {
-		return true;
-	}
+static bool __hook_ok = false;
 
-	__called = true;
-
+static void winapi_hook_once(void) {
 	//DetourRestoreAfterWith();
 	DetourTransactionBegin();
 	DetourUpdateThread(GetCurrentThread());
@@ -53,7 +50,16 @@ bool winapi_hook(void) {
 	HOOK_API(__select, acl_fiber_select, set_select_fn);
 
 	DetourTransactionCommit();
-	return true;
+	__hook_ok = true;
+}
+
+static pthread_once_t __once = PTHREAD_ONCE_INIT;
+
+bool winapi_hook(void) {
+	if (pthread_once(&__once, winapi_hook_once) != 0) {
+		return false;
+	}
+	return __hook_ok;
 }
 
 #else

@@ -200,6 +200,12 @@ public:
 	static void acl_io_unlock(void);
 
 	/**
+	 * Windows 平台下可以显式地调用此函数 Hook 一些与网络协程相关的系统 API
+	 * @return {bool}
+	 */
+	static bool winapi_hook(void);
+
+	/**
 	 * 获得当前系统级错误号
 	 * @return {int}
 	 */

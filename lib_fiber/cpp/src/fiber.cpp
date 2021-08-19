@@ -133,6 +133,12 @@ void fiber::acl_io_unlock(void)
 	acl_set_select(select);
 }
 
+#include "winapi_hook.hpp"
+
+bool fiber::winapi_hook(void) {
+	return ::winapi_hook();
+}
+
 void fiber::run(void)
 {
 	acl_msg_fatal("%s(%d), %s: base function be called",
