@@ -39,8 +39,11 @@ public:
 	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
 	 * 单独添加参数名，应该调用 add_param 方法来添加
 	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
+	 * @param encoding {bool} 是否对存在于 url 中的参数进行 url 编码，如果为
+	 *  true 则会重新解析 url 并重新对 url 中的参数进行编码，否则则 url 保持原样
 	 */
-	http_header(const char* url, dbuf_guard* dbuf = NULL);
+	http_header(const char* url, dbuf_guard* dbuf = NULL,
+		bool encoding = true);
 
 	/**
 	 * HTTP 响应头构造函数
@@ -267,12 +270,11 @@ public:
 	 * 当参数字段只有参数名没有参数值时，该参数将会被忽略，所以如果想
 	 * 单独添加参数名，应该调用 add_param 方法来添加
 	 * @param url {const char*} 请求的 url，非空指针
-	 * @param encoding {bool} 是否对存在于 url 中的参数进行 url 编码
-	 * @param keep {bool} 内部是否保持原始的 url 数据
+	 * @param encoding {bool} 是否对存在于 url 中的参数进行 url 编码，如果为
+	 *  true 则会重新解析 url 并重新对 url 中的参数进行编码，否则则 url 保持原样
 	 * @return {http_header&} 返回本对象的引用，便于用户连续操作
 	 */
-	http_header& set_url(const char* url, bool encoding = true,
-		bool keep = true);
+	http_header& set_url(const char* url, bool encoding = true);
 
 	/**
 	 * 设置 HTTP 请求头的 HOST 字段
@@ -321,7 +323,8 @@ public:
 	http_header& accept_gzip(bool on);
 
 	/**
-	 * 在调用下面的 add_param 时，是否允许覆盖同名参数，内部缺省值为否
+	 * 在调用下面的 add_param/add_int/add_format 时，是否允许覆盖同名参数，
+	 * 内部缺省值为否，既不覆盖同名参数
 	 * @param yes {bool}
 	 * @return {http_header&}
 	 */
@@ -494,7 +497,6 @@ private:
 	//char* domain_;  // HTTP 服务器域名
 	//unsigned short port_;               // HTTP 服务器端口
 	char* url_;                           // HTTP 请求的 URL
-	char* url_part_;                      // HTTP 请求 URL 中的相对路径
 	std::list<HTTP_PARAM*> params_;       // 请求参数集合
 	bool param_override_;                 // 在添加参数时是否覆盖同步参数
 	std::list<HttpCookie*> cookies_;      // cookies 集合

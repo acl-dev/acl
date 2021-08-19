@@ -30,7 +30,8 @@ http_header::http_header(dbuf_guard* dbuf /* = NULL */)
 	fixed_ = false;
 }
 
-http_header::http_header(const char* url, dbuf_guard* dbuf /* = NULL */)
+http_header::http_header(const char* url, dbuf_guard* dbuf /* = NULL */,
+	 bool encoding /* = true */)
 {
 	if (dbuf != NULL) {
 		dbuf_ = dbuf;
@@ -42,7 +43,7 @@ http_header::http_header(const char* url, dbuf_guard* dbuf /* = NULL */)
 	init();
 	fixed_ = false;
 	if (url && *url) {
-		set_url(url);
+		set_url(url, encoding);
 	}
 }
 
@@ -74,7 +75,6 @@ http_header::http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf /* = NULL
 	version_[0]       = 0;
 	is_request_       = false;
 	url_              = NULL;
-	url_part_         = NULL;
 	param_override_   = false;
 	method_           = HTTP_METHOD_UNKNOWN;
 	CP(method_s_, "UNKNOWN");
@@ -136,7 +136,6 @@ http_header::http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf /* = NULL
 	fixed_            = true;
 	version_[0]       = 0;
 	is_request_       = true;
-	url_part_         = NULL;
 	param_override_   = false;
 	set_method(hdr_req.method);
 	if (hdr_req.host[0]) {
@@ -211,12 +210,11 @@ http_header::~http_header(void)
 	delete dbuf_internal_;
 }
 
-void http_header::init()
+void http_header::init(void)
 {
 	version_[0]       = 0;
 	is_request_       = true;
 	url_              = NULL;
-	url_part_         = NULL;
 	param_override_   = false;
 	method_           = HTTP_METHOD_GET;
 	CP(method_s_, "GET");
@@ -479,8 +477,7 @@ void http_header::build_common(string& buf) const
 //////////////////////////////////////////////////////////////////////////
 // 与 HTTP 请求头相关的函数
 
-http_header& http_header::set_url(const char* url, bool encoding /* = true */,
-	 bool keep /* = true */)
+http_header& http_header::set_url(const char* url, bool encoding /* = true */)
 {
 	acl_assert(url && *url);
 
@@ -511,9 +508,6 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */,
 
 	// 当 url 中只有相对路径时
 	if (ptr == url_) {
-		if (keep) {
-			url_part_ = dbuf_->dbuf_strdup(url_);
-		}
 		if (encoding) {
 			params = strchr(ptr, '?');
 		} else {
@@ -523,9 +517,6 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */,
 
 	// 当 url 为绝对路径时
 	else if ((slash = strchr(ptr, '/')) != NULL && slash > ptr) {
-		if (keep) {
-			url_part_ = dbuf_->dbuf_strdup(slash);
-		}
 		size_t n = slash - ptr + 1;
 		if (n > sizeof(host_)) {
 			n = sizeof(host_);
@@ -547,9 +538,6 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */,
 			url_[len] = '/';
 			url_[len + 1] = 0;
 		}
-		if (keep) {
-			url_part_ = dbuf_->dbuf_strdup("/");
-		}
 		if (encoding) {
 			params = strchr(ptr, '?');
 		} else {
@@ -557,8 +545,8 @@ http_header& http_header::set_url(const char* url, bool encoding /* = true */,
 		}
 	}
 
-	// 如果参数部分为空或要求保持原始请求的URL，则不必再解析参数列表
-	if (params == NULL || keep) {
+	// 如果参数部分为空，则不必再解析参数列表
+	if (params == NULL) {
 		return *this;
 	}
 
@@ -891,10 +879,7 @@ bool http_header::build_request(string& buf) const
 		return true;
 	}
 
-	// 如果在 set_url() 选择了保持原有 url 格式，则直接创建请求行
-	if (url_part_ != NULL) {
-		buf.format("%s %s", method_s_, url_part_);
-	} else if (url_ == NULL || *url_ == 0) {
+	if (url_ == NULL || *url_ == 0) {
 		logger_error("url empty");
 		return false;
 	} else {
@@ -902,15 +887,19 @@ bool http_header::build_request(string& buf) const
 	}
 
 	if (!params_.empty()) {
-		buf << '?';
+		bool is_first;
+		if (strchr(url_, '?') == NULL) {
+			buf << '?';
+			is_first = false;
+		} else {
+			is_first = true;
+		}
 		acl::string tmp;
-		int i = 0;
 		std::list<HTTP_PARAM*>::const_iterator it = params_.begin();
 		for (; it != params_.end(); ++it) {
-			if (i > 0) {
+			if (is_first) {
 				buf += '&';
-			} else {
-				i++;
+				is_first = false;
 			}
 
 			// 需要对参数进行 URL 编码
