@@ -172,7 +172,7 @@ static void hook_api(void)
 	LOAD_FN("recvmsg", recvmsg_fn, __sys_recvmsg, sys_recvmsg);
 	LOAD_FN("write", write_fn, __sys_write, sys_write);
 	LOAD_FN("writev", writev_fn, __sys_writev, sys_writev);
-	LOAD_FN("send" send_fn __sys_send, sys_send);
+	LOAD_FN("send", send_fn, __sys_send, sys_send);
 	LOAD_FN("sendto", sendto_fn, __sys_sendto, sys_sendto);
 	LOAD_FN("sendmsg", sendmsg_fn, __sys_sendmsg, sys_sendmsg);
 
@@ -195,7 +195,7 @@ static void hook_api(void)
 	LOAD_FN("gethostbyname", gethostbyname_fn, __sys_gethostbyname, sys_gethostbyname);
 
 # ifndef __APPLE__
-	LOAD_FN("gethostbname_r", gethostbyname_r_fn, __sys_gethostbyname_r, sys_gethostbyname_r);
+	LOAD_FN("gethostbyname_r", gethostbyname_r_fn, __sys_gethostbyname_r, sys_gethostbyname_r);
 # endif
 #elif defined(SYS_WIN)
 	__sys_socket   = socket;
