@@ -887,20 +887,21 @@ bool http_header::build_request(string& buf) const
 	}
 
 	if (!params_.empty()) {
-		bool is_first;
+		bool first_param;
 		if (strchr(url_, '?') == NULL) {
 			buf << '?';
-			is_first = false;
+			first_param = true;
 		} else {
-			is_first = true;
+			first_param = false;
 		}
 		acl::string tmp;
 		std::list<HTTP_PARAM*>::const_iterator it = params_.begin();
 		for (; it != params_.end(); ++it) {
-			if (is_first) {
+			if (first_param) {
+				first_param = false;
+			} else {
 				buf += '&';
-				is_first = false;
-			}
+            }
 
 			// 需要对参数进行 URL 编码
 
