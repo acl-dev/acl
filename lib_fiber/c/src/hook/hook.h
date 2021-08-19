@@ -73,17 +73,17 @@ typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 
 #endif
 
-void WINAPI set_socket_fn(socket_fn *fn);
-void WINAPI set_close_fn(close_fn *fn);
-void WINAPI set_listen_fn(listen_fn *fn);
-void WINAPI set_accept_fn(accept_fn *fn);
-void WINAPI set_connect_fn(connect_fn *fn);
-void WINAPI set_recv_fn(recv_fn *fn);
-void WINAPI set_recvfrom_fn(recvfrom_fn *fn);
-void WINAPI set_send_fn(send_fn *fn);
-void WINAPI set_sendto_fn(sendto_fn *fn);
-void WINAPI set_poll_fn(poll_fn *fn);
-void WINAPI set_select_fn(select_fn *fn);
+FIBER_API void WINAPI set_socket_fn(socket_fn *fn);
+FIBER_API void WINAPI set_close_fn(close_fn *fn);
+FIBER_API void WINAPI set_listen_fn(listen_fn *fn);
+FIBER_API void WINAPI set_accept_fn(accept_fn *fn);
+FIBER_API void WINAPI set_connect_fn(connect_fn *fn);
+FIBER_API void WINAPI set_recv_fn(recv_fn *fn);
+FIBER_API void WINAPI set_recvfrom_fn(recvfrom_fn *fn);
+FIBER_API void WINAPI set_send_fn(send_fn *fn);
+FIBER_API void WINAPI set_sendto_fn(sendto_fn *fn);
+FIBER_API void WINAPI set_poll_fn(poll_fn *fn);
+FIBER_API void WINAPI set_select_fn(select_fn *fn);
 
 extern socket_fn            *sys_socket;
 extern close_fn             *sys_close;
