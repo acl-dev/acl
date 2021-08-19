@@ -114,7 +114,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 {
 	struct addrinfo hints_tmp;
 
-	if (__sys_getaddrinfo == NULL) {
+	if (sys_getaddrinfo == NULL) {
 		hook_once();
 	}
 
@@ -126,7 +126,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 # endif
 #endif
 	if (!var_hook_sys_api) {
-		return __sys_getaddrinfo ? __sys_getaddrinfo
+		return sys_getaddrinfo ? (*sys_getaddrinfo)
 			(node, service, hints, res) : EAI_NODATA;
 	}
 
@@ -166,13 +166,13 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 
 void acl_fiber_freeaddrinfo(struct addrinfo *res)
 {
-	if (__sys_freeaddrinfo == NULL) {
+	if (sys_freeaddrinfo == NULL) {
 		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
-		if (__sys_freeaddrinfo) {
-			__sys_freeaddrinfo(res);
+		if (sys_freeaddrinfo) {
+			(*sys_freeaddrinfo)(res);
 		}
 		return;
 	}

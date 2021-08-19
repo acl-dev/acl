@@ -127,12 +127,12 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	EVENT *ev;
 	int old_timeout;
 
-	if (__sys_poll == NULL) {
+	if (sys_poll == NULL) {
 		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
-		return __sys_poll ? __sys_poll(fds, nfds, timeout) : -1;
+		return sys_poll ? (*sys_poll)(fds, nfds, timeout) : -1;
 	}
 
 	ev        = fiber_io_event();

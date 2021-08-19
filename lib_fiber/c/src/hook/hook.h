@@ -3,6 +3,10 @@
 
 #include "fiber/fiber_define.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //extern struct dns_resolv_conf *var_dns_conf;
 //extern struct dns_hosts *var_dns_hosts;
 //extern struct dns_hints *var_dns_hints;
@@ -16,7 +20,7 @@ typedef int (WINAPI *listen_fn)(socket_t, int);
 typedef socket_t (WINAPI *accept_fn)(socket_t, struct sockaddr *, socklen_t *);
 typedef int (WINAPI *connect_fn)(socket_t, const struct sockaddr *, socklen_t);
 
-#if defined(SYS_WIN)
+#if defined(_WIN32) || defined(_WIN64)
 
 typedef int (WINAPI *recv_fn)(socket_t, char *, int, int);
 typedef int (WINAPI *recvfrom_fn)(socket_t, char *, int, int,
@@ -28,7 +32,7 @@ typedef int (WINAPI *poll_fn)(struct pollfd *, nfds_t, int);
 typedef int (WINAPI *select_fn)(int, fd_set *, fd_set *,
 	fd_set *, const struct timeval *);
 
-#elif defined(SYS_UNIX)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
 typedef ssize_t  (*read_fn)(socket_t, void *, size_t);
@@ -69,54 +73,71 @@ typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 
 #endif
 
-extern socket_fn            __sys_socket;
-extern close_fn             __sys_close;
-extern listen_fn            __sys_listen;
-extern accept_fn            __sys_accept;
-extern connect_fn           __sys_connect;
+void WINAPI set_socket_fn(socket_fn *fn);
+void WINAPI set_close_fn(close_fn *fn);
+void WINAPI set_listen_fn(listen_fn *fn);
+void WINAPI set_accept_fn(accept_fn *fn);
+void WINAPI set_connect_fn(connect_fn *fn);
+void WINAPI set_recv_fn(recv_fn *fn);
+void WINAPI set_recvfrom_fn(recvfrom_fn *fn);
+void WINAPI set_send_fn(send_fn *fn);
+void WINAPI set_sendto_fn(sendto_fn *fn);
+void WINAPI set_poll_fn(poll_fn *fn);
+void WINAPI set_select_fn(select_fn *fn);
 
-extern recv_fn              __sys_recv;
+extern socket_fn            *sys_socket;
+extern close_fn             *sys_close;
+extern listen_fn            *sys_listen;
+extern accept_fn            *sys_accept;
+extern connect_fn           *sys_connect;
 
-extern recvfrom_fn          __sys_recvfrom;
+extern recv_fn              *sys_recv;
 
-extern send_fn              __sys_send;
-extern sendto_fn            __sys_sendto;
-extern poll_fn              __sys_poll;
-extern select_fn            __sys_select;
+extern recvfrom_fn          *sys_recvfrom;
 
-#if defined(SYS_UNIX)
+extern send_fn              *sys_send;
+extern sendto_fn            *sys_sendto;
+extern poll_fn              *sys_poll;
+extern select_fn            *sys_select;
 
-extern sleep_fn             __sys_sleep;
-extern setsockopt_fn        __sys_setsockopt;
+#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  // SYS_UNIX
 
-extern read_fn              __sys_read;
-extern readv_fn             __sys_readv;
-extern recvmsg_fn           __sys_recvmsg;
+extern sleep_fn             *sys_sleep;
+extern setsockopt_fn        *sys_setsockopt;
 
-extern write_fn             __sys_write;
-extern writev_fn            __sys_writev;
-extern sendmsg_fn           __sys_sendmsg;
+extern read_fn              *sys_read;
+extern readv_fn             *sys_readv;
+extern recvmsg_fn           *sys_recvmsg;
+
+extern write_fn             *sys_write;
+extern writev_fn            *sys_writev;
+extern sendmsg_fn           *sys_sendmsg;
 
 # ifdef __USE_LARGEFILE64
-extern sendfile64_fn        __sys_sendfile64;
+extern sendfile64_fn        *sys_sendfile64;
 # endif
 
 # ifdef	HAS_EPOLL
-extern epoll_create_fn      __sys_epoll_create;
-extern epoll_wait_fn        __sys_epoll_wait;
-extern epoll_ctl_fn         __sys_epoll_ctl;
+extern epoll_create_fn		*sys_epoll_create;
+extern epoll_wait_fn        *sys_epoll_wait;
+extern epoll_ctl_fn         *sys_epoll_ctl;
 # endif
 
-extern getaddrinfo_fn       __sys_getaddrinfo;
-extern freeaddrinfo_fn      __sys_freeaddrinfo;
-extern gethostbyname_fn     __sys_gethostbyname;
+extern getaddrinfo_fn       *sys_getaddrinfo;
+extern freeaddrinfo_fn      *sys_freeaddrinfo;
+extern gethostbyname_fn     *sys_gethostbyname;
 
 # ifndef __APPLE__
-extern gethostbyname_r_fn   __sys_gethostbyname_r;
+extern gethostbyname_r_fn   *sys_gethostbyname_r;
 # endif
 
 #endif // SYS_UNIX
 
 void hook_once(void);
 
+#ifdef __cplusplus
+}
 #endif
+
+#endif
+

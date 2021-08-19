@@ -292,6 +292,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hook_api.h" />
     <ClInclude Include="include\fiber\fiber_base.h" />
     <ClInclude Include="include\fiber\fiber_channel.h" />
     <ClInclude Include="include\fiber\fiber_define.h" />

@@ -9,13 +9,13 @@ unsigned int sleep(unsigned int seconds)
 {
 	if (!var_hook_sys_api) {
 #ifndef USE_SYSCALL
-		if (__sys_sleep == NULL) {
+		if (sys_sleep == NULL) {
 			hook_once();
 		}
 #endif
 
 		//printf("use system gettimeofday\r\n");
-		return __sys_sleep(seconds);
+		return (*sys_sleep)(seconds);
 	}
 
 	return acl_fiber_sleep(seconds);
@@ -39,12 +39,12 @@ int acl_fiber_close(socket_t fd)
 		return -1;
 	}
 
-	if (__sys_close == NULL) {
+	if (sys_close == NULL) {
 		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
-		return __sys_close(fd);
+		return (*sys_close)(fd);
 	}
 
 #ifdef	HAS_EPOLL
@@ -63,7 +63,7 @@ int acl_fiber_close(socket_t fd)
 		return 0;
 	}
 
-	ret = __sys_close(fd);
+	ret = (*sys_close)(fd);
 	if (ret == 0) {
 		return ret;
 	}
@@ -89,13 +89,13 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	}
 
 #ifndef	USE_SYSCALL
-	if (__sys_read == NULL) {
+	if (sys_read == NULL) {
 		hook_once();
 	}
 #endif
 
 	if (!var_hook_sys_api) {
-		return __sys_read(fd, buf, count);
+		return (*sys_read)(fd, buf, count);
 	}
 
 	fe = fiber_file_open(fd);
@@ -109,7 +109,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 			return -1;
 		}
 
-		n = __sys_read(fd, buf, count);
+		n = (*sys_read)(fd, buf, count);
 		if (n >= 0) {
 			return n;
 		}
@@ -135,13 +135,13 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	}
 
 #ifndef	USE_SYSCALL
-	if (__sys_read == NULL) {
+	if (sys_read == NULL) {
 		hook_once();
 	}
 #endif
 
 	if (!var_hook_sys_api) {
-		return __sys_read(fd, buf, count);
+		return (*sys_read)(fd, buf, count);
 	}
 
 	fe = fiber_file_open(fd);
@@ -161,7 +161,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 			return -1;
 		}
 
-		ret = __sys_read(fd, buf, count);
+		ret = (*sys_read)(fd, buf, count);
 		if (ret >= 0) {
 			return ret;
 		}
@@ -186,13 +186,13 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 	}
 
 #ifndef USE_SYSCALL
-	if (__sys_readv == NULL) {
+	if (sys_readv == NULL) {
 		hook_once();
 	}
 #endif
 
 	if (!var_hook_sys_api) {
-		return __sys_readv(fd, iov, iovcnt);
+		return (*sys_readv)(fd, iov, iovcnt);
 	}
 
 	fe = fiber_file_open(fd);
@@ -211,7 +211,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 			return -1;
 		}
 
-		ret = __sys_readv(fd, iov, iovcnt);
+		ret = (*sys_readv)(fd, iov, iovcnt);
 		if (ret >= 0) {
 			return ret;
 		}
@@ -266,13 +266,13 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	}
 
 #ifndef USE_SYSCALL
-	if (__sys_recv == NULL) {
+	if (sys_recv == NULL) {
 		hook_once();
 	}
 #endif
 
 	if (!var_hook_sys_api) {
-		return __sys_recv(sockfd, buf, len, flags);
+		return (*sys_recv)(sockfd, buf, len, flags);
 	}
 
 	fe = fiber_file_open(sockfd);
@@ -296,7 +296,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 			return -1;
 		}
 
-		ret = (int) __sys_recv(sockfd, buf, len, flags);
+		ret = (int) (*sys_recv)(sockfd, buf, len, flags);
 		if (ret >= 0) {
 			return ret;
 		}
@@ -326,13 +326,13 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	}
 
 #ifndef USE_SYSCALL
-	if (__sys_recvfrom == NULL) {
+	if (sys_recvfrom == NULL) {
 		hook_once();
 	}
 #endif
 
 	if (!var_hook_sys_api) {
-		return __sys_recvfrom(sockfd, buf, len, flags,
+		return (*sys_recvfrom)(sockfd, buf, len, flags,
 				src_addr, addrlen);
 	}
 
@@ -357,8 +357,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 			return -1;
 		}
 
-		ret = __sys_recvfrom(sockfd, buf, len, flags,
-				src_addr, addrlen);
+		ret = (*sys_recvfrom)(sockfd, buf, len, flags, src_addr, addrlen);
 		if (ret >= 0) {
 			return (int) ret;
 		}
@@ -383,13 +382,13 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 	}
 
 #ifdef USE_SYSCALL
-	if (__sys_recvmsg == NULL) {
+	if (sys_recvmsg == NULL) {
 		hook_once();
 	}
 #endif
 
 	if (!var_hook_sys_api) {
-		return __sys_recvmsg(sockfd, msg, flags);
+		return (*sys_recvmsg)(sockfd, msg, flags);
 	}
 
 	fe = fiber_file_open(sockfd);
@@ -409,7 +408,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 			return -1;
 		}
 
-		ret = __sys_recvmsg(sockfd, msg, flags);
+		ret = (*sys_recvmsg)(sockfd, msg, flags);
 		if (ret >= 0) {
 			return ret;
 		}
@@ -429,12 +428,12 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 #ifdef SYS_UNIX
 ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
-	if (__sys_write == NULL) {
+	if (sys_write == NULL) {
 		hook_once();
 	}
 
 	while (1) {
-		ssize_t n = __sys_write(fd, buf, count);
+		ssize_t n = (*sys_write)(fd, buf, count);
 		FILE_EVENT *fe;
 		int err;
 
@@ -465,12 +464,12 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
-	if (__sys_writev == NULL) {
+	if (sys_writev == NULL) {
 		hook_once();
 	}
 
 	while (1) {
-		int n = (int) __sys_writev(fd, iov, iovcnt);
+		int n = (int) (*sys_writev)(fd, iov, iovcnt);
 		FILE_EVENT *fe;
 		int err;
 
@@ -509,13 +508,13 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 #endif
 {
 #ifndef USE_SYSCALL
-	if (__sys_send == NULL) {
+	if (sys_send == NULL) {
 		hook_once();
 	}
 #endif
 
 	while (1) {
-		int n = (int) __sys_send(sockfd, buf, len, flags);
+		int n = (int) (*sys_send)(sockfd, buf, len, flags);
 		FILE_EVENT *fe;
 		int err;
 
@@ -552,12 +551,12 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #endif
 {
-	if (__sys_sendto == NULL) {
+	if (sys_sendto == NULL) {
 		hook_once();
 	}
 
 	while (1) {
-		int n = (int) __sys_sendto(sockfd, buf, len, flags,
+		int n = (int) (*sys_sendto)(sockfd, buf, len, flags,
 				dest_addr, addrlen);
 		FILE_EVENT *fe;
 		int err;
@@ -590,12 +589,12 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 #ifdef SYS_UNIX
 ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
-	if (__sys_sendmsg == NULL) {
+	if (sys_sendmsg == NULL) {
 		hook_once();
 	}
 
 	while (1) {
-		ssize_t n = __sys_sendmsg(sockfd, msg, flags);
+		ssize_t n = (*sys_sendmsg)(sockfd, msg, flags);
 		FILE_EVENT *fe;
 		int err;
 
@@ -688,12 +687,12 @@ ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 #if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
 ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
-	if (__sys_sendfile64 == NULL) {
+	if (sys_sendfile64 == NULL) {
 		hook_once();
 	}
 
 	while (1) {
-		ssize_t n = __sys_sendfile64(out_fd, in_fd, offset, count);
+		ssize_t n = (*sys_sendfile64)(out_fd, in_fd, offset, count);
 		FILE_EVENT *fe;
 		int err;
 

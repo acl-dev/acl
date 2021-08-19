@@ -156,6 +156,9 @@
     <ClInclude Include="src\event\event_iocp.h">
       <Filter>源文件\event</Filter>
     </ClInclude>
+    <ClInclude Include="hook_api.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">

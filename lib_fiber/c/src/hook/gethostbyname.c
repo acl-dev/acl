@@ -130,16 +130,16 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 	struct addrinfo *res;
 
 #ifdef __APPLE__
-	if (__sys_gethostbyname == NULL) {
+	if (sys_gethostbyname == NULL) {
 #else
-	if (__sys_gethostbyname_r == NULL) {
+	if (sys_gethostbyname_r == NULL) {
 #endif
 		hook_once();
 	}
 
 	if (!var_hook_sys_api) {
 #ifdef __APPLE__
-		*result = __sys_gethostbyname(name);
+		*result = (*sys_gethostbyname)(name);
 		if (result == NULL) {
 			if (h_errnop) {
 				*h_errnop = h_errno;
@@ -148,7 +148,7 @@ int acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
 		}
 		return 0;
 #else
-		return __sys_gethostbyname_r ? __sys_gethostbyname_r
+		return sys_gethostbyname_r ? (*sys_gethostbyname_r)
 			(name, ent, buf, buflen, result, h_errnop) : -1;
 #endif
 	}

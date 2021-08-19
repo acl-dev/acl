@@ -125,12 +125,12 @@ int acl_fiber_select(int nfds, fd_set *readfds, fd_set *writefds,
 	struct pollfd *fds;
 	int i, timo, n, nready = 0;
 
-	if (__sys_select == NULL) {
+	if (sys_select == NULL) {
 		hook_once();
 	}
 
 	if (!var_hook_sys_api)
-		return __sys_select ? __sys_select
+		return sys_select ? (*sys_select)
 			(nfds, readfds, writefds, exceptfds, timeout) : -1;
 
 	fds = pfds_create(&nfds, readfds, writefds, exceptfds);

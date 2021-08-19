@@ -410,6 +410,7 @@
     <ClCompile Include="src\hook\epoll.c" />
     <ClCompile Include="src\hook\getaddrinfo.c" />
     <ClCompile Include="src\hook\gethostbyname.c" />
+    <ClCompile Include="src\hook\hook.c" />
     <ClCompile Include="src\hook\io.c" />
     <ClCompile Include="src\hook\poll.c" />
     <ClCompile Include="src\hook\select.c" />

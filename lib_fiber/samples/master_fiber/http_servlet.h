@@ -4,7 +4,7 @@ class http_servlet : public acl::HttpServlet
 {
 public:
 	http_servlet(acl::socket_stream* stream, acl::session* session)
-		: HttpServlet(stream, session)
+		: HttpServlet(stream, session), i_(0)
 	{
 	}
 
@@ -21,13 +21,16 @@ public:
 	// override
 	bool doPost(acl::HttpServletRequest&, acl::HttpServletResponse& res)
 	{
-		const char* buf = "hello world!";
-		size_t len = strlen(buf);
+		acl::string buf;
+		buf.format("hello world-%d", i_++);
 
-		res.setContentLength(len);
+		res.setContentLength(buf.size());
 		res.setKeepAlive(true);
 
 		// ∑¢ÀÕ http œÏ”¶ÃÂ
-		return res.write(buf, len) && res.write(NULL, 0);
+		return res.write(buf) && res.write(NULL, 0);
 	}
+
+private:
+	int i_;
 };

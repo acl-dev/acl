@@ -214,14 +214,7 @@ static void *thread_main(void *ctx)
 	int i;
 
 #if defined(_WIN32) || defined(_WIN64)
-#if 0
-	if (winapi_hook()) {
-		acl_msg_info("hook Win API ok");
-	} else {
-		acl_msg_error("hook Win API error: %s", acl_last_serror());
-	}
-#endif
-
+	#if 0
 	SOCKET s = socket(PF_INET, SOCK_STREAM, 0);
 	if (s == INVALID_SOCKET) {
 		printf("invalid socket: %s\r\n", acl::last_serror());
@@ -229,6 +222,7 @@ static void *thread_main(void *ctx)
 	} else {
 		printf("create socket ok\r\n");
 	}
+	#endif
 #endif
 
 	if (__thread_init) {
@@ -819,14 +813,6 @@ static void servers_start(FIBER_SERVER **servers, int nthreads)
 	acl_pthread_attr_init(&attr);
 	acl_pthread_attr_setdetachstate(&attr, ACL_PTHREAD_CREATE_DETACHED);
 
-#if defined(_WIN32) || defined(_WIN64)
-	if (winapi_hook()) {
-		acl_msg_info("hook Win API ok");
-	} else {
-		acl_msg_error("hook Win API error: %s", acl_last_serror());
-	}
-#endif
-
 	for (i = 0; i < nthreads; i++) {
 		acl_pthread_create(&servers[i]->tid, &attr,
 			thread_main, servers[i]);
@@ -1013,22 +999,36 @@ void acl_fiber_server_main(int argc, char *argv[],
 	__service_ctx = ctx;
 	__first_name  = name;
 
-//#if !defined(_WIN32) && !defined(_WIN64)
 	va_start(ap, name);
+
+#if defined(_WIN32) || defined(_WIN64)
+# if  _MSC_VER >= 1911
+	va_copy(__ap_dest, ap);
+# else
+	__ap_dest = ap;
+# endif
+#else
 	va_copy(__ap_dest, ap);
 	master_log_open(argv[0]);
+#endif
 	va_end(ap);
-//#endif
 
 	__conf_file[0] = 0;
 
 #ifndef __APPLE__
-
-#if !defined(_WIN32) && !defined(_WIN64)
+# if !defined(_WIN32) && !defined(_WIN64)
 	opterr = 0;
-#endif
+# endif
 	optind = 0;
 	optarg = 0;
+#endif  // __APPLE__
+
+#if defined(_WIN32) || defined(_WIN64)
+	if (winapi_hook()) {
+		acl_msg_info("hook Win API ok");
+	} else {
+		acl_msg_error("hook Win API error: %s", acl_last_serror());
+	}
 #endif
 
 	while ((c = getopt(argc, argv, "Hc:n:s:t:uf:L:")) > 0) {
