@@ -901,7 +901,7 @@ bool http_header::build_request(string& buf) const
 				first_param = false;
 			} else {
 				buf += '&';
-            }
+			}
 
 			// 需要对参数进行 URL 编码
 

@@ -224,7 +224,6 @@ static void *thread_main(void *ctx)
 	}
 
 	// create monitor fiber waiting STOPPING command from main thread
-	if (0)
 	acl_fiber_create(thread_fiber_monitor, server, STACK_SIZE);
 
 	// schedule the current thread fibers
