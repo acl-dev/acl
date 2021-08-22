@@ -8,11 +8,9 @@
 unsigned int sleep(unsigned int seconds)
 {
 	if (!var_hook_sys_api) {
-#ifndef USE_SYSCALL
 		if (sys_sleep == NULL) {
 			hook_once();
 		}
-#endif
 
 		//printf("use system gettimeofday\r\n");
 		return (*sys_sleep)(seconds);
@@ -41,6 +39,10 @@ int acl_fiber_close(socket_t fd)
 
 	if (sys_close == NULL) {
 		hook_once();
+		if (sys_close == NULL) {
+			msg_error("%s: sys_close NULL", __FUNCTION__);
+			return -1;
+		}
 	}
 
 	if (!var_hook_sys_api) {
@@ -88,11 +90,9 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		return -1;
 	}
 
-#ifndef	USE_SYSCALL
 	if (sys_read == NULL) {
 		hook_once();
 	}
-#endif
 
 	if (!var_hook_sys_api) {
 		return (*sys_read)(fd, buf, count);
@@ -134,11 +134,9 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		return -1;
 	}
 
-#ifndef	USE_SYSCALL
 	if (sys_read == NULL) {
 		hook_once();
 	}
-#endif
 
 	if (!var_hook_sys_api) {
 		return (*sys_read)(fd, buf, count);
@@ -185,11 +183,9 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		return -1;
 	}
 
-#ifndef USE_SYSCALL
 	if (sys_readv == NULL) {
 		hook_once();
 	}
-#endif
 
 	if (!var_hook_sys_api) {
 		return (*sys_readv)(fd, iov, iovcnt);
@@ -253,6 +249,19 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 }
 
 #ifdef SYS_WIN
+int WINAPI acl_fiber_WSARecv(socket_t sockfd,
+	LPWSABUF lpBuffers,
+	DWORD dwBufferCount,
+	LPDWORD lpNumberOfBytesRecvd,
+	LPDWORD lpFlags,
+	LPWSAOVERLAPPED lpOverlapped,
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine)
+{
+	return acl_fiber_recv(sockfd, lpBuffers->buf, dwBufferCount, *lpFlags);
+}
+#endif
+
+#ifdef SYS_WIN
 int WINAPI acl_fiber_recv(socket_t sockfd, char *buf, int len, int flags)
 #else
 ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
@@ -265,11 +274,13 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		return -1;
 	}
 
-#ifndef USE_SYSCALL
 	if (sys_recv == NULL) {
 		hook_once();
+		if (sys_recv == NULL) {
+			msg_error("%s: sys_recv NULL", __FUNCTION__);
+			return -1;
+		}
 	}
-#endif
 
 	if (!var_hook_sys_api) {
 		return (*sys_recv)(sockfd, buf, len, flags);
@@ -325,11 +336,13 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		return -1;
 	}
 
-#ifndef USE_SYSCALL
 	if (sys_recvfrom == NULL) {
 		hook_once();
+		if (sys_recvfrom == NULL) {
+			msg_error("%s: sys_recvfrom NULL", __FUNCTION__);
+			return -1;
+		}
 	}
-#endif
 
 	if (!var_hook_sys_api) {
 		return (*sys_recvfrom)(sockfd, buf, len, flags,
@@ -381,11 +394,9 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		return -1;
 	}
 
-#ifdef USE_SYSCALL
 	if (sys_recvmsg == NULL) {
 		hook_once();
 	}
-#endif
 
 	if (!var_hook_sys_api) {
 		return (*sys_recvmsg)(sockfd, msg, flags);
@@ -507,11 +518,13 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 	size_t len, int flags)
 #endif
 {
-#ifndef USE_SYSCALL
 	if (sys_send == NULL) {
 		hook_once();
+		if (sys_send == NULL) {
+			msg_error("%s: sys_send NULL", __FUNCTION__);
+			return -1;
+		}
 	}
-#endif
 
 	while (1) {
 		int n = (int) (*sys_send)(sockfd, buf, len, flags);
@@ -553,6 +566,10 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 {
 	if (sys_sendto == NULL) {
 		hook_once();
+		if (sys_sendto == NULL) {
+			msg_error("%s: sys_sendto NULL", __FUNCTION__);
+			return -1;
+		}
 	}
 
 	while (1) {

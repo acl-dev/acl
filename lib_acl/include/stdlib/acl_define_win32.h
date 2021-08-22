@@ -3,6 +3,7 @@
 
 /**
  * _MSC_VER:
+ * see: https://docs.microsoft.com/zh-cn/cpp/preprocessor/predefined-macros?view=msvc-160&viewFallbackFrom=vs-2019
  * vc++5.0	VS 5.0	1100
  * vc++6.0	VS 6.0	1200
  * vc++7.0	VS 2003	1310
@@ -12,7 +13,14 @@
  * vc++11.0	VS 2012	1700
  * vc++14.0	VS 2015	1900
  * vc++15.0	VS 2017	1911
- * vc++16.0	VS 2019	1929
+ * vc++16.0	VS 2019	1920
+ * vc++16.1	VS 2019	1921
+ * vc++16.2	VS 2019	1922
+ * vc++16.3	VS 2019	1923
+ * vc++16.4	VS 2019	1924
+ * vc++16.5	VS 2019	1925
+ * vc++16.6	VS 2019	1926
+ * vc++16.7	VS 2019	1927
  */
 
 #if defined (_WIN32) || defined(_WIN64)

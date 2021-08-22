@@ -168,7 +168,19 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 		return -1;
 	}
 
+# if defined(_WIN32) || defined(_WIN64)
+#  ifdef SYS_WSA_API
+	WSABUF wsabuf;
+	wsabuf.buf = buf;
+	wsabuf.len = (int) size;
+	DWORD flags = 0;
+	return WSARecv(fd, &wsabuf, (int) size, 0, &flags, 0, 0);
+#  else
 	return __sys_recv(fd, buf, (int) size, 0);
+#  endif
+# else
+	return __sys_recv(fd, buf, (int) size, 0);
+# endif
 #endif
 }
 

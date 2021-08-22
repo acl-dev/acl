@@ -126,11 +126,12 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	int   ch, cocurrent = 10;
+	int   ch, cocurrent = 1;
 	string addr("www.sina.com.cn:80");
 
 	// ³õÊ¼»¯ acl ¿â
 	acl::acl_cpp_init();
+	acl::log::stdout_open(true);
 
 	while ((ch = getopt(argc, argv, "hs:H:n:c:zD")) > 0) {
 		switch (ch) {

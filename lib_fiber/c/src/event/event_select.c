@@ -4,37 +4,9 @@
 #ifdef HAS_SELECT
 
 #include "fiber/libfiber.h"
+#include "hook/hook.h"
 #include "event.h"
 #include "event_select.h"
-
-#ifdef SYS_WIN
-typedef int(WINAPI *select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
-#else
-typedef int(*select_fn)(int, fd_set *, fd_set *, fd_set *, struct timeval *);
-#endif
-
-static select_fn __sys_select = NULL;
-
-static void hook_api(void)
-{
-#ifdef SYS_UNIX
-	__sys_select = (select_fn) dlsym(RTLD_NEXT, "select");
-	assert(__sys_select);
-#elif defined(SYS_WIN)
-	__sys_select = (select_fn) select;
-#endif
-}
-
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-static void hook_init(void)
-{
-	if (pthread_once(&__once_control, hook_api) != 0) {
-		abort();
-	}
-}
-
-/****************************************************************************/
 
 typedef struct EVENT_SELECT {
 	EVENT  event;
@@ -165,7 +137,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 		return 0;
 	}
 
-	n = __sys_select(0, &rset, &wset, &xset, tp);
+	n = (*sys_select)(0, &rset, &wset, &xset, tp);
 #else
 	if (es->dirty) {
 		es->maxfd = -1;
@@ -176,7 +148,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 			}
 		}
 	}
-	n = __sys_select(es->maxfd + 1, &rset, 0, &xset, tp);
+	n = (*sys_select)(es->maxfd + 1, &rset, 0, &xset, tp);
 #endif
 	if (n < 0) {
 		if (acl_fiber_last_error() == FIBER_EINTR) {
@@ -237,8 +209,12 @@ EVENT *event_select_create(int size)
 {
 	EVENT_SELECT *es = (EVENT_SELECT *) mem_calloc(1, sizeof(EVENT_SELECT));
 
-	if (__sys_select == NULL) {
-		hook_init();
+	if (sys_select == NULL) {
+		hook_once();
+		if (sys_select == NULL) {
+			msg_error("%s: sys_select NULL", __FUNCTION__);
+			return NULL;
+		}
 	}
 
 	// override size with system open limit setting

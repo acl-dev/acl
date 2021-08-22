@@ -33,6 +33,19 @@ FIBER_API int WINAPI acl_fiber_select(int nfds, fd_set *readfds,
 FIBER_API int WINAPI acl_fiber_poll(struct pollfd *fds,
 	unsigned long nfds, int timeout);
 
+FIBER_API int WINAPI acl_fiber_WSARecv(socket_t sockfd,
+	LPWSABUF lpBuffers,
+	DWORD dwBufferCount,
+	LPDWORD lpNumberOfBytesRecvd,
+	LPDWORD lpFlags,
+	LPWSAOVERLAPPED lpOverlapped,
+	LPWSAOVERLAPPED_COMPLETION_ROUTINE lpCompletionRoutine);
+FIBER_API socket_t WSAAPI acl_fiber_WSAAccept(
+    SOCKET s,
+    struct sockaddr FAR * addr,
+    LPINT addrlen,
+    LPCONDITIONPROC lpfnCondition,
+    DWORD_PTR dwCallbackData);
 #else
 
 FIBER_API socket_t acl_fiber_socket(int domain, int type, int protocol);

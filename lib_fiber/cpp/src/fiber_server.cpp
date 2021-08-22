@@ -213,18 +213,6 @@ static void *thread_main(void *ctx)
 	static int dummy;
 	int i;
 
-#if defined(_WIN32) || defined(_WIN64)
-	#if 0
-	SOCKET s = socket(PF_INET, SOCK_STREAM, 0);
-	if (s == INVALID_SOCKET) {
-		printf("invalid socket: %s\r\n", acl::last_serror());
-		return NULL;
-	} else {
-		printf("create socket ok\r\n");
-	}
-	#endif
-#endif
-
 	if (__thread_init) {
 		__thread_init(__thread_init_ctx);
 	}
@@ -236,6 +224,7 @@ static void *thread_main(void *ctx)
 	}
 
 	// create monitor fiber waiting STOPPING command from main thread
+	if (0)
 	acl_fiber_create(thread_fiber_monitor, server, STACK_SIZE);
 
 	// schedule the current thread fibers

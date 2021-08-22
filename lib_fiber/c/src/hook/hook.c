@@ -91,7 +91,15 @@ gethostbyname_r_fn __sys_gethostbyname_r    = NULL;
 gethostbyname_r_fn *sys_gethostbyname_r     = NULL;
 # endif
 
-#endif // SYS_UNIX
+#elif defined(SYS_WIN)
+
+WSARecv_fn __sys_WSARecv                     = NULL;
+WSARecv_fn *sys_WSARecv                      = NULL;
+
+WSAAccept_fn __sys_WSAAccept                 = NULL;
+WSAAccept_fn *sys_WSAAccept                  = NULL;
+
+#endif // SYS_WIN
 
 void WINAPI set_socket_fn(socket_fn *fn)
 {
@@ -148,6 +156,18 @@ void WINAPI set_select_fn(select_fn *fn)
 	sys_select = fn;
 }
 
+#if defined(SYS_WIN)
+void WINAPI set_WSAAccept_fn(WSAAccept_fn *fn)
+{
+	sys_WSAAccept = fn;
+}
+
+void WINAPI set_WSARecv_fn(WSARecv_fn *fn)
+{
+	sys_WSARecv = fn;
+}
+#endif
+
 static void hook_api(void)
 {
 #ifdef SYS_UNIX
@@ -198,38 +218,44 @@ static void hook_api(void)
 	LOAD_FN("gethostbyname_r", gethostbyname_r_fn, __sys_gethostbyname_r, sys_gethostbyname_r);
 # endif
 #elif defined(SYS_WIN)
-	__sys_socket   = socket;
-	sys_socket     = &__sys_socket;
+	__sys_socket    = socket;
+	sys_socket      = &__sys_socket;
 
-	__sys_listen   = listen;
-	sys_listen     = &__sys_listen;
+	__sys_listen    = listen;
+	sys_listen      = &__sys_listen;
 
-	__sys_accept   = accept;
-	sys_accept     = &__sys_accept;
+	__sys_accept    = accept;
+	sys_accept      = &__sys_accept;
 
-	__sys_connect  = connect;
-	sys_connect    = &__sys_connect;
+	__sys_connect   = connect;
+	sys_connect     = &__sys_connect;
 
-	__sys_close    = closesocket;
-	sys_close      = &__sys_close;
+	__sys_close     = closesocket;
+	sys_close       = &__sys_close;
 
-	__sys_recv     = (recv_fn) recv;
-	sys_recv       = &__sys_recv;
+	__sys_recv      = (recv_fn) recv;
+	sys_recv        = &__sys_recv;
 
-	__sys_recvfrom = (recvfrom_fn) recvfrom;
-	sys_recvfrom   = &__sys_recvfrom;
+	__sys_recvfrom  = (recvfrom_fn) recvfrom;
+	sys_recvfrom    = &__sys_recvfrom;
 
-	__sys_send     = (send_fn) send;
-	sys_send       = &__sys_send;
+	__sys_send      = (send_fn) send;
+	sys_send        = &__sys_send;
 
-	__sys_sendto   = (sendto_fn) sendto;
-	sys_sendto     = &__sys_sendto;
+	__sys_sendto    = (sendto_fn) sendto;
+	sys_sendto      = &__sys_sendto;
 
-	__sys_poll     = WSAPoll;
-	sys_poll       = &__sys_poll;
+	__sys_poll      = WSAPoll;
+	sys_poll        = &__sys_poll;
 
-	__sys_select   = select;
-	sys_select     = &__sys_select;
+	__sys_select    = select;
+	sys_select      = &__sys_select;
+
+	__sys_WSARecv   = (WSARecv_fn) WSARecv;
+	sys_WSARecv     = &__sys_WSARecv;
+
+	__sys_WSAAccept = (WSAAccept_fn) WSAAccept;
+	sys_WSAAccept   = &__sys_WSAAccept;
 #endif
 }
 

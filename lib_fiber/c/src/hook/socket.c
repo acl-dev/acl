@@ -5,19 +5,16 @@
 #include "fiber.h"
 #include "hook.h"
 
-/***************************************************************************/
-
 socket_t WINAPI acl_fiber_socket(int domain, int type, int protocol)
 {
 	socket_t sockfd;
 
 	if (sys_socket == NULL) {
 		hook_once();
+		if (sys_socket == NULL) {
+			return -1;
+		}
 	} 
-
-	if (sys_socket == NULL) {
-		return -1;
-	}
 
 	sockfd = (*sys_socket)(domain, type, protocol);
 
@@ -38,6 +35,10 @@ int WINAPI acl_fiber_listen(socket_t sockfd, int backlog)
 {
 	if (sys_listen == NULL) {
 		hook_once();
+		if (sys_listen == NULL) {
+			msg_error("%s: sys_listen NULL", __FUNCTION__);
+			return -1;
+		}
 	}
 
 	if (!var_hook_sys_api) {
@@ -53,6 +54,18 @@ int WINAPI acl_fiber_listen(socket_t sockfd, int backlog)
 	return -1;
 }
 
+#ifdef SYS_WIN
+socket_t WSAAPI acl_fiber_WSAAccept(
+    socket_t s,
+    struct sockaddr FAR * addr,
+    LPINT addrlen,
+    LPCONDITIONPROC lpfnCondition,
+    DWORD_PTR dwCallbackData)
+{
+	return acl_fiber_accept(s, addr, addrlen);
+}
+#endif
+
 #define FAST_ACCEPT
 
 socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
@@ -67,20 +80,44 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		return -1;
 	}
 
+#ifdef SYS_WSA_API
+	if (sys_WSAAccept == NULL) {
+		hook_once();
+		if (sys_WSAAccept == NULL) {
+			msg_error("%s: sys_accept NULL", __FUNCTION__);
+			return -1;
+		}
+	}
+#else
 	if (sys_accept == NULL) {
 		hook_once();
+		if (sys_accept == NULL) {
+			msg_error("%s: sys_accept NULL", __FUNCTION__);
+			return -1;
+		}
 	}
+#endif
 
 	if (!var_hook_sys_api) {
+#ifdef SYS_WSA_API
+		return sys_WSAAccept ?
+			(*sys_WSAAccept)(sockfd, addr, addrlen, 0, 0) : INVALID_SOCKET;
+#else
 		return sys_accept ?
 			(*sys_accept)(sockfd, addr, addrlen) : INVALID_SOCKET;
+#endif
 	}
 
 #ifdef	FAST_ACCEPT
 
 	non_blocking(sockfd, NON_BLOCKING);
 
+#ifdef SYS_WSA_API
+	clifd = (*sys_WSAAccept)(sockfd, addr, addrlen, 0, 0);
+#else
 	clifd = (*sys_accept)(sockfd, addr, addrlen);
+#endif
+
 	if (clifd != INVALID_SOCKET) {
 		non_blocking(clifd, NON_BLOCKING);
 		tcp_nodelay(clifd, 1);
@@ -124,7 +161,12 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			return clifd;
 		}
 #endif
+
+#ifdef SYS_WSA_API
+		clifd = (*sys_WSAAccept)(sockfd, addr, addrlen, 0, 0);
+#else
 		clifd = (*sys_accept)(sockfd, addr, addrlen);
+#endif
 
 		if (clifd != INVALID_SOCKET) {
 			non_blocking(clifd, NON_BLOCKING);
@@ -194,6 +236,10 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 
 	if (sys_connect == NULL) {
 		hook_once();
+		if (sys_connect == NULL) {
+			msg_error("%s: sys_connect NULL", __FUNCTION__);
+			return -1;
+		}
 	}
 
 	if (!var_hook_sys_api) {

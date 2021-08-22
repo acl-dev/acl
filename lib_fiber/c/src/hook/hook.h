@@ -32,7 +32,13 @@ typedef int (WINAPI *poll_fn)(struct pollfd *, nfds_t, int);
 typedef int (WINAPI *select_fn)(int, fd_set *, fd_set *,
 	fd_set *, const struct timeval *);
 
+typedef int (WSAAPI *WSARecv_fn)(socket_t, LPWSABUF, DWORD, LPDWORD, LPDWORD,
+    LPWSAOVERLAPPED, LPWSAOVERLAPPED_COMPLETION_ROUTINE);
+typedef socket_t (WSAAPI *WSAAccept_fn)(SOCKET, struct sockaddr FAR *,
+    LPINT, LPCONDITIONPROC, DWORD_PTR);
+
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
+
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
 typedef ssize_t  (*read_fn)(socket_t, void *, size_t);
@@ -85,6 +91,11 @@ FIBER_API void WINAPI set_sendto_fn(sendto_fn *fn);
 FIBER_API void WINAPI set_poll_fn(poll_fn *fn);
 FIBER_API void WINAPI set_select_fn(select_fn *fn);
 
+#if defined(_WIN32) || defined(_WIN64)
+FIBER_API void WINAPI set_WSARecv_fn(WSARecv_fn *fn);
+FIBER_API void WINAPI set_WSAAccept_fn(WSAAccept_fn *fn);
+#endif
+
 extern socket_fn            *sys_socket;
 extern close_fn             *sys_close;
 extern listen_fn            *sys_listen;
@@ -100,7 +111,12 @@ extern sendto_fn            *sys_sendto;
 extern poll_fn              *sys_poll;
 extern select_fn            *sys_select;
 
-#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  // SYS_UNIX
+#if defined(_WIN32) || defined(_WIN64)
+
+extern WSARecv_fn           *sys_WSARecv;
+extern WSAAccept_fn         *sys_WSAAccept;
+
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  // SYS_UNIX
 
 extern sleep_fn             *sys_sleep;
 extern setsockopt_fn        *sys_setsockopt;

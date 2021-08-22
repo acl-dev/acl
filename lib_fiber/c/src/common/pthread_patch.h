@@ -7,6 +7,7 @@ extern "C" {
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <time.h>
+#include "fiber/fiber_define.h"
 
 #define __thread __declspec(thread)
 
@@ -28,7 +29,7 @@ struct pthread_mutexattr_t {
 	SECURITY_ATTRIBUTES attr;
 };
 
-int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
+FIBER_API int pthread_once(pthread_once_t *once_control, void (*init_routine)(void));
 int pthread_key_create(pthread_key_t *key_ptr, void (*destructor)(void*));
 
 void *pthread_getspecific(pthread_key_t key);

@@ -21,8 +21,9 @@ public:
 	// override
 	bool doPost(acl::HttpServletRequest&, acl::HttpServletResponse& res)
 	{
+		static int __n = 0;
 		acl::string buf;
-		buf.format("hello world-%d", i_++);
+		buf.format("hello world-%d, total=%d", i_++, __n++);
 
 		res.setContentLength(buf.size());
 		res.setKeepAlive(true);

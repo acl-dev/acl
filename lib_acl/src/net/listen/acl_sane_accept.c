@@ -80,7 +80,14 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 	 * XXX HP-UX 11 returns ENOBUFS when the client has disconnected in
 	 * the mean time.
 	 */
+
+#if defined(_WIN32) || defined(_WIN64)
+	//fd = WSAAccept(sock, (struct sockaddr *) sa, (socklen_t *) len, 0, 0);
 	fd = __sys_accept(sock, (struct sockaddr *) sa, (socklen_t *) len);
+#else
+	fd = __sys_accept(sock, (struct sockaddr *) sa, (socklen_t *) len);
+#endif
+
 	if (fd == ACL_SOCKET_INVALID) {
 		int  count = 0, err, error = acl_last_error();
 		for (; (err = accept_ok_errors[count]) != 0; count++) {
