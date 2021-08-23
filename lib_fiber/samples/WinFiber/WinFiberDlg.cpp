@@ -90,6 +90,7 @@ BEGIN_MESSAGE_MAP(CWinFiberDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_START_HTTPD, &CWinFiberDlg::OnBnClickedStartHttpd)
 	ON_BN_CLICKED(IDOK, &CWinFiberDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CWinFiberDlg::OnBnClickedCancel)
+ON_BN_CLICKED(IDC_AWAIT_DNS, &CWinFiberDlg::OnBnClickedAwaitDns)
 END_MESSAGE_MAP()
 
 // CWinFiberDlg 消息处理程序
@@ -302,8 +303,10 @@ void CWinFiberDlg::OnBnClickedCreateTimer()
 void CWinFiberDlg::OnBnClickedStartHttpd()
 {
 	// TODO: 在此添加控件通知处理程序代码
+	GetDlgItem(IDC_START_HTTPD)->EnableWindow(FALSE);
 	acl::fiber* fb = new CFiberHttpd(m_httpdAddr.c_str());
 	fb->start();
+	//GetDlgItem(IDC_START_HTTPD)->EnableWindow(FALSE);
 }
 
 void CWinFiberDlg::OnBnClickedOk()
@@ -318,4 +321,44 @@ void CWinFiberDlg::OnBnClickedCancel()
 	// TODO: 在此添加控件通知处理程序代码
 	CDialogEx::OnCancel();
 	StopFiber();  // 停止协程调度过程
+}
+
+bool CWinFiberDlg::ResolveDNS(const char* name, std::vector<std::string>* addrs)
+{
+	struct hostent *ent = gethostbyname(name);
+	if (ent == NULL) {
+		printf("gethostbyname error: %s, name=%s\r\n", acl::last_serror(), name);
+		return false;
+	}
+
+	for (int i = 0; ent->h_addr_list[i]; i++) {
+		char* addr = ent->h_addr_list[i];
+		char  ip[64];
+		const char* ptr = inet_ntop(ent->h_addrtype, addr, ip, sizeof(ip));
+		if (ptr) {
+			addrs->push_back(ptr);
+		} else {
+			printf(">>>inet_ntop error\r\n");
+		}
+	}
+
+	return true;
+}
+
+void CWinFiberDlg::OnBnClickedAwaitDns()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	std::string name = "www.google.com";
+	std::vector<std::string> addrs;
+	go_wait[&]{
+		if (!ResolveDNS(name.c_str(), &addrs)) {
+			printf(">>>resolve DNS error, name=%s\r\n", name.c_str());
+		}
+	};
+
+	printf(">>>name=%s, result count=%zd\r\n", name.c_str(), addrs.size());
+	for (std::vector<std::string>::const_iterator cit = addrs.begin();
+		cit != addrs.end(); ++cit) {
+		printf(">>>ip=%s\r\n", (*cit).c_str());
+	}
 }

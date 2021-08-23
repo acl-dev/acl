@@ -4,8 +4,6 @@
 #include "fiber_define.h"
 #include "fiber_event.h"
 
-#if !defined(_WIN32) && !defined(_WIN64)
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -61,4 +59,3 @@ FIBER_API int acl_fiber_cond_signal(ACL_FIBER_COND *cond);
 
 #endif // !defined(_WIN32) && !defined(_WIN64)
 
-#endif

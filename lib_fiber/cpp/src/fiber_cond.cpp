@@ -2,8 +2,6 @@
 #include "fiber/fiber_event.hpp"
 #include "fiber/fiber_cond.hpp"
 
-#if !defined(_WIN32) && !defined(_WIN64)
-
 namespace acl {
 
 fiber_cond::fiber_cond(void)
@@ -38,4 +36,3 @@ bool fiber_cond::notify(void)
 
 } // namespace acl
 
-#endif // !defined(_WIN32) && !defined(_WIN64)

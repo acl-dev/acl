@@ -14,5 +14,6 @@
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/lib_fiber.h"
 #include "fiber/lib_fiber.hpp"
+#include "fiber/go_fiber.hpp"
 
 #endif //PCH_H

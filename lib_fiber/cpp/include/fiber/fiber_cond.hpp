@@ -1,8 +1,6 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 
-#if !defined(_WIN32) && !defined(_WIN64)
-
 struct ACL_FIBER_COND;
 
 namespace acl {
@@ -52,4 +50,3 @@ private:
 
 }
 
-#endif

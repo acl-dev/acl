@@ -54,8 +54,20 @@ void tcp_nodelay(socket_t fd, int onoff);
 // in read_wait.c
 int read_wait(socket_t fd, int delay);
 
-#ifdef SYS_UNIX
-int sane_socketpair(int domain, int type, int protocol, int result[2]);
+/**
+ * ´´½¨ socket ¶Ô
+ * @param domain {int}
+ * @param type {int}
+ * @param protocol {int}
+ * @param result {int[2]}
+ * @return {int}
+ */
+int sane_socketpair(int domain, int type, int protocol, socket_t result[2]);
+
+#if defined(_WIN32) || defined(_WIN64)
+# define CLOSE_SOCKET closesocket
+#else
+# define CLOSE_SOCKET close
 #endif
 
 #ifdef	__cplusplus

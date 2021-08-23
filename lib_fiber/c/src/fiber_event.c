@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "common.h"
 
-#ifdef SYS_UNIX
-
 #include "fiber/libfiber.h"
 #include "fiber.h"
 
@@ -57,11 +55,15 @@ ACL_FIBER_EVENT *acl_fiber_event_create(unsigned flag)
 	atomic_int64_set(event->atomic, 0);
 
 	if ((flag & FIBER_FLAG_USE_MUTEX)) {
+#ifdef SYS_WIN
+		pthread_mutex_init(&event->lock.tlock, NULL);
+#else
 		pthread_mutexattr_t attr;
 
 		pthread_mutexattr_init(&attr);
 		pthread_mutex_init(&event->lock.tlock, &attr);
 		pthread_mutexattr_destroy(&attr);
+#endif
 	} else {
 		event->lock.atomic.alock = atomic_new();
 		atomic_set(event->lock.atomic.alock, &event->lock.atomic.value);
@@ -119,7 +121,11 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 	FIBER_BASE *fbase;
 	unsigned    wakeup;
 
+#ifdef SYS_WIN
+	if (atomic_int64_cas(event->atomic, 0, 1) == 0) {
+#else
 	if (LIKELY(atomic_int64_cas(event->atomic, 0, 1) == 0)) {
+#endif
 		__ll_lock(event);
 		event->owner = fiber ? &fiber->base : NULL;
 		event->tid   = __pthread_self();
@@ -254,5 +260,3 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 
 	return 0;
 }
-
-#endif // SYS_UNIX

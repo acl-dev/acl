@@ -3,12 +3,12 @@
 
 #include "define.h"
 
-#if 1
-#define LIKELY(x)	__builtin_expect(!!(x), 1)
-#define UNLIKELY(x)	__builtin_expect(!!(x), 0)
+#if defined(_WIN32) || defined(_WIN64)
+# define LIKELY
+# define UNLIKELY
 #else
-#define	LIKELY
-#define	UNLIKELY
+# define LIKELY(x)   __builtin_expect(!!(x), 1)
+# define UNLIKELY(x) __builtin_expect(!!(x), 0)
 #endif
 
 #ifndef _GNU_SOURCE

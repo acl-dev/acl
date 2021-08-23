@@ -48,6 +48,8 @@ private:
 	void InitFiber();
 	void StopFiber();
 
+	bool ResolveDNS(const char* name, std::vector<std::string>* addrs);
+
 public:
 	void OnFiberConnectExit(acl::fiber* fb);
 
@@ -59,4 +61,5 @@ public:
 	afx_msg void OnBnClickedStartHttpd();
 	afx_msg void OnBnClickedOk();
 	afx_msg void OnBnClickedCancel();
+	afx_msg void OnBnClickedAwaitDns();
 };

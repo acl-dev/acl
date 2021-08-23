@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "common.h"
 
-#ifdef SYS_UNIX
-
 #if defined(__linux__)
 # include <linux/version.h>
 # if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
@@ -14,6 +12,8 @@
 #endif
 
 #include "fiber/libfiber.h"
+#include "fiber/fiber_hook.h"
+#include "common/iostuff.h"
 #include "fiber.h"
 
 void fbase_event_open(FIBER_BASE *fbase)
@@ -53,10 +53,10 @@ void fbase_event_open(FIBER_BASE *fbase)
 void fbase_event_close(FIBER_BASE *fbase)
 {
 	if (fbase->event_in >= 0) {
-		close(fbase->event_in);
+		CLOSE_SOCKET(fbase->event_in);
 	}
 	if (fbase->event_out != fbase->event_in && fbase->event_out >= 0) {
-		close(fbase->event_out);
+		CLOSE_SOCKET(fbase->event_out);
 	}
 	fbase->event_in  = -1;
 	fbase->event_out = -2;
@@ -73,7 +73,11 @@ int fbase_event_wait(FIBER_BASE *fbase)
 	}
 
 	while (1) {
+#ifdef SYS_WIN
+		ret = (int) recv(fbase->event_in, (char*) &n, sizeof(n), 0);
+#else
 		ret = (int) acl_fiber_read(fbase->event_in, &n, sizeof(n));
+#endif
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -126,7 +130,12 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	}
 
 	while (1) {
+#ifdef SYS_WIN
+		ret = (int) acl_fiber_send(fbase->event_out, (char*) &n, sizeof(n), 0);
+#else
 		ret = (int) acl_fiber_write(fbase->event_out, &n, sizeof(n));
+#endif
+
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -155,4 +164,3 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	return 0;
 }
 
-#endif // SYS_UNIX

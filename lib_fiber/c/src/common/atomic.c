@@ -11,14 +11,9 @@
 #  undef HAS_ATOMIC
 #endif
 
-#if defined(_WIN32) || defined(_WIN64)
-# ifndef WINDOWS
-#  define WINDOWS
-# endif
-#endif
-
-#if defined(WINDOWS)
-# define HAS_ATOMIC
+#if defined(SYS_WIN)
+//# define HAS_ATOMIC
+#include "common/pthread_patch.h"
 #endif
 
 /*
@@ -60,7 +55,7 @@ void atomic_set(ATOMIC *self, void *value)
 	pthread_mutex_lock(&self->lock);
 	self->value = value;
 	pthread_mutex_unlock(&self->lock);
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	InterlockedExchangePointer((volatile PVOID*) &self->value, value);
 #else
 	(void) __sync_lock_test_and_set(&self->value, value);
@@ -79,7 +74,7 @@ void *atomic_cas(ATOMIC *self, void *cmp, void *value)
 	pthread_mutex_unlock(&self->lock);
 
 	return old;
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	return InterlockedCompareExchangePointer(
 		(volatile PVOID*)&self->value, value, cmp);
 #else
@@ -98,7 +93,7 @@ void *atomic_xchg(ATOMIC *self, void *value)
 	pthread_mutex_unlock(&self->lock);
 
 	return old;
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	return InterlockedExchangePointer((volatile PVOID*)&self->value, value);
 #else
 	return __sync_lock_test_and_set(&self->value, value);
@@ -111,7 +106,7 @@ void atomic_int64_set(ATOMIC *self, long long n)
 	pthread_mutex_lock(&self->lock);
 	*((long long *) self->value) = n;
 	pthread_mutex_unlock(&self->lock);
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	InterlockedExchangePointer((volatile PVOID*) self->value, (PVOID) n);
 #else
 	(void) __sync_lock_test_and_set((long long *) self->value, n);
@@ -126,7 +121,7 @@ long long atomic_int64_fetch_add(ATOMIC *self, long long n)
 	*((long long *) self->value) = v + n;
 	pthread_mutex_unlock(&self->lock);
 	return v;
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	return InterlockedExchangeAdd64((volatile LONGLONG*) self->value, n);
 #else
 	return (long long) __sync_fetch_and_add((long long *) self->value, n);
@@ -141,7 +136,7 @@ long long atomic_int64_add_fetch(ATOMIC *self, long long n)
 	*((long long *) self->value) = v;
 	pthread_mutex_unlock(&self->lock);
 	return v;
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	return n + InterlockedExchangeAdd64((volatile LONGLONG*) self->value, n);
 #else
 	return (long long) __sync_add_and_fetch((long long *) self->value, n);
@@ -157,7 +152,7 @@ long long atomic_int64_cas(ATOMIC *self, long long cmp, long long n)
 		*((long long *) self->value) = n;
 	pthread_mutex_unlock(&self->lock);
 	return old;
-#elif	defined(WINDOWS)
+#elif	defined(SYS_WIN)
 	return InterlockedCompareExchange64(
 		(volatile LONGLONG*)&self->value, n, cmp);
 #else
