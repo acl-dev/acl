@@ -6,8 +6,6 @@ class CFiberConnect : public acl::fiber
 {
 public:
 	CFiberConnect(CWinFiberDlg& hWin, const char* serverAddr, int count);
-
-private:
 	~CFiberConnect(void);
 
 	// @override

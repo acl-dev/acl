@@ -41,6 +41,7 @@ private:
 	acl::fiber* m_fiberListen;
 	acl::string m_httpdAddr;
 
+	std::set<acl::fiber*> m_clientFibers;
 	UINT m_cocurrent;
 	UINT m_count;
 	void Uni2Str(const CString& in, acl::string& out);
@@ -48,7 +49,7 @@ private:
 	void StopFiber();
 
 public:
-	void OnFiberConnectExit(void);
+	void OnFiberConnectExit(acl::fiber* fb);
 
 public:
 	afx_msg void OnBnClickedOpenDos();

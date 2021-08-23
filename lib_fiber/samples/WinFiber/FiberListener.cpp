@@ -51,5 +51,6 @@ void CFiberListener::run(void)
 	}
 #endif
 
+	printf("Listener fiber exits now ...\r\n");
 	delete this;
 }

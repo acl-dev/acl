@@ -73,6 +73,7 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 	 * 
 	 * XXX FreeBSD 4.2-STABLE accept() returns ECONNABORTED when a
 	 * UNIX-domain client has disconnected in the mean time. The data
+#endif
 	 * that was sent with connect() write() close() is lost, even though
 	 * the write() and close() reported successful completion.
 	 * This was fixed shortly before FreeBSD 4.3.
@@ -82,8 +83,12 @@ ACL_SOCKET acl_sane_accept(ACL_SOCKET sock, struct sockaddr * sa, socklen_t *len
 	 */
 
 #if defined(_WIN32) || defined(_WIN64)
-	//fd = WSAAccept(sock, (struct sockaddr *) sa, (socklen_t *) len, 0, 0);
+# ifdef USE_WSASOCK
+	fd = __sys_accept(sock, (struct sockaddr *) sa, (socklen_t *) len, 0, 0);
+# else
 	fd = __sys_accept(sock, (struct sockaddr *) sa, (socklen_t *) len);
+	//fd = WSAAccept(sock, (struct sockaddr *) sa, (socklen_t *) len, 0, 0);
+# endif
 #else
 	fd = __sys_accept(sock, (struct sockaddr *) sa, (socklen_t *) len);
 #endif
@@ -156,9 +161,16 @@ ACL_SOCKET acl_accept(ACL_SOCKET sock, char *buf, size_t size, int* sock_type)
 		return fd;
 	}
 #endif
+	/* There're some bug in accept on Windows sock lib, the sa->samily is set 0,
+	 * which will cause the acl_inet_ntop() failed, so we just try use another
+	 * way by calling acl_getpeername() to get the peer addr of remote socket.
+	 * ---zsx, 2021.8.23
+	 */
 	if (acl_inet_ntop(sa, buf, size) == 0) {
-		acl_msg_error("%s(%d): inet_ntop error=%s",
-			__FUNCTION__, __LINE__, acl_last_serror());
+		if (acl_getpeername(fd, buf, size) == -1) {
+			acl_msg_error("%s(%d): getpeername error=%s",
+				__FUNCTION__, __LINE__, acl_last_serror());
+		}
 	}
 	return fd;
 }

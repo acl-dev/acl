@@ -59,7 +59,7 @@ CWinFiberDlg::CWinFiberDlg(CWnd* pParent /*=nullptr*/)
 , m_listenAddr("127.0.0.1:9001")
 , m_fiberListen(NULL)
 , m_httpdAddr("127.0.0.1:8088")
-, m_cocurrent(1)
+, m_cocurrent(100)
 , m_count(100)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -264,19 +264,31 @@ void CWinFiberDlg::OnBnClickedConnect()
 	UpdateData();
 	GetDlgItem(IDC_CONNECT)->EnableWindow(FALSE);
 
-	UINT n = m_cocurrent;
-	for (UINT i = 0; i < n; i++) {
+	printf("Begin connect %s with cocurrent=%d, count=%d\r\n",
+		m_listenAddr.c_str(), m_cocurrent, m_count);
+
+	for (UINT i = 0; i < m_cocurrent; i++) {
 		acl::fiber* fb = new CFiberConnect(
 			*this, m_listenAddr.c_str(), m_count);
+		m_clientFibers.insert(fb);
 		fb->start();
 	}
 }
 
-void CWinFiberDlg::OnFiberConnectExit(void)
+void CWinFiberDlg::OnFiberConnectExit(acl::fiber* fb)
 {
-	if (--m_cocurrent == 0) {
+	std::set<acl::fiber*>::iterator it = m_clientFibers.find(fb);
+	if (it != m_clientFibers.end()) {
+		m_clientFibers.erase(it);
+		delete fb;
+	} else {
+		printf("Not found fb=%p\r\n", fb);
+	}
+
+	if (m_clientFibers.empty()) {
 		GetDlgItem(IDC_CONNECT)->EnableWindow(TRUE);
-		printf("All connect fibers finished now!\r\n");
+		printf("All connect fibers=%d count=%d finished now!\r\n",
+			m_cocurrent, m_count);
 	}
 }
 
@@ -294,14 +306,12 @@ void CWinFiberDlg::OnBnClickedStartHttpd()
 	fb->start();
 }
 
-
 void CWinFiberDlg::OnBnClickedOk()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	CDialogEx::OnOK();
 	StopFiber();  // 停止协程调度过程
 }
-
 
 void CWinFiberDlg::OnBnClickedCancel()
 {

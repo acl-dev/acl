@@ -134,7 +134,14 @@ ACL_API int acl_fifo_listen(const char *path, int permissions, int mode);
 #endif
 
 #if defined(_WIN32) || defined(_WIN64)
+# ifdef USE_WSASOCK
+/* The WSAAccept prototype */
+/* */typedef SOCKET (WSAAPI *acl_accept_fn)(SOCKET, struct sockaddr FAR *,
+    LPINT, LPCONDITIONPROC, DWORD_PTR);
+# else
+/* The accept prototype */
 typedef SOCKET (WINAPI *acl_accept_fn)(SOCKET, struct sockaddr*, socklen_t*);
+# endif
 #else
 typedef int (*acl_accept_fn)(int, struct sockaddr*, socklen_t*);
 #endif
