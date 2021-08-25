@@ -74,7 +74,7 @@ int fbase_event_wait(FIBER_BASE *fbase)
 
 	while (1) {
 #ifdef SYS_WIN
-		ret = (int) recv(fbase->event_in, (char*) &n, sizeof(n), 0);
+		ret = (int) acl_fiber_recv(fbase->event_in, (char*) &n, sizeof(n), 0);
 #else
 		ret = (int) acl_fiber_read(fbase->event_in, &n, sizeof(n));
 #endif

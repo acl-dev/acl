@@ -12,7 +12,7 @@
 #endif
 
 #if defined(SYS_WIN)
-//# define HAS_ATOMIC
+# define HAS_ATOMIC
 #include "common/pthread_patch.h"
 #endif
 
@@ -76,7 +76,7 @@ void *atomic_cas(ATOMIC *self, void *cmp, void *value)
 	return old;
 #elif	defined(SYS_WIN)
 	return InterlockedCompareExchangePointer(
-		(volatile PVOID*)&self->value, value, cmp);
+		(volatile PVOID*) &self->value, value, cmp);
 #else
 	return __sync_val_compare_and_swap(&self->value, cmp, value);
 #endif
@@ -154,7 +154,7 @@ long long atomic_int64_cas(ATOMIC *self, long long cmp, long long n)
 	return old;
 #elif	defined(SYS_WIN)
 	return InterlockedCompareExchange64(
-		(volatile LONGLONG*)&self->value, n, cmp);
+		(volatile LONGLONG*) self->value, n, cmp);
 #else
 	return (long long) __sync_val_compare_and_swap(
 			(long long*) self->value, cmp, n);

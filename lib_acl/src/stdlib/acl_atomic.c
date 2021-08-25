@@ -118,7 +118,7 @@ void *acl_atomic_cas(ACL_ATOMIC *self, void *cmp, void *value)
 	return old;
 #elif	defined(ACL_WINDOWS)
 	return InterlockedCompareExchangePointer(
-		(volatile PVOID*)&self->value, value, cmp);
+		(volatile PVOID*) &self->value, value, cmp);
 #else
 	return __sync_val_compare_and_swap(&self->value, cmp, value);
 #endif
@@ -136,7 +136,7 @@ void *acl_atomic_xchg(ACL_ATOMIC *self, void *value)
 
 	return old;
 #elif	defined(ACL_WINDOWS)
-	return InterlockedExchangePointer((volatile PVOID*)&self->value, value);
+	return InterlockedExchangePointer((volatile PVOID*) &self->value, value);
 #else
 	return __sync_lock_test_and_set(&self->value, value);
 #endif
@@ -196,7 +196,7 @@ long long acl_atomic_int64_cas(ACL_ATOMIC *self, long long cmp, long long n)
 	return old;
 #elif	defined(ACL_WINDOWS)
 	return InterlockedCompareExchange64(
-		(volatile LONGLONG*)&self->value, n, cmp);
+		(volatile LONGLONG*) self->value, n, cmp);
 #else
 	return (long long) __sync_val_compare_and_swap(
 			(long long*) self->value, cmp, n);
