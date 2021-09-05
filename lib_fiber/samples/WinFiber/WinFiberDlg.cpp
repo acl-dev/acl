@@ -190,6 +190,7 @@ void CWinFiberDlg::InitFiber(void)
 	// 协程调试器，必须在界面消息引擎正常运行后才启动协程调度器！
 	acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
 	acl::fiber::winapi_hook();
+	//acl::fiber::schedule_with(acl::FIBER_EVENT_T_WMSG);
 	// HOOK ACL 库中的网络 IO 过程
 	//acl::fiber::acl_io_hook();
 }
@@ -223,7 +224,7 @@ void CWinFiberDlg::OnBnClickedOpenDos()
 void CWinFiberDlg::OnBnClickedListen()
 {
 	// TODO: 在此添加控件通知处理程序代码
-		if (m_fiberListen == NULL) {
+	if (m_fiberListen == NULL) {
 		UpdateData();
 		Uni2Str(m_listenIP, m_listenAddr);
 		m_listenAddr.format_append(":%d", m_listenPort);
@@ -323,7 +324,7 @@ void CWinFiberDlg::OnBnClickedCancel()
 	StopFiber();  // 停止协程调度过程
 }
 
-bool CWinFiberDlg::ResolveDNS(const char* name, std::vector<std::string>* addrs)
+static bool ResolveDNS(const char* name, std::vector<std::string>* addrs)
 {
 	struct hostent *ent = gethostbyname(name);
 	if (ent == NULL) {
@@ -345,9 +346,8 @@ bool CWinFiberDlg::ResolveDNS(const char* name, std::vector<std::string>* addrs)
 	return true;
 }
 
-void CWinFiberDlg::OnBnClickedAwaitDns()
+static void fiber_resolve(ACL_FIBER*, void*)
 {
-	// TODO: 在此添加控件通知处理程序代码
 	std::string name = "www.google.com";
 	std::vector<std::string> addrs;
 	go_wait[&]{
@@ -356,9 +356,44 @@ void CWinFiberDlg::OnBnClickedAwaitDns()
 		}
 	};
 
-	printf(">>>name=%s, result count=%zd\r\n", name.c_str(), addrs.size());
+	printf(">>>resolve done: name=%s, result count=%zd\r\n",
+		name.c_str(), addrs.size());
+
 	for (std::vector<std::string>::const_iterator cit = addrs.begin();
 		cit != addrs.end(); ++cit) {
 		printf(">>>ip=%s\r\n", (*cit).c_str());
 	}
+}
+
+static void fiber_one(ACL_FIBER*, void* ctx)
+{
+	acl::fiber_tbox<int>* box = (acl::fiber_tbox<int>*) ctx;
+	acl::fiber::delay(2000);
+	printf(">>>call box push\r\n");
+	box->push(NULL);
+}
+
+static void fiber_main(ACL_FIBER*, void*)
+{
+	acl::fiber_tbox<int> box;
+	acl_fiber_create(fiber_one, &box, 256000);
+	printf(">>>>call box pop\r\n");
+	(void) box.pop();
+	printf(">>fiber_main over!\r\n");
+}
+
+void CWinFiberDlg::OnBnClickedAwaitDns()
+{
+	// TODO: 在此添加控件通知处理程序代码
+#if 1
+	acl_fiber_create(fiber_resolve, NULL, 256000);
+	//fiber_resolve(NULL, NULL);
+#elif 1
+	acl_fiber_create(fiber_main, NULL, 256000);
+#else
+	acl::fiber_tbox<int> box;
+	acl_fiber_create(fiber_one, &box, 256000);
+	(void) box.pop();
+	printf(">>>fiber_one done\r\n");
+#endif
 }

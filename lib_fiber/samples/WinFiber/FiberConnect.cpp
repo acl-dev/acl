@@ -59,19 +59,23 @@ void CFiberConnect::doEcho(socket_t sock)
 	char buf[1024];
 	const char* s = "hello world\r\n";
 
-	for (int i = 0; i < m_count; i++) {
+	int i;
+	for (i = 0; i < m_count; i++) {
 		if (acl_fiber_send(sock, s, (int) strlen(s), 0) < 0) {
-			printf("send error %s\r\n", acl::last_serror());
+			printf("%s(%d): send error %s\r\n",
+				__FILE__, __LINE__, acl::last_serror());
 			break;
 		}
 		int n = acl_fiber_recv(sock, buf, sizeof(buf) - 1, 0);
 		if (n <= 0) {
-			printf("read error %s\r\n", acl::last_serror());
+			printf("%s(%d): read error %s\r\n",
+				__FILE__, __LINE__, acl::last_serror());
 			break;
 		}
-		buf[n];
+		buf[n] = 0;
+		//printf(">>read=%s\r\n", buf);
 	}
-	printf("Echo over, fd=%u\r\n", sock);
+	printf("Echo over, fd=%u, total=%d, count=%d\r\n", sock, m_count, i);
 }
 
 void CFiberConnect::doEcho(acl::socket_stream& conn)
@@ -79,18 +83,23 @@ void CFiberConnect::doEcho(acl::socket_stream& conn)
 	char buf[1024];
 	const char* s = "hello world\r\n";
 
-	for (int i = 0; i < m_count; i++) {
+	int i;
+	for (i = 0; i < m_count; i++) {
 		if (conn.write(s, strlen(s)) == -1) {
-			printf("write error %s\r\n", acl::last_serror());
+			printf("%s(%d): write error %s\r\n",
+				__FILE__, __LINE__, acl::last_serror());
 			break;
 		}
 		int n = conn.read(buf, sizeof(buf) - 1, false);
 		if (n == -1) {
-			printf("read error %s\r\n", acl::last_serror());
+			printf("%s(%d): read error %s\r\n",
+				__FILE__, __LINE__, acl::last_serror());
 			break;
 		}
 		buf[n] = 0;
+		//printf(">>read=%s\r\n", buf);
 	}
 
-	printf("Echo over, fd=%u\r\n", conn.sock_handle());
+	printf("%s(%d): echo over, fd=%u, total=%d, count=%d\r\n",
+		__FILE__, __LINE__, conn.sock_handle(), m_count, i);
 }

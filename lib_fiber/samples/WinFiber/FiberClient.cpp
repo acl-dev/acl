@@ -42,19 +42,21 @@ void CFiberClient::run(void)
 	m_conn->set_rw_timeout(10);
 	while (true) {
 		if (m_conn->read(buf, false) == false) {
-			printf("read error %s, count=%d\r\n",
-				acl::last_serror(), n);
+			printf("%s(%d): read error %s, count=%d\r\n",
+				__FILE__, __LINE__, acl::last_serror(), n);
 			break;
 		}
 		//printf("read: %s\r\n", buf.c_str());
 		if (m_conn->write(buf) == -1) {
-			printf("write error %s\r\n", acl::last_serror());
+			printf("%s(%d): server client: write error %s\r\n",
+				__FILE__, __LINE__, acl::last_serror());
 			break;
 		}
 		n++;
 	}
 	delete m_conn;
-	printf("curr id=%u, %u\r\n", get_id(), acl::fiber::self());
+	printf("%s(%d): delete fiber, curr id=%u, %u\r\n",
+		__FILE__, __LINE__, get_id(), acl::fiber::self());
 	delete this;
 #endif
 }

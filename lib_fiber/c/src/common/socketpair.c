@@ -5,6 +5,9 @@
 
 #ifdef SYS_WIN
 
+#include "../hook/hook.h"
+#include "../fiber.h"
+
 static socket_t inet_listen(const char *addr, int port, int backlog)
 {
 	socket_t s;
@@ -37,9 +40,53 @@ static socket_t inet_listen(const char *addr, int port, int backlog)
 	return s;
 }
 
+static int check(socket_t listener, socket_t client, socket_t result[2])
+{
+	int ret;
+	struct pollfd fds[2];
+
+	memset(fds, 0, sizeof(fds));
+
+	while (result[0] == INVALID_SOCKET || result[1] ==INVALID_SOCKET) {
+		int i = 0;
+		if (result[1] == INVALID_SOCKET) {
+			fds[i].fd      = listener;
+			fds[i].events  = POLLIN;
+			fds[i].revents = 0;
+			i++;
+		}
+
+		if (result[0] == INVALID_SOCKET) {
+			fds[i].fd      = client;
+			fds[i].events  = POLLOUT;
+			fds[i].revents = 0;
+		}
+
+		if (var_hook_sys_api) {
+			ret = (*sys_poll)(fds, 2, -1);
+		} else {
+			ret = WSAPoll(fds, 2, -1);
+		}
+
+		if (ret <= 0) {
+			msg_error("WSAPoll error: %s", last_serror());
+			return -1;
+		}
+
+		if ((fds[0].revents & POLLIN)) {
+			result[1] = accept(listener, NULL, 0);
+		}
+		if ((fds[1].revents & POLLOUT)) {
+			result[0] = client;
+		}
+	}
+
+	return 0;
+}
+
 int sane_socketpair(int domain, int type, int protocol, socket_t result[2])
 {
-	socket_t listener = inet_listen("127.0.0.1", 0, 10);
+	socket_t listener = inet_listen("127.0.0.1", 0, 10), client;
 	struct sockaddr_in addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
@@ -65,33 +112,46 @@ int sane_socketpair(int domain, int type, int protocol, socket_t result[2])
 		return -1;
 	}
 
-	result[0] = socket(AF_INET, SOCK_STREAM, 0);
-	if (result[0] == INVALID_SOCKET) {
+	client = socket(AF_INET, SOCK_STREAM, 0);
+	if (client == INVALID_SOCKET) {
 		msg_error("%s(%d), %s: create socket %s error %s",
 			__FILE__, __LINE__, __FUNCTION__, addr, last_serror());
 		CLOSE_SOCKET(listener);
 		return -1;
 	}
-	if (connect(result[0], sa, len) == -1) {
-		msg_error("%s(%d), %s: connect error %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
+
+	non_blocking(client, NON_BLOCKING);
+
+	if (!var_hook_sys_api) {
+		if (connect(client, sa, len) == -1) {
+			int err = acl_fiber_last_error();
+			if (err != FIBER_EINPROGRESS && !error_again(err)) {
+				msg_error("%s(%d), %s: connect error %s",
+					__FILE__, __LINE__, __FUNCTION__, last_serror());
+				CLOSE_SOCKET(listener);
+				CLOSE_SOCKET(client);
+				return -1;
+			}
+		}
+	} else if ((*sys_connect)(client, sa, len) == -1) {
+		int err = acl_fiber_last_error();
+		if (err != FIBER_EINPROGRESS && !error_again(err)) {
+			msg_error("%s(%d), %s: connect error %s",
+				__FILE__, __LINE__, __FUNCTION__, last_serror());
+			CLOSE_SOCKET(listener);
+			CLOSE_SOCKET(client);
+			return -1;
+		}
+	}
+
+	non_blocking(client, BLOCKING);
+
+	if (check(listener, client, result) == -1) {
 		CLOSE_SOCKET(listener);
-		CLOSE_SOCKET(result[0]);
-		result[0] = INVALID_SOCKET;
 		return -1;
 	}
 
-	result[1] = accept(listener, NULL, 0);
 	CLOSE_SOCKET(listener);
-
-	if (result[1] == INVALID_SOCKET) {
-		msg_error("%s(%d), %s: accept error %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-		CLOSE_SOCKET(result[0]);
-		result[0] = INVALID_SOCKET;
-		return -1;
-	}
-
 	tcp_nodelay(result[0], 1);
 	tcp_nodelay(result[1], 1);
 	return 0;

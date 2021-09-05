@@ -48,8 +48,6 @@ private:
 	void InitFiber();
 	void StopFiber();
 
-	bool ResolveDNS(const char* name, std::vector<std::string>* addrs);
-
 public:
 	void OnFiberConnectExit(acl::fiber* fb);
 
