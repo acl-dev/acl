@@ -346,7 +346,7 @@ static bool ResolveDNS(const char* name, std::vector<std::string>* addrs)
 	return true;
 }
 
-static void fiber_resolve(ACL_FIBER*, void*)
+static void fiber_resolve(void)
 {
 	std::string name = "www.google.com";
 	std::vector<std::string> addrs;
@@ -386,14 +386,10 @@ void CWinFiberDlg::OnBnClickedAwaitDns()
 {
 	// TODO: 在此添加控件通知处理程序代码
 #if 1
-	acl_fiber_create(fiber_resolve, NULL, 256000);
-	//fiber_resolve(NULL, NULL);
-#elif 1
-	acl_fiber_create(fiber_main, NULL, 256000);
+	go[] { fiber_resolve(); };
+
+	//fiber_resolve();
 #else
-	acl::fiber_tbox<int> box;
-	acl_fiber_create(fiber_one, &box, 256000);
-	(void) box.pop();
-	printf(">>>fiber_one done\r\n");
+	acl_fiber_create(fiber_main, NULL, 256000);
 #endif
 }
