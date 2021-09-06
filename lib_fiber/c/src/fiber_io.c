@@ -32,8 +32,10 @@ int var_maxfd = MAXFD;
 
 void acl_fiber_schedule_stop(void)
 {
-	fiber_io_check();
-	__thread_fiber->io_stop = 1;
+	if (__thread_fiber != NULL) {
+		fiber_io_check();
+		__thread_fiber->io_stop = 1;
+	}
 }
 
 #define RING_TO_FIBER(r) \
@@ -96,9 +98,8 @@ void fiber_io_check(void)
 {
 	if (__thread_fiber != NULL) {
 		if (__thread_fiber->ev_fiber == NULL) {
-			__thread_fiber->ev_fiber  = acl_fiber_create(
-				fiber_io_loop, __thread_fiber->event,
-				STACK_SIZE);
+			__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
+				__thread_fiber->event, STACK_SIZE);
 			__thread_fiber->io_count  = 0;
 			__thread_fiber->nsleeping = 0;
 			__thread_fiber->io_stop   = 0;
