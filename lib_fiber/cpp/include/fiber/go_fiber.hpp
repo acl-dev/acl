@@ -107,13 +107,13 @@ private:
  *
  *	// run in thread and wait for result
  *	go_wait_thread[&] { incr(n); };
- *      // here: n should be 101
+ *  // here: n should be 101
  *
  *	n = 200;
  *
  *	// run in fiber and wait for result
  *	go_wait_fiber[&] { incr(n); };
- *      // here: n should be 201
+ *  // here: n should be 201
  * }
  *
  * static test(void)

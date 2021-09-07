@@ -20,6 +20,11 @@ typedef int (WINAPI *listen_fn)(socket_t, int);
 typedef socket_t (WINAPI *accept_fn)(socket_t, struct sockaddr *, socklen_t *);
 typedef int (WINAPI *connect_fn)(socket_t, const struct sockaddr *, socklen_t);
 
+typedef int (WINAPI *getaddrinfo_fn)(const char *node, const char *service,
+	const struct addrinfo* hints, struct addrinfo **res);
+typedef void (WINAPI *freeaddrinfo_fn)(struct addrinfo *res);
+typedef struct hostent *(WINAPI *gethostbyname_fn)(const char *);
+
 #if defined(_WIN32) || defined(_WIN64)
 
 typedef int (WINAPI *recv_fn)(socket_t, char *, int, int);
@@ -67,11 +72,6 @@ typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
 typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
 # endif
 
-typedef int (*getaddrinfo_fn)(const char *node, const char *service,
-	const struct addrinfo* hints, struct addrinfo **res);
-typedef void (*freeaddrinfo_fn)(struct addrinfo *res);
-typedef struct hostent *(*gethostbyname_fn)(const char *);
-
 # ifndef __APPLE__
 typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 	size_t, struct hostent **, int *);
@@ -90,6 +90,9 @@ FIBER_API void WINAPI set_send_fn(send_fn *fn);
 FIBER_API void WINAPI set_sendto_fn(sendto_fn *fn);
 FIBER_API void WINAPI set_poll_fn(poll_fn *fn);
 FIBER_API void WINAPI set_select_fn(select_fn *fn);
+FIBER_API void WINAPI set_getaddrinfo_fn(getaddrinfo_fn *fn);
+FIBER_API void WINAPI set_freeaddrinfo_fn(freeaddrinfo_fn *fn);
+FIBER_API void WINAPI set_gethostbyname_fn(gethostbyname_fn *fn);
 
 #if defined(_WIN32) || defined(_WIN64)
 FIBER_API void WINAPI set_WSARecv_fn(WSARecv_fn *fn);
@@ -110,6 +113,10 @@ extern send_fn              *sys_send;
 extern sendto_fn            *sys_sendto;
 extern poll_fn              *sys_poll;
 extern select_fn            *sys_select;
+
+extern getaddrinfo_fn       *sys_getaddrinfo;
+extern freeaddrinfo_fn      *sys_freeaddrinfo;
+extern gethostbyname_fn     *sys_gethostbyname;
 
 #if defined(_WIN32) || defined(_WIN64)
 
@@ -138,10 +145,6 @@ extern epoll_create_fn		*sys_epoll_create;
 extern epoll_wait_fn        *sys_epoll_wait;
 extern epoll_ctl_fn         *sys_epoll_ctl;
 # endif
-
-extern getaddrinfo_fn       *sys_getaddrinfo;
-extern freeaddrinfo_fn      *sys_freeaddrinfo;
-extern gethostbyname_fn     *sys_gethostbyname;
 
 # ifndef __APPLE__
 extern gethostbyname_r_fn   *sys_gethostbyname_r;

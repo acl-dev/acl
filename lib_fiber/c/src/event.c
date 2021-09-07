@@ -41,7 +41,7 @@ EVENT *event_create(int size)
 		break;
 	case FIBER_EVENT_WMSG:
 #ifdef	HAS_WMSG
-		ev = event_wmsg_create(1024);
+		ev = event_wmsg_create(size);
 #else
 		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
 #endif

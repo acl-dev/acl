@@ -23,6 +23,10 @@ poll_fn       __poll       = WSAPoll;
 WSARecv_fn    __WSARecv    = WSARecv;
 WSAAccept_fn  __WSAAccept  = WSAAccept;
 
+getaddrinfo_fn   __getaddrinfo   = getaddrinfo;
+freeaddrinfo_fn  __freeaddrinfo  = freeaddrinfo;
+gethostbyname_fn __gethostbyname = gethostbyname;
+
 #define HOOK_API(from, to, action) do { \
 	LONG ret = DetourAttach(&from, to); \
 	if (ret != 0) { \
@@ -52,6 +56,9 @@ static void winapi_hook_once(void) {
 	HOOK_API(__sendto, acl_fiber_sendto, set_sendto_fn);
 	HOOK_API(__poll, acl_fiber_poll, set_poll_fn);
 	HOOK_API(__select, acl_fiber_select, set_select_fn);
+	HOOK_API(__getaddrinfo, acl_fiber_getaddrinfo, set_getaddrinfo_fn);
+	HOOK_API(__freeaddrinfo, acl_fiber_freeaddrinfo, set_freeaddrinfo_fn);
+	HOOK_API(__gethostbyname, acl_fiber_gethostbyname, set_gethostbyname_fn);
 
 #ifdef SYS_WSA_API
 	HOOK_API(__WSARecv, acl_fiber_WSARecv, set_WSARecv_fn);

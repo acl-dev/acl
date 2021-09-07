@@ -1,9 +1,6 @@
 #include "stdafx.h"
 #include "common.h"
 
-//#ifdef SYS_UNIX
-#if 1
-
 #include "fiber/libfiber.h"
 #include "fiber/fiber_cond.h"
 #include "common/pthread_patch.h"
@@ -68,21 +65,21 @@ static void __ll_unlock(ACL_FIBER_COND *cond)
 	}
 }
 
-#define FBASE_DETACH_FREE do {             \
-	__ll_lock(cond);                   \
-	ring_detach(&fbase->event_waiter); \
-	__ll_unlock(cond);                 \
-	fbase_event_close(fbase);          \
-	if (fbase->flag & FBASE_F_BASE) {  \
-		fbase_free(fbase);         \
-	}                                  \
+#define FBASE_DETACH_FREE do {         \
+    __ll_lock(cond);                   \
+    ring_detach(&fbase->event_waiter); \
+    __ll_unlock(cond);                 \
+    fbase_event_close(fbase);          \
+    if (fbase->flag & FBASE_F_BASE) {  \
+        fbase_free(fbase);             \
+    }                                  \
 } while (0)
 
-#define FBASE_FREE do {                    \
-	fbase_event_close(fbase);          \
-	if (fbase->flag & FBASE_F_BASE) {  \
-		fbase_free(fbase);         \
-	}                                  \
+#define FBASE_FREE do {                \
+    fbase_event_close(fbase);          \
+    if (fbase->flag & FBASE_F_BASE) {  \
+        fbase_free(fbase);             \
+    }                                  \
 } while (0)
 
 int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event)
@@ -214,4 +211,3 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	return 0;
 }
 
-#endif // SYS_UNIX

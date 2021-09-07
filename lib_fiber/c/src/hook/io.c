@@ -25,11 +25,7 @@ int close(socket_t fd)
 }
 #endif
 
-#if defined(SYS_WIN)
 int WINAPI acl_fiber_close(socket_t fd)
-#else
-int acl_fiber_close(socket_t fd)
-#endif
 {
 	int ret, closed;
 	if (fd == INVALID_SOCKET) {

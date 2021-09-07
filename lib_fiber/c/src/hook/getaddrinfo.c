@@ -5,10 +5,6 @@
 #include "fiber.h"
 #include "hook.h"
 
-#ifdef SYS_UNIX
-
-/****************************************************************************/
-
 static struct addrinfo *create_addrinfo(const char *ip, short port,
 	int iptype, int socktype, int flags)
 {
@@ -109,7 +105,7 @@ static struct addrinfo *check_local(const char *node, const char *service,
 	return NULL;
 }
 
-int acl_fiber_getaddrinfo(const char *node, const char *service,
+int WINAPI acl_fiber_getaddrinfo(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res)
 {
 	struct addrinfo hints_tmp;
@@ -164,7 +160,7 @@ int acl_fiber_getaddrinfo(const char *node, const char *service,
 	return 0;
 }
 
-void acl_fiber_freeaddrinfo(struct addrinfo *res)
+void WINAPI acl_fiber_freeaddrinfo(struct addrinfo *res)
 {
 	if (sys_freeaddrinfo == NULL) {
 		hook_once();
@@ -179,6 +175,8 @@ void acl_fiber_freeaddrinfo(struct addrinfo *res)
 
 	resolver_freeaddrinfo(res);
 }
+
+#ifdef SYS_UNIX
 
 int getaddrinfo(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res)

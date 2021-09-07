@@ -46,6 +46,14 @@ FIBER_API socket_t WSAAPI acl_fiber_WSAAccept(
     LPINT addrlen,
     LPCONDITIONPROC lpfnCondition,
     DWORD_PTR dwCallbackData);
+
+FIBER_API struct hostent * WINAPI acl_fiber_gethostbyname(const char *name);
+FIBER_API int WINAPI acl_fiber_gethostbyname_r(const char *name, struct hostent *ent,
+	char *buf, size_t buflen, struct hostent **result, int *h_errnop);
+FIBER_API int WINAPI acl_fiber_getaddrinfo(const char *node, const char *service,
+	const struct addrinfo* hints, struct addrinfo **res);
+FIBER_API void WINAPI acl_fiber_freeaddrinfo(struct addrinfo *res);
+
 #else
 
 FIBER_API socket_t acl_fiber_socket(int domain, int type, int protocol);

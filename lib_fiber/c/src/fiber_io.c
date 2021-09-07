@@ -25,7 +25,7 @@ static __thread FIBER_TLS *__thread_fiber = NULL;
 
 static void fiber_io_loop(ACL_FIBER *fiber, void *ctx);
 
-#define MAXFD		1024
+#define MAXFD		10240
 #define STACK_SIZE	819200
 
 int var_maxfd = MAXFD;

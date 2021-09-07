@@ -35,6 +35,15 @@ poll_fn       *sys_poll                     = NULL;
 select_fn     __sys_select                  = NULL;
 select_fn     *sys_select                   = NULL;
 
+getaddrinfo_fn   __sys_getaddrinfo          = NULL;
+getaddrinfo_fn   *sys_getaddrinfo           = NULL;
+
+freeaddrinfo_fn  __sys_freeaddrinfo         = NULL;
+freeaddrinfo_fn  *sys_freeaddrinfo          = NULL;
+
+gethostbyname_fn __sys_gethostbyname        = NULL;
+gethostbyname_fn *sys_gethostbyname         = NULL;
+
 #ifdef SYS_UNIX
 
 sleep_fn    __sys_sleep                     = NULL;
@@ -76,15 +85,6 @@ epoll_wait_fn   *sys_epoll_wait             = NULL;
 epoll_ctl_fn    __sys_epoll_ctl             = NULL;
 epoll_ctl_fn    *sys_epoll_ctl              = NULL;
 # endif
-
-getaddrinfo_fn   __sys_getaddrinfo          = NULL;
-getaddrinfo_fn   *sys_getaddrinfo           = NULL;
-
-freeaddrinfo_fn  __sys_freeaddrinfo         = NULL;
-freeaddrinfo_fn  *sys_freeaddrinfo          = NULL;
-
-gethostbyname_fn __sys_gethostbyname        = NULL;
-gethostbyname_fn *sys_gethostbyname         = NULL;
 
 # ifndef __APPLE__
 gethostbyname_r_fn __sys_gethostbyname_r    = NULL;
@@ -154,6 +154,21 @@ void WINAPI set_poll_fn(poll_fn *fn)
 void WINAPI set_select_fn(select_fn *fn)
 {
 	sys_select = fn;
+}
+
+void WINAPI set_getaddrinfo_fn(getaddrinfo_fn *fn)
+{
+	sys_getaddrinfo = fn;
+}
+
+void WINAPI set_freeaddrinfo_fn(freeaddrinfo_fn *fn)
+{
+	sys_freeaddrinfo = fn;
+}
+
+void WINAPI set_gethostbyname_fn(gethostbyname_fn *fn)
+{
+	sys_gethostbyname = fn;
 }
 
 #if defined(SYS_WIN)
@@ -233,16 +248,16 @@ static void hook_api(void)
 	__sys_close     = closesocket;
 	sys_close       = &__sys_close;
 
-	__sys_recv      = (recv_fn) recv;
+	__sys_recv      = recv;
 	sys_recv        = &__sys_recv;
 
-	__sys_recvfrom  = (recvfrom_fn) recvfrom;
+	__sys_recvfrom  = recvfrom;
 	sys_recvfrom    = &__sys_recvfrom;
 
-	__sys_send      = (send_fn) send;
+	__sys_send      = send;
 	sys_send        = &__sys_send;
 
-	__sys_sendto    = (sendto_fn) sendto;
+	__sys_sendto    = sendto;
 	sys_sendto      = &__sys_sendto;
 
 	__sys_poll      = WSAPoll;
@@ -251,11 +266,20 @@ static void hook_api(void)
 	__sys_select    = select;
 	sys_select      = &__sys_select;
 
-	__sys_WSARecv   = (WSARecv_fn) WSARecv;
+	__sys_WSARecv   = WSARecv;
 	sys_WSARecv     = &__sys_WSARecv;
 
-	__sys_WSAAccept = (WSAAccept_fn) WSAAccept;
+	__sys_WSAAccept = WSAAccept;
 	sys_WSAAccept   = &__sys_WSAAccept;
+
+	__sys_getaddrinfo   = getaddrinfo;
+	sys_getaddrinfo     = &__sys_getaddrinfo;
+
+	__sys_freeaddrinfo  = freeaddrinfo;
+	sys_freeaddrinfo    = &__sys_freeaddrinfo;
+
+	__sys_gethostbyname = gethostbyname;
+	sys_gethostbyname   = &__sys_gethostbyname;
 #endif
 }
 

@@ -324,6 +324,34 @@ void CWinFiberDlg::OnBnClickedCancel()
 	StopFiber();  // 停止协程调度过程
 }
 
+static void GetDNSAddrs(void)
+{
+	unsigned long len = 0;
+	DWORD ret = GetNetworkParams(NULL, &len);
+	if (ret != ERROR_BUFFER_OVERFLOW) {
+		printf("invalid ret\r\n");
+		return;
+	}
+
+	FIXED_INFO *info = (FIXED_INFO*) malloc(len);
+	ret = GetNetworkParams(info, &len);
+	if (ret != NO_ERROR) {
+		printf("can't get dns info, ret=%d\r\n", ret);
+		free(info);
+		return;
+	}
+	printf("len=%lu\n", len);
+	printf("host=%s\r\n", info->HostName);
+
+	IP_ADDR_STRING *addr = &info->DnsServerList;
+	while (addr) {
+		printf(">>%s\r\n", addr->IpAddress.String);
+		addr = addr->Next;
+	}
+
+	free(info);
+}
+
 static bool ResolveDNS(const char* name, std::vector<std::string>* addrs)
 {
 	struct hostent *ent = gethostbyname(name);
@@ -343,6 +371,7 @@ static bool ResolveDNS(const char* name, std::vector<std::string>* addrs)
 		}
 	}
 
+	GetDNSAddrs();
 	return true;
 }
 
