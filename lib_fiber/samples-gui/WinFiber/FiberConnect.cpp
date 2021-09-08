@@ -43,7 +43,7 @@ void CFiberConnect::run(void)
 	acl_fiber_close(m_sock);
 #else
 	acl::socket_stream conn;
-	if (conn.open(m_serverAddr, 2, 0) == false) {
+	if (!conn.open(m_serverAddr, 2, 0)) {
 		printf("connect %s error %s\r\n", m_serverAddr.c_str(),
 			acl::last_serror());
 	} else {
@@ -73,7 +73,7 @@ void CFiberConnect::doEcho(socket_t sock)
 			break;
 		}
 		buf[n] = 0;
-		//printf(">>read=%s\r\n", buf);
+		printf(">>read=%s\r\n", buf);
 	}
 	printf("Echo over, fd=%u, total=%d, count=%d\r\n", sock, m_count, i);
 }
@@ -82,6 +82,11 @@ void CFiberConnect::doEcho(acl::socket_stream& conn)
 {
 	char buf[1024];
 	const char* s = "hello world\r\n";
+
+	int delay = 100;
+	printf("Begin sleep %d ms\r\n", delay);
+	acl::fiber::delay(delay);
+	printf("Begin do echo ...\r\n");
 
 	int i;
 	for (i = 0; i < m_count; i++) {

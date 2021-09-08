@@ -54,9 +54,9 @@ END_MESSAGE_MAP()
 CWinFiberDlg::CWinFiberDlg(CWnd* pParent /*=nullptr*/)
 : CDialogEx(IDD_WINFIBER_DIALOG, pParent)
 , m_dosFp(NULL)
-, m_listenPort(9001)
+, m_listenPort(9101)
 , m_listenIP(_T("127.0.0.1"))
-, m_listenAddr("127.0.0.1:9001")
+, m_listenAddr("127.0.0.1:9101")
 , m_fiberListen(NULL)
 , m_httpdAddr("127.0.0.1:8088")
 , m_cocurrent(100)
@@ -91,6 +91,7 @@ BEGIN_MESSAGE_MAP(CWinFiberDlg, CDialogEx)
 	ON_BN_CLICKED(IDOK, &CWinFiberDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CWinFiberDlg::OnBnClickedCancel)
 ON_BN_CLICKED(IDC_AWAIT_DNS, &CWinFiberDlg::OnBnClickedAwaitDns)
+ON_BN_CLICKED(IDC_RESOLVE, &CWinFiberDlg::OnBnClickedResolve)
 END_MESSAGE_MAP()
 
 // CWinFiberDlg 消息处理程序
@@ -269,12 +270,16 @@ void CWinFiberDlg::OnBnClickedConnect()
 	printf("Begin connect %s with cocurrent=%d, count=%d\r\n",
 		m_listenAddr.c_str(), m_cocurrent, m_count);
 
-	for (UINT i = 0; i < m_cocurrent; i++) {
-		acl::fiber* fb = new CFiberConnect(
-			*this, m_listenAddr.c_str(), m_count);
-		m_clientFibers.insert(fb);
-		fb->start();
-	}
+	go[&] {
+		for (UINT i = 0; i < m_cocurrent; i++) {
+			acl::fiber* fb = new CFiberConnect(
+				*this, m_listenAddr.c_str(), m_count);
+			m_clientFibers.insert(fb);
+			fb->start();
+			acl::fiber::delay(10);
+			printf("One client fiber started!\r\n");
+		}
+	};
 }
 
 void CWinFiberDlg::OnFiberConnectExit(acl::fiber* fb)
@@ -324,34 +329,6 @@ void CWinFiberDlg::OnBnClickedCancel()
 	StopFiber();  // 停止协程调度过程
 }
 
-static void GetDNSAddrs(void)
-{
-	unsigned long len = 0;
-	DWORD ret = GetNetworkParams(NULL, &len);
-	if (ret != ERROR_BUFFER_OVERFLOW) {
-		printf("invalid ret\r\n");
-		return;
-	}
-
-	FIXED_INFO *info = (FIXED_INFO*) malloc(len);
-	ret = GetNetworkParams(info, &len);
-	if (ret != NO_ERROR) {
-		printf("can't get dns info, ret=%d\r\n", ret);
-		free(info);
-		return;
-	}
-	printf("len=%lu\n", len);
-	printf("host=%s\r\n", info->HostName);
-
-	IP_ADDR_STRING *addr = &info->DnsServerList;
-	while (addr) {
-		printf(">>%s\r\n", addr->IpAddress.String);
-		addr = addr->Next;
-	}
-
-	free(info);
-}
-
 static bool ResolveDNS(const char* name, std::vector<std::string>* addrs)
 {
 	struct hostent *ent = gethostbyname(name);
@@ -371,7 +348,6 @@ static bool ResolveDNS(const char* name, std::vector<std::string>* addrs)
 		}
 	}
 
-	GetDNSAddrs();
 	return true;
 }
 
@@ -379,7 +355,7 @@ static void fiber_resolve(void)
 {
 	std::string name = "www.google.com";
 	std::vector<std::string> addrs;
-	go_wait[&]{
+	go_wait[&] {
 		if (!ResolveDNS(name.c_str(), &addrs)) {
 			printf(">>>resolve DNS error, name=%s\r\n", name.c_str());
 		}
@@ -421,4 +397,89 @@ void CWinFiberDlg::OnBnClickedAwaitDns()
 #else
 	acl_fiber_create(fiber_main, NULL, 256000);
 #endif
+}
+
+void CWinFiberDlg::OnBnClickedResolve()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	static std::string name = "www.baidu.com";
+
+	go[&] {
+		struct addrinfo *res0, *res;
+		int ret = getaddrinfo(name.c_str(), NULL, NULL, &res0) ;
+		if (ret != 0) {
+			printf("getaddrinfo error=%d, %s, domain=%s\r\n",
+				ret, gai_strerrorA(ret), name.c_str());
+			if (res0) {
+				freeaddrinfo(res0);
+			}
+			return;
+		}
+
+		printf("\r\n");
+		printf("getaddrinfo: domain=%s\r\n", name.c_str());
+		for (res = res0; res; res = res->ai_next) {
+			const void *addr;
+			char ip[64];
+			if (res->ai_family == AF_INET) {
+				const struct sockaddr_in *in =
+					(const struct sockaddr_in*) res->ai_addr;
+				addr = (const void*) &in->sin_addr;
+			} else if (res->ai_family == AF_INET6) {
+				const struct sockaddr_in6 *in =
+					(const struct sockaddr_in6*) res->ai_addr;
+				addr = (const void*) &in->sin6_addr;
+			} else {
+				printf("Unknown ai_family=%d\r\n", res->ai_family);
+				continue;
+			}
+
+			if (inet_ntop(res->ai_family, addr, ip, sizeof(ip)) != NULL) {
+				printf(">>ip=%s\r\n", ip);
+			} else {
+				printf(">>inet_ntop error=%s\r\n", acl::last_serror());
+			}
+		}
+	};
+
+	go[&] {
+		struct hostent *ent = gethostbyname(name.c_str());
+		if (ent == NULL) {
+			printf("gethostbyname error, domain=%s\r\n", name.c_str());
+			return;
+		}
+
+		printf("\r\n");
+		printf("gethostbyname: domain=%s\r\n", name.c_str());
+		printf(">>h_name=%s, h_length=%d, h_addrtype=%d\r\n",
+			ent->h_name, ent->h_length, ent->h_addrtype);
+		for (int i = 0; ent->h_addr_list[i]; i++) {
+			char *addr = ent->h_addr_list[i];
+			char ip[64];
+			const char *ptr = inet_ntop(ent->h_addrtype, addr, ip, sizeof(ip));
+			if (ptr) {
+				printf(">>ip=%s\r\n", ip);
+			} else {
+				printf(">>inet_ntop error\r\n");
+			}
+		}
+	};
+
+	go[&] {
+		std::vector<std::string> addrs;
+		go_wait[&] {
+			if (!ResolveDNS(name.c_str(), &addrs)) {
+				printf("ResolveDNS error\r\n");
+			}
+		};
+
+		printf("\r\n");
+		printf(">>>resolve done: name=%s, result count=%zd\r\n",
+			name.c_str(), addrs.size());
+
+		for (std::vector<std::string>::const_iterator cit = addrs.begin();
+			 cit != addrs.end(); ++cit) {
+			printf(">>>ip=%s\r\n", (*cit).c_str());
+		}
+	};
 }
