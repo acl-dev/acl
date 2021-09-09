@@ -55,9 +55,100 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 
 #elif defined(ACL_WINDOWS)
 
+# if defined(ACL_HAS_POLL)
+
+static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
+{
+	int ret;
+	struct pollfd fds[2];
+
+	while (result[0] == ACL_SOCKET_INVALID || result[1] ==ACL_SOCKET_INVALID) {
+		int i = 0;
+		if (result[1] == ACL_SOCKET_INVALID) {
+			fds[i].fd      = listener;
+			fds[i].events  = POLLIN;
+			fds[i].revents = 0;
+			i++;
+		}
+
+		if (result[0] == ACL_SOCKET_INVALID) {
+			fds[i].fd      = client;
+			fds[i].events  = POLLOUT;
+			fds[i].revents = 0;
+		}
+
+		ret = WSAPoll(fds, 2, 10);
+		if (ret <= 0) {
+			acl_msg_error("WSAPoll error: %s, ret=%d", acl_last_serror(), ret);
+			return -1;
+		}
+
+		if ((fds[0].revents & POLLIN)) {
+			result[1] = accept(listener, NULL, 0);
+		}
+		if ((fds[1].revents & POLLOUT)) {
+			result[0] = client;
+		}
+	}
+
+	return 0;
+}
+
+# else
+
+static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
+{
+    int ret;
+    fd_set rmask, wmask, xmask;
+
+	while (result[0] == ACL_SOCKET_INVALID || result[1] ==ACL_SOCKET_INVALID) {
+        FD_ZERO(&rmask);
+        FD_ZERO(&wmask);
+        FD_ZERO(&xmask);
+
+        if (result[1] == ACL_SOCKET_INVALID) {
+            FD_SET(listener, &rmask);
+            FD_SET(listener, &xmask);
+        }
+
+        if (result[0] == ACL_SOCKET_INVALID) {
+            FD_SET(client, &wmask);
+            FD_SET(client, &xmask);
+        }
+
+        ret = select(2, &rmask, &wmask, &xmask, NULL);
+        if (ret <= 0) {
+            acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
+            return -1;
+        }
+
+        if (FD_ISSET(listener, &xmask)) {
+            acl_msg_error("listener exception");
+            return -1;
+        }
+
+        if (FD_ISSET(client, &xmask)) {
+            acl_msg_error("client exception");
+            return -1;
+        }
+
+        if (FD_ISSET(listener, &rmask)) {
+            result[1] = accept(listener, NULL, 0);
+        }
+
+        if (FD_ISSET(client, &wmask)) {
+            result[0] = client;
+        }
+    }
+
+    return 0;
+}
+
+# endif /* ACL_HAS_POLL */
+
 int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2])
 {
-	ACL_SOCKET listener = acl_inet_listen("127.0.0.1:0", 10, 0);
+	ACL_SOCKET listener = acl_inet_listen("127.0.0.1:0", 10, 0), client;
 	char addr[64];
 
 	(void) domain;
@@ -79,33 +170,22 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 		return -1;
 	}
 
-	result[0] = acl_inet_connect(addr, ACL_BLOCKING, 2);
-	if (result[0] == ACL_SOCKET_INVALID) {
+	client = acl_inet_connect(addr, ACL_NON_BLOCKING, 0);
+	if (client == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: connect %s error %s",
 			__FILE__, __LINE__, __FUNCTION__, addr, acl_last_serror());
 		acl_socket_close(listener);
 		return -1;
 	}
 
-	if (acl_read_wait(listener, 2) < 0) {
-		acl_msg_error("%s(%dP, %s: listener wait timeout",
-			__FILE__, __LINE__, __FUNCTION__);
-		acl_socket_close(result[0]);
-		acl_socket_close(listener);
-		return -1;
-	}
+    acl_non_blocking(client, ACL_BLOCKING);
 
-	result[1] = acl_inet_accept(listener);
+    if (check(listener, client, result) == -1) {
+        acl_socket_close(listener);
+        return -1;
+    }
+
 	acl_socket_close(listener);
-
-	if (result[1] == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d), %s: accept error %s",
-			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
-		acl_socket_close(result[0]);
-		result[0] = ACL_SOCKET_INVALID;
-		return -1;
-	}
-
 	acl_tcp_set_nodelay(result[0]);
 	acl_tcp_set_nodelay(result[1]);
 	return 0;

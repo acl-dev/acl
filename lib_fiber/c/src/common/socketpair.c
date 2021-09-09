@@ -40,12 +40,12 @@ static socket_t inet_listen(const char *addr, int port, int backlog)
 	return s;
 }
 
+#if defined(HAS_POLL)
+
 static int check(socket_t listener, socket_t client, socket_t result[2])
 {
 	int ret;
 	struct pollfd fds[2];
-
-	memset(fds, 0, sizeof(fds));
 
 	while (result[0] == INVALID_SOCKET || result[1] ==INVALID_SOCKET) {
 		int i = 0;
@@ -63,9 +63,9 @@ static int check(socket_t listener, socket_t client, socket_t result[2])
 		}
 
 		if (var_hook_sys_api) {
-			ret = (*sys_poll)(fds, 2, -1);
+			ret = (*sys_poll)(fds, 2, 10);
 		} else {
-			ret = WSAPoll(fds, 2, -1);
+			ret = WSAPoll(fds, 2, 10);
 		}
 
 		if (ret <= 0) {
@@ -83,6 +83,58 @@ static int check(socket_t listener, socket_t client, socket_t result[2])
 
 	return 0;
 }
+
+#else
+
+static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
+{
+    int ret;
+    fd_set rmask, wmask, xmask;
+
+	while (result[0] == ACL_SOCKET_INVALID || result[1] ==ACL_SOCKET_INVALID) {
+        FD_ZERO(&rmask);
+        FD_ZERO(&wmask);
+        FD_ZERO(&xmask);
+
+        if (result[1] == ACL_SOCKET_INVALID) {
+            FD_SET(listener, &rmask);
+            FD_SET(listener, &xmask);
+        }
+
+        if (result[0] == ACL_SOCKET_INVALID) {
+            FD_SET(client, &wmask);
+            FD_SET(client, &xmask);
+        }
+
+        ret = select(2, &rmask, &wmask, &xmask, NULL);
+        if (ret <= 0) {
+            acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
+            return -1;
+        }
+
+        if (FD_ISSET(listener, &xmask)) {
+            acl_msg_error("listener exception");
+            return -1;
+        }
+
+        if (FD_ISSET(client, &xmask)) {
+            acl_msg_error("client exception");
+            return -1;
+        }
+
+        if (FD_ISSET(listener, &rmask)) {
+            result[1] = accept(listener, NULL, 0);
+        }
+
+        if (FD_ISSET(client, &wmask)) {
+            result[0] = client;
+        }
+    }
+
+    return 0;
+}
+
+#endif /* HAS_POLL */
 
 int sane_socketpair(int domain, int type, int protocol, socket_t result[2])
 {
