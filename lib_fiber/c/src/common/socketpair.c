@@ -63,9 +63,9 @@ static int check(socket_t listener, socket_t client, socket_t result[2])
 		}
 
 		if (var_hook_sys_api) {
-			ret = (*sys_poll)(fds, 2, 10);
+			ret = (*sys_poll)(fds, 2, 10000);
 		} else {
-			ret = WSAPoll(fds, 2, 10);
+			ret = WSAPoll(fds, 2, 10000);
 		}
 
 		if (ret <= 0) {
@@ -86,39 +86,42 @@ static int check(socket_t listener, socket_t client, socket_t result[2])
 
 #else
 
-static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
+static int check(socket_t listener, socket_t client, socket_t result[2])
 {
     int ret;
+	struct timeval tv;
     fd_set rmask, wmask, xmask;
 
-	while (result[0] == ACL_SOCKET_INVALID || result[1] ==ACL_SOCKET_INVALID) {
+	while (result[0] == INVALID_SOCKET || result[1] ==INVALID_SOCKET) {
         FD_ZERO(&rmask);
         FD_ZERO(&wmask);
         FD_ZERO(&xmask);
+		tv.tv_usec = 10;
+		tv.tv_sec  = 0;
 
-        if (result[1] == ACL_SOCKET_INVALID) {
+        if (result[1] == INVALID_SOCKET) {
             FD_SET(listener, &rmask);
             FD_SET(listener, &xmask);
         }
 
-        if (result[0] == ACL_SOCKET_INVALID) {
+        if (result[0] == INVALID_SOCKET) {
             FD_SET(client, &wmask);
             FD_SET(client, &xmask);
         }
 
         ret = select(2, &rmask, &wmask, &xmask, NULL);
         if (ret <= 0) {
-            acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
+            msg_error("select error: %s, ret=%d", last_serror(), ret);
             return -1;
         }
 
         if (FD_ISSET(listener, &xmask)) {
-            acl_msg_error("listener exception");
+            msg_error("listener exception");
             return -1;
         }
 
         if (FD_ISSET(client, &xmask)) {
-            acl_msg_error("client exception");
+            msg_error("client exception");
             return -1;
         }
 

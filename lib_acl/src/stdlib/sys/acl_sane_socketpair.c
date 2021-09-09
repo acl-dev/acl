@@ -77,7 +77,7 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 			fds[i].revents = 0;
 		}
 
-		ret = WSAPoll(fds, 2, 10);
+		ret = WSAPoll(fds, 2, 10000);
 		if (ret <= 0) {
 			acl_msg_error("WSAPoll error: %s, ret=%d", acl_last_serror(), ret);
 			return -1;
@@ -99,12 +99,15 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 {
     int ret;
+	struct timeval tv;
     fd_set rmask, wmask, xmask;
 
 	while (result[0] == ACL_SOCKET_INVALID || result[1] ==ACL_SOCKET_INVALID) {
         FD_ZERO(&rmask);
         FD_ZERO(&wmask);
         FD_ZERO(&xmask);
+		tv.tv_usec = 10;
+		tv.tv_sec  = 0;
 
         if (result[1] == ACL_SOCKET_INVALID) {
             FD_SET(listener, &rmask);
