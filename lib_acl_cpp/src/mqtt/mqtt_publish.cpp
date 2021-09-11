@@ -101,12 +101,12 @@ static struct {
 	int status;
 	int (mqtt_publish::*handler)(const char*, int);
 } handlers[] = {
-	{ MQTT_STAT_HDR_VAR,	&mqtt_publish::update_header_var	},
+	{ MQTT_STAT_HDR_VAR,	&mqtt_publish::update_header_var },
 
-	{ MQTT_STAT_TOPIC_LEN,	&mqtt_publish::update_topic_len		},
-	{ MQTT_STAT_TOPIC_VAL,	&mqtt_publish::update_topic_val		},
-	{ MQTT_STAT_PKTID,	&mqtt_publish::update_pktid	},
-	{ MQTT_STAT_PAYLOAD,	&mqtt_publish::update_payload		},
+	{ MQTT_STAT_TOPIC_LEN,	&mqtt_publish::update_topic_len  },
+	{ MQTT_STAT_TOPIC_VAL,	&mqtt_publish::update_topic_val  },
+	{ MQTT_STAT_PKTID,	&mqtt_publish::update_pktid      },
+	{ MQTT_STAT_PAYLOAD,	&mqtt_publish::update_payload    },
 };
 
 int mqtt_publish::update(const char* data, int dlen) {

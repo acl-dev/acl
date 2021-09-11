@@ -98,53 +98,53 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 
 static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 {
-    int ret;
+	int ret;
 	struct timeval tv;
-    fd_set rmask, wmask, xmask;
+	fd_set rmask, wmask, xmask;
 
 	while (result[0] == ACL_SOCKET_INVALID || result[1] ==ACL_SOCKET_INVALID) {
-        FD_ZERO(&rmask);
-        FD_ZERO(&wmask);
-        FD_ZERO(&xmask);
+		FD_ZERO(&rmask);
+		FD_ZERO(&wmask);
+		FD_ZERO(&xmask);
 		tv.tv_usec = 10;
 		tv.tv_sec  = 0;
 
-        if (result[1] == ACL_SOCKET_INVALID) {
-            FD_SET(listener, &rmask);
-            FD_SET(listener, &xmask);
-        }
+		if (result[1] == ACL_SOCKET_INVALID) {
+			FD_SET(listener, &rmask);
+			FD_SET(listener, &xmask);
+		}
 
-        if (result[0] == ACL_SOCKET_INVALID) {
-            FD_SET(client, &wmask);
-            FD_SET(client, &xmask);
-        }
+		if (result[0] == ACL_SOCKET_INVALID) {
+			FD_SET(client, &wmask);
+			FD_SET(client, &xmask);
+		}
 
-        ret = select(2, &rmask, &wmask, &xmask, NULL);
-        if (ret <= 0) {
-            acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
-            return -1;
-        }
+		ret = select(2, &rmask, &wmask, &xmask, NULL);
+		if (ret <= 0) {
+			acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
+			return -1;
+		}
 
-        if (FD_ISSET(listener, &xmask)) {
-            acl_msg_error("listener exception");
-            return -1;
-        }
+		if (FD_ISSET(listener, &xmask)) {
+			acl_msg_error("listener exception");
+			return -1;
+		}
 
-        if (FD_ISSET(client, &xmask)) {
-            acl_msg_error("client exception");
-            return -1;
-        }
+		if (FD_ISSET(client, &xmask)) {
+			acl_msg_error("client exception");
+			return -1;
+		}
 
-        if (FD_ISSET(listener, &rmask)) {
-            result[1] = accept(listener, NULL, 0);
-        }
+		if (FD_ISSET(listener, &rmask)) {
+			result[1] = accept(listener, NULL, 0);
+		}
 
-        if (FD_ISSET(client, &wmask)) {
-            result[0] = client;
-        }
-    }
+		if (FD_ISSET(client, &wmask)) {
+			result[0] = client;
+		}
+	}
 
-    return 0;
+	return 0;
 }
 
 # endif /* ACL_HAS_POLL */
@@ -181,12 +181,12 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 		return -1;
 	}
 
-    acl_non_blocking(client, ACL_BLOCKING);
+	acl_non_blocking(client, ACL_BLOCKING);
 
-    if (check(listener, client, result) == -1) {
-        acl_socket_close(listener);
-        return -1;
-    }
+	if (check(listener, client, result) == -1) {
+		acl_socket_close(listener);
+		return -1;
+	}
 
 	acl_socket_close(listener);
 	acl_tcp_set_nodelay(result[0]);
