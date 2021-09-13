@@ -4,6 +4,10 @@
 
 #pragma once
 
+enum {
+	HTTP_DOWNLOAD_FIBER  = 0,
+	HTTP_DOWNLOAD_THREAD = 1,
+};
 
 // CHttpGetDlg 对话框
 class CHttpGetDlg : public CDialogEx
@@ -40,14 +44,17 @@ public:
 	afx_msg void OnBnClickedCancel();
 	afx_msg void OnBnClickedStartGet();
 	afx_msg void OnBnClickedReset();
+	afx_msg void OnBnClickedRadio();
 
 private:
 	CProgressCtrl m_progress;
-	CEdit m_url;
+	CString m_url;
+	int m_downType;
 	CEdit m_request;
 	CEdit m_response;
 
 	long long m_length;
+	UINT m_lastPos;
 
 public:
 	void SetError(const char* fmt, ...);

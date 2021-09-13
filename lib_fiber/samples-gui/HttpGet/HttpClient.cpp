@@ -3,18 +3,27 @@
 #include "HttpClient.h"
 
 CHttpClient::CHttpClient(CHttpGetDlg& hWin, const CString& url)
-: m_hWin(hWin)
+: m_hWin(&hWin)
+, m_box(NULL)
 , m_url(url)
 {
 }
 
-CHttpClient::~CHttpClient(void) {}
+CHttpClient::CHttpClient(acl::fiber_tbox<CHttpMsg>& box, const CString& url)
+: m_hWin(NULL)
+, m_box(&box)
+, m_url(url)
+{
+}
+
+CHttpClient::~CHttpClient() {}
 
 void CHttpClient::run()
 {
 	acl::http_url hu;
 	if (!hu.parse(m_url.GetString())) {
-		m_hWin.SetError("Invalid url=%s", m_url.GetString());
+		SetError("Invalid url=%s", m_url.GetString());
+		SetEnd();
 		return;
 	}
 
@@ -36,21 +45,22 @@ void CHttpClient::run()
 
 	acl::string head;
 	header.build_request(head);
-	m_hWin.SetRequestHead(head.c_str());
+	SetRequestHead(head.c_str());
 
 	if (!request.request(NULL, 0)) {
-		m_hWin.SetError("Send request to %s error: %s",
+		SetError("Send request to %s error: %s",
 			addr.GetString(), acl::last_serror());
+		SetEnd();
 		return;
 	}
 
 	acl::http_client* client = request.get_client();
 	head.clear();
 	client->sprint_header(head);
-	m_hWin.SetResponseHead(head);
+	SetResponseHead(head);
 
 	long long length = request.body_length();
-	m_hWin.SetBodyTotalLength(length);
+	SetBodyTotalLength(length);
 
 	length = 0;
 	char buf[8192];
@@ -61,8 +71,71 @@ void CHttpClient::run()
 		}
 
 		length += ret;
-		m_hWin.SetBodyLength(length);
+		SetBodyLength(length);
 	}
 
-	m_hWin.SetBodyLength(length);
+	SetBodyLength(length);
+	SetEnd();
+}
+
+void CHttpClient::SetError(const char* fmt, ...)
+{
+	va_list ap;
+	va_start(ap, fmt);
+	CString buf;
+	buf.FormatV(fmt, ap);
+	va_end(ap);
+
+	if (m_box) {
+		CHttpMsg* msg = new CHttpMsg(buf.GetString(), HTTP_MSG_ERR);
+		m_box->push(msg);
+	} else if (m_hWin) {
+		m_hWin->SetError("%s", buf.GetString());
+	}
+}
+
+void CHttpClient::SetRequestHead(const char* data)
+{
+	if (m_box) {
+		CHttpMsg* msg = new CHttpMsg(data, HTTP_MSG_REQ);
+		m_box->push(msg);
+	} else if (m_hWin) {
+		m_hWin->SetRequestHead(data);
+	}
+}
+
+void CHttpClient::SetResponseHead(const char* data)
+{
+	if (m_box) {
+		CHttpMsg* msg = new CHttpMsg(data, HTTP_MSG_RES);
+		m_box->push(msg);
+	} else if (m_hWin) {
+		m_hWin->SetResponseHead(data);
+	}
+}
+
+void CHttpClient::SetBodyTotalLength(long long length)
+{
+	if (m_box) {
+		CHttpMsg* msg = new CHttpMsg(length, HTTP_MSG_TOTAL_LENGTH);
+		m_box->push(msg);
+	} else if (m_hWin) {
+		m_hWin->SetBodyTotalLength(length);
+	}
+}
+
+void CHttpClient::SetBodyLength(long long length)
+{
+	if (m_box) {
+		CHttpMsg* msg = new CHttpMsg(length, HTTP_MSG_LENGTH);
+		m_box->push(msg);
+	} else if (m_hWin) {
+		m_hWin->SetBodyLength(length);
+	}
+}
+
+void CHttpClient::SetEnd() {
+	if (m_box) {
+		m_box->push(NULL);
+	}
 }

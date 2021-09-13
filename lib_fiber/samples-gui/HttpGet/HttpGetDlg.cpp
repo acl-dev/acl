@@ -50,7 +50,10 @@ END_MESSAGE_MAP()
 
 CHttpGetDlg::CHttpGetDlg(CWnd* pParent /*=nullptr*/)
 : CDialogEx(IDD_HTTPGET_DIALOG, pParent)
+, m_url("http://www.baidu.com/")
 , m_length(-1)
+, m_lastPos(0)
+, m_downType(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -59,9 +62,10 @@ void CHttpGetDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_DOWN_PROGRESS, m_progress);
-	DDX_Control(pDX, IDC_URL, m_url);
+	DDX_Text(pDX, IDC_URL, m_url);
 	DDX_Control(pDX, IDC_REQUEST_HEAD, m_request);
 	DDX_Control(pDX, IDC_RESPONSE, m_response);
+	DDX_Radio(pDX, IDC_RADIO_FIBER, m_downType);
 }
 
 BEGIN_MESSAGE_MAP(CHttpGetDlg, CDialogEx)
@@ -72,6 +76,8 @@ BEGIN_MESSAGE_MAP(CHttpGetDlg, CDialogEx)
 	ON_BN_CLICKED(IDCANCEL, &CHttpGetDlg::OnBnClickedCancel)
 	ON_BN_CLICKED(IDC_START_GET, &CHttpGetDlg::OnBnClickedStartGet)
 	ON_BN_CLICKED(IDC_RESET, &CHttpGetDlg::OnBnClickedReset)
+	ON_BN_CLICKED(IDC_RADIO_FIBER, &CHttpGetDlg::OnBnClickedRadio)
+	ON_BN_CLICKED(IDC_RADIO_THREAD, &CHttpGetDlg::OnBnClickedRadio)
 END_MESSAGE_MAP()
 
 
@@ -180,26 +186,74 @@ void CHttpGetDlg::OnBnClickedCancel()
 void CHttpGetDlg::OnBnClickedStartGet()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	CString url;
-	GetDlgItem(IDC_URL)->GetWindowText(url);
-	if (url.IsEmpty()) {
+	CString* url = new CString;
+	GetDlgItem(IDC_URL)->GetWindowText(*url);
+	if (url->IsEmpty()) {
 		MessageBox("Please input http url first!");
 		GetDlgItem(IDC_URL)->SetFocus();
+		delete url;
 		return;
 	}
 
 	m_progress.SetPos(0);
+	m_lastPos = 0;
 
-	go[&]{
-		CHttpClient client(*this, url);
-		client.run();
-	};
+	if (m_downType == HTTP_DOWNLOAD_FIBER) {
+		go[=] {
+			CHttpClient client(*this, *url);
+			delete url;
+			client.run();
+		};
+	} else if (m_downType == HTTP_DOWNLOAD_THREAD) {
+		go[=] {
+			acl::fiber_tbox<CHttpMsg> box;
+			std::thread thread([&] {
+				CHttpClient client(box, *url);
+				delete url;
+				client.run();
+			});
+
+			thread.detach();
+
+			while (true) {
+				CHttpMsg* msg = box.pop();
+				if (msg == NULL) {
+					break;
+				}
+				switch (msg->m_type) {
+				case HTTP_MSG_ERR:
+					SetError("%s", msg->m_buf.GetString());
+					break;
+				case HTTP_MSG_REQ:
+					SetRequestHead(msg->m_buf.GetString());
+					break;
+				case HTTP_MSG_RES:
+					SetResponseHead(msg->m_buf.GetString());
+					break;
+				case HTTP_MSG_TOTAL_LENGTH:
+					SetBodyTotalLength(msg->m_length);
+					break;
+				case HTTP_MSG_LENGTH:
+					SetBodyLength(msg->m_length);
+					break;
+				default:
+					break;
+				}
+				delete msg;
+			}
+		};
+	} else {
+		delete url;
+	}
 }
 
 void CHttpGetDlg::OnBnClickedReset()
 {
 	// TODO: 在此添加控件通知处理程序代码
 	m_progress.SetPos(0);
+	m_lastPos = 0;
+	GetDlgItem(IDC_REQUEST_HEAD)->SetWindowText("");
+	GetDlgItem(IDC_RESPONSE)->SetWindowTextA("");
 }
 
 void CHttpGetDlg::SetError(const char* fmt, ...)
@@ -236,5 +290,22 @@ void CHttpGetDlg::SetBodyLength(long long length)
 	}
 
 	UINT n = (UINT) (100 * length / m_length);
-	m_progress.SetPos(n);
+	if (n >= m_lastPos + 1) {
+		m_progress.SetPos(n);
+		m_lastPos = n;
+	}
+}
+
+void CHttpGetDlg::OnBnClickedRadio()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+	switch (m_downType) {
+	case HTTP_DOWNLOAD_FIBER:
+		break;
+	case HTTP_DOWNLOAD_THREAD:
+		break;
+	default:
+		break;
+	}
 }

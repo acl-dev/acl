@@ -90,8 +90,8 @@ BEGIN_MESSAGE_MAP(CWinFiberDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_START_HTTPD, &CWinFiberDlg::OnBnClickedStartHttpd)
 	ON_BN_CLICKED(IDOK, &CWinFiberDlg::OnBnClickedOk)
 	ON_BN_CLICKED(IDCANCEL, &CWinFiberDlg::OnBnClickedCancel)
-ON_BN_CLICKED(IDC_AWAIT_DNS, &CWinFiberDlg::OnBnClickedAwaitDns)
-ON_BN_CLICKED(IDC_RESOLVE, &CWinFiberDlg::OnBnClickedResolve)
+	ON_BN_CLICKED(IDC_AWAIT_DNS, &CWinFiberDlg::OnBnClickedAwaitDns)
+	ON_BN_CLICKED(IDC_RESOLVE, &CWinFiberDlg::OnBnClickedResolve)
 END_MESSAGE_MAP()
 
 // CWinFiberDlg 消息处理程序
