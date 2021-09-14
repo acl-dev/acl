@@ -147,7 +147,7 @@
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_vc2019d</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(ProjectName)</TargetName>
-    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">$(ProjectName)</TargetName>
     <TargetName Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">$(ProjectName)</TargetName>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">false</LinkIncremental>
@@ -164,8 +164,8 @@
     <IntDir>.\Release\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
-    <OutDir>.\</OutDir>
-    <IntDir>DebugDll\</IntDir>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">
     <OutDir>.\</OutDir>
@@ -310,9 +310,9 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
-      <AdditionalLibraryDirectories>..\lib\win64;..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcmt;libc</IgnoreSpecificDefaultLibraries>
@@ -320,10 +320,8 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
       <AssemblyDebug>true</AssemblyDebug>
     </Link>
     <PostBuildEvent>
-      <Command>copy $(TargetName).lib ..\dist\lib\win64\$(TargetName).lib /Y
-copy $(TargetName).dll ..\dist\lib\win64\$(TargetName).dll /Y
-copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
-</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">

@@ -31,8 +31,8 @@ typedef struct FIBER_BASE {
 #define FBASE_F_FIBER	(1 << 1)
 	unsigned flag;
 
-	int      event_in;
-	int      event_out;
+	socket_t event_in;
+	socket_t event_out;
 	RING     event_waiter;
 } FIBER_BASE;
 

@@ -22,7 +22,7 @@ typedef long ssize_t;
 # ifndef FIBER_CPP_API
 #  define FIBER_CPP_API
 # endif
-#elif defined(FIBER_DLL) // || defined(_WINDLL)
+#elif defined(FIBER_CPP_DLL) // || defined(_WINDLL)
 # if defined(FIBER_CPP_EXPORTS) || defined(fibercpp_EXPORTS)
 #  ifndef FIBER_CPP_API
 #   define FIBER_CPP_API __declspec(dllexport)

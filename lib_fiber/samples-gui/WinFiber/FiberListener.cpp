@@ -41,7 +41,7 @@ void CFiberListener::run(void)
 	while (true) {
 		acl::socket_stream* conn = m_listener.accept();
 		if (conn) {
-			printf("accept one, fd=%u\r\n", conn->sock_handle());
+			printf("accept one, fd=%u\r\n", (int) conn->sock_handle());
 			acl::fiber* fb = new CFiberClient(conn);
 			fb->start();
 		} else {

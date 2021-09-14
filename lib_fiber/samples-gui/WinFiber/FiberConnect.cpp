@@ -75,7 +75,7 @@ void CFiberConnect::doEcho(socket_t sock)
 		buf[n] = 0;
 		printf(">>read=%s\r\n", buf);
 	}
-	printf("Echo over, fd=%u, total=%d, count=%d\r\n", sock, m_count, i);
+	printf("Echo over, fd=%u, total=%d, count=%d\r\n", (int) sock, m_count, i);
 }
 
 void CFiberConnect::doEcho(acl::socket_stream& conn)
@@ -106,5 +106,5 @@ void CFiberConnect::doEcho(acl::socket_stream& conn)
 	}
 
 	printf("%s(%d): echo over, fd=%u, total=%d, count=%d\r\n",
-		__FILE__, __LINE__, conn.sock_handle(), m_count, i);
+		__FILE__, __LINE__, (int) conn.sock_handle(), m_count, i);
 }

@@ -9,7 +9,7 @@ struct ACL_FIBER;
 
 namespace acl {
 
-class FIBER_CPP_API fiber_ctx
+class fiber_ctx
 {
 public:
 	fiber_ctx(std::function<void()> fn) {
@@ -21,14 +21,14 @@ public:
 	std::function<void()> fn_;
 };
 
-#define	go			acl::go_fiber()>
-#define	go_stack(size)		acl::go_fiber(size)>
+#define	go                  acl::go_fiber()>
+#define	go_stack(size)      acl::go_fiber(size)>
 
-#define	go_wait_fiber		acl::go_fiber()<
-#define	go_wait_thread		acl::go_fiber()<<
-#define	go_wait			go_wait_thread
+#define	go_wait_fiber       acl::go_fiber()<
+#define	go_wait_thread      acl::go_fiber()<<
+#define	go_wait             go_wait_thread
 
-class FIBER_CPP_API go_fiber
+class go_fiber
 {
 public:
 	go_fiber(void) {}
