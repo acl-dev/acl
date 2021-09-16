@@ -47,7 +47,6 @@ void CAboutDlg::DoDataExchange(CDataExchange* pDX)
 BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
 END_MESSAGE_MAP()
 
-
 // CEchoServerDlg 对话框
 
 CEchoServerDlg::CEchoServerDlg(CWnd* pParent /*=nullptr*/)
@@ -71,8 +70,8 @@ BEGIN_MESSAGE_MAP(CEchoServerDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_LISTEN, &CEchoServerDlg::OnBnClickedListen)
 	ON_BN_CLICKED(IDC_STOP_LISTEN, &CEchoServerDlg::OnBnClickedStopListen)
-ON_BN_CLICKED(IDOK, &CEchoServerDlg::OnBnClickedOk)
-ON_BN_CLICKED(IDCANCEL, &CEchoServerDlg::OnBnClickedCancel)
+	ON_BN_CLICKED(IDOK, &CEchoServerDlg::OnBnClickedOk)
+	ON_BN_CLICKED(IDCANCEL, &CEchoServerDlg::OnBnClickedCancel)
 END_MESSAGE_MAP()
 
 // CEchoServerDlg 消息处理程序

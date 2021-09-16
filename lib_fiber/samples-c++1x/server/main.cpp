@@ -7,10 +7,9 @@
 static void client_echo(acl::socket_stream* conn) {
 	acl::string buf;
 	while (true) {
-		int fd = conn->sock_handle();
 		struct timeval begin, end;
 		gettimeofday(&begin, NULL);
-		int ret = acl_readable(fd);
+		int ret = acl_readable(conn->sock_handle());
 		gettimeofday(&end, NULL);
 		double cost = acl::stamp_sub(end, begin);
 
@@ -87,5 +86,6 @@ int main(int argc, char *argv[]) {
 	};
 
 	acl::fiber::schedule();
+
 	return 0;
 }
