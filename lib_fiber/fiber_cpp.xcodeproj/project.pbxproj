@@ -40,6 +40,9 @@
 		07BED4EA22AFCB060060BBE4 /* keeper_conns.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */; };
 		07BED4EB22AFCB060060BBE4 /* keeper_waiter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */; };
 		07BED4EC22AFCB060060BBE4 /* keeper_waiter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */; };
+		70E41F5726F3293E0068042B /* winapi_hook.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 70E41F5426F3293E0068042B /* winapi_hook.hpp */; };
+		70E41F5826F3293E0068042B /* winapi_hook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 70E41F5526F3293E0068042B /* winapi_hook.cpp */; };
+		70E41F5926F3293E0068042B /* tcp_keeper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 70E41F5626F3293E0068042B /* tcp_keeper.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -77,6 +80,9 @@
 		07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_conns.hpp; sourceTree = "<group>"; };
 		07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keeper_waiter.cpp; sourceTree = "<group>"; };
 		07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_waiter.hpp; sourceTree = "<group>"; };
+		70E41F5426F3293E0068042B /* winapi_hook.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = winapi_hook.hpp; path = cpp/src/winapi_hook.hpp; sourceTree = "<group>"; };
+		70E41F5526F3293E0068042B /* winapi_hook.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = winapi_hook.cpp; path = cpp/src/winapi_hook.cpp; sourceTree = "<group>"; };
+		70E41F5626F3293E0068042B /* tcp_keeper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tcp_keeper.cpp; path = cpp/src/tcp_keeper.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -130,6 +136,9 @@
 		070F35F220902DB100672EDC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				70E41F5626F3293E0068042B /* tcp_keeper.cpp */,
+				70E41F5526F3293E0068042B /* winapi_hook.cpp */,
+				70E41F5426F3293E0068042B /* winapi_hook.hpp */,
 				07BED4D121BA278D0060BBE4 /* fiber_cond.cpp */,
 				070F360420902FDA00672EDC /* channel.cpp */,
 				070F360520902FDA00672EDC /* fiber_event.cpp */,
@@ -193,6 +202,7 @@
 				070F35E720902D9800672EDC /* fiber_cpp.h in Headers */,
 				07BED4D621BA27BE0060BBE4 /* fiber_tbox.hpp in Headers */,
 				070F35FD20902DDC00672EDC /* fiber.hpp in Headers */,
+				70E41F5726F3293E0068042B /* winapi_hook.hpp in Headers */,
 				07BED4DD22AFCAF40060BBE4 /* tcp_keeper.hpp in Headers */,
 				07BED4D421BA27B70060BBE4 /* fiber_cond.hpp in Headers */,
 				070F360220902DDC00672EDC /* lib_fiber.hpp in Headers */,
@@ -274,7 +284,9 @@
 				070F361420902FDA00672EDC /* fiber.cpp in Sources */,
 				07BED4D221BA278D0060BBE4 /* fiber_cond.cpp in Sources */,
 				070F360E20902FDA00672EDC /* channel.cpp in Sources */,
+				70E41F5926F3293E0068042B /* tcp_keeper.cpp in Sources */,
 				070F361520902FDA00672EDC /* master_fiber.cpp in Sources */,
+				70E41F5826F3293E0068042B /* winapi_hook.cpp in Sources */,
 				070F361020902FDA00672EDC /* fiber_lock.cpp in Sources */,
 				07BED4E922AFCB060060BBE4 /* keeper_conns.cpp in Sources */,
 				07BED4EB22AFCB060060BBE4 /* keeper_waiter.cpp in Sources */,

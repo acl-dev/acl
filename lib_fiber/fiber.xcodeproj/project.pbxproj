@@ -103,6 +103,7 @@
 		70C9841F253D4BAE003A9689 /* rfc1035.h in Headers */ = {isa = PBXBuildFile; fileRef = 70C9841B253D4BAE003A9689 /* rfc1035.h */; };
 		70C98420253D4BAE003A9689 /* resolver.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C9841C253D4BAE003A9689 /* resolver.c */; };
 		70C98422253FEE12003A9689 /* read_wait.c in Sources */ = {isa = PBXBuildFile; fileRef = 70C98421253FEE12003A9689 /* read_wait.c */; };
+		70E41F5226F329080068042B /* hook.c in Sources */ = {isa = PBXBuildFile; fileRef = 70E41F5126F329080068042B /* hook.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -203,6 +204,7 @@
 		70C9841B253D4BAE003A9689 /* rfc1035.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rfc1035.h; sourceTree = "<group>"; };
 		70C9841C253D4BAE003A9689 /* resolver.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = resolver.c; sourceTree = "<group>"; };
 		70C98421253FEE12003A9689 /* read_wait.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_wait.c; sourceTree = "<group>"; };
+		70E41F5126F329080068042B /* hook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hook.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -365,6 +367,7 @@
 		070F35812090225C00672EDC /* hook */ = {
 			isa = PBXGroup;
 			children = (
+				70E41F5126F329080068042B /* hook.c */,
 				070F35832090225C00672EDC /* epoll.c */,
 				070F35842090225C00672EDC /* getaddrinfo.c */,
 				070F35852090225C00672EDC /* gethostbyname.c */,
@@ -558,6 +561,7 @@
 				070F35942090225C00672EDC /* close_on_exec.c in Sources */,
 				070F35C42090225C00672EDC /* event.c in Sources */,
 				07BED4CC21BA270A0060BBE4 /* fiber_cond.c in Sources */,
+				70E41F5226F329080068042B /* hook.c in Sources */,
 				070F35A02090225C00672EDC /* memory.c in Sources */,
 				070F35A22090225C00672EDC /* msg.c in Sources */,
 				070F358E2090225C00672EDC /* argv.c in Sources */,
