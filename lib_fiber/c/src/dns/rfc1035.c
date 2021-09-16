@@ -4,6 +4,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#elif defined(SYS_WIN)
+#pragma comment(lib, "Iphlpapi.lib")
 #endif
 
 #include <string.h>

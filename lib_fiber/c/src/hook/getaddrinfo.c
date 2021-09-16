@@ -5,6 +5,10 @@
 #include "fiber.h"
 #include "hook.h"
 
+#if defined(SYS_WIN)
+#pragma comment(lib, "Iphlpapi.lib")
+#endif
+
 static struct addrinfo *create_addrinfo(const char *ip, short port,
 	int iptype, int socktype, int flags)
 {

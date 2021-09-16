@@ -5,6 +5,8 @@
 
 #ifndef SYS_UNIX
 #include "common/pthread_patch.h"
+#elif defined(SYS_WIN)
+#pragma comment(lib, "Iphlpapi.lib")
 #endif
 
 #include "common/msg.h"
