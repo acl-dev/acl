@@ -355,6 +355,8 @@ static void fiber_resolve(void)
 {
 	std::string name = "www.google.com";
 	std::vector<std::string> addrs;
+
+	// 因为需要等待线程解析完成，所以此处可使得引用方式传参
 	go_wait[&] {
 		if (!ResolveDNS(name.c_str(), &addrs)) {
 			printf(">>>resolve DNS error, name=%s\r\n", name.c_str());
@@ -402,9 +404,12 @@ void CWinFiberDlg::OnBnClickedAwaitDns()
 void CWinFiberDlg::OnBnClickedResolve()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	static std::string name = "www.baidu.com";
+	std::string name = "www.baidu.com";
 
-	go[&] {
+	// 因为 go 调用方式启动协程是异步的，所以通过 lambda 表达式传递参数时
+	// 需要用拷贝方式，而不能为引用方式
+
+	go[=] {
 		struct addrinfo *res0, *res;
 		int ret = getaddrinfo(name.c_str(), NULL, NULL, &res0) ;
 		if (ret != 0) {
@@ -442,7 +447,7 @@ void CWinFiberDlg::OnBnClickedResolve()
 		}
 	};
 
-	go[&] {
+	go[=] {
 		struct hostent *ent = gethostbyname(name.c_str());
 		if (ent == NULL) {
 			printf("gethostbyname error, domain=%s\r\n", name.c_str());
@@ -465,7 +470,7 @@ void CWinFiberDlg::OnBnClickedResolve()
 		}
 	};
 
-	go[&] {
+	go[=] {
 		std::vector<std::string> addrs;
 		go_wait[&] {
 			if (!ResolveDNS(name.c_str(), &addrs)) {

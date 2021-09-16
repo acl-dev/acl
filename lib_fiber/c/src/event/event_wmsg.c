@@ -216,6 +216,10 @@ static int wmsg_wait(EVENT *ev, int timeout)
 	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE)) {
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
+		if (msg.message == WM_QUIT) {
+			PostQuitMessage(0);
+			break;
+		}
 	}
 #endif
 	return 0;
