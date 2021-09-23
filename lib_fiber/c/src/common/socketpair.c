@@ -68,8 +68,14 @@ static int check(socket_t listener, socket_t client, socket_t result[2])
 			ret = WSAPoll(fds, 2, 10000);
 		}
 
-		if (ret <= 0) {
+		if (ret < 0) {
+			if (acl_fiber_last_error() == FIBER_EINTR) {
+				continue;
+			}
 			msg_error("WSAPoll error: %s", last_serror());
+			return -1;
+		} else if (ret == 0) {
+			msg_error("WSAPoll timeout: %s", last_serror());
 			return -1;
 		}
 
