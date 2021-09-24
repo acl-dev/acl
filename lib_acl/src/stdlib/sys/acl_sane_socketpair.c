@@ -39,18 +39,18 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 	 */
 	while ((ret = socketpair(domain, type, protocol, result)) < 0) {
 		for (count = 0; /* void */ ; count++) {
-			if ((err = socketpair_ok_errors[count]) == 0)
+			if ((err = socketpair_ok_errors[count]) == 0) {
 				return (ret);
+			}
 			if (acl_last_error() == err) {
-				char tbuf[256];
 				acl_msg_warn("socketpair: %s (trying again)",
-					acl_last_strerror(tbuf, sizeof(tbuf)));
+					acl_last_serror());
 				sleep(1);
 				break;
 			}
 		}
 	}
-	return (ret);
+	return ret;
 }
 
 #elif defined(ACL_WINDOWS)
@@ -126,10 +126,16 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 		}
 
 		ret = select(2, &rmask, &wmask, &xmask, NULL);
-		if (ret <= 0) {
+		if (ret == 0) {
+			acl_msg_error("select timeout: %s, ret=%d", acl_last_serror(), ret);
+			return -1;
+		} else if (ret < 0) {
+			if (acl_last_error() == ACL_EINTR) {
+				continue;
+			}
 			acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
 			return -1;
-		}
+        }
 
 		if (FD_ISSET(listener, &xmask)) {
 			acl_msg_error("listener exception");
