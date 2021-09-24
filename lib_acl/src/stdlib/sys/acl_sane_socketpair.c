@@ -82,10 +82,10 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 			if (acl_last_error() == ACL_EINTR) {
 				continue;
 			}
-			acl_msg_error("WSAPoll error: %s, ret=%d", acl_last_serror(), ret);
+			acl_msg_error("WSAPoll error: %s", acl_last_serror());
 			return -1;
 		} else if (ret == 0) {
-			acl_msg_error("WSAPoll timeout: %s, ret=%d", acl_last_serror(), ret);
+			acl_msg_error("WSAPoll timeout: %s", acl_last_serror());
 			return -1;
 		}
 
@@ -127,13 +127,13 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 
 		ret = select(2, &rmask, &wmask, &xmask, NULL);
 		if (ret == 0) {
-			acl_msg_error("select timeout: %s, ret=%d", acl_last_serror(), ret);
+			acl_msg_error("select timeout: %s", acl_last_serror());
 			return -1;
 		} else if (ret < 0) {
 			if (acl_last_error() == ACL_EINTR) {
 				continue;
 			}
-			acl_msg_error("select error: %s, ret=%d", acl_last_serror(), ret);
+			acl_msg_error("select error: %s", acl_last_serror());
 			return -1;
         }
 

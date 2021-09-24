@@ -116,14 +116,15 @@ static int check(socket_t listener, socket_t client, socket_t result[2])
 		}
 
 		ret = select(2, &rmask, &wmask, &xmask, NULL);
+
 		if (ret == 0) {
-			msg_error("select timeout: %s, ret=%d", last_serror(), ret);
+			msg_error("select timeout: %s", last_serror());
 			return -1;
 		} else if (ret < 0) {
 			if (acl_fiber_last_error() == FIBER_EINTR) {
 				continue;
 			}
-			msg_error("select error: %s, ret=%d", last_serror(), ret);
+			msg_error("select error: %s", last_serror());
 			return -1;
 		}
 
