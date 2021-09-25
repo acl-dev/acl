@@ -143,10 +143,12 @@ packinstall:
 	@cp -f libacl_all.a $(LIB_ACL)/libacl_all.a;
 	@if test "$(OSNAME)" = "Linux"; then \
 		$(shell mkdir -p $(INC_ACL)/fiber) \
+		$(shell mkdir -p $(INC_ACL)/fiber/detail) \
 		echo "copying lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/"; \
 		cp -f lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/; \
 		echo "copying lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/"; \
 		cp -f lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/; \
+		cp -f lib_fiber/cpp/include/fiber/detail/* $(INC_ACL)/fiber/detail/; \
 		echo "copying lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a"; \
 		cp -f lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a; \
 		echo "copying lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a"; \

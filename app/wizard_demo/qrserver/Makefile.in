@@ -99,14 +99,12 @@ endif
 ACL_PATH = ../../..
 CFLAGS += -I$(ACL_PATH)/lib_acl/include \
 	  -I$(ACL_PATH)/lib_protocol/include \
-	  -I$(ACL_PATH)/lib_acl_cpp/include \
-	  -I/home/zsx/download/qr/qrcode/libqr
+	  -I$(ACL_PATH)/lib_acl_cpp/include
 EXTLIBS =
 LDFLAGS = -L$(ACL_PATH)/lib_acl_cpp/lib -l_acl_cpp \
 	  -L$(ACL_PATH)/lib_protocol/lib -l_protocol \
 	  -L$(ACL_PATH)/lib_acl/lib -l_acl \
-	  /home/zsx/download/qr/qrcode/libqr/libqr.a \
-	  $(EXTLIBS) $(SYSLIB)
+	  /usr/local/lib/libqr.a $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)

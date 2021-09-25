@@ -39,6 +39,7 @@ rm -rf %{buildroot}
 %{_includedir}/acl-lib/acl
 %{_includedir}/acl-lib/acl_cpp
 %{_includedir}/acl-lib/fiber
+%{_includedir}/acl-lib/fiber/detail
 %{_includedir}/acl-lib/protocol
 /usr/lib/libacl_all.a
 /usr/lib/libfiber.a
