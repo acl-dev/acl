@@ -7,6 +7,7 @@
 #pragma hdrstop
 #endif
 
+#include "stdlib/acl_msg.h"
 #include "stdlib/acl_allocator.h"
 
 #endif
