@@ -7,6 +7,7 @@
 static void client_echo(acl::socket_stream* conn) {
 	acl::string buf;
 	while (true) {
+#if 1
 		struct timeval begin, end;
 		gettimeofday(&begin, NULL);
 		int ret = acl_readable(conn->sock_handle());
@@ -14,12 +15,13 @@ static void client_echo(acl::socket_stream* conn) {
 		double cost = acl::stamp_sub(end, begin);
 
 		if (ret == 0) {
-			printf("not readable, cost=%.2f\r\n", cost);
+			//printf("not readable, cost=%.2f\r\n", cost);
 		} else if (ret == 1) {
 			printf("readable, cost=%.2f\r\n", cost);
 		} else {
 			printf("readable error\r\n");
 		}
+#endif
 
 		if (!conn->gets(buf, false)) {
 			printf("client read error %s\r\n", acl::last_serror());
@@ -57,7 +59,7 @@ static void usage(const char* procname) {
 
 int main(int argc, char *argv[]) {
 	int  ch;
-	acl::string addr = "127.0.0.1:9000";
+	acl::string addr = "0.0.0.0:9000";
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);

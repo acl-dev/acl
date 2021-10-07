@@ -535,6 +535,7 @@ int fiber_file_close(socket_t fd, int *closed)
 	}
 
 	if (fe->fiber == acl_fiber_running()) {
+		printf(">>>>>free fe=%p<<<\r\n", fe);
 		file_event_free(fe);
 	} else {
 		fe->fiber->errnum = ECANCELED;

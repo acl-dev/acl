@@ -26,7 +26,7 @@ class aio_istream;
 class ACL_CPP_API aio_timer_reader : public aio_timer_callback
 {
 public:
-	aio_timer_reader(void) {}
+	aio_timer_reader(void) : in_(NULL) {}
 
 	/**
 	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数

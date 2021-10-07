@@ -88,10 +88,13 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		 * the GetQueuedCompletionStatus process.
 		 */
 		if (ok) {
+			printf(">>>0-has over, fe=%p, e=%p, %p, reader=%p\r\n",
+				fe,&ev->event, ev, fe->reader);
 			mem_free(fe->reader);
 		} else {
 			fe->reader->type = IOCP_EVENT_DEAD;
 			fe->reader->fe   = NULL;
+			printf(">>>0-has not over\r\n");
 		}
 		fe->reader = NULL;
 	}
@@ -103,9 +106,11 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		 */
 		if (HasOverlappedIoCompleted(&fe->writer->overlapped)) {
 			mem_free(fe->writer);
+			printf(">>>has over\r\n");
 		} else {
 			fe->writer->type = IOCP_EVENT_DEAD;
 			fe->writer->fe   = NULL;
+			printf(">>>not over\r\n");
 		}
 
 		fe->writer = NULL;
@@ -182,10 +187,10 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	if (fe->reader == NULL) {
 		fe->reader     = (IOCP_EVENT*) mem_malloc(sizeof(IOCP_EVENT));
 		fe->reader->fe = fe;
+		memset(&fe->reader->overlapped, 0, sizeof(fe->reader->overlapped));
 	}
 
 	fe->reader->type = IOCP_EVENT_READ;
-	memset(&fe->reader->overlapped, 0, sizeof(fe->reader->overlapped));
 
 	if (is_listen_socket(fe->fd)) {
 		return iocp_add_listen(ev, fe);
@@ -196,7 +201,13 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	ret = WSARecv(fe->fd, &wsaData, 1, &len, &flags,
 		(OVERLAPPED*) &fe->reader->overlapped, NULL);
+
 	fe->len = (int) len;
+
+	if (!HasOverlappedIoCompleted(&fe->reader->overlapped)) {
+		printf("reader padding, fe->buf=%p, size=%d\r\n", fe->buf, fe->size);
+		//return 0;
+	}
 
 	if (ret != SOCKET_ERROR) {
 		fe->mask |= EVENT_READ;
@@ -207,6 +218,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): ReadFile error(%s), fd=%d",
 			__FUNCTION__, __LINE__, last_serror(), fe->fd);
+		printf(">>>read error=%s\r\n", last_serror());
 		fe->mask |= EVENT_ERROR;
 		array_append(ev->readers, fe);
 		return -1;
@@ -387,7 +399,11 @@ static int iocp_wait(EVENT *ev, int timeout)
 			continue;
 		}
 
-		assert(fe == event->fe);
+		if (fe != event->fe) {
+			printf("fe=%p, reader=%p, null=%s, e=%p, e->fe=%p\n",
+				fe, fe->reader, fe->reader ? "no":"yes", event, event->fe);
+			assert(fe == event->fe);
+		}
 
 		if (fe->mask & EVENT_ERROR) {
 			continue;
