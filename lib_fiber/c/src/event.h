@@ -99,13 +99,15 @@ struct FILE_EVENT {
 	EPOLL_CTX    *epx;
 #endif
 
-	char *buf;
-	int   size;
-	int   len;
 #ifdef HAS_IOCP
+	char         *buff;
+	int           size;
+	int           len;
 	HANDLE        h_iocp;
 	IOCP_EVENT   *reader;
 	IOCP_EVENT   *writer;
+	IOCP_EVENT   *poller_read;
+	IOCP_EVENT   *poller_write;
 	socket_t      iocp_sock;
 	struct sockaddr_in peer_addr;
 

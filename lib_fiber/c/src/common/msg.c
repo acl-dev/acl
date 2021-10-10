@@ -163,6 +163,7 @@ const char *acl_fiber_strerror(int errnum, char *buffer, size_t size)
 		buffer[L - 1] = '\0';
 		L--;
 	}
+	WSASetLastError(errnum);
 #else
 	if (buffer == NULL || size <= 0) {
 		msg_error("%s, %s(%d): input error",

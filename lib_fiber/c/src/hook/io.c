@@ -218,9 +218,10 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 }
 #endif // SYS_UNIX
 
+#ifdef HAS_IOCP
 static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
-	fe->buf  = buf;
+	fe->buff = buf;
 	fe->size = len;
 	fe->len  = 0;
 
@@ -252,6 +253,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		}
 	}
 }
+#endif
 
 #ifdef SYS_WIN
 int WINAPI acl_fiber_WSARecv(socket_t sockfd,
@@ -293,9 +295,11 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 
 	fe = fiber_file_open(sockfd);
 
+#ifdef HAS_IOCP
 	if (EVENT_IS_IOCP(fiber_io_event())) {
 		return fiber_iocp_read(fe, buf, (int) len);
 	}
+#endif
 
 	while (1) {
 		int ret;

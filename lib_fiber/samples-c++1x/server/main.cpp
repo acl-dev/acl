@@ -31,6 +31,7 @@ static void client_echo(acl::socket_stream* conn) {
 			printf("client write error %s\r\n", acl::last_serror());
 			break;
 		}
+		//acl::fiber::delay(1000);
 	}
 	delete conn;
 }
