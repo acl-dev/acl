@@ -202,7 +202,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	iocp_check(ev, fe);
 
-	if (fe->from_poll) {
+	if (IS_POLLING(fe)) {
 		if (fe->poller_read == NULL) {
 			fe->poller_read = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
 			fe->poller_read->refer = 0;
@@ -317,25 +317,37 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
 	DWORD sendBytes;
 	BOOL  ret;
+	IOCP_EVENT *event;
 
 	iocp_check(ev, fe);
 
-	if (fe->writer == NULL) {
-		fe->writer        = (IOCP_EVENT*) mem_malloc(sizeof(IOCP_EVENT));
-		fe->writer->refer = 0;
-		fe->writer->fe    = fe;
-		memset(&fe->writer->overlapped, 0, sizeof(fe->writer->overlapped));
+	if (IS_POLLING(fe)) {
+		if (fe->poller_write == NULL) {
+			fe->poller_write = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
+			fe->poller_write->refer = 0;
+			fe->poller_write->fe    = fe;
+			fe->poller_write->type  = IOCP_EVENT_POLLW;
+		}
+		event = fe->poller_write;
+	} else {
+		if (fe->writer == NULL) {
+			fe->writer        = (IOCP_EVENT*) mem_malloc(sizeof(IOCP_EVENT));
+			fe->writer->refer = 0;
+			fe->writer->fe    = fe;
+			fe->writer->type = IOCP_EVENT_WRITE;
+		}
+		event = fe->writer;
 	}
 
-	fe->writer->type = IOCP_EVENT_WRITE;
-	fe->writer->refer++;
+	event->proc = fe->w_proc;
+	event->refer++;
 
 	if (fe->status & STATUS_CONNECTING) {
 		//return iocp_add_connect(ev, fe);
 	}
 
 	ret = WriteFile((HANDLE) fe->fd, NULL, 0, &sendBytes,
-		&fe->writer->overlapped);
+		&event->overlapped);
 
 	if (ret == TRUE) {
 		fe->mask |= EVENT_WRITE;

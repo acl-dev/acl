@@ -95,6 +95,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	}
 
 	fe = fiber_file_open(fd);
+	CLR_POLLING(fe);
 
 	while (1) {
 		ssize_t n;
@@ -139,6 +140,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	}
 
 	fe = fiber_file_open(fd);
+	CLR_POLLING(fe);
 
 	while (1) {
 		ssize_t ret;
@@ -188,6 +190,8 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 	}
 
 	fe = fiber_file_open(fd);
+	CLR_POLLING(fe);
+
 	while (1) {
 		ssize_t ret;
 		int err;
@@ -294,6 +298,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	}
 
 	fe = fiber_file_open(sockfd);
+	CLR_POLLING(fe);
 
 #ifdef HAS_IOCP
 	if (EVENT_IS_IOCP(fiber_io_event())) {
@@ -359,6 +364,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	}
 
 	fe = fiber_file_open(sockfd);
+	CLR_POLLING(fe);
 
 	if (EVENT_IS_IOCP(fiber_io_event())) {
 		return fiber_iocp_read(fe, buf, (int) len);
@@ -412,6 +418,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 	}
 
 	fe = fiber_file_open(sockfd);
+	CLR_POLLING(fe);
 
 	while (1) {
 		ssize_t ret;
@@ -473,6 +480,8 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		}
 
 		fe = fiber_file_open(fd);
+		CLR_POLLING(fe);
+
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
@@ -509,6 +518,8 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		}
 
 		fe = fiber_file_open(fd);
+		CLR_POLLING(fe);
+
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
@@ -556,6 +567,8 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		}
 
 		fe = fiber_file_open(sockfd);
+		CLR_POLLING(fe);
+
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
@@ -603,6 +616,8 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		}
 
 		fe = fiber_file_open(sockfd);
+		CLR_POLLING(fe);
+
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
@@ -640,6 +655,8 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		}
 
 		fe = fiber_file_open(sockfd);
+		CLR_POLLING(fe);
+
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {
@@ -734,6 +751,8 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		}
 
 		fe = fiber_file_open(out_fd);
+		CLR_POLLING(fe);
+
 		fiber_wait_write(fe);
 
 		if (acl_fiber_canceled(fe->fiber)) {

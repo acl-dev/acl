@@ -65,13 +65,19 @@ struct FILE_EVENT {
 #define	STATUS_CONNECTING	(unsigned) (1 << 0)
 #define	STATUS_READABLE		(unsigned) (1 << 1)
 #define	STATUS_WRITABLE		(unsigned) (1 << 2)
+#define	STATUS_POLLING		(unsigned) (1 << 3)
 
 #define	SET_READABLE(x) ((x)->status |= STATUS_READABLE)
 #define	SET_WRITABLE(x)	((x)->status |= STATUS_WRITABLE)
+#define	SET_POLLING(x)	((x)->status |= STATUS_POLLING)
+
 #define	CLR_READABLE(x)	((x)->status &= ~STATUS_READABLE)
 #define	CLR_WRITABLE(x)	((x)->status &= ~STATUS_WRITABLE)
+#define	CLR_POLLING(x)	((x)->status &= ~STATUS_POLLING)
+
 #define	IS_READABLE(x)	((x)->status & STATUS_READABLE)
 #define	IS_WRITABLE(x)	((x)->status & STATUS_WRITABLE)
+#define	IS_POLLING(x)	((x)->status & STATUS_POLLING)
 
 	unsigned type;
 #define	TYPE_NONE		0
@@ -100,7 +106,6 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IOCP
-	int           from_poll;
 	char         *buff;
 	int           size;
 	int           len;

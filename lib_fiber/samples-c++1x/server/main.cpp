@@ -15,7 +15,7 @@ static void client_echo(acl::socket_stream* conn) {
 		double cost = acl::stamp_sub(end, begin);
 
 		if (ret == 0) {
-			//printf("not readable, cost=%.2f\r\n", cost);
+			printf("not readable, cost=%.2f\r\n", cost);
 		} else if (ret == 1) {
 			printf("readable, cost=%.2f\r\n", cost);
 		} else {
