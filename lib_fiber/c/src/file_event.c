@@ -21,6 +21,7 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 #endif
 
 #ifdef HAS_IOCP
+	fe->from_poll = 0;
 	fe->h_iocp = NULL;
 	fe->reader = NULL;
 	fe->writer = NULL;

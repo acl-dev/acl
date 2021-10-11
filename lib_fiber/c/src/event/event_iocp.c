@@ -26,8 +26,7 @@ typedef struct EVENT_IOCP {
 	int    size;
 	int    count;
 	HANDLE h_iocp;
-	ARRAY *readers;
-	ARRAY *writers;
+	ARRAY *events;
 } EVENT_IOCP;
 
 struct IOCP_EVENT {
@@ -40,6 +39,7 @@ struct IOCP_EVENT {
 #define	IOCP_EVENT_POLLW	(1 << 4)
 	int   refer;
 	FILE_EVENT *fe;
+	event_proc *proc;
 
 #define ACCEPT_ADDRESS_LENGTH ((sizeof(struct sockaddr_in) + 16))
 	char  myAddrBlock[ACCEPT_ADDRESS_LENGTH * 2];
@@ -58,8 +58,6 @@ static void iocp_remove(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
-	BOOL ok;
-
 	if (fe->h_iocp != NULL) {
 		fe->h_iocp = NULL;
 	}
@@ -68,21 +66,17 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		iocp_remove(ev, fe);
 	}
 
+	/* must close socket before releasing fe->reader/fe->writer */
+	if (fe->fd != INVALID_SOCKET) {
+		closesocket(fe->fd);
+
+		/* set fd INVALID_SOCKET notifying the caller the socket be closed*/
+		fe->fd = INVALID_SOCKET;
+	}
+
 	/* On Windows XP, must check if the OVERLAPPED IO is in STATUS_PENDING
 	 * status before the socket being closed.
 	 */
-	if (fe->reader != NULL) {
-		ok = HasOverlappedIoCompleted(&fe->reader->overlapped);
-	} else {
-		ok = FALSE;
-	}
-
-	/* must close socket before releasing fe->reader/fe->writer */
-	closesocket(fe->fd);
-	printf(">>>>>>>>>>>>>>close socket=%d<<<<<<\r\n", fe->fd);
-
-	/* set fd INVALID_SOCKET notifying the caller the socket be closed*/
-	fe->fd = INVALID_SOCKET;
 
 	if (fe->reader) {
 		/*
@@ -90,12 +84,9 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		 * object should not be released, which should be released in
 		 * the GetQueuedCompletionStatus process.
 		 */
-		if (ok) {
+		if (HasOverlappedIoCompleted(&fe->reader->overlapped)) {
 			if (fe->reader->refer == 0) {
-				printf(">>>>>>>>>>>>>>>>free reader=%p\r\n", fe->reader);
 				mem_free(fe->reader);
-			} else {
-				printf(">>>>>>>>>>>>>>set reader=%p\r\n", fe->reader);
 				fe->reader->fe = NULL;
 			}
 		} else {
@@ -126,10 +117,8 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	if (fe->poller_read) {
 		if (fe->poller_read->refer == 0) {
-			printf(">>>>>>>>>>>>>>free poller read=%p\r\n", fe->poller_read);
 			mem_free(fe->poller_read);
 		} else {
-			printf(">>>>>>>>>>>>>>>set poller read fe null=%p\r\n", fe->poller_read);
 			fe->poller_read->fe = NULL;
 		}
 	}
@@ -197,7 +186,8 @@ static int iocp_add_listen(EVENT_IOCP *ev, FILE_EVENT *fe)
 		msg_warn("%s(%d): AcceptEx error(%s)",
 			__FUNCTION__, __LINE__, last_serror());
 		fe->mask |= EVENT_ERROR;
-		array_append(ev->readers, fe);
+		assert(fe->reader);
+		array_append(ev->events, fe->reader);
 		return 1;
 	}
 }
@@ -212,15 +202,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	iocp_check(ev, fe);
 
-	if (is_listener || (fe->buff && fe->size > 0)) {
-		if (fe->reader == NULL) {
-			fe->reader = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
-			fe->reader->refer = 0;
-			fe->reader->fe    = fe;
-			fe->reader->type = IOCP_EVENT_READ;
-		}
-		event = fe->reader;
-	} else {
+	if (fe->from_poll) {
 		if (fe->poller_read == NULL) {
 			fe->poller_read = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
 			fe->poller_read->refer = 0;
@@ -228,8 +210,17 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 			fe->poller_read->type  = IOCP_EVENT_POLLR;
 		}
 		event = fe->poller_read;
+	} else {
+		if (fe->reader == NULL) {
+			fe->reader = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
+			fe->reader->refer = 0;
+			fe->reader->fe    = fe;
+			fe->reader->type = IOCP_EVENT_READ;
+		}
+		event = fe->reader;
 	}
 
+	event->proc = fe->r_proc;
 	event->refer++;
 
 	if (is_listener) {
@@ -244,12 +235,6 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	fe->len = (int) len;
 
-	#if 0
-	printf("reader %s, fe->buf=%p, size=%d, ret=%d, len=%d, err=%d, %d\r\n",
-		HasOverlappedIoCompleted(&event->overlapped) ? "no padding":"padding",
-		fe->buff, fe->size, ret, len, acl_fiber_last_error(), ERROR_IO_PENDING);
-	#endif
-
 	if (ret != SOCKET_ERROR) {
 		fe->mask |= EVENT_READ;
 		return 1;
@@ -259,9 +244,9 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): ReadFile error(%s), fd=%d",
 			__FUNCTION__, __LINE__, acl_fiber_last_serror(), fe->fd);
-		printf(">>>read error=%s, %d\r\n", last_serror(), acl_fiber_last_error());
 		fe->mask |= EVENT_ERROR;
-		array_append(ev->readers, fe);
+		assert(fe->reader);
+		array_append(ev->events, fe->reader);
 		return -1;
 	}
 }
@@ -321,7 +306,8 @@ static int iocp_add_connect(EVENT_IOCP *ev, FILE_EVENT *fe)
 		msg_warn("%s(%d): ConnectEx error(%s), sock(%u)",
 			__FUNCTION__, __LINE__, last_serror(), fe->fd);
 		fe->mask |= EVENT_ERROR;
-		array_append(ev->writers, fe);
+		assert(fe->writer);
+		array_append(ev->events, fe->writer);
 		return -1;
 	}
 }
@@ -361,7 +347,8 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		msg_warn("%s(%d): WriteFile error(%s)",
 			__FUNCTION__, __LINE__, last_serror());
 		fe->mask |= EVENT_ERROR;
-		array_append(ev->writers, fe);
+		assert(fe->writer);
+		array_append(ev->events, fe->writer);
 		return -1;
 	}
 }
@@ -401,27 +388,26 @@ static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 	FILE_EVENT *fe, DWORD trans)
 {
-	if ((event->type & (IOCP_EVENT_READ | IOCP_EVENT_POLLR)) && fe->r_proc) {
-		//assert(fe->reader == event);
+	if ((event->type & (IOCP_EVENT_READ | IOCP_EVENT_POLLR))) {
 		fe->mask &= ~EVENT_READ;
-		fe->len = (int) trans;
-		array_append(ei->readers, fe);
-	} else if ((event->type & (IOCP_EVENT_WRITE | IOCP_EVENT_POLLW)) && fe->w_proc) {
-		//assert(fe->writer == event);
+	} else if ((event->type & (IOCP_EVENT_WRITE | IOCP_EVENT_POLLW))) {
 		fe->mask &= ~EVENT_WRITE;
-		fe->len = trans;
-		array_append(ei->writers, fe);
 	}
+
+	fe->len = (int) trans;
+	array_append(ei->events, event);
 }
 
 static int iocp_wait(EVENT *ev, int timeout)
 {
 	EVENT_IOCP *ei = (EVENT_IOCP *) ev;
-	FILE_EVENT *fe;
+	IOCP_EVENT *event;
 
 	for (;;) {
 		DWORD bytesTransferred;
-		IOCP_EVENT *event = NULL;
+		FILE_EVENT *fe;
+		event = NULL;
+
 		BOOL isSuccess = GetQueuedCompletionStatus(ei->h_iocp,
 			&bytesTransferred, (PULONG_PTR) &fe,
 			(OVERLAPPED**) &event, timeout);
@@ -450,12 +436,6 @@ static int iocp_wait(EVENT *ev, int timeout)
 			continue;
 		}
 
-		/* skip the event which is not for the IO read or write */
-		if (!(event->type & (IOCP_EVENT_READ | IOCP_EVENT_WRITE))) {
-//			continue;
-//			printf(">>>>>>>>>>>>>poller event\r\n");
-		}
-
 		if (fe != event->fe) {
 			assert(fe == event->fe);
 		}
@@ -468,15 +448,10 @@ static int iocp_wait(EVENT *ev, int timeout)
 		timeout = 0;
 	}
 
-	while ((fe = (FILE_EVENT*) ei->readers->pop_back(ei->readers)) != NULL) {
-		if (fe->r_proc) {
-			fe->r_proc(ev, fe);
-		}
-	}
-
-	while ((fe = (FILE_EVENT*) ei->writers->pop_back(ei->writers)) != NULL) {
-		if (fe->w_proc) {
-			fe->w_proc(ev, fe);
+	int i = 0;
+	while ((event = (IOCP_EVENT*) ei->events->pop_back(ei->events)) != NULL) {
+		if (event->proc && event->fe) {
+			event->proc(ev, event->fe);
 		}
 	}
 
@@ -490,8 +465,7 @@ static void iocp_free(EVENT *ev)
 	if (ei->h_iocp) {
 		CloseHandle(ei->h_iocp);
 	}
-	array_free(ei->readers, NULL);
-	array_free(ei->writers, NULL);
+	array_free(ei->events, NULL);
 	mem_free(ei->files);
 	mem_free(ei);
 }
@@ -522,8 +496,8 @@ EVENT *event_iocp_create(int size)
 		msg_fatal("%s(%d): create iocp error(%s)",
 			__FUNCTION__, __LINE__, last_serror());
 	}
-	ei->readers = array_create(100);
-	ei->writers = array_create(100);
+
+	ei->events = array_create(100);
 
 	ei->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	ei->size  = size;

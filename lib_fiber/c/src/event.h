@@ -100,6 +100,7 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IOCP
+	int           from_poll;
 	char         *buff;
 	int           size;
 	int           len;
@@ -110,7 +111,6 @@ struct FILE_EVENT {
 	IOCP_EVENT   *poller_write;
 	socket_t      iocp_sock;
 	struct sockaddr_in peer_addr;
-
 #endif
 };
 

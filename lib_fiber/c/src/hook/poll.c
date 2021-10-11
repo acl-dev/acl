@@ -21,6 +21,10 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd = fe->pfd;
 
+	if (pfd == NULL) {
+		return;
+	}
+
 	assert(pfd->pfd->events & POLLIN);
 
 	event_del_read(ev, fe);
@@ -42,6 +46,10 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd = fe->pfd;
+
+	if (pfd == NULL) {
+		return;
+	}
 
 	assert(pfd->pfd->events & POLLOUT);
 
@@ -97,6 +105,10 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 		if (pfd->fe == NULL)
 			continue;
 
+#ifdef HAS_IOCP
+		pfd->fe->from_poll = 0;
+#endif
+
 		if (pfd->pfd->events & POLLIN) {
 			event_del_read(ev, pfd->fe);
 		}
@@ -127,8 +139,9 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 	for (i = 0; i < nfds; i++) {
 		pfds[i].fe       = fiber_file_open(fds[i].fd);
 #ifdef HAS_IOCP
-		pfds[i].fe->buff = NULL;
-		pfds[i].fe->size = 0;
+		pfds[i].fe->from_poll = 1;
+		pfds[i].fe->buff      = NULL;
+		pfds[i].fe->size      = 0;
 #endif
 		pfds[i].pe       = pe;
 		pfds[i].pfd      = &fds[i];
