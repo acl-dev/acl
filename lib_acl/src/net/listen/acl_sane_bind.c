@@ -257,7 +257,7 @@ ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 
 #ifdef ACL_UNIX
 	if (acl_valid_unix(addr)) {
-		fd = acl_unix_dgram_bind(addr, flag);
+		ACL_SOCKET fd = acl_unix_dgram_bind(addr, flag);
 		if (fd >= 0 && family) {
 			*family = AF_UNIX;
 		}
