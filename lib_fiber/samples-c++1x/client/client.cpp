@@ -14,7 +14,7 @@ static size_t do_echo(acl::socket_stream& conn, int count) {
 			printf("client write error %s\r\n", acl::last_serror());
 			break;
 		}
-#if 1
+#if 0
 		struct timeval begin, end;
 		gettimeofday(&begin, NULL);
 		int ret = acl_readable(conn.sock_handle());
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 		type = acl::FIBER_EVENT_T_KERNEL;
 	}
 
-	size_t total = 0;
+	long long total = 0;
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[]) {
 	struct timeval end;
 	gettimeofday(&end, NULL);
 	double cost = acl::stamp_sub(end, begin);
-	printf("Total count=%zd, cost=%.2f ms, speed=%.2f\r\n",
+	printf("Total count=%lld, cost=%.2f ms, speed=%.2f\r\n",
 		total, cost, (total * 1000) / (cost > 0 ? cost : 0.1));
 	return 0;
 }

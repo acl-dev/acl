@@ -7,7 +7,7 @@
 static void client_echo(acl::socket_stream* conn) {
 	acl::string buf;
 	while (true) {
-#if 1
+#if 0
 		struct timeval begin, end;
 		gettimeofday(&begin, NULL);
 		int ret = acl_readable(conn->sock_handle());
