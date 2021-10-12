@@ -97,6 +97,10 @@ extern int   acl_var_udp_threads_detached;
 #define ACL_DEF_UDP_FATAL_ON_BIND_ERROR		0
 extern int   acl_var_udp_fatal_on_bind_error;
 
+#define	ACL_VAR_UDP_MONITOR_NETLINK		"udp_monitor_netlink"
+#define	ACL_DEF_UDP_MONITOR_NETLINK		1
+extern int   acl_var_udp_monitor_netlink;
+
 #define ACL_VAR_UDP_NON_BLOCK			"master_nonblock"
 #define ACL_DEF_UDP_NON_BLOCK			1
 extern int   acl_var_udp_non_block;

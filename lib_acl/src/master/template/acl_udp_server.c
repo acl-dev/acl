@@ -118,6 +118,7 @@ static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
 int   acl_var_udp_threads_detached;
 int   acl_var_udp_non_block;
 int   acl_var_udp_fatal_on_bind_error;
+int   acl_var_udp_monitor_netlink;
 
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ ACL_VAR_UDP_THREADS_DETACHED, ACL_DEF_UDP_THREADS_DETACHED,
@@ -126,6 +127,8 @@ static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 		&acl_var_udp_non_block },
 	{ ACL_VAR_UDP_FATAL_ON_BIND_ERROR, ACL_DEF_UDP_FATAL_ON_BIND_ERROR,
 		&acl_var_udp_fatal_on_bind_error },
+	{ ACL_VAR_UDP_MONITOR_NETLINK, ACL_DEF_UDP_MONITOR_NETLINK,
+		&acl_var_udp_monitor_netlink },
 
 	{ 0, 0, 0 },
 };
@@ -863,7 +866,7 @@ static void *thread_main(void *ctx)
 		__FILE__, __LINE__, __FUNCTION__, __servers_count);
 
 #if defined(ACL_LINUX) && defined(SO_REUSEPORT)
-	if (var_udp_reuse_port) {
+	if (var_udp_reuse_port && acl_var_udp_monitor_netlink) {
 		netlink_monitor(server->event, netlink_on_changed, server);
 	}
 #endif
