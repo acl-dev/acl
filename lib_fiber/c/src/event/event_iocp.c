@@ -87,6 +87,7 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 		if (HasOverlappedIoCompleted(&fe->reader->overlapped)) {
 			if (fe->reader->refer == 0) {
 				mem_free(fe->reader);
+			} else {
 				fe->reader->fe = NULL;
 			}
 		} else {

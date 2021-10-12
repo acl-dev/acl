@@ -251,8 +251,6 @@ ACL_SOCKET acl_sane_bind(const char *addr, unsigned flag,
 
 ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 {
-	ACL_SOCKET fd;
-
 	if (family) {
 		*family = 0;
 	}
