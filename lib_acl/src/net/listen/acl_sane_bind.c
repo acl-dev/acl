@@ -21,6 +21,7 @@
 #include "stdlib/acl_iostuff.h"
 #include "net/acl_host_port.h"
 #include "net/acl_valid_hostname.h"
+#include "net/acl_sane_inet.h"
 #include "net/acl_listen.h"
 #endif
 
@@ -165,36 +166,40 @@ ACL_SOCKET acl_unix_dgram_bind(const char *addr, unsigned flag)
 }
 #endif
 
-ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag)
+static ACL_SOCKET bind_addr(const char *addr, unsigned flag,
+	int socktype, int family)
 {
-	return acl_udp_bind3(addr, flag, NULL);
+	struct addrinfo res;
+	ACL_SOCKADDR in;
+	size_t addrlen;
+
+	addrlen = acl_inet_pton(family, addr, (struct sockaddr*) &in);
+	if (addrlen == 0) {
+		acl_msg_error("%s(%d), %s: acl_inet_pton error, addr=%s",
+			__FILE__, __LINE__, __FUNCTION__, addr);
+		return ACL_SOCKET_INVALID;
+	}
+
+	res.ai_flags    = AI_NUMERICHOST;
+	res.ai_family   = family;
+	res.ai_socktype = socktype;
+	res.ai_protocol = 0;
+	res.ai_addrlen  = addrlen;
+	res.ai_addr     = (struct sockaddr*) &in;
+
+	return acl_inet_bind(&res, flag);
 }
 
-ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
+static ACL_SOCKET find_bind(const char *addr, unsigned flag,
+	int socktype, int *family)
 {
 	struct addrinfo *res0, *res;
 	ACL_SOCKET fd;
 
-	if (family) {
-		*family = 0;
-	}
-
-#ifdef ACL_UNIX
-	if (!acl_valid_ipv4_hostaddr(addr, 0)
-		&& !acl_valid_ipv6_hostaddr(addr, 0)) {
-
-		fd = acl_unix_dgram_bind(addr, flag);
-		if (fd >= 0 && family) {
-			*family = AF_UNIX;
-		}
-		return fd;
-	}
-#endif
-
-	res0 = acl_host_addrinfo(addr, SOCK_DGRAM);
+	res0 = acl_host_addrinfo(addr, socktype);
 	if (res0 == NULL) {
-		acl_msg_error("%s(%d): host_addrinfo NULL, addr=%s",
-			__FILE__, __LINE__, addr);
+		acl_msg_error("%s(%d), %s: host_addrinfo NULL, addr=%s",
+			__FILE__, __LINE__, __FUNCTION__, addr);
 		return ACL_SOCKET_INVALID;
 	}
 
@@ -211,6 +216,27 @@ ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 	}
 
 	freeaddrinfo(res0);
+	return fd;
+}
+
+ACL_SOCKET acl_sane_bind(const char *addr, unsigned flag,
+	int socktype, int *family)
+{
+	ACL_SOCKET fd;
+
+	if (acl_valid_ipv4_hostaddr(addr, 0)) {
+		if (family) {
+			*family = AF_INET;
+		}
+		fd = bind_addr(addr, flag, socktype, AF_INET);
+	} else if (acl_valid_ipv6_hostaddr(addr, 0)) {
+		if (family) {
+			*family = AF_INET6;
+		}
+		fd = bind_addr(addr, flag, socktype, AF_INET6);
+	} else {
+		fd = find_bind(addr, flag, socktype, family);
+	}
 
 	if (fd == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d): bind %s error %s",
@@ -220,6 +246,31 @@ ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
 
 	acl_non_blocking(fd, flag & ACL_INET_FLAG_NBLOCK ?
 		ACL_NON_BLOCKING : ACL_BLOCKING);
-
 	return fd;
+}
+
+ACL_SOCKET acl_udp_bind3(const char *addr, unsigned flag, int *family)
+{
+	ACL_SOCKET fd;
+
+	if (family) {
+		*family = 0;
+	}
+
+#ifdef ACL_UNIX
+	if (acl_valid_unix(addr)) {
+		fd = acl_unix_dgram_bind(addr, flag);
+		if (fd >= 0 && family) {
+			*family = AF_UNIX;
+		}
+		return fd;
+	}
+#endif
+
+	return acl_sane_bind(addr, flag, SOCK_DGRAM, family);
+}
+
+ACL_SOCKET acl_udp_bind(const char *addr, unsigned flag)
+{
+	return acl_udp_bind3(addr, flag, NULL);
 }

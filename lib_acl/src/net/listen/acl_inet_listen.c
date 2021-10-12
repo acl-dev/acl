@@ -32,10 +32,10 @@
 
 #endif
 
-static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
-	int backlog, unsigned flag)
+/* acl_inet_listen - create TCP listener */
+ACL_SOCKET acl_inet_listen(const char *addr, int backlog, unsigned flag)
 {
-	ACL_SOCKET sock = acl_inet_bind(res, flag);
+	ACL_SOCKET sock = acl_sane_bind(addr, flag, SOCK_STREAM, NULL);
 
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: bind %s error %s", __FILE__,
@@ -48,9 +48,10 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 		int on = 1;
 		int ret = setsockopt(sock, IPPROTO_TCP, TCP_FASTOPEN,
 			(const void *) &on, sizeof(on));
-		if (ret < 0)
+		if (ret < 0) {
 			acl_msg_warn("%s(%d): setsocket(TCP_FASTOPEN): %s",
 				__FUNCTION__, __LINE__, acl_last_serror());
+		}
 	}
 #endif
 
@@ -65,30 +66,6 @@ static ACL_SOCKET inet_listen(const char *addr, const struct addrinfo *res,
 	}
 
 	acl_msg_info("%s: listen %s ok", __FUNCTION__, addr);
-	return sock;
-}
-
-/* acl_inet_listen - create TCP listener */
-
-ACL_SOCKET acl_inet_listen(const char *addr, int backlog, unsigned flag)
-{
-	struct addrinfo *res0 = acl_host_addrinfo(addr, SOCK_STREAM), *res;
-	ACL_SOCKET sock;
-
-	if (res0 == NULL) {
-		return ACL_SOCKET_INVALID;
-	}
-
-	sock = ACL_SOCKET_INVALID;
-
-	for (res = res0; res != NULL; res = res->ai_next) {
-		sock = inet_listen(addr, res, backlog, flag);
-		if (sock != ACL_SOCKET_INVALID) {
-			break;
-		}
-	}
-
-	freeaddrinfo(res0);
 	return sock;
 }
 

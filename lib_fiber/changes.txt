@@ -1,4 +1,7 @@
 
+116) 2021.10.10-12
+116.1) bugfix: 修复采用 iocp 引擎时的问题
+
 115) 2020.1.25
 115.1) bugfix: hook/epoll.c，在 read_callback/write_callback 中如果 nready
 超过了 maxevents，则会引起崩溃，原因是用户在调用 epoll_wait 时可能给定的值

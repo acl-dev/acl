@@ -79,9 +79,20 @@ ACL_API ACL_SOCKET acl_inet_accept_ex(ACL_SOCKET listen_fd, char *ipbuf,
  * @param res {const struct addrinfo*} 域名解析得到的地址信息对象
  * @param flag {unsigned int} 标志位
  * @return {ACL_SOCKET} 返回 ACL_SOCKET_INVALID 表示绑定失败
- * 
  */
 ACL_API ACL_SOCKET acl_inet_bind(const struct addrinfo *res, unsigned flag);
+
+/**
+ * 网络地址绑定函数，适用于 TCP/UDP 套接口
+ * @param addr {const char*} 域名解析得到的地址
+ * @param flag {unsigned int} 标志位
+ * @param socktype {int} 所绑定的 socket 类型：SOCK_STREAM, SOCK_DGRAM
+ * @param family {int*} 如果绑定成功且该地址非空则存放地址类型，类型有：
+ *  AF_INET, AF_INET6, AF_UNIX
+ * @return {ACL_SOCKET} 返回 ACL_SOCKET_INVALID 表示绑定失败
+ */
+ACL_API ACL_SOCKET acl_sane_bind(const char *addr, unsigned flag,
+	int socktype, int *family);
 
 #ifdef ACL_UNIX
 
