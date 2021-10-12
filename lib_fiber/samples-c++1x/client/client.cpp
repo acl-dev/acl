@@ -4,7 +4,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-static size_t do_echo(acl::socket_stream& conn, int count) {
+static size_t do_echo(acl::socket_stream& conn, int count, bool readable) {
 	acl::string data("hello world!\r\n");
 	acl::string buf;
 
@@ -14,21 +14,23 @@ static size_t do_echo(acl::socket_stream& conn, int count) {
 			printf("client write error %s\r\n", acl::last_serror());
 			break;
 		}
-#if 0
-		struct timeval begin, end;
-		gettimeofday(&begin, NULL);
-		int ret = acl_readable(conn.sock_handle());
-		gettimeofday(&end, NULL);
-		double cost = acl::stamp_sub(end, begin);
 
-		if (ret == 0) {
-			printf("not readable, cost=%.2f\r\n", cost);
-		} else if (ret == 1) {
-			printf("readable, cost=%.2f\r\n", cost);
-		} else {
-			printf("readable error\r\n");
+		if (readable) {
+			struct timeval begin, end;
+			gettimeofday(&begin, NULL);
+			int ret = acl_readable(conn.sock_handle());
+			gettimeofday(&end, NULL);
+			double cost = acl::stamp_sub(end, begin);
+
+			if (ret == 0) {
+				printf("not readable, cost=%.2f\r\n", cost);
+			} else if (ret == 1) {
+				printf("readable, cost=%.2f\r\n", cost);
+			} else {
+				printf("readable error\r\n");
+			}
 		}
-#endif
+
 		if (!conn.gets(buf, false)) {
 			printf("client read error %s\r\n", acl::last_serror());
 			break;
@@ -39,7 +41,7 @@ static size_t do_echo(acl::socket_stream& conn, int count) {
 	return i;
 }
 
-static size_t connect_server(const char* addr, int count) {
+static size_t connect_server(const char* addr, int count, bool readable) {
 	acl::socket_stream conn;
 	if (!conn.open(addr, 10, 10)) {
 		printf("connect %s error %s\r\n", addr, acl::last_serror());
@@ -47,7 +49,7 @@ static size_t connect_server(const char* addr, int count) {
 	}
 
 	printf(">>>connect %s ok\r\n", addr);
-	return do_echo(conn, count);
+	return do_echo(conn, count, readable);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -58,17 +60,19 @@ static void usage(const char* procname) {
 		" -s server_addr[default: 127.0.0.1:9000]\r\n"
 		" -c fiber_count[default: 1]\r\n"
 		" -n count[default: 100]\r\n"
+		" -r [if call readable? default: false]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[]) {
 	int  ch, nfiber = 1, count = 100;
+	bool readable = false;
 	acl::string addr = "127.0.0.1:9000", event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "he:s:c:n:")) > 0) {
+	while ((ch = getopt(argc, argv, "he:s:c:n:r")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -84,6 +88,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'n':
 			count = atoi(optarg);
+			break;
+		case 'r':
+			readable = true;
 			break;
 		default:
 			break;
@@ -107,7 +114,7 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < nfiber; i++) {
 		go[&] {
-			total += connect_server(addr, count);
+			total += connect_server(addr, count, readable);
 		};
 	}
 
