@@ -21,6 +21,9 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd = fe->pfd;
 
+	/* In iocp mode on windows, the pfd maybe be set NULL when more overlapped
+	 * events happened by IO or poll events.
+	 */
 	if (pfd == NULL) {
 		return;
 	}

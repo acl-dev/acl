@@ -202,6 +202,9 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	iocp_check(ev, fe);
 
+	/* Check if the fe has been set STATUS_POLLING in io.c/poll.c/socket.c,
+	 * and will set poller_write or writer IOCP_EVENT.
+	 */
 	if (IS_POLLING(fe)) {
 		if (fe->poller_read == NULL) {
 			fe->poller_read = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
@@ -321,6 +324,9 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	iocp_check(ev, fe);
 
+	/* Check if the fe has been set STATUS_POLLING in io.c/poll.c/socket.c,
+	 * and will set poller_write or writer IOCP_EVENT.
+	 */
 	if (IS_POLLING(fe)) {
 		if (fe->poller_write == NULL) {
 			fe->poller_write = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
@@ -373,7 +379,13 @@ static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	assert(fe->id >= 0 && fe->id < ev->count);
 	fe->mask &= ~EVENT_READ;
-	fe->reader->type &= ~IOCP_EVENT_READ;
+
+	if (fe->reader) {
+		fe->reader->type &= ~IOCP_EVENT_READ;
+	}
+	if (fe->poller_read) {
+		fe->poller_read->type &= ~IOCP_EVENT_POLLR;
+	}
 
 	if (fe->mask == 0) {
 		iocp_remove(ev, fe);
@@ -389,7 +401,13 @@ static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	assert(fe->id >= 0 && fe->id < ev->count);
 	fe->mask &= ~EVENT_WRITE;
-	fe->writer->type &= ~IOCP_EVENT_WRITE;
+
+	if (fe->writer) {
+		fe->writer->type &= ~IOCP_EVENT_WRITE;
+	}
+	if (fe->poller_write) {
+		fe->poller_write->type &= ~IOCP_EVENT_POLLW;
+	}
 
 	if (fe->mask == 0) {
 		iocp_remove(ev, fe);
@@ -442,7 +460,6 @@ static int iocp_wait(EVENT *ev, int timeout)
 		event->refer--;
 		if (event->fe == NULL) {
 			if (event->refer == 0) {
-				printf(">>>>>>>>>>>>>>free event=%p refer 0, fe null\r\n", event);
 				mem_free(event);
 			}
 			continue;
@@ -460,7 +477,7 @@ static int iocp_wait(EVENT *ev, int timeout)
 		timeout = 0;
 	}
 
-	int i = 0;
+	/* peek and handle all IOCP EVENT added in iocp_event_save(). */
 	while ((event = (IOCP_EVENT*) ei->events->pop_back(ei->events)) != NULL) {
 		if (event->proc && event->fe) {
 			event->proc(ev, event->fe);

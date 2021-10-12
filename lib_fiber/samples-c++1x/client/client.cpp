@@ -14,7 +14,7 @@ static size_t do_echo(acl::socket_stream& conn, int count) {
 			printf("client write error %s\r\n", acl::last_serror());
 			break;
 		}
-#if 0
+#if 1
 		struct timeval begin, end;
 		gettimeofday(&begin, NULL);
 		int ret = acl_readable(conn.sock_handle());
@@ -41,11 +41,12 @@ static size_t do_echo(acl::socket_stream& conn, int count) {
 
 static size_t connect_server(const char* addr, int count) {
 	acl::socket_stream conn;
-	if (!conn.open(addr, 0, 0)) {
+	if (!conn.open(addr, 10, 10)) {
 		printf("connect %s error %s\r\n", addr, acl::last_serror());
 		return 0;
 	}
 
+	printf(">>>connect %s ok\r\n", addr);
 	return do_echo(conn, count);
 }
 

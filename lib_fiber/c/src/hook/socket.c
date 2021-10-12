@@ -304,6 +304,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 # endif
 #endif
 
+	SET_POLLING(fe);
 	time(&begin);
 	fiber_wait_write(fe);
 	time(&end);
