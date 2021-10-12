@@ -35,7 +35,7 @@ static size_t do_echo(acl::socket_stream& conn, int count) {
 		}
 	}
 
-	printf(">>>count=%d<<<\r\n", i);
+	printf(">>>count=%zd<<<\r\n", i);
 	return i;
 }
 

@@ -366,9 +366,11 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	fe = fiber_file_open(sockfd);
 	CLR_POLLING(fe);
 
+#ifdef HAS_IOCP
 	if (EVENT_IS_IOCP(fiber_io_event())) {
 		return fiber_iocp_read(fe, buf, (int) len);
 	}
+#endif
 
 	while (1) {
 		ssize_t ret;
