@@ -41,9 +41,9 @@ static size_t do_echo(acl::socket_stream& conn, int count, bool readable) {
 	return i;
 }
 
-static size_t connect_server(const char* addr, int count, bool readable) {
+static size_t start(const char* addr, int count, bool readable, int timeout) {
 	acl::socket_stream conn;
-	if (!conn.open(addr, 10, 10)) {
+	if (!conn.open(addr, timeout, timeout)) {
 		printf("connect %s error %s\r\n", addr, acl::last_serror());
 		return 0;
 	}
@@ -61,18 +61,19 @@ static void usage(const char* procname) {
 		" -c fiber_count[default: 1]\r\n"
 		" -n count[default: 100]\r\n"
 		" -r [if call readable? default: false]\r\n"
+		" -T timeout[default: 10 seconds]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[]) {
-	int  ch, nfiber = 1, count = 100;
+	int  ch, nfiber = 1, count = 100, timeout = 10;
 	bool readable = false;
 	acl::string addr = "127.0.0.1:9000", event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "he:s:c:n:r")) > 0) {
+	while ((ch = getopt(argc, argv, "he:s:c:n:rT:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -91,6 +92,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'r':
 			readable = true;
+			break;
+		case 'T':
+			timeout = atoi(optarg);
 			break;
 		default:
 			break;
@@ -114,7 +118,7 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < nfiber; i++) {
 		go[&] {
-			total += connect_server(addr, count, readable);
+			total += start(addr, count, readable, timeout);
 		};
 	}
 

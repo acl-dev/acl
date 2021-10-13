@@ -55,24 +55,32 @@ static void server_listen(acl::server_socket& ss, bool readable) {
 //////////////////////////////////////////////////////////////////////////////
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s server_addr -r [if call readable]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -e event_type[kernel|select|poll]\r\n"
+		" -s server_addr\r\n"
+		" -r [if call readable]\r\n"
+		, procname);
 }
 
 int main(int argc, char *argv[]) {
 	int  ch;
 	bool readable = false;
 	acl::string addr = "0.0.0.0:9000";
+	acl::string event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:r")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:e:r")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
 			addr = optarg;
+			break;
+		case 'e':
+			event_type = optarg;
 			break;
 		case 'r':
 			readable = true;
@@ -92,7 +100,16 @@ int main(int argc, char *argv[]) {
 		server_listen(ss, readable);
 	};
 
-	acl::fiber::schedule();
+	acl::fiber_event_t type;
+	if (event_type == "select") {
+		type = acl::FIBER_EVENT_T_SELECT;
+	} else if (event_type == "poll") {
+		type = acl::FIBER_EVENT_T_POLL;
+	} else {
+		type = acl::FIBER_EVENT_T_KERNEL;
+	}
+
+	acl::fiber::schedule_with(type);
 
 	return 0;
 }
