@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,15 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Oct 13 2021 shuxin.zheng@qq.com 3.5.3-1-20211014.09
+- bugfix: don't call getaddrinfo when binding a numric IP addr
+- feature: add udp_monitor_netlink configure in acl_udp_server.c
+- bugfix: optimize and fix bugs in iocp event in fiber module
+- bugfix: optimize and fix bugs in windows GUI message in fiber module
+- feature: DNS module in fiber module  can work on windows
+- feature: add API hook for windows platform by adding detrours module from MS open source
+- more: more features and bugs fixed
 
 * Thu Jun 24 2021 shuxin.zheng@qq.com 3.5.3-0-20210624.16
 - feature: mqtt module has been proved ok
