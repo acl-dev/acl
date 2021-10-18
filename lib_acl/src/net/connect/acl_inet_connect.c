@@ -266,7 +266,7 @@ ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 	struct addrinfo *peer_res0, *res, *local_res0;
 	struct addrinfo peer_buf, local_buf;
 	ACL_SOCKADDR peer_in, local_in;
-	int family;
+	int family = PF_UNSPEC;
 
 	if (h_error) {
 		*h_error = 0;
@@ -293,7 +293,6 @@ ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 		family = PF_INET;
 	} else if (!(ptr = strrchr(buf, ACL_ADDR_SEP))) {
 		ptr = strrchr(buf, ':');
-		family = PF_UNSPEC;
 	}
 
 	if (ptr == NULL) {
