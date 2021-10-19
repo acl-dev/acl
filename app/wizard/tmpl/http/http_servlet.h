@@ -38,10 +38,10 @@ protected:
 	bool doOptions(HttpRequest& req, HttpResponse& res);
 
 	// @override
-	bool doProfind(HttpRequest& req, HttpResponse& res);
+	bool doPropfind(HttpRequest& req, HttpResponse& res);
 
 	// @override
-	bool doWebsocket(HttpRequest& req, HttpResponse& res);
+	bool doWebSocket(HttpRequest& req, HttpResponse& res);
 
 	// @override
 	bool doUnknown(HttpRequest& req, HttpResponse& res);

@@ -55,12 +55,12 @@ bool http_servlet::doOptions(HttpRequest& req, HttpResponse& res)
 	return doService(http_handler_options, req, res);
 }
 
-bool http_servlet::doProfind(HttpRequest& req, HttpResponse& res)
+bool http_servlet::doPropfind(HttpRequest& req, HttpResponse& res)
 {
 	return doService(http_handler_profind, req, res);
 }
 
-bool http_servlet::doWebsocket(HttpRequest& req, HttpResponse& res)
+bool http_servlet::doWebSocket(HttpRequest& req, HttpResponse& res)
 {
 	return doService(http_handler_websocket, req, res);
 }
