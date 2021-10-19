@@ -55,12 +55,11 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 	return -1;
 }
 
-/* inet_connect_one - try to connect to one address */
+/* connect_one - try to connect to one address */
 
-static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
+static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	const struct addrinfo *local0, int blocking, int timeout)
 {
-	const char *myname = "inet_connect_one";
 	ACL_SOCKET  sock;
 	int         on;
 
@@ -68,7 +67,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d): create socket error: %s",
-			myname, __LINE__, acl_last_serror());
+			__FUNCTION__, __LINE__, acl_last_serror());
 		return ACL_SOCKET_INVALID;
 	}
 
@@ -87,7 +86,7 @@ static ACL_SOCKET inet_connect_one(const struct addrinfo *peer,
 
 	if (local0 != NULL && bind_local(sock, peer->ai_family, local0) < 0) {
 		acl_msg_error("%s(%d): bind local error %s, fd=%d",
-			myname, __LINE__, acl_last_serror(), sock);
+			__FUNCTION__, __LINE__, acl_last_serror(), sock);
 		acl_socket_close(sock);
 		return ACL_SOCKET_INVALID;
 	}
@@ -197,7 +196,7 @@ static struct addrinfo *try_numeric_addr(int family, const char *name,
 		if (acl_valid_ipv6_hostaddr(name, 0)) {
 			family = AF_INET6;
 		} else if (acl_valid_ipv4_hostaddr(name, 0)) {
-			family = AF_INET;
+			family = PF_INET;
 		} else {
 			return NULL;
 		}
@@ -210,7 +209,7 @@ static struct addrinfo *try_numeric_addr(int family, const char *name,
 		return NULL;
 	}
 
-	if (family == AF_INET) {
+	if (family == PF_INET) {
 		in_buf->in.sin_port   = htons(atoi(service));
 	} else {
 		in_buf->in6.sin6_port = htons(atoi(service));
@@ -257,24 +256,28 @@ static struct addrinfo *resolve_addr(const char *name, const char *service)
 	return NULL;
 }
 
-ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
-	int timeout, int *h_error)
+struct addr_res {
+	int peer_family;
+	char buf[2 * sizeof(ACL_SOCKADDR) + 128];
+	ACL_SOCKADDR peer_in;
+	ACL_SOCKADDR local_in;
+	struct addrinfo  peer_buf;
+	struct addrinfo  local_buf;
+	struct addrinfo *peer_res0;
+	struct addrinfo *local_res0;
+	const char *peer_port;
+};
+
+static int parse_addr(const char *addr, struct addr_res *res)
 {
-	ACL_SOCKET  sock;
-	char  buf[2 * sizeof(ACL_SOCKADDR) + 128], *ptr = NULL;
-	const char *peer, *local, *port;
-	struct addrinfo *peer_res0, *res, *local_res0;
-	struct addrinfo peer_buf, local_buf;
-	ACL_SOCKADDR peer_in, local_in;
-	int family = PF_UNSPEC;
+	char *ptr;
+	const char *peer, *local;
 
-	if (h_error) {
-		*h_error = 0;
-	}
+	res->peer_family = PF_UNSPEC;
 
-	snprintf(buf, sizeof(buf) - 1, "%s", addr);
-	peer = buf;
-	ptr  = strchr(buf, '@');
+	snprintf(res->buf, sizeof(res->buf) - 1, "%s", addr);
+	peer = res->buf;
+	ptr  = strchr(res->buf, '@');
 	if (ptr != NULL) {
 		*ptr  = 0;
 		local = *++ptr == 0 ? NULL : ptr;
@@ -284,70 +287,90 @@ ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 
 	if (acl_valid_ipv6_hostaddr(peer, 0)) {
 		ptr = strrchr(peer, ACL_ADDR_SEP);
-		family = PF_INET6;
+		res->peer_family = PF_INET6;
 	} else if (acl_valid_ipv4_hostaddr(peer, 0)) {
 		ptr = strrchr(peer, ACL_ADDR_SEP);
 		if (ptr == NULL) {
 			ptr = strrchr(peer, ':');
 		}
-		family = PF_INET;
-	} else if (!(ptr = strrchr(buf, ACL_ADDR_SEP))) {
-		ptr = strrchr(buf, ':');
+		res->peer_family = PF_INET;
+	} else if (!(ptr = strrchr(res->buf, ACL_ADDR_SEP))) {
+		ptr = strrchr(res->buf, ':');
 	}
 
 	if (ptr == NULL) {
 		acl_msg_error("%s, %s(%d): invalid addr(%s)",
 			__FILE__, __FUNCTION__, __LINE__, addr);
-		return ACL_SOCKET_INVALID;
+		return -1;
 	}
 
 	*ptr++ = 0;
-	port   = ptr;
+	res->peer_port = ptr;
 
-	if (atoi(port) <= 0) {
+	if (atoi(res->peer_port) <= 0) {
 		acl_msg_error("%s, %s(%d): invalid port(%s)",
-			__FILE__, __FUNCTION__, __LINE__, port);
-		return ACL_SOCKET_INVALID;
+			__FILE__, __FUNCTION__, __LINE__, res->peer_port);
+		return -1;
 	}
 
 	if (strlen(peer) == 0) {
 		acl_msg_error("%s, %s(%d): ip buf's length is 0",
 			__FILE__, __FUNCTION__, __LINE__);
-		return ACL_SOCKET_INVALID;
+		return -1;
 	}
 
-	peer_res0 = try_numeric_addr(family, peer, port, &peer_buf, &peer_in);
-	if (!peer_res0 && !(peer_res0 = resolve_addr(peer, port))) {
-		return ACL_SOCKET_INVALID;
+	res->peer_res0 = try_numeric_addr(res->peer_family, peer,
+		res->peer_port, &res->peer_buf, &res->peer_in);
+	if (res->peer_res0 == NULL && (res->peer_res0 =
+		 resolve_addr(peer, res->peer_port)) == NULL) {
+		return -1;
 	}
 
 	if (local == NULL) {
-		local_res0 = NULL;
-	} else if (!(local_res0 = try_numeric_addr(PF_UNSPEC, local, "0",
-		 &local_buf, &local_in))) {
-		local_res0 = resolve_addr(local, "0");
+		res->local_res0 = NULL;
+	} else if ((res->local_res0 = try_numeric_addr(PF_UNSPEC, local, "0",
+		 &res->local_buf, &res->local_in)) == NULL) {
+		res->local_res0 = resolve_addr(local, "0");
+	}
+
+	return 0;
+}
+
+ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
+	int timeout, int *h_error)
+{
+	ACL_SOCKET  sock;
+	struct addr_res ares;
+	struct addrinfo *res;
+
+	if (h_error) {
+		*h_error = 0;
+	}
+
+	if (parse_addr(addr, &ares) == -1) {
+		return ACL_SOCKET_INVALID;
 	}
 
 	sock = ACL_SOCKET_INVALID;
 
-	for (res = peer_res0; res != NULL ; res = res->ai_next) {
-		sock = inet_connect_one(res, local_res0, blocking, timeout);
+	for (res = ares.peer_res0; res != NULL ; res = res->ai_next) {
+		sock = connect_one(res, ares.local_res0, blocking, timeout);
 		if (sock != ACL_SOCKET_INVALID) {
 			break;
 		}
 	}
 
 	if (sock == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d) %s: connect error %s, addr=%s",
-			__FILE__, __LINE__, __FUNCTION__, acl_last_serror(), addr);
+		acl_msg_error("%s(%d) %s: connect %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, addr, acl_last_serror());
 	}
 
-	if (peer_res0 != &peer_buf) {
-		freeaddrinfo(peer_res0);
+	if (ares.peer_res0 != &ares.peer_buf) {
+		freeaddrinfo(ares.peer_res0);
 	}
 
-	if (local_res0 && local_res0 != &local_buf) {
-		freeaddrinfo(local_res0);
+	if (ares.local_res0 && ares.local_res0 != &ares.local_buf) {
+		freeaddrinfo(ares.local_res0);
 	}
 
 	return sock;
