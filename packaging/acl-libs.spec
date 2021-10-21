@@ -1,4 +1,4 @@
-%define release_id 1
+%define release_id 2
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Oct 21 2021 shuxin.zheng@qq.com 3.5.3-2-20211021.17
+- bugfix: fixed one corrupt bug occasionally in acl_udp_server.c
 
 * Thu Oct 13 2021 shuxin.zheng@qq.com 3.5.3-1-20211014.09
 - bugfix: don't call getaddrinfo when binding a numric IP addr

@@ -245,6 +245,27 @@ static void remove_stream(UDP_SERVER *server, const char *addr)
 			continue;
 		}
 
+		/* force to call all closing process first, then clean them
+		 * to avoid some corrupt __server_on_unbind()
+		 * or acl_vstream_close.
+		 * For example, when one close handler with acl::socket_stream
+		 * was added in ACL_VSTREAM, the acl::socket_stram was created
+		 * in master_udp::service_on_bind() and will be deleted in
+		 * master_udp::service_on_unbind(), and the service_on_unbind()
+		 * will be called and acl::socket_stream will be deleted when
+		 * __server_on_unbind was called below, on the calling for
+		 * acl_vstream_close() the close handler will be called, if
+		 * acl::socket_stream was used one corrupt will happen because
+		 * it has been deleted in service_on_unbind(). So, we should
+		 * call acl_vstream_call_close_handles() to call all close handlers
+		 * first and the acl::socket_stream can be used on the time,
+		 * then call __server_on_unbind() to delete acl::socket_stream,
+		 * then call acl_vstream_close() to close the ACL_VSTREAM that
+		 * no more calling for the close handler which has been called.
+		 * --- zsx, 2021.10.21
+		 */
+		acl_vstream_call_close_handles(stream);
+
 		if (__server_on_unbind) {
 			__server_on_unbind(__service_ctx, stream);
 		}
