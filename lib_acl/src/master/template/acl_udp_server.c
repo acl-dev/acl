@@ -317,8 +317,9 @@ static void server_add_addrs(UDP_SERVER *server, ACL_HTABLE *addrs)
 		ACL_VSTREAM *stream = server_bind_one(ptr);
 
 		if (stream == NULL) {
-			acl_msg_error("%s(%d): bind %s error %s", __FUNCTION__,
-				__LINE__, ptr, acl_last_serror());
+			acl_msg_error("%s(%d), %s: bind %s error %s",
+				__FILE__, __LINE__, __FUNCTION__,
+				ptr, acl_last_serror());
 			continue;
 		}
 
@@ -330,7 +331,8 @@ static void server_add_addrs(UDP_SERVER *server, ACL_HTABLE *addrs)
 		acl_event_enable_read(server->event, stream, 0,
 			udp_server_read, server);
 
-		acl_msg_info("bind %s addr ok, fd %d",
+		acl_msg_info("%s(%d), %s: bind %s addr ok, fd %d",
+			__FILE__, __LINE__, __FUNCTION__,
 			ACL_VSTREAM_LOCAL(stream), SOCK(stream));
 	}
 }
@@ -709,7 +711,8 @@ static ACL_VSTREAM *server_bind_one(const char *addr)
 
 	fd = acl_udp_bind(addr, flag);
 	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_warn("bind %s error %s", addr, acl_last_serror());
+		acl_msg_warn("%s(%d), %s: bind %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, addr, acl_last_serror());
 		return NULL;
 	}
 

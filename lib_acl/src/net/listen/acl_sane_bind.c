@@ -220,27 +220,30 @@ static ACL_SOCKET find_bind(const char *addr, unsigned flag,
 }
 
 ACL_SOCKET acl_sane_bind(const char *addr, unsigned flag,
-	int socktype, int *family)
+	int socktype, int *family_ptr)
 {
 	ACL_SOCKET fd;
+	int family = PF_UNSPEC;
 
 	if (acl_valid_ipv4_hostaddr(addr, 0)) {
-		if (family) {
-			*family = AF_INET;
-		}
-		fd = bind_addr(addr, flag, socktype, AF_INET);
+		family = PF_INET;
+		fd = bind_addr(addr, flag, socktype, PF_INET);
 	} else if (acl_valid_ipv6_hostaddr(addr, 0)) {
-		if (family) {
-			*family = AF_INET6;
-		}
-		fd = bind_addr(addr, flag, socktype, AF_INET6);
+		family = PF_INET6;
+		fd = bind_addr(addr, flag, socktype, PF_INET6);
 	} else {
-		fd = find_bind(addr, flag, socktype, family);
+		fd = find_bind(addr, flag, socktype, &family);
+	}
+
+	if (family_ptr) {
+		*family_ptr = family;
 	}
 
 	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d): bind %s error %s",
-			__FILE__, __LINE__, addr, acl_last_serror());
+		acl_msg_error("%s(%d): bind %s error %s, family=%s",
+			__FILE__, __LINE__, addr, acl_last_serror(),
+			family == PF_INET ? "PF_INET" : (family == PF_INET6 ?
+				"PF_INET6" : "UNKNOWN"));
 		return ACL_SOCKET_INVALID;
 	}
 
