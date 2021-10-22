@@ -151,7 +151,7 @@ static const char *json_pair(ACL_JSON *json, const char *data)
 static const char *json_tag(ACL_JSON *json, const char *data)
 {
 	ACL_JSON_NODE *node = json->curr_node;
-	char ch;
+	int ch;
 
 	while ((ch = *data) != 0) {
 		/* 如果前面有引号，则需要找到结尾引号 */
@@ -214,7 +214,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 				/* 处理半个汉字的情形 */
 				if (node->part_word)
 					node->part_word = 0;
-				else if (ch < 0)
+				else if (ch < 0 || ch > 0x80)
 					node->part_word = 1;
 			} else {
 				ADDCH(node->ltag, ch);
@@ -252,7 +252,7 @@ static const char *json_tag(ACL_JSON *json, const char *data)
 			/* 处理半个汉字的情形 */
 			if (node->part_word)
 				node->part_word = 0;
-			else if (ch < 0)
+			else if (ch < 0 || ch > 0x80)
 				node->part_word = 1;
 		} else {
 			ADDCH(node->ltag, ch);
@@ -470,7 +470,7 @@ static const char *json_string(ACL_JSON *json, const char *data)
 				/* 前一个字节非前半个汉字且当前字节高位
 				 * 为 1，则表明当前字节为前半个汉字
 				 */
-				else if (ch < 0)
+				else if (ch < 0 || ch > 0x80)
 					node->part_word = 1;
 			} else {
 				ADDCH(node->text, ch);
@@ -499,7 +499,7 @@ static const char *json_string(ACL_JSON *json, const char *data)
 			/* 处理半个汉字的情形 */
 			if (node->part_word)
 				node->part_word = 0;
-			else if (ch < 0)
+			else if (ch < 0 || ch > 0x80)
 				node->part_word = 1;
 		} else {
 			ADDCH(node->text, ch);

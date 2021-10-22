@@ -214,11 +214,11 @@ int mqtt_subscribe::update_topic_qos(const char* data, int dlen) {
 		return -1;
 	}
 
-	char qos = *data++;
+	int qos = *data++;
 	dlen--;
 	nread_++;
 
-	if (qos < (char) MQTT_QOS0 || qos > (char) MQTT_QOS2) {
+	if (qos < MQTT_QOS0 || qos > 0x80 || qos > MQTT_QOS2) {
 		logger_warn("invalid qos=%d, topic=%s", qos, topic_.c_str());
 		qos = MQTT_QOS0;
 	}
