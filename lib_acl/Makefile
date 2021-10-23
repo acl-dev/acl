@@ -120,6 +120,10 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 #		CFLAGS += -m64
 		RPATH = linux64
 	endif
+	ifeq ($(findstring aarch64, $(OSTYPE)), aarch64)
+#		CFLAGS += -maarch64
+		RPATH = aarch64
+	endif
 	CFLAGS += -O3
 endif
 

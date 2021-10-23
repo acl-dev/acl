@@ -145,11 +145,11 @@ int mqtt_suback::update_header_var(const char* data, int dlen) {
 int mqtt_suback::update_topic_qos(const char* data, int dlen) {
 	assert(data && dlen > 0);
 
-	char qos = *data++;
+	int qos = *data++;
 	dlen--;
 	nread_++;
 
-	if (qos < (char) MQTT_QOS0 || qos > (char) MQTT_QOS2) {
+	if (qos < MQTT_QOS0 || qos > 0x80 || qos > MQTT_QOS2) {
 		logger_warn("invalid qos=%d", qos);
 		qos = MQTT_QOS0;
 	}

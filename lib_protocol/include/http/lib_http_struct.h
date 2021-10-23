@@ -125,8 +125,8 @@ struct HTTP_HDR {
 	http_off_t content_length; /**< HTTP协议体数据长度 */
 
 	/**< 是否保持长连接: 0 -> 不保持，> 0 -> 保持，< 0 -> 没有该字段 */
-	char  keep_alive;
-	char  chunked; /* 该字段本来对HTTP协议响应有意义, 为了将来的扩展, 故定义于此 */
+	short  keep_alive;
+	short  chunked; /* 该字段本来对HTTP协议响应有意义, 为了将来的扩展, 故定义于此 */
 
 	/* 内部变量 */
 	short  cur_lines;
@@ -139,7 +139,7 @@ struct HTTP_HDR {
 	void *chat_ctx;
 	void (*chat_free_ctx_fn)(void*);
 
-	char  debug;            /**< 调试信息头的标志位 */
+	short  debug;            /**< 调试信息头的标志位 */
 };
 
 #define HDR_RESTORE(hdr_ptr, hdr_type, hdr_member) \

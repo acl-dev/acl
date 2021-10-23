@@ -51,6 +51,9 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
 		RPATH = linux64
 	endif
+	ifeq ($(findstring aarch64, $(OSTYPE)), aarch64)
+		RPATH = aarch64
+	endif
 	n = `cat /proc/cpuinfo | grep processor | wc -l`
 	MAKE_ARGS = -j $(n)
 	SYSLIB += -lrt -ldl

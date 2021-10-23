@@ -34,6 +34,9 @@ guess_os() {
 		i686)
 			RPATH="linux32"
 			;;
+		aarch64)
+			RPATH="aarch64"
+			;;
 		*)
 			echo "unknown OS - $os_name $os_type"
 			exit 1
