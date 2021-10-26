@@ -11,7 +11,7 @@ typedef struct HTTP_CHAT_CTX {
 	ACL_VSTREAM *stream;
 	unsigned int flag;                  /**<　继承的标志位, defined as HTTP_CHAT_FLAG_XXX */
 	int   timeout;
-	char  chunked;
+	short chunked;
 	http_off_t   chunk_len;             /**< 当前数据块所需要读的数据长度(字节) */
 	http_off_t   read_cnt;              /**< 当前数据块所读数据长度(字节) */
 	http_off_t   body_len;              /**< 所读到数据体总长度(字节) */

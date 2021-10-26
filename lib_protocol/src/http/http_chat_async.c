@@ -13,7 +13,7 @@ typedef struct HTTP_CHAT_CTX {
 	HTTP_HDR  *hdr;                     /**< 通用HTTP头(请求头或响应头) */
 	ACL_ASTREAM *stream;                /**< 流指针 */
 	int   timeout;                      /**< 读写超时时间，秒 */
-	char  chunked;                      /**< 是否是块传输模式 */
+	short chunked;                      /**< 是否是块传输模式 */
 	ctx_type type;                      /**< 仅为了调试方便 */
 	int   status;                       /**< 当前所处IO状态 */
 #define	CHAT_S_HDR		(1 << 0)    /**< 读 HTTP 头 */
