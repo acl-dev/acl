@@ -156,6 +156,13 @@ public:
 	 * 步写状态(此时该流会重新被异步引擎监控)
 	 */
 	void disable_write(void);
+
+	/**
+	 * 获得发送队列里数据长度
+	 * @return {size_t}
+	 */
+	size_t pending_length(void) const;
+
 protected:
 	virtual ~aio_ostream(void);
 

@@ -272,6 +272,11 @@ void aio_ostream::vformat(const char* fmt, va_list ap)
 	acl_aio_vfprintf(stream_, fmt, ap);
 }
 
+size_t aio_ostream::pending_length(void) const
+{
+	return acl_aio_send_pending(stream_);
+}
+
 void aio_ostream::write_wait(int timeout /* = 0 */)
 {
 	// 设置流的异步读超时时间

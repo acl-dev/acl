@@ -771,6 +771,13 @@ ACL_API void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 ACL_API void ACL_PRINTF(2, 3) acl_aio_fprintf(ACL_ASTREAM *astream, const char *fmt, ...);
 
 /**
+ * 获得当前发送队列里的数据长度
+ * @param astream {ACL_ASTREAM*}
+ * @return {size_tt}
+ */
+ACL_API size_t acl_aio_send_pending(ACL_ASTREAM *astream);
+
+/**
  * 设置异步流为写监听状态，当该流可写时则调用用户的回调函数
  * @param astream {ACL_ASTREM*} 异步流对象
  * @param can_write_fn {ACL_AIO_NOTIFY_FN} 用户回调函数

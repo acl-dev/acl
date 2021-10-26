@@ -536,6 +536,22 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 }
 
+size_t acl_aio_send_pending(ACL_ASTREAM *astream)
+{
+	ACL_ITER iter;
+	size_t n = 0;
+
+	acl_foreach(iter, &astream->write_fifo) {
+		ACL_VSTRING *buf = (ACL_VSTRING*) iter.data;
+		n += ACL_VSTRING_LEN(buf);
+	}
+
+	if (astream->write_offset > 0 && n > (size_t) astream->write_offset) {
+		n -= astream->write_offset;
+	}
+	return n;
+}
+
 static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
 	ACL_VSTREAM *stream acl_unused, void *context)
 {
