@@ -100,6 +100,7 @@ void event_timer_free(ACL_EVENT *eventp)
 	}
 
 	acl_htable_free(eventp->timers->table, acl_myfree_fn);
+	acl_myfree(eventp->timers);
 }
 
 /* event_timer_request - (re)set timer */
