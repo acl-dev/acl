@@ -836,7 +836,7 @@ ACL_API const char *acl_vstream_strerror(ACL_VSTREAM *fp);
  * 获得文件流句柄的文件路径名
  * @param stream_ptr {ACL_VSTREAM*}
  */
-#define	ACL_VSTREAM_PATH(stream_ptr) ((stream_ptr)->path)
+#define	ACL_VSTREAM_PATH(stream_ptr) ((stream_ptr)->path ? (stream_ptr)->path : "")
 
 /**
  * 当 ACL_VSTREAM 为文件流时，设置文件流的路径
@@ -848,7 +848,7 @@ ACL_API void acl_vstream_set_path(ACL_VSTREAM *fp, const char *path);
 /**
  * 当 ACL_VSTREAM 为网络流时，用此宏取得对方的地址
  */
-#define	ACL_VSTREAM_PEER(stream_ptr) ((stream_ptr)->addr_peer)
+#define	ACL_VSTREAM_PEER(stream_ptr) ((stream_ptr)->addr_peer ? (stream_ptr)->addr_peer : "")
 
 /**
  * 当 ACL_VSTREAM 为网络流时，此函数设置远程连接地址
@@ -868,7 +868,7 @@ ACL_API int acl_vstream_set_peer_addr(ACL_VSTREAM *fp, const struct sockaddr *sa
 /**
  * 当 ACL_VSTREAM 为网络流时，用此宏取得本地的地址
  */
-#define	ACL_VSTREAM_LOCAL(stream_ptr) ((stream_ptr)->addr_local)
+#define	ACL_VSTREAM_LOCAL(stream_ptr) ((stream_ptr)->addr_local ? (stream_ptr)->addr_local : "")
 
 /**
  * 当 ACL_VSTREAM 为网络流时，此函数设置本地地址

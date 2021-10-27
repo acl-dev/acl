@@ -135,7 +135,7 @@ static int check(ACL_SOCKET listener, ACL_SOCKET client, ACL_SOCKET result[2])
 			}
 			acl_msg_error("select error: %s", acl_last_serror());
 			return -1;
-        }
+		}
 
 		if (FD_ISSET(listener, &xmask)) {
 			acl_msg_error("listener exception");

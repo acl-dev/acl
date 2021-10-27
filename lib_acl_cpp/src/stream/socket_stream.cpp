@@ -148,7 +148,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
-	char* ptr = ACL_VSTREAM_PEER(stream_);
+	const char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char  buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
@@ -172,7 +172,7 @@ const char* socket_stream::get_peer_ip(void) const
 		return "";
 	}
 
-	char* ptr = ACL_VSTREAM_PEER(stream_);
+	const char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char buf[256];
 		if (acl_getpeername(ACL_VSTREAM_SOCK(stream_),
@@ -206,7 +206,7 @@ const char* socket_stream::get_local(bool full /* = false */) const
 	}
 
 	// xxx: acl_vstream 中没有对此地址赋值
-	char* ptr = ACL_VSTREAM_LOCAL(stream_);
+	const char* ptr = ACL_VSTREAM_LOCAL(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char buf[256];
 		if (acl_getsockname(ACL_VSTREAM_SOCK(stream_),
@@ -230,7 +230,7 @@ const char* socket_stream::get_local_ip(void) const
 		return "";
 	}
 
-	char* ptr = ACL_VSTREAM_LOCAL(stream_);
+	const char* ptr = ACL_VSTREAM_LOCAL(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char buf[256];
 		if (acl_getsockname(ACL_VSTREAM_SOCK(stream_),
