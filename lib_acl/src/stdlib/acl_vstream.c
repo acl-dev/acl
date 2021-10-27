@@ -43,8 +43,6 @@
 
 #include "../event/events_fdtable.h"
 
-static char __empty_string[] = "";
-
  /*
   * Initialization of the three pre-defined streams. Pre-allocate a static
   * I/O buffer for the standard error fp, so that the error handler can
@@ -2246,9 +2244,6 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	}
 	fp->read_buf     = (unsigned char *) acl_mymalloc(buflen + 1);
 	fp->read_buf_len = (int) buflen;
-	fp->addr_local   = __empty_string;
-	fp->addr_peer    = __empty_string;
-	fp->path         = __empty_string;
 
 #ifdef ACL_MACOSX
 	if ((fdtype & ACL_VSTREAM_TYPE_LISTEN_INET)
@@ -2359,16 +2354,16 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 	memcpy(to->read_buf, from->read_buf, (size_t) to->read_buf_len);
 	to->read_ptr = to->read_buf + (from->read_ptr - from->read_buf);
 
-	if (from->addr_peer && from->addr_peer != __empty_string) {
+	if (from->addr_peer) {
 		to->addr_peer = acl_mystrdup(from->addr_peer);
 	} else {
-		to->addr_peer = __empty_string;
+		to->addr_peer = NULL;
 	}
 
-	if (from->addr_local && from->addr_local != __empty_string) {
+	if (from->addr_local) {
 		to->addr_local = acl_mystrdup(from->addr_local);
 	} else {
-		to->addr_local = __empty_string;
+		to->addr_local = NULL;
 	}
 
 	if (from->sa_peer) {
@@ -2386,10 +2381,10 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 		to->sa_local_len = from->sa_local_len;
 	}
 
-	if (from->path && from->path != __empty_string) {
+	if (from->path) {
 		to->path = acl_mystrdup(from->path);
 	} else {
-		to->path = __empty_string;
+		to->path = NULL;
 	}
 
 	to->ioctl_read_ctx   = NULL;
@@ -2576,7 +2571,7 @@ void acl_vstream_ctl(ACL_VSTREAM *fp, int name,...)
 			break;
 		case ACL_VSTREAM_CTL_PATH:
 			ptr = va_arg(ap, char*);
-			if (fp->addr_peer && fp->addr_peer != __empty_string) {
+			if (fp->addr_peer) {
 				acl_myfree(fp->addr_peer);
 				fp->addr_peer = NULL;
 			}
@@ -3010,11 +3005,13 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 		acl_myfree(fp->wbuf);
 	}
 
-	if (fp->addr_peer && fp->addr_peer != __empty_string) {
+	if (fp->addr_peer) {
 		acl_myfree(fp->addr_peer);
+		fp->addr_peer = NULL;
 	}
-	if (fp->addr_local && fp->addr_local != __empty_string) {
+	if (fp->addr_local) {
 		acl_myfree(fp->addr_local);
+		fp->addr_local = NULL;
 	}
 	if (fp->sa_peer) {
 		acl_myfree(fp->sa_peer);
@@ -3022,8 +3019,9 @@ void acl_vstream_free(ACL_VSTREAM *fp)
 	if (fp->sa_local) {
 		acl_myfree(fp->sa_local);
 	}
-	if (fp->path && fp->path != __empty_string) {
+	if (fp->path) {
 		acl_myfree(fp->path);
+		fp->path = NULL;
 	}
 
 	if (fp != &acl_vstream_fstd[0] && fp != &acl_vstream_fstd[1]
@@ -3131,10 +3129,10 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 		acl_myfree(fp->wbuf);
 	}
 
-	if (fp->addr_local && fp->addr_local != __empty_string) {
+	if (fp->addr_local) {
 		acl_myfree(fp->addr_local);
 	}
-	if (fp->addr_peer && fp->addr_peer != __empty_string) {
+	if (fp->addr_peer) {
 		acl_myfree(fp->addr_peer);
 	}
 	if (fp->sa_peer) {
@@ -3143,7 +3141,7 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 	if (fp->sa_local) {
 		acl_myfree(fp->sa_local);
 	}
-	if (fp->path && fp->path != __empty_string) {
+	if (fp->path) {
 		acl_myfree(fp->path);
 	}
 
@@ -3175,7 +3173,7 @@ void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
 		return;
 	}
 
-	if (fp->addr_local == __empty_string || fp->addr_local == NULL) {
+	if (fp->addr_local == NULL) {
 		fp->addr_local = acl_mystrdup(addr);
 	} else {
 		acl_myfree(fp->addr_local);
@@ -3222,7 +3220,7 @@ int acl_vstream_set_local_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 	memcpy(fp->sa_local, sa, fp->sa_local_size);
 	fp->sa_local_len = fp->sa_local_size;
 
-	if (fp->addr_local == __empty_string || fp->addr_local == NULL) {
+	if (fp->addr_local == NULL) {
 		fp->addr_local = acl_mystrdup(addr);
 	} else {
 		acl_myfree(fp->addr_local);
@@ -3253,7 +3251,7 @@ void acl_vstream_set_peer(ACL_VSTREAM *fp, const char *addr)
 		return;
 	}
 
-	if (fp->addr_peer == __empty_string || fp->addr_peer == NULL) {
+	if (fp->addr_peer == NULL) {
 		fp->addr_peer = acl_mystrdup(addr);
 	} else {
 		acl_myfree(fp->addr_peer);
@@ -3287,7 +3285,7 @@ int acl_vstream_set_peer_addr(ACL_VSTREAM *fp, const struct sockaddr *sa)
 	memcpy(fp->sa_peer, sa, fp->sa_peer_size);
 	fp->sa_peer_len = fp->sa_peer_size;
 
-	if (fp->addr_peer == __empty_string || fp->addr_peer == NULL) {
+	if (fp->addr_peer == NULL) {
 		fp->addr_peer = acl_mystrdup(addr);
 	} else {
 		acl_myfree(fp->addr_peer);
@@ -3306,7 +3304,7 @@ void acl_vstream_set_path(ACL_VSTREAM *fp, const char *path)
 		return;
 	}
 
-	if (fp->path == __empty_string || fp->path == NULL) {
+	if (fp->path == NULL) {
 		fp->path = acl_mystrdup(path);
 	} else {
 		acl_myfree(fp->path);
