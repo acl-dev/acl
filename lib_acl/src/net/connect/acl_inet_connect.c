@@ -347,6 +347,9 @@ ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 		*h_error = 0;
 	}
 
+	/* we should fill the ares with 0 to init all members int it. */
+	memset(&ares, 0, sizeof(ares));
+
 	if (parse_addr(addr, &ares) == -1) {
 		return ACL_SOCKET_INVALID;
 	}
