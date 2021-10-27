@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* wed Oct 27 2021 shuxin.zheng@qq.com 3.5.3-3-20211027.17
+- fixed one crashed bug in acl_inet_connect.c.
 
 * Thu Oct 21 2021 shuxin.zheng@qq.com 3.5.3-2-20211021.17
 - bugfix: fixed one corrupt bug occasionally in acl_udp_server.c
