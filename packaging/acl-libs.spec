@@ -47,7 +47,7 @@ rm -rf %{buildroot}
 
 %changelog
 
-* wed Oct 27 2021 shuxin.zheng@qq.com 3.5.3-3-20211027.17
+* Wed Oct 27 2021 shuxin.zheng@qq.com 3.5.3-3-20211027.17
 - fixed one crashed bug in acl_inet_connect.c.
 
 * Thu Oct 21 2021 shuxin.zheng@qq.com 3.5.3-2-20211021.17
