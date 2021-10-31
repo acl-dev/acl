@@ -216,6 +216,13 @@ public:
 	aio_handle& get_handle(void) const;
 
 	/**
+	 * 重新绑定异步事件句柄
+	 * @param {aio_handle&}
+	 * 注：该方法仅可在对象创建后调用一次，一旦进入 IO 过程则禁止调用
+	 */
+	void set_handle(aio_handle& handle);
+
+	/**
 	 * 注册读写流对象，内部自动调用 hook->open 过程，如果成功，则返回之前注册
      * 的对象(可能为NULL)，若失败则返回与输入参数相同的指针，应用可以通过判断
      * 返回值与输入值是否相同来判断注册流对象是否成功
@@ -276,7 +283,7 @@ private:
 
 private:
 	std::string ip_peer_;
-    std::string ip_local_;
+	std::string ip_local_;
 
 	const char* get_ip(const char* addr, std::string& out);
 

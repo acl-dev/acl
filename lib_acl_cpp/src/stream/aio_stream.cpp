@@ -133,6 +133,19 @@ aio_handle& aio_stream::get_handle(void) const
 	return *handle_;
 }
 
+void aio_stream::set_handle(aio_handle& handle) {
+	if (stream_) {
+		handle_->decrease();
+	}
+
+	handle_ = &handle;
+
+	if (stream_) {
+		stream_->aio = handle_->get_handle();
+		handle_->increase();  // 增加异步流计数
+	}
+}
+
 ACL_ASTREAM* aio_stream::get_astream(void) const
 {
 	return stream_;
