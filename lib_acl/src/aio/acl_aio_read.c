@@ -652,6 +652,10 @@ void acl_aio_readn(ACL_ASTREAM *astream, int count)
 	/* count 表示用户希望读的数据总长度 */
 	astream->count = count;
 
+	/* 预留出足够的空间 */
+	ACL_VSTRING_SPACE(&astream->strbuf, count);
+
+	/* 初始化内存缓存区对象*/
 	ACL_VSTRING_RESET(&astream->strbuf);
 
 	/* 当满足回调条件时，有可能是从系统缓冲区中读取数据，也有可能从用户

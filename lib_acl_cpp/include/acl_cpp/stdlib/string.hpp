@@ -910,6 +910,7 @@ public:
 	 * @return {string&} 当前对象的引用
 	 */
 	string& space(size_t n);
+	string& reserve(size_t n);
 
 	/**
 	 * 将当前对象存储的字符串进行分割

@@ -1097,6 +1097,12 @@ string& string::space(size_t n)
 	return *this;
 }
 
+string& string::reserve(size_t n)
+{
+	ACL_VSTRING_SPACE(vbf_, (int) n);
+	return *this;
+}
+
 bool string::empty(void) const
 {
 	return LEN(vbf_) > 0 ? false : true;
