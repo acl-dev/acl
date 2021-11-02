@@ -6,6 +6,8 @@
 #include "aio_timer_callback.hpp"
 #include "aio_stream.hpp"
 
+struct iovec;
+
 namespace acl
 {
 
@@ -127,6 +129,14 @@ public:
 	void write(const void* data, int len, long long int delay = 0,
 		aio_timer_writer* callback = NULL);
 #endif
+
+	/**
+	 * 异步向流中写数据, 当流出错、写超时或写成功时将触发事件通知过程，
+	 * 类似系统的 writev
+	 * @param iov {const struct iovec*} 数据集合数组
+	 * @param count {int} iov 数组的长度
+	 */
+	void writev(const struct iovec *iov, int count);
 
 	/**
 	 * 格式化方式异步写数据，当完全写成功或出错或超时时会

@@ -259,6 +259,12 @@ void aio_ostream::write(const void* data, int len,
 	acl_aio_writen(stream_, (const char*) data, len);
 }
 
+void aio_ostream::writev(const struct iovec *iov, int count)
+{
+	acl_assert(stream_);
+	acl_aio_writev(stream_, iov, count);
+}
+
 void aio_ostream::format(const char* fmt, ...)
 {
 	va_list ap;

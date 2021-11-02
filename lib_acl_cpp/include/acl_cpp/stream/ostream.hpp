@@ -15,8 +15,8 @@ class string;
  */
 
 class ACL_CPP_API ostream
-	: virtual public stream
-	, public pipe_stream
+: virtual public stream
+, public pipe_stream
 {
 public:
 	ostream(void) {}
