@@ -83,7 +83,7 @@ int acl_getsocktype(ACL_SOCKET fd)
 	int type;
 	socklen_t len = sizeof(len);
 
-	if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) == -1) {
+	if (getsockopt(fd, SOL_SOCKET, SO_TYPE, (void*) &type, &len) == -1) {
 		return -1;
 	}
 
