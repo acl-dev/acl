@@ -556,7 +556,9 @@ stream_hook* aio_stream::setup_hook(stream_hook* hook)
 		vstream->write_fn = send_hook;
 		acl_vstream_add_object(vstream, HOOK_KEY, this);
 
-		acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(vstream));
+		if (acl_getsocktype(ACL_VSTREAM_SOCK(vstream)) == SOCK_STREAM) {
+			acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(vstream));
+		}
 
 		if (hook->open(vstream) == false) {
 			// 如果打开失败，则恢复

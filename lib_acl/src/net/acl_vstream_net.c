@@ -204,7 +204,7 @@ ACL_VSTREAM *acl_vstream_timed_connect(const char *addr, int block_mode,
 
 	ACL_VSTREAM_SET_MS(client);
 
-	family = acl_getsocktype(connfd);
+	family = acl_getsockfamily(connfd);
 
 	switch (family) {
 #ifdef ACL_UNIX

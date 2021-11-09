@@ -33,12 +33,20 @@ ACL_API int acl_getpeername(ACL_SOCKET fd, char *buf, size_t bsize);
 ACL_API int acl_getsockname(ACL_SOCKET fd, char *buf, size_t bsize);
 
 /**
- * 取得套接字的类型：是网络套接字还是域套接字
+ * 获得套接字类型
+ * @param fd {ACL_SOCKET} 网络套接字
+ * @return {int} -1 表示出错或所给够本非套接字，如果是 TCP 则返回 SOCK_STREAM,
+ *  如果是 UDP 则返回 SOCK_DGRAM
+ */
+ACL_API int acl_getsocktype(ACL_SOCKET fd);
+
+/**
+ * 取得套接字地址族类型：是网络套接字还是域套接字
  * @param fd {ACL_SOCKET} 网络套接字
  * @return {int} -1: 表示出错或输入非法或非套接字; >= 0 表示成功获得套接字
  *  类型，返回值有 AF_INET、AF_INET6 或 AF_UNIX(仅限 UNIX 平台)
  */
-ACL_API int acl_getsocktype(ACL_SOCKET fd);
+ACL_API int acl_getsockfamily(ACL_SOCKET fd);
 
 /**
  * 检查套接字：是监听套接字还是网络套接字

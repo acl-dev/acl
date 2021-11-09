@@ -2293,7 +2293,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 		 * 否则在写大数据包时会造成阻塞，超时作用失效
 		 */
 		/**
-		 * if (rw_timeout > 0 && acl_getsocktype(fd) >= 0)
+		 * if (rw_timeout > 0 && acl_getsockfamily(fd) >= 0)
 		 *	acl_non_blocking(fd, ACL_NON_BLOCKING);
 		 */
 	}
@@ -2305,7 +2305,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	if (fdtype & ACL_VSTREAM_TYPE_FILE) {
 		/* nothing */
 	} else if ((ret = acl_check_socket(fd)) == 1) {
-		ret = acl_getsocktype(fd);
+		ret = acl_getsockfamily(fd);
 #ifdef ACL_INET6
 		if (ret == AF_INET || ret == AF_INET6) {
 #else

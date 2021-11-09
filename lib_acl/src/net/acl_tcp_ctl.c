@@ -29,7 +29,7 @@
 void acl_tcp_set_rcvbuf(ACL_SOCKET fd, int size)
 {
 	const char *myname = "acl_tcp_set_rcvbuf";
-	int n = acl_getsocktype(fd);
+	int n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -49,7 +49,7 @@ void acl_tcp_set_rcvbuf(ACL_SOCKET fd, int size)
 void acl_tcp_set_sndbuf(ACL_SOCKET fd, int size)
 {
 	const char *myname = "acl_tcp_sndbuf";
-	int n = acl_getsocktype(fd);
+	int n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -71,7 +71,7 @@ int acl_tcp_get_rcvbuf(ACL_SOCKET fd)
 	const char *myname = "acl_tcp_get_rcvbuf";
 	int   size;
 	socklen_t len;
-	int n = acl_getsocktype(fd);
+	int n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -97,7 +97,7 @@ int acl_tcp_get_sndbuf(ACL_SOCKET fd)
 	const char *myname = "acl_tcp_get_sndbuf";
 	int   size;
 	socklen_t len;
-	int n = acl_getsocktype(fd);
+	int n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -125,7 +125,7 @@ void acl_tcp_nodelay(ACL_SOCKET fd, int onoff)
 {
 	const char *myname = "acl_tcp_nodelay";
 	int   on = onoff ? 1 : 0;
-	int   n = acl_getsocktype(fd);
+	int   n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -147,7 +147,7 @@ int acl_get_tcp_nodelay(ACL_SOCKET fd)
 	const char *myname = "acl_get_tcp_nodelay";
 	socklen_t len;
 	int   on = 0;
-	int   n = acl_getsocktype(fd);
+	int   n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -171,7 +171,7 @@ void acl_tcp_so_linger(ACL_SOCKET fd, int onoff, int timeout)
 {
 	const char *myname = "acl_tcp_so_linger";
 	struct linger  l;
-	int   n = acl_getsocktype(fd);
+	int   n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)
@@ -194,7 +194,7 @@ int acl_get_tcp_solinger(ACL_SOCKET fd)
 	const char *myname = "acl_get_tcp_solinger";
 	struct linger  l;
 	socklen_t len = (socklen_t) sizeof(l);
-	int   n = acl_getsocktype(fd);
+	int   n = acl_getsockfamily(fd);
 
 #ifdef AF_INET6
 	if (n != AF_INET && n != AF_INET6)

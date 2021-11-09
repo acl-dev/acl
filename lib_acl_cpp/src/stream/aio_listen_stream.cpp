@@ -72,7 +72,7 @@ bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 bool aio_listen_stream::open(ACL_SOCKET fd)
 {
 	unsigned fdtype = 0;
-	int type = acl_getsocktype(fd);
+	int type = acl_getsockfamily(fd);
 	switch (type) {
 #ifdef ACL_UNIX
 	case AF_UNIX:

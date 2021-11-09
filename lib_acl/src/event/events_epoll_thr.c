@@ -117,7 +117,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 			if (errno == EEXIST)
 				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
 					myname, acl_last_serror(), fd);
-			else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+			else if (errno == EBADF && acl_getsockfamily(fd) < 0) {
 				acl_msg_error("%s: epool_ctl: %s, fd: %d",
 					myname, acl_last_serror(), fd);
 				ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
@@ -148,7 +148,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 		if (errno == EEXIST)
 			acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
 				myname, acl_last_serror(), fd);
-		else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+		else if (errno == EBADF && acl_getsockfamily(fd) < 0) {
 			acl_msg_error("%s: epool_ctl: %s, fd: %d",
 				myname, acl_last_serror(), fd);
 			ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
@@ -292,7 +292,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 			if (errno == EEXIST)
 				acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
 					myname, acl_last_serror(), fd);
-			else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+			else if (errno == EBADF && acl_getsockfamily(fd) < 0) {
 				acl_msg_error("%s: epool_ctl: %s, fd: %d",
 					myname, acl_last_serror(), fd);
 				ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);
@@ -311,7 +311,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *fp,
 		if (errno == EEXIST)
 			acl_msg_warn("%s: epoll_ctl: %s, fd: %d",
 				myname, acl_last_serror(), fd);
-		else if (errno == EBADF && acl_getsocktype(fd) < 0) {
+		else if (errno == EBADF && acl_getsockfamily(fd) < 0) {
 			acl_msg_error("%s: epool_ctl: %s, fd: %d",
 				myname, acl_last_serror(), fd);
 			ACL_VSTREAM_SET_SOCK(fp, ACL_SOCKET_INVALID);

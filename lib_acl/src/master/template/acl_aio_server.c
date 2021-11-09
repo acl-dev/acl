@@ -968,7 +968,7 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 		return;
 	}
 
-	ret = acl_getsocktype(fd);
+	ret = acl_getsockfamily(fd);
 #ifdef AF_INET6
 	if (ret == AF_INET || ret == AF_INET6)
 #else

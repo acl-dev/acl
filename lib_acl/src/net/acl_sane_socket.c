@@ -80,6 +80,18 @@ int acl_getsockname(ACL_SOCKET fd, char *buf, size_t size)
 
 int acl_getsocktype(ACL_SOCKET fd)
 {
+	int type;
+	socklen_t len = sizeof(len);
+
+	if (getsockopt(fd, SOL_SOCKET, SO_TYPE, &type, &len) == -1) {
+		return -1;
+	}
+
+	return type;
+}
+
+int acl_getsockfamily(ACL_SOCKET fd)
+{
 	ACL_SOCKADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
 	socklen_t len = sizeof(addr);
