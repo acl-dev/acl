@@ -216,8 +216,7 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 		return NULL;
 	}
 
-	aio_socket_stream* stream =
-		NEW aio_socket_stream(handle, astream, false);
+	aio_socket_stream* stream = NEW aio_socket_stream(handle, astream, false);
 
 	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
 	// 同时 hook 关闭及超时回调过程
@@ -225,6 +224,23 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 	// hook 连接成功的回调过程
 	stream->hook_open();
 
+	return stream;
+}
+
+aio_socket_stream* aio_socket_stream::bind(aio_handle* handle, const char * addr)
+{
+	acl_assert(handle);
+	unsigned flag = ACL_INET_FLAG_NBLOCK | ACL_INET_FLAG_REUSEPORT;
+
+	ACL_VSTREAM* vstream = acl_vstream_bind(addr, 0, flag);
+	if (vstream == NULL) {
+		logger_error("bind %s error %s", addr, last_serror());
+		return NULL;
+	}
+
+	ACL_AIO* aio = handle->get_handle();
+	ACL_ASTREAM* astream = acl_aio_open(aio, vstream);
+	aio_socket_stream* stream = NEW aio_socket_stream(handle, astream, true);
 	return stream;
 }
 

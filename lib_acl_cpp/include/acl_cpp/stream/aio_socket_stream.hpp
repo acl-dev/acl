@@ -69,12 +69,21 @@ public:
 	 * @param addr {const char*} 远程服务器的地址，地址格式为：
 	 *  针对TCP：IP:Port 或 针对域套接口：{filePath}
 	 * @param timeout {int} 连接超时时间(秒)
-	 * @return {bool} 如果连接立即返回失败则该函数返回 false，如果返回
-	 *  true 只是表示正处于连接过程中，至于连接是否超时或连接是否失败
+	 * @return {aio_socket_stream*} 如果连接立即返回失败则该函数返回 NULL，
+	 *  返回非 NULL 对象只是表示正处于连接过程中，至于连接是否超时或连接是否失败
 	 *  应通过回调函数来判断
 	 */
 	static aio_socket_stream* open(aio_handle* handle,
 		const char* addr, int timeout);
+
+	/**
+	 * 绑定 UDP 套接字，并创建非阻塞对象
+	 * @param handle {aio_handle*} 异步引擎句柄
+	 * @param addr {const char*} 远程服务器的地址，地址格式为：
+	 *  针对TCP：IP:Port 或 针对域套接口：{filePath}
+	 * @return {aio_socket_stream*} 返回 NULL 表示绑定失败，否则表示成功
+	 */
+	static aio_socket_stream* bind(aio_handle* handle, const char* addr);
 
 	/**
 	 * 添加针对 open 函数的回调过程
