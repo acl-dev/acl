@@ -118,12 +118,12 @@ bool aio_listen_stream::open(ACL_ASTREAM* astream)
 
 	stream_ = astream;
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	hook_error();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	this->enable_error();
 
-	// hook 监听通知过程
-	hook_listen();
+	// 注册监听通知过程
+	this->enable_listen();
 
 	return true;
 }
@@ -133,7 +133,7 @@ const char* aio_listen_stream::get_addr(void) const
 	return addr_;
 }
 
-void aio_listen_stream::hook_listen(void)
+void aio_listen_stream::enable_listen(void)
 {
 	acl_assert(stream_);
 	if (listen_hooked_) {

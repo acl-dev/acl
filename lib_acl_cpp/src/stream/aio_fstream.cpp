@@ -23,16 +23,16 @@ aio_fstream::aio_fstream(aio_handle* handle, ACL_FILE_HANDLE fd,
 	ACL_VSTREAM* vstream = acl_vstream_fhopen(fd, oflags);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	hook_error();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	this->enable_error();
 
 	// 只有当流连接成功后才可 hook IO 读写状态
-	// hook 读回调过程
-	hook_read();
+	// 注册读回调过程
+	this->enable_read();
 
-	// hook 写回调过程
-	hook_write();
+	// 注册写回调过程
+	this->enable_write();
 }
 
 aio_fstream::~aio_fstream(void)
@@ -52,19 +52,19 @@ bool aio_fstream::open(const char* path, unsigned int oflags, unsigned int mode)
 	}
 	stream_ = acl_aio_open(handle_->get_handle(), fp);
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	hook_error();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	this->enable_error();
 
 	// 只有当流连接成功后才可 hook IO 读写状态
 	// hook 读回调过程
 	if ((oflags & (O_RDONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
-		hook_read();
+		this->enable_read();
 	}
 
 	// hook 写回调过程
 	if ((oflags & (O_WRONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
-		hook_write();
+		this->enable_write();
 	}
 
 	return true;

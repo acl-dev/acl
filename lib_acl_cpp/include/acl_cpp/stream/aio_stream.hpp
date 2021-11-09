@@ -223,9 +223,9 @@ public:
 	void set_handle(aio_handle& handle);
 
 	/**
-	 * 注册读写流对象，内部自动调用 hook->open 过程，如果成功，则返回之前注册
-     * 的对象(可能为NULL)，若失败则返回与输入参数相同的指针，应用可以通过判断
-     * 返回值与输入值是否相同来判断注册流对象是否成功
+	 * 注册读写流对象，内部自动调用 hook->open 过程，如果成功，则返回之前
+	 * 注册的对象(可能为NULL)，若失败则返回与输入参数相同的指针，应用可以
+	 * 通过判断返回值与输入值是否相同来判断注册流对象是否成功
 	 * xxx: 在调用此方法前必须保证流连接已经创建
 	 * @param hook {stream_hook*} 非空对象指针
 	 * @return {stream_hook*} 返回值与输入值不同则表示成功
@@ -258,9 +258,9 @@ protected:
 
 	/**
 	 * 子类应在创建成功后调用该函数通知基类增加异步流句柄数,
-	 * 同时 hook 流关闭及流超时时的回调过程
+	 * 同时注册流关闭及流超时时的回调过程
 	 */
-	void hook_error(void);
+	void enable_error(void);
 
 protected:
 	enum {

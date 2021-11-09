@@ -133,7 +133,7 @@ protected:
 	/**
 	 * 注册流连接成功的回调过程
 	 */
-	void hook_open(void);
+	void enable_open(void);
 
 private:
 	std::list<AIO_OPEN_CALLBACK*>* open_callbacks_;

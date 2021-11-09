@@ -182,9 +182,9 @@ protected:
 	virtual void destroy(void);
 
 	/**
-	 * hook 写过程
+	 * 注册写过程
 	 */
-	void hook_write(void);
+	void enable_write(void);
 
 private:
 	friend class aio_timer_writer;

@@ -21,17 +21,17 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle,
 
 	stream_ = stream;
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	hook_error();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	this->enable_error();
 
 	// 只有当流连接成功后才可 hook IO 读写状态
 	if (opened) {
-		// hook 读回调过程
-		hook_read();
+		// 注册读回调过程
+		this->enable_read();
 
-		// hook 写回调过程
-		hook_write();
+		// 注册写回调过程
+		this->enable_write();
 	}
 }
 
@@ -47,16 +47,16 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	hook_error();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	this->enable_error();
 
 	// 只有当流连接成功后才可 hook IO 读状态
-	// hook 读回调过程
-	hook_read();
+	// 注册读回调过程
+	this->enable_read();
 
-	// hook 写回调过程
-	hook_write();
+	// 注册写回调过程
+	this->enable_write();
 }
 
 aio_socket_stream::~aio_socket_stream(void)
@@ -218,11 +218,11 @@ aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 
 	aio_socket_stream* stream = NEW aio_socket_stream(handle, astream, false);
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	stream->hook_error();
-	// hook 连接成功的回调过程
-	stream->hook_open();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	stream->enable_error();
+	// 注册连接成功的回调过程
+	stream->enable_open();
 
 	return stream;
 }
@@ -249,7 +249,7 @@ bool aio_socket_stream::is_opened(void) const
 	return (status_ & STATUS_CONN_OPENED) ? true : false;
 }
 
-void aio_socket_stream::hook_open(void)
+void aio_socket_stream::enable_open(void)
 {
 	acl_assert(stream_);
 
@@ -270,11 +270,11 @@ int aio_socket_stream::open_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 	// 设置状态，表明已经连接成功
 	ss->status_ |= STATUS_CONN_OPENED;
 
-	// hook 读回调过程
-	ss->hook_read();
+	// 注册读回调过程
+	ss->enable_read();
 
-	// hook 写回调过程
-	ss->hook_write();
+	// 注册写回调过程
+	ss->enable_write();
 
 	if (ss->open_callbacks_ == NULL) {
 		return 0;

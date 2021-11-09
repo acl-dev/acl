@@ -139,7 +139,7 @@ private:
 	std::list<aio_accept_callback*> accept_callbacks_;
 	std::list<aio_listen_callback*> listen_callbacks_;
 
-	void hook_listen(void);
+	void enable_listen(void);
 	int accept_callback(aio_socket_stream* conn);
 	static int listen_callback(ACL_ASTREAM*, void*);
 };

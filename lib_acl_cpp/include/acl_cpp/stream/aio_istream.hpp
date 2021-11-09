@@ -208,7 +208,7 @@ protected:
 	/**
 	 * 注册可读的回调函数
 	 */
-	void hook_read(void);
+	void enable_read(void);
 
 private:
 	friend class aio_timer_reader;

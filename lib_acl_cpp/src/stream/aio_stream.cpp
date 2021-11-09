@@ -429,7 +429,7 @@ int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_stream::hook_error(void)
+void aio_stream::enable_error(void)
 {
 	acl_assert(stream_);
 

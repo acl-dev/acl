@@ -62,13 +62,13 @@ aio_ostream::aio_ostream(aio_handle* handle, ACL_SOCKET fd)
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// 调用基类的 hook_error 以向 handle 中增加异步流计数,
-	// 同时 hook 关闭及超时回调过程
-	hook_error();
+	// 调用基类的 enable_error 以向 handle 中增加异步流计数,
+	// 同时注册关闭及超时回调过程
+	this->enable_error();
 
 	// 只有当流连接成功后才可 hook IO 写状态
-	// hook 写回调过程
-	hook_write();
+	// 注册写回调过程
+	enable_write();
 }
 
 aio_ostream::~aio_ostream(void)
@@ -208,7 +208,7 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_ostream::hook_write(void)
+void aio_ostream::enable_write(void)
 {
 	acl_assert(stream_);
 
