@@ -196,7 +196,7 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 
 	// 开始 SSL 握手过程，read_wait 对应的回调方法为 read_wakeup
 	conn_->add_read_callback(this);
-	conn_->read_wait(rw_timeout_);
+	conn_->readable_await(rw_timeout_);
 	return true;
 }
 
@@ -724,7 +724,7 @@ void http_aclient::ws_read_wait(int timeout /* = 0 */)
 
 	// 注册 websocket 读回调过程
 	conn_->add_read_callback(this);
-	conn_->read_wait(timeout);
+	conn_->readable_await(timeout);
 }
 
 bool http_aclient::ws_send_text(char* data, size_t len)

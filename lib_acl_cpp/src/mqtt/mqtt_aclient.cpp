@@ -59,7 +59,7 @@ bool mqtt_aclient::open(aio_socket_stream* conn) {
 
 	// begin SSL handshake, read_wakeup will be called if some data arrived.
 	conn_->add_read_callback(this);
-	conn_->read_wait(rw_timeout_);
+	conn_->readable_await(rw_timeout_);
 	return true;
 
 }
@@ -154,7 +154,7 @@ bool mqtt_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 
 	// begin SSL handshake, read_wakeup will be called if some data arrived.
 	conn_->add_read_callback(this);
-	conn_->read_wait(rw_timeout_);
+	conn_->readable_await(rw_timeout_);
 	return true;
 }
 

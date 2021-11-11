@@ -123,19 +123,23 @@ public:
 	 * @param timeout {int} 读超时时间(秒)，若为 0 则表示
 	 *  永远等待直到读到完整一行数据或出错
 	 * @param nonl {bool} 是否自动去掉尾部的回车换行符
-	 * @param delay {int64} 如果对方发送数据比较快时，此参数
+	 * @param delay {long long int} 如果对方发送数据比较快时，此参数
 	 *  大于 0 时可以延迟接收对方的数据，该值控制延迟读数据
 	 *  的时间(单位为微秒)
 	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
 	 *  当 delay > 0，如果该值为空，则采用缺省的对象
 	 */
-#if defined(_WIN32) || defined(_WIN64)
-	void gets(int timeout = 0, bool nonl = true,
-		__int64 delay = 0, aio_timer_reader* callback = NULL);
-#else
-	void gets(int timeout = 0, bool nonl = true,
+	void gets_await(int timeout = 0, bool nonl = true,
 		long long int delay = 0, aio_timer_reader* callback = NULL);
-#endif
+
+	/**
+	 * same as gets_await();
+	 */
+	void gets(int timeout = 0, bool nonl = true,
+		long long int delay = 0, aio_timer_reader* callback = NULL)
+	{
+		gets_await(timeout, nonl, delay, callback);
+	}
 
 	/**
 	 * 异步读取数据，当延迟异步读时，如果连续调用此过程，
@@ -144,26 +148,38 @@ public:
 	 *  可读就返回，否则直到读超时或读出错或读满足所要求的字节数
 	 * @param timeout {int} 读超时时间(秒)，若为 0 则表示
 	 *  永远等待直到读到所要求的数据或出错
-	 * @param delay {int64} 如果对方发送数据比较快时，此参数
+	 * @param delay {long long int} 如果对方发送数据比较快时，此参数
 	 *  大于 0 时可以延迟接收对方的数据，该值控制延迟读数据
 	 *  的时间(单位为微秒)
 	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
 	 *  如果该值为空，则采用缺省的对象
 	 */
-#if defined(_WIN32) || defined(_WIN64)
-	void read(int count = 0, int timeout = 0,
-		__int64 delay = 0, aio_timer_reader* callback = NULL);
-#else
-	void read(int count = 0, int timeout = 0,
+	void read_await(int count = 0, int timeout = 0,
 		long long int delay = 0, aio_timer_reader* callback = NULL);
-#endif
+
+	/**
+	 * same as read_await()
+	 */
+	void read(int count = 0, int timeout = 0,
+		long long int delay = 0, aio_timer_reader* callback = NULL)
+	{
+		read_await(count, timeout, delay, callback);
+	}
 
 	/**
 	 * 异步等待连接流可读，该函数设置异步流的读监听状态，当有数据可读
 	 * 时，回调函数被触发，由用户自己负责数据的读取
 	 * @param timeout {int} 读超时时间(秒)，当该值为 0 时，则没有读超时
 	 */
-	void read_wait(int timeout = 0);
+	void readable_await(int timeout = 0);
+
+	/**
+	 * same as readable_await()
+	 */
+	void read_wait(int timeout = 0)
+	{
+		readable_await(timeout);
+	}
 
 	/**
 	 * 禁止异步流的异步读状态，将该异步流从异步引擎的监控中

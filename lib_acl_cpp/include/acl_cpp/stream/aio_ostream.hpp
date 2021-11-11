@@ -122,13 +122,37 @@ public:
 	 * @param delay {int64} 如果该值 > 0 则采用延迟发送的模式(单位为微秒)
 	 * @param callback {aio_timer_writer*} 定时器到达时的回调函数类对象，
 	 */
-#if defined(_WIN32) || defined(_WIN64)
-	void write(const void* data, int len, __int64 delay = 0,
+	void write_await(const void* data, int len, long long int delay = 0,
 		aio_timer_writer* callback = NULL);
-#else
+
+	/**
+	 * same as write_await();
+	 */
 	void write(const void* data, int len, long long int delay = 0,
-		aio_timer_writer* callback = NULL);
-#endif
+		aio_timer_writer* callback = NULL)
+	{
+		write_await(data, len, delay, callback);
+	}
+
+	/**
+	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
+	 * @param data {const void*} 数据地址
+	 * @param len {int} 数据长度
+	 * @param dest_addr {const char*} 目标地址，格式：ip|port
+	 * @return {int} 返回 -1 表示发送失败
+	 */
+	int sendto(const void* data, int len, const char* dest_addr);
+
+	/**
+	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
+	 * @param data {const void*} 数据地址
+	 * @param len {int} 数据长度
+	 * @param dest_addr {const sockaddr*} 目标地址，格式：ip|port
+	 * @param addrlen {int} dest_addr 地址长度
+	 * @return {int} 返回 -1 表示发送失败
+	 */
+	int sendto(const void* data, int len,
+		const struct sockaddr* dest_addr, int addrlen);
 
 	/**
 	 * 异步向流中写数据, 当流出错、写超时或写成功时将触发事件通知过程，
@@ -136,14 +160,33 @@ public:
 	 * @param iov {const struct iovec*} 数据集合数组
 	 * @param count {int} iov 数组的长度
 	 */
-	void writev(const struct iovec *iov, int count);
+	void writev_await(const struct iovec *iov, int count);
+
+	/**
+	 * same as writev_await()
+	 */
+	void writev(const struct iovec *iov, int count)
+	{
+		writev_await(iov, count);
+	}
 
 	/**
 	 * 格式化方式异步写数据，当完全写成功或出错或超时时会
 	 * 调用用户注册的回调函数
 	 * @param fmt {const char*} 格式字符串
 	 */
-	void format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
+	void format_await(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
+
+	/**
+	 * please use format_await() instead
+	 */
+	void format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3)
+	{
+		va_list ap;
+		va_start(ap, fmt);
+		vformat_await(fmt, ap);
+		va_end(ap);
+	}
 
 	/**
 	 * 格式化方式异步写数据，当完全写成功或出错或超时时会
@@ -151,14 +194,30 @@ public:
 	 * @param fmt {const char*} 格式字符串
 	 * @param ap {va_list} 数据值列表
 	 */
-	void vformat(const char* fmt, va_list ap);
+	void vformat_await(const char* fmt, va_list ap);
+
+	/**
+	 * same as vformat_await()
+	 */
+	void vformat(const char* fmt, va_list ap)
+	{
+		vformat_await(fmt, ap);
+	}
 
 	/**
 	 * 异步等待连接流可写，该函数设置异步流的写监听状态，当有可写时，
 	 * 回调函数被触发，由用户自己负责数据的读取
 	 * @param timeout {int} 写超时时间(秒)，当该值为 0 时，则没有写超时
 	 */
-	void write_wait(int timeout = 0);
+	void writable_await(int timeout = 0);
+
+	/**
+	 * same as writable_await()
+	 */
+	void write_wait(int timeout = 0)
+	{
+		writable_await(timeout);
+	}
 
 	/**
 	 * 禁止异步流的异步写状态，则将该异步流从异步引擎的监控

@@ -228,7 +228,7 @@ int aio_istream::get_buf_max(void) const
 	return acl_aio_stream_get_line_length(stream_);
 }
 
-void aio_istream::gets(int timeout /* = 0 */, bool nonl /* = true */,
+void aio_istream::gets_await(int timeout /* = 0 */, bool nonl /* = true */,
 	acl_int64 delay /* = 0 */, aio_timer_reader* callback /* = NULL */)
 {
 	if (delay > 0) {
@@ -274,7 +274,7 @@ void aio_istream::gets(int timeout /* = 0 */, bool nonl /* = true */,
 	}
 }
 
-void aio_istream::read(int count /* = 0 */, int timeout /* = 0 */,
+void aio_istream::read_await(int count /* = 0 */, int timeout /* = 0 */,
 	acl_int64 delay /* = 0 */, aio_timer_reader* callback /* = NULL */)
 {
 	if (delay > 0) {
@@ -320,7 +320,7 @@ void aio_istream::read(int count /* = 0 */, int timeout /* = 0 */,
 	}
 }
 
-void aio_istream::read_wait(int timeout /* = 0 */)
+void aio_istream::readable_await(int timeout /* = 0 */)
 {
 	// 设置流的异步读超时时间
 	if (timeout >= 0) {
