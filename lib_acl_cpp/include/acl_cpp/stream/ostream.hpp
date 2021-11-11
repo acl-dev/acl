@@ -36,6 +36,29 @@ public:
 		bool buffed = false);
 
 	/**
+	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
+	 * @param data {const void*} 数据地址
+	 * @param len {int} 数据长度
+	 * @param dest_addr {const char*} 目标地址，格式：ip|port
+	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
+	 * @return {int} 返回 -1 表示发送失败
+	 */
+	int sendto(const void* data, size_t size,
+		const char* dest_addr, int flags = 0);
+
+	/**
+	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
+	 * @param data {const void*} 数据地址
+	 * @param len {int} 数据长度
+	 * @param dest_addr {const sockaddr*} 目标地址，格式：ip|port
+	 * @param addrlen {int} dest_addr 地址长度
+	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
+	 * @return {int} 返回 -1 表示发送失败
+	 */
+	int sendto(const void* data, size_t size,
+		const struct sockaddr* dest_addr, int addrlen, int flags = 0);
+
+	/**
 	 * 如果采用写缓冲方式，则最后需要调用本函数刷写缓冲区
 	 * @return {bool} 返回 false 表示写失败，有可能是连接关闭
 	 */

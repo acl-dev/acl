@@ -25,6 +25,31 @@ int ostream::write(const void* data, size_t size, bool loop /* = true */,
 	return ret;
 }
 
+int ostream::sendto(const void* data, size_t len, const char* dest_addr, int flags)
+{
+	ACL_SOCKADDR sa;
+	size_t addrlen = acl_sane_pton(dest_addr, (struct sockaddr*) &sa);
+	if (addrlen == 0) {
+		logger_error("invalid dest_addr=%s", dest_addr);
+		return -1;
+	}
+
+	return sendto(data, len, (const struct sockaddr*) &sa, (int) addrlen, flags);
+}
+
+int ostream::sendto(const void* data, size_t len,
+	const struct sockaddr* dest_addr, int addrlen, int flags)
+{
+	acl_assert(stream_);
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream_);
+
+#if defined(_WIN32) || defined(_WIN64)
+	return (int) ::sendto(fd, (char*) data, len, flags, dest_addr, addrlen);
+#else
+	return (int) ::sendto(fd, data, len, flags, dest_addr, (socklen_t) addrlen);
+#endif
+}
+
 bool ostream::fflush(void)
 {
 	if (acl_vstream_fflush(stream_) == ACL_VSTREAM_EOF) {
