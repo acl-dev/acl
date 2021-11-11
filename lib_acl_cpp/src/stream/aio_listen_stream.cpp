@@ -52,7 +52,7 @@ void aio_listen_stream::add_listen_callback(aio_listen_callback* callback)
 	listen_callbacks_.push_back(callback);
 }
 
-bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
+bool aio_listen_stream::open(const char* addr, unsigned flag, int qlen)
 {
 	unsigned oflag = 0;
 	if (flag & OPEN_FLAG_REUSEPORT) {
@@ -61,7 +61,10 @@ bool aio_listen_stream::open(const char* addr, unsigned flag /* = 0 */)
 	if (flag & OPEN_FLAG_EXCLUSIVE) {
 		oflag |= ACL_INET_FLAG_EXCLUSIVE;
 	}
-	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128, oflag, 0, 0);
+	if (qlen <= 0) {
+		qlen = 128;
+	}
+	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, qlen, oflag, 0, 0);
 	if (sstream == NULL) {
 		return false;
 	}

@@ -90,9 +90,10 @@ public:
 	 *   abstract unix domain socket 监听模式（其中的 @ 符只是用来标记，内
 	 *   部的监听地址会自动去掉）
 	 * @param flag {unsigned} 创建监听套接口时的打开标志位，见 server_socket.hpp
+	 * @param qlen {int} 指定监听套接字监听队列的长度
 	 * @return {bool} 监听是否成功
 	 */
-	bool open(const char* addr, unsigned flag = 0);
+	bool open(const char* addr, unsigned flag = 0, int qlen = 128);
 
 	/**
 	 * 使用套接字创建监听对象，该套接字句柄必须已经调用了 bind/listen 过程
