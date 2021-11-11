@@ -139,9 +139,10 @@ public:
 	 * @param data {const void*} 数据地址
 	 * @param len {int} 数据长度
 	 * @param dest_addr {const char*} 目标地址，格式：ip|port
+	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
 	 * @return {int} 返回 -1 表示发送失败
 	 */
-	int sendto(const void* data, int len, const char* dest_addr);
+	int sendto(const void* data, int len, const char* dest_addr, int flags = 0);
 
 	/**
 	 * 当采用报文方式发送数据时，可调用本方法向目标地址发送数据包
@@ -149,10 +150,11 @@ public:
 	 * @param len {int} 数据长度
 	 * @param dest_addr {const sockaddr*} 目标地址，格式：ip|port
 	 * @param addrlen {int} dest_addr 地址长度
+	 * @param flags {int} 发送标志位，请参考系统 sendto() api 中 flags 说明
 	 * @return {int} 返回 -1 表示发送失败
 	 */
 	int sendto(const void* data, int len,
-		const struct sockaddr* dest_addr, int addrlen);
+		const struct sockaddr* dest_addr, int addrlen, int flags = 0);
 
 	/**
 	 * 异步向流中写数据, 当流出错、写超时或写成功时将触发事件通知过程，

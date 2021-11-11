@@ -258,7 +258,7 @@ void aio_ostream::write_await(const void* data, int len,
 	acl_aio_writen(stream_, (const char*) data, len);
 }
 
-int aio_ostream::sendto(const void* data, int len, const char* dest_addr)
+int aio_ostream::sendto(const void* data, int len, const char* dest_addr, int flags)
 {
 	ACL_SOCKADDR sa;
 	size_t addrlen = acl_sane_pton(dest_addr, (struct sockaddr*) &sa);
@@ -267,20 +267,20 @@ int aio_ostream::sendto(const void* data, int len, const char* dest_addr)
 		return -1;
 	}
 
-	return sendto(data, len, (const struct sockaddr*) &sa, (int) addrlen);
+	return sendto(data, len, (const struct sockaddr*) &sa, (int) addrlen, flags);
 }
 
 int aio_ostream::sendto(const void* data, int len,
-	const struct sockaddr* dest_addr, int addrlen)
+	const struct sockaddr* dest_addr, int addrlen, int flags)
 {
 	acl_assert(stream_);
 	ACL_VSTREAM* vs = acl_aio_vstream(stream_);
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(vs);
 
 #if defined(_WIN32) || defined(_WIN64)
-	return (int) ::sendto(fd, (char*) data, len, 0, dest_addr, addrlen);
+	return (int) ::sendto(fd, (char*) data, len, flags, dest_addr, addrlen);
 #else
-	return (int) ::sendto(fd, data, len, 0, dest_addr, (socklen_t) addrlen);
+	return (int) ::sendto(fd, data, len, flags, dest_addr, (socklen_t) addrlen);
 #endif
 }
 
