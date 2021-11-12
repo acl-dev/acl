@@ -255,13 +255,20 @@ static int sys_read(ACL_VSTREAM *in, void *buf, size_t size)
 {
 	int read_cnt, nagain = 0;
 
+	 /* clear the read_ready flag first: we shouldn't clear the flag
+	  * after read() API such as read_fn called, because in some case,
+	  * the read_ready flag maybe set 1 again in order to invoke the
+	  * IO event in non-blocking mode.
+	  */
+	in->read_ready = 0;
+
 	if (in->type == ACL_VSTREAM_TYPE_FILE) {
 		if (ACL_VSTREAM_FILE(in) == ACL_FILE_INVALID) {
-			in->read_ready = 0;
+			/* in->read_ready = 0; */
 			return -1;
 		}
 	} else if (ACL_VSTREAM_SOCK(in) == ACL_SOCKET_INVALID) {
-		in->read_ready = 0;
+		/* in->read_ready = 0; */
 		return -1;
 	}
 
