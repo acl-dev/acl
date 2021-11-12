@@ -213,6 +213,14 @@ public:
 	 */
 	int get_buf_max(void) const;
 
+	/**
+	 * 清除内部的 read_ready flag 位，当 IO 引擎检测到 IO 可读时，会设置
+	 * read_ready 标志位，而且还会定期检测该标志位是否设置，以决定是否需
+	 * 要再次触发读回调过程，通过本方法清理掉该标志位后，IO 引擎就不会在
+	 * 应用层检测该句柄是否可读，而是交由 OS 去判断是否可读
+	 */
+	void clear_read_ready(void);
+
 protected:
 	virtual ~aio_istream(void);
 

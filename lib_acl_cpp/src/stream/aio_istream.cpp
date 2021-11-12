@@ -71,6 +71,13 @@ void aio_istream::destroy(void)
 	delete this;
 }
 
+void aio_istream::clear_read_ready(void)
+{
+	ACL_VSTREAM* vstream = get_vstream();
+	assert(vstream);
+	vstream->read_ready = 0;
+}
+
 void aio_istream::add_read_callback(aio_callback* callback)
 {
 	acl_assert(callback);
