@@ -570,7 +570,10 @@ int http_aclient::http_res_callback(int status, char* data, int dlen, void* ctx)
 
 bool http_aclient::handle_res_hdr(int status)
 {
-	acl_assert(status == HTTP_CHAT_OK);
+	if (status != HTTP_CHAT_OK) {
+		logger_error("http response head error, status=%d", status);
+		return false;
+	}
 
 	// ½âÎö HTTP ÏìÓ¦Í·
 	http_hdr_res_parse(hdr_res_);
