@@ -81,7 +81,7 @@ stages:
 test:centos:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/library/ci-env-centos7:7-iqiyi-1"
+            "docker-registry.qiyi.virtual/cdn-cloud/centos-builder:5.9"
     }
     <<: *TEST
 
