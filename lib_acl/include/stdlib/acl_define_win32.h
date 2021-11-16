@@ -54,7 +54,7 @@
 # ifndef ACL_API
 #  define ACL_API
 # endif
-#elif defined(ACL_DLL) // || defined(_WINDLL)
+#elif defined(ACL_DLL) /* || defined(_WINDLL) */
 # if defined(ACL_EXPORTS) || defined(acl_EXPORTS)
 #  ifndef ACL_API
 #   define ACL_API __declspec(dllexport)

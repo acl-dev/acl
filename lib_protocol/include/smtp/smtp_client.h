@@ -11,7 +11,7 @@ extern "C" {
 # ifndef SMTP_API
 #  define SMTP_API
 # endif
-#elif defined(SMTP_DLL) // || defined(_WINDLL)
+#elif defined(SMTP_DLL) /* || defined(_WINDLL) */
 # if defined(SMTP_EXPORTS) || defined(protocol_EXPORTS)
 #  ifndef SMTP_API
 #   define SMTP_API __declspec(dllexport)

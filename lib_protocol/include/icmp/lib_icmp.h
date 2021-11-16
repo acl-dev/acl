@@ -12,7 +12,7 @@ extern "C" {
 # ifndef ICMP_API
 #  define ICMP_API
 # endif
-#elif defined(ICMP_DLL) // || defined(_WINDLL)
+#elif defined(ICMP_DLL) /* || defined(_WINDLL) */
 # if defined(ICMP_EXPORTS) || defined(protocol_EXPORTS)
 #  ifndef ICMP_API
 #   define ICMP_API __declspec(dllexport)

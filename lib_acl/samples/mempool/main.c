@@ -200,11 +200,11 @@ static void mempool_bench_test(const char *label, int mutex, int loop, acl_mem_t
 			time(&begin);
 			while (i++ < loop) {
 				acl_pthread_mutex_lock(&lock);
-				buf = acl_allocator_mem_alloc(__var_allocator, type);
+				buf = acl_allocator_mem_alloc(__FILE__, __LINE__, __var_allocator, type);
 				acl_pthread_mutex_unlock(&lock);
 
 				acl_pthread_mutex_lock(&lock);
-				acl_allocator_mem_free(__var_allocator, type, buf);
+				acl_allocator_mem_free(__FILE__, __LINE__, __var_allocator, type, buf);
 				acl_pthread_mutex_unlock(&lock);
 			}
 			time(&end);
@@ -238,8 +238,8 @@ static void mempool_bench_test(const char *label, int mutex, int loop, acl_mem_t
 		if (type > ACL_MEM_TYPE_NONE && type < ACL_MEM_TYPE_MAX) {
 			time(&begin);
 			while (i++ < loop) {
-				buf = acl_allocator_mem_alloc(__var_allocator, type);
-				acl_allocator_mem_free(__var_allocator, type, buf);
+				buf = acl_allocator_mem_alloc(__FILE__, __LINE__, __var_allocator, type);
+				acl_allocator_mem_free(__FILE__, __LINE__, __var_allocator, type, buf);
 			}
 			time(&end);
 		} else if (type == MEM_TYPE_GROSS) {
