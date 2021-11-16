@@ -1,4 +1,4 @@
-%define release_id 5
+%define release_id 6
 
 Summary: acl master framework
 Name:           acl-master
@@ -63,6 +63,9 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Tue Nov 16 2021 shuxin.zheng@qq.com 3.5.1-6-20211116.14
+- upgrade to new acl
 
 * Sun Jun 28 2020 shuxin.zheng@qq.com 3.5.1-5-20200628.11
 - release 3.5.1-5: just for releasing new version.
