@@ -81,132 +81,132 @@ stages:
 test:centos:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.8"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.8"
     }
     <<: *TEST
 
 devel:centos5.8:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.8"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.8"
     }
     <<: *DEVEL
 
 devel:centos5.9:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.9"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.9"
     }
     <<: *DEVEL
 
 devel:centos6.4:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:6.4"
+            "docker-registry.qiyi.virtual/acl/centos-builder:6.4"
     }
     <<: *DEVEL
 
 devel:centos6.6:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:6.6"
+            "docker-registry.qiyi.virtual/acl/centos-builder:6.6"
     }
     <<: *DEVEL
 
 devel:centos7.0:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:7.0"
+            "docker-registry.qiyi.virtual/acl/centos-builder:7.0"
     }
     <<: *DEVEL
 
 devel:centos7.2:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:7.2"
+            "docker-registry.qiyi.virtual/acl/centos-builder:7.2"
     }
     <<: *DEVEL
 
 lib_release:centos5.8:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.8"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.8"
     }
     <<: *LIB_RELEASE
 
 lib_release:centos5.9:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.9"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.9"
     }
     <<: *LIB_RELEASE
 
 lib_release:centos6.4:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:6.4"
+            "docker-registry.qiyi.virtual/acl/centos-builder:6.4"
     }
     <<: *LIB_RELEASE
 
 lib_release:centos6.6:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:6.6"
+            "docker-registry.qiyi.virtual/acl/centos-builder:6.6"
     }
     <<: *LIB_RELEASE
 
 lib_release:centos7.0:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:7.0"
+            "docker-registry.qiyi.virtual/acl/centos-builder:7.0"
     }
     <<: *LIB_RELEASE
 
 lib_release:centos7.2:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:7.2"
+            "docker-registry.qiyi.virtual/acl/centos-builder:7.2"
     }
     <<: *LIB_RELEASE
 
 frame_release:centos5.8:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.8"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.8"
     }
     <<: *FRAME_RELEASE
 
 frame_release:centos5.9:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:5.9"
+            "docker-registry.qiyi.virtual/acl/centos-builder:5.9"
     }
     <<: *FRAME_RELEASE
 
 frame_release:centos6.4:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:6.4"
+            "docker-registry.qiyi.virtual/acl/centos-builder:6.4"
     }
     <<: *FRAME_RELEASE
 
 frame_release:centos6.6:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:6.6"
+            "docker-registry.qiyi.virtual/acl/centos-builder:6.6"
     }
     <<: *FRAME_RELEASE
 
 frame_release:centos7.0:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:7.0"
+            "docker-registry.qiyi.virtual/acl/centos-builder:7.0"
     }
     <<: *FRAME_RELEASE
 
 frame_release:centos7.2:
     variables: {
         BUILDIMAGES:
-            "docker-registry.qiyi.virtual/acl/centos-builer:7.2"
+            "docker-registry.qiyi.virtual/acl/centos-builder:7.2"
     }
     <<: *FRAME_RELEASE
