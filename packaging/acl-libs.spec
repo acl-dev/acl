@@ -47,7 +47,7 @@ rm -rf %{buildroot}
 
 %changelog
 
-* Wed Nov 17 2021 shuxin.zheng@qq.com 3.5.4-4-20211117.11
+* Wed Nov 17 2021 shuxin.zheng@qq.com 3.5.3-4-20211117.11
 - bugfix: fixed one crash bug in http_aclient::handle_res_hdr()
 - optimize: add more functions in aio module
 
