@@ -251,9 +251,6 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	ACL_FIBER *fiber;
 	RING_ITER iter;
 	EVENT *ev;
-#ifdef	CHECK_MIN
-	long long min = -1;
-#endif
 
 	if (!var_hook_sys_api) {
 		doze(milliseconds);
@@ -264,48 +261,50 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 	ev = fiber_io_event();
 
-	SET_TIME(when);
-	when += milliseconds;
+	SET_TIME(now);
+	when = now + milliseconds;
 
-	ring_foreach_reverse(iter, &__thread_fiber->ev_timer) {
+	/* The timers in the ring were stored from small to large in ascending
+	 * order, and we walk through the ring from head to tail until the
+	 * current time is less than the timer's stamp, and the new timer will
+	 * be prepend to the timer found.
+	 */
+	ring_foreach(iter, &__thread_fiber->ev_timer) {
 		fiber = ring_to_appl(iter.ptr, ACL_FIBER, me);
-		if (when >= fiber->when) {
-#ifdef	CHECK_MIN
-			long long n = when - fiber->when;
-			if (min == -1 || n < min) {
-				min = n;
-			}
-#endif
+		if (when < fiber->when) {
 			break;
 		}
 	}
 
-#ifdef	CHECK_MIN
-	if ((min >= 0 && min < ev->timeout) || ev->timeout < 0) {
-		ev->timeout = (int) milliseconds;
-	}
-#else
-	ev->timeout = 10;
-#endif
-
 	fiber = acl_fiber_running();
 	fiber->when = when;
 	ring_detach(&fiber->me);
-
-	ring_append(iter.ptr, &fiber->me);
+	ring_prepend(iter.ptr, &fiber->me);
 
 	if (!fiber->sys && __thread_fiber->nsleeping++ == 0) {
 		fiber_count_inc();
 	}
 
-	acl_fiber_switch();
+#ifdef	CHECK_MIN
+	/* compute the event waiting interval according the timers' head */
+	fiber = FIRST_FIBER(&__thread_fiber->ev_timer);
+	if (fiber->when <= now) {
+		/* If the first timer has been expired, we should wakeup it
+		 * immediately, so the event waiting interval should be set 0.
+		 */
+		ev->timeout = 0;
+	} else {
+		/* Then we use the interval between the first timer and now */
+		ev->timeout = (int) (fiber->when - now);
+	}
+#else
+	ev->timeout = 10;
+#endif
 
-	//ring_detach(&fiber->me);
+	acl_fiber_switch();
 
 	if (ring_size(&__thread_fiber->ev_timer) == 0) {
 		ev->timeout = -1;
-	} else {
-		ev->timeout = (int) min;
 	}
 
 	SET_TIME(now);

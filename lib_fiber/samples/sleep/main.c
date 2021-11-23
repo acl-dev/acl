@@ -12,6 +12,11 @@ static void sleep_main(ACL_FIBER *fiber, void *ctx)
 	int *n = (int *) ctx;
 	time_t last, now;
 
+	while (1) {
+		acl_fiber_sleep(1);
+		printf("fiber-%d wakeup\r\n", acl_fiber_self());
+	}
+
 	printf("fiber-%d: begin sleep %d\r\n", acl_fiber_id(fiber), *n);
 	time(&last);
 	*n = (int) acl_fiber_sleep(*n);
