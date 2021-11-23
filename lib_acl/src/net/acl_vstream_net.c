@@ -69,7 +69,7 @@ ACL_VSTREAM *acl_vstream_listen_ex(const char *addr, int qlen,
 		return sstream;
 	}
 #endif
-	/* addr such as '192.168.0.1:80' */
+	/* addr such as '192.168.0.1|80' */
 	listenfd = acl_inet_listen(addr, qlen, flag);
 	if (listenfd == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s: listen addr(%s) error(%s)",
@@ -260,7 +260,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 	size_t n;
 
 	if (stream->sa_peer_size == 0) {
-		acl_vstream_set_peer(stream, "0.0.0.0:0");
+		acl_vstream_set_peer(stream, "0.0.0.0|0");
 	}
 
 	memset(&sa, 0, sizeof(sa));
