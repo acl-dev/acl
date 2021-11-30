@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-int main()
+int main(void)
 {
 	acl::json json;
 	acl::json_node& root = json.get_root();
@@ -18,6 +18,8 @@ int main()
 	
 	//////////////////////////////////////////////////////////////////////
 	// 方法一：
+
+	root = json.get_root();
 
 	root.add_text("cmd", "add")	// 添加 root 节点的子节点并返回 root
 	  .add_child("Para", true)	// 添加 root 的子节点(Para)并返回 Para
@@ -38,6 +40,8 @@ int main()
 
 	// 在重新使用前需要重置 json 生成器状态
 	json.reset();
+
+	root = json.get_root();
 
 	root.add_text("cmd", "add")
 		.add_child("Para",
@@ -90,9 +94,10 @@ int main()
 	//////////////////////////////////////////////////////////////////////
 	// 比较三种方法的结果是否相等
 
-	if (buf2 == buf1 && buf3 == buf2)
+	if (buf2 == buf1 && buf3 == buf2) {
 		printf("OK\r\n");
-	else
+	} else {
 		printf("ERROR\r\n");
+	}
 	return 0;
 }
