@@ -217,7 +217,7 @@ public:
 
 	/**
 	 * 重新绑定异步事件句柄
-	 * @param {aio_handle&}
+	 * @param handle {aio_handle&}
 	 * 注：该方法仅可在对象创建后调用一次，一旦进入 IO 过程则禁止调用
 	 */
 	void set_handle(aio_handle& handle);
