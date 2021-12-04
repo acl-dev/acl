@@ -648,6 +648,12 @@ public:
 	bool operator>(const string& s) const;
 
 	/**
+	 * 计算当前字符串的哈希值
+	 * @return {size_t}
+	 */
+	size_t hash(void) const;
+
+	/**
 	 * 将当前对象直接转为字符串指针（即将内部缓冲区直接导出）
 	 * @return {const char*} 返回值永远为非空指针，有可能为空串
 	 */
@@ -1324,3 +1330,13 @@ string operator+(T v, const string& rhs)
  */
 
 } // namespce acl
+
+// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类模板使用
+namespace std {
+template <>
+struct hash<acl::string> {
+	size_t operator()(const acl::string& key) const {
+		return key.hash();
+	}
+};
+}

@@ -899,6 +899,14 @@ string::operator const void *(void) const
 	return (void*) STR(vbf_);
 }
 
+size_t string::hash(void) const
+{
+	if (empty()) {
+		return 0;
+	}
+	return (size_t) acl_hash_crc32(c_str(), size());
+}
+
 bool string::equal(const string& s, bool case_sensitive /* = true */) const
 {
 	size_t n1 = LEN(vbf_), n2 = LEN(s.vbf_);
