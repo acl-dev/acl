@@ -309,7 +309,7 @@ protected:
 	virtual bool open();
 
 private:
-	char addr_[64];
+	char addr_[128];
 	bool unzip_;
 	sslbase_conf* ssl_conf_;
 	char local_charset_[64];

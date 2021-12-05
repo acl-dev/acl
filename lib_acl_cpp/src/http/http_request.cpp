@@ -15,6 +15,7 @@
 #include "acl_cpp/http/HttpCookie.hpp"
 #include "acl_cpp/http/http_ctype.hpp"
 #include "acl_cpp/http/http_pipe.hpp"
+#include "acl_cpp/http/http_utils.hpp"
 #include "acl_cpp/http/http_request.hpp"
 #endif
 
@@ -57,7 +58,35 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 	int rw_timeout /* = 60 */, bool unzip /* = true */)
 {
 	acl_assert(addr && *addr);
-	ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
+
+	if (!strncasecmp(addr, "http://", sizeof("http://") - 1)
+		 || !strncasecmp(addr, "https://", sizeof("https://") - 1)) {
+
+		http_url url;
+		if (url.parse(addr)) {
+			snprintf(addr_, sizeof(addr_), "%s:%d",
+				url.get_domain(), url.get_port());
+			string url_part(url.get_url_path());
+			const char* params = url.get_url_params();
+			if (*params) {
+				url_part << "?" << params;
+			}
+			header_.set_url(url_part);
+		} else if (strrchr(addr, '|') || strrchr(addr, ':')){
+			ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
+			header_.set_url("/");
+		} else {
+			snprintf(addr_, sizeof(addr_), "%s:80", addr);
+			header_.set_url("/");
+		}
+	} else if (strrchr(addr, '|') || strrchr(addr, ':')){
+		ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
+		header_.set_url("/");
+	} else {
+		snprintf(addr_, sizeof(addr_), "%s:80", addr);
+		header_.set_url("/");
+	}
+
 	set_timeout(conn_timeout, rw_timeout);
 
 	unzip_            = unzip;
@@ -65,7 +94,6 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 	local_charset_[0] = 0;
 	conv_             = NULL;
 
-	header_.set_url("/");
 	header_.set_keep_alive(true);
 	header_.set_host(addr_);
 	cookie_inited_ = false;

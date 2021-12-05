@@ -29,20 +29,6 @@ public:
 	 */
 	static bool get_addr(const char* url, char* domain, size_t size,
 		unsigned short* port);
-
-	/**
-	 * 解析输入的完整或部分 URL
-	 * @param url {const char*} 非空完整或部分 URL 字符串
-	 * @param domain {string&} 用来存放域名地址信息
-	 * @param port {unsigned short*} 用来存放 url 中的端口号
-	 * @param url_path {string&} 用来存放 url 中不含域名和参数的部分，即针对类似
-	 *  于 URL：http://test.com.cn/cgi-bin/test?name=value 则只提取其中的字
-	 *  符串：/cgi-bin/test
-	 * @param url_params {string&} 用来存放 url 中的参数部分字符串
-	 * @return {bool} 解析 url 是否成功
-	 */
-	static bool parse_url(const char* url, string& domain,
-		unsigned short* port, string& url_path, string& url_params);
 };
 
 class ACL_CPP_API http_url {

@@ -19,6 +19,7 @@ bool http_utils::get_addr(const char* url, char* addr, size_t size)
 	safe_snprintf(addr, size, "%s:%d", buf, port);
 	return true;
 }
+
 #define	HTTP_PREFIX	"http://"
 #define	HTTPS_PREFIX	"https://"
 
@@ -44,7 +45,7 @@ bool http_utils::get_addr(const char* url, char* domain, size_t size,
 		return false;
 	}
 
-	char buf[256];
+	char buf[512];
 	ACL_SAFE_STRNCPY(buf, ptr, sizeof(buf));
 
 	char* slash = strchr(buf, '/');
