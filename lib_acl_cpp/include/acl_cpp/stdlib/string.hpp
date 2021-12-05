@@ -17,8 +17,7 @@ class dbuf_pool;
  * 该类为字符串处理类，支持大部分 std::string 中的功能，同时支持其不支持的一些
  * 功能；该类内部自动保证最后一个字符为 \0
  */
-class ACL_CPP_API string
-{
+class ACL_CPP_API string {
 public:
 	/**
 	 * 构造函数
@@ -1286,8 +1285,7 @@ public:
 	 * s1 = s2 + v;
 	 */
 	template<typename T>
-	string operator+(T v)
-	{
+	string operator+(T v) {
 		string s(*this);
 		s += v;
 		return s;
@@ -1313,8 +1311,7 @@ private:
  * s1 = v + s2;
  */
 template<typename T>
-string operator+(T v, const string& rhs)
-{
+string operator+(T v, const string& rhs) {
 	string s;
 	s = v;
 	s += rhs;
@@ -1331,7 +1328,8 @@ string operator+(T v, const string& rhs)
 
 } // namespce acl
 
-// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类模板使用
+// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
+#if __cplusplus >= 201103L      // Support c++11 ?
 namespace std {
 template <>
 struct hash<acl::string> {
@@ -1340,3 +1338,4 @@ struct hash<acl::string> {
 	}
 };
 }
+#endif

@@ -35,6 +35,13 @@ int main(void)
 	acl::string buf1;
 	json.build_json(buf1);
 
+	acl::json_node* para = json.getFirstElementByTagName("Para");
+	if (para) {
+		root.add_text("root-name", "root-value");
+		para->get_obj()->add_text("test", "111111");
+		printf("%s\r\n", json.to_string().c_str());
+	}
+
 	//////////////////////////////////////////////////////////////////////
 	// ·½·¨¶þ£º
 
