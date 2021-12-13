@@ -97,8 +97,10 @@ public:
 
 	/**
 	 * 关闭异步流
+	 * @param flush_out {bool} 当为 true 时，则需要等发送缓冲敬的数据写完
+	 *  才可以关闭，否则则不必清理写缓冲区中的数据便可关闭
 	 */
-	void close(void);
+	void close(bool flush_out = false);
 
 	/**
 	 * 添加关闭时的回调类对象指针，如果该回调类对象已经存在，则只是

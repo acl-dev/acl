@@ -567,7 +567,7 @@ static int __readn_peek(ACL_ASTREAM *astream)
 			READ_IOCP_CLOSE(astream);
 			return -1;
 		} else if (astream->keep_read == 0
-			 || (astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
+			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
 
 			return 0;
 		}

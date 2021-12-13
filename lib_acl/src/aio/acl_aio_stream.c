@@ -324,6 +324,15 @@ static void init_thread_aio(void)
 
 #endif  /* ACL_WINDOWS */
 
+void acl_aio_flush_on_close(ACL_ASTREAM *astream, int yes)
+{
+	if (yes) {
+		astream->flag |= ACL_AIO_FLAG_FLUSH_CLOSE;
+	} else {
+		astream->flag &= ~ACL_AIO_FLAG_FLUSH_CLOSE;
+	}
+}
+
 /* 该函数非常关键，采用的IO完成时才关闭的策略，防止重复关闭 */
 void acl_aio_iocp_close(ACL_ASTREAM *astream)
 {
@@ -331,10 +340,13 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 	ACL_ITER iter;
 	ACL_AIO *aio = astream->aio;
 
-	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
+	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return;
+	}
+
 	if (!(astream->flag & ACL_AIO_FLAG_DEAD)
-		 && (astream->flag & ACL_AIO_FLAG_ISWR)) {
+		&& (astream->flag & ACL_AIO_FLAG_ISWR)
+		&& (astream->flag & ACL_AIO_FLAG_FLUSH_CLOSE)) {
 
 		astream->flag |= ACL_AIO_FLAG_IOCP_CLOSE;
 		return;

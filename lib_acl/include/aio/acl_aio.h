@@ -143,11 +143,12 @@ struct ACL_ASTREAM {
 	int   timeout;		/**< IO超时时间 */
 	int   nrefer;		/**< 通过此引用计数防止流被提前关闭 */
 	int   flag;		/**< 标志位 */
-#define ACL_AIO_FLAG_IOCP_CLOSE     (1 << 0)
-#define	ACL_AIO_FLAG_ISRD           (1 << 1)
-#define	ACL_AIO_FLAG_ISWR           (1 << 2)
-#define ACL_AIO_FLAG_DELAY_CLOSE    (1 << 3)
-#define ACL_AIO_FLAG_DEAD           (1 << 4)
+#define ACL_AIO_FLAG_IOCP_CLOSE     (1 << 0) /* 是否设置了 IOCP 关闭标志位 */
+#define	ACL_AIO_FLAG_ISRD           (1 << 1) /* 是否注册了读事件 */
+#define	ACL_AIO_FLAG_ISWR           (1 << 2) /* 是否注册了写事件 */
+#define ACL_AIO_FLAG_DELAY_CLOSE    (1 << 3) /* 是否处于延时关闭状态 */
+#define ACL_AIO_FLAG_DEAD           (1 << 4) /* 套接字是否已经损坏 */
+#define	ACL_AIO_FLAG_FLUSH_CLOSE    (1 << 5) /* 是否需要清理缓冲区数据后才关闭 */
 
 	ACL_FIFO write_fifo;	/**< 异步写时的先进先出队列数据 */
 	int   write_left;	/**< 写缓冲中未写完的数据量 */
@@ -407,6 +408,13 @@ ACL_API ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream);
  * @param astream {ACL_ASTREAM*} 异步数据流
  */
 ACL_API void acl_aio_iocp_close(ACL_ASTREAM *astream);
+
+/**
+ * 在关闭套接字前是否需要先将缓冲区中的数据写完，内部缺省值为 0
+ * @param astream {ACL_ASTREAM*} 异步数据流
+ * @param yes {int} 非 0 表示关闭套接字前需要将写缓冲区中的数据写完
+ */
+ACL_API void acl_aio_flush_on_close(ACL_ASTREAM *astream, int yes);
 
 /**
  * 取消异步IO过程，该功能主要是为了将异步IO流转换为同步IO流而写

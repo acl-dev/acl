@@ -56,9 +56,10 @@ void aio_stream::destroy(void)
 	delete this;
 }
 
-void aio_stream::close(void)
+void aio_stream::close(bool flush_out /* false */)
 {
 	acl_assert(stream_);
+	acl_aio_flush_on_close(stream_, flush_out ? 1 : 0);
 	acl_aio_iocp_close(stream_);
 }
 
