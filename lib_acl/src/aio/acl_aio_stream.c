@@ -27,7 +27,7 @@ static int accept_callback(ACL_ASTREAM *astream acl_unused,
 	const char *myname = "accept_callback";
 
 	acl_msg_fatal("%s: default accept_callback be called", myname);
-	return (-1);
+	return -1;
 }
 
 static int listen_callback(ACL_ASTREAM *astream acl_unused,
@@ -36,25 +36,27 @@ static int listen_callback(ACL_ASTREAM *astream acl_unused,
 	const char *myname = "listen_callback";
 
 	acl_msg_fatal("%s: default listen_callback be called", myname);
-	return (-1);
+	return -1;
 }
 
 ACL_AIO *acl_aio_handle(ACL_ASTREAM *stream)
 {
-	if (stream == NULL)
-		return (NULL);
-	return (stream->aio);
+	if (stream == NULL) {
+		return NULL;
+	}
+	return stream->aio;
 }
 
 void acl_aio_set_ctx(ACL_ASTREAM *stream, void *ctx)
 {
-	if (stream)
+	if (stream) {
 		stream->context = ctx;
+	}
 }
 
 void *acl_aio_get_ctx(ACL_ASTREAM *stream)
 {
-	return (stream ? stream->context : NULL);
+	return stream ? stream->context : NULL;
 }
 
 ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
@@ -84,8 +86,9 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 
 	/* just for listen fd */
 	if ((stream->type & ACL_VSTREAM_TYPE_LISTEN)) {
-		if (stream->read_buf == NULL)
+		if (stream->read_buf == NULL) {
 			stream->read_buf_len = aio->rbuf_size;
+		}
 		astream->accept_nloop = 1;
 	}
 
@@ -111,7 +114,7 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	acl_fifo_init(&astream->reader_fifo);
 	acl_fifo_init(&astream->writer_fifo);
 
-	return (astream);
+	return astream;
 }
 
 void acl_aio_set_accept_nloop(ACL_ASTREAM *astream, int accept_nloop)
@@ -127,7 +130,7 @@ ACL_VSTREAM *acl_aio_cancel(ACL_ASTREAM *astream)
 	stream->flag = 0;
 	acl_aio_clean_hooks(astream);
 	acl_myfree(astream);
-	return (stream);
+	return stream;
 }
 
 int acl_aio_refer_value(ACL_ASTREAM * astream)
@@ -136,27 +139,30 @@ int acl_aio_refer_value(ACL_ASTREAM * astream)
 
 	if (astream == NULL) {
 		acl_msg_error("%s(%d): astream null", myname, __LINE__);
-		return (-1);
+		return -1;
 	}
-	return (astream->nrefer);
+	return astream->nrefer;
 }
 
 void acl_aio_refer(ACL_ASTREAM *astream)
 {
-	if (astream)
+	if (astream) {
 		astream->nrefer++;
+	}
 }
 
 void acl_aio_unrefer(ACL_ASTREAM *astream)
 {
-	if (astream)
+	if (astream) {
 		astream->nrefer--;
+	}
 }
 
 static void aio_disable_readwrite(ACL_AIO *aio, ACL_ASTREAM *astream)
 {
-	if (astream->stream == NULL)
+	if (astream->stream == NULL) {
 		return;
+	}
 
 	if ((astream->flag & ACL_AIO_FLAG_ISRD) != 0) {
 		astream->flag &= ~ACL_AIO_FLAG_ISRD; 
@@ -183,6 +189,7 @@ static void close_astream(ACL_ASTREAM *astream)
 		}
 		acl_vstream_close(astream->stream);
 	}
+
 	acl_aio_clean_hooks(astream);
 
 	/* bugfix: 在 acl_aio_clean_hooks 中并不会释放数组对象 --zsx, 2012.7.2 */
@@ -231,8 +238,9 @@ void aio_delay_check(ACL_AIO *aio)
 	while (1) {
 		astream = (ACL_ASTREAM*)
 			aio->dead_streams->pop_back(aio->dead_streams);
-		if (astream == NULL)
+		if (astream == NULL) {
 			break;
+		}
 
 		aio_delay_close(astream);
 	}
@@ -254,15 +262,15 @@ static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg,
 
 	KillTimer(hwnd, idEvent);
 
-	if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-		acl_msg_fatal("%s(%d): __aio_tls_key invalid",
-			myname, __LINE__);
+	if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES) {
+		acl_msg_fatal("%s(%d): __aio_tls_key invalid", myname, __LINE__);
+	}
 
 	tls_aio = acl_pthread_tls_get(&__aio_tls_key);
-	if (tls_aio == NULL)
+	if (tls_aio == NULL) {
 		acl_msg_fatal("%s(%d): get tls aio error(%s), tls_key: %d",
-			myname, __LINE__, acl_last_serror(),
-			(int) __aio_tls_key);
+			myname, __LINE__, acl_last_serror(), (int) __aio_tls_key);
+	}
 	aio_delay_check(tls_aio);
 }
 
@@ -289,21 +297,22 @@ static VOID CALLBACK CloseTimer(HWND hwnd, UINT uMsg,
 
 	KillTimer(hwnd, idEvent);
 
-	if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-		acl_msg_fatal("%s(%d): __aio_tls_key invalid",
-			myname, __LINE__);
+	if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES) {
+		acl_msg_fatal("%s(%d): __aio_tls_key invalid", myname, __LINE__);
+	}
 
 	tls_aio = acl_pthread_getspecific(__aio_tls_key);
-	if (tls_aio == NULL)
+	if (tls_aio == NULL) {
 		acl_msg_fatal("%s(%d): get tls aio error(%s), tls_key: %d",
-		myname, __LINE__, acl_last_serror(), (int) __aio_tls_key);
+			myname, __LINE__, acl_last_serror(), (int) __aio_tls_key);
+	}
+
 	aio_delay_check(tls_aio);
 	tls_aio->timer_active = 0;
 }
 
 static void finish_thread_aio(void *arg acl_unused)
 {
-
 }
 
 static void init_thread_aio(void)
@@ -325,18 +334,20 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE))
 		return;
 	if (!(astream->flag & ACL_AIO_FLAG_DEAD)
-		&& (astream->flag & ACL_AIO_FLAG_ISWR))
-	{
+		 && (astream->flag & ACL_AIO_FLAG_ISWR)) {
+
 		astream->flag |= ACL_AIO_FLAG_IOCP_CLOSE;
 		return;
 	}
 
 	acl_foreach(iter, aio->dead_streams) {
 		ACL_ASTREAM *s = (ACL_ASTREAM*) iter.data;
-		if (s == astream)
+		if (s == astream) {
 			acl_msg_fatal("%s(%d): flag: %d, size: %d",
 				myname, __LINE__, astream->flag, iter.size);
+		}
 	}
+
 	/* 放在延迟关闭队列中 */
 	aio->dead_streams->push_back(aio->dead_streams, astream);
 	astream->flag |= ACL_AIO_FLAG_DELAY_CLOSE;
@@ -350,14 +361,14 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 		ACL_AIO *tls_aio = acl_pthread_tls_get(&__aio_tls_key);
 
 		acl_assert(hWnd != NULL);
-		if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-			acl_msg_fatal("%s(%d): __tls_key invalid",
-				myname, __LINE__);
-		if (tls_aio == NULL)
+		if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES) {
+			acl_msg_fatal("%s(%d): __tls_key invalid", myname, __LINE__);
+		}
+		if (tls_aio == NULL) {
 			acl_pthread_tls_set(__aio_tls_key, aio, NULL);
-		else if (tls_aio != aio)
-			acl_msg_fatal("%s(%d): tls_aio != aio",
-				myname, __LINE__);
+		} else if (tls_aio != aio) {
+			acl_msg_fatal("%s(%d): tls_aio != aio", myname, __LINE__);
+		}
 		aio->timer_active = 1;
 		SetTimer(hWnd, aio->tid, 1000, CloseTimer);
 	}
@@ -378,16 +389,16 @@ void acl_aio_iocp_close(ACL_ASTREAM *astream)
 
 		(void) acl_pthread_once(&__aio_once_control, init_thread_aio);
 
-		if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES)
-			acl_msg_fatal("%s(%d): __tls_key invalid",
-				myname, __LINE__);
+		if (__aio_tls_key == ACL_TLS_OUT_OF_INDEXES) {
+			acl_msg_fatal("%s(%d): __tls_key invalid", myname, __LINE__);
+		}
 
 		tls_aio = acl_pthread_getspecific(__aio_tls_key);
-		if (tls_aio == NULL)
+		if (tls_aio == NULL) {
 			acl_pthread_setspecific(__aio_tls_key, aio);
-		else if (tls_aio != aio)
-			acl_msg_fatal("%s(%d): tls_aio != aio",
-				myname, __LINE__);
+		} else if (tls_aio != aio) {
+			acl_msg_fatal("%s(%d): tls_aio != aio", myname, __LINE__);
+		}
 
 		aio->timer_active = 1;
 		SetTimer(hWnd, aio->tid, 1, CloseTimer);
@@ -420,9 +431,10 @@ void acl_aio_add_read_hook(ACL_ASTREAM *astream,
 	handle->callback = callback;
 	handle->ctx = ctx;
 	handle->disable = 0;
-	if (acl_array_append(astream->read_handles, handle) < 0)
+	if (acl_array_append(astream->read_handles, handle) < 0) {
 		acl_msg_fatal("%s(%d), %s: add to array error",
 			__FILE__, __LINE__, myname);
+	}
 }
 
 void acl_aio_add_write_hook(ACL_ASTREAM *astream,
@@ -447,9 +459,10 @@ void acl_aio_add_write_hook(ACL_ASTREAM *astream,
 	handle->callback = callback;
 	handle->ctx = ctx;
 	handle->disable = 0;
-	if (acl_array_append(astream->write_handles, handle) < 0)
+	if (acl_array_append(astream->write_handles, handle) < 0) {
 		acl_msg_fatal("%s(%d), %s: add to array error",
 			__FILE__, __LINE__, myname);
+	}
 }
 
 void acl_aio_add_close_hook(ACL_ASTREAM *astream,
@@ -474,9 +487,10 @@ void acl_aio_add_close_hook(ACL_ASTREAM *astream,
 	handle->callback = callback;
 	handle->ctx = ctx;
 	handle->disable = 0;
-	if (acl_array_append(astream->close_handles, handle) < 0)
+	if (acl_array_append(astream->close_handles, handle) < 0) {
 		acl_msg_fatal("%s(%d), %s: add to array error",
 			__FILE__, __LINE__, myname);
+	}
 }
 
 void acl_aio_add_timeo_hook(ACL_ASTREAM *astream,
@@ -501,9 +515,10 @@ void acl_aio_add_timeo_hook(ACL_ASTREAM *astream,
 	handle->callback = callback;
 	handle->ctx = ctx;
 	handle->disable = 0;
-	if (acl_array_append(astream->timeo_handles, handle) < 0)
+	if (acl_array_append(astream->timeo_handles, handle) < 0) {
 		acl_msg_fatal("%s(%d), %s: add to array error",
 			__FILE__, __LINE__, myname);
+	}
 }
 
 void acl_aio_add_connect_hook(ACL_ASTREAM *astream,
@@ -528,9 +543,10 @@ void acl_aio_add_connect_hook(ACL_ASTREAM *astream,
 	handle->callback = callback;
 	handle->ctx = ctx;
 	handle->disable = 0;
-	if (acl_array_append(astream->connect_handles, handle) < 0)
+	if (acl_array_append(astream->connect_handles, handle) < 0) {
 		acl_msg_fatal("%s(%d), %s: add to array error",
 			__FILE__, __LINE__, myname);
+	}
 }
 
 void acl_aio_del_read_hook(ACL_ASTREAM *astream,
@@ -635,8 +651,9 @@ void acl_aio_clean_read_hooks(ACL_ASTREAM *astream)
 	while (1) {
 		AIO_READ_HOOK *handle = astream->reader_fifo.pop_back(
 			&astream->reader_fifo);
-		if (handle == NULL)
+		if (handle == NULL) {
 			break;
+		}
 		free_handle(handle);
 	}
 	acl_vstring_free_buf(&astream->strbuf);
@@ -648,15 +665,17 @@ void acl_aio_clean_write_hooks(ACL_ASTREAM *astream)
 	while (1) {
 		AIO_WRITE_HOOK *handle = astream->writer_fifo.pop_back(
 			&astream->writer_fifo);
-		if (handle == NULL)
+		if (handle == NULL) {
 			break;
+		}
 		free_handle(handle);
 	}
 	while (1) {
 		ACL_VSTRING *str = (ACL_VSTRING*) acl_fifo_pop(
 			&astream->write_fifo);
-		if (str == NULL)
+		if (str == NULL) {
 			break;
+		}
 		acl_vstring_free(str);
 	}
 }
@@ -720,17 +739,19 @@ void acl_aio_ctl(ACL_ASTREAM *astream, int name, ...)
 		switch (name) {
 		case ACL_AIO_CTL_ACCEPT_FN:
 			accept_fn = va_arg(ap, ACL_AIO_ACCEPT_FN);
-			if (accept_fn)
+			if (accept_fn) {
 				astream->accept_fn = accept_fn;
-			else
+			} else {
 				astream->accept_fn = accept_callback;
+			}
 			break;
 		case ACL_AIO_CTL_LISTEN_FN:
 			listen_fn = va_arg(ap, ACL_AIO_LISTEN_FN);
-			if (listen_fn)
+			if (listen_fn) {
 				astream->listen_fn = listen_fn;
-			else
+			} else {
 				astream->listen_fn = listen_callback;
+			}
 			break;
 		case ACL_AIO_CTL_CTX:
 			astream->context = va_arg(ap, void *);
@@ -747,8 +768,9 @@ void acl_aio_ctl(ACL_ASTREAM *astream, int name, ...)
 			break;
 		case ACL_AIO_CTL_READ_NESTED:
 			astream->read_nested_limit = va_arg(ap, int);
-			if (astream->read_nested_limit < 0)
+			if (astream->read_nested_limit < 0) {
 				astream->read_nested_limit = 0;
+			}
 			break;
 		case ACL_AIO_CTL_WRITE_NESTED:
 			astream->write_nested_limit = va_arg(ap, int);
@@ -820,10 +842,11 @@ void acl_aio_ctl(ACL_ASTREAM *astream, int name, ...)
 
 ACL_VSTREAM *acl_aio_vstream(ACL_ASTREAM *astream)
 {
-	if (astream && astream->stream)
-		return (astream->stream);
+	if (astream && astream->stream) {
+		return astream->stream;
+	}
 
-	return (NULL);
+	return NULL;
 }
 
 void acl_aio_disable_readwrite(ACL_ASTREAM *astream)
@@ -836,10 +859,11 @@ int acl_aio_isset(ACL_ASTREAM *astream)
 {
 	const char *myname = "acl_aio_isset";
 
-	if (astream == NULL)
+	if (astream == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
-	else if (astream->stream == NULL)
-		return (0);
+	} else if (astream->stream == NULL) {
+		return 0;
+	}
 
-	return (acl_event_isset(astream->aio->event, astream->stream));
+	return acl_event_isset(astream->aio->event, astream->stream);
 }

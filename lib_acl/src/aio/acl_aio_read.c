@@ -178,8 +178,8 @@ static int __gets_peek(ACL_ASTREAM *astream)
 			READ_IOCP_CLOSE(astream);
 			return -1;
 		} else if (astream->keep_read == 0
-			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0)
-		{
+			 || (astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
+
 			return 0;
 		}
 		return len;
@@ -294,7 +294,7 @@ static void __aio_gets(ACL_ASTREAM *astream, int nonl)
 	if (astream->read_nested < astream->read_nested_limit) {
 		/* 尝试性地读数据 */
 		while (1) {
-			if (__gets_peek(astream) <= 0 || astream->keep_read == 0) {
+			if (__gets_peek(astream) <= 0 || !astream->keep_read) {
 				break;
 			}
 		}
@@ -379,8 +379,8 @@ static int __read_peek(ACL_ASTREAM *astream)
 			READ_IOCP_CLOSE(astream);
 			return -1;
 		} else if (astream->keep_read == 0
-			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0)
-		{
+			 || (astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
+
 			return 0;
 		}
 		return len;
@@ -441,9 +441,9 @@ static void __read_notify_callback(int event_type, ACL_ASTREAM *astream)
 
 	/* 尝试性地读数据 */
 	while (1) {
-		 if (__read_peek(astream) <= 0 || astream->keep_read == 0) {
+		if (__read_peek(astream) <= 0 || !astream->keep_read) {
 			break;
-		 }
+		}
 	}
 }
 
@@ -454,9 +454,9 @@ void acl_aio_read(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return;
 	}
+
 	if (astream->stream == NULL) {
-		acl_msg_fatal("%s: astream(%p)->stream null",
-			myname, astream);
+		acl_msg_fatal("%s: astream(%p)->stream null", myname, astream);
 	}
 
 	astream->event_read_callback = __read_notify_callback;
@@ -479,7 +479,7 @@ void acl_aio_read(ACL_ASTREAM *astream)
 	if (astream->read_nested < astream->read_nested_limit) {
 		/* 尝试性地读数据 */
 		while (1) {
-			if (__read_peek(astream) <= 0 || astream->keep_read == 0) {
+			if (__read_peek(astream) <= 0 || !astream->keep_read) {
 				break;
 			}
 		}
@@ -535,14 +535,14 @@ static int __readn_peek(ACL_ASTREAM *astream)
 			READ_SAFE_ENABLE(astream, main_read_callback);
 			return 0;
 		}
+
 		/* XXX: 查看缓冲区中是否还有数据, 必须兼容数据读不够的情况! */
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			char *ptr = acl_vstring_str(&astream->strbuf);
 			int   len = (int) ACL_VSTRING_LEN(&astream->strbuf);
 
-			acl_msg_warn("%s: nneed(%d), nread(%d),"
-				" read_netsted(%d), nrefer(%d)",
-				myname, astream->count, len,
+			acl_msg_warn("%s: nneed(%d), nread(%d), read_netsted(%d),"
+				" nrefer(%d)", myname, astream->count, len,
 				astream->read_nested, astream->nrefer);
 
 			(void) read_complete_callback(astream, ptr, len);
@@ -567,8 +567,8 @@ static int __readn_peek(ACL_ASTREAM *astream)
 			READ_IOCP_CLOSE(astream);
 			return -1;
 		} else if (astream->keep_read == 0
-			|| (astream->flag & ACL_AIO_FLAG_ISRD) == 0)
-		{
+			 || (astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
+
 			return 0;
 		}
 		return len;
@@ -630,7 +630,7 @@ static void __readn_notify_callback(int event_type, ACL_ASTREAM *astream)
 	}
 
 	while (1) {
-		if (__readn_peek(astream) <= 0 || astream->keep_read == 0) {
+		if (__readn_peek(astream) <= 0 || !astream->keep_read) {
 			break;
 		}
 	}
@@ -674,7 +674,7 @@ void acl_aio_readn(ACL_ASTREAM *astream, int count)
 	if (astream->read_nested < astream->read_nested_limit) {
 		/* 尝试性地读数据 */
 		while (1) {
-			if (__readn_peek(astream) <= 0 || astream->keep_read == 0) {
+			if (__readn_peek(astream) <= 0 || !astream->keep_read) {
 				break;
 			}
 		}
@@ -703,6 +703,7 @@ ACL_VSTRING *acl_aio_gets_peek(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return NULL;
 	}
+
 	if (acl_vstream_gets_peek(astream->stream,
 		&astream->strbuf, &ready) == ACL_VSTREAM_EOF
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
@@ -730,13 +731,14 @@ ACL_VSTRING *acl_aio_gets_nonl_peek(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_DELAY_CLOSE)) {
 		return NULL;
 	}
+
 	if (acl_vstream_gets_nonl_peek(astream->stream,
 		&astream->strbuf, &ready) == ACL_VSTREAM_EOF
 #if ACL_EWOULDBLOCK == ACL_EAGAIN
 		&& astream->stream->errnum != ACL_EAGAIN
 #endif
-		&& astream->stream->errnum != ACL_EWOULDBLOCK)
-	{
+		&& astream->stream->errnum != ACL_EWOULDBLOCK) {
+
 		astream->flag |= ACL_AIO_FLAG_DEAD;
 		if (ACL_VSTRING_LEN(&astream->strbuf) > 0) {
 			return &astream->strbuf;
@@ -898,6 +900,7 @@ void acl_aio_disable_read(ACL_ASTREAM *astream)
 	if ((astream->flag & ACL_AIO_FLAG_ISRD) == 0) {
 		return;
 	}
+
 	astream->flag &= ~ACL_AIO_FLAG_ISRD;
 	astream->can_read_fn = NULL;
 	astream->can_read_ctx = NULL;

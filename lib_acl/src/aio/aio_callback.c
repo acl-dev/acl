@@ -37,25 +37,29 @@ int aio_timeout_callback(ACL_ASTREAM *astream)
 		acl_fifo_init(&timeo_handles);
 		acl_foreach_reverse(iter, astream->timeo_handles) {
 			AIO_TIMEO_HOOK *handle = (AIO_TIMEO_HOOK*) iter.data;
-			if (handle->disable)
+			if (handle->disable) {
 				continue;
+			}
+
 			acl_fifo_push(&timeo_handles, handle);
 		}
 
 		while (1) {
 			AIO_TIMEO_HOOK *handle = acl_fifo_pop(&timeo_handles);
-			if (handle == NULL)
+			if (handle == NULL) {
 				break;
+			}
+
 			ret = handle->callback(astream, handle->ctx);
 			if (ret < 0) {
 				astream->nrefer--;
-				return (ret);
+				return ret;
 			}
 		}
 	}
 
 	astream->nrefer--;
-	return (ret);
+	return ret;
 }
 
 void aio_close_callback(ACL_ASTREAM *astream)
@@ -77,8 +81,10 @@ void aio_close_callback(ACL_ASTREAM *astream)
 		acl_fifo_init(&close_handles);
 		acl_foreach_reverse(iter, astream->close_handles) {
 			AIO_CLOSE_HOOK *handle = (AIO_CLOSE_HOOK*) iter.data;
-			if (handle->disable)
+			if (handle->disable) {
 				continue;
+			}
+
 			acl_fifo_push(&close_handles, handle);
 		}
 
@@ -86,8 +92,10 @@ void aio_close_callback(ACL_ASTREAM *astream)
 			AIO_CLOSE_HOOK *handle = acl_fifo_pop(&close_handles);
 			void *ctx;
 
-			if (handle == NULL)
+			if (handle == NULL) {
 				break;
+			}
+
 			/* xxx: 关闭回调仅能被调用一次 */
 			ctx = handle->ctx;
 			handle->disable = 1;

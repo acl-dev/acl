@@ -60,28 +60,31 @@ static int write_complete_callback(ACL_ASTREAM *astream)
 		while (1) {
 			handle = astream->write_handles->pop_back(
 				astream->write_handles);
-			if (handle == NULL)
+			if (handle == NULL) {
 				break;
+			}
+
 			astream->writer_fifo.push_back(
 					&astream->writer_fifo, handle);
 		}
 
 		acl_foreach_reverse(iter, &astream->writer_fifo) {
 			handle = (AIO_WRITE_HOOK*) iter.data;
-			if (handle->disable)
+			if (handle->disable) {
 				continue;
+			}
 
 			/* 回调写成功注册函数 */
 			ret = handle->callback(astream, handle->ctx);
 			if (ret != 0) {
 				astream->nrefer--;
-				return (ret);
+				return ret;
 			}
 		}
 	}
 
 	astream->nrefer--;
-	return (ret);
+	return ret;
 }
 
 /* 尝试发送流写队列里的数据，返回值为写队列里还剩余的数据长度或写失败 */
@@ -102,10 +105,11 @@ static int __try_fflush(ACL_ASTREAM *astream)
 		str = acl_fifo_head(&astream->write_fifo);
 		if (str == NULL) {
 			/* 说明写队列已经为空 */
-			if (astream->write_left != 0)
+			if (astream->write_left != 0) {
 				acl_msg_fatal("%s: write_left(%d) != 0",
 					myname, astream->write_left);
-			return (astream->write_left);
+			}
+			return astream->write_left;
 		}
 
 		/* 计算本数据块的长度及数据开始位置, write_offset 仅是本数据块
@@ -123,10 +127,10 @@ static int __try_fflush(ACL_ASTREAM *astream)
 		if (n == ACL_VSTREAM_EOF) {
 			if (acl_last_error() != ACL_EAGAIN) {
 				astream->flag |= ACL_AIO_FLAG_DEAD;
-				return (-1);
+				return -1;
 			}
 			/* 本次写操作未写入数据，仅需要返回剩余数据长度即可 */
-			return (astream->write_left);
+			return astream->write_left;
 		}
 
 		/* 重新计算写队列里剩余数据的总长度 */
@@ -137,7 +141,7 @@ static int __try_fflush(ACL_ASTREAM *astream)
 			 * 该数据块的可写数据的相对偏移位置
 			 */
 			astream->write_offset += n;
-			return (astream->write_left);
+			return astream->write_left;
 		}
 
 		/* 将本数据块从写队列中剔除并释放该数据块所占的内存 */
@@ -155,10 +159,11 @@ static int __try_fflush(ACL_ASTREAM *astream)
 		 * 会有很多数据连接需要被处理，总之，数据面前大家平等:)
 		 */
 		if (++i >= 10) {
-			if (acl_msg_verbose)
+			if (acl_msg_verbose) {
 				acl_msg_warn("%s: write_left=%d, loop=%d",
 					myname, astream->write_left, i);
-			return (astream->write_left);
+			}
+			return astream->write_left;
 		}
 	}
 }
@@ -192,11 +197,13 @@ static void __writen_notify_callback(int event_type, ACL_EVENT *event acl_unused
 			/* 说明用户希望继续等待写事件 */
 			WRITE_SAFE_ENABLE(astream, __writen_notify_callback);
 		}
+
 		return;
 	}
 
-	if ((event_type & ACL_EVENT_WRITE) == 0)
+	if ((event_type & ACL_EVENT_WRITE) == 0) {
 		acl_msg_fatal("%s: unknown event: %d", myname, event_type);
+	}
 
 	/* 尝试发送流的写队列里的数据 */
 	nleft = __try_fflush(astream);
@@ -231,18 +238,21 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 	ACL_VSTRING *str;
 	int   n;
 
-	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD)))
+	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD))) {
 		return;
+	}
 
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->write_nested++;
 
 	if (astream->write_nested >= astream->write_nested_limit) {
 		/* 递归写次数达到了阀值，只需记个警告信息，因为有嵌套限制 */
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_warn("%s(%d): write_nested(%d) >= max(%d)",
 				myname, __LINE__, astream->write_nested,
 				astream->write_nested_limit);
+		}
+
 		n = 0;
 	}
 
@@ -277,8 +287,9 @@ void acl_aio_writen(ACL_ASTREAM *astream, const char *data, int dlen)
 			 * 完成流的IO延迟关闭过程
 			 */
 			WRITE_IOCP_CLOSE(astream);
-		} else
+		} else {
 			astream->write_nested--;
+		}
 
 		return;
 	} else if (n == ACL_VSTREAM_EOF) {
@@ -330,10 +341,12 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 	if (astream->write_nested >= astream->write_nested_limit) {
 		/* 递归嵌套写次数达到了规定的阀值，只需记个警告信息即可，
 		 * 因为有嵌套限制 */
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_warn("%s: write_nested(%d) >= max(%d)",
 				myname, astream->write_nested,
 				astream->write_nested_limit);
+		}
+
 		n = 0;
 	}
 
@@ -369,9 +382,9 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 			acl_vstring_free(str);
 			astream->write_nested--;
 
-			if (ret < 0) /* 调用者希望关闭流 */
+			if (ret < 0) { /* 调用者希望关闭流 */
 				WRITE_IOCP_CLOSE(astream);
-			else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
+			} else if ((astream->flag & ACL_AIO_FLAG_IOCP_CLOSE)) {
 				/* 因为本次写IO已经成功完成，所以需要
 				 * 完成流的IO延迟关闭过程 */
 				WRITE_IOCP_CLOSE(astream);
@@ -396,8 +409,9 @@ void acl_aio_vfprintf(ACL_ASTREAM *astream, const char *fmt, va_list ap)
 	acl_assert(n >= 0);
 
 	len = (int) ACL_VSTRING_LEN(str);
-	if (n < len)
+	if (n < len) {
 		acl_vstring_memmove(str, acl_vstring_str(str) + n, len - n);
+	}
 
 	/* 将数据置入该流的写队列中 */
 	acl_fifo_push(&astream->write_fifo, str);
@@ -425,8 +439,9 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	acl_assert(vector);
 	acl_assert(count);
 
-	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD)))
+	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD))) {
 		return;
+	}
 
 	/* 将嵌套计数加1，以防止嵌套层次太深而使栈溢出 */
 	astream->write_nested++;
@@ -460,8 +475,8 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	 * 本次可以真正调用一次写操作
 	 */
 	else if ((n = acl_vstream_writev(astream->stream, vector, count))
-		== ACL_VSTREAM_EOF)
-	{
+		== ACL_VSTREAM_EOF) {
+
 		if (acl_last_error() != ACL_EAGAIN) {
 			astream->flag |= ACL_AIO_FLAG_DEAD;
 			astream->write_nested--;
@@ -514,6 +529,7 @@ void acl_aio_writev(ACL_ASTREAM *astream, const struct iovec *vector, int count)
 	j = i;
 	dlen = (int) vector[i].iov_len - n;
 	i++;  /* skipt this */
+
 	for (; i < count; i++) {
 		dlen += (int) vector[i].iov_len;
 	}
@@ -549,6 +565,7 @@ size_t acl_aio_send_pending(ACL_ASTREAM *astream)
 	if (astream->write_offset > 0 && n > (size_t) astream->write_offset) {
 		n -= astream->write_offset;
 	}
+
 	return n;
 }
 
@@ -574,12 +591,14 @@ static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
 		} else {
 			WRITE_SAFE_ENABLE(astream, can_write_callback);
 		}
+
 		return;
 	}
 
-	if (astream->can_write_fn == NULL)
-		printf("%s(%d): can_write_fn null for astream(%p)",
+	if (astream->can_write_fn == NULL) {
+		acl_msg_error("%s(%d): can_write_fn null for astream(%p)",
 			myname, __LINE__, astream);
+	}
 
 	astream->nrefer++;
 	if (astream->can_write_fn(astream, astream->can_write_ctx) < 0) {
@@ -595,8 +614,10 @@ static void can_write_callback(int event_type, ACL_EVENT *event acl_unused,
 void acl_aio_enable_write(ACL_ASTREAM *astream,
 	ACL_AIO_NOTIFY_FN can_write_fn, void *context)
 {
-	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD)))
+	if ((astream->flag & (ACL_AIO_FLAG_DELAY_CLOSE | ACL_AIO_FLAG_DEAD))) {
 		return;
+	}
+
         astream->can_write_fn = can_write_fn;
         astream->can_write_ctx = context;
 	WRITE_SAFE_ENABLE(astream, can_write_callback);
@@ -604,23 +625,30 @@ void acl_aio_enable_write(ACL_ASTREAM *astream,
 
 void acl_aio_disable_write(ACL_ASTREAM *astream)
 {
-	if ((astream->flag & ACL_AIO_FLAG_ISWR) == 0)
+	if ((astream->flag & ACL_AIO_FLAG_ISWR) == 0) {
 		return;
+	}
+
 	astream->flag &= ~ACL_AIO_FLAG_ISWR;
         astream->can_write_fn = NULL;
         astream->can_write_ctx = NULL;
-	if (astream->stream)
+
+	if (astream->stream) {
 		acl_event_disable_write(astream->aio->event, astream->stream);
+	}
 }
 
 int acl_aio_iswset(ACL_ASTREAM *astream)
 {
 	const char *myname = "acl_aio_iswset";
 
-	if (astream == NULL)
+	if (astream == NULL) {
 		acl_msg_fatal("%s: input invalid", myname);
-	if (astream->stream == NULL)
-		return (0);
+	}
 
-	return (acl_event_iswset(astream->aio->event, astream->stream));
+	if (astream->stream == NULL) {
+		return 0;
+	}
+
+	return acl_event_iswset(astream->aio->event, astream->stream);
 }
