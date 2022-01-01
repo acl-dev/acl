@@ -173,6 +173,7 @@ void http_creator()
 		if (n == ACL_VSTREAM_EOF) {
 			break;
 		}
+
 		if (n == 0) {
 			acl::safe_snprintf(buf, sizeof(buf), "http_demo");
 		}

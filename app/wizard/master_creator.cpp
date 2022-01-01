@@ -24,8 +24,9 @@ static bool create_master_fiber(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (tmpl.copy_and_replace("master_fiber.cf", file.c_str()) == false)
+	if (!tmpl.copy_and_replace("master_fiber.cf", file.c_str())) {
 		return false;
+	}
 
 	const char* name = "master_fiber";
 	const FILE_FROM_TO tab[] = {
@@ -46,8 +47,9 @@ static bool create_master_proc(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (tmpl.copy_and_replace("master_proc.cf", file.c_str()) == false)
+	if (!tmpl.copy_and_replace("master_proc.cf", file.c_str())) {
 		return false;
+	}
 
 	const char* name = "master_proc";
 	const FILE_FROM_TO tab[] = {
@@ -64,8 +66,9 @@ static bool create_master_aio(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (tmpl.copy_and_replace("master_aio.cf", file.c_str()) == false)
+	if (!tmpl.copy_and_replace("master_aio.cf", file.c_str())) {
 		return false;
+	}
 
 	const char* name = "master_aio";
 	const FILE_FROM_TO tab[] = {
@@ -82,8 +85,9 @@ static bool create_master_rpc(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (tmpl.copy_and_replace("master_aio.cf", file.c_str()) == false)
+	if (!tmpl.copy_and_replace("master_aio.cf", file.c_str())) {
 		return false;
+	}
 
 	const char* name = "master_rpc";
 	const FILE_FROM_TO tab[] = {
@@ -102,8 +106,9 @@ static bool create_master_trigger(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (tmpl.copy_and_replace("master_trigger.cf", file.c_str()) == false)
+	if (!tmpl.copy_and_replace("master_trigger.cf", file.c_str())) {
 		return false;
+	}
 
 	const char* name = "master_trigger";
 	const FILE_FROM_TO tab[] = {
@@ -120,8 +125,9 @@ static bool create_master_udp(file_tmpl& tmpl)
 {
 	string file(tmpl.get_project_name());
 	file << ".cf";
-	if (tmpl.copy_and_replace("master_udp.cf", file.c_str()) == false)
+	if (!tmpl.copy_and_replace("master_udp.cf", file.c_str())) {
 		return false;
+	}
 
 	const char* name = "master_udp";
 	const FILE_FROM_TO tab[] = {
@@ -141,8 +147,7 @@ void master_creator()
 	// 设置源程序所在目录
 	tmpl.set_path_from("tmpl/master");
 
-	while (true)
-	{
+	while (true) {
 		char buf[256];
 		int  n;
 
@@ -150,10 +155,13 @@ void master_creator()
 		fflush(stdout);
 
 		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-		if (n == ACL_VSTREAM_EOF)
+		if (n == ACL_VSTREAM_EOF) {
 			break;
-		if (n == 0)
+		}
+
+		if (n == 0) {
 			acl::safe_snprintf(buf, sizeof(buf), "master_service");
+		}
 
 		tmpl.set_project_name(buf);
 		// 创建目录
@@ -172,58 +180,46 @@ void master_creator()
 		fflush(stdout);
 
 		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-		if (n == ACL_VSTREAM_EOF)
+		if (n == ACL_VSTREAM_EOF) {
 			break;
-		else if (strcasecmp(buf, "t") == 0)
-		{
+		} else if (strcasecmp(buf, "t") == 0) {
 			tmpl.create_common();
 			create_master_threads(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "p") == 0)
-		{
+		} else if (strcasecmp(buf, "p") == 0) {
 			tmpl.create_common();
 			create_master_proc(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "a") == 0)
-		{
+		} else if (strcasecmp(buf, "a") == 0) {
 			tmpl.create_common();
 			create_master_aio(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "r") == 0)
-		{
+		} else if (strcasecmp(buf, "r") == 0) {
 			tmpl.create_common();
 			create_master_rpc(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "g") == 0)
-		{
+		} else if (strcasecmp(buf, "g") == 0) {
 			tmpl.create_common();
 			create_master_trigger(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "u") == 0)
-		{
+		} else if (strcasecmp(buf, "u") == 0) {
 			tmpl.create_common();
 			create_master_udp(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "f") == 0)
-		{
+		} else if (strcasecmp(buf, "f") == 0) {
 			tmpl.create_common();
 			create_master_fiber(tmpl);
 			break;
-		}
-		else if (strcasecmp(buf, "s") == 0)
+		} else if (strcasecmp(buf, "s") == 0) {
 			goto END;
-		else
+		} else {
 			printf("unknown ch: %s\r\n", buf);
+		}
 	}
 
 END:
-	for (int i = 0; i < 78; i++)
+	for (int i = 0; i < 78; i++) {
 		putchar('-');
+	}
 	printf("\r\n");
 }
