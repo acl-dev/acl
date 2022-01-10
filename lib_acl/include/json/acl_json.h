@@ -347,6 +347,18 @@ ACL_API ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
 	const char *name, double value);
 
 /**
+ * 构建 json 对象时创建 json double 类型的叶节点
+ * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
+ * @param name {const char*} 标签名，非空
+ * @param value {double} 有符号整形值
+ * @param precision {int} 小数点精度，大于 0 时有效，否则取缺省值为 4
+ * @return {ACL_JSON_NODE*} 新创建的节点对象，在释放 ACL_JSON 对象时
+ *  一起被释放，所以不需要单独释放
+ */
+ACL_API ACL_JSON_NODE *acl_json_create_double2(ACL_JSON *json,
+	const char *name, double value, int precision);
+
+/**
  * 构建 json 对象的字符串节点，按 json 规范，该节点只能加入至数组对象中
  * @param json {ACL_JSON*} 由 acl_json_alloc / acl_json_alloc1 创建
  * @param text {const char*}

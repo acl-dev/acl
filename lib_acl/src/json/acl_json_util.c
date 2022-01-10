@@ -46,10 +46,10 @@ ACL_ARRAY *acl_json_getElementsByTagName(ACL_JSON *json, const char *tag)
 
 	if (acl_array_size(a) == 0) {
 		acl_array_destroy(a, NULL);
-		return (NULL);
+		return NULL;
 	}
 
-	return (a);
+	return a;
 }
 
 ACL_ARRAY *acl_json_getElementsByTags(ACL_JSON *json, const char *tags)
@@ -63,7 +63,7 @@ ACL_ARRAY *acl_json_getElementsByTags(ACL_JSON *json, const char *tags)
 	a = acl_json_getElementsByTagName(json, tokens->argv[tokens->argc - 1]);
 	if (a == NULL) {
 		acl_argv_free(tokens);
-		return (NULL);
+		return NULL;
 	}
 
 	result = acl_array_create(acl_array_size(a));
@@ -78,16 +78,17 @@ ACL_ARRAY *acl_json_getElementsByTags(ACL_JSON *json, const char *tags)
 			if (node->left_ch != 0) {
 				node = node->parent;
 			} else if (NEQ(tokens->argv[i], "*")
-				&& NEQ(tokens->argv[i], STR(node->ltag)))
-			{
+				&& NEQ(tokens->argv[i], STR(node->ltag))) {
+
 				break;
 			} else {
 				i--;
 				node = node->parent;
 			}
 		}
-		if (i == -1)
+		if (i == -1) {
 			result->push_back(result, node_saved);
+		}
 	}
 
 	acl_json_free_array(a);
@@ -111,7 +112,7 @@ ACL_JSON_NODE *acl_json_create_text(ACL_JSON *json,
 	acl_vstring_strcpy(node->ltag, name);
 	acl_vstring_strcpy(node->text, value);
 	node->type = ACL_JSON_T_STRING;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_bool(ACL_JSON *json,
@@ -122,7 +123,7 @@ ACL_JSON_NODE *acl_json_create_bool(ACL_JSON *json,
 	acl_vstring_strcpy(node->ltag, name);
 	acl_vstring_strcpy(node->text, value == 0 ? "false" : "true");
 	node->type = ACL_JSON_T_BOOL;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_null(ACL_JSON *json, const char *name)
@@ -132,7 +133,7 @@ ACL_JSON_NODE *acl_json_create_null(ACL_JSON *json, const char *name)
 	acl_vstring_strcpy(node->ltag, name);
 	acl_vstring_strcpy(node->text, "null");
 	node->type = ACL_JSON_T_NULL;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
@@ -143,7 +144,7 @@ ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
 	acl_vstring_strcpy(node->ltag, name);
 	acl_vstring_sprintf(node->text, "%lld", value);
 	node->type = ACL_JSON_T_NUMBER;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
@@ -154,7 +155,24 @@ ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
 	acl_vstring_strcpy(node->ltag, name);
 	acl_vstring_sprintf(node->text, "%.4f", value);
 	node->type = ACL_JSON_T_DOUBLE;
-	return (node);
+	return node;
+}
+
+ACL_JSON_NODE *acl_json_create_double2(ACL_JSON *json,
+	const char *name, double value, int precision)
+{
+	ACL_JSON_NODE *node = acl_json_node_alloc(json);
+	char fmt[16];
+
+	acl_vstring_strcpy(node->ltag, name);
+	if (precision <= 0) {
+		precision = 4;
+	}
+
+	snprintf(fmt, sizeof(fmt), "%%.%df", precision);
+	acl_vstring_sprintf(node->text, fmt, value);
+	node->type = ACL_JSON_T_DOUBLE;
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json, const char *text)
@@ -163,7 +181,7 @@ ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json, const char *text)
 
 	acl_vstring_strcpy(node->text, text);
 	node->type = ACL_JSON_T_A_STRING;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json, acl_int64 value)
@@ -172,7 +190,7 @@ ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json, acl_int64 value)
 
 	acl_vstring_sprintf(node->text, "%lld", value);
 	node->type = ACL_JSON_T_A_NUMBER;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_array_double(ACL_JSON *json, double value)
@@ -181,7 +199,7 @@ ACL_JSON_NODE *acl_json_create_array_double(ACL_JSON *json, double value)
 
 	acl_vstring_sprintf(node->text, "%.4f", value);
 	node->type = ACL_JSON_T_A_DOUBLE;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_array_bool(ACL_JSON *json, int value)
@@ -190,7 +208,7 @@ ACL_JSON_NODE *acl_json_create_array_bool(ACL_JSON *json, int value)
 
 	acl_vstring_strcpy(node->text, value ? "true" : "false");
 	node->type = ACL_JSON_T_A_BOOL;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_array_null(ACL_JSON *json)
@@ -199,7 +217,7 @@ ACL_JSON_NODE *acl_json_create_array_null(ACL_JSON *json)
 
 	acl_vstring_strcpy(node->text, "null");
 	node->type = ACL_JSON_T_A_NULL;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_obj(ACL_JSON *json)
@@ -209,7 +227,7 @@ ACL_JSON_NODE *acl_json_create_obj(ACL_JSON *json)
 	node->left_ch = '{';
 	node->right_ch = '}';
 	node->type = ACL_JSON_T_OBJ;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_array(ACL_JSON *json)
@@ -219,7 +237,7 @@ ACL_JSON_NODE *acl_json_create_array(ACL_JSON *json)
 	node->left_ch = '[';
 	node->right_ch = ']';
 	node->type = ACL_JSON_T_ARRAY;
-	return (node);
+	return node;
 }
 
 ACL_JSON_NODE *acl_json_create_node(ACL_JSON *json,
@@ -231,7 +249,7 @@ ACL_JSON_NODE *acl_json_create_node(ACL_JSON *json,
 	node->tag_node = value;
 	node->type = ACL_JSON_T_OBJ;
 	acl_json_node_add_child(node, value);
-	return (node);
+	return node;
 }
 
 void acl_json_node_append_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child)
@@ -396,16 +414,17 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		/* 当本节点有子节点或虽为叶节点，但该节点的下一个兄弟节点
 		 * 非空时继续下一个循环过程
 		 */
-		if (acl_ring_size(&node->children) > 0)
+		if (acl_ring_size(&node->children) > 0) {
 			continue;
-		else if (acl_json_node_next(node) != NULL) {
+		} else if (acl_json_node_next(node) != NULL) {
 			if (node->right_ch > 0)
 				ACL_VSTRING_ADDCH(buf, node->right_ch);
 			continue;
 		}
 
-		if (node->right_ch > 0)
+		if (node->right_ch > 0) {
 			ACL_VSTRING_ADDCH(buf, node->right_ch);
+		}
 
 		/* 当本节点为叶节点且后面没有兄弟节点时，需要一级一级回溯
 		 * 将父节点的分隔符添加至本叶节点尾部，直到遇到根节点或父
