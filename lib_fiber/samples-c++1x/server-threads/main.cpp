@@ -37,8 +37,8 @@ static void client_echo(acl::socket_stream* conn) {
 			printf("client write error %s\r\n", acl::last_serror());
 			break;
 		}
-		//acl::fiber::delay(1000);
 	}
+
 	delete conn;
 }
 
@@ -51,8 +51,9 @@ static void server_listen(acl::server_socket& ss, bool readable) {
 		}
 
 	}
-	acl::fiber::schedule_stop();
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 static void box_fiber(acl::fiber_tbox<acl::socket_stream>& box) {
 	while (true) {
@@ -101,6 +102,117 @@ private:
 	acl::fiber_tbox<acl::socket_stream> box_;
 };
 
+static void start_threads(acl::fiber_event_t type,
+		const char* addr, int nthreads) {
+
+	std::vector<fiber_thread*> threads;
+
+	for (int i = 0; i < nthreads; i++) {
+		fiber_thread* thread = new fiber_thread(type);
+		threads.push_back(thread);
+		thread->start();
+	}
+
+	acl::server_socket ss;
+	if (!ss.open(addr)) {
+		printf("open %s error %s\r\n", addr, acl::last_serror());
+		return;
+	}
+
+	printf("Listen on %s ...\r\n", addr);
+
+	size_t i = 0, n = (size_t) nthreads;
+
+	while (true) {
+		acl::socket_stream* conn = ss.accept();
+		if (conn == NULL) {
+			printf("accept error %s\r\n", acl::last_serror());
+			break;
+		}
+
+		// peek one thread and push the connection to it
+		fiber_thread* thread = threads[i++ % n];
+		thread->push(conn);
+	}
+
+	for (std::vector<fiber_thread*>::iterator it = threads.begin();
+		 it != threads.end(); ++it) {
+		(*it)->wait();
+		delete *it;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+#if !defined(_WIN32) && !defined(_WIN64)
+
+static void listen_fiber(const char* addr) {
+	acl::server_socket ss;
+	if (!ss.open(addr)) {
+		printf("listen on %s error %s\r\n", addr, acl::last_serror());
+		return;
+	}
+
+	while (true) {
+		acl::socket_stream* conn = ss.accept();
+		if (conn == NULL) {
+			printf("accept error %s\r\n", acl::last_serror());
+			break;
+		}
+
+		// start one fiber to handle the connection.
+		go[=]{
+			client_echo(conn);
+		};
+	}
+}
+
+class fiber_thread2 : public acl::thread {
+public:
+	fiber_thread2(acl::fiber_event_t type, const char* addr)
+	: type_(type)
+	, addr_(addr)
+	{}
+
+	~fiber_thread2(void) {}
+
+protected:
+	// @override
+	void* run(void) {
+		go[&] {
+			listen_fiber(addr_.c_str());
+		};
+
+		// start the fiber schedule process
+		acl::fiber::schedule_with(type_);
+		return NULL;
+	}
+
+private:
+	acl::fiber_event_t type_;
+	acl::string addr_;
+};
+
+static void start_threads2(acl::fiber_event_t type,
+		const char* addr, int nthreads) {
+
+	std::vector<fiber_thread2*> threads;
+
+	for (int i = 0; i < nthreads; i++) {
+		fiber_thread2* thread = new fiber_thread2(type, addr);
+		threads.push_back(thread);
+		thread->start();
+	}
+
+	for (std::vector<fiber_thread2*>::iterator it = threads.begin();
+		 it != threads.end(); ++it) {
+		(*it)->wait();
+		delete *it;
+	}
+}
+
+#endif // !_WIN32 && !_WIN64
+
 //////////////////////////////////////////////////////////////////////////////
 
 static void usage(const char* procname) {
@@ -109,19 +221,20 @@ static void usage(const char* procname) {
 		" -s server_addr\r\n"
 		" -r [if call readable]\r\n"
 		" -t threads_count\r\n"
+		" -T [if listening in multiple threads]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[]) {
 	int  ch, nthreads = 1;
-	bool readable = false;
+	bool readable = false, multi_listen = false;
 	acl::string addr = "0.0.0.0:9000";
 	acl::string event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:e:rt:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:e:rt:T")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -141,6 +254,9 @@ int main(int argc, char *argv[]) {
 				nthreads = 1;
 			}
 			break;
+		case 'T':
+			multi_listen = true;
+			break;
 		default:
 			break;
 		}
@@ -155,41 +271,15 @@ int main(int argc, char *argv[]) {
 		type = acl::FIBER_EVENT_T_KERNEL;
 	}
 
-	std::vector<fiber_thread*> threads;
-
-	for (int i = 0; i < nthreads; i++) {
-		fiber_thread* thread = new fiber_thread(type);
-		threads.push_back(thread);
-		thread->start();
+#if !defined(_WIN32) && !defined(_WIN64)
+	if (multi_listen) {
+		start_threads2(type, addr, nthreads);
+	} else {
+		start_threads(type, addr, nthreads);
 	}
-
-	acl::server_socket ss;
-	if (!ss.open(addr)) {
-		printf("open %s error %s\r\n", addr.c_str(), acl::last_serror());
-		return 1;
-	}
-
-	printf("Listen on %s ...\r\n", addr.c_str());
-
-	size_t i = 0, n = (size_t) nthreads;
-
-	while (true) {
-		acl::socket_stream* conn = ss.accept();
-		if (conn == NULL) {
-			printf("accept error %s\r\n", acl::last_serror());
-			break;
-		}
-
-		// peek one thread and push the connection to it
-		fiber_thread* thread = threads[i++ % n];
-		thread->push(conn);
-	}
-
-	for (std::vector<fiber_thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it) {
-		(*it)->wait();
-		delete *it;
-	}
+#else
+	start_threads(type, addr, nthreads);
+#endif
 
 	return 0;
 }
