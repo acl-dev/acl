@@ -42,17 +42,6 @@ static void client_echo(acl::socket_stream* conn) {
 	delete conn;
 }
 
-static void server_listen(acl::server_socket& ss, bool readable) {
-	while (true) {
-		acl::socket_stream* conn = ss.accept();
-		if (conn == NULL) {
-			printf("accept error %s\r\n", acl::last_serror());
-			break;
-		}
-
-	}
-}
-
 //////////////////////////////////////////////////////////////////////////////
 
 static void box_fiber(acl::fiber_tbox<acl::socket_stream>& box) {
@@ -219,7 +208,6 @@ static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -e event_type[kernel|select|poll]\r\n"
 		" -s server_addr\r\n"
-		" -r [if call readable]\r\n"
 		" -t threads_count\r\n"
 		" -T [if listening in multiple threads]\r\n"
 		, procname);
@@ -227,14 +215,14 @@ static void usage(const char* procname) {
 
 int main(int argc, char *argv[]) {
 	int  ch, nthreads = 1;
-	bool readable = false, multi_listen = false;
+	bool multi_listen = false;
 	acl::string addr = "0.0.0.0:9000";
 	acl::string event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:e:rt:T")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:e:t:T")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -244,9 +232,6 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'e':
 			event_type = optarg;
-			break;
-		case 'r':
-			readable = true;
 			break;
 		case 't':
 			nthreads = atoi(optarg);
