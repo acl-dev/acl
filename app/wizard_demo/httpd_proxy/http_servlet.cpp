@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "fiber_transfer.h"
+#include "tcp_transfer.h"
 #include "http_servlet.h"
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
@@ -44,21 +44,6 @@ bool http_servlet::doGet(request_t& req, response_t& res)
 
 bool http_servlet::doPost(request_t& req, response_t& res)
 {
-	// 如果需要 http session 控制，请打开下面注释，且需要保证
-	// 在 master_service.cpp 的函数 thread_on_read 中设置的
-	// memcached 服务正常工作
-	/*
-	const char* sid = req.getSession().getAttribute("sid");
-	if (*sid == 0)
-		req.getSession().setAttribute("sid", "xxxxxx");
-	sid = req.getSession().getAttribute("sid");
-	*/
-
-	// 如果需要取得浏览器 cookie 请打开下面注释
-	/*
-	
-	*/
-
 	const char* path = req.getPathInfo();
 	handler_t handler = path && *path ? handlers_[path] : NULL;
 	return handler ? (this->*handler)(req, res) : on_default(req, res);
@@ -133,7 +118,7 @@ bool http_servlet::doConnect(request_t& req, response_t& res)
 
 	const char* ok = "";
 	res.setContentLength(0);
-	if (res.write(ok) == false) {
+	if (res.write(ok, 1) == false) {
 		return false;
 	}
 
@@ -144,8 +129,8 @@ bool http_servlet::doConnect(request_t& req, response_t& res)
 
 bool http_servlet::doProxy(acl::socket_stream& local, acl::socket_stream& peer)
 {
-	fiber_transfer fiber_local(local, peer);
-	fiber_transfer fiber_peer(peer, local);
+	tcp_transfer fiber_local(local, peer);
+	tcp_transfer fiber_peer(peer, local);
 
 	fiber_local.set_peer(fiber_peer);
 	fiber_peer.set_peer(fiber_local);
