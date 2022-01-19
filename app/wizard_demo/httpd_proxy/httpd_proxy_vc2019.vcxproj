@@ -339,6 +339,7 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="http_servlet.cpp" />
+    <ClCompile Include="http_transfer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="master_service.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -355,6 +356,7 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="http_servlet.h" />
+    <ClInclude Include="http_transfer.h" />
     <ClInclude Include="master_service.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="tcp_transfer.h" />

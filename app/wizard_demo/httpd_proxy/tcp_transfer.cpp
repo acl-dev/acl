@@ -6,13 +6,13 @@ tcp_transfer::tcp_transfer(acl::socket_stream& in, acl::socket_stream& out)
 {
 } 
 
+tcp_transfer::~tcp_transfer(void)
+{
+}
+
 void tcp_transfer::set_peer(tcp_transfer& peer)
 {
 	peer_ = &peer;
-}
-
-tcp_transfer::~tcp_transfer(void)
-{
 }
 
 void tcp_transfer::wait(void)

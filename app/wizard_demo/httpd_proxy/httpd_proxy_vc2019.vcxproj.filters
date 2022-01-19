@@ -30,6 +30,9 @@
     <ClCompile Include="tcp_transfer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="http_transfer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="http_servlet.h">
@@ -42,6 +45,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="tcp_transfer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="http_transfer.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
