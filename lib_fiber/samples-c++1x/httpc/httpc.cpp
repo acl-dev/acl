@@ -16,10 +16,15 @@ static int start(const char* addr, int count) {
 			.set_host(addr)
 			.set_keep_alive(false);
 
+		acl::string tmp;
+		head.build_request(tmp);
+		printf(">>request: %s\r\n", tmp.c_str());
 		if (!req.request(NULL, 0)) {
 			printf("request error\r\n");
 			break;
 		}
+
+		printf(">>>begin read body\r\n");
 
 		if (!req.get_body(buf)) {
 			printf("get response error\r\n");
@@ -38,7 +43,7 @@ static int start(const char* addr, int count) {
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -e event_type[kernel|select|poll, default: kernel]\r\n"
-		" -s server_addr[default: 127.0.0.1:9000]\r\n"
+		" -s server_addr[default: 127.0.0.1:8088]\r\n"
 		" -c fiber_count[default: 1]\r\n"
 		" -n count[default: 100]\r\n"
 		, procname);
