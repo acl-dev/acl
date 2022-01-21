@@ -421,7 +421,7 @@ static void sqlite_rows_save(char** results, int nrow,
 		db_row* row = NEW db_row(result.names_);
 		for (int j = 0; j < ncolumn; j++) {
 			const char* value = results[n++];
-			size_t len = strlen(value);
+			size_t len = value ? strlen(value) : 0;
 			row->push_back(value, len);
 		}
 		result.rows_.push_back(row);

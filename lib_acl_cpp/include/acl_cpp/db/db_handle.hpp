@@ -25,7 +25,7 @@ public:
 	/**
 	 * 取得数据表中的某个对应下标值的字段名
 	 * @param ifield {size_t} 下标值
-	 * @return {const char*} 返回空说明该下标值越界
+	 * @return {const char*} 返回空说明该下标值越界或不存在
 	 */
 	const char* field_name(size_t ifield) const;
 

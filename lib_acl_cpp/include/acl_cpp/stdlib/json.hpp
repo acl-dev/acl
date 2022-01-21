@@ -246,6 +246,18 @@ public:
 		bool return_child = false);
 
 	/**
+	 * 创建一个 double 类型的 json 节点对象，并将之添加为本 json 节点的子节点
+	 * @param tag {const char*} 标签名
+	 * @param value {double} 标签值
+	 * @param return_child {bool} 是否需要本函数返回新创建的子节点的引用
+	 * @param precision {int} 小数点精度，大于 0 时有效，否则取缺省值为 4
+	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
+	 *  否则返回本 json 节点对象的引用
+	 */
+	json_node& add_double(const char* tag, double value, int precision,
+		bool return_child = false);
+
+	/**
 	 * 创建一个布尔类型的 json 节点对象，并将之添加为本 json 节点的子节点
 	 * @param tag {const char*} 标签名
 	 * @param value {bool} 标签值
@@ -588,11 +600,12 @@ public:
 	 * "tag_name": tag_value
 	 * @param tag {const char*} 标签名
 	 * @param value {double} 标签值
+	 * @param precision {int} 小数点后面的精度（> 0 时有效，否则设为 4）
 	 * @return {json_node&} 新产生的 json_node 对象不需要用户手工释放，
 	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
 	 *  不用时调用 reset 来释放这些 json_node 节点对象
 	 */
-	json_node& create_double(const char* tag, double value);
+	json_node& create_double(const char* tag, double value, int precision = 4);
 
 	/**
 	 * 创建一个 json_node 叶节点对象，该节点对象的格式为：

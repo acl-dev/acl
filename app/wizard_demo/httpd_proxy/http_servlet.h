@@ -25,8 +25,8 @@ private:
 	typedef bool (http_servlet::*handler_t)(request_t&,response_t&);
 	std::map<std::string, handler_t> handlers_;
 
-	bool on_default(request_t&, response_t&);
-	bool on_hello(request_t&, response_t&);
+	bool onDefault(request_t&, response_t&);
+	bool onHello(request_t&, response_t&);
 
-	bool doProxy(acl::socket_stream& local, acl::socket_stream& peer);
+	bool doTcpProxy(acl::socket_stream& local, acl::socket_stream& peer);
 };

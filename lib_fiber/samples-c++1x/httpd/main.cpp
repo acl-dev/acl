@@ -1,4 +1,3 @@
-#include <getopt.h>
 #include <cstdlib>
 #include <cstdio>
 
@@ -102,8 +101,8 @@ int main(int argc, char *argv[]) {
 
 	// start the server in alone or daemon mode
 
-	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0) {
-		const char* addr = "0.0.0.0|8194";
+	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {
+		const char* addr = "0.0.0.0|8088";
 		const char* conf = argc >= 3 ? argv[2] : NULL;
 
 		// run in alone mode

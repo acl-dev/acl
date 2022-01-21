@@ -301,6 +301,12 @@ json_node& json_node::add_double(const char* tag, double value,
 	return add_child(json_->create_double(tag, value), return_child);
 }
 
+json_node& json_node::add_double(const char* tag, double value, int precision,
+	bool return_child /* = false */)
+{
+	return add_child(json_->create_double(tag, value, precision), return_child);
+}
+
 json_node& json_node::add_bool(const char* tag, bool value,
 	bool return_child /* = false */)
 {
@@ -593,9 +599,9 @@ json_node& json::create_node(const char* tag, acl_int64 value)
 	return *n;
 }
 
-json_node& json::create_double(const char* tag, double value)
+json_node& json::create_double(const char* tag, double value, int precision)
 {
-	ACL_JSON_NODE* node = acl_json_create_double(json_, tag, value);
+	ACL_JSON_NODE* node = acl_json_create_double2(json_, tag, value, precision);
 	json_node* n = dbuf_->create<json_node>(node, this);
 	return *n;
 }

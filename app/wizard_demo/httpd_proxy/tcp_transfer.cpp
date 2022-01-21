@@ -1,26 +1,26 @@
 #include "stdafx.h"
-#include "fiber_transfer.h"
+#include "tcp_transfer.h"
 
-fiber_transfer::fiber_transfer(acl::socket_stream& in, acl::socket_stream& out)
+tcp_transfer::tcp_transfer(acl::socket_stream& in, acl::socket_stream& out)
 : in_(in), out_(out), peer_(NULL)
 {
 } 
 
-void fiber_transfer::set_peer(fiber_transfer& peer)
+tcp_transfer::~tcp_transfer(void)
+{
+}
+
+void tcp_transfer::set_peer(tcp_transfer& peer)
 {
 	peer_ = &peer;
 }
 
-fiber_transfer::~fiber_transfer(void)
-{
-}
-
-void fiber_transfer::wait(void)
+void tcp_transfer::wait(void)
 {
 	(void) box_.pop();
 }
 
-void fiber_transfer::run(void)
+void tcp_transfer::run(void)
 {
 	char buf[8192];
 	while (true) {

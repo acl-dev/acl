@@ -107,7 +107,10 @@ static void test(void)
 			.get_parent()
 		.add_text("name28", "value28")
 		.add_text("name29", "value29")
-		.add_text("name30", "value30");
+		.add_text("name30", "value30")
+		.add_double("name31", 100)
+		.add_double("name32", 100, 2)
+		.add_double("name33", 100, 5);
 	//////////////////////////////////////////////////////////////////////////
 
 	// 遍历所有有标签名的结点

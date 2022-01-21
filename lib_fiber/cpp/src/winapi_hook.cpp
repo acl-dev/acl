@@ -75,7 +75,6 @@ bool winapi_hook(void) {
 	if (pthread_once(&__once, winapi_hook_once) != 0) {
 		return false;
 	}
-	winapi_hook_once();
 
 #if 0
 	// just test socket hook

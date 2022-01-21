@@ -44,7 +44,7 @@ int ostream::sendto(const void* data, size_t len,
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream_);
 
 #if defined(_WIN32) || defined(_WIN64)
-	return (int) ::sendto(fd, (char*) data, len, flags, dest_addr, addrlen);
+	return (int) ::sendto(fd, (char*) data, (int) len, flags, dest_addr, addrlen);
 #else
 	return (int) ::sendto(fd, data, len, flags, dest_addr, (socklen_t) addrlen);
 #endif
