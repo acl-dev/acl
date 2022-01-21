@@ -95,7 +95,7 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	if (timeout > 0) {
 		acl_non_blocking(sock, ACL_NON_BLOCKING);
 #ifdef ACL_WINDOWS
-		if (acl_timed_connect(sock, peer->ai_addr,
+		if (acl_timed_connect_ms(sock, peer->ai_addr,
 			(socklen_t) peer->ai_addrlen, timeout) < 0) {
 #else
 		if (acl_timed_connect_ms(sock, peer->ai_addr,
