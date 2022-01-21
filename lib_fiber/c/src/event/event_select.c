@@ -148,7 +148,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 			}
 		}
 	}
-	n = (*sys_select)(es->maxfd + 1, &rset, 0, &xset, tp);
+	n = (*sys_select)(es->maxfd + 1, &rset, &wset, &xset, tp);
 #endif
 	if (n < 0) {
 		if (acl_fiber_last_error() == FIBER_EINTR) {
