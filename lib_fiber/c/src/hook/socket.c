@@ -22,11 +22,20 @@ socket_t WINAPI acl_fiber_socket(int domain, int type, int protocol)
 		return sockfd;
 	}
 
+#if 0
+	/* We shouldn't set NON_BLOCKING where because the NON_BLOCKING will
+	 * be checked in acl_fiber_connect(). -- zsx, 2022.01.21
+	 */
 	if (sockfd != INVALID_SOCKET) {
 		non_blocking(sockfd, NON_BLOCKING);
 	} else {
 		fiber_save_errno(acl_fiber_last_error());
 	}
+#else
+	if (sockfd == INVALID_SOCKET) {
+		fiber_save_errno(acl_fiber_last_error());
+	}
+#endif
 
 	return sockfd;
 }
