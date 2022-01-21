@@ -18,16 +18,25 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	if (!__setsockopt_timeout) {
 		cstream->rw_timeout = __rw_timeout;
+	} else if (__rw_timeout > 0) {
+		struct timeval tm;
+		tm.tv_sec = __rw_timeout;
+		tm.tv_usec = 0;
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+		if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
+			SO_RCVTIMEO, &__rw_timeout, sizeof(__rw_timeout)) < 0) {
+#else
+		if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
+			SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
+#endif
+			printf("setsockopt error: %s\r\n", acl_last_serror());
+		}
 	}
 
 #define	SOCK ACL_VSTREAM_SOCK
 
 	while (1) {
-		if (__setsockopt_timeout && __rw_timeout > 0) {
-			setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
-				SO_RCVTIMEO, &__rw_timeout, sizeof(__rw_timeout));
-		}
-
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
 			printf("gets error: %s, fd: %d, count: %d\r\n",
@@ -101,10 +110,11 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		"  -s listen_addr\r\n"
-		"  -r rw_timeout\r\n"
+		"  -r rw_timeout [default: 0]\r\n"
 		"  -S [if sleep]\r\n"
 		"  -q listen_queue\r\n"
 		"  -z stack_size\r\n"
+		"  -T [if using setsockopt to set the timeout option]\r\n"
 		"  -w [if echo data, default: no]\r\n", procname);
 }
 
@@ -118,7 +128,7 @@ int main(int argc, char *argv[])
 
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9002");
 
-	while ((ch = getopt(argc, argv, "hs:r:Sq:wz:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:Sq:wz:T")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -140,6 +150,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'z':
 			__stack_size = atoi(optarg);
+			break;
+		case 'T':
+			__setsockopt_timeout = 1;
 			break;
 		default:
 			break;
