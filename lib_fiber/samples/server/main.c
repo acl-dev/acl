@@ -8,20 +8,25 @@
 static int __stack_size = 320000;
 static int __rw_timeout = 0;
 static int __echo_data  = 0;
+static int __setsockopt_timeout = 0;
 
 static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
-	int   ret, count = 0, timeout = 2;
+	int   ret, count = 0;
 
-	//cstream->rw_timeout = __rw_timeout;
+	if (!__setsockopt_timeout) {
+		cstream->rw_timeout = __rw_timeout;
+	}
 
 #define	SOCK ACL_VSTREAM_SOCK
 
 	while (1) {
-		setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET, SO_RCVTIMEO,
-			&timeout, sizeof(timeout));
+		if (__setsockopt_timeout && __rw_timeout > 0) {
+			setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
+				SO_RCVTIMEO, &__rw_timeout, sizeof(__rw_timeout));
+		}
 
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
