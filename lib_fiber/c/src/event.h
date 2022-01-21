@@ -94,7 +94,9 @@ struct FILE_EVENT {
 #define	EVENT_NONE		0
 #define	EVENT_READ		(unsigned) (1 << 0)
 #define	EVENT_WRITE		(unsigned) (1 << 1)
-#define	EVENT_ERROR		(unsigned) (1 << 2)
+#define	EVENT_ERR		(unsigned) (1 << 2)
+#define	EVENT_HUP		(unsigned) (1 << 3)
+#define	EVENT_NVAL		(unsigned) (1 << 4)
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;

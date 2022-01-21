@@ -68,15 +68,27 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 				__FILE__, __LINE__, myname, delay);
 			return -1;
 		default:
-			if (fds.revents & POLLOUT) {
-				return 0;
+			if (fds.revents & POLLNVAL) {
+				acl_msg_error("%s(%d), %s: %s, POLLNVAL, fd=%d",
+					__FILE__, __LINE__, myname,
+					acl_last_serror(), (int) fd);
+				acl_set_error(ACL_EINVAL);
+				return -1;
 			}
 
-			if (!(fds.revents & (POLLHUP | POLLERR | POLLNVAL))) {
-				acl_msg_error("%s(%d), %s: error: %s, fd: %d",
+			if ((fds.revents & (POLLHUP | POLLERR))) {
+				acl_msg_error("%s(%d), %s: %s, %s, %s, fd=%d",
 					__FILE__, __LINE__, myname,
-					acl_last_serror(), fd);
+					acl_last_serror(),
+					fds.revents & POLLHUP ? "POLLHUP" : "0",
+					fds.revents & POLLERR ? "POLLERR" : "0",
+					fd);
+				acl_set_error(ACL_ECONNREFUSED);
 				return -1;
+			}
+
+			if (fds.revents & POLLOUT) {
+				return 0;
 			}
 
 #ifdef ACL_UNIX

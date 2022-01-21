@@ -3,6 +3,7 @@
 #include "iostuff.h"
 
 #ifdef SYS_WIN
+
 int non_blocking(socket_t fd, int on)
 {
 	unsigned long n = on;
@@ -14,7 +15,15 @@ int non_blocking(socket_t fd, int on)
 	}
 	return flags;
 }
+
+int is_non_blocking(socket_t fd)
+{
+	return 0;
+}
+
+
 #elif defined(SYS_UNIX)
+
 # ifndef O_NONBLOCK
 #  define PATTERN	FNDELAY
 # else
@@ -52,6 +61,21 @@ int non_blocking(socket_t fd, int on)
 		return -1;
 	}
 
-	return flags;
+	return (flags & PATTERN) ? 1 : 0;
 }
+
+int is_non_blocking(socket_t fd)
+{
+	int flags;
+
+	if ((flags = fcntl(fd, F_GETFL)) == -1) {
+		msg_error("%s(%d), %s: fcntl(%d, F_GETFL) error: %s",
+			__FILE__, __LINE__, __FUNCTION__,
+			fd, last_serror());
+		return 0;
+	}
+
+	return (flags & PATTERN) ? 1 : 0;
+}
+
 #endif

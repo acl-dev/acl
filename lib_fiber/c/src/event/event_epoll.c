@@ -219,13 +219,27 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 		ee = &ep->events[i];
 		fe = (FILE_EVENT *) ee->data.ptr;
 
-#define EVENT_ERR	(EPOLLERR | EPOLLHUP)
+#define ERR	(EPOLLERR | EPOLLHUP)
 
-		if (ee->events & (EPOLLIN | EVENT_ERR) && fe && fe->r_proc) {
+		if (ee->events & (EPOLLIN | ERR) && fe && fe->r_proc) {
+			if (ee->events & EPOLLERR) {
+				fe->mask |= EVENT_ERR;
+			}
+			if (ee->events & EPOLLHUP) {
+				fe->mask |= EVENT_HUP;
+			}
+
 			fe->r_proc(ev, fe);
 		}
 
-		if (ee->events & (EPOLLOUT | EVENT_ERR) && fe && fe->w_proc) {
+		if (ee->events & (EPOLLOUT | ERR) && fe && fe->w_proc) {
+			if (ee->events & EPOLLERR) {
+				fe->mask |= EVENT_ERR;
+			}
+			if (ee->events & EPOLLHUP) {
+				fe->mask |= EVENT_HUP;
+			}
+
 			fe->w_proc(ev, fe);
 		}
 	}

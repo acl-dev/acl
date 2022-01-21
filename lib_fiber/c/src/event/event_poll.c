@@ -168,13 +168,33 @@ static int poll_wait(EVENT *ev, int timeout)
 		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
 		struct pollfd *pfd = &ep->pfds[fe->id];
 
-#define EVENT_ERR	(POLLERR | POLLHUP | POLLNVAL)
+#define ERR	(POLLERR | POLLHUP | POLLNVAL)
 
-		if (pfd->revents & (POLLIN | EVENT_ERR) && fe->r_proc) {
+		if (pfd->revents & (POLLIN | ERR) && fe->r_proc) {
+			if (pfd->revents & POLLERR) {
+				fe->mask |= EVENT_ERR;
+			}
+			if (pfd->revents & POLLHUP) {
+				fe->mask |= EVENT_HUP;
+			}
+			if (pfd->revents & POLLNVAL) {
+				fe->mask |= EVENT_NVAL;
+			}
+
 			fe->r_proc(ev, fe);
 		}
 
-		if (pfd->revents & (POLLOUT | EVENT_ERR ) && fe->w_proc) {
+		if (pfd->revents & (POLLOUT | ERR ) && fe->w_proc) {
+			if (pfd->revents & POLLERR) {
+				fe->mask |= EVENT_ERR;
+			}
+			if (pfd->revents & POLLHUP) {
+				fe->mask |= EVENT_HUP;
+			}
+			if (pfd->revents & POLLNVAL) {
+				fe->mask |= EVENT_NVAL;
+			}
+
 			fe->w_proc(ev, fe);
 		}
 	}

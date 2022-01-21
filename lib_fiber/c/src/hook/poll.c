@@ -31,7 +31,18 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	assert(pfd->pfd->events & POLLIN);
 
 	event_del_read(ev, fe);
+
 	pfd->pfd->revents |= POLLIN;
+
+	if (fe->mask & EVENT_ERR) {
+		pfd->pfd->revents |= POLLERR;
+	}
+	if (fe->mask & EVENT_HUP) {
+		pfd->pfd->revents |= POLLHUP;
+	}
+	if (fe->mask & EVENT_NVAL) {
+		pfd->pfd->revents |= POLLNVAL;
+	}
 
 	if (!(pfd->pfd->events & POLLOUT)) {
 		fe->pfd = NULL;
@@ -57,7 +68,18 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	assert(pfd->pfd->events & POLLOUT);
 
 	event_del_write(ev, fe);
+
 	pfd->pfd->revents |= POLLOUT;
+
+	if (fe->mask & EVENT_ERR) {
+		pfd->pfd->revents |= POLLERR;
+	}
+	if (fe->mask & EVENT_HUP) {
+		pfd->pfd->revents |= POLLHUP;
+	}
+	if (fe->mask & EVENT_NVAL) {
+		pfd->pfd->revents |= POLLNVAL;
+	}
 
 	if (!(pfd->pfd->events & POLLIN)) {
 		fe->pfd = NULL;
@@ -104,7 +126,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 	for (i = 0; i < pe->nfds; i++) {
 		POLLFD *pfd = &pe->fds[i];
 
-		// maybe has been cleaned in read_callback/write_callback
+		/* maybe has been cleaned in read_callback/write_callback */
 		if (pfd->fe == NULL)
 			continue;
 

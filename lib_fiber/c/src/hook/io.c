@@ -234,7 +234,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 
 		fe->mask &= ~EVENT_READ;
 		fiber_wait_read(fe);
-		if (fe->mask & EVENT_ERROR) {
+		if (fe->mask & EVENT_ERR) {
 			err = acl_fiber_last_error();
 			fiber_save_errno(err);
 			return -1;

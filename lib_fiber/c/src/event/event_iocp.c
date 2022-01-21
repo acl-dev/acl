@@ -186,7 +186,7 @@ static int iocp_add_listen(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): AcceptEx error(%s)",
 			__FUNCTION__, __LINE__, last_serror());
-		fe->mask |= EVENT_ERROR;
+		fe->mask |= EVENT_ERR;
 		assert(fe->reader);
 		array_append(ev->events, fe->reader);
 		return 1;
@@ -248,7 +248,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): ReadFile error(%s), fd=%d",
 			__FUNCTION__, __LINE__, acl_fiber_last_serror(), fe->fd);
-		fe->mask |= EVENT_ERROR;
+		fe->mask |= EVENT_ERR;
 		assert(fe->reader);
 		array_append(ev->events, fe->reader);
 		return -1;
@@ -309,7 +309,7 @@ static int iocp_add_connect(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): ConnectEx error(%s), sock(%u)",
 			__FUNCTION__, __LINE__, last_serror(), fe->fd);
-		fe->mask |= EVENT_ERROR;
+		fe->mask |= EVENT_ERR;
 		assert(fe->writer);
 		array_append(ev->events, fe->writer);
 		return -1;
@@ -365,7 +365,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): WriteFile error(%s)",
 			__FUNCTION__, __LINE__, last_serror());
-		fe->mask |= EVENT_ERROR;
+		fe->mask |= EVENT_ERR;
 		assert(fe->writer);
 		array_append(ev->events, fe->writer);
 		return -1;
@@ -470,7 +470,7 @@ static int iocp_wait(EVENT *ev, int timeout)
 			assert(fe == event->fe);
 		}
 
-		if (fe->mask & EVENT_ERROR) {
+		if (fe->mask & EVENT_ERR) {
 			continue;
 		}
 

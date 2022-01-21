@@ -229,7 +229,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	socklen_t addrlen)
 {
-	int err, ret;
+	int err, ret, nblock;
 	socklen_t len;
 	FILE_EVENT *fe;
 	time_t begin, end;
@@ -246,7 +246,10 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 		return sys_connect ? (*sys_connect)(sockfd, addr, addrlen) : -1;
 	}
 
-	non_blocking(sockfd, NON_BLOCKING);
+	nblock = is_non_blocking(sockfd);
+	if (!nblock) {
+		non_blocking(sockfd, NON_BLOCKING);
+	}
 
 	ret = (*sys_connect)(sockfd, addr, addrlen);
 	if (ret >= 0) {
@@ -292,6 +295,11 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 				last_serror());
 		}
 
+		return -1;
+	}
+
+	/* If the non-blocking has bee set, we should return and don't wait */
+	if (nblock) {
 		return -1;
 	}
 

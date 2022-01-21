@@ -14,11 +14,18 @@ extern "C" {
 
 /**
  * 设置套接口为阻塞或非阻塞
- * @param fd {int} 套接字
+ * @param fd {socket_t} 套接字
  * @param on {int} 是否设置该套接字为非阻塞, BLOCKING 或 NON_BLOCKING
  * @return {int} >= 0: 成功, 返回值 > 0 表示设置之前的标志位; -1: 失败
  */
 int non_blocking(socket_t fd, int on);
+
+/**
+ * 判断指定的套接字是否被设置了非阻塞模式
+ * @param fd {socket_t} 套接字
+ * @return {int} 返回 1 表示被设置了非阻塞模式，0 表示未设置或出错
+ */
+int is_non_blocking(socket_t fd);
 
 /**
  * 毫秒级别睡眠

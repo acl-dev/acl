@@ -60,11 +60,14 @@ static void echo_client(ACL_VSTREAM *cstream)
 static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *addr = (const char *) ctx;
+	time_t begin = time(NULL);
 	ACL_VSTREAM *cstream = acl_vstream_connect(addr, ACL_BLOCKING,
 			__conn_timeout, __rw_timeout, 4096);
 	if (cstream == NULL) {
-		printf("fiber-%d: connect %s error %s\r\n",
-			acl_fiber_self(), addr, acl_last_serror());
+		time_t end = time(NULL);
+		printf("fiber-%d: connect %s error %s, connect timeout=%d, cost=%ld\r\n",
+			acl_fiber_self(), addr, acl_last_serror(),
+			__conn_timeout, end - begin);
 		__total_error_clients++;
 	} else {
 		__total_clients++;
@@ -108,6 +111,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -e event_type[kernel|select|poll, default: kernel]\r\n"
 		" -s addr\r\n"
 		" -t connt_timeout\r\n"
 		" -r rw_timeout\r\n"
@@ -118,14 +122,14 @@ static void usage(const char *procname)
 
 int main(int argc, char *argv[])
 {
-	int   ch;
+	int   ch, event_type = FIBER_EVENT_KERNEL;
 	char  addr[256];
        
 	acl_msg_stdout_enable(1);
 
 	snprintf(addr, sizeof(addr), "%s", "0.0.0.0:9002");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:t:r:w")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:t:r:we:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -149,6 +153,15 @@ int main(int argc, char *argv[])
 		case 'w':
 			__read_data = 1;
 			break;
+		case 'e':
+			if (strcmp(optarg, "kernel") == 0) {
+				event_type = FIBER_EVENT_KERNEL;
+			} else if (strcmp(optarg, "select") == 0) {
+				event_type = FIBER_EVENT_SELECT;
+			} else if (strcmp(optarg, "poll") == 0) {
+				event_type = FIBER_EVENT_POLL;
+			}
+			break;
 		default:
 			break;
 		}
@@ -160,7 +173,7 @@ int main(int argc, char *argv[])
 
 	printf("call fiber_schedule\r\n");
 
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(event_type);
 
 	return 0;
 }
