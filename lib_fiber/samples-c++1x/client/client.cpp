@@ -42,6 +42,10 @@ static size_t do_echo(acl::socket_stream& conn, int count, bool readable) {
 }
 
 static size_t start(const char* addr, int count, bool readable, int timeout) {
+	if (timeout > 0) {
+		acl::fiber::set_non_blocking(true);
+	}
+
 	acl::socket_stream conn;
 	if (!conn.open(addr, timeout, timeout)) {
 		printf("connect %s error %s\r\n", addr, acl::last_serror());

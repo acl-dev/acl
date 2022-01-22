@@ -23,6 +23,12 @@ FIBER_API ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr);
 FIBER_API void acl_fiber_hook_api(int onoff);
 
 /**
+ * set the global flag that if in non-blocking status, just for windows
+ * @param yes {int} set in non-blocking status global if yes not 0
+ */
+FIBER_API void acl_fiber_set_non_blocking(int yes);
+
+/**
  * create and start one fiber
  * @param fn {void (*)(ACL_FIBER*, void*)} the callback of fiber running
  * @param arg {void*} the second parameter of the callback fn

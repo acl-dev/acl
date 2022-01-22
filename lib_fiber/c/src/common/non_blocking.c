@@ -16,9 +16,16 @@ int non_blocking(socket_t fd, int on)
 	return flags;
 }
 
+static __thread __is_non_blocking = 0;
+
+void acl_fiber_set_non_blocking(int yes)
+{
+	__is_non_blocking = yes;
+}
+
 int is_non_blocking(socket_t fd)
 {
-	return 0;
+	return __is_non_blocking;
 }
 
 
@@ -76,6 +83,11 @@ int is_non_blocking(socket_t fd)
 	}
 
 	return (flags & PATTERN) ? 1 : 0;
+}
+
+void acl_fiber_set_non_blocking(int yes)
+{
+	(void) yes;
 }
 
 #endif

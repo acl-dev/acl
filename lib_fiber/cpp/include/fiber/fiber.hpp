@@ -189,6 +189,12 @@ public:
 	static void hook_api(bool on);
 
 	/**
+	 * 设置本线程中所有协程在连接服务端时都采用了带超时的非阻塞方式（仅限Windows)
+	 * @param yes {bool}
+	 */
+	static void set_non_blocking(bool yes);
+
+	/**
 	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
 	 * 调用本函数，因为内部会自动 HOOK IO API
 	 */

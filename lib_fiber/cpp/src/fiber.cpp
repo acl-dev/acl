@@ -97,6 +97,11 @@ void fiber::hook_api(bool on)
 	acl_fiber_hook_api(on ? 1 : 0);
 }
 
+void fiber::set_non_blocking(bool yes)
+{
+	acl_fiber_set_non_blocking(yes ? 1 : 0);
+}
+
 ACL_FIBER *fiber::get_fiber(void) const
 {
 	return f_;
