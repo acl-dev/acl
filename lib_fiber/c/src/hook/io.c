@@ -225,6 +225,19 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 #ifdef HAS_IOCP
 static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
+	/* If the socket type is UDP, We must check the fixed buffer first,
+	 * which maybe used in iocp_add_read() and set for polling read status.
+	 */
+	if (fe->sock_type == SOCK_DGRAM && fe->buff == fe->packet && fe->len > 0) {
+		if (fe->len < len) {
+			len = fe->len;
+		}
+		memcpy(buf, fe->packet, len);
+		fe->buff = NULL;
+		fe->len  = 0;
+		return len;
+	}
+
 	fe->buff = buf;
 	fe->size = len;
 	fe->len  = 0;

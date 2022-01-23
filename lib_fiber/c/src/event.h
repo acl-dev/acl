@@ -108,6 +108,7 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IOCP
+	char          packet[1500];  // just for UDP packet
 	char         *buff;
 	int           size;
 	int           len;
@@ -117,6 +118,7 @@ struct FILE_EVENT {
 	IOCP_EVENT   *poller_read;
 	IOCP_EVENT   *poller_write;
 	socket_t      iocp_sock;
+	int           sock_type;
 	struct sockaddr_in peer_addr;
 #endif
 };

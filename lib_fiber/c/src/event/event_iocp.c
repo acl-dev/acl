@@ -231,8 +231,24 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return iocp_add_listen(ev, fe);
 	}
 
-	wsaData.buf = fe->buff;
-	wsaData.len = fe->size;
+	/* If fe->buff has been set in io.c, we use it as overlapped buffer,
+	 * or we must check if the socket is for UDP and being in poll reading
+	 * status, if so, we must use the fixed buffer as UDP's reading buffer,
+	 * because IOCP will discard UDP packet when no buffer provided.
+	 */
+	if (fe->buff != NULL && fe->size > 0) {
+		wsaData.buf = fe->buff;
+		wsaData.len = fe->size;
+	} else if (IS_POLLING(fe) && fe->sock_type == SOCK_DGRAM) {
+		fe->buff    = fe->packet;
+		fe->size    = sizeof(fe->packet);
+		fe->len     = 0;
+		wsaData.buf = fe->packet;
+		wsaData.len = fe->size;
+	} else {
+		wsaData.buf = fe->buff;
+		wsaData.len = fe->size;
+	}
 
 	ret = WSARecv(fe->fd, &wsaData, 1, &len, &flags,
 		(OVERLAPPED*) &event->overlapped, NULL);
@@ -255,26 +271,32 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	}
 }
 
-#if 0
-static int iocp_add_connect(EVENT_IOCP *ev, FILE_EVENT *fe)
+int event_iocp_connect(EVENT *ev, FILE_EVENT *fe)
 {
+	EVENT_IOCP *ei = (EVENT_IOCP*) ev;
 	DWORD SentLen = 0;
 	struct sockaddr_in addr;
 	LPFN_CONNECTEX lpfnConnectEx = NULL;
 	GUID  GuidConnectEx = WSAID_CONNECTEX;
 	int   dwErr, dwBytes;
 	BOOL  ret;
-	static const char *any_ip = "127.0.0.1";
+	IOCP_EVENT *event;
+	static const char *any_ip = "0.0.0.0";
+
+	iocp_check(ei, fe);
 
 	memset(&addr, 0, sizeof(addr));
 	addr.sin_family      = AF_INET;
 	addr.sin_addr.s_addr = inet_addr(any_ip);
 	addr.sin_port        = htons(0);
 
-	if (bind(fe->fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
+	// In IOCP, the local address must be bound first, or WSAEINVAL will
+	// return when calling lpfnConnectEx.
+	if (bind(fe->fd, (struct sockaddr *) &addr, sizeof(struct sockaddr)) < 0) {
 		msg_error("%s(%d): bind local ip(%s) error(%s, %d), sock: %u",
 			__FUNCTION__, __LINE__, any_ip, last_serror(),
 			acl_fiber_last_error(), (unsigned) fe->fd);
+		return -1;
 	}
 
 	dwErr = WSAIoctl(fe->fd,
@@ -292,30 +314,38 @@ static int iocp_add_connect(EVENT_IOCP *ev, FILE_EVENT *fe)
 			__FUNCTION__, __LINE__, last_serror());
 	}
 
+	if (fe->poller_write == NULL) {
+		fe->poller_write = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
+		fe->poller_write->refer = 0;
+		fe->poller_write->fe    = fe;
+		fe->poller_write->type = IOCP_EVENT_WRITE;
+	}
+
+	event = fe->poller_write;
+	event->refer++;
+
+	memset(&event->overlapped, 0, sizeof(event->overlapped));
+
+	DWORD len;
 	ret = lpfnConnectEx(fe->fd,
 		(const struct sockaddr *) &fe->peer_addr,
 		sizeof(struct sockaddr),
 		NULL,
 		0,
-		NULL,
-		&fe->writer->overlapped);
+		&len,
+		&event->overlapped);
 
 	if (ret == TRUE) {
-		fe->mask |= EVENT_WRITE;
-		return 1;
-	} else if (acl_fiber_last_error() == ERROR_IO_PENDING) {
-		fe->mask |= EVENT_WRITE;
-		return 1;
+		return 0;
+	} else if ((dwErr = acl_fiber_last_error()) == ERROR_IO_PENDING) {
+		acl_fiber_set_error(FIBER_EINPROGRESS);
+		return -1;
 	} else {
 		msg_warn("%s(%d): ConnectEx error(%s), sock(%u)",
 			__FUNCTION__, __LINE__, last_serror(), fe->fd);
-		fe->mask |= EVENT_ERR;
-		assert(fe->writer);
-		array_append(ev->events, fe->writer);
 		return -1;
 	}
 }
-#endif
 
 static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
@@ -328,7 +358,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 	/* Check if the fe has been set STATUS_POLLING in io.c/poll.c/socket.c,
 	 * and will set poller_write or writer IOCP_EVENT.
 	 */
-	if (IS_POLLING(fe)) {
+	if (IS_POLLING(fe) || fe->status & STATUS_CONNECTING) {
 		if (fe->poller_write == NULL) {
 			fe->poller_write = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
 			fe->poller_write->refer = 0;
@@ -338,7 +368,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		event = fe->poller_write;
 	} else {
 		if (fe->writer == NULL) {
-			fe->writer        = (IOCP_EVENT*) mem_malloc(sizeof(IOCP_EVENT));
+			fe->writer        = (IOCP_EVENT*) mem_calloc(1, sizeof(IOCP_EVENT));
 			fe->writer->refer = 0;
 			fe->writer->fe    = fe;
 			fe->writer->type = IOCP_EVENT_WRITE;
@@ -347,24 +377,27 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 	}
 
 	event->proc = fe->w_proc;
-	event->refer++;
 
 	if (fe->status & STATUS_CONNECTING) {
-		//return iocp_add_connect(ev, fe);
+		fe->mask |= EVENT_WRITE;
+		return 0;
 	}
 
-	ret = WriteFile((HANDLE) fe->fd, NULL, 0, &sendBytes,
-		&event->overlapped);
+	event->refer++;
+
+	memset(&event->overlapped, 0, sizeof(event->overlapped));
+
+	ret = WriteFile((HANDLE) fe->fd, NULL, 0, &sendBytes, &event->overlapped);
 
 	if (ret == TRUE) {
 		fe->mask |= EVENT_WRITE;
 		return 0;
-	} else if (acl_fiber_last_error() != ERROR_IO_PENDING) {
+	} else if (acl_fiber_last_error() == ERROR_IO_PENDING) {
 		fe->mask |= EVENT_WRITE;
 		return 0;
 	} else {
-		msg_warn("%s(%d): WriteFile error(%s)",
-			__FUNCTION__, __LINE__, last_serror());
+		msg_warn("%s(%d): WriteFile error(%d, %s)",
+			__FUNCTION__, __LINE__, acl_fiber_last_error(), last_serror());
 		fe->mask |= EVENT_ERR;
 		assert(fe->writer);
 		array_append(ev->events, fe->writer);
@@ -422,6 +455,12 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 	if ((event->type & (IOCP_EVENT_READ | IOCP_EVENT_POLLR))) {
 		fe->mask &= ~EVENT_READ;
 	} else if ((event->type & (IOCP_EVENT_WRITE | IOCP_EVENT_POLLW))) {
+		if (fe->status & STATUS_CONNECTING) {
+			// just for the calling of getpeername()
+			DWORD val = 1;
+			setsockopt(fe->fd, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT,
+				(char *)&val, sizeof(DWORD));
+		}
 		fe->mask &= ~EVENT_WRITE;
 	}
 
@@ -443,18 +482,12 @@ static int iocp_wait(EVENT *ev, int timeout)
 			&bytesTransferred, (PULONG_PTR) &fe,
 			(OVERLAPPED**) &event, timeout);
 
-		if (!isSuccess) {
-			if (event == NULL) {
+		if (event == NULL) {
 				break;
-			}
+		}
 
-			if (event->type & IOCP_EVENT_DEAD) {
-				mem_free(event);
-				continue;
-			}
-
-			assert(fe);
-			iocp_event_save(ei, event, fe, bytesTransferred);
+		if (event->type & IOCP_EVENT_DEAD) {
+			mem_free(event);
 			continue;
 		}
 
@@ -463,6 +496,17 @@ static int iocp_wait(EVENT *ev, int timeout)
 			if (event->refer == 0) {
 				mem_free(event);
 			}
+			continue;
+		}
+
+		assert(fe);
+
+		if (!isSuccess) {
+			msg_error("%s(%d): fd=%d, GetQueuedCompletionStatus error=%d, %s",
+				__FUNCTION__, __LINE__, (int) fe->fd, acl_fiber_last_error(),
+				last_serror());
+			iocp_event_save(ei, event, fe, bytesTransferred);
+			fe->mask |= EVENT_ERR;
 			continue;
 		}
 
@@ -503,7 +547,7 @@ static void iocp_free(EVENT *ev)
 static int iocp_checkfd(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
 	(void) ev;
-	return getsocktype(fe->fd) == -1 ? -1 : 0;
+	return getsockfamily(fe->fd) == -1 ? -1 : 0;
 }
 
 static acl_handle_t iocp_handle(EVENT *ev)

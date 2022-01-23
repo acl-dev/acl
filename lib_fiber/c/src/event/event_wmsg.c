@@ -197,7 +197,7 @@ static int wmsg_del_write(EVENT_WMSG *ev, FILE_EVENT *fe)
 static int wmsg_checkfd(EVENT_WMSG *ev, FILE_EVENT *fe)
 {
 	(void) ev;
-	return getsocktype(fe->fd) == -1 ? -1 : 0;
+	return getsockfamily(fe->fd) == -1 ? -1 : 0;
 }
 
 static int wmsg_wait(EVENT *ev, int timeout)

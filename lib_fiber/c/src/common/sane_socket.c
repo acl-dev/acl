@@ -21,7 +21,7 @@ int is_listen_socket(socket_t fd)
 	}
 }
 
-int getsocktype(socket_t fd)
+int getsockfamily(socket_t fd)
 {
 	SOCK_ADDR addr;
 	struct sockaddr *sa = (struct sockaddr*) &addr;
@@ -50,3 +50,15 @@ int getsocktype(socket_t fd)
 
 	return -1;
 }
+int getsocktype(socket_t fd)
+{
+	int type;
+	socklen_t len = sizeof(len);
+
+	if (getsockopt(fd, SOL_SOCKET, SO_TYPE, (void*) &type, &len) == -1) {
+		return -1;
+	}
+
+	return type;
+}
+

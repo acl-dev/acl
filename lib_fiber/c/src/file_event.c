@@ -21,10 +21,16 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 #endif
 
 #ifdef HAS_IOCP
+	fe->buff   = NULL;
+	fe->size   = 0;
+	fe->len    = 0;
 	fe->h_iocp = NULL;
 	fe->reader = NULL;
 	fe->writer = NULL;
-	fe->iocp_sock = INVALID_SOCKET;
+	fe->poller_read  = NULL;
+	fe->poller_write = NULL;
+	fe->iocp_sock    = INVALID_SOCKET;
+	fe->sock_type    = getsocktype(fd);
 	memset(&fe->peer_addr, 0, sizeof(fe->peer_addr));
 #endif
 }

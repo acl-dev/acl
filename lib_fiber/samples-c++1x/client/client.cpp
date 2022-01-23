@@ -35,24 +35,34 @@ static size_t do_echo(acl::socket_stream& conn, int count, bool readable) {
 			printf("client read error %s\r\n", acl::last_serror());
 			break;
 		}
+		if (i == 0) {
+			printf("gets: %s\r\n", buf.c_str());
+		}
 	}
 
 	printf(">>>count=%zd<<<\r\n", i);
 	return i;
 }
 
-static size_t start(const char* addr, int count, bool readable, int timeout) {
-	if (timeout > 0) {
+static size_t start(const char* addr, int count, bool readable,
+		int conn_timeout, int rw_timeout) {
+	if (conn_timeout > 0) {
 		acl::fiber::set_non_blocking(true);
 	}
 
 	acl::socket_stream conn;
-	if (!conn.open(addr, timeout, timeout)) {
+	if (!conn.open(addr, conn_timeout, rw_timeout)) {
 		printf("connect %s error %s\r\n", addr, acl::last_serror());
 		return 0;
 	}
 
 	printf(">>>connect %s ok\r\n", addr);
+
+	struct sockaddr_in in;
+	int len = sizeof(in);
+	if (getpeername(conn.sock_handle(), (struct sockaddr*) &in, &len) < 0) {
+		printf(">>>getpeername error: %s\r\n", acl::last_serror());
+	}
 	return do_echo(conn, count, readable);
 }
 
@@ -64,20 +74,22 @@ static void usage(const char* procname) {
 		" -s server_addr[default: 127.0.0.1:9000]\r\n"
 		" -c fiber_count[default: 1]\r\n"
 		" -n count[default: 100]\r\n"
-		" -r [if call readable? default: false]\r\n"
-		" -T timeout[default: 10 seconds]\r\n"
+		" -R [if call readable? default: false]\r\n"
+		" -t connect_timeout[default: 10 seconds]\r\n"
+		" -r rw_timeout[default: 10 seconds]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[]) {
-	int  ch, nfiber = 1, count = 100, timeout = 10;
+	int  ch, nfiber = 1, count = 100, conn_timeout = 10, rw_timeout = 10;
 	bool readable = false;
 	acl::string addr = "127.0.0.1:9000", event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
+	acl::fiber::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "he:s:c:n:rT:")) > 0) {
+	while ((ch = getopt(argc, argv, "he:s:c:n:Rt:r:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -94,11 +106,14 @@ int main(int argc, char *argv[]) {
 		case 'n':
 			count = atoi(optarg);
 			break;
-		case 'r':
+		case 'R':
 			readable = true;
 			break;
-		case 'T':
-			timeout = atoi(optarg);
+		case 't':
+			conn_timeout = atoi(optarg);
+			break;
+		case 'r':
+			rw_timeout = atoi(optarg);
 			break;
 		default:
 			break;
@@ -122,7 +137,7 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < nfiber; i++) {
 		go[&] {
-			total += start(addr, count, readable, timeout);
+			total += start(addr, count, readable, conn_timeout, rw_timeout);
 		};
 	}
 

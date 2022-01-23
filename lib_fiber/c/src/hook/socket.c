@@ -235,6 +235,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 #endif
 }
 
+extern int event_iocp_connect(EVENT* ev, FILE_EVENT* fe);
 int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	socklen_t addrlen)
 {
@@ -255,14 +256,35 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 		return sys_connect ? (*sys_connect)(sockfd, addr, addrlen) : -1;
 	}
 
+	fe = fiber_file_open(sockfd);
+
+#ifdef SYS_WIN
+	fe->status |= STATUS_CONNECTING;
+# ifdef HAS_IOCP
+	memcpy(&fe->peer_addr, addr, addrlen);
+# endif
+#endif
+
 	nblock = is_non_blocking(sockfd);
 	if (!nblock) {
 		non_blocking(sockfd, NON_BLOCKING);
 	}
 
+#ifdef HAS_IOCP
+	if (EVENT_IS_IOCP(fiber_io_event())) {
+		fe->type = TYPE_SOCK;
+		EVENT *ev = fiber_io_event();
+		ret = event_iocp_connect(ev, fe);
+	} else {
+		ret = (*sys_connect)(sockfd, addr, addrlen);
+	}
+#else
 	ret = (*sys_connect)(sockfd, addr, addrlen);
+#endif
+
 	if (ret >= 0) {
 		tcp_nodelay(sockfd, 1);
+		fe->status &= ~STATUS_CONNECTING;
 		return ret;
 	}
 
@@ -312,16 +334,6 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 		return -1;
 	}
 
-	fe = fiber_file_open(sockfd);
-
-#ifdef SYS_WIN
-	fe->status |= STATUS_CONNECTING;
-# ifdef HAS_IOCP
-	memcpy(&fe->peer_addr, addr, addrlen);
-# endif
-#endif
-
-	SET_POLLING(fe);
 	time(&begin);
 	fiber_wait_write(fe);
 	time(&end);
