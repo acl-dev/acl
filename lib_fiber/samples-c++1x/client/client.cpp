@@ -60,7 +60,12 @@ static size_t start(const char* addr, int count, bool readable,
 
 	struct sockaddr_in in;
 	int len = sizeof(in);
+#if defined(_WIN32) || defined(_WIN64)
 	if (getpeername(conn.sock_handle(), (struct sockaddr*) &in, &len) < 0) {
+#else
+	if (getpeername(conn.sock_handle(), (struct sockaddr*) &in,
+			(socklen_t*) &len) < 0) {
+#endif
 		printf(">>>getpeername error: %s\r\n", acl::last_serror());
 	}
 	return do_echo(conn, count, readable);
