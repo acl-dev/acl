@@ -1,11 +1,14 @@
 #include "stdafx.h"
 #include "tcp_transfer.h"
+#include "http_transfer.h"
 #include "http_servlet.h"
 
-http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session)
+http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session,
+	int port /* 80 */)
 : acl::HttpServlet(stream, session)
+, port_(port)
 {
-	handlers_["/hello"] = &http_servlet::onHello;
+	handlers_["/hello"] = &http_servlet::on_hello;
 }
 
 http_servlet::~http_servlet(void)
@@ -39,17 +42,19 @@ bool http_servlet::doOther(request_t&, response_t& res, const char* method)
 
 bool http_servlet::doGet(request_t& req, response_t& res)
 {
-	return doPost(req, res);
+	const char* path = req.getPathInfo();
+	handler_t handler = path && *path ? handlers_[path] : NULL;
+	return handler ? (this->*handler)(req, res) : transfer_get(req, res);
 }
 
 bool http_servlet::doPost(request_t& req, response_t& res)
 {
 	const char* path = req.getPathInfo();
 	handler_t handler = path && *path ? handlers_[path] : NULL;
-	return handler ? (this->*handler)(req, res) : onDefault(req, res);
+	return handler ? (this->*handler)(req, res) : transfer_post(req, res);
 }
 
-bool http_servlet::onHello(request_t& req, response_t& res)
+bool http_servlet::on_hello(request_t& req, response_t& res)
 {
 	res.setContentType("text/html; charset=utf-8")	// 设置响应字符集
 		.setKeepAlive(req.isKeepAlive())	// 设置是否保持长连接
@@ -89,30 +94,26 @@ bool http_servlet::onHello(request_t& req, response_t& res)
 	return res.write(buf) && res.write(NULL, 0);
 }
 
-bool http_servlet::onDefault(request_t& req, response_t& res)
+bool http_servlet::transfer_get(request_t& req, response_t& res)
 {
-	const char* host = req.getRemoteHost();
-	if (host == NULL || *host == 0) {
-		logger_error("no Host in request head");
-		return false;
-	}
+	http_transfer fiber_peer(acl::HTTP_METHOD_GET, req, res, port_);
+	fiber_peer.start();
 
-	acl::string buf(host);
-	char* port = strrchr(buf.c_str(), ':');
-	if (port == NULL || *(port + 1) == 0) {
-		port = "80";
-	} else {
-		*port++ = 0;
-	}
+	bool keep_alive;
+	fiber_peer.wait(&keep_alive);
+	return keep_alive && req.isKeepAlive();
+}
 
-	acl::string peer_addr;
-	peer_addr.format("%s|%s", buf.c_str(), port);
-	acl::socket_stream peer;
-	if (!peer.open(buf.c_str(), 0, 0)) {
-		logger_error("connect %s error %s", buf.c_str(), acl::last_serror());
-		return false;
-	}
-	return true;
+bool http_servlet::transfer_post(request_t& req, response_t& res)
+{
+	http_transfer fiber_peer(acl::HTTP_METHOD_POST, req, res, port_);
+	fiber_peer.start();
+
+	bool keep_alive;
+	fiber_peer.wait(&keep_alive);
+
+	printf("transfer_post finished\r\n");
+	return keep_alive && req.isKeepAlive();
 }
 
 bool http_servlet::doConnect(request_t& req, response_t& res)
@@ -144,11 +145,11 @@ bool http_servlet::doConnect(request_t& req, response_t& res)
 	}
 
 	acl::socket_stream& local = req.getSocketStream();
-	doTcpProxy(local, peer);
+	transfer_tcp(local, peer);
 	return false;
 }
 
-bool http_servlet::doTcpProxy(acl::socket_stream& local, acl::socket_stream& peer)
+bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& peer)
 {
 	tcp_transfer fiber_local(local, peer);
 	tcp_transfer fiber_peer(peer, local);
@@ -162,7 +163,7 @@ bool http_servlet::doTcpProxy(acl::socket_stream& local, acl::socket_stream& pee
 	fiber_local.wait();
 	fiber_peer.wait();
 
-	printf("doProxy finished, local fd=%d, peer fd=%d\r\n",
+	printf("transfer_tcp finished, local fd=%d, peer fd=%d\r\n",
 		fiber_local.get_input().sock_handle(),
 		fiber_local.get_output().sock_handle());
 	return true;

@@ -396,8 +396,8 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		fe->mask |= EVENT_WRITE;
 		return 0;
 	} else {
-		msg_warn("%s(%d): WriteFile error(%d, %s)",
-			__FUNCTION__, __LINE__, acl_fiber_last_error(), last_serror());
+		msg_warn("%s(%d): WriteFile error(%d, %s)", __FUNCTION__,
+			__LINE__, acl_fiber_last_error(), last_serror());
 		fe->mask |= EVENT_ERR;
 		assert(fe->writer);
 		array_append(ev->events, fe->writer);
@@ -456,7 +456,11 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 		fe->mask &= ~EVENT_READ;
 	} else if ((event->type & (IOCP_EVENT_WRITE | IOCP_EVENT_POLLW))) {
 		if (fe->status & STATUS_CONNECTING) {
-			// just for the calling of getpeername()
+			// Just for the calling of getpeername():
+			// If the socket is ready for connecting server, we
+			// should set SO_UPDATE_CONNECT_CONTEXT here, because
+			// the peer address wasn't associated with the socket
+			// automaticlly in IOCP mode.
 			DWORD val = 1;
 			setsockopt(fe->fd, SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT,
 				(char *)&val, sizeof(DWORD));
@@ -483,7 +487,7 @@ static int iocp_wait(EVENT *ev, int timeout)
 			(OVERLAPPED**) &event, timeout);
 
 		if (event == NULL) {
-				break;
+			break;
 		}
 
 		if (event->type & IOCP_EVENT_DEAD) {
@@ -492,6 +496,11 @@ static int iocp_wait(EVENT *ev, int timeout)
 		}
 
 		event->refer--;
+
+		// If the associated FILE_EVENT with the event has gone in
+		// iocp_close_sock(), we should check the event's refer and
+		// free it when refer is 0.
+
 		if (event->fe == NULL) {
 			if (event->refer == 0) {
 				mem_free(event);
