@@ -48,6 +48,8 @@ static size_t start(const char* addr, int count, bool readable,
 		int conn_timeout, int rw_timeout) {
 	if (conn_timeout > 0) {
 		acl::fiber::set_non_blocking(true);
+	} else {
+		acl::fiber::set_non_blocking(false);
 	}
 
 	acl::socket_stream conn;
