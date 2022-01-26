@@ -540,6 +540,9 @@ static void iocp_wait_one(EVENT_IOCP *ei, int timeout)
 
 		iocp_event_save(ei, event, fe, bytesTransferred);
 		timeout = 0;
+
+		// If I need to loop again ?
+		break;
 	}
 }
 
@@ -550,7 +553,7 @@ static void handle_event(EVENT_IOCP *ei, OVERLAPPED_ENTRY *entry)
 	FILE_EVENT *fe;
 
 	event = (IOCP_EVENT*) entry->lpOverlapped;
-	fe = (FILE_EVENT*) entry->Internal;
+	fe = (FILE_EVENT*) entry->lpCompletionKey;
 	bytesTransferred = entry->dwNumberOfBytesTransferred;
 
 	if (event->type & IOCP_EVENT_DEAD) {
@@ -587,7 +590,7 @@ static void handle_event(EVENT_IOCP *ei, OVERLAPPED_ENTRY *entry)
 
 static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
 {
-#define MAX_ENTRIES	50
+#define MAX_ENTRIES	128
 	OVERLAPPED_ENTRY entries[MAX_ENTRIES];
 	unsigned long ready;
 
@@ -601,6 +604,7 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
 			break;
 		}
 
+		//printf(">>>ready: %d\r\n", ready);
 		for (unsigned long i = 0; i < ready; i++) {
 			handle_event(ei, &entries[i]);
 		}
@@ -612,16 +616,25 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
 		}
 
 		timeout = 0;
+
+		// If I need to loop again ?
+		break;
 	}
 }
+
+static int __use_wait_more = 1;
 
 static int iocp_wait(EVENT *ev, int timeout)
 {
 	EVENT_IOCP *ei = (EVENT_IOCP *) ev;
 	IOCP_EVENT *event;
 
-	//iocp_wait_one(ei, timeout);
-	iocp_wait_more(ei, timeout);
+	if (__use_wait_more) {
+		iocp_wait_more(ei, timeout);
+	} else {
+		iocp_wait_one(ei, timeout);
+
+	}
 
 	/* peek and handle all IOCP EVENT added in iocp_event_save(). */
 	while ((event = (IOCP_EVENT*) ei->events->pop_back(ei->events)) != NULL) {
