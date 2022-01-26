@@ -479,9 +479,8 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 	array_append(ei->events, event);
 }
 
-static int iocp_wait(EVENT *ev, int timeout)
+static void iocp_wait_one(EVENT_IOCP *ei, int timeout)
 {
-	EVENT_IOCP *ei = (EVENT_IOCP *) ev;
 	IOCP_EVENT *event;
 
 	for (;;) {
@@ -542,6 +541,87 @@ static int iocp_wait(EVENT *ev, int timeout)
 		iocp_event_save(ei, event, fe, bytesTransferred);
 		timeout = 0;
 	}
+}
+
+static void handle_event(EVENT_IOCP *ei, OVERLAPPED_ENTRY *entry)
+{
+	IOCP_EVENT *event;
+	DWORD bytesTransferred;
+	FILE_EVENT *fe;
+
+	event = (IOCP_EVENT*) entry->lpOverlapped;
+	fe = (FILE_EVENT*) entry->Internal;
+	bytesTransferred = entry->dwNumberOfBytesTransferred;
+
+	if (event->type & IOCP_EVENT_DEAD) {
+		if (!HasOverlappedIoCompleted(&event->overlapped)) {
+			msg_warn("overlapped not completed yet");
+		}
+		mem_free(event);
+		return;
+	}
+
+	event->refer--;
+
+	// If the associated FILE_EVENT with the event has gone in
+	// iocp_close_sock(), we should check the event's refer and
+	// free it when refer is 0.
+
+	if (event->fe == NULL) {
+		if (event->refer == 0) {
+			mem_free(event);
+		}
+		return;
+	}
+
+	if (fe != event->fe) {
+		assert(fe == event->fe);
+	}
+
+	if (fe->mask & EVENT_ERR) {
+		return;
+	}
+
+	iocp_event_save(ei, event, fe, bytesTransferred);
+}
+
+static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
+{
+#define MAX_ENTRIES	50
+	OVERLAPPED_ENTRY entries[MAX_ENTRIES];
+	unsigned long ready;
+
+	for (;;) {
+		BOOL isSuccess;
+
+		isSuccess = GetQueuedCompletionStatusEx(ei->h_iocp,
+			entries, MAX_ENTRIES, &ready, timeout, FALSE);
+
+		if (ready == 0) {
+			break;
+		}
+
+		for (unsigned long i = 0; i < ready; i++) {
+			handle_event(ei, &entries[i]);
+		}
+
+		if (!isSuccess) {
+			msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
+				__FUNCTION__, __LINE__, acl_fiber_last_error(),
+				last_serror());
+		}
+
+		timeout = 0;
+	}
+}
+
+static int iocp_wait(EVENT *ev, int timeout)
+{
+	EVENT_IOCP *ei = (EVENT_IOCP *) ev;
+	IOCP_EVENT *event;
+
+	//iocp_wait_one(ei, timeout);
+	iocp_wait_more(ei, timeout);
 
 	/* peek and handle all IOCP EVENT added in iocp_event_save(). */
 	while ((event = (IOCP_EVENT*) ei->events->pop_back(ei->events)) != NULL) {
