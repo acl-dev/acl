@@ -418,7 +418,6 @@ static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		if (!CancelIoEx((HANDLE) fe->fd, &fe->reader->overlapped)) {
 			msg_error("cancel read error %s", acl_fiber_last_serror());
 		}
-		else printf(">>>cancel read ok\r\n");
 		fe->reader->type &= ~IOCP_EVENT_READ;
 	}
 	if (fe->poller_read) {
