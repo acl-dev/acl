@@ -64,7 +64,7 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 
 		http_url url;
 		if (url.parse(addr)) {
-			snprintf(addr_, sizeof(addr_), "%s:%d",
+			safe_snprintf(addr_, sizeof(addr_), "%s:%d",
 				url.get_domain(), url.get_port());
 			string url_part(url.get_url_path());
 			const char* params = url.get_url_params();
@@ -76,14 +76,14 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 			ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 			header_.set_url("/");
 		} else {
-			snprintf(addr_, sizeof(addr_), "%s:80", addr);
+			safe_snprintf(addr_, sizeof(addr_), "%s:80", addr);
 			header_.set_url("/");
 		}
 	} else if (strrchr(addr, '|') || strrchr(addr, ':')){
 		ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 		header_.set_url("/");
 	} else {
-		snprintf(addr_, sizeof(addr_), "%s:80", addr);
+		safe_snprintf(addr_, sizeof(addr_), "%s:80", addr);
 		header_.set_url("/");
 	}
 

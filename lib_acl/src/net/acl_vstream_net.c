@@ -196,7 +196,7 @@ ACL_VSTREAM *acl_vstream_timed_connect(const char *addr, int block_mode,
 	}
 
 	client = acl_vstream_fdopen(connfd, ACL_VSTREAM_FLAG_RW,
-		    rw_bufsize, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
+		    rw_bufsize, rw_timeout / 1000, ACL_VSTREAM_TYPE_SOCK);
 	if (client == NULL) {
 		acl_socket_close(connfd);
 		return NULL;

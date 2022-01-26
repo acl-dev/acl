@@ -86,7 +86,7 @@ void acl_fiber_event_free(ACL_FIBER_EVENT *event)
 	mem_free(event);
 }
 
-static inline void __ll_lock(ACL_FIBER_EVENT *event)
+static void __ll_lock(ACL_FIBER_EVENT *event)
 {
 	int n;
 
@@ -99,7 +99,7 @@ static inline void __ll_lock(ACL_FIBER_EVENT *event)
 	}
 }
 
-static inline void __ll_unlock(ACL_FIBER_EVENT *event)
+static void __ll_unlock(ACL_FIBER_EVENT *event)
 {
 	int n;
 

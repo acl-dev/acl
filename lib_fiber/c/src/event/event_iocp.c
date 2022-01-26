@@ -275,6 +275,7 @@ int event_iocp_connect(EVENT *ev, FILE_EVENT *fe)
 {
 	EVENT_IOCP *ei = (EVENT_IOCP*) ev;
 	DWORD SentLen = 0;
+	DWORD len;
 	struct sockaddr_in addr;
 	LPFN_CONNECTEX lpfnConnectEx = NULL;
 	GUID  GuidConnectEx = WSAID_CONNECTEX;
@@ -326,7 +327,6 @@ int event_iocp_connect(EVENT *ev, FILE_EVENT *fe)
 
 	memset(&event->overlapped, 0, sizeof(event->overlapped));
 
-	DWORD len;
 	ret = lpfnConnectEx(fe->fd,
 		(const struct sockaddr *) &fe->peer_addr,
 		sizeof(struct sockaddr),
@@ -415,6 +415,10 @@ static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	fe->mask &= ~EVENT_READ;
 
 	if (fe->reader) {
+		if (!CancelIoEx((HANDLE) fe->fd, &fe->reader->overlapped)) {
+			msg_error("cancel read error %s", acl_fiber_last_serror());
+		}
+		else printf(">>>cancel read ok\r\n");
 		fe->reader->type &= ~IOCP_EVENT_READ;
 	}
 	if (fe->poller_read) {
@@ -437,6 +441,9 @@ static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 	fe->mask &= ~EVENT_WRITE;
 
 	if (fe->writer) {
+		if (!CancelIoEx((HANDLE) fe->fd, &fe->writer->overlapped)) {
+			msg_error("cancel write error %s", acl_fiber_last_serror());
+		}
 		fe->writer->type &= ~IOCP_EVENT_WRITE;
 	}
 	if (fe->poller_write) {
@@ -480,9 +487,11 @@ static int iocp_wait(EVENT *ev, int timeout)
 	for (;;) {
 		DWORD bytesTransferred;
 		FILE_EVENT *fe;
+		BOOL isSuccess;
+
 		event = NULL;
 
-		BOOL isSuccess = GetQueuedCompletionStatus(ei->h_iocp,
+		isSuccess = GetQueuedCompletionStatus(ei->h_iocp,
 			&bytesTransferred, (PULONG_PTR) &fe,
 			(OVERLAPPED**) &event, timeout);
 
@@ -491,6 +500,9 @@ static int iocp_wait(EVENT *ev, int timeout)
 		}
 
 		if (event->type & IOCP_EVENT_DEAD) {
+			if (!HasOverlappedIoCompleted(&event->overlapped)) {
+				msg_warn("overlapped not completed yet");
+			}
 			mem_free(event);
 			continue;
 		}

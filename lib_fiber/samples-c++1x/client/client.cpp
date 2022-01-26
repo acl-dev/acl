@@ -5,7 +5,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 static size_t do_echo(acl::socket_stream& conn, int count, bool readable) {
-	acl::string data("hello world!\r\n");
+	acl::string data("hello world\r\n");
 	acl::string buf;
 
 	size_t i;
