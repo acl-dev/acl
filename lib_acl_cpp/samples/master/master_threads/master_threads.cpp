@@ -260,7 +260,6 @@ int main(int argc, char* argv[])
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
 		int   task_count = 2, threads_count = 2;
-		format = (void (*)(const char*, ...)) printf;
 		format("listen: 127.0.0.1|8888\r\n");
 		acl::log::stdout_open(true);
 
@@ -278,7 +277,6 @@ int main(int argc, char* argv[])
 	{
 #ifdef	WIN32
 		int   task_count = 2, threads_count = 2;
-		format = (void (*)(const char*, ...)) printf;
 		format("listen: 127.0.0.1|8888\r\n");
 
 		// 单独运行方式

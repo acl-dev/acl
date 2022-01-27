@@ -10,7 +10,11 @@
 
 #ifdef	ACL_UNIX
 #include <fcntl.h>
-#include <sys/poll.h>   
+# if defined(ALPINE)
+#  include <poll.h>   
+# else
+#  include <sys/poll.h>   
+# endif
 #include <unistd.h>
 #endif
 
@@ -44,7 +48,8 @@ static void main_epoll_end(void)
 	if (main_epoll_ctx != NULL) {
 		acl_msg_info("%s(%d), %s: close epoll_fd: %d, tid: %lu, %lu",
 			__FILE__, __LINE__, myname, main_epoll_ctx->epfd,
-			main_epoll_ctx->tid, acl_pthread_self());
+			(unsigned long) main_epoll_ctx->tid,
+			(unsigned long) acl_pthread_self());
 
 		close(main_epoll_ctx->epfd);
 		acl_myfree(main_epoll_ctx);
@@ -63,7 +68,8 @@ static void thread_epoll_end(void *ctx)
 
 	acl_msg_info("%s(%d), %s: close epoll_fd: %d, tid: %lu, %lu",
 		__FILE__, __LINE__, myname, epoll_ctx->epfd,
-		epoll_ctx->tid, acl_pthread_self());
+		(unsigned long) epoll_ctx->tid,
+		(unsigned long) acl_pthread_self());
 
 	close(epoll_ctx->epfd);
 	acl_myfree(epoll_ctx);
@@ -92,18 +98,20 @@ static EPOLL_CTX *thread_epoll_init(void)
 		return NULL;
 	}
 
-	if ((unsigned int) acl_pthread_self() == acl_main_thread_self()) {
+	if ((unsigned long) acl_pthread_self() == (unsigned long) acl_main_thread_self()) {
 #ifndef HAVE_NO_ATEXIT
 		main_epoll_ctx = epoll_ctx;
 		atexit(main_epoll_end);
 #endif
 		acl_msg_info("%s(%d): %s, create epoll_fd: %d, tid: %lu, %lu",
 			__FILE__, __LINE__, myname, epoll_ctx->epfd,
-			epoll_ctx->tid, acl_pthread_self());
+			(unsigned long) epoll_ctx->tid,
+			(unsigned long) acl_pthread_self());
 	} else {
 		acl_msg_info("%s(%d): %s, create epoll_fd: %d, tid: %lu, %lu",
 			__FILE__, __LINE__, myname, epoll_ctx->epfd,
-			epoll_ctx->tid, acl_pthread_self());
+			(unsigned long) epoll_ctx->tid,
+			(unsigned long) acl_pthread_self());
 	}
 
 	return epoll_ctx;
@@ -171,7 +179,8 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d, "
 			"epfd: %d, tid: %lu, %lu", myname, __LINE__,
 			acl_last_serror(), fd, epoll_ctx->epfd,
-			epoll_ctx->tid, acl_pthread_self());
+			(unsigned long) epoll_ctx->tid,
+			(unsigned long) acl_pthread_self());
 
 		return -1;
 	}
@@ -209,7 +218,8 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 			acl_msg_error("%s(%d): epoll_wait error: %s, fd: %d,"
 				" epfd: %d, tid: %lu, %lu", myname, __LINE__,
 				acl_last_serror(), fd, epoll_ctx->epfd,
-				epoll_ctx->tid, acl_pthread_self());
+				(unsigned long) epoll_ctx->tid,
+				(unsigned long) acl_pthread_self());
 			ret = -1;
 			break;
 		} else if (ret == 0) {
@@ -242,8 +252,8 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 	if (epoll_ctl(epoll_ctx->epfd, EPOLL_CTL_DEL, fd, &ee) == -1) {
 		acl_msg_error("%s(%d): epoll_ctl error: %s, fd: %d, epfd: %d,"
 			" tid: %lu, %lu", myname, __LINE__, acl_last_serror(),
-			fd, epoll_ctx->epfd, epoll_ctx->tid,
-			acl_pthread_self());
+			fd, epoll_ctx->epfd, (unsigned long) epoll_ctx->tid,
+			(unsigned long) acl_pthread_self());
 		return -1;
 	}
 

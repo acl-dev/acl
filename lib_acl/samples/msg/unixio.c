@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 static int __max = 1000;
-static char __server_addr[64];
+static char __server_addr[512];
 static ACL_VSTREAM *__sstream;
 static int __finish = 0;
 

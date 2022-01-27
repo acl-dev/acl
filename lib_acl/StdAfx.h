@@ -5,6 +5,8 @@
 
 # include "stdlib/acl_define.h"
 
+# define ALPINE
+
 # include <string.h>
 # include <errno.h>
 # include <float.h>			/* DBL_MAX_10_EXP */

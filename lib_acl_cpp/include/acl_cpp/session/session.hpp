@@ -21,14 +21,23 @@ class ACL_CPP_API session_string : public string
 {
 public:
 	session_string(size_t n = 64) : string(n), todo_(TODO_NUL) {}
-	session_string(const session_string& ss)
-		: string(ss)
+	session_string(const session_string& ss) : string(ss)
 	{
 		todo_ = ss.todo_;
 	}
 	session_string(const string& s) : string(s), todo_(TODO_NUL) {}
 	session_string(const char* s) : string(s), todo_(TODO_NUL) {}
 	~session_string() {}
+
+	session_string& operator= (const session_string& ss)
+	{
+		if (!ss.empty()) {
+			this->copy(ss.c_str(), ss.size());
+		}
+		todo_ = ss.todo_;
+		return *this;
+	}
+
 	todo_t todo_;
 };
 

@@ -16,12 +16,17 @@
 #endif
 
 #if defined(ACL_LINUX)
-# include <linux/version.h>
-# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+# if defined(ALPINE)
 #  include <sys/eventfd.h>
 #  define HAS_EVENTFD
 # else
-#  undef  HAS_EVENTFD
+#  include <linux/version.h>
+#  if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+#   include <sys/eventfd.h>
+#   define HAS_EVENTFD
+#  else
+#   undef  HAS_EVENTFD
+#  endif
 # endif
 #else
 #  undef  HAS_EVENTFD
@@ -47,7 +52,9 @@ ACL_MBOX *acl_mbox_create2(unsigned type)
 	ACL_SOCKET fds[2];
 
 #if defined(HAS_EVENTFD)
-# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+# if defined(ALPINE)
+	int flags = 0;
+# elif INUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
 	int flags = FD_CLOEXEC;
 # else
 	int flags = 0;

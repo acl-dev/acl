@@ -10,7 +10,11 @@
 
 #ifdef	ACL_UNIX
 #include <fcntl.h>
-#include <sys/poll.h>   
+# ifdef ALPINE
+#  include <poll.h>   
+# else
+#  include <sys/poll.h>   
+# endif
 #include <unistd.h>
 #endif
 

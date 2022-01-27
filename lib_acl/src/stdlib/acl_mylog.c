@@ -127,8 +127,8 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 	 */
 # if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX)
 	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-# elif defined(MINGW)
-	n2 = 0
+# elif defined(MINGW) || defined(ALPINE)
+	n2 = 0;
 # else
 	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
 # endif

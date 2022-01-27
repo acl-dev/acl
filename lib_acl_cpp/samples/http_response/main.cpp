@@ -3,8 +3,6 @@
 #include <assert.h>
 #include "acl_cpp/lib_acl.hpp"
 
-static void (*format)(const char*, ...) = acl::log::msg1;
-
 using namespace acl;
 
 //////////////////////////////////////////////////////////////////////////
@@ -240,7 +238,6 @@ int main(int argc, char* argv[])
 		if (argc >= 3)
 			service.set_charset(argv[2]);
 
-		format = (void (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0:8888 ...\r\n");
 		service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
 	}

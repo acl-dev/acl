@@ -82,13 +82,11 @@ int main(int argc, char* argv[])
 
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
-		format = (void (*)(const char*, ...)) printf;
 		mt.run_alone(NULL, 5, 1);  // 单独运行方式
 	}
 	else
 	{
 #ifdef	WIN32
-		format = (void (*)(const char*, ...)) printf;
 		mt.run_alone(NULL, 5, 1);  // 单独运行方式
 #else
 		mt.run_daemon(argc, argv);  // acl_master 控制模式运行

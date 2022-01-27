@@ -18,7 +18,7 @@ all:
 	@(cd flock; make)
 	@(cd net; make)
 	@(cd configure; make)
-	@(cd file; make)
+#	@(cd file; make)
 	@(cd file_fmt; make)
 	@(cd base64; make)
 	@(cd aio; make)

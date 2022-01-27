@@ -225,7 +225,7 @@ static void get_addr(const char *addr, char *buf, size_t size)
 #endif
 }
 
-#if defined(ACL_LINUX) && defined(SO_REUSEPORT)
+#if defined(ACL_LINUX) && !defined(ALPINE) && defined(SO_REUSEPORT)
 
 static void remove_stream(UDP_SERVER *server, const char *addr)
 {
@@ -287,6 +287,7 @@ static void remove_stream(UDP_SERVER *server, const char *addr)
 	}
 }
 
+#if !defined(ALPINE)
 static void server_del_addrs(UDP_SERVER *server, ACL_ARGV *addrs)
 {
 	ACL_ITER iter;
@@ -402,6 +403,7 @@ static void netlink_on_changed(void *ctx)
 	acl_htable_free(addrs2add, NULL);
 	acl_free_ifaddrs(ifconf);
 }
+#endif
 
 #endif	// ACL_LINUX && SO_REUSEPORT
 
@@ -889,7 +891,7 @@ static void *thread_main(void *ctx)
 	acl_msg_info("%s(%d), %s: current threads count=%lld",
 		__FILE__, __LINE__, __FUNCTION__, __servers_count);
 
-#if defined(ACL_LINUX) && defined(SO_REUSEPORT)
+#if defined(ACL_LINUX) && !defined(ALPINE) && defined(SO_REUSEPORT)
 	if (var_udp_reuse_port && acl_var_udp_monitor_netlink) {
 		netlink_monitor(server->event, netlink_on_changed, server);
 	}

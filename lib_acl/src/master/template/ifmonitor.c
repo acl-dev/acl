@@ -3,7 +3,7 @@
 #include "stdlib/acl_define.h"
 #endif
 
-#ifdef ACL_LINUX
+#if defined(ACL_LINUX) && !defined(ALPINE)
 
 #include <stdlib.h>
 #include <string.h>

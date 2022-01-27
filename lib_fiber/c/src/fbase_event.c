@@ -2,11 +2,16 @@
 #include "common.h"
 
 #if defined(__linux__)
-# include <linux/version.h>
-# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
-#  define	HAS_EVENTFD
-#  include <sys/eventfd.h>
+# if defined(ALPINE)
+#   define	HAS_EVENTFD
+#   include <sys/eventfd.h>
 # else
+#  include <linux/version.h>
+#  if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
+#   define	HAS_EVENTFD
+#   include <sys/eventfd.h>
+#  else
+#  endif
 # endif
 #else
 #endif
@@ -20,10 +25,11 @@ void fbase_event_open(FIBER_BASE *fbase)
 {
 #if defined(HAS_EVENTFD)
 	int flags = 0;
-# if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
+# if !defined(ALPINE)
+#  if	LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,27)
 	flags |= FD_CLOEXEC;
+#  endif
 # endif
-	flags = 0;
 	if (fbase->event_in == INVALID_SOCKET) {
 		fbase->event_in  = eventfd(0, flags);
 		fbase->event_out = fbase->event_in;

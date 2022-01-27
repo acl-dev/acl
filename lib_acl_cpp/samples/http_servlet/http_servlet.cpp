@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "acl_cpp/lib_acl.hpp"
 
-static void (*format)(const char*, ...) = acl::log::msg1;
+//static void (*format)(const char*, ...) = acl::log::msg1;
 
 using namespace acl;
 
@@ -124,14 +124,14 @@ int main(int argc, char* argv[])
 
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
-		format = (void (*)(const char*, ...)) printf;
+//		format = (int (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0|8888 ...\r\n");
 		service.run_alone("0.0.0.0|8888", NULL, 0);  // 单独运行方式
 	}
 	else
 	{
 #ifdef	WIN32
-		format = (void (*)(const char*, ...)) printf;
+//		format = (void (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0|8888 ...\r\n");
 		service.run_alone("0.0.0.0|8888", NULL, 1);  // 单独运行方式
 #else

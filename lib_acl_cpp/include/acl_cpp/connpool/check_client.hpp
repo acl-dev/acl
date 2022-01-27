@@ -21,7 +21,7 @@ class ACL_CPP_API check_client : public aio_open_callback
 {
 public:
 	check_client(check_timer& timer, const char* addr,
-		aio_socket_stream& conn, struct timeval& begin);
+		aio_socket_stream& conn, struct ::timeval& begin);
 
 	/**
 	 * 获得输入的非阻塞 IO 句柄
@@ -83,7 +83,7 @@ private:
 	bool blocked_;
 	bool aliving_;
 	bool timedout_;
-	struct timeval begin_;
+	struct ::timeval begin_;
 	check_timer& timer_;
 	aio_socket_stream& conn_;
 	string addr_;

@@ -29,7 +29,11 @@
 
 #ifdef	ACL_EVENTS_POLL_STYLE
 #if !defined(ACL_WINDOWS)
-#include <sys/poll.h>
+# if defined(ALPINE)
+#  include <poll.h>
+# else
+#  include <sys/poll.h>
+# endif
 #include <unistd.h>
 #endif
 

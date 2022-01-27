@@ -347,7 +347,6 @@ int main(int argc, char* argv[])
 		else
 			conf = NULL;
 
-		format = (void (*)(const char*, ...)) printf;
 		format("listen: %s now\r\n", addr);
 		ma.run_alone(addr, conf);  // 单独运行方式
 	}
@@ -357,7 +356,6 @@ int main(int argc, char* argv[])
 		const char* addr = "127.0.0.1|8888, 127.0.0.1|8889";
 		const char* conf = "./master_aio.cf";
 
-		format = (void (*)(const char*, ...)) printf;
 		format("listen: %s now\r\n", addr);
 		ma.run_alone(addr, conf);  // 单独运行方式
 
