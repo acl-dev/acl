@@ -18,6 +18,11 @@ ifeq ($(CC),)
         CC = g++
 endif
 
+ifeq ($(findstring Alpine, $(shell uname -a)), Alpine)
+#	"You need to install libucontext first from https://github.com/kaniini/libucontext!"
+	SYSLIB += -lucontext
+endif
+
 ifeq ($(findstring g++, $(CC)), g++)
 	GCC_VERSION:=$(shell echo `gcc --version|grep ^gcc|cut -d' ' -f3`)
 	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)

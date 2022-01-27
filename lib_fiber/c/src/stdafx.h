@@ -2,7 +2,6 @@
 #define __STD_AFX_INCLUDE_H__
 
 #include "define.h"
-#define ALPINE
 
 #if defined(_WIN32) || defined(_WIN64)
 # define LIKELY

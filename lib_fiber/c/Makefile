@@ -57,6 +57,10 @@ ifeq ($(RANLIB),)
 	RANLIB = ranlib
 endif
 
+ifeq ($(findstring Alpine, $(shell uname -a)), Alpine)
+	CFLAGS += -DALPINE
+endif
+
 ifeq ($(findstring gcc, $(CC)), gcc)
 	CFLAGS += -Wstrict-prototypes
 	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
