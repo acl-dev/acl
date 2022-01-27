@@ -17,6 +17,10 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+ifeq ($(findstring Alpine, $(shell uname -a)), Alpine)
+	SYSLIB += -lucontext
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)

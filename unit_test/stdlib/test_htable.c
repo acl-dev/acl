@@ -143,7 +143,7 @@ static void __htable_rwlock_fn(void *arg)
 	__THR_CTX *thr_ctx = acl_mycalloc(1, sizeof(__THR_CTX));
 
 #ifdef	LINUX2
-	snprintf(key, sizeof(key), "%lu", pthread_self());
+	snprintf(key, sizeof(key), "%lu", (unsigned long) pthread_self());
 #elif	defined(SUNOS5)
 	snprintf(key, sizeof(key), "%d", pthread_self());
 #endif

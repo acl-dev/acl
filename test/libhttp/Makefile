@@ -56,6 +56,11 @@ OBJ_PATH_DST = ./debug
 LIB_PATH_DST = .
 DEF_PATH_DST = ./debug
 
+$(shell mkdir -p ../../build/lib)
+$(shell cp ../../lib_acl/lib/libacl.a ../../build/lib)
+$(shell cp ../../lib_acl_cpp/lib/libacl_cpp.a ../../build/lib)
+$(shell cp ../../lib_protocol/lib/libprotocol.a ../../build/lib)
+
 CFLAGS += -I. -I../../lib_protocol/include -I../../lib_acl/include
 shared_ldflags = ../../build/lib/libprotocol.a ../../build/lib/libacl.a -lz -lpthread
 
