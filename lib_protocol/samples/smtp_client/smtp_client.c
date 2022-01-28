@@ -10,7 +10,7 @@
 static int smtp_sender(void)
 {
 	SMTP_CLIENT* conn;
-	char  addr[128], line[256];
+	char  addr[512], line[256];
 
 	acl_printf("please enter smtp server addr: ");
 	if (acl_gets_nonl(line, sizeof(line)) == NULL)

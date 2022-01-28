@@ -18,6 +18,15 @@ ifeq ($(CC),)
         CC = g++
 endif
 
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+	SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+	SYSLIB += -liconv
+endif
+
 ifeq ($(findstring Alpine, $(shell uname -a)), Alpine)
 #	"You need to install libucontext first from https://github.com/kaniini/libucontext!"
 	SYSLIB += -lucontext

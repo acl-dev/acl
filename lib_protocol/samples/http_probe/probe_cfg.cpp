@@ -78,7 +78,7 @@ static int  __parse_url(const char *url, char *host_buf, int hlen,
 static void __build_http_request(PROBE_SERVER *server)
 {
 	const char *myname = "__build_http_request";
-	char  host_refer[256], url_request[256];
+	char  host_refer[1024], url_request[1024];
 	int   port_refer = 80;
 	int   ret;
 

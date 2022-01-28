@@ -18,6 +18,15 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+	SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+	SYSLIB += -liconv
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)

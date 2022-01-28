@@ -28,6 +28,15 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+	SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+	SYSLIB += -liconv
+endif
+
 ifeq ($(findstring Alpine, $(shell uname -a)), Alpine)
 	SYSLIB += -lucontext
 endif

@@ -18,6 +18,15 @@ ifeq ($(CC),)
         CC = gcc
 endif
 
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+	SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+	SYSLIB += -liconv
+endif
+
 EXIST_READLINE = $(shell if [ -f "/lib64/libreadline.a" \
 		 -o -f "/lib64/libreadline.so" \
 		 -o -f "/usr/lib/libreadline.a" \

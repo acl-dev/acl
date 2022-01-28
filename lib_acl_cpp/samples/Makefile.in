@@ -29,6 +29,15 @@ ifeq ($(CC),)
         CC = g++
 endif
 
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+	SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+	SYSLIB += -liconv
+endif
+
 ifeq ($(findstring HAS_LIBICONV, $(FLAGS)), HAS_LIBICONV)
 	EXTLIBS += -liconv
 endif
