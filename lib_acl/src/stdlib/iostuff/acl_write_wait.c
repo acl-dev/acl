@@ -9,13 +9,9 @@
 #endif
 
 #ifdef	ACL_UNIX
-#include <fcntl.h>
-# ifdef ALPINE
-#  include <poll.h>   
-# else
-#  include <sys/poll.h>   
-# endif
-#include <unistd.h>
+# include <fcntl.h>
+# include <poll.h>   
+# include <unistd.h>
 #endif
 
 #ifdef ACL_BCB_COMPILER

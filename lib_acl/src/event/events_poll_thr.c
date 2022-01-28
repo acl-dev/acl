@@ -27,15 +27,11 @@
 #include "events_define.h"
 
 #if defined(ACL_EVENTS_POLL_STYLE) && !defined(ACL_WINDOWS)
-# if defined(ALPINE)
-#  include <poll.h>
-# else
-#  include <sys/poll.h>
-# endif
-#include <unistd.h>
-#include "events_fdtable.h"
-#include "events_dog.h"
-#include "events.h"
+# include <poll.h>
+# include <unistd.h>
+# include "events_fdtable.h"
+# include "events_dog.h"
+# include "events.h"
 
 typedef struct EVENT_POLL_THR {
 	EVENT_THR event;
