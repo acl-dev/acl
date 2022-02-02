@@ -213,7 +213,7 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 	if (attr != NULL)
 		h_thread->detached = attr->detached;
 	else
-		h_thread->detached = 1;
+		h_thread->detached = 0;
 	h_thread->start_routine = start_routine;
 	h_thread->routine_arg   = arg;
 
@@ -255,7 +255,7 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 
 	/* 根据线程的属性来确定线程创建时是分离模式还是非分离模式 */
 
-	if (attr == NULL || attr->detached) {
+	if (attr != NULL && attr->detached) {
 		thread->detached = 1;
 		return 0;
 	}

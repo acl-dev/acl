@@ -26,13 +26,10 @@ static void *test_once_thread(void *arg acl_unused)
 
 static void test_pthread_once(void)
 {
-	acl_pthread_attr_t attr;
 	acl_pthread_t t1, t2;
 
-	acl_pthread_attr_init(&attr);
-
-	acl_pthread_create(&t1, &attr, test_once_thread, NULL);
-	acl_pthread_create(&t2, &attr, test_once_thread, NULL);
+	acl_pthread_create(&t1, NULL, test_once_thread, NULL);
+	acl_pthread_create(&t2, NULL, test_once_thread, NULL);
 	acl_pthread_join(t1, NULL);
 	acl_pthread_join(t2, NULL);
 	printf("At last, __init_once_key=%d\r\n", __init_once_key);
