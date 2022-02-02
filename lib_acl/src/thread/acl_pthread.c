@@ -265,6 +265,23 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 	return 0;
 }
 
+#ifdef HAS_ONCE
+BOOL CALLBACK once_callback(_Inout_ PINIT_ONCE InitOnce,
+	_Inout_opt_ PVOID Parameter, _Out_opt_ PVOID* Context)
+{
+	void (*init_routine)() = (void (*)(void)) Parameter;
+	init_routine();
+	return TRUE;
+}
+
+int acl_pthread_once(acl_pthread_once_t *once_control,
+	void (*init_routine)(void))
+{
+	PVOID lpContext = NULL;
+	return InitOnceExecuteOnce(once_control, once_callback,
+		init_routine, lpContext) ? 0 : 1;
+}
+#else
 int acl_pthread_once(acl_pthread_once_t *once_control,
 	void (*init_routine)(void))
 {
@@ -314,6 +331,7 @@ int acl_pthread_once(acl_pthread_once_t *once_control,
 	}
 	return 1;  /* 不可达代码，避免编译器报警告 */
 }
+#endif
 
 int acl_pthread_attr_init(acl_pthread_attr_t *thr_attr)
 {

@@ -70,7 +70,18 @@ typedef pthread_once_t acl_pthread_once_t;
 #define	ACL_PTHREAD_CREATE_JOINABLE     0
 #define	ACL_TLS_OUT_OF_INDEXES          0xffffffff
 #define	ACL_PTHREAD_KEYS_MAX            1024
+
+#define HAS_ONCE
+
+/*
+ * see https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-initonceexecuteonce
+ * for the supported windows OS's version, if not please comment out it.
+ */
+#ifdef HAS_ONCE
+#define ACL_PTHREAD_ONCE_INIT           INIT_ONCE_STATIC_INIT
+#else
 #define ACL_PTHREAD_ONCE_INIT           0
+#endif
 
 typedef struct acl_pthread_t acl_pthread_t;
 typedef struct acl_pthread_attr_t acl_pthread_attr_t;
@@ -79,7 +90,12 @@ typedef struct acl_pthread_cond_t acl_pthread_cond_t;
 typedef struct acl_pthread_mutexattr_t acl_pthread_mutexattr_t;
 typedef struct acl_pthread_condattr_t acl_pthread_condattr_t;
 typedef int acl_pthread_key_t;
+
+#ifdef HAS_ONCE
+typedef INIT_ONCE acl_pthread_once_t;
+#else
 typedef int acl_pthread_once_t;
+#endif
 
 struct acl_pthread_t {
 	unsigned long id;
