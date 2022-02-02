@@ -234,7 +234,7 @@ void echo_client_start(int use_slice)
 
 	printf(">>> OK, current thread number=0, exit now, nconn(%d)\r\n", __nconn);
 	printf(">>> nconnect(%d), nread(%d), nwrite(%d), total time(%ld)\r\n",
-		__nconnect_ok, __nread, __nwrite, time(NULL) - begin);
+		__nconnect_ok, __nread, __nwrite, (long) (time(NULL) - begin));
 
 	if (__server_addr)
 		acl_myfree(__server_addr);

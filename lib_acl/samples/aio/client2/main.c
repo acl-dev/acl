@@ -68,11 +68,11 @@ static int on_read(ACL_ASTREAM *conn, void *ctx acl_unused,
 
 // 连接成功或失败时的回调函数
 
-static int on_connect(ACL_ASTREAM *conn, void *ctx)
+static int on_connect(const ACL_ASTREAM_CTX *ctx)
 {
-	const char *server_addr = (const char *) ctx;
+	ACL_ASTREAM *conn = acl_astream_get_conn(ctx);
+	char *server_addr = (char *) acl_astream_get_ctx(ctx);
 	const char data[] = "hello world!\r\n";
-
 	if (conn == NULL) {
 		int err = acl_last_error();
 		printf("connect %s failed, errno=%d, %s\r\n",
@@ -85,13 +85,13 @@ static int on_connect(ACL_ASTREAM *conn, void *ctx)
 	printf("connect %s ok\r\n", server_addr);
 
 	// 添加读成功时的回调函数
-	acl_aio_add_read_hook(conn, on_read, ctx);
+	acl_aio_add_read_hook(conn, on_read, server_addr);
 
 	// 添加写成功时的回调函数
-	acl_aio_add_write_hook(conn, on_write, ctx);
+	acl_aio_add_write_hook(conn, on_write, server_addr);
 
 	// 添加连接句柄关闭时的回调函数
-	acl_aio_add_close_hook(conn, on_close, ctx);
+	acl_aio_add_close_hook(conn, on_close, server_addr);
 
 	// 注册读事件过程
 	acl_aio_read(conn);

@@ -73,8 +73,8 @@ static void *__runner_loop(void *arg)
 
 	aio = echo_server_start(sstream, __accept_auto, __event_mode);
 
-	printf("start one thread ok, id=%lu, pid=%d\n",
-		(unsigned long) acl_pthread_self(), (int) getpid());
+	printf("start one thread ok, id=%lu\n",
+		(unsigned long) acl_pthread_self());
 
 	/* 设定定时器定时清理垃圾回收器 */
 	if (__use_slice)
@@ -92,7 +92,9 @@ static void *__runner_loop(void *arg)
 
 static void __proccess_running(ACL_VSTREAM *sstream, int nrunner)
 {
-#ifdef ACL_UNIX
+#if defined(_WIN32) || defined(_WIN64)
+	__runner_loop(sstream);
+#else
 	int   i;
 
 	if (nrunner <= 1)
@@ -110,9 +112,6 @@ static void __proccess_running(ACL_VSTREAM *sstream, int nrunner)
 			}
 		}
 	}
-
-#elif defined(ACL_MS_WINDOWS)
-	__runner_loop(sstream);
 #endif
 }
 
