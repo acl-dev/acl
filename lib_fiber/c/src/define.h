@@ -22,7 +22,7 @@
 
 # if(_MSC_VER >= 1300)
 #  undef FD_SETSIZE
-#  define FD_SETSIZE 10240
+#  define FD_SETSIZE 102400
 #  include <winsock2.h>
 #  include <mswsock.h>
 # else

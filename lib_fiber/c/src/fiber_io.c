@@ -118,6 +118,8 @@ void fiber_io_check(void)
 		var_maxfd = MAXFD;
 	}
 
+	msg_info("%s(%d): maxfd=%d", __FUNCTION__, __LINE__, var_maxfd);
+
 	__thread_fiber = (FIBER_TLS *) mem_malloc(sizeof(FIBER_TLS));
 	__thread_fiber->event = event_create(var_maxfd);
 	__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,

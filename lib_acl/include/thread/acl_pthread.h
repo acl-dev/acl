@@ -71,12 +71,22 @@ typedef pthread_once_t acl_pthread_once_t;
 #define	ACL_TLS_OUT_OF_INDEXES          0xffffffff
 #define	ACL_PTHREAD_KEYS_MAX            1024
 
-#define HAS_ONCE
-
 /*
  * see https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-initonceexecuteonce
  * for the supported windows OS's version, if not please comment out it.
  */
+#ifdef _WIN32_WINNT
+# if defined(_WIN32_WINNT_WS08)
+#  if _WIN32_WINNT >= _WIN32_WINNT_WS08
+#   define HAS_ONCE
+#  endif
+# elif defined(_WIN32_WINNT_VISTA)
+#  if _WIN32_WINNT >= _WIN32_WINNT_VISTA
+#   define HAS_ONCE
+#  endif
+# endif
+#endif
+
 #ifdef HAS_ONCE
 #define ACL_PTHREAD_ONCE_INIT           INIT_ONCE_STATIC_INIT
 #else

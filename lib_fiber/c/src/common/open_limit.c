@@ -5,7 +5,7 @@
 
 #ifdef SYS_WIN
 
-static int __default_limit = 10240;
+static int __default_limit = FD_SETSIZE;
 
 int open_limit(int limit)
 {
