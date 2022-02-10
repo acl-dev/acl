@@ -23,11 +23,11 @@
   }
 
   function onOpen(evt, user) {
-    setStatus("connected ...");
+    setStatus("connected!");
   }
 
   function onClose(evt) {
-    setStatus("disconnected ...");
+    setStatus("disconnected!");
     logined = false;
     user_list = new Array();
     ws = null;
@@ -158,6 +158,7 @@
     message = "chat|" + msg + "|" + to_user;
     ws.send(message);
     document.getElementById(msgid).value = "";
+    document.all.msg.focus();
   }
 
   function doClear(output) {
@@ -176,7 +177,7 @@
   <fieldset style="width:530px;">
     <legend>WebSocket Chat</legend>
     <p><span>Server url:</span>
-      <input id="url" type="text"  value="ws://121.42.12.244:9001/" />
+      <input id="url" type="text"  value="ws://127.0.0.1:9001/" />
       <input type="button" id="connect" value="connect" onclick="OnConnect('user');" />
     </p>
     <p>
@@ -197,7 +198,7 @@
       <div id="output" style="width:500px;height:300px; overflow:auto;"></div>
       <hr>
       <div id="status" style="width:500px;height:25px; overflow:auto;" align = "right"> </div>
-      <div><a href="https://github.com/zhengshuxin/acl/tree/master/app/wizard_demo/fiber_chat" target=_blank>源码</a></div>
+      <div><a href="https://github.com/acl-dev/acl/tree/master/app/wizard_demo/fiber_chat" target=_blank>源码</a></div>
     </fieldset>
   </fieldset>
 </div>

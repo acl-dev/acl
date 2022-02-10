@@ -95,7 +95,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	return ret;
 }
 
-bool http_servlet::doWebsocket(acl::HttpServletRequest& req,
+bool http_servlet::doWebSocket(acl::HttpServletRequest& req,
 	acl::HttpServletResponse&)
 {
 	acl::socket_stream& ss = req.getSocketStream();
