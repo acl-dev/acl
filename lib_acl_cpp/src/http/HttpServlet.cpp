@@ -183,14 +183,29 @@ bool HttpServlet::start(void)
 
 	switch (method) {
 	case HTTP_METHOD_GET:
-		if (upgradeWebsocket(*req_, *res_)) {
-			if (res_->sendHeader() == false) {
-				logger_error("sendHeader error!");
-				return false;
-			}
-			ret = doWebSocket(*req_, *res_);
-		} else {
+		// 先设置尝试旧方法标志为 false，如果用户未实现当前虚方法，则
+		// 会调用基类虚方法，在其中会设置该标志为 true，从而再尝试使用
+		// 旧的虚接口，这样做主要是为了历史兼容性因素。
+		try_old_ws_ = false;
+
+		// 如果不包含 Websocket 握手信息，则当普通 GET 过程处理
+		if (!upgradeWebsocket(*req_, *res_)) {
 			ret = doGet(*req_, *res_);
+		}
+		// 当为 Websocket 握手请求时，先响应握手信息
+		else if (!res_->sendHeader()) {
+			ret = false;
+			logger_error("sendHeader error!");
+		}
+		// 然后调用 Websocket 处理过程，如果返回成功，则说明子类实现了
+		// 该虚方法，所以无需再次尝试旧方法
+		else if (!(ret = doWebSocket(*req_, *res_))) {
+			// 如果返回 false 是因为子类未实现 doWebSocket 造成的
+			// (如果调用了基类的虚方法，则在其中会设置 try_old_ws_),
+			// 则再尝试旧的处理过程 doWebsocket
+			if (try_old_ws_) {
+				ret = doWebsocket(*req_, *res_);
+			}
 		}
 		break;
 	case HTTP_METHOD_POST:
@@ -282,7 +297,14 @@ bool HttpServlet::doGet(HttpServletRequest&, HttpServletResponse&)
 
 bool HttpServlet::doWebSocket(HttpServletRequest&, HttpServletResponse&)
 {
-	logger_error("child not implement doWebSocket yet!");
+	try_old_ws_ = true;
+	logger_error("child not implement doWebSocket, try doWebsocket!");
+	return false;
+}
+
+bool HttpServlet::doWebsocket(HttpServletRequest&, HttpServletResponse&)
+{
+	logger_error("child not implement doWebsocket yet!");
 	return false;
 }
 

@@ -137,6 +137,11 @@ protected:
 	virtual bool doWebSocket(HttpServletRequest&, HttpServletResponse&);
 
 	/**
+	 * 旧的处理 websocket 接口，请重载上面的 doWebSocket 方法
+	 */
+	virtual bool doWebsocket(HttpServletRequest&, HttpServletResponse&);
+
+	/**
 	 * 当 HTTP 请求为 POST 方式时调用的虚函数
 	 */
 	virtual bool doPost(HttpServletRequest&, HttpServletResponse&);
@@ -211,6 +216,7 @@ private:
 	char local_charset_[32];
 	int  rw_timeout_;
 	int  parse_body_limit_;
+	bool try_old_ws_;
 
 	void init();
 };
