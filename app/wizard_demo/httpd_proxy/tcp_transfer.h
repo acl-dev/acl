@@ -3,7 +3,7 @@
 class tcp_transfer : public acl::fiber
 {
 public:
-	tcp_transfer(acl::socket_stream& in, acl::socket_stream& out);
+	tcp_transfer(acl::socket_stream& in, acl::socket_stream& out, bool running);
 	~tcp_transfer(void);
 
 	void set_peer(tcp_transfer& peer);
@@ -19,7 +19,7 @@ public:
 		return out_;
 	}
 
-protected:
+public:
 	// @override
 	void run(void);
 

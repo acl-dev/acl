@@ -91,8 +91,8 @@ int fbase_event_wait(FIBER_BASE *fbase)
 
 		if (ret >= 0) {
 			msg_fatal("%s(%d), %s: read ret=%d invalid length, "
-				"interrupt=%d", __FILE__, __LINE__,
-				__FUNCTION__, ret, interrupt);
+				"interrupt=%d, fd=%d", __FILE__, __LINE__,
+				__FUNCTION__, ret, interrupt, (int) fbase->event_in);
 		}
 
 		if (acl_fiber_last_error() == EINTR) {

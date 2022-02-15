@@ -1,8 +1,10 @@
 #include "stdafx.h"
 #include "tcp_transfer.h"
 
-tcp_transfer::tcp_transfer(acl::socket_stream& in, acl::socket_stream& out)
-: in_(in), out_(out), peer_(NULL)
+tcp_transfer::tcp_transfer(acl::socket_stream& in,
+	acl::socket_stream& out, bool running)
+: acl::fiber(running)
+, in_(in), out_(out), peer_(NULL)
 {
 } 
 

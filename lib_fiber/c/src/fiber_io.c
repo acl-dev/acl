@@ -471,6 +471,8 @@ FILE_EVENT *fiber_file_open(socket_t fd)
 		fe = file_event_alloc(fd);
 		fiber_file_set(fe);
 	}
+
+	fe->fiber = acl_fiber_running();
 	return fe;
 }
 

@@ -15,9 +15,11 @@ int main(int argc, char *argv[])
 		const char* addr = ":8288";
 
 		acl::log::stdout_open(true);
+		acl::fiber::stdout_open(true);
 
-		if (argc >= 4)
+		if (argc >= 4) {
 			addr = argv[3];
+		}
 		printf("listen: %s\r\n", addr);
 
 		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL);

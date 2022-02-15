@@ -45,6 +45,9 @@ struct IOCP_EVENT {
 	char  myAddrBlock[ACCEPT_ADDRESS_LENGTH * 2];
 };
 
+static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
+	FILE_EVENT *fe, DWORD trans);
+
 static void iocp_remove(EVENT_IOCP *ev, FILE_EVENT *fe)
 {
 	if (fe->id < --ev->count) {
@@ -265,8 +268,13 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		msg_warn("%s(%d): ReadFile error(%s), fd=%d",
 			__FUNCTION__, __LINE__, acl_fiber_last_serror(), fe->fd);
 		fe->mask |= EVENT_ERR;
-		assert(fe->reader);
-		array_append(ev->events, fe->reader);
+#if 0
+		fe->mask &= ~EVENT_READ;
+		fe->len = -1;
+		array_append(ev->events, event);
+#else
+		iocp_event_save(ev, event, fe, -1);
+#endif
 		return -1;
 	}
 }
@@ -343,6 +351,7 @@ int event_iocp_connect(EVENT *ev, FILE_EVENT *fe)
 	} else {
 		msg_warn("%s(%d): ConnectEx error(%s), sock(%u)",
 			__FUNCTION__, __LINE__, last_serror(), fe->fd);
+		iocp_event_save(ei, event, fe, -1);
 		return -1;
 	}
 }
@@ -399,8 +408,13 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		msg_warn("%s(%d): WriteFile error(%d, %s)", __FUNCTION__,
 			__LINE__, acl_fiber_last_error(), last_serror());
 		fe->mask |= EVENT_ERR;
-		assert(fe->writer);
-		array_append(ev->events, fe->writer);
+#if 0
+		fe->mask &= ~EVENT_WRITE;
+		fe->len = -1;
+		array_append(ev->events, event);
+#else
+		iocp_event_save(ev, event, fe, -1);
+#endif
 		return -1;
 	}
 }

@@ -121,44 +121,64 @@ bool http_servlet::doConnect(request_t& req, response_t& res)
 	// CONNECT 127.0.0.1:22 HTTP/1.0
 	// HTTP/1.1 200 Connection Established
 
-	const char* host = req.getRemoteHost();
-	if (host == NULL || *host == 0) {
+	const char* phost = req.getRemoteHost();
+	if (phost == NULL || *phost == 0) {
 		logger_error("getRemoteHost null");
 		return false;
 	}
 
-	printf("remote host=%s\r\n", host);
+	acl::string host;
+	const char* port = strrchr(phost, ':');
+	if (port == NULL) {
+		host.format("%s|80", phost);
+	} else if (*(port + 1) == 0) {
+		host.format("%s80", phost);
+	} else {
+		host = phost;
+	}
+	printf("remote host=%s\r\n", host.c_str());
 
 	acl::socket_stream peer;
-	if (peer.open(host, 0, 0) == false) {
-		logger_error("connect %s error %s", host, acl::last_serror());
-		return false;
-	}
-
-	//const char* ok = "HTTP/1.1 200 Connection Established\r\n";
-	//acl::ostream& out = res.getOutputStream();
-
-	const char* ok = "";
-	res.setContentLength(0);
-	if (res.write(ok, 1) == false) {
+	if (!peer.open(host, 0, 0)) {
+		logger_error("connect %s error %s", host.c_str(), acl::last_serror());
 		return false;
 	}
 
 	acl::socket_stream& local = req.getSocketStream();
+	local.set_rw_timeout(3);
+
+#if 0
+	const char* ok = "";
+	res.setContentLength(0);
+	if (!res.write(ok, 1)) {
+		logger_error("write connect header error");
+		return false;
+	}
+#else
+	const char* ok = "HTTP/1.1 200 Connection Established\r\n\r\n";
+	size_t n = strlen(ok);
+
+	if (local.write(ok, n) != n) {
+		logger_error("write connect response error");
+		return false;
+	}
+#endif
+
 	transfer_tcp(local, peer);
 	return false;
 }
 
 bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& peer)
 {
-	tcp_transfer fiber_local(local, peer);
-	tcp_transfer fiber_peer(peer, local);
+	tcp_transfer fiber_local(local, peer, false);
+	tcp_transfer fiber_peer(peer, local, false);
 
 	fiber_local.set_peer(fiber_peer);
 	fiber_peer.set_peer(fiber_local);
 
-	fiber_local.start();
 	fiber_peer.start();
+
+	fiber_local.start();
 
 	fiber_local.wait();
 	fiber_peer.wait();
