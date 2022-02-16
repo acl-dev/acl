@@ -116,7 +116,7 @@ bool http_servlet::transfer_post(request_t& req, response_t& res)
 	return keep_alive && req.isKeepAlive();
 }
 
-bool http_servlet::doConnect(request_t& req, response_t& res)
+bool http_servlet::doConnect(request_t& req, response_t&)
 {
 	// CONNECT 127.0.0.1:22 HTTP/1.0
 	// HTTP/1.1 200 Connection Established
@@ -158,7 +158,7 @@ bool http_servlet::doConnect(request_t& req, response_t& res)
 	const char* ok = "HTTP/1.1 200 Connection Established\r\n\r\n";
 	size_t n = strlen(ok);
 
-	if (local.write(ok, n) != n) {
+	if (local.write(ok, n) != (int) n) {
 		logger_error("write connect response error");
 		return false;
 	}
