@@ -238,9 +238,16 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 	int block_mode, int connect_timeout, int rw_timeout,
 	int rw_bufsize, int *error)
 {
-	return acl_vstream_timed_connect(addr, block_mode,
+	ACL_VSTREAM *conn = acl_vstream_timed_connect(addr, block_mode,
 		 connect_timeout * 1000, rw_timeout * 1000,
 		rw_bufsize, error);
+
+	/* reset rw_timeout with second unit */
+	if (conn) {
+		ACL_VSTREAM_CLR_MS(conn);
+		ACL_VSTREAM_SET_RWTIMO(conn, rw_timeout);
+	}
+	return conn;
 }
 
 ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
