@@ -139,7 +139,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	printf("remote host=%s, current fiber=%p\r\n", host.c_str(), acl_fiber_running());
 
 	acl::socket_stream peer;
-	if (!peer.open(host, 0, 0)) {
+	if (!peer.open(host, 5, 5)) {
 		logger_error("connect %s error %s", host.c_str(), acl::last_serror());
 		return false;
 	}

@@ -21,7 +21,7 @@ CFLAGS = -c -g -W \
 -Wcast-qual \
 -DUSE_FAST_RING \
 -DUSE_JMP_DEF \
--DUSE_VALGRIND \
+#-DUSE_VALGRIND \
 #-DUSE_BOOST_JMP \
 #-DUSE_FAST_TIME \
 #-Waggregate-return \

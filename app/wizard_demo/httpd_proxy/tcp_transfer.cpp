@@ -17,6 +17,11 @@ void tcp_transfer::set_peer(tcp_transfer& peer)
 	peer_ = &peer;
 }
 
+void tcp_transfer::unset_peer(void)
+{
+	peer_ = NULL;
+}
+
 void tcp_transfer::wait(void)
 {
 	(void) box_.pop();
@@ -37,6 +42,7 @@ void tcp_transfer::run(void)
 	}
 
 	if (peer_) {
+		peer_->unset_peer();
 		peer_->kill();
 	}
 
