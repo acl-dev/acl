@@ -136,7 +136,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	} else {
 		host = phost;
 	}
-	printf("remote host=%s\r\n", host.c_str());
+	printf("remote host=%s, current fiber=%p\r\n", host.c_str(), acl_fiber_running());
 
 	acl::socket_stream peer;
 	if (!peer.open(host, 0, 0)) {

@@ -537,6 +537,10 @@ int fiber_file_close(socket_t fd, int *closed)
 		*closed = event->close_sock(event, fe);
 	}
 
+	/* we just rebind the current running fiber and free it */
+	fe->fiber = acl_fiber_running();
+	file_event_free(fe);
+#if 0
 	if (fe->fiber == acl_fiber_running()) {
 		file_event_free(fe);
 	} else {
@@ -545,5 +549,6 @@ int fiber_file_close(socket_t fd, int *closed)
 		ring_detach(&fe->fiber->me);
 		acl_fiber_ready(fe->fiber);
 	}
+#endif
 	return 1;
 }

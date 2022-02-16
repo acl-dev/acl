@@ -40,8 +40,7 @@ static void fiber_sleep(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void fiber_sleep2(ACL_FIBER *fiber, void *ctx acl_unused)
 {
-	while (1)
-	{
+	while (1) {
 		printf("sleep2 fiber-%d: %p sleep\r\n",
 			acl_fiber_self(), fiber);
 		sleep(1);
@@ -103,9 +102,9 @@ static void fiber_server(ACL_FIBER *fiber, void *ctx acl_unused)
 					acl_fiber_self());
 				break;
 			}
-		}
-		else
+		} else {
 			printf("----accept one client ----\r\n");
+		}
 
 		acl_fiber_create(fiber_client, conn, 320000);
 	}

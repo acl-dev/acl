@@ -518,6 +518,7 @@ void acl_fiber_ready(ACL_FIBER *fiber)
 {
 	if (fiber->status != FIBER_STATUS_EXITING) {
 		fiber->status = FIBER_STATUS_READY;
+		assert(__thread_fiber);
 		ring_prepend(&__thread_fiber->ready, &fiber->me);
 	}
 }
