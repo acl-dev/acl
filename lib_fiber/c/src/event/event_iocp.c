@@ -609,6 +609,7 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
 
 	for (;;) {
 		BOOL isSuccess;
+		unsigned long i;
 
 		isSuccess = GetQueuedCompletionStatusEx(ei->h_iocp,
 			entries, MAX_ENTRIES, &ready, timeout, FALSE);
@@ -618,7 +619,7 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
 		}
 
 		//printf(">>>ready: %d\r\n", ready);
-		for (unsigned long i = 0; i < ready; i++) {
+		for (i = 0; i < ready; i++) {
 			handle_event(ei, &entries[i]);
 		}
 
