@@ -135,6 +135,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_client", "lib_acl\sampl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_client2", "lib_acl\samples\aio\client2\aio_client2_vc2019.vcxproj", "{4A56E6AE-448C-4D98-AB7F-3C077ECABE24}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "wizard_demo", "wizard_demo", "{FF701178-83CC-4992-B3FA-114073E7A33A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpd_proxy", "app\wizard_demo\httpd_proxy\httpd_proxy_vc2019.vcxproj", "{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -655,6 +659,36 @@ Global
 		{4A56E6AE-448C-4D98-AB7F-3C077ECABE24}.Template|Win32.Build.0 = Debug|Win32
 		{4A56E6AE-448C-4D98-AB7F-3C077ECABE24}.Template|x64.ActiveCfg = Debug|Win32
 		{4A56E6AE-448C-4D98-AB7F-3C077ECABE24}.Template|x64.Build.0 = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug|Win32.Build.0 = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug|x64.ActiveCfg = Debug|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Debug|x64.Build.0 = Debug|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll|x64.ActiveCfg = DebugDll|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.DebugDll|x64.Build.0 = DebugDll|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release|Win32.ActiveCfg = Release|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release|Win32.Build.0 = Release|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release|x64.ActiveCfg = Release|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Release|x64.Build.0 = Release|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Releasedll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Releasedll|Mixed Platforms.Build.0 = ReleaseDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Releasedll|x64.ActiveCfg = ReleaseDll|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Releasedll|x64.Build.0 = ReleaseDll|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Template|Mixed Platforms.ActiveCfg = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Template|Mixed Platforms.Build.0 = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Template|Win32.ActiveCfg = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Template|Win32.Build.0 = Debug|Win32
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Template|x64.ActiveCfg = Debug|x64
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C}.Template|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -685,6 +719,8 @@ Global
 		{4A56E6AE-448C-4D98-AB7F-3C077ECABE20} = {5E5307B3-44A8-4E49-A91D-999EF818C486}
 		{4A56E6AE-448C-4D98-AB7F-3C077ECABE23} = {5E5307B3-44A8-4E49-A91D-999EF818C486}
 		{4A56E6AE-448C-4D98-AB7F-3C077ECABE24} = {5E5307B3-44A8-4E49-A91D-999EF818C486}
+		{FF701178-83CC-4992-B3FA-114073E7A33A} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
+		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C} = {FF701178-83CC-4992-B3FA-114073E7A33A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40FA3A5B-123F-4EC0-9EEB-8A9C17BF573B}

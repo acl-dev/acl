@@ -167,7 +167,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp.lib;lib_acl.lib;lib_protocol.lib;libfiber.lib;libfiber_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)httpd_proxy.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -189,7 +189,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp_vc2019d.lib;lib_acl_vc2019d.lib;lib_protocol_vc2019d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)httpd_proxy.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -209,7 +209,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp.lib;lib_acl.lib;lib_protocol.lib;libfiber.lib;libfiber_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -229,7 +229,7 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp_vc2019.lib;lib_protocol_vc2019.lib;lib_acl_vc2019.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -248,12 +248,13 @@
     <Link>
       <AdditionalDependencies>lib_acl_cpp.lib;lib_acl.lib;lib_protocol.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <TargetMachine>MachineX86</TargetMachine>
+      <PerUserRedirection>false</PerUserRedirection>
     </Link>
     <PreBuildEvent>
       <Command>copy ..\..\..\dist\lib\win32\lib_acl.dll $(OutDir) /Y
@@ -273,7 +274,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol.dll $(OutDir) /Y</Command>
     <Link>
       <AdditionalDependencies>lib_acl_cpp.lib;lib_acl.lib;lib_protocol.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -300,7 +301,7 @@ copy ..\..\..\dist\lib\win64\lib_protocol.dll $(OutDir) /Y</Command>
     <Link>
       <AdditionalDependencies>lib_acl_cpp_d.lib;lib_acl_d.lib;lib_protocol_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)httpd_proxy.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -326,7 +327,7 @@ copy ..\..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir) /Y</Command>
     <Link>
       <AdditionalDependencies>lib_acl_cpp_d.lib;lib_acl_d.lib;lib_protocol_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)httpd_proxy.exe</OutputFile>
-      <AdditionalLibraryDirectories>..\..\..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>$(OutDir)httpd_proxy.pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
