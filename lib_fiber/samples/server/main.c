@@ -30,7 +30,8 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 		if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
 			SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
 #endif
-			printf("setsockopt error: %s\r\n", acl_last_serror());
+			printf("%s: setsockopt error: %s\r\n",
+				__FUNCTION__, acl_last_serror());
 		}
 	}
 
@@ -125,6 +126,7 @@ int main(int argc, char *argv[])
 	int   ch, enable_sleep = 0, qlen = 128;
 
 	acl_msg_stdout_enable(1);
+	acl_fiber_msg_stdout_enable(1);
 
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9002");
 

@@ -437,6 +437,7 @@ int setsockopt(int sockfd, int level, int optname,
 {
 	size_t val;
 	TIMEOUT_CTX *ctx;
+	const struct timeval *tm;
 
 	if (sys_setsockopt == NULL) {
 		hook_once();
@@ -468,6 +469,10 @@ int setsockopt(int sockfd, int level, int optname,
 		break;
 	case 8:
 		val = *((const long long*) optval);
+		break;
+	case 16:
+		tm = (const struct timeval*) optval;
+		val = tm->tv_sec + tm->tv_usec / 1000000;
 		break;
 	default:
 		msg_error("invalid optlen=%d", (int) optlen);

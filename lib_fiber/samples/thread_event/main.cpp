@@ -66,8 +66,8 @@ static void test(void)
 {
 	int fd = eventfd(0, 0);
 	long long n = 100;
-	write(fd, &n, sizeof(n));
-	read(fd, &n, sizeof(n));
+	if (write(fd, &n, sizeof(n)) == -1) {}
+	if (read(fd, &n, sizeof(n)) <= 0) {}
 	printf("n=%lld\r\n", n);
 }
 
