@@ -486,17 +486,10 @@ FILE_EVENT *fiber_file_open_read(socket_t fd)
 		fiber_file_set(fe);
 	}
 
+	/* we can't set the fe's type here because it'll effect the DGRAM IO,
+	 * so, we'll set the fe's sock type in event.c.
+	 */
 	fe->fiber_r = acl_fiber_running();
-
-	if (fe->type == TYPE_NONE) {
-		EVENT *event = __thread_fiber->event;
-		if (event_checkfd(event, fe) == -1) {
-			fe->type = TYPE_NOSOCK;
-		} else {
-			fe->type = TYPE_SOCK;
-		}
-	}
-
 	return fe;
 }
 
@@ -510,16 +503,6 @@ FILE_EVENT *fiber_file_open_write(socket_t fd)
 	}
 
 	fe->fiber_w = acl_fiber_running();
-
-	if (fe->type == TYPE_NONE) {
-		EVENT *event = __thread_fiber->event;
-		if (event_checkfd(event, fe) == -1) {
-			fe->type = TYPE_NOSOCK;
-		} else {
-			fe->type = TYPE_SOCK;
-		}
-	}
-
 	return fe;
 }
 

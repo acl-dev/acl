@@ -253,8 +253,8 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 			return -1;
 		}
 
-		if (acl_fiber_canceled(fe->fiber)) {
-			acl_fiber_set_error(fe->fiber->errnum);
+		if (acl_fiber_canceled(fe->fiber_r)) {
+			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
 		}
 
