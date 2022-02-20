@@ -151,7 +151,10 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
 {
 	fiber_io_dec();
-	acl_fiber_ready(pe->fiber);
+
+	if (pe->fiber->status != FIBER_STATUS_READY) {
+		acl_fiber_ready(pe->fiber);
+	}
 }
 
 static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)

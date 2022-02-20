@@ -378,7 +378,14 @@ unsigned int acl_fiber_sleep(unsigned int seconds)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	event_del_read(ev, fe);
-	acl_fiber_ready(fe->fiber_r);
+
+	/* If the reader fiber has been set in ready status when the
+	 * other fiber killed the reader fiber, the reader fiber should
+	 * not be set in ready queue again.
+	 */
+	if (fe->fiber_r->status != FIBER_STATUS_READY) {
+		acl_fiber_ready(fe->fiber_r);
+	}
 	__thread_fiber->io_count--;
 }
 
@@ -400,7 +407,14 @@ void fiber_wait_read(FILE_EVENT *fe)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	event_del_write(ev, fe);
-	acl_fiber_ready(fe->fiber_w);
+
+	/* If the writer fiber has been set in ready status when the
+	 * other fiber killed the writer fiber, the writer fiber should
+	 * not be set in ready queue again.
+	 */
+	if (fe->fiber_w->status != FIBER_STATUS_READY) {
+		acl_fiber_ready(fe->fiber_w);
+	}
 	__thread_fiber->io_count--;
 }
 
