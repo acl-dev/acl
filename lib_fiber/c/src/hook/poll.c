@@ -152,9 +152,9 @@ static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
 {
 	fiber_io_dec();
 
-	//if (pe->fiber->status != FIBER_STATUS_READY) {
+	if (pe->fiber->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(pe->fiber);
-	//}
+	}
 }
 
 static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
@@ -217,7 +217,10 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		pe.nready = 0;
 
 		fiber_io_inc();
+
+		pe.fiber->status = FIBER_STATUS_POLL_WAIT;
 		acl_fiber_switch();
+
 		ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(pe.fiber)) {
