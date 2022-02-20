@@ -378,7 +378,7 @@ unsigned int acl_fiber_sleep(unsigned int seconds)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	event_del_read(ev, fe);
-	acl_fiber_ready(fe->fiber);
+	acl_fiber_ready(fe->fiber_r);
 	__thread_fiber->io_count--;
 }
 
@@ -386,13 +386,13 @@ void fiber_wait_read(FILE_EVENT *fe)
 {
 	fiber_io_check();
 
-	fe->fiber = acl_fiber_running();
+	fe->fiber_r = acl_fiber_running();
 	// when return 0 just let it go continue
 	if (!event_add_read(__thread_fiber->event, fe, read_callback)) {
 		return;
 	}
 
-	fe->fiber->status = FIBER_STATUS_WAIT_READ;
+	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
 	__thread_fiber->io_count++;
 	acl_fiber_switch();
 }
@@ -400,7 +400,7 @@ void fiber_wait_read(FILE_EVENT *fe)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	event_del_write(ev, fe);
-	acl_fiber_ready(fe->fiber);
+	acl_fiber_ready(fe->fiber_w);
 	__thread_fiber->io_count--;
 }
 
@@ -408,12 +408,12 @@ void fiber_wait_write(FILE_EVENT *fe)
 {
 	fiber_io_check();
 
-	fe->fiber = acl_fiber_running();
+	fe->fiber_w = acl_fiber_running();
 	if (!event_add_write(__thread_fiber->event, fe, write_callback)) {
 		return;
 	}
 
-	fe->fiber->status = FIBER_STATUS_WAIT_WRITE;
+	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
 	__thread_fiber->io_count++;
 	acl_fiber_switch();
 }
@@ -463,7 +463,7 @@ static void fiber_file_set(FILE_EVENT *fe)
 #endif
 }
 
-FILE_EVENT *fiber_file_open(socket_t fd)
+FILE_EVENT *fiber_file_open_read(socket_t fd)
 {
 	FILE_EVENT *fe = fiber_file_get(fd);
 
@@ -472,7 +472,40 @@ FILE_EVENT *fiber_file_open(socket_t fd)
 		fiber_file_set(fe);
 	}
 
-	fe->fiber = acl_fiber_running();
+	fe->fiber_r = acl_fiber_running();
+	if (fe->type == TYPE_NONE) {
+		EVENT *event = __thread_fiber->event;
+		if (event_checkfd(event, fe) == -1) {
+			fe->type = TYPE_NOSOCK;
+		} else {
+			fe->type = TYPE_SOCK;
+			non_blocking(fd, 1);
+		}
+	}
+
+	return fe;
+}
+
+FILE_EVENT *fiber_file_open_write(socket_t fd)
+{
+	FILE_EVENT *fe = fiber_file_get(fd);
+
+	if (fe == NULL) {
+		fe = file_event_alloc(fd);
+		fiber_file_set(fe);
+	}
+
+	fe->fiber_w = acl_fiber_running();
+	if (fe->type == TYPE_NONE) {
+		EVENT *event = __thread_fiber->event;
+		if (event_checkfd(event, fe) == -1) {
+			fe->type = TYPE_NOSOCK;
+		} else {
+			fe->type = TYPE_SOCK;
+			non_blocking(fd, 1);
+		}
+	}
+
 	return fe;
 }
 
@@ -538,7 +571,8 @@ int fiber_file_close(socket_t fd, int *closed)
 	}
 
 	/* we just rebind the current running fiber and free it */
-	fe->fiber = acl_fiber_running();
+	fe->fiber_r = acl_fiber_running();
+	fe->fiber_w = acl_fiber_running();
 	file_event_free(fe);
 #if 0
 	if (fe->fiber == acl_fiber_running()) {

@@ -139,14 +139,14 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		return INVALID_SOCKET;
 	}
 
-	fe = fiber_file_open(sockfd);
+	fe = fiber_file_open_read(sockfd);
 
 	while (1) {
 		fiber_wait_read(fe);
 
-		if (acl_fiber_killed(fe->fiber)) {
+		if (acl_fiber_killed(fe->fiber_r)) {
 			msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
-				__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber));
+				__LINE__, __FUNCTION__, acl_fiber_id(fe->fiber_r));
 			return INVALID_SOCKET;
 		}
 
@@ -256,10 +256,11 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 		return sys_connect ? (*sys_connect)(sockfd, addr, addrlen) : -1;
 	}
 
-	fe = fiber_file_open(sockfd);
+	fe = fiber_file_open_write(sockfd);
+	SET_NDUBLOCK(fe);
 
 #ifdef SYS_WIN
-	fe->status |= STATUS_CONNECTING;
+	SET_CONNECTING(fe);
 # ifdef HAS_IOCP
 	memcpy(&fe->peer_addr, addr, addrlen);
 # endif
@@ -284,7 +285,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 
 	if (ret >= 0) {
 		tcp_nodelay(sockfd, 1);
-		fe->status &= ~STATUS_CONNECTING;
+		CLR_CONNECTING(fe);
 		return ret;
 	}
 
@@ -339,13 +340,13 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	time(&end);
 
 #ifdef SYS_WIN
-	fe->status &= ~STATUS_CONNECTING;
+	CLR_CONNECTING(fe);
 #endif
 
-	if (acl_fiber_killed(fe->fiber)) {
+	if (acl_fiber_killed(fe->fiber_w)) {
 		msg_info("%s(%d), %s: fiber-%u was killed, %s, spend %ld",
 			__FILE__, __LINE__, __FUNCTION__,
-			acl_fiber_id(fe->fiber), last_serror(),
+			acl_fiber_id(fe->fiber_w), last_serror(),
 			(long) (end - begin));
 		return -1;
 	}
@@ -410,8 +411,8 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 	FILE_EVENT *fe = fiber_file_get(tc->sockfd);
 
 	// we must check the fiber carefully here.
-	if (fe == NULL || tc->fiber != fe->fiber
-		|| tc->fiber->id != fe->fiber->id) {
+	if (fe == NULL || tc->fiber != fe->fiber_r
+		|| tc->fiber->id != fe->fiber_r->id) {
 
 		mem_free(ctx);
 		return;
@@ -419,8 +420,8 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 
 	// we can kill the fiber only if the fiber is waiting
 	// for readable ore writable of IO process.
-	if (fe->fiber->status == FIBER_STATUS_WAIT_READ
-		|| fe->fiber->status == FIBER_STATUS_WAIT_WRITE) {
+	if (fe->fiber_r->status == FIBER_STATUS_WAIT_READ
+		|| fe->fiber_w->status == FIBER_STATUS_WAIT_WRITE) {
 
 		tc->fiber->errnum = FIBER_EAGAIN;
 		acl_fiber_signal(tc->fiber, SIGINT);

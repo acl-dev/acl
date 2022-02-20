@@ -277,17 +277,18 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 	ee->fds[fd]->mask    = EVENT_NONE;
 	ee->fds[fd]->rmask   = EVENT_NONE;
 	ee->fds[fd]->ee      = ee;
-	ee->fds[fd]->fe      = fiber_file_open(fd);
 	ee->fds[fd]->fe->epx = ee->fds[fd];
 
 	memcpy(&ee->fds[fd]->data, &event->data, sizeof(event->data));
 
 	if (event->events & EPOLLIN) {
 		ee->fds[fd]->mask |= EVENT_READ;
+		ee->fds[fd]->fe    = fiber_file_open_read(fd);
 		event_add_read(ev, ee->fds[fd]->fe, read_callback);
 	}
 	if (event->events & EPOLLOUT) {
 		ee->fds[fd]->mask |= EVENT_WRITE;
+		ee->fds[fd]->fe    = fiber_file_open_write(fd);
 		event_add_write(ev, ee->fds[fd]->fe, write_callback);
 	}
 }

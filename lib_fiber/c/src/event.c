@@ -98,7 +98,7 @@ void event_free(EVENT *ev)
 }
 
 #ifdef SYS_WIN
-static int checkfd(EVENT *ev, FILE_EVENT *fe)
+int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	if (getsockfamily(fe->fd) >= 0) {
 		return 0;
@@ -106,7 +106,7 @@ static int checkfd(EVENT *ev, FILE_EVENT *fe)
 	return ev->checkfd(ev, fe);
 }
 #else
-static int checkfd(EVENT *ev, FILE_EVENT *fe)
+int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 #if 0
 	struct stat s;
@@ -206,7 +206,7 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 	if (!(fe->mask & EVENT_READ)) {
 		if (fe->type == TYPE_NONE) {
-			if (checkfd(ev, fe) == -1) {
+			if (event_checkfd(ev, fe) == -1) {
 				fe->type = TYPE_NOSOCK;
 				return 0;
 			} else {
@@ -245,7 +245,7 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 	if (!(fe->mask & EVENT_WRITE)) {
 		if (fe->type == TYPE_NONE) {
-			if (checkfd(ev, fe) == -1) {
+			if (event_checkfd(ev, fe) == -1) {
 				fe->type = TYPE_NOSOCK;
 				return 0;
 			} else {

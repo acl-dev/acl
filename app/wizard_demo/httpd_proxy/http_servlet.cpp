@@ -143,6 +143,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 		logger_error("connect %s error %s", host.c_str(), acl::last_serror());
 		return false;
 	}
+	printf("connect %s ok, fd=%d\r\n", host.c_str(), peer.sock_handle());
 
 	acl::socket_stream& local = req.getSocketStream();
 	local.set_rw_timeout(3);
@@ -170,6 +171,9 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 
 bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& peer)
 {
+	local.set_rw_timeout(50);
+	peer.set_rw_timeout(50);
+
 	tcp_transfer fiber_local(local, peer, false);
 	tcp_transfer fiber_peer(peer, local, false);
 
@@ -177,11 +181,15 @@ bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& p
 	fiber_peer.set_peer(fiber_local);
 
 	fiber_peer.start();
-
 	fiber_local.start();
 
+	printf("wait local fiber, fd=%d\r\n", local.sock_handle());
 	fiber_local.wait();
+	printf("local fiber done, fd=%d\r\n", local.sock_handle());
+
+	printf("wait peer fiber, fd=%d\r\n", peer.sock_handle());
 	fiber_peer.wait();
+	printf("peer fiber done, fd=%d\r\n", peer.sock_handle());
 
 	printf("transfer_tcp finished, local fd=%d, peer fd=%d\r\n",
 		fiber_local.get_input().sock_handle(),

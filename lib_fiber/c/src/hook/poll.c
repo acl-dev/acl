@@ -160,7 +160,11 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 	nfds_t  i;
 
 	for (i = 0; i < nfds; i++) {
-		pfds[i].fe       = fiber_file_open(fds[i].fd);
+		if (fds[i].events & POLLIN) {
+			pfds[i].fe = fiber_file_open_read(fds[i].fd);
+		} else {
+			pfds[i].fe = fiber_file_open_write(fds[i].fd);
+		}
 #ifdef HAS_IOCP
 		pfds[i].fe->buff = NULL;
 		pfds[i].fe->size = 0;
@@ -214,6 +218,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(pe.fiber)) {
+			acl_fiber_set_error(pe.fiber->errnum);
 			ring_detach(&pe.me);
 			msg_info("%s(%d), %s: fiber-%u was killed, %s",
 				__FILE__, __LINE__, __FUNCTION__,

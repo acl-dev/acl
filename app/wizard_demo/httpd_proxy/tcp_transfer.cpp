@@ -33,6 +33,8 @@ void tcp_transfer::run(void)
 	while (true) {
 		int ret = in_.read(buf, sizeof(buf) - 1, false);
 		if (ret == -1) {
+			printf("%s: read error %s, fd=%d\r\n", __FUNCTION__,
+				acl::last_serror(), in_.sock_handle());
 			break;
 		}
 
@@ -46,5 +48,7 @@ void tcp_transfer::run(void)
 		peer_->kill();
 	}
 
+	//printf("fd=%d, push\n", in_.sock_handle());
 	box_.push(NULL);
+	printf("fd=%d, push done\n", in_.sock_handle());
 }

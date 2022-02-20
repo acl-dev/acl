@@ -54,6 +54,9 @@ void fbase_event_open(FIBER_BASE *fbase)
 		msg_fatal("%s(%d), %s event_in(%d) invalid",
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
+
+	//non_blocking(fbase->event_in, 1);
+	//non_blocking(fbase->event_out, 1);
 }
 
 void fbase_event_close(FIBER_BASE *fbase)

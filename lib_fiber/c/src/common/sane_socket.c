@@ -50,6 +50,7 @@ int getsockfamily(socket_t fd)
 
 	return -1;
 }
+
 int getsocktype(socket_t fd)
 {
 	int type;
@@ -61,4 +62,3 @@ int getsocktype(socket_t fd)
 
 	return type;
 }
-

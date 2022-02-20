@@ -57,7 +57,8 @@ typedef struct IOCP_EVENT IOCP_EVENT;
  */
 struct FILE_EVENT {
 	RING       me;
-	ACL_FIBER *fiber;
+	ACL_FIBER *fiber_r;
+	ACL_FIBER *fiber_w;
 	socket_t   fd;
 	int id;
 	unsigned status;
@@ -66,18 +67,25 @@ struct FILE_EVENT {
 #define	STATUS_READABLE		(unsigned) (1 << 1)
 #define	STATUS_WRITABLE		(unsigned) (1 << 2)
 #define	STATUS_POLLING		(unsigned) (1 << 3)
+#define	STATUS_NDUBLOCK		(unsigned) (1 << 4)
 
-#define	SET_READABLE(x) ((x)->status |= STATUS_READABLE)
-#define	SET_WRITABLE(x)	((x)->status |= STATUS_WRITABLE)
-#define	SET_POLLING(x)	((x)->status |= STATUS_POLLING)
+#define	SET_CONNECTING(x)	((x)->status |= STATUS_CONNECTING)
+#define	SET_READABLE(x)		((x)->status |= STATUS_READABLE)
+#define	SET_WRITABLE(x)		((x)->status |= STATUS_WRITABLE)
+#define	SET_POLLING(x)		((x)->status |= STATUS_POLLING)
+#define	SET_NDUBLOCK(x)		((x)->status |= STATUS_NDUBLOCK)
 
-#define	CLR_READABLE(x)	((x)->status &= ~STATUS_READABLE)
-#define	CLR_WRITABLE(x)	((x)->status &= ~STATUS_WRITABLE)
-#define	CLR_POLLING(x)	((x)->status &= ~STATUS_POLLING)
+#define	CLR_CONNECTING(x)	((x)->status &= ~STATUS_CONNECTING)
+#define	CLR_READABLE(x)		((x)->status &= ~STATUS_READABLE)
+#define	CLR_WRITABLE(x)		((x)->status &= ~STATUS_WRITABLE)
+#define	CLR_POLLING(x)		((x)->status &= ~STATUS_POLLING)
+#define	CLR_NDUBLOCK(x)		((x)->status &= ~STATUS_NDUBLOCK)
 
-#define	IS_READABLE(x)	((x)->status & STATUS_READABLE)
-#define	IS_WRITABLE(x)	((x)->status & STATUS_WRITABLE)
-#define	IS_POLLING(x)	((x)->status & STATUS_POLLING)
+#define	IS_CONNECTING(x)	((x)->status & STATUS_CONNECTING)
+#define	IS_READABLE(x)		((x)->status & STATUS_READABLE)
+#define	IS_WRITABLE(x)		((x)->status & STATUS_WRITABLE)
+#define	IS_POLLING(x)		((x)->status & STATUS_POLLING)
+#define	IS_NDUBLOCK(x)		((x)->status & STATUS_NDUBLOCK)
 
 	unsigned type;
 #define	TYPE_NONE		0
@@ -213,6 +221,7 @@ ssize_t event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 
+int  event_checkfd(EVENT *ev, FILE_EVENT *fe);
 int  event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 int  event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 void event_del_read(EVENT *ev, FILE_EVENT *fe);
