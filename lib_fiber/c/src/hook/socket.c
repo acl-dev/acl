@@ -236,6 +236,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 }
 
 extern int event_iocp_connect(EVENT* ev, FILE_EVENT* fe);
+
 int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	socklen_t addrlen)
 {
@@ -257,6 +258,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	}
 
 	fe = fiber_file_open_write(sockfd);
+
 	SET_NDUBLOCK(fe);
 
 #ifdef SYS_WIN

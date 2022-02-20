@@ -473,13 +473,13 @@ FILE_EVENT *fiber_file_open_read(socket_t fd)
 	}
 
 	fe->fiber_r = acl_fiber_running();
+
 	if (fe->type == TYPE_NONE) {
 		EVENT *event = __thread_fiber->event;
 		if (event_checkfd(event, fe) == -1) {
 			fe->type = TYPE_NOSOCK;
 		} else {
 			fe->type = TYPE_SOCK;
-			non_blocking(fd, 1);
 		}
 	}
 
@@ -496,13 +496,13 @@ FILE_EVENT *fiber_file_open_write(socket_t fd)
 	}
 
 	fe->fiber_w = acl_fiber_running();
+
 	if (fe->type == TYPE_NONE) {
 		EVENT *event = __thread_fiber->event;
 		if (event_checkfd(event, fe) == -1) {
 			fe->type = TYPE_NOSOCK;
 		} else {
 			fe->type = TYPE_SOCK;
-			non_blocking(fd, 1);
 		}
 	}
 
