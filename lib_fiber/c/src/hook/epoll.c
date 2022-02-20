@@ -356,9 +356,9 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 static void epoll_callback(EVENT *ev fiber_unused, EPOLL_EVENT *ee)
 {
 	fiber_io_dec();
-	if (ee->fiber->status != FIBER_STATUS_READY) {
+	//if (ee->fiber->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(ee->fiber);
-	}
+	//}
 }
 
 static void event_epoll_set(EVENT *ev, EPOLL_EVENT *ee, int timeout)
