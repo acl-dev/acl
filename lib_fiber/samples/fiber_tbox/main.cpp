@@ -42,6 +42,8 @@ private:
 			__producing++;
 			tbox_.push(o);
 		}
+
+		tbox_.push(NULL);
 		delete this;
 	}
 };
@@ -98,9 +100,16 @@ private:
 		while (true) {
 			myobj* o = tbox_.pop(timeout_);
 			if (!o) {
+				if (timeout_ < 0) {
+					printf("Over now!\r\n");
+					break;
+				}
 				continue;
 			}
 
+			if (__consuming < 5) {
+				o->test();
+			}
 			delete o;
 
 			if (++__consuming % 100000 != 0) {
