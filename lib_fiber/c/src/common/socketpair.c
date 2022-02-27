@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "fiber/libfiber.h"
 #include "msg.h"
+#include "sane_socket.h"
 #include "iostuff.h"
 
 #ifdef SYS_WIN
@@ -222,6 +223,8 @@ int sane_socketpair(int domain, int type, int protocol, socket_t result[2])
 	CLOSE_SOCKET(listener);
 	tcp_nodelay(result[0], 1);
 	tcp_nodelay(result[1], 1);
+	tcp_so_linger(result[0], 1, 0);
+	tcp_so_linger(result[1], 1, 0);
 	return 0;
 }
 

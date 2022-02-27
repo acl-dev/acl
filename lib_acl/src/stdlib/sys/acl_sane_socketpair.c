@@ -203,6 +203,8 @@ int acl_sane_socketpair(int domain, int type, int protocol, ACL_SOCKET result[2]
 	acl_socket_close(listener);
 	acl_tcp_set_nodelay(result[0]);
 	acl_tcp_set_nodelay(result[1]);
+	acl_tcp_so_linger(result[0], 1, 0);
+	acl_tcp_so_linger(result[1], 1, 0);
 	return 0;
 }
 

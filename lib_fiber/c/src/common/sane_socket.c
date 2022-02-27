@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "fiber/libfiber.h"
+#include "msg.h"
 #include "sane_socket.h"
 
 int is_listen_socket(socket_t fd)
@@ -62,3 +63,27 @@ int getsocktype(socket_t fd)
 
 	return type;
 }
+
+void tcp_so_linger(socket_t fd, int onoff, int timeout)
+{
+	const char *myname = "tcp_so_linger";
+	struct linger  l;
+	int   n = getsockfamily(fd);
+
+#ifdef AF_INET6
+	if (n != AF_INET && n != AF_INET6) {
+#else
+	if (n != AF_INET) {
+#endif
+		return;
+	}
+
+	l.l_onoff = onoff ? 1 : 0;
+	l.l_linger = timeout >= 0 ? timeout : 0;
+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, (char *) &l, sizeof(l)) < 0) {
+		msg_error("%s(%d): setsockopt(SO_LINGER) error(%s),"
+			" onoff(%d), timeout(%d)", myname, __LINE__,
+			last_serror(), onoff, timeout);
+	}
+}
+

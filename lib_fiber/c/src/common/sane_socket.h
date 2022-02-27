@@ -11,4 +11,7 @@ int getsockfamily(socket_t fd);
 // return: -1, SOCK_STREAM, SOCK_DGRAM
 int getsocktype(socket_t fd);
 
+// set the TCP socket SO_LINGER option
+void tcp_so_linger(socket_t fd, int onoff, int timeout);
+
 #endif
