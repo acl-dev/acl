@@ -54,8 +54,8 @@ static void kqueue_free(EVENT *ev)
 	close(ek->kqfd);
 	mem_free(ek->changes);
 	mem_free(ek->events);
-	array_free(ep->r_ready, NULL);
-	array_free(ep->w_ready, NULL);
+	array_free(ek->r_ready, NULL);
+	array_free(ek->w_ready, NULL);
 	mem_free(ek);
 }
 
@@ -163,6 +163,7 @@ static int kqueue_wait(EVENT *ev, int timeout)
 	struct timespec ts;
 	struct kevent *kev;
 	FILE_EVENT *fe;
+	ITER iter;
 	int n, i;
 
 	ts.tv_sec = timeout / 1000;
