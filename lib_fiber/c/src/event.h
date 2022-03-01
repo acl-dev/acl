@@ -68,24 +68,36 @@ struct FILE_EVENT {
 #define	STATUS_WRITABLE		(unsigned) (1 << 2)
 #define	STATUS_POLLING		(unsigned) (1 << 3)
 #define	STATUS_NDUBLOCK		(unsigned) (1 << 4)
+#define	STATUS_READWAIT		(unsigned) (1 << 5)
+#define	STATUS_WRITEWAIT	(unsigned) (1 << 6)
+#define	STATUS_CLOSING		(unsigned) (1 << 7)
 
 #define	SET_CONNECTING(x)	((x)->status |= STATUS_CONNECTING)
 #define	SET_READABLE(x)		((x)->status |= STATUS_READABLE)
 #define	SET_WRITABLE(x)		((x)->status |= STATUS_WRITABLE)
 #define	SET_POLLING(x)		((x)->status |= STATUS_POLLING)
 #define	SET_NDUBLOCK(x)		((x)->status |= STATUS_NDUBLOCK)
+#define	SET_READWAIT(x)		((x)->status |= STATUS_READWAIT)
+#define	SET_WRITEWAIT(x)	((x)->status |= STATUS_WRITEWAIT)
+#define	SET_CLOSING(x)		((x)->status |= STATUS_CLOSING)
 
 #define	CLR_CONNECTING(x)	((x)->status &= ~STATUS_CONNECTING)
 #define	CLR_READABLE(x)		((x)->status &= ~STATUS_READABLE)
 #define	CLR_WRITABLE(x)		((x)->status &= ~STATUS_WRITABLE)
 #define	CLR_POLLING(x)		((x)->status &= ~STATUS_POLLING)
 #define	CLR_NDUBLOCK(x)		((x)->status &= ~STATUS_NDUBLOCK)
+#define	CLR_READWAIT(x)		((x)->status &= ~STATUS_READWAIT)
+#define	CLR_WRITEWAIT(x)	((x)->status &= ~STATUS_WRITEWAIT)
+#define	CLR_CLOSING(x)		((x)->status &= ~STATUS_CLOSING)
 
 #define	IS_CONNECTING(x)	((x)->status & STATUS_CONNECTING)
 #define	IS_READABLE(x)		((x)->status & STATUS_READABLE)
 #define	IS_WRITABLE(x)		((x)->status & STATUS_WRITABLE)
 #define	IS_POLLING(x)		((x)->status & STATUS_POLLING)
 #define	IS_NDUBLOCK(x)		((x)->status & STATUS_NDUBLOCK)
+#define	IS_READWAIT(x)		((x)->status & STATUS_READWAIT)
+#define	IS_WRITEWAIT(x)		((x)->status & STATUS_WRITEWAIT)
+#define	IS_CLOSING(x)		((x)->status & STATUS_CLOSING)
 
 	unsigned type;
 #define	TYPE_NONE		0

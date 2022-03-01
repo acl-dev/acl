@@ -474,6 +474,7 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 {
 	if ((event->type & (IOCP_EVENT_READ | IOCP_EVENT_POLLR))) {
 		fe->mask &= ~EVENT_READ;
+		CLR_READWAIT(fe);
 	} else if ((event->type & (IOCP_EVENT_WRITE | IOCP_EVENT_POLLW))) {
 		if (fe->status & STATUS_CONNECTING) {
 			// Just for the calling of getpeername():
@@ -486,6 +487,7 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 				(char *)&val, sizeof(DWORD));
 		}
 		fe->mask &= ~EVENT_WRITE;
+		CLR_WRITEWAIT(fe);
 	}
 
 	fe->len = (int) trans;

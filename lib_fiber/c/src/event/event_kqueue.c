@@ -43,6 +43,8 @@ typedef struct EVENT_KQUEUE {
 	int    nchanges;
 	struct kevent *events;
 	int    nevents;
+	ARRAY *r_ready;
+	ARRAY *w_ready;
 } EVENT_KQUEUE;
 
 static void kqueue_free(EVENT *ev)
@@ -52,6 +54,8 @@ static void kqueue_free(EVENT *ev)
 	close(ek->kqfd);
 	mem_free(ek->changes);
 	mem_free(ek->events);
+	array_free(ep->r_ready, NULL);
+	array_free(ep->w_ready, NULL);
 	mem_free(ek);
 }
 
@@ -182,13 +186,28 @@ static int kqueue_wait(EVENT *ev, int timeout)
 		fe  = (FILE_EVENT *) kev->udata;
 
 		if (kev && kev->filter == EVFILT_READ && fe && fe->r_proc) {
-			fe->r_proc(ev, fe);
+			CLR_READWAIT(fe);
+			array_append(ek->r_ready, fe);
 		}
 
 		if (kev && kev->filter == EVFILT_WRITE && fe && fe->w_proc) {
-			fe->w_proc(ev, fe);
+			CLR_WRITEWAIT(fe);
+			array_append(ek->w_ready, fe);
 		}
 	}
+
+	foreach(iter, ek->r_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->r_proc(ev, fe);
+	}
+
+	foreach(iter, ek->w_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->w_proc(ev, fe);
+	}
+
+	array_clean(ek->r_ready, NULL);
+	array_clean(ek->w_ready, NULL);
 
 	return n;
 }
@@ -224,6 +243,8 @@ EVENT *event_kqueue_create(int size)
 	ek->changes  = (struct kevent *) mem_malloc(sizeof(struct kevent) * size);
 	ek->setsize  = size;
 	ek->nchanges = 0;
+	ek->r_ready  = array_create(100);
+	ek->w_ready  = array_create(100);
 
 	ek->nevents  = 100;
 	ek->events   = (struct kevent *) mem_malloc(sizeof(struct kevent) * ek->nevents);

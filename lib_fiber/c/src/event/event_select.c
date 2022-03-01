@@ -18,14 +18,16 @@ typedef struct EVENT_SELECT {
 	int    count;
 	socket_t maxfd;
 	int    dirty;
-	ARRAY *ready;
+	ARRAY *r_ready;
+	ARRAY *w_ready;
 } EVENT_SELECT;
 
 static void select_free(EVENT *ev)
 {
 	EVENT_SELECT *es = (EVENT_SELECT *) ev;
 	mem_free(es->files);
-	array_free(es->ready, NULL);
+	array_free(es->r_ready, NULL);
+	array_free(es->w_ready, NULL);
 	mem_free(es);
 }
 
@@ -120,7 +122,8 @@ static int select_event_wait(EVENT *ev, int timeout)
 	EVENT_SELECT *es = (EVENT_SELECT *) ev;
 	fd_set rset = es->rset, wset = es->wset, xset = es->xset;
 	struct timeval tv, *tp;
-	ITER   iter;
+	FILE_EVENT *fe;
+	ITER iter;
 	int n, i;
 
 	if (timeout >= 0) {
@@ -142,7 +145,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 	if (es->dirty) {
 		es->maxfd = -1;
 		for (i = 0; i < es->count; i++) {
-			FILE_EVENT *fe = es->files[i];
+			fe = es->files[i];
 			if (fe->fd > es->maxfd) {
 				es->maxfd = fe->fd;
 			}
@@ -160,31 +163,41 @@ static int select_event_wait(EVENT *ev, int timeout)
 	}
 
 	for (i = 0; i < es->count; i++) {
-		FILE_EVENT *fe = es->files[i];
-		array_append(es->ready, fe);
-	}
-
-	foreach(iter, es->ready) {
-		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
+		fe = es->files[i];
 
 		if (FD_ISSET(fe->fd, &xset)) {
 			if (FD_ISSET(fe->fd, &es->rset) && fe->r_proc) {
-				fe->r_proc(ev, fe);
+				CLR_READWAIT(fe);
+				array_append(es->r_ready, fe);
 			}
 			if (FD_ISSET(fe->fd, &es->wset) && fe->w_proc) {
-				fe->w_proc(ev, fe);
+				CLR_WRITEWAIT(fe);
+				array_append(es->w_ready, fe);
 			}
 		} else {
 			if (FD_ISSET(fe->fd, &rset) && fe->r_proc) {
-				fe->r_proc(ev, fe);
+				CLR_READWAIT(fe);
+				array_append(es->r_ready, fe);
 			}
 			if (FD_ISSET(fe->fd, &wset) && fe->w_proc) {
-				fe->w_proc(ev, fe);
+				CLR_WRITEWAIT(fe);
+				array_append(es->w_ready, fe);
 			}
 		}
 	}
 
-	array_clean(es->ready, NULL);
+	foreach(iter, es->r_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->r_proc(ev, fe);
+	}
+
+	foreach(iter, es->w_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->w_proc(ev, fe);
+	}
+
+	array_clean(es->r_ready, NULL);
+	array_clean(es->w_ready, NULL);
 
 	return n;
 }
@@ -223,7 +236,8 @@ EVENT *event_select_create(int size)
 	es->dirty = 0;
 	es->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	es->size  = size;
-	es->ready = array_create(100);
+	es->r_ready = array_create(100);
+	es->w_ready = array_create(100);
 	es->count = 0;
 	FD_ZERO(&es->rset);
 	FD_ZERO(&es->wset);

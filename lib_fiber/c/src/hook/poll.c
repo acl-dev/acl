@@ -87,7 +87,6 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	assert(ring_size(&ev->poll_list) > 0);
-	fe->status |= STATUS_WRITABLE;
 	SET_WRITABLE(fe);
 	pfd->pe->nready++;
 }
@@ -105,9 +104,11 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 
 		if (pfd->pfd->events & POLLIN) {
 			event_add_read(ev, pfd->fe, read_callback);
+			SET_READWAIT(pfd->fe);
 		}
 		if (pfd->pfd->events & POLLOUT) {
 			event_add_write(ev, pfd->fe, write_callback);
+			SET_WRITEWAIT(pfd->fe);
 		}
 
 		pfd->fe->pfd      = pfd;

@@ -43,10 +43,12 @@ static void hook_init(void)
 /****************************************************************************/
 
 typedef struct EVENT_EPOLL {
-	EVENT event;
-	int   epfd;
+	EVENT  event;
+	int    epfd;
 	struct epoll_event *events;
-	int   size;
+	int    size;
+	ARRAY *r_ready;
+	ARRAY *w_ready;
 } EVENT_EPOLL;
 
 static void epoll_free(EVENT *ev)
@@ -55,6 +57,8 @@ static void epoll_free(EVENT *ev)
 
 	close(ep->epfd);
 	mem_free(ep->events);
+	array_free(ep->r_ready, NULL);
+	array_free(ep->w_ready, NULL);
 	mem_free(ep);
 }
 
@@ -197,6 +201,7 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	struct epoll_event *ee;
 	FILE_EVENT *fe;
+	ITER iter;
 	int n, i;
 
 	if (__sys_epoll_wait == NULL) {
@@ -229,7 +234,8 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 				fe->mask |= EVENT_HUP;
 			}
 
-			fe->r_proc(ev, fe);
+			CLR_READWAIT(fe);
+			array_append(ep->r_ready, fe);
 		}
 
 		if (ee->events & (EPOLLOUT | ERR) && fe && fe->w_proc) {
@@ -240,9 +246,23 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 				fe->mask |= EVENT_HUP;
 			}
 
-			fe->w_proc(ev, fe);
+			CLR_WRITEWAIT(fe);
+			array_append(ep->w_ready, fe);
 		}
 	}
+
+	foreach(iter, ep->r_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->r_proc(ev, fe);
+	}
+
+	foreach(iter, ep->w_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->w_proc(ev, fe);
+	}
+
+	array_clean(ep->r_ready, NULL);
+	array_clean(ep->w_ready, NULL);
 
 	return n;
 }
@@ -282,7 +302,9 @@ EVENT *event_epoll_create(int size)
 
 	ep->events = (struct epoll_event *)
 		mem_malloc(sizeof(struct epoll_event) * size);
-	ep->size   = size;
+	ep->size    = size;
+	ep->r_ready = array_create(100);
+	ep->w_ready = array_create(100);
 
 	ep->epfd = __sys_epoll_create(1024);
 	assert(ep->epfd >= 0);

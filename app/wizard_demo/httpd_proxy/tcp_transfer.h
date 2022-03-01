@@ -8,6 +8,7 @@ public:
 
 	void set_peer(tcp_transfer& peer);
 	void unset_peer(void);
+	void close(void);
 	void wait(void);
 
 	acl::socket_stream& get_input(void) const

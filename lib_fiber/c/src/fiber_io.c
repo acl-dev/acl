@@ -377,6 +377,7 @@ unsigned int acl_fiber_sleep(unsigned int seconds)
 
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
+	CLR_READWAIT(fe);
 	event_del_read(ev, fe);
 
 	/* If the reader fiber has been set in ready status when the
@@ -401,11 +402,13 @@ void fiber_wait_read(FILE_EVENT *fe)
 
 	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
 	__thread_fiber->io_count++;
+	SET_READWAIT(fe);
 	acl_fiber_switch();
 }
 
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
+	CLR_WRITEWAIT(fe);
 	event_del_write(ev, fe);
 
 	/* If the writer fiber has been set in ready status when the
@@ -429,6 +432,7 @@ void fiber_wait_write(FILE_EVENT *fe)
 
 	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
 	__thread_fiber->io_count++;
+	SET_WRITEWAIT(fe);
 	acl_fiber_switch();
 }
 
@@ -559,6 +563,24 @@ int fiber_file_close(socket_t fd, int *closed)
 		return 0;
 	}
 
+	if (IS_READWAIT(fe) && fe->fiber_r
+		&& fe->fiber_r->status != FIBER_STATUS_EXITING) {
+		//&& fe->fiber_r->status >= FIBER_STATUS_WAIT_READ
+		//&& fe->fiber_r->status <= FIBER_STATUS_EPOLL_WAIT) {
+		acl_fiber_kill(fe->fiber_r);
+		*closed = 1;
+		return 0;
+	}
+
+	if (IS_WRITEWAIT(fe) && fe->fiber_w
+		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
+		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
+		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {
+		acl_fiber_kill(fe->fiber_w);
+		*closed = 1;
+		return 0;
+	}
+
 	event = __thread_fiber->event;
 	event_close(event, fe);
 	fiber_file_del(fe);
@@ -568,8 +590,8 @@ int fiber_file_close(socket_t fd, int *closed)
 	}
 
 	/* we just rebind the current running fiber and free it */
-	fe->fiber_r = acl_fiber_running();
-	fe->fiber_w = acl_fiber_running();
+	//fe->fiber_r = acl_fiber_running();
+	//fe->fiber_w = acl_fiber_running();
 	file_event_free(fe);
 #if 0
 	if (fe->fiber == acl_fiber_running()) {

@@ -13,7 +13,8 @@ typedef struct EVENT_POLL {
 	int    size;
 	int    count;
 	struct pollfd *pfds;
-	ARRAY *ready;
+	ARRAY *r_ready;
+	ARRAY *w_ready;
 } EVENT_POLL;
 
 static void poll_free(EVENT *ev)
@@ -22,7 +23,8 @@ static void poll_free(EVENT *ev)
 
 	mem_free(ep->files);
 	mem_free(ep->pfds);
-	array_free(ep->ready, NULL);
+	array_free(ep->r_ready, NULL);
+	array_free(ep->w_ready, NULL);
 	mem_free(ep);
 }
 
@@ -136,6 +138,8 @@ static int poll_del_write(EVENT_POLL *ep, FILE_EVENT *fe)
 static int poll_wait(EVENT *ev, int timeout)
 {
 	EVENT_POLL *ep = (EVENT_POLL *) ev;
+	FILE_EVENT *fe;
+	struct pollfd *pfd;
 	ITER  iter;
 	int n, i;
 
@@ -160,13 +164,8 @@ static int poll_wait(EVENT *ev, int timeout)
 	}
 
 	for (i = 0; i < ep->count; i++) {
-		FILE_EVENT *fe     = ep->files[i];
-		array_append(ep->ready, fe);
-	}
-
-	foreach(iter, ep->ready) {
-		FILE_EVENT *fe = (FILE_EVENT *) iter.data;
-		struct pollfd *pfd = &ep->pfds[fe->id];
+		fe  = ep->files[i];
+		pfd = &ep->pfds[fe->id];
 
 #define ERR	(POLLERR | POLLHUP | POLLNVAL)
 
@@ -181,7 +180,8 @@ static int poll_wait(EVENT *ev, int timeout)
 				fe->mask |= EVENT_NVAL;
 			}
 
-			fe->r_proc(ev, fe);
+			CLR_READWAIT(fe);
+			array_append(ep->r_ready, fe);
 		}
 
 		if (pfd->revents & (POLLOUT | ERR ) && fe->w_proc) {
@@ -195,11 +195,24 @@ static int poll_wait(EVENT *ev, int timeout)
 				fe->mask |= EVENT_NVAL;
 			}
 
-			fe->w_proc(ev, fe);
+			CLR_WRITEWAIT(fe);
+			array_append(ep->w_ready, fe);
 		}
 	}
 
-	array_clean(ep->ready, NULL);
+	foreach(iter, ep->r_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->r_proc(ev, fe);
+	}
+
+	foreach(iter, ep->w_ready) {
+		fe = (FILE_EVENT *) iter.data;
+		fe->w_proc(ev, fe);
+	}
+
+	array_clean(ep->r_ready, NULL);
+	array_clean(ep->w_ready, NULL);
+
 	return n;
 }
 
@@ -236,8 +249,9 @@ EVENT *event_poll_create(int size)
 	ep->size  = size;
 	ep->pfds  = (struct pollfd *) mem_calloc(size, sizeof(struct pollfd));
 	ep->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
-	ep->ready = array_create(100);
 	ep->count = 0;
+	ep->r_ready = array_create(100);
+	ep->w_ready = array_create(100);
 
 	ep->event.name   = poll_name;
 	ep->event.handle = poll_handle;

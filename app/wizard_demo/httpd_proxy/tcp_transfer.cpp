@@ -22,6 +22,15 @@ void tcp_transfer::unset_peer(void)
 	peer_ = NULL;
 }
 
+void tcp_transfer::close(void)
+{
+	//printf(">>>close sockfd=%d\r\n", in_.sock_handle());
+	int fd = in_.sock_handle();
+	//in_.close();
+	::close(fd);
+	//printf(">>>after close sockfd=%d\r\n", in_.sock_handle());
+}
+
 void tcp_transfer::wait(void)
 {
 	(void) box_.pop();
@@ -31,10 +40,11 @@ void tcp_transfer::run(void)
 {
 	char buf[8192];
 	while (true) {
+		int fd = in_.sock_handle();
 		int ret = in_.read(buf, sizeof(buf) - 1, false);
 		if (ret == -1) {
-			printf("%s: read error %s, fd=%d\r\n", __FUNCTION__,
-				acl::last_serror(), in_.sock_handle());
+			printf("%s: read error %s, fd=%d, %d\r\n", __FUNCTION__,
+				acl::last_serror(), in_.sock_handle(), fd);
 			break;
 		}
 
@@ -45,10 +55,11 @@ void tcp_transfer::run(void)
 
 	if (peer_) {
 		peer_->unset_peer();
-		peer_->kill();
+		//peer_->kill();
+		peer_->close();
 	}
 
 	//printf("fd=%d, push\n", in_.sock_handle());
 	box_.push(NULL);
-	printf("fd=%d, push done\n", in_.sock_handle());
+	//printf("fd=%d, push done\n", in_.sock_handle());
 }
