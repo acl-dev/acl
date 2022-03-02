@@ -285,11 +285,13 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 		ee->fds[fd]->mask |= EVENT_READ;
 		ee->fds[fd]->fe    = fiber_file_open_read(fd);
 		event_add_read(ev, ee->fds[fd]->fe, read_callback);
+		SET_READWAIT(ee->fds[fd]->fe);
 	}
 	if (event->events & EPOLLOUT) {
 		ee->fds[fd]->mask |= EVENT_WRITE;
 		ee->fds[fd]->fe    = fiber_file_open_write(fd);
 		event_add_write(ev, ee->fds[fd]->fe, write_callback);
+		SET_WRITEWAIT(ee->fds[fd]->fe);
 	}
 }
 
@@ -297,9 +299,11 @@ static void epoll_ctl_del(EVENT *ev, EPOLL_EVENT *ee, int fd)
 {
 	if (ee->fds[fd]->mask & EVENT_READ) {
 		event_del_read(ev, ee->fds[fd]->fe);
+		CLR_READWAIT(ee->fds[fd]->fe);
 	}
 	if (ee->fds[fd]->mask & EVENT_WRITE) {
 		event_del_write(ev, ee->fds[fd]->fe);
+		CLR_WRITEWAIT(ee->fds[fd]->fe);
 	}
 
 	ee->fds[fd]->fd      = -1;
@@ -344,6 +348,8 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 		return -1;
 	} else if (ee->fds[fd] != NULL) {
 		epoll_ctl_del(ev, ee, fd);
+		CLR_READWAIT(ee->fds[fd]->fe);
+		CLR_WRITEWAIT(ee->fds[fd]->fe);
 	} else {
 		msg_error("%s(%d), %s: invalid fd=%d",
 			__FILE__, __LINE__, __FUNCTION__, fd);
