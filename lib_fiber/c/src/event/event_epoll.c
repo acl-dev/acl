@@ -47,8 +47,10 @@ typedef struct EVENT_EPOLL {
 	int    epfd;
 	struct epoll_event *events;
 	int    size;
+#ifdef	DELAY_CALL
 	ARRAY *r_ready;
 	ARRAY *w_ready;
+#endif
 } EVENT_EPOLL;
 
 static void epoll_free(EVENT *ev)
@@ -57,8 +59,10 @@ static void epoll_free(EVENT *ev)
 
 	close(ep->epfd);
 	mem_free(ep->events);
+#ifdef	DELAY_CALL
 	array_free(ep->r_ready, NULL);
 	array_free(ep->w_ready, NULL);
+#endif
 	mem_free(ep);
 }
 
@@ -201,7 +205,9 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 	EVENT_EPOLL *ep = (EVENT_EPOLL *) ev;
 	struct epoll_event *ee;
 	FILE_EVENT *fe;
+#ifdef	DELAY_CALL
 	ITER iter;
+#endif
 	int n, i;
 
 	if (__sys_epoll_wait == NULL) {
@@ -235,7 +241,11 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 			}
 
 			CLR_READWAIT(fe);
+#ifdef	DELAY_CALL
 			array_append(ep->r_ready, fe);
+#else
+			fe->r_proc(ev, fe);
+#endif
 		}
 
 		if (ee->events & (EPOLLOUT | ERR) && fe && fe->w_proc) {
@@ -247,10 +257,15 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 			}
 
 			CLR_WRITEWAIT(fe);
+#ifdef	DELAY_CALL
 			array_append(ep->w_ready, fe);
+#else
+			fe->w_proc(ev, fe);
+#endif
 		}
 	}
 
+#ifdef	DELAY_CALL
 	foreach(iter, ep->r_ready) {
 		fe = (FILE_EVENT *) iter.data;
 		fe->r_proc(ev, fe);
@@ -263,6 +278,7 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 
 	array_clean(ep->r_ready, NULL);
 	array_clean(ep->w_ready, NULL);
+#endif
 
 	return n;
 }
@@ -303,8 +319,11 @@ EVENT *event_epoll_create(int size)
 	ep->events = (struct epoll_event *)
 		mem_malloc(sizeof(struct epoll_event) * size);
 	ep->size    = size;
+
+#ifdef	DELAY_CALL
 	ep->r_ready = array_create(100);
 	ep->w_ready = array_create(100);
+#endif
 
 	ep->epfd = __sys_epoll_create(1024);
 	assert(ep->epfd >= 0);

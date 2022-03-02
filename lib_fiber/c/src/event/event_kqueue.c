@@ -43,8 +43,10 @@ typedef struct EVENT_KQUEUE {
 	int    nchanges;
 	struct kevent *events;
 	int    nevents;
+#ifdef	DELAY_CALL
 	ARRAY *r_ready;
 	ARRAY *w_ready;
+#endif
 } EVENT_KQUEUE;
 
 static void kqueue_free(EVENT *ev)
@@ -54,8 +56,10 @@ static void kqueue_free(EVENT *ev)
 	close(ek->kqfd);
 	mem_free(ek->changes);
 	mem_free(ek->events);
+#ifdef	DELAY_CALL
 	array_free(ek->r_ready, NULL);
 	array_free(ek->w_ready, NULL);
+#endif
 	mem_free(ek);
 }
 
@@ -163,7 +167,9 @@ static int kqueue_wait(EVENT *ev, int timeout)
 	struct timespec ts;
 	struct kevent *kev;
 	FILE_EVENT *fe;
+#ifdef	DELAY_CALL
 	ITER iter;
+#endif
 	int n, i;
 
 	ts.tv_sec = timeout / 1000;
@@ -188,15 +194,24 @@ static int kqueue_wait(EVENT *ev, int timeout)
 
 		if (kev && kev->filter == EVFILT_READ && fe && fe->r_proc) {
 			CLR_READWAIT(fe);
+#ifdef	DELAY_CALL
 			array_append(ek->r_ready, fe);
+#else
+			fe->r_proc(ev, fe);
+#endif
 		}
 
 		if (kev && kev->filter == EVFILT_WRITE && fe && fe->w_proc) {
 			CLR_WRITEWAIT(fe);
+#ifdef	DELAY_CALL
 			array_append(ek->w_ready, fe);
+#else
+			fe->w_proc(ev, fe);
+#endif
 		}
 	}
 
+#ifdef	DELAY_CALL
 	foreach(iter, ek->r_ready) {
 		fe = (FILE_EVENT *) iter.data;
 		fe->r_proc(ev, fe);
@@ -209,6 +224,7 @@ static int kqueue_wait(EVENT *ev, int timeout)
 
 	array_clean(ek->r_ready, NULL);
 	array_clean(ek->w_ready, NULL);
+#endif
 
 	return n;
 }
@@ -244,8 +260,11 @@ EVENT *event_kqueue_create(int size)
 	ek->changes  = (struct kevent *) mem_malloc(sizeof(struct kevent) * size);
 	ek->setsize  = size;
 	ek->nchanges = 0;
+
+#ifdef	DELAY_CALL
 	ek->r_ready  = array_create(100);
 	ek->w_ready  = array_create(100);
+#endif
 
 	ek->nevents  = 100;
 	ek->events   = (struct kevent *) mem_malloc(sizeof(struct kevent) * ek->nevents);

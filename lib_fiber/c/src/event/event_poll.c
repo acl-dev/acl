@@ -13,8 +13,10 @@ typedef struct EVENT_POLL {
 	int    size;
 	int    count;
 	struct pollfd *pfds;
+#ifdef	DELAY_CALL
 	ARRAY *r_ready;
 	ARRAY *w_ready;
+#endif
 } EVENT_POLL;
 
 static void poll_free(EVENT *ev)
@@ -23,8 +25,10 @@ static void poll_free(EVENT *ev)
 
 	mem_free(ep->files);
 	mem_free(ep->pfds);
+#ifdef	DELAY_CALL
 	array_free(ep->r_ready, NULL);
 	array_free(ep->w_ready, NULL);
+#endif
 	mem_free(ep);
 }
 
@@ -140,7 +144,9 @@ static int poll_wait(EVENT *ev, int timeout)
 	EVENT_POLL *ep = (EVENT_POLL *) ev;
 	FILE_EVENT *fe;
 	struct pollfd *pfd;
+#ifdef	DELAY_CALL
 	ITER  iter;
+#endif
 	int n, i;
 
 #ifdef SYS_WIN
@@ -181,7 +187,11 @@ static int poll_wait(EVENT *ev, int timeout)
 			}
 
 			CLR_READWAIT(fe);
+#ifdef	DELAY_CALL
 			array_append(ep->r_ready, fe);
+#else
+			fe->r_proc(ev, fe);
+#endif
 		}
 
 		if (pfd->revents & (POLLOUT | ERR ) && fe->w_proc) {
@@ -196,10 +206,15 @@ static int poll_wait(EVENT *ev, int timeout)
 			}
 
 			CLR_WRITEWAIT(fe);
+#ifdef	DELAY_CALL
 			array_append(ep->w_ready, fe);
+#else
+			fe->w_proc(ev, fe);
+#endif
 		}
 	}
 
+#ifdef	DELAY_CALL
 	foreach(iter, ep->r_ready) {
 		fe = (FILE_EVENT *) iter.data;
 		fe->r_proc(ev, fe);
@@ -212,6 +227,7 @@ static int poll_wait(EVENT *ev, int timeout)
 
 	array_clean(ep->r_ready, NULL);
 	array_clean(ep->w_ready, NULL);
+#endif
 
 	return n;
 }
@@ -250,8 +266,11 @@ EVENT *event_poll_create(int size)
 	ep->pfds  = (struct pollfd *) mem_calloc(size, sizeof(struct pollfd));
 	ep->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	ep->count = 0;
+
+#ifdef	DELAY_CALL
 	ep->r_ready = array_create(100);
 	ep->w_ready = array_create(100);
+#endif
 
 	ep->event.name   = poll_name;
 	ep->event.handle = poll_handle;
