@@ -134,9 +134,11 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 		CLR_POLLING(pfd->fe);
 
 		if (pfd->pfd->events & POLLIN) {
+			CLR_READWAIT(pfd->fe);
 			event_del_read(ev, pfd->fe);
 		}
 		if (pfd->pfd->events & POLLOUT) {
+			CLR_WRITEWAIT(pfd->fe);
 			event_del_write(ev, pfd->fe);
 		}
 		pfd->fe->pfd = NULL;

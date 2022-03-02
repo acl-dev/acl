@@ -549,6 +549,7 @@ int fiber_file_close(socket_t fd, int *closed)
 {
 	FILE_EVENT *fe;
 	EVENT *event;
+	ACL_FIBER *curr;
 
 	*closed = 0;
 
@@ -563,7 +564,9 @@ int fiber_file_close(socket_t fd, int *closed)
 		return 0;
 	}
 
-	if (IS_READWAIT(fe) && fe->fiber_r
+	curr = acl_fiber_running();
+
+	if (IS_READWAIT(fe) && fe->fiber_r && fe->fiber_r != curr
 		&& fe->fiber_r->status != FIBER_STATUS_EXITING) {
 		//&& fe->fiber_r->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_r->status <= FIBER_STATUS_EPOLL_WAIT) {
@@ -572,7 +575,7 @@ int fiber_file_close(socket_t fd, int *closed)
 		return 0;
 	}
 
-	if (IS_WRITEWAIT(fe) && fe->fiber_w
+	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
 		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
 		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {

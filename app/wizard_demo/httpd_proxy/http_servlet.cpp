@@ -139,7 +139,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	printf("remote host=%s, current fiber=%p\r\n", host.c_str(), acl_fiber_running());
 
 	acl::socket_stream peer;
-	if (!peer.open(host, 5, 5)) {
+	if (!peer.open(host, 5, 5, acl::time_unit_s)) {
 		logger_error("connect %s error %s", host.c_str(), acl::last_serror());
 		return false;
 	}
@@ -174,8 +174,8 @@ bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& p
 	local.set_rw_timeout(5);
 	peer.set_rw_timeout(5);
 
-	tcp_transfer fiber_local(local, peer, false);
-	tcp_transfer fiber_peer(peer, local, false);
+	tcp_transfer fiber_local(acl_fiber_running(), local, peer, false);
+	tcp_transfer fiber_peer(acl_fiber_running(), peer, local, false);
 
 	fiber_local.set_peer(fiber_peer);
 	fiber_peer.set_peer(fiber_local);

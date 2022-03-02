@@ -43,7 +43,7 @@ master_service::~master_service(void)
 
 void master_service::on_accept(acl::socket_stream& conn)
 {
-	logger("connect from %s, fd %d", conn.get_peer(), conn.sock_handle());
+	//logger("connect from %s, fd %d", conn.get_peer(), conn.sock_handle());
 
 	conn.set_rw_timeout(120);
 
@@ -55,7 +55,7 @@ void master_service::on_accept(acl::socket_stream& conn)
 
 	while(servlet.doRun()) {}
 
-	logger("disconnect from %s", conn.get_peer());
+	//logger("disconnect from %s", conn.get_peer());
 }
 
 void master_service::proc_pre_jail(void)

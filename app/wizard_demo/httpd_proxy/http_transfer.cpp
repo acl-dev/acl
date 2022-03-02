@@ -85,7 +85,7 @@ bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
 		return false;
 	}
 
-	printf(">>>send head: [%s]\r\n", header.c_str());
+	//printf(">>>send head: [%s]\r\n", header.c_str());
 	client_ = new acl::http_client(&conn, true);
 	return true;
 }
