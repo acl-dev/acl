@@ -142,7 +142,12 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 	fe = fiber_file_open_read(sockfd);
 
 	while (1) {
-		fiber_wait_read(fe);
+		if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(),
+				(int) sockfd);
+			return INVALID_SOCKET;
+		}
 
 		if (acl_fiber_killed(fe->fiber_r)) {
 			msg_info("%s(%d), %s: fiber-%u was killed", __FILE__,
@@ -197,7 +202,12 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
 		} else {
-			fiber_wait_read(fe);
+			if (fiber_wait_read(fe) < 0) {
+				msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+					__FUNCTION__, __LINE__, last_serror(),
+					(int) sockfd);
+				return INVALID_SOCKET;
+			}
 
 			if (acl_fiber_killed(fe->fiber)) {
 				msg_info("%s(%d), %s: fiber-%u was killed",
@@ -338,7 +348,13 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	}
 
 	time(&begin);
-	fiber_wait_write(fe);
+	if (fiber_wait_write(fe) < 0) {
+		time(&end);
+		msg_error("%s(%d): fiber_wait_write error=%s, fd=%d, cost=%ld",
+			__FUNCTION__, __LINE__, last_serror(), (int) sockfd,
+			(long)(end - begin));
+		return -1;
+	}
 	time(&end);
 
 #ifdef SYS_WIN

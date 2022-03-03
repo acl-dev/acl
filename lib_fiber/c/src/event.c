@@ -101,9 +101,15 @@ void event_free(EVENT *ev)
 int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	if (getsockfamily(fe->fd) >= 0) {
+		return 1;
+	}
+	if (ev->checkfd(ev, fe) == 0) {
+		fe->type = TYPE_SOCK;
+		return 1;
+	} else {
+		fe->type = TYPE_NOSOCK;
 		return 0;
 	}
-	return ev->checkfd(ev, fe);
 }
 #else
 int event_checkfd(EVENT *ev, FILE_EVENT *fe)
@@ -137,12 +143,23 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 	/* If we cannot seek, it must be a pipe, socket or fifo, else it
 	 * should be a file.
 	 */
-	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1 && errno == ESPIPE) {
+	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1) {
+		switch (errno) {
+		case ESPIPE:
+			fe->type = TYPE_SOCK;
+			acl_fiber_set_error(0);
+			return 1;
+		case EBADF:
+			fe->type = TYPE_BADFD;
+			return -1;
+		default:
+			fe->type = TYPE_NOSOCK;
+			return -1;
+		}
+	} else {
+		fe->type = TYPE_NOSOCK;
 		acl_fiber_set_error(0);
 		return 0;
-	} else {
-		acl_fiber_set_error(0);
-		return -1;
 	}
 #endif
 }
@@ -190,7 +207,9 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
-	if (fe->type == TYPE_NOSOCK) {
+	// if the fd's type has been checked and it isn't a valid socket,
+	// return immediately.
+	if (fe->type > TYPE_SOCK) {
 		return 0;
 	}
 
@@ -205,12 +224,11 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
+		// we should check the fd's type for the first time.
 		if (fe->type == TYPE_NONE) {
-			if (event_checkfd(ev, fe) == -1) {
-				fe->type = TYPE_NOSOCK;
-				return 0;
-			} else {
-				fe->type = TYPE_SOCK;
+			int ret = event_checkfd(ev, fe);
+			if (ret <= 0) {
+				return ret;
 			}
 		}
 
@@ -229,7 +247,7 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
 	assert(fe);
 
-	if (fe->type == TYPE_NOSOCK) {
+	if (fe->type > TYPE_SOCK) {
 		return 0;
 	}
 
@@ -245,11 +263,9 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 	if (!(fe->mask & EVENT_WRITE)) {
 		if (fe->type == TYPE_NONE) {
-			if (event_checkfd(ev, fe) == -1) {
-				fe->type = TYPE_NOSOCK;
-				return 0;
-			} else {
-				fe->type = TYPE_SOCK;
+			int ret = event_checkfd(ev, fe);
+			if (ret <= 0) {
+				return ret;
 			}
 		}
 

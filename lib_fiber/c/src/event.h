@@ -103,6 +103,7 @@ struct FILE_EVENT {
 #define	TYPE_NONE		0
 #define	TYPE_SOCK		1
 #define	TYPE_NOSOCK		2
+#define	TYPE_BADFD		3
 
 	unsigned oper;
 #define	EVENT_ADD_READ		(unsigned) (1 << 0)
@@ -233,9 +234,16 @@ ssize_t event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 
+// check if the fd in fe is a valid socket, return 1 if yes, -1 if the fd
+// is not a valid fd, 0 if the fd is valid but not a socket.
 int  event_checkfd(EVENT *ev, FILE_EVENT *fe);
+
+// event_add_read() and event_add_write() add the fd in fe to the IO event,
+// return 1 if adding ok, return 0 if the fd is a valid fd but not a socket,
+// return -1 if the fd is not a valid fd.
 int  event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 int  event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
+
 void event_del_read(EVENT *ev, FILE_EVENT *fe);
 void event_del_write(EVENT *ev, FILE_EVENT *fe);
 int  event_process(EVENT *ev, int left);

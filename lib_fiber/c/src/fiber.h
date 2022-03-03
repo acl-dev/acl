@@ -96,8 +96,16 @@ extern int var_maxfd;
 
 void fiber_io_check(void);
 void fiber_io_clear(void);
-void fiber_wait_read(FILE_EVENT *fe);
-void fiber_wait_write(FILE_EVENT *fe);
+
+// fiber_wait_read and fiber_wait_write will check if the given fd holding
+// in fe is a valid socket, if fd is a valid socket, it will be added to the
+// event loop until it's ready for  reading or writing, and the current fiber
+// will be suspended; if the given fd in fe isn't a valid socket, the function
+// will return immediatly, users can check fe->type.
+// the return value is same as which is from event_add_read or event_add_write.
+int fiber_wait_read(FILE_EVENT *fe);
+int fiber_wait_write(FILE_EVENT *fe);
+
 void fiber_io_dec(void);
 void fiber_io_inc(void);
 EVENT *fiber_io_event(void);

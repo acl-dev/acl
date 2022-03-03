@@ -118,7 +118,11 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 			return -1;
 		}
 
-		fiber_wait_read(fe);
+		if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			return -1;
+		}
 	}
 }
 # else
@@ -148,11 +152,14 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
-		} else {
-			fiber_wait_read(fe);
+		} else if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			return -1;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
+			printf(">>>cancel read fd=%d\r\n", fe->fd);
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
 		}
@@ -162,6 +169,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 			return ret;
 		}
 
+		printf(">>>read error =%s, fd=%d\r\n", last_serror(), fe->fd);
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
@@ -198,8 +206,10 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
-		} else {
-			fiber_wait_read(fe);
+		} else if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			return -1;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -246,7 +256,13 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		int err;
 
 		fe->mask &= ~EVENT_READ;
-		fiber_wait_read(fe);
+
+		if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
+			return -1;
+		}
+
 		if (fe->mask & EVENT_ERR) {
 			err = acl_fiber_last_error();
 			fiber_save_errno(err);
@@ -325,8 +341,10 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
-		} else {
-			fiber_wait_read(fe);
+		} else if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__,last_serror(), (int) sockfd);
+			return -1;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -391,8 +409,10 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
-		} else {
-			fiber_wait_read(fe);
+		} else if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			return -1;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -441,8 +461,10 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
-		} else {
-			fiber_wait_read(fe);
+		} else if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			return -1;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -509,7 +531,11 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		fe = fiber_file_open_write(fd);
 		CLR_POLLING(fe);
 
-		fiber_wait_write(fe);
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			return -1;
+		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
@@ -549,7 +575,11 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		fe = fiber_file_open_write(fd);
 		CLR_POLLING(fe);
 
-		fiber_wait_write(fe);
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			return -1;
+		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
@@ -600,7 +630,11 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		fe = fiber_file_open_write(sockfd);
 		CLR_POLLING(fe);
 
-		fiber_wait_write(fe);
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			return -1;
+		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
@@ -651,7 +685,11 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		fe = fiber_file_open_write(sockfd);
 		CLR_POLLING(fe);
 
-		fiber_wait_write(fe);
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			return -1;
+		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
@@ -692,7 +730,11 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		fe = fiber_file_open_write(sockfd);
 		CLR_POLLING(fe);
 
-		fiber_wait_write(fe);
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			return -1;
+		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
@@ -790,7 +832,11 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		fe = fiber_file_open_write(out_fd);
 		CLR_POLLING(fe);
 
-		fiber_wait_write(fe);
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) out_fd);
+			return -1;
+		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);

@@ -390,20 +390,31 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	__thread_fiber->io_count--;
 }
 
-void fiber_wait_read(FILE_EVENT *fe)
+/**
+ * set fd in reading status by adding it to the event set if the fd is a
+ * valid socket or pipe, or return immediately if the fd is not a valid
+ * socket. In event_add_read the fd holding in fe will be checking if it's
+ * a socket for the first time.
+ */
+int fiber_wait_read(FILE_EVENT *fe)
 {
+	int ret;
+
 	fiber_io_check();
 
 	fe->fiber_r = acl_fiber_running();
+
 	// when return 0 just let it go continue
-	if (!event_add_read(__thread_fiber->event, fe, read_callback)) {
-		return;
+	ret = event_add_read(__thread_fiber->event, fe, read_callback);
+	if (ret <= 0) {
+		return ret;
 	}
 
 	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
 	__thread_fiber->io_count++;
 	SET_READWAIT(fe);
 	acl_fiber_switch();
+	return ret;
 }
 
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
@@ -421,19 +432,24 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	__thread_fiber->io_count--;
 }
 
-void fiber_wait_write(FILE_EVENT *fe)
+int fiber_wait_write(FILE_EVENT *fe)
 {
+	int ret;
+
 	fiber_io_check();
 
 	fe->fiber_w = acl_fiber_running();
-	if (!event_add_write(__thread_fiber->event, fe, write_callback)) {
-		return;
+	ret = event_add_write(__thread_fiber->event, fe, write_callback);
+	if (ret <= 0) {
+		return ret;
 	}
 
 	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
 	__thread_fiber->io_count++;
 	SET_WRITEWAIT(fe);
 	acl_fiber_switch();
+
+	return ret;
 }
 
 /****************************************************************************/
@@ -592,19 +608,6 @@ int fiber_file_close(socket_t fd, int *closed)
 		*closed = event->close_sock(event, fe);
 	}
 
-	/* we just rebind the current running fiber and free it */
-	//fe->fiber_r = acl_fiber_running();
-	//fe->fiber_w = acl_fiber_running();
 	file_event_free(fe);
-#if 0
-	if (fe->fiber == acl_fiber_running()) {
-		file_event_free(fe);
-	} else {
-		fe->fiber->errnum = ECANCELED;
-		fe->fiber->flag  |= FIBER_F_CLOSED;
-		ring_detach(&fe->fiber->me);
-		acl_fiber_ready(fe->fiber);
-	}
-#endif
 	return 1;
 }
