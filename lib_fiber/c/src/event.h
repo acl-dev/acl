@@ -71,6 +71,7 @@ struct FILE_EVENT {
 #define	STATUS_READWAIT		(unsigned) (1 << 5)
 #define	STATUS_WRITEWAIT	(unsigned) (1 << 6)
 #define	STATUS_CLOSING		(unsigned) (1 << 7)
+#define	STATUS_CLOSED		(unsigned) (1 << 8)
 
 #define	SET_CONNECTING(x)	((x)->status |= STATUS_CONNECTING)
 #define	SET_READABLE(x)		((x)->status |= STATUS_READABLE)
@@ -80,6 +81,7 @@ struct FILE_EVENT {
 #define	SET_READWAIT(x)		((x)->status |= STATUS_READWAIT)
 #define	SET_WRITEWAIT(x)	((x)->status |= STATUS_WRITEWAIT)
 #define	SET_CLOSING(x)		((x)->status |= STATUS_CLOSING)
+#define	SET_CLOSED(x)		((x)->status |= STATUS_CLOSED)
 
 #define	CLR_CONNECTING(x)	((x)->status &= ~STATUS_CONNECTING)
 #define	CLR_READABLE(x)		((x)->status &= ~STATUS_READABLE)
@@ -89,6 +91,7 @@ struct FILE_EVENT {
 #define	CLR_READWAIT(x)		((x)->status &= ~STATUS_READWAIT)
 #define	CLR_WRITEWAIT(x)	((x)->status &= ~STATUS_WRITEWAIT)
 #define	CLR_CLOSING(x)		((x)->status &= ~STATUS_CLOSING)
+#define	CLR_CLOSED(x)		((x)->status &= ~STATUS_CLOSED)
 
 #define	IS_CONNECTING(x)	((x)->status & STATUS_CONNECTING)
 #define	IS_READABLE(x)		((x)->status & STATUS_READABLE)
@@ -98,6 +101,7 @@ struct FILE_EVENT {
 #define	IS_READWAIT(x)		((x)->status & STATUS_READWAIT)
 #define	IS_WRITEWAIT(x)		((x)->status & STATUS_WRITEWAIT)
 #define	IS_CLOSING(x)		((x)->status & STATUS_CLOSING)
+#define	IS_CLOSED(x)		((x)->status & STATUS_CLOSED)
 
 	unsigned type;
 #define	TYPE_NONE		0

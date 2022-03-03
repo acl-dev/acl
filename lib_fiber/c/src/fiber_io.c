@@ -581,8 +581,11 @@ int fiber_file_close(socket_t fd, int *closed)
 	}
 
 	event = __thread_fiber->event;
-	// at first, we should remote the IO event for the fd
-	event_close(event, fe);
+
+	// at first, we should remove the IO event for the fd.
+	if (!IS_CLOSING(fe)) {
+		event_close(event, fe);
+	}
 
 	curr = acl_fiber_running();
 
@@ -596,6 +599,11 @@ int fiber_file_close(socket_t fd, int *closed)
 		// stop the fe be freed in the killed fiber.
 		SET_CLOSING(fe);
 		acl_fiber_kill(fe->fiber_r);
+
+		// check if the fd has been closed which was set below.
+		if (IS_CLOSED(fe)) {
+			*closed = 1;
+		}
 		fiber_file_del(fe);
 		file_event_free(fe);
 		return 0;
@@ -605,14 +613,22 @@ int fiber_file_close(socket_t fd, int *closed)
 		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
 		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {
+
 		SET_CLOSING(fe);
 		acl_fiber_kill(fe->fiber_r);
+
+		if (IS_CLOSED(fe)) {
+			*closed = 1;
+		}
 		fiber_file_del(fe);
 		file_event_free(fe);
 		return 0;
 	}
 
 	if (IS_CLOSING(fe)) {
+		// set the fd being closed status will be used above
+		// after acl_fiber_kill come back and checking it.
+		SET_CLOSED(fe);
 		return 0;
 	}
 
