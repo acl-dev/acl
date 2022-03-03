@@ -485,12 +485,20 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 #if 0
 	fiber_ready(fiber);
 	fiber_yield();
-#else
+#elif 1
 	curr->status = FIBER_STATUS_READY;
 	ring_append(&__thread_fiber->ready, &curr->me);
 
 	fiber->status = FIBER_STATUS_READY;
 	ring_append(&__thread_fiber->ready, &fiber->me);
+
+	acl_fiber_switch();
+#else
+	fiber->status = FIBER_STATUS_READY;
+	ring_prepend(&__thread_fiber->ready, &fiber->me);
+
+	curr->status = FIBER_STATUS_READY;
+	ring_prepend(&__thread_fiber->ready, &curr->me);
 
 	acl_fiber_switch();
 #endif

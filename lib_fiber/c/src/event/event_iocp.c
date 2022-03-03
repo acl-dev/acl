@@ -7,6 +7,7 @@
 #pragma comment(lib, "Kernel32.lib")
 #pragma comment(lib, "Mswsock.lib")
 
+#include "../hook/hook.h"
 #include "event.h"
 #include "event_iocp.h"
 
@@ -71,10 +72,13 @@ static int iocp_close_sock(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	/* must close socket before releasing fe->reader/fe->writer */
 	if (fe->fd != INVALID_SOCKET) {
-		closesocket(fe->fd);
+		// because closesocket API has been hooked, so we should use the
+		// real system API to close the socket.
+		//closesocket(fe->fd);
+		(*sys_close)(fe->fd);
 
 		/* set fd INVALID_SOCKET notifying the caller the socket be closed*/
-		fe->fd = INVALID_SOCKET;
+		//fe->fd = INVALID_SOCKET;
 	}
 
 	/* On Windows XP, must check if the OVERLAPPED IO is in STATUS_PENDING
@@ -147,8 +151,12 @@ static void iocp_check(EVENT_IOCP *ev, FILE_EVENT *fe)
 		ev->files[fe->id] = fe;
 		ev->event.fdcount++;
 	} else {
-		assert(fe->id >= 0 && fe->id < ev->count);
-		assert(ev->files[fe->id] == fe);
+		if (fe->id < 0 || fe->id > ev->count) {
+			assert(fe->id >= 0 && fe->id < ev->count);
+		}
+		if (ev->files[fe->id] != fe) {
+			assert(ev->files[fe->id] == fe);
+		}
 	}
 
 	if (fe->h_iocp == NULL) {

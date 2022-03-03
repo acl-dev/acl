@@ -598,6 +598,7 @@ int fiber_file_close(socket_t fd, int *closed)
 		// should be very carefully. we just set the CLOSING flag to
 		// stop the fe be freed in the killed fiber.
 		SET_CLOSING(fe);
+		CLR_READWAIT(fe);
 		acl_fiber_kill(fe->fiber_r);
 
 		// check if the fd has been closed which was set below.
@@ -614,6 +615,7 @@ int fiber_file_close(socket_t fd, int *closed)
 		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {
 
+		CLR_WRITEWAIT(fe);
 		SET_CLOSING(fe);
 		acl_fiber_kill(fe->fiber_r);
 
@@ -625,6 +627,11 @@ int fiber_file_close(socket_t fd, int *closed)
 		return 0;
 	}
 
+	if (event->close_sock) {
+		*closed = event->close_sock(event, fe);
+		SET_CLOSED(fe);
+	}
+
 	if (IS_CLOSING(fe)) {
 		// set the fd being closed status will be used above
 		// after acl_fiber_kill come back and checking it.
@@ -632,12 +639,7 @@ int fiber_file_close(socket_t fd, int *closed)
 		return 0;
 	}
 
-	if (event->close_sock) {
-		*closed = event->close_sock(event, fe);
-	}
-
 	fiber_file_del(fe);
 	file_event_free(fe);
-
 	return 1;
 }
