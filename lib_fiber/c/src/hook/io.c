@@ -159,7 +159,6 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
-			printf(">>>cancel read fd=%d\r\n", fe->fd);
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
 		}
@@ -169,7 +168,6 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 			return ret;
 		}
 
-		printf(">>>read error =%s, fd=%d\r\n", last_serror(), fe->fd);
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
