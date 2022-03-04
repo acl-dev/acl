@@ -82,6 +82,9 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 	} else if (strrchr(addr, '|') || strrchr(addr, ':')){
 		ACL_SAFE_STRNCPY(addr_, addr, sizeof(addr_));
 		header_.set_url("/");
+	} else if (acl_valid_unix(addr)) {
+		safe_snprintf(addr_, sizeof(addr_), "%s", addr);
+		header_.set_url("/");
 	} else {
 		safe_snprintf(addr_, sizeof(addr_), "%s:80", addr);
 		header_.set_url("/");
