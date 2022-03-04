@@ -438,7 +438,8 @@ static int iocp_del_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	if (fe->reader) {
 		if (!CancelIoEx((HANDLE) fe->fd, &fe->reader->overlapped)) {
-			msg_error("cancel read error %s", acl_fiber_last_serror());
+			msg_error("%s(%d): cancel read error %s, fd=%d", __FUNCTION__,
+				__LINE__, acl_fiber_last_serror(), (int) fe->fd);
 		}
 		fe->reader->type &= ~IOCP_EVENT_READ;
 	}
@@ -463,7 +464,8 @@ static int iocp_del_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 
 	if (fe->writer) {
 		if (!CancelIoEx((HANDLE) fe->fd, &fe->writer->overlapped)) {
-			msg_error("cancel write error %s", acl_fiber_last_serror());
+			msg_error("%s(%d): cancel write error %s, fd=%d", __FUNCTION__,
+				__LINE__, acl_fiber_last_serror(), (int) fe->fd);
 		}
 		fe->writer->type &= ~IOCP_EVENT_WRITE;
 	}
