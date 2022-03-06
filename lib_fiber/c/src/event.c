@@ -67,6 +67,7 @@ EVENT *event_create(int size)
 	ev->maxfd   = -1;
 	ev->waiter  = 0;
 
+	SET_TIME(ev->stamp);  // init the event's stamp when create each event
 #ifdef HAS_POLL
 	ring_init(&ev->poll_list);
 #endif
@@ -95,6 +96,17 @@ ssize_t event_size(EVENT *ev)
 void event_free(EVENT *ev)
 {
 	ev->free(ev);
+}
+
+long long event_set_stamp(EVENT *ev)
+{
+	SET_TIME(ev->stamp);  // decrease the SET_TIME's calling count.
+	return ev->stamp;
+}
+
+long long event_get_stamp(EVENT *ev)
+{
+	return ev->stamp;
 }
 
 #ifdef SYS_WIN
@@ -374,6 +386,7 @@ static void event_prepare(EVENT *ev)
 #ifdef HAS_POLL
 static void event_process_poll(EVENT *ev)
 {
+#if 0
 	while (1) {
 		POLL_EVENT *pe;
 		RING *head = ring_pop_head(&ev->poll_list);
@@ -387,12 +400,32 @@ static void event_process_poll(EVENT *ev)
 	}
 
 	ring_init(&ev->poll_list);
+#else
+	POLL_EVENT *pe;
+	RING *next, *curr;
+	long long now;
+
+	now = event_get_stamp(ev);
+
+	for (next = ring_succ(&ev->poll_list); next != &ev->poll_list;) {
+		pe = ring_to_appl(next, POLL_EVENT, me);
+		if (pe->nready != 0 || (pe->expire >= 0 && now >= pe->expire)) {
+			curr = next;
+			next = ring_succ(next);
+			ring_detach(curr);
+			pe->proc(ev, pe);
+		} else {
+			next = ring_succ(next);
+		}
+	}
+#endif
 }
 #endif
 
 #ifdef	HAS_EPOLL
 static void event_process_epoll(EVENT *ev)
 {
+#if 0
 	while (1) {
 		EPOLL_EVENT *ee;
 		RING *head = ring_pop_head(&ev->epoll_list);
@@ -402,6 +435,25 @@ static void event_process_epoll(EVENT *ev)
 		ee = TO_APPL(head, EPOLL_EVENT, me);
 		ee->proc(ev, ee);
 	}
+#else
+	EPOLL_EVENT *ee;
+	RING *next, *curr;
+	long long now;
+
+	now = event_get_stamp(ev);
+
+	for (next = ring_succ(&ev->epoll_list); next != &ev->epoll_list;) {
+		ee = ring_to_appl(next, EPOLL_EVENT, me);
+		if (ee->nready != 0 || (ee->expire >= 0 && now >= ee->expire)) {
+			curr = next;
+			next = ring_succ(next);
+			ring_detach(curr);
+			ee->proc(ev, ee);
+		} else {
+			next = ring_succ(next);
+		}
+	}
+#endif
 }
 #endif
 
@@ -427,7 +479,11 @@ int event_process(EVENT *ev, int timeout)
 	}
 
 	event_prepare(ev);
+
+	// call the system event waiting API for any event arriving.
 	ret = ev->event_wait(ev, timeout);
+
+	(void) event_set_stamp(ev);  // reset the stamp after event waiting.
 
 #ifdef HAS_POLL
 	event_process_poll(ev);

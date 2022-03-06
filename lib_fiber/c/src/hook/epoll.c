@@ -376,8 +376,13 @@ static void event_epoll_set(EVENT *ev, EPOLL_EVENT *ee, int timeout)
 		ee->events[i].events = 0;
 	}
 
-	if (timeout >= 0 && (ev->timeout < 0 || timeout < ev->timeout)) {
-		ev->timeout = timeout;
+	if (timeout >= 0) {
+		ee->expire = event_get_stamp(ev) + timeout;
+		if (ev->timeout < 0 || timeout < ev->timeout) {
+			ev->timeout = timeout;
+		}
+	} else {
+		ee->expire = -1;
 	}
 }
 
@@ -385,7 +390,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 {
 	EVENT *ev;
 	EPOLL_EVENT *ee;
-	long long begin, now;
+	long long now;
 	int old_timeout;
 
 	if (sys_epoll_wait == NULL) {
@@ -418,7 +423,6 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 	old_timeout = ev->timeout;
 	event_epoll_set(ev, ee, timeout);
-	SET_TIME(begin);
 	ev->waiter++;
 
 	while (1) {
@@ -441,8 +445,9 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		if (ee->nready != 0 || timeout == 0) {
 			break;
 		}
-		SET_TIME(now);
-		if (timeout > 0 && (now - begin >= timeout)) {
+
+		now = event_get_stamp(ev);
+		if (ee->expire > 0 && now >= ee->expire) {
 			break;
 		}
 	}

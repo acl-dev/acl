@@ -21,9 +21,9 @@ CFLAGS = -c -g -W \
 -Wcast-qual \
 -DUSE_FAST_RING \
 -DUSE_JMP_DEF \
+#-DUSE_FAST_TIME \
 #-DUSE_VALGRIND \
 #-DUSE_BOOST_JMP \
-#-DUSE_FAST_TIME \
 #-Waggregate-return \
 #-DDEBUG_MEM \
 #-I/usr/local/include

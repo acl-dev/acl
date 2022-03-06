@@ -115,8 +115,13 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 		pfd->pfd->revents = 0;
 	}
 
-	if (timeout >= 0 && (ev->timeout < 0 || timeout < ev->timeout)) {
-		ev->timeout = timeout;
+	if (timeout >= 0) {
+		pe->expire = event_get_stamp(ev) + timeout;
+		if (ev->timeout < 0 || timeout < ev->timeout) {
+			ev->timeout = timeout;
+		}
+	} else {
+		pe->expire = -1;
 	}
 }
 
@@ -128,8 +133,9 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 		POLLFD *pfd = &pe->fds[i];
 
 		/* maybe has been cleaned in read_callback/write_callback */
-		if (pfd->fe == NULL)
+		if (pfd->fe == NULL) {
 			continue;
+		}
 
 		CLR_POLLING(pfd->fe);
 
@@ -190,7 +196,7 @@ static void pollfd_free(POLLFD *pfds)
 
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
-	long long begin, now;
+	long long now;
 	POLL_EVENT pe;
 	EVENT *ev;
 	int old_timeout;
@@ -212,7 +218,6 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	old_timeout = ev->timeout;
 	poll_event_set(ev, &pe, timeout);
-	SET_TIME(begin);
 	ev->waiter++;
 
 	while (1) {
@@ -242,8 +247,9 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		if (pe.nready != 0 || timeout == 0) {
 			break;
 		}
-		SET_TIME(now);
-		if (timeout > 0 && (now - begin >= timeout)) {
+
+		now = event_get_stamp(ev);
+		if (pe.expire > 0 && now >= pe.expire) {
 			acl_fiber_set_error(FIBER_ETIMEDOUT);
 			break;
 		}

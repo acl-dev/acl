@@ -159,6 +159,7 @@ struct POLL_EVENT {
 	RING       me;
 	ACL_FIBER *fiber;
 	poll_proc *proc;
+	long long  expire;
 	int        nready;
 	int        nfds;
 	POLLFD    *fds;
@@ -181,6 +182,7 @@ struct EPOLL_EVENT {
 	ACL_FIBER  *fiber;
 	epoll_proc *proc;
 	size_t      nfds;
+	long long   expire;
 	EPOLL_CTX **fds;
 	int         epfd;
 
@@ -197,6 +199,7 @@ struct EVENT {
 	ssize_t  setsize;
 	socket_t maxfd;
 
+	long long stamp;  // the stamp of the current fiber scheduler
 	unsigned flag;
 #define EVENT_F_IOCP (1 << 0)
 #define EVENT_IS_IOCP(x) ((x)->flag & EVENT_F_IOCP)
@@ -237,6 +240,8 @@ acl_handle_t event_handle(EVENT *ev);
 ssize_t event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
+long long event_set_stamp(EVENT *ev);
+long long event_get_stamp(EVENT *ev);
 
 // check if the fd in fe is a valid socket, return 1 if yes, -1 if the fd
 // is not a valid fd, 0 if the fd is valid but not a socket.

@@ -14,7 +14,7 @@ typedef struct {
 	int        nsleeping;
 	int        io_stop;
 #ifdef SYS_WIN
-	HTABLE      *events;
+	HTABLE     *events;
 #else
 	FILE_EVENT **events;
 #endif
@@ -162,6 +162,12 @@ EVENT *fiber_io_event(void)
 	return __thread_fiber->event;
 }
 
+static long long fiber_io_stamp(void)
+{
+	EVENT *ev = fiber_io_event();
+	return event_get_stamp(ev);
+}
+
 static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
@@ -177,7 +183,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		if (timer == NULL) {
 			left = -1;
 		} else {
-			SET_TIME(now);
+			now  = event_get_stamp(__thread_fiber->event);
 			last = now;
 			if (now >= timer->when) {
 				left = 0;
@@ -205,8 +211,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			break;
 		}
 
-		SET_TIME(now);
-
+		now = event_get_stamp(__thread_fiber->event);
 		if (now - last < left) {
 			continue;
 		}
@@ -220,7 +225,6 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 
 			acl_fiber_ready(timer);
 			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
-
 		} while (timer != NULL && now >= timer->when);
 	}
 
@@ -263,7 +267,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 	ev = fiber_io_event();
 
-	SET_TIME(now);
+	now = event_get_stamp(ev);
 	when = now + milliseconds;
 
 	/* The timers in the ring were stored from small to large in ascending
@@ -309,7 +313,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 		ev->timeout = -1;
 	}
 
-	SET_TIME(now);
+	now = event_get_stamp(ev);
 	if (now < when) {
 		return 0;
 	}
@@ -321,7 +325,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 {
 	long long now, left;
 
-	SET_TIME(now);
+	now = fiber_io_stamp();
 
 	for (;;) {
 		left = fiber->when > now ? fiber->when - now : 0;
@@ -331,7 +335,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 
 		acl_fiber_delay((unsigned int) left);
 
-		SET_TIME(now);
+		now = fiber_io_stamp();
 		if (fiber->when <= now) {
 			break;
 		}
@@ -349,7 +353,7 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 
 	fiber_io_check();
 
-	SET_TIME(when);
+	when = fiber_io_stamp();
 	when += milliseconds;
 
 	fiber           = acl_fiber_create(fiber_timer_callback, ctx, size);
@@ -364,7 +368,7 @@ void acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 
 	fiber_io_check();
 
-	SET_TIME(when);
+	when = fiber_io_stamp();
 	when += milliseconds;
 	fiber->when = when;
 	fiber->status = FIBER_STATUS_READY;
