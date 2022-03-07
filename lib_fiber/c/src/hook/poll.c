@@ -49,9 +49,14 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 		pfd->fe = NULL;
 	}
 
-	assert(ring_size(&ev->poll_list) > 0);
-	SET_READABLE(fe);
+	assert(avl_numnodes(&ev->poll_list) > 0);
+
+	if (pfd->pe->nready == 0) {
+		avl_remove(&ev->poll_list, pfd->pe);
+		ring_prepend(&ev->poll_ready, &pfd->pe->me);
+	}
 	pfd->pe->nready++;
+	SET_READABLE(fe);
 }
 
 /**
@@ -86,9 +91,14 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 		pfd->fe = NULL;
 	}
 
-	assert(ring_size(&ev->poll_list) > 0);
-	SET_WRITABLE(fe);
+	assert(avl_numnodes(&ev->poll_list) > 0);
+
+	if (pfd->pe->nready == 0) {
+		avl_remove(&ev->poll_list, pfd->pe);
+		ring_prepend(&ev->poll_ready, &pfd->pe->me);
+	}
 	pfd->pe->nready++;
+	SET_WRITABLE(fe);
 }
 
 /**
@@ -194,6 +204,21 @@ static void pollfd_free(POLLFD *pfds)
 	mem_free(pfds);
 }
 
+static void poll_list_add(EVENT *ev, POLL_EVENT *pe)
+{
+	POLL_EVENT iter, *node;
+
+	iter.expire = pe->expire;
+	node = avl_find(&ev->poll_list, &iter, NULL);
+	if (node == NULL) {
+		pe->expire = iter.expire;
+		avl_add(&ev->poll_list, pe);
+	} else {
+		pe->next = node->next;
+		node->next = pe;
+	}
+}
+
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long now;
@@ -210,6 +235,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	}
 
 	ev        = fiber_io_event();
+	pe.next   = NULL;
 	pe.fds    = pollfd_alloc(&pe, fds, nfds);
 	pe.nfds   = nfds;
 	pe.fiber  = acl_fiber_running();
@@ -221,7 +247,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	ev->waiter++;
 
 	while (1) {
-		ring_prepend(&ev->poll_list, &pe.me);
+		poll_list_add(ev, &pe);
 		pe.nready = 0;
 
 		fiber_io_inc();
@@ -241,7 +267,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			break;
 		}
 
-		if (ring_size(&ev->poll_list) == 0) {
+		if (avl_numnodes(&ev->poll_list) == 0) {
 			ev->timeout = -1;
 		}
 		if (pe.nready != 0 || timeout == 0) {

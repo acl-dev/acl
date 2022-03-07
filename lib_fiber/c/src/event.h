@@ -157,6 +157,9 @@ struct POLLFD {
 
 struct POLL_EVENT {
 	RING       me;
+	avl_node_t node;
+	struct POLL_EVENT *next;
+
 	ACL_FIBER *fiber;
 	poll_proc *proc;
 	long long  expire;
@@ -205,11 +208,14 @@ struct EVENT {
 #define EVENT_IS_IOCP(x) ((x)->flag & EVENT_F_IOCP)
 
 #ifdef HAS_POLL
-	RING   poll_list;
+	avl_tree_t poll_list;
+	RING   poll_ready;
 #endif
+
 #ifdef HAS_EPOLL
 	RING   epoll_list;
 #endif
+
 	unsigned waiter;
 
 	const char *(*name)(void);

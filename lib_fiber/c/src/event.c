@@ -24,6 +24,21 @@ void event_set(int event_mode)
 	}
 }
 
+static int avl_cmp_fn(const void *v1, const void *v2)
+{
+	const POLL_EVENT *n1 = (const POLL_EVENT*) v1;
+	const POLL_EVENT *n2 = (const POLL_EVENT*) v2;
+	long long ret = n1->expire - n2->expire;
+
+	if (ret < 0) {
+		return -1;
+	} else if (ret > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 EVENT *event_create(int size)
 {
 	EVENT *ev = NULL;
@@ -69,7 +84,9 @@ EVENT *event_create(int size)
 
 	SET_TIME(ev->stamp);  // init the event's stamp when create each event
 #ifdef HAS_POLL
-	ring_init(&ev->poll_list);
+	avl_create(&ev->poll_list, avl_cmp_fn, sizeof(POLL_EVENT),
+		offsetof(POLL_EVENT, node));
+	ring_init(&ev->poll_ready);
 #endif
 
 #ifdef HAS_EPOLL
@@ -400,7 +417,7 @@ static void event_process_poll(EVENT *ev)
 	}
 
 	ring_init(&ev->poll_list);
-#else
+#elif 0
 	POLL_EVENT *pe;
 	RING *next, *curr;
 	long long now;
@@ -418,6 +435,30 @@ static void event_process_poll(EVENT *ev)
 			next = ring_succ(next);
 		}
 	}
+#else
+	RING *head;
+	long long now = event_get_stamp(ev);
+	POLL_EVENT *pe = avl_first(&ev->poll_list), *next;
+
+	while (pe && pe->expire >= 0 && pe->expire <= now) {
+		next = AVL_NEXT(&ev->poll_list, pe);
+		avl_remove(&ev->poll_list, pe);
+		pe->proc(ev, pe);
+		pe = next;
+	}
+
+	while (1) {
+		head = ring_pop_head(&ev->poll_ready);
+		if (head == NULL) {
+			break;
+		}
+
+		pe = TO_APPL(head, POLL_EVENT, me);
+		pe->proc(ev, pe);
+	}
+
+	ring_init(&ev->poll_ready);
+
 #endif
 }
 #endif

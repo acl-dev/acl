@@ -15,5 +15,6 @@
 #include "common/pthread_patch.h"
 #include "common/memory.h"
 #include "common/sane_socket.h"
+#include "common/avl.h"
 
 #endif
