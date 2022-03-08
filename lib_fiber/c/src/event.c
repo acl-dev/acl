@@ -24,21 +24,6 @@ void event_set(int event_mode)
 	}
 }
 
-static int avl_cmp_fn(const void *v1, const void *v2)
-{
-	const POLL_EVENT *n1 = (const POLL_EVENT*) v1;
-	const POLL_EVENT *n2 = (const POLL_EVENT*) v2;
-	long long ret = n1->expire - n2->expire;
-
-	if (ret < 0) {
-		return -1;
-	} else if (ret > 0) {
-		return 1;
-	} else {
-		return 0;
-	}
-}
-
 EVENT *event_create(int size)
 {
 	EVENT *ev = NULL;
@@ -84,8 +69,7 @@ EVENT *event_create(int size)
 
 	SET_TIME(ev->stamp);  // init the event's stamp when create each event
 #ifdef HAS_POLL
-	avl_create(&ev->poll_list, avl_cmp_fn, sizeof(POLL_EVENT),
-		offsetof(POLL_EVENT, node));
+	ev->poll_list = timer_cache_create();
 	ring_init(&ev->poll_ready);
 #endif
 
@@ -112,6 +96,7 @@ ssize_t event_size(EVENT *ev)
 
 void event_free(EVENT *ev)
 {
+	timer_cache_free(ev->poll_list);
 	ev->free(ev);
 }
 
@@ -403,52 +388,23 @@ static void event_prepare(EVENT *ev)
 #ifdef HAS_POLL
 static void event_process_poll(EVENT *ev)
 {
-#if 0
-	while (1) {
-		POLL_EVENT *pe;
-		RING *head = ring_pop_head(&ev->poll_list);
-
-		if (head == NULL) {
-			break;
-		}
-
-		pe = TO_APPL(head, POLL_EVENT, me);
-		pe->proc(ev, pe);
-	}
-
-	ring_init(&ev->poll_list);
-#elif 0
+	RING_ITER   iter;
 	POLL_EVENT *pe;
-	RING *next, *curr;
-	long long now;
+	long long   now = event_get_stamp(ev);
+	TIMER_CACHE_NODE *node = avl_first(&ev->poll_list->tree), *next;
 
-	now = event_get_stamp(ev);
-
-	for (next = ring_succ(&ev->poll_list); next != &ev->poll_list;) {
-		pe = ring_to_appl(next, POLL_EVENT, me);
-		if (pe->nready != 0 || (pe->expire >= 0 && now >= pe->expire)) {
-			curr = next;
-			next = ring_succ(next);
-			ring_detach(curr);
+	while (node && node->expire >= 0 && node->expire <= now) {
+		next = AVL_NEXT(&ev->poll_list->tree, node);
+		ring_foreach(iter, &node->ring) {
+			pe = TO_APPL(iter.ptr, POLL_EVENT, me);
 			pe->proc(ev, pe);
-		} else {
-			next = ring_succ(next);
 		}
-	}
-#else
-	RING *head;
-	long long now = event_get_stamp(ev);
-	POLL_EVENT *pe = avl_first(&ev->poll_list), *next;
-
-	while (pe && pe->expire >= 0 && pe->expire <= now) {
-		next = AVL_NEXT(&ev->poll_list, pe);
-		avl_remove(&ev->poll_list, pe);
-		pe->proc(ev, pe);
-		pe = next;
+		timer_cache_free_node(ev->poll_list, node);
+		node = next;
 	}
 
 	while (1) {
-		head = ring_pop_head(&ev->poll_ready);
+		RING *head = ring_pop_head(&ev->poll_ready);
 		if (head == NULL) {
 			break;
 		}
@@ -458,8 +414,6 @@ static void event_process_poll(EVENT *ev)
 	}
 
 	ring_init(&ev->poll_ready);
-
-#endif
 }
 #endif
 

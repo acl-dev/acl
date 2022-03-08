@@ -3,6 +3,7 @@
 
 #include "define.h"
 #include "common/gettimeofday.h"
+#include "common/avl.h"
 
 #ifdef	HAS_EPOLL
 #include <sys/epoll.h>
@@ -157,8 +158,6 @@ struct POLLFD {
 
 struct POLL_EVENT {
 	RING       me;
-	avl_node_t node;
-	struct POLL_EVENT *next;
 
 	ACL_FIBER *fiber;
 	poll_proc *proc;
@@ -195,6 +194,8 @@ struct EPOLL_EVENT {
 };
 #endif
 
+typedef struct TIMER_CACHE TIMER_CACHE;
+
 struct EVENT {
 	RING events;
 	int  timeout;
@@ -208,7 +209,7 @@ struct EVENT {
 #define EVENT_IS_IOCP(x) ((x)->flag & EVENT_F_IOCP)
 
 #ifdef HAS_POLL
-	avl_tree_t poll_list;
+	TIMER_CACHE *poll_list;
 	RING   poll_ready;
 #endif
 

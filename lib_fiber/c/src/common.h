@@ -16,5 +16,6 @@
 #include "common/memory.h"
 #include "common/sane_socket.h"
 #include "common/avl.h"
+#include "common/timer_cache.h"
 
 #endif
