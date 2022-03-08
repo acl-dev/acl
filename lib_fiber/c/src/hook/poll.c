@@ -243,11 +243,12 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 		if (acl_fiber_killed(pe.fiber)) {
 			acl_fiber_set_error(pe.fiber->errnum);
-			ring_detach(&pe.me);
+			timer_cache_remove(ev->poll_list, pe.expire, &pe.me);
+			pe.nready = -1;
+
 			msg_info("%s(%d), %s: fiber-%u was killed, %s",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(pe.fiber), last_serror());
-			pe.nready = -1;
 			break;
 		}
 
