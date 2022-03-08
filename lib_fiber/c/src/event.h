@@ -3,7 +3,7 @@
 
 #include "define.h"
 #include "common/gettimeofday.h"
-#include "common/avl.h"
+#include "common/timer_cache.h"
 
 #ifdef	HAS_EPOLL
 #include <sys/epoll.h>
@@ -193,8 +193,6 @@ struct EPOLL_EVENT {
 	int nready;
 };
 #endif
-
-typedef struct TIMER_CACHE TIMER_CACHE;
 
 struct EVENT {
 	RING events;

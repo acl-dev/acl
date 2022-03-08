@@ -93,6 +93,11 @@
 		07BED4CC21BA270A0060BBE4 /* fiber_cond.c in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4CB21BA270A0060BBE4 /* fiber_cond.c */; };
 		07BED4CE21BA271F0060BBE4 /* fbase_event.c in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4CD21BA271F0060BBE4 /* fbase_event.c */; };
 		07BED4D021BA27530060BBE4 /* fiber_cond.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4CF21BA27530060BBE4 /* fiber_cond.h */; };
+		7029801227D751F800DF6A41 /* avl.h in Headers */ = {isa = PBXBuildFile; fileRef = 7029800D27D751F800DF6A41 /* avl.h */; };
+		7029801327D751F800DF6A41 /* avl_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = 7029800E27D751F800DF6A41 /* avl_impl.h */; };
+		7029801427D751F800DF6A41 /* timer_cache.c in Sources */ = {isa = PBXBuildFile; fileRef = 7029800F27D751F800DF6A41 /* timer_cache.c */; };
+		7029801527D751F800DF6A41 /* timer_cache.h in Headers */ = {isa = PBXBuildFile; fileRef = 7029801027D751F800DF6A41 /* timer_cache.h */; };
+		7029801627D751F800DF6A41 /* avl.c in Sources */ = {isa = PBXBuildFile; fileRef = 7029801127D751F800DF6A41 /* avl.c */; };
 		70753A3D251F8F67005B6E56 /* unix_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3A251F8F67005B6E56 /* unix_jmp.h */; };
 		70753A3E251F8F67005B6E56 /* boost_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3B251F8F67005B6E56 /* boost_jmp.h */; };
 		70753A3F251F8F67005B6E56 /* exp_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3C251F8F67005B6E56 /* exp_jmp.h */; };
@@ -194,6 +199,11 @@
 		07BED4CB21BA270A0060BBE4 /* fiber_cond.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fiber_cond.c; path = c/src/fiber_cond.c; sourceTree = "<group>"; };
 		07BED4CD21BA271F0060BBE4 /* fbase_event.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = fbase_event.c; path = c/src/fbase_event.c; sourceTree = "<group>"; };
 		07BED4CF21BA27530060BBE4 /* fiber_cond.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fiber_cond.h; path = c/include/fiber/fiber_cond.h; sourceTree = "<group>"; };
+		7029800D27D751F800DF6A41 /* avl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avl.h; sourceTree = "<group>"; };
+		7029800E27D751F800DF6A41 /* avl_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = avl_impl.h; sourceTree = "<group>"; };
+		7029800F27D751F800DF6A41 /* timer_cache.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timer_cache.c; sourceTree = "<group>"; };
+		7029801027D751F800DF6A41 /* timer_cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer_cache.h; sourceTree = "<group>"; };
+		7029801127D751F800DF6A41 /* avl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = avl.c; sourceTree = "<group>"; };
 		70753A3A251F8F67005B6E56 /* unix_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unix_jmp.h; sourceTree = "<group>"; };
 		70753A3B251F8F67005B6E56 /* boost_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = boost_jmp.h; sourceTree = "<group>"; };
 		70753A3C251F8F67005B6E56 /* exp_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exp_jmp.h; sourceTree = "<group>"; };
@@ -274,6 +284,11 @@
 		070F353C2090225C00672EDC /* common */ = {
 			isa = PBXGroup;
 			children = (
+				7029800E27D751F800DF6A41 /* avl_impl.h */,
+				7029801127D751F800DF6A41 /* avl.c */,
+				7029800D27D751F800DF6A41 /* avl.h */,
+				7029800F27D751F800DF6A41 /* timer_cache.c */,
+				7029801027D751F800DF6A41 /* timer_cache.h */,
 				70C98421253FEE12003A9689 /* read_wait.c */,
 				070F353D2090225C00672EDC /* argv.c */,
 				070F353E2090225C00672EDC /* argv.h */,
@@ -428,6 +443,7 @@
 				070F35992090225C00672EDC /* gettimeofday.h in Headers */,
 				70753A3E251F8F67005B6E56 /* boost_jmp.h in Headers */,
 				070F35A32090225C00672EDC /* msg.h in Headers */,
+				7029801327D751F800DF6A41 /* avl_impl.h in Headers */,
 				07BED4D021BA27530060BBE4 /* fiber_cond.h in Headers */,
 				070F35A92090225C00672EDC /* ring.h in Headers */,
 				070F35AE2090225C00672EDC /* strops.h in Headers */,
@@ -449,6 +465,7 @@
 				070F35B52090225C00672EDC /* sane_inet.h in Headers */,
 				070F35322090220400672EDC /* fiber_base.h in Headers */,
 				070F35AB2090225C00672EDC /* sane_socket.h in Headers */,
+				7029801527D751F800DF6A41 /* timer_cache.h in Headers */,
 				070F35BF2090225C00672EDC /* event_poll.h in Headers */,
 				70753A3F251F8F67005B6E56 /* exp_jmp.h in Headers */,
 				070F35332090220400672EDC /* fiber_channel.h in Headers */,
@@ -456,6 +473,7 @@
 				070F35B02090225C00672EDC /* common.h in Headers */,
 				070F35C32090225C00672EDC /* event_wmsg.h in Headers */,
 				070F35382090220400672EDC /* fiber_sem.h in Headers */,
+				7029801227D751F800DF6A41 /* avl.h in Headers */,
 				070F35342090220400672EDC /* fiber_define.h in Headers */,
 				070F35392090220400672EDC /* lib_fiber.h in Headers */,
 			);
@@ -528,6 +546,7 @@
 				070F35982090225C00672EDC /* gettimeofday.c in Sources */,
 				070F35D12090225C00672EDC /* getaddrinfo.c in Sources */,
 				070F358D2090225C00672EDC /* channel.c in Sources */,
+				7029801427D751F800DF6A41 /* timer_cache.c in Sources */,
 				070F35C22090225C00672EDC /* event_wmsg.c in Sources */,
 				070F35CB2090225C00672EDC /* fiber_sem.c in Sources */,
 				070F35A42090225C00672EDC /* non_blocking.c in Sources */,
@@ -539,6 +558,7 @@
 				070F35C92090225C00672EDC /* fiber_io.c in Sources */,
 				070F35BC2090225C00672EDC /* event_kqueue.c in Sources */,
 				70C98422253FEE12003A9689 /* read_wait.c in Sources */,
+				7029801627D751F800DF6A41 /* avl.c in Sources */,
 				070F35A82090225C00672EDC /* ring.c in Sources */,
 				070F35C02090225C00672EDC /* event_select.c in Sources */,
 				070F35AD2090225C00672EDC /* strops.c in Sources */,
