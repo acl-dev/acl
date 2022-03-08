@@ -1,4 +1,4 @@
-%define release_id 7
+%define release_id 8
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Mar 08 2022
+- optimize: libfiber is ok!
 
 * Wed Feb 23 2022 shuxin.zheng@qq.com 3.5.3-7-20220223.11
 - optimize: optimize fiber module
