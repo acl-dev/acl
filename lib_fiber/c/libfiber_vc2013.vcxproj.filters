@@ -156,6 +156,15 @@
     <ClInclude Include="src\event\event_iocp.h">
       <Filter>源文件\event</Filter>
     </ClInclude>
+    <ClInclude Include="src\common\avl.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\avl_impl.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\timer_cache.h">
+      <Filter>源文件\common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\stdafx.c">
@@ -307,6 +316,12 @@
     </ClCompile>
     <ClCompile Include="src\event\event_iocp.c">
       <Filter>源文件\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\avl.c">
+      <Filter>源文件\common</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\timer_cache.c">
+      <Filter>源文件\common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

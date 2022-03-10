@@ -310,6 +310,8 @@
     <ClInclude Include="src\common\argv.h" />
     <ClInclude Include="src\common\array.h" />
     <ClInclude Include="src\common\atomic.h" />
+    <ClInclude Include="src\common\avl.h" />
+    <ClInclude Include="src\common\avl_impl.h" />
     <ClInclude Include="src\common\fifo.h" />
     <ClInclude Include="src\common\gettimeofday.h" />
     <ClInclude Include="src\common\htable.h" />
@@ -322,6 +324,7 @@
     <ClInclude Include="src\common\ring.h" />
     <ClInclude Include="src\common\sane_socket.h" />
     <ClInclude Include="src\common\strops.h" />
+    <ClInclude Include="src\common\timer_cache.h" />
     <ClInclude Include="src\define.h" />
     <ClInclude Include="src\dns\resolver.h" />
     <ClInclude Include="src\dns\rfc1035.h" />
@@ -344,6 +347,7 @@
     <ClCompile Include="src\common\argv.c" />
     <ClCompile Include="src\common\array.c" />
     <ClCompile Include="src\common\atomic.c" />
+    <ClCompile Include="src\common\avl.c" />
     <ClCompile Include="src\common\close_on_exec.c" />
     <ClCompile Include="src\common\doze.c" />
     <ClCompile Include="src\common\fifo.c" />
@@ -361,6 +365,7 @@
     <ClCompile Include="src\common\socketpair.c" />
     <ClCompile Include="src\common\strops.c" />
     <ClCompile Include="src\common\tcp_nodelay.c" />
+    <ClCompile Include="src\common\timer_cache.c" />
     <ClCompile Include="src\dns\resolver.c" />
     <ClCompile Include="src\dns\rfc1035.c" />
     <ClCompile Include="src\dns\sane_inet.c" />
