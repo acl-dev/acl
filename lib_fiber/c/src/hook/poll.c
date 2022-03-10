@@ -51,6 +51,14 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 
 	assert(timer_cache_size(ev->poll_list) > 0);
 
+	/*
+	 * If any fe has been ready, the pe holding fe should be removed from
+	 * ev->poll_list to avoid to be called in timeout process.
+	 * We should just remove pe only once by checking if the value of
+	 * pe->nready is 0. After the pe has been removed from the
+	 * ev->poll_list, the pe's callback will not be called again in the
+	 * timeout process in event_process_poll() in event.c.
+	 */
 	if (pfd->pe->nready == 0) {
 		timer_cache_remove(ev->poll_list, pfd->pe->expire, &pfd->pe->me);
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);

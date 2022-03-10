@@ -388,27 +388,30 @@ static void event_prepare(EVENT *ev)
 #ifdef HAS_POLL
 static void event_process_poll(EVENT *ev)
 {
-	RING_ITER   iter;
+	RING *head;
 	POLL_EVENT *pe;
 	long long   now = event_get_stamp(ev);
 	TIMER_CACHE_NODE *node = avl_first(&ev->poll_list->tree), *next;
 
+	/* Check and call all the pe's callback which was timeout except the
+	 * pe which has been ready and been removed from ev->poll_list. The
+	 * removing operations are in read_callback or write_callback in the
+	 * hook/poll.c.
+	 */
 	while (node && node->expire >= 0 && node->expire <= now) {
 		next = AVL_NEXT(&ev->poll_list->tree, node);
-		ring_foreach(iter, &node->ring) {
-			pe = TO_APPL(iter.ptr, POLL_EVENT, me);
+
+		// Call all the pe's callback with the same expire time.
+		while ((head = ring_pop_head(&node->ring)) != NULL) {
+			pe = TO_APPL(head, POLL_EVENT, me);
 			pe->proc(ev, pe);
 		}
+
 		timer_cache_free_node(ev->poll_list, node);
 		node = next;
 	}
 
-	while (1) {
-		RING *head = ring_pop_head(&ev->poll_ready);
-		if (head == NULL) {
-			break;
-		}
-
+	while ((head = ring_pop_head(&ev->poll_ready)) != NULL) {
 		pe = TO_APPL(head, POLL_EVENT, me);
 		pe->proc(ev, pe);
 	}

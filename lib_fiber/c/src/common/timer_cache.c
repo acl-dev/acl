@@ -90,21 +90,20 @@ void timer_cache_remove(TIMER_CACHE *cache, long long expire, RING *entry)
 
 	ring_detach(entry);
 
-	if (ring_size(&node->ring) > 0) {
-		return;
-	}
-
-	avl_remove(&cache->tree, node);
-
-	if (cache->cache_max > 0 && ring_size(&cache->caches) < cache->cache_max) {
-		ring_append(&cache->caches, &node->ring);
-	} else {
-		mem_free(node);
+	if (ring_size(&node->ring) == 0) {
+		timer_cache_free_node(cache, node);
 	}
 }
 
 void timer_cache_free_node(TIMER_CACHE *cache, TIMER_CACHE_NODE *node)
 {
+	// The node will be removed if it hasn't any entry.
 	avl_remove(&cache->tree, node);
-	mem_free(node);
+
+	// The node object can be cached for being reused in future.
+	if (cache->cache_max > 0 && ring_size(&cache->caches) < cache->cache_max) {
+		ring_append(&cache->caches, &node->ring);
+	} else {
+		mem_free(node);
+	}
 }
