@@ -525,6 +525,10 @@ void fiber_exit(int exit_code)
 void acl_fiber_ready(ACL_FIBER *fiber)
 {
 	if (fiber->status != FIBER_STATUS_EXITING) {
+		if (fiber->status == FIBER_STATUS_READY) {
+			ring_detach(&fiber->me);
+		}
+
 		fiber->status = FIBER_STATUS_READY;
 		assert(__thread_fiber);
 		ring_prepend(&__thread_fiber->ready, &fiber->me);
@@ -540,6 +544,7 @@ int acl_fiber_yield(void)
 	}
 
 	n = __thread_fiber->switched;
+	__thread_fiber->running->status = FIBER_STATUS_NONE;
 	acl_fiber_ready(__thread_fiber->running);
 	acl_fiber_switch();
 
@@ -671,7 +676,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->fn     = fn;
 	fiber->arg    = arg;
 	fiber->flag   = 0;
-	fiber->status = FIBER_STATUS_READY;
+	fiber->status = FIBER_STATUS_NONE;
 
 	fiber->waiting = NULL;
 	ring_init(&fiber->holding);

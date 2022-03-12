@@ -55,8 +55,8 @@ void fbase_event_open(FIBER_BASE *fbase)
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
 
-	//non_blocking(fbase->event_in, 1);
-	//non_blocking(fbase->event_out, 1);
+	non_blocking(fbase->event_in, 1);
+	non_blocking(fbase->event_out, 1);
 }
 
 void fbase_event_close(FIBER_BASE *fbase)
@@ -75,7 +75,7 @@ void fbase_event_close(FIBER_BASE *fbase)
 int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
-	int  ret, interrupt = 0;
+	int  ret, interrupt = 0, err;
 
 	if (fbase->event_in == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s: invalid event_in=%d",
@@ -95,22 +95,29 @@ int fbase_event_wait(FIBER_BASE *fbase)
 		if (ret >= 0) {
 			msg_fatal("%s(%d), %s: read ret=%d invalid length, "
 				"interrupt=%d, fd=%d", __FILE__, __LINE__,
-				__FUNCTION__, ret, interrupt, (int) fbase->event_in);
+				__FUNCTION__, ret, interrupt,
+				(int) fbase->event_in);
 		}
 
-		if (acl_fiber_last_error() == EINTR) {
+		err = acl_fiber_last_error();
+		if (err == EINTR) {
 			interrupt++;
 			msg_info("%s(%d), %s: read EINTR=%d, in=%d, ret=%d",
 				__FILE__, __LINE__, __FUNCTION__,
 				interrupt, (int) fbase->event_in, ret);
 			doze(1);
-			continue;
+		} else if (err == FIBER_EAGAIN) {
+			msg_info("%s(%d), %s: read EAGAIN, in=%d, ret=%d",
+				__FILE__, __LINE__, __FUNCTION__,
+				(int) fbase->event_in, ret);
+			doze(1);
+		} else {
+			msg_error("%s(%d), %s: read error %s, %d, in=%d, ret=%d,"
+				" interrupt=%d", __FILE__, __LINE__,
+				__FUNCTION__, last_serror(), err,
+				(int) fbase->event_in, ret, interrupt);
+			return -1;
 		}
-
-		msg_error("%s(%d), %s: read error %s, in=%d, ret=%d, "
-			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
-			last_serror(), (int) fbase->event_in, ret, interrupt);
-		return -1;
 	}
 
 	/**

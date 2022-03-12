@@ -212,6 +212,8 @@ static void pollfd_free(POLLFD *pfds)
 	mem_free(pfds);
 }
 
+#define	MAX_TIMEOUT	200000000
+
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long now;
@@ -225,6 +227,10 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	if (!var_hook_sys_api) {
 		return sys_poll ? (*sys_poll)(fds, nfds, timeout) : -1;
+	}
+
+	if (timeout < 0) {
+		timeout = MAX_TIMEOUT;
 	}
 
 	ev        = fiber_io_event();
@@ -247,16 +253,19 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		pe.fiber->status = FIBER_STATUS_POLL_WAIT;
 		acl_fiber_switch();
 
+		if (pe.nready == 0) {
+			timer_cache_remove(ev->poll_list, pe.expire, &pe.me);
+		}
+
 		ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(pe.fiber)) {
 			acl_fiber_set_error(pe.fiber->errnum);
-			timer_cache_remove(ev->poll_list, pe.expire, &pe.me);
 			pe.nready = -1;
 
-			msg_info("%s(%d), %s: fiber-%u was killed, %s",
+			msg_info("%s(%d), %s: fiber-%u was killed, %s, timeout=%d",
 				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(pe.fiber), last_serror());
+				acl_fiber_id(pe.fiber), last_serror(), timeout);
 			break;
 		}
 

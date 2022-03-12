@@ -14,7 +14,9 @@ extern void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
 */
 
 typedef enum {
+	FIBER_STATUS_NONE,
 	FIBER_STATUS_READY,
+	FIBER_STATUS_SUSPEND,
 	FIBER_STATUS_RUNNING,
 	FIBER_STATUS_WAIT_READ,
 	FIBER_STATUS_WAIT_WRITE,
@@ -113,7 +115,7 @@ EVENT *fiber_io_event(void);
 FILE_EVENT *fiber_file_open_read(socket_t fd);
 FILE_EVENT *fiber_file_open_write(socket_t fd);
 FILE_EVENT *fiber_file_get(socket_t fd);
-int fiber_file_close(socket_t fd, int *closed);
+int fiber_file_close(socket_t fd);
 
 /* in hook/epoll.c */
 int  epoll_event_close(int epfd);

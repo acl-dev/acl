@@ -223,6 +223,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 				fiber_count_dec();
 			}
 
+			timer->status = FIBER_STATUS_NONE;
 			acl_fiber_ready(timer);
 			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
 		} while (timer != NULL && now >= timer->when);
@@ -565,13 +566,12 @@ static int fiber_file_del(FILE_EVENT *fe)
 #endif
 }
 
-int fiber_file_close(socket_t fd, int *closed)
+int fiber_file_close(socket_t fd)
 {
 	FILE_EVENT *fe;
 	EVENT *event;
 	ACL_FIBER *curr;
-
-	*closed = 0;
+	int closed = 0;
 
 	fiber_io_check();
 	if (fd == INVALID_SOCKET || fd >= (socket_t) var_maxfd) {
@@ -607,11 +607,11 @@ int fiber_file_close(socket_t fd, int *closed)
 
 		// check if the fd has been closed which was set below.
 		if (IS_CLOSED(fe)) {
-			*closed = 1;
+			closed = 1;
 		}
 		fiber_file_del(fe);
 		file_event_free(fe);
-		return 0;
+		return closed ? 1: 0;
 	}
 
 	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
@@ -624,15 +624,15 @@ int fiber_file_close(socket_t fd, int *closed)
 		acl_fiber_kill(fe->fiber_r);
 
 		if (IS_CLOSED(fe)) {
-			*closed = 1;
+			closed = 1;
 		}
 		fiber_file_del(fe);
 		file_event_free(fe);
-		return 0;
+		return closed ? 1 : 0;
 	}
 
 	if (event->close_sock) {
-		*closed = event->close_sock(event, fe);
+		closed = event->close_sock(event, fe);
 		SET_CLOSED(fe);
 	}
 
@@ -643,7 +643,9 @@ int fiber_file_close(socket_t fd, int *closed)
 		return 0;
 	}
 
+	printf(">>>>%s: del and free fe=%p, fd=%d, type=%d, read fiber=%p, write fiber=%p, curr fiber=%p\n", __FUNCTION__, fe, fe->fd, fe->type, fe->fiber_r, fe->fiber_w, acl_fiber_running());
+
 	fiber_file_del(fe);
 	file_event_free(fe);
-	return 1;
+	return closed ? 1 : 0;
 }

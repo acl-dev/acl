@@ -12,7 +12,6 @@ unsigned int sleep(unsigned int seconds)
 			hook_once();
 		}
 
-		//printf("use system gettimeofday\r\n");
 		return (*sys_sleep)(seconds);
 	}
 
@@ -27,7 +26,7 @@ int close(socket_t fd)
 
 int WINAPI acl_fiber_close(socket_t fd)
 {
-	int ret, closed;
+	int ret;
 	if (fd == INVALID_SOCKET) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
@@ -55,10 +54,16 @@ int WINAPI acl_fiber_close(socket_t fd)
 	}
 #endif
 
-	(void) fiber_file_close(fd, &closed);
-	if (closed) {
-		/* return if the socket has been closed in fiber_file_close */
+	switch (fiber_file_close(fd)) {
+	case 0:
+		break;
+	case 1:
 		return 0;
+	case -1:
+		return (*sys_close)(fd);
+	default:
+		msg_fatal("%s(%d), fd=%d", __FUNCTION__, __LINE__, fd);
+		return -1;
 	}
 
 	ret = (*sys_close)(fd);
@@ -150,12 +155,23 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		ssize_t ret;
 		int err;
 
+		if (acl_fiber_canceled(fe->fiber_r)) {
+			acl_fiber_set_error(fe->fiber_r->errnum);
+			//return -1;
+		}
+
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
 		} else if (fiber_wait_read(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d, fe=%p",
+				__FUNCTION__, __LINE__, last_serror(), (int) fd, fe);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) fd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -208,6 +224,12 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) fd);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) fd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -265,6 +287,12 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 			err = acl_fiber_last_error();
 			fiber_save_errno(err);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) fe->fd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -345,6 +373,12 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 			return -1;
 		}
 
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) sockfd);
+			return 0;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -413,6 +447,12 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 			return -1;
 		}
 
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) sockfd);
+			return 0;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -463,6 +503,12 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) sockfd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_r)) {
@@ -535,6 +581,12 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 			return -1;
 		}
 
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) fd);
+			return 0;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
@@ -577,6 +629,12 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) fd);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) fd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -634,6 +692,12 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 			return -1;
 		}
 
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) sockfd);
+			return 0;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
@@ -689,6 +753,12 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 			return -1;
 		}
 
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) sockfd);
+			return 0;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
@@ -732,6 +802,12 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) sockfd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -834,6 +910,12 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) out_fd);
 			return -1;
+		}
+
+		if (IS_CLOSING(fe)) {
+			msg_info("%s(%d): fd=%d being closing",
+				__FUNCTION__, __LINE__, (int) out_fd);
+			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {

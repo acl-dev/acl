@@ -165,6 +165,7 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 			return 1;
 		case EBADF:
 			fe->type = TYPE_BADFD;
+			msg_error("%s(%d): badfd=%d, fe=%p", fe->fd, fe);
 			return -1;
 		default:
 			fe->type = TYPE_NOSOCK;
@@ -388,6 +389,7 @@ static void event_prepare(EVENT *ev)
 #ifdef HAS_POLL
 static void event_process_poll(EVENT *ev)
 {
+	RING_ITER iter;
 	RING *head;
 	POLL_EVENT *pe;
 	long long   now = event_get_stamp(ev);
@@ -402,12 +404,11 @@ static void event_process_poll(EVENT *ev)
 		next = AVL_NEXT(&ev->poll_list->tree, node);
 
 		// Call all the pe's callback with the same expire time.
-		while ((head = ring_pop_head(&node->ring)) != NULL) {
-			pe = TO_APPL(head, POLL_EVENT, me);
+		ring_foreach(iter, &node->ring) {
+			pe = TO_APPL(iter.ptr, POLL_EVENT, me);
 			pe->proc(ev, pe);
 		}
 
-		timer_cache_free_node(ev->poll_list, node);
 		node = next;
 	}
 
