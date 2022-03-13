@@ -138,17 +138,17 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (S_ISSOCK(s.st_mode)) {
-		return 0;
+		return 1;
 	}
 	if (S_ISFIFO(s.st_mode)) {
-		return 0;
+		return 1;
 	}
 
 	if (S_ISCHR(s.st_mode)) {
-		return 0;
+		return 1;
 	}
 	if (isatty(fe->fd)) {
-		return 0;
+		return 1;
 	}
 
 	return ev->checkfd(ev, fe);
@@ -160,19 +160,21 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1) {
 		switch (errno) {
 		case ESPIPE:
-			fe->type = TYPE_SOCK;
+			fe->type = TYPE_SPIPE;
 			acl_fiber_set_error(0);
 			return 1;
 		case EBADF:
 			fe->type = TYPE_BADFD;
-			msg_error("%s(%d): badfd=%d, fe=%p", fe->fd, fe);
+			msg_error("%s(%d): badfd=%d, fe=%p",
+				__FUNCTION__, __LINE__, fe->fd, fe);
 			return -1;
 		default:
-			fe->type = TYPE_NOSOCK;
-			return -1;
+			fe->type = TYPE_FILE;
+			acl_fiber_set_error(0);
+			return 0;
 		}
 	} else {
-		fe->type = TYPE_NOSOCK;
+		fe->type = TYPE_FILE;
 		acl_fiber_set_error(0);
 		return 0;
 	}
@@ -220,12 +222,24 @@ static int check_write_wait(EVENT *ev, FILE_EVENT *fe)
 
 int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
-	assert(fe);
+	if (fe->type == TYPE_NONE) {
+		int ret = event_checkfd(ev, fe);
+		if (ret <= 0) {
+			return ret;
+		}
+	}
 
 	// if the fd's type has been checked and it isn't a valid socket,
 	// return immediately.
-	if (fe->type > TYPE_SOCK) {
-		return 0;
+	if (fe->type != TYPE_SPIPE) {
+		switch (fe->type) {
+		case TYPE_FILE:
+			return 0;
+		case TYPE_BADFD:
+			return -1;
+		default:
+			return -1;
+		}
 	}
 
 	if (fe->fd >= (socket_t) ev->setsize) {
@@ -240,13 +254,6 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 	if (!(fe->mask & EVENT_READ)) {
 		// we should check the fd's type for the first time.
-		if (fe->type == TYPE_NONE) {
-			int ret = event_checkfd(ev, fe);
-			if (ret <= 0) {
-				return ret;
-			}
-		}
-
 		if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
@@ -260,10 +267,22 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 {
-	assert(fe);
+	if (fe->type == TYPE_NONE) {
+		int ret = event_checkfd(ev, fe);
+		if (ret <= 0) {
+			return ret;
+		}
+	}
 
-	if (fe->type > TYPE_SOCK) {
-		return 0;
+	if (fe->type != TYPE_SPIPE) {
+		switch (fe->type) {
+		case TYPE_FILE:
+			return 0;
+		case TYPE_BADFD:
+			return -1;
+		default:
+			return -1;
+		}
 	}
 
 	if (fe->fd >= (socket_t) ev->setsize) {
@@ -277,13 +296,6 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_WRITE)) {
-		if (fe->type == TYPE_NONE) {
-			int ret = event_checkfd(ev, fe);
-			if (ret <= 0) {
-				return ret;
-			}
-		}
-
 		if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
@@ -297,8 +309,6 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 
 void event_del_read(EVENT *ev, FILE_EVENT *fe)
 {
-	assert(fe);
-
 	if (fe->oper & EVENT_ADD_READ) {
 		fe->oper &=~EVENT_ADD_READ;
 	}
@@ -316,8 +326,6 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe)
 
 void event_del_write(EVENT *ev, FILE_EVENT *fe)
 {
-	assert(fe);
-
 	if (fe->oper & EVENT_ADD_WRITE) {
 		fe->oper &= ~EVENT_ADD_WRITE;
 	}

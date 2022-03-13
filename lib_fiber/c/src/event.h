@@ -106,8 +106,8 @@ struct FILE_EVENT {
 
 	unsigned type;
 #define	TYPE_NONE		0
-#define	TYPE_SOCK		1
-#define	TYPE_NOSOCK		2
+#define	TYPE_SPIPE		1
+#define	TYPE_FILE		2
 #define	TYPE_BADFD		3
 
 	unsigned oper;
