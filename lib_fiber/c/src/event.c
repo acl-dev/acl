@@ -121,7 +121,7 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 		fe->type = TYPE_SOCK;
 		return 1;
 	} else {
-		fe->type = TYPE_NOSOCK;
+		fe->type = TYPE_FILE;
 		return 0;
 	}
 }
@@ -236,8 +236,18 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		case TYPE_FILE:
 			return 0;
 		case TYPE_BADFD:
+#ifdef SYS_UNIX
+			acl_fiber_set_error(EBADF);
+#endif
+			msg_error("%s(%d): invalid fd=%d", __FUNCTION__,
+				__LINE__, (int) fe->fd);
 			return -1;
 		default:
+#ifdef SYS_UNIX
+			acl_fiber_set_error(EINVAL);
+#endif
+			msg_error("%s(%d): invalid type=%d, fd=%d",
+				__FUNCTION__, __LINE__, fe->type, (int) fe->fd);
 			return -1;
 		}
 	}

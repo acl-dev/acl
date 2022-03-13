@@ -640,7 +640,8 @@ int fiber_file_close(socket_t fd)
 		// set the fd being closed status will be used above
 		// after acl_fiber_kill come back and checking it.
 		SET_CLOSED(fe);
-		return 0;
+
+		return closed ? 1 : 0;
 	}
 
 	printf(">>>>%s: del and free fe=%p, fd=%d, type=%d, read fiber=%p, write fiber=%p, curr fiber=%p\n", __FUNCTION__, fe, fe->fd, fe->type, fe->fiber_r, fe->fiber_w, acl_fiber_running());
