@@ -30,11 +30,6 @@ int WINAPI acl_fiber_close(socket_t fd)
 	FILE_EVENT *fe;
 	EVENT *ev;
 
-	if (fd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
-		return -1;
-	}
-
 	if (sys_close == NULL) {
 		hook_once();
 		if (sys_close == NULL) {
@@ -228,7 +223,13 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			fiber_file_free(fe);
+			// If the fd is a descriptor but not a socket, the
+			// above fiber_wait_read() must return 0, so we must
+			// free the fe here because the fd isn't monitored by
+			// the event engine.
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
@@ -281,7 +282,9 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			fiber_file_free(fe);
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
@@ -338,7 +341,9 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			fiber_file_free(fe);
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
@@ -418,7 +423,9 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			fiber_file_free(fe);
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
@@ -487,7 +494,9 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			fiber_file_free(fe);
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
@@ -540,7 +549,9 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			fiber_file_free(fe);
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
@@ -554,8 +565,8 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 // from connecting process.
 #define CHECK_SET_NBLOCK(_fd) do { \
 	if (var_hook_sys_api) { \
-		FILE_EVENT *fe = fiber_file_open_write(_fd); \
-		if (IS_NDUBLOCK(fe)) { \
+		FILE_EVENT *fe = fiber_file_get(_fd); \
+		if (fe && IS_NDUBLOCK(fe)) { \
 			non_blocking(_fd, NON_BLOCKING); \
 			CLR_NDUBLOCK(fe); \
 		} \

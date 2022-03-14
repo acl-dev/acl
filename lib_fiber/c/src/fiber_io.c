@@ -609,6 +609,6 @@ void fiber_file_close(FILE_EVENT *fe)
 
 		CLR_WRITEWAIT(fe);
 		SET_CLOSING(fe);
-		acl_fiber_kill(fe->fiber_r);
+		acl_fiber_kill(fe->fiber_w);
 	}
 }
