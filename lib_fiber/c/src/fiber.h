@@ -115,7 +115,8 @@ EVENT *fiber_io_event(void);
 FILE_EVENT *fiber_file_open_read(socket_t fd);
 FILE_EVENT *fiber_file_open_write(socket_t fd);
 FILE_EVENT *fiber_file_get(socket_t fd);
-int fiber_file_close(socket_t fd);
+void fiber_file_free(FILE_EVENT *fe);
+void fiber_file_close(FILE_EVENT *fe);
 
 /* in hook/epoll.c */
 int  epoll_event_close(int epfd);

@@ -27,6 +27,9 @@ int close(socket_t fd)
 int WINAPI acl_fiber_close(socket_t fd)
 {
 	int ret;
+	FILE_EVENT *fe;
+	EVENT *ev;
+
 	if (fd == INVALID_SOCKET) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
@@ -44,6 +47,14 @@ int WINAPI acl_fiber_close(socket_t fd)
 		return (*sys_close)(fd);
 	}
 
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
+		return -1;
+	} else if (fd >= (socket_t) var_maxfd) {
+		msg_error("%s(%d): too large fd=%u", __FUNCTION__, __LINE__, fd);
+		return (*sys_close)(fd);
+	}
+
 #ifdef	HAS_EPOLL
 	/* when the fd was closed by epoll_event_close normally, the fd
 	 * must be a epoll fd which was created by epoll_create function
@@ -54,24 +65,49 @@ int WINAPI acl_fiber_close(socket_t fd)
 	}
 #endif
 
-	switch (fiber_file_close(fd)) {
-	case 0:
-		break;
-	case 1:
-		return 0;
-	case -1:
-		return (*sys_close)(fd);
-	default:
-		msg_fatal("%s(%d), fd=%d", __FUNCTION__, __LINE__, fd);
-		return -1;
-	}
-
-	ret = (*sys_close)(fd);
-	if (ret == 0) {
+	// The fd should be closed directly if no fe hoding it.
+	fe = fiber_file_get(fd);
+	if (fe == NULL) {
+		ret = (*sys_close)(fd);
+		if (ret != 0) {
+			fiber_save_errno(acl_fiber_last_error());
+		}
 		return ret;
 	}
 
-	fiber_save_errno(acl_fiber_last_error());
+	// If the fd is in the status waiting for IO ready, the current fiber
+	// is trying to close the other fiber's fd, so, we should wakeup the
+	// suspending fiber and wait for its returning back, the process is:
+	// ->killer kill the fiber which is suspending and holding the fd;
+	// ->suspending fiber wakeup and return;
+	// ->killer closing the fd and free the fe.
+
+	// If the fd isn't in waiting status, we don't know which fiber is
+	// holding the fd, but we can close it and free the fe with it.
+	// If the current fiber is holding the fd, we just close it ok, else
+	// if the other fiber is holding it, the IO API such as acl_fiber_read
+	// should hanlding the fd carefully, the process is:
+	// ->killer closing the fd and free fe owned by itself or other fiber;
+	// ->if fd was owned by the other fiber, calling API like acl_fiber_read
+	//   will return -1 after fiber_wait_read returns.
+
+	fiber_file_close(fe);
+
+	ev = fiber_io_event();
+	if (ev && ev->close_sock) {
+		ret = ev->close_sock(ev, fe);
+		if (ret == 0) {
+			ret = (*sys_close)(fd);
+		}
+	} else {
+		ret = (*sys_close)(fd);
+	}
+
+	fiber_file_free(fe);
+
+	if (ret != 0) {
+		fiber_save_errno(acl_fiber_last_error());
+	}
 	return ret;
 }
 
@@ -155,25 +191,29 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		ssize_t ret;
 		int err;
 
-		if (acl_fiber_canceled(fe->fiber_r)) {
-			acl_fiber_set_error(fe->fiber_r->errnum);
-			//return -1;
-		}
-
 		if (IS_READABLE(fe)) {
 			CLR_READABLE(fe);
-		} else if (fiber_wait_read(fe) < 0) {
+		}
+
+		// The fiber_wait_read will return three status:
+		// 1: The fd is a valid socket/pipe/fifo, which can be
+		//    monitored by event engine, such as epoll, select or poll;
+		// 0: The fd isn't a socket/pipe/fifo, maybe a file, and can't
+		//    be monitored by event engine and can read directly;
+		// -1: The fd isn't a valid descriptor, just return error, and
+		//   the fe should be freed.
+		else if (fiber_wait_read(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d, fe=%p",
 				__FUNCTION__, __LINE__, last_serror(), (int) fd, fe);
+			fiber_file_free(fe);
 			return -1;
 		}
 
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) fd);
-			return 0;
-		}
-
+		// If the suspending fiber wakeup for the reason that it was
+		// killed by the other fiber which called acl_fiber_kill and
+		// want to close the fd owned by the current fiber, we just
+		// set the errno status and return -1, and the killer fiber
+		// will close the fd in acl_fiber_close API.
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -188,6 +228,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
+			fiber_file_free(fe);
 			return -1;
 		}
 	}
@@ -226,12 +267,6 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 			return -1;
 		}
 
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) fd);
-			return 0;
-		}
-
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -246,6 +281,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
+			fiber_file_free(fe);
 			return -1;
 		}
 	}
@@ -289,12 +325,6 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 			return -1;
 		}
 
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) fe->fd);
-			return 0;
-		}
-
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -308,6 +338,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
+			fiber_file_free(fe);
 			return -1;
 		}
 	}
@@ -373,12 +404,6 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 			return -1;
 		}
 
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) sockfd);
-			return 0;
-		}
-
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -393,6 +418,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
+			fiber_file_free(fe);
 			return -1;
 		}
 	}
@@ -447,12 +473,6 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 			return -1;
 		}
 
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) sockfd);
-			return 0;
-		}
-
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -467,6 +487,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
+			fiber_file_free(fe);
 			return -1;
 		}
 	}
@@ -505,12 +526,6 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 			return -1;
 		}
 
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) sockfd);
-			return 0;
-		}
-
 		if (acl_fiber_canceled(fe->fiber_r)) {
 			acl_fiber_set_error(fe->fiber_r->errnum);
 			return -1;
@@ -525,6 +540,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
+			fiber_file_free(fe);
 			return -1;
 		}
 	}
@@ -533,7 +549,10 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 
 /****************************************************************************/
 
-#define check_and_set_nblock(_fd) do { \
+// In the API connect() being hooked in hook/socket.c, the STATUS_NDUBLOCK
+// flag was set and the fd was in non-block status in order to return imaginary
+// from connecting process.
+#define CHECK_SET_NBLOCK(_fd) do { \
 	if (var_hook_sys_api) { \
 		FILE_EVENT *fe = fiber_file_open_write(_fd); \
 		if (IS_NDUBLOCK(fe)) { \
@@ -546,11 +565,16 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 #ifdef SYS_UNIX
 ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
 	if (sys_write == NULL) {
 		hook_once();
 	}
 
-	check_and_set_nblock(fd);
+	CHECK_SET_NBLOCK(fd);
 
 	while (1) {
 		ssize_t n = (*sys_write)(fd, buf, count);
@@ -578,13 +602,8 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			fiber_file_free(fe);
 			return -1;
-		}
-
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) fd);
-			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -596,11 +615,16 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
 	if (sys_writev == NULL) {
 		hook_once();
 	}
 
-	check_and_set_nblock(fd);
+	CHECK_SET_NBLOCK(fd);
 
 	while (1) {
 		int n = (int) (*sys_writev)(fd, iov, iovcnt);
@@ -628,13 +652,8 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			fiber_file_free(fe);
 			return -1;
-		}
-
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) fd);
-			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -653,6 +672,11 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 	size_t len, int flags)
 #endif
 {
+	if (sockfd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
 	if (sys_send == NULL) {
 		hook_once();
 		if (sys_send == NULL) {
@@ -661,7 +685,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		}
 	}
 
-	check_and_set_nblock(sockfd);
+	CHECK_SET_NBLOCK(sockfd);
 
 	while (1) {
 		int n = (int) (*sys_send)(sockfd, buf, len, flags);
@@ -689,13 +713,8 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			fiber_file_free(fe);
 			return -1;
-		}
-
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) sockfd);
-			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -713,6 +732,11 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #endif
 {
+	if (sockfd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
 	if (sys_sendto == NULL) {
 		hook_once();
 		if (sys_sendto == NULL) {
@@ -721,7 +745,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		}
 	}
 
-	check_and_set_nblock(sockfd);
+	CHECK_SET_NBLOCK(sockfd);
 
 	while (1) {
 		int n = (int) (*sys_sendto)(sockfd, buf, len, flags,
@@ -750,13 +774,8 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			fiber_file_free(fe);
 			return -1;
-		}
-
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) sockfd);
-			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -769,11 +788,16 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 #ifdef SYS_UNIX
 ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
+	if (sockfd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
+		return -1;
+	}
+
 	if (sys_sendmsg == NULL) {
 		hook_once();
 	}
 
-	check_and_set_nblock(sockfd);
+	CHECK_SET_NBLOCK(sockfd);
 
 	while (1) {
 		ssize_t n = (*sys_sendmsg)(sockfd, msg, flags);
@@ -801,13 +825,8 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
+			fiber_file_free(fe);
 			return -1;
-		}
-
-		if (IS_CLOSING(fe)) {
-			msg_info("%s(%d): fd=%d being closing",
-				__FUNCTION__, __LINE__, (int) sockfd);
-			return 0;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {
@@ -881,11 +900,16 @@ ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 #if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
 ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
+	if (out_fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, out_fd);
+		return -1;
+	}
+
 	if (sys_sendfile64 == NULL) {
 		hook_once();
 	}
 
-	check_and_set_nblock(out_fd);
+	CHECK_SET_NBLOCK(out_fd);
 
 	while (1) {
 		ssize_t n = (*sys_sendfile64)(out_fd, in_fd, offset, count);
@@ -909,6 +933,7 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) out_fd);
+			fiber_file_free(fe);
 			return -1;
 		}
 

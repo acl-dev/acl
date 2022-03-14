@@ -64,15 +64,15 @@ struct FILE_EVENT {
 	int id;
 	unsigned status;
 #define	STATUS_NONE		0
-#define	STATUS_CONNECTING	(unsigned) (1 << 0)
-#define	STATUS_READABLE		(unsigned) (1 << 1)
-#define	STATUS_WRITABLE		(unsigned) (1 << 2)
-#define	STATUS_POLLING		(unsigned) (1 << 3)
-#define	STATUS_NDUBLOCK		(unsigned) (1 << 4)
-#define	STATUS_READWAIT		(unsigned) (1 << 5)
-#define	STATUS_WRITEWAIT	(unsigned) (1 << 6)
-#define	STATUS_CLOSING		(unsigned) (1 << 7)
-#define	STATUS_CLOSED		(unsigned) (1 << 8)
+#define	STATUS_CONNECTING	(unsigned) (1 << 0)	// In connecting status
+#define	STATUS_READABLE		(unsigned) (1 << 1)	// Ready for reading
+#define	STATUS_WRITABLE		(unsigned) (1 << 2)	// Ready for writing
+#define	STATUS_POLLING		(unsigned) (1 << 3)	// In polling status
+#define	STATUS_NDUBLOCK		(unsigned) (1 << 4)	// If need to set unblock
+#define	STATUS_READWAIT		(unsigned) (1 << 5)	// Wait for readable
+#define	STATUS_WRITEWAIT	(unsigned) (1 << 6)	// Wait for Writable
+#define	STATUS_CLOSING		(unsigned) (1 << 7)	// In closing status
+#define	STATUS_CLOSED		(unsigned) (1 << 8)	// In closed status
 
 #define	SET_CONNECTING(x)	((x)->status |= STATUS_CONNECTING)
 #define	SET_READABLE(x)		((x)->status |= STATUS_READABLE)

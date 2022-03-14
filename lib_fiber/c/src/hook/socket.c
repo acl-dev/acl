@@ -278,6 +278,12 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 # endif
 #endif
 
+	// The socket must be set to in no blocking status to avoid to be
+	// blocked by the sys_connect API. If sys_connect returns an error
+	// which is FIBER_EINPROGRESS or FIBER_EAGAIN and the original status
+	// of the socket is blocking, the socket should be be in waiting for
+	// writable by calling fiber_wait_write, which is just like the
+	// connecting process being in blocking mode.
 	nblock = is_non_blocking(sockfd);
 	if (!nblock) {
 		non_blocking(sockfd, NON_BLOCKING);

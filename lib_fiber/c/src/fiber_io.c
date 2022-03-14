@@ -566,28 +566,24 @@ static int fiber_file_del(FILE_EVENT *fe)
 #endif
 }
 
-int fiber_file_close(socket_t fd)
+void fiber_file_free(FILE_EVENT *fe)
 {
-	FILE_EVENT *fe;
-	EVENT *event;
+	fiber_file_del(fe);
+	file_event_free(fe);
+}
+
+void fiber_file_close(FILE_EVENT *fe)
+{
 	ACL_FIBER *curr;
-	int closed = 0;
 
+	assert(fe);
 	fiber_io_check();
-	if (fd == INVALID_SOCKET || fd >= (socket_t) var_maxfd) {
-		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
-		return -1;
-	}
 
-	fe = fiber_file_get(fd);
-	if (fe == NULL) {
-		return 0;
-	}
-
-	event = __thread_fiber->event;
-
-	// at first, we should remove the IO event for the fd.
+	// At first, we should remove the IO event for the fd.
 	if (!IS_CLOSING(fe)) {
+		EVENT *event;
+
+		event = __thread_fiber->event;
 		event_close(event, fe);
 	}
 
@@ -598,23 +594,15 @@ int fiber_file_close(socket_t fd)
 		//&& fe->fiber_r->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_r->status <= FIBER_STATUS_EPOLL_WAIT) {
 
-		// the current fiber is closing another fiber's fd, so we
-		// should be very carefully. we just set the CLOSING flag to
-		// stop the fe be freed in the killed fiber.
+		// The current fiber is closing the other fiber's fd, and the
+		// other fiber hoding the fd is blocked by waiting for the
+		// fd to be ready, so we just notify the blocked fiber to
+		// wakeup from read waiting status.
+
 		SET_CLOSING(fe);
 		CLR_READWAIT(fe);
 		acl_fiber_kill(fe->fiber_r);
-
-		// check if the fd has been closed which was set below.
-		if (IS_CLOSED(fe)) {
-			closed = 1;
-		}
-		fiber_file_del(fe);
-		file_event_free(fe);
-		return closed ? 1: 0;
-	}
-
-	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
+	} else if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
 		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
 		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {
@@ -622,31 +610,5 @@ int fiber_file_close(socket_t fd)
 		CLR_WRITEWAIT(fe);
 		SET_CLOSING(fe);
 		acl_fiber_kill(fe->fiber_r);
-
-		if (IS_CLOSED(fe)) {
-			closed = 1;
-		}
-		fiber_file_del(fe);
-		file_event_free(fe);
-		return closed ? 1 : 0;
 	}
-
-	if (event->close_sock) {
-		closed = event->close_sock(event, fe);
-		SET_CLOSED(fe);
-	}
-
-	if (IS_CLOSING(fe)) {
-		// set the fd being closed status will be used above
-		// after acl_fiber_kill come back and checking it.
-		SET_CLOSED(fe);
-
-		return closed ? 1 : 0;
-	}
-
-	printf(">>>>%s: del and free fe=%p, fd=%d, type=%d, read fiber=%p, write fiber=%p, curr fiber=%p\n", __FUNCTION__, fe, fe->fd, fe->type, fe->fiber_r, fe->fiber_w, acl_fiber_running());
-
-	fiber_file_del(fe);
-	file_event_free(fe);
-	return closed ? 1 : 0;
 }
