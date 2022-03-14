@@ -118,7 +118,7 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 		return 1;
 	}
 	if (ev->checkfd(ev, fe) == 0) {
-		fe->type = TYPE_SOCK;
+		fe->type = TYPE_SPIPE;
 		return 1;
 	} else {
 		fe->type = TYPE_FILE;
