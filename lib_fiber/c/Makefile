@@ -7,6 +7,8 @@ ARFL    = rv
 #ARFL    = cru
 RANLIB  = ${ENV_RANLIB}
 
+JMP_CTX = USE_JMP_DEF
+
 CFLAGS = -c -g -W \
 -std=gnu99 \
 -fPIC \
@@ -20,10 +22,10 @@ CFLAGS = -c -g -W \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_RING \
--DUSE_JMP_DEF \
+#-DUSE_JMP_DEF \
+#-DUSE_BOOST_JMP \
 #-DUSE_VALGRIND \
 #-DUSE_FAST_TIME \
-#-DUSE_BOOST_JMP \
 #-Waggregate-return \
 #-DDEBUG_MEM \
 #-I/usr/local/include
@@ -95,6 +97,9 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
 		  -Wno-deprecated-declarations
+	ifeq ($(findstring arm64, $(UNIXNAME)), aram64)
+		JMP_CTX = USE_BOOST_JMP
+	endif
 endif
 
 # For Linux
@@ -130,10 +135,14 @@ ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	UNIXTYPE = HPUX
 endif
 
+# set which jump lib should be used
+CFLAGS += -D$(JMP_CTX)
+
 #Find system type.
 ifneq ($(SYSPATH),)
 	CHECKSYSRES = @echo "System is $(shell uname -sm)"
 endif
+
 ###########################################################
 
 LIB_PATH_DST = ../lib
