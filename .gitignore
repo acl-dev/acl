@@ -155,3 +155,5 @@ android/acl/gradle
 .idea
 .vs
 .vscode
+
+cmake-build-debug
