@@ -19,6 +19,7 @@ namespace acl
 HttpServlet::HttpServlet(socket_stream* stream, session* session)
 : req_(NULL)
 , res_(NULL)
+, parse_body_(true)
 , stream_(stream)
 {
 	init();
@@ -88,8 +89,9 @@ HttpServlet& HttpServlet::setRwTimeout(int rw_timeout)
 	return *this;
 }
 
-HttpServlet& HttpServlet::setParseBody(bool)
+HttpServlet& HttpServlet::setParseBody(bool yes)
 {
+	parse_body_ = yes;
 	return *this;
 }
 
@@ -161,6 +163,7 @@ bool HttpServlet::start(void)
 	res_ = NEW HttpServletResponse(*out);
 	req_ = NEW HttpServletRequest(*res_, *session_, *in, local_charset_,
 			parse_body_limit_);
+	req_->setParseBody(parse_body_);
 
 	// ÉèÖÃ HttpServletRequest ¶ÔÏó
 	res_->setHttpServletRequest(req_);

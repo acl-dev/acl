@@ -81,8 +81,7 @@ bool http_servlet::on_hello(request_t& req, response_t& res)
 			return false;
 		}
 
-		if (i % 10000 == 0)
-		{
+		if (i % 10000 == 0) {
 			sleep(1);
 			printf("i=%d\n", (int) i);
 		}

@@ -61,13 +61,17 @@ bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
 	acl::string addr;
 	addr.format("%s|%d", buf.c_str(), port_);
 
-	if (conn.open(addr, 0, 0)) {
-		logger("connect %s ok", addr.c_str());
-		return true;
+	if (!conn.open(addr, 0, 0)) {
+		logger_error("connect %s error %s",
+			addr.c_str(), acl::last_serror());
+		return false;
 	}
 
-	logger_error("connect %s error %s", addr.c_str(), acl::last_serror());
-	return false;
+	logger("connect %s ok", addr.c_str());
+
+	bool is_request = true, unzip = false, fixed_stream = true;
+	client_ = new acl::http_client(&conn, is_request, unzip, fixed_stream);
+	return true;
 }
 
 bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
@@ -85,8 +89,7 @@ bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
 		return false;
 	}
 
-	//printf(">>>send head: [%s]\r\n", header.c_str());
-	client_ = new acl::http_client(&conn, true);
+	printf(">>>send head: [%s]\r\n", header.c_str());
 	return true;
 }
 
@@ -155,6 +158,7 @@ bool http_transfer::transfer_response(void) {
 		logger_error("read response head error");
 		return false;
 	}
+	client_->header_update("Connection", "Close");
 
 	acl::string header;
 	client_->sprint_header(header, NULL);
@@ -173,26 +177,41 @@ bool http_transfer::transfer_response(void) {
 		return false;
 	}
 
+	acl::http_client* out_client = res_.getClient();
+	assert(out_client);
+
 	long long length = client_->body_length();
 	if (length == 0) {
 		return client_->is_server_keep_alive();
 	}
 
+	HTTP_HDR_RES* hdr_res = client_->get_respond_head(NULL);
+	assert(hdr_res);
+	bool chunked = hdr_res->hdr.chunked ? true : false;
+
 	char buf[8192];
+
 	while (true) {
 		int ret = client_->read_body(buf, sizeof(buf));
 		if (ret <= 0) {
 			break;
+		} else if (chunked) {
+			if (!out_client->write_chunk(out, buf, ret)) {
+				logger_error("send response body error");
+				return false;
+			}
 		} else if (out.write(buf, ret) == -1) {
 			logger_error("send response body error");
 			return false;
 		}
 	}
 
-
-	if (length < 0) {
-		return false;
+	if (chunked) {
+		if (!out_client->write_chunk_trailer(out)) {
+			logger_error("write chunked trailer error");
+			return false;
+		}
 	}
 
-	return client_->is_server_keep_alive();
+	return client_->is_server_keep_alive() && false;
 }
