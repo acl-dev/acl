@@ -52,7 +52,6 @@ public:
 	 * 该函数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，
 	 * 即使调用本方法设置了解析数据，也不会对数据体进行解析
 	 * @param yes {bool} 是否需要解析
-	 * @return {HttpServlet&}
 	 */
 	void setParseBody(bool yes);
 
