@@ -181,6 +181,7 @@ struct EPOLL_CTX {
 
 struct EPOLL_EVENT {
 	RING        me;
+
 	ACL_FIBER  *fiber;
 	epoll_proc *proc;
 	size_t      nfds;
@@ -212,7 +213,8 @@ struct EVENT {
 #endif
 
 #ifdef HAS_EPOLL
-	RING   epoll_list;
+	TIMER_CACHE *epoll_list;
+	RING   epoll_ready;
 #endif
 
 	unsigned waiter;

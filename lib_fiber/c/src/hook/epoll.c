@@ -224,7 +224,7 @@ int epoll_create1(int flags)
 }
 #endif
 
-static void read_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
+static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	EPOLL_CTX  *epx = fe->epx;
 	EPOLL_EVENT *ee = epx->ee;
@@ -239,6 +239,12 @@ static void read_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	ee->events[ee->nready].events |= EPOLLIN;
 	memcpy(&ee->events[ee->nready].data, &ee->fds[epx->fd]->data,
 		sizeof(ee->fds[epx->fd]->data));
+
+	if (ee->nready == 0) {
+		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
+		ring_prepend(&ev->epoll_ready, &ee->me);
+	}
+
 	if (!(ee->events[ee->nready].events & EPOLLOUT)) {
 		ee->nready++;
 	}
@@ -259,6 +265,12 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	ee->events[ee->nready].events |= EPOLLOUT;
 	memcpy(&ee->events[ee->nready].data, &ee->fds[epx->fd]->data,
 		sizeof(ee->fds[epx->fd]->data));
+
+	if (ee->nready == 0) {
+		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
+		ring_prepend(&ev->epoll_ready, &ee->me);
+	}
+
 	if (!(ee->events[ee->nready].events & EPOLLIN)) {
 		ee->nready++;
 	}
@@ -417,7 +429,6 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 	ee->events    = events;
 	ee->maxevents = maxevents;
-	ee->nready    = 0;
 	ee->fiber     = acl_fiber_running();
 	ee->proc      = epoll_callback;
 
@@ -426,28 +437,44 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	ev->waiter++;
 
 	while (1) {
-		ring_prepend(&ev->epoll_list, &ee->me);
+		timer_cache_add(ev->epoll_list, ee->expire, &ee->me);
+		ee->nready = 0;
 
 		fiber_io_inc();
 
 		ee->fiber->status = FIBER_STATUS_EPOLL_WAIT;
 		acl_fiber_switch();
+
+		if (ee->nready == 0) {
+			timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
+		}
+
 		ev->timeout = old_timeout;
 
-		ev->timeout = -1;
 		if (acl_fiber_killed(ee->fiber)) {
 			ring_detach(&ee->me);
+			acl_fiber_set_error(ee->fiber->errnum);
+			if (ee->nready == 0) {
+				ee->nready = -1;
+			}
+
 			msg_info("%s(%d), %s: fiber-%u was killed",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(ee->fiber));
 			break;
 		}
+
+		if (timer_cache_size(ev->epoll_list) == 0) {
+			ev->timeout = -1;
+		}
+
 		if (ee->nready != 0 || timeout == 0) {
 			break;
 		}
 
 		now = event_get_stamp(ev);
 		if (ee->expire > 0 && now >= ee->expire) {
+			acl_fiber_set_error(FIBER_ETIMEDOUT);
 			break;
 		}
 	}
