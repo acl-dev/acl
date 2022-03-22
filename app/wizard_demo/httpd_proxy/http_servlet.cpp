@@ -135,6 +135,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	} else {
 		host = phost;
 	}
+
 	printf("remote host=%s, current fiber=%p\r\n", host.c_str(), acl_fiber_running());
 
 	acl::socket_stream peer;
@@ -170,8 +171,8 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 
 bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& peer)
 {
-	local.set_rw_timeout(5);
-	peer.set_rw_timeout(5);
+	local.set_rw_timeout(15);
+	peer.set_rw_timeout(25);
 
 	tcp_transfer fiber_local(acl_fiber_running(), local, peer, false);
 	tcp_transfer fiber_peer(acl_fiber_running(), peer, local, false);

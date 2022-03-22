@@ -7,6 +7,12 @@
 
 #ifdef HAS_POLL
 
+struct POLLFD {
+	FILE_EVENT *fe;
+	POLL_EVENT *pe;
+	struct pollfd *pfd;
+};
+
 /****************************************************************************/
 
 #define TO_APPL ring_to_appl
@@ -261,7 +267,6 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(pe.fiber)) {
-			ring_detach(&pe.me);
 			acl_fiber_set_error(pe.fiber->errnum);
 			if (pe.nready == 0) {
 				pe.nready = -1;

@@ -445,35 +445,6 @@ static void event_process_poll(EVENT *ev)
 #ifdef	HAS_EPOLL
 static void event_process_epoll(EVENT *ev)
 {
-#if 0
-	while (1) {
-		EPOLL_EVENT *ee;
-		RING *head = ring_pop_head(&ev->epoll_list);
-		if (head == NULL) {
-			break;
-		}
-		ee = TO_APPL(head, EPOLL_EVENT, me);
-		ee->proc(ev, ee);
-	}
-#elif 0
-	EPOLL_EVENT *ee;
-	RING *next, *curr;
-	long long now;
-
-	now = event_get_stamp(ev);
-
-	for (next = ring_succ(&ev->epoll_list); next != &ev->epoll_list;) {
-		ee = ring_to_appl(next, EPOLL_EVENT, me);
-		if (ee->nready != 0 || (ee->expire >= 0 && now >= ee->expire)) {
-			curr = next;
-			next = ring_succ(next);
-			ring_detach(curr);
-			ee->proc(ev, ee);
-		} else {
-			next = ring_succ(next);
-		}
-	}
-#else
 	RING_ITER iter;
 	RING *head;
 	EPOLL_EVENT *ee;
@@ -497,7 +468,6 @@ static void event_process_epoll(EVENT *ev)
 	}
 
 	ring_init(&ev->epoll_ready);
-#endif
 }
 #endif
 

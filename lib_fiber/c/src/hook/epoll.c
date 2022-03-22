@@ -10,22 +10,94 @@
 
 /****************************************************************************/
 
-static EPOLL_EVENT *epfd_alloc(void)
-{
-	EPOLL_EVENT *ee = mem_calloc(1, sizeof(EPOLL_EVENT));
-	int  maxfd = open_limit(0);
+struct EPOLL_CTX {
+	int  fd;
+	int  op;
+	int  mask;
+	int  rmask;
+	FILE_EVENT  *fe;
+	EPOLL_EVENT *ee;
+	epoll_data_t data;
+};
 
-	if (maxfd <= 0) {
-		msg_fatal("%s(%d), %s: open_limit error %s",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
+/**
+ * One EPOLL for each fiber is assosiate with the same one epoll fd.
+ * one epoll fd --> one fiber's EPOLL
+ *              --> one fiber's EPOLL
+ *              --> ...
+ *              --> one fiber' sEPOLL --> socket fd's EPOLL_CTX
+ *                                    --> socket fd's EPOLL_CTX
+ *                                    --> socket fd's EPOLL_CTX
+ *                                    --> ...
+ */
+struct EPOLL {
+	int         epfd;
+	EPOLL_CTX **fds;
+	size_t      nfds;
+
+	// Store all EPOLL_EVENT, every fiber should use its own EPOLL_EVENT,
+	// Because in some case, one thread maybe have many fibers but it maybe
+	// use only one epoll fd to handle IO events, see acl_read_epoll_wait()
+	// in lib_acl/src/stdlib/iostuff/acl_read_wait.c.
+	HTABLE      *ep_events;
+};
+
+/****************************************************************************/
+
+#ifdef SYS_WIN
+# define SNPRINTF _snprintf
+#else
+# define SNPRINTF snprintf
+#endif
+
+static void epoll_event_free(EPOLL_EVENT *ee)
+{
+	mem_free(ee);
+}
+
+static void fiber_on_exit(void *ctx)
+{
+	EPOLL_EVENT *ee = (EPOLL_EVENT*) ctx, *tmp;
+	EPOLL *ep = ee->epoll;
+	ACL_FIBER *curr = acl_fiber_running();
+	char key[32];
+
+	assert(ep);
+	assert(curr);
+
+	SNPRINTF(key, sizeof(key), "%u", curr->id);
+	tmp = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
+
+	if (tmp == NULL) {
+		msg_fatal("%s(%d), %s: not found ee=%p, curr fiber=%d,"
+			" ee fiber=%d", __FILE__, __LINE__, __FUNCTION__, ee,
+			acl_fiber_id(curr), acl_fiber_id(ee->fiber));
 	}
 
-	++maxfd;
-	ee->fds  = (EPOLL_CTX **) mem_malloc(maxfd * sizeof(EPOLL_CTX *));
-	ee->nfds = maxfd;
+	assert(tmp == ee);
+	htable_delete(ep->ep_events, key, NULL);
+	epoll_event_free(ee);
+}
+
+static __thread int __local_key;
+
+static EPOLL_EVENT *epoll_event_alloc(void)
+{
+	EPOLL_EVENT *ee = (EPOLL_EVENT*) acl_fiber_get_specific(__local_key);
+	if (ee) {
+		return ee;
+	}
+
+	ee = mem_calloc(1, sizeof(EPOLL_EVENT));
+	acl_fiber_set_specific(&__local_key, ee, fiber_on_exit);
+
+	ring_init(&ee->me);
+	ee->fiber = acl_fiber_running();
 
 	return ee;
 }
+
+/****************************************************************************/
 
 static ARRAY     *__main_epfds = NULL;
 static __thread ARRAY *__epfds = NULL;
@@ -33,9 +105,10 @@ static __thread ARRAY *__epfds = NULL;
 static pthread_key_t  __once_key;
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
+static void epoll_free(EPOLL *ep);
+
 static void thread_free(void *ctx fiber_unused)
 {
-	size_t j;
 	ITER iter;
 
 	if (__epfds == NULL) {
@@ -47,20 +120,13 @@ static void thread_free(void *ctx fiber_unused)
 	}
 
 	foreach(iter, __epfds) {
-		EPOLL_EVENT *ee = (EPOLL_EVENT *) iter.data;
+		EPOLL *ep = (EPOLL *) iter.data;
 
-		for (j = 0; j < ee->nfds; j++) {
-			if (ee->fds[j] != NULL) {
-				mem_free(ee->fds[j]);
-			}
-		}
-
-		if (ee->epfd >= 0 && (*sys_close)(ee->epfd) < 0) {
+		if (ep->epfd >= 0 && (*sys_close)(ep->epfd) < 0) {
 			fiber_save_errno(acl_fiber_last_error());
 		}
 
-		mem_free(ee->fds);
-		mem_free(ee);
+		epoll_free(ep);
 	}
 
 	array_free(__epfds, NULL);
@@ -83,17 +149,21 @@ static void thread_init(void)
 	}
 }
 
-static EPOLL_EVENT *epoll_event_create(int epfd)
+static EPOLL *epoll_alloc(int epfd)
 { 
-	EPOLL_EVENT *ee = NULL;
-	size_t i;
+	EPOLL *ep;
+	int maxfd = open_limit(0), i;
 
-	/* using thread specific to store the epoll handles for each thread*/
+	if (maxfd <= 0) {
+		msg_fatal("%s(%d), %s: open_limit error %s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	}
+
+	/* Using thread local to store the epoll handles for each thread. */
 	if (__epfds == NULL) {
 		if (pthread_once(&__once_control, thread_init) != 0) {
 			msg_fatal("%s(%d), %s: pthread_once error %s",
-				__FILE__, __LINE__, __FUNCTION__,
-				last_serror());
+				__FILE__, __LINE__, __FUNCTION__, last_serror());
 		}
 
 		__epfds = array_create(5);
@@ -105,24 +175,53 @@ static EPOLL_EVENT *epoll_event_create(int epfd)
 		}
 	}
 
-	ee = epfd_alloc();
-	array_append(__epfds, ee);
+	ep = mem_malloc(sizeof(EPOLL));
+	array_append(__epfds, ep);
 
-	/* duplicate the current thread's epoll fd, so we can assosiate the
+	/* Duplicate the current thread's epoll fd, so we can assosiate the
 	 * connection handles with one epoll fd for the current thread, and
-	 * use one epoll fd for each thread to handle all fds
+	 * use one epoll fd for each thread to handle all fds.
 	 */
-	ee->epfd = dup(epfd);
+	ep->epfd = dup(epfd);
 
-	for (i = 0; i < ee->nfds; i++) {
-		ee->fds[i] = NULL;
+	ep->nfds = maxfd;
+	ep->fds  = (EPOLL_CTX **) mem_malloc(maxfd * sizeof(EPOLL_CTX *));
+	for (i = 0; i < maxfd; i++) {
+		ep->fds[i] = NULL;
 	}
 
-	return ee;
+	ep->ep_events = htable_create(100);
+	return ep;
 }
 
-static EPOLL_EVENT *epoll_event_find(int epfd)
+static void epoll_free(EPOLL *ep)
 {
+	ITER iter;
+	size_t i;
+
+	foreach(iter, ep->ep_events) {
+		EPOLL_EVENT *ee = (EPOLL_EVENT *) iter.data;
+		epoll_event_free(ee);
+	}
+
+	htable_free(ep->ep_events, NULL);
+
+	for (i = 0; i < ep->nfds; i++) {
+		if (ep->fds[i] != NULL) {
+			mem_free(ep->fds[i]);
+		}
+	}
+
+	mem_free(ep->fds);
+	mem_free(ep);
+}
+
+static EPOLL_EVENT *epoll_event_find(int epfd, int create)
+{
+	ACL_FIBER *curr = acl_fiber_running();
+	EPOLL *ep = NULL;
+	EPOLL_EVENT *ee;
+	char key[32];
 	ITER iter;
 
 	if (__epfds == NULL) {
@@ -132,47 +231,79 @@ static EPOLL_EVENT *epoll_event_find(int epfd)
 	}
 
 	foreach(iter, __epfds) {
-		EPOLL_EVENT *ee = (EPOLL_EVENT *) iter.data;
-		if (ee->epfd == epfd) {
-			return ee;
+		EPOLL *tmp = (EPOLL *) iter.data;
+		if (tmp->epfd == epfd) {
+			ep = tmp;
+			break;
 		}
 	}
 
-	return NULL;
+	if (ep == NULL) {
+		msg_error("%s(%d, %s: not found epfd=%d",
+			__FILE__, __LINE__, __FUNCTION__, epfd);
+		return NULL;
+	}
+
+	SNPRINTF(key, sizeof(key), "%u", curr->id);
+	ee = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
+	if (ee != NULL) {
+		assert(ee->epoll == ep);
+		return ee;
+	}
+
+	if (create) {
+		ee = epoll_event_alloc();
+		ee->epoll = ep;
+		htable_enter(ep->ep_events, key, ee);
+
+		return ee;
+	} else {
+		return NULL;
+	}
 }
 
 int epoll_event_close(int epfd)
 {
-	ITER iter;
-	EPOLL_EVENT *ee = NULL;
+	EVENT *ev;
+	int sys_epfd;
+	EPOLL *ep = NULL;
 	int pos = -1;
-	size_t i;
+	ITER iter;
 
 	if (__epfds == NULL || epfd < 0) {
 		return -1;
 	}
 
 	foreach(iter, __epfds) {
-		EPOLL_EVENT *e = (EPOLL_EVENT *) iter.data;
-		if (e->epfd == epfd) {
-			ee  = e;
+		EPOLL *tmp = (EPOLL *) iter.data;
+		if (tmp->epfd == epfd) {
+			ep  = tmp;
 			pos = iter.i;
 			break;
 		}
 	}
 
-	if (ee == NULL) {
+	if (ep == NULL) {
 		return -1;
 	}
 
-	for (i = 0; i < ee->nfds; i++) {
-		if (ee->fds[i] != NULL) {
-			mem_free(ee->fds[i]);
-		}
+	ev = fiber_io_event();
+	assert(ev);
+
+	sys_epfd = event_handle(ev);
+	assert(sys_epfd >= 0);
+
+	// We can't close the epfd same as the internal fiber event's fd.
+	// Because we've alloced a new fd as a duplication of internal epfd
+	// in epoll_alloc by calling sys API dup(), the epfd here shouldn't
+	// be same as the internal epfd.
+	if (epfd == sys_epfd) {
+		msg_error("%s(%d): can't close the event sys_epfd=%d",
+			__FUNCTION__, __LINE__, epfd);
+		return -1;
 	}
 
-	mem_free(ee->fds);
-	mem_free(ee);
+	epoll_free(ep);
 	array_delete(__epfds, pos, NULL);
 
 	return (*sys_close)(epfd);
@@ -182,8 +313,8 @@ int epoll_event_close(int epfd)
 
 int epoll_create(int size fiber_unused)
 {
-	EPOLL_EVENT *ee;
 	EVENT *ev;
+	EPOLL *ep;
 	int    epfd;
 
 	if (sys_epoll_create == NULL) {
@@ -195,9 +326,9 @@ int epoll_create(int size fiber_unused)
 	}
 
 	ev = fiber_io_event();
+	assert(ev);
 
-	/* get the current thread's epoll fd */
-
+	// Get the current thread's epoll fd.
 	epfd = event_handle(ev);
 	if (epfd < 0) {
 		msg_error("%s(%d), %s: invalid event_handle %d",
@@ -205,8 +336,10 @@ int epoll_create(int size fiber_unused)
 		return epfd;
 	}
 
-	ee = epoll_event_create(epfd);
-	return ee->epfd;
+	// The epoll fd will be duplicated in the below function, and the new
+	// fd will be returned to the caller.
+	ep = epoll_alloc(epfd);
+	return ep->epfd;
 }
 
 #ifdef EPOLL_CLOEXEC
@@ -226,19 +359,27 @@ int epoll_create1(int flags)
 
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
-	EPOLL_CTX  *epx = fe->epx;
-	EPOLL_EVENT *ee = epx->ee;
+	EPOLL_CTX   *epx = fe->epx;
+	EPOLL_EVENT *ee;
+	EPOLL       *ep;
 
-	assert(ee);
+	assert(epx);
 	assert(epx->mask & EVENT_READ);
 
+	ee = epx->ee;
+	assert(ee);
+
+	ep = ee->epoll;
+	assert(ep);
+
 	if (ee->nready >= ee->maxevents) {
-		return;
+		msg_fatal("%s(%d), %s: nready(%d) >= maxevents(%d)", __FILE__,
+			__LINE__, __FUNCTION__, ee->nready, ee->maxevents);
 	}
 
 	ee->events[ee->nready].events |= EPOLLIN;
-	memcpy(&ee->events[ee->nready].data, &ee->fds[epx->fd]->data,
-		sizeof(ee->fds[epx->fd]->data));
+	memcpy(&ee->events[ee->nready].data, &ep->fds[epx->fd]->data,
+		sizeof(ep->fds[epx->fd]->data));
 
 	if (ee->nready == 0) {
 		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
@@ -253,18 +394,27 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 
 static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 {
-	EPOLL_CTX  *epx = fe->epx;
-	EPOLL_EVENT *ee = epx->ee;
+	EPOLL_CTX   *epx = fe->epx;
+	EPOLL_EVENT *ee;
+	EPOLL       *ep;
 
-	assert(ee);
+	assert(epx);
 	assert(epx->mask & EVENT_WRITE);
+
+	ee = epx->ee;
+	assert(ee);
+
+	ep = ee->epoll;
+	assert(ep);
+
 	if (ee->nready >= ee->maxevents) {
-		return;
+		msg_fatal("%s(%d), %s: nready(%d) >= maxevents(%d)", __FILE__,
+			__LINE__, __FUNCTION__, ee->nready, ee->maxevents);
 	}
 
 	ee->events[ee->nready].events |= EPOLLOUT;
-	memcpy(&ee->events[ee->nready].data, &ee->fds[epx->fd]->data,
-		sizeof(ee->fds[epx->fd]->data));
+	memcpy(&ee->events[ee->nready].data, &ep->fds[epx->fd]->data,
+		sizeof(ep->fds[epx->fd]->data));
 
 	if (ee->nready == 0) {
 		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
@@ -280,60 +430,69 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 	struct epoll_event *event, int fd, int op)
 {
-	if (ee->fds[fd] == NULL) {
-		ee->fds[fd] = (EPOLL_CTX *) mem_malloc(sizeof(EPOLL_CTX));
+	EPOLL *ep = ee->epoll;
+
+	if (ep->fds[fd] == NULL) {
+		ep->fds[fd] = (EPOLL_CTX *) mem_malloc(sizeof(EPOLL_CTX));
 	}
 
-	ee->fds[fd]->fd      = fd;
-	ee->fds[fd]->op      = op;
-	ee->fds[fd]->mask    = EVENT_NONE;
-	ee->fds[fd]->rmask   = EVENT_NONE;
-	ee->fds[fd]->ee      = ee;
-	ee->fds[fd]->fe->epx = ee->fds[fd];
+	ep->fds[fd]->fd      = fd;
+	ep->fds[fd]->op      = op;
+	ep->fds[fd]->mask    = EVENT_NONE;
+	ep->fds[fd]->rmask   = EVENT_NONE;
+	ep->fds[fd]->ee      = ee;
 
-	memcpy(&ee->fds[fd]->data, &event->data, sizeof(event->data));
+	memcpy(&ep->fds[fd]->data, &event->data, sizeof(event->data));
 
 	if (event->events & EPOLLIN) {
-		ee->fds[fd]->mask |= EVENT_READ;
-		ee->fds[fd]->fe    = fiber_file_open_read(fd);
-		event_add_read(ev, ee->fds[fd]->fe, read_callback);
-		SET_READWAIT(ee->fds[fd]->fe);
+		ep->fds[fd]->mask   |= EVENT_READ;
+		ep->fds[fd]->fe      = fiber_file_open_read(fd);
+		ep->fds[fd]->fe->epx = ep->fds[fd];
+
+		event_add_read(ev, ep->fds[fd]->fe, read_callback);
+		SET_READWAIT(ep->fds[fd]->fe);
 	}
+
 	if (event->events & EPOLLOUT) {
-		ee->fds[fd]->mask |= EVENT_WRITE;
-		ee->fds[fd]->fe    = fiber_file_open_write(fd);
-		event_add_write(ev, ee->fds[fd]->fe, write_callback);
-		SET_WRITEWAIT(ee->fds[fd]->fe);
+		ep->fds[fd]->mask   |= EVENT_WRITE;
+		ep->fds[fd]->fe      = fiber_file_open_write(fd);
+		ep->fds[fd]->fe->epx = ep->fds[fd];
+
+		event_add_write(ev, ep->fds[fd]->fe, write_callback);
+		SET_WRITEWAIT(ep->fds[fd]->fe);
 	}
 }
 
 static void epoll_ctl_del(EVENT *ev, EPOLL_EVENT *ee, int fd)
 {
-	if (ee->fds[fd]->mask & EVENT_READ) {
-		event_del_read(ev, ee->fds[fd]->fe);
-		CLR_READWAIT(ee->fds[fd]->fe);
-	}
-	if (ee->fds[fd]->mask & EVENT_WRITE) {
-		event_del_write(ev, ee->fds[fd]->fe);
-		CLR_WRITEWAIT(ee->fds[fd]->fe);
+	EPOLL *ep = ee->epoll;
+
+	if (ep->fds[fd]->mask & EVENT_READ) {
+		event_del_read(ev, ep->fds[fd]->fe);
+		CLR_READWAIT(ep->fds[fd]->fe);
 	}
 
-	ee->fds[fd]->fd      = -1;
-	ee->fds[fd]->op      = 0;
-	ee->fds[fd]->mask    = EVENT_NONE;
-	ee->fds[fd]->rmask   = EVENT_NONE;
-	ee->fds[fd]->fe->epx = NULL;
-	ee->fds[fd]->fe      = NULL;
-	memset(&ee->fds[fd]->data, 0, sizeof(ee->fds[fd]->data));
+	if (ep->fds[fd]->mask & EVENT_WRITE) {
+		event_del_write(ev, ep->fds[fd]->fe);
+		CLR_WRITEWAIT(ep->fds[fd]->fe);
+	}
 
-	mem_free(ee->fds[fd]);
-	ee->fds[fd] = NULL;
+	ep->fds[fd]->fd      = -1;
+	ep->fds[fd]->op      = 0;
+	ep->fds[fd]->mask    = EVENT_NONE;
+	ep->fds[fd]->rmask   = EVENT_NONE;
+	ep->fds[fd]->fe->epx = NULL;
+	ep->fds[fd]->fe      = NULL;
+	memset(&ep->fds[fd]->data, 0, sizeof(ep->fds[fd]->data));
+
+	mem_free(ep->fds[fd]);
+	ep->fds[fd] = NULL;
 }
 
 int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 {
-	EPOLL_EVENT *ee;
 	EVENT *ev;
+	EPOLL_EVENT *ee;
 
 	if (sys_epoll_ctl == NULL) {
 		hook_once();
@@ -343,12 +502,14 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 		return sys_epoll_ctl ?  (*sys_epoll_ctl)(epfd, op, fd, event) : -1;
 	}
 
-	ee = epoll_event_find(epfd);
+	ee = epoll_event_find(epfd, 1);
 	if (ee == NULL) {
 		msg_error("%s(%d), %s: not exist epfd=%d",
 			__FILE__, __LINE__, __FUNCTION__, epfd);
 		return -1;
 	}
+
+	assert(ee->epoll);
 
 	ev = fiber_io_event();
 
@@ -358,10 +519,8 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 		msg_error("%s(%d), %s: invalid op %d, fd %d",
 			__FILE__, __LINE__, __FUNCTION__, op, fd);
 		return -1;
-	} else if (ee->fds[fd] != NULL) {
+	} else if (ee->epoll->fds[fd] != NULL) {
 		epoll_ctl_del(ev, ee, fd);
-		CLR_READWAIT(ee->fds[fd]->fe);
-		CLR_WRITEWAIT(ee->fds[fd]->fe);
 	} else {
 		msg_error("%s(%d), %s: invalid fd=%d",
 			__FILE__, __LINE__, __FUNCTION__, fd);
@@ -410,7 +569,8 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	}
 
 	if (!var_hook_sys_api) {
-		return sys_epoll_wait ?  (*sys_epoll_wait)(epfd, events, maxevents, timeout) : -1;
+		return sys_epoll_wait ?  (*sys_epoll_wait)
+			(epfd, events, maxevents, timeout) : -1;
 	}
 
 	ev = fiber_io_event();
@@ -420,7 +580,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		return -1;
 	}
 
-	ee = epoll_event_find(epfd);
+	ee = epoll_event_find(epfd, 0);
 	if (ee == NULL) {
 		msg_error("%s(%d), %s: not exist epfd %d",
 			__FILE__, __LINE__, __FUNCTION__, epfd);
@@ -431,6 +591,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	ee->maxevents = maxevents;
 	ee->fiber     = acl_fiber_running();
 	ee->proc      = epoll_callback;
+	ee->nready    = 0;
 
 	old_timeout = ev->timeout;
 	event_epoll_set(ev, ee, timeout);
@@ -438,7 +599,6 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 	while (1) {
 		timer_cache_add(ev->epoll_list, ee->expire, &ee->me);
-		ee->nready = 0;
 
 		fiber_io_inc();
 
@@ -452,7 +612,6 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		ev->timeout = old_timeout;
 
 		if (acl_fiber_killed(ee->fiber)) {
-			ring_detach(&ee->me);
 			acl_fiber_set_error(ee->fiber->errnum);
 			if (ee->nready == 0) {
 				ee->nready = -1;

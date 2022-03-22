@@ -150,12 +150,6 @@ struct FILE_EVENT {
 };
 
 #ifdef HAS_POLL
-struct POLLFD {
-	FILE_EVENT *fe;
-	POLL_EVENT *pe;
-	struct pollfd *pfd;
-};
-
 struct POLL_EVENT {
 	RING       me;
 
@@ -169,25 +163,16 @@ struct POLL_EVENT {
 #endif
 
 #ifdef	HAS_EPOLL
-struct EPOLL_CTX {
-	int  fd;
-	int  op;
-	int  mask;
-	int  rmask;
-	FILE_EVENT  *fe;
-	EPOLL_EVENT *ee;
-	epoll_data_t data;
-};
+
+typedef struct EPOLL EPOLL;
 
 struct EPOLL_EVENT {
 	RING        me;
-
 	ACL_FIBER  *fiber;
+	EPOLL      *epoll;
+
 	epoll_proc *proc;
-	size_t      nfds;
 	long long   expire;
-	EPOLL_CTX **fds;
-	int         epfd;
 
 	struct epoll_event *events;
 	int maxevents;
