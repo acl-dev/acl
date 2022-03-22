@@ -98,7 +98,9 @@ ssize_t event_size(EVENT *ev)
 void event_free(EVENT *ev)
 {
 	timer_cache_free(ev->poll_list);
+#ifdef	HAS_EPOLL
 	timer_cache_free(ev->epoll_list);
+#endif
 
 	ev->free(ev);
 }
