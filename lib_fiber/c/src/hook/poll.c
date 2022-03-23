@@ -55,8 +55,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 		pfd->fe = NULL;
 	}
 
-	assert(timer_cache_size(ev->poll_list) > 0);
-
 	/*
 	 * If any fe has been ready, the pe holding fe should be removed from
 	 * ev->poll_list to avoid to be called in timeout process.
@@ -105,8 +103,6 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 		fe->pfd = NULL;
 		pfd->fe = NULL;
 	}
-
-	assert(timer_cache_size(ev->poll_list) > 0);
 
 	if (pfd->pe->nready == 0) {
 		timer_cache_remove(ev->poll_list, pfd->pe->expire, &pfd->pe->me);
