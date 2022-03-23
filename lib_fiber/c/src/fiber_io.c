@@ -94,6 +94,8 @@ static void thread_init(void)
 
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
+// Notice: don't write log here to avoid recursive calling when user call
+// acl_fiber_msg_register() to hook the log process.
 void fiber_io_check(void)
 {
 	if (__thread_fiber != NULL) {
@@ -109,16 +111,15 @@ void fiber_io_check(void)
 	}
 
 	if (pthread_once(&__once_control, thread_init) != 0) {
-		msg_fatal("%s(%d), %s: pthread_once error %s",
+		printf("%s(%d), %s: pthread_once error %s\r\n",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
+		abort();
 	}
 
 	var_maxfd = open_limit(0);
 	if (var_maxfd <= 0) {
 		var_maxfd = MAXFD;
 	}
-
-	msg_info("%s(%d): maxfd=%d", __FUNCTION__, __LINE__, var_maxfd);
 
 	__thread_fiber = (FIBER_TLS *) mem_malloc(sizeof(FIBER_TLS));
 	__thread_fiber->event = event_create(var_maxfd);
@@ -140,7 +141,8 @@ void fiber_io_check(void)
 		__main_fiber = __thread_fiber;
 		atexit(fiber_io_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
-		msg_fatal("pthread_setspecific error!");
+		printf("pthread_setspecific error!\r\n");
+		abort();
 	}
 }
 
