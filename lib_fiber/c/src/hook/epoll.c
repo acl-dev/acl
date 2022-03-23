@@ -21,14 +21,14 @@ struct EPOLL_CTX {
 };
 
 /**
- * One EPOLL for each fiber is assosiate with the same one epoll fd.
- * one epoll fd --> one fiber's EPOLL
- *              --> one fiber's EPOLL
- *              --> ...
- *              --> one fiber' sEPOLL --> socket fd's EPOLL_CTX
- *                                    --> socket fd's EPOLL_CTX
- *                                    --> socket fd's EPOLL_CTX
- *                                    --> ...
+ * All EPOLL_EVENT owned by its fiber are assosiate with the same one epoll fd.
+ * one epoll fd -|- one EPOLL -|- fiber EPOLL_EVENT
+ *                             |- fiber EPOLL_EVENT
+ *                             |- ...
+ *                             |- fiber EPOLL_EVENT -|- socket EPOLL_CTX
+ *                                                   |- socket EPOLL_CTX
+ *                                                   |- socket EPOLL_CTX
+ *                                                   |- ...
  */
 struct EPOLL {
 	int         epfd;
@@ -58,24 +58,30 @@ static void epoll_event_free(EPOLL_EVENT *ee)
 static void fiber_on_exit(void *ctx)
 {
 	EPOLL_EVENT *ee = (EPOLL_EVENT*) ctx, *tmp;
-	EPOLL *ep = ee->epoll;
 	ACL_FIBER *curr = acl_fiber_running();
 	char key[32];
 
-	assert(ep);
 	assert(curr);
 
+	// If the epoll in ee has been set NULL in epoll_free(), the EPOLL
+	// must have been freed and the associated epoll fd must also have
+	// been closed, so we just only free the ee here.
+	if (ee->epoll == NULL) {
+		epoll_event_free(ee);
+		return;
+	}
+
 	SNPRINTF(key, sizeof(key), "%u", curr->id);
-	tmp = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
+	tmp = (EPOLL_EVENT *) htable_find(ee->epoll->ep_events, key);
 
 	if (tmp == NULL) {
 		msg_fatal("%s(%d), %s: not found ee=%p, curr fiber=%d,"
-			" ee fiber=%d", __FILE__, __LINE__, __FUNCTION__, ee,
-			acl_fiber_id(curr), acl_fiber_id(ee->fiber));
+			" ee fiber=%d", __FILE__, __LINE__, __FUNCTION__,
+			ee, acl_fiber_id(curr), acl_fiber_id(ee->fiber));
 	}
 
 	assert(tmp == ee);
-	htable_delete(ep->ep_events, key, NULL);
+	htable_delete(ee->epoll->ep_events, key, NULL);
 	epoll_event_free(ee);
 }
 
@@ -83,6 +89,10 @@ static __thread int __local_key;
 
 static EPOLL_EVENT *epoll_event_alloc(void)
 {
+	// One EPOLL_EVENT can be owned by one fiber and be stored in the
+	// fiber's local store, so the EPOLL_EVENT can be used repeated by
+	// its owner fiber, and can be freed when the fiber is exiting.
+
 	EPOLL_EVENT *ee = (EPOLL_EVENT*) acl_fiber_get_specific(__local_key);
 	if (ee) {
 		return ee;
@@ -199,9 +209,13 @@ static void epoll_free(EPOLL *ep)
 	ITER iter;
 	size_t i;
 
+	// Walk through all EPOLL_EVENT stored in ep_events, and just set their
+	// epoll variable to NULL, because they will be freed in fiber_on_exit()
+	// when the fiber the EPOLL_EVENT belonging to is exiting.
+
 	foreach(iter, ep->ep_events) {
 		EPOLL_EVENT *ee = (EPOLL_EVENT *) iter.data;
-		epoll_event_free(ee);
+		ee->epoll = NULL;
 	}
 
 	htable_free(ep->ep_events, NULL);
@@ -214,52 +228,6 @@ static void epoll_free(EPOLL *ep)
 
 	mem_free(ep->fds);
 	mem_free(ep);
-}
-
-static EPOLL_EVENT *epoll_event_find(int epfd, int create)
-{
-	ACL_FIBER *curr = acl_fiber_running();
-	EPOLL *ep = NULL;
-	EPOLL_EVENT *ee;
-	char key[32];
-	ITER iter;
-
-	if (__epfds == NULL) {
-		msg_error("%s(%d), %s: __epfds NULL",
-			__FILE__, __LINE__, __FUNCTION__);
-		return NULL;
-	}
-
-	foreach(iter, __epfds) {
-		EPOLL *tmp = (EPOLL *) iter.data;
-		if (tmp->epfd == epfd) {
-			ep = tmp;
-			break;
-		}
-	}
-
-	if (ep == NULL) {
-		msg_error("%s(%d, %s: not found epfd=%d",
-			__FILE__, __LINE__, __FUNCTION__, epfd);
-		return NULL;
-	}
-
-	SNPRINTF(key, sizeof(key), "%u", curr->id);
-	ee = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
-	if (ee != NULL) {
-		assert(ee->epoll == ep);
-		return ee;
-	}
-
-	if (create) {
-		ee = epoll_event_alloc();
-		ee->epoll = ep;
-		htable_enter(ep->ep_events, key, ee);
-
-		return ee;
-	} else {
-		return NULL;
-	}
 }
 
 int epoll_event_close(int epfd)
@@ -297,6 +265,7 @@ int epoll_event_close(int epfd)
 	// Because we've alloced a new fd as a duplication of internal epfd
 	// in epoll_alloc by calling sys API dup(), the epfd here shouldn't
 	// be same as the internal epfd.
+
 	if (epfd == sys_epfd) {
 		msg_error("%s(%d): can't close the event sys_epfd=%d",
 			__FUNCTION__, __LINE__, epfd);
@@ -307,6 +276,52 @@ int epoll_event_close(int epfd)
 	array_delete(__epfds, pos, NULL);
 
 	return (*sys_close)(epfd);
+}
+
+static EPOLL_EVENT *epoll_event_find(int epfd, int create)
+{
+	ACL_FIBER *curr = acl_fiber_running();
+	EPOLL *ep = NULL;
+	EPOLL_EVENT *ee;
+	char key[32];
+	ITER iter;
+
+	if (__epfds == NULL) {
+		msg_error("%s(%d), %s: __epfds NULL",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
+
+	foreach(iter, __epfds) {
+		EPOLL *tmp = (EPOLL *) iter.data;
+		if (tmp->epfd == epfd) {
+			ep = tmp;
+			break;
+		}
+	}
+
+	if (ep == NULL) {
+		msg_error("%s(%d, %s: not found epfd=%d",
+			__FILE__, __LINE__, __FUNCTION__, epfd);
+		return NULL;
+	}
+
+	SNPRINTF(key, sizeof(key), "%u", curr->id);
+	ee = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
+	if (ee != NULL) {
+		ee->epoll = ep;
+		return ee;
+	}
+
+	if (create) {
+		ee = epoll_event_alloc();
+		ee->epoll = ep;
+		htable_enter(ep->ep_events, key, ee);
+
+		return ee;
+	} else {
+		return NULL;
+	}
 }
 
 /****************************************************************************/
