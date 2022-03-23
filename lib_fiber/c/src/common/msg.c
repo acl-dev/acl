@@ -49,17 +49,21 @@ void msg_info(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__pre_write_fn) {
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		__pre_write_fn(__pre_write_ctx, fmt, ap_tmp);
+	}
+
+	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		printf("msg_info->pid(%d), ", GETPID());
+		vprintf(fmt, ap_tmp);
+		printf("\r\n");
 	}
 
 	if (__write_fn != NULL) {
 		__write_fn(__msg_ctx, fmt, ap);
-	}
-
-	if (__stdout_enable) {
-		printf("msg_info->pid(%d), ", GETPID());
-		vprintf(fmt, ap);
-		printf("\r\n");
 	}
 
 	va_end (ap);
@@ -72,17 +76,21 @@ void msg_warn(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__pre_write_fn) {
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		__pre_write_fn(__pre_write_ctx, fmt, ap_tmp);
+	}
+	
+	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		printf("msg_warn->pid(%d), ", GETPID());
+		vprintf(fmt, ap_tmp);
+		printf("\r\n");
 	}
 
 	if (__write_fn != NULL) {
 		__write_fn(__msg_ctx, fmt, ap);
-	}
-	
-	if (__stdout_enable) {
-		printf("msg_warn->pid(%d), ", GETPID());
-		vprintf(fmt, ap);
-		printf("\r\n");
 	}
 
 	va_end (ap);
@@ -95,17 +103,21 @@ void msg_error(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__pre_write_fn) {
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		__pre_write_fn(__pre_write_ctx, fmt, ap_tmp);
+	}
+	
+	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		printf("msg_error->pid(%d), ", GETPID());
+		vprintf(fmt, ap_tmp);
+		printf("\r\n");
 	}
 
 	if (__write_fn != NULL) {
 		__write_fn(__msg_ctx, fmt, ap);
-	}
-	
-	if (__stdout_enable) {
-		printf("msg_error->pid(%d), ", GETPID());
-		vprintf(fmt, ap);
-		printf("\r\n");
 	}
 
 	va_end (ap);
@@ -118,18 +130,22 @@ void msg_fatal(const char *fmt,...)
 	va_start (ap, fmt);
 
 	if (__pre_write_fn) {
-		__pre_write_fn(__pre_write_ctx, fmt, ap);
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		__pre_write_fn(__pre_write_ctx, fmt, ap_tmp);
+	}
+	
+	if (__stdout_enable) {
+		va_list ap_tmp;
+		va_copy(ap_tmp, ap);
+		printf("msg_fatal->pid(%d), ", GETPID());
+		printf("fatal:");
+		vprintf(fmt, ap_tmp);
+		printf("\r\n");
 	}
 
 	if (__write_fn != NULL) {
 		__write_fn(__msg_ctx, fmt, ap);
-	}
-	
-	if (__stdout_enable) {
-		printf("msg_fatal->pid(%d), ", GETPID());
-		printf("fatal:");
-		vprintf(fmt, ap);
-		printf("\r\n");
 	}
 
 	va_end (ap);
