@@ -229,7 +229,6 @@ void event_set(int event_mode);
 EVENT *event_create(int size);
 const char *event_name(EVENT *ev);
 acl_handle_t event_handle(EVENT *ev);
-ssize_t event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 long long event_set_stamp(EVENT *ev);

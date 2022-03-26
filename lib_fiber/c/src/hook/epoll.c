@@ -387,9 +387,12 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	ep = ee->epoll;
 	assert(ep);
 
+	// If the ready count exceeds the maxevents been set which limits the
+	// the buffer space to hold the the ready fds, we just return to let
+	// the left ready fds keeped in system buffer, and hope they'll be
+	// handled in the next epoll_wait().
 	if (ee->nready >= ee->maxevents) {
-		msg_fatal("%s(%d), %s: nready(%d) >= maxevents(%d)", __FILE__,
-			__LINE__, __FUNCTION__, ee->nready, ee->maxevents);
+		return;
 	}
 
 	ee->events[ee->nready].events |= EPOLLIN;
@@ -404,6 +407,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	if (!(ee->events[ee->nready].events & EPOLLOUT)) {
 		ee->nready++;
 	}
+
 	SET_READABLE(fe);
 }
 
@@ -423,8 +427,7 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	assert(ep);
 
 	if (ee->nready >= ee->maxevents) {
-		msg_fatal("%s(%d), %s: nready(%d) >= maxevents(%d)", __FILE__,
-			__LINE__, __FUNCTION__, ee->nready, ee->maxevents);
+		return;
 	}
 
 	ee->events[ee->nready].events |= EPOLLOUT;
@@ -439,6 +442,7 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	if (!(ee->events[ee->nready].events & EPOLLIN)) {
 		ee->nready++;
 	}
+
 	SET_WRITABLE(fe);
 }
 

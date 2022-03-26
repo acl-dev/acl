@@ -90,11 +90,6 @@ acl_handle_t event_handle(EVENT *ev)
 	return ev->handle(ev);
 }
 
-ssize_t event_size(EVENT *ev)
-{
-	return ev->setsize;
-}
-
 void event_free(EVENT *ev)
 {
 	timer_cache_free(ev->poll_list);
@@ -258,7 +253,8 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (fe->fd >= (socket_t) ev->setsize) {
-		msg_error("fd: %d >= setsize: %d", fe->fd, (int) ev->setsize);
+		msg_error("%s(%d): fd=%d >= setsize=%d", __FUNCTION__,
+			__LINE__, fe->fd, (int) ev->setsize);
 		acl_fiber_set_error(ERANGE);
 		return 0;
 	}
@@ -301,7 +297,8 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (fe->fd >= (socket_t) ev->setsize) {
-		msg_error("fd: %d >= setsize: %d", fe->fd, (int) ev->setsize);
+		msg_error("%s(%d): fd=%d >= setsize=%d", __FUNCTION__,
+			__LINE__, fe->fd, (int) ev->setsize);
 		acl_fiber_set_error(ERANGE);
 		return 0;
 	}
