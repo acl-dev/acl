@@ -316,6 +316,14 @@ EVENT *event_epoll_create(int size)
 		hook_init();
 	}
 
+	// Limit the max events buff maybe a good idea to impromve performance
+	// for handling large fds. Because epoll uses robin round to handle
+	// all the ready fds, so we needn't worry about the starvation of the
+	// left ready fds.
+	if (size <= 0 || size > 100) {
+		size = 100;
+	}
+
 	ep->events = (struct epoll_event *)
 		mem_malloc(sizeof(struct epoll_event) * size);
 	ep->size    = size;
@@ -325,7 +333,7 @@ EVENT *event_epoll_create(int size)
 	ep->w_ready = array_create(100);
 #endif
 
-	ep->epfd = __sys_epoll_create(1024);
+	ep->epfd = __sys_epoll_create(size);
 	assert(ep->epfd >= 0);
 
 	ep->event.name   = epoll_name;
