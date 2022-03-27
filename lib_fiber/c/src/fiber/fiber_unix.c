@@ -189,8 +189,8 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
 
-	fb->context->uc_stack.ss_sp   = fb->buff + 8;
-	fb->context->uc_stack.ss_size = fb->size - 64;
+	fb->context->uc_stack.ss_sp   = fb->buff;// + 8;
+	fb->context->uc_stack.ss_size = fb->size;// - 64;
 	fb->context->uc_link = NULL;
 	makecontext(fb->context, (void(*)(void)) fiber_unix_start,
 		2, carg.i[0], carg.i[1]);
