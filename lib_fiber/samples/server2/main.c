@@ -51,12 +51,17 @@ static int check_read(int fd, int timeout)
 		return -1;
 	}
 
-	if (n == 0)
+	if (n == 0) {
+		printf(">>>poll return n=%d, fd=%d\n", n, fd);
 		return 0;
-	if (pfd.revents & POLLIN)
+	}
+	if (pfd.revents & POLLIN) {
+		printf(">>>poll return n=%d read ready, fd=%d\n", n, fd);
 		return 1;
-	else
+	} else {
+		printf(">>>poll return n=%d read no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
 		return 0;
+	}
 }
 
 static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)

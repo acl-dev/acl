@@ -36,21 +36,27 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 
 	assert(pfd->pfd->events & POLLIN);
 
+	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 	event_del_read(ev, fe);
 
 	pfd->pfd->revents |= POLLIN;
+	printf(">>%s(%d): set read, pfd=%p\n", __FUNCTION__, __LINE__, pfd->pfd);
 
 	if (fe->mask & EVENT_ERR) {
+	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		pfd->pfd->revents |= POLLERR;
 	}
 	if (fe->mask & EVENT_HUP) {
+	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		pfd->pfd->revents |= POLLHUP;
 	}
 	if (fe->mask & EVENT_NVAL) {
+	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		pfd->pfd->revents |= POLLNVAL;
 	}
 
 	if (!(pfd->pfd->events & POLLOUT)) {
+	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		fe->pfd = NULL;
 		pfd->fe = NULL;
 	}
@@ -64,6 +70,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	 * timeout process in event_process_poll() in event.c.
 	 */
 	if (pfd->pe->nready == 0) {
+	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		timer_cache_remove(ev->poll_list, pfd->pe->expire, &pfd->pe->me);
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
 	}
@@ -205,6 +212,7 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 #endif
 		pfds[i].pe       = pe;
 		pfds[i].pfd      = &fds[i];
+		pfds[i].pfd->revents = 0;
 		SET_POLLING(pfds[i].fe);
 	}
 
@@ -221,9 +229,9 @@ static void pollfd_free(POLLFD *pfds)
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long now;
-	POLL_EVENT pe;
+	POLL_EVENT *pe;
 	EVENT *ev;
-	int old_timeout;
+	int old_timeout, nready;
 
 	if (sys_poll == NULL) {
 		hook_once();
@@ -237,40 +245,41 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		timeout = MAX_TIMEOUT;
 	}
 
-	ev        = fiber_io_event();
-	pe.fds    = pollfd_alloc(&pe, fds, nfds);
-	pe.nfds   = nfds;
-	pe.fiber  = acl_fiber_running();
-	pe.proc   = poll_callback;
+	pe         = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
+	ev         = fiber_io_event();
+	pe->fds    = pollfd_alloc(pe, fds, nfds);
+	pe->nfds   = nfds;
+	pe->fiber  = acl_fiber_running();
+	pe->proc   = poll_callback;
 
 	old_timeout = ev->timeout;
-	poll_event_set(ev, &pe, timeout);
+	poll_event_set(ev, pe, timeout);
 	ev->waiter++;
 
 	while (1) {
-		timer_cache_add(ev->poll_list, pe.expire, &pe.me);
-		pe.nready = 0;
+		timer_cache_add(ev->poll_list, pe->expire, &pe->me);
+		pe->nready = 0;
 
 		fiber_io_inc();
 
-		pe.fiber->status = FIBER_STATUS_POLL_WAIT;
+		pe->fiber->status = FIBER_STATUS_POLL_WAIT;
 		acl_fiber_switch();
 
-		if (pe.nready == 0) {
-			timer_cache_remove(ev->poll_list, pe.expire, &pe.me);
+		if (pe->nready == 0) {
+			timer_cache_remove(ev->poll_list, pe->expire, &pe->me);
 		}
 
 		ev->timeout = old_timeout;
 
-		if (acl_fiber_killed(pe.fiber)) {
-			acl_fiber_set_error(pe.fiber->errnum);
-			if (pe.nready == 0) {
-				pe.nready = -1;
+		if (acl_fiber_killed(pe->fiber)) {
+			acl_fiber_set_error(pe->fiber->errnum);
+			if (pe->nready == 0) {
+				pe->nready = -1;
 			}
 
 			msg_info("%s(%d), %s: fiber-%u was killed, %s, timeout=%d",
 				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(pe.fiber), last_serror(), timeout);
+				acl_fiber_id(pe->fiber), last_serror(), timeout);
 			break;
 		}
 
@@ -278,22 +287,25 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			ev->timeout = -1;
 		}
 
-		if (pe.nready != 0 || timeout == 0) {
+		if (pe->nready != 0 || timeout == 0) {
 			break;
 		}
 
 		now = event_get_stamp(ev);
-		if (pe.expire > 0 && now >= pe.expire) {
+		if (pe->expire > 0 && now >= pe->expire) {
 			acl_fiber_set_error(FIBER_ETIMEDOUT);
 			break;
 		}
 	}
 
-	poll_event_clean(ev, &pe);
-	pollfd_free(pe.fds);
+	poll_event_clean(ev, pe);
+	pollfd_free(pe->fds);
 	ev->waiter--;
 
-	return pe.nready;
+	nready = pe->nready;
+	mem_free(pe);
+	printf(">>>>>>>>>nready=%d\n", nready);
+	return nready;
 }
 
 #ifdef SYS_UNIX
