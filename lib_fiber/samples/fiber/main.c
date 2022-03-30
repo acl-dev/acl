@@ -15,10 +15,11 @@ static int __stack_size = 64000;
 
 static __thread struct timeval __begin;
 static __thread int __left_fiber = 1000;
+static __thread long long __count = 0;
 
 static void stack_dummy(ACL_FIBER *fiber acl_unused)
 {
-	char buf[81920];
+	char buf[512000];
 
 	memset(buf, 0, sizeof(buf));
 }
@@ -28,18 +29,24 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 	int  i;
 
 	if (0)
-		stack_dummy(fiber);
+	stack_dummy(fiber);
 
 	errno = acl_fiber_errno(fiber);
-	for (i = 0; i < __max_loop; i++) {
-		acl_fiber_yield();
-		if (!__display)
-			continue;
 
-		if (i <= 2)
-			printf("fiber-%d, errno: %d\r\n",
-				acl_fiber_id(fiber), errno);
+	for (i = 0; i < __max_loop; i++) {
+		if (__count < 10) {
+			printf("fiber-%d, run, begin to yield\r\n", acl_fiber_id(fiber));
+		}
+
+		acl_fiber_yield();
+
+		if (__count++ < 10) {
+			printf("fiber-%d, wakeup errno: %d\r\n", acl_fiber_id(fiber), errno);
+			printf("------------------------------------------\r\n");
+		}
 	}
+
+	printf("%s: fiber-%d exiting, count=%lld ...\r\n", __FUNCTION__, acl_fiber_id(fiber), __count);
 
 	if (--__left_fiber == 0) {
 		long long count = __max_fiber * __max_loop;
@@ -61,13 +68,13 @@ static void *thread_main(void *ctx acl_unused)
 	gettimeofday(&__begin, NULL);
 	__left_fiber = __max_fiber;
 
-	for (i = 0; i < __max_fiber; i++)
+	for (i = 0; i < __max_fiber; i++) {
 		acl_fiber_create(fiber_main, NULL, __stack_size);
+	}
 
 	acl_fiber_schedule();
 
 	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
-
 	return NULL;
 }
 
@@ -117,11 +124,15 @@ int main(int argc, char *argv[])
 	acl_pthread_attr_init(&attr);
 	tids = (acl_pthread_t *) acl_mycalloc(nthreads, sizeof(acl_pthread_t));
 
-	for (i = 0; i < nthreads; i++)
+	for (i = 0; i < nthreads; i++) {
 		acl_pthread_create(&tids[i], &attr, thread_main, NULL);
+	}
 
-	for (i = 0; i < nthreads; i++)
+	for (i = 0; i < nthreads; i++) {
 		acl_pthread_join(tids[i], NULL);
+	}
+
+	printf("All fiber threads exited now ...\r\n");
 
 	acl_myfree(tids);
 

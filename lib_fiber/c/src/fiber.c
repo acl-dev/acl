@@ -36,7 +36,13 @@ typedef struct THREAD {
 	unsigned   idgen;
 	int        count;
 	size_t     switched;
+	size_t     switched_old;
 	int        nlocal;
+
+#ifdef	SHARE_STACK
+	char      *stack_buff;
+	size_t     stack_size;
+#endif
 } THREAD;
 
 static THREAD          *__main_fiber   = NULL;
@@ -44,6 +50,10 @@ static __thread THREAD *__thread_fiber = NULL;
 static __thread int __scheduled = 0;
 static __thread int __schedule_auto = 0;
 __thread int var_hook_sys_api   = 0;
+
+#ifdef	SHARE_STACK
+static size_t __shared_stack_size = 1024000;
+#endif
 
 #ifdef	SYS_UNIX
 static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_unix_alloc;
@@ -98,13 +108,13 @@ static void thread_free(void *ctx)
 		return;
 	}
 
-	/* free fiber object in the dead fibers link */
+	/* Free fiber object in the dead fibers link */
 	while ((head = ring_pop_head(&__thread_fiber->dead))) {
 		fiber = RING_TO_APPL(head, ACL_FIBER, me);
 		fiber_free(fiber);
 	}
 
-	/* free all possible aliving fiber object */
+	/* Free all possible aliving fiber object */
 	for (i = 0; i < __thread_fiber->slot; i++) {
 		fiber_free(__thread_fiber->fibers[i]);
 	}
@@ -112,6 +122,10 @@ static void thread_free(void *ctx)
 	if (tf->fibers) {
 		mem_free(tf->fibers);
 	}
+
+#ifdef	SHARE_STACK
+	mem_free(tf->stack_buff);
+#endif
 
 	tf->original->free_fn(tf->original);
 	mem_free(tf);
@@ -165,6 +179,11 @@ static void fiber_check(void)
 	__thread_fiber->count    = 0;
 	__thread_fiber->nlocal   = 0;
 
+#ifdef	SHARE_STACK
+	__thread_fiber->stack_size = __shared_stack_size;
+	__thread_fiber->stack_buff = mem_malloc(__thread_fiber->stack_size);
+#endif
+
 	ring_init(&__thread_fiber->ready);
 	ring_init(&__thread_fiber->dead);
 
@@ -175,6 +194,30 @@ static void fiber_check(void)
 		msg_fatal("pthread_setspecific error!");
 	}
 }
+
+ACL_FIBER *fiber_origin(void)
+{
+	return __thread_fiber->original;
+}
+
+#ifdef	SHARE_STACK
+
+char *fiber_share_stack_addr(void)
+{
+	return __thread_fiber->stack_buff;
+}
+
+char *fiber_share_stack_top(void)
+{
+	return __thread_fiber->stack_buff + __thread_fiber->stack_size;
+}
+
+size_t fiber_share_stack_size(void)
+{
+	return __thread_fiber->stack_size;
+}
+
+#endif
 
 #ifdef	HOOK_ERRNO
 
@@ -205,7 +248,7 @@ static void fiber_init(void)
 #endif
 }
 
-/* see /usr/include/bits/errno.h for __errno_location */
+/* See /usr/include/bits/errno.h for __errno_location */
 #ifdef ANDROID
 volatile int*   __errno(void)
 #else
@@ -356,7 +399,7 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		size_t slot = from->slot;
 		int n = ring_size(&__thread_fiber->dead);
 
-		/* if the cached dead fibers reached the limit,
+		/* If the cached dead fibers reached the limit,
 		 * some will be freed
 		 */
 		if (n > MAX_CACHE) {
@@ -474,14 +517,14 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 
 	fiber->signum = signum;
 
-	if (fiber == curr) { // just return if kill myself
+	if (fiber == curr) { // Just return if kill myself
 		return;
 	}
 
 	ring_detach(&curr->me);
 	ring_detach(&fiber->me);
 
-	/* add the current fiber and signed fiber in the head of the ready */
+	/* Add the current fiber and signed fiber in the head of the ready */
 #if 0
 	fiber_ready(fiber);
 	fiber_yield();
@@ -537,24 +580,22 @@ void acl_fiber_ready(ACL_FIBER *fiber)
 
 int acl_fiber_yield(void)
 {
-	size_t  n;
-
 	if (ring_size(&__thread_fiber->ready) == 0) {
 		return 0;
 	}
 
-	n = __thread_fiber->switched;
+	__thread_fiber->switched_old = __thread_fiber->switched;
 	__thread_fiber->running->status = FIBER_STATUS_NONE;
 	acl_fiber_ready(__thread_fiber->running);
 	acl_fiber_switch();
 
-	// when switched overflows, it will be set to 0, then n saved last
+	// When switched overflows, it will be set to 0, then n saved last
 	// switched's value will larger than switched, so we need to use
 	// abs function to avoiding this problem
 #if defined(__APPLE__) || defined(SYS_WIN) || defined(ANDROID)
-	return (int) (__thread_fiber->switched - n - 1);
+	return (int) (__thread_fiber->switched - __thread_fiber->switched_old - 1);
 #else
-	return (int) abs(__thread_fiber->switched - n - 1);
+	return (int) abs(__thread_fiber->switched - __thread_fiber->switched_old - 1);
 #endif
 }
 
@@ -656,7 +697,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 
 #define	APPL	RING_TO_APPL
 
-	/* try to reuse the fiber memory in dead queue */
+	/* Try to reuse the fiber memory in dead queue */
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 		fiber = __fiber_alloc_fn(fiber_start, size);
@@ -666,7 +707,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	}
 
 	__thread_fiber->idgen++;
-	if (__thread_fiber->idgen == 0) { /* overflow ? */
+	if (__thread_fiber->idgen == 0) { /* Overflow ? */
 		__thread_fiber->idgen++;
 	}
 
@@ -733,6 +774,15 @@ int acl_fiber_status(const ACL_FIBER *fiber)
 	return fiber ? fiber->status : 0;
 }
 
+void acl_fiber_set_shared_stack_size(size_t size)
+{
+	if (size >= 1024) {
+#ifdef	SHARE_STACK
+		__shared_stack_size = size;
+#endif
+	}
+}
+
 void acl_fiber_schedule_set_event(int event_mode)
 {
 	event_set(event_mode);
@@ -778,7 +828,7 @@ void acl_fiber_schedule(void)
 		__thread_fiber->running = NULL;
 	}
 
-	/* release dead fiber */
+	/* Release dead fiber */
 	while ((head = ring_pop_head(&__thread_fiber->dead)) != NULL) {
 		fiber = RING_TO_APPL(head, ACL_FIBER, me);
 		fiber_free(fiber);

@@ -76,9 +76,17 @@ struct ACL_FIBER {
 
 /* in fiber.c */
 extern __thread int var_hook_sys_api;
+
 FIBER_BASE *fbase_alloc(void);
 void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
+ACL_FIBER *fiber_origin(void);
+
+#ifdef	SHARE_STACK
+char *fiber_share_stack_addr(void);
+char *fiber_share_stack_top(void);
+size_t fiber_share_stack_size(void);
+#endif
 
 /* in fbase.c */
 void fbase_event_open(FIBER_BASE *fbase);

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "http_servlet.h"
 
-#define	 STACK_SIZE	128000
+static int STACK_SIZE = 128000;
 static int __rw_timeout = 0;
 static int __schedule_event = FIBER_EVENT_KERNEL;
 
@@ -90,6 +90,7 @@ static void usage(const char* procname)
 		" -e event\r\n"
 		" -R reuse_port\r\n"
 		" -t threads\r\n"
+		" -z stack_size[default: 128000]\r\n"
 		" -r rw_timeout\r\n", procname);
 }
 
@@ -99,7 +100,7 @@ int main(int argc, char *argv[])
 	int  ch, nthreads = 2;
 	bool reuse_port = false;
 
-	while ((ch = getopt(argc, argv, "hs:r:t:Re:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:t:Re:z:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -124,6 +125,9 @@ int main(int argc, char *argv[])
 			} else if (strcasecmp(optarg, "select") == 0) {
 				__schedule_event = FIBER_EVENT_SELECT;
 			}
+		case 'z':
+			STACK_SIZE = atoi(optarg);
+			break;
 		default:
 			break;
 		}

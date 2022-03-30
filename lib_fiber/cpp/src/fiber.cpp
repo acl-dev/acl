@@ -102,6 +102,12 @@ void fiber::set_non_blocking(bool yes)
 	acl_fiber_set_non_blocking(yes ? 1 : 0);
 }
 
+void fiber::set_shared_stack_size(size_t size)
+{
+	acl_fiber_set_shared_stack_size(size);
+}
+
+
 ACL_FIBER *fiber::get_fiber(void) const
 {
 	return f_;

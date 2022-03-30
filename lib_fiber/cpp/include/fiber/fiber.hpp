@@ -195,6 +195,12 @@ public:
 	static void set_non_blocking(bool yes);
 
 	/**
+	 * 在启用共享栈模式下设置共享栈的大小,内部缺省值为 1024000 字节
+	 * @param size {size_t} 共享栈内存大小
+	 */
+	static void set_shared_stack_size(size_t size);
+
+	/**
 	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
 	 * 调用本函数，因为内部会自动 HOOK IO API
 	 */

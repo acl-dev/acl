@@ -29,6 +29,12 @@ FIBER_API void acl_fiber_hook_api(int onoff);
 FIBER_API void acl_fiber_set_non_blocking(int yes);
 
 /**
+ * set the shared stack's memory size in shared stack mode
+ * @param size {size_t} must more than 1024 for shared stack mode.
+ */
+FIBER_API void acl_fiber_set_shared_stack_size(size_t size);
+
+/**
  * create and start one fiber
  * @param fn {void (*)(ACL_FIBER*, void*)} the callback of fiber running
  * @param arg {void*} the second parameter of the callback fn
