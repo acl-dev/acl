@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
 			} else if (strcasecmp(optarg, "select") == 0) {
 				__schedule_event = FIBER_EVENT_SELECT;
 			}
+			break;
 		case 'z':
 			STACK_SIZE = atoi(optarg);
 			break;

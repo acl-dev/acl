@@ -272,6 +272,12 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	int old_timeout, nready;
 
 #ifdef SHARE_STACK
+	// In shared stack mode, we should use heap memory for pe to hold
+	// all the fds, because the pe will be operated by the event fiber,
+	// but the shared stack can be used by only one fiber, the stack
+	// memory of the current fiber will be occupied by the other fiber
+	// after switching the other fiber. So, we use heap memory to hold
+	// pe to avoid stack memory collision.
 	pollfds    *pfds;
 	POLL_EVENT *pe;
 #else
