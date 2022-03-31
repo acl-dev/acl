@@ -44,14 +44,14 @@ bool http_servlet::doGet(request_t& req, response_t& res)
 {
 	const char* path = req.getPathInfo();
 	handler_t handler = path && *path ? handlers_[path] : NULL;
-	return handler ? (this->*handler)(req, res) : transfer_get(req, res);
+	return handler ? (this->*handler)(req, res) : transfer_get(&req, &res);
 }
 
 bool http_servlet::doPost(request_t& req, response_t& res)
 {
 	const char* path = req.getPathInfo();
 	handler_t handler = path && *path ? handlers_[path] : NULL;
-	return handler ? (this->*handler)(req, res) : transfer_post(req, res);
+	return handler ? (this->*handler)(req, res) : transfer_post(&req, &res);
 }
 
 bool http_servlet::on_hello(request_t& req, response_t& res)
@@ -93,26 +93,31 @@ bool http_servlet::on_hello(request_t& req, response_t& res)
 	return res.write(buf) && res.write(NULL, 0);
 }
 
-bool http_servlet::transfer_get(request_t& req, response_t& res)
+bool http_servlet::transfer_get(request_t* req, response_t* res)
 {
-	http_transfer fiber_peer(acl::HTTP_METHOD_GET, req, res, port_);
-	fiber_peer.start();
+	http_transfer* fiber_peer = new
+		http_transfer(acl::HTTP_METHOD_GET, req, res, port_);
+	fiber_peer->start();
 
 	bool keep_alive;
-	fiber_peer.wait(&keep_alive);
-	return keep_alive && req.isKeepAlive();
+	fiber_peer->wait(&keep_alive);
+
+	delete fiber_peer;
+	return keep_alive && req->isKeepAlive();
 }
 
-bool http_servlet::transfer_post(request_t& req, response_t& res)
+bool http_servlet::transfer_post(request_t* req, response_t* res)
 {
-	http_transfer fiber_peer(acl::HTTP_METHOD_POST, req, res, port_);
-	fiber_peer.start();
+	http_transfer* fiber_peer = new
+		http_transfer(acl::HTTP_METHOD_POST, req, res, port_);
+	fiber_peer->start();
 
 	bool keep_alive;
-	fiber_peer.wait(&keep_alive);
+	fiber_peer->wait(&keep_alive);
 
+	delete fiber_peer;
 	printf("transfer_post finished\r\n");
-	return keep_alive && req.isKeepAlive();
+	return keep_alive && req->isKeepAlive();
 }
 
 bool http_servlet::doConnect(request_t& req, response_t&)
@@ -138,15 +143,17 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 
 	printf("remote host=%s, current fiber=%p\r\n", host.c_str(), acl_fiber_running());
 
-	acl::socket_stream peer;
-	if (!peer.open(host, 5, 5, acl::time_unit_s)) {
+	acl::socket_stream* peer = new acl::socket_stream;
+	if (!peer->open(host, 5, 5, acl::time_unit_s)) {
 		logger_error("connect %s error %s", host.c_str(), acl::last_serror());
+		delete peer;
 		return false;
 	}
-	printf("connect %s ok, fd=%d\r\n", host.c_str(), peer.sock_handle());
+	printf("connect %s ok, fd=%d\r\n", host.c_str(), peer->sock_handle());
 
-	acl::socket_stream& local = req.getSocketStream();
-	local.set_rw_timeout(3);
+	//acl::socket_stream* local = &req.getSocketStream();
+	acl::socket_stream* local = new acl::socket_stream;
+	local->open(req.getSocketStream().sock_handle());
 
 #if 0
 	const char* ok = "";
@@ -159,43 +166,58 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	const char* ok = "HTTP/1.1 200 Connection Established\r\n\r\n";
 	size_t n = strlen(ok);
 
-	if (local.write(ok, n) != (int) n) {
+	if (local->write(ok, n) != (int) n) {
 		logger_error("write connect response error");
+		delete peer;
+		local->unbind();
+		delete local;
 		return false;
 	}
 #endif
 
 	transfer_tcp(local, peer);
+
+	delete peer;
+	local->unbind();
+	delete local;
 	return false;
 }
 
-bool http_servlet::transfer_tcp(acl::socket_stream& local, acl::socket_stream& peer)
+bool http_servlet::transfer_tcp(acl::socket_stream* local, acl::socket_stream* peer)
 {
-	local.set_rw_timeout(15);
-	peer.set_rw_timeout(25);
+	local->set_rw_timeout(20);
+	peer->set_rw_timeout(20);
 
-	tcp_transfer fiber_local(acl_fiber_running(), local, peer, false);
-	tcp_transfer fiber_peer(acl_fiber_running(), peer, local, false);
+	tcp_transfer* fiber_local = new
+		tcp_transfer(acl_fiber_running(), local, peer, false);
+	tcp_transfer* fiber_peer = new
+		tcp_transfer(acl_fiber_running(), peer, local, false);
 
-	fiber_local.set_peer(fiber_peer);
-	fiber_peer.set_peer(fiber_local);
+	fiber_local->set_peer(fiber_peer);
+	fiber_local->set_local(true);
 
-	fiber_peer.start();
-	fiber_local.start();
+	fiber_peer->set_peer(fiber_local);
+	fiber_peer->set_local(false);
+
+	fiber_peer->start();
+	fiber_local->start();
 
 	//int fd_local = local.sock_handle();
 	//int fd_peer = peer.sock_handle();
 
 	//printf("wait local fiber, local fd=%d, peer fd=%d\r\n", fd_local, fd_peer);
-	fiber_local.wait();
+	fiber_local->wait();
 	//printf("local fiber done, local fd=%d, peer fd=%d\r\n", fd_local, fd_peer);
 
 	//printf("wait peer fiber, local fd=%d, peer fd=%d\r\n", fd_local, fd_peer);
-	fiber_peer.wait();
+	fiber_peer->wait();
 	//printf("peer fiber done, local fd=%d, peer fd=%d\r\n", fd_local, fd_peer);
 
 	//printf("transfer_tcp finished, local fd=%d, %d, peer fd=%d, %d\r\n",
 	//	fiber_local.get_input().sock_handle(), fd_local,
 	//	fiber_local.get_output().sock_handle(), fd_peer);
+
+	delete fiber_peer;
+	delete fiber_local;
 	return true;
 }

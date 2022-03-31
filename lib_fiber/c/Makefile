@@ -24,7 +24,7 @@ CFLAGS = -c -g -W \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_RING \
--DSHARE_STACK \
+#-DSHARE_STACK \
 #-DUSE_VALGRIND \
 #-DUSE_FAST_TIME \
 #-Waggregate-return \

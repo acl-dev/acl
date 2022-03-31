@@ -3,12 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-static void fiber_client(acl::socket_stream* conn)
+static bool stop = false;
+
+static void echo_client(acl::socket_stream* conn, acl::fiber_tbox<bool> *box)
 {
 	printf("fiber-%d running, sock fd=%d\r\n",
 		acl::fiber::self(), conn->sock_handle());
 
-	bool stop = false;
 	char buf[8192];
 	while (true) {
 		int ret = conn->read(buf, sizeof(buf), false);
@@ -16,6 +17,7 @@ static void fiber_client(acl::socket_stream* conn)
 			break;
 		}
 		buf[ret] = 0;
+
 		if (strncasecmp(buf, "stop", 4) == 0) {
 			stop = true;
 			break;
@@ -23,8 +25,39 @@ static void fiber_client(acl::socket_stream* conn)
 		if (conn->write(buf, ret) == -1) {
 			break;
 		}
+		if (strncasecmp(buf, "bye", 3) == 0) {
+			break;
+		}
 	}
 
+	box->push(NULL);
+}
+
+static void fiber_client(acl::socket_stream* conn)
+{
+	acl::fiber_tbox<bool>* box = new acl::fiber_tbox<bool>;
+
+	char buf[8192];
+	int ret = conn->read(buf, sizeof(buf), false);
+	if (ret == -1) {
+		printf("read from fd=%d error\r\n", conn->sock_handle());
+		delete conn;
+		return;
+	}
+	if (conn->write(buf, ret) == -1) {
+		printf("write to fd=%d error\r\n", conn->sock_handle());
+		delete conn;
+		return;
+	}
+
+	go[&] {
+		echo_client(conn, box);
+	};
+
+	box->pop();
+	delete box;
+
+	printf("%s: delete fd=%d\r\n", __FUNCTION__, conn->sock_handle());
 	delete conn;
 
 	if (stop) {

@@ -69,10 +69,24 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	for (;;) {
 		ACL_VSTREAM *cstream = acl_vstream_accept(sstream, NULL, 0);
+		char buf[1024];
+		int  ret;
+
 		if (cstream == NULL) {
 			printf("acl_vstream_accept error %s\r\n",
 				acl_last_serror());
 			break;
+		}
+
+		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
+		if (ret == ACL_VSTREAM_EOF) {
+			printf("get first line error\r\n");
+			acl_vstream_close(cstream);
+			continue;
+		} else if (acl_vstream_writen(cstream, buf, ret) != ret) {
+			printf("write error\r\n");
+			acl_vstream_close(cstream);
+			continue;
 		}
 
 		//printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));

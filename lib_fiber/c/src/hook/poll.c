@@ -36,27 +36,21 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 
 	assert(pfd->pfd->events & POLLIN);
 
-	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 	event_del_read(ev, fe);
 
 	pfd->pfd->revents |= POLLIN;
-	printf(">>%s(%d): set read, pfd=%p\n", __FUNCTION__, __LINE__, pfd->pfd);
 
 	if (fe->mask & EVENT_ERR) {
-	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		pfd->pfd->revents |= POLLERR;
 	}
 	if (fe->mask & EVENT_HUP) {
-	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		pfd->pfd->revents |= POLLHUP;
 	}
 	if (fe->mask & EVENT_NVAL) {
-	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		pfd->pfd->revents |= POLLNVAL;
 	}
 
 	if (!(pfd->pfd->events & POLLOUT)) {
-	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		fe->pfd = NULL;
 		pfd->fe = NULL;
 	}
@@ -70,7 +64,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	 * timeout process in event_process_poll() in event.c.
 	 */
 	if (pfd->pe->nready == 0) {
-	printf(">>>%s(%d): fd=%d\n", __FUNCTION__, __LINE__, fe->fd);
 		timer_cache_remove(ev->poll_list, pfd->pe->expire, &pfd->pe->me);
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
 	}
@@ -224,14 +217,66 @@ static void pollfd_free(POLLFD *pfds)
 	mem_free(pfds);
 }
 
+#ifdef SHARE_STACK
+
+typedef struct pollfds {
+	struct pollfd *fds;
+	nfds_t nfds;
+	size_t size;
+} pollfds;
+
+static void fiber_on_exit(void *ctx)
+{
+	pollfds *pfds = (pollfds *) ctx;
+
+	mem_free(pfds->fds);
+	mem_free(pfds);
+}
+
+static __thread int __local_key;
+
+static pollfds *pollfds_save(const struct pollfd *fds, nfds_t nfds)
+{
+	pollfds *pfds = (pollfds *) acl_fiber_get_specific(__local_key);
+
+	if (pfds == NULL) {
+		pfds = (pollfds *) mem_malloc(sizeof(pollfds));
+		pfds->size = nfds + 1;
+		pfds->fds  = mem_malloc(sizeof(struct pollfds) * pfds->size);
+		acl_fiber_set_specific(&__local_key, pfds, fiber_on_exit);
+	} else if (pfds->size < (size_t) nfds) {
+		mem_free(pfds->fds);
+		pfds->size = nfds + 1;
+		pfds->fds  = mem_malloc(sizeof(struct pollfd) * pfds->size);
+	} else {
+		pfds->nfds = nfds;
+	}
+
+	pfds->nfds = nfds;
+	memcpy(pfds->fds, fds, sizeof(struct pollfd) * nfds);
+	return pfds;
+}
+
+static void pollfds_copy(const pollfds *pfds, struct pollfd *fds)
+{
+	memcpy(fds, pfds->fds, sizeof(struct pollfd) * pfds->nfds);
+}
+#endif // SHARE_STACK
+
 #define	MAX_TIMEOUT	200000000
 
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long now;
-	POLL_EVENT *pe;
 	EVENT *ev;
 	int old_timeout, nready;
+
+#ifdef SHARE_STACK
+	pollfds    *pfds;
+	POLL_EVENT *pe;
+#else
+	POLL_EVENT  pevent, *pe;
+#endif
 
 	if (sys_poll == NULL) {
 		hook_once();
@@ -245,14 +290,22 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		timeout = MAX_TIMEOUT;
 	}
 
-	pe         = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
-	ev         = fiber_io_event();
-	pe->fds    = pollfd_alloc(pe, fds, nfds);
-	pe->nfds   = nfds;
-	pe->fiber  = acl_fiber_running();
-	pe->proc   = poll_callback;
-
+	ev          = fiber_io_event();
 	old_timeout = ev->timeout;
+
+#ifdef SHARE_STACK
+	pfds      = pollfds_save(fds, nfds);
+	pe        = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
+	pe->fds   = pollfd_alloc(pe, pfds->fds, nfds);
+#else
+	pe        = &pevent;
+	pe->fds   = pollfd_alloc(pe, fds, nfds);
+#endif
+
+	pe->nfds  = nfds;
+	pe->fiber = acl_fiber_running();
+	pe->proc  = poll_callback;
+
 	poll_event_set(ev, pe, timeout);
 	ev->waiter++;
 
@@ -303,8 +356,12 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	ev->waiter--;
 
 	nready = pe->nready;
+
+#ifdef SHARE_STACK
 	mem_free(pe);
-	printf(">>>>>>>>>nready=%d\n", nready);
+	pollfds_copy(pfds, fds);
+#endif
+
 	return nready;
 }
 

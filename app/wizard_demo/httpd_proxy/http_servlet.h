@@ -27,8 +27,8 @@ private:
 	std::map<std::string, handler_t> handlers_;
 
 	bool on_hello(request_t&, response_t&);
-	bool transfer_get(request_t&, response_t&);
-	bool transfer_post(request_t&, response_t&);
+	bool transfer_get(request_t*, response_t*);
+	bool transfer_post(request_t*, response_t*);
 
-	bool transfer_tcp(acl::socket_stream& local, acl::socket_stream& peer);
+	bool transfer_tcp(acl::socket_stream* local, acl::socket_stream* peer);
 };
