@@ -570,8 +570,12 @@ static int fiber_file_del(FILE_EVENT *fe)
 
 void fiber_file_free(FILE_EVENT *fe)
 {
-	fiber_file_del(fe);
-	file_event_free(fe);
+	if (fiber_file_del(fe) == 0) {
+		file_event_free(fe);
+	} else {
+		// xxx: What happened?
+		msg_error("Some error happened for fe=%p, fd=%d", fe, fe->fd);
+	}
 }
 
 void fiber_file_close(FILE_EVENT *fe)

@@ -130,6 +130,8 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	acl_fiber_set_shared_stack_size(8000000);
+
 	acl_pthread_attr_init(&attr);
 	tids = (acl_pthread_t *) acl_mycalloc(nthreads, sizeof(acl_pthread_t));
 
