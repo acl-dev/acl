@@ -95,7 +95,7 @@ typedef int socket_t;
 #endif
 
 /**
- * the fiber struct type definition
+ * The fiber struct type definition
  */
 typedef struct ACL_FIBER ACL_FIBER;
 

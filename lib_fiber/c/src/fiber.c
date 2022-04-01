@@ -783,6 +783,16 @@ void acl_fiber_set_shared_stack_size(size_t size)
 	}
 }
 
+size_t acl_fiber_get_shared_stack_size(void)
+{
+#if	defined(SHARE_STACK)
+	return __shared_stack_size;
+#else
+	return 0;
+#endif
+}
+
+
 void acl_fiber_schedule_set_event(int event_mode)
 {
 	event_set(event_mode);

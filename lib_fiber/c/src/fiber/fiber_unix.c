@@ -67,11 +67,15 @@ static void swap_fcontext(FIBER_UNIX *from, FIBER_UNIX *to)
 }
 #endif
 
+#if	defined(SHARE_STACK) && defined(USE_BOOST_JMP)
+# error "Not support shared stack when use boost jmp!"
+#endif
+
 static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 {
 	// The shared stack mode isn't supported in USE_BOOST_JMP current,
 	// which may be supported in future.
-#if	defined(SHARE_STACK) && !defined(USE_BOOST_JMP)
+#if	defined(SHARE_STACK)
 	char *top = fiber_share_stack_top();
 	char  dummy = 0;
 
@@ -117,7 +121,7 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 	}
 #endif
 
-#if	defined(SHARE_STACK) && !defined(USE_BOOST_JMP)
+#if	defined(SHARE_STACK)
 	assert(from->fiber.status != FIBER_STATUS_EXITING);
 
 	// After coming back, the from fiber's stack should be restored and
@@ -231,7 +235,7 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
 
-#if	defined(SHARE_STACK) && !defined(USE_BOOST_JMP)
+#if	defined(SHARE_STACK)
 	fb->context->uc_stack.ss_sp   = fiber_share_stack_addr();
 	fb->context->uc_stack.ss_size = fiber_share_stack_size();
 #else
