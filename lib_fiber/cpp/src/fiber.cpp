@@ -107,6 +107,10 @@ void fiber::set_shared_stack_size(size_t size)
 	acl_fiber_set_shared_stack_size(size);
 }
 
+size_t fiber::get_shared_stack_size(void)
+{
+	return acl_fiber_get_shared_stack_size();
+}
 
 ACL_FIBER *fiber::get_fiber(void) const
 {

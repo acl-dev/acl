@@ -201,6 +201,12 @@ public:
 	static void set_shared_stack_size(size_t size);
 
 	/**
+	 * 在启用共享栈模式下获得共享栈大小
+	 * @return {size_t} 如果返回 0 则表示未启用共享栈方式
+	 */
+	static size_t get_shared_stack_size(void);
+
+	/**
 	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
 	 * 调用本函数，因为内部会自动 HOOK IO API
 	 */
