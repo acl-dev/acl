@@ -100,6 +100,7 @@ static void usage(const char* procname)
 int main(int argc, char *argv[])
 {
 	int  ch, n = 10;
+	size_t shared_size;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
@@ -118,8 +119,14 @@ int main(int argc, char *argv[])
 	}
 
 	go fiber1;
-	go fiber_wait4thread;
-	go fiber_wait4fiber;
+
+	shared_size = acl::fiber::get_shared_stack_size();
+	if (shared_size == 0) {
+		// These two fibers can't running in shared stack mode.
+
+		go fiber_wait4thread;
+		go fiber_wait4fiber;
+	}
 
 	go[=] {
 		fiber2(n, "hello world");

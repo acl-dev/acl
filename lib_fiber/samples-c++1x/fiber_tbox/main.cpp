@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
 
-	size_t count;
+	size_t count = 0;
 
 	if (use_shared_stack > 0) {
 		if (use_thread) {
