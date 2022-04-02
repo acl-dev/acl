@@ -182,8 +182,9 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 
 	int fd = local->unbind_sock();
 	if (fd == -1) {
-		logger_warn("the socket has been closed before!");
 		acl::socket_stream& ss = req.getSocketStream();
+		logger_warn("The socket=%d has been closed before!",
+			ss.sock_handle());
 		ss.unbind_sock();
 	}
 	delete local;

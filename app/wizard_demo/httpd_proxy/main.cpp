@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
 
 		acl::log::stdout_open(true);
 		acl::fiber::stdout_open(true);
-		logger_open("debug.log", "httpd_proxy");
 
 		if (argc >= 4) {
 			addr = argv[3];
