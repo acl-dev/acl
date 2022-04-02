@@ -151,9 +151,14 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	}
 	printf("connect %s ok, fd=%d\r\n", host.c_str(), peer->sock_handle());
 
-	//acl::socket_stream* local = &req.getSocketStream();
+//#define	USE_REFER
+
+#ifdef	USE_REFER
+	acl::socket_stream* local = &req.getSocketStream();
+#else
 	acl::socket_stream* local = new acl::socket_stream;
 	local->open(req.getSocketStream().sock_handle());
+#endif
 
 #if 0
 	const char* ok = "";
@@ -178,8 +183,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 
 	transfer_tcp(local, peer);
 
-	delete peer;
-
+#ifndef	USE_REFER
 	int fd = local->unbind_sock();
 	if (fd == -1) {
 		acl::socket_stream& ss = req.getSocketStream();
@@ -188,6 +192,8 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 		ss.unbind_sock();
 	}
 	delete local;
+#endif
+	delete peer;
 	return false;
 }
 
