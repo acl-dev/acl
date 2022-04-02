@@ -19,12 +19,14 @@ static __thread long long __count = 0;
 
 #define	DUMMY_SIZE	512000
 
+/*
 static void stack_dummy(ACL_FIBER *fiber acl_unused)
 {
 	char buf[DUMMY_SIZE];
 
 	memset(buf, 0, sizeof(buf));
 }
+*/
 
 static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 {
@@ -34,7 +36,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 	printf("\r\nshared_stack_size=%zd\r\n\r\n", shared_stack_size);
 
 	if (shared_stack_size > DUMMY_SIZE) {
-		stack_dummy(fiber);
+		//stack_dummy(fiber);
 	}
 
 	errno = acl_fiber_errno(fiber);

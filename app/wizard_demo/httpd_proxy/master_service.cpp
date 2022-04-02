@@ -71,7 +71,8 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 
 void master_service::proc_on_init(void)
 {
-	logger(">>>proc_on_init<<<");
+	logger(">>>proc_on_init: shared stack size=%zd<<<",
+		acl::fiber::get_shared_stack_size());
 }
 
 void master_service::proc_on_exit(void)

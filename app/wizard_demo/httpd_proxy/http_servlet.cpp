@@ -169,7 +169,8 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	if (local->write(ok, n) != (int) n) {
 		logger_error("write connect response error");
 		delete peer;
-		local->unbind();
+
+		local->unbind_sock();
 		delete local;
 		return false;
 	}
@@ -178,7 +179,13 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	transfer_tcp(local, peer);
 
 	delete peer;
-	local->unbind();
+
+	int fd = local->unbind_sock();
+	if (fd == -1) {
+		logger_warn("the socket has been closed before!");
+		acl::socket_stream& ss = req.getSocketStream();
+		ss.unbind_sock();
+	}
 	delete local;
 	return false;
 }
