@@ -149,7 +149,8 @@ static ACL_VSTREAM *stream_udp_bind(struct sockaddr_in addr)
 	stream = stream_udp_open();
 	fd = ACL_VSTREAM_SOCK(stream);
 	if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) != 0)
-		acl_msg_fatal("%s(%d): can't bind", myname, __LINE__);
+		acl_msg_fatal("%s(%d): bind, error: %s", myname,
+			__LINE__, acl_last_serror());
 
 	return stream;
 }
@@ -456,7 +457,7 @@ void service_udp_init(SERVICE *service, const char *local_ip,
 	ACL_SAFE_STRNCPY(ctx->local_ip, local_ip, sizeof(ctx->local_ip));
 	ctx->local_port = local_port;
 	ctx->local_addr.sin_addr.s_addr = inet_addr(local_ip);
-	ctx->local_addr.sin_port = htons(local_port);
+	ctx->local_addr.sin_port = htons(local_port + 1);
 	ctx->local_addr.sin_family = AF_INET;
 
 	ACL_SAFE_STRNCPY(ctx->remote_ip, remote_ip, sizeof(ctx->remote_ip));
@@ -464,6 +465,8 @@ void service_udp_init(SERVICE *service, const char *local_ip,
 	ctx->remote_addr.sin_addr.s_addr = inet_addr(remote_ip);
 	ctx->remote_addr.sin_port = htons(remote_port);
 	ctx->remote_addr.sin_family = AF_INET;
+
+	printf("begin bind %s:%d\r\n", local_ip, local_port);
 
 	// 创建接收客户端请求的流
 	stream = stream_udp_bind(ctx->local_addr);
