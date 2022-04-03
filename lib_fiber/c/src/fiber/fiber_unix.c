@@ -49,6 +49,10 @@ typedef struct FIBER_UNIX {
 } FIBER_UNIX;
 
 #if	defined(USE_BOOST_JMP)
+# if	defined(SHARE_STACK)
+#  error "Not support shared stack when using boost jmp!"
+# endif
+
 typedef struct {
 	FIBER_UNIX *from;
 	FIBER_UNIX *to;
@@ -65,10 +69,45 @@ static void swap_fcontext(FIBER_UNIX *from, FIBER_UNIX *to)
 	jmp        = (s_jump_t*) trans.data;
 	jmp->from->fcontext = trans.fctx;
 }
+
 #endif
 
-#if	defined(SHARE_STACK) && defined(USE_BOOST_JMP)
-# error "Not support shared stack when use boost jmp!"
+#if	defined(SHARE_STACK)
+
+static void fiber_stack_save(FIBER_UNIX *curr, const char *stack_top)
+{
+	// If the fiber isn't in exiting status, and not the origin fiber,
+	// the fiber's running stack should be copied from the shared running
+	// stack to the fiber's private memory.
+	if (curr->fiber.status != FIBER_STATUS_EXITING && curr->fiber.id > 0) {
+		curr->dlen = fiber_share_stack_bottom() - stack_top;
+		if (curr->dlen > curr->size) {
+			stack_free(curr->buff);
+			curr->buff = (char *) stack_alloc(curr->dlen);
+			curr->size = curr->dlen;
+		}
+		memcpy(curr->buff, stack_top, curr->dlen);
+	}
+}
+
+static void fiber_stack_restore(void)
+{
+	FIBER_UNIX *curr = (FIBER_UNIX *) acl_fiber_running();
+
+	if (curr->fiber.status != FIBER_STATUS_EXITING) {
+		// After coming back, the current fiber's stack should be
+		// restored and copied from its private memory to the shared
+		// stack running memory.
+		if (curr->dlen > 0) {
+			char *top = fiber_share_stack_bottom();
+			memcpy(top - curr->dlen, curr->buff, curr->dlen);
+			fiber_share_stack_set_dlen(curr->dlen);
+		}
+		// else if from->dlen == 0, the fiber must be the origin fiber
+		// that its fiber id should be 0.
+	}
+}
+
 #endif
 
 static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
@@ -76,23 +115,8 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 	// The shared stack mode isn't supported in USE_BOOST_JMP current,
 	// which may be supported in future.
 #if	defined(SHARE_STACK)
-	char *top = fiber_share_stack_top();
-	char  dummy = 0;
-
-	// If the fiber isn't in exiting status, and not the origin fiber,
-	// the fiber's running stack should be copied from the shared running
-	// stack to the fiber's private memory.
-	if (from->fiber.status != FIBER_STATUS_EXITING && from->fiber.id > 0) {
-		from->dlen = top - &dummy;
-		assert(from->dlen > 0);
-
-		if (from->dlen > from->size) {
-			stack_free(from->buff);
-			from->buff = (char *) stack_alloc(from->dlen);
-			from->size = from->dlen;
-		}
-		memcpy(from->buff, &dummy, from->dlen);
-	}
+	char stack_top = 0;
+	fiber_stack_save(from, &stack_top);
 #endif
 
 #if	defined(USE_BOOST_JMP)
@@ -111,10 +135,9 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 			setcontext(to->context);
 		} else {
 			LONGJMP(&to->env);
-			assert(0);
 		}
 	}
-#else
+#else	// Use the default context swap API
 	if (swapcontext(from->context, to->context) < 0) {
 		msg_fatal("%s(%d), %s: swapcontext error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
@@ -122,15 +145,7 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 #endif
 
 #if	defined(SHARE_STACK)
-	assert(from->fiber.status != FIBER_STATUS_EXITING);
-
-	// After coming back, the from fiber's stack should be restored and
-	// copied from its private memory to the shared stack running memory.
-	if (from->dlen > 0) {
-		memcpy(top - from->dlen, from->buff, from->dlen);
-	}
-	// else if from->dlen == 0, the fiber must be the origin fiber that
-	// its fiber id should be 0.
+	fiber_stack_restore();
 #endif
 }
 
@@ -210,9 +225,15 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 	}
 
 #if	defined(USE_BOOST_JMP)
+# if	defined(SHARE_STACK)
+	fb->stack = fiber_share_stack_bottom();
+	fb->fcontext = make_fcontext(fb->stack, fiber_share_stack_size(),
+		(void(*)(transfer_t)) fiber_unix_start);
+# else
 	fb->stack = fb->buff + fb->size;
 	fb->fcontext = make_fcontext(fb->stack, fb->size,
 		(void(*)(transfer_t)) fiber_unix_start);
+# endif
 #else
 	carg.p = fiber;
 

@@ -42,6 +42,7 @@ typedef struct THREAD {
 #ifdef	SHARE_STACK
 	char      *stack_buff;
 	size_t     stack_size;
+	size_t     stack_dlen;
 #endif
 } THREAD;
 
@@ -182,6 +183,7 @@ static void fiber_check(void)
 #ifdef	SHARE_STACK
 	__thread_fiber->stack_size = __shared_stack_size;
 	__thread_fiber->stack_buff = mem_malloc(__thread_fiber->stack_size);
+	__thread_fiber->stack_dlen = 0;
 #endif
 
 	ring_init(&__thread_fiber->ready);
@@ -207,7 +209,7 @@ char *fiber_share_stack_addr(void)
 	return __thread_fiber->stack_buff;
 }
 
-char *fiber_share_stack_top(void)
+char *fiber_share_stack_bottom(void)
 {
 	return __thread_fiber->stack_buff + __thread_fiber->stack_size;
 }
@@ -215,6 +217,16 @@ char *fiber_share_stack_top(void)
 size_t fiber_share_stack_size(void)
 {
 	return __thread_fiber->stack_size;
+}
+
+size_t fiber_share_stack_dlen(void)
+{
+	return __thread_fiber->stack_dlen;
+}
+
+void fiber_share_stack_set_dlen(size_t dlen)
+{
+	__thread_fiber->stack_dlen = dlen;
 }
 
 #endif

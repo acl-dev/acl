@@ -84,8 +84,10 @@ ACL_FIBER *fiber_origin(void);
 
 #ifdef	SHARE_STACK
 char *fiber_share_stack_addr(void);
-char *fiber_share_stack_top(void);
+char *fiber_share_stack_bottom(void);
 size_t fiber_share_stack_size(void);
+size_t fiber_share_stack_dlen(void);
+void fiber_share_stack_set_dlen(size_t dlen);
 #endif
 
 /* in fbase.c */
