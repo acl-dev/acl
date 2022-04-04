@@ -99,8 +99,8 @@ static void fiber_stack_restore(void)
 		// restored and copied from its private memory to the shared
 		// stack running memory.
 		if (curr->dlen > 0) {
-			char *top = fiber_share_stack_bottom();
-			memcpy(top - curr->dlen, curr->buff, curr->dlen);
+			char *bottom = fiber_share_stack_bottom();
+			memcpy(bottom - curr->dlen, curr->buff, curr->dlen);
 			fiber_share_stack_set_dlen(curr->dlen);
 		}
 		// else if from->dlen == 0, the fiber must be the origin fiber

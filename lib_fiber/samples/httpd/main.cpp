@@ -59,10 +59,10 @@ public:
 
 	thread_server(const char* addr)
 	{
-		server_inner_ = new acl::server_socket(acl::OPEN_FLAG_REUSEPORT);
+		server_inner_ = new acl::server_socket(acl::OPEN_FLAG_REUSEPORT, 128);
 		if (server_inner_->open(addr) == false) {
-			printf("open %s error %s\r\n",
-				addr, acl::last_serror());
+			printf("%s(%d): open %s error %s\r\n", __FUNCTION__,
+				__LINE__, addr, acl::last_serror());
 			exit (1);
 		}
 
@@ -141,7 +141,8 @@ int main(int argc, char *argv[])
 
 	if (!reuse_port) {
 		if (server.open(addr) == false) {
-			printf("open %s error\r\n", addr.c_str());
+			printf("%s(%d): open %s error %s\r\n", __FUNCTION__,
+				__LINE__, addr.c_str(), acl::last_serror());
 			exit (1);
 		} else {
 			printf("open %s ok\r\n", addr.c_str());
