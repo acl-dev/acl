@@ -149,8 +149,8 @@ bool redis_stream::xadd_with_maxlen(const char* key, size_t maxlen,
 	argv_lens_[i] = 1;
 	i++;
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%ld", (long) maxlen);
+	char* buf= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%ld", (long) maxlen);
 	argv_[i] = buf;
 	argv_lens_[i] = strlen(buf);
 	i++;
@@ -196,26 +196,25 @@ int redis_stream::xlen(const char* key)
 void redis_stream::build(const std::map<string, string>& streams, size_t i,
 	size_t count, ssize_t block, bool noack /* = false */)
 {
-	char count_s[LONG_LEN];
 	if (count > 0) {
 		argv_[i] = "COUNT";
 		argv_lens_[i] = sizeof("COUNT") - 1;
 		i++;
 
-		safe_snprintf(count_s, sizeof(count_s), "%lu",
-			(unsigned long) count);
+		char* count_s= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+		safe_snprintf(count_s, LONG_LEN, "%lu", (unsigned long) count);
 		argv_[i] = count_s;
 		argv_lens_[i] = strlen(count_s);
 		i++;
 	}
 
-	char block_s[LONG_LEN];
 	if (block >= 0) {
 		argv_[i] = "BLOCK";
 		argv_lens_[i] = sizeof("BLOCK") - 1;
 		i++;
 
-		safe_snprintf(block_s, sizeof(block_s), "%ld", (long) block);
+		char* block_s= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+		safe_snprintf(block_s, LONG_LEN, "%ld", (long) block);
 		argv_[i] = block_s;
 		argv_lens_[i] = strlen(block_s);
 		i++;
@@ -359,14 +358,13 @@ bool redis_stream::range(redis_stream_messages& messages, const char* cmd,
 	lens[i] = strlen(end);
 	i++;
 
-	char count_s[LONG_LEN];
 	if (count > 0) {
 		argv[i] = "COUNT";
 		lens[i] = sizeof("COUNT") - 1;
 		i++;
 
-		safe_snprintf(count_s, sizeof(count_s), "%lu",
-			(unsigned long) count);
+		char* count_s= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+		safe_snprintf(count_s, LONG_LEN, "%lu", (unsigned long) count);
 		argv[i] = count_s;
 		lens[i] = strlen(count_s);
 		i++;
@@ -545,8 +543,8 @@ void redis_stream::xclaim_build(const char* key, const char* group,
 	argv_lens_[i] = strlen(consumer);
 	i++;
 
-	char min_idle_s[LONG_LEN];
-	safe_snprintf(min_idle_s, sizeof(min_idle_s), "%lu", min_idle_time);
+	char* min_idle_s= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(min_idle_s, LONG_LEN, "%lu", min_idle_time);
 	argv_[i] = min_idle_s;
 	argv_lens_[i] = strlen(min_idle_s);
 	i++;
@@ -559,22 +557,23 @@ void redis_stream::xclaim_build(const char* key, const char* group,
 		i++;
 	}
 
-	char tbuf[LONG_LEN];
 	if (idle > 0) {
-		safe_snprintf(tbuf, sizeof(tbuf), "%lu", (unsigned long) idle);
+		char* tbuf= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+		safe_snprintf(tbuf, LONG_LEN, "%lu", (unsigned long) idle);
 		argv_[i] = tbuf;
 		argv_lens_[i] = strlen(tbuf);
 		i++;
 	} else if (time_ms > 0) {
-		safe_snprintf(tbuf, sizeof(tbuf), "%lld", time_ms);
+		char* tbuf= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+		safe_snprintf(tbuf, LONG_LEN, "%lld", time_ms);
 		argv_[i] = tbuf;
 		argv_lens_[i] = strlen(tbuf);
 		i++;
 	}
 
-	char retry_buf[INT_LEN];
 	if (retry_count > 0) {
-		safe_snprintf(retry_buf, sizeof(retry_buf), "%d", retry_count);
+		char* retry_buf= (char*) dbuf_->dbuf_alloc(INT_LEN);
+		safe_snprintf(retry_buf, INT_LEN, "%d", retry_count);
 		argv_[i] = retry_buf;
 		argv_lens_[i] = strlen(retry_buf);
 		i++;
@@ -968,8 +967,8 @@ bool redis_stream::xpending_detail(redis_pending_detail& result,
 	lens[i] = strlen(end_id);
 	i++;
 
-	char count_s[LONG_LEN];
-	safe_snprintf(count_s, sizeof(count_s), "%lu", (unsigned long) count);
+	char* count_s= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(count_s, LONG_LEN, "%lu", (unsigned long) count);
 	argv[i] = count_s;
 	lens[i] = strlen(count_s);
 	i++;
@@ -1105,8 +1104,8 @@ int redis_stream::xtrim(const char* key, size_t maxlen, bool tilde)
 		i++;
 	}
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) maxlen);
+	char* buf= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%lu", (unsigned long) maxlen);
 	argv[i] = buf;
 	lens[i] = strlen(buf);
 	i++;

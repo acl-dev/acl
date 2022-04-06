@@ -344,8 +344,8 @@ bool redis_zset::zadd_with_incr(const char* key, const char* member,
 		i++;
 	}
 
-	char score_s[BUFLEN];
-	safe_snprintf(score_s, sizeof(score_s), "%.8f", score);
+	char* score_s= (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(score_s, BUFLEN, "%.8f", score);
 	argv[i] = score_s;
 	lens[i] = strlen(score_s);
 	i++;
@@ -410,9 +410,10 @@ int redis_zset::zcount(const char* key, double min, double max)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char min_buf[BUFLEN], max_buf[BUFLEN];
-	safe_snprintf(min_buf, sizeof(min_buf), "%.8f", min);
-	safe_snprintf(max_buf, sizeof(max_buf), "%.8f", max);
+	char* min_buf= (char*) dbuf_->dbuf_alloc(BUFLEN);
+	char* max_buf= (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(min_buf, BUFLEN, "%.8f", min);
+	safe_snprintf(max_buf, BUFLEN, "%.8f", max);
 
 	argv[2] = min_buf;
 	lens[2] = strlen(min_buf);
@@ -443,8 +444,8 @@ bool redis_zset::zincrby(const char* key, double inc,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char score[BUFLEN];
-	safe_snprintf(score, sizeof(score), "%.8f", inc);
+	char* score= (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(score, BUFLEN, "%.8f", inc);
 	argv[2] = score;
 	lens[2] = strlen(score);
 
@@ -474,9 +475,10 @@ int redis_zset::zrange_get(const char* cmd, const char* key, int start,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char start_s[INTLEN], stop_s[INTLEN];
-	safe_snprintf(start_s, sizeof(start_s), "%d", start);
-	safe_snprintf(stop_s, sizeof(stop_s), "%d", stop);
+	char* start_s= (char*) dbuf_->dbuf_alloc(INTLEN);
+	char* stop_s= (char*) dbuf_->dbuf_alloc(INTLEN);
+	safe_snprintf(start_s, INTLEN, "%d", start);
+	safe_snprintf(stop_s, INTLEN, "%d", stop);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);
@@ -550,9 +552,10 @@ int redis_zset::zrange_get_with_scores(const char* cmd, const char* key,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char start_s[INTLEN], stop_s[INTLEN];
-	safe_snprintf(start_s, sizeof(start_s), "%d", start);
-	safe_snprintf(stop_s, sizeof(stop_s), "%d", stop);
+	char* start_s= (char*) dbuf_->dbuf_alloc(INTLEN);
+	char* stop_s= (char*) dbuf_->dbuf_alloc(INTLEN);
+	safe_snprintf(start_s, INTLEN, "%d", start);
+	safe_snprintf(stop_s, INTLEN, "%d", stop);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);
@@ -595,10 +598,11 @@ int redis_zset::zrangebyscore_get(const char* cmd, const char* key,
 	argv[3] = max;
 	lens[3] = strlen(max);
 
-	char offset_s[INTLEN], count_s[INTLEN];
 	if (offset && count) {
-		safe_snprintf(offset_s, sizeof(offset_s), "%d", *offset);
-		safe_snprintf(count_s, sizeof(count_s), "%d", *count);
+		char* offset_s= (char*) dbuf_->dbuf_alloc(INTLEN);
+		char* count_s= (char*) dbuf_->dbuf_alloc(INTLEN);
+		safe_snprintf(offset_s, INTLEN, "%d", *offset);
+		safe_snprintf(count_s, INTLEN, "%d", *count);
 
 		argv[4] = "LIMIT";
 		lens[4] = sizeof("LIMIT") - 1;
@@ -629,9 +633,10 @@ int redis_zset::zrangebyscore(const char* key, double min,
 	double max, std::vector<string>* out,
 	const int* offset /* = NULL */, const int* count /* = NULL */)
 {
-	char min_s[BUFLEN], max_s[BUFLEN];
-	safe_snprintf(min_s, sizeof(min_s), "%.8f", min);
-	safe_snprintf(max_s, sizeof(max_s), "%.8f", max);
+	char* min_s= (char*) dbuf_->dbuf_alloc(BUFLEN);
+	char* max_s= (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(min_s, BUFLEN, "%.8f", min);
+	safe_snprintf(max_s, BUFLEN, "%.8f", max);
 
 	return zrangebyscore(key, min_s, max_s, out, offset, count);
 }
@@ -660,10 +665,11 @@ int redis_zset::zrangebyscore_get_with_scores(const char* cmd,
 	argv[4] = "WITHSCORES";
 	lens[4] = sizeof("WITHSCORES") - 1;
 
-	char offset_s[INTLEN], count_s[INTLEN];
 	if (offset && count) {
-		safe_snprintf(offset_s, sizeof(offset_s), "%d", *offset);
-		safe_snprintf(count_s, sizeof(count_s), "%d", *count);
+		char* offset_s = (char*) dbuf_->dbuf_alloc(INTLEN);
+		char* count_s = (char*) dbuf_->dbuf_alloc(INTLEN);
+		safe_snprintf(offset_s, INTLEN, "%d", *offset);
+		safe_snprintf(count_s, INTLEN, "%d", *count);
 
 		argv[5] = "LIMIT";
 		lens[5] = sizeof("LIMIT") - 1;
@@ -695,9 +701,10 @@ int redis_zset::zrangebyscore_with_scores(const char* key, double min,
 	double max, std::vector<std::pair<string, double> >& out,
 	const int* offset /* = NULL */, const int* count /* = NULL */)
 {
-	char min_s[BUFLEN], max_s[BUFLEN];
-	safe_snprintf(min_s, sizeof(min_s), "%.8f", min);
-	safe_snprintf(max_s, sizeof(max_s), "%.8f", max);
+	char* min_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	char* max_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(min_s, BUFLEN, "%.8f", min);
+	safe_snprintf(max_s, BUFLEN, "%.8f", max);
 
 	return zrangebyscore_with_scores(key, min_s, max_s, out, offset, count);
 }
@@ -772,9 +779,10 @@ int redis_zset::zremrangebyrank(const char* key, int start, int stop)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char start_s[INTLEN], stop_s[INTLEN];
-	safe_snprintf(start_s, sizeof(start_s), "%d", start);
-	safe_snprintf(stop_s, sizeof(stop_s), "%d", stop);
+	char* start_s = (char*) dbuf_->dbuf_alloc(INTLEN);
+	char*stop_s = (char*) dbuf_->dbuf_alloc(INTLEN);
+	safe_snprintf(start_s, INTLEN, "%d", start);
+	safe_snprintf(stop_s, INTLEN, "%d", stop);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);
@@ -789,9 +797,10 @@ int redis_zset::zremrangebyrank(const char* key, int start, int stop)
 
 int redis_zset::zremrangebyscore(const char* key, double min, double max)
 {
-	char min_s[BUFLEN], max_s[BUFLEN];
-	safe_snprintf(min_s, sizeof(min_s), "%.8f", min);
-	safe_snprintf(max_s, sizeof(max_s), "%.8f", max);
+	char* min_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	char* max_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(min_s, BUFLEN, "%.8f", min);
+	safe_snprintf(max_s, BUFLEN, "%.8f", max);
 
 	return zremrangebyscore(key, min_s, max_s);
 }
@@ -843,9 +852,10 @@ int redis_zset::zrevrangebyscore_with_scores(const char* key, double min,
 	double max, std::vector<std::pair<string, double> >& out,
 	const int* offset /* = NULL */, const int* count /* = NULL */)
 {
-	char min_s[BUFLEN], max_s[BUFLEN];
-	safe_snprintf(min_s, sizeof(min_s), "%.8f", min);
-	safe_snprintf(max_s, sizeof(max_s), "%.8f", max);
+	char* min_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	char* max_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(min_s, BUFLEN, "%.8f", min);
+	safe_snprintf(max_s, BUFLEN, "%.8f", max);
 
 	return zrevrangebyscore_with_scores(key, min_s, max_s,
 		out, offset, count);
@@ -925,8 +935,8 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	argv[1] = dst;
 	lens[1] = strlen(dst);
 
-	char num_s[BUFLEN];
-	safe_snprintf(num_s, sizeof(num_s), "%d", (int) num);
+	char* num_s = (char*) dbuf_->dbuf_alloc(INTLEN);
+	safe_snprintf(num_s, INTLEN, "%d", (int) num);
 	argv[2] = num_s;
 	lens[2] = strlen(num_s);
 
@@ -1002,8 +1012,8 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	argv[1] = dst;
 	lens[1] = strlen(dst);
 
-	char num_s[INTLEN];
-	safe_snprintf(num_s, sizeof(num_s), "%d", (int) keys.size());
+	char* num_s = (char*) dbuf_->dbuf_alloc(INTLEN);
+	safe_snprintf(num_s, INTLEN, "%d", (int) keys.size());
 	argv[2] = num_s;
 	lens[2] = strlen(num_s);
 
@@ -1201,8 +1211,8 @@ int redis_zset::zpop(const char* cmd, const char* key,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char count_s[BUFLEN];
-	safe_snprintf(count_s, sizeof(count_s), "%lu", (unsigned long) count);
+	char* count_s = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(count_s, BUFLEN, "%lu", (unsigned long) count);
 	argv[2] = count_s;
 	lens[2] = strlen(count_s);
 	argc = 3;
@@ -1251,8 +1261,8 @@ int redis_zset::bzpop(const char* cmd, const char* key, size_t timeout,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char buf[BUFLEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) timeout);
+	char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(buf, BUFLEN, "%lu", (unsigned long) timeout);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
@@ -1278,8 +1288,8 @@ int redis_zset::bzpop(const char* cmd, const std::vector<string>& keys,
 		i++;
 	}
 
-	char buf[BUFLEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) timeout);
+	char* buf = (char*) dbuf_->dbuf_alloc(BUFLEN);
+	safe_snprintf(buf, BUFLEN, "%lu", (unsigned long) timeout);
 	argv_[i] = buf;
 	argv_lens_[i] = strlen(buf);
 	build_request(argc_, argv_, argv_lens_);

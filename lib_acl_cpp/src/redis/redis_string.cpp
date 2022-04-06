@@ -104,8 +104,8 @@ bool redis_string::set(const char* key, size_t key_len, const char* value,
 			goto NEXT_X;
 		}
 
-		char buf[INT_LEN];
-		(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
+		char* buf= (char*) dbuf_->dbuf_alloc(INT_LEN);
+		(void) safe_snprintf(buf, INT_LEN, "%d", timeout);
 		argv[n] = buf;
 		lens[n] = strlen(buf);
 		n++;
@@ -144,8 +144,8 @@ bool redis_string::setex(const char* key, size_t key_len, const char* value,
 	argv[1] = key;
 	lens[1] = key_len;
 
-	char buf[INT_LEN];
-	(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
+	char* buf= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(buf, INT_LEN, "%d", timeout);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
@@ -174,8 +174,8 @@ bool redis_string::psetex(const char* key, size_t key_len, const char* value,
 	argv[1] = key;
 	lens[1] = key_len;
 
-	char buf[INT_LEN];
-	(void) safe_snprintf(buf, sizeof(buf), "%d", timeout);
+	char* buf= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(buf, INT_LEN, "%d", timeout);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
@@ -378,12 +378,13 @@ bool redis_string::getrange(const char* key, size_t key_len,
 	argv[1] = key;
 	lens[1] = key_len;
 
-	char start_buf[INT_LEN], end_buf[INT_LEN];
-	(void) safe_snprintf(start_buf, sizeof(start_buf), "%d", start);
+	char* start_buf= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(start_buf, INT_LEN, "%d", start);
 	argv[2] = start_buf;
 	lens[2] = strlen(start_buf);
 
-	(void) safe_snprintf(end_buf, sizeof(end_buf), "%d", end);
+	char* end_buf= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(end_buf, INT_LEN, "%d", end);
 	argv[3] = end_buf;
 	lens[3] = strlen(end_buf);
 
@@ -411,8 +412,8 @@ bool redis_string::setbit_(const char* key, size_t len,
 	argv[1] = key;
 	lens[1] = len;
 
-	char buf4off[INT_LEN];
-	(void) safe_snprintf(buf4off, sizeof(buf4off), "%d", offset);
+	char* buf4off= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(buf4off, INT_LEN, "%d", offset);
 	argv[2] = buf4off;
 	lens[2] = strlen(buf4off);
 
@@ -441,8 +442,8 @@ bool redis_string::getbit(const char* key, size_t len,
 	argv[1] = key;
 	lens[1] = len;
 
-	char buf4off[INT_LEN];
-	(void) safe_snprintf(buf4off, sizeof(buf4off), "%d", offset);
+	char* buf4off= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(buf4off, INT_LEN, "%d", offset);
 	argv[2] = buf4off;
 	lens[2] = strlen(buf4off);
 
@@ -492,13 +493,13 @@ int redis_string::bitcount(const char* key, size_t len, int start, int end)
 	argv[1] = key;
 	lens[1] = len;
 
-	char buf4start[INT_LEN];
-	(void) safe_snprintf(buf4start, sizeof(buf4start), "%d", start);
+	char* buf4start= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(buf4start, INT_LEN, "%d", start);
 	argv[2] = buf4start;
 	lens[2] = strlen(buf4start);
 
-	char buf4end[INT_LEN];
-	(void) safe_snprintf(buf4end, sizeof(buf4end), "%d", end);
+	char* buf4end= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	(void) safe_snprintf(buf4end, INT_LEN, "%d", end);
 	argv[3] = buf4end;
 	lens[3] = strlen(buf4end);
 
@@ -800,8 +801,8 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char buf[FLOAT_LEN];
-	(void) safe_snprintf(buf, sizeof(buf), "%f", inc);
+	char* buf= (char*) dbuf_->dbuf_alloc(FLOAT_LEN);
+	(void) safe_snprintf(buf, FLOAT_LEN, "%f", inc);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 

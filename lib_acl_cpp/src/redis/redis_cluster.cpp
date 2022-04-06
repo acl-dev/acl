@@ -112,13 +112,13 @@ int redis_cluster::cluster_getkeysinslot(size_t slot, size_t max,
 	argv[1] = "GETKEYSINSLOT";
 	lens[1] = sizeof("GETKEYSINSLOT") - 1;
 
-	char slot_s[LONG_LEN];
-	safe_snprintf(slot_s, sizeof(slot_s), "%lu", (unsigned long) slot);
+	char* slot_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(slot_s, LONG_LEN, "%lu", (unsigned long) slot);
 	argv[2] = slot_s;
 	lens[2] = strlen(slot_s);
 
-	char max_s[LONG_LEN];
-	safe_snprintf(max_s, sizeof(max_s), "%lu", (unsigned long) max);
+	char* max_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(max_s, LONG_LEN, "%lu", (unsigned long) max);
 	argv[3] = max_s;
 	lens[3] = strlen(max_s);
 
@@ -140,8 +140,8 @@ bool redis_cluster::cluster_meet(const char* ip, int port)
 	argv[2] = ip;
 	lens[2] = strlen(ip);
 
-	char port_s[INT_LEN];
-	safe_snprintf(port_s, sizeof(port_s), "%d", port);
+	char* port_s = (char*) dbuf_->dbuf_alloc(INT_LEN);
+	safe_snprintf(port_s, INT_LEN, "%d", port);
 	argv[3] = port_s;
 	lens[3] = strlen(port_s);
 
@@ -212,8 +212,8 @@ bool redis_cluster::cluster_setslot_importing(size_t slot, const char* src_node)
 	argv[1] = "SETSLOT";
 	lens[1] = sizeof("SETSLOT") - 1;
 
-	char slot_s[LONG_LEN];
-	safe_snprintf(slot_s, sizeof(slot_s), "%lu", (unsigned long) slot);
+	char* slot_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(slot_s, LONG_LEN, "%lu", (unsigned long) slot);
 	argv[2] = slot_s;
 	lens[2] = strlen(slot_s);
 
@@ -238,8 +238,8 @@ bool redis_cluster::cluster_setslot_migrating(size_t slot, const char* dst_node)
 	argv[1] = "SETSLOT";
 	lens[1] = sizeof("SETSLOT") - 1;
 
-	char slot_s[LONG_LEN];
-	safe_snprintf(slot_s, sizeof(slot_s), "%lu", (unsigned long) slot);
+	char* slot_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(slot_s, LONG_LEN, "%lu", (unsigned long) slot);
 	argv[2] = slot_s;
 	lens[2] = strlen(slot_s);
 
@@ -264,8 +264,8 @@ bool redis_cluster::cluster_setslot_stable(size_t slot)
 	argv[1] = "SETSLOT";
 	lens[1] = sizeof("SETSLOT") - 1;
 
-	char slot_s[LONG_LEN];
-	safe_snprintf(slot_s, sizeof(slot_s), "%lu", (unsigned long) slot);
+	char* slot_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(slot_s, LONG_LEN, "%lu", (unsigned long) slot);
 	argv[2] = slot_s;
 	lens[2] = strlen(slot_s);
 
@@ -287,8 +287,8 @@ bool redis_cluster::cluster_setslot_node(size_t slot, const char* node)
 	argv[1] = "SETSLOT";
 	lens[1] = sizeof("SETSLOT") - 1;
 
-	char slot_s[LONG_LEN];
-	safe_snprintf(slot_s, sizeof(slot_s), "%lu", (unsigned long) slot);
+	char* slot_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(slot_s, LONG_LEN, "%lu", (unsigned long) slot);
 	argv[2] = slot_s;
 	lens[2] = strlen(slot_s);
 
@@ -432,8 +432,8 @@ int redis_cluster::cluster_countkeysinslot(size_t slot)
 	argv[1] = "COUNTKEYSINSLOT";
 	lens[1] = sizeof("COUNTKEYSINSLOT") - 1;
 
-	char slot_s[LONG_LEN];
-	safe_snprintf(slot_s, sizeof(slot_s), "%lu", (unsigned long) slot);
+	char* slot_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(slot_s, LONG_LEN, "%lu", (unsigned long) slot);
 	argv[2] = slot_s;
 	lens[2] = strlen(slot_s);
 

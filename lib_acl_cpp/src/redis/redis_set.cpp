@@ -380,8 +380,8 @@ int redis_set::srandmember(const char* key, size_t n, std::vector<string>& out)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) n);
+	char* buf= (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%lu", (unsigned long) n);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 

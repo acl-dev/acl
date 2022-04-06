@@ -370,6 +370,8 @@ int main(int argc, char* argv[])
 	// stop pipeline thread
 	pipeline.stop_thread();
 
+	printf("The pipeline thread has stopped!\r\n");
+
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
 	getchar();

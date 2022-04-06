@@ -195,7 +195,7 @@ int redis_key::expire(const char* key, size_t len, int n)
 	argv[1] = key;
 	lens[1] = len;
 
-	char buf[INT_LEN];
+	char* buf = (char*) dbuf_->dbuf_alloc(INT_LEN);
 	(void) safe_snprintf(buf, INT_LEN, "%d", n);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
@@ -221,8 +221,8 @@ int redis_key::expireat(const char* key, size_t len, time_t stamp)
 	argv[1] = key;
 	lens[1] = len;
 
-	char stamp_s[LONG_LEN];
-	safe_snprintf(stamp_s, sizeof(stamp_s), "%lu", (unsigned long) stamp);
+	char* stamp_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(stamp_s, LONG_LEN, "%lu", (unsigned long) stamp);
 
 	argv[2] = stamp_s;
 	lens[2] = strlen(stamp_s);
@@ -284,7 +284,7 @@ int redis_key::pexpire(const char* key, size_t len, int n)
 	argv[1] = key;
 	lens[1] = len;
 
-	char buf[INT_LEN];
+	char* buf = (char*) dbuf_->dbuf_alloc(INT_LEN);
 	(void) safe_snprintf(buf, INT_LEN, "%d", n);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
@@ -422,8 +422,8 @@ bool redis_key::restore(const char* key, const char* value, size_t len,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char ttl_s[INT_LEN];
-	safe_snprintf(ttl_s, sizeof(ttl_s), "%d", nttl);
+	char* ttl_s = (char*) dbuf_->dbuf_alloc(INT_LEN);
+	safe_snprintf(ttl_s, INT_LEN, "%d", nttl);
 	argv[2] = ttl_s;
 	lens[2] = strlen(ttl_s);
 
@@ -517,8 +517,8 @@ bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 bool redis_key::migrate(const char* key, size_t len, const char* addr,
 	unsigned dest_db, unsigned timeout, const char* option /* = NULL */)
 {
-	char addrbuf[64];
-	safe_snprintf(addrbuf, sizeof(addrbuf), "%s", addr);
+	char* addrbuf = (char*) dbuf_->dbuf_alloc(64);
+	safe_snprintf(addrbuf, 64, "%s", addr);
 	char* at = strchr(addrbuf, ':');
 	if (at == NULL || *(at + 1) == 0)
 		return false;
@@ -540,13 +540,13 @@ bool redis_key::migrate(const char* key, size_t len, const char* addr,
 	argv[3] = key;
 	lens[3] = len;
 
-	char db_s[11];
-	safe_snprintf(db_s, sizeof(db_s), "%u", dest_db);
+	char* db_s = (char*) dbuf_->dbuf_alloc(11);
+	safe_snprintf(db_s, 11, "%u", dest_db);
 	argv[4] = db_s;
 	lens[4] = strlen(db_s);
 
-	char timeout_s[11];
-	safe_snprintf(timeout_s, sizeof(timeout_s), "%u", timeout);
+	char* timeout_s = (char*) dbuf_->dbuf_alloc(11);
+	safe_snprintf(timeout_s, 11, "%u", timeout);
 	argv[5] = timeout_s;
 	lens[5] = strlen(timeout_s);
 
@@ -575,8 +575,8 @@ int redis_key::move(const char* key, size_t len, unsigned dest_db)
 	argv[1] = key;
 	lens[1] = len;
 
-	char db_s[11];
-	safe_snprintf(db_s, sizeof(db_s), "%u", dest_db);
+	char* db_s = (char*) dbuf_->dbuf_alloc(11);
+	safe_snprintf(db_s, 11, "%u", dest_db);
 	argv[2] = db_s;
 	lens[2] = strlen(db_s);
 

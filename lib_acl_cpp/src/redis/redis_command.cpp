@@ -859,8 +859,8 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 		argc++;
 	}
 
-	char cursor_s[INT_LEN];
-	safe_snprintf(cursor_s, sizeof(cursor_s), "%d", cursor);
+	char* cursor_s = (char*) dbuf_->dbuf_alloc(INT_LEN);
+	safe_snprintf(cursor_s, INT_LEN, "%d", cursor);
 	argv[argc] = cursor_s;
 	lens[argc] = strlen(cursor_s);
 	argc++;
@@ -880,8 +880,8 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 		lens[argc] = sizeof("COUNT") - 1;
 		argc++;
 
-		char count_s[LONG_LEN];
-		safe_snprintf(count_s, sizeof(count_s), "%lu",
+		char* count_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+		safe_snprintf(count_s, LONG_LEN, "%lu",
 			(unsigned long) (*count));
 		argv[argc] = count_s;
 		lens[argc] = strlen(count_s);
