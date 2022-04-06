@@ -44,14 +44,14 @@ bool http_servlet::doGet(request_t& req, response_t& res)
 {
 	const char* path = req.getPathInfo();
 	handler_t handler = path && *path ? handlers_[path] : NULL;
-	return handler ? (this->*handler)(req, res) : transfer_get(&req, &res);
+	return handler ? (this->*handler)(req, res) : transfer_get(req, res);
 }
 
 bool http_servlet::doPost(request_t& req, response_t& res)
 {
 	const char* path = req.getPathInfo();
 	handler_t handler = path && *path ? handlers_[path] : NULL;
-	return handler ? (this->*handler)(req, res) : transfer_post(&req, &res);
+	return handler ? (this->*handler)(req, res) : transfer_post(req, res);
 }
 
 bool http_servlet::on_hello(request_t& req, response_t& res)
@@ -93,7 +93,7 @@ bool http_servlet::on_hello(request_t& req, response_t& res)
 	return res.write(buf) && res.write(NULL, 0);
 }
 
-bool http_servlet::transfer_get(request_t* req, response_t* res)
+bool http_servlet::transfer_get(request_t& req, response_t& res)
 {
 	http_transfer* fiber_peer = new
 		http_transfer(acl::HTTP_METHOD_GET, req, res, port_);
@@ -103,10 +103,10 @@ bool http_servlet::transfer_get(request_t* req, response_t* res)
 	fiber_peer->wait(&keep_alive);
 
 	delete fiber_peer;
-	return keep_alive && req->isKeepAlive();
+	return keep_alive && req.isKeepAlive();
 }
 
-bool http_servlet::transfer_post(request_t* req, response_t* res)
+bool http_servlet::transfer_post(request_t& req, response_t& res)
 {
 	http_transfer* fiber_peer = new
 		http_transfer(acl::HTTP_METHOD_POST, req, res, port_);
@@ -117,7 +117,7 @@ bool http_servlet::transfer_post(request_t* req, response_t* res)
 
 	delete fiber_peer;
 	printf("transfer_post finished\r\n");
-	return keep_alive && req->isKeepAlive();
+	return keep_alive && req.isKeepAlive();
 }
 
 bool http_servlet::doConnect(request_t& req, response_t&)
@@ -151,7 +151,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	}
 	printf("connect %s ok, fd=%d\r\n", host.c_str(), peer->sock_handle());
 
-//#define	USE_REFER
+#define	USE_REFER
 
 #ifdef	USE_REFER
 	acl::socket_stream* local = &req.getSocketStream();
@@ -181,7 +181,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	}
 #endif
 
-	transfer_tcp(local, peer);
+	transfer_tcp(*local, *peer);
 
 #ifndef	USE_REFER
 	int fd = local->unbind_sock();
@@ -197,10 +197,11 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 	return false;
 }
 
-bool http_servlet::transfer_tcp(acl::socket_stream* local, acl::socket_stream* peer)
+bool http_servlet::transfer_tcp(acl::socket_stream& local,
+	acl::socket_stream& peer)
 {
-	local->set_rw_timeout(20);
-	peer->set_rw_timeout(20);
+	local.set_rw_timeout(20);
+	peer.set_rw_timeout(20);
 
 	tcp_transfer* fiber_local = new
 		tcp_transfer(acl_fiber_running(), local, peer, false);

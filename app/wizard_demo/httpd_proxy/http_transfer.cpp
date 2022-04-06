@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "http_transfer.h"
 
-http_transfer::http_transfer(acl::http_method_t method, request_t* req,
-	response_t* res, int port)
+http_transfer::http_transfer(acl::http_method_t method, request_t& req,
+	response_t& res, int port)
 : port_(port)
 , method_(method)
 , req_(req)
@@ -11,12 +11,12 @@ http_transfer::http_transfer(acl::http_method_t method, request_t* req,
 {
 	box_ = new acl::fiber_tbox<bool>;
 
-	acl::socket_stream& sin = req_->getSocketStream();
+	acl::socket_stream& sin = req_.getSocketStream();
 	req_in_.open(sin.sock_handle());
 
-	acl::socket_stream& sout = res_->getSocketStream();
+	acl::socket_stream& sout = res_.getSocketStream();
 	res_out_.open(sout.sock_handle());
-	res_client_ = res_->getClient();
+	res_client_ = res_.getClient();
 }
 
 http_transfer::~http_transfer(void) {
@@ -52,9 +52,9 @@ void http_transfer::run(void) {
 	box_->push(res);
 }
 
-bool http_transfer::open_peer(request_t* req, acl::socket_stream* conn)
+bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
 {
-	const char* host = req->getRemoteHost();
+	const char* host = req.getRemoteHost();
 	if (host == NULL || *host == 0) {
 		logger_error("no Host in request head");
 		return false;
@@ -74,7 +74,7 @@ bool http_transfer::open_peer(request_t* req, acl::socket_stream* conn)
 	acl::string addr;
 	addr.format("%s|%d", buf.c_str(), port_);
 
-	if (!conn->open(addr, 0, 0)) {
+	if (!conn.open(addr, 0, 0)) {
 		logger_error("connect %s error %s",
 			addr.c_str(), acl::last_serror());
 		return false;
@@ -83,13 +83,13 @@ bool http_transfer::open_peer(request_t* req, acl::socket_stream* conn)
 	logger("connect %s ok", addr.c_str());
 
 	bool is_request = true, unzip = false, fixed_stream = true;
-	client_ = new acl::http_client(conn, is_request, unzip, fixed_stream);
+	client_ = new acl::http_client(&conn, is_request, unzip, fixed_stream);
 	return true;
 }
 
-bool http_transfer::transfer_request_head(acl::socket_stream* conn) {
+bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
 	acl::string header;
-	req_->sprint_header(header, NULL);
+	req_.sprint_header(header, NULL);
 	if (header.empty()) {
 		logger_error("http request head empty");
 		return false;
@@ -97,7 +97,7 @@ bool http_transfer::transfer_request_head(acl::socket_stream* conn) {
 
 	header += "\r\n";
 
-	if (conn->write(header) == -1) {
+	if (conn.write(header) == -1) {
 		logger_error("write request header error");
 		return false;
 	}
@@ -106,8 +106,8 @@ bool http_transfer::transfer_request_head(acl::socket_stream* conn) {
 	return true;
 }
 
-bool http_transfer::transfer_request_body(acl::socket_stream* conn) {
-	long long length = req_->getContentLength();
+bool http_transfer::transfer_request_body(acl::socket_stream& conn) {
+	long long length = req_.getContentLength();
 	if (length <= 0) {
 		return true;
 	}
@@ -122,7 +122,7 @@ bool http_transfer::transfer_request_body(acl::socket_stream* conn) {
 			return false;
 		}
 
-		if (conn->write(buf, ret) == -1) {
+		if (conn.write(buf, ret) == -1) {
 			logger_error("send request body error");
 			return false;
 		}
@@ -134,12 +134,12 @@ bool http_transfer::transfer_request_body(acl::socket_stream* conn) {
 }
 
 bool http_transfer::transfer_get(void) {
-	if (!open_peer(req_, &conn_)) {
+	if (!open_peer(req_, conn_)) {
 		logger_error("open server error");
 		return false;
 	}
 
-	if (!transfer_request_head(&conn_)) {
+	if (!transfer_request_head(conn_)) {
 		logger_error("transfer_request_head error");
 		return false;
 	} else {
@@ -148,15 +148,15 @@ bool http_transfer::transfer_get(void) {
 }
 
 bool http_transfer::transfer_post(void) {
-	if (!open_peer(req_, &conn_)) {
+	if (!open_peer(req_, conn_)) {
 		logger_error("open server error");
 		return false;
 	}
 
-	if (!transfer_request_head(&conn_)) {
+	if (!transfer_request_head(conn_)) {
 		logger_error("transfer_request_head error");
 		return false;
-	} else if (!transfer_request_body(&conn_)) {
+	} else if (!transfer_request_body(conn_)) {
 		logger_error("transfer_request_body error");
 		return false;
 	} else {
