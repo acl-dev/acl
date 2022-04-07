@@ -67,8 +67,10 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 };
 
 static int  acl_var_fiber_quick_abort;
+static int  acl_var_fiber_share_stack;
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ "fiber_quick_abort", 1, &acl_var_fiber_quick_abort },
+	{ "fiber_share_stack", 0, &acl_var_fiber_share_stack },
 
 	{ 0, 0, 0 },
 };
@@ -141,6 +143,11 @@ static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 	static socket_t __max_fd = 0, __last_fd = 0;
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx, *cstream;
 	char  ip[64];
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, acl_var_fiber_stack_size);
+	acl_fiber_attr_setsharestack(&attr, acl_var_fiber_share_stack ? 1 : 0);
 
 	while (1) {
 		cstream = acl_vstream_accept(sstream, ip, sizeof(ip));
@@ -150,8 +157,7 @@ static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 				__max_fd = __last_fd;
 			}
 
-			acl_fiber_create(fiber_client, cstream,
-				acl_var_fiber_stack_size);
+			acl_fiber_create2(&attr, fiber_client, cstream);
 			continue;
 		}
 
@@ -401,6 +407,11 @@ static int main_dispatch_receive(int dispatch_fd)
 	char  buf[256], remote[256], local[256];
 	int   fd = -1, ret;
 	ACL_VSTREAM *cstream;
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, acl_var_fiber_stack_size);
+	acl_fiber_attr_setsharestack(&attr, acl_var_fiber_share_stack ? 1 : 0);
 
 	ret = acl_read_fd(dispatch_fd, buf, sizeof(buf) - 1, &fd);
 	if (ret < 0 || fd < 0) {
@@ -422,7 +433,7 @@ static int main_dispatch_receive(int dispatch_fd)
 		acl_vstream_set_peer(cstream, remote);
 	}
 
-	acl_fiber_create(fiber_client, cstream, acl_var_fiber_stack_size);
+	acl_fiber_create2(&attr, fiber_client, cstream);
 	return 0;
 }
 

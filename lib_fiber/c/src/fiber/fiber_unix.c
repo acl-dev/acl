@@ -298,7 +298,8 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 #endif
 }
 
-ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), ACL_FIBER_ATTR *attr)
+ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *),
+		const ACL_FIBER_ATTR *attr)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
 	size_t size = attr ? attr->stack_size : 128000;

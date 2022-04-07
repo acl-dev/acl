@@ -160,13 +160,18 @@ void fiber::run(void)
 		__FILE__, __LINE__, __FUNCTION__);
 }
 
-void fiber::start(size_t stack_size /* = 64000 */)
+void fiber::start(size_t stack_size /* 64000 */, bool share_stack /* false */)
 {
 	if (f_ != NULL) {
 		acl_msg_fatal("%s(%d), %s: fiber-%u, already running!",
 			__FILE__, __LINE__, __FUNCTION__, self());
 	}
-	acl_fiber_create(fiber_callback, this, stack_size);
+	ACL_FIBER_ATTR attr;
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, stack_size);
+	acl_fiber_attr_setsharestack(&attr, share_stack ? 1 : 0);
+
+	acl_fiber_create2(&attr, fiber_callback, this);
 }
 
 void fiber::fiber_callback(ACL_FIBER *f, void *ctx)

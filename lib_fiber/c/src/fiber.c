@@ -709,7 +709,7 @@ ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr)
 }
 
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
-	void *arg, ACL_FIBER_ATTR *attr)
+	void *arg, const ACL_FIBER_ATTR *attr)
 {
 	ACL_FIBER *fiber = NULL;
 	RING *head;
@@ -783,7 +783,7 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	return acl_fiber_create2(&attr, fn, arg);
 }
 
-ACL_FIBER *acl_fiber_create2(ACL_FIBER_ATTR *attr,
+ACL_FIBER *acl_fiber_create2(const ACL_FIBER_ATTR *attr,
 	void (*fn)(ACL_FIBER *, void *), void *arg)
 {
 	ACL_FIBER *fiber = fiber_alloc(fn, arg, attr);

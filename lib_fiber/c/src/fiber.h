@@ -135,13 +135,15 @@ int  epoll_event_close(int epfd);
 /* in fiber/fiber_unix.c */
 #ifdef SYS_UNIX
 ACL_FIBER *fiber_unix_origin(void);
-ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), ACL_FIBER_ATTR *attr);
+ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *),
+		const ACL_FIBER_ATTR *attr);
 #endif
 
 /* in fiber/fiber_win.c */
 #ifdef SYS_WIN
 ACL_FIBER *fiber_win_origin(void);
-ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *), ACL_FIBER_ATTR *attr);
+ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *),
+		const ACL_FIBER_ATTR *attr);
 #endif
 
 #endif

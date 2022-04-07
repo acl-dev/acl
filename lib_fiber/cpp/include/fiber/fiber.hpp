@@ -35,8 +35,10 @@ public:
 	 * 协程，然后子类的重载的 run 方法将被回调，如果 running 为 true 时，
 	 * 则禁止调用 start 方法
 	 * @param stack_size {size_t} 创建的协程对象的栈大小
+	 * @param 是否采用共享栈方式(若要采用共享栈方式，必须在编译 libfiber.a
+	 *  时将编译开关 SHARE_STACK 打开)
 	 */
-	void start(size_t stack_size = 320000);
+	void start(size_t stack_size = 320000, bool share_stack = false);
 
 	/**
 	 * 在本协程运行时调用此函数通知该协程退出
@@ -250,6 +252,7 @@ public:
 	 */
 	static void fiber_create(void (*fn)(ACL_FIBER*, void*),
 			void* ctx, size_t size);
+
 protected:
 	/**
 	 * 虚函数，子类须实现本函数，当通过调用 start 方法启动协程后，本
