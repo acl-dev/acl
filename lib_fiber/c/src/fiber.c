@@ -63,8 +63,8 @@ static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_unix_origin;
 static FIBER_ALLOC_FN  __fiber_alloc_fn  = fiber_win_alloc;
 static FIBER_ORIGIN_FN __fiber_origin_fn = fiber_win_origin;
 #else
-static ACL_FIBER *fiber_dummy_alloc(void(*start_fn)(ACL_FIBER*) fiber_unused,
-	size_t size fiber_unused)
+static ACL_FIBER *fiber_dummy_alloc(ACL_FIBER_ATTR *attr fiber_unused,
+	void(*start_fn)(ACL_FIBER*) fiber_unused, size_t size fiber_unused)
 {
 	msg_fatal("unknown OS");
 	return NULL;
@@ -709,7 +709,7 @@ ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr)
 }
 
 static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
-	void *arg, size_t size)
+	void *arg, ACL_FIBER_ATTR *attr)
 {
 	ACL_FIBER *fiber = NULL;
 	RING *head;
@@ -721,7 +721,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	/* Try to reuse the fiber memory in dead queue */
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
-		fiber = __fiber_alloc_fn(fiber_start, size);
+		fiber = __fiber_alloc_fn(fiber_start, attr);
 		fbase_init(&fiber->base, FBASE_F_FIBER);
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);
@@ -737,12 +737,13 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->signum = 0;
 	fiber->fn     = fn;
 	fiber->arg    = arg;
+	fiber->oflag  = attr ? attr->oflag : 0;
 	fiber->flag   = 0;
 	fiber->status = FIBER_STATUS_NONE;
 
 	fiber->waiting = NULL;
 	ring_init(&fiber->holding);
-	fiber->init_fn(fiber, size);
+	fiber->init_fn(fiber, attr ? attr->stack_size : 128000);
 
 	return fiber;
 }
@@ -752,10 +753,40 @@ void acl_fiber_schedule_init(int on)
 	__schedule_auto = on;
 }
 
+void acl_fiber_attr_init(ACL_FIBER_ATTR *attr)
+{
+	attr->oflag = 0;
+	attr->stack_size  = 128000;
+}
+
+void acl_fiber_attr_setstacksize(ACL_FIBER_ATTR *attr, size_t size)
+{
+	attr->stack_size = size;
+}
+
+void acl_fiber_attr_setsharestack(ACL_FIBER_ATTR *attr, int on)
+{
+	if (on) {
+		attr->oflag |= ACL_FIBER_ATTR_SHARE_STACK;
+	} else {
+		attr->oflag &= ~ACL_FIBER_ATTR_SHARE_STACK;
+	}
+}
+
 ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 	void *arg, size_t size)
 {
-	ACL_FIBER *fiber = fiber_alloc(fn, arg, size);
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+	attr.stack_size = size;
+	return acl_fiber_create2(&attr, fn, arg);
+}
+
+ACL_FIBER *acl_fiber_create2(ACL_FIBER_ATTR *attr,
+	void (*fn)(ACL_FIBER *, void *), void *arg)
+{
+	ACL_FIBER *fiber = fiber_alloc(fn, arg, attr);
 
 	__thread_fiber->count++;
 
@@ -774,6 +805,11 @@ ACL_FIBER *acl_fiber_create(void (*fn)(ACL_FIBER *, void *),
 		acl_fiber_schedule();
 	}
 	return fiber;
+}
+
+int acl_fiber_use_share_stack(const ACL_FIBER *fiber)
+{
+	return fiber->oflag & ACL_FIBER_ATTR_SHARE_STACK ? 1 : 0;
 }
 
 unsigned int acl_fiber_id(const ACL_FIBER *fiber)

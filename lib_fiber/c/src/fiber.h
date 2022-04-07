@@ -50,16 +50,17 @@ struct ACL_FIBER {
 	int            errnum;
 	int            sys;
 	int            signum;
+	unsigned int   oflag;
 	unsigned int   flag;
-
-	RING           holding;
-	ACL_FIBER_MUTEX *waiting;
 
 #define FIBER_F_SAVE_ERRNO	(unsigned) 1 << 0
 #define	FIBER_F_KILLED		(unsigned) 1 << 1
 #define	FIBER_F_CLOSED		(unsigned) 1 << 2
 #define	FIBER_F_SIGNALED	(unsigned) 1 << 3
 #define	FIBER_F_CANCELED	(FIBER_F_KILLED | FIBER_F_CLOSED | FIBER_F_SIGNALED)
+
+	RING           holding;
+	ACL_FIBER_MUTEX *waiting;
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
@@ -134,13 +135,13 @@ int  epoll_event_close(int epfd);
 /* in fiber/fiber_unix.c */
 #ifdef SYS_UNIX
 ACL_FIBER *fiber_unix_origin(void);
-ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), size_t size);
+ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), ACL_FIBER_ATTR *attr);
 #endif
 
 /* in fiber/fiber_win.c */
 #ifdef SYS_WIN
 ACL_FIBER *fiber_win_origin(void);
-ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *), size_t size);
+ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *), ACL_FIBER_ATTR *attr);
 #endif
 
 #endif

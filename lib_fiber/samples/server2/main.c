@@ -34,7 +34,6 @@ static int  __listen_port = 9001;
 static int  __listen_qlen = 64;
 static int  __rw_timeout = 0;
 static int  __echo_data  = 1;
-static int  __stack_size = 320000;
 
 static int check_read(int fd, int timeout)
 {
@@ -132,11 +131,14 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 }
 
-static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 {
+	ACL_FIBER_ATTR *attr = (ACL_FIBER_ATTR*) ctx;
 	SOCKET lfd;
 	int on = 1;
 	struct sockaddr_in sa;
+
+	assert(attr);
 
 	memset(&sa, 0, sizeof(sa));
 	sa.sin_family      = AF_INET;
@@ -184,7 +186,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 
 		__nconnect++;
 		printf("accept one, fd: %u, %p\r\n", cfd, pfd);
-		acl_fiber_create(echo_client, pfd, __stack_size);
+		acl_fiber_create2(attr, echo_client, pfd);
 	}
 
 	CLOSE(lfd);
@@ -217,16 +219,20 @@ static void usage(const char *procname)
 		" -r rw_timeout\r\n"
 		" -q listen_queue\r\n"
 		" -z stack_size\r\n"
+		" -Z [if use shared stack]\r\n"
 		" -S [if using single IO, default: no]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int   ch, event_mode = FIBER_EVENT_KERNEL;
+	ACL_FIBER_ATTR fiber_attr;
+	int   stack_size = 320000;
 
+	acl_fiber_attr_init(&fiber_attr);
 	snprintf(__listen_ip, sizeof(__listen_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hs:p:r:q:Sz:e:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:p:r:q:Sz:Ze:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -247,7 +253,11 @@ int main(int argc, char *argv[])
 			__echo_data = 0;
 			break;
 		case 'z':
-			__stack_size = atoi(optarg);
+			stack_size = atoi(optarg);
+			acl_fiber_attr_setstacksize(&fiber_attr, stack_size);
+			break;
+		case 'Z':
+			acl_fiber_attr_setsharestack(&fiber_attr, 1);
 			break;
 		case 'e':
 			if (strcasecmp(optarg, "select") == 0)
@@ -273,7 +283,7 @@ int main(int argc, char *argv[])
 #endif
 
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	acl_fiber_create(fiber_accept, NULL, 327680);
+	acl_fiber_create(fiber_accept, &fiber_attr, 327680);
 
 #ifndef	SCHEDULE_AUTO
 	acl_fiber_create(fiber_memcheck, NULL, 640000);

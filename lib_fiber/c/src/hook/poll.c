@@ -261,6 +261,7 @@ static void pollfds_copy(const pollfds *pfds, struct pollfd *fds)
 {
 	memcpy(fds, pfds->fds, sizeof(struct pollfd) * pfds->nfds);
 }
+
 #endif // SHARE_STACK
 
 #define	MAX_TIMEOUT	200000000
@@ -270,6 +271,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	long long now;
 	EVENT *ev;
 	int old_timeout, nready;
+	ACL_FIBER *curr;
 
 #ifdef SHARE_STACK
 	// In shared stack mode, we should use heap memory for pe to hold
@@ -279,7 +281,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	// after switching the other fiber. So, we use heap memory to hold
 	// pe to avoid stack memory collision.
 	pollfds    *pfds;
-	POLL_EVENT *pe;
+	POLL_EVENT  pevent, *pe;
 #else
 	POLL_EVENT  pevent, *pe;
 #endif
@@ -292,6 +294,8 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		return sys_poll ? (*sys_poll)(fds, nfds, timeout) : -1;
 	}
 
+	curr = acl_fiber_running();
+
 	if (timeout < 0) {
 		timeout = MAX_TIMEOUT;
 	}
@@ -300,16 +304,22 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	old_timeout = ev->timeout;
 
 #ifdef SHARE_STACK
-	pfds      = pollfds_save(fds, nfds);
-	pe        = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
-	pe->fds   = pollfd_alloc(pe, pfds->fds, nfds);
+	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
+		pfds      = pollfds_save(fds, nfds);
+		pe        = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
+		pe->fds   = pollfd_alloc(pe, pfds->fds, nfds);
+	} else {
+		pfds      = NULL;
+		pe        = &pevent;
+		pe->fds   = pollfd_alloc(pe, fds, nfds);
+	}
 #else
 	pe        = &pevent;
 	pe->fds   = pollfd_alloc(pe, fds, nfds);
 #endif
 
 	pe->nfds  = nfds;
-	pe->fiber = acl_fiber_running();
+	pe->fiber = curr;
 	pe->proc  = poll_callback;
 
 	poll_event_set(ev, pe, timeout);
@@ -364,8 +374,10 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	nready = pe->nready;
 
 #ifdef SHARE_STACK
-	mem_free(pe);
-	pollfds_copy(pfds, fds);
+	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
+		mem_free(pe);
+		pollfds_copy(pfds, fds);
+	}
 #endif
 
 	return nready;

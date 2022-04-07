@@ -8,7 +8,18 @@
 extern "C" {
 #endif
 
-typedef ACL_FIBER *((*FIBER_ALLOC_FN)(void (*)(ACL_FIBER *), size_t));
+typedef struct ACL_FIBER_ATTR {
+	unsigned int   oflag;
+#define	ACL_FIBER_ATTR_SHARE_STACK	(unsigned) 1 << 0
+
+	size_t stack_size;
+} ACL_FIBER_ATTR;
+
+void acl_fiber_attr_init(ACL_FIBER_ATTR *attr);
+void acl_fiber_attr_setstacksize(ACL_FIBER_ATTR *attr, size_t size);
+void acl_fiber_attr_setsharestack(ACL_FIBER_ATTR *attr, int on);
+
+typedef ACL_FIBER *((*FIBER_ALLOC_FN)(void (*)(ACL_FIBER *), ACL_FIBER_ATTR *));
 typedef ACL_FIBER *((*FIBER_ORIGIN_FN)(void));
 
 FIBER_API void acl_fiber_register(FIBER_ALLOC_FN alloc_fn,
@@ -50,6 +61,9 @@ FIBER_API size_t acl_fiber_get_shared_stack_size(void);
 FIBER_API ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 	void* arg, size_t size);
 
+FIBER_API ACL_FIBER* acl_fiber_create2(ACL_FIBER_ATTR *attr,
+	void (*fn)(ACL_FIBER*, void*), void* arg);
+
 /**
  * Get the fibers count in deading status
  * @return {unsigned}
@@ -74,6 +88,13 @@ FIBER_API void acl_fiber_check_timer(size_t max);
  * @retur {ACL_FIBER*} if no running fiber NULL will be returned
  */
 FIBER_API ACL_FIBER* acl_fiber_running(void);
+
+/**
+ * If the fiber using shared stack?
+ * @param fiber {const ACL_FIBER*}
+ * @return {int} return 0 if using private stack, or the shared stack was used
+ */
+FIBER_API int acl_fiber_use_share_stack(const ACL_FIBER *fiber);
 
 /**
  * Get the fiber ID of the specified fiber

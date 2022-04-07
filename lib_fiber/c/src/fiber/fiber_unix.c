@@ -94,7 +94,8 @@ static void fiber_stack_restore(void)
 {
 	FIBER_UNIX *curr = (FIBER_UNIX *) acl_fiber_running();
 
-	if (curr->fiber.status != FIBER_STATUS_EXITING) {
+	if (curr->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK
+			&& curr->fiber.status != FIBER_STATUS_EXITING) {
 		// After coming back, the current fiber's stack should be
 		// restored and copied from its private memory to the shared
 		// stack running memory.
@@ -115,8 +116,10 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 	// The shared stack mode isn't supported in USE_BOOST_JMP current,
 	// which may be supported in future.
 #if	defined(SHARE_STACK)
-	char stack_top = 0;
-	fiber_stack_save(from, &stack_top);
+	if (from->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK) {
+		char stack_top = 0;
+		fiber_stack_save(from, &stack_top);
+	}
 #endif
 
 #if	defined(USE_BOOST_JMP)
@@ -226,9 +229,16 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 
 #if	defined(USE_BOOST_JMP)
 # if	defined(SHARE_STACK)
-	fb->stack = fiber_share_stack_bottom();
-	fb->fcontext = make_fcontext(fb->stack, fiber_share_stack_size(),
-		(void(*)(transfer_t)) fiber_unix_start);
+	if (fb->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK) {
+		fb->stack = fiber_share_stack_bottom();
+		fb->fcontext = make_fcontext(fb->stack,
+			fiber_share_stack_size(),
+			(void(*)(transfer_t)) fiber_unix_start);
+	} else {
+		fb->stack = fb->buff + fb->size;
+		fb->fcontext = make_fcontext(fb->stack, fb->size,
+			(void(*)(transfer_t)) fiber_unix_start);
+	}
 # else
 	fb->stack = fb->buff + fb->size;
 	fb->fcontext = make_fcontext(fb->stack, fb->size,
@@ -257,8 +267,13 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 	}
 
 #if	defined(SHARE_STACK)
-	fb->context->uc_stack.ss_sp   = fiber_share_stack_addr();
-	fb->context->uc_stack.ss_size = fiber_share_stack_size();
+	if (fb->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK) {
+		fb->context->uc_stack.ss_sp   = fiber_share_stack_addr();
+		fb->context->uc_stack.ss_size = fiber_share_stack_size();
+	} else {
+		fb->context->uc_stack.ss_sp   = fb->buff;
+		fb->context->uc_stack.ss_size = fb->size;
+	}
 #else
 	fb->context->uc_stack.ss_sp   = fb->buff;
 	fb->context->uc_stack.ss_size = fb->size;
@@ -283,13 +298,15 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 #endif
 }
 
-ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
+ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *), ACL_FIBER_ATTR *attr)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
+	size_t size = attr ? attr->stack_size : 128000;
 
 	/* No using calloc just avoiding using real memory */
 	fb->buff           = (char *) stack_alloc(size);
 	fb->size           = size;
+	fb->fiber.oflag    = attr ? attr->oflag : 0;
 	fb->fiber.init_fn  = fiber_unix_init;
 	fb->fiber.free_fn  = fiber_unix_free;
 	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
