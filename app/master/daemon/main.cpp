@@ -185,7 +185,7 @@ int     main(int argc, char **argv)
 	}
 
 	if (setsid() == -1 && getsid(0) != getpid())
-		acl_msg_fatal("unable to set session %s", acl_last_serror());
+		acl_msg_warn("unable to set session %s", acl_last_serror());
 
 	/*
 	 * Make some room for plumbing with file descriptors. XXX This breaks
