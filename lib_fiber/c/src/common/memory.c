@@ -149,3 +149,10 @@ void mem_stat(void)
 		__nrealloc, __nfree, __nmalloc + __ncalloc + __nstrdup - __nfree);
 #endif
 }
+
+#ifdef	HAS_INLINE_MEMCPY
+void *memcpy(void * __restrict dst, const void * __restrict src, size_t size)
+{
+	return inline_memcpy(dst, src, size);
+}
+#endif

@@ -24,15 +24,16 @@ CFLAGS = -c -g -W \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_RING \
+#-O3 \
 #-DSHARE_STACK \
 #-DUSE_VALGRIND \
+#-DUSE_INLINE_MEMCPY\
 #-DUSE_FAST_TIME \
 #-Waggregate-return \
 #-DDEBUG_MEM \
 #-I/usr/local/include
 #-DUSE_PRINTF_MACRO
 #-Wno-clobbered
-#-O3
 
 #-pedantic
 # -Wcast-align
