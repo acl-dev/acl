@@ -22,6 +22,7 @@ static void stack_dummy(ACL_FIBER *fiber acl_unused)
 	char buf[DUMMY_SIZE];
 
 	memset(buf, 0, sizeof(buf));
+	printf("%s: called OK, dummy_size=%d\r\n", __FUNCTION__, DUMMY_SIZE);
 }
 
 static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
