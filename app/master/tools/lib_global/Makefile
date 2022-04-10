@@ -53,6 +53,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CC += -arch x86_64 -arch arm64
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof -fPIC -Werror \
 		  -Wno-unused-private-field

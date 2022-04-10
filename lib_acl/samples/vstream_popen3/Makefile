@@ -30,6 +30,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CC += -arch x86_64 -arch arm64
 	CFLAGS += -D_REENTRANT -pedantic -DMACOSX
 	SYSLIB = -lpthread
 endif

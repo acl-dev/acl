@@ -49,7 +49,8 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 endif
 
 # For Darwin
-ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)                               
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CC += -arch x86_64 -arch arm64
 	CFLAGS += -DMACOSX                                                     
 	UNIXTYPE = MACOSX                                                      
 endif 

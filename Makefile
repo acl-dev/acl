@@ -61,6 +61,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
+	CC += -arch x86_64 -arch arm64
 	RPATH = macos
 	SYSLIB +=  -rdynamic -L/usr/lib -liconv
 	LDFLAGS = -dynamiclib -shared
