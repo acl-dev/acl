@@ -62,9 +62,11 @@ static void fiber_win_init(FIBER_WIN *fb, size_t size)
 	}
 }
 
-ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *), size_t size)
+ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *),
+		const ACL_FIBER_ATTR *attr)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) mem_calloc(1, sizeof(*fb));
+	size_t size = attr ? attr->stack_size : 128000;
 
 	fb->fiber.init_fn  = (void (*)(ACL_FIBER*, size_t)) fiber_win_init;
 	fb->fiber.free_fn  = fiber_win_free;

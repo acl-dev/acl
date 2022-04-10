@@ -8,14 +8,27 @@ http_transfer::http_transfer(acl::http_method_t method, request_t& req,
 , req_(req)
 , res_(res)
 , client_(NULL)
-{}
+{
+	box_ = new acl::fiber_tbox<bool>;
+
+	acl::socket_stream& sin = req_.getSocketStream();
+	req_in_.open(sin.sock_handle());
+
+	acl::socket_stream& sout = res_.getSocketStream();
+	res_out_.open(sout.sock_handle());
+	res_client_ = res_.getClient();
+}
 
 http_transfer::~http_transfer(void) {
+	req_in_.unbind_sock();
+	res_out_.unbind_sock();
+
 	delete client_;
+	delete box_;
 }
 
 void http_transfer::wait(bool* keep_alive) {
-	bool* res = box_.pop();
+	bool* res = box_->pop();
 	assert(res);
 	*keep_alive = *res;
 	delete res;
@@ -36,7 +49,7 @@ void http_transfer::run(void) {
 		break;
 	}
 
-	box_.push(res);
+	box_->push(res);
 }
 
 bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
@@ -61,13 +74,17 @@ bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
 	acl::string addr;
 	addr.format("%s|%d", buf.c_str(), port_);
 
-	if (conn.open(addr, 0, 0)) {
-		logger("connect %s ok", addr.c_str());
-		return true;
+	if (!conn.open(addr, 0, 0)) {
+		logger_error("connect %s error %s",
+			addr.c_str(), acl::last_serror());
+		return false;
 	}
 
-	logger_error("connect %s error %s", addr.c_str(), acl::last_serror());
-	return false;
+	logger("connect %s ok", addr.c_str());
+
+	bool is_request = true, unzip = false, fixed_stream = true;
+	client_ = new acl::http_client(&conn, is_request, unzip, fixed_stream);
+	return true;
 }
 
 bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
@@ -85,8 +102,7 @@ bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
 		return false;
 	}
 
-	//printf(">>>send head: [%s]\r\n", header.c_str());
-	client_ = new acl::http_client(&conn, true);
+	printf(">>>send head: [%s]\r\n", header.c_str());
 	return true;
 }
 
@@ -96,12 +112,11 @@ bool http_transfer::transfer_request_body(acl::socket_stream& conn) {
 		return true;
 	}
 
-	acl::istream& in = req_.getInputStream();
 	long long n = 0;
 	char buf[8192];
 
 	while (n < length) {
-		int ret = in.read(buf, sizeof(buf), false);
+		int ret = req_in_.read(buf, sizeof(buf), false);
 		if (ret == -1) {
 			logger_error("read request body error");
 			return false;
@@ -156,6 +171,9 @@ bool http_transfer::transfer_response(void) {
 		return false;
 	}
 
+	bool keep_alive = false; // xxxx
+	client_->header_update("Connection", "Close");
+
 	acl::string header;
 	client_->sprint_header(header, NULL);
 	if (header.empty()) {
@@ -167,32 +185,47 @@ bool http_transfer::transfer_response(void) {
 
 	printf("response head:\r\n[%s]\r\n", header.c_str());
 
-	acl::ostream& out = res_.getOutputStream();
-	if (out.write(header) == -1) {
+	//acl::ostream* out = &res_->getOutputStream();
+	if (res_out_.write(header) == -1) {
 		logger_error("send response head error");
 		return false;
 	}
 
+	//acl::http_client* out_client = res_->getClient();
+	//assert(out_client);
+
 	long long length = client_->body_length();
 	if (length == 0) {
-		return client_->is_server_keep_alive();
+		return client_->is_server_keep_alive() && keep_alive;
 	}
 
+	HTTP_HDR_RES* hdr_res = client_->get_respond_head(NULL);
+	assert(hdr_res);
+	bool chunked = hdr_res->hdr.chunked ? true : false;
+
 	char buf[8192];
+
 	while (true) {
 		int ret = client_->read_body(buf, sizeof(buf));
 		if (ret <= 0) {
 			break;
-		} else if (out.write(buf, ret) == -1) {
+		} else if (chunked) {
+			if (!res_client_->write_chunk(res_out_, buf, ret)) {
+				logger_error("send response body error");
+				return false;
+			}
+		} else if (res_out_.write(buf, ret) == -1) {
 			logger_error("send response body error");
 			return false;
 		}
 	}
 
-
-	if (length < 0) {
-		return false;
+	if (chunked) {
+		if (!res_client_->write_chunk_trailer(res_out_)) {
+			logger_error("write chunked trailer error");
+			return false;
+		}
 	}
 
-	return client_->is_server_keep_alive();
+	return client_->is_server_keep_alive() && false;
 }

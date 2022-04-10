@@ -539,6 +539,8 @@ int acl_read_wait(ACL_SOCKET fd, int timeout)
 	return acl_read_wait_ms(fd, timeout * 1000);
 }
 
+/* #define USE_EPOLL */
+
 int acl_read_wait_ms(ACL_SOCKET fd, int timeout)
 {
 #if defined(ACL_LINUX) && !defined(MINGW) && defined(USE_EPOLL)

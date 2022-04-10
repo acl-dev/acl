@@ -440,8 +440,8 @@ bool redis_hash::hincrbyfloat(const char* key, const char* name,
 	const char* values[1];
 
 	names[0] = name;
-	char buf[FLOAT_LEN];
-	(void) safe_snprintf(buf, sizeof(buf), "%f", inc);
+	char* buf = (char*) dbuf_->dbuf_alloc(FLOAT_LEN);
+	(void) safe_snprintf(buf, FLOAT_LEN, "%f", inc);
 	values[0] = buf;
 
 	hash_slot(key);

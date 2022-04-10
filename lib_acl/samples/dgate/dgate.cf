@@ -28,7 +28,7 @@ service server {
 #	上游 DNS 服务器的 IP
 #	dns_neighbor_ip = 211.157.131.7
 #	dns_neighbor_ip = 192.168.198.47
-	dns_neighbor_ip = 8.8.8.8
+	dns_neighbor_ip = 114.114.114.114
 #	上游 DNS 服务器的 PORT
 	dns_neighbor_port = 53
 }

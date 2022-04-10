@@ -392,8 +392,8 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	argv[1] = script;
 	lens[1] = strlen(script);
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) keys.size());
+	char* buf = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%lu", (unsigned long) keys.size());
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
@@ -437,8 +437,8 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 	argv[1] = script;
 	lens[1] = strlen(script);
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) keys.size());
+	char* buf = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%lu", (unsigned long) keys.size());
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 

@@ -43,6 +43,7 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
 , client_(NULL)
 , method_(HTTP_METHOD_UNKNOWN)
 , request_type_(HTTP_REQUEST_NORMAL)
+, parse_body_(true)
 , mime_(NULL)
 , body_(NULL)
 , json_(NULL)
@@ -88,6 +89,11 @@ http_method_t HttpServletRequest::getMethod(string* method_s /* = NULL */) const
 		const_cast<HttpServletRequest*>(this)->readHeader(method_s);
 	}
 	return method_;
+}
+
+void HttpServletRequest::setParseBody(bool yes)
+{
+	parse_body_ = yes;
 }
 
 void HttpServletRequest::add_cookie(char* data)
@@ -826,6 +832,10 @@ bool HttpServletRequest::readHeader(string* method_s)
 	// 当数据体为 form 格式时：
 	if (EQ(ctype, "application") && EQ(stype, "x-www-form-urlencoded")) {
 		request_type_ = HTTP_REQUEST_NORMAL;
+		if (!parse_body_) {
+			return true;
+		}
+
 		char* query = (char*) dbuf_->dbuf_alloc((size_t) len + 1);
 		int ret = getInputStream().read(query, (size_t) len);
 		if (ret > 0) {

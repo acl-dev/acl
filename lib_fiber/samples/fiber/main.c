@@ -11,14 +11,15 @@
 static int __max_loop = 1000;
 static int __max_fiber = 1000;
 static int __display   = 0;
-static int __stack_size = 64000;
 
 static __thread struct timeval __begin;
-static __thread int __left_fiber = 1000;
+static __thread long long __count = 0;
+
+#define	DUMMY_SIZE	512000
 
 static void stack_dummy(ACL_FIBER *fiber acl_unused)
 {
-	char buf[81920];
+	char buf[DUMMY_SIZE];
 
 	memset(buf, 0, sizeof(buf));
 }
@@ -26,49 +27,61 @@ static void stack_dummy(ACL_FIBER *fiber acl_unused)
 static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 {
 	int  i;
+	size_t shared_stack_size = acl_fiber_get_shared_stack_size();
 
-	if (0)
+	printf("\r\nshared_stack_size=%zd\r\n\r\n", shared_stack_size);
+
+	if (acl_fiber_use_share_stack(fiber) && shared_stack_size > DUMMY_SIZE) {
 		stack_dummy(fiber);
+	}
 
 	errno = acl_fiber_errno(fiber);
+
 	for (i = 0; i < __max_loop; i++) {
+		if (__count < 10) {
+			printf("fiber-%d, run, begin to yield\r\n",
+				acl_fiber_id(fiber));
+		}
+
 		acl_fiber_yield();
-		if (!__display)
-			continue;
 
-		if (i <= 2)
-			printf("fiber-%d, errno: %d\r\n",
+		if (__count++ < 10) {
+			printf("fiber-%d, wakeup errno: %d\r\n",
 				acl_fiber_id(fiber), errno);
+			printf("---------------------------------------\r\n");
+		}
 	}
 
-	if (--__left_fiber == 0) {
-		long long count = __max_fiber * __max_loop;
-		struct timeval end;
-		double spent;
-
-		gettimeofday(&end, NULL);
-		spent = stamp_sub(&end, &__begin);
-		printf("fibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
-			__max_fiber, count, spent,
-			(count * 1000) / (spent > 0 ? spent : 1));
-	}
+	printf("%s: fiber-%d exiting, count=%lld ...\r\n",
+		__FUNCTION__, acl_fiber_id(fiber), __count);
 }
 
-static void *thread_main(void *ctx acl_unused)
+static void *thread_main(void *ctx)
 {
+	ACL_FIBER_ATTR *attr = (ACL_FIBER_ATTR *) ctx;
 	int i;
 
-	gettimeofday(&__begin, NULL);
-	__left_fiber = __max_fiber;
-
-	for (i = 0; i < __max_fiber; i++)
-		acl_fiber_create(fiber_main, NULL, __stack_size);
+	for (i = 0; i < __max_fiber; i++) {
+		acl_fiber_create2(attr, fiber_main, NULL);
+	}
 
 	acl_fiber_schedule();
 
 	printf("thread: %lu\r\n", (unsigned long) acl_pthread_self());
-
 	return NULL;
+}
+
+static void calc_speed(void)
+{
+	long long count = __max_fiber * __max_loop;
+	struct timeval end;
+	double spent, speed;
+
+	gettimeofday(&end, NULL);
+	spent = stamp_sub(&end, &__begin);
+	speed = (count * 1000) / (spent > 0 ? spent : 1);
+	printf("\r\nfibers: %d, count: %lld, spent: %.2f, speed: %.2f\r\n",
+		__max_fiber, count, spent, speed);
 }
 
 static void usage(const char *procname)
@@ -78,7 +91,9 @@ static void usage(const char *procname)
 		" -c max_fiber\r\n"
 		" -t max_threads\r\n"
 		" -d stack_size\r\n"
-		" -e [if display]\r\n", procname);
+		" -e [if display]\r\n"
+		" -S [if use shared stack]\r\n"
+		, procname);
 }
 
 int main(int argc, char *argv[])
@@ -86,8 +101,12 @@ int main(int argc, char *argv[])
 	int   ch, i, nthreads = 1;
 	acl_pthread_attr_t attr;
 	acl_pthread_t *tids;
+	ACL_FIBER_ATTR fiber_attr;
+	size_t stack_size = 64000;
 
-	while ((ch = getopt(argc, argv, "hn:c:t:d:e")) > 0) {
+	acl_fiber_attr_init(&fiber_attr);
+
+	while ((ch = getopt(argc, argv, "hn:c:t:ed:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -104,7 +123,11 @@ int main(int argc, char *argv[])
 				nthreads = 1;
 			break;
 		case 'd':
-			__stack_size = atoi(optarg);
+			stack_size = (size_t) atoi(optarg);
+			acl_fiber_attr_setstacksize(&fiber_attr, stack_size);
+			break;
+		case 'S':
+			acl_fiber_attr_setsharestack(&fiber_attr, 1);
 			break;
 		case 'e':
 			__display = 1;
@@ -114,14 +137,23 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	acl_fiber_set_shared_stack_size(8000000);
+
 	acl_pthread_attr_init(&attr);
 	tids = (acl_pthread_t *) acl_mycalloc(nthreads, sizeof(acl_pthread_t));
 
-	for (i = 0; i < nthreads; i++)
-		acl_pthread_create(&tids[i], &attr, thread_main, NULL);
+	gettimeofday(&__begin, NULL);
 
-	for (i = 0; i < nthreads; i++)
+	for (i = 0; i < nthreads; i++) {
+		acl_pthread_create(&tids[i], &attr, thread_main, &fiber_attr);
+	}
+
+	for (i = 0; i < nthreads; i++) {
 		acl_pthread_join(tids[i], NULL);
+	}
+
+	calc_speed();
+	printf("All fiber threads exited now ...\r\n");
 
 	acl_myfree(tids);
 

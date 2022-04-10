@@ -14,7 +14,7 @@ protected:
 	void run(void);
 
 private:
-	acl::fiber_tbox<bool> box_;
+	acl::fiber_tbox<bool>* box_;
 
 	int port_;
 	acl::http_method_t method_;
@@ -22,6 +22,10 @@ private:
 	response_t& res_;
 	acl::socket_stream conn_;
 	acl::http_client* client_;
+
+	acl::socket_stream req_in_;
+	acl::socket_stream res_out_;
+	acl::http_client* res_client_;
 
 	bool open_peer(request_t& req, acl::socket_stream& conn);
 

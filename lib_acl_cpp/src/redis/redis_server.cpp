@@ -358,8 +358,8 @@ bool redis_server::slaveof(const char* ip, int port)
 	argv[1] = ip;
 	lens[1] = strlen(ip);
 
-	char port_s[INT_LEN];
-	safe_snprintf(port_s, sizeof(port_s), "%d", port);
+	char* port_s= (char*) dbuf_->dbuf_alloc(INT_LEN);
+	safe_snprintf(port_s, INT_LEN, "%d", port);
 	argv[2] = port_s;
 	lens[2] = strlen(port_s);
 
@@ -380,9 +380,9 @@ const redis_result* redis_server::slowlog_get(int number /* = 0 */)
 
 	size_t argc = 2;
 
-	char buf[INT_LEN];
 	if (number > 0) {
-		safe_snprintf(buf, sizeof(buf), "%d", number);
+		char* buf = (char*) dbuf_->dbuf_alloc(INT_LEN);
+		safe_snprintf(buf, INT_LEN, "%d", number);
 		argv[2] = buf;
 		lens[2] = strlen(buf);
 		argc++;

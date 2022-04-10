@@ -108,14 +108,16 @@ void master_fiber::service_on_accept(void* ctx, ACL_VSTREAM *client)
 	master_fiber* mf = (master_fiber *) ctx;
 	acl_assert(mf != NULL);
 
-	socket_stream stream;
-	if (!stream.open(client)) {
+	socket_stream* stream = new socket_stream;
+	if (!stream->open(client)) {
 		logger_error("open stream error(%s)", acl_last_serror());
+		delete stream;
 		return;
 	}
 
-	mf->on_accept(stream);
-	stream.unbind();
+	mf->on_accept(*stream);
+	stream->unbind();
+	delete stream;
 }
 
 void master_fiber::thread_init(void* ctx)

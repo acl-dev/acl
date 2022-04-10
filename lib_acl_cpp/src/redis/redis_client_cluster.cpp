@@ -164,11 +164,13 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 		char buf[128];
 		safe_snprintf(buf, sizeof(buf), "%s:%d", ip, port);
 		redis_client_pool* conns = (redis_client_pool*) get(buf);
-		if (conns == NULL)
+		if (conns == NULL) {
 			set(buf, max_conns, conn_timeout, rw_timeout);
+		}
 
-		for (size_t i = slot_min; i <= slot_max; i++)
+		for (size_t i = slot_min; i <= slot_max; i++) {
 			set_slot((int) i, buf);
+		}
 	}
 }
 

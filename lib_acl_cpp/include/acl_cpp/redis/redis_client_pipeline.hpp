@@ -54,11 +54,18 @@ public:
 			tbox_ = new tbox<redis_pipeline_message>(false);
 			mbox_ = NULL;
 		}
+
+		size_ = 10;
+		argc_ = 0;
+		argv_ = new const char* [size_];
+		lens_ = new size_t [size_];
 	}
 
 	~redis_pipeline_message(void) {
 		delete mbox_;
 		delete tbox_;
+		delete [] argv_;
+		delete [] lens_;
 	}
 
 	redis_pipeline_message& set_type(redis_pipeline_type_t type) {
@@ -83,9 +90,25 @@ public:
 	}
 
 	void set_request(size_t argc, const char** argv, size_t* lens) {
+#if 0
 		argc_    = argc;
 		argv_    = argv;
 		lens_    = lens;
+#else
+		if (argc_ > size_) {
+			delete [] argv_;
+			delete [] lens_;
+			size_ = argc;
+			argv_ = new const char* [size_];
+			lens_ = new size_t [size_];
+		}
+
+		argc_ = argc;
+		for (size_t i = 0; i < size_; i++) {
+			argv_[i] = argv[i];
+			lens_[i] = lens[i];
+		}
+#endif
 	}
 
 	void set_addr(const char* addr) {
@@ -142,6 +165,7 @@ private:
 	size_t redirect_count_;
 
 public:
+	size_t       size_;
 	size_t       argc_;
 	const char** argv_;
 	size_t*      lens_;

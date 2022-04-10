@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include "http_servlet.h"
 
-#define	 STACK_SIZE	320000
+static int STACK_SIZE = 128000;
 static int __rw_timeout = 0;
 static int __schedule_event = FIBER_EVENT_KERNEL;
 
@@ -11,31 +11,31 @@ static void http_server(ACL_FIBER *, void *ctx)
 {
 	acl::socket_stream *conn = (acl::socket_stream *) ctx;
 
+	acl::memcache_session *session = new acl::memcache_session("127.0.0.1:11211");
+	http_servlet *servlet = new http_servlet(conn, session);
+	servlet->setLocalCharset("gb2312");
+
 	//printf("start one http_server\r\n");
 
-	acl::memcache_session session("127.0.0.1:11211");
-	http_servlet servlet(conn, &session);
-	servlet.setLocalCharset("gb2312");
-
-	while (true)
-	{
-		if (servlet.doRun() == false)
+	while (true) {
+		if (servlet->doRun() == false) {
 			break;
+		}
 	}
 
 	printf("close one connection: %d, %s\r\n", conn->sock_handle(),
 		acl::last_serror());
+	delete session;
+	delete servlet;
 	delete conn;
 }
 
 static void fiber_accept(ACL_FIBER *, void *ctx)
 {
 	acl::server_socket* server = (acl::server_socket *) ctx;
-	while (true)
-	{
+	while (true) {
 		acl::socket_stream* client = server->accept();
-		if (client == NULL)
-		{
+		if (client == NULL) {
 			printf("accept failed: %s\r\n", acl::last_serror());
 			break;
 		}
@@ -59,11 +59,10 @@ public:
 
 	thread_server(const char* addr)
 	{
-		server_inner_ = new acl::server_socket(acl::OPEN_FLAG_REUSEPORT);
-		if (server_inner_->open(addr) == false)
-		{
-			printf("open %s error %s\r\n",
-				addr, acl::last_serror());
+		server_inner_ = new acl::server_socket(acl::OPEN_FLAG_REUSEPORT, 128);
+		if (server_inner_->open(addr) == false) {
+			printf("%s(%d): open %s error %s\r\n", __FUNCTION__,
+				__LINE__, addr, acl::last_serror());
 			exit (1);
 		}
 
@@ -91,6 +90,7 @@ static void usage(const char* procname)
 		" -e event\r\n"
 		" -R reuse_port\r\n"
 		" -t threads\r\n"
+		" -z stack_size[default: 128000]\r\n"
 		" -r rw_timeout\r\n", procname);
 }
 
@@ -100,10 +100,8 @@ int main(int argc, char *argv[])
 	int  ch, nthreads = 2;
 	bool reuse_port = false;
 
-	while ((ch = getopt(argc, argv, "hs:r:t:Re:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:r:t:Re:z:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -120,12 +118,17 @@ int main(int argc, char *argv[])
 			reuse_port = true;
 			break;
 		case 'e':
-			if (strcasecmp(optarg, "kernel") == 0)
+			if (strcasecmp(optarg, "kernel") == 0) {
 				__schedule_event = FIBER_EVENT_KERNEL;
-			else if (strcasecmp(optarg, "poll") == 0)
-				__schedule_event = FIBER_EVENT_SELECT;
-			else if (strcasecmp(optarg, "select") == 0)
+			} else if (strcasecmp(optarg, "poll") == 0) {
 				__schedule_event = FIBER_EVENT_POLL;
+			} else if (strcasecmp(optarg, "select") == 0) {
+				__schedule_event = FIBER_EVENT_SELECT;
+			}
+			break;
+		case 'z':
+			STACK_SIZE = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -136,26 +139,25 @@ int main(int argc, char *argv[])
 
 	acl::server_socket server;
 
-	if (!reuse_port)
-	{
-		if (server.open(addr) == false)
-		{
-			printf("open %s error\r\n", addr.c_str());
+	if (!reuse_port) {
+		if (server.open(addr) == false) {
+			printf("%s(%d): open %s error %s\r\n", __FUNCTION__,
+				__LINE__, addr.c_str(), acl::last_serror());
 			exit (1);
-		}
-		else
+		} else {
 			printf("open %s ok\r\n", addr.c_str());
+		}
 	}
 
 	std::vector<acl::thread*> threads;
 
-	for (int i = 0; i < nthreads; i++)
-	{
+	for (int i = 0; i < nthreads; i++) {
 		acl::thread* thr;
-		if (reuse_port)
+		if (reuse_port) {
 			thr = new thread_server(addr);
-		else
+		} else {
 			thr = new thread_server(server);
+		}
 		threads.push_back(thr);
 		thr->set_detachable(false);
 		thr->start();
@@ -163,8 +165,7 @@ int main(int argc, char *argv[])
 	}
 
 	for (std::vector<acl::thread*>::iterator it = threads.begin();
-		it != threads.end(); ++it)
-	{
+		 it != threads.end(); ++it) {
 		(*it)->wait();
 		delete *it;
 	}

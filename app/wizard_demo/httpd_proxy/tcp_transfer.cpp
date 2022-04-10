@@ -9,6 +9,7 @@ tcp_transfer::tcp_transfer(ACL_FIBER* parent, acl::socket_stream& in,
 , in_(in)
 , out_(out)
 , peer_(NULL)
+, is_local_(false)
 {
 } 
 
@@ -16,9 +17,14 @@ tcp_transfer::~tcp_transfer(void)
 {
 }
 
-void tcp_transfer::set_peer(tcp_transfer& peer)
+void tcp_transfer::set_peer(tcp_transfer* peer)
 {
-	peer_ = &peer;
+	peer_ = peer;
+}
+
+void tcp_transfer::set_local(bool yes)
+{
+	is_local_ = yes;
 }
 
 void tcp_transfer::unset_peer(void)
@@ -45,7 +51,9 @@ void tcp_transfer::wait(void)
 void tcp_transfer::run(void)
 {
 	me_ = acl_fiber_running();
+
 	char buf[8192];
+
 	while (true) {
 		int fd = in_.sock_handle();
 		int ret = in_.read(buf, sizeof(buf) - 1, false);
@@ -57,9 +65,24 @@ void tcp_transfer::run(void)
 			break;
 		}
 
+		buf[ret] = 0;
+
+#if 0
+		printf("send from %s data, in=%d, out=%d\r\n",
+			is_local_ ? "local" : "remote",
+			in_->sock_handle(), out_->sock_handle());
+#endif
+
 		if (out_.write(buf, ret) == -1) {
+			printf(">>>write error\n");
 			break;
 		}
+
+#if 0
+		printf("send to %s data, in=%d, out=%d ok\r\n",
+			is_local_ ? "local" : "remote",
+			in_->sock_handle(), out_->sock_handle());
+#endif
 	}
 
 	if (peer_) {

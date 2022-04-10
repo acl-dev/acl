@@ -47,15 +47,18 @@ void master_service::on_accept(acl::socket_stream& conn)
 
 	conn.set_rw_timeout(120);
 
-	acl::memcache_session session("127.0.0.1:11211");
-	http_servlet servlet(&conn, &session);
+	acl::memcache_session* session = new acl::memcache_session("127.0.0.1:11211");
+	http_servlet* servlet = new http_servlet(&conn, session);
 
 	// charset: big5, gb2312, gb18030, gbk, utf-8
-	servlet.setLocalCharset("utf-8");
+	servlet->setLocalCharset("utf-8");
+	servlet->setParseBody(false);
 
-	while(servlet.doRun()) {}
+	while(servlet->doRun()) {}
 
 	logger("disconnect from %s, fd %d", conn.get_peer(), conn.sock_handle());
+	delete session;
+	delete servlet;
 }
 
 void master_service::proc_pre_jail(void)
@@ -70,7 +73,8 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 
 void master_service::proc_on_init(void)
 {
-	logger(">>>proc_on_init<<<");
+	logger(">>>proc_on_init: shared stack size=%zd<<<",
+		acl::fiber::get_shared_stack_size());
 }
 
 void master_service::proc_on_exit(void)

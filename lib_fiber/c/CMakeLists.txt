@@ -57,6 +57,7 @@ add_definitions(
 	"-Wno-long-long"
 	"-Wuninitialized"
 #	"-DUSE_JMP"
+#	"-DSHARE_STACK"
 	"-DUSE_FAST_RING"
 	"-D_POSIX_PTHREAD_SEMANTICS"
 	"-DACL_PREPARE_COMPILE"

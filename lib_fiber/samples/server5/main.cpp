@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+static int __event_type = ACL_EVENT_KERNEL;
 
 static bool echo(acl::socket_stream& conn)
 {
@@ -71,7 +74,7 @@ static void fiber_client(acl::socket_stream* conn)
 	printf("fiber-%d running\r\n", acl::fiber::self());
 
 	bool stop = false;
-	ACL_EVENT *event = acl_event_new(ACL_EVENT_POLL, 0, 1, 0);
+	ACL_EVENT *event = acl_event_new(__event_type, 0, 1, 0);
 	ACL_VSTREAM *cstream = conn->get_vstream();
 	cstream->context = conn;
 	conn->set_ctx(&stop);
@@ -105,7 +108,7 @@ static void fiber_server(acl::server_socket& ss)
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -s listen_addr\r\n", procname);
+	printf("usage: %s -h [help] -s listen_addr -e event_type[kernel|poll|select]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -116,7 +119,7 @@ int main(int argc, char *argv[])
 	acl::string addr("127.0.0.1:9006");
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:e:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -124,6 +127,14 @@ int main(int argc, char *argv[])
 		case 's':
 			addr = optarg;
 			break;
+		case 'e':
+			if (strcasecmp(optarg, "poll") == 0) {
+				__event_type = ACL_EVENT_POLL;
+			} else if (strcasecmp(optarg, "select") == 0) {
+				__event_type = ACL_EVENT_SELECT;
+			} else {
+				__event_type = ACL_EVENT_KERNEL;
+			}
 		default:
 			break;
 		}

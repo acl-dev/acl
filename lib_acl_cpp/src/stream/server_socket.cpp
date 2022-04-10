@@ -89,7 +89,7 @@ bool server_socket::opened(void) const
 bool server_socket::open(const char* addr)
 {
 	if (fd_ != ACL_SOCKET_INVALID) {
-		logger_error("listen fd already opened");
+		logger_error("listen fd already opened, fd_=%d", (int) fd_);
 		return true;
 	}
 

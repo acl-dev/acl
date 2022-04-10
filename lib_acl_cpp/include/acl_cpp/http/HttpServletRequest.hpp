@@ -48,6 +48,14 @@ public:
 	~HttpServletRequest(void);
 
 	/**
+	 * 针对 POST 方法，该方法设置是否需要解析 Form 数据体数据，默认为解析，
+	 * 该函数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，
+	 * 即使调用本方法设置了解析数据，也不会对数据体进行解析
+	 * @param yes {bool} 是否需要解析
+	 */
+	void setParseBody(bool yes);
+
+	/**
 	 * 获得 HTTP 客户端请求方法：GET, POST, PUT, CONNECT, PURGE
 	 * @param method_s {string*} 非空时存储字符串方式的请求方法
 	 * @return {http_method_t}
@@ -413,6 +421,7 @@ private:
 	int  rw_timeout_;
 	std::vector<HTTP_PARAM*> params_;
 	http_request_t request_type_;
+	bool parse_body_;
 	http_mime* mime_;
 	string* body_;
 	json* json_;

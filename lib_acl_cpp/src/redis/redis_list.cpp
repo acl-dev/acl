@@ -71,8 +71,8 @@ bool redis_list::lindex(const char* key, size_t idx, string& buf)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char tmp[LONG_LEN];
-	(void) safe_snprintf(tmp, sizeof(tmp), "%lu", (unsigned long) idx);
+	char* tmp = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	(void) safe_snprintf(tmp, LONG_LEN, "%lu", (unsigned long) idx);
 	argv[2] = tmp;
 	lens[2] = strlen(tmp);
 
@@ -96,8 +96,8 @@ bool redis_list::lset(const char* key, int idx, const char* value, size_t len)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char tmp[LONG_LEN];
-	(void) safe_snprintf(tmp, sizeof(tmp), "%lu", (unsigned long) idx);
+	char* tmp = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	(void) safe_snprintf(tmp, LONG_LEN, "%lu", (unsigned long) idx);
 	argv[2] = tmp;
 	lens[2] = strlen(tmp);
 
@@ -388,8 +388,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<const char*>& keys,
 		i++;
 	}
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) timeout);
+	char* buf = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%lu", (unsigned long) timeout);
 	args[i] = buf;
 	lens[i] = strlen(args[i]);
 
@@ -415,8 +415,8 @@ bool redis_list::bpop(const char* cmd, const std::vector<string>& keys,
 		i++;
 	}
 
-	char buf[LONG_LEN];
-	safe_snprintf(buf, sizeof(buf), "%lu", (unsigned long) timeout);
+	char* buf = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(buf, LONG_LEN, "%lu", (unsigned long) timeout);
 	args[i] = buf;
 	lens[i] = strlen(args[i]);
 
@@ -486,8 +486,8 @@ bool redis_list::brpoplpush(const char* src, const char* dst,
 	argv[2] = dst;
 	lens[2] = strlen(dst);
 
-	char tmp[LONG_LEN];
-	safe_snprintf(tmp, sizeof(tmp), "%lu", (unsigned long) timeout);
+	char* tmp = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(tmp, LONG_LEN, "%lu", (unsigned long) timeout);
 	argv[3] = tmp;
 	lens[3] = strlen(argv[3]);
 
@@ -506,9 +506,10 @@ bool redis_list::lrange(const char* key, int start, int end,
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char start_s[LONG_LEN], end_s[LONG_LEN];
-	safe_snprintf(start_s, sizeof(start_s), "%d", start);
-	safe_snprintf(end_s, sizeof(end_s), "%d", end);
+	char* start_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	char* end_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(start_s, LONG_LEN, "%d", start);
+	safe_snprintf(end_s, LONG_LEN, "%d", end);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);
@@ -535,8 +536,8 @@ int redis_list::lrem(const char* key, int count, const char* value, size_t len)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char buf[INT_LEN];
-	safe_snprintf(buf, sizeof(buf), "%d", count);
+	char* buf = (char*) dbuf_->dbuf_alloc(INT_LEN);
+	safe_snprintf(buf, INT_LEN, "%d", count);
 	argv[2] = buf;
 	lens[2] = strlen(buf);
 
@@ -558,9 +559,10 @@ bool redis_list::ltrim(const char* key, int start, int end)
 	argv[1] = key;
 	lens[1] = strlen(key);
 
-	char start_s[LONG_LEN], end_s[LONG_LEN];
-	safe_snprintf(start_s, sizeof(start_s), "%d", start);
-	safe_snprintf(end_s, sizeof(end_s), "%d", end);
+	char* start_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	char* end_s = (char*) dbuf_->dbuf_alloc(LONG_LEN);
+	safe_snprintf(start_s, LONG_LEN, "%d", start);
+	safe_snprintf(end_s, LONG_LEN, "%d", end);
 
 	argv[2] = start_s;
 	lens[2] = strlen(start_s);

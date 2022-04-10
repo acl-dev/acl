@@ -62,8 +62,8 @@ bool redis_connection::select(int dbnum)
 	argv[0] = "SELECT";
 	lens[0] = strlen(argv[0]);
 
-	char buf[21];
-	safe_snprintf(buf, sizeof(buf), "%d", dbnum);
+	char* buf = (char*) dbuf_->dbuf_alloc(21);
+	safe_snprintf(buf, 21, "%d", dbnum);
 	argv[1] = buf;
 	lens[1] = strlen(argv[1]);
 

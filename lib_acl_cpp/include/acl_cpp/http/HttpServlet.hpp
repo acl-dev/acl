@@ -69,14 +69,13 @@ public:
 	HttpServlet& setRwTimeout(int rw_timeout);
 
 	/**
-	 * 针对 POST 方法，该方法设置是否需要解析数据体数据，默认为解析，该函
-	 * 数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，即使
-	 * 调用本方法设置了解析数据，也不会对数据体进行解析
-	 * @param on {bool} 是否需要解析
+	 * 针对 POST 方法，该方法设置是否需要解析 Form 数据体数据，默认为解析，
+	 * 该函数必须在 doRun 之前调用才有效；当数据体为数据流或 MIME 格式，
+	 * 即使调用本方法设置了解析数据，也不会对数据体进行解析
+	 * @param yes {bool} 是否需要解析
 	 * @return {HttpServlet&}
-	 * xxxx: 该方法已经被废弃！
 	 */
-	HttpServlet& setParseBody(bool on);
+	HttpServlet& setParseBody(bool yes);
 
 	/**
 	 * 针对 POST 方法，该方法设置解析数据体的最大长度，如果数据体，该函数
@@ -207,6 +206,7 @@ protected:
 protected:
 	HttpServletRequest* req_;
 	HttpServletResponse* res_;
+	bool parse_body_;
 
 private:
 	session* session_;

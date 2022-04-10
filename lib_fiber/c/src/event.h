@@ -150,12 +150,6 @@ struct FILE_EVENT {
 };
 
 #ifdef HAS_POLL
-struct POLLFD {
-	FILE_EVENT *fe;
-	POLL_EVENT *pe;
-	struct pollfd *pfd;
-};
-
 struct POLL_EVENT {
 	RING       me;
 
@@ -169,24 +163,16 @@ struct POLL_EVENT {
 #endif
 
 #ifdef	HAS_EPOLL
-struct EPOLL_CTX {
-	int  fd;
-	int  op;
-	int  mask;
-	int  rmask;
-	FILE_EVENT  *fe;
-	EPOLL_EVENT *ee;
-	epoll_data_t data;
-};
+
+typedef struct EPOLL EPOLL;
 
 struct EPOLL_EVENT {
 	RING        me;
 	ACL_FIBER  *fiber;
+	EPOLL      *epoll;
+
 	epoll_proc *proc;
-	size_t      nfds;
 	long long   expire;
-	EPOLL_CTX **fds;
-	int         epfd;
 
 	struct epoll_event *events;
 	int maxevents;
@@ -212,7 +198,8 @@ struct EVENT {
 #endif
 
 #ifdef HAS_EPOLL
-	RING   epoll_list;
+	TIMER_CACHE *epoll_list;
+	RING   epoll_ready;
 #endif
 
 	unsigned waiter;
@@ -242,7 +229,6 @@ void event_set(int event_mode);
 EVENT *event_create(int size);
 const char *event_name(EVENT *ev);
 acl_handle_t event_handle(EVENT *ev);
-ssize_t event_size(EVENT *ev);
 void event_free(EVENT *ev);
 void event_close(EVENT *ev, FILE_EVENT *fe);
 long long event_set_stamp(EVENT *ev);

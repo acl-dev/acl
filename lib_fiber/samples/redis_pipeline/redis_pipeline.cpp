@@ -147,10 +147,7 @@ protected:
 	void run(void)
 	{
 		bool ret;
-		acl::redis_key cmd_key;
 		cmd_key.set_pipeline(&conns_);
-
-		acl::redis_string cmd_string;
 		cmd_string.set_pipeline(&conns_);
 
 		for (int i = 0; i < n_; i++) {
@@ -208,6 +205,9 @@ private:
 	acl::redis_client_pipeline& conns_;
 	acl::string cmd_;
 	int n_;
+
+	acl::redis_key cmd_key;
+	acl::redis_string cmd_string;
 };
 
 class test_thread : public acl::thread
@@ -369,6 +369,8 @@ int main(int argc, char* argv[])
 
 	// stop pipeline thread
 	pipeline.stop_thread();
+
+	printf("The pipeline thread has stopped!\r\n");
 
 #ifdef WIN32
 	printf("enter any key to exit\r\n");

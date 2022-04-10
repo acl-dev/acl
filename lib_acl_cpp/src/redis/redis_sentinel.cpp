@@ -399,13 +399,13 @@ bool redis_sentinel::sentinel_monitor(const char* master_name, const char* ip,
 	argv[3] = ip;
 	lens[3] = strlen(ip);
 
-	char port_s[64];
-	safe_snprintf(port_s, sizeof(port_s), "%d", port);
+	char* port_s = (char*) dbuf_->dbuf_alloc(64);
+	safe_snprintf(port_s, 64, "%d", port);
 	argv[4] = port_s;
 	lens[4] = strlen(argv[4]);
 
-	char quorum_s[64];
-	safe_snprintf(quorum_s, sizeof(quorum_s), "%d", quorum);
+	char* quorum_s = (char*) dbuf_->dbuf_alloc(64);
+	safe_snprintf(quorum_s, 64, "%d", quorum);
 	argv[5] = quorum_s;
 	lens[5] = strlen(argv[5]);
 
@@ -441,8 +441,8 @@ bool redis_sentinel::sentinel_set(const char* master_name, const char* name,
 bool redis_sentinel::sentinel_set(const char* master_name, const char* name,
 	unsigned value)
 {
-	char buf[64];
-	safe_snprintf(buf, sizeof(buf), "%u", value);
+	char* buf = (char*) dbuf_->dbuf_alloc(64);
+	safe_snprintf(buf, 64, "%u", value);
 	return sentinel_set(master_name, name, buf);
 }
 
