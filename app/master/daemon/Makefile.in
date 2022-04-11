@@ -29,7 +29,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
-	CC += -arch x86_64 -arch arm64
+#	CC += -arch x86_64 -arch arm64
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof
 	UNIXTYPE = MACOSX

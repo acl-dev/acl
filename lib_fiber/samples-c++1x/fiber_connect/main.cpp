@@ -32,10 +32,12 @@ protected:
 		acl::socket_stream conn;
 
 		printf("%s: begin to connect %s\r\n", __FUNCTION__, addr_.c_str());
+
+		printf("\r\n");
 		if (conn.open(addr_, 0, 0)) {
-			printf("%s: connect %s ok\r\n", __FUNCTION__, addr_.c_str());
+			printf(">>> %s: connect %s ok\r\n", __FUNCTION__, addr_.c_str());
 		} else {
-			printf("%s: connect %s error %s\r\n", __FUNCTION__,
+			printf(">>> %s: connect %s error %s\r\n", __FUNCTION__,
 				addr_.c_str(), acl::last_serror());
 		}
 
@@ -56,10 +58,11 @@ static void fiber_redis(const char* addr, bool use_sem)
 {
 	acl::socket_stream conn;
 
+	printf("\r\n");
 	if (conn.open(addr, 0, 0)) {
-		printf("%s: connect %s ok\r\n", __FUNCTION__, addr);
+		printf(">>> %s: connect %s ok\r\n", __FUNCTION__, addr);
 	} else {
-		printf("%s: connect %s error %s\r\n",
+		printf(">>> %s: connect %s error %s\r\n",
 			__FUNCTION__, addr, acl::last_serror());
 	}
 

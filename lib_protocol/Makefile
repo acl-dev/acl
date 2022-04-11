@@ -70,7 +70,7 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
-	CC += -arch x86_64 -arch arm64
+#	CC += -arch x86_64 -arch arm64
 	CFLAGS += -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
 		  -fdata-sections \
