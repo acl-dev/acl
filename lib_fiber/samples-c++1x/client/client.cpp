@@ -58,7 +58,8 @@ static size_t start(const char* addr, int count, bool readable,
 		return 0;
 	}
 
-	printf(">>>connect %s ok\r\n", addr);
+	printf(">>>connect %s ok, conn_timeout=%d, rw_timeout=%d\r\n",
+		addr, conn_timeout, rw_timeout);
 
 	struct sockaddr_in in;
 	int len = sizeof(in);

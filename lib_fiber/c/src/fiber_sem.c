@@ -74,7 +74,7 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 	ring_prepend(&sem->waiting, &curr->me);
 	acl_fiber_switch();
 
-	/* if switch to me because other killed me, I should detach myself;
+	/* If switch to me because other killed me, I should detach myself;
 	 * else if because other unlock, I'll be detached twice which is
 	 * hamless because RIGN can deal with it.
 	 */
@@ -118,6 +118,7 @@ int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem)
 int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 {
 	ACL_FIBER *ready;
+	int num;
 
 	if (sem->tid == 0) {
 		sem->tid = __pthread_self();
@@ -138,6 +139,7 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	ring_detach(&ready->me);
 	acl_fiber_ready(ready);
 
+	num = sem->num;
 	acl_fiber_yield();
-	return sem->num;
+	return num;
 }

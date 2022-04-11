@@ -204,12 +204,18 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		}
 
 		if (timer == NULL) {
+			/* Try again before exiting the IO fiber loop, some
+			 * other fiber maybe in the ready queue and wants to
+			 * add some IO event.
+			 */
+			acl_fiber_yield();
+
 			if (ev->fdcount > 0 || ev->waiter > 0) {
 				continue;
 			}
-			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u",
+			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u, events=%d",
 				__FUNCTION__, __LINE__, __pthread_self(),
-				ev->waiter);
+				ev->waiter, ring_size(&ev->events));
 			break;
 		}
 
