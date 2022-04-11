@@ -24,7 +24,6 @@ CFLAGS = -c -g -W \
 -Wmissing-prototypes \
 -Wcast-qual \
 -DUSE_FAST_RING \
--DSHARE_STACK \
 #-O3 \
 #-DUSE_VALGRIND \
 #-DUSE_INLINE_MEMCPY\
@@ -108,6 +107,7 @@ endif
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
+	CFLAGS += -DSHARE_STACK
 endif
 
 # For MINGW

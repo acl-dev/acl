@@ -5,11 +5,18 @@
 
 #ifdef SYS_UNIX
 
+#if defined(__arm64__)
+# ifndef USE_BOOST_JMP
+#  define USE_BOOST_JMP
+#  undef SHARE_STACK
+# endif
+#endif
+
 # if defined(USE_BOOST_JMP)
 #  include "boost_jmp.h"
 # elif defined(USE_JMP_DEF)
 #  define USE_JMP
-#  include "unix_jmp.h"
+#  include "x86_jmp.h"
 # elif defined(USE_JMP_EXP)
 #  define USE_JMP
 #  include "exp_jmp.h"

@@ -98,7 +98,7 @@
 		7029801427D751F800DF6A41 /* timer_cache.c in Sources */ = {isa = PBXBuildFile; fileRef = 7029800F27D751F800DF6A41 /* timer_cache.c */; };
 		7029801527D751F800DF6A41 /* timer_cache.h in Headers */ = {isa = PBXBuildFile; fileRef = 7029801027D751F800DF6A41 /* timer_cache.h */; };
 		7029801627D751F800DF6A41 /* avl.c in Sources */ = {isa = PBXBuildFile; fileRef = 7029801127D751F800DF6A41 /* avl.c */; };
-		70753A3D251F8F67005B6E56 /* unix_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3A251F8F67005B6E56 /* unix_jmp.h */; };
+		702F21412804085E0075B2AF /* x86_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 702F21402804085E0075B2AF /* x86_jmp.h */; };
 		70753A3E251F8F67005B6E56 /* boost_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3B251F8F67005B6E56 /* boost_jmp.h */; };
 		70753A3F251F8F67005B6E56 /* exp_jmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 70753A3C251F8F67005B6E56 /* exp_jmp.h */; };
 		70753B03251F91E9005B6E56 /* jump_gas.S in Sources */ = {isa = PBXBuildFile; fileRef = 70753B01251F91E9005B6E56 /* jump_gas.S */; };
@@ -204,7 +204,7 @@
 		7029800F27D751F800DF6A41 /* timer_cache.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = timer_cache.c; sourceTree = "<group>"; };
 		7029801027D751F800DF6A41 /* timer_cache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timer_cache.h; sourceTree = "<group>"; };
 		7029801127D751F800DF6A41 /* avl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = avl.c; sourceTree = "<group>"; };
-		70753A3A251F8F67005B6E56 /* unix_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = unix_jmp.h; sourceTree = "<group>"; };
+		702F21402804085E0075B2AF /* x86_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = x86_jmp.h; sourceTree = "<group>"; };
 		70753A3B251F8F67005B6E56 /* boost_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = boost_jmp.h; sourceTree = "<group>"; };
 		70753A3C251F8F67005B6E56 /* exp_jmp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = exp_jmp.h; sourceTree = "<group>"; };
 		70753B01251F91E9005B6E56 /* jump_gas.S */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = jump_gas.S; path = boost/jump_gas.S; sourceTree = "<group>"; };
@@ -368,10 +368,10 @@
 		070F35772090225C00672EDC /* fiber */ = {
 			isa = PBXGroup;
 			children = (
+				702F21402804085E0075B2AF /* x86_jmp.h */,
 				70753B00251F91C2005B6E56 /* boost */,
 				70753A3B251F8F67005B6E56 /* boost_jmp.h */,
 				70753A3C251F8F67005B6E56 /* exp_jmp.h */,
-				70753A3A251F8F67005B6E56 /* unix_jmp.h */,
 				070F35782090225C00672EDC /* fiber_unix.c */,
 				070F35792090225C00672EDC /* fiber_win.c */,
 			);
@@ -445,6 +445,7 @@
 				070F35A32090225C00672EDC /* msg.h in Headers */,
 				7029801327D751F800DF6A41 /* avl_impl.h in Headers */,
 				07BED4D021BA27530060BBE4 /* fiber_cond.h in Headers */,
+				702F21412804085E0075B2AF /* x86_jmp.h in Headers */,
 				070F35A92090225C00672EDC /* ring.h in Headers */,
 				070F35AE2090225C00672EDC /* strops.h in Headers */,
 				070F35B92090225C00672EDC /* event_epoll.h in Headers */,
@@ -461,7 +462,6 @@
 				070F35BB2090225C00672EDC /* event_iocp.h in Headers */,
 				070F35C12090225C00672EDC /* event_select.h in Headers */,
 				70C9841D253D4BAE003A9689 /* resolver.h in Headers */,
-				70753A3D251F8F67005B6E56 /* unix_jmp.h in Headers */,
 				070F35B52090225C00672EDC /* sane_inet.h in Headers */,
 				070F35322090220400672EDC /* fiber_base.h in Headers */,
 				070F35AB2090225C00672EDC /* sane_socket.h in Headers */,
