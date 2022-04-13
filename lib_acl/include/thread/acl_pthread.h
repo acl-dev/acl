@@ -17,6 +17,12 @@ extern "C" {
 #endif
 # include <pthread.h>
 
+# if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX) || defined(ALPINE)
+#  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE
+# else
+#  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE_NP
+# endif
+
 typedef pthread_t acl_pthread_t;
 typedef pthread_attr_t acl_pthread_attr_t;
 typedef pthread_mutex_t acl_pthread_mutex_t;
@@ -35,6 +41,9 @@ typedef pthread_once_t acl_pthread_once_t;
 #define acl_pthread_detach              pthread_detach
 #define acl_pthread_once                pthread_once
 #define acl_pthread_join                pthread_join
+#define	acl_pthread_mutexattr_init	pthread_mutexattr_init
+#define	acl_pthread_mutexattr_destroy	pthread_mutexattr_destroy
+#define	acl_pthread_mutexattr_settype	pthread_mutexattr_settype
 #define acl_pthread_mutex_init          pthread_mutex_init
 #define acl_pthread_mutex_destroy       pthread_mutex_destroy
 #define acl_pthread_mutex_lock          pthread_mutex_lock
@@ -172,6 +181,9 @@ ACL_API int acl_pthread_detach(acl_pthread_t thread);
 ACL_API int acl_pthread_join(acl_pthread_t thread, void **thread_return);
 
 /* in acl_pthread_mutex.c */
+ACL_API int acl_pthread_mutexattr_init(acl_pthread_mutexattr_t *attr);
+ACL_API int acl_pthread_mutexattr_destroy(acl_pthread_mutexattr_t *attr);
+ACL_API int acl_pthread_mutexattr_settype(acl_pthread_mutexattr_t *attr, int type);
 ACL_API int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
 		const acl_pthread_mutexattr_t *mattr);
 ACL_API int acl_pthread_mutex_destroy(acl_pthread_mutex_t *mutex);

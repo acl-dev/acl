@@ -248,45 +248,13 @@ ACL_EVENT *event_new_kernel_thr(int fdsize);
 ACL_EVENT *event_epoll_alloc_thr(int fdsize);
 #endif
 
-#ifdef	EVENT_USE_SPINLOCK
-
 # define LOCK_INIT(mutex_in) do { \
-	pthread_spinlock_t *sp = mutex_in; \
-	int   status = pthread_spin_init(sp, PTHREAD_PROCESS_PRIVATE); \
-	if (status != 0) \
-		acl_msg_fatal("%s(%d): init lock error(%s)", \
-			__FILE__, __LINE__, strerror(status)); \
-} while (0)
-
-# define LOCK_DESTROY(mutex_in) do { \
-	pthread_spinlock_t *sp = mutex_in; \
-	pthread_spin_destroy(sp); \
-} while (0)
-
-# define THREAD_LOCK(mutex_in) do { \
-	pthread_spinlock_t *sp = mutex_in; \
-	int   status = pthread_spin_lock(sp); \
-	if (status != 0) \
-		acl_msg_fatal("%s(%d): lock error(%s)", \
-			__FILE__, __LINE__, strerror(status)); \
-} while (0)
-
-# define THREAD_UNLOCK(mutex_in) do { \
-	pthread_spinlock_t *sp = mutex_in; \
-	int   status = pthread_spin_unlock(sp); \
-	if (status != 0) \
-		acl_msg_fatal("%s(%d): unlock error(%s)", \
-			__FILE__, __LINE__, strerror(status)); \
-} while (0)
-
-#else
-
-# define LOCK_INIT(mutex_in) do { \
+	acl_pthread_mutexattr_t attr; \
 	acl_pthread_mutex_t *mutex_ptr = (mutex_in); \
-	int   status = acl_pthread_mutex_init(mutex_ptr, NULL); \
-	if (status != 0) \
-		acl_msg_fatal("%s(%d): init lock error(%s)", \
-			__FILE__, __LINE__, strerror(status)); \
+	acl_pthread_mutexattr_init(&attr); \
+	acl_pthread_mutexattr_settype(&attr, ACL_PTHREAD_MUTEX_RECURSIVE); \
+	acl_pthread_mutex_init(mutex_ptr, &attr); \
+	acl_pthread_mutexattr_destroy(&attr); \
 } while (0)
 
 # define LOCK_DESTROY(mutex_in) do { \
@@ -309,8 +277,6 @@ ACL_EVENT *event_epoll_alloc_thr(int fdsize);
 		acl_msg_fatal("%s(%d): unlock error(%s)", \
 			__FILE__, __LINE__, strerror(status)); \
 } while (0)
-
-#endif
 
 #define SET_TIME(x) {  \
 	struct timeval _tv;  \

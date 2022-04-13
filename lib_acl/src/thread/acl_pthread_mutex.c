@@ -17,6 +17,26 @@
 
 #ifdef	ACL_WINDOWS
 
+int acl_pthread_mutexattr_init(acl_pthread_mutexattr_t *attr)
+{
+	(void) attr;
+	return 0;
+}
+
+int acl_pthread_mutexattr_destroy(acl_pthread_mutexattr_t *attr)
+{
+	(void) attr;
+	return 0;
+}
+
+int acl_pthread_mutexattr_settype(acl_pthread_mutexattr_t *attr, int type)
+{
+	(void) attr;
+	(void) type;
+	/* The mutex on Windows is recursive by default. */
+	return 0;
+}
+
 int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
 	const acl_pthread_mutexattr_t *mattr)
 {
@@ -28,10 +48,12 @@ int acl_pthread_mutex_init(acl_pthread_mutex_t *mutex,
 		return -1;
 	}
 
+	(void) mattr;
+
 	mutex->dynamic = 0;
 
 	/* Create the mutex, with initial value signaled */
-	mutex->id = CreateMutex((SECURITY_ATTRIBUTES *) mattr, FALSE, NULL);
+	mutex->id = CreateMutex(/* (SECURITY_ATTRIBUTES *) mattr */ NULL, FALSE, NULL);
 	if (!mutex->id) {
 		acl_msg_error("%s, %s(%d): CreateMutex error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
