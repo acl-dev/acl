@@ -1,4 +1,4 @@
-%define release_id 8
+%define release_id 10
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,10 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Apr 13 2022 shuxin.zheng@qq.com 3.5.3-10-20220413.15
+- fixed one dead lock process in event timer module
+- fiber has more improvement: shared stack, close fd safety, IO timer with higth performance
 
 * Tue Mar 08 2022
 - optimize: libfiber is ok!
