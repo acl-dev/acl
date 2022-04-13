@@ -37,6 +37,20 @@ static void test_pthread_once(void)
 
 int main(int argc acl_unused, char *argv[] acl_unused)
 {
+	acl_pthread_mutexattr_t attr;
+	acl_pthread_mutex_t mutex;
+
+	acl_pthread_mutexattr_init(&attr);
+	acl_pthread_mutexattr_settype(&attr, ACL_PTHREAD_MUTEX_RECURSIVE);
+	acl_pthread_mutex_init(&mutex, &attr);
+	acl_pthread_mutexattr_destroy(&attr);
+
+	acl_pthread_mutex_lock(&mutex);
+	acl_pthread_mutex_lock(&mutex);
+	acl_pthread_mutex_lock(&mutex);
+	acl_pthread_mutex_destroy(&mutex);
+
+	printf("lock ok\r\n");
 	test_pthread_once();
 	return 0;
 }
