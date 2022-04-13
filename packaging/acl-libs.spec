@@ -47,12 +47,9 @@ rm -rf %{buildroot}
 
 %changelog
 
-* Wed Apr 13 2022 shuxin.zheng@qq.com 3.5.3-10-20220413.15
+* Wed Apr 13 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-10-20220413.15
 - fixed one dead lock process in event timer module
 - fiber has more improvement: shared stack, close fd safety, IO timer with higth performance
-
-* Tue Mar 08 2022
-- optimize: libfiber is ok!
 
 * Wed Feb 23 2022 shuxin.zheng@qq.com 3.5.3-7-20220223.11
 - optimize: optimize fiber module
