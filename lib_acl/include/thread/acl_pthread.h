@@ -79,6 +79,7 @@ typedef pthread_once_t acl_pthread_once_t;
 #define	ACL_PTHREAD_CREATE_JOINABLE     0
 #define	ACL_TLS_OUT_OF_INDEXES          0xffffffff
 #define	ACL_PTHREAD_KEYS_MAX            1024
+#define ACL_PTHREAD_MUTEX_RECURSIVE		1
 
 /*
  * see https://docs.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-initonceexecuteonce
