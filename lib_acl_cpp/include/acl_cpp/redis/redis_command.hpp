@@ -476,7 +476,7 @@ public:
 
 protected:
 	bool check_addr_;
-	char addr_[32];
+	char addr_[128];
 	redis_client* conn_;
 	redis_client_cluster* cluster_;
 	redis_client_pipeline* pipeline_;

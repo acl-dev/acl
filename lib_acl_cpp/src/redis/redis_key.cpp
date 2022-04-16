@@ -515,30 +515,61 @@ bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
 }
 
 bool redis_key::migrate(const char* key, size_t len, const char* addr,
-	unsigned dest_db, unsigned timeout, const char* option /* = NULL */)
+	unsigned dest_db, unsigned timeout, const char* options /* = NULL */)
 {
+	std::vector<const char*> keys;
+	std::vector<size_t> lens;
+	keys.push_back(key);
+	lens.push_back(len);
+	return migrate(addr, dest_db, timeout, keys, lens, options);
+}
+
+bool redis_key::migrate(const char* addr, unsinged dest_db, unsigned timeout,
+	const std::vector<char*>& keys, std::vector<size_t>& lens,
+	const char* options /* = NULL */)
+{
+	if (keys.empty() || lens.empty()) {
+		logger_error("keys empty");
+		return false;
+	} else if (keys.size() != lens.size()) {
+		logger_error("invalid lens size=%zd, keys size=%zd",
+			lens.size(), keys.size());
+		return false;
+	}
+
 	char* addrbuf = (char*) dbuf_->dbuf_alloc(64);
 	safe_snprintf(addrbuf, 64, "%s", addr);
-	char* at = strchr(addrbuf, ':');
-	if (at == NULL || *(at + 1) == 0)
+	char* port_s = strchr(addrbuf, ':');
+	if (port_s == NULL || *(port_s + 1) == 0) {
 		return false;
-	*at++ = 0;
-	int port = atoi(at);
-	if (port >= 65535 || port <= 0)
+	}
+	*port_s++ = 0;
+	int port = atoi(port_s);
+	if (port >= 65535 || port <= 0) {
 		return false;
+	}
 
-	const char* argv[7];
-	size_t lens[7];
+	std::vector<string>* options_tokens;
+	string options_buf;
+	if (options && *options) {
+		buf = options;
+		options_tokens = &options_buf.split2(" \t", true);
+	} else {
+		options_tokens = NULL;
+	}
+
+	const char* argv[11];
+	size_t lens[11];
 	size_t argc = 6;
 
 	argv[0] = "MIGRATE";
 	lens[0] = sizeof("MIGRATE") - 1;
 	argv[1] = addrbuf;
 	lens[1] = strlen(addrbuf);
-	argv[2] = at;
-	lens[2] = strlen(at);
-	argv[3] = key;
-	lens[3] = len;
+	argv[2] = port_s;
+	lens[2] = strlen(port_s);
+	argv[3] = "";
+	lens[3] = 0;
 
 	char* db_s = (char*) dbuf_->dbuf_alloc(11);
 	safe_snprintf(db_s, 11, "%u", dest_db);
@@ -551,11 +582,32 @@ bool redis_key::migrate(const char* key, size_t len, const char* addr,
 	lens[5] = strlen(timeout_s);
 
 	if (option && *option) {
-		argv[6] = option;
-		lens[6] = strlen(option);
+		argv[argc] = option;
+		lens[argc] = strlen(option);
 		argc++;
 	}
 
+	argv[argc] = "REPLACE";
+	lens[argc] = sizeof("REPLACE") - 1;
+	argc++;
+
+	argv[argc] = "AUTH";
+	lens[argc] = 4;
+	argc++;
+
+	argv[argc] = "111111";
+	lens[argc] = 6;
+	argc++;
+
+	argv[argc] = "KEYS";
+	lens[argc] = 4;
+	argc++;
+
+	argv[argc] = key;
+	lens[argc] = len;
+	argc++;
+
+	printf(">>>>argc=%zd, key=%s\r\n", argc, key);
 	build_request(argc, argv, lens);
 	return check_status();
 }

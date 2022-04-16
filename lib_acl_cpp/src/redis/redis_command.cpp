@@ -155,6 +155,15 @@ void redis_command::set_client_addr(redis_client& conn)
 	socket_stream* stream = conn.get_stream();
 	if (stream == NULL) {
 		addr_[0] = 0;
+		return;
+	}
+
+	char buf[128];
+	safe_snprintf(buf, sizeof(buf), "%s", stream->get_peer(true));
+	char* sep = strrchr(buf, '|');
+	if (sep && *(sep + 1)) {
+		*sep++ = 0;
+		safe_snprintf(addr_, sizeof(addr_), "%s:%s", buf, sep);
 	} else {
 		ACL_SAFE_STRNCPY(addr_, stream->get_peer(true), sizeof(addr_));
 	}
