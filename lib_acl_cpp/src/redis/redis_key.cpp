@@ -509,9 +509,9 @@ redis_key_t redis_key::type(const char* key, size_t len)
 }
 
 bool redis_key::migrate(const char* key, const char* addr, unsigned dest_db,
-	unsigned timeout, const char* option /* = NULL */)
+	unsigned timeout, const char* options /* = NULL */)
 {
-	return migrate(key, strlen(key), addr, dest_db, timeout, option);
+	return migrate(key, strlen(key), addr, dest_db, timeout, options);
 }
 
 bool redis_key::migrate(const char* key, size_t len, const char* addr,
@@ -524,8 +524,8 @@ bool redis_key::migrate(const char* key, size_t len, const char* addr,
 	return migrate(addr, dest_db, timeout, keys, lens, options);
 }
 
-bool redis_key::migrate(const char* addr, unsinged dest_db, unsigned timeout,
-	const std::vector<char*>& keys, std::vector<size_t>& lens,
+bool redis_key::migrate(const char* addr, unsigned dest_db, unsigned timeout,
+	const std::vector<const char*>& keys, std::vector<size_t>& lens,
 	const char* options /* = NULL */)
 {
 	if (keys.empty() || lens.empty()) {
@@ -552,63 +552,61 @@ bool redis_key::migrate(const char* addr, unsinged dest_db, unsigned timeout,
 	std::vector<string>* options_tokens;
 	string options_buf;
 	if (options && *options) {
-		buf = options;
+		options_buf = options;
 		options_tokens = &options_buf.split2(" \t", true);
 	} else {
 		options_tokens = NULL;
 	}
 
-	const char* argv[11];
-	size_t lens[11];
-	size_t argc = 6;
+	argc_ = 7 + keys.size();
+	if (options_tokens != NULL) {
+		argc_ += options_tokens->size();
+	}
+	argv_space(argc_);
 
-	argv[0] = "MIGRATE";
-	lens[0] = sizeof("MIGRATE") - 1;
-	argv[1] = addrbuf;
-	lens[1] = strlen(addrbuf);
-	argv[2] = port_s;
-	lens[2] = strlen(port_s);
-	argv[3] = "";
-	lens[3] = 0;
+	argv_[0] = "MIGRATE";
+	argv_lens_[0] = sizeof("MIGRATE") - 1;
+	argv_[1] = addrbuf;
+	argv_lens_[1] = strlen(addrbuf);
+	argv_[2] = port_s;
+	argv_lens_[2] = strlen(port_s);
+	argv_[3] = "\"\"";
+	argv_lens_[3] = 0;
 
 	char* db_s = (char*) dbuf_->dbuf_alloc(11);
 	safe_snprintf(db_s, 11, "%u", dest_db);
-	argv[4] = db_s;
-	lens[4] = strlen(db_s);
+	argv_[4] = db_s;
+	argv_lens_[4] = strlen(db_s);
 
 	char* timeout_s = (char*) dbuf_->dbuf_alloc(11);
 	safe_snprintf(timeout_s, 11, "%u", timeout);
-	argv[5] = timeout_s;
-	lens[5] = strlen(timeout_s);
+	argv_[5] = timeout_s;
+	argv_lens_[5] = strlen(timeout_s);
 
-	if (option && *option) {
-		argv[argc] = option;
-		lens[argc] = strlen(option);
+	size_t argc = 6;
+	if (options_tokens != NULL) {
+		assert(!options_tokens->empty());
+		for (std::vector<string>::const_iterator
+			cit = options_tokens->begin();
+			cit != options_tokens->end(); ++cit) {
+			argv_[argc] = (*cit).c_str();
+			argv_lens_[argc] = (*cit).size();
+			argc++;
+		}
+	}
+
+	argv_[argc] = "KEYS";
+	argv_lens_[argc] = 4;
+	argc++;
+
+	size_t n = keys.size();
+	for (size_t i = 0; i < n; i++) {
+		argv_[argc] = keys[i];
+		argv_lens_[argc] = lens[i];
 		argc++;
 	}
 
-	argv[argc] = "REPLACE";
-	lens[argc] = sizeof("REPLACE") - 1;
-	argc++;
-
-	argv[argc] = "AUTH";
-	lens[argc] = 4;
-	argc++;
-
-	argv[argc] = "111111";
-	lens[argc] = 6;
-	argc++;
-
-	argv[argc] = "KEYS";
-	lens[argc] = 4;
-	argc++;
-
-	argv[argc] = key;
-	lens[argc] = len;
-	argc++;
-
-	printf(">>>>argc=%zd, key=%s\r\n", argc, key);
-	build_request(argc, argv, lens);
+	build_request(argc, argv_, argv_lens_);
 	return check_status();
 }
 

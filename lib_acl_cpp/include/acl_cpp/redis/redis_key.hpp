@@ -187,15 +187,18 @@ public:
 	 *  the databases ID in destination redis
 	 * @param timeout {unsigned} 迁移过程的超时时间(毫秒级)
 	 *  timeout(microseconds) in transfering
-	 * @param option {const char*} COPY 或 REPLACE
+	 * @param options {const char*} COPY/REPLACE/AUTH/AUTH2...
 	 *  transfer option: COPY or REPLACE
 	 * @return {bool} 迁移是否成功
 	 *  if transfering successfully
 	 */
 	bool migrate(const char* key, size_t len, const char* addr,
-		unsigned dest_db, unsigned timeout, const char* option = NULL);
+		unsigned dest_db, unsigned timeout, const char* options = NULL);
 	bool migrate(const char* key, const char* addr, unsigned dest_db,
-		unsigned timeout, const char* option = NULL);
+		unsigned timeout, const char* options = NULL);
+	bool migrate(const char* addr, unsigned dest_db, unsigned timeout,
+		const std::vector<const char*>& keys, std::vector<size_t>& lens,
+		const char* options = NULL);
 
 	/**
 	 * 将数据移至本 redis-server 中的另一个数据库中

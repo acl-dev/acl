@@ -180,9 +180,18 @@ bool redis_migrate::move_slot(size_t slot, acl::redis& from, acl::redis& to)
 bool redis_migrate::move_key(const char* key, acl::redis& from,
 	const char* to_addr)
 {
-	if (from.migrate(key, to_addr, 0, 15000)) {
-		return true;
+	if (passwd_.empty()) {
+		if (from.migrate(key, to_addr, 0, 15000, NULL)) {
+			return true;
+		}
+	} else {
+		acl::string options;
+		options.format("AUTH %s", passwd_.c_str());
+		if (from.migrate(key, to_addr, 0, 15000, options)) {
+			return true;
+		}
 	}
+
 	acl::string error(from.result_error());
 	if (error.find("BUSYKEY", false) == NULL) {
 		printf("move key: %s error: %s, from: %s, to: %s\r\n",
@@ -205,8 +214,17 @@ bool redis_migrate::move_key(const char* key, acl::redis& from,
 		return false;
 	}
 
-	if (from.migrate(key, to_addr, 0, 15000, "REPLACE")) {
-		return true;
+	if (passwd_.empty()) {
+		if (from.migrate(key, to_addr, 0, 15000, "REPLACE")) {
+			return true;
+		}
+	} else {
+		acl::string options;
+		options.format("REPLACE AUTH %s", passwd_.c_str());
+
+		if (from.migrate(key, to_addr, 0, 15000, options)) {
+			return true;
+		}
 	}
 
 	printf("move key: %s error: %s, from: %s, to: %s\r\n",
