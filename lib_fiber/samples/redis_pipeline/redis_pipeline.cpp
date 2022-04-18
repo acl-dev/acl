@@ -214,12 +214,15 @@ class test_thread : public acl::thread
 {
 public:
 	test_thread(acl::locker& locker, acl::redis_client_pipeline& conns,
-		const char* cmd, int n, size_t nfibers)
+		const char* cmd, int n, size_t nfibers, size_t stack_size,
+		bool share_stack)
 	: locker_(locker)
 	, conns_(conns)
 	, cmd_(cmd)
 	, n_(n)
 	, nfibers_(nfibers)
+	, stack_size_(stack_size)
+	, share_stack_(share_stack)
 	{}
 
 	~test_thread(void) {}
@@ -231,7 +234,7 @@ protected:
 		for (size_t i = 0; i < nfibers_; i++) {
 			test_fiber* fb = new test_fiber(conns_, cmd_, n_);
 			fibers.push_back(fb);
-			fb->start();
+			fb->start(stack_size_, share_stack_);
 		}
 
 		acl::fiber::schedule();
@@ -253,6 +256,8 @@ private:
 	acl::string cmd_;
 	int n_;
 	size_t nfibers_;
+	size_t stack_size_;
+	bool   share_stack_;
 };
 
 static void usage(const char* procname)
@@ -264,6 +269,8 @@ static void usage(const char* procname)
 		"-I rw_timeout[default: 10]\r\n"
 		"-t max_threads[default: 10]\r\n"
 		"-c fibers_count[default: 50]]\r\n"
+		"-S [if use shared stack, default: false]\r\n"
+		"-z stack_size[default: 64000]\r\n"
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
@@ -275,9 +282,11 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	int  max_threads = 10, nfibers = 50;
+	size_t stack_size = 64000;
+	bool share_stack = false;
 	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:a:p:Sz:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -306,6 +315,12 @@ int main(int argc, char* argv[])
 		case 'p':
 			passwd = optarg;
 			break;;
+		case 'S':
+			share_stack = true;
+			break;
+		case 'z':
+			stack_size = (size_t) atoi(optarg);
+			break;
 		default:
 			usage(argv[0]);
 			return 1;
@@ -332,7 +347,7 @@ int main(int argc, char* argv[])
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
 		test_thread* thread = new test_thread(locker, pipeline,
-			cmd.c_str(), n, nfibers);
+			cmd.c_str(), n, nfibers, stack_size, share_stack);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();
