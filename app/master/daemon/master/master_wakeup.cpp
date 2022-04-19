@@ -23,21 +23,25 @@ static void master_wakeup_timer_event(int type acl_unused,
 	static char wakeup = ACL_TRIGGER_REQ_WAKEUP;
 	int     status = 0;
 
-	if (event != acl_var_master_global_event)
+	if (event != acl_var_master_global_event) {
 		abort();
+	}
 
 	/*
 	 * Don't wakeup services whose automatic wakeup feature was
 	 * turned off in the mean time.
 	 */
-	if (serv->wakeup_time == 0)
+	if (serv->wakeup_time == 0) {
 		return;
+	}
 
 	/*
 	 * Don't wakeup services whose is ACL_MASTER_SERV_TYPE_SOCK
 	 */
-	if (serv->type == ACL_MASTER_SERV_TYPE_SOCK)
+	if (serv->type == ACL_MASTER_SERV_TYPE_SOCK
+		|| serv->type == ACL_MASTER_SERV_TYPE_NONE) {
 		return;
+	}
 
 	/*
 	 * Don't wake up services that are throttled. Find out what
@@ -46,8 +50,9 @@ static void master_wakeup_timer_event(int type acl_unused,
 #define BRIEFLY	1
 
 	if (ACL_MASTER_THROTTLED(serv) == 0) {
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("%s: service %s", myname, serv->name);
+		}
 
 		switch (serv->type) {
 		case ACL_MASTER_SERV_TYPE_INET:
@@ -79,21 +84,26 @@ static void master_wakeup_timer_event(int type acl_unused,
 		 * a kernel module that is paranoid about open() calls.
 		 */
 		case ACL_MASTER_SERV_TYPE_FIFO:
-			if (acl_var_master_limit_privilege)
+			if (acl_var_master_limit_privilege) {
 				acl_set_eugid(acl_var_master_owner_uid,
 					acl_var_master_owner_gid);
+			}
 			status = acl_fifo_trigger(acl_var_master_global_event,
 				serv->name, &wakeup, sizeof(wakeup), BRIEFLY);
-			if (acl_var_master_limit_privilege)
+			if (acl_var_master_limit_privilege) {
 				acl_set_ugid(getuid(), getgid());
+			}
 			break;
 		default:
 			acl_msg_panic("%s: unknown service type: %d",
 				myname, serv->type);
+			break;
 		}
-		if (status < 0)
+
+		if (status < 0) {
 			acl_msg_warn("%s: service %s: %s",
 				myname, serv->name, strerror(errno));
+		}
 	}
 
 	/*
@@ -110,11 +120,18 @@ void acl_master_wakeup_init(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_wakeup_init";
 
-	if (serv->wakeup_time == 0 || (serv->flags & ACL_MASTER_FLAG_CONDWAKE))
+	if (serv->wakeup_time == 0 || (serv->flags & ACL_MASTER_FLAG_CONDWAKE)) {
 		return;
-	if (acl_msg_verbose)
+	}
+
+	if (acl_msg_verbose) {
 		acl_msg_info("%s: service %s time %d",
 			myname, serv->name, serv->wakeup_time);
+	}
+
+	if (serv->type == ACL_MASTER_SERV_TYPE_NONE) {
+		return;
+	}
 	master_wakeup_timer_event(0, acl_var_master_global_event, serv);
 }
 
@@ -130,8 +147,13 @@ void acl_master_wakeup_cleanup(ACL_MASTER_SERV *serv)
 	 * that reloads the config file to reset the wakeup timer when
 	 * things change.
 	 */
-	if (acl_msg_verbose)
+	if (acl_msg_verbose) {
 		acl_msg_info("%s: service %s", myname, serv->name);
+	}
+
+	if (serv->type == ACL_MASTER_SERV_TYPE_NONE) {
+		return;
+	}
 
 	acl_event_cancel_timer(acl_var_master_global_event,
 		master_wakeup_timer_event, (void *) serv);

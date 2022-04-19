@@ -51,9 +51,10 @@ static void master_unthrottle(ACL_MASTER_SERV *serv)
 		serv->flags &= ~ACL_MASTER_FLAG_THROTTLE;
 		acl_event_cancel_timer(acl_var_master_global_event,
 			master_unthrottle_wrapper, (void *) serv);
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("throttle released for command %s",
 				serv->path);
+		}
 		acl_master_avail_listen(serv);	/* XXX interface botch */
 	}
 }
@@ -75,10 +76,25 @@ static void master_throttle(ACL_MASTER_SERV *serv)
 		acl_event_request_timer(acl_var_master_global_event,
 			master_unthrottle_wrapper, (void *) serv,
 			(acl_int64) serv->throttle_delay * 1000000, 0);
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("%s(%d)->%s: throttling command %s",
 				__FILE__, __LINE__, myname, serv->path);
+		}
 	}
+}
+
+static void log_argv(const char *procname, ACL_ARGV *args)
+{
+	ACL_ITER iter;
+	ACL_VSTRING *buf = acl_vstring_alloc(128);
+
+	acl_foreach(iter, args) {
+		acl_vstring_strcat(buf, " ");
+		acl_vstring_strcat(buf, (char*) iter.data);
+	}
+
+	acl_msg_info("%s %s", procname, acl_vstring_str(buf));
+	acl_vstring_free(buf);
 }
 
 /* acl_master_spawn - spawn off new child process if we can */
@@ -86,77 +102,100 @@ static void master_throttle(ACL_MASTER_SERV *serv)
 static unsigned master_generation = 0;
 static ACL_VSTRING *env_gen = 0;
 
-static void start_child(ACL_MASTER_SERV *serv)
+static void prepare_child_fds(ACL_MASTER_SERV *serv)
 {
-	const char *myname = "start_child";
-	ACL_MASTER_NV *nv;
-	int i, n;
+	const char *myname = "prepare_child_fds";
+	int n;
 
 	/* MASTER_FLOW_READ_STREAM has been inited in master_vars.c */
-	if (acl_var_master_flow_pipe[0] <= ACL_MASTER_FLOW_READ)
+	if (acl_var_master_flow_pipe[0] <= ACL_MASTER_FLOW_READ) {
 		acl_msg_fatal("%s: flow pipe read descriptor <= %d",
 			myname, ACL_MASTER_FLOW_READ);
-	if (dup2(acl_var_master_flow_pipe[0], ACL_MASTER_FLOW_READ) < 0)
+	}
+	if (dup2(acl_var_master_flow_pipe[0], ACL_MASTER_FLOW_READ) < 0) {
 		acl_msg_fatal("%s: dup2: %s", myname, strerror(errno));
-	if (close(acl_var_master_flow_pipe[0]) < 0)
+	}
+	if (close(acl_var_master_flow_pipe[0]) < 0) {
 		acl_msg_fatal("close %d: %s",
 			acl_var_master_flow_pipe[0], strerror(errno));
+	}
 
 	/* MASTER_FLOW_WRITE_STREAM has been inited in master_vars.c */
-	if (acl_var_master_flow_pipe[1] <= ACL_MASTER_FLOW_WRITE)
+	if (acl_var_master_flow_pipe[1] <= ACL_MASTER_FLOW_WRITE) {
 		acl_msg_fatal("%s: flow pipe read descriptor <= %d",
 			myname, ACL_MASTER_FLOW_WRITE);
-	if (dup2(acl_var_master_flow_pipe[1], ACL_MASTER_FLOW_WRITE) < 0)
+	}
+	if (dup2(acl_var_master_flow_pipe[1], ACL_MASTER_FLOW_WRITE) < 0) {
 		acl_msg_fatal("%s: dup2: %s", myname, strerror(errno));
-	if (close(acl_var_master_flow_pipe[1]) < 0)
+	}
+	if (close(acl_var_master_flow_pipe[1]) < 0) {
 		acl_msg_fatal("close %d: %s",
 			acl_var_master_flow_pipe[1], strerror(errno));
+	}
 
-	/* status channel */
+	/* Status channel */
 	acl_vstream_close(serv->status_reader);
 
 	/* MASTER_STAT_STREAM has been inited in master_vars.c*/
-	if (serv->status_fd[1] <= ACL_MASTER_STATUS_FD)
+	if (serv->status_fd[1] <= ACL_MASTER_STATUS_FD) {
 		acl_msg_fatal("%s: status file descriptor collision", myname);
-	if (dup2(serv->status_fd[1], ACL_MASTER_STATUS_FD) < 0)
+	}
+	if (dup2(serv->status_fd[1], ACL_MASTER_STATUS_FD) < 0) {
 		acl_msg_fatal("%s: dup2 status_fd: %s", myname, strerror(errno));
+	}
 
 	close(serv->status_fd[1]);
 
 	for (n = 0; n < serv->listen_fd_count; n++) {
-		if (serv->listen_fds[n] <= ACL_MASTER_LISTEN_FD + n)
+		if (serv->listen_fds[n] <= ACL_MASTER_LISTEN_FD + n) {
 			acl_msg_fatal("%s: listen fd collision", myname);
-		if (dup2(serv->listen_fds[n], ACL_MASTER_LISTEN_FD + n) < 0)
+		}
+		if (dup2(serv->listen_fds[n], ACL_MASTER_LISTEN_FD + n) < 0) {
 			acl_msg_fatal("%s: dup2 listen_fd %d: %s",
 				myname, serv->listen_fds[n], strerror(errno));
+		}
 		(void) close(serv->listen_fds[n]);
 		acl_vstream_free(serv->listen_streams[n]);
+	}
+}
+
+static void start_child(ACL_MASTER_SERV *serv)
+{
+	const char *myname = "start_child";
+	int n, i;
+	ACL_MASTER_NV *nv;
+
+	if (serv->type != ACL_MASTER_SERV_TYPE_NONE) {
+		prepare_child_fds(serv);
 	}
 
 	acl_vstring_sprintf(env_gen, "%s=%o", ACL_MASTER_GEN_NAME,
 		master_generation);
-	if (putenv(acl_vstring_str(env_gen)) < 0)
+	if (putenv(acl_vstring_str(env_gen)) < 0) {
 		acl_msg_fatal("%s: putenv: %s", myname, strerror(errno));
+	}
 
 	n = acl_array_size(serv->children_env);
 	for (i = 0; i < n; i++) {
-		nv = (ACL_MASTER_NV *)
-			acl_array_index(serv->children_env, i);
-		if (nv == NULL)
+		nv = (ACL_MASTER_NV *) acl_array_index(serv->children_env, i);
+		if (nv == NULL) {
 			break;
+		}
 		setenv(nv->name, nv->value, 1);
 	}
 
-	/* begin to call the child process */
-	if (acl_msg_verbose)
+	/* Begin to call the child process */
+	if (acl_msg_verbose) {
 		acl_msg_info("%s: cmd = %s", myname, serv->path);
+	}
 
-	/* help programs written by golang to change runing privilege */
+	/* Help programs written by golang to change runing privilege */
 	if (serv->owner && *serv->owner) {
 		acl_msg_info("%s: acl_chroot_uid %s", myname, serv->owner);
 		acl_chroot_uid(NULL, serv->owner);
 	}
 
+	log_argv(serv->path, serv->args);
 	execvp(serv->path, serv->args->argv);
 	acl_msg_fatal("%s: exec %s: %s", myname, serv->path, strerror(errno));
 }
@@ -167,8 +206,9 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 	ACL_MASTER_PROC *proc;
 	ACL_MASTER_PID   pid;
 
-	if (env_gen == 0)
+	if (env_gen == 0) {
 		env_gen = acl_vstring_alloc(100);
+	}
 
 	/*
 	 * Sanity checks. The master_avail module is supposed
@@ -176,9 +216,10 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 	 */
 
 	if (!(serv->flags & ACL_MASTER_FLAG_RELOADING)) {
-		if (!ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc))
+		if (!ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc)) {
 			acl_msg_warn("%s(%d)->%s: at process limit %d",
 				__FILE__, __LINE__, myname, serv->total_proc);
+		}
 
 		if (serv->avail_proc > 0 && (serv->prefork_proc <= 0
 			|| serv->avail_proc > serv->prefork_proc)) {
@@ -189,13 +230,15 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 		}
 	}
 
-	/* delete ACL_MASTER_FLAG_RELOADING set in acl_master_restart_service */
-	else
-	        serv->flags &= ~ACL_MASTER_FLAG_RELOADING;
+	/* Delete ACL_MASTER_FLAG_RELOADING set in acl_master_restart_service */
+	else {
+		serv->flags &= ~ACL_MASTER_FLAG_RELOADING;
+	}
 
-	if (serv->flags & ACL_MASTER_FLAG_THROTTLE)
+	if (serv->flags & ACL_MASTER_FLAG_THROTTLE) {
 		acl_msg_warn("%s(%d)-%s: throttled service: %s",
 			__FILE__, __LINE__, myname, serv->path);
+	}
 
 	/*
 	 * Create a child process and connect parent and
@@ -231,8 +274,9 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 	 * service is actually used, turn on the wakeup timer.
 	 */
 	default: /* the parent process */
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("spawn cmd %s pid %d", serv->path, pid);
+		}
 		proc = (ACL_MASTER_PROC *) acl_mycalloc(1, sizeof(ACL_MASTER_PROC));
 		proc->serv      = serv;
 		proc->pid       = pid;
@@ -250,8 +294,9 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 		if (serv->flags & ACL_MASTER_FLAG_CONDWAKE) {
 			serv->flags &= ~ACL_MASTER_FLAG_CONDWAKE;
 			acl_master_wakeup_init(serv);
-			if (acl_msg_verbose)
+			if (acl_msg_verbose) {
 				acl_msg_info("start timer for %s", serv->name);
+			}
 		}
 
 		break;
@@ -273,21 +318,24 @@ static void master_delete_child(ACL_MASTER_PROC *proc)
 	serv = proc->serv;
 	serv->total_proc--;
 	if (proc->avail == ACL_MASTER_STAT_AVAIL) {
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("%s(%d)->%s: call master_avail_less",
 				__FILE__, __LINE__, myname);
+		}
 		acl_master_avail_less(serv, proc);
 	} else if (ACL_MASTER_LIMIT_OK(serv->max_proc, serv->total_proc)
 		&& serv->avail_proc < 1) {
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("%s(%d)->%s: listen again",
 				__FILE__, __LINE__, myname);
+		}
 		acl_master_avail_listen(serv);
 	}
 
-	if (acl_msg_verbose > 2)
+	if (acl_msg_verbose > 2) {
 		acl_msg_info("%s(%d)->%s: delete process id: %d",
 			__FILE__, __LINE__, myname, proc->pid);
+	}
 
 	acl_binhash_delete(acl_var_master_child_table, (void *) &proc->pid,
 		sizeof(proc->pid), (void (*) (void *)) 0);
@@ -363,8 +411,9 @@ void acl_master_reap_child(void)
 	 * and back off.
 	 */
 	while ((pid = waitpid((pid_t) - 1, &status, WNOHANG)) > 0) {
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("%s: pid %d", myname, pid);
+		}
 
 		proc = (ACL_MASTER_PROC *) acl_binhash_find(
 			acl_var_master_child_table, &pid, sizeof(pid));
@@ -436,16 +485,18 @@ void acl_master_kill_children(ACL_MASTER_SERV *serv)
 	info = list = acl_binhash_list(acl_var_master_child_table);
 	for (; *info; info++) {
 		proc = (ACL_MASTER_PROC *) info[0]->value;
-		if (proc->serv == serv)
+		if (proc->serv == serv) {
 			(void) kill(proc->pid, SIGTERM);
+		}
 	}
 	acl_myfree(list);
 
 	if ((serv->flags & ACL_MASTER_FLAG_STOP_WAIT) != 0) {
 		while (serv->total_proc > 0) {
 			acl_master_reap_child();
-			if (serv->total_proc > 0)
+			if (serv->total_proc > 0) {
 				acl_doze(100);
+			}
 		}
 
 		acl_msg_info("%s(%d): free service %s been %s, total proc=%d",
@@ -457,15 +508,16 @@ void acl_master_kill_children(ACL_MASTER_SERV *serv)
 		return;
 	}
 
-	// try waiting children to exit
-	if (serv->total_proc > 0)
+	// Try waiting children to exit
+	if (serv->total_proc > 0) {
 		acl_master_reap_child();
+	}
 
-	// if there are some other children existing, create a timer to wait
-	if (serv->total_proc > 0)
+	// If there are some other children existing, create a timer to wait
+	if (serv->total_proc > 0) {
 		acl_event_request_timer(acl_var_master_global_event,
 			waiting_children, (void *) serv, WAITING_CHILD, 0);
-	else {
+	} else {
 		acl_msg_info("%s(%d): free service %s been %s, total proc=%d",
 			__FUNCTION__, __LINE__, serv->path,
 			ACL_MASTER_STOPPING(serv) ? "stopped" : "killed",
@@ -495,15 +547,17 @@ void acl_master_signal_children(ACL_MASTER_SERV *serv, int sig, int *nsignaled)
 		proc = acl_ring_to_appl(iter.ptr, ACL_MASTER_PROC, me);
 		acl_assert(proc);
 
-		if (kill(proc->pid, sig) < 0)
+		if (kill(proc->pid, sig) < 0) {
 			acl_msg_warn("%s: kill child %d, path %s error %s",
 				myname, proc->pid, serv->path, strerror(errno));
-		else
+		} else {
 			n++;
+		}
 	}
 
-	if (nsignaled)
+	if (nsignaled) {
 		*nsignaled = n;
+	}
 
 	acl_msg_info("%s: service %s, path %s, signal %d, children %d,"
 		" signaled %d", myname, serv->name, serv->path,

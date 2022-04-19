@@ -37,10 +37,11 @@ static int check_command(ACL_MASTER_SERV *entry, const char *ext)
 	char *path;
 
 	/* if ext name not NULL, then add it as the extern name of command */
-	if (ext && *ext)
+	if (ext && *ext) {
 		path = acl_concatenate(entry->path, ext, NULL);
-	else
+	} else {
 		path = acl_concatenate(entry->path, entry->cmdext, NULL);
+	}
 
 	if (access(path, F_OK) != 0) {
 		acl_msg_error("%s(%d), %s: command %s can't be executed, %s",
@@ -92,10 +93,12 @@ ACL_MASTER_SERV *acl_master_start(const char *path, int *nchilden,
 		return NULL;
 	}
 
-	if (nchilden)
+	if (nchilden) {
 		*nchilden = entry->prefork_proc;
-	if (nsignaled)
+	}
+	if (nsignaled) {
 		*nsignaled = entry->prefork_proc;
+	}
 
 	(void) setup_callback(__FUNCTION__, entry, callback, ctx);
 	entry->next = acl_var_master_head;
@@ -109,9 +112,10 @@ ACL_MASTER_SERV *acl_master_restart(const char *path, int *nchilden,
 {
         ACL_MASTER_SERV *serv = acl_master_lookup(path);
 
-        if (serv == NULL)
+        if (serv == NULL) {
 		return acl_master_start(path, nchilden, nsignaled,
 				callback, ctx, ext);
+	}
 
 	ACL_MASTER_SERV *entry = acl_master_ent_load(path);
 	if (entry == NULL) {
@@ -132,30 +136,36 @@ ACL_MASTER_SERV *acl_master_restart(const char *path, int *nchilden,
 
 /* kill processes of service according the master_service name in configure */
 
-int acl_master_kill(const char *path)
+static int master_kill(const char *path, ACL_MASTER_SERV *serv)
 {
-	ACL_MASTER_SERV *serv = acl_master_lookup(path);
 	ACL_MASTER_SERV *iter, **servp;
-
-	if (serv == NULL) {
-		acl_msg_error("%s(%d), %s: no service, path %s",
-			__FILE__, __LINE__, __FUNCTION__, path);
-		return -1;
-	}
 
 	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
 		if (SAME(iter->conf, path)) {
 			*servp = iter->next;
 			acl_master_service_kill(iter);
 			return 0;
-		} else
+		} else {
 			servp = &iter->next;
+		}
 	}
 
 	acl_msg_warn("%s(%d), %s: not found service - %s %d, path %s",
 		__FILE__, __LINE__, __FUNCTION__, serv->name, serv->type, path);
 
 	return -1;
+}
+
+int acl_master_kill(const char *path)
+{
+	ACL_MASTER_SERV *serv = acl_master_lookup(path);
+
+	if (serv == NULL) {
+		acl_msg_error("%s(%d), %s: no service, path %s",
+			__FILE__, __LINE__, __FUNCTION__, path);
+		return -1;
+	}
+	return master_kill(path, serv);
 }
 
 /* stop one service according the master_service name in configure */
@@ -171,6 +181,10 @@ int acl_master_stop(const char *path)
 		return -1;
 	}
 
+	if (serv->type == ACL_MASTER_SERV_TYPE_NONE) {
+		return master_kill(path, serv);
+	}
+
 	for (servp = &acl_var_master_head; (iter = *servp) != 0;) {
 		if (SAME(iter->conf, path)) {
 			*servp = iter->next;
@@ -178,8 +192,9 @@ int acl_master_stop(const char *path)
 			// children of which exited.
 			acl_master_service_stop(iter);
 			return 0;
-		} else
+		} else {
 			servp = &iter->next;
+		}
 	}
 
 	acl_msg_warn("%s(%d), %s: not found service - %s %d, path %s",
@@ -199,8 +214,9 @@ int acl_master_reload(const char *path, int *nchilden, int *nsignaled,
 		return -1;
 	}
 
-	if (nchilden)
+	if (nchilden) {
 		*nchilden = (int) acl_ring_size(&serv->children);
+	}
 
 	(void) setup_callback(__FUNCTION__, serv, callback, ctx);
 

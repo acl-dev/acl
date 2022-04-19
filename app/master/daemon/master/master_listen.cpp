@@ -115,8 +115,9 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 		return 0;
 	}
 
-	if (serv->defer_accept > 0)
+	if (serv->defer_accept > 0) {
 		acl_tcp_defer_accept(serv->listen_fds[0], serv->defer_accept);
+	}
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
 		O_RDONLY, acl_var_master_buf_size,
@@ -210,8 +211,9 @@ static int master_listen_unix(ACL_MASTER_SERV *serv)
 		qlen = 128;
 	}
 
-	if (acl_var_master_limit_privilege)
+	if (acl_var_master_limit_privilege) {
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
+	}
 	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, serv->inet_flags);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: listen on addr(%s) error(%s)",
@@ -223,8 +225,9 @@ static int master_listen_unix(ACL_MASTER_SERV *serv)
 		O_RDONLY, acl_var_master_buf_size,
 		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	if (acl_var_master_limit_privilege)
+	if (acl_var_master_limit_privilege) {
 		acl_set_ugid(getuid(), getgid());
+	}
 	acl_msg_info("%s(%d), %s: listen on domain socket: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
 
@@ -235,8 +238,9 @@ static int master_listen_fifo(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "master_listen_fifo";
 
-	if (acl_var_master_limit_privilege)
+	if (acl_var_master_limit_privilege) {
 		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
+	}
 	serv->listen_fds[0] = acl_fifo_listen(serv->name, 0622, ACL_NON_BLOCKING);
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: listen on name(%s) error(%s)",
@@ -248,10 +252,25 @@ static int master_listen_fifo(ACL_MASTER_SERV *serv)
 		O_RDONLY, acl_var_master_buf_size,
 		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN);
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	if (acl_var_master_limit_privilege)
+	if (acl_var_master_limit_privilege) {
 		acl_set_ugid(getuid(), getgid());
+	}
 	acl_msg_info("%s(%d), %s: listen on fifo socket: %s",
 		__FILE__, __LINE__, myname, serv->name);
+	return 1;
+}
+
+static int master_listen_none(ACL_MASTER_SERV *serv acl_unused)
+{
+	const char *myname = "master_listen_none";
+
+	if (acl_var_master_limit_privilege) {
+		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
+	}
+	if (acl_var_master_limit_privilege) {
+		acl_set_ugid(getuid(), getgid());
+	}
+	acl_msg_info("%s(%d), %s: listen none", __FILE__, __LINE__, myname);
 	return 1;
 }
 
@@ -302,6 +321,12 @@ int acl_master_listen_init(ACL_MASTER_SERV *serv)
 	case ACL_MASTER_SERV_TYPE_FIFO:
 		return master_listen_fifo(serv) > 0 ? 0 : -1;
 
+	/*
+	 * NONE listener.
+	 */
+	case ACL_MASTER_SERV_TYPE_NONE:
+		return master_listen_none(serv) > 0 ? 0 : -1;
+
 	default:
 		acl_msg_error("%s(%d): unknown service type: %d",
 			myname, __LINE__, serv->type);
@@ -316,6 +341,10 @@ void acl_master_listen_cleanup(ACL_MASTER_SERV *serv)
 	const char *myname = "acl_master_listen_cleanup";
 	int     i;
 
+	if (serv->type == ACL_MASTER_SERV_TYPE_NONE) {
+		return;
+	}
+
 	/*
 	 * XXX The listen socket is shared with child processes. Closing the
 	 * socket in the master process does not really disable listeners in
@@ -324,9 +353,10 @@ void acl_master_listen_cleanup(ACL_MASTER_SERV *serv)
 	 * when shutdown(2) is applied to a socket that is not connected.
 	 */
 	for (i = 0; i < serv->listen_fd_count; i++) {
-		if (close(serv->listen_fds[i]) < 0)
+		if (close(serv->listen_fds[i]) < 0) {
 			acl_msg_warn("%s: close listener socket %d: %s",
 				myname, serv->listen_fds[i], strerror(errno));
+		}
 		serv->listen_fds[i] = -1;
 		acl_vstream_free(serv->listen_streams[i]);
 		serv->listen_streams[i] = NULL;

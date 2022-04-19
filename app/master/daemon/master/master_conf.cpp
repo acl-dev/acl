@@ -18,8 +18,9 @@ void acl_master_refresh(void)
 	/*
 	 * Mark all existing services.
 	 */
-	for (serv = acl_var_master_head; serv != 0; serv = serv->next)
+	for (serv = acl_var_master_head; serv != 0; serv = serv->next) {
 		serv->flags |= ACL_MASTER_FLAG_MARK;
+	}
 
 	/* load the main.cf of acl_master */
 	acl_master_main_config();
@@ -39,10 +40,11 @@ void acl_master_refresh(void)
 	for (servp = &acl_var_master_head; (serv = *servp) != 0;) {
 		if ((serv->flags & ACL_MASTER_FLAG_MARK) != 0) {
 			*servp = serv->next;
-                        // serv will be freed after all of it children exited.
+			// serv will be freed after all of it children exited.
 			acl_master_service_stop(serv);
-		} else
+		} else {
 			servp = &serv->next;
+		}
 	}
 }
 
@@ -57,8 +59,9 @@ int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 	 * order the service entries are kept in memory.
 	 */
 	if (serv == 0) {
-		if (acl_master_service_start(entry) < 0)
+		if (acl_master_service_start(entry) < 0) {
 			return -1;
+		}
 
 		entry->next  = acl_var_master_head;
 		entry->start = (long) time(NULL);
@@ -73,10 +76,11 @@ int acl_master_refresh_service(ACL_MASTER_SERV *entry)
 	 * will run with the new configuration settings.
 	 */
 	serv->flags &= ~ACL_MASTER_FLAG_MARK;
-	if (entry->flags & ACL_MASTER_FLAG_CONDWAKE)
+	if (entry->flags & ACL_MASTER_FLAG_CONDWAKE) {
 		serv->flags |= ACL_MASTER_FLAG_CONDWAKE;
-	else
+	} else {
 		serv->flags &= ~ACL_MASTER_FLAG_CONDWAKE;
+	}
 	serv->wakeup_time = entry->wakeup_time;
 	serv->max_proc = entry->max_proc;
 	serv->prefork_proc = entry->prefork_proc;
@@ -142,10 +146,11 @@ static void master_scan_services(void)
 
 	acl_master_ent_end();
 
-	if (service_null)
+	if (service_null) {
 		acl_msg_warn("%s(%d), %s: no service in dir %s%s", __FILE__,
 			__LINE__, myname, acl_var_master_service_dir,
 			acl_var_master_scan_subdir ? " and its subdir" : "");
+	}
 }
 
 static void master_load_services(void)
@@ -155,22 +160,27 @@ static void master_load_services(void)
 	ACL_MASTER_SERV *entry;
 	ACL_ARGV        *tokens;
 
-	if (*acl_var_master_service_file == 0)
+	if (*acl_var_master_service_file == 0) {
 		return;
+	}
+
 	fp = acl_fopen(acl_var_master_service_file, "r");
-	if (fp == NULL)
+	if (fp == NULL) {
 		return;
+	}
 
 #define SKIP_WHILE(cond, ptr) { while(*ptr && (cond)) ptr++; }
 
 	while (!acl_feof(fp)) {
 		ptr = acl_fgets_nonl(buf, sizeof(buf), fp);
-		if (ptr == NULL)
+		if (ptr == NULL) {
 			continue;
+		}
 
 		SKIP_WHILE(*ptr == ' ' || *ptr == '\t', ptr);
-		if (*ptr == 0 || *ptr == '#')
+		if (*ptr == 0 || *ptr == '#') {
 			continue;
+		}
 
 		tokens = acl_argv_split(ptr, "|");
 		filepath = tokens->argv[0];

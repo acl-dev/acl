@@ -179,21 +179,29 @@ void acl_master_status_init(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_status_init";
 
+	if (acl_msg_verbose) {
+		acl_msg_info("%s: %s", myname, serv->name);
+	}
+
+	if (serv->type == ACL_MASTER_SERV_TYPE_NONE) {
+		return;
+	}
+
 	/*
 	 * Sanity checks.
 	 */
-	if (serv->status_fd[0] >= 0 || serv->status_fd[1] >= 0)
+	if (serv->status_fd[0] >= 0 || serv->status_fd[1] >= 0) {
 		acl_msg_panic("%s: status events already enabled", myname);
-	if (acl_msg_verbose)
-		acl_msg_info("%s: %s", myname, serv->name);
+	}
 
 	/*
 	 * Make the read end of this service's status pipe non-blocking so that
 	 * we can detect partial writes on the child side. We use a duplex pipe
 	 * so that the child side becomes readable when the master goes away.
 	 */
-	if (acl_duplex_pipe(serv->status_fd) < 0)
+	if (acl_duplex_pipe(serv->status_fd) < 0) {
 		acl_msg_fatal("pipe: %s", strerror(errno));
+	}
 
 	acl_non_blocking(serv->status_fd[0], ACL_BLOCKING);
 	acl_close_on_exec(serv->status_fd[0], ACL_CLOSE_ON_EXEC);
@@ -205,10 +213,11 @@ void acl_master_status_init(ACL_MASTER_SERV *serv)
 	serv->status_reader = acl_vstream_fdopen(serv->status_fd[0],
 		O_RDWR, acl_var_master_buf_size, 0, ACL_VSTREAM_TYPE_SOCK);
 
-	if (acl_msg_verbose)
+	if (acl_msg_verbose) {
 		acl_msg_info("%s(%d)->%s: call acl_event_enable_read, "
 			"status_fd = %d", __FILE__, __LINE__,
 			myname, serv->status_fd[0]);
+	}
 
 	acl_event_enable_read(acl_var_master_global_event,
 		serv->status_reader, 0, master_status_event, serv);
@@ -220,13 +229,20 @@ void acl_master_status_cleanup(ACL_MASTER_SERV *serv)
 {
 	const char *myname = "acl_master_status_cleanup";
 
+	if (acl_msg_verbose) {
+		acl_msg_info("%s: %s", myname, serv->name);
+	}
+
+	if (serv->type == ACL_MASTER_SERV_TYPE_NONE) {
+		return;
+	}
+
 	/*
 	 * Sanity checks.
 	 */
-	if (serv->status_fd[0] < 0 || serv->status_fd[1] < 0)
+	if (serv->status_fd[0] < 0 || serv->status_fd[1] < 0) {
 		acl_msg_panic("%s: status events not enabled", myname);
-	if (acl_msg_verbose)
-		acl_msg_info("%s: %s", myname, serv->name);
+	}
 
 	/*
 	 * Dispose of this service's status pipe after disabling read events.

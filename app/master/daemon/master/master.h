@@ -95,7 +95,7 @@ typedef struct ACL_MASTER_SERV {
  /*
   * Service types.
   */
-#define	ACL_MASTER_SERV_TYPE_NULL	0	/* invalid type */
+#define	ACL_MASTER_SERV_TYPE_NONE	0	/* none type */
 #define ACL_MASTER_SERV_TYPE_UNIX	1	/* AF_UNIX domain socket */
 #define ACL_MASTER_SERV_TYPE_INET	2	/* AF_INET domain socket */
 #define ACL_MASTER_SERV_TYPE_FIFO	3	/* fifo (named pipe) */

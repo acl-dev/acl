@@ -12,6 +12,7 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	if (serv == NULL) {
 		info.status = 404;
 		info.conf   = path;
+		logger("service not found, path=%s", path);
 		return false;
 	}
 
@@ -33,12 +34,15 @@ bool service_stat::stat_one(const char* path, serv_info_t& info)
 	info.check_net       = serv->check_net ? true : false;
 	info.check_limits    = serv->check_limits ? true : false;
 
-	if (serv->owner && *serv->owner)
+	if (serv->owner && *serv->owner) {
 		info.owner = serv->owner;
-	if (serv->notify_addr && *serv->notify_addr)
+	}
+	if (serv->notify_addr && *serv->notify_addr) {
 		info.notify_addr = serv->notify_addr;
-	if (serv->notify_recipients && *serv->notify_recipients)
+	}
+	if (serv->notify_recipients && *serv->notify_recipients) {
 		info.notify_recipients = serv->notify_recipients;
+	}
 
 	info.version = serv->version;
 
@@ -85,8 +89,9 @@ bool service_stat::handle(const stat_req_t& req, stat_res_t& res)
 		cit = req.data.begin(); cit != req.data.end(); ++cit) {
 
 		serv_info_t info;
-		if (stat_one((*cit).path.c_str(), info))
+		if (stat_one((*cit).path.c_str(), info)) {
 			n++;
+		}
 		res.data.push_back(info);
 	}
 
