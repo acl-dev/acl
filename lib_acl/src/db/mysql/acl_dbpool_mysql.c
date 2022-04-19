@@ -218,6 +218,8 @@ int sane_mysql_reopen(ACL_DB_HANDLE *handle)
 	MYSQL *myconn_saved = mysql_handle->connection;
 	ACL_DB_INFO *db_info = &mysql_handle->handle.parent->db_info;
 
+	__close_mysql_handle(mysql_handle);
+
 	if (__open_mysql_handle((ACL_DB_POOL_MYSQL*) handle->parent,
 			mysql_handle, db_info) == NULL)
 	{
@@ -226,7 +228,6 @@ int sane_mysql_reopen(ACL_DB_HANDLE *handle)
 		mysql_handle->connection = myconn_saved;
 		return (-1);
 	}
-	__close_mysql_handle(mysql_handle);
 	return (0);
 }
 
