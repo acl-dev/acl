@@ -189,6 +189,17 @@ static void start_child(ACL_MASTER_SERV *serv)
 		acl_msg_info("%s: cmd = %s", myname, serv->path);
 	}
 
+	/* Help app to change working directory */
+	if (serv->home && *serv->home) {
+		if (chdir(serv->home) == -1) {
+			acl_msg_error("%s: chdir to %s error %s",
+				myname, serv->home, acl_last_serror());
+		} else {
+			acl_msg_info("%s: %s chdir to %s ok",
+				myname, serv->path, serv->home);
+		}
+	}
+
 	/* Help programs written by golang to change runing privilege */
 	if (serv->owner && *serv->owner) {
 		acl_msg_info("%s: acl_chroot_uid %s", myname, serv->owner);
@@ -196,6 +207,7 @@ static void start_child(ACL_MASTER_SERV *serv)
 	}
 
 	log_argv(serv->path, serv->args);
+
 	execvp(serv->path, serv->args->argv);
 	acl_msg_fatal("%s: exec %s: %s", myname, serv->path, strerror(errno));
 }

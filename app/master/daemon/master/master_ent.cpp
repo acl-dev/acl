@@ -629,6 +629,13 @@ static int service_args(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv,
 		serv->owner = NULL;
 	}
 
+	ptr_const = get_str_ent(xcp, ACL_VAR_MASTER_SERV_HOME, "");
+	if (ptr_const && *ptr_const) {
+		serv->home = acl_mystrdup(ptr_const);
+	} else {
+		serv->home = NULL;
+	}
+
 	/* Path to command */
 	command = get_str_ent(xcp, ACL_VAR_MASTER_SERV_COMMAND, "");
 	if (command == NULL || *command == 0) {
@@ -946,8 +953,9 @@ void acl_master_ent_print(ACL_MASTER_SERV *serv)
 	acl_msg_info("max_proc: %d", serv->max_proc);
 	acl_msg_info("prefork_proc: %d", serv->prefork_proc);
 	acl_msg_info("path: %s", serv->path);
-	for (cpp = serv->args->argv; *cpp; cpp++)
+	for (cpp = serv->args->argv; *cpp; cpp++) {
 		acl_msg_info("arg[%d]: %s", (int) (cpp - serv->args->argv), *cpp);
+	}
 	acl_msg_info("prefork_proc: %d", serv->prefork_proc);
 	acl_msg_info("avail_proc: %d", serv->avail_proc);
 	acl_msg_info("total_proc: %d", serv->total_proc);
@@ -1001,6 +1009,9 @@ void acl_master_ent_free(ACL_MASTER_SERV *serv)
 	}
 	if (serv->owner) {
 		acl_myfree(serv->owner);
+	}
+	if (serv->home) {
+		acl_myfree(serv->home);
 	}
 	if (serv->notify_addr) {
 		acl_myfree(serv->notify_addr);

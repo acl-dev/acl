@@ -135,6 +135,7 @@ extern int   acl_var_master_start_timeo;
 #define ACL_VAR_MASTER_SERV_CMDEXT		"master_cmdext"
 #define	ACL_VAR_MASTER_SERV_ARGS		"master_args"
 #define	ACL_VAR_MASTER_SERV_OWNER		"master_owner"
+#define	ACL_VAR_MASTER_SERV_HOME		"master_home"
 #define	ACL_VAR_MASTER_SERV_ENV			"master_env"
 #define	ACL_VAR_MASTER_NOTIFY_ADDR		"master_notify_addr"
 #define	ACL_VAR_MASTER_NOTIFY_RECIPIENTS	"master_notify_recipients"

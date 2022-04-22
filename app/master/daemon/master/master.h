@@ -30,6 +30,7 @@ typedef struct ACL_MASTER_SERV {
 	int      flags;			/* status, features, etc. */
 	char    *name;			/* service endpoint name */
 	char    *owner;			/* service running privilege if not null*/
+	char    *home;			/* service working home default */
 	long     start;			/* service start running time */
 	int      type;			/* UNIX-domain, INET, etc. */
 	int      wakeup_time;		/* wakeup interval */
