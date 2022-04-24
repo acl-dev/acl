@@ -1,4 +1,4 @@
-%define release_id 10
+%define release_id 11
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Sun Apr 24 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-11-20220422.17
+- fixed bugs in app/redis_tools/redis_builder
 
 * Wed Apr 13 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-10-20220413.15
 - fixed one dead lock process in event timer module
