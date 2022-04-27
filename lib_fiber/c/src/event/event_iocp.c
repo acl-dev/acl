@@ -615,37 +615,23 @@ static void handle_event(EVENT_IOCP *ei, OVERLAPPED_ENTRY *entry)
 
 static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
 {
-#define MAX_ENTRIES	128
-	OVERLAPPED_ENTRY entries[MAX_ENTRIES];
-	unsigned long ready;
+    ULONG ready = 0;
+    OVERLAPPED_ENTRY entries[128];
+    const ULONG MAX_ENTRIES = _countof(entries);
 
-	for (;;) {
-		BOOL isSuccess;
-		unsigned long i;
+    if (GetQueuedCompletionStatusEx(ei->h_iocp, entries, MAX_ENTRIES, &ready, timeout, FALSE)) {
+        for (unsigned long i = 0; i < ready; i++) {
+            handle_event(ei, &entries[i]);
+        }
+    } else {
+        int err = acl_fiber_last_error();
 
-		isSuccess = GetQueuedCompletionStatusEx(ei->h_iocp,
-			entries, MAX_ENTRIES, &ready, timeout, FALSE);
-
-		if (ready == 0) {
-			break;
-		}
-
-		//printf(">>>ready: %d\r\n", ready);
-		for (i = 0; i < ready; i++) {
-			handle_event(ei, &entries[i]);
-		}
-
-		if (!isSuccess) {
-			msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
-				__FUNCTION__, __LINE__, acl_fiber_last_error(),
-				last_serror());
-		}
-
-		timeout = 0;
-
-		// If I need to loop again ?
-		break;
-	}
+        if (err != WAIT_TIMEOUT) {
+            msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
+                      __FUNCTION__, __LINE__, err,
+                      last_serror());
+        }
+    }
 }
 
 static int __use_wait_more = 1;
