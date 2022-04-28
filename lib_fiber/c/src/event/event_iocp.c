@@ -577,7 +577,7 @@ static void iocp_wait_more(EVENT_IOCP *ei, int timeout) {
         int err = acl_fiber_last_error();
 
         if (err != WAIT_TIMEOUT) {
-            msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
+            msg_error("%s(%d):GetQueuedCompletionStatusEx error=%d, %s",
                       __FUNCTION__, __LINE__, err,
                       last_serror());
         }
