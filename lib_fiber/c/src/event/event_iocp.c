@@ -504,124 +504,74 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 	array_append(ei->events, event);
 }
 
-static void iocp_wait_one(EVENT_IOCP *ei, int timeout)
-{
-	IOCP_EVENT *event;
+static void handle_event(EVENT_IOCP *ei, IOCP_EVENT *event, FILE_EVENT *fe, DWORD bytesTransferred) {
+    if (event->type & IOCP_EVENT_DEAD) {
+        if (!HasOverlappedIoCompleted(&event->overlapped)) {
+            msg_warn("overlapped not completed yet");
+        }
+        mem_free(event);
+        return;
+    }
 
-	for (;;) {
-		DWORD bytesTransferred;
-		FILE_EVENT *fe;
-		BOOL isSuccess;
+    event->refer--;
 
-		event = NULL;
+    // If the associated FILE_EVENT with the event has gone in
+    // iocp_close_sock(), we should check the event's refer and
+    // free it when refer is 0.
 
-		isSuccess = GetQueuedCompletionStatus(ei->h_iocp,
-			&bytesTransferred, (PULONG_PTR) &fe,
-			(OVERLAPPED**) &event, timeout);
+    if (event->fe == NULL) {
+        if (event->refer == 0) {
+            mem_free(event);
+        }
+        return;
+    }
 
-		if (event == NULL) {
-			break;
-		}
+    if (fe != event->fe) {
+        assert(fe == event->fe);
+    }
 
-		if (event->type & IOCP_EVENT_DEAD) {
-			if (!HasOverlappedIoCompleted(&event->overlapped)) {
-				msg_warn("overlapped not completed yet");
-			}
-			mem_free(event);
-			continue;
-		}
+    if (fe->mask & EVENT_ERR) {
+        return;
+    }
 
-		event->refer--;
-
-		// If the associated FILE_EVENT with the event has gone in
-		// iocp_close_sock(), we should check the event's refer and
-		// free it when refer is 0.
-
-		if (event->fe == NULL) {
-			if (event->refer == 0) {
-				mem_free(event);
-			}
-			continue;
-		}
-
-		assert(fe);
-
-		if (!isSuccess) {
-			msg_error("%s(%d): fd=%d, GetQueuedCompletionStatus error=%d, %s",
-				__FUNCTION__, __LINE__, (int) fe->fd, acl_fiber_last_error(),
-				last_serror());
-			iocp_event_save(ei, event, fe, bytesTransferred);
-			fe->mask |= EVENT_ERR;
-			continue;
-		}
-
-		if (fe != event->fe) {
-			assert(fe == event->fe);
-		}
-
-		if (fe->mask & EVENT_ERR) {
-			continue;
-		}
-
-		iocp_event_save(ei, event, fe, bytesTransferred);
-		timeout = 0;
-
-		// If I need to loop again ?
-		break;
-	}
+    iocp_event_save(ei, event, fe, bytesTransferred);
 }
 
-static void handle_event(EVENT_IOCP *ei, OVERLAPPED_ENTRY *entry)
-{
-	IOCP_EVENT *event;
-	DWORD bytesTransferred;
-	FILE_EVENT *fe;
+static void iocp_wait_one(EVENT_IOCP *ei, int timeout) {
+    IOCP_EVENT *ev;
+    FILE_EVENT *fe;
+    DWORD bytesTransferred;
 
-	event = (IOCP_EVENT*) entry->lpOverlapped;
-	fe = (FILE_EVENT*) entry->lpCompletionKey;
-	bytesTransferred = entry->dwNumberOfBytesTransferred;
+    BOOL ok = GetQueuedCompletionStatus(ei->h_iocp,
+                                        &bytesTransferred, (PULONG_PTR) &fe,
+                                        (OVERLAPPED **) &ev, timeout);
 
-	if (event->type & IOCP_EVENT_DEAD) {
-		if (!HasOverlappedIoCompleted(&event->overlapped)) {
-			msg_warn("overlapped not completed yet");
-		}
-		mem_free(event);
-		return;
-	}
+    if (ok) {
+        handle_event(ei, ev, fe, bytesTransferred);
+    } else {
+        int err = acl_fiber_last_error();
 
-	event->refer--;
-
-	// If the associated FILE_EVENT with the event has gone in
-	// iocp_close_sock(), we should check the event's refer and
-	// free it when refer is 0.
-
-	if (event->fe == NULL) {
-		if (event->refer == 0) {
-			mem_free(event);
-		}
-		return;
-	}
-
-	if (fe != event->fe) {
-		assert(fe == event->fe);
-	}
-
-	if (fe->mask & EVENT_ERR) {
-		return;
-	}
-
-	iocp_event_save(ei, event, fe, bytesTransferred);
+        if (err != WAIT_TIMEOUT) {
+            msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
+                      __FUNCTION__, __LINE__, err,
+                      last_serror());
+        }
+    }
 }
 
-static void iocp_wait_more(EVENT_IOCP *ei, int timeout)
-{
+static void iocp_wait_more(EVENT_IOCP *ei, int timeout) {
     ULONG ready = 0;
     OVERLAPPED_ENTRY entries[128];
     const ULONG MAX_ENTRIES = _countof(entries);
 
     if (GetQueuedCompletionStatusEx(ei->h_iocp, entries, MAX_ENTRIES, &ready, timeout, FALSE)) {
-        for (unsigned long i = 0; i < ready; i++) {
-            handle_event(ei, &entries[i]);
+        for (ULONG i = 0; i < ready; i++) {
+            LPOVERLAPPED_ENTRY entry = &entries[i];
+            IOCP_EVENT* ev = (IOCP_EVENT *) entry->lpOverlapped;
+            FILE_EVENT* fe = (FILE_EVENT *) entry->lpCompletionKey;
+            DWORD bytesTransferred = entry->dwNumberOfBytesTransferred;
+
+            handle_event(ei, ev, fe, bytesTransferred);
         }
     } else {
         int err = acl_fiber_last_error();
