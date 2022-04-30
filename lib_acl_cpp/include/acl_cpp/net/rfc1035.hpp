@@ -78,6 +78,18 @@ public:
 		return ttl_;
 	}
 
+	const std::vector<string>& get_addrs4a(void) const {
+		return addrs4a_;
+	}
+
+	const std::vector<string>& get_addrs4aaaa(void) const {
+		return addrs4aaaa_;
+	}
+
+	const std::vector<string>& get_cnames(void) const {
+		return cnames_;
+	}
+
 public:
 	size_t build_reply(const std::vector<string>& addrs,
 		char* buf, size_t size);

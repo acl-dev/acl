@@ -91,7 +91,8 @@ bool rfc1035_request::parse_request(const void *buf, size_t len) {
 		type_ = rfc1035_type_aaaa;
 		break;
 	default:
-		logger_error("type(%d) not supported", (int) type_);
+		//logger_error("type(%d) not supported, name=%s, qid=%d",
+		//	(int) query->qtype, name_, qid_);
 		acl_rfc1035_message_destroy(message);
 		return false;
 	}
@@ -193,8 +194,9 @@ bool rfc1035_response::parse_reply(const void *buf, size_t len) {
 			size_t n = message->answer[i].rdlength > 4
 				   ? 4 : message->answer[i].rdlength;
 
-			memcpy(&in.sin_addr, message->answer[i].rdata, n);
 			in.sin_family = AF_INET;
+			in.sin_port = 0;
+			memcpy(&in.sin_addr, message->answer[i].rdata, n);
 
 			char ip[64];
 			if (acl_inet_ntop((const struct sockaddr*) &in,
@@ -207,8 +209,9 @@ bool rfc1035_response::parse_reply(const void *buf, size_t len) {
 			size_t n = message->answer[i].rdlength > 16
 				   ? 16 : message->answer[i].rdlength;
 
-			memcpy(&in.sin6_addr, message->answer[i].rdata, n);
 			in.sin6_family = AF_INET6;
+			in.sin6_port = 0;
+			memcpy(&in.sin6_addr, message->answer[i].rdata, n);
 
 			char ip[64];
 			if (acl_inet_ntop((const struct sockaddr*) &in,
