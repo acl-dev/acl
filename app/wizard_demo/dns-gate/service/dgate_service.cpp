@@ -1,15 +1,3 @@
-/**
- * Copyright (C) 2015-2018 IQIYI
- * All rights reserved.
- *
- * AUTHOR(S)
- *   Zheng Shuxin
- *   E-mail: zhengshuxin@qiyi.com
- * 
- * VERSION
- *   Sat Apr 30 10:20:34 2022
- */
-
 #include "stdafx.h"
 #include <thread>
 #include "dgate_service.h"

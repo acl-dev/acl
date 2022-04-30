@@ -84,7 +84,7 @@ void master_service::proc_on_init(void)
 
 	if (var_cfg_redis_addr && *var_cfg_redis_addr) {
 		var_redis_conns = new acl::redis_client_cluster;
-		var_redis_conns->set(var_cfg_redis_addr, 10, 10);
+		var_redis_conns->set(var_cfg_redis_addr, 0, 10, 10);
 		if (var_cfg_redis_pass && *var_cfg_redis_pass) {
 			var_redis_conns->set_password("default", var_cfg_redis_pass);
 		}
