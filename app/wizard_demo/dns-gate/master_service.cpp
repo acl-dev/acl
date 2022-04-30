@@ -7,9 +7,13 @@
 
 char* var_cfg_upstream_addr;
 char* var_cfg_display_disabled;
+char* var_cfg_redis_addr;
+char* var_cfg_redis_pass;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "upstream_addr", "114.114.114.114|53", &var_cfg_upstream_addr },
 	{ "display_disabled", "", &var_cfg_display_disabled },
+	{ "redis_addr", "", &var_cfg_redis_addr },
+	{ "redis_pass", "", &var_cfg_redis_pass },
 
 	{ 0, 0, 0 }
 };
@@ -30,6 +34,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 };
 
 std::set<acl::string> var_display_disabled;
+acl::redis_client_cluster* var_redis_conns = NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -77,12 +82,21 @@ void master_service::proc_on_init(void)
 		}
 	}
 
+	if (var_cfg_redis_addr && *var_cfg_redis_addr) {
+		var_redis_conns = new acl::redis_client_cluster;
+		var_redis_conns->set(var_cfg_redis_addr, 10, 10);
+		if (var_cfg_redis_pass && *var_cfg_redis_pass) {
+			var_redis_conns->set_password("default", var_cfg_redis_pass);
+		}
+	}
+
 	dgate_service_start();
 }
 
 void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
+	delete var_redis_conns;
 }
 
 bool master_service::proc_on_sighup(acl::string&)

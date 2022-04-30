@@ -64,6 +64,8 @@
 
 extern char *var_cfg_upstream_addr;
 extern char *var_cfg_display_disabled;
+extern char *var_cfg_redis_addr;
+extern char *var_cfg_redis_pass;
 extern acl::master_str_tbl var_conf_str_tab[];
 
 extern acl::master_bool_tbl var_conf_bool_tab[];
@@ -73,3 +75,4 @@ extern acl::master_int_tbl var_conf_int_tab[];
 extern acl::master_int64_tbl var_conf_int64_tab[];
 
 extern std::set<acl::string> var_display_disabled;
+extern acl::redis_client_cluster *var_redis_conns;

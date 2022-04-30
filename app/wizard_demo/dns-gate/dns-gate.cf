@@ -110,4 +110,9 @@ service server
 
 #	禁止显示的域名
 	display_disabled = www.w3.org
+
+#	Redis 服务器地址
+	redis_addr = 127.0.0.1|6379
+#	连接 Redis 服务的密码
+	redis_pass = 111111
 }

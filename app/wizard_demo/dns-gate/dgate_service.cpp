@@ -69,6 +69,25 @@ static void show_addrs(const char* client_addr, const char* name,
 	logger("%s", buf.c_str());
 }
 
+static void save_record(acl::redis_client_cluster& conns, const char* name,
+		acl::rfc1035_response& res) {
+	time_t now = time(NULL);
+	acl::rfc822 rfc;
+	char buf[128];
+	buf[0] = 0;
+	rfc.mkdate_cst(now, buf, sizeof(buf));
+	if (buf[0] == 0) {
+		return;
+	}
+
+	std::map<acl::string, double> members;
+	members[buf] = now;
+
+	(void) res;
+	acl::redis cmd(&conns);
+	cmd.zadd(name, members);
+}
+
 static void handle_request(request_message& msg) {
 	acl::rfc1035_request req;
 	if (!req.parse_request(msg.data_, msg.data_.size())) {
@@ -122,6 +141,10 @@ static void handle_request(request_message& msg) {
 	}
 
 	reply.unbind_sock();
+
+	if (var_redis_conns) {
+		save_record(*var_redis_conns, name, res);
+	}
 }
 
 static void waiting_message(acl::fiber_tbox<request_message> *box) {
