@@ -115,6 +115,7 @@ long long event_get_stamp(EVENT *ev)
 int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	if (getsockfamily(fe->fd) >= 0) {
+        fe->type = TYPE_SPIPE;
 		return 1;
 	}
 	if (ev->checkfd(ev, fe) == 0) {
