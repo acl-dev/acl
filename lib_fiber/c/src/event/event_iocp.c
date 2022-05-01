@@ -504,83 +504,81 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 	array_append(ei->events, event);
 }
 
-static void handle_event(EVENT_IOCP *ei, IOCP_EVENT *event, FILE_EVENT *fe, DWORD bytesTransferred) {
-    if (event->type & IOCP_EVENT_DEAD) {
-        if (!HasOverlappedIoCompleted(&event->overlapped)) {
-            msg_warn("overlapped not completed yet");
-        }
-        mem_free(event);
-        return;
-    }
+static void handle_event(EVENT_IOCP *ei, IOCP_EVENT *event, FILE_EVENT *fe,
+		DWORD bytesTransferred) {
+	if (event->type & IOCP_EVENT_DEAD) {
+		if (!HasOverlappedIoCompleted(&event->overlapped)) {
+			msg_warn("overlapped not completed yet");
+		}
+		mem_free(event);
+		return;
+	}
 
-    event->refer--;
+	event->refer--;
 
-    // If the associated FILE_EVENT with the event has gone in
-    // iocp_close_sock(), we should check the event's refer and
-    // free it when refer is 0.
+	// If the associated FILE_EVENT with the event has gone in
+	// iocp_close_sock(), we should check the event's refer and
+	// free it when refer is 0.
 
-    if (event->fe == NULL) {
-        if (event->refer == 0) {
-            mem_free(event);
-        }
-        return;
-    }
+	if (event->fe == NULL) {
+		if (event->refer == 0) {
+			mem_free(event);
+		}
+		return;
+	}
 
-    if (fe != event->fe) {
-        assert(fe == event->fe);
-    }
+	if (fe != event->fe) {
+		assert(fe == event->fe);
+	}
 
-    if (fe->mask & EVENT_ERR) {
-        return;
-    }
-
-    iocp_event_save(ei, event, fe, bytesTransferred);
+	if (!(fe->mask & EVENT_ERR)) {
+		iocp_event_save(ei, event, fe, bytesTransferred);
+	}
 }
 
 static void iocp_wait_one(EVENT_IOCP *ei, int timeout) {
-    IOCP_EVENT *ev;
-    FILE_EVENT *fe;
-    DWORD bytesTransferred;
+	IOCP_EVENT *ev;
+	FILE_EVENT *fe;
+	DWORD bytesTransferred;
 
-    BOOL ok = GetQueuedCompletionStatus(ei->h_iocp,
-                                        &bytesTransferred, (PULONG_PTR) &fe,
-                                        (OVERLAPPED **) &ev, timeout);
+	BOOL ok = GetQueuedCompletionStatus(ei->h_iocp,
+			&bytesTransferred, (PULONG_PTR) &fe,
+			(OVERLAPPED **) &ev, timeout);
 
-    if (ok) {
-        handle_event(ei, ev, fe, bytesTransferred);
-    } else {
-        int err = acl_fiber_last_error();
+	if (ok) {
+		handle_event(ei, ev, fe, bytesTransferred);
+	} else {
+		int err = acl_fiber_last_error();
 
-        if (err != WAIT_TIMEOUT) {
-            msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
-                      __FUNCTION__, __LINE__, err,
-                      last_serror());
-        }
-    }
+		if (err != WAIT_TIMEOUT) {
+			msg_error("%s(%d):GetQueuedCompletionStatus error=%d, %s",
+				__FUNCTION__, __LINE__, err, last_serror());
+		}
+	}
 }
 
 static void iocp_wait_more(EVENT_IOCP *ei, int timeout) {
-    ULONG ready = 0;
-    OVERLAPPED_ENTRY entries[128];
-    const ULONG MAX_ENTRIES = _countof(entries);
+	ULONG ready = 0;
+	OVERLAPPED_ENTRY entries[128];
+	const ULONG MAX_ENTRIES = _countof(entries);
 
-    if (GetQueuedCompletionStatusEx(ei->h_iocp, entries, MAX_ENTRIES, &ready, timeout, FALSE)) {
-        for (ULONG i = 0; i < ready; i++) {
-            LPOVERLAPPED_ENTRY entry = &entries[i];
-            IOCP_EVENT* ev = (IOCP_EVENT *) entry->lpOverlapped;
-            FILE_EVENT* fe = (FILE_EVENT *) entry->lpCompletionKey;
-            DWORD bytesTransferred = entry->dwNumberOfBytesTransferred;
+	if (GetQueuedCompletionStatusEx(ei->h_iocp, entries, MAX_ENTRIES,
+			&ready, timeout, FALSE)) {
+		for (ULONG i = 0; i < ready; i++) {
+			LPOVERLAPPED_ENTRY entry = &entries[i];
+			IOCP_EVENT* ev = (IOCP_EVENT *) entry->lpOverlapped;
+			FILE_EVENT* fe = (FILE_EVENT *) entry->lpCompletionKey;
+			DWORD bytesTransferred = entry->dwNumberOfBytesTransferred;
 
-            handle_event(ei, ev, fe, bytesTransferred);
-        }
-    } else {
-        int err = acl_fiber_last_error();
+			handle_event(ei, ev, fe, bytesTransferred);
+		}
+	} else {
+		int err = acl_fiber_last_error();
 
-        if (err != WAIT_TIMEOUT) {
-            msg_error("%s(%d):GetQueuedCompletionStatusEx error=%d, %s",
-                      __FUNCTION__, __LINE__, err,
-                      last_serror());
-        }
+		if (err != WAIT_TIMEOUT) {
+			msg_error("%s(%d):GetQueuedCompletionStatusEx error=%d, %s",
+				__FUNCTION__, __LINE__, err, last_serror());
+		}
     }
 }
 

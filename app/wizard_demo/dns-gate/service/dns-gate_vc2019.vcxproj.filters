@@ -24,12 +24,24 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="dgate_db.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dgate_service.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="master_service.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dgate_db.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dgate_service.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

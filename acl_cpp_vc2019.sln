@@ -141,6 +141,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpd_proxy", "app\wizard_d
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fiber_tbox", "lib_fiber\samples\fiber_tbox\fiber_tbox.vcxproj", "{92668907-1B34-4B74-98A2-5849FDE67B34}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dns-gate", "app\wizard_demo\dns-gate\service\dns-gate_vc2019.vcxproj", "{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wizard", "app\wizard\wizard_vc2019.vcxproj", "{84376B60-FF20-4FD0-967E-C568FC2FBC53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -721,6 +725,66 @@ Global
 		{92668907-1B34-4B74-98A2-5849FDE67B34}.Template|Win32.Build.0 = Debug|Win32
 		{92668907-1B34-4B74-98A2-5849FDE67B34}.Template|x64.ActiveCfg = Debug|x64
 		{92668907-1B34-4B74-98A2-5849FDE67B34}.Template|x64.Build.0 = Debug|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Debug|Win32.Build.0 = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Debug|x64.ActiveCfg = Debug|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Debug|x64.Build.0 = Debug|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.DebugDll|x64.ActiveCfg = DebugDll|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.DebugDll|x64.Build.0 = DebugDll|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Release|Win32.ActiveCfg = Release|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Release|Win32.Build.0 = Release|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Release|x64.ActiveCfg = Release|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Release|x64.Build.0 = Release|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Releasedll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Releasedll|Mixed Platforms.Build.0 = ReleaseDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Releasedll|x64.ActiveCfg = ReleaseDll|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Releasedll|x64.Build.0 = ReleaseDll|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Template|Mixed Platforms.ActiveCfg = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Template|Mixed Platforms.Build.0 = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Template|Win32.ActiveCfg = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Template|Win32.Build.0 = Debug|Win32
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Template|x64.ActiveCfg = Debug|x64
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88}.Template|x64.Build.0 = Debug|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Debug|Win32.Build.0 = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Debug|x64.ActiveCfg = Debug|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Debug|x64.Build.0 = Debug|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.DebugDll|Mixed Platforms.ActiveCfg = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.DebugDll|Mixed Platforms.Build.0 = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.DebugDll|Win32.ActiveCfg = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.DebugDll|Win32.Build.0 = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.DebugDll|x64.ActiveCfg = Debug|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.DebugDll|x64.Build.0 = Debug|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Release|Win32.ActiveCfg = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Release|Win32.Build.0 = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Release|x64.ActiveCfg = Release|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Release|x64.Build.0 = Release|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Releasedll|Mixed Platforms.ActiveCfg = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Releasedll|Mixed Platforms.Build.0 = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Releasedll|Win32.ActiveCfg = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Releasedll|Win32.Build.0 = Release|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Releasedll|x64.ActiveCfg = Release|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Releasedll|x64.Build.0 = Release|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Template|Mixed Platforms.ActiveCfg = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Template|Mixed Platforms.Build.0 = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Template|Win32.ActiveCfg = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Template|Win32.Build.0 = Debug|Win32
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Template|x64.ActiveCfg = Debug|x64
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53}.Template|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -754,6 +818,8 @@ Global
 		{FF701178-83CC-4992-B3FA-114073E7A33A} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 		{58FE3581-C997-4BD5-9AC6-AEEB54A43D2C} = {FF701178-83CC-4992-B3FA-114073E7A33A}
 		{92668907-1B34-4B74-98A2-5849FDE67B34} = {FD628E34-FBB8-4C60-8176-B770EC631CD9}
+		{7D4D4DD5-E3E7-4D35-BA76-B451974F1E88} = {FF701178-83CC-4992-B3FA-114073E7A33A}
+		{84376B60-FF20-4FD0-967E-C568FC2FBC53} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40FA3A5B-123F-4EC0-9EEB-8A9C17BF573B}

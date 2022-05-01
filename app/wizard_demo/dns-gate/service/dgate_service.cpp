@@ -63,7 +63,7 @@ static void show_addrs(const char* client_addr, const char* name,
 static void redis_save(acl::redis_client_cluster& conns, const char* name,
 		time_t now, const char* now_s) {
 	std::map<acl::string, double> members;
-	members[now_s] = now;
+	members[now_s] = (double) now;
 
 	acl::redis cmd(&conns);
 	cmd.zadd(name, members);
