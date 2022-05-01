@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include <thread>
+#include "dgate_db.h"
 #include "dgate_service.h"
 
 class request_message {
 public:
-	request_message(acl::socket_stream* server, const char* peer_addr,
-			const char* data, size_t dlen) {
+	request_message(dgate_db* db, acl::socket_stream* server,
+			const char* peer_addr, const char* data, size_t dlen) {
+		db_ = db;
 		server_ = server;
 		peer_addr_ = peer_addr;
 		data_.copy(data, dlen);
@@ -13,6 +15,7 @@ public:
 
 	~request_message(void) {}
 
+	dgate_db* db_;
 	acl::socket_stream* server_;
 	acl::string peer_addr_;
 	acl::string data_;
@@ -57,23 +60,36 @@ static void show_addrs(const char* client_addr, const char* name,
 	logger("%s", buf.c_str());
 }
 
-static void save_record(acl::redis_client_cluster& conns, const char* name,
-		acl::rfc1035_response& res) {
+static void redis_save(acl::redis_client_cluster& conns, const char* name,
+		time_t now, const char* now_s) {
+	std::map<acl::string, double> members;
+	members[now_s] = now;
+
+	acl::redis cmd(&conns);
+	cmd.zadd(name, members);
+}
+
+static void db_save(dgate_db& db, const char* name, time_t now, const char* now_s) {
+	db.add("127.0.0.1", name, now, now_s);
+}
+
+static void save_record(request_message& msg, const char* name) {
 	time_t now = time(NULL);
 	acl::rfc822 rfc;
 	char buf[128];
 	buf[0] = 0;
 	rfc.mkdate_cst(now, buf, sizeof(buf));
 	if (buf[0] == 0) {
+		logger_error("can't mkdate_cst, name=%s", name);
 		return;
 	}
 
-	std::map<acl::string, double> members;
-	members[buf] = now;
-
-	(void) res;
-	acl::redis cmd(&conns);
-	cmd.zadd(name, members);
+	if (var_redis_conns) {
+		redis_save(*var_redis_conns, name, now, buf);
+	}
+	if (msg.db_) {
+		db_save(*msg.db_, name, now, buf);
+	}
 }
 
 static void handle_request(request_message& msg) {
@@ -130,9 +146,7 @@ static void handle_request(request_message& msg) {
 
 	reply.unbind_sock();
 
-	if (var_redis_conns) {
-		save_record(*var_redis_conns, name, res);
-	}
+	save_record(msg, name);
 }
 
 static void waiting_message(acl::fiber_tbox<request_message> *box) {
@@ -165,8 +179,9 @@ void dgate_service_start(void) {
 	dgate_thread.detach();
 }
 
-void dgate_push_request(acl::socket_stream* server, const char* peer_addr,
-	const char* data, size_t dlen) {
-	request_message* msg = new request_message(server, peer_addr, data, dlen);
+void dgate_push_request(dgate_db* db, acl::socket_stream* server,
+		const char* peer_addr, const char* data, size_t dlen) {
+	request_message* msg = new
+		request_message(db, server, peer_addr, data, dlen);
 	__request_box->push(msg);
 }

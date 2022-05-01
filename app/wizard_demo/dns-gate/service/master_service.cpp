@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "dgate_db.h"
 #include "dgate_service.h"
 #include "master_service.h"
 
@@ -9,11 +10,15 @@ char* var_cfg_upstream_addr;
 char* var_cfg_display_disabled;
 char* var_cfg_redis_addr;
 char* var_cfg_redis_pass;
+char* var_cfg_sqlite_path;
+char* var_cfg_dbfile;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "upstream_addr", "114.114.114.114|53", &var_cfg_upstream_addr },
 	{ "display_disabled", "", &var_cfg_display_disabled },
 	{ "redis_addr", "", &var_cfg_redis_addr },
 	{ "redis_pass", "", &var_cfg_redis_pass },
+	{ "sqlite_path", "", &var_cfg_sqlite_path },
+	{ "dbfile", "", &var_cfg_dbfile },
 
 	{ 0, 0, 0 }
 };
@@ -35,6 +40,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 
 std::set<acl::string> var_display_disabled;
 acl::redis_client_cluster* var_redis_conns = NULL;
+dgate_db* var_db = NULL;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -55,7 +61,7 @@ void master_service::on_read(acl::socket_stream* stream)
 		return;
 	}
 
-	dgate_push_request(stream, stream->get_peer(true), buf, n);
+	dgate_push_request(var_db, stream, stream->get_peer(true), buf, n);
 	//logger("read from %s, %d bytes", stream->get_peer(true), n);
 }
 
@@ -72,6 +78,7 @@ void master_service::proc_on_bind(acl::socket_stream&)
 void master_service::proc_on_init(void)
 {
 	logger(">>>proc_on_init: %s<<<", var_cfg_display_disabled);
+
 	if (var_cfg_display_disabled && *var_cfg_display_disabled) {
 		acl::string buf(var_cfg_display_disabled);
 		buf.lower();
@@ -90,7 +97,29 @@ void master_service::proc_on_init(void)
 		}
 	}
 
+	open_db();
+
 	dgate_service_start();
+}
+
+void master_service::open_db(void)
+{
+	if (var_cfg_sqlite_path == NULL || *var_cfg_sqlite_path == 0) {
+		return;
+	}
+	if (var_cfg_dbfile == NULL || *var_cfg_dbfile == 0) {
+		return;
+	}
+
+	acl::db_handle::set_loadpath(var_cfg_sqlite_path);
+	var_db = new dgate_db(var_cfg_dbfile);
+	if (!var_db->open()) {
+		logger_error("opend db=%s error", var_cfg_dbfile);
+		delete var_db;
+		var_db = NULL;
+	} else {
+		logger("opend db=%s ok", var_cfg_dbfile);
+	}
 }
 
 void master_service::proc_on_exit(void)

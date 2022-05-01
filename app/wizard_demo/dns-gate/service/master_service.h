@@ -28,4 +28,7 @@ protected:
 
 	// @override
 	bool proc_on_sighup(acl::string&);
+
+private:
+	void open_db(void);
 };
