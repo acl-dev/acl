@@ -146,11 +146,14 @@ static void handle_request(request_message& msg) {
 		return;
 	}
 
+	acl::string matched;
 	int now_hour, now_min;
-	std::vector<std::string> hells;
-	if (var_rules_option->is_blocked(name, &now_hour, &now_min, hells)) {
-		logger_warn("BLOCKED, name=%s, now=%d:%d", name, now_hour, now_min);
-		reply_dummy(msg, req, hells);
+	const std::vector<std::string>* hells = var_rules_option->get_hells(name,
+			matched, now_hour, now_min);
+	if (hells != NULL) {
+		logger_warn("BLOCKED, name=%s, matched=%s, now=%d:%d",
+			name, matched.c_str(), now_hour, now_min);
+		reply_dummy(msg, req, *hells);
 		return;
 	}
 

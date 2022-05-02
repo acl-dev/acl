@@ -126,7 +126,7 @@ endif
 ###########################################################
 
 ACL_PATH = ../../../..
-CFLAGS += -I$(ACL_PATH)/lib_acl/include \
+CFLAGS += -I. -I$(ACL_PATH)/lib_acl/include \
 	  -I$(ACL_PATH)/lib_protocol/include \
 	  -I$(ACL_PATH)/lib_acl_cpp/include \
 	  -I$(ACL_PATH)/lib_fiber/c/include \
@@ -144,12 +144,14 @@ LINK = $(CC) $(OBJ) $(LDFLAGS)
 OBJ_PATH = .
 
 #Project's objs
-SRC = $(wildcard *.cpp)
+SRC = $(wildcard *.cpp) $(wildcard rules/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 #$(shell mkdir -p ../../../dist/master/libexec/$(RPATH)/)
 
 $(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: rules/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

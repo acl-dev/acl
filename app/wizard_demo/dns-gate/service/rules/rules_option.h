@@ -2,6 +2,8 @@
 #include "rules.h"
 #include "rules.gson.h"
 
+class rule_match;
+
 class rules_option {
 public:
 	rules_option(void);
@@ -9,9 +11,12 @@ public:
 
 	bool load(const char* filepath);
 
-	bool is_blocked(const char* name, int* hour, int* min,
-		std::vector<std::string>& hells) const;
+	const std::vector<std::string>* get_hells(const char* name,
+		acl::string& matched, int& tm_hour, int& tm_min) const;
 
 private:
-	filter_rules rules_;
+	std::vector<rule_match*> rules_match_;
+
+	void build(const filter_rules& rules);
+	void build_add(const filter_rule& rule);
 };
