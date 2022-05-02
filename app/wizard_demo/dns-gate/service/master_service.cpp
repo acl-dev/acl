@@ -16,6 +16,7 @@ char* var_cfg_sqlite_path;
 char* var_cfg_dbfile;
 char* var_cfg_black_list;
 char* var_cfg_rules_file;
+char* var_cfg_manage_addr;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "upstream_addr", "114.114.114.114|53", &var_cfg_upstream_addr },
 	{ "display_disabled", "", &var_cfg_display_disabled },
@@ -25,6 +26,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 	{ "dbfile", "", &var_cfg_dbfile },
 	{ "black_list", "", &var_cfg_black_list },
 	{ "rules_file", "", &var_cfg_rules_file },
+	{ "manage_addr", "0.0.0.0:8688", &var_cfg_manage_addr },
 
 	{ 0, 0, 0 }
 };

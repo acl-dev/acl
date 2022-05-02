@@ -2,6 +2,7 @@
 #include <thread>
 #include "black_list.h"
 #include "rules/rules_option.h"
+#include "manage/manage_service.h"
 #include "dgate_db.h"
 #include "dgate_service.h"
 
@@ -223,6 +224,12 @@ static void service_main(acl::fiber_tbox<request_message>* box) {
 	go[=] {
 		waiting_message(box);
 	};
+
+	if (var_cfg_manage_addr && *var_cfg_manage_addr) {
+		go [] {
+			manage_service_start(var_cfg_manage_addr);
+		};
+	}
 
 	acl::fiber::schedule();
 }

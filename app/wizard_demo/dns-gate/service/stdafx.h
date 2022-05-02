@@ -19,6 +19,41 @@
 #define	snprintf _snprintf
 #endif
 
+typedef acl::HttpServletRequest  HttpRequest;
+typedef acl::HttpServletResponse HttpResponse;
+
+// __cplusplus show c++ version as below:
+// 199711L: c++98, 201103L: c++11, 201402L: c++14, 201703L: c++17
+
+#if defined(__cplusplus) && __cplusplus >= 201103L
+#include <functional>
+typedef std::function<bool(HttpRequest&, HttpResponse&)> http_handler_t;
+typedef std::function<bool(const char*, HttpRequest&, HttpResponse&)>
+	http_default_handler_t;
+#else
+typedef bool (*http_handler_t)(HttpRequest&, HttpResponse&);
+typedef bool (*http_default_handler_t)(const char*, HttpRequest&, HttpResponse&);
+#endif
+
+typedef std::map<acl::string, http_handler_t> http_handlers_t;
+
+enum {
+	http_handler_get = 0,
+	http_handler_post,
+	http_handler_head,
+	http_handler_put,
+	http_handler_patch,
+	http_handler_connect,
+	http_handler_purge,
+	http_handler_delete,
+	http_handler_options,
+	http_handler_profind,
+	http_handler_websocket,
+	http_handler_error,
+	http_handler_unknown,
+	http_handler_max,
+};
+
 #undef logger
 #undef logger_warn
 #undef logger_error
@@ -65,6 +100,7 @@ extern char *var_cfg_upstream_addr;
 extern char *var_cfg_display_disabled;
 extern char *var_cfg_redis_addr;
 extern char *var_cfg_redis_pass;
+extern char *var_cfg_manage_addr;
 extern acl::master_str_tbl var_conf_str_tab[];
 
 extern acl::master_bool_tbl var_conf_bool_tab[];

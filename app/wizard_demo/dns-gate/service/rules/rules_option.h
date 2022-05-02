@@ -14,6 +14,17 @@ public:
 	const std::vector<std::string>* get_hells(const char* name,
 		acl::string& matched, int& tm_hour, int& tm_min) const;
 
+public:
+	int update(const char* name, const std::vector<std::string>& hells,
+		const std::vector<time_enable>& enables);
+
+	int remove(const char* name);
+
+	void add(const char* name, int from_hour, int from_min,
+		int to_hour, int to_min);
+
+	void get_rules(filter_rules& rules) const;
+
 private:
 	std::vector<rule_match*> rules_match_;
 

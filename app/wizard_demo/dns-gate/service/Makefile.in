@@ -141,10 +141,12 @@ LDFLAGS = -L$(ACL_PATH)/lib_fiber/lib -lfiber_cpp \
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
 ###########################################################
-OBJ_PATH = .
+OBJ_PATH = ./debug
+
+$(shell mkdir -p ./debug)
 
 #Project's objs
-SRC = $(wildcard *.cpp) $(wildcard rules/*.cpp)
+SRC = $(wildcard *.cpp) $(wildcard rules/*.cpp) $(wildcard manage/*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 #$(shell mkdir -p ../../../dist/master/libexec/$(RPATH)/)
@@ -152,6 +154,8 @@ OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: rules/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: manage/%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean
