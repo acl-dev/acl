@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "dgate_db.h"
 #include "dgate_service.h"
+#include "black_list.h"
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -12,6 +13,7 @@ char* var_cfg_redis_addr;
 char* var_cfg_redis_pass;
 char* var_cfg_sqlite_path;
 char* var_cfg_dbfile;
+char* var_cfg_black_list;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "upstream_addr", "114.114.114.114|53", &var_cfg_upstream_addr },
 	{ "display_disabled", "", &var_cfg_display_disabled },
@@ -19,6 +21,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 	{ "redis_pass", "", &var_cfg_redis_pass },
 	{ "sqlite_path", "", &var_cfg_sqlite_path },
 	{ "dbfile", "", &var_cfg_dbfile },
+	{ "black_list", "", &var_cfg_black_list },
 
 	{ 0, 0, 0 }
 };
@@ -41,15 +44,18 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 std::set<acl::string> var_display_disabled;
 acl::redis_client_cluster* var_redis_conns = NULL;
 dgate_db* var_db = NULL;
+black_list* var_black_list;
 
 //////////////////////////////////////////////////////////////////////////////
 
 master_service::master_service(void)
 {
+	var_black_list = new black_list;
 }
 
 master_service::~master_service(void)
 {
+	delete var_black_list;
 }
 
 void master_service::on_read(acl::socket_stream* stream)
@@ -95,6 +101,10 @@ void master_service::proc_on_init(void)
 		if (var_cfg_redis_pass && *var_cfg_redis_pass) {
 			var_redis_conns->set_password("default", var_cfg_redis_pass);
 		}
+	}
+
+	if (var_cfg_black_list && *var_cfg_black_list) {
+		var_black_list->add_list(var_cfg_black_list);
 	}
 
 	open_db();

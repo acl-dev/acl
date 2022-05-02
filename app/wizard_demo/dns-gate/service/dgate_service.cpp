@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <thread>
+#include "black_list.h"
 #include "dgate_db.h"
 #include "dgate_service.h"
 
@@ -92,6 +93,30 @@ static void save_record(request_message& msg, const char* name) {
 	}
 }
 
+static void reply_dummy(request_message& msg, acl::rfc1035_request& req) {
+	const char* name = req.get_name();
+	unsigned short qid = req.get_qid();
+
+	char buf[1024];
+	std::vector<acl::string> addrs;
+	addrs.push_back("220.181.109.164");
+	addrs.push_back("220.181.109.165");
+	addrs.push_back("220.181.109.165");
+
+	acl::rfc1035_response res;
+	res.set_name(name).set_qid(qid).set_type(acl::rfc1035_type_a)
+		.set_ttl(600);
+	size_t n  = res.build_reply(addrs, buf, sizeof(buf));
+
+	acl::socket_stream reply_sock;
+	reply_sock.open(msg.server_->sock_handle(), true);
+	if (reply_sock.sendto(buf, n, msg.peer_addr_, 0) == -1) {
+		logger_error("sendto reply to %s error %s, name=%s",
+			msg.peer_addr_.c_str(), acl::last_serror(), name);
+	}
+	reply_sock.unbind_sock();
+}
+
 static void handle_request(request_message& msg) {
 	acl::rfc1035_request req;
 	if (!req.parse_request(msg.data_, msg.data_.size())) {
@@ -100,7 +125,11 @@ static void handle_request(request_message& msg) {
 	}
 
 	const char* name = req.get_name();
-	//unsigned short qid = req.get_qid();
+	if (var_black_list->is_blocked(name)) {
+		logger_warn("BLOCKED, name=%s", name);
+		reply_dummy(msg, req);
+		return;
+	}
 
 	const char* local_addr = "0.0.0.0|0";
 	acl::socket_stream client;
@@ -137,14 +166,14 @@ static void handle_request(request_message& msg) {
 		show_addrs(msg.peer_addr_.c_str(), name, res);
 	}
 
-	acl::socket_stream reply;
-	reply.open(msg.server_->sock_handle(), true);
-	if (reply.sendto(buf, len, msg.peer_addr_, 0) == -1) {
+	acl::socket_stream reply_sock;
+	reply_sock.open(msg.server_->sock_handle(), true);
+	if (reply_sock.sendto(buf, len, msg.peer_addr_, 0) == -1) {
 		logger_error("sendto reply to %s error %s, name=%s",
 			msg.peer_addr_.c_str(), acl::last_serror(), name);
 	}
 
-	reply.unbind_sock();
+	reply_sock.unbind_sock();
 
 	save_record(msg, name);
 }

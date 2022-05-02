@@ -118,4 +118,6 @@ service server
 
 	sqlite_path = ./libsqlite3.dylib
 	dbfile = ./access.db
+
+	black_list = netease.com; 163.com
 }
