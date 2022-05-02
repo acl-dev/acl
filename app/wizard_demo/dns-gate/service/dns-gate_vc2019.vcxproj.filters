@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
     </Filter>
+    <Filter Include="rules">
+      <UniqueIdentifier>{2ff976e2-85a7-420e-b5c5-bfccaaee99e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -30,6 +33,12 @@
     <ClCompile Include="dgate_service.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="rules\rules.gson.cpp">
+      <Filter>rules</Filter>
+    </ClCompile>
+    <ClCompile Include="rules\rules_option.cpp">
+      <Filter>rules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="master_service.h">
@@ -44,8 +53,25 @@
     <ClInclude Include="dgate_service.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="rules\rules.gson.h">
+      <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="rules\rules.h">
+      <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="rules\rules_option.h">
+      <Filter>rules</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rules\rules.stub">
+      <Filter>rules</Filter>
+    </None>
+    <None Include="rules\rules.json">
+      <Filter>rules</Filter>
+    </None>
   </ItemGroup>
 </Project>

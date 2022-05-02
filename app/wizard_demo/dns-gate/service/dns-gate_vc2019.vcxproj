@@ -155,7 +155,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\..\lib_acl_cpp\include;..\..\..\..\lib_acl\include;..\..\..\..\lib_fiber\cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\..\lib_acl_cpp\include;..\..\..\..\lib_acl\include;..\..\..\..\lib_fiber\cpp\include;.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -345,6 +345,8 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
     <ClCompile Include="dgate_service.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="master_service.cpp" />
+    <ClCompile Include="rules\rules.gson.cpp" />
+    <ClCompile Include="rules\rules_option.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">Create</PrecompiledHeader>
@@ -360,10 +362,17 @@ copy ..\..\..\dist\lib\win64\lib_protocol_d.dll $(OutDir) /Y</Command>
     <ClInclude Include="dgate_db.h" />
     <ClInclude Include="dgate_service.h" />
     <ClInclude Include="master_service.h" />
+    <ClInclude Include="rules\rules.gson.h" />
+    <ClInclude Include="rules\rules.h" />
+    <ClInclude Include="rules\rules_option.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rules\rules.json" />
+    <None Include="rules\rules.stub" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

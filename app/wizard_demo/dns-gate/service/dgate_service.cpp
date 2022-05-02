@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <thread>
 #include "black_list.h"
+#include "rules/rules_option.h"
 #include "dgate_db.h"
 #include "dgate_service.h"
 
@@ -93,16 +94,12 @@ static void save_record(request_message& msg, const char* name) {
 	}
 }
 
-static void reply_dummy(request_message& msg, acl::rfc1035_request& req) {
+static void reply_dummy(request_message& msg, acl::rfc1035_request& req,
+	const std::vector<acl::string>& addrs) {
 	const char* name = req.get_name();
 	unsigned short qid = req.get_qid();
 
 	char buf[1024];
-	std::vector<acl::string> addrs;
-	addrs.push_back("220.181.109.164");
-	addrs.push_back("220.181.109.165");
-	addrs.push_back("220.181.109.165");
-
 	acl::rfc1035_response res;
 	res.set_name(name).set_qid(qid).set_type(acl::rfc1035_type_a)
 		.set_ttl(600);
@@ -117,6 +114,24 @@ static void reply_dummy(request_message& msg, acl::rfc1035_request& req) {
 	reply_sock.unbind_sock();
 }
 
+static void reply_dummy(request_message& msg, acl::rfc1035_request& req) {
+	std::vector<acl::string> addrs;
+	addrs.push_back("220.181.109.164");
+	addrs.push_back("220.181.109.165");
+	addrs.push_back("220.181.109.165");
+	reply_dummy(msg, req, addrs);
+}
+
+static void reply_dummy(request_message& msg, acl::rfc1035_request& req,
+		const std::vector<std::string>& hells) {
+	std::vector<acl::string> addrs;
+	for (std::vector<std::string>::const_iterator cit = hells.begin();
+		cit != hells.end(); ++cit) {
+		addrs.push_back((*cit).c_str());
+	}
+	reply_dummy(msg, req, addrs);
+}
+
 static void handle_request(request_message& msg) {
 	acl::rfc1035_request req;
 	if (!req.parse_request(msg.data_, msg.data_.size())) {
@@ -128,6 +143,14 @@ static void handle_request(request_message& msg) {
 	if (var_black_list->is_blocked(name)) {
 		logger_warn("BLOCKED, name=%s", name);
 		reply_dummy(msg, req);
+		return;
+	}
+
+	int now_hour, now_min;
+	std::vector<std::string> hells;
+	if (var_rules_option->is_blocked(name, &now_hour, &now_min, hells)) {
+		logger_warn("BLOCKED, name=%s, now=%d:%d", name, now_hour, now_min);
+		reply_dummy(msg, req, hells);
 		return;
 	}
 

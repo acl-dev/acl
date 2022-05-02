@@ -78,3 +78,7 @@ extern acl::redis_client_cluster *var_redis_conns;
 
 class black_list;
 extern black_list *var_black_list;
+
+class rules_option;
+extern rules_option* var_rules_option;
+

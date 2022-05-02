@@ -2,6 +2,7 @@
 #include "dgate_db.h"
 #include "dgate_service.h"
 #include "black_list.h"
+#include "rules/rules_option.h"
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -14,6 +15,7 @@ char* var_cfg_redis_pass;
 char* var_cfg_sqlite_path;
 char* var_cfg_dbfile;
 char* var_cfg_black_list;
+char* var_cfg_rules_file;
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "upstream_addr", "114.114.114.114|53", &var_cfg_upstream_addr },
 	{ "display_disabled", "", &var_cfg_display_disabled },
@@ -22,6 +24,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 	{ "sqlite_path", "", &var_cfg_sqlite_path },
 	{ "dbfile", "", &var_cfg_dbfile },
 	{ "black_list", "", &var_cfg_black_list },
+	{ "rules_file", "", &var_cfg_rules_file },
 
 	{ 0, 0, 0 }
 };
@@ -45,17 +48,20 @@ std::set<acl::string> var_display_disabled;
 acl::redis_client_cluster* var_redis_conns = NULL;
 dgate_db* var_db = NULL;
 black_list* var_black_list;
+rules_option* var_rules_option;
 
 //////////////////////////////////////////////////////////////////////////////
 
 master_service::master_service(void)
 {
 	var_black_list = new black_list;
+	var_rules_option = new rules_option;
 }
 
 master_service::~master_service(void)
 {
 	delete var_black_list;
+	delete var_rules_option;
 }
 
 void master_service::on_read(acl::socket_stream* stream)
@@ -107,8 +113,11 @@ void master_service::proc_on_init(void)
 		var_black_list->add_list(var_cfg_black_list);
 	}
 
-	open_db();
+	if (var_cfg_rules_file && *var_cfg_rules_file) {
+		var_rules_option->load(var_cfg_rules_file);
+	}
 
+	open_db();
 	dgate_service_start();
 }
 
