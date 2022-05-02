@@ -16,6 +16,9 @@
     <Filter Include="rules">
       <UniqueIdentifier>{2ff976e2-85a7-420e-b5c5-bfccaaee99e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="manage">
+      <UniqueIdentifier>{ad859543-2c97-4ee7-8c40-ab138674ee68}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -39,6 +42,18 @@
     <ClCompile Include="rules\rules_option.cpp">
       <Filter>rules</Filter>
     </ClCompile>
+    <ClCompile Include="manage\http_service.cpp">
+      <Filter>manage</Filter>
+    </ClCompile>
+    <ClCompile Include="manage\http_servlet.cpp">
+      <Filter>manage</Filter>
+    </ClCompile>
+    <ClCompile Include="manage\manage_service.cpp">
+      <Filter>manage</Filter>
+    </ClCompile>
+    <ClCompile Include="black_list.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="master_service.h">
@@ -61,6 +76,18 @@
     </ClInclude>
     <ClInclude Include="rules\rules_option.h">
       <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\http_service.h">
+      <Filter>manage</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\http_servlet.h">
+      <Filter>manage</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\manage_service.h">
+      <Filter>manage</Filter>
+    </ClInclude>
+    <ClInclude Include="black_list.h">
+      <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
