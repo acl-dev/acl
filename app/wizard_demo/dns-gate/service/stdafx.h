@@ -101,6 +101,7 @@ extern char *var_cfg_display_disabled;
 extern char *var_cfg_redis_addr;
 extern char *var_cfg_redis_pass;
 extern char *var_cfg_manage_addr;
+extern char *var_cfg_rules_file;
 extern acl::master_str_tbl var_conf_str_tab[];
 
 extern acl::master_bool_tbl var_conf_bool_tab[];

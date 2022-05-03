@@ -25,9 +25,13 @@ public:
 
 	void get_rules(filter_rules& rules) const;
 
+	bool reload(const char* filepath);
+
 private:
 	std::vector<rule_match*> rules_match_;
 
 	void build(const filter_rules& rules);
 	void build_add(const filter_rule& rule);
+
+	void free_rules(void);
 };

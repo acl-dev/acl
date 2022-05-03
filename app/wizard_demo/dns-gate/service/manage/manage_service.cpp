@@ -102,8 +102,17 @@ static bool do_add(HttpRequest& req, HttpResponse& res) {
 	buf = "OK!\r\n";
 	res.setContentLength(buf.size());
 	return res.write(buf);
+}
 
+static bool do_reload(HttpRequest&, HttpResponse& res) {
+	if (var_rules_option == NULL) {
+		return do_none(res);
+	}
 
+	bool ret = var_rules_option->reload(var_cfg_rules_file);
+	acl::string buf = ret ? "OK!\r\n" : "Error!\r\n";
+	res.setContentLength(buf.size());
+	return res.write(buf);
 }
 
 static void handle_client(acl::socket_stream& conn) {
@@ -127,6 +136,16 @@ void manage_service_start(const char* addr) {
 		return do_remove(req, res);
 	}).Get("/add", [](HttpRequest& req, HttpResponse& res) {
 		return do_add(req, res);
+	}).Get("/reload", [](HttpRequest& req, HttpResponse& res) {
+		return do_reload(req, res);
+	/*
+	}).Get("/restart", [](HttpRequest&, HttpResponse& res) {
+		acl::string buf("OK!\r\n");
+		res.setContentLength(buf.size());
+		res.write(buf);
+		exit (0);
+		return false;
+	*/
 	}).Default([](const char*, HttpRequest&, HttpResponse& res) {
 		acl::string buf("OK!\r\n");
 		res.setContentLength(buf.size());

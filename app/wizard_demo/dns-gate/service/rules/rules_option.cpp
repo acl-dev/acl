@@ -148,10 +148,15 @@ private:
 rules_option::rules_option(void) {}
 
 rules_option::~rules_option(void) {
+	free_rules();
+}
+
+void rules_option::free_rules(void) {
 	for (std::vector<rule_match*>::const_iterator cit = rules_match_.begin();
 		cit != rules_match_.end(); ++cit) {
 		delete *cit;
 	}
+	rules_match_.clear();
 }
 
 void rules_option::build_add(const filter_rule& rule) {
@@ -191,6 +196,11 @@ bool rules_option::load(const char* filepath) {
 
 	logger("load %s ok", filepath);
 	return true;
+}
+
+bool rules_option::reload(const char* filepath) {
+	free_rules();
+	return load(filepath);
 }
 
 const std::vector<std::string>* rules_option::get_hells(const char* name,
