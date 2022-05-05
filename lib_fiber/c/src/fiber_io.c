@@ -215,6 +215,13 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			} else if (ring_size(&ev->events) > 0) {
 				continue;
 			}
+			
+			// only sleep fiber alive ?
+			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
+			if (timer) {
+				continue;
+			}
+			
 			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u, events=%d",
 				__FUNCTION__, __LINE__, __pthread_self(),
 				ev->waiter, ring_size(&ev->events));
