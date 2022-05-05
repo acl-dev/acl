@@ -22,6 +22,15 @@ UNIXNAME = $(shell uname -s)
 OSTYPE = $(shell uname -m)
 RPATH = linux64
 
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+        SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+        SYSLIB += -liconv
+endif
+
 ifeq ($(CC),)
         CC = gcc
 endif

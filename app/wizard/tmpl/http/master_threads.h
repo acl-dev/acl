@@ -103,6 +103,9 @@ protected:
 private:
 	// redis 集群对象
 	acl::redis_client_cluster* redis_;
-
+	acl::sslbase_conf* conf_;
 	http_service* service_;
+
+	acl::sslbase_io* setup_ssl(acl::socket_stream& conn,
+		acl::sslbase_conf& conf);
 };
