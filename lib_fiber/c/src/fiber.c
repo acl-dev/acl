@@ -546,17 +546,15 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 
 	fiber->status = FIBER_STATUS_READY;
 	ring_append(&__thread_fiber->ready, &fiber->me);
-
-	acl_fiber_switch();
 #else
 	fiber->status = FIBER_STATUS_READY;
 	ring_prepend(&__thread_fiber->ready, &fiber->me);
 
 	curr->status = FIBER_STATUS_READY;
 	ring_prepend(&__thread_fiber->ready, &curr->me);
-
-	acl_fiber_switch();
 #endif
+	acl_fiber_switch();
+	fiber->flag &= ~FIBER_F_SIGNALED;
 }
 
 int acl_fiber_signum(ACL_FIBER *fiber)
