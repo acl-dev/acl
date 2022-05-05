@@ -362,12 +362,12 @@ static void resolver_init(void)
 
 #ifdef SYS_UNIX
 	load_reolv_conf(resolv_file, __resolv);
-#elif defined(SYS_WIN)
-	add_nameservers(__resolv);
-#endif
 
 	load_hosts_conf(hosts_file, __hosts);
 	load_services_conf(services_file, __services);
+#elif defined(SYS_WIN)
+	add_nameservers(__resolv);
+#endif
 }
 
 static pthread_once_t  __once_control = PTHREAD_ONCE_INIT;
