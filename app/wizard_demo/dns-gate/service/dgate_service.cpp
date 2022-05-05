@@ -119,7 +119,7 @@ static void reply_dummy(request_message& msg, acl::rfc1035_request& req) {
 	std::vector<acl::string> addrs;
 	addrs.push_back("220.181.109.164");
 	addrs.push_back("220.181.109.165");
-	addrs.push_back("220.181.109.165");
+	addrs.push_back("220.181.109.166");
 	reply_dummy(msg, req, addrs);
 }
 
