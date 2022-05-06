@@ -367,6 +367,13 @@ static void resolver_init(void)
 	load_services_conf(services_file, __services);
 #elif defined(SYS_WIN)
 	add_nameservers(__resolv);
+	{
+		CHAR win32_host[MAX_PATH];
+
+		GetSystemDirectoryA(win32_host, MAX_PATH);
+		lstrcatA(win32_host, "\\drivers\\etc\\hosts");
+		load_hosts_conf(win32_host, __hosts);
+	}
 #endif
 }
 
