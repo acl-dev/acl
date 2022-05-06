@@ -901,6 +901,11 @@ void acl_fiber_schedule(void)
 		fiber_free(fiber);
 	}
 
+	if (__thread_fiber->count > 0) {
+		msg_warn("%s(%d), %s: fiber count: %d, deadlock?", __FILE__, __LINE__,
+			__FUNCTION__, __thread_fiber->count);
+	}
+
 	fiber_io_clear();
 	acl_fiber_hook_api(0);
 	__scheduled = 0;
