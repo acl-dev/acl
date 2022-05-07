@@ -409,7 +409,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	if (fe->fiber_r->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(fe->fiber_r);
 	}
-	__thread_fiber->io_count--;
 }
 
 /**
@@ -433,9 +432,10 @@ int fiber_wait_read(FILE_EVENT *fe)
 	}
 
 	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
-	__thread_fiber->io_count++;
+	fiber_io_inc();
 	SET_READWAIT(fe);
 	acl_fiber_switch();
+	fiber_io_dec();
 	return ret;
 }
 
@@ -451,7 +451,6 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	if (fe->fiber_w->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(fe->fiber_w);
 	}
-	__thread_fiber->io_count--;
 }
 
 int fiber_wait_write(FILE_EVENT *fe)
@@ -467,10 +466,10 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
-	__thread_fiber->io_count++;
+	fiber_io_inc();
 	SET_WRITEWAIT(fe);
 	acl_fiber_switch();
-
+	fiber_io_dec();
 	return ret;
 }
 
