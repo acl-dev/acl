@@ -123,9 +123,11 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
 
-	acl::sslbase_io* ssl = setup_ssl(*conn, *conf_);
-	if (ssl == NULL) {
-		return false;
+	if (conf_) {
+		acl::sslbase_io* ssl = setup_ssl(*conn, *conf_);
+		if (ssl == NULL) {
+			return false;
+		}
 	}
 
 	conn->set_rw_timeout(var_cfg_rw_timeout);
@@ -188,6 +190,7 @@ void master_service::proc_on_init(void)
 
 	if (var_cfg_crt_file == NULL || *var_cfg_crt_file == 0
 		|| var_cfg_key_file == NULL || *var_cfg_key_file == 0) {
+		logger("not use SSL mode");
 		return;
 	}
 
