@@ -12,6 +12,7 @@ char *var_cfg_libx509_path;
 char *var_cfg_libssl_path;
 char *var_cfg_crt_file;
 char *var_cfg_key_file;
+char *var_cfg_html_path;
 
 acl::master_str_tbl var_conf_str_tab[] = {
 	{ "redis_addrs", "127.0.0.1:6379", &var_cfg_redis_addrs },
@@ -20,6 +21,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 	{ "libssl_path", "", &var_cfg_libssl_path },
 	{ "crt_file", "", &var_cfg_crt_file },
 	{ "key_file", "", &var_cfg_key_file },
+	{ "html_path", "./html", &var_cfg_html_path },
 
 	{ 0, 0, 0 }
 };
