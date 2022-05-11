@@ -51,7 +51,7 @@ int  ring_size(const RING *ring);
 #endif
 
 /**
- * 将一个新元素添加进环的尾部
+ * 将一个新元素添加进环的头部，在环中后添加的元素位于先添加的元素前面
  * @param ring {RING*} 数据环
  * @param entry {RING*} 新的元素
  */
@@ -70,7 +70,7 @@ void ring_append(RING *ring, RING *entry);
 #endif
 
 /**
- * 将一个新元素添加进环的头部
+ * 将一个新元素添加进环的尾部，在环中后添加的元素位于先添加的元素后面
  * @param ring {RING*} 数据环
  * @param entry {RING*} 新的元素
  */
@@ -285,7 +285,7 @@ RING *ring_pop_tail(RING *ring);
 #define	ring_last_appl	RING_LAST_APPL
 
 /**
- * 将一个新元素添加进环的尾部
+ * 将一个新元素添加进环的头部，在环中后添加的元素位于先添加的元素前面
  * @param ring {RING*} 数据环
  * @param entry {RING*} 新的元素
  */
@@ -300,7 +300,7 @@ RING *ring_pop_tail(RING *ring);
 } while (0)
 
 /**
- * 将一个新元素添加进环的头部
+ * 将一个新元素添加进环的尾部，在环中后添加的元素位于先添加的元素后面
  * @param ring {RING*} 数据环
  * @param entry {RING*} 新的元素
  */

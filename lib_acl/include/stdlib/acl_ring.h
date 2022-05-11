@@ -39,14 +39,14 @@ ACL_API void acl_ring_init(ACL_RING *ring);
 ACL_API int  acl_ring_size(const ACL_RING *ring);
 
 /**
- * 将一个新元素添加进环的头部
+ * 将一个新元素添加进环的尾部，在环中后添加的元素位于先添加的元素后面
  * @param ring {ACL_RING*} 数据环
  * @param entry {ACL_RING*} 新的元素
  */
 ACL_API void acl_ring_prepend(ACL_RING *ring, ACL_RING *entry);
 
 /**
- * 将一个新元素添加进环的尾部
+ * 将一个新元素添加进环的头部，在环中后添加的元素位于先添加的元素前面
  * @param ring {ACL_RING*} 数据环
  * @param entry {ACL_RING*} 新的元素
  */
