@@ -36,10 +36,10 @@ void tcp_transfer::close(void)
 {
 	printf(">>>close sockfd=%d, curr=%p, me=%p, parent=%p\r\n",
 		in_.sock_handle(), acl_fiber_running(), me_, parent_);
-	int fd = in_.sock_handle();
-	//in_.close();
-	in_.unbind_sock();
-	acl_fiber_close(fd);
+	int fd = in_.unbind_sock();
+	if (fd >= 0) {
+		acl_fiber_close(fd);
+	}
 	//printf(">>>after close sockfd=%d\r\n", in_.sock_handle());
 }
 
