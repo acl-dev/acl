@@ -39,7 +39,7 @@ Supports HTTP/1.1, can be used in client and server sides.
 - Provides stl-like C++ interface for each redis command
 - Communication in single, cluster or pipeline mode
 - Connection pool be used in signle or cluster mode
-- More information see lib_acl_cpp/samples/redis/README.md
+- More information see [Using redis](lib_acl_cpp/samples/redis/README.md)
 
 # 2.3. Coroutine
 
