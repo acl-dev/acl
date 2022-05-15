@@ -60,4 +60,5 @@ The most important module in Acl is the server framework, which helps users quic
 # 2.5. Database module
 The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresq and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
 
-# 2.6. Mime module
+# 2.6. MIME module
+MIME(Multipurpose Internet Mail Extensions) format is widely used in email application. MIME format is too important that it can be used not only for email applications, but also for Web applications. MIME RFC such as RFC2045/RFC2047/RFC822 has been implemented in Acl. Acl has a MIME data stream parser that is indepedent of the IO model, so it can be used by synchronous or asynchronous IO programs.
