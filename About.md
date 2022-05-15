@@ -9,28 +9,16 @@ As a C/C++ foundation library, Acl provides many useful functions for users to d
 
 ## 2.1. HTTP module
 Supports HTTP/1.1, can be used in client and server sides.
-
-### 2.1.1. Client mode
-- Connection pool mode
+- HttpServlet interface like Java(server side)
+- Connection pool mode(client side)
 - Chunked block transfer
-- Gzip decompression
+- Gzip compression/decompression
 - SSL encrypted
 - Breakpoints transmission
 - Setting/acquisition of cookies
+- Session managment(server side)
 - Websocket transmission
-- Sync/Async mode
-- ...
-
-### 2.1.2 Server mode
-- HttpServlet interface like Java
-- Chunked block transfer
-- Gzip compression
-- SSL encrypted
-- Breakpoints transmission
-- Setting/acquisition of cookies
-- Session managment
 - HTTP MIME format
-- Websocket transmission
 - Sync/Async mode
 - ...
 
@@ -70,5 +58,6 @@ The most important module in Acl is the server framework, which helps users quic
 - **Trigger service:** The model instance is mainly used to process the background service process of some scheduled tasks (similar to the system's crontab).
 
 # 2.5. Database module
+The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresq and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
 
 # 2.6. Mime module
