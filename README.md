@@ -27,12 +27,20 @@ Architecture diagram:
     * [3.1. Compiling Acl on different platforms](#31-compiling-acl-on-different-platforms)
     * [3.2. Precautions when compiling on Windows](#32-precautions-when-compiling-on-windows)
 
-* [4. More about](#4-more-about)
-    * [4.1. Samples](#41-samples)
-    * [4.2. FAQ](#42-faq)
-    * [4.3. Who are using acl?](#43-who-are-using-acl)
-    * [4.4. License](#44-license)
-    * [4.5. Reference](#45-reference)
+* [4. Quick start](#4-quick-start)
+    * [4.1. Write your first demo with Acl](#41-write-your-first-demo-with-acl)
+    * [4.2. Write one simple TCP server](#42-write-one-simple-tcp-server)
+    * [4.3. Write one simple TCP client](#43-write-one-simple-tcp-client)
+    * [4.4. Write one Http client](#44-write-one-http-client)
+    * [4.5. Write one redis client](#45-write-one-redis-client)
+    * [4.6. Write one TCP server in coroutine mode](#46-write-one-tcp-server-in-coroutine-mode)
+
+* [5. More about](#5-more-about)
+    * [5.1. Samples](#51-samples)
+    * [5.2. FAQ](#52-faq)
+    * [5.3. Who are using acl?](#53-who-are-using-acl)
+    * [5.4. License](#54-license)
+    * [5.5. Reference](#55-reference)
 
 <hr>
 
@@ -76,16 +84,16 @@ The coroutine module in Acl can be used on multiple platforms, and there are man
 - Support select/poll/epoll/kqueue/iocp/win32 GUI message
 - The DNS protocol has been implemented in acl coroutine, so DNS API can also be used in coroutine model
 - Hook system IO API on Unix and Windows
-  - Read API: read/readv/recv/recvfrom/recvmsg
-  - Write API: write/writev/send/sendto/sendmsg/sendfile64
-  - Socket API: socket/listen/accept/connect/setsockopt
-  - event API: select/poll/epoll_create/epoll_ctl/epoll_wait
-  - DNS API: gethostbyname/gethostbyname_r/getaddrinfo/freeaddrinfo
-- Support shared stack mode to minimize memory usage
+  - **Read API:** read/readv/recv/recvfrom/recvmsg
+  - **Write API:** write/writev/send/sendto/sendmsg/sendfile64
+  - **Socket API:** socket/listen/accept/connect/setsockopt
+  - **event API:** select/poll/epoll_create/epoll_ctl/epoll_wait
+  - **DNS API:** gethostbyname/gethostbyname_r/getaddrinfo/freeaddrinfo
+- Support **shared stack** mode to minimize memory usage
 - Synchronization primitive
-  - Coroutine mutex, semphore can be used between coroutines
-  - Coroutine event can be used between coroutines and threads
-- For more information, see [Using Acl fiber](lib_fiber/README_en.md)
+  - Coroutine **mutex**, **semphore** can be used between coroutines
+  - Coroutine **event** can be used between coroutines and threads
+- For more information, see **[Using Acl fiber](lib_fiber/README_en.md)**
 
 ## 1.3. HTTP module
 Supports HTTP/1.1, can be used in client and server sides.
@@ -113,19 +121,19 @@ The redis client module in Acl is powerful, high-performance and easy to use.
 - Same interface for single, cluster and pipeline modes
 - Retry automatically for the reason of network error
 - Can be used in the shared stack coroutine mode
-- For more information, see [Using Acl redis client](lib_acl_cpp/samples/redis/README.md)
+- For more information, see **[Using Acl redis client](lib_acl_cpp/samples/redis/README.md)**
 
 ## 1.5. MQTT module
 The MQTT 3.1.1 version has been implemented in Acl, which has a stream parser, so can be used indepedentily of any IO mode.
-- Support MQTT 3.1.1 protocol: CONNECT/CONNACK/PUBLISH/PUBACK/PUBREC/PUBREL/PUBCOMP/SUBSCRIBE/SUBACK/UNSUBSCRIBE/UNSUBACK/PINGREQ/PINGRESP/DISCONNECT
+- Support **MQTT 3.1.1** protocol: CONNECT/CONNACK/PUBLISH/PUBACK/PUBREC/PUBREL/PUBCOMP/SUBSCRIBE/SUBACK/UNSUBSCRIBE/UNSUBACK/PINGREQ/PINGRESP/DISCONNECT
 - One class per command
 - Stream parser can be used for any IO mode
 - Data parsing separats from network communicationo
 - Can be used on client and server sides
-- For more information, see [Using Acl MQTT](lib_acl_cpp/samples/mqtt/README.md)
+- For more information, see **[Using Acl MQTT](lib_acl_cpp/samples/mqtt/README.md)**
 
 ## 1.6. Server framework
-The most important module in Acl is the server framework, which helps users quickly write back-end services, such as web services. Tools in app/wizard can help users generate one appropriate service code within several seconds. The server framework of Acl includes two parts, one is the services manager, the other is the service written by Acl service template. The services manager named acl_master in Acl comes from the famous Postfix, whose name is master, and acl_master has many extensions to master in order to be as one general services manager. There are six service templates in Acl that can be used to write application services, as below:
+The most important module in Acl is the server framework, which helps users quickly write back-end services, such as web services. Tools in app/wizard can help users generate one appropriate service code within several seconds. The server framework of Acl includes two parts, one is the services manager, the other is the service written by Acl service template. The services manager named **acl_master** in Acl comes from the famous **MTA Postfix**, whose name is master, and acl_master has many extensions to master in order to be as one general services manager. There are six service templates in Acl that can be used to write application services, as below:
 - **Process service:** One connection one process, the advantage is that the programming is simple, safe and stable, and the disadvantage is that the concurrency is too low;
 - **Threads service:** Each process handles all client connections through a set of threads in the thread pool. The IO event trigger mode is used that a connection is bound to a thread only if it has readable data, and the thread will be released after processing the data. The service model's advantage is that it can handle a large number of client connections in one process with a small number of threads. Compare with the aio model, the programming is relatively simple;
 - **Aio service:** Similar to nginx/squid/ircd, one thread can handle a large number of client connections in a non-blocking IO manner. The advantages of this model are high processing efficiency and low resource consumption, while the disadvantages are more complex programming;
@@ -146,11 +154,12 @@ The unified database interface in Acl is designed to easily and safely operate t
 
 # 3. Platform support and compilation
 ## 3.1. Compiling Acl on different platforms
-Acl project currently supports Linux, Windows, MacOS, FreeBSD, Solaris, Android, IOS.
-- Linux/UNIX: The compiler is gcc, enter the lib_acl/lib_protocol/lib_acl_cpp directory directly in the terminal command line mode, run the make command.
-- Windows: Can be compiled with VS2003/VS2008/VS2010/VS2012/VS2013/VS2015/VS2019. (If you need to compile with VS6/VS2005, you can refer to the compilation conditions of VS2003).
-- MacOS: Compiled with xcode.
-- Support for CMake cross-platform compilation
+Acl project currently supports Linux, Windows, MacOS, FreeBSD, Solaris, Android, and iOS.
+- **Linux/UNIX:** The compiler is gcc/clang, enter **`acl/`** directory and run **`make`**, then libacl_all.a and libacl_all.so will be generated in acl/ directory, libacl_all.a is consist of three libraries including lib_acl.a, lib_protocol.a and libacl_cpp.a;
+- **Windows:** Can be compiled with VS2003/VS2008/VS2010/VS2012/VS2013/VS2015/VS2019. (If you need to compile with VS6/VS2005, you can refer to the compilation conditions of VS2003);
+- **MacOS/iOS:** Compiled with xcode;
+- **Android:** Open Adnroid's project in **`acl/android/acl_c++_shared/`** with **`Android Studio`**;
+- Support for cross platform compilation with **cmake**.
 
 ## 3.2. Precautions when compiling on Windows
 There are a few things to keep in mind when using dynamic libraries in a WIN32 environment:
@@ -161,14 +170,186 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 - When using a dynamic library of lib_tls, you need to predefine TLS_DLL in your project.
 - Detailed compilation process, see: [Compilation and use of acl library](BUILD.md)
 
-# 4. More about
-## 4.1. Samples
+# 4. Quick start
+## 4.1. Write your first demo with Acl
+```c++
+#include <iostream>
+#include "acl_cpp/lib_acl.hpp"
+
+int main(void) {
+  acl::string buf = "hello world!\r\n";
+  std::cout << buf.c_str() << std::endl;
+  return 0;
+}
+```
+
+## 4.2. Write one simple TCP server
+```c++
+#include <thread>
+#include "acl_cpp/lib_acl.hpp"
+
+void run(void) {
+  const char* addr = "127.0.0.1:8088";
+  acl::server_socket server;
+  if (!server.open(addr)) {  // Bind and listen the local address.
+    return;
+  }
+
+  while (true) {
+    acl::socket_stream* conn = server.accept(); // Wait for connection.
+    if (conn == NULl) {
+      break;
+    }
+    std::thread thread([=] {  // Start one thread to handle the connection.
+      char buf[256];
+      int ret = conn->read(buf, sizeof(buf), false);  // Read data.
+      if (ret > 0) {
+        conn->write(buf, ret);  // Write the received data.
+      }
+      delete conn;
+    });
+    thread.detach();
+  }
+}
+```
+
+## 4.3. Write one simple TCP client
+```c++
+void run(void) {
+  const char* addr = "127.0.0.1:8088";
+  int conn_timeout = 5, rw_timeout = 10;
+  acl::socket_stream conn;
+  if (!conn.open(addr, conn_timeout, rw_timeout)) { // Connecting the server.
+    return;
+  }
+  const char data[] = "Hello world!\r\n";
+  if (conn.write(data, sizeof(data] - 1)) == -1) {  // Send data to server.
+    return;
+  }
+  char buf[256];
+  int ret;
+  if ((ret = conn.read(buf, sizeof(buf) - 1, false)) > 0) {  // Read from server.
+    buf[ret] = 0;
+    std::cout << buf << std::endl;
+  }
+}
+```
+
+## 4.4. Write one Http client
+```c++
+bool run(void) {
+  acl::http_request conn("www.baidu.com:80");
+  acl::http_header& header = conn.request_header()
+  header.set_url("/")
+    .set_keep_alive(false);
+    .set_content_type("text/html");
+
+  if (!conn.request(NULL, 0)) {
+    return false;
+  }
+  int status = conn.get_status();
+  if (status != 200) {
+    return false;
+  }
+  long long len = conn.get_content_length();
+  if (len <= 0) {
+    return true;
+  }
+  acl::string buf;
+  if (!conn.get_body(body)) {
+    return false;
+  }
+  return true;
+}
+```
+
+## 4.5. Write one redis client
+```c++
+static void thread_run(acl::redis_client_cluster& conns) {
+  acl::redis cmd(&conns);
+  acl::string key, val;
+  for (int i = 0; i < 10; i++) {
+    key.format("key-%d", i);
+    val.format("val-%d", i);
+    if (!cmd.set(key, val)) {
+      printf("set error=%s\r\n", cmd.result_error());
+      break;
+    }
+  }
+
+  cmd.clear();
+  std::map<acl::string, acl::string> attrs;
+  attrs["name1"] = "value1";
+  attrs["name2"] = "value2";
+  attrs["name3"] = "value3";
+  key = "hash-key-1";
+  if (!cmd.hmset(key, attrs)) {
+    printf("hmset error=%s\r\n", cmd.result_error());
+    return;
+  }
+
+  cmd.clear();
+  attrs.clear();
+  if (!cmd.hgetall(key, attrs)) {
+    printf("hgetall error=%s\r\n", cmd.result_error());
+  }
+}
+
+void run(void) {
+  const char* addr = "126.0.0.1:6379";
+  acl::redis_client_cluster conns;
+  conns.set(addr, 0);
+
+  const size_t nthreads = 10;
+  std::thread threads[nthreads];
+  // Create some threads to test redis using the same conns.
+  for (size_t i = 0; i < nthreads; i++) {
+    threads[i] = std::thread(thread_run, std::ref(conns));
+  }
+  // Wait for all threads to exit
+  for (size_t i = 0; i < nthreads; i++) {
+    threads[i].join();
+  }
+}
+```
+
+## 4.6. Write one TCP server in coroutine mode
+```c++
+void run(void) {
+  const char* addr = "127.0.0.1:8088";
+  acl::server_socket server;
+  if (!server.open(addr)) {
+    return;
+  }
+
+  go[&] {  // Create one server coroutine to wait for connection.
+    while (true) {
+      acl::socket_stream* conn = server.accept();
+      if (conn) {
+        go[=] {  // Create one client coroutine to handle the connection.
+          char buf[256];
+          int ret = conn->read(buf, sizeof(buf), false);
+          if (ret > 0) {
+            (void) conn->write(buf, ret);
+          }
+          delete conn;
+        };
+      }
+    }
+  };
+
+  acl::fiber::schedule();  // Start the coroutine scheculde process.
+}
+```
+
+# 5. More about
+## 5.1. Samples
 There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
 
-## 4.2. FAQ
+## 5.2. FAQ
 If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 
-## 4.3. Who are using acl?
+## 5.3. Who are using acl?
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
 [![263](res/logo/logo_263.png)](http://www.263.net/)
 [![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
@@ -178,10 +359,10 @@ If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 [![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
 [![foundao](res/logo/logo_foundao.png)](http://www.foundao.com/)
 
-## 4.4. License
+## 5.4. License
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
-## 4.5. Reference
+## 5.5. Reference
 - Web site: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
 - Gitee:  https://gitee.com/acl-dev/acl
