@@ -24,7 +24,7 @@ Architecture diagram:
     * [2.3. Database module](#23-database-module)
 
 * [3. Platform support and compilation](#3-platform-support-and-compilation)
-    * [3.1. Compile on different platforms](#31-compile-on-different-platforms)
+    * [3.1. Compiling Acl on different platforms](#31-compiling-acl-on-different-platforms)
     * [3.2. Precautions when compiling on Windows](#32-precautions-when-compiling-on-windows)
 
 * [4. More about](#4-more-about)
@@ -145,7 +145,7 @@ Thare are some common codecs in Acl, such as Json, Xml, Base64, Url, etc., which
 The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresq and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
 
 # 3. Platform support and compilation
-## 3.1. Compile on different platforms
+## 3.1. Compiling Acl on different platforms
 Acl project currently supports Linux, Windows, MacOS, FreeBSD, Solaris, Android, IOS.
 - Linux/UNIX: The compiler is gcc, enter the lib_acl/lib_protocol/lib_acl_cpp directory directly in the terminal command line mode, run the make command.
 - Windows: Can be compiled with VS2003/VS2008/VS2010/VS2012/VS2013/VS2015/VS2019. (If you need to compile with VS6/VS2005, you can refer to the compilation conditions of VS2003).
@@ -182,8 +182,8 @@ If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
 ## 4.5. Reference
-- WEB site: https://blog.csdn.net/zsxxsz
+- Web site: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
 - Gitee:  https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
-- QQ Group: ，693868497
+- QQ Group: 693868497
