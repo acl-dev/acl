@@ -315,6 +315,5 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 - WEB site: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
 - Oschina:  https://gitee.com/acl-dev/acl
-- Download: https://sourceforge.net/projects/acl
 - Weibo:    http://weibo.com/zsxxsz
-- QQ Group: 242722074
+- QQ Group: 693868497
