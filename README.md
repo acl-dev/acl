@@ -24,6 +24,8 @@ Architecture diagram:
     * [2.3. Database module](#23-database-module)
 
 * [3. Platform support and compilation](#3-platform-support-and-compilation)
+    * [3.1. Compile on different platforms](#31-compile-on-different-platforms)
+    * [3.2. Precautions when compiling on Windows](#32-precautions-when-compiling-on-windows)
 
 * [4. More about](#4-more-about)
     * [4.1. Samples](#41-samples)
@@ -83,7 +85,7 @@ The coroutine module in Acl can be used on multiple platforms, and there are man
 - Synchronization primitive
   - Coroutine mutex, semphore can be used between coroutines
   - Coroutine event can be used between coroutines and threads
-- More information see [Using acl fiber](lib_fiber/README_en.md)
+- For more information, see [Using Acl fiber](lib_fiber/README_en.md)
 
 ## 1.3. HTTP module
 Supports HTTP/1.1, can be used in client and server sides.
@@ -111,7 +113,7 @@ The redis client module in Acl is powerful, high-performance and easy to use.
 - Same interface for single, cluster and pipeline modes
 - Retry automatically for the reason of network error
 - Can be used in the shared stack coroutine mode
-- More information see [Using acl redis client](lib_acl_cpp/samples/redis/README.md)
+- For more information, see [Using Acl redis client](lib_acl_cpp/samples/redis/README.md)
 
 ## 1.5. MQTT module
 The MQTT 3.1.1 version has been implemented in Acl, which has a stream parser, so can be used indepedentily of any IO mode.
@@ -120,6 +122,7 @@ The MQTT 3.1.1 version has been implemented in Acl, which has a stream parser, s
 - Stream parser can be used for any IO mode
 - Data parsing separats from network communicationo
 - Can be used on client and server sides
+- For more information, see [Using Acl MQTT](lib_acl_cpp/samples/mqtt/README.md)
 
 ## 1.6. Server framework
 The most important module in Acl is the server framework, which helps users quickly write back-end services, such as web services. Tools in app/wizard can help users generate one appropriate service code within several seconds. The server framework of Acl includes two parts, one is the services manager, the other is the service written by Acl service template. The services manager named acl_master in Acl comes from the famous Postfix, whose name is master, and acl_master has many extensions to master in order to be as one general services manager. There are six service templates in Acl that can be used to write application services, as below:
@@ -142,19 +145,21 @@ Thare are some common codecs in Acl, such as Json, Xml, Base64, Url, etc., which
 The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresq and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
 
 # 3. Platform support and compilation
+## 3.1. Compile on different platforms
 Acl project currently supports Linux, Windows, MacOS, FreeBSD, Solaris, Android, IOS.
 - Linux/UNIX: The compiler is gcc, enter the lib_acl/lib_protocol/lib_acl_cpp directory directly in the terminal command line mode, run the make command.
 - Windows: Can be compiled with VS2003/VS2008/VS2010/VS2012/VS2013/VS2015/VS2019. (If you need to compile with VS6/VS2005, you can refer to the compilation conditions of VS2003).
 - MacOS: Compiled with xcode.
 - Support for CMake cross-platform compilation
 
+## 3.2. Precautions when compiling on Windows
 There are a few things to keep in mind when using dynamic libraries in a WIN32 environment:
 - When using the dynamic library of lib_acl, it needs to be predefined in the user's project: ACL_DLL;
 - When using the HTTP library or ICMP library in the lib_protocol dynamic library, you need to predefine HTTP_DLL or ICMP_DLL in the project;
 - When using the dynamic library of lib_acl_cpp, you need to predefine ACL_CPP_DLL in the project. If you use the VC2003 compiler environment, you need to predefine VC2003.
 - When using the dynamic library of lib_dict, you need to predefine DICT_DLL in the project;
 - When using a dynamic library of lib_tls, you need to predefine TLS_DLL in your project.
-- Detailed compilation process, see: [compilation and use of acl library] (BUILD.md)
+- Detailed compilation process, see: [Compilation and use of acl library](BUILD.md)
 
 # 4. More about
 ## 4.1. Samples
