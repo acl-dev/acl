@@ -310,7 +310,6 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 [![263](res/logo/logo_263.png)](http://www.263.net/)
 [![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
 [![v1](res/logo/logo_v1.png)](http://www.v1.cn/)
-[![lecloud](res/logo/logo_lecloud.png)](http://www.lecloud.com/)
 [![ksyun](res/logo/logo_ksyun.png)](https://www.ksyun.com/)
 [![weibangong](res/logo/logo_weibangong.png)](https://www.weibangong.com/)
 [![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
@@ -322,6 +321,6 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 ## 六、参考
 - WEB 站点: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
-- Oschina:  https://gitee.com/acl-dev/acl
+- Gitee:  https://gitee.com/acl-dev/acl
 - Download: https://sourceforge.net/projects/acl- 微 博：   http://weibo.com/zsxxsz
 - QQ 群:  693868497

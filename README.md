@@ -2,16 +2,42 @@
 
 # Acl -- One Advanced C/C++ Library for Unix/Windows
 
-# 1. About Acl project
+# 0. About Acl project
 The Acl (Advanced C/C++ Library) project is powerful multi-platform network communication library and service framework, suppoting LINUX, WIN32, Solaris, FreeBSD, AndroidOS, iOS. Many applications written by Acl run on these devices with Linux, Windows, iPhone and Android and serve billions of users. There are some important modules in Acl project, including network communcation, server framework, application protocols, multiple coders, etc. The common protocols such as HTTP/SMTP/ICMP//MQTT/Redis/Memcached/Beanstalk/Handler Socket are implemented in Acl, and the codec library such as XML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047/RFC1035, etc., are also included in Acl. Acl also provides unified abstract interface for popular databases such as Mysql, Postgresql, Sqlite. Using Acl library users can write database application more easily, quickly and safely.
 
 Architecture diagram:
  ![Overall architecture diagram](res/img/architecture_en.png)
 
-# 2. The six most important modules
+<hr>
+
+* [1. The six most important modules](#1-the-six-most-important-modules)
+    * [1.1. Basic network module](#11-basic-network-module)
+    * [1.2. Coroutine](#12-coroutine)
+    * [1.3. HTTP module](#13-http-module)
+    * [1.4. Redis client](#14-redis-client)
+    * [1.5. MQTT module](#15-mqtt-module)
+    * [1.6. Server framework](#16-server-framework)
+
+* [2. The other important modules](#2-the-other-important-modules)
+    * [2.1. MIME module](#21-mime-module)
+    * [2.2. Codec module](#22-codec-module)
+    * [2.3. Database module](#23-database-module)
+
+* [3. Platform support and compilation](#3-platform-support-and-compilation)
+
+* [4. More about](#4-more-about)
+    * [4.1. Samples](#41-samples)
+    * [4.2. FAQ](#42-faq)
+    * [4.3. Who are using acl?](#43-who-are-using-acl)
+    * [4.4. License](#44-license)
+    * [4.5. Reference](#45-reference)
+
+<hr>
+
+# 1. The six most important modules
 As a C/C++ foundation library, Acl provides many useful functions for users to develop applications, including six important modules: Network, Coroutine, HTTP,  Redis client, MQTT, and Server framework.
 
-## 2.1. Basic network module
+## 1.1. Basic network module
 - Stream processing module
 This module is the most basic streaming communication module for the entire acl network communication. It not only supports network streaming, but also supports file streaming. It mainly supports:
   - Read data by line, compatible with \r\n under win32, and compatible with the end of \n under UNIX
@@ -41,7 +67,7 @@ This module is the most basic streaming communication module for the entire acl 
 - Common network communication library
   - Support memcached, beanstalk, handler socket client communication library, the communication library supports connection pool mode.
 
-## 2.2. Coroutine
+## 1.2. Coroutine
 The coroutine module in Acl can be used on multiple platforms, and there are many engineering practices in some important projects.
 - Run on Linux, MacOS, Windows, iOS and Android
 - Support x86, Arm architecture
@@ -59,7 +85,7 @@ The coroutine module in Acl can be used on multiple platforms, and there are man
   - Coroutine event can be used between coroutines and threads
 - More information see [Using acl fiber](lib_fiber/README_en.md)
 
-## 2.3. HTTP module
+## 1.3. HTTP module
 Supports HTTP/1.1, can be used in client and server sides.
 - HttpServlet interface like Java(server side)
 - Connection pool mode(client side)
@@ -74,7 +100,7 @@ Supports HTTP/1.1, can be used in client and server sides.
 - Sync/Async mode
 - ...
 
-## 2.4. Redis client
+## 1.4. Redis client
 The redis client module in Acl is powerful, high-performance and easy to use.
 - Support Bitmap/String/Hash/List/Set/Sorted Set/PubSub/HyperLogLog/Geo/Script/Stream/Server/Cluster/etc.
 - Provides stl-like C++ interface for each redis command
@@ -87,7 +113,7 @@ The redis client module in Acl is powerful, high-performance and easy to use.
 - Can be used in the shared stack coroutine mode
 - More information see [Using acl redis client](lib_acl_cpp/samples/redis/README.md)
 
-## 2.5. MQTT module
+## 1.5. MQTT module
 The MQTT 3.1.1 version has been implemented in Acl, which has a stream parser, so can be used indepedentily of any IO mode.
 - Support MQTT 3.1.1 protocol: CONNECT/CONNACK/PUBLISH/PUBACK/PUBREC/PUBREL/PUBCOMP/SUBSCRIBE/SUBACK/UNSUBSCRIBE/UNSUBACK/PINGREQ/PINGRESP/DISCONNECT
 - One class per command
@@ -95,7 +121,7 @@ The MQTT 3.1.1 version has been implemented in Acl, which has a stream parser, s
 - Data parsing separats from network communicationo
 - Can be used on client and server sides
 
-## 2.6. Server framework
+## 1.6. Server framework
 The most important module in Acl is the server framework, which helps users quickly write back-end services, such as web services. Tools in app/wizard can help users generate one appropriate service code within several seconds. The server framework of Acl includes two parts, one is the services manager, the other is the service written by Acl service template. The services manager named acl_master in Acl comes from the famous Postfix, whose name is master, and acl_master has many extensions to master in order to be as one general services manager. There are six service templates in Acl that can be used to write application services, as below:
 - **Process service:** One connection one process, the advantage is that the programming is simple, safe and stable, and the disadvantage is that the concurrency is too low;
 - **Threads service:** Each process handles all client connections through a set of threads in the thread pool. The IO event trigger mode is used that a connection is bound to a thread only if it has readable data, and the thread will be released after processing the data. The service model's advantage is that it can handle a large number of client connections in one process with a small number of threads. Compare with the aio model, the programming is relatively simple;
@@ -104,18 +130,18 @@ The most important module in Acl is the server framework, which helps users quic
 - **UDP service:** The model is mainly a service model supporting UDP communication process;
 - **Trigger service:** The model instance is mainly used to process the background service process of some scheduled tasks (similar to the system's crontab).
 
-# 3. The other important modules
+# 2. The other important modules
 
-## 3.1. MIME module
+## 2.1. MIME module
 MIME(Multipurpose Internet Mail Extensions) format is widely used in email application. MIME format is too important that it can be used not only for email applications, but also for Web applications. MIME RFC such as RFC2045/RFC2047/RFC822 has been implemented in Acl. Acl has a MIME data stream parser that is indepedent of the IO model, so it can be used by synchronous or asynchronous IO programs.
 
-## 3.2. Codec module
+## 2.2. Codec module
 Thare are some common codecs in Acl, such as Json, Xml, Base64, Url, etc., which are all stream parser and indepedent of IO communication. Json is very popular, so Acl also provides serialization/deserialization tools which can be used to transfer between Json data and C struct objects, which greatly improves the programming efficiency.
 
-## 3.3. Database module
+## 2.3. Database module
 The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresq and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
 
-# 4. Platform support and compilation
+# 3. Platform support and compilation
 Acl project currently supports Linux, Windows, MacOS, FreeBSD, Solaris, Android, IOS.
 - Linux/UNIX: The compiler is gcc, enter the lib_acl/lib_protocol/lib_acl_cpp directory directly in the terminal command line mode, run the make command.
 - Windows: Can be compiled with VS2003/VS2008/VS2010/VS2012/VS2013/VS2015/VS2019. (If you need to compile with VS6/VS2005, you can refer to the compilation conditions of VS2003).
@@ -130,28 +156,29 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 - When using a dynamic library of lib_tls, you need to predefine TLS_DLL in your project.
 - Detailed compilation process, see: [compilation and use of acl library] (BUILD.md)
 
-# 5. More about
-## 5.1. There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
+# 4. More about
+## 4.1. Samples
+There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
 
-## 5.2. Acl using FAQ: [FAQ.md](FAQ.md)
+## 4.2. FAQ
+If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 
-## 5.3. Who are using acl?
+## 4.3. Who are using acl?
 [![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
 [![263](res/logo/logo_263.png)](http://www.263.net/)
 [![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
 [![v1](res/logo/logo_v1.png)](http://www.v1.cn/)
-[![lecloud](res/logo/logo_lecloud.png)](http://www.lecloud.com/)
 [![ksyun](res/logo/logo_ksyun.png)](https://www.ksyun.com/)
 [![weibangong](res/logo/logo_weibangong.png)](https://www.weibangong.com/)
 [![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
 [![foundao](res/logo/logo_foundao.png)](http://www.foundao.com/)
 
-## 5.4. License
+## 4.4. License
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
-## 5.5. Reference
+## 4.5. Reference
 - WEB site: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
-- Oschina:  https://gitee.com/acl-dev/acl
+- Gitee:  https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
 - QQ Group: ，693868497
