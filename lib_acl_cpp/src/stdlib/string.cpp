@@ -899,6 +899,17 @@ string::operator const void *(void) const
 	return (void*) STR(vbf_);
 }
 
+string::operator const std::string (void) const
+{
+	if (!this->empty()) {
+		std::string temp(this->c_str());
+		return temp;
+	} else {
+		std::string temp("");
+		return temp;
+	}
+}
+
 size_t string::hash(void) const
 {
 	if (empty()) {

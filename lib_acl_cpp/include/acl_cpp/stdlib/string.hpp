@@ -665,6 +665,12 @@ public:
 	operator const void*() const;
 
 	/**
+	 * 将 acl::string 转为 std::string
+	 * @return {const std::string}
+	 */
+	operator const std::string() const;
+
+	/**
 	 * 将一个有符号字符添加进当前字符串对象的尾部
 	 * @param ch {char} 有符号字符
 	 * @return {string&} 当前字符串对象的引用
@@ -1337,5 +1343,6 @@ struct hash<acl::string> {
 		return key.hash();
 	}
 };
-}
+} // namespace std
+
 #endif

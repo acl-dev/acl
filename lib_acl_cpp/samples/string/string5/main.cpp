@@ -2,6 +2,7 @@
 #include "acl_cpp/lib_acl.hpp"
 #include <stdio.h>
 #include <string>
+#include <iostream>
 
 static void test(acl::string& buf)
 {
@@ -116,5 +117,12 @@ int main(int argc, char* argv[])
 	else
 		test_mem(max);
 
+	acl::string buf("hello world!");
+
+	// XXX: fixme?
+	// std::cout << buf << std::endl;
+
+	std::string tmp = buf;
+	std::cout << tmp << std::endl;
 	return (0);
 }
