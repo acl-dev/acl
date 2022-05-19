@@ -28,12 +28,12 @@ Architecture diagram:
     * [3.2. Precautions when compiling on Windows](#32-precautions-when-compiling-on-windows)
 
 * [4. Quick start](#4-quick-start)
-    * [4.1. Write your first demo with Acl](#41-write-your-first-demo-with-acl)
-    * [4.2. Write one simple TCP server](#42-write-one-simple-tcp-server)
-    * [4.3. Write one simple TCP client](#43-write-one-simple-tcp-client)
-    * [4.4. Write one Http client](#44-write-one-http-client)
-    * [4.5. Write one redis client](#45-write-one-redis-client)
-    * [4.6. Write one TCP server in coroutine mode](#46-write-one-tcp-server-in-coroutine-mode)
+    * [4.1. The first demo with Acl](#41-the-first-demo-with-acl)
+    * [4.2. Simple TCP server](#42-simple-tcp-server)
+    * [4.3. Simple TCP client](#43-simple-tcp-client)
+    * [4.4. One Http client](#44-one-http-client)
+    * [4.5. Redis client](#45-one-redis-client)
+    * [4.6. Coroutine TCP server](#46-coroutine-tcp-server)
 
 * [5. More about](#5-more-about)
     * [5.1. Samples](#51-samples)
@@ -171,7 +171,7 @@ There are a few things to keep in mind when using dynamic libraries in a WIN32 e
 - Detailed compilation process, see: [Compilation and use of acl library](BUILD.md)
 
 # 4. Quick start
-## 4.1. Write your first demo with Acl
+## 4.1. The first demo with Acl
 ```c++
 #include <iostream>
 #include "acl_cpp/lib_acl.hpp"
@@ -183,7 +183,7 @@ int main(void) {
 }
 ```
 
-## 4.2. Write one simple TCP server
+## 4.2. Simple TCP server
 ```c++
 #include <thread>
 #include "acl_cpp/lib_acl.hpp"
@@ -213,8 +213,10 @@ void run(void) {
 }
 ```
 
-## 4.3. Write one simple TCP client
+## 4.3. Simple TCP client
 ```c++
+#include "acl_cpp/lib_acl.hpp"
+
 void run(void) {
   const char* addr = "127.0.0.1:8088";
   int conn_timeout = 5, rw_timeout = 10;
@@ -223,20 +225,22 @@ void run(void) {
     return;
   }
   const char data[] = "Hello world!\r\n";
-  if (conn.write(data, sizeof(data] - 1)) == -1) {  // Send data to server.
+  if (conn.write(data, sizeof(data) - 1) == -1) {  // Send data to server.
     return;
   }
   char buf[256];
-  int ret;
-  if ((ret = conn.read(buf, sizeof(buf) - 1, false)) > 0) {  // Read from server.
+  int ret = conn.read(buf, sizeof(buf) - 1, false);
+  if (ret > 0) {  // Read from server.
     buf[ret] = 0;
     std::cout << buf << std::endl;
   }
 }
 ```
 
-## 4.4. Write one Http client
+## 4.4. One Http client
 ```c++
+#include "acl_cpp/lib_acl.hpp"
+
 bool run(void) {
   acl::http_request conn("www.baidu.com:80");
   acl::http_header& header = conn.request_header()
@@ -247,11 +251,11 @@ bool run(void) {
   if (!conn.request(NULL, 0)) {
     return false;
   }
-  int status = conn.get_status();
+  int status = conn.http_status();
   if (status != 200) {
     return false;
   }
-  long long len = conn.get_content_length();
+  long long len = conn.body_length();
   if (len <= 0) {
     return true;
   }
@@ -263,26 +267,18 @@ bool run(void) {
 }
 ```
 
-## 4.5. Write one redis client
+## 4.5. One redis client
 ```c++
+#include <thread>
+#include "acl_cpp/lib_acl.hpp"
+
 static void thread_run(acl::redis_client_cluster& conns) {
   acl::redis cmd(&conns);
-  acl::string key, val;
-  for (int i = 0; i < 10; i++) {
-    key.format("key-%d", i);
-    val.format("val-%d", i);
-    if (!cmd.set(key, val)) {
-      printf("set error=%s\r\n", cmd.result_error());
-      break;
-    }
-  }
-
-  cmd.clear();
   std::map<acl::string, acl::string> attrs;
   attrs["name1"] = "value1";
   attrs["name2"] = "value2";
   attrs["name3"] = "value3";
-  key = "hash-key-1";
+  acl::string key = "hash-key-1";
   if (!cmd.hmset(key, attrs)) {
     printf("hmset error=%s\r\n", cmd.result_error());
     return;
@@ -313,8 +309,11 @@ void run(void) {
 }
 ```
 
-## 4.6. Write one TCP server in coroutine mode
+## 4.6. Coroutine TCP server
 ```c++
+#include "acl_cpp/lib_acl.hpp"
+#include "fiber/go_fiber.hpp"
+
 void run(void) {
   const char* addr = "127.0.0.1:8088";
   acl::server_socket server;
