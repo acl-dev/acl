@@ -90,5 +90,6 @@ private:
 	bool load_file();
 	void lookup_all();
 
-	static void dns_result(ACL_DNS_DB *dns_db, void *ctx, int errnum);
+	static void dns_result(ACL_DNS_DB *dns_db, void *ctx, int errnum,
+		const ACL_RFC1035_MESSAGE*);
 };

@@ -175,7 +175,8 @@ void nslookup::lookup_all()
 	acl_aio_free(aio);
 }
 
-void nslookup::dns_result(ACL_DNS_DB *dns_db, void *ctx, int errnum)
+void nslookup::dns_result(ACL_DNS_DB *dns_db, void *ctx, int errnum,
+	const ACL_RFC1035_MESSAGE*)
 {
 	domain_info* info = (domain_info*) ctx;
 

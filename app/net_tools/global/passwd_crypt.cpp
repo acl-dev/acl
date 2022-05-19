@@ -1,5 +1,5 @@
 #include "StdAfx.h"
-#include "polarssl/des.h"
+#include "mbedtls-2.7.12/des.h"
 #include "passwd_crypt.h"
 
 static const unsigned char des3_test_keys[24] =
@@ -17,12 +17,12 @@ static const unsigned char des3_test_iv[8] =
 char* passwd_crypt(const char* in)
 {
 	const char* myname = "passwd_crypt";
-	des3_context ctx;
+	mbedtls_des3_context ctx;
 	unsigned char iv[8];
 	unsigned char* data, *result;
 	size_t len;
 
-	if (des3_set3key_enc(&ctx, des3_test_keys) != 0)
+	if (mbedtls_des3_set3key_enc(&ctx, des3_test_keys) != 0)
 	{
 		acl_msg_error("%s: des3_set3key_enc error!", myname);
 		return NULL;
@@ -35,7 +35,7 @@ char* passwd_crypt(const char* in)
 
 	memcpy(iv, des3_test_iv, 8);
 
-	if (des3_crypt_cbc(&ctx, DES_ENCRYPT, len, iv, data, data) != 0)
+	if (mbedtls_des3_crypt_cbc(&ctx, MBEDTLS_DES_ENCRYPT, len, iv, data, data) != 0)
 	{
 		acl_myfree(data);
 		acl_msg_error("%s: des3_crypt_cbc error!", myname);
@@ -49,13 +49,13 @@ char* passwd_crypt(const char* in)
 char* passwd_decrypt(const char* in)
 {
 	const char* myname = "passwd_decrypt";
-	des3_context ctx;
+	mbedtls_des3_context ctx;
 	unsigned char iv[8];
 	unsigned char* buf;
 	char* data;
 	int   n;
 
-	if (des3_set3key_dec(&ctx, des3_test_keys) != 0)
+	if (mbedtls_des3_set3key_dec(&ctx, des3_test_keys) != 0)
 	{
 		acl_msg_error("%s: des3_set3key_dec error!", myname);
 		return NULL;
@@ -75,7 +75,7 @@ char* passwd_decrypt(const char* in)
 	memcpy(buf, data, n);
 	acl_myfree(data);
 
-	if (des3_crypt_cbc(&ctx, DES_DECRYPT, n, iv, buf, buf) != 0)
+	if (mbedtls_des3_crypt_cbc(&ctx, MBEDTLS_DES_DECRYPT, n, iv, buf, buf) != 0)
 	{
 		acl_myfree(buf);
 		acl_msg_error("%s: des3_crypt_cbc error!", myname);

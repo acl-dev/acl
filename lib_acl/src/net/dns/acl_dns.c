@@ -524,7 +524,7 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 		/* 设置定时器 */
 		if (dns->aio) {
 			acl_aio_request_timer(dns->aio, dns->lookup_timeout,
-				req, dns->timeout * 1000000, 0);
+				req, ((long long) dns->timeout) * 1000000, 0);
 		} else {
 			acl_msg_error("%s(%d): dns->aio NULL", __FUNCTION__, __LINE__);
 		}
@@ -902,7 +902,7 @@ END_FOREACH_TAG:
 
 	/* 设置定时器 */
 	acl_aio_request_timer(dns->aio, dns->lookup_timeout,
-		req, dns->timeout * 1000000, 0);
+		req, ((long long) dns->timeout) * 1000000, 0);
 }
 
 void acl_dns_cancel(ACL_DNS_REQ *req)
