@@ -1,35 +1,49 @@
-# acl redis -- one C++ redis lib based on acl
+# Acl redis - One C++ redis client library in Acl
 
-## descrption
-The acl redis is one C++ redis lib, which is one part of acl project. There're 12 redis CLASS and 150+ redis commands included in the acl redis. The acl redis provides all functions for each redis command including  including STRING, HASH, LIST, SET, ZSET, HLL, PUBSUB, TRANSACTION, SCRIPT, CONNECTION, SERVER. And the new cluster redis3.0's new commands(MOVE, ASK) are also implemented in the acl redis.
-The header files of acl redis are in lib_acl_cpp\include\acl_cpp\redis; the source code files are in lib_acl_cpp\src\redis; and the redis samples are in lib_acl_cpp\samples\redis.
+## 0. Introduction
+The redis module in Acl is a powerful redis client library with higth performance, rich interface and easy to use. There are more than 13 C++ classes and over 150 commands in Acl redis, including STRING, HASH, LIST, SET, ZSET, HyperLogLog, PUBSUB, STREAM, TRANSACTION, SCRIPT, CONNECTION, SERVER, etc. User using Acl redis doesn't need care about network comminucation, redis protocol, hash slots caching, etc., just like using C++ STL standard interface.
 
-## compile
-Because acl redis lib is a part of lib_acl_cpp lib, and lib_acl_cpp depend lib_acl and lib_protocol, you should compile lib_acl and lib_protocol libs first, and compile lib_acl_cpp lib. After you've compiled lib_acl_cpp lib, the redis lib is also compiled OK.
+<hr>
 
-### compile on UNIX/LINUX
-- 1 compile `lib_acl.a`: Enter into *lib_acl* path and type make, the lib_acl.a will be compiled
-- 2 compile `lib_protocol.a`: Enter into *lib_protocol* path and type make, the lib_protocol.a will be compiled
-- 3 compile `lib_acl_cpp.a`: Enter into *lib_acl_cpp* path and type make, the lib_acl_cpp.a will be compiled
-- 4 compile redis samples: Enter into lib_acl_cpp\samples\redis and type make, all the redis samples(including redis_cluster, redis_connection, redis_hash, redis_hyperloglog, redis_key, redis_lib, redis_manager, redis_pool, redis_pubsub, redis_server, redis_set, redis_string, redis_trans, redis_zset, redis_zset_pool, redis_client_cluster) will be compiled.
+* [0. Introduction](#0-introduction)
+* [1. Building Acl redis](#1-building-acl-redis)
+    * [1.1. Compiling on UNIX/LINUX](#11-compiling-on-unixlinux)
+    * [1.2. Compiling on Windows](#12-compiling-on-windows)
+* [2. Write some examples using Acl redis](#2-write-some-examples-using-acl-redis)
+    * [2.1. Simple example for redis STRING and redis KEY](#21-simple-example-for-redis-string-and-redis-key)
+    * [2.2. Redis client cluster example for redis3.0+](#22-redis-client-cluster-example-for-redis30)
+    * [2.3. Using redis client cluster in multi-threads](#23-using-redis-client-cluster-in-multi-threads)
+    * [2.4. Use redis pipeline in multi-threads](#24-use-redis-pipeline-in-multi-threads)
+* [3. Add Acl redis to your projects](#3-add-acl-redis-to-your-projects)
+    * [3.1. On UNIX/LINUX](#31-on-unixlinux)
+    * [3.2. On Windows](#32-on-windows)
+* [4. Reference](#4-reference)
+* [5. About Acl](#5-about-acl)
 
-### compile on WINDOWS
-You can use `VC2003`, `VC2008`, `VC2010`, `VC2012` to build all acl libs including acl redis lib in lib_acl_cpp module when you open the acl projects(acl_cpp_vc2003.sln, acl_cpp_vc2008.sln, acl_cpp_vc2010.sln, acl_cpp_vc2012.sln). You should build lib_acl first, and second build lib_protocol, and third build lib_acl_cpp, and at last build all the acl samples including redis samples.
+<hr>
 
-## write some samples using acl redis lib
-### simple example for redis STRING and redis KEY:
+## 1. Building Acl redis
+Acl redis is a part of lib_acl_cpp, so users only need to build the Acl project.
 
+### 1.1. Compiling on UNIX/LINUX
+- Enter the root directory of the Acl project and type **make**, **libacl_all.a** will be created later, which consists of three libraries: **libacl_cpp.a**, **lib_protocol.a** and **lib_acl.a**;
+- Compile redis samples: Enter into lib_acl_cpp/samples/redis and type **make**, all the redis samples(including redis_cluster, redis_connection, redis_hash, redis_hyperloglog, redis_key, redis_lib, redis_manager, redis_pool, redis_pubsub, redis_server, redis_set, redis_string, redis_trans, redis_zset, redis_zset_pool, redis_client_cluster) will be compiled.
+
+### 1.2. Compiling on Windows
+Users can use `VS2003/VS2008/VS2010/VS2012/VS2015/VS2017/VS1019` to compile all Acl libraries by opening the Acl projects(acl_cpp_vc2003.sln, acl_cpp_vc2008.sln, acl_cpp_vc2010.sln, acl_cpp_vc2012.sln, acl_cpp_vc2015.sln, acl_cpp_vc2017.sln, acl_cpp_vc2019.sln) with the corresponding VS tools. Due to the dependency in Acl, lib_acl should be compiled first, then lib_protocol, and finally lib_acl_cpp.
+
+## 2. Write some examples using Acl redis
+### 2.1. Simple example for redis STRING and redis KEY:
 ```c++
 #include <stdlib.h>
 #include <stdio.h>
 #include "acl_cpp/lib_acl.hpp"
 
-static void test_redis_string(acl::redis_string& cmd, const char* key)
-{
+static void test_redis_string(acl::redis& cmd, const char* key) {
 	acl::string val("test_value");
 
 	// call redis-server: SET key value
-	if (cmd.set(key, val.c_str()) == false) {
+	if (!cmd.set(key, val.c_str())) {
 		printf("redis set error\r\n");
 		return;
 	}
@@ -41,20 +55,20 @@ static void test_redis_string(acl::redis_string& cmd, const char* key)
 	cmd.clear();
 
 	// call redis-server: GET key
-	if (cmd.get(key, val) == false)
+	if (!cmd.get(key, val)) {}
 		printf("get key error\r\n");
+	}
 }
 
-static void test_redis_key(acl::redis_key& cmd, const char* key)
-{
-	if (cmd.exists(key) == false)
-		printf("key not exists\r\n");
-	else
+static void test_redis_key(acl::redis& cmd, const char* key) {
+	if (cmd.exists(key)) {
 		printf("key exists\r\n");
+	} else {
+		printf("key not exists\r\n");
+	}
 }
 
-int main(void)
-{
+int main(void) {
 	// init socket module for windows
 	acl::acl_cpp_init();
 
@@ -66,117 +80,63 @@ int main(void)
 
 	const char* key = "test_key";
 
-	// test redis STRING command
-	// bind redis_string command with redis connection
-	acl::redis_string cmd_string(&conn);
-	test_redis_string(cmd_string, key);
+	// Bind redis_string command with redis connection.
+	acl::redis cmd(&conn);
+	test_redis_string(cmd, key);
 
-	// test redis KEY command with the same redis connection
-	acl::redis_key cmd_key(&conn);
-	test_redis_key(cmd_key, key);
+	cmd.clear();  // Clear the temp memory.
+
+	// Test redis KEY command with the same redis connection.
+	test_redis_key(cmd, key);
+
+	return 0;
 }
 ```
-### redis client cluster example for redis3.0
-```c++
-int main(void)
-{
-	// init socket module for windows
-	acl::acl_cpp_init();
-
-	const char* redis_addr = "127.0.0.1:6379";
-	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
-
-	// declare redis cluster ojbect
-	acl::redis_client_cluster cluster;
-	cluster.set(redis_addr, max_conns, conn_timeout, rw_timeout);
-
-	// redis operation command
-	acl::redis_string cmd_string;
-	acl::redis_key cmd_key;
-
-	// bind redis command with redis cluster
-	cmd_string.set_cluster(&cluster, max_conns);
-	cmd_key.set_cluster(&cluster, max_conns);
-
-	const char* key = "test_key";
-
-	// call redis server
-	test_redis_string(cmd_string, key);
-	test_redis_key(cmd_key, key);
-}
-```
-The redis cluster support caching the redis hash-slot in client for performance, and can dynamic add redis server nodes in running.
-
-
-### another way to use acl redis easily
-The acl::redis class inherits from all the other acl redis command class, which includes all the redis client commands. So you can use the acl::redis class just as you can do in all the redis-client-commands class.
-
+### 2.2. Redis client cluster example for redis3.0+
 ```c++
 #include <stdlib.h>
 #include <stdio.h>
 #include "acl_cpp/lib_acl.hpp"
 
-static void test_redis_string(acl::redis& cmd, const char* key)
-{
-	acl::string val("test_value");
-
-	// call redis-server: SET key value
-	if (cmd.set(key, val.c_str()) == false) {
-		printf("redis set error\r\n");
-		return;
-	}
-
-	// clear the string buf space
-	val.clear();
-
-	// reset the redis command object for reusing it
-	cmd.clear();
-
-	// call redis-server: GET key
-	if (cmd.get(key, val) == false)
-		printf("get key error\r\n");
-}
-
-static void test_redis_key(acl::redis& cmd, const char* key)
-{
-	if (cmd.exists(key) == false)
-		printf("key not exists\r\n");
-	else
-		printf("key exists\r\n");
-}
-
-int main(void)
-{
-	// init socket module for windows
+int main(void) {
+	// Init socket module for windows
 	acl::acl_cpp_init();
 
 	const char* redis_addr = "127.0.0.1:6379";
 	int conn_timeout = 10, rw_timeout = 10, max_conns = 100;
 
-	// declare redis cluster ojbect
+	// Declare redis connection cluster ojbect.
 	acl::redis_client_cluster cluster;
 	cluster.set(redis_addr, max_conns, conn_timeout, rw_timeout);
 
-	// redis operation command
+	// Redis operation command.
 	acl::redis cmd;
 
-	// bind redis command with redis cluster
-	cmd.set_cluster(&cluster, max_conns);
+	// Bind redis command with redis connection cluster.
+	cmd.set_cluster(&cluster);
 
 	const char* key = "test_key";
 
-	// call redis server
+	// Call redis server
 	test_redis_string(cmd, key);
+	cmd.clear();
 	test_redis_key(cmd, key);
+
+	return 0;
 }
 ```
+The redis cluster module of Acl supports caching the redis hash slots on client to improve performance, and can dynamically change local hash slots at runtime.
 
-### use redis client cluster in multi-threads
+### 2.3. Using redis client cluster in multi-threads
 ```c++
+#include <stdlib.h>
+#include <stdio.h>
+#include <pthread.h>
+#include "acl_cpp/lib_acl.hpp"
+
 static int __max_conns = 100;
 
-static void* thread_main(void* arg)
-{
+static void* thread_main(void* arg) {
 	acl::redis_client_cluster* cluster = (acl::redis_client_cluster*) arg;
 
 	acl::redis cmd;
@@ -187,13 +147,13 @@ static void* thread_main(void* arg)
 	for (int i = 0; i < 100000; i++) {
 		test_redis_string(cmd, key);
 		test_redis_key(cmd, key);
+		cmd.clear(); // Clear temporary meory to avoid meory overflow.
 	}
 
 	return NULL;
 }
 
-int main(void)
-{
+int main(void) {
 	// init socket module for windows
 	acl::acl_cpp_init();
 
@@ -222,11 +182,14 @@ int main(void)
 }
 ```
 
-### use redis pipeline in multi-threads
+### 2.4. Use redis pipeline in multi-threads
 ```c++
+#include <stdlib.h>
+#include <stdio.h>
+#include <pthread.h>
+#include "acl_cpp/lib_acl.hpp"
 
-static void* thread_main(void* arg)
-{
+static void* thread_main(void* arg) {
 	acl::redis_client_pipeline* pipeline = (acl::redis_client_pipeline*) arg;
 
 	acl::redis cmd;
@@ -243,17 +206,16 @@ static void* thread_main(void* arg)
 	return NULL;
 }
 
-int main(void)
-{
-	// init socket module for windows
+int main(void) {
+	// Init socket module for windows
 	acl::acl_cpp_init();
 
 	const char* redis_addr = "127.0.0.1:6379";
 
-	// declare redis pipeline ojbect
+	// Declare redis pipeline ojbect
 	acl::redis_client_pipeline pipeline(redis_addr);
 
-	// start the pipeline thread
+	// Start the pipeline thread backend.
 	pipeline.start_thread();
 
 	pthread_attr_t attr;
@@ -282,42 +244,42 @@ int main(void)
 }
 ```
 
-### add acl redis to your projects
-Before you use the acl redis, you should compile the three base libraries which redis depending on. Enter the *lib_acl*, *lib_protocol*, *lib_acl_cpp*, and build the `lib_acl.a`, `lib_protocol.a` and `lib_acl_cpp.a`.
+## 3. Add acl redis to your projects
+Before using Acl redis, you should compile the three basic libraries. Enter the *lib_acl*, *lib_protocol*, *lib_acl_cpp*, and build the `lib_acl.a`, `lib_protocol.a` and `libacl_cpp.a`.
 ```compile
 $cd lib_acl; make
 $cd lib_protocol; make
 $cd lib_acl_cpp; make
 ```
 
-#### On UNIX/LINUX
-In your Makefile, you should add below compiling flags:
--DLINUX2 for LINUX, -DFREEBSD for FreeBSD, -DMACOSX for MAXOS, -DSUNOS5 for Solaris X86;
--I path specify the lib_acl.hpp's parent path, for exmaple: -I./lib_acl_cpp/include, in the lib_acl_cpp/include path the acl_cpp path should be included;
-At last, link with -L{path_to_acl_cpp} -l_acl_cpp -L{path_to_protocol} -l_protocol -L{path_to_acl) -l_acl
-Of couse you can look at the Makefile.in in lib_acl_cpp\samples and Makfile in lib_acl_cpp\samples\redis\ to find the build conditions.
+### 3.1. On UNIX/LINUX
+You should add the following compilation options in your Makefile:
+- **Compling options:** `-I` specify the lib_acl.hpp's parent path, for exmaple: `-I./lib_acl_cpp/include`;
+- **Linking options:** Link with -L{path_to_acl_cpp} -lacl_cpp -L{path_to_protocol} -lprotocol -L{path_to_acl) -lacl ;
+- **Reference:** lib_acl_cpp/samples/Makefile.in, lib_acl_cpp/samples/redis/redis/Makefile.
+
 One Makefile as below:
 ```Makefile
+ACL_PATH=./acl
 CFLAGS = -c -g -W -O3 -Wall -Werror -Wshadow \
--Wno-long-long -Wpointer-arith -D_REENTRANT \
--D_POSIX_PTHREAD_SEMANTICS -DLINUX2 \
--I ./lib_acl_cpp/include
-BASE_PATH=./acl
-LDFLAGS = -L$(BASE_PATH)/lib_acl_cpp/lib -l_acl_cpp \
-	-L$(BASE_PATH)/lib_protocol/lib -l_protocol \
-	-L$(BASE_PATH)/lib_acl/lib -l_acl \
+	-Wno-long-long -Wpointer-arith -D_REENTRANT \
+	-D_POSIX_PTHREAD_SEMANTICS \
+	-I $(ACL_PATH)/lib_acl_cpp/include
+LDFLAGS = -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
+	-L$(ACL_PATH)/lib_protocol/lib -lprotocol \
+	-L$(ACL_PATH)/lib_acl/lib -lacl \
 	-lpthread
 test: main.o
 	g++ -o main.o $(LDFLAGS)
 main.o: main.cpp
 	g++ $(CFLAGS) main.cpp -o main.o
 ```
-### On WIN32
+### 3.2. On Windows
 Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and look at at the redis samples project option setting.
 
-## reference
-- redis include in acl: [redis include files](../../include/acl_cpp/redis/)
-- redis src in acl: [redis source files](../../src/redis/)
-
-## Authors
-the acl redis lib was written by zsx, the lib is just one part of acl project which includes lib_acl(base C lib), lib_protocol(http/icmp/smtp C libs) and lib_acl_cpp(a wrapper of lib_acl and lib_protocol witch C++, including one more other useful libs).
+## 4. Reference
+- Acl redis headers: [Redis include files](../../include/acl_cpp/redis/)
+- Acl redis source: [Redis source files](../../src/redis/)
+- More examples: See examples in the current directory
+## 5. About Acl
+- See [About Acl](../../../README.md)
