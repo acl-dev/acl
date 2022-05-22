@@ -5,8 +5,8 @@
 #include <unistd.h>
 #include "fiber/libfiber.h"
 
-#define	STACK_SIZE	160000
-
+static int __stack_size	= 128000;
+static int __shared_stack = 0;
 static int __rw_timeout = 0;
 
 static int http_client(ACL_VSTREAM *cstream, const char* res, size_t len)
@@ -49,8 +49,9 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	size_t len = strlen(res);
 
 	while (1) {
-		if (http_client(cstream, res, len) < 0)
+		if (http_client(cstream, res, len) < 0) {
 			break;
+		}
 	}
 
 	acl_vstream_close(cstream);
@@ -60,6 +61,11 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
 	int  fd;
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, __stack_size);
+	acl_fiber_attr_setsharestack(&attr, __shared_stack);
 
 	for (;;) {
 		ACL_VSTREAM *cstream = acl_vstream_accept(sstream, NULL, 0);
@@ -70,7 +76,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 		}
 
 		fd = ACL_VSTREAM_SOCK(cstream);
-		acl_fiber_create(echo_client, cstream, STACK_SIZE);
+		acl_fiber_create2(&attr, echo_client, cstream);
 		printf("accept one over: %d\r\n", fd);
 	}
 
@@ -81,8 +87,9 @@ static void* thread_main(void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
 
+
 	printf("%s: call fiber_creater\r\n", __FUNCTION__);
-	acl_fiber_create(fiber_accept, sstream, STACK_SIZE);
+	acl_fiber_create(fiber_accept, sstream, 128000);
 
 	printf("call fiber_schedule\r\n");
 	acl_fiber_schedule();
@@ -94,7 +101,10 @@ static void usage(const char *procname)
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
 		" -t max_threads\r\n"
-		" -r rw_timeout\r\n", procname);
+		" -r rw_timeout\r\n"
+		" -z stack_size[default: 128000]\r\n"
+		" -S [if use shared stack]\r\n",
+		procname);
 }
 
 int main(int argc, char *argv[])
@@ -107,7 +117,7 @@ int main(int argc, char *argv[])
 
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9001");
 
-	while ((ch = getopt(argc, argv, "hs:r:t:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:t:z:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -121,6 +131,12 @@ int main(int argc, char *argv[])
 		case 't':
 			nthreads = atoi(optarg);
 			break;
+		case 'z':
+			__stack_size = atoi(optarg);
+			break;
+		case 'S':
+			__shared_stack = 1;
+			break;
 		default:
 			break;
 		}
@@ -131,7 +147,8 @@ int main(int argc, char *argv[])
 		printf("acl_vstream_listen error %s\r\n", acl_last_serror());
 		return 1;
 	}
-	printf("listen %s ok\r\n", addr);
+
+	printf("listen %s ok, ACL_VSTREAM's size=%zd\r\n", addr, sizeof(ACL_VSTREAM));
 
 	for (i = 0; i < nthreads; i++) {
 		acl_pthread_t* tid = acl_mymalloc(sizeof(acl_pthread_t));
