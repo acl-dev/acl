@@ -34,7 +34,7 @@ Architecture diagram:
     * [4.3. Simple TCP client](#43-simple-tcp-client)
     * [4.4. Coroutine TCP server](#44-coroutine-tcp-server)
     * [4.5. One Http client](#45-one-http-client)
-    * [4.6. Coroutine Http server](#46-one-http-server)
+    * [4.6. Coroutine Http server](#46-coroutine-http-server)
     * [4.7. One Redis client](#47-one-redis-client)
 
 * [5. More about](#5-more-about)
