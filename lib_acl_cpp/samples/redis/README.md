@@ -275,7 +275,7 @@ main.o: main.cpp
 	g++ $(CFLAGS) main.cpp -o main.o
 ```
 ### 3.2. On Windows
-Open acl_cpp_vc2003.sln/acl_cpp_vc2008.sln/acl_cpp_vc2010.sln/acl_cpp_vc2012.sln, and look at at the redis samples project option setting.
+Open the VS projects, such as acl_cpp_vc2003.sln, acl_cpp_vc2008.sln, acl_cpp_vc2010.sln, acl_cpp_vc2012.sln, acl_cpp_vc2013.sln, acl_cpp_vc2015.sln, acl_cpp_vc2017.sln, or acl_cpp_vc2019.sln to  look at the redis samples project option setting.
 
 ## 4. Reference
 - Acl redis headers: [Redis include files](../../include/acl_cpp/redis/)
