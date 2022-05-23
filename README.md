@@ -23,6 +23,9 @@ Architecture diagram:
     * [2.1. MIME module](#21-mime-module)
     * [2.2. Codec module](#22-codec-module)
     * [2.3. Database module](#23-database-module)
+    * [2.4. Connection pool manager](#24-connection-pool-manager)
+    * [2.5. The other client libraries](#25-the-other-client-libraries)
+    * [2.6. DNS module](#26-dns-module)
 
 * [3. Platform support and compilation](#3-platform-support-and-compilation)
     * [3.1. Compiling Acl on different platforms](#31-compiling-acl-on-different-platforms)
@@ -152,7 +155,16 @@ MIME(Multipurpose Internet Mail Extensions) format is widely used in email appli
 Thare are some common codecs in Acl, such as Json, Xml, Base64, Url, etc., which are all stream parser and indepedent of IO communication. Json is very popular, so Acl also provides serialization/deserialization tools which can be used to transfer between Json data and C struct objects, which greatly improves the programming efficiency.
 
 ## 2.3. Database module
-The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresq and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
+The unified database interface in Acl is designed to easily and safely operate thease well-known open source databases such as Mysql, Postgresql and SQLite. The SQL codec is designed to escape the charactors to avoid the DB SQL attacks. When users use Acl to write database applications, Acl will dynamically load the dynamic libraries of Mysql, Postgresql or SQLite. The advantage of dynamic loading is that users who don't need the database functionality don't care about it at all.
+
+## 2.4. Connection pool manager
+There's a genernal connection pool manager in Acl, which is used widely by the other important modules, including redis, database, and http modules, etc.
+
+## 2.5. The other client libraries
+In addition to redis client, Acl also implements some other important client libraries, such as memcached client, handler-socket, beanstalk, disque and so on.
+
+## 2.6. DNS module
+Acl not only wraps the system DNS API, such as getaddrinfo and gethostbyname, but also implements the DNS protocol specified in RFC1035. Users can use the DNS module in Acl to implement their own DNS client or server.
 
 # 3. Platform support and compilation
 ## 3.1. Compiling Acl on different platforms
