@@ -33,8 +33,9 @@ Architecture diagram:
     * [4.2. Simple TCP server](#42-simple-tcp-server)
     * [4.3. Simple TCP client](#43-simple-tcp-client)
     * [4.4. One Http client](#44-one-http-client)
-    * [4.5. Redis client](#45-one-redis-client)
-    * [4.6. Coroutine TCP server](#46-coroutine-tcp-server)
+    * [4.5. One Http server](#45-one-http-server)
+    * [4.6. Redis client](#46-one-redis-client)
+    * [4.7. Coroutine TCP server](#47-coroutine-tcp-server)
 
 * [5. More about](#5-more-about)
     * [5.1. Samples](#51-samples)
@@ -268,7 +269,63 @@ bool run(void) {
 }
 ```
 
-## 4.5. One redis client
+## 4.5. One Http server
+```c++
+#include "acl_cpp/lib_acl.hpp"  // Must before http_server.hpp
+#include "fiber/http_server.hpp"
+
+static char *var_cfg_debug_msg;
+static acl::master_str_tbl var_conf_str_tab[] = {
+  { "debug_msg", "test_msg", &var_cfg_debug_msg },
+  { 0, 0, 0 }
+};
+
+static int  var_cfg_io_timeout;
+static acl::master_int_tbl var_conf_int_tab[] = {
+  { "io_timeout", 120, &var_cfg_io_timeout, 0, 0 },
+  { 0, 0 , 0 , 0, 0 }
+};
+
+int main(int argc, char* argv[]) {
+  const char* addr = "0.0.0.0|8194";
+  const char* conf = argc >= 2 ? argv[1] : NULL;
+  acl::http_server server;
+
+  // call the methods in acl::http_server
+  server.set_cfg_int(var_conf_int_tab).set_cfg_str(var_conf_str_tab);
+
+  // call the methods in acl::master_base class
+  server.on_proc_init([&addr] {
+    printf("---> after process init: addr=%s, io_timeout=%d\r\n", addr, var_cfg_io_timeout);
+  }).on_proc_exit([] {
+    printf("---> before process exit\r\n");
+  }).on_proc_sighup([] (acl::string& s) {
+    s = "+ok";
+    printf("---> process got sighup\r\n");
+    return true;
+  }).on_thread_accept([] (acl::socket_stream& conn) {
+    printf("---> accept %d\r\n", conn.sock_handle());
+    return true;
+  }).Get("/", [](acl::HttpRequest&, acl::HttpResponse& res) {
+    std::string buf("hello world1!\r\n");
+    res.setContentLength(buf.size());
+    return res.write(buf.c_str(), buf.size());
+  }).Post("/json", [](acl::HttpRequest& req, acl::HttpResponse& res) {
+    acl::json* json = req.getJson();
+    if (json) {
+      return res.write(*json);
+    } else {
+      std::string buf = "no json got\r\n";
+      res.setContentLength(buf.size());
+      return res.write(buf.c_str(), buf.size());
+    }
+  }).run_alone(addr, conf);
+
+  return 0;
+}
+```
+
+## 4.6. One redis client
 ```c++
 #include <thread>
 #include "acl_cpp/lib_acl.hpp"
@@ -310,7 +367,7 @@ void run(void) {
 }
 ```
 
-## 4.6. Coroutine TCP server
+## 4.7. Coroutine TCP server
 ```c++
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/go_fiber.hpp"
