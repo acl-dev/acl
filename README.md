@@ -291,10 +291,10 @@ int main(int argc, char* argv[]) {
   const char* conf = argc >= 2 ? argv[1] : NULL;
   acl::http_server server;
 
-  // call the methods in acl::http_server
+  // Call the methods in acl::master_base class .
   server.set_cfg_int(var_conf_int_tab).set_cfg_str(var_conf_str_tab);
 
-  // call the methods in acl::master_base class
+  // Call the methods in acl::http_server .
   server.on_proc_init([&addr] {
     printf("---> after process init: addr=%s, io_timeout=%d\r\n", addr, var_cfg_io_timeout);
   }).on_proc_exit([] {
