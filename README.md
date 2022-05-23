@@ -32,10 +32,10 @@ Architecture diagram:
     * [4.1. The first demo with Acl](#41-the-first-demo-with-acl)
     * [4.2. Simple TCP server](#42-simple-tcp-server)
     * [4.3. Simple TCP client](#43-simple-tcp-client)
-    * [4.4. One Http client](#44-one-http-client)
-    * [4.5. One Http server](#45-one-http-server)
-    * [4.6. Redis client](#46-one-redis-client)
-    * [4.7. Coroutine TCP server](#47-coroutine-tcp-server)
+    * [4.4. Coroutine TCP server](#44-coroutine-tcp-server)
+    * [4.5. One Http client](#45-one-http-client)
+    * [4.6. Coroutine Http server](#46-one-http-server)
+    * [4.7. One Redis client](#47-one-redis-client)
 
 * [5. More about](#5-more-about)
     * [5.1. Samples](#51-samples)
@@ -239,7 +239,39 @@ void run(void) {
 }
 ```
 
-## 4.4. One Http client
+## 4.4. Coroutine TCP server
+```c++
+#include "acl_cpp/lib_acl.hpp"
+#include "fiber/go_fiber.hpp"
+
+void run(void) {
+  const char* addr = "127.0.0.1:8088";
+  acl::server_socket server;
+  if (!server.open(addr)) {
+    return;
+  }
+
+  go[&] {  // Create one server coroutine to wait for connection.
+    while (true) {
+      acl::socket_stream* conn = server.accept();
+      if (conn) {
+        go[=] {  // Create one client coroutine to handle the connection.
+          char buf[256];
+          int ret = conn->read(buf, sizeof(buf), false);
+          if (ret > 0) {
+            (void) conn->write(buf, ret);
+          }
+          delete conn;
+        };
+      }
+    }
+  };
+
+  acl::fiber::schedule();  // Start the coroutine scheculde process.
+}
+```
+
+## 4.5. One Http client
 ```c++
 #include "acl_cpp/lib_acl.hpp"
 
@@ -269,7 +301,7 @@ bool run(void) {
 }
 ```
 
-## 4.5. One Http server
+## 4.6. Coroutine Http server
 ```c++
 #include "acl_cpp/lib_acl.hpp"  // Must before http_server.hpp
 #include "fiber/http_server.hpp"
@@ -325,7 +357,7 @@ int main(int argc, char* argv[]) {
 }
 ```
 
-## 4.6. One redis client
+## 4.7. One redis client
 ```c++
 #include <thread>
 #include "acl_cpp/lib_acl.hpp"
@@ -342,7 +374,6 @@ static void thread_run(acl::redis_client_cluster& conns) {
     return;
   }
 
-  cmd.clear();
   attrs.clear();
   if (!cmd.hgetall(key, attrs)) {
     printf("hgetall error=%s\r\n", cmd.result_error());
@@ -364,38 +395,6 @@ void run(void) {
   for (size_t i = 0; i < nthreads; i++) {
     threads[i].join();
   }
-}
-```
-
-## 4.7. Coroutine TCP server
-```c++
-#include "acl_cpp/lib_acl.hpp"
-#include "fiber/go_fiber.hpp"
-
-void run(void) {
-  const char* addr = "127.0.0.1:8088";
-  acl::server_socket server;
-  if (!server.open(addr)) {
-    return;
-  }
-
-  go[&] {  // Create one server coroutine to wait for connection.
-    while (true) {
-      acl::socket_stream* conn = server.accept();
-      if (conn) {
-        go[=] {  // Create one client coroutine to handle the connection.
-          char buf[256];
-          int ret = conn->read(buf, sizeof(buf), false);
-          if (ret > 0) {
-            (void) conn->write(buf, ret);
-          }
-          delete conn;
-        };
-      }
-    }
-  };
-
-  acl::fiber::schedule();  // Start the coroutine scheculde process.
 }
 ```
 
