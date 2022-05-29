@@ -40,6 +40,12 @@ static void add_addrs(acl::string& buf, const std::vector<acl::string>& addrs) {
 
 static void show_addrs(const char* client_addr, const char* name,
 		const acl::rfc1035_response& res) {
+	const char* pname = name;
+	const acl::token_node* node = var_display_disabled.search(&pname);
+	if (node != NULL) {
+		return;
+	}
+
 	acl::string buf;
 	buf.format("client=%s, name=%s", client_addr, name);
 
@@ -189,9 +195,8 @@ static void handle_request(request_message& msg) {
 
 	acl::string key(name);
 	key.lower();
-	if (var_display_disabled.find(key) == var_display_disabled.end()) {
-		show_addrs(msg.peer_addr_.c_str(), name, res);
-	}
+
+	show_addrs(msg.peer_addr_.c_str(), name, res);
 
 	acl::socket_stream reply_sock;
 	reply_sock.open(msg.server_->sock_handle(), true);
@@ -226,7 +231,7 @@ static void service_main(acl::fiber_tbox<request_message>* box) {
 	};
 
 	if (var_cfg_manage_addr && *var_cfg_manage_addr) {
-		go [] {
+		go[] {
 			manage_service_start(var_cfg_manage_addr);
 		};
 	}

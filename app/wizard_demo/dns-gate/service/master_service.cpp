@@ -46,7 +46,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 	{ 0, 0 , 0 , 0, 0 }
 };
 
-std::set<acl::string> var_display_disabled;
+acl::token_tree var_display_disabled;
 acl::redis_client_cluster* var_redis_conns = NULL;
 dgate_db* var_db = NULL;
 black_list* var_black_list;
@@ -86,19 +86,17 @@ void master_service::thread_on_init(void)
 
 void master_service::proc_on_bind(acl::socket_stream&)
 {
-	logger(">>>proc_on_bind<<<");
 }
 
 void master_service::proc_on_init(void)
 {
-	logger(">>>proc_on_init: %s<<<", var_cfg_display_disabled);
-
 	if (var_cfg_display_disabled && *var_cfg_display_disabled) {
 		acl::string buf(var_cfg_display_disabled);
 		buf.lower();
 		const std::vector<acl::string>& tokens = buf.split2(",; \t\r\n");
 		for (std::vector<acl::string>::const_iterator cit = tokens.begin();
 			cit != tokens.end(); ++cit) {
+			logger("Not show: %s", (*cit).c_str());
 			var_display_disabled.insert(*cit);
 		}
 	}

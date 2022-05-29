@@ -24,7 +24,8 @@ static void test1(const char* tokens[])
 static void test2(void)
 {
 	const char* disks = "/data1; /data2; /data3; /data4; /data; /data5;"
-		" /data6; /data7; /data8; /data9; /data10; /data10/www";
+		" /data6; /data7; /data8; /data9; /data10; /data10/www"
+		" .baidu.com; sina.com; sohu.com";
 	acl::string buf(disks);
 	std::vector<acl::string>& tokens = buf.split2(";, \t\r\n");
 	acl::token_tree tree;
@@ -52,12 +53,39 @@ static void test2(void)
 
 	path = "/data10";
 	node = tree.find(path);
-
 	if (node) {
 		printf("ok, found it, path=%s, key=%s\r\n",
 			path, node->get_key());
 	} else {
 		printf("error, not found, path=%s\r\n", path);
+	}
+
+	path = "/data10/";
+	node = tree.find(path);
+	if (node) {
+		printf("error, found it, path=%s, key=%s\r\n",
+			path, node->get_key());
+	} else {
+		printf("ok, not found, path=%s\r\n", path);
+	}
+
+	path = "www.baidu.com";
+	node = tree.find(path);
+	if (node) {
+		printf("error, found it, path=%s, key=%s\r\n",
+			path, node->get_key());
+	} else {
+		printf("ok, not found, path=%s\r\n", path);
+	}
+
+	path = "www.baidu.com";
+	ptr = path;
+	node = tree.search(&ptr);
+	if (node) {
+		printf("ok, search found it, path=%s, key=%s\r\n",
+			path, node->get_key());
+	} else {
+		printf("error, search not found, path=%s\r\n", path);
 	}
 }
 

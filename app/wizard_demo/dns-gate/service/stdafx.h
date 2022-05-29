@@ -110,7 +110,7 @@ extern acl::master_int_tbl var_conf_int_tab[];
 
 extern acl::master_int64_tbl var_conf_int64_tab[];
 
-extern std::set<acl::string> var_display_disabled;
+extern acl::token_tree var_display_disabled;
 extern acl::redis_client_cluster *var_redis_conns;
 
 class black_list;

@@ -114,8 +114,7 @@ static void test3(void)
 {
 	const char *tokens1 = "hello world he is a man he"
 		" 中 中华 中华人 中华人民 中华人民共 中华人民共和 中华人民共和国"
-		" 中华人民共和国万岁 中华人民共和国万岁万万岁"
-		" 法轮功|d 研究法轮功|d 反对法轮功|p 法轮功协会|d";
+		" 中华人民共和国万岁 中华人民共和国万岁万万岁";
 	const char *tokens2 = "比利时|d 中国|p 说的|d";
 
 	static const char *test1_tab[] = {
@@ -128,11 +127,6 @@ static void test3(void)
 		"中华人民共和国万岁",
 		"我们中华人民共和国万岁",
 		"我们中华人民共和国万岁万万岁",
-		"法轮功",
-		"反对法轮功",
-		"法轮功协会",
-		"反对法轮功协会",
-		"研究法轮功",
 		NULL
 	};
 
@@ -145,7 +139,6 @@ static void test3(void)
 	};
 
 	static const char *test3_tab[] = {
-		"我爱研法轮功",
 		"中国",
 		"比利时",
 		"中国比利时",
