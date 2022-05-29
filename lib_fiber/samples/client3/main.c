@@ -99,10 +99,6 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	sa.sin_port   = htons(__server_port);
 	sa.sin_addr.s_addr = inet_addr(__server_ip);
 
-	if (__fiber_delay > 0) {
-		acl_fiber_delay(__fiber_delay);
-	}
-
 #if defined(_WIN32) || defined(_WIN64)
 	if (acl_fiber_connect(fd, (const struct sockaddr *) &sa, len) < 0) {
 		acl_fiber_close(fd);
@@ -149,6 +145,10 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 
 	for (i = 0; i < __max_fibers; i++) {
 		acl_fiber_create(fiber_connect, NULL, __stack_size);
+
+		if (__fiber_delay > 0) {
+			acl_fiber_delay(__fiber_delay);
+		}
 	}
 }
 

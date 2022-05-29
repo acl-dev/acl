@@ -88,11 +88,6 @@ void acl_fiber_register(FIBER_ALLOC_FN alloc_fn, FIBER_ORIGIN_FN origin_fn)
 
 static pthread_key_t __fiber_key;
 
-void acl_fiber_hook_api(int onoff)
-{
-	var_hook_sys_api = onoff;
-}
-
 int acl_fiber_scheduled(void)
 {
 	return __scheduled;
@@ -847,6 +842,10 @@ size_t acl_fiber_get_shared_stack_size(void)
 #endif
 }
 
+static void fiber_hook_api(int on)
+{
+	var_hook_sys_api = on;
+}
 
 void acl_fiber_schedule_set_event(int event_mode)
 {
@@ -873,7 +872,7 @@ void acl_fiber_schedule(void)
 #endif
 
 	fiber_check();
-	acl_fiber_hook_api(1);
+	fiber_hook_api(1);
 	__scheduled = 1;
 
 	for (;;) {
@@ -900,7 +899,7 @@ void acl_fiber_schedule(void)
 	}
 
 	fiber_io_clear();
-	acl_fiber_hook_api(0);
+	fiber_hook_api(0);
 	__scheduled = 0;
 }
 

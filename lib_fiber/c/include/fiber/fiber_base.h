@@ -28,12 +28,6 @@ FIBER_API void acl_fiber_register(FIBER_ALLOC_FN alloc_fn,
 FIBER_API ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr);
 
 /**
- * Set flag if the system API should be hooked, default value is 1 internal
- * @param onoff {int} if need to hook the system API
- */
-FIBER_API void acl_fiber_hook_api(int onoff);
-
-/**
  * Set the global flag that if in non-blocking status, just for windows
  * @param yes {int} set in non-blocking status global if yes not 0
  */
