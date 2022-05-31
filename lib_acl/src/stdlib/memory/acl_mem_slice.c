@@ -87,45 +87,54 @@ typedef struct {
 #define FILLER          0x0
 
 #define CHECK_PTR(_ptr, _real_ptr, _len, _fname, _line) { \
-  if (_ptr == 0) \
+  if (_ptr == 0) { \
     acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
       __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+  } \
   _real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
-  if (_real_ptr->signature != SIGNATURE) \
+  if (_real_ptr->signature != SIGNATURE) { \
     acl_msg_panic("%s(%d), %s: in %s(%d), corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
       __FILE__, __LINE__, __FUNCTION__, _fname, _line, \
       (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
-  if ((_len = _real_ptr->length) < 1) \
+  } \
+  if ((_len = _real_ptr->length) < 1) { \
     acl_msg_panic("%s(%d), %s: in %s(%d), corrupt memory block length", \
       __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+  } \
 }
 
 #define CHECK_IN_PTR(_ptr, _real_ptr, _len, _fname, _line) { \
-  if (_ptr == 0) \
-    acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
-      __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    if (_ptr == 0) { \
+      acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
+        __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    } \
     _real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
-    if (_real_ptr->signature != SIGNATURE) \
+    if (_real_ptr->signature != SIGNATURE) { \
       acl_msg_panic("%s(%d), %s: in %s(%d), corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
         __FILE__, __LINE__, __FUNCTION__, _fname, _line, \
         (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
-      _real_ptr->signature = 0; \
-      if ((_len = _real_ptr->length) < 1) \
-        acl_msg_panic("%s(%d), %s: in %s(%d), corrupt memory block length", \
-          __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    } \
+    _real_ptr->signature = 0; \
+    if ((_len = _real_ptr->length) < 1) { \
+      acl_msg_panic("%s(%d), %s: in %s(%d), corrupt memory block length", \
+        __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    } \
 }
 
 #define CHECK_IN_PTR2(_ptr, _real_ptr, _len, _fname, _line) { \
-  if (_ptr == 0) \
-    acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
-      __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    if (_ptr == 0) { \
+      acl_msg_panic("%s(%d), %s: in %s(%d), null pointer input", \
+        __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    } \
     _real_ptr = (MBLOCK *) ((char *) _ptr - offsetof(MBLOCK, u.payload[0])); \
-    if (_real_ptr->signature != SIGNATURE) \
+    if (_real_ptr->signature != SIGNATURE) { \
       acl_msg_panic("%s(%d)(CHECK_IN_PTR2): corrupt or unallocated memory block(%d, 0x%x, 0x%x)", \
         _fname, _line, (int) _real_ptr->length, _real_ptr->signature, SIGNATURE); \
-    if ((_len = _real_ptr->length) < 1) \
+    } \
+    if ((_len = _real_ptr->length) < 1) { \
       acl_msg_panic("%s(%d), %s: in %s(%d) corrupt memory block length", \
         __FILE__, __LINE__, __FUNCTION__, _fname, _line); \
+    } \
 }
 
 #define CHECK_OUT_PTR(_ptr, _real_ptr, _mem_slice, _len) { \
