@@ -787,6 +787,20 @@ static int service_env(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 	return 0;
 }
 
+static void service_misc(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
+{
+	const char *ptr = get_str_ent(xcp, ACL_VAR_MASTER_SERV_STDOUT, NULL);
+
+	if (ptr && *ptr) {
+		serv->stdout_log = acl_mystrdup(ptr);
+	}
+
+	ptr = get_str_ent(xcp, ACL_VAR_MASTER_SERV_STDERR, NULL);
+	if (ptr && *ptr) {
+		serv->stderr_log = acl_mystrdup(ptr);
+	}
+}
+
 static int valid_extname(const char *filename)
 {
 	ACL_ITER    iter;
@@ -861,8 +875,6 @@ ACL_MASTER_SERV *acl_master_ent_get()
 		acl_msg_info("%s(%d), %s: load service file = %s",
 			__FILE__, __LINE__, __FUNCTION__, STR(path_buf));
 
-		acl_vstring_strcpy(__config_file, STR(path_buf));
-
 		serv = acl_master_ent_load(STR(path_buf));
 		if (serv != NULL) {
 			acl_vstring_free(path_buf);
@@ -876,6 +888,8 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 	ACL_XINETD_CFG_PARSER *xcp = acl_xinetd_cfg_load(filepath);
 	ACL_MASTER_SERV *serv;
 	const char *ptr;
+
+	acl_vstring_strcpy(__config_file, filepath);
 
 	if (xcp == NULL) {
 		acl_msg_error("%s(%d), %s: load %s error %s", __FILE__,
@@ -920,7 +934,10 @@ ACL_MASTER_SERV *acl_master_ent_load(const char *filepath)
 		return NULL;
 	}
 
-	/* linked for children */
+	/* The other configure entries */
+	service_misc(xcp, serv);
+
+	/* Linked for children */
 	acl_ring_init(&serv->children);
 
 	/* Backoff time in case a service is broken. */

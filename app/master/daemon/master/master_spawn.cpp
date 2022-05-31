@@ -112,9 +112,11 @@ static void prepare_child_fds(ACL_MASTER_SERV *serv)
 		acl_msg_fatal("%s: flow pipe read descriptor <= %d",
 			myname, ACL_MASTER_FLOW_READ);
 	}
+
 	if (dup2(acl_var_master_flow_pipe[0], ACL_MASTER_FLOW_READ) < 0) {
 		acl_msg_fatal("%s: dup2: %s", myname, strerror(errno));
 	}
+
 	if (close(acl_var_master_flow_pipe[0]) < 0) {
 		acl_msg_fatal("close %d: %s",
 			acl_var_master_flow_pipe[0], strerror(errno));
@@ -167,6 +169,26 @@ static void start_child(ACL_MASTER_SERV *serv)
 
 	if (serv->type != ACL_MASTER_SERV_TYPE_NONE) {
 		prepare_child_fds(serv);
+	}
+
+	/* Redirect stdout to local file */
+	if (serv->stdout_log) {
+		int oflags = O_APPEND | O_WRONLY | O_CREAT;
+		int fd = open(serv->stdout_log, oflags, 0600);
+		if (fd >= 0 && fd != 1) {
+			dup2(fd, 1);
+			close(fd);
+		}
+	}
+
+	/* Redirect stderr to local file */
+	if (serv->stderr_log) {
+		int oflags = O_APPEND | O_WRONLY | O_CREAT;
+		int fd = open(serv->stderr_log, oflags, 0600);
+		if (fd >= 0 && fd != 2) {
+			dup2(fd, 2);
+			close(fd);
+		}
 	}
 
 	acl_vstring_sprintf(env_gen, "%s=%o", ACL_MASTER_GEN_NAME,

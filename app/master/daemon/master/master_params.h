@@ -131,6 +131,8 @@ extern int   acl_var_master_start_timeo;
 #define	ACL_VAR_MASTER_SERV_CHROOT		"master_chroot"
 #define	ACL_VAR_MASTER_SERV_WAKEUP		"master_wakeup"
 #define	ACL_VAR_MASTER_SERV_LOG			"master_log"
+#define	ACL_VAR_MASTER_SERV_STDOUT		"master_stdout"
+#define	ACL_VAR_MASTER_SERV_STDERR		"master_stderr"
 #define	ACL_VAR_MASTER_SERV_COMMAND		"master_command"
 #define ACL_VAR_MASTER_SERV_CMDEXT		"master_cmdext"
 #define	ACL_VAR_MASTER_SERV_ARGS		"master_args"
