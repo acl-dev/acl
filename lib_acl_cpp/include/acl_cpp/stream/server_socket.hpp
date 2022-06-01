@@ -14,7 +14,8 @@ enum {
 	OPEN_FLAG_NONE      = 0,
 	OPEN_FLAG_NONBLOCK  = 1,	// 非阻塞模式
 	OPEN_FLAG_REUSEPORT = 1 << 1,	// 端口复用，要求 Linux3.0 以上
-	OPEN_FLAG_EXCLUSIVE = 1 << 2,	// 是否禁止复用地址
+	OPEN_FLAG_FASTOPEN  = 1 << 2,	// 是否启用 Fast open（实验阶段）
+	OPEN_FLAG_EXCLUSIVE = 1 << 3,	// 是否禁止复用地址
 };
 
 /**

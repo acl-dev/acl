@@ -38,6 +38,9 @@ server_socket::server_socket(unsigned flag, int backlog)
 	if (flag & OPEN_FLAG_REUSEPORT) {
 		open_flag_ |= ACL_INET_FLAG_REUSEPORT;
 	}
+	if (flag & OPEN_FLAG_FASTOPEN) {
+		open_flag_ |= ACL_INET_FLAG_FASTOPEN;
+	}
 	if (flag & OPEN_FLAG_EXCLUSIVE) {
 		open_flag_ |= ACL_INET_FLAG_EXCLUSIVE;
 	}

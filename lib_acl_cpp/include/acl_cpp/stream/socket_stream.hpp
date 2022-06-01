@@ -64,7 +64,7 @@ public:
 	 * @param addr {const char*} 本机地址，格式：ip:port；该地址也可以为
 	 *  UNIX 域套接字或 Linux 抽象域套接字（Linux abstract unix socket）
 	 * @param rw_timeout {int} 读写超时时间(秒)
-	 * @param flag {unsigned}
+	 * @param flag {unsigned} 该标志位的定义参加 server_socket.hpp
 	 * @return {bool} 绑定是否成功
 	 */
 	bool bind_udp(const char* addr, int rw_timeout = 0, unsigned flag = 0);

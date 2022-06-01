@@ -3,6 +3,7 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stream/socket_stream.hpp"
+#include "acl_cpp/stream/socket_stream.hpp"
 #endif
 
 namespace acl {
@@ -64,7 +65,26 @@ bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */,
 	if (stream_) {
 		acl_vstream_close(stream_);
 	}
-	stream_ = acl_vstream_bind(addr, rw_timeout, flag);
+
+	unsigned oflag = 0;
+
+	if (flag & OPEN_FLAG_NONBLOCK) {
+		oflag |= ACL_NON_BLOCKING;
+	} else {
+		oflag |= ACL_BLOCKING;
+	}
+
+	if (flag & OPEN_FLAG_REUSEPORT) {
+		oflag |= ACL_INET_FLAG_REUSEPORT;
+	}
+	if (flag & OPEN_FLAG_FASTOPEN) {
+		oflag |= ACL_INET_FLAG_FASTOPEN;
+	}
+	if (flag & OPEN_FLAG_EXCLUSIVE) {
+		oflag |= ACL_INET_FLAG_EXCLUSIVE;
+	}
+
+	stream_ = acl_vstream_bind(addr, rw_timeout, oflag);
 	if (stream_ == NULL) {
 		return false;
 	}
