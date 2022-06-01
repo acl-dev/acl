@@ -1,4 +1,4 @@
-%define release_id 11
+%define release_id 12
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,13 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Jun 01 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-12-20220601.20
+- optimize iocp of fiber module
+- fixed bugs in fiber_io.c
+- optimize fiber on Windows when parsing hosts file
+- optimize wizard for generating SSL service
+- transfer open flags from lib_acl_cpp to lib_acl
 
 * Sun Apr 24 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-11-20220422.17
 - fixed bugs in app/redis_tools/redis_builder

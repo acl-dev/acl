@@ -2,7 +2,7 @@
 
 Summary: acl master framework
 Name:           acl-master
-Version:        3.5.2
+Version:        3.5.3
 Release:        %{release_id}
 Group:          System Environment/Tools
 License:        IBM
@@ -63,6 +63,9 @@ fi
 /etc/init.d/master
 
 %changelog
+
+* Wed Jun 01 2022 shuxin.zheng@qq.com 3.5.3-0-20220601.20
+- feature: acl_master can manage service not written by acl libs
 
 * Tue Apr 19 2022 shuxin.zheng@qq.com 3.5.2-0-20220419.17
 - release 3.5.2-0: Can manage the services not written by acl service template.
