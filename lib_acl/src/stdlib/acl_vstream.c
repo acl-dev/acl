@@ -1405,6 +1405,26 @@ int acl_vstream_can_read(ACL_VSTREAM *fp)
 	}
 }
 
+int acl_vstream_readable(ACL_VSTREAM *fp)
+{
+	if (fp == NULL) {
+		acl_msg_error("%s(%d), %s: fp null",
+			__FILE__, __LINE__, __FUNCTION__);
+		return 1;
+	}
+
+	if (acl_vstream_can_read(fp) != 0) {
+		return 1;
+	}
+
+	if (acl_readable(ACL_VSTREAM_SOCK(fp)) == 0) {
+		return 0;
+	}
+
+	fp->read_ready = 1;
+	return 1;
+}
+
 static int file_write_once(ACL_VSTREAM *fp, const void *vptr, int dlen)
 {
 	int n;

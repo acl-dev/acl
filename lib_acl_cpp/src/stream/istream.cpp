@@ -245,6 +245,10 @@ int istream::ugetch(int ch)
 	return ret;
 }
 
+bool istream::readable(void) const {
+	return acl_vstream_readable(stream_) != 0 ? true : false;
+}
+
 bool istream::gets_peek(string& buf, bool nonl /* = true */,
 	bool clear /* = false */, int max /* = 0 */)
 {

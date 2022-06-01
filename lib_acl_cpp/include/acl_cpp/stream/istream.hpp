@@ -151,6 +151,13 @@ public:
 	int ugetch(int ch);
 
 	/**
+	 * 检测当前流是否可读(有数据, 连接关闭或出错均表示可读),该方法可用于和
+	 * 下面的 xxx_peek() 结合.
+	 * @return {bool}
+	 */
+	bool readable(void) const;
+
+	/**
 	 * 尝试性从输入流中读取一行数据
 	 * @param buf {string&} 缓冲区
 	 * @param nonl {bool} 是否保留所读行数据中的 "\r\n" 或 "\n"

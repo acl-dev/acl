@@ -582,6 +582,15 @@ ACL_API int acl_vstream_read_peek3(ACL_VSTREAM *fp, void *buf, size_t size);
 ACL_API int acl_vstream_can_read(ACL_VSTREAM *fp);
 
 /**
+ * 检查 ACL_VSTREAM 流是否可读,该函数会首先调用 acl_vstream_can_read() 检查是否
+ * 可读,如果不可读会再次调用 poll() 方法检测 fd 句柄是否可读.
+ * @param fp {ACL_VSTREAM*} 数据流 
+ * @return {int} 如果返回 0 表示当前 fd 对应的流暂不可读,返回 1 则表示有数据可
+ *  读或连接已经断开或出错.
+ */
+ACL_API int acl_vstream_readable(ACL_VSTREAM *fp);
+
+/**
  * 将文件流中的系统缓冲区及流缓冲区中的数据都直接同步至硬盘
  * @param fp {ACL_VSTREAM*} 文件流指针
  * @return {int} 0: ok; ACL_VSTREAM_EOF: error
