@@ -285,7 +285,20 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	n = stream->sa_peer_size > sizeof(sa) ?
 		sizeof(sa) : stream->sa_peer_size;
-	if (ret > 0 && memcmp(stream->sa_peer, &sa, n) != 0) {
+	if (ret <= 0) {
+		return ret;
+	}
+
+	if (sa.sa.sa_family == 0) {
+#ifdef ACL_UNIX
+		n = stream->sa_local_len > stream->sa_peer_len ?
+			stream->sa_peer_len : stream->sa_local_len;
+		if (n > 0 && stream->sa_local
+			  && stream->sa_local->sa_family == AF_UNIX) {
+			acl_vstream_set_peer_addr(stream, stream->sa_local);
+		}
+#endif
+	} else if (!stream->sa_peer || memcmp(stream->sa_peer, &sa, n) != 0) {
 		acl_vstream_set_peer_addr(stream, (struct sockaddr *) &sa);
 	}
 	return ret;
@@ -297,8 +310,9 @@ static int udp_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int   ret;
 
 	if (stream->sa_peer_len == 0) {
-		acl_msg_fatal("%s, %s(%d): peer addr null",
+		acl_msg_error("%s, %s(%d): peer addr null",
 			__FUNCTION__, __FILE__, __LINE__);
+		return -1;
 	}
 
 	ret = (int) sendto(fd, buf, (int) size, 0,
