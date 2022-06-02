@@ -96,6 +96,10 @@ ifeq ($(findstring arm32, $(UNIXNAME)), arm32)
 	JMP_CTX = USE_BOOST_JMP
 endif
 
+ifeq ($(findstring arm, $(UNIXNAME)), arm)
+	JMP_CTX = USE_BOOST_JMP
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
