@@ -88,6 +88,14 @@ ifeq ($(findstring clang++, $(CC)), clang++)
 		  -Wno-invalid-offsetof
 endif
 
+ifeq ($(findstring arm64, $(UNIXNAME)), arm64)
+	JMP_CTX = USE_BOOST_JMP
+endif
+
+ifeq ($(findstring arm32, $(UNIXNAME)), arm32)
+	JMP_CTX = USE_BOOST_JMP
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
@@ -99,9 +107,6 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
 		  -Wno-deprecated-declarations
-	ifeq ($(findstring arm64, $(UNIXNAME)), arm64)
-		JMP_CTX = USE_BOOST_JMP
-	endif
 endif
 
 # For Linux
