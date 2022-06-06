@@ -117,6 +117,8 @@ void master_service::proc_on_init(void)
 		var_rules_option->load(var_cfg_rules_file);
 	}
 
+	logger("rules file=%s", var_cfg_rules_file);
+
 	open_db();
 	dgate_service_start();
 }

@@ -116,7 +116,7 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-ACL_PATH = ../../../..
+ACL_PATH = ../../../../..
 CFLAGS += -I$(ACL_PATH)/lib_acl/include \
 	  -I$(ACL_PATH)/lib_protocol/include \
 	  -I$(ACL_PATH)/lib_acl_cpp/include \
