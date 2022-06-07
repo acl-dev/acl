@@ -4,8 +4,6 @@ static acl::string __keypre("test_key_cluster");
 
 static bool test_del(acl::redis_key& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -22,8 +20,6 @@ static bool test_del(acl::redis_key& cmd, int i)
 
 static bool test_expire(acl::redis_key& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -40,8 +36,6 @@ static bool test_expire(acl::redis_key& cmd, int i)
 
 static bool test_ttl(acl::redis_key& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 	int ttl;
 
@@ -58,8 +52,6 @@ static bool test_ttl(acl::redis_key& cmd, int i)
 
 static bool test_exists(acl::redis_key& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -77,8 +69,6 @@ static bool test_exists(acl::redis_key& cmd, int i)
 
 static bool test_type(acl::redis_key& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 
 	key.format("%s_%d", __keypre.c_str(), i);
@@ -94,8 +84,6 @@ static bool test_type(acl::redis_key& cmd, int i)
 
 static bool test_set(acl::redis_string& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
 
@@ -113,8 +101,6 @@ static bool test_set(acl::redis_string& cmd, int i)
 
 static bool test_get(acl::redis_string& cmd, int i)
 {
-	cmd.clear();
-
 	acl::string key;
 	key.format("%s_%d", __keypre.c_str(), i);
 
@@ -127,6 +113,56 @@ static bool test_get(acl::redis_string& cmd, int i)
 			(int) value.length());
 	}
 	return ret;
+}
+
+static bool test_hmset(acl::redis_hash& cmd, int i)
+{
+	acl::string key;
+	key.format("hash-%s-%d", __keypre.c_str(), i);
+
+	std::map<acl::string, acl::string> attrs;
+	attrs["name1"] = "value1";
+	attrs["name2"] = "value2";
+	attrs["name3"] = "value3";
+
+	if (!cmd.hmset(key, attrs)) {
+		printf("hmset %s error=%s\r\n", key.c_str(), cmd.result_error());
+		return false;
+	}
+	if (i < 10) {
+		printf("hmset %s ok\r\n", key.c_str());
+	}
+	return true;
+}
+
+static bool test_hmget(acl::redis_hash& cmd, int i)
+{
+	acl::string key;
+	key.format("hash-%s-%d", __keypre.c_str(), i);
+
+	std::vector<acl::string> names;
+	names.push_back("name1");
+	names.push_back("name2");
+	names.push_back("name3");
+
+	std::vector<acl::string> values;
+
+	if (!cmd.hmget(key, names,&values)) {
+		printf("hmget error %s\r\n", cmd.result_error());
+		return false;
+	}
+
+	if (i < 10) {
+		printf("key=%s:", key.c_str());
+		assert(names.size() == values.size());
+		size_t n = names.size();
+		for (size_t j = 0; j < n; j++) {
+			printf(" %s->%s", names[j].c_str(), values[j].c_str());
+		}
+		printf("\r\n");
+	}
+
+	return true;
 }
 
 static int __threads_exit = 0;
@@ -147,36 +183,40 @@ protected:
 	void run(void)
 	{
 		bool ret;
-		cmd_key.set_pipeline(&conns_);
-		cmd_string.set_pipeline(&conns_);
+		acl::redis redis;
+		redis.set_pipeline(&conns_);
 
 		for (int i = 0; i < n_; i++) {
 			if (cmd_ == "set") {
-				ret = test_set(cmd_string, i);
+				ret = test_set(redis, i);
 			} else if (cmd_ == "get") {
-				ret = test_get(cmd_string, i);
+				ret = test_get(redis, i);
 			} else if (cmd_ == "del") {
-				ret = test_del(cmd_key, i);
+				ret = test_del(redis, i);
 			} else if (cmd_ == "expire") {
-				ret = test_expire(cmd_key, i);
+				ret = test_expire(redis, i);
 			} else if (cmd_ == "ttl") {
-				ret = test_ttl(cmd_key, i);
+				ret = test_ttl(redis, i);
 			} else if (cmd_ == "exists") {
-				ret = test_exists(cmd_key, i);
+				ret = test_exists(redis, i);
 			} else if (cmd_ == "type") {
-				ret = test_type(cmd_key, i);
+				ret = test_type(redis, i);
 			} else if (cmd_ == "all") {
-				if (!test_set(cmd_string, i)
-				    || !test_get(cmd_string, i)
-				    || !test_exists(cmd_key, i)
-				    || !test_type(cmd_key, i)
-				    || !test_expire(cmd_key, i)
-				    || !test_ttl(cmd_key, i)
-				    || !test_del(cmd_key, i)) {
+				if (!test_set(redis, i)
+				    || !test_get(redis, i)
+				    || !test_exists(redis, i)
+				    || !test_type(redis, i)
+				    || !test_expire(redis, i)
+				    || !test_ttl(redis, i)
+				    || !test_del(redis, i)) {
 					ret = false;
 				} else {
 					ret = true;
 				}
+			} else if (cmd_ == "hmset") {
+				ret = test_hmset(redis, i);
+			} else if (cmd_ == "hmget") {
+				ret = test_hmget(redis, i);
 			} else {
 				printf("unknown cmd: %s\r\n", cmd_.c_str());
 				break;
@@ -196,8 +236,7 @@ protected:
 			}
 			*/
 
-			cmd_string.clear();
-			cmd_key.clear();
+			redis.clear();
 		}
 	}
 
@@ -205,9 +244,6 @@ private:
 	acl::redis_client_pipeline& conns_;
 	acl::string cmd_;
 	int n_;
-
-	acl::redis_key cmd_key;
-	acl::redis_string cmd_string;
 };
 
 class test_thread : public acl::thread
@@ -274,7 +310,7 @@ static void usage(const char* procname)
 		"-w wait_for_cluster_resume[default: 500 ms]\r\n"
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
-		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
+		"-a cmd[set|get|hmset|hmget|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
 
