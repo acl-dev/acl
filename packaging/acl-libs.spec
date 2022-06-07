@@ -1,4 +1,4 @@
-%define release_id 12
+%define release_id 13
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Jun 07 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-13-20220607.20
+- bugfix: fixed one urgent bug in redis_client_cluster.hpp for memory overflow.
 
 * Wed Jun 01 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-12-20220601.20
 - optimize iocp of fiber module
