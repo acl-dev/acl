@@ -90,12 +90,15 @@ public:
 	}
 
 	void set_request(size_t argc, const char** argv, size_t* lens) {
+		// When running in coroutine of shared stack mode,
+		// the variables on stack are volatile, so we should save
+		// the request data in heap.
 #if 0
 		argc_    = argc;
 		argv_    = argv;
 		lens_    = lens;
 #else
-		if (argc_ > size_) {
+		if (argc > size_) {
 			delete [] argv_;
 			delete [] lens_;
 			size_ = argc;
