@@ -63,12 +63,23 @@ ACL_API ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len);
 /**
  * 采用内存映射文件方式分配内存时，调用此函数创建 ACL_VSTRING 动态缓冲区对象
  * @param fd {ACL_FILE_HANDLE} 有效的文件句柄
- * @param max_len {ssize_t} 所映射的最大内存大小
- * @param init_len {ssize_t} 初始化时的内存映射大小
+ * @param max_len {size_t} 所映射的最大内存大小
+ * @param init_len {size_t} 初始化时的内存映射大小
  * @return {ACL_VSTRING*} 新创建的 ACL_VSTRING 对象
  */
 ACL_API ACL_VSTRING *acl_vstring_mmap_alloc(ACL_FILE_HANDLE fd,
-	ssize_t max_len, ssize_t init_len);
+	size_t max_len, size_t init_len);
+
+/**
+ * 采用内存映射文件方式分配内存时，调用此函数创建 ACL_VSTRING 动态缓冲区对象
+ * @param fd {ACL_FILE_HANDLE} 有效的文件句柄
+ * @param max_len {size_t} 所映射的最大内存大小
+ * @param init_len {size_t} 初始化时的内存映射大小
+ * @param offset {ssize_t} 在所映射文件中的起始位置
+ * @return {ACL_VSTRING*} 新创建的 ACL_VSTRING 对象
+ */
+ACL_API ACL_VSTRING *acl_vstring_mmap_alloc2(ACL_FILE_HANDLE fd,
+	size_t max_len, size_t init_len, size_t offset);
 
 /**
  * 设置 ACL_VSTRING 对象的属性, 目前该函数的功能还不够完善

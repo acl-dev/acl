@@ -91,13 +91,13 @@ string::string(const void* s, size_t n)
 	TERM(vbf_);
 }
 
-string::string(ACL_FILE_HANDLE fd, size_t max, size_t n)
+string::string(ACL_FILE_HANDLE fd, size_t max, size_t n, size_t offset /* 0 */)
 {
 	if (n < 1) {
 		n = 1;
 	}
 	if (fd >= 0) {
-		vbf_ = acl_vstring_mmap_alloc(fd, (ssize_t) max, (ssize_t) n);
+		vbf_ = acl_vstring_mmap_alloc2(fd, max, n, offset);
 	} else {
 		vbf_ = ALLOC(n);
 	}

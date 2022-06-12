@@ -66,11 +66,16 @@ static void echo_client(SOCKET fd)
 #if defined(_WIN32) || defined(_WIN64)
 		ret = acl_fiber_recv(fd, buf, BUF_SIZE, 0);
 #else
-		ret = read(fd, buf, BUF_SIZE);
+		ret = read(fd, buf, BUF_SIZE - 1);
 #endif
 		if (ret <= 0) {
 			printf("read error: %s\r\n", acl_last_serror());
 			break;
+		}
+		if (i < 10) {
+			buf[ret] = 0;
+			printf("%s", buf);
+			fflush(stdout);
 		}
 
 		__total_count++;
