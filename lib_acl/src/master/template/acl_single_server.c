@@ -414,7 +414,9 @@ static void single_server_open_log(const char *proc)
 	master_log_close();
 
 	/* second, open the service's log */
-	acl_msg_open(acl_var_single_log_file, acl_var_single_procname);
+	if (acl_master_log_enabled()) {
+		acl_msg_open(acl_var_single_log_file, acl_var_single_procname);
+	}
 
 	if (acl_var_single_log_debug && *acl_var_single_log_debug
 		&& acl_var_single_max_debug >= 100)

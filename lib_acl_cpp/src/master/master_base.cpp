@@ -11,6 +11,16 @@
 namespace acl
 {
 
+void master_log_enable(bool yes)
+{
+	acl_master_log_enable(yes ? 1 : 0);
+}
+
+bool master_log_enabled(void)
+{
+	return acl_master_log_enabled() ? true : false;
+}
+
 master_base::master_base(void)
 {
 	daemon_mode_ = false;

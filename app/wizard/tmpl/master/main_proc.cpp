@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0)) {
 		// 日志输出至标准输出
 		acl::log::stdout_open(true);
+		// 禁止生成 acl_master.log 日志
+		acl::master_log_enable(false);
 
 		// 监听的地址列表，格式：ip|port1,ip|port2,...
 		const char* addrs = "|8888";

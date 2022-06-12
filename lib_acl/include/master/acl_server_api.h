@@ -187,6 +187,12 @@ extern ACL_API int acl_var_server_gotsighup;
 ACL_API void acl_server_sighup_setup(void);
 ACL_API void acl_server_sigterm_setup(void);
 
+/*
+ * master_log.c
+ */
+ACL_API void acl_master_log_enable(int yes);
+ACL_API int acl_master_log_enabled(void);
+
 #ifdef	__cplusplus
 }
 #endif

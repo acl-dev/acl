@@ -8,6 +8,7 @@
 #ifdef	__cplusplus
 extern "C" {
 #endif
+
 void master_log_open(const char *procname);
 void master_log_close(void);
 

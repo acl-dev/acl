@@ -828,7 +828,9 @@ static void open_service_log(void)
 #endif
 
 	/* second, open the service's log */
-	acl_msg_open(acl_var_fiber_log_file, acl_var_fiber_procname);
+	if (acl_master_log_enabled()) {
+		acl_msg_open(acl_var_fiber_log_file, acl_var_fiber_procname);
+	}
 
 	if (acl_var_fiber_log_debug && *acl_var_fiber_log_debug
 		&& acl_var_fiber_max_debug >= 100) {

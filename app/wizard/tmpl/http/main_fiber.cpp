@@ -124,9 +124,13 @@ int main(int argc, char *argv[])
 #endif
 
 	if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
+		// 日志输出至标准输出
+		acl::log::stdout_open(true);
+		// 禁止生成 acl_master.log 日志
+		acl::master_log_enable(false);
+
 		const char* addr = "|8888";
 
-		acl::log::stdout_open(true);
 		if (argc >= 4) {
 			addr = argv[3];
 		}

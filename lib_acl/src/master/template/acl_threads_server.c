@@ -932,7 +932,9 @@ static void open_service_log(int event_mode)
 #endif
 
 	/* second, open the service's log */
-	acl_msg_open(acl_var_threads_log_file, acl_var_threads_procname);
+	if (acl_master_log_enabled()) {
+		acl_msg_open(acl_var_threads_log_file, acl_var_threads_procname);
+	}
 
 	if (acl_var_threads_log_debug && *acl_var_threads_log_debug
 		&& acl_var_threads_max_debug >= 100) {

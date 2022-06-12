@@ -15,6 +15,9 @@ class server_socket;
 class event_timer;
 class string;
 
+ACL_CPP_API void master_log_enable(bool yes);
+ACL_CPP_API bool master_log_enabled(void);
+
 class ACL_CPP_API master_base : public noncopyable
 {
 public:

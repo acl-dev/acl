@@ -1082,7 +1082,9 @@ static void open_service_log(void)
 	master_log_close();
 
 	/* second, open the service's log */
-	acl_msg_open(acl_var_aio_log_file, acl_var_aio_procname);
+	if (acl_master_log_enabled()) {
+		acl_msg_open(acl_var_aio_log_file, acl_var_aio_procname);
+	}
 
 	if (acl_var_aio_log_debug && *acl_var_aio_log_debug
 		&& acl_var_aio_max_debug >= 100)

@@ -13,9 +13,12 @@ int main(int argc, char *argv[])
 	ms.set_cfg_bool(var_conf_bool_tab);
 
 	if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
-		const char* addr = "|8887";
-
+		// 日志输出至标准输出
 		acl::log::stdout_open(true);
+		// 禁止生成 acl_master.log 日志
+		acl::master_log_enable(false);
+
+		const char* addr = "|8887";
 		printf("listen: %s\r\n", addr);
 		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL);
 	} else {

@@ -19,6 +19,8 @@ int main(int argc, char* argv[])
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0)) {
 		// 日志输出至标准输出
 		acl::log::stdout_open(true);
+		// 禁止生成 acl_master.log 日志
+		acl::master_log_enable(false);
 
 		// 当该值 > 0 时设定定时器被触发的次数限制，即当定时器触发
 		// 的次数达到此值时，程序退出；否则 (<=0) 则定时器会一直触发

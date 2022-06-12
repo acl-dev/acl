@@ -19,6 +19,7 @@
 #include "stdlib/acl_msg.h"
 #include "stdlib/acl_sys_patch.h"
 #include "stdlib/acl_vbuf_print.h"
+#include "thread/acl_pthread.h"
 #include "stdlib/acl_vstring.h"
 
 #ifdef ACL_UNIX
@@ -323,6 +324,28 @@ ACL_VSTRING *acl_vstring_mmap_alloc(ACL_FILE_HANDLE fd,
 	return acl_vstring_mmap_alloc2(fd, max_len, init_len, 0);
 }
 
+static int __page_size = 4096;
+
+static void get_pagesize(void)
+{
+#if defined(ACL_UNIX)
+	int size = getpagesize();
+	if (size > 0) {
+		__page_size = size;
+	}
+#elif defined(ACL_WINDOWS)
+	SYSTEM_INFO info;
+
+	memset(&info, 0, sizeof(SYSTEM_INFO));
+	GetSystemInfo(&info);
+	if (info.dwPageSize > 0) {
+		__page_size = (int) info.dwPageSize;
+	}
+#endif
+}
+
+static acl_pthread_once_t __once_control = ACL_PTHREAD_ONCE_INIT;
+
 ACL_VSTRING *acl_vstring_mmap_alloc2(ACL_FILE_HANDLE fd,
 	size_t max_len, size_t init_len, size_t offset)
 {
@@ -333,8 +356,10 @@ ACL_VSTRING *acl_vstring_mmap_alloc2(ACL_FILE_HANDLE fd,
 		acl_msg_panic("%s: bad length %ld", myname, (long) init_len);
 	}
 
-	if (offset < 0) {
-		offset = 0;
+	if (offset > 0) {
+		int n = offset % __page_size  == 0 ? 0 : 1;
+		acl_pthread_once(&__once_control, get_pagesize);
+		offset = (n + offset / __page_size) * __page_size;
 	}
 
 	if (max_len < init_len) {

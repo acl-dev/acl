@@ -10,6 +10,18 @@
 
 #ifndef ACL_CLIENT_ONLY
 
+static int __master_log_enable = 1;
+
+void acl_master_log_enable(int yes)
+{
+	__master_log_enable = yes;
+}
+
+int acl_master_log_enabled(void)
+{
+	return __master_log_enable;
+}
+
 static int  var_master_log_opened = 0;
 
 void master_log_open(const char *procname)

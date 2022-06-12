@@ -646,7 +646,9 @@ static void udp_server_open_log(void)
 	master_log_close();
 
 	/* second, open the service's log */
-	acl_msg_open(acl_var_udp_log_file, acl_var_udp_procname);
+	if (acl_master_log_enabled()) {
+		acl_msg_open(acl_var_udp_log_file, acl_var_udp_procname);
+	}
 
 	if (acl_var_udp_log_debug && *acl_var_udp_log_debug
 		&& acl_var_udp_max_debug >= 100) {
