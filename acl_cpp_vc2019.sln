@@ -163,6 +163,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gson", "app\gson\gson_vc201
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "net_tools", "app\net_tools\net_tools_vc2019.vcxproj", "{45276293-D169-4D73-8930-F255C09DA976}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_builder", "app\redis_tools\redis_builder\redis_builder_vc2019.vcxproj", "{D90DCF51-E219-4BD8-A032-076335675F58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -861,6 +863,36 @@ Global
 		{45276293-D169-4D73-8930-F255C09DA976}.Template|Win32.Build.0 = DebugDll|Win32
 		{45276293-D169-4D73-8930-F255C09DA976}.Template|x64.ActiveCfg = DebugDll|Win32
 		{45276293-D169-4D73-8930-F255C09DA976}.Template|x64.Build.0 = DebugDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Debug|Win32.Build.0 = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Debug|x64.ActiveCfg = Debug|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Debug|x64.Build.0 = Debug|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.DebugDll|x64.ActiveCfg = DebugDll|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.DebugDll|x64.Build.0 = DebugDll|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Release|Win32.ActiveCfg = Release|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Release|Win32.Build.0 = Release|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Release|x64.ActiveCfg = Release|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Release|x64.Build.0 = Release|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Releasedll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Releasedll|Mixed Platforms.Build.0 = ReleaseDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Releasedll|x64.ActiveCfg = ReleaseDll|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Releasedll|x64.Build.0 = ReleaseDll|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Template|Mixed Platforms.ActiveCfg = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Template|Mixed Platforms.Build.0 = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Template|Win32.ActiveCfg = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Template|Win32.Build.0 = Debug|Win32
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Template|x64.ActiveCfg = Debug|x64
+		{D90DCF51-E219-4BD8-A032-076335675F58}.Template|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -898,6 +930,7 @@ Global
 		{84376B60-FF20-4FD0-967E-C568FC2FBC53} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 		{D15D860E-5012-471A-83D4-81A1251BF88D} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 		{45276293-D169-4D73-8930-F255C09DA976} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
+		{D90DCF51-E219-4BD8-A032-076335675F58} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40FA3A5B-123F-4EC0-9EEB-8A9C17BF573B}
