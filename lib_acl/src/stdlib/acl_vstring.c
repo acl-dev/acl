@@ -73,10 +73,11 @@ static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 	 * avoid memory double growing too large --- 2015.2.2, zsx
 	 */
 	new_len = bp->len + incr;
-	if (new_len < MAX_PREALLOC)
+	if (new_len < MAX_PREALLOC) {
 		new_len *= 2;
-	else
+	} else {
 		new_len += MAX_PREALLOC;
+	}
 #else
 	new_len = bp->len + (bp->len > incr ? bp->len : incr);
 #endif
@@ -90,8 +91,8 @@ static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 			__FILE__, __LINE__, vp->slice, bp->data, new_len);
 	} else if (vp->dbuf) {
 		const unsigned char *data = bp->data;
-		bp->data = (unsigned char *) acl_dbuf_pool_alloc(
-			vp->dbuf, new_len);
+		bp->data = (unsigned char *)
+			acl_dbuf_pool_alloc(vp->dbuf, new_len);
 		memcpy(bp->data, data, (size_t) used);
 		acl_dbuf_pool_free(vp->dbuf, data);
 	} else if (bp->fd != ACL_FILE_INVALID) {
@@ -144,9 +145,8 @@ static int vstring_buf_space(ACL_VBUF *bp, ssize_t len)
 	}
 	if ((need = len - bp->cnt) > 0) {
 		return vstring_extend(bp, need);
-	} else {
-		return 0;
 	}
+	return 0;
 }
 
 void acl_vstring_init(ACL_VSTRING *vp, size_t len)
@@ -308,8 +308,11 @@ static void mmap_buf_init(ACL_VSTRING *vp, size_t offset)
 	if (vp->vbuf.hmap == NULL) {
 		acl_msg_fatal("CreateFileMapping: %s", acl_last_serror());
 	}
+	DWORD dwFileOffsetHigh = offset / (unsigned int) -1;
+	DWORD dwFileOffsetLow  = offset % (unsigned int) -1;
 	vp->vbuf.data = (unsigned char *) MapViewOfFile(vp->vbuf.hmap,
-		FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
+		FILE_MAP_READ | FILE_MAP_WRITE, dwFileOffsetHigh,
+		dwFileOffsetLow, 0);
 	if (vp->vbuf.data == NULL) {}
 		acl_msg_fatal("MapViewOfFile error: %s", acl_last_serror());
 	}
@@ -405,8 +408,9 @@ void acl_vstring_free(ACL_VSTRING *vp)
 		acl_myfree(vp);
 	}
 #elif defined(_WIN32) || defined(_WIN64)
-	else if (vp->vbuf.hmap != NULL)
+	else if (vp->vbuf.hmap != NULL) {
 		acl_myfree(vp);
+	}
 #endif
 	else if (vp->dbuf == NULL) {
 		acl_myfree(vp);
@@ -645,12 +649,10 @@ char *acl_vstring_strstr(ACL_VSTRING *vp, const char *needle)
 	for (cp = (unsigned char *) acl_vstring_str(vp);
 		cp < (unsigned char *) acl_vstring_end(vp); cp++) {
 		if (np) {
-			if (*cp == *np) {
-				if (!*++np) {
-					return (char *) startn;
-				}
-			} else {
+			if (*cp != *np) {
 				np = 0;
+			} else if (!*++np) {
+				return (char *) startn;
 			}
 		}
 		if (!np && *cp == *((const unsigned char *)needle)) {
@@ -680,12 +682,10 @@ char *acl_vstring_strcasestr(ACL_VSTRING *vp, const char *needle)
 	for (cp = (unsigned char *) acl_vstring_str(vp);
 		cp < (unsigned char *) acl_vstring_end(vp); cp++) {
 		if (np) {
-			if (cm[*cp] == cm[*np]) {
-				if (!*++np) {
-					return (char *) startn;
-				}
-			} else {
+			if (cm[*cp] != cm[*np]) {
 				np = 0;
+			} else if (!*++np) {
+				return (char *) startn;
 			}
 		}
 		if (!np && cm[*cp] == cm[*((const unsigned char *)needle)]) {
