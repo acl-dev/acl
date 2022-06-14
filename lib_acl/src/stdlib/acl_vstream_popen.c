@@ -209,7 +209,7 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 		if (close(sockfd[0]))
 			acl_msg_warn("close: %s", acl_last_serror());
 		fp = acl_vstream_fdopen(sockfd[1], flags,
-				4096, 0, ACL_VSTREAM_TYPE_FILE);
+				4096, 0, ACL_VSTREAM_TYPE_SOCK);
 		/*
 		 * fp->waitpid_fn = args.waitpid_fn;
 		 */
@@ -233,8 +233,15 @@ int acl_vstream_pclose(ACL_VSTREAM *fp)
 	/*
 	 * Close the pipe. Don't trigger an alarm in vstream_fclose().
 	 */
-	if (saved_pid == 0)
+	if (saved_pid == 0) {
 		acl_msg_panic("vstream_pclose: fp has no process");
+	}
+
+	if (fp->errnum == ACL_ETIMEDOUT) {
+		acl_msg_warn("kill child(%d) for waiting timeout ", saved_pid);
+		kill(saved_pid, SIGTERM);
+	}
+
 	fp->pid = 0;
 	acl_vstream_fclose(fp);
 
@@ -242,14 +249,15 @@ int acl_vstream_pclose(ACL_VSTREAM *fp)
 	 * Reap the child exit status.
 	 */
 	do {
-		if (saved_waitpid_fn != 0)
+		if (saved_waitpid_fn != 0) {
 			pid = saved_waitpid_fn(saved_pid, &wait_status, 0);
-		else
+		} else {
 			pid = waitpid(saved_pid, &wait_status, 0);
+		}
 	} while (pid == -1 && errno == EINTR);
-	return pid == -1 ? -1 :
-		WIFSIGNALED(wait_status) ? WTERMSIG(wait_status) :
-		WEXITSTATUS(wait_status);
+
+	return pid == -1 ? -1 : WIFSIGNALED(wait_status) ?
+		WTERMSIG(wait_status) : WEXITSTATUS(wait_status);
 }
 
 #elif defined(ACL_WINDOWS)
