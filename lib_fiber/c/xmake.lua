@@ -16,5 +16,5 @@ target("fiber")
 
     -- add flags
     add_cxflags("-std=gnu99")
-    add_defines("USE_JMP")
+    add_defines("DUSE_BOOST_JMP")
 

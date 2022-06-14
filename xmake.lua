@@ -72,7 +72,7 @@ end
 if not is_plat("windows") then
     add_cflags("-Wshadow",
             "-Wpointer-arith",
-            "-Waggregate-return",
+            --"-Waggregate-return",
             "-Wmissing-prototypes",
             "-Wno-long-long",
             "-Wuninitialized",
@@ -80,9 +80,9 @@ if not is_plat("windows") then
             "-fdata-sections",
             "-ffunction-sections",
             "-fPIC",
-            "-fno-rtti",
-            "-fno-exceptions",
-            "-fomit-frame-pointer"
+            -- "-fno-rtti",
+            "-fomit-frame-pointer",
+            "-fno-exceptions"
             )
     add_cxxflags("-Wshadow",
             "-Wpointer-arith",
@@ -93,11 +93,13 @@ if not is_plat("windows") then
             "-fPIC",
             "-fno-rtti",
             "-fno-exceptions",
+	    "-fexceptions",
+	    "-fpermissive",
             "-fomit-frame-pointer"
             )
 
     if is_kind("static") then
-    	add_cxflags("-fvisibility-inlines-hidden")
+    	--add_cxflags("-fvisibility-inlines-hidden")
 
         --add_cflags("-flto")
         --add_cxxflags("-flto")
@@ -115,14 +117,14 @@ if not is_plat("windows") then
     add_defines("ANDROID")
     add_defines("NDEBUG")
     add_defines("acl_cpp_EXPORTS")
-    add_cflags("fno-addrsig")
-    add_cxxflags("fno-addrsig")
+    --add_cflags("fno-addrsig")
+    --add_cflags("-fno-addrsig")
+    --add_cxxflags("fno-addrsig")
+    --add_cxxflags("-fno-addrsig")
     --add_cflags("-MD", "-MT", "-MF")
     --add_cxxflags("-MD", "-MT", "-MF")
     add_cflags("-no-canonical-prefixes")
     add_cxxflags("-no-canonical-prefixes")
-    add_cflags("-fno-addrsig")
-    add_cxxflags("-fno-addrsig")
 end
 
 -- include project sources

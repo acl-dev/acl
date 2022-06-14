@@ -8,7 +8,8 @@ target("fiber_cpp")
     add_deps("fiber", "acl_cpp", "acl")
 
     -- add source files
-    add_files("src/**.cpp")
+    add_files("src/*.cpp")
+    add_files("src/keeper/*.cpp")
 
     -- add include directories
     add_includedirs("src")
@@ -16,6 +17,7 @@ target("fiber_cpp")
 
     -- add headers
     add_headerfiles("include/(**.h)", "include/(**.hpp)")
+    add_includedirs("$(projectdir)/lib_acl/src/master")
 
 
 

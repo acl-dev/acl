@@ -12,7 +12,7 @@ target("acl_cpp")
 
     -- add include directories
     add_includedirs("$(projectdir)/include")
-    add_includedirs("$(projectdir)/include/zlib")
+    add_includedirs("$(projectdir)/include/zlib-1.2.11")
     add_includedirs("$(projectdir)/include/mysql")
     add_includedirs("$(projectdir)/include/pgsql")
     add_includedirs("$(projectdir)/include/sqlite")
