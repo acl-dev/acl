@@ -51,15 +51,15 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 	/*
 	 * First, set the default values (on all non-zero entries)
 	 */
-	args->argv = 0;
-	args->command = 0;
+	args->argv       = 0;
+	args->command    = 0;
 	args->privileged = 0;
-	args->env = 0;
-	args->export = 0;
-	args->shell = 0;
+	args->env        = 0;
+	args->export     = 0;
+	args->shell      = 0;
 #ifdef ACL_UNIX
-	args->uid = 0;
-	args->gid = 0;
+	args->uid        = 0;
+	args->gid        = 0;
 	args->waitpid_fn = 0;
 #endif
 
@@ -69,15 +69,17 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 	while ((key = va_arg(ap, int)) != ACL_VSTREAM_POPEN_END) {
 		switch (key) {
 		case ACL_VSTREAM_POPEN_ARGV:
-			if (args->command != 0)
+			if (args->command != 0) {
 				acl_msg_panic("%s: got ACL_VSTREAM_POPEN_ARGV"
 					" and ACL_VSTREAM_POPEN_COMMAND", myname);
+			}
 			args->argv = va_arg(ap, char **);
 			break;
 		case ACL_VSTREAM_POPEN_COMMAND:
-			if (args->argv != 0)
+			if (args->argv != 0) {
 				acl_msg_panic("%s: got ACL_VSTREAM_POPEN_ARGV"
 					" and ACL_VSTREAM_POPEN_COMMAND", myname);
+			}
 			args->command = va_arg(ap, char *);
 			break;
 		case ACL_VSTREAM_POPEN_ENV:
@@ -115,18 +117,56 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 		}
 	}
 
-	if (args->command == 0 && args->argv == 0)
+	if (args->command == 0 && args->argv == 0) {
 		acl_msg_panic("%s: missing ACL_VSTREAM_POPEN_ARGV"
 			" or ACL_VSTREAM_POPEN_COMMAND", myname);
+	}
 #ifdef	ACL_UNIX
-	if (args->privileged != 0 && args->uid == 0)
+	if (args->privileged != 0 && args->uid == 0) {
 		acl_msg_panic("%s: privileged uid", myname);
-	if (args->privileged != 0 && args->gid == 0)
+	}
+	if (args->privileged != 0 && args->gid == 0) {
 		acl_msg_panic("%s: privileged gid", myname);
+	}
 #endif
 }
 
 #ifdef	ACL_UNIX
+
+static char *dump_cmdline(const ACL_VSTREAM_POPEN_ARGS *args)
+{
+	ACL_VSTRING *buff = acl_vstring_alloc(128);
+
+	if (args->argv) {
+		int i = 0;
+
+		for (i = 0; args->argv[i] != NULL; i++) {
+			if (i > 0) {
+				acl_vstring_strcat(buff, " ");
+			}
+			acl_vstring_strcat(buff, args->argv[i]);
+		}
+	} else if (args->shell && *args->shell) {
+		ACL_ITER iter;
+		ACL_ARGV *argv = acl_argv_split(args->shell, " \t\r\n");
+
+		acl_argv_add(argv, args->command, (char *) 0);
+		acl_argv_terminate(argv);
+
+		acl_foreach(iter, argv) {
+			acl_vstring_strcat(buff, (char*) iter.data);
+			acl_vstring_strcat(buff, " ");
+		}
+
+		acl_argv_free(argv);
+	} else if (args->command) {
+		acl_vstring_strcat(buff, args->command);
+	} else {
+		acl_vstring_strcat(buff, "unknown");
+	}
+
+	return acl_vstring_export(buff);
+}
 
 /* acl_vstream_popen - open fp to child process */
 
@@ -139,18 +179,19 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 	int     sockfd[2];
 	int     pid;
 	int     fd;
-	ACL_ARGV   *argv;
 	char  **cpp;
 
 	va_start(ap, flags);
 	vstream_parse_args(&args, ap);
 	va_end(ap);
 
-	if (args.command == 0)
+	if (args.command == 0) {
 		args.command = args.argv[0];
+	}
 
-	if (acl_duplex_pipe(sockfd) < 0)
+	if (acl_duplex_pipe(sockfd) < 0) {
 		return 0;
+	}
 
 	switch (pid = fork()) {
 	case -1:				/* error */
@@ -158,43 +199,54 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 		(void) close(sockfd[1]);
 		return 0;
 	case 0:					/* child */
-		if (close(sockfd[1]))
+		if (close(sockfd[1])) {
 			acl_msg_warn("close: %s", acl_last_serror());
-		for (fd = 0; fd < 2; fd++)
-			if (sockfd[0] != fd && DUP2(sockfd[0], fd) < 0)
+		}
+		for (fd = 0; fd < 2; fd++) {
+			if (sockfd[0] != fd && DUP2(sockfd[0], fd) < 0) {
 				acl_msg_fatal("dup2: %s", acl_last_serror());
-		if (sockfd[0] >= 2 && close(sockfd[0]))
+			}
+		}
+		if (sockfd[0] >= 2 && close(sockfd[0])) {
 			acl_msg_warn("close: %s", acl_last_serror());
+		}
 
 		/*
 		 * Don't try to become someone else unless the user specified it.
 		 */
-		if (args.privileged)
+		if (args.privileged) {
 			acl_set_ugid(args.uid, args.gid);
+		}
 
 		/*
-		 * Environment plumbing. Always reset the command search path. XXX
+		 * Environment plumbing. Always reset the command search path.
 		 * That should probably be done by clean_env().
 		 */
-		if (args.export)
+		if (args.export) {
 			acl_clean_env(args.export);
-		if (setenv("PATH", ACL_PATH_DEFPATH, 1))
+		}
+		if (setenv("PATH", ACL_PATH_DEFPATH, 1)) {
 			acl_msg_fatal("%s: setenv: %s", myname, acl_last_serror());
-		if (args.env)
-			for (cpp = args.env; *cpp; cpp += 2)
-				if (setenv(cpp[0], cpp[1], 1))
+		}
+		if (args.env) {
+			for (cpp = args.env; *cpp; cpp += 2) {
+				if (setenv(cpp[0], cpp[1], 1)) {
 					acl_msg_fatal("setenv: %s", acl_last_serror());
+				}
+			}
+		}
 
 		/*
 		 * Process plumbing. If possible, avoid running a shell.
 		 */
 		acl_msg_close();
+
 		if (args.argv) {
 			execvp(args.argv[0], args.argv);
 			acl_msg_fatal("%s: execvp %s: %s",
 				myname, args.argv[0], acl_last_serror());
 		} else if (args.shell && *args.shell) {
-			argv = acl_argv_split(args.shell, " \t\r\n");
+			ACL_ARGV *argv = acl_argv_split(args.shell, " \t\r\n");
 			acl_argv_add(argv, args.command, (char *) 0);
 			acl_argv_terminate(argv);
 			execvp(argv->argv[0], argv->argv);
@@ -206,14 +258,16 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 		/* NOTREACHED */
 		return NULL;
 	default:					/* parent */
-		if (close(sockfd[0]))
+		if (close(sockfd[0])) {
 			acl_msg_warn("close: %s", acl_last_serror());
+		}
 		fp = acl_vstream_fdopen(sockfd[1], flags,
-				4096, 0, ACL_VSTREAM_TYPE_SOCK);
+			4096, 0, ACL_VSTREAM_TYPE_SOCK);
 		/*
 		 * fp->waitpid_fn = args.waitpid_fn;
 		 */
 		fp->pid = pid;
+		fp->context = dump_cmdline(&args);
 		return fp;
 	}
 }
@@ -238,11 +292,16 @@ int acl_vstream_pclose(ACL_VSTREAM *fp)
 	}
 
 	if (fp->errnum == ACL_ETIMEDOUT) {
-		acl_msg_warn("kill child(%d) for waiting timeout ", saved_pid);
+		acl_msg_warn("%s(%d): timeout, kill child(%d), cmdline='%s'",
+			__FUNCTION__, __LINE__, saved_pid,
+			fp->context ? (char*) fp->context : "unknown");
 		kill(saved_pid, SIGTERM);
 	}
 
 	fp->pid = 0;
+	if (fp->context) {
+		acl_myfree(fp->context);
+	}
 	acl_vstream_fclose(fp);
 
 	/*
@@ -330,8 +389,9 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 			acl_vstring_memcat(envbuf, cpp[1], strlen(cpp[1]));
 			ACL_VSTRING_ADDCH(envbuf, '\0');
 		}
-		if (ACL_VSTRING_LEN(envbuf) == 0)
+		if (ACL_VSTRING_LEN(envbuf) == 0) {
 			ACL_VSTRING_ADDCH(envbuf, '\0');
+		}
 		ACL_VSTRING_ADDCH(envbuf, '\0');
 	} else {
 		envbuf = NULL;
@@ -371,8 +431,9 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 	fp->pid = pinfo.dwProcessId;
 	fp->hproc = pinfo.hProcess;
 
-	if (envbuf)
+	if (envbuf) {
 		acl_vstring_free(envbuf);
+	}
 	acl_vstring_free(cmdline);
 	return fp;
 }
@@ -390,9 +451,10 @@ static void wait_child(ACL_VSTREAM *fp)
 	wait_status = WaitForSingleObject(fp->hproc, ntime);
 	if (wait_status == WAIT_OBJECT_0) {
 		if (GetExitCodeProcess(fp->hproc, &wait_status)) {
-			if (wait_status != 0)
+			if (wait_status != 0) {
 				acl_msg_warn("%s(%d): child exit code(%d)",
 					myname, __LINE__, wait_status);
+			}
 		}
 	} else if (wait_status == WAIT_TIMEOUT) {
 		acl_msg_warn("%s(%d): wait child timeout", myname, __LINE__);
