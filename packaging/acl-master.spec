@@ -2,7 +2,7 @@
 
 Summary: acl master framework
 Name:           acl-master
-Version:        3.5.3
+Version:        3.5.4
 Release:        %{release_id}
 Group:          System Environment/Tools
 License:        IBM
@@ -32,23 +32,37 @@ make install_master  DESTDIR=$RPM_BUILD_ROOT
 rm -rf %{buildroot}
 
 %post
-/sbin/chkconfig --add master
 if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
-    service master start > /dev/null 2>&1 ||:
+    %if 0%{?el7:1} || 0%{?el8:1}
+        systemctl enable master.service > /dev/null 2>&1 || :
+        systemctl start master.service > /dev/null 2>&1 || :
+    %else
+        /sbin/chkconfig --add master
+        service master start > /dev/null 2>&1 ||:
+    %endif
 fi
 
 %preun
 if [ "$1" == "0" ]; then
-    service master stop >/dev/null 2>&1 ||:
-    /sbin/chkconfig --del master
+    %if 0%{?el7:1} || 0%{?el8:1}
+        systemctl stop master.service > /dev/null 2>&1 || :
+        systemctl disable master.service > /dev/null 2>&1 || :
+    %else
+        service master stop >/dev/null 2>&1 ||:
+        /sbin/chkconfig --del master
+    %endif
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     echo "prepare restarting acl_master ..."
-    service master masterrestart > /dev/null 2>&1 ||:
+    %if 0%{?el7:1} || 0%{?el8:1}
+        systemctl restart master.service > /dev/null 2>&1 || :
+    %else
+        service master masterrestart > /dev/null 2>&1 ||:
+    %endif
 fi
 
 %files
@@ -61,8 +75,13 @@ fi
 /opt/soft/acl-master/sh
 /opt/soft/acl-master/var
 /etc/init.d/master
+%if 0%{?el7:1} || 0%{?el8:1}
+    /usr/lib/systemd/system/master.service
+%endif
 
 %changelog
+* Mon Jun 13 2022 shuxin.zheng@qq.com 3.5.4-0-20220613.18
+- feature: acl_master support master.service
 
 * Wed Jun 01 2022 shuxin.zheng@qq.com 3.5.3-0-20220601.20
 - feature: acl_master can manage service not written by acl libs
