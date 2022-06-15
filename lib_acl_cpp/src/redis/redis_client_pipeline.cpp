@@ -86,15 +86,15 @@ bool redis_pipeline_channel::flush_all(void)
 				last_serror(), addr_.c_str(), buf_.c_str());
 		}
 
-		// return false if we have retried
+		// Return false if we have retried
 		if (retried) {
 			return false;
 		}
 
-		// close the old connection
+		// Close the old connection
 		client_->close();
 
-		// reopen the new connection
+		// Reopen the new connection
 		if (!((connect_client*) client_)->open()) {
 			logger_error("reopen connection failed!");
 			return false;
@@ -161,13 +161,13 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		} else {
 			msg.set_addr(addr);
 			msg.set_type(redis_pipeline_t_redirect);
-			// transfer to pipeline processs again
+			// Transfer to pipeline processs again
 			pipeline_.push(&msg);
 		}
 	} else if (EQ(ptr, "CLUSTERDOWN")) {
 		msg.set_addr(this->get_addr());
 		msg.set_type(redis_pipeline_t_clusterdonw);
-		// transfer to pipeline processs again
+		// Transfer to pipeline processs again
 		pipeline_.push(&msg);
 	} else {
 		logger_error("unknown error: %s", ptr);
@@ -195,14 +195,14 @@ bool redis_pipeline_channel::wait_results(void)
 		}
 	}
 
-	// if we can't get the first result, the socket maybe be disconnected,
+	// If we can't get the first result, the socket maybe be disconnected,
 	// so we should return false and retry again.
 	if (it == msgs_.begin()) {
 		logger_error("get the first result failed");
 		return false;
 	}
 
-	// return NULL for the left failed results
+	// Return NULL for the left failed results
 	for (; it != msgs_.end(); ++it) {
 		(*it)->push(NULL);
 	}
@@ -258,7 +258,7 @@ void* redis_pipeline_channel::run(void)
 				msgs_.push_back(msg);
 				break;
 			case redis_pipeline_t_stop:
-				// handle left messages and stop the channel.
+				// Handle left messages and stop the channel.
 				handle_messages();
 				return NULL;
 			default:
@@ -342,7 +342,7 @@ void redis_client_pipeline::stop_thread(void)
 {
 	redis_pipeline_message message(NULL, redis_pipeline_t_stop);
 	push(&message);
-	this->wait();  // wait for the thread to exit
+	this->wait();  // Wait for the thread to exit
 }
 
 const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
@@ -356,7 +356,7 @@ void redis_client_pipeline::push(redis_pipeline_message *msg)
 	box_.push(msg, false);
 }
 
-// called after the thread started
+// Called after the thread started
 // @override from acl::thread
 void* redis_client_pipeline::run(void)
 {
@@ -391,7 +391,16 @@ void* redis_client_pipeline::run(void)
 			}
 
 			int slot = msg->get_cmd()->get_slot();
+
+			// When coming from redis_pipeline_channel, the type
+			// will be redis_pipeline_t_redirect or
+			// redis_pipeline_t_clusterdonw. So we should handle
+			// these two types carefully.
+
 			if (type == redis_pipeline_t_redirect) {
+				// Reset to cmd type from redirect type which
+				// will be used in redis_pipeline_channel::run().
+				msg->set_type(redis_pipeline_t_cmd);
 				redirect(*msg, slot);
 			} else if (type == redis_pipeline_t_clusterdonw) {
 				cluster_down(*msg);
@@ -437,14 +446,14 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 		return;
 	}
 
-	// clear all slots' addrs same as the dead node
+	// Clear all slots' addrs same as the dead node
 	for (int i = 0; i < max_slot_; i++) {
 		if (strcmp(slot_addrs_[i], addr) == 0) {
 			slot_addrs_[i] = NULL;
 		}
 	}
 
-	// reset the default addr which different from the the dead node
+	// Reset the default addr which different from the the dead node
 	if (addr_ == addr) {
 		for (std::vector<char*>::const_iterator it = addrs_.begin();
 		     it != addrs_.end(); ++it) {
@@ -454,7 +463,7 @@ void redis_client_pipeline::cluster_down(const redis_pipeline_message &msg)
 			}
 		}
 
-		// stop and remove the dead node
+		// Stop and remove the dead node
 		stop_channel(addr);
 	}
 }
@@ -533,13 +542,13 @@ void redis_client_pipeline::stop_channels(void)
 	while (iter) {
 		redis_pipeline_channel* channel = (redis_pipeline_channel*)
 			iter->get_ctx();
-		// notify and wait for the channel thread to exit
+		// Notify and wait for the channel thread to exit
 		channel->stop_thread();
 		channels.push_back(channel);
 		iter = channels_->next_node();
 	}
 
-	// delete all channels threads
+	// Delete all channels threads
 	for (std::vector<redis_pipeline_channel*>::iterator
 		     it = channels.begin(); it != channels.end(); ++it) {
 		channels_->remove(((*it)->get_addr()));
@@ -592,14 +601,14 @@ void redis_client_pipeline::stop_channel(const char *addr)
 redis_pipeline_channel* redis_client_pipeline::get_channel(int slot)
 {
 	const char* addr;
-	// first, get one addr of cluster mode when slot is valid
+	// First, get one addr of cluster mode when slot is valid
 	if (slot >= 0 && slot < (int) max_slot_) {
 		addr = slot_addrs_[slot];
 		if (addr == NULL) {
 			addr = addr_.c_str();
 		}
 	}
-	// then, use the default addr for mode in cluster or alone
+	// Then, use the default addr for mode in cluster or alone
 	else {
 		addr = addr_.c_str();
 	}
