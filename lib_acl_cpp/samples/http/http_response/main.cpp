@@ -66,7 +66,7 @@ static void handle_request(acl::socket_stream* conn)
 			break;
 	}
 
-	conn->close();
+	//conn->close();
 	printf(">>>> close client <<<<\r\n");
 }
 
