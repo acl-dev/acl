@@ -15,7 +15,8 @@ class ACL_CPP_API http_response : public noncopyable
 {
 public:
 	/**
-	 * 构造函数：通过该构造函数传入的 socket_stream 流对象将在本类析构时释放
+	 * 构造函数：通过该构造函数传入的 socket_stream 流对象需要用户自己进行
+	 * 删除,内部在析构时并不会删除它.
 	 * @param client {socket_stream*} 数据连接流，非空
 	 * 注：该类实例在长连接时可以被多次使用，但一定得注意使用
 	 * 顺序：get_body->response
