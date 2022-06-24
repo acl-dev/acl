@@ -172,7 +172,7 @@ bool mqtt_header::build_header(string& out) {
 }
 
 mqtt_qos_t mqtt_header::get_qos(void) const {
-	switch ((hflags_ >> 1) & 0x0f) {
+	switch ((hflags_ >> 1) & 0x03) {
 	case MQTT_QOS1:
 		return MQTT_QOS1;
 	case MQTT_QOS2:
