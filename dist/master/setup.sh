@@ -167,6 +167,7 @@ create_all_path()
 	create_path $VAR_PATH/private
 	create_path $VAR_PATH/public
 	create_path $INIT_PATH
+	create_path $SYSTEMD_INIT_PATH
 
 	chmod 700 $VAR_PATH/private
 	chmod 1777 $VAR_PATH/log
