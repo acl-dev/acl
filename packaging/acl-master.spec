@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary: acl master framework
 Name:           acl-master
@@ -36,6 +36,7 @@ if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
     %if 0%{?el7:1} || 0%{?el8:1}
         systemctl enable master.service > /dev/null 2>&1 || :
+	systemctl daemon-reload > /dev/null 2>&1 || :
         systemctl start master.service > /dev/null 2>&1 || :
     %else
         /sbin/chkconfig --add master
@@ -80,6 +81,9 @@ fi
 %endif
 
 %changelog
+* Tue Jun 28 2022 shuxin.zheng@qq.com 3.5.4-1-20220628.23
+- optimize: acl_master support master.service
+
 * Mon Jun 13 2022 shuxin.zheng@qq.com 3.5.4-0-20220613.18
 - feature: acl_master support master.service
 
