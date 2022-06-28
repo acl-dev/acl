@@ -1,1 +1,0 @@
-{"error_code": "ok", "error_msg": "ok", data: [{ "name": "Ö£Ê÷ÐÂ", "pass": "zsx1" }, { "name": "Ö£Ê÷ÐÂ", "pass": "zsx2" }]}

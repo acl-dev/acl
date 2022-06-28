@@ -1,2 +1,0 @@
-include ':websocket'
-rootProject.name='websocket'

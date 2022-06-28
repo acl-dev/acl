@@ -1,2 +1,0 @@
-#!/bin/sh
-./websocket alone

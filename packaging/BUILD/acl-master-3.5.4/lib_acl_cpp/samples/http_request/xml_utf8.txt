@@ -1,7 +1,0 @@
-<root>
-  <users>
-    <user name="中国" pass="xxx1" />
-    <user name="中国" pass="xxx1" />
-    <user name="中国" pass="xxx1" />
-  </users>
-</root>

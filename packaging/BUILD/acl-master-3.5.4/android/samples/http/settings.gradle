@@ -1,2 +1,0 @@
-include ':http'
-rootProject.name='http'

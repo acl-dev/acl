@@ -1,6 +1,0 @@
-POST / HTTP/1.1
-HOST: 127.0.0.1:8888
-Content-Type: text/json; charset=gb2312
-Content-Length: 124
-
-{"error_code": "ok", "error_msg": "ok", data: [{ "name": "Ö£Ê÷ÐÂ", "pass": "zsx1" }, { "name": "Ö£Ê÷ÐÂ", "pass": "zsx2" }]}

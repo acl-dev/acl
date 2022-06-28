@@ -1,8 +1,0 @@
-<listitem>
-	<para><acronym>XML</acronym> catalog behavior can be changed by redirecting
-		queries to the user's own set of catalogs. This can be done by setting
-		the <envar>XML_CATALOG_FILES</envar> environment variable to a list
-		of catalogs. An empty one should deactivate loading the
-		default <filename>/etc/xml/catalog</filename>
-	</para>
-</listitem>

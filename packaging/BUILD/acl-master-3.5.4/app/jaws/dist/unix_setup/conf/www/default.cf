@@ -1,5 +1,0 @@
-service test {
-	host = localhost
-	root_path = {install_path}/www/htdocs/
-#	vpath_map = /  {install_path}/www/htdocs/  0
-}

@@ -1,5 +1,0 @@
-Ðì¸Õ»Ô <xuganghui> changed: 
-What    |Removed             |Added
--------------------------------------
-Status|NEW                   |ASSIGNED
-AssignedTo|xuganghui         |zhengshuxin

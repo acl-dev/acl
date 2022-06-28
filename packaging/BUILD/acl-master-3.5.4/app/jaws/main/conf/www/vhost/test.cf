@@ -1,7 +1,0 @@
-service test {
-	host = test.com.cn
-	root_path = /opt/acl/var/www/htdocs/test.domain/html/
-	vpath_map = /  /opt/acl/var/www/htdocs/test.domain/html/  0
-	vpath_map = /test2/  /opt/acl/var/www/htdocs/test.domain/test2/html/  0
-	vpath_map = /test3/  /opt/acl/var/www/htdocs/test.domain/test3/html/  0
-}

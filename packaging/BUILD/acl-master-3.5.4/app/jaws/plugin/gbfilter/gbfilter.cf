@@ -1,6 +1,0 @@
-# configure
-
-service gbfilter {
-	logpath = /opt/jaws/var/log/gbfilter.log
-	data_clone = 0
-}

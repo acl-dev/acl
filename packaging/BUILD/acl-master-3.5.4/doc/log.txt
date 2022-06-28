@@ -1,9 +1,0 @@
-
-1) 2011.4.18
-1.1) 为了更好地以 UDP 方式与 syslog-ng 通信，应在 syslog-ng.conf
-中的 source 中添加选项: so_rcvbuf(xxx)，如:
-source s_udp {
-	udp(ip(0.0.0.0) port(12345) so_rcvbuf(81920000));
-};
-
-同时配置 net.core.rmem_max, 如: /sbin/sysctl -w net.core.rmem_max=81920000

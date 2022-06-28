@@ -1,2 +1,0 @@
-ip -f inet addr add 192.168.146.229/32 brd 192.168.146.229 dev eth0
-ip -f inet addr delete 192.168.146.229/32 brd 192.168.146.229 dev eth0

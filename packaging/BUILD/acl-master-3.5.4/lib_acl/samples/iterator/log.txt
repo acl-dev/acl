@@ -1,3 +1,0 @@
-begin set mem_hook
-acl_debug_dump(222): begin scan memory alloc and free
-acl_debug_dump(227): scan memory finish

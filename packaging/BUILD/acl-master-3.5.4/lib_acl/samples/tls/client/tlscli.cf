@@ -1,6 +1,0 @@
-
-service tlscli {
-	client_tls_loglevel = 0
-	client_tls_scert_vd = 9
-	client_starttls_tmout = 300
-}

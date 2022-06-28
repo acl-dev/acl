@@ -1,9 +1,0 @@
-mail:foo@localhost.localdomain
-rcpt:admin@test.com
-
-From: <foo@localhost.localdomain>
-To: <admin@test.com>
-Date: Fri, 17 Dec 2010 09:55:10 +0800 (CST)
-Message-Id: <4f9f.0003.ffffffed@localhost.localdomain>
-
-XXXXXXXXXX
