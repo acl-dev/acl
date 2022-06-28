@@ -27,7 +27,7 @@ x64/
 build/
 Debug/
 Release/
-dist/
+#dist/
 acl_cpp_vc2015.VC.VC.opendb
 acl_cpp_vc2015.VC.db
 app/gson/debug/

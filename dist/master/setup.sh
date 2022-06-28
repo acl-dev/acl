@@ -146,6 +146,7 @@ CONF_PATH=$PREFIX_PATH$INSTALL_PATH/conf
 SERVICE_PATH=$PREFIX_PATH$INSTALL_PATH/conf/service
 LIBEXEC_PATH=$PREFIX_PATH$INSTALL_PATH/libexec
 INIT_PATH=$PREFIX_PATH/etc/init.d/
+SYSTEMD_INIT_PATH=$PREFIX_PATH/usr/lib/systemd/system/
 SH_PATH=$PREFIX_PATH$INSTALL_PATH/sh
 VAR_PATH=$PREFIX_PATH$INSTALL_PATH/var
 
@@ -187,6 +188,7 @@ copy_all_file()
 	install_file a+x,go-wrx conf/service $SERVICE_PATH
 #	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
 	install_file a+x,go-wrx init.d/ $INIT_PATH
+	install_file a-x,go-wx system/ $SYSTEMD_INIT_PATH
 }
 
 guess_os
