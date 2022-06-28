@@ -7,7 +7,7 @@ tempdir="/tmp"
 umask 022       
 
 censored_ls() {
-    ls "$@" | egrep -v '^\.|/\.|CVS|RCS|SCCS|linux\.d|solaris\.d|hp_ux\.d|example|service'
+    ls "$@" | egrep -v '^\.|/\.|CVS|RCS|SCCS|linux\.d|solaris\.d|hp_ux\.d|example'
 }               
         
 compare_or_replace() {
