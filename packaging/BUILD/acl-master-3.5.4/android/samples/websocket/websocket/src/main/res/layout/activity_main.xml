@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:id="@+id/layoutText"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/domain_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp">
+            <TextView
+                android:id="@+id/domain_lable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:text="域名："
+                android:textSize="20sp" />
+
+            <EditText
+                android:id="@+id/domain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@+id/domain_lable"
+                android:ems="10"
+                android:inputType="textPersonName"
+                android:text="10.110.28.210|8885"
+                android:verticalScrollbarPosition="defaultPosition"
+                tools:layout_editor_absoluteX="88dp"
+                tools:layout_editor_absoluteY="97dp" />
+                </RelativeLayout>
+        <Button
+           android:id="@+id/http_get"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:text="请求"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:textSize="20sp"
+           android:layout_below="@+id/domain_layout"
+           android:layout_centerVertical="true"
+           android:textStyle="bold" />
+       <Button
+           android:id="@+id/clear_results"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_below="@+id/http_get"
+           android:layout_centerVertical="true"
+           android:layout_marginLeft="10dp"
+           android:layout_marginRight="10dp"
+           android:text="清空"
+           android:textSize="20sp"
+           android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/result"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/http_get"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="55dp"
+            android:fadeScrollbars="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:maxLines="15"
+            android:paddingLeft="40dp"
+            android:paddingTop="40dp"
+            android:paddingRight="40dp"
+            android:paddingBottom="40dp"
+            android:scrollbarStyle="outsideInset"
+            android:scrollbars="vertical"
+	    android:fillViewport="true"
+            android:scrollHorizontally="true"
+            android:text="TextView"
+            android:visibility="visible"
+            tools:layout_editor_absoluteX="65dp"
+            tools:visibility="visible" />
+   </RelativeLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

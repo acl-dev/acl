@@ -1,0 +1,6 @@
+service http_plugin_access {
+#	以下域名列表是否允许访问
+	http_domain_allow = hexun.com, hexun.com.tw
+#	是否允许访问其它所有域名
+	http_domain_allow_all = 1
+}

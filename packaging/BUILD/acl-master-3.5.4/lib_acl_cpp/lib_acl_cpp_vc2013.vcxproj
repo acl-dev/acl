@@ -1,0 +1,872 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugDll|Win32">
+      <Configuration>DebugDll</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="DebugDll|x64">
+      <Configuration>DebugDll</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Releasedll|Win32">
+      <Configuration>Releasedll</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Releasedll|x64">
+      <Configuration>Releasedll</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}</ProjectGuid>
+    <RootNamespace>lib_acl_cpp</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>lib_acl_cpp</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">.\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">.\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)_vc2013d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectName)_vc2013d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">$(ProjectName)_d</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">$(ProjectName)</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">$(ProjectName)</TargetName>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">true</LinkIncremental>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectName)_vc2013</TargetName>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectName)_vc2013</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IntDir>Debug\</IntDir>
+    <OutDir>.\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>.\</OutDir>
+    <IntDir>.\Release\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
+    <OutDir>.\</OutDir>
+    <IntDir>DebugDll\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">
+    <OutDir>.\</OutDir>
+    <IntDir>ReleaseDll\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_vc2013d.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName)_vc2013d.lib</OutputFile>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_MT;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(ProjectName)_vc2013d.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(ProjectName)_vc2013d.lib</OutputFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win64\$(TargetName).lib /Y
+copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_vc2013.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName)_vc2013.lib</OutputFile>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_LIB;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_vc2013.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(ProjectName)_vc2013.lib</OutputFile>
+      <TargetMachine>MachineX64</TargetMachine>
+    </Lib>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win64\$(TargetName).lib /Y
+copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_d.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\lib\win32;..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcmt;libc</IgnoreSpecificDefaultLibraries>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).dll ..\dist\lib\win32\$(TargetName).dll /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_DEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName)_d.pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>lib_protocol_d.lib;lib_acl_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName)_d.dll</OutputFile>
+      <AdditionalLibraryDirectories>..\lib\win64;..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcmt;libc</IgnoreSpecificDefaultLibraries>
+      <GenerateMapFile>true</GenerateMapFile>
+      <AssemblyDebug>true</AssemblyDebug>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win64\$(TargetName).lib /Y
+copy $(TargetName).dll ..\dist\lib\win64\$(TargetName).dll /Y
+copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;.\src;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>..\lib\win32;..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <IgnoreSpecificDefaultLibraries>libcmt;libc</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win32\$(TargetName).lib /Y
+copy $(TargetName).dll ..\dist\lib\win32\$(TargetName).dll /Y
+copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>.\include;..\lib_acl\include;..\lib_protocol\include;..\include\sqlite;..\include\mysql;..\include\pgsql;.\src;..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;_LIB;_MT;ACL_DLL;ACL_CPP_DLL;ACL_CPP_EXPORTS;USE_WIN_ICONV;HAS_MYSQL_DLL;HAS_SQLITE_DLL;HAS_PGSQL_DLL;HAS_POLARSSL_DLL;HAS_MBEDTLS_DLL;HAS_ZLIB_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>acl_stdafx.hpp</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <ProgramDataBaseFileName>$(OutDir)$(ProjectName).pdb</ProgramDataBaseFileName>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>lib_protocol.lib;lib_acl.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).dll</OutputFile>
+      <AdditionalLibraryDirectories>..\lib\win64;..\dist\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>$(OutDir)$(TargetName).lib</ImportLibrary>
+      <IgnoreSpecificDefaultLibraries>libcmt;libc</IgnoreSpecificDefaultLibraries>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetName).lib ..\dist\lib\win64\$(TargetName).lib /Y
+copy $(TargetName).dll ..\dist\lib\win64\$(TargetName).dll /Y
+copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="src\acl_cpp_init.cpp" />
+    <ClCompile Include="src\acl_cpp_test.cpp" />
+    <ClCompile Include="src\acl_stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Releasedll|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Releasedll|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="src\beanstalk\beanstalk.cpp" />
+    <ClCompile Include="src\beanstalk\beanstalk_pool.cpp" />
+    <ClCompile Include="src\connpool\check_client.cpp" />
+    <ClCompile Include="src\connpool\check_rpc.cpp" />
+    <ClCompile Include="src\connpool\check_timer.cpp" />
+    <ClCompile Include="src\connpool\connect_manager.cpp" />
+    <ClCompile Include="src\connpool\connect_monitor.cpp" />
+    <ClCompile Include="src\connpool\connect_pool.cpp" />
+    <ClCompile Include="src\connpool\tcp_reader.cpp" />
+    <ClCompile Include="src\connpool\tcp_sender.cpp" />
+    <ClCompile Include="src\connpool\tcp_client.cpp" />
+    <ClCompile Include="src\connpool\tcp_pool.cpp" />
+    <ClCompile Include="src\connpool\tcp_manager.cpp" />
+    <ClCompile Include="src\connpool\tcp_ipc.cpp" />
+    <ClCompile Include="src\db\db_handle.cpp" />
+    <ClCompile Include="src\db\db_mysql.cpp" />
+    <ClCompile Include="src\db\db_pgsql.cpp" />
+    <ClCompile Include="src\db\db_pool.cpp" />
+    <ClCompile Include="src\db\mysql_conf.cpp" />
+    <ClCompile Include="src\db\mysql_manager.cpp" />
+    <ClCompile Include="src\db\pgsql_conf.cpp" />
+    <ClCompile Include="src\db\pgsql_manager.cpp" />
+    <ClCompile Include="src\db\query.cpp" />
+    <ClCompile Include="src\db\db_service.cpp" />
+    <ClCompile Include="src\db\db_service_mysql.cpp" />
+    <ClCompile Include="src\db\db_service_sqlite.cpp" />
+    <ClCompile Include="src\db\db_sqlite.cpp" />
+    <ClCompile Include="src\db\mysql_pool.cpp" />
+    <ClCompile Include="src\db\pgsql_pool.cpp" />
+    <ClCompile Include="src\db\sqlite_manager.cpp" />
+    <ClCompile Include="src\db\sqlite_cursor.cpp" />
+    <ClCompile Include="src\db\sqlite_pool.cpp" />
+    <ClCompile Include="src\disque\disque.cpp" />
+    <ClCompile Include="src\disque\disque_cond.cpp" />
+    <ClCompile Include="src\disque\disque_job.cpp" />
+    <ClCompile Include="src\event\event_mutex.cpp" />
+    <ClCompile Include="src\event\event_timer.cpp" />
+    <ClCompile Include="src\hsocket\hsclient.cpp" />
+    <ClCompile Include="src\hsocket\hserror.cpp" />
+    <ClCompile Include="src\hsocket\hspool.cpp" />
+    <ClCompile Include="src\hsocket\hsproto.cpp" />
+    <ClCompile Include="src\hsocket\hsrow.cpp" />
+    <ClCompile Include="src\hsocket\hstable.cpp" />
+    <ClCompile Include="src\http\HttpCookie.cpp" />
+    <ClCompile Include="src\http\HttpServlet.cpp" />
+    <ClCompile Include="src\http\HttpServletRequest.cpp" />
+    <ClCompile Include="src\http\HttpServletResponse.cpp" />
+    <ClCompile Include="src\http\HttpSession.cpp" />
+    <ClCompile Include="src\http\http_aclient.cpp" />
+    <ClCompile Include="src\http\http_client.cpp" />
+    <ClCompile Include="src\http\http_ctype.cpp" />
+    <ClCompile Include="src\http\http_download.cpp" />
+    <ClCompile Include="src\http\http_header.cpp" />
+    <ClCompile Include="src\http\http_mime.cpp" />
+    <ClCompile Include="src\http\http_pipe.cpp" />
+    <ClCompile Include="src\http\http_request.cpp" />
+    <ClCompile Include="src\http\http_request_manager.cpp" />
+    <ClCompile Include="src\http\http_request_pool.cpp" />
+    <ClCompile Include="src\http\http_response.cpp" />
+    <ClCompile Include="src\http\http_service.cpp" />
+    <ClCompile Include="src\http\http_utils.cpp" />
+    <ClCompile Include="src\http\websocket.cpp" />
+    <ClCompile Include="src\http\WebSocketServlet.cpp" />
+    <ClCompile Include="src\ipc\ipc_client.cpp" />
+    <ClCompile Include="src\ipc\ipc_server.cpp" />
+    <ClCompile Include="src\ipc\ipc_service.cpp" />
+    <ClCompile Include="src\ipc\rpc.cpp" />
+    <ClCompile Include="src\master\master_aio.cpp" />
+    <ClCompile Include="src\master\master_base.cpp" />
+    <ClCompile Include="src\master\master_conf.cpp" />
+    <ClCompile Include="src\master\master_proc.cpp" />
+    <ClCompile Include="src\master\master_threads.cpp" />
+    <ClCompile Include="src\master\master_trigger.cpp" />
+    <ClCompile Include="src\master\master_udp.cpp" />
+    <ClCompile Include="src\memcache\memcache.cpp" />
+    <ClCompile Include="src\memcache\memcache_manager.cpp" />
+    <ClCompile Include="src\memcache\memcache_pool.cpp" />
+    <ClCompile Include="src\mime\internal\header_opts.cpp" />
+    <ClCompile Include="src\mime\internal\header_token.cpp" />
+    <ClCompile Include="src\mime\internal\is_header.cpp" />
+    <ClCompile Include="src\mime\internal\mime_state.cpp" />
+    <ClCompile Include="src\mime\internal\mime_state_parse.cpp" />
+    <ClCompile Include="src\mime\internal\quote_821_local.cpp" />
+    <ClCompile Include="src\mime\internal\quote_822_local.cpp" />
+    <ClCompile Include="src\mime\internal\rec_type.cpp" />
+    <ClCompile Include="src\mime\internal\tok822_find.cpp" />
+    <ClCompile Include="src\mime\internal\tok822_node.cpp" />
+    <ClCompile Include="src\mime\internal\tok822_parse.cpp" />
+    <ClCompile Include="src\mime\internal\tok822_tree.cpp" />
+    <ClCompile Include="src\mime\internal\trimblanks.cpp" />
+    <ClCompile Include="src\mime\mime.cpp" />
+    <ClCompile Include="src\mime\mime_attach.cpp" />
+    <ClCompile Include="src\mime\mime_base64.cpp" />
+    <ClCompile Include="src\mime\mime_body.cpp" />
+    <ClCompile Include="src\mime\mime_code.cpp" />
+    <ClCompile Include="src\mime\mime_head.cpp" />
+    <ClCompile Include="src\mime\mime_image.cpp" />
+    <ClCompile Include="src\mime\mime_node.cpp" />
+    <ClCompile Include="src\mime\mime_quoted_printable.cpp" />
+    <ClCompile Include="src\mime\mime_uucode.cpp" />
+    <ClCompile Include="src\mime\mime_xxcode.cpp" />
+    <ClCompile Include="src\mime\rfc2047.cpp" />
+    <ClCompile Include="src\mime\rfc822.cpp" />
+    <ClCompile Include="src\net\rfc1035.cpp" />
+    <ClCompile Include="src\queue\queue_file.cpp" />
+    <ClCompile Include="src\queue\queue_manager.cpp" />
+    <ClCompile Include="src\redis\redis.cpp" />
+    <ClCompile Include="src\redis\redis_client.cpp" />
+    <ClCompile Include="src\redis\redis_client_cluster.cpp" />
+    <ClCompile Include="src\redis\redis_client_pipeline.cpp" />
+    <ClCompile Include="src\redis\redis_client_pool.cpp" />
+    <ClCompile Include="src\redis\redis_cluster.cpp" />
+    <ClCompile Include="src\redis\redis_command.cpp" />
+    <ClCompile Include="src\redis\redis_connection.cpp" />
+    <ClCompile Include="src\redis\redis_geo.cpp" />
+    <ClCompile Include="src\redis\redis_hash.cpp" />
+    <ClCompile Include="src\redis\redis_hyperloglog.cpp" />
+    <ClCompile Include="src\redis\redis_key.cpp" />
+    <ClCompile Include="src\redis\redis_list.cpp" />
+    <ClCompile Include="src\redis\redis_master.cpp" />
+    <ClCompile Include="src\redis\redis_slave.cpp" />
+    <ClCompile Include="src\redis\redis_node.cpp" />
+    <ClCompile Include="src\redis\redis_pubsub.cpp" />
+    <ClCompile Include="src\redis\redis_request.cpp" />
+    <ClCompile Include="src\redis\redis_result.cpp" />
+    <ClCompile Include="src\redis\redis_role.cpp" />
+    <ClCompile Include="src\redis\redis_sentinel.cpp" />
+    <ClCompile Include="src\redis\redis_script.cpp" />
+    <ClCompile Include="src\redis\redis_server.cpp" />
+    <ClCompile Include="src\redis\redis_set.cpp" />
+    <ClCompile Include="src\redis\redis_slot.cpp" />
+    <ClCompile Include="src\redis\redis_string.cpp" />
+    <ClCompile Include="src\redis\redis_stream.cpp" />
+    <ClCompile Include="src\redis\redis_transaction.cpp" />
+    <ClCompile Include="src\redis\redis_zset.cpp" />
+    <ClCompile Include="src\serialize\gsoner.cpp" />
+    <ClCompile Include="src\session\memcache_session.cpp" />
+    <ClCompile Include="src\session\redis_session.cpp" />
+    <ClCompile Include="src\session\session.cpp" />
+    <ClCompile Include="src\smtp\mail_attach.cpp" />
+    <ClCompile Include="src\smtp\mail_body.cpp" />
+    <ClCompile Include="src\smtp\mail_message.cpp" />
+    <ClCompile Include="src\smtp\smtp_client.cpp" />
+    <ClCompile Include="src\stdlib\atomic.cpp" />
+    <ClCompile Include="src\stdlib\bitmap.cpp" />
+    <ClCompile Include="src\stdlib\charset_conv.cpp" />
+    <ClCompile Include="src\stdlib\dbuf_pool.cpp" />
+    <ClCompile Include="src\stdlib\dns_service.cpp" />
+    <ClCompile Include="src\stdlib\diff_manager.cpp" />
+    <ClCompile Include="src\stdlib\diff_object.cpp" />
+    <ClCompile Include="src\stdlib\diff_string.cpp" />
+    <ClCompile Include="src\stdlib\escape.cpp" />
+    <ClCompile Include="src\stdlib\internal\win_iconv.cpp" />
+    <ClCompile Include="src\stdlib\json.cpp" />
+    <ClCompile Include="src\stdlib\locker.cpp" />
+    <ClCompile Include="src\stdlib\log.cpp" />
+    <ClCompile Include="src\stdlib\malloc.cpp" />
+    <ClCompile Include="src\stdlib\mbox.cpp" />
+    <ClCompile Include="src\stdlib\md5.cpp" />
+    <ClCompile Include="src\stdlib\pipe_stream.cpp" />
+    <ClCompile Include="src\stdlib\scan_dir.cpp" />
+    <ClCompile Include="src\stdlib\sha1.cpp" />
+    <ClCompile Include="src\stdlib\snprintf.cpp" />
+    <ClCompile Include="src\stdlib\string.cpp" />
+    <ClCompile Include="src\stdlib\thread.cpp" />
+    <ClCompile Include="src\stdlib\thread_cond.cpp" />
+    <ClCompile Include="src\stdlib\thread_mutex.cpp" />
+    <ClCompile Include="src\stdlib\thread_pool.cpp" />
+    <ClCompile Include="src\stdlib\thread_queue.cpp" />
+    <ClCompile Include="src\stdlib\token_tree.cpp" />
+    <ClCompile Include="src\stdlib\url_coder.cpp" />
+    <ClCompile Include="src\stdlib\util.cpp" />
+    <ClCompile Include="src\stdlib\xml.cpp" />
+    <ClCompile Include="src\stdlib\xml1.cpp" />
+    <ClCompile Include="src\stdlib\xml2.cpp" />
+    <ClCompile Include="src\stdlib\zlib_stream.cpp" />
+    <ClCompile Include="src\stream\aio_delay_free.cpp" />
+    <ClCompile Include="src\stream\aio_fstream.cpp" />
+    <ClCompile Include="src\stream\aio_handle.cpp" />
+    <ClCompile Include="src\stream\aio_istream.cpp" />
+    <ClCompile Include="src\stream\aio_listen_stream.cpp" />
+    <ClCompile Include="src\stream\aio_ostream.cpp" />
+    <ClCompile Include="src\stream\aio_socket_stream.cpp" />
+    <ClCompile Include="src\stream\aio_stream.cpp" />
+    <ClCompile Include="src\stream\aio_timer_callback.cpp" />
+    <ClCompile Include="src\stream\aio_timer_delay_free.cpp" />
+    <ClCompile Include="src\stream\fstream.cpp" />
+    <ClCompile Include="src\stream\ifstream.cpp" />
+    <ClCompile Include="src\stream\istream.cpp" />
+    <ClCompile Include="src\stream\ofstream.cpp" />
+    <ClCompile Include="src\stream\ostream.cpp" />
+    <ClCompile Include="src\stream\mbedtls_conf.cpp" />
+    <ClCompile Include="src\stream\mbedtls_io.cpp" />
+    <ClCompile Include="src\stream\polarssl_conf.cpp" />
+    <ClCompile Include="src\stream\polarssl_io.cpp" />
+    <ClCompile Include="src\stream\server_socket.cpp" />
+    <ClCompile Include="src\stream\socket_stream.cpp" />
+    <ClCompile Include="src\stream\sslbase_io.cpp" />
+    <ClCompile Include="src\stream\stdin_stream.cpp" />
+    <ClCompile Include="src\stream\stdout_stream.cpp" />
+    <ClCompile Include="src\stream\stream.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_ack.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_aclient.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_client.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_connack.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_connect.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_disconnect.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_header.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_message.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pingreq.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pingresp.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_puback.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pubcomp.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_publish.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pubrec.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_pubrel.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_suback.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_subscribe.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_unsuback.cpp" />
+    <ClCompile Include="src\mqtt\mqtt_unsubscribe.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\acl_cpp\acl_cpp_define.hpp" />
+    <ClInclude Include="include\acl_cpp\acl_cpp_init.hpp" />
+    <ClInclude Include="include\acl_cpp\acl_cpp_test.hpp" />
+    <ClInclude Include="include\acl_cpp\beanstalk\beanstalk.hpp" />
+    <ClInclude Include="include\acl_cpp\beanstalk\beanstalk_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\check_client.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\connect_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\connect_monitor.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\connect_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_reader.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_sender.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_client.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\connpool\tcp_ipc.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_handle.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_cursor.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_mysql.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_pgsql.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\db\mysql_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\db\pgsql_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\db\pgsql_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\db\query.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_service.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_service_mysql.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_service_sqlite.hpp" />
+    <ClInclude Include="include\acl_cpp\db\db_sqlite.hpp" />
+    <ClInclude Include="include\acl_cpp\db\mysql_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\db\pgsql_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\db\sqlite_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\db\sqlite_cursor.hpp" />
+    <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\disque\disque.hpp" />
+    <ClInclude Include="include\acl_cpp\disque\disque_cond.hpp" />
+    <ClInclude Include="include\acl_cpp\disque\disque_job.hpp" />
+    <ClInclude Include="include\acl_cpp\disque\disque_node.hpp" />
+    <ClInclude Include="include\acl_cpp\event\event_mutex.hpp" />
+    <ClInclude Include="include\acl_cpp\event\event_timer.hpp" />
+    <ClInclude Include="include\acl_cpp\hsocket\hsclient.hpp" />
+    <ClInclude Include="include\acl_cpp\hsocket\hserror.hpp" />
+    <ClInclude Include="include\acl_cpp\hsocket\hspool.hpp" />
+    <ClInclude Include="include\acl_cpp\hsocket\hsproto.hpp" />
+    <ClInclude Include="include\acl_cpp\hsocket\hsrow.hpp" />
+    <ClInclude Include="include\acl_cpp\hsocket\hstable.hpp" />
+    <ClInclude Include="include\acl_cpp\http\HttpCookie.hpp" />
+    <ClInclude Include="include\acl_cpp\http\HttpServlet.hpp" />
+    <ClInclude Include="include\acl_cpp\http\HttpServletRequest.hpp" />
+    <ClInclude Include="include\acl_cpp\http\HttpServletResponse.hpp" />
+    <ClInclude Include="include\acl_cpp\http\HttpSession.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_aclient.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_client.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_ctype.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_download.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_header.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_mime.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_pipe.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_request.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_request_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_request_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_response.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_service.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_type.hpp" />
+    <ClInclude Include="include\acl_cpp\http\http_utils.hpp" />
+    <ClInclude Include="include\acl_cpp\http\websocket.hpp" />
+    <ClInclude Include="include\acl_cpp\http\WebSocketServlet.hpp" />
+    <ClInclude Include="include\acl_cpp\ipc\ipc_client.hpp" />
+    <ClInclude Include="include\acl_cpp\ipc\ipc_server.hpp" />
+    <ClInclude Include="include\acl_cpp\ipc\ipc_service.hpp" />
+    <ClInclude Include="include\acl_cpp\ipc\rpc.hpp" />
+    <ClInclude Include="include\acl_cpp\lib_acl.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_aio.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_base.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_proc.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_threads.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_trigger.hpp" />
+    <ClInclude Include="include\acl_cpp\master\master_udp.hpp" />
+    <ClInclude Include="include\acl_cpp\memcache\memcache.hpp" />
+    <ClInclude Include="include\acl_cpp\memcache\memcache_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\memcache\memcache_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_attach.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_base64.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_body.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_code.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_define.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_head.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_image.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_node.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_quoted_printable.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_uucode.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\mime_xxcode.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\rfc2047.hpp" />
+    <ClInclude Include="include\acl_cpp\mime\rfc822.hpp" />
+    <ClInclude Include="include\acl_cpp\net\rfc1035.hpp" />
+    <ClInclude Include="include\acl_cpp\queue\queue_file.hpp" />
+    <ClInclude Include="include\acl_cpp\queue\queue_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_client.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_client_cluster.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_client_pipeline.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_client_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_cluster.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_command.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_hash.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_hyperloglog.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_key.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_list.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_master.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_slave.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_node.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_pubsub.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_result.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_role.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_sentinel.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_script.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_server.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_set.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_slot.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_string.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_transaction.hpp" />
+    <ClInclude Include="include\acl_cpp\redis\redis_zset.hpp" />
+    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp" />
+    <ClInclude Include="include\acl_cpp\session\memcache_session.hpp" />
+    <ClInclude Include="include\acl_cpp\session\redis_session.hpp" />
+    <ClInclude Include="include\acl_cpp\session\session.hpp" />
+    <ClInclude Include="include\acl_cpp\smtp\mail_attach.hpp" />
+    <ClInclude Include="include\acl_cpp\smtp\mail_body.hpp" />
+    <ClInclude Include="include\acl_cpp\smtp\mail_message.hpp" />
+    <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\atomic.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\bitmap.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\diff_manager.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\diff_object.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\diff_string.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\escape.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\final_tpl.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\json.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\locker.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\log.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\malloc.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\mbox.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\md5.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\noncopyable.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\pipe_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\singleton.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\sha1.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\snprintf.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\string.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\tbox.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\thread.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\thread_cond.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\token_tree.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\trigger.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\url_coder.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\util.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\vld.h" />
+    <ClInclude Include="include\acl_cpp\stdlib\xml.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\xml1.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\xml2.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\zlib_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_delay_free.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_fstream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_handle.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_istream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_listen_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_ostream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_socket_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\aio_timer_callback.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\fstream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\ifstream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\istream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\ofstream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\ostream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\mbedtls_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\mbedtls_io.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\server_socket.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\sslbase_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\sslbase_io.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\stdin_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\stdout_stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\stream.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_aclient.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connack.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connect.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_disconnect.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_header.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_message.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingreq.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingresp.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_puback.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubcomp.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_publish.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrec.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrel.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_suback.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_subscribe.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsuback.hpp" />
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsubscribe.hpp" />
+    <ClInclude Include="resource_vc2013.h" />
+    <ClInclude Include="src\acl_stdafx.hpp" />
+    <ClInclude Include="src\connpool\check_rpc.hpp" />
+    <ClInclude Include="src\connpool\check_timer.hpp" />
+    <ClInclude Include="src\mime\internal\header_opts.hpp" />
+    <ClInclude Include="src\mime\internal\header_token.hpp" />
+    <ClInclude Include="src\mime\internal\is_header.hpp" />
+    <ClInclude Include="src\mime\internal\lex_822.hpp" />
+    <ClInclude Include="src\mime\internal\mime_state.hpp" />
+    <ClInclude Include="src\mime\internal\quote_821_local.hpp" />
+    <ClInclude Include="src\mime\internal\quote_822_local.hpp" />
+    <ClInclude Include="src\mime\internal\quote_flags.hpp" />
+    <ClInclude Include="src\mime\internal\rec_type.hpp" />
+    <ClInclude Include="src\mime\internal\tok822.hpp" />
+    <ClInclude Include="src\mime\internal\trimblanks.hpp" />
+    <ClInclude Include="src\redis\redis_request.hpp" />
+    <ClInclude Include="src\stdlib\internal\win_iconv.hpp" />
+    <ClInclude Include="src\stream\aio_timer_delay_free.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="changes.txt" />
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="lib_acl_cpp_vc2013.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

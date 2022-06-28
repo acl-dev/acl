@@ -1,0 +1,447 @@
+
+116) 2021.10.10-12
+116.1) bugfix: 修复采用 iocp 引擎时的问题
+
+115) 2020.1.25
+115.1) bugfix: hook/epoll.c，在 read_callback/write_callback 中如果 nready
+超过了 maxevents，则会引起崩溃，原因是用户在调用 epoll_wait 时可能给定的值
+maxevents 会比较小，所以在 read_callback/write_callback 就增加判断，如果发现
+准备好的句柄数大于 maxevents 值，则直接返回，准备在下次再处理
+
+114) 2019.9.19
+114.1) bugfix: event_epoll.c 中当 epoll_wait 返回 -1 时应该判断 errno 是否为
+中断信号再决定是否需要记录日志
+
+113) 2019.8.17
+113.1) bugfix: fiber_io.c 中 fiber_io_loop() 当 IO 调度退出无法再次重启 IO 调度过程，
+解决方法是在 acl_fiber_schedule() 结尾处重置 IO 调度器状态
+
+112) 2019.8.12
+112.1) workaroud: gettimeofday() 增加条件编译开关
+
+111) 2019.8.8
+111.1) bugfix: io.c 中 hook API sleep 有误
+
+110) 2019.8.6
+110.1) bugfix: gettimeofday 内部在进行时间校准时休眠 50 毫秒，之前是休眠 1 毫秒造成较大误差
+
+109) 2019.7.31
+109.1) performance: 因为 ring.h 中的方法被调用次数比较频繁，所以将其中代码实现
+放在头文件中，成为内联函数或宏定义
+
+108) 2019.7.30
+108.1) performance: 从 DPDK 摘取代码用以实现 getimeofday() 从而获得更高的性能
+
+107) 2019.5.16
+107.1) bugifx: fiber_sem.c/fiber_lock.c 当释放资源时，应该先让出来调度权，以便于
+等待者获得被调度机会
+
+106) 2019.5.9
+106.1) safety & feature: 为防止用错，对于一些类增加了禁止拷贝复制限制
+
+105) 2019.4.30
+105.1) feature: tcp_keeper::peek 增加直连控制参数 sync，当该参数为 true 时，则
+内部不会针对所给地址创建连接池
+
+104) 2019.4.28
+104.1) bugfix: keeper_conn.cpp 中在当 fd dup 后创建 socket_stream 流对象时，
+有可能内部设置的 peer 地址为空，现在通过源 socket_stream 获得 peer 地址再
+给 dup 后的 socket_stream 赋值来解决此类问题
+
+------------------------------------------------------------------------------
+
+103) 2019.1.15
+103.1) feature: tcp_keeper 及相关功能类测试 OK
+
+102) 2019.1.2
+102.1) workaround: fiber_tbox.hpp 将 free_obj 缺省值设为 true，以便与 mbox.hpp
+和 tbox.hpp 中的缺省参数保持一致
+
+101) 2018.12.28
+101.1) feature: libfiber_cpp 模块新 tcp_keeper 类
+
+100) 2018.12.27
+100.1) bugfix: acl_fiber_cond.c 中 acl_fiber_cond_timedwait 和 acl_fiber_cond_wait
+在释放 fbase 对象时，必须在调用 acl_fiber_event_wait 之前，否则会引起句柄被
+提前关闭问题
+
+99) 2018.12.25
+99.1) bugfix: acl_fiber_cond.c 中如果多个线程调用同一个条件变量的的
+acl_fiber_cond_timedwait 方法时，可能会存在超时值失效的情况
+99.2) workaround: fiber_tbox::push 增加 bool 返回值
+
+98) 2018.12.20
+98.1) buffix: fiber_server.cpp 当有连接未断开时，进程无法正常退出
+
+97) 2018.11.29
+97.1) bugfix: fbase_event.c 中 fbase_event_wakeup/fbase_event_wait IO 如果遇到
+中断信号，应该需要重启 IO 过程
+97.2) bugfix: fiber_event.c 的方法 acl_fiber_event_notify 中需要用线程锁对等待
+队列(event->waiters)和原子数(event->atomic)进行保护，否则中间会有时间间隙，导致
+加锁等待者(调用acl_fiber_event_wait)永久等待
+
+96) 2018.11.28
+96.1) bugfix: fiber_event.c 修复锁竞争问题
+96.2) feature: 添加 fiber_cond.c 可用于协程和线程之间的条件变量
+
+95) 2018.11.27
+95.1) bugfix: fiber_event.c 中的锁存在几处锁竞争失效问题
+
+94) 2018.11.26
+94.1) bugfix: event_iocp.c 中的 iocp_check 方法中的一处断言有问题
+-- program_code@sohu.com
+
+93) 2018.11.25
+93.1) feature: fiber_event.c 增加控制参数
+
+92) 2018.10.31
+92.1) compile: acl_set_core_limit 仅可用在 UNIX-like 平台
+
+91) 2018.10.23
+91.1) feature: fiber_server.c 支持所生成 core 文件的大小及进程退出时不产生 core
+
+90) 2018.9.20
+90.1) bugfix: getaddrinfo.c 修复一处 IPV6 相关问题
+
+89) 2018.5.17
+89.1) bugfix: 使用 poll 方法时，在初始化参数时不需要设置 POLLERR, POLLHUP
+
+88) 2018.4.24
+88.1) feature: acl 协程库可以运行在 MacOS 上了
+
+87) 2018.4.17
+87.1) bugfix: 当所有协程还未执行完毕而调用 acl_fiber_stop 时，则需要将缓存的
+协程对象及正在运行的协程对象的内存释放掉
+
+86) 2018.3.5
+86.1) bugfix: acl_fiber_gethostbyname 在协程模式下是不安全的，会存在多个协程
+共用一个线程局部变量的问题，从而导致内存解析失败，解决方式是使用协程局部变量
+
+------------------------------------------------------------------------------
+
+85) 2018.2.6
+85.1) bugfix: 修复了 FreeBSD kqueue 的问题
+
+84) 2018.2.5
+84.1) feature: fiber_server.cpp 支持协程调度时选择不同的事件引擎
+
+83) 2018.2.1
+83.1) feature: 协程事件引擎增加针对 Winsock IOCP 的支持
+
+82) 2018.1.28
+82.1) feature: 增加 API acl_fiber_schedule_init() 可以设置协程调度器为自启动模式
+82.2) feature: 增加 API acl_fiber_schedule_set_event() 可以显式地设置协程事件引擎
+
+81) 2018.1.23
+81.1) bugfix: event_epoll.c 的 函数 epoll_event_wait 中没有处理 EPOLLERR|EPOLLHUP
+的错误情况，会导致程序进入死循环
+
+80) 2018.1.22
+80.1) feature: fiber_io.c 当没有监控网络句柄并且没有定时器任务时，该 IO 协程
+会自动退出
+80.2) bugfix: event_select.c/event_poll.c 当没有网络句柄被监控时，应调用 Sleep，因为
+Windows 下的 select/WSAPoll 不允许输入的句柄为空
+
+79) 2018.1.21
+79.1) bugfix: event_poll.c 中应该处理异常情况（POLLERR | POLLHUP | POLLNVAL）
+
+78) 2018.1.17
+78.1) performance: win32 窗口消息引擎处理性能优化，每次调度循环过程可以尽量多的提取消息，
+从而提升消息处理能力
+
+77) 2018.1.16
+77.1) performance: 针对超时读/写操作时，当调用 poll/select 后再调用读/写，会首先检查
+当前句柄状态，如果可读，则不必再次调用 IO 等待过程
+
+76) 2018.1.14
+76.1) feature: 协程模块可以支持 WIN32 窗口消息引擎，从而可以与界面编程无缝整合
+76.2) feature: acl_fiber_poll/acl_fiber_select 支持 win32 平台
+
+75) 2017.12.28
+75.1) feature: 增加 kqueue 事件引擎以支持 FreeBSD，从而使 acl 协程支持 FreeBSD
+
+74) 2017.12.19
+74.1) bugfix: 解决了 hook poll 时的一个关键性问题
+
+73) 2017.11.23
+73.1) feature: fiber_event.c 新增同时支持协程/线程互斥的锁，性能可达千万级别 QPS
+
+72) 2017.11.2
+72.1) feature: fiber.c, fiber_alloc 中需要增加针对信号的处理过程
+72.2) bugfix: fiber_io.c, fiber_io_loop 中容易产生 32 位整数溢出问题，会导致
+定时器无法触发
+
+71) 2017.10.27
+71.1) bugfix: fiber.c，__thread_fiber->switched 原来为有符号 int 型，有可能会
+因溢出问题造成协程调度出问题
+
+70) 2017.10.20
+70.1) feature: EVENT::poll_list, epoll_list 可以采用 FIFO 或 STACK
+70.2) feature: hook sendfile/sendfile64
+
+69) 2017.10.17
+69.1) feature: 增加 acl_fiber_sys_errno/acl_fiber_sys_errno_set/
+acl::fiber::get_sys_errno/acl::fiber_set_sys_errno API 可用于获得/设置当前线程
+的系统的 errno
+
+68) 2017.10.16
+68.1) feature: hook sendfile API
+
+67) 2017.10.10
+67.1) bugfix: fiber_mutex 当启用线程安全方式时，IO 操作过程会产生非法内存访问
+问题而导致事件进入死循环，原因是多个线程中的多个线程如果同时阻塞在同一 fd 上
+时会容易产生此问题，现修改为当进入 IO 读时，dup 出一个新的 fd 并使线程中的协程
+阻塞在该 fd 上
+
+66) 2017.9.29
+66.1) feature: fiber_mutex 可以同时支持线程锁和协程锁
+
+65) 2017.9.28
+65.1) valgrind: fiber_server.c 当进程退出前需要释放掉一些全局对象，以免干扰
+valgrind 产生一些误报
+
+64) 2017.9.27
+64.1) workaround: 为方便使用 valgrind 检查内存问题，将内部一些静态或全局动态
+对象手动释放，以免干扰应用查看真正的内存问题
+
+63) 2017.9.23
+63.1) feature: hook_io.c 支持 hook mkdir
+
+62) 2017.9.22
+62.1) feature: hook_io.c 支持 hook stat/fstat/lstat
+
+61) 2017.9.20
+61.1) feature: hook_net.c 支持 epoll_create1 API
+
+60) 2017.9.18
+60.1) feature: 增加 fiber_trigger 类用于按时间触发操作
+
+59) 2017.9.10
+59.1) feature: 协程服务器模板在执行完 reload 后可以将执行状态反馈给 master
+
+58) 2017.8.25
+58.1) feature: 添加 C++ 版本的协程定时器类 fiber_timer
+58.2) feature: acl_fiber_create_timer 中增加协程栈大小参数
+
+57) 2017.8.21
+57.1) feature: fiber_server.c 当在独立运行时也可以通过配置文件指定 master_reuseport
+选项
+
+56) 2017.7.27
+56.1) compile: master_fiber.hpp 中去掉了对 master_base.hpp 的包含，要求应用
+需要首先包含该头文件
+56.2) compile: lib_fiber.h 中去年了对 lib_acl.h 的包含
+
+55) 2017.7.22
+55.1) feature: master_fiber 增加 get_conf_path, acl_fiber_server.cpp 中增加
+acl_fiber_server_conf，此二方法用于获得当前的服务配置文件路径
+
+54) 2017.7.7
+54.1) feature: master/fiber_server.c 中将 fiber_sleep 协程的栈大小允许受配置项
+控制；同时将内部的 STACK_SIZE 缺省值由 64 K 改为 128 K，该值也是用户级所创建
+协程的栈缺省大小
+
+53) 2017.7.4
+53.1) feature: fiber_server.c/master_fiber.cpp 支持 SIGHUP 信号回调过程
+53.2) 重构 fiber_server.c/master_fiber.cpp 代码
+
+52) 2017.7.2
+52.1) feature: fiber_server.c 支持多线程运行模式
+
+51) 2017.6.6
+51.1) feature: fiber_server.c 在启动协程调度前的过程放在主线程中进行，从而使
+该段代码的运行栈大小不受协程栈大小的限制
+
+50) 2017.5.16
+50.1) feature: fiber_server.c 协程服务器模板增加了平滑退出机制
+
+49) 2017.5.1
+49.1) samples/pgsql: 添加测试 postgresql 的客户端例子
+
+48) 2017.4.24
+48.1) bugfix: fiber.s 中 acl_fiber_set_specific 在调用 realloc 重新分配内存槽
+时应该将空闲的槽置 NULL
+
+------------------------------------------------------------------------------
+
+47) 2017.4.13
+47.1) feature: hook_net.c 中新增对 getaddrinfo 的支持
+
+46) 2017.4.10
+46.1) feature: 协程信号量当被跨线程使用时，禁止出现同一信号量被不同线程使用
+
+45) 2017.3.29
+45.1) bugfix: 当一个协程处于 poll wait 状态时被另一个协程 kill 掉时，会造成内存
+非法访问，修复方式是在 event.c 中对 poll list 的遍历访问采用 pop 方式，同时在
+hook_net.c 中的 poll 函数中当被 kill 时自动清理自身，与本 BUG 相关的文件有
+fiber.c, hook_net.c, event.c，其中 hook_net.c 及 event.c 中的修复是最关键的
+
+44) 2017.3.28
+44.1) feature: fiber.c 中 fiber_alloc 函数当复用缓存的协程内存对象时，应调用
+free->malloc，而不是调用 realloc，这样一方面可以避免使用 tcmalloc 时的 valgrind
+的内存警告，另一方面，可以有效地使用虚存
+
+43) 2017.3.23
+43.1) feature: fiber.c 中 acl_fiber_signal/acl_fiber_kill 中，需要设置 errno
+为 ECANCELED
+
+42) 2017.3.9
+42.1) compile: ?当打开 valgrind 编译选项时，有一处编译警告
+42.2) workaround: master_fiber 类中的方法 run_alone 去掉最后一个参数，其原来用
+来控制处理次数，改由从配置文件中读取
+
+41) 2017.2.9
+41.1) bugfix: fiber.c 中，fiber_init 函数应该必须保证 __sys_errno 为 NULL 时
+被调用，否则会引起一些静态初始化需要 __sys_errno 的使用
+
+40) 2017.1.23
+40.1) workaround: 协程号统一改成无符号 32 位整数
+
+39) 2017.1.12
+39.1) bugfix: 协程在双通模式下，如果写时堵塞会导致读也堵塞，是因为延迟关闭
+及事件设置不合理
+
+38) 2017.1.5
+38.1) bugfix: fiber.c 中函数 acl_fiber_killed 中的判断有误
+
+37) 2016.12.31
+37.1) feature: 增加 acl_fiber_signal 函数，允许协程给其它协程发送唤醒信号
+
+36) 2016.12.27
+36.1) bugfix: fiber.cpp 中 kill 方法需将 f_ 成员置 NULL，防止嵌套访问非法地址
+36.2) feature: fiber.cpp 允许将当前运行的协程与 fiber 类对象绑定(只需在构造
+函数中将构造参数设为 true)，从而可以方便使用类 fiber 中的方法
+
+35) 2016.12.19
+35.1) feature: fiber.c 中有关协程局部变量的接口调整，更符合实际应用场景
+35.2) bugfix: fiber.c 中当协程退出时，协程局部变量的对象未释放造成内存泄露
+35.3) sample: samples/fiber_local，该示例用于测试协程局部变量
+
+34) 2016.12.16
+34.1) bugfix: hook_net.c, hook_io.c, event_epoll.c 其中因为 hook 了很多系统的
+API，当个别应用在 main 函数执行前需要调用这些 API 时可能会因为 hook 操作还未
+进行而造成函数指针为 NULL，从而导致程序崩溃
+
+33) 2016.12.8
+33.1) bugfix: hook_net.c 中，当非协程模式下，hook epoll 相关 API 应该加以区别
+
+32) 2016.12.3
+32.1) feature: acl_fiber_kill 可以支持因调用 acl_fiber_sleep, acl_fiber_sem,
+acl_fiber_mutex_lock 而阻塞的协程
+
+31) 2016.11.28
+31.1) feature: fiber.cpp 中，fiber 类增加了 kill 和 killed 方法用来”杀死“协程
+和判断指定协程是否已经退出
+
+30) 2016.11.27
+30.1) bugfix: fiber.c 中函数 acl_fiber_create 中存在运行时内存增长问题，即
+__thread_fiber->fibers 对象在 realloc 过程中内存不断增长，因为 __thread_fier->size
+计算方法有问题
+
+29) 2016.11.24
+29.1) feature: 增加 acl_fiber_kill 接口用来通知指定协程退出
+
+28) 2016.10.31
+28.1) feature: fiber.c 中实现了 __i386__ 下 SETJMP，LONGJMP 的汇编方式，从
+libdill 借鉴而来
+
+27) 2016.10.19
+27.1) bugfix: fiber_io.c 中的 __thread_fiber->loop_fn 没有赋初值
+
+26) 2016.9.25
+26.1) feature: 增加 acl_fiber_post_event 函数，在每次事件循环过程中可以调用由
+该函数设置的回调函数
+
+25) 2016.9.22
+25.1) 函数改名： acl_fiber_stop --> acl_fiber_schedule_stop,
+acl::fiber::stop --> acl::fiber::schedule_stop
+
+24) 2016.9.21
+24.1) bugfix: hook_io.c 中的 writev() 函数应该调用 fiber_writev()
+
+23) 2016.9.1
+23.1) feature: 支持 C++11 功能，使用 lambda 表达式创建协程更加方便简洁
+
+------------------------------------------------------------------------------
+
+22) 2016.8.25
+22.1) feature: hook_io.c 中提供了单独的 fiber_xxx IO 接口
+
+21) 2016.8.17
+21.1) performance: fiber.c 中函数 fiber_alloc 在创建协程栈时使用 malloc 代替了
+原来的 calloc，避免内存提交，仅使用虚存，从而有效控制了协程的实际占用内存大小
+21.2) bugfix: hook_io.c 中的 read 等读函数只有当读返回 < 0 时才需要设置 errno
+21.3) bugfix: fiber_io.c, acl_fiber_delay 函数需要合理设置 ev->timeout 值
+21.4) performance: hook_net.c 中 hook 的系统 accept API 优化了接收连接的顺序，
+从而使 accept 速度更快
+
+20) 2016.8.16
+20.1) portable: fiber.c 中增强了 SETJMP 汇编代码移植性
+
+19) 2016.8.10
+19.1) performance&feature: 允许使用 setjmp/longjmp 进行栈的跳转，性能更好
+
+18) 2016.8.7
+18.1) feature: fiber.c 中在 acl_fiber_schedule 结束前自动将 acl_var_hook_sys_api
+置 0，从而恢复系统 API 调用过程
+
+17) 2016.8.5
+17.1) feature: hook_io.c 中增加系统 API sleep 的 hook 函数
+
+16) 2016.8.4
+16.1) bugfix: hook_net.c 中的 gethostbyname_r 在解析域名时的地址所用字节序有误
+--- found by 陈晓勇
+
+15) 2016.7.28
+15.1) bugfix: hook_net.c 中的 poll/epoll_wait 对于超时的计数有误，会导致超时
+时间提前
+
+14) 2016.7.26
+14.1) feature: hook_net.c 中的 connect 函数增加了出错处理
+
+13) 2016.7.22
+13.1) bugfix: poll/epoll_wait API 的超时值设置的不对
+13.1) performance: fiber.c 中 acl_fiber_yield 函数首先判断是否有待处理协程，
+然后再决定是否需要切换协程上下文，从而减少上下文的切换次数
+
+12) 2016.7.14
+12.1) feature: hook_net.c 增加了 epoll 的 hook 支持
+
+11) 2016.7.9
+11.1) feature: fiber_sem.c 增加协程信号量
+
+10) 2016.6.22
+10.1) feature: fiber_server.c 服务模块支持空闲超时退出及处理连接数达上限退出
+
+9) 2016.6.21
+9.1) feature: 将非 socket 类型的 fd 采用同步模式
+9.2) feature: master_fiber.c 支持 dispatch 方式获得客户端连接
+
+8) 2016.6.19
+8.1) feature: 增加了 FIBER 锁功能
+8.2) feature: 增加 fiber_server.c 模块，可由 acl_master 服务器框架控制
+
+7) 2016.6.18
+7.1) feature: 增加了 FIBER_CHANNEL 用于协程间的交互通信
+
+6) 2016.6.15
+6.1) feature: 增加定时器功能 -- fiber_create_timer()
+
+5) 2016.6.14
+5.1) feature: hook 了 errno 所依赖的函数 __errno_location，从而使 errno 针对
+每个协程是安全的
+
+4) 2016.6.11
+4.1) valgrind: 增加编译开关以防止 valgrind 工具对 swapcontext 跳转的误报
+
+3) 2016.6.9
+3.1) performance: fiber_schedule.c，由星形切换改为环形切换，从而提升了上下文件
+切换的效率 --- by niukey@qq.com
+
+2) 2016.6.5
+2.1) feature: 将 fiber_schedule.c, fiber_io.c 中的全局静态变量调整为线程局部
+变量，为实现多线程化协程做准备
+
+1) 2016.6.4
+1.1) 当前的协程支持 hook: read/redv/redv/recvfrom/recvmsg,
+write/writev/send/sendto/sendmsg, poll/select/sleep/gethostbyname/gethostbyname_r

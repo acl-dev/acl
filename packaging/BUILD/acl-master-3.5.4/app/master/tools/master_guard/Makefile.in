@@ -1,0 +1,166 @@
+CC      = g++
+
+CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
+-Wno-long-long \
+-Wpointer-arith -Werror -Wshadow -O3 \
+-D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+
+###########################################################
+#Check system:
+#       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
+SYSLIB = -lpthread -lz
+CHECKSYSRES = @echo "Unknow system type!";exit 1
+OSNAME = $(shell uname -s)
+OSTYPE = $(shell uname -m)
+
+ifeq ($(CC),)
+        CC = gcc
+endif
+
+OS_ENV=$(shell uname -a)
+ifeq ($(findstring WSL, $(OS_ENV)), WSL)
+	SYSLIB += -liconv
+endif
+
+ifeq ($(findstring ubuntu, $(OS_ENV)), ubuntu)
+	SYSLIB += -liconv
+endif
+
+# For FreeBSD
+ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
+	ifeq ($(findstring gcc, $(CC)), gcc)
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DFREEBSD -D_REENTRANT
+	RPATH = freebsd
+	SYSLIB = -lcrypt -lpthread -lz -L/usr/local/lib -liconv
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
+#	CC += -arch x86_64 -arch arm64
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-invalid-offsetof
+	UNIXTYPE = MACOSX
+	RPATH = macos
+	SYSLIB +=  -liconv -rdynamic
+endif
+
+#Path for Linux
+ifeq ($(findstring Linux, $(OSNAME)), Linux)
+	ifeq ($(findstring i686, $(OSTYPE)), i686)
+		RPATH = linux32
+	endif
+	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
+		RPATH = linux64
+	endif
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DLINUX2 -D_REENTRANT
+	SYSLIB += -lcrypt -ldl -lz
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(OSNAME)), MINGW)
+	SYSLIB = -lpthread-2 -liconv -lz
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+	RPATH = mingw
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(OSNAME)), MSYS)
+	SYSLIB = -lpthread-2 -liconv -lz -ldl
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+	RPATH = msys
+endif
+
+#Path for SunOS
+ifeq ($(findstring SunOS, $(OSNAME)), SunOS)
+	ifeq ($(findstring 86, $(OSTYPE)), 86)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($(findstring sun4u, $(OSTYPE)), sun4u)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DSUNOS5 -D_REENTRANT
+	RPATH = sunos5_x86
+endif
+
+#Path for HP-UX
+ifeq ($(findstring HP-UX, $(OSNAME)), HP-UX)
+	ifeq ($CC, "gcc")
+		CFLAGS += -Wstrict-prototypes
+	endif
+	CFLAGS += -DHP_UX -DHPUX11
+	PLAT_NAME=hp-ux
+	RPATH = hpux
+endif
+
+#Find system type.
+ifneq ($(SYSPATH),)
+	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+endif
+###########################################################
+
+ACL_PATH    = ../../../..
+MASTER_PATH = ../..
+GLOBAL_PATH = ../lib_global
+
+CFLAGS += -I. -I$(GLOBAL_PATH)/include \
+	  -I$(MASTER_PATH) \
+	  -I$(ACL_PATH)/lib_acl/include \
+	  -I$(ACL_PATH)/lib_acl_cpp/include \
+	  -I$(ACL_PATH)/lib_protocol/include
+
+LDFLAGS = -L$(GLOBAL_PATH) -lglobal \
+	  -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
+	  -L$(ACL_PATH)/lib_protocol/lib -lprotocol \
+	  -L$(ACL_PATH)/lib_acl/lib -lacl $(SYSLIB)
+
+COMPILE = $(CC) $(CFLAGS)
+LINK = $(CC) $(OBJ) $(LDFLAGS)
+###########################################################
+OBJ_PATH = ./debug
+
+$(shell mkdir -p $(OBJ_PATH))
+
+#Project's objs
+SRC = $(wildcard *.cpp) \
+	$(wildcard $(MASTER_PATH)/daemon/json/*.cpp) \
+	$(wildcard main/*.cpp) \
+	$(wildcard action/*.cpp)
+OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+
+$(OBJ_PATH)/%.o: %.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: main/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: action/%.cpp
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: $(MASTER_PATH)/daemon/json/%.cpp
+	$(COMPILE) $< -o $@
+
+.PHONY = all clean
+all: RM $(OBJ)
+	$(LINK) -o $(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+RM:
+	rm -f $(PROG)
+clean cl:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+rebuild rb: clean all
+install:
+	@mkdir -p ../../../../dist/master/libexec/$(RPATH)
+	@mkdir -p ../../../../dist/master/conf/service
+	cp $(PROG) ../../../../dist/master/libexec/$(RPATH)/
+	cp $(PROG).cf ../../../../dist/master/conf/service/
+###########################################################

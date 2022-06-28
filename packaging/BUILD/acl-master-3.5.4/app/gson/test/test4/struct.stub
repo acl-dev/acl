@@ -1,0 +1,29 @@
+#pragma once
+#include <string>
+#include <set>
+
+struct user
+{
+	std::string name;
+	std::string domain;
+	int  age;
+	bool male;
+
+	std::map<std::string, std::vector<std::string> > names;
+	//Gson@optional
+	std::map<std::string, std::vector<std::string*> > names2;
+	//Gson@optional
+	std::map<std::string, std::string> names3;
+	//Gson@optional
+	std::list<acl::string*> values1;
+	//Gson@optional
+	std::list<acl::string> values2;
+	//Gson@optional
+	std::list<std::string*> values3;
+	//Gson@optional
+	std::list<std::string> values4;
+	//Gson@optional
+	std::map<std::string, std::string*> names4;
+
+	std::set<int> values5;
+};

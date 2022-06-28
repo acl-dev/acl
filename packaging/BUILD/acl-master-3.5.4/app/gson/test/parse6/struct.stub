@@ -1,0 +1,8 @@
+#pragma once
+#include <string>
+
+struct files_outdate
+{
+	std::vector<acl::string> files;
+	std::vector<int> values;
+};

@@ -1,0 +1,156 @@
+CC = $(ENV_CC)
+
+CFLAGS = -c -g -W -Wall -Wcast-qual \
+-Waggregate-return \
+-Wno-long-long \
+-Wmissing-prototypes \
+-Wpointer-arith \
+-Werror \
+-Wshadow \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO
+#-Wno-invalid-source-encoding
+
+# -Wcast-align
+#CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
+#-Waggregate-return -Wmissing-prototypes \
+#-Wpointer-arith -Werror -Wshadow -O2 \
+#-D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO
+###########################################################
+#Check system:
+#       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
+SYSLIB = -lpthread
+CHECKSYSRES = @echo "Unknow system type!";exit 1
+UNIXNAME = $(shell uname -sm)
+
+ifeq ($(CC),)
+        CC = gcc
+endif
+
+ifeq ($(findstring gcc, $(CC)), gcc)
+	CFLAGS += -Wstrict-prototypes
+endif
+
+ifeq ($(findstring clang, $(CC)), clang)
+	CFLAGS += -Wstrict-prototypes \
+		  -Wno-invalid-source-encoding \
+		  -Wno-invalid-offsetof
+endif
+
+ifeq ($(findstring clang++, $(CC)), clang)
+	CFLAGS += -Wno-invalid-source-encoding \
+		  -Wno-invalid-offsetof
+endif
+
+ifeq ($(findstring gcc, $(CC)), clang++)
+	CFLAGS += -Wstrict-prototypes \
+		  -Wno-invalid-source-encoding \
+		  -Wno-invalid-offsetof
+endif
+
+# For FreeBSD
+ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
+	CFLAGS += -DFREEBSD
+	SYSLIB += -lcrypt -rdynamic
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+#	CC += -arch x86_64 -arch arm64
+	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
+		  -Wno-invalid-offsetof
+	SYSLIB += -rdynamic
+	UNIXTYPE = MACOSX
+endif
+
+#Path for Linux
+ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
+#	CFLAGS += -DLINUX2
+	SYSLIB += -lcrypt -rdynamic
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	CFLAGS += -DLINUX2 -DMINGW
+	SYSLIB  = -lpthread-2 -rdynamic
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	CFLAGS += -DLINUX2 -DMINGW
+	SYSLIB  = -lpthread-2 -rdynamic
+	UNIXTYPE = LINUX
+endif
+
+#Path for SunOS
+ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
+	ifeq ($(findstring 86, $(UNIXNAME)), 86)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
+		SYSLIB += -lsocket -lnsl -lrt
+	endif
+	CFLAGS += -DSUNOS5
+	SYSLIB += -lcrypt -rdynamic
+endif
+
+#Path for HP-UX
+ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
+	CFLAGS += -DHP_UX -DHPUX11
+	PLAT_NAME=hp-ux
+	SYSLIB += -lcrypt -rdynamic
+endif
+
+#Find system type.
+ifneq ($(SYSPATH),)
+	CHECKSYSRES = @echo "System is $(shell uname -sm)"
+endif
+###########################################################
+
+BASE_PATH =
+ifneq ($(base_path),)
+	BASE_PATH = $(base_path)
+else
+	BASE_PATH = ../..
+endif
+
+#ACL_PATH   = ../../../lib_acl
+ACL_PATH   = $(BASE_PATH)
+ACL_INC    = $(ACL_PATH)/include
+ACL_LIB    = $(ACL_PATH)/lib
+
+EXTLIBS =
+CFLAGS += -I$(ACL_INC)
+LDFLAGS = -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
+
+###########################################################
+
+OUT_PATH = .
+OBJ_PATH = $(OUT_PATH)
+
+#Project's objs
+SRC = $(wildcard *.c)
+OBJ = $(patsubst %.c, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+###########################################################
+
+.PHONY = all clean
+PROG =
+
+COMPILE = $(CC) $(CFLAGS)
+
+#-Wl,-rpath,$(ACL_LIB) -Wl,-rpath,$(PROTO_LIB) -o $(OBJ_PATH)/$(PROG)
+all: RM $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(OBJ_PATH)/$(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+$(OBJ_PATH)/%.o: %.c
+	$(COMPILE) $< -o $@
+RM:
+	rm -f $(PROG)
+clean:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+###########################################################

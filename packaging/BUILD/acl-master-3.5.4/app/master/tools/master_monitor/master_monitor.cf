@@ -1,0 +1,127 @@
+
+service master_monitor
+{
+#	进程是否禁止运行
+	master_disable = no
+#	服务地址及端口号
+#	for master_type = inet
+#	master_service = 127.0.0.1:5001
+#	for master_type = unix
+#	master_service = echo.sock
+#	for master_type = sock
+	master_service = monitor.sock
+
+#	服务监听为域套接口
+#	master_service = aio_echo.sock
+#	服务类型
+#	master_type = inet
+#	master_type = unix
+	master_type = sock
+
+#	停止子进程时是否采用强行停止的方式(即给子进程发送 SIGTERM 信号)
+	master_stop_kill = false
+#	当 master_stop_kill 为 true 时，该配置决定是否要等待子进程退出
+	master_stop_wait = false
+
+#	当系统支持 SO_REUSEPORT 时，是否启用该功能
+	master_reuseport = yes
+#	是否针对监听套接口设定为非阻塞方式
+	master_nonblock = yes
+#	当系统支持 TCP_FASTOPEN 时，是否启用该功能
+	master_fastopen = no
+
+#	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
+#	master_notify_addr = 127.0.0.1:5801
+#	邮件通知接收者
+#	master_notify_recipients = zhengshuxin@hotmail.com
+
+#	是否允许延迟接受客户端连接，如果为0则表示关闭该功能，如果大于0则表示打开此功能
+#	并且此值代表延迟接受连接的超时值，超过此值时如果客户端依然没有发来数据，则操作
+#	系统会在系统层直接关闭该连接
+#	master_defer_accept = 0
+#	是否只允许私有访问, 如果为 y, 则域套接口创建在 {install_path}/var/log/private/ 目录下,
+#	如果为 n, 则域套接口创建在 {install_path}/var/log/public/ 目录下,
+	master_private = n
+	master_unpriv = n
+#	是否需要 chroot: n -- no, y -- yes
+	master_chroot = n
+#	每隔多长时间触发一次，单位为秒(仅对 trigger 模式有效)
+	master_wakeup = -
+#	最大进程数
+	master_maxproc = 1
+#	预启动进程数，该值不得大于 master_maxproc
+	master_prefork = 1
+#	进程程序名
+	master_command = master_monitor
+#	进程日志记录文件
+	master_log = {install_path}/var/log/master_monitor
+#	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
+#	master_debug =
+#	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
+#	master_args =
+#	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
+#	master_env = mempool_limit:512000000
+#	当启动多个子进程实例时，该开关控制多个子进程在接收连接时是否向 acl_master 发送消息报告自己的状态
+#	master_status_notify = 1
+#	是否允许产生 core 文件
+#	fiber_enable_core = 1
+#	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
+	fiber_use_limit = 0
+#	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
+	fiber_idle_limit = 0
+#	每个进程启动的线程数
+	fiber_threads = 1
+#	进程运行时所在的路径
+	fiber_queue_dir = {install_path}/var
+#	读写超时时间, 单位为秒
+	fiber_rw_timeout = 120
+#	读缓冲区的缓冲区大小
+	fiber_buf_size = 8192
+#	进程运行时的用户身份
+	fiber_owner = root
+
+#	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
+#	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接
+#	fiber_dispatch_addr = {install_path}/var/private/dispatch.sock
+#	当 fiber_dispatch_addr 开启后，下面参数控制本服务进程发给前端 master_dispatch 的服务标识信息
+#	fiber_dispatch_type = default
+
+#	线程的堆栈空间大小，单位为字节
+	fiber_stack_size = 64000
+#	允许访问 udserver 的客户端IP地址范围
+#	fiber_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
+	fiber_access_allow = all
+
+#	当 acl_master 退出时，如果该值置1则该程序不等所有连接处理完毕便立即退出
+	fiber_quick_abort = 1
+
+#	当 fiber_quick_abort 为 0 且本配置项大于 0 时，该配置项才有效，指定了
+#	本进程在所有连接退出前的最大等待时间(秒)
+	fiber_wait_limit = 0
+
+############################################################################
+#	应用自己的配置选项
+
+#	mysql 服务地址
+#	mysql_dbaddr = /tmp/mysql.sock
+#	mysql_dbaddr = 10.0.250.199:3306
+#	连接 mysql 数据库的连接池的最大值
+#	mysql_dbmax  = 200
+#	ping mysql 连接的间隔时间, 以秒为单位
+#	mysql_dbping = 10
+#	mysql 连接空闲的时间间隔, 以秒为单位
+#	mysql_dbtimeout = 30
+
+#	数据库名称
+#	mysql_dbname = fiber_db
+#	数据库访问用户
+#	mysql_dbuser = fiber_user
+#	数据库用户访问密码
+#	mysql_dbpass = 111111
+
+#	是否输出当前内存的状态信息
+#	debug_mem = 1
+#	是否在一个线程中连接读
+#	loop_read = 1
+	guard_manager = master.domain:8390
+}

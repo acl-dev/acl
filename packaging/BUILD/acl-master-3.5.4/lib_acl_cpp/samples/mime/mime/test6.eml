@@ -1,0 +1,209 @@
+Received: from ltdmailsystem.com (unknown [60.195.252.107])
+	by mx5 (Coremail) with SMTP id I8mowLBLD0m5N7dMbuCYBg--.758S2;
+	Fri, 15 Oct 2010 01:02:49 +0800 (CST)
+Received: from localhost.localdomain (unknown [192.168.2.2])
+	by ltdmailsystem.com (Postfix) with ESMTP id A5569143276
+	for <whouseit@126.com>; Fri, 15 Oct 2010 01:02:48 +0800 (CST)
+Date: Fri, 15 Oct 2010 01:02:48 +0800
+To: "whouseit@126.com" <whouseit@126.com>
+From: =?UTF-8?B?55uR5o6n5a6d?= <report-noreply@jiankongbao.com>
+Subject: =?UTF-8?B?56uZ54K555uR5o6n5pel5oqlWzEw5pyIMTTml6Vd?=
+Message-ID: <8259409720071c429d0461cb07567c8c@localhost.localdomain>
+X-Priority: 3
+X-Mailer: PHPMailer 5.1 (phpmailer.sourceforge.net)
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/html; charset="UTF-8"
+X-Coremail-Antispam: 1Uf129KBjvdXoW7XryDJrWDCr4xWFW7uF1rJFb_yoWkZrXEgw
+	43Aa9xJrWDAr1kXF40gr43A390qr1kXw1xGw4qq34fKry3Cr48KrZFkanI9r40qr4Du3Z8
+	X34Y93yakw47ujkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU8ME_tUUUUU==
+
+
+<style>
+@charset "utf-8";
+body{
+	margin:0 auto;
+	padding:0;
+	font-size:12px;
+	line-height:14px;
+	font-family:Verdana;
+	background-color:#fff;
+}
+p{color:#000;margin:26px;font-size:14px;}
+ul{margin-left:20px;}
+li{font-size:14px;}
+.title{color:#77B353;font-size:16px;font-weight:bold;}
+img{border:0;}
+
+a:link{color:#005E95;text-decoration:underline;font-weight:bold;}
+a:visited{color:#005E95;text-decoration:underline;}
+a:hover{color:#005E95;text-decoration:underline;}
+a:active{color:#005E95;text-decoration:underline;}
+
+table.tbl1{}
+.tbl1 tr{height:27px;font-size:12px;background:url(http://www.jiankongbao.com/images/t_line_bg.gif) 0 26px repeat-x;}
+.tbl1 tr.header{font-size:12px;background:0;background-color:#F2F6F9;height:36px;font-weight:bold;color:#555;}
+.tbl1 tr.header td.h_l{text-align:left;width:15px;background:url(http://www.jiankongbao.com/images/t_h_l.gif) #F2F6F9 0 0 no-repeat;padding:0;}
+.tbl1 tr.header td.h_r{text-align:left;width:15px;background:url(http://www.jiankongbao.com/images/t_h_r.gif) #F2F6F9 right 0 no-repeat;padding:0;}
+.tbl1 td{padding:0 5px;}
+.tbl1 td.nopadding{padding:0;}
+
+.up_rate_1{color:#28AB17;}
+.up_rate_2{color:#FF9900;}
+.up_rate_3{color:#FF0000;}
+
+.resp_time_1{color:#28AB17;}
+.resp_time_2{color:#FF9900;}
+.resp_time_3{color:#33CCFF;}
+.resp_time_4{color:#FF0000;}
+
+.diff_up{color:#AA0033;}
+.diff_down{color:#008000}
+
+a.menu:link{color:#919D18;text-decoration:none;}
+a.menu:visited{color:#919D18;text-decoration:none;}
+a.menu:hover{color:#919D18;text-decoration:underline;}
+a.menu:active{color:#919D18;text-decoration:none;}
+
+</style>
+
+<style type="text/css">
+table.tbl6{border-width:0;display:table;font-size:12px;}
+.tbl6 tr.header{font-weight:bold;background-color:#F2F6F9;vertical-align:middle;}
+.tbl6 tr.header td{padding:11px 5px 11px 8px;color:#555;border-bottom:0;}
+.tbl6 td{padding:0 0 0 5px;border-bottom:1px solid #fff;}
+.tbl6 tr.title td{padding:6px 5px 6px 8px;border-bottom:1px solid #ccc;background-color:#fafafa;}
+.tbl6 tr.red{background-color:#FFEFEF;}
+.tbl6 tr.yellow{background-color:#FFF9DA;}
+.tbl6 tr.green{background-color:#EBF5E5;}
+.tbl6 tr.nostate{background-color:#fafafa;}
+.tbl6 tr.alert td{padding:4px 5px 4px 2px;border-bottom:1px solid #DBE5EA;}
+.tbl6 p{margin:6px 0;font-size:12px;line-height:12px;}
+</style>
+
+
+<p class="title">站点监控日报[10月14日]  </p>
+<p>以下是监控宝自动发送的监控日报概述，你可以通过它快速了解昨日的站点性能和可用率。你也可以在详细报告中了解更多的信息。</p>
+
+
+
+
+<p>监控项目概述[10月14日]</p>
+<p><a href="http://www.jiankongbao.com/site/task/list" target="_blank">导出以下报表到Excel？</a></p>
+<table class="tbl1" width="100%" style="margin-left:20px;" border="0" cellspacing="0" cellpadding="0">
+  <tr class="header">
+	<td class="h_l nopadding">&nbsp;</td>
+	<td>任务名称</td>
+	<td>摘要</td>
+	<td>监控类型</td>
+	<td>监控频率</td>
+	<td align="right">可用率</td>
+	<td align="right">平均响应时间</td>
+	<td align="right">故障时间</td>
+	<td></td>
+	<td class="h_r nopadding">&nbsp;</td>
+  </tr>
+    <tr style="background:0;background-color:#fafafa">
+	<td>&nbsp;</td>
+	<td><a target="_blank" href="http://www.jiankongbao.com/task/http/26217">http</a></td>
+	<td><span title="">http://221.194.139.155:8088/</span></td>
+	<td>http</td>
+	<td>30分钟</td>
+		<td align="right"><a target="_blank" href="http://www.jiankongbao.com/task/http/26217/report/uptime?period=custom&range=2010-10-14,2010-10-14"><span class="up_rate_1">100.00%</span></a></td>
+		<td align="right"><span class="resp_time_2">205.38 ms</span></td>
+	<td align="right"><span>-</span></td>
+	  	<td><span class="icon_medium">[<a class="menu" target="_blank" href="http://www.jiankongbao.com/task/http/26217/report/20101014">查看详细报告</a>]</span></td>
+	  	<td>&nbsp;</td>
+  </tr>
+    <tr style="background:0;background-color:#fafafa">
+	<td>&nbsp;</td>
+	<td><a target="_blank" href="http://www.jiankongbao.com/task/ping/26218">ping</a></td>
+	<td><span title="">221.194.139.155</span></td>
+	<td>ping</td>
+	<td>30分钟</td>
+		<td align="right"><a target="_blank" href="http://www.jiankongbao.com/task/ping/26218/report/uptime?period=custom&range=2010-10-14,2010-10-14"><span class="up_rate_1">100.00%</span></a></td>
+		<td align="right"><span class="resp_time_1">81.29 ms</span></td>
+	<td align="right"><span>-</span></td>
+	  	<td><span class="icon_medium">[<a class="menu" target="_blank" href="http://www.jiankongbao.com/task/ping/26218/report/20101014">查看详细报告</a>]</span></td>
+	  	<td>&nbsp;</td>
+  </tr>
+  </table>
+
+
+<p>告警通知[10月14日]</p>
+<p><a href="http://www.jiankongbao.com/invite" target="_blank">是否需要手机短信告警？邀请好友即可获赠更多短信配额！</a></p>
+<table width="500" cellspacing="0" cellpadding="0" border="0" style="margin-left:20px;" class="tbl1">
+  <tr>
+	<td>&nbsp;</td>
+	<td><img src="http://www.jiankongbao.com/images/icon_email.gif" /> <span title="">Email通知次数</span>:</td>
+	<td align="right">
+			0
+		</td>
+	<td></td>
+  </tr> 
+  <tr>
+	<td>&nbsp;</td>
+	<td><img src="http://www.jiankongbao.com/images/icon_sms.gif" /> <span title="">短信通知次数</span>:</td>
+	<td align="right">
+			0
+		</td>
+	<td></td>
+  </tr>
+  <tr>
+	<td>&nbsp;</td>
+	<td><img src="http://www.jiankongbao.com/images/icon_msn.gif" /> <span title="">MSN通知次数</span>:</td>
+	<td align="right">
+			0
+		</td>
+	<td></td>
+  </tr>
+  <tr>
+	<td>&nbsp;</td>
+	<td><img src="http://www.jiankongbao.com/images/icon_gtalk.gif" /> <span title="">Gtalk通知次数</span>:</td>
+	<td align="right">
+			0
+		</td>
+	<td></td>
+  </tr>
+</table>
+
+<p>whouseit@126.com的帐号信息</p>
+
+<table width="500" cellspacing="0" cellpadding="0" border="0" style="margin-left:20px;" class="tbl1">
+  <tr>
+	<td>&nbsp;</td>
+	<td>账户版本:</td>
+	<td align="right"><strong>免费版</strong></td>
+	<td></td>
+  </tr> 
+  <tr>
+	<td>&nbsp;</td>
+	<td>本月套餐剩余短信配额:</td>
+	<td align="right">0</td>
+	<td></td>
+  </tr>
+  <tr>
+	<td>&nbsp;</td>
+	<td>额外剩余短信配额:</td>
+	<td align="right">2</td>
+	<td></td>
+  </tr>
+  <tr>
+	<td>&nbsp;</td>
+	<td>还可创建站点监控项目数:</td>
+	<td align="right">3</td>
+	<td></td>
+  </tr>
+</table>
+
+
+<p>是否需要退订每日报告邮件？
+请访问 <a href="http://www.jiankongbao.com/user_report_list.php?m=8771" target="_blank">http://www.jiankongbao.com/user_report_list.php?m=8771</a> 。</p>
+<p>是否需要帮助？请发送邮件至 help@jiankongbao.com。我们将尽力帮助您。</p>
+<p>是否希望了解监控宝的新功能和新动态？请浏览我们的Blog: <a href="http://blog.jiankongbao.com" target="_blank">http://blog.jiankongbao.com</a>，或者关注我们的微博: <a href="http://t.sina.com.cn/jiankongbao" target="_blank">http://t.sina.com.cn/jiankongbao</a>(新浪微博) 或 <a href="http://t.qq.com/jiankongbao" target="_blank">http://t.qq.com/jiankongbao</a>(腾讯微博)。</p>
+<p>谢谢您的使用<br />
+监控宝 <a href="http://www.jiankongbao.com" target="_blank">www.jiankongbao.com</a>
+</p>
+
+

@@ -1,0 +1,20 @@
+{
+  "rules" : [
+    { "names" : [ "netease.com", "163.com" ],
+      "hells" : [ "192.168.0.100", "192.168.0.101" ],
+      "enables" : [
+        {"from_hour" : 7,  "from_min": 30, "to_hour" : 9,  "to_min" : 30 },
+        {"from_hour" : 13, "from_min": 30, "to_hour" : 15, "to_min" : 30 },
+        {"from_hour" : 19, "from_min": 0,  "to_hour" : 21, "to_min" : 0  }
+      ]
+    },
+    { "names" : [ "qq.com", "game.qq.com" ],
+      "hells" : [ "192.168.0.102", "192.168.0.103" ],
+      "enables" : [
+        {"from_hour" : 7,  "from_min": 30, "to_hour" : 9,  "to_min" : 30 },
+        {"from_hour" : 13, "from_min": 30, "to_hour" : 15, "to_min" : 30 },
+        {"from_hour" : 19, "from_min": 0,  "to_hour" : 21, "to_min" : 0  }
+      ]
+    }
+  ]
+}

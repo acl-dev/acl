@@ -1,0 +1,35 @@
+
+service server {
+	server_port = 1053
+#	本地域名映射关系表，格式：域名1:ip11:ip12..., 域名2:ip21:ip22...
+#	domain_map = mailz.hexun.com:127.0.0.1:211.157.110.179:211.157.110.185, \
+#			www1.sina.com:192.168.0.1:192.168.0.2:192.168.0.3, \
+#			a.b.c:193.168.0.1:193.168.0.2:193.168.0.3
+#	domain_map = all:192.168.1.1:192.168.1.2:192.168.1.3
+	domain_map = m.hotmail.com:192.168.188.173, \
+			blu405-m.hotmail.com:192.168.188.173, \
+			263esCom1.263es.com:192.168.198.47, \
+			263es.com:192.168.198.47, \
+			i.163.com:127.0.0.1, \
+			ex.qq.com:127.0.0.1, \
+			test.zsx.com:127.0.0.1, \
+			#all:192.168.198.47
+
+#	未知域名返回的缺省地址列表
+#	domain_unknown = 211.157.110.179:211.157.110.185
+	domain_unknown = 127.0.0.1
+
+#	本 DNS 服务器的名称标识
+	dns_name = acl_dgate
+
+#	本 DNS 服务器的 IP 地址
+	dns_ip = 192.168.198.41
+
+#	上游 DNS 服务器的 IP
+#	dns_neighbor_ip = 211.157.131.7
+#	dns_neighbor_ip = 192.168.198.47
+#	dns_neighbor_ip = 114.114.114.114
+	dns_neighbor_ip = 192.168.1.1
+#	上游 DNS 服务器的 PORT
+	dns_neighbor_port = 53
+}

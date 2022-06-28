@@ -1,0 +1,183 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="源文件\attr">
+      <UniqueIdentifier>{272aa828-d623-44be-8dfc-08251740e386}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\util">
+      <UniqueIdentifier>{8f22d734-7a95-41f9-946c-98681d2410e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\tls">
+      <UniqueIdentifier>{fd7b1d7e-a846-4adb-8a43-3a6d7d67c555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include=".\snprintf.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".\StdAfx.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_clnt.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_print0.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_print64.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_print_plain.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_scan0.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_scan64.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\attr_scan_plain.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\attr\auto_clnt.c">
+      <Filter>源文件\attr</Filter>
+    </ClCompile>
+    <ClCompile Include=".\util\allprint.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\util\name_code.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\util\name_mask.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\util\printable.c">
+      <Filter>源文件\util</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_bio_ops.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_certkey.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_client.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_dh.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_level.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_mgr.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_misc.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_params.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_prng_dev.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_prng_egd.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_prng_exch.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_prng_file.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_rsa.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_scache.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_seed.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_server.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_session.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_stream.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_threads.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tls_verify.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+    <ClCompile Include=".\tls\tlsmgr_daemon.c">
+      <Filter>源文件\tls</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include=".\StdAfx.h">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".\attr\attr.h">
+      <Filter>源文件\attr</Filter>
+    </ClInclude>
+    <ClInclude Include=".\attr\attr_clnt.h">
+      <Filter>源文件\attr</Filter>
+    </ClInclude>
+    <ClInclude Include=".\attr\auto_clnt.h">
+      <Filter>源文件\attr</Filter>
+    </ClInclude>
+    <ClInclude Include=".\util\name_code.h">
+      <Filter>源文件\util</Filter>
+    </ClInclude>
+    <ClInclude Include=".\util\name_mask.h">
+      <Filter>源文件\util</Filter>
+    </ClInclude>
+    <ClInclude Include=".\util\stringops.h">
+      <Filter>源文件\util</Filter>
+    </ClInclude>
+    <ClInclude Include=".\tls\tls_mgr.h">
+      <Filter>源文件\tls</Filter>
+    </ClInclude>
+    <ClInclude Include=".\tls\tls_private.h">
+      <Filter>源文件\tls</Filter>
+    </ClInclude>
+    <ClInclude Include=".\tls\tls_prng.h">
+      <Filter>源文件\tls</Filter>
+    </ClInclude>
+    <ClInclude Include=".\tls\tls_scache.h">
+      <Filter>源文件\tls</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\lib_tls.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\tls.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include=".\include\tls_params.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\lib_protocol\resource.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+  </ItemGroup>
+</Project>

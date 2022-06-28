@@ -1,0 +1,181 @@
+# acl 示例
+## acl 项目的测试及应用示例，主要包括三个示例集合，如下：
+
+### 1、acl/samples：该目录下的例子主要是基于 lib_acl 及 lib_protocol 两个库的例子
+-    1.1 acl: 打印当前 acl 库版本号程序
+-    1.2 aio/client: 非阻塞 io 客户端
+-    1.3 aio/server: 非阻塞 io 服务器
+-    1.4 base64: base64 编/解码程序
+-    1.5 btree: 二叉树程序
+-    1.6 cache: 对象缓存程序
+-    1.7 cache2: 对象缓存程序
+-    1.8 cgi_env: CGI 程序用来获得 CGI 环境变量
+-    1.9 chunk_chain: 二分块数据程序
+-    1.10 configure: 配置文件处理程序
+-    1.11 connect: 网络客户端连接程序
+-    1.12 dbpool: 数据库连接池程序
+-    1.13 dlink: 二分块查找算法程序
+-    1.14 dns: 域名查询程序
+-    1.15 dns_req: 域名查询程序
+-    1.16 event: 事件引擎程序
+-    1.17 fifo: 先进先出算法程序
+-    1.18 file: 文件流处理程序
+-    1.19 file_fmt: 将 UNIX 下的 \n 转为 WIN32 下的 \r\n 或者反向转换程序
+-    1.20 FileDir: win32 下目录操作程序
+-    1.21 flock: 文件锁处理程序
+-    1.22 gc: 内存自动回收程序
+-    1.23 htable: 哈希表处理程序
+-    1.24 http/header: http 客户端程序
+-    1.25 http/url_get1: 网页下载客户端程序
+-    1.26 http/url_get2: 网页下载客户端程序
+-    1.27 http/url_get3: 网页下载客户端程序
+-    1.28 http_aio: 简单的 HTTP 异步下载程序
+-    1.29 http_client: WIN32 下 HTTP 客户端程序
+-    1.30 http_probe: HTTP 客户端程序
+-    1.31 ifconf: 获取本机网卡的程序
+-    1.32 iplink: IP 地址段管理程序
+-    1.33 iterator: C 方式进行遍历的程序
+-    1.34 json: json 对象处理程序
+-    1.35 json2: json 对象处理程序
+-    1.36 json3: json 对象处理程序
+-    1.37 jt2ft: 简体转繁体程序
+-    1.38 log: 日志处理程序
+-    1.39 master/aio_echo: 非阻塞回显服务器程序
+-    1.40 master/aio_proxy: 非阻塞 TCP 代理程序
+-    1.41 master/ioctl_echo2: 多线程回显示服务器程序
+-    1.42 master/ioctl_echo3: 多线程回显示服务器程序
+-    1.43 master/master_notify: 多线程服务器程序
+-    1.44 master/master_threads: 多线程服务器程序
+-    1.45 master/single_echo: 多进程回显示服务器程序
+-    1.46 master/trigger: 触发器服务器程序
+-    1.47 master/udp_echo: UDP 回显服务器程序
+-    1.48 memdb: 简单的内存数据库程序
+-    1.49 mempool: 内存池程序
+-    1.50 mkdir: 创建多级目录程序
+-    1.51 net: 简单网络程序
+-    1.52 ping: 阻塞/非阻塞 PING 程序
+-    1.53 pipe: 管道处理程序
+-    1.54 proctl: WIN32 下父子进程程序
+-    1.55 resolve: 域名解析程序
+-    1.56 server: 简单的服务器程序
+-    1.57 server1: 简单的服务器程序
+-    1.58 slice: 内存池切片程序
+-    1.59 slice_mem: 内存池切片程序
+-    1.60 smtp_client: smtp 客户端发信程序
+-    1.61 string: acl 字符串处理程序
+-    1.62 thread: 线程程序
+-    1.63 token_tree: 256 叉树程序
+-    1.64 udp_clinet: UDP 客户端程序
+-    1.65 udp_server: UDP 服务器程序
+-    1.66 urlcode: URL 编码处理程序
+-    1.67 vstream: IO 网络流处理程序
+-    1.68 vstream_client: 网络客户端流程序
+-    1.69 vstream_fseek: 文件流处理程序
+-    1.70 vstream_fseek2: 文件流处理程序
+-    1.71 vstream_popen: 管道流处理程序
+-    1.71 vstream_popen2: 管道流处理程序
+-    1.71 vstream_popen3: 管道流处理程序
+-    1.72 vstream_server: 网络服务端程序
+-    1.73 xml: XML 解析程序
+-    1.74 xml2: XML 解析程序
+-    1.75 zdb: 数字KEY/VALUE 文件存储引擎程序
+
+### 2、acl/lib_acl_cpp/samples：该目录下的例子基本是基于 lib_acl_cpp 库写的 C++ 例子
+-    2.1 aio/aio_client: 非阻塞网络客户端程序
+-    2.2 aio/aio_dns: 非阻塞域名解析客户端程序
+-    2.3 aio/aio_echo: 非阻塞回显服务器程序
+-    2.4 aio/aio_ipc: 阻塞/非阻塞整合的网络程序
+-    2.5 aio/aio_server: 非阻塞服务器程序
+-    2.6 beanstalk: 队列应用 beanstalkd 的客户端程序
+-    2.7 benchmark: 与性能测试相关的程序集
+-    2.8 cgi: 简单的 WEB CGI 程序
+-    2.9 cgi_upload: 接收上传文件的 CGI 程序
+-    2.10 charset: 字符集转换程序
+-    2.11 check_trigger: 检测远程 HTTP 服务器状态的触发器程序
+-    2.12 connect_manager: 客户端连接池集群管理程序
+-    2.13 db_service: 与数据库相关的程序
+-    2.14 dbpool: 使用数据库客户端连接池的程序
+-    2.15 dircopy: 目录文件拷贝程序
+-    2.16 final_class: 禁止继承类程序
+-    2.17 flock: 文件锁处理程序
+-    2.18 fs_benchmark: 文件系统压力测试程序
+-    2.19 fstream: 文件流程序
+-    2.20 gui_rpc: WIN32 下阻塞过程与 WIN32 界面的消息整合的例子
+-    2.21 hsclient: handle-socket 客户端程序
+-    2.22 http_client: HTTP 客户端程序
+-    2.23 http_client2: HTTP 客户端程序
+-    2.24 http_mime: HTTP 协议的 MIME 格式处理程序
+-    2.25 htttp/http_request: 使用 http_request 类的 HTTP 客户端程序
+-    2.26 http_request_manager: HTTP 客户端连接池集群程序
+-    2.27 http_request_pool: HTTP 客户端连接池程序
+-    2.28 http_request2: 使用 http_request 类的 HTTP 客户端程序
+-    2.29 http/http_response: 使用 http_reponse 类响应 HTTP 客户端请求的程序
+-    2.30 http_server: 简单的 HTTP 服务器程序
+-    2.31 http_servlet: 类似于 JAVA HttpServlet 的程序
+-    2.32 http_servlet2: 类似于 JAVA HttpServlet 的程序
+-    2.33 HttpClient: 简单的 HTTP 客户端程序
+-    2.34 json/json0 - json7: json 字符串对象解析程序
+-    2.35 logger: 日志程序
+-    2.36 master/master_aio: 非阻塞服务器程序
+-    2.37 master_aio_proxy: 非阻塞 TCP 代理服务器程序
+-    2.38 master/master_http_aio: 简单的非阻塞 HTTP 服务器程序
+-    2.39 master/master_http_rpc: 阻塞/非阻塞整合的 HTTP 服务器程序
+-    2.40 master/master_http_threads: 多线程 HTTP 服务器程序
+-    2.40 master/master_http_threads2: 多线程 HTTP 服务器程序
+-    2.41 master/maser_proc: 进程池服务器程序
+-    2.42 master/master_threads: 多线程服务器程序
+-    2.43 master/master_trigger: 触发器服务器程序
+-    2.44 master/master_udp: UDP 通信服务器程序
+-    2.45 master/master_udp_threads: 多线程 UDP 通信服务器程序
+-    2.46 md5: md5 处理程序
+-    2.47 mem_cache: memcached 客户端程序
+-    2.47 memcache_pool: memcached 支持连接池的客户端程序
+-    2.48 mime: 邮件 MIME 解析处理程序
+-    2.49 mime_base64: MIME BASE64 格式处理程序
+-    2.50 mime_qp: MIME QP 格式处理程序
+-    2.51 mime_xxcode: MIME XXCODE 格式处理程序
+-    2.52 mysql: mysql 客户端程序
+-    2.53 mysql2: mysql 客户端程序
+-    2.54 rfc822: 邮件的 RFC822 协议处理程序
+-    2.55 rfc2047: 邮件的 RFC2047 协议处理程序
+-    2.56 rpc_download: 采用阻塞/非阻塞整合方式进行 HTTP 下载的程序
+-    2.57 scan_dir: 目录递归扫描程序
+-    2.58 singleton: 单例程序
+-    2.59 session: 会话程序
+-    2.60 socket_client: 网络客户端程序
+-    2.61 socket_stream: 网络流处理程序
+-    2.62 sqlite: sqlite 数据库程序
+-    2.63 ssl_aio_client: SSL 非阻塞网络客户端程序
+-    2.64 ssl_clinet: SSL 阻塞网络客户端程序
+-    2.65 string: 动态缓冲区处理程序
+-    2.66 string2: 动态缓冲区处理程序
+-    2.67 thread: 多线程程序
+-    2.68 thread_client: 多线程客户端程序
+-    2.69 thread_pool: 线程池程序
+-    2.70 udp_client: UDP 通信客户端程序
+-    2.71 url_coder: URL 编、解码程序
+-    2.72 win_dbservice: 基于 WIN32 图形界面的数据库处理程序
+-    2.73 winaio: 基于 WIN32 图形界面的非阻塞客户端程序
+-    2.74 xml: XML 对象解析处理程序
+-    2.75 zlib: 压缩格式处理程序
+-    2.75 redis/redis_connection: redis Connection 客户端程序
+-    2.76 redis/redis_hash: redis 哈希表类客户端程序
+-    2.77 redis/redis_hyperloglog: redis hyperloglog 客户端程序
+-    2.78 redis/redis_key: redis 键类客户端程序
+-    2.79 redis/redis_list: redis 列表客户端程序
+-    2.80 redis/redis_manager: redis 连接池集群管理客户端程序
+-    2.81 redis/redis_pool: redis 连接池客户端程序
+-    2.82 redis/redis_pubsub: redis 发布订阅客户端程序
+-    2.83 redis/redis_server: redis 服务器管理的客户端程序
+-    2.84 redis/redis_set: redis 集合客户端程序
+-    2.85 redis/redis_string: redis 字符串客户端程序
+-    2.86 redis/redis_trans: redis 事务客户端程序
+-    2.87 redis/redis_zset: redis 有序集客户端程序
+-    2.88 redis/redis_zset_pool: redis 有序集客户端程序，使用有序集对象存储大数据块，支持连接池方式
+
+### 3、acl/app：该目录下的例子主要是一些比较实用的例子
+-    **3.1 wizard: 用来生成基于 acl 服务器框架的程序模板的程序**
+-    3.2 gid: 用来产生全局唯一 ID 号的服务程序（含客户端库）
+-    3.3 net_tools: 用来测试网络状态的程序
+-    3.4 master_dispatch: 对后端服务器分配 TCP 连接的连接均衡程序
+-    3.5 jaws（目前不可用）：基于 acl 的非阻塞通信模块和 HTTP 模块写的一个简易的 HTTP 高并发服务器程序

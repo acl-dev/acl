@@ -1,0 +1,7 @@
+service test {
+	host = test.com.cn
+	root_path = {install_path}/www/htdocs/test.domain/
+	vpath_map = /  {install_path}/www/htdocs/test.domain/  0
+#	vpath_map = /test2/  {install_path}/www/htdocs/test.domain/test2/  0
+#	vpath_map = /test3/  {install_path}/www/htdocs/test.domain/test3/  0
+}

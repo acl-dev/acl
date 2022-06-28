@@ -1,0 +1,1536 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\acl_cpp_init.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\acl_cpp_test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\acl_stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\rfc2047.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_attach.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_base64.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_body.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_code.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_head.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_image.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_node.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_quoted_printable.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_uucode.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\mime_xxcode.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\rfc822.cpp">
+      <Filter>Source Files\mime</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_trigger.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_aio.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_base.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_proc.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_threads.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ipc\ipc_service.cpp">
+      <Filter>Source Files\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ipc\ipc_client.cpp">
+      <Filter>Source Files\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ipc\ipc_server.cpp">
+      <Filter>Source Files\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_service.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_aclient.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_client.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_header.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hsocket\hstable.cpp">
+      <Filter>Source Files\hsocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hsocket\hsclient.cpp">
+      <Filter>Source Files\hsocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hsocket\hserror.cpp">
+      <Filter>Source Files\hsocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hsocket\hspool.cpp">
+      <Filter>Source Files\hsocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hsocket\hsproto.cpp">
+      <Filter>Source Files\hsocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hsocket\hsrow.cpp">
+      <Filter>Source Files\hsocket</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_sqlite.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_handle.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_mysql.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_pgsql.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_pool.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_service.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\zlib_stream.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\atomic.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\bitmap.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\charset_conv.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\dns_service.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\diff_manager.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\diff_object.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\diff_string.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\locker.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\log.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\malloc.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\pipe_stream.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\string.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\util.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\xml.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_handle.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_istream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_listen_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_ostream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_socket_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\fstream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\ifstream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\istream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\ofstream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\ostream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\socket_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\sslbase_io.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\header_opts.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\header_token.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\is_header.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\mime_state.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\mime_state_parse.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\quote_821_local.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\quote_822_local.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\rec_type.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\tok822_find.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\tok822_node.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\tok822_parse.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\tok822_tree.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mime\internal\trimblanks.cpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\internal\win_iconv.cpp">
+      <Filter>Source Files\stdlib\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_service_mysql.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\db_service_sqlite.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\json.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_request.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_response.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\HttpServlet.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\HttpServletRequest.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\HttpServletResponse.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\HttpSession.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\escape.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_ctype.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_mime.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_pipe.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ipc\rpc.cpp">
+      <Filter>Source Files\ipc</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_conf.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_download.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_utils.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\websocket.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\WebSocketServlet.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\sha1.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\snprintf.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\mbox.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\md5.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\session\memcache_session.cpp">
+      <Filter>Source Files\session</Filter>
+    </ClCompile>
+    <ClCompile Include="src\session\redis_session.cpp">
+      <Filter>Source Files\session</Filter>
+    </ClCompile>
+    <ClCompile Include="src\session\session.cpp">
+      <Filter>Source Files\session</Filter>
+    </ClCompile>
+    <ClCompile Include="src\beanstalk\beanstalk.cpp">
+      <Filter>Source Files\beanstalk</Filter>
+    </ClCompile>
+    <ClCompile Include="src\queue\queue_file.cpp">
+      <Filter>Source Files\queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\queue\queue_manager.cpp">
+      <Filter>Source Files\queue</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\HttpCookie.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\url_coder.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\beanstalk\beanstalk_pool.cpp">
+      <Filter>Source Files\beanstalk</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\server_socket.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_fstream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\mysql_pool.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\pgsql_pool.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\sqlite_cursor.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\sqlite_pool.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\connect_manager.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\connect_pool.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_reader.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_sender.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_client.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_pool.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_manager.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\tcp_ipc.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_request_pool.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memcache\memcache_pool.cpp">
+      <Filter>Source Files\memcache</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memcache\memcache.cpp">
+      <Filter>Source Files\memcache</Filter>
+    </ClCompile>
+    <ClCompile Include="src\http\http_request_manager.cpp">
+      <Filter>Source Files\http</Filter>
+    </ClCompile>
+    <ClCompile Include="src\memcache\memcache_manager.cpp">
+      <Filter>Source Files\memcache</Filter>
+    </ClCompile>
+    <ClCompile Include="src\master\master_udp.cpp">
+      <Filter>Source Files\master</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_cond.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_mutex.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_pool.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_delay_free.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_timer_delay_free.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\aio_timer_callback.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_mutex.cpp">
+      <Filter>Source Files\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\event\event_timer.cpp">
+      <Filter>Source Files\event</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\connect_monitor.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\scan_dir.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\mbedtls_io.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\mbedtls_conf.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\polarssl_io.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\polarssl_conf.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\query.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\dbuf_pool.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_result.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_hash.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_key.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_list.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_master.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_slave.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_sentinel.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_role.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_string.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_stream.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_connection.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_pubsub.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_transaction.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_set.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_zset.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_command.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_server.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_script.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_hyperloglog.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_request.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client_cluster.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client_pipeline.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_client_pool.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_cluster.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_node.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\check_timer.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\check_client.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\connpool\check_rpc.cpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_slot.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\disque\disque.cpp">
+      <Filter>Source Files\disque</Filter>
+    </ClCompile>
+    <ClCompile Include="src\disque\disque_job.cpp">
+      <Filter>Source Files\disque</Filter>
+    </ClCompile>
+    <ClCompile Include="src\disque\disque_cond.cpp">
+      <Filter>Source Files\disque</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\thread_queue.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\token_tree.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\redis\redis_geo.cpp">
+      <Filter>Source Files\redis</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\stdin_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\stdout_stream.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\mysql_manager.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\pgsql_manager.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\sqlite_manager.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\mysql_conf.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\db\pgsql_conf.cpp">
+      <Filter>Source Files\db</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\smtp_client.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_message.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_attach.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\smtp\mail_body.cpp">
+      <Filter>Source Files\smtp</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\xml1.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stdlib\xml2.cpp">
+      <Filter>Source Files\stdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="src\serialize\gsoner.cpp">
+      <Filter>Source Files\serialize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_ack.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_aclient.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_client.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_connack.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_connect.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_disconnect.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_header.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_message.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pingreq.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pingresp.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_puback.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pubcomp.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_publish.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pubrec.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_pubrel.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_suback.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_subscribe.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_unsuback.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mqtt\mqtt_unsubscribe.cpp">
+      <Filter>Source Files\mqtt</Filter>
+    </ClCompile>
+    <ClCompile Include="src\net\rfc1035.cpp">
+      <Filter>Source Files\net</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\acl_stdafx.hpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\trimblanks.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\header_opts.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\header_token.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\is_header.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\lex_822.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\mime_state.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\quote_821_local.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\quote_822_local.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\quote_flags.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\rec_type.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mime\internal\tok822.hpp">
+      <Filter>Source Files\mime\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stdlib\internal\win_iconv.hpp">
+      <Filter>Source Files\stdlib\internal</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_sqlite.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_handle.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_mysql.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_pgsql.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_pool.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_service.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_service_mysql.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_service_sqlite.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\hsocket\hstable.hpp">
+      <Filter>Header Files\hsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\hsocket\hsclient.hpp">
+      <Filter>Header Files\hsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\hsocket\hserror.hpp">
+      <Filter>Header Files\hsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\hsocket\hspool.hpp">
+      <Filter>Header Files\hsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\hsocket\hsproto.hpp">
+      <Filter>Header Files\hsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\hsocket\hsrow.hpp">
+      <Filter>Header Files\hsocket</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\HttpSession.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_aclient.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_client.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_ctype.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_download.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_header.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_mime.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_pipe.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_request.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_response.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_service.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_utils.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\websocket.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\WebSocketServlet.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\HttpServlet.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\HttpServletRequest.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\HttpServletResponse.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\ipc\rpc.hpp">
+      <Filter>Header Files\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\ipc\ipc_client.hpp">
+      <Filter>Header Files\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\ipc\ipc_server.hpp">
+      <Filter>Header Files\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\ipc\ipc_service.hpp">
+      <Filter>Header Files\ipc</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_trigger.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_aio.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_base.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_conf.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_proc.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_threads.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\rfc2047.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_attach.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_base64.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_body.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_code.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_define.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_head.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_image.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_node.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_quoted_printable.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_uucode.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\mime_xxcode.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mime\rfc822.hpp">
+      <Filter>Header Files\mime</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\net\rfc1035.hpp">
+      <Filter>Header Files\net</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\session\memcache_session.hpp">
+      <Filter>Header Files\session</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\session\redis_session.hpp">
+      <Filter>Header Files\session</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\session\session.hpp">
+      <Filter>Header Files\session</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\zlib_stream.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\atomic.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\bitmap.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\diff_manager.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\diff_object.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\diff_string.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\escape.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\final_tpl.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\json.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\locker.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\log.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\malloc.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\mbox.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\md5.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\noncopyable.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\pipe_stream.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\singleton.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\sha1.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\snprintf.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\string.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\util.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\vld.h">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\xml.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_handle.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_istream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_listen_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_ostream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_socket_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\fstream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\ifstream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\istream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\ofstream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\ostream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\socket_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\sslbase_conf.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\sslbase_io.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\lib_acl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\acl_cpp_define.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\acl_cpp_init.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\acl_cpp_test.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\beanstalk\beanstalk.hpp">
+      <Filter>Header Files\beanstalk</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\queue\queue_file.hpp">
+      <Filter>Header Files\queue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\queue\queue_manager.hpp">
+      <Filter>Header Files\queue</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\url_coder.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_type.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\HttpCookie.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\beanstalk\beanstalk_pool.hpp">
+      <Filter>Header Files\beanstalk</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\server_socket.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_fstream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\db_cursor.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\mysql_pool.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\pgsql_pool.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\sqlite_cursor.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\sqlite_pool.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\connect_client.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\connect_manager.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\connect_pool.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_reader.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_sender.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_client.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_pool.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_manager.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\tcp_ipc.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_request_pool.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\memcache\memcache_pool.hpp">
+      <Filter>Header Files\memcache</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\memcache\memcache.hpp">
+      <Filter>Header Files\memcache</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\http\http_request_manager.hpp">
+      <Filter>Header Files\http</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\memcache\memcache_manager.hpp">
+      <Filter>Header Files\memcache</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\master\master_udp.hpp">
+      <Filter>Header Files\master</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\tbox.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_cond.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_pool.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_delay_free.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="src\stream\aio_timer_delay_free.hpp">
+      <Filter>Source Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\aio_timer_callback.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\event\event_mutex.hpp">
+      <Filter>Header Files\event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\event\event_timer.hpp">
+      <Filter>Header Files\event</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\connect_monitor.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\scan_dir.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\mbedtls_io.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\mbedtls_conf.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\query.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stream_hook.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_result.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_hash.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_key.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_list.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_master.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_slave.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_sentinel.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_role.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_string.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_stream.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_connection.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_pubsub.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_transaction.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_set.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_zset.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_command.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_server.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_script.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_hyperloglog.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="src\redis\redis_request.hpp">
+      <Filter>Source Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client_cluster.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client_pipeline.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_client_pool.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_cluster.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_node.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="src\connpool\check_timer.hpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\connpool\check_client.hpp">
+      <Filter>Header Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="src\connpool\check_rpc.hpp">
+      <Filter>Source Files\connpool</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_slot.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque.hpp">
+      <Filter>Header Files\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque_node.hpp">
+      <Filter>Header Files\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque_job.hpp">
+      <Filter>Header Files\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\disque\disque_cond.hpp">
+      <Filter>Header Files\disque</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\thread_queue.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\token_tree.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\trigger.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\redis\redis_geo.hpp">
+      <Filter>Header Files\redis</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stdin_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\stdout_stream.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\mysql_manager.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\pgsql_manager.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\sqlite_manager.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\mysql_conf.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\db\pgsql_conf.hpp">
+      <Filter>Header Files\db</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_message.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_attach.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\smtp\mail_body.hpp">
+      <Filter>Header Files\smtp</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\xml1.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\xml2.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\serialize\gsoner.hpp">
+      <Filter>Header Files\serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_ack.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_aclient.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_client.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connack.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_connect.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_disconnect.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_header.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_message.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingreq.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pingresp.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_puback.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubcomp.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_publish.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrec.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_pubrel.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_suback.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_subscribe.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsuback.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\mqtt\mqtt_unsubscribe.hpp">
+      <Filter>Header Files\mqtt</Filter>
+    </ClInclude>
+    <ClInclude Include="resource_vc2017.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ReadMe.txt" />
+    <None Include="changes.txt">
+      <Filter>doc</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="doc">
+      <UniqueIdentifier>{a80d07a5-f9b0-4ac2-a34b-42630c2c3df2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{fd48fd8e-6d1f-453d-83ab-0ae0e780ea61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stream">
+      <UniqueIdentifier>{9f12de7c-d7c3-420f-9a60-9793db211ac3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\stdlib">
+      <UniqueIdentifier>{f9db895a-582c-48a4-b774-1ab5720f9504}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\db">
+      <UniqueIdentifier>{0018e60b-eb12-4931-bacc-873d9120d5f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\http">
+      <UniqueIdentifier>{1e5a6664-4abc-450f-a90e-b6f54005a9ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\hsocket">
+      <UniqueIdentifier>{07e43147-2b00-4c35-bb54-e2236ccd10b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ipc">
+      <UniqueIdentifier>{bac1b5f2-f852-431e-9a1a-8e766ef41628}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mime">
+      <UniqueIdentifier>{3fba5f16-8e84-4f34-a790-7cddab50bd01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\master">
+      <UniqueIdentifier>{81cebce6-9d46-42ef-8fa7-b7bdde75874b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\memcache">
+      <UniqueIdentifier>{e12b6c03-0697-416d-864a-6a026e3453a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\redis">
+      <UniqueIdentifier>{10c86744-c545-4b37-a494-7d4a5b1a1174}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\session">
+      <UniqueIdentifier>{c6a1206e-5f76-4734-921d-2f535db47f05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\beanstalk">
+      <UniqueIdentifier>{9660da6b-1d05-48a9-8d15-b459f15a14ce}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\queue">
+      <UniqueIdentifier>{9cf41123-21b3-46aa-bca8-5943eadfc59d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\connpool">
+      <UniqueIdentifier>{558e804c-bb2d-4045-81fd-d650d1a5e166}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\event">
+      <UniqueIdentifier>{c81440c9-71a3-4a12-b078-f9845c634089}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\disque">
+      <UniqueIdentifier>{b1614f78-4c4d-476b-a687-30b643e8eae8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{b32c2c23-ff56-49c9-b06e-111bf76f87d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stream">
+      <UniqueIdentifier>{0c83d5a8-6836-4441-b274-df0457c53aa3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stdlib">
+      <UniqueIdentifier>{24be489e-2733-452f-9b03-15e89bfd00e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\stdlib\internal">
+      <UniqueIdentifier>{3ad8990a-bc3b-45e5-a95d-b39874cbd89b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mime">
+      <UniqueIdentifier>{d7d5c4e2-0bc4-4bb0-8a3f-280f38dffab1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mime\internal">
+      <UniqueIdentifier>{7602c164-8abb-437a-9d62-2ef30121b955}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\master">
+      <UniqueIdentifier>{d1887d6c-21ec-475b-bd00-1cdcc9a7638c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ipc">
+      <UniqueIdentifier>{366c4a7a-52da-4c30-a5ff-4c1e0b55ca42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\http">
+      <UniqueIdentifier>{85c18bb9-83f9-43f3-b1a9-b90050bb7c9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\hsocket">
+      <UniqueIdentifier>{4d7baa9e-dfb8-4492-9755-34465cebaea9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\db">
+      <UniqueIdentifier>{8f2915a6-bdde-4405-a2aa-bde292765fe3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\memcache">
+      <UniqueIdentifier>{9610edea-3618-48cb-b775-679afa95c809}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\session">
+      <UniqueIdentifier>{3514e29b-4004-4e16-a72f-fd84cb24d059}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\beanstalk">
+      <UniqueIdentifier>{e9c69b7b-6c6c-4e0b-98af-1742e14371a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\queue">
+      <UniqueIdentifier>{1df40883-a4d1-44f2-84bf-87f3d46fc8b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\connpool">
+      <UniqueIdentifier>{477f1b57-f0e0-4eb7-9343-8f13a8618463}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\event">
+      <UniqueIdentifier>{c24e07a0-4035-459f-bd05-3feef68f2bd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\redis">
+      <UniqueIdentifier>{5ea6d29e-ffbe-4bdb-b5c1-fa5966807ce7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\disque">
+      <UniqueIdentifier>{a6fc0af4-630b-4f95-9d1a-eb8fcaf1c78f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\smtp">
+      <UniqueIdentifier>{bdeed402-2f54-4ea3-8f25-f3e8663fbe8f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\smtp">
+      <UniqueIdentifier>{d34f52dc-798d-4c26-b23f-25210566d571}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\serialize">
+      <UniqueIdentifier>{61183180-d88a-4f27-96bf-34a9c11fd714}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\serialize">
+      <UniqueIdentifier>{2b06d3aa-a69d-4f30-a8c3-4c5443a1d0a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\net">
+      <UniqueIdentifier>{0018e60b-eb12-4931-bacc-sfdfsfsdf5f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mqtt">
+      <UniqueIdentifier>{d7d5c4e2-0bc4-4bb0-8a3f-fsdsfsfsfsd1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mqtt">
+      <UniqueIdentifier>{b1614f78-4c4d-476b-a687-fsdfsfsfsfsf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\net">
+      <UniqueIdentifier>{85815c20-2811-4991-8e0c-e2e4b8c7dc35}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="todo.txt">
+      <Filter>doc</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="lib_acl_cpp_vc2017.rc" />
+  </ItemGroup>
+</Project>

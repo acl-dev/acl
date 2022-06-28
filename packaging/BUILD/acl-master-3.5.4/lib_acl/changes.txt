@@ -1,0 +1,3901 @@
+修改历史列表：
+
+672) 2021.10.12
+672.1) feature: 增加 acl_sane_bind() 接口，可以适合不同的地址类型。
+
+671) 2021.3.27
+671.1) bugfix: 修复了 json 模块的一处问题。
+
+670) 2020.7.1
+670.1) bugfix: acl_dns.c 模块当 udp socket 读出错时，需要重新打开，同时在发送
+DNS UDP 请求时需要判断 udp socket 是否准备好。
+
+669) 2020.4.16
+669.1) feature: acl_get_ifaddrs() work ok on MacOS
+
+668) 2020.1.6
+668.1) feature: acl::mbedtls_conf 支持动态加载 mbedtls 的三个动态库
+
+667) 2020.1.2
+667.1) bugfix: acl_vstream.c 中函数 read_to_buffer() 的返回值应区分 0 和 -1，
+否则下面的 acl_vstream_xxx_peek() 函数集不好处理
+
+666) 2019.12.30
+666.1) bugfix: 在 net/dns/rfc1035.c 的 rfc1035MessageUnpack() 函数中，当调用
+rfc1035MessageDestroy() 后不应再释放临时内存对象 msg 和 msg->query，否则引起
+内存被重复释放问题，引起程序崩溃.
+
+665) 2019.12.16
+665.1) safety: add more safety protection for dns module.
+
+664) 2019.12.11
+664.1) feature: 支持 Linux 平台下的 abstract unix domain 抽象域套接字。
+
+663) 2019.11.1
+663.1) bugfix: 在 Android 平台上，如果使用 NDK r16b 及以下版本时，如果使用到了
+atomic 原子操作功能，则会引入 Android 内核中标准库 Bionic 中的 bug，参见：
+https://android.googlesource.com/toolchain/gcc/+/refs/heads/master/gcc-4.9/libgcc/config/arm/linux-atomic-64bit.c#64
+所以为了兼容起见，在 acl_atomic.c 中增加条件编译，在 Android 平台上不使用 atomic 原子操作，
+使用线程锁进行替换。
+
+662) 2019.8.16
+662.1) feature: inet_connect_one() 函数支持客户端连接时设置 SO_REUSEADDR
+
+661) 2019.8.12
+661.1) feature: acl_dns.c 中域名查询函数 acl_dns_lookup() 支持一次性向多个域名
+服务器发送查询请求，使用最先到达的查询结果
+
+660) 2019.8.9
+660,1) bugfix: events_kqueue.h 中时间间隔计算有误，导致时间间隔过长
+
+659) 2019.8.2
+659.1) bugfix: acl_myloc.c 中的函数 init_log_mutex() 去掉 PTHREAD_MUTEX_RECURSIVE 宏
+的条件编译，可能会造成一些未知问题
+
+658) 2019.7.26
+658.1) bugfix: acl_vstream.c 中 acl_vstream_clean_close_handle() 函数有存在死
+循环问题 -- by liqiang
+
+657) 2019.7.9
+657.1) performance: acl_vstream_read_peek3 支持根据缓冲区空间大小动态决定是否
+将数据直接读到用户缓冲区中以减少数据拷贝次数
+657.2) bugfix: acl_atomic.c 中 acl_atomic_int64_fetch_add 及 acl_atomic_int64_add_fetch
+返回值有误
+
+656) 2019.7.8
+656.1) feature: acl_vstream.c 新增 acl_vstream_read_peek3 函数
+
+655) 2019.6.13
+655.1) bugfix: acl_mylog.c 中 get_buf() 函数在 WIN 平台下可能会有数据截断的问题
+
+654) 2019.6.5
+654.1) feature: acl_aio_read.c 丰富了 acl_aio_read_peek/acl_aio_readn_peek 的应用场景
+
+653) 2019.6.2
+653.1) feature: acl_dbuf_pool.c 允许保留一个缓冲区节点，以便于重复利用，从而提高效率
+
+652) 2019.5.26
+652.1) feature: acl_aio_connect.c 在异步连接给定域名的服务地址时，如果解析出
+多个 IP 地址，则会尝试连接所有的 IP 地址直至有一个连接成功为止
+
+651) 2019.5.24
+651.1) feature: acl_aio.c/acl_aio_connect.c 支持异步解析远程服务器域名并进行
+异步连接解析后的 IP 地址及端口
+651.2) samples/aio/client2: 测试异步解析域名及异步连接服务器的例子
+
+650) 2019.5.18
+650.1) compile: 增加宏编译选项 ACL_CLIENT_ONLY，当将 acl 库用于客户端模式时可以有效地
+减少编译库的大小
+
+649) 2019.5.6
+649.1) bugfix: acl_vstream_fflush() 当调用 loop_writen() 时其返回值 < 0，应该
+将 fp->wbuf_dlen 值置 0，以防止在调用 acl_vstream_close() 时报错
+
+------------------------------------------------------------------------------
+
+648) 2019.2.24
+648.1) performance: acl_mylog.c 中当将日志写入本地文件或远程 UDP 服务器时，无需
+加线程锁，从而提升并发写性能
+
+647) 2019.2.13
+647.1) feature: acl_scan_dir.c 在扫描过程中为每个目录添加目录属性，以便于应用
+可以获得目录的访问时间等属性
+
+646) 2019.2.11
+646.1) optimise: acl_scan_dir.c 中在扫描目录过程中，如果遇到出错情况则会继续
+扫描下一个，以免提前结束扫描
+
+645) 2019.2.1
+645.1) feature: acl_scan_dir.c 增加扫描过程中删除空目录功能，例子参照：scan_rmdir
+
+644) 2018.12.6
+644.1) bugfix: acl_threads_server.c，在 client_wakeup() 中调用 acl_access_permit()
+时如果该函数返回 0 后再调用 ctx->serv_close() 时会导致服务崩溃，原因是调用
+serv_close 中的参数顺序不对
+
+643) 2018.11.28
+643.1) bugfix: acl_udp_server.c 中 server_binding 绑定失败时不应放在事件监控中
+644.2) feature: acl_udp_server.c 增加配置项 udp_fatal_on_bind_err 来决定当无法
+绑定地址时，进程是否需要自动崩溃
+
+642) 2018.11.15
+642.1) bugfix: acl_json_utio.c, acl_json_build() 当数组成员为字符串类型时，应允许空串的存在
+
+641) 2018.10.31
+641.1) compile: acl_set_core_limit 仅可用在 UNIX-like 平台
+
+640) 2018.10.23
+640.1) feature: acl_aio_server.c, acl_single_server.c, acl_threads_server.c,
+acl_trigger_server.c, acl_udp_server.c 支持进程崩溃时所产生 core 文件的大小，
+以及进程退出前可禁止产生 core 文件
+640.2) feature: acl_udp_server.c 可以通过配置项 master_reuseport 决定是否需要绑定地址
+640.3) feature: acl_bind_udp() 在绑定 UNIX 域套接口时不再需要有 @udp 后缀，内部
+会自动进行判断是否是 UNIX 域套接口
+640.4) bugfix: acl_udp_server.c, server_open() 在打开多个流对象时未将数组索引
+递增，导致无法绑定多个地址
+
+639) 2018.10.4
+639.1) bugfix: ssize_t redefined to long to avoid error on vc in x64
+
+638) 2018.9.29
+638.1) feature: 新增函数 acl_socket_alive 用来检测所给套接字是否正常
+
+637) 2018.9.28
+637.1) bugfix: acl_inet_connect.c 中 acl_inet_connect_ex 函数不支持地址为域名
+
+636) 2018.9.25
+636.1) bugfix: acl_host_port.c 中不支持只有 port 的解析方式
+
+635) 2018.9.22
+635.1) feature: 当创建监听套接口时通过新增标志位 ACL_INET_FLAG_EXCLUSIVE 来
+控制是否禁止地址复用，默认是允许地址复用
+635.2) feature: acl_cache2.c 中 acl_cache2_enter 在添加新元素时，如果缓冲区满
+则按 LRU 算法将最老的元素删除，以保证缓冲区空间大小
+636.3) bugfix: acl_cache2.c 中 acl_cache2_update 的过期时间添加有误
+
+634) 2018.9.21
+634.1) bugfix: acl_inet_ntop should use ':' as the seperate for IPV4, or the
+acl_udp_server.c will mismatch the changed IPV4 addrs.
+
+633) 2018.9.19
+633.1) bugfix: acl_ifconf.c 中的 acl_ifconf_search 修正几处地址匹配模式问题
+633.2) compiling: AF_UNIX 在 VC 中虽然有定义，但对应的域套接地址结构却不存在，
+MS 太坑人
+
+632) 2018.9.18
+632.1) feature: acl_cache2 中新增一些方便使用的接口
+
+631) 2018.9.10 -- 9.16
+631.1) feature: 网络通信及域名解析全面支持 IPV6!
+
+630) 2018.8.6
+630.1) optimize: 优化 ACL_VSTRING, ACL_VBUF, ACL_JSON_NODE 对象的存储空间大小
+
+629) 2018.8.3
+629.1) bugfix: acl_json_parse.c 在分析 Json 数据时，针对字符串对象，如果字符串
+值的开始部分为空格，则会被过滤掉，此问题已修复
+
+628) 2018.8.2
+628.1) bugfix: acl_json_parse.c 不能处理空数组的情况
+
+627) 2018.5.17
+627.1) bugfix: acl_write_wait.c 中使用 poll 方法时，针对 POLLHUP, POLLERR 应
+直接返回正常，让 write 函数触发异常行为
+
+------------------------------------------------------------------------
+626) 2018.4.8
+626.1) bugfix: acl_xml_parse.c 宏 IS_CDATA 判断有误，--- by https://gitee.com/ghostshy
+
+625) 2018.2.24
+625.1) acl_unix_listen.c: 当出错时不再采用 fatal 方式，而是给调用者返回给错误
+
+624) 2018.2.5
+624.1) bugfix: acl_read_wait.c 在调用 epoll 前无需设置 EPOLLHUP | EPOLLERR 标志，
+该标志属于返回值
+624.2) bugfix: acl_inet_connect.c 当连接失败时因为调用了 acl_socket_close 在 WIN
+平台上会重置系统错误号
+
+623) 2018.2.3
+623.1) bugfix: acl_read_wait.c/acl_write_wait.c 调用 poll API 时，
+POLLHUP | POLLERR 不应做为输入参数
+
+622) 2018.1.30
+622.1) event: 为避免出现 core 文件太大将磁盘占满，现在当事件引擎报错时不再 core，
+而是记录错误日志后调用 exit(1) 退出进程
+
+621) 2018.1.23
+621.1) bugfix: 当用 acl_vstream_fdopen 打开文件时，不应再判断是否是 SOCKET 类型，
+否则会将文件句柄类型当作 SOCKET 类型，从而引发问题
+
+620) 2018.1.16
+620.1) bugfix: 重构 acl_ifconf.c 中的函数 acl_ifconf_search，该函数存在一些
+兼容性问题
+620.2) optimization: acl_udp_server.c 服务模块优化
+
+619) 2018.1.15
+619.1) bugfix: 修复 acl_udp_server.c 中网卡 IP 地址变化自我感知问题
+
+618) 2018.1.14
+618.1) feature: 提供 socket IO 读写注册接口，允许使用者注册 IO 过程，从而使 ACL_VSTREAM
+流针对网络 IO 的读写过程使用用户注册的 API 过程
+
+617) 2018.1.9
+617.1) feature: aio 模块增加 acl_aio_last_nready，event 模块增加
+acl_event_last_nready 用来表明一次事件循环被触发的事件次数
+
+616) 2017.12.12
+616.1) feature: acl_mbox.c 支持采用 eventfd 句柄进行 IO 通知
+616.2) bugfix: acl_ifconf_search 配置地址时有误
+
+615) 2017.12.10
+615.1) feature: acl_udp_server.c 支持绑定 UNIX 域套接口
+615.2) feature: net 中的 udp 模块支持绑定 UNIX 域套接口传输数据
+
+614) 2017.11.21
+614.1) feature: acl_argv.c 增加 acl_argv_set 用于替换指定下标位置的值
+
+613) 2017.11.10
+613.1) bugfix: acl_mylog.c 当 fork 子进程时，可能会造成死锁问题
+
+612) 2017.11.9
+612.1) feature: acl_udp_server.c 支持 IP 地址自动发现功能，即当网卡地址发生
+变化时，会自动添加或删除监听的地址
+
+611) 2017.9.28
+611.1) bugfix: acl_mbox.c 中的流对象替换成系统的 fd 句柄
+
+610) 2017.9.21
+610.1) bugfix: acl_events.c 中 event_init 函数 eventp->timer_keep 为函数指针，
+不应设为 0，否则会引起 acl_event_keep_timer 函数崩溃
+610.2) workaround: events 模块中的所有定时器重构，代码结构更加清晰
+610.3) workaround: events 中的定时器触发过程抽象成独立的函数模块
+
+609) 2017.9.19
+609.1) bugfix: acl_udp_server.c 当收到 SIGHUP 信号后通过管道反馈给 acl_master
+时，所传递的进程号有误
+
+608) 2017.9.13
+608.1) bugfix: acl_dlink.c 二分块算法当添加两个连续的数据块时，应该进行合并
+608.2) feature: acl_dlink.c 二分块算法支持添加负整数
+
+607) 2017.9.6
+607.1) bugfix: acl_mylog.c 内部的线程锁采用递归锁，否则，当记日志时收到信号再
+记日志时会造成死锁
+
+606) 2017.9.5
+606.1) feature: master 服务器模板支持收到 SIGTERM 信号后的后续处理过程
+
+605) 2017.8.29
+605.1) feature: acl_mbox.c 中的 acl_mbox_read 函数读超时单位由秒级调整为毫秒级
+605.2) bugfix: acl_aqueue.c 中的 acl_aqueue_pop_timedwait 函数计算超时时间方式有误
+
+604) 2017.8.15
+604.1) feature: 开放 acl_read_xxx_wait 接口，以允许毫秒级读超时等待
+
+603) 2017.8.11
+603.1) stable: acl_chroot_uid 内部如果出错则不会自动崩溃，给是返回 -1 通知上层
+
+602) 2017.8.10
+602.1) rename: acl_sane_bind 改名为 acl_inet_bind
+602.2) feature: acl_inet_listen/acl_inet_bind/acl_vstream_listen_ex 增 flag 标志位
+602.3) feature: master 服务器框架及服务器模板增加配置项 master_reuseport 及
+master_nonblock，master_fastopen 以允许用户可以通过配置文件来设置监听方式
+
+601) 2017.8.7
+601.1) safety & feature: 当使用 ACL_VSTRING 对象中的 printf 等方法时，如果传入
+了空指针，则内部自动处理成 "(null)" 以免程序崩溃
+
+600) 2017.7.31
+600.1) bugfix: acl_host_port.c->host_port 在 windows 平台下的解析有误
+600.2) bugfix: acl_aio_server.c/acl_threads_server.c 在 windows 下有误
+600.3) bugfix: acl_threads_server.c 中 thread_callback 在调用回调函数
+serv_timeout 时的参数顺序是错误的。
+
+599) 2017.7.22
+599.1) feature: acl_udp_server.c/acl_threads_server.c/acl_aio_server.c,
+acl_single_server.c/acl_trigger_server.c，增加方法用于获得当前服务的配置文件路径
+
+598) 2017.7.10
+598.1) feature: master/template/acl_udp_server.c 增加配置项，允许创建的线程为
+非“分离”模式
+
+597) 2017.7.4
+597.1) feature: master/template 下所有服务器模板支持获得 SIGHUP 信号后的回调过程
+597.2) 重构 master/template 下所有服务器模板
+
+596) 2017.7.3
+596.1) bugfix: acl_atomic_int64_fetch_add/acl_atomic_int64_add_fetch 实现有问题
+
+595) 2017.6.26
+595.1) feature: event_kernel.c 中的函数 event_new_kernel 增加 acl_close_on_exec
+控制，防止子进程继承 epoll/devpoll/kqueue 句柄
+
+594) 2017.6.21
+594.1) feature: 增加 acl_sane_bind.c 文件，将地址绑定操作形成单独的方法
+594.2) feature: 增加 acl_host_addrinfo 方法，支持通用的域名解析
+594.3) feature: acl_udp_server.c 支持 daemon 及 alone 两种运行模式
+
+593) 2017.6.20
+593.1) feature: acl_udp_server.c 支持绑定模糊匹配的地址
+
+592) 2017.6.11
+592.1) bugfix: acl_master 当 master_prefork > 0 时，若停止一个服务模块或将该
+服务模块的监听地址改变后 reload acl_master 则 acl_master 会产生崩溃，该问题
+已经修复
+
+591) 2017.6.8
+591.1) feature: acl_master 服务器框架允许启动时没有应用服务程序，以便于用户
+动态添加
+
+590) 2017.6.4
+590.1) feature: ACL_TOKEN 对象增加针对 acl_foreach 的支持，可以遍历所有的关键词
+
+589) 2017.6.3
+589.1) feature: acl_token_tree.c 增加 acl_token_tree_word_remove 方法
+
+588) 2017.6.2
+588.1) feature: acl_master 支持 UDP 方式下的 SO_REUSEPORT
+
+587) 2017.5.25
+587.1) bugfix: acl_pthread.c 中 acl_pthread_setspecific 存在 bug
+
+586) 2017.5.24
+586.1) performance: acl_udp_server.c 优化处理性能
+
+585) 2017.5.22
+585.1) feature: acl_master 服务器框架支持在 fork 子进程后, execvp 应用程序前
+切换子进程运行身份，此功能将帮助使用 go 语言编写的应用服务切换运行身份。
+Linux 平台下，使用 go 语言编写的程序如果在启动时如果为 root 身份，则因为 go
+预启动了几个后台线程以及 setuid 在 Linux 平台下仅切换当前线程的运行环境，则
+会导致其它线程无法切换运行身份的问题，go 作者说这是 Linux 系统的问题 :)
+
+584) 2017.5.3
+584.1) bugfix: acl_mylog.c/private_stream.c 中的内存存在非法释放
+
+583) 2017.4.23
+583.1) feature: add inet_ntop/inet_pton for vc2003
+
+------------------------------------------------------------------------
+
+582) 2017.4.17
+582.1) bugfix: acl_pthread_cond.c 中在 windows 平台下当释放线程锁时会造成
+内存重复释放的问题，主要还是 acl_pthread_mutex_create 的函数设计不合理所致，
+故去掉了 acl_pthread_mutex_create 以免引起误用
+
+581) 2017.4.13
+581.1) bugfix: rfc1035.c 中的函数 rfc1035MessageUnpack 存在内存泄露
+
+580) 2017.4.11
+580.1) feature: 所有网络模块均支持 IPV6
+
+579) 2017.4.7
+579.1) feature: 网络监听及网络连接模块支持 IPV6
+
+578) 2017.4.5
+578.1) bugfix: acl_atomic.c/acl_mbox.c/acl_pthread_mutext.c 存在内存泄露问题
+
+577) 2017.3.30
+577.1) feature: json 类对象在创建 json 字符串时默认不自动添加空格，但允许调用者
+设置参数以便于自动添加空格从而使 json 字符串更可读
+
+576) 2017.3.11
+576.1) bugfix: acl_scan_dir.c 中函数 acl_scan_dir_push 在 windows 下存在问题，
+会造成死循环
+
+575) 2017.1.31
+575.1) compile: 在 Linux/Android 平台下编译时，由头文件自动识别操作系统类型，
+无需在 Makefile 文件中专门指定
+
+574) 2017.1.28--1.29
+574.1) bugfix: acl_dbuf_pool.c 支持 ARM LINUX，内部在分配内存片时，应该是 4
+字节对齐
+
+573) 2016.12.29
+573.1) bugfix: acl_slice.c 中修复了 SLICE1 方式分配内存的一处 BUG
+
+572) 2016.12.28
+572.1) feature: acl_mem_slice.c 中的函数 tls_mem_realloc 允许源指针为 NULL
+
+571) 2016.12.1
+571.1) feature: acl_aio_server.c/acl_threads_server.c/acl_single_server.c 增加
+回调函数 __service_on_listen，以便于将监听的流对象传递给应用
+
+570) 2016.11.30
+570.1) feature: acl_master 服务器框架支持监听地址的模糊匹配机制，以便于多机部署
+时的配置文件一致性
+
+569) 2016.11.27
+569.1) feature: 增加了内存调试函数 acl_default_meminfo 用来显示内存分配及释放情况
+
+568) 2016.11.18
+568.1) bugfix: acl_vstream.c 中的函数 acl_vstream_fdopen 设置 IO 句柄为非阻塞
+模式是存在问题的，上层应用应该自己决定是否设为非阻塞模式
+568.2) workaround: 将 acl_master 服务器中的所有服务器模板的 use_limit 和 idle_limit
+的缺省都设为 0，即服务子进程默认情况下是不退出的
+
+567) 2016.10.28
+567.1) compile: 可以在 centos4.7 上使用 gcc 3.x.x 编译
+
+566) 2016.10.25
+566.1) compile: 使用 gcc 编译时若打开预编译选项，个别文件会因头文件未包含而报错
+566.2) bugfix: 修复了 url coder 针对  '+' 编码时的不兼容性问题
+
+565) 2016.10.21
+565.1) feature: ACL_VSTREAM 结构体中新增标志位 omode，主要用于 UNIX 平台打开文件
+565.2) bugfix: acl_json.h 头文件中定义的 ACL_JSON_T_XXX 有重复值，容易造成混乱
+
+564) 2016.10.11
+564.1) bugfix: acl_json_util.c 中 acl_json_build/acl_json_building 创建 json
+字符串时，针对非文本类型不应该有双引号
+
+563) 2016.10.10
+563.1) feature: acl_json_util.c 增加 acl_json_create_null 及
+acl_json_create_array_null 用于创建 null 类型的节点
+
+562) 2016.9.7
+562.1) bugfix: acl_vstream.c 中 acl_vstream_gets/acl_vstream_gets_nonl
+/acl_vstream_readtags/acl_vstream_gets_peek/acl_vstream_gets_nonl_peek
+应该在函数入口处先清除 ACL_VSTREAM_FLAG_TAGYES 标志位，否则在多次读行
+过程中第一次置 ACL_VSTREAM_FLAG_TAGYES 标志位后有可能会被后面的读行复用
+
+561) 2016.9.1
+561.1) bugfix: acl_urlcode.c 中的解码字典 dec_tab 有误
+
+------------------------------------------------------------------------
+560) 2016.8.23
+560.1) bugfix: acl_json_parse.c 中，在解析 JSON 过程中需要设置叶节点标志
+
+559) 2016.8.15
+559.1) bugfix: events.c 中的函数 event_thr_prepare/event_prepare 中，如果当
+ACL_VSTREAM_BFRD_CNT 及 read_ready 两个条件同时满足时，ACL_VSTREAM_BFRD_CNT
+满足条件如果放置在 read_ready 前面，会造成 read_ready 被提醒清除，因此，需要
+把 read_ready 条件放置在前面
+559.2) performance: events_epoll_thr.c 的 event_enable_read 函数中，通过设置
+/清除标志位 EVENT_FDTABLE_FLAG_FIRE 来达到减少 epoll_ctl 的调用次数，从而提高
+事件处理性能
+
+558) 2016.8.13
+558.1) bugfix: acl_vstream.c 中的 acl_vstream_writevn 函数数据指针偏移有问题，
+导致写入的数据量计数错误
+
+557) 2016.8.11
+557.1) bugfix: events_epoll_thr.c 中的 event_enable_read 函数里，解锁调用过程
+THREAD_UNLOCK 需要 epoll_ctl 调用之后，以免主线程和子线程同时操作同一对象
+557.2) compile: 需要将 acl_ypipe/acl_yqueue 添加至 vc2015 的工程中
+
+556) 2016.7.29
+556.1) feature: json 解析器支持 double 数据元素
+
+555) 2016.7.20
+555.1) compile: __sync_val_compare_and_swap 在 Linux 32 位系统下编译时需要
+加编译选项 -march=i686
+
+554) 2016.7.14
+554.1) bugfix: events_kernel.c 中的 stream_on_close 当 fdp == NULL 时直接返回
+
+553) 2016.7.10
+553.1) compile: 消除了 gcc6.1 的几处编译警告
+
+552) 2016.6.26
+552.1) feature: 增加 acl_mbox.c 用于线程之间的单向通信，内部使用了无锁队列方式
+效率更高 -- by niukey@qq.com
+
+551) 2016.6.21
+551.1) safety: acl_vstream.c->acl_vstream_fdopen 中的 rw_timeout > 0 时，应该
+再通过 acl_getsocktype 判断一下是否是需要设置非阻塞模式
+
+550) 2016.5.21
+550.1) bugfix: acl_sys_file.c 中的函数 acl_file_open 当以 O_APPEND 方式打开文件时，
+文件指针没有指向文件尾部
+
+549) 2016.5.12
+549.1) feature: 增加原子操作 acl_atomic.c, 无锁队列 acl_yqueue.c, acl_ypipe.c
+--- by niukey@qq.com
+
+548) 2016.5.9
+548.1) 将几个 socket IO 的 hook 函数由 acl_sys_socket.c 移至 acl_vstream.c 中
+
+547) 2016.5.8
+547.1) feature: acl_sys_socket.c 中的 SOCKET IO 过程允许被 HOOK，这样
+acl_vstream.c 中的 acl_vstream_fdopen 在创建 SOCKET 流对象时允许使用被 HOOK 的函数
+
+546) 2016.5.5
+546.1) safety: acl_xml_parse.c/acl_xml2_parse.c 当输入为 NULL 时返回 ""
+546.2) feature: 在 acl_vstream.c 的 acl_vstream_fdopen 时针对带有读写超时
+的 socket 的设置为非阻塞模式，这样代码逻辑更为清晰
+546.3) feature: acl_read_wait.c 中的读超时重新使用 epoll 来判断，为防止 epoll
+句柄被异外关闭，内部增加了重新打开 epoll 句柄的功能
+
+545) 2016.5.4
+545.1) bugfix: acl_sys_socket.c 中函数 acl_socket_write 修改了写超时的问题
+
+544) 2016.4.20
+544.1) feature: acl_threads_server.c 在 alone 模式下运行时，释放全局分配的
+动态对象，以便于用户使用 valgrind 查找内存问题
+
+------------------------------------------------------------------------
+543) 2016.4.16
+543.1) bugfix: acl_xml_util.c->acl_xml_node_set_text_stream->acl_vstream_fseek
+及 acl_xml2_util.c->acl_xml2_node_set_text_stream->acl_vstream_fseek 中的第二、
+第三个顺序相反
+543.2) compile: 消除了 VC2012 使用 x64 方式编译时的一些编译警告
+
+542) 2016.4.14
+542.1) feature: acl_argv_split.c 新增字符串分隔函数 acl_argv_quote_split 允许
+在对字符串进行分隔时，不破坏被单引号/双引号引用的字符串
+
+541) 2016.3.29
+541.1) bugfix: acl_vstream.c 中针对 stdin, stdout, stderr 需要做特殊处理
+
+540) 2016.3.22
+540.1) bugfix: acl_vstring.c 中没有针对 fd 进行初始化，这样当释放 ACL_VSTRING
+对象时，会误判该对象创建在 mmap 上，从而会导致内存泄露
+
+539) 2016.3.18
+539.1) bugfix: acl_threads_server.c 中的函数 dispatch_receive 是通过调用
+acl_read_fd 直接从套接字中读取数据的，此时应该将 conn->read_ready 标志位清0，
+否则会再次引发读操作，同时将该套接字设为非阻塞模式，以免阻塞主线程
+
+538) 2016.3.8
+538.1) bugfix: acl_vstream_net.c 中的函数 udp_read 应该设置 read_ready = 0，
+否则当该 UDP 对象置入 event 事件循环时，会造成无用的事件触发
+
+537) 2016.3.3
+537.1) compile: acl_env.c 中去掉了变量 _environ
+537.2) compile: acl_server_api.h 中的函数前需加 ACL_API 以便于生成动态库
+
+536) 2016.3.1
+536.1) bugfix: acl_threads_server.c 在 daemon 模式下当只监听一个端口时，控制
+服务器 acl_master 不会传递 -s 参数，应该 socket_count 值初始化为 1
+
+535) 2016.2.28
+535.1) bugfix: acl_vstream.c 加强了 fp->read_cnt < 0 时的安全处理
+535.2) feature: acl_threads_server.c 支持 WINDOWS 平台，同时支持 daemon 模式
+及独立运行模式
+
+534) 2016.2.26
+534.1) feature: acl_threads_server.c 服务器模板增加了几个接口
+
+533) 2016.2.22
+533.1) feature: acl_inet_listen.c 在创建监听描述符时支持使用 SO_REUSEPORT,
+TCP_FASTOPEN 以提升 TCP 的处理性能（此两个特性均需要内核支持，同时 TCP_FASTOPEN
+还需要在编译 lib_acl.a 时定义预编译条件：USE_FASTOPEN）
+
+532) 2016.2.18
+532.1) feature: acl_xml/acl_xml2 增加函数接口，允许以文件流为创建 xml 节点的文本
+
+531) 2016.2.16
+531.1) performance: 优化 acl_vstream.c 中 acl_vstream_read 函数的读性能:
+同时兼顾大数据读取与小数据读取的性能问题
+
+530) 2016.2.13
+530.1) compile: 使用预编译，优化 gcc 编译速度
+
+529) 2016.2.5
+529.1) feature: acl_vstring.c 以内存映射文件方式管理内存同时支持 UNIX/WINDOWS
+
+528) 2016.2.1
+528.1) feature: acl_vstring.c, 优化代码结构
+
+527) 2016.1.30
+527.1) feature: acl_vstring.c 增加了 acl_vstring_mmap_alloc，用于支持以内存
+文件映射方式管理内存
+527.2) feature&safety: acl_vstring.c 真正支持限定最大使用空间功能
+527.3) samples/mmap_string: 该示例用于测试以内存文件映射方式使用 acl_vstring
+的功能
+
+526) 2016.1.17
+526.1) feature: acl_default_malloc.c，函数 acl_default_realloc 当输入的地址为
+NULL，则自动切换至 acl_default_malloc 过程
+526.2) feature: acl_vstream.c，函数 acl_vstream_fdopen 会自动判断所给描述符是否
+为监听描述符，避免了用户输入的参数 fdtype 的非法性
+526.3) feature: events_select.c/events_poll.c/events_kernel.c，内部自动判断是否
+为监听描述符，从而降低了事件模块与流模块之间以及其它模块之间的耦合度
+
+525) 2016.1.16
+525.1) bugfix: acl_multi_server.c/acl_single_server.c/acl_trigger_server.c，在
+将监控监听套接口的读事件时，应该调用 acl_event_enable_listen，而不是调用
+acl_event_enable_read
+525.2) feature: 增加函数 acl_check_socket 用来检查所给套接字是否为监听套接字
+
+524) 2016.1.8
+524.1) bugfix: acl_xml_parse.c/acl_xml2_parse.c/acl_xml_util.c/acl_xml2_util.c,
+修复了当数据节点为 META, COMMENT, CDATA 时解析与创建 xml 对象时的 BUG
+
+------------------------------------------------------------------------
+523) 2015.12.28
+523.1) acl_read_wait.c 中的函数 acl_read_wait 在 32 位的低版本 LINUX 平台下
+使用 epoll 方法模拟读超时可能有问题，所以改用 poll 方法来实现读超时机制
+
+522) 2015.12.24
+522.1) bugfix: 修复了 valgrind 检测出的 acl_xml_parse.c 中函数 cdata_prepare
+存在指针非法访问问题
+
+521) 2015.12.23
+521.1) bugfix: acl_xml_parse.c/acl_xml2_parse.c 当解析一个空的 CDATA 时有问题
+
+520) 2015.12.21
+520.1) bugfix: master_sig.c 中在读数据时应该使用 acl_vstream_read，而不是
+调用系统 API read，否则会形成死循环
+520.2) bugfix: event 事件引擎应该区分监听描述字和一般套接字，有的地方未给
+监听套接字 listener 置 1，这样会造成死循环
+520.3) bugfix: acl_read_wait 函数中使用 epoll 的方式有问题，会造成死循环
+
+519) 2015.12.20
+519.1) feature: acl_aio.c 增加了设置检查所有套接字状态的时间间隔函数
+519.2) performance: events.c, events_kernel.c, events_iocp.c, 在每一个事件
+循环处理完毕时，如果依然有一些描述字的缓冲区还有数据，则立即触发下一个事件
+循环过程，从而保证了 IO 读的处理效率
+
+518) 2015.12.19
+518.1) bugfix: acl_sys_socket.c 的函数 acl_socket_read 中没有清除流对象 fp
+的系统可读标志位(sys_read_ready 置 0)，则可能会造成读阻塞或异步读时的死循环
+518.2) bugfix: acl_aio_write.c 的函数 acl_aio_writen 中在一处返回时未将嵌套
+层级减一，可能会阻塞写过程
+
+517) 2015.12.18
+517.1) bugfix: events.c 中函数 event_prepare 针对监听描述符，应该忽略掉标志位
+sys_read_ready，该标志位仅对网络 IO 套接字有效
+517.2) bugfix: 事件引擎不应针对监听套接字设置 sys_read_ready 标志位
+517.3) bugfix: master_status.c 函数 master_status_event 中在读数据时应该使用
+acl_vstream_read，而不应使用系统 API read，因为 acl_vstream_read 内部才会清除
+sys_read_ready 标志位
+
+516) 2015.12.9
+516.1) feature: acl_xml_parse.c / acl_xml2_parse.c can parse CDATA
+
+515) 2015.12.8
+515.1) bugfix: acl_vstream.c 中当 read/write 接口被注入时，因为没有对应的
+writev 注入方式，所以需要多次调用 write 来模拟 writev 过程
+515.2) bugfix: events.c 中的函数 event_prepare 针对 sys_read_ready = 1 的情况
+需要将 event_type 为 ACL_EVENT_ACCEPT 的情形排除
+
+514) 2015.12.7
+514.1) performance: acl_xml_util.c 中的函数 acl_xml_create_node 在创建节点时，
+如果正文内容比较大，则会因内存的快速频繁膨胀而造成性能损耗，现在采用了预分配策略，
+以减少这种性能损耗
+514.2) bugfix: acl_xml.c/acl_xml2.c/acl_xml3.c 在删除节点时在在残留问题
+
+513) 2015.12.4
+513.1) bugfix: fdp->stream->sys_read_ready should be check in event_prepare
+513.2) performance: acl_xmlcode.c 中的函数 acl_xml_encode/acl_xml_decode 通过
+提前预分配内存，以减少重复分配/释放内存的次数，从而在一定程度上提升内存操作性能
+513.3) bugfix: 将清楚 ACL_VSTREAM::sys_read_ready 标志位的操作从 acl_vstream.c
+的函数 sys_read 中移除，在 acl_sys_socket.c 的函数 acl_socket_read 进行清除该标志位
+
+function of events.c for reading event.
+
+512) 2015.12.3
+512.1) bugfix: acl_vstream.c 中的函数 sys_read 中必须在调用 fread_fn/read_fn
+前清除可读标志位，这样 IO 钩子函数在重置该标志位时才能生效
+
+511) 2015.12.2
+511.1) feature: acl_xml2 解析器新增接口 acl_xml2_mmap_alloc，方便以内存文件
+映射方式对 xml 文件进行解析和创建
+511.2) feature: acl_xml2 解析器支持文件空间大小自动扩充方式
+
+510) 2015.11.29
+510.1) feature: 新增 xml 解析器 acl_xml3，该解析器性能与 RapidXML(号称世界上
+最快的)解析器的性能几乎相当
+510.2) feature: acl_xml2 增加了将 xml 对象转换为字符串的功能
+
+509) 2015.11.27
+509.1) feature: acl_dbuf_pool.c 在调用 acl_dbuf_pool_free 时可以有效地释放掉
+大内存，这样在 acl_vstring.c 中在进行大内存扩充时可以有效地将大内存优先释放掉
+
+508) 2015.11.26
+508.1) feature: acl_xml_parse.c 支持解析有多个或单个 xml 根节点的 xml 文档
+
+507) 2015.11.24
+507.1) feature: 增加新的 xml 编解码函数，其中的参数指定输出缓冲区大小
+
+506) 2015.11.20
+506.1) bugfix: acl_dbuf_pool.c 中在调用 acl_dbuf_pool_reset 时在遇到保留内存
+块时应该保留整个内存块，且偏移地址保持不变
+
+505) 2015.11.19
+505.1) feature & performance: acl_array.c, acl_xml.c 引入了 ACL_DBUF_POOL，
+从而提升了性能
+
+504) 2015.11.18
+504.1) bugfix: acl_xml_util.c 中 acl_xml_build 进行 xml 特殊字符转义时有误
+504.2) feature: acl_xml_parse.c 在解析时，允许进行 xml 数据格式的解码
+
+503) 2015.11.11
+503.1) bugfix: acl_json_parse.c 针对 -xxx 或 +xxx 也应识别为数值类型
+
+502) 2015.11.6
+502.1) feature: acl_htable.c 中新增函数 acl_htable_delete_entry
+
+501) 2015.11.3
+501.1) feature: acl_urlcode.c 中引用了 ACL_DBUF_POOL 内存池
+
+500) 2015.10.30
+500.1) feature: acl_dbuf_pool.c 增加了 acl_dbuf_pool_free, acl_dbuf_pool_keep,
+acl_dbuf_pool_unkeep 三个函数，同时优化 acl_dbuf_pool_reset 函数，当某个内存
+块有标识为保留的内存段时并不会释放
+
+499) 2015.10.29
+499.1) feature: acl_dbuf_pool.c 中的 acl_dbuf_pool_reset 函数在重置内存池时
+支持保留指定长度的缓冲区
+
+498) 2015.10.7
+498.1) bugfix: acl_atoui64/acl_atoi64 在 WINDOWS 平台使用 VC2012 编译时有问题，
+因为内部所用的 VC 提供的 API _atoi64 有问题，当转换最大的 64 位整数（18446744073709551615）
+时会自动截断，而 VC2003 却没有此问题
+
+498.2) 整理 acl_mystring.c 中的代码
+498.3) feature: json 解析器增加了函数 acl_json_getFirstElementByTagName，该方法在
+遍历过程中当匹配到一个符合的节点后便立即返回，因而效率比 acl_json_getElementsByTagName 更高
+498.4) feature: xml 解析器增加了函数 acl_xml_getFirstElementByTagName，该方法在
+遍历过程中当匹配到一个符合的节点后便立即返回，因而效率比 acl_xml_getElementsByTagName 更高
+
+497) 2015.9.23
+497.1) feature: json 解析器支持最外层为数组类型，同时完全支持：bool, number, null 类型的数据
+
+496) 2015.9.22
+496.1) feature: json 解析器增加支持判断是否解析完毕的功能
+
+------------------------------------------------------------------------
+
+495) 2015.8.13
+495.1) feature: acl_msg.c 文件中，即可以将日志信息记入文件中，同时又可以输出
+至屏幕
+
+494) 2015.7.7
+494.1) bugfix: acl_urlcode.c 中函数 acl_url_decode 当输入串非法时有可能造成内存溢出
+494.2) samples/dgate: 将之前写过的一个 DNS 查询代理的例子加入
+
+493) 2015.6.28
+493.1) compile: 支持在 VC x64 环境下编译使用
+493.2) workaroud: 为了防止因在 acl_define_win32.h 中将 FD_SETSIZE 设置的过大
+而导致进程在64位环境下堆栈溢出（VC 编译时的默认堆栈为1MB），将 FD_SETSIZE 设为 40000
+
+492) 2015.6.24
+492.1) bugfix: acl_vstring.c 中 acl_vstring_init 函数应禁止使用内存池方式
+
+491) 2015.6.21
+491.1) feature: acl_dbuf_pool.c 增加了 acl_dbuf_pool_reset 方法，可以方便该
+内存池被重复使用
+491.2) performance: acl_json.c 中 acl_json_rest 方法中使用了 acl_dbuf_pool_reset
+来重复使用会话内存池
+
+490) 2015.6.19
+490.1) performance: acl_json.c/acl_vstring.c 支持使用 ACL_DBUF_POOL 内存池
+进行内存分配，从而大大提升了性能
+
+489) 2015.6.12
+489.1) bugfix: acl_vstream.c 中的函数 acl_vstream_loadfile2 在分配内存判断条件有误
+489.2) compile: 编译条件整理
+
+488) 2015.5.25
+488.1) performance: acl_dbuf_pool.c 性能优化，将内存分配次数由原来的三次减少
+至一次
+488.2) performance: acl_vstream.c 性能优化，acl_vstream_read 提供预读功能
+488.3) performance: acl_read_wait.c 中函数 acl_read_wait 在 linux 下采用
+epoll，性能提升不少
+
+487) 2015.4.4
+487.1) compile: acl_define_win32.h 中的 socklen_t 的定义原来使用宏定义 #define
+方式，有时会因为有些版本的 VC 提供了此类型而导致编译报错，现在改为 typedef 定义方式
+
+------------------------------------------------------------------------
+486) 2015.3.11
+486.1) bugfix: 修改 acl_read_wait.c/acl_write_wait.c， 在 WIN32 平台下调用
+select 时不必检查 fd 与 FD_SETSIZE 的关系，因为 WIN32 下的 fd_set 结构定义及
+FD_XXX 宏的实现原理与 UNIX 不同，并且 WIN32 下的 fd 是不连续的，有可能会出现非常大
+的值，所以其中检查 fd < FD_SETSIZE 有可能会导致崩溃，其实也完全没有必要检查
+
+485) 2015.3.5
+485.1) bugfix: acl_threads_server.c/acl_aio_server.c 当进程退出时，需要通知
+acl_master 主进程自己当前不可用，同时需要关闭与前端 TCP 派发器(master_dispatch)的连接
+
+484) 2015.2.26
+484.1) feature: acl_msg.c 增加了函数 acl_msg_trace_enable 用来设置当写出错
+或警告类型的日志时是否记录函数的调用堆栈
+
+483) 2015.2.25
+483.1) feature: 增加了 CRC17 的哈希算法 acl_hash_crc16
+
+482) 2015.2.14
+482.1) bugfix: acl_trace.c/acl_trace_info 中的变量 results 在调用系统的
+backtrace_symbols() 函数后应该释放，否则会造成内存泄漏
+
+481) 2015.2.10
+481.1) bugfix: acl_master 服务器框架当设置了 master_prefork 后可能会导致
+master_maxproc 不起作用，原因是 master_avail.c 中的 master_prefork 函数
+的限制问题，现在修改 master_avail_event 函数，当 master_prefork 返回 0 时
+再判断是否还需要 fork 子进程；该 BUG 仅影响多进程服务器模板，对其它服务器
+模板（如：非阻塞、多线程 等）没有影响
+481.2) bugfix: acl_single_server.c 多进程服务器模板的空闲超时退出机制存在问题
+
+------------------------------------------------------------------------
+480) 2015.2.2
+480.1) feature: acl_vstring.c/vstring_extend 在内存自动增加时，原来采用了内存翻倍
+增长的方式，当原始内存比较大时容易造成很大内存浪费，现采用了 redis-server 中的策略，在一
+定范围内（1MB）增长时按翻倍增长方式，超过此范围则以 1MB 为单位进行递增
+
+479) 2015.1.27
+479.1) bugfix: acl_dbuf_pool.c 的函数 acl_dbuf_pool_alloc() 在比较剩余长度
+与 pool->block_size 的长度时，采用的是 pool->block_size 长度减去一个较大的
+长度，结果导致无符号整形(block_size 为 size_t 类型) 溢出
+注：原来的错误表达方式为：
+pool->block_size - ((char*) pool->head->ptr - (char*) pool->head->buf) < length
+正确的方式为：
+pool->block_size < ((char*) pool->head->ptr - (char*) pool->head->buf) + length
+因为其中的整形都为无符号类型，所以第一种表达方式会造成比较符左边的值产生溢出
+
+478) 2015.1.7
+478.1) feature: 增加了 acl_is_blocking() 函数用于判断套接字是阻塞模式还是非阻塞模式
+
+477) 2015.1.1
+477.1) compile: 整个工程可以使用 clang/clang++ 编译通过
+
+476) 2014.12.28
+476.1) feature: win32 iocp 模式下可以支撑更多的连接数，在 acl_events.c 中的函数
+（acl_event_new_kernel）中，将默认值设为 50000，使用者可以根据自己需要修改成更大的值
+476.2) bugfix: win32 iocp 模块(events_iocp.c)的函数 stream_on_close 中，应该
+增加 fdp->event_read 是否为空指针的判断
+
+------------------------------------------------------------------------
+475) 2014.12.13
+475) bugfix: acl_json_util.c 中将 JSON 对象转为字符串的函数 acl_json_build
+不能支持某些情形
+476) featrue: acl_json_util.c 中增加了流式将 JSON 对象转为字符串的函数
+acl_json_building，这样当 JSON 对象比较大时使用该函数可以有效防止要求系统分配
+非常大的内存空间而导致分配内存失败
+
+474) 2014.12.8
+474.1) feature: acl_trace.c 中的函数 acl_trace_info 增加了防止递归嵌套的功能
+
+473) 2014.12.6
+473.1) feature: acl_msg.c 中的 acl_msg_error/warn/fatal/panic 支持记录函数调用堆栈
+
+472) 2014.12.5
+472.1) feature: acl_vstream.c 中循环写函数(loop_writen)支持超时写功能，即当设置了
+写超时后，会检查每次写后的数据长度是否小于要求的写长度，如果小于则进入写超时等待；同时该循环
+写函数支持以 64KB 为单位写数据
+472.2) feature: acl_threads_server.c 完善了连接使用数自动退出机制
+472.3) feature: acl_threads_server.c 当采用 TCP 连接分发方式时，增加了汇报给分发器
+的信息字段，以便于分发器根据这些字段决定分发的策略
+
+471) 2014.12.4
+471.1) performance: acl_vstream.c 优化了读 (__sys_read) 的性能
+471.2) bugfix: acl_vstream.c 在写时有可能会造成死循环
+
+470) 2014.12.2
+470.1) bugfix: acl_vstream.c 中函数 __sys_read 的标志位 sys_read_ready 置 0
+应该在 read_fn/fread_fn 函数返回后
+
+469) 2014.11.30
+469.1) bugfix: acl_aio_read.c 中的 reactor IO 方式的函数 acl_aio_enable_read
+内部在某种情况下有可能不会触发读回调过程
+
+468) 2014.11.29
+468.1) bugfix: acl_sys_socket.c 中的读/写超时参数 timeout 不起作用，已修复
+468.2) workaround: acl_vstream.c 中的 __sys_read 将读超时判断交由 read_fn 处理
+
+467) 2014.11.28
+467.1) feature: acl_trace.c 中增加了 acl_log_strace() 函数用来将函数调用堆栈
+输出至日志文件中
+467.2) feature: acl_default_mallo.c 增加了 acl_default_set_memlimit,
+acl_default_get_memlimit 函数用来设置/获得分配内存最大报警值
+
+466) 2014.11.25
+466.1) feature: acl_mystring.c 中增加了 acl_find_blank_line 函数，用来从给定
+数据中查找空行的位置
+466.2) feature: acl_pthread_pool.c 中增加了 acl_pthread_pool_idle，
+acl_pthread_pool_busy 两个函数，分别用来获得当前线程池中的空闲线程数及繁忙线程数
+466.3) feature: acl_threads_server.c 服务器模板当子进程退出时会优先调用应用
+回调函数，由应用回调函数优先决定是否退出
+
+465) 2014.11.23
+465.1) bugfix: acl_threads_server.c/acl_aio_server.c 服务器模板，当采用 TCP
+分发方式时，如果 acl_master reload 后若子进程配置的不是立即退出，则该子进程
+会重试连接 TCP 派发器从而导致该子进程永不会退出
+
+464) 2014.11.18
+464.1) bugfix: snprintf.c 中 acl_secure_snprintf/acl_secure_vsnprintf 在调用
+_vsnprintf_s 时有误，第三个参数需传入 _TRUNCATE，否则当缓冲区较小时会产生断言
+
+463) 2014.11.10
+463.1) bugfix: acl_threads_server.c 将对客户端 IP 地址访问权限的处理过程放在
+client_wakeup 中，否则会造成 master_threads2 类产生 core
+463.2) feature: acl_threads_server.c 中增加了设置 ACL_MASTER_SERVER_HANDSHAKE_FN
+的方法，用来替代 ACL_MASTER_SERVER_ACCEPT_FN 函数的一些较长时间的初始化工作
+
+462) 2014.11.8
+462.1) bugfix: acl_json_util.c 中的函数 json_escape_append 不应针对字符
+'/' 进行转义
+
+461) 2014.11.7
+461.1) feature: json 模块增加了构造布尔型和数值型的接口
+
+------------------------------------------------------------------------
+460) 2014.10.25
+460.1) feature: acl_tcp_ctl.c 增加了套接字选项的获取新接口：acl_get_tcp_solinger，
+acl_get_tcp_nodelay
+
+459) 2014.10.24
+459.1) bugfix: acl_aqueue.c 的 acl_aqueue_free 中在释放时存在一处空指针使用
+
+458) 2014.9.9
+458.1) feature: acl_threads_server.c 线程池服务器模板支持通过配置项
+(ioctl_thread_accept = 1) 将 on_accept 回调过程放在线程池的子线程中处理
+458.2) feature: 事件引擎模块可以区分 ACL_EVENT_ACCEPT/ACL_EVENT_CONNECT 与
+ACL_EVENT_READ/ACL_EVENT_WRITE 事件类型了
+
+457) 2014.9.6
+457.1) 整理库的所有头文件，使之更规范
+
+456) 2014.9.2
+456.1) acl_master 进程的 master_spawn.c 中，在函数 master_delete_child 中，
+当调用 acl_binhash_find 返回 NULL 时会自动 panic，从而导致 acl_master 守护进程
+异常退出，现改成 warning
+
+455) 2014.8.27
+455.1) feature: acl_vstream.c 增加了几处 IO 出错时的错误号记录位置
+
+------------------------------------------------------------------------
+454) 2014.8.20
+454.1) feature: ACL_VSTREAM 增加了 objs_table 成员用来存放 KEY-OBJECT 对象，
+可以通过 acl_vstream_add_object/acl_vstream_get_object/acl_vstream_del_object
+来操作
+
+453) 2014.7.31
+453.1) compile: 在FreeBSD9.2(64)上编译通过
+
+452) 2014.7.21
+452.1) 将 master/template/acl_tmpl.c 移到 stdlib/sys/unix/acl_core_limit.c
+452.2) bugfix: acl_basename.c 中的 acl_safe_basename() 函数有 BUG
+
+451) 2014.7.7
+451.1) acl_set_ugid.c/acl_set_eugid.c: 当进程不能切换用户身份时取消了自动
+fatal 的过程，而是给上一级调用者返回 -1 表示切换用户身份失败
+
+450) 2014.6.26
+450.1) feature: acl_vstream.c 中 acl_vstream_gets_peek/acl_vstream_gets_nonl_peek
+增加了行长度限制功能，当缓冲区 buf->maxlen > 0 时，该限制将会生效，这可以避免
+客户端通过发送一行特别长的数据而造成本地内存溢出
+450.2) feature: acl_aio_read.c 中增加了针对读行数据的最大长度限制
+
+------------------------------------------------------------------------
+449) 2014.6.23
+449.1) acl_aio_server.c: 增加了与之前功能兼容性接口
+
+448) 2014.6.20
+448.1) acl_aio_server.c: 增加了 IP 地址限制功能
+
+447) 2014.6.17
+447.1) master/template: 整理了一下该模块的代码
+447.2) removed: 去掉了 acl_aio_app_main.c，将其功能合并至 acl_aio_server.c 中，
+去掉了 acl_app_main.h 头文件，将其中的部分代码合并至 acl_server_api.h 中
+
+446) 2014.6.13
+446.1) upgrade: 去掉了 acl_ioctl_app_main.c，该模块将由 acl_threads_server.c
+完全代替
+446.2) deprecated: 将 acl_ioctl_server.c 中的函数声明为过期，将来也会被去掉，
+其中的功能完全可以由 acl_threads_server.c 模块代替
+
+445) 2014.6.3
+445.1) performance: acl_pthread_pool.c, worker_wait() 函数将空闲线程添加至线程池
+和从线程池中移除的操作放在 pthread_cond_timedwait 等待循环的外面，这样既可以减少
+添加/移除操作的次数，同时又可以使等待任务超时的线程迟早地退出
+
+444) 2014.5.26
+444.1) acl_scan_dir.c: 整理了代码，在返回的目录字符串中，最后的字母如果是
+'/' 或 '\\' (win32)，则自动去掉尾部的目录分隔符
+
+443) 2014.5.20
+443.1) feature: acl_master 允许以非 root 用户身份运行，需要在其配置文件(main.cf)中
+的 limit_privilege = 0
+
+442) 2014.5.15
+442.1) feature: acl_scan_dir.c 增加子函数 acl_scan_dir_next_name 及丰富了一些接口的功能
+
+441) 2014.5.7
+441.1) bugfix: acl_vstream.c 中 acl_vstream_ftell 应该将读缓冲区中读到的数据减去
+441.2) bugfix: acl_aqueue.c 中应支持无限等待方式
+
+440) 2014.5.5
+440.1) feature: acl_vstream.c/acl_file.c 支持类似于标准 C 中的 ftell 功能，用来获得
+当前文件指针在文件中的位置
+
+439) 2014.4.2
+439.1) acl_vstream.c: 新增加的针对写超时功能并不能真正检测出网卡的故障，所以暂时去掉，
+因为在检测可写状态时会增加一次系统调用，影响正常写的效率
+
+438) 2014.4.1
+438.1) bugfix: acl_vstream.c 中调用 __vstream_write 写时原来没有超时机制，如果接收者
+网卡突然当掉，则可能会使发送者堵塞
+
+437) 2014.3.27
+437.1) bugfix: acl_ioctl_server.c 中调用 acl_event_set_check_inter 时应该在调用
+acl_ioctl_start 之后，否则因为 ACL_EVENT 对象还未创建而出现空指针引用
+437.2) feature: acl_aio_server.c 支持与 master_dispatch 服务模块配合，接收来自
+于 master_dispatch 模块的连接转发及向其汇报自身当前连接数
+437.3) bugfix: acl_transfer_fd.c 中，将 control_un 的定义放在函数内部，否则将是
+线程不安全的
+437.4) compile: acl_transfer_fd.c 中 *((int *) CMSG_DATA(cmptr)) = send_fd; 类的
+用法在高版本 gcc (打开 -O2 以上开关，同时未使用 -fno-strict-aliasing) 编译时会报
+警告，采用另外的方法避免此警告
+
+436) 2014.3.26
+436.1) bugfix: acl_vstream_net.c 中 acl_vstream_accept_ex 接收外来连接时，判断
+监听描述符的类型方式有误
+436.2) bugfix: acl_getpeername 函数当客户端连接的是域套接字时，给出的地址不对，
+解决方法是当判断为域套接字后再调用 acl_getsockname 取得域套接字监听路径
+436.3) bugfix: acl_transfer_fd.c 中 acl_read_fd() 函数在读取 fd 时应该如下表示：
+*recv_fd = *((int *) CMSG_DATA(cmptr)); 而不是 *recv_fd = *CMSG_DATA(cmptr);
+436.4) feature: acl_threads_server.c 服务器模板支持从描述字派发器处获取来自于
+客户端的连接，应用只需要增加配置项：ioctl_dispatch_addr = xxx 即可
+436.5) app: 增加了 app/master_dispatch 套接字接收与派发服务器
+
+435) 2014.3.24
+435.1) bugfix: acl_master 服务器模块在 reload 配置文件时有可能会导致产生 core
+文件，原因是 acl_master_spawn 当判断进程数计数有问题会直接产生 core，导致计数
+不对的主要原因是 master_conf.c 在 reload 配置时预启动机制存在问题，解决方法是：
+a) 在 acl_master_spawn 中仅记 warning 信息，不产生 core
+b) 去掉 master_conf.c 中 acl_master_avail_reset 调用
+c) 在 master_avail.c 中的 acl_master_avail_listen 函数最后再判断是否需要启动新
+的子进程
+
+434) 2014.3.21
+434.1) feature: acl_threads_server.c 中有几处在关闭流时都增加了流关闭的回调过程
+
+433) 2014.3.20
+433.1) bugfix: events_epoll_thr.c 在函数 event_disable_readwrite 中调用
+epoll_ctl 删除描述字时，也必须保证第四个参数（struct epoll_event*) 非空，否则在低版
+本 LINUX 下会有问题
+
+432) 2014.3.18
+432.1) bugfix: events_pool_thr.c 应该把 acl_fdmap_add/acl_fdmap_del/acl_fdmap_ctx
+的操作放在线程锁内部
+
+431) 2014.2.27
+431.1) workaround: event 事件引擎中，为了防止因64位整型转32位整型而出现负值做了
+安全判断
+
+430) 2014.2.26
+430.1) performance: events.h 将自旋锁的方式关闭，否则在32位机器上会造成 CPU
+过高
+
+429) 2014.2.24
+429.1) bugfix: events_epoll_thr.c 当流对象有缓存数据需要事件引擎从应用级触发时，
+为了防止主线程在子线程的函数 event_enable_read 中修改 fdtabs 和调用
+epoll_ctl/EPOLL_CTL_ADD 之间调用了 event_disable_readwrite 中的
+epoll_ctl/EPOLL_CTL_DEL 而出错，需要在 event_enable_read 区分处理互斥锁的位置
+
+------------------------------------------------------------------------
+
+428) 2014.2.22
+428.1) bugfix: events_iocp.c 关闭未决状态的完成端口在 WIN XP 下存在 BUG，应该
+在套接字关闭前先取得完成端口状态
+
+427) 2014.2.21
+427.1) bugfix: events_wmsg.c 中在回调函数中没有将 stream 流针对传递，这会影响
+基于 win32 消息事件的异步 IO 过程
+427.2) bugfix: events_iocp.c 当主动关闭完成端口时，对于未决状态，不应提前释放
+重叠结构对象(http://support.microsoft.com/kb/192800/zh-cn)
+427.3) bugfix: acl_pthread_pool.c 线程条件变量链表的操作方法存在指针越界问题
+
+------------------------------------------------------------------------
+
+426) 2014.2.17
+426.1) feature: acl_event.c 增加函数 acl_event_set_check_inter，可以用来
+设置事件循环过程进行全局描述字检查的时间间隔
+
+425) 2014.2.14
+425.1) performance: acl_pthread_pool.c，将 pthread_cond_signal 放在
+pthread_mutex_unlock 之后，从而减少了子线程等待任务被触发的时间(为了防止
+在子线程退出后与其绑定的线程条件变量未释放，将该条件变量放在线程池对象中，
+子线程只是引用该条件变量)
+
+424) 2014.2.8
+424.1) feature: acl_pthread_pool.c，将线程池中的线程超时等待时间切割成以
+1 秒为单位的时间片
+
+423) 2014.2.6
+423.1) feature: 针对 gcc 或 vc 编译器，增加了一些编译属性开关
+
+422) 2014.2.3
+422.1) performance: events_kernel_thr.c 在调用 event_loop 循环过程中调用
+event_thr_prepare 时，增加了检测时间间隔，这样在高并发条件下可以有效地减少
+CPU 轮循的损耗
+422.2) feature: 增加了 events_epoll_thr.c，从而将 epoll 的调用方式从
+events_kernel_thr.c 中剥离，以便于专门针对 epoll 方式进行优化
+
+421) 2014.1.25
+421.1) workaround: 去掉了 acl_threads_server.c, acl_ioctl_server.c, 
+acl_aio_server.c, acl_udp_server.c 中无用的监视狗(watchdog) 及文件互斥锁
+
+420) 2014.1.24
+420.1) performance: acl_pthread_pool.c 在创建任务时，允许重复使用已经分配的任务
+对象
+
+419) 2014.1.23
+419.1) performance: acl_pthread_pool.c 线程池任务调度优化，当以批处理方式添加
+任务时，优先将任务分给空闲线程，减少线程竞争的概率
+
+418) 2014.1.22
+418.1) performance: acl_pthread_pool.c 线程池任务调度优化，将任务分配至每个线程
+本身的任务队列，从而将线程之间的竞争条件降至最低，大大提高了线程池任务调度的性能
+
+417) 2014.1.20
+417.1) workaround: ACL_DEF_THREADS_BATADD(acl_threads_params.h) 参数由原来的
+1 改为 0，以适应新的线程池框架设计(即在缺省条件下，线程池服务器模板不采用批量
+添加任务方式)
+
+416) 2014.1.19
+416.1) performance: acl_pthread_pool.c，由原来线程池统一用一个线程条件变量改
+为每个线程一个单独的线程条件变量，从而大大减少线程之间的锁冲突，因而提高了
+线程池的运行性能
+
+------------------------------------------------------------------------
+
+415) 2014.1.11
+415.1) compile: 去掉了 ACL_MS_WINDOWS 宏定义，在WINDOWS环境下统一使用 WIN32
+来标识 VC 编译环境
+415.2) compile: 支持 vc2008 编译器
+
+414) 2014.1.7
+414.1) bugfix: 线程池服务器模板 (acl_threads_server.c) 应该在 acl_chroot_uid
+调用之后再调用 set_core_limit，这样才能使应用程序崩溃时产生 core 文件
+
+413) 2013.1.6
+413.1) bugfix: 新线程池服务器模板 (acl_threads_server.c) 事件引擎的创建应该在
+调用 pre_jail 前，否则应用在 pre_jail 回调中获得的事件引擎句柄为空
+413.2) feature: 新线程池服务器模板在 pre_jail 前使用 acl_master 的日志记录可能
+出现的错误
+
+412) 2013.12.31
+412.1) bugfix: 修复了一些 json 解析器中的 bug
+
+411) 2013.12.30
+411.1) compatibility: json 模块对老的解析器进行了兼容
+
+410) 2013.12.29
+410.1) feature: 按 json 规范(www.json.org)，继续完善了 json 流式解析器，
+同时提供多个测试用例进行测试
+
+409) 2013.12.25-27
+409.1) feature: 完善了 json 流式解析器，提供了更多的功能(如：可以提取某个
+结点标签后的 json 字符串)
+
+408) 2013.12.15
+408.1) feature: acl_threads_server.c 服务器模板增加了配置控制参数 ioctl_batadd,
+用来控制是否采用任务添加批处理方式
+
+407) 2013.12.13
+407.1) feature: acl_pthread_pool.c, 新增加了 acl_pthread_pool_alloc_job,
+acl_pthread_pool_free_job, acl_pthread_pool_add_job(新的批量添加线程任务
+的接口)
+407.2) feature: acl_threads_server.c, 新添加的线程池服务器框架模板库
+407.3) feature: event.c, acl_events.c, 新增加了任务派发前及派发后的回调过程
+
+------------------------------------------------------------------------
+
+406) 2013.12.5
+406.1) feature: Makefile 支持 solaris 编译
+
+405) 2013.12.4
+405.1) remove: 去掉了 event 目录下的 events_kernel2.c 及 events_kernel3.c
+
+404) 2013.11.26
+404.1) feature: acl_json.c 增加了 acl_json_node_duplicate 用于复制一个 JSON
+结点对象到一个新的 JSON 结点中；增加了 acl_json_create 用于根据一个 JSON 结点
+创建一个完全的 JSON 对象
+404.2) feature: acl_json_util.c 增加了 acl_json_node_build 用于根据一个 JSON
+结点生成 JSON 字符串
+
+403) 2013.11.25
+403.1) bugfix: acl_json_parse.c，json_val() 函数中没有针对转义内容做特殊处理
+
+402) 2013.11.17
+402.1) performance: acl_vstream.c，__sys_read 函数中当流的 sys_read_ready
+为 1 时，则不会调用系统 API select 判断超时过程，从而减少一次系统调用，
+因为 sys_read_ready 标志位会在事件模块(event_xxx) 中被设置
+402.2) performance: acl_aio_server.c, acl_ioctl_server.c 服务器模块参加了
+控制参数：master_status_notify，当启动多个子进程时，该参数决定是否向
+acl_master 主进程汇报子进程的状态，当 master_prefork 预启动参数打开且该
+值 > 1 时，将 master_status_notify 设置为 0，则子进程不再向 acl_master 主
+进程汇报状态，有助于减少 acl_master 主进程的负载
+402.3) performance: acl_vstream.c, 在 acl_vstream_readn 中，为减少 read
+次数，当输入缓冲区较小时，则自动启用双缓冲读方式
+
+401) 2013.11.7
+401.1) bugfix: acl_vstream.c，在 acl_vstream_ctl 函数中，当控制参数为
+ACL_VSTREAM_CTL_PATH 时，对 stream->addr_peer 的赋值有问题（此 bug 由高
+版本的 gcc4.8.2 检测出）
+
+400) 2013.11.6
+400.1) compile: acl_msg.c，在函数 acl_last_serror() 中分配的线程局部变量
+在主线程中无法被正常释放，会导致 valgrind 报错
+
+------------------------------------------------------------------------
+399) 2013.11.5
+399.1) bugfix: events.c，event_thr_fire() 函数在调用 disable_readwrite_fn
+后 fdp->stream = NULL，而此值在 events_dog.c 中被使用造成错误
+
+398) 2013.11.3
+398.1) acl_debug.c: 调整了参数的表示方法，调整后的调试标签及级别字符串的
+格式: 1:1, 2:10, 3:8...  or 1:1; 2:10; 3:8...
+
+397) 2013.11.2
+397.1) feature: acl_master 服务器模板添加了 master_debug 配置项，方便用户
+在使用 acl 的服务器框架时调试日志
+
+396) 2013.10.29
+396.1) bugfix: acl_xml_util.c, acl_xml_tag_add() 在调用 acl_token_tree_add
+时，第三个参数应该调用 ACL_TOKEN_F_STOP，原来是 ACL_TOKEN_F_PASS
+
+395) 2013.10.20
+395.1) compile: acl_aio_app_main.c, 其中在调用 write 时，需要判断返回值，否则
+会在高版本 gcc 上报警告
+
+394) 2013.10.17
+394.1) bugfix: acl_mylog.c, 当通过 UDP 方式记录日志时，因为之前 acl_vstream.c
+允许注册外部接口的改变而发生了不兼容性问题
+
+393) 2013.10.15
+393.1) feature: acl_aio_app_main.c/acl_ioctl_app_main.c, 增加了配置项
+master_deny_banner 允许用户自定义拒绝连接的内容信息
+
+392) 2013.10.12
+392.1) feature: acl_pthread_pool.c 增加了 acl_pthread_pool_qlen 函数，提供
+当前线程池队列中未被处理的任务数量
+
+391) 2013.10.7
+391.1) performance: acl_vstream.c，将 __vstream_sys_read 的读过程进行了
+优化，改名为 __sys_read，以允许将用户输入的缓冲区做为系统 read 的内存地址，
+从而在调用 acl_vstream_readn/acl_vstream_read 时避免了数据的二次拷贝
+
+------------------------------------------------------------------------
+
+390) 2013.10.1
+390.1) 将 master 模块下的源文件代码排版整理了一下
+390.2) bugfix: events_select.c/events_select_thr.c 当套接字监听集合为空时
+休眠的时间单位为秒，需要将微秒级的 delay 转为秒级
+
+389) 2013.9.30
+389.1) feature: acl_single_server.c, acl_ioctl_server.c, acl_aio_server.c
+acl_udp_server.c 增加了可以获得本地监听套接口流对象集合的函数
+
+388) 2013.9.27
+388.1) events: ACL_EVENT_NOTIFY_RDWR/ACL_EVENT_NOTIFY_TIME 函数接口类型
+重新定义，在回调函数中增加了 ACL_EVENT，ACL_VSTREAM 参数，从而方便用户
+直接使用；因为这两个接口的重新定义，导致了很多功能模块做相应修改，主要
+影响的模块有：event, master, aio, ioctl
+
+387) 2013.9.26
+387.1) feature: master 服务器框架增加了专门针对 UDP 的服务器模板
+acl_udp_server.c/acl_udp_params.h
+
+386) 2013.9.22
+386.1) feature: ACL_VSTREAM 支持 UDP 传输; acl_vstream_net.c 中增加了
+acl_vstream_bind 函数用来绑定 UDP 传输模式
+386.2) feature: ACL_VSTREAM 增加了 acl_vstream_set_local_addr,
+acl_vstream_set_peer_addr
+386.3) acl_vstream.c: acl_vstream_set_remote 重命名为 acl_vstream_set_peer
+
+385) 2013.9.21
+385.1) 优化: ACL_VSTREAM 中将 remote_addr, local_addr 定义为指针，从而大大
+减少了 ACL_VSTREAM 对象创建时的尺寸大小
+385.2) feature: ACL_VSTREAM 中添加了 struct sockaddr_in 类型的两个指针，以便
+于将来 ACL_VSTREAM 很容易支持 UDP 传输
+385.3) feature: ACL_VSTREAM 对象增加了 acl_vstream_set_local,
+acl_vstream_set_remote, acl_vstream_set_path 三个函数
+
+384) 2013.9.13
+384.1) compile: 增加了工程文件 Makefile.db，使用该工程文件编译，则可以使用
+mysql 数据库功能，使用 Makefile 工程文件编译，则可以 lib_acl.a 更为干净
+(即不依赖于任何第三方库)
+
+383) 2013.8.21
+383.1) feature: master 框架允许以非 root 身份启动，需要用户修改 acl_master 的
+配置文件 main.cf，添加 set_ugid = 0，默认情况下该值为 1
+
+382) 2013.8.20
+382.1) bugfix: acl_json_util.c::json_escape_append, acl_json_parse::json_tag
+中需要对特殊控制字符做转义处理（目前在解析时暂不支持 \u 的情况)
+
+381) 2013.8.19
+381.1) bugfix: acl_json_util.c::json_escape_append 中不应将 "{}[]" 这些字符作为
+特殊字符而转义
+
+380) 2013.8.14
+380.1) event: events_select/events_poll/events_kernel/events_iocp 使事件引擎
+的时钟更为精确
+
+379) 2013.8.7
+379.1) bugfix: 在 iocp 方式下不能通过 getpeername/getsockname 获得
+远程/本地的地址，通过在 acl_vstream_accept_ex 中添加 setsockopt 调用，
+将监听套接字中的一些属性拷贝至客户端连接中解决了此类问题
+
+378) 2013.7.23
+378.1) feature: acl_aio_server.c, aio_accept_timer 添加了一个配置参数：
+aio_accept_timer，当该值 > 0 时，内部便启动一个定时器，定时尝试接收客户
+端连接，从而达到提升连接事件优先的目的
+
+377) 2013.7.18
+377.1) performance: event/event_kernel_thr.c, 优化多线程方式下事件引擎的
+运行速度；acl_master 框架中，当事件引擎选用 kernel 方式时，不需要打开
+ioctl_enable_dog 选项
+377.2) compile: linux32 gcc4 当打开编译选项 strict-aliasing rules 时，
+acl_sane_socket.c 中的声明的 SOCK_ADDR 类型被转换别的类型时会报警告
+
+376) 2013.7.15
+376.1) lib_acl: 去掉了 svr 模块，该模块的功能完全由 thread/ 下的线程池模块
+(acl_pthread_pool_xxx) 代替；同时修改了 ioctl/ 模块中对于 svn 模块的依赖，
+替换为 threead/ 下的线程池模块
+
+375) 2013.7.11
+375.1) feature: acl_sane_socket.c, 增加了 acl_getsocktype 函数，可以获得当前
+socket 句柄类型是 TCP 套接口还是 UNIX 域套接口;
+acl_getsockname/acl_getpeername 支持 UNIX 域套接口
+375.2) feature: acl_sane_accept.c, 增加了 acl_accept 函数，比较方便地接收客户
+端连接，同时兼容 TCP 套接口及 UNIX 域套接口
+375.3) master/template: 进一步完善了 acl_aio_server.c, acl_ioctl_server.c,
+acl_single_server.c acl_multi_server.c, 内部统一改为 acl_accept 方式
+
+374) 2013.7.7
+374.1) bugfix: acl_vstream.h, 因为 ACL_VSTREAM 流对象中的写缓冲 wbuf 采取了
+写时分配的策略，所以会造成宏 ACL_VSTREAM_PUTC 的空指针问题，现在增加了判断
+以预分配 wbuf 空间
+374.2) master 服务器框架：因为支持同一进程同时监听多个地址且允许 TCP 与 UNIX
+域套接口混用，所以目前各个服务器模板针对此种情况，均默认调用 UNIX 域套接口的
+accept 过程
+
+373) 2013.6.25
+373.1) compile: 消除了在 gcc-4.6.3 下的一些编译警告
+
+372) 2013.6.21
+372.1) feature: acl_master 框架支持在一个配置文件中监听多个地址(可以为 TCP
+套接口与域套接口混用)
+
+371) 2013.6.21
+371.1) feature: acl_master 框架支持在 reload 时的 prefork，修改的相关文件有：
+master_avail.c, master_service.c, master_spawn.c, master.h
+371.2) acl_master_log.c: 将日志输出信息当调试状态对待
+
+370) 2013.6.15
+370.1) bugfix: acl_array.c->acl_array_prepend，其中调用的 acl_array_succ_insert，
+应该调用 acl_array_pred_insert，该 BUG 会影响到所有调用 acl_dlink, acl_iplink,
+acl_access 函数的地方，包括 acl_aio_app_main.c/acl_ioctl_app_main.c 中有关访问
+权限的地方
+370.2) 将 acl_iplink.c 中的函数调用映射为直接调用 acl_dlink.c 中的方法
+370.3) samples/iplink: 该例子用于测试 acl_iplink.c 中的相关函数
+
+369) 2013.6.4
+369.1) bugfix: acl_mylog.c->reopen_log 函数中的 RETURN 宏定义中应该是
+thread_mutex_unlock，原来的 thread_mutex_lock 会造成死锁
+
+368) 2013.5.27
+368.1) bugfix: acl_json_parse.c: 有些汉字，如“誠”的后半个字节的值正好与转义字符
+相同，即为 92，所以需要兼容此情况，当判断 last_ch < 0 且当前 char 为 92 时，则认为
+汉字情况; acl_xml_parse.c 也存在类似问题，已修复
+
+367) 2013.5.23
+367.1) acl_json.c/acl_xml.c: 当启用结点对象缓存策略时，acl_json_node_reset 和
+acl_xml_node_reset 中调用 ACL_VSTRING_RESET 后还应该调用 ACL_VSTRING_TERMINATE
+
+366) 2013.5.20
+366.1) bugfix: acl_basename.c -> acl_safe_basename 在 3 月份修改的有误
+
+365) 2013.5.13
+365.1) acl_ioctl_server.c: 在主函数 acl_ioctl_server_main 中，需要将 acl_ioctl_start
+放在 proc_init 之前，以便于应用在 proc_init 回调过程中设置一次性定时器
+
+364) 2013.3.26
+364.1) bugfix: acl_xml_parse.c->xml_parse_attr_val() 函数中当
+if (ch == attr->quote) 时应该添加 xml->curr_node->last_ch = ch;
+
+363) 2013.3.24
+363.1) bugfix: acl_vstream_net.c->acl_vstream_listen_ex() 中针对域套接口地址
+时没有对 local_addr 赋值
+
+362) 2013.2.26
+362.1) bugfix: acl_dns.c, acl_dns_serror() 函数中返回字符串描述信息时查询方式有误
+362.2) bugfix: acl_dns.c, acl_dns_lookup() 函数中创建 ACL_DNS_REQ 对象时，部分变量
+未清零
+
+361) 2013.2.5
+361.1) bugfix: acl_scan_dir.c, acl_scan_dir_open() 原来采用 acl_mymalloc
+分配内存导致一些变量未初始化，现改成 acl_mycalloc
+
+360) 2013.1.29
+360.1) bugfix: acl_vbuf_print.c, 新改的代码中没有处理格式为 %* 的情形
+
+359) 2013.1.26
+359) performance: acl_vbuf_print.c 中的 fmt 内存由原来的动态分配改为固定的堆栈
+内存，使之性能提高大约 80% 左右，由此提升了依赖于该函数的 ACL_VSTRING 中的格式
+串操作的性能；fmt 的内存固定为 128 字节，理论上足够支持现在的机器指令长度，其中
+对于 %{xxx}d 的操作中，{xxx} 为数字，如 123，因为不可能有超过 128 个字节长度的
+数字，所以此固定尺寸的方式是安全有效的，如果用户在使用过程中用到了超过 128 个字
+节长度的数据，则内部会 fatal 以提醒用户有非法操作
+
+358) 2013.1.22
+358.1) bugfix: acl_single_server.c 的 single_server_wakeup 函数中没有将网络流的
+远程与本地地址赋予流对象
+
+357) 2012.12.31
+357.1) feature: acl_ioctl_app_main.c, 增加了两个回调函数指针:
+__app_on_timeout/__app_on_close，这样当套接口连接读超时或关闭时会分别调用
+此两个函数
+
+356) 2012.12.30
+356.1) feature: acl_file.h, 增加了几个通用的函数
+
+356) 2012.12.28
+356.1) compile: Makefile 的编译开关增加了 -pedantic 选项，挑出几个隐藏的 BUG
+
+355) 2012.12.27
+355.1) performance: ACL_VSTREAM 结构优化了个别参数，使该结构的尺寸由原来的 9K
+多变为现在的只有 800 个字节，即采用了写时分配内存的策略
+
+354) 2012.12.3
+354.1) bugfix: acl_events: event_limit() 函数在调用 acl_open_limit() 时传入了
+一个默认的值，导致进程打开的文件句柄数无法扩大。
+354.2) feature: acl_ioctl_server.c/acl_aio_server.c: 当客户端连接数超过系统限制时，
+原来的做法是程序退出，现在改为让程序暂时监听，通过定时器再重启监听过程
+
+353) 2012.10.12
+353.1) feature: xml/,
+增加了三个函数接口：acl_xml_getElementMeta/acl_xml_getEncoding/acl_xml_getType,
+用于取得 xml 起始控制字段的相关信息
+
+352) 2012.9.29
+352.1) 为了兼容 MAC OS 以及关于线程局部变量在动态库的限制因素，将库中
+带有 __thread 关键字标识的局部变量统一改为通过 acl_pthread_getspecific
+等函数获得
+
+351) 2012.9.25
+351.1) 在 MAC OS 编译通过，并测试了大部分示例
+351.2) 去掉了 code/ 目录下一些与字符集转换相关的代码
+
+350) 2012.8.26
+350.1) feature: ACL_VSTREAM::flag 增加了一个标志位：ACL_VSTREAM_FLAG_PREREAD,
+当调用 acl_vstream_can_read 时会判断此标志位，如果设置了此标志位，则当系统提示
+有数据可读时，该函数会预读网络数据
+
+349) 2012.8.25
+349.1) bugfix: acl_vstream.c 中将 stream->sys_read_ready = 0; 代码放在
+__vstream_sys_read 函数内，这样可以保证阻塞读与非阻塞读的数据一致性
+
+348) 2012.8.1
+348.1) 将所有的定时器接口进行修改，使之更灵活
+原来的定时器有一个自动重启的功能，但这个重启定时器功能被绑定在异步事件框架
+引擎上(这样只有当异步引擎设置了定时器重启功能，所有的定时器才会开户重启机制，
+这样做不够灵活)，现在将自动重启功能绑定在每个定时器本身上
+影响到的文件有：
+a) event: acl_events.c, acl_events.h, events_select.c, events_pool.c,
+events_kernel.c, events_kernel2.c, events_kernel3.c, events_iocp.c,
+events_wmsg.c, events_timer.c, events_alloc.c, events.c, events_select_thr.c,
+events_poll_thr.c, events_kernel_thr.c, events_timer_thr.c
+b) aio: acl_aio.c, acl_aio.h
+c) master: master_spawn.c, master_wakeup.c, acl_single_server.c, acl_multi_server.c,
+d) acl_trigger_server.c, acl_listener_server.c, unix_trigger.c
+e) ioctl: acl_ioctl.c, acl_ioctl.h
+
+347) 2012.7.27
+347.1) acl_aio_read.c: acl_aio_enable_read() 函数中增加了递归层次限制；
+can_read_callback() 中增加了 READ_SAFE_DISABLE 宏控制
+
+346) 2012.7.25
+346.1) acl_xml_util.c: 增加了对 '<' 和 '>' 的转义支持
+346.2) acl_json_util.c: 增加了对 '{', '}', '[', ']' 的转义支持
+
+345) 2012.7.23
+345.1) bugfix: acl_xml_parse.c，当属性值含有转义符 '\' 时，解析不能正常进行，在
+ACL_XML_ATTR 中增加成员 backslash 解决此类问题
+345.2) bugfix: acl_xml_util.c/acl_json_util.c 在创建对象时，也没有处理含有转义符 '\' 的情况
+
+344) 2012.7.10
+344.1) compile: 将 snprintf 在 WIN32 的实现做为内部函数使用
+
+343) 2012.7.2
+343.1) bugfix: acl_aio_stream.c->close_astream() 中并没有释放在 acl_aio_open
+中创建的四个数组对象
+343.2) feature: acl_aio.h, 添加了两个宏 ACL_AIO_SET_TIMEOUT/ACL_AIO_SET_CTX，
+可以快速地设置异步流的超时/上下文参数
+
+342) 2012.6.6
+342.1) compile: event_epoll.h 添加了 #include <stdint.h> 避免编译问题
+--liuhui (liuhui331234958@gmail.com)
+
+341) 2012.6.4
+341.1) bugfix: acl_ifconf.c 在 win32 下 acl_free_ifaddrs() 函数中有一处隐含的错误
+341.2) feature: acl_env.c 增加了 acl_getenv3()/3 该函数在 win32 下要比 acl_getenv 更安全
+341.3) compile: 在 AS6/CS6 上编译通过
+
+340) 2012.5.26
+340.1) bugfix: net/connect/acl_stream_connect.c: acl_stream_connect()/3 仅能支持
+SUNOS5，所以在LINUX下需要将其注释，影响的程序：master/framework/trigger/stream_trigger.c
+
+340) 2012.5.10
+340.1) bugfix: acl_aio_app_main.c/acl_ioctl_app_main.c 中在调用
+acl_access_permit 时传的是 IP:PORT格式，应该是 IP
+
+339) 2012.4.17
+339.1) feature: json/, 添加了由 json 对象树构建成字符串的函数接口
+
+338) 2012.4.15
+338.1) feature: xml/, 添加了由 xml 对象树构建成字符串的函数接口
+338.2) samples: samples/xml/, 增加了构建 xml 字符串的测试例子: build_xml2()
+
+337) 2012.4.9
+337.1) bugfix: 修复了许多变参类型不匹配的情况
+
+336) 2012.4.5 --- 2.1.2.8 release
+336.1) bugfix: events.h 中的宏 SET_TIME 原来的定义为：
+#define SET_TIME(x) {  \
+        struct timeval _tv;  \
+        gettimeofday(&_tv, NULL);  \
+        (x) = ((unsigned long) _tv.tv_sec) * 1000000 + ((unsigned long) _tv.tv_usec);
+\
+}
+
+应该改为：
+#define SET_TIME(x) {  \
+        struct timeval _tv;  \
+        gettimeofday(&_tv, NULL);  \
+        (x) = ((acl_int64) _tv.tv_sec) * 1000000 + ((acl_int64) _tv.tv_usec);
+\
+}
+因为在32位机上 unsigned long 也是32位的，所以计算出的 x 值可能已经越界了，这样会
+导致使用该宏的事件引擎中的定时器出现死循环问题
+
+335) 2012.4.1
+335.1) bugfix: acl_mem_slice.c 中在 mem_slice_free 调用
+thread_mutex_lock(__mem_slice_list_lock) 时可能是 __mem_slice_list_lock
+已经在 free_global_ctx 中被释放了
+
+334) 2012.3.31
+334.1) lib_acl/src/master/framework: 多处有未将全局变量未赋初始值的情况，其会
+导致在 AS4/CS4 上出错
+334.2) bugfix: acl_mylog.c->acl_close_log() 内部在释放线程锁时重复释放了线程锁变量
+log->lock 的内存，在调用 thread_mutex_destroy 时已经将该内存自动释放掉了
+334.3) acl_single_server.c: 调整了日志打开的顺序
+ 
+333) 2012.3.27
+333.1) bugfix: acl_mem_slice.c 有一处内存泄露问题，虽然这种问题只是一次性
+的
+333.2) private_thread_mutex.c: 添加了一个 thread_mutex_desotry 函数
+
+332) 2012.3.26
+332.1) acl_json.c: 少一个 acl_json_alloc() 函数
+
+331) 2012.3.24
+331.1) acl_master: prefork 模式改进，原来是当有连接到达时才会预告 fork
+指定的服务进程数，现在改为启动时直接预告启动指定的服务进程数
+
+330) 2012.3.17
+330.1) feature: acl_master 服务器模板支持 prefork 模式, 只需要将配置文件
+中的 master_prefork 设置成 > 0 的值即启用了 prefork 模式
+330.2) feature: acl_read_wait/acl_write_wait 支持在 UNIX 下采用 poll 方式
+来判断读写超时，这相对于 select 的优点是描述字可以很容易超过 1024 限制
+
+329) 2012.3.14
+329.1) bugfix: 去掉了 acl_ioctl_app_main.c 中的app_client_idle_limit 配置
+选项，使用 acl_ioctl_server.c 中的 ioctl_rw_timeout 配置选项来表明客户端
+连接的读超时和空闲超时时间，避免了当客户端连接连上后的超时时间的不一致问
+
+328) 2012.3.7
+328.1) compile: 在编译动态库时可以指定链接路径，用法如下：
+make shared rpath=xxx; 仅编译动态库
+或 make rpath=xxx; 同时编译动态库及静态库存
+
+327) 2012.2.12
+327.1) performance: acl_json.c, acl_fifo.c, acl_argv.c 通过传入内存池对象
+优化内存分配过程
+
+326) 2012.2.11
+326.1) performance: acl_xml.c, 通过内存池方式优化了内存分配与释放过程
+326.2) performance: acl_htable.c, 不再使哈希表对象自身创建内存池对象，改为
+由参数接口传入内存池对象
+
+325) 2012.2.6
+325.1) performance: aio/, 优化了非阻塞的读/写过程
+
+324) 2012.1.10
+324.1) feature: acl_aio_app_main.c 增加了进程切换身份之前调用的回调函数
+
+323) 2012.1.8
+323.1) feature: acl_ioctl_app_main.c 增加了进程切换身份之前调用的回调函数
+
+322) 2011.11.28
+322.1) acl_pthread_mutex.c: 其中分配内存的操作用 acl_mymalloc 替换了原来的
+acl_dbuf_pool_alloc 函数，这样可以避免内存在短时间内的堆积问题
+
+321) 2011.11.26
+321.1) acl_fhandle.c: 完善了内部一些调用，使之可以在打开文件句柄对象时自动加锁, 
+这对于 gid_server 非常有用
+321.2) acl_htable.c: 增加了标志位 ACL_HTABLE_FLAG_KEY_LOWER 作为创建哈希表的
+标志之一，如果设置了此标记，则内部自动将键值转为小写，这样便可以实现对键值进行
+增、删、查时不区分键值大小写的功能
+
+320) 2011.11.19
+320.1) bugfix: acl_json.c, json 结果集的结点遍历问题修复
+320.2) feature: acl_json_util.c, acl_json_getElementsByTags 查询标签支持模糊方式 
+320.3) feature: acl_xml_util.c, acl_xml_getElementsByTags 查询标签支持模糊方式 
+
+319) 2011.10.23
+319.1) json/: 增加了针对 json 数据格式的流式解析库，以此纪念C语言发明者丹尼斯，
+C 语言是如此强大，可以让我们随心所欲地做任何事情。
+
+318) 2011.10.8
+318) acl_msg.c: 将未打开日志却调用日志记录的函数时，原来的默认操作是直接输出至
+标准输出上，现在增加了开关设置，且默认操作针对此种情况不做任何操作
+
+317) 2011.10.1
+317.1) stdlib/ 目录下的 acl_vstring.h, acl_vbuf.h, acl_vbuf_print.h
+头文件定义中的宏定义与 Postfix 的冲突
+
+316) 2011.9.12
+316.1) acl_pthread_t 重新定义为 unsigned long 类型
+316.2) acl_mem_slice.c: 针对主线程，增加了内存池释放的机制
+
+315) 2011.9.5
+315.1) feature: acl_htmlcode.c 支持 &#xxx; 方式的解码
+
+314) 2011.7.19
+314.1) feature: acl_xml.c 增加了 acl_xml_add_tag 允许用户添加自定义的非闭合标签
+
+313) 2011.7.18
+313) 增加了 WIN32 平台下的版本资源文件
+
+312) 2011.6.29
+312.1) acl_aio_read.c: 对于 acl_aio_gets, acl_aio_gets_nonl, acl_aio_read,
+acl_aio_readn 这四个函数，当对于流的读操作是持续读时，如果在用户的回调中取消了
+读监听状态，且当流的用户缓冲区中有数据，当用户再次调用这些读操作时，仅能对这些
+流的用户中的缓冲区数据触发回调，无法继续触发流的系统缓冲区中的数据的回调过程，
+所以在这些读操作的开始处针对持续读状态，首先设置流的读监听状态。
+
+311) 2011.6.17
+311.1) bugfix: acl_aio_server.c, acl_ioctl_server.c, acl_single_server.c,
+acl_multi_server.c, acl_trigger_server.c, 其中的与时间相关的变量都是 int 类型，
+为了调用 acl_event_request_timer 等方法时，需要乘 1000000 转成 64 int 整型,
+必须在这些变量前加 acl_int64 以提醒编译器在将变量与 1000000 相乘时需要按 64 位
+整型对待
+
+310) 2011.6.13
+310.1) bugfix: acl_doze.c, 休眠的时间单位里面实现的并不是毫秒级
+
+309) 2011.6.10
+309.1) acl_getopt.c: 因为其中使用了 fprintf，则可能会导致使用 VC2010 编译的工程
+在采用 /MD 方式编译时需要添加如下代码才能通过，现在把其中的 fprintf 改成 printf
+后用 VC2010 的工程则就不用添加如下代码了
+#if !defined(VC2003) && !defined(VC6)
+extern "C" { FILE _iob[3] = {__iob_func()[0], __iob_func()[1], __iob_func()[2]}; }
+#endif
+
+308) 2011.6.8
+308.1) bugfix: acl_vstream.c, acl_vstream_readn_peek 有问题，已经修复，否则将会
+影响 acl_aio_read.c 中的 acl_aio_readn 函数
+
+307) 2011.5.31
+307.1) feature: events/, aio/ 支持定时器任务可以被循环使用，用户只需要调用
+acl_event_keep_timer 即可保证在 acl_event_request_timer 中设置的定时器可以被循环
+使用，默认情况下定时器是只能使用次的
+
+306) 2011.5.24
+306.1) bugfix: acl_xml_util.c, acl_xml_getElementsByTags() 中调用
+acl_xml_getElementsByTagName() 创建的动态数组没有被释放
+306.2) bugfix: acl_xml.c, xml_iter_next/xml_iter_prev 遍历函数中在 do-while 循环中
+判断结束的条件是 parent == NULL，该判断条件仅对由 acl_xml_alloc() 创建的 XML 对象
+有效，对于 acl_xml_foreach_init() 使用的 XML 对象无效，所以现在修改一下，在循环开始
+判断 parent == xml->root，以此判断是否该退出循环
+
+305) 2011.5.19
+305.1) bugfix: 2011.5.18 对 acl_vstream.c 的修改虽然会使 iocp 引擎工作正常，但
+却会使 win32 消息引擎出现问题，所以恢复 acl_vstream.c 之前的状态，同时为了避免
+iocp 引擎的问题，在 iocp 引擎内部的 stream_on_close 函数中提前对套接口关闭
+
+304) 2011.5.18
+304.1) bugfix: acl_vstream.c，修改了 acl_vstream_close() 中关闭套接口连接的
+顺序，因为在使用 iocp 作为事件引擎时，当流关闭时会调用 events_iocp.c 中的
+stream_on_close，该函数会释放掉 fdp->event_read t  fdp->event_write 两个对象，
+但当套接口未关闭时，这两个对象有可能会被 iocp 使用时，只有当套接口关闭时，
+iocp 才不会使用这两个对象中的 IOCP_EVENT->overlapped 等成员
+304.2) feature: acl_aio_connect.c，当事件引擎为 win32 消息时支持连接超时功能键
+
+303) 2011.5.17
+303.1) bugfix: 将定时器的精度改成微秒级后，在 events/ 下的事件引擎会因为
+向下取整问题而导致循环过快
+
+302) 2011.5.16
+302.1) feature: 将所有与定时器相关的功能函数中的时间精度由秒级改为微秒级
+
+301) 2011.5.13
+301.1) compile: 将 StdAfx.h 从 include/ 目录移到 lib_acl/ 目录
+
+300) 2011.5.10
+300.1) feature: acl_pthread.c, acl_pthread_tls_get() 可以保证在主线程退出时
+释放主线程的局部变量，从而 valgrind 检查不会出错
+300.2) feature: acl_init.c, 增加了 acl_main_thread_self() 可以用来在子线程中
+获得主线程的线程号
+300.3) bugfix: acl_pthread_mutex.c 中 acl_thread_mutex_init_once() 在创建
+__header_key 和 __pool_key 时有错，再将此二参数地址传入 acl_pthread_key_create()
+后再将 acl_pthread_key_create() 返回值给此二参数赋值
+
+299) 2011.5.9
+299.1) bugfix: acl_ioctl_server.c, 需要给接收到的客户端流赋远程地址及本地地址
+
+298) 2011.5.8
+298.1) feature: acl_xml.c, 增加了 acl_xml_foreach_init, 该函数可以将某个结点
+做为一个新的 xml 树的根结点进行遍历
+
+297) 2011.5.7
+297.1) feature: acl_xml.c, 增加了 acl_xml_getElementsByTags, 该函数可以取出
+符合多级标签名的 xml 结点集合
+
+296) 2011.5.6
+296.1) bugfix: events_wmsg.c, 在销毁事件引擎对象时需要关闭套接字所依赖的窗口,
+应该调用 DestroyWindow(), 而不是 CloseWindow()
+
+295) 2011.4.28
+295.1) bugfix: 除 UNIX/LINUX 下的 select 和 iocp 系统调用外，其它的调用如：
+select(win32), epoll, kqueue, devpoll, WSAAsyncSelect, 它们都可能存在一个
+问题：即使 socket 的系统缓冲区依然有数据，如果操作系统检测到连接关闭，有可
+能先发送关闭的事件通知，所以 acl 的事件通知机制及异步IO部分做了一致调整，
+即保证读事件优先，或socket的系统缓冲区中有数据时，也是优先将数据读出，最后
+所有数据都读完后才处理关闭事件，并关闭socket.
+影响的文件：
+acl_vstream.c: acl_vstream_xxx_peek
+acl_aio_read.c: __xxx_notify_callback
+
+294) 2011.4.22
+294.1) bugfix: acl_aio_read.c, acl_aio_readn() 应该调用 __readn_peek 而
+不是 __read_peek，并且在 __read_peek 中当 acl_vstream_read_peek 返回 0
+时不应该 fatal
+ 
+293) 2011.4.20--21
+293.1) feature: acl_xml_code.c, acl_html_code.c, 增加了对 XML 和 HTML
+中特殊字符的转码与解码功能
+
+392) 2011.4.19
+392.1) bugfix: acl_xml.c, acl_xml_reset() 函数中应该把 xml->curr_node
+结点置 NULL，否则会导致内存错误
+392.2) feature: acl_xml_parse.c, 可以兼容单个结点中用 ">" 表示结束而非
+"/>" 结束的情况
+392.3) feature: acl_xml_util.c, 增加了 acl_xml_dump2 用来将 xml 对象转
+储于指定缓冲区中
+
+391) 2011.4.18
+391.1) feature: acl_vbuf_print.c, 支持 %zu, %zd 功能
+
+390) 2011.4.17
+390.1) acl_mem_slice.c: 将线程局部变量由 acl_pthread_tls_get/set
+改为 acl_pthread_get{set}specific，以免应用采用 acl_pthread_tls_xxx
+且同时使用线程局部内存池时产生冲突
+
+389) 2011.4.12
+389.1) performance: acl_xml.c, 增加了 acl_xml_reset, acl_xml_cache
+两个函数，从而可以使 xml 解析器被重复使用，并且大大提高了解析性能
+
+388) 2011.4.11
+388.1) Makefile: 当每个源程序所依赖的头文件发生改变时，该 Makefile
+会自动进行编译该源文件
+388.2) Makefile: 默认将 mysql 库编译进库中
+
+387) 2011.4.8
+387) 修复了几个在高版本GCC上的编译错误
+
+386) 2011.3.28
+386.1) acl_aio_read.c: 优化了异步读的代码
+386.2) acl_aio_stream.c: 增加了是否是连续读的功能函数
+
+385) 2011.3.25
+385.1) 在 win32 平台下用 VC 编译 release 版本时 assert 会被优化掉，
+所以统一将 assert 修改成 acl_assert
+385.2) 提供了 acl_aio_create2 接口，允许当采用 ACL_EVENT_WMSG 消息
+异步 IO 时可以指定要绑定的消息值
+385.3) acl_aio_read.c: 当采用 ACL_EVENT_WMSG 时，可能会因为缓冲区有
+数据，而嵌套层数达到限制时，会导致数据无法返回给应用，增加了循环探测
+的功能，将缓冲区中的数据都返回给应用
+
+384) 2011.3.19
+384.1) acl_aio_listen.c: 在 acl_aio_listen/acl_aio_accept 中需要设置
+astream->flag |= ACL_AIO_FLAG_ISRD，否则 acl_aio_disable_read 对监听
+流不起作用
+
+383) 2011.3.18
+383.1) feature: events_wmsg.c 通过 SetWindowLongPtr/GetWindowLongPtr
+两个 API 与给窗口句柄赋私有值及获得私有值，替代了原来的线程局部变量
+的存取方式
+
+382) 2011.3.16
+382.1) bugfix: events_select_thr.c 中的流 IO 超时不起作用
+
+381) 2011.3.13
+381.1) bugfix: event 针对 WIN32 界面的定时器存在可能耗费CPU的逻辑
+381.2) aio: 对 WIN32 界面的定时器可以采用 event 中的定时器
+
+380) 2011.3.12
+381) feature: event/aio 两模块增加了WIN32界面的消息的支持，至此，ACL库
+的异步事件引擎及异步IO框架支持: select, pool, epoll, kqueue, devpoll,
+iocp, WIN32 GUI 消息。
+382) feature: event/aio 两模块增加了WIN32界面的定时器支持
+
+379) 2011.3.8
+379.1) bugfix: events_kernel.c, events_iocp.c: 在调用 event_disable_xxx
+时，需要处理未决状态，如在调用 event_disable_read 时，不仅需要判断 flag
+标志位是否设置了 EVENT_FDTABLE_FLAG_WRITE, 还需要判断 flag 是否设置了标志
+EVENT_FDTABLE_FLAG_ADD_WRITE, 以防止当流处于读/写状态时被提前拆除
+380.1) private_vstream.c: 函数名定义与POSTFIX中的冲突，都加了前缀
+
+378) 2011.3.1
+378.1) acl_aio_write.c: acl_aio_vfprintf(), 内部调用 acl_vstring_memcpy(),
+该函数会导致 valgrind 报错说是内存重叠，所以修改为 acl_vstring_memmove()
+
+377) 2011.2.26-27
+377.1) acl_aio: 增强了容错性及键壮性
+
+376) 2011.2.23
+376.1) feature: acl_ioctl_app_main.c, 增加了当新连接到达时可以预先调用用户
+回调函数的功能
+
+375) 2011.2.17
+375.1) feature: acl_mylog.c, 对网络流 (TCP, UNIX) 日志发送器，如果网络出现
+故障，允许重新打开网络流日志
+
+374) 2011.2.16
+374.1) bugfix: acl_mylog.c, 当多线程记日志时，因为网络流模式下没有加锁可能
+会造成冲突问题
+
+373) 2011.2.15
+373.1) bugfix: acl_mylog.c, 有可能会造成函数循环嵌套调用的情况.
+373.2) acl_aio_server.c: 增加了控制参数 aio_quick_abort, 如果该值在
+配置文件中非 0，则当 acl_master 退出时该 aio 程序立刻退出，默认情况下
+该值非 0
+373.3) acl_ioctl_server.c: 将 ioctl_quick_abort 的默认配置值设为 1
+
+372) 2011.2.14
+372.1) bugfix: acl_mylog.c, 需要将日志中的前缀与后面字符串用空格分开才能
+支持 syslog-ng 的 $PROGRAM 宏
+
+371) 2011.2.9
+371.1) feature: acl_mylog.c, 支持与 syslog-ng 配合记录日志格式
+
+370) 2011.1.27
+370.1) bugfix: acl_vstring.c, acl_buffer_gets/acl_buffer_gets_nonl 当
+最后的数据没有包含 \n 时没有将填充的数据补 \0
+
+369) 2011.1.26
+369.1) acl_mylog.c: 可以允许用户设置是否在日志中记录线程ID号，默认情况下
+不记录
+
+368) 2011.1.25
+368.1) acl_mylog.c: 去掉了日志中 pri(表示权重) 的记录项
+
+367) 2011.1.24
+367.1) feature: 增加了 acl_trace.c 用于打印程序运行堆栈信息至目标文件中
+367.2) feature: acl_master 可以允许子进程被切换为普通用户后产生 core 文件,
+相应地，五个acl_master的服务器模板增加了 bool 类型的配置选项如下：
+ioctl_enable_core/aio_enable_core/trigger_enable_core/single_enable_core
+/multi_enable_core
+367.3) bugfix: acl_dbpool_mysql.c, 当连接失败时有内存泄露问题
+
+366) 2011.1.21
+366.1) acl_init.c: 增加了 acl_version/1 用于说明当前ACL的版本号
+366.2) bugfix: acl_dbpool_mysql.c, 新添加的功能函数db_before_connect处理
+有问题
+
+365) 2011.1.18
+365.1) samples: master_notify, 该模块用于接收来自于 acl_master 发出的其它
+服务进程异常退出的消息，并将该消息发送至相关责任人
+365.1) master: 增加了子进程异常退出时的消息参数
+
+364) 2011.1.10
+364.1) feature: acl_dbpool.h, 增加了真正连接数据库之前的回调函数调用，方便
+用户的一些特殊设置需求
+
+363) 2010.12.31
+363.1) bugfix: acl_dbpool_mysql.c, 在调用 __dbpool_mysql_destroy 时需要调用
+mysql_library_end(), 否则会引起内存泄露
+363.2) sample: 增加了 dbpool 用户测试数据库连接池功能
+363.3) feature: db/mysql: 增加了因MYSQL连接中断而查询失败时的重试功能
+
+362) 2010.12.28
+362.1) bugfix: 修复了 src/unit_test 下内存泄露的问题
+
+361) 2010.12.13
+361.1) acl_xml_parse.c: acl_xml_parse 更名为 acl_xml_update 从而更能体现流式解析
+的特点
+361.2) acl_base64.c: 输入参数类型略加改变
+
+360) 2010.12.7
+360.1) feature: acl_vstring.c, 增加了 acl_vstring_memmove()/3 函数
+
+359) 2010.11.29
+359.1) feature: 增加了 acl_utf8_to_big5/acl_big5_to_utf8,
+acl_utf8_to_unicode/acl_unicode_to_utf8,
+acl_gb2312_to_big5/acl_big5_to_gb2312,
+acl_hz_to_gb2312/acl_gb2312_to_hz 字符集转换编码
+
+358) 2010.11.16
+358.1) bugfix: acl_array.c, acl_stack.c 在使用 acl_foreach() 宏
+时的内部函数有问题, 当数组为空时依然将第一个元素返回
+
+357) 2010.11.15
+357.1) feature: ACL_ARGV(acl_argv.c/acl_argv.h),
+ACL_ARRAY(acl_array.c/acl_array.h),
+ACL_FIFO(acl_fifo.c/acl_fifo.h),
+ACL_STACK(acl_stack.c/acl_stack.h) 增加了 push_back/push_front,
+pop_back/pop_front 函数接口
+357.2) aio: 重新构建
+
+356) 2010.11.2
+356.1) compile: 在WIN32下编译时配置了每个工程的.pdb文件指定
+
+355) 2010.10.28
+355.1) bugfix: acl_base64.c, acl_vstring_base64.c, 其中用到的解码表
+为 128 字节的, 但如果数据中的 char 值超过 128 则可能会出现越界问题
+(这种情况在一些base64的非法编码数据中可能会出现), 所以现在将其修改成
+255 字节的解码表
+355.2) compile: StdAfx.h 将 #include <limit.h> 做为通用的系统头
+
+354) 2010.9.19
+354.1) bugfix: acl_vstream.c, acl_vstream_gets_nonl() 没有设置
+ACL_VSTREAM_FLAG_TAGYES / ACL_VSTREAM_FLAG_TAGNO 标志位
+
+353) 2010.9.16
+353.1) bugfix: acl_debug.c 中增加了 acl_debug_end() 函数用于程序结束时
+释放内部分配的内存
+353.2) acl_mystring.h: 增加了针对 strcasecmp 等函数的补充宏定义
+
+352) 2010.8.4
+352.1) compile: 修复了在 AS3, AS4 上的编译错误
+
+351) 2010.7.21
+351.1) bugfix: acl_token_tree.c, acl_token_tree_create() 第 485 行
+创建的 argv 内存没有被释放
+
+350) 2010.7.11
+350.1) xml: acl_xml_parse.c xml_parse_left_tag() 修改, 以更好地支持
+<br/> 和 <br /> 方式
+
+349) 2010.6.9
+349.1) 支持 gcc 的预编译方式, 使编译速度大约能提升一倍
+
+348) 2010.6.8
+348.1) 支持 vc2003 的预编译方式，使编译速度大大提高
+
+347) 2010.6.27-7.6
+347.1) feature: 增加了 xml 目录, 用于解析 xml 及 html 文件, 该解析库采
+用"状态机"解析方式, 对输入流进行完整或部分解析, 从而更方便支持阻塞式或
+非阻塞式通讯; 同时该库还提供类似于 javascript 的简单查询函数.
+注: 目前该库还存在的已知问题如下:
+a) 对 doctype 类型支持不完善
+b) 对 xml 开始时的内容解析需要增加更多功能
+
+347.2) bugfix: acl_vstream.c 340 行调用 snprintf 时发现 ebuf 缓冲区未
+被初始化, 幸亏 valgrind 检查出此错误
+
+347.3) acl_ring.c: acl_ring_detach 中, 原来会将某个结点的 ring->succ 及
+ring->pred 均赋 NULL, 现在修改为与调用 acl_ring_init 之后一样的行为, 会
+将 ring->succ, ring->pred, ring->parent 赋为自己, 同时将 ring->len 赋 0
+
+346) 2010.6.13
+346.1) feature: code/acl_gbcode.c, 增加了 acl_gb2312_to_utf8()/4 及
+acl_utf8_to_gb2312()/4 函数, 用于字符集的转换
+
+345) 2010.6.8
+345.1) feature: acl_vstream.c, acl_vstream_unread 会根据输入数据长度自动
+重新分配空间以保证所给数据能够完全被放回流中; acl_vstream_ungetc 通过内部
+调用 acl_vstream_unread 来保证数据肯定能被回写
+
+344) 2010.5.6
+344.1) feature: acl_vstream.c, 增加了 acl_vstream_unread 从而可以方便地
+将已经读到的数据再重新放回流中
+
+343) 2010.4.17
+343.1) bugfix: events_poll.c/events_select_thr.c/events_poll_thr.c 存在着
+类似于 342.1 所示问题，统一进行了修复
+
+342) 2010.4.11
+342.1) bugfix: events_select.c, event_loop() 中当 event_prepare() 返回 0
+且 eventp->fdcnt_ready > 0 时会因为 goto TAG_DONE 语句直接跳至 后面的 for
+循环中，但会因 xmask/rmask/wmask 三个变量未被初始化而造成无法预知的问题，
+所以在 goto TAG_DONE 语句前增加了四个语句来分别初始 nready/xmask/rmask/wmask,
+这种未初始化的问题编译器很难捕获，可能是因为有 goto 语句的缘故，看来 goto
+语句确实应该少用为宜:)
+
+341) 2010.3.31
+341.1) bugfix: events_epoll.h/events_kernel.c, 在 Linux 下，epoll
+的 EPOLL_CTL_DEL 使用有误
+
+340) 2010.3.24
+340.1) feature: acl_htable.c, 增加 ACL_HTABLE_FLAG_MSLOOK 标志位，
+当用户名在通过 acl_htable_create 创建哈希表时打开此标志位，则在
+进行查询时自动将查询到的结果的位置放在热词位置
+340.2) 在 acl_init.c 增加了针对WIN32平台下的 ws2_32.lib 及
+wsock32.lib 的直接引用，从而方便应用，不必在自身工程里再引用这两个库
+
+339) 2010.3.6--2010.3.17
+339.1) feature: 在WIN32平台下，event 事件模块支持 iocp 接口方式,
+这样 ACL 的事件驱动模块支持　WIN32(vc2003以上)/LINUX/BSD/SOLARIS
+四个平台下的内核级高级IO方式
+339.2) samples: 增加了 http_aio 例子
+
+338) 2010.3.5
+338.1) bugfix: acl_dbpool_mysql.c->__dbpool_mysql_destroy() 有一处内存
+泄露(增加了acl_array_destroy(mysql_pool->handles, NULL))，此处问题由
+徐刚辉发现
+338.2) acl_dns.c: 当 jaws 服务器调用 mod_http.so 模块，因为是动态加载，
+所以导致 dns_lookup_timeout() 函数地址在 jaws 中和 mod_http.so 是不一致
+的，而在 acl_dns.c 中通过函数 acl_aio_cancel_timer() 取消定时器时，便
+无法取消定时器任务，所以把 dns_lookup_timeout() 对象的地址直接赋给
+ACL_DNS.lookup_timeout 变量，这样就保证了在 mod_http.so 的运行空间内
+调用 acl_aio_request_timer 中的参数之函数地址与在 jaws 的运行空间内调用
+acl_aio_cancel_timer 中的参数之函数地址是一致的
+
+337) 2010.3.2
+337.1) bugfix: events_kernel.c/events_kernel2.c/events_kernel3.c 的函数
+event_loop() 函数里增加了 EVENT_TEST_ERROR 检测代码，当描述字出错时
+epoll/devpoll 会设置这些描述字的出错状态，这段检测代码正好可以处理这种情况
+
+336) 2010.2.23-2.24
+336.1) performance: events_kernel.c 进一步优化了代码和性能: 对于超时的
+处理采用每隔一秒进行全局扫描的方式; 将读/写任务的添加放置在一个队列中，
+而不象以前那样放在一个全局数组里(该方式的问题时当并发慢连接比较多时，每
+个事件循环都要全局扫描整个数组，查看哪些任务需要处理)
+336.2) 依然保留原来的 events_kernel.c，只是重命名为 events_kernel2.c,
+events_kernel3.c，以备后用(谁知道哪天会重用这些代码呢？)
+
+335) 2010.2.11
+335.1) acl_aio_read.c: acl_aio_enable_read() 如果判断还有数据则直接回调
+用户的回调函数
+
+334) 2010.2.9
+334.1) bugfix: acl_dns.c, acl_add_dns_host() 内部在添加静态域名IP列表时
+有错误
+
+333) 2010.2.8
+333.1) feature: acl_dns.c 增加了域名组功能
+
+332) 2010.2.5
+332.1) events_select.c, events_poll.c: 采用与 events_kernel.c 中的方式
+重写
+
+331) 2010.2.4
+331.1) bugfix: events_kernel.c 修改了一些BUGS, 增加流关闭时的删除监控
+回调函数
+331.2) feature: acl_vstream.c 增加了 acl_vstream_call_close_handles()/1
+可以提前调用关闭回调函数，主要配合 events_kernels.c
+
+330) 2010.1.25 -- 2010.2.3
+330.1) event/: 增加了支持 epoll/kqueue/devpoll 更为高效的事件引擎，将
+原来的 event_kernel.c 更名为 event_kernel2.c, 新的事件引擎名称为
+event_kernel.c
+330.2) bugfix: acl_access.c/acl_access_permit() 传入的地址可以为
+IP:PORT/IP 格式
+330.3) acl_vstream.c: acl_vstream_close() 在 event_kernel.c 的配合下
+支持延迟关闭功能
+330.4) aio/: acl_aio.c, aio_callback.c 完善了一些处理条件，支持
+ACL_ASTREAM.stream 流的延迟关闭; aio_callback.c 当有一个关闭回调返回
+-1 则停止调用下一个关闭回调
+
+329) 2010.1.24
+329.1) aio/: acl_aio_disable_readwrite, acl_aio_disable_read,
+acl_aio_disable_write 增加了一些判断条件
+
+328) 2010.1.22
+328.1) bugfix: acl_vstream.c, acl_vstream_readn_peek() 内部有问题
+328.2) bugfix: acl_aio.c, acl_aio_open() 在对监听流设置读缓冲大小时
+设置条件是错误的，原来是：if ((stream->type  ACL_VSTREAM_TYPE_LISTEN))，
+应该是 if ((stream->type & ACL_VSTREAM_TYPE_LISTEN))；同时当
+stream->read_buf 非空时，stream->read_buf_len 是不能被修改的
+
+327) 2010.1.19
+327.1) acl_pthread.h: ACL_PTHREAD_ONCE_INIT 在 solaris 下需要定义为
+{ PTHREAD_ONCE_INIT }, 只有这样才可以在 solaris 下如下使用:
+static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
+327.2) 在所有平台上编译通过
+
+326) 2010.1.18
+326.1) acl_dns.c: 增加了缓存功能(使用了 acl_cache2.c 中的函数接口)
+
+325) 2010.1.17
+325.1) acl_cache2.c: 完善了一些功能并修复了一些 bugs
+325.2) samples: cache2/
+
+324) 2010.1.16
+324.1) 将 acl_idns.c 改名为 acl_dns.c, acl_idns.h 改名为 acl_dns.h, 将
+ACL_DNS_EVENT 改名为 ACL_DNS_REQ
+324.2) 增加了 acl_cache2.c 模块, 该函数内部采用哈希表加平衡二叉树的组合
+方式来提供比 acl_cahce.c (采用哈希表加双向链表组合方式) 更加灵活高效的
+缓存控制机制
+
+323) 2010.1.15
+323.1) feature: acl_idns.c, 增加了异步DNS查询功能及相关功能函数; 该函数库
+支持DNS查询的动态平衡功能及DNS地址有效性校验机制
+323.2) bugfix: rfc1035.c(从squid借鉴的源码) 内部存在一个可能发生内存泄露
+的问题
+323.3) samples: idns/ 该例子使用DNS异步查询来获得DNS结果
+
+322) 2010.1.14
+322.1) acl_aio_connect.c: 调整了部分逻辑执行顺序
+322.2) master/template/: 所有模板使用的 argv 参数都修改为小写
+
+321) 2010.1.13
+321.1) bugfix: aio_callback.c, 在调用关闭回调函数集时，只要有一个回调函
+数返回 -1 都应该停止继续调用剩余的关闭回调函数
+
+320) 2010.1.7
+320.1) bugfix: acl_pthread.c, 当采用线程局部存储方式管理内存池时会出错,
+因为其内部用到了的算法中含有 acl_myxxx 类的内存分配方式
+320.2) feature: private_fifo.c 为配合线程局部管理内存池增加了几个接口
+320.3) acl_vstream_popen.h: 为了在 win32 平台下以动态库加载方式使用这些
+接口，前面增加了导入导出标志 ACL_API
+320.4) win32 编译工程整理
+320.5) acl_aio_listen.c: 当监听返回错误时，原来的做法直接 fatal, 现在是
+先睡眠 1 秒然后继续监听
+
+319) 2010.1.6
+319.1) acl_aio_listen.c: 增加了出错提示功能
+
+318) 2010.1.5
+318.1) feature: acl_mem_slice.c 增加了 acl_mem_slice_delay_destroy 接口,
+当一个线程退出时发现自己分配的内存片被其它线程占用时，该将退出线程不可
+硬性释放被占用内存而只能释放非占用内存片，同时将剩余被占用内存片置入一
+个进程内全局的待释放区内，由主线程或其它线程调用 acl_mem_slice_delay_destroy
+来清理
+
+317) 2010.1.4
+317.1) bugfix:
+acl_aio_read.c/acl_aio_write.c/acl_aio_connect.c/aio_callback.c, 其中在
+遍历回调函数的句柄时有可能会因为递归嵌套而造成回调函数被重复调用，现在
+采用每次需要回调时重新建立回调队列方式来避免此类问题发生
+
+316) 2010.1.2
+316.1) acl_aio.c: 增加了函数接口注释; 修改了部分接口名称，使之更易读懂
+316.2) acl_aio.c: 增加了 acl_aio_enable_write 接口
+
+315) 2010.1.1
+315.1) acl_aio.c: 修订了上次修改时在 acl_aio_read.c 中增加的一处BUG
+315.2) acl_aio.c: 完善了 acl_aio_enable_read 函数
+
+314) 2009.12.31
+314.1) acl_aio.c: 完善了一些接口，增加了出错检查
+314.2) acl_array.c: 调用 acl_array_clean/acl_array_destroy 内部代码略有改动
+
+313) 2009.12.25
+313.1) bugfix: acl_vstream.c 针对非阻塞式读应该区分出该出错情形
+
+312) 2009.12.23
+312.1) feature: acl_mem_slice.c 增加了自动进行内存垃圾回收机制，当分配计
+数器达到规定的值时自动进行垃圾回收(注：此垃圾回收主要是用来回收其它线程
+释放本线程分配的内存资源)
+312.2) compile: BSD 平台编译通过
+
+311) 2009.12.19-12.20
+311.1) performance&feature: 增加了针对线程局部变量的内存分配与释放函数库
+接口，这样在多线程进行内存分配时的冲突被降低至最低，从而大大提高了多线程
+程序的内存管理性能
+311.2) acl_aio_server.c/acl_aio_app_main.c: 为了提高效率，接口略作调整
+
+310) 2009.12.18
+310.1) feature: acl_slice.c 增加了 acl_slice_pool_xxx 系列功能
+
+309) 2009.12.17
+309.1) feature&performance: 增加了 acl_mem_slice.c, 从而可以高效地利用内存
+切片技术分配和释放内存
+
+308) 2009.12.16
+308.1) performance: acl_vstream.c 中的 __bfread_cnt_ready 及 __bfread_ready
+的数据拷贝由原来的字节拷贝改为块拷贝，效率大大提高，受此影响 acl_aio_read()
+和 acl_aio_readn() 的性能也大大提高
+
+307) 2009.12.12
+307.1) bugfix: acl_sys_file.c 中的 acl_file_fsize()/1 函数在 win32 平台下,
+因为需要兼容64位文件系统，所以其中的 nHigh << 32 操作会因 nHigh 为 DWORD
+而可能产生32位整数溢出问题
+
+306) 2009.12.10-12.11
+306.1) feature: acl_pthread.c 增加了 acl_pthread_tls_get/acl_pthread_tls_set,
+可以更方便地操作线程局部变量, acl_pthread_tls_set_max/acl_pthread_tls_get_max,
+可以设置/获得 acl_pthread_tls_get/acl_pthread_tls_set 所用的线程局部变量的键
+值最大个数，因为系统的线程局部变量所对应的键有上限限制，所以可以使用这些函数
+突破这些限制
+306.2) acl 库内部基本上去掉了以 __thread 方式使用线程局部变量的方式，因为此
+使用方式在当应用动态加载 acl 动态库时会发生不确定行为（如果应用是静态链接 acl
+库或静态加载 acl 动态库则不会产生此问题）; 目前还有几个源文件里还有 __thread
+的使用情况: zdb_dat_iter.c, zdb_key.c, acl_aio_app_main.c, acl_aio_server.c,
+acl_ioctl_app_main.c, rfc1035.c, acl_meter_time.c, gettimeofday.c, 应用在使用
+这些源文件里的函数时一定注意不要以动态加载 acl 动态库方式使用之
+
+305) 2009.12.9
+305.1) feature: acl_pthread.c, 增加了 acl_pthread_tls_get, acl_pthread_tls_set
+接口，同时增加了 win32 平台下的 acl_pthread_key_create, acl_pthread_getspecific,
+acl_pthread_setspecific 接口，其调用方式与 UNIX 下的 pthread_key_create,
+pthread_getspecific, pthread_setspecific 相同, 为了保证跨平台，建议使用
+acl_xxx 方式使用这些函数接口
+
+304) 2009.12.7-12.8
+304.1) feature: acl_dll.c, 用于动态库的加载
+304.2) bugifx: acl_netdb.c, acl_res.c res_util.c 内部用到了 inet_ntoa,
+而该函数是线程非安全的, 统一换成 acl_inet_ntoa
+
+303) 2009.12.6
+303.1) acl_fifo.c: 有些代码实现的有点罗嗦
+
+302) 2009.12.3
+302.1) bugfix: acl_vstring_sprintf(), 其中的 fmt 64位格式字符(如: llu)
+用VC6编译时不能正确识别, 所以在平台上做了区分: UNIX平台用 llu/lld,而在
+WIN32平台则用 I64u/I64d. 但用户在使用 acl_vstring_sprintf() 时则只需要
+使用统一的 llu/lld 即可
+302.2) feature: acl_getenv_list() 函数可以获得本进程的环境变量(以字符串
+表示, 如: name1=value1, name2=value2, name3=value3)
+
+301) 2009.11.30--12.2
+301.1) feature: acl_vstream_popen.c 可以同时支持UNIX、WIN32平台了
+301.2) feature: acl_env.c 可以同时支持UNIX、WIN32平台
+
+300) 2009.11.27
+300.1) feature: acl_sane_inet.c, 增加了 acl_ipv4_addr_valid()/1,
+acl_ipv4_valid()/1 函数, 用比判断所给地址是否有效
+300.2) acl_aio_connect.c: 增加了对输入地址的有效性进行判断功能
+
+299) 2009.11.25
+299.1) bugfix: acl_aio.c, acl_aio_iocp_close()/1 当 astream->stream = NULL 时,
+应该设置 ACL_AIO_FLAG_IOCP_CLOSE 标志位, 否则会造成内存泄露
+
+298) 2009.11.24
+298.1) acl_sane_socket.c: 调用 acl_getsockname/acl_getpeername 取得地址时将端口
+号也加进去了
+
+297) 2009.11.23
+297) ACL_ITER: 符合通用遍历的容器的接口返回类型的 const 限定属性取消，从而方便
+应用操作返回的对象
+297.2) acl_fifo.c: 允许 acl_fifo_push()/2 返回新创建的队列元素对象, 方便调用者
+缓存并操作该对象
+
+296) 2009.11.22
+296.1) bugfix: strcasestr.c, acl_strcasestr()/2 函数有处 bug
+296.2) feature: acl_inet_listen.c, acl_inet_accept_ex 中存储客户端地址的内存区
+ipbuf 原来仅存储 IP 地址，现在可以同时存储端口号了，所以正常情况下 ipbuf 里面
+存储的是: ip:port, 如: 192.168.0.1:80
+
+295) 2009.11.20
+295.1) 增加了 acl_dll.h 头文件，用于在 dll 之间传递环境变量
+295.2) acl_debug_malloc.c: 调整了一下接口调用
+295.3) bugfix: acl_aio_read.c, acl_aio_write.c,
+READ_IOCP_CLOSE/WRITE_IOCP_CLOSE 这两个宏应该增加标志位 ACL_AIO_FLAG_IOCP_CLOSE
+
+294) 2009.11.19
+294.1) bugfix: acl_inet_listen.c 当监听失败时会有一处内存泄露问题
+294.2) bugfix: events_select_thr.c, event_enable_listen() 函数内部被重复使用
+时，因为没有重复利用 ACL_VSTREAM.fdp, 所以每当对 event_enable_listen() 调用
+一次就会调用一次 event_fdtable_alloc(), 从而造成了内存泄露. 该 bug 会影响到
+acl_ioctl.c, acl_ioctl_server.c 的使用造成内存泄露. 老版本的 acl 的 acl_master
+框架下的多线程模板会受到此影响，避免此问题的方法有二：重新用新的 acl 库编译
+服务器程序，或将配置文件中的 ioctl_event_mode 选项改为 poll/kernel 方式，因为
+其只会影响 select 多线程方式.
+
+293) 2009.11.16-18
+293.1) acl_msgio: 重新设计并修改了一些代码
+293.2) bugfix: master/template/ 目录下，acl_aio_server.c, aio_msg.c 存在一些
+消息传递的 bug
+
+292) 2009.11.15
+292.1) ACL_VSTREAM 中增加了 pid_t pid 成员
+
+291) 2009.11.13
+291.1) compile: 在 Debian Linux 平台下编译通过
+
+290) 2009.11.12
+290.1) samples: win32 -- code_map, 主要用于产生字符集的映射表
+290.2) samples: win32 -- connect, 异步连接举例
+290.3) acl_aio: 添加了一些使用接口，同时将 ACL_ITER 迭代器引入，使代码
+更为清晰
+
+289) 2009.11.10
+289.1) feature: acl_file 增加了 acl_fprintf, acl_vfprintf
+289.2) feature: code/ 增加了GBK字符集内部的简繁体转换函数: acl_gbcode
+289.3) samples: jt2ft 用于测试简繁体转换
+
+288) 2009.10.26
+288.1) feature: acl_vstring 增加了 acl_buffer_gets_nonl()/3,
+acl_buffer_gets()/3; stdlib/common/ 下增加了 acl_token_tree 模块
+288.2) compile: 在 LINUX/FREEBSD/SOLARIS/WIN32 平台编译通过
+
+287) 2009.10.20
+287.1) bugfix: acl_bits_map.h 中当 nmax 为 (unsigned int) -1 时，得到的
+(mask)->data_len = 0, 因为在计算长度时产生了整数溢出错误; acl_bits_map.h
+的注释不太明确
+287.2) compile: 在 FreeBSD, Solaris, Windows 上编译通过，消除了一些移植性问题
+
+286) 2009.10.18
+286.1) bugfix: ACL_CFG_INT64_TABLE.*target 应该为 acl_int64 类型而不是 int 类型
+286.2) compile: 在用VC编译动态库时，lib_acl 库需要依赖 IPHlpApi.Lib
+
+285) 2009.9.30
+285.1) feature: acl_xinetd_params.c/acl_xinetd_params.h, acl_master 服务器框架
+增加了针对 acl_int64 配置类型的支持
+285.2) bugfix: zdb/zdb_private.h, 其中 KEY_INODE, KEY_OFF 两个宏计算有误
+
+284) 2009.9.29
+284.1) bugfix: acl_fhandle.c, 其中在使用线程锁时存在问题，应该是
+acl_thread_mutex_lock/acl_thread_mutex_unlock,
+acl_pthread_mutex_lock/acl_pthread_mutex_unlock 配对使用，在一些地方存在混用问题
+284.2) zdb: zdb.h 存储结构规定为4字节对齐
+284.3) acl_cache.c: 增了容错处理，创建时可以允许缓存个数及数据时间为0
+
+283) 2009.9.27
+283.1) bugfix: acl_non_blocking() 内部在BSD平台下可能会有问题
+
+282) 2009.9.25
+282.1) zdb: 为了保证 zdb 数据结构在32位及64位机上可移植性, 增加了冗余变量以使各
+个存储结构按8字节对齐，将来应该采用其它方式保证这点
+282.2) acl_slice: 优化了 SLICE2 方式的释放速度
+
+281) 2009.9.24
+281.1) bugfix: acl_slice.c 中的 ACL_SLICE_FLAG_GC2 算法存在严重 BUG, 导致内存指针越界
+
+280) 2009.9.23
+280.1) feature: zdb_key.c, 增加了 zdb_key_init()/3 接口，可以使应用预先初始化键存储
+280.2) 将 win32 平台下的 BDB, OPENSSL 打包进去
+
+279) 2009.9.21
+279.1) feature: db/zdb, 该模块是一个非常高效的数字键存储系统
+279.2) bugfix: stdlib/sys/acl_sys_file.c, acl_file_fsize()/1 在win32平台下有一处错误
+
+278) 2009.9.20
+278.1) feature: net/acl_ifconf.c, 可以获得UNIX/WIN32下网卡信息
+
+277) 2009.9.15
+277.1) bugfix: acl_cache.c, acl_cache_free()/1 在释放缓存对象时如果引用计数
+大于 0 则无法释放而造成死循环，采取的方法是强制将缓存对象的引用计数置 0
+277.2) feature: acl_vbuf_print.c, 支持 "%lld" 格式，从而 acl_vstring.c 也支持
+"%lld" 格式
+
+276) 2009.9.11
+276.1) feature: event/acl_timer.c 支持通用的 ACL_ITER 方法
+276.2) feature: ACL_ITER 支持 acl_iter_info()/2 取得与容器相关联的成员对象
+
+275) 2009.9.10
+275.1) feature: ACL_DNS_DB 结构增加了对 ACL_ITER 迭代器的支持
+275.2) acl_fhandle.c: acl_fhandle_init()/3 及 acl_fhandle_end() 增加了
+内容判断，防止被调用两次
+
+274) 2009.9.9
+274.1) comment: 增加了一些注释
+274.2) acl_mask_addr.c: 增加了单元测试, unit_test/net/test_net_misc.c
+
+273) 2009.9.8
+273) feature: db/acl_dbsql.c, db/mysql/acl_dbmysql.c 中增加了
+acl_dbmysql_select()/3, acl_dbmysql_free_result()/1, db/acl_dbpool.h 中
+增加了 ACL_SQL_RES 结构，可以使用通用的 ACL_ITER 对查询结果进行遍历
+
+272) 2009.9.7
+272.1) acl_iterator.h: ACL_ITER 结构中增加了一个成员变量 dlen, 使用者可以
+设置此值表明数据大小
+
+271) 2009.9.5
+271.1) acl_iterator.h: 去掉了 ACL_ITER 中的 iter_init()/2, 而在各个容器本身
+中增加 iter_head()/2, iter_next()/2, iter_tail()/2, iter_prev()/2 四个成员，
+这样更加直观，如果容器没有这些函数则便是不支持通用的遍历操作; 这样，任务函数
+库只要包含 iter_head()/2, iter_next()/2 便可支持向后遍历, 若包含
+iter_tail()/2, iter_prev()/2 则支持向前遍历，这更具有通用性
+
+270) 2009.9.1
+270.1) bugfix: acl_fhandle.c 中 acl_fhandle_open 若失败在记录错误信息时引用
+了一个空地址
+270.2) bugfix: acl_fseek()/3 没有在 acl_file.h 头文件中声明
+
+269) 2009.8.31
+269.1) feature: acl_file.c, 增加了 acl_fseek()/3 接口
+
+268) 2009.8.30
+268.1) feature: stdlib/acl_file.c, 增加了专门针对文件流的读写操作, 提供了与
+ANSI 标准相似的接口
+
+267) 2009.8.29
+267.1) 将 ACL_ASTREAM 的类型定义从内部移出至公开的 acl_aio.h 头文件中, 因为
+有时需要访问里面的一些参数，如果继续隐藏此类型定义，则势必会需要实现一些函数
+来访问这些参数，实在麻烦，所以将该结构的定义公开从而方便了有些参数的访问，但
+如果提供了访问函数，建议还是用函数访问较好，免得将来该结构定义发生变化
+
+266) 2009.8.28
+266.1) feature: acl_iterator.h, 其中定义了更为通用的迭代器处理方式, 这样在
+stdlib/common/ 的数据结构的容器基本都可以以非常简单的方式用此通用迭代器进行
+遍历
+266.2) sample: iterator/, 其中增加了很多使用迭代器进行遍历的例子
+
+265) 2009.8.27
+265.1) feature: acl_fhandle.c, acl_fhandle_open()/6 中的参数 oflags 增加了一个标志位
+ACL_FHANDLE_O_MKDIR 用来确定是否自动检查并创建不存在的目录，如果设置该标志位，则当
+第一次打开文件时且目录存在时会有些不必要的性能降低
+265.2) acl_htable/acl_binhash: 在遍历过程中，旧的 foreach() 存在一个问题：当在循环
+过程中需要 break 则不会退出循环, 原因是旧的 foreach() 是嵌套了两个 for() 循环，现在
+进行了修复，增加了 acl_xxx_iter_head/acl_xxx_iter_next/acl_xxx_iter_tail/acl_xxx_iter_prev
+几个函数，这样 foreach() 就仅嵌套一个 for() 循环，而使用者便可以在遍历过程中 break 循环
+
+264) 2009.8.26
+264.1) bugfix: acl_fhandle.c, acl_fhandle_end() 在关闭所有文件句柄前应该
+回调应用的关闭回调函数
+264.2) acl_cache.c: 允许在调用 acl_cache_create() 时的 free_fn 回调函数为空,
+只是给出一个提示告诉使用者 free_fn 为空
+264.3) feature: acl_fhandle.c, acl_fhandle_init() 增加了一个参数，以使内部决定是否加锁;
+同时 acl_fhandle_open() 的 oflags 也增加了一个是否启动线程锁的标志位 ACL_FHANDLE_O_MLOCK
+
+263) 2009.8.24
+263.1) acl_lseek: 支持 Linux/Solaris 平台下的64位操作
+263.2) bugfix: acl_fhandle.c 在记录日志时有一处参数错误
+
+262) 2009.8.23
+262.1) acl_mystring.c: acl_ui64toa_radix() 函数没有WIN32的定义
+262.2) db/memdb: 修正了一些对内存高效使用的地方
+
+261) 2009.8.20
+261.1) acl_slice: 修复了几处 bug; acl_slice_free()/1 支持 ACL_SLICE_FLAG_GC2,
+ACL_SLICE_FLAG_GC3 两类内存的直接释放, 而 acl_slice_free2()/2 则支持所有释放操作
+
+260) 2009.8.19
+260.1) bugfix: acl_slice 去掉了 ACL_SLICE_FLAG_GC_TIME2 算法，该算法的设计是有缺陷的
+
+259) 2009.8.17--8.18
+259.1) feature: stdlib/memory/acl_slice.c: 增加了一个参数 ACL_SLICE_FLAG_LP64_ALIGN,
+可以用来对一些特殊的应用在64位机下进行字节对齐;
+259.2) 需进一步改进的地方: acl_slice.c 中的 ACL_SLICE_FLAG_MIN_TIME3 还有内存节省
+的改进空间, 主要是在64位平台上将占8个字节的指针转换为占4个字节的整数，这样当分配
+10240000 个对象时又可以节省39MB
+
+258) 2009.8.12
+258.1) feature: stdlib/memory/acl_slice.c: 又增加了一个新的内存切片算法，该算法
+的效率更高，同时内存占用更小
+258.2) feature: acl_mystring.c 增加了 acl_i64toa_radix()/4, acl_ui64toa_radix()/4 两个函数,
+可以在转换时指定进制类型，在LINUX下测试发现这两个函数的执行效率还不如 snprintf
+进行转换时高:)
+258.3) stdlib/ 目录下所有与内存分配有关的源文件都移至 stdlib/memory/ 目录下
+
+257) 2009.8.10
+257.1) feature: stdlib/acl_fhandle.c, 可以缓存所打开的文件句柄
+
+256) 2009.8.7
+256.1) bugfix: acl_vstream.c, 因为将 ACL_VSTREAM.path 做为
+ACL_VSTREAM.remote_addr 的一个引用，从而导致 acl_vstream_free()/1 内部释放
+path 出错，现在将 ACL_VSTREAM.path 定义为 const char*, 以避免非法释放, 该
+bug 影响所有使用 acl_vstream_free()/1 的地方
+如: acl_master/framework/master_spawn.c: acl_master_spawn()->acl_vstream_free()/1,
+
+255) 2009.8.6
+255.1) acl_ring, acl_htable, acl_binhash, acl_fifo: 统一了遍历的访问方式,
+使遍历过程更加简单有效
+255.2) acl_ring: 去掉了没有用的重复定义的宏
+
+254) 2009.8.3
+254.1) stdlib: acl_htable/acl_binhash/acl_fifo/acl_ring, 统一了遍历方式
+
+253) 2009.7.31
+253.1) stdlib: acl_htable.c, acl_binhash.c, acl_cache.c, acl_btree.c 内部均
+增加了 acl_slice_xxx 功能
+253.2) private: 去掉了 htable.c, binhash.c
+253.3) db/memdb: 不再使用私有的 htable.c, binhash.c, 因为 acl_htable.c,
+acl_binhash.c 也支持内存切片, 所以 memdb/ 下的函数直接使用公共的 acl_htable.c,
+acl_binhash.c.
+253.4) 修改了所有与新的 acl_htable.c 中所提供的接口不一致的地方
+
+252) 2009.7.28
+252.1) stdlib/acl_slice: 又增加了一个内存分配算法，该算法的实时垃圾回收
+效率更高，且采用了冒泡算法，从而使不用的内存能够尽快被回收，唯一的缺点就是
+稍微增加了一点内存，但这些是微不足道的:)
+
+251) 2009.7.26
+251.1) private: 增加该模块主要是为了 lib_acl 内部所用的一些常见库
+251.2) 将 stdlib/debug/ 下的 debug_htable.c 的函数及结构定义前增加了
+前缀，从而避免了在VC环境下的编译警告
+251.3) 在 VC6 下编译通过
+
+250) 2009.7.24
+250.1) stdlib/acl_slice: 终于修复了所有的BUG:)
+为了保证 acl_slice 的通用性，尤其是为了保证在64位机上 AVL 使用 acl_slice
+时不会报错, 在内部内存片结构中增加了填充数据
+250.2) lib_acl 已经在 Redhat AS4/AS5(32/64), FreeBSD, VC2003/VC2008 上编译并测试通过
+
+249) 2009.7.22
+249.1) stdlib/acl_slice: 可以进行内存片的管理，该函数集在处理固定长度的内存
+的分配与释放时非常有效，而且不会产生内存碎片
+
+248) 2009.7.18
+248.1) db/memdb: 重新进行了设计，设计了一个整体的框架，目前基于该框架所用的
+算法有：字符串哈希表、二进制哈希表、平稳二叉树(基于SUN的avl库)
+248.2) samples/memdb: 增加了 valgrind 测试，用来检测内存漏洞情况
+
+247) 2009.7.3
+247.1) acl_vstream: ACL_VSTREAM 结构中去掉了多余的 rw_arg, 同时将
+ACL_VSTREAM_CTL_RW_ARG 删除, 将 ACL_VSTREAM_CTL_CACHE_SEEK 由原来的 8 改为 7,
+增了 ACL_VSTREAM_CTL_CONTEXT 的相同定义 ACL_VSTREAM_CTL_CTX; acl_vstream.c
+中所有 rw_arg 的参数都修改为 context.
+
+246) 2009.6.30
+246.1) aio/, ioctl/, master/template/: 都增加了引出 ACL_EVENT 的函数接口
+246.2) master/template/: 几个服务器模板中将创建事件对象的位置放在 pre_init()
+前, 从而便于外部调用获得 ACL_EVENT 句柄
+
+245) 2009.6.27
+245.1) acl_vstream: IO 函数类型增加了个 timeout 超时参数
+
+244) 2009.6.26
+244.1) acl_vstream.c: 增加了几个方便使用的函数, 同时将缓冲写与非缓冲写结合起来
+
+243) 2009.6.23
+243.1) bugfix: acl_ioctl_app_main.c, acl_aio_app_main.c 中的
+__deny_info 没有先赋初始值，会导致 coredump
+243.2) 去掉了 acl_define_unix.h, acl_define_linux.h 里包含的头
+文件, 以免应用在引用库时冲突, 如: pthread_spinlock_t 的要求就比较严格
+243.3) performance: 
+a) linux 平台:
+单线程运行时 pthread_spinlock_t 的加锁、解锁速度大约是 pthread_mutex_t 的2倍左右;
+双线程运行时 pthread_spinlock_t 的加锁、解锁速度大约是 2-3倍
+b) FreeBsd 平台:
+双线程运行时 pthread_spinlock_t 的加锁、解锁速度大约是 7-8倍
+
+242) 2009.6.22
+242.1) feature: 增加了一次性释放的内存池函数库 acl_dbuf_pool.c
+242.2) feature: acl_pthread_mutex.c, 增加了线程嵌套加锁的函数
+acl_thread_mutex_lock()/1, acl_thread_mutex_unlock()/2,
+acl_thread_mutex_nested()/1, 这样当某个线程对某一线程锁进行
+多次加锁时，可以立即返回，防止死锁
+242.3) feature: src/master/template, 增加了 acl_ioctl_app_main.c,
+acl_aio_app_main.c, 可以更为方便地使用服务器框架
+
+241) 2009.6.19
+241.1) samples/cache/main.c: 在 bsd 环境编译有警告
+
+240) 2009.6.16
+240.1) 增加了 gc 的测试例子
+240.2) 增加了字符串比较函数: strrncasecmp()/3, strrncmp()/3
+
+239) 2009.5.12
+239.1) bugfix: stdlib/common/acl_array.c, acl_array_clean()/2 当动态数组
+为空时进行释放时有内存空指针被操作
+
+238) 2009.4.28
+238.1) feature: stdlib/common/acl_cache.c, 增加了具有容量限制及过期功能
+的缓存池函数库;
+238.2) samples: samples/cache/ 增加了一个测试缓存池的例子
+
+237) 2009.4.23
+237.1) feature: acl_ring.h 增加了 ACL_RING_FIRST()/1, ACL_RING_LAST()/1,
+ACL_RING_LAST_APPL()/3 三个有用的宏; 同时将 ACL_FIRST_APPL()/3 改名为
+ACL_RING_FIRST_APPL()/3
+237.2) feature: acl_xinetd_params.c 中的三个函数
+acl_xinetd_params_int_table()/2, acl_xinetd_params_bool_table()/2,
+acl_xinetd_params_str_table()/2 可以允许其中的 cfg 参数为空，在这种情况
+下仅用默认值进行赋值，从而方便于调试工作
+
+236) 2009.4.21
+236.1) feature: acl_timer.c 增加了 acl_timer_walk()/3, 从而方便遍历定时器
+里的所有定时任务信息，同时将 ACL_TIMER_INFO 结构引出至 acl_timer.h 文件中
+226.2) bugfix: acl_timer.c 中的 acl_timer_free()/1 有内存泄露问题，现在更
+改为 acl_timer_free()/2, 用户可以用自己的回调函数进行用户数据对象的释放
+226.3) feature: acl_timer.c 增加了 acl_timer_size()/1 可以获得定时器里的
+定时任务个数
+
+235) 2009.4.20
+235.1) bugfix: win32 平台下的 acl_pthread_cond_timedwait()/3 实现存在与
+Posix 参数含义不兼容问题，其中的第三个参数: 超时值应该是绝对时间而不是相对
+时间。相关的文件修改有: acl_pthread_cond.c, acl_pthread_pool.c, acl_aqueue.c
+acl_workq.c，此BUG由黄奕发现。
+
+234) 2009.4.19
+234.1) bugfix: getimeofday()/2, 该函数模拟了在WIN32平台下获得精确时间的功能，
+因为其内部由时钟计数来计算的，当开机时间较长时，时钟计数会因为溢出而归零，这
+样就会生产计算的新时间截小于真实时间截的情形，所以增加了每隔1天重新初始化时
+钟校验基准的过程，这样就不会因时钟计数溢出而造成的问题
+
+233) 2009.4.14
+233.1) feature: 添加了获得进程运行时程序全路径及程序运行路径的函数:
+acl_process_path(), acl_getcwd(), 这两个函数支持: win32, Linux/FreeBsd/Solaris
+233.2) samples: process/ 测试新添加的两个函数
+233.3) 在 stdlib/ 目录下增加了 sys/ 目录，将一些与操作系统相关的程序移至该目录下
+233.4) acl_argv_split.c:  添加了 acl_argv_splitn()/3, acl_argv_splitn_append()/4
+两个函数
+
+232) 2009.4.9
+232.1) acl_sys_patch.c: 原来在 win32 平台下的 gettimeofday()/2 实现仅依赖于
+win32 API "GetSystemTimeAsFileTime"，而该 API 的精度不够细，所以重新实现了
+win32 平台下的 gettimeofday 的函数，通过结合 GetSystemTimeAsFileTime 及系统
+的时钟，使 gettimeofday 获得的时间颗粒度更细
+
+231) 2009.4.7
+231.1) events: 抽象出 event_prepare()/1, event_fire()/1,
+event_thr_prepare()/1, event_thr_fire()/1 四个函数，由各个事件引擎相同的操作
+抽象而成.
+
+230) 2009.4.3
+230.1) bugfix: ACL_VSTREAM 结构定义中的字符串缓存空间应为 unsigned char*,
+原来定义为 char*, 在某些情况会导致使用该结构的一些函数出错, 如:
+ACL_VSTREAM_GETC/acl_vstream_getc, 它们在使用时以返回值为 ACL_VSTREAM_EOF
+表示出错或读结束，同时返回值又作为所读到的字符值，按 ACL_VSTREAM->read_buf,
+read_ptr 原来的类型(char*) 则如果数据源中含有 (char) -1, 则调用
+int  ch = ACL_VSTREAM_GETC(stream)/int ch = acl_vstream_getc(stream) 后，
+则 ch = -1 (即由 char 升级为 int 后依然为 -1), 而在源中 (char)-1 其实为
+(unsigned char) 255, 当升级为 int 后依然为 255.
+230.2) aio: 存在一些不太合理的定义，进行了修改
+
+229) 2009.4.2
+229.1) acl_set_error()/1: 在WIN32平台上，不仅设置了API的错误号，同时将标准C
+的 errno 进行了设置
+229.2) bugfix: acl_vstring_strstr/acl_vstring_strcasestr/strcasestr 均存在一
+个明显的bug, 导致在某种条件下查不到结果;
+229.3) feature: 增加了 acl_vstring_rstrstr/acl_vstring_rstrcasestr,
+acl_rstrstr/acl_rstrcasestr 字符串函数，可以方便地从后向前查找字符串
+
+228) 2009.4.1
+228.1) net/connect/acl_timed_connect.c: 修改了一个小bug, 没有初始化变量 err
+228.2) net/connect: getsockopt 在不同平台上有不同的语义，所以导致在处理此问题
+时比较麻烦些，在 Solaris 上，针对一个非阻塞调用 getsockopt 时并不设置出错值，
+而是通过全局的 errno 来表明套接字的状态; 在 Linux 上，在非阻塞连接时，errno
+却被设置为 EINPROGRESS, 需要通过 getsockopt 中的设置出错值来判断; 在 win32平台
+下，如果连接本地一个不存在的监听端口时，却无法立即探测连接失败的情形，其在
+getsockopt 的出错参数设置为0, 而且将全局的错误号置0.  为了解决这些平台差异，需要
+保留一个调用 connect 之后的 errno 号，同时加上 getsockopt 里的错误号，进行判断.
+
+227) 2009.3.30
+227.1) event: 增加了对 poll 的支持
+227.2) aio: 修改了部分接口
+227.3) net/connect: 修改了部分BUG
+
+226) 2009.3.11
+226.1) acl_vstream_accept_ex()/4: 有一处BUG，套接字类型应该取 stream->type
+226.2) samples: msg/, 增加了测试TCP套接口、UNIX域套接口、管道、异步队列性能
+的例子，在 Linux 平台下 看来UNIX域套接口与线程异步队列性能都是不错的，管道次之，
+TCP套接口最低 226.3) samples: dns/, 完善了DNS测试的例子; 在 FreeBSD 测试过程中，
+发现线程 异步队列出奇地快，性能是其它基于IO的性能的3-4倍; 在 Solaris10-x86平台下，
+线程异步队列的性能也是IO性能的1.5倍左右。看来 Linux 平台下的线程还有待提高:)
+
+225) 2009.3.10
+225.1) event: kqueue 功能测试; 修改了 events_kernel.c 中的几处 bug
+225.2) samples/aio: 测试了该例子在Linux/Solaris/FreeBSD 三个平台的运行状态
+
+224) 2009.3.9
+224.1) event: 支持 FreeBSD 平台下的 kqueue
+224.2) samepls/aio: 有关AIO操作的两个例子
+
+223) 2009.3.6
+223.1) feature: acl_vstream.c, acl_vstream_fopen()/4 针对WIN32平台在
+打开文件时，自动将参数 oflags 添加 O_BINARY 标志
+223.2) feature: acl_vstream.c, 增加了 acl_vstream_fstat()/2 和
+acl_vstream_fsize()/1 两个函数，可以方便获得文件句柄的属性信息和文件大小
+223.3) feature: acl_msg.c, 增加了 acl_last_serror()/0 可以更方便地获得
+出错提示信息，同时该函数内部采用了线程局部变量，所以是线程安全的
+223.4) feature: acl_vstream.c, 增加 acl_vstream_fsync()/1, 可以将文件流缓冲区
+及系统缓冲区中的数据直接同步至硬盘
+223.5) acl_file_fstat()/2: 支持WIN32平台
+223.6) 将 acl_sys_patch.c 拆分为三个文件: acl_sys_patch.c, acl_sys_file.c
+和 acl_sys_socket.c
+223.7) acl_pthread_pool.c: 将负载高于所启动线程数的10倍时便需报警
+
+222) 2009.3.5
+222.1) feature: 增加了 acl_file_size()/1, acl_file_fsize()/1 函数
+222.2) 将 acl_stat_t 用 typedef 进行了类型别名定义，即如果要用此类型，
+只需要直接声明："acl_stat_t sbuf;" 即可，当然也可以这样声明:
+"struct acl_stat sbuf;"
+222.3) featur: acl_vstream_fflush()/1 当操作文件时可以保证数据写至硬盘，
+在WIN32平台下尤为重要
+
+221) 2009.3.4
+221.1) event: 支持 Solaris 平台下的 /dev/poll
+
+220) 2009.3.3
+220.1) event: 修改了 events_kernel.c, events_select.c 中的一处bug
+220.2) master/template: acl_aio_server.c 模板增加了 socket 的接收增强功能
+
+219) 2009.3.2
+219.1) event: 进一步修改了几处BUG，并且增加了容错机制
+
+218) 2009.3.1
+218.1) event: events_select, events_kernel, 修改了几处BUG
+
+217) 2009.2.28
+217.1) 增加了针对 epoll, devpoll 的支持，同时修改了 event 中的一些BUG
+
+216) 2009.2.17-2009.2.26
+216.1) 将 engine 目录改名为 event; 重新写了 event 事件循环的底层框架，
+借鉴了一部分 nginx 中有关事件处理的方式, 同时保留了 postfix 原来的一部分
+处理方式，使事件循环机制更灵活、更可靠、效率更高，同时扩展性更好.
+(目前仅支持 select 方式，很快将会支持 epoll, poll, kqueue, devpoll)
+216.2) aio: 模块进行了优化调整，增加了一些方便使用的功能
+
+215) 2009.2.16
+215.1) acl_aio_server.c: 优化与子进程与 acl_master 父进程之间的通信机制，
+当客户端连接非常频繁时，通过减少与 acl_master 父进程之间的通信，提高了子
+进程的执行效率，并且大大减轻了 acl_master 的通信负载
+215.2) Makefile: 支持 make -j n 方式的编译(n 表示CPU核心数，由 Makefile
+自动识别），从而在多核系统上大大提高了编译速度
+
+214) 2009.2.12
+214.1) 在WIN32平台下将 acl_project/unit_test/ 的单元测试建立工程文件，这样
+可以对ACL采用单元测试了
+
+213) 2009.2.11
+213.1) net/connect/acl_inet_connect: 在连接远程地址时，可以绑定本机的
+某个网卡的地址，对于多网卡机器比较有用
+213.2) include/master/acl_master_type.h: ACL_CONFIG_INT_TABLE,
+ACL_CONFIG_STR_TABLE, ACL_CONFIG_BOOL_TABLE 定义成与
+stdlib/acl_xinetd_cfg.h 中的结构类型一致
+
+212) 2009.1.18-2009.1.19
+212.1) feature: acl_pthread.c, 增加了 acl_pthread_atexit_add()/2,
+acl_pthread_atexit_remove()/2 两个函数，这样用户线程可以通过此两个函数
+添加/删除线程局部变量，当线程退出时，将回调用户的用来释放线程局部
+变量的函数
+212.2) 修改了 thread/ 目录下源程序在分配/释放内存时调用底层内存操作的
+函数集(acl_default_xxx), 而是改为更通用的内存分配 acl_myxxx() 的操作方式；
+同时在 stdlib/ 目录下增加了 local/ 模块，仅供ACL库内部使用
+212.3) samples: thread_pool/ 增加了线程局部变量的测试过程
+
+211) 2009.1.13
+211.1) acl_myflock: 统一了在UNIX/WIN32平台下接口调用的方式
+211.2) proctl: 去掉了无用的 lockfile.c, lockfile.h, 并修改了调用
+acl_myflock()/3 的参数
+211.3) acl_mystring: 修改了几个字符串处理函数
+
+210) 2009.1.12
+210.1) acl_vstream: 整理了头文件，将 ACL_VSTREAM 结构中的某些不用的成员
+去掉
+210.2) acl_aio_server, acl_ioctl_server, acl_single_server, acl_multi_server,
+这几个模块允许以手工方式启动，以便于应用进行调试
+
+209) 2009.1.10
+209.1) acl_vstream: 改变 acl_vstream_getc()/2 为 acl_vstream_getc()/1,
+同时对外提供更高效的宏调用 ACL_VSTREAM_GETC()/1; 提供了标准输出函数
+acl_vstream_printf()/n
+209.2) acl_vstring_vstream: 因为 acl_vstream 有些接口的改变而做相应的修改
+
+208) 2009.1.9
+208.1) bugfix: acl_ioctl_server.c, 原来当 acl_master 重读配置后, 该服务器
+模板的子进程需要关闭监听流，但采用的是同步关闭方式，因为关闭监听流的线程与
+事件循环的线程的运行空间不同，容易造成冲突，现在将关闭流的操作放在定时器
+里进行，因为定时器的运行与事件循环的运行线程空间是相同的，所以不再会造成
+冲突现象。
+208.2) feature: acl_vstring_vstream.c, 增加了将 ACL_VSTRING, ACL_VSTREAM
+结合的操作函数。
+
+207) 2009.1.8
+207.1) feature: acl_htable 增加了两个函数接口 acl_htable_capacity() 和
+acl_htable_size()
+207.2) feature: 从 Postfix 的代码中拷贝了 readline.c, readline.h,
+split_nameval.c 至 acl 库中，命名为: acl_readline.c, readline.h
+acl_split_nameval.c
+207.3) acl_vstream: acl_vstream_fopen()/4 的参数去掉了最后一个参数(rw_timeo),
+变为4个参数，因为对文件流来说读、写超时根本就没有什么意义；此外，在此
+changes.txt 文档中对于函数名的标识今后将采用 acl_xxxx()/n, n 表示参数的个数
+207.4) vc2003, vc2008 工程文件中漏掉的源文件:
+proctl/lockfile.c, lockfile.h, stdlib/acl_meter_time.c, stdlib/acl_meter_time.h
+
+206) 2009.1.7
+206.1) feature:  acl_aio_server, acl_multi_server 两个服务器模板现在均
+支持重读配置功能及软件在线升级功能；
+206.2) acl_ioctl_server, acl_aio_server, acl_single_server,acl_multi_server
+这些服务器模板都支持配置重读功能、软件在线升级功能;
+206.3) acl_ioctl_server, acl_aio_server, acl_multi_server: 使用这些服务器
+模板的服务子进程在运行时，acl_master 主服务器可以重启；而如果使用
+acl_single_server 服务器模板的服务子进程在运行时, acl_master 是无法立即重
+启的，需要等待这类服务子进程退出后 acl_master 才可重启
+
+205) 2009.1.6
+205.1) feature: acl_master 框架支持子进程崩溃报警机制
+205.2) acl_master: 支持重读配置功能的完善，目前支持该功能的模板有：
+acl_ioctl_server, acl_single_server 两个模板，其它的模板需要再测试并完善
+
+204) 2009.1.4
+204.1) bugfix: events_proc.c, events_thr.c 中的函数 event_loop() 中的
+wait_ring, ready_ring 两个变量是局部变量, 当调用 acl_event_disable_xxx
+的时候会调用 event_fdtable_free, 而 event_fdtable_free 中的在调用函数
+acl_ring_detach 时便对上述两个临时变量进行了改写操作，当这种操作在
+event_loop() 循环外执行时便造成了内存非法访问.
+204.2) feature: acl_master 服务器框架现在支持配置文件重读功能，从而可以
+实现所谓的程序热升级功能:)
+
+203) 2008.12.30
+203.1) doc: 头文件中修改了不符合 doxygen 注释规范的注释方法
+
+202) 2008.12.29
+202.1) feature: thread/acl_pthread_pool 中增加了创建线程池的简单函数
+acl_thread_pool_create
+202.2) comment: acl_scan_dir.h 中完善了注释
+
+201) 2008.12.23
+201.1) compile: acl_pthread_xxx 函数库在 FreeBSD 及 WIN32 平台下编译错误问题
+
+200) 2008.12.22
+200.1) 在FreeBSD 6 上编译ACL工程
+200.2) bugfix: master/template/acl_ioctl_server.c: 在使用 getopt() 前因为初始化了
+getopt() 中的全局变量，从而影响了参数传递, 这种情况在BSD上会发生
+200.3) compile: 将 samples/ 目录下的工程文件进行了整理
+200.4) 将 ACL 工程命名为 acl_project.2.0.1
+
+199) 2008.12.20-12.21
+199.1) 在 vc2008 上编译通过
+199.2) 重新组织了VC2003的编译工程
+199.3) 重新组织了VC6的编译工程
+199.4) 增加了一些头文件的注释
+199.5) thread: 增加了线程池模块，将用它取代老的线程池模块 (acl_workq)
+
+198) 2008.12.12-12.16
+198.1) comment: 为了生成 doxygen 文档，增加了许多注释
+198.2) compile: 在 Redhat AS5 上编译通过
+198.3) acl_socket_init 初始化时在UNIX平台下自动调用了 signal(SIGPIPE, SIG_IGN)
+
+197) 2008.12.8
+197.1) feature: code/acl_urlcode.c, 增加了 url 编解码函数库
+197.2) samples: samples/urlcode/, 增加了 url 编解码的测试用例
+
+196) 2008.12.2
+196.1) acl_vstream.c: 为了避免因为缓存 fseek 位置而造成的副作用，提供一
+个开关用于控制是否需要进行 fseek 位置缓存，可以通过调用 acl_vstream_ctl()
+并设置标志位 ACL_VSTREAM_CTL_CACHE_SEEK 来达到此目的.
+
+195) 2008.12.1
+195.1) performance: acl_vstream.c, acl_vstream_fseek() 进一步提高了执行
+效率, 只要读缓冲区数据还在并且未被破坏，就可以在调用 fseek 时，通过移动
+缓冲区的指定位置就能重复利用缓冲区里的数据，从而大大减少调用系统调用的
+次数.
+
+194) 2008.11.30
+194.1) performance: acl_vstream.c, acl_vstream_fseek() 通过缓冲策略提高
+了执行效率
+194.2) samples: vstream_fseek/, watchdog/, base64/
+
+193) 2008.11.28
+193.1) bugfix: proctl/proctl_service.c, proctl_service_exist()
+判断服务是否在运行的条件有误, 该库仅在WIN32下有效
+
+192) 2008.11.23-11.24
+192.1) feature: acl_chunk_chain.c, 该文件主要实现了数据块连的虚拟连续块
+的功能，内部自动处理数据缓冲、纠错等功能，可以将无序的数据流转为有序的
+数据流
+192.2) samples: chunk_chain, 测试虚拟数据链的例子
+
+191) 2008.11.20
+191.1) bugfix: proctl/acl_proctl.c, acl_proctl_child() 及
+acl_proctl_deamon_init() 函数内部在创建线程时应该设置新线程的创建属性为
+detached 状态，否则会引起资源泄漏问题
+
+190) 2008.11.19
+190.1) bugfix: proctl/acl_proctl.c, acl_proctl_deamon_init() 函数在创建
+线程时没有初始化 attr 参数，从造成新线程无法正常启动
+190.2) acl_define_win32.h: 为了增加对VC6的兼容性，增了宏“if(_MSC_VER >= 1300)”
+以决定是采用 winsock.h, 还是 winsock2.h
+
+189) 2008.11.18
+189.1) feature: stdlib/debug/, 增加了针对ACL库的内存泄漏与内存越界的访问
+检测
+189.2) samples: debug_malloc/ 内存检测的例子
+189.3) bugfix: acl_aio_read.c 中原来在调用 read_fn() 回调后才清空 strbuf
+缓冲区，这样当发生嵌套时，依然可能存在该缓冲区内的数据被重复利用的情形，
+现在采用的策略是先取得 strbuf 的缓存地址及缓存数据长度，然后将该 strbuf
+复位(但不破坏具体数据内容)，然后再调用 read_fn() 并将预先取得的缓存地址
+及缓存数据长度传递进去，从而彻底地避免了在调用 read_fn() 内部的多次递归
+嵌套过程的 strbuf 里的数据被重复利用
+
+188) 2008.11.17
+188.1) feature: 增加了 acl_mem_hook.c 函数接口，使调用者可以注册自己的内存
+分配与释放函数
+
+187) 2008.11.14
+187.1) bugfix: acl_vstream.c, 其中的 __vstream_sys_readn() 的读超时操作在
+WIN32平台下是被 undef 而关闭的，所以WIN32的超时读不超作用，现在将WIN32平台
+下的读超时功能打开
+187.2) feature: net/acl_tcp_ctl.c, 添加了 acl_tcp_so_linger() 封装，用户
+可以在通过此函数设置当套接口关闭时是否立即关掉，即避免 TIME_WAIT 状态的出现，
+这样可以当套接口频繁地打开关闭时有效地节约TCP的端口号，但也可能产生一定的
+副作用
+
+186) 2008.11.13
+186.1) thread/acl_pthread.c: WIN32平台下，当没有调用acl_pthread_init()时，
+内部在创建线程时采用CREATE_SUSPENDED的创建模式，当在创建线程中必要的初始化
+完成后再ResumeThread()新创建的线程，从而可以保证即使用户没有调用
+acl_pthread_init()的前提下依然保证创建线程的理论安全性；如果用户预先调用了
+acl_pthread_init()函数，则内部会通过线程锁的方式来避免创建线程时理论上的
+安全问题。
+
+185) 2008.11.12
+185.1) bugfix: stdlib/string/acl_mystring.c 中的 acl_mystrline() 函数存在bug,
+从而会影响使用该函数的 acl_xinetd_cfg.c 以及 master 服务器框架中的读配置文件
+的操作
+185.2) feature: stdlib/common/acl_htable.c 添加了 acl_htable_last_errno() 以
+及 acl_htable_set_errno() 两个函数，使应用可以判断操作完哈希表后的错误状态，
+目前仅在哈希表添加时设置了错误状态. 错误号为：ACL_HTABLE_STAT_DUPLEX_KEY
+
+184) 2008.11.10
+184.1) thread: 增了 acl_pthread_init()/acl_pthread_end() 函数，从而避免了
+理论上在WIN32平台下创建线程时的acl_pthread_creeate句柄赋值与 RunThreadWrap()
+内部使用线程句柄的可能存在的冲突问题
+184.2) 添加了 init/ 模块，主要用于ACL库内部的初始化工作, 用户只需要调用一次
+acl_init(), 该函数内部就会自动将有关WIN32下的SOCKET、THREAD以及UNIX下的signal
+进行了初始化
+
+183) 2008.11.9
+183.1) thread: 进一步完善了WIN32平台下的POSIX函数库
+
+182) 2008.11.8
+182.1) thread/: 完善了 acl_pthread_join 函数等POSIX标准的函数，同时添加了
+acl_pthread_detach()
+
+181) 2008.11.7
+181.1) bugfix: acl_mystring.c->acl_mystrline() 在解析以 "\r\n" 为回车换行符时
+有一处BUG，从而影响使用它来分析配置文件的函数库的分析结果(acl_xinetd_cfg.c)
+181.2) performance: acl_mystring.c->acl_mystrline() 内部遇到特殊标志位时会有
+多次数据的移动过程(即调用：memmove())，现在修改成最多只移动一次的方式
+
+180) 2008.11.6
+180.1) bugfix: acl_aio_read.c, 在所有的调用 astream->read_fn() 之后都应
+添加 ACL_VSTRING_RESET() 以防止旧数据被重复利用
+180.2) performance: stdlib/charmap.h, 添加了字符串转换映射表，从而使
+strcaseXXX类操作更加快捷
+180.3) net/dns: rfc1035 模块进一步完善功能实现
+180.4) stdlib/configure: 增加了方便读配置文件的操作功能
+
+179) 2008.11.5
+179.1) feature: acl_dlink.c, acl_dlink_lookup_larger() 函数，可以查
+出大于等于某个值的所有结点集合; acl_dlink_lookup_lower() 函数，可以查出
+小于等于某个值的所有结点集合；不过这两个函数内部是顺序查找的，如果数据结点
+比较多时，效率会比较低，将来应该都改成二分查找
+179.2) performance: strcasecmp, strcasencmp, 两个函数采用了更高效的做法
+179.3) bugfix: acl_aio_read.c, acl_aio_readn() 中，应该将
+" astream->count = count; " 放在函数开始；__readn_notify_callback() 中
+调用 "astream->read_fn" 后增加 "ACL_VSTRING_RESET(&astream->strbuf);"
+以避免 fatal 错误
+
+178) 2008.11.3
+178.1) feature: acl_dlink.c, 增加了 acl_dlink_lookup_range()函数，可以方便
+查询某个范围的数据结点是否存在
+
+177) 2008.10.31
+177.1) feature: acl_dlink.c, 增加了 acl_dlink_delete_range() 函数，可以方便
+地从数据链中删除某个范围内的数据结点
+177.2) feature: acl_array.c, 增加了 acl_array_delete_range() 函数，可以方便
+地删除某个下标范围之间的数组结点
+
+176) 2008.10.27
+176.1) feature: C99标准增加了针对线程局部存储的易用性处理，只要在变量前增加
+宏：__thread 则该变量就被声明为一个线程局部变量，如：函数内部用的线程局部变量
+static __thread int i = 0; 如果是外部可用的线程局部变量，则在 .c 文件中声明为：
+__thread int i; 然后在 .h 头文件中声明：extern __thread int i;
+windows 下从VC7开始也支持C99标准，但若要在WIN32下用这个特性，需要在变量前增加
+__declspec(thread)，为了使用的一致性，在 acl_define_win32.h 中将这个统一声明为
+__thread; 但在UNIX下的Makefile文件用GCC编译时需要把　-pedantic　选项去掉，因为
+它是C89的标准
+176.2) samples: thread/ 下的例子说明了C89关于线程局部变量存储的使用例子
+
+175) 2008.10.26
+175.1) feature: acl_dlink.c, 增加了两个接口 acl_dlink_lookup2_by_item,
+acl_dlink_lookup2, 可以在查询数据结点时同时取得该结点的下标值
+
+174) 2008.10.21
+174.1) feature: acl_sys_patch.c, 增加了 win32 下的 gettimeofday 实现
+174.2) feature: acl_netdb.c, 扩展了一些结构成员，同时增加了如下函数：
+acl_netdb_refer_oper, acl_netdb_refer, acl_netdb_unrefer, acl_netdb_add_addr
+
+173) 2008.10.17
+173.1) feature: 增加了线程堆栈空间大小的设置功能，涉及的文件有：
+acl_pthread.c/h, acl_workq.c/h, acl_ioctl.c/h, acl_ioctl_server.c,
+acl_ioctl_params.h
+acl_pthread.c: acl_pthread_attr_setstacksize
+acl_workq.c: acl_workq_set_stacksize
+acl_ioctl.c/h: ACL_IOCTL_CTL_THREAD_STACKSIZE
+acl_ioctl_server.c: acl_var_ioctl_stacksize
+acl_ioctl_params.h: ACL_VAR_IOCTL_STACKSIZE, ACL_DEF_IOCTL_STACKSIZE
+
+172) 2008.10.10
+172.1) samples: 增加了一个非常有用的HTTP客户请求的例子 http_client/
+
+171) 2008.10.9
+171.1) workaround: 重新整理了VC6、VC2003编译环境下的工程组织，将动态库以
+lib_acl.dll, lib_acl.lib, lib_acl_d.dll, lib_acl_d.lib 命名，将静态库以
+lib_acl_vc6.lib, lib_acl_vc6d.lib, lib_acl_vc2003.lib, lib_acl_vc2003d.lib
+命名，其中动态库是用VC2003编译的，可以在VC6下使用
+171.2) samples: 增加了VC6环境的 samples 工程，目前为了测试仅添加了两个
+工程(vstream.dsp, vstring.dsp)
+
+170) 2008.10.8
+170.1) master 框架: 增加了 acl_tcp_defer_accept() 可配置功能，使用者可以
+在配置文件中指定是否针对客户端连接采用无数据延迟接受功能, 修改的文件有
+master.h, master_ent.c, master_listen.c
+170.2) acl_inet_listen.c: 去掉了默认的 acl_tcp_defer_accept() 调用，使用
+者若要使用此功能，可以创建监听套接口后手工进行设置
+
+169) 2008.10.7
+169.1) 编译：VC 编译动态库的DEBUG版本或编译可执行程序的DEBUG版本时，默认
+的增量链接会增加 *.ilk 文件，但在编译清除时如果设置的最终输出路径不是VC
+默认的，则这些 *.ilk 文件，有可能是VC开发环境的一处BUG，所以现在关闭了
+VC的增量链接的功能
+169.2) samples/proctld 模块编译出错，进行了修复
+169.3) 当将ACL库编译成动态链接库时，其它库或程序使用ACL动态库时应该添加
+预定义：ACL_DLL
+169.4) include/stdlib/acl_define_win32.h: 因为VC编译器自动在预处理处添加
+预定义选项: WIN32, 所以在该文件中做了默认处理，如果遇到此预定义，也默认
+认为是VC编译器
+
+168) 2008.9.29
+168.1) feature: 修改了所有头文件的函数定义，添加了 ACL_API 定义，允许
+以DLL方式引出, 可以方便其它编程语言使用ACL库，当其它应用以DLL方式使用
+ACL库时，需要增加一个预定义宏：ACL_DLL
+
+167) 2008.9.27
+167.1) bugfix: events_proc.c, 调用 select() 后，如果返回值 -1, 且 error
+为 EINTR, 则需要返回，但没有将 eventp->nested 恢复，则造成下一次调用
+event_loop() 时，触发了 "if (eventp->nested++ > 0)" 条件, 该BUG会影响
+acl_master, 基于 master 框架的 aio 框架实例
+
+166) 2008.9.26
+166.1) acl_vstream.h: 整理了文档的注释格式，使之更符合 JAVA-DOC 格式
+166.2) acl_vstream.c: 增加了 acl_vstream_fhopen() 接口，从而更加兼容win32
+166.3) acl_myloc.c: 增加了 acl_log_fp() 接口
+
+165) 2008.9.22
+165.1) mempool/acl_allocator.c: 增加了接口 acl_allocator_ctl() 以方便
+控制内存池的缓存的最小/大字节数
+
+164) 2008.9.19
+164.1) proctl: 调整了 acl_proctl_start_one() 及 acl_proctl_stop_one()
+的参数入口，所有参数的轮换工作均内部解决，应用不必在参数里添加双引号
+164.2) compile: 消除了几处在 C++ Builder6 上的编译警告
+164.3) acl_hash.c: 将 crc64 名称修改为 acl_hash_crc64
+164.4) 重新在各个平台及编译器上编译通过
+164.5) acl_aio_read/write: 在调用 XXX_SAFE_IOCP 后不应再对 astream 进行
+任何操作，否则会造成操作非法指针的错误
+
+163) 2008.9.18
+163.1) proctl: 该模块在参数处理等方面有些问题
+
+162) 2008.9.11
+162.1) acl_vstream: 支持套接字的 writev 模式，且保证全部数据完整写入
+162.2) samples/vstream: 增加了几个测试函数
+162.3) samples/master/: 整理了几个 Makefile 文件
+
+161) 2008.9.10
+161.1) 内存池的缓存对象大小最大可以达到1M，也许应该加个开关控制一下
+是否需要大内存的缓存
+161.2) acl_sys_patch.c: 支持套接字的 writev 模式
+161.3) acl_vstream.c: 支持套接字的 writev 模式
+161.4) acl_aio_write.c: 支持套接字的 writev 模式
+
+160) 2008.9.9
+160.1) 新版本的 acl 库在各个平台上编译通过
+
+159) 2008.9.4-9.8
+159.1) engine/events_proc.c: 修改了几处与 Linux epoll 相关的几处BUG，
+从 postfix 中继承了有关 epoll 的相关代码，但 postfix 中对读写事件的要求
+是不能同时将某个套接字置于读写监控集合中，并且其仅实现了
+event_disable_readwrite 接口，但 acl 库中的 events_proc.c 中却允许同时
+对同一套接字进行读写监控，并且增加了 event_disable_read, event_disable_write
+两个接口，所以原 postifx 中的有关 epoll 的调用在 acl 中就会出现错误，
+现在已经进行了修正，使 acl 库可以非常方便地支持 Linux 下的 epoll 调用，
+只需要打开 lib_acl/src/engine/events_define.h 中的 ACL_EVENTS_KERNEL
+定义即可
+159.2) aio/: 原来的 acl 库中的非阻塞 IO 即 aio 模块对于读操作的处理方式
+是当某个套接字的读事件满足时，便将其从读监听集合中去除，读操作完成后再
+将该套接字往读监听集合中添加，这样就造成了两个费时的操作(尤其是对采用
+epoll 类似的方法)，现在将异步读操作设置为一直可读，真到应用想要关闭该
+套接字或明确禁止继续读为止；acl_aio_write 模块的嵌套处理存在问题，因为
+在一处函数返回时未将嵌套层数减一，导致对一个长连接的套接字来说，在达到
+写嵌套层数限制后，以后的每一次写操作都要通过将写事件进行监听然后通过写
+事件满足时的回调方式完成，这样大大降低了非阻塞写的效率(实践证明，修改
+此BUG的后，基于 acl 库编译的 webserver 性能提高了2000次每秒；在 
+acl_aio_listen 中增加循环接收外部连接功能，大大提高并发连接性能; 整理了 aio
+模块的相关代码，修改了有关接口
+159.3) acl_aio_create 调用时可以通过将 accept_max 参数设置为大于1的
+值以提升监听套接字接收并发连接的性能，实践证明如果该值为1且acl_vstream_listen
+的监听队列比较小时(如小于64)，则有可能造成一定的接收延迟
+
+158) 2008.9.1-9.3
+158.1) socket performance: 在测试基于 acl_aio_xxx 库编写的HTTP服务器时，
+(用Apache 的ab工具测试) 发现长连接的效率反而比断连接的效率低，经过仔细
+排查，发现是因为测试时因为是用了小数据包，则操作系统自动启动 Nagle 算法，
+从而造成了一定延迟，为了避免此种情况，修改了 acl_sane_accept, 
+acl_sane_connect 两个函数，自动启用 TCP_NODELAY 传输策略，避免因 Nagle
+可能造成的延迟现象(虽然有可能会降低一些网络性能)
+158.2) net/acl_tcp_ctl.c: 增加了acl_tcp_nodelay接口，可以开/关某个套接口
+的 TCP_NODELAY 传输策略
+158.3) feature: 增加了程序效率测试接口，stdlib/acl_meter_time.c, 从而可以
+方便应用通过调用宏 ACL_METER_TIME("your info") 来测试每个执行函数的执行时间,
+在测试　158.1) 的因 Nagle 而造成的时间延迟时，该函数库起了非常重要的作用
+158.4) acl_fifo.c: 增加了更多的接口，同时将结构类型定义引出至头文件中，
+这样用户可以在栈上分配队列对象
+158.5) acl_aio: 优化了结构设计，将一些需要多次动态分配的对象进程合并，减少
+动态分配内存的操作次数
+158.6) acl_vstring: 为 acl_aio 的优化增加了 acl_vstring_free_buf 函数
+158.7) sample: fifo 增加了测试例子
+
+157) 2008.8.27
+157.1) 内存分配：因为将整个 acl 工程基于内存池进行了重新构建，会导致有些
+内存分配计数不准；当采用内存池时，有些函数库可能存在内存泄露问题
+157.2) acl_vstream.c: 将所有的回调释放函数 acl_myfree_fn 去掉，采用直接
+的内存释放方式；将 acl_array_delete_idx 的调用放在 close_fn 调用之前，以
+防止用户在 close_fn 内部调用 acl_vstream_delete_close_handle 时造成内存
+非法重复释放
+157.3) samples/master/ioctl_echo, aio_echo: 所给的例子有一处错误，当配置
+文件里没有 master_env 时，没有判断 getenv() 返回 NULL 的情形
+
+156) 2008.8.26
+156.1) 内存分配：重新将一些函数名进行重命名
+156.2) 编译：将整个工程在VC6上成功编译，同时将win32平台下的的库名加后缀，
+即 lib_acl_vc6.lib, lib_acl_vc2003.lib, lib_acl_cb6.lib
+
+155) 2008.8.23-25
+155.1) 内存池：将 acl 库基于内存池进行重新构造, 与之相关的修改文件有
+acl_malloc.c, acl_mylog.c, acl_allocator.c mem_pool.c, squid_allocator.c
+vstring_pool.c, etc, 并创建单独的目录 mempool/ 将内存池做为 acl 工程
+中 stdlib/ 下的一个单独模块
+155.2) acl_stack.c: 重新进行了设计与改写, 增加了迭代器等功能
+155.3) unit_test: 增加了针对 acl_stack 模块的单元测试
+155.4) master/aio, iotcl: 服务模板增加了采用内存池的功能
+
+154) 2008.8.22
+154.1) acl_mymalloc.c: acl_mymalloc(), acl_myfree() 去掉了 memset()
+的操作，该操作当分配的内存比较大时会比较耗时
+154.2) acl_allocator: 内存池模块重新进行了整理
+154.3) samples/mempool: 增加了内存池的测试例子
+
+154) 2008.8.21
+154) acl_vstring.c: acl_vstring_sprintf_prepend 存在一处潜在的指针BUG
+
+153) 2008.8.20
+153.1) acl_mylog.c: 打开文件时，在UNIX平台下对 打开的文件描述符增加了
+acl_close_on_exec 功能，以防止父进程的文件句柄被传递给子进程
+153.2) master 框架: 使子进程可以以普通用户身份运行，并且在子进程切换
+身份前可以先借用 acl_master 主进程的日志文件进行记录，当子进程切换为
+普通用户身份后便使用自己的日志文件进行中记录
+153.3) acl_master 安装包进行中了相应的整理，在安装时为了保证切换为普通
+用户身份的子进程记录日志，将 var/log 目录的权限设置设置为 1777; 将安装
+包中的服务配置例子放置在 conf/service/samples/ 目录下
+
+152) 2008.8.18
+152.1) 重新整理了 acl_master 服务器框架，可以无缝地与第三方日志记录库
+进行集成
+152.2) feature: acl_master 可以根据配置文件(main.cf) 中的 scan_subdir
+选项来判断是否需要启动配置服务子目录下的服务程序
+152.3) feature: 每个服务的配置文件里增加了 master_env 环境变量配置项，
+使得 acl_master 进程可以将该环境变量传递给服务子进程
+152.4) 重新整理了 samples/master/ 下的例子
+
+151) 2008.8.14
+151.1) feature: acl_vstream，使 ACL_VSTREAM_IN, ACL_VSTREAM_OUT,
+ACL_VSTREAM_ERR 可以在WIN32下正常使用，但如果想要使用这些标准输出、输入，
+需要提前调用 acl_vstream_init() 进行初始化
+151.2) samples: 增加了测试 ACL_VSTREAM 流的例子--samples/vstream
+
+150) 2008.8.12
+150.1) bugfix: acl_ioctl.c 中的 __on_thread_init 及 __on_thread_exit
+的参数检验有误，且传递给回调函数的参数有误
+
+149) 2008.8.7
+149.1) 工程管理: 重新整理了各个平台下的编译工程
+149.2) experiment: avl 库可以在64位LINUX下编译通过
+149.3) unit_test: 增加了针对 avl 的单元测试用例
+149.4) compile: 重新在SUNOS-X86上编译通过
+
+148) 2008.7.30
+148.1) samples: 整理了一下 samples/master/ 下的几个例子，以便于使用
+
+147) 2008.7.23
+147.1) samples: 增加并完善了带WIN32界面的 FileDir 例子，该例子即可以统计目录，
+又可以测试AVL树(移植于 OpenSolaris)
+
+146) 2008.7.19
+146.1) feature: acl_scan_dir 模块更加完善化，增加了许多有用的接口，可以方便
+地设置回调，还可以方便数据统计
+146.1) samples: FileDir(win32) 扫描目录的程序，类似于WIN32的统计目录程序
+
+145) 2008.7.17
+145.1) feature: proctl 模块增加了服务子进程退出时的回调函数及回调参数功能
+145.2) feature: acl_scan_dir 模块增加了 acl_scan_stat() 函数，可以非常
+方便地(象标准的 stat 函数一样)取得当前所扫描的文件或目录的属性信息
+
+144) 2008.7.15
+144.1) feature: proctl/ 增加了在WIN32平台进行父子进程控制的模块，支持
+启动、停止（某个服务或所有服务）、退出、列表、探测功能
+144.2) feature: 完善了WIN32平台下文件锁的功能
+144.3) msg/acl_aqueue.c: acl_aqueue_pop_timedwait() 的时间参数允许均为0
+的情形，以前的做法是如果全为0则无限期等待直至出错或等待某个条件正常返回，
+现在可以当队列里无数据时立即返回
+144.4) compile: 重新在 VC2003, CB++, GCC 下编译通过
+
+143) 2008.7.4
+143.1) feature: 增加了 engine/acl_timer.c, 该库实现了定时任务的管理功能
+
+142) 2008.6.30
+142.1) 增加了二叉树的算法(DEBUG版本): acl_btree.c
+142.2) 增加了WIN32平台下的文件锁机制: acl_myflock.c
+142.3) acl_vstream.c: 增加了 acl_file_ftruncate(), acl_file_truncate()
+
+141) 2008.6.25
+141.1) acl_vstring.c: 增加了 acl_vstring_memchr，acl_vstring_strcasestr，
+acl_vstring_strstr，acl_vstring_insert，acl_vstring_prepend，
+acl_vstring_sprintf_prepend 函数
+141.2) samples: 增加了 vstring 测试函数
+
+140) 2008.6.23
+140.1) acl_vstream.c: 针对WIN32平台，因为API不支持APPEND模式，所以在
+ACL_VSTREAM 结构中增加了一个标志位，用于当用户设置O_APPEND后可以保证
+在写时在文件结尾处写(调用__vstream_sys_write时)(但目前还不完全遵守规范
+--加锁移至文件尾)
+
+139) 2008.6.18
+139.1) acl_mystring.c: 增加了 strcasestr
+
+138) 2008.6.17
+138.1) acl_fifo.c/acl_fifo.h: 增加了 iterator 功能
+138.2) samples: 测试 ACL_FIFO 的例子
+
+137) 2008.6.4
+137.1) 在64位Redhat Linux编译通过
+137.2) 调整了VC下的工程文件
+
+136) 2008.6.3
+136.1) acl_mymalloc.h, acl_mymalloc.h: 增加了方便调试的接口, 将函数
+调用统一修改为宏调用，这样可以方便查出调用者真实的文件位置
+136.2) master/, ioctl/: 增加了线程初始化回调函数及线程退出回调函数，
+master/template/acl_ioctl_server.c: 模板增加了线程初始化及线程退出
+的回调函数; samples/master/ioctl_echo/app_main.c(.h) 也增加了线程
+初始化及线程退出的回调函数
+136.3) unit_test: stdlib/test_malloc.c, 测试内存分配时如果参数有误
+能否打印出调用者所在的源程序位置
+
+135) 2008.5.29
+135.1) acl_make_dirs.c: 完全支持WIN32平台下创建各级目录
+
+134) 2008.5.5
+134.1) feature: 针对 master 框架，将读取配置项的功能移至公用接口，这样
+应用可以比较方便地读取自己的数据
+134.2) bugfix: acl_inet_listen() 当监听一个已经被监听的地址时，日志记
+录不下来，原因是在 bind() 后的日志记录语句中的各个参数的顺序不对
+
+133) 2008.4.30
+133.1) bugfix: db/memdb/acl_mdt.c 中的 acl_mdt_delete() 函数有一处BUG，
+不能正确删除相关联的数据项
+
+132) 2008.4.29
+132.1) feature: db/memdb, 增加了 acl_mdt_list 接口可以顺序列出某个范围
+的结果集; acl_mdt_walk 增加了范围遍历参数
+
+131) 2008.4.28
+131.1) bugfix: stdlib/acl_vstream.c, acl_vstream_probe_status() 在UNIX
+环境下没有将套接口设置为非阻塞模式，所以会导致调用该函数的调用阻塞，因
+为 db/null/ 连接池的缺省探测连接的方式调用了此函数，所以导致了阻塞现象
+131.2) feature: db/ (数据库)连接池模块允许用户自己设置自己的探测模块
+131.3) feature: db/ 增加手工强制检查连接池连接的函数
+
+130) 2008.4.24-4.25
+130.1) performance: master 框架中的针对多线程的服务器框架做了优化，避免
+了在多线程事件循环的情况下的延迟现象; 所改动的与之相关的模块有
+engine/, ioctl/, master/template/acl_ioctl_server.c
+130.2) feature: stdlib/common，增加了一个新的CRC64的算法，由郭朝辉根据
+相关资料进行修改提供
+
+129) 2008.4.23
+129.1) feature: db/memdb，增加了探测某个字段值是否存在于数据表中的函数
+
+128) 2008.4.21
+128.1) 在BORLAND CBuilter6 上编译通过
+128.2) db/memdb: 整理了相关接口，使调用更方便，效率更高
+128.3) bugfix: acl_vstream.c 中对 wbuf_size 的初始赋值有误，误取为
+sizeof(stream->wbuf_size) - 1，应该为 sizeof(stream->wbuf)，因为此错误
+会大大降低 acl_vstream_buffed_writen 的效率，当连续写很少字节时，因为
+系统默认采用 TCP_NODELAY，所以还可能会造成延迟!
+128.4) bugfix: db/ 连接池有几次错误，进行了修改
+
+127) 2008.4.19
+127.1) bugfix: acl_sys_patch.c 中的 acl_file_open 在WIN32下的实现有些
+问题，重新进行了修正 
+
+126) 2008.4.17
+126.1) bugfix: acl_vstream_fileno, ACL_VSTREAM_FILENO 两个调用存在问题,
+因为之前将 ACL_VSTREAM 的中的句柄针对套接字及文件句柄做了区分, 而这两
+个宏没有进行区分, 现在已经根据 stream->type 的类型进行了区分, 现在分别
+用 ACL_VSTREAM_SOCK, ACL_VSTREAM_FILE 两个宏来取得套接字或文件句柄
+126.2) stdlib/acl_vstream.c: 重新整理了数据流通信库
+
+125) 2008.4.16
+125.1) db/memdb: 将内存数据库的内部使用的ACL_RING修改为自身单独使用
+的 MDB_RING, MDB_RING 中比 ACL_RING 减少两个字段从而减少了内存的占用;
+增加了内存检测机制；增加了索引字段的约束性添加功能
+
+124) 2008.4.15
+124.1) examples: 增加一个小工具，可以将源程序的格式转换成:
+UNIX, DOS, MAC 三种格式
+124.2) 用上述小工具将 acl 工程统一转换成UNIX的文件格式
+
+123) 2008.4.9
+123.1) db/null, 利用数据库连接池框架增加了TCP连接池库
+
+122) 2008.4.3
+122.1) 修改了内存数据库，增加了数据结点的克隆功能, 即对于用查询
+结果生成一个结果集时调用用户设置的回调函数，避免了线程不安全隐患
+
+121) 2008.4.2
+121.2) acl_define_linux.h: 当用 g++
+编译时，_GNU_SOURCE会被自动定义，则出现重复定义 _LARGEFILE64_SOURCE
+
+120) 2008.3.29-4.1
+120.1) 重新设计了内存数据库模块(db/memdb/)，支持更方便的哈希关系查询与添加
+删除，去掉了可能会影响性能的动态数组部分，改用双向链表方式，从而避免了数据
+结点的移动；编写了测试用例 samples/memdb/
+该内存数据库模块的特点：
+1、对同一数据采用不同的关键字段进行索引
+2、支持多个数据库句柄，多个数据表句柄
+3、添加、查询、删除都是采用哈希定位方式
+4、大量采用双向链表，取代动态数组，以提高删除、添加时的性能
+5、将影响内存空间的数据结构对象尽量压缩至最小(还有些需要优化压缩的地方)
+
+119) 2008.3.27
+119.1) compiling: 在LINUX编译通过
+
+118) 2008.3.25
+118.1) bugfix: 在 acl_aio_xxx 中，因为异步读写可能会被嵌套调用，这样有可能
+会返回 -1 的值，从而使调用这些函数的应用如：http_chat_async.c 的读误以为出
+了错，现在统一将 acl_aio_read, acl_aio_readn, acl_aio_gets, acl_aio_gets_nonl,
+acl_aio_writen, acl_aio_vfprintf, acl_aio_fprintf等函数的返回值为 >=0，调用
+这些函数的过程不应从这些返回值中判断是否读写成功，而应从回调函数中进行判断，
+因为异步读写过程都是异步的，为了避免引起混乱，现已经将这些函数的返回值为 void
+
+117) 2008.3.20
+117.1) 将新版本在LINUX下编译通过
+在Linux下，需要在Makefile文件的编译选项中添加 -Wno-long-long 从而支持
+long long 类型
+
+116) 2008.3.19
+116.1) feature: 增加了对64位系统的一些支持，同时支持在32位系统上模拟64位的一些
+特征，修改的相关文件有：
+acl_define_linux.h, acl_define_win32.h, acl_mystring.h, acl_sys_patch.h,
+acl_vstream.h, acl_define.h, acl_dlink.h, acl_msg.c, squid_allocator_tools.c,
+acl_sys_patch.c, acl_vstream.c, acl_dlink.c, acl_mystring.c, acl_vstream_net.c,
+116.2) feature: 在WIN32平台下，对文件的操作直接用WIN32的API，从而支持大文件的
+读写等操作；支持LINUX平台下大文件的操作, 需要在 acl_define_linux.h 中提前定义
+# define _LARGEFILE64_SOURCE
+# define _FILE_OFFSET_BITS 64
+在 acl_vstream.c 中打开文件时需要指定 O_LARGEFILE 打开参数
+116.3) comment: acl_mystring.h 增加了比较详细的头文件中函数接口注释
+116.4) 内部使用 snprintf 函数时使用系统默认的 snprintf, 在WIN32平台下是 _snprintf
+
+115) 2008.2.20
+115.1) bugfix: acl_dlink.c, acl_iplink.c, 之前针对 begin = 0 时不能进行插入操作
+
+114) 2008.2.19
+114.1) performance: acl_vstream.c 中，之前未启用读字符加速宏定义
+
+113) 2008.2.3
+113.1) feature: 增加了类似于 squid 的分级记录日志的函数库 acl_debug.c/acl_debug.h
+113.2) 将 acl_argv_split.h 去掉，其中的函数声明合并至 acl_argv.h 中
+
+112) 2008.2.2
+112.1) feature: 重新整理了 acl_iplink 库，将其修改为 acl_dlink 从而使二分块查找算法
+更加通用，将来 acl_iplink 将从 acl_dlink 中继承
+
+111) 2008.1.29
+111.1) vc 工程文件修改: 将 debug 类的库的名后添加 _d, 如 lib_acl.lib 的 debug 版本名
+为 lib_acl_d.lib，以下是各个版本的DEBUG版本名称:
+lib_acl_d.lib, lib_acl_mysql_d.lib, lib_protocol_d.lib
+以下是RELEASE版本名称:
+lib_acl.lib, lib_acl_mysql.lib, lib_protocol.lib
+
+110) 2008.1.24
+110.1) Bugfix: acl_ring.c, 在 acl_ring_append(), acl_ring_prepend() 两个函数中,
+新插入结点的 parent 不应是 ring, 即 entry->parent 不应是 ring, 而 应是 ring->parent,
+这样才能保证所有结点的 parent 都指向同一个 ring header, 否则会造成内存非法越界问题,
+该问题是在反复测试 unix_trigger.c 的功能时候检测出来的, 因为在测试触电发器的问题时，
+发现如果启用 unix_trigger.c 中的 __USE_TIMER, 则当触发器的触发时间小于每个用于触发器
+的套接口的超时时间时会发生内存越界问题, 用系统工具 valgrind 测试非常容易发现此问题,
+为了找出此问题，花费了许多时间，也走了很多弯路，如今，一个偶然的现象才使本人发现问题
+的本质不在于触发器，而在于 acl_ring.c 中对 parent 对象的引用存在问题。呵呵，好难发现
+的BUG，valgrind is very good!
+
+109) 2008.1.16
+109.1) acl_vstream.c: 全程跟踪某个套接口的总写入字节数及总读出字节数
+109.2) acl_vstream.c: acl_vstream_xxx_ready 类型的函数进行了整理，使逻辑更清晰
+109.3) acl_aio_read.c: 增加了针对非阻塞错误号 ACL_EWOULDBLOCK, ACL_EAGAIN 的处理
+109.4) acl_aio_read.c: 整理函数，使逻辑更清晰
+109.5) acl_aio.c: acl_aio_open() 中强制将套接字转为非阻塞模式
+109.6) acl_inet_listen.c: 增加了延迟接收的功能(TCP_DEFER_ACCEPT)，默认的延迟 accept
+时间为30秒。
+
+108) 2008.1.15
+108.1) acl_dbpool_mysql.c: 一些日志的记录增加了开关设置，即可通过 acl_msg_verbose控制
+
+107) 2008.1.10
+107.1) acl_netdb_cache.c: DNS缓存链表的顺序有问题，进行了修复。
+
+106) 2008.1.9
+106.1) acl_htable.c: acl_htable_enter, acl_htable_enter_r 中针对添加重复KEY时增加了
+日志警告，用户不应添加重复KEY，否则将会导致内存泄漏现象。
+
+105) 2008.1.8
+105.1) bugfix: acl_http_header.c->__add_request_item，__add_cookie_item，中对变量对
+的存储原来未处理重复变量名的情况，会导致内存泄漏，不过该HTTP库将来将被从基础的ACL库
+中去掉，并且该部分函数除了BUG修复外不再做升级，另一个项目：lib_protocol 将提供更加
+好的针对各种协议处理的解决方案。
+
+104) 2008.1.7
+104.1) 重新整理了 acl_define.h 文件，将与WIN32相关的定义归为一个单独的文件
+acl_define_win32.h，这样 acl_define.h 就比较清晰了。
+注：由于VC在 extern“C++”方面的限制，会导致编译器出现如下致命错误：
+"fatal error C1045: 编译器限制 : 链接规范嵌套太深"
+因此，在整理 acl_define_xxx.h 文件时，将 extern "C" 从这些类文件去掉了。
+但GCC与BC++却没有这方面的问题，呵呵。不过BC++也有比较弱的地方，在编译库的时候，
+必须保证工程的：option->Tlib->Page size 选项为 0x0020，否则如果该值为 0x0010则
+BC++也会报一个比较弱的编译错误，如下：
+[TLib Error] library too large, please restart with library page size 32
+104.2) lib_acl/Makefile, Makefile.mysql: 增加了对MYSQL的编译支持
+104.3) dist: 增加了一个专门针对 acl_master 服务器框架的安装包.
+
+103) 2008.1.5
+103.1) acl_aio.c: 增加了从异步流中提取异步框架句柄的函数: acl_aio_handle();
+103.2) acl_aio_server.c: 增加了acl_aio_server_handle()函数，方便应用在函数自己
+的post_init()函数中直接通过此函数提取异步框架句柄。
+103.2) acl_aio_server.c: bugfix, 当 acl_master 退出时基于该模板的子进程不退出，
+这是与异步流的关闭相关。
+
+102) 2007.12.30
+102.1) acl_aio_read.c: 修复了几处错误
+102.2) acl_vstream.c: 为 acl_aio_ 异步库提供了更方便的接口
+102.3) unix_trigger.c, inet_trigger.c, stream_trigger.c: 可能 events_proc.c 的
+定时器与IO事件存在冲突，所以暂时修改了这三个程序，将超时事件的定时器去掉，而是
+直接由IO的超时来处理。
+
+101) 2007.12.25
+101.1) master_status.c: master_status_event 函数中将acl_vstream_readn修改为read
+101.2) acl_aio.c: 在所有的调用timeo_fn()前用增加引用计数的方法来防止流被提前异常关闭
+101.3) acl_aio.c: 将流关闭的标记位 closing 统一用 nrefer 来代替
+101.4) acl_aio.c: 因为该文件太大了，所以进行了分割，分成几个小模块文件
+
+100) 2007.12.16
+100.1) db/acl_dbsql.c, mysql/acl_dbmysql.c: 回调函数的参数my_row 对应于MYSQL_ROW
+声明为 const void**, 原来声明为 const void*, 在GCC下编译时报错
+100.2) msg/acl_aqueue.c, acl_aqueue_pop_timedwait 的等待时间做一处理，因为UNIX
+与WIN32有不同。
+100.3) protocol/, 因为声明的HTTP_STATUS_状态宏与VC的冲突，所以修改HTTP_STATUS_
+为HTTP_CHAT_。
+
+99) 2007.12.13
+99.1) db/acl_dbpool.c: acl_dbpool_destroy函数有一处BUG，在调用子类的销毁函数
+后不应再次重复释放同一块内存。
+
+98) 2007.12.7
+98.1) acl_define.h: 增加了 acl_unused 宏定义，方便应用避免一些编译时的警告
+
+97) 2007.11.6
+97.1) aio/acl_aio.c: 防止遗漏描述符未被关闭现象，所有重要函数回调返回处
+都需要判断是不是处于IO完成延迟状态
+97.2) aio/acl_aio.c: 增加了许多有用的注释说明，以使该复杂的异步库更加
+容易理解，因为该库的设计确实比较复杂
+97.3) feature: acl_netdb.c, 添加了一个方便生成 ACL_DNS_DB 的函数
+acl_netdb_addip
+
+96) 2007.11.5
+96.1) aio/acl_aio.c: 保证非阻塞式写失败错误号的处理正确且兼容各平台
+96.2) 整理了所有的 errno, 将其转换为 acl_last_error(), 将 strerror()
+转换为 acl_last_strerror()，从而保证平台的移植性
+
+96) 2007.11.3
+96.1) net/listen/acl_inet_listen.c: acl_inet_listen():
+if (nport <= 0) --> if (nport < 0), 因为acl_msgio_listen传递过来的地址为
+"127.0.0.1:0" 的格式，目的是让操作系统自动分配监听端口号
+
+95) 2007.11.2
+95.1) 修改了 protocol/ 下的部分函数
+
+94) 2007.11.28--11.30
+94.1) 整理 master/ 模块
+94.2) 费好大劲才找出 acl_master 无法在 AS3.0 上正常运行的原因: 不能在
+acl_define.h 中定义 HAS_DUPLEX_PIPE, 否则会导致
+master/framework/master_status.c 中的 acl_master_status_init() 函数在
+调用 stdlib/iostuff/acl_duplex_pipe.c 中的 acl_duplex_pipe() 函数时自动
+岂用 pipe() 模式.
+
+93) 2007.11.27
+93.1) 整理了一下各个模块的位置
+93.2) 对LINUX及WINDOWS的兼容性做调整
+
+92) 2007.11.26
+92.1) stdlib/acl_msg.c, acl_mylog.c: 记录了日期, 进程号与线程号
+
+91) 2007.11.25
+91.1) db: 将数据库模块进行了整理
+91.2) thread: 当在WIN32下与MYSQL进行整合时, pthread_xxx 的命名与MYSQL的库
+冲突, 所以将 thread/ 下的 pthread_xxx 重新命名为 acl_pthread_xxx
+
+90) 2007.11.23
+90.1) portable: 经过长期努力, 终于将WINDOWS版本的ACL与UNIX版本的ACL合并了:)
+
+89) 2007.11.11--11.12
+89.1) feature: add the trigger framework to acl_master.
+89.2) example: samples/master/trigger/, add one example for trigger
+
+88) 2007.9.11
+88.1) example: samples/http_probe, 增加了一个用于探测HTTP服务器状态的例子
+
+87) 2007.9.10
+87.1) bugfix: spool/acl_spool.c, 在创建池的时候对参数的判断问题进行修复.
+87.2) bugfix: proto/http/http_chat.c, 对HTTP协议的接收处理过程问题进行修复.
+
+86) 2007.8.30
+86.1) performance: master/acl_master_listen.c: 监听套接口的监听队列依赖于
+main.cf 中的 default_process_limit 值, 当此值比较小时会导致监听套接口的监听
+队列也比较小, 从而严重影响了 accept() 的性能, 通过在 acl_master_listen.c 
+中限制最小的监听队列来保证 accept() 性能.
+87.2) bugfix: master/acl_aio_server.c->aio_server_wakeup() 中的 acl_vstream_fdopen
+中的读写超时时间应该为 0, 因为在非阻塞模式下套接口的读写超时时间由事件循环
+机制进行控制, 如果此值大于0, 则在 stdlib/acl_vstream.c 中进行真正的IO读时
+会有一个多余的 select() 系统调用, 这将会影响非阻塞模式的IO性能.
+
+85) 2007.8.26
+85.1) feature: 增加了 /dev/poll for solaris.
+85.2) 进一步完善了 engine/ 的事件接口, 隐藏了一些底层的内部接口, 使调用者
+更加方便地使用事件接口(engine/events_define.h 中打开 ACL_EVENTS_KERNEL 的
+定义, 便可以在 solaris 中使用 /dev/oll 或在 Linux Kernel2.6 以上版本中使用
+epoll).
+
+84) 2007.8.23
+84.1) portable: rebuilt on solaris.
+
+83) 2007.8.22
+83.1) feature: 增加了日志记录的注册函数功能, 可以外挂第三方的日志记录函数库,
+stdlib/acl_msg.c, acl_msg.h; 例子参见 samples/master/spool_server/app_log.c.
+
+82) 2007.8.21
+82.1) 完善了 acl_aio_server.c 框架模板
+82.1) performance: master/acl_spool_server.c
+82.3) bugfix: engine/events_thr.c, events_proc.c 中关于定时器的错误修复
+
+81) 2007.8.19
+81.1) bugfix: engine/events_proc.c, 为了 master/ 的需要, 修改了 events_proc.c,
+及 events_thr.c 中的 events_disable_readwrite() 允许空操作.
+81.2) experiment: master/acl_aio_server.c, acl_aio_params.h, 增加了非阻塞库到
+master/ 服务框架模型中.
+
+80) 2007.8.14
+80.1) 重新调整了 engine/ 下的架构, 对于流的定位与查询不再基于数组定位模式, 以
+便于将来移植至 MS Windows 时操作更加方便同时并不会造成性能下降.
+80.2) 修改的相关文件: acl_events.c, events_proc.c, events_thr.c, acl_event.h
+80.3) 新增的文件: events_fdtable.c, events_fdtable.h
+80.4) tagged as milestone
+
+79) 2007.8.11
+79.1) portable: 成功将 acl 库移植至 Sun Solaris11 for x86.
+79.2) bugfix: acl_vstream.c, event_thr.c, 修改了有关异步读的错误
+
+78) 2007.8.8
+78.1) performance: acl_spool.c, acl_vstream.h/acl_vstream.c: 通过在 ACL_VSTREAM
+中添加 acl_spool.c 中的内部临时变量(ACL_SPOOL_CTX), 减少了 acl_spool_xxx 的每次
+调用过程中的分配与释放内存的次数. (与 acl_aio.c 中的做法类似)
+78.2) framework: samples/master/spool_server/, app_main.c/app_main.h, 进一步抽象
+了框架接口的调用模式, 以便于用户更加方便地使用.
+
+77) 2007.8.7
+77.1) bugfix: engine/event_proc.c
+
+76) 2007.7.17
+76.1) bugfix: acl_aio.c->acl_aio_connect() 中未预分配 data_buf 的内存空间
+76.2) add on sample: 增加了一个用于高并发测试WEB服务器的例子(samples/http_auto),
+该例子可以与WEB服务器一直保持高并发的连接, 如果连接断了会重新建立连接并发送
+连接请求.
+
+75) 2007.7.12
+75.1) performance: 一定程度上提高了 acl_aio.c 中异步读的性能
+
+74) 2007.7.11
+74.1) feature: 增加了针对 Linux2.6 的 epoll 的支持
+74.2) performance: 大大提高了异步IO的性能(acl_aio.c, acl_vstream.c)
+74.3) example: 针对HTTP服务器(webstar)做性能压力测试, 可以达到450Mbits/s,
+12500 request/sec. (./ab -n 1000000 -c 5000 -k http://ip:8080/postfix/)
+
+73) 2007.6.7
+73.1) feature: acl_spool.c/acl_spool.h, acl_aio.c/acl_aio.h, 增加了异步
+处理函数库的单线程版本, 发现单线程版本的处理能力大约是多线程版本处理能力
+的1.5倍左右(原因可能是操作系统的线程调试开销及其它锁机制), 测试程序参见:
+sample/aio/. 单线程版本: 41002 次/秒; 多线程版本: 26549 次/秒.
+
+72) 2007.5.29
+72.1) bugfix: acl_htable.c/acl_htable.h, 里面在处理多线程加锁处理机制有
+问题, 现在已经由新的接口函数替代了
+
+71) 2007.5.27
+70.1) acl_htable.c/acl_htable.h: 增加了哈希函数的注册功能及线程安全特性
+70.2) 增加了哈希算法函数集于 acl_hash.c, acl_hash.h 中
+
+70) 2007.5.21
+70.1) acl_dbpool.c, acl_dbpool.h: 增加了事务自动提交的可配置功能及检测功能
+
+69) 2007.5.20
+69.1) acl_spool.c, acl_workq.c: 进一步抽象与完善了任务池的函数接口
+
+68) 2007.5.11
+68.1) feature: spool/acl_spool.c, acl_spool.h 增加了任务添加函数接口
+68.2) engine/acl_event.c acl_event.h, event_thr.c, event_proc.c: 修改了内部的
+流程, 更进一步抽象, 同时使 acl_event_request_timer/acl_event_cancel_timer 具备
+多线程工作特性.
+
+67) 2007.5.7
+67.1) bugfix: aio/acl_aio.c: acl_aio_read() 中传递的已读数据长度有误.
+
+66) 2007.4.16
+66.1) 注释: aio/acl_aio.h 头文件里增加了使用注释
+
+65) 2007.4.14--4.15
+65.1) feature: 整理 http/ 协议库...
+
+65) 2007.4.11
+65.1) bugfix: aio/acl_aio.c, acl_aio_readn() 的回调函数里有一处漏内存错误.
+64.2) feature: 整理 http/ 协议库...
+
+64) 2007.4.10
+64.1) feature: 整理 http/ 协议库...
+
+63) 2007.4.9
+63.1) feature: aio/acl_aio.c, stdlib/acl_vstream.c, 增加了异步读N个字节的函数.
+63.1) feature: 开始整理 proto/http/ 协议库...
+
+62) 2007.4.8
+62.1) bugfix: engine/events_thr.c, 去掉了 select() 之后对超时的设定.
+62.2) util/aio/: 修改了函数接口的定义方式, 使接口调用方式更加清晰.
+
+61) 2007.4.7
+61.1) 检验异步AIO的内存泄漏情况, 发布异步包含异步IO的库(util/aio/).
+61.2) 提供异步IO的例子: samples/aio/.
+
+60) 2007.4.6
+60.1) 修定了 master/acl_master_ent.c 中的一处BUG: acl_free_master_ent() 函数中
+acl_array_destroy() 的调用应在 acl_myfree((char *) serv) 之前.
+
+59) 2007.4.5
+59.1) 增加了 aio/ 用于异步IO操作, net/acl_vstream_aync.c 将被丢弃
+
+58) 2007.4.1
+58.1) 增加了 master/acl_spool_server.c, 该服务框架基于 spool/acl_spool.c
+58.2) 调整了 engine/event_thr.c 中针对 timer 在 event_loop() 的调用关系, 使监听描述符的处理
+直接在主循环里进行, 从而缓解了多程模式中 select() 调用中时间值的影响
+
+57) 2007.3.25
+57.1) 增了数据库连接池的状态记录日志: util/spool/mysql/acl_dbpool_mysql.c
+57.2) 将与 mysql 相关的头文件建立连接实现动态编译: depends/
+57.3) bugfix: 修改了几处与编译相关的错误
+
+56) 2007.3.24
+56.1) feature: 增加了服务器应用框架及数据库连接池框架 spool/.
+56.2) example: 增加了针对 master/listener_server 的例子.
+56.3) performance: 修改了 event_thr.c->event_loop() 的事件触发策略, 减少了线程锁的冲突.
+
+55) 2007.2.15
+55.1) master/, net/ 经过初步测试已经可以用了:)
+55.2) 将 app/master/ 归并到 samples/ 下.
+
+54) 2007.2.14
+54.1) feature: stdlib/acl_vstream.c, stdlib/acl_vstream.h, 增加了 acl_vstream_fprintf,
+acl_vstream_vfprintf 两个函数, 大大方便了使用者进行数据流的带格式写操作.
+
+53) 2007.2.13
+53.1) 对 master/, trigger/, net/ 目录下的一些文件名及函数名重新按 acl/ACL 的命名规范进行了整理
+注: 这部分代码仅能编译通过, 还未充分进行测试.
+
+52) 2007.2.3--2.4
+52) unit_test: 进行了重大调整, 使其更易用
+52.1) 命名规范进行了统一: 函数名前加 aut_, 类型前加 AUT_
+52.2) 调整了循环过程的调用方法, 使代码更加清晰.
+
+51) 2007.1.27
+51.1) feature: 增加并完善了 listener_server.c/listener_params.h, 该模块做为 master 半驻留进程池模块的补充,
+增加了另外一种服务器模型, 该模型仅用于套接口监听, 可以与线程池的服务器模型很好的结合在一起, 即现在已经可以
+支持半驻留式的多进程多线程服务器模型; 同时该模型还可用于接收一个请求 fork 一个进程的模式。
+51.2) bugfix: event_proc.c/event_thr.c event_XXX_loop 的事件循环中针对 timer 操作的错误.
+
+50)2006.10.20
+50.1) app/squid/analog: 增加了一个日志分析程序。
+
+49)2006.8.29
+49.1) util/net/acl_vstream_async.c: 修订了一处BUG, 以避免造成内存冲突。
+49.2) util/stdlib: acl_mymalloc.c, acl_mymalloc.h, 增加了为了调试内存分配与释放的宏调用(通过在 acl_mymalloc.h
+中将宏定义: #define DEBUG_FREE 开关打开即可)。
+
+48) 2006.8.28
+48.1) util/stdlib/acl_vstream.c: 增加了acl_vstream_gets_ready()/acl_vstream_gets_nonl_ready(), 使异步通信
+操作更加方便, 并且使之与阻塞式方式读缓冲紧密结合在一起, 即：对于一个ACL_VSTREAM 可以同时对其进行同步、异步
+读操作。
+48.2) util/net: acl_vstream_async.c/acl_vstream_async.h, 因为 acl_vstream.c 从更底层提供了接口，所以该异步
+函数集的操作更加简化了，抛弃了原来异步读行的模式，而采用新的异步读行的模式。
+
+47) 2006.8.25
+47.1) util/net: acl_vstream_async.c/acl_vstream_async.h, 修改了一处BUG, 内容见 acl_vstream_async.h 中所述.
+
+46 ) 2006.8.11
+46.1) util/servtmpl: acl_workq.c/acl_workq.h, 增加了有关连接池功能的调用
+
+45) 2006.7.28
+45.1) util/code/, 增加了BASE64编码的两个实现方法
+
+44) 2006.7.27
+44.1) util/engine/acl_event.c, 增加了参数入口的判断
+44.2) util/master/master_conf.c, 增加服务数量的检查
+
+43) 2006.7.24
+43.1) app/weboe/: 避免了内存泄漏的问题, 并且经过了大规模长时间的压力测试及其它的破坏性测试, 说明非阻塞
+式框架库基本稳定了.
+
+42) 2006.7.23
+42.1) 性能优化与BUG修复, event_thr.c->event_thr_loop() 中锁的控制, 改变了 dipatch_fn() 的函数接口参数,
+从而避免了一些复杂的容易出错的释放操作, 并且减少了加锁次数.
+42.2) event_thr.c->event_thr_loop() 中又减少了某一种锁的冲突.
+
+41) 2006.7.11
+41.1) 调整了参数，使非阻塞服务器的性能得到大幅提高
+
+40) 2006.7.5
+40.1) Bugfix: acl_vstream_async.c->__handle_line_data() 中依然有一处错误, 现已经进行了修正
+
+39) 2006.7.3 night
+39.1) Feature: 通过修改 __handle_line_data(), acl_vstream_async_buf_new() 两个函数进一步提高了执行效率,
+减少了数据移动拷贝现象.
+39.2) Feature: 通过增加 acl_vstream_async_buf_new() 的参数列表及修改 __handle_line_data() 函数，增加了
+针对一行数据的长度的最大值限制, 从而进一步避免缓存区溢出问题.
+
+38) 2006.7.2
+38.1) Bugfix: 修改了异步通信库的一个错误, 发生于异步读一行的函数处理中: util/net/acl_vstream_async.c 中
+的  __handle_line_data() 函数.
+38.2) 将 util/stdlib/acl_vstream.c, .h 中的 acl_vstream_vstring_readn 改名为:acl_vstream_vstring_append_readn
+
+37) 2006.6.23
+Feature: 完善了异步通信的接口: util/stdlib/acl_vstream.c, util/engine/acl_events.c,
+util/net/acl_vstream_async.c. 在 ACL_VSTREMA 结构类型中增加了注销函数数组: close_handle_lnk, 以保证
+当数据流被关闭前先倒序调用各个已经在该数组中注册的析构函数; 在 ACL_EVENT 结构中增加了线程锁成员
+变量: lock_mutex, 对于处于线程事件的循环中该锁将起作用, 对于进程类型的事件循环该锁不起作用, 因为增加
+了该锁, 从而使 acl_vstream_async.c 中不在存在线程锁的调用, 而是将锁的调用移至 acl_events.c中.
+
+36) 2006.6.15
+Bugfix: 修订了有关域名解析部分线程不安全的函数: util/net/myaddinfo.c
+Bugfix: util/net/acl_vstream_net.c 中的acl_vstream_connect() 函数中在调用 acl_vstream_fdopen()
+时参数顺序有错误。
+
+35) 2006.6.13
+增加了探测程序: app/squid/probe
+
+34) 2006.6.8
+完善了线程库部分.
+Feature: 增加线程读写锁部分, util/ipc/acl_thread_rwlock.c, acl_thread_rwlock.h
+Feature: 将以前的内存DB放置该库中
+
+33) 2006.6.7
+Bugfix: 修订了有些函数在调用 acl_vstream_fdopen() 时的各个参数顺序的BUG!!!, 费了好大劲才找出此错误:(
+Test: 增加了两个测试线程池库的实例(app/thread_server/server2, server3)
+
+32) 2006.6.6
+写了一个用来测试线程库的实例(app/thread_server/server1)
+
+31) 2006.6.4
+为了避免函数的名字空间冲突，修改了大量的函数，将所有函数名及类型名前均增加 ACL_ 前缀，同时将
+源程序名前增加 acl_ 前缀。至此，本函数库的工作被定义为 acl_project 工程. ---zsx
+注： acl 是 advanced c library 的英文简写.
+     建议使用者尽是使用 ACL_ 开头的函数及类型，其它的函数及类型并不保证将来的兼容性。
+
+30) 2006.5.30
+Feature(debug status): 1) 增加了另一个线程池的库: servertmpl/workq.c, workq.h, worker.c, worker.h
+Name: 确定以后将本函数库命名为 : ACL(高级的 C 库)
+
+29) 2006.4.30
+Portable: 查询了所有的Makefile，将其中的所有的编译选项 -gdwarf 都换成 -g，以兼容新的
+编译器要求，折腾了俺一上午时间:(
+
+28) 2005.12.14
+Feature: 1) 提供了另外一个 vstream_fseek 函数, 该新函数的效率更高, 且把第一版本的 vstream_fseek
+重新命名为 vstream_fseek2. 另外加强了测试代码.
+
+27) 2005.12.13
+Feature: 1) 增加了 vstream_fseek 函数
+
+26) 2005.10.24
+Feature: 1) 增加了 util/stdlib/filedir/make_dirs.c 文件, 从而可以创建一级或多级目录
+
+25) 2005.10.8
+Bugfix: 1) 在 app/master/multi_proxy/multi_proxy.c 中, 在打开文件数据流时没有将文件指针移至文件
+的结尾, 故增加了 O_APPEND, 使每次打开文件数据流时都使文件指针指向文件的最后.
+Feature: 1) 在 app/master/master.c 中增加了写 master 进程的 pid 的功能, 这样可以使诸如 stop.sh
+之类的脚本来停止主控进程.
+
+24) 2005.9.27
+Feature: 1) 针对 multi_server.c 增加了记录信息的功能
+
+23) 2005.9.26
+Bugfix: 1) 修复了 __proc(thread)__event_loop() 中的一处错误, 即当 nowait != 0 时, 应该设置指针 tvp
+的值而不应设置其为空指针, 否则会导致后面的 select() 调用永远等待; 2) multi_server.c 中有一处错误,
+在一个 switch() 条件中缺少一个 break.
+Feature: 1) 修改了 multi_proxy.c 文件, 使其变得更加通用:)
+
+22) 2005.9.25
+Feature: 1) 针对 multi_server.c, 增加了读超时的处理功能, 这对于处理非阻塞模式的读超时非常　有价值.
+
+21) 2005.9.22
+Bugfix: 1) 通过边界测试(即设置缓冲区分别为2, 4, 4096, 8192)时, 发现代理服务器(multi_proxy)会有异
+常退出的问题, 经过仔细检查, 发现是服务框架事件处理函数(event.c)有问题, 即当外部函数通过调用函数
+event_disable_readwrite()来关闭永久可读写描述集时, 因为 ..._event_loop() 中所用的临时描述集未被清
+除, 这样就产生了不同步清理的问题, 从而造成调用 select() 时报严重的错误: 有非法的描述符存在于描述
+符集合中, 解决方法是在 EVENT 的结构中增加临时描述集, 用来代替 ..._event_loop() 中的局部描述集,
+所修改的文件主要有: event.c, event.h
+
+20) 2005.9.19
+Portable: 20.1) can run on HP-UX
+
+19) 2005.9.11
+Workaround: 19.1) 增加了使用 multi_server.c 框架的代理服务器, 19.2) 修补了 multi_server.c 中的几
+处 bug
+
+18) 2005.9.10
+Workaround: 18.1) 归整了一些变量的命名格式, 并去掉了一一些无用的变量
+
+17) 2005.9.9
+Bugfix: 17.1) 修改了 events.c 中的一处 bug
+Feature: 17.1) 增加了一个测试程序: single_proxy/
+
+16) 2005.9.6
+Workaround: 16.1) 移植到了 SUN 平台上, 并修改了几处
+
+15) 2005.9.5
+Feature: 15.1) 增加了 VSTREAM_STDIN, VSTREAM_STDOUT, VSTREAM_STDERR 三个标准的数据流
+
+14) 2005.9.4
+Workaround: 14.1) 使 multi_server() 服务框架可以正常使用了
+Bugfix: 14.1) 修复了 servtmpl/event.c 中的一个处 bug: 当有可用的描述字中流中有数据时, 则需要将
+select() 所需要的时间等待时间设置为 0.
+
+13) 2005.8.28
+Workaround: 13.1) 调整了一些程序的书写格式, 同时还明白了 throttle_delay 的真正含义: 即当子进程非
+法退出后, 父进程将停止相应的服务的时间间隔为 throttle_delay.
+
+12) 2005.8.27
+Workaround: 12.1) 基本调度成功　了 single_server 的服务框架模式:)
+
+11) 2005.8.24
+Workaround: 11.1) 修改了 events.c/.h, 使之支持进程池的模式, 在进程池模式下不需要检查描述符是否
+处于忙状态; 在线程池模式下需要检查描述符是否处于忙状态; 11.2) 继续完善 util/master/ 下的文件,
+基本实现了半驻留服务模式的运行.
+
+10) 2005.8.21
+Bugfix: 10.1) 修复了 xinetd_cfg.c 中的一处错误
+Feature: 10.1) 针对 xinetd_cfg.c/.h 增加了 xinetd_cfg_index(...) 函数
+Workaround: 10.1) 继续完善了 master/ 库函数
+
+9) 2005.8.15
+Workaround: 9.1) 终于使 master 可以运行了:) util/master/: master_vars.c, master_params.c,
+master_params.h, master_conf.c, master_service.c, master.h, master_ent.c, master_avail.c,
+master_sig.c, master_spawn.c, master_status.c,  master_wakeup.c
+
+8) 2005.8.14
+Workaround: 8.1) 将 master 编译成功:), app/master/: master.c
+
+7) 2005.8.9
+Bugfic: 7.1) 修补了一处可能会造成内存泄漏的错误, master_ent.c
+Workaround: 7.1) 整理了 master/ 目录下的文件, 仅剩余 mail_flow.c 等几个文件未整理.
+
+6) 2005.8.8
+Workaround: 6.1) 修改了目录结构, 在 stdlib/ 目录下建立了 proc_specific/ 目录, 该目录今后将存放
+仅在进程编程时才用的库函数, 这些库函数是线程不安全的; 6.2) 将测试 watchdog 库的程序移动到专门的
+测试程序目录下(test_util/watchdog/), 还有 test_util/inet/; 6.3) 修改了两个头文件(cgi-rep.h 及
+cgi-util.h), 在其中增加了针对 C++ 编译引用的支持.; 6.4) 继续完善 master 函数库 (master/)
+
+5) 2005.7.29
+Feature: 5.1) 增加了针对异读、异步连接、异步读行的读超时功能(这是微软的异步SOCKET里所不具备的).
+event.h, event.c, vstream_async.c, vstream_async.h, readline_async/, tcp_proxy/.
+
+4) 2005.7.25
+Feature: 4.1) 在 vstream.c 中, 增加了 vstream_vstring_readn(), 从而可以利用 vstring 的特性来拷贝
+数据; 4.2) 在 vstream_async.c 中增加了 vstream_async_gets(), 从而可以将获得一行作为事件通知条件,
+当缓冲区内有一行数据时才会通知应用程序, 即实现了读取行非阻塞的模式.
+Test: 4.1) 在 app/ 目录下增加了工程: readline_async/, 用于测试异步读取整行数据的库函数.
+
+3) 2005.7.18
+Workaround: 3.1) 修改了 vstream_net.c/h 文件, 将 vstream_listen2 修改为 vstream_listen_ex, 并增加
+了一个 block_mode 的参数, 从而使数据流完全遵守非阻塞模式; 3.2) vstream_async.c, 在 vstream_listen_ex
+中增加了 NON_BLOCKING 参数.
+
+2) 2005.7.10
+Workaround: 2.1) 重新改写了各个 Makefile 文件, 可以自动从环境变量中取得用 gcc 编译还是用 g++ 编译;
+2.2) 修改各个 .c 及 .h 文件, 消除了在用 g++ 编译时的错误与警告, 以使本函数库可以用方便地应用在一
+些 C++ 的程序中.
+
+1) 2005.7.9
+Bugfix: 修订了 servtmpl/events.c 中的两处 BUG, 1.1) event_enable_write() 及 event_enable_read()
+中增加了防止上一次操作中未将状态设置为空闲的隐患; 1.2) event_loop() 以前在最初设置描述符集合时没
+有将处于忙状态的描述符清除掉.

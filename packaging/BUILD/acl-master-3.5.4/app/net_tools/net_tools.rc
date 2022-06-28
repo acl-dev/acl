@@ -1,0 +1,336 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// 中文(中华人民共和国) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
+LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
+#pragma code_page(936)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+    "LANGUAGE 4, 2\r\n"
+    "#pragma code_page(936)\r\n"
+    "#include ""res\\net_tools.rc2""  // 非 Microsoft Visual C++ 编辑过的资源\r\n"
+    "#include ""afxres.rc""         // 标准组件\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "res\\net_tools.ico"
+IDI_ICON_MIN            ICON                    "res\\icon_min.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_ABOUTBOX DIALOGEX 0, 0, 235, 55
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "关于 net_tools"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    ICON            IDR_MAINFRAME,IDC_STATIC,11,17,20,20
+    LTEXT           "net_tools Version 1.0",IDC_STATIC,40,10,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2013",IDC_STATIC,40,25,119,8
+    DEFPUSHBUTTON   "确定",IDOK,178,7,50,16,WS_GROUP
+END
+
+IDD_NET_TOOLS_DIALOG DIALOGEX 0, 0, 461, 243
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+CAPTION "net_tools - 二六三企业通讯"
+FONT 9, "MS Shell Dlg", 0, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "打开DOS窗口",IDC_OPEN_DOS,317,211,52,16
+    EDITTEXT        IDC_IP_FILE_PATH,87,19,288,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "浏览",IDC_LOAD_IP,388,18,51,15
+    EDITTEXT        IDC_NPKT,87,37,28,15,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_DELAY,162,37,25,15,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_TIMEOUT,248,37,22,14,ES_AUTOHSCROLL | ES_NUMBER
+    EDITTEXT        IDC_PKT_SIZE,87,55,28,15,ES_AUTOHSCROLL | ES_NUMBER
+    PUSHBUTTON      "运行",IDC_PING,388,38,50,14
+    EDITTEXT        IDC_DOMAIN_FILE,102,91,271,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "浏览",IDC_LOAD_DOMAIN,386,91,51,15
+    CONTROL         "",IDC_DNS_IP,"SysIPAddress32",WS_TABSTOP,102,110,83,13
+    EDITTEXT        IDC_DNS_PORT,257,110,26,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "超时时间：",IDC_STATIC,290,112,37,12
+    PUSHBUTTON      "运行",IDC_NSLOOKUP,387,111,50,14
+    PUSHBUTTON      "退出",IDOK,384,211,52,16
+    GROUPBOX        "PING 测试",IDC_STATIC,26,7,414,68
+    GROUPBOX        "DNS 测试",IDC_STATIC,26,81,413,53
+    CONTROL         "IP 配置文件：",IDC_STATIC,"Static",SS_LEFTNOWORDWRAP | 
+                    WS_GROUP,37,21,47,14
+    LTEXT           "域名配置文件：",IDC_STATIC,46,93,53,14
+    LTEXT           "数据包数量：",IDC_STATIC,39,39,42,8
+    LTEXT           "时间间隔：",IDC_STATIC,126,39,34,14
+    LTEXT           "秒",IDC_STATIC,193,39,20,15
+    LTEXT           "超时时间：",IDC_STATIC,210,38,34,14
+    LTEXT           "秒",IDC_STATIC,276,39,20,15
+    LTEXT           "DNS 服务器地址：",IDC_STATIC,37,110,62,14
+    LTEXT           "DNS 服务器端口：",IDC_STATIC,193,111,60,14
+    EDITTEXT        IDC_LOOKUP_TIMEOUT,329,110,26,14,ES_AUTOHSCROLL | 
+                    ES_NUMBER
+    LTEXT           "秒",IDC_STATIC,363,113,14,14
+    LTEXT           "数据包大小：",IDC_STATIC,39,56,47,11
+    LTEXT           "字节",IDC_STATIC,127,57,20,15
+    PUSHBUTTON      "一键测试",IDC_TESTALL,191,211,48,16
+    PUSHBUTTON      "配置选项",IDC_OPTION,254,211,48,16
+    GROUPBOX        "邮件测试",IDC_STATIC,26,141,412,58
+    PUSHBUTTON      "发信测试",IDC_SEND_MAIL,384,153,52,14
+    LTEXT           "添加附件：",IDC_STATIC,47,155,38,14
+    EDITTEXT        IDC_FILE,88,153,216,15,ES_AUTOHSCROLL
+    PUSHBUTTON      "浏览",IDC_LOAD_FILE,319,153,51,15
+    PUSHBUTTON      "收信测试",IDC_RECV_MAIL,384,176,52,14
+    LTEXT           "收取邮件数量：",IDC_STATIC,33,178,53,11
+    EDITTEXT        IDC_RECV_LIMIT,88,177,43,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "封",IDC_STATIC,137,180,19,14
+    CONTROL         "接收所有邮件",IDC_RECV_ALL,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,162,179,57,10
+    CONTROL         "存储所有邮件",IDC_RECV_SAVE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,224,179,57,10
+END
+
+IDD_OPTION DIALOGEX 0, 0, 309, 337
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_CAPTION | WS_VSCROLL | WS_HSCROLL | WS_SYSMENU
+CAPTION "设置"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_RECIPIENTS,107,217,121,60,ES_MULTILINE | 
+                    ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | 
+                    WS_VSCROLL | WS_HSCROLL
+    PUSHBUTTON      "确定",IDOK,170,298,50,14,NOT WS_TABSTOP
+    PUSHBUTTON      "取消",IDCANCEL,225,297,50,14
+    GROUPBOX        "SMTP 发送服务器",IDC_STATIC,37,17,239,58
+    GROUPBOX        "帐号设置",IDC_STATIC,37,144,239,58
+    LTEXT           "服务器地址：",IDC_STATIC,50,33,52,14
+    EDITTEXT        IDC_SMTP_ADDR,108,32,121,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_SMTP_PORT,107,49,37,15,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "服务器端口：",IDC_STATIC,50,50,51,14
+    GROUPBOX        "POP3 接收服务器",IDC_STATIC,37,80,239,58
+    LTEXT           "服务器地址：",IDC_STATIC,49,96,52,14
+    EDITTEXT        IDC_POP3_ADDR,107,95,121,14,ES_AUTOHSCROLL
+    EDITTEXT        IDC_POP3_PORT,107,112,37,15,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "服务器端口：",IDC_STATIC,49,112,51,14
+    LTEXT           "邮箱帐号：",IDC_STATIC,57,161,42,14
+    EDITTEXT        IDC_USER_ACCOUNT,108,159,121,14,ES_AUTOHSCROLL
+    LTEXT           "邮箱密码：",IDC_STATIC,57,178,42,14
+    EDITTEXT        IDC_USER_PASSWD,107,176,121,14,ES_PASSWORD | 
+                    ES_AUTOHSCROLL
+    GROUPBOX        "收件人设置",IDC_STATIC,37,206,239,80
+    LTEXT           "接收者列表：",IDC_STATIC,48,224,51,14
+    LTEXT           "(多个接收者之间用分号分隔)",IDC_STATIC,48,237,51,19
+    LTEXT           "√",IDC_STATIC_SMTP_ADDR,237,33,32,15
+    LTEXT           "√",IDC_STATIC_PASS,236,177,32,15
+    LTEXT           "√",IDC_STATIC_POP3_ADDR,238,97,36,15
+    LTEXT           "√",IDC_STATIC_USER,236,161,32,15
+    LTEXT           "√",IDC_STATIC_RECIPIENTS,236,227,32,15
+END
+
+IDD_DIALOG_QUIT DIALOGEX 0, 0, 176, 89
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | 
+    WS_SYSMENU
+CAPTION "选择"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "确定",IDOK,119,56,50,14
+    CONTROL         "记住选择",IDC_CHECK_SAVE,"Button",BS_AUTOCHECKBOX | 
+                    WS_TABSTOP,26,57,56,10
+    CONTROL         "退出",IDC_QUIT_YES,"Button",BS_AUTORADIOBUTTON,25,34,28,
+                    12
+    CONTROL         "最小化",IDC_QUIT_NO,"Button",BS_AUTORADIOBUTTON,25,17,
+                    43,11
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 1,0,0,1
+ PRODUCTVERSION 1,0,0,1
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "080403a8"
+        BEGIN
+            VALUE "CompanyName", "TODO: <公司名>"
+            VALUE "FileDescription", "TODO: <文件说明>"
+            VALUE "FileVersion", "1.0.0.1"
+            VALUE "InternalName", "net_tools.exe"
+            VALUE "LegalCopyright", "TODO: (C) <公司名>。保留所有权利。"
+            VALUE "OriginalFilename", "net_tools.exe"
+            VALUE "ProductName", "TODO: <产品名>"
+            VALUE "ProductVersion", "1.0.0.1"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "翻译", 0x804, 936
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_ABOUTBOX, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 228
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 48
+    END
+
+    IDD_NET_TOOLS_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 453
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 236
+    END
+
+    IDD_OPTION, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 291
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 319
+    END
+
+    IDD_DIALOG_QUIT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 169
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 82
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// RT_MANIFEST
+//
+
+IDR_241                 RT_MANIFEST             "net_tools.manifest"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_MENU_ICON MENU 
+BEGIN
+    POPUP "托盘菜单"
+    BEGIN
+        MENUITEM "打开主面板",                  ID_OPEN_MAIN
+        MENUITEM "退出程序",                    ID_QUIT
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_ABOUTBOX            "关于 net_tools(&A)..."
+    IDP_SOCKETS_INIT_FAILED "Windows 套接字初始化失败。"
+END
+
+#endif    // 中文(中华人民共和国) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+LANGUAGE 4, 2
+#pragma code_page(936)
+#include "res\net_tools.rc2"  // 非 Microsoft Visual C++ 编辑过的资源
+#include "afxres.rc"         // 标准组件
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

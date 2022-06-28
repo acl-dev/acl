@@ -1,0 +1,12 @@
+GET http://photo.test.com/inc/global.js HTTP/1.1
+Host: photo.test.com
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 5.0; zh-CN; rv:1.8.1) Gecko/20061010 Firefox/2.0
+Accept: text/xml,application/xml,application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5
+Accept-Language: en-us,zh-cn;q=0.7,zh;q=0.3
+Accept-Encoding: gzip,deflate
+Accept-Charset: gb2312,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 300
+Proxy-Connection: keep-alive
+Cookie: ASP.NET_SessionId=ey5drq45lsomio55hoydzc45
+Cache-Control: max-age=0
+

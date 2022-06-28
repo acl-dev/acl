@@ -1,0 +1,8 @@
+# configure
+
+service http_cgi {
+	debug_mem = 0
+	logpath = {install_path}/var/log/cgi.log
+	cgi-bin = {install_path}/www/cgi-bin
+	cgi-map = /cgi-bin/hello {install_path}/www/cgi-bin/hello.cgi
+}

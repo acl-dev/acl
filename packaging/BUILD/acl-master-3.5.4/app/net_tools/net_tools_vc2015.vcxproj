@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>net_tools</ProjectName>
+    <ProjectGuid>{45276293-D169-4D73-8930-F255C09DA976}</ProjectGuid>
+    <Keyword>MFCProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>Dynamic</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>11.0.50727.1</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>Debug\</OutDir>
+    <IntDir>Debug\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>Release\</OutDir>
+    <IntDir>Release\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\..\lib_acl_cpp\include;..\..\lib_acl\include;..\..\lib_protocol\include;.;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_CRT_SECURE_NO_WARNINGS;SMTP_DLL;HTTP_DLL;ICMP_DLL;ACL_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0804</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>uxtheme.lib;polarssl.lib;Iphlpapi.lib;lib_acl_d.lib;lib_protocol_d.lib;lib_acl_cpp_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\dist\lib\win32;..\..\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libc;libcmt;libcmtd;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\dist\lib\win32\lib_acl_d.dll $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_protocol_d.dll $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_acl_cpp_d.dll $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_acl_d.pdb $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_protocol_d.pdb $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_acl_cpp_d.pdb $(OutDir)  /Y
+copy ..\..\lib_acl\lib_acl_d.map $(OutDir) /Y
+copy ..\..\lib_protocol\lib_protocol_d.map $(OutDir) /Y
+copy ..\..\lib_acl_cpp\lib_acl_cpp_d.map $(OutDir) /Y
+copy ..\..\lib\win32\zlib.dll $(OutDir) /Y
+copy ..\..\lib\win32\sqlite3.dll $(OutDir) /Y
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\lib_acl_cpp\include;..\..\lib_acl\include;..\..\lib_protocol\include;.;..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0804</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <AdditionalDependencies>uxtheme.lib;Iphlpapi.lib;lib_acl.lib;lib_protocol.lib;lib_acl_cpp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\lib\win32;..\..\dist\lib\win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libc;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <EnableUAC>false</EnableUAC>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy ..\..\dist\lib\win32\lib_acl.dll $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_protocol.dll $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_acl_cpp.dll $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_acl.pdb $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_protocol.pdb $(OutDir)  /Y
+copy ..\..\dist\lib\win32\lib_acl_cpp.pdb $(OutDir)  /Y
+copy ..\..\lib\win32\zlib.dll $(OutDir) /Y
+copy ..\..\lib\win32\sqlite3.dll $(OutDir) /Y
+</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="net_store.cpp" />
+    <ClCompile Include="net_tools.cpp" />
+    <ClCompile Include="net_toolsDlg.cpp" />
+    <ClCompile Include="NetOption.cpp" />
+    <ClCompile Include="OptionOnClose.cpp" />
+    <ClCompile Include="SingleCtrl.cpp" />
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="test_all.cpp" />
+    <ClCompile Include="rpc\rpc_manager.cpp" />
+    <ClCompile Include="ping\ping.cpp" />
+    <ClCompile Include="ping\ping_store.cpp" />
+    <ClCompile Include="dns\dns_store.cpp" />
+    <ClCompile Include="dns\nslookup.cpp" />
+    <ClCompile Include="ui\MeterBar.cpp" />
+    <ClCompile Include="ui\MeterCtrl.cpp" />
+    <ClCompile Include="ui\TrayIcon.cpp" />
+    <ClCompile Include="ui\WndResizer.cpp" />
+    <ClCompile Include="upload\upload.cpp" />
+    <ClCompile Include="global\global.cpp" />
+    <ClCompile Include="global\passwd_crypt.cpp" />
+    <ClCompile Include="global\util.cpp" />
+    <ClCompile Include="mail\mime_builder.cpp" />
+    <ClCompile Include="mail\pop3_client.cpp" />
+    <ClCompile Include="mail\pop3_store.cpp" />
+    <ClCompile Include="mail\smtp_client.cpp" />
+    <ClCompile Include="mail\smtp_store.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="net_store.h" />
+    <ClInclude Include="net_tools.h" />
+    <ClInclude Include="net_toolsDlg.h" />
+    <ClInclude Include="NetOption.h" />
+    <ClInclude Include="OptionOnClose.h" />
+    <ClInclude Include="Resource.h" />
+    <ClInclude Include="SingleCtrl.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="test_all.h" />
+    <ClInclude Include="rpc\rpc_manager.h" />
+    <ClInclude Include="ping\ping.h" />
+    <ClInclude Include="ping\ping_store.h" />
+    <ClInclude Include="dns\dns_store.h" />
+    <ClInclude Include="dns\nslookup.h" />
+    <ClInclude Include="ui\MeterBar.h" />
+    <ClInclude Include="ui\MeterCtrl.h" />
+    <ClInclude Include="ui\TrayIcon.h" />
+    <ClInclude Include="ui\WndResizer.h" />
+    <ClInclude Include="upload\upload.h" />
+    <ClInclude Include="global\global.h" />
+    <ClInclude Include="global\passwd_crypt.h" />
+    <ClInclude Include="global\util.h" />
+    <ClInclude Include="mail\mime_builder.hpp" />
+    <ClInclude Include="mail\pop3_client.h" />
+    <ClInclude Include="mail\pop3_store.h" />
+    <ClInclude Include="mail\smtp_client.h" />
+    <ClInclude Include="mail\smtp_store.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\bin242.bin" />
+    <None Include="res\net_tools.rc2" />
+    <None Include="res\rt_manif.bin" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\icon_min.ico" />
+    <Image Include="res\net_tools.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="net_tools.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="net_tools.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\lib_acl\lib_acl_vc2015.vcxproj">
+      <Project>{b40213c2-507c-4c7f-a6e1-b850c9bdc27b}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib_acl_cpp\lib_acl_cpp_vc2015.vcxproj">
+      <Project>{6ec1f44e-6a6a-48e9-b699-d7e89b63c8dc}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\lib_protocol\lib_protocol_vc2015.vcxproj">
+      <Project>{fe724ef7-3763-4e78-bdf5-bcbc075719fd}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="net_tools.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

@@ -1,0 +1,30 @@
+待解决的问题及待增加的功能列表：
+----------------------------------------------------------------------------------------------------
+
+1) acl_master 框架在切换子进程身份(使用 setuid)后，子进程如果出现错误无法产生 core 文件 --- 解决
+2) acl_trace.c, 当编译时打开 -O2, -O3 选项后无法知道确切的堆栈位置信息，看来 GNU 提供的
+backtrace 的相关函数还是不够完善
+3) acl_html_code.c, 编码部分还没有完全解析 html 所有的特殊字符，
+所以 acl_html_encode 只能对255以下的值进行编码
+4) 当事件引擎为 win32 消息引擎(ACL_EVENT_WMSG) 时，acl_aio_read.c，acl_aio_write.c 两个函数库暂不支持
+超时功能
+5) 在采用内存池后，由于 acl_ioctl_server.c 中的线程池是半驻留的，当某个线程退出时归属于它的内存池如果
+正在被其它线程引用而无法释放，需要在主线程中增加功能定期清理一些残留的未释放的内存池，所以不建议在使用
+acl_ioctl_server.c 的模板程序中采用内存池功能
+6) 应该将 xyssl 库引用进来，它要比 openssl 简单实用
+7) acl_pthread_tls_get 函数有一个线程冲突的BUG，其它调用此函数的地方需要修改成标准的事 --- 解决，
+使用者在调用本函数时输入的参数 KEY 需要声明为 static __thread acl_pthread_key_t key = -1
+8) acl_master 应该增加了一个定时器，用来定期扫描配置文件，从而将新添加的服务自动加载，同时将
+禁止的服务自动卸载
+9) 配置文件中应支持变量
+10) acl_master 的子进程的监听地址应允许在配置文件中写多个 -- 完成
+11) acl_master 在重读配置是需要支持预启动机制 -- 完成
+12) event 模块需要进一步优化 -- 完成大部分
+13) json 解析器需要支持 \u 方式 UNICODE 格式
+14) acl_master 子进程需要支持 UDP 方式 -- 完成
+15) json 解析器可以支持 BOOL, NUMBER, NULL 等类型 -- 完成
+16) events_select_thr.c, events_poll.c, events_select.c 需要支持检测时间间隔
+17) acl_master 服务器框架的各个服务模板应该支持进程退出前的回调接口，便于应用的善后工作 -- 完成
+18) acl_master 当子进程的 master_prefork 和空闲退出通知打开时，可能存在冲突
+19) ACL_VSTREAM: sa_local & sa_peer 需要支持 IPV6 -- 完成
+20) acl_master 当 master_prefork > 0 时无法禁止服务 -- 完成 

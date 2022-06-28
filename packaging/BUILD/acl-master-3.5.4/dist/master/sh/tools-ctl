@@ -1,0 +1,155 @@
+#!/bin/sh
+
+MASTER_HOME_PATH={install_path}
+MASTER_HOME_PATH=/opt/soft/acl-master
+MASTER_NAME=acl_master
+MASTER_PATH=$MASTER_HOME_PATH/libexec/$MASTER_NAME
+MASTER_CONF_PATH=$MASTER_HOME_PATH/conf
+MASTER_VAR_PATH=$MASTER_HOME_PATH/var
+MASTER_PID_FILE=$MASTER_VAR_PATH/pid/acl_master.pid
+MASTER_LOG_PATH=$MASTER_VAR_PATH/log/acl_master
+MASTER_SOCK=$MASTER_VAR_PATH/public/master.sock
+
+MASTER_RUNNING="no"
+MASTER_PID=0
+OSTYPE=
+
+MASTER_CTL_CMD=$MASTER_HOME_PATH/bin/master_ctl
+MASTER_CTLD_CONF=$MASTER_CONF_PATH/service/master_ctld.cf
+MASTER_GUARD_CONF=$MASTER_CONF_PATH/service/master_guard.cf
+MASTER_MONITOR_CONF=$MASTER_CONF_PATH/service/master_monitor.cf
+
+guess_os()
+{
+	os_name=`uname -s`
+	os_type=`uname -p`
+	case $os_name in
+	Linux)
+		OSTYPE="linux"
+		;;
+	SunOS)
+		OSTYPE="sunos"
+		;;
+	FreeBSD)
+		OSTYPE="freebsd"
+		;;
+	*)
+		echo "unknown OS - $os_name $os_type"
+		exit 1
+		;;
+	esac
+}
+
+check_master()
+{
+	guess_os
+
+	if [ ! -f $MASTER_PID_FILE ]; then
+		MASTER_RUNNING="no"
+		return
+	fi
+
+	MASTER_PID=`sed 1q $MASTER_PID_FILE | awk '{print $NF}'`
+	if [ ! -d "/proc/$MASTER_PID" ]; then
+		MASTER_RUNNING="no"
+		return
+	fi
+
+	if [ "$OSTYPE" != "linux" ]; then
+		MASTER_RUNNING="yes"
+		return
+	fi
+
+	link_path=`ls -l /proc/$MASTER_PID/exe | awk '{print $NF}'`
+	if [ "$link_path" = "$MASTER_PATH" ]; then
+		MASTER_RUNNING="yes"
+	fi
+}
+
+restart_service()
+{
+	if [ -f $MASTER_CTL_CMD ]; then
+		$MASTER_CTL_CMD -s $MASTER_SOCK -f $1 -a restart
+	else
+		echo "$MASTER_CTL_CMD not exist!"
+		exit 1
+	fi
+}
+
+stop_service()
+{
+	if [ -f $MASTER_CTL_CMD ]; then
+		$MASTER_CTL_CMD -s $MASTER_SOCK -f $1 -a stop
+	else
+		echo "$MASTER_CTL_CMD not exist!"
+		exit 1
+	fi
+}
+
+start()
+{
+	check_master
+	if [ "$MASTER_RUNNING" != "yes" ]; then
+		echo "starting $MASTER_NAME ..."
+		service master start
+	fi
+
+	check_master
+	if [ "$MASTER_RUNNING" != "yes" ]; then
+		echo "start $MASTER_NAME failed!"
+		exit 1
+	fi
+
+	restart_service $MASTER_CTLD_CONF
+	restart_service $MASTER_GUARD_CONF
+	restart_service $MASTER_MONITOR_CONF
+}
+
+stop()
+{
+	check_master
+
+	if [ "$MASTER_RUNNING" = "yes" ]; then
+		if [ "$MASTER_PID" -eq 0 ]; then
+			echo "$MASTER_NAME: pid($MASTER_PID) invalid"
+			exit 1
+		fi
+		stop_service $MASTER_CTLD_CONF
+		stop_service $MASTER_GUARD_CONF
+		stop_service $MASTER_MONITOR_CONF
+	else
+		echo "$MASTER_NAME not running!"
+	fi
+}
+
+restart()
+{
+	check_master
+	if [ "$MASTER_RUNNING" = "yes" ]; then
+		if [ "$MASTER_PID" -eq 0 ]; then
+			echo "$MASTER_NAME: pid($MASTER_PID) invalid"
+			exit 1
+		fi
+		restart_service $MASTER_CTLD_CONF
+		restart_service $MASTER_GUARD_CONF
+		restart_service $MASTER_MONITOR_CONF
+	else
+		echo "$MASTER_NAME not running!"
+	fi
+}
+
+# See how we were called.
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart)
+		restart
+		;;
+	*)
+		echo $"Usage: $0 {start|stop|restart}"
+		;;
+esac

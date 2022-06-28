@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+    <Filter Include="rules">
+      <UniqueIdentifier>{2ff976e2-85a7-420e-b5c5-bfccaaee99e4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="manage">
+      <UniqueIdentifier>{ad859543-2c97-4ee7-8c40-ab138674ee68}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="master_service.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dgate_db.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="dgate_service.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="rules\rules.gson.cpp">
+      <Filter>rules</Filter>
+    </ClCompile>
+    <ClCompile Include="rules\rules_option.cpp">
+      <Filter>rules</Filter>
+    </ClCompile>
+    <ClCompile Include="manage\http_service.cpp">
+      <Filter>manage</Filter>
+    </ClCompile>
+    <ClCompile Include="manage\http_servlet.cpp">
+      <Filter>manage</Filter>
+    </ClCompile>
+    <ClCompile Include="manage\manage_service.cpp">
+      <Filter>manage</Filter>
+    </ClCompile>
+    <ClCompile Include="black_list.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="master_service.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dgate_db.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="dgate_service.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="rules\rules.gson.h">
+      <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="rules\rules.h">
+      <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="rules\rules_option.h">
+      <Filter>rules</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\http_service.h">
+      <Filter>manage</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\http_servlet.h">
+      <Filter>manage</Filter>
+    </ClInclude>
+    <ClInclude Include="manage\manage_service.h">
+      <Filter>manage</Filter>
+    </ClInclude>
+    <ClInclude Include="black_list.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="rules\rules.stub">
+      <Filter>rules</Filter>
+    </None>
+    <None Include="rules\rules.json">
+      <Filter>rules</Filter>
+    </None>
+  </ItemGroup>
+</Project>

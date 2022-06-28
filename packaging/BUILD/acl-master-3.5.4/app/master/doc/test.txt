@@ -1,0 +1,34 @@
+POST /?cmd=list HTTP/1.0
+Content-Length: 25
+Connection: keep-alive
+Content-Type: text/json
+
+{ cmd: 'list', data: {}}
+
+POST /?cmd=stat HTTP/1.0
+Content-Length: 72
+Connection: keep-alive
+Content-Type: text/json
+
+{ cmd: 'stat', data: [{'path':'/opt/soft/master/conf/service/web.cf'}]}
+
+POST /?cmd=stop HTTP/1.0
+Content-Length: 72
+Connection: keep-alive
+Content-Type: text/json
+
+{ cmd: 'stop', data: [{'path':'/opt/soft/master/conf/service/web.cf'}]}
+
+POST /?cmd=start HTTP/1.0
+Content-Length: 73
+Connection: keep-alive
+Content-Type: text/json
+
+{ cmd: 'start', data: [{'path':'/opt/soft/master/conf/service/web.cf'}]}
+
+POST /?cmd=reload HTTP/1.0
+Content-Length: 74
+Connection: keep-alive
+Content-Type: text/json
+
+{ cmd: 'reload', data: [{'path':'/opt/soft/master/conf/service/web.cf'}]}

@@ -1,0 +1,100 @@
+<root>
+	<calendar>
+		<zone time="xxx" name="xxxx" value="xxxx">
+<![CDATA[BEGIN:VTIMEZONE
+TZID:Asia/Hong_Kong
+BEGIN:STANDARD
+TZOFFSETTO:+0800
+TZOFFSETFROM:+0800
+TZNAME:CST
+DTSTART:19710101T000000
+END:STANDARD
+END:VTIMEZONE
+]]>
+		</zone>
+		<zone time="xxx" name="xxxx" value="xxxx">
+<![CDATA[BEGIN:VTIMEZONE
+TZID:Asia/Hong_Kong
+BEGIN:STANDARD
+TZOFFSETTO:+0800
+TZOFFSETFROM:+0800
+TZNAME:CST
+DTSTART:19710101T000000
+END:STANDARD
+END:VTIMEZONE
+]]>
+		</zone>
+		<zone time="xxx" name="xxxx" value="xxxx">
+<![CDATA[BEGIN:VTIMEZONE
+TZID:Asia/Hong_Kong
+BEGIN:STANDARD
+TZOFFSETTO:+0800
+TZOFFSETFROM:+0800
+TZNAME:CST
+DTSTART:19710101T000000
+END:STANDARD
+END:VTIMEZONE
+]]>
+<![CDATA[BEGIN:VTIMEZONE
+TZID:Asia/Hong_Kong
+BEGIN:STANDARD
+TZOFFSETTO:+0800
+TZOFFSETFROM:+0800
+TZNAME:CST
+DTSTART:19710101T000000
+END:STANDARD
+END:VTIMEZONE
+]]>
+<![CDATA[BEGIN:VTIMEZONE
+TZID:Asia/Hong_Kong
+BEGIN:STANDARD
+TZOFFSETTO:+0800
+TZOFFSETFROM:+0800
+TZNAME:CST
+DTSTART:19710101T000000
+END:STANDARD
+END:VTIMEZONE
+]]>
+		</zone>
+	</calendar>
+	<users>
+		<user>
+			<name>zsx11</name>
+			<name>zsx12</name>
+			<name>zsx12</name>
+		</user>
+		<user>
+			<name>zsx21</name>
+			<name>zsx22</name>
+			<name>zsx22</name>
+		</user>
+		<user>
+			<name>zsx31</name>
+			<name>zsx32</name>
+			<name>zsx32</name>
+		</user>
+	</users>
+	<information>
+		<info>
+			<!--user information11-->
+			<!--user information12-->
+			<!--user information13-->
+		</info>
+		<info>
+			<!--user information21 -->
+			<!--user information22 -->
+			<!--user information23 -->
+		</info>
+		<info>
+			<!-- user information31-->
+			<!-- user information32-->
+			<!-- user information33-->
+		</info>
+		<info>
+			<!-- user information41 -->
+			<!-- user information42 -->
+			<!-- user information43 -->
+		</info>
+	</information>
+
+</root>

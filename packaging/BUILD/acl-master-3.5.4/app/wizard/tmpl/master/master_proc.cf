@@ -1,0 +1,95 @@
+# service type  private unpriv  chroot  wakeup  maxproc command + args
+
+service $<PROGRAM>
+{
+#	进程是否禁止运行
+	master_disable = no
+#	服务地址及端口号
+#	for master_type = inet
+#	master_service = 127.0.0.1|5000
+#	for master_type = unix
+#	master_service = proc_echo.sock
+#	for master_type = sock
+	master_service = 127.0.0.1|5000, 5002, |5003
+#	服务监听为域套接口
+#	master_service = single_echo.sock
+#	服务类型
+#	master_type = inet
+#	master_type = unix
+	master_type = sock
+
+#	停止子进程时是否采用强行停止的方式(即给子进程发送 SIGTERM 信号)
+	master_stop_kill = false
+#	当 master_stop_kill 为 true 时，该配置决定是否要等待子进程退出
+	master_stop_wait = false
+
+#	当系统支持 SO_REUSEPORT 时，是否启用该功能
+	master_reuseport = yes
+#	是否针对监听套接口设定为非阻塞方式
+	master_nonblock = yes
+#	当系统支持 TCP_FASTOPEN 时，是否启用该功能
+	master_fastopen = no
+
+#	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
+#	master_notify_addr = 127.0.0.1:5801
+#	邮件通知接收者
+#	master_notify_recipients = zhengshuxin@hotmail.com
+
+#	是否允许延迟接受客户端连接，如果为0则表示关闭该功能，如果大于0则表示打开此功能
+#	并且此值代表延迟接受连接的超时值，超过此值时如果客户端依然没有发来数据，则操作
+#	系统会在系统层直接关闭该连接
+#	master_defer_accept = 0
+#	是否只允许私有访问, 如果为 y, 则域套接口创建在 {install_path}/var/log/private/ 目录下,
+#	如果为 n, 则域套接口创建在 {install_path}/var/log/public/ 目录下,
+	master_private = n
+	master_unpriv = n
+#	是否需要 chroot: n -- no, y -- yes
+	master_chroot = n
+#	每隔多长时间触发一次，单位为秒(仅对 trigger 模式有效)
+	master_wakeup = -
+#	最大进程数
+	master_maxproc = 10
+#	预启动进程数，该值不得大于 master_maxproc
+	master_prefork = 10
+#	进程程序名
+	master_command = $<PROGRAM>
+#	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
+#	master_args = 
+#	进程日志记录文件
+	master_log = {install_path}/var/log/$<PROGRAM>.log
+#	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
+#	master_debug =
+#	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
+#	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
+			sync_action:E_LOG_SEM, sem_name:/tmp/single_echo.sem
+
+#	是否允许产生 core 文件
+#	single_enable_core = 1
+#	core 文件大小限制，-1 表示不限制 core 文件大小，0 表示禁止产生 core，> 0 表示 core 文件最大大小
+#	single_core_limit = -1
+#	进程退出时是否禁止产生 core 文件
+#	single_disable_core_onexit = 1
+#	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
+	single_use_limit = 250
+#	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
+#	single_idle_limit = 180
+#	记录进程PID的位置(对于多进程实例来说没有意义)
+	single_pid_dir = {install_path}/var/pid
+#	进程运行时所在的路径
+	single_queue_dir = {install_path}/var
+#	读写超时时间, 单位为秒
+	single_rw_timeout = 1800
+#	读缓冲区的缓冲区大小
+	single_buf_size = 8192
+#	进程运行时的用户身份
+	single_owner = root
+
+#	single_in_flow_delay = 1
+#	single_owner = owner
+#	用 select 进行循环时的时间间隔
+#	单位为秒
+#	single_delay_sec = 1
+#	单位为微秒
+#	single_delay_usec = 5000
+#	single_daemon_timeout = 1800
+}

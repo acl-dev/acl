@@ -1,0 +1,30 @@
+
+service probe {
+	loglevel = 2
+	logfile = probe.log
+	fork_sleep=0
+
+####################################################################################################
+	probed_server = <server_name="ÍøÍ¨ÍøÕ¾:202.108.33.60", \
+				addr=202.108.33.60:80, \
+				url=http://www.sina.com.cn, \
+				connect_timeout=60, \
+				rw_timeout=60, \
+				retry_inter=5, \
+				probe_inter=5, \
+				http_errors=500:503:504, \
+				log=www.log, \
+				warn_time=2>
+
+	probed_server = <server_name="ÍøÍ¨²©¿Í:60.28.250.219", \
+				addr=60.28.250.219:80, \
+				url=http://blog.hexun.com/, \
+				connect_timeout=60, \
+				rw_timeout=60, \
+				retry_inter=5, \
+				probe_inter=5, \
+				http_errors=500:503:504, \
+				log=blog.log, \
+				warn_time=2>
+####################################################################################################
+}

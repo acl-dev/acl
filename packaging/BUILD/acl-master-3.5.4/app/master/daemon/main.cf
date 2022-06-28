@@ -1,0 +1,50 @@
+#inet_interfaces = all
+# 默认的每个服务的最大进程数
+default_process_limit = 250
+# 用户属主
+owner_user = root
+master_owner = root
+# 当停止 master 时是否等待所有子进程退出
+waiting_on_stop = true
+# 组主
+owner_group = root
+# 如果子进程服务异常退出，重启该子进程服务的时间间隔(秒)
+service_throttle_time = 10
+# 父进程进程名
+process_name = acl_master
+#daemon_timeout = 18000
+buf_size = 81920
+# 父进程与子进程通信时的读写超时时间(秒)
+rw_timeout = 60
+# 父进程通知子进程重新加载配置时获得子进程反馈的超时时间(毫秒)
+reload_timeout = 5000
+#max_use = 100
+#max_idle = 100
+#in_flow_delay = 1
+# 调用 select 循环时的等待秒级值
+event_delay_sec = 1
+# 调用 select 循环时的等待微秒级值
+event_delay_usec = 5000
+# 所有服务进程程序所在的默认目录
+daemon_directory = {install_path}/libexec
+# acl_master 进程运行时的日志记录文件
+log_file = {install_path}/var/log/acl_master
+# 所有服务进程的服务配置文件所在的目录
+service_directory = {install_path}/conf/service
+# 是否扫描并行 {install_path}/conf/service/ 目录下的子目录服务配置文件，0 -- 否，1 -- 是
+scan_subdir = 0
+# 扫描 service_directory 下的配置文件时，指定的文件扩展名
+file_exts = .cf, .conf
+# 指定了单独要启动的服务的配置文件列表
+service_file = {install_path}/conf/services.cf
+# master 程序运行目录
+queue_directory = {install_path}/var
+# 记录 acl_master 运行时的进程号
+pid_file = {install_path}/var/pid/acl_master.pid
+# 是否允许自动切换用户运行身份
+# limit_privilege = 0
+# acl_master 对外 WEB 管理接口地址
+#manage_addr = 127.0.0.1:8190
+manage_addr = {install_path}/var/public/master.sock
+# the montitor listen addr for acl_master reports the children's exception
+master_notify_addr = {install_path}/var/public/monitor.sock

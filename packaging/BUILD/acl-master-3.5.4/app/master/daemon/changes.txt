@@ -1,0 +1,88 @@
+
+24) 2018.11.15
+24.1) feature: http_client::do_reply 记录请求信息，以便于排查问题
+
+23) 2018.10.23
+23.1) feature: master_listen.cpp, master_listen_sock() 中的 defer_accept
+可以控制是否采用延迟接收方式
+23.2) bugfix: master_listen.cpp, master_bind_udp() 中在非 reuseport 方式下如果
+没有成功绑定任何地址，则应返回错误
+
+22) 2018.10.17
+22.1) bugfix: 对于 Centos7.x 以下版本，当需 acl_master 绑定 UDP 服务时，会造成
+因类型判断有误导致的崩溃问题，Centos7.x 以上版本不存在此问题，因为 UDP 服务是
+由服务模块自行进行绑定
+
+21) 2017.3.21
+21.1) feature: http_client.cpp 里需要记录客户端发来的命令字
+
+20) 2017.1.31
+20.1) bugfix: master_conf.cpp check_xxx should be override after reloading services' configures.
+
+19) 2018.1.24
+19.1) feature: web interface adds many checking parameters.
+
+18) 2018.1.23
+18.1) feature: web interface adds version info for every services.
+
+17) 2018.1.19
+17.1) log: don't save some command reply information
+
+16) 2018.1.5
+16.1) bugfix: remove command in ACL_MASTER_SERV struct, which maybe be misused
+
+15) 2018.1.3
+15.1) bugfix: the service start item is lost in action/service_list.cpp
+
+14) 2017.12.22
+14.1) bugfix: master_conf.cpp 中 master_add_service 在调用 acl_master_ent_find
+时，应该使用 entry->conf (配置文件路径) 而不是 entry->path 程序路径
+14.2) bugfix: master_api.cpp 远程调用 restart 命令时，没有重新读取配置文件，
+所以造成无法启动服务程序改名后的服务
+
+13) 2017.11.21
+13.1) feature: add master_config command for getting the configure of master
+
+12) 2017.11.12
+12.1) bugfix: master should not fork child process after starting service failed.
+
+11) 2017.11.11
+11.1) feature: master can start services which are specified in file.
+
+10) 2017.11.7
+10.1) feature: master can start one service with the specified path
+
+9) 2017.10.26
+9.1) feature: when starting one or more services remotely, sync or async can be used.
+
+8) 2017.9.22
+8.1) workaround: restructure the manage module of acl_master.
+
+7) 2017.9.9
+7.1) feature: master can wait callback from children when reloading the specific children
+
+6) 2017.9.5
+6.1) feature: master can wait children to exit with sync or async
+6.2) feature: master can kill SIGTERM children when reloading
+6.3) bugfix: master_params.cpp 中的 init_conf_str_vars 函数在 master reload 时
+有内存泄露
+
+5) 2017.8.11
+5.1) safety: master can't fatal for some configure error of any app service.
+
+4) 2017.7.7
+4.1) feature: master can stop or kill one service, stopping service is graceful
+by closing the IPC pipe, and killing service is rude by signal SIGTEM children.
+4.2) feature: add graceful stop API in master's web management interface.
+
+3) 2017.6.26
+3.1) protocol: changed the web management protocols.
+
+2) 2017.6.25
+2.1) feature: acl_master uses kernel event mode
+
+1) 2017.6.18
+1.1) feature: In Docker's running time, the master's pid was set to 1; When
+stopping master by sending TERM singal to master's pid, master_sigdeath func
+will be called and which'll send TERM to -pid that's the master's pid group,
+but in docker the pid is 1, so we should stop the children in the other way.

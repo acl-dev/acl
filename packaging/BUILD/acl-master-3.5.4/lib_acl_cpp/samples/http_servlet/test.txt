@@ -1,0 +1,14 @@
+POST /cgi-bin/test/http_servlet?name1=%CD%E2%B9%FA%C8%CB HTTP/1.1
+Host: 127.0.0.1
+User-Agent: Mozilla/5.0 (Windows NT 5.1; rv:12.0) Gecko/20100101 Firefox/12.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: zh-cn,en-us;q=0.7,en;q=0.3
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+Referer: http://127.0.0.1/test/
+Cookie: acl_session=1336957885.98220.1804289383; name1=value1; doxygen_width=300
+Cache-Control: max-age=0
+Content-Length: 62
+Content-Type: application/x-www-form-urlencoded
+
+name2=%26%2320013%3B%26%2322269%3B%26%2320154%3B&submit=submit

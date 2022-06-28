@@ -1,0 +1,72 @@
+# service type  private unpriv  chroot  wakeup  maxproc command + args
+
+service check_trigger
+{
+#	进程是否禁止运行
+	master_disable = no
+#	服务监听为域套接口
+	master_service = check_trigger.sock
+#	服务类型
+	master_type = unix
+
+#	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
+#	master_notify_addr = 127.0.0.1:5801
+#	邮件通知接收者
+#	master_notify_recipients = zhengshuxin@hotmail.com
+
+#	是否只允许私有访问, 如果为 y, 则域套接口创建在 {install_path}/var/log/private/ 目录下,
+#	如果为 n, 则域套接口创建在 {install_path}/var/log/public/ 目录下,
+	master_private = y
+	master_unpriv = n
+#	是否需要 chroot: n -- no, y -- yes
+	master_chroot = n
+#	每隔多长时间触发一次，单位为秒(仅对 trigger 模式有效)
+	master_wakeup = 1
+#	最大进程数
+	master_maxproc = 1
+#	进程程序名
+	master_command = check_trigger
+#	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
+#	master_args = 
+#	进程日志记录文件
+	master_log = {install_path}/var/log/check_trigger
+#	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
+#	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
+#			sync_action:E_LOG_SEM, sem_name:/tmp/trigger.sem
+
+#	是否允许产生 core 文件
+#	trigger_enable_core = 1
+#	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
+	trigger_use_limit = 250
+#	记录进程PID的位置(对于多进程实例来说没有意义)
+	trigger_pid_dir = {install_path}/var/pid
+#	进程运行时所在的路径
+	trigger_queue_dir = {install_path}/var
+#	读写超时时间, 单位为秒
+	trigger_rw_timeout = 1800
+#	读缓冲区的缓冲区大小
+	trigger_buf_size = 8192
+
+#	进程运行时的用户身份
+	trigger_owner = owner
+#	用 select 进行循环时的时间间隔
+#	单位为秒
+#	trigger_delay_sec = 1
+#	单位为微秒
+#	trigger_delay_usec = 5000
+#	trigger_daemon_timeout = 1800
+
+##############################################################################
+#	http_url_list = http://www.263.net/; \
+#			http://www.sina.com.cn/; \
+#			http://www.sohu.com/
+#	http_url_list = http://www.263.net/
+	http_url_list = http://www.sohu.com/
+	dns_ip = 8.8.8.8
+	dns_port = 53
+	dbpath = ./check.db
+	dbcharset = UTF-8
+	http_cocurrent = 2
+	conn_timeout = 10
+	rw_timeout = 10
+}
