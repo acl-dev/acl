@@ -186,7 +186,9 @@ copy_all_file()
 	}
 	install_file a+x,go-wrx sh $SH_PATH
 	install_file a+x,go-wrx conf $CONF_PATH
-	install_file a+x,go-wrx conf/service $SERVICE_PATH
+	test -d conf/service && {
+		install_file a+x,go-wrx conf/service $SERVICE_PATH
+	}
 #	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
 	install_file a+x,go-wrx init.d/ $INIT_PATH
 	install_file a-x,go-wx system/ $SYSTEMD_INIT_PATH
