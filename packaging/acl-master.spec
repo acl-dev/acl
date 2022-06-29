@@ -35,22 +35,22 @@ rm -rf %{buildroot}
 if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
     %if 0%{?el7:1} || 0%{?el8:1}
-        systemctl enable master.service > /dev/null 2>&1 || :
-	systemctl daemon-reload > /dev/null 2>&1 || :
-        systemctl start master.service > /dev/null 2>&1 || :
+        systemctl enable master.service
+	systemctl daemon-reload
+        systemctl start master.service
     %else
         /sbin/chkconfig --add master
-        service master start > /dev/null 2>&1 ||:
+        service master start
     %endif
 fi
 
 %preun
 if [ "$1" == "0" ]; then
     %if 0%{?el7:1} || 0%{?el8:1}
-        systemctl stop master.service > /dev/null 2>&1 || :
-        systemctl disable master.service > /dev/null 2>&1 || :
+        systemctl stop master.service
+        systemctl disable master.service
     %else
-        service master stop >/dev/null 2>&1 ||:
+        service master stop
         /sbin/chkconfig --del master
     %endif
 fi
@@ -60,9 +60,10 @@ if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     echo "prepare restarting acl_master ..."
     %if 0%{?el7:1} || 0%{?el8:1}
-        systemctl restart master.service > /dev/null 2>&1 || :
+	systemctl daemon-reload
+        systemctl restart master.service
     %else
-        service master masterrestart > /dev/null 2>&1 ||:
+        service master restart
     %endif
 fi
 
