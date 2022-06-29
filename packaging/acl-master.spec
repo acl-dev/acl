@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary: acl master framework
 Name:           acl-master
@@ -20,6 +20,7 @@ acl master framework
 %setup -q
 
 %build
+
 make -j 4
 make -C lib_fiber
 
@@ -34,37 +35,37 @@ rm -rf %{buildroot}
 %post
 if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
-    %if 0%{?el7:1} || 0%{?el8:1}
+    if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then
         systemctl enable master.service
-	systemctl daemon-reload
+        systemctl daemon-reload
         systemctl start master.service
-    %else
+    else
         /sbin/chkconfig --add master
         service master start
-    %endif
+    fi
 fi
 
 %preun
 if [ "$1" == "0" ]; then
-    %if 0%{?el7:1} || 0%{?el8:1}
+    if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then
         systemctl stop master.service
         systemctl disable master.service
-    %else
+    else
         service master stop
         /sbin/chkconfig --del master
-    %endif
+    fi
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     echo "prepare restarting acl_master ..."
-    %if 0%{?el7:1} || 0%{?el8:1}
-	systemctl daemon-reload
+    if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then
+        systemctl daemon-reload
         systemctl restart master.service
-    %else
+    else
         service master restart
-    %endif
+    fi
 fi
 
 %files
@@ -77,11 +78,15 @@ fi
 /opt/soft/acl-master/sh
 /opt/soft/acl-master/var
 /etc/init.d/master
-%if 0%{?el7:1} || 0%{?el8:1}
-    /usr/lib/systemd/system/master.service
+%define HAS_SYSTEMD %( if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then echo "1" ; else echo "0"; fi )
+%if %HAS_SYSTEMD==1
+/usr/lib/systemd/system/master.service
 %endif
 
 %changelog
+* Wed Jun 29 2022 shuxin.zheng@qq.com 3.5.4-3-20220629.20
+- optimize: acl_master service supports Centos5, Centos6
+
 * Wed Jun 29 2022 shuxin.zheng@qq.com 3.5.4-2-20220629.19
 - optimize: acl_master service supports Centos5, Centos6
 
