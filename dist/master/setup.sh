@@ -191,7 +191,7 @@ copy_all_file()
 	}
 #	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
 	install_file a+x,go-wrx init.d/ $INIT_PATH
-	install_file a-x,go-wx system/ $SYSTEMD_INIT_PATH
+	#install_file a-x,go-wx system/ $SYSTEMD_INIT_PATH
 }
 
 guess_os
