@@ -1,4 +1,4 @@
-%define release_id 1
+%define release_id 2
 
 Summary: acl master framework
 Name:           acl-master
@@ -82,6 +82,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 29 2022 shuxin.zheng@qq.com 3.5.4-2-20220629.19
+- optimize: acl_master service supports Centos5, Centos6
+
 * Tue Jun 28 2022 shuxin.zheng@qq.com 3.5.4-1-20220628.23
 - optimize: acl_master support master.service
 
