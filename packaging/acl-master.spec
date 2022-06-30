@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary: acl master framework
 Name:           acl-master
@@ -21,6 +21,8 @@ acl master framework
 
 %build
 
+%define HAS_SYSTEMD %( if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then echo "1" ; else echo "0"; fi )
+
 make -j 4
 make -C lib_fiber
 
@@ -35,37 +37,37 @@ rm -rf %{buildroot}
 %post
 if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
-    if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then
+    %if %HAS_SYSTEMD == 1
         systemctl enable master.service
         systemctl daemon-reload
         systemctl start master.service
-    else
+    %else
         /sbin/chkconfig --add master
         service master start
-    fi
+    %endif
 fi
 
 %preun
 if [ "$1" == "0" ]; then
-    if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then
+    %if %HAS_SYSTEMD == 1
         systemctl stop master.service
         systemctl disable master.service
-    else
+    %else
         service master stop
         /sbin/chkconfig --del master
-    fi
+    %endif
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     echo "prepare restarting acl_master ..."
-    if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then
+    %if %HAS_SYSTEMD == 1
         systemctl daemon-reload
         systemctl restart master.service
-    else
+    %else
         service master restart
-    fi
+    %endif
 fi
 
 %files
@@ -78,12 +80,14 @@ fi
 /opt/soft/acl-master/sh
 /opt/soft/acl-master/var
 /etc/init.d/master
-%define HAS_SYSTEMD %( if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then echo "1" ; else echo "0"; fi )
 %if %HAS_SYSTEMD==1
 /usr/lib/systemd/system/master.service
 %endif
 
 %changelog
+* Thu Jun 30 2022 shuxin.zheng@qq.com 3.5.4-4-20220630.09
+- optimize: acl_master service supports different CentOS automatically
+
 * Wed Jun 29 2022 shuxin.zheng@qq.com 3.5.4-3-20220629.20
 - optimize: acl_master service supports Centos5, Centos6
 

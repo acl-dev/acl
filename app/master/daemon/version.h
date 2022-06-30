@@ -2,7 +2,7 @@
 #define __MASTER_VERSION_INCLUDE_H__
 
 #define MASTER_NAME	"acl_master"
-#define MASTER_VERSION	"3.5.4-3"
-#define MASTER_DATE	"20220629"
+#define MASTER_VERSION	"3.5.4-4"
+#define MASTER_DATE	"20220630"
 
 #endif
