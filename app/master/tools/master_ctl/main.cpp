@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <signal.h>
+
 #ifdef	HAS_READLINE
 #include <readline/readline.h>
 #include <readline/history.h>
@@ -9,6 +11,7 @@
 
 static bool        __verbose = false;
 static long long   __timeout = 0;
+static int         __signum  = -1;
 static acl::string __server_addr;
 static acl::string __extname;
 
@@ -410,6 +413,24 @@ static void print_reload_results(const std::vector<reload_res_data_t>& res)
 	}
 }
 
+static void print_signal(const signal_res_data_t& data)
+{
+	println("status", data.status);
+	println("proc_count", data.proc_count);
+	println("proc_signaled", data.proc_signaled);
+	println("proc_ok", data.proc_ok);
+	println("path", data.path.c_str());
+}
+
+static void print_signal_results(const std::vector<signal_res_data_t>& res)
+{
+	for (std::vector<signal_res_data_t>::const_iterator cit = res.begin();
+		cit != res.end(); ++cit)
+	{
+		print_signal(*cit);
+	}
+}
+
 static bool do_reload(const std::vector<acl::string>& tokens,
 	const char* addr, const char* fpath)
 {
@@ -440,6 +461,60 @@ static bool do_reload(const std::vector<acl::string>& tokens,
 		return false;
 
 	print_reload_results(res.data);
+	return true;
+}
+
+static int get_signum(const char* signame)
+{
+	static struct {
+		const char* name;
+		int signum;
+	} sigmap[] = {
+		{ "SIGINT",  SIGINT  },
+		{ "SIGHUP",  SIGHUP  },
+		{ "SIGUSR1", SIGUSR1 },
+		{ "SIGUSR2", SIGUSR2 },
+		{ NULL,      -1      },
+	};
+
+	for (int i = 0; sigmap[i].name != NULL; i++) {
+		if (strcasecmp(sigmap[i].name, signame) == 0) {
+			return sigmap[i].signum;
+		}
+	}
+	return -1;
+}
+
+static bool do_signal(const std::vector<acl::string>& tokens,
+	const char* addr, const char* fpath)
+{
+	if (*fpath == 0)
+	{
+#ifdef	HAS_READLINE
+		printf("\033[1;34;40musage\033[0m: "
+			"\033[1;33;40msignal\033[0m configure_path SIGXXX\r\n");
+#else
+		printf("usage: signal configure_path SIGXXX\r\n");
+#endif
+		return false;
+	}
+
+	if (tokens.size() >= 3)
+		__signum = get_signum(tokens[2]);
+
+	signal_req_t req;
+	req.cmd = "reload";
+	req.signum = __timeout;
+
+	signal_req_data_t req_data;
+	req_data.path = fpath;
+	req.data.push_back(req_data);
+
+	signal_res_t res;
+	if (!http_request<signal_req_t, signal_res_t>(addr, req, res))
+		return false;
+
+	print_signal_results(res.data);
 	return true;
 }
 
@@ -546,6 +621,7 @@ static bool do_help(const std::vector<acl::string>&, const char*, const char*)
 	println("stop", "stop one service");
 	println("kill", "kill one service");
 	println("reload", "reload one service");
+	println("signal", "signal one service");
 	println("master_config", "get master's configure entries");
 	println_underline("timeout", "show one service's running status");
 
@@ -610,6 +686,7 @@ static struct {
 	{ "stop",		'\0',	true,	do_stop			},
 	{ "kill",		'\0',	true,	do_kill			},
 	{ "reload",		'r',	true,	do_reload		},
+	{ "signal",		'k',	true,	do_signal		},
 	{ "master_config",	'\0',	false,	do_master_config	},
 
 	{ "help",		'h',	false,	do_help			},
@@ -682,10 +759,11 @@ static void run(const char* server, const char* filepath)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		" -s master_manage_addr[default: 127.0.0.1:8290]\r\n"
+		" -s master_manage_addr[default: /opt/soft/acl-master/var/public/master.sock]\r\n"
 		" -f servicde_path\r\n"
 		" -t timeout[waiting the result from master, default: 0]\r\n"
-		" -a cmd[list|stat|start|stop|reload|restart]\r\n"
+		" -a cmd[list|stat|start|stop|reload|restart|signal]\r\n"
+		" -n signum[specify the signal number if command is signal]\r\n"
 		" -e extname[specified the extname of service's path, just for start and restart]\r\n",
 		procname);
 }
@@ -695,7 +773,7 @@ int main(int argc, char* argv[])
 	acl::string filepath, action, addr("/opt/soft/acl-master/var/public/master.sock");
 	int  ch;
 
-	while ((ch = getopt(argc, argv, "hs:f:a:t:e:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:f:a:t:e:n:")) > 0)
 	{
 		switch (ch)
 		{
@@ -718,6 +796,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'e':
 			__extname = optarg;
+			break;
+		case 'n':
+			__signum = get_signum(optarg);
 			break;
 		default:
 			usage(argv[0]);
