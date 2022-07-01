@@ -219,9 +219,27 @@ int acl_master_reload(const char *path, int *nchilden, int *nsignaled,
 	}
 
 	(void) setup_callback(__FUNCTION__, serv, callback, ctx);
-
 	acl_master_sighup_children(serv, nsignaled);
+	return 0;
+}
 
+int acl_master_signal(const char *path, int sig, int *nchilden, int *nsignaled,
+	STATUS_CALLBACK callback, void *ctx)
+{
+	ACL_MASTER_SERV *serv = acl_master_lookup(path);
+
+	if (serv == NULL) {
+		acl_msg_error("%s(%d), %s: no service for path %s",
+			__FILE__, __LINE__, __FUNCTION__, path);
+		return -1;
+	}
+
+	if (nchilden) {
+		*nchilden = (int) acl_ring_size(&serv->children);
+	}
+
+	(void) setup_callback(__FUNCTION__, serv, callback, ctx);
+	acl_master_signal_children(serv, sig, nsignaled);
 	return 0;
 }
 

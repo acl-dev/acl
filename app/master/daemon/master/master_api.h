@@ -16,6 +16,8 @@ extern int acl_master_kill(const char *path);
 extern int acl_master_stop(const char *path);
 extern int acl_master_reload(const char *path, int *nchildren, int *nsignaled,
 	STATUS_CALLBACK callback, void *ctx);
+extern int acl_master_signal(const char *path, int sig, int *nchilden,
+	int *nsignaled, STATUS_CALLBACK callback, void *ctx);
 extern void acl_master_callback_clean(const char *path);
 
 

@@ -1,8 +1,6 @@
 #pragma once
 #include "json/serialize.h"
 
-class service_reload;
-
 class http_client
 {
 public:
@@ -41,6 +39,7 @@ public:
 	bool handle_start(void);
 	bool handle_restart(void);
 	bool handle_reload(void);
+	bool handle_signal(void);
 	bool handle_master_config(void);
 
 private:

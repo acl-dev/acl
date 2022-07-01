@@ -5,6 +5,7 @@
 #include "action/service_kill.h"
 #include "action/service_stop.h"
 #include "action/service_reload.h"
+#include "action/service_signal.h"
 #include "action/service_restart.h"
 #include "action/service_master_config.h"
 #include "http_client.h"
@@ -150,6 +151,7 @@ static struct {
 	{ "stop",	&http_client::handle_stop		 },
 	{ "restart",	&http_client::handle_restart		 },
 	{ "reload",	&http_client::handle_reload		 },
+	{ "signal",     &http_client::handle_signal              },
 
 	{ "master_config",&http_client::handle_master_config	 },
 
@@ -236,6 +238,12 @@ bool http_client::handle_restart(void)
 bool http_client::handle_reload(void)
 {
 	service_reload* service = new service_reload(*this);
+	return service->run(json_);
+}
+
+bool http_client::handle_signal(void)
+{
+	service_signal* service = new service_signal(*this);
 	return service->run(json_);
 }
 
