@@ -816,7 +816,7 @@ static int valid_extname(const char *filename)
 		return 1;
 	}
 
-	ext = strchr(filename, '.');
+	ext = strrchr(filename, '.');
 	if (ext == NULL) {
 		ext = filename;
 	} else {

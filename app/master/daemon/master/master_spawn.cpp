@@ -593,8 +593,8 @@ void acl_master_signal_children(ACL_MASTER_SERV *serv, int sig, int *nsignaled)
 		*nsignaled = n;
 	}
 
-	acl_msg_info("%s: service %s, path %s, signal %d, children %d,"
-		" signaled %d", myname, serv->name, serv->path,
+	acl_msg_info("%s: service=%s, path=%s, signal=%d, children=%d,"
+		" signaled=%d", myname, serv->name, serv->path,
 		sig, acl_ring_size(&serv->children), n);
 }
 

@@ -210,3 +210,24 @@ frame_release:centos7.2:
             "docker-registry.qiyi.virtual/acl/centos-builder:7.2"
     }
     <<: *FRAME_RELEASE
+
+frame_release:centos8.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.0"
+    }
+    <<: *FRAME_RELEASE
+
+frame_release:centos8.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.2"
+    }
+    <<: *FRAME_RELEASE
+
+frame_release:centos8.4:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.4"
+    }
+    <<: *FRAME_RELEASE

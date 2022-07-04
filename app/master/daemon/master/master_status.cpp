@@ -43,15 +43,17 @@ static void service_status(ACL_MASTER_PROC *proc, int status)
 			__FUNCTION__, __LINE__, path, (int) proc->pid,
 			status, ss->name, ss->info);
 
-		if (serv->callback)
+		if (serv->callback) {
 			serv->callback(proc, status, serv->ctx);
-		else
+		} else {
 			acl_msg_info("%s(%d): callback null, service=%s",
 				__FUNCTION__, __LINE__, path);
-	} else
+		}
+	} else {
 		acl_msg_warn("%s(%d), service=%s, pid=%d, status=%d, %s, %s",
 			__FUNCTION__, __LINE__, path, (int) proc->pid, status,
 			"unknown", "unknown");
+	}
 }
 
 /* master_status_event - status read event handler */
@@ -66,8 +68,9 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	ACL_MASTER_PID pid;
 	int     n;
 
-	if (type == 0)  /* XXX Can this happen?  */
+	if (type == 0) { /* XXX Can this happen?  */
 		return;
+	}
 
 	/*
 	 * We always keep the child end of the status pipe open, so an EOF
@@ -113,10 +116,11 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 
 	case sizeof(stat_buf):
 		pid = stat_buf.pid;
-		if (acl_msg_verbose)
+		if (acl_msg_verbose) {
 			acl_msg_info("%s: pid = %d, gen = %u, status = %d, "
 				"fd = %d", myname, stat_buf.pid, stat_buf.gen,
 				stat_buf.status, serv->status_fd[0]);
+		}
 	} /* end switch */
 
 	/*
@@ -127,16 +131,17 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	 * status update, so this is not an error.
 	 */
 
-	if (acl_var_master_child_table == 0)
+	if (acl_var_master_child_table == 0) {
 		acl_msg_fatal("%s(%d): acl_var_master_child_table null",
 			myname, __LINE__);
+	}
 
-	if ((proc = (ACL_MASTER_PROC *) acl_binhash_find(
-		acl_var_master_child_table, (char *) &pid, sizeof(pid))) == 0)
-	{
+	proc = (ACL_MASTER_PROC *) acl_binhash_find(
+		acl_var_master_child_table, (char *) &pid, sizeof(pid));
+	if (proc == 0) {
 		acl_msg_warn("%s(%d)->%s: process id not found: pid = %d,"
-			 " status = %d, gen = %u", __FILE__, __LINE__,
-			 myname, stat_buf.pid, stat_buf.status, stat_buf.gen);
+			" status = %d, gen = %u", __FILE__, __LINE__,
+			myname, stat_buf.pid, stat_buf.status, stat_buf.gen);
 		return;
 	}
 	if (proc->gen != stat_buf.gen) {
@@ -145,10 +150,11 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 			myname, pid, stat_buf.gen);
 		return;
 	}
-	if (proc->serv != serv)
+	if (proc->serv != serv) {
 		acl_msg_panic("%s(%d)->%s: pointer corruption: %p != %p",
 			__FILE__, __LINE__, myname, (void *) proc->serv,
 			(void *) serv);
+	}
 
 	/*
 	 * Update our idea of the child process status. Allow redundant status
@@ -156,8 +162,9 @@ static void master_status_event(int type, ACL_EVENT *event acl_unused,
 	 * order. Otherwise, warn about weird status updates but do not take
 	 * action. It's all gossip after all.
 	 */
-	if (proc->avail == stat_buf.status)
+	if (proc->avail == stat_buf.status) {
 		return;
+	}
 
 	switch (stat_buf.status) {
 	case ACL_MASTER_STAT_AVAIL:
@@ -251,14 +258,17 @@ void acl_master_status_cleanup(ACL_MASTER_SERV *serv)
 	acl_event_disable_readwrite(acl_var_master_global_event,
 		serv->status_reader);
 
-	if (close(serv->status_fd[0]) != 0)
+	if (close(serv->status_fd[0]) != 0) {
 		acl_msg_warn("%s: close status descriptor (read side): %s",
 			myname, strerror(errno));
-	if (close(serv->status_fd[1]) != 0)
+	}
+	if (close(serv->status_fd[1]) != 0) {
 		acl_msg_warn("%s: close status descriptor (write side): %s",
 			myname, strerror(errno));
+	}
 	serv->status_fd[0] = serv->status_fd[1] = -1;
-	if (serv->status_reader)
+	if (serv->status_reader) {
 		acl_vstream_free(serv->status_reader);
+	}
 	serv->status_reader = NULL;
 }

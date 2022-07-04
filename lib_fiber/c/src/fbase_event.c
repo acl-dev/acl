@@ -83,6 +83,11 @@ int fbase_event_wait(FIBER_BASE *fbase)
 	}
 
 	while (1) {
+		if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
+			msg_error("%s(%d), %s: read_wait error, fd=%d",
+				__FILE__, __LINE__, __FUNCTION__, fbase->event_in);
+			return -1;
+		}
 #ifdef SYS_WIN
 		ret = (int) acl_fiber_recv(fbase->event_in, (char*) &n, sizeof(n), 0);
 #else
@@ -107,8 +112,9 @@ int fbase_event_wait(FIBER_BASE *fbase)
 				interrupt, (int) fbase->event_in, ret);
 			doze(1);
 		} else if (err == FIBER_EAGAIN) {
-			msg_info("%s(%d), %s: read EAGAIN, in=%d, ret=%d",
-				__FILE__, __LINE__, __FUNCTION__,
+			msg_info("%s(%d), %s: scheduled %s, read EAGAIN, "
+				"in=%d, ret=%d", __FILE__, __LINE__,
+				__FUNCTION__, acl_fiber_scheduled() ? "yes":"no",
 				(int) fbase->event_in, ret);
 			doze(1);
 		} else {

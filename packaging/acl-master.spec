@@ -1,8 +1,8 @@
-%define release_id 0
+%define release_id 5
 
 Summary: acl master framework
 Name:           acl-master
-Version:        3.5.3
+Version:        3.5.4
 Release:        %{release_id}
 Group:          System Environment/Tools
 License:        IBM
@@ -20,6 +20,9 @@ acl master framework
 %setup -q
 
 %build
+
+%define HAS_SYSTEMD %( if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then echo "1" ; else echo "0"; fi )
+
 make -j 4
 make -C lib_fiber
 
@@ -32,23 +35,39 @@ make install_master  DESTDIR=$RPM_BUILD_ROOT
 rm -rf %{buildroot}
 
 %post
-/sbin/chkconfig --add master
 if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
-    service master start > /dev/null 2>&1 ||:
+    %if %HAS_SYSTEMD == 1
+        systemctl enable master.service
+        systemctl daemon-reload
+        systemctl start master.service
+    %else
+        /sbin/chkconfig --add master
+        service master start
+    %endif
 fi
 
 %preun
 if [ "$1" == "0" ]; then
-    service master stop >/dev/null 2>&1 ||:
-    /sbin/chkconfig --del master
+    %if %HAS_SYSTEMD == 1
+        systemctl stop master.service
+        systemctl disable master.service
+    %else
+        service master stop
+        /sbin/chkconfig --del master
+    %endif
 fi
 
 %postun
 if [ "$1" -ge "1" ]; then
     # TODO: upgrade should be support
     echo "prepare restarting acl_master ..."
-    service master masterrestart > /dev/null 2>&1 ||:
+    %if %HAS_SYSTEMD == 1
+        systemctl daemon-reload
+        systemctl restart master.service
+    %else
+        service master restart
+    %endif
 fi
 
 %files
@@ -61,8 +80,28 @@ fi
 /opt/soft/acl-master/sh
 /opt/soft/acl-master/var
 /etc/init.d/master
+%if %HAS_SYSTEMD==1
+/usr/lib/systemd/system/master.service
+%endif
 
 %changelog
+* Mon Jul 04 2022 shuxin.zheng@qq.com 3.5.4-5-20220704.11
+- feature: acl_master supports signal the children processes with the specified signal numer
+
+* Thu Jun 30 2022 shuxin.zheng@qq.com 3.5.4-4-20220630.09
+- optimize: acl_master service supports different CentOS automatically
+
+* Wed Jun 29 2022 shuxin.zheng@qq.com 3.5.4-3-20220629.20
+- optimize: acl_master service supports Centos5, Centos6
+
+* Wed Jun 29 2022 shuxin.zheng@qq.com 3.5.4-2-20220629.19
+- optimize: acl_master service supports Centos5, Centos6
+
+* Tue Jun 28 2022 shuxin.zheng@qq.com 3.5.4-1-20220628.23
+- optimize: acl_master support master.service
+
+* Mon Jun 13 2022 shuxin.zheng@qq.com 3.5.4-0-20220613.18
+- feature: acl_master support master.service
 
 * Wed Jun 01 2022 shuxin.zheng@qq.com 3.5.3-0-20220601.20
 - feature: acl_master can manage service not written by acl libs

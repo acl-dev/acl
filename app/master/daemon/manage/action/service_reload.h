@@ -2,9 +2,6 @@
 #include "master/master.h"
 
 class  http_client;
-struct reload_req_t;
-struct reload_res_t;
-struct reload_res_data_t;
 
 class service_reload
 {

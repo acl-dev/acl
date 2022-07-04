@@ -270,6 +270,46 @@ struct reload_res_t : res_t
 
 //////////////////////////////////////////////////////////////////////////////
 
+struct signal_req_data_t
+{
+	acl::string path;
+};
+
+struct signal_req_t : req_t
+{
+	int signum;
+	std::vector<signal_req_data_t> data;
+
+	signal_req_t(void) : signum(-1) {}
+};
+
+struct signal_res_data_t
+{
+	signal_res_data_t(void)
+	{
+		status        = 0;
+		proc_count    = 0;
+		proc_signaled = 0;
+		proc_ok       = 0;
+		proc_err      = 0;
+	}
+
+	int status;
+	int proc_count;
+	int proc_signaled;
+	int proc_ok;
+	int proc_err;
+
+	acl::string path;
+};
+
+struct signal_res_t : res_t
+{
+	std::vector<signal_res_data_t> data;
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 struct master_config_req_t : req_t
 {
 };

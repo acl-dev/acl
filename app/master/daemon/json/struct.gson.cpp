@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "struct.h"
 #include "struct.gson.h"
-#include "acl_cpp/serialize/gson_helper.ipp"
 namespace acl
 {
     acl::json_node& gson(acl::json &$json, const kill_req_data_t &$obj)
@@ -1565,6 +1564,315 @@ namespace acl
 
 
      std::pair<bool,std::string> gson(const acl::string &$str, serv_info_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const signal_req_data_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.path))
+            $node.add_null("path");
+        else
+            $node.add_text("path", acl::get_value($obj.path));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const signal_req_data_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const signal_req_data_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_req_data_t &$obj)
+    {
+        acl::json_node *path = $node["path"];
+        std::pair<bool, std::string> $result;
+
+        if(!path ||!($result = gson(*path, &$obj.path), $result.first))
+            return std::make_pair(false, "required [signal_req_data_t.path] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_req_data_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, signal_req_data_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const signal_req_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.cmd))
+            $node.add_null("cmd");
+        else
+            $node.add_text("cmd", acl::get_value($obj.cmd));
+
+        if (check_nullptr($obj.signum))
+            $node.add_null("signum");
+        else
+            $node.add_number("signum", acl::get_value($obj.signum));
+
+        if (check_nullptr($obj.data))
+            $node.add_null("data");
+        else
+            $node.add_child("data", acl::gson($json, $obj.data));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const signal_req_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const signal_req_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_req_t &$obj)
+    {
+        acl::json_node *cmd = $node["cmd"];
+        acl::json_node *signum = $node["signum"];
+        acl::json_node *data = $node["data"];
+        std::pair<bool, std::string> $result;
+
+        if(!cmd ||!($result = gson(*cmd, &$obj.cmd), $result.first))
+            return std::make_pair(false, "required [signal_req_t.cmd] failed:{"+$result.second+"}");
+     
+        if(!signum ||!($result = gson(*signum, &$obj.signum), $result.first))
+            return std::make_pair(false, "required [signal_req_t.signum] failed:{"+$result.second+"}");
+     
+        if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
+            return std::make_pair(false, "required [signal_req_t.data] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_req_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, signal_req_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const signal_res_data_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.status))
+            $node.add_null("status");
+        else
+            $node.add_number("status", acl::get_value($obj.status));
+
+        if (check_nullptr($obj.proc_count))
+            $node.add_null("proc_count");
+        else
+            $node.add_number("proc_count", acl::get_value($obj.proc_count));
+
+        if (check_nullptr($obj.proc_signaled))
+            $node.add_null("proc_signaled");
+        else
+            $node.add_number("proc_signaled", acl::get_value($obj.proc_signaled));
+
+        if (check_nullptr($obj.proc_ok))
+            $node.add_null("proc_ok");
+        else
+            $node.add_number("proc_ok", acl::get_value($obj.proc_ok));
+
+        if (check_nullptr($obj.proc_err))
+            $node.add_null("proc_err");
+        else
+            $node.add_number("proc_err", acl::get_value($obj.proc_err));
+
+        if (check_nullptr($obj.path))
+            $node.add_null("path");
+        else
+            $node.add_text("path", acl::get_value($obj.path));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const signal_res_data_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const signal_res_data_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_res_data_t &$obj)
+    {
+        acl::json_node *status = $node["status"];
+        acl::json_node *proc_count = $node["proc_count"];
+        acl::json_node *proc_signaled = $node["proc_signaled"];
+        acl::json_node *proc_ok = $node["proc_ok"];
+        acl::json_node *proc_err = $node["proc_err"];
+        acl::json_node *path = $node["path"];
+        std::pair<bool, std::string> $result;
+
+        if(!status ||!($result = gson(*status, &$obj.status), $result.first))
+            return std::make_pair(false, "required [signal_res_data_t.status] failed:{"+$result.second+"}");
+     
+        if(!proc_count ||!($result = gson(*proc_count, &$obj.proc_count), $result.first))
+            return std::make_pair(false, "required [signal_res_data_t.proc_count] failed:{"+$result.second+"}");
+     
+        if(!proc_signaled ||!($result = gson(*proc_signaled, &$obj.proc_signaled), $result.first))
+            return std::make_pair(false, "required [signal_res_data_t.proc_signaled] failed:{"+$result.second+"}");
+     
+        if(!proc_ok ||!($result = gson(*proc_ok, &$obj.proc_ok), $result.first))
+            return std::make_pair(false, "required [signal_res_data_t.proc_ok] failed:{"+$result.second+"}");
+     
+        if(!proc_err ||!($result = gson(*proc_err, &$obj.proc_err), $result.first))
+            return std::make_pair(false, "required [signal_res_data_t.proc_err] failed:{"+$result.second+"}");
+     
+        if(!path ||!($result = gson(*path, &$obj.path), $result.first))
+            return std::make_pair(false, "required [signal_res_data_t.path] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_res_data_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, signal_res_data_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const signal_res_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.status))
+            $node.add_null("status");
+        else
+            $node.add_number("status", acl::get_value($obj.status));
+
+        if (check_nullptr($obj.msg))
+            $node.add_null("msg");
+        else
+            $node.add_text("msg", acl::get_value($obj.msg));
+
+        if (check_nullptr($obj.data))
+            $node.add_null("data");
+        else
+            $node.add_child("data", acl::gson($json, $obj.data));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const signal_res_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const signal_res_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_res_t &$obj)
+    {
+        acl::json_node *status = $node["status"];
+        acl::json_node *msg = $node["msg"];
+        acl::json_node *data = $node["data"];
+        std::pair<bool, std::string> $result;
+
+        if(!status ||!($result = gson(*status, &$obj.status), $result.first))
+            return std::make_pair(false, "required [signal_res_t.status] failed:{"+$result.second+"}");
+     
+        if(!msg ||!($result = gson(*msg, &$obj.msg), $result.first))
+            return std::make_pair(false, "required [signal_res_t.msg] failed:{"+$result.second+"}");
+     
+        if(!data ||!data->get_obj()||!($result = gson(*data->get_obj(), &$obj.data), $result.first))
+            return std::make_pair(false, "required [signal_res_t.data] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, signal_res_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, signal_res_t &$obj)
     {
         acl::json _json;
         _json.update($str.c_str());
