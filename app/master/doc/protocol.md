@@ -12,12 +12,13 @@
 
 请求协议：
 ```
-POST /?cmd=list HTTP/1.0
-Content-Length: 25
+POST /?cmd=list HTTP/1.1
+Host: localhost
+Content-Length: 24
 Connection: keep-alive
 Content-Type: text/json
 
-{ cmd: 'list', data: {}}
+{"cmd":"list","data":{}}
 ```
 
 响应协议：
@@ -26,7 +27,7 @@ HTTP/1.1 200 OK
 Date: Tue, 19 Sep 2017 06:51:50 GMT
 Server: acl
 Content-Type: text/json; charset=utf-8
-Content-Length: 1588
+Content-Length: 552
 Connection: Keep-Alive
 
 {"status":200,"msg":"ok","data":[{"status":200,"name":"*.*.*.*:53","type":5,"start":0,"owner":"","path":"/opt/soft/acl-master/libexec/udp-echo","conf":"/opt/soft/acl-master/conf/service/udp-echo.cf","proc_max":1,"proc_prefork":1,"proc_total":1,"proc_avail":1,"throttle_delay":6,"listen_fd_count":0,"notify_addr":"","notify_recipients":"","env":[{"LOG":"/opt/soft/acl-master/var/log/udp-echo"},{"MASTER_LOG":"/opt/soft/acl-master/var/log/acl_master"},{"SERVICE_LOG":"/opt/soft/acl-master/var/log/udp-echo"}],"procs":[{"pid":26036,"start":1505803886}]}]}
@@ -36,12 +37,13 @@ Connection: Keep-Alive
 
 请求协议
 ```
-POST /?cmd=stat HTTP/1.0
-Content-Length: 81
+POST /?cmd=stat HTTP/1.1
+Host: localhost
+Content-Length: 80
 Connection: keep-alive
 Content-Type: text/json
 
-{ cmd: 'stat', data: [{'path':'/opt/soft/acl-master/conf/service/udp-echo.cf'}]}
+{"cmd":"stat","data":[{"path":"/opt/soft/acl-master/conf/service/udp-echo.cf"}]}
 ```
 
 响应协议
@@ -60,12 +62,13 @@ Connection: Keep-Alive
 
 请求协议
 ```
-POST /?cmd=stop HTTP/1.0
-Content-Length: 81
+POST /?cmd=stop HTTP/1.1
+Host: localhost
+Content-Length: 80
 Connection: keep-alive
 Content-Type: text/json
 
-{ cmd: 'stop', data: [{'path':'/opt/soft/acl-master/conf/service/udp-echo.cf'}]}
+{"cmd":"stop","data":[{"path":"/opt/soft/acl-master/conf/service/udp-echo.cf"}]}
 ```
 
 响应协议
@@ -84,12 +87,13 @@ Connection: Keep-Alive
 
 请求协议
 ```
-POST /?cmd=start HTTP/1.0
-Content-Length: 83
+POST /?cmd=start HTTP/1.1
+Host: localhost
+Content-Length: 81
 Connection: keep-alive
 Content-Type: text/json
 
-{ cmd: 'start', data: [{'path':'/opt/soft/acl-master/conf/service/udp-echo.cf'}]}
+{"cmd":"start","data":[{"path":"/opt/soft/acl-master/conf/service/udp-echo.cf"}]}
 ```
 
 响应协议
@@ -108,12 +112,13 @@ Connection: Keep-Alive
 
 请求协议
 ```
-POST /?cmd=reload HTTP/1.0
-Content-Length: 84
+POST /?cmd=reload HTTP/1.1
+Host: localhost
+Content-Length: 82
 Connection: keep-alive
 Content-Type: text/json
 
-{ cmd: 'reload', data: [{'path':'/opt/soft/acl-master/conf/service/udp-echo.cf'}]}
+{"cmd":"reload","data":[{"path":"/opt/soft/acl-master/conf/service/udp-echo.cf"}]}
 ```
 
 响应协议
@@ -126,4 +131,17 @@ Content-Length: 137
 Connection: Keep-Alive
 
 {"status":200,"msg":"ok","data":[{"status":200,"proc_count":1,"proc_signaled":1,"path":"/opt/soft/acl-master/conf/service/udp-echo.cf"}]}
+```
+
+### 6. 给指定服务的进程发送指定信号
+
+请求协议
+```
+POST /?cmd=signal HTTP/1.1
+Host: localhost
+Content-Length: 96
+Connection: keep-alive
+Content-Type: text/json
+
+{"cmd":"signal","signum":"SIGUSR1","data":[{"path":"/opt/soft/acl-master/conf/service/mf.cf"}]}}
 ```

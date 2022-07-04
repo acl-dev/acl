@@ -1,4 +1,4 @@
-%define release_id 4
+%define release_id 5
 
 Summary: acl master framework
 Name:           acl-master
@@ -85,6 +85,9 @@ fi
 %endif
 
 %changelog
+* Mon Jul 04 2022 shuxin.zheng@qq.com 3.5.4-5-20220704.11
+- feature: acl_master supports signal the children processes with the specified signal numer
+
 * Thu Jun 30 2022 shuxin.zheng@qq.com 3.5.4-4-20220630.09
 - optimize: acl_master service supports different CentOS automatically
 
