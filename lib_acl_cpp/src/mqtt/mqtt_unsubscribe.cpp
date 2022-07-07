@@ -46,7 +46,7 @@ mqtt_unsubscribe& mqtt_unsubscribe::set_pkt_id(unsigned short id) {
 
 mqtt_unsubscribe& mqtt_unsubscribe::add_topic(const char* topic) {
 	topics_.push_back(topic);
-	body_len_ += (unsigned) strlen(topic);
+	body_len_ += 2 + (unsigned) strlen(topic);
 	return *this;
 }
 
@@ -63,7 +63,8 @@ bool mqtt_unsubscribe::to_string(string& out) {
 	body_len_ += sizeof(pkt_id_);
 
 	mqtt_header& header = this->get_header();
-	header.set_remaing_length(body_len_);
+	header.set_header_flags(0x02)
+		.set_remaing_length(body_len_);
 
 	if (!header.build_header(out)) {
 		return false;
