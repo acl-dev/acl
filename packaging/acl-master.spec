@@ -1,4 +1,4 @@
-%define release_id 5
+%define release_id 6
 
 Summary: acl master framework
 Name:           acl-master
@@ -82,9 +82,14 @@ fi
 /etc/init.d/master
 %if %HAS_SYSTEMD==1
 /usr/lib/systemd/system/master.service
+%else
+/etc/cron.d/acl_master.cron
 %endif
 
 %changelog
+* Thu Jul 07 2022 shuxin.zheng@qq.com 3.5.4-6-20220707.15
+- feature: acl_master supports cron keepalived shell for os5 & os6
+
 * Mon Jul 04 2022 shuxin.zheng@qq.com 3.5.4-5-20220704.11
 - feature: acl_master supports signal the children processes with the specified signal numer
 

@@ -146,6 +146,7 @@ CONF_PATH=$PREFIX_PATH$INSTALL_PATH/conf
 SERVICE_PATH=$PREFIX_PATH$INSTALL_PATH/conf/service
 LIBEXEC_PATH=$PREFIX_PATH$INSTALL_PATH/libexec
 INIT_PATH=$PREFIX_PATH/etc/init.d/
+CRON_PATH=$PREFIX_PATH/etc/cron.d/
 SYSTEMD_INIT_PATH=$PREFIX_PATH/usr/lib/systemd/system/
 SYSTEMD=/usr/lib/systemd/systemd
 SH_PATH=$PREFIX_PATH$INSTALL_PATH/sh
@@ -168,8 +169,11 @@ create_all_path()
 	create_path $VAR_PATH/private
 	create_path $VAR_PATH/public
 	create_path $INIT_PATH
+	create_path $CRON_PATH
 	if [ -f $SYSTEMD ]; then
 		create_path $SYSTEMD_INIT_PATH
+	else
+		create_path $CRON_PATH
 	fi
 
 	chmod 700 $VAR_PATH/private
@@ -196,6 +200,8 @@ copy_all_file()
 	install_file a+x,go-wrx init.d/ $INIT_PATH
 	if [ -f $SYSTEMD ]; then
 		install_file a-x,go-wx system/ $SYSTEMD_INIT_PATH
+	else
+		install_file a-x,go-wx cron.d/ $CRON_PATH
 	fi
 }
 
