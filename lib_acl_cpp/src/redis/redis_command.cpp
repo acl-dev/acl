@@ -387,8 +387,14 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 	conn_->set_check_addr(check_addr_);
 
 	if (slice_req_) {
+		if (request_obj_ == NULL) {
+			request_obj_ = NEW redis_request();
+		}
 		result_ = conn_->run(dbuf_, *request_obj_, nchild, timeout);
 	} else {
+		if (request_buf_ == NULL) {
+			request_buf_ = NEW string(128);
+		}
 		result_ = conn_->run(dbuf_, *request_buf_, nchild, timeout);
 	}
 	return result_;
