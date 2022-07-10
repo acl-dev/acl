@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2.0)
 #set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Release CACHE STRING "set build type to release")
 
@@ -117,7 +117,13 @@ set(LIBRARY_OUTPUT_PATH ${lib_output_path})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
 add_library(protocol_static STATIC ${lib_src})
-SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
+
+if (${WIN_OS})
+	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "libprotocol")
+else()
+	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
+endif()
+
 link_directories(${lib_output_path})
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")

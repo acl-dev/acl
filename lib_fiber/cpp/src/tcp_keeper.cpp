@@ -1,4 +1,7 @@
 #include "stdafx.hpp"
+
+#if !defined(_WIN32) && !defined(_WIN64)
+
 #include "fiber/tcp_keeper.hpp"
 #include "keeper/keeper.hpp"
 #include "keeper/keeper_waiter.hpp"
@@ -184,3 +187,5 @@ socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */,
 }
 
 } // namespace acl
+
+#endif // _WIN32 && _WIN64

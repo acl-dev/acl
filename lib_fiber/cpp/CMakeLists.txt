@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.2.0)
 #set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Release CACHE STRING "set build type to release")
 
@@ -38,43 +38,51 @@ else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
 
-add_definitions(
-	"-W"
-	"-fPIC"
-	"-Wall"
-	"-Werror"
-	"-Wshadow"
-	"-Wformat"
-	"-Wpointer-arith"
-	"-D_REENTRANT"
-	"-D_USE_FAST_MACRO"
-	"-Wno-long-long"
-#	"-Wuninitialized"
-	"-D_POSIX_PTHREAD_SEMANTICS"
-#	"-Wno-invalid-source-encoding"
-#	"-Wno-unused-private-field"
-	"-Wno-unused-parameter"
-#	"-Wno-unused-const-variable"
-	"-fexceptions"
-)
+if (${UNIX_OS})
+	add_definitions(
+		"-W"
+		"-fPIC"
+		"-Wall"
+		"-Werror"
+		"-Wshadow"
+		"-Wformat"
+		"-Wpointer-arith"
+		"-D_REENTRANT"
+		"-D_USE_FAST_MACRO"
+		"-Wno-long-long"
+	#	"-Wuninitialized"
+		"-D_POSIX_PTHREAD_SEMANTICS"
+	#	"-Wno-invalid-source-encoding"
+	#	"-Wno-unused-private-field"
+		"-Wno-unused-parameter"
+	#	"-Wno-unused-const-variable"
+		"-fexceptions"
+	)
 
-if (CMAKE_BUILD_TYPE STREQUAL "")
-	set(CMAKE_BUILD_TYPE "DEBUG")
-else()
-	string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+	if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
+		add_definitions("-O3")
+	else()
+		add_definitions("-g")
+	endif()
+elseif (${WIN_OS})
+	add_definitions(
+		"-D_WINSOCK_DEPRECATED_NO_WARNINGS"
+		"-DACL_WRITEABLE_CHECK"
+		"-DACL_PREPARE_COMPILE")
 endif()
 
-if (CMAKE_BUILD_TYPE STREQUAL "RELEASE")
-	add_definitions("-O3")
-else()
-	add_definitions("-g")
-endif()
+#if (CMAKE_BUILD_TYPE STREQUAL "")
+#	set(CMAKE_BUILD_TYPE "DEBUG")
+#else()
+#	string(TOUPPER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE)
+#endif()
 
 #string(TOUPPER ${CMAKE_SYSTEM_NAME} CMAKE_SYSTEM_NAME)
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 else()
 	message(FATAL_ERROR "unknown CMAKE_SYSTEM_NAME=${CMAKE_SYSTEM_NAME}")
 endif()
@@ -99,7 +107,11 @@ include_directories(
 	${fiber_include}
 )
 
-set(sources ${src} ${src}/keeper)
+if (${WIN_OS})
+	set(sources ${src})
+else()
+	set(sources ${src} ${src}/keeper)
+endif()
 
 foreach(iter ${sources})
 	aux_source_directory(${iter} lib_src)
@@ -115,7 +127,13 @@ set(LIBRARY_OUTPUT_PATH ${lib_output_path})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 
 add_library(fiber_cpp_static STATIC ${lib_src})
-SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "fiber_cpp")
+
+if (${WIN_OS})
+	SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "libfiber_cpp")
+else()
+	SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "fiber_cpp")
+endif()
+
 link_directories(${lib_output_path})
 
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
