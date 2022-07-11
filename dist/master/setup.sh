@@ -147,12 +147,13 @@ SERVICE_PATH=$PREFIX_PATH$INSTALL_PATH/conf/service
 LIBEXEC_PATH=$PREFIX_PATH$INSTALL_PATH/libexec
 INIT_PATH=$PREFIX_PATH/etc/init.d/
 CRON_PATH=$PREFIX_PATH/etc/cron.d/
-SYSTEMD_INIT_PATH=$PREFIX_PATH/usr/lib/systemd/system/
+SYSTEMD_PATH=$PREFIX_PATH/usr/lib/systemd/system/
 SYSTEMD=/usr/lib/systemd/systemd
 SH_PATH=$PREFIX_PATH$INSTALL_PATH/sh
 VAR_PATH=$PREFIX_PATH$INSTALL_PATH/var
 
 ###############################################################################
+
 create_all_path()
 {
 	create_path $INSTALL_PATH
@@ -162,21 +163,19 @@ create_all_path()
 	create_path $SH_PATH
 	create_path $CONF_PATH
 	create_path $SERVICE_PATH
-#	create_path $SERVICE_PATH/samples
 	create_path $VAR_PATH
 	create_path $VAR_PATH/log
 	create_path $VAR_PATH/pid
 	create_path $VAR_PATH/private
 	create_path $VAR_PATH/public
 	create_path $INIT_PATH
-	create_path $CRON_PATH
 	if [ -f $SYSTEMD ]; then
-		create_path $SYSTEMD_INIT_PATH
+		create_path $SYSTEMD_PATH
 	else
 		create_path $CRON_PATH
 	fi
 
-	chmod 700 $VAR_PATH/private
+	chmod 700  $VAR_PATH/private
 	chmod 1777 $VAR_PATH/log
 }
 
@@ -196,12 +195,12 @@ copy_all_file()
 	test -d conf/service && {
 		install_file a+x,go-wrx conf/service $SERVICE_PATH
 	}
-#	install_file a+x,go-wrx conf/service/samples $SERVICE_PATH/samples
 	install_file a+x,go-wrx init.d/ $INIT_PATH
+
 	if [ -f $SYSTEMD ]; then
-		install_file a-x,go-wx system/ $SYSTEMD_INIT_PATH
+		compare_or_replace a-x,go-wx system/master.service $SYSTEMD_PATH/master.service
 	else
-		install_file a-x,go-wx cron.d/ $CRON_PATH
+		compare_or_replace a-x,go-wx cron.d/master.cron $CRON_PATH/master.cron
 	fi
 }
 

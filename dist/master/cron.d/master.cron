@@ -1,0 +1,1 @@
+*/1 * * * * root /bin/bash /opt/soft/acl-master/sh/master_keepalive.sh >/dev/null 2>&1
