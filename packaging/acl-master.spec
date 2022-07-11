@@ -83,7 +83,7 @@ fi
 %if %HAS_SYSTEMD==1
 /usr/lib/systemd/system/master.service
 %else
-/etc/cron.d/acl_master.cron
+/etc/cron.d/master.cron
 %endif
 
 %changelog
