@@ -9,7 +9,7 @@ function pack() {
     PKG_VERSION=$(grep '^Version:' ${PKG_NAME}.spec | awk '{print $2}')
     cd ..
     PROJECT_NAME="${PKG_NAME}-${PKG_VERSION}"
-    git archive --format=tar --prefix=$PROJECT_NAME/ HEAD | (tar xpf -) #归档父项目后解压到指定目录
+    git archive --format=tar --prefix=$PROJECT_NAME/ HEAD | (tar xpf -)
 	tar zcpf ${PROJECT_NAME}.tar.gz ${PROJECT_NAME}
 	/bin/mv -f ${PROJECT_NAME}.tar.gz packaging
     rm -rf ${PKG_NAME}-${PKG_VERSION}
