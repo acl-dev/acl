@@ -11,14 +11,17 @@ PKG_VERSION = $(shell grep '^Version:' $(PKG_NAME).spec | awk '{print $$2}')
 
 PWD = $(shell pwd)
 
+DEBUGINFO=$(shell ./control debuginfo )
+
 all: libs
 
+debuginfo:
 tar:
 	@./control pack ${PKG_NAME}
 
 libs: tar
 	@mkdir -p {BUILD,BUILDROOT,SRPMS,SPECS}
-	@rpmbuild --define "_topdir ${PWD}" --define "_sourcedir ${PWD}" --define "_rpmdir ${PWD}" --nodebuginfo -bb $(PKG_NAME).spec
+	@rpmbuild --define "_topdir ${PWD}" --define "_sourcedir ${PWD}" --define "_rpmdir ${PWD}" ${DEBUGINFO} -bb $(PKG_NAME).spec
 	@echo Binary PRM for $(PKG_NAME) has been created under ${PWD}/`rpm --eval '%{_arch}'`
 
 clean cl:

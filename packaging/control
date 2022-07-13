@@ -20,6 +20,16 @@ function help() {
     echo "$0 build|pack"
 }
 
+# 检测rpmbuild是否可使用--nodebuginfo参数
+function debuginfo() {
+	local exist_debuginfo=`rpmbuild --help |grep 'nodebuginfo' |wc -l`
+	if [ ${exist_debuginfo} -eq 1 ]; then
+		echo "--nodebuginfo"
+	else
+		echo ""
+	fi
+}
+
 
 function help() {
     echo "$0 build|pack"
@@ -29,6 +39,8 @@ if [ "$1" == "" ]; then
     help
 elif [ "$1" == "pack" ];then
     pack $2
+elif [ "$1" == "debuginfo" ];then
+	debuginfo
 elif [ "$1" == "test" ];then
     run_test
 else
