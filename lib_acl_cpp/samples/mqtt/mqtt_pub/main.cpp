@@ -14,7 +14,7 @@ static bool handle_puback(acl::mqtt_client&, const acl::mqtt_message&) {
 	return true;
 }
 
-static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
+static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) {
 	acl::mqtt_publish publish;
 
 	publish.get_header().set_qos(acl::MQTT_QOS1);
@@ -24,7 +24,12 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
 	publish.set_topic(topic);
 
 	acl::string payload;
-	payload.format("payload-%ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd", id);
+	payload.format("payload-%d:", id);
+
+	for (; payload.size() < (size_t) length;) {
+		payload += 'c';
+	}
+
 	publish.set_payload((unsigned) payload.size(), payload);
 
 	if (!conn.send(publish)) {
@@ -64,15 +69,15 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id) {
 }
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s addr -n max\r\n", procname);
+	printf("usage: %s -h [help] -s addr -n max -c payload_length\r\n", procname);
 }
 
 int main(int argc, char* argv[]) {
 	char ch;
-	int  max = 1;
+	int  max = 1, length = 32;
 	acl::string addr("127.0.0.1|1883");
 
-	while ((ch = getopt(argc, argv, "hs:n:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -82,6 +87,9 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'n':
 			max = atoi(optarg);
+			break;
+		case 'c':
+			length = atoi(optarg);
 			break;
 		default:
 			break;
@@ -126,7 +134,7 @@ int main(int argc, char* argv[]) {
 
 	unsigned short id = 1;
 	for (int i = 1; i <= max; i++) {
-		if (!test_publish(conn, id++)) {
+		if (!test_publish(conn, id++, length)) {
 			break;
 		}
 		// id must be more than 0

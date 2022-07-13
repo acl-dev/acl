@@ -55,9 +55,10 @@ static bool handle_publish(acl::mqtt_client& conn,
 		const acl::mqtt_message& message) {
 	const acl::mqtt_publish& publish = (const acl::mqtt_publish&) message;
 	const acl::string& payload = publish.get_payload();
-	printf("topic: %s, qos: %d, pkt_id: %d, payload len: %zd, payload: %s\r\n",
+	printf("payload: %s\r\n", payload.c_str());
+	printf("topic: %s, qos: %d, pkt_id: %d, payload len: %zd\r\n",
 		publish.get_topic(), (int) publish.get_header().get_qos(),
-		publish.get_pkt_id(), payload.size(), payload.c_str());
+		publish.get_pkt_id(), payload.size());
 
 	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
