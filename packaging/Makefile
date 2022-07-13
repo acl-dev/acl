@@ -11,6 +11,7 @@ PKG_VERSION = $(shell grep '^Version:' $(PKG_NAME).spec | awk '{print $$2}')
 
 PWD = $(shell pwd)
 
+$(shell chmod +x control)
 DEBUGINFO=$(shell ./control debuginfo )
 
 all: libs
