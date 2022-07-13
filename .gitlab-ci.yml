@@ -127,6 +127,20 @@ devel:centos7.2:
     }
     <<: *DEVEL
 
+devel:centos8.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.0"
+    }
+    <<: *DEVEL
+
+devel:centos8.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.2"
+    }
+    <<: *DEVEL
+
 lib_release:centos5.8:
     variables: {
         BUILDIMAGES:
@@ -166,6 +180,20 @@ lib_release:centos7.2:
     variables: {
         BUILDIMAGES:
             "docker-registry.qiyi.virtual/acl/centos-builder:7.2"
+    }
+    <<: *LIB_RELEASE
+
+lib_release:centos8.0:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.0"
+    }
+    <<: *LIB_RELEASE
+
+lib_release:centos8.2:
+    variables: {
+        BUILDIMAGES:
+            "docker-registry.qiyi.virtual/acl/centos-builder:8.2"
     }
     <<: *LIB_RELEASE
 
