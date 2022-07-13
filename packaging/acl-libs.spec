@@ -1,4 +1,4 @@
-%define release_id 15
+%define release_id 16
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -46,6 +46,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Jul 13 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-15-20220713.17
+- just release rpm package for CentOS8.x
 
 * Sat Jul 09 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-15-20220709.17
 - bugfix: fixed one crash bug that redis_command::request_buf_ will be NULL

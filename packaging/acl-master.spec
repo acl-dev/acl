@@ -1,4 +1,4 @@
-%define release_id 6
+%define release_id 7
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Wed Jul 13 2022 shuxin.zheng@qq.com 3.5.4-7-20220713.16
+- workaroud: don't generate core files when children processes abnormally crash.
+
 * Thu Jul 07 2022 shuxin.zheng@qq.com 3.5.4-6-20220707.15
 - feature: acl_master supports cron keepalived shell for os5 & os6
 
