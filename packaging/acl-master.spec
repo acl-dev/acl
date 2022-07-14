@@ -1,4 +1,4 @@
-%define release_id 7
+%define release_id 8
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 14 2022 shuxin.zheng@qq.com 3.5.4-8-20220714.09
+- just release new version
+
 * Wed Jul 13 2022 shuxin.zheng@qq.com 3.5.4-7-20220713.16
 - workaroud: don't generate core files when children processes abnormally crash.
 
