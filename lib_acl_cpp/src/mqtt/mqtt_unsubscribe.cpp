@@ -200,6 +200,8 @@ int mqtt_unsubscribe::update_topic_val(const char* data, int dlen) {
 
 	nread_ += (unsigned) topic_.size();
 
+	topics_.push_back(topic_);
+
 	if (nread_ >= body_len_) {
 		finished_ = true;
 		return dlen;
