@@ -275,6 +275,8 @@ static void main_server_exit(ACL_FIBER *fiber, int status)
 
 	/* stop the main thread fiber schedule proccess */
 	acl_fiber_schedule_stop();
+	acl_app_conf_unload();
+	acl_debug_end();
 	__exit_status = status;
 }
 
@@ -639,8 +641,9 @@ static void main_thread_loop(void)
 		acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
 		acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
 		acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
-		if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr)
+		if (acl_var_fiber_dispatch_addr && *acl_var_fiber_dispatch_addr) {
 			acl_fiber_create(main_fiber_dispatch, NULL, STACK_SIZE);
+		}
 	}
 #endif
 

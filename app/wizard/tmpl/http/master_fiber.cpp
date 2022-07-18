@@ -50,8 +50,6 @@ master_service::master_service(void)
 
 master_service::~master_service(void)
 {
-	delete conf_;
-	delete service_;
 }
 
 http_service& master_service::get_service(void) const
@@ -185,6 +183,9 @@ void master_service::proc_on_init(void)
 void master_service::proc_on_exit(void)
 {
 	logger(">>>proc_on_exit<<<");
+
+	delete conf_;
+	delete service_;
 }
 
 bool master_service::proc_on_sighup(acl::string&)
