@@ -37,6 +37,14 @@ public:
 	 */
 	mqtt_unsubscribe& add_topic(const char* topic);
 
+	/**
+	 * get all the topics.
+	 * @return {const std::vector<string>&}
+	 */
+	const std::vector<string>& get_topics(void) const {
+		return topics_;
+	}
+
 protected:
 	// @override
 	bool to_string(string& out);
