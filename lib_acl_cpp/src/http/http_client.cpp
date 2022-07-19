@@ -272,7 +272,9 @@ bool http_client::write_gzip(ostream& out, const void* data, size_t len)
 
 	// 普通流式方式输出压缩数据
 	if (out.write(data, len, true, true) < 0 || !out.fflush()) {
-		(void) zstream_->zip_finish(buf_);
+		if (!zstream_->is_finished()) {
+			(void) zstream_->zip_finish(buf_);
+		}
 		disconnected_ = true;
 		return false;
 	}
