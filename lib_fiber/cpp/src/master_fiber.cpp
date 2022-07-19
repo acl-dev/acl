@@ -91,15 +91,6 @@ void master_fiber::service_exit(void* ctx)
 	master_fiber* mf = (master_fiber *) ctx;
 	acl_assert(mf != NULL);
 	mf->proc_on_exit();
-
-	for (std::vector<server_socket*>::iterator it = mf->servers_.begin();
-		it != mf->servers_.end(); ++it) {
-		(*it)->unbind();
-		delete *it;
-	}
-
-	mf->conf_.reset();
-	acl::log::close();
 }
 
 void master_fiber::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
