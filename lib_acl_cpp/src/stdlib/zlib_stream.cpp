@@ -483,6 +483,7 @@ bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */,
 # endif
 #endif
 
+	finished_    = false;
 	is_compress_ = true;
 //	int   ret = __deflateInit(zstream_, level,
 //		ZLIB_VERSION, sizeof(z_stream));
@@ -524,7 +525,7 @@ bool zlib_stream::zip_finish(string* out)
 	bool ret = flush_out(__deflate, zlib_flush_finish, out);
 	//(void) __deflateReset(zstream_);
 	__deflateEnd(zstream_);
-	finished_ = false;
+	finished_ = true;
 	return ret;
 }
 
@@ -565,7 +566,9 @@ bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,
 	}
 # endif
 #endif
+	finished_    = false;
 	is_compress_ = false;
+
 	int   ret = __inflateInit2(zstream_, have_zlib_header ?
 		wsize : -wsize, ZLIB_VERSION, sizeof(z_stream));
 	if (ret != Z_OK) {
@@ -602,7 +605,7 @@ bool zlib_stream::unzip_finish(string* out)
 	bool ret = flush_out(__inflate, zlib_flush_finish, out);
 	//(void) __inflateReset(zstream_);
 	__inflateEnd(zstream_);
-	finished_ = false;
+	finished_ = true;
 	return ret;
 }
 

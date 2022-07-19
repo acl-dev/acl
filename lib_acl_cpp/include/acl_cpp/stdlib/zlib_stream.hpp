@@ -161,6 +161,15 @@ public:
 	bool zip_finish(string* out);
 
 	/**
+	 * 判断压缩/解压过程是否已经完成
+	 * @return {bool}
+	 */
+	bool is_finished(void) const
+	{
+		return finished_;
+	}
+
+	/**
 	 * 重置压缩器状态，一般只有当压缩过程出错时才会调用本函数
 	 * @return {bool} 是否成功
 	 */
