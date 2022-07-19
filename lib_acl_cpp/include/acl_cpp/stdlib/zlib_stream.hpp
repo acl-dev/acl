@@ -72,6 +72,14 @@ typedef enum
 	zlib_flush_finish = 4   // 完全刷新并停止压缩或解压过程
 } zlib_flush_t;
 
+enum
+{
+	zlib_flags_zip_begin   = 1,
+	zlib_flags_zip_end     = 1 << 1,
+	zlib_flags_unzip_begin = 1 << 2,
+	zlib_flags_unzip_end   = 1 << 3,
+};
+
 class string;
 
 class ACL_CPP_API zlib_stream : public pipe_stream
@@ -161,12 +169,12 @@ public:
 	bool zip_finish(string* out);
 
 	/**
-	 * 判断压缩/解压过程是否已经完成
+	 * 判断压缩过程是否已经完成
 	 * @return {bool}
 	 */
-	bool is_finished(void) const
+	bool zip_finished(void) const
 	{
-		return finished_;
+		return (zlib_flags_ & zlib_flags_zip_end) ? true : false;
 	}
 
 	/**
@@ -228,6 +236,15 @@ public:
 	bool unzip_finish(string* out);
 
 	/**
+	 * 判断解压过程是否已经完成
+	 * @return {bool}
+	 */
+	bool unzip_finished(void) const
+	{
+		return (zlib_flags_ & zlib_flags_unzip_end) ? true : false;
+	}
+
+	/**
 	 * 重置解压缩器状态，一般只有当解压缩过程出错时才会调用本函数
 	 * @return {bool} 是否成功
 	 */
@@ -280,6 +297,7 @@ private:
 	z_stream* zstream_;
 	bool finished_;
 	bool is_compress_;
+	unsigned zlib_flags_;
 	zlib_flush_t flush_;
 
 	bool update(int (*func)(z_stream*, int), zlib_flush_t flag,

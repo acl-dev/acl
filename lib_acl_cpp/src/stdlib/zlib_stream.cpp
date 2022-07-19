@@ -246,6 +246,7 @@ bool zlib_stream::zlib_load_once(void)
 
 zlib_stream::zlib_stream(void)
 {
+	zlib_flags_      = 0;
 	finished_        = false;
 	zstream_         = (z_stream*) acl_mycalloc(1, sizeof(z_stream));
 	zstream_->zalloc = __zlib_calloc;
@@ -264,6 +265,18 @@ zlib_stream::zlib_stream(void)
 
 zlib_stream::~zlib_stream(void)
 {
+	if ((zlib_flags_ & zlib_flags_zip_begin)
+		  && !(zlib_flags_ & zlib_flags_zip_end)) {
+		string dummy(256);
+		(void) zip_finish(&dummy);
+	}
+
+	if ((zlib_flags_ & zlib_flags_unzip_begin)
+		  && !(zlib_flags_ & zlib_flags_unzip_end)) {
+		string dummy(256);
+		(void) unzip_finish(&dummy);
+	}
+
 	acl_myfree(zstream_);
 }
 
@@ -483,10 +496,10 @@ bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */,
 # endif
 #endif
 
+	zlib_flags_  = zlib_flags_zip_begin;
 	finished_    = false;
 	is_compress_ = true;
-//	int   ret = __deflateInit(zstream_, level,
-//		ZLIB_VERSION, sizeof(z_stream));
+//	int ret = __deflateInit(zstream_, level, ZLIB_VERSION, sizeof(z_stream));
 
 	int ret = __deflateInit2(zstream_, level, Z_DEFLATED,
 			wbits, mlevel, Z_DEFAULT_STRATEGY, ZLIB_VERSION,
@@ -514,9 +527,12 @@ bool zlib_stream::zip_update(const char* in, int len, string* out,
 
 bool zlib_stream::zip_finish(string* out)
 {
-	if (finished_) {
+	if (zlib_flags_ & zlib_flags_zip_end) {
 		return true;
 	}
+
+	zlib_flags_ &= ~zlib_flags_zip_begin;
+	zlib_flags_ |= zlib_flags_zip_end;
 
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
@@ -529,7 +545,6 @@ bool zlib_stream::zip_finish(string* out)
 	bool ret = flush_out(__deflate, zlib_flush_finish, out);
 	//(void) __deflateReset(zstream_);
 	__deflateEnd(zstream_);
-	finished_ = true;
 	return ret;
 }
 
@@ -570,6 +585,7 @@ bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,
 	}
 # endif
 #endif
+	zlib_flags_  = zlib_flags_unzip_begin;
 	finished_    = false;
 	is_compress_ = false;
 
@@ -598,9 +614,12 @@ bool zlib_stream::unzip_update(const char* in, int len, string* out,
 
 bool zlib_stream::unzip_finish(string* out)
 {
-	if (finished_) {
+	if (zlib_flags_ & zlib_flags_unzip_end) {
 		return true;
 	}
+
+	zlib_flags_ &= ~zlib_flags_unzip_begin;
+	zlib_flags_ |= zlib_flags_unzip_end;
 
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
@@ -613,7 +632,6 @@ bool zlib_stream::unzip_finish(string* out)
 	bool ret = flush_out(__inflate, zlib_flush_finish, out);
 	//(void) __inflateReset(zstream_);
 	__inflateEnd(zstream_);
-	finished_ = true;
 	return ret;
 }
 
