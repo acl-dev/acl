@@ -514,6 +514,10 @@ bool zlib_stream::zip_update(const char* in, int len, string* out,
 
 bool zlib_stream::zip_finish(string* out)
 {
+	if (finished_) {
+		return true;
+	}
+
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
 	if (__deflate == NULL || __deflateEnd == NULL) {
@@ -594,6 +598,10 @@ bool zlib_stream::unzip_update(const char* in, int len, string* out,
 
 bool zlib_stream::unzip_finish(string* out)
 {
+	if (finished_) {
+		return true;
+	}
+
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
 	if (__inflate == NULL || __inflateEnd == NULL) {
