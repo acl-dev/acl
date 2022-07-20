@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
+static bool __show_messsage = false;
+static bool __show_binary   = false;
 static std::vector<acl::string> __topics;
 
 static bool handle_connack(acl::mqtt_client& conn,
@@ -55,10 +58,25 @@ static bool handle_publish(acl::mqtt_client& conn,
 		const acl::mqtt_message& message) {
 	const acl::mqtt_publish& publish = (const acl::mqtt_publish&) message;
 	const acl::string& payload = publish.get_payload();
-	printf("payload: %s\r\n", payload.c_str());
-	printf("topic: %s, qos: %d, pkt_id: %d, payload len: %zd\r\n",
+
+	if (__show_messsage) {
+		if (__show_binary) {
+			for (size_t i = 0; i < payload.size(); i++) {
+				char ch = payload[i];
+				printf("[%zd]->%d ", i, (int) ch);
+			}
+			printf("\r\n");
+		} else {
+			printf("payload: %s\r\n", payload.c_str());
+		}
+	}
+
+	ACL_VSTREAM* vs = conn.sock_stream()->get_vstream();
+	assert(vs);
+
+	printf("topic: %s, qos: %d, pkt_id: %d, payload len: %zd, total read=%lld\r\n",
 		publish.get_topic(), (int) publish.get_header().get_qos(),
-		publish.get_pkt_id(), payload.size());
+		publish.get_pkt_id(), payload.size(), vs->total_read_cnt);
 
 	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
@@ -116,20 +134,30 @@ static bool handle_message(acl::mqtt_client& conn, acl::mqtt_message& message) {
 }
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s addr\r\n", procname);
+	printf("usage: %s -h [help] \r\n"
+		" -s addr\r\n"
+		" -D [if display messages]\r\n"
+		" -B [if display as binary data format]\r\n"
+		, procname);
 }
 
 int main(int argc, char* argv[]) {
 	char ch;
 	acl::string addr("127.0.0.1|1883");
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:DB")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
 			addr = optarg;
+			break;
+		case 'D':
+			__show_messsage = true;
+			break;
+		case 'B':
+			__show_binary = true;
 			break;
 		default:
 			break;

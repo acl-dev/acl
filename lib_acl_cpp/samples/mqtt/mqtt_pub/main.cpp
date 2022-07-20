@@ -1,7 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
+#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
+
+static bool __payload_binary = false;
 
 static bool handle_connack(const acl::mqtt_message& message) {
 	const acl::mqtt_connack& connack = (const acl::mqtt_connack&) message;
@@ -26,8 +29,15 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) 
 	acl::string payload;
 	payload.format("payload-%d:", id);
 
+	char ch;
+	if (__payload_binary) {
+		ch = 0;
+	} else {
+		ch = 'c';
+	}
+
 	for (; payload.size() < (size_t) length;) {
-		payload += 'c';
+		payload.append(&ch, 1);
 	}
 
 	publish.set_payload((unsigned) payload.size(), payload);
@@ -36,6 +46,12 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) 
 		printf("send publish error\r\n");
 		return false;
 	}
+
+	ACL_VSTREAM* vs = conn.sock_stream()->get_vstream();
+	assert(vs);
+
+	printf("payload->size=%zd, total sent size=%lld\n",
+		payload.size(), vs->total_write_cnt);
 
 	if (publish.get_header().get_qos() == acl::MQTT_QOS0) {
 		return true;
@@ -69,7 +85,7 @@ static bool test_publish(acl::mqtt_client& conn, unsigned short id, int length) 
 }
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s addr -n max -c payload_length\r\n", procname);
+	printf("usage: %s -h [help] -s addr -n max -c payload_length -B [if payload is binary data]\r\n", procname);
 }
 
 int main(int argc, char* argv[]) {
@@ -77,7 +93,7 @@ int main(int argc, char* argv[]) {
 	int  max = 1, length = 32;
 	acl::string addr("127.0.0.1|1883");
 
-	while ((ch = getopt(argc, argv, "hs:n:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:B")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -90,6 +106,9 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'c':
 			length = atoi(optarg);
+			break;
+		case 'B':
+			__payload_binary = true;
 			break;
 		default:
 			break;

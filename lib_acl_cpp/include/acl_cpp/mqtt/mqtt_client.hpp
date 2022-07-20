@@ -64,6 +64,14 @@ public:
 	 */
 	bool read_message(const mqtt_header& header, mqtt_message& body);
 
+	/**
+	 * get the socket_stream with the current mqtt_client object
+	 * @return {sock_stream*} return NULL if no connection opened.
+	 */
+	socket_stream* sock_stream(void) const {
+		return conn_;
+	}
+
 protected:
 	// @override
 	bool open(void);
