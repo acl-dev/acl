@@ -63,15 +63,17 @@
   * VSTRING_SPACE() because that always succeeds or never returns.
   */
 #define VBUF_SKIP(bp)	{ \
-	while ((bp)->cnt > 0 && *(bp)->ptr) \
-	    (bp)->ptr++, (bp)->cnt--; \
+	while ((bp)->ptr < (bp)->data + (bp)->len && *(bp)->ptr) { \
+		(bp)->ptr++; \
+	} \
     }
 
 #define VBUF_STRCAT(bp, s) { \
 	const unsigned char *_cp = (const unsigned char *) (s); \
 	int _ch; \
-	while ((_ch = *_cp++) != 0) \
-	    ACL_VBUF_PUT((bp), _ch); \
+	while ((_ch = *_cp++) != 0) { \
+		ACL_VBUF_PUT((bp), _ch); \
+	} \
     }
 
 /* vbuf_print - format string, vsprintf-like interface */

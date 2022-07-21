@@ -674,9 +674,16 @@ public:
 	/**
 	 * 将一个有符号字符添加进当前字符串对象的尾部
 	 * @param ch {char} 有符号字符
+	 * @param term {bool} 是否需要在尾部追加 \0,追加的 \0 不增加长度
 	 * @return {string&} 当前字符串对象的引用
 	 */
-	string& push_back(char ch);
+	string& push_back(char ch, bool term = true);
+
+	/**
+	 * 在缓冲区尾部添加 \0 以便应用使用时的安全性, 添加的 \0 不增加长度
+	 * @return {string&} 当前字符串对象的引用
+	 */
+	string& terminate(void);
 
 	/**
 	 * 比较两个字符串对象的内容是否相同（区分大小写）

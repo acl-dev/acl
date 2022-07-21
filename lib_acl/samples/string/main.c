@@ -110,5 +110,6 @@ int main(void)
 
 	test_path_correct();
 
+	printf("sizeof(ACL_VSTRING)=%zd\r\n", sizeof(ACL_VSTRING));
 	return 0;
 }

@@ -622,9 +622,19 @@ string& string::operator <<(unsigned char n)
 	return *this;
 }
 
-string& string::push_back(char ch)
+string& string::push_back(char ch, bool term /* true */)
 {
-	return append(&ch, sizeof(ch));
+	ADDCH(vbf_, ch);
+	if (term) {
+		TERM(vbf_);
+	}
+	return *this;
+}
+
+string& string::terminate(void)
+{
+	TERM(vbf_);
+	return *this;
 }
 
 char* string::buf_end(void)

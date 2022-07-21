@@ -21,6 +21,7 @@ static const char label[] = "vstring";
 static ACL_ALLOCATOR *__var_allocator;
 static int __len = 1024;
 
+#if 0
 static void vstring_extend(ACL_VBUF *bp, int incr)
 {
 	unsigned used = (unsigned int) (bp->ptr - bp->data);
@@ -67,6 +68,7 @@ static int vstring_buf_space(ACL_VBUF *bp, ssize_t len)
 		vstring_extend(bp, (int) need);
 	return (0);
 }
+#endif
 
 static void after_alloc_fn(void *obj, void *pool_ctx acl_unused)
 {
@@ -76,9 +78,11 @@ static void after_alloc_fn(void *obj, void *pool_ctx acl_unused)
 	buf = acl_allocator_membuf_alloc(__FILE__, __LINE__,
 		__var_allocator, __len);
 	acl_vstring_glue(vp, buf, __len);
+#if 0
 	vp->vbuf.get_ready = vstring_buf_get_ready;
 	vp->vbuf.put_ready = vstring_buf_put_ready;
 	vp->vbuf.space = vstring_buf_space;
+#endif
 }
 
 static void before_free_fn(void *obj, void *pool_ctx acl_unused)

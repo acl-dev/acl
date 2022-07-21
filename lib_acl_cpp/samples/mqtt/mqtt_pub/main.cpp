@@ -151,6 +151,8 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
+	delete res;
+
 	unsigned short id = 1;
 	for (int i = 1; i <= max; i++) {
 		if (!test_publish(conn, id++, length)) {

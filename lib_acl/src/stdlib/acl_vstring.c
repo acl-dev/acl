@@ -86,15 +86,15 @@ static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 		new_len = vp->maxlen;
 	}
 
-	if (vp->slice) {
-		bp->data = (unsigned char *) acl_slice_pool_realloc(
-			__FILE__, __LINE__, vp->slice, bp->data, new_len);
-	} else if (vp->dbuf) {
+	if (vp->vbuf.flags & ACL_VBUF_FLAG_SLICE) {
+		bp->data = (unsigned char *) acl_slice_pool_realloc(__FILE__,
+			__LINE__, bp->alloc.slice, bp->data, new_len);
+	} else if (vp->vbuf.flags & ACL_VBUF_FLAG_DBUF) {
 		const unsigned char *data = bp->data;
 		bp->data = (unsigned char *)
-			acl_dbuf_pool_alloc(vp->dbuf, new_len);
+			acl_dbuf_pool_alloc(bp->alloc.dbuf, new_len);
 		memcpy(bp->data, data, (size_t) used);
-		acl_dbuf_pool_free(vp->dbuf, data);
+		acl_dbuf_pool_free(bp->alloc.dbuf, data);
 	} else if (bp->fd != ACL_FILE_INVALID) {
 #ifdef ACL_UNIX
 		acl_off_t off = new_len - 1;
@@ -114,36 +114,27 @@ static int vstring_extend(ACL_VBUF *bp, ssize_t incr)
 
 	bp->len = new_len;
 	bp->ptr = bp->data + used;
-	bp->cnt = bp->len - used;
 
 	return 0;
 }
 
-/* vstring_buf_get_ready - vbuf callback for read buffer empty condition */
+/* acl_vstring_put_ready - vbuf callback for write buffer full condition */
 
-static int vstring_buf_get_ready(ACL_VBUF *buf acl_unused)
-{
-	acl_msg_panic("vstring_buf_get: write-only buffer");
-	return 0;
-}
-
-/* vstring_buf_put_ready - vbuf callback for write buffer full condition */
-
-static int vstring_buf_put_ready(ACL_VBUF *bp)
+int acl_vstring_put_ready(ACL_VBUF *bp)
 {
 	return vstring_extend(bp, 0);
 }
 
-/* vstring_buf_space - vbuf callback to reserve space */
+/* acl_vstring_space - vbuf callback to reserve space */
 
-static int vstring_buf_space(ACL_VBUF *bp, ssize_t len)
+int acl_vstring_space(ACL_VBUF *bp, ssize_t len)
 {
-	ssize_t need;
+	ssize_t need, n = bp->len - (bp->ptr - bp->data);
 
 	if (len < 0) {
-		acl_msg_panic("vstring_buf_space: bad length %ld", (long) len);
+		acl_msg_panic("%s: bad length %ld", __FUNCTION__, (long) len);
 	}
-	if ((need = len - bp->cnt) > 0) {
+	if ((need = len - n) > 0) {
 		return vstring_extend(bp, need);
 	}
 	return 0;
@@ -155,21 +146,23 @@ void acl_vstring_init(ACL_VSTRING *vp, size_t len)
 		acl_msg_panic("acl_vstring_alloc: bad input, len < 1");
 	}
 
-	vp->slice     = NULL;
-	vp->dbuf      = NULL;
 	vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
 
 	vp->vbuf.flags     = 0;
 	vp->vbuf.len       = (int) len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0]   = 0;
-	vp->vbuf.get_ready = vstring_buf_get_ready;
-	vp->vbuf.put_ready = vstring_buf_put_ready;
-	vp->vbuf.space     = vstring_buf_space;
-/*	vp->vbuf.ctx = NULL; */
+#if 0
+	vp->vbuf.get_ready = acl_vstring_get_ready;
+	vp->vbuf.put_ready = acl_vstring_put_ready;
+	vp->vbuf.space     = acl_vstring_space;
+#endif
 	vp->maxlen         = 0;
-	vp->slice          = NULL;
+	vp->vbuf.alloc.slice = NULL;
 	vp->vbuf.fd        = ACL_FILE_INVALID;
+#if defined(_WIN32) || defined(_WIN64)
+	vp->vbuf.hmap      = NULL;
+#endif
 }
 
 void acl_vstring_free_buf(ACL_VSTRING *vp)
@@ -178,9 +171,6 @@ void acl_vstring_free_buf(ACL_VSTRING *vp)
 		return;
 	}
 
-	if (vp->slice) {
-		acl_slice_pool_free(__FILE__, __LINE__, vp->vbuf.data);
-	}
 #ifdef ACL_UNIX
 	if (vp->vbuf.fd != ACL_FILE_INVALID) {
 		if (vp->maxlen > 0 && munmap(vp->vbuf.data, vp->maxlen) < 0) {
@@ -195,7 +185,9 @@ void acl_vstring_free_buf(ACL_VSTRING *vp)
 		CloseHandle(vp->vbuf.hmap);
 	}
 #endif
-	else if (vp->dbuf == NULL) {
+	else if (vp->vbuf.flags & ACL_VBUF_FLAG_SLICE) {
+		acl_slice_pool_free(__FILE__, __LINE__, vp->vbuf.data);
+	} else if ((vp->vbuf.flags & ACL_VBUF_FLAG_DBUF) == 0) {
 		acl_myfree(vp->vbuf.data);
 	}
 	vp->vbuf.data = NULL;
@@ -219,30 +211,30 @@ ACL_VSTRING *acl_vstring_slice_alloc(ACL_SLICE_POOL *slice, size_t len)
 	if (slice) {
 		vp = (ACL_VSTRING*) acl_slice_pool_alloc(__FILE__, __LINE__,
 			slice, sizeof(*vp));
-		vp->slice = slice;
-		vp->dbuf = NULL;
+		vp->vbuf.alloc.slice = slice;
 		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
 			__FILE__, __LINE__, slice, len);
+		vp->vbuf.flags = ACL_VBUF_FLAG_SLICE;
 	} else {
 		vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
-		vp->slice = NULL;
-		vp->dbuf = NULL;
+		vp->vbuf.alloc.slice = NULL;
 		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
+		vp->vbuf.flags = 0;
 	}
 
-#if defined(_WIN32) || defined(_WIN64)
-	vp->vbuf.hmap  = NULL;
-#endif
-	vp->vbuf.flags     = 0;
-	vp->vbuf.len       = (int) len;
 	ACL_VSTRING_RESET(vp);
+	vp->vbuf.len       = (int) len;
 	vp->vbuf.data[0]   = 0;
-	vp->vbuf.get_ready = vstring_buf_get_ready;
-	vp->vbuf.put_ready = vstring_buf_put_ready;
-	vp->vbuf.space     = vstring_buf_space;
-/*	vp->vbuf.ctx = NULL; */
+#if 0
+	vp->vbuf.get_ready = acl_vstring_get_ready;
+	vp->vbuf.put_ready = acl_vstring_buf_ready;
+	vp->vbuf.space     = acl_vstring_space;
+#endif
 	vp->maxlen         = 0;
 	vp->vbuf.fd        = ACL_FILE_INVALID;
+#if defined(_WIN32) || defined(_WIN64)
+	vp->vbuf.hmap      = NULL;
+#endif
 
 	return vp;
 }
@@ -257,29 +249,29 @@ ACL_VSTRING *acl_vstring_dbuf_alloc(ACL_DBUF_POOL *dbuf, size_t len)
 
 	if (dbuf) {
 		vp = (ACL_VSTRING*) acl_dbuf_pool_alloc(dbuf, sizeof(*vp));
-		vp->dbuf      = dbuf;
-		vp->slice     = NULL;
-		vp->vbuf.data = (unsigned char *) acl_dbuf_pool_alloc(dbuf, len);
+		vp->vbuf.alloc.dbuf = dbuf;
+		vp->vbuf.data  = (unsigned char *) acl_dbuf_pool_alloc(dbuf, len);
+		vp->vbuf.flags = ACL_VBUF_FLAG_DBUF;
 	} else {
 		vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
-		vp->slice     = NULL;
-		vp->dbuf      = NULL;
-		vp->vbuf.data = (unsigned char *) acl_mymalloc(len);
+		vp->vbuf.alloc.dbuf = NULL;
+		vp->vbuf.data  = (unsigned char *) acl_mymalloc(len);
+		vp->vbuf.flags = 0;
 	}
 
-#if defined(_WIN32) || defined(_WIN64)
-	vp->vbuf.hmap  = NULL;
-#endif
-	vp->vbuf.flags     = 0;
-	vp->vbuf.len       = (int) len;
 	ACL_VSTRING_RESET(vp);
+	vp->vbuf.len       = (int) len;
 	vp->vbuf.data[0]   = 0;
-	vp->vbuf.get_ready = vstring_buf_get_ready;
-	vp->vbuf.put_ready = vstring_buf_put_ready;
-	vp->vbuf.space     = vstring_buf_space;
-/*	vp->vbuf.ctx = NULL; */
+#if 0
+	vp->vbuf.get_ready = acl_vstring_get_ready;
+	vp->vbuf.put_ready = acl_vstring_put_ready;
+	vp->vbuf.space     = acl_vstring_space;
+#endif
 	vp->maxlen         = 0;
 	vp->vbuf.fd        = ACL_FILE_INVALID;
+#if defined(_WIN32) || defined(_WIN64)
+	vp->vbuf.hmap      = NULL;
+#endif
 
 	return vp;
 }
@@ -375,17 +367,20 @@ ACL_VSTRING *acl_vstring_mmap_alloc2(ACL_FILE_HANDLE fd,
 
 	vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
 
-	vp->vbuf.fd = fd;
-	vp->slice   = NULL;
-	vp->dbuf    = NULL;
 
-	vp->vbuf.flags     = 0;
+	vp->vbuf.flags     = ACL_VBUF_FLAG_MMAP;
 	vp->vbuf.len       = init_len;
-	vp->vbuf.get_ready = vstring_buf_get_ready;
-	vp->vbuf.put_ready = vstring_buf_put_ready;
-	vp->vbuf.space = vstring_buf_space;
-/*	vp->vbuf.ctx = NULL; */
+#if 0
+	vp->vbuf.get_ready = acl_vstring_get_ready;
+	vp->vbuf.put_ready = acl_vstring_put_ready;
+	vp->vbuf.space     = acl_vstring_space;
+#endif
 	vp->maxlen         = max_len;
+	vp->vbuf.alloc.slice = NULL;
+	vp->vbuf.fd        = fd;
+#if defined(_WIN32) || defined(_WIN64)
+	vp->vbuf.hmap      = NULL;
+#endif
 
 	mmap_buf_init(vp, offset);
 
@@ -400,7 +395,7 @@ void acl_vstring_free(ACL_VSTRING *vp)
 {
 	acl_vstring_free_buf(vp);
 
-	if (vp->slice) {
+	if (vp->vbuf.flags & ACL_VBUF_FLAG_SLICE) {
 		acl_slice_pool_free(__FILE__, __LINE__, vp);
 	}
 #ifdef ACL_UNIX
@@ -412,7 +407,7 @@ void acl_vstring_free(ACL_VSTRING *vp)
 		acl_myfree(vp);
 	}
 #endif
-	else if (vp->dbuf == NULL) {
+	else if ((vp->vbuf.flags & ACL_VBUF_FLAG_DBUF) == 0) {
 		acl_myfree(vp);
 	}
 }
@@ -550,12 +545,12 @@ ACL_VSTRING *acl_vstring_memmove(ACL_VSTRING *vp, const char *src, size_t len)
 
 	vp->vbuf.len = (ssize_t) len;
 
-	if (vp->slice != NULL) {
+	if (vp->vbuf.flags & ACL_VBUF_FLAG_SLICE) {
 		vp->vbuf.data = (unsigned char *) acl_slice_pool_alloc(
-			__FILE__, __LINE__, vp->slice, len);
-	} else if (vp->dbuf != NULL) {
+			__FILE__, __LINE__, vp->vbuf.alloc.slice, len);
+	} else if (vp->vbuf.flags & ACL_VBUF_FLAG_DBUF) {
 		vp->vbuf.data = (unsigned char *)
-			acl_dbuf_pool_alloc(vp->dbuf, len);
+			acl_dbuf_pool_alloc(vp->vbuf.alloc.dbuf, len);
 	}
 #ifdef ACL_UNIX
 	else if (vp->vbuf.fd != ACL_FILE_INVALID) {
@@ -858,7 +853,8 @@ ACL_VSTRING *acl_vstring_import(char *str)
 	int     len;
 
 	vp = (ACL_VSTRING *) acl_mymalloc(sizeof(*vp));
-	vp->slice = NULL;
+	vp->vbuf.flags = 0;
+	vp->vbuf.alloc.slice = NULL;
 	len = (int) strlen(str);
 	vp->vbuf.data = (unsigned char *) str;
 	vp->vbuf.len = len + 1;
@@ -874,9 +870,11 @@ void acl_vstring_glue(ACL_VSTRING *vp, void *buf, size_t len)
 	vp->vbuf.len = (int) len;
 	ACL_VSTRING_RESET(vp);
 	vp->vbuf.data[0] = 0;
-	vp->vbuf.get_ready = vstring_buf_get_ready;
-	vp->vbuf.put_ready = vstring_buf_put_ready;
-	vp->vbuf.space = vstring_buf_space;
+#if 0
+	vp->vbuf.get_ready = acl_vstring_get_ready;
+	vp->vbuf.put_ready = acl_vstring_put_ready;
+	vp->vbuf.space     = acl_vstring_space;
+#endif
 	vp->maxlen = 0;
 }
 
@@ -890,9 +888,8 @@ char acl_vstring_charat(ACL_VSTRING *vp, size_t offset)
 		acl_msg_fatal("%s(%d): invalid input", myname, __LINE__);
 	}
 	if (offset >= ACL_VSTRING_LEN(vp)) {
-		acl_msg_fatal("%s(%d): offset(%d) >= strlen(%d)",
-			myname, __LINE__, (int) offset,
-			(int) ACL_VSTRING_LEN(vp));
+		acl_msg_fatal("%s(%d): offset(%d) >= strlen(%d)", myname,
+			__LINE__, (int) offset, (int) ACL_VSTRING_LEN(vp));
 	}
 	return ACL_VBUF_CHARAT(vp->vbuf, offset);
 }

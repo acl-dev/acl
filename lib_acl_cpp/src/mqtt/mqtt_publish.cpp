@@ -244,10 +244,13 @@ int mqtt_publish::update_payload(const char* data, int dlen) {
 
 	size_t i, left = (size_t) payload_len_ - payload_.size();
 	for (i = 0; i < left && dlen > 0; i++) {
-		payload_.append(data, 1);
+		//payload_.append(data, 1);
+		payload_.push_back(*data, false);
 		data++;
 		dlen--;
 	}
+
+	payload_.terminate();
 
 	if (i == left) {
 		finished_ = true;

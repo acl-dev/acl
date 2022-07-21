@@ -8,17 +8,13 @@ extern "C" {
 #include "acl_define.h"
 #include <stdarg.h>
 #include "acl_vbuf.h"
-#include "acl_dbuf_pool.h"
-#include "acl_slice.h"
 
 /**
  * 封装了 ACL_VBUF，ACL_VSTRING 结构类型定义
  */
 typedef struct ACL_VSTRING {
-    ACL_VBUF        vbuf;
-    ACL_SLICE_POOL *slice;
-    ACL_DBUF_POOL  *dbuf;
-    ssize_t         maxlen;
+	ACL_VBUF vbuf;
+	ssize_t  maxlen;
 } ACL_VSTRING;
 
 /**
@@ -357,7 +353,11 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
  /*
   * Macros. Unsafe macros have UPPERCASE names.
   */
+#if 0
 #define ACL_VSTRING_SPACE(vp, len) ((vp)->vbuf.space(&(vp)->vbuf, len))
+#else
+#define ACL_VSTRING_SPACE(vp, len) ACL_VBUF_SPACE(&(vp)->vbuf, len)
+#endif
 
 /**
  * 取得当前 ACL_VSTRING 数据存储地址
@@ -391,17 +391,7 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
  * 将 ACL_VSTRING 的数据偏移指针位置置 0
  * @param vp {ACL_VSTRING*}
  */
-#define ACL_VSTRING_TERMINATE(vp) { \
-	if ((vp)->vbuf.cnt <= 0) \
-		ACL_VSTRING_SPACE((vp), 1); \
-	if ((vp)->vbuf.cnt > 0) \
-		*(vp)->vbuf.ptr = 0; \
-	else if ((vp)->vbuf.ptr > (vp)->vbuf.data) { \
-		(vp)->vbuf.ptr--; \
-		*(vp)->vbuf.ptr = 0; \
-		(vp)->vbuf.cnt++; \
-	} \
-}
+#define ACL_VSTRING_TERMINATE(vp) ACL_VBUF_TERM(&(vp)->vbuf)
 
 /**
  * 重置 ACL_VSTRING 内部缓冲区指针地址起始位置，但不会将尾部数据置 0，应用可以
@@ -410,7 +400,6 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
  */
 #define ACL_VSTRING_RESET(vp) {	\
 	(vp)->vbuf.ptr = (vp)->vbuf.data; \
-	(vp)->vbuf.cnt = (vp)->vbuf.len; \
 	acl_vbuf_clearerr(&(vp)->vbuf); \
 }
 
@@ -426,15 +415,16 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
  * @param vp {ACL_VSTRING*}
  */
 #define ACL_VSTRING_SKIP(vp) { \
-	while ((vp)->vbuf.cnt > 0 && *(vp)->vbuf.ptr) \
-		(vp)->vbuf.ptr++, (vp)->vbuf.cnt--; \
+	while ((vp)->vbuf.ptr < (vp)->vbuf.data + (vp)->vbuf.len && *(vp)->vbuf.ptr) { \
+		(vp)->vbuf.ptr++; \
+	} \
 }
 
 /**
  * 当前 ACL_VSTRING 中还有多少数据可用
  * @param vp {ACL_VSTRING*}
  */
-#define acl_vstring_avail(vp) ((vp)->vbuf.cnt)
+#define acl_vstring_avail(vp) ((vp)->vbuf.len - ((vp)->vbuf.ptr - (vp)->vbuf.data))
 
  /**
   * The following macro is not part of the public interface, because it can
@@ -442,8 +432,10 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
   */
 #define ACL_VSTRING_AT_OFFSET(vp, offset) { \
 	(vp)->vbuf.ptr = (vp)->vbuf.data + (offset); \
-	(vp)->vbuf.cnt = (vp)->vbuf.len - (offset); \
 }
+
+ACL_API int acl_vstring_space(ACL_VBUF *bp, ssize_t len);
+ACL_API int acl_vstring_put_ready(ACL_VBUF *bp);
 
 #ifdef  __cplusplus
 }
