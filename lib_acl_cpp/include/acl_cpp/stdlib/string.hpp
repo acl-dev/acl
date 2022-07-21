@@ -27,7 +27,7 @@ public:
 	 *  时，则按二进制方式处理，否则按文本方式处理
 	 */
 	string(size_t n, bool bin);
-	explicit string(size_t n);
+	string(size_t n);
 	string(void);
 
 	/**
@@ -64,7 +64,7 @@ public:
 	string(int fd, size_t max, size_t n, size_t offset = 0);
 #endif
 
-	virtual ~string(void);
+	~string(void);
 
 	/**
 	 * 设置字符串类对象为二进制处理模式
