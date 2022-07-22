@@ -353,11 +353,7 @@ ACL_API const ACL_VSTRING *acl_buffer_gets(ACL_VSTRING *vp,
  /*
   * Macros. Unsafe macros have UPPERCASE names.
   */
-#if 0
-#define ACL_VSTRING_SPACE(vp, len) ((vp)->vbuf.space(&(vp)->vbuf, len))
-#else
 #define ACL_VSTRING_SPACE(vp, len) ACL_VBUF_SPACE(&(vp)->vbuf, len)
-#endif
 
 /**
  * 取得当前 ACL_VSTRING 数据存储地址
