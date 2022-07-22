@@ -27,7 +27,7 @@ public:
 	 *  时，则按二进制方式处理，否则按文本方式处理
 	 */
 	string(size_t n, bool bin);
-	string(size_t n);
+	explicit string(size_t n);
 	string(void);
 
 	/**
