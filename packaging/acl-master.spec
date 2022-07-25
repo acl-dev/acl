@@ -185,7 +185,7 @@ fi
 * Mon May 06 2019 shuxin.zheng@qq.com 3.5.0-2-20190506.09
 - acl_vstream.c: fixed bug in acl_vstream_fflush() where wbuf_dlen should be set 0
 
-* Thu Apr 30 2019 shuxin.zheng@qq.com 3.5.0-1-20190430.17
+* Tue Apr 30 2019 shuxin.zheng@qq.com 3.5.0-1-20190430.17
 - tcp_keeper: add sync parameter to control if connect the given addr directly
 
 * Sun Apr 28 2019 shuxin.zheng@qq.com 3.5.0-1-20190428.16
@@ -262,7 +262,7 @@ fi
 - feature: disable core when process exiting
 - feature: core file size can be configured
 
-* Thu Oct 17 2018 shuxin.zheng@qq.com 3.4.1-28-20181017.17
+* Wed Oct 17 2018 shuxin.zheng@qq.com 3.4.1-28-20181017.17
 - bugfix: acl_master can't support UDP service on Centos whose version is below 7.x
 
 * Thu Oct 11 2018 shuxin.zheng@qq.com 3.4.1-27-20181011.11
@@ -289,10 +289,10 @@ fi
 * Sun Sep 16 2018 shuxin.zheng@qq.com 3.4.1-21-20180916.21
 - feature: support IPV6 OK!
 
-* Sat Sep 06 2018 shuxin.zheng@qq.com 3.4.1-20-20180908.21
+* Sat Sep 08 2018 shuxin.zheng@qq.com 3.4.1-20-20180908.21
 - fixed bugs in acl::string::begin_with API
 
-* Sat Sep 06 2018 shuxin.zheng@qq.com 3.4.1-19-20180908.13
+* Sat Sep 08 2018 shuxin.zheng@qq.com 3.4.1-19-20180908.13
 - fixed bugs in acl::string::begin_with API
 
 * Thu Sep 06 2018 shuxin.zheng@qq.com 3.4.1-18-20180906.19
@@ -334,10 +334,10 @@ fi
 * Fri Jun 15 2018 shuxin.zheng@qq.com 3.4.1-6-20180615.15
 - thread_cond::wait add locked parameter for one locking condition
 
-* Tue Jun 04 2018 shuxin.zheng@qq.com 3.4.1-5-20180605.14
+* Tue Jun 05 2018 shuxin.zheng@qq.com 3.4.1-5-20180605.14
 - check_client: just choose one from on_refused and on_timeout to report connection status
 
-* Tue Jun 04 2018 shuxin.zheng@qq.com 3.4.1-4-20180605.14
+* Tue Jun 05 2018 shuxin.zheng@qq.com 3.4.1-4-20180605.14
 - connect_monitor: change params for on_refused and on_timeout methods
 
 * Mon Jun 04 2018 shuxin.zheng@qq.com 3.4.1-3-20180604.18
@@ -530,7 +530,7 @@ just using ACL_MASETR_SERV::path, and ACL_MASETR_SERV::command was removed.
 * Thu Nov 16 2017 shuxin.zheng@qq.com 3.3.0-35-20171116.11
 - add master_ctl into rpm package
 
-* Wed Nov 13 2017 shuxin.zheng@qq.com 3.3.0-34-20171113.09
+* Mon Nov 13 2017 shuxin.zheng@qq.com 3.3.0-34-20171113.09
 - acl_udp_server & master upgrade
 
 * Fri Oct 27 2017 shuxin.zheng@qq.com 3.3.0-33-20171027.14
