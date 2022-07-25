@@ -1,4 +1,4 @@
-%define release_id 16
+%define release_id 17
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Mon Jul 25 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-17-20220725.17
+- feature: the fiber service template supports SO_REUSEPORT option
 
 * Wed Jul 13 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-16-20220713.17
 - just release rpm package for CentOS8.x

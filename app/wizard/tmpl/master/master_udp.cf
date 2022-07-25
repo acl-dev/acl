@@ -20,7 +20,7 @@ service server
 	master_stop_wait = false
 
 #	当系统支持 SO_REUSEPORT 功能时，本开关决定是否允许该特性
-	master_reuseport = yes
+	master_reuseport = no
 
 #	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
 #	master_notify_addr = 127.0.0.1:5801

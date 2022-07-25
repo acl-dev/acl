@@ -24,7 +24,7 @@ service $<PROGRAM>
 	master_stop_wait = false
 
 #	当系统支持 SO_REUSEPORT 时，是否启用该功能
-	master_reuseport = yes
+	master_reuseport = no
 #	是否针对监听套接口设定为非阻塞方式
 	master_nonblock = yes
 #	当系统支持 TCP_FASTOPEN 时，是否启用该功能
@@ -63,6 +63,11 @@ service $<PROGRAM>
 #	master_env = mempool_limit:512000000
 #	当启动多个子进程实例时，该开关控制多个子进程在接收连接时是否向 acl_master 发送消息报告自己的状态
 #	master_status_notify = 1
+#	程序标准输出重定向至指定文件中
+#	master_stdout = {install_path}/var/log/dnsmasq-stdout.log
+#	程序错误输出重定向至指定文件中
+#	master_stderr = {install_path}/var/log/dnsmasq-stderr.log
+
 #	是否允许产生 core 文件
 #	fiber_enable_core = 1
 #	core 文件大小限制，-1 表示不限制 core 文件大小，0 表示禁止产生 core，> 0 表示 core 文件最大大小

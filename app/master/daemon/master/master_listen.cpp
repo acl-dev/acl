@@ -20,6 +20,14 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 	int   i, service_type, qlen;
 	ACL_ITER iter;
 
+#ifdef SO_REUSEPORT
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
+		serv->listen_fd_count = 0;
+		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
+		return 0;
+	}
+#endif
+
 	qlen = serv->max_qlen > acl_var_master_proc_limit
 		? serv->max_qlen : acl_var_master_proc_limit;
 	if (qlen < 128) {
@@ -100,6 +108,14 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 	const char *myname = "master_listen_inet";
 	int   qlen;
 
+#ifdef SO_REUSEPORT
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
+		serv->listen_fd_count = 0;
+		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
+		return 0;
+	}
+#endif
+
 	qlen = serv->max_qlen > acl_var_master_proc_limit
 		? serv->max_qlen : acl_var_master_proc_limit;
 	if (qlen < 128) {
@@ -112,7 +128,7 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d)->%s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
-		return 0;
+		return -1;
 	}
 
 	if (serv->defer_accept > 0) {
@@ -203,6 +219,14 @@ static int master_listen_unix(ACL_MASTER_SERV *serv)
 	const char *myname = "master_listen_unix";
 	int   qlen;
 
+#ifdef SO_REUSEPORT
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
+		serv->listen_fd_count = 0;
+		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
+		return 0;
+	}
+#endif
+
 	qlen = serv->max_qlen > acl_var_master_proc_limit
 		? serv->max_qlen : acl_var_master_proc_limit;
 	if (qlen < 128) {
@@ -218,7 +242,7 @@ static int master_listen_unix(ACL_MASTER_SERV *serv)
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: listen on addr(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
-		return 0;
+		return -1;
 	}
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
@@ -245,7 +269,7 @@ static int master_listen_fifo(ACL_MASTER_SERV *serv)
 	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d), %s: listen on name(%s) error(%s)",
 			__FILE__, __LINE__, myname, serv->name, strerror(errno));
-		return 0;
+		return -1;
 	}
 
 	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
@@ -271,7 +295,7 @@ static int master_listen_none(ACL_MASTER_SERV *serv acl_unused)
 		acl_set_ugid(getuid(), getgid());
 	}
 	acl_msg_info("%s(%d), %s: listen none", __FILE__, __LINE__, myname);
-	return 1;
+	return 0;
 }
 
 /* acl_master_listen_init - enable connection requests */
@@ -294,14 +318,14 @@ int acl_master_listen_init(ACL_MASTER_SERV *serv)
 	 * SOCK: INET/UNIX domain or stream listener endpoints
 	 */
 	case ACL_MASTER_SERV_TYPE_SOCK:
-		return master_listen_sock(serv) > 0 ? 0 : -1;
+		return master_listen_sock(serv) >= 0 ? 0 : -1;
 
 	/*      
 	 * INET-domain listener endpoints can be wildcarded (the default) or
 	 * bound to specific interface addresses.
 	 */
 	case ACL_MASTER_SERV_TYPE_INET:
-		return master_listen_inet(serv) > 0 ? 0 : -1;
+		return master_listen_inet(serv) >= 0 ? 0 : -1;
 
 	/*
 	 * UDP socket endponts
@@ -313,19 +337,19 @@ int acl_master_listen_init(ACL_MASTER_SERV *serv)
 	 * UNIX-domain or stream listener endpoints always come as singlets.
 	 */
 	case ACL_MASTER_SERV_TYPE_UNIX:
-		return master_listen_unix(serv) > 0 ? 0 : -1;
+		return master_listen_unix(serv) >= 0 ? 0 : -1;
 
 	/*
 	 * FIFO listener endpoints always come as singlets.
 	 */
 	case ACL_MASTER_SERV_TYPE_FIFO:
-		return master_listen_fifo(serv) > 0 ? 0 : -1;
+		return master_listen_fifo(serv) >= 0 ? 0 : -1;
 
 	/*
 	 * NONE listener.
 	 */
 	case ACL_MASTER_SERV_TYPE_NONE:
-		return master_listen_none(serv) > 0 ? 0 : -1;
+		return master_listen_none(serv) >= 0 ? 0 : -1;
 
 	default:
 		acl_msg_error("%s(%d): unknown service type: %d",

@@ -1,4 +1,4 @@
-%define release_id 8
+%define release_id 9
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Mon Jul 25 2022 shuxin.zheng@qq.com 3.5.4-9-20220725.15
+- feature: acl_master framework's tcp service supports SO_REUSEPORT option
+
 * Thu Jul 14 2022 shuxin.zheng@qq.com 3.5.4-8-20220714.09
 - just release new version
 
