@@ -3,6 +3,8 @@
 
 int main(int argc, char *argv[])
 {
+	printf("ACL_VSTRING=%zd, acl::string=%zd, std::string=%zd\r\n",
+		sizeof(ACL_VSTRING), sizeof(acl::string), sizeof(std::string));
 	acl::acl_cpp_init();
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
