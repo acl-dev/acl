@@ -678,6 +678,7 @@ public:
 	 * @return {string&} 当前字符串对象的引用
 	 */
 	string& push_back(char ch, bool term = true);
+	string& push_back(unsigned char ch, bool term = true);
 
 	/**
 	 * 在缓冲区尾部添加 \0 以便应用使用时的安全性, 添加的 \0 不增加长度

@@ -624,11 +624,20 @@ string& string::operator <<(unsigned char n)
 
 string& string::push_back(char ch, bool term /* true */)
 {
-	ADDCH(vbf_, ch);
+	ADDCH(vbf_, (unsigned char) ch);
 	if (term) {
 		TERM(vbf_);
 	}
 	return *this;
+}
+
+string& string::push_back(unsigned char ch, bool term /* true */)
+{
+    ADDCH(vbf_, ch);
+    if (term) {
+        TERM(vbf_);
+    }
+    return *this;
 }
 
 string& string::terminate(void)
