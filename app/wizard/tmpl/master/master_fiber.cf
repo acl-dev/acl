@@ -25,6 +25,12 @@ service $<PROGRAM>
 
 #	当系统支持 SO_REUSEPORT 时，是否启用该功能
 	master_reuseport = no
+#	当启用 SO_REUSEPORT 时(即 master_reuseport=yes 时), 是否需要 acl_master
+#	也监听该地址, 对于使用旧版 acl(< 3.5.3-17) 编写的服务, 必须将此项设为
+#	yes, 即: master_reuseport_listen = yes; 对于使用 acl 版本 >= 3.5.3-17
+#	编写的服务需设置为 no; 当 master_reuseport=no时,该项设置将被忽略; 当未
+#	设置此项时内部缺省值为 yes. 以便使 acl_master 保持对于旧版服务的兼容性.
+	master_reuseport_listen = no
 #	是否针对监听套接口设定为非阻塞方式
 	master_nonblock = yes
 #	当系统支持 TCP_FASTOPEN 时，是否启用该功能

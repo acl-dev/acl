@@ -80,7 +80,16 @@ bool master_threads::run_alone(const char* addrs, const char* path /* = NULL */,
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = false;
-	acl_assert(addrs && *addrs);
+	if (addrs == NULL || *addrs == 0) {
+		if (path == NULL || *path == 0) {
+			printf("%s: addrs NULL and path NULL\r\n", __FUNCTION__);
+			return false;
+		}
+		printf("%s: addrs NULL and try to use master_service in %s\r\n",
+			__FUNCTION__, path);
+	}
+
+	//acl_assert(addrs && *addrs);
 
 	int  argc = 0;
 	const char *argv[5];

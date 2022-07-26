@@ -49,7 +49,15 @@ void master_fiber::run_daemon(int argc, char** argv)
 
 bool master_fiber::run_alone(const char* addrs, const char* path /* = NULL */)
 {
-	acl_assert(addrs && *addrs);
+	//acl_assert(addrs && *addrs);
+	if (addrs == NULL || *addrs == 0) {
+		if (path == NULL || *path == 0) {
+			printf("%s: addrs NULL and path NULL\r\n", addrs);
+			return false;
+		}
+		printf("%s: addrs NULL and try to use master_service in %s\r\n",
+			__FUNCTION__, path);
+	}
 
 	daemon_mode_ = false;
 

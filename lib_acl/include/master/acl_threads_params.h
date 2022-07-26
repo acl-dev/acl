@@ -148,6 +148,14 @@ extern char *acl_var_threads_dispatch_addr;
 #define	ACL_DEF_THREADS_DISPATCH_TYPE		"default"
 extern char *acl_var_threads_dispatch_type;
 
+#define	ACL_VAR_THREADS_MASTER_SERVICE		"master_service"
+#define	ACL_DEF_THREADS_MASTER_SERVICE		""
+extern char *acl_var_threads_master_service;
+
+#define	ACL_VAR_THREADS_MASTER_REUSEPORT	"master_reuseport"
+#define	ACL_DEF_THREADS_MASTER_REUSEPORT	""
+extern char *acl_var_threads_master_reuseport;
+
 #ifdef	__cplusplus
 }
 #endif

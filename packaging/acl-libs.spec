@@ -1,4 +1,4 @@
-%define release_id 17
+%define release_id 18
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Jul 26 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-18-20220726.16
+- feature: optimize master service template
 
 * Mon Jul 25 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-17-20220725.17
 - feature: the fiber service template supports SO_REUSEPORT option

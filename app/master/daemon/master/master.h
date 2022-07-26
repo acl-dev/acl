@@ -88,6 +88,7 @@ typedef struct ACL_MASTER_SERV {
 #define ACL_MASTER_FLAG_KILLED          (1<<5)  /* the service is killed */
 #define ACL_MASTER_FLAG_STOP_KILL	(1<<6)  /* the service can be killed on stopping */
 #define ACL_MASTER_FLAG_STOP_WAIT	(1<<7)  /* master waiting service exited */
+#define	ACL_MASTER_FLAG_REUSE_LISTEN	(1<<8)	/* if master can listen when using SO_REUSEPORT for TCP */
 
 #define ACL_MASTER_THROTTLED(f)		((f)->flags & ACL_MASTER_FLAG_THROTTLE)
 #define ACL_MASTER_STOPPING(f)		((f)->flags & ACL_MASTER_FLAG_STOPPING)

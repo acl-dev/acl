@@ -156,6 +156,10 @@ char *acl_var_threads_deny_banner;
 char *acl_var_threads_access_allow;
 char *acl_var_threads_dispatch_addr;
 char *acl_var_threads_dispatch_type;
+char *acl_var_threads_master_service;
+char *acl_var_threads_master_reuseport;
+
+static int var_threads_master_reuseport = 0;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ ACL_VAR_THREADS_QUEUE_DIR, ACL_DEF_THREADS_QUEUE_DIR,
@@ -174,6 +178,10 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 		&acl_var_threads_dispatch_addr },
 	{ ACL_VAR_THREADS_DISPATCH_TYPE, ACL_DEF_THREADS_DISPATCH_TYPE,
 		&acl_var_threads_dispatch_type },
+	{ ACL_VAR_THREADS_MASTER_SERVICE, ACL_DEF_THREADS_MASTER_SERVICE,
+		&acl_var_threads_master_service },
+	{ ACL_VAR_THREADS_MASTER_REUSEPORT, ACL_DEF_THREADS_MASTER_REUSEPORT,
+		&acl_var_threads_master_reuseport },
 
         { 0, 0, 0 },
 };
@@ -902,6 +910,14 @@ static void server_init(const char *procname)
 	if (acl_var_threads_access_allow && *acl_var_threads_access_allow) {
 		acl_access_add(acl_var_threads_access_allow, ", \t", ":");
 	}
+
+#define EQ !strcasecmp
+	if (EQ(acl_var_threads_master_reuseport, "yes")
+		|| EQ(acl_var_threads_master_reuseport, "true")
+		|| EQ(acl_var_threads_master_reuseport, "on")) {
+
+		var_threads_master_reuseport = 1;
+	}
 }
 
 static void log_event_mode(int event_mode)
@@ -1194,13 +1210,25 @@ static acl_pthread_pool_t *threads_create(ACL_MASTER_SERVER_THREAD_INIT_FN init_
 
 #ifdef ACL_UNIX
 
+static void server_status_init(ACL_EVENT *event, acl_pthread_pool_t *threads)
+{
+	ACL_VSTREAM *stat_stream;
+
+	stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
+		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+
+	acl_event_enable_read(event, stat_stream, 0, server_abort, threads);
+
+	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
+	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
+	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
+}
 
 static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 	acl_pthread_pool_t *threads, int count, int fdtype)
 {
 	const char *myname = "server_daemon_open";
-	ACL_VSTREAM *stream, **streams;
-	ACL_VSTREAM *stat_stream;
+	ACL_VSTREAM **streams;
 	ACL_SOCKET   fd;
 	int i;
 
@@ -1209,13 +1237,14 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 	streams = (ACL_VSTREAM **)
 		acl_mycalloc(count + 1, sizeof(ACL_VSTREAM *));
 
-	for (i = 0; i < count + 1; i++)
+	for (i = 0; i < count + 1; i++) {
 		streams[i] = NULL;
+	}
 
 	i = 0;
 	fd = ACL_MASTER_LISTEN_FD;
 	for (; fd < ACL_MASTER_LISTEN_FD + count; fd++) {
-		stream = acl_vstream_fdopen(fd, O_RDWR,
+		ACL_VSTREAM *stream = acl_vstream_fdopen(fd, O_RDWR,
 				acl_var_threads_buf_size,
 				acl_var_threads_rw_timeout, fdtype);
 		if (stream == NULL) {
@@ -1227,21 +1256,14 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 		acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
 		acl_event_enable_listen(event, stream, 0,
 			__server_accept, threads);
+
 		if (__server_on_listen) {
 			__server_on_listen(__service_ctx, stream);
 		}
 		streams[i++] = stream;
 	}
 
-	stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
-
-	acl_event_enable_read(event, stat_stream, 0, server_abort, threads);
-
-	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);
-	acl_close_on_exec(ACL_MASTER_FLOW_READ, ACL_CLOSE_ON_EXEC);
-	acl_close_on_exec(ACL_MASTER_FLOW_WRITE, ACL_CLOSE_ON_EXEC);
-
+	server_status_init(event, threads);
 	return streams;
 }
 
@@ -1254,30 +1276,38 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	ACL_ARGV*     tokens = acl_argv_split(addrs, ";, \t");
 	ACL_ITER      iter;
 	int           i;
+	unsigned flag = ACL_INET_FLAG_NONE;
 	ACL_VSTREAM **streams = (ACL_VSTREAM **)
 		acl_mycalloc(tokens->argc + 1, sizeof(ACL_VSTREAM *));
 
-	for (i = 0; i < tokens->argc + 1; i++)
+	if (var_threads_master_reuseport) {
+		flag |= ACL_INET_FLAG_REUSEPORT;
+	}
+
+	for (i = 0; i < tokens->argc + 1; i++) {
 		streams[i] = NULL;
+	}
 
 	i = 0;
 	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
-		ACL_VSTREAM* sstream = acl_vstream_listen(addr, 128);
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
+				flag, 0, 0);
 		if (sstream == NULL) {
 			acl_msg_error("%s(%d): listen %s error(%s)",
 				myname, __LINE__, addr, acl_last_serror());
-			exit(1);
+			exit(2);
 		}
+
+		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
+		acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
+		acl_event_enable_listen(event, sstream, 0,
+			__server_accept, threads);
 
 		if (__server_on_listen) {
 			__server_on_listen(__service_ctx, sstream);
 		}
 		streams[i++] = sstream;
-
-		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
-		acl_event_enable_listen(event, sstream, 0,
-			__server_accept, threads);
 	}
 
 	acl_argv_free(tokens);
@@ -1379,7 +1409,7 @@ void acl_threads_server_main(int argc, char * argv[],
 			__FILE__, __LINE__, myname, __conf_file);
 	}
 
-	if (addrs && *addrs) {
+	if (isatty(STDIN_FILENO)) {
 		__daemon_mode = 0;
 	} else {
 		__daemon_mode = 1;
@@ -1530,14 +1560,24 @@ void acl_threads_server_main(int argc, char * argv[],
 	/* open all listen streams */
 
 	if (__daemon_mode == 0) {
+		if (addrs == NULL || *addrs == 0) {
+			addrs = acl_var_threads_master_service;
+		}
 		__sstreams = server_alone_open(__event, __threads, addrs);
 #ifdef ACL_UNIX
-	} else if (socket_count <= 0) {
-		acl_msg_fatal("%s(%d): invalid socket_count: %d",
-			myname, __LINE__, socket_count);
-	} else {
+	} else if (var_threads_master_reuseport) {
+		assert(acl_var_threads_master_service);
+		assert(*acl_var_threads_master_service);
+		addrs = acl_var_threads_master_service;
+
+		__sstreams = server_alone_open(__event, __threads, addrs);
+		server_status_init(__event, __threads);
+	} else if (socket_count > 0) {
 		__sstreams = server_daemon_open(__event, __threads,
 			socket_count, fdtype);
+	} else {
+		acl_msg_fatal("%s(%d): invalid socket_count: %d",
+			myname, __LINE__, socket_count);
 	}
 #else
 	} else {

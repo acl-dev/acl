@@ -43,7 +43,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 	{ 0, 0, 0, 0, 0 },
 };
 
-static char *acl_var_fiber_service;
+static char *acl_var_fiber_master_service;
 static char *acl_var_fiber_queue_dir;
 static char *acl_var_fiber_log_debug;
 static char *acl_var_fiber_deny_banner;
@@ -51,15 +51,15 @@ static char *acl_var_fiber_access_allow;
 static char *acl_var_fiber_owner;
 static char *acl_var_fiber_dispatch_addr;
 static char *acl_var_fiber_dispatch_type;
-static char *acl_var_fiber_reuseport;     /* just for stand alone */
+static char *acl_var_fiber_master_reuseport;     /* just for stand alone */
 static char *acl_var_fiber_schedule_event;
 
-static int var_fiber_reuseport = 0;
+static int var_fiber_master_reuseport = 0;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-	{ "master_service", "", &acl_var_fiber_service },
+	{ "master_service", "", &acl_var_fiber_master_service },
 	{ "master_debug", "all:1", &acl_var_fiber_log_debug },
-	{ "master_reuseport", "", &acl_var_fiber_reuseport },
+	{ "master_reuseport", "", &acl_var_fiber_master_reuseport },
 	{ "fiber_queue_dir", "", &acl_var_fiber_queue_dir },
 	{ "fiber_deny_banner", "Denied!\r\n", &acl_var_fiber_deny_banner },
 	{ "fiber_access_allow", "all", &acl_var_fiber_access_allow },
@@ -756,16 +756,18 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 	unsigned flag = ACL_INET_FLAG_NONE;
 	int i = 0;
 
-	if (var_fiber_reuseport) {
+	if (var_fiber_master_reuseport) {
 		flag |= ACL_INET_FLAG_REUSEPORT;
 	}
 
 	acl_foreach(iter, addrs) {
 		const char* addr = (const char*) iter.data;
-		ACL_VSTREAM* sstream = acl_vstream_listen_ex(
-				addr, 128, flag, 0, 0);
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
+				flag, 0, 0);
 		if (sstream != NULL) {
 			acl_msg_info("%s: listen %s ok", myname, addr);
+			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream),
+				ACL_CLOSE_ON_EXEC);
 			server->sstreams[i++] = sstream;
 		} else {
 			acl_msg_fatal("%s(%d): listen %s error(%s)",
@@ -888,12 +890,11 @@ static void server_init(const char *procname)
 	acl_get_app_conf_bool_table(__conf_bool_tab);
 
 #define EQ !strcasecmp
-	if (EQ(acl_var_fiber_reuseport, "yes")
-		|| EQ(acl_var_fiber_reuseport, "true")
-		|| EQ(acl_var_fiber_reuseport, "on")
-		|| acl_var_fiber_threads > 1) {
+	if (EQ(acl_var_fiber_master_reuseport, "yes")
+		|| EQ(acl_var_fiber_master_reuseport, "true")
+		|| EQ(acl_var_fiber_master_reuseport, "on")) {
 
-		var_fiber_reuseport = 1;
+		var_fiber_master_reuseport = 1;
 	}
 
 	if (__deny_info == NULL) {
@@ -998,7 +999,7 @@ static void parse_args(void)
 void acl_fiber_server_main(int argc, char *argv[],
 	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...)
 {
-	const char *myname = "server_prepare";
+	const char *myname = __FUNCTION__;
 	const char *service_name = acl_safe_basename(argv[0]);
 	const char *root_dir = NULL, *user = NULL, *addrs = NULL;
 	int   c, socket_count = 1, fdtype = ACL_VSTREAM_TYPE_LISTEN;
@@ -1093,7 +1094,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 #if defined(_WIN32) || defined(_WIN64)
 	__daemon_mode = 0;
 #else
-	if (addrs && *addrs) {
+	if (isatty(STDIN_FILENO)) {
 		__daemon_mode = 0;
 	} else {
 		__daemon_mode = 1;
@@ -1145,14 +1146,23 @@ void acl_fiber_server_main(int argc, char *argv[],
 
 	/* create static servers object */
 
-	if (var_fiber_reuseport && acl_var_fiber_service && *acl_var_fiber_service) {
-		servers_alone(acl_var_fiber_service, fdtype, acl_var_fiber_threads);
-	} else if (__daemon_mode) {
-		servers_daemon(socket_count, fdtype, acl_var_fiber_threads);
-	} else if (addrs && *addrs) {
+	if (__daemon_mode == 0) {
+		if (addrs == NULL || *addrs == 0) {
+			addrs = acl_var_fiber_master_service;
+		}
+		assert(addrs && *addrs);
 		servers_alone(addrs, fdtype, acl_var_fiber_threads);
+	} else if (var_fiber_master_reuseport) {
+		assert(acl_var_fiber_master_service);
+		assert(*acl_var_fiber_master_service);
+		addrs = acl_var_fiber_master_service;
+
+		servers_alone(addrs, fdtype, acl_var_fiber_threads);
+	} else if (socket_count > 0) {
+		servers_daemon(socket_count, fdtype, acl_var_fiber_threads);
 	} else {
-		acl_msg_fatal("%s(%d): addrs NULL", __FUNCTION__, __LINE__);
+		acl_msg_fatal("%s(%d): invalid socket_count: %d",
+			myname, __LINE__, socket_count);
 	}
 #endif // !_WIN32 && !_WIN64
 

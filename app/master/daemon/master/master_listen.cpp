@@ -21,7 +21,8 @@ static int master_listen_sock(ACL_MASTER_SERV *serv)
 	ACL_ITER iter;
 
 #ifdef SO_REUSEPORT
-	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0
+		&& (serv->flags & ACL_MASTER_FLAG_REUSE_LISTEN) == 0) {
 		serv->listen_fd_count = 0;
 		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
 		return 0;
@@ -109,7 +110,8 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 	int   qlen;
 
 #ifdef SO_REUSEPORT
-	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0
+		&& (serv->flags & ACL_MASTER_FLAG_REUSE_LISTEN) == 0) {
 		serv->listen_fd_count = 0;
 		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
 		return 0;
@@ -141,6 +143,51 @@ static int master_listen_inet(ACL_MASTER_SERV *serv)
 
 	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
 	acl_msg_info("%s(%d), %s: listen on inet: %s, qlen: %d",
+		__FILE__, __LINE__, myname, serv->name, qlen);
+
+	return 1;
+}
+
+static int master_listen_unix(ACL_MASTER_SERV *serv)
+{
+	const char *myname = "master_listen_unix";
+	int   qlen;
+
+#ifdef SO_REUSEPORT
+	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0
+		&& (serv->flags & ACL_MASTER_FLAG_REUSE_LISTEN) == 0) {
+		serv->listen_fd_count = 0;
+		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
+		return 0;
+	}
+#endif
+
+	qlen = serv->max_qlen > acl_var_master_proc_limit
+		? serv->max_qlen : acl_var_master_proc_limit;
+	if (qlen < 128) {
+		acl_msg_warn("%s(%d): qlen(%d) too small, use 128 now",
+			myname, __LINE__, qlen);
+		qlen = 128;
+	}
+
+	if (acl_var_master_limit_privilege) {
+		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
+	}
+	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, serv->inet_flags);
+	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d), %s: listen on addr(%s) error(%s)",
+			__FILE__, __LINE__, myname, serv->name, strerror(errno));
+		return -1;
+	}
+
+	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
+		O_RDONLY, acl_var_master_buf_size,
+		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
+	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
+	if (acl_var_master_limit_privilege) {
+		acl_set_ugid(getuid(), getgid());
+	}
+	acl_msg_info("%s(%d), %s: listen on domain socket: %s, qlen: %d",
 		__FILE__, __LINE__, myname, serv->name, qlen);
 
 	return 1;
@@ -212,50 +259,6 @@ static int master_bind_udp(ACL_MASTER_SERV *serv)
 	}
 
 	return serv->listen_fd_count;
-}
-
-static int master_listen_unix(ACL_MASTER_SERV *serv)
-{
-	const char *myname = "master_listen_unix";
-	int   qlen;
-
-#ifdef SO_REUSEPORT
-	if ((serv->inet_flags & ACL_INET_FLAG_REUSEPORT) != 0) {
-		serv->listen_fd_count = 0;
-		acl_msg_info("%s(%d): master_reuseport set", myname, __LINE__);
-		return 0;
-	}
-#endif
-
-	qlen = serv->max_qlen > acl_var_master_proc_limit
-		? serv->max_qlen : acl_var_master_proc_limit;
-	if (qlen < 128) {
-		acl_msg_warn("%s(%d): qlen(%d) too small, use 128 now",
-			myname, __LINE__, qlen);
-		qlen = 128;
-	}
-
-	if (acl_var_master_limit_privilege) {
-		acl_set_eugid(acl_var_master_owner_uid, acl_var_master_owner_gid);
-	}
-	serv->listen_fds[0] = acl_unix_listen(serv->name, qlen, serv->inet_flags);
-	if (serv->listen_fds[0] == ACL_SOCKET_INVALID) {
-		acl_msg_error("%s(%d), %s: listen on addr(%s) error(%s)",
-			__FILE__, __LINE__, myname, serv->name, strerror(errno));
-		return -1;
-	}
-
-	serv->listen_streams[0] = acl_vstream_fdopen(serv->listen_fds[0],
-		O_RDONLY, acl_var_master_buf_size,
-		acl_var_master_rw_timeout, ACL_VSTREAM_TYPE_LISTEN_UNIX);
-	acl_close_on_exec(serv->listen_fds[0], ACL_CLOSE_ON_EXEC);
-	if (acl_var_master_limit_privilege) {
-		acl_set_ugid(getuid(), getgid());
-	}
-	acl_msg_info("%s(%d), %s: listen on domain socket: %s, qlen: %d",
-		__FILE__, __LINE__, myname, serv->name, qlen);
-
-	return 1;
 }
 
 static int master_listen_fifo(ACL_MASTER_SERV *serv)

@@ -126,24 +126,28 @@ int     main(int argc, char **argv)
 	}
 
 	/* Initialize. */
-	if (!keep_mask)
+	if (!keep_mask) {
 		umask(077);  /* never fails! */
+	}
 
 	/* Don't die when a process goes away unexpectedly. */
 	signal(SIGPIPE, SIG_IGN);
 
-	if (acl_var_master_conf_dir == NULL || acl_var_master_log_file == NULL)
+	if (acl_var_master_conf_dir == NULL || acl_var_master_log_file == NULL) {
 		usage(argv[0]);
+	}
 
 	ptr = strrchr(acl_var_master_conf_dir, '/');
-	if (ptr != NULL && *(ptr + 1) == '\0')  /* as "/opt/master/conf/" */
+	if (ptr != NULL && *(ptr + 1) == '\0') { /* as "/opt/master/conf/" */
 		*ptr = '\0';
+	}
 	
 	/*
 	 * This program takes no other arguments.
 	 */
-	if (argc > optind)
+	if (argc > optind) {
 		usage(argv[0]);
+	}
 
 	/*
 	 * When running a child process, don't leak any open files that were
@@ -180,12 +184,14 @@ int     main(int argc, char **argv)
 	 */
 	for (fd = 1; fd < 3; fd++) {
 		(void) close(fd);
-		if (open("/dev/null", (int) O_RDWR, 0) != fd)
+		if (open("/dev/null", (int) O_RDWR, 0) != fd) {
 			acl_msg_fatal("open /dev/null: %s", acl_last_serror());
+		}
 	}
 
-	if (setsid() == -1 && getsid(0) != getpid())
+	if (setsid() == -1 && getsid(0) != getpid()) {
 		acl_msg_warn("unable to set session %s", acl_last_serror());
+	}
 
 	/*
 	 * Make some room for plumbing with file descriptors. XXX This breaks
@@ -198,10 +204,12 @@ int     main(int argc, char **argv)
 	 */
 	for (n = 0; n < 5; n++) {
 		fd = dup(1);
-		if (acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC) < 0)
+		if (acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC) < 0) {
 			acl_msg_fatal("dup(0): %s", acl_last_serror());
-		if (acl_msg_verbose)
+		}
+		if (acl_msg_verbose) {
 			acl_msg_info("dup(0), fd = %d", fd);
+		}
 	}
 
 	/* load main.cf of acl_master */
@@ -256,8 +264,9 @@ int     main(int argc, char **argv)
 
 		acl_event_loop(acl_var_master_global_event);
 		aio = manager::get_instance().get_aio();
-		if (aio)
+		if (aio) {
 			acl_aio_check(aio);
+		}
 
 		if (acl_var_master_gotsighup) {
 			acl_msg_info("reload configuration");
@@ -265,13 +274,15 @@ int     main(int argc, char **argv)
 			acl_master_refresh();           /* then this */
 		}
 		if (acl_var_master_gotsigchld) {
-			if (acl_msg_verbose)
+			if (acl_msg_verbose) {
 				acl_msg_info("got sigchld");
+			}
 			acl_var_master_gotsigchld = 0;  /* this first */
 			acl_master_reap_child();        /* then this */
 		}
-		if (acl_var_master_stopped)
+		if (acl_var_master_stopped) {
 			break;
+		}
 	}
 
 #define EQ	!strcasecmp
@@ -282,5 +293,6 @@ int     main(int argc, char **argv)
 
 		acl_master_delete_all_children();
 	}
+
 	return 0;
 }

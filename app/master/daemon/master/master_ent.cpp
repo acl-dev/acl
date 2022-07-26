@@ -483,8 +483,15 @@ static int service_transport(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 		}
 	}
 
-	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT, "y")) {
+	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT, "n")) {
 		serv->inet_flags |= ACL_INET_FLAG_REUSEPORT;
+	}
+
+	/* In order to be compatible with the old servers written with the old
+	 * acl library, we should let the acl_master listen on the address.
+	 */
+	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_REUSEPORT_LISTEN, "y")) {
+		serv->flags |= ACL_MASTER_FLAG_REUSE_LISTEN;
 	}
 	if (get_bool_ent(xcp, ACL_VAR_MASTER_SERV_FASTOPEN, "n")) {
 		serv->inet_flags |= ACL_INET_FLAG_FASTOPEN;

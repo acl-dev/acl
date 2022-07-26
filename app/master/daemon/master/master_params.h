@@ -155,6 +155,7 @@ extern int   acl_var_master_start_timeo;
 #define	ACL_DEF_MASTER_SERV_DEFER_ACCEPT	"0"
 
 #define ACL_VAR_MASTER_SERV_REUSEPORT		"master_reuseport"
+#define	ACL_VAR_MASTER_SERV_REUSEPORT_LISTEN	"master_reuseport_listen"
 #define ACL_VAR_MASTER_SERV_FASTOPEN		"master_fastopen"
 #define ACL_VAR_MASTER_SERV_NBLOCK		"master_nonblock"
 #define ACL_VAR_MASETR_SERV_STOP_KILL		"master_stop_kill"
