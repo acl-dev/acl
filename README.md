@@ -142,7 +142,7 @@ The most important module in Acl is the server framework, which helps users quic
 - **Process service:** One connection one process, the advantage is that the programming is simple, safe and stable, and the disadvantage is that the concurrency is too low;
 - **Threads service:** Each process handles all client connections through a set of threads in the thread pool. The IO event trigger mode is used that a connection is bound to a thread only if it has readable data, and the thread will be released after processing the data. The service model's advantage is that it can handle a large number of client connections in one process with a small number of threads. Compare with the aio model, the programming is relatively simple;
 - **Aio service:** Similar to nginx/squid/ircd, one thread can handle a large number of client connections in a non-blocking IO manner. The advantages of this model are high processing efficiency and low resource consumption, while the disadvantages are more complex programming;
-- **Fiber service:** Although the non-blocking service model can obtain large concurrent processing capability, the programming complexity is high. The coroutine model combines the features of large concurrent processing and low programming complexity, enabling programmers to easily implement sequential IO programming;
+- **Coroutine service:** Although the non-blocking service model can obtain large concurrent processing capability, the programming complexity is high. The coroutine model combines the features of large concurrent processing and low programming complexity, enabling programmers to easily implement sequential IO programming;
 - **UDP service:** The model is mainly a service model supporting UDP communication process;
 - **Trigger service:** The model instance is mainly used to process the background service process of some scheduled tasks (similar to the system's crontab).
 
@@ -433,6 +433,6 @@ If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 ## 5.5. Reference
 - Web site: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
-- Gitee:  https://gitee.com/acl-dev/acl
+- Gitee:    https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
 - QQ Group: 693868497
