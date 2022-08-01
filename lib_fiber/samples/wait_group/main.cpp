@@ -19,7 +19,8 @@ private:
 
 	// @override
 	void run(void) {
-		printf("Fiber-%u started\r\n", acl::fiber::self());
+		printf("Fiber-%u started, delay=%d seconds\r\n",
+			acl::fiber::self(), __delay);
 		sleep(__delay);
 
 		printf("Fiber-%u done\r\n", acl::fiber::self());
@@ -44,7 +45,8 @@ private:
 
 	// @override
 	void* run(void) {
-		printf("Thread-%lu started\r\n", acl::thread::self());
+		printf("Thread-%lu started, delay=%d seconds\r\n",
+			acl::thread::self(), __delay);
 		sleep(__delay);
 
 		printf("Thread-%lu done\r\n", acl::thread::self());
@@ -80,7 +82,7 @@ static void usage(const char* procname)
 	printf("usage: %s -h [help]\r\n"
 		" -t threads_count[default: 1]\r\n"
 		" -c fibers_count[default: 1]\r\n"
-		" -d delay[default: 1 ms]\r\n"
+		" -d delay[default: 1 second]\r\n"
 		, procname);
 }
 
@@ -91,7 +93,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "ht:f:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "ht:f:c:d:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
