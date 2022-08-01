@@ -6,12 +6,6 @@
 
 int main(void)
 {
-	char buf[256];
-	long long n = -1;
-
-	acl_snprintf(buf, sizeof(buf), "n=%lld\r\n", (unsigned long) n);
-	printf("buf=%s\r\n", buf);
-
 	printf("current acl version: %s\r\n", acl_version());
 	printf("ACL_VSTREAM's size: %d\r\n", (int) sizeof(ACL_VSTREAM));
 	printf("main tid: %lu\r\n", acl_main_thread_self());
