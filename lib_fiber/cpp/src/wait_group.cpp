@@ -31,7 +31,7 @@ void wait_group::done(void)
 #endif
 }
 
-void wait_group::wait(void)
+size_t wait_group::wait(void)
 {
 	size_t i;
 	for (i = 0; i < count_; i++) {
@@ -40,6 +40,7 @@ void wait_group::wait(void)
 		assert(found);
 		delete tid;
 	}
+	return i;
 }
 
 } // namespace acl

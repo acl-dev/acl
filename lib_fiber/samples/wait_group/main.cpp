@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "wait_group.h"
 
 static int __delay = 1;
 
@@ -10,13 +9,13 @@ static int __delay = 1;
 class fiber_notifier : public acl::fiber
 {
 public:
-	fiber_notifier(wait_group& sync) : sync_(sync) {}
+	fiber_notifier(acl::wait_group& sync) : sync_(sync) {}
 
 private:
 	~fiber_notifier(void) {}
 
 private:
-	wait_group& sync_;
+	acl::wait_group& sync_;
 
 	// @override
 	void run(void) {
@@ -35,13 +34,13 @@ private:
 class thread_notifier : public acl::thread
 {
 public:
-	thread_notifier(wait_group& sync) : sync_(sync) {}
+	thread_notifier(acl::wait_group& sync) : sync_(sync) {}
 
 private:
 	~thread_notifier(void) {}
 
 private:
-	wait_group& sync_;
+	acl::wait_group& sync_;
 
 	// @override
 	void* run(void) {
@@ -61,11 +60,11 @@ private:
 class fiber_waiter : public acl::fiber
 {
 public:
-	fiber_waiter(wait_group& sync) : sync_(sync) {}
+	fiber_waiter(acl::wait_group& sync) : sync_(sync) {}
 	~fiber_waiter(void) {}
 
 private:
-	wait_group& sync_;
+	acl::wait_group& sync_;
 
 	// @override
 	void run(void) {
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
 	acl::log::stdout_open(true);
 	acl::fiber::stdout_open(true);
 
-	wait_group sync;
+	acl::wait_group sync;
 	sync.add(threads_count + fibers_count);
 
 	for (int i = 0; i < threads_count; i++) {

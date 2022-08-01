@@ -11,7 +11,7 @@ public:
 
 	void add(size_t n);
 	void done(void);
-	void wait(void);
+	size_t wait(void);
 
 private:
 	size_t count_;
