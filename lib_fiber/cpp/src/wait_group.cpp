@@ -36,9 +36,14 @@ size_t wait_group::wait(void)
 	size_t i;
 	for (i = 0; i < count_; i++) {
 		bool found;
+#ifdef	_DEBUG
 		unsigned long* tid = box_->pop(-1, &found);
 		assert(found);
 		delete tid;
+#else
+		(void) box_->pop(-1, &found);
+		assert(found);
+#endif
 	}
 	return i;
 }

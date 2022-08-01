@@ -766,8 +766,9 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 				flag, 0, 0);
 		if (sstream != NULL) {
 			acl_msg_info("%s: listen %s ok", myname, addr);
-			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream),
-				ACL_CLOSE_ON_EXEC);
+#if !defined(_WIN32) && !defined(_WIN64)
+			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
+#endif
 			server->sstreams[i++] = sstream;
 		} else {
 			acl_msg_fatal("%s(%d): listen %s error(%s)",

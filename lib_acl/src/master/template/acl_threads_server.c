@@ -1300,7 +1300,9 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 		}
 
 		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_NON_BLOCKING);
+#ifdef ACL_UNIX
 		acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
+#endif
 		acl_event_enable_listen(event, sstream, 0,
 			__server_accept, threads);
 
@@ -1409,11 +1411,15 @@ void acl_threads_server_main(int argc, char * argv[],
 			__FILE__, __LINE__, myname, __conf_file);
 	}
 
+#ifdef ACL_UNIX
 	if (isatty(STDIN_FILENO)) {
 		__daemon_mode = 0;
 	} else {
 		__daemon_mode = 1;
 	}
+#else
+	__daemon_mode = 0;
+#endif
 
 	/*******************************************************************/
 
