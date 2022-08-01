@@ -6,6 +6,7 @@
 #include "fiber_event.hpp"
 #include "fiber_cond.hpp"
 #include "fiber_tbox.hpp"
+#include "wait_group.hpp"
 #include "fiber_sem.hpp"
 #include "channel.hpp"
 

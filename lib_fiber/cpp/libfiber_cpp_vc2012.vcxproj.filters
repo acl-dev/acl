@@ -51,6 +51,9 @@
     <ClInclude Include="include\fiber\master_fiber.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\wait_group.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="include\fiber\libfiber.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -84,6 +87,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\master_fiber.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\wait_group.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\winapi_hook.cpp">

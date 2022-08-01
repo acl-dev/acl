@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "t:f:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "ht:f:c:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);

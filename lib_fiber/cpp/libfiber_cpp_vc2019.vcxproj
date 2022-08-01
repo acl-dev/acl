@@ -321,6 +321,7 @@
     <ClInclude Include="include\fiber\libfiber.hpp" />
     <ClInclude Include="include\fiber\lib_fiber.hpp" />
     <ClInclude Include="include\fiber\master_fiber.hpp" />
+    <ClInclude Include="include\fiber\wait_group.hpp" />
     <ClInclude Include="src\detours\detours.h" />
     <ClInclude Include="src\detours\detver.h" />
     <ClInclude Include="src\fiber_server.hpp" />
@@ -341,6 +342,7 @@
     <ClCompile Include="src\fiber_sem.cpp" />
     <ClCompile Include="src\fiber_server.cpp" />
     <ClCompile Include="src\master_fiber.cpp" />
+    <ClCompile Include="src\wait_group.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

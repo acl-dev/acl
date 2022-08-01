@@ -83,7 +83,8 @@ int fbase_event_wait(FIBER_BASE *fbase)
 	}
 
 	while (1) {
-		if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
+		//if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
+		if (read_wait(fbase->event_in, -1) == -1) {
 			msg_error("%s(%d), %s: read_wait error, fd=%d",
 				__FILE__, __LINE__, __FUNCTION__, fbase->event_in);
 			return -1;
