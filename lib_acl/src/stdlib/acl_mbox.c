@@ -15,7 +15,7 @@
 
 #endif
 
-#if defined(ACL_LINUX)
+#if defined(ACL_LINUX) && !defined(MINGW)
 # if defined(ALPINE)
 #  include <sys/eventfd.h>
 #  define HAS_EVENTFD
