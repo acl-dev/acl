@@ -281,9 +281,8 @@ static int service_unix(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 static ACL_MASTER_ADDR *master_stream_addr(const char *addr, char private_val)
 {
-	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)
-		|| acl_alldig(addr)) {
-//	if (acl_valid_hostaddr(addr, 0)) {
+	//if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP) || acl_alldig(addr)) {
+	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
 		ACL_MASTER_ADDR *ma = (ACL_MASTER_ADDR*)
 			acl_mycalloc(1, sizeof(ACL_MASTER_ADDR));
 		ma->type = ACL_MASTER_SERV_TYPE_INET;

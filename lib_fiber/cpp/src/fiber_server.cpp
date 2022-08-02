@@ -52,6 +52,7 @@ static char *acl_var_fiber_owner;
 static char *acl_var_fiber_dispatch_addr;
 static char *acl_var_fiber_dispatch_type;
 static char *acl_var_fiber_master_reuseport;     /* just for stand alone */
+static char *acl_var_fiber_master_private;
 static char *acl_var_fiber_schedule_event;
 
 static int var_fiber_master_reuseport = 0;
@@ -60,7 +61,8 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "master_service", "", &acl_var_fiber_master_service },
 	{ "master_debug", "all:1", &acl_var_fiber_log_debug },
 	{ "master_reuseport", "", &acl_var_fiber_master_reuseport },
-	{ "fiber_queue_dir", "", &acl_var_fiber_queue_dir },
+	{ "master_private", "n", &acl_var_fiber_master_private },
+	{ "fiber_queue_dir", "/opt/soft/acl-master/var", &acl_var_fiber_queue_dir },
 	{ "fiber_deny_banner", "Denied!\r\n", &acl_var_fiber_deny_banner },
 	{ "fiber_access_allow", "all", &acl_var_fiber_access_allow },
 	{ "fiber_owner", "", &acl_var_fiber_owner },
@@ -791,6 +793,61 @@ static void servers_alone(const char *addrs, int fdtype, int nthreads)
 	acl_argv_free(tokens);
 }
 
+static void correct_addr(const char *addr, char *buf, size_t size)
+{
+	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
+		ACL_SAFE_STRNCPY(buf, addr, size);
+	} else {
+		const char *pri = !strcmp(acl_var_fiber_master_private, "y") ?
+			"private" : "public";
+		snprintf(buf, size, "%s/%s/%s", acl_var_fiber_queue_dir, pri, addr);
+	}
+}
+
+static void server_open(FIBER_SERVER *server, ACL_ARGV *addrs)
+{
+	const char *myname = "server_open";
+	ACL_ITER iter;
+	unsigned flag = ACL_INET_FLAG_NONE;
+	int i = 0;
+
+	if (var_fiber_master_reuseport) {
+		flag |= ACL_INET_FLAG_REUSEPORT;
+	}
+
+	acl_foreach(iter, addrs) {
+		const char* addr = (const char*) iter.data;
+		char addrbuf[256];
+		correct_addr(addr, addrbuf, sizeof(addrbuf));
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addrbuf, 128,
+				flag, 0, 0);
+		if (sstream != NULL) {
+			acl_msg_info("%s: listen %s ok", myname, addr);
+#if !defined(_WIN32) && !defined(_WIN64)
+			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
+#endif
+			server->sstreams[i++] = sstream;
+		} else {
+			acl_msg_fatal("%s(%d): listen %s error(%s)",
+				myname, __LINE__, addr, acl_last_serror());
+		}
+	}
+}
+
+static void servers_open(const char *addrs, int fdtype, int nthreads)
+{
+	ACL_ARGV* tokens = acl_argv_split(addrs, ";, \t");
+	int i;
+
+	__servers = servers_alloc(nthreads, tokens->argc, fdtype);
+
+	for (i = 0; i < nthreads; i++) {
+		server_open(__servers[i], tokens);
+	}
+
+	acl_argv_free(tokens);
+}
+
 static void servers_start(FIBER_SERVER **servers, int nthreads)
 {
 	acl_pthread_attr_t attr;
@@ -1158,7 +1215,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 		assert(*acl_var_fiber_master_service);
 		addrs = acl_var_fiber_master_service;
 
-		servers_alone(addrs, fdtype, acl_var_fiber_threads);
+		servers_open(addrs, fdtype, acl_var_fiber_threads);
 	} else if (socket_count > 0) {
 		servers_daemon(socket_count, fdtype, acl_var_fiber_threads);
 	} else {
