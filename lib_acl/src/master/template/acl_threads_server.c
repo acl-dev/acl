@@ -1415,7 +1415,12 @@ void acl_threads_server_main(int argc, char * argv[],
 	if (isatty(STDIN_FILENO)) {
 		__daemon_mode = 0;
 	} else {
-		__daemon_mode = 1;
+		const char *mode = getenv("MASTER_SERVICE");
+		if (mode && strcasecmp(mode, "ALONE") == 0) {
+			__daemon_mode = 0;
+		} else {
+			__daemon_mode = 1;
+		}
 	}
 #else
 	__daemon_mode = 0;
