@@ -654,8 +654,13 @@ static void main_thread_loop(void)
 	}
 #endif
 
-	__sighup_fiber = acl_fiber_create(main_fiber_sighup, NULL,
-		acl_var_fiber_stack_size);
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, acl_var_fiber_stack_size);
+	acl_fiber_attr_setsharestack(&attr, acl_var_fiber_share_stack ? 1 : 0);
+
+	__sighup_fiber = acl_fiber_create2(&attr, main_fiber_sighup, NULL);
 
 	if (acl_var_fiber_use_limit > 0) {
 		acl_fiber_create(main_fiber_monitor_used, NULL, STACK_SIZE);
@@ -793,9 +798,28 @@ static void servers_alone(const char *addrs, int fdtype, int nthreads)
 	acl_argv_free(tokens);
 }
 
+static int is_ipaddr(const char *addr)
+{
+    // Just only the port, such as: 8088
+	if (acl_alldig(addr)) {
+        return 1;
+    }
+
+    // Such as: ip:port, or ip|port, or :port, or |port
+    if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
+        return 1;
+    }
+
+    if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
+        return 1;
+    }
+
+    return 0;
+}
+
 static void correct_addr(const char *addr, char *buf, size_t size)
 {
-	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
+	if (is_ipaddr(addr)) {
 		ACL_SAFE_STRNCPY(buf, addr, size);
 	} else {
 		const char *pri = !strcmp(acl_var_fiber_master_private, "y") ?
