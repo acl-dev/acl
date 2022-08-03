@@ -1,4 +1,4 @@
-%define release_id 10
+%define release_id 11
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Wed Aug 03 2022 shuxin.zheng@qq.com 3.5.4-11-20220802.10
+- optimize ipaddr's checking conditions
+
 * Tue Jul 26 2022 shuxin.zheng@qq.com 3.5.4-10-20220726.16
 - optimize: acl_master suppots SO_REUSEADDR and be compatible with old server mode with old acl library.
 

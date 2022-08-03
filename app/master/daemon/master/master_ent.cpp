@@ -281,21 +281,21 @@ static int service_unix(ACL_XINETD_CFG_PARSER *xcp, ACL_MASTER_SERV *serv)
 
 static int is_ipaddr(const char *addr)
 {
-    // Just only the port, such as: 8088
+	// Just only the port, such as: 8088
 	if (acl_alldig(addr)) {
-        return 1;
-    }
+		return 1;
+	}
 
-    // Such as: ip:port, or ip|port, or :port, or |port
-    if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
-        return 1;
-    }
+	// Such as: ip:port, or ip|port, or :port, or |port
+	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
+		return 1;
+	}
 
-    if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
-        return 1;
-    }
+	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
+		return 1;
+	}
 
-    return 0;
+	return 0;
 }
 
 static ACL_MASTER_ADDR *master_stream_addr(const char *addr, char private_val)
