@@ -73,28 +73,17 @@ int   acl_var_trigger_disable_core_onexit;
 int   acl_var_trigger_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
-	{ ACL_VAR_TRIGGER_BUF_SIZE, ACL_DEF_TRIGGER_BUF_SIZE,
-		&acl_var_trigger_buf_size, 0, 0 },
-	{ ACL_VAR_TRIGGER_RW_TIMEOUT, ACL_DEF_TRIGGER_RW_TIMEOUT,
-		&acl_var_trigger_rw_timeout, 0, 0 },
-	{ ACL_VAR_TRIGGER_IN_FLOW_DELAY, ACL_DEF_TRIGGER_IN_FLOW_DELAY,
-		&acl_var_trigger_in_flow_delay, 0, 0 },
-	{ ACL_VAR_TRIGGER_IDLE_LIMIT, ACL_DEF_TRIGGER_IDLE_LIMIT,
-		&acl_var_trigger_idle_limit, 0, 0 },
-	{ ACL_VAR_TRIGGER_DELAY_SEC, ACL_DEF_TRIGGER_DELAY_SEC,
-		&acl_var_trigger_delay_sec, 0, 0 },
-	{ ACL_VAR_TRIGGER_DELAY_USEC, ACL_DEF_TRIGGER_DELAY_USEC,
-		&acl_var_trigger_delay_usec, 0, 0 },
-	{ ACL_VAR_TRIGGER_DAEMON_TIMEOUT, ACL_DEF_TRIGGER_DAEMON_TIMEOUT,
-		&acl_var_trigger_daemon_timeout, 0, 0 },
-	{ ACL_VAR_TRIGGER_USE_LIMIT, ACL_DEF_TRIGGER_USE_LIMIT,
-		&acl_var_trigger_use_limit, 0, 0 },
-	{ ACL_VAR_TRIGGER_ENABLE_CORE, ACL_DEF_TRIGGER_ENABLE_CORE,
-		&acl_var_trigger_enable_core, 0, 0 },
-	{ ACL_VAR_TRIGGER_DISABLE_CORE_ONEXIT, ACL_DEF_TRIGGER_DISABLE_CORE_ONEXIT,
-		&acl_var_trigger_disable_core_onexit, 0, 0 },
-	{ ACL_VAR_TRIGGER_MAX_DEBUG, ACL_DEF_TRIGGER_MAX_DEBUG,
-		&acl_var_trigger_max_debug, 0, 0 },
+	{ "trigger_buf_size", 81920, &acl_var_trigger_buf_size, 0, 0 },
+	{ "trigger_rw_timeout", 30, &acl_var_trigger_rw_timeout, 0, 0 },
+	{ "trigger_in_flow_delay", 1, &acl_var_trigger_in_flow_delay, 0, 0 },
+	{ "trigger_idle_limit", 0, &acl_var_trigger_idle_limit, 0, 0 },
+	{ "trigger_delay_sec", 1, &acl_var_trigger_delay_sec, 0, 0 },
+	{ "trigger_delay_usec", 5000, &acl_var_trigger_delay_usec, 0, 0 },
+	{ "trigger_daemon_timeout", 1800, &acl_var_trigger_daemon_timeout, 0, 0 },
+	{ "trigger_use_limit", 0, &acl_var_trigger_use_limit, 0, 0 },
+	{ "trigger_enable_core", 1, &acl_var_trigger_enable_core, 0, 0 },
+	{ "trigger_disable_core_onexit", 1, &acl_var_trigger_disable_core_onexit, 0, 0 },
+	{ "master_debug_max", 1000, &acl_var_trigger_max_debug, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };
@@ -102,8 +91,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 long long int acl_var_trigger_core_limit;
 
 static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
-	{ ACL_VAR_TRIGGER_CORE_LIMIT, ACL_DEF_TRIGGER_CORE_LIMIT,
-		&acl_var_trigger_core_limit, 0, 0 },
+	{ "trigger_core_limit", -1, &acl_var_trigger_core_limit, 0, 0 },
         { 0, 0, 0, 0, 0 },
 };
 
@@ -113,14 +101,10 @@ char *acl_var_trigger_pid_dir;
 char *acl_var_trigger_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-	{ ACL_VAR_TRIGGER_QUEUE_DIR, ACL_DEF_TRIGGER_QUEUE_DIR,
-		&acl_var_trigger_queue_dir },
-	{ ACL_VAR_TRIGGER_OWNER, ACL_DEF_TRIGGER_OWNER,
-		&acl_var_trigger_owner },
-	{ ACL_VAR_TRIGGER_PID_DIR, ACL_DEF_TRIGGER_PID_DIR,
-		&acl_var_trigger_pid_dir },
-	{ ACL_VAR_TRIGGER_LOG_DEBUG, ACL_DEF_TRIGGER_LOG_DEBUG,
-		&acl_var_trigger_log_debug },
+	{ "trigger_queue_dir", "/opt/acl_master/var/queue", &acl_var_trigger_queue_dir },
+	{ "trigger_owner", "root", &acl_var_trigger_owner },
+	{ "trigger_pid_dir", "/opt/acl_master/var/pid", &acl_var_trigger_pid_dir },
+	{ "master_debug", "", &acl_var_trigger_log_debug },
 
 	{ 0, 0, 0 },
 };

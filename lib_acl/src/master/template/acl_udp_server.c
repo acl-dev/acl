@@ -77,28 +77,17 @@ int   acl_var_udp_max_debug;
 int   acl_var_udp_threads;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
-	{ ACL_VAR_UDP_BUF_SIZE, ACL_DEF_UDP_BUF_SIZE,
-		&acl_var_udp_buf_size, 0, 0 },
-	{ ACL_VAR_UDP_RW_TIMEOUT, ACL_DEF_UDP_RW_TIMEOUT,
-		&acl_var_udp_rw_timeout, 0, 0 },
-	{ ACL_VAR_UDP_IDLE_LIMIT, ACL_DEF_UDP_IDLE_LIMIT,
-		&acl_var_udp_idle_limit, 0, 0 },
-	{ ACL_VAR_UDP_DELAY_SEC, ACL_DEF_UDP_DELAY_SEC,
-		&acl_var_udp_delay_sec, 0, 0 },
-	{ ACL_VAR_UDP_DELAY_USEC, ACL_DEF_UDP_DELAY_USEC,
-		&acl_var_udp_delay_usec, 0, 0 },
-	{ ACL_VAR_UDP_DAEMON_TIMEOUT, ACL_DEF_UDP_DAEMON_TIMEOUT,
-		&acl_var_udp_daemon_timeout, 0, 0 },
-	{ ACL_VAR_UDP_MASTER_MAXPROC, ACL_DEF_UDP_MASTER_MAXPROC,
-		&acl_var_udp_master_maxproc, 0, 0},
-	{ ACL_VAR_UDP_ENABLE_CORE, ACL_DEF_UDP_ENABLE_CORE,
-		&acl_var_udp_enable_core, 0, 0 },
-	{ ACL_VAR_UDP_DISABLE_CORE_ONEXIT, ACL_DEF_UDP_DISABLE_CORE_ONEXIT,
-		&acl_var_udp_disable_core_onexit, 0, 0 },
-	{ ACL_VAR_UDP_MAX_DEBUG, ACL_DEF_UDP_MAX_DEBUG,
-		&acl_var_udp_max_debug, 0, 0 },
-	{ ACL_VAR_UDP_THREADS, ACL_DEF_UDP_THREADS,
-		&acl_var_udp_threads, 0, 0 },
+	{ "udp_bufsize", 4096, &acl_var_udp_buf_size, 0, 0 },
+	{ "udp_rw_timeout", 30, &acl_var_udp_rw_timeout, 0, 0 },
+	{ "udp_idle_limit", 0, &acl_var_udp_idle_limit, 0, 0 },
+	{ "udp_delay_sec", 1, &acl_var_udp_delay_sec, 0, 0 },
+	{ "udp_delay_usec", 5000, &acl_var_udp_delay_usec, 0, 0 },
+	{ "udp_daemon_timeout", 1800, &acl_var_udp_daemon_timeout, 0, 0 },
+	{ "master_maxproc", 1, &acl_var_udp_master_maxproc, 0, 0},
+	{ "udp_enable_core", 1, &acl_var_udp_enable_core, 0, 0 },
+	{ "udp_disable_core_onexit", 1, &acl_var_udp_disable_core_onexit, 0, 0 },
+	{ "master_debug_max", 1000, &acl_var_udp_max_debug, 0, 0 },
+	{ "udp_threads", 1, &acl_var_udp_threads, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -107,10 +96,8 @@ long long int acl_var_udp_use_limit;
 long long int acl_var_udp_core_limit;
 
 static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
-	{ ACL_VAR_UDP_USE_LIMIT, ACL_DEF_UDP_USE_LIMIT,
-		&acl_var_udp_use_limit, 0, 0 },
-	{ ACL_VAR_UDP_CORE_LIMIT, ACL_DEF_UDP_CORE_LIMIT,
-		&acl_var_udp_core_limit, 0, 0 },
+	{ "udp_use_limit", 0, &acl_var_udp_use_limit, 0, 0 },
+	{ "udp_core_limit", -1, &acl_var_udp_core_limit, 0, 0 },
 
         { 0, 0, 0, 0, 0 },
 };
@@ -121,14 +108,10 @@ int   acl_var_udp_fatal_on_bind_error;
 int   acl_var_udp_monitor_netlink;
 
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
-	{ ACL_VAR_UDP_THREADS_DETACHED, ACL_DEF_UDP_THREADS_DETACHED,
-		&acl_var_udp_threads_detached },
-	{ ACL_VAR_UDP_NON_BLOCK, ACL_DEF_UDP_NON_BLOCK,
-		&acl_var_udp_non_block },
-	{ ACL_VAR_UDP_FATAL_ON_BIND_ERROR, ACL_DEF_UDP_FATAL_ON_BIND_ERROR,
-		&acl_var_udp_fatal_on_bind_error },
-	{ ACL_VAR_UDP_MONITOR_NETLINK, ACL_DEF_UDP_MONITOR_NETLINK,
-		&acl_var_udp_monitor_netlink },
+	{ "udp_threads_detached", 1, &acl_var_udp_threads_detached },
+	{ "master_nonblock", 1, &acl_var_udp_non_block },
+	{ "udp_fatal_on_bind_error", 0, &acl_var_udp_fatal_on_bind_error },
+	{ "udp_monitor_netlink", 1, &acl_var_udp_monitor_netlink },
 
 	{ 0, 0, 0 },
 };
@@ -143,20 +126,13 @@ char *acl_var_udp_reuse_port;
 static int var_udp_reuse_port = 0;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-	{ ACL_VAR_UDP_QUEUE_DIR, ACL_DEF_UDP_QUEUE_DIR,
-		&acl_var_udp_queue_dir },
-	{ ACL_VAR_UDP_OWNER, ACL_DEF_UDP_OWNER,
-		&acl_var_udp_owner },
-	{ ACL_VAR_UDP_PID_DIR, ACL_DEF_UDP_PID_DIR,
-		&acl_var_udp_pid_dir },
-	{ ACL_VAR_UDP_EVENT_MODE, ACL_DEF_UDP_EVENT_MODE,
-		&acl_var_udp_event_mode },
-	{ ACL_VAR_UDP_LOG_DEBUG, ACL_DEF_UDP_LOG_DEBUG,
-		&acl_var_udp_log_debug },
-	{ ACL_VAR_UDP_PRIVATE, ACL_DEF_UDP_PRIVATE,
-		&acl_var_udp_private },
-	{ ACL_VAR_UDP_REUSEPORT, ACL_DEF_UDP_REUSEPORT,
-		&acl_var_udp_reuse_port},
+	{ "udp_queue_dir", "/opt/acl_master/var/queue", &acl_var_udp_queue_dir },
+	{ "udp_owner", "root", &acl_var_udp_owner },
+	{ "udp_pid_dir", "/opt/acl_master/var/pid", &acl_var_udp_pid_dir },
+	{ "udp_event_mode", "select", &acl_var_udp_event_mode },
+	{ "master_debug", "", &acl_var_udp_log_debug },
+	{ "master_private", "n", &acl_var_udp_private },
+	{ "master_reuseport", "yes", &acl_var_udp_reuse_port},
 
         { 0, 0, 0 },
 };

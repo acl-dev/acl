@@ -75,28 +75,17 @@ int   acl_var_single_disable_core_onexit;
 int   acl_var_single_max_debug;
 
 static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
-	{ ACL_VAR_SINGLE_BUF_SIZE, ACL_DEF_SINGLE_BUF_SIZE,
-		&acl_var_single_buf_size, 0, 0 },
-	{ ACL_VAR_SINGLE_RW_TIMEOUT, ACL_DEF_SINGLE_RW_TIMEOUT,
-		&acl_var_single_rw_timeout, 0, 0 },
-	{ ACL_VAR_SINGLE_IN_FLOW_DELAY, ACL_DEF_SINGLE_IN_FLOW_DELAY,
-		&acl_var_single_in_flow_delay, 0, 0 },
-	{ ACL_VAR_SINGLE_IDLE_LIMIT, ACL_DEF_SINGLE_IDLE_LIMIT,
-		&acl_var_single_idle_limit, 0, 0 },
-	{ ACL_VAR_SINGLE_DELAY_SEC, ACL_DEF_SINGLE_DELAY_SEC,
-		&acl_var_single_delay_sec, 0, 0 },
-	{ ACL_VAR_SINGLE_DELAY_USEC, ACL_DEF_SINGLE_DELAY_USEC,
-		&acl_var_single_delay_usec, 0, 0 },
-	{ ACL_VAR_SINGLE_DAEMON_TIMEOUT, ACL_DEF_SINGLE_DAEMON_TIMEOUT,
-		&acl_var_single_daemon_timeout, 0, 0 },
-	{ ACL_VAR_SINGLE_USE_LIMIT, ACL_DEF_SINGLE_USE_LIMIT,
-		&acl_var_single_use_limit, 0, 0 },
-	{ ACL_VAR_SINGLE_ENABLE_CORE, ACL_DEF_SINGLE_ENABLE_CORE,
-		&acl_var_single_enable_core, 0, 0 },
-	{ ACL_VAR_SINGLE_DISABLE_CORE_ONEXIT, ACL_DEF_SINGLE_DISABLE_CORE_ONEXIT,
-		&acl_var_single_disable_core_onexit, 0, 0 },
-	{ ACL_VAR_SINGLE_MAX_DEBUG, ACL_DEF_SINGLE_MAX_DEBUG,
-		&acl_var_single_max_debug, 0, 0 },
+	{ "single_buf_size", 81920, &acl_var_single_buf_size, 0, 0 },
+	{ "single_rw_timeout", 30, &acl_var_single_rw_timeout, 0, 0 },
+	{ "single_in_flow_delay", 1, &acl_var_single_in_flow_delay, 0, 0 },
+	{ "single_idle_limit", 0, &acl_var_single_idle_limit, 0, 0 },
+	{ "single_delay_sec", 1, &acl_var_single_delay_sec, 0, 0 },
+	{ "single_delay_usec", 5000, &acl_var_single_delay_usec, 0, 0 },
+	{ "single_daemon_timeout", 1800, &acl_var_single_daemon_timeout, 0, 0 },
+	{ "single_use_limit", 0, &acl_var_single_use_limit, 0, 0 },
+	{ "single_enable_core", 1, &acl_var_single_enable_core, 0, 0 },
+	{ "single_disable_core_onexit", 1, &acl_var_single_disable_core_onexit, 0, 0 },
+	{ "master_debug_max", 1000, &acl_var_single_max_debug, 0, 0 },
 
 	{ 0, 0, 0, 0, 0 },
 };
@@ -104,8 +93,7 @@ static ACL_CONFIG_INT_TABLE __conf_int_tab[] = {
 long long int acl_var_single_core_limit;
 
 static ACL_CONFIG_INT64_TABLE __conf_int64_tab[] = {
-	{ ACL_VAR_SINGLE_CORE_LIMIT, ACL_DEF_SINGLE_CORE_LIMIT,
-		&acl_var_single_core_limit, 0, 0 },
+	{ "single_core_limit", -1, &acl_var_single_core_limit, 0, 0 },
         { 0, 0, 0, 0, 0 },
 };
 
@@ -115,14 +103,10 @@ char *acl_var_single_pid_dir;
 char *acl_var_single_log_debug;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
-	{ ACL_VAR_SINGLE_QUEUE_DIR, ACL_DEF_SINGLE_QUEUE_DIR,
-		&acl_var_single_queue_dir },
-	{ ACL_VAR_SINGLE_OWNER, ACL_DEF_SINGLE_OWNER,
-		&acl_var_single_owner },
-	{ ACL_VAR_SINGLE_PID_DIR, ACL_DEF_SINGLE_PID_DIR,
-		&acl_var_single_pid_dir },
-	{ ACL_VAR_SINGLE_LOG_DEBUG, ACL_DEF_SINGLE_LOG_DEBUG,
-		&acl_var_single_log_debug },
+	{ "single_queue_dir", "/opt/acl_master/var/queue", &acl_var_single_queue_dir },
+	{ "single_owner", "root", &acl_var_single_owner },
+	{ "single_pid_dir", "/opt/acl_master/var/pid", &acl_var_single_pid_dir },
+	{ "master_debug", "", &acl_var_single_log_debug },
 
 	{ 0, 0, 0 },
 };
