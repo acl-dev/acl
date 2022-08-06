@@ -102,7 +102,7 @@ char *acl_url_decode(const char *str, ACL_DBUF_POOL *dbuf)
 				break;
 			tmp[pos] = str[i];
 			break;
-		} else if (isalnum(str[i + 1]) && isalnum(str[i + 2])) {
+		} else if (isalnum((int) str[i + 1]) && isalnum((int) str[i + 2])) {
 			tmp[pos] = (dec_tab[(unsigned char) str[i + 1]] << 4)
 				+ dec_tab[(unsigned char) str[i + 2]];
 			i += 2;

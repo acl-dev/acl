@@ -241,11 +241,13 @@ extern int gethostbyname_r(const char *name, struct hostent *ent,
 	char *buf, size_t buflen, struct hostent **result, int *h_errnop);
 #endif
 
+#ifndef MINGW
 int gethostbyname_r(const char *name, struct hostent *ent,
 	char *buf, size_t buflen, struct hostent **result, int *h_errnop)
 {
 	return acl_fiber_gethostbyname_r(name, ent, buf, buflen,
 			result, h_errnop);
 }
+#endif
 
 #endif /* SYS_UNIX */

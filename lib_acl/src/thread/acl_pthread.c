@@ -557,8 +557,8 @@ int acl_pthread_atexit_add(void *arg, void (*free_fn)(void *))
 	}
 	acl_pthread_once(&__pthread_atexit_control_once, pthread_atexit_init);
 	if (__pthread_atexit_key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES) {
-		acl_msg_error("%s(%d): __pthread_atexit_key(%d) invalid",
-			myname, __LINE__, (int) __pthread_atexit_key);
+		acl_msg_error("%s(%d): __pthread_atexit_key(%ld) invalid",
+			myname, __LINE__, (long int) __pthread_atexit_key);
 		return -1;
 	}
 
@@ -577,9 +577,9 @@ int acl_pthread_atexit_add(void *arg, void (*free_fn)(void *))
 	if (id_list == NULL) {
 		id_list = private_fifo_new();
 		if (acl_pthread_setspecific(__pthread_atexit_key, id_list) != 0) {
-			acl_msg_error("%s(%d): pthread_setspecific: %s, key(%d)",
+			acl_msg_error("%s(%d): pthread_setspecific: %s, key(%ld)",
 				myname, __LINE__, acl_last_serror(),
-				(int) __pthread_atexit_key);
+				(long int) __pthread_atexit_key);
 			return -1;
 		}
 	}
@@ -598,16 +598,16 @@ int acl_pthread_atexit_remove(void *arg, void (*free_fn)(void*))
 		return -1;
 	}
 	if (__pthread_atexit_key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES) {
-		acl_msg_error("%s(%d): __pthread_atexit_key(%d)  invalid",
-			myname, __LINE__, (int) __pthread_atexit_key);
+		acl_msg_error("%s(%d): __pthread_atexit_key(%ld)  invalid",
+			myname, __LINE__, (long int) __pthread_atexit_key);
 		acl_set_error(ACL_EINVAL);
 		return -1;
 	}
 	id_list = (ACL_FIFO*) acl_pthread_getspecific(__pthread_atexit_key);
 	if (id_list == NULL) {
-		acl_msg_error("%s(%d): __pthread_atexit_key(%d) no exist"
+		acl_msg_error("%s(%d): __pthread_atexit_key(%ld) no exist"
 			" in tid(%lu)", myname, __LINE__,
-			(int) __pthread_atexit_key,
+			(long int) __pthread_atexit_key,
 			(unsigned long) acl_pthread_self());
 		return -1;
 	}
@@ -700,7 +700,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 {
 	const char *myname = "acl_pthread_tls_get";
 	TLS_CTX *tls_ctxes;
-	int   i;
+	long  i;
 
 	acl_pthread_once(&__tls_ctx_control_once, tls_ctx_once_init);
 	if (__tls_ctx_key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES) {
@@ -735,18 +735,18 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 	}
 
 	/* 如果该键已经存在则取出对应数据 */
-	if ((int) (*key_ptr) >= 0 && (int) (*key_ptr) < acl_tls_ctx_max) {
-		if (tls_ctxes[(int) (*key_ptr)].key == *key_ptr)
-			return tls_ctxes[(int) (*key_ptr)].ptr;
-		if (tls_ctxes[(int) (*key_ptr)].key
+	if ((long) (*key_ptr) >= 0 && (long) (*key_ptr) < acl_tls_ctx_max) {
+		if (tls_ctxes[(long) (*key_ptr)].key == *key_ptr)
+			return tls_ctxes[(long) (*key_ptr)].ptr;
+		if (tls_ctxes[(long) (*key_ptr)].key
 			== (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES)
 		{
-			tls_ctxes[(int) (*key_ptr)].key = *key_ptr;
-			return tls_ctxes[(int) (*key_ptr)].ptr;
+			tls_ctxes[(long) (*key_ptr)].key = *key_ptr;
+			return tls_ctxes[(long) (*key_ptr)].ptr;
 		}
-		acl_msg_warn("%s(%d): tls_ctxes[%d].key(%d)!= key(%d)",
-			myname, __LINE__, (int) (*key_ptr),
-			(int) tls_ctxes[(int) (*key_ptr)].key, (int) (*key_ptr));
+		acl_msg_warn("%s(%d): tls_ctxes[%ld].key(%ld)!= key(%ld)",
+			myname, __LINE__, (long) (*key_ptr),
+			(long) tls_ctxes[(long) (*key_ptr)].key, (long) (*key_ptr));
 		return NULL;
 	}
 
@@ -778,9 +778,9 @@ int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
 	const char *myname = "acl_pthread_tls_set";
 	TLS_CTX *tls_ctxes;
 
-	if ((int) key < 0 || (int) key >= acl_tls_ctx_max) {
-		acl_msg_error("%s(%d): key(%d) invalid",
-			myname, __LINE__, (int) key);
+	if ((long) key < 0 || (long) key >= acl_tls_ctx_max) {
+		acl_msg_error("%s(%d): key(%ld) invalid",
+			myname, __LINE__, (long) key);
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
@@ -793,22 +793,22 @@ int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
 	}
 	tls_ctxes = (TLS_CTX*) acl_pthread_getspecific(__tls_ctx_key);
 	if (tls_ctxes == NULL) {
-		acl_msg_error("%s(%d): __tls_ctx_key(%d) no exist",
-			myname, __LINE__, (int) __tls_ctx_key);
+		acl_msg_error("%s(%d): __tls_ctx_key(%ld) no exist",
+			myname, __LINE__, (long) __tls_ctx_key);
 		return -1;
 	}
-	if (tls_ctxes[(int) key].key != key) {
-		acl_msg_error("%s(%d): key(%d) invalid",
-			myname, __LINE__, (int) key);
+	if (tls_ctxes[(long) key].key != key) {
+		acl_msg_error("%s(%d): key(%ld) invalid",
+			myname, __LINE__, (long) key);
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
 	/* 如果该键值存在旧数据则首先需要释放掉旧数据 */
-	if (tls_ctxes[(int) key].ptr != NULL && tls_ctxes[(int) key].free_fn != NULL)
-		tls_ctxes[(int) key].free_fn(tls_ctxes[(int) key].ptr);
+	if (tls_ctxes[(long) key].ptr != NULL && tls_ctxes[(long) key].free_fn != NULL)
+		tls_ctxes[(long) key].free_fn(tls_ctxes[(long) key].ptr);
 
-	tls_ctxes[(int) key].free_fn = free_fn;
-	tls_ctxes[(int) key].ptr = ptr;
+	tls_ctxes[(long) key].free_fn = free_fn;
+	tls_ctxes[(long) key].ptr = ptr;
 	return 0;
 }
 
@@ -817,9 +817,9 @@ int acl_pthread_tls_del(acl_pthread_key_t key)
 	const char *myname = "acl_pthread_tls_del";
 	TLS_CTX *tls_ctxes;
 
-	if ((int) key < 0 || (int) key >= acl_tls_ctx_max) {
-		acl_msg_error("%s(%d): key(%d) invalid",
-			myname, __LINE__, (int) key);
+	if ((long) key < 0 || (long) key >= acl_tls_ctx_max) {
+		acl_msg_error("%s(%d): key(%ld) invalid",
+			myname, __LINE__, (long) key);
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
@@ -833,21 +833,21 @@ int acl_pthread_tls_del(acl_pthread_key_t key)
 
 	tls_ctxes = (TLS_CTX*) acl_pthread_getspecific(__tls_ctx_key);
 	if (tls_ctxes == NULL) {
-		acl_msg_error("%s(%d): __tls_ctx_key(%d) no exist",
-			myname, __LINE__, (int) __tls_ctx_key);
+		acl_msg_error("%s(%d): __tls_ctx_key(%ld) no exist",
+			myname, __LINE__, (long int) __tls_ctx_key);
 		return -1;
 	}
 
-	if (tls_ctxes[(int) key].key != key) {
-		acl_msg_error("%s(%d): key(%d) invalid",
-			myname, __LINE__, (int) key);
+	if (tls_ctxes[(long) key].key != key) {
+		acl_msg_error("%s(%d): key(%ld) invalid",
+			myname, __LINE__, (long int) key);
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
 
-	tls_ctxes[(int) key].free_fn = NULL;
-	tls_ctxes[(int) key].ptr = NULL;
-	tls_ctxes[(int) key].key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
+	tls_ctxes[(long) key].free_fn = NULL;
+	tls_ctxes[(long) key].ptr = NULL;
+	tls_ctxes[(long) key].key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 	return 0;
 }
 

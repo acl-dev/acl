@@ -77,9 +77,23 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	SYSLIB += -lcrypt -rdynamic -ldl
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	SYSLIB  = -lpthread -rdynamic
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
-	SYSLIB  = -lpthread-2 -rdynamic
+	SYSLIB  = -lpthread -rdynamic
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB  = -lpthread -rdynamic
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 endif

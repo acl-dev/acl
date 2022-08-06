@@ -90,8 +90,20 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	shared_ldflags = -lacl_cpp -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+  CFLAGS += -DLINUX2 -DMINGW
+  UNIXTYPE = LINUX
+endif
+
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+  CFLAGS += -DLINUX2 -DMINGW
+  UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
   CFLAGS += -DLINUX2 -DMINGW
   UNIXTYPE = LINUX
 endif

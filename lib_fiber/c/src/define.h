@@ -7,6 +7,11 @@
 # define HAS_SELECT
 # define HAS_POLL
 # define HAS_EPOLL
+#elif defined(MINGW)
+# define LINUX
+# define SYS_UNIX
+# define HAS_SELECT
+# define HAS_POLL
 #elif defined(__FreeBSD__)
 # define SYS_UNIX
 # define HAS_SELECT

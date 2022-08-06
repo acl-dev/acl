@@ -42,7 +42,7 @@ typedef int (WSAAPI *WSARecv_fn)(socket_t, LPWSABUF, DWORD, LPDWORD, LPDWORD,
 typedef socket_t (WSAAPI *WSAAccept_fn)(SOCKET, struct sockaddr FAR *,
     LPINT, LPCONDITIONPROC, DWORD_PTR);
 
-#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(MINGW)
 
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
@@ -123,7 +123,7 @@ extern gethostbyname_fn     *sys_gethostbyname;
 extern WSARecv_fn           *sys_WSARecv;
 extern WSAAccept_fn         *sys_WSAAccept;
 
-#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  // SYS_UNIX
+#elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  || defined(MINGW) // SYS_UNIX
 
 extern sleep_fn             *sys_sleep;
 extern setsockopt_fn        *sys_setsockopt;

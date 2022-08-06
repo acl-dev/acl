@@ -383,7 +383,7 @@ long long acl_atoll(const char *s)
 	long long num = 0;
 	int neg = 0;
 
-	while (isspace(*s))
+	while (isspace((int) (*s)))
 		s++;
 
 	if (*s == '-') {	
@@ -391,7 +391,7 @@ long long acl_atoll(const char *s)
 		s++;
 	}
 
-	while (isdigit(*s)) {
+	while (isdigit((int) (*s))) {
 		num = 10 * num + (*s - '0');
 		s++;
 	}

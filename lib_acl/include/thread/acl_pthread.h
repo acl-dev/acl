@@ -17,7 +17,7 @@ extern "C" {
 #endif
 # include <pthread.h>
 
-# if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX) || defined(ALPINE)
+# if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX) || defined(ALPINE) || defined(MINGW)
 #  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE
 # else
 #  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE_NP

@@ -162,6 +162,15 @@ ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	RPATH = mingw
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
+	UNIXTYPE = LINUX
+	SYSLIB = -lpthread-2
+	RPATH = mingw
+endif
+
 # For SunOS
 ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring 86, $(OSTYPE)), 86)

@@ -253,9 +253,9 @@ static ACL_MEM_SLICE *mem_slice_create(void)
 	acl_pthread_once(&once_control, slice_key_init);
 
 	if (__mem_slice_key == (acl_pthread_key_t) -1)
-		acl_msg_fatal("%s(%d): __mem_slice_key(%d) invalid,"
+		acl_msg_fatal("%s(%d): __mem_slice_key(%ld) invalid,"
 			" call acl_mem_slice_init or acl_mem_slice_set first",
-			myname, __LINE__, (int) __mem_slice_key);
+			myname, __LINE__, (long int) __mem_slice_key);
 
 	mem_slice = acl_pthread_getspecific(__mem_slice_key);
 	if (mem_slice != NULL)

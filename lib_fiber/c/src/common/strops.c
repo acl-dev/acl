@@ -103,7 +103,7 @@ int alldig(const char *s)
 	if (s == NULL || *s == 0)
 		return 0;
 	for (; *s != 0; s++)
-		if (!isdigit(*s))
+		if (!isdigit((int) (*s)))
 			return 0;
 	return 1;
 }

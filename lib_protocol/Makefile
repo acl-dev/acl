@@ -86,6 +86,13 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -O3
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+	CFLAGS += -O3
+endif
+
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW

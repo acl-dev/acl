@@ -20,8 +20,6 @@ CFLAGS = -c -g -W \
 -DHAS_MYSQL_DLL \
 -DHAS_PGSQL_DLL \
 -DHAS_SQLITE_DLL \
--DHAS_POLARSSL_DLL \
--DHAS_MBEDTLS_DLL \
 -Winvalid-pch \
 -DACL_PREPARE_COMPILE \
 #-DHAS_ZLIB_DLL \
@@ -70,15 +68,6 @@ ifeq ($(RANLIB),)
 	RANLIB = ranlib
 endif
 
-ifeq ($(findstring HAS_POLARSSL, $(FLAGS)), HAS_POLARSSL)
-	CFLAGS += -DHAS_POLARSSL
-	polarssl = on
-endif
-
-ifeq ($(findstring on, $(polarssl)), on)
-	CFLAGS += -DHAS_POLARSSL
-endif
-
 ifeq ($(findstring clang++, $(CC)), clang++)
 	CFLAGS += -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof
@@ -89,6 +78,7 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
+	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL
 	shared_ldflags = -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
@@ -103,6 +93,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -flto \
 		  -Os
 	CFLAGS += -Wshadow
+	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL
 	UNIXTYPE = MACOSX
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
@@ -112,7 +103,16 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
+	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
+endif
+
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -Wshadow
+	CFLAGS += -O3
+	UNIXTYPE = LINUX
 endif
 
 # For MINGW
@@ -150,6 +150,15 @@ ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
 	UNIXTYPE = HPUX
+endif
+
+ifeq ($(findstring HAS_POLARSSL, $(FLAGS)), HAS_POLARSSL)
+	CFLAGS += -DHAS_POLARSSL
+	polarssl = on
+endif
+
+ifeq ($(findstring on, $(polarssl)), on)
+	CFLAGS += -DHAS_POLARSSL
 endif
 
 #Find system type.

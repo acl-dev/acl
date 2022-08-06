@@ -139,7 +139,7 @@ static int skip_atoi(const char **s)
 {
 	int i=0;
 
-	while (isdigit(**s))
+	while (isdigit((int)(**s)))
 		i = i*10 + *((*s)++) - '0';
 	return i;
 }
@@ -201,7 +201,7 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 
 		/* get field width */
 		field_width = -1;
-		if (isdigit(*fmt))
+		if (isdigit((int)(*fmt)))
 			field_width = skip_atoi(&fmt);
 		else if (*fmt == '*') {
 			++fmt;
@@ -217,7 +217,7 @@ int acl_vsnprintf(char *buf, size_t size, const char *fmt, va_list args)
 		precision = -1;
 		if (*fmt == '.') {
 			++fmt;	
-			if (isdigit(*fmt))
+			if (isdigit((int) (*fmt)))
 				precision = skip_atoi(&fmt);
 			else if (*fmt == '*') {
 				++fmt;

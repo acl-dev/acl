@@ -101,6 +101,27 @@ ifeq ($(findstring HP-UX, $(UNIXNAME)), HP-UX)
 	PLAT_NAME=hp-ux
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	SYSLIB  = -lpthread -rdynamic
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
+	SYSLIB  = -lpthread -rdynamic
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
+	SYSLIB  = -lpthread -rdynamic
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+endif
+
 #Find system type.
 ifneq ($(SYSPATH),)
 	CHECKSYSRES = @echo "System is $(shell uname -sm)"

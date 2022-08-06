@@ -79,7 +79,7 @@
 
 
 /* Binary safe string search */
-static const char *tpl_strstr(register const char *haystack,
+static const char *tpl_strstr(const char *haystack,
                               ssize_t haystack_len,
                               const char *needle,
                               int needle_len)
@@ -177,7 +177,7 @@ static void destroy_tcell(tpl_tcell_t* section)
 static unsigned int tpl_hash(const char *key, int key_len)
 {
     const char *p_key_end = key + key_len;
-    register unsigned int h = *key++;
+    unsigned int h = *key++;
 
     while (key != p_key_end && *key != 0)
     {
@@ -410,7 +410,7 @@ void tpl_init(tpl_t *tpl)
 
 void tpl_release(tpl_t *tpl)
 {
-    register int i;
+    int i;
 
     /* Free nodes */
     while (tpl->head != NULL)

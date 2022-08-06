@@ -4,6 +4,7 @@
 #include <vector>
 #include <set>
 #include <list>
+#include <string.h>
 
 #include "lib_acl.h"
 #include "lib_protocol.h"

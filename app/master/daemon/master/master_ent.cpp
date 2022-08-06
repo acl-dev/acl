@@ -309,7 +309,7 @@ static ACL_MASTER_ADDR *master_stream_addr(const char *addr, char private_val)
 	}
 
 	char *buf = acl_mystrdup(addr);
-	char *at  = strcasestr(buf, "@unix");
+	char *at  = acl_strcasestr(buf, "@unix");
 	if (at == NULL) {
 		acl_msg_warn("%s: @unix should after %s", __FUNCTION__, addr);
 	}

@@ -187,11 +187,19 @@ static void hook_api(void)
 {
 #ifdef SYS_UNIX
 
-#define LOAD_FN(name, type, fn, fp) do { \
+# ifdef MINGW
+#  define LOAD_FN(name, type, fn, fp) do { \
+	(fn) = (type) dlsym(RTLD_DEFAULT, name); \
+	assert((fn)); \
+	(fp) = &(fn); \
+} while (0)
+# else
+#  define LOAD_FN(name, type, fn, fp) do { \
 	(fn) = (type) dlsym(RTLD_NEXT, name); \
 	assert((fn)); \
 	(fp) = &(fn); \
 } while (0)
+# endif
 
 	LOAD_FN("socket", socket_fn, __sys_socket, sys_socket);
 	LOAD_FN("close", close_fn, __sys_close, sys_close);

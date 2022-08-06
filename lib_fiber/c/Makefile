@@ -119,6 +119,11 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -DSHARE_STACK
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	CFLAGS += -DLINUX2 -DMINGW
+endif
+
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW

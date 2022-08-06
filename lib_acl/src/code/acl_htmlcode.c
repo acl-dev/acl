@@ -98,7 +98,7 @@ static const char* markup_unescape(const char* in, ACL_VSTRING* out)
 			acl_vstring_strcat(out, buf);
 
 			n = *(in + 2) == 'x' ? 3 : 2;
-			while (isxdigit(in[n]))
+			while (isxdigit((int) in[n]))
 				n++;
 			if(in[n] == ';')
 				n++;

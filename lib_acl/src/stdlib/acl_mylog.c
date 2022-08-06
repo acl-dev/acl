@@ -813,9 +813,9 @@ static void file_vsyslog(ACL_LOG *log, const char *info,
 
 	if (__log_thread_id) {
 #ifdef MINGW
-		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%u)(%s): ",
+		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%lu)(%s): ",
 			fmtstr, log->logpre, (int) getpid(),
-			(unsigned int) acl_pthread_self(), info);
+			(unsigned long) acl_pthread_self(), info);
 #elif defined(ACL_LINUX)
 		snprintf(tbuf, sizeof(tbuf), "%s %s (pid=%d, tid=%llu)(%s): ",
 			fmtstr, log->logpre, (int) getpid(),
@@ -864,9 +864,9 @@ static void net_vsyslog(ACL_LOG *log, const char *info,
 
 	if (__log_thread_id) {
 #ifdef MINGW
-		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%u)(%s): ",
+		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%lu)(%s): ",
 			log->logpre, (int) getpid(),
-			(unsigned int) acl_pthread_self(), info);
+			(unsigned long) acl_pthread_self(), info);
 #elif defined(ACL_LINUX)
 		snprintf(tbuf, sizeof(tbuf), " %s (pid=%d, tid=%llu)(%s): ",
 			log->logpre, (int) getpid(),

@@ -54,7 +54,8 @@ EVENT *event_create(int size)
 #elif	defined(HAS_IOCP)
 		ev = event_iocp_create(size);
 #else
-#error	"unknown OS"
+		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
+		assert(0);
 #endif
 		break;
 	}
