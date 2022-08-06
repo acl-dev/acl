@@ -22,7 +22,9 @@ typedef struct acl_stat acl_stat_t;
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#if !defined(_WIN32) && !defined(_WIN64)
 #include <strings.h>
+#endif
 
 #define _ACL_UCHAR_(c)      ((unsigned char)(c))
 
