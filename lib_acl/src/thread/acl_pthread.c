@@ -735,7 +735,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 	}
 
 	/* 如果该键已经存在则取出对应数据 */
-	if ((long) (*key_ptr) >= 0 && (long) (*key_ptr) < acl_tls_ctx_max) {
+	if ((long) (*key_ptr) > 0 && (long) (*key_ptr) < acl_tls_ctx_max) {
 		if (tls_ctxes[(long) (*key_ptr)].key == *key_ptr)
 			return tls_ctxes[(long) (*key_ptr)].ptr;
 		if (tls_ctxes[(long) (*key_ptr)].key
@@ -778,7 +778,7 @@ int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
 	const char *myname = "acl_pthread_tls_set";
 	TLS_CTX *tls_ctxes;
 
-	if ((long) key < 0 || (long) key >= acl_tls_ctx_max) {
+	if ((long) key >= acl_tls_ctx_max) {
 		acl_msg_error("%s(%d): key(%ld) invalid",
 			myname, __LINE__, (long) key);
 		acl_set_error(ACL_EINVAL);
@@ -817,7 +817,7 @@ int acl_pthread_tls_del(acl_pthread_key_t key)
 	const char *myname = "acl_pthread_tls_del";
 	TLS_CTX *tls_ctxes;
 
-	if ((long) key < 0 || (long) key >= acl_tls_ctx_max) {
+	if ((long) key >= acl_tls_ctx_max) {
 		acl_msg_error("%s(%d): key(%ld) invalid",
 			myname, __LINE__, (long) key);
 		acl_set_error(ACL_EINVAL);
