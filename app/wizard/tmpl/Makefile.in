@@ -62,7 +62,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof
 	UNIXTYPE = MACOSX
-	SYSLIB +=  -liconv -rdynamic
+	SYSLIB += -liconv -rdynamic -lz
 	RPATH = macos
 endif
 
@@ -78,19 +78,26 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 		RPATH = linux64
 	endif
 	CFLAGS += -DLINUX2 -D_REENTRANT
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -lz
+endif
+
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	SYSLIB = -lpthread -liconv -lz
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
 endif
 
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
-	SYSLIB = -lpthread-2 -liconv
+	SYSLIB = -lpthread -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 endif
 
 # For MSYS
 ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
-	SYSLIB = -lpthread-2 -liconv
+	SYSLIB = -lpthread -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 endif

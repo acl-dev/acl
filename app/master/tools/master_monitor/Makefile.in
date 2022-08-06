@@ -56,9 +56,17 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	SYSLIB += -lcrypt -ldl -lz
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(OSNAME)), CYGWIN)
+	SYSLIB = -lpthread -liconv -lz
+	CFLAGS += -DLINUX2 -DMINGW
+	UNIXTYPE = LINUX
+	RPATH = mingw
+endif
+
 # For MINGW
 ifeq ($(findstring MINGW, $(OSNAME)), MINGW)
-	SYSLIB = -lpthread-2 -liconv -lz
+	SYSLIB = -lpthread -liconv -lz
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 	RPATH = mingw
@@ -66,7 +74,7 @@ endif
 
 # For MSYS
 ifeq ($(findstring MSYS, $(OSNAME)), MSYS)
-	SYSLIB = -lpthread-2 -liconv -lz -ldl
+	SYSLIB = -lpthread -liconv -lz -ldl
 	CFLAGS += -DLINUX2 -DMINGW
 	UNIXTYPE = LINUX
 	RPATH = msys

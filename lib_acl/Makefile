@@ -144,12 +144,21 @@ ifeq ($(findstring exist, $(EXECINFO_H_EXIST)), exist)
 	CFLAGS += -DHAS_EXECINFO_HEAD
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
+	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
+	UNIXTYPE = LINUX
+	SYSLIB = -lpthread -liconv
+	RPATH = mingw
+endif
+
 # For MINGW
 ifeq ($(findstring MINGW, $(UNIXNAME)), MINGW)
 	CFLAGS += -DLINUX2 -DMINGW
 	CFLAGS += -O3
 	UNIXTYPE = LINUX
-	SYSLIB = -lpthread-2
+	SYSLIB = -lpthread -liconv
 	RPATH = mingw
 endif
 
@@ -158,16 +167,7 @@ ifeq ($(findstring MSYS, $(UNIXNAME)), MSYS)
 	CFLAGS += -DLINUX2 -DMINGW
 	CFLAGS += -O3
 	UNIXTYPE = LINUX
-	SYSLIB = -lpthread-2
-	RPATH = mingw
-endif
-
-# For CYGWIN
-ifeq ($(findstring CYGWIN, $(UNIXNAME)), CYGWIN)
-	CFLAGS += -DLINUX2 -DMINGW
-	CFLAGS += -O3
-	UNIXTYPE = LINUX
-	SYSLIB = -lpthread-2
+	SYSLIB = -lpthread -liconv
 	RPATH = mingw
 endif
 

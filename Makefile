@@ -59,6 +59,33 @@ ifeq ($(findstring Linux, $(OSNAME)), Linux)
 	SYSLIB += -lrt -ldl
 endif
 
+# For CYGWIN
+ifeq ($(findstring CYGWIN, $(OSNAME)), CYGWIN)
+	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
+	UNIXTYPE = LINUX
+	SYSLIB += -liconv
+	RPATH = mingw
+endif
+
+# For MINGW
+ifeq ($(findstring MINGW, $(OSNAME)), MINGW)
+	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
+	UNIXTYPE = LINUX
+	SYSLIB += -liconv
+	RPATH = mingw
+endif
+
+# For MSYS
+ifeq ($(findstring MSYS, $(OSNAME)), MSYS)
+	CFLAGS += -DLINUX2 -DMINGW
+	CFLAGS += -O3
+	UNIXTYPE = LINUX
+	SYSLIB += -liconv
+	RPATH = mingw
+endif
+
 # For Darwin
 ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
 #	CC += -arch x86_64 -arch arm64
