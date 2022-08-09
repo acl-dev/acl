@@ -3,7 +3,7 @@
 
 process="/opt/soft/acl-master/libexec/acl_master"
 pidfile="/opt/soft/acl-master/var/pid/acl_master.pid"
-pnum=`pidof /opt/soft/acl-master/libexec/acl_master|wc -l`
+pnum=`/sbin/pidof /opt/soft/acl-master/libexec/acl_master|wc -l`
 
 # Try to start acl_master if it has been stopped abnormally. This shell will
 # be called every minute by crond.

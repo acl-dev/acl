@@ -1,4 +1,4 @@
-%define release_id 11
+%define release_id 12
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Tue Aug 09 2022 shuxin.zheng@qq.com 3.5.4-12-20220809.14
+- optimize master_keepalive.sh
+
 * Wed Aug 03 2022 shuxin.zheng@qq.com 3.5.4-11-20220802.10
 - optimize ipaddr's checking conditions
 
