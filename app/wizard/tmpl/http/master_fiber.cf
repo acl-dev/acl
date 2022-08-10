@@ -70,9 +70,9 @@ service $<PROGRAM>
 #	当启动多个子进程实例时，该开关控制多个子进程在接收连接时是否向 acl_master 发送消息报告自己的状态
 #	master_status_notify = 1
 #	程序标准输出重定向至指定文件中
-#	master_stdout = {install_path}/var/log/dnsmasq-stdout.log
+#	master_stdout = {install_path}/var/log/stdout.log
 #	程序错误输出重定向至指定文件中
-#	master_stderr = {install_path}/var/log/dnsmasq-stderr.log
+#	master_stderr = {install_path}/var/log/tderr.log
 
 #	是否允许产生 core 文件
 #	fiber_enable_core = 1

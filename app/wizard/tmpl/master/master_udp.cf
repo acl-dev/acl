@@ -51,6 +51,10 @@ service server
 	master_log = {install_path}/var/log/$<PROGRAM>.log
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2
 #	master_debug =
+#	程序标准输出重定向至指定文件中
+#	master_stdout = {install_path}/var/log/stdout.log
+#	程序错误输出重定向至指定文件中
+#	master_stderr = {install_path}/var/log/stderr.log
 #	进程启动参数，只能为: -u [是否允许以某普通用户的身份运行]
 #	master_args =
 #	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值

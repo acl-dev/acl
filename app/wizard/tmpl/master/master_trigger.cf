@@ -41,9 +41,9 @@ service $<PROGRAM>
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/trigger.sem
 #	程序标准输出重定向至指定文件中
-#	master_stdout = {install_path}/var/log/dnsmasq-stdout.log
+#	master_stdout = {install_path}/var/log/stdout.log
 #	程序错误输出重定向至指定文件中
-#	master_stderr = {install_path}/var/log/dnsmasq-stderr.log
+#	master_stderr = {install_path}/var/log/stderr.log
 
 #	是否允许产生 core 文件
 #	trigger_enable_core = 1
