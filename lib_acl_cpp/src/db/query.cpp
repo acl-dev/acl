@@ -386,36 +386,14 @@ const char* query::to_date(time_t t, string& out,
 		fmt = "%Y-%m-%d %H:%M:%S";
 	}
 	
-	
-	struct tm* local_ptr;
-
-#ifdef ACL_WINDOWS
-# ifdef __STDC_WANT_SECURE_LIB__
-
 	struct tm local;
 
-	if (localtime_s(&local, &t) != 0) {
+	if (acl_localtime_r(&t, &local) == NULL) {
 		logger_error("localtime_s failed, t: %ld", (long) t);
 		return NULL;
 	}
-	local_ptr = &local;
-# else
-	local_ptr = localtime(&t);
-	if (local_ptr == NULL) {
-		logger_error("localtime failed, t: %ld", (long) t);
-		return NULL;
-	}
-# endif
-#else
 
-	struct tm local;
-
-	if ((local_ptr = localtime_r(&t, &local)) == NULL) {
-		logger_error("localtime_r failed, t: %ld", (long) t);
-		return NULL;
-	}
-#endif
-	if (strftime(buf, sizeof(buf), fmt, local_ptr) == 0) {
+	if (strftime(buf, sizeof(buf), fmt, &local) == 0) {
 		logger_error("strftime failed, t: %ld, fmt: %s",
 			(long) t, fmt);
 		return NULL;

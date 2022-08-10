@@ -422,6 +422,9 @@
     <ClCompile Include=".\src\stdlib\string\acl_hex_code.c">
       <Filter>Source Files\stdlib\string</Filter>
     </ClCompile>
+    <ClCompile Include=".\src\stdlib\string\acl_localtime.c">
+      <Filter>Source Files\stdlib\string</Filter>
+    </ClCompile>
     <ClCompile Include=".\src\stdlib\string\acl_mystring.c">
       <Filter>Source Files\stdlib\string</Filter>
     </ClCompile>

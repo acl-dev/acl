@@ -776,6 +776,10 @@
 						>
 					</File>
 					<File
+						RelativePath=".\src\stdlib\string\acl_localtime.c"
+						>
+					</File>
+					<File
 						RelativePath=".\src\stdlib\string\acl_mystring.c"
 						>
 					</File>

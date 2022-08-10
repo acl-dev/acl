@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "stdlib/acl_define.h"
 #include "stdlib/acl_mymalloc.h"
+#include "stdlib/acl_timeops.h"
 
 /* #include <time.h> */
 #include <stdio.h>
@@ -670,21 +671,11 @@ int acl_open_log(const char *recipients, const char *logpre)
 void acl_logtime_fmt(char *buf, size_t size)
 {
 	time_t	now;
-#ifdef	ACL_UNIX
 	struct tm local_time;
 
 	(void) time (&now);
-	(void) localtime_r(&now, &local_time);
+	(void) acl_localtime_r(&now, &local_time);
 	strftime(buf, size, "%Y/%m/%d %H:%M:%S", &local_time);
-#elif	defined(ACL_WINDOWS)
-	struct tm *local_time;
-
-	(void) time (&now);
-	local_time = localtime(&now);
-	strftime(buf, size, "%Y/%m/%d %H:%M:%S", local_time);
-#else
-# error "unknown OS type"
-#endif
 }
 
 #ifdef	ACL_UNIX

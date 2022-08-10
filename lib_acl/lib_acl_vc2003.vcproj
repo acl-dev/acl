@@ -576,6 +576,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 						RelativePath=".\src\stdlib\string\acl_hex_code.c">
 					</File>
 					<File
+						RelativePath=".\src\stdlib\string\acl_localtime.c">
+					</File>
+					<File
 						RelativePath=".\src\stdlib\string\acl_mystring.c">
 					</File>
 					<File

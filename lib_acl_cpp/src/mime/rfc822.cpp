@@ -315,26 +315,12 @@ void rfc822::mkdate_gmt(time_t t, char *buf, size_t size)
 
 void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 {
-	struct tm *p;
 	long offset = 0;
-
-#ifdef	ACL_WINDOWS
-# if _MSC_VER >= 1500
 	struct tm tm_buf;
-	long s;
-	p = &tm_buf;
-	if (localtime_s(p, &t) != 0) {
-		p = NULL;
-	}
-# else
-	p = localtime(&t);
-# endif
-#else
-	struct tm tm_buf;
-	p = localtime_r(&t, &tm_buf);
-#endif
+	struct tm *p = acl_localtime_r(&t, &tm_buf);
 
 	buf[0] = 0;
+
 	if (p == NULL) {
 		return;
 	}

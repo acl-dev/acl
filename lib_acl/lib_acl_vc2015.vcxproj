@@ -515,6 +515,7 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include=".\src\stdlib\string\acl_basename.c" />
     <ClCompile Include=".\src\stdlib\string\acl_concatenate.c" />
     <ClCompile Include=".\src\stdlib\string\acl_hex_code.c" />
+    <ClCompile Include=".\src\stdlib\string\acl_localtime.c" />
     <ClCompile Include=".\src\stdlib\string\acl_mystring.c" />
     <ClCompile Include=".\src\stdlib\string\acl_split_at.c" />
     <ClCompile Include=".\src\stdlib\string\acl_split_nameval.c" />
