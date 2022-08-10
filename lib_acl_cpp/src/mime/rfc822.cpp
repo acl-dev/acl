@@ -354,6 +354,7 @@ void rfc822::mkdate_cst(time_t t, char *buf, size_t size)
 
 #ifdef ACL_WINDOWS
 # if _MSC_VER >= 1500
+	long s;
 	if ( _get_timezone(&s) != 0) {
 		s = 0;
 	}
