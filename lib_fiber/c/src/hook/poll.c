@@ -64,7 +64,11 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	 * timeout process in event_process_poll() in event.c.
 	 */
 	if (pfd->pe->nready == 0) {
-		timer_cache_remove(ev->poll_list, pfd->pe->expire, &pfd->pe->me);
+		/* The cache timer has been be set when timeout >= 0. */
+		if (pfd->pe->expire >= 0) {
+			timer_cache_remove(ev->poll_list, pfd->pe->expire,
+				&pfd->pe->me);
+		}
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
 	}
 
@@ -105,7 +109,10 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (pfd->pe->nready == 0) {
-		timer_cache_remove(ev->poll_list, pfd->pe->expire, &pfd->pe->me);
+		if (pfd->pe->expire >= 0) {
+			timer_cache_remove(ev->poll_list, pfd->pe->expire,
+				&pfd->pe->me);
+		}
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
 	}
 
@@ -264,7 +271,7 @@ static void pollfds_copy(const pollfds *pfds, struct pollfd *fds)
 
 #endif // SHARE_STACK
 
-#define	MAX_TIMEOUT	200000000
+//#define	MAX_TIMEOUT	200000000
 
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
@@ -296,9 +303,11 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	curr = acl_fiber_running();
 
+#if 0
 	if (timeout < 0) {
 		timeout = MAX_TIMEOUT;
 	}
+#endif
 
 	ev          = fiber_io_event();
 	old_timeout = ev->timeout;
@@ -326,7 +335,11 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	ev->waiter++;
 
 	while (1) {
-		timer_cache_add(ev->poll_list, pe->expire, &pe->me);
+		/* The cache timer should be set when timeout >= 0. */
+		if (pe->expire >= 0) {
+			timer_cache_add(ev->poll_list, pe->expire, &pe->me);
+		}
+
 		pe->nready = 0;
 
 		fiber_io_inc();
@@ -334,7 +347,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		pe->fiber->status = FIBER_STATUS_POLL_WAIT;
 		acl_fiber_switch();
 
-		if (pe->nready == 0) {
+		if (pe->nready == 0 && pe->expire >= 0) {
 			timer_cache_remove(ev->poll_list, pe->expire, &pe->me);
 		}
 

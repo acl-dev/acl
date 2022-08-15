@@ -5,6 +5,7 @@
 #include "fiber/libfiber.h"
 
 static  int  __nfibers = 0;
+static  int  __timeout = 1;
 
 /**
  * 协程入口
@@ -21,7 +22,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 		FD_ZERO(&rset);
 		FD_SET(fd, &rset);
 
-		tv.tv_sec = 1;
+		tv.tv_sec = __timeout;
 		tv.tv_usec = 0;
 
 		/* 监控该描述符句柄是否可读 */
@@ -76,7 +77,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -c fibers_count\r\n", procname);
+	printf("usage: %s -h [help] -c fibers_count -t timeout\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -85,13 +86,16 @@ int main(int argc, char *argv[])
 
 	__nfibers = 1;
 
-	while ((ch = getopt(argc, argv, "hc:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 'c':
 			__nfibers = atoi(optarg);
+			break;
+		case 't':
+			__timeout = atoi(optarg);
 			break;
 		default:
 			break;
