@@ -1,4 +1,4 @@
-%define release_id 19
+%define release_id 20
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Mon Aug 15 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-20-20220815.15
+- bugfix: don't use max timeout when the timeout is -1 in poll.c
 
 * Wed Aug 03 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-19-20220802.10
 - bugfix: fixed bugs in fiber_server.cpp when using shared stack mode in sighup fiber.
