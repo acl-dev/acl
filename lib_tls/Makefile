@@ -84,7 +84,7 @@ endif
 
 OUT_PATH = .
 OBJ_PATH_DST = $(OUT_PATH)/debug
-LIB_PATH_DST = $(OUT_PATH)/lib
+LIB_PATH_DST = $(OUT_PATH)
 
 #Project's objs
 TLS_SRC   = $(wildcard ./*.c) \
@@ -111,12 +111,12 @@ LIB_NAME  = lib_tls.a
 
 COMPILE = $(CC) $(CFLAGS)
 
-all: TLSMGR
+#all: TLSMGR
 
 $(shell mkdir -p $(OBJ_PATH_DST))
 
-TLSMGR: $(LIB_NAME)
-	@(cd tlsmgr; make)
+#TLSMGR: $(LIB_NAME)
+#	@(cd tlsmgr; make)
 
 $(LIB_NAME): $(TLS_OBJ)
 	$(AR) $(ARFL) $(LIB_PATH_DST)/$(LIB_NAME) $(TLS_OBJ)

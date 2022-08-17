@@ -71,11 +71,11 @@ ACL_LIB = $(ACL_PATH)/lib
 
 TLS_PATH = ..
 TLS_INC = $(TLS_PATH)/include
-TLS_LIB = $(TLS_PATH)/lib
+TLS_LIB = $(TLS_PATH)
 
 DICT_PATH = ../../lib_dict
 DICT_INC = $(DICT_PATH)/include
-DICT_LIB = $(DICT_PATH)/lib
+DICT_LIB = $(DICT_PATH)
 
 ALL_LIBS = -L$(TLS_LIB) -l_tls -L$(DICT_LIB) -l_dict -L$(ACL_LIB) -l_acl \
 	-lssl -ldb $(SYSLIB)
