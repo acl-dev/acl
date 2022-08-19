@@ -4,14 +4,12 @@
 #include "sslbase_conf.hpp"
 #include <vector>
 
-namespace acl
-{
+namespace acl {
 
 /**
  * SSL 证书校验级别类型定义
  */
-typedef enum
-{
+typedef enum {
 	MBEDTLS_VERIFY_NONE,	// 不校验证书
 	MBEDTLS_VERIFY_OPT,	// 选择性校验，可以在握手时或握手后校验
 	MBEDTLS_VERIFY_REQ	// 要求在握手时校验
@@ -24,8 +22,7 @@ class mbedtls_io;
  * 连接对象进行证书配置；该类加载了全局性的证书、密钥等信息；每一个 SSL 对象
  * (mbedtls_io) 调用本对象的setup_certs 方法来初始化自身的证书、密钥等信息
  */
-class ACL_CPP_API mbedtls_conf : public sslbase_conf
-{
+class ACL_CPP_API mbedtls_conf : public sslbase_conf {
 public:
 	/**
 	 * 构造函数

@@ -7,10 +7,7 @@ namespace acl {
 
 class string;
 
-class ACL_CPP_API fstream
-	: public istream
-	, public ostream
-{
+class ACL_CPP_API fstream : public istream , public ostream {
 public:
 	fstream(void);
 	virtual ~fstream(void);

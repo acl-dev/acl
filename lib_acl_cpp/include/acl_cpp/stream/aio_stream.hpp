@@ -10,14 +10,12 @@
 struct ACL_ASTREAM;
 struct ACL_VSTREAM;
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 异步流回调类
  */
-class ACL_CPP_API aio_callback : public noncopyable
-{
+class ACL_CPP_API aio_callback : public noncopyable {
 public:
 	aio_callback(void) {}
 	virtual ~aio_callback(void) {};
@@ -73,8 +71,7 @@ public:
 	}
 };
 
-struct AIO_CALLBACK 
-{
+struct AIO_CALLBACK {
 	aio_callback* callback;
 	bool enable;
 };
@@ -86,8 +83,7 @@ class stream_hook;
  * 异步流基类，该类为纯虚类，不能被直接实例化，只能被子类继承使用
  * 该类只能在堆上分配，不能在栈上分配
  */
-class ACL_CPP_API aio_stream : public noncopyable
-{
+class ACL_CPP_API aio_stream : public noncopyable {
 public:
 	/**
 	 * 构造函数

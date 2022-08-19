@@ -14,10 +14,7 @@ class string;
  * 应该调用 stream->eof() 来进行判断
  */
 
-class ACL_CPP_API ostream
-: virtual public stream
-, public pipe_stream
-{
+class ACL_CPP_API ostream : virtual public stream , public pipe_stream {
 public:
 	ostream(void) {}
 	virtual ~ostream(void) {}

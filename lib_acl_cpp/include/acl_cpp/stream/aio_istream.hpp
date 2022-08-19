@@ -5,8 +5,7 @@
 #include "aio_timer_callback.hpp"
 #include "aio_stream.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class aio_istream;
 
@@ -23,8 +22,7 @@ class aio_istream;
  * 会导致非法内存释放操作)
  * 
  */
-class ACL_CPP_API aio_timer_reader : public aio_timer_callback
-{
+class ACL_CPP_API aio_timer_reader : public aio_timer_callback {
 public:
 	aio_timer_reader(void) : in_(NULL) {}
 

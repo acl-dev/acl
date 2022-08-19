@@ -10,8 +10,7 @@ namespace acl {
 class sslbase_conf;
 class atomic_long;
 
-class ACL_CPP_API sslbase_io : public stream_hook
-{
+class ACL_CPP_API sslbase_io : public stream_hook {
 public:
 	/**
 	 * ¹¹Ôìº¯Êý

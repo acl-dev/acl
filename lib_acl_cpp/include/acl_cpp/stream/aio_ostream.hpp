@@ -8,8 +8,7 @@
 
 struct iovec;
 
-namespace acl
-{
+namespace acl {
 
 class aio_ostream;
 
@@ -26,8 +25,7 @@ class aio_ostream;
  * 会导致非法内存释放操作)
  * 
  */
-class ACL_CPP_API aio_timer_writer : public aio_timer_callback
-{
+class ACL_CPP_API aio_timer_writer : public aio_timer_callback {
 public:
 	aio_timer_writer(void);
 
@@ -58,8 +56,7 @@ private:
  * 异步写数据流类定义，该类只能在堆上被实例化，在析构时需要调用 close
  * 函数以释放该类对象
  */
-class ACL_CPP_API aio_ostream : virtual public aio_stream
-{
+class ACL_CPP_API aio_ostream : virtual public aio_stream {
 public:
 	/**
 	 * 构造函数

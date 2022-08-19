@@ -6,8 +6,7 @@ namespace acl {
 
 class string;
 
-class ACL_CPP_API ifstream: public fstream
-{
+class ACL_CPP_API ifstream: public fstream {
 public:
 	ifstream(void) {}
 	virtual ~ifstream(void) {}

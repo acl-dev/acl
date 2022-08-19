@@ -3,8 +3,7 @@
 #include <list>
 #include "aio_delay_free.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class aio_timer_task;
 class aio_handle;
@@ -12,8 +11,7 @@ class aio_handle;
 /**
  * 定时器的回调类
  */
-class ACL_CPP_API aio_timer_callback : public aio_delay_free
-{
+class ACL_CPP_API aio_timer_callback : public aio_delay_free {
 public:
 	/**
 	 * 构造函数

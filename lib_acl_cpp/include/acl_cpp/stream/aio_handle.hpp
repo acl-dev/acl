@@ -6,12 +6,10 @@
 struct ACL_AIO;
 struct ACL_EVENT;
 
-namespace acl
-{
+namespace acl {
 
 // 事件引擎类型
-typedef enum
-{
+typedef enum {
 	ENGINE_SELECT,  // select 模式(支持所有平台)
 	ENGINE_POLL,    // poll 模式(仅 UNIX 平台)
 	ENGINE_KERNEL,  // kernel 模式(win32: iocp, Linux: epoll, FreeBsd: kqueue, Solaris: devpoll
@@ -26,8 +24,7 @@ class aio_timer_callback;
 class aio_delay_free;
 class aio_timer_delay_free;
 
-class ACL_CPP_API aio_handle : private noncopyable
-{
+class ACL_CPP_API aio_handle : private noncopyable {
 public:
 	/**
 	 * 构造函数，会自动创建IO事件引擎，并且在析构函数中会自动释放

@@ -21,8 +21,7 @@ typedef enum {
 class stream_hook;
 class dbuf_pool;
 
-class ACL_CPP_API stream : public noncopyable
-{
+class ACL_CPP_API stream : public noncopyable {
 public:
 	stream(void);
 	virtual ~stream(void) = 0;

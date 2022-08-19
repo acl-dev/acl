@@ -13,8 +13,7 @@ class polarssl_conf;
  * stream/aio_stream 流对象中 默认的底层 IO 过程；该类对象必须是动态创建的(即为堆对象)，
  * stream/aio_stream 流对象通过调用本类对象的 destroy()　方法释放本类对象
  */
-class ACL_CPP_API polarssl_io : public sslbase_io
-{
+class ACL_CPP_API polarssl_io : public sslbase_io {
 public:
 	/**
 	 * 构造函数

@@ -2,8 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include "aio_stream.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class aio_socket_stream;
 class aio_listen_stream;
@@ -12,8 +11,7 @@ class aio_listen_stream;
  * 当异步监听流接收到新的客户端流时调用此回调类中的回调函数，该类为纯虚类，
  * 要求子类必须实现 accept_callback 回调过程
  */
-class ACL_CPP_API aio_accept_callback : public aio_callback
-{
+class ACL_CPP_API aio_accept_callback : public aio_callback {
 public:
 	aio_accept_callback(void) {}
 	virtual ~aio_accept_callback(void) {}
@@ -34,8 +32,7 @@ public:
  * 有所不同，在 aio_accept_callback::accept_callback() 被调用时，客户端连接对
  * 象已经被创建，而在 listen_callback() 中，则需要应用自己接收连接对象
  */
-class ACL_CPP_API aio_listen_callback : public aio_callback
-{
+class ACL_CPP_API aio_listen_callback : public aio_callback {
 public:
 	aio_listen_callback(void) {}
 	virtual ~aio_listen_callback(void) {}
@@ -49,8 +46,7 @@ public:
  * 后该异步流对象自动释放，无需调用 delete 删除该类对象
  *
  */
-class ACL_CPP_API aio_listen_stream : public aio_stream
-{
+class ACL_CPP_API aio_listen_stream : public aio_stream {
 public:
 	/**
 	 * 构造函数，用以构造异步监听流

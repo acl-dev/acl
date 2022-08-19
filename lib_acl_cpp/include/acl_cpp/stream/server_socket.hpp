@@ -21,8 +21,7 @@ enum {
 /**
  * 服务端监听套接口类，接收客户端连接，并创建客户端流连接对象
  */
-class ACL_CPP_API server_socket : public noncopyable
-{
+class ACL_CPP_API server_socket : public noncopyable {
 public:
 #if 0
 	/**

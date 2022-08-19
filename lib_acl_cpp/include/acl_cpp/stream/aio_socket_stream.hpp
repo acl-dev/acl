@@ -6,15 +6,13 @@
 #include "aio_istream.hpp"
 #include "aio_ostream.hpp"
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 当异步客户端流异步连接远程服务器时的回调函数类，该类为纯虚类，
  * 要求子类必须实现 open_callback 回调过程
  */
-class ACL_CPP_API aio_open_callback : public aio_callback
-{
+class ACL_CPP_API aio_open_callback : public aio_callback {
 public:
 	aio_open_callback(void) {}
 	virtual ~aio_open_callback(void) {}
@@ -24,8 +22,7 @@ protected:
 private:
 };
 
-struct AIO_OPEN_CALLBACK 
-{
+struct AIO_OPEN_CALLBACK {
 	aio_open_callback* callback;
 	bool enable;
 };
@@ -37,10 +34,7 @@ class aio_handle;
  * 不能在栈上分配，并且该类结束时应用不必释放该类对象，因为异步流
  * 框架内部会自动释放该类对象，应用可以调用 close 主动关闭流
  */
-class ACL_CPP_API aio_socket_stream
-	: public aio_istream
-	, public aio_ostream
-{
+class ACL_CPP_API aio_socket_stream : public aio_istream , public aio_ostream {
 public:
 	/**
 	 * 构造函数，创建网络异步客户端流

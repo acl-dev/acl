@@ -12,8 +12,7 @@ class string;
  * 尾部，应通过调用 stream->eof() 来进行判断
  */
 
-class ACL_CPP_API istream : virtual public stream
-{
+class ACL_CPP_API istream : virtual public stream {
 public:
 	istream(void) {}
 	virtual ~istream(void) {}

@@ -2,13 +2,11 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class sslbase_io;
 
-class ACL_CPP_API sslbase_conf : public noncopyable
-{
+class ACL_CPP_API sslbase_conf : public noncopyable {
 public:
 	sslbase_conf(void) {}
 	virtual ~sslbase_conf(void) {}

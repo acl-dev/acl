@@ -10,10 +10,7 @@ class fstream;
 /**
  * 异步文件读写流，该类对象只可用在 UNIX 系统中
  */
-class ACL_CPP_API aio_fstream
-	: public aio_istream
-	, public aio_ostream
-{
+class ACL_CPP_API aio_fstream : public aio_istream , public aio_ostream {
 public:
 	/**
 	 * 构造函数
