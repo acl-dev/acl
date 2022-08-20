@@ -181,7 +181,7 @@ bool mbedtls_io::open(ACL_VSTREAM* s)
 	// 防止重复调用 open 过程
 	if (ssl_ != NULL) {
 		// 如果是同一个流，则返回 true
-		if (stream_ == s) {
+		if (this->stream_ == s) {
 			return true;
 		} else if (ACL_VSTREAM_SOCK(stream_) == ACL_VSTREAM_SOCK(s)) {
 			long long n = ++(*refers_);
@@ -213,7 +213,7 @@ bool mbedtls_io::open(ACL_VSTREAM* s)
 		*ptr = 0;
 	}
 
-	stream_ = s;
+	this->stream_ = s;
 	++(*refers_);
 
 	ssl_ = acl_mycalloc(1, sizeof(mbedtls_ssl_context));
@@ -254,7 +254,7 @@ bool mbedtls_io::on_close(bool alive)
 		logger_error("ssl_ null");
 		return false;
 	}
-	if (stream_ == NULL) {
+	if (this->stream_ == NULL) {
 		logger_error("stream_ null");
 		return false;
 	}
@@ -369,11 +369,11 @@ int mbedtls_io::read(void* buf, size_t len)
 	// 如果 SSL 缓冲区中还有未读数据，则需要重置流可读标志位，
 	// 这样可以触发 acl_vstream.c 及 events.c 中的系统读过程
 	if (__ssl_get_bytes_avail((mbedtls_ssl_context*) ssl_) > 0) {
-		stream_->read_ready = 1;
+		this->stream_->read_ready = 1;
 	}
 	// 否则，取消可读状态，表明 SSL 缓冲区里没有数据
 	else {
-		stream_->read_ready = 0;
+		this->stream_->read_ready = 0;
 	}
 
 	return ret;
@@ -389,7 +389,7 @@ int mbedtls_io::send(const void* buf, size_t len)
 {
 #ifdef HAS_MBEDTLS
 	size_t total_bytes = 0;
-	int bytes_written = 0;
+	int bytes_written  = 0;
 
 	while (total_bytes < len) {
 		bytes_written = __ssl_write((mbedtls_ssl_context*) ssl_,
