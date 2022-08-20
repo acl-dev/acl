@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/thread_mutex.hpp"
+#include "../stdlib/string.hpp"
 #include "sslbase_conf.hpp"
 #include <vector>
 
@@ -42,18 +43,26 @@ public:
 	/**
 	 * @override
 	 */
-	bool append_key_cert(const char* crt_file, const char* key_file,
+	bool add_cert(const char* crt_file, const char* key_file,
 		const char* key_pass = NULL);
 
 	/**
 	 * @override
+	 * 注: 该方法在 mbedtls_conf 中已经废弃, 请直接使用上面方法
 	 */
-	bool add_cert(const char* crt_file);
+	bool add_cert(const char* /* crt_file */)
+	{
+		return false;
+	}
 
 	/**
 	 * @override
+	 * 注: 该方法在 mbedtls_conf 中已经废弃, 请直接使用上面方法
 	 */
-	bool set_key(const char* key_file, const char* key_pass = NULL);
+	bool set_key(const char* /*key_file*/, const char* /* key_pass */)
+	{
+		return false;
+	}
 
 	/**
 	 * @override
@@ -116,8 +125,9 @@ private:
 	void* entropy_;
 	void* rnd_;
 	void* cacert_;
-	void* pkey_;
-	void* cert_chain_;
+	string key_file_;
+	string key_pass_;
+	string crt_file_;
 	void* cache_;
 	mbedtls_verify_t verify_mode_;
 	std::vector<std::pair<void*, void*> > cert_keys_;

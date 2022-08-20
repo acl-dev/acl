@@ -40,7 +40,7 @@ public:
 	 * @param key_pass {const char*} 密钥文件的密码，没有密钥密码可写 NULL
 	 * @return {bool} 添加证书是否成功
 	 */
-	virtual bool append_key_cert(const char* crt_file, const char* key_file,
+	virtual bool add_cert(const char* crt_file, const char* key_file,
 		const char* key_pass = NULL)
 	{
 		(void) crt_file;

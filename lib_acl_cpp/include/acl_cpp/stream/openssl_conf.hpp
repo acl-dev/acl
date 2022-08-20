@@ -20,18 +20,8 @@ public:
 	/**
 	 * @override
 	 */
-	bool append_key_cert(const char* crt_file, const char* key_file,
+	bool add_cert(const char* crt_file, const char* key_file,
 		const char* key_pass = NULL);
-
-	/**
-	 * @override
-	 */
-	//bool add_cert(const char* crt_file);
-
-	/**
-	 * @override
-	 */
-	//bool set_key(const char* key_file, const char* key_pass = NULL);
 
 	/**
 	 * @override

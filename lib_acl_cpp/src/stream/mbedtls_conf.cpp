@@ -680,10 +680,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	entropy_     = acl_mycalloc(1, sizeof(mbedtls_entropy_context));
 	rnd_         = acl_mycalloc(1, sizeof(mbedtls_ctr_drbg_context));
 	cacert_      = NULL;
-	cert_chain_  = NULL;
-	
 	cache_       = NULL;
-	pkey_        = NULL;
 	verify_mode_ = verify_mode;
 #else
 	(void) server_side;
@@ -695,9 +692,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	(void) entropy_;
 	(void) rnd_;
 	(void) cacert_;
-	(void) cert_chain_;
 	(void) cache_;
-	(void) pkey_;
 	(void) verify_mode_;
 #endif
 }
@@ -706,16 +701,6 @@ mbedtls_conf::~mbedtls_conf(void)
 {
 #ifdef HAS_MBEDTLS
 	free_ca();
-
-	if (cert_chain_) {
-		__x509_crt_free((X509_CRT*) cert_chain_);
-		acl_myfree(cert_chain_);
-	}
-
-	if (pkey_) {
-		__pk_free((PKEY*) pkey_);
-		acl_myfree(pkey_);
-	}
 
 	if (init_status_ != CONF_INIT_NIL) {
 		__entropy_free((mbedtls_entropy_context*) entropy_);
@@ -813,7 +798,7 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 #endif
 }
 
-bool mbedtls_conf::append_key_cert(const char* crt_file, const char* key_file,
+bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	const char* key_pass)
 {
 	if (crt_file == NULL || crt_file[0] == '\0' ||
@@ -855,8 +840,7 @@ bool mbedtls_conf::append_key_cert(const char* crt_file, const char* key_file,
 	cert_status_ = CONF_OWN_CERT_OK;
 	return true;
 ERR:
-	logger_error("append_key_cert(%s:%s) error: -0x%04x",
-		crt_file, key_file, -ret);
+	logger_error("add cert (%s:%s) error: -0x%04x", crt_file, key_file, -ret);
 	if (cert) {
 		__x509_crt_free(cert);
 		acl_myfree(cert);
@@ -869,83 +853,6 @@ ERR:
 	return false;
 #else
 	(void) crt_file;
-	(void) key_file;
-	(void) key_pass;
-
-	logger_error("HAS_MBEDTLS not defined!");
-	return false;
-#endif
-}
-
-bool mbedtls_conf::add_cert(const char* crt_file)
-{
-	if (crt_file == NULL || *crt_file == 0) {
-		logger_error("crt_file null");
-		return false;
-	}
-
-#ifdef HAS_MBEDTLS
-	if (!init_once()) {
-		logger_error("init_once error");
-		return false;
-	}
-
-	if (cert_chain_ == NULL) {
-		cert_chain_ = acl_mycalloc(1, sizeof(X509_CRT));
-		__x509_crt_init((X509_CRT*) cert_chain_);
-	}
-
-	int ret = __x509_crt_parse_file((X509_CRT*) cert_chain_, crt_file);
-	if (ret != 0) {
-		logger_error("x509_crt_parse_file(%s) error: -0x%04x",
-			crt_file, -ret);
-
-		__x509_crt_free((X509_CRT*) cert_chain_);
-		acl_myfree(cert_chain_);
-		cert_chain_ = NULL;
-		return false;
-	}
-
-	return true;
-#else
-	(void) crt_file;
-	logger_error("HAS_MBEDTLS not defined!");
-	return false;
-#endif
-}
-
-bool mbedtls_conf::set_key(const char* key_file,
-	const char* key_pass /* = NULL */)
-{
-#ifdef HAS_MBEDTLS
-	if (!init_once()) {
-		logger_error("init_once error");
-		return false;
-	}
-
-	if (pkey_ != NULL) {
-		__pk_free((PKEY*) pkey_);
-		acl_myfree(pkey_);
-	}
-
-	pkey_ = acl_mycalloc(1, sizeof(PKEY));
-
-	__pk_init((PKEY*) pkey_);
-
-	int ret = __pk_parse_keyfile((PKEY*) pkey_, key_file,
-			key_pass ? key_pass : "");
-	if (ret != 0) {
-		logger_error("pk_parse_keyfile(%s) error: -0x%04x",
-			key_file, -ret);
-
-		__pk_free((PKEY*) pkey_);
-		acl_myfree(pkey_);
-		pkey_ = NULL;
-		return false;
-	}
-
-	return true;
-#else
 	(void) key_file;
 	(void) key_pass;
 
@@ -998,26 +905,6 @@ bool mbedtls_conf::setup_certs(void* ssl)
 		return false;
 	}
 
-	if (cert_chain_ == NULL || pkey_ == NULL) {
-		return true;
-	}
-
-	thread_mutex_guard guard(lock_);
-	if (cert_status_ == CONF_OWN_CERT_OK) {
-		return true;
-	} else if (cert_status_ == CONF_OWN_CERT_ERR) {
-		return false;
-	}
-
-	// Setup own's cert chain and private key
-	ret = __ssl_conf_own_cert((mbedtls_ssl_config*) conf_,
-			(X509_CRT*) cert_chain_, (PKEY*) pkey_);
-	if (ret != 0) {
-		cert_status_ = CONF_OWN_CERT_ERR;
-		logger_error("ssl_conf_own_cert error: -0x%04x", -ret);
-		return false;
-	}
-	cert_status_ = CONF_OWN_CERT_OK;
 	return true;
 #else
 	(void) ssl;

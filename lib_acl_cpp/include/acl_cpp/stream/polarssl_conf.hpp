@@ -42,6 +42,12 @@ public:
 	/**
 	 * @override
 	 */
+	bool add_cert(const char* crt_file, const char* key_file,
+		const char* key_pass = NULL);
+
+	/**
+	 * @override
+	 */
 	bool add_cert(const char* crt_file);
 
 	/**

@@ -80,7 +80,6 @@ bool openssl_io::handshake(void)
 	}
 
 	int ret = SSL_do_handshake((SSL*) ssl_);
-	printf(">>>>>>>>>>handshake ret=%d\r\n", ret);
 	if (ret == 1) {
 		handshake_ok_ = true;
 		return true;
@@ -107,6 +106,7 @@ bool openssl_io::on_close(bool alive)
 		// OpenSSL 1.0.2f complains if SSL_shutdown() is called during
 		// an SSL handshake, while previous versions always return 0.
 		// Avoid calling SSL_shutdown() if handshake wasn't completed.
+		// -- nginx
 		return true;
 	}
 
@@ -135,13 +135,17 @@ bool openssl_io::on_close(bool alive)
 int openssl_io::read(void* buf, size_t len)
 {
 	size_t total_bytes = 0;
-	char* ptr = (char*) buf;
+	char*  ptr = (char*) buf;
 
 	while (total_bytes < len) {
 		int ret = SSL_read((SSL*) ssl_, ptr, len);
 		if (ret > 0) {
 			total_bytes += ret;
 			ptr += ret;
+
+			if (!nblock_) {
+				break;
+			}
 			continue;
 		}
 
@@ -176,6 +180,10 @@ int openssl_io::send(const void* buf, size_t len)
 		bytes_written = SSL_write((SSL*) ssl_, buf, len);
 		if (bytes_written > 0) {
 			total_bytes += bytes_written;
+
+			if (!nblock_) {
+				break;
+			}
 			continue;
 		}
 

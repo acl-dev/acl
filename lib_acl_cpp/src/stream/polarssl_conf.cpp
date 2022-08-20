@@ -403,6 +403,12 @@ bool polarssl_conf::load_ca(const char* ca_file, const char* ca_path)
 #endif
 }
 
+bool polarssl_conf::add_cert(const char* crt_file, const char* key_file,
+	const char* key_pass /* NULL */)
+{
+	return add_cert(crt_file) && set_key(key_file, key_pass);
+}
+
 bool polarssl_conf::add_cert(const char* crt_file)
 {
 	if (crt_file == NULL || *crt_file == 0) {
@@ -437,8 +443,7 @@ bool polarssl_conf::add_cert(const char* crt_file)
 #endif
 }
 
-bool polarssl_conf::set_key(const char* key_file,
-	const char* key_pass /* = NULL */)
+bool polarssl_conf::set_key(const char* key_file, const char* key_pass /* NULL */)
 {
 #ifdef HAS_POLARSSL
 	init_once();

@@ -216,8 +216,8 @@ void master_service::proc_on_init(void)
 	// 允许服务端的 SSL 会话缓存功能
 	conf_->enable_cache(var_cfg_ssl_session_cache);
 
-	// 添加本地服务的证书
-	if (!conf_->add_cert(var_cfg_crt_file)) {
+	// 添加本地服务的证书及服务密钥
+	if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file)) {
 		logger_error("add cert failed, crt: %s, key: %s",
 			var_cfg_crt_file, var_cfg_key_file);
 		delete conf_;
@@ -226,13 +226,6 @@ void master_service::proc_on_init(void)
 	}
 	logger("load cert ok, crt: %s, key: %s",
 		var_cfg_crt_file, var_cfg_key_file);
-
-	// 添加本地服务密钥
-	if (!conf_->set_key(var_cfg_key_file)) {
-		logger_error("set private key error");
-		delete conf_;
-		conf_ = NULL;
-	}
 }
 
 void master_service::proc_on_exit(void)

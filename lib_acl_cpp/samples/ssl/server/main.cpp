@@ -33,7 +33,7 @@ private:
 
 	bool setup_ssl(void) {
 		bool non_block = false;
-		acl::sslbase_io* ssl = ssl_conf_.open(non_block);
+		acl::sslbase_io* ssl = ssl_conf_.create(non_block);
 
 		// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 		// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
@@ -85,15 +85,9 @@ static bool ssl_init(const acl::string& ssl_crt, const acl::string& ssl_key,
 
 	ssl_conf.enable_cache(true);
 
-	// 加载 SSL 证书
-	if (!ssl_conf.add_cert(ssl_crt)) {
+	// 加载 SSL 证书及证书私钥
+	if (!ssl_conf.add_cert(ssl_crt, ssl_key)) {
 		printf("add ssl crt=%s error\r\n", ssl_crt.c_str());
-		return false;
-	}
-
-	// 设置 SSL 证书私钥
-	if (!ssl_conf.set_key(ssl_key)) {
-		printf("set ssl key=%s error\r\n", ssl_key.c_str());
 		return false;
 	}
 

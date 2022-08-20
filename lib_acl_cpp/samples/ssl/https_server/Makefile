@@ -12,4 +12,4 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 endif
 PROG = https_server
 #EXTLIBS += -lpolarssl -lz
-EXTLIBS += -lz -ldl
+EXTLIBS += -L/usr/local/lib -lssl -lcrypto -lz -ldl

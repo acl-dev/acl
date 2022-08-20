@@ -250,24 +250,33 @@ void master_service::proc_on_init()
 	// 允许服务端的 SSL 会话缓存功能
 	server_ssl_conf_->enable_cache(var_cfg_session_cache ? true : false);
 
-	// 添加本地服务的证书
-	if (!server_ssl_conf_->add_cert(var_cfg_crt_file)) {
-		logger_error("add cert failed, crt: %s, key: %s",
-			var_cfg_crt_file, var_cfg_key_file);
-		delete server_ssl_conf_;
-		server_ssl_conf_ = NULL;
-		return;
+	if (use_mbedtls) {
+		if (!server_ssl_conf_->add_cert(var_cfg_crt_file, var_cfg_key_file)) {
+			logger_error("add cert failed, crt: %s, key: %s",
+				var_cfg_crt_file, var_cfg_key_file);
+			delete server_ssl_conf_;
+			server_ssl_conf_ = NULL;
+			return;
+		}
+	} else {
+		// 添加本地服务的证书
+		if (!server_ssl_conf_->add_cert(var_cfg_crt_file)) {
+			logger_error("add cert failed, crt: %s, key: %s",
+				var_cfg_crt_file, var_cfg_key_file);
+			delete server_ssl_conf_;
+			server_ssl_conf_ = NULL;
+			return;
+		}
+		// 添加本地服务密钥
+		if (!server_ssl_conf_->set_key(var_cfg_key_file)) {
+			logger_error("add key failed, crt: %s, key: %s",
+				var_cfg_crt_file, var_cfg_key_file);
+			delete server_ssl_conf_;
+			server_ssl_conf_ = NULL;
+		}
 	}
-	logger("load cert ok, crt: %s, key: %s",
-		var_cfg_crt_file, var_cfg_key_file);
 
-	// 添加本地服务密钥
-	if (!server_ssl_conf_->set_key(var_cfg_key_file)) {
-		logger_error("add key failed, crt: %s, key: %s",
-			var_cfg_crt_file, var_cfg_key_file);
-		delete server_ssl_conf_;
-		server_ssl_conf_ = NULL;
-	}
+	logger("load cert ok, crt: %s, key: %s", var_cfg_crt_file, var_cfg_key_file);
 }
 
 void master_service::proc_on_exit()

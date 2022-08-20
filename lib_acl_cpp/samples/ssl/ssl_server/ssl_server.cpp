@@ -363,6 +363,17 @@ protected:
 		// 允许服务端的 SSL 会话缓存功能
 		conf_->enable_cache(true);
 
+#ifdef USE_MBEDTLS
+		// 添加本地服务的证书
+		if (!conf_->add_cert(crt_file_.c_str(), key_file_.c_str())) {
+			logger_error("add cert failed, crt: %s, key: %s",
+				crt_file_.c_str(), key_file_.c_str());
+			delete conf_;
+			conf_ = NULL;
+			return;
+		}
+		logger("load cert ok, crt: %s", crt_file_.c_str());
+#else
 		// 添加本地服务的证书
 		if (conf_->add_cert(crt_file_.c_str()) == false) {
 			logger_error("add cert failed, crt: %s, key: %s",
@@ -381,6 +392,7 @@ protected:
 			return;
 		}
 		logger("set key ok, key: %s", key_file_.c_str());
+#endif
 
 #ifndef USE_MBEDTLS
 		conf_->set_authmode(verify_mode_);

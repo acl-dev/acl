@@ -86,7 +86,7 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 	return true;
 }
 
-bool openssl_conf::append_key_cert(const char* crt_file, const char* key_file,
+bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	const char* key_pass /* NULL */)
 {
 	if (crt_file == NULL || key_file == NULL) {

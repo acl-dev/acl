@@ -79,6 +79,6 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	// 发送 http 响应体，因为设置了 chunk 传输模式，所以需要多调用一次
 	// res.write 且两个参数均为 0 以表示 chunk 传输数据结束
 	bool ret = res.write(buf) && res.write(NULL, 0) && keep_alive;
-	printf(">>>ret: %s\r\n", ret ? "ok":"err");
+	printf(">>>write ret: %s\r\n", ret ? "ok":"err");
 	return ret;
 }

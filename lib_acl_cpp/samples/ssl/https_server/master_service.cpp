@@ -18,7 +18,7 @@ acl::master_str_tbl var_conf_str_tab[] = {
 #else
 	{ "libcrypto_path", "./libmbedcrypto.so", &var_cfg_libcrypto_path },
 	{ "libx509_path", "./libmbedx509.so", &var_cfg_libx509_path },
-	{ "libssl_path", "./lib.so", &var_cfg_libssl_path },
+	{ "libssl_path", "./libssl.so", &var_cfg_libssl_path },
 #endif
 	{ "crt_file", "./ssl_crt.pem", &var_cfg_crt_file },
 	{ "key_file", "./ssl_key.pem", &var_cfg_key_file },
@@ -157,6 +157,8 @@ void master_service::proc_on_init()
 		return;
 	}
 
+	bool use_polarssl = false;
+
 	if (strstr(var_cfg_libssl_path, "mbedtls")) {
 		acl::mbedtls_conf::set_libpath(var_cfg_libcrypto_path,
 			var_cfg_libx509_path, var_cfg_libssl_path);
@@ -174,28 +176,42 @@ void master_service::proc_on_init()
 		}
 
 		conf_ = new acl::polarssl_conf();
+		use_polarssl = true;
+	} else if (strstr(var_cfg_libssl_path, "openssl")) {
+		conf_ = new acl::openssl_conf(true);
+	} else {
+		logger_error("not support this ssl lib=%s!", var_cfg_libssl_path);
+		exit (1);
 	}
 
 	// 允许服务端的 SSL 会话缓存功能
 	conf_->enable_cache(var_cfg_session_cache);
 
-	// 添加本地服务的证书
-	if (!conf_->add_cert(var_cfg_crt_file)) {
+	if (use_polarssl) {
+		// 添加本地服务的证书
+		if (!conf_->add_cert(var_cfg_crt_file)) {
+			logger_error("add cert failed, crt: %s, key: %s",
+					var_cfg_crt_file, var_cfg_key_file);
+			delete conf_;
+			conf_ = NULL;
+			return;
+		}
+
+		// 添加本地服务密钥
+		if (!conf_->set_key(var_cfg_key_file)) {
+			logger_error("set private key error");
+			delete conf_;
+			conf_ = NULL;
+		}
+	} else if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file)) {
 		logger_error("add cert failed, crt: %s, key: %s",
 			var_cfg_crt_file, var_cfg_key_file);
 		delete conf_;
 		conf_ = NULL;
 		return;
 	}
-	logger("load cert ok, crt: %s, key: %s",
-		var_cfg_crt_file, var_cfg_key_file);
 
-	// 添加本地服务密钥
-	if (!conf_->set_key(var_cfg_key_file)) {
-		logger_error("set private key error");
-		delete conf_;
-		conf_ = NULL;
-	}
+	logger("load cert ok, crt: %s, key: %s", var_cfg_crt_file, var_cfg_key_file);
 }
 
 void master_service::proc_on_exit()

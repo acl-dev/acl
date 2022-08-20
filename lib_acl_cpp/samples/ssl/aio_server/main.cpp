@@ -240,7 +240,7 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	// 事件引擎是否采用内核中的高效模式
-	bool use_kernel = false;
+	bool use_kernel = false, use_polarssl = true;
 	acl::string key_file, cert_file, libpath("../libpolarssl.so");
 	acl::string addr("127.0.0.1:9800");
 	int  ch, delay_ms = 100, check_fds_inter = 10;
@@ -303,6 +303,7 @@ int main(int argc, char* argv[])
 			cert_file.clear();
 			printf("load %s error\r\n", libpath.c_str());
 		}
+		use_polarssl = false;
 	} else if (libpath.find("polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(libpath);
 
@@ -322,22 +323,30 @@ int main(int argc, char* argv[])
 		// 允许服务端的 SSL 会话缓存功能
 		__ssl_conf->enable_cache(true);
 
-		// 添加本地服务的证书
-		if (!__ssl_conf->add_cert(cert_file.c_str())) {
-			delete __ssl_conf;
-			__ssl_conf = NULL;
-			std::cout << "add_cert error: " << cert_file.c_str()
-				<< std::endl;
-		}
+		if (use_polarssl) {
+			// 添加本地服务的证书
+			if (!__ssl_conf->add_cert(cert_file.c_str())) {
+				delete __ssl_conf;
+				__ssl_conf = NULL;
+				std::cout << "add_cert error: " << cert_file.c_str() << std::endl;
+			}
 
-		// 添加本地服务密钥
-		else if (!__ssl_conf->set_key(key_file.c_str())) {
-			delete __ssl_conf;
-			__ssl_conf = NULL;
-			std::cout << "set_key error: " << key_file.c_str()
-				<< std::endl;
+			// 添加本地服务密钥
+			else if (!__ssl_conf->set_key(key_file.c_str())) {
+				delete __ssl_conf;
+				__ssl_conf = NULL;
+				std::cout << "set_key error: " << key_file.c_str() << std::endl;
+				std::cout << "Load cert&key OK!" << std::endl;
+			}
 		} else {
-			std::cout << "Load cert&key OK!" << std::endl;
+			// 添加本地服务的证书
+			if (!__ssl_conf->add_cert(cert_file.c_str(), key_file.c_str())) {
+				delete __ssl_conf;
+				__ssl_conf = NULL;
+				std::cout << "add_cert error: " << cert_file.c_str() << std::endl;
+			} else {
+				std::cout << "Load cert&key OK!" << std::endl;
+			}
 		}
 	}
 
