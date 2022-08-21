@@ -5,8 +5,8 @@
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -f path of libpolarssl.so\r\n"
-		" -s server_addr [default: 127.0.0.1:8888]\r\n"
+		" -f path of mbedtls or polarssl\r\n"
+		" -s server_addr [default: 127.0.0.1:1443]\r\n"
 		" -H host\r\n"
 		" -U url\r\n"
 		" -L data_length [default: 1024]\r\n"
@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	int   ch, cocurrent = 1, count = 10;
 	bool  use_ssl = false;
 	acl::string server_addr("127.0.0.1:1443"), host;
-	acl::string libpath("libpolarssl.so");
+	acl::string libpath;
 	acl::string url("/");
 
 	acl::acl_cpp_init();
@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 	} else {
-		use_ssl = false;
+		ssl_conf = new acl::openssl_conf(false);
 	}
 
 	if (host.empty()) {

@@ -13,6 +13,7 @@
 #include "acl_cpp/stream/aio_istream.hpp"
 #include "acl_cpp/stream/aio_listen_stream.hpp"
 #include "acl_cpp/stream/aio_socket_stream.hpp"
+#include "acl_cpp/stream/openssl_conf.hpp"
 
 static int   __max = 0;
 static int   __timeout = 0;
@@ -116,6 +117,7 @@ public:
 			client_->get_handle().stop();
 		}
 
+		//printf(">>data=%s\n", data);
 		// 向远程客户端回写收到的数据
 
 		client_->write(data, len);
@@ -209,6 +211,7 @@ public:
 
 			// 将客户端置于读监听状态以触发 read_wakeup 回调过程，
 			// SSL 握手过程将在 read_wakeup 中完成
+			printf(">>>begin wait for ssl handshake\r\n");
 			client->read_wait(__timeout);
 		}
 
@@ -225,7 +228,7 @@ public:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
-		"  -d path_to_polarssl\r\n"
+		"  -d path_to_polarssl_or_mbedtls\r\n"
 		"  -l server_addr[ip:port, default: 127.0.0.1:9800]\r\n"
 		"  -L line_max_length\r\n"
 		"  -t timeout\r\n"
@@ -241,7 +244,7 @@ int main(int argc, char* argv[])
 {
 	// 事件引擎是否采用内核中的高效模式
 	bool use_kernel = false, use_polarssl = true;
-	acl::string key_file, cert_file, libpath("../libpolarssl.so");
+	acl::string key_file, cert_file, libpath;
 	acl::string addr("127.0.0.1:9800");
 	int  ch, delay_ms = 100, check_fds_inter = 10;
 
@@ -315,6 +318,9 @@ int main(int argc, char* argv[])
 			cert_file.clear();
 			printf("load %s error\r\n", libpath.c_str());
 		}
+	} else if (libpath.find("libssl") != NULL) {
+		__ssl_conf = new acl::openssl_conf(true);
+		printf("use openssl_conf now\r\n");
 	}
 
 	// 当私钥及证书都存在时才采用 SSL 通信方式
@@ -348,9 +354,6 @@ int main(int argc, char* argv[])
 				std::cout << "Load cert&key OK!" << std::endl;
 			}
 		}
-	}
-
-	if (__ssl_conf) {
 	}
 
 	// 构建异步引擎类对象

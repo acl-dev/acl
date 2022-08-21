@@ -39,6 +39,7 @@
 # define SSL_GET_VERIFY_RESULT_NAME	"mbedtls_ssl_get_verify_result"
 # define SSL_GET_PEER_CERT_NAME		"mbedtls_ssl_get_peer_cert"
 # define SSL_GET_BYTES_AVAIL_NAME	"mbedtls_ssl_get_bytes_avail"
+# define SSL_STRERROR			"mbedtls_strerror"
 
 typedef void (*ssl_init_fn)(mbedtls_ssl_context*);
 typedef void (*ssl_free_fn)(mbedtls_ssl_context*);
@@ -57,6 +58,7 @@ typedef int  (*ssl_close_notify_fn)(mbedtls_ssl_context*);
 typedef unsigned (*ssl_get_verify_result_fn)(const mbedtls_ssl_context*);
 typedef const mbedtls_x509_crt *(*ssl_get_peer_cert_fn)(const mbedtls_ssl_context*);
 typedef size_t (*ssl_get_bytes_avail_fn)(const mbedtls_ssl_context*);
+typedef void (*ssl_strerror_fn)(int, char*, size_t);
 
 static ssl_init_fn			__ssl_init;
 static ssl_free_fn			__ssl_free;
@@ -72,6 +74,7 @@ static ssl_close_notify_fn		__ssl_close_notify;
 static ssl_get_verify_result_fn		__ssl_get_verify_result;
 static ssl_get_peer_cert_fn		__ssl_get_peer_cert;
 static ssl_get_bytes_avail_fn		__ssl_get_bytes_avail;
+static ssl_strerror_fn			__ssl_strerror;
 
 extern ACL_DLL_HANDLE __tls_dll;  // defined in mbedtls_conf.cpp
 
@@ -101,6 +104,7 @@ bool mbedtls_load_io(void)
 	LOAD(SSL_GET_VERIFY_RESULT_NAME, ssl_get_verify_result_fn, __ssl_get_verify_result);
 	LOAD(SSL_GET_PEER_CERT_NAME, ssl_get_peer_cert_fn, __ssl_get_peer_cert);
 	LOAD(SSL_GET_BYTES_AVAIL_NAME, ssl_get_bytes_avail_fn, __ssl_get_bytes_avail);
+	LOAD(SSL_STRERROR, ssl_strerror_fn, __ssl_strerror);
 	return true;
 }
 
@@ -120,6 +124,7 @@ bool mbedtls_load_io(void)
 # define __ssl_get_verify_result	::mbedtls_ssl_get_verify_result
 # define __ssl_get_peer_cert		::mbedtls_ssl_get_peer_cert
 # define __ssl_get_bytes_avail		::mbedtls_ssl_get_bytes_avail
+# define __ssl_strerror			::mbedtls_strerror
 
 #endif
 
@@ -131,6 +136,7 @@ mbedtls_io::mbedtls_io(mbedtls_conf& conf, bool server_side,
 , conf_(conf)
 , ssl_(NULL)
 , ssn_(NULL)
+, ebf_(NULL)
 {
 #ifdef HAS_MBEDTLS
 	conf.init_once();
@@ -153,6 +159,9 @@ mbedtls_io::~mbedtls_io(void)
 		acl_myfree(ssn_);
 	}
 #endif
+	if (ebf_) {
+		acl_myfree(ebf_);
+	}
 }
 
 void mbedtls_io::destroy(void)
@@ -160,6 +169,17 @@ void mbedtls_io::destroy(void)
 	if (--(*refers_) == 0) {
 		delete this;
 	}
+}
+
+const char* mbedtls_io::ssl_strerror(int err)
+{
+	size_t len = 256;
+	if (ebf_ == NULL) {
+		ebf_ = (char*) acl_mymalloc(len);
+	}
+	ebf_[0] = 0;
+	__ssl_strerror(err, ebf_, len);
+	return ebf_;
 }
 
 #ifdef	DEBUG_SSL
@@ -268,7 +288,8 @@ bool mbedtls_io::on_close(bool alive)
 		if( ret != MBEDTLS_ERR_SSL_WANT_READ &&
 			ret != MBEDTLS_ERR_SSL_WANT_WRITE ) {
 
-			logger_warn("ssl_close_notify error: -0x%04x", ret);
+			logger_warn("ssl_close_notify error: -0x%04x, %s",
+				ret, ssl_strerror(ret));
 			return false;
 		}
 	}
@@ -298,7 +319,8 @@ bool mbedtls_io::handshake(void)
 		if (ret != MBEDTLS_ERR_SSL_WANT_READ
 			&& ret != MBEDTLS_ERR_SSL_WANT_WRITE) {
 
-			logger_error("ssl_handshake failed: -0x%04x", -ret);
+			logger_error("ssl_handshake failed: -0x%04x, %s",
+				-ret, ssl_strerror(ret));
 			return false;
 		}
 

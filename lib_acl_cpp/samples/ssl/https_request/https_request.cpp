@@ -11,6 +11,7 @@ https_request::https_request(acl::sslbase_conf* ssl_conf, const char* addr,
 	printf("server addr: %s\r\n", addr);
 	printf("host: %s\r\n", host);
 	printf("url: %s\r\n", url);
+	printf("ssl_conf: %p\r\n", ssl_conf);
 	printf("\r\n");
 
 	if (ssl_conf) {

@@ -117,7 +117,7 @@ bool openssl_io::on_close(bool alive)
 	SSL_set_shutdown((SSL*) ssl_, mode);
 
 	int ret = SSL_shutdown((SSL*) ssl_);
-	if (ret == 1 && ERR_peek_error() == 0) {
+	if (ret == 1 || ERR_peek_error() == 0) {
 		return true;
 	}
 
@@ -134,16 +134,17 @@ bool openssl_io::on_close(bool alive)
 
 int openssl_io::read(void* buf, size_t len)
 {
-	size_t total_bytes = 0;
+	size_t nbytes = 0;
 	char*  ptr = (char*) buf;
 
-	while (total_bytes < len) {
+	while (len > 0) {
 		int ret = SSL_read((SSL*) ssl_, ptr, len);
 		if (ret > 0) {
-			total_bytes += ret;
+			nbytes += ret;
 			ptr += ret;
+			len -= ret;
 
-			if (!nblock_) {
+			if (nblock_) {
 				break;
 			}
 			continue;
@@ -168,26 +169,32 @@ int openssl_io::read(void* buf, size_t len)
 		break;
 	}
 
-	return total_bytes > 0 ? (int) total_bytes : ACL_VSTREAM_EOF;
+	if (len == 0) {
+		this->stream_->read_ready = 1;
+	}
+
+	return nbytes > 0 ? (int) nbytes : ACL_VSTREAM_EOF;
 }
 
 int openssl_io::send(const void* buf, size_t len)
 {
-	size_t total_bytes = 0;
-	int bytes_written  = 0;
+	size_t nbytes = 0;
+	char*  ptr = (char*) buf;
 
-	while (total_bytes < len) {
-		bytes_written = SSL_write((SSL*) ssl_, buf, len);
-		if (bytes_written > 0) {
-			total_bytes += bytes_written;
+	while (len > 0) {
+		int ret = SSL_write((SSL*) ssl_, ptr, len);
+		if (ret > 0) {
+			nbytes += ret;
+			ptr += ret;
+			len -= ret;
 
-			if (!nblock_) {
+			if (nblock_) {
 				break;
 			}
 			continue;
 		}
 
-		int err = SSL_get_error((SSL*) ssl_, bytes_written);
+		int err = SSL_get_error((SSL*) ssl_, ret);
 		switch (err) {
 		case SSL_ERROR_WANT_READ:
 		case SSL_ERROR_WANT_WRITE:
@@ -196,9 +203,10 @@ int openssl_io::send(const void* buf, size_t len)
 		default:
 			break;
 		}
+		break;
 	}
 
-	return total_bytes > 0 ? (int) total_bytes : ACL_VSTREAM_EOF;
+	return nbytes > 0 ? (int) nbytes : ACL_VSTREAM_EOF;
 }
 
 } // namespace acl

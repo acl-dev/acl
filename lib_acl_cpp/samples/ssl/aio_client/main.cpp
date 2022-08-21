@@ -3,6 +3,7 @@
 #include "lib_acl.h"
 #include "../../util.h"
 #include "acl_cpp/lib_acl.hpp"
+#include "acl_cpp/stream/openssl_conf.hpp"
 
 typedef struct
 {
@@ -65,6 +66,8 @@ public:
 	 */
 	bool read_callback(char*, int len)
 	{
+		//printf(">>>>read len=%d\n", len);
+
 		nread_ += len;
 		ctx_->nread_total++;
 
@@ -149,20 +152,23 @@ public:
 			return false;
 		}
 
+		printf(">>>%s: begin handshake\n", __FUNCTION__);
 		// 尝试进行 SSL 握手
 		if (!hook->handshake()) {
-			logger_error("ssl handshake failed");
+			logger_error("%s: ssl handshake failed", __FUNCTION__);
 			return false;
 		}
 
+		printf(">>>%s: end handshake\r\n", __FUNCTION__);
 		// SSL 握手还未完成，等待本函数再次被触发
 		if (!hook->handshake_ok()) {
+			printf(">>>%s: not handshake ok\r\n", __FUNCTION__);
 			return true;
 		}
 
 		// 如果 SSL 握手已经成功，则开始读数据
 		
-		printf("ssl handshake ok\r\n");
+		printf(">>>%s: ssl handshake ok\r\n", __FUNCTION__);
 
 		// 由 reactor 模式转为 proactor 模式，从而取消
 		// read_wakeup 回调过程
@@ -230,8 +236,15 @@ private:
 			return false;
 		}
 
-		// 开始异步 SSL 握手过程，满足可读条件时将触发 read_wakeup
-		client_->read_wait(10);
+		if (ssl->handshake_ok()) {
+			printf("%s: ssl handshake ok\r\n", __FUNCTION__);
+			client_->disable_read();
+			return begin_run();
+		} else {
+			// 开始异步 SSL 握手过程，满足可读条件时将触发
+			// read_wakeup
+			client_->read_wait(10);
+		}
 		return true;
 	}
 
@@ -308,7 +321,7 @@ int main(int argc, char* argv[])
 {
 	bool use_kernel = false, use_ssl = false;
 	IO_CTX ctx;
-	acl::string libpath("../libpolarssl.so");
+	acl::string libpath;
 	acl::sslbase_conf* ssl_conf = NULL;
 	int   ch;
 	int   check_fds_inter = 10, delay_ms = 100;
@@ -405,6 +418,8 @@ int main(int argc, char* argv[])
 			} else {
 				printf("load %s error\r\n", libpath.c_str());
 			}
+		} else if (libpath.find("libssl") != NULL) {
+			ssl_conf = new acl::openssl_conf(false);
 		}
 	}
 

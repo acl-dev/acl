@@ -70,6 +70,9 @@ private:
 	mbedtls_conf& conf_;
 	void* ssl_;
 	void* ssn_;
+	char* ebf_;
+
+	const char* ssl_strerror(int err);
 
 private:
 	static int sock_read(void *ctx, unsigned char *buf, size_t len);

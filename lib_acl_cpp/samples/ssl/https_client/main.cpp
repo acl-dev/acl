@@ -6,8 +6,8 @@
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -f path of libpolarssl.so\r\n"
-		" -s server_addr [default: 127.0.0.1:8888]\r\n"
+		" -f path of mbedtls or polarss\r\n"
+		" -s server_addr [default: 127.0.0.1:1443]\r\n"
 		" -k [keep alive, default: false]\r\n"
 		" -L data_length [default: 1024]\r\n"
 		" -c cocurrent [default: 1]\r\n"
@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
 	int   ch, cocurrent = 1, count = 10, length = 1024;
 	bool  keep_alive = false, use_ssl = false;
 	acl::string server_addr("127.0.0.1:1443");
-	acl::string domain, libpath("libpolarssl.so");
+	acl::string domain, libpath;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 			return 1;
 		}
 	} else {
-		use_ssl = false;
+		ssl_conf = new acl::openssl_conf(false);
 	}
 
 
@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
 
-#if 0
+#if 1
 	std::list<https_client*> threads;
 
 	for (int i = 0; i < cocurrent; i++) {
