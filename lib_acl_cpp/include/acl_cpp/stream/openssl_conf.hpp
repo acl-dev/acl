@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
+#include "../stdlib/string.hpp"
 #include "sslbase_conf.hpp"
 
 namespace acl {
@@ -22,6 +23,18 @@ public:
 	 */
 	bool add_cert(const char* crt_file, const char* key_file,
 		const char* key_pass = NULL);
+
+	/**
+	 * @override
+	 * @deprecate use add_cert(const char*, const char*, const char*)
+	 */
+	bool add_cert(const char* crt_file);
+
+	/**
+	 * @override
+	 * @deprecate use add_cert(const char*, const char*, const char*)
+	 */
+	bool set_key(const char* key_file, const char* key_pass);
 
 	/**
 	 * @override
@@ -48,8 +61,9 @@ public:
 private:
 	friend class openssl_io;
 
-	bool  server_side_;
-	void* ssl_ctx_;
+	bool   server_side_;
+	void*  ssl_ctx_;
+	string crt_file_;
 };
 
 } // namespace acl

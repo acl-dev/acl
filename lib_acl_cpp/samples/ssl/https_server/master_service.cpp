@@ -177,7 +177,7 @@ void master_service::proc_on_init()
 
 		conf_ = new acl::polarssl_conf();
 		use_polarssl = true;
-	} else if (strstr(var_cfg_libssl_path, "openssl")) {
+	} else if (strstr(var_cfg_libssl_path, "libssl")) {
 		conf_ = new acl::openssl_conf(true);
 	} else {
 		logger_error("not support this ssl lib=%s!", var_cfg_libssl_path);

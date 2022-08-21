@@ -861,6 +861,32 @@ ERR:
 #endif
 }
 
+bool mbedtls_conf::add_cert(const char* crt_file)
+{
+	if (crt_file == NULL || *crt_file == 0) {
+		logger_error("crt_file null");
+		return false;
+	}
+
+	crt_file_ = crt_file;
+	return true;
+}
+
+bool mbedtls_conf::set_key(const char* key_file, const char* key_pass /* NULL */)
+{
+	if (key_file == NULL || *key_file == 0) {
+		logger_error("key_file null");
+		return false;
+	}
+
+	if (crt_file_.empty()) {
+		logger_error("crt_file empty, call add_cert first");
+		return false;
+	}
+
+	return add_cert(crt_file_, key_file, key_pass);
+}
+
 void mbedtls_conf::enable_cache(bool on)
 {
 #ifdef HAS_MBEDTLS
@@ -880,6 +906,7 @@ void mbedtls_conf::enable_cache(bool on)
 		acl_myfree(cache_);
 		cache_ = NULL;
 	}
+
 	// Setup cache only for server-side
 	if (server_side_ && cache_ != NULL) {
 		__ssl_conf_session_cache((mbedtls_ssl_config*) conf_, cache_,

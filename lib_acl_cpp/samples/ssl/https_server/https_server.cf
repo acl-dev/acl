@@ -119,9 +119,9 @@ service http_server {
 
 	libcrypto_path = ../libmbedcrypto.so
 	libx509_path   = ../libmbedx509.so
-	libssl_path    = ../libmbedtls.so
+#	libssl_path    = ../libmbedtls.so
 #	libssl_path    = ../libpolarssl.so
-#	libssl_path    = ../libopenssl.so
+#	libssl_path    = ../libssl.so
 
 #	libcrypto_path = ../libmbedcrypto.dylib
 #	libx509_path   = ../libmbedx509.dylib

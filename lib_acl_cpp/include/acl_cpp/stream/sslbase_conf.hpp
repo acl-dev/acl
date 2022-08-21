@@ -53,7 +53,7 @@ public:
 	 * 添加一个服务端/客户端自己的证书，可以多次调用本方法加载多个证书
 	 * @param crt_file {const char*} 证书文件全路径，非空
 	 * @return {bool} 添加证书是否成功
-	 * @deprecated use append_key_cert
+	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
 	virtual bool add_cert(const char* crt_file)
 	{
@@ -66,7 +66,7 @@ public:
 	 * @param key_file {const char*} 密钥文件全路径，非空
 	 * @param key_pass {const char*} 密钥文件的密码，没有密钥密码可写 NULL
 	 * @return {bool} 设置是否成功
-	 * @deprecated use append_key_cert
+	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
 	virtual bool set_key(const char* key_file, const char* key_pass = NULL)
 	{

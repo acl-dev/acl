@@ -89,7 +89,13 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	const char* key_pass /* NULL */)
 {
-	if (crt_file == NULL || key_file == NULL) {
+	if (crt_file == NULL || *crt_file == 0) {
+		logger_error("crt_file empty");
+		return false;
+	}
+
+	if (key_file == NULL || *key_file == 0) {
+		logger_error("key_file empty");
 		return false;
 	}
 
@@ -115,6 +121,27 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	}
 
 	return true;
+}
+
+bool openssl_conf::add_cert(const char* crt_file)
+{
+	if (crt_file == NULL || *crt_file == 0) {
+		logger_error("crt_file null");
+		return false;
+	}
+
+	crt_file_ = crt_file;
+	return true;
+}
+
+bool openssl_conf::set_key(const char* key_file, const char* key_pass /* NULL */)
+{
+	if (crt_file_.empty()) {
+		logger_error("call add_cert first");
+		return false;
+	}
+
+	return add_cert(crt_file_, key_file, key_pass);
 }
 
 void openssl_conf::enable_cache(bool on)

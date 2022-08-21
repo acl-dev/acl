@@ -48,21 +48,15 @@ public:
 
 	/**
 	 * @override
-	 * 注: 该方法在 mbedtls_conf 中已经废弃, 请直接使用上面方法
+	 * 注: 该方法在 mbedtls_conf 中将被废弃, 请直接使用上面方法
 	 */
-	bool add_cert(const char* /* crt_file */)
-	{
-		return false;
-	}
+	bool add_cert(const char* /* crt_file */);
 
 	/**
 	 * @override
-	 * 注: 该方法在 mbedtls_conf 中已经废弃, 请直接使用上面方法
+	 * 注: 该方法在 mbedtls_conf 中将被废弃, 请直接使用上面方法
 	 */
-	bool set_key(const char* /*key_file*/, const char* /* key_pass */)
-	{
-		return false;
-	}
+	bool set_key(const char* /*key_file*/, const char* /* key_pass */);
 
 	/**
 	 * @override
@@ -125,8 +119,6 @@ private:
 	void* entropy_;
 	void* rnd_;
 	void* cacert_;
-	string key_file_;
-	string key_pass_;
 	string crt_file_;
 	void* cache_;
 	mbedtls_verify_t verify_mode_;
