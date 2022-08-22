@@ -239,6 +239,8 @@
 		70BD6B8C232B933D00E4C798 /* redis_stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4677E1E6FCCF1002C9B3C /* redis_stream.cpp */; };
 		70BD6B8D232B933D00E4C798 /* token_tree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467A01E6FCCF1002C9B3C /* token_tree.cpp */; };
 		70BD6B8E232B933D00E4C798 /* sqlite_manager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4670B1E6FCCF1002C9B3C /* sqlite_manager.cpp */; };
+		70DBEF4C28B383500009208D /* openssl_conf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 70DBEF4A28B383500009208D /* openssl_conf.cpp */; };
+		70DBEF4D28B383500009208D /* openssl_io.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 70DBEF4B28B383500009208D /* openssl_io.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -746,6 +748,10 @@
 		706D0F3A25F4749300BA5347 /* mqtt_connect.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mqtt_connect.cpp; path = mqtt/mqtt_connect.cpp; sourceTree = "<group>"; };
 		7085630E25F7160400EACC5B /* mqtt_header.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mqtt_header.cpp; path = mqtt/mqtt_header.cpp; sourceTree = "<group>"; };
 		7085631125F7161600EACC5B /* mqtt_header.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = mqtt_header.hpp; path = mqtt/mqtt_header.hpp; sourceTree = "<group>"; };
+		70DBEF4A28B383500009208D /* openssl_conf.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl_conf.cpp; sourceTree = "<group>"; };
+		70DBEF4B28B383500009208D /* openssl_io.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = openssl_io.cpp; sourceTree = "<group>"; };
+		70DBEF4E28B383620009208D /* openssl_conf.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = openssl_conf.hpp; sourceTree = "<group>"; };
+		70DBEF4F28B383620009208D /* openssl_io.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = openssl_io.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1178,6 +1184,8 @@
 		07A467A81E6FCCF1002C9B3C /* stream */ = {
 			isa = PBXGroup;
 			children = (
+				70DBEF4A28B383500009208D /* openssl_conf.cpp */,
+				70DBEF4B28B383500009208D /* openssl_io.cpp */,
 				7029CC2E23A9D075001B3EDB /* sslbase_io.cpp */,
 				702B9D8E23A8E31200079240 /* mbedtls_conf.cpp */,
 				702B9D8F23A8E31200079240 /* mbedtls_io.cpp */,
@@ -1591,6 +1599,8 @@
 		07A469361E6FD404002C9B3C /* stream */ = {
 			isa = PBXGroup;
 			children = (
+				70DBEF4E28B383620009208D /* openssl_conf.hpp */,
+				70DBEF4F28B383620009208D /* openssl_io.hpp */,
 				7029CC2C23A9D05D001B3EDB /* sslbase_conf.hpp */,
 				7029CC2D23A9D05D001B3EDB /* sslbase_io.hpp */,
 				702B9D8C23A8E2FB00079240 /* mbedtls_conf.hpp */,
@@ -1796,6 +1806,7 @@
 				07A4686A1E6FCCF1002C9B3C /* fstream.cpp in Sources */,
 				07A467C11E6FCCF1002C9B3C /* acl_cpp_test.cpp in Sources */,
 				07A4684D1E6FCCF1002C9B3C /* json.cpp in Sources */,
+				70DBEF4C28B383500009208D /* openssl_conf.cpp in Sources */,
 				07A468201E6FCCF1002C9B3C /* mime_image.cpp in Sources */,
 				7017904824C542140016B873 /* redis_client_pipeline.cpp in Sources */,
 				07A4685A1E6FCCF1002C9B3C /* url_coder.cpp in Sources */,
@@ -1848,6 +1859,7 @@
 				07A4682E1E6FCCF1002C9B3C /* redis_command.cpp in Sources */,
 				07A468041E6FCCF1002C9B3C /* master_base.cpp in Sources */,
 				07A467FC1E6FCCF1002C9B3C /* HttpServletResponse.cpp in Sources */,
+				70DBEF4D28B383500009208D /* openssl_io.cpp in Sources */,
 				07A468401E6FCCF1002C9B3C /* gsoner.cpp in Sources */,
 				07A467DC1E6FCCF1002C9B3C /* db_sqlite.cpp in Sources */,
 				07A467CC1E6FCCF1002C9B3C /* ResponseHeaderOverrides.cpp in Sources */,

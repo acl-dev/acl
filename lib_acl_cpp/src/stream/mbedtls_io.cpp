@@ -9,6 +9,7 @@
 #ifdef HAS_MBEDTLS
 # include "mbedtls-2.7.12/ssl.h"
 # include "mbedtls-2.7.12/havege.h"
+# include "mbedtls-2.7.12/error.h"
 # include "mbedtls-2.7.12/ctr_drbg.h"
 # include "mbedtls-2.7.12/entropy.h"
 # include "mbedtls-2.7.12/net_sockets.h"
