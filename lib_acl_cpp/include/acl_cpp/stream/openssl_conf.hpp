@@ -44,15 +44,15 @@ public:
 
 public:
 	/**
-	 * è°ƒç”¨æœ¬å‡½æ•°è®¾ç½®ä¸€ä¸ªåŠ¨æ€åº“çš„å…¨è·¯å¾„
-	 * @param libcrypto {const char*} libcrypto.so åŠ¨æ€åº“çš„å…¨è·¯å¾„
-	 * @param libssl {const char*} libssl.so åŠ¨æ€åº“çš„å…¨è·¯å¾„
+	 * µ÷ÓÃ±¾º¯ÊıÉèÖÃÒ»¸ö¶¯Ì¬¿âµÄÈ«Â·¾¶
+	 * @param libcrypto {const char*} libcrypto.so ¶¯Ì¬¿âµÄÈ«Â·¾¶
+	 * @param libssl {const char*} libssl.so ¶¯Ì¬¿âµÄÈ«Â·¾¶
 	 */
 	static void set_libpath(const char* libcrypto, const char* libssl);
 
 	/**
-	 * æ˜¾å¼è°ƒç”¨æœ¬æ–¹æ³•ï¼ŒåŠ¨æ€åŠ è½½ libssl.so åŠ¨æ€åº“
-	 * @return {bool} åŠ è½½æ˜¯å¦æˆåŠŸ
+	 * ÏÔÊ½µ÷ÓÃ±¾·½·¨£¬¶¯Ì¬¼ÓÔØ libssl.so ¶¯Ì¬¿â
+	 * @return {bool} ¼ÓÔØÊÇ·ñ³É¹¦
 	 */
 	static bool load(void);
 

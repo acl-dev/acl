@@ -558,13 +558,13 @@ static void iocp_wait_one(EVENT_IOCP *ei, int timeout) {
 }
 
 static void iocp_wait_more(EVENT_IOCP *ei, int timeout) {
-	ULONG ready = 0;
+	ULONG ready = 0, i;
 	OVERLAPPED_ENTRY entries[128];
 	const ULONG MAX_ENTRIES = _countof(entries);
 
 	if (GetQueuedCompletionStatusEx(ei->h_iocp, entries, MAX_ENTRIES,
 			&ready, timeout, FALSE)) {
-		for (ULONG i = 0; i < ready; i++) {
+		for (i = 0; i < ready; i++) {
 			LPOVERLAPPED_ENTRY entry = &entries[i];
 			IOCP_EVENT* ev = (IOCP_EVENT *) entry->lpOverlapped;
 			FILE_EVENT* fe = (FILE_EVENT *) entry->lpCompletionKey;

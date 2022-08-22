@@ -300,11 +300,13 @@ static void mmap_buf_init(ACL_VSTRING *vp, size_t offset)
 	if (vp->vbuf.hmap == NULL) {
 		acl_msg_fatal("CreateFileMapping: %s", acl_last_serror());
 	}
-	DWORD dwFileOffsetHigh = offset / (unsigned int) -1;
-	DWORD dwFileOffsetLow  = offset % (unsigned int) -1;
+	/*
+	DWORD dwFileOffsetHigh = (DWORD) (offset / (unsigned int) -1);
+	DWORD dwFileOffsetLow  = (DWORD) (offset % (unsigned int) -1);
 	vp->vbuf.data = (unsigned char *) MapViewOfFile(vp->vbuf.hmap,
 		FILE_MAP_READ | FILE_MAP_WRITE, dwFileOffsetHigh,
 		dwFileOffsetLow, 0);
+	*/
 	if (vp->vbuf.data == NULL) {
 		acl_msg_fatal("MapViewOfFile error: %s", acl_last_serror());
 	}

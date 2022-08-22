@@ -824,7 +824,11 @@ static void correct_addr(const char *addr, char *buf, size_t size)
 	} else {
 		const char *pri = !strcmp(acl_var_fiber_master_private, "y") ?
 			"private" : "public";
+#if defined(_WIN32) || defined(_WIN64)
+		_snprintf(buf, size, "%s/%s/%s", acl_var_fiber_queue_dir, pri, addr);
+#else
 		snprintf(buf, size, "%s/%s/%s", acl_var_fiber_queue_dir, pri, addr);
+#endif
 	}
 }
 
