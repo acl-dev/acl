@@ -589,6 +589,8 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClCompile Include="src\stream\ostream.cpp" />
     <ClCompile Include="src\stream\mbedtls_conf.cpp" />
     <ClCompile Include="src\stream\mbedtls_io.cpp" />
+    <ClCompile Include="src\stream\openssl_conf.cpp" />
+    <ClCompile Include="src\stream\openssl_io.cpp" />
     <ClCompile Include="src\stream\polarssl_conf.cpp" />
     <ClCompile Include="src\stream\polarssl_io.cpp" />
     <ClCompile Include="src\stream\server_socket.cpp" />
@@ -808,6 +810,8 @@ copy $(TargetName).pdb ..\dist\lib\win64\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stream\ostream.hpp" />
     <ClInclude Include="include\acl_cpp\stream\mbedtls_conf.hpp" />
     <ClInclude Include="include\acl_cpp\stream\mbedtls_io.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\openssl_conf.hpp" />
+    <ClInclude Include="include\acl_cpp\stream\openssl_io.hpp" />
     <ClInclude Include="include\acl_cpp\stream\polarssl_conf.hpp" />
     <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp" />
     <ClInclude Include="include\acl_cpp\stream\server_socket.hpp" />

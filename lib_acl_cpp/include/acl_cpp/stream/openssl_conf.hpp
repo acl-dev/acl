@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
+#include "../stdlib/thread_mutex.hpp"
 #include "../stdlib/string.hpp"
 #include "sslbase_conf.hpp"
 
@@ -42,6 +43,19 @@ public:
 	void enable_cache(bool on);
 
 public:
+	/**
+	 * 调用本函数设置一个动态库的全路径
+	 * @param libssl {const char*} libssl.so 动态库的全路径
+	 */
+	static void set_libpath(const char* libssl);
+
+	/**
+	 * 显式调用本方法，动态加载 libssl.so 动态库
+	 * @return {bool} 加载是否成功
+	 */
+	static bool load(void);
+
+public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
 
@@ -64,6 +78,10 @@ private:
 	bool   server_side_;
 	void*  ssl_ctx_;
 	string crt_file_;
+	unsigned init_status_;
+	thread_mutex lock_;
+
+	bool init_once(void);
 };
 
 } // namespace acl

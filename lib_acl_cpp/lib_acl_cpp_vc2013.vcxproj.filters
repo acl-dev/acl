@@ -445,6 +445,12 @@
     <ClCompile Include="src\stream\mbedtls_conf.cpp">
       <Filter>Source Files\stream</Filter>
     </ClCompile>
+    <ClCompile Include="src\stream\openssl_io.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stream\openssl_conf.cpp">
+      <Filter>Source Files\stream</Filter>
+    </ClCompile>
     <ClCompile Include="src\stream\polarssl_io.cpp">
       <Filter>Source Files\stream</Filter>
     </ClCompile>
@@ -1150,6 +1156,12 @@
       <Filter>Header Files\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\mbedtls_conf.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\openssl_io.hpp">
+      <Filter>Header Files\stream</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stream\openssl_conf.hpp">
       <Filter>Header Files\stream</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stream\polarssl_io.hpp">

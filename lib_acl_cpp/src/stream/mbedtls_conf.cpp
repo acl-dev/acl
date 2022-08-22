@@ -464,8 +464,7 @@ static void mbedtls_dll_load(void)
 # endif // HAS_MBEDTLS_DLL
 #endif  // HAS_MBEDTLS
 
-namespace acl
-{
+namespace acl {
 
 void mbedtls_conf::set_libpath(const char* libmbedcrypto,
 	const char* libmbedx509, const char* libmbedtls)
@@ -552,6 +551,7 @@ bool mbedtls_conf::init_rand(void)
 		(mbedtls_ctr_drbg_context*) rnd_);
 	return true;
 #else
+	logger_error("HAS_MBEDTLS not defined!");
 	return false;
 #endif
 }
@@ -661,9 +661,12 @@ bool mbedtls_conf::init_once(void)
 	}
 
 	__ssl_conf_ciphersuites((mbedtls_ssl_config*) conf_, cipher_suites);
-#endif
 	init_status_ = CONF_INIT_OK;
 	return true;
+#else
+	logger_error("HAS_MBEDTLS not defined!");
+	return false;
+#endif // HAS_MBEDTLS
 }
 
 #define CONF_OWN_CERT_NIL	0

@@ -78,7 +78,7 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
-	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL
+	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL -DHAS_OPENSSL_DLL
 	shared_ldflags = -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
@@ -93,7 +93,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -flto \
 		  -Os
 	CFLAGS += -Wshadow
-	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL
+	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL -DHAS_OPENSSL_DLL
 	UNIXTYPE = MACOSX
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
@@ -103,7 +103,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
-	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL
+	CFLAGS += -DHAS_POLARSSL_DLL -DHAS_MBEDTLS_DLL -DHAS_OPENSSL_DLL
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 

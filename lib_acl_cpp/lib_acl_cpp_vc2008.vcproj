@@ -1302,6 +1302,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\src\stream\openssl_conf.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\src\stream\openssl_io.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\src\stream\ofstream.cpp"
 					>
 				</File>
@@ -2241,6 +2249,14 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\mbedtls_io.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\openssl_conf.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\openssl_io.hpp"
 					>
 				</File>
 				<File

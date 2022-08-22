@@ -178,7 +178,9 @@ const char* mbedtls_io::ssl_strerror(int err)
 		ebf_ = (char*) acl_mymalloc(len);
 	}
 	ebf_[0] = 0;
+#ifdef HAS_MBEDTLS
 	__ssl_strerror(err, ebf_, len);
+#endif
 	return ebf_;
 }
 

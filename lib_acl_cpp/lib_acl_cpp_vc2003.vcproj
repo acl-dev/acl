@@ -324,6 +324,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\src\stream\mbedtls_io.cpp">
 				</File>
 				<File
+					RelativePath=".\src\stream\openssl_conf.cpp">
+				</File>
+				<File
+					RelativePath=".\src\stream\openssl_io.cpp">
+				</File>
+				<File
 					RelativePath=".\src\stream\ofstream.cpp">
 				</File>
 				<File
@@ -1157,6 +1163,12 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\mbedtls_io.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\openssl_conf.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stream\openssl_io.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stream\ofstream.hpp">
