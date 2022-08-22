@@ -117,11 +117,14 @@ service http_server {
 	crt_file = ../ssl_crt.pem
 	key_file = ../ssl_key.pem
 
-	libcrypto_path = ../libmbedcrypto.so
-	libx509_path   = ../libmbedx509.so
+#	libcrypto_path = ../libmbedcrypto.so
+#	libx509_path   = ../libmbedx509.so
 #	libssl_path    = ../libmbedtls.so
+
 #	libssl_path    = ../libpolarssl.so
-#	libssl_path    = ../libssl.so
+
+	libcrypto_path = /usr/local/lib64/libcrypto.so
+	libssl_path    = /usr/local/lib64/libssl.so
 
 #	libcrypto_path = ../libmbedcrypto.dylib
 #	libx509_path   = ../libmbedx509.dylib

@@ -65,7 +65,8 @@ static ssl_comp_pop __ssl_comp_pop;
 typedef void (*ssl_clear_error_fn)(void);
 static ssl_clear_error_fn __ssl_clear_error;
 
-#  define SSLV23_METHOD			"SSLv23_method"
+//#  define SSLV23_METHOD		"SSLv23_method"
+#  define SSLV23_METHOD			"TLS_method"
 typedef const SSL_METHOD* (*sslv23_method_fn)(void);
 static sslv23_method_fn __sslv23_method;
 
@@ -106,26 +107,40 @@ typedef void (*ssl_ctx_set_def_pass_fn)(SSL_CTX*, void*);
 static ssl_ctx_set_def_pass_fn __ssl_ctx_set_def_pass;
 
 static acl_pthread_once_t __openssl_once = ACL_PTHREAD_ONCE_INIT;
-static acl::string* __ssl_path_buf = NULL;
+static acl::string* __crypto_path_buf = NULL;
+static acl::string* __ssl_path_buf    = NULL;
 
 #  if defined(_WIN32) || defined(_WIN64)
-static const char* __ssl_path = "libssl.dll";
+static const char* __crypto_path = "libcrypto.dll";
+static const char* __ssl_path    = "libssl.dll";
 #  elif defined(ACL_MACOSX)
-static const char* __ssl_path = "libssl.dylib";
+static const char* __crypto_path = "libcrypto.dylib";
+static const char* __ssl_path    = "libssl.dylib";
 #  else
-static const char* __ssl_path = "libssl.so";
+static const char* __crypto_path = "libcrypto.so";
+static const char* __ssl_path    = "libssl.so";
 #  endif
 
-ACL_DLL_HANDLE __ssl_dll = NULL;
+ACL_DLL_HANDLE __openssl_crypto_dll = NULL;
+ACL_DLL_HANDLE __openssl_ssl_dll    = NULL;
+
 extern bool openssl_load_io(void); // defined in openssl_io.cpp
 
 #  ifndef HAVE_NO_ATEXIT
 static void openssl_dll_unload(void)
 {
-	if (__ssl_dll) {
-		acl_dlclose(__ssl_dll);
-		__ssl_dll = NULL;
+	if (__openssl_ssl_dll) {
+		acl_dlclose(__openssl_ssl_dll);
+		__openssl_ssl_dll = NULL;
 	}
+
+	if (__openssl_crypto_dll) {
+		acl_dlclose(__openssl_crypto_dll);
+		__openssl_crypto_dll = NULL;
+	}
+
+	delete __crypto_path_buf;
+	__crypto_path_buf = NULL;
 
 	delete __ssl_path_buf;
 	__ssl_path_buf = NULL;
@@ -133,9 +148,10 @@ static void openssl_dll_unload(void)
 #  endif
 
 #  define LOAD_SSL(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__ssl_dll, (name));			\
+	(fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));		\
 	if ((fn) == NULL) {						\
-		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		logger_error("dlsym %s error %s, lib=%s",		\
+			name, acl_dlerror(), __ssl_path);		\
 		return false;						\
 	}								\
 } while (0)
@@ -175,12 +191,22 @@ static bool load_from_ssl(void)
 
 static bool load_all_dlls(void)
 {
+	if (__crypto_path_buf && !__crypto_path_buf->empty()) {
+		__crypto_path = __crypto_path_buf->c_str();
+	}
+
 	if (__ssl_path_buf && !__ssl_path_buf->empty()) {
 		__ssl_path = __ssl_path_buf->c_str();
 	}
 
-	__ssl_dll = acl_dlopen(__ssl_path);
-	if (__ssl_dll == NULL) {
+	__openssl_crypto_dll = acl_dlopen(__crypto_path);
+	if (__openssl_crypto_dll == NULL) {
+		logger_error("load %s error %s", __crypto_path, acl_dlerror());
+		return false;
+	}
+
+	__openssl_ssl_dll = acl_dlopen(__ssl_path);
+	if (__openssl_ssl_dll == NULL) {
 		logger_error("load %s error %s", __ssl_path, acl_dlerror());
 		return false;
 	}
@@ -190,7 +216,7 @@ static bool load_all_dlls(void)
 
 static void openssl_dll_load(void)
 {
-	if (__ssl_dll) {
+	if (__openssl_ssl_dll) {
 		logger("openssl(%s) has been loaded!", __ssl_path);
 		return;
 	}
@@ -200,19 +226,19 @@ static void openssl_dll_load(void)
 	}
 
 	if (!load_from_ssl()) {
-		acl_dlclose(__ssl_dll);
-		__ssl_dll = NULL;
+		acl_dlclose(__openssl_ssl_dll);
+		__openssl_ssl_dll = NULL;
 		return;
 	}
 
 	if (!openssl_load_io()) {
 		logger_error("openssl_dll_load_io %s error", __ssl_path);
-		acl_dlclose(__ssl_dll);
-		__ssl_dll = NULL;
+		acl_dlclose(__openssl_ssl_dll);
+		__openssl_ssl_dll = NULL;
 		return;
 	}
 
-	logger("%s loaded!", __ssl_path);
+	logger("%s, %s loaded!", __crypto_path, __ssl_path);
 
 #ifndef HAVE_NO_ATEXIT
 	atexit(openssl_dll_unload);
@@ -259,14 +285,20 @@ namespace acl {
 #define CONF_INIT_OK	1
 #define CONF_INIT_ERR	2
 
-void openssl_conf::set_libpath(const char* libssl)
+void openssl_conf::set_libpath(const char* libcrypto, const char* libssl)
 {
 #ifdef HAS_OPENSSL_DLL
+	if (__crypto_path_buf == NULL) {
+		__crypto_path_buf = NEW string;
+	}
+	*__crypto_path_buf = libcrypto;
+
 	if (__ssl_path_buf == NULL) {
 		__ssl_path_buf = NEW string;
 	}
 	*__ssl_path_buf = libssl;
 #else
+	(void) libcrypto;
 	(void) libssl;
 #endif
 }
@@ -275,7 +307,7 @@ bool openssl_conf::load(void)
 {
 #ifdef HAS_OPENSSL_DLL
 	acl_pthread_once(&__openssl_once, openssl_dll_load);
-	if (__ssl_dll == NULL) {
+	if (__openssl_ssl_dll == NULL) {
 		logger_error("load openssl error");
 		return false;
 	}
@@ -307,7 +339,9 @@ bool openssl_conf::init_once(void)
 
 # if OPENSSL_VERSION_NUMBER >= 0x10100003L
 	if (__ssl_init(OPENSSL_INIT_LOAD_CONFIG, NULL) == 0) {
-		logger_fatal("OPENSSL_init_ssl error");
+		logger_error("OPENSSL_init_ssl error");
+		init_status_ = CONF_INIT_ERR;
+		return false;
 	}
 
 	// OPENSSL_init_ssl() may leave errors in the error queue
@@ -331,6 +365,7 @@ bool openssl_conf::init_once(void)
 	}
 #  endif
 # endif
+	init_status_ = CONF_INIT_OK;
 	return true;
 #else
 	logger_error("HAS_OPENSSL not defined!");

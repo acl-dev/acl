@@ -250,7 +250,8 @@ extern bool mbedtls_load_io(void); // defined in mbedtls_io.cpp
 #define LOAD_CRYPTO(name, type, fn) do {				\
 	(fn) = (type) acl_dlsym(__crypto_dll, (name));			\
 	if ((fn) == NULL) {						\
-		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		logger_error("dlsym %s error %s, lib=%s",		\
+			name, acl_dlerror(), __crypto_path);		\
 		return false;						\
 	}								\
 } while (0)
@@ -258,7 +259,8 @@ extern bool mbedtls_load_io(void); // defined in mbedtls_io.cpp
 #define LOAD_X509(name, type, fn) do {					\
 	(fn) = (type) acl_dlsym(__x509_dll, (name));			\
 	if ((fn) == NULL) {						\
-		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		logger_error("dlsym %s error %s, lib=%s",		\
+			name, acl_dlerror(), __x509_path);		\
 		return false;						\
 	}								\
 } while (0)
@@ -266,7 +268,8 @@ extern bool mbedtls_load_io(void); // defined in mbedtls_io.cpp
 #define LOAD_SSL(name, type, fn) do {					\
 	(fn) = (type) acl_dlsym(__tls_dll, (name));			\
 	if ((fn) == NULL) {						\
-		logger_error("dlsym %s error %s", name, acl_dlerror());	\
+		logger_error("dlsym %s error %s, lib=%s",		\
+			name, acl_dlerror(), __tls_path);		\
 		return false;						\
 	}								\
 } while (0)

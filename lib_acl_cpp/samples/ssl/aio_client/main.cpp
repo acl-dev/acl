@@ -334,6 +334,8 @@ int main(int argc, char* argv[])
 	ctx.dlen = 8193;
 	acl::safe_snprintf(ctx.addr, sizeof(ctx.addr), "127.0.0.1:9800");
 
+	acl::log::stdout_open(true);
+
 	while ((ch = getopt(argc, argv, "hd:c:n:kl:t:SL:I:M:")) > 0) {
 		switch (ch) {
 		case 'c':
@@ -419,7 +421,19 @@ int main(int argc, char* argv[])
 				printf("load %s error\r\n", libpath.c_str());
 			}
 		} else if (libpath.find("libssl") != NULL) {
-			ssl_conf = new acl::openssl_conf(false);
+			const std::vector<acl::string>& libs = libpath.split2(";, \t");
+			if (libs.size() != 2) {
+				printf("invalid libpath=%s\r\n", libpath.c_str());
+				return 1;
+			}
+
+			acl::openssl_conf::set_libpath(libs[0], libs[1]);
+
+			if (acl::openssl_conf::load()) {
+				ssl_conf = new acl::openssl_conf(false);
+			} else {
+				printf("load %s error\r\n", libpath.c_str());
+			}
 		}
 	}
 

@@ -45,9 +45,10 @@ public:
 public:
 	/**
 	 * 调用本函数设置一个动态库的全路径
+	 * @param libcrypto {const char*} libcrypto.so 动态库的全路径
 	 * @param libssl {const char*} libssl.so 动态库的全路径
 	 */
-	static void set_libpath(const char* libssl);
+	static void set_libpath(const char* libcrypto, const char* libssl);
 
 	/**
 	 * 显式调用本方法，动态加载 libssl.so 动态库

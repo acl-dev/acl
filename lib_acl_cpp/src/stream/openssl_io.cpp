@@ -81,19 +81,19 @@ static ssl_read_fn __ssl_read;
 typedef int (*ssl_write_fn)(SSL*, const void*, int);
 static ssl_write_fn __ssl_write;
 
-extern ACL_DLL_HANDLE __ssl_dll;  // defined in openssl_conf.cpp
+extern ACL_DLL_HANDLE __openssl_ssl_dll;  // defined in openssl_conf.cpp
 
 bool openssl_load_io(void)
 {
 #define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__ssl_dll, (name));			\
+	(fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));			\
 	if ((fn) == NULL) {						\
 		logger_error("dlsym %s error %s", name, acl_dlerror());	\
 		return false;						\
 	}								\
 } while (0)
 
-	acl_assert(__ssl_dll);
+	acl_assert(__openssl_ssl_dll);
 
 	LOAD(SSL_NEW, ssl_new_fn, __ssl_new);
 	LOAD(SSL_FREE, ssl_free_fn, __ssl_free);
@@ -285,10 +285,7 @@ int openssl_io::read(void* buf, size_t len)
 			ptr += ret;
 			len -= ret;
 
-			if (nblock_) {
-				break;
-			}
-			continue;
+			break;
 		}
 
 		int err = __ssl_get_error((SSL*) ssl_, ret);
@@ -336,10 +333,7 @@ int openssl_io::send(const void* buf, size_t len)
 			ptr += ret;
 			len -= ret;
 
-			if (nblock_) {
-				break;
-			}
-			continue;
+			break;
 		}
 
 		int err = __ssl_get_error((SSL*) ssl_, ret);

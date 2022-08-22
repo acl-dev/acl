@@ -62,7 +62,7 @@ public:
 
 		// 尝试进行 SSL 握手
 		if (!hook->handshake()) {
-			printf("ssl handshake failed\r\n");
+			printf("%s: ssl handshake failed\r\n", __FUNCTION__);
 			return false;
 		}
 
@@ -229,7 +229,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"  -d path_to_polarssl_or_mbedtls\r\n"
-		"  -l server_addr[ip:port, default: 127.0.0.1:9800]\r\n"
+		"  -l server_addr[ip:port, default: 0.0.0.0:9800]\r\n"
 		"  -L line_max_length\r\n"
 		"  -t timeout\r\n"
 		"  -n conn_used_limit\r\n"
@@ -245,7 +245,7 @@ int main(int argc, char* argv[])
 	// 事件引擎是否采用内核中的高效模式
 	bool use_kernel = false, use_polarssl = true;
 	acl::string key_file, cert_file, libpath;
-	acl::string addr("127.0.0.1:9800");
+	acl::string addr("0.0.0.0:9800");
 	int  ch, delay_ms = 100, check_fds_inter = 10;
 
 	while ((ch = getopt(argc, argv, "l:d:hkL:t:K:C:n:M:I:")) > 0) {
@@ -291,7 +291,7 @@ int main(int argc, char* argv[])
 	acl::log::stdout_open(true);
 
 	if (libpath.find("mbedtls") != NULL) {
-		const std::vector<acl::string>& libs = libpath.split2(";");
+		const std::vector<acl::string>& libs = libpath.split2(";, \t");
 		if (libs.size() != 3) {
 			printf("invalid libpath=%s\r\n", libpath.c_str());
 			return 1;
@@ -319,8 +319,27 @@ int main(int argc, char* argv[])
 			printf("load %s error\r\n", libpath.c_str());
 		}
 	} else if (libpath.find("libssl") != NULL) {
+#if 1
+		const std::vector<acl::string>& libs = libpath.split2(";, \t");
+		if (libs.size() != 2) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+
+		if (acl::openssl_conf::load()) {
+			__ssl_conf = new acl::openssl_conf(true);
+			printf("use openssl_conf now\r\n");
+		} else {
+			key_file.clear();
+			cert_file.clear();
+			printf("load %s error\r\n", libpath.c_str());
+		}
+#else
 		__ssl_conf = new acl::openssl_conf(true);
 		printf("use openssl_conf now\r\n");
+#endif
 	}
 
 	// 当私钥及证书都存在时才采用 SSL 通信方式

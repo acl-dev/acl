@@ -72,7 +72,20 @@ int main(int argc, char* argv[])
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
-	} else {
+	} else if (libpath.find("libssl")) {
+		const std::vector<acl::string>& libs = libpath.split2(";, \t");
+		if (libs.size() != 2) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+
+		if (!acl::openssl_conf::load()) {
+			printf("load ssl error\r\n");
+			return 1;
+		}
+
 		ssl_conf = new acl::openssl_conf(false);
 	}
 

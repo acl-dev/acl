@@ -6,3 +6,5 @@ if [ $os == 'Darwin' ]; then
 else
 	./aio_server -d "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so" -K ../ssl_key.pem -C ../ssl_crt.pem
 fi
+
+#./aio_server -d "/usr/local/lib64/libcrypto.so; /usr/local/lib64/libssl.so" -K ../ssl_key.pem -C ../ssl_crt.pem -K

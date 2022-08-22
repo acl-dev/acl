@@ -171,7 +171,7 @@ void master_service::proc_on_init()
 	conf_->enable_cache(var_cfg_session_cache);
 
 	// 添加本地服务的证书及本地服务密钥
-	if (!conf_->append_key_cert(var_cfg_crt_file, var_cfg_key_file)) {
+	if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file)) {
 		logger_error("add cert failed, crt: %s, key: %s",
 			var_cfg_crt_file, var_cfg_key_file);
 		delete conf_;
