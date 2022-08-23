@@ -160,7 +160,7 @@ openssl_io::~openssl_io(void)
 
 void openssl_io::destroy(void)
 {
-	if (--(refers_) == 0) {
+	if (--(*refers_) <= 0) {
 		delete this;
 	}
 }

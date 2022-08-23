@@ -167,7 +167,7 @@ mbedtls_io::~mbedtls_io(void)
 
 void mbedtls_io::destroy(void)
 {
-	if (--(*refers_) == 0) {
+	if (--(*refers_) <= 0) {
 		delete this;
 	}
 }
