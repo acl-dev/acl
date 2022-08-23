@@ -16,8 +16,8 @@
 #endif
 
 #ifdef HAS_OPENSSL
-#include "openssl-1.1.1q/openssl/ssl.h"
-#include "openssl-1.1.1q/openssl/err.h"
+#include "openssl/ssl.h"
+#include "openssl/err.h"
 #endif
 
 #if defined(HAS_OPENSSL)
