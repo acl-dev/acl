@@ -295,6 +295,7 @@ bool mbedtls_io::on_close(bool alive)
 				ret, ssl_strerror(ret));
 			return false;
 		}
+		break;
 	}
 #else
 	(void) alive;

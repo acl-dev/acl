@@ -7,19 +7,22 @@
 // 配置内容项
 
 char *var_cfg_redis_addrs;
-char *var_cfg_libcrypto_path;
-char *var_cfg_libx509_path;
-char *var_cfg_libssl_path;
-char *var_cfg_crt_file;
-char *var_cfg_key_file;
+
+char *var_cfg_libcrypto_path;	// For OpenSSL, MbedTLS
+char *var_cfg_libx509_path;	// For MbedTLS
+char *var_cfg_libssl_path;	// For OpenSSL, MbedTLS, and PolarSSL
+char *var_cfg_crt_file;		// For OpenSSL, MbedTLS, and PolarSSL
+char *var_cfg_key_file;		// For OpenSSL, MbedTLS, and PolarSSL
+char *var_cfg_key_pass;		// For OpenSSL, MbedTLS, and PolarSSL
 
 acl::master_str_tbl var_conf_str_tab[] = {
-	{ "redis_addrs", "127.0.0.1:6379", &var_cfg_redis_addrs },
-	{ "libcrypto_path", "", &var_cfg_libcrypto_path },
-	{ "libx509_path", "", &var_cfg_libx509_path},
-	{ "libssl_path", "", &var_cfg_libssl_path },
-	{ "crt_file", "", &var_cfg_crt_file },
-	{ "key_file", "", &var_cfg_key_file },
+	{ "redis_addrs",	"127.0.0.1:6379",	&var_cfg_redis_addrs },
+	{ "libcrypto_path",	"",	&var_cfg_libcrypto_path },
+	{ "libx509_path",	"",	&var_cfg_libx509_path	},
+	{ "libssl_path",	"",	&var_cfg_libssl_path	},
+	{ "crt_file",		"",	&var_cfg_crt_file	},
+	{ "key_file",		"",	&var_cfg_key_file	},
+	{ "key_pass",		"",	&var_cfg_key_pass	},
 
 	{ 0, 0, 0 }
 };
@@ -202,6 +205,10 @@ void master_service::proc_on_init(void)
 			return;
 		}
 
+		logger("MbedTLS loaded, crypto=%s, x509=%s, ssl=%s",
+			var_cfg_libcrypto_path, var_cfg_libx509_path,
+			var_cfg_libssl_path);
+
 		conf_ = new acl::mbedtls_conf(true);
 	} else if (strstr(var_cfg_libssl_path, "polarssl")) {
 		acl::polarssl_conf::set_libpath(var_cfg_libssl_path);
@@ -210,14 +217,32 @@ void master_service::proc_on_init(void)
 			return;
 		}
 
+		logger("PolarSSL loaded, ssl=%s", var_cfg_libssl_path);
+
 		conf_ = new acl::polarssl_conf();
+	} else if (strstr(var_cfg_libssl_path, "libssl")) {
+		acl::openssl_conf::set_libpath(var_cfg_libcrypto_path,
+			var_cfg_libssl_path);
+		if (!acl::openssl_conf::load()) {
+			logger_error("load %s error", var_cfg_libssl_path);
+			return;
+		}
+
+		logger("OpenSSL loaded, crypto=%s, ssl=%s",
+			var_cfg_libcrypto_path, var_cfg_libssl_path);
+
+		conf_ = new acl::openssl_conf(true);
+	} else {
+		logger("unsupported ssl=%s", var_cfg_libssl_path);
+		return;
 	}
 
 	// 允许服务端的 SSL 会话缓存功能
 	conf_->enable_cache(var_cfg_ssl_session_cache);
 
 	// 添加本地服务的证书及服务密钥
-	if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file)) {
+	if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file,
+			var_cfg_key_pass)) {
 		logger_error("add cert failed, crt: %s, key: %s",
 			var_cfg_crt_file, var_cfg_key_file);
 		delete conf_;

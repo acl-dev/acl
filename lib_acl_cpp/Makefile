@@ -109,7 +109,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	CFLAGS += -O3
 	CFLAGS += -DHAS_POLARSSL_DLL
 	CFLAGS += -DHAS_MBEDTLS_DLL
-	CFLAGS += -DHAS_OPENSSL_DLL
+#	CFLAGS += -DHAS_OPENSSL_DLL
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 
