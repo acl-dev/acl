@@ -210,20 +210,25 @@ bool openssl_io::handshake(void)
 	}
 
 #ifdef HAS_OPENSSL
-	int ret = __ssl_do_handshake((SSL*) ssl_);
-	if (ret == 1) {
-		handshake_ok_ = true;
-		return true;
-	}
+	while (true) {
+		int ret = __ssl_do_handshake((SSL*) ssl_);
+		if (ret == 1) {
+			handshake_ok_ = true;
+			return true;
+		}
 
-	int err = __ssl_get_error((SSL*) ssl_, ret);
-	switch (err) {
-	case SSL_ERROR_WANT_READ:
-	case SSL_ERROR_WANT_WRITE:
-		return true;
-	case SSL_ERROR_ZERO_RETURN:
-	default:
-		return false;
+		int err = __ssl_get_error((SSL*) ssl_, ret);
+		switch (err) {
+		case SSL_ERROR_WANT_READ:
+		case SSL_ERROR_WANT_WRITE:
+			if (nblock_) {
+				return true;
+			}
+			break;
+		case SSL_ERROR_ZERO_RETURN:
+		default:
+			return false;
+		}
 	}
 #else
 	logger_error("define HAS_OPENSSL first!");
@@ -288,11 +293,20 @@ int openssl_io::read(void* buf, size_t len)
 			break;
 		}
 
+		if (nbytes > 0) {
+			break;
+		}
+
+		this->stream_->read_ready = 0;
+
 		int err = __ssl_get_error((SSL*) ssl_, ret);
+
 		switch (err) {
 		case SSL_ERROR_WANT_READ:
 		case SSL_ERROR_WANT_WRITE:
-			this->stream_->read_ready = 0;
+			if (nblock_) {
+				return ACL_VSTREAM_EOF;
+			}
 			break;
 		case SSL_ERROR_ZERO_RETURN:
 		case SSL_ERROR_SYSCALL:
@@ -301,10 +315,8 @@ int openssl_io::read(void* buf, size_t len)
 			if (ERR_peek_error() == 0) {
 			}
 			*/
-			break;
+			return ACL_VSTREAM_EOF;
 		}
-
-		break;
 	}
 
 	if (len == 0) {
