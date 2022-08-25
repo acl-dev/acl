@@ -33,4 +33,7 @@ protected:
 	bool proc_on_sighup(acl::string&);
 
 private:
+	acl::sslbase_conf* conf_;
+	acl::sslbase_io* setup_ssl(acl::socket_stream& conn,
+		acl::sslbase_conf& conf);
 };
