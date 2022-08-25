@@ -74,7 +74,7 @@ ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream)
 	acl_vstring_init(&astream->strbuf, __default_line_length);
 	astream->timeout = 0;
 	astream->nrefer = 0;
-	astream->flag = 0;
+	astream->flag = ACL_AIO_FLAG_FLUSH_CLOSE; /* 尽量在数据写完前关闭连接 */
 
 	/* for read */
 	astream->read_nested = 0;

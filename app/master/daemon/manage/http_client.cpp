@@ -255,8 +255,9 @@ bool http_client::handle_master_config(void)
 
 void http_client::on_finish(void)
 {
-	if (hdr_req_->hdr.keep_alive)
+	if (hdr_req_->hdr.keep_alive) {
 		wait();
-	else
+	} else {
 		acl_aio_iocp_close(conn_);
+	}
 }

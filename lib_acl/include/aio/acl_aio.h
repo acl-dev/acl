@@ -410,7 +410,9 @@ ACL_API ACL_ASTREAM *acl_aio_open(ACL_AIO *aio, ACL_VSTREAM *stream);
 ACL_API void acl_aio_iocp_close(ACL_ASTREAM *astream);
 
 /**
- * 在关闭套接字前是否需要先将缓冲区中的数据写完，内部缺省值为 0
+ * 在关闭套接字前是否需要先将缓冲区中的数据写完，内部缺省值为 1 (即需要写完后
+ * 才会真正关闭连接), 所以如果想要立即关闭连接而不必等数据写完,则需要调用此方法
+ * 设置第二个参数为0
  * @param astream {ACL_ASTREAM*} 异步数据流
  * @param yes {int} 非 0 表示关闭套接字前需要将写缓冲区中的数据写完
  */
