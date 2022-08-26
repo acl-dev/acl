@@ -80,11 +80,13 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 
 	if (!ssl->handshake()) {
 		logger_error("ssl handshake failed");
+		ssl->destroy();
 		return NULL;
 	}
 
 	if (!ssl->handshake_ok()) {
-		logger("handshake trying again...");
+		logger_error("handshake trying again...");
+		ssl->destroy();
 		return NULL;
 	}
 
@@ -115,7 +117,7 @@ void master_service::on_accept(acl::socket_stream& conn)
 			local, var_cfg_https_port, server_conf_);
 	}
 
-	conn.set_rw_timeout(120);
+	conn.set_rw_timeout(5);
 
 	acl::memcache_session* session = new acl::memcache_session("127.0.0.1:11211");
 	http_servlet* servlet = new http_servlet(&conn, session,

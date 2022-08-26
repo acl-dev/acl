@@ -82,11 +82,13 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 
 	if (!ssl->handshake()) {
 		logger_error("ssl handshake failed");
+		ssl->destroy();
 		return NULL;
 	}
 
 	if (!ssl->handshake_ok()) {
 		logger("handshake trying again...");
+		ssl->destroy();
 		return NULL;
 	}
 

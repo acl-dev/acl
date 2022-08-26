@@ -204,8 +204,8 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 bool http_servlet::transfer_tcp(acl::socket_stream& local,
 	acl::socket_stream& peer)
 {
-	local.set_rw_timeout(20);
-	peer.set_rw_timeout(20);
+	local.set_rw_timeout(30);
+	peer.set_rw_timeout(30);
 
 	tcp_transfer* fiber_local = new
 		tcp_transfer(acl_fiber_running(), local, peer, false);

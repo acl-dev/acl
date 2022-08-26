@@ -26,11 +26,14 @@ void http_transfer::wait(bool* keep_alive) {
 	delete res;
 }
 
+static int nwait = 0;
 void http_transfer::run(void) {
 	bool* res = new bool;
 	switch (method_) {
 	case acl::HTTP_METHOD_GET:
+		nwait++;
 		*res = transfer_get();
+		nwait--;
 		break;
 	case acl::HTTP_METHOD_POST:
 		*res = transfer_post();
@@ -41,6 +44,7 @@ void http_transfer::run(void) {
 		break;
 	}
 
+	printf(">>>>nwait=%d\n", nwait);
 	box_->push(res);
 }
 
@@ -72,11 +76,13 @@ bool http_transfer::setup_ssl(acl::socket_stream& conn,
 
 	if (!ssl->handshake()) {
 		logger_error("ssl handshake failed, fd=%d", conn.sock_handle());
+		ssl->destroy();
 		return false;
 	}
 
 	if (!ssl->handshake_ok()) {
 		logger("handshake trying again, fd=%d", conn.sock_handle());
+		ssl->destroy();
 		return false;
 	}
 
@@ -106,7 +112,7 @@ bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
 	acl::string addr;
 	addr.format("%s|%d", buf.c_str(), port_);
 
-	if (!conn.open(addr, 0, 0)) {
+	if (!conn.open(addr, 5, 5)) {
 		logger_error("connect %s error %s",
 			addr.c_str(), acl::last_serror());
 		return false;
@@ -248,14 +254,14 @@ bool http_transfer::transfer_response(void) {
 		int ret = client_->read_body(buf, sizeof(buf));
 		if (ret <= 0) {
 			break;
-		} else if (chunked) {
-			if (!res_client_->write_chunk(*out, buf, ret)) {
-				logger_error("send response body error, chunked=%s",
-					chunked ? "yes" : "no");
+		} else if (!chunked) {
+			if (out->write(buf, ret) == -1) {
+				logger_error("send response body error");
 				return false;
 			}
-		} else if (out->write(buf, ret) == -1) {
-			logger_error("send response body error");
+		} else if (!res_client_->write_chunk(*out, buf, ret)) {
+			logger_error("send response body error, chunked=%s",
+				chunked ? "yes" : "no");
 			return false;
 		}
 	}
