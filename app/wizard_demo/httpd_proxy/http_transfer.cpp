@@ -1,28 +1,20 @@
 #include "stdafx.h"
 #include "http_transfer.h"
 
-http_transfer::http_transfer(acl::http_method_t method, request_t& req,
-	response_t& res, int port)
-: port_(port)
+http_transfer::http_transfer(acl::sslbase_conf* ssl_conf, acl::http_method_t method,
+	request_t& req, response_t& res, int port)
+: ssl_conf_(ssl_conf)
 , method_(method)
 , req_(req)
 , res_(res)
+, port_(port)
 , client_(NULL)
 {
 	box_ = new acl::fiber_tbox<bool>;
-
-	acl::socket_stream& sin = req_.getSocketStream();
-	req_in_.open(sin.sock_handle());
-
-	acl::socket_stream& sout = res_.getSocketStream();
-	res_out_.open(sout.sock_handle());
 	res_client_ = res_.getClient();
 }
 
 http_transfer::~http_transfer(void) {
-	req_in_.unbind_sock();
-	res_out_.unbind_sock();
-
 	delete client_;
 	delete box_;
 }
@@ -50,6 +42,46 @@ void http_transfer::run(void) {
 	}
 
 	box_->push(res);
+}
+
+bool http_transfer::setup_ssl(acl::socket_stream& conn,
+		acl::sslbase_conf& ssl_conf, const char* host)
+{
+	acl::sslbase_io* hook = (acl::sslbase_io*) conn.get_hook();
+	if (hook != NULL) {
+		logger("fd=%d, already in ssl status", conn.sock_handle());
+		return true;
+	}
+
+	// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
+	// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
+
+	logger("begin setup ssl hook...");
+
+	// 采用阻塞 SSL 握手方式
+	acl::sslbase_io* ssl = ssl_conf.create(false);
+
+	// 设置 SSL SNI, 以便服务端选择合适的证书
+	ssl->set_sni_host(host);
+
+	if (conn.setup_hook(ssl) == ssl) {
+		logger_error("setup_hook error, fd=%d", conn.sock_handle());
+		ssl->destroy();
+		return false;
+	}
+
+	if (!ssl->handshake()) {
+		logger_error("ssl handshake failed, fd=%d", conn.sock_handle());
+		return false;
+	}
+
+	if (!ssl->handshake_ok()) {
+		logger("handshake trying again, fd=%d", conn.sock_handle());
+		return false;
+	}
+
+	logger("handshake_ok, fd=%d", conn.sock_handle());
+	return true;
 }
 
 bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
@@ -80,7 +112,13 @@ bool http_transfer::open_peer(request_t& req, acl::socket_stream& conn)
 		return false;
 	}
 
-	logger("connect %s ok", addr.c_str());
+	logger("connect %s ok, fd=%d, use ssl=%s", addr.c_str(),
+		conn.sock_handle(), ssl_conf_ ? "yes" : "no");
+
+	if (ssl_conf_ && !setup_ssl(conn, *ssl_conf_, host)) {
+		logger_error("setup ssl error!");
+		return false;
+	}
 
 	bool is_request = true, unzip = false, fixed_stream = true;
 	client_ = new acl::http_client(&conn, is_request, unzip, fixed_stream);
@@ -115,8 +153,9 @@ bool http_transfer::transfer_request_body(acl::socket_stream& conn) {
 	long long n = 0;
 	char buf[8192];
 
+	acl::istream* in = &req_.getInputStream();
 	while (n < length) {
-		int ret = req_in_.read(buf, sizeof(buf), false);
+		int ret = in->read(buf, sizeof(buf), false);
 		if (ret == -1) {
 			logger_error("read request body error");
 			return false;
@@ -185,8 +224,8 @@ bool http_transfer::transfer_response(void) {
 
 	printf("response head:\r\n[%s]\r\n", header.c_str());
 
-	//acl::ostream* out = &res_->getOutputStream();
-	if (res_out_.write(header) == -1) {
+	acl::ostream* out = &res_.getOutputStream();
+	if (out->write(header) == -1) {
 		logger_error("send response head error");
 		return false;
 	}
@@ -210,18 +249,19 @@ bool http_transfer::transfer_response(void) {
 		if (ret <= 0) {
 			break;
 		} else if (chunked) {
-			if (!res_client_->write_chunk(res_out_, buf, ret)) {
-				logger_error("send response body error");
+			if (!res_client_->write_chunk(*out, buf, ret)) {
+				logger_error("send response body error, chunked=%s",
+					chunked ? "yes" : "no");
 				return false;
 			}
-		} else if (res_out_.write(buf, ret) == -1) {
+		} else if (out->write(buf, ret) == -1) {
 			logger_error("send response body error");
 			return false;
 		}
 	}
 
 	if (chunked) {
-		if (!res_client_->write_chunk_trailer(res_out_)) {
+		if (!res_client_->write_chunk_trailer(*out)) {
 			logger_error("write chunked trailer error");
 			return false;
 		}

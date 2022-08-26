@@ -4,9 +4,11 @@
 #include "http_servlet.h"
 
 http_servlet::http_servlet(acl::socket_stream* stream, acl::session* session,
-	int port /* 80 */)
+	acl::sslbase_conf* ssl_conf, int http_port /* 80 */, int https_port /* 443 */)
 : acl::HttpServlet(stream, session)
-, port_(port)
+, ssl_conf_(ssl_conf)
+, http_port_(http_port)
+, https_port_(https_port)
 {
 	handlers_["/hello"] = &http_servlet::on_hello;
 }
@@ -96,7 +98,8 @@ bool http_servlet::on_hello(request_t& req, response_t& res)
 bool http_servlet::transfer_get(request_t& req, response_t& res)
 {
 	http_transfer* fiber_peer = new
-		http_transfer(acl::HTTP_METHOD_GET, req, res, port_);
+		http_transfer(ssl_conf_, acl::HTTP_METHOD_GET, req, res,
+			ssl_conf_ ? https_port_ : http_port_);
 	fiber_peer->start();
 
 	bool keep_alive;
@@ -109,7 +112,8 @@ bool http_servlet::transfer_get(request_t& req, response_t& res)
 bool http_servlet::transfer_post(request_t& req, response_t& res)
 {
 	http_transfer* fiber_peer = new
-		http_transfer(acl::HTTP_METHOD_POST, req, res, port_);
+		http_transfer(ssl_conf_, acl::HTTP_METHOD_POST, req, res,
+			ssl_conf_ ? https_port_ : http_port_);
 	fiber_peer->start();
 
 	bool keep_alive;

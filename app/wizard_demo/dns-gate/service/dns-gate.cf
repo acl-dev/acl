@@ -116,8 +116,12 @@ service server
 #	连接 Redis 服务的密码
 	redis_pass = 111111
 
-	sqlite_path = ./libsqlite3.dylib
+#	sqlite_path = ./libsqlite3.dylib
+	sqlite_path = ./libsqlite3.so
 	dbfile = ./access.db
 
-	black_list = netease.com; 163.com
+#	black_list = netease.com; 163.com
+
+#	规则文件
+	rules_file = /opt/soft/dns-gate/conf/rules.json
 }

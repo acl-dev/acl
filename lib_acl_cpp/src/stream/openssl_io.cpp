@@ -33,6 +33,10 @@ static ssl_free_fn __ssl_free;
 typedef int (*ssl_set_fd_fn)(SSL*, int);
 static ssl_set_fd_fn __ssl_set_fd;
 
+# define SSL_CTRL			"SSL_ctrl"
+typedef long (*ssl_ctrl_fn)(SSL *ssl, int, long, void*);
+static ssl_ctrl_fn __ssl_ctrl;
+
 # define SSL_SET_ACCEPT_STATE		"SSL_set_accept_state"
 typedef void (*ssl_set_accept_state_fn)(SSL*);
 static ssl_set_accept_state_fn __ssl_set_accept_state;
@@ -86,7 +90,7 @@ extern ACL_DLL_HANDLE __openssl_ssl_dll;  // defined in openssl_conf.cpp
 bool openssl_load_io(void)
 {
 #define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));			\
+	(fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));		\
 	if ((fn) == NULL) {						\
 		logger_error("dlsym %s error %s", name, acl_dlerror());	\
 		return false;						\
@@ -98,6 +102,7 @@ bool openssl_load_io(void)
 	LOAD(SSL_NEW, ssl_new_fn, __ssl_new);
 	LOAD(SSL_FREE, ssl_free_fn, __ssl_free);
 	LOAD(SSL_SET_FD, ssl_set_fd_fn, __ssl_set_fd);
+	LOAD(SSL_CTRL, ssl_ctrl_fn, __ssl_ctrl);
 	LOAD(SSL_SET_ACCEPT_STATE, ssl_set_accept_state_fn, __ssl_set_accept_state);
 	LOAD(SSL_SET_CONNECT_STATE, ssl_set_connect_state_fn, __ssl_set_connect_state);
 	LOAD(SSL_DO_HANDSHAKE, ssl_do_handshake_fn, __ssl_do_handshake);
@@ -119,6 +124,7 @@ bool openssl_load_io(void)
 # define __ssl_new			SSL_new
 # define __ssl_free			SSL_free
 # define __ssl_set_fd			SSL_set_fd
+# define __ssl_ctrl			SSL_ctrl
 # define __ssl_set_accept_state		SSL_set_accept_state
 # define __ssl_set_connect_state	SSL_set_connect_state
 # define __ssl_do_handshake		SSL_do_handshake
@@ -187,6 +193,11 @@ bool openssl_io::open(ACL_VSTREAM* s)
 	if (conf_.is_server_side()) {
 		__ssl_set_accept_state(ssl);
 	} else {
+		if (!sni_host_.empty()) {
+			__ssl_ctrl(ssl, SSL_CTRL_SET_TLSEXT_HOSTNAME,
+				TLSEXT_NAMETYPE_host_name,
+				(void*) sni_host_.c_str());
+		}
 		__ssl_set_connect_state(ssl);
 	}
 

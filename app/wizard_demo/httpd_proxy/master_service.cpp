@@ -46,16 +46,19 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 //////////////////////////////////////////////////////////////////////////
 
 master_service::master_service(void)
-: conf_(NULL)
+: server_conf_(NULL)
+, client_conf_(NULL)
 {
 }
 
 master_service::~master_service(void)
 {
+	delete server_conf_;
+	delete client_conf_;
 }
 
 acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
-		acl::sslbase_conf& conf)
+		acl::sslbase_conf& server_conf)
 {
 	acl::sslbase_io* hook = (acl::sslbase_io*) conn.get_hook();
 	if (hook != NULL) {
@@ -65,10 +68,10 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 	// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 	// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
 
-	//logger("begin setup ssl hook...");
+	logger("begin setup ssl hook...");
 
 	// 采用阻塞 SSL 握手方式
-	acl::sslbase_io* ssl = conf.create(false);
+	acl::sslbase_io* ssl = server_conf.create(false);
 	if (conn.setup_hook(ssl) == ssl) {
 		logger_error("setup_hook error!");
 		ssl->destroy();
@@ -99,18 +102,24 @@ void master_service::on_accept(acl::socket_stream& conn)
 		return;
 	}
 
+	bool use_ssl = false;
 	acl::string buf(local);
-	if (buf.end_with(var_cfg_https_port) && conf_) {
-		if (setup_ssl(conn, *conf_) == NULL) {
+	if (buf.end_with(var_cfg_https_port) && server_conf_) {
+		if (setup_ssl(conn, *server_conf_) == NULL) {
 			logger_error("setup ssl error");
 			return;
 		}
+		use_ssl = true;
+	} else {
+		printf("local=%s, https=%s, server_conf_=%p\n",
+			local, var_cfg_https_port, server_conf_);
 	}
 
 	conn.set_rw_timeout(120);
 
 	acl::memcache_session* session = new acl::memcache_session("127.0.0.1:11211");
-	http_servlet* servlet = new http_servlet(&conn, session);
+	http_servlet* servlet = new http_servlet(&conn, session,
+			use_ssl ? client_conf_ : NULL);
 
 	// charset: big5, gb2312, gb18030, gbk, utf-8
 	servlet->setLocalCharset("utf-8");
@@ -158,7 +167,8 @@ void master_service::proc_on_init(void)
 			var_cfg_libcrypto_path, var_cfg_libx509_path,
 			var_cfg_libssl_path);
 
-		conf_ = new acl::mbedtls_conf(true);
+		server_conf_ = new acl::mbedtls_conf(true);
+		client_conf_ = new acl::mbedtls_conf(false);
 	} else if (strstr(var_cfg_libssl_path, "polarssl")) {
 		acl::polarssl_conf::set_libpath(var_cfg_libssl_path);
 		if (!acl::polarssl_conf::load()) {
@@ -168,7 +178,8 @@ void master_service::proc_on_init(void)
 
 		logger("PolarSSL loaded, ssl=%s", var_cfg_libssl_path);
 
-		conf_ = new acl::polarssl_conf();
+		server_conf_ = new acl::polarssl_conf();
+		client_conf_ = new acl::polarssl_conf();
 	} else if (strstr(var_cfg_libssl_path, "libssl")) {
 		acl::openssl_conf::set_libpath(var_cfg_libcrypto_path,
 			var_cfg_libssl_path);
@@ -180,23 +191,24 @@ void master_service::proc_on_init(void)
 		logger("OpenSSL loaded, crypto=%s, ssl=%s",
 			var_cfg_libcrypto_path, var_cfg_libssl_path);
 
-		conf_ = new acl::openssl_conf(true);
+		server_conf_ = new acl::openssl_conf(true);
+		client_conf_ = new acl::openssl_conf(false);
 	} else {
 		logger("unsupported ssl=%s", var_cfg_libssl_path);
 		return;
 	}
 
 	// 允许服务端的 SSL 会话缓存功能
-	//conf_->enable_cache(var_cfg_ssl_session_cache);
+	//server_conf_->enable_cache(var_cfg_ssl_session_cache);
 
 	// 添加本地服务的证书及服务密钥
-	if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file,
+	if (!server_conf_->add_cert(var_cfg_crt_file, var_cfg_key_file,
 			var_cfg_key_pass)) {
 
 		logger_error("add cert failed, crt: %s, key: %s",
 			var_cfg_crt_file, var_cfg_key_file);
-		delete conf_;
-		conf_ = NULL;
+		delete server_conf_;
+		server_conf_ = NULL;
 		return;
 	}
 

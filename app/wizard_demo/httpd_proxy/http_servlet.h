@@ -3,7 +3,9 @@
 class http_servlet : public acl::HttpServlet
 {
 public:
-	http_servlet(acl::socket_stream*, acl::session*, int port = 80);
+	http_servlet(acl::socket_stream*, acl::session*,
+		acl::sslbase_conf* ssl_conf, int http_port = 80,
+		int https_port = 443);
 	~http_servlet();
 
 protected:
@@ -22,7 +24,10 @@ protected:
 	bool doConnect(request_t&, response_t&);
 
 private:
-	int port_;
+	acl::sslbase_conf* ssl_conf_;
+	int http_port_;
+	int https_port_;
+
 	typedef bool (http_servlet::*handler_t)(request_t&,response_t&);
 	std::map<std::string, handler_t> handlers_;
 

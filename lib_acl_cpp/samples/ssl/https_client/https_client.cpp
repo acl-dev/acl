@@ -10,8 +10,10 @@ https_client::https_client(const char* server_addr, const char* domain,
 : server_addr_(server_addr)
 , domain_(domain)
 , keep_alive_(keep_alive)
+, accept_gzip_(true)
 , count_(count)
 , length_(length)
+, show_body_(false)
 , ssl_conf_(NULL)
 {
 	(void) length_;
@@ -21,9 +23,19 @@ https_client::~https_client()
 {
 }
 
+void https_client::set_show_body(bool yes)
+{
+	show_body_ = yes;
+}
+
 void https_client::set_ssl_conf(acl::sslbase_conf *conf)
 {
 	ssl_conf_ = conf;
+}
+
+void https_client::accept_gzip(bool yes)
+{
+	accept_gzip_ = yes;
 }
 
 bool https_client::connect_server(acl::http_client& client)
@@ -43,6 +55,7 @@ bool https_client::connect_server(acl::http_client& client)
 		logger("begin open ssl");
 
 		acl::sslbase_io* ssl = ssl_conf_->create(false);
+		ssl->set_sni_host(domain_);
 		if (client.get_stream().setup_hook(ssl) == ssl)
 		{
 			logger_error("open ssl client error");
@@ -68,7 +81,7 @@ int https_client::http_request(int count)
 
 	acl::http_header header;
 	header.set_url("/")
-		.accept_gzip(true)
+		.accept_gzip(accept_gzip_)
 		.add_entry("Accept-Languge", "zh-cn,en;q=0.5")
 		.set_host(domain_.c_str())
 		.set_keep_alive(keep_alive_);
@@ -102,11 +115,12 @@ int https_client::http_request(int count)
 			}
 			else if (ret == 0)
 				break;
-#if 1
-			buf[ret] = 0;
-			printf("[%s]\r\n", buf);
-			fflush(stdout);
-#endif
+			if (show_body_)
+			{
+				buf[ret] = 0;
+				printf("[%s]\r\n", buf);
+				fflush(stdout);
+			}
 		}
 
 		if (!keep_alive_)

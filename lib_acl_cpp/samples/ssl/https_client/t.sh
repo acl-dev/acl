@@ -14,3 +14,5 @@ else
 	echo ""
 	./https_client -f "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so" -s echo.websocket.org:443 -S
 fi
+
+# ./https_client -f "/usr/local/lib64/libcrypto.so;/usr/local/lib64/libssl.so" -s www.163.com:443 -H www.163.com -S -n 1
