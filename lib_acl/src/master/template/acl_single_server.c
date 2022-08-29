@@ -674,7 +674,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	}
 
 	stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+		O_RDWR, 8192, -1, ACL_VSTREAM_TYPE_SOCK);
 	acl_event_enable_read(__eventp, stream, 0, single_server_abort, NULL);
 
 	acl_close_on_exec(ACL_MASTER_STATUS_FD, ACL_CLOSE_ON_EXEC);

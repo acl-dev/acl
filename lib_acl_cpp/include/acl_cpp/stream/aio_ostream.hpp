@@ -206,7 +206,7 @@ public:
 	/**
 	 * 异步等待连接流可写，该函数设置异步流的写监听状态，当有可写时，
 	 * 回调函数被触发，由用户自己负责数据的读取
-	 * @param timeout {int} 写超时时间(秒)，当该值为 0 时，则没有写超时
+	 * @param timeout {int} 写超时时间(秒)，当该值为 <= 0 时，则没有写超时
 	 */
 	void writable_await(int timeout = 0);
 

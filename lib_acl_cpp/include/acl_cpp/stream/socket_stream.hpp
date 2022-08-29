@@ -67,7 +67,7 @@ public:
 	 * @param flag {unsigned} 该标志位的定义参加 server_socket.hpp
 	 * @return {bool} 绑定是否成功
 	 */
-	bool bind_udp(const char* addr, int rw_timeout = 0, unsigned flag = 0);
+	bool bind_udp(const char* addr, int rw_timeout = -1, unsigned flag = 0);
 
 	/**
 	 * 关闭套接口读操作

@@ -20,7 +20,7 @@ socket_stream::~socket_stream(void)
 bool socket_stream::open(ACL_SOCKET fd, bool udp_mode /* = false */)
 {
 	ACL_VSTREAM* conn = acl_vstream_fdopen(fd, O_RDWR,
-		8192, 0, ACL_VSTREAM_TYPE_SOCK);
+		8192, -1, ACL_VSTREAM_TYPE_SOCK);
 	acl_assert(conn);
 	return open(conn, udp_mode);
 }

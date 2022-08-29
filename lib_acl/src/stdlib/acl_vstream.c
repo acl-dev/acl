@@ -81,7 +81,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* fdp */
 		ACL_VSTREAM_FLAG_READ,          /* flag */
 		0,                              /* errnum */
-		0,                              /* rw_timeout */
+		-1,                             /* rw_timeout */
 		NULL,                           /* addr_local */
 		NULL,                           /* addr_peer */
 		NULL,                           /* sa_local */
@@ -138,7 +138,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* fdp */
 		ACL_VSTREAM_FLAG_WRITE,         /* flag */
 		0,                              /* errnum */
-		0,                              /* rw_timeout */
+		-1,                             /* rw_timeout */
 		NULL,                           /* addr_local */
 		NULL,                           /* addr_peer */
 		NULL,                           /* sa_local */
@@ -194,7 +194,7 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 		NULL,                           /* fdp */
 		ACL_VSTREAM_FLAG_WRITE,         /* flag */
 		0,                              /* errnum */
-		0,                              /* rw_timeout */
+		-1,                             /* rw_timeout */
 		NULL,                           /* addr_local */
 		NULL,                           /* addr_peer */
 		NULL,                           /* sa_local */
@@ -2200,7 +2200,7 @@ ACL_VSTREAM *acl_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
 	}
 
 	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags,
-		4096, 0, ACL_VSTREAM_TYPE_FILE);
+		4096, -1, ACL_VSTREAM_TYPE_FILE);
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -2295,10 +2295,8 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	fp->oflags           = oflags;
 	fp->omode            = 0600;
 	fp->close_handle_lnk = acl_array_create(8);
-
-	if (rw_timeout > 0) {
-		fp->rw_timeout = rw_timeout;
-	}
+	/* Fixed. when the rw_timeout <= 0, we should force to set it -1. */
+	fp->rw_timeout       = rw_timeout <= 0 ? -1 : rw_timeout;
 
 	fp->sys_getc = read_char;
 	if (fdtype == ACL_VSTREAM_TYPE_FILE) {
@@ -2497,7 +2495,7 @@ ACL_VSTREAM *acl_vstream_fopen(const char *path, unsigned int oflags,
 	}
 
 	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags, buflen,
-		0, ACL_VSTREAM_TYPE_FILE);
+		-1, ACL_VSTREAM_TYPE_FILE);
 	if (fp == NULL) {
 		return NULL;
 	}

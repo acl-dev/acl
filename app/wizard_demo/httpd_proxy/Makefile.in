@@ -8,7 +8,7 @@ CFLAGS = -c -g -W \
 -Wpointer-arith \
 -Werror \
 -Wshadow \
--O3 \
+-O0 \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO

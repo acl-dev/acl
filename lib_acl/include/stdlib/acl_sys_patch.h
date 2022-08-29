@@ -92,7 +92,8 @@ ACL_API int acl_socket_shutdown(ACL_SOCKET fd, int how);
  * @param fd {ACL_SOCKET} 网络套接字
  * @param buf {void*} 内存缓冲区地址
  * @param size {size_t} buf 缓冲区大小
- * @param timeout {size_t} 读超时时间(秒)
+ * @param timeout {int} 读写超时时间(默认以秒为单位, 当ACL_VSTREAM_IS_MS() 时
+ *  则单位为毫秒), 当该值 >= 0 时, 则会启用读写超时检测机制, < 0 则不检测.
  * @param fp {ACL_VSTREAM*} 网络流, 可以为空
  * @param arg {void*} 用户自已的参数，在回调方式时有用
  * @return {int} 0: OK; -1: error
@@ -105,7 +106,8 @@ ACL_API int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
  * @param fd {ACL_SOCKET} 网络套接字
  * @param buf {void*} 数据地址
  * @param size {size_t} buf 数据大小
- * @param timeout {int} 写超时时间(秒)
+ * @param timeout {int} 读写超时时间(默认以秒为单位, 当ACL_VSTREAM_IS_MS() 时
+ *  则单位为毫秒), 当该值 >= 0 时, 则会启用读写超时检测机制, < 0 则不检测.
  * @param fp {ACL_VSTREAM*} 网络流, 可以为空
  * @param arg {void*} 用户自已的参数，在回调方式时有用
  * @return {int} 0: OK; -1: error
@@ -118,7 +120,8 @@ ACL_API int acl_socket_write(ACL_SOCKET fd, const void *buf,
  * @param fd {ACL_SOCKET} 网络套接字
  * @param vec {const struct iovec*} 数据数组地址
  * @param count {int} vec 数组长度
- * @param timeout {int} 写超时时间(秒)
+ * @param timeout {int} 读写超时时间(默认以秒为单位, 当ACL_VSTREAM_IS_MS() 时
+ *  则单位为毫秒), 当该值 >= 0 时, 则会启用读写超时检测机制, < 0 则不检测.
  * @param fp {ACL_VSTREAM*} 网络流, 可以为空
  * @param arg {void*} 用户自已的参数，在回调方式时有用
  * @return {int} 0: OK; -1: error
@@ -164,7 +167,7 @@ ACL_API acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence);
  * @param fh {ACL_FILE_HANDLE} 文件句柄
  * @param buf {void*} 存储缓冲区
  * @param size {size_t} buf 缓冲区大小
- * @param timeout {int} 读超时时间(秒)
+ * @param timeout {int} 该参数将被忽略
  * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 读到的实际数据, 如果返回 ACL_VSTREAM_EOF 表示读结束或出错
@@ -177,7 +180,7 @@ ACL_API int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
  * @param fh {ACL_FILE_HANDLE} 文件句柄
  * @param buf {void*} 数据存储缓冲区
  * @param size {size_t} buf 缓冲区中数据长度大小
- * @param timeout {int} 写超时时间(秒)
+ * @param timeout {int} 该参数将被忽略
  * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 成功写的数据量, 如果返回 ACL_VSTREAM_EOF 表示写出错
@@ -190,7 +193,7 @@ ACL_API int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
  * @param fh {ACL_FILE_HANDLE} 文件句柄
  * @param vec {const struct iovec*} 数据存储数组
  * @param count {int} vec 数组中元素个数
- * @param timeout {int} 写超时时间(秒)
+ * @param timeout {int} 该参数将被忽略
  * @param fp {ACL_VSTREAM*} 对应的文件流句柄, 可以为空
  * @param arg {void*} 用户传递的参数, 以回调方式使用时此参数有效
  * @return {int} 成功写的数据量, 如果返回 ACL_VSTREAM_EOF 表示写出错

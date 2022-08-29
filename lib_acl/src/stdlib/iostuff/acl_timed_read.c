@@ -38,17 +38,18 @@ int acl_timed_read(ACL_SOCKET fd, void *buf, unsigned len,
 	 * returns success.
 	 */
 	for (;;) {
-		if (timeout > 0 && acl_read_wait(fd, timeout) < 0)
+		if (timeout > 0 && acl_read_wait(fd, timeout) < 0) {
 			return -1;
-		ret = acl_socket_read(fd, buf, len, 0, NULL, NULL);
-		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN)
-		{
+		}
+		ret = acl_socket_read(fd, buf, len, -1, NULL, NULL);
+		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN) {
 			acl_msg_warn("read() returns EAGAIN on"
 				" a readable file descriptor!");
 			acl_msg_warn("pausing to avoid going into"
 				" a tight select/read loop!");
 			sleep(1);
-		} else
+		} else {
 			return ret;
+		}
 	}
 }

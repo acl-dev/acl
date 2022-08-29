@@ -921,7 +921,7 @@ static void main_thread_loop(void)
 #ifdef ACL_UNIX
 	if (__daemon_mode) {
 		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
-			ACL_MASTER_STATUS_FD, O_RDWR, 8192, 0,
+			ACL_MASTER_STATUS_FD, O_RDWR, 8192, -1,
 			ACL_VSTREAM_TYPE_SOCK);
 
 		acl_event_enable_read(__main_event, stat_stream, 0,

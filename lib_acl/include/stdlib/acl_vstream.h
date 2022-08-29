@@ -259,13 +259,14 @@ ACL_API ACL_VSTREAM *acl_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
  *  O_TRUNC: 0x0200, O_EXCL: 0x0400; just for win32, O_TEXT: 0x4000,
  *  O_BINARY: 0x8000, O_RAW: O_BINARY, O_SEQUENTIAL: 0x0020, O_RANDOM: 0x0010.
  * @param buflen {size_t} 内置缓冲区的大小
- * @param rw_timeo {int} 读写超时时间(以秒为单位)
+ * @param rw_timeout {int} 读写超时时间(默认以秒为单位, 当ACL_VSTREAM_IS_MS() 时
+ *  则单位为毫秒), 当该值 >= 0 时, 则会启用读写超时检测机制, < 0 则不检测.
  * @param fdtype {int} ACL_VSTREAM_TYPE_FILE, ACL_VSTREAM_TYPE_SOCK,
  *  ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET | ACL_VSTREAM_TYPE_LISTEN_UNIX
  * @return ret {ACL_VSTREAM*}, ret == NULL: 出错, ret != NULL: OK
  */
 ACL_API ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
-		size_t buflen, int rw_timeo, int fdtype);
+		size_t buflen, int rw_timeout, int fdtype);
 
 /**
  * 打开一个文件的数据流

@@ -347,7 +347,7 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 	char  buf[8192];
 	int   ret, n = 0;
 
-	stat_stream->rw_timeout = 0;
+	stat_stream->rw_timeout = -1;
 	ret = acl_vstream_read(stat_stream, buf, sizeof(buf));
 	acl_msg_info("%s(%d), %s: disconnect(%d) from acl_master, clients %lld",
 		__FILE__, __LINE__, __FUNCTION__, ret,
@@ -640,7 +640,7 @@ static void main_thread_loop(void)
 #if !defined(_WIN32) && !defined(_WIN64)
 	if (__daemon_mode) {
 		ACL_VSTREAM *stat_stream = acl_vstream_fdopen(
-				ACL_MASTER_STATUS_FD, O_RDWR, 8192, 0,
+				ACL_MASTER_STATUS_FD, O_RDWR, 8192, -1,
 				ACL_VSTREAM_TYPE_SOCK);
 
 		acl_fiber_create(main_fiber_monitor_master,

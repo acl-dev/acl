@@ -262,7 +262,7 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 			acl_msg_warn("close: %s", acl_last_serror());
 		}
 		fp = acl_vstream_fdopen(sockfd[1], flags,
-			4096, 0, ACL_VSTREAM_TYPE_SOCK);
+			4096, -1, ACL_VSTREAM_TYPE_SOCK);
 		/*
 		 * fp->waitpid_fn = args.waitpid_fn;
 		 */

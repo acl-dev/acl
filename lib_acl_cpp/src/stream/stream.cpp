@@ -146,7 +146,7 @@ void stream::open_stream(bool is_file /* = false */)
 	if (stream_ != NULL) {
 		return;
 	}
-	stream_ = acl_vstream_fdopen(ACL_SOCKET_INVALID, O_RDWR, 8192, 0,
+	stream_ = acl_vstream_fdopen(ACL_SOCKET_INVALID, O_RDWR, 8192, -1,
 		is_file ? ACL_VSTREAM_TYPE_FILE : ACL_VSTREAM_TYPE_SOCK);
 }
 

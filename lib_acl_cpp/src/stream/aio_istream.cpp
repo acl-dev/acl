@@ -40,7 +40,7 @@ aio_istream::aio_istream(aio_handle* handle, ACL_SOCKET fd)
 {
 	acl_assert(handle);
 
-	ACL_VSTREAM* vstream = acl_vstream_fdopen(fd, O_RDWR, 8192, 0,
+	ACL_VSTREAM* vstream = acl_vstream_fdopen(fd, O_RDWR, 8192, -1,
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 

@@ -88,7 +88,7 @@ ICMP_STREAM* icmp_stream_open(ACL_AIO* aio)
 	if (fd == ACL_SOCKET_INVALID)
 		acl_msg_fatal("%s(%d): socket create error", myname, __LINE__);
 
-	is->vstream = acl_vstream_fdopen(fd, O_RDWR, 1024, 0,
+	is->vstream = acl_vstream_fdopen(fd, O_RDWR, 1024, -1,
 			ACL_VSTREAM_TYPE_SOCK);
 
 	acl_vstream_ctl(is->vstream, ACL_VSTREAM_CTL_READ_FN, icmp_read,
@@ -109,7 +109,7 @@ void icmp_stream_reopen(ACL_AIO* aio, ICMP_STREAM* is)
 		ACL_SOCKET_INVALID; /* ·ÀÖ¹Ô­SOCKET±»¹Ø±Õ:) */
 
 	is->vstream = acl_vstream_fdopen(
-		fd, O_RDWR, 1024, 0, ACL_VSTREAM_TYPE_SOCK);
+		fd, O_RDWR, 1024, -1, ACL_VSTREAM_TYPE_SOCK);
 	acl_vstream_ctl(is->vstream, ACL_VSTREAM_CTL_READ_FN, icmp_read,
 		ACL_VSTREAM_CTL_WRITE_FN, icmp_write, ACL_VSTREAM_CTL_CONTEXT,
 		is, ACL_VSTREAM_CTL_END);

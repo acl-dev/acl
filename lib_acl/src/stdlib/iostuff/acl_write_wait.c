@@ -63,7 +63,11 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 				acl_last_serror(), (int) fd);
 			return -1;
 		case 0:
-			acl_set_error(ACL_ETIMEDOUT);
+			if (timeout == 0) {
+				acl_set_error(ACL_EAGAIN);
+			} else {
+				acl_set_error(ACL_ETIMEDOUT);
+			}
 			acl_msg_error("%s(%d), %s: poll return 0, delay=%d",
 				__FILE__, __LINE__, myname, delay);
 			return -1;
@@ -167,7 +171,11 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 				acl_last_serror(), (int) fd);
 			return -1;
 		case 0:
-			acl_set_error(ACL_ETIMEDOUT);
+			if (timeout == 0) {
+				acl_set_error(ACL_EAGAIN);
+			} else {
+				acl_set_error(ACL_ETIMEDOUT);
+			}
 			return -1;
 		default:
 			return 0;

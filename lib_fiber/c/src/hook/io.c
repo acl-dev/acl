@@ -617,6 +617,12 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 			return -1;
 		}
 
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error",
+				__FUNCTION__, __LINE__, fd);
+			return -1;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
@@ -664,6 +670,12 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) fd);
 			fiber_file_free(fe);
+			return -1;
+		}
+
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error",
+				__FUNCTION__, __LINE__, fd);
 			return -1;
 		}
 
@@ -728,6 +740,12 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 			return -1;
 		}
 
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error",
+				__FUNCTION__, __LINE__, sockfd);
+			return -1;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
@@ -789,6 +807,12 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 			return -1;
 		}
 
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error",
+				__FUNCTION__, __LINE__, sockfd);
+			return -1;
+		}
+
 		if (acl_fiber_canceled(fe->fiber_w)) {
 			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
@@ -837,6 +861,12 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
 				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
 			fiber_file_free(fe);
+			return -1;
+		}
+
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error",
+				__FUNCTION__, __LINE__, sockfd);
 			return -1;
 		}
 
@@ -952,6 +982,12 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 			msg_info("%s(%d): fd=%d being closing",
 				__FUNCTION__, __LINE__, (int) out_fd);
 			return 0;
+		}
+
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error",
+				__FUNCTION__, __LINE__, out_fd);
+			return -1;
 		}
 
 		if (acl_fiber_canceled(fe->fiber_w)) {

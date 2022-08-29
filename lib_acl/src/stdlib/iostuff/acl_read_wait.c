@@ -148,13 +148,14 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 		}
 	}
 
-	ee.events = EPOLLIN;
+	ee.events   = EPOLLIN;
 	ee.data.u64 = 0;
-	ee.data.fd = fd;
+	ee.data.fd  = fd;
 
 	while (1) {
-		if (epoll_ctl(epoll_ctx->epfd, EPOLL_CTL_ADD, fd, &ee) == 0)
+		if (epoll_ctl(epoll_ctx->epfd, EPOLL_CTL_ADD, fd, &ee) == 0) {
 			break;
+		}
 
 		ret = acl_last_error();
 
@@ -166,8 +167,9 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 			if (retried) {
 				return -1;
 			}
-			if (thread_epoll_reopen(epoll_ctx) == -1)
+			if (thread_epoll_reopen(epoll_ctx) == -1) {
 				return -1;
+			}
 			retried = 1;
 			continue;
 		}
@@ -225,7 +227,11 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 				myname, acl_last_serror(), fd, delay,
 				(long) (time(NULL) - begin));
 			*/
-			acl_set_error(ACL_ETIMEDOUT);
+			if (delay == 0) {
+				acl_set_error(ACL_EAGAIN);
+			} else {
+				acl_set_error(ACL_ETIMEDOUT);
+			}
 			ret = -1;
 			break;
 		} else if ((events[0].events & EPOLLIN) != 0) {
@@ -344,12 +350,16 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 				myname, acl_last_serror(), fd, delay,
 				(long) (time(NULL) - begin));
 			*/
-			if (left == 0) {
-				acl_set_error(ACL_ETIMEDOUT);
-				return -1;
-			} else {
+			if (left > 0) {
 				break;
 			}
+
+			if (delay == 0) {
+				acl_set_error(ACL_EAGAIN);
+			} else {
+				acl_set_error(ACL_ETIMEDOUT);
+			}
+			return -1;
 		default:
 			if ((fds.revents & POLLIN)) {
 				return 0;
@@ -526,7 +536,11 @@ int acl_read_select_wait(ACL_SOCKET fd, int delay)
 				myname, acl_last_serror(), fd, timeout,
 				(long) (time(NULL) - begin));
 			*/
-			acl_set_error(ACL_ETIMEDOUT);
+			if (delay == 0) {
+				acl_set_error(ACL_EAGAIN);
+			} else {
+				acl_set_error(ACL_ETIMEDOUT);
+			}
 			return -1;
 		default:
 			return 0;

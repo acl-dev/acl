@@ -608,7 +608,7 @@ static void server_wakeup(ACL_AIO *aio, int fd)
 		ACL_ASTREAM *as;
 
 		vs = acl_vstream_fdopen(fd, O_RDWR, acl_var_aio_buf_size,
-			0, ACL_VSTREAM_TYPE_SOCK);
+			-1, ACL_VSTREAM_TYPE_SOCK);
 		acl_vstream_set_peer(vs, addr);
 		acl_getsockname(fd, addr, sizeof(addr));
 		acl_vstream_set_local(vs, addr);
@@ -1218,7 +1218,7 @@ static ACL_ASTREAM **create_listener(ACL_AIO *aio, int event_mode acl_unused,
 static void setup_ipc(ACL_AIO *aio)
 {
 	ACL_VSTREAM *stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-			O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+			O_RDWR, 8192, -1, ACL_VSTREAM_TYPE_SOCK);
 	ACL_ASTREAM *stat_astream = acl_aio_open(aio, stream);
 
 	acl_aio_ctl(stat_astream,

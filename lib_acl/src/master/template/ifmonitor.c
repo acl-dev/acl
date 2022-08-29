@@ -100,7 +100,7 @@ static ACL_VSTREAM *netlink_open(void)
 		return NULL;
 	}
 
-	stream = acl_vstream_fdopen(fd, O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+	stream = acl_vstream_fdopen(fd, O_RDWR, 8192, -1, ACL_VSTREAM_TYPE_SOCK);
 	return stream;
 }
 

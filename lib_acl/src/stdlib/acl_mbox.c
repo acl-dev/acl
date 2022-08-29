@@ -132,7 +132,7 @@ int acl_mbox_send(ACL_MBOX *mbox, void *msg)
 
 	mbox->nsend++;
 
-	ret = acl_socket_write(mbox->out, &n, sizeof(n), 0, NULL, NULL);
+	ret = acl_socket_write(mbox->out, &n, sizeof(n), -1, NULL, NULL);
 #if !defined(HAS_EVENTFD)
 	if (lock) {
 		acl_pthread_mutex_unlock(lock);
@@ -183,7 +183,7 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 		return NULL;
 	}
 
-	ret = acl_socket_read(mbox->in, &n, sizeof(n), 0, NULL, NULL);
+	ret = acl_socket_read(mbox->in, &n, sizeof(n), -1, NULL, NULL);
 	if (ret == -1) {
 		if (success) {
 			*success = 0;

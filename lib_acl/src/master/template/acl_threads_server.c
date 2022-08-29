@@ -1189,7 +1189,7 @@ static void server_status_init(ACL_EVENT *event, acl_pthread_pool_t *threads)
 	ACL_VSTREAM *stat_stream;
 
 	stat_stream = acl_vstream_fdopen(ACL_MASTER_STATUS_FD,
-		O_RDWR, 8192, 0, ACL_VSTREAM_TYPE_SOCK);
+		O_RDWR, 8192, -1, ACL_VSTREAM_TYPE_SOCK);
 
 	acl_event_enable_read(event, stat_stream, 0, server_abort, threads);
 

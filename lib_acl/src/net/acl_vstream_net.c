@@ -275,7 +275,7 @@ static int udp_read(ACL_SOCKET fd, void *buf, size_t size,
 
 	if (stream->read_ready) {
 		stream->read_ready = 0;
-	} else if (stream->rw_timeout > 0
+	} else if (stream->rw_timeout >= 0
 		&& acl_read_wait(fd, stream->rw_timeout) < 0) {
 		return -1;
 	}
@@ -334,7 +334,7 @@ ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned flag)
 		return NULL;
 	}
 
-	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, 0, ACL_VSTREAM_TYPE_SOCK);
+	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, -1, ACL_VSTREAM_TYPE_SOCK);
 	stream->rw_timeout = rw_timeout;
 
 	/* 设置本地绑定地址 */

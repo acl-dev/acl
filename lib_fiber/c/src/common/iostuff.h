@@ -55,11 +55,11 @@ int open_limit(int limit);
  */
 int issock(int fd);
 
-//int read_wait(int fd, int timeout);
 void tcp_nodelay(socket_t fd, int onoff);
 
 // in read_wait.c
 int read_wait(socket_t fd, int delay);
+int socket_alive(socket_t fd);
 
 /**
  * ´´½¨ socket ¶Ô

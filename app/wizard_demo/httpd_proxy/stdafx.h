@@ -61,3 +61,9 @@ typedef acl::HttpServletResponse response_t;
 # define logger_debug(section, level, fmt, args...)  \
 	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 #endif // !_WIN32 && !_WIN64
+
+#define	DEBUG_MIN	100
+#define DEBUG_CONN	(DEBUG_MIN + 1)
+#define	DEBUG_SSL	(DEBUG_MIN + 2)
+#define DEBUG_REQ	(DEBUG_MIN + 3)
+#define DEBUG_RES	(DEBUG_MIN + 4)

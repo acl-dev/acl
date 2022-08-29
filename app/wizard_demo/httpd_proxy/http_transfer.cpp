@@ -28,12 +28,11 @@ void http_transfer::wait(bool* keep_alive) {
 
 static int nwait = 0;
 void http_transfer::run(void) {
+	nwait++;
 	bool* res = new bool;
 	switch (method_) {
 	case acl::HTTP_METHOD_GET:
-		nwait++;
 		*res = transfer_get();
-		nwait--;
 		break;
 	case acl::HTTP_METHOD_POST:
 		*res = transfer_post();
@@ -44,6 +43,7 @@ void http_transfer::run(void) {
 		break;
 	}
 
+	nwait--;
 	printf(">>>>nwait=%d\n", nwait);
 	box_->push(res);
 }
@@ -146,7 +146,7 @@ bool http_transfer::transfer_request_head(acl::socket_stream& conn) {
 		return false;
 	}
 
-	printf(">>>send head: [%s]\r\n", header.c_str());
+	logger_debug(DEBUG_REQ, 2, ">>>send head: [%s]", header.c_str());
 	return true;
 }
 
@@ -228,11 +228,11 @@ bool http_transfer::transfer_response(void) {
 
 	header += "\r\n";
 
-	printf("response head:\r\n[%s]\r\n", header.c_str());
+	logger_debug(DEBUG_RES, 2, "response head:\r\n[%s]", header.c_str());
 
 	acl::ostream* out = &res_.getOutputStream();
 	if (out->write(header) == -1) {
-		logger_error("send response head error");
+		logger_error("send response head error=%s", acl::last_serror());
 		return false;
 	}
 
@@ -256,19 +256,24 @@ bool http_transfer::transfer_response(void) {
 			break;
 		} else if (!chunked) {
 			if (out->write(buf, ret) == -1) {
-				logger_error("send response body error");
+				logger_error("send response body error=%s, rfd=%d, wfd=%d",
+					acl::last_serror(), client_->get_stream().sock_handle(),
+					res_client_->get_stream().sock_handle());
 				return false;
 			}
 		} else if (!res_client_->write_chunk(*out, buf, ret)) {
-			logger_error("send response body error, chunked=%s",
-				chunked ? "yes" : "no");
+			logger_error("reply chunk body error=%s, rfd=%d, wfd=%d",
+				acl::last_serror(), client_->get_stream().sock_handle(),
+				res_client_->get_stream().sock_handle());
 			return false;
 		}
 	}
 
 	if (chunked) {
 		if (!res_client_->write_chunk_trailer(*out)) {
-			logger_error("write chunked trailer error");
+			logger_error("write chunked trailer error=%s, rfd=%d, wfd=%d",
+				acl::last_serror(), client_->get_stream().sock_handle(),
+				res_client_->get_stream().sock_handle());
 			return false;
 		}
 	}

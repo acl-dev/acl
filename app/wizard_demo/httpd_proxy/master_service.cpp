@@ -68,7 +68,7 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 	// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 	// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
 
-	logger("begin setup ssl hook...");
+	logger_debug(DEBUG_SSL, 2, "begin setup ssl hook...");
 
 	// 采用阻塞 SSL 握手方式
 	acl::sslbase_io* ssl = server_conf.create(false);
@@ -90,13 +90,14 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 		return NULL;
 	}
 
-	logger("handshake_ok");
+	logger_debug(DEBUG_SSL, 2, "handshake_ok");
 	return ssl;
 }
 
 void master_service::on_accept(acl::socket_stream& conn)
 {
-	logger("connect from %s, fd %d", conn.get_peer(), conn.sock_handle());
+	logger_debug(DEBUG_CONN, 2, "connect from %s, fd %d",
+		conn.get_peer(), conn.sock_handle());
 
 	const char* local = conn.get_local(true);
 	if (local == NULL || *local == 0) {
@@ -113,8 +114,8 @@ void master_service::on_accept(acl::socket_stream& conn)
 		}
 		use_ssl = true;
 	} else {
-		printf("local=%s, https=%s, server_conf_=%p\n",
-			local, var_cfg_https_port, server_conf_);
+		//printf("local=%s, https=%s, server_conf_=%p\n",
+		//	local, var_cfg_https_port, server_conf_);
 	}
 
 	conn.set_rw_timeout(5);
@@ -129,7 +130,9 @@ void master_service::on_accept(acl::socket_stream& conn)
 
 	while(servlet->doRun()) {}
 
-	logger("disconnect from %s, fd %d", conn.get_peer(), conn.sock_handle());
+	logger_debug(DEBUG_CONN, 2, "disconnect from %s, fd %d",
+		conn.get_peer(), conn.sock_handle());
+
 	delete session;
 	delete servlet;
 }

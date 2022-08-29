@@ -47,7 +47,7 @@ int acl_timed_write(ACL_SOCKET fd, void *buf, unsigned len,
 		if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
 			return -1;
 		}
-		ret = acl_socket_write(fd, buf, len, 0, NULL, NULL);
+		ret = acl_socket_write(fd, buf, len, -1, NULL, NULL);
 		if (ret < 0 && timeout > 0 && acl_last_error() == ACL_EAGAIN) {
 			acl_msg_warn("write() returns EAGAIN on"
 				" a writable file descriptor!");

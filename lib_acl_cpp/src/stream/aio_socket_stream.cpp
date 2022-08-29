@@ -43,7 +43,7 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 
 	status_ |= STATUS_CONN_OPENED;
 
-	ACL_VSTREAM* vstream = acl_vstream_fdopen(fd, O_RDWR, 8192, 0,
+	ACL_VSTREAM* vstream = acl_vstream_fdopen(fd, O_RDWR, 8192, -1,
 					ACL_VSTREAM_TYPE_SOCK);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
