@@ -106,6 +106,10 @@ static ssl_ctx_check_pkey_fn __ssl_ctx_check_pkey;
 typedef void (*ssl_ctx_set_def_pass_fn)(SSL_CTX*, void*);
 static ssl_ctx_set_def_pass_fn __ssl_ctx_set_def_pass;
 
+#  define SSL_CTX_SET_TIMEOUT		"SSL_CTX_set_timeout"
+typedef long (*ssl_ctx_set_timeout_fn)(SSL_CTX*, long);
+static ssl_ctx_set_timeout_fn __ssl_ctx_set_timeout;
+
 static acl_pthread_once_t __openssl_once = ACL_PTHREAD_ONCE_INIT;
 static acl::string* __crypto_path_buf = NULL;
 static acl::string* __ssl_path_buf    = NULL;
@@ -186,6 +190,7 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_CTX_USE_PKEY_FILE, ssl_ctx_use_pkey_fn, __ssl_ctx_use_pkey);
 	LOAD_SSL(SSL_CTX_CHECK_PKEY, ssl_ctx_check_pkey_fn, __ssl_ctx_check_pkey);
 	LOAD_SSL(SSL_CTX_SET_DEF_PASS, ssl_ctx_set_def_pass_fn, __ssl_ctx_set_def_pass);
+	LOAD_SSL(SSL_CTX_SET_TIMEOUT, ssl_ctx_set_timeout_fn, __ssl_ctx_set_timeout);
 	return true;
 }
 
@@ -275,6 +280,7 @@ static void openssl_dll_load(void)
 #  define __ssl_ctx_use_pkey		SSL_CTX_use_PrivateKey_file
 #  define __ssl_ctx_check_pkey		SSL_CTX_check_private_key
 #  define __ssl_ctx_set_def_pass	SSL_CTX_set_default_passwd_cb_userdata
+#  define __ssl_ctx_set_timeout		SSL_CTX_set_timeout
 # endif // !HAS_OPENSSL_DLL
 
 #endif  // HAS_OPENSSL
@@ -337,6 +343,10 @@ bool openssl_conf::init_once(void)
 
 	ssl_ctx_ = (void*) __ssl_ctx_new(__sslv23_method());
 
+	if (timeout_ > 0) {
+		__ssl_ctx_set_timeout((SSL_CTX*) ssl_ctx_, timeout_);
+	}
+
 # if OPENSSL_VERSION_NUMBER >= 0x10100003L
 	if (__ssl_init(OPENSSL_INIT_LOAD_CONFIG, NULL) == 0) {
 		logger_error("OPENSSL_init_ssl error");
@@ -373,9 +383,10 @@ bool openssl_conf::init_once(void)
 #endif // HAS_OPENSSL
 }
 
-openssl_conf::openssl_conf(bool server_side /* false */)
+openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 : server_side_(server_side)
 , ssl_ctx_(NULL)
+, timeout_(timeout)
 , init_status_(CONF_INIT_NIL)
 {
 }

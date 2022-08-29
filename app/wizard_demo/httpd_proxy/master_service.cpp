@@ -196,8 +196,8 @@ void master_service::proc_on_init(void)
 		logger("OpenSSL loaded, crypto=%s, ssl=%s",
 			var_cfg_libcrypto_path, var_cfg_libssl_path);
 
-		server_conf_ = new acl::openssl_conf(true);
-		client_conf_ = new acl::openssl_conf(false);
+		server_conf_ = new acl::openssl_conf(true, 5);
+		client_conf_ = new acl::openssl_conf(false, 5);
 	} else {
 		logger("unsupported ssl=%s", var_cfg_libssl_path);
 		return;

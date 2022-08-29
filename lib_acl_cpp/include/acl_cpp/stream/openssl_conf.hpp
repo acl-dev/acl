@@ -11,7 +11,7 @@ class openssl_io;
 
 class ACL_CPP_API openssl_conf : public sslbase_conf {
 public:
-	openssl_conf(bool server_side = false);
+	openssl_conf(bool server_side = false, int timeout = 30);
 	~openssl_conf(void);
 
 	/**
@@ -78,6 +78,7 @@ private:
 
 	bool   server_side_;
 	void*  ssl_ctx_;
+	int    timeout_;
 	string crt_file_;
 	unsigned init_status_;
 	thread_mutex lock_;

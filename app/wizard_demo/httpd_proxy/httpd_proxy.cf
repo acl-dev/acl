@@ -131,13 +131,13 @@ service httpd_proxy
 #	loop_read = 1
 
 #	启用MbedTLS时加载的动态库
-	libcrypto_path = ./libmbedtls_all.so
-	libx509_path = ./libmbedtls_all.so
-	libssl_path = ./libmbedtls_all.so
+#	libcrypto_path = ./libmbedtls_all.so
+#	libx509_path = ./libmbedtls_all.so
+#	libssl_path = ./libmbedtls_all.so
 
 #	启用OpenSSL时加载的动态库
-#	libcrypto_path = /usr/local/lib64/libcrypto.so
-#	libssl_path = /usr/local/lib64/libssl.so
+	libcrypto_path = /usr/local/lib64/libcrypto.so
+	libssl_path = /usr/local/lib64/libssl.so
 
 #	加载的证书及证书私钥
 #	crt_file = ./ssl_crt.pem

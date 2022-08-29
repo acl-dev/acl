@@ -43,10 +43,13 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 	const char *myname = "acl_write_wait";
 	struct pollfd fds;
 	int delay = timeout;
+	time_t begin, end;
 
 	fds.events = POLLOUT;
 	fds.revents = 0;
 	fds.fd = fd;
+
+	begin = time(NULL);
 
 	for (;;) {
 		switch (__sys_poll(&fds, 1, delay)) {
@@ -68,8 +71,10 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 			} else {
 				acl_set_error(ACL_ETIMEDOUT);
 			}
-			acl_msg_error("%s(%d), %s: poll return 0, delay=%d",
-				__FILE__, __LINE__, myname, delay);
+			end = time(NULL);
+			acl_msg_error("%s(%d), %s: poll return 0, delay=%d, "
+				"fd=%d, cost=%ld", __FILE__, __LINE__,
+				myname, delay, fd, end - begin);
 			return -1;
 		default:
 			if (fds.revents & POLLNVAL) {
