@@ -155,13 +155,22 @@ static void openssl_dll_unload(void)
 }
 #  endif
 
-#  define LOAD_SSL(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));		\
-	if ((fn) == NULL) {						\
-		logger_error("dlsym %s error %s, lib=%s",		\
-			name, acl_dlerror(), __ssl_path);		\
-		return false;						\
-	}								\
+#  define LOAD_SSL(name, type, fn) do {                     \
+    (fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));     \
+    if ((fn) == NULL) {                                     \
+        logger_error("dlsym %s error %s, lib=%s",           \
+            name, acl_dlerror(), __ssl_path);               \
+        return false;                                       \
+    }                                                       \
+} while (0)
+
+#  define LOAD_CRYPTO(name, type, fn) do {                  \
+    (fn) = (type) acl_dlsym(__openssl_crypto_dll, (name));  \
+    if ((fn) == NULL) {                                     \
+        logger_error("dlsym %s error %s, lib=%s",           \
+            name, acl_dlerror(), __ssl_path);               \
+        return false;                                       \
+    }                                                       \
 } while (0)
 
 static bool load_from_ssl(void)
@@ -183,7 +192,11 @@ static bool load_from_ssl(void)
 #   endif
 #  endif
 
+#  if defined(_WIN32) || defined(_WIN64)
+	LOAD_CRYPTO(SSL_CLEAR_ERROR, ssl_clear_error_fn, __ssl_clear_error);
+#else
 	LOAD_SSL(SSL_CLEAR_ERROR, ssl_clear_error_fn, __ssl_clear_error);
+#endif
 	LOAD_SSL(SSLV23_METHOD, sslv23_method_fn, __sslv23_method);
 	LOAD_SSL(SSL_CTX_NEW, ssl_ctx_new_fn, __ssl_ctx_new);
 	LOAD_SSL(SSL_CTX_FREE, ssl_ctx_free_fn, __ssl_ctx_free);

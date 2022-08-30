@@ -86,15 +86,24 @@ typedef int (*ssl_write_fn)(SSL*, const void*, int);
 static ssl_write_fn __ssl_write;
 
 extern ACL_DLL_HANDLE __openssl_ssl_dll;  // defined in openssl_conf.cpp
+extern ACL_DLL_HANDLE __openssl_crypto_dll;  // defined in openssl_conf.cpp
 
 bool openssl_load_io(void)
 {
-#define LOAD(name, type, fn) do {					\
-	(fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));		\
-	if ((fn) == NULL) {						\
-		logger_error("dlsym %s error %s", name, acl_dlerror());	\
-		return false;						\
-	}								\
+#define LOAD(name, type, fn) do {                               \
+    (fn) = (type) acl_dlsym(__openssl_ssl_dll, (name));         \
+    if ((fn) == NULL) {                                         \
+        logger_error("dlsym %s error %s", name, acl_dlerror()); \
+        return false;                                           \
+    }                                                           \
+} while (0)
+
+#define LOAD_CRYPTO(name, type, fn) do {                        \
+    (fn) = (type) acl_dlsym(__openssl_crypto_dll, (name));      \
+    if ((fn) == NULL) {                                         \
+        logger_error("dlsym %s error %s", name, acl_dlerror()); \
+        return false;                                           \
+    }                                                           \
 } while (0)
 
 	acl_assert(__openssl_ssl_dll);
@@ -107,7 +116,11 @@ bool openssl_load_io(void)
 	LOAD(SSL_SET_CONNECT_STATE, ssl_set_connect_state_fn, __ssl_set_connect_state);
 	LOAD(SSL_DO_HANDSHAKE, ssl_do_handshake_fn, __ssl_do_handshake);
 	LOAD(SSL_GET_ERROR, ssl_get_error_fn, __ssl_get_error);
+#if defined(_WIN32) || defined(_WIN64)
+	LOAD_CRYPTO(ERR_PEEK_ERROR, err_peek_error_fn, __err_peek_error);
+#else
 	LOAD(ERR_PEEK_ERROR, err_peek_error_fn, __err_peek_error);
+#endif
 	LOAD(SSL_IN_INIT, ssl_in_init_fn, __ssl_in_init);
 	LOAD(SSL_GET_SHUTDOWN, ssl_get_shutdown_fn, __ssl_get_shutdown);
 	LOAD(SSL_SET_QUIET_SHUTDOWN, ssl_set_quiet_shutdown_fn, __ssl_set_quiet_shutdown);
