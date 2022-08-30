@@ -124,9 +124,9 @@ int main(int argc, char *argv[])
 #endif
 
 	if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
-		// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
+		// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
 		acl::log::stdout_open(true);
-		// ç¦æ­¢ç”Ÿæˆ acl_master.log æ—¥å¿—
+		// ½ûÖ¹Éú³É acl_master.log ÈÕÖ¾
 		acl::master_log_enable(false);
 
 		const char* addr = "|8888";
