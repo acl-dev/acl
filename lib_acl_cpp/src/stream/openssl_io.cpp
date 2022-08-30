@@ -293,8 +293,18 @@ int openssl_io::read(void* buf, size_t len)
 #ifdef HAS_OPENSSL
 	size_t nbytes = 0;
 	char*  ptr = (char*) buf;
+	int timeout = nblock_ ? 0 : this->stream_->rw_timeout;
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 
 	while (len > 0) {
+		time_t begin = time(NULL);
+		if (acl_read_wait(fd, timeout) < 0) {
+			time_t end = time(NULL);
+			logger_error("acl_read_wait error=%s, fd=%d, cost=%ld",
+				last_serror(), (int) fd, (long) (end - begin));
+			return -1;
+		}
+
 		int ret = __ssl_read((SSL*) ssl_, ptr, len);
 		if (ret > 0) {
 			nbytes += ret;
@@ -348,8 +358,18 @@ int openssl_io::send(const void* buf, size_t len)
 #ifdef HAS_OPENSSL
 	size_t nbytes = 0;
 	char*  ptr = (char*) buf;
+	int timeout = nblock_ ? 0 : this->stream_->rw_timeout;
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 
 	while (len > 0) {
+		time_t begin = time(NULL);
+		if (acl_write_wait(fd, timeout) < 0) {
+			time_t end = time(NULL);
+			logger_error("acl_write_wait error=%s, fd=%d, cost=%ld",
+				last_serror(), (int) fd, (long) (end - begin));
+			return -1;
+		}
+
 		int ret = __ssl_write((SSL*) ssl_, ptr, len);
 		if (ret > 0) {
 			nbytes += ret;

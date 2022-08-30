@@ -78,7 +78,7 @@ static ssl_ctx_new_fn __ssl_ctx_new;
 typedef void (*ssl_ctx_free_fn)(SSL_CTX*);
 static ssl_ctx_free_fn __ssl_ctx_free;
 
-#  define SSL_CTX_SET_VERIFY_DEPTH		"SSL_CTX_set_verify_depth"
+#  define SSL_CTX_SET_VERIFY_DEPTH	"SSL_CTX_set_verify_depth"
 typedef void (*ssl_ctx_set_verify_depth_fn)(SSL_CTX*, int);
 static ssl_ctx_set_verify_depth_fn __ssl_ctx_set_verify_depth;
 
@@ -86,15 +86,15 @@ static ssl_ctx_set_verify_depth_fn __ssl_ctx_set_verify_depth;
 typedef STACK_OF(X509_NAME)* (*ssl_load_client_ca_fn)(const char*);
 static ssl_load_client_ca_fn __ssl_load_client_ca;
 
-#  define SSL_CTX_SET_CLIENT_CA	"SSL_CTX_set_client_CA_list"
+#  define SSL_CTX_SET_CLIENT_CA		"SSL_CTX_set_client_CA_list"
 typedef void (*ssl_ctx_set_client_ca_fn)(SSL_CTX*, STACK_OF(X509_NAME)*);
 static ssl_ctx_set_client_ca_fn __ssl_ctx_set_client_ca;
 
-#  define SSL_CTX_USE_CERT_CHAN	"SSL_CTX_use_certificate_chain_file"
+#  define SSL_CTX_USE_CERT_CHAN		"SSL_CTX_use_certificate_chain_file"
 typedef int (*ssl_ctx_use_cert_chain_fn)(SSL_CTX*, const char*);
 static ssl_ctx_use_cert_chain_fn __ssl_ctx_use_cert_chain;
 
-#  define SSL_CTX_USE_PKEY_FILE	"SSL_CTX_use_PrivateKey_file"
+#  define SSL_CTX_USE_PKEY_FILE		"SSL_CTX_use_PrivateKey_file"
 typedef int (*ssl_ctx_use_pkey_fn)(SSL_CTX*, const char*, int);
 static ssl_ctx_use_pkey_fn __ssl_ctx_use_pkey;
 
@@ -109,6 +109,8 @@ static ssl_ctx_set_def_pass_fn __ssl_ctx_set_def_pass;
 #  define SSL_CTX_SET_TIMEOUT		"SSL_CTX_set_timeout"
 typedef long (*ssl_ctx_set_timeout_fn)(SSL_CTX*, long);
 static ssl_ctx_set_timeout_fn __ssl_ctx_set_timeout;
+
+//////////////////////////////////////////////////////////////////////////////
 
 static acl_pthread_once_t __openssl_once = ACL_PTHREAD_ONCE_INIT;
 static acl::string* __crypto_path_buf = NULL;
@@ -127,6 +129,8 @@ static const char* __ssl_path    = "libssl.so";
 
 ACL_DLL_HANDLE __openssl_crypto_dll = NULL;
 ACL_DLL_HANDLE __openssl_ssl_dll    = NULL;
+
+//////////////////////////////////////////////////////////////////////////////
 
 extern bool openssl_load_io(void); // defined in openssl_io.cpp
 
@@ -250,6 +254,8 @@ static void openssl_dll_load(void)
 #endif
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
 # else  // !HAS_OPENSSL_DLL && HAS_OPENSSL
 
 #  if OPENSSL_VERSION_NUMBER >= 0x10100003L
@@ -284,6 +290,8 @@ static void openssl_dll_load(void)
 # endif // !HAS_OPENSSL_DLL
 
 #endif  // HAS_OPENSSL
+
+//////////////////////////////////////////////////////////////////////////////
 
 namespace acl {
 
