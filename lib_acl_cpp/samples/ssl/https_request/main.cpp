@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "util.h"
+#include "../../util.h"
 #include "https_request.h"
 
 static void usage(const char* procname)
