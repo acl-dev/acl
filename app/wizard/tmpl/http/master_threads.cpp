@@ -42,15 +42,15 @@ int   var_cfg_rw_timeout;
 int   var_cfg_max_threads;
 
 acl::master_int_tbl var_conf_int_tab[] = {
-	{ "rw_timeout", 120, &var_cfg_rw_timeout, 0, 0 },
-	{ "ioctl_max_threads", 128, &var_cfg_max_threads, 0, 0 },
+	{ "rw_timeout",		120,	&var_cfg_rw_timeout,	0, 0 },
+	{ "ioctl_max_threads",	128,	&var_cfg_max_threads,	0, 0 },
 
 	{ 0, 0 , 0 , 0, 0 }
 };
 
 long long int   var_cfg_int64;
 acl::master_int64_tbl var_conf_int64_tab[] = {
-	{ "int64", 120, &var_cfg_int64, 0, 0 },
+	{ "int64",		120,	&var_cfg_int64,		0, 0 },
 
 	{ 0, 0 , 0 , 0, 0 }
 };

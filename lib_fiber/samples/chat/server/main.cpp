@@ -265,7 +265,7 @@ static int __nreader = 0;
 static void fiber_reader(user_client* client)
 {
 	acl::socket_stream& conn = client->get_stream();
-	conn.set_rw_timeout(0);
+	conn.set_rw_timeout(-1);
 
 	client->set_reader();
 	client->set_reading(true);
@@ -289,7 +289,7 @@ static void fiber_reader(user_client* client)
 		fiber_writer(client);
 	};
 
-	conn.set_rw_timeout(0);
+	conn.set_rw_timeout(-1);
 
 	bool stop = false;
 	acl::string buf;

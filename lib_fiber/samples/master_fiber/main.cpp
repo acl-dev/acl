@@ -39,7 +39,7 @@ protected:
 	// @override
 	void on_accept(acl::socket_stream& conn) {
 		acl_msg_info(">>>accept connection: %d", conn.sock_handle());
-		conn.set_rw_timeout(0);
+		conn.set_rw_timeout(-1);
 		acl::memcache_session session("127.0.0.1:11211");
 		http_servlet servlet(&conn, &session);
 		servlet.setLocalCharset("gb2312");

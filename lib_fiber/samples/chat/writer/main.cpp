@@ -45,7 +45,7 @@ static void client_logout(user_client* client)
 static void fiber_writer(user_client* client)
 {
 	acl::socket_stream& conn = client->get_stream();
-	conn.set_rw_timeout(0);
+	conn.set_rw_timeout(-1);
 
 	if (client_login(client) == false)
 	{

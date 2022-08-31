@@ -71,7 +71,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 {
 	logger("connect from %s, fd: %d", conn->get_peer(true),
 		conn->sock_handle());
-	conn->set_rw_timeout(0);
+	conn->set_rw_timeout(-1);
 
 	// 使用 redis 集群来存储 session
 	http_servlet* servlet = new http_servlet(*session_server,
