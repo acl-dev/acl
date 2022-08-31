@@ -256,8 +256,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy $(OutDir)\..\..\..\$(Configuration)\lib_acl.dll $(OutDir) /Y                                                                             copy $(OutDir)\..\..\..\$(Configuration)\lib_acl_cpp.dll $(OutDir) /Y                                                                                        copy $(OutDir)\..\..\..\$(Configuration)\lib_protocol.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">
@@ -279,8 +278,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy $(OutDir)\..\..\..\$(Configuration)\lib_acl.dll $(OutDir) /Y                                                                             copy $(OutDir)\..\..\..\$(Configuration)\lib_acl_cpp.dll $(OutDir) /Y                                                                                        copy $(OutDir)\..\..\..\$(Configuration)\lib_protocol.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|Win32'">
@@ -305,8 +303,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy $(OutDir)\..\..\..\$(Configuration)\lib_acl.dll $(OutDir) /Y                                                                             copy $(OutDir)\..\..\..\$(Configuration)\lib_acl_cpp.dll $(OutDir) /Y                                                                                        copy $(OutDir)\..\..\..\$(Configuration)\lib_protocol.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugDll|x64'">
@@ -329,8 +326,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>copy $(OutDir)\..\..\..\$(Configuration)\lib_acl.dll $(OutDir) /Y                                                                             copy $(OutDir)\..\..\..\$(Configuration)\lib_acl_cpp.dll $(OutDir) /Y                                                                                        copy $(OutDir)\..\..\..\$(Configuration)\lib_protocol.dll $(OutDir) /Y</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
