@@ -1,4 +1,4 @@
-%define release_id 20
+%define release_id 21
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,13 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Aug 31 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-21-20220821.15
+- feature: Openssl has been supported in acl ssl module
+- workaroud: when IO timeout be set 0, which will not block the IO process,
+	but the time before, 0 mean the blocking the IO process.
+- workaroud: in aio module, it's the default that the connection will be closed
+	after the data in sending buffer been sent.
 
 * Mon Aug 15 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-20-20220815.15
 - bugfix: don't use max timeout when the timeout is -1 in poll.c
