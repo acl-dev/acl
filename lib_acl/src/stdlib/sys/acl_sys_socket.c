@@ -164,7 +164,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 #else
 	if (fp != NULL && fp->read_ready) {
 		fp->read_ready = 0;
-	} else if (timeout >= 0) {
+	} else if (timeout > 0) {
 		if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
 			if (acl_read_wait_ms(fd, timeout) < 0) {
 				return -1;
@@ -210,7 +210,7 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int   ret;
 
 #ifdef ACL_WRITEABLE_CHECK
-	if (timeout >= 0 && acl_write_wait(fd, timeout) < 0) {
+	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
 		errno = acl_last_error();
 		return -1;
 	}
@@ -232,7 +232,7 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 	int   i, n, ret;
 
 #ifdef ACL_WRITEABLE_CHECK
-	if (timeout >= 0 && acl_write_wait(fd, timeout) < 0) {
+	if (timeout > 0 && acl_write_wait(fd, timeout) < 0) {
 		errno = acl_last_error();
 		return -1;
 	}
@@ -446,7 +446,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 {
 	if (fp != NULL && fp->read_ready) {
 		fp->read_ready = 0;
-	} else if (timeout >= 0) {
+	} else if (timeout > 0) {
 		if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
 			if (acl_read_wait_ms(fd, timeout) < 0) {
 				return -1;
@@ -462,13 +462,30 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 #endif
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
-#ifdef ACL_WRITEABLE_CHECK
-	if (timeout < 0) {
-		return (int) __sys_write(fd, buf, size);
+	int ret, error;
+
+	ret = (int) __sys_write(fd, buf, size);
+	if (ret > 0) {
+		return ret;
 	}
 
+	if (timeout <= 0) {
+		return ret;
+	}
+
+	error = acl_last_error();
+
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+	if (error != ACL_EWOULDBLOCK) {
+#else
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
+#endif
+		return ret;
+	}
+
+#ifdef ACL_WRITEABLE_CHECK
 	if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
 		if (acl_write_wait_ms(fd, timeout) < 0) {
 			return -1;
@@ -477,32 +494,45 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 		return -1;
 	}
 
-	return (int) __sys_write(fd, buf, size);
-#else
-	return (int) __sys_write(fd, buf, size);
+	ret = __sys_write(fd, buf, size);
 #endif
+
+	return ret;
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
-	int timeout acl_unused, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
+	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
-#ifdef ACL_WRITEABLE_CHECK
-	if (timeout < 0) {
-		return (int) __sys_writev(fd, vec, count);
+	int ret, error;
+
+	ret = (int) __sys_writev(fd, vec, count);
+	if (ret > 0) {
+		return ret;
 	}
 
-	if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
-		if (acl_write_wait_ms(fd, timeout) < 0) {
-			return -1;
-		}
-	} else if (acl_write_wait(fd, timeout) < 0) {
+	if (timeout <= 0) {
+		return ret;
+	}
+
+	error = acl_last_error();
+
+#if ACL_EWOULDBLOCK == ACL_EAGAIN
+	if (error != ACL_EWOULDBLOCK) {
+#else
+	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
+#endif
+		return ret;
+	}
+
+#ifdef ACL_WRITEABLE_CHECK
+	if (acl_write_wait(fd, timeout) < 0) {
 		return -1;
 	}
 
-	return (int) __sys_writev(fd, vec, count);
-#else
-	return (int) __sys_writev(fd, vec, count);
+	ret = __sys_writev(fd, vec, count);
 #endif
+
+	return ret;
 }
 
 #else

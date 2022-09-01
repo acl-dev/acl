@@ -531,11 +531,15 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 	ring_detach(&curr->me);
 	ring_detach(&fiber->me);
 
-	/* Add the current fiber and signed fiber in the head of the ready */
+	/* Add the current fiber and signaled fiber in the head of the ready */
 #if 0
 	fiber_ready(fiber);
 	fiber_yield();
 #elif 1
+	/* First add current fiber, then the signaled fiber, and the signaled
+	 * fiber will run first, then the current fiber.
+	 */
+
 	curr->status = FIBER_STATUS_READY;
 	ring_append(&__thread_fiber->ready, &curr->me);
 
