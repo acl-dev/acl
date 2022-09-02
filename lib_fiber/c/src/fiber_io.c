@@ -622,7 +622,9 @@ void fiber_file_close(FILE_EVENT *fe)
 		SET_CLOSING(fe);
 		CLR_READWAIT(fe);
 		acl_fiber_kill(fe->fiber_r);
-	} else if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
+	}
+
+	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
 		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
 		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
 		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {
