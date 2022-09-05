@@ -121,11 +121,11 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 	non_blocking(sockfd, NON_BLOCKING);
 
-#ifdef SYS_WSA_API
+# ifdef SYS_WSA_API
 	clifd = (*sys_WSAAccept)(sockfd, addr, addrlen, 0, 0);
-#else
+# else
 	clifd = (*sys_accept)(sockfd, addr, addrlen);
-#endif
+# endif
 
 	if (clifd != INVALID_SOCKET) {
 		non_blocking(clifd, NON_BLOCKING);
@@ -155,7 +155,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			return INVALID_SOCKET;
 		}
 
-#ifdef HAS_IOCP
+# ifdef HAS_IOCP
 		clifd = fe->iocp_sock;
 		if (clifd != INVALID_SOCKET) {
 			int ret;
@@ -174,13 +174,13 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			}
 			return clifd;
 		}
-#endif
+# endif
 
-#ifdef SYS_WSA_API
+# ifdef SYS_WSA_API
 		clifd = (*sys_WSAAccept)(sockfd, addr, addrlen, 0, 0);
-#else
+# else
 		clifd = (*sys_accept)(sockfd, addr, addrlen);
-#endif
+# endif
 
 		if (clifd != INVALID_SOCKET) {
 			non_blocking(clifd, NON_BLOCKING);
@@ -195,7 +195,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			return INVALID_SOCKET;
 		}
 	}
-#else
+#else /* !FAST_ACCEPT */
 	fe = fiber_file_open(sockfd);
 
 	while(1) {
@@ -218,7 +218,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 		}
 
-#ifdef HAS_IOCP
+# ifdef HAS_IOCP
 		clifd = fe->iocp_sock;
 		if (clifd != INVALID_SOCKET) {
 			non_blocking(clifd, NON_BLOCKING);
@@ -226,7 +226,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			fe->iocp_sock = INVALID_SOCKET;
 			return clifd;
 		}
-#endif
+# endif
 		clifd = (*sys_accept)(sockfd, addr, addrlen);
 
 		if (clifd != INVALID_SOCKET) {
@@ -242,7 +242,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			return INVALID_SOCKET;
 		}
 	}
-#endif
+#endif /* FAST_ACCEPT */
 }
 
 extern int event_iocp_connect(EVENT* ev, FILE_EVENT* fe);
