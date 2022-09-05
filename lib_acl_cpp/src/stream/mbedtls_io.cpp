@@ -509,10 +509,20 @@ int mbedtls_io::sock_send(void *ctx, const unsigned char *buf, size_t len)
 #ifdef HAS_MBEDTLS
 	mbedtls_io* io = (mbedtls_io*) ctx;
 	ACL_VSTREAM* vs = io->stream_;
+	ACL_SOCKET   fd = ACL_VSTREAM_SOCK(vs);
+	int timeout = io->nblock_ ? 0 : vs->rw_timeout;
+
+	time_t begin = time(NULL);
+	if (acl_write_wait(fd, timeout) < 0) {
+		time_t end = time(NULL);
+		logger_error("acl_write_wait error=%s, fd=%d, cost=%ld",
+			last_serror(), (int) fd, (long) (end - begin));
+		return MBEDTLS_ERR_NET_SEND_FAILED;
+	}
 
 	// 当为非阻塞模式时，超时等待为 0 秒
-	int ret = acl_socket_write(ACL_VSTREAM_SOCK(vs), buf, len,
-			io->nblock_ ? 0 : vs->rw_timeout, vs, NULL);
+	int ret = acl_socket_write(fd, buf, len, io->nblock_
+			? 0 : vs->rw_timeout, vs, NULL);
 	if (ret < 0) {
 		int errnum = acl_last_error();
 
