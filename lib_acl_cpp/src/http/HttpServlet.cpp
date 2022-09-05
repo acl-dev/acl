@@ -241,13 +241,32 @@ bool HttpServlet::start(void)
 	case HTTP_METHOD_OTHER:
 		ret = doOther(*req_, *res_, method_s.c_str());
 		break;
+	case HTTP_METHOD_UNKNOWN:
 	default:
 		ret = false; // 有可能是IO失败或未知方法
-		if (req_->getLastError() == HTTP_REQ_ERR_METHOD) {
+
+		switch (req_->getLastError()) {
+		case HTTP_REQ_ERR_IO:
+			logger_error("read error=%s, method=%d, peer=%s, fd=%d",
+				last_serror(), method,
+				req_->getSocketStream().get_peer(true),
+				(int) req_->getSocketStream().sock_handle());
+			break;
+		case HTTP_REQ_ERR_METHOD:
 			doUnknown(*req_, *res_);
-		} else if (first) {
+			break;
+		default:
+			if (!first) {
+				break;
+			}
+
+			logger_error("method=%d, error=%s, fd=%d",
+				method, last_serror(),
+				(int) req_->getSocketStream().sock_handle());
 			doError(*req_, *res_);
+			break;
 		}
+
 		break;
 	}
 
