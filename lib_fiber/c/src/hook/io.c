@@ -222,6 +222,9 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
+		//msg_error("%s(%d): fd=%d, read error=%s, errno=%d",
+		//	__FUNCTION__, __LINE__, (int) fd, last_serror(), err);
+
 		if (!error_again(err)) {
 			// If the fd is a descriptor but not a socket, the
 			// above fiber_wait_read() must return 0, so we must
