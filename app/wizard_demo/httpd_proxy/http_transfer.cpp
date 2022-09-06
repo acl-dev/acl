@@ -57,15 +57,15 @@ bool http_transfer::setup_ssl(acl::socket_stream& conn,
 		return true;
 	}
 
-	// å¯¹äºŽä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
-	// è¿žæŽ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
+	// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ÐèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
+	// Á¬½ÓÁ÷¶ÔÏóÖÐ£¬¼´ÓÃ ssl io Ìæ»» stream ÖÐÄ¬ÈÏµÄµ×²ã IO ¹ý³Ì
 
 	logger("begin setup ssl hook...");
 
-	// é‡‡ç”¨é˜»å¡ž SSL æ¡æ‰‹æ–¹å¼
+	// ²ÉÓÃ×èÈû SSL ÎÕÊÖ·½Ê½
 	acl::sslbase_io* ssl = ssl_conf.create(false);
 
-	// è®¾ç½® SSL SNI, ä»¥ä¾¿æœåŠ¡ç«¯é€‰æ‹©åˆé€‚çš„è¯ä¹¦
+	// ÉèÖÃ SSL SNI, ÒÔ±ã·þÎñ¶ËÑ¡ÔñºÏÊÊµÄÖ¤Êé
 	ssl->set_sni_host(host);
 
 	if (conn.setup_hook(ssl) == ssl) {
