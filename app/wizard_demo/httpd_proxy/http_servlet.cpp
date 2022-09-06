@@ -153,7 +153,7 @@ bool http_servlet::doConnect(request_t& req, response_t&)
 		delete peer;
 		return false;
 	}
-	printf("connect %s ok, fd=%d\r\n", host.c_str(), peer->sock_handle());
+	printf("connect %s ok, fd=%d\r\n", host.c_str(), (int)  peer->sock_handle());
 
 #define	USE_REFER
 

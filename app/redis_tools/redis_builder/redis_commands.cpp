@@ -618,7 +618,7 @@ int redis_commands::scan(const char* addr, const char* pattern,
 		}
 
 		i++;
-		n += res.size();
+		n += (int) res.size();
 
 		if (display_count > 0 && n1++ < display_count) {
 			size_t n2 = 0;
@@ -628,7 +628,7 @@ int redis_commands::scan(const char* addr, const char* pattern,
 				if (display_count > 0 && n2 >= display_count) {
 					break;
 				}
-				get((*cit).c_str(), display_count);
+				get((*cit).c_str(), (int) display_count);
 				n2++;
 			}
 		}

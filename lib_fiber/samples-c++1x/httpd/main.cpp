@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 		printf("---> thread-%lu on init\r\n", acl::thread::self());
 	}).on_thread_accept([] (acl::socket_stream& conn) {
 		printf("---> thread-%lu on accept %d\r\n",
-			acl::thread::self(), conn.sock_handle());
+			acl::thread::self(), (int) conn.sock_handle());
 		return true;
 	});
 
