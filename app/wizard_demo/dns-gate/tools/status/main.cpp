@@ -8,6 +8,7 @@ static void usage(const char* procname) {
 		" -p password\r\n"
 		" -C path_to_crypto\r\n"
 		" -S path_to_ssl\r\n"
+		" -L logfile\r\n"
 		, procname);
 }
 
@@ -17,9 +18,9 @@ int main(int argc, char* argv[]) {
 	acl::sslbase_conf* ssl_conf;
 	acl::string crypto_path = "/usr/local/lib/libcrypto.dylib";
 	acl::string ssl_path = "/usr/local/lib/libssl.dylib";
-	acl::string user, pass;
+	acl::string user, pass, logfile;
 
-	while ((ch = getopt(argc, argv, "hs:C:S:u:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:C:S:u:p:L:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -39,6 +40,9 @@ int main(int argc, char* argv[]) {
 		case 'p':
 			pass = optarg;
 			break;
+		case 'L':
+			logfile = optarg;
+			break;
 		default:
 			break;
 		}
@@ -50,7 +54,11 @@ int main(int argc, char* argv[]) {
 		return 1;
 	}
 
-	acl::log::stdout_open(true);
+	if (logfile.empty()) {
+		acl::log::stdout_open(true);
+	} else {
+		acl::log::open(logfile, "status");
+	}
 
 	acl::openssl_conf::set_libpath(crypto_path, ssl_path);
 

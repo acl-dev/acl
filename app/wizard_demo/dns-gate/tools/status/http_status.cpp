@@ -65,7 +65,7 @@ void http_status::show_status(const response_t& res) {
 			continue;
 		}
 
-		printf(">>name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s\r\n",
+		logger("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s",
 			it.sta_list_1.name.c_str(),
 			it.sta_list_1.mac.c_str(),
 			it.sta_list_1.ip.c_str(),
