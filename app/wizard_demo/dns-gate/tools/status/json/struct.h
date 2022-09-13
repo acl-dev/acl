@@ -60,8 +60,6 @@ struct res_wireless_t {
 	std::map<acl::string, stat_list_t> sta_list;
 };
 
-//////////////////////////////////////////////////////////////////////////////
-
 struct res_count_t {
 	int host_info;
 };
