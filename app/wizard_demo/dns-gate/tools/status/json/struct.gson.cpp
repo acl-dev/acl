@@ -603,6 +603,16 @@ namespace acl
         else
             $node.add_text("method", acl::get_value($obj.method));
 
+        if (check_nullptr($obj.global_config))
+            $node.add_null("global_config");
+        else
+            $node.add_child("global_config", acl::gson($json, $obj.global_config));
+
+        if (check_nullptr($obj.host_management))
+            $node.add_null("host_management");
+        else
+            $node.add_child("host_management", acl::gson($json, $obj.host_management));
+
         if (check_nullptr($obj.wireless))
             $node.add_null("wireless");
         else
@@ -629,11 +639,19 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, request_t &$obj)
     {
         acl::json_node *method = $node["method"];
+        acl::json_node *global_config = $node["global_config"];
+        acl::json_node *host_management = $node["host_management"];
         acl::json_node *wireless = $node["wireless"];
         std::pair<bool, std::string> $result;
 
         if(!method ||!($result = gson(*method, &$obj.method), $result.first))
             return std::make_pair(false, "required [request_t.method] failed:{"+$result.second+"}");
+     
+        if(!global_config ||!global_config->get_obj()||!($result = gson(*global_config->get_obj(), &$obj.global_config), $result.first))
+            return std::make_pair(false, "required [request_t.global_config] failed:{"+$result.second+"}");
+     
+        if(!host_management ||!host_management->get_obj()||!($result = gson(*host_management->get_obj(), &$obj.host_management), $result.first))
+            return std::make_pair(false, "required [request_t.host_management] failed:{"+$result.second+"}");
      
         if(!wireless ||!wireless->get_obj()||!($result = gson(*wireless->get_obj(), &$obj.wireless), $result.first))
             return std::make_pair(false, "required [request_t.wireless] failed:{"+$result.second+"}");
@@ -717,63 +735,6 @@ namespace acl
     }
 
 
-    acl::json_node& gson(acl::json &$json, const res_host_info_t &$obj)
-    {
-        acl::json_node &$node = $json.create_node();
-
-        if (check_nullptr($obj.host_info_1))
-            $node.add_null("host_info_1");
-        else
-            $node.add_child("host_info_1", acl::gson($json, $obj.host_info_1));
-
-
-        return $node;
-    }
-    
-    acl::json_node& gson(acl::json &$json, const res_host_info_t *$obj)
-    {
-        return gson ($json, *$obj);
-    }
-
-
-    acl::string gson(const res_host_info_t &$obj)
-    {
-        acl::json $json;
-        acl::json_node &$node = acl::gson ($json, $obj);
-        return $node.to_string ();
-    }
-
-
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_host_info_t &$obj)
-    {
-        acl::json_node *host_info_1 = $node["host_info_1"];
-        std::pair<bool, std::string> $result;
-
-        if(!host_info_1 ||!host_info_1->get_obj()||!($result = gson(*host_info_1->get_obj(), &$obj.host_info_1), $result.first))
-            return std::make_pair(false, "required [res_host_info_t.host_info_1] failed:{"+$result.second+"}");
-     
-        return std::make_pair(true,"");
-    }
-
-
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_host_info_t *$obj)
-    {
-        return gson($node, *$obj);
-    }
-
-
-     std::pair<bool,std::string> gson(const acl::string &$str, res_host_info_t &$obj)
-    {
-        acl::json _json;
-        _json.update($str.c_str());
-        if (!_json.finish())
-        {
-            return std::make_pair(false, "json not finish error");
-        }
-        return gson(_json.get_root(), $obj);
-    }
-
-
     acl::json_node& gson(acl::json &$json, const res_host_management_t &$obj)
     {
         acl::json_node &$node = $json.create_node();
@@ -829,81 +790,6 @@ namespace acl
 
 
      std::pair<bool,std::string> gson(const acl::string &$str, res_host_management_t &$obj)
-    {
-        acl::json _json;
-        _json.update($str.c_str());
-        if (!_json.finish())
-        {
-            return std::make_pair(false, "json not finish error");
-        }
-        return gson(_json.get_root(), $obj);
-    }
-
-
-    acl::json_node& gson(acl::json &$json, const res_sta_list_t &$obj)
-    {
-        acl::json_node &$node = $json.create_node();
-
-        if (check_nullptr($obj.sta_list_1))
-            $node.add_null("sta_list_1");
-        else
-            $node.add_child("sta_list_1", acl::gson($json, $obj.sta_list_1));
-
-        if (check_nullptr($obj.sta_list_2))
-            $node.add_null("sta_list_2");
-        else
-            $node.add_child("sta_list_2", acl::gson($json, $obj.sta_list_2));
-
-        if (check_nullptr($obj.sta_list_3))
-            $node.add_null("sta_list_3");
-        else
-            $node.add_child("sta_list_3", acl::gson($json, $obj.sta_list_3));
-
-
-        return $node;
-    }
-    
-    acl::json_node& gson(acl::json &$json, const res_sta_list_t *$obj)
-    {
-        return gson ($json, *$obj);
-    }
-
-
-    acl::string gson(const res_sta_list_t &$obj)
-    {
-        acl::json $json;
-        acl::json_node &$node = acl::gson ($json, $obj);
-        return $node.to_string ();
-    }
-
-
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_sta_list_t &$obj)
-    {
-        acl::json_node *sta_list_1 = $node["sta_list_1"];
-        acl::json_node *sta_list_2 = $node["sta_list_2"];
-        acl::json_node *sta_list_3 = $node["sta_list_3"];
-        std::pair<bool, std::string> $result;
-
-        if(sta_list_1&& sta_list_1->get_obj())
-             gson(*sta_list_1->get_obj(), &$obj.sta_list_1);
-     
-        if(sta_list_2&& sta_list_2->get_obj())
-             gson(*sta_list_2->get_obj(), &$obj.sta_list_2);
-     
-        if(sta_list_3&& sta_list_3->get_obj())
-             gson(*sta_list_3->get_obj(), &$obj.sta_list_3);
-     
-        return std::make_pair(true,"");
-    }
-
-
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_sta_list_t *$obj)
-    {
-        return gson($node, *$obj);
-    }
-
-
-     std::pair<bool,std::string> gson(const acl::string &$str, res_sta_list_t &$obj)
     {
         acl::json _json;
         _json.update($str.c_str());
@@ -976,6 +862,11 @@ namespace acl
     {
         acl::json_node &$node = $json.create_node();
 
+        if (check_nullptr($obj.host_management))
+            $node.add_null("host_management");
+        else
+            $node.add_child("host_management", acl::gson($json, $obj.host_management));
+
         if (check_nullptr($obj.wireless))
             $node.add_null("wireless");
         else
@@ -1006,10 +897,14 @@ namespace acl
 
     std::pair<bool,std::string> gson(acl::json_node &$node, response_t &$obj)
     {
+        acl::json_node *host_management = $node["host_management"];
         acl::json_node *wireless = $node["wireless"];
         acl::json_node *error_code = $node["error_code"];
         std::pair<bool, std::string> $result;
 
+        if(!host_management ||!host_management->get_obj()||!($result = gson(*host_management->get_obj(), &$obj.host_management), $result.first))
+            return std::make_pair(false, "required [response_t.host_management] failed:{"+$result.second+"}");
+     
         if(!wireless ||!wireless->get_obj()||!($result = gson(*wireless->get_obj(), &$obj.wireless), $result.first))
             return std::make_pair(false, "required [response_t.wireless] failed:{"+$result.second+"}");
      

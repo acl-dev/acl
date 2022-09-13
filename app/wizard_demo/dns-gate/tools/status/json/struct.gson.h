@@ -80,14 +80,6 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, res_count_t *$obj);
     std::pair<bool,std::string> gson(const acl::string &str, res_count_t &$obj);
 
-    //res_host_info_t
-    acl::string gson(const res_host_info_t &$obj);
-    acl::json_node& gson(acl::json &$json, const res_host_info_t &$obj);
-    acl::json_node& gson(acl::json &$json, const res_host_info_t *$obj);
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_host_info_t &$obj);
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_host_info_t *$obj);
-    std::pair<bool,std::string> gson(const acl::string &str, res_host_info_t &$obj);
-
     //res_host_management_t
     acl::string gson(const res_host_management_t &$obj);
     acl::json_node& gson(acl::json &$json, const res_host_management_t &$obj);
@@ -95,14 +87,6 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, res_host_management_t &$obj);
     std::pair<bool,std::string> gson(acl::json_node &$node, res_host_management_t *$obj);
     std::pair<bool,std::string> gson(const acl::string &str, res_host_management_t &$obj);
-
-    //res_sta_list_t
-    acl::string gson(const res_sta_list_t &$obj);
-    acl::json_node& gson(acl::json &$json, const res_sta_list_t &$obj);
-    acl::json_node& gson(acl::json &$json, const res_sta_list_t *$obj);
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_sta_list_t &$obj);
-    std::pair<bool,std::string> gson(acl::json_node &$node, res_sta_list_t *$obj);
-    std::pair<bool,std::string> gson(const acl::string &str, res_sta_list_t &$obj);
 
     //res_wireless_t
     acl::string gson(const res_wireless_t &$obj);

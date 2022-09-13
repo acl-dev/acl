@@ -39,40 +39,40 @@ bool http_status::parse_response(const acl::string& data, response_t& res) {
 }
 
 void http_status::show_status(const response_t& res) {
-#if 0
+	printf("\r\n");
 	if (res.host_management.host_info.empty()) {
 		printf("host_info empty!\r\n");
-		return;
 	}
 
-	const res_host_info_t& host_info = res.host_management.host_info[0];
-	const host_info_t& info = host_info.host_info_1;
+	for (auto it : res.host_management.host_info) {
+		printf("name=%s\r\n", it.first.c_str());
+		printf("hostname=%s, ip=%s, mac=%s, up_limit=%s, down_limit=%s\r\n",
+			it.second.hostname.c_str(),
+			it.second.ip.c_str(),
+			it.second.mac.c_str(),
+			it.second.up_limit.c_str(),
+			it.second.down_limit.c_str());
+	}
 
-	printf("hostname=%s, ip=%s, mac=%s, up_limit=%s, down_limit=%s\r\n",
-		info.hostname.c_str(),
-		info.ip.c_str(),
-		info.mac.c_str(),
-		info.up_limit.c_str(),
-		info.down_limit.c_str());
-#else
+	printf("--------------------------------------------------------\r\n");
+
+	//////////////////////////////////////////////////////////////////////
+
 	if (res.wireless.sta_list.empty()) {
 		printf("sta_list empty!\r\n");
-		return;
 	}
 
 	for (auto it : res.wireless.sta_list) {
-		if (it.sta_list_1.name.empty()) {
-			continue;
-		}
-
-		logger("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s",
-			it.sta_list_1.name.c_str(),
-			it.sta_list_1.mac.c_str(),
-			it.sta_list_1.ip.c_str(),
-			it.sta_list_1.tx_rate.c_str(),
-			it.sta_list_1.rx_rate.c_str());
+		printf("\r\n");
+		printf("name=%s\n", it.first.c_str());
+		printf("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s\r\n",
+			it.second.name.c_str(),
+			it.second.mac.c_str(),
+			it.second.ip.c_str(),
+			it.second.tx_rate.c_str(),
+			it.second.rx_rate.c_str());
 	}
-#endif
+	printf("========================================================\r\n");
 }
 
 bool http_status::get_status(const char* stok) {
