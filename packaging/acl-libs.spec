@@ -1,4 +1,4 @@
-%define release_id 21
+%define release_id 22
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,10 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Sep 14 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-22-20220914.14
+- bugfix: when using SO_REUSEPORT, acl_threads_server.cpp should support
+	binding unix domain socket.
 
 * Wed Aug 31 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-21-20220821.15
 - feature: Openssl has been supported in acl ssl module

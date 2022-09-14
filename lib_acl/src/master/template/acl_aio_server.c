@@ -123,9 +123,9 @@ char *acl_var_aio_event_mode;
 char *acl_var_aio_pid_dir;
 char *acl_var_aio_access_allow;
 char *acl_var_aio_accept_alone;
-char *acl_var_aio_log_debug;
 char *acl_var_aio_dispatch_addr;
 char *acl_var_aio_dispatch_type;
+char *acl_var_aio_log_debug;
 char *acl_var_aio_deny_info;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
@@ -135,9 +135,10 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "aio_access_allow", "0.0.0.0:255.255.255.255", &acl_var_aio_access_allow },
         { "aio_event_mode", "select", &acl_var_aio_event_mode },
 	{ "aio_accept_alone", "yes", &acl_var_aio_accept_alone },
-	{ "master_debug", "", &acl_var_aio_log_debug },
 	{ "aio_dispatch_addr", "", &acl_var_aio_dispatch_addr },
 	{ "aio_dispatch_type", "default", &acl_var_aio_dispatch_type },
+
+	{ "master_debug", "", &acl_var_aio_log_debug },
 	{ "master_deny_info", "you're not welcome!", &acl_var_aio_deny_info },
 
         { 0, 0, 0 },

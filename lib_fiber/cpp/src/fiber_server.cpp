@@ -845,7 +845,8 @@ static void server_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 
 	acl_foreach(iter, addrs) {
 		const char* addr = (const char*) iter.data;
-		char addrbuf[256];
+		char addrbuf[512];
+
 		correct_addr(addr, addrbuf, sizeof(addrbuf));
 		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addrbuf, 128,
 				flag, 0, 0);

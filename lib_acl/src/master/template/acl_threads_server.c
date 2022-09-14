@@ -138,6 +138,7 @@ char *acl_var_threads_dispatch_addr;
 char *acl_var_threads_dispatch_type;
 char *acl_var_threads_master_service;
 char *acl_var_threads_master_reuseport;
+char *acl_var_threads_master_private;
 
 static int var_threads_master_reuseport = 0;
 
@@ -149,13 +150,15 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 #else
 	{ "ioctl_event_mode", "select", &acl_var_threads_event_mode },
 #endif
-	{ "master_debug", "", &acl_var_threads_log_debug },
 	{ "ioctl_deny_banner", "You'are not Welcome!", &acl_var_threads_deny_banner },
 	{ "ioctl_access_allow", "all", &acl_var_threads_access_allow },
 	{ "ioctl_dispatch_addr", "", &acl_var_threads_dispatch_addr },
 	{ "ioctl_dispatch_type", "default", &acl_var_threads_dispatch_type },
+
+	{ "master_debug", "", &acl_var_threads_log_debug },
 	{ "master_service", "", &acl_var_threads_master_service },
 	{ "master_reuseport", "", &acl_var_threads_master_reuseport },
+	{ "master_private", "n", &acl_var_threads_master_private },
 
         { 0, 0, 0 },
 };
@@ -1243,6 +1246,40 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 
 #endif
 
+static int is_ipaddr(const char *addr)
+{
+	// Just only the port, such as: 8088
+	if (acl_alldig(addr)) {
+		return 1;
+	}
+
+	// Such as: ip:port, or ip|port, or :port, or |port
+	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
+		return 1;
+	}
+
+	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
+		return 1;
+	}
+
+	return 0;
+}
+
+static void correct_addr(const char *addr, char *buf, size_t size)
+{
+	if (is_ipaddr(addr)) {
+		ACL_SAFE_STRNCPY(buf, addr, size);
+	} else {
+		const char *pri = !strcmp(acl_var_threads_master_private, "y") ?
+			"private" : "public";
+#if defined(_WIN32) || defined(_WIN64)
+		_snprintf(buf, size, "%s/%s/%s", acl_var_thread_queue_dir, pri, addr);
+#else
+		snprintf(buf, size, "%s/%s/%s", acl_var_threads_queue_dir, pri, addr);
+#endif
+	}
+}
+
 static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	acl_pthread_pool_t *threads, const char *addrs)
 {
@@ -1265,11 +1302,14 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	i = 0;
 	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
-		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
+		char addrbuf[512];
+
+		correct_addr(addr, addrbuf, sizeof(addrbuf));
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addrbuf, 128,
 				flag, 0, 0);
 		if (sstream == NULL) {
 			acl_msg_error("%s(%d): listen %s error(%s)",
-				myname, __LINE__, addr, acl_last_serror());
+				myname, __LINE__, addrbuf, acl_last_serror());
 			exit(2);
 		}
 
