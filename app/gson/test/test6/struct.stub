@@ -1,0 +1,33 @@
+#pragma once
+
+struct user
+{
+	user(const char* name_in, int age_in, bool male_in)
+	: name(name_in), age(age_in), male(male_in) {}
+
+	user() : age(-1), male(false) {}
+	~user() {}
+
+	//Gson@required
+	std::string name;
+	int  age;
+	bool male;
+
+	//Gson@optional
+	std::string addr;
+
+	//Gson@skip
+	acl::string nick;
+};
+
+struct group
+{
+	std::string name;
+	std::vector<user> users;
+};
+
+struct company
+{
+	std::string name;
+	std::map<acl::string, group> groups;
+};
