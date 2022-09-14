@@ -1273,7 +1273,7 @@ static void correct_addr(const char *addr, char *buf, size_t size)
 		const char *pri = !strcmp(acl_var_threads_master_private, "y") ?
 			"private" : "public";
 #if defined(_WIN32) || defined(_WIN64)
-		_snprintf(buf, size, "%s/%s/%s", acl_var_thread_queue_dir, pri, addr);
+		_snprintf(buf, size, "%s/%s/%s", acl_var_threads_queue_dir, pri, addr);
 #else
 		snprintf(buf, size, "%s/%s/%s", acl_var_threads_queue_dir, pri, addr);
 #endif

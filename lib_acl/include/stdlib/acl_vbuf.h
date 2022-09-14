@@ -70,7 +70,7 @@ struct ACL_VBUF {
 #define ACL_VBUF_PUT(v,c) ((v)->ptr < (v)->data + (v)->len ? \
 	(int) (*(v)->ptr++ = (c)) : acl_vbuf_put((v),(c)))
 
-int acl_vbuf_space(struct ACL_VBUF *bp, ssize_t len);
+ACL_API int acl_vbuf_space(struct ACL_VBUF *bp, ssize_t len);
 #define	ACL_VBUF_SPACE acl_vbuf_space
 
 #define ACL_VBUF_TERM(v) ((v)->ptr < (v)->data + (v)->len ? \

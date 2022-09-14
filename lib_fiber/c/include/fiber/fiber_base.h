@@ -15,9 +15,9 @@ typedef struct ACL_FIBER_ATTR {
 	size_t stack_size;
 } ACL_FIBER_ATTR;
 
-void acl_fiber_attr_init(ACL_FIBER_ATTR *attr);
-void acl_fiber_attr_setstacksize(ACL_FIBER_ATTR *attr, size_t size);
-void acl_fiber_attr_setsharestack(ACL_FIBER_ATTR *attr, int on);
+FIBER_API void acl_fiber_attr_init(ACL_FIBER_ATTR *attr);
+FIBER_API void acl_fiber_attr_setstacksize(ACL_FIBER_ATTR *attr, size_t size);
+FIBER_API void acl_fiber_attr_setsharestack(ACL_FIBER_ATTR *attr, int on);
 
 typedef ACL_FIBER *((*FIBER_ALLOC_FN)(void (*)(ACL_FIBER *), const ACL_FIBER_ATTR *));
 typedef ACL_FIBER *((*FIBER_ORIGIN_FN)(void));
