@@ -25,13 +25,14 @@ bool http_status::parse_response(const acl::string& data, response_t& res) {
 	acl::json json;
 	json.update(data);
 	if (!json.finish()) {
-		printf("invalid json=%s\r\n", data.c_str());
+		logger_error("invalid json=%s", data.c_str());
 		return false;
 	}
 
 	acl::string err;
 	if (!acl::deserialize<response_t>(json, res, &err)) {
-		printf("parse json=%s\r\n\r\nerr=%s\r\n", data.c_str(), err.c_str());
+		logger_error("parse json=%s\r\n\r\nerr=%s\r\n",
+			data.c_str(), err.c_str());
 		return false;
 	}
 
@@ -39,14 +40,14 @@ bool http_status::parse_response(const acl::string& data, response_t& res) {
 }
 
 void http_status::show_status(const response_t& res) {
-	printf("\r\n");
+	logger("");
 	if (res.host_management.host_info.empty()) {
-		printf("host_info empty!\r\n");
+		logger("host_info empty!");
 	}
 
 	for (auto it : res.host_management.host_info) {
-		printf("name=%s\r\n", it.first.c_str());
-		printf("hostname=%s, ip=%s, mac=%s, up_limit=%s, down_limit=%s\r\n",
+		logger("name=%s", it.first.c_str());
+		logger("hostname=%s, ip=%s, mac=%s, up_limit=%s, down_limit=%s",
 			it.second.hostname.c_str(),
 			it.second.ip.c_str(),
 			it.second.mac.c_str(),
@@ -54,25 +55,25 @@ void http_status::show_status(const response_t& res) {
 			it.second.down_limit.c_str());
 	}
 
-	printf("--------------------------------------------------------\r\n");
+	logger("--------------------------------------------------------");
 
 	//////////////////////////////////////////////////////////////////////
 
 	if (res.wireless.sta_list.empty()) {
-		printf("sta_list empty!\r\n");
+		logger("sta_list empty!\r\n");
 	}
 
 	for (auto it : res.wireless.sta_list) {
-		printf("\r\n");
-		printf("name=%s\n", it.first.c_str());
-		printf("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s\r\n",
+		logger("");
+		logger("name=%s", it.first.c_str());
+		logger("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s",
 			it.second.name.c_str(),
 			it.second.mac.c_str(),
 			it.second.ip.c_str(),
 			it.second.tx_rate.c_str(),
 			it.second.rx_rate.c_str());
 	}
-	printf("========================================================\r\n");
+	logger("========================================================");
 }
 
 bool http_status::get_status(const char* stok) {
@@ -96,13 +97,13 @@ bool http_status::get_status(const char* stok) {
 	//printf("req=%s\r\n", req.c_str());
 
 	if (!conn.request(req, req.size())) {
-		printf("send request error, req=%s\r\n", req.c_str());
+		logger_error("send request error, req=%s", req.c_str());
 		return false;
 	}
 
 	acl::string buf;
 	if (!conn.get_body(buf)) {
-		printf("get response error\r\n");
+		logger_error("get response error");
 		return false;
 	}
 
@@ -110,7 +111,7 @@ bool http_status::get_status(const char* stok) {
 
 	response_t res;
 	if (!parse_response(buf, res)) {
-		printf("parse response error\r\n");
+		logger_error("parse response error");
 		return false;
 	}
 
@@ -138,13 +139,13 @@ bool http_status::login(acl::string& out) {
 		.set_content_type("application/json");
 
 	if (!conn.request(buf, buf.size())) {
-		printf("send login request error, req=%s\r\n", buf.c_str());
+		logger_error("send login request error, req=%s", buf.c_str());
 		return false;
 	}
 
 	acl::json json;
 	if (!conn.get_body(json)) {
-		printf("get login res error\r\n");
+		logger_error("get login res error");
 		return false;
 	}
 
@@ -158,11 +159,11 @@ bool http_status::login(acl::string& out) {
 	login_res_t res;
 	acl::string err;
 	if (!acl::deserialize<login_res_t>(json, res, &err)) {
-		printf("parse login res error=%s\r\n", err.c_str());
+		logger_error("parse login res error=%s", err.c_str());
 		return false;
 	}
 
-	printf("login ok, stok=%s\r\n", res.stok.c_str());
+	logger("login ok, stok=%s", res.stok.c_str());
 	out = res.stok;
 	return true;
 }
@@ -170,13 +171,20 @@ bool http_status::login(acl::string& out) {
 bool http_status::start(void) {
 	acl::string stok;
 	if (!login(stok)) {
-		printf("login error\r\n");
+		logger_error("login error");
 		return false;
 	}
 
 	while (true) {
-		get_status(stok);
+		bool ret = get_status(stok);
 		sleep(1);
+
+		if (!ret) {
+			if (!login(stok)) {
+				logger_error("login error");
+				return false;
+			}
+		}
 	}
 	return true;
 }

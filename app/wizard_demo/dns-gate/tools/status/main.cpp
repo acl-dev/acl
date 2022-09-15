@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 	acl::openssl_conf::set_libpath(crypto_path, ssl_path);
 
 	if (!acl::openssl_conf::load()) {
-		printf("load ssl error, crypto=%s, ssl=%s\r\n",
+		logger_error("load ssl error, crypto=%s, ssl=%s",
 			crypto_path.c_str(), ssl_path.c_str());
 		return 1;
 	}
