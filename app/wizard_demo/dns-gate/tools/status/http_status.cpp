@@ -40,11 +40,12 @@ bool http_status::parse_response(const acl::string& data, response_t& res) {
 }
 
 void http_status::show_status(const response_t& res) {
-	logger("");
+	//logger("");
 	if (res.host_management.host_info.empty()) {
 		logger("host_info empty!");
 	}
 
+#if 0
 	for (auto it : res.host_management.host_info) {
 		logger("name=%s", it.first.c_str());
 		logger("hostname=%s, ip=%s, mac=%s, up_limit=%s, down_limit=%s",
@@ -56,6 +57,7 @@ void http_status::show_status(const response_t& res) {
 	}
 
 	logger("--------------------------------------------------------");
+#endif
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -63,17 +65,23 @@ void http_status::show_status(const response_t& res) {
 		logger("sta_list empty!\r\n");
 	}
 
+	int i = 0;
 	for (auto it : res.wireless.sta_list) {
-		logger("");
-		logger("name=%s", it.first.c_str());
-		logger("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s",
-			it.second.name.c_str(),
-			it.second.mac.c_str(),
-			it.second.ip.c_str(),
-			it.second.tx_rate.c_str(),
-			it.second.rx_rate.c_str());
+		if (atoi(it.second.rx_rate.c_str()) >= 5) {
+			logger("");
+			logger("name=%s", it.first.c_str());
+			logger("name=%s, mac=%s, ip=%s, tx_rate=%s, rx_rate=%s",
+				it.second.name.c_str(),
+				it.second.mac.c_str(),
+				it.second.ip.c_str(),
+				it.second.tx_rate.c_str(),
+				it.second.rx_rate.c_str());
+			i++;
+		}
 	}
-	logger("========================================================");
+	if (i > 0) {
+		logger("========================================================");
+	}
 }
 
 bool http_status::get_status(const char* stok) {
