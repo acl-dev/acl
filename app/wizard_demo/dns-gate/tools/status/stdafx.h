@@ -58,3 +58,7 @@
 # define logger_debug(section, level, fmt, args...)  \
 	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 #endif // !_WIN32 && !_WIN64
+
+#include "json/struct.h"
+#include "json/struct.gson.h"
+#include "acl_cpp/serialize/serialize.hpp"

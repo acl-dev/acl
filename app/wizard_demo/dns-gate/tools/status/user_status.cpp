@@ -1,27 +1,23 @@
 #include "stdafx.h"
-#include "json/struct.h"
-#include "json/struct.gson.h"
-#include "acl_cpp/serialize/serialize.hpp"
-#include "http_status.h"
+#include "user_status.h"
 
-http_status::http_status(const char* addr, acl::sslbase_conf& ssl_conf,
-	const char* user, const char* pass)
+user_status::user_status(const char* addr, acl::sslbase_conf& ssl_conf,
+	const char* stok)
 : addr_(addr)
 , ssl_conf_(ssl_conf)
-, user_(user)
-, pass_(pass)
+, stok_(stok)
 {
 }
 
-http_status::~http_status(void) {}
+user_status::~user_status(void) {}
 
-void http_status::build_request(acl::string& buf) {
+void user_status::build_request(acl::string& buf) {
 	request_t req;
 
 	acl::serialize<request_t>(req, buf);
 }
 
-bool http_status::parse_response(const acl::string& data, response_t& res) {
+bool user_status::parse_response(const acl::string& data, response_t& res) {
 	acl::json json;
 	json.update(data);
 	if (!json.finish()) {
@@ -39,7 +35,7 @@ bool http_status::parse_response(const acl::string& data, response_t& res) {
 	return true;
 }
 
-void http_status::show_status(const response_t& res) {
+void user_status::show_status(const response_t& res) {
 	//logger("");
 	if (res.host_management.host_info.empty()) {
 		logger("host_info empty!");
@@ -84,7 +80,7 @@ void http_status::show_status(const response_t& res) {
 	}
 }
 
-bool http_status::get_status(const char* stok) {
+bool user_status::get_status(const char* stok) {
 	acl::http_request conn(addr_);
 	conn.set_ssl(&ssl_conf_);
 
@@ -127,71 +123,13 @@ bool http_status::get_status(const char* stok) {
 	return true;
 }
 
-bool http_status::login(acl::string& out) {
-	login_req_t req;
-	req.method = "do";
-	req.login.username = user_;
-	req.login.password = pass_;
-
-	acl::string buf;
-	acl::serialize<login_req_t>(req, buf);
-
-	acl::string url;
-	url += "/";
-
-	acl::http_request conn(addr_);
-	conn.set_ssl(&ssl_conf_);
-
-	conn.request_header().set_url(url)
-		.set_host(addr_)
-		.set_content_type("application/json");
-
-	if (!conn.request(buf, buf.size())) {
-		logger_error("send login request error, req=%s", buf.c_str());
-		return false;
-	}
-
-	acl::json json;
-	if (!conn.get_body(json)) {
-		logger_error("get login res error");
-		return false;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-
-	acl::http_client* client = conn.get_client();
-	client->print_header("--response--");
-
-	//////////////////////////////////////////////////////////////////////
-
-	login_res_t res;
-	acl::string err;
-	if (!acl::deserialize<login_res_t>(json, res, &err)) {
-		logger_error("parse login res error=%s", err.c_str());
-		return false;
-	}
-
-	logger("login ok, stok=%s", res.stok.c_str());
-	out = res.stok;
-	return true;
-}
-
-bool http_status::start(void) {
-	acl::string stok;
-	if (!login(stok)) {
-		logger_error("login error");
-		return false;
-	}
-
+bool user_status::start(void) {
 	while (true) {
-		bool ret = get_status(stok);
+		bool ret = get_status(stok_);
 		sleep(1);
 
 		if (!ret) {
-			if (!login(stok)) {
-				logger_error("login error");
-				return false;
-			}
+			return false;
 		}
 	}
 	return true;

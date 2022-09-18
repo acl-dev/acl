@@ -1,9 +1,52 @@
 #include "stdafx.h"
-#include "http_status.h"
+#include "user_login.h"
+#include "user_status.h"
+#include "limit_speed.h"
+
+static void do_status(const char* addr, acl::sslbase_conf& ssl_conf,
+	const char* user, const char* pass) {
+
+	while (true) {
+		acl::string stok;
+		user_login login(addr, ssl_conf, user, pass);
+		if (!login.start(stok)) {
+			logger_error("login failed, user=%s, pass=%s",
+				user, pass);
+			sleep(1);
+			continue;
+		}
+
+		user_status status(addr, ssl_conf, stok);
+		status.start();
+		sleep(1);
+	}
+}
+
+static void do_limit_speed(const char* addr, acl::sslbase_conf& ssl_conf,
+	const char* hostname, const char* user, const char* pass,
+	const char* mac, const char* ip, int up, int down) {
+
+	acl::string stok;
+	user_login login(addr, ssl_conf, user, pass);
+	if (!login.start(stok)) {
+		logger_error("login failed, user=%s, pass=%s", user, pass);
+		return;
+	}
+
+	limit_speed limit(addr, ssl_conf, stok, mac, ip);
+	limit.set_hostname(hostname);
+	limit.start(up, down);
+}
 
 static void usage(const char* procname) {
 	printf("usage: %s -h[help]\r\n"
 		" -s server_address\r\n"
+		" -a action[status|limit_speed]\r\n"
+		" -U up_limit[default: 15]\r\n"
+		" -D down_limit[default: 15]\r\n"
+		" -H hostname\r\n"
+		" -M mac\r\n"
+		" -I ip\r\n"
 		" -u username\r\n"
 		" -p password\r\n"
 		" -C path_to_crypto\r\n"
@@ -14,19 +57,23 @@ static void usage(const char* procname) {
 
 int main(int argc, char* argv[]) {
 	acl::string addr("192.168.1.65:443");
-	int ch;
+	int ch, up = 15, down = 15;
 	acl::sslbase_conf* ssl_conf;
 	acl::string crypto_path = "/usr/local/lib/libcrypto.dylib";
 	acl::string ssl_path = "/usr/local/lib/libssl.dylib";
-	acl::string user, pass, logfile;
+	acl::string user, pass, logfile, action = "status";
+	acl::string mac, ip, hostname = "---";
 
-	while ((ch = getopt(argc, argv, "hs:C:S:u:p:L:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:a:C:S:u:p:L:U:D:M:I:H:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
 			addr = optarg;
+			break;
+		case 'a':
+			action = optarg;
 			break;
 		case 'C':
 			crypto_path = optarg;
@@ -42,6 +89,21 @@ int main(int argc, char* argv[]) {
 			break;
 		case 'L':
 			logfile = optarg;
+			break;
+		case 'U':
+			up = atoi(optarg);
+			break;
+		case 'D':
+			down = atoi(optarg);
+			break;
+		case 'M':
+			mac = optarg;
+			break;
+		case 'I':
+			ip = optarg;
+			break;
+		case 'H':
+			hostname = optarg;
 			break;
 		default:
 			break;
@@ -69,8 +131,14 @@ int main(int argc, char* argv[]) {
 	}
 
 	ssl_conf = new acl::openssl_conf(false);
-	http_status status(addr, *ssl_conf, user, pass);
-	status.start();
+
+	if (action == "status") {
+		do_status(addr, *ssl_conf, user, pass);
+	} else if (action == "limit_speed") {
+		do_limit_speed(addr, *ssl_conf, hostname, user, pass, mac, ip, up, down);
+	} else {
+		printf("unknown action=%s\r\n", action.c_str());
+	}
 
 	printf("OVER!\n");
 

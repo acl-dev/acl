@@ -109,3 +109,56 @@ struct login_res_t {
 };
 
 //////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+struct filter_mac_t {
+	acl::string mac;
+};
+
+struct limit_speed_para_t {
+	acl::string host_save;
+	acl::string type;
+	acl::string origin_hostname;
+	acl::string hostname;
+	acl::string ssid;
+	acl::string ip;
+	acl::string mac;
+	acl::string limit;
+	acl::string up_limit;
+	acl::string down_limit;
+	acl::string time_obj;
+	acl::string name;
+	acl::string time_mode;
+	acl::string is_cur_host;
+
+	limit_speed_para_t(void) {
+		host_save = "on";
+		type = "wireless";
+		origin_hostname = "---";
+		hostname = "---";
+		ssid = "TP_LINK_668D";
+		limit = "1";
+		time_obj = "any";
+		time_mode = "any";
+		is_cur_host = "false";
+	}
+};
+
+struct limit_speed_host_management_t {
+	acl::string table;
+	std::vector<filter_mac_t> filter;
+	limit_speed_para_t para;
+
+	limit_speed_host_management_t(void) {
+		table = "host_info";
+	}
+};
+
+struct limit_speed_req_t {
+	acl::string method;
+	limit_speed_host_management_t host_management;
+
+	limit_speed_req_t(void) {
+		method = "set";
+	}
+};

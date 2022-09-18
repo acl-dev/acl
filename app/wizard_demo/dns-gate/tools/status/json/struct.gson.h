@@ -1,5 +1,13 @@
 namespace acl
 {
+    //filter_mac_t
+    acl::string gson(const filter_mac_t &$obj);
+    acl::json_node& gson(acl::json &$json, const filter_mac_t &$obj);
+    acl::json_node& gson(acl::json &$json, const filter_mac_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, filter_mac_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, filter_mac_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, filter_mac_t &$obj);
+
     //host_info_t
     acl::string gson(const host_info_t &$obj);
     acl::json_node& gson(acl::json &$json, const host_info_t &$obj);
@@ -7,6 +15,30 @@ namespace acl
     std::pair<bool,std::string> gson(acl::json_node &$node, host_info_t &$obj);
     std::pair<bool,std::string> gson(acl::json_node &$node, host_info_t *$obj);
     std::pair<bool,std::string> gson(const acl::string &str, host_info_t &$obj);
+
+    //limit_speed_host_management_t
+    acl::string gson(const limit_speed_host_management_t &$obj);
+    acl::json_node& gson(acl::json &$json, const limit_speed_host_management_t &$obj);
+    acl::json_node& gson(acl::json &$json, const limit_speed_host_management_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_host_management_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_host_management_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, limit_speed_host_management_t &$obj);
+
+    //limit_speed_para_t
+    acl::string gson(const limit_speed_para_t &$obj);
+    acl::json_node& gson(acl::json &$json, const limit_speed_para_t &$obj);
+    acl::json_node& gson(acl::json &$json, const limit_speed_para_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_para_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_para_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, limit_speed_para_t &$obj);
+
+    //limit_speed_req_t
+    acl::string gson(const limit_speed_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const limit_speed_req_t &$obj);
+    acl::json_node& gson(acl::json &$json, const limit_speed_req_t *$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_req_t &$obj);
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_req_t *$obj);
+    std::pair<bool,std::string> gson(const acl::string &str, limit_speed_req_t &$obj);
 
     //login_req_t
     acl::string gson(const login_req_t &$obj);

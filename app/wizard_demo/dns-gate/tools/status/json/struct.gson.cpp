@@ -3,6 +3,63 @@
 #include "struct.gson.h"
 namespace acl
 {
+    acl::json_node& gson(acl::json &$json, const filter_mac_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.mac))
+            $node.add_null("mac");
+        else
+            $node.add_text("mac", acl::get_value($obj.mac));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const filter_mac_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const filter_mac_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, filter_mac_t &$obj)
+    {
+        acl::json_node *mac = $node["mac"];
+        std::pair<bool, std::string> $result;
+
+        if(!mac ||!($result = gson(*mac, &$obj.mac), $result.first))
+            return std::make_pair(false, "required [filter_mac_t.mac] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, filter_mac_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, filter_mac_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
     acl::json_node& gson(acl::json &$json, const host_info_t &$obj)
     {
         acl::json_node &$node = $json.create_node();
@@ -139,6 +196,321 @@ namespace acl
 
 
      std::pair<bool,std::string> gson(const acl::string &$str, host_info_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const limit_speed_host_management_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.table))
+            $node.add_null("table");
+        else
+            $node.add_text("table", acl::get_value($obj.table));
+
+        if (check_nullptr($obj.filter))
+            $node.add_null("filter");
+        else
+            $node.add_child("filter", acl::gson($json, $obj.filter));
+
+        if (check_nullptr($obj.para))
+            $node.add_null("para");
+        else
+            $node.add_child("para", acl::gson($json, $obj.para));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const limit_speed_host_management_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const limit_speed_host_management_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_host_management_t &$obj)
+    {
+        acl::json_node *table = $node["table"];
+        acl::json_node *filter = $node["filter"];
+        acl::json_node *para = $node["para"];
+        std::pair<bool, std::string> $result;
+
+        if(!table ||!($result = gson(*table, &$obj.table), $result.first))
+            return std::make_pair(false, "required [limit_speed_host_management_t.table] failed:{"+$result.second+"}");
+     
+        if(!filter ||!filter->get_obj()||!($result = gson(*filter->get_obj(), &$obj.filter), $result.first))
+            return std::make_pair(false, "required [limit_speed_host_management_t.filter] failed:{"+$result.second+"}");
+     
+        if(!para ||!para->get_obj()||!($result = gson(*para->get_obj(), &$obj.para), $result.first))
+            return std::make_pair(false, "required [limit_speed_host_management_t.para] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_host_management_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, limit_speed_host_management_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const limit_speed_para_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.host_save))
+            $node.add_null("host_save");
+        else
+            $node.add_text("host_save", acl::get_value($obj.host_save));
+
+        if (check_nullptr($obj.type))
+            $node.add_null("type");
+        else
+            $node.add_text("type", acl::get_value($obj.type));
+
+        if (check_nullptr($obj.origin_hostname))
+            $node.add_null("origin_hostname");
+        else
+            $node.add_text("origin_hostname", acl::get_value($obj.origin_hostname));
+
+        if (check_nullptr($obj.hostname))
+            $node.add_null("hostname");
+        else
+            $node.add_text("hostname", acl::get_value($obj.hostname));
+
+        if (check_nullptr($obj.ssid))
+            $node.add_null("ssid");
+        else
+            $node.add_text("ssid", acl::get_value($obj.ssid));
+
+        if (check_nullptr($obj.ip))
+            $node.add_null("ip");
+        else
+            $node.add_text("ip", acl::get_value($obj.ip));
+
+        if (check_nullptr($obj.mac))
+            $node.add_null("mac");
+        else
+            $node.add_text("mac", acl::get_value($obj.mac));
+
+        if (check_nullptr($obj.limit))
+            $node.add_null("limit");
+        else
+            $node.add_text("limit", acl::get_value($obj.limit));
+
+        if (check_nullptr($obj.up_limit))
+            $node.add_null("up_limit");
+        else
+            $node.add_text("up_limit", acl::get_value($obj.up_limit));
+
+        if (check_nullptr($obj.down_limit))
+            $node.add_null("down_limit");
+        else
+            $node.add_text("down_limit", acl::get_value($obj.down_limit));
+
+        if (check_nullptr($obj.time_obj))
+            $node.add_null("time_obj");
+        else
+            $node.add_text("time_obj", acl::get_value($obj.time_obj));
+
+        if (check_nullptr($obj.name))
+            $node.add_null("name");
+        else
+            $node.add_text("name", acl::get_value($obj.name));
+
+        if (check_nullptr($obj.time_mode))
+            $node.add_null("time_mode");
+        else
+            $node.add_text("time_mode", acl::get_value($obj.time_mode));
+
+        if (check_nullptr($obj.is_cur_host))
+            $node.add_null("is_cur_host");
+        else
+            $node.add_text("is_cur_host", acl::get_value($obj.is_cur_host));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const limit_speed_para_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const limit_speed_para_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_para_t &$obj)
+    {
+        acl::json_node *host_save = $node["host_save"];
+        acl::json_node *type = $node["type"];
+        acl::json_node *origin_hostname = $node["origin_hostname"];
+        acl::json_node *hostname = $node["hostname"];
+        acl::json_node *ssid = $node["ssid"];
+        acl::json_node *ip = $node["ip"];
+        acl::json_node *mac = $node["mac"];
+        acl::json_node *limit = $node["limit"];
+        acl::json_node *up_limit = $node["up_limit"];
+        acl::json_node *down_limit = $node["down_limit"];
+        acl::json_node *time_obj = $node["time_obj"];
+        acl::json_node *name = $node["name"];
+        acl::json_node *time_mode = $node["time_mode"];
+        acl::json_node *is_cur_host = $node["is_cur_host"];
+        std::pair<bool, std::string> $result;
+
+        if(!host_save ||!($result = gson(*host_save, &$obj.host_save), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.host_save] failed:{"+$result.second+"}");
+     
+        if(!type ||!($result = gson(*type, &$obj.type), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.type] failed:{"+$result.second+"}");
+     
+        if(!origin_hostname ||!($result = gson(*origin_hostname, &$obj.origin_hostname), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.origin_hostname] failed:{"+$result.second+"}");
+     
+        if(!hostname ||!($result = gson(*hostname, &$obj.hostname), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.hostname] failed:{"+$result.second+"}");
+     
+        if(!ssid ||!($result = gson(*ssid, &$obj.ssid), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.ssid] failed:{"+$result.second+"}");
+     
+        if(!ip ||!($result = gson(*ip, &$obj.ip), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.ip] failed:{"+$result.second+"}");
+     
+        if(!mac ||!($result = gson(*mac, &$obj.mac), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.mac] failed:{"+$result.second+"}");
+     
+        if(!limit ||!($result = gson(*limit, &$obj.limit), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.limit] failed:{"+$result.second+"}");
+     
+        if(!up_limit ||!($result = gson(*up_limit, &$obj.up_limit), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.up_limit] failed:{"+$result.second+"}");
+     
+        if(!down_limit ||!($result = gson(*down_limit, &$obj.down_limit), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.down_limit] failed:{"+$result.second+"}");
+     
+        if(!time_obj ||!($result = gson(*time_obj, &$obj.time_obj), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.time_obj] failed:{"+$result.second+"}");
+     
+        if(!name ||!($result = gson(*name, &$obj.name), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.name] failed:{"+$result.second+"}");
+     
+        if(!time_mode ||!($result = gson(*time_mode, &$obj.time_mode), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.time_mode] failed:{"+$result.second+"}");
+     
+        if(!is_cur_host ||!($result = gson(*is_cur_host, &$obj.is_cur_host), $result.first))
+            return std::make_pair(false, "required [limit_speed_para_t.is_cur_host] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_para_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, limit_speed_para_t &$obj)
+    {
+        acl::json _json;
+        _json.update($str.c_str());
+        if (!_json.finish())
+        {
+            return std::make_pair(false, "json not finish error");
+        }
+        return gson(_json.get_root(), $obj);
+    }
+
+
+    acl::json_node& gson(acl::json &$json, const limit_speed_req_t &$obj)
+    {
+        acl::json_node &$node = $json.create_node();
+
+        if (check_nullptr($obj.method))
+            $node.add_null("method");
+        else
+            $node.add_text("method", acl::get_value($obj.method));
+
+        if (check_nullptr($obj.host_management))
+            $node.add_null("host_management");
+        else
+            $node.add_child("host_management", acl::gson($json, $obj.host_management));
+
+
+        return $node;
+    }
+    
+    acl::json_node& gson(acl::json &$json, const limit_speed_req_t *$obj)
+    {
+        return gson ($json, *$obj);
+    }
+
+
+    acl::string gson(const limit_speed_req_t &$obj)
+    {
+        acl::json $json;
+        acl::json_node &$node = acl::gson ($json, $obj);
+        return $node.to_string ();
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_req_t &$obj)
+    {
+        acl::json_node *method = $node["method"];
+        acl::json_node *host_management = $node["host_management"];
+        std::pair<bool, std::string> $result;
+
+        if(!method ||!($result = gson(*method, &$obj.method), $result.first))
+            return std::make_pair(false, "required [limit_speed_req_t.method] failed:{"+$result.second+"}");
+     
+        if(!host_management ||!host_management->get_obj()||!($result = gson(*host_management->get_obj(), &$obj.host_management), $result.first))
+            return std::make_pair(false, "required [limit_speed_req_t.host_management] failed:{"+$result.second+"}");
+     
+        return std::make_pair(true,"");
+    }
+
+
+    std::pair<bool,std::string> gson(acl::json_node &$node, limit_speed_req_t *$obj)
+    {
+        return gson($node, *$obj);
+    }
+
+
+     std::pair<bool,std::string> gson(const acl::string &$str, limit_speed_req_t &$obj)
     {
         acl::json _json;
         _json.update($str.c_str());
