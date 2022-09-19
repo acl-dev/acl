@@ -223,16 +223,20 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 	} else
 		flag = CREATE_SUSPENDED;
 
+#define	MIN_STACK	(1024 * 4096)
+
 #ifdef ACL_WIN32_STDC
 	h_thread->handle = handle = (HANDLE) _beginthreadex(NULL,
-			attr ? (unsigned int) attr->stacksize : 0,
+			attr && attr->stacksize > MIN_STACK ?
+				(unsigned int) attr->stacksize : MIN_STACK,
 			RunThreadWrap,
 			(void *) h_thread,
 			flag,
 			&id);
 #else
 	h_thread->handle = handle = CreateThread(NULL,
-			attr ? attr->stacksize : 0,,
+			attr && attr->stacksize > MIN_STACK ?
+				(unsigned int) attr->stacksize : MIN_STACK,
 			RunThreadWrap,
 			h_thread,
 			flag,

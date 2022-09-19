@@ -105,6 +105,9 @@
     </content>
     <content url="file://$MODULE_DIR$/../../include">
       <sourceFolder url="file://$MODULE_DIR$/../../include" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../include/mysql" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../include/sqlite" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../include/pgsql" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../include/mysql" />
       <sourceFolder url="file://$MODULE_DIR$/../../include/sqlite" />
       <sourceFolder url="file://$MODULE_DIR$/../../include/pgsql" />
@@ -121,6 +124,8 @@
     </content>
     <content url="file://$MODULE_DIR$/../../lib_acl">
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/include" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/src" />
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl/include" />
       <sourceFolder url="file://$MODULE_DIR$/../../lib_acl" />
