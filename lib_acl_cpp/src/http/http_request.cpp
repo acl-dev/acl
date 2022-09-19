@@ -345,13 +345,11 @@ bool http_request::send_request(const void* data, size_t len)
 
 	// 写 HTTP 请求头
 	if (client_->write_head(header_) == false) {
-		close();
 		return false;
 	}
 
 	// 写 HTTP 请求体
 	if (client_->write_body(data, len) == false) {
-		close();
 		return false;
 	}
 
@@ -392,6 +390,9 @@ bool http_request::request(const void* data, size_t len)
 				return false;
 			}
 
+			// 先关闭之前的连接流
+			close();
+
 			// 对于长连接，如果是第一次IO失败，则可以再重试一次
 			have_retried = true;
 			continue;
@@ -406,7 +407,6 @@ bool http_request::request(const void* data, size_t len)
 
 		if (have_retried || !reuse_conn) {
 			logger_error("read response header error");
-			close();
 			return false;
 		}
 
@@ -606,7 +606,6 @@ bool http_request::get_body(xml& out, const char* to_charset /* = NULL */)
 		// 调用可以自动解压缩的读函数
 		ret = client_->read_body(buf);
 		if (ret < 0) {
-			close();
 			break;
 		} else if (ret == 0) {
 			break;
@@ -642,7 +641,6 @@ bool http_request::get_body(json& out, const char* to_charset /* = NULL */)
 	while (true) {
 		ret = client_->read_body(buf);
 		if (ret < 0) {
-			close();
 			break;
 		} else if (ret == 0) {
 			break;
@@ -682,7 +680,6 @@ bool http_request::get_body(string& out, const char* to_charset /* = NULL */)
 	while (true) {
 		ret = client_->read_body(buf);
 		if (ret < 0) {
-			close();
 			break;
 		} else if (ret == 0) {
 			break;
@@ -716,11 +713,7 @@ int http_request::read_body(string& out, bool clean /* = false */,
 	int   ret;
 
 	if (conv_ == NULL) {
-		ret = client_->read_body(out, clean, real_size);
-		if (ret < 0) {
-			close();
-		}
-		return ret;
+		return client_->read_body(out, clean, real_size);
 	}
 
 	size_t saved_size = out.length();
@@ -728,7 +721,6 @@ int http_request::read_body(string& out, bool clean /* = false */,
 	ret = client_->read_body(buf, true, real_size);
 	if (ret < 0) {
 		conv_->update_finish(&out);
-		close();
 		return ret;
 	}
 
@@ -760,7 +752,7 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 			return true;
 		} else {
 			if (client_->disconnected()) {
-				close();
+				// Do nothing.
 			}
 			return false;
 		}
@@ -777,7 +769,7 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 			*size = out.length() - size_saved;
 		}
 		if (client_->disconnected()) {
-			close();
+			// Do nothing.
 		}
 		return false;
 	}
