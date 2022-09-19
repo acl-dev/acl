@@ -213,14 +213,6 @@ http_client* http_request::get_client(void) const
 
 bool http_request::write_head()
 {
-#if 0
-	// 必须保证该连接已经打开
-	if (client_ == NULL) {
-		logger_error("connection not opened!");
-		return false;
-	}
-#endif
-
 	bool  reuse_conn;
 	http_method_t method = header_.get_method();
 
@@ -287,6 +279,12 @@ bool http_request::write_head()
 bool http_request::write_body(const void* data, size_t len)
 {
 	while (true) {
+		// 必须保证该连接已经打开
+		if (client_ == NULL) {
+			logger_error("connection not opened yet!");
+			return false;
+		}
+
 		if (client_->write_body(data, len) == false) {
 			if (!need_retry_) {
 				return false;
@@ -294,6 +292,9 @@ bool http_request::write_body(const void* data, size_t len)
 
 			// 取消重试标志位
 			need_retry_ = false;
+
+			// 先关闭之前的连接，在 write_head() 会重新打开连接
+			close();
 
 			// 再重试一次
 			if (write_head() == false) {
@@ -338,6 +339,7 @@ bool http_request::send_request(const void* data, size_t len)
 {
 	// 必须保证该连接已经打开
 	if (client_ == NULL) {
+		logger_error("connection not opened yet!");
 		return false;
 	}
 
@@ -459,6 +461,11 @@ void http_request::check_range()
 	// 先取出用户在请求时设置的 range 字段，如果没设置则直接返回
 	header_.get_range(&range_from, &range_to);
 	if (range_from < 0) {
+		return;
+	}
+
+	if (client_ == NULL) {
+		logger_error("connection not opened yet!");
 		return;
 	}
 
@@ -590,6 +597,7 @@ http_pipe* http_request::get_pipe(const char* to_charset)
 bool http_request::get_body(xml& out, const char* to_charset /* = NULL */)
 {
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return false;
 	}
 
@@ -627,6 +635,7 @@ bool http_request::get_body(xml& out, const char* to_charset /* = NULL */)
 bool http_request::get_body(json& out, const char* to_charset /* = NULL */)
 {
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return false;
 	}
 
@@ -662,6 +671,7 @@ bool http_request::get_body(json& out, const char* to_charset /* = NULL */)
 bool http_request::get_body(string& out, const char* to_charset /* = NULL */)
 {
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return false;
 	}
 
@@ -707,6 +717,7 @@ int http_request::read_body(string& out, bool clean /* = false */,
 		out.clear();
 	}
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return -1;
 	}
 
@@ -744,6 +755,7 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 		*size = 0;
 	}
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return false;
 	}
 
@@ -788,6 +800,7 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 int http_request::read_body(char* buf, size_t size)
 {
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return -1;
 	}
 	return client_->read_body(buf, size);
@@ -832,6 +845,7 @@ void http_request::create_cookies()
 {
 	acl_assert(cookie_inited_ == false);
 	if (client_ == NULL) {
+		logger_error("connection not opened yet");
 		return;
 	}
 
