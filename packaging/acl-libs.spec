@@ -1,4 +1,4 @@
-%define release_id 22
+%define release_id 23
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,10 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Sep 19 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-23-20220919.10
+- optimize: limit the minmal thread stack size to 4M when creating new thread
+	on Win64 to avoid stack crash.
 
 * Wed Sep 14 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-22-20220914.14
 - bugfix: when using SO_REUSEPORT, acl_threads_server.cpp should support
