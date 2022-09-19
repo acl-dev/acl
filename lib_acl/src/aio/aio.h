@@ -57,7 +57,12 @@ typedef struct AIO_CONNECT_HOOK {
 	char  disable;
 } AIO_CONNECT_HOOK;
 
-#define __AIO_NESTED_MAX	10
+#if defined(_WIN32) || defined(_WIN64)
+# define __AIO_NESTED_MAX	1
+#else
+# define __AIO_NESTED_MAX	10
+#endif
+
 #define	__default_line_length	4096
 
 /* in aio_callback.c */
