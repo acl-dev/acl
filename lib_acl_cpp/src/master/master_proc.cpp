@@ -201,7 +201,7 @@ void master_proc::service_on_listen(void* ctx, ACL_VSTREAM* sstream)
 
 	server_socket* ss = NEW server_socket(sstream);
 	mp->servers_.push_back(ss);
-	server_socket m(sstream);
+	//server_socket m(sstream);
 	mp->proc_on_listen(*ss);
 }
 
