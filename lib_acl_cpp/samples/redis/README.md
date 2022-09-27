@@ -55,7 +55,7 @@ static void test_redis_string(acl::redis& cmd, const char* key) {
 	cmd.clear();
 
 	// call redis-server: GET key
-	if (!cmd.get(key, val)) {}
+	if (!cmd.get(key, val)) {
 		printf("get key error\r\n");
 	}
 }
