@@ -83,6 +83,8 @@ private:
 			return false;
 		}
 
+		//printf("query=%s\r\n", query.to_string().c_str());
+
 		const acl::db_rows* result = db.get_result();
 		if (__show_results && result)
 		{
@@ -195,9 +197,10 @@ static void usage(const char* procname)
 		" -f mysqlclient_path\r\n"
 		" -s mysql_addr\r\n"
 		" -o db_oper[add|get]\r\n"
-		" -d [show results of get]\r\n"
+		" -D [show results of get]\r\n"
 		" -C conn_timeout\r\n"
 		" -R rw_timeout\r\n"
+		" -d dbname(default: acl_db)\r\n"
 		" -u dbuser\r\n"
 		" -p dbpass\r\n",
 		procname);
@@ -214,7 +217,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:d")) > 0)
+	while ((ch = getopt(argc, argv, "hc:tn:f:s:u:o:p:C:R:d:D")) > 0)
 	{
 		switch (ch)
 		{
@@ -252,6 +255,9 @@ int main(int argc, char *argv[])
 			rw_timeout = atoi(optarg);
 			break;
 		case 'd':
+			dbname = optarg;
+			break;
+		case 'D':
 			__show_results = true;
 			break;
 		default:

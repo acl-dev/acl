@@ -595,4 +595,19 @@ charset_conv* charset_conv::create(const char* fromCharset, const char* toCharse
 	return conv;
 }
 
+string strconv(const char* in, size_t len,
+	const char* from_charset, const char* to_charset)
+{
+	charset_conv conv;
+	string res;
+	if (conv.convert(from_charset, to_charset, in, len, &res)) {
+		return res;
+	} else {
+		logger_error("convert error, from=%s, to=%s",
+			from_charset, to_charset);
+		res.clear();
+		return res;
+	}
+}
+
 } // namespace acl

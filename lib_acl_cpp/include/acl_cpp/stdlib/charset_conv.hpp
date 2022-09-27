@@ -88,6 +88,8 @@ public:
 	virtual int pop_end(string* out, size_t max = 0);
 	virtual void clear();
 
+public:
+
 private:
 	bool m_addInvalid;  // 如果遇到无效的字符集，是否直接拷贝
 	string  m_errmsg;
@@ -99,5 +101,16 @@ private:
 	ACL_VSTRING* m_pOutBuf;
 	const char* m_pUtf8Pre;
 };
+
+/**
+ * 该 C-like API 可以更方便快捷地方便进行字符集转换
+ * @param in {const char*} 输入字符串(非空字符串)
+ * @param len {size_t} 输入字符串长度(>0)
+ * @param from_charset {const char*} 源字符集编码
+ * @param to_charset {constchar*} 目标字符集编码
+ * @return {string} 返回的 string 对象非空时(即: !string.empty()) 表示转换成功
+ */
+ACL_CPP_API string strconv(const char* in, size_t len,
+	const char* from_charset, const char* to_charset);
 
 } // namespace acl

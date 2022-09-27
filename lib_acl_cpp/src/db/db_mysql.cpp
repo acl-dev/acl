@@ -696,12 +696,12 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	}
 
 	if (!charset_.empty()) {
-		if (!__mysql_set_character_set(conn_, charset_.c_str())) {
-			logger("set mysql charset to %s, %s", charset_.c_str(),
-				__mysql_character_set_name(conn_));
-		} else {
+		if (__mysql_set_character_set(conn_, charset_.c_str())) {
 			logger_error("set mysql to %s error %s",
 				charset_.c_str(), __mysql_error(conn_));
+		} else {
+			//logger("set mysql charset to %s, %s", charset_.c_str(),
+			//	__mysql_character_set_name(conn_));
 		}
 	}
 
