@@ -124,6 +124,7 @@
 /* errno define */
 #if defined(_WIN32) || defined(_WIN64)
 # define	ACL_ETIMEDOUT		WSAETIMEDOUT
+# define	ACL_ETIME		WSAETIMEDOUT
 # define	ACL_ENOMEM		WSAENOBUFS
 # define	ACL_EINVAL		WSAEINVAL
 

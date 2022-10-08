@@ -385,7 +385,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 		now = event_get_stamp(ev);
 		if (pe->expire > 0 && now >= pe->expire) {
-			acl_fiber_set_error(FIBER_ETIMEDOUT);
+			acl_fiber_set_error(FIBER_ETIME);
 			break;
 		}
 	}

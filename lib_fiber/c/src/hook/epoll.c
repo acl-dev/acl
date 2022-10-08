@@ -652,7 +652,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 		now = event_get_stamp(ev);
 		if (ee->expire > 0 && now >= ee->expire) {
-			acl_fiber_set_error(FIBER_ETIMEDOUT);
+			acl_fiber_set_error(FIBER_ETIME);
 			break;
 		}
 	}

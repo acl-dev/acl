@@ -54,6 +54,7 @@
 # define ACL_API
 
 # define	ACL_ETIMEDOUT		ETIMEDOUT
+# define	ACL_ETIME		ETIME
 # define	ACL_ENOMEM		ENOMEM
 # define	ACL_EINVAL		EINVAL
 

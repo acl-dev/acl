@@ -23,7 +23,7 @@ int read_wait(socket_t fd, int delay)
 			}
 			return -1;
 		case 0:
-			acl_fiber_set_error(FIBER_ETIMEDOUT);
+			acl_fiber_set_error(FIBER_ETIME);
 			return -1;
 		default:
 			if ((fds.revents & POLLIN)) {

@@ -144,7 +144,7 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event,
 				msg_fatal("%s(%d), %s: wait event error",
 					__FILE__, __LINE__, __FUNCTION__);
 			}
-			return ETIMEDOUT;
+			return FIBER_ETIME;
 		}
 
 		__ll_lock(cond);

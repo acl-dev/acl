@@ -23,6 +23,13 @@ static void event_uring_free(EVENT *ev)
 	mem_free(ep);
 }
 
+#define	TRY_SUBMMIT(e) do {  \
+	if (++(e)->appending >= (e)->sqe_size) {  \
+		(e)->appending = 0;  \
+		io_uring_submit(&(e)->ring);  \
+	}  \
+} while (0)
+
 static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 {
 	struct io_uring_sqe *sqe;
@@ -31,12 +38,9 @@ static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 	io_uring_prep_poll_add(sqe, fe->fd, POLLIN | POLLHUP | POLLERR);
 	io_uring_sqe_set_data(sqe, fe);
 	sqe->flags = IOSQE_IO_LINK;
-	if (++ep->appending >= ep->sqe_size) {
-		ep->appending = 0;
-		io_uring_submit(&ep->ring);
-	}
 
 	file_event_refer(fe);
+	TRY_SUBMMIT(ep);
 
 	fe->rts.tv_sec  = tmo_ms / 1000;
 	fe->rts.tv_nsec = (((long long) tmo_ms) % 1000) * 1000000;
@@ -46,11 +50,7 @@ static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 	io_uring_sqe_set_data(sqe, fe);
 
 	file_event_refer(fe);
-
-	if (++ep->appending >= ep->sqe_size) {
-		ep->appending = 0;
-		io_uring_submit(&ep->ring);
-	}
+	TRY_SUBMMIT(ep);
 }
 
 static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
@@ -72,18 +72,14 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 			(struct sockaddr*) &fe->peer_addr,
 			(socklen_t*) &fe->addr_len, 0);
 		io_uring_sqe_set_data(sqe, fe);
-		if (++ep->appending >= ep->sqe_size) {
-			ep->appending = 0;
-			io_uring_submit(&ep->ring);
-		}
+
+		TRY_SUBMMIT(ep);
 	} else {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, 0);
 		io_uring_sqe_set_data(sqe, fe);
-		if (++ep->appending >= ep->sqe_size) {
-			ep->appending = 0;
-			io_uring_submit(&ep->ring);
-		}
+
+		TRY_SUBMMIT(ep);
 	}
 
 	return 0;
@@ -137,6 +133,60 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 	return 0;
 }
 
+static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
+{
+	if (fe->mask & EVENT_ACCEPT) {
+		fe->iocp_sock = res;
+	} else if (fe->mask & EVENT_POLLIN) {
+		if (res == -ETIME) {
+			printf("fd=%d timeout, fe=%p\r\n", fe->fd, fe);
+			file_event_unrefer(fe);
+			return;
+		} else if (res == -ECANCELED) {
+			printf("fd=%d canceled, fe=%p\n", fe->fd, fe);
+			file_event_unrefer(fe);
+			return;
+		} else if (res & POLLIN) {
+			fe->mask &= ~EVENT_POLLIN;
+			CLR_READWAIT(fe);
+		} else {
+			printf("unknown res=%d, fd=%d\n", res, fe->fd);
+		}
+	} else {
+		fe->rlen = res;
+	}
+
+	fe->mask &= ~EVENT_READ;
+	fe->r_proc(ev, fe);
+}
+
+static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
+{
+	if (fe->mask & EVENT_CONNECT) {
+		fe->iocp_sock = res;
+	} else if (fe->mask & EVENT_POLLOUT) {
+		if (res == -ETIME) {
+			printf("fd=%d timeout, fe=%p\r\n", fe->fd, fe);
+			file_event_unrefer(fe);
+			return;
+		} else if (res == -ECANCELED) {
+			printf("fd=%d canceled, fe=%p\n", fe->fd, fe);
+			file_event_unrefer(fe);
+			return;
+		} else if (res & POLLIN) {
+			fe->mask &= ~EVENT_POLLOUT;
+			CLR_WRITEWAIT(fe);
+		} else {
+			printf("unknown res=%d, fd=%d\n", res, fe->fd);
+		}
+	} else {
+		fe->wlen = res;
+	}
+
+	fe->mask &= ~EVENT_WRITE;
+	fe->w_proc(ev, fe);
+}
+
 static int event_uring_wait(EVENT *ev, int timeout)
 {
 	EVENT_URING *ep = (EVENT_URING*) ev;
@@ -157,8 +207,6 @@ static int event_uring_wait(EVENT *ev, int timeout)
 	}
 
 	if (ep->appending > 0) {
-		printf("\r\n>>>>fid=%d, submit append=%d\r\n",
-			acl_fiber_self(), (int) ep->appending);
 		ep->appending = 0;
 		io_uring_submit(&ep->ring);
 	}
@@ -197,43 +245,17 @@ static int event_uring_wait(EVENT *ev, int timeout)
 			return -1;
 		}
 
-		usleep(1000000);
+		//usleep(100000);
 
 		if ((fe->mask & EVENT_READ) && fe->r_proc) {
-			fe->mask &= ~EVENT_READ;
-			if (fe->mask & EVENT_ACCEPT) {
-				fe->iocp_sock = res;
-			} else if (fe->mask & EVENT_POLLIN) {
-				if (res == -ETIME) {
-					printf("fd read timeout=%d\r\n", fe->fd);
-					fe->rlen = -1;
-					file_event_unrefer(fe);
-				} else if (res == -ECANCELED) {
-					printf("fd=%d canceled\n", fe->fd);
-					file_event_unrefer(fe);
-					continue;
-				} else if (res & POLLIN) {
-				}
-			} else {
-				fe->rlen = res;
-			}
-
-			fe->r_proc(ev, fe);
+			handle_read(ev, fe, res);
 		}
 
 		if ((fe->mask & EVENT_WRITE) && fe->w_proc) {
-			fe->mask &= ~EVENT_WRITE;
-			if (fe->mask & EVENT_CONNECT) {
-				fe->iocp_sock = res;
-			} else {
-				fe->wlen = res;
-			}
-
-			fe->w_proc(ev, fe);
+			handle_write(ev, fe, res);
 		}
 	}
 
-	printf(">>>fid=%d, handle count=%d<<<<\n\n", acl_fiber_self(), count);
 	return count;
 }
 
