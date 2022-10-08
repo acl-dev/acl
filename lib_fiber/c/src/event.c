@@ -7,6 +7,8 @@
 #include "event/event_poll.h"
 #include "event/event_wmsg.h"
 #include "event/event_iocp.h"
+#include "event/event_io_uring.h"
+
 #include "event.h"
 
 static __thread int __event_mode = FIBER_EVENT_KERNEL;
@@ -17,6 +19,8 @@ void event_set(int event_mode)
 	case FIBER_EVENT_KERNEL:
 	case FIBER_EVENT_POLL:
 	case FIBER_EVENT_SELECT:
+	case FIBER_EVENT_WMSG:
+	case FIBER_EVENT_IO_URING:
 		__event_mode = event_mode;
 		break;
 	default:
@@ -43,7 +47,14 @@ EVENT *event_create(int size)
 #ifdef	HAS_WMSG
 		ev = event_wmsg_create(size);
 #else
-		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
+		msg_fatal("%s(%d): WMSG not support!", __FUNCTION__, __LINE__);
+#endif
+		break;
+	case FIBER_EVENT_IO_URING:
+#ifdef	HAS_IO_URING
+		ev = event_io_uring_create(size);
+#else
+		msg_fatal("%s(%d): IO_URING not support!", __FUNCTION__, __LINE__);
 #endif
 		break;
 	default:

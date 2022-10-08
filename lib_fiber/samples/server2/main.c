@@ -101,7 +101,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 
-		// buf[ret] = 0; printf("buf=%s\r\n", buf);
+		//buf[ret] = 0; printf("buf=%s\r\n", buf);
 		__count++;
 
 		if (!__echo_data)
@@ -185,7 +185,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 		*pfd = cfd;
 
 		__nconnect++;
-		printf("accept one, fd: %u, %p\r\n", cfd, pfd);
+		printf("accept one, fd: %d, %p\r\n", cfd, pfd);
 		acl_fiber_create2(attr, echo_client, pfd);
 	}
 
@@ -213,7 +213,7 @@ static void fiber_memcheck(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -e event_mode [kernel|select|poll]\r\n"
+		" -e event_mode [kernel|select|poll|io_uring]\r\n"
 		" -s listen_ip\r\n"
 		" -p listen_port\r\n"
 		" -r rw_timeout\r\n"
@@ -260,10 +260,13 @@ int main(int argc, char *argv[])
 			acl_fiber_attr_setsharestack(&fiber_attr, 1);
 			break;
 		case 'e':
-			if (strcasecmp(optarg, "select") == 0)
+			if (strcasecmp(optarg, "select") == 0) {
 				event_mode = FIBER_EVENT_SELECT;
-			else if (strcasecmp(optarg, "poll") == 0)
+			} else if (strcasecmp(optarg, "poll") == 0) {
 				event_mode = FIBER_EVENT_POLL;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				event_mode = FIBER_EVENT_IO_URING;
+			}
 			break;
 		default:
 			break;

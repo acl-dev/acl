@@ -223,6 +223,7 @@ FIBER_API void acl_fiber_schedule(void);
 #define FIBER_EVENT_POLL	1	/* poll			*/
 #define FIBER_EVENT_SELECT	2	/* select		*/
 #define FIBER_EVENT_WMSG	3	/* win message		*/
+#define	FIBER_EVENT_IO_URING	4	/* io_uring of Linux5.x */
 FIBER_API void acl_fiber_schedule_with(int event_mode);
 
 /**

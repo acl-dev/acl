@@ -123,6 +123,8 @@ struct FILE_EVENT {
 #define	EVENT_ERR		(unsigned) (1 << 2)
 #define	EVENT_HUP		(unsigned) (1 << 3)
 #define	EVENT_NVAL		(unsigned) (1 << 4)
+#define	EVENT_ACCEPT		(unsigned) (1 << 5)
+#define	EVENT_CONNECT		(unsigned) (1 << 6)
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
@@ -140,6 +142,9 @@ struct FILE_EVENT {
 	const char   *wbuf;
 	size_t        wsize;
 	int           wlen;
+	socket_t      iocp_sock;
+	struct sockaddr_in peer_addr;
+	socklen_t     addr_len;
 #endif
 
 #ifdef HAS_IOCP
@@ -154,7 +159,7 @@ struct FILE_EVENT {
 	IOCP_EVENT   *poller_write;
 	socket_t      iocp_sock;
 	int           sock_type;
-	struct sockaddr_in peer_addr;
+	struct sockaddr_in addr;
 #endif
 };
 

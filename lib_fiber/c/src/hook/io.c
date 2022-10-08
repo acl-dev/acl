@@ -202,6 +202,10 @@ static int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 			return fe->wlen;
 		}
 
+		// only for test
+		printf("%s: write error, wlen=%d, size=%zd\n", __FUNCTION__,
+				fe->wlen, fe->wsize);
+
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
@@ -568,7 +572,19 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 // In the API connect() being hooked in hook/socket.c, the STATUS_NDUBLOCK
 // flag was set and the fd was in non-block status in order to return imaginary
 // from connecting process.
-#define CHECK_SET_NBLOCK(_fd) do { \
+
+#if defined(HAS_IO_URING)
+# define CHECK_SET_NBLOCK(_fd) do { \
+	if (var_hook_sys_api && !EVENT_IS_IO_URING(fiber_io_event())) { \
+		FILE_EVENT *fe = fiber_file_get(_fd); \
+		if (fe && IS_NDUBLOCK(fe)) { \
+			non_blocking(_fd, NON_BLOCKING); \
+			CLR_NDUBLOCK(fe); \
+		} \
+	} \
+} while (0)
+#else
+# define CHECK_SET_NBLOCK(_fd) do { \
 	if (var_hook_sys_api) { \
 		FILE_EVENT *fe = fiber_file_get(_fd); \
 		if (fe && IS_NDUBLOCK(fe)) { \
@@ -577,6 +593,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		} \
 	} \
 } while (0)
+#endif
 
 #ifdef SYS_UNIX
 ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
@@ -622,6 +639,14 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 		fe = fiber_file_open_write(fd);
 		CLR_POLLING(fe);
+
+/*
+#if defined(HAS_IO_URING)
+		if (EVENT_IS_IO_URING(fiber_io_event())) {
+			return fiber_iocp_write(fe, buf, (int) count);
+		}
+#endif
+*/
 
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",

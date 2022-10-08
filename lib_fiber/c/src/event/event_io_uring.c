@@ -11,6 +11,7 @@
 typedef struct EVENT_URING {
 	EVENT event;
 	struct io_uring ring;
+	size_t appending;
 } EVENT_URING;
 
 static void event_uring_free(EVENT *ev)
@@ -32,9 +33,18 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 	fe->mask |= EVENT_READ;
 	sqe = io_uring_get_sqe(&ep->ring);
 	assert(sqe);
-
 	io_uring_sqe_set_data(sqe, fe);
-	io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, 0);
+
+	ep->appending++;
+
+	if (fe->mask & EVENT_ACCEPT) {
+		fe->addr_len = (socklen_t) sizeof(fe->peer_addr);
+		io_uring_prep_accept(sqe, fe->fd,
+			(struct sockaddr*) &fe->peer_addr,
+			(socklen_t*) &fe->addr_len, 0);
+	} else {
+		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, 0);
+	}
 	return 0;
 }
 
@@ -49,9 +59,17 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 	fe->mask |= EVENT_WRITE;
 	sqe = io_uring_get_sqe(&ep->ring);
 	assert(sqe);
-
 	io_uring_sqe_set_data(sqe, fe);
-	io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wlen, 0);
+
+	ep->appending++;
+
+	if (fe->mask & EVENT_CONNECT) {
+		io_uring_prep_connect(sqe, fe->fd,
+			(struct sockaddr*) &fe->peer_addr,
+			(socklen_t) fe->addr_len);
+	} else {
+		io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wsize, 0);
+	}
 	return 0;
 }
 
@@ -78,33 +96,49 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 static int event_uring_wait(EVENT *ev, int timeout)
 {
 	EVENT_URING *ep = (EVENT_URING*) ev;
-	struct __kernel_timespec ts, *tp;
+	//struct __kernel_timespec ts, *tp;
 	struct io_uring_cqe *cqe;
-	unsigned count = 0, head;
 	FILE_EVENT *fe;
-	int n;
+	int ret, count = 0;
 
+	/*
 	if (timeout >= 0) {
 		ts.tv_sec = timeout / 1000;
 		ts.tv_nsec = (((long long) timeout) % 1000) * 1000000;
 		tp = &ts;
 	} else {
+		ts.tv_sec = 0;
+		ts.tv_nsec = 0;
 		tp = NULL;
 	}
+	*/
+	(void) timeout;
 
-	n = io_uring_submit_and_wait_timeout(&ep->ring, &cqe, 1, tp, NULL);
-	if (n == 0) {
-		return 0;
-	} else if (n < 0) {
-		if (n == -ETIME) {
-			return 0;
-		}
-		printf("%s(%d): wait error=%d\r\n", __FUNCTION__, __LINE__, n);
-		return -1;
+	if (ep->appending > 0) {
+		ep->appending = 0;
+		io_uring_submit(&ep->ring);
 	}
 
-	io_uring_for_each_cqe(&ep->ring, head, cqe) {
+	while (1) {
+		if (count > 0) {
+			ret = io_uring_peek_cqe(&ep->ring, &cqe);
+		} else {
+			ret = io_uring_wait_cqe(&ep->ring, &cqe);
+		}
+
+		if (ret) {
+			if (ret == -EAGAIN) {
+				return 0;
+			}
+
+			msg_error("io_uring_wait_cqe error=%s", strerror(-ret));
+			return -1;
+		}
+
+		count++;
+
 		if (cqe->res == -ENOBUFS) {
+			msg_error("%s(%d): ENOBUFS error", __FUNCTION__, __LINE__);
 			return -1;
 		}
 
@@ -116,14 +150,26 @@ static int event_uring_wait(EVENT *ev, int timeout)
 
 		if (fe && (fe->mask & EVENT_READ) && fe->r_proc) {
 			fe->mask &= ~EVENT_READ;
-			fe->rlen = cqe->res;
+			if (fe->mask & EVENT_ACCEPT) {
+				fe->iocp_sock = cqe->res;
+			} else {
+				fe->rlen = cqe->res;
+			}
+
 			fe->r_proc(ev, fe);
 		}
 
 		if (fe && (fe->mask & EVENT_WRITE) && fe->w_proc) {
 			fe->mask &= ~EVENT_WRITE;
+			if (fe->mask & EVENT_CONNECT) {
+				fe->iocp_sock = cqe->res;
+			} else {
+				fe->wlen = cqe->res;
+			}
+
 			fe->w_proc(ev, fe);
 		}
+		break;
 	}
 
 	return count;
@@ -149,15 +195,20 @@ EVENT *event_io_uring_create(int size)
 {
 	EVENT_URING *eu = (EVENT_URING *) mem_calloc(1, sizeof(EVENT_URING));
 	struct io_uring_params params;
+	int ret;
 
-	if (size <= 0 || size > 100) {
-		size = 100;
+	if (size <= 0 || size >= 4096) {
+		size = 2048;
 	}
 
 	memset(&params, 0, sizeof(params));
-	if (io_uring_queue_init_params(size, &eu->ring, &params) < 0) {
-		abort();
+	ret = io_uring_queue_init_params(size, &eu->ring, &params);
+	if (ret < 0) {
+		msg_fatal("%s(%d): init io_uring error=%s, size=%d",
+			__FUNCTION__, __LINE__, strerror(-ret), size);
 	}
+
+	eu->appending    = 0;
 
 	eu->event.name   = event_uring_name;
 	eu->event.handle = (acl_handle_t (*)(EVENT *)) event_uring_handle;
