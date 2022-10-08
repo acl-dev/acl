@@ -160,7 +160,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
-		" -e event_mode [kernel|select|poll]\r\n"
+		" -e event_mode [kernel|select|poll|io_uring]\r\n"
 		" -s server_ip\r\n"
 		" -p server_port\r\n"
 		" -t connt_timeout\r\n"
@@ -228,12 +228,15 @@ int main(int argc, char *argv[])
 			__stack_size = atoi(optarg);
 			break;
 		case 'e':
-			if (strcasecmp(optarg, "select") == 0)
+			if (strcasecmp(optarg, "select") == 0) {
 				event_mode = FIBER_EVENT_SELECT;
-			else if (strcasecmp(optarg, "poll") == 0)
+			} else if (strcasecmp(optarg, "poll") == 0) {
 				event_mode = FIBER_EVENT_POLL;
-			else if (strcasecmp(optarg, "kernel") == 0)
+			} else if (strcasecmp(optarg, "kernel") == 0) {
 				event_mode = FIBER_EVENT_KERNEL;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				event_mode = FIBER_EVENT_IO_URING;
+			}
 			break;
 		default:
 			break;
