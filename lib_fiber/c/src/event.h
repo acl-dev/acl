@@ -133,6 +133,13 @@ struct FILE_EVENT {
 	EPOLL_CTX    *epx;
 #endif
 
+#ifdef HAS_IO_URING
+	char         *rbuf;
+	size_t        rsize;
+	char         *wbuf;
+	size_t        wsize;
+#endif
+
 #ifdef HAS_IOCP
 	char          packet[1500];  // just for UDP packet
 	char         *buff;
