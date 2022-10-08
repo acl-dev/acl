@@ -11,6 +11,7 @@
 typedef struct EVENT_URING {
 	EVENT event;
 	struct io_uring ring;
+	size_t sqe_size;
 	size_t appending;
 } EVENT_URING;
 
@@ -35,8 +36,6 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 	assert(sqe);
 	io_uring_sqe_set_data(sqe, fe);
 
-	ep->appending++;
-
 	if (fe->mask & EVENT_ACCEPT) {
 		fe->addr_len = (socklen_t) sizeof(fe->peer_addr);
 		io_uring_prep_accept(sqe, fe->fd,
@@ -46,6 +45,10 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, 0);
 	}
 
+	if (++ep->appending >= ep->sqe_size) {
+		ep->appending = 0;
+		io_uring_submit(&ep->ring);
+	}
 	return 0;
 }
 
@@ -62,8 +65,6 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 	assert(sqe);
 	io_uring_sqe_set_data(sqe, fe);
 
-	ep->appending++;
-
 	if (fe->mask & EVENT_CONNECT) {
 		io_uring_prep_connect(sqe, fe->fd,
 			(struct sockaddr*) &fe->peer_addr,
@@ -72,6 +73,10 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 		io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wsize, 0);
 	}
 
+	if (++ep->appending >= ep->sqe_size) {
+		ep->appending = 0;
+		io_uring_submit(&ep->ring);
+	}
 	return 0;
 }
 
@@ -196,11 +201,13 @@ EVENT *event_io_uring_create(int size)
 	int ret;
 
 	if (size <= 0 || size >= 4096) {
-		size = 2048;
+		eu->sqe_size = 2048;
+	} else {
+		eu->sqe_size = size;
 	}
 
 	memset(&params, 0, sizeof(params));
-	ret = io_uring_queue_init_params(size, &eu->ring, &params);
+	ret = io_uring_queue_init_params(eu->sqe_size, &eu->ring, &params);
 	if (ret < 0) {
 		msg_fatal("%s(%d): init io_uring error=%s, size=%d",
 			__FUNCTION__, __LINE__, strerror(-ret), size);
