@@ -108,60 +108,116 @@ int WINAPI acl_fiber_close(socket_t fd)
 
 /****************************************************************************/
 
-#ifdef SYS_UNIX
-
-//# define READ_FIRST
-
-# ifdef READ_FIRST
-ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
+#if defined(HAS_IOCP) || defined(HAS_IO_URING)
+static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
-	FILE_EVENT* fe;
-
-	if (fd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
-		return -1;
+#if defined(HAS_IOCP)
+	/* If the socket type is UDP, We must check the fixed buffer first,
+	 * which maybe used in iocp_add_read() and set for polling read status.
+	 */
+	if (fe->sock_type == SOCK_DGRAM && fe->rbuf == fe->packet && fe->rlen > 0) {
+		if (fe->rlen < len) {
+			len = fe->rlen;
+		}
+		memcpy(buf, fe->packet, len);
+		fe->rbuf = NULL;
+		fe->rlen  = 0;
+		return len;
 	}
+#endif
 
-	if (sys_read == NULL) {
-		hook_once();
-	}
-
-	if (!var_hook_sys_api) {
-		return (*sys_read)(fd, buf, count);
-	}
-
-	fe = fiber_file_open(fd);
-	CLR_POLLING(fe);
+	fe->rbuf  = buf;
+	fe->rsize = (size_t) len;
+	fe->rlen  = 0;
 
 	while (1) {
-		ssize_t n;
 		int err;
 
-		if (acl_fiber_canceled(fe->fiber)) {
-			acl_fiber_set_error(fe->fiber->errnum);
+		fe->mask &= ~EVENT_READ;
+
+		if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
 			return -1;
 		}
 
-		n = (*sys_read)(fd, buf, count);
-		if (n >= 0) {
-			return n;
+		if (fe->mask & EVENT_ERR) {
+			err = acl_fiber_last_error();
+			fiber_save_errno(err);
+			return -1;
+		}
+
+		if (acl_fiber_canceled(fe->fiber_r)) {
+			acl_fiber_set_error(fe->fiber_r->errnum);
+			return -1;
+		}
+
+		if (fe->rlen >= 0) {
+			return fe->rlen;
 		}
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			return -1;
-		}
-
-		if (fiber_wait_read(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) fd);
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
 			return -1;
 		}
 	}
 }
-# else
+#endif // HAS_IOCP || HAS_IO_URING
+
+#if defined(HAS_IO_URING)
+static int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
+{
+	fe->wbuf  = buf;
+	fe->wsize = (size_t) len;
+	fe->wlen  = 0;
+
+	while (1) {
+		int err;
+
+		fe->mask &= ~EVENT_WRITE;
+
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
+			return -1;
+		}
+
+		if (fe->mask & EVENT_ERR) {
+			err = acl_fiber_last_error();
+			fiber_save_errno(err);
+			return -1;
+		}
+
+		if (acl_fiber_canceled(fe->fiber_w)) {
+			acl_fiber_set_error(fe->fiber_w->errnum);
+			return -1;
+		}
+
+		if (fe->wlen == (int) fe->wsize) {
+			return fe->wlen;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+
+		if (!error_again(err)) {
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
+			return -1;
+		}
+	}
+}
+
+#endif
+
+#ifdef SYS_UNIX
+
 ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 {
 	FILE_EVENT* fe;
@@ -181,6 +237,12 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 
 	fe = fiber_file_open_read(fd);
 	CLR_POLLING(fe);
+
+#ifdef HAS_IO_URING
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
+		return fiber_iocp_read(fe, buf, (int) count);
+	}
+#endif
 
 	while (1) {
 		ssize_t ret;
@@ -237,7 +299,6 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		}
 	}
 }
-# endif // READ_FIRST
 
 ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 {
@@ -293,65 +354,6 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 	}
 }
 #endif // SYS_UNIX
-
-#ifdef HAS_IOCP
-static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
-{
-	/* If the socket type is UDP, We must check the fixed buffer first,
-	 * which maybe used in iocp_add_read() and set for polling read status.
-	 */
-	if (fe->sock_type == SOCK_DGRAM && fe->buff == fe->packet && fe->len > 0) {
-		if (fe->len < len) {
-			len = fe->len;
-		}
-		memcpy(buf, fe->packet, len);
-		fe->buff = NULL;
-		fe->len  = 0;
-		return len;
-	}
-
-	fe->buff = buf;
-	fe->size = len;
-	fe->len  = 0;
-
-	while (1) {
-		int err;
-
-		fe->mask &= ~EVENT_READ;
-
-		if (fiber_wait_read(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
-			return -1;
-		}
-
-		if (fe->mask & EVENT_ERR) {
-			err = acl_fiber_last_error();
-			fiber_save_errno(err);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_r)) {
-			acl_fiber_set_error(fe->fiber_r->errnum);
-			return -1;
-		}
-
-		if (fe->len >= 0) {
-			return fe->len;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
-				fiber_file_free(fe);
-			}
-			return -1;
-		}
-	}
-}
-#endif
 
 #ifdef SYS_WIN
 int WINAPI acl_fiber_WSARecv(socket_t sockfd,
@@ -589,6 +591,14 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 	}
 
 	CHECK_SET_NBLOCK(fd);
+
+#if defined(HAS_IO_URING)
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
+		FILE_EVENT *fe = fiber_file_open_write(fd);
+		CLR_POLLING(fe);
+		return fiber_iocp_write(fe, buf, (int) count);
+	}
+#endif
 
 	while (1) {
 		ssize_t n = (*sys_write)(fd, buf, count);

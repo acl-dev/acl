@@ -242,29 +242,29 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		return iocp_add_listen(ev, fe);
 	}
 
-	/* If fe->buff has been set in io.c, we use it as overlapped buffer,
+	/* If fe->rbuf has been set in io.c, we use it as overlapped buffer,
 	 * or we must check if the socket is for UDP and being in poll reading
 	 * status, if so, we must use the fixed buffer as UDP's reading buffer,
 	 * because IOCP will discard UDP packet when no buffer provided.
 	 */
-	if (fe->buff != NULL && fe->size > 0) {
-		wsaData.buf = fe->buff;
-		wsaData.len = fe->size;
+	if (fe->rbuf != NULL && fe->rsize > 0) {
+		wsaData.buf = fe->rbuf;
+		wsaData.len = fe->rsize;
 	} else if (IS_POLLING(fe) && fe->sock_type == SOCK_DGRAM) {
-		fe->buff    = fe->packet;
-		fe->size    = sizeof(fe->packet);
-		fe->len     = 0;
+		fe->rbuf    = fe->packet;
+		fe->rsize   = sizeof(fe->packet);
+		fe->rlen    = 0;
 		wsaData.buf = fe->packet;
-		wsaData.len = fe->size;
+		wsaData.len = fe->rsize;
 	} else {
-		wsaData.buf = fe->buff;
-		wsaData.len = fe->size;
+		wsaData.buf = fe->rbuf;
+		wsaData.len = fe->rsize;
 	}
 
 	ret = WSARecv(fe->fd, &wsaData, 1, &len, &flags,
 		(OVERLAPPED*) &event->overlapped, NULL);
 
-	fe->len = (int) len;
+	fe->rlen = (int) len;
 
 	if (ret != SOCKET_ERROR) {
 		fe->mask |= EVENT_READ;
@@ -278,7 +278,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		fe->mask |= EVENT_ERR;
 #if 0
 		fe->mask &= ~EVENT_READ;
-		fe->len = -1;
+		fe->rlen = -1;
 		array_append(ev->events, event);
 #else
 		iocp_event_save(ev, event, fe, -1);
@@ -418,7 +418,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		fe->mask |= EVENT_ERR;
 #if 0
 		fe->mask &= ~EVENT_WRITE;
-		fe->len = -1;
+		fe->rlen = -1;
 		array_append(ev->events, event);
 #else
 		iocp_event_save(ev, event, fe, -1);
@@ -500,7 +500,7 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 		CLR_WRITEWAIT(fe);
 	}
 
-	fe->len = (int) trans;
+	fe->rlen = (int) trans;
 	array_append(ei->events, event);
 }
 

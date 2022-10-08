@@ -136,15 +136,17 @@ struct FILE_EVENT {
 #ifdef HAS_IO_URING
 	char         *rbuf;
 	size_t        rsize;
-	char         *wbuf;
+	int           rlen;
+	const char   *wbuf;
 	size_t        wsize;
+	int           wlen;
 #endif
 
 #ifdef HAS_IOCP
 	char          packet[1500];  // just for UDP packet
-	char         *buff;
-	int           size;
-	int           len;
+	char         *rbuf;
+	int           rsize;
+	int           rlen;
 	HANDLE        h_iocp;
 	IOCP_EVENT   *reader;
 	IOCP_EVENT   *writer;
@@ -196,8 +198,10 @@ struct EVENT {
 
 	long long stamp;  // the stamp of the current fiber scheduler
 	unsigned flag;
-#define EVENT_F_IOCP (1 << 0)
-#define EVENT_IS_IOCP(x) ((x)->flag & EVENT_F_IOCP)
+#define EVENT_F_IOCP		(1 << 0)
+#define	EVENT_F_IO_URING	(1 << 1)
+#define EVENT_IS_IOCP(x)	((x)->flag & EVENT_F_IOCP)
+#define	EVENT_IS_IO_URING(x)	((x)->flag & EVENT_F_IO_URING)
 
 #ifdef HAS_POLL
 	TIMER_CACHE *poll_list;
