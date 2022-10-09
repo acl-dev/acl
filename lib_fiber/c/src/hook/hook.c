@@ -75,6 +75,11 @@ sendfile64_fn __sys_sendfile64              = NULL;
 sendfile64_fn *sys_sendfile64               = NULL;
 # endif
 
+pread_fn      __sys_pread                   = NULL;
+pread_fn      *sys_pread                    = NULL;
+pwrite_fn     __sys_pwrite                  = NULL;
+pwrite_fn     *sys_pwrite                   = NULL;
+
 # ifdef HAS_EPOLL
 epoll_create_fn __sys_epoll_create          = NULL;
 epoll_create_fn *sys_epoll_create           = NULL;
@@ -97,6 +102,8 @@ renameat2_fn    __sys_renameat2             = NULL;
 renameat2_fn    *sys_renameat2              = NULL;
 mkdirat_fn      __sys_mkdirat               = NULL;
 mkdirat_fn      *sys_mkdirat                = NULL;
+splice_fn       __sys_splice                = NULL;
+splice_fn       *sys_splice                 = NULL;
 # endif
 
 # ifndef __APPLE__
@@ -235,6 +242,8 @@ static void hook_api(void)
 # ifdef __USE_LARGEFILE64
 	LOAD_FN("sendfile64", sendfile64_fn, __sys_sendfile64, sys_sendfile64);
 # endif
+	LOAD_FN("pread", pread_fn, __sys_pread, sys_pread);
+	LOAD_FN("pwrite", pwrite_fn, __sys_pwrite, sys_pwrite);
 	LOAD_FN("poll", poll_fn, __sys_poll, sys_poll);
 	LOAD_FN("select", select_fn, __sys_select, sys_select);
 
@@ -252,6 +261,7 @@ static void hook_api(void)
 	LOAD_FN("statx", statx_fn, __sys_statx, sys_statx);
 	LOAD_FN("renameat2", renameat2_fn, __sys_renameat2, sys_renameat2);
 	LOAD_FN("mkdirat", mkdirat_fn, __sys_mkdirat, sys_mkdirat);
+	LOAD_FN("splice", splice_fn, __sys_splice, sys_splice);
 # endif
 
 	LOAD_FN("getaddrinfo", getaddrinfo_fn, __sys_getaddrinfo, sys_getaddrinfo);

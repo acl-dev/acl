@@ -62,11 +62,11 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	fe->mask &= ~EVENT_FILE_CLOSE;
 
-	if (fe->fd == 0) {
+	if (fe->rlen == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->fd);
+		acl_fiber_set_error(fe->rlen);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -89,7 +89,6 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 		return (*sys_openat)(dirfd, pathname, flags, mode);
 	}
 
-	fiber_io_check();
 	ev = fiber_io_event();
 	if (!EVENT_IS_IO_URING(ev)) {
 		return (*sys_openat)(dirfd, pathname, flags, mode);
@@ -108,13 +107,14 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 	free(fe->rbuf);
 	fe->rbuf = NULL;
 
-	if (fe->fd >= 0) {
-		fiber_file_set(fe);
+	if (fe->rlen >= 0) {
+		fe->fd   = fe->rlen;
 		fe->type = TYPE_FILE | TYPE_EVENTABLE;
+		fiber_file_set(fe);
 		return fe->fd;
 	}
 
-	acl_fiber_set_error(-fe->fd);
+	acl_fiber_set_error(-fe->rlen);
 	file_event_unrefer(fe);
 	return -1;
 }
@@ -142,7 +142,6 @@ int unlink(const char *pathname)
 		return (*sys_unlink)(pathname);
 	}
 
-	fiber_io_check();
 	ev = fiber_io_event();
 	if (!EVENT_IS_IO_URING(ev)) {
 		return (*sys_unlink)(pathname);
@@ -161,11 +160,11 @@ int unlink(const char *pathname)
 	free(fe->rbuf);
 	fe->rbuf = NULL;
 
-	if (fe->fd == 0) {
+	if (fe->rlen == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->fd);
+		acl_fiber_set_error(-fe->rlen);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -183,7 +182,6 @@ int renameat2(int olddirfd, const char *oldpath,
 		return (*sys_renameat2)(olddirfd, oldpath, newdirfd, newpath, flags);
 	}
 
-	fiber_io_check();
 	ev = fiber_io_event();
 	if (!EVENT_IS_IO_URING(ev)) {
 		return (*sys_renameat2)(olddirfd, oldpath, newdirfd, newpath, flags);
@@ -204,11 +202,11 @@ int renameat2(int olddirfd, const char *oldpath,
 	free(fe->rbuf);
 	free(fe->var.path);
 
-	if (fe->fd == 0) {
+	if (fe->rlen == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->fd);
+		acl_fiber_set_error(fe->rlen);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -236,7 +234,6 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 		return (*sys_statx)(dirfd, pathname, flags, mask, statxbuf);
 	}
 
-	fiber_io_check();
 	ev = fiber_io_event();
 	if (!EVENT_IS_IO_URING(ev)) {
 		return (*sys_statx)(dirfd, pathname, flags, mask, statxbuf);
@@ -257,12 +254,12 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	free(fe->rbuf);
 	fe->rbuf = NULL;
 
-	if (fe->fd == 0) {
+	if (fe->rlen == 0) {
 		file_event_unrefer(fe);
 		memcpy(statxbuf, &fe->var.statxbuf, sizeof(struct statx));
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->fd);
+		acl_fiber_set_error(fe->rlen);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -278,16 +275,16 @@ int stat(const char *pathname, struct stat *statbuf)
 		return -1;
 	}
 
-	statbuf->st_dev = statxbuf.stx_dev_major;
-	statbuf->st_ino = statxbuf.stx_ino;
-	statbuf->st_mode = statxbuf.stx_mode;
-	statbuf->st_nlink = statxbuf.stx_nlink;
-	statbuf->st_uid = statxbuf.stx_uid;
-	statbuf->st_gid = statxbuf.stx_gid;
-	statbuf->st_rdev = statxbuf.stx_rdev_major;
-	statbuf->st_size = statxbuf.stx_size;
-	statbuf->st_blksize = statxbuf.stx_blksize;
-	statbuf->st_blocks = statxbuf.stx_blocks;
+	statbuf->st_dev         = statxbuf.stx_dev_major;
+	statbuf->st_ino         = statxbuf.stx_ino;
+	statbuf->st_mode        = statxbuf.stx_mode;
+	statbuf->st_nlink       = statxbuf.stx_nlink;
+	statbuf->st_uid         = statxbuf.stx_uid;
+	statbuf->st_gid         = statxbuf.stx_gid;
+	statbuf->st_rdev        = statxbuf.stx_rdev_major;
+	statbuf->st_size        = statxbuf.stx_size;
+	statbuf->st_blksize     = statxbuf.stx_blksize;
+	statbuf->st_blocks      = statxbuf.stx_blocks;
 	statbuf->st_atim.tv_sec = statxbuf.stx_atime.tv_sec;
 	statbuf->st_mtim.tv_sec = statxbuf.stx_mtime.tv_sec;
 	statbuf->st_ctim.tv_sec = statxbuf.stx_ctime.tv_sec;
@@ -305,7 +302,6 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 		return (*sys_mkdirat)(dirfd, pathname, mode);
 	}
 
-	fiber_io_check();
 	ev = fiber_io_event();
 	if (!EVENT_IS_IO_URING(ev)) {
 		return (*sys_mkdirat)(dirfd, pathname, mode);
@@ -323,15 +319,118 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	fe->mask &= ~EVENT_DIR_MKDIRAT;
 	free(fe->rbuf);
 
-	if (fe->fd == 0) {
+	if (fe->rlen == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->fd);
+		acl_fiber_set_error(-fe->rlen);
 		file_event_unrefer(fe);
 		return -1;
 	}
 }
 
-#endif // HAS_IO_URING
+#define _GNU_SOURCE
+#include <fcntl.h>
 
+ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
+	loff_t *poff_out, size_t len, unsigned int flags)
+{
+	FILE_EVENT *fe;
+	EVENT *ev;
+	int    ret;
+	loff_t off_in, off_out;
+	unsigned int sqe_flags = 0;
+
+	if (fd_in < 0 || fd_out < 0) {
+		msg_error("%s: invalid fd_in: %d, fd_out: %d",
+			__FUNCTION__, fd_in, fd_out);
+		return -1;
+	}
+
+	CHECK_API("sys_splice", sys_splice);
+
+	if (!var_hook_sys_api) {
+		return (*sys_splice)(fd_in, poff_in, fd_out, poff_out, len, flags);
+	}
+
+	ev = fiber_io_event();
+
+	if (!EVENT_IS_IO_URING(ev)) {
+		return (*sys_splice)(fd_in, poff_in, fd_out, poff_out, len, flags);
+	}
+
+	off_in  = poff_in ? *poff_in : -1;
+	off_out = poff_out ? *poff_out : -1;
+
+	FILE_ALLOC(fe, EVENT_SPLICE);
+
+	// flags => SPLICE_F_FD_IN_FIXED;
+	// sqe_flags => IOSQE_FIXED_FILE;
+	event_uring_splice(ev, fe, fd_in, off_in, fd_out, off_out, len, flags,
+		sqe_flags, IORING_OP_SPLICE);
+
+	fiber_io_inc();
+	acl_fiber_switch();
+	fiber_io_dec();
+
+	fe->mask &= ~EVENT_SPLICE;
+
+	if (fe->rlen < 0) {
+		acl_fiber_set_error(-fe->rlen);
+		file_event_unrefer(fe);
+		return -1;
+	}
+	
+	if (off_in != -1 && poff_in) {
+		*poff_in += fe->rlen;
+	}
+
+	if (off_out != -1 && poff_out) {
+		*poff_out += fe->rlen;
+	}
+
+	ret = fe->rlen;
+	file_event_unrefer(fe);
+	return ret;
+}
+
+ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
+{
+	FILE_EVENT *fe;
+	EVENT *ev = fiber_io_event();
+	int ret;
+
+	FILE_ALLOC(fe, EVENT_SENDFILE);
+
+	if (pipe(fe->var.pipefd) == -1) {
+		msg_error("%s(%d): pipe error=%s",
+			__FUNCTION__, __LINE__, last_serror());
+		return -1;
+	}
+
+	event_uring_sendfile(ev, fe, out_fd, in_fd, off ? *off : 0, cnt);
+
+	fiber_io_inc();
+	acl_fiber_switch();
+	fiber_io_dec();
+
+	fe->mask &= ~EVENT_SENDFILE;
+
+	ret = fe->rlen;
+	close(fe->var.pipefd[0]);
+	close(fe->var.pipefd[1]);
+
+	if (ret < 0) {
+		acl_fiber_set_error(-ret);
+		file_event_unrefer(fe);
+		return -1;
+	}
+
+	if (off) {
+		*off += cnt;
+	}
+	file_event_unrefer(fe);
+	return ret;
+}
+
+#endif // HAS_IO_URING

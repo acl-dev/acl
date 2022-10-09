@@ -18,6 +18,11 @@ void event_uring_file_renameat2(EVENT *ev, FILE_EVENT *fe, int olddirfd,
 	const char *oldpath, int newdirfd, const char *newpath, unsigned flags);
 void event_uring_mkdirat(EVENT *ev, FILE_EVENT *fe, int dirfd,
 	const char *pathname, mode_t mode);
+void event_uring_splice(EVENT *ev, FILE_EVENT *fe, int fd_in, loff_t off_in,
+	int fd_out, loff_t off_out, size_t len, unsigned int splice_flags,
+	unsigned int sqe_flags, __u8 opcode);
+void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
+	off64_t off, size_t cnt);
 
 #endif
 

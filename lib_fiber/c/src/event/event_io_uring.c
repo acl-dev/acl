@@ -197,6 +197,43 @@ void event_uring_mkdirat(EVENT *ev, FILE_EVENT *fe, int dirfd,
 	TRY_SUBMMIT(ep);
 }
 
+void event_uring_splice(EVENT *ev, FILE_EVENT *fe, int fd_in, loff_t off_in,
+	int fd_out, loff_t off_out, size_t len, unsigned int splice_flags,
+	unsigned int sqe_flags, __u8 opcode)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_splice(sqe, fd_in, off_in, fd_out, off_out,
+		len, splice_flags);
+	io_uring_sqe_set_data(sqe, fe);
+	sqe->flags |= sqe_flags;
+	sqe->opcode = opcode;
+	TRY_SUBMMIT(ep);
+}
+
+void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
+	off64_t off, size_t cnt)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+	unsigned flags = SPLICE_F_MOVE |SPLICE_F_MORE;
+
+	printf("hello>>>in=%d, off=%d\n", in, (int) off);
+	io_uring_prep_splice(sqe, in, off, fe->var.pipefd[1], -1, cnt, flags);
+	io_uring_sqe_set_data(sqe, fe);
+	sqe->opcode = IORING_OP_SPLICE;
+
+	TRY_SUBMMIT(ep);
+
+	sqe = io_uring_get_sqe(&ep->ring);
+	io_uring_prep_splice(sqe, fe->var.pipefd[0], -1, out, -1, cnt, flags);
+	io_uring_sqe_set_data(sqe, fe);
+	sqe->opcode = IORING_OP_SPLICE;
+
+	TRY_SUBMMIT(ep);
+}
+
 static int event_uring_del_read(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 {
 	if (!(fe->mask & EVENT_READ)) {
@@ -326,7 +363,8 @@ static int event_uring_wait(EVENT *ev, int timeout)
 				break;
 			}
 
-			msg_error("io_uring_wait_cqe error=%s", strerror(-ret));
+			msg_error("%s(%d): io_uring_wait_cqe error=%s",
+				__FUNCTION__, __LINE__, strerror(-ret));
 			return -1;
 		}
 
@@ -369,21 +407,16 @@ static int event_uring_wait(EVENT *ev, int timeout)
 		| EVENT_FILE_UNLINK \
 		| EVENT_FILE_STATX \
 		| EVENT_FILE_RENAMEAT2 \
-		| EVENT_DIR_MKDIRAT)
+		| EVENT_DIR_MKDIRAT \
+		| EVENT_SPLICE \
+		| EVENT_SENDFILE)
 
-		switch (fe->mask & FLAGS) {
-		case EVENT_FILE_CLOSE:
-		case EVENT_FILE_OPENAT:
-		case EVENT_FILE_UNLINK:
-		case EVENT_FILE_STATX:
-		case EVENT_FILE_RENAMEAT2:
-		case EVENT_DIR_MKDIRAT:
-			fe->fd = res;
+		if (fe->mask & FLAGS) {
+			fe->rlen = res;
 			fe->r_proc(ev, fe);
-			break;
-		default:
-			msg_error("Unknown mask=%u", (fe->mask & FLAGS));
-			break;
+		} else {
+			msg_error("%s(%d): unknown mask=%u",
+				__FUNCTION__, __LINE__, (fe->mask & ~FLAGS));
 		}
 	}
 

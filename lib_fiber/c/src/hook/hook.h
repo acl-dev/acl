@@ -78,6 +78,7 @@ typedef int (*unlink_fn)(const char *);
 typedef int (*statx_fn)(int dirfd, const char *, int, unsigned int, struct statx *);
 typedef int (*renameat2_fn)(int, const char *, int, const char *, unsigned);
 typedef int (*mkdirat_fn)(int, const char *, mode_t);
+typedef ssize_t (*splice_fn)(int, loff_t *, int, loff_t *, size_t, unsigned);
 # endif
 
 # ifndef __APPLE__
@@ -85,7 +86,10 @@ typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 	size_t, struct hostent **, int *);
 # endif
 
-#endif
+typedef size_t (*pread_fn)(int, void *, size_t, off_t);
+typedef ssize_t (*pwrite_fn)(int, const void *, size_t, off_t);
+
+#endif  // __linux__, __APPLE__, __FreeBSD__, MINGW
 
 FIBER_API void WINAPI set_socket_fn(socket_fn *fn);
 FIBER_API void WINAPI set_close_fn(close_fn *fn);
@@ -155,18 +159,26 @@ extern epoll_ctl_fn         *sys_epoll_ctl;
 # endif
 
 # ifdef HAS_IO_URING
+typedef struct EVENT EVENT;
+typedef struct FILE_EVENT FILE_EVENT;
+
 extern int file_close(EVENT *ev, FILE_EVENT *fe);
+extern ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt);
 
 extern openat_fn            *sys_openat;
 extern unlink_fn            *sys_unlink;
 extern statx_fn             *sys_statx;
 extern renameat2_fn         *sys_renameat2;
 extern mkdirat_fn           *sys_mkdirat;
+extern splice_fn            *sys_splice;
 # endif
 
 # ifndef __APPLE__
 extern gethostbyname_r_fn   *sys_gethostbyname_r;
 # endif
+
+extern pread_fn             *sys_pread;
+extern pwrite_fn            *sys_pwrite;
 
 #endif // SYS_UNIX
 

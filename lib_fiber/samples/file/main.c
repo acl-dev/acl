@@ -1,14 +1,25 @@
+
+#define	_GNU_SOURCE
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
 #include <getopt.h>
+#include <sys/sendfile.h>
 #include "lib_acl.h"
 #include "fiber/libfiber.h"
 
 static int __open_flags = 0;
 static int __write_size = 1024;
+
+struct FIBER_CTX {
+	const char *frompath;
+	const char *topath;
+	off_t off;
+	int   len;
+};
 
 static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 {
@@ -41,8 +52,8 @@ static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *path = (const char*) ctx;
-	int   fd = open(path, __open_flags, 0600), i, ret;
-	char  buf[1];
+	int   fd = open(path, __open_flags, 0600), i, n;
+	char  buf[10];
 	if (fd < 0) {
 		printf("open %s error %s\r\n", path, strerror(errno));
 		return;
@@ -50,8 +61,9 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	printf("open %s ok, fd=%d\r\n", path, fd);
 
-	buf[0] = 'x';
 	for (i = 0; i < __write_size; i++) {
+		n = i % 10;
+		snprintf(buf, sizeof(buf), "%d", n);
 		if (write(fd, buf, 1) <= 0) {
 			printf("write to %s error %s\r\n", path, strerror(errno));
 			break;
@@ -59,8 +71,119 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 
 	(void) write(fd, "\r\n", 2);
-	ret = close(fd);
-	printf("close %s %s, fd=%d\r\n", path, ret == 0 ? "ok" : "error", fd);
+	n = close(fd);
+	printf("close %s %s, fd=%d\r\n", path, n == 0 ? "ok" : "error", fd);
+}
+
+static void fiber_pread(ACL_FIBER *fiber acl_unused, void *ctx)
+{
+	const struct FIBER_CTX *fc = (const struct FIBER_CTX*)ctx;
+	int   fd = open(fc->frompath, O_RDONLY, 0600), ret;
+	char  buf[4096];
+	int len = (int) sizeof(buf) - 1 > fc->len ? fc->len : (int) sizeof(buf) - 1;
+
+	if (fd == -1) {
+		printf("open %s error %s\r\n", fc->frompath, strerror(errno));
+		return;
+	}
+
+	ret = pread(fd, buf, len, fc->off);
+	if (ret < 0) {
+		printf("pread from %s %d error %s\r\n",
+			fc->frompath, fd, strerror(errno));
+	} else {
+		buf[ret] = 0;
+		printf("%s\r\n", buf);
+	}
+
+	close(fd);
+}
+
+static int accept_one(void)
+{
+	const char *addr = "127.0.0.1:8080";
+	ACL_VSTREAM *ln = acl_vstream_listen(addr, 128), *conn;
+	int cfd;
+	if (ln == NULL) {
+		printf("listen %s error %s\r\n", addr, strerror(errno));
+		exit(1);
+	}
+
+	printf("Waiting for accept from %s ...\r\n", addr);
+
+	conn = acl_vstream_accept(ln, NULL, 0);
+	if (conn == NULL) {
+		printf("accept from %s error %s\r\n", addr, strerror(errno));
+		exit(1);
+	}
+	acl_vstream_close(ln);
+
+	cfd = ACL_VSTREAM_SOCK(conn);
+	acl_vstream_free(conn);
+	return cfd;
+}
+
+static void fiber_sendfile(ACL_FIBER *fiber acl_unused, void *ctx)
+{
+	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
+	int in = open(fc->frompath, O_RDONLY, 0600), cfd;
+	ssize_t ret;
+
+	if (in == -1) {
+		printf("open %s error %s\r\n", fc->frompath, strerror(errno));
+		return;
+	}
+
+	cfd = accept_one();
+	ret = sendfile64(cfd, in, &fc->off, 100);
+	printf(">>>sendfile ret=%zd, off=%d\r\n", ret, (int) fc->off);
+
+	close(in);
+	close(cfd);
+}
+
+static void fiber_splice(ACL_FIBER *fiber acl_unused, void *ctx)
+{
+	const char *path = (const char*) ctx;
+	int in = open(path, O_RDONLY, 0600), out;
+	loff_t off_in = 0;
+	int pipefd[2];
+
+	if (in == -1) {
+		printf("open %s error %s\r\n", path, strerror(errno));
+		return;
+	}
+
+	if (pipe(pipefd) == -1) {
+		printf("create pipe error %s\r\n", strerror(errno));
+		exit(1);
+	}
+	out = pipefd[1];
+
+	while (1) {
+		char buf[1024];
+		int flags = SPLICE_F_MOVE |SPLICE_F_MORE;
+		int ret = splice(in, &off_in, out, NULL, 100, flags);
+
+		if (ret <= 0) {
+			printf("splice over: %s\r\n", strerror(errno));
+			break;
+		}
+
+		ret = read(pipefd[0], buf, sizeof(buf) - 1);
+		if (ret <= 0) {
+			printf("read from pipe over: %s\r\n", strerror(errno));
+			break;
+		}
+
+		buf[ret] = 0;
+		printf("%s", buf);
+		fflush(stdout);
+	}
+
+	close(in);
+	close(pipefd[0]);
+	close(pipefd[1]);
 }
 
 static void fiber_filestat(ACL_FIBER *fiber acl_unused, void *ctx)
@@ -79,22 +202,17 @@ static void fiber_filestat(ACL_FIBER *fiber acl_unused, void *ctx)
 		statbuf.st_ctime);
 }
 
-struct FIBER_CTX {
-	const char *oldpath;
-	const char *newpath;
-};
-
 static void fiber_rename(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
 
-	if (rename(fc->oldpath, fc->newpath) == -1) {
+	if (rename(fc->frompath, fc->topath) == -1) {
 		printf("rename from %s to %s error %s\r\n",
-			fc->oldpath, fc->newpath, strerror(errno));
+			fc->frompath, fc->topath, strerror(errno));
 		return;
 	}
 
-	printf("rename from %s to %s ok\r\n", fc->oldpath, fc->newpath);
+	printf("rename from %s to %s ok\r\n", fc->frompath, fc->topath);
 }
 
 static void fiber_unlink(ACL_FIBER *fiber acl_unused, void *ctx)
@@ -125,10 +243,25 @@ static void usage(const char *proc)
 	printf("usage: %s -h [help]\r\n"
 		"  -f filepath\r\n"
 		"  -t tofilepath\r\n"
-		"  -a action[read|write|unlink|stat|mkdir]\r\n"
+		"  -a action[read|write|rename|unlink|stat|mkdir|splice|pread|pwrite|sendfile]\r\n"
 		"  -n write_size[default: 1024]\r\n"
 		"  -o open_flags[O_RDONLY, O_WRONLY, O_RDWR, O_APPEND, O_CREAT, O_EXCL, O_TRUNC]\r\n"
+		"  -p offset\r\n"
 		, proc);
+}
+
+static int check_ctx(const char *action, const struct FIBER_CTX *ctx)
+{
+	if (ctx->frompath == NULL) {
+		printf("%s: frompath NULL\r\n", action);
+		return -1;
+	}
+	if (ctx->topath == NULL) {
+		printf("%s: rename topath: NULL\r\n", action);
+		return -1;
+	}
+
+	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -137,25 +270,33 @@ int main(int argc, char *argv[])
 	char buf[256], buf2[256], action[128];
 	struct FIBER_CTX ctx;
 
-	buf[0]    = 0;
-	action[0] = 0;
-	ctx.oldpath = NULL;
-	ctx.newpath = NULL;
+	buf[0]       = 0;
+	action[0]    = 0;
+	ctx.frompath = NULL;
+	ctx.topath   = NULL;
+	ctx.off      = 0;
+	ctx.len      = 100;
 
 #define	EQ(x, y)	!strcasecmp((x), (y))
 
-	while ((ch = getopt(argc, argv, "hf:t:a:o:n:")) > 0) {
+	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:l:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 'f':
 			snprintf(buf, sizeof(buf), "%s", optarg);
-			ctx.oldpath = buf;
+			ctx.frompath = buf;
 			break;
 		case 't':
 			snprintf(buf2, sizeof(buf2), "%s", optarg);
-			ctx.newpath = buf2;
+			ctx.topath = buf2;
+			break;
+		case 'p':
+			ctx.off = atoi(optarg);
+			break;
+		case 'l':
+			ctx.len = atoi(optarg);
 			break;
 		case 'a':
 			snprintf(action, sizeof(action), "%s", optarg);
@@ -193,6 +334,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
+	acl_fiber_msg_stdout_enable(1);
 	acl_msg_stdout_enable(1);
 
 	if (__open_flags == 0) {
@@ -208,9 +350,18 @@ int main(int argc, char *argv[])
 	} else if (EQ(action, "stat")) {
 		acl_fiber_create(fiber_filestat, buf, 320000);
 	} else if (EQ(action, "rename")) {
+		if (check_ctx("rename", &ctx) == -1) {
+			return 1;
+		}
 		acl_fiber_create(fiber_rename, &ctx, 320000);
 	} else if (EQ(action, "mkdir")) {
 		acl_fiber_create(fiber_mkdir, buf, 320000);
+	} else if (EQ(action, "splice")) {
+		acl_fiber_create(fiber_splice, buf, 320000);
+	} else if (EQ(action, "pread")) {
+		acl_fiber_create(fiber_pread, &ctx, 320000);
+	} else if (EQ(action, "sendfile")) {
+		acl_fiber_create(fiber_sendfile, &ctx, 320000);
 	} else {
 		printf("Unknown action=%s\r\n", action);
 		usage(argv[0]);

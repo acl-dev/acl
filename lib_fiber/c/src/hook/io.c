@@ -102,8 +102,10 @@ int WINAPI acl_fiber_close(socket_t fd)
 		ret = (*sys_close)(fd);
 	}
 
-	fiber_file_free(fe);
+	// We must set fd INVALID_SOCKET to stop any using the old fd,
+	// fe will be freed only when the reference of it is 0.
 	fe->fd = INVALID_SOCKET;
+	fiber_file_free(fe);
 
 	if (ret != 0) {
 		fiber_save_errno(acl_fiber_last_error());
@@ -222,6 +224,70 @@ static int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 #endif
 
 #ifdef SYS_UNIX
+
+ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+{
+	FILE_EVENT *fe;
+
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
+	if (sys_pread == NULL) {
+		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_pread)(fd, buf, count, offset);
+	}
+
+#ifdef HAS_IO_URING
+	if (!EVENT_IS_IO_URING(fiber_io_event())) {
+		return (*sys_pread)(fd, buf, count, offset);
+	}
+
+	fe = fiber_file_open_read(fd);
+	CLR_POLLING(fe);
+	fe->off = offset;
+
+	return fiber_iocp_read(fe, buf, (int) count);
+#else
+	return (*sys_pread)(fd, buf, count, offset);
+#endif
+}
+
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
+{
+	FILE_EVENT *fe;
+
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
+	if (sys_pwrite == NULL) {
+		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_pwrite)(fd, buf, count, offset);
+	}
+
+#ifdef HAS_IO_URING
+	if (!EVENT_IS_IO_URING(fiber_io_event())) {
+		return (*sys_pwrite)(fd, buf, count, offset);
+	}
+
+	fe = fiber_file_open_write(fd);
+	CLR_POLLING(fe);
+	fe->off = offset;
+
+	return fiber_iocp_write(fe, buf, (int) count);
+#else
+	return (*sys_pwrite)(fd, buf, count, offset);
+#endif
+}
 
 ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 {
@@ -978,6 +1044,7 @@ ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 /****************************************************************************/
 
 #if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
+
 ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
 	if (out_fd == INVALID_SOCKET) {
@@ -988,6 +1055,12 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 	if (sys_sendfile64 == NULL) {
 		hook_once();
 	}
+
+#ifdef	HAS_IO_URING
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
+		return file_sendfile(out_fd, in_fd, offset, count);
+	}
+#endif
 
 	CHECK_SET_NBLOCK(out_fd);
 
@@ -1035,4 +1108,5 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		}
 	}
 }
+
 #endif

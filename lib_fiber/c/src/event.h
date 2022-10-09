@@ -142,6 +142,8 @@ struct FILE_EVENT {
 #define	EVENT_FILE_STATX	(unsigned) (1 << 12)
 #define	EVENT_FILE_RENAMEAT2	(unsigned) (1 << 13)
 #define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 14)
+#define	EVENT_SPLICE		(unsigned) (1 << 15)
+#define	EVENT_SENDFILE		(unsigned) (1 << 16)
 
 #endif // HAS_IO_URING
 
@@ -167,6 +169,7 @@ struct FILE_EVENT {
 		struct sockaddr_in peer_addr;
 		struct statx statxbuf;
 		char  *path;
+		int    pipefd[2];
 	} var;
 	socklen_t     addr_len;
 	struct __kernel_timespec rts;
