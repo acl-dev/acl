@@ -23,6 +23,26 @@ static void event_uring_free(EVENT *ev)
 	mem_free(ep);
 }
 
+static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe)
+{
+	struct io_uring_sqe *sqe;
+	struct __kernel_timespec ts;
+
+	sqe = io_uring_get_sqe(&ep->ring);
+	io_uring_sqe_set_data(sqe, fe);
+	io_uring_prep_poll_add(sqe, fe->fd, POLLIN);
+	sqe->flags |= IOSQE_IO_LINK;
+	++ep->appending;
+
+	ts.tv_sec = 2;
+	ts.tv_nsec = 0;
+	sqe = io_uring_get_sqe(&ep->ring);
+	io_uring_sqe_set_data(sqe, fe);
+	io_uring_prep_link_timeout(sqe, &ts, 0);
+	//sqe->flags |= IOSQE_IO_LINK;
+	++ep->appending;
+}
+
 static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 {
 	struct io_uring_sqe *sqe;
@@ -43,6 +63,8 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 			(socklen_t*) &fe->addr_len, 0);
 	} else {
 		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, 0);
+		//sqe->flags |= IOSQE_IO_LINK;
+		add_read_wait(ep, fe);
 	}
 
 	if (++ep->appending >= ep->sqe_size) {
@@ -116,9 +138,11 @@ static int event_uring_wait(EVENT *ev, int timeout)
 		ts.tv_sec  = 0;
 		ts.tv_nsec = 0;
 		tp         = NULL;
+		assert(0);
 	}
 
 	if (ep->appending > 0) {
+		printf(">>>>submit append=%d\r\n", (int) ep->appending);
 		ep->appending = 0;
 		io_uring_submit(&ep->ring);
 	}
@@ -131,6 +155,7 @@ static int event_uring_wait(EVENT *ev, int timeout)
 			ret = io_uring_wait_cqes(&ep->ring, &cqe, 1, tp, NULL);
 		}
 
+		//printf("ret=%d, eagain=%d, time=%d, tim=%d\n", ret, EAGAIN, ETIME, (int) timeout);
 		if (ret) {
 			if (ret == -ETIME) {
 				return 0;
@@ -152,12 +177,31 @@ static int event_uring_wait(EVENT *ev, int timeout)
 
 		fe = (FILE_EVENT*) io_uring_cqe_get_data(cqe);
 
+		printf("ret=%d, POLLIN=%d, POLLNVAL=%d, res=%d, e=%s, %s\n",
+			ret, __io_uring_prep_poll_mask(cqe->res), POLLNVAL, cqe ? cqe->res : -10000,
+			cqe->res < 0 ? strerror(-cqe->res) : "ok",
+			strerror(195));
+
+		if (cqe->res == -ETIME) {
+			printf("timeout, fd=%d\r\n", fe ? fe->fd : -1);
+			continue;
+		}
+
+		if (cqe->res == -ECANCELED) {
+			printf("canceled, fd=%d\r\n", fe ? fe->fd : -1);
+			continue;
+		}
+
 		if ((fe->mask & EVENT_READ) && fe->r_proc) {
 			fe->mask &= ~EVENT_READ;
 			if (fe->mask & EVENT_ACCEPT) {
 				fe->iocp_sock = cqe->res;
 			} else {
 				fe->rlen = cqe->res;
+				if (cqe->res == -ETIME) {
+					printf("fd read timeout=%d\r\n", fe->fd);
+					fe->rlen = -1;
+				}
 			}
 
 			fe->r_proc(ev, fe);
@@ -175,6 +219,7 @@ static int event_uring_wait(EVENT *ev, int timeout)
 		}
 	}
 
+	printf(">>>handle count=%d\n", count);
 	return count;
 }
 
@@ -209,11 +254,11 @@ EVENT *event_io_uring_create(int size)
 	memset(&params, 0, sizeof(params));
 	ret = io_uring_queue_init_params(eu->sqe_size, &eu->ring, &params);
 	if (ret < 0) {
-		msg_fatal("%s(%d): init io_uring error=%s, size=%d",
-			__FUNCTION__, __LINE__, strerror(-ret), size);
+		msg_fatal("%s(%d): init io_uring error=%s, size=%zd",
+			__FUNCTION__, __LINE__, strerror(-ret), eu->sqe_size);
 	} else {
-		msg_info("%s(%d): init io_uring ok, size=%d",
-			__FUNCTION__, __LINE__, size);
+		msg_info("%s(%d): init io_uring ok, size=%zd",
+			__FUNCTION__, __LINE__, eu->sqe_size);
 	}
 
 	eu->appending    = 0;
