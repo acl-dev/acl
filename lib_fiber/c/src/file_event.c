@@ -34,6 +34,8 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	fe->sock_type    = getsocktype(fd);
 	memset(&fe->peer_addr, 0, sizeof(fe->peer_addr));
 #endif
+
+	fe->refer = 1;
 }
 
 FILE_EVENT *file_event_alloc(socket_t fd)
@@ -43,7 +45,22 @@ FILE_EVENT *file_event_alloc(socket_t fd)
 	return fe;
 }
 
-void file_event_free(FILE_EVENT *fe)
+static void file_event_free(FILE_EVENT *fe)
 {
 	mem_free(fe);
+}
+
+int file_event_refer(FILE_EVENT *fe)
+{
+	return ++fe->refer;
+}
+
+int file_event_unrefer(FILE_EVENT *fe)
+{
+	if (--fe->refer <= 0) {
+		file_event_free(fe);
+		return 0;
+	} else {
+		return fe->refer;
+	}
 }

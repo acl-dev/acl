@@ -8,6 +8,11 @@
 #ifdef	HAS_EPOLL
 #include <sys/epoll.h>
 #endif
+
+#ifdef	HAS_IO_URING
+#include <liburing.h>
+#endif
+
 #include "fiber/libfiber.h"
 
 #if defined(USE_FAST_TIME)
@@ -125,6 +130,8 @@ struct FILE_EVENT {
 #define	EVENT_NVAL		(unsigned) (1 << 4)
 #define	EVENT_ACCEPT		(unsigned) (1 << 5)
 #define	EVENT_CONNECT		(unsigned) (1 << 6)
+#define	EVENT_POLLIN		(unsigned) (1 << 7)
+#define	EVENT_POLLOUT		(unsigned) (1 << 8)
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
@@ -145,6 +152,10 @@ struct FILE_EVENT {
 	socket_t      iocp_sock;
 	struct sockaddr_in peer_addr;
 	socklen_t     addr_len;
+	struct __kernel_timespec rts;
+	struct __kernel_timespec wts;
+	int           r_timeout;
+	int           w_timeout;
 #endif
 
 #ifdef HAS_IOCP
@@ -161,6 +172,7 @@ struct FILE_EVENT {
 	int           sock_type;
 	struct sockaddr_in addr;
 #endif
+	int refer;
 };
 
 #ifdef HAS_POLL
@@ -238,7 +250,8 @@ struct EVENT {
 /* file_event.c */
 void file_event_init(FILE_EVENT *fe, socket_t fd);
 FILE_EVENT *file_event_alloc(socket_t fd);
-void file_event_free(FILE_EVENT *fe);
+int file_event_refer(FILE_EVENT *fe);
+int file_event_unrefer(FILE_EVENT *fe);
 
 /* event.c */
 void event_set(int event_mode);

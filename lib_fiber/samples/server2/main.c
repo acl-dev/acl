@@ -185,7 +185,8 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 		*pfd = cfd;
 
 		__nconnect++;
-		printf("accept one, fd: %d, %p\r\n", cfd, pfd);
+		printf("fiber-%d: accept one, fd: %d, %p\r\n",
+			acl_fiber_self(), cfd, pfd);
 		acl_fiber_create2(attr, echo_client, pfd);
 	}
 

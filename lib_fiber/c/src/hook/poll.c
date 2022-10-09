@@ -132,10 +132,18 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 		POLLFD *pfd = &pe->fds[i];
 
 		if (pfd->pfd->events & POLLIN) {
+#ifdef	HAS_IO_URING
+			pfd->fe->mask |= EVENT_POLLIN;
+			pfd->fe->r_timeout = timeout;
+#endif
 			event_add_read(ev, pfd->fe, read_callback);
 			SET_READWAIT(pfd->fe);
 		}
 		if (pfd->pfd->events & POLLOUT) {
+#ifdef	HAS_IO_URING
+			pfd->fe->mask |= EVENT_POLLOUT;
+			pfd->fe->w_timeout = timeout;
+#endif
 			event_add_write(ev, pfd->fe, write_callback);
 			SET_WRITEWAIT(pfd->fe);
 		}
@@ -170,10 +178,12 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 
 		if (pfd->pfd->events & POLLIN) {
 			CLR_READWAIT(pfd->fe);
+			pfd->fe->mask &= ~EVENT_POLLIN;
 			event_del_read(ev, pfd->fe);
 		}
 		if (pfd->pfd->events & POLLOUT) {
 			CLR_WRITEWAIT(pfd->fe);
+			pfd->fe->mask &= ~EVENT_POLLOUT;
 			event_del_write(ev, pfd->fe);
 		}
 		pfd->fe->pfd = NULL;

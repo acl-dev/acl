@@ -99,6 +99,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 	}
 
 	fiber_file_free(fe);
+	fe->fd = INVALID_SOCKET;
 
 	if (ret != 0) {
 		fiber_save_errno(acl_fiber_last_error());
