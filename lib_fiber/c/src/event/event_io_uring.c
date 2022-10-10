@@ -259,9 +259,6 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 
 static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 {
-	printf("%s: file size=%zd, s=%zd statusx=%zd\n", __FUNCTION__,
-		sizeof(FILE_EVENT), sizeof(struct sockaddr_in),
-		sizeof(struct statx));
 	if (fe->mask & EVENT_ACCEPT) {
 		fe->rlen = res;
 	} else if (fe->mask & EVENT_POLLIN) {
