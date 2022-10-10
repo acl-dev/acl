@@ -28,10 +28,9 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	fe->off    = 0;
 	fe->wbuf   = 0;
 	fe->wsize  = 0;
-	fe->iocp_sock = INVALID_SOCKET;
-	fe->addr_len  = 0;
 	fe->r_timeout = -1;
 	fe->w_timeout = -1;
+	memset(&fe->var, 0, sizeof(fe->var));
 #endif
 
 #ifdef HAS_IOCP

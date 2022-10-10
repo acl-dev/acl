@@ -63,11 +63,9 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 	fe->mask &= ~EVENT_FILE_CLOSE;
 
 	if (fe->rlen == 0) {
-		file_event_unrefer(fe);
 		return 0;
 	} else {
 		acl_fiber_set_error(fe->rlen);
-		file_event_unrefer(fe);
 		return -1;
 	}
 }
@@ -241,10 +239,11 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 
 	FILE_ALLOC(fe, EVENT_FILE_STATX);
 	fe->rbuf = strdup(pathname);
-	memcpy(&fe->var.statxbuf, statxbuf, sizeof(struct statx));
+	fe->var.statxbuf = (struct statx*) malloc(sizeof(struct statx));
+	memcpy(fe->var.statxbuf, statxbuf, sizeof(struct statx));
 
 	event_uring_file_statx(ev, fe, dirfd, fe->rbuf, flags, mask,
-		&fe->var.statxbuf);
+		fe->var.statxbuf);
 
 	fiber_io_inc();
 	acl_fiber_switch();
@@ -255,11 +254,13 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	fe->rbuf = NULL;
 
 	if (fe->rlen == 0) {
+		memcpy(statxbuf, fe->var.statxbuf, sizeof(struct statx));
+		free(fe->var.statxbuf);
 		file_event_unrefer(fe);
-		memcpy(statxbuf, &fe->var.statxbuf, sizeof(struct statx));
 		return 0;
 	} else {
 		acl_fiber_set_error(fe->rlen);
+		free(fe->var.statxbuf);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -420,7 +421,10 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 	close(fe->var.pipefd[0]);
 	close(fe->var.pipefd[1]);
 
-	if (ret < 0) {
+	if (ret == 0) {
+		file_event_unrefer(fe);
+		return 0;
+	} else if (ret < 0) {
 		acl_fiber_set_error(-ret);
 		file_event_unrefer(fe);
 		return -1;

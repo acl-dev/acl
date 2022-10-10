@@ -71,6 +71,7 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 
 	(void) write(fd, "\r\n", 2);
+	printf("write over!\r\n");
 	n = close(fd);
 	printf("close %s %s, fd=%d\r\n", path, n == 0 ? "ok" : "error", fd);
 }
@@ -135,7 +136,9 @@ static void fiber_sendfile(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 
 	cfd = accept_one();
-	ret = sendfile64(cfd, in, &fc->off, 100);
+
+	printf(">>>begin call sendfile64\r\n");
+	ret = sendfile64(cfd, in, &fc->off, fc->len);
 	printf(">>>sendfile ret=%zd, off=%d\r\n", ret, (int) fc->off);
 
 	close(in);
@@ -144,13 +147,12 @@ static void fiber_sendfile(ACL_FIBER *fiber acl_unused, void *ctx)
 
 static void fiber_splice(ACL_FIBER *fiber acl_unused, void *ctx)
 {
-	const char *path = (const char*) ctx;
-	int in = open(path, O_RDONLY, 0600), out;
-	loff_t off_in = 0;
+	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
+	int in = open(fc->frompath, O_RDONLY, 0600), out;
 	int pipefd[2];
 
 	if (in == -1) {
-		printf("open %s error %s\r\n", path, strerror(errno));
+		printf("open %s error %s\r\n", fc->frompath, strerror(errno));
 		return;
 	}
 
@@ -162,22 +164,22 @@ static void fiber_splice(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	while (1) {
 		char buf[1024];
-		int flags = SPLICE_F_MOVE |SPLICE_F_MORE;
-		int ret = splice(in, &off_in, out, NULL, 100, flags);
+		int flags = SPLICE_F_MOVE | SPLICE_F_MORE;
+		int ret = splice(in, &fc->off, out, NULL, fc->len, flags);
 
 		if (ret <= 0) {
-			printf("splice over: %s\r\n", strerror(errno));
+			printf("splice over, ret=%d: %s\r\n", ret, strerror(errno));
 			break;
 		}
 
 		ret = read(pipefd[0], buf, sizeof(buf) - 1);
 		if (ret <= 0) {
-			printf("read from pipe over: %s\r\n", strerror(errno));
+			printf("pipe over, ret=%d: %s\r\n", ret, strerror(errno));
 			break;
 		}
 
 		buf[ret] = 0;
-		printf("%s", buf);
+		printf("off: %ld, %s", fc->off, buf);
 		fflush(stdout);
 	}
 
@@ -244,24 +246,10 @@ static void usage(const char *proc)
 		"  -f filepath\r\n"
 		"  -t tofilepath\r\n"
 		"  -a action[read|write|rename|unlink|stat|mkdir|splice|pread|pwrite|sendfile]\r\n"
-		"  -n write_size[default: 1024]\r\n"
+		"  -n size[default: 1024]\r\n"
 		"  -o open_flags[O_RDONLY, O_WRONLY, O_RDWR, O_APPEND, O_CREAT, O_EXCL, O_TRUNC]\r\n"
 		"  -p offset\r\n"
 		, proc);
-}
-
-static int check_ctx(const char *action, const struct FIBER_CTX *ctx)
-{
-	if (ctx->frompath == NULL) {
-		printf("%s: frompath NULL\r\n", action);
-		return -1;
-	}
-	if (ctx->topath == NULL) {
-		printf("%s: rename topath: NULL\r\n", action);
-		return -1;
-	}
-
-	return 0;
 }
 
 int main(int argc, char *argv[])
@@ -270,16 +258,18 @@ int main(int argc, char *argv[])
 	char buf[256], buf2[256], action[128];
 	struct FIBER_CTX ctx;
 
-	buf[0]       = 0;
+	snprintf(buf, sizeof(buf), "from.txt");
+	snprintf(buf2, sizeof(buf2), "to.txt");
+
 	action[0]    = 0;
-	ctx.frompath = NULL;
-	ctx.topath   = NULL;
+	ctx.frompath = buf;
+	ctx.topath   = buf2;
 	ctx.off      = 0;
 	ctx.len      = 100;
 
 #define	EQ(x, y)	!strcasecmp((x), (y))
 
-	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -295,14 +285,12 @@ int main(int argc, char *argv[])
 		case 'p':
 			ctx.off = atoi(optarg);
 			break;
-		case 'l':
-			ctx.len = atoi(optarg);
-			break;
 		case 'a':
 			snprintf(action, sizeof(action), "%s", optarg);
 			break;
 		case 'n':
 			__write_size = atoi(optarg);
+			ctx.len = atoi(optarg);
 			break;
 		case 'o':
 			if (EQ(optarg, "O_RDONLY")) {
@@ -334,7 +322,7 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	acl_fiber_msg_stdout_enable(1);
+	//acl_fiber_msg_stdout_enable(1);
 	acl_msg_stdout_enable(1);
 
 	if (__open_flags == 0) {
@@ -350,14 +338,11 @@ int main(int argc, char *argv[])
 	} else if (EQ(action, "stat")) {
 		acl_fiber_create(fiber_filestat, buf, 320000);
 	} else if (EQ(action, "rename")) {
-		if (check_ctx("rename", &ctx) == -1) {
-			return 1;
-		}
 		acl_fiber_create(fiber_rename, &ctx, 320000);
 	} else if (EQ(action, "mkdir")) {
 		acl_fiber_create(fiber_mkdir, buf, 320000);
 	} else if (EQ(action, "splice")) {
-		acl_fiber_create(fiber_splice, buf, 320000);
+		acl_fiber_create(fiber_splice, &ctx, 320000);
 	} else if (EQ(action, "pread")) {
 		acl_fiber_create(fiber_pread, &ctx, 320000);
 	} else if (EQ(action, "sendfile")) {

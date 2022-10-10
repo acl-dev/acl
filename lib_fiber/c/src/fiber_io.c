@@ -224,7 +224,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			if (timer) {
 				continue;
 			}
-			
+
 			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u, events=%d",
 				__FUNCTION__, __LINE__, __pthread_self(),
 				ev->waiter, ring_size(&ev->events));
@@ -550,48 +550,52 @@ FILE_EVENT *fiber_file_open_write(socket_t fd)
 	return fe;
 }
 
-static int fiber_file_del(FILE_EVENT *fe)
+static int fiber_file_del(FILE_EVENT *fe, socket_t fd)
 {
 #ifdef SYS_WIN
 	char key[64];
 
-	if (fe->fd == INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
-		msg_error("%s(%d): invalid fd=%d",
-			__FUNCTION__, __LINE__, fe->fd);
+	if (fd == INVALID_SOCKET || fd >= (socket_t) var_maxfd) {
+		msg_error("%s(%d): invalid fd=%d", __FUNCTION__, __LINE__, fd);
 		return -1;
 	}
 
 	//_snprintf(key, sizeof(key), "%u", fe->fd);
-	_i64toa(fe->fd, key, 10);
+	_i64toa(fd, key, 10);
 
 	htable_delete(__thread_fiber->events, key, NULL);
 	return 0;
 #else
-	if (fe->fd == INVALID_SOCKET || fe->fd >= var_maxfd) {
-		msg_error("%s(%d): invalid fd=%d",
-			__FUNCTION__, __LINE__, fe->fd);
+	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
+		msg_error("%s(%d): invalid fd=%d", __FUNCTION__, __LINE__, fd);
 		return -1;
 	}
 
-	if (__thread_fiber->events[fe->fd] != fe) {
+	if (__thread_fiber->events[fd] != fe) {
 		msg_error("%s(%d): invalid fe=%p, fd=%d, origin=%p",
-			__FUNCTION__, __LINE__, fe, fe->fd,
-			__thread_fiber->events[fe->fd]);
+			__FUNCTION__, __LINE__, fe, fd, __thread_fiber->events[fd]);
 		return -1;
 	}
 
-	__thread_fiber->events[fe->fd] = NULL;
+	__thread_fiber->events[fd] = NULL;
 	return 0;
 #endif
 }
 
 void fiber_file_free(FILE_EVENT *fe)
 {
-	if (fiber_file_del(fe) == 0) {
+	socket_t fd = fe->fd;
+
+	// We must set fd INVALID_SOCKET to stop any using the old fd,
+	// fe will be freed only when the reference of it is 0.
+	fe->fd = INVALID_SOCKET;
+
+	if (fiber_file_del(fe, fd) == 0) {
 		file_event_unrefer(fe);
 	} else {
 		// xxx: What happened?
-		msg_error("Some error happened for fe=%p, fd=%d", fe, fe->fd);
+		msg_error("%s(%d): some error happened for fe=%p, fd=%d",
+			__FUNCTION__, __LINE__, fe, fe->fd);
 	}
 }
 

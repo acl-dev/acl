@@ -64,10 +64,10 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		assert(sqe);
 
-		fe->addr_len = (socklen_t) sizeof(fe->var.peer_addr);
+		fe->var.peer.len = (socklen_t) sizeof(fe->var.peer.addr);
 		io_uring_prep_accept(sqe, fe->fd,
-			(struct sockaddr*) &fe->var.peer_addr,
-			(socklen_t*) &fe->addr_len, 0);
+			(struct sockaddr*) &fe->var.peer.addr,
+			(socklen_t*) &fe->var.peer.len, 0);
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -116,8 +116,8 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 		non_blocking(fe->fd, 1);
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		io_uring_prep_connect(sqe, fe->fd,
-			(struct sockaddr*) &fe->var.peer_addr,
-			(socklen_t) fe->addr_len);
+			(struct sockaddr*) &fe->var.peer.addr,
+			(socklen_t) fe->var.peer.len);
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -217,11 +217,12 @@ void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
 {
 	EVENT_URING *ep = (EVENT_URING*) ev;
 	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-	unsigned flags = SPLICE_F_MOVE |SPLICE_F_MORE;
+	unsigned flags = SPLICE_F_MOVE | SPLICE_F_MORE; // | SPLICE_F_NONBLOCK;
 
-	printf("hello>>>in=%d, off=%d\n", in, (int) off);
+	printf("hello>>>in=%d, off=%dfe=%p\n", in, (int) off, fe);
 	io_uring_prep_splice(sqe, in, off, fe->var.pipefd[1], -1, cnt, flags);
 	io_uring_sqe_set_data(sqe, fe);
+	sqe->flags = IOSQE_IO_LINK;
 	sqe->opcode = IORING_OP_SPLICE;
 
 	TRY_SUBMMIT(ep);
@@ -258,8 +259,11 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 
 static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 {
+	printf("%s: file size=%zd, s=%zd statusx=%zd\n", __FUNCTION__,
+		sizeof(FILE_EVENT), sizeof(struct sockaddr_in),
+		sizeof(struct statx));
 	if (fe->mask & EVENT_ACCEPT) {
-		fe->iocp_sock = res;
+		fe->rlen = res;
 	} else if (fe->mask & EVENT_POLLIN) {
 		if (res & (POLLIN | ERR)) {
 			if (res & POLLERR) {
@@ -292,7 +296,7 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 {
 	if (fe->mask & EVENT_CONNECT) {
-		fe->iocp_sock = res;
+		fe->rlen = res;
 	} else if (fe->mask & EVENT_POLLOUT) {
 		if (res & (POLLOUT | ERR)) {
 			if (res & POLLERR) {

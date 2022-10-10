@@ -158,20 +158,21 @@ struct FILE_EVENT {
 
 #ifdef HAS_IO_URING
 	char         *rbuf;
-	size_t        rsize;
+	unsigned      rsize;
 	int           rlen;
 	__u64         off;
 	const char   *wbuf;
-	size_t        wsize;
+	unsigned      wsize;
 	int           wlen;
-	socket_t      iocp_sock;
 	union {
-		struct sockaddr_in peer_addr;
-		struct statx statxbuf;
+		struct {
+			struct sockaddr_in addr;
+			socklen_t          len;
+		} peer;
+		struct statx *statxbuf;
 		char  *path;
 		int    pipefd[2];
 	} var;
-	socklen_t     addr_len;
 	struct __kernel_timespec rts;
 	struct __kernel_timespec wts;
 	int           r_timeout;

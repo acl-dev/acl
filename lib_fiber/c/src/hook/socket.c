@@ -87,14 +87,14 @@ static socket_t fiber_iocp_accept(FILE_EVENT *fe)
 {
 	fe->mask &= ~EVENT_READ;
 	fe->mask |= EVENT_ACCEPT;
-	fe->iocp_sock = INVALID_SOCKET;
+	fe->rlen  = INVALID_SOCKET;
 
 	if (fiber_wait_read(fe) < 0) {
 		msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
 			__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
 		return INVALID_SOCKET;
 	}
-	return fe->iocp_sock;
+	return fe->rlen;
 }
 #endif
 
@@ -291,8 +291,8 @@ static socket_t fiber_iocp_connect(FILE_EVENT *fe)
 	}
 
 	fe->mask &= ~EVENT_CONNECT;
-	if (fe->iocp_sock < 0) {
-		acl_fiber_set_error(-fe->iocp_sock);
+	if (fe->rlen < 0) {
+		acl_fiber_set_error(-fe->rlen);
 		return -1;
 	}
 	return 0;
@@ -326,8 +326,8 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	SET_CONNECTING(fe);
 
 #if defined(HAS_IOCP) || defined(HAS_IO_URING)
-	memcpy(&fe->var.peer_addr, addr, addrlen);
-	fe->addr_len = addrlen;
+	memcpy(&fe->var.peer.addr, addr, addrlen);
+	fe->var.peer.len = addrlen;
 #endif
 
 	// The socket must be set to in no blocking status to avoid to be

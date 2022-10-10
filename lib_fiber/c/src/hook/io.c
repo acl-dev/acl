@@ -102,9 +102,6 @@ int WINAPI acl_fiber_close(socket_t fd)
 		ret = (*sys_close)(fd);
 	}
 
-	// We must set fd INVALID_SOCKET to stop any using the old fd,
-	// fe will be freed only when the reference of it is 0.
-	fe->fd = INVALID_SOCKET;
 	fiber_file_free(fe);
 
 	if (ret != 0) {
