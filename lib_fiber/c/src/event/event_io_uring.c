@@ -5,6 +5,7 @@
 
 #include <dlfcn.h>
 #include <liburing.h>
+#include "../common/queue.h"
 #include "event.h"
 #include "event_io_uring.h"
 
@@ -13,15 +14,39 @@ typedef struct EVENT_URING {
 	struct io_uring ring;
 	size_t sqe_size;
 	size_t appending;
+
+	QUEUE *queue;
+	pthread_t waiter;
 } EVENT_URING;
+
+static void *submit_waiter(void *ctx)
+{
+	EVENT_URING *ep = (EVENT_URING*) ctx;
+	while (1) {
+		if (queue_pop(ep->queue) == NULL) {
+			printf("Got NULL and over now!\r\n");
+			break;
+		}
+		io_uring_submit(&ep->ring);
+	}
+
+	queue_push(ep->queue, NULL);
+	return NULL;
+}
 
 static void event_uring_free(EVENT *ev)
 {
 	EVENT_URING *ep = (EVENT_URING*) ev;
 
 	io_uring_queue_exit(&ep->ring);
+	queue_push(ep->queue, NULL);
+	queue_pop(ep->queue);
+	queue_free(ep->queue, NULL);
+
 	mem_free(ep);
 }
+
+#if 1
 
 #define	TRY_SUBMMIT(e) do {  \
 	if (++(e)->appending >= (e)->sqe_size) {  \
@@ -29,6 +54,27 @@ static void event_uring_free(EVENT *ev)
 		io_uring_submit(&(e)->ring);  \
 	}  \
 } while (0)
+
+#define	SUBMMIT(e) do {  \
+	(e)->appending = 0;  \
+	 io_uring_submit(&(e)->ring);  \
+} while (0)
+
+#else
+
+#define	TRY_SUBMMIT(e) do {  \
+	if (++(e)->appending >= (e)->sqe_size) {  \
+		(e)->appending = 0;  \
+		queue_push((e)->queue, (e));  \
+	}  \
+} while (0)
+
+#define	SUBMMIT(e) do {  \
+	(e)->appending = 0;  \
+	 queue_push((e)->queue, (e));  \
+} while (0)
+
+#endif
 
 static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 {
@@ -473,8 +519,7 @@ static int event_uring_wait(EVENT *ev, int timeout)
 	int ret, count = 0;
 
 	if (ep->appending > 0) {
-		ep->appending = 0;
-		io_uring_submit(&ep->ring);
+		SUBMMIT(ep);
 	}
 
 	while (1) {
@@ -550,6 +595,8 @@ EVENT *event_io_uring_create(int size)
 	}
 
 	eu->appending    = 0;
+	eu->queue        = queue_new();
+	pthread_create(&eu->waiter, NULL, submit_waiter, eu);
 
 	eu->event.name   = event_uring_name;
 	eu->event.handle = (acl_handle_t (*)(EVENT *)) event_uring_handle;
