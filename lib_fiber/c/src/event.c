@@ -7,7 +7,9 @@
 #include "event/event_poll.h"
 #include "event/event_wmsg.h"
 #include "event/event_iocp.h"
+#ifdef	HAS_IO_URING
 #include "event/event_io_uring.h"
+#endif
 
 #include "event.h"
 
