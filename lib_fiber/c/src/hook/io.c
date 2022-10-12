@@ -161,7 +161,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;
@@ -203,15 +203,11 @@ static int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 			return fe->wlen;
 		}
 
-		// only for test
-		printf("%s: write error, wlen=%d, size=%zd\n", __FUNCTION__,
-				fe->wlen, fe->wsize);
-
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;
@@ -293,11 +289,11 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		//	__FUNCTION__, __LINE__, (int) fd, last_serror(), err);
 
 		if (!error_again(err)) {
-			// If the fd is a descriptor but not a socket, the
-			// above fiber_wait_read() must return 0, so we must
-			// free the fe here because the fd isn't monitored by
-			// the event engine.
-			if (fe->type != TYPE_SPIPE) {
+			// Check if the fd can monitored by event, if the fd
+			// isn't monitored by the event engine, the above
+			// fiber_wait_read() must return 0, so we must free
+			// the fe here.
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;
@@ -351,7 +347,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;
@@ -433,7 +429,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;
@@ -504,7 +500,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;
@@ -559,7 +555,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (fe->type != TYPE_SPIPE) {
+			if (!(fe->type & TYPE_EVENTABLE)) {
 				fiber_file_free(fe);
 			}
 			return -1;

@@ -110,10 +110,11 @@ struct FILE_EVENT {
 #define	IS_CLOSED(x)		((x)->status & STATUS_CLOSED)
 
 	unsigned type;
-#define	TYPE_NONE		0
-#define	TYPE_SPIPE		1
-#define	TYPE_FILE		2
-#define	TYPE_BADFD		3
+#define	TYPE_NONE		(unsigned) 0
+#define	TYPE_SPIPE		(unsigned) (1 << 0)
+#define	TYPE_FILE		(unsigned) (1 << 1)
+#define	TYPE_BADFD		(unsigned) (1 << 2)
+#define	TYPE_EVENTABLE		(unsigned) (1 << 3)
 
 	unsigned oper;
 #define	EVENT_ADD_READ		(unsigned) (1 << 0)
@@ -132,6 +133,7 @@ struct FILE_EVENT {
 #define	EVENT_CONNECT		(unsigned) (1 << 6)
 #define	EVENT_POLLIN		(unsigned) (1 << 7)
 #define	EVENT_POLLOUT		(unsigned) (1 << 8)
+#define	EVENT_FILE_OPEN		(unsigned) (1 << 9)
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
@@ -146,6 +148,7 @@ struct FILE_EVENT {
 	char         *rbuf;
 	size_t        rsize;
 	int           rlen;
+	__u64         off;
 	const char   *wbuf;
 	size_t        wsize;
 	int           wlen;

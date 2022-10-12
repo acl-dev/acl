@@ -21,6 +21,19 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	fe->pfd    = NULL;
 #endif
 
+#ifdef	HAS_IO_URING
+	fe->rbuf   = NULL;
+	fe->rsize  = 0;
+	fe->rlen   = 0;
+	fe->off    = 0;
+	fe->wbuf   = 0;
+	fe->wsize  = 0;
+	fe->iocp_sock = INVALID_SOCKET;
+	fe->addr_len  = 0;
+	fe->r_timeout = -1;
+	fe->w_timeout = -1;
+#endif
+
 #ifdef HAS_IOCP
 	fe->buff   = NULL;
 	fe->size   = 0;

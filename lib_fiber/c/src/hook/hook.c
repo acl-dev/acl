@@ -86,6 +86,11 @@ epoll_ctl_fn    __sys_epoll_ctl             = NULL;
 epoll_ctl_fn    *sys_epoll_ctl              = NULL;
 # endif
 
+# ifdef HAS_IO_URING
+open_fn         __sys_open                  = NULL;
+open_fn         *sys_open                   = NULL;
+# endif
+
 # ifndef __APPLE__
 gethostbyname_r_fn __sys_gethostbyname_r    = NULL;
 gethostbyname_r_fn *sys_gethostbyname_r     = NULL;
@@ -232,6 +237,10 @@ static void hook_api(void)
 
 	LOAD_FN("epoll_ctl", epoll_ctl_fn, __sys_epoll_ctl, sys_epoll_ctl);
 # endif // HAS_EPOLL
+
+# ifdef	HAS_IO_URING
+	LOAD_FN("open", open_fn, __sys_open, sys_open);
+# endif
 
 	LOAD_FN("getaddrinfo", getaddrinfo_fn, __sys_getaddrinfo, sys_getaddrinfo);
 	LOAD_FN("freeaddrinfo", freeaddrinfo_fn, __sys_freeaddrinfo, sys_freeaddrinfo);

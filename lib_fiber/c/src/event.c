@@ -129,11 +129,11 @@ long long event_get_stamp(EVENT *ev)
 int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	if (getsockfamily(fe->fd) >= 0) {
-        fe->type = TYPE_SPIPE;
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 		return 1;
 	}
 	if (ev->checkfd(ev, fe) == 0) {
-		fe->type = TYPE_SPIPE;
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 		return 1;
 	} else {
 		fe->type = TYPE_FILE;
@@ -143,31 +143,6 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 #else
 int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
-#if 0
-	struct stat s;
-
-	if (fstat(fe->fd, &s) < 0) {
-		msg_info("%s(%d), %s: fd: %d fstat error %s", __FILE__,
-			__LINE__, __FUNCTION__, fe->fd, last_serror());
-		return -1;
-	}
-
-	if (S_ISSOCK(s.st_mode)) {
-		return 1;
-	}
-	if (S_ISFIFO(s.st_mode)) {
-		return 1;
-	}
-
-	if (S_ISCHR(s.st_mode)) {
-		return 1;
-	}
-	if (isatty(fe->fd)) {
-		return 1;
-	}
-
-	return ev->checkfd(ev, fe);
-#else
 	(void) ev;
 	/* If we cannot seek, it must be a pipe, socket or fifo, else it
 	 * should be a file.
@@ -175,7 +150,7 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1) {
 		switch (errno) {
 		case ESPIPE:
-			fe->type = TYPE_SPIPE;
+			fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 			acl_fiber_set_error(0);
 			return 1;
 		case EBADF:
@@ -193,9 +168,8 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 		acl_fiber_set_error(0);
 		return 0;
 	}
-#endif
 }
-#endif
+#endif // !SYS_WIN
 
 #if 0
 static int check_read_wait(EVENT *ev, FILE_EVENT *fe)
@@ -244,20 +218,19 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		}
 	}
 
-	// if the fd's type has been checked and it isn't a valid socket,
+	// If the fd's type has been checked and it isn't a valid socket,
 	// return immediately.
-	if (fe->type != TYPE_SPIPE) {
-		switch (fe->type) {
-		case TYPE_FILE:
+	if (!(fe->type & TYPE_EVENTABLE)) {
+		if (fe->type & TYPE_FILE) {
 			return 0;
-		case TYPE_BADFD:
+		} else if (fe->type & TYPE_BADFD) {
 #ifdef SYS_UNIX
 			acl_fiber_set_error(EBADF);
 #endif
 			msg_error("%s(%d): invalid fd=%d", __FUNCTION__,
 				__LINE__, (int) fe->fd);
 			return -1;
-		default:
+		} else {
 #ifdef SYS_UNIX
 			acl_fiber_set_error(EINVAL);
 #endif
@@ -300,13 +273,12 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		}
 	}
 
-	if (fe->type != TYPE_SPIPE) {
-		switch (fe->type) {
-		case TYPE_FILE:
+	if (!(fe->type & TYPE_EVENTABLE)) {
+		if (fe->type & TYPE_FILE) {
 			return 0;
-		case TYPE_BADFD:
+		} else if (fe->type & TYPE_BADFD) {
 			return -1;
-		default:
+		} else {
 			return -1;
 		}
 	}

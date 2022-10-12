@@ -196,7 +196,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 
 		assert(left < INT_MAX);
 
-		/* add 1 just for the deviation of epoll_wait */
+		/* Add 1 just for the deviation of epoll_wait */
 		event_process(ev, left > 0 ? (int) left + 1 : (int) left);
 
 		if (__thread_fiber->io_stop) {
@@ -219,7 +219,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 				continue;
 			}
 			
-			// only sleep fiber alive ?
+			// Only sleep fiber alive ?
 			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
 			if (timer) {
 				continue;
@@ -257,7 +257,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 	msg_info("%s(%d), tid=%lu: IO fiber exit now",
 		__FUNCTION__, __LINE__, __pthread_self());
 
-	// don't set ev_fiber NULL here, using fiber_io_clear() to set it NULL
+	// Don't set ev_fiber NULL here, using fiber_io_clear() to set it NULL
 	// in acl_fiber_schedule() after scheduling finished.
 	// 
 	// __thread_fiber->ev_fiber = NULL;
@@ -313,7 +313,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	}
 
 #ifdef	CHECK_MIN
-	/* compute the event waiting interval according the timers' head */
+	/* Compute the event waiting interval according the timers' head */
 	fiber = FIRST_FIBER(&__thread_fiber->ev_timer);
 	if (fiber->when <= now) {
 		/* If the first timer has been expired, we should wakeup it
@@ -415,7 +415,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 }
 
 /**
- * set fd in reading status by adding it to the event set if the fd is a
+ * Set fd in reading status by adding it to the event set if the fd is a
  * valid socket or pipe, or return immediately if the fd is not a valid
  * socket. In event_add_read the fd holding in fe will be checking if it's
  * a socket for the first time.
@@ -428,7 +428,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	fe->fiber_r = acl_fiber_running();
 
-	// when return 0 just let it go continue
+	// When return 0 just let it go continue
 	ret = event_add_read(__thread_fiber->event, fe, read_callback);
 	if (ret <= 0) {
 		return ret;
@@ -499,7 +499,7 @@ FILE_EVENT *fiber_file_get(socket_t fd)
 #endif
 }
 
-static void fiber_file_set(FILE_EVENT *fe)
+void fiber_file_set(FILE_EVENT *fe)
 {
 #ifdef SYS_WIN
 	char key[64];
@@ -530,7 +530,7 @@ FILE_EVENT *fiber_file_open_read(socket_t fd)
 		fiber_file_set(fe);
 	}
 
-	/* we can't set the fe's type here because it'll effect the DGRAM IO,
+	/* We can't set the fe's type here because it'll effect the DGRAM IO,
 	 * so, we'll set the fe's sock type in event.c.
 	 */
 	fe->fiber_r = acl_fiber_running();

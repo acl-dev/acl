@@ -73,7 +73,7 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 		TRY_SUBMMIT(ep);
 	} else {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, 0);
+		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, fe->off);
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -123,13 +123,24 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 		TRY_SUBMMIT(ep);
 	} else {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-		io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wsize, 0);
+		io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wsize, fe->off);
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
 	}
 
 	return 0;
+}
+
+void event_uring_file_open(EVENT *ev, FILE_EVENT *fe, const char* pathname,
+	int flags, mode_t mode)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_openat(sqe, AT_FDCWD, pathname, flags, mode);
+	io_uring_sqe_set_data(sqe, fe);
+	TRY_SUBMMIT(ep);
 }
 
 static int event_uring_del_read(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
@@ -178,6 +189,9 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 		}
 	} else {
 		fe->rlen = res;
+		if ((fe->type & TYPE_FILE) && res > 0) {
+			fe->off += res;
+		}
 	}
 
 	fe->mask &= ~EVENT_READ;
@@ -208,6 +222,9 @@ static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 		}
 	} else {
 		fe->wlen = res;
+		if ((fe->type & TYPE_FILE) && res > 0) {
+			fe->off += res;
+		}
 	}
 
 	fe->mask &= ~EVENT_WRITE;
@@ -275,8 +292,8 @@ static int event_uring_wait(EVENT *ev, int timeout)
 		if (res == -ETIME || res == -ECANCELED || fe == NULL) {
 			continue;
 		} else if (res < 0) {
-			msg_error("%s(%d): some other error=%d, %s",
-				__FUNCTION__, __LINE__, -res, strerror(-res));
+			//msg_error("%s(%d): some other error=%d, %s",
+			//	__FUNCTION__, __LINE__, -res, strerror(-res));
 		}
 
 		//usleep(100000);
@@ -287,6 +304,11 @@ static int event_uring_wait(EVENT *ev, int timeout)
 
 		if ((fe->mask & EVENT_WRITE) && fe->w_proc) {
 			handle_write(ev, fe, res);
+		}
+
+		if ((fe->mask & EVENT_FILE_OPEN) && fe->r_proc) {
+			fe->fd = res;
+			fe->r_proc(ev, fe);
 		}
 	}
 

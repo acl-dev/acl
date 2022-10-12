@@ -354,7 +354,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 #ifdef HAS_IOCP
 	if (EVENT_IS_IOCP(fiber_io_event())) {
 		EVENT *ev = fiber_io_event();
-		fe->type = TYPE_SPIPE;
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 		ret = event_iocp_connect(ev, fe);
 	} else {
 		ret = (*sys_connect)(sockfd, addr, addrlen);

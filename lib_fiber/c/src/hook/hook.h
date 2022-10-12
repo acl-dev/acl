@@ -72,6 +72,10 @@ typedef int (*epoll_wait_fn)(int, struct epoll_event *,int, int);
 typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
 # endif
 
+# ifdef HAS_IO_URING
+typedef int (*open_fn)(const char *, int, ...);
+# endif
+
 # ifndef __APPLE__
 typedef int (*gethostbyname_r_fn)(const char *, struct hostent *, char *,
 	size_t, struct hostent **, int *);
@@ -141,9 +145,13 @@ extern sendfile64_fn        *sys_sendfile64;
 # endif
 
 # ifdef	HAS_EPOLL
-extern epoll_create_fn		*sys_epoll_create;
+extern epoll_create_fn      *sys_epoll_create;
 extern epoll_wait_fn        *sys_epoll_wait;
 extern epoll_ctl_fn         *sys_epoll_ctl;
+# endif
+
+# ifdef HAS_IO_URING
+extern open_fn              *sys_open;
 # endif
 
 # ifndef __APPLE__
