@@ -7,6 +7,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
 #else
+#include <fcntl.h>
 #include <unistd.h>
 #include <signal.h>
 #include <netinet/in.h>
@@ -121,3 +122,81 @@ SOCKET socket_connect(const char *ip, int port)
 	}
 	return fd;
 }
+
+#if defined(_WIN32) || defined(_WIN64)
+
+int set_non_blocking(SOCKET fd, int on)
+{
+	unsigned long n = on;
+	int flags = 0;
+
+	if (ioctlsocket(fd, FIONBIO, &n) < 0) {
+		msg_error("ioctlsocket(fd,FIONBIO) failed");
+		return -1;
+	}
+	return flags;
+}
+
+int socket_is_non_blocking(SOCKET fd)
+{
+	printf("%s: Not support, fd=%d\r\n", __FUNCTION__, fd);
+	return -1;
+}
+
+#else
+
+# ifndef O_NONBLOCK
+#  define PATTERN       FNDELAY
+# else
+#  define PATTERN       O_NONBLOCK
+# endif
+
+int set_non_blocking(SOCKET fd, int on)
+{
+	int   flags;
+	int   nonb = PATTERN;
+
+	/*
+	** NOTE: consult ALL your relevant manual pages *BEFORE* changing
+	**	 these ioctl's.  There are quite a few variations on them,
+	**	 as can be seen by the PCS one.  They are *NOT* all the same.
+	**	 Heed this well. - Avalon.
+	*/
+#ifdef	NBLOCK_POSIX
+	nonb |= O_NONBLOCK;
+#endif
+#ifdef	NBLOCK_BSD
+	nonb |= O_NDELAY;
+#endif
+
+	if ((flags = fcntl(fd, F_GETFL)) == -1) {
+		printf("%s(%d), %s: fcntl(%d, F_GETFL) error: %s\r\n",
+			__FILE__, __LINE__, __FUNCTION__,
+			fd, acl_fiber_last_serror());
+		return -1;
+	}
+	if (fcntl(fd, F_SETFL, on ? flags | nonb : flags & ~nonb) < 0) {
+		printf("%s(%d), %s: fcntl(%d, F_SETL, nonb) error: %s\r\n",
+			__FILE__, __LINE__, __FUNCTION__,
+			fd, acl_fiber_last_serror());
+		return -1;
+	}
+
+	return (flags & PATTERN) ? 1 : 0;
+}
+
+int socket_is_non_blocking(SOCKET fd)
+{
+	int flags;
+
+	if ((flags = fcntl(fd, F_GETFL)) == -1) {
+		printf("%s(%d), %s: fcntl(%d, F_GETFL) error: %s\r\n",
+			__FILE__, __LINE__, __FUNCTION__,
+			fd, acl_fiber_last_serror());
+		return 0;
+	}
+
+	return (flags & PATTERN) ? 1 : 0;
+}
+
+#endif // !_WIN32 && !_WIN64

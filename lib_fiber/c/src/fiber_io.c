@@ -200,6 +200,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		event_process(ev, left > 0 ? (int) left + 1 : (int) left);
 
 		if (__thread_fiber->io_stop) {
+			msg_info("%s(%d): io_stop set!", __FUNCTION__, __LINE__);
 			break;
 		}
 
@@ -213,6 +214,8 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			if (ev->fdcount > 0 || ev->waiter > 0) {
 				continue;
 			} else if (ring_size(&ev->events) > 0) {
+				continue;
+			} else if (__thread_fiber->io_count > 0) {
 				continue;
 			}
 			
@@ -247,7 +250,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 	}
 
 	if (__thread_fiber->io_count > 0) {
-		msg_info("%s(%d), %s: waiting io: %d", __FILE__, __LINE__,
+		msg_warn("%s(%d), %s: waiting io: %d", __FILE__, __LINE__,
 			__FUNCTION__, (int) __thread_fiber->io_count);
 	}
 

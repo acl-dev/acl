@@ -283,7 +283,7 @@ static socket_t fiber_iocp_connect(FILE_EVENT *fe)
 	fe->mask &= ~EVENT_WRITE;
 	fe->mask |= EVENT_CONNECT;
 
-	if (fiber_wait_read(fe) < 0) {
+	if (fiber_wait_write(fe) < 0) {
 		fe->mask &= ~EVENT_CONNECT;
 		msg_error("%s(%d): fiber_wait_write rrror=%s, fd=%d",
 			__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
@@ -293,9 +293,9 @@ static socket_t fiber_iocp_connect(FILE_EVENT *fe)
 	fe->mask &= ~EVENT_CONNECT;
 	if (fe->iocp_sock < 0) {
 		acl_fiber_set_error(-fe->iocp_sock);
-		return INVALID_SOCKET;
+		return -1;
 	}
-	return fe->fd;
+	return 0;
 }
 #endif
 
@@ -330,12 +330,6 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	fe->addr_len = addrlen;
 #endif
 
-#if defined(HAS_IO_URING)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		return fiber_iocp_connect(fe);
-	}
-#endif
-
 	// The socket must be set to in no blocking status to avoid to be
 	// blocked by the sys_connect API. If sys_connect returns an error
 	// which is FIBER_EINPROGRESS or FIBER_EAGAIN and the original status
@@ -346,6 +340,16 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	if (!nblock) {
 		non_blocking(sockfd, NON_BLOCKING);
 	}
+
+#if defined(HAS_IO_URING)
+	// For IO_URING event, if the socket hasn't been set non-block,
+	// we should use io_uring to connect the server in block mode,
+	// else we should use connect system API in non-block, so the
+	// user can poll waiting for writable to check the connection is ok.
+	if (EVENT_IS_IO_URING(fiber_io_event()) && !nblock) {
+		return fiber_iocp_connect(fe);
+	}
+#endif
 
 #ifdef HAS_IOCP
 	if (EVENT_IS_IOCP(fiber_io_event())) {

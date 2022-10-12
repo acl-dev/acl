@@ -32,7 +32,8 @@ static int  __socket_count = 0;
 static char __listen_ip[64];
 static int  __listen_port = 9001;
 static int  __listen_qlen = 64;
-static int  __rw_timeout = 0;
+static int  __read_timeout = -1;
+static int  __write_timeout = -1;
 static int  __echo_data  = 1;
 
 static int check_read(int fd, int timeout)
@@ -61,6 +62,32 @@ static int check_read(int fd, int timeout)
 	}
 }
 
+static int check_write(int fd, int timeout)
+{
+	struct pollfd pfd;
+	int n;
+
+	memset(&pfd, 0, sizeof(struct pollfd));
+	pfd.fd = fd;
+	pfd.events = POLLOUT;
+
+	n = POLL(&pfd, 1, timeout);
+	if (n < 0) {
+		printf("poll error: %s\r\n", acl_last_serror());
+		return -1;
+	}
+
+	if (n == 0) {
+		return 0;
+	}
+	if (pfd.revents & POLLOUT) {
+		return 1;
+	} else {
+		printf(">>>poll return n=%d write no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
+		return 0;
+	}
+}
+
 static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	SOCKET  *pfd = (SOCKET *) ctx;
@@ -72,10 +99,11 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	//printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), fd);
 
 	while (1) {
-		if (__rw_timeout > 0) {
-			ret = check_read(fd, __rw_timeout * 1000);
-			if (ret < 0)
+		if (__read_timeout > 0) {
+			ret = check_read(fd, __read_timeout * 1000);
+			if (ret < 0) {
 				break;
+			}
 			if (ret == 0) {
 				printf("read timeout fd=%u\r\n", fd);
 				break;
@@ -104,24 +132,36 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 		//buf[ret] = 0; printf("buf=%s\r\n", buf);
 		__count++;
 
-		if (!__echo_data)
+		if (!__echo_data) {
 			continue;
+		}
+
+		if (__write_timeout > 0) {
+			int n = check_write(fd, __write_timeout * 1000);
+			if (n < 0) {
+				break;
+			}
+			if (n == 0) {
+				printf("write wait timeout, fd=%d\r\n", fd);
+				break;
+			}
+		}
 
 #if defined(_WIN32) || defined(_WIN64)
 		if (acl_fiber_send(fd, buf, ret, 0) < 0) {
 #else
 		if (write(fd, buf, ret) < 0) {
 #endif
-			if (errno == EINTR)
+			if (errno == EINTR) {
 				continue;
+			}
 			printf("write error, fd: %d\r\n", fd);
 			break;
 		}
 	}
 
 	__socket_count--;
-	printf("%s: close %d, socket_count=%d\r\n",
-		__FUNCTION__, fd, __socket_count);
+	printf("%s: close %d, socket_count=%d\r\n", __FUNCTION__, fd, __socket_count);
 	CLOSE(fd);
 	free(pfd);
 
@@ -217,7 +257,8 @@ static void usage(const char *procname)
 		" -e event_mode [kernel|select|poll|io_uring]\r\n"
 		" -s listen_ip\r\n"
 		" -p listen_port\r\n"
-		" -r rw_timeout\r\n"
+		" -r read_timeout\r\n"
+		" -w write_timeout\r\n"
 		" -q listen_queue\r\n"
 		" -z stack_size\r\n"
 		" -Z [if use shared stack]\r\n"
@@ -233,7 +274,7 @@ int main(int argc, char *argv[])
 	acl_fiber_attr_init(&fiber_attr);
 	snprintf(__listen_ip, sizeof(__listen_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hs:p:r:q:Sz:Ze:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:p:r:w:q:Sz:Ze:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -245,7 +286,10 @@ int main(int argc, char *argv[])
 			__listen_port = atoi(optarg);
 			break;
 		case 'r':
-			__rw_timeout = atoi(optarg);
+			__read_timeout = atoi(optarg);
+			break;
+		case 'w':
+			__write_timeout = atoi(optarg);
 			break;
 		case 'q':
 			__listen_qlen = atoi(optarg);

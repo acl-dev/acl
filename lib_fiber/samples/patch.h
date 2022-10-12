@@ -23,6 +23,8 @@ void socket_close(SOCKET fd);
 SOCKET socket_listen(const char *ip, int port);
 SOCKET socket_accept(SOCKET fd);
 SOCKET socket_connect(const char *ip, int port);
+int set_non_blocking(SOCKET fd, int on);
+int socket_is_non_blocking(SOCKET fd);
 
 #ifdef __cplusplus
 }

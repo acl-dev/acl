@@ -39,7 +39,6 @@ static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 	io_uring_sqe_set_data(sqe, fe);
 	sqe->flags = IOSQE_IO_LINK;
 
-	file_event_refer(fe);
 	TRY_SUBMMIT(ep);
 
 	fe->rts.tv_sec  = tmo_ms / 1000;
@@ -47,9 +46,7 @@ static void add_read_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 
 	sqe = io_uring_get_sqe(&ep->ring);
 	io_uring_prep_link_timeout(sqe, &fe->rts, 0);
-	io_uring_sqe_set_data(sqe, fe);
 
-	file_event_refer(fe);
 	TRY_SUBMMIT(ep);
 }
 
@@ -85,31 +82,53 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 	return 0;
 }
 
-static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
+static void add_write_wait(EVENT_URING *ep, FILE_EVENT *fe, int tmo_ms)
 {
 	struct io_uring_sqe *sqe;
 
+	sqe = io_uring_get_sqe(&ep->ring);
+	io_uring_prep_poll_add(sqe, fe->fd, POLLOUT | POLLHUP | POLLERR);
+	io_uring_sqe_set_data(sqe, fe);
+	sqe->flags = IOSQE_IO_LINK;
+
+	TRY_SUBMMIT(ep);
+
+	fe->wts.tv_sec  = tmo_ms / 1000;
+	fe->wts.tv_nsec = (((long long) tmo_ms) % 1000) * 1000000;
+
+	sqe = io_uring_get_sqe(&ep->ring);
+	io_uring_prep_link_timeout(sqe, &fe->wts, 0);
+
+	TRY_SUBMMIT(ep);
+}
+
+static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
+{
 	if (fe->mask & EVENT_WRITE) {
 		return 0;
 	}
 
 	fe->mask |= EVENT_WRITE;
-	sqe = io_uring_get_sqe(&ep->ring);
-	assert(sqe);
-	io_uring_sqe_set_data(sqe, fe);
 
-	if (fe->mask & EVENT_CONNECT) {
+	if (fe->mask & EVENT_POLLOUT) {
+		add_write_wait(ep, fe, fe->r_timeout);
+	} else if (fe->mask & EVENT_CONNECT) {
+		non_blocking(fe->fd, 1);
+		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		io_uring_prep_connect(sqe, fe->fd,
 			(struct sockaddr*) &fe->peer_addr,
 			(socklen_t) fe->addr_len);
+		io_uring_sqe_set_data(sqe, fe);
+
+		TRY_SUBMMIT(ep);
 	} else {
+		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wsize, 0);
+		io_uring_sqe_set_data(sqe, fe);
+
+		TRY_SUBMMIT(ep);
 	}
 
-	if (++ep->appending >= ep->sqe_size) {
-		ep->appending = 0;
-		io_uring_submit(&ep->ring);
-	}
 	return 0;
 }
 
@@ -133,24 +152,29 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 	return 0;
 }
 
+#define	ERR	(POLLERR | POLLHUP | POLLNVAL)
+
 static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 {
 	if (fe->mask & EVENT_ACCEPT) {
 		fe->iocp_sock = res;
 	} else if (fe->mask & EVENT_POLLIN) {
-		if (res == -ETIME) {
-			printf("fd=%d timeout, fe=%p\r\n", fe->fd, fe);
-			file_event_unrefer(fe);
-			return;
-		} else if (res == -ECANCELED) {
-			printf("fd=%d canceled, fe=%p\n", fe->fd, fe);
-			file_event_unrefer(fe);
-			return;
-		} else if (res & POLLIN) {
+		if (res & (POLLIN | ERR)) {
+			if (res & POLLERR) {
+				fe->mask |= EVENT_ERR;
+			}
+			if (res & POLLHUP) {
+				fe->mask |= EVENT_HUP;
+			}
+			if (res & POLLNVAL) {
+				fe->mask |= EVENT_NVAL;;
+			}
+
 			fe->mask &= ~EVENT_POLLIN;
 			CLR_READWAIT(fe);
 		} else {
-			printf("unknown res=%d, fd=%d\n", res, fe->fd);
+			msg_error("%s(%d): unknown res=%d, fd=%d",
+				__FUNCTION__, __LINE__, res, fe->fd);
 		}
 	} else {
 		fe->rlen = res;
@@ -165,26 +189,31 @@ static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 	if (fe->mask & EVENT_CONNECT) {
 		fe->iocp_sock = res;
 	} else if (fe->mask & EVENT_POLLOUT) {
-		if (res == -ETIME) {
-			printf("fd=%d timeout, fe=%p\r\n", fe->fd, fe);
-			file_event_unrefer(fe);
-			return;
-		} else if (res == -ECANCELED) {
-			printf("fd=%d canceled, fe=%p\n", fe->fd, fe);
-			file_event_unrefer(fe);
-			return;
-		} else if (res & POLLIN) {
+		if (res & (POLLOUT | ERR)) {
+			if (res & POLLERR) {
+				fe->mask |= EVENT_ERR;
+			}
+			if (res & POLLHUP) {
+				fe->mask |= EVENT_HUP;
+			}
+			if (res & POLLNVAL) {
+				fe->mask |= EVENT_NVAL;;
+			}
+
 			fe->mask &= ~EVENT_POLLOUT;
 			CLR_WRITEWAIT(fe);
 		} else {
-			printf("unknown res=%d, fd=%d\n", res, fe->fd);
+			msg_error("%s(%d): unknown res=%d, fd=%d",
+				__FUNCTION__, __LINE__, res, fe->fd);
 		}
 	} else {
 		fe->wlen = res;
 	}
 
 	fe->mask &= ~EVENT_WRITE;
-	fe->w_proc(ev, fe);
+	if (fe->w_proc) {
+		fe->w_proc(ev, fe);
+	}
 }
 
 static int event_uring_wait(EVENT *ev, int timeout)
@@ -212,8 +241,6 @@ static int event_uring_wait(EVENT *ev, int timeout)
 	}
 
 	while (1) {
-		cqe = NULL;
-
 		if (count > 0) {
 			ret = io_uring_peek_cqe(&ep->ring, &cqe);
 		} else {
@@ -243,6 +270,13 @@ static int event_uring_wait(EVENT *ev, int timeout)
 		if (res == -ENOBUFS) {
 			msg_error("%s(%d): ENOBUFS error", __FUNCTION__, __LINE__);
 			return -1;
+		}
+
+		if (res == -ETIME || res == -ECANCELED || fe == NULL) {
+			continue;
+		} else if (res < 0) {
+			msg_error("%s(%d): some other error=%d, %s",
+				__FUNCTION__, __LINE__, -res, strerror(-res));
 		}
 
 		//usleep(100000);

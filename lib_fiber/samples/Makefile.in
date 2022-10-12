@@ -145,7 +145,7 @@ OUT_PATH = .
 OBJ_PATH = $(OUT_PATH)
 
 #Project's objs
-SRC = $(wildcard *.c)
+SRC = $(wildcard *.c) $(wildcard ../*.c)
 OBJ = $(patsubst %.c, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 ###########################################################
 
@@ -161,6 +161,8 @@ all: RM $(OBJ)
 	@echo "All ok! Output:$(PROG)"
 	@echo ""
 $(OBJ_PATH)/%.o: %.c
+	$(COMPILE) $< -o $@
+$(OBJ_PATH)/%.o: ../%.c
 	$(COMPILE) $< -o $@
 RM:
 	rm -f $(PROG)
