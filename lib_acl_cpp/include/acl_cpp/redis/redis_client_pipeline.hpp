@@ -107,7 +107,7 @@ public:
 		}
 
 		argc_ = argc;
-		for (size_t i = 0; i < size_; i++) {
+		for (size_t i = 0; i < argc_; i++) {
 			argv_[i] = argv[i];
 			lens_[i] = lens[i];
 		}
