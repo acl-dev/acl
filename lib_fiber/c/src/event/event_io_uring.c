@@ -64,9 +64,9 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		assert(sqe);
 
-		fe->addr_len = (socklen_t) sizeof(fe->peer_addr);
+		fe->addr_len = (socklen_t) sizeof(fe->var.peer_addr);
 		io_uring_prep_accept(sqe, fe->fd,
-			(struct sockaddr*) &fe->peer_addr,
+			(struct sockaddr*) &fe->var.peer_addr,
 			(socklen_t*) &fe->addr_len, 0);
 		io_uring_sqe_set_data(sqe, fe);
 
@@ -116,7 +116,7 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 		non_blocking(fe->fd, 1);
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 		io_uring_prep_connect(sqe, fe->fd,
-			(struct sockaddr*) &fe->peer_addr,
+			(struct sockaddr*) &fe->var.peer_addr,
 			(socklen_t) fe->addr_len);
 		io_uring_sqe_set_data(sqe, fe);
 
@@ -132,13 +132,67 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 	return 0;
 }
 
-void event_uring_file_open(EVENT *ev, FILE_EVENT *fe, const char* pathname,
-	int flags, mode_t mode)
+void event_uring_file_close(EVENT *ev, FILE_EVENT *fe)
 {
 	EVENT_URING *ep = (EVENT_URING*) ev;
 	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 
-	io_uring_prep_openat(sqe, AT_FDCWD, pathname, flags, mode);
+	io_uring_prep_close(sqe, fe->fd);
+	io_uring_sqe_set_data(sqe, fe);
+	TRY_SUBMMIT(ep);
+}
+
+void event_uring_file_openat(EVENT *ev, FILE_EVENT *fe, int dirfd,
+	const char *pathname, int flags, mode_t mode)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_openat(sqe, dirfd, pathname, flags, mode);
+	io_uring_sqe_set_data(sqe, fe);
+	TRY_SUBMMIT(ep);
+}
+
+void event_uring_file_unlink(EVENT *ev, FILE_EVENT *fe, const char *pathname)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_unlink(sqe, pathname, 0);
+	io_uring_sqe_set_data(sqe, fe);
+	TRY_SUBMMIT(ep);
+}
+
+void event_uring_file_statx(EVENT *ev, FILE_EVENT *fe, int dirfd,
+	const char *pathname, int flags, unsigned int mask,
+	struct statx *statxbuf)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_statx(sqe, dirfd, pathname, flags, mask, statxbuf);
+	io_uring_sqe_set_data(sqe, fe);
+	TRY_SUBMMIT(ep);
+}
+
+void event_uring_file_renameat2(EVENT *ev, FILE_EVENT *fe, int olddirfd,
+	const char *oldpath, int newdirfd, const char *newpath, unsigned flags)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_renameat(sqe, olddirfd, oldpath, newdirfd, newpath, flags);
+	io_uring_sqe_set_data(sqe, fe);
+	TRY_SUBMMIT(ep);
+}
+
+void event_uring_mkdirat(EVENT *ev, FILE_EVENT *fe, int dirfd,
+	const char *pathname, mode_t mode)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_mkdirat(sqe, dirfd, pathname, mode);
 	io_uring_sqe_set_data(sqe, fe);
 	TRY_SUBMMIT(ep);
 }
@@ -300,15 +354,36 @@ static int event_uring_wait(EVENT *ev, int timeout)
 
 		if ((fe->mask & EVENT_READ) && fe->r_proc) {
 			handle_read(ev, fe, res);
-		}
-
-		if ((fe->mask & EVENT_WRITE) && fe->w_proc) {
+			continue;
+		} else if ((fe->mask & EVENT_WRITE) && fe->w_proc) {
 			handle_write(ev, fe, res);
+			continue;
 		}
 
-		if ((fe->mask & EVENT_FILE_OPEN) && fe->r_proc) {
+		if (fe->r_proc == NULL) {
+			continue;
+		}
+
+#define	FLAGS	(EVENT_FILE_CLOSE \
+		| EVENT_FILE_OPENAT \
+		| EVENT_FILE_UNLINK \
+		| EVENT_FILE_STATX \
+		| EVENT_FILE_RENAMEAT2 \
+		| EVENT_DIR_MKDIRAT)
+
+		switch (fe->mask & FLAGS) {
+		case EVENT_FILE_CLOSE:
+		case EVENT_FILE_OPENAT:
+		case EVENT_FILE_UNLINK:
+		case EVENT_FILE_STATX:
+		case EVENT_FILE_RENAMEAT2:
+		case EVENT_DIR_MKDIRAT:
 			fe->fd = res;
 			fe->r_proc(ev, fe);
+			break;
+		default:
+			msg_error("Unknown mask=%u", (fe->mask & FLAGS));
+			break;
 		}
 	}
 

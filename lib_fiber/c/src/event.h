@@ -129,11 +129,21 @@ struct FILE_EVENT {
 #define	EVENT_ERR		(unsigned) (1 << 2)
 #define	EVENT_HUP		(unsigned) (1 << 3)
 #define	EVENT_NVAL		(unsigned) (1 << 4)
+
+#ifdef	HAS_IO_URING
+
 #define	EVENT_ACCEPT		(unsigned) (1 << 5)
 #define	EVENT_CONNECT		(unsigned) (1 << 6)
 #define	EVENT_POLLIN		(unsigned) (1 << 7)
 #define	EVENT_POLLOUT		(unsigned) (1 << 8)
-#define	EVENT_FILE_OPEN		(unsigned) (1 << 9)
+#define	EVENT_FILE_OPENAT	(unsigned) (1 << 9)
+#define	EVENT_FILE_CLOSE	(unsigned) (1 << 10)
+#define	EVENT_FILE_UNLINK	(unsigned) (1 << 11)
+#define	EVENT_FILE_STATX	(unsigned) (1 << 12)
+#define	EVENT_FILE_RENAMEAT2	(unsigned) (1 << 13)
+#define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 14)
+
+#endif // HAS_IO_URING
 
 	event_proc   *r_proc;
 	event_proc   *w_proc;
@@ -153,7 +163,11 @@ struct FILE_EVENT {
 	size_t        wsize;
 	int           wlen;
 	socket_t      iocp_sock;
-	struct sockaddr_in peer_addr;
+	union {
+		struct sockaddr_in peer_addr;
+		struct statx statxbuf;
+		char  *path;
+	} var;
 	socklen_t     addr_len;
 	struct __kernel_timespec rts;
 	struct __kernel_timespec wts;

@@ -326,7 +326,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 	SET_CONNECTING(fe);
 
 #if defined(HAS_IOCP) || defined(HAS_IO_URING)
-	memcpy(&fe->peer_addr, addr, addrlen);
+	memcpy(&fe->var.peer_addr, addr, addrlen);
 	fe->addr_len = addrlen;
 #endif
 

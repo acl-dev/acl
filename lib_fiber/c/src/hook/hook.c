@@ -87,8 +87,16 @@ epoll_ctl_fn    *sys_epoll_ctl              = NULL;
 # endif
 
 # ifdef HAS_IO_URING
-open_fn         __sys_open                  = NULL;
-open_fn         *sys_open                   = NULL;
+openat_fn       __sys_openat                = NULL;
+openat_fn       *sys_openat                 = NULL;
+unlink_fn       __sys_unlink                = NULL;
+unlink_fn       *sys_unlink                 = NULL;
+statx_fn        __sys_statx                 = NULL;
+statx_fn        *sys_statx                  = NULL;
+renameat2_fn    __sys_renameat2             = NULL;
+renameat2_fn    *sys_renameat2              = NULL;
+mkdirat_fn      __sys_mkdirat               = NULL;
+mkdirat_fn      *sys_mkdirat                = NULL;
 # endif
 
 # ifndef __APPLE__
@@ -239,7 +247,11 @@ static void hook_api(void)
 # endif // HAS_EPOLL
 
 # ifdef	HAS_IO_URING
-	LOAD_FN("open", open_fn, __sys_open, sys_open);
+	LOAD_FN("openat", openat_fn, __sys_openat, sys_openat);
+	LOAD_FN("unlink", unlink_fn, __sys_unlink, sys_unlink);
+	LOAD_FN("statx", statx_fn, __sys_statx, sys_statx);
+	LOAD_FN("renameat2", renameat2_fn, __sys_renameat2, sys_renameat2);
+	LOAD_FN("mkdirat", mkdirat_fn, __sys_mkdirat, sys_mkdirat);
 # endif
 
 	LOAD_FN("getaddrinfo", getaddrinfo_fn, __sys_getaddrinfo, sys_getaddrinfo);

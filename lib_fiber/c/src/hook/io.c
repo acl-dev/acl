@@ -94,6 +94,10 @@ int WINAPI acl_fiber_close(socket_t fd)
 		if (ret == 0) {
 			ret = (*sys_close)(fd);
 		}
+#ifdef	HAS_IO_URING
+	} else if (EVENT_IS_IO_URING(ev) && (fe->type & TYPE_FILE)) {
+		ret = file_close(ev, fe);
+#endif
 	} else {
 		ret = (*sys_close)(fd);
 	}

@@ -73,7 +73,11 @@ typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
 # endif
 
 # ifdef HAS_IO_URING
-typedef int (*open_fn)(const char *, int, ...);
+typedef int (*openat_fn)(int, const char *, int, mode_t);
+typedef int (*unlink_fn)(const char *);
+typedef int (*statx_fn)(int dirfd, const char *, int, unsigned int, struct statx *);
+typedef int (*renameat2_fn)(int, const char *, int, const char *, unsigned);
+typedef int (*mkdirat_fn)(int, const char *, mode_t);
 # endif
 
 # ifndef __APPLE__
@@ -151,7 +155,13 @@ extern epoll_ctl_fn         *sys_epoll_ctl;
 # endif
 
 # ifdef HAS_IO_URING
-extern open_fn              *sys_open;
+extern int file_close(EVENT *ev, FILE_EVENT *fe);
+
+extern openat_fn            *sys_openat;
+extern unlink_fn            *sys_unlink;
+extern statx_fn             *sys_statx;
+extern renameat2_fn         *sys_renameat2;
+extern mkdirat_fn           *sys_mkdirat;
 # endif
 
 # ifndef __APPLE__
