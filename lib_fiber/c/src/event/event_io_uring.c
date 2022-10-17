@@ -259,7 +259,12 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 
 static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 {
-	if (fe->mask & EVENT_ACCEPT) {
+	if (!(fe->mask & (EVENT_ACCEPT | EVENT_POLLIN))) {
+		fe->rlen = res;
+		if ((fe->type & TYPE_FILE) && res > 0) {
+			fe->off += res;
+		}
+	} else if (fe->mask & EVENT_ACCEPT) {
 		fe->rlen = res;
 	} else if (fe->mask & EVENT_POLLIN) {
 		if (res & (POLLIN | ERR)) {
@@ -279,11 +284,6 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 			msg_error("%s(%d): unknown res=%d, fd=%d",
 				__FUNCTION__, __LINE__, res, fe->fd);
 		}
-	} else {
-		fe->rlen = res;
-		if ((fe->type & TYPE_FILE) && res > 0) {
-			fe->off += res;
-		}
 	}
 
 	fe->mask &= ~EVENT_READ;
@@ -292,7 +292,12 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 
 static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 {
-	if (fe->mask & EVENT_CONNECT) {
+	if (!(fe->mask & (EVENT_CONNECT | EVENT_POLLOUT))) {
+		fe->wlen = res;
+		if ((fe->type & TYPE_FILE) && res > 0) {
+			fe->off += res;
+		}
+	} else if (fe->mask & EVENT_CONNECT) {
 		fe->rlen = res;
 	} else if (fe->mask & EVENT_POLLOUT) {
 		if (res & (POLLOUT | ERR)) {
@@ -312,11 +317,6 @@ static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 			msg_error("%s(%d): unknown res=%d, fd=%d",
 				__FUNCTION__, __LINE__, res, fe->fd);
 		}
-	} else {
-		fe->wlen = res;
-		if ((fe->type & TYPE_FILE) && res > 0) {
-			fe->off += res;
-		}
 	}
 
 	fe->mask &= ~EVENT_WRITE;
@@ -325,13 +325,44 @@ static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 	}
 }
 
-static int event_uring_wait(EVENT *ev, int timeout)
+static void handle_one(EVENT *ev, FILE_EVENT *fe, int res)
 {
-	EVENT_URING *ep = (EVENT_URING*) ev;
+	if ((fe->mask & EVENT_READ) && fe->r_proc) {
+		handle_read(ev, fe, res);
+		return;
+	} else if ((fe->mask & EVENT_WRITE) && fe->w_proc) {
+		handle_write(ev, fe, res);
+		return;
+	}
+
+	if (fe->r_proc == NULL) {
+		return;
+	}
+
+#define	FLAGS	(EVENT_FILE_CLOSE \
+		| EVENT_FILE_OPENAT \
+		| EVENT_FILE_UNLINK \
+		| EVENT_FILE_STATX \
+		| EVENT_FILE_RENAMEAT2 \
+		| EVENT_DIR_MKDIRAT \
+		| EVENT_SPLICE \
+		| EVENT_SENDFILE)
+
+	if (fe->mask & FLAGS) {
+		fe->rlen = res;
+		fe->r_proc(ev, fe);
+	} else {
+		msg_error("%s(%d): unknown mask=%u",
+			__FUNCTION__, __LINE__, (fe->mask & ~FLAGS));
+	}
+}
+
+static int wait_one(EVENT_URING *ep, int timeout)
+{
 	struct __kernel_timespec ts, *tp;
 	struct io_uring_cqe *cqe;
 	FILE_EVENT *fe;
-	int ret, count = 0;
+	int ret;
 
 	if (timeout >= 0) {
 		ts.tv_sec  = timeout / 1000;
@@ -344,6 +375,75 @@ static int event_uring_wait(EVENT *ev, int timeout)
 		assert(0);
 	}
 
+	ret = io_uring_wait_cqes(&ep->ring, &cqe, 1, tp, NULL);
+	if (ret < 0) {
+		if (ret == -ETIME) {
+			return 0;
+		} else if (ret == -EAGAIN) {
+			return 0;
+		}
+
+		msg_error("%s(%d): io_uring_wait_cqe error=%s",
+			__FUNCTION__, __LINE__, strerror(-ret));
+		return -1;
+	}
+
+	ret = cqe->res;
+	fe = (FILE_EVENT*) io_uring_cqe_get_data(cqe);
+
+	io_uring_cqe_seen(&ep->ring, cqe);
+
+	if (ret == -ENOBUFS) {
+		msg_error("%s(%d): ENOBUFS error", __FUNCTION__, __LINE__);
+		return -1;
+	}
+
+	if (ret == -ETIME || ret == -ECANCELED || fe == NULL) {
+		return 1;
+	}
+
+	handle_one((EVENT*) ep, fe, ret);
+	return 1;
+}
+
+static int peek_more(EVENT_URING *ep)
+{
+#define	PEEK_MAX	100
+	struct io_uring_cqe *cqes[PEEK_MAX + 1];
+	FILE_EVENT *fe;
+	unsigned n, i;
+	int ret, cnt = 0;
+
+	while ((n = io_uring_peek_batch_cqe(&ep->ring, cqes, PEEK_MAX)) > 0) {
+		for (i = 0; i < n; i++) {
+			ret = cqes[i]->res;
+			fe = (FILE_EVENT*) io_uring_cqe_get_data(cqes[i]);
+
+			if (ret == -ENOBUFS) {
+				msg_error("%s(%d): ENOBUFS error",
+					__FUNCTION__, __LINE__);
+				return -1;
+			}
+
+			if (ret == -ETIME || ret == -ECANCELED || fe == NULL) {
+				continue;
+			}
+
+			handle_one((EVENT*) ep, fe, ret);
+		}
+
+		io_uring_cq_advance(&ep->ring, n);
+		cnt += n;
+	}
+
+	return cnt;
+}
+
+static int event_uring_wait(EVENT *ev, int timeout)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	int ret, count = 0;
+
 	if (ep->appending > 0) {
 		ep->appending = 0;
 		io_uring_submit(&ep->ring);
@@ -351,74 +451,25 @@ static int event_uring_wait(EVENT *ev, int timeout)
 
 	while (1) {
 		if (count > 0) {
-			ret = io_uring_peek_cqe(&ep->ring, &cqe);
-		} else {
-			//ret = io_uring_wait_cqe(&ep->ring, &cqe);
-			ret = io_uring_wait_cqes(&ep->ring, &cqe, 1, tp, NULL);
-		}
-
-		if (ret) {
-			if (ret == -ETIME) {
-				return 0;
-			} else if (ret == -EAGAIN) {
+			ret = peek_more(ep);
+			if (ret == 0) {
 				break;
+			} else if (ret < 0) {
+				return -1;
 			}
-
-			msg_error("%s(%d): io_uring_wait_cqe error=%s",
-				__FUNCTION__, __LINE__, strerror(-ret));
-			return -1;
-		}
-
-		assert(cqe);
-		count++;
-
-		int res = cqe->res;
-		fe = (FILE_EVENT*) io_uring_cqe_get_data(cqe);
-
-		io_uring_cqe_seen(&ep->ring, cqe);
-
-		if (res == -ENOBUFS) {
-			msg_error("%s(%d): ENOBUFS error", __FUNCTION__, __LINE__);
-			return -1;
-		}
-
-		if (res == -ETIME || res == -ECANCELED || fe == NULL) {
-			continue;
-		} else if (res < 0) {
-			//msg_error("%s(%d): some other error=%d, %s",
-			//	__FUNCTION__, __LINE__, -res, strerror(-res));
-		}
-
-		//usleep(100000);
-
-		if ((fe->mask & EVENT_READ) && fe->r_proc) {
-			handle_read(ev, fe, res);
-			continue;
-		} else if ((fe->mask & EVENT_WRITE) && fe->w_proc) {
-			handle_write(ev, fe, res);
-			continue;
-		}
-
-		if (fe->r_proc == NULL) {
-			continue;
-		}
-
-#define	FLAGS	(EVENT_FILE_CLOSE \
-		| EVENT_FILE_OPENAT \
-		| EVENT_FILE_UNLINK \
-		| EVENT_FILE_STATX \
-		| EVENT_FILE_RENAMEAT2 \
-		| EVENT_DIR_MKDIRAT \
-		| EVENT_SPLICE \
-		| EVENT_SENDFILE)
-
-		if (fe->mask & FLAGS) {
-			fe->rlen = res;
-			fe->r_proc(ev, fe);
+			count += ret;
+			break;
 		} else {
-			msg_error("%s(%d): unknown mask=%u",
-				__FUNCTION__, __LINE__, (fe->mask & ~FLAGS));
+			ret = wait_one(ep, timeout);
+			if (ret == 0) {
+				break;
+			} else if (ret < 0) {
+				return -1;
+			}
+			count += ret;
 		}
+
+		//usleep(10000);
 	}
 
 	return count;
@@ -446,8 +497,8 @@ EVENT *event_io_uring_create(int size)
 	struct io_uring_params params;
 	int ret;
 
-	if (size <= 0 || size >= 4096) {
-		eu->sqe_size = 2048;
+	if (size <= 0 || size > 4096) {
+		eu->sqe_size = 4096;
 	} else {
 		eu->sqe_size = size;
 	}
