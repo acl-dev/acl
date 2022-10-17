@@ -673,12 +673,17 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 	CHECK_SET_NBLOCK(fd);
 
+//#define	WRITE_FIRST
+
 #if defined(HAS_IO_URING)
+
+# ifndef WRITE_FIRST
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		FILE_EVENT *fe = fiber_file_open_write(fd);
 		CLR_POLLING(fe);
 		return fiber_iocp_write(fe, buf, (int) count);
 	}
+# endif
 #endif
 
 	while (1) {
@@ -704,13 +709,13 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		fe = fiber_file_open_write(fd);
 		CLR_POLLING(fe);
 
-/*
 #if defined(HAS_IO_URING)
+# ifdef WRITE_FIRST
 		if (EVENT_IS_IO_URING(fiber_io_event())) {
 			return fiber_iocp_write(fe, buf, (int) count);
 		}
+# endif
 #endif
-*/
 
 		if (fiber_wait_write(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",

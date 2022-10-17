@@ -497,11 +497,13 @@ EVENT *event_io_uring_create(int size)
 	struct io_uring_params params;
 	int ret;
 
-	if (size <= 0 || size > 4096) {
-		eu->sqe_size = 4096;
+	if (size <= 0 || size > 2048) {
+		eu->sqe_size = 2048;
 	} else {
 		eu->sqe_size = size;
 	}
+
+	//eu->sqe_size = 256;
 
 	memset(&params, 0, sizeof(params));
 	ret = io_uring_queue_init_params(eu->sqe_size, &eu->ring, &params);
