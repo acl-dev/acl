@@ -102,12 +102,18 @@ redis_command::~redis_command(void)
 	if (argv_ != NULL) {
 		acl_myfree(argv_);
 	}
+
 	if (argv_lens_ != NULL) {
 		acl_myfree(argv_lens_);
 	}
+
 	delete request_buf_;
 	delete request_obj_;
-	delete pipe_msg_;
+
+	if (pipe_msg_) {
+		pipe_msg_->unrefer();
+	}
+
 	dbuf_->destroy();
 }
 
@@ -232,6 +238,7 @@ redis_pipeline_message& redis_command::get_pipeline_message(void)
 	if (pipe_msg_ == NULL) {
 		pipe_msg_ = NEW redis_pipeline_message(
 			this, redis_pipeline_t_cmd, pipe_use_mbox_);
+		pipe_msg_->refer();
 	}
 	return *pipe_msg_;
 }
