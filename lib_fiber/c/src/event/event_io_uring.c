@@ -372,7 +372,6 @@ static int wait_one(EVENT_URING *ep, int timeout)
 		ts.tv_sec  = 0;
 		ts.tv_nsec = 0;
 		tp         = NULL;
-		assert(0);
 	}
 
 	ret = io_uring_wait_cqes(&ep->ring, &cqe, 1, tp, NULL);
@@ -408,6 +407,9 @@ static int wait_one(EVENT_URING *ep, int timeout)
 
 static int peek_more(EVENT_URING *ep)
 {
+#define	PEEK_BATCH
+
+#ifdef	PEEK_BATCH
 #define	PEEK_MAX	100
 	struct io_uring_cqe *cqes[PEEK_MAX + 1];
 	FILE_EVENT *fe;
@@ -437,6 +439,32 @@ static int peek_more(EVENT_URING *ep)
 	}
 
 	return cnt;
+#else
+	int cnt = 0, ret;
+	struct io_uring_cqe *cqe;
+	FILE_EVENT *fe;
+
+	while (1) {
+		ret = io_uring_peek_cqe(&ep->ring, &cqe);
+		if (ret == -EAGAIN) {
+			break;
+		}
+
+		ret = cqe->res;
+		fe = (FILE_EVENT*) io_uring_cqe_get_data(cqe);
+		io_uring_cqe_seen(&ep->ring, cqe);
+
+		if (ret == -ETIME || ret == -ECANCELED || fe == NULL) {
+			continue;
+		} else if (ret < 0) {
+			return -1;
+		}
+
+		handle_one((EVENT*) ep, fe, ret);
+		cnt++;
+	}
+	return cnt;
+#endif
 }
 
 static int event_uring_wait(EVENT *ev, int timeout)
@@ -450,6 +478,7 @@ static int event_uring_wait(EVENT *ev, int timeout)
 	}
 
 	while (1) {
+#if 1
 		if (count > 0) {
 			ret = peek_more(ep);
 			if (ret == 0) {
@@ -468,7 +497,12 @@ static int event_uring_wait(EVENT *ev, int timeout)
 			}
 			count += ret;
 		}
-
+#else
+		count = peek_more(ep);
+		if (count <= 0) {
+			break;
+		}
+#endif
 		//usleep(10000);
 	}
 
