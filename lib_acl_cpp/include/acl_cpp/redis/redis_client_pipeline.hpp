@@ -4,6 +4,7 @@
 #include "../stdlib/string.hpp"
 #include "../stdlib/tbox.hpp"
 #include "../stdlib/mbox.hpp"
+#include "../stdlib/atomic.hpp"
 #include "redis_command.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
@@ -66,6 +67,16 @@ public:
 		delete tbox_;
 		delete [] argv_;
 		delete [] lens_;
+	}
+
+	void refer(void) {
+		++refers_;
+	}
+
+	void unrefer(void) {
+		if (--refers_ == 0) {
+			delete this;
+		}
 	}
 
 	redis_pipeline_message& set_type(redis_pipeline_type_t type) {
@@ -166,7 +177,8 @@ private:
 	const redis_result* result_;
 	const char* addr_;
 	size_t redirect_count_;
-
+	atomic_long refers_;  // The msg will be freed when refers_ is 0.
+ 
 public:
 	size_t       size_;
 	size_t       argc_;

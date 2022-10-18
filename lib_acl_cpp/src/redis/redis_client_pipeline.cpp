@@ -190,9 +190,19 @@ bool redis_pipeline_channel::wait_results(void)
 
 	std::vector<redis_pipeline_message*>::iterator it;
 	for (it = msgs_.begin(); it != msgs_.end(); ++it) {
+		// Add the msg's reference to avoid it is freed in advance.
+		// The mbox is not safety in the tail return after push back
+		// if the consumer may free the msg at once after getting
+		// one result. See acl_ypipe_flush(), if the consumer frees
+		// the mbox after acl_atomic_cas() but before acl_atomic_set(),
+		// the producer will crash.
+		(*it)->refer();
+
 		if (!wait_one(*conn, **it)) {
+			(*it)->unrefer();
 			break;
 		}
+		(*it)->unrefer();
 	}
 
 	// If we can't get the first result, the socket maybe be disconnected,
@@ -204,7 +214,9 @@ bool redis_pipeline_channel::wait_results(void)
 
 	// Return NULL for the left failed results
 	for (; it != msgs_.end(); ++it) {
+		(*it)->refer();
 		(*it)->push(NULL);
+		(*it)->unrefer();
 	}
 
 	return true;
