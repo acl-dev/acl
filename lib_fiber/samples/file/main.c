@@ -12,14 +12,14 @@
 #include "fiber/libfiber.h"
 
 static int __open_flags = 0;
-static int __write_size = 1024;
+static long long __write_size = 1024;
 
 struct FIBER_CTX {
 	const char *frompath;
 	const char *topath;
 	int   fd;
 	off_t off;
-	int   len;
+	long long len;
 	char  addr[256];
 	int   check;
 };
@@ -55,7 +55,8 @@ static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *path = (const char*) ctx;
-	int   fd = open(path, __open_flags, 0600), i, n;
+	int   fd = open(path, __open_flags, 0600);
+	long long i, n;
 	char  buf[10];
 	if (fd < 0) {
 		printf("open %s error %s\r\n", path, strerror(errno));
@@ -66,7 +67,7 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	for (i = 0; i < __write_size; i++) {
 		n = i % 10;
-		snprintf(buf, sizeof(buf), "%d", n);
+		snprintf(buf, sizeof(buf), "%lld", n);
 		if (write(fd, buf, 1) <= 0) {
 			printf("write to %s error %s\r\n", path, strerror(errno));
 			break;
@@ -163,9 +164,9 @@ struct IO_CTX {
 static void fiber_one_preader(ACL_FIBER *fb acl_unused, void *ctx)
 {
 	struct IO_CTX *ic = (struct IO_CTX*) ctx;
-	int   count = ic->len / MB, left = ic->len % MB;
+	long long count = ic->len / MB, left = ic->len % MB, i;
 	char *buf = malloc(MB);
-	int   ret, i;
+	int   ret;
 
 	memset(buf, 'x', MB);
 
@@ -173,17 +174,17 @@ static void fiber_one_preader(ACL_FIBER *fb acl_unused, void *ctx)
 		ret = pread(ic->fd, buf, MB, ic->off);
 
 		if (ret <= 0) {
-			printf("pread ret=%d, wrror=%s\r\n", ret, strerror(errno));
-			exit(1);
+			printf("pread over ret=%d, wrror=%s\r\n", ret, strerror(errno));
+			break;
 		}
+
 		ic->off += ret;
 	}
 
 	if (left > 0) {
 		ret = pread(ic->fd, buf, left, ic->off);
 		if (ret <= 0) {
-			printf("pwrite ret=%d, wrror=%s\r\n", ret, strerror(errno));
-			exit(1);
+			printf("pread over ret=%d, wrror=%s\r\n", ret, strerror(errno));
 		}
 	}
 
@@ -198,7 +199,7 @@ static void fiber_one_preader(ACL_FIBER *fb acl_unused, void *ctx)
 static void co_readers(struct FIBER_CTX *fc, int fd)
 {
 #define	COUNT	10
-	int i, step = fc->len / COUNT, cnt = 0;
+	long long i, step = fc->len / COUNT, cnt = 0;
 	off_t off = 0;
 	ACL_FIBER_SEM *sem = acl_fiber_sem_create(0);
 
@@ -241,7 +242,7 @@ static void fiber_co_pread(ACL_FIBER *fb acl_unused, void *ctx)
 	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
 	int fd, i;
 
-	fd = open(fc->frompath, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	fd = open(fc->frompath, O_RDONLY, 0600);
 	if (fd == -1) {
 		printf("open %s for write error %s\r\n",
 			fc->frompath, strerror(errno));
@@ -586,7 +587,7 @@ int main(int argc, char *argv[])
 			break;
 		case 'n':
 			__write_size = atoi(optarg);
-			ctx.len = atoi(optarg);
+			ctx.len = atoll(optarg);
 			break;
 		case 'C':
 			ctx.check = 1;
