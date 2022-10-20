@@ -33,7 +33,7 @@ static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 	printf("open %s ok, fd=%d\r\n", path, fd);
 
 	while (1) {
-		char buf[1024];
+		char buf[8192];
 		ret = read(fd, buf, sizeof(buf) - 1);
 		if (ret <= 0) {
 			printf("Read over!\r\n");
@@ -100,56 +100,61 @@ static void fiber_pread(ACL_FIBER *fiber acl_unused, void *ctx)
 	close(fd);
 }
 
-static int accept_one(void)
+static void wait_and_sendfile(int in, struct FIBER_CTX *fc)
 {
 	const char *addr = "127.0.0.1:8080";
 	ACL_VSTREAM *ln = acl_vstream_listen(addr, 128), *conn;
+	ssize_t ret;
+	off_t off_saved = fc->off;
 	int cfd;
 	if (ln == NULL) {
 		printf("listen %s error %s\r\n", addr, strerror(errno));
 		exit(1);
 	}
 
-	printf("Waiting for accept from %s ...\r\n", addr);
+	while (1) {
+		printf("Waiting for accept from %s ...\r\n", addr);
 
-	conn = acl_vstream_accept(ln, NULL, 0);
-	if (conn == NULL) {
-		printf("accept from %s error %s\r\n", addr, strerror(errno));
-		exit(1);
+		conn = acl_vstream_accept(ln, NULL, 0);
+		if (conn == NULL) {
+			printf("accept from %s error %s\r\n", addr, strerror(errno));
+			exit(1);
+		}
+
+		cfd = ACL_VSTREAM_SOCK(conn);
+		acl_vstream_free(conn);
+
+		printf(">>>begin call sendfile64 to fd=%d\r\n", cfd);
+
+		ret = sendfile64(cfd, in, &fc->off, fc->len);
+		close(cfd);
+
+		printf(">>>sendfile ret=%zd, off=%d\r\n", ret, (int) fc->off);
+
+		fc->off = off_saved;
 	}
-	acl_vstream_close(ln);
 
-	cfd = ACL_VSTREAM_SOCK(conn);
-	acl_vstream_free(conn);
-	return cfd;
+	acl_vstream_close(ln);
 }
 
 static void fiber_sendfile(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
-	int in = open(fc->frompath, O_RDONLY, 0600), cfd;
-	ssize_t ret;
+	int in = open(fc->frompath, O_RDONLY, 0600);
 
 	if (in == -1) {
 		printf("open %s error %s\r\n", fc->frompath, strerror(errno));
 		return;
 	}
 
-	cfd = accept_one();
-
-	printf(">>>begin call sendfile64\r\n");
-	ret = sendfile64(cfd, in, &fc->off, fc->len);
-	printf(">>>sendfile ret=%zd, off=%d\r\n", ret, (int) fc->off);
-
+	wait_and_sendfile(in, fc);
 	close(in);
-	close(cfd);
-	printf("close client=%d ok\r\n", cfd);
 }
 
 static void fiber_splice(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
-	int in = open(fc->frompath, O_RDONLY, 0600), out;
+	int in = open(fc->frompath, O_RDONLY, 0600), out, total = 0, loop = 0;
 	int pipefd[2];
 
 	if (in == -1) {
@@ -166,24 +171,33 @@ static void fiber_splice(ACL_FIBER *fiber acl_unused, void *ctx)
 	while (1) {
 		char buf[1024];
 		int flags = SPLICE_F_MOVE | SPLICE_F_MORE;
-		int ret = splice(in, &fc->off, out, NULL, fc->len, flags);
+		ssize_t ret = splice(in, &fc->off, out, NULL, fc->len, flags);
 
 		if (ret <= 0) {
-			printf("splice over, ret=%d: %s\r\n", ret, strerror(errno));
+			printf("splice over, ret=%zd: %s\r\n", ret, strerror(errno));
 			break;
 		}
 
-		ret = read(pipefd[0], buf, sizeof(buf) - 1);
-		if (ret <= 0) {
-			printf("pipe over, ret=%d: %s\r\n", ret, strerror(errno));
-			break;
-		}
+		while (ret > 0) {
+			size_t size = sizeof(buf) - 1 > (size_t) ret
+				? (size_t) ret : sizeof(buf) - 1;
+			ssize_t n = read(pipefd[0], buf, size);
+			if (n <= 0) {
+				printf("pipe over, ret=%zd: %s\r\n",
+					ret, strerror(errno));
+				break;
+			}
 
-		buf[ret] = 0;
-		printf("off: %ld, %s", fc->off, buf);
-		fflush(stdout);
+			buf[n] = 0;
+			printf("%s", buf);
+			fflush(stdout);
+			ret -= n;
+			total += n;
+			loop++;
+		}
 	}
 
+	printf("Total read %d bytes, loop=%d\r\n", total, loop);
 	close(in);
 	close(pipefd[0]);
 	close(pipefd[1]);
@@ -354,5 +368,8 @@ int main(int argc, char *argv[])
 	}
 
 	acl_fiber_schedule_with(FIBER_EVENT_IO_URING);
+
+	printf("Enter any key to exit ...\r\n");
+	getchar();
 	return 0;
 }

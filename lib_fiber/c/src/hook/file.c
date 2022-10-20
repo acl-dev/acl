@@ -26,13 +26,13 @@
 	(fe)->fiber_r = acl_fiber_running();  \
 	(fe)->fiber_w = acl_fiber_running();  \
 	(fe)->fiber_r->status = FIBER_STATUS_NONE;  \
-	(fe)->r_proc = file_default_callback;  \
-	(fe)->mask = (type);  \
+	(fe)->fiber_w->status = FIBER_STATUS_NONE;  \
+	(fe)->r_proc = file_read_callback;  \
+	(fe)->mask   = (type);  \
 } while (0)
 
-static void file_default_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
+static void file_read_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
 {
-	printf(">>>rlen=%d\n", fe->rlen);
 	if (fe->fiber_r->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(fe->fiber_r);
 	}
@@ -52,7 +52,7 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	fe->fiber_r = acl_fiber_running();
 	fe->fiber_r->status = FIBER_STATUS_NONE;
-	fe->r_proc = file_default_callback;
+	fe->r_proc = file_read_callback;
 	fe->mask = EVENT_FILE_CLOSE;
 
 	event_uring_file_close(ev, fe);
@@ -429,7 +429,7 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 	fe->var.pipefd[0] = -1;
 	fe->var.pipefd[1] = -1;
 
-	printf(">>>>>>>>.ret=%d\n", ret);
+	printf(">>>>>>>>%s: ret=%d\n", __FUNCTION__, ret);
 	if (ret == 0) {
 		return 0;
 	} else if (ret < 0) {

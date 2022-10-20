@@ -222,15 +222,16 @@ void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
 	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 	unsigned flags = SPLICE_F_MOVE | SPLICE_F_MORE; // | SPLICE_F_NONBLOCK;
 
-	printf("hello>>>in=%d, off=%d, cnt=%zd, fe=%p\n",
-		in, (int) off, cnt, fe);
+	printf("hello>>>in=%d, off=%d, cnt=%zd, fe=%p, flags=%u\n",
+		in, (int) off, cnt, fe, flags);
 	io_uring_prep_splice(sqe, in, off, fe->var.pipefd[1], -1, cnt, flags);
 	io_uring_sqe_set_data(sqe, fe);
-	sqe->flags = IOSQE_IO_LINK;
+	sqe->flags |= IOSQE_IO_LINK | SPLICE_F_FD_IN_FIXED | IOSQE_ASYNC;
 	sqe->opcode = IORING_OP_SPLICE;
 
 	TRY_SUBMMIT(ep);
 
+	flags = 0;
 	sqe = io_uring_get_sqe(&ep->ring);
 	io_uring_prep_splice(sqe, fe->var.pipefd[0], -1, out, -1, cnt, flags);
 	io_uring_sqe_set_data(sqe, fe);
