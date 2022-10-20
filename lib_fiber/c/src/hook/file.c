@@ -32,6 +32,7 @@
 
 static void file_default_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
 {
+	printf(">>>rlen=%d\n", fe->rlen);
 	if (fe->fiber_r->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(fe->fiber_r);
 	}
@@ -401,13 +402,18 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 	EVENT *ev = fiber_io_event();
 	int ret;
 
-	FILE_ALLOC(fe, EVENT_SENDFILE);
+	fe = fiber_file_open_read(in_fd);
+	fe->mask |= EVENT_SENDFILE;
 
 	if (pipe(fe->var.pipefd) == -1) {
+		fe->mask &= ~EVENT_SENDFILE;
 		msg_error("%s(%d): pipe error=%s",
 			__FUNCTION__, __LINE__, last_serror());
 		return -1;
 	}
+
+	fe->fiber_r = acl_fiber_running();
+	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
 
 	event_uring_sendfile(ev, fe, out_fd, in_fd, off ? *off : 0, cnt);
 
@@ -420,20 +426,20 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 	ret = fe->rlen;
 	close(fe->var.pipefd[0]);
 	close(fe->var.pipefd[1]);
+	fe->var.pipefd[0] = -1;
+	fe->var.pipefd[1] = -1;
 
+	printf(">>>>>>>>.ret=%d\n", ret);
 	if (ret == 0) {
-		file_event_unrefer(fe);
 		return 0;
 	} else if (ret < 0) {
 		acl_fiber_set_error(-ret);
-		file_event_unrefer(fe);
 		return -1;
 	}
 
 	if (off) {
 		*off += cnt;
 	}
-	file_event_unrefer(fe);
 	return ret;
 }
 

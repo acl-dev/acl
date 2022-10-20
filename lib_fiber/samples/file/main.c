@@ -143,6 +143,7 @@ static void fiber_sendfile(ACL_FIBER *fiber acl_unused, void *ctx)
 
 	close(in);
 	close(cfd);
+	printf("close client=%d ok\r\n", cfd);
 }
 
 static void fiber_splice(ACL_FIBER *fiber acl_unused, void *ctx)

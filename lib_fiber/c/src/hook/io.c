@@ -637,7 +637,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 // flag was set and the fd was in non-block status in order to return imaginary
 // from connecting process.
 
-#if defined(HAS_IO_URING_xxx)
+#if defined(HAS_IO_URING)
 # define CHECK_SET_NBLOCK(_fd) do { \
 	if (var_hook_sys_api && !EVENT_IS_IO_URING(fiber_io_event())) { \
 		FILE_EVENT *fe = fiber_file_get(_fd); \
