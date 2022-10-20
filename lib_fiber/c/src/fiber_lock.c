@@ -35,6 +35,7 @@ void acl_fiber_mutex_free(ACL_FIBER_MUTEX *lk)
 static int __lock(ACL_FIBER_MUTEX *lk, int block)
 {
 	ACL_FIBER *curr = acl_fiber_running();
+	EVENT *ev;
 
 	if (lk->owner == NULL) {
 		lk->owner = acl_fiber_running();
@@ -52,7 +53,10 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 	ring_prepend(&lk->waiting, &curr->me);
 	curr->waiting = lk;
 
+	ev = fiber_io_event();
+	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
+	ev->waiter--;
 
 	/* if switch to me because other killed me, I should detach myself;
 	 * else if because other unlock, I'll be detached twice which is
@@ -137,6 +141,7 @@ void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK *lk)
 static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 {
 	ACL_FIBER *curr;
+	EVENT *ev;
 
 	if (lk->writer == NULL && FIRST_FIBER(&lk->wwaiting) == NULL) {
 		lk->readers++;
@@ -149,7 +154,11 @@ static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 
 	curr = acl_fiber_running();
 	ring_prepend(&lk->rwaiting, &curr->me);
+
+	ev = fiber_io_event();
+	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
+	ev->waiter--;
 
 	/* if switch to me because other killed me, I should detach myself */
 	ring_detach(&curr->me);
@@ -170,6 +179,7 @@ int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK *lk)
 static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 {
 	ACL_FIBER *curr;
+	EVENT *ev;
 
 	if (lk->writer == NULL && lk->readers == 0) {
 		lk->writer = acl_fiber_running();
@@ -182,7 +192,11 @@ static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 
 	curr = acl_fiber_running();
 	ring_prepend(&lk->wwaiting, &curr->me);
+
+	ev = fiber_io_event();
+	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
+	ev->waiter--;
 
 	/* if switch to me because other killed me, I should detach myself */
 	ring_detach(&curr->me);

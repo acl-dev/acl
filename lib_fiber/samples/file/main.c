@@ -21,6 +21,7 @@ struct FIBER_CTX {
 	off_t off;
 	int   len;
 	char  addr[256];
+	int   check;
 };
 
 static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
@@ -136,7 +137,21 @@ static void fiber_pwrite(ACL_FIBER *fiber acl_unused, void *ctx)
 	close(fd);
 }
 
-struct WRITER_CTX {
+static void fiber_sleep(ACL_FIBER *fb acl_unused, void *ctx acl_unused)
+{
+	time_t last, now, delay;
+	while (1) {
+		time(&last);
+		sleep(1);
+		time(&now);
+		delay = now - last;
+		printf(">>fiber-%d wakeup, delay=%ld seconds\r\n",
+			acl_fiber_self(), delay);
+		assert(delay == 1);
+	}
+}
+
+struct IO_CTX {
 	int   fd;
 	off_t off;
 	int   len;
@@ -145,32 +160,125 @@ struct WRITER_CTX {
 
 #define	MB	1000000
 
-static void fiber_one_pwriter(ACL_FIBER *fb acl_unused, void *ctx)
+static void fiber_one_preader(ACL_FIBER *fb acl_unused, void *ctx)
 {
-	struct WRITER_CTX *wc = (struct WRITER_CTX*) ctx;
-	int   count = wc->len / MB, left = wc->len % MB;
+	struct IO_CTX *ic = (struct IO_CTX*) ctx;
+	int   count = ic->len / MB, left = ic->len % MB;
 	char *buf = malloc(MB);
 	int   ret, i;
 
 	memset(buf, 'x', MB);
 
 	for (i = 0; i < count; i++) {
-	printf(">>>%d: fiber-%d running ...\r\n", __LINE__, acl_fiber_self());
-		ret = pwrite(wc->fd, buf, MB, wc->off);
-		//printf(">>>fiber-%d, ret=%d\r\n", acl_fiber_self(), ret);
+		ret = pread(ic->fd, buf, MB, ic->off);
+
+		if (ret <= 0) {
+			printf("pread ret=%d, wrror=%s\r\n", ret, strerror(errno));
+			exit(1);
+		}
+		ic->off += ret;
+	}
+
+	if (left > 0) {
+		ret = pread(ic->fd, buf, left, ic->off);
+		if (ret <= 0) {
+			printf("pwrite ret=%d, wrror=%s\r\n", ret, strerror(errno));
+			exit(1);
+		}
+	}
+
+	printf("fiber=%d: pread ok, ret=%d, off=%ld, len=%d\r\n",
+		acl_fiber_self(), ret, ic->off, ic->len);
+
+	acl_fiber_sem_post(ic->sem);
+	free(buf);
+	free(ic);
+}
+
+static void co_readers(struct FIBER_CTX *fc, int fd)
+{
+#define	COUNT	10
+	int i, step = fc->len / COUNT, cnt = 0;
+	off_t off = 0;
+	ACL_FIBER_SEM *sem = acl_fiber_sem_create(0);
+
+	assert(fc->len > 0);
+	assert(step > 0);
+
+	for (i = 0; i < COUNT - 1; i++) {
+		struct IO_CTX *ic = malloc(sizeof(struct IO_CTX));
+		ic->fd  = fd;
+		ic->sem = sem;
+		ic->len = step;
+		ic->off = off;
+		off    += step;
+		cnt++;
+
+		acl_fiber_create(fiber_one_preader, ic, 320000);
+	}
+
+	if (off < fc->len) {
+		struct IO_CTX *ic = malloc(sizeof(struct IO_CTX));
+		ic->fd  = fd;
+		ic->sem = sem;
+		ic->len = fc->len - off;
+		ic->off = off;
+		cnt++;
+
+		acl_fiber_create(fiber_one_preader, ic, 320000);
+	}
+
+	for (i = 0; i < cnt; i++) {
+		acl_fiber_sem_wait(sem);
+	}
+
+	printf("All pread fibers finished!\r\n");
+	acl_fiber_sem_free(sem);
+}
+
+static void fiber_co_pread(ACL_FIBER *fb acl_unused, void *ctx)
+{
+	struct FIBER_CTX *fc = (struct FIBER_CTX*) ctx;
+	int fd, i;
+
+	fd = open(fc->frompath, O_WRONLY | O_CREAT | O_TRUNC, 0600);
+	if (fd == -1) {
+		printf("open %s for write error %s\r\n",
+			fc->frompath, strerror(errno));
+		exit(1);
+	}
+
+	if (fc->check) {
+		acl_fiber_create(fiber_sleep, NULL, 32000);
+	}
+
+	for (i = 0; i < 10; i++) {
+		co_readers(fc, fd);
+	}
+	close(fd);
+}
+
+static void fiber_one_pwriter(ACL_FIBER *fb acl_unused, void *ctx)
+{
+	struct IO_CTX *ic = (struct IO_CTX*) ctx;
+	int   count = ic->len / MB, left = ic->len % MB;
+	char *buf = malloc(MB);
+	int   ret, i;
+
+	memset(buf, 'x', MB);
+
+	for (i = 0; i < count; i++) {
+		ret = pwrite(ic->fd, buf, MB, ic->off);
 
 		if (ret <= 0) {
 			printf("pwrite ret=%d, wrror=%s\r\n", ret, strerror(errno));
 			exit(1);
 		}
-	printf(">>>%d: fiber-%d running ...\r\n", __LINE__, acl_fiber_self());
-		wc->off += ret;
+		ic->off += ret;
 	}
 
-	printf(">>>%d: fiber-%d running ...\r\n", __LINE__, acl_fiber_self());
-
 	if (left > 0) {
-		ret = pwrite(wc->fd, buf, left, wc->off);
+		ret = pwrite(ic->fd, buf, left, ic->off);
 		if (ret <= 0) {
 			printf("pwrite ret=%d, wrror=%s\r\n", ret, strerror(errno));
 			exit(1);
@@ -178,11 +286,11 @@ static void fiber_one_pwriter(ACL_FIBER *fb acl_unused, void *ctx)
 	}
 
 	printf("fiber=%d: pwrite ok, ret=%d, off=%ld, len=%d\r\n",
-		acl_fiber_self(), ret, wc->off, wc->len);
+		acl_fiber_self(), ret, ic->off, ic->len);
 
-	acl_fiber_sem_post(wc->sem);
+	acl_fiber_sem_post(ic->sem);
 	free(buf);
-	free(wc);
+	free(ic);
 }
 
 static void co_writers(struct FIBER_CTX *fc, int fd)
@@ -196,34 +304,33 @@ static void co_writers(struct FIBER_CTX *fc, int fd)
 	assert(step > 0);
 
 	for (i = 0; i < COUNT - 1; i++) {
-		struct WRITER_CTX *wc = malloc(sizeof(struct WRITER_CTX));
-		wc->fd  = fd;
-		wc->sem = sem;
-		wc->len = step;
-		wc->off = off;
+		struct IO_CTX *ic = malloc(sizeof(struct IO_CTX));
+		ic->fd  = fd;
+		ic->sem = sem;
+		ic->len = step;
+		ic->off = off;
 		off    += step;
 		cnt++;
 
-		acl_fiber_create(fiber_one_pwriter, wc, 320000);
+		acl_fiber_create(fiber_one_pwriter, ic, 320000);
 	}
 
 	if (off < fc->len) {
-		struct WRITER_CTX *wc = malloc(sizeof(struct WRITER_CTX));
-		wc->fd  = fd;
-		wc->sem = sem;
-		wc->len = fc->len - off;
-		wc->off = off;
+		struct IO_CTX *ic = malloc(sizeof(struct IO_CTX));
+		ic->fd  = fd;
+		ic->sem = sem;
+		ic->len = fc->len - off;
+		ic->off = off;
 		cnt++;
 
-		acl_fiber_create(fiber_one_pwriter, wc, 320000);
+		acl_fiber_create(fiber_one_pwriter, ic, 320000);
 	}
 
 	for (i = 0; i < cnt; i++) {
 		acl_fiber_sem_wait(sem);
-		//sleep(1);
 	}
 
-	printf("All fiber finished!\r\n");
+	printf("All pwrite fibers finished!\r\n");
 	acl_fiber_sem_free(sem);
 }
 
@@ -237,6 +344,10 @@ static void fiber_co_pwrite(ACL_FIBER *fb acl_unused, void *ctx)
 		printf("open %s for write error %s\r\n",
 			fc->frompath, strerror(errno));
 		exit(1);
+	}
+
+	if (fc->check) {
+		acl_fiber_create(fiber_sleep, NULL, 32000);
 	}
 
 	for (i = 0; i < 10; i++) {
@@ -427,10 +538,11 @@ static void usage(const char *proc)
 	printf("usage: %s -h [help]\r\n"
 		"  -f filepath\r\n"
 		"  -t tofilepath\r\n"
-		"  -a action[read|write|rename|unlink|stat|mkdir|splice|pread|pwrite|sendfile|co_pwrite]\r\n"
+		"  -a action[read|write|rename|unlink|stat|mkdir|splice|pread|pwrite|sendfile|co_pwrite|co_pread]\r\n"
 		"  -n size[default: 1024]\r\n"
 		"  -o open_flags[O_RDONLY, O_WRONLY, O_RDWR, O_APPEND, O_CREAT, O_EXCL, O_TRUNC]\r\n"
 		"  -p offset\r\n"
+		"  -C [if check the process been blocked by disk IO]\r\n"
 		, proc);
 }
 
@@ -449,10 +561,11 @@ int main(int argc, char *argv[])
 	ctx.off      = 0;
 	ctx.len      = 100;
 	snprintf(ctx.addr, sizeof(ctx.addr), "127.0.0.1|8080");
+	ctx.check    = 0;
 
 #define	EQ(x, y)	!strcasecmp((x), (y))
 
-	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:C")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -474,6 +587,9 @@ int main(int argc, char *argv[])
 		case 'n':
 			__write_size = atoi(optarg);
 			ctx.len = atoi(optarg);
+			break;
+		case 'C':
+			ctx.check = 1;
 			break;
 		case 'o':
 			if (EQ(optarg, "O_RDONLY")) {
@@ -532,6 +648,8 @@ int main(int argc, char *argv[])
 		acl_fiber_create(fiber_pwrite, &ctx, 320000);
 	} else if (EQ(action, "co_pwrite")) {
 		acl_fiber_create(fiber_co_pwrite, &ctx, 320000);
+	} else if (EQ(action, "co_pread")) {
+		acl_fiber_create(fiber_co_pread, &ctx, 320000);
 	} else if (EQ(action, "sendfile")) {
 		acl_fiber_create(fiber_sendfile, &ctx, 320000);
 	} else {
