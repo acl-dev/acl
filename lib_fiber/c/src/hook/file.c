@@ -1,10 +1,14 @@
 #include "stdafx.h"
-#include "common.h"
 
+#ifdef	HAS_IO_URING
+
+#include "common.h"
+#include "event.h"
 #include "fiber.h"
 #include "hook.h"
 
-#ifdef	HAS_IO_URING
+#define _GNU_SOURCE
+#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -21,14 +25,13 @@
 	}  \
 } while (0)
 
-#define	FILE_ALLOC(fe, type) do {  \
-	(fe) = file_event_alloc(-1);  \
-	(fe)->fiber_r = acl_fiber_running();  \
-	(fe)->fiber_w = acl_fiber_running();  \
-	(fe)->fiber_r->status = FIBER_STATUS_NONE;  \
-	(fe)->fiber_w->status = FIBER_STATUS_NONE;  \
-	(fe)->r_proc = file_read_callback;  \
-	(fe)->mask   = (type);  \
+#define	FILE_ALLOC(__fe, __type) do {  \
+	(__fe) = file_event_alloc(-1);  \
+	(__fe)->fiber_r->status = FIBER_STATUS_NONE;  \
+	(__fe)->fiber_w->status = FIBER_STATUS_NONE;  \
+	(__fe)->r_proc = file_read_callback;  \
+	(__fe)->mask   = (__type);  \
+	(__fe)->type   = TYPE_EVENTABLE | TYPE_FILE;  \
 } while (0)
 
 static void file_read_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
@@ -50,10 +53,10 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 		return (*sys_close)(fe->fd);
 	}
 
-	fe->fiber_r = acl_fiber_running();
+	fe->fiber_r         = acl_fiber_running();
 	fe->fiber_r->status = FIBER_STATUS_NONE;
-	fe->r_proc = file_read_callback;
-	fe->mask = EVENT_FILE_CLOSE;
+	fe->r_proc          = file_read_callback;
+	fe->mask           |= EVENT_FILE_CLOSE;
 
 	event_uring_file_close(ev, fe);
 
@@ -109,7 +112,7 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 	if (fe->rlen >= 0) {
 		fe->fd   = fe->rlen;
 		fe->type = TYPE_FILE | TYPE_EVENTABLE;
-		fiber_file_set(fe);
+		fiber_file_set(fe);  // Save the fe for the future using.
 		return fe->fd;
 	}
 
@@ -187,7 +190,7 @@ int renameat2(int olddirfd, const char *oldpath,
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_RENAMEAT2);
-	fe->rbuf = strdup(oldpath);
+	fe->rbuf     = strdup(oldpath);
 	fe->var.path = strdup(newpath);
 
 	event_uring_file_renameat2(ev, fe, olddirfd, fe->rbuf,
@@ -331,8 +334,70 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	}
 }
 
-#define _GNU_SOURCE
-#include <fcntl.h>
+ssize_t pread(int fd, void *buf, size_t count, off_t offset)
+{
+	FILE_EVENT *fe;
+	ssize_t ret;
+
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
+	if (sys_pread == NULL) {
+		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_pread)(fd, buf, count, offset);
+	}
+
+	if (!EVENT_IS_IO_URING(fiber_io_event())) {
+		return (*sys_pread)(fd, buf, count, offset);
+	}
+
+	// We alloc one new FILE_EVENT for the fd so that multiple fibers
+	// can pread or pwrite the same fd.
+
+	FILE_ALLOC(fe, EVENT_READ);
+	fe->fd  = fd;
+	fe->off = offset;
+	ret = fiber_iocp_read(fe, buf, (int) count);
+	file_event_unrefer(fe);
+
+	return ret;
+}
+
+ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
+{
+	FILE_EVENT *fe;
+	ssize_t ret;
+
+	if (fd == INVALID_SOCKET) {
+		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+		return -1;
+	}
+
+	if (sys_pwrite == NULL) {
+		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_pwrite)(fd, buf, count, offset);
+	}
+
+	if (!EVENT_IS_IO_URING(fiber_io_event())) {
+		return (*sys_pwrite)(fd, buf, count, offset);
+	}
+
+	FILE_ALLOC(fe, EVENT_WRITE);
+	fe->fd  = fd;
+	fe->off = offset;
+	ret = fiber_iocp_write(fe, buf, (int) count);
+	file_event_unrefer(fe);
+
+	return ret;
+}
 
 ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 	loff_t *poff_out, size_t len, unsigned int flags)
@@ -361,13 +426,14 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 		return (*sys_splice)(fd_in, poff_in, fd_out, poff_out, len, flags);
 	}
 
-	off_in  = poff_in ? *poff_in : -1;
+	off_in  = poff_in  ? *poff_in : -1;
 	off_out = poff_out ? *poff_out : -1;
 
+	// The same fd_in maybe be shared by multiple fibers, so we should
+	// alloc one new FILE_EVENT for each operation.
 	FILE_ALLOC(fe, EVENT_SPLICE);
+	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
 
-	// flags => SPLICE_F_FD_IN_FIXED;
-	// sqe_flags => IOSQE_FIXED_FILE;
 	event_uring_splice(ev, fe, fd_in, off_in, fd_out, off_out, len, flags,
 		sqe_flags, IORING_OP_SPLICE);
 
@@ -398,48 +464,33 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 
 ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 {
-	FILE_EVENT *fe;
-	EVENT *ev = fiber_io_event();
-	int ret;
+	unsigned flags = SPLICE_F_MOVE | SPLICE_F_MORE | SPLICE_F_NONBLOCK;
+	ssize_t ret;
+	int pipefd[2];
 
-	fe = fiber_file_open_read(in_fd);
-	fe->mask |= EVENT_SENDFILE;
 
-	if (pipe(fe->var.pipefd) == -1) {
-		fe->mask &= ~EVENT_SENDFILE;
+	if (pipe(pipefd) == -1) {
 		msg_error("%s(%d): pipe error=%s",
 			__FUNCTION__, __LINE__, last_serror());
 		return -1;
 	}
 
-	fe->fiber_r = acl_fiber_running();
-	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
-
-	event_uring_sendfile(ev, fe, out_fd, in_fd, off ? *off : 0, cnt);
-
-	fiber_io_inc();
-	acl_fiber_switch();
-	fiber_io_dec();
-
-	fe->mask &= ~EVENT_SENDFILE;
-
-	ret = fe->rlen;
-	close(fe->var.pipefd[0]);
-	close(fe->var.pipefd[1]);
-	fe->var.pipefd[0] = -1;
-	fe->var.pipefd[1] = -1;
-
-	printf(">>>>>>>>%s: ret=%d\n", __FUNCTION__, ret);
-	if (ret == 0) {
-		return 0;
-	} else if (ret < 0) {
-		acl_fiber_set_error(-ret);
-		return -1;
+	ret = splice(in_fd, off, pipefd[1], NULL, cnt, flags);
+	if (ret <= 0) {
+		close(pipefd[0]);
+		close(pipefd[1]);
+		return ret;
 	}
 
-	if (off) {
-		*off += cnt;
+	ret = splice(pipefd[0], NULL, out_fd, NULL, ret, flags);
+	if (ret <= 0) {
+		close(pipefd[0]);
+		close(pipefd[1]);
+		return ret;
 	}
+
+	close(pipefd[0]);
+	close(pipefd[1]);
 	return ret;
 }
 

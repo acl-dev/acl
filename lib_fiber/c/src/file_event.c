@@ -17,6 +17,7 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	fe->mask   = 0;
 	fe->r_proc = NULL;
 	fe->w_proc = NULL;
+
 #ifdef HAS_POLL
 	fe->pfd    = NULL;
 #endif

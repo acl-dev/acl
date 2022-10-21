@@ -215,6 +215,9 @@ void event_uring_splice(EVENT *ev, FILE_EVENT *fe, int fd_in, loff_t off_in,
 	TRY_SUBMMIT(ep);
 }
 
+#if 0
+// Some problems can't be resolve current, so I use another way to do it.
+
 void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
 	off64_t off, size_t cnt)
 {
@@ -222,8 +225,6 @@ void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
 	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
 	unsigned flags = SPLICE_F_MOVE | SPLICE_F_MORE; // | SPLICE_F_NONBLOCK;
 
-	printf("hello>>>in=%d, off=%d, cnt=%zd, fe=%p, flags=%u\n",
-		in, (int) off, cnt, fe, flags);
 	io_uring_prep_splice(sqe, in, off, fe->var.pipefd[1], -1, cnt, flags);
 	io_uring_sqe_set_data(sqe, fe);
 	sqe->flags |= IOSQE_IO_LINK | SPLICE_F_FD_IN_FIXED | IOSQE_ASYNC;
@@ -239,6 +240,7 @@ void event_uring_sendfile(EVENT *ev, FILE_EVENT *fe, int out, int in,
 
 	TRY_SUBMMIT(ep);
 }
+#endif
 
 static int event_uring_del_read(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 {
@@ -350,8 +352,7 @@ static void handle_one(EVENT *ev, FILE_EVENT *fe, int res)
 		| EVENT_FILE_STATX \
 		| EVENT_FILE_RENAMEAT2 \
 		| EVENT_DIR_MKDIRAT \
-		| EVENT_SPLICE \
-		| EVENT_SENDFILE)
+		| EVENT_SPLICE)
 
 	if (fe->mask & FLAGS) {
 		fe->rlen = res;

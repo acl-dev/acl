@@ -26,6 +26,10 @@ echo "enter any key to test unlink..."
 read n
 ./file -f to.txt -a unlink
 
+echo "enter any key to test pwrite..."
+read n
+./file -f from.txt -a pwrite -p 500 -n 256
+
 echo "enter any key to test mkdir..."
 read n
 ./file -f "a/b/c/d" -a mkdir

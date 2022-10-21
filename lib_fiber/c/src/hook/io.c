@@ -113,7 +113,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 /****************************************************************************/
 
 #if defined(HAS_IOCP) || defined(HAS_IO_URING)
-static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
+int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
 #if defined(HAS_IOCP)
 	/* If the socket type is UDP, We must check the fixed buffer first,
@@ -137,6 +137,8 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 	while (1) {
 		int err;
 
+		// Must clear the EVENT_READ flags in order to set IO event
+		// for each IO process.
 		fe->mask &= ~EVENT_READ;
 
 		if (fiber_wait_read(fe) < 0) {
@@ -174,7 +176,7 @@ static int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 #endif // HAS_IOCP || HAS_IO_URING
 
 #if defined(HAS_IO_URING)
-static int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
+int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 {
 	fe->wbuf  = buf;
 	fe->wsize = (size_t) len;
@@ -217,74 +219,9 @@ static int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 		}
 	}
 }
-
-#endif
+#endif // HAS_IO_URING
 
 #ifdef SYS_UNIX
-
-ssize_t pread(int fd, void *buf, size_t count, off_t offset)
-{
-	FILE_EVENT *fe;
-
-	if (fd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
-		return -1;
-	}
-
-	if (sys_pread == NULL) {
-		hook_once();
-	}
-
-	if (!var_hook_sys_api) {
-		return (*sys_pread)(fd, buf, count, offset);
-	}
-
-#ifdef HAS_IO_URING
-	if (!EVENT_IS_IO_URING(fiber_io_event())) {
-		return (*sys_pread)(fd, buf, count, offset);
-	}
-
-	fe = fiber_file_open_read(fd);
-	CLR_POLLING(fe);
-	fe->off = offset;
-
-	return fiber_iocp_read(fe, buf, (int) count);
-#else
-	return (*sys_pread)(fd, buf, count, offset);
-#endif
-}
-
-ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
-{
-	FILE_EVENT *fe;
-
-	if (fd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
-		return -1;
-	}
-
-	if (sys_pwrite == NULL) {
-		hook_once();
-	}
-
-	if (!var_hook_sys_api) {
-		return (*sys_pwrite)(fd, buf, count, offset);
-	}
-
-#ifdef HAS_IO_URING
-	if (!EVENT_IS_IO_URING(fiber_io_event())) {
-		return (*sys_pwrite)(fd, buf, count, offset);
-	}
-
-	fe = fiber_file_open_write(fd);
-	CLR_POLLING(fe);
-	fe->off = offset;
-
-	return fiber_iocp_write(fe, buf, (int) count);
-#else
-	return (*sys_pwrite)(fd, buf, count, offset);
-#endif
-}
 
 ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 {
