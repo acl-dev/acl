@@ -8,10 +8,11 @@ namespace acl {
 
 typedef enum 
 {
-	FIBER_EVENT_T_KERNEL,  // Linux: epoll, FreeBSD: kquque, Windows: iocp
-	FIBER_EVENT_T_POLL,
-	FIBER_EVENT_T_SELECT,
-	FIBER_EVENT_T_WMSG,
+	FIBER_EVENT_T_KERNEL,	// Linux: epoll, FreeBSD: kquque, Windows: iocp
+	FIBER_EVENT_T_POLL,	// Linux, FreeBSD, MacOS, Windows
+	FIBER_EVENT_T_SELECT,	// Linux, FreeBSD, MacOS, Windows
+	FIBER_EVENT_T_WMSG,	// Windows
+	FIBER_EVENT_T_IO_URING,	// Linux
 } fiber_event_t;
 
 /**

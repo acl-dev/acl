@@ -7,7 +7,13 @@
 #include <unistd.h>
 #include <errno.h>
 #include <getopt.h>
+#ifdef	__APPLE__
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/uio.h>
+#elif	defined(__line__)
 #include <sys/sendfile.h>
+#endif
 #include "lib_acl.h"
 #include "fiber/libfiber.h"
 
@@ -189,7 +195,7 @@ static void fiber_one_preader(ACL_FIBER *fb acl_unused, void *ctx)
 	}
 
 	printf("fiber=%d: pread ok, ret=%d, off=%ld, len=%d\r\n",
-		acl_fiber_self(), ret, ic->off, ic->len);
+		acl_fiber_self(), ret, (long) ic->off, ic->len);
 
 	acl_fiber_sem_post(ic->sem);
 	free(buf);
@@ -287,7 +293,7 @@ static void fiber_one_pwriter(ACL_FIBER *fb acl_unused, void *ctx)
 	}
 
 	printf("fiber=%d: pwrite ok, ret=%d, off=%ld, len=%d\r\n",
-		acl_fiber_self(), ret, ic->off, ic->len);
+		acl_fiber_self(), ret, (long) ic->off, ic->len);
 
 	acl_fiber_sem_post(ic->sem);
 	free(buf);
@@ -404,7 +410,11 @@ static void wait_and_sendfile(int in, struct FIBER_CTX *fc)
 
 		printf(">>>begin call sendfile64 to fd=%d\r\n", cfd);
 
+#ifdef	__linux__
 		ret = sendfile64(cfd, in, &fc->off, fc->len);
+#elif	defined(__APPLE__)
+#error	"not support now!"
+#endif
 		printf(">>>begin to close cfd=%d\r\n", cfd);
 		close(cfd);
 
