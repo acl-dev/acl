@@ -3,7 +3,7 @@
 
 #include "event.h"
 
-#ifdef HAS_EPOLL
+#ifdef HAS_IO_URING
 
 EVENT *event_io_uring_create(int size);
 
