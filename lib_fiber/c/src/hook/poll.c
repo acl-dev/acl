@@ -221,11 +221,11 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 			pfds[i].fe = fiber_file_open_write(fds[i].fd);
 		}
 #ifdef HAS_IOCP
-		pfds[i].fe->buff = NULL;
-		pfds[i].fe->size = 0;
+		pfds[i].fe->rbuf  = NULL;
+		pfds[i].fe->rsize = 0;
 #endif
-		pfds[i].pe       = pe;
-		pfds[i].pfd      = &fds[i];
+		pfds[i].pe  = pe;
+		pfds[i].pfd = &fds[i];
 		pfds[i].pfd->revents = 0;
 		SET_POLLING(pfds[i].fe);
 	}

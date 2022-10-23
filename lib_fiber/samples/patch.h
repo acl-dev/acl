@@ -11,7 +11,7 @@ extern "C" {
 # define snprintf _snprintf
 extern int   optind;
 extern char *optarg;
-int getopt(int argc, char * const argv[], char *opts);
+int getopt(int argc, char *argv[], const char *opts);
 #else
 # define SOCKET		int
 # define INVALID_SOCKET -1

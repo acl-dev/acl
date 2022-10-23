@@ -131,7 +131,7 @@ int set_non_blocking(SOCKET fd, int on)
 	int flags = 0;
 
 	if (ioctlsocket(fd, FIONBIO, &n) < 0) {
-		msg_error("ioctlsocket(fd,FIONBIO) failed");
+		printf("ioctlsocket(fd,FIONBIO) failed\r\n");
 		return -1;
 	}
 	return flags;

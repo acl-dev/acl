@@ -189,7 +189,12 @@ struct FILE_EVENT {
 	IOCP_EVENT   *poller_write;
 	socket_t      iocp_sock;
 	int           sock_type;
-	struct sockaddr_in addr;
+	union {
+		struct {
+			struct sockaddr_in addr;
+			socklen_t          len;
+		} peer;
+	} var;
 #endif
 	int refer;
 };

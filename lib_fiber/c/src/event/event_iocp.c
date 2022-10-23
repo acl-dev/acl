@@ -344,7 +344,7 @@ int event_iocp_connect(EVENT *ev, FILE_EVENT *fe)
 	memset(&event->overlapped, 0, sizeof(event->overlapped));
 
 	ret = lpfnConnectEx(fe->fd,
-		(const struct sockaddr *) &fe->addr,
+		(const struct sockaddr *) &fe->var.peer.addr,
 		sizeof(struct sockaddr),
 		NULL,
 		0,

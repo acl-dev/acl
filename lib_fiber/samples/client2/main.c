@@ -51,7 +51,12 @@ static int check_write(SOCKET fd, int timeout)
 	pfd.fd = fd;
 	pfd.events = POLLOUT;
 
+#if defined(_WIN32) || defined(_WIN64)
+	n = WSAPoll(&pfd, 1, timeout);
+#else
 	n = poll(&pfd, 1, timeout);
+#endif
+
 	if (n < 0) {
 		printf("poll error: %s\r\n", acl_last_serror());
 		return -1;
