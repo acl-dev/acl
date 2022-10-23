@@ -178,12 +178,16 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 
 		if (pfd->pfd->events & POLLIN) {
 			CLR_READWAIT(pfd->fe);
+#ifdef	HAS_IO_URING
 			pfd->fe->mask &= ~EVENT_POLLIN;
+#endif
 			event_del_read(ev, pfd->fe);
 		}
 		if (pfd->pfd->events & POLLOUT) {
 			CLR_WRITEWAIT(pfd->fe);
+#ifdef	HAS_IO_URING
 			pfd->fe->mask &= ~EVENT_POLLOUT;
+#endif
 			event_del_write(ev, pfd->fe);
 		}
 		pfd->fe->pfd = NULL;
