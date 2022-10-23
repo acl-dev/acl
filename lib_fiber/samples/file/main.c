@@ -11,7 +11,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
-#elif	defined(__line__)
+#elif	defined(__linux__)
 #include <sys/sendfile.h>
 #endif
 #include "lib_acl.h"
