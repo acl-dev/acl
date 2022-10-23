@@ -14,6 +14,8 @@
 * [4、编译协程库](#4编译协程库)
     * [4.1、在 Unix 平台编译](#41在-Unix-平台编译)
     * [4.2、在 Windows 平台编译](#42在-Windows-平台编译)
+    * [4.3、编译使用 io_uring](#43编译使用-iouring)
+### 4.3、编译使用 io_uring
 * [5、性能测试](#5性能测试)
 * [6、API 列表](#6API-列表)
     * [6.1、Base API](#61Base-API)
@@ -33,14 +35,10 @@ libfiber 不仅支持常见的 IO 事件引擎，而且支持 Win32 GUI 界面�
 
 以下为 libfiber 所支持的事件引擎：
 
-Event|Linux|BSD|Mac|Windows
------|----|------|---|---
-<b>select</b>|yes|yes|yes|yes
-<b>poll</b>|yes|yes|yes|yes
-<b>epoll</b>|yes|no|no|no
-<b>kqueue</b>|no|yes|yes|no
-<b>iocp</b>|no|no|no|yes
-<b>Win GUI message</b>|no|no|no|yes
+- **Linux:** select/poll/epoll(Linux2.6+)/io_uring(Linux5.1+)
+- **BSD:** select/poll/kqueue
+- **Mac:** select/poll/kqueue
+- **Windows:** select/poll/IOCP/Windows GUI Message
 
 ## 3、示例
 
@@ -464,10 +462,21 @@ fiber_server: fiber_server.cpp
 ```
 在该 Makefile 中，-lfiber_cpp 放到最前面，是因为其依赖于其它几个库，而 -lfiber 放在最后，是因为该库需要 hook 系统 IO 操作。
 
-
 ### 4.2、在 Windows 平台编译
 
 目前可以使用 vc2012/vc2013/vc2015 分别打开 [fiber_vc2012.sln](fiber_vc2012.sln) /[fiber_vc2013.sln](fiber_vc2013.sln)/[fiber_vc2015.sln](fiber_vc2015.sln) 编译 libfiber 库。
+
+### 4.3、编译使用 io_uring
+
+在 Linux5.1 以上版本开始支持新的事件引擎 io_uring，该引擎为IO异步完成模型，同时支持网络套接口及文件IO操作，效率基本与 epoll 相当，但因为 io_uring 本身提供的系统 API 较为复杂，所以  Jens Axboe（磁盘压测工具fio作者）提供了二次封装从而使调用过程变得简单（可以从：https://github.com/axboe/liburing 下载），目前在 Acl 协程中也是通过调用 liburing 中的 API 来使用系统中的 io_uring 功能；下面给出了在 Acl 协程中编译及使用 io_uring 的过程如下：
+- 可从 Ubuntu 官网下下载最新版本的 Ubuntu（已经支持了高版本的Linux内核，从而支持了io_uring）；
+- 从 https://github.com/axboe/liburing 下载 liburing 库，并编译安装；
+- 从 https://github.com/acl-dev/acl 下载 acl 源码；
+  - 在 shell 环境中设置环境变量打开 acl 中支持 io_uring 的编译条件：`export HAS_IO_URING=yes`;
+  - 进入 acl/lib_fiber/c/ 目录运行 `make` 编译 acl 协程库（因为上面已经设置了支持io_uring的环境变量，在Makefile文件中自动增加编译选项 `-DHAS_IO_URING`）
+  - 进入 acl/lib_fiber/samples/ 目录，然后再分别进入 server2, client2, file 三个例子编译（需在设置了 HAS_IO_URING=yes 的 shell 环境中编译）；
+  - 进入 server2/ 目录，运行时加上io_uring启动参数：`./server -e io_uring` ；
+  - 进入 client2/ 目录，运行时加上io_uring启动参数：`./client -e io_uring` ；
 
 ## 5、性能测试
 下面仅做了简单的 IOPS （网络 IO 性能）的测试，同时和其它协程库做了简单的对比：  
@@ -575,28 +584,13 @@ fiber_server: fiber_server.cpp
 
 ## 6.6、关于 API Hook
 在 Linux/MacOS/FreeBSD 平台上，很多与 IO 和网络相关的的系统 API 被 hook 了，因此，在编译连接时将 libfiber 加上，这样你的应用程序中仅需使用系统标准 IO API，便可以使你的网络程序自动协程化。下面是一些被 hook 的系统 API 列表：  
-- close
+- socket/listen/accept/connect
+- select/poll/epoll: epoll_create, epoll_ctl, epoll_wait
+- read/readv/recv/recvfrom/recvmsg/write/writev/send/sendto/sendmsg
+- pread/pwrite/splice/sendfile64
+- gethostbyname(_r)/getaddrinfo/freeaddrinfo
+- open/openat/close/unlink/rename/renameat/renameat2/stat/statx/mkdir/mkdirat
 - sleep
-- read
-- readv
-- recv
-- recvfrom
-- recvmsg
-- write
-- writev
-- send
-- sendto
-- sendmsg
-- sendfile64
-- socket
-- listen
-- accept
-- connect
-- select
-- poll
-- epoll: epoll_create, epoll_ctl, epoll_wait
-- gethostbyname(_r)
-- getaddrinfo/freeaddrinfo
 
 ## 7、更多参考
 

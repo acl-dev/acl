@@ -1293,6 +1293,8 @@ void acl_fiber_server_main(int argc, char *argv[],
 		__fiber_schedule_event = FIBER_EVENT_SELECT;
 	} else if (strcasecmp(acl_var_fiber_schedule_event, "wmsg") == 0) {
 		__fiber_schedule_event = FIBER_EVENT_WMSG;
+	} else if (strcasecmp(acl_var_fiber_schedule_event, "io_uring") == 0) {
+		__fiber_schedule_event = FIBER_EVENT_IO_URING;
 	} else {
 		__fiber_schedule_event = FIBER_EVENT_KERNEL;
 	}

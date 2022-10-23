@@ -74,7 +74,7 @@ service $<PROGRAM>
 #	程序错误输出重定向至指定文件中
 #	master_stderr = {install_path}/var/log/tderr.log
 
-#	事件引擎: kernel, poll, select
+#	事件引擎: kernel, poll, select, io_uring
 	fiber_schedule_event = kernel
 #	是否允许产生 core 文件
 #	fiber_enable_core = 1
