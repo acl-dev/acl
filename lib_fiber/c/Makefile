@@ -117,7 +117,10 @@ endif
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -DSHARE_STACK
-	CFLAGS += -DHAS_IO_URING
+	has_io_uring=$(HAS_IO_URING)
+	ifeq ($(has_io_uring), yes)
+		CFLAGS += -DHAS_IO_URING
+	endif
 endif
 
 # For CYGWIN
