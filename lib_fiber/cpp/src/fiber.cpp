@@ -221,6 +221,7 @@ void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
 		break;
 	case FIBER_EVENT_T_IO_URING:
 		etype = FIBER_EVENT_IO_URING;
+		break;
 	case FIBER_EVENT_T_KERNEL:
 	default:
 		etype = FIBER_EVENT_KERNEL;
