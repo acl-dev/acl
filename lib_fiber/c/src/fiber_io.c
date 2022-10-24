@@ -8,7 +8,6 @@
 
 typedef struct {
 	EVENT     *event;
-	size_t     io_count;
 	ACL_FIBER *ev_fiber;
 	RING       ev_timer;
 	int        nsleeping;
@@ -102,7 +101,6 @@ void fiber_io_check(void)
 		if (__thread_fiber->ev_fiber == NULL) {
 			__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
 				__thread_fiber->event, STACK_SIZE);
-			__thread_fiber->io_count  = 0;
 			__thread_fiber->nsleeping = 0;
 			__thread_fiber->io_stop   = 0;
 			ring_init(&__thread_fiber->ev_timer);
@@ -125,7 +123,6 @@ void fiber_io_check(void)
 	__thread_fiber->event = event_create(var_maxfd);
 	__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
 			__thread_fiber->event, STACK_SIZE);
-	__thread_fiber->io_count  = 0;
 	__thread_fiber->nsleeping = 0;
 	__thread_fiber->io_stop   = 0;
 	ring_init(&__thread_fiber->ev_timer);
@@ -144,18 +141,6 @@ void fiber_io_check(void)
 		printf("pthread_setspecific error!\r\n");
 		abort();
 	}
-}
-
-void fiber_io_dec(void)
-{
-	fiber_io_check();
-	__thread_fiber->io_count--;
-}
-
-void fiber_io_inc(void)
-{
-	fiber_io_check();
-	__thread_fiber->io_count++;
 }
 
 EVENT *fiber_io_event(void)
@@ -194,7 +179,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			}
 		}
 
-		assert(left < INT_MAX);
+		//assert(left < INT_MAX);
 
 		/* Add 1 just for the deviation of epoll_wait */
 		event_process(ev, left > 0 ? (int) left + 1 : (int) left);
@@ -204,6 +189,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			break;
 		}
 
+
 		if (timer == NULL) {
 			/* Try again before exiting the IO fiber loop, some
 			 * other fiber maybe in the ready queue and wants to
@@ -211,11 +197,9 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			 */
 			while (acl_fiber_yield() > 0) {}
 
-			if (ev->fdcount > 0 || ev->waiter > 0) {
+			if (/*ev->fdcount > 0 || */ ev->waiter > 0) {
 				continue;
 			} else if (ring_size(&ev->events) > 0) {
-				continue;
-			} else if (__thread_fiber->io_count > 0) {
 				continue;
 			}
 			
@@ -247,11 +231,6 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			acl_fiber_ready(timer);
 			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
 		} while (timer != NULL && now >= timer->when);
-	}
-
-	if (__thread_fiber->io_count > 0) {
-		msg_warn("%s(%d), %s: waiting io: %d", __FILE__, __LINE__,
-			__FUNCTION__, (int) __thread_fiber->io_count);
 	}
 
 	msg_info("%s(%d), tid=%lu: IO fiber exit now",
@@ -435,10 +414,12 @@ int fiber_wait_read(FILE_EVENT *fe)
 	}
 
 	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
-	fiber_io_inc();
 	SET_READWAIT(fe);
+
+	__thread_fiber->event->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	__thread_fiber->event->waiter--;
+
 	return ret;
 }
 
@@ -469,10 +450,12 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
-	fiber_io_inc();
 	SET_WRITEWAIT(fe);
+
+	__thread_fiber->event->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	__thread_fiber->event->waiter--;
+
 	return ret;
 }
 

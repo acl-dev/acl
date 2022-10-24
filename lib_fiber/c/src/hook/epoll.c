@@ -551,8 +551,6 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 
 static void epoll_callback(EVENT *ev fiber_unused, EPOLL_EVENT *ee)
 {
-	fiber_io_dec();
-
 	if (ee->fiber->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(ee->fiber);
 	}
@@ -619,10 +617,11 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	while (1) {
 		timer_cache_add(ev->epoll_list, ee->expire, &ee->me);
 
-		fiber_io_inc();
-
 		ee->fiber->status = FIBER_STATUS_EPOLL_WAIT;
+
+		ev->waiter++;
 		acl_fiber_switch();
+		ev->waiter--;
 
 		if (ee->nready == 0) {
 			timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);

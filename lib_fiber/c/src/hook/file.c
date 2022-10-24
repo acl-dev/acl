@@ -60,9 +60,9 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	event_uring_file_close(ev, fe);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_CLOSE;
 
@@ -101,9 +101,9 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 
 	event_uring_file_openat(ev, fe, dirfd, fe->rbuf, flags, mode);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_OPENAT;
 	free(fe->rbuf);
@@ -154,9 +154,9 @@ int unlink(const char *pathname)
 
 	event_uring_file_unlink(ev, fe, fe->rbuf);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_UNLINK;
 	free(fe->rbuf);
@@ -196,9 +196,9 @@ int renameat2(int olddirfd, const char *oldpath,
 	event_uring_file_renameat2(ev, fe, olddirfd, fe->rbuf,
 		newdirfd, fe->var.path, flags);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_RENAMEAT2;
 	free(fe->rbuf);
@@ -249,9 +249,9 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	event_uring_file_statx(ev, fe, dirfd, fe->rbuf, flags, mask,
 		fe->var.statxbuf);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_STATX;
 	free(fe->rbuf);
@@ -317,9 +317,9 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 
 	event_uring_mkdirat(ev, fe, dirfd, fe->rbuf, mode);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_DIR_MKDIRAT;
 	free(fe->rbuf);
@@ -437,9 +437,9 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 	event_uring_splice(ev, fe, fd_in, off_in, fd_out, off_out, len, flags,
 		sqe_flags, IORING_OP_SPLICE);
 
-	fiber_io_inc();
+	ev->waiter++;
 	acl_fiber_switch();
-	fiber_io_dec();
+	ev->waiter--;
 
 	fe->mask &= ~EVENT_SPLICE;
 

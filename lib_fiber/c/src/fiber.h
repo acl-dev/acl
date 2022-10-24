@@ -119,8 +119,6 @@ void fiber_io_clear(void);
 int fiber_wait_read(FILE_EVENT *fe);
 int fiber_wait_write(FILE_EVENT *fe);
 
-void fiber_io_dec(void);
-void fiber_io_inc(void);
 EVENT *fiber_io_event(void);
 
 FILE_EVENT *fiber_file_open_read(socket_t fd);
