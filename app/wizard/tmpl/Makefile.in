@@ -152,6 +152,7 @@ SRC = $(wildcard *.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(shell mkdir -p ../../../dist/master/libexec/$(RPATH)/)
+$(shell mkdir -p ../../../dist/master/conf/service/)
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@

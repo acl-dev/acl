@@ -673,7 +673,8 @@ static void main_thread_loop(void)
 	acl_server_sighup_setup();
 	acl_server_sigterm_setup();
 
-	acl_msg_info("daemon started, log=%s", acl_var_fiber_log_file);
+	acl_msg_info("daemon started, log=%s, ev=%d", acl_var_fiber_log_file,
+			__fiber_schedule_event);
 	acl_fiber_schedule_with(__fiber_schedule_event);
 	acl_msg_info("daemon stopped now, exit status=%d", __exit_status);
 	exit(__exit_status);
@@ -1083,6 +1084,16 @@ static void parse_args(void)
 	}
 }
 
+static void fiber_log_writer(void *, const char *fmt, va_list ap)
+{
+	va_list tmp;
+	va_copy(tmp, ap);
+
+	acl::string buf;
+	buf.vformat(fmt, tmp);
+	acl_msg_info("%s", buf.c_str());
+}
+
 void acl_fiber_server_main(int argc, char *argv[],
 	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...)
 {
@@ -1300,6 +1311,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 	}
 
 	acl_msg_info("schedule event type - %s", acl_var_fiber_schedule_event);
+	acl_fiber_msg_register(fiber_log_writer, NULL);
 
 #if !defined(_WIN32) && !defined(_WIN64)
 	/* notify master that child started ok */
