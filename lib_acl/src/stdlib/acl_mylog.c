@@ -115,7 +115,7 @@ ACL_ARRAY *acl_log_get_streams(void)
 	a = acl_array_create(1);
 	acl_foreach(iter, __loggers) {
 		ACL_LOG *log = (ACL_LOG*) iter.data;
-		acl_array_append(a, log);
+		acl_array_append(a, log->fp);
 	}
 	return a;
 }

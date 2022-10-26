@@ -59,14 +59,12 @@ int non_blocking(socket_t fd, int on)
 
 	if ((flags = fcntl(fd, F_GETFL)) == -1) {
 		msg_error("%s(%d), %s: fcntl(%d, F_GETFL) error: %s",
-			__FILE__, __LINE__, __FUNCTION__,
-			fd, last_serror());
+			__FILE__, __LINE__, __FUNCTION__, fd, last_serror());
 		return -1;
 	}
 	if (fcntl(fd, F_SETFL, on ? flags | nonb : flags & ~nonb) < 0) {
 		msg_error("%s(%d), %s: fcntl(%d, F_SETL, nonb) error: %s",
-			__FILE__, __LINE__, __FUNCTION__,
-			fd, last_serror());
+			__FILE__, __LINE__, __FUNCTION__, fd, last_serror());
 		return -1;
 	}
 

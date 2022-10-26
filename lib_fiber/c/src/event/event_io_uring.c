@@ -590,7 +590,6 @@ EVENT *event_io_uring_create(int size)
 		printf("IORING_FEAT_FAST_POLL not available in the kernel\r\n");
 	} else {
 		printf("IORING_FEAT_FAST_POLL is available in the kernel\r\n");
-		msg_info("IORING_FEAT_FAST_POLL is available in the kernel\r\n");
 	}
 
 	eu->appending    = 0;

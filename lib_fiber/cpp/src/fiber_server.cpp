@@ -1098,7 +1098,8 @@ static void fiber_log_writer(void *, const char *fmt, va_list ap)
 
 	acl::string buf;
 	buf.vformat(fmt, tmp);
-	acl_msg_info("%s", buf.c_str());
+	//acl_msg_info("%s", buf.c_str());
+	printf("%s\r\n", buf.c_str());
 }
 
 static void hook_fiber_log(void)
@@ -1110,7 +1111,6 @@ static void hook_fiber_log(void)
 	if (loggers) {
 		acl_foreach(iter, loggers) {
 			ACL_VSTREAM *fp = (ACL_VSTREAM*) iter.data;
-			printf(">>>fd=%d\n", ACL_VSTREAM_FILE(fp));
 			acl_fiber_set_sysio(ACL_VSTREAM_FILE(fp));
 		}
 
