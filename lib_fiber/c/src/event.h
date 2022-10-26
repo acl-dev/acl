@@ -124,25 +124,26 @@ struct FILE_EVENT {
 
 	unsigned mask;
 #define	EVENT_NONE		0
-#define	EVENT_READ		(unsigned) (1 << 0)
-#define	EVENT_WRITE		(unsigned) (1 << 1)
-#define	EVENT_ERR		(unsigned) (1 << 2)
-#define	EVENT_HUP		(unsigned) (1 << 3)
-#define	EVENT_NVAL		(unsigned) (1 << 4)
+#define	EVENT_SYSIO		(unsigned) (1 << 0)
+#define	EVENT_READ		(unsigned) (1 << 1)
+#define	EVENT_WRITE		(unsigned) (1 << 2)
+#define	EVENT_ERR		(unsigned) (1 << 3)
+#define	EVENT_HUP		(unsigned) (1 << 4)
+#define	EVENT_NVAL		(unsigned) (1 << 5)
 
 #ifdef	HAS_IO_URING
 
-#define	EVENT_ACCEPT		(unsigned) (1 << 5)
-#define	EVENT_CONNECT		(unsigned) (1 << 6)
-#define	EVENT_POLLIN		(unsigned) (1 << 7)
-#define	EVENT_POLLOUT		(unsigned) (1 << 8)
-#define	EVENT_FILE_OPENAT	(unsigned) (1 << 9)
-#define	EVENT_FILE_CLOSE	(unsigned) (1 << 10)
-#define	EVENT_FILE_UNLINK	(unsigned) (1 << 11)
-#define	EVENT_FILE_STATX	(unsigned) (1 << 12)
-#define	EVENT_FILE_RENAMEAT2	(unsigned) (1 << 13)
-#define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 14)
-#define	EVENT_SPLICE		(unsigned) (1 << 15)
+#define	EVENT_ACCEPT		(unsigned) (1 << 6)
+#define	EVENT_CONNECT		(unsigned) (1 << 7)
+#define	EVENT_POLLIN		(unsigned) (1 << 8)
+#define	EVENT_POLLOUT		(unsigned) (1 << 9)
+#define	EVENT_FILE_OPENAT	(unsigned) (1 << 10)
+#define	EVENT_FILE_CLOSE	(unsigned) (1 << 11)
+#define	EVENT_FILE_UNLINK	(unsigned) (1 << 12)
+#define	EVENT_FILE_STATX	(unsigned) (1 << 13)
+#define	EVENT_FILE_RENAMEAT2	(unsigned) (1 << 14)
+#define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 15)
+#define	EVENT_SPLICE		(unsigned) (1 << 16)
 
 #endif // HAS_IO_URING
 

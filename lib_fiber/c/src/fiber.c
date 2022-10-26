@@ -161,8 +161,9 @@ static void fiber_check(void)
 	}
 
 	if (pthread_once(&__once_control, thread_init) != 0) {
-		msg_fatal("%s(%d), %s: pthread_once error %s",
+		printf("%s(%d), %s: pthread_once error %s\r\n",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
+		abort();
 	}
 
 	__thread_fiber = (THREAD *) mem_calloc(1, sizeof(THREAD));
@@ -188,7 +189,8 @@ static void fiber_check(void)
 		__main_fiber = __thread_fiber;
 		atexit(fiber_schedule_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
-		msg_fatal("pthread_setspecific error!");
+		printf("pthread_setspecific error!\r\n");
+		abort();
 	}
 }
 

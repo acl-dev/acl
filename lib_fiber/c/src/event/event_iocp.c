@@ -641,8 +641,9 @@ EVENT *event_iocp_create(int size)
 
 	ei->h_iocp = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);
 	if (ei->h_iocp == NULL) {
-		msg_fatal("%s(%d): create iocp error(%s)",
+		printf("%s(%d): create iocp error(%s)\r\n",
 			__FUNCTION__, __LINE__, last_serror());
+		abort();
 	}
 
 	ei->events = array_create(100);

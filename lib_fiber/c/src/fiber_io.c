@@ -83,7 +83,7 @@ static void fiber_io_main_free(void)
 	}
 }
 
-static void thread_init(void)
+static void thread_once(void)
 {
 	if (pthread_key_create(&__fiber_key, thread_free) != 0) {
 		msg_fatal("%s(%d), %s: pthread_key_create error %s",
@@ -91,29 +91,8 @@ static void thread_init(void)
 	}
 }
 
-static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-
-// Notice: don't write log here to avoid recursive calling when user call
-// acl_fiber_msg_register() to hook the log process.
-void fiber_io_check(void)
+static void thread_init(void)
 {
-	if (__thread_fiber != NULL) {
-		if (__thread_fiber->ev_fiber == NULL) {
-			__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
-				__thread_fiber->event, STACK_SIZE);
-			__thread_fiber->nsleeping = 0;
-			__thread_fiber->io_stop   = 0;
-			ring_init(&__thread_fiber->ev_timer);
-		}
-		return;
-	}
-
-	if (pthread_once(&__once_control, thread_init) != 0) {
-		printf("%s(%d), %s: pthread_once error %s\r\n",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-		abort();
-	}
-
 	var_maxfd = open_limit(0);
 	if (var_maxfd <= 0) {
 		var_maxfd = MAXFD;
@@ -141,6 +120,33 @@ void fiber_io_check(void)
 		printf("pthread_setspecific error!\r\n");
 		abort();
 	}
+}
+
+static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+
+// Notice: don't write log here to avoid recursive calling when user call
+// acl_fiber_msg_register() to hook the log process.
+
+void fiber_io_check(void)
+{
+	if (__thread_fiber != NULL) {
+		if (__thread_fiber->ev_fiber == NULL) {
+			__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
+				__thread_fiber->event, STACK_SIZE);
+			__thread_fiber->nsleeping = 0;
+			__thread_fiber->io_stop   = 0;
+			ring_init(&__thread_fiber->ev_timer);
+		}
+		return;
+	}
+
+	if (pthread_once(&__once_control, thread_once) != 0) {
+		printf("%s(%d), %s: pthread_once error %s\r\n",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+		abort();
+	}
+
+	thread_init();
 }
 
 EVENT *fiber_io_event(void)
@@ -473,8 +479,18 @@ FILE_EVENT *fiber_file_get(socket_t fd)
 	return (FILE_EVENT *) htable_find(__thread_fiber->events, key);
 #else
 	fiber_io_check();
-	if (fd == INVALID_SOCKET || fd >= var_maxfd) {
+	if (fd <= INVALID_SOCKET || fd >= var_maxfd) {
+#ifdef	HAS_IO_URING
+		if (EVENT_IS_IO_URING(fiber_io_event())) {
+			printf("%s(%d): invalid fd=%d\r\n",
+				__FUNCTION__, __LINE__, fd);
+		} else {
+			msg_error("%s(%d): invalid fd=%d",
+				__FUNCTION__, __LINE__, fd);
+		}
+#else
 		msg_error("%s(%d): invalid fd=%d", __FUNCTION__, __LINE__, fd);
+#endif
 		return NULL;
 	}
 
@@ -492,12 +508,14 @@ void fiber_file_set(FILE_EVENT *fe)
 
 	htable_enter(__thread_fiber->events, key, fe);
 #else
-	if (fe->fd == INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
-		msg_fatal("%s(%d): invalid fd=%d", __FUNCTION__, __LINE__, fe->fd);
+	if (fe->fd <= INVALID_SOCKET || fe->fd >= (socket_t) var_maxfd) {
+		printf("%s(%d): invalid fd=%d\r\n", __FUNCTION__, __LINE__, fe->fd);
+		abort();
 	}
 
 	if (__thread_fiber->events[fe->fd] != NULL) {
-		msg_fatal("%s(%d): exist fd=%d", __FUNCTION__, __LINE__, fe->fd);
+		printf("%s(%d): exist fd=%d\r\n", __FUNCTION__, __LINE__, fe->fd);
+		abort();
 	}
 
 	__thread_fiber->events[fe->fd] = fe;
@@ -531,6 +549,22 @@ FILE_EVENT *fiber_file_open_write(socket_t fd)
 
 	fe->fiber_w = acl_fiber_running();
 	return fe;
+}
+
+void acl_fiber_set_sysio(socket_t fd)
+{
+	FILE_EVENT *fe;
+
+	if (fd <= INVALID_SOCKET) {
+		return;
+	}
+
+	fe = fiber_file_get(fd);
+	if (fe == NULL) {
+		fe = file_event_alloc(fd);
+		fiber_file_set(fe);
+	}
+	fe->mask |= EVENT_SYSIO;
 }
 
 static int fiber_file_del(FILE_EVENT *fe, socket_t fd)

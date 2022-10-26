@@ -569,6 +569,8 @@ EVENT *event_io_uring_create(int size)
 		eu->sqe_size = size;
 	}
 
+	// XXX: Don't write log here to avoid IO write recursive!
+
 	//eu->sqe_size = 256;
 
 	memset(&params, 0, sizeof(params));
@@ -576,17 +578,19 @@ EVENT *event_io_uring_create(int size)
 
 	ret = io_uring_queue_init_params(eu->sqe_size, &eu->ring, &params);
 	if (ret < 0) {
-		msg_fatal("%s(%d): init io_uring error=%s, size=%zd",
+		printf("%s(%d): init io_uring error=%s, size=%zd\r\n",
 			__FUNCTION__, __LINE__, strerror(-ret), eu->sqe_size);
+		abort();
 	} else {
-		msg_info("%s(%d): init io_uring ok, size=%zd",
+		printf("%s(%d): init io_uring ok, size=%zd\r\n",
 			__FUNCTION__, __LINE__, eu->sqe_size);
 	}
 
 	if (!(params.features & IORING_FEAT_FAST_POLL)) {
-		msg_info("IORING_FEAT_FAST_POLL not available in the kernel");
+		printf("IORING_FEAT_FAST_POLL not available in the kernel\r\n");
 	} else {
-		msg_info("IORING_FEAT_FAST_POLL is available in the kernel");
+		printf("IORING_FEAT_FAST_POLL is available in the kernel\r\n");
+		msg_info("IORING_FEAT_FAST_POLL is available in the kernel\r\n");
 	}
 
 	eu->appending    = 0;

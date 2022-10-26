@@ -248,10 +248,7 @@ EVENT *event_select_create(int size)
 
 	if (sys_select == NULL) {
 		hook_once();
-		if (sys_select == NULL) {
-			msg_error("%s: sys_select NULL", __FUNCTION__);
-			return NULL;
-		}
+		assert(sys_select != NULL);
 	}
 
 	// override size with system open limit setting

@@ -156,6 +156,10 @@ static void prepare_child_fds(ACL_MASTER_SERV *serv)
 			acl_msg_fatal("%s: dup2 listen_fd %d: %s",
 				myname, serv->listen_fds[n], strerror(errno));
 		}
+		acl_msg_info("%s: dup listen fd from %d to %d in %s mode",
+			myname, serv->listen_fds[n], ACL_MASTER_LISTEN_FD + n,
+			acl_is_blocking(ACL_MASTER_LISTEN_FD + n) == 1 ?
+				"non-blocking" : "blocking");
 		(void) close(serv->listen_fds[n]);
 		acl_vstream_free(serv->listen_streams[n]);
 	}

@@ -220,8 +220,7 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 		if (acl_fiber_last_error() == FIBER_EINTR) {
 			return 0;
 		}
-		msg_fatal("%s: epoll_wait error %s",
-			__FUNCTION__, last_serror());
+		msg_fatal("%s: epoll_wait error %s", __FUNCTION__, last_serror());
 	} else if (n == 0) {
 		return 0;
 	}

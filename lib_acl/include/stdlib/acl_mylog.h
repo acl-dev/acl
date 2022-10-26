@@ -77,6 +77,9 @@ ACL_API int acl_write_to_log2(const char *info, const char *fmt, va_list ap);
  */
 ACL_API void acl_close_log(void);
 
+ACL_API ACL_ARRAY *acl_log_get_streams(void);
+ACL_API void acl_log_free_streams(ACL_ARRAY *a);
+
 #ifdef  __cplusplus
 }
 #endif

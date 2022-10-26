@@ -149,6 +149,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 #ifdef	FAST_ACCEPT
 
+	// We can set the sockfd in non-blocking mode for not the io_uring.
 	non_blocking(sockfd, NON_BLOCKING);
 
 # ifdef SYS_WSA_API

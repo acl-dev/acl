@@ -577,20 +577,20 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 #if defined(HAS_IO_URING)
 # define CHECK_SET_NBLOCK(_fd) do { \
 	if (var_hook_sys_api && !EVENT_IS_IO_URING(fiber_io_event())) { \
-		FILE_EVENT *fe = fiber_file_get(_fd); \
-		if (fe && IS_NDUBLOCK(fe)) { \
+		FILE_EVENT *_fe = fiber_file_get(_fd); \
+		if (_fe && IS_NDUBLOCK(_fe)) { \
 			non_blocking(_fd, NON_BLOCKING); \
-			CLR_NDUBLOCK(fe); \
+			CLR_NDUBLOCK(_fe); \
 		} \
 	} \
 } while (0)
 #else
 # define CHECK_SET_NBLOCK(_fd) do { \
 	if (var_hook_sys_api) { \
-		FILE_EVENT *fe = fiber_file_get(_fd); \
-		if (fe && IS_NDUBLOCK(fe)) { \
+		FILE_EVENT *_fe = fiber_file_get(_fd); \
+		if (_fe && IS_NDUBLOCK(_fe)) { \
 			non_blocking(_fd, NON_BLOCKING); \
-			CLR_NDUBLOCK(fe); \
+			CLR_NDUBLOCK(_fe); \
 		} \
 	} \
 } while (0)
@@ -599,10 +599,14 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 #ifdef SYS_UNIX
 ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
-	if (fd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+	FILE_EVENT *fe;
+
+	if (fd <= INVALID_SOCKET) {
+		//msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
 	}
+
+	fe = fiber_file_open_write(fd);
 
 	if (sys_write == NULL) {
 		hook_once();
@@ -615,8 +619,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 #if defined(HAS_IO_URING)
 
 # ifndef WRITE_FIRST
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		FILE_EVENT *fe = fiber_file_open_write(fd);
+	if (EVENT_IS_IO_URING(fiber_io_event()) && !(fe->mask & EVENT_SYSIO)) {
 		CLR_POLLING(fe);
 		return fiber_iocp_write(fe, buf, (int) count);
 	}
@@ -625,7 +628,6 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 	while (1) {
 		ssize_t n = (*sys_write)(fd, buf, count);
-		FILE_EVENT *fe;
 		int err;
 
 		if (!var_hook_sys_api) {

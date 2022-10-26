@@ -39,7 +39,8 @@ EVENT *event_create(int size)
 #ifdef	HAS_POLL
 		ev = event_poll_create(size);
 #else
-		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
+		printf("%s(%d): not support!\r\n", __FUNCTION__, __LINE__);
+		assert(0);
 #endif
 		break;
 	case FIBER_EVENT_SELECT:
@@ -49,14 +50,16 @@ EVENT *event_create(int size)
 #ifdef	HAS_WMSG
 		ev = event_wmsg_create(size);
 #else
-		msg_fatal("%s(%d): WMSG not support!", __FUNCTION__, __LINE__);
+		printf("%s(%d): WMSG not support!\r\n", __FUNCTION__, __LINE__);
+		assert(0);
 #endif
 		break;
 	case FIBER_EVENT_IO_URING:
 #ifdef	HAS_IO_URING
 		ev = event_io_uring_create(size);
 #else
-		msg_fatal("%s(%d): IO_URING not support!", __FUNCTION__, __LINE__);
+		printf("%s(%d): IO_URING not support!\r\n", __FUNCTION__, __LINE__);
+		assert(0);
 #endif
 		break;
 	default:
@@ -67,7 +70,7 @@ EVENT *event_create(int size)
 #elif	defined(HAS_IOCP)
 		ev = event_iocp_create(size);
 #else
-		msg_fatal("%s(%d): not support!", __FUNCTION__, __LINE__);
+		printf("%s(%d): not support!\r\n", __FUNCTION__, __LINE__);
 		assert(0);
 #endif
 		break;

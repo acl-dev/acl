@@ -254,10 +254,7 @@ EVENT *event_poll_create(int size)
 
 	if (sys_poll == NULL) {
 		hook_once();
-		if (sys_poll == NULL) {
-			msg_error("%s: sys_poll NULL", __FUNCTION__);
-			return NULL;
-		}
+		assert(sys_poll != NULL);
 	}
 
 	// override size with system open limit setting

@@ -103,6 +103,30 @@ static ACL_FIFO *__loggers = NULL;
 
 static int __log_close_onexec = 1;
 
+ACL_ARRAY *acl_log_get_streams(void)
+{
+	ACL_ARRAY *a;
+	ACL_ITER   iter;
+
+	if (__loggers == NULL) {
+		return NULL;
+	}
+
+	a = acl_array_create(1);
+	acl_foreach(iter, __loggers) {
+		ACL_LOG *log = (ACL_LOG*) iter.data;
+		acl_array_append(a, log);
+	}
+	return a;
+}
+
+void acl_log_free_streams(ACL_ARRAY *a)
+{
+	if (a) {
+		acl_array_free(a, NULL);
+	}
+}
+
 void acl_log_close_onexec(int yes)
 {
 	__log_close_onexec = yes;

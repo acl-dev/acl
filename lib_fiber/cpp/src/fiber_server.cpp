@@ -75,9 +75,11 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 
 static int  acl_var_fiber_quick_abort;
 static int  acl_var_fiber_share_stack;
+static int  acl_var_fiber_hook_log;
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ "fiber_quick_abort", 1, &acl_var_fiber_quick_abort },
 	{ "fiber_share_stack", 0, &acl_var_fiber_share_stack },
+	{ "fiber_hook_log", 1, &acl_var_fiber_hook_log },
 
 	{ 0, 0, 0 },
 };
@@ -155,6 +157,11 @@ static void thread_fiber_accept(ACL_FIBER *fiber, void *ctx)
 	acl_fiber_attr_init(&attr);
 	acl_fiber_attr_setstacksize(&attr, acl_var_fiber_stack_size);
 	acl_fiber_attr_setsharestack(&attr, acl_var_fiber_share_stack ? 1 : 0);
+
+	// We must set the listen fd in blocking mode for io_uring engine.
+	if (__fiber_schedule_event == FIBER_EVENT_IO_URING) {
+		acl_non_blocking(ACL_VSTREAM_SOCK(sstream), ACL_BLOCKING);
+	}
 
 	while (1) {
 		cstream = acl_vstream_accept(sstream, ip, sizeof(ip));
@@ -1094,6 +1101,27 @@ static void fiber_log_writer(void *, const char *fmt, va_list ap)
 	acl_msg_info("%s", buf.c_str());
 }
 
+static void hook_fiber_log(void)
+{
+
+	ACL_ARRAY *loggers = acl_log_get_streams();
+	ACL_ITER iter;
+
+	if (loggers) {
+		acl_foreach(iter, loggers) {
+			ACL_VSTREAM *fp = (ACL_VSTREAM*) iter.data;
+			printf(">>>fd=%d\n", ACL_VSTREAM_FILE(fp));
+			acl_fiber_set_sysio(ACL_VSTREAM_FILE(fp));
+		}
+
+		acl_log_free_streams(loggers);
+	}
+
+	// If hook flag been set, the log of fiber module will be
+	// written to the current log file.
+	acl_fiber_msg_register(fiber_log_writer, NULL);
+}
+
 void acl_fiber_server_main(int argc, char *argv[],
 	void (*service)(void*, ACL_VSTREAM*), void *ctx, int name, ...)
 {
@@ -1311,7 +1339,10 @@ void acl_fiber_server_main(int argc, char *argv[],
 	}
 
 	acl_msg_info("schedule event type - %s", acl_var_fiber_schedule_event);
-	acl_fiber_msg_register(fiber_log_writer, NULL);
+
+	if (acl_var_fiber_hook_log) {
+		hook_fiber_log();
+	}
 
 #if !defined(_WIN32) && !defined(_WIN64)
 	/* notify master that child started ok */

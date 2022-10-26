@@ -6,3 +6,6 @@ $ lldb --core "/cores/core.xxxxx"
 (lldb) bt all
 (lldb) thread select 1
 (lldb) frame select 1
+
+# open core dump on ubuntu
+systemctl disable apport.service

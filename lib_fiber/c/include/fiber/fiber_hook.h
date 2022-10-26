@@ -90,6 +90,8 @@ FIBER_API void acl_fiber_freeaddrinfo(struct addrinfo *res);
 
 #endif
 
+FIBER_API void acl_fiber_set_sysio(socket_t fd);
+
 #ifdef __cplusplus
 }
 #endif
