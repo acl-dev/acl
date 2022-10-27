@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include "fiber/libfiber.h"
 
+static int __event_type = FIBER_EVENT_KERNEL;
 static int __stack_size	= 128000;
 static int __shared_stack = 0;
 static int __rw_timeout = 0;
@@ -92,7 +93,7 @@ static void* thread_main(void *ctx)
 	acl_fiber_create(fiber_accept, sstream, 128000);
 
 	printf("call fiber_schedule\r\n");
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(__event_type);
 	return NULL;
 }
 
@@ -100,6 +101,7 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
+		" -e event_type[kernel|io_uring|select|poll]\r\n"
 		" -t max_threads\r\n"
 		" -r rw_timeout\r\n"
 		" -z stack_size[default: 128000]\r\n"
@@ -117,7 +119,7 @@ int main(int argc, char *argv[])
 
 	snprintf(addr, sizeof(addr), "%s", "127.0.0.1:9001");
 
-	while ((ch = getopt(argc, argv, "hs:r:t:z:S")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:t:z:Se:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -127,6 +129,15 @@ int main(int argc, char *argv[])
 			break;
 		case 'r':
 			__rw_timeout = atoi(optarg);
+			break;
+		case 'e':
+			if (strcasecmp(optarg, "poll") == 0) {
+				__event_type = FIBER_EVENT_POLL;
+			} else if (strcasecmp(optarg, "select") == 0) {
+				__event_type = FIBER_EVENT_SELECT;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				__event_type = FIBER_EVENT_IO_URING;
+			}
 			break;
 		case 't':
 			nthreads = atoi(optarg);

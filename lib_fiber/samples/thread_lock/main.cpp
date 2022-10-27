@@ -8,6 +8,7 @@ static int __nthreads = 2;
 static int __nfibers  = 2;
 static int __nloop    = 2;
 static int __delay    = 0;
+static acl::fiber_event_t __event_type = acl::FIBER_EVENT_T_KERNEL;
 
 static acl::atomic_long __counter = 0;
 static long long __counter2 = 0;
@@ -94,7 +95,7 @@ private:
 			fb->start();
 		}
 
-		acl::fiber::schedule();
+		acl::fiber::schedule_with(__event_type);
 		return NULL;
 	}
 };
@@ -104,6 +105,7 @@ private:
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -e event_type[select|poll|kernel|io_uring]\r\n"
 		" -t nthreads[default: 2]\r\n"
 		" -c nfibers[default: 2]\r\n"
 		" -n nloop[default: 2]\r\n"
@@ -119,13 +121,24 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hc:t:n:Sd:")) > 0)
+	while ((ch = getopt(argc, argv, "he:c:t:n:Sd:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'e':
+			if (strcasecmp(optarg, "select") == 0) {
+				__event_type = acl::FIBER_EVENT_T_SELECT;
+			} else if (strcasecmp(optarg, "poll") == 0) {
+				__event_type = acl::FIBER_EVENT_T_POLL;
+			} else if (strcasecmp(optarg, "kernel") == 0) {
+				__event_type = acl::FIBER_EVENT_T_KERNEL;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				__event_type = acl::FIBER_EVENT_T_IO_URING;
+			}
+			break;
 		case 'c':
 			__nfibers = atoi(optarg);
 			break;
