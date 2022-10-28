@@ -65,7 +65,8 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 
 	if (LIKELY(!(fe->mask & (EVENT_POLLIN | EVENT_ACCEPT)))) {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-		io_uring_prep_read(sqe, fe->fd, fe->rbuf, fe->rsize, fe->off);
+		io_uring_prep_read(sqe, fe->fd, fe->in.read_ctx.buf,
+			fe->in.read_ctx.size, fe->in.read_ctx.off);
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -115,7 +116,8 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 
 	if (LIKELY(!(fe->mask & (EVENT_POLLOUT | EVENT_CONNECT)))) {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-		io_uring_prep_write(sqe, fe->fd, fe->wbuf, fe->wsize, fe->off);
+		io_uring_prep_write(sqe, fe->fd, fe->out.write_ctx.buf,
+			fe->out.write_ctx.size, fe->out.write_ctx.off);
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -267,12 +269,12 @@ static int event_uring_del_write(EVENT_URING *ep UNUSED, FILE_EVENT *fe)
 static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 {
 	if (LIKELY(!(fe->mask & (EVENT_ACCEPT | EVENT_POLLIN)))) {
-		fe->rlen = res;
+		fe->in.read_ctx.len = res;
 		if ((fe->type & TYPE_FILE) && res > 0) {
-			fe->off += res;
+			fe->in.read_ctx.off += res;
 		}
 	} else if (fe->mask & EVENT_ACCEPT) {
-		fe->rlen = res;
+		fe->res = res;
 	} else if (fe->mask & EVENT_POLLIN) {
 		if (res & (POLLIN | ERR)) {
 			if (res & POLLERR) {
@@ -300,12 +302,12 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 {
 	if (LIKELY(!(fe->mask & (EVENT_CONNECT | EVENT_POLLOUT)))) {
-		fe->wlen = res;
+		fe->out.write_ctx.len = res;
 		if ((fe->type & TYPE_FILE) && res > 0) {
-			fe->off += res;
+			fe->out.write_ctx.off += res;
 		}
 	} else if (fe->mask & EVENT_CONNECT) {
-		fe->rlen = res;
+		fe->res = res;
 	} else if (fe->mask & EVENT_POLLOUT) {
 		if (res & (POLLOUT | ERR)) {
 			if (res & POLLERR) {
@@ -355,7 +357,7 @@ static void handle_one(EVENT *ev, FILE_EVENT *fe, int res)
 		| EVENT_SPLICE)
 
 	if (fe->mask & FLAGS) {
-		fe->rlen = res;
+		fe->res = res;
 		fe->r_proc(ev, fe);
 	} else {
 		msg_error("%s(%d): unknown mask=%u",

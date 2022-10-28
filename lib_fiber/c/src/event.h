@@ -10,6 +10,8 @@
 #endif
 
 #ifdef	HAS_IO_URING
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <liburing.h>
 #endif
 
@@ -157,21 +159,85 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IO_URING
-	char         *rbuf;
-	unsigned      rsize;
-	int           rlen;
-	__u64         off;
-	const char   *wbuf;
-	unsigned      wsize;
-	int           wlen;
+	union {
+		struct {
+			char *buf;
+			size_t size;
+			int len;
+			__u64 off;
+		} read_ctx;
+
+		struct {
+			const struct iovec *iov;
+			int iovcnt;
+		} readv_ctx;
+
+		struct {
+			char *buf;
+			size_t size;
+			int len;
+			int flags;
+		} recv_ctx;
+
+		struct {
+			char *buf;
+			size_t len;
+			struct sockaddr *src_addr;
+			socklen_t *addrlen;
+			int flags;
+		} recvfrom_ctx;
+
+		struct {
+			struct msghdr *msg;
+			int flags;
+		} recvmsg_ctx;
+	} in;
+
+	union {
+		struct {
+			const void *buf;
+			size_t size;
+			int len;
+			__u64 off;
+		} write_ctx;
+
+		struct {
+			const struct iovec *iov;
+			int iovcnt;
+		} writev_ctx;
+
+		struct {
+			const void *buf;
+			size_t len;
+			int flags;
+		} send_ctx;
+
+		struct {
+			const void *buf;
+			size_t len;
+			int flags;
+			const struct sockaddr *dest_addr;
+			socklen_t addrlen;
+		} sendto_ctx;
+
+		struct {
+			const struct msghdr *msg;
+			int flags;
+		} sendmsg_ctx;
+	} out;
+
+	int res;
+
 	union {
 		struct {
 			struct sockaddr_in addr;
 			socklen_t          len;
 		} peer;
+
 		struct statx *statxbuf;
 		char  *path;
 	} var;
+
 	struct __kernel_timespec rts;
 	struct __kernel_timespec wts;
 	int           r_timeout;

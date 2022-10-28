@@ -130,9 +130,9 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 	}
 #endif
 
-	fe->rbuf  = buf;
-	fe->rsize = (size_t) len;
-	fe->rlen  = 0;
+	fe->in.read_ctx.buf  = buf;
+	fe->in.read_ctx.size = len;
+	fe->in.read_ctx.len  = 0;
 
 	while (1) {
 		int err;
@@ -158,8 +158,8 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 			return -1;
 		}
 
-		if (fe->rlen >= 0) {
-			return fe->rlen;
+		if (fe->in.read_ctx.len >= 0) {
+			return fe->in.read_ctx.len;
 		}
 
 		err = acl_fiber_last_error();
@@ -556,38 +556,50 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 } while (0)
 #endif
 
+static int wait_write(FILE_EVENT *fe)
+{
+	CLR_POLLING(fe);
+
+	if (fiber_wait_write(fe) < 0) {
+		msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+			__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
+		fiber_file_free(fe);
+		return -1;
+	}
+
+	if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+		int err = acl_fiber_last_error();
+		fiber_save_errno(err);
+		msg_error("%s(%d): fd=%d error", __FUNCTION__, __LINE__, fe->fd);
+		return -1;
+	}
+
+	if (acl_fiber_canceled(fe->fiber_w)) {
+		acl_fiber_set_error(fe->fiber_w->errnum);
+		return -1;
+	}
+
+	return 0;
+}
+
 #if defined(HAS_IO_URING)
 int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 {
-	fe->wbuf  = buf;
-	fe->wsize = (size_t) len;
-	fe->wlen  = 0;
+	fe->out.write_ctx.buf  = buf;
+	fe->out.write_ctx.size = len;
+	fe->out.write_ctx.len  = 0;
 
 	while (1) {
 		int err;
 
 		fe->mask &= ~EVENT_WRITE;
 
-		if (fiber_wait_write(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(),
-				(int) fe->fd);
+		if (wait_write(fe) == -1) {
 			return -1;
 		}
 
-		if (fe->mask & EVENT_ERR) {
-			err = acl_fiber_last_error();
-			fiber_save_errno(err);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
-			return -1;
-		}
-
-		if (fe->wlen == (int) fe->wsize) {
-			return fe->wlen;
+		if (fe->out.write_ctx.len == (int) fe->out.write_ctx.size) {
+			return fe->out.write_ctx.len;
 		}
 
 		err = acl_fiber_last_error();
@@ -626,24 +638,7 @@ static int fiber_write(FILE_EVENT *fe, const char *buf, int count)
 			return -1;
 		}
 
-		CLR_POLLING(fe);
-
-		if (fiber_wait_write(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(),
-				(int) fe->fd);
-			fiber_file_free(fe);
-			return -1;
-		}
-
-		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
-			msg_error("%s(%d): fd=%d error",
-				__FUNCTION__, __LINE__, fe->fd);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
+		if (wait_write(fe) == -1) {
 			return -1;
 		}
 	}
@@ -655,15 +650,14 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 	FILE_EVENT *fe;
 
 	if (fd <= INVALID_SOCKET) {
-		//msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
 	}
-
-	fe = fiber_file_open_write(fd);
 
 	if (sys_write == NULL) {
 		hook_once();
 	}
+
+	fe = fiber_file_open_write(fd);
 
 #if defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event()) && !(fe->mask & EVENT_SYSIO)) {
@@ -675,13 +669,12 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 	return fiber_write(fe, buf, (int) count);
 }
 
-static ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
+static ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 {
-	CHECK_SET_NBLOCK(fd);
+	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
-		int n = (int) (*sys_writev)(fd, iov, iovcnt);
-		FILE_EVENT *fe;
+		int n = (int) (*sys_writev)(fe->fd, iov, iovcnt);
 		int err;
 
 		if (!var_hook_sys_api) {
@@ -699,24 +692,7 @@ static ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 			return -1;
 		}
 
-		fe = fiber_file_open_write(fd);
-		CLR_POLLING(fe);
-
-		if (fiber_wait_write(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) fd);
-			fiber_file_free(fe);
-			return -1;
-		}
-
-		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
-			msg_error("%s(%d): fd=%d error",
-				__FUNCTION__, __LINE__, fd);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
+		if (wait_write(fe) == -1) {
 			return -1;
 		}
 	}
@@ -724,8 +700,9 @@ static ssize_t fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 
 ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
-	if (fd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
+	FILE_EVENT *fe;
+
+	if (fd <= INVALID_SOCKET) {
 		return -1;
 	}
 
@@ -733,36 +710,21 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		hook_once();
 	}
 
-	return fiber_writev(fd, iov, iovcnt);
+	fe = fiber_file_open_write(fd);
+	return fiber_writev(fe, iov, iovcnt);
 }
 #endif
 
 #ifdef SYS_WIN
-int WINAPI acl_fiber_send(socket_t sockfd, const char *buf,
-	int len, int flags)
+static int fiber_send(FILE_EVENT *fe, const char *buf, int len, int flags)
 #else
-ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
-	size_t len, int flags)
+static ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
 #endif
 {
-	if (sockfd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
-		return -1;
-	}
-
-	if (sys_send == NULL) {
-		hook_once();
-		if (sys_send == NULL) {
-			msg_error("%s: sys_send NULL", __FUNCTION__);
-			return -1;
-		}
-	}
-
-	CHECK_SET_NBLOCK(sockfd);
+	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
-		int n = (int) (*sys_send)(sockfd, buf, len, flags);
-		FILE_EVENT *fe;
+		int n = (int) (*sys_send)(fe->fd, buf, len, flags);
 		int err;
 
 		if (!var_hook_sys_api) {
@@ -780,24 +742,64 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf,
 			return -1;
 		}
 
-		fe = fiber_file_open_write(sockfd);
-		CLR_POLLING(fe);
+		if (wait_write(fe) == -1) {
+			return -1;
+		}
+	}
+}
 
-		if (fiber_wait_write(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
-			fiber_file_free(fe);
+#ifdef SYS_WIN
+int WINAPI acl_fiber_send(socket_t sockfd, const char *buf, int len, int flags)
+#else
+ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
+#endif
+{
+	FILE_EVENT *fe;
+
+	if (sockfd <= INVALID_SOCKET) {
+		return -1;
+	}
+
+	if (sys_send == NULL) {
+		hook_once();
+	}
+
+	fe = fiber_file_open_write(sockfd);
+
+	return fiber_send(fe, buf, len, flags);
+}
+
+#ifdef SYS_WIN
+static int fiber_sendto(FILE_EVENT *fe, const char *buf, int len,
+	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
+#else
+static ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
+	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
+#endif
+{
+	CHECK_SET_NBLOCK(fe->fd);
+
+	while (1) {
+		int n = (int) (*sys_sendto)(fe->fd, buf, len, flags,
+				dest_addr, addrlen);
+		int err;
+
+		if (!var_hook_sys_api) {
+			return n;
+		}
+
+		if (n >= 0) {
+			return n;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+
+		if (!error_again(err)) {
 			return -1;
 		}
 
-		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
-			msg_error("%s(%d): fd=%d error",
-				__FUNCTION__, __LINE__, sockfd);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
+		if (wait_write(fe) == -1) {
 			return -1;
 		}
 	}
@@ -811,25 +813,28 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 #endif
 {
-	if (sockfd == INVALID_SOCKET) {
+	FILE_EVENT *fe;
+
+	if (sockfd <= INVALID_SOCKET) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
 		return -1;
 	}
 
 	if (sys_sendto == NULL) {
 		hook_once();
-		if (sys_sendto == NULL) {
-			msg_error("%s: sys_sendto NULL", __FUNCTION__);
-			return -1;
-		}
 	}
 
-	CHECK_SET_NBLOCK(sockfd);
+	fe = fiber_file_open_write(sockfd);
+	return fiber_sendto(fe, buf, len, flags, dest_addr, addrlen);
+}
+
+#ifdef SYS_UNIX
+static ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
+{
+	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
-		int n = (int) (*sys_sendto)(sockfd, buf, len, flags,
-				dest_addr, addrlen);
-		FILE_EVENT *fe;
+		ssize_t n = (*sys_sendmsg)(fe->fd, msg, flags);
 		int err;
 
 		if (!var_hook_sys_api) {
@@ -847,34 +852,25 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 			return -1;
 		}
 
-		fe = fiber_file_open_write(sockfd);
-		CLR_POLLING(fe);
-
-		if (fiber_wait_write(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
-			fiber_file_free(fe);
-			return -1;
-		}
-
-		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
-			msg_error("%s(%d): fd=%d error",
-				__FUNCTION__, __LINE__, sockfd);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
+		if (wait_write(fe) == -1) {
 			return -1;
 		}
 	}
 }
 
-#ifdef SYS_UNIX
+/*
+#if deinfed(HAS_IO_URING)
+static int fiber_iocp_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
+{
+}
+#endif
+*/
+
 ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
-	if (sockfd == INVALID_SOCKET) {
-		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
+	FILE_EVENT *fe;
+
+	if (sockfd <= INVALID_SOCKET) {
 		return -1;
 	}
 
@@ -882,49 +878,8 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		hook_once();
 	}
 
-	CHECK_SET_NBLOCK(sockfd);
-
-	while (1) {
-		ssize_t n = (*sys_sendmsg)(sockfd, msg, flags);
-		FILE_EVENT *fe;
-		int err;
-
-		if (!var_hook_sys_api) {
-			return n;
-		}
-
-		if (n >= 0) {
-			return n;
-		}
-
-		err = acl_fiber_last_error();
-		fiber_save_errno(err);
-
-		if (!error_again(err)) {
-			return -1;
-		}
-
-		fe = fiber_file_open_write(sockfd);
-		CLR_POLLING(fe);
-
-		if (fiber_wait_write(fe) < 0) {
-			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) sockfd);
-			fiber_file_free(fe);
-			return -1;
-		}
-
-		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
-			msg_error("%s(%d): fd=%d error",
-				__FUNCTION__, __LINE__, sockfd);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
-			return -1;
-		}
-	}
+	fe = fiber_file_open_write(sockfd);
+	return fiber_sendmsg(fe, msg, flags);
 }
 #endif
 

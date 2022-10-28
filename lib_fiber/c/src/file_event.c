@@ -23,15 +23,11 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 #endif
 
 #ifdef	HAS_IO_URING
-	fe->rbuf   = NULL;
-	fe->rsize  = 0;
-	fe->rlen   = 0;
-	fe->off    = 0;
-	fe->wbuf   = 0;
-	fe->wsize  = 0;
+	memset(&fe->in, 0, sizeof(fe->in));
+	memset(&fe->out, 0, sizeof(fe->out));
+	memset(&fe->var, 0, sizeof(fe->var));
 	fe->r_timeout = -1;
 	fe->w_timeout = -1;
-	memset(&fe->var, 0, sizeof(fe->var));
 #endif
 
 #ifdef HAS_IOCP

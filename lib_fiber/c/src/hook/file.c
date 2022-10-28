@@ -66,10 +66,10 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	fe->mask &= ~EVENT_FILE_CLOSE;
 
-	if (fe->rlen == 0) {
+	if (fe->res == 0) {
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->rlen);
+		acl_fiber_set_error(-fe->res);
 		return -1;
 	}
 }
@@ -97,26 +97,26 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_OPENAT);
-	fe->rbuf = strdup(pathname);
+	fe->var.path = strdup(pathname);
 
-	event_uring_file_openat(ev, fe, dirfd, fe->rbuf, flags, mode);
+	event_uring_file_openat(ev, fe, dirfd, fe->var.path, flags, mode);
 
 	ev->waiter++;
 	acl_fiber_switch();
 	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_OPENAT;
-	free(fe->rbuf);
-	fe->rbuf = NULL;
+	free(fe->var.path);
+	fe->var.path = NULL;
 
-	if (fe->rlen >= 0) {
-		fe->fd   = fe->rlen;
+	if (fe->res >= 0) {
+		fe->fd   = fe->res;
 		fe->type = TYPE_FILE | TYPE_EVENTABLE;
 		fiber_file_set(fe);  // Save the fe for the future using.
 		return fe->fd;
 	}
 
-	acl_fiber_set_error(-fe->rlen);
+	acl_fiber_set_error(-fe->res);
 	file_event_unrefer(fe);
 	return -1;
 }
@@ -150,23 +150,23 @@ int unlink(const char *pathname)
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_UNLINK);
-	fe->rbuf = strdup(pathname);
+	fe->var.path = strdup(pathname);
 
-	event_uring_file_unlink(ev, fe, fe->rbuf);
+	event_uring_file_unlink(ev, fe, fe->var.path);
 
 	ev->waiter++;
 	acl_fiber_switch();
 	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_UNLINK;
-	free(fe->rbuf);
-	fe->rbuf = NULL;
+	free(fe->var.path);
+	fe->var.path = NULL;
 
-	if (fe->rlen == 0) {
+	if (fe->res == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->rlen);
+		acl_fiber_set_error(-fe->res);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -190,10 +190,10 @@ int renameat2(int olddirfd, const char *oldpath,
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_RENAMEAT2);
-	fe->rbuf     = strdup(oldpath);
+	fe->in.read_ctx.buf = strdup(oldpath);
 	fe->var.path = strdup(newpath);
 
-	event_uring_file_renameat2(ev, fe, olddirfd, fe->rbuf,
+	event_uring_file_renameat2(ev, fe, olddirfd, fe->in.read_ctx.buf,
 		newdirfd, fe->var.path, flags);
 
 	ev->waiter++;
@@ -201,14 +201,14 @@ int renameat2(int olddirfd, const char *oldpath,
 	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_RENAMEAT2;
-	free(fe->rbuf);
+	free(fe->in.read_ctx.buf);
 	free(fe->var.path);
 
-	if (fe->rlen == 0) {
+	if (fe->res == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->rlen);
+		acl_fiber_set_error(-fe->res);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -242,11 +242,11 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_STATX);
-	fe->rbuf = strdup(pathname);
+	fe->in.read_ctx.buf = strdup(pathname);
 	fe->var.statxbuf = (struct statx*) malloc(sizeof(struct statx));
 	memcpy(fe->var.statxbuf, statxbuf, sizeof(struct statx));
 
-	event_uring_file_statx(ev, fe, dirfd, fe->rbuf, flags, mask,
+	event_uring_file_statx(ev, fe, dirfd, fe->in.read_ctx.buf, flags, mask,
 		fe->var.statxbuf);
 
 	ev->waiter++;
@@ -254,16 +254,16 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	ev->waiter--;
 
 	fe->mask &= ~EVENT_FILE_STATX;
-	free(fe->rbuf);
-	fe->rbuf = NULL;
+	free(fe->in.read_ctx.buf);
+	fe->in.read_ctx.buf = NULL;
 
-	if (fe->rlen == 0) {
+	if (fe->res == 0) {
 		memcpy(statxbuf, fe->var.statxbuf, sizeof(struct statx));
 		free(fe->var.statxbuf);
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(fe->rlen);
+		acl_fiber_set_error(-fe->res);
 		free(fe->var.statxbuf);
 		file_event_unrefer(fe);
 		return -1;
@@ -313,22 +313,22 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	}
 
 	FILE_ALLOC(fe, EVENT_DIR_MKDIRAT);
-	fe->rbuf = strdup(pathname);
+	fe->var.path = strdup(pathname);
 
-	event_uring_mkdirat(ev, fe, dirfd, fe->rbuf, mode);
+	event_uring_mkdirat(ev, fe, dirfd, fe->var.path, mode);
 
 	ev->waiter++;
 	acl_fiber_switch();
 	ev->waiter--;
 
 	fe->mask &= ~EVENT_DIR_MKDIRAT;
-	free(fe->rbuf);
+	free(fe->var.path);
 
-	if (fe->rlen == 0) {
+	if (fe->res == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->rlen);
+		acl_fiber_set_error(-fe->res);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -360,8 +360,8 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
 	// can pread or pwrite the same fd.
 
 	FILE_ALLOC(fe, EVENT_READ);
-	fe->fd  = fd;
-	fe->off = offset;
+	fe->fd = fd;
+	fe->in.read_ctx.off = offset;
 	ret = fiber_iocp_read(fe, buf, (int) count);
 	file_event_unrefer(fe);
 
@@ -391,8 +391,8 @@ ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
 	}
 
 	FILE_ALLOC(fe, EVENT_WRITE);
-	fe->fd  = fd;
-	fe->off = offset;
+	fe->fd = fd;
+	fe->out.write_ctx.off = offset;
 	ret = fiber_iocp_write(fe, buf, (int) count);
 	file_event_unrefer(fe);
 
@@ -443,21 +443,21 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 
 	fe->mask &= ~EVENT_SPLICE;
 
-	if (fe->rlen < 0) {
-		acl_fiber_set_error(-fe->rlen);
+	if (fe->res < 0) {
+		acl_fiber_set_error(-fe->res);
 		file_event_unrefer(fe);
 		return -1;
 	}
 	
 	if (off_in != -1 && poff_in) {
-		*poff_in += fe->rlen;
+		*poff_in += fe->res;
 	}
 
 	if (off_out != -1 && poff_out) {
-		*poff_out += fe->rlen;
+		*poff_out += fe->res;
 	}
 
-	ret = fe->rlen;
+	ret = fe->res;
 	file_event_unrefer(fe);
 	return ret;
 }
