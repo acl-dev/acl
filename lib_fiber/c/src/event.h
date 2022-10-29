@@ -162,29 +162,27 @@ struct FILE_EVENT {
 	union {
 		struct {
 			char *buf;
-			size_t size;
-			int len;
+			unsigned len;
 			__u64 off;
 		} read_ctx;
 
 		struct {
 			const struct iovec *iov;
-			int iovcnt;
+			int cnt;
 		} readv_ctx;
 
 		struct {
 			char *buf;
-			size_t size;
-			int len;
+			unsigned len;
 			int flags;
 		} recv_ctx;
 
 		struct {
 			char *buf;
-			size_t len;
+			unsigned len;
+			int flags;
 			struct sockaddr *src_addr;
 			socklen_t *addrlen;
-			int flags;
 		} recvfrom_ctx;
 
 		struct {
@@ -196,25 +194,24 @@ struct FILE_EVENT {
 	union {
 		struct {
 			const void *buf;
-			size_t size;
-			int len;
+			unsigned len;
 			__u64 off;
 		} write_ctx;
 
 		struct {
 			const struct iovec *iov;
-			int iovcnt;
+			int cnt;
 		} writev_ctx;
 
 		struct {
 			const void *buf;
-			size_t len;
+			unsigned len;
 			int flags;
 		} send_ctx;
 
 		struct {
 			const void *buf;
-			size_t len;
+			unsigned len;
 			int flags;
 			const struct sockaddr *dest_addr;
 			socklen_t addrlen;
