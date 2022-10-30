@@ -1104,7 +1104,7 @@ static void fiber_log_writer(void *, const char *fmt, va_list ap)
 
 static void hook_fiber_log(void)
 {
-
+#if !defined(_WIN32) && !defined(_WIN64)
 	ACL_ARRAY *loggers = acl_log_get_streams();
 	ACL_ITER iter;
 
@@ -1116,10 +1116,10 @@ static void hook_fiber_log(void)
 
 		acl_log_free_streams(loggers);
 	}
-
 	// If hook flag been set, the log of fiber module will be
 	// written to the current log file.
 	acl_fiber_msg_register(fiber_log_writer, NULL);
+#endif
 }
 
 void acl_fiber_server_main(int argc, char *argv[],
