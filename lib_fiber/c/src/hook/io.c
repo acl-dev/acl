@@ -5,6 +5,12 @@
 #include "hook.h"
 
 #ifdef SYS_UNIX
+#define IS_INVALID(fd) (fd <= INVALID_SOCKET)
+#elif defined(_WIN32) || defined(_WIN64)
+#define IS_INVALID(fd) (fd == INVALID_SOCKET)
+#endif
+
+#ifdef SYS_UNIX
 unsigned int sleep(unsigned int seconds)
 {
 	if (!var_hook_sys_api) {
@@ -42,7 +48,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 		return (*sys_close)(fd);
 	}
 
-	if (fd == INVALID_SOCKET) {
+	if (IS_INVALID(fd)) {
 		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
 		return -1;
 	} else if (fd >= (socket_t) var_maxfd) {
@@ -269,7 +275,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 {
 	FILE_EVENT* fe;
 
-	if (fd <= INVALID_SOCKET) {
+	if (IS_INVALID(fd)) {
 		return -1;
 	}
 
@@ -300,7 +306,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 {
 	FILE_EVENT *fe;
 
-	if (fd <= INVALID_SOCKET) {
+	if (IS_INVALID(fd)) {
 		return -1;
 	}
 
@@ -352,7 +358,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 {
 	FILE_EVENT *fe;
 
-	if (sockfd <= INVALID_SOCKET) {
+	if (IS_INVALID(sockfd)) {
 		return -1;
 	}
 
@@ -395,7 +401,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 {
 	FILE_EVENT *fe;
 
-	if (sockfd <= INVALID_SOCKET) {
+	if (IS_INVALID(sockfd)) {
 		return -1;
 	}
 
@@ -437,7 +443,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
 
-	if (sockfd <= INVALID_SOCKET) {
+	if (IS_INVALID(sockfd)) {
 		return -1;
 	}
 
@@ -584,7 +590,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
 	FILE_EVENT *fe;
 
-	if (fd <= INVALID_SOCKET) {
+	if (IS_INVALID(fd)) {
 		return -1;
 	}
 
@@ -617,7 +623,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 {
 	FILE_EVENT *fe;
 
-	if (fd <= INVALID_SOCKET) {
+	if (IS_INVALID(fd)) {
 		return -1;
 	}
 
@@ -657,7 +663,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 {
 	FILE_EVENT *fe;
 
-	if (sockfd <= INVALID_SOCKET) {
+	if (IS_INVALID(sockfd)) {
 		return -1;
 	}
 
@@ -702,7 +708,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 {
 	FILE_EVENT *fe;
 
-	if (sockfd <= INVALID_SOCKET) {
+	if (IS_INVALID(sockfd)) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, sockfd);
 		return -1;
 	}
@@ -745,7 +751,7 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
 
-	if (sockfd <= INVALID_SOCKET) {
+	if (IS_INVALID(sockfd)) {
 		return -1;
 	}
 
@@ -839,7 +845,7 @@ ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 
 ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
-	if (out_fd == INVALID_SOCKET) {
+	if (IS_INVALID(out_fd)) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, out_fd);
 		return -1;
 	}

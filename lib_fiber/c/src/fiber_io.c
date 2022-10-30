@@ -555,7 +555,7 @@ void acl_fiber_set_sysio(socket_t fd)
 {
 	FILE_EVENT *fe;
 
-	if (fd <= INVALID_SOCKET) {
+	if (fd == INVALID_SOCKET) {
 		return;
 	}
 
