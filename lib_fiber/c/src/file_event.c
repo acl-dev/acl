@@ -33,7 +33,7 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 #ifdef HAS_IOCP
 	fe->rbuf    = NULL;
 	fe->rsize   = 0;
-	fe->rlen    = 0;
+	fe->res     = 0;
 	fe->h_iocp  = NULL;
 	fe->reader  = NULL;
 	fe->writer  = NULL;
