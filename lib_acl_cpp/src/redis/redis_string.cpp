@@ -808,7 +808,7 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 
 	hash_slot(key);
 	build_request(3, argv, lens);
-	if (get_string(buf, sizeof(buf)) <= 0)
+	if (get_string(buf, FLOAT_LEN) <= 0)
 		return false;
 
 	if (result != NULL)
