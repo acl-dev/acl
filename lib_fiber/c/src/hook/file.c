@@ -339,7 +339,7 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
 	FILE_EVENT *fe;
 	ssize_t ret;
 
-	if (fd == INVALID_SOCKET) {
+	if (fd <= INVALID_SOCKET) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
 	}
@@ -373,7 +373,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
 	FILE_EVENT *fe;
 	ssize_t ret;
 
-	if (fd == INVALID_SOCKET) {
+	if (fd <= INVALID_SOCKET) {
 		msg_error("%s: invalid fd: %d", __FUNCTION__, fd);
 		return -1;
 	}

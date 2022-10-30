@@ -147,6 +147,15 @@ struct FILE_EVENT {
 #define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 15)
 #define	EVENT_SPLICE		(unsigned) (1 << 16)
 
+#define	EVENT_READV		(unsigned) (1 << 17)
+#define	EVENT_RECV		(unsigned) (1 << 18)
+#define	EVENT_RECVFROM		(unsigned) (1 << 19)
+#define	EVENT_RECVMSG		(unsigned) (1 << 20)
+
+#define	EVENT_WRITEV		(unsigned) (1 << 21)
+#define	EVENT_SEND		(unsigned) (1 << 22)
+#define	EVENT_SENDTO		(unsigned) (1 << 23)
+#define	EVENT_SENDMSG		(unsigned) (1 << 24)
 #endif // HAS_IO_URING
 
 	event_proc   *r_proc;
@@ -169,6 +178,7 @@ struct FILE_EVENT {
 		struct {
 			const struct iovec *iov;
 			int cnt;
+			__u64 off;
 		} readv_ctx;
 
 		struct {
@@ -177,6 +187,7 @@ struct FILE_EVENT {
 			int flags;
 		} recv_ctx;
 
+#if defined(IO_URING_HAS_RECVFROM)
 		struct {
 			char *buf;
 			unsigned len;
@@ -184,6 +195,7 @@ struct FILE_EVENT {
 			struct sockaddr *src_addr;
 			socklen_t *addrlen;
 		} recvfrom_ctx;
+#endif
 
 		struct {
 			struct msghdr *msg;
@@ -201,6 +213,7 @@ struct FILE_EVENT {
 		struct {
 			const struct iovec *iov;
 			int cnt;
+			__u64 off;
 		} writev_ctx;
 
 		struct {
@@ -209,6 +222,7 @@ struct FILE_EVENT {
 			int flags;
 		} send_ctx;
 
+#if defined(IO_URING_HAS_SENDTO)
 		struct {
 			const void *buf;
 			unsigned len;
@@ -216,6 +230,7 @@ struct FILE_EVENT {
 			const struct sockaddr *dest_addr;
 			socklen_t addrlen;
 		} sendto_ctx;
+#endif
 
 		struct {
 			const struct msghdr *msg;
@@ -242,10 +257,10 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IOCP
-	char          packet[1500];  // just for UDP packet
+	char          packet[1500];  // Just for UDP packet
 	char         *rbuf;
 	int           rsize;
-	int           rlen;
+	int           res;
 	HANDLE        h_iocp;
 	IOCP_EVENT   *reader;
 	IOCP_EVENT   *writer;

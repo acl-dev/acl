@@ -1,6 +1,6 @@
 CC = $(ENV_CC)
 
-CFLAGS = -c -g -W \
+CFLAGS = -c -g -W -O3 \
 -Wall \
 -Wcast-qual \
 -Wcast-align \

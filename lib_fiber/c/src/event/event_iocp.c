@@ -253,7 +253,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	} else if (IS_POLLING(fe) && fe->sock_type == SOCK_DGRAM) {
 		fe->rbuf    = fe->packet;
 		fe->rsize   = sizeof(fe->packet);
-		fe->rlen    = 0;
+		fe->res     = 0;
 		wsaData.buf = fe->packet;
 		wsaData.len = fe->rsize;
 	} else {
@@ -264,7 +264,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 	ret = WSARecv(fe->fd, &wsaData, 1, &len, &flags,
 		(OVERLAPPED*) &event->overlapped, NULL);
 
-	fe->rlen = (int) len;
+	fe->res = (int) len;
 
 	if (ret != SOCKET_ERROR) {
 		fe->mask |= EVENT_READ;
@@ -278,7 +278,7 @@ static int iocp_add_read(EVENT_IOCP *ev, FILE_EVENT *fe)
 		fe->mask |= EVENT_ERR;
 #if 0
 		fe->mask &= ~EVENT_READ;
-		fe->rlen = -1;
+		fe->res   = -1;
 		array_append(ev->events, event);
 #else
 		iocp_event_save(ev, event, fe, -1);
@@ -418,7 +418,7 @@ static int iocp_add_write(EVENT_IOCP *ev, FILE_EVENT *fe)
 		fe->mask |= EVENT_ERR;
 #if 0
 		fe->mask &= ~EVENT_WRITE;
-		fe->rlen = -1;
+		fe->res   = -1;
 		array_append(ev->events, event);
 #else
 		iocp_event_save(ev, event, fe, -1);
@@ -500,7 +500,7 @@ static void iocp_event_save(EVENT_IOCP *ei, IOCP_EVENT *event,
 		CLR_WRITEWAIT(fe);
 	}
 
-	fe->rlen = (int) trans;
+	fe->res = (int) trans;
 	array_append(ei->events, event);
 }
 

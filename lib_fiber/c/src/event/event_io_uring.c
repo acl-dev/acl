@@ -65,8 +65,36 @@ static int event_uring_add_read(EVENT_URING *ep, FILE_EVENT *fe)
 
 	if (LIKELY(!(fe->mask & (EVENT_POLLIN | EVENT_ACCEPT)))) {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-		io_uring_prep_read(sqe, fe->fd, fe->in.read_ctx.buf,
-			fe->in.read_ctx.len, fe->in.read_ctx.off);
+
+		if (fe->mask & EVENT_READV) {
+			io_uring_prep_readv(sqe, fe->fd,
+				fe->in.readv_ctx.iov,
+				fe->in.readv_ctx.cnt,
+				fe->in.readv_ctx.off);
+		} else if (fe->mask & EVENT_RECV) {
+			io_uring_prep_recv(sqe, fe->fd,
+				fe->in.recv_ctx.buf,
+				fe->in.recv_ctx.len,
+				fe->in.recv_ctx.flags);
+#if defined(IO_URING_HAS_RECVFROM)
+		} else if (fe->mask & EVENT_RECVFROM) {
+			io_uring_prep_recvfrom(sqe, fe->fd,
+				fe->in.recvfrom_ctx.buf,
+				fe->in.recvfrom_ctx.len,
+				fe->in.recvfrom_ctx.flags,
+				fe->in.recvfrom_ctx.src_addr,
+				fe->in.recvfrom_ctx.addrlen);
+#endif
+		} else if (fe->mask & EVENT_RECVMSG) {
+			io_uring_prep_recvmsg(sqe, fe->fd,
+				fe->in.recvmsg_ctx.msg,
+				fe->in.recvmsg_ctx.flags);
+		} else {
+			io_uring_prep_read(sqe, fe->fd,
+				fe->in.read_ctx.buf,
+				fe->in.read_ctx.len,
+				fe->in.read_ctx.off);
+		}
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -116,8 +144,36 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 
 	if (LIKELY(!(fe->mask & (EVENT_POLLOUT | EVENT_CONNECT)))) {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
-		io_uring_prep_write(sqe, fe->fd, fe->out.write_ctx.buf,
-			fe->out.write_ctx.len, fe->out.write_ctx.off);
+
+		if (fe->mask & EVENT_WRITEV) {
+			io_uring_prep_writev(sqe, fe->fd,
+				fe->out.writev_ctx.iov,
+				fe->out.writev_ctx.cnt,
+				fe->out.writev_ctx.off);
+		} else if (fe->mask & EVENT_SEND) {
+			io_uring_prep_send(sqe, fe->fd,
+				fe->out.send_ctx.buf,
+				fe->out.send_ctx.len,
+				fe->out.send_ctx.flags);
+#if defined(IO_URING_HAS_SENDTO)
+		} else if (fe->mask & EVENT_SENDTO) {
+			io_uring_prep_sendto(sqe, fe->fd,
+				fe->out.sendto_ctx.buf,
+				fe->out.sendto_ctx.len,
+				fe->out.sendto_ctx.flags,
+				fe->out.sendto_ctx.dest_addr,
+				fe->out.sendto_ctx.addrlen);
+#endif
+		} else if (fe->mask & EVENT_SENDMSG) {
+			io_uring_prep_sendmsg(sqe, fe->fd,
+				fe->out.sendmsg_ctx.msg,
+				fe->out.sendmsg_ctx.flags);
+		} else {
+			io_uring_prep_write(sqe, fe->fd,
+				fe->out.write_ctx.buf,
+				fe->out.write_ctx.len,
+				fe->out.write_ctx.off);
+		}
 		io_uring_sqe_set_data(sqe, fe);
 
 		TRY_SUBMMIT(ep);
@@ -272,7 +328,11 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 
 	if (LIKELY(!(fe->mask & (EVENT_ACCEPT | EVENT_POLLIN)))) {
 		if ((fe->type & TYPE_FILE) && res > 0) {
-			fe->in.read_ctx.off += res;
+			if (fe->mask & EVENT_READV) {
+				fe->in.readv_ctx.off += res;
+			} else {
+				fe->in.read_ctx.off  += res;
+			}
 		}
 	} else if (fe->mask & EVENT_ACCEPT) {
 		// fe->res = res;
@@ -296,7 +356,8 @@ static void handle_read(EVENT *ev, FILE_EVENT *fe, int res)
 		}
 	}
 
-	fe->mask &= ~EVENT_READ;
+	fe->mask &= ~(EVENT_READ | EVENT_READV | EVENT_RECV
+			| EVENT_RECVFROM | EVENT_RECVMSG);
 	fe->r_proc(ev, fe);
 }
 
@@ -306,7 +367,11 @@ static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 
 	if (LIKELY(!(fe->mask & (EVENT_CONNECT | EVENT_POLLOUT)))) {
 		if ((fe->type & TYPE_FILE) && res > 0) {
-			fe->out.write_ctx.off += res;
+			if (fe->mask & EVENT_WRITEV) {
+				fe->out.writev_ctx.off += res;
+			} else {
+				fe->out.write_ctx.off  += res;
+			}
 		}
 	} else if (fe->mask & EVENT_CONNECT) {
 		//fe->res = res;
@@ -330,7 +395,8 @@ static void handle_write(EVENT *ev, FILE_EVENT *fe, int res)
 		}
 	}
 
-	fe->mask &= ~EVENT_WRITE;
+	fe->mask &= ~(EVENT_WRITE | EVENT_WRITEV | EVENT_SEND
+			| EVENT_SENDTO | EVENT_SENDMSG);
 	if (fe->w_proc) {
 		fe->w_proc(ev, fe);
 	}
