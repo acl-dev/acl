@@ -30,6 +30,21 @@ struct FIBER_CTX {
 	int   check;
 };
 
+static void build_dummy(char *buf, size_t size)
+{
+	const char ss[] = "0123456789abcdefghijklmnopqrstuvwxyz\r\n";
+	size_t len = sizeof(ss) - 1;
+	char *ptr;
+
+	ptr = buf;
+	while (size > 0) {
+		size_t n = len > size ? size : len;
+		memcpy(ptr, ss, n);
+		ptr  += n;
+		size -= n;
+	}
+}
+
 static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *path = (const char*) ctx;
@@ -69,11 +84,12 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 		exit(1);
 	}
 
+	build_dummy(buf, sizeof(buf));
+
 	printf("open %s ok, fd=%d\r\n", path, fd);
 
 	for (i = 0; i < __write_size; i++) {
 		n = i % 10;
-		snprintf(buf, sizeof(buf), "%lld", n);
 		if (write(fd, buf, 1) <= 0) {
 			printf("write to %s error %s\r\n", path, strerror(errno));
 			break;
@@ -139,9 +155,11 @@ static void fiber_pwrite(ACL_FIBER *fiber acl_unused, void *ctx)
 		exit(1);
 	}
 
-	printf(">>%s: begin to call pwrite to fd=%d\r\rn", __FUNCTION__, fd);
 	buf = malloc(fc->len);
-	memset(buf, 'x', fc->len);
+	build_dummy(buf, fc->len);
+
+	printf(">>%s: begin to call pwrite to fd=%d\r\rn", __FUNCTION__, fd);
+
 	ret = pwrite(fd, buf, fc->len, fc->off);
 	printf(">>pwrite ret=%d, file=%s, fd=%d\r\n", ret, fc->frompath, fd);
 
@@ -271,18 +289,11 @@ static void fiber_one_pwriter(ACL_FIBER *fb acl_unused, void *ctx)
 {
 	struct IO_CTX *ic = (struct IO_CTX*) ctx;
 	int   count = ic->len / MB, left = ic->len % MB;
-	char *buf = malloc(MB), *ptr;
+	char *buf = malloc(MB);
 	int   ret, i;
-	const char ss[] = "0123456789abcdefghijklmnopqrstuvwxyz\r\n";
-	size_t len = sizeof(ss) - 1, size = MB;
+	size_t size = MB;
 
-	ptr = buf;
-	while (size > 0) {
-		size_t n = len > size ? size : len;
-		memcpy(ptr, ss, n);
-		ptr  += n;
-		size -= n;
-	}
+	build_dummy(buf, size);
 
 	for (i = 0; i < count; i++) {
 		ret = pwrite(ic->fd, buf, MB, ic->off);
