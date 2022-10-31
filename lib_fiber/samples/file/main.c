@@ -80,7 +80,11 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 		}
 	}
 
-	(void) write(fd, "\r\n", 2);
+	int ret = write(fd, "\r\n", 2);
+	if (ret <= 0) {
+		printf("write CRLF error %s\r\n", strerror(errno));
+	}
+
 	printf("write over!\r\n");
 	n = close(fd);
 	printf("close %s %s, fd=%d\r\n", path, n == 0 ? "ok" : "error", fd);
@@ -173,8 +177,6 @@ static void fiber_one_preader(ACL_FIBER *fb acl_unused, void *ctx)
 	long long count = ic->len / MB, left = ic->len % MB, i;
 	char *buf = malloc(MB);
 	int   ret;
-
-	memset(buf, 'x', MB);
 
 	for (i = 0; i < count; i++) {
 		ret = pread(ic->fd, buf, MB, ic->off);
@@ -269,10 +271,18 @@ static void fiber_one_pwriter(ACL_FIBER *fb acl_unused, void *ctx)
 {
 	struct IO_CTX *ic = (struct IO_CTX*) ctx;
 	int   count = ic->len / MB, left = ic->len % MB;
-	char *buf = malloc(MB);
+	char *buf = malloc(MB), *ptr;
 	int   ret, i;
+	const char ss[] = "0123456789abcdefghijklmnopqrstuvwxyz\r\n";
+	size_t len = sizeof(ss) - 1, size = MB;
 
-	memset(buf, 'x', MB);
+	ptr = buf;
+	while (size > 0) {
+		size_t n = len > size ? size : len;
+		memcpy(ptr, ss, n);
+		ptr  += n;
+		size -= n;
+	}
 
 	for (i = 0; i < count; i++) {
 		ret = pwrite(ic->fd, buf, MB, ic->off);

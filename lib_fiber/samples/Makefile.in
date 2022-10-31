@@ -75,7 +75,9 @@ endif
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 #	CFLAGS += -DLINUX2
 	SYSLIB += -lcrypt -rdynamic -ldl
-	has_io_uring=$(HAS_IO_URING)
+	ifeq ($(HAS_IO_URING), yes)
+		SYSLIB += -luring
+	endif
 	ifeq ($(has_io_uring), yes)
 		SYSLIB += -luring
 	endif
