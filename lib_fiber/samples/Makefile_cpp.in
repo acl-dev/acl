@@ -72,7 +72,9 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($(findstring x86_64, $(OSTYPE)), x86_64)
 		RPATH = linux64
 	endif
-	has_io_uring=$(HAS_IO_URING)
+	ifeq ($(HAS_IO_URING), yes)
+		SYSLIB += -luring
+	endif
 	ifeq ($(has_io_uring), yes)
 		SYSLIB += -luring
 	endif

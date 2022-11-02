@@ -263,8 +263,10 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
-		if (EVENT_IS_IO_URING(ev)) {
-			ev->add_read(ev, fe);
+		if (fe->mask & EVENT_DIRECT) {
+			if (ev->add_read(ev, fe) < 0) {
+				return -1;
+			}
 		}
 		// we should check the fd's type for the first time.
 		else if (fe->me.parent == &fe->me) {
@@ -310,8 +312,10 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 	}
 
 	if (!(fe->mask & EVENT_WRITE)) {
-		if (EVENT_IS_IO_URING(ev)) {
-			ev->add_write(ev, fe);
+		if (fe->mask & EVENT_DIRECT) {
+			if (ev->add_write(ev, fe) < 0) {
+				return -1;
+			}
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}

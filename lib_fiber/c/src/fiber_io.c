@@ -529,6 +529,11 @@ FILE_EVENT *fiber_file_open_read(socket_t fd)
 	if (fe == NULL) {
 		fe = file_event_alloc(fd);
 		fiber_file_set(fe);
+#ifdef	HAS_IO_URING
+		if (var_hook_sys_api && EVENT_IS_IO_URING(fiber_io_event())) {
+			fe->mask |= EVENT_DIRECT;
+		}
+#endif
 	}
 
 	/* We can't set the fe's type here because it'll effect the DGRAM IO,
@@ -545,6 +550,11 @@ FILE_EVENT *fiber_file_open_write(socket_t fd)
 	if (fe == NULL) {
 		fe = file_event_alloc(fd);
 		fiber_file_set(fe);
+#ifdef	HAS_IO_URING
+		if (var_hook_sys_api && EVENT_IS_IO_URING(fiber_io_event())) {
+			fe->mask |= EVENT_DIRECT;
+		}
+#endif
 	}
 
 	fe->fiber_w = acl_fiber_running();
