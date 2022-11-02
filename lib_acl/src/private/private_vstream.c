@@ -416,7 +416,7 @@ TAG_AGAIN:
 	return (n);
 }
 
-static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
+static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, ssize_t dlen)
 {
 	const unsigned char *ptr;
 	int   n;
@@ -433,6 +433,8 @@ static int __loop_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 			return (ACL_VSTREAM_EOF);
 		}
 
+		assert(n <= dlen);
+
 		dlen  -= n;
 		ptr   += n;
 	}
@@ -448,7 +450,7 @@ int private_vstream_writen(ACL_VSTREAM *stream, const void *vptr, size_t dlen)
 		if (private_vstream_fflush(stream) == ACL_VSTREAM_EOF)
 			return (ACL_VSTREAM_EOF);
 	}
-	return (__loop_writen(stream, vptr, dlen));
+	return (__loop_writen(stream, vptr, (ssize_t) dlen));
 }
 
 int private_vstream_write(ACL_VSTREAM *stream, const void *vptr, size_t dlen)

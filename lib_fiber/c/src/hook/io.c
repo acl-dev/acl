@@ -127,7 +127,7 @@ static int iocp_wait_read(FILE_EVENT *fe)
 		// Must clear the EVENT_READ flags in order to set IO event
 		// for each IO process.
 		fe->mask &= ~EVENT_READ;
-		fe->res   = 0;
+		fe->reader_ctx.res = 0;
 
 		if (fiber_wait_read(fe) < 0) {
 			return -1;
@@ -144,8 +144,8 @@ static int iocp_wait_read(FILE_EVENT *fe)
 			return -1;
 		}
 
-		if (fe->res >= 0) {
-			return fe->res;
+		if (fe->reader_ctx.res >= 0) {
+			return fe->reader_ctx.res;
 		}
 
 		err = acl_fiber_last_error();
@@ -168,14 +168,14 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 	 * which maybe used in iocp_add_read() and set for polling read status.
 	 */
 	if (fe->sock_type == SOCK_DGRAM && fe->rbuf == fe->packet
-		&& fe->res > 0) {
+		&& fe->reader_ctx.res > 0) {
 
-		if (fe->res < len) {
-			len = fe->res;
+		if (fe->reader_ctx.res < len) {
+			len = fe->reader_ctx.res;
 		}
 		memcpy(buf, fe->packet, len);
 		fe->rbuf = NULL;
-		fe->res  = 0;
+		fe->reader_ctx.res = 0;
 		return len;
 	}
 
@@ -530,14 +530,14 @@ static int iocp_wait_write(FILE_EVENT *fe)
 		int err;
 
 		fe->mask &= ~EVENT_WRITE;
-		fe->res = 0;
+		fe->writer_ctx.res = -1;
 
 		if (wait_write(fe) == -1) {
 			return -1;
 		}
 
-		if (fe->res >= 0) {
-			return fe->res;
+		if (fe->writer_ctx.res >= 0) {
+			return fe->writer_ctx.res;
 		}
 
 		err = acl_fiber_last_error();

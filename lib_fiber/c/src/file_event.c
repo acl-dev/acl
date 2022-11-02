@@ -26,6 +26,8 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	memset(&fe->in, 0, sizeof(fe->in));
 	memset(&fe->out, 0, sizeof(fe->out));
 	memset(&fe->var, 0, sizeof(fe->var));
+	memset(&fe->reader_ctx, 0, sizeof(fe->reader_ctx));
+	memset(&fe->writer_ctx, 0, sizeof(fe->writer_ctx));
 	fe->r_timeout = -1;
 	fe->w_timeout = -1;
 #endif
@@ -56,6 +58,7 @@ FILE_EVENT *file_event_alloc(socket_t fd)
 
 static void file_event_free(FILE_EVENT *fe)
 {
+	memset(fe, 0, sizeof(*fe));
 	mem_free(fe);
 }
 

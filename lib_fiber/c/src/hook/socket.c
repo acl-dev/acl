@@ -87,14 +87,14 @@ static socket_t fiber_iocp_accept(FILE_EVENT *fe)
 {
 	fe->mask &= ~EVENT_READ;
 	fe->mask |= EVENT_ACCEPT;
-	fe->res   = INVALID_SOCKET;
+	fe->reader_ctx.res = INVALID_SOCKET;
 
 	if (fiber_wait_read(fe) < 0) {
 		msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
 			__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
 		return INVALID_SOCKET;
 	}
-	return fe->res;
+	return fe->reader_ctx.res;
 }
 #endif
 
@@ -292,8 +292,8 @@ static socket_t fiber_iocp_connect(FILE_EVENT *fe)
 	}
 
 	fe->mask &= ~EVENT_CONNECT;
-	if (fe->res < 0) {
-		acl_fiber_set_error(-fe->res);
+	if (fe->writer_ctx.res < 0) {
+		acl_fiber_set_error(-fe->writer_ctx.res);
 		return -1;
 	}
 	return 0;

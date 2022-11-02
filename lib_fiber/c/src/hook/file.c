@@ -66,10 +66,10 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	fe->mask &= ~EVENT_FILE_CLOSE;
 
-	if (fe->res == 0) {
+	if (fe->reader_ctx.res == 0) {
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->res);
+		acl_fiber_set_error(-fe->reader_ctx.res);
 		return -1;
 	}
 }
@@ -109,14 +109,14 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 	free(fe->var.path);
 	fe->var.path = NULL;
 
-	if (fe->res >= 0) {
-		fe->fd   = fe->res;
+	if (fe->reader_ctx.res >= 0) {
+		fe->fd   = fe->reader_ctx.res;
 		fe->type = TYPE_FILE | TYPE_EVENTABLE;
 		fiber_file_set(fe);  // Save the fe for the future using.
 		return fe->fd;
 	}
 
-	acl_fiber_set_error(-fe->res);
+	acl_fiber_set_error(-fe->reader_ctx.res);
 	file_event_unrefer(fe);
 	return -1;
 }
@@ -162,11 +162,11 @@ int unlink(const char *pathname)
 	free(fe->var.path);
 	fe->var.path = NULL;
 
-	if (fe->res == 0) {
+	if (fe->reader_ctx.res == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->res);
+		acl_fiber_set_error(-fe->reader_ctx.res);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -204,11 +204,11 @@ int renameat2(int olddirfd, const char *oldpath,
 	free(fe->in.read_ctx.buf);
 	free(fe->var.path);
 
-	if (fe->res == 0) {
+	if (fe->reader_ctx.res == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->res);
+		acl_fiber_set_error(-fe->reader_ctx.res);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -257,13 +257,13 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	free(fe->in.read_ctx.buf);
 	fe->in.read_ctx.buf = NULL;
 
-	if (fe->res == 0) {
+	if (fe->reader_ctx.res == 0) {
 		memcpy(statxbuf, fe->var.statxbuf, sizeof(struct statx));
 		free(fe->var.statxbuf);
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->res);
+		acl_fiber_set_error(-fe->reader_ctx.res);
 		free(fe->var.statxbuf);
 		file_event_unrefer(fe);
 		return -1;
@@ -324,11 +324,11 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	fe->mask &= ~EVENT_DIR_MKDIRAT;
 	free(fe->var.path);
 
-	if (fe->res == 0) {
+	if (fe->reader_ctx.res == 0) {
 		file_event_unrefer(fe);
 		return 0;
 	} else {
-		acl_fiber_set_error(-fe->res);
+		acl_fiber_set_error(-fe->reader_ctx.res);
 		file_event_unrefer(fe);
 		return -1;
 	}
@@ -443,21 +443,21 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 
 	fe->mask &= ~EVENT_SPLICE;
 
-	if (fe->res < 0) {
-		acl_fiber_set_error(-fe->res);
+	if (fe->reader_ctx.res < 0) {
+		acl_fiber_set_error(-fe->reader_ctx.res);
 		file_event_unrefer(fe);
 		return -1;
 	}
 	
 	if (off_in != -1 && poff_in) {
-		*poff_in += fe->res;
+		*poff_in += fe->reader_ctx.res;
 	}
 
 	if (off_out != -1 && poff_out) {
-		*poff_out += fe->res;
+		*poff_out += fe->reader_ctx.res;
 	}
 
-	ret = fe->res;
+	ret = fe->reader_ctx.res;
 	file_event_unrefer(fe);
 	return ret;
 }

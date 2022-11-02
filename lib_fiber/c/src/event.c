@@ -166,6 +166,12 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 			acl_fiber_set_error(0);
 			return 0;
 		}
+#if defined(HAS_IO_URING)
+	} else if (EVENT_IS_IO_URING(ev)) {
+		fe->type = TYPE_FILE | TYPE_EVENTABLE;
+		acl_fiber_set_error(0);
+		return 1;
+#endif
 	} else {
 		fe->type = TYPE_FILE;
 		acl_fiber_set_error(0);
@@ -250,20 +256,24 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		return 0;
 	}
 
+	fe->r_proc = proc;
+
 	if (fe->oper & EVENT_DEL_READ) {
 		fe->oper &= ~EVENT_DEL_READ;
 	}
 
 	if (!(fe->mask & EVENT_READ)) {
+		if (EVENT_IS_IO_URING(ev)) {
+			ev->add_read(ev, fe);
+		}
 		// we should check the fd's type for the first time.
-		if (fe->me.parent == &fe->me) {
+		else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
 		fe->oper |= EVENT_ADD_READ;
 	}
 
-	fe->r_proc = proc;
 	return 1;
 }
 
@@ -293,19 +303,22 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		return 0;
 	}
 
+	fe->w_proc = proc;
+
 	if (fe->oper & EVENT_DEL_WRITE) {
 		fe->oper &= ~EVENT_DEL_WRITE;
 	}
 
 	if (!(fe->mask & EVENT_WRITE)) {
-		if (fe->me.parent == &fe->me) {
+		if (EVENT_IS_IO_URING(ev)) {
+			ev->add_write(ev, fe);
+		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
 		fe->oper |= EVENT_ADD_WRITE;
 	}
 
-	fe->w_proc = proc;
 	return 1;
 }
 

@@ -21,6 +21,8 @@
 #include "common/iostuff.h"
 #include "fiber.h"
 
+//#undef	HAS_EVENTFD
+
 void fbase_event_open(FIBER_BASE *fbase)
 {
 #if defined(HAS_EVENTFD)
@@ -55,8 +57,10 @@ void fbase_event_open(FIBER_BASE *fbase)
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
 
-	non_blocking(fbase->event_in, 1);
-	non_blocking(fbase->event_out, 1);
+	//if (!EVENT_IS_IO_URING(fiber_io_event())) {
+		non_blocking(fbase->event_in, 1);
+		non_blocking(fbase->event_out, 1);
+	//}
 }
 
 void fbase_event_close(FIBER_BASE *fbase)
@@ -76,20 +80,27 @@ int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
 	int  ret, interrupt = 0, err;
+	FILE_EVENT *fe;
 
 	if (fbase->event_in == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s: invalid event_in=%d",
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
 
+	fe = fiber_file_open_read(fbase->event_in);
+	fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+
 	while (1) {
 		//if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
+#if 1
 		if (read_wait(fbase->event_in, -1) == -1) {
 			msg_error("%s(%d), %s: read_wait error=%s, fd=%d",
 				__FILE__, __LINE__, __FUNCTION__,
 				last_serror(), fbase->event_in);
 			return -1;
 		}
+#endif
+
 #ifdef SYS_WIN
 		ret = (int) acl_fiber_recv(fbase->event_in, (char*) &n, sizeof(n), 0);
 #else
@@ -141,6 +152,7 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
 	int  ret, interrupt = 0;
+	FILE_EVENT *fe;
 
 	/**
 	 * if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
@@ -154,6 +166,9 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 			fbase, (int) fbase->event_out);
 	}
 
+	fe = fiber_file_open_write(fbase->event_out);
+	fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+
 	while (1) {
 #ifdef SYS_WIN
 		ret = (int) acl_fiber_send(fbase->event_out, (char*) &n, sizeof(n), 0);
@@ -166,9 +181,11 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 		}
 
 		if (ret >= 0) {
-			msg_fatal("%s(%d), %s: write ret=%d invalid length, "
-				"interrupt=%d", __FILE__, __LINE__,
-				__FUNCTION__, ret, interrupt);
+			msg_fatal("%s(%d), %s: fiber=%d, write ret=%d invalid"
+				" length, interrupt=%d, fd=%d",
+				__FILE__, __LINE__, __FUNCTION__,
+				acl_fiber_self(), ret, interrupt,
+				(int) fbase->event_out);
 		}
 
 		if (acl_fiber_last_error() == EINTR) {

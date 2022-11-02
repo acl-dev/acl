@@ -60,6 +60,15 @@ typedef void epoll_proc(EVENT *ev, EPOLL_EVENT *ee);
 typedef struct IOCP_EVENT IOCP_EVENT;
 #endif
 
+#ifdef HAS_IO_URING
+typedef struct IO_URING_CTX {
+	FILE_EVENT *fe;
+	int res;
+	int cnt;
+	unsigned mask;
+} IO_URING_CTX;
+#endif
+
 /**
  * for each connection fd
  */
@@ -238,8 +247,6 @@ struct FILE_EVENT {
 		} sendmsg_ctx;
 	} out;
 
-	int res;
-
 	union {
 		struct {
 			struct sockaddr_in addr;
@@ -250,6 +257,8 @@ struct FILE_EVENT {
 		char  *path;
 	} var;
 
+	struct IO_URING_CTX reader_ctx;
+	struct IO_URING_CTX writer_ctx;
 	struct __kernel_timespec rts;
 	struct __kernel_timespec wts;
 	int           r_timeout;
