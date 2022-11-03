@@ -52,15 +52,32 @@ void fbase_event_open(FIBER_BASE *fbase)
 	fbase->event_out = fds[1];
 #endif
 
+#if defined(HAS_IO_URING)
+	FILE_EVENT *fe;
+#endif
+
 	if (fbase->event_in == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s event_in(%d) invalid",
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
 
-	//if (!EVENT_IS_IO_URING(fiber_io_event())) {
-		non_blocking(fbase->event_in, 1);
-		non_blocking(fbase->event_out, 1);
-	//}
+#if defined(HAS_IO_URING)
+	non_blocking(fbase->event_in, 0);
+	non_blocking(fbase->event_out, 0);
+
+	fe = fiber_file_open_read(fbase->event_in);
+	fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+	fe->mask = EVENT_SYSIO;
+
+	if (fbase->event_in != fbase->event_out) {
+		fe = fiber_file_open_write(fbase->event_out);
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		fe->mask = EVENT_SYSIO;
+	}
+#else
+	non_blocking(fbase->event_in, 1);
+	non_blocking(fbase->event_out, 1);
+#endif
 }
 
 void fbase_event_close(FIBER_BASE *fbase)
@@ -80,15 +97,12 @@ int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
 	int  ret, interrupt = 0, err;
-	FILE_EVENT *fe;
 
 	if (fbase->event_in == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s: invalid event_in=%d",
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
 
-	fe = fiber_file_open_read(fbase->event_in);
-	fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 
 	while (1) {
 		//if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
@@ -152,7 +166,6 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
 	int  ret, interrupt = 0;
-	FILE_EVENT *fe;
 
 	/**
 	 * if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
@@ -165,9 +178,6 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 			__FILE__, __LINE__, __FUNCTION__,
 			fbase, (int) fbase->event_out);
 	}
-
-	fe = fiber_file_open_write(fbase->event_out);
-	fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 
 	while (1) {
 #ifdef SYS_WIN
@@ -197,9 +207,9 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 			continue;
 		}
 
-		msg_error("%s(%d), %s: write error %s, out=%d, ret=%d, "
+		msg_error("%s(%d), %s: write error %s, fb=%p, out=%d, ret=%d, "
 			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
-			last_serror(), (int) fbase->event_out, ret, interrupt);
+			last_serror(), fbase, (int) fbase->event_out, ret, interrupt);
 		return -1;
 	}
 

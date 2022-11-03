@@ -461,8 +461,12 @@ static void handle_one(EVENT *ev, IO_URING_CTX *ctx, int res)
 	if (fe->mask & FLAGS) {
 		fe->r_proc(ev, fe);
 	} else {
-		msg_error("%s(%d): unknown mask=%u",
-			__FUNCTION__, __LINE__, (fe->mask & ~FLAGS));
+		msg_error("%s(%d): unknown mask=%u, fd=%d, fe=%p, "
+			"EVENT_SYSIO=%s, EVENT_READ=%s, EVENT_POLLIN=%s",
+			__FUNCTION__, __LINE__, (fe->mask & ~FLAGS), fe->fd, fe,
+			fe->mask & EVENT_SYSIO ? "yes" : "no",
+			fe->mask & EVENT_READ ? "yes" : "no",
+			fe->mask & EVENT_POLLIN ? "yes" : "no");
 	}
 }
 
