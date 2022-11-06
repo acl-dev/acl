@@ -185,7 +185,8 @@ SRC = $(wildcard $(SRC_PATH_SRC)/*.c) \
       $(wildcard $(SRC_PATH_SRC)/dns/*.c) \
       $(wildcard $(SRC_PATH_SRC)/fiber/*.c) \
       $(wildcard $(SRC_PATH_SRC)/event/*.c) \
-      $(wildcard $(SRC_PATH_SRC)/hook/*.c)
+      $(wildcard $(SRC_PATH_SRC)/hook/*.c) \
+      $(wildcard $(SRC_PATH_SRC)/sync/*.c)
 
 #ASM_OBJ=$(OBJ_PATH_DST)/setjmp.o $(OBJ_PATH_DST)/make_gas.o $(OBJ_PATH_DST)/jump_gas.o
 ASM_OBJ=$(OBJ_PATH_DST)/make_gas.o $(OBJ_PATH_DST)/jump_gas.o

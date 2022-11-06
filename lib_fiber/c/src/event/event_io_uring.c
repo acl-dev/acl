@@ -150,7 +150,7 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 
 	fe->mask |= EVENT_WRITE;
 	fe->writer_ctx.mask = EVENT_WRITE;
-	fe->writer_ctx.cnt++;
+	//fe->writer_ctx.cnt++;
 
 	if (LIKELY(!(fe->mask & (EVENT_POLLOUT | EVENT_CONNECT)))) {
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
@@ -437,7 +437,7 @@ static void handle_one(EVENT *ev, IO_URING_CTX *ctx, int res)
 	}
 
 	if (ctx == &fe->writer_ctx && ctx->mask == EVENT_WRITE && fe->w_proc) {
-		fe->writer_ctx.cnt--;
+		//fe->writer_ctx.cnt--;
 		fe->mask &= ~EVENT_WRITE;
 		ctx->mask = 0;
 		handle_write(ev, fe, res);

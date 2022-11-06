@@ -64,7 +64,7 @@ typedef struct IOCP_EVENT IOCP_EVENT;
 typedef struct IO_URING_CTX {
 	FILE_EVENT *fe;
 	int res;
-	int cnt;
+	//int cnt;
 	unsigned mask;
 } IO_URING_CTX;
 #endif
