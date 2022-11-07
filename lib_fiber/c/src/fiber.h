@@ -40,6 +40,8 @@ typedef struct FIBER_BASE {
 	RING     event_waiter;
 } FIBER_BASE;
 
+typedef struct SYNC_WAITER SYNC_WAITER;
+
 struct ACL_FIBER {
 	FIBER_BASE     base;
 	fiber_status_t status;
@@ -60,7 +62,8 @@ struct ACL_FIBER {
 #define	FIBER_F_CANCELED	(FIBER_F_KILLED | FIBER_F_CLOSED | FIBER_F_SIGNALED)
 
 	RING           holding;
-	ACL_FIBER_MUTEX *waiting;
+	ACL_FIBER_LOCK *waiting;
+	SYNC_WAITER   *waiter;
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;

@@ -1,7 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 
-struct ACL_FIBER_MUTEX;
+struct ACL_FIBER_LOCK;
 struct ACL_FIBER_RWLOCK;
 
 namespace acl {
@@ -9,11 +9,11 @@ namespace acl {
 /**
  * 仅能用于同一线程内部的协程之间进行互斥的互斥锁
  */
-class FIBER_CPP_API fiber_mutex
+class FIBER_CPP_API fiber_lock
 {
 public:
-	fiber_mutex(void);
-	~fiber_mutex(void);
+	fiber_lock(void);
+	~fiber_lock(void);
 
 	/**
 	 * 等待互斥锁
@@ -34,10 +34,10 @@ public:
 	bool unlock(void);
 
 private:
-	ACL_FIBER_MUTEX* lock_;
+	ACL_FIBER_LOCK* lock_;
 
-	fiber_mutex(const fiber_mutex&);
-	void operator=(const fiber_mutex&);
+	fiber_lock(const fiber_lock&);
+	void operator=(const fiber_lock&);
 };
 
 /**

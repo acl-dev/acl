@@ -3,17 +3,17 @@
 #include "msg.h"
 #include "array.h"
 
-static void array_push_back(struct ARRAY *a, void *obj)
+void array_push_back(struct ARRAY *a, void *obj)
 {
 	array_append(a, obj);
 }
 
-static void array_push_front(struct ARRAY *a, void *obj)
+void array_push_front(struct ARRAY *a, void *obj)
 {
 	array_prepend(a, obj);
 }
 
-static void *array_pop_back(struct ARRAY *a)
+void *array_pop_back(struct ARRAY *a)
 {
 	void *obj;
 	if (a->count <= 0) {
@@ -24,7 +24,7 @@ static void *array_pop_back(struct ARRAY *a)
 	return obj;
 }
 
-static void *array_pop_front(struct ARRAY *a)
+void *array_pop_front(struct ARRAY *a)
 {
 	void *obj;
 	int   i;
@@ -136,12 +136,12 @@ static void array_grow(ARRAY *a, int min_capacity)
 		(a->capacity - a->count) * sizeof(void *));
 }
 
-ARRAY *array_create(int init_size)
+ARRAY *array_create(int init_size, unsigned flags)
 {
 	ARRAY *a;
 
 	a = (ARRAY *) mem_calloc(1, sizeof(ARRAY));
-
+	a->flags      = flags;
 	a->push_back  = array_push_back;
 	a->push_front = array_push_front;
 	a->pop_back   = array_pop_back;
@@ -261,48 +261,39 @@ int array_prepend(ARRAY *a, void *obj)
 	return array_pred_insert(a, 0, obj);
 }
 
-int array_delete_idx(ARRAY *a, int position, void (*free_fn)(void *))
+int array_delete(ARRAY *a, int pos, void (*free_fn)(void*))
 {
-	int	idx;
-
-	if (position < 0 || position >= a->count) {
-		return -1;
-	}
-	if (free_fn != NULL && a->items[position] != NULL) {
-		free_fn(a->items[position]);
-	}
-	a->items[position] = NULL;   /* sanity set to be null */
-
-	for (idx = position; idx < a->count - 1; idx++) {
-		a->items[idx] = a->items[idx + 1];
-	}
-	a->count--;
-	return 0;
-}
-
-int array_delete(ARRAY *a, int idx, void (*free_fn)(void*))
-{
-	if (idx < 0 || idx >= a->count) {
+	if (pos < 0 || pos >= a->count) {
 		return  -1;
 	}
-	if (free_fn != NULL && a->items[idx] != NULL) {
-		free_fn(a->items[idx]);
+
+	if (free_fn != NULL && a->items[pos] != NULL) {
+		free_fn(a->items[pos]);
 	}
-	a->count--;
-	if (a->count > 0) {
-		a->items[idx] = a->items[a->count];
+
+	if (a->flags & ARRAY_F_UNORDER) {
+		a->count--;
+		if (a->count > 0) {
+			a->items[pos] = a->items[a->count];
+		}
+	} else {
+		int i;
+		for (i = pos; i < a->count - 1; i++) {
+			a->items[i] = a->items[i + 1];
+		}
+		a->count--;
 	}
+
 	return 0;
 }
 
 int array_delete_obj(ARRAY *a, void *obj, void (*free_fn)(void *))
 {
-	int   idx, position, ret;
+	int   idx, pos = -1;
 
-	position = -1;
 	for (idx = 0; idx < a->count; idx++) {
 		if (a->items[idx] == obj) {
-			position = idx;
+			pos = idx;
 			break;
 		}
 	}
@@ -310,17 +301,12 @@ int array_delete_obj(ARRAY *a, void *obj, void (*free_fn)(void *))
 	if (free_fn != NULL && obj != NULL) {
 		free_fn(obj);
 	}
-	if (position == -1) { /* not found */
+	if (pos == -1) { /* not found */
 		return -1;
 	}
 
-	/* don't need to free the obj in array_delete_idx */
-	a->items[idx] = NULL;
-	ret = array_delete_idx(a, position, NULL);
-	if (ret < 0) {
-		return -1;
-	}
-	return ret;
+	/* don't need to free the obj in array_delete */
+	return array_delete(a, pos, NULL);
 }
 
 int array_delete_range(ARRAY *a, int ibegin, int iend,
@@ -331,6 +317,7 @@ int array_delete_range(ARRAY *a, int ibegin, int iend,
 	if (ibegin < 0 || iend < 0 || a->count <= 0) {
 		return -1;
 	}
+
 	if (ibegin > iend) {
 		return -1;
 	}
@@ -422,4 +409,22 @@ void *array_index(const ARRAY *a, int idx)
 int array_size(const ARRAY *a)
 {
 	return a->count;
+}
+
+void *array_head(ARRAY *a)
+{
+	if (a->count > 0) {
+		return a->items[0];
+	} else {
+		return NULL;
+	}
+}
+
+void *array_tail(ARRAY *a)
+{
+	if (a->count > 0) {
+		return a->items[a->count - 1];
+	} else {
+		return NULL;
+	}
 }

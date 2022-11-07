@@ -13,7 +13,7 @@ extern "C" {
  * Fiber mutex, thread unsafety, one fiber mutex can only be used in the
  * same thread, otherwise the result is unpredictable
  */
-typedef struct ACL_FIBER_MUTEX ACL_FIBER_MUTEX;
+typedef struct ACL_FIBER_LOCK ACL_FIBER_LOCK;
 
 /**
  * Fiber read/write mutex, thread unsafety, can only be used in the sampe thread
@@ -22,37 +22,37 @@ typedef struct ACL_FIBER_RWLOCK ACL_FIBER_RWLOCK;
 
 /**
  * Create one fiber mutex, can only be used in the same thread
- * @return {ACL_FIBER_MUTEX*} fiber mutex returned
+ * @return {ACL_FIBER_LOCK*} fiber mutex returned
  */
-FIBER_API ACL_FIBER_MUTEX* acl_fiber_mutex_create(void);
+FIBER_API ACL_FIBER_LOCK* acl_fiber_lock_create(void);
 
 /**
- * Free fiber mutex created by acl_fiber_mutex_create
- * @param l {ACL_FIBER_MUTEX*} created by acl_fiber_mutex_create
+ * Free fiber mutex created by acl_fiber_lock_create
+ * @param l {ACL_FIBER_LOCK*} created by acl_fiber_lock_create
  */
-FIBER_API void acl_fiber_mutex_free(ACL_FIBER_MUTEX* l);
+FIBER_API void acl_fiber_lock_free(ACL_FIBER_LOCK* l);
 
 /**
  * Lock the specified fiber mutex, return immediately when locked, or will
  * wait until the mutex can be used
- * @param l {ACL_FIBER_MUTEX*} created by acl_fiber_mutex_create
+ * @param l {ACL_FIBER_LOCK*} created by acl_fiber_lock_create
  */
-FIBER_API void acl_fiber_mutex_lock(ACL_FIBER_MUTEX* l);
+FIBER_API void acl_fiber_lock_lock(ACL_FIBER_LOCK* l);
 
 /**
  * Try lock the specified fiber mutex, return immediately no matter the mutex
  * can be locked.
- * @param l {ACL_FIBER_MUTEX*} created by acl_fiber_mutex_create
+ * @param l {ACL_FIBER_LOCK*} created by acl_fiber_lock_create
  * @return {int} 0 returned when locking successfully, -1 when locking failed
  */
-FIBER_API int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX* l);
+FIBER_API int acl_fiber_lock_trylock(ACL_FIBER_LOCK* l);
 
 /**
  * The fiber mutex be unlock by its owner fiber, fatal will happen when others
  * release the fiber mutex
- * @param l {ACL_FIBER_MUTEX*} created by acl_fiber_mutex_create
+ * @param l {ACL_FIBER_LOCK*} created by acl_fiber_lock_create
  */
-FIBER_API void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX* l);
+FIBER_API void acl_fiber_lock_unlock(ACL_FIBER_LOCK* l);
 
 /****************************************************************************/
 

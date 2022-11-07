@@ -176,7 +176,7 @@ static EPOLL *epoll_alloc(int epfd)
 				__FILE__, __LINE__, __FUNCTION__, last_serror());
 		}
 
-		__epfds = array_create(5);
+		__epfds = array_create(5, ARRAY_F_UNORDER);
 		if (__pthread_self() == main_thread_self()) {
 			__main_epfds = __epfds;
 			atexit(main_thread_free);

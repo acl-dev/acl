@@ -14,7 +14,9 @@ typedef	struct ARRAY ARRAY;
 struct ARRAY{
 	int     capacity;	/**< items 数组空间大小 */
 	int     count;		/**< items 中含有元素的个数 */
-	void    **items;	/**< 动态数组 */
+	void  **items;		/**< 动态数组 */
+	unsigned flags;
+#define	ARRAY_F_UNORDER		(1 << 0)	/* 是否按添加顺序存放 */
 
 	/* 添加及弹出 */
 
@@ -42,9 +44,10 @@ struct ARRAY{
 /**
  * 创建一个动态数组
  * @param init_size {int} 动态数组的初始大小
+ * @param flags {unsigned} 所创建动态数组的属性标志
  * @return {ARRAY*} 动态数组指针
  */
-ARRAY *array_create(int init_size);
+ARRAY *array_create(int init_size, unsigned flags);
 
 /**
  * 释放掉动态数组内的成员变量，但并不释放动态数组对象
@@ -102,23 +105,23 @@ int array_succ_insert(ARRAY *a, int position, void *obj);
  * 如果被删除位置在中间某个位置，为了保证元素的顺序性，内部将被删除元素后的所有元素
  * 都前移一个位置
  * @param a {ARRAY*} 动态数组指针
- * @param position {int} 某个位置，不得越界
+ * @param pos {int} 某个位置，不得越界
  * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
  *  指针为空，则不释放，否则用此函数进行释放动态对象
  * @return {int} 0: 成功；-1: 失败
  */
-int array_delete_idx(ARRAY *a, int position, void (*free_fn)(void *));
+int array_delete_idx(ARRAY *a, int pos, void (*free_fn)(void *));
 
 /**
  * 从动态数组中的指定位置删除某个对象，删除后数组内元素的先后顺序有可能发生了改变,
  * 因为删除后会自动将数组中最后的元素移至该位置处
  * @param a {ARRAY*} 动态数组指针
- * @param position {int} 某个位置，不得越界
+ * @param pos {int} 某个位置，不得越界
  * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
  *  指针为空，则不释放，否则用此函数进行释放动态对象
  * @return {int} 0: 成功；-1: 失败
  */
-int array_delete(ARRAY *a, int position, void (*free_fn)(void*));
+int array_delete(ARRAY *a, int pos, void (*free_fn)(void*));
 
 /**
  * 从动态数组中删除指定指针地址的动态对象, 删除后数组内元素的先后顺序保持不变
@@ -176,6 +179,13 @@ void *array_index(const ARRAY *a, int idx);
  * @return {int} 动态数组中动态对象的个数
  */
 int array_size(const ARRAY *a);
+
+void *array_head(ARRAY *a);
+void *array_tail(ARRAY *a);
+void array_push_back(struct ARRAY *a, void *obj);
+void array_push_front(struct ARRAY *a, void *obj);
+void *array_pop_back(struct ARRAY *a);
+void *array_pop_front(struct ARRAY *a);
 
 #ifdef  __cplusplus
 }

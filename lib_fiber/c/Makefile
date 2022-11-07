@@ -264,6 +264,8 @@ $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/event/%.c
 	$(COMPILE) $< -o $@
 $(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/hook/%.c
 	$(COMPILE) $< -o $@
+$(OBJ_PATH_DST)/%.o: $(SRC_PATH_SRC)/sync/%.c
+	$(COMPILE) $< -o $@
 
 clean cl:
 	rm -f $(LIB_PATH_DST)/${STATIC_LIBNAME}

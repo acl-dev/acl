@@ -114,10 +114,10 @@ static void fiber_server(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void fiber_lock(ACL_FIBER *fiber, void *ctx)
 {
-	ACL_FIBER_MUTEX *lock = (ACL_FIBER_MUTEX *) ctx;
+	ACL_FIBER_LOCK *lock = (ACL_FIBER_LOCK *) ctx;
 
 	printf("lock fiber-%d: begin to lock\r\n", acl_fiber_self());
-	acl_fiber_mutex_lock(lock);
+	acl_fiber_lock_lock(lock);
 	if (acl_fiber_killed(fiber))
 		printf("lock fiber-%d: killed\r\n", acl_fiber_self());
 	else {
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 {
 	int  ch;
 	ACL_FIBER_SEM *sem;
-	ACL_FIBER_MUTEX *lock;
+	ACL_FIBER_LOCK *lock;
 
 	acl_msg_stdout_enable(1);
 
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
 	}
 
 	sem = acl_fiber_sem_create(0);
-	lock = acl_fiber_mutex_create();
+	lock = acl_fiber_lock_create();
 
 	__fiber_wait1  = acl_fiber_create(fiber_wait, sem, 320000);
 	__fiber_wait2  = acl_fiber_create(fiber_wait, sem, 320000);
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
 
 	acl_fiber_schedule();
 	acl_fiber_sem_free(sem);
-	acl_fiber_mutex_free(lock);
+	acl_fiber_lock_free(lock);
 
 	return 0;
 }

@@ -3,29 +3,29 @@
 
 namespace acl {
 
-fiber_mutex::fiber_mutex(void)
+fiber_lock::fiber_lock(void)
 {
-	lock_ = acl_fiber_mutex_create();
+	lock_ = acl_fiber_lock_create();
 }
 
-fiber_mutex::~fiber_mutex(void)
+fiber_lock::~fiber_lock(void)
 {
-	acl_fiber_mutex_free(lock_);
+	acl_fiber_lock_free(lock_);
 }
 
-bool fiber_mutex::lock(void)
+bool fiber_lock::lock(void)
 {
-	acl_fiber_mutex_lock(lock_);
+	acl_fiber_lock_lock(lock_);
 	return true;
 }
 
-bool fiber_mutex::trylock(void)
+bool fiber_lock::trylock(void)
 {
-	return acl_fiber_mutex_trylock(lock_) == 0 ? true : false;
+	return acl_fiber_lock_trylock(lock_) == 0 ? true : false;
 }
-bool fiber_mutex::unlock(void)
+bool fiber_lock::unlock(void)
 {
-	acl_fiber_mutex_unlock(lock_);
+	acl_fiber_lock_unlock(lock_);
 	return true;
 }
 

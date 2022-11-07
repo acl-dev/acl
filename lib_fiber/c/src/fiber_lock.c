@@ -4,7 +4,7 @@
 #include "fiber/libfiber.h"
 #include "fiber.h"
 
-struct ACL_FIBER_MUTEX {
+struct ACL_FIBER_LOCK {
 	RING       me;
 	ACL_FIBER *owner;
 	RING       waiting;
@@ -17,9 +17,10 @@ struct ACL_FIBER_RWLOCK {
 	RING       wwaiting;
 };
 
-ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
+ACL_FIBER_LOCK *acl_fiber_lock_create(void)
 {
-	ACL_FIBER_MUTEX *lk = (ACL_FIBER_MUTEX *) mem_malloc(sizeof(ACL_FIBER_MUTEX));
+	ACL_FIBER_LOCK *lk = (ACL_FIBER_LOCK *)
+		mem_malloc(sizeof(ACL_FIBER_LOCK));
 
 	lk->owner = NULL;
 	ring_init(&lk->me);
@@ -27,12 +28,12 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(void)
 	return lk;
 }
 
-void acl_fiber_mutex_free(ACL_FIBER_MUTEX *lk)
+void acl_fiber_lock_free(ACL_FIBER_LOCK *lk)
 {
 	mem_free(lk);
 }
 
-static int __lock(ACL_FIBER_MUTEX *lk, int block)
+static int __lock(ACL_FIBER_LOCK *lk, int block)
 {
 	ACL_FIBER *curr = acl_fiber_running();
 	EVENT *ev;
@@ -79,12 +80,12 @@ static int __lock(ACL_FIBER_MUTEX *lk, int block)
 	return -1;
 }
 
-void acl_fiber_mutex_lock(ACL_FIBER_MUTEX *lk)
+void acl_fiber_lock_lock(ACL_FIBER_LOCK *lk)
 {
 	__lock(lk, 1);
 }
 
-int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *lk)
+int acl_fiber_lock_trylock(ACL_FIBER_LOCK *lk)
 {
 	return __lock(lk, 0) ? 0 : -1;
 }
@@ -95,7 +96,7 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *lk)
 #define FIRST_FIBER(head) \
     (ring_succ(head) != (head) ? RING_TO_FIBER(ring_succ(head)) : 0)
 
-void acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *lk)
+void acl_fiber_lock_unlock(ACL_FIBER_LOCK *lk)
 {
 	ACL_FIBER *ready, *curr = acl_fiber_running();
 	
