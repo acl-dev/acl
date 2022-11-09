@@ -43,27 +43,12 @@ void acl_fiber_mutex_free(ACL_FIBER_MUTEX *mutex)
 
 int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 {
-	int wakeup;
+	int wakeup = 0;
 	EVENT *ev;
 	ACL_FIBER *fiber;
 
-	if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
-		pthread_mutex_lock(&mutex->thread_lock);
-		return 0;
-	}
-
-	wakeup = 0;
-
-	if (var_hook_sys_api) {
-		pthread_mutex_lock(&mutex->lock);
-	}
-
 	while (1) {
 		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
-			if (var_hook_sys_api) {
-				pthread_mutex_unlock(&mutex->lock);
-			}
-
 			pthread_mutex_lock(&mutex->thread_lock);
 			return 0;
 		}
@@ -75,7 +60,7 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 
 			if (++wakeup > 5) {
 				wakeup = 0;
-				sleep(1);
+				acl_fiber_delay(100);
 			}
 			continue;
 		}
@@ -83,8 +68,18 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 		fiber = acl_fiber_running();
 		fiber->waiter = sync_waiter_get();
 		sync_waiter_append(fiber->waiter, fiber);
-		array_append(mutex->waiters, fiber);
 
+#if 0
+		{
+			ITER iter;
+			foreach(iter, mutex->waiters) {
+				ACL_FIBER *fb = (ACL_FIBER*) iter.data;
+				assert(fb != fiber);
+			}
+		}
+#endif
+		pthread_mutex_lock(&mutex->lock);
+		array_append(mutex->waiters, fiber);
 		pthread_mutex_unlock(&mutex->lock);
 
 		ev = fiber_io_event();
@@ -94,9 +89,8 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 
 		if (++wakeup > 5) {
 			wakeup = 0;
-			sleep(1);
+			acl_fiber_delay(100);
 		}
-		pthread_mutex_lock(&mutex->lock);
 	}
 }
 
@@ -106,21 +100,27 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 
 	pthread_mutex_lock(&mutex->lock);
 	fiber = (ACL_FIBER*) array_head(mutex->waiters);
+	(void) array_pop_front(mutex->waiters);
+	pthread_mutex_unlock(&mutex->lock);
+	pthread_mutex_unlock(&mutex->thread_lock);
 
 	if (atomic_int64_cas(mutex->atomic, 1, 0) != 1) {
-		pthread_mutex_unlock(&mutex->lock);
 		return -1;
 	}
 
-	(void) array_pop_front(mutex->waiters);
-
-	pthread_mutex_unlock(&mutex->lock);
-
-	pthread_mutex_unlock(&mutex->thread_lock);
-
 	if (fiber) {
+#if 0
+		if (fiber->status == FIBER_STATUS_READY) {
+			printf("fiber already ready\n");
+		}
+#endif
 		sync_waiter_wakeup(fiber->waiter, fiber);
 	}
 
+#if 0
+	if (var_hook_sys_api) {
+		acl_fiber_yield();
+	}
+#endif
 	return 0;
 }

@@ -427,6 +427,10 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		ring_prepend(&__thread_fiber->dead, &from->me);
 	}
 
+	if (to->status != FIBER_STATUS_EXITING) {
+		to->status = FIBER_STATUS_RUNNING;
+	}
+
 	from->swap_fn(from, to);
 }
 
