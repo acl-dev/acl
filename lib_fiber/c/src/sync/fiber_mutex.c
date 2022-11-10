@@ -69,7 +69,7 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 		fiber->waiter = sync_waiter_get();
 		sync_waiter_append(fiber->waiter, fiber);
 
-#if 0
+#if 1
 		{
 			ITER iter;
 			foreach(iter, mutex->waiters) {
@@ -102,18 +102,13 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	fiber = (ACL_FIBER*) array_head(mutex->waiters);
 	(void) array_pop_front(mutex->waiters);
 	pthread_mutex_unlock(&mutex->lock);
-	pthread_mutex_unlock(&mutex->thread_lock);
 
+	pthread_mutex_unlock(&mutex->thread_lock);
 	if (atomic_int64_cas(mutex->atomic, 1, 0) != 1) {
 		return -1;
 	}
 
 	if (fiber) {
-#if 0
-		if (fiber->status == FIBER_STATUS_READY) {
-			printf("fiber already ready\n");
-		}
-#endif
 		sync_waiter_wakeup(fiber->waiter, fiber);
 	}
 

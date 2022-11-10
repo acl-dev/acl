@@ -42,11 +42,16 @@ static void test1(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
+static int __event_type = FIBER_EVENT_KERNEL;
+static int __use_yield = 0;
+static int __use_event = 0;
 static ACL_FIBER_MUTEX **__locks;
+static ACL_FIBER_EVENT **__events;
 static int __nlocks = 10, __nloop = 100;
 static __thread int __nfibers = 10;
 static ACL_ATOMIC *__atomic;
 static long long __atomic_value;
+static __thread int __count = 0;
 
 static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
@@ -59,14 +64,43 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		acl_fiber_mutex_unlock(l);
 		acl_atomic_int64_add_fetch(__atomic, 1);
 		//acl_fiber_delay(1);
-		//acl_fiber_yield();
+		if (__use_yield) {
+			acl_fiber_yield();
+		}
+		__count++;
 	}
 
-	//printf(">>>thread-%lu, fiber-%d over\r\n",
-	//	pthread_self(), acl_fiber_self());
+	//printf(">>>thread-%lu, fiber-%d over\r\n", pthread_self(), acl_fiber_self());
 
 	if (--__nfibers == 0) {
-		printf("thread-%lu, all fibers over!\r\n", pthread_self());
+		printf("thread-%lu, all fibers over, count=%d!\r\n",
+			pthread_self(), __count);
+		acl_fiber_schedule_stop();
+	}
+}
+
+static void fiber_main3(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+{
+	int i;
+	ACL_FIBER_EVENT *l;
+
+	for (i = 0; i < __nloop; i++) {
+		l = __events[i % __nlocks];
+		acl_fiber_event_wait(l);
+		acl_fiber_event_notify(l);
+		acl_atomic_int64_add_fetch(__atomic, 1);
+		//acl_fiber_delay(1);
+		if (__use_yield) {
+			acl_fiber_yield();
+		}
+		__count++;
+	}
+
+	//printf(">>>thread-%lu, fiber-%d over\r\n", pthread_self(), acl_fiber_self());
+
+	if (--__nfibers == 0) {
+		printf("thread-%lu, all fibers over, count=%d\r\n",
+			pthread_self(), __count);
 		acl_fiber_schedule_stop();
 	}
 }
@@ -78,10 +112,14 @@ static void *thread_main(void *arg acl_unused)
 	__nfibers = __fibers_count;
 
 	for (i = 0; i < __fibers_count; i++) {
-		acl_fiber_create(fiber_main2, NULL, 320000);
+		if (__use_event) {
+			acl_fiber_create(fiber_main3, NULL, 320000);
+		} else {
+			acl_fiber_create(fiber_main2, NULL, 320000);
+		}
 	}
 
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(__event_type);
 	return NULL;
 }
 
@@ -94,8 +132,10 @@ static void test2(int nthreads)
 	long long n;
 
 	__locks = (ACL_FIBER_MUTEX**) malloc(__nlocks * sizeof(ACL_FIBER_MUTEX*));
+	__events = (ACL_FIBER_EVENT**) malloc(__nlocks * sizeof(ACL_FIBER_EVENT*));
 	for (i = 0; i < __nlocks; i++) {
 		__locks[i] = acl_fiber_mutex_create(0);
+		__events[i] = acl_fiber_event_create(FIBER_FLAG_USE_MUTEX);
 	}
 
 	__atomic = acl_atomic_new();
@@ -123,20 +163,25 @@ static void test2(int nthreads)
 
 	for (i = 0; i < __nlocks; i++) {
 		acl_fiber_mutex_free(__locks[i]);
+		acl_fiber_event_free(__events[i]);
 	}
 
 	free(__locks);
+	free(__events);
 	acl_atomic_free(__atomic);
 }
 
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -e schedule_event_type[kernel|poll|select|io_uring]\r\n"
 		" -a action\r\n"
 		" -t threads_count\r\n"
 		" -c fibers_count\r\n"
 		" -n loop_count\r\n"
 		" -l locks_count\r\n"
+		" -E [if use fiber_event]\r\n"
+		" -Y [if yield after unlock]\r\n"
 		, procname);
 }
 
@@ -147,11 +192,20 @@ int main(int argc, char *argv[])
 
 	snprintf(action, sizeof(action), "test1");
 
-	while ((ch = getopt(argc, argv, "ha:t:c:n:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "he:a:t:c:n:l:EY")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'e':
+			if (strcasecmp(optarg, "poll") == 0) {
+				__event_type = FIBER_EVENT_POLL;
+			} else if (strcasecmp(optarg, "select") == 0) {
+				__event_type = FIBER_EVENT_SELECT;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				__event_type = FIBER_EVENT_IO_URING;
+			}
+			break;
 		case 'a':
 			snprintf(action, sizeof(action), "%s", optarg);
 			break;
@@ -166,6 +220,12 @@ int main(int argc, char *argv[])
 			break;
 		case 'l':
 			__nlocks = atoi(optarg);
+			break;
+		case 'E':
+			__use_event = 1;
+			break;
+		case 'Y':
+			__use_yield = 1;
 			break;
 		default:
 			break;

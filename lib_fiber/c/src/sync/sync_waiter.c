@@ -6,7 +6,7 @@
 #include "common/mbox.h"
 #include "sync_waiter.h"
 
-//#define	USE_MBOX
+#define	USE_MBOX
 
 struct SYNC_WAITER {
 	pthread_mutex_t lock;
@@ -70,6 +70,7 @@ static void check_timedout(SYNC_WAITER *waiter)
 	(void) waiter;
 }
 
+#ifndef	USE_MBOX
 static void wakeup_waiters(SYNC_WAITER *waiter)
 {
 	RING *head;
@@ -89,14 +90,16 @@ static void wakeup_waiters(SYNC_WAITER *waiter)
 	}
 #endif
 }
+#endif
 
 static void fiber_waiting(ACL_FIBER *fb, void *ctx)
 {
 	SYNC_WAITER *waiter = (SYNC_WAITER*) ctx;
-	int delay = -1, res;
+	int delay = -1;
 
 	while (!waiter->stop) {
 #ifdef	USE_MBOX
+		int res;
 		ACL_FIBER *fiber = mbox_read(waiter->box, delay, &res);
 		if (fiber) {
 			acl_fiber_ready(fiber);
@@ -111,8 +114,8 @@ static void fiber_waiting(ACL_FIBER *fb, void *ctx)
 		if (fbase_event_wait(&fb->base) == -1) {
 			abort();
 		}
-#endif
 		wakeup_waiters(waiter);
+#endif
 
 #if 0
 		if (atomic_int64_cas(waiter->atomic, 1, 0) != 1) {

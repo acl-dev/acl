@@ -519,6 +519,7 @@ static int submit_and_wait(EVENT_URING *ep, int timeout)
 		tp         = NULL;
 	}
 
+AGAIN:
 	if (ep->appending > 0) {
 		ep->appending = 0;  \
 		ret = io_uring_submit_and_wait_timeout(&ep->ring, &cqe,
@@ -529,9 +530,14 @@ static int submit_and_wait(EVENT_URING *ep, int timeout)
 
 	if (ret < 0) {
 		if (ret == -ETIME) {
+			printf("thread-%lu: Got etime\n", pthread_self());
 			return 0;
 		} else if (ret == -EAGAIN) {
+			printf("Got eagain\n");
 			return 0;
+		} else if (ret == -EINTR) {
+			printf("Got eintr\n");
+			goto AGAIN;
 		}
 
 		msg_error("%s(%d): io_uring_wait_cqe error=%s",
