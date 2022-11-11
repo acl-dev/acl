@@ -425,6 +425,8 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		__thread_fiber->fibers[slot]->slot = (unsigned) slot;
 
 		ring_prepend(&__thread_fiber->dead, &from->me);
+	} else {
+		from->status = FIBER_STATUS_SUSPEND;
 	}
 
 	if (to->status != FIBER_STATUS_EXITING) {

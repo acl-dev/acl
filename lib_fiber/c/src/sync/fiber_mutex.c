@@ -41,6 +41,8 @@ void acl_fiber_mutex_free(ACL_FIBER_MUTEX *mutex)
 	mem_free(mutex);
 }
 
+static __thread int __cnt = 0;
+
 int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 {
 	int wakeup = 0;
@@ -49,7 +51,9 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 
 	while (1) {
 		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
-			pthread_mutex_lock(&mutex->thread_lock);
+			//pthread_mutex_lock(&mutex->thread_lock);
+			__cnt++;
+			//printf(">>>>thread-%lu, cnt=%d\n", pthread_self(), __cnt);
 			return 0;
 		}
 
@@ -67,25 +71,43 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 
 		fiber = acl_fiber_running();
 		fiber->waiter = sync_waiter_get();
-		sync_waiter_append(fiber->waiter, fiber);
+		//sync_waiter_append(fiber->waiter, fiber);
 
-#if 1
-		{
-			ITER iter;
-			foreach(iter, mutex->waiters) {
-				ACL_FIBER *fb = (ACL_FIBER*) iter.data;
-				assert(fb != fiber);
-			}
-		}
-#endif
 		pthread_mutex_lock(&mutex->lock);
 		array_append(mutex->waiters, fiber);
+
+		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
+			int r = array_delete_obj(mutex->waiters, fiber, NULL);
+			pthread_mutex_unlock(&mutex->lock);
+
+			//pthread_mutex_lock(&mutex->thread_lock);
+			printf("thread-%lu, ok fb=%p, wakeup=%d, cnt=%d, r=%d\n",
+				pthread_self(), fiber, wakeup, __cnt, r);
+			assert(r == 0);
+			return 0;
+		}
 		pthread_mutex_unlock(&mutex->lock);
 
 		ev = fiber_io_event();
 		ev->waiter++;
 		acl_fiber_switch();
 		ev->waiter--;
+
+#if 1
+		pthread_mutex_lock(&mutex->lock);
+		{
+			ITER iter;
+			foreach(iter, mutex->waiters) {
+				ACL_FIBER *fb = (ACL_FIBER*) iter.data;
+				if (fb == fiber) {
+					printf(">>>thread-%lu, dup, why? fb=%p\n",
+						pthread_self(), fb);
+					assert(fb != fiber);
+				}
+			}
+		}
+		pthread_mutex_unlock(&mutex->lock);
+#endif
 
 		if (++wakeup > 5) {
 			wakeup = 0;
@@ -99,16 +121,22 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	ACL_FIBER *fiber;
 
 	pthread_mutex_lock(&mutex->lock);
-	fiber = (ACL_FIBER*) array_head(mutex->waiters);
-	(void) array_pop_front(mutex->waiters);
-	pthread_mutex_unlock(&mutex->lock);
+	fiber = (ACL_FIBER*) array_pop_front(mutex->waiters);
 
-	pthread_mutex_unlock(&mutex->thread_lock);
+	//pthread_mutex_unlock(&mutex->thread_lock);
 	if (atomic_int64_cas(mutex->atomic, 1, 0) != 1) {
+		assert(0);
 		return -1;
 	}
+	pthread_mutex_unlock(&mutex->lock);
 
 	if (fiber) {
+		if (fiber->status == FIBER_STATUS_SUSPEND)
+			printf(">>>thread-%lu, pop suspend fb=%p\n",
+				pthread_self(), fiber);
+		else
+			printf(">>>thread-%lu, pop not %d fb=%p\n",
+				pthread_self(), fiber->status, fiber);
 		sync_waiter_wakeup(fiber->waiter, fiber);
 	}
 

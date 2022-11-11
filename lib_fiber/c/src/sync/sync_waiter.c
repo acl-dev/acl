@@ -10,14 +10,15 @@
 
 struct SYNC_WAITER {
 	pthread_mutex_t lock;
-	RING waiters;
-	RING ready;
+	ARRAY *waiters;
+	ARRAY *ready;
 	ACL_FIBER *fb;
 	ATOMIC *atomic;
 	long long value;
 #ifdef	USE_MBOX
 	MBOX *box;
 #endif
+	int left;
 	int stop;
 };
 
@@ -26,8 +27,8 @@ static SYNC_WAITER *sync_waiter_new(void)
 	SYNC_WAITER *waiter = (SYNC_WAITER*) mem_calloc(1, sizeof(SYNC_WAITER));
 
 	pthread_mutex_init(&waiter->lock, NULL);
-	ring_init(&waiter->waiters);
-	ring_init(&waiter->ready);
+	waiter->waiters = array_create(100, ARRAY_F_UNORDER);
+	waiter->ready   = array_create(100, ARRAY_F_UNORDER);
 	waiter->atomic  = atomic_new();
 	atomic_set(waiter->atomic, &waiter->value);
 	atomic_int64_set(waiter->atomic, 0);
@@ -35,6 +36,7 @@ static SYNC_WAITER *sync_waiter_new(void)
 #ifdef	USE_MBOX
 	waiter->box = mbox_create(MBOX_T_MPSC);
 #endif
+	waiter->left = 0;
 
 	return waiter;
 }
@@ -43,6 +45,8 @@ static void sync_waiter_free(SYNC_WAITER *waiter)
 {
 	pthread_mutex_destroy(&waiter->lock);
 	atomic_free(waiter->atomic);
+	array_free(waiter->waiters, NULL);
+	array_free(waiter->ready, NULL);
 #ifdef	USE_MBOX
 	mbox_free(waiter->box, NULL);
 #endif
@@ -65,21 +69,22 @@ static void thread_init(void)
 	}
 }
 
+/*
 static void check_timedout(SYNC_WAITER *waiter)
 {
 	(void) waiter;
 }
+*/
 
 #ifndef	USE_MBOX
 static void wakeup_waiters(SYNC_WAITER *waiter)
 {
-	RING *head;
+	ACL_FIBER *fb;
 	int n = 0;
 
 	pthread_mutex_lock(&waiter->lock);
-	while ((head = ring_pop_head(&waiter->ready)) != NULL) {
-		ACL_FIBER *fiber = RING_TO_APPL(head, ACL_FIBER, me);
-		acl_fiber_ready(fiber);
+	while ((fb = (ACL_FIBER*) array_pop_front(waiter->ready)) != NULL) {
+		acl_fiber_ready(fb);
 		n++;
 	}
 	pthread_mutex_unlock(&waiter->lock);
@@ -92,7 +97,8 @@ static void wakeup_waiters(SYNC_WAITER *waiter)
 }
 #endif
 
-static void fiber_waiting(ACL_FIBER *fb, void *ctx)
+static __thread int __cnt = 0;
+static void fiber_waiting(ACL_FIBER *fiber, void *ctx)
 {
 	SYNC_WAITER *waiter = (SYNC_WAITER*) ctx;
 	int delay = -1;
@@ -100,18 +106,28 @@ static void fiber_waiting(ACL_FIBER *fb, void *ctx)
 	while (!waiter->stop) {
 #ifdef	USE_MBOX
 		int res;
-		ACL_FIBER *fiber = mbox_read(waiter->box, delay, &res);
-		if (fiber) {
-			acl_fiber_ready(fiber);
+		ACL_FIBER *fb = mbox_read(waiter->box, delay, &res);
+		if (fb) {
+			int left;
+			__cnt++;
+			pthread_mutex_lock(&waiter->lock);
+			left = --waiter->left;
+			pthread_mutex_unlock(&waiter->lock);
+			printf(">>>thread-%lu, read one fb=%p, cnt=%d, fb status=%d, left=%d\n",
+				pthread_self(), fb, __cnt, fb->status, left);
+			assert(fb->status == FIBER_STATUS_SUSPEND);
+			acl_fiber_ready(fb);
+		} else {
+			assert(0);
 		}
 #else
-		if (read_wait(fb->base.event_in, delay) == -1) {
+		if (read_wait(fiber->base.event_in, delay) == -1) {
 			check_timedout(waiter);
 			//wakeup_waiters(waiter);
 			continue;
 		}
 
-		if (fbase_event_wait(&fb->base) == -1) {
+		if (fbase_event_wait(&fiber->base) == -1) {
 			abort();
 		}
 		wakeup_waiters(waiter);
@@ -124,9 +140,9 @@ static void fiber_waiting(ACL_FIBER *fb, void *ctx)
 #endif
 	}
 
-	printf(">>>begin free base=%p\n", &fb->base);
+	printf(">>>begin free base=%p\n", &fiber->base);
 #ifndef	USE_MBOX
-	fbase_event_close(&fb->base);
+	fbase_event_close(&fiber->base);
 #endif
 }
 
@@ -158,7 +174,7 @@ SYNC_WAITER *sync_waiter_get(void)
 void sync_waiter_append(SYNC_WAITER *waiter, ACL_FIBER *fb)
 {
 	pthread_mutex_lock(&waiter->lock);
-	ring_prepend(&waiter->waiters, &fb->me);
+	array_append(waiter->waiters, fb);
 	pthread_mutex_unlock(&waiter->lock);
 }
 
@@ -166,13 +182,17 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 {
 #ifdef	USE_MBOX
 	pthread_mutex_lock(&waiter->lock);
-	ring_detach(&fb->me);
+	array_delete_obj(waiter->waiters, fb, NULL);
+	waiter->left++;
+	printf("thread-%lu >>>wakeup left=%d, fb=%p, status=%d\n",
+		pthread_self(), waiter->left, fb, fb->status);
 	pthread_mutex_unlock(&waiter->lock);
 	mbox_send(waiter->box, fb);
 #else
 	pthread_mutex_lock(&waiter->lock);
-	ring_detach(&fb->me);
-	ring_prepend(&waiter->ready, &fb->me);
+	array_delete_obj(waiter->waiters, fb, NULL);
+	array_append(waiter->waiters, fb);
+	waiter->left++;
 	pthread_mutex_unlock(&waiter->lock);
 
 	// Only one wakeup action can be executed in the same time.

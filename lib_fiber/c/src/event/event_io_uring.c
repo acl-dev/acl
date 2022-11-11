@@ -530,7 +530,7 @@ AGAIN:
 
 	if (ret < 0) {
 		if (ret == -ETIME) {
-			printf("thread-%lu: Got etime\n", pthread_self());
+			printf("thread-%lu: Got etime, waiter=%d\n", pthread_self(), (int) ep->event.waiter);
 			return 0;
 		} else if (ret == -EAGAIN) {
 			printf("Got eagain\n");
