@@ -87,8 +87,9 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 
 	LOCK_COND(cond);
 	array_append(cond->waiters, obj);
-	sync_timer_await(obj->timer, obj);
 	UNLOCK_COND(cond);
+
+	sync_timer_await(obj->timer, obj);
 
 	FIBER_UNLOCK(mutex);
 
