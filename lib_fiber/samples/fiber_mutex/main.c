@@ -123,7 +123,7 @@ static void *thread_main(void *arg acl_unused)
 	return NULL;
 }
 
-static void test2(int nthreads)
+static void test2(int nthreads, unsigned flags)
 {
 	int i;
 	pthread_t threads[nthreads];
@@ -134,7 +134,7 @@ static void test2(int nthreads)
 	__locks = (ACL_FIBER_MUTEX**) malloc(__nlocks * sizeof(ACL_FIBER_MUTEX*));
 	__events = (ACL_FIBER_EVENT**) malloc(__nlocks * sizeof(ACL_FIBER_EVENT*));
 	for (i = 0; i < __nlocks; i++) {
-		__locks[i] = acl_fiber_mutex_create(0);
+		__locks[i] = acl_fiber_mutex_create(flags);
 		__events[i] = acl_fiber_event_create(FIBER_FLAG_USE_MUTEX);
 	}
 
@@ -182,17 +182,19 @@ static void usage(const char *procname)
 		" -l locks_count\r\n"
 		" -E [if use fiber_event]\r\n"
 		" -Y [if yield after unlock]\r\n"
+		" -T [if use first try lock for mutex]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int  ch, nthreads = 2;
+	unsigned flags = 0;
 	char action[64];
 
 	snprintf(action, sizeof(action), "test1");
 
-	while ((ch = getopt(argc, argv, "he:a:t:c:n:l:EY")) > 0) {
+	while ((ch = getopt(argc, argv, "he:a:t:c:n:l:EYT")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -227,6 +229,9 @@ int main(int argc, char *argv[])
 		case 'Y':
 			__use_yield = 1;
 			break;
+		case 'T':
+			flags |= FIBER_MUTEX_F_LOCK_TRY;
+			break;
 		default:
 			break;
 		}
@@ -235,7 +240,7 @@ int main(int argc, char *argv[])
 	if (strcasecmp(action, "test1") == 0) {
 		test1();
 	} else if (strcasecmp(action, "test2") == 0) {
-		test2(nthreads);
+		test2(nthreads, flags);
 	} else {
 		printf("unknown action: %s\r\n", action);
 		usage(argv[0]);

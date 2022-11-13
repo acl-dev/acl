@@ -9,6 +9,8 @@ extern "C" {
 
 typedef struct ACL_FIBER_MUTEX ACL_FIBER_MUTEX;
 
+#define	FIBER_MUTEX_F_LOCK_TRY	(1 << 0)
+
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flag);
 void acl_fiber_mutex_free(ACL_FIBER_MUTEX *mutex);
 int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex);

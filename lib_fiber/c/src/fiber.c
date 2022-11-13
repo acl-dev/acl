@@ -606,23 +606,7 @@ int acl_fiber_yield(void)
 	acl_fiber_ready(__thread_fiber->running);
 	acl_fiber_switch();
 
-	// When switched overflows, it will be set to 0, then n saved last
-	// switched's value will larger than switched, so we need to use
-	// abs function to avoiding this problem
-	if (__thread_fiber->switched_old > __thread_fiber->switched) {
-		return (int) (__thread_fiber->switched_old -
-			__thread_fiber->switched - 1);
-	} else {
-		return (int) (__thread_fiber->switched -
-			__thread_fiber->switched_old - 1);
-	}
-/*
-#if defined(__APPLE__) || defined(SYS_WIN) || defined(ANDROID)
-	return (int) (__thread_fiber->switched - __thread_fiber->switched_old - 1);
-#else
-	return (int) abs(__thread_fiber->switched - __thread_fiber->switched_old - 1);
-#endif
-*/
+	return 1;
 }
 
 unsigned acl_fiber_ndead(void)
