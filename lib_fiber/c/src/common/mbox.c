@@ -23,7 +23,7 @@
 #  undef  HAS_EVENTFD
 #endif
 
-#  undef  HAS_EVENTFD
+//#  undef  HAS_EVENTFD
 
 struct MBOX {
 	socket_t in;
