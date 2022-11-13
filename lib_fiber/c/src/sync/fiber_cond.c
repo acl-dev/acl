@@ -76,20 +76,19 @@ static void ll_unlock(ACL_FIBER_COND *cond)
 int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	int delay_ms)
 {
+	EVENT *ev        = fiber_io_event();
 	ACL_FIBER *fiber = acl_fiber_running();
-	EVENT *ev = fiber_io_event();
-	SYNC_OBJ *obj = (SYNC_OBJ*) mem_calloc(1, sizeof(SYNC_OBJ));
-	obj->fb = fiber;
-	obj->delay = delay_ms;
-	obj->status = 0;
+	SYNC_OBJ *obj    = (SYNC_OBJ*) mem_calloc(1, sizeof(SYNC_OBJ));
 
-	assert(fiber);
+	obj->fb     = fiber;
+	obj->delay  = delay_ms;
+	obj->status = 0;
+	obj->timer  = sync_timer_get();
+
 	ll_lock(cond);
 	array_append(cond->waiters, obj);
+	sync_timer_await(obj->timer, obj);
 	ll_unlock(cond);
-
-	obj->timer = sync_timer_get();
-	sync_timer_add(obj->timer, obj);
 
 	FIBER_UNLOCK(mutex);
 
@@ -98,8 +97,17 @@ int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	ev->waiter--;
 
 	FIBER_LOCK(mutex);
+
+	ll_lock(cond);
+	if (obj->status & SYNC_STATUS_TIMEOUT) {
+		// The obj has been deleted in sync_timer.c when timeout.
+		mem_free(obj);
+		ll_unlock(cond);
+		return FIBER_ETIME;
+	}
+
 	mem_free(obj);
-	return FIBER_ETIME;
+	ll_unlock(cond);
 	return 0;
 }
 
@@ -119,4 +127,14 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	}
 	ll_unlock(cond);
 	return 0;
+}
+
+int fiber_cond_delete_waiter(ACL_FIBER_COND *cond, SYNC_OBJ *obj)
+{
+	int ret;
+
+	ll_lock(cond);
+	ret = array_delete_obj(cond->waiters, obj, NULL);
+	ll_unlock(cond);
+	return ret;
 }

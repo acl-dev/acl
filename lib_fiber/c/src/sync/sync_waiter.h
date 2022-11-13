@@ -5,7 +5,6 @@ typedef struct SYNC_WAITER SYNC_WAITER;
 typedef struct ACL_FIBER ACL_FIBER;
 
 SYNC_WAITER *sync_waiter_get(void);
-void sync_waiter_append(SYNC_WAITER *waiter, ACL_FIBER *fb);
 void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb);
 
 #endif

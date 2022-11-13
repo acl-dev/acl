@@ -82,6 +82,7 @@ void timer_cache_remove(TIMER_CACHE *cache, long long expire, RING *entry)
 {
 	TIMER_CACHE_NODE n, *node;
 	n.expire = expire;
+
 	node = avl_find(&cache->tree, &n, NULL);
 	if (node == NULL) {
 		msg_error("not found expire=%lld", expire);
@@ -106,4 +107,27 @@ void timer_cache_free_node(TIMER_CACHE *cache, TIMER_CACHE_NODE *node)
 	} else {
 		mem_free(node);
 	}
+}
+
+int timer_cache_remove_exist(TIMER_CACHE *cache, long long expire, RING *entry)
+{
+	RING_ITER iter;
+	TIMER_CACHE_NODE n, *node;
+
+	n.expire = expire;
+	node = avl_find(&cache->tree, &n, NULL);
+	if (node == NULL) {
+		return 0;
+	}
+
+	ring_foreach(iter, &node->ring) {
+		if (iter.ptr == entry) {
+			ring_detach(entry);
+			if (ring_size(&node->ring) == 0) {
+				timer_cache_free_node(cache, node);
+			}
+			return 1;
+		}
+	}
+	return 0;
 }

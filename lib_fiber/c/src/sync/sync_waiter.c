@@ -8,7 +8,6 @@
 
 struct SYNC_WAITER {
 	pthread_mutex_t lock;
-	ARRAY *waiters;
 	ACL_FIBER *fb;
 	MBOX *box;
 	int stop;
@@ -19,7 +18,6 @@ static SYNC_WAITER *sync_waiter_new(void)
 	SYNC_WAITER *waiter = (SYNC_WAITER*) mem_calloc(1, sizeof(SYNC_WAITER));
 
 	pthread_mutex_init(&waiter->lock, NULL);
-	waiter->waiters = array_create(100, ARRAY_F_UNORDER);
 	waiter->box = mbox_create(MBOX_T_MPSC);
 	return waiter;
 }
@@ -27,7 +25,6 @@ static SYNC_WAITER *sync_waiter_new(void)
 static void sync_waiter_free(SYNC_WAITER *waiter)
 {
 	pthread_mutex_destroy(&waiter->lock);
-	array_free(waiter->waiters, NULL);
 	mbox_free(waiter->box, NULL);
 	mem_free(waiter);
 }
@@ -81,18 +78,7 @@ SYNC_WAITER *sync_waiter_get(void)
 	return waiter;
 }
 
-void sync_waiter_append(SYNC_WAITER *waiter, ACL_FIBER *fb)
-{
-	pthread_mutex_lock(&waiter->lock);
-	array_append(waiter->waiters, fb);
-	pthread_mutex_unlock(&waiter->lock);
-}
-
 void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 {
-	pthread_mutex_lock(&waiter->lock);
-	array_delete_obj(waiter->waiters, fb, NULL);
-	pthread_mutex_unlock(&waiter->lock);
-
 	mbox_send(waiter->box, fb);
 }
