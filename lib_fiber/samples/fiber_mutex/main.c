@@ -23,7 +23,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx)
 
 	if (--__fibers_count == 0) {
 		printf("--- All fibers Over ----\r\n");
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -75,7 +75,7 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all fibers over, count=%d!\r\n",
 			pthread_self(), __count);
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -101,7 +101,7 @@ static void fiber_main3(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all fibers over, count=%d\r\n",
 			pthread_self(), __count);
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 

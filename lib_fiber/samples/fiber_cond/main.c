@@ -20,7 +20,6 @@ static int __all_consumers_exit = 0;
 
 static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
-	return;
 	int n = 0;
 	while (!__all_consumers_exit) {
 		acl_fiber_cond_signal(__cond);

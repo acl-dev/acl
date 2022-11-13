@@ -26,14 +26,14 @@ static SYNC_WAITER *sync_waiter_new(void)
 	assert(out != INVALID_SOCKET);
 	fe = fiber_file_open_write(out);
 	assert(fe);
-	fe->type |= TYPE_INTERNAL;
+	fe->type |= TYPE_INTERNAL | TYPE_EVENTABLE;
 
 	in = mbox_out(waiter->box);
 	assert(in != INVALID_SOCKET);
 	if (in != out) {
 		fe = fiber_file_open_read(in);
 		assert(fe);
-		fe->type |= TYPE_INTERNAL;
+		fe->type |= TYPE_INTERNAL | TYPE_EVENTABLE;
 	}
 
 	return waiter;
