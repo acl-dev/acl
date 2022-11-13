@@ -25,7 +25,7 @@ static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		acl_fiber_cond_signal(__cond);
 		if (++n % 2000000 == 0) {
 			printf("--signal = %d\n", n);
-			sleep(1);
+			//sleep(1);
 		}
 		//acl_fiber_delay(1000);
 	}
