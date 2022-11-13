@@ -2,7 +2,7 @@
 #define FIBER_COND_INCLUDE_H
 
 #include "fiber_define.h"
-#include "fiber_event.h"
+#include "fiber_mutex.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,19 +32,21 @@ FIBER_API void acl_fiber_cond_free(ACL_FIBER_COND *cond);
 /**
  * Wait for cond event to be signaled
  * @param cond {ACL_FIBER_COND *}
- * @param event {ACL_FIBER_EVENT *} must be owned by the current caller
+ * @param mutex {ACL_FIBER_MUTEX *} must be owned by the current caller
  * @return {int} return 0 if ok or return error value
  */
-FIBER_API int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_EVENT *event);
+FIBER_API int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex);
 
 /**
  * Wait for cond event to be signaled with the specified timeout
  * @param cond {ACL_FIBER_COND *}
+ * @param mutex {ACL_FIBER_MUTEX *} must be owned by the current caller
+ * @param delay_ms {int}
  * @return {int} return 0 if ok or return error value, when timedout ETIMEDOUT
  *  will be returned
  */
 FIBER_API int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond,
-	ACL_FIBER_EVENT *event, int delay_ms);
+	ACL_FIBER_MUTEX *mutex, int delay_ms);
 
 /**
  * Signal the cond which will wakeup one waiter for the cond to be signaled

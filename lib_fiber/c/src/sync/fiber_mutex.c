@@ -69,8 +69,8 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 		}
 
 		fiber = acl_fiber_running();
-		fiber->waiter = sync_waiter_get();
-		sync_waiter_append(fiber->waiter, fiber);
+		fiber->sync = sync_waiter_get();
+		sync_waiter_append(fiber->sync, fiber);
 
 		pos = array_append(mutex->waiters, fiber);
 
@@ -120,8 +120,8 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 		}
 
 		fiber = acl_fiber_running();
-		fiber->waiter = sync_waiter_get();
-		sync_waiter_append(fiber->waiter, fiber);
+		fiber->sync = sync_waiter_get();
+		sync_waiter_append(fiber->sync, fiber);
 
 		pthread_mutex_lock(&mutex->lock);
 		pos = array_append(mutex->waiters, fiber);
@@ -172,7 +172,7 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	pthread_mutex_unlock(&mutex->lock);
 
 	if (fiber) {
-		sync_waiter_wakeup(fiber->waiter, fiber);
+		sync_waiter_wakeup(fiber->sync, fiber);
 	}
 
 	return 0;

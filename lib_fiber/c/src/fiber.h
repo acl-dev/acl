@@ -63,7 +63,8 @@ struct ACL_FIBER {
 
 	RING           holding;
 	ACL_FIBER_LOCK *waiting;
-	SYNC_WAITER   *waiter;
+
+	SYNC_WAITER  *sync;
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;

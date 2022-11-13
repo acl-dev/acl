@@ -1,0 +1,122 @@
+#include "stdafx.h"
+#include "common.h"
+
+#include "fiber/libfiber.h"
+#include "fiber/fiber_cond.h"
+#include "common/pthread_patch.h"
+#include "fiber.h"
+#include "sync_timer.h"
+
+struct ACL_FIBER_COND {
+	ARRAY          *waiters;
+	pthread_mutex_t mutex;
+};
+
+ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
+{
+#ifdef SYS_UNIX
+	pthread_mutexattr_t attr;
+#endif
+	ACL_FIBER_COND *cond = (ACL_FIBER_COND *)
+		mem_calloc(1, sizeof(ACL_FIBER_COND));
+
+	cond->waiters = array_create(10, ARRAY_F_UNORDER);
+
+#ifdef SYS_UNIX
+	pthread_mutexattr_init(&attr);
+	pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	pthread_mutex_init(&cond->mutex, &attr);
+	pthread_mutexattr_destroy(&attr);
+#else
+	pthread_mutex_init(&cond->mutex, NULL);
+#endif
+
+	return cond;
+}
+
+void acl_fiber_cond_free(ACL_FIBER_COND *cond)
+{
+	array_free(cond->waiters, NULL);
+	pthread_mutex_destroy(&cond->mutex);
+	mem_free(cond);
+}
+
+static void ll_lock(ACL_FIBER_COND *cond)
+{
+	int n = pthread_mutex_lock(&cond->mutex);
+	if (n) {
+		acl_fiber_set_error(n);
+		msg_fatal("%s(%d), %s: pthread_mutex_lock error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	}
+}
+
+static void ll_unlock(ACL_FIBER_COND *cond)
+{
+	int n = pthread_mutex_unlock(&cond->mutex);
+	if (n) {
+		acl_fiber_set_error(n);
+		msg_fatal("%s(%d), %s: pthread_mutex_unlock error=%s",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+	}
+}
+
+#define	FIBER_LOCK(l) do {  \
+	if (acl_fiber_mutex_lock(l) != 0) {  \
+		msg_fatal("acl_fiber_mutex_lock failed");  \
+	}  \
+} while (0)
+
+#define	FIBER_UNLOCK(l) do {  \
+	if (acl_fiber_mutex_unlock(l) != 0) {  \
+		msg_fatal("acl_fiber_mutex_unlock failed");  \
+	}  \
+} while (0)
+
+int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
+	int delay_ms)
+{
+	ACL_FIBER *fiber = acl_fiber_running();
+	EVENT *ev = fiber_io_event();
+	SYNC_OBJ *obj = (SYNC_OBJ*) mem_calloc(1, sizeof(SYNC_OBJ));
+	obj->fb = fiber;
+	obj->delay = delay_ms;
+	obj->status = 0;
+
+	assert(fiber);
+	ll_lock(cond);
+	array_append(cond->waiters, obj);
+	ll_unlock(cond);
+
+	obj->timer = sync_timer_get();
+	sync_timer_add(obj->timer, obj);
+
+	FIBER_UNLOCK(mutex);
+
+	ev->waiter++;
+	acl_fiber_switch();
+	ev->waiter--;
+
+	FIBER_LOCK(mutex);
+	mem_free(obj);
+	return FIBER_ETIME;
+	return 0;
+}
+
+int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex)
+{
+	return acl_fiber_cond_timedwait(cond, mutex, -1);
+}
+
+int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
+{
+	SYNC_OBJ *obj;
+
+	ll_lock(cond);
+	obj = array_pop_front(cond->waiters);
+	if (obj) {
+		sync_timer_wakeup(obj->timer, obj);
+	}
+	ll_unlock(cond);
+	return 0;
+}
