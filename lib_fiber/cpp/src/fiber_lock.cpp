@@ -23,6 +23,7 @@ bool fiber_lock::trylock(void)
 {
 	return acl_fiber_lock_trylock(lock_) == 0 ? true : false;
 }
+
 bool fiber_lock::unlock(void)
 {
 	acl_fiber_lock_unlock(lock_);

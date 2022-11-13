@@ -1,5 +1,5 @@
 #include "stdafx.hpp"
-#include "fiber/fiber_event.hpp"
+#include "fiber/fiber_mutex.hpp"
 #include "fiber/fiber_cond.hpp"
 
 namespace acl {
@@ -14,15 +14,15 @@ fiber_cond::~fiber_cond(void)
 	acl_fiber_cond_free(cond_);
 }
 
-bool fiber_cond::wait(fiber_event& event, int timeout /* = -1 */)
+bool fiber_cond::wait(fiber_mutex& mutex, int timeout /* = -1 */)
 {
-	ACL_FIBER_EVENT* ev = event.get_event();
+	ACL_FIBER_MUTEX* m = mutex.get_mutex();
 
 	if (timeout < 0) {
-		return acl_fiber_cond_wait(cond_, ev) == 0 ? true : false;
+		return acl_fiber_cond_wait(cond_, m) == 0 ? true : false;
 	}
 
-	if (acl_fiber_cond_timedwait(cond_, ev, timeout) == 0) {
+	if (acl_fiber_cond_timedwait(cond_, m, timeout) == 0) {
 		return true;
 	} else {
 		return false;

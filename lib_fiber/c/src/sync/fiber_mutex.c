@@ -154,6 +154,15 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 	}
 }
 
+int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *mutex)
+{
+	if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
+		pthread_mutex_lock(&mutex->thread_lock);
+		return 0;
+	}
+	return EBUSY;
+}
+
 int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 {
 	ACL_FIBER *fiber;

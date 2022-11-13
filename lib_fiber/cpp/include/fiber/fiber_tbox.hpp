@@ -2,7 +2,7 @@
 #include "fiber_cpp_define.hpp"
 #include <list>
 #include <stdlib.h>
-#include "fiber_event.hpp"
+#include "fiber_mutex.hpp"
 #include "fiber_cond.hpp"
 
 namespace acl {
@@ -84,7 +84,7 @@ public:
 	bool push(T* t, bool notify_first = true)
 	{
 		// 先加锁
-		if (event_.wait() == false) {
+		if (mutex_.lock() == false) {
 			abort();
 		}
 
@@ -96,12 +96,12 @@ public:
 			if (cond_.notify() == false) {
 				abort();
 			}
-			if (event_.notify() == false) {
+			if (mutex_.unlock() == false) {
 				abort();
 			}
 			return true;
 		} else {
-			if (event_.notify() == false) {
+			if (mutex_.unlock() == false) {
 				abort();
 			}
 			if (cond_.notify() == false) {
@@ -127,13 +127,13 @@ public:
 	T* pop(int wait_ms = -1, bool* found = NULL)
 	{
 		bool found_flag;
-		if (event_.wait() == false) {
+		if (mutex_.lock() == false) {
 			abort();
 		}
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				if (event_.notify() == false) {
+				if (mutex_.unlock() == false) {
 					abort();
 				}
 				if (found) {
@@ -143,8 +143,8 @@ public:
 			}
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
-			if (!cond_.wait(event_, wait_ms) && wait_ms >= 0) {
-				if (event_.notify() == false) {
+			if (!cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
+				if (mutex_.unlock() == false) {
 					abort();
 				}
 				if (found) {
@@ -167,14 +167,14 @@ public:
 public:
 	void lock(void)
 	{
-		if (event_.wait() == false) {
+		if (mutex_.lock() == false) {
 			abort();
 		}
 	}
 
 	void unlock(void)
 	{
-		if (event_.notify() == false) {
+		if (mutex_.unlock() == false) {
 			abort();
 		}
 	}
@@ -187,7 +187,7 @@ private:
 	std::list<T*> tbox_;
 	size_t        size_;
 	bool          free_obj_;
-	fiber_event   event_;
+	fiber_mutex   mutex_;
 	fiber_cond    cond_;
 
 	T* peek(bool& found_flag)
