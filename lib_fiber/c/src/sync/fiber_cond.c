@@ -168,6 +168,7 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	LOCK_COND(cond);
 	obj = array_pop_front(cond->waiters);
 	UNLOCK_COND(cond);
+
 	if (obj == NULL) {
 		return 0;
 	}
