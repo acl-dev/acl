@@ -167,11 +167,10 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 
 	LOCK_COND(cond);
 	obj = array_pop_front(cond->waiters);
+	UNLOCK_COND(cond);
 	if (obj == NULL) {
-		UNLOCK_COND(cond);
 		return 0;
 	}
-	UNLOCK_COND(cond);
 
 	if (obj->type == SYNC_OBJ_T_FIBER) {
 		sync_timer_wakeup(obj->timer, obj);
