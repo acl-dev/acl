@@ -27,15 +27,23 @@ void *array_pop_back(struct ARRAY *a)
 void *array_pop_front(struct ARRAY *a)
 {
 	void *obj;
-	int   i;
 
 	if (a->count <= 0) {
 		return NULL;
 	}
+
 	obj = a->items[0];
 	a->count--;
-	for (i = 0; i < a->count; i++) {
-		a->items[i] = a->items[i + 1];
+
+	if (a->flags & ARRAY_F_UNORDER) {
+		if (a->count > 0) {
+			a->items[0] = a->items[a->count];
+		}
+	} else {
+		int i;
+		for (i = 0; i < a->count; i++) {
+			a->items[i] = a->items[i + 1];
+		}
 	}
 
 	return obj;
@@ -271,17 +279,17 @@ int array_delete(ARRAY *a, int pos, void (*free_fn)(void*))
 		free_fn(a->items[pos]);
 	}
 
+	a->count--;
+
 	if (a->flags & ARRAY_F_UNORDER) {
-		a->count--;
 		if (a->count > 0) {
 			a->items[pos] = a->items[a->count];
 		}
 	} else {
 		int i;
-		for (i = pos; i < a->count - 1; i++) {
+		for (i = pos; i < a->count; i++) {
 			a->items[i] = a->items[i + 1];
 		}
-		a->count--;
 	}
 
 	return 0;

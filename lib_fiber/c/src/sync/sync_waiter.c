@@ -6,18 +6,11 @@
 #include "common/mbox.h"
 #include "sync_waiter.h"
 
-#define	USE_MBOX
-
 struct SYNC_WAITER {
 	pthread_mutex_t lock;
 	ARRAY *waiters;
-	ARRAY *ready;
 	ACL_FIBER *fb;
-	ATOMIC *atomic;
-	long long value;
-#ifdef	USE_MBOX
 	MBOX *box;
-#endif
 	int stop;
 };
 
@@ -27,27 +20,15 @@ static SYNC_WAITER *sync_waiter_new(void)
 
 	pthread_mutex_init(&waiter->lock, NULL);
 	waiter->waiters = array_create(100, ARRAY_F_UNORDER);
-	waiter->ready   = array_create(100, ARRAY_F_UNORDER);
-	waiter->atomic  = atomic_new();
-	atomic_set(waiter->atomic, &waiter->value);
-	atomic_int64_set(waiter->atomic, 0);
-
-#ifdef	USE_MBOX
 	waiter->box = mbox_create(MBOX_T_MPSC);
-#endif
-
 	return waiter;
 }
 
 static void sync_waiter_free(SYNC_WAITER *waiter)
 {
 	pthread_mutex_destroy(&waiter->lock);
-	atomic_free(waiter->atomic);
 	array_free(waiter->waiters, NULL);
-	array_free(waiter->ready, NULL);
-#ifdef	USE_MBOX
 	mbox_free(waiter->box, NULL);
-#endif
 	mem_free(waiter);
 }
 
@@ -67,64 +48,19 @@ static void thread_init(void)
 	}
 }
 
-/*
-static void check_timedout(SYNC_WAITER *waiter)
-{
-	(void) waiter;
-}
-*/
-
-#ifndef	USE_MBOX
-static void wakeup_waiters(SYNC_WAITER *waiter)
-{
-	ACL_FIBER *fb;
-	int n = 0;
-
-	pthread_mutex_lock(&waiter->lock);
-	while ((fb = (ACL_FIBER*) array_pop_front(waiter->ready)) != NULL) {
-		acl_fiber_ready(fb);
-		n++;
-	}
-	pthread_mutex_unlock(&waiter->lock);
-}
-#endif
-
 static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 {
 	SYNC_WAITER *waiter = (SYNC_WAITER*) ctx;
 	int delay = -1;
 
 	while (!waiter->stop) {
-#ifdef	USE_MBOX
 		int res;
 		ACL_FIBER *fb = mbox_read(waiter->box, delay, &res);
 		if (fb) {
 			assert(fb->status == FIBER_STATUS_SUSPEND);
 			acl_fiber_ready(fb);
 		}
-#else
-		if (read_wait(fiber->base.event_in, delay) == -1) {
-			check_timedout(waiter);
-			//wakeup_waiters(waiter);
-			continue;
-		}
-
-		if (fbase_event_wait(&fiber->base) == -1) {
-			abort();
-		}
-		wakeup_waiters(waiter);
-#endif
-
-#if 0
-		if (atomic_int64_cas(waiter->atomic, 1, 0) != 1) {
-			assert(0);
-		}
-#endif
 	}
-
-#ifndef	USE_MBOX
-	fbase_event_close(&fiber->base);
-#endif
 }
 
 SYNC_WAITER *sync_waiter_get(void)
@@ -140,14 +76,8 @@ SYNC_WAITER *sync_waiter_get(void)
 		waiter = sync_waiter_new();
 		pthread_setspecific(__waiter_key, waiter);
 		waiter->fb = acl_fiber_create(fiber_waiting, waiter, 320000);
-#ifndef	USE_MBOX
-		fbase_event_open(&waiter->fb->base);
-#endif
 	}
 
-#ifndef	USE_MBOX
-	assert(waiter->fb->base.event_out != INVALID_SOCKET);
-#endif
 	return waiter;
 }
 
@@ -160,26 +90,9 @@ void sync_waiter_append(SYNC_WAITER *waiter, ACL_FIBER *fb)
 
 void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 {
-#ifdef	USE_MBOX
 	pthread_mutex_lock(&waiter->lock);
 	array_delete_obj(waiter->waiters, fb, NULL);
 	pthread_mutex_unlock(&waiter->lock);
+
 	mbox_send(waiter->box, fb);
-#else
-	pthread_mutex_lock(&waiter->lock);
-	array_delete_obj(waiter->waiters, fb, NULL);
-	array_append(waiter->waiters, fb);
-	pthread_mutex_unlock(&waiter->lock);
-
-	// Only one wakeup action can be executed in the same time.
-#if 0
-	if (atomic_int64_cas(waiter->atomic, 0, 1) != 0) {
-		return;
-	}
-#endif
-
-	// Notify the waiter fiber to handle the ready fibers.
-	fbase_event_wakeup(&waiter->fb->base);
-#endif
-
 }
