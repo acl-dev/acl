@@ -126,7 +126,7 @@ static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	UNLOCK_COND(cond);
 
 	gettimeofday(&tv, NULL);
-	timeout.tv_sec = tv.tv_sec + delay_ms / 1000;
+	timeout.tv_sec  = tv.tv_sec + delay_ms / 1000;
 	timeout.tv_nsec = tv.tv_usec * 1000 + (delay_ms % 1000) * 1000 * 1000;
 
 	ret = pthread_cond_timedwait(&cond->thread_cond,
@@ -170,6 +170,7 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 		UNLOCK_COND(cond);
 		return 0;
 	}
+	UNLOCK_COND(cond);
 
 	if (obj->type == SYNC_OBJ_T_FIBER) {
 		sync_timer_wakeup(obj->timer, obj);
@@ -180,7 +181,6 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 		msg_fatal("%s: unknown type=%d", __FUNCTION__, obj->type);
 	}
 
-	UNLOCK_COND(cond);
 	return ret;
 }
 
