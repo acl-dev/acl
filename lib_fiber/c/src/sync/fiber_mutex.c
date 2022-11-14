@@ -4,16 +4,9 @@
 #include "fiber/libfiber.h"
 #include "fiber/fiber_mutex.h"
 #include "fiber.h"
-#include "sync_waiter.h"
 
-struct ACL_FIBER_MUTEX {
-	unsigned flags;
-	ATOMIC *atomic;
-	long long value;
-	ARRAY  *waiters;
-	pthread_mutex_t lock;
-	pthread_mutex_t thread_lock;
-};
+#include "sync_type.h"
+#include "sync_waiter.h"
 
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flags)
 {

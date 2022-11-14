@@ -113,6 +113,7 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 
 	while (!timer->stop) {
 		SYNC_MSG *msg = mbox_read(timer->box, delay, &res);
+
 		if (msg == NULL) {
 			delay = check_expire(ev, timer);
 			continue;
@@ -139,6 +140,7 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 				__FUNCTION__, __LINE__, msg->action);
 			break;
 		}
+
 		mem_free(msg);
 
 		delay = check_expire(ev, timer);
