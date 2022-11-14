@@ -16,9 +16,26 @@ struct SYNC_WAITER {
 static SYNC_WAITER *sync_waiter_new(void)
 {
 	SYNC_WAITER *waiter = (SYNC_WAITER*) mem_calloc(1, sizeof(SYNC_WAITER));
+	socket_t in, out;
+	FILE_EVENT *fe;
 
 	pthread_mutex_init(&waiter->lock, NULL);
 	waiter->box = mbox_create(MBOX_T_MPSC);
+
+	out = mbox_out(waiter->box);
+	assert(out != INVALID_SOCKET);
+	fe = fiber_file_open_write(out);
+	assert(fe);
+	fe->type |= TYPE_INTERNAL;
+
+	in = mbox_out(waiter->box);
+	assert(in != INVALID_SOCKET);
+	if (in != out) {
+		fe = fiber_file_open_read(in);
+		assert(fe);
+		fe->type |= TYPE_INTERNAL;
+	}
+
 	return waiter;
 }
 

@@ -126,6 +126,7 @@ struct FILE_EVENT {
 #define	TYPE_FILE		(unsigned) (1 << 1)
 #define	TYPE_BADFD		(unsigned) (1 << 2)
 #define	TYPE_EVENTABLE		(unsigned) (1 << 3)
+#define	TYPE_INTERNAL		(unsigned) (1 << 4)
 
 	unsigned oper;
 #define	EVENT_ADD_READ		(unsigned) (1 << 0)

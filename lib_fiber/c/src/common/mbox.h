@@ -52,4 +52,7 @@ size_t mbox_nsend(MBOX *mbox);
  */
 size_t mbox_nread(MBOX *mbox);
 
+socket_t mbox_in(MBOX *mbox);
+socket_t mbox_out(MBOX *mbox);
+
 #endif

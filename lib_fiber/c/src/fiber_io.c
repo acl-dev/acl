@@ -422,9 +422,15 @@ int fiber_wait_read(FILE_EVENT *fe)
 	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
 	SET_READWAIT(fe);
 
-	__thread_fiber->event->waiter++;
+	if (!(fe->type & TYPE_INTERNAL)) {
+		__thread_fiber->event->waiter++;
+	}
+
 	acl_fiber_switch();
-	__thread_fiber->event->waiter--;
+
+	if (!(fe->type & TYPE_INTERNAL)) {
+		__thread_fiber->event->waiter--;
+	}
 
 	return ret;
 }

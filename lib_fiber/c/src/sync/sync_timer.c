@@ -17,10 +17,27 @@ struct SYNC_TIMER {
 static SYNC_TIMER *sync_timer_new(void)
 {
 	SYNC_TIMER *timer = (SYNC_TIMER*) mem_calloc(1, sizeof(SYNC_TIMER));
+	socket_t in, out;
+	FILE_EVENT *fe;
 
 	pthread_mutex_init(&timer->lock, NULL);
 	timer->box = mbox_create(MBOX_T_MPSC);
 	timer->waiters = timer_cache_create();
+
+	out = mbox_out(timer->box);
+	assert(out != INVALID_SOCKET);
+	fe = fiber_file_open_write(out);
+	assert(fe);
+	fe->type |= TYPE_INTERNAL;
+
+	in = mbox_out(timer->box);
+	assert(in != INVALID_SOCKET);
+	if (in != out) {
+		fe = fiber_file_open_read(in);
+		assert(fe);
+		fe->type |= TYPE_INTERNAL;
+	}
+
 	return timer;
 }
 

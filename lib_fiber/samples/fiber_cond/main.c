@@ -20,6 +20,7 @@ static int __all_consumers_exit = 0;
 
 static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
+	return;
 	int n = 0;
 	while (!__all_consumers_exit) {
 		acl_fiber_cond_signal(__cond);
@@ -32,7 +33,7 @@ static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all producers over!\r\n", pthread_self());
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -88,7 +89,7 @@ static void fiber_consumer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	if (--__nfibers == 0) {
 		printf("---thread-%lu, all consumers over, count=%d!\r\n",
 			pthread_self(), __count);
-		acl_fiber_schedule_stop();
+		//acl_fiber_schedule_stop();
 	}
 }
 

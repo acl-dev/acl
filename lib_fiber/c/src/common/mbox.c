@@ -34,6 +34,16 @@ struct MBOX {
 	pthread_mutex_t *lock;
 };
 
+socket_t mbox_in(MBOX *mbox)
+{
+	return mbox->in;
+}
+
+socket_t mbox_out(MBOX *mbox)
+{
+	return mbox->out;
+}
+
 MBOX *mbox_create(unsigned type)
 {
 	MBOX *mbox;
