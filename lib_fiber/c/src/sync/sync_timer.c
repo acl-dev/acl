@@ -50,14 +50,16 @@ static void thread_init(void)
 
 static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 {
-	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = avl_first(&ev->poll_list->tree), *next;
+	long long now = event_get_stamp(ev), expire = -1;
+	TIMER_CACHE_NODE *node = avl_first(&timer->waiters->tree), *next;
 	RING_ITER iter;
 
+	expire = node ? node->expire : -1;
+
 	while (node && node->expire >= 0 && node->expire <= now) {
-		next = AVL_NEXT(&timer->waiters->tree, node);
 		ring_foreach(iter, &node->ring) {
 			SYNC_OBJ *obj = ring_to_appl(iter.ptr, SYNC_OBJ, me);
+
 			// Try to delete the obj from cond's waiters, 0 will
 			// be returned if the obj has been in the cond, or else
 			// -1 will return, so we just set the DELAYED flag.
@@ -69,17 +71,20 @@ static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 			}
 		}
 
+		next = AVL_NEXT(&timer->waiters->tree, node);
+
 		// Remove all the waiters in the node and remove the node.
 		timer_cache_free_node(timer->waiters, node);
+
 		node = next;
 	}
 
-	if (node == NULL) {
-		return -1;
+	if (node && node->expire > expire) {
+		expire = node->expire;
 	}
 
-	if (node->expire > now) {
-		return node->expire - now;
+	if (expire > now) {
+		return expire - now;
 	}
 	// xxx?
 	return 100;
@@ -95,8 +100,7 @@ static void handle_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 	} else if (obj->status & SYNC_STATUS_DELAYED) {
 		acl_fiber_ready(obj->fb);
 	} else {
-		msg_error("%s(%d): not exist, obj=%p",
-			__FUNCTION__, __LINE__, obj);
+		msg_error("%s(%d): no obj=%p", __FUNCTION__, __LINE__, obj);
 	}
 }
 
@@ -104,22 +108,24 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 {
 	SYNC_TIMER *timer = (SYNC_TIMER*) ctx;
 	EVENT *ev = fiber_io_event();
-	int delay = -1;
+	SYNC_OBJ *obj;
+	int delay = -1, res;
 
 	while (!timer->stop) {
-		int res;
-		SYNC_OBJ *obj = mbox_read(timer->box, delay, &res);
-		if (obj == NULL) {
+		SYNC_MSG *msg = mbox_read(timer->box, delay, &res);
+		if (msg == NULL) {
 			delay = check_expire(ev, timer);
 			continue;
 		}
 
+		obj = msg->obj;
+
 		//assert(obj->fb->status == FIBER_STATUS_SUSPEND);
 
-		switch (obj->action) {
+		switch (msg->action) {
 		case SYNC_ACTION_AWAIT:
 			assert (obj->delay >= 0);
-			obj->expire = event_get_stamp(ev) + delay;
+			obj->expire = event_get_stamp(ev) + obj->delay;
 			timer_cache_add(timer->waiters, obj->expire, &obj->me);
 			if (delay == -1 || obj->delay < delay) {
 				delay = obj->delay;
@@ -130,9 +136,10 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 			break;
 		default:
 			msg_fatal("%s(%d): unkown action=%d",
-				__FUNCTION__, __LINE__, obj->action);
+				__FUNCTION__, __LINE__, msg->action);
 			break;
 		}
+		mem_free(msg);
 
 		delay = check_expire(ev, timer);
 
@@ -163,13 +170,17 @@ SYNC_TIMER *sync_timer_get(void)
 void sync_timer_await(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
 	if (obj->delay >= 0) {
-		obj->action = SYNC_ACTION_AWAIT;
-		mbox_send(timer->box, obj);
+		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+		msg->obj = obj;
+		msg->action = SYNC_ACTION_AWAIT;
+		mbox_send(timer->box, msg);
 	}
 }
 
 void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
-	obj->action = SYNC_ACTION_WAKEUP;
-	mbox_send(timer->box, obj);
+	SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+	msg->obj = obj;
+	msg->action = SYNC_ACTION_WAKEUP;
+	mbox_send(timer->box, msg);
 }

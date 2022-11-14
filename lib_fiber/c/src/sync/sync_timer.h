@@ -10,9 +10,6 @@ typedef struct SYNC_OBJ {
 	SYNC_TIMER *timer;
 	ACL_FIBER *fb;
 	ACL_FIBER_COND *cond;
-	int action;
-#define	SYNC_ACTION_AWAIT	1
-#define	SYNC_ACTION_WAKEUP	2
 
 	long long expire;
 	int delay;
@@ -20,6 +17,13 @@ typedef struct SYNC_OBJ {
 #define	SYNC_STATUS_TIMEOUT	(1 << 0)
 #define	SYNC_STATUS_DELAYED	(1 << 1)
 } SYNC_OBJ;
+
+typedef struct SYNC_MSG {
+	SYNC_OBJ *obj;
+	int action;
+#define	SYNC_ACTION_AWAIT	1
+#define	SYNC_ACTION_WAKEUP	2
+} SYNC_MSG;
 
 SYNC_TIMER *sync_timer_get(void);
 void sync_timer_await(SYNC_TIMER *waiter, SYNC_OBJ *obj);

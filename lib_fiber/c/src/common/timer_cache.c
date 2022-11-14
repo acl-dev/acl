@@ -129,5 +129,6 @@ int timer_cache_remove_exist(TIMER_CACHE *cache, long long expire, RING *entry)
 			return 1;
 		}
 	}
+
 	return 0;
 }
