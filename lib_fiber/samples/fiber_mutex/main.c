@@ -55,15 +55,24 @@ static __thread int __count = 0;
 
 static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
-	int i;
+	int i, ret;
 	ACL_FIBER_MUTEX *l;
 
 	for (i = 0; i < __nloop; i++) {
 		l = __locks[i % __nlocks];
-		acl_fiber_mutex_lock(l);
-		acl_fiber_mutex_unlock(l);
+		ret = acl_fiber_mutex_lock(l);
+		if (ret) {
+			printf("%s: lock error=%s\r\n", __FUNCTION__, strerror(ret));
+			assert(ret == 0);
+		}
+
+		ret = acl_fiber_mutex_unlock(l);
+		if (ret) {
+			printf("%s: unlock error=%s\r\n", __FUNCTION__, strerror(ret));
+			assert(ret == 0);
+		}
+
 		acl_atomic_int64_add_fetch(__atomic, 1);
-		//acl_fiber_delay(1);
 		if (__use_yield) {
 			acl_fiber_yield();
 		}
@@ -89,7 +98,6 @@ static void fiber_main3(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		acl_fiber_event_wait(l);
 		acl_fiber_event_notify(l);
 		acl_atomic_int64_add_fetch(__atomic, 1);
-		//acl_fiber_delay(1);
 		if (__use_yield) {
 			acl_fiber_yield();
 		}
@@ -123,10 +131,27 @@ static void *thread_main(void *arg acl_unused)
 	return NULL;
 }
 
-static void test2(int nthreads, unsigned flags)
+static void *thread_alone_main(void *ctx acl_unused)
 {
 	int i;
-	pthread_t threads[nthreads];
+	ACL_FIBER_MUTEX *l;
+
+	for (i = 0; i < __nloop; i++) {
+		l = __locks[i % __nlocks];
+		acl_fiber_mutex_lock(l);
+		acl_fiber_mutex_unlock(l);
+		acl_atomic_int64_add_fetch(__atomic, 1);
+		__count++;
+	}
+
+	printf("thread-%lu over, count=%d\r\n", pthread_self(), __count);
+	return NULL;
+}
+
+static void test2(int nthreads, int nthreads2, unsigned flags)
+{
+	int i;
+	pthread_t threads[nthreads], threads2[nthreads2];
 	struct timeval begin, end;
 	double cost, speed;
 	long long n;
@@ -148,8 +173,16 @@ static void test2(int nthreads, unsigned flags)
 		pthread_create(&threads[i], NULL, thread_main, NULL);
 	}
 
+	for (i = 0; i < nthreads2; i++) {
+		pthread_create(&threads2[i], NULL, thread_alone_main, NULL);
+	}
+
 	for (i = 0; i < nthreads; i++) {
 		pthread_join(threads[i], NULL);
+	}
+
+	for (i = 0; i < nthreads2; i++) {
+		pthread_join(threads2[i], NULL);
 	}
 
 	gettimeofday(&end, NULL);
@@ -178,6 +211,7 @@ static void usage(const char *procname)
 		" -a action\r\n"
 		" -t threads_count\r\n"
 		" -c fibers_count\r\n"
+		" -p threads_alone_count\r\n"
 		" -n loop_count\r\n"
 		" -l locks_count\r\n"
 		" -E [if use fiber_event]\r\n"
@@ -188,13 +222,13 @@ static void usage(const char *procname)
 
 int main(int argc, char *argv[])
 {
-	int  ch, nthreads = 2;
+	int  ch, nthreads = 2, nthreads2 = 0;
 	unsigned flags = 0;
 	char action[64];
 
 	snprintf(action, sizeof(action), "test1");
 
-	while ((ch = getopt(argc, argv, "he:a:t:c:n:l:EYT")) > 0) {
+	while ((ch = getopt(argc, argv, "he:a:t:c:p:n:l:EYT")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -216,6 +250,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'c':
 			__fibers_count = atoi(optarg);
+			break;
+		case 'p':
+			nthreads2 = atoi(optarg);
 			break;
 		case 'n':
 			__nloop = atoi(optarg);
@@ -240,7 +277,7 @@ int main(int argc, char *argv[])
 	if (strcasecmp(action, "test1") == 0) {
 		test1();
 	} else if (strcasecmp(action, "test2") == 0) {
-		test2(nthreads, flags);
+		test2(nthreads, nthreads2, flags);
 	} else {
 		printf("unknown action: %s\r\n", action);
 		usage(argv[0]);

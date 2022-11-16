@@ -28,8 +28,6 @@ ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
 	pthread_mutex_init(&cond->mutex, NULL);
 #endif
 
-	pthread_cond_init(&cond->thread_cond, NULL);
-
 	return cond;
 }
 
@@ -37,7 +35,6 @@ void acl_fiber_cond_free(ACL_FIBER_COND *cond)
 {
 	array_free(cond->waiters, NULL);
 	pthread_mutex_destroy(&cond->mutex);
-	pthread_cond_destroy(&cond->thread_cond);
 	mem_free(cond);
 }
 
@@ -60,27 +57,33 @@ void acl_fiber_cond_free(ACL_FIBER_COND *cond)
 } while (0)
 
 #define	FIBER_LOCK(l) do {  \
-	if (acl_fiber_mutex_lock(l) != 0) {  \
-		msg_fatal("acl_fiber_mutex_lock failed");  \
+	int n = acl_fiber_mutex_lock(l);  \
+	if (n) {  \
+		acl_fiber_set_error(n);  \
+		msg_fatal("%s(%d), %s: acl_fiber_mutex_lock error=%s",  \
+			__FILE__, __LINE__, __FUNCTION__, last_serror());  \
 	}  \
 } while (0)
 
 #define	FIBER_UNLOCK(l) do {  \
-	if (acl_fiber_mutex_unlock(l) != 0) {  \
-		msg_fatal("acl_fiber_mutex_unlock failed");  \
+	int n = acl_fiber_mutex_unlock(l);  \
+	if (n) {  \
+		acl_fiber_set_error(n);  \
+		msg_fatal("%s(%d), %s: acl_fiber_mutex_unlock error=%s",  \
+			__FILE__, __LINE__, __FUNCTION__, last_serror());  \
 	}  \
 } while (0)
 
 static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
-	int delay_ms)
+	int delay)
 {
 	EVENT *ev        = fiber_io_event();
 	ACL_FIBER *fiber = acl_fiber_running();
-	SYNC_OBJ *obj    = (SYNC_OBJ*) mem_malloc(sizeof(SYNC_OBJ));
+	SYNC_OBJ *obj    = sync_obj_alloc(1);
 
 	obj->type   = SYNC_OBJ_T_FIBER;
 	obj->fb     = fiber;
-	obj->delay  = delay_ms;
+	obj->delay  = delay;
 	obj->status = 0;
 	obj->cond   = cond;
 	obj->timer  = sync_timer_get();
@@ -100,49 +103,66 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	FIBER_LOCK(mutex);
 
 	LOCK_COND(cond);
+	assert(array_delete_obj(cond->waiters, obj, NULL) != 0);
+	UNLOCK_COND(cond);
+
 	if (obj->status & SYNC_STATUS_TIMEOUT) {
 		// The obj has been deleted in sync_timer.c when timeout.
-		mem_free(obj);
-		UNLOCK_COND(cond);
+		sync_obj_unrefer(obj);
 		return FIBER_ETIME;
 	}
 
-	mem_free(obj);
-	UNLOCK_COND(cond);
+	sync_obj_unrefer(obj);
 	return 0;
 }
 
 static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
-	int delay_ms)
+	int delay)
 {
-	SYNC_OBJ *obj = (SYNC_OBJ*) mem_calloc(1, sizeof(SYNC_OBJ));
-	struct timespec timeout;
-	struct timeval  tv;
-	int ret;
+	SYNC_OBJ *obj = sync_obj_alloc(1);
 
 	obj->type = SYNC_OBJ_T_THREAD;
+	obj->base = fbase_alloc();
+	obj->tid  = pthread_self();
+
+	fbase_event_open(obj->base);
 
 	LOCK_COND(cond);
 	array_append(cond->waiters, obj);
 	UNLOCK_COND(cond);
 
-	gettimeofday(&tv, NULL);
-	timeout.tv_sec  = tv.tv_sec + delay_ms / 1000;
-	timeout.tv_nsec = tv.tv_usec * 1000 + (delay_ms % 1000) * 1000 * 1000;
+	FIBER_UNLOCK(mutex);
 
-	ret = pthread_cond_timedwait(&cond->thread_cond,
-			&mutex->thread_lock, &timeout);
-	LOCK_COND(cond);
-	// If the object hasn't been poped by producer, we should remove it
-	// from the waiters' array and free it here.
-	if (array_delete_obj(cond->waiters, obj, NULL) == 0) {
-		mem_free(obj);
+	if (delay >= 0 && read_wait(obj->base->event_in, delay) == -1) {
+		FIBER_LOCK(mutex);
+
+		LOCK_COND(cond);
+		array_delete_obj(cond->waiters, obj, NULL);
+		UNLOCK_COND(cond);
+
+		sync_obj_unrefer(obj);
+		FIBER_LOCK(mutex);
+		return FIBER_ETIME;
 	}
-	// else: the object must be poped by acl_fiber_cond_signal, and will
-	// be freed there.
-	UNLOCK_COND(cond);
 
-	return ret;
+	if (fbase_event_wait(obj->base) == -1) {
+		msg_error("%s(%d), %s: wait event error",
+			__FILE__, __LINE__, __FUNCTION__);
+
+		FIBER_LOCK(mutex);
+
+		LOCK_COND(cond);
+		array_delete_obj(cond->waiters, obj, NULL);
+		UNLOCK_COND(cond);
+
+		sync_obj_unrefer(obj);
+		FIBER_LOCK(mutex);
+		return FIBER_EINVAL;
+	}
+
+	FIBER_LOCK(mutex);
+	sync_obj_unrefer(obj);
+	return 0;
 }
 
 int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
@@ -166,22 +186,36 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	int ret = 0;
 
 	LOCK_COND(cond);
-	obj = array_pop_front(cond->waiters);
-	UNLOCK_COND(cond);
 
+	obj = (SYNC_OBJ*) array_head(cond->waiters);
 	if (obj == NULL) {
+		UNLOCK_COND(cond);
 		return 0;
 	}
+
+	switch (obj->type) {
+	case SYNC_OBJ_T_FIBER:
+	case SYNC_OBJ_T_THREAD:
+		sync_obj_refer(obj);
+		(void) array_pop_front(cond->waiters);
+		break;
+	default:
+		msg_fatal("%s: unknown type=%d", __FUNCTION__, obj->type);
+		break;
+	}
+
+	UNLOCK_COND(cond);
 
 	if (obj->type == SYNC_OBJ_T_FIBER) {
 		sync_timer_wakeup(obj->timer, obj);
 	} else if (obj->type == SYNC_OBJ_T_THREAD) {
-		ret = pthread_cond_signal(&obj->cond->thread_cond);
-		mem_free(obj);
+		ret = fbase_event_wakeup(obj->base);
 	} else {
-		msg_fatal("%s: unknown type=%d", __FUNCTION__, obj->type);
+		msg_fatal("%s(%d): unknown type=%d",
+			__FUNCTION__, __LINE__, obj->type);
 	}
 
+	sync_obj_unrefer(obj);
 	return ret;
 }
 

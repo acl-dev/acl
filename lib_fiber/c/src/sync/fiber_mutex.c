@@ -14,9 +14,6 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flags)
 		mem_calloc(1, sizeof(ACL_FIBER_MUTEX));
 
 	mutex->flags  = flags;
-	mutex->atomic = atomic_new();
-	atomic_set(mutex->atomic, &mutex->value);
-	atomic_int64_set(mutex->atomic, 0);
 
 	mutex->waiters = array_create(5, ARRAY_F_UNORDER);
 	pthread_mutex_init(&mutex->lock, NULL);
@@ -27,7 +24,6 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flags)
 
 void acl_fiber_mutex_free(ACL_FIBER_MUTEX *mutex)
 {
-	atomic_free(mutex->atomic);
 	array_free(mutex->waiters, NULL);
 	pthread_mutex_destroy(&mutex->lock);
 	pthread_mutex_destroy(&mutex->thread_lock);
@@ -42,23 +38,15 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 
 	while (1) {
 		pthread_mutex_lock(&mutex->lock);
-		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
+		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			pthread_mutex_unlock(&mutex->lock);
-			pthread_mutex_lock(&mutex->thread_lock);
 			return 0;
 		}
 
 		// For the independent thread, only lock the thread mutex.
 		if (!var_hook_sys_api) {
 			pthread_mutex_unlock(&mutex->lock);
-			pthread_mutex_lock(&mutex->thread_lock);
-			pthread_mutex_unlock(&mutex->thread_lock);
-
-			if (++wakeup > 5) {
-				wakeup = 0;
-				acl_fiber_delay(100);
-			}
-			continue;
+			return pthread_mutex_lock(&mutex->thread_lock);
 		}
 
 		fiber = acl_fiber_running();
@@ -66,13 +54,13 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 
 		pos = array_append(mutex->waiters, fiber);
 
-		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
+		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			array_delete(mutex->waiters, pos, NULL);
 			pthread_mutex_unlock(&mutex->lock);
 
-			pthread_mutex_lock(&mutex->thread_lock);
 			return 0;
 		}
+
 		pthread_mutex_unlock(&mutex->lock);
 
 		ev = fiber_io_event();
@@ -94,21 +82,13 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 	ACL_FIBER *fiber;
 
 	while (1) {
-		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
-			pthread_mutex_lock(&mutex->thread_lock);
+		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			return 0;
 		}
 
 		// For the independent thread, only lock the thread mutex.
 		if (!var_hook_sys_api) {
-			pthread_mutex_lock(&mutex->thread_lock);
-			pthread_mutex_unlock(&mutex->thread_lock);
-
-			if (++wakeup > 5) {
-				wakeup = 0;
-				acl_fiber_delay(100);
-			}
-			continue;
+			return pthread_mutex_lock(&mutex->thread_lock);
 		}
 
 		fiber = acl_fiber_running();
@@ -117,13 +97,13 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 		pthread_mutex_lock(&mutex->lock);
 		pos = array_append(mutex->waiters, fiber);
 
-		if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
+		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			array_delete(mutex->waiters, pos, NULL);
 			pthread_mutex_unlock(&mutex->lock);
 
-			pthread_mutex_lock(&mutex->thread_lock);
 			return 0;
 		}
+
 		pthread_mutex_unlock(&mutex->lock);
 
 		ev = fiber_io_event();
@@ -149,27 +129,22 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 
 int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *mutex)
 {
-	if (atomic_int64_cas(mutex->atomic, 0, 1) == 0) {
-		pthread_mutex_lock(&mutex->thread_lock);
-		return 0;
-	}
-	return EBUSY;
+	return pthread_mutex_trylock(&mutex->thread_lock);
 }
 
 int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 {
 	ACL_FIBER *fiber;
+	int ret;
 
 	pthread_mutex_lock(&mutex->lock);
 	fiber = (ACL_FIBER*) array_pop_front(mutex->waiters);
-
-	pthread_mutex_unlock(&mutex->thread_lock);
-
-	if (atomic_int64_cas(mutex->atomic, 1, 0) != 1) {
-		pthread_mutex_unlock(&mutex->lock);
-		return -1;
-	}
 	pthread_mutex_unlock(&mutex->lock);
+
+	ret = pthread_mutex_unlock(&mutex->thread_lock);
+	if (ret != 0) {
+		return ret;
+	}
 
 	if (fiber) {
 		sync_waiter_wakeup(fiber->sync, fiber);

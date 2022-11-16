@@ -13,6 +13,8 @@ static ACL_FIBER_MUTEX *__mutex;
 static ACL_FIBER_COND  *__cond;
 static ACL_ATOMIC      *__atomic;
 static long long        __atomic_value;
+static ACL_ATOMIC      *__atomic_signal;
+static long long        __atomic_signal_value;
 
 static __thread int __nfibers   = 1;
 static __thread int __count     = 0;
@@ -23,15 +25,19 @@ static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	int n = 0;
 	while (!__all_consumers_exit) {
 		acl_fiber_cond_signal(__cond);
+
+		acl_atomic_int64_add_fetch(__atomic_signal, 1);
+
 		if (++n % 2000000 == 0) {
-			printf("--signal = %d\n", n);
-			//sleep(1);
+			//printf("--signal = %d\n", n);
+			//acl_fiber_delay(1000);
 		}
 		//acl_fiber_delay(1000);
 	}
 
 	if (--__nfibers == 0) {
-		printf("thread-%lu, all producers over!\r\n", pthread_self());
+		printf("thread-%lu, all producers over, total signal=%lld!\r\n",
+			pthread_self(), acl_atomic_int64_add_fetch(__atomic_signal, 0));
 		//acl_fiber_schedule_stop();
 	}
 }
@@ -50,24 +56,37 @@ static void *thread_producer(void *arg acl_unused)
 	return NULL;
 }
 
-static void fiber_consumer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+static void do_consume(void)
 {
-	int ret, base = __total_count / 10;
+	int ret, base = __total_count / 10, res;
 	long long n;
 
 	if (base == 0) {
 		base = 1;
 	}
 
-	acl_fiber_mutex_lock(__mutex);
-
 	while (1) {
+		res = acl_fiber_mutex_lock(__mutex);
+		if (res != 0) {
+			printf("%s(%d): lock error=%s\r\n",
+				__FUNCTION__, __LINE__, strerror(res));
+		}
+
 		ret = acl_fiber_cond_timedwait(__cond, __mutex, __wait_timeout);
+
+		res = acl_fiber_mutex_unlock(__mutex);
+		if (res != 0) {
+			printf("%s(%d): unlock error=%s\r\n",
+				__FUNCTION__, __LINE__, strerror(res));
+		}
+
 		if (ret != 0) {
 			printf("thread-%lu, fiber-%d: timedwait error=%s\r\n",
 				pthread_self(), acl_fiber_self(), strerror(ret));
 			continue;
 		}
+
+		//printf("thread-%lu got one\n", pthread_self());
 
 		if (++__count % base == 0) {
 			printf("---consumer thread-%lu, fiber=%d: count=%d\r\n",
@@ -84,10 +103,13 @@ static void fiber_consumer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	}
 
 	acl_fiber_mutex_unlock(__mutex);
+}
+
+static void fiber_consumer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+{
+	do_consume();
 
 	if (--__nfibers == 0) {
-		printf("---thread-%lu, all consumers over, count=%d!\r\n",
-			pthread_self(), __count);
 		//acl_fiber_schedule_stop();
 	}
 }
@@ -103,14 +125,24 @@ static void *thread_consumer(void *arg acl_unused)
 	}
 
 	acl_fiber_schedule_with(__event_type);
-	printf("---thread-%lu consumer will exit\r\n", pthread_self());
+	printf("---thread-%lu, fiber consumers over, count=%d\r\n",
+		pthread_self(), __count);
 	return NULL;
 }
 
-static void test(int nthreads, unsigned flags)
+static void *thread_alone_consumer(void *arg acl_unused)
+{
+	do_consume();
+	printf("---thread-%lu, thread consumer over, count=%d\r\n",
+		pthread_self(), __count);
+	return NULL;
+}
+
+static void test(int nthreads, int nthreads2, unsigned flags)
 {
 	int i;
 	pthread_t producers[nthreads], consumers[nthreads];
+	pthread_t consumers_alone[nthreads2];
 	struct timeval begin, end;
 	double cost, speed;
 	long long n;
@@ -121,6 +153,10 @@ static void test(int nthreads, unsigned flags)
 	__atomic = acl_atomic_new();
 	acl_atomic_set(__atomic, &__atomic_value);
 	acl_atomic_int64_set(__atomic, 0);
+
+	__atomic_signal = acl_atomic_new();
+	acl_atomic_set(__atomic_signal, &__atomic_signal_value);
+	acl_atomic_int64_set(__atomic_signal, 0);
 
 	gettimeofday(&begin, NULL);
 
@@ -134,8 +170,19 @@ static void test(int nthreads, unsigned flags)
 		printf("---create one consumer--%lu\n", consumers[i]);
 	}
 
+	for (i = 0; i < nthreads2; i++) {
+		pthread_create(&consumers_alone[i], NULL,
+			thread_alone_consumer, NULL);
+		printf("---create one thread consumer--%lu\n",
+			consumers_alone[i]);
+	}
+
 	for (i = 0; i < nthreads; i++) {
 		pthread_join(consumers[i], NULL);
+	}
+
+	for (i = 0; i < nthreads2; i++) {
+		pthread_join(consumers_alone[i], NULL);
 	}
 
 	__all_consumers_exit = 1;
@@ -158,6 +205,7 @@ static void test(int nthreads, unsigned flags)
 	acl_fiber_mutex_free(__mutex);
 	acl_fiber_cond_free(__cond);
 	acl_atomic_free(__atomic);
+	acl_atomic_free(__atomic_signal);
 }
 
 static void usage(const char *procname)
@@ -166,17 +214,19 @@ static void usage(const char *procname)
 		" -e schedule_event_type[kernel|poll|select|io_uring]\r\n"
 		" -t threads_count\r\n"
 		" -c fibers_count\r\n"
+		" -p threads_alone_count\r\n"
 		" -n total_loop_count\r\n"
 		" -r wait_timeout[default: -1]\r\n"
+		" -D [if open debug log to stdout]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int  ch, nthreads = 1;
+	int  ch, nthreads = 1, nthreads2 = 0, debug = 0;
 	unsigned flags = 0;
 
-	while ((ch = getopt(argc, argv, "he:t:c:n:Tr:")) > 0) {
+	while ((ch = getopt(argc, argv, "he:t:c:p:n:Tr:D")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -196,6 +246,9 @@ int main(int argc, char *argv[])
 		case 'c':
 			__fibers_count = atoi(optarg);
 			break;
+		case 'p':
+			nthreads2 = atoi(optarg);
+			break;
 		case 'n':
 			__total_count = atoi(optarg);
 			break;
@@ -205,11 +258,18 @@ int main(int argc, char *argv[])
 		case 'T':
 			flags |= FIBER_MUTEX_F_LOCK_TRY;
 			break;
+		case 'D':
+			debug = 1;
+			break;
 		default:
 			break;
 		}
 	}
 
-	test(nthreads, flags);
+	if (debug) {
+		acl_fiber_msg_stdout_enable(1);
+	}
+
+	test(nthreads, nthreads2, flags);
 	return 0;
 }
