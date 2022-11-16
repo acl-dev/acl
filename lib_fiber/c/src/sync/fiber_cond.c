@@ -103,7 +103,7 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	FIBER_LOCK(mutex);
 
 	LOCK_COND(cond);
-	assert(array_delete_obj(cond->waiters, obj, NULL) != 0);
+	array_delete_obj(cond->waiters, obj, NULL);
 	UNLOCK_COND(cond);
 
 	if (obj->status & SYNC_STATUS_TIMEOUT) {
