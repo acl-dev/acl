@@ -96,10 +96,12 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 
 	FIBER_UNLOCK(mutex);
 
+	printf(">>>%s: wait waiter=%d\n", __FUNCTION__, ev->waiter);
 	ev->waiter++;
 	acl_fiber_switch();
 	ev->waiter--;
 
+	printf(">>>%s: wakeup waiter=%d\n", __FUNCTION__, ev->waiter);
 	FIBER_LOCK(mutex);
 
 	LOCK_COND(cond);
@@ -207,7 +209,10 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	UNLOCK_COND(cond);
 
 	if (obj->type == SYNC_OBJ_T_FIBER) {
+		EVENT *ev = fiber_io_event();
+	printf(">>>%s: sync waiter=%d\n", __FUNCTION__, ev->waiter);
 		sync_timer_wakeup(obj->timer, obj);
+	printf(">>>%s: sync ok waiter=%d\n", __FUNCTION__, ev->waiter);
 	} else if (obj->type == SYNC_OBJ_T_THREAD) {
 		ret = fbase_event_wakeup(obj->base);
 	} else {

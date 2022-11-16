@@ -37,7 +37,8 @@ static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all producers over, total signal=%lld!\r\n",
-			pthread_self(), acl_atomic_int64_add_fetch(__atomic_signal, 0));
+			(unsigned long) pthread_self(),
+			acl_atomic_int64_add_fetch(__atomic_signal, 0));
 		//acl_fiber_schedule_stop();
 	}
 }
@@ -82,7 +83,8 @@ static void do_consume(void)
 
 		if (ret != 0) {
 			printf("thread-%lu, fiber-%d: timedwait error=%s\r\n",
-				pthread_self(), acl_fiber_self(), strerror(ret));
+				(unsigned long) pthread_self(),
+				acl_fiber_self(), strerror(ret));
 			continue;
 		}
 
@@ -90,13 +92,15 @@ static void do_consume(void)
 
 		if (++__count % base == 0) {
 			printf("---consumer thread-%lu, fiber=%d: count=%d\r\n",
-				pthread_self(), acl_fiber_self(), ++__count);
+				(unsigned long) pthread_self(),
+				acl_fiber_self(), ++__count);
 		}
 
 		n = acl_atomic_int64_add_fetch(__atomic, 1);
 		if (n >= __total_count) {
 			printf("---thread-%lu, fiber=%d, consumer all ok, "
-				"n=%lld, total=%d---\r\n", pthread_self(),
+				"n=%lld, total=%d---\r\n",
+				(unsigned long) pthread_self(),
 				acl_fiber_self(), n, __total_count);
 			break;
 		}
@@ -126,7 +130,7 @@ static void *thread_consumer(void *arg acl_unused)
 
 	acl_fiber_schedule_with(__event_type);
 	printf("---thread-%lu, fiber consumers over, count=%d\r\n",
-		pthread_self(), __count);
+		(unsigned long) pthread_self(), __count);
 	return NULL;
 }
 
@@ -134,7 +138,7 @@ static void *thread_alone_consumer(void *arg acl_unused)
 {
 	do_consume();
 	printf("---thread-%lu, thread consumer over, count=%d\r\n",
-		pthread_self(), __count);
+		(unsigned long) pthread_self(), __count);
 	return NULL;
 }
 
@@ -162,19 +166,19 @@ static void test(int nthreads, int nthreads2, unsigned flags)
 
 	for (i = 0; i < nthreads; i++) {
 		pthread_create(&producers[i], NULL, thread_producer, NULL);
-		printf("---create one producer--%lu\n", producers[i]);
+		printf("---create one producer--%lu\n", (unsigned long) producers[i]);
 	}
 
 	for (i = 0; i < nthreads; i++) {
 		pthread_create(&consumers[i], NULL, thread_consumer, NULL);
-		printf("---create one consumer--%lu\n", consumers[i]);
+		printf("---create one consumer--%lu\n", (unsigned long) consumers[i]);
 	}
 
 	for (i = 0; i < nthreads2; i++) {
 		pthread_create(&consumers_alone[i], NULL,
 			thread_alone_consumer, NULL);
 		printf("---create one thread consumer--%lu\n",
-			consumers_alone[i]);
+			(unsigned long) consumers_alone[i]);
 	}
 
 	for (i = 0; i < nthreads; i++) {

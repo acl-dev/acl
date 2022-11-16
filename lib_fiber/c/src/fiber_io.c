@@ -203,6 +203,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			 */
 			while (acl_fiber_yield() > 0) {}
 
+			printf(">>ev->waiter=%d\n", ev->waiter);
 			if (/*ev->fdcount > 0 || */ ev->waiter > 0) {
 				continue;
 			} else if (ring_size(&ev->events) > 0) {
