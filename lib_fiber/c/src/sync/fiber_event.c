@@ -127,14 +127,22 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 	if (LIKELY(atomic_int64_cas(event->atomic, 0, 1) == 0)) {
 #endif
 		__ll_lock(event);
-		event->owner = fiber ? &fiber->base : NULL;
+		event->owner = fiber ? fiber->base : NULL;
 		event->tid   = __pthread_self();
 		__ll_unlock(event);
 		return 0;
 	}
 
 	// FIBER_BASE obj will be created if is not in fiber scheduled
-	fbase = fiber ? &fiber->base : fbase_alloc();
+
+	if (!fiber) {
+		fbase = fbase_alloc(FBASE_F_BASE);
+	} else if (fiber->base) {
+		fbase = fiber->base;
+	} else {
+		fiber->base = fbase = fbase_alloc(FBASE_F_FIBER);
+	}
+
 	fbase_event_open(fbase);
 
 	wakeup = 0;
@@ -203,7 +211,7 @@ int acl_fiber_event_trywait(ACL_FIBER_EVENT *event)
 	if (atomic_int64_cas(event->atomic, 0, 1) == 0) {
 		ACL_FIBER *fiber = acl_fiber_running();
 		__ll_lock(event);
-		event->owner     = fiber ? &fiber->base : NULL;
+		event->owner     = fiber ? fiber->base : NULL;
 		event->tid       = __pthread_self();
 		__ll_unlock(event);
 		return 0;
@@ -214,7 +222,7 @@ int acl_fiber_event_trywait(ACL_FIBER_EVENT *event)
 int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 {
 	ACL_FIBER  *curr  = acl_fiber_running();
-	FIBER_BASE *owner = curr ? &curr->base : NULL, *waiter;
+	FIBER_BASE *owner = curr ? curr->base : NULL, *waiter;
 	RING       *head;
 
 	if (UNLIKELY(event->owner != owner)) {

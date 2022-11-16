@@ -40,10 +40,10 @@ typedef struct FIBER_BASE {
 	RING     event_waiter;
 } FIBER_BASE;
 
-typedef struct SYNC_WAITER SYNC_WAITER;
+struct SYNC_WAITER;
 
 struct ACL_FIBER {
-	FIBER_BASE     base;
+	FIBER_BASE    *base;
 	fiber_status_t status;
 	RING           me;
 	unsigned       id;
@@ -64,7 +64,7 @@ struct ACL_FIBER {
 	RING           holding;
 	ACL_FIBER_LOCK *waiting;
 
-	SYNC_WAITER  *sync;
+	struct SYNC_WAITER *sync;
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
@@ -82,7 +82,7 @@ struct ACL_FIBER {
 /* in fiber.c */
 extern __thread int var_hook_sys_api;
 
-FIBER_BASE *fbase_alloc(void);
+FIBER_BASE *fbase_alloc(unsigned flag);
 void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
 ACL_FIBER *fiber_origin(void);

@@ -645,11 +645,11 @@ static void fbase_finish(FIBER_BASE *fbase)
 	//atomic_free(fbase->atomic);
 }
 
-FIBER_BASE *fbase_alloc(void)
+FIBER_BASE *fbase_alloc(unsigned flag)
 {
 	FIBER_BASE *fbase = (FIBER_BASE *) mem_calloc(1, sizeof(FIBER_BASE));
 
-	fbase_init(fbase, FBASE_F_BASE);
+	fbase_init(fbase, flag);
 	return fbase;
 }
 
@@ -661,7 +661,9 @@ void fbase_free(FIBER_BASE *fbase)
 
 void fiber_free(ACL_FIBER *fiber)
 {
-	fbase_finish(&fiber->base);
+	if (fiber->base) {
+		fbase_finish(fiber->base);
+	}
 	fiber->free_fn(fiber);
 }
 
@@ -711,7 +713,6 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 		fiber = __fiber_alloc_fn(fiber_start, attr);
-		fbase_init(&fiber->base, FBASE_F_FIBER);
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);
 	}

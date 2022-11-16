@@ -1,8 +1,8 @@
 #ifndef	__SYNC_TYPE_INCLUDE_H__
 #define	__SYNC_TYPE_INCLUDE_H__
 
-typedef struct ACL_FIBER_COND ACL_FIBER_COND;
 typedef struct SYNC_TIMER SYNC_TIMER;
+typedef struct SYNC_WAITER SYNC_WAITER;
 
 struct ACL_FIBER_MUTEX {
 	unsigned flags;

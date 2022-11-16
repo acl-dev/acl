@@ -79,12 +79,10 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		__count++;
 	}
 
-	//printf(">>>thread-%lu, fiber-%d over\r\n", pthread_self(), acl_fiber_self());
-
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all fibers over, count=%d!\r\n",
-			pthread_self(), __count);
-		//acl_fiber_schedule_stop();
+			(unsigned long) pthread_self(), __count);
+		acl_fiber_schedule_stop();
 	}
 }
 
@@ -104,11 +102,9 @@ static void fiber_main3(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		__count++;
 	}
 
-	//printf(">>>thread-%lu, fiber-%d over\r\n", pthread_self(), acl_fiber_self());
-
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all fibers over, count=%d\r\n",
-			pthread_self(), __count);
+			(unsigned long) pthread_self(), __count);
 		//acl_fiber_schedule_stop();
 	}
 }
@@ -144,7 +140,8 @@ static void *thread_alone_main(void *ctx acl_unused)
 		__count++;
 	}
 
-	printf("thread-%lu over, count=%d\r\n", pthread_self(), __count);
+	printf("thread-%lu over, count=%d\r\n",
+		(unsigned long) pthread_self(), __count);
 	return NULL;
 }
 
