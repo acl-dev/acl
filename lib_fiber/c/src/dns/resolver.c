@@ -416,7 +416,7 @@ static int udp_request(const char *ip, unsigned short port,
 	ret = acl_fiber_sendto(sock, data, (int) dlen, 0, (struct sockaddr *) &addr,
 		     (socklen_t) sizeof(addr));
 #else
-	ret = acl_fiber_sendto(sock, data, dlen, 0, (struct sockaddr *) &addr,
+	ret = (int) acl_fiber_sendto(sock, data, dlen, 0, (struct sockaddr *) &addr,
 		     (socklen_t) sizeof(addr));
 #endif
 
@@ -440,7 +440,7 @@ static int udp_request(const char *ip, unsigned short port,
 	ret = acl_fiber_recvfrom(sock, buf, (int) size, 0,
 		(struct sockaddr*) &from_addr, &len);
 #else
-	ret = acl_fiber_recvfrom(sock, buf, size, 0,
+	ret = (int) acl_fiber_recvfrom(sock, buf, size, 0,
 		(struct sockaddr*) &from_addr, &len);
 #endif
 

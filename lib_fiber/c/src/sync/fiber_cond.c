@@ -207,7 +207,6 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	UNLOCK_COND(cond);
 
 	if (obj->type == SYNC_OBJ_T_FIBER) {
-		EVENT *ev = fiber_io_event();
 		sync_timer_wakeup(obj->timer, obj);
 	} else if (obj->type == SYNC_OBJ_T_THREAD) {
 		ret = fbase_event_wakeup(obj->base);

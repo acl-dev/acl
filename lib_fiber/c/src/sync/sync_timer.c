@@ -101,7 +101,7 @@ static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 	}
 
 	if (expire > now) {
-		return expire - now;
+		return (int) (expire - now);
 	}
 	// xxx?
 	return 100;

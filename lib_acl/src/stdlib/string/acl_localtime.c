@@ -84,7 +84,7 @@ static void nolocks_localtime(struct tm *tmp, time_t t, time_t tz, int dst)
 	time_t seconds = t % secs_day;      /* Remaining seconds. */
 
 	tmp->tm_isdst = dst;
-	tmp->tm_hour = seconds / secs_hour;
+	tmp->tm_hour = (int) (seconds / secs_hour);
 	tmp->tm_min = (seconds % secs_hour) / secs_min;
 	tmp->tm_sec = (seconds % secs_hour) % secs_min;
 
@@ -107,7 +107,7 @@ static void nolocks_localtime(struct tm *tmp, time_t t, time_t tz, int dst)
 		tmp->tm_year++;
 	}
 
-	tmp->tm_yday = days;  /* Number of day of the current year. */
+	tmp->tm_yday = (int) days;  /* Number of day of the current year. */
 
 	/* We need to calculate in which month and day of the month we are.
 	 * To do so we need to skip days according to how many days there are
@@ -123,7 +123,7 @@ static void nolocks_localtime(struct tm *tmp, time_t t, time_t tz, int dst)
 		tmp->tm_mon++;
 	}
 
-	tmp->tm_mday = days + 1;  /* Add 1 since our 'days' is zero-based. */
+	tmp->tm_mday = (int) days + 1;  /* Add 1 since our 'days' is zero-based. */
 	tmp->tm_year -= 1900;     /* Surprisingly tm_year is year-1900. */
 }
 

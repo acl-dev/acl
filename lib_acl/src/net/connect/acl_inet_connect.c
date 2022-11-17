@@ -219,7 +219,7 @@ static struct addrinfo *try_numeric_addr(int family, const char *name,
 	ai_buf->ai_family   = family;
 	ai_buf->ai_socktype = SOCK_STREAM;
 	ai_buf->ai_protocol = 0;
-	ai_buf->ai_addrlen  = addrlen;
+	ai_buf->ai_addrlen  = (socklen_t) addrlen;
 	ai_buf->ai_addr     = (struct sockaddr*) in_buf;
 	return ai_buf;
 }

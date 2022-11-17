@@ -184,7 +184,7 @@ static ACL_SOCKET bind_addr(const char *addr, unsigned flag,
 	res.ai_family   = family;
 	res.ai_socktype = socktype;
 	res.ai_protocol = 0;
-	res.ai_addrlen  = addrlen;
+	res.ai_addrlen  = (socklen_t) addrlen;
 	res.ai_addr     = (struct sockaddr*) &in;
 
 	return acl_inet_bind(&res, flag);

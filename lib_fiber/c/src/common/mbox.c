@@ -132,7 +132,7 @@ int mbox_send(MBOX *mbox, void *msg)
 
 	mbox->nsend++;
 
-	ret = acl_fiber_write(mbox->out, &n, sizeof(n));
+	ret = (int) acl_fiber_write(mbox->out, &n, sizeof(n));
 #if !defined(HAS_EVENTFD)
 	if (lock) {
 		pthread_mutex_unlock(lock);
@@ -179,7 +179,7 @@ void *mbox_read(MBOX *mbox, int timeout, int *success)
 		return NULL;
 	}
 
-	ret = acl_fiber_read(mbox->in, &n, sizeof(n));
+	ret = (int) acl_fiber_read(mbox->in, &n, sizeof(n));
 	if (ret == -1) {
 		if (success) {
 			*success = 0;
