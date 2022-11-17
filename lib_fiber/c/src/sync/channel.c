@@ -338,9 +338,9 @@ static int channel_alt(FIBER_ALT a[])
 	}
 
 	ev = fiber_io_event();
-	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
+	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	if (acl_fiber_killed(t))
 		return -1;

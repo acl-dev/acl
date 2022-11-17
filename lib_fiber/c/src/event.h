@@ -361,6 +361,14 @@ struct EVENT {
 	event_oper *close_sock;
 };
 
+#if 1
+#define	WAITER_INC(e) ((e)->waiter++)
+#define	WAITER_DEC(e) ((e)->waiter--)
+#else
+#define	WAITER_INC(e) { printf("%s(%d): thread-%lu, ++waiter=%d\r\n", __FUNCTION__, __LINE__, (unsigned long) pthread_self(), ++(e)->waiter); }
+#define	WAITER_DEC(e) { printf("%s(%d): thread-%lu, --waiter=%d\r\n", __FUNCTION__, __LINE__, (unsigned long) pthread_self(), --(e)->waiter); }
+#endif
+
 /* file_event.c */
 void file_event_init(FILE_EVENT *fe, socket_t fd);
 FILE_EVENT *file_event_alloc(socket_t fd);

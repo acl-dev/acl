@@ -72,11 +72,12 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 		return -1;
 	}
 
-	ev = fiber_io_event();
-	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
 	ring_prepend(&sem->waiting, &curr->me);
+
+	ev = fiber_io_event();
+	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	/* If switch to me because other killed me, I should detach myself;
 	 * else if because other unlock, I'll be detached twice which is

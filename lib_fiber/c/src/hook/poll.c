@@ -344,7 +344,6 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	pe->proc  = poll_callback;
 
 	poll_event_set(ev, pe, timeout);
-	ev->waiter++;
 
 	while (1) {
 		/* The cache timer should be set when timeout >= 0. */
@@ -355,9 +354,9 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		pe->nready = 0;
 		pe->fiber->status = FIBER_STATUS_POLL_WAIT;
 
-		ev->waiter++;
+		WAITER_INC(ev);
 		acl_fiber_switch();
-		ev->waiter--;
+		WAITER_DEC(ev);
 
 		if (pe->nready == 0 && pe->expire >= 0) {
 			timer_cache_remove(ev->poll_list, pe->expire, &pe->me);
@@ -394,7 +393,6 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 
 	poll_event_clean(ev, pe);
 	pollfd_free(pe->fds);
-	ev->waiter--;
 
 	nready = pe->nready;
 

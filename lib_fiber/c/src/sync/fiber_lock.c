@@ -55,9 +55,9 @@ static int __lock(ACL_FIBER_LOCK *lk, int block)
 	curr->waiting = lk;
 
 	ev = fiber_io_event();
-	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
+	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	/* if switch to me because other killed me, I should detach myself;
 	 * else if because other unlock, I'll be detached twice which is
@@ -157,9 +157,9 @@ static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 	ring_prepend(&lk->rwaiting, &curr->me);
 
 	ev = fiber_io_event();
-	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
+	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	/* if switch to me because other killed me, I should detach myself */
 	ring_detach(&curr->me);
@@ -195,9 +195,9 @@ static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 	ring_prepend(&lk->wwaiting, &curr->me);
 
 	ev = fiber_io_event();
-	ev->waiter++;  // Just for avoiding fiber_io_loop to exit
+	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	/* if switch to me because other killed me, I should detach myself */
 	ring_detach(&curr->me);

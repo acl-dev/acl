@@ -60,9 +60,9 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	event_uring_file_close(ev, fe);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_FILE_CLOSE;
 
@@ -101,9 +101,9 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 
 	event_uring_file_openat(ev, fe, dirfd, fe->var.path, flags, mode);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_FILE_OPENAT;
 	free(fe->var.path);
@@ -154,9 +154,9 @@ int unlink(const char *pathname)
 
 	event_uring_file_unlink(ev, fe, fe->var.path);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_FILE_UNLINK;
 	free(fe->var.path);
@@ -196,9 +196,9 @@ int renameat2(int olddirfd, const char *oldpath,
 	event_uring_file_renameat2(ev, fe, olddirfd, fe->in.read_ctx.buf,
 		newdirfd, fe->var.path, flags);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_FILE_RENAMEAT2;
 	free(fe->in.read_ctx.buf);
@@ -249,9 +249,9 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	event_uring_file_statx(ev, fe, dirfd, fe->in.read_ctx.buf, flags, mask,
 		fe->var.statxbuf);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_FILE_STATX;
 	free(fe->in.read_ctx.buf);
@@ -317,9 +317,9 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 
 	event_uring_mkdirat(ev, fe, dirfd, fe->var.path, mode);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_DIR_MKDIRAT;
 	free(fe->var.path);
@@ -437,9 +437,9 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 	event_uring_splice(ev, fe, fd_in, off_in, fd_out, off_out, len, flags,
 		sqe_flags, IORING_OP_SPLICE);
 
-	ev->waiter++;
+	WAITER_INC(ev);
 	acl_fiber_switch();
-	ev->waiter--;
+	WAITER_DEC(ev);
 
 	fe->mask &= ~EVENT_SPLICE;
 

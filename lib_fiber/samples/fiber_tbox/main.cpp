@@ -19,7 +19,7 @@ public:
 
 	void test(void)
 	{
-		printf("hello world!\r\n");
+		printf("thread-%lu: hello world!\r\n", acl::thread::self());
 	}
 
 	bool stop_;

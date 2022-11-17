@@ -612,16 +612,15 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 
 	old_timeout = ev->timeout;
 	event_epoll_set(ev, ee, timeout);
-	ev->waiter++;
 
 	while (1) {
 		timer_cache_add(ev->epoll_list, ee->expire, &ee->me);
 
 		ee->fiber->status = FIBER_STATUS_EPOLL_WAIT;
 
-		ev->waiter++;
+		WAITER_INC(ev);
 		acl_fiber_switch();
-		ev->waiter--;
+		WAITER_DEC(ev);
 
 		if (ee->nready == 0) {
 			timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
@@ -656,7 +655,6 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		}
 	}
 
-	ev->waiter--;
 	return ee->nready;
 }
 

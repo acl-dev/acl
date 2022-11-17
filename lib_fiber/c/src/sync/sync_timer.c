@@ -30,7 +30,7 @@ static SYNC_TIMER *sync_timer_new(void)
 	assert(fe);
 	fe->type |= TYPE_INTERNAL | TYPE_EVENTABLE;
 
-	in = mbox_out(timer->box);
+	in = mbox_in(timer->box);
 	assert(in != INVALID_SOCKET);
 	if (in != out) {
 		fe = fiber_file_open_read(in);

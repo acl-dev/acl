@@ -28,7 +28,7 @@ static SYNC_WAITER *sync_waiter_new(void)
 	assert(fe);
 	fe->type |= TYPE_INTERNAL | TYPE_EVENTABLE;
 
-	in = mbox_out(waiter->box);
+	in = mbox_in(waiter->box);
 	assert(in != INVALID_SOCKET);
 	if (in != out) {
 		fe = fiber_file_open_read(in);
