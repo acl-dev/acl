@@ -251,9 +251,6 @@
     <ClCompile Include="src\dns\valid_hostname.c">
       <Filter>源文件\dns</Filter>
     </ClCompile>
-    <ClCompile Include="src\channel.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\event.c">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -263,19 +260,7 @@
     <ClCompile Include="src\fiber.c">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\fiber_cond.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\fiber_event.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="src\fiber_io.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\fiber_lock.c">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="src\fiber_sem.c">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\file_event.c">

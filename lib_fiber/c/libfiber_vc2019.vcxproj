@@ -343,7 +343,6 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\channel.c" />
     <ClCompile Include="src\common\argv.c" />
     <ClCompile Include="src\common\array.c" />
     <ClCompile Include="src\common\atomic.c" />
@@ -381,11 +380,7 @@
     <ClCompile Include="src\fiber.c" />
     <ClCompile Include="src\fiber\fiber_unix.c" />
     <ClCompile Include="src\fiber\fiber_win.c" />
-    <ClCompile Include="src\fiber_cond.c" />
-    <ClCompile Include="src\fiber_event.c" />
     <ClCompile Include="src\fiber_io.c" />
-    <ClCompile Include="src\fiber_lock.c" />
-    <ClCompile Include="src\fiber_sem.c" />
     <ClCompile Include="src\file_event.c" />
     <ClCompile Include="src\hook\epoll.c" />
     <ClCompile Include="src\hook\getaddrinfo.c" />

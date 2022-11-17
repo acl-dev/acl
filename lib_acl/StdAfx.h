@@ -10,6 +10,7 @@
 # include <float.h>			/* DBL_MAX_10_EXP */
 # include <ctype.h>
 # include <limits.h>			/* CHAR_BIT */
+# include <assert.h>
 
 # if defined(_WIN32) || defined(_WIN64)
 #  include <process.h>
