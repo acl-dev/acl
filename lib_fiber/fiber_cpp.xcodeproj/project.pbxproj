@@ -49,6 +49,7 @@
 		70E41F5726F3293E0068042B /* winapi_hook.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 70E41F5426F3293E0068042B /* winapi_hook.hpp */; };
 		70E41F5826F3293E0068042B /* winapi_hook.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 70E41F5526F3293E0068042B /* winapi_hook.cpp */; };
 		70E41F5926F3293E0068042B /* tcp_keeper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 70E41F5626F3293E0068042B /* tcp_keeper.cpp */; };
+		70F62E502926432F0010B1F6 /* fiber_mutex.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 70F62E4F2926432F0010B1F6 /* fiber_mutex.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,6 +96,7 @@
 		70E41F5426F3293E0068042B /* winapi_hook.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = winapi_hook.hpp; path = cpp/src/winapi_hook.hpp; sourceTree = "<group>"; };
 		70E41F5526F3293E0068042B /* winapi_hook.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = winapi_hook.cpp; path = cpp/src/winapi_hook.cpp; sourceTree = "<group>"; };
 		70E41F5626F3293E0068042B /* tcp_keeper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tcp_keeper.cpp; path = cpp/src/tcp_keeper.cpp; sourceTree = "<group>"; };
+		70F62E4F2926432F0010B1F6 /* fiber_mutex.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_mutex.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,6 +173,7 @@
 		070F35F320902DDC00672EDC /* fiber */ = {
 			isa = PBXGroup;
 			children = (
+				70F62E4F2926432F0010B1F6 /* fiber_mutex.hpp */,
 				70147AA6292616CE00367292 /* go_fiber.hpp */,
 				70147AA4292616CE00367292 /* http_server.hpp */,
 				70147AA5292616CE00367292 /* http_servlet.hpp */,
@@ -215,6 +218,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				070F35FF20902DDC00672EDC /* fiber_event.hpp in Headers */,
+				70F62E502926432F0010B1F6 /* fiber_mutex.hpp in Headers */,
 				070F35FC20902DDC00672EDC /* channel.hpp in Headers */,
 				070F35E920902D9800672EDC /* fiber_cppPriv.h in Headers */,
 				702452F22897BD2300B7449B /* wait_group.hpp in Headers */,
