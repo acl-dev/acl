@@ -1,12 +1,15 @@
 #include "stdafx.h"
 #include <errno.h>
+#if defined(_WIN32) || defined(_WIN64)
+#include "pthread_patch.h"
+#else
 #include <pthread.h>
+#include <sys/time.h>
+#include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/time.h>
 #include <string.h>
-#include <time.h>
-#include <unistd.h>
 #include <time.h>
 
 #include "msg.h"

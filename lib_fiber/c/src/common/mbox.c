@@ -2,6 +2,7 @@
 #include "fiber/libfiber.h"
 
 #include "msg.h"
+#include "pthread_patch.h"
 #include "ypipe.h"
 #include "iostuff.h"
 #include "mbox.h"
@@ -132,7 +133,12 @@ int mbox_send(MBOX *mbox, void *msg)
 
 	mbox->nsend++;
 
+#if defined(_WIN32) || defined(_WIN64)
+	ret = (int) acl_fiber_send(mbox->out, (const char*) &n, (int) sizeof(n), 0);
+#else
 	ret = (int) acl_fiber_write(mbox->out, &n, sizeof(n));
+#endif
+
 #if !defined(HAS_EVENTFD)
 	if (lock) {
 		pthread_mutex_unlock(lock);
@@ -179,7 +185,12 @@ void *mbox_read(MBOX *mbox, int timeout, int *success)
 		return NULL;
 	}
 
+#if defined(_WIN32) || defined(_WIN64)
+	ret = (int) acl_fiber_recv(mbox->in, (char*) &n, (int) sizeof(n), 0);
+#else
 	ret = (int) acl_fiber_read(mbox->in, &n, sizeof(n));
+#endif
+
 	if (ret == -1) {
 		if (success) {
 			*success = 0;

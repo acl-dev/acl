@@ -646,7 +646,7 @@ EVENT *event_iocp_create(int size)
 		abort();
 	}
 
-	ei->events = array_create(100);
+	ei->events = array_create(100, ARRAY_F_UNORDER);
 
 	ei->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
 	ei->size  = size;

@@ -127,7 +127,9 @@ static int iocp_wait_read(FILE_EVENT *fe)
 		// Must clear the EVENT_READ flags in order to set IO event
 		// for each IO process.
 		fe->mask &= ~EVENT_READ;
+#ifdef HAS_IO_URING
 		fe->reader_ctx.res = 0;
+#endif
 
 		if (fiber_wait_read(fe) < 0) {
 			return -1;
@@ -144,9 +146,11 @@ static int iocp_wait_read(FILE_EVENT *fe)
 			return -1;
 		}
 
+#ifdef HAS_IO_URING
 		if (fe->reader_ctx.res >= 0) {
 			return fe->reader_ctx.res;
 		}
+#endif
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
@@ -167,15 +171,15 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 	/* If the socket type is UDP, We must check the fixed buffer first,
 	 * which maybe used in iocp_add_read() and set for polling read status.
 	 */
-	if (fe->sock_type == SOCK_DGRAM && fe->rbuf == fe->packet
-		&& fe->reader_ctx.res > 0) {
+	if (fe->sock_type == SOCK_DGRAM
+		&& fe->rbuf == fe->packet && fe->res > 0) {
 
-		if (fe->reader_ctx.res < len) {
-			len = fe->reader_ctx.res;
+		if (fe->res < len) {
+			len = fe->res;
 		}
 		memcpy(buf, fe->packet, len);
 		fe->rbuf = NULL;
-		fe->reader_ctx.res = 0;
+		fe->res = 0;
 		return len;
 	}
 
@@ -530,15 +534,19 @@ static int iocp_wait_write(FILE_EVENT *fe)
 		int err;
 
 		fe->mask &= ~EVENT_WRITE;
+#ifdef HAS_IO_URING
 		fe->writer_ctx.res = -1;
+#endif
 
 		if (wait_write(fe) == -1) {
 			return -1;
 		}
 
+#ifdef HAS_IO_URING
 		if (fe->writer_ctx.res >= 0) {
 			return fe->writer_ctx.res;
 		}
+#endif
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);

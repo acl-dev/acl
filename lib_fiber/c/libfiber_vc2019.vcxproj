@@ -304,6 +304,7 @@
     <ClInclude Include="include\fiber\fiber_event.h" />
     <ClInclude Include="include\fiber\fiber_hook.h" />
     <ClInclude Include="include\fiber\fiber_lock.h" />
+    <ClInclude Include="include\fiber\fiber_mutex.h" />
     <ClInclude Include="include\fiber\fiber_sem.h" />
     <ClInclude Include="include\fiber\libfiber.h" />
     <ClInclude Include="src\common.h" />
@@ -318,13 +319,17 @@
     <ClInclude Include="src\common\init.h" />
     <ClInclude Include="src\common\iostuff.h" />
     <ClInclude Include="src\common\iterator.h" />
+    <ClInclude Include="src\common\mbox.h" />
     <ClInclude Include="src\common\memory.h" />
     <ClInclude Include="src\common\msg.h" />
     <ClInclude Include="src\common\pthread_patch.h" />
+    <ClInclude Include="src\common\queue.h" />
     <ClInclude Include="src\common\ring.h" />
     <ClInclude Include="src\common\sane_socket.h" />
     <ClInclude Include="src\common\strops.h" />
     <ClInclude Include="src\common\timer_cache.h" />
+    <ClInclude Include="src\common\ypipe.h" />
+    <ClInclude Include="src\common\yqueue.h" />
     <ClInclude Include="src\define.h" />
     <ClInclude Include="src\dns\resolver.h" />
     <ClInclude Include="src\dns\rfc1035.h" />
@@ -340,6 +345,9 @@
     <ClInclude Include="src\fiber.h" />
     <ClInclude Include="src\hook\hook.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\sync\sync_timer.h" />
+    <ClInclude Include="src\sync\sync_type.h" />
+    <ClInclude Include="src\sync\sync_waiter.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
@@ -353,11 +361,13 @@
     <ClCompile Include="src\common\gettimeofday.c" />
     <ClCompile Include="src\common\htable.c" />
     <ClCompile Include="src\common\init.c" />
+    <ClCompile Include="src\common\mbox.c" />
     <ClCompile Include="src\common\memory.c" />
     <ClCompile Include="src\common\msg.c" />
     <ClCompile Include="src\common\non_blocking.c" />
     <ClCompile Include="src\common\open_limit.c" />
     <ClCompile Include="src\common\pthread_patch.c" />
+    <ClCompile Include="src\common\queue.c" />
     <ClCompile Include="src\common\read_wait.c" />
     <ClCompile Include="src\common\ring.c" />
     <ClCompile Include="src\common\sane_socket.c" />
@@ -365,6 +375,8 @@
     <ClCompile Include="src\common\strops.c" />
     <ClCompile Include="src\common\tcp_nodelay.c" />
     <ClCompile Include="src\common\timer_cache.c" />
+    <ClCompile Include="src\common\ypipe.c" />
+    <ClCompile Include="src\common\yqueue.c" />
     <ClCompile Include="src\dns\resolver.c" />
     <ClCompile Include="src\dns\rfc1035.c" />
     <ClCompile Include="src\dns\sane_inet.c" />
@@ -400,6 +412,15 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\sync\channel.c" />
+    <ClCompile Include="src\sync\fiber_cond.c" />
+    <ClCompile Include="src\sync\fiber_event.c" />
+    <ClCompile Include="src\sync\fiber_lock.c" />
+    <ClCompile Include="src\sync\fiber_mutex.c" />
+    <ClCompile Include="src\sync\fiber_sem.c" />
+    <ClCompile Include="src\sync\sync_timer.c" />
+    <ClCompile Include="src\sync\sync_type.c" />
+    <ClCompile Include="src\sync\sync_waiter.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

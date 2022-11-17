@@ -1,5 +1,5 @@
-#ifndef	__ACL_FIBER_MUTEX_INCLUDE_H__
-#define	__ACL_FIBER_MUTEX_INCLUDE_H__
+#ifndef FIBER_MUTEX_INCLUDE_H
+#define	FIBER_MUTEX_INCLUDE_H
 
 #include "fiber_define.h"
 

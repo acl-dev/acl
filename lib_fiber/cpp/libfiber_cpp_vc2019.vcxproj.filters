@@ -69,6 +69,12 @@
     <ClCompile Include="src\winapi_hook.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\fiber_mutex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\tcp_keeper.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\stdafx.hpp">
@@ -123,6 +129,18 @@
       <Filter>源文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\go_fiber.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_mutex.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\http_server.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\http_servlet.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\tcp_keeper.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
