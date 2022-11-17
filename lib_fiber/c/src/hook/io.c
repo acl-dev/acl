@@ -118,7 +118,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 
 /****************************************************************************/
 
-#if defined(HAS_IO_URING) || defined(HAS_IOCP)
+#if defined(HAS_IO_URING)
 static int iocp_wait_read(FILE_EVENT *fe)
 {
 	while (1) {
@@ -163,9 +163,57 @@ static int iocp_wait_read(FILE_EVENT *fe)
 		}
 	}
 }
-#endif
+
+int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
+{
+	fe->in.read_ctx.buf = buf;
+	fe->in.read_ctx.len = len;
+
+	return iocp_wait_read(fe);
+}
+#endif  // HAS_IO_URING
 
 #if defined(HAS_IOCP)
+static int iocp_wait_read(FILE_EVENT *fe)
+{
+	while (1) {
+		int err;
+
+		fe->mask &= ~EVENT_READ;
+
+		if (fiber_wait_read(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
+			return -1;
+		}
+
+		if (fe->mask & EVENT_ERR) {
+			err = acl_fiber_last_error();
+			fiber_save_errno(err);
+			return -1;
+		}
+
+		if (acl_fiber_canceled(fe->fiber_r)) {
+			acl_fiber_set_error(fe->fiber_r->errnum);
+			return -1;
+		}
+
+		if (fe->res >= 0) {
+			return fe->res;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+
+		if (!error_again(err)) {
+			if (fe->type != TYPE_SPIPE) {
+				fiber_file_free(fe);
+			}
+			return -1;
+		}
+	}
+}
+
 int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
 	/* If the socket type is UDP, We must check the fixed buffer first,
@@ -183,14 +231,10 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 		return len;
 	}
 
-	return iocp_wait_read(fe);
-}
-#elif defined(HAS_IO_URING)
-int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
-{
-	fe->in.read_ctx.buf = buf;
-	fe->in.read_ctx.len = len;
-
+	
+	fe->rbuf  = buf;
+	fe->rsize = len;
+	fe->res   = 0;
 	return iocp_wait_read(fe);
 }
 #endif // HAS_IOCP
@@ -527,7 +571,7 @@ static int wait_write(FILE_EVENT *fe)
 	return 0;
 }
 
-#if defined(HAS_IO_URING) || defined(HAS_IOCP)
+#if defined(HAS_IO_URING)
 static int iocp_wait_write(FILE_EVENT *fe)
 {
 	while (1) {
@@ -561,12 +605,16 @@ static int iocp_wait_write(FILE_EVENT *fe)
 }
 #endif
 
+/*
 #if defined(HAS_IOCP)
 int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 {
 	return iocp_wait_write(fe);
 }
-#elif defined(HAS_IO_URING)
+#endif
+*/
+
+#if defined(HAS_IO_URING)
 int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 {
 	fe->out.write_ctx.buf = buf;
@@ -682,11 +730,15 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 	fe = fiber_file_open_write(sockfd);
 	CLR_POLLING(fe);
 
+/**
 #if defined(HAS_IOCP)
 	if (EVENT_IS_IOCP(fiber_io_event())) {
 		return iocp_wait_write(fe);
 	}
-#elif defined(HAS_IO_URING)
+#endif
+*/
+
+#if defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		fe->out.send_ctx.buf   = buf;
 		fe->out.send_ctx.len   = (unsigned) len;
@@ -728,11 +780,15 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	fe = fiber_file_open_write(sockfd);
 	CLR_POLLING(fe);
 
+/*
 #if defined(HAS_IOCP)
 	if (EVENT_IS_IOCP(fiber_io_event())) {
 		return iocp_wait_write(fe);
 	}
-#elif defined(HAS_IO_URING) && defined(IO_URING_HAS_SENDTO)
+#endif
+*/
+
+#if defined(HAS_IO_URING) && defined(IO_URING_HAS_SENDTO)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		fe->out.sendto_ctx.buf       = buf;
 		fe->out.sendto_ctx.len       = (unsigned) len;
@@ -744,6 +800,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		return iocp_wait_write(fe);
 	}
 #endif
+
 	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
