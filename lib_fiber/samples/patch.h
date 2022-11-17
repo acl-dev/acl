@@ -9,9 +9,11 @@ extern "C" {
 # include <winsock2.h>
 # define HAVE_NO_GETOPT
 # define snprintf _snprintf
+/*
 extern int   optind;
 extern char *optarg;
 int getopt(int argc, char *argv[], const char *opts);
+*/
 #else
 # define SOCKET		int
 # define INVALID_SOCKET -1

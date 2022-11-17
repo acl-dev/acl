@@ -132,8 +132,8 @@
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\lib_acl\lib_acl_d.dll .\ /Y
-copy ..\..\c\libfiber.dll .\ /Y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">
@@ -157,8 +157,8 @@ copy ..\..\c\libfiber.dll .\ /Y</Command>
       </IgnoreSpecificDefaultLibraries>
     </Link>
     <PostBuildEvent>
-      <Command>copy ..\..\..\lib_acl\lib_acl.dll .\ /Y
-copy ..\..\c\libfiber.dll .\ /Y</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
