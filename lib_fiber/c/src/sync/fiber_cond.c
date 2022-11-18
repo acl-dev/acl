@@ -123,7 +123,7 @@ static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 
 	obj->type = SYNC_OBJ_T_THREAD;
 	obj->base = fbase_alloc(0);
-	obj->tid  = __pthread_self();
+	obj->tid  = (pthread_t) __pthread_self();
 
 	fbase_event_open(obj->base);
 
