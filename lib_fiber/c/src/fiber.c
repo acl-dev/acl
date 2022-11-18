@@ -713,6 +713,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 		fiber = __fiber_alloc_fn(fiber_start, attr);
+		fiber->tid = pthread_self();
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);
 	}

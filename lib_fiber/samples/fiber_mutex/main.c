@@ -5,6 +5,7 @@
 #include "../stamp.h"
 
 static int __fibers_count = 10;
+static int __event_type = FIBER_EVENT_KERNEL;
 
 static void fiber_main(ACL_FIBER *fiber, void *ctx)
 {
@@ -36,13 +37,12 @@ static void test1(void)
 		acl_fiber_create(fiber_main, l, 320000);
 	}
 
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(__event_type);
 	acl_fiber_mutex_free(l);
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-static int __event_type = FIBER_EVENT_KERNEL;
 static int __use_yield = 0;
 static int __use_event = 0;
 static ACL_FIBER_MUTEX **__locks;
@@ -58,6 +58,8 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	int i, ret;
 	ACL_FIBER_MUTEX *l;
 
+	printf("thread-%lu, fiber-%d start!\r\n", (long) pthread_self(), acl_fiber_self());
+
 	for (i = 0; i < __nloop; i++) {
 		l = __locks[i % __nlocks];
 		ret = acl_fiber_mutex_lock(l);
@@ -66,7 +68,11 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 			assert(ret == 0);
 		}
 
+		//acl_fiber_delay(100);
+
 		ret = acl_fiber_mutex_unlock(l);
+
+		//printf(">>fiber-%d unlock\n", acl_fiber_self());
 		if (ret) {
 			printf("%s: unlock error=%s\r\n", __FUNCTION__, strerror(ret));
 			assert(ret == 0);
@@ -77,12 +83,14 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 			acl_fiber_yield();
 		}
 		__count++;
+
+		//acl_fiber_delay(100);
 	}
 
 	if (--__nfibers == 0) {
-		printf("thread-%lu, all fibers over, count=%d!\r\n",
-			(unsigned long) pthread_self(), __count);
-		acl_fiber_schedule_stop();
+		printf("%s: thread-%lu, all fibers over, count=%d!\r\n",
+			__FUNCTION__, (unsigned long) pthread_self(), __count);
+		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -103,8 +111,8 @@ static void fiber_main3(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	}
 
 	if (--__nfibers == 0) {
-		printf("thread-%lu, all fibers over, count=%d\r\n",
-			(unsigned long) pthread_self(), __count);
+		printf("%s: thread-%lu, all fibers over, count=%d\r\n",
+			__FUNCTION__, (unsigned long) pthread_self(), __count);
 		//acl_fiber_schedule_stop();
 	}
 }
@@ -168,10 +176,12 @@ static void test2(int nthreads, int nthreads2, unsigned flags)
 
 	for (i = 0; i < nthreads; i++) {
 		pthread_create(&threads[i], NULL, thread_main, NULL);
+		printf("--create fibers thread-%lu\r\n", (long) threads[i]);
 	}
 
 	for (i = 0; i < nthreads2; i++) {
 		pthread_create(&threads2[i], NULL, thread_alone_main, NULL);
+		printf("--create alone thread-%lu\r\n", (long) threads2[i]);
 	}
 
 	for (i = 0; i < nthreads; i++) {
@@ -214,7 +224,35 @@ static void usage(const char *procname)
 		" -E [if use fiber_event]\r\n"
 		" -Y [if yield after unlock]\r\n"
 		" -T [if use first try lock for mutex]\r\n"
+		" -S [if using fiber switching first when they're in the same thread]\r\n"
 		, procname);
+}
+
+static void test_lock(void)
+{
+	int i;
+	pthread_mutex_t lock;
+
+	pthread_mutex_init(&lock, NULL);
+
+	for (i = 0; i < 5; i++) {
+		int ret = pthread_mutex_trylock(&lock);
+		if (ret != 0) {
+			printf("lock error %s, i=%d\n", strerror(ret), i);
+			exit(1);
+		}
+		printf("lock ok, i=%d\n", i);
+	}
+
+	for (i = 0; i < 5; i++) {
+		int ret = pthread_mutex_lock(&lock);
+		if (ret != 0) {
+			printf("unlock error, i=%d\n", i);
+			exit(1);
+		}
+		printf("unlock ok, i=%d\n", i);
+	}
+
 }
 
 int main(int argc, char *argv[])
@@ -223,9 +261,13 @@ int main(int argc, char *argv[])
 	unsigned flags = 0;
 	char action[64];
 
-	snprintf(action, sizeof(action), "test1");
+	if (0) {
+		test_lock();
+	}
 
-	while ((ch = getopt(argc, argv, "he:a:t:c:p:n:l:EYT")) > 0) {
+	snprintf(action, sizeof(action), "test2");
+
+	while ((ch = getopt(argc, argv, "he:a:t:c:p:n:l:EYTS")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -265,6 +307,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'T':
 			flags |= FIBER_MUTEX_F_LOCK_TRY;
+			break;
+		case 'S':
+			flags |= FIBER_MUTEX_F_SWITCH_FIRST;
 			break;
 		default:
 			break;

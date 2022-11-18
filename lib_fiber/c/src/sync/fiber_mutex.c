@@ -57,7 +57,6 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 		if (pthread_mutex_trylock(&mutex->thread_lock) == 0) {
 			array_delete(mutex->waiters, pos, NULL);
 			pthread_mutex_unlock(&mutex->lock);
-
 			return 0;
 		}
 
@@ -147,7 +146,13 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	}
 
 	if (fiber) {
-		sync_waiter_wakeup(fiber->sync, fiber);
+		if (!(mutex->flags & FIBER_MUTEX_F_SWITCH_FIRST)) {
+			sync_waiter_wakeup(fiber->sync, fiber);
+		} else if (pthread_self() == fiber->tid) {
+			acl_fiber_ready(fiber);
+		} else {
+			sync_waiter_wakeup(fiber->sync, fiber);
+		}
 	}
 
 	return 0;

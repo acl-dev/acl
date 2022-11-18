@@ -488,6 +488,15 @@ static int peek_more(EVENT_URING *ep)
 			return -1;
 		}
 
+		if (ret == -ETIME) {
+			printf("%s(%d): ETIME\n", __FUNCTION__, __LINE__);
+		}
+		if (ret == -ECANCELED) {
+			printf("%s(%d): ECANCELED\n", __FUNCTION__, __LINE__);
+		}
+		if (ctx == NULL) {
+			printf("%s(%d): ctx NULL\n", __FUNCTION__, __LINE__);
+		}
 		if (ret == -ETIME || ret == -ECANCELED || ctx == NULL) {
 			continue;
 		}
@@ -555,6 +564,15 @@ AGAIN:
 		return -1;
 	}
 
+	if (ret == -ETIME) {
+		printf("%s(%d): ETIME\n", __FUNCTION__, __LINE__);
+	}
+	if (ret == -ECANCELED) {
+		printf("%s(%d): ECANCELED\n", __FUNCTION__, __LINE__);
+	}
+	if (ctx == NULL) {
+		printf("%s(%d): ctx NULL\n", __FUNCTION__, __LINE__);
+	}
 	if (ret == -ETIME || ret == -ECANCELED || ctx == NULL) {
 		return 1;
 	}
@@ -631,8 +649,8 @@ EVENT *event_io_uring_create(int size)
 			__FUNCTION__, __LINE__, strerror(-ret), eu->sqe_size);
 		abort();
 	} else {
-		printf("%s(%d): init io_uring ok, size=%zd\r\n",
-			__FUNCTION__, __LINE__, eu->sqe_size);
+		printf("%s(%d): thread-%lu init io_uring ok, size=%zd\r\n",
+			__FUNCTION__, __LINE__, pthread_self(), eu->sqe_size);
 	}
 
 	if (!(params.features & IORING_FEAT_FAST_POLL)) {
