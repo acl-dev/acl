@@ -255,8 +255,8 @@ EVENT *event_select_create(int size)
 	size      = open_limit(0);
 	es->maxfd = -1;
 	es->dirty = 0;
-	es->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
-	es->size  = size;
+	es->size  = size > 0 ? size : 10240;
+	es->files = (FILE_EVENT**) mem_calloc(es->size, sizeof(FILE_EVENT*));
 
 #ifdef	DELAY_CALL
 	es->r_ready = array_create(100);

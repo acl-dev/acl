@@ -259,9 +259,9 @@ EVENT *event_poll_create(int size)
 
 	// override size with system open limit setting
 	size      = open_limit(0);
-	ep->size  = size;
-	ep->pfds  = (struct pollfd *) mem_calloc(size, sizeof(struct pollfd));
-	ep->files = (FILE_EVENT**) mem_calloc(size, sizeof(FILE_EVENT*));
+	ep->size  = size > 0 ? size : 10240;
+	ep->pfds  = (struct pollfd *) mem_calloc(ep->size, sizeof(struct pollfd));
+	ep->files = (FILE_EVENT**) mem_calloc(ep->size, sizeof(FILE_EVENT*));
 	ep->count = 0;
 
 #ifdef	DELAY_CALL
