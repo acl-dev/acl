@@ -209,6 +209,11 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	if (obj->type == SYNC_OBJ_T_FIBER) {
 		sync_timer_wakeup(obj->timer, obj);
 	} else if (obj->type == SYNC_OBJ_T_THREAD) {
+		if (var_hook_sys_api) {
+			socket_t out = obj->base->event_out;
+			FILE_EVENT *fe = fiber_file_open_write(out);
+			fe->mask |= EVENT_SYSIO;
+		}
 		ret = fbase_event_wakeup(obj->base);
 	} else {
 		msg_fatal("%s(%d): unknown type=%d",

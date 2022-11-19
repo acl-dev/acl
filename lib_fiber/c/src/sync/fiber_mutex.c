@@ -146,9 +146,7 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	}
 
 	if (fiber) {
-		if (!(mutex->flags & FIBER_MUTEX_F_SWITCH_FIRST)) {
-			sync_waiter_wakeup(fiber->sync, fiber);
-		} else if (pthread_self() == fiber->tid) {
+		if (pthread_self() == fiber->tid) {
 			acl_fiber_ready(fiber);
 		} else {
 			sync_waiter_wakeup(fiber->sync, fiber);

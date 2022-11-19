@@ -201,5 +201,13 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 	SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
 	msg->obj = obj;
 	msg->action = SYNC_ACTION_WAKEUP;
+
+	if (var_hook_sys_api) {
+		socket_t out = mbox_out(timer->box);
+		FILE_EVENT *fe = fiber_file_open_write(out);
+
+		fe->mask |= EVENT_SYSIO;
+	}
+
 	mbox_send(timer->box, msg);
 }

@@ -58,7 +58,7 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 	int i, ret;
 	ACL_FIBER_MUTEX *l;
 
-	printf("thread-%lu, fiber-%d start!\r\n", (long) pthread_self(), acl_fiber_self());
+	//printf("thread-%lu, fiber-%d start!\r\n", (long) pthread_self(), acl_fiber_self());
 
 	for (i = 0; i < __nloop; i++) {
 		l = __locks[i % __nlocks];
@@ -84,7 +84,7 @@ static void fiber_main2(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		}
 		__count++;
 
-		//acl_fiber_delay(100);
+		//acl_fiber_delay(10);
 	}
 
 	if (--__nfibers == 0) {
@@ -215,7 +215,7 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -e schedule_event_type[kernel|poll|select|io_uring]\r\n"
-		" -a action\r\n"
+		" -a action[test1|test, default: test2]\r\n"
 		" -t threads_count\r\n"
 		" -c fibers_count\r\n"
 		" -p threads_alone_count\r\n"
@@ -279,6 +279,8 @@ int main(int argc, char *argv[])
 				__event_type = FIBER_EVENT_SELECT;
 			} else if (strcasecmp(optarg, "io_uring") == 0) {
 				__event_type = FIBER_EVENT_IO_URING;
+			} else if (strcasecmp(optarg, "kernel") == 0) {
+				__event_type = FIBER_EVENT_KERNEL;
 			}
 			break;
 		case 'a':
@@ -315,6 +317,8 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+
+	acl_fiber_msg_stdout_enable(1);
 
 	if (strcasecmp(action, "test1") == 0) {
 		test1();

@@ -20,7 +20,7 @@ static __thread int __nfibers   = 1;
 static __thread int __count     = 0;
 static int __all_consumers_exit = 0;
 
-static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+static void do_produce(void)
 {
 	int n = 0;
 	while (!__all_consumers_exit) {
@@ -34,6 +34,12 @@ static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		}
 		//acl_fiber_delay(1000);
 	}
+}
+
+static void fiber_producer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
+{
+	//printf(">>>thread-%lu, fiber-%d producer start!\r\n", pthread_self(), acl_fiber_self());
+	do_produce();
 
 	if (--__nfibers == 0) {
 		printf("thread-%lu, all producers over, total signal=%lld!\r\n",
@@ -54,6 +60,12 @@ static void *thread_producer(void *arg acl_unused)
 	}
 
 	acl_fiber_schedule_with(__event_type);
+	return NULL;
+}
+
+static void *thread_producer_alone(void *arg acl_unused)
+{
+	do_produce();
 	return NULL;
 }
 
@@ -134,7 +146,7 @@ static void *thread_consumer(void *arg acl_unused)
 	return NULL;
 }
 
-static void *thread_alone_consumer(void *arg acl_unused)
+static void *thread_consumer_alone(void *arg acl_unused)
 {
 	do_consume();
 	printf("---thread-%lu, thread consumer over, count=%d\r\n",
@@ -142,11 +154,14 @@ static void *thread_alone_consumer(void *arg acl_unused)
 	return NULL;
 }
 
-static void test(int nthreads, int nthreads2, unsigned flags)
+static void test(unsigned flags, int nthreads_producer, int nthreads_consumer,
+	int nthreads_producer_alone, int nthreads_consumer_alone)
 {
 	int i;
-	pthread_t producers[nthreads], consumers[nthreads];
-	pthread_t consumers_alone[nthreads2];
+	pthread_t producers_fiber[nthreads_producer];
+	pthread_t consumers_fiber[nthreads_consumer];
+	pthread_t producers_thread[nthreads_producer_alone];
+	pthread_t consumers_thread[nthreads_consumer_alone];
 	struct timeval begin, end;
 	double cost, speed;
 	long long n;
@@ -164,36 +179,45 @@ static void test(int nthreads, int nthreads2, unsigned flags)
 
 	gettimeofday(&begin, NULL);
 
-	for (i = 0; i < nthreads; i++) {
-		pthread_create(&producers[i], NULL, thread_producer, NULL);
-		printf("---create one producer--%lu\n", (unsigned long) producers[i]);
+	for (i = 0; i < nthreads_producer; i++) {
+		pthread_create(&producers_fiber[i], NULL, thread_producer, NULL);
+		printf("---create one producer--%lu\n",
+			(unsigned long) producers_fiber[i]);
 	}
 
-	for (i = 0; i < nthreads; i++) {
-		pthread_create(&consumers[i], NULL, thread_consumer, NULL);
-		printf("---create one consumer--%lu\n", (unsigned long) consumers[i]);
+	for (i = 0; i < nthreads_consumer; i++) {
+		pthread_create(&consumers_fiber[i], NULL, thread_consumer, NULL);
+		printf("---create one consumer--%lu\n",
+			(unsigned long) consumers_fiber[i]);
 	}
 
-	for (i = 0; i < nthreads2; i++) {
-		pthread_create(&consumers_alone[i], NULL,
-			thread_alone_consumer, NULL);
+	for (i = 0; i < nthreads_producer_alone; i++) {
+		pthread_create(&producers_thread[i], NULL,
+			thread_producer_alone, NULL);
+		printf("---create one thread producer--%lu\r\n",
+			(unsigned long) producers_thread[i]);
+	}
+
+	for (i = 0; i < nthreads_consumer_alone; i++) {
+		pthread_create(&consumers_thread[i], NULL,
+			thread_consumer_alone, NULL);
 		printf("---create one thread consumer--%lu\n",
-			(unsigned long) consumers_alone[i]);
+			(unsigned long) consumers_thread[i]);
 	}
 
-	for (i = 0; i < nthreads; i++) {
-		pthread_join(consumers[i], NULL);
+	for (i = 0; i < nthreads_consumer; i++) {
+		pthread_join(consumers_fiber[i], NULL);
 	}
 
-	for (i = 0; i < nthreads2; i++) {
-		pthread_join(consumers_alone[i], NULL);
+	for (i = 0; i < nthreads_consumer_alone; i++) {
+		pthread_join(consumers_thread[i], NULL);
 	}
 
 	__all_consumers_exit = 1;
 	printf("---All consumer threads over---\r\n");
 
-	for (i = 0; i < nthreads; i++) {
-		pthread_join(producers[i], NULL);
+	for (i = 0; i < nthreads_producer; i++) {
+		pthread_join(producers_fiber[i], NULL);
 	}
 	printf("---All producer threads over---\r\n");
 
@@ -216,21 +240,25 @@ static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -e schedule_event_type[kernel|poll|select|io_uring]\r\n"
-		" -t threads_count\r\n"
-		" -c fibers_count\r\n"
-		" -p threads_alone_count\r\n"
+		" -p producer_threads_count\r\n"
+		" -c consumer_threads_count\r\n"
+		" -f fibers_per_thread\r\n"
+		" -s producer_threads_alone_count\r\n"
+		" -r consumer_threads_alone_count\r\n"
 		" -n total_loop_count\r\n"
-		" -r wait_timeout[default: -1]\r\n"
+		" -t wait_timeout[default: -1]\r\n"
 		" -D [if open debug log to stdout]\r\n"
 		, procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int  ch, nthreads = 1, nthreads2 = 0, debug = 0;
+	int  ch, debug = 0;
+	int  nthreads_producer = 1, nthreads_consumer = 1;
+	int  nthreads_producer_alone = 0, nthreads_consumer_alone = 0;
 	unsigned flags = 0;
 
-	while ((ch = getopt(argc, argv, "he:t:c:p:n:Tr:D")) > 0) {
+	while ((ch = getopt(argc, argv, "he:p:c:f:s:r:n:t:TD")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -244,19 +272,25 @@ int main(int argc, char *argv[])
 				__event_type = FIBER_EVENT_IO_URING;
 			}
 			break;
-		case 't':
-			nthreads = atoi(optarg);
+		case 'p':
+			nthreads_producer = atoi(optarg);
 			break;
 		case 'c':
+			nthreads_consumer = atoi(optarg);
+			break;
+		case 'f':
 			__fibers_count = atoi(optarg);
 			break;
-		case 'p':
-			nthreads2 = atoi(optarg);
+		case 's':
+			nthreads_producer_alone = atoi(optarg);
+			break;
+		case 'r':
+			nthreads_consumer_alone = atoi(optarg);
 			break;
 		case 'n':
 			__total_count = atoi(optarg);
 			break;
-		case 'r':
+		case 't':
 			__wait_timeout = atoi(optarg);
 			break;
 		case 'T':
@@ -274,6 +308,7 @@ int main(int argc, char *argv[])
 		acl_fiber_msg_stdout_enable(1);
 	}
 
-	test(nthreads, nthreads2, flags);
+	test(flags, nthreads_producer, nthreads_consumer,
+		nthreads_producer_alone, nthreads_consumer_alone);
 	return 0;
 }

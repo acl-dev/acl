@@ -254,6 +254,9 @@ void fiber::schedule_with(fiber_event_t type)
 	case FIBER_EVENT_T_WMSG:
 		etype = FIBER_EVENT_WMSG;
 		break;
+	case FIBER_EVENT_T_IO_URING:
+		etype = FIBER_EVENT_IO_URING;
+		break;
 	case FIBER_EVENT_T_KERNEL:
 	default:
 		etype = FIBER_EVENT_KERNEL;

@@ -301,6 +301,8 @@ int main(int argc, char *argv[])
 				__event_type = acl::FIBER_EVENT_T_POLL;
 			} else if (EQ(optarg, "select")) {
 				__event_type = acl::FIBER_EVENT_T_SELECT;
+			} else if (EQ(optarg, "kernel")) {
+				__event_type = acl::FIBER_EVENT_T_KERNEL;
 			}
 			break;
 		case 'p':

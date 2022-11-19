@@ -97,5 +97,16 @@ SYNC_WAITER *sync_waiter_get(void)
 
 void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 {
+	if (var_hook_sys_api) {
+		// When using io_uring, we should call the system API of write
+		// to send data, because the fd is shared by multiple threads
+		// and which can't use io_uring directly, so we set the mask
+		// as EVENT_SYSIO.
+		socket_t out = mbox_out(waiter->box);
+		FILE_EVENT *fe = fiber_file_open_write(out);
+
+		fe->mask |= EVENT_SYSIO;
+	}
+
 	mbox_send(waiter->box, fb);
 }

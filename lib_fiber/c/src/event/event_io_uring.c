@@ -488,15 +488,6 @@ static int peek_more(EVENT_URING *ep)
 			return -1;
 		}
 
-		if (ret == -ETIME) {
-			printf("%s(%d): ETIME\n", __FUNCTION__, __LINE__);
-		}
-		if (ret == -ECANCELED) {
-			printf("%s(%d): ECANCELED\n", __FUNCTION__, __LINE__);
-		}
-		if (ctx == NULL) {
-			printf("%s(%d): ctx NULL\n", __FUNCTION__, __LINE__);
-		}
 		if (ret == -ETIME || ret == -ECANCELED || ctx == NULL) {
 			continue;
 		}
@@ -530,7 +521,7 @@ static int submit_and_wait(EVENT_URING *ep, int timeout)
 
 AGAIN:
 	if (ep->appending > 0) {
-		ep->appending = 0;  \
+		ep->appending = 0;
 		ret = io_uring_submit_and_wait_timeout(&ep->ring, &cqe,
 				1, tp, NULL);
 	} else {
@@ -539,19 +530,20 @@ AGAIN:
 
 	if (ret < 0) {
 		if (ret == -ETIME) {
-			printf("thread-%lu: Got etime, waiter=%d\n", pthread_self(), (int) ep->event.waiter);
 			return 0;
 		} else if (ret == -EAGAIN) {
-			printf("Got eagain\n");
 			return 0;
 		} else if (ret == -EINTR) {
-			printf("Got eintr\n");
 			goto AGAIN;
 		}
 
 		msg_error("%s(%d): io_uring_wait_cqe error=%s",
 			__FUNCTION__, __LINE__, strerror(-ret));
 		return -1;
+	}
+
+	if (cqe == NULL) {
+		return 0;
 	}
 
 	ret = cqe->res;
@@ -564,15 +556,6 @@ AGAIN:
 		return -1;
 	}
 
-	if (ret == -ETIME) {
-		printf("%s(%d): ETIME\n", __FUNCTION__, __LINE__);
-	}
-	if (ret == -ECANCELED) {
-		printf("%s(%d): ECANCELED\n", __FUNCTION__, __LINE__);
-	}
-	if (ctx == NULL) {
-		printf("%s(%d): ctx NULL\n", __FUNCTION__, __LINE__);
-	}
 	if (ret == -ETIME || ret == -ECANCELED || ctx == NULL) {
 		return 1;
 	}
