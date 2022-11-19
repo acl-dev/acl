@@ -44,7 +44,7 @@ struct SYNC_WAITER;
 
 struct ACL_FIBER {
 	FIBER_BASE    *base;
-	pthread_t      tid;
+	unsigned long  tid;
 	fiber_status_t status;
 	RING           me;
 	unsigned       id;
