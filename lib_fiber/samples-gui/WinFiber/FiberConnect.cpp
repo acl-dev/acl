@@ -43,7 +43,7 @@ void CFiberConnect::run(void)
 	acl_fiber_close(m_sock);
 #else
 	acl::socket_stream conn;
-	if (!conn.open(m_serverAddr, 2, 0)) {
+	if (!conn.open(m_serverAddr, 2, 10)) {
 		printf("connect %s error %s\r\n", m_serverAddr.c_str(),
 			acl::last_serror());
 	} else {
