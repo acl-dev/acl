@@ -12,6 +12,7 @@ struct SYNC_TIMER {
 	MBOX *box;
 	int stop;
 	TIMER_CACHE *waiters;
+	unsigned long tid;
 };
 
 static SYNC_TIMER *sync_timer_new(void)
@@ -23,6 +24,7 @@ static SYNC_TIMER *sync_timer_new(void)
 	pthread_mutex_init(&timer->lock, NULL);
 	timer->box = mbox_create(MBOX_T_MPSC);
 	timer->waiters = timer_cache_create();
+	timer->tid = __pthread_self();
 
 	out = mbox_out(timer->box);
 	assert(out != INVALID_SOCKET);
@@ -204,12 +206,24 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 
 	if (var_hook_sys_api) {
 		socket_t out = mbox_out(timer->box);
-		FILE_EVENT *fe = fiber_file_cache_get(out);
+		FILE_EVENT *fe;
+		int same_thread;
+
+		if (__pthread_self() == timer->tid) {
+			fe = fiber_file_open_write(out);
+			same_thread = 1;
+		} else {
+			fe = fiber_file_cache_get(out);
+			same_thread = 0;
+		}
 
 		fe->mask |= EVENT_SYSIO;
 
 		mbox_send(timer->box, msg);
-		fiber_file_cache_put(fe);
+
+		if (!same_thread) {
+			fiber_file_cache_put(fe);
+		}
 	} else {
 		mbox_send(timer->box, msg);
 	}

@@ -532,7 +532,8 @@ void fiber_file_set(FILE_EVENT *fe)
 	}
 
 	if (__thread_fiber->events[fe->fd] != NULL) {
-		printf("%s(%d): exist fd=%d\r\n", __FUNCTION__, __LINE__, fe->fd);
+		printf("%s(%d): exist fd=%d, old=%p new=%p\r\n", __FUNCTION__,
+			__LINE__, fe->fd, __thread_fiber->events[fe->fd], fe);
 		abort();
 	}
 
@@ -692,9 +693,16 @@ void fiber_file_close(FILE_EVENT *fe)
 FILE_EVENT *fiber_file_cache_get(socket_t fd)
 {
 	FILE_EVENT *fe;
+	int exist = 0;
 
 	fiber_io_check();
-	fe = (FILE_EVENT*) array_pop_back(__thread_fiber->cache);
+
+	fe = fiber_file_get(fd);
+	if (fe == NULL) {
+		fe = (FILE_EVENT*) array_pop_back(__thread_fiber->cache);
+	} else { // Why? the fe wasn't removed by fiber_file_cache_put ?
+		exist = 1;
+	}
 	if (fe == NULL) {
 		fe = file_event_alloc(fd);
 	} else {
@@ -706,7 +714,9 @@ FILE_EVENT *fiber_file_cache_get(socket_t fd)
 		fe->mask |= EVENT_DIRECT;
 	}
 #endif
-	fiber_file_set(fe);
+	if (!exist) {
+		fiber_file_set(fe);
+	}
 	return fe;
 }
 
