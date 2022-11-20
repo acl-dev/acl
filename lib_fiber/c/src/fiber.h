@@ -132,6 +132,8 @@ void fiber_file_set(FILE_EVENT *fe);
 FILE_EVENT *fiber_file_get(socket_t fd);
 void fiber_file_free(FILE_EVENT *fe);
 void fiber_file_close(FILE_EVENT *fe);
+FILE_EVENT *fiber_file_cache_get(socket_t fd);
+void fiber_file_cache_put(FILE_EVENT *fe);
 
 /* in hook/epoll.c */
 int  epoll_event_close(int epfd);

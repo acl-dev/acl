@@ -17,6 +17,8 @@ typedef struct {
 #else
 	FILE_EVENT **events;
 #endif
+	ARRAY      *cache;
+	int         cache_max;
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -45,6 +47,12 @@ void acl_fiber_schedule_stop(void)
 
 static pthread_key_t __fiber_key;
 
+static void free_file(void *arg)
+{
+	FILE_EVENT *fe = (FILE_EVENT*) arg;
+	file_event_unrefer(fe);
+}
+
 static void thread_free(void *ctx)
 {
 	FIBER_TLS *tf = (FIBER_TLS *) ctx;
@@ -64,6 +72,7 @@ static void thread_free(void *ctx)
 	mem_free(tf->events);
 #endif
 
+	array_free(tf->cache, free_file);
 	mem_free(tf);
 
 	if (__main_fiber == __thread_fiber) {
@@ -112,6 +121,9 @@ static void thread_init(void)
 	__thread_fiber->events = (FILE_EVENT **)
 		mem_calloc(var_maxfd, sizeof(FILE_EVENT*));
 #endif
+
+	__thread_fiber->cache     = array_create(100, ARRAY_F_UNORDER);
+	__thread_fiber->cache_max = 1000;
 
 	if (__pthread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
@@ -628,7 +640,7 @@ void fiber_file_free(FILE_EVENT *fe)
 	} else {
 		// xxx: What happened?
 		msg_error("%s(%d): some error happened for fe=%p, fd=%d",
-			__FUNCTION__, __LINE__, fe, fe->fd);
+			__FUNCTION__, __LINE__, fe, fd);
 	}
 }
 
@@ -674,3 +686,40 @@ void fiber_file_close(FILE_EVENT *fe)
 		acl_fiber_kill(fe->fiber_w);
 	}
 }
+
+/****************************************************************************/
+
+FILE_EVENT *fiber_file_cache_get(socket_t fd)
+{
+	FILE_EVENT *fe;
+
+	fiber_io_check();
+	fe = (FILE_EVENT*) array_pop_back(__thread_fiber->cache);
+	if (fe == NULL) {
+		fe = file_event_alloc(fd);
+	} else {
+		file_event_init(fe, fd);
+	}
+
+#ifdef	HAS_IO_URING
+	if (var_hook_sys_api && EVENT_IS_IO_URING(fiber_io_event())) {
+		fe->mask |= EVENT_DIRECT;
+	}
+#endif
+	fiber_file_set(fe);
+	return fe;
+}
+
+void fiber_file_cache_put(FILE_EVENT *fe)
+{
+	fiber_file_del(fe, fe->fd);
+	fe->fd = INVALID_SOCKET;
+
+	if (array_size(__thread_fiber->cache) < __thread_fiber->cache_max) {
+		array_push_back(__thread_fiber->cache, fe);
+	} else {
+		file_event_unrefer(fe);
+	}
+}
+
+/****************************************************************************/

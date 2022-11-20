@@ -204,10 +204,13 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 
 	if (var_hook_sys_api) {
 		socket_t out = mbox_out(timer->box);
-		FILE_EVENT *fe = fiber_file_open_write(out);
+		FILE_EVENT *fe = fiber_file_cache_get(out);
 
 		fe->mask |= EVENT_SYSIO;
-	}
 
-	mbox_send(timer->box, msg);
+		mbox_send(timer->box, msg);
+		fiber_file_cache_put(fe);
+	} else {
+		mbox_send(timer->box, msg);
+	}
 }
