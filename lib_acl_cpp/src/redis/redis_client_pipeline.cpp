@@ -404,10 +404,10 @@ void* redis_client_pipeline::run(void)
 
 	redis_pipeline_channel* channel;
 	int  timeout = -1;
-	bool found;
+	bool flag;
 
 	while (true) {
-		redis_pipeline_message* msg = box_->pop(timeout, &found);
+		redis_pipeline_message* msg = box_->pop(timeout, &flag);
 		if (msg != NULL) {
 			redis_pipeline_type_t type = msg->get_type();
 			if (type == redis_pipeline_t_stop) {
@@ -440,7 +440,9 @@ void* redis_client_pipeline::run(void)
 				channel->push(msg);
 				timeout = 0;
 			}
-		} else if (found) {
+		} else if (box_->has_null() && flag) {
+			break;
+		} else if (!box_->has_null() && !flag) {
 			break;
 		} else {
 			timeout = -1;

@@ -161,7 +161,7 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 		return msg;
 	} else if (timeout == 0) {
 		if (success) {
-			*success = 0;
+			*success = 1;
 		}
 		return NULL;
 	}
@@ -175,7 +175,7 @@ void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success)
 #endif
 		if (acl_last_error() == ACL_ETIMEDOUT) {
 			if (success) {
-				*success = 0;
+				*success = 1;
 			}
 		} else if (success) {
 			*success = 0;

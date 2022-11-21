@@ -100,6 +100,15 @@ public:
 	}
 
 	/**
+	 * mbox 没有空消息
+	 * @return {bool}
+	 * @override
+	 */
+	bool has_null(void) const {
+		return false;
+	}
+
+	/**
 	 * 统计当前已经发送的消息数
 	 * @return {size_t}
 	 */

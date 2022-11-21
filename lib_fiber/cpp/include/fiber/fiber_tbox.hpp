@@ -158,6 +158,15 @@ public:
 	}
 
 	/**
+	 * tbox 允许有空消息
+	 * @return {bool}
+	 * @override
+	 */
+	bool has_null(void) const {
+		return true;
+	}
+
+	/**
 	 * 返回当前存在于消息队列中的消息数量
 	 * @return {size_t}
 	 */

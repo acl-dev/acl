@@ -300,6 +300,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"-s one_redis_addr[127.0.0.1:6379]\r\n"
+		"-F [if using fiber_redis_pipeline, default: false]\r\n"
 		"-n count[default: 10]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
@@ -319,10 +320,10 @@ int main(int argc, char* argv[])
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
 	int  max_threads = 10, nfibers = 50;
 	size_t stack_size = 64000;
-	bool share_stack = false;
+	bool share_stack = false, use_fiber_tbox = false;
 	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:a:p:Sz:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:a:p:Sz:F")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -357,6 +358,9 @@ int main(int argc, char* argv[])
 		case 'z':
 			stack_size = (size_t) atoi(optarg);
 			break;
+		case 'F':
+			use_fiber_tbox = true;
+			break;
 		default:
 			usage(argv[0]);
 			return 1;
@@ -366,15 +370,20 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	//acl::redis_client_pipeline pipeline(addr);
-	acl::fiber_redis_pipeline pipeline(addr);
-	pipeline.set_timeout(conn_timeout, rw_timeout);
+	acl::redis_client_pipeline* pipeline;
+	if (use_fiber_tbox) {
+		pipeline = new acl::fiber_redis_pipeline(addr);
+	} else {
+		pipeline = new acl::redis_client_pipeline(addr);
+	}
+
+	pipeline->set_timeout(conn_timeout, rw_timeout);
 	if (!passwd.empty()) {
-		pipeline.set_password(passwd);
+		pipeline->set_password(passwd);
 	}
 
 	// start pipeline thread to handle all redis command messages
-	pipeline.start_thread();
+	pipeline->start_thread();
 
 	struct timeval begin;
 	gettimeofday(&begin, NULL);
@@ -383,7 +392,7 @@ int main(int argc, char* argv[])
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
-		test_thread* thread = new test_thread(locker, pipeline,
+		test_thread* thread = new test_thread(locker, *pipeline,
 			cmd.c_str(), n, nfibers, stack_size, share_stack);
 		threads.push_back(thread);
 		thread->set_detachable(true);
@@ -419,8 +428,9 @@ int main(int argc, char* argv[])
 		delete (*it);
 	}
 
-	// stop pipeline thread
-	pipeline.stop_thread();
+	// stop pipeline thread and delete pipeline object.
+	pipeline->stop_thread();
+	delete pipeline;
 
 	printf("The pipeline thread has stopped!\r\n");
 
