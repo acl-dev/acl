@@ -693,16 +693,10 @@ void fiber_file_close(FILE_EVENT *fe)
 FILE_EVENT *fiber_file_cache_get(socket_t fd)
 {
 	FILE_EVENT *fe;
-	int exist = 0;
 
 	fiber_io_check();
 
-	fe = fiber_file_get(fd);
-	if (fe == NULL) {
-		fe = (FILE_EVENT*) array_pop_back(__thread_fiber->cache);
-	} else { // Why? the fe wasn't removed by fiber_file_cache_put ?
-		exist = 1;
-	}
+	fe = (FILE_EVENT*) array_pop_back(__thread_fiber->cache);
 	if (fe == NULL) {
 		fe = file_event_alloc(fd);
 	} else {
@@ -714,9 +708,7 @@ FILE_EVENT *fiber_file_cache_get(socket_t fd)
 		fe->mask |= EVENT_DIRECT;
 	}
 #endif
-	if (!exist) {
-		fiber_file_set(fe);
-	}
+	fiber_file_set(fe);
 	return fe;
 }
 

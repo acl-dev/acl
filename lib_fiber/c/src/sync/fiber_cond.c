@@ -119,6 +119,9 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	int delay)
 {
+	// Create one waiting object with the one reference added, which can
+	// be used by multiple threads, and will be released really when its
+	// refernece is zero.
 	SYNC_OBJ *obj = sync_obj_alloc(1);
 
 	obj->type = SYNC_OBJ_T_THREAD;
@@ -206,20 +209,35 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 
 	UNLOCK_COND(cond);
 
+	// If the waiter is a fiber, we should use sync_timer_wakeup() to
+	// notify the fiber, or if it's a thread, we should use the
+	// fbase_event_wakeup() to notify it.
+	// That is to say, a fiber waiter is managed by the sync_timer, and
+	// the thread waiter uses a temporary IO to wait for a notice.
 	if (obj->type == SYNC_OBJ_T_FIBER) {
 		sync_timer_wakeup(obj->timer, obj);
 	} else if (obj->type == SYNC_OBJ_T_THREAD) {
 		if (var_hook_sys_api) {
 			socket_t out = obj->base->event_out;
-			FILE_EVENT *fe = fiber_file_open_write(out);
+			// The waiter is a thread, the out fd is temporaryly
+			// created by the thread waiter, so we just use one
+			// temporary FILE_EVENT to bind the out fd, and
+			// release it after notify the waiter thread.
+			FILE_EVENT *fe = fiber_file_cache_get(out);
 			fe->mask |= EVENT_SYSIO;
+			ret = fbase_event_wakeup(obj->base);
+			fiber_file_cache_put(fe);
+		} else {
+			ret = fbase_event_wakeup(obj->base);
 		}
-		ret = fbase_event_wakeup(obj->base);
 	} else {
 		msg_fatal("%s(%d): unknown type=%d",
 			__FUNCTION__, __LINE__, obj->type);
 	}
 
+	// Unrefer the waiter object, which will be really freed when its
+	// reference is zero. It's safely that the waiter object is used
+	// by multiple threads with using the reference way.
 	sync_obj_unrefer(obj);
 	return ret;
 }

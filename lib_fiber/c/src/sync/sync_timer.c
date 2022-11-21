@@ -209,6 +209,13 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		FILE_EVENT *fe;
 		int same_thread;
 
+		// If the current fiber is in the same thread with the one
+		// to be noticed, the out fd is owned by the current thread
+		// and the FILE_EVENT with the out fd should be in long time
+		// status, so we use fiber_file_open_write to get it, or else
+		// the out fd we got is owned by the other thread, and
+		// we just need to get the temporary FILE_EVENT from cache to
+		// bind with the out fd, and release it after mbox_send.
 		if (__pthread_self() == timer->tid) {
 			fe = fiber_file_open_write(out);
 			same_thread = 1;
