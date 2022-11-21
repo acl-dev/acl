@@ -2,22 +2,13 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/thread.hpp"
 #include "../stdlib/string.hpp"
-#include "../stdlib/tbox.hpp"
-#include "../stdlib/mbox.hpp"
+#include "../stdlib/box.hpp"
 #include "../stdlib/atomic.hpp"
 #include "redis_command.hpp"
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
 namespace acl {
-
-#define USE_MBOX
-
-#ifdef USE_MBOX
-# define BOX	mbox
-#else
-# define BOX	tbox
-#endif
 
 class token_tree;
 class redis_client;
@@ -36,11 +27,12 @@ typedef enum {
 class redis_pipeline_message {
 public:
 	redis_pipeline_message(redis_command* cmd, redis_pipeline_type_t type,
-		bool use_mbox = true)
+		box<redis_pipeline_message>* box)
 	: cmd_(cmd)
 	, type_(type)
 	, nchild_(0)
 	, timeout_(NULL)
+	, box_(box)
 	, result_(NULL)
 	, addr_(NULL)
 	, redirect_count_(0)
@@ -48,14 +40,6 @@ public:
 	, argv_(NULL)
 	, lens_(NULL)
 	{
-		if (use_mbox) {
-			mbox_ = new mbox<redis_pipeline_message>(false, false);
-			tbox_ = NULL;
-		} else {
-			tbox_ = new tbox<redis_pipeline_message>(false);
-			mbox_ = NULL;
-		}
-
 		size_ = 10;
 		argc_ = 0;
 		argv_ = new const char* [size_];
@@ -63,8 +47,7 @@ public:
 	}
 
 	~redis_pipeline_message(void) {
-		delete mbox_;
-		delete tbox_;
+		delete box_;
 		delete [] argv_;
 		delete [] lens_;
 	}
@@ -142,19 +125,11 @@ public:
 
 	void push(const redis_result* result) {
 		result_ = result;
-		if (mbox_) {
-			mbox_->push(this, false);
-		} else {
-			tbox_->push(this, false);
-		}
+		box_->push(this, false);
 	}
 
 	const redis_result* wait(void) {
-		if (mbox_) {
-			mbox_->pop();
-		} else {
-			tbox_->pop();
-		}
+		box_->pop();
 		return result_;
 	}
 
@@ -171,8 +146,7 @@ private:
 	redis_pipeline_type_t type_;
 	size_t nchild_;
 	int* timeout_;
-	mbox<redis_pipeline_message>* mbox_;
-	tbox<redis_pipeline_message>* tbox_;
+	box<redis_pipeline_message>* box_;
 
 	const redis_result* result_;
 	const char* addr_;
@@ -216,7 +190,7 @@ private:
 	string addr_;
 	string buf_;
 	redis_client* client_;
-	BOX<redis_pipeline_message> box_;
+	box<redis_pipeline_message>* box_;
 	std::vector<redis_pipeline_message*> msgs_;
 public:
 	void push(redis_pipeline_message* msg);
@@ -238,8 +212,8 @@ private:
  */
 class ACL_CPP_API redis_client_pipeline : public thread {
 public:
-	redis_client_pipeline(const char* addr);
-	~redis_client_pipeline(void);
+	redis_client_pipeline(const char* addr, box_type_t type = BOX_TYPE_MBOX);
+	virtual ~redis_client_pipeline(void);
 
 	// Start the pipeline thread
 	void start_thread(void);
@@ -253,6 +227,10 @@ public:
 
 	// Called by redis_pipeline_channel
 	void push(redis_pipeline_message* msg);
+
+	// Called by redis_command::get_pipeline_message, and can be overrided
+	// by child class. The box can be tbox, tbox_array, mbox, or fiber_tbox.
+	virtual box<redis_pipeline_message>* create_box(void);
 
 public:
 	// Set the password for connecting the redis server
@@ -282,7 +260,8 @@ protected:
 private:
 	string addr_;		// The default redis address
 	string passwd_;		// Password for connecting redis
-	int max_slot_;		// The max hash slot for redis cluster
+	box_type_t box_type_;	// The type of box
+	int    max_slot_;	// The max hash slot for redis cluster
 	int    conn_timeout_;	// Timeout to connect redis
 	int    rw_timeout_;	// IO timeout with redis
 	bool   retry_;		// If try again when disconnect from redis
@@ -291,7 +270,7 @@ private:
 	token_tree* channels_;	// holds and manage all pipeline channels
 
 	// The message queue for receiving redis message from other threads
-	BOX<redis_pipeline_message> box_;
+	box<redis_pipeline_message>* box_;
 
 	std::vector<char*> addrs_;	// Hold all redis's addresses
 	const char** slot_addrs_;	// Map hash slot with address

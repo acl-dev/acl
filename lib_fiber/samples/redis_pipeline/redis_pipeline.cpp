@@ -366,7 +366,8 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_pipeline pipeline(addr);
+	//acl::redis_client_pipeline pipeline(addr);
+	acl::fiber_redis_pipeline pipeline(addr);
 	pipeline.set_timeout(conn_timeout, rw_timeout);
 	if (!passwd.empty()) {
 		pipeline.set_password(passwd);

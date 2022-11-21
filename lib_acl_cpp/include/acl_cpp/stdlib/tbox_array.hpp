@@ -5,18 +5,16 @@
 #include <string.h>
 #include "thread_mutex.hpp"
 #include "thread_cond.hpp"
-#include "noncopyable.hpp"
+#include "box.hpp"
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 用于线程之间的消息通信，通过线程条件变量及线程锁实现
  *
  * 示例：
  *
- * class myobj
- * {
+ * class myobj {
  * public:
  *     myobj(void) {}
  *     ~myobj(void) {}
@@ -41,8 +39,7 @@ namespace acl
  */
 
 template<typename T>
-class tbox_array : public noncopyable
-{
+class tbox_array : public box<T> {
 public:
 	/**
 	 * 构造方法
@@ -85,6 +82,7 @@ public:
 	 * @param notify_first {bool} 如果为 true，则先通知后解锁，否则先解锁
 	 *  后通知，注意二者的区别
 	 * @return {bool}
+	 * @override
 	 */
 	bool push(T* t, bool notify_first = false)
 	{
@@ -144,6 +142,7 @@ public:
 	 *  为 -1 时返回 NULL 依然认为获得了一个空消息对象，如果 wait_ms 大于
 	 *  等于 0 时返回 NULL，则应该检查 found 参数的值为 true 还是 false 来
 	 *  判断是否获得了一个空消息对象
+	 * @override
 	 */
 	T* pop(int wait_ms = -1, bool* found = NULL)
 	{

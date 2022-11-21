@@ -18,11 +18,13 @@ redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 , buf_(81920)
 {
 	client_ = NEW redis_client(addr, conn_timeout, rw_timeout, retry);
+	box_ = new mbox<redis_pipeline_message>;
 }
 
 redis_pipeline_channel::~redis_pipeline_channel(void)
 {
 	delete client_;
+	delete box_;
 }
 
 redis_pipeline_channel& redis_pipeline_channel::set_passwd(const char *passwd)
@@ -45,14 +47,15 @@ bool redis_pipeline_channel::start_thread(void)
 
 void redis_pipeline_channel::stop_thread(void)
 {
-	redis_pipeline_message message(NULL, redis_pipeline_t_stop);
+	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
+	redis_pipeline_message message(NULL, redis_pipeline_t_stop, box);
 	push(&message);
 	this->wait();
 }
 
 void redis_pipeline_channel::push(redis_pipeline_message* msg)
 {
-	box_.push(msg, false);
+	box_->push(msg, false);
 }
 
 bool redis_pipeline_channel::flush_all(void)
@@ -261,7 +264,7 @@ void* redis_pipeline_channel::run(void)
 	int timeout = -1;
 
 	while (!client_->eof()) {
-		redis_pipeline_message* msg = box_.pop(timeout, &success);
+		redis_pipeline_message* msg = box_->pop(timeout, &success);
 		if (msg != NULL) {
 			timeout = 0;
 
@@ -289,8 +292,9 @@ void* redis_pipeline_channel::run(void)
 
 //////////////////////////////////////////////////////////////////////////////
 
-redis_client_pipeline::redis_client_pipeline(const char* addr)
+redis_client_pipeline::redis_client_pipeline(const char* addr, box_type_t type)
 : addr_(addr)
+, box_type_(type)
 , max_slot_(16384)
 , conn_timeout_(10)
 , rw_timeout_(10)
@@ -299,6 +303,7 @@ redis_client_pipeline::redis_client_pipeline(const char* addr)
 {
 	slot_addrs_ = (const char**) acl_mycalloc(max_slot_, sizeof(char*));
 	channels_   = NEW token_tree;
+	box_        = new mbox<redis_pipeline_message>;
 }
 
 redis_client_pipeline::~redis_client_pipeline(void)
@@ -309,6 +314,7 @@ redis_client_pipeline::~redis_client_pipeline(void)
 	}
 	acl_myfree(slot_addrs_);
 	delete channels_;
+	delete box_;
 }
 
 redis_client_pipeline& redis_client_pipeline::set_timeout(int conn_timeout,
@@ -352,20 +358,34 @@ void redis_client_pipeline::start_thread(void)
 
 void redis_client_pipeline::stop_thread(void)
 {
-	redis_pipeline_message message(NULL, redis_pipeline_t_stop);
+	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
+	redis_pipeline_message message(NULL, redis_pipeline_t_stop, box);
 	push(&message);
 	this->wait();  // Wait for the thread to exit
 }
 
 const redis_result* redis_client_pipeline::run(redis_pipeline_message& msg)
 {
-	box_.push(&msg, false);
+	box_->push(&msg, false);
 	return msg.wait();
 }
 
 void redis_client_pipeline::push(redis_pipeline_message *msg)
 {
-	box_.push(msg, false);
+	box_->push(msg, false);
+}
+
+box<redis_pipeline_message>* redis_client_pipeline::create_box(void)
+{
+	switch (box_type_) {
+	case BOX_TYPE_TBOX:
+		return new tbox<redis_pipeline_message>(false);
+	case BOX_TYPE_TBOX_ARRAY:
+		return new tbox_array<redis_pipeline_message>(false);
+	case BOX_TYPE_MBOX:
+	default:
+		return new mbox<redis_pipeline_message>(false, false);
+	}
 }
 
 // Called after the thread started
@@ -384,18 +404,10 @@ void* redis_client_pipeline::run(void)
 
 	redis_pipeline_channel* channel;
 	int  timeout = -1;
-#ifdef USE_MBOX
-	bool success;
-#else
 	bool found;
-#endif
 
 	while (true) {
-#ifdef USE_MBOX
-		redis_pipeline_message* msg = box_.pop(timeout, &success);
-#else
-		redis_pipeline_message* msg = box_.pop(timeout, &found);
-#endif
+		redis_pipeline_message* msg = box_->pop(timeout, &found);
 		if (msg != NULL) {
 			redis_pipeline_type_t type = msg->get_type();
 			if (type == redis_pipeline_t_stop) {
@@ -428,11 +440,7 @@ void* redis_client_pipeline::run(void)
 				channel->push(msg);
 				timeout = 0;
 			}
-#ifdef USE_MBOX
-		} else if (!success) {
-#else
 		} else if (found) {
-#endif
 			break;
 		} else {
 			timeout = -1;

@@ -13,8 +13,7 @@ namespace acl {
  *
  * 示例：
  *
- * class myobj
- * {
+ * class myobj {
  * public:
  *     myobj(void) {}
  *     ~myobj(void) {}
@@ -38,9 +37,10 @@ namespace acl {
  * }
  */
 
+// The base box<T> defined in acl_cpp/stdlib/box.hpp, so you must include
+// box.hpp first before including fiber_tbox.hpp
 template<typename T>
-class fiber_tbox
-{
+class fiber_tbox : public box<T> {
 public:
 	/**
 	 * 构造方法
@@ -80,6 +80,7 @@ public:
 	 *  则本参数应该设为 true，以避免 push 者还没有完全返回前因 fiber_tbox
 	 *  对象被提前销毁而造成内存非法访问
 	 * @return {bool}
+	 * @override
 	 */
 	bool push(T* t, bool notify_first = true)
 	{
@@ -123,6 +124,7 @@ public:
 	 *  为 -1 时返回 NULL 依然认为获得了一个空消息对象，如果 wait_ms 大于
 	 *  等于 0 时返回 NULL，则应该检查 found 参数的值为 true 还是 false 来
 	 *  判断是否获得了一个空消息对象
+	 * @override
 	 */
 	T* pop(int wait_ms = -1, bool* found = NULL)
 	{

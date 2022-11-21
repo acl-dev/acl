@@ -136,10 +136,9 @@ class test_thread : public acl::thread
 {
 public:
 	test_thread(acl::locker& locker, acl::redis_client_pipeline& conns,
-		bool pipeline_use_mbox, const char* cmd, int n)
+		const char* cmd, int n)
 	: locker_(locker)
 	, conns_(conns)
-	, pipeline_use_mbox_(pipeline_use_mbox)
 	, cmd_(cmd)
 	, n_(n)
 	{}
@@ -152,10 +151,10 @@ protected:
 	{
 		bool ret;
 		acl::redis cmd_key;
-		cmd_key.set_pipeline(&conns_, pipeline_use_mbox_);
+		cmd_key.set_pipeline(&conns_);
 
 		acl::redis cmd_string;
-		cmd_string.set_pipeline(&conns_, pipeline_use_mbox_);
+		cmd_string.set_pipeline(&conns_);
 
 		for (int i = 0; i < n_; i++) {
 			if (cmd_ == "set") {
@@ -217,7 +216,6 @@ protected:
 private:
 	acl::locker& locker_;
 	acl::redis_client_pipeline& conns_;
-	bool pipeline_use_mbox_;
 	acl::string cmd_;
 	int  n_;
 };
@@ -239,7 +237,7 @@ int main(int argc, char* argv[])
 {
 	int  ch, n = 1;
 	int  max_threads = 10;
-	bool pipeline_use_mbox = false;
+	acl::box_type_t btype = acl::BOX_TYPE_TBOX;
 	acl::string addr("127.0.0.1:6379"), cmd("del"), passwd;
 
 	while ((ch = getopt(argc, argv, "hs:n:t:a:p:m")) > 0) {
@@ -263,7 +261,7 @@ int main(int argc, char* argv[])
 			passwd = optarg;
 			break;
 		case 'm':
-			pipeline_use_mbox = true;
+			btype = acl::BOX_TYPE_MBOX;
 			break;
 		default:
 			break;
@@ -273,7 +271,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	acl::redis_client_pipeline pipeline(addr);
+	acl::redis_client_pipeline pipeline(addr, btype);
 	if (!passwd.empty()) {
 		pipeline.set_password(passwd);
 	}
@@ -287,7 +285,7 @@ int main(int argc, char* argv[])
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
 		test_thread* thread = new test_thread(locker, pipeline,
-			pipeline_use_mbox, cmd.c_str(), n);
+			cmd.c_str(), n);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();
