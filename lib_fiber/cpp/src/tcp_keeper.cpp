@@ -113,7 +113,7 @@ void tcp_keeper::update(const char* addr, double cost)
 socket_stream* tcp_keeper::peek(const char* addr, bool* hit /* = NULL */,
 	bool sync /* = false */)
 {
-	bool found;
+	bool found = false;
 
 	if (addr == NULL || *addr == 0) {
 		logger_fatal("addr null, addr=%s", addr ? addr : "null");

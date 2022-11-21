@@ -207,6 +207,7 @@
 		07A468751E6FCCF1002C9B3C /* stream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A467BF1E6FCCF1002C9B3C /* stream.cpp */; };
 		07A4D1731E94E4BC00790E12 /* mbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07A4D1721E94E4BC00790E12 /* mbox.cpp */; };
 		07BED4DB22AFC5B30060BBE4 /* http_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */; };
+		07C51BA3292BA8A700231646 /* thread_queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07C51BA2292BA8A700231646 /* thread_queue.cpp */; };
 		700C4C1625F8E5A4004955AD /* mqtt_aclient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 700C4C1525F8E5A4004955AD /* mqtt_aclient.cpp */; };
 		7017904424C542140016B873 /* redis_role.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017903E24C542140016B873 /* redis_role.cpp */; };
 		7017904524C542140016B873 /* redis_master.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7017903F24C542140016B873 /* redis_master.cpp */; };
@@ -693,6 +694,10 @@
 		07BEA6C3214F79E20060BBE4 /* WebSocketServlet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = WebSocketServlet.hpp; sourceTree = "<group>"; };
 		07BED4D922AFC5710060BBE4 /* http_aclient.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_aclient.hpp; sourceTree = "<group>"; };
 		07BED4DA22AFC5B30060BBE4 /* http_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = http_aclient.cpp; sourceTree = "<group>"; };
+		07C51BA2292BA8A700231646 /* thread_queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread_queue.cpp; sourceTree = "<group>"; };
+		07C51BA4292BA8D600231646 /* tbox_array.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = tbox_array.hpp; sourceTree = "<group>"; };
+		07C51BA5292BA8D600231646 /* box.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = box.hpp; sourceTree = "<group>"; };
+		07C51BA6292BA8D600231646 /* dbuf_allocator.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = dbuf_allocator.hpp; sourceTree = "<group>"; };
 		700C4C1425F8E594004955AD /* mqtt_aclient.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = mqtt_aclient.hpp; path = mqtt/mqtt_aclient.hpp; sourceTree = "<group>"; };
 		700C4C1525F8E5A4004955AD /* mqtt_aclient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mqtt_aclient.cpp; path = mqtt/mqtt_aclient.cpp; sourceTree = "<group>"; };
 		7017903E24C542140016B873 /* redis_role.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = redis_role.cpp; sourceTree = "<group>"; };
@@ -1137,6 +1142,7 @@
 		07A4678C1E6FCCF1002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				07C51BA2292BA8A700231646 /* thread_queue.cpp */,
 				070F351120901EE100672EDC /* diff_manager.cpp */,
 				070F351220901EE100672EDC /* diff_object.cpp */,
 				070F351320901EE100672EDC /* diff_string.cpp */,
@@ -1554,6 +1560,9 @@
 		07A469191E6FD404002C9B3C /* stdlib */ = {
 			isa = PBXGroup;
 			children = (
+				07C51BA5292BA8D600231646 /* box.hpp */,
+				07C51BA6292BA8D600231646 /* dbuf_allocator.hpp */,
+				07C51BA4292BA8D600231646 /* tbox_array.hpp */,
 				07BEA6BC214F79050060BBE4 /* thread_queue.hpp */,
 				07BEA6BB214F78F40060BBE4 /* tbox.hpp */,
 				070F350E20901E6B00672EDC /* diff_manager.hpp */,
@@ -1871,6 +1880,7 @@
 				07A468331E6FCCF1002C9B3C /* redis_key.cpp in Sources */,
 				07A468141E6FCCF1002C9B3C /* rec_type.cpp in Sources */,
 				07A467E51E6FCCF1002C9B3C /* disque_job.cpp in Sources */,
+				07C51BA3292BA8A700231646 /* thread_queue.cpp in Sources */,
 				07A4680A1E6FCCF1002C9B3C /* memcache.cpp in Sources */,
 				07A467F21E6FCCF1002C9B3C /* http_pipe.cpp in Sources */,
 				07A467F41E6FCCF1002C9B3C /* http_request_manager.cpp in Sources */,

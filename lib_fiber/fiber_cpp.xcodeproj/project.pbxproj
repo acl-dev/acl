@@ -40,6 +40,8 @@
 		07BED4EA22AFCB060060BBE4 /* keeper_conns.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */; };
 		07BED4EB22AFCB060060BBE4 /* keeper_waiter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */; };
 		07BED4EC22AFCB060060BBE4 /* keeper_waiter.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */; };
+		07C51B9F292BA87300231646 /* fiber_redis_pipeline.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07C51B9E292BA87300231646 /* fiber_redis_pipeline.cpp */; };
+		07C51BA1292BA88200231646 /* fiber_redis_pipeline.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07C51BA0292BA88200231646 /* fiber_redis_pipeline.hpp */; };
 		70147AA7292616CE00367292 /* http_server.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 70147AA4292616CE00367292 /* http_server.hpp */; };
 		70147AA8292616CE00367292 /* http_servlet.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 70147AA5292616CE00367292 /* http_servlet.hpp */; };
 		70147AA9292616CE00367292 /* go_fiber.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 70147AA6292616CE00367292 /* go_fiber.hpp */; };
@@ -87,6 +89,8 @@
 		07BED4E322AFCB060060BBE4 /* keeper_conns.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_conns.hpp; sourceTree = "<group>"; };
 		07BED4E422AFCB060060BBE4 /* keeper_waiter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = keeper_waiter.cpp; sourceTree = "<group>"; };
 		07BED4E522AFCB060060BBE4 /* keeper_waiter.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = keeper_waiter.hpp; sourceTree = "<group>"; };
+		07C51B9E292BA87300231646 /* fiber_redis_pipeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_redis_pipeline.cpp; path = cpp/src/fiber_redis_pipeline.cpp; sourceTree = "<group>"; };
+		07C51BA0292BA88200231646 /* fiber_redis_pipeline.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_redis_pipeline.hpp; sourceTree = "<group>"; };
 		70147AA4292616CE00367292 /* http_server.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_server.hpp; sourceTree = "<group>"; };
 		70147AA5292616CE00367292 /* http_servlet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = http_servlet.hpp; sourceTree = "<group>"; };
 		70147AA6292616CE00367292 /* go_fiber.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = go_fiber.hpp; sourceTree = "<group>"; };
@@ -150,6 +154,7 @@
 		070F35F220902DB100672EDC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				07C51B9E292BA87300231646 /* fiber_redis_pipeline.cpp */,
 				70147AAA292616E600367292 /* fiber_mutex.cpp */,
 				702452EF2897BD0D00B7449B /* wait_group.cpp */,
 				70E41F5626F3293E0068042B /* tcp_keeper.cpp */,
@@ -173,6 +178,7 @@
 		070F35F320902DDC00672EDC /* fiber */ = {
 			isa = PBXGroup;
 			children = (
+				07C51BA0292BA88200231646 /* fiber_redis_pipeline.hpp */,
 				70F62E4F2926432F0010B1F6 /* fiber_mutex.hpp */,
 				70147AA6292616CE00367292 /* go_fiber.hpp */,
 				70147AA4292616CE00367292 /* http_server.hpp */,
@@ -232,6 +238,7 @@
 				07BED4D421BA27B70060BBE4 /* fiber_cond.hpp in Headers */,
 				070F360220902DDC00672EDC /* lib_fiber.hpp in Headers */,
 				07BED4EA22AFCB060060BBE4 /* keeper_conns.hpp in Headers */,
+				07C51BA1292BA88200231646 /* fiber_redis_pipeline.hpp in Headers */,
 				07BED4EC22AFCB060060BBE4 /* keeper_waiter.hpp in Headers */,
 				070F35FE20902DDC00672EDC /* fiber_cpp_define.hpp in Headers */,
 				07BED4E822AFCB060060BBE4 /* keeper_conn.hpp in Headers */,
@@ -311,6 +318,7 @@
 				07BED4E722AFCB060060BBE4 /* keeper_conn.cpp in Sources */,
 				070F361420902FDA00672EDC /* fiber.cpp in Sources */,
 				07BED4D221BA278D0060BBE4 /* fiber_cond.cpp in Sources */,
+				07C51B9F292BA87300231646 /* fiber_redis_pipeline.cpp in Sources */,
 				070F360E20902FDA00672EDC /* channel.cpp in Sources */,
 				70E41F5926F3293E0068042B /* tcp_keeper.cpp in Sources */,
 				070F361520902FDA00672EDC /* master_fiber.cpp in Sources */,
