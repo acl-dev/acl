@@ -23,12 +23,12 @@ bool mbox_send(void* mbox, void* o)
 	return acl_mbox_send((ACL_MBOX*) mbox, o) == 0;
 }
 
-void* mbox_read(void* mbox, int timeout, bool* found)
+void* mbox_read(void* mbox, int timeout, bool* success)
 {
 	int ok;
 	void* o = (void*) acl_mbox_read((ACL_MBOX*) mbox, timeout, &ok);
-	if (found) {
-		*found = ok ? true : false;
+	if (success) {
+		*success = ok ? true : false;
 	}
 	return o;
 }

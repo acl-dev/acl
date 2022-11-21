@@ -45,6 +45,9 @@
     <ClInclude Include="include\fiber\fiber_lock.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\fiber_redis_pipeline.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="include\fiber\fiber_sem.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -78,6 +81,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\fiber_lock.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fiber_redis_pipeline.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\fiber_sem.cpp">
