@@ -900,6 +900,9 @@
     <ClInclude Include="include\acl_cpp\stdlib\bitmap.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\box.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
@@ -1111,6 +1114,9 @@
       <Filter>Header Files\master</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\tbox.hpp">
+      <Filter>Header Files\stdlib</Filter>
+    </ClInclude>
+    <ClInclude Include="include\acl_cpp\stdlib\tbox_array.hpp">
       <Filter>Header Files\stdlib</Filter>
     </ClInclude>
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp">

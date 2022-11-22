@@ -1214,6 +1214,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 					RelativePath=".\include\acl_cpp\stdlib\bitmap.hpp">
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\box.hpp">
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp">
 				</File>
 				<File
@@ -1278,6 +1281,9 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\tbox.hpp">
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\tbox_array.hpp">
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\thread.hpp">

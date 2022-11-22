@@ -2048,6 +2048,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\include\acl_cpp\stdlib\box.hpp"
+					>
+				</File>
+				<File
 					RelativePath=".\include\acl_cpp\stdlib\charset_conv.hpp"
 					>
 				</File>
@@ -2133,6 +2137,10 @@
 				</File>
 				<File
 					RelativePath=".\include\acl_cpp\stdlib\tbox.hpp"
+					>
+				</File>
+				<File
+					RelativePath=".\include\acl_cpp\stdlib\tbox_array.hpp"
 					>
 				</File>
 				<File

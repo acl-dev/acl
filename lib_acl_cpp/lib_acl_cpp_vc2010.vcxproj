@@ -564,6 +564,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\smtp\smtp_client.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\atomic.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\bitmap.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\box.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\charset_conv.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dbuf_pool.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\dns_service.hpp" />
@@ -586,6 +587,7 @@ copy $(TargetName).pdb ..\dist\lib\win32\$(TargetName).pdb /Y
     <ClInclude Include="include\acl_cpp\stdlib\snprintf.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\string.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\tbox.hpp" />
+    <ClInclude Include="include\acl_cpp\stdlib\tbox_array.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_cond.hpp" />
     <ClInclude Include="include\acl_cpp\stdlib\thread_mutex.hpp" />
