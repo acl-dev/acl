@@ -137,14 +137,12 @@ static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	FIBER_UNLOCK(mutex);
 
 	if (delay >= 0 && read_wait(obj->base->event_in, delay) == -1) {
-		FIBER_LOCK(mutex);
-
 		LOCK_COND(cond);
 		array_delete_obj(cond->waiters, obj, NULL);
 		UNLOCK_COND(cond);
 
-		sync_obj_unrefer(obj);
 		FIBER_LOCK(mutex);
+		sync_obj_unrefer(obj);
 		return FIBER_ETIME;
 	}
 
@@ -152,14 +150,12 @@ static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 		msg_error("%s(%d), %s: wait event error",
 			__FILE__, __LINE__, __FUNCTION__);
 
-		FIBER_LOCK(mutex);
-
 		LOCK_COND(cond);
 		array_delete_obj(cond->waiters, obj, NULL);
 		UNLOCK_COND(cond);
 
-		sync_obj_unrefer(obj);
 		FIBER_LOCK(mutex);
+		sync_obj_unrefer(obj);
 		return FIBER_EINVAL;
 	}
 
