@@ -625,9 +625,6 @@ int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 
 #define	CHECK_WRITE_RESULT(_fe, _n) do {                                     \
 	int _err;                                                            \
-	if (!var_hook_sys_api) {                                             \
-		return _n;                                                   \
-	}                                                                    \
 	if (_n >= 0) {                                                       \
 		return _n;                                                   \
 	}                                                                    \
@@ -652,6 +649,10 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 
 	if (sys_write == NULL) {
 		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_write)(fd, buf, count);
 	}
 
 	fe = fiber_file_open_write(fd);
@@ -685,6 +686,10 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 
 	if (sys_writev == NULL) {
 		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_writev)(fd, iov, iovcnt);
 	}
 
 	fe = fiber_file_open_write(fd);
@@ -725,6 +730,10 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 
 	if (sys_send == NULL) {
 		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (int) (*sys_send)(sockfd, buf, len, flags);
 	}
 
 	fe = fiber_file_open_write(sockfd);
@@ -777,6 +786,11 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 		hook_once();
 	}
 
+	if (!var_hook_sys_api) {
+		return (int) (*sys_sendto)(sockfd, buf, len, flags,
+				dest_addr, addrlen);
+	}
+
 	fe = fiber_file_open_write(sockfd);
 	CLR_POLLING(fe);
 
@@ -822,6 +836,10 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 
 	if (sys_sendmsg == NULL) {
 		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_sendmsg)(sockfd, msg, flags);
 	}
 
 	fe = fiber_file_open_write(sockfd);
@@ -919,6 +937,10 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		hook_once();
 	}
 
+	if (!var_hook_sys_api) {                                             \
+		return (*sys_sendfile64)(out_fd, in_fd, offset, count);
+	}
+
 #ifdef	HAS_IO_URING
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		return file_sendfile(out_fd, in_fd, offset, count);
@@ -932,7 +954,7 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		FILE_EVENT *fe;
 		int err;
 
-		if (!var_hook_sys_api || n >= 0) {
+		if (n >= 0) {
 			return n;
 		}
 
