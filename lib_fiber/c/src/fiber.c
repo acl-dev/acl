@@ -723,8 +723,10 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		__thread_fiber->idgen++;
 	}
 
+#if 0
 	printf(">>>>%s: fiber=%p, init_fn=%p, free_fn=%p, swap_fn=%p, start_fn=%p, fn=%p\n", __FUNCTION__,
 		fiber, fiber->init_fn, fiber->free_fn, fiber->swap_fn, fiber->start_fn, fiber->fn);
+#endif
 
 	fiber->id     = __thread_fiber->idgen;
 	fiber->errnum = 0;
