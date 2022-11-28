@@ -631,18 +631,6 @@ static void fbase_init(FIBER_BASE *fbase, int flag)
 	fbase->event_in  = -1;
 	fbase->event_out = -1;
 	ring_init(&fbase->event_waiter);
-
-	//fbase->atomic = atomic_new();
-	//atomic_set(fbase->atomic, &fbase->atomic_value);
-	//atomic_int64_set(fbase->atomic, 0);
-}
-
-static void fbase_finish(FIBER_BASE *fbase)
-{
-#ifdef SYS_UNIX
-	fbase_event_close(fbase);
-#endif
-	//atomic_free(fbase->atomic);
 }
 
 FIBER_BASE *fbase_alloc(unsigned flag)
@@ -655,14 +643,14 @@ FIBER_BASE *fbase_alloc(unsigned flag)
 
 void fbase_free(FIBER_BASE *fbase)
 {
-	fbase_finish(fbase);
+	fbase_event_close(fbase); // Not closed? try again!
 	mem_free(fbase);
 }
 
 void fiber_free(ACL_FIBER *fiber)
 {
 	if (fiber->base) {
-		fbase_finish(fiber->base);
+		fbase_event_close(fiber->base);
 	}
 	fiber->free_fn(fiber);
 }

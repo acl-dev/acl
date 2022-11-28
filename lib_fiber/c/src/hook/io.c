@@ -45,6 +45,12 @@ int WINAPI acl_fiber_close(socket_t fd)
 	}
 
 	if (!var_hook_sys_api) {
+		// In thread mode, we only need to free the fe, because
+		// no fiber was bound with the fe.
+		fe = fiber_file_get(fd);
+		if (fe) {
+			fiber_file_free(fe);
+		}
 		return (*sys_close)(fd);
 	}
 

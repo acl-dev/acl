@@ -128,6 +128,8 @@ static int thread_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	obj->base = fbase_alloc(0);
 	obj->tid  = (pthread_t) __pthread_self();
 
+	// The in/out fds opened by fbase_event_open() will be closed
+	// in sync_obj_unrefer().
 	fbase_event_open(obj->base);
 
 	LOCK_COND(cond);

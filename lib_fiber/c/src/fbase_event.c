@@ -89,6 +89,10 @@ void fbase_event_close(FIBER_BASE *fbase)
 		 && fbase->event_out != INVALID_SOCKET) {
 		CLOSE_SOCKET(fbase->event_out);
 	}
+
+	// Set the fds to INVALID_SOCKET to avoid closing the same fd
+	// more than once, because the fbase_event_close() maybe be called
+	// more than once:(
 	fbase->event_in  = INVALID_SOCKET;
 	fbase->event_out = INVALID_SOCKET;
 }
