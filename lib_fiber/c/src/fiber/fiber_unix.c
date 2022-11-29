@@ -324,10 +324,6 @@ ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *),
 	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
 	fb->fiber.start_fn = start_fn;
 
-#if 0
-	printf(">>>%s: fb=%p, init_fn=%p, free_fn=%p, swap_fn=%p, start_fn=%p\n",
-		__FUNCTION__, &fb->fiber, fb->fiber.init_fn, fb->fiber.free_fn, fb->fiber.swap_fn, fb->fiber.start_fn);
-#endif
 	return (ACL_FIBER *) fb;
 }
 
