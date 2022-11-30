@@ -82,7 +82,7 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 	WAITER_DEC(ev);
 
 	fe_tmp->mask &= ~EVENT_FILE_CLOSE;
-	fe->reader_ctx.res = fe_tmp->reader_ctx.res;
+	res = fe->reader_ctx.res = fe_tmp->reader_ctx.res;
 	file_event_unrefer(fe_tmp);
 
 	if (fe->reader_ctx.res < 0) {
