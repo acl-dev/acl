@@ -8,7 +8,7 @@
 EVENT *event_io_uring_create(int size);
 
 void event_uring_file_close(EVENT *ev, FILE_EVENT *fe);
-void event_uring_file_cancel(EVENT *ev, FILE_EVENT *, FILE_EVENT *fe);
+void event_uring_file_cancel(EVENT *ev, FILE_EVENT *fe_orig, FILE_EVENT *fe);
 void event_uring_file_openat(EVENT* ev, FILE_EVENT *fe, int dirfd,
 	const char* pathname, int flags, mode_t mode);
 void event_uring_file_unlink(EVENT *ev, FILE_EVENT *fe, const char *pathname);

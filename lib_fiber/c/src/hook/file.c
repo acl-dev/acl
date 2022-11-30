@@ -82,13 +82,12 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 	WAITER_DEC(ev);
 
 	fe_tmp->mask &= ~EVENT_FILE_CLOSE;
-	res = fe_tmp->reader_ctx.res;
+	fe->reader_ctx.res = fe_tmp->reader_ctx.res;
 	file_event_unrefer(fe_tmp);
 
-	if (res < 0) {
+	if (fe->reader_ctx.res < 0) {
 		acl_fiber_set_error(-fe->reader_ctx.res);
 	}
-	fe->reader_ctx.res = res;
 
 	if (close_other == 1) {
 		fe->fiber_r->errnum = ECANCELED;
@@ -153,13 +152,13 @@ int file_cancel(EVENT *ev, FILE_EVENT *fe, int iotype)
 	if (cancel_type == CANCEL_IO_READ && res == 0) {
 		fe->fiber_r->errnum = ECANCELED;
 		fe->fiber_r->flag  |= FIBER_F_KILLED;
-		fe->reader_ctx.res  = -1;
+		fe->reader_ctx.res  = 0;
 		acl_fiber_kill(fe->fiber_r);
 		file_event_unrefer(fe);
 	} else if (cancel_type == CANCEL_IO_WRITE && res == 0) {
 		fe->fiber_w->errnum = ECANCELED;
 		fe->fiber_w->flag  |= FIBER_F_KILLED;
-		fe->writer_ctx.res  = -1;
+		fe->writer_ctx.res  = 0;
 		acl_fiber_kill(fe->fiber_w);
 		file_event_unrefer(fe);
 	} else {
