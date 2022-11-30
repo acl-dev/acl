@@ -152,7 +152,7 @@ static void fiber_killer(ACL_FIBER *fiber, void *ctx acl_unused)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help]\r\n", procname);
+	printf("usage: %s -h [help] -e event_type[kernel|select|poll|io_uring]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -160,14 +160,26 @@ int main(int argc, char *argv[])
 	int  ch;
 	ACL_FIBER_SEM *sem;
 	ACL_FIBER_LOCK *lock;
+	int event_type = FIBER_EVENT_KERNEL;
 
 	acl_msg_stdout_enable(1);
 
-	while ((ch = getopt(argc, argv, "hn:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "he:n:c:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'e':
+			if (strcasecmp(optarg, "kernel") == 0) {
+				event_type = FIBER_EVENT_KERNEL;
+			} else if (strcasecmp(optarg, "select") == 0) {
+				event_type = FIBER_EVENT_SELECT;
+			} else if (strcasecmp(optarg, "poll") == 0) {
+				event_type = FIBER_EVENT_POLL;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				event_type = FIBER_EVENT_IO_URING;
+			}
+			break;
 		default:
 			break;
 		}
@@ -186,7 +198,7 @@ int main(int argc, char *argv[])
 	__fiber_sleep2 = acl_fiber_create(fiber_sleep2, NULL, 320000);
 	acl_fiber_create(fiber_killer, NULL, 320000);
 
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(event_type);
 	acl_fiber_sem_free(sem);
 	acl_fiber_lock_free(lock);
 

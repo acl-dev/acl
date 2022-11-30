@@ -43,6 +43,10 @@ static void file_read_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
 
 int file_close(EVENT *ev, FILE_EVENT *fe)
 {
+	int close_other;
+	FILE_EVENT *fe_tmp;
+	int res;
+
 	CHECK_API("sys_close", sys_close);
 
 	if (!var_hook_sys_api) {
@@ -53,25 +57,115 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 		return (*sys_close)(fe->fd);
 	}
 
-	fe->fiber_r         = acl_fiber_running();
-	fe->fiber_r->status = FIBER_STATUS_NONE;
-	fe->r_proc          = file_read_callback;
-	fe->mask           |= EVENT_FILE_CLOSE;
+	FILE_ALLOC(fe_tmp, EVENT_FILE_CANCEL);
 
-	event_uring_file_close(ev, fe);
+	fe_tmp->fd              = fe->fd;
+	fe_tmp->fiber_r         = acl_fiber_running();
+	fe_tmp->fiber_r->status = FIBER_STATUS_NONE;
+	fe_tmp->r_proc          = file_read_callback;
+	fe_tmp->mask           |= EVENT_FILE_CLOSE;
+
+	if (fe->fiber_r && fe->fiber_r != fe_tmp->fiber_r) {
+		close_other = 1;
+	} else if (fe->fiber_w && fe->fiber_w != fe_tmp->fiber_r) {
+		close_other = 2;
+	} else {
+		close_other = 0;
+	}
+
+	event_uring_file_close(ev, fe_tmp);
+
+	file_event_refer(fe);
 
 	WAITER_INC(ev);
 	acl_fiber_switch();
 	WAITER_DEC(ev);
 
-	fe->mask &= ~EVENT_FILE_CLOSE;
+	fe_tmp->mask &= ~EVENT_FILE_CLOSE;
+	res = fe_tmp->reader_ctx.res;
+	file_event_unrefer(fe_tmp);
 
-	if (fe->reader_ctx.res == 0) {
-		return 0;
-	} else {
+	if (res < 0) {
 		acl_fiber_set_error(-fe->reader_ctx.res);
+	}
+	fe->reader_ctx.res = res;
+
+	if (close_other == 1) {
+		fe->fiber_r->errnum = ECANCELED;
+		fe->fiber_r->flag  |= FIBER_F_CLOSED;
+		acl_fiber_kill(fe->fiber_r);
+	} else if (close_other == 2) {
+		fe->fiber_w->errnum = ECANCELED;
+		fe->fiber_w->flag  |= FIBER_F_CLOSED;
+		acl_fiber_kill(fe->fiber_w);
+	}
+
+	file_event_unrefer(fe);
+	return res;
+}
+
+int file_cancel(EVENT *ev, FILE_EVENT *fe, int iotype)
+{
+	int res, cancel_type = CANCEL_NONE;
+	FILE_EVENT *fe_tmp;
+
+	if (!var_hook_sys_api) {
+		return 0;
+	}
+
+	if (!EVENT_IS_IO_URING(ev)) {
+		return 0;
+	}
+
+	FILE_ALLOC(fe_tmp, EVENT_FILE_CANCEL);
+
+	fe_tmp->fd              = fe->fd;
+	fe_tmp->fiber_r         = acl_fiber_running();
+	fe_tmp->fiber_r->status = FIBER_STATUS_NONE;
+	fe_tmp->r_proc          = file_read_callback;
+	fe_tmp->mask           |= EVENT_FILE_CANCEL;
+
+	if (iotype == CANCEL_IO_READ) {
+		if (fe_tmp->fiber_r != fe->fiber_r) {
+			cancel_type = iotype;
+		}
+	} else if (iotype == CANCEL_IO_WRITE) {
+		if (fe_tmp->fiber_w != fe->fiber_w) {
+			cancel_type = iotype;
+		}
+	} else {
+		msg_error("%s(%d): invalid cancel iotype=%d",
+			__FUNCTION__, __LINE__, iotype);
 		return -1;
 	}
+
+	event_uring_file_cancel(ev, fe, fe_tmp);
+
+	file_event_refer(fe);
+
+	WAITER_INC(ev);
+	acl_fiber_switch();
+	WAITER_DEC(ev);
+
+	res = fe_tmp->reader_ctx.res;
+	file_event_unrefer(fe_tmp);
+
+	if (cancel_type == CANCEL_IO_READ && res == 0) {
+		fe->fiber_r->errnum = ECANCELED;
+		fe->fiber_r->flag  |= FIBER_F_KILLED;
+		fe->reader_ctx.res  = -1;
+		acl_fiber_kill(fe->fiber_r);
+		file_event_unrefer(fe);
+	} else if (cancel_type == CANCEL_IO_WRITE && res == 0) {
+		fe->fiber_w->errnum = ECANCELED;
+		fe->fiber_w->flag  |= FIBER_F_KILLED;
+		fe->writer_ctx.res  = -1;
+		acl_fiber_kill(fe->fiber_w);
+		file_event_unrefer(fe);
+	} else {
+		file_event_unrefer(fe);
+	}
+	return 0;
 }
 
 int openat(int dirfd, const char *pathname, int flags, ...)

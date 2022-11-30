@@ -168,6 +168,11 @@ int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len);
 
 // in file.c
 extern int file_close(EVENT *ev, FILE_EVENT *fe);
+
+#define	CANCEL_NONE	0
+#define	CANCEL_IO_READ	1
+#define	CANCEL_IO_WRITE	2
+extern int file_cancel(EVENT *ev, FILE_EVENT *fe, int iotype);
 extern ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt);
 
 extern openat_fn            *sys_openat;

@@ -3,6 +3,7 @@
 
 #include "fiber/libfiber.h"
 #include "common/gettimeofday.h"
+#include "hook/hook.h"
 #include "event.h"
 #include "fiber.h"
 
@@ -674,7 +675,15 @@ void fiber_file_close(FILE_EVENT *fe)
 
 		SET_CLOSING(fe);
 		CLR_READWAIT(fe);
+#ifdef HAS_IO_URING
+		if (EVENT_IS_IO_URING(__thread_fiber->event)) {
+			file_cancel(__thread_fiber->event, fe, CANCEL_IO_READ);
+		} else {
+			acl_fiber_kill(fe->fiber_r);
+		}
+#else
 		acl_fiber_kill(fe->fiber_r);
+#endif
 	}
 
 	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
@@ -684,7 +693,15 @@ void fiber_file_close(FILE_EVENT *fe)
 
 		CLR_WRITEWAIT(fe);
 		SET_CLOSING(fe);
+#ifdef HAS_IO_URING
+		if (EVENT_IS_IO_URING(__thread_fiber->event)) {
+			file_cancel(__thread_fiber->event, fe, CANCEL_IO_WRITE);
+		} else {
+			acl_fiber_kill(fe->fiber_w);
+		}
+#else
 		acl_fiber_kill(fe->fiber_w);
+#endif
 	}
 }
 

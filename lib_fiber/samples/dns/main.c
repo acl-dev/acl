@@ -81,7 +81,8 @@ static void nslookup(ACL_FIBER *fiber acl_unused, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -n addrs -a dns_ip -p dns_port\r\n", procname);
+	printf("usage: %s -h [help] -e event_type[kernel|select|poll|io_uring]"
+		" -n addrs -a dns_ip -p dns_port\r\n", procname);
 }
 
 int main(int argc, char *argv[])
@@ -90,15 +91,27 @@ int main(int argc, char *argv[])
 	char  buf[1024];
 	ACL_ARGV *tokens;
 	ACL_ITER  iter;
+	int   event_type = FIBER_EVENT_KERNEL;
 
 	buf[0] = 0;
 	__dns_ip[0] = 0;
 
-	while ((ch = getopt(argc, argv, "hn:a:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "he:n:a:p:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'e':
+			if (strcasecmp(optarg, "kernel") == 0) {
+				event_type = FIBER_EVENT_KERNEL;
+			} else if (strcasecmp(optarg, "poll") == 0) {
+				event_type = FIBER_EVENT_POLL;
+			} else if (strcasecmp(optarg, "select") == 0) {
+				event_type = FIBER_EVENT_SELECT;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				event_type = FIBER_EVENT_IO_URING;
+			}
+			break;
 		case 'n':
 			snprintf(buf, sizeof(buf), "%s", optarg);
 			break;
@@ -130,7 +143,7 @@ int main(int argc, char *argv[])
 		test_gethostbyname(addr);
 	}
 
-	acl_fiber_schedule();
+	acl_fiber_schedule_with(event_type);
 
 	acl_argv_free(tokens);
 

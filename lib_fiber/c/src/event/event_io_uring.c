@@ -218,6 +218,17 @@ void event_uring_file_close(EVENT *ev, FILE_EVENT *fe)
 	TRY_SUBMMIT(ep);
 }
 
+void event_uring_file_cancel(EVENT *ev, FILE_EVENT *fe_orig, FILE_EVENT *fe)
+{
+	EVENT_URING *ep = (EVENT_URING*) ev;
+	struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);
+
+	io_uring_prep_cancel(sqe, &fe_orig->reader_ctx, 0);
+	fe->reader_ctx.fe = fe;
+	io_uring_sqe_set_data(sqe, &fe->reader_ctx);
+	TRY_SUBMMIT(ep);
+}
+
 void event_uring_file_openat(EVENT *ev, FILE_EVENT *fe, int dirfd,
 	const char *pathname, int flags, mode_t mode)
 {
@@ -429,6 +440,11 @@ static void handle_one(EVENT *ev, IO_URING_CTX *ctx, int res)
 {
 	FILE_EVENT *fe = ctx->fe;
 
+	if (fe == NULL) { // xxx?
+		msg_warn("%s(%d): fe null here?", __FUNCTION__, __LINE__);
+		return;
+	}
+
 	if (ctx == &fe->reader_ctx && ctx->mask == EVENT_READ && fe->r_proc) {
 		fe->mask &= ~EVENT_READ;
 		handle_read(ev, fe, res);
@@ -449,6 +465,7 @@ static void handle_one(EVENT *ev, IO_URING_CTX *ctx, int res)
 	}
 
 #define	FLAGS	(EVENT_FILE_CLOSE \
+		| EVENT_FILE_CANCEL \
 		| EVENT_FILE_OPENAT \
 		| EVENT_FILE_UNLINK \
 		| EVENT_FILE_STATX \

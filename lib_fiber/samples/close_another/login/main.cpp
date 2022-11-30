@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
 			addr = optarg;
 			break;
 		case 'c':
-			max = atoi(optarg);
+			cocurrent = atoi(optarg);
 			break;
 		case 'n':
 			max = atoi(optarg);

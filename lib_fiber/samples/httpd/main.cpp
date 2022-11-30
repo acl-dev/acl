@@ -87,7 +87,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
-		" -e event\r\n"
+		" -e event[kernel|poll|select|io_uring]\r\n"
 		" -R reuse_port\r\n"
 		" -t threads\r\n"
 		" -z stack_size[default: 128000]\r\n"
@@ -124,6 +124,8 @@ int main(int argc, char *argv[])
 				__schedule_event = FIBER_EVENT_POLL;
 			} else if (strcasecmp(optarg, "select") == 0) {
 				__schedule_event = FIBER_EVENT_SELECT;
+			} else if (strcasecmp(optarg, "io_uring") == 0) {
+				__schedule_event = FIBER_EVENT_IO_URING;
 			}
 			break;
 		case 'z':

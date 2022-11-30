@@ -107,8 +107,11 @@ int WINAPI acl_fiber_close(socket_t fd)
 			ret = (*sys_close)(fd);
 		}
 #ifdef	HAS_IO_URING
-	} else if (EVENT_IS_IO_URING(ev) && (fe->type & TYPE_FILE)) {
-		ret = file_close(ev, fe);
+	} else if (EVENT_IS_IO_URING(ev) /* && (fe->type & TYPE_FILE) */) {
+		// Don't call file_close() here, because we has called
+		// canceling the IO in fiber_file_close() for IO URING event.
+		// ret = file_close(ev, fe);
+		ret = (*sys_close)(fd);
 #endif
 	} else {
 		ret = (*sys_close)(fd);
@@ -125,7 +128,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 /****************************************************************************/
 
 #if defined(HAS_IO_URING)
-static int iocp_wait_read(FILE_EVENT *fe)
+static int uring_wait_read(FILE_EVENT *fe)
 {
 	while (1) {
 		int err;
@@ -168,6 +171,17 @@ static int iocp_wait_read(FILE_EVENT *fe)
 			return -1;
 		}
 	}
+}
+
+static int iocp_wait_read(FILE_EVENT *fe)
+{
+	int ret;
+
+	// Add one reference to prevent being released prematurely.
+	file_event_refer(fe);
+	ret = uring_wait_read(fe);
+	file_event_unrefer(fe);
+	return ret;
 }
 
 int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)

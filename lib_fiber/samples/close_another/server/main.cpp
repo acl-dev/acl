@@ -29,11 +29,13 @@ protected:
 			return;
 		}
 
+		int fd = conn_->sock_handle();
 		char buf[8192];
 		while (true) {
 			int ret = conn_->read(buf, sizeof(buf), false);
 			if (ret == -1) {
-				printf("read error=%s\r\n", acl::last_serror());
+				printf("read error=%s, fd=%d, %d\r\n",
+					acl::last_serror(), fd, conn_->sock_handle());
 				break;
 			}
 			if (strncasecmp(buf, "quit", 4) == 0) {
@@ -55,7 +57,8 @@ protected:
 		}
 
 		errno = 0;
-		printf("user: %s logout\r\n", name_.c_str());
+		printf("user: %s logout, fd=%d, %d\r\n", name_.c_str(),
+			fd, conn_->sock_handle());
 		delete this;
 	}
 
@@ -73,14 +76,18 @@ private:
 
 		std::map<acl::string, fiber_client*>::iterator it = __users.find(name_);
 		if (it == __users.end()) {
-			printf(">>>new user: %s, users: %zd\r\n",
-				name_.c_str(), __users.size());
-			if (conn_->format("Welcome %s!\r\n", name_.c_str()) > 0) {
-				__users[name_] = this;
-				return true;
-			} else {
+			printf(">>>new user: %s, fd=%d, users: %zd\r\n",
+				name_.c_str(), conn_->sock_handle(), __users.size());
+			if (conn_->format("Welcome %s!\r\n", name_.c_str()) <= 0) {
 				printf("write error: %s\r\n", acl::last_serror());
 				return false;
+			}
+
+			// Need try check again!
+			it = __users.find(name_);
+			if (it == __users.end()) {
+				__users[name_] = this;
+				return true;
 			}
 		}
 
@@ -93,18 +100,29 @@ private:
 		if (use_kill_) {
 			it->second->kill();
 		} else {
+			// Must unbind the socket with the conn object
+			// to avoid closing the socket twice.
 			conn.unbind_sock();
+			printf("Kick the old fd=%d, my fd=%d\r\n",
+				fd, conn_->sock_handle());
 			close(fd);
 		}
 
-		printf("Kick old %s, fd=%d\r\n", name_.c_str(), fd);
+		printf("Kick old %s, old fd=%d, my fd=%d\r\n", name_.c_str(),
+			fd, conn_->sock_handle());
 
-		if (conn_->format("Welcome %s!\r\n", name_.c_str()) > 0) {
+		if (conn_->format("Welcome %s!\r\n", name_.c_str()) <= 0) {
+			printf("write to %s error %s\r\n",
+				name_.c_str(), acl::last_serror());
+			return false;
+		}
+
+		it = __users.find(name_);
+		if (it == __users.end()) {
 			__users[name_] = this;
 			return true;
 		} else {
-			printf("write to %s error %s\r\n",
-				name_.c_str(), acl::last_serror());
+			printf("The other one has already logined!\r\n");
 			return false;
 		}
 	}
@@ -149,7 +167,7 @@ private:
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
-		" -e event_type[select|poll|kernel, default: kernel]\r\n"
+		" -e event_type[select|poll|kernel|io_uring, default: kernel]\r\n"
 		" -k [use kill, default: false]\r\n"
 		, procname);
 }
@@ -176,6 +194,10 @@ int main(int argc, char *argv[]) {
 				event = acl::FIBER_EVENT_T_POLL;
 			} else if (strcmp(optarg, "select") == 0) {
 				event = acl::FIBER_EVENT_T_SELECT;
+			} else if (strcmp(optarg, "kernel") == 0) {
+				event = acl::FIBER_EVENT_T_KERNEL;
+			} else if (strcmp(optarg, "io_uring") == 0) {
+				event = acl::FIBER_EVENT_T_IO_URING;
 			}
 			break;
 		case 'k':
@@ -196,11 +218,15 @@ int main(int argc, char *argv[]) {
 	case acl::FIBER_EVENT_T_KERNEL:
 		printf("use kernel\r\n");
 		break;
+	case acl::FIBER_EVENT_T_IO_URING:
+		printf("use io_uring\r\n");
+		break;
 	default:
 		printf("unknown event=%d\r\n", (int) event);
 		return 1;
 	}
 
+	acl::fiber::stdout_open(true);
 	acl::server_socket ss;
 	if (!ss.open(addr)) {
 		printf("listen %s error %s\r\n", addr.c_str(), acl::last_serror());
