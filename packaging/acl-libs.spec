@@ -1,8 +1,8 @@
-%define release_id 23
+%define release_id 0
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.5.3
+Version:        3.6.0
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
@@ -44,6 +44,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Dec 01 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-0-20221201.20
+- feature: fiber module supports io_uring
+- optimize&feature: add the new fiber lock named as fiber_mutex
+- some other optimize and bugs fixed
 
 * Wed Sep 19 2022 shuxin.zheng shuxin.zheng@qq.com 3.5.3-23-20220919.10
 - optimize: limit the minmal thread stack size to 4M when creating new thread
