@@ -154,20 +154,22 @@ struct FILE_EVENT {
 #define	EVENT_FILE_CLOSE	(unsigned) (1 << 12)
 #define	EVENT_FILE_CANCEL	(unsigned) (1 << 13)
 #define	EVENT_FILE_UNLINK	(unsigned) (1 << 14)
-#define	EVENT_FILE_STATX	(unsigned) (1 << 15)
-#define	EVENT_FILE_RENAMEAT2	(unsigned) (1 << 16)
-#define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 17)
-#define	EVENT_SPLICE		(unsigned) (1 << 18)
+#define	EVENT_FILE_STAT		(unsigned) (1 << 15)
+#define	EVENT_FILE_STATX	(unsigned) (1 << 16)
+#define	EVENT_FILE_RENAMEAT	(unsigned) (1 << 17)
+#define	EVENT_FILE_RENAMEAT2	(unsigned) (1 << 18)
+#define	EVENT_DIR_MKDIRAT	(unsigned) (1 << 19)
+#define	EVENT_SPLICE		(unsigned) (1 << 20)
 
-#define	EVENT_READV		(unsigned) (1 << 19)
-#define	EVENT_RECV		(unsigned) (1 << 20)
-#define	EVENT_RECVFROM		(unsigned) (1 << 21)
-#define	EVENT_RECVMSG		(unsigned) (1 << 22)
+#define	EVENT_READV		(unsigned) (1 << 21)
+#define	EVENT_RECV		(unsigned) (1 << 22)
+#define	EVENT_RECVFROM		(unsigned) (1 << 23)
+#define	EVENT_RECVMSG		(unsigned) (1 << 24)
 
-#define	EVENT_WRITEV		(unsigned) (1 << 23)
-#define	EVENT_SEND		(unsigned) (1 << 24)
-#define	EVENT_SENDTO		(unsigned) (1 << 25)
-#define	EVENT_SENDMSG		(unsigned) (1 << 26)
+#define	EVENT_WRITEV		(unsigned) (1 << 25)
+#define	EVENT_SEND		(unsigned) (1 << 26)
+#define	EVENT_SENDTO		(unsigned) (1 << 27)
+#define	EVENT_SENDMSG		(unsigned) (1 << 28)
 #endif // HAS_IO_URING
 
 	event_proc   *r_proc;
@@ -256,7 +258,9 @@ struct FILE_EVENT {
 			socklen_t          len;
 		} peer;
 
+#ifdef HAS_STATX
 		struct statx *statxbuf;
+#endif
 		char  *path;
 	} var;
 

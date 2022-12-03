@@ -96,10 +96,14 @@ openat_fn       __sys_openat                = NULL;
 openat_fn       *sys_openat                 = NULL;
 unlink_fn       __sys_unlink                = NULL;
 unlink_fn       *sys_unlink                 = NULL;
+# ifdef HAS_STATX
 statx_fn        __sys_statx                 = NULL;
 statx_fn        *sys_statx                  = NULL;
+# endif
+# ifdef HAS_RENAMEAT2
 renameat2_fn    __sys_renameat2             = NULL;
 renameat2_fn    *sys_renameat2              = NULL;
+# endif
 mkdirat_fn      __sys_mkdirat               = NULL;
 mkdirat_fn      *sys_mkdirat                = NULL;
 splice_fn       __sys_splice                = NULL;
@@ -258,8 +262,12 @@ static void hook_api(void)
 # ifdef	HAS_IO_URING
 	LOAD_FN("openat", openat_fn, __sys_openat, sys_openat);
 	LOAD_FN("unlink", unlink_fn, __sys_unlink, sys_unlink);
+# ifdef HAS_STATX
 	LOAD_FN("statx", statx_fn, __sys_statx, sys_statx);
+# endif
+# ifdef HAS_RENAMEAT2
 	LOAD_FN("renameat2", renameat2_fn, __sys_renameat2, sys_renameat2);
+# endif
 	LOAD_FN("mkdirat", mkdirat_fn, __sys_mkdirat, sys_mkdirat);
 	LOAD_FN("splice", splice_fn, __sys_splice, sys_splice);
 # endif

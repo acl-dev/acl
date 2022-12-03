@@ -252,6 +252,7 @@ void event_uring_file_unlink(EVENT *ev, FILE_EVENT *fe, const char *pathname)
 	TRY_SUBMMIT(ep);
 }
 
+#ifdef HAS_STATX
 void event_uring_file_statx(EVENT *ev, FILE_EVENT *fe, int dirfd,
 	const char *pathname, int flags, unsigned int mask,
 	struct statx *statxbuf)
@@ -264,7 +265,9 @@ void event_uring_file_statx(EVENT *ev, FILE_EVENT *fe, int dirfd,
 	io_uring_sqe_set_data(sqe, &fe->reader_ctx);
 	TRY_SUBMMIT(ep);
 }
+#endif
 
+#ifdef HAS_RENAMEAT2
 void event_uring_file_renameat2(EVENT *ev, FILE_EVENT *fe, int olddirfd,
 	const char *oldpath, int newdirfd, const char *newpath, unsigned flags)
 {
@@ -276,6 +279,7 @@ void event_uring_file_renameat2(EVENT *ev, FILE_EVENT *fe, int olddirfd,
 	io_uring_sqe_set_data(sqe, &fe->reader_ctx);
 	TRY_SUBMMIT(ep);
 }
+#endif
 
 void event_uring_mkdirat(EVENT *ev, FILE_EVENT *fe, int dirfd,
 	const char *pathname, mode_t mode)
@@ -468,7 +472,9 @@ static void handle_one(EVENT *ev, IO_URING_CTX *ctx, int res)
 		| EVENT_FILE_CANCEL \
 		| EVENT_FILE_OPENAT \
 		| EVENT_FILE_UNLINK \
+		| EVENT_FILE_STAT \
 		| EVENT_FILE_STATX \
+		| EVENT_FILE_RENAMEAT \
 		| EVENT_FILE_RENAMEAT2 \
 		| EVENT_DIR_MKDIRAT \
 		| EVENT_SPLICE)

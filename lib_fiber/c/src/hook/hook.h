@@ -75,8 +75,15 @@ typedef int (*epoll_ctl_fn)(int, int, int, struct epoll_event *);
 # ifdef HAS_IO_URING
 typedef int (*openat_fn)(int, const char *, int, mode_t);
 typedef int (*unlink_fn)(const char *);
+
+#  ifdef HAS_STATX
 typedef int (*statx_fn)(int dirfd, const char *, int, unsigned int, struct statx *);
+#  endif
+
+#  ifdef HAS_RENAMEAT2
 typedef int (*renameat2_fn)(int, const char *, int, const char *, unsigned);
+#  endif
+
 typedef int (*mkdirat_fn)(int, const char *, mode_t);
 typedef ssize_t (*splice_fn)(int, loff_t *, int, loff_t *, size_t, unsigned);
 # endif
@@ -177,8 +184,12 @@ extern ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cn
 
 extern openat_fn            *sys_openat;
 extern unlink_fn            *sys_unlink;
+# ifdef HAS_STATX
 extern statx_fn             *sys_statx;
+# endif
+# ifdef HAS_RENAMEAT2
 extern renameat2_fn         *sys_renameat2;
+# endif
 extern mkdirat_fn           *sys_mkdirat;
 extern splice_fn            *sys_splice;
 # endif

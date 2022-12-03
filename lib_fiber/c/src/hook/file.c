@@ -8,7 +8,6 @@
 #include "hook.h"
 
 #define _GNU_SOURCE
-#include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -265,6 +264,7 @@ int unlink(const char *pathname)
 	}
 }
 
+#ifdef HAS_RENAMEAT2
 int renameat2(int olddirfd, const char *oldpath,
 	int newdirfd, const char *newpath, unsigned int flags)
 {
@@ -311,12 +311,14 @@ int renameat(int olddirfd, const char *oldpath, int newdirfd, const char *newpat
 {
 	return renameat2(olddirfd, oldpath, newdirfd, newpath, 0);
 }
+#endif
 
 int rename(const char *oldpath, const char *newpath)
 {
 	return renameat(AT_FDCWD, oldpath, AT_FDCWD, newpath);
 }
 
+# ifdef HAS_STATX
 int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	struct statx *statxbuf)
 {
@@ -337,7 +339,7 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	FILE_ALLOC(fe, EVENT_FILE_STATX);
 	fe->in.read_ctx.buf = strdup(pathname);
 	fe->var.statxbuf = (struct statx*) malloc(sizeof(struct statx));
-	memcpy(fe->var.statxbuf, statxbuf, sizeof(struct statx));
+	//memcpy(fe->var.statxbuf, statxbuf, sizeof(struct statx));
 
 	event_uring_file_statx(ev, fe, dirfd, fe->in.read_ctx.buf, flags, mask,
 		fe->var.statxbuf);
@@ -388,6 +390,7 @@ int stat(const char *pathname, struct stat *statbuf)
 	statbuf->st_ctim.tv_sec = statxbuf.stx_ctime.tv_sec;
 	return 0;
 } 
+#endif
 
 int mkdirat(int dirfd, const char *pathname, mode_t mode)
 {

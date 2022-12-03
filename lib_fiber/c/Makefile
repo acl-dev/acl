@@ -126,6 +126,12 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($(has_io_uring), yes)
 		CFLAGS += -DHAS_IO_URING
 	endif
+	ifeq ($(HAS_STATX), yes)
+		CFLAGS += -DHAS_STATX
+	endif
+	ifeq ($(HAS_RENAMEAT2), yes)
+		CFLAGS += -DHAS_RENAMEAT2
+	endif
 endif
 
 # For CYGWIN
