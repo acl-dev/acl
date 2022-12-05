@@ -19,6 +19,7 @@
 #include "fiber/libfiber.h"
 #include "fiber/fiber_hook.h"
 #include "common/iostuff.h"
+#include "hook/hook.h"
 #include "fiber.h"
 
 //#undef	HAS_EVENTFD
@@ -52,27 +53,28 @@ void fbase_event_open(FIBER_BASE *fbase)
 	fbase->event_out = fds[1];
 #endif
 
-#if defined(HAS_IO_URING)
-	FILE_EVENT *fe;
-#endif
-
 	if (fbase->event_in == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s event_in(%d) invalid",
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
+	}
+
+	fbase->in = fiber_file_open_read(fbase->event_in);
+	if (fbase->event_in == fbase->event_out) {
+		fbase->out = fbase->in;
+	} else {
+		fbase->out = fiber_file_open_write(fbase->event_out);
 	}
 
 #if defined(HAS_IO_URING)
 	non_blocking(fbase->event_in, 0);
 	non_blocking(fbase->event_out, 0);
 
-	fe = fiber_file_open_read(fbase->event_in);
-	fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
-	fe->mask = EVENT_SYSIO;
+	fbase->in->type = TYPE_SPIPE | TYPE_EVENTABLE;
+	fbase->in->mask = EVENT_SYSIO;
 
-	if (fbase->event_in != fbase->event_out) {
-		fe = fiber_file_open_write(fbase->event_out);
-		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
-		fe->mask = EVENT_SYSIO;
+	if (fbase->out != fbase->in) {
+		fbase->out->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		fbase->out->mask = EVENT_SYSIO;
 	}
 #else
 	non_blocking(fbase->event_in, 1);
@@ -95,6 +97,8 @@ void fbase_event_close(FIBER_BASE *fbase)
 	// more than once:(
 	fbase->event_in  = INVALID_SOCKET;
 	fbase->event_out = INVALID_SOCKET;
+	fbase->in  = NULL;
+	fbase->out = NULL;
 }
 
 int fbase_event_wait(FIBER_BASE *fbase)
@@ -110,20 +114,14 @@ int fbase_event_wait(FIBER_BASE *fbase)
 
 	while (1) {
 		//if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
-#if 1
 		if (read_wait(fbase->event_in, -1) == -1) {
 			msg_error("%s(%d), %s: read_wait error=%s, fd=%d",
 				__FILE__, __LINE__, __FUNCTION__,
 				last_serror(), fbase->event_in);
 			return -1;
 		}
-#endif
 
-#ifdef SYS_WIN
-		ret = (int) acl_fiber_recv(fbase->event_in, (char*) &n, sizeof(n), 0);
-#else
-		ret = (int) acl_fiber_read(fbase->event_in, &n, sizeof(n));
-#endif
+		ret = (int) file_recv(fbase->in, (char*) &n, sizeof(n), 0);
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -184,12 +182,7 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	}
 
 	while (1) {
-#ifdef SYS_WIN
-		ret = (int) acl_fiber_send(fbase->event_out, (char*) &n, sizeof(n), 0);
-#else
-		ret = (int) acl_fiber_write(fbase->event_out, &n, sizeof(n));
-#endif
-
+		ret = file_send(fbase->out, (char*) &n, sizeof(n), 0);
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -219,4 +212,3 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 
 	return 0;
 }
-

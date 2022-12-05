@@ -37,6 +37,8 @@ typedef struct FIBER_BASE {
 
 	socket_t event_in;
 	socket_t event_out;
+	FILE_EVENT *in;
+	FILE_EVENT *out;
 	RING     event_waiter;
 } FIBER_BASE;
 

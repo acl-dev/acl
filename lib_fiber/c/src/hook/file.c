@@ -458,7 +458,7 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
 	FILE_ALLOC(fe, EVENT_READ);
 	fe->fd = fd;
 	fe->in.read_ctx.off = offset;
-	ret = fiber_iocp_read(fe, buf, (int) count);
+	ret = file_iocp_read(fe, buf, (int) count);
 	file_event_unrefer(fe);
 
 	return ret;
@@ -489,7 +489,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
 	FILE_ALLOC(fe, EVENT_WRITE);
 	fe->fd = fd;
 	fe->out.write_ctx.off = offset;
-	ret = fiber_iocp_write(fe, buf, (int) count);
+	ret = file_iocp_write(fe, buf, (int) count);
 	file_event_unrefer(fe);
 
 	return ret;

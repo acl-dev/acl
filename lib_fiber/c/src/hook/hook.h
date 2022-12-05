@@ -7,10 +7,6 @@
 extern "C" {
 #endif
 
-//extern struct dns_resolv_conf *var_dns_conf;
-//extern struct dns_hosts *var_dns_hosts;
-//extern struct dns_hints *var_dns_hints;
-
 extern void fiber_dns_set_read_wait(int timeout);
 extern void fiber_dns_init(void);
 
@@ -137,6 +133,20 @@ extern getaddrinfo_fn       *sys_getaddrinfo;
 extern freeaddrinfo_fn      *sys_freeaddrinfo;
 extern gethostbyname_fn     *sys_gethostbyname;
 
+typedef struct FILE_EVENT FILE_EVENT;
+
+// in file_read.c
+ssize_t file_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags);
+ssize_t file_recv(FILE_EVENT *fe, void *buf, size_t len, int flags);
+ssize_t file_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
+	int flags, struct sockaddr *src_addr, socklen_t *addrlen);
+
+// in file_write.c
+ssize_t file_send(FILE_EVENT *fe, const void *buf, size_t len, int flags);
+ssize_t file_sendto(FILE_EVENT *fe, const void *buf, size_t len,
+	int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
+ssize_t file_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags);
+
 #if defined(_WIN32) || defined(_WIN64)
 
 extern WSARecv_fn           *sys_WSARecv;
@@ -167,18 +177,28 @@ extern epoll_ctl_fn         *sys_epoll_ctl;
 
 # ifdef HAS_IO_URING
 typedef struct EVENT EVENT;
-typedef struct FILE_EVENT FILE_EVENT;
 
-// in io.c
-int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len);
-int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len);
+// in file_read.c
+int file_iocp_read(FILE_EVENT *fe, char *buf, int len);
+
+ssize_t file_read(FILE_EVENT *fe,  void *buf, size_t count);
+ssize_t file_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
+
+// in file_write.c
+int file_iocp_write(FILE_EVENT *fe, const char *buf, int len);
+
+ssize_t file_write(FILE_EVENT *fe, const void *buf, size_t count);
+ssize_t file_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
+# if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
+ssize_t file_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count);
+# endif
 
 // in file.c
 extern int file_close(EVENT *ev, FILE_EVENT *fe);
 
-#define	CANCEL_NONE	0
-#define	CANCEL_IO_READ	1
-#define	CANCEL_IO_WRITE	2
+# define	CANCEL_NONE	0
+# define	CANCEL_IO_READ	1
+# define	CANCEL_IO_WRITE	2
 extern int file_cancel(EVENT *ev, FILE_EVENT *fe, int iotype);
 extern ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt);
 

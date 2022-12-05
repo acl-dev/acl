@@ -398,6 +398,8 @@ unsigned int acl_fiber_sleep(unsigned int seconds)
 	return acl_fiber_delay(seconds * 1000) / 1000;
 }
 
+/****************************************************************************/
+
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_READWAIT(fe);
