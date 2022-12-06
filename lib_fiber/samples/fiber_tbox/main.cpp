@@ -207,7 +207,7 @@ private:
 			fb->start();
 		}
 
-		acl::fiber::schedule();
+		acl::fiber::schedule_with(__event_type);
 
 		printf("consumer fiber thread-%lu exit, consume=%lld\r\n",
 			acl::thread::self(), __consuming.value());
