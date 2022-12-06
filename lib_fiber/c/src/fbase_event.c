@@ -121,7 +121,7 @@ int fbase_event_wait(FIBER_BASE *fbase)
 			return -1;
 		}
 
-		ret = (int) file_recv(fbase->in, (char*) &n, sizeof(n), 0);
+		ret = (int) fiber_recv(fbase->in, (char*) &n, sizeof(n), 0);
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -182,7 +182,7 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	}
 
 	while (1) {
-		ret = file_send(fbase->out, (char*) &n, sizeof(n), 0);
+		ret = fiber_send(fbase->out, (char*) &n, sizeof(n), 0);
 		if (ret == sizeof(n)) {
 			break;
 		}

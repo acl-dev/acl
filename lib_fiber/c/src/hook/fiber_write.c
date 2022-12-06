@@ -88,7 +88,7 @@ static int iocp_wait_write(FILE_EVENT *fe)
 #endif
 
 #if defined(HAS_IO_URING)
-int file_iocp_write(FILE_EVENT *fe, const char *buf, int len)
+int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 {
 	fe->out.write_ctx.buf = buf;
 	fe->out.write_ctx.len = len;
@@ -112,7 +112,7 @@ int file_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 } while (0)
 
 #ifdef SYS_UNIX
-ssize_t file_write(FILE_EVENT *fe, const void *buf, size_t count)
+ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count)
 {
 	CLR_POLLING(fe);
 
@@ -134,7 +134,7 @@ ssize_t file_write(FILE_EVENT *fe, const void *buf, size_t count)
 	}
 }
 
-ssize_t file_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
+ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 {
 	CLR_POLLING(fe);
 
@@ -159,7 +159,7 @@ ssize_t file_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 }
 #endif
 
-ssize_t file_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
+ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
 {
 	CLR_POLLING(fe);
 
@@ -183,7 +183,7 @@ ssize_t file_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
 	}
 }
 
-ssize_t file_sendto(FILE_EVENT *fe, const void *buf, size_t len,
+ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	CLR_POLLING(fe);
@@ -212,7 +212,7 @@ ssize_t file_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 }
 
 #ifdef SYS_UNIX
-ssize_t file_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
+ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
 {
 	CLR_POLLING(fe);
 
@@ -237,7 +237,7 @@ ssize_t file_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
 
 #if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
 
-ssize_t file_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
+ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
 #ifdef	HAS_IO_URING
 	if (EVENT_IS_IO_URING(fiber_io_event())) {

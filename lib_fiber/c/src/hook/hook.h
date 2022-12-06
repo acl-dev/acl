@@ -135,17 +135,17 @@ extern gethostbyname_fn     *sys_gethostbyname;
 
 typedef struct FILE_EVENT FILE_EVENT;
 
-// in file_read.c
-ssize_t file_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags);
-ssize_t file_recv(FILE_EVENT *fe, void *buf, size_t len, int flags);
-ssize_t file_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
+// in fiber_read.c
+ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags);
+ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags);
+ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 	int flags, struct sockaddr *src_addr, socklen_t *addrlen);
 
-// in file_write.c
-ssize_t file_send(FILE_EVENT *fe, const void *buf, size_t len, int flags);
-ssize_t file_sendto(FILE_EVENT *fe, const void *buf, size_t len,
+// in fiber_write.c
+ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags);
+ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
-ssize_t file_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags);
+ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags);
 
 #if defined(_WIN32) || defined(_WIN64)
 
@@ -178,19 +178,19 @@ extern epoll_ctl_fn         *sys_epoll_ctl;
 # ifdef HAS_IO_URING
 typedef struct EVENT EVENT;
 
-// in file_read.c
-int file_iocp_read(FILE_EVENT *fe, char *buf, int len);
+// in fiber_read.c
+int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len);
 
-ssize_t file_read(FILE_EVENT *fe,  void *buf, size_t count);
-ssize_t file_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
+ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count);
+ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
 
-// in file_write.c
-int file_iocp_write(FILE_EVENT *fe, const char *buf, int len);
+// in fiber_write.c
+int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len);
 
-ssize_t file_write(FILE_EVENT *fe, const void *buf, size_t count);
-ssize_t file_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
+ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count);
+ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
 # if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
-ssize_t file_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count);
+ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count);
 # endif
 
 // in file.c

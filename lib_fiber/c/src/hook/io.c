@@ -146,7 +146,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	}
 
 	fe = fiber_file_open_read(fd);
-	return file_read(fe, buf, count);
+	return fiber_read(fe, buf, count);
 }
 
 ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
@@ -166,7 +166,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 	}
 
 	fe = fiber_file_open_read(fd);
-	return file_readv(fe, iov, iovcnt);
+	return fiber_readv(fe, iov, iovcnt);
 }
 
 #endif // SYS_UNIX
@@ -205,7 +205,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	}
 
 	fe = fiber_file_open_read(sockfd);
-	return file_recv(fe, buf, len, flags);
+	return fiber_recv(fe, buf, len, flags);
 }
 
 #ifdef SYS_WIN
@@ -232,7 +232,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	}
 
 	fe = fiber_file_open_read(sockfd);
-	return file_recvfrom(fe, buf, len, flags, src_addr, addrlen);
+	return fiber_recvfrom(fe, buf, len, flags, src_addr, addrlen);
 }
 
 #ifdef SYS_UNIX
@@ -254,7 +254,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 	}
 
 	fe = fiber_file_open_read(sockfd);
-	return file_recvmsg(fe, msg, flags);
+	return fiber_recvmsg(fe, msg, flags);
 }
 #endif
 
@@ -278,7 +278,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 	}
 
 	fe = fiber_file_open_write(fd);
-	return file_write(fe, buf, count);
+	return fiber_write(fe, buf, count);
 }
 
 ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
@@ -298,7 +298,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 	}
 
 	fe = fiber_file_open_write(fd);
-	return file_writev(fe, iov, iovcnt);
+	return fiber_writev(fe, iov, iovcnt);
 }
 #endif
 
@@ -323,7 +323,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 	}
 
 	fe = fiber_file_open_write(sockfd);
-	return file_send(fe, buf, len, flags);
+	return fiber_send(fe, buf, len, flags);
 }
 
 #ifdef SYS_WIN
@@ -351,7 +351,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	}
 
 	fe = fiber_file_open_write(sockfd);
-	return file_sendto(fe, buf, len, flags, dest_addr, addrlen);
+	return fiber_sendto(fe, buf, len, flags, dest_addr, addrlen);
 }
 
 #ifdef SYS_UNIX
@@ -372,7 +372,7 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 	}
 
 	fe = fiber_file_open_write(sockfd);
-	return file_sendmsg(fe, msg, flags);
+	return fiber_sendmsg(fe, msg, flags);
 }
 #endif
 
@@ -453,7 +453,7 @@ ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 		return (*sys_sendfile64)(out_fd, in_fd, offset, count);
 	}
 
-	return file_sendfile64(out_fd, in_fd, offset, count);
+	return fiber_sendfile64(out_fd, in_fd, offset, count);
 }
 
 #endif

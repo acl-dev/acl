@@ -61,7 +61,7 @@ static int iocp_wait_read(FILE_EVENT *fe)
 	return ret;
 }
 
-int file_iocp_read(FILE_EVENT *fe, char *buf, int len)
+int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
 	fe->in.read_ctx.buf = buf;
 	fe->in.read_ctx.len = len;
@@ -111,7 +111,7 @@ static int iocp_wait_read(FILE_EVENT *fe)
 	}
 }
 
-int file_iocp_read(FILE_EVENT *fe, char *buf, int len)
+int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 {
 	/* If the socket type is UDP, We must check the fixed buffer first,
 	 * which maybe used in iocp_add_read() and set for polling read status.
@@ -216,7 +216,7 @@ int file_iocp_read(FILE_EVENT *fe, char *buf, int len)
 
 #ifdef SYS_UNIX
 
-ssize_t file_read(FILE_EVENT *fe,  void *buf, size_t count)
+ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 {
 	CLR_POLLING(fe);
 
@@ -232,7 +232,7 @@ ssize_t file_read(FILE_EVENT *fe,  void *buf, size_t count)
 	FIBER_READ(sys_read, fe, buf, count);
 }
 
-ssize_t file_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
+ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 {
 	CLR_POLLING(fe);
 
@@ -250,7 +250,7 @@ ssize_t file_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 	FIBER_READ(sys_readv, fe, iov, iovcnt);
 }
 
-ssize_t file_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
+ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
 {
 	CLR_POLLING(fe);
 
@@ -269,7 +269,7 @@ ssize_t file_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
 
 #endif  // SYS_UNIX
 
-ssize_t file_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
+ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 {
 	CLR_POLLING(fe);
 
@@ -291,7 +291,7 @@ ssize_t file_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 	FIBER_READ(sys_recv, fe, buf, len, flags);
 }
 
-ssize_t file_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
+ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 	int flags, struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	CLR_POLLING(fe);
