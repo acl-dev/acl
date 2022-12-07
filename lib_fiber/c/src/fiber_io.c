@@ -471,6 +471,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 	fiber_io_check();
 
 	fe->fiber_w = acl_fiber_running();
+
 	ret = event_add_write(__thread_fiber->event, fe, write_callback);
 	if (ret <= 0) {
 		return ret;
@@ -561,7 +562,8 @@ FILE_EVENT *fiber_file_open_read(socket_t fd)
 	/* We can't set the fe's type here because it'll effect the DGRAM IO,
 	 * so, we'll set the fe's sock type in event.c.
 	 */
-	fe->fiber_r = acl_fiber_running();
+	// Don't set fiber_r here, which will be set in fiber_wait_read()
+	//fe->fiber_r = acl_fiber_running();
 	return fe;
 }
 
@@ -579,7 +581,8 @@ FILE_EVENT *fiber_file_open_write(socket_t fd)
 #endif
 	}
 
-	fe->fiber_w = acl_fiber_running();
+	// Don't set fiber_w here, which will be set in fiber_wait_write()
+	//fe->fiber_w = acl_fiber_running();
 	return fe;
 }
 

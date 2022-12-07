@@ -291,7 +291,8 @@ struct FILE_EVENT {
 		} peer;
 	} var;
 #endif
-	int refer;
+	short refer;
+	short busy;
 };
 
 #ifdef HAS_POLL

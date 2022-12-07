@@ -111,6 +111,15 @@ int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 	}                                                                    \
 } while (0)
 
+#define	FILE_ALLOC(__fe, __type, _fd) do {  \
+	(__fe) = file_event_alloc(_fd);  \
+	(__fe)->fiber_r->status = FIBER_STATUS_NONE;  \
+	(__fe)->fiber_w->status = FIBER_STATUS_NONE;  \
+	(__fe)->mask   = (__type);  \
+	(__fe)->type   = TYPE_EVENTABLE;  \
+} while (0)
+
+
 #ifdef SYS_UNIX
 ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count)
 {
@@ -118,10 +127,26 @@ ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count)
 
 #if defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event()) && !(fe->mask & EVENT_SYSIO)) {
-		fe->out.write_ctx.buf = buf;
-		fe->out.write_ctx.len = (unsigned) count;
+		if (fe->busy == 0) {
+			int ret;
 
-		return iocp_wait_write(fe);
+			fe->out.write_ctx.buf = buf;
+			fe->out.write_ctx.len = (unsigned) count;
+
+			fe->busy++;
+			ret = iocp_wait_write(fe);
+			fe->busy--;
+			return ret;
+		} else {
+			int ret;
+
+			FILE_ALLOC(fe, 0, fe->fd);
+			fe->out.write_ctx.buf = buf;
+			fe->out.write_ctx.len = (unsigned) count;
+			ret = iocp_wait_write(fe);
+			file_event_unrefer(fe);
+			return ret;
+		}
 	}
 #endif
 

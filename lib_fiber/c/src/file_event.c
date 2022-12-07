@@ -47,6 +47,7 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 #endif
 
 	fe->refer = 1;
+	fe->busy  = 0;
 }
 
 FILE_EVENT *file_event_alloc(socket_t fd)
