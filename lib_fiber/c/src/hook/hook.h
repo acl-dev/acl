@@ -7,9 +7,6 @@
 extern "C" {
 #endif
 
-extern void fiber_dns_set_read_wait(int timeout);
-extern void fiber_dns_init(void);
-
 typedef socket_t (WINAPI *socket_fn)(int, int, int);
 typedef int (WINAPI *close_fn)(socket_t);
 typedef int (WINAPI *listen_fn)(socket_t, int);
@@ -94,6 +91,7 @@ typedef ssize_t (*pwrite_fn)(int, const void *, size_t, off_t);
 
 #endif  // __linux__, __APPLE__, __FreeBSD__, MINGW
 
+// in hook.c
 FIBER_API void WINAPI set_socket_fn(socket_fn *fn);
 FIBER_API void WINAPI set_close_fn(close_fn *fn);
 FIBER_API void WINAPI set_listen_fn(listen_fn *fn);
@@ -133,20 +131,6 @@ extern getaddrinfo_fn       *sys_getaddrinfo;
 extern freeaddrinfo_fn      *sys_freeaddrinfo;
 extern gethostbyname_fn     *sys_gethostbyname;
 
-typedef struct FILE_EVENT FILE_EVENT;
-
-// in fiber_read.c
-ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags);
-ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags);
-ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
-	int flags, struct sockaddr *src_addr, socklen_t *addrlen);
-
-// in fiber_write.c
-ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags);
-ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
-	int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
-ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags);
-
 #if defined(_WIN32) || defined(_WIN64)
 
 extern WSARecv_fn           *sys_WSARecv;
@@ -176,32 +160,6 @@ extern epoll_ctl_fn         *sys_epoll_ctl;
 # endif
 
 # ifdef HAS_IO_URING
-typedef struct EVENT EVENT;
-
-// in fiber_read.c
-int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len);
-
-ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count);
-ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
-
-// in fiber_write.c
-int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len);
-
-ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count);
-ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
-# if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
-ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count);
-# endif
-
-// in file.c
-extern int file_close(EVENT *ev, FILE_EVENT *fe);
-
-# define	CANCEL_NONE	0
-# define	CANCEL_IO_READ	1
-# define	CANCEL_IO_WRITE	2
-extern int file_cancel(EVENT *ev, FILE_EVENT *fe, int iotype);
-extern ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt);
-
 extern openat_fn            *sys_openat;
 extern unlink_fn            *sys_unlink;
 # ifdef HAS_STATX
@@ -212,7 +170,7 @@ extern renameat2_fn         *sys_renameat2;
 # endif
 extern mkdirat_fn           *sys_mkdirat;
 extern splice_fn            *sys_splice;
-# endif
+# endif // HAS_IO_URING
 
 # ifndef __APPLE__
 extern gethostbyname_r_fn   *sys_gethostbyname_r;
@@ -223,6 +181,7 @@ extern pwrite_fn            *sys_pwrite;
 
 #endif // SYS_UNIX
 
+// in hook.c
 void hook_once(void);
 
 #ifdef __cplusplus

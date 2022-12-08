@@ -2,7 +2,8 @@
 #include "common.h"
 
 #include "fiber.h"
-#include "hook/hook.h"
+#include "hook.h"
+#include "io.h"
 
 #if defined(HAS_IO_URING)
 static int uring_wait_read(FILE_EVENT *fe)

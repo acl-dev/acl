@@ -3,6 +3,7 @@
 
 #include "fiber.h"
 #include "hook.h"
+#include "io.h"
 
 #ifdef SYS_UNIX
 #define IS_INVALID(fd) (fd <= INVALID_SOCKET)

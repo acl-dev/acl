@@ -20,6 +20,7 @@
 #include "fiber/fiber_hook.h"
 #include "common/iostuff.h"
 #include "hook/hook.h"
+#include "hook/io.h"
 #include "fiber.h"
 
 //#undef	HAS_EVENTFD

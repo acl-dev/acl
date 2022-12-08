@@ -3,6 +3,7 @@
 
 #include "fiber.h"
 #include "hook.h"
+#include "io.h"
 
 // In the API connect() being hooked in hook/socket.c, the STATUS_NDUBLOCK
 // flag was set and the fd was in non-block status in order to return imaginary

@@ -6,6 +6,7 @@
 #include "event.h"
 #include "fiber.h"
 #include "hook.h"
+#include "io.h"
 
 #define _GNU_SOURCE
 #include <sys/types.h>
