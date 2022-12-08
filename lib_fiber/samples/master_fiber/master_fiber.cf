@@ -8,7 +8,7 @@ service master_fiber {
 #	for master_type = unix
 #	master_service = echo.sock
 #	for master_type = sock
-	master_service = 127.0.0.1:5001, 5002, :5003, echo.sock, echo2.sock
+	master_service = 1234 #127.0.0.1:5001, 5002, :5003, echo.sock, echo2.sock
 
 #	服务监听为域套接口
 #	master_service = aio_echo.sock
@@ -16,6 +16,10 @@ service master_fiber {
 #	master_type = inet
 #	master_type = unix
 	master_type = sock
+
+#	当系统支持 SO_REUSEPORT 时，是否启用该功能, 只有该项为 yes 时下面的
+#	fiber_threads 值才可以大于 1
+	master_reuseport = no
 
 #	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
 #	master_notify_addr = 127.0.0.1:5801
@@ -51,6 +55,11 @@ service master_fiber {
 #	当启动多个子进程实例时，该开关控制多个子进程在接收连接时是否向 acl_master 发送消息报告自己的状态
 #	master_status_notify = 1
 #	是否允许产生 core 文件
+
+#	事件引擎: kernel, poll, select, io_uring
+#	fiber_schedule_event = io_uring
+	fiber_schedule_event = kernel
+#	fiber_schedule_event = poll
 #	fiber_enable_core = 1
 #	每个进程实例处理连接数的最大次数，超过此值后进程实例主动退出
 	fiber_use_limit = 0
@@ -65,7 +74,7 @@ service master_fiber {
 #	进程运行时的用户身份
 	fiber_owner = root
 #	同时启动的线程数
-	fiber_threads = 4
+	fiber_threads = 1
 
 #	当启用 master_dispatch 连接分开服务后，该配置指定 master_dispatch 所监听的
 #	域套接口的全路径，这样本子进程就可以从 master_dispatch 获得客户端连接

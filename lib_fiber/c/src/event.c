@@ -144,9 +144,8 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 	}
 }
 #else
-int event_checkfd(EVENT *ev, FILE_EVENT *fe)
+int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 {
-	(void) ev;
 	/* If we cannot seek, it must be a pipe, socket or fifo, else it
 	 * should be a file.
 	 */
@@ -173,9 +172,23 @@ int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 		return 1;
 #endif
 	} else {
-		fe->type = TYPE_FILE;
+		// Try to check if the fd can be monitored by the current
+		// event engine by really add_read/del_read it.
+
+		if (ev->add_read(ev, fe) == -1) {
+			fe->type = TYPE_FILE;
+			acl_fiber_set_error(0);
+			return 0;
+		}
+
+		if (ev->del_read(ev, fe) == -1) {
+			msg_error("%s(%d): del_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), fe->fd);
+		}
+
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 		acl_fiber_set_error(0);
-		return 0;
+		return 1;
 	}
 }
 #endif // !SYS_WIN

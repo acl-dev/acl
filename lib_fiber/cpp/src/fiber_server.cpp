@@ -780,14 +780,16 @@ static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
 				flag, 0, 0);
 		if (sstream != NULL) {
-			acl_msg_info("%s: listen %s ok", myname, addr);
+			acl_msg_info("%s: thread-%lu, listen %s ok", myname,
+				acl_pthread_self(), addr);
 #if !defined(_WIN32) && !defined(_WIN64)
 			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
 #endif
 			server->sstreams[i++] = sstream;
 		} else {
-			acl_msg_fatal("%s(%d): listen %s error(%s)",
-				myname, __LINE__, addr, acl_last_serror());
+			acl_msg_fatal("%s(%d): thread-%lu, listen %s error(%s)",
+				myname, __LINE__, acl_pthread_self(), addr,
+				acl_last_serror());
 		}
 	}
 }
