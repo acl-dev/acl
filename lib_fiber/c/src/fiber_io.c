@@ -3,8 +3,9 @@
 
 #include "fiber/libfiber.h"
 #include "common/gettimeofday.h"
-#include "hook/hook.h"
 #include "event.h"
+#include "hook/hook.h"
+#include "hook/io.h"
 #include "fiber.h"
 
 typedef struct {
