@@ -93,6 +93,8 @@ int main(int argc, char *argv[])
 		const char* addr = "0.0.0.0|8088";
 
 		printf("listen: %s\r\n", addr);
+		acl::log::stdout_open(true);
+
 		mf.run_alone(addr, argc >= 3 ? argv[2] : NULL);
 	} else {
 		mf.run_daemon(argc, argv);

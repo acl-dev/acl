@@ -182,6 +182,8 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IO_URING
+	// Because in the sharing stack mode, the below objects maybe used
+	// by the io_uring kernel thread, we must add them here.
 	union {
 		struct {
 			char *buf;
@@ -273,7 +275,7 @@ struct FILE_EVENT {
 #endif
 
 #ifdef HAS_IOCP
-	char          packet[1500];  // Just for UDP packet
+	char          packet[512];  // Just for UDP packet
 	char         *rbuf;
 	int           rsize;
 	int           res;
