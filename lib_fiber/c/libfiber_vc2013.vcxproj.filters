@@ -69,6 +69,9 @@
     <ClInclude Include="src\hook\hook.h">
       <Filter>源文件\hook</Filter>
     </ClInclude>
+    <ClInclude Include="src\hook\io.h">
+      <Filter>源文件\hook</Filter>
+    </ClInclude>
     <ClInclude Include="src\dns\resolver.h">
       <Filter>源文件\dns</Filter>
     </ClInclude>
@@ -228,6 +231,12 @@
       <Filter>源文件\hook</Filter>
     </ClCompile>
     <ClCompile Include="src\hook\io.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\fiber_read.c">
+      <Filter>源文件\hook</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hook\fiber_write.c">
       <Filter>源文件\hook</Filter>
     </ClCompile>
     <ClCompile Include="src\hook\poll.c">

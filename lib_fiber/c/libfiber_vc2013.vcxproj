@@ -333,6 +333,7 @@
     <ClInclude Include="src\event\event_wmsg.h" />
     <ClInclude Include="src\fiber.h" />
     <ClInclude Include="src\hook\hook.h" />
+    <ClInclude Include="src\hook\io.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -385,6 +386,8 @@
     <ClCompile Include="src\hook\getaddrinfo.c" />
     <ClCompile Include="src\hook\gethostbyname.c" />
     <ClCompile Include="src\hook\io.c" />
+    <ClCompile Include="src\hook\fiber_read.c" />
+    <ClCompile Include="src\hook\fiber_write.c" />
     <ClCompile Include="src\hook\poll.c" />
     <ClCompile Include="src\hook\select.c" />
     <ClCompile Include="src\hook\socket.c" />
