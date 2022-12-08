@@ -229,16 +229,20 @@ ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 	CLR_POLLING(fe);
 
 #ifdef HAS_IO_URING
+	// One FILE_EVENT can be used by multiple fibers with the same
+	// EVENT_BUSY_READ or EVENT_BUSY_WRITE in the same time. But can be
+	// used by two fibers that one is a reader and the other is a writer,
+	// because there're two different objects for reader and writer.
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		if (fe->busy == 0) {
+		if (!(fe->busy & EVENT_BUSY_READ)) {
 			int ret;
 
 			fe->in.read_ctx.buf = buf;
 			fe->in.read_ctx.len = (int) count;
 
-			fe->busy++;
+			fe->busy |= EVENT_BUSY_READ;
 			ret = iocp_wait_read(fe);
-			fe->busy--;
+			fe->busy &= ~EVENT_BUSY_READ;
 			return ret;
 		} else {
 			int ret;

@@ -295,6 +295,9 @@ struct FILE_EVENT {
 #endif
 	short refer;
 	short busy;
+#define	EVENT_BUSY_NONE		0
+#define	EVENT_BUSY_READ		(1 << 0)
+#define	EVENT_BUSY_WRITE	(1 << 1)
 };
 
 #ifdef HAS_POLL

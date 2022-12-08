@@ -127,15 +127,15 @@ ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count)
 
 #if defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event()) && !(fe->mask & EVENT_SYSIO)) {
-		if (fe->busy == 0) {
+		if (!(fe->busy & EVENT_BUSY_WRITE)) {
 			int ret;
 
 			fe->out.write_ctx.buf = buf;
 			fe->out.write_ctx.len = (unsigned) count;
 
-			fe->busy++;
+			fe->busy |= EVENT_BUSY_WRITE;
 			ret = iocp_wait_write(fe);
-			fe->busy--;
+			fe->busy &= ~EVENT_BUSY_WRITE;
 			return ret;
 		} else {
 			int ret;
