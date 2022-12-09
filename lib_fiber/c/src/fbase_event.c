@@ -124,6 +124,7 @@ int fbase_event_wait(FIBER_BASE *fbase)
 
 		if (var_hook_sys_api) {
 #ifdef	HAS_EVENTFD
+			// The eventfd can only use read API.
 			ret = (int) fiber_read(fbase->in, (char*) &n, sizeof(n));
 #else
 			ret = (int) fiber_recv(fbase->in, (char*) &n, sizeof(n), 0);
@@ -187,6 +188,7 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 	while (1) {
 		if (var_hook_sys_api) {
 #ifdef	HAS_EVENTFD
+			// The eventfd can only use write API.
 			ret = fiber_write(fbase->out, (char*) &n, sizeof(n));
 #else
 			ret = fiber_send(fbase->out, (char*) &n, sizeof(n), 0);
