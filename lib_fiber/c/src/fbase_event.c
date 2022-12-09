@@ -106,15 +106,15 @@ int fbase_event_wait(FIBER_BASE *fbase)
 {
 	long long n;
 	int  ret, interrupt = 0, err;
+	socket_t fd = fbase->in->fd;
 
-	if (fbase->event_in == INVALID_SOCKET) {
+	if (fd == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s: invalid event_in=%d",
-			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
+			__FILE__, __LINE__, __FUNCTION__, (int) fd);
 	}
 
 
 	while (1) {
-		//if (acl_fiber_scheduled() && read_wait(fbase->event_in, -1) == -1) {
 		if (read_wait(fbase->event_in, -1) == -1) {
 			msg_error("%s(%d), %s: read_wait error=%s, fd=%d",
 				__FILE__, __LINE__, __FUNCTION__,
@@ -122,7 +122,20 @@ int fbase_event_wait(FIBER_BASE *fbase)
 			return -1;
 		}
 
-		ret = (int) fiber_recv(fbase->in, (char*) &n, sizeof(n), 0);
+		if (var_hook_sys_api) {
+#ifdef	HAS_EVENTFD
+			ret = (int) fiber_read(fbase->in, (char*) &n, sizeof(n));
+#else
+			ret = (int) fiber_recv(fbase->in, (char*) &n, sizeof(n), 0);
+#endif
+		} else {
+#ifdef	HAS_EVENTFD
+			ret = (int) acl_fiber_read(fd, (char*)& n, sizeof(n));
+#else
+			ret = (int) acl_fiber_recv(fd, (char*)& n, sizeof(n), 0);
+#endif
+		}
+
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -149,19 +162,14 @@ int fbase_event_wait(FIBER_BASE *fbase)
 			doze(1);
 		} else {
 			msg_error("%s(%d), %s: read error %s, %d, in=%d, ret=%d,"
-				" interrupt=%d", __FILE__, __LINE__,
+				" interrupt=%d, fiber=%d", __FILE__, __LINE__,
 				__FUNCTION__, last_serror(), err,
-				(int) fbase->event_in, ret, interrupt);
+				(int) fbase->event_in, ret, interrupt,
+				acl_fiber_self());
 			return -1;
 		}
 	}
 
-	/**
-	 * if (atomic_int64_cas(fbase->atomic, 1, 0) != 1) {
-	 *	msg_fatal("%s(%d), %s: atomic corrupt",
-	 *	__FILE__, __LINE__, __FUNCTION__);
-	 * }
-	 */
 	return 0;
 }
 
@@ -169,21 +177,28 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 {
 	long long n = 1;
 	int  ret, interrupt = 0;
+	socket_t fd = fbase->out->fd;
 
-	/**
-	 * if (LIKELY(atomic_int64_cas(fbase->atomic, 0, 1) != 0)) {
-	 * 	return 0;
-	 * }
-	 */
-
-	if (fbase->event_out == INVALID_SOCKET) {
+	if (fd == INVALID_SOCKET) {
 		msg_fatal("%s(%d), %s: fbase=%p, invalid event_out=%d",
-			__FILE__, __LINE__, __FUNCTION__,
-			fbase, (int) fbase->event_out);
+			__FILE__, __LINE__, __FUNCTION__, fbase, (int) fd);
 	}
 
 	while (1) {
-		ret = fiber_send(fbase->out, (char*) &n, sizeof(n), 0);
+		if (var_hook_sys_api) {
+#ifdef	HAS_EVENTFD
+			ret = fiber_write(fbase->out, (char*) &n, sizeof(n));
+#else
+			ret = fiber_send(fbase->out, (char*) &n, sizeof(n), 0);
+#endif
+		} else {
+#ifdef	HAS_EVENTFD
+			ret = acl_fiber_write(fd, (char*) &n, sizeof(n));
+#else
+			ret = acl_fiber_send(fd, (char*) &n, sizeof(n), 0);
+#endif
+		}
+
 		if (ret == sizeof(n)) {
 			break;
 		}
@@ -206,8 +221,10 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 		}
 
 		msg_error("%s(%d), %s: write error %s, fb=%p, out=%d, ret=%d, "
-			"interrupt=%d", __FILE__, __LINE__, __FUNCTION__,
-			last_serror(), fbase, (int) fbase->event_out, ret, interrupt);
+			"interrupt=%d, fiber=%d", __FILE__, __LINE__,
+			__FUNCTION__, last_serror(), fbase,
+			(int) fbase->event_out, ret, interrupt,
+			acl_fiber_self());
 		return -1;
 	}
 
