@@ -81,7 +81,8 @@ static int iocp_wait_read(FILE_EVENT *fe)
 
 		if (fiber_wait_read(fe) < 0) {
 			msg_error("%s(%d): fiber_wait_read error=%s, fd=%d",
-				__FUNCTION__, __LINE__, last_serror(), (int) fe->fd);
+				__FUNCTION__, __LINE__, last_serror(),
+				(int) fe->fd);
 			return -1;
 		}
 
@@ -162,65 +163,65 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 // not monitor the file fd in fiber_wait_read.
 
 #if defined(_WIN32) || defined(_WIN64)
-#define	FIBER_READ(_fn, _fe, ...) do {                                       \
-        ssize_t ret;                                                         \
-        int err;                                                             \
-        if (IS_READABLE(_fe)) {                                              \
-                CLR_READABLE(_fe);                                           \
-        } else if (fiber_wait_read(_fe) < 0) {                               \
-                return -1;                                                   \
+#define FIBER_READ(_fn, _fe, ...) do {                                       \
+    ssize_t ret;                                                             \
+    int err;                                                                 \
+    if (IS_READABLE(_fe)) {                                                  \
+        CLR_READABLE(_fe);                                                   \
+    } else if (fiber_wait_read(_fe) < 0) {                                   \
+        return -1;                                                           \
+    }                                                                        \
+    if (acl_fiber_canceled(_fe->fiber_r)) {                                  \
+        acl_fiber_set_error(_fe->fiber_r->errnum);                           \
+        return -1;                                                           \
+    }                                                                        \
+    ret = (*_fn)(_fe->fd, __VA_ARGS__);                                      \
+    if (ret >= 0) {                                                          \
+        return ret;                                                          \
+    }                                                                        \
+    err = acl_fiber_last_error();                                            \
+    fiber_save_errno(err);                                                   \
+    if (!error_again(err)) {                                                 \
+        if (!(_fe->type & TYPE_EVENTABLE)) {                                 \
+            fiber_file_free(_fe);                                            \
         }                                                                    \
-        if (acl_fiber_canceled(_fe->fiber_r)) {                              \
-                acl_fiber_set_error(_fe->fiber_r->errnum);                   \
-                return -1;                                                   \
-        }                                                                    \
-        ret = (*_fn)(_fe->fd, __VA_ARGS__);                                  \
-        if (ret >= 0) {                                                      \
-                return ret;                                                  \
-        }                                                                    \
-        err = acl_fiber_last_error();                                        \
-        fiber_save_errno(err);                                               \
-        if (!error_again(err)) {                                             \
-                if (!(_fe->type & TYPE_EVENTABLE)) {                         \
-                        fiber_file_free(_fe);                                \
-                }                                                            \
-                return -1;                                                   \
-        }                                                                    \
+        return -1;                                                           \
+    }                                                                        \
 } while (1)
 #else
-#define	FIBER_READ(_fn, _fe, _args...) do {                                  \
-        ssize_t ret;                                                         \
-        int err;                                                             \
-        if (IS_READABLE(_fe)) {                                              \
-                CLR_READABLE(_fe);                                           \
-        } else if (fiber_wait_read(_fe) < 0) {                               \
-                return -1;                                                   \
+#define FIBER_READ(_fn, _fe, _args...) do {                                  \
+    ssize_t ret;                                                             \
+    int err;                                                                 \
+    if (IS_READABLE(_fe)) {                                                  \
+        CLR_READABLE(_fe);                                                   \
+    } else if (fiber_wait_read(_fe) < 0) {                                   \
+        return -1;                                                           \
+    }                                                                        \
+    if (acl_fiber_canceled(_fe->fiber_r)) {                                  \
+        acl_fiber_set_error(_fe->fiber_r->errnum);                           \
+        return -1;                                                           \
+    }                                                                        \
+    ret = (*_fn)(_fe->fd, ##_args);                                          \
+    if (ret >= 0) {                                                          \
+        return ret;                                                          \
+    }                                                                        \
+    err = acl_fiber_last_error();                                            \
+    fiber_save_errno(err);                                                   \
+    if (!error_again(err)) {                                                 \
+        if (!(_fe->type & TYPE_EVENTABLE)) {                                 \
+            fiber_file_free(_fe);                                            \
         }                                                                    \
-        if (acl_fiber_canceled(_fe->fiber_r)) {                              \
-                acl_fiber_set_error(_fe->fiber_r->errnum);                   \
-                return -1;                                                   \
-        }                                                                    \
-        ret = (*_fn)(_fe->fd, ##_args);                                      \
-        if (ret >= 0) {                                                      \
-                return ret;                                                  \
-        }                                                                    \
-        err = acl_fiber_last_error();                                        \
-        fiber_save_errno(err);                                               \
-        if (!error_again(err)) {                                             \
-                if (!(_fe->type & TYPE_EVENTABLE)) {                         \
-                        fiber_file_free(_fe);                                \
-                }                                                            \
-                return -1;                                                   \
-        }                                                                    \
+        return -1;                                                           \
+    }                                                                        \
 } while (1)
 #endif
 
-#define	FILE_ALLOC(__fe, __type, _fd) do {  \
-	(__fe) = file_event_alloc(_fd);  \
-	(__fe)->fiber_r->status = FIBER_STATUS_NONE;  \
-	(__fe)->fiber_w->status = FIBER_STATUS_NONE;  \
-	(__fe)->mask   = (__type);  \
-	(__fe)->type   = TYPE_EVENTABLE;  \
+#define FILE_ALLOC(f, t, fd) do {                                            \
+    (f) = file_event_alloc(fd);                                              \
+    (f)->fiber_r->status = FIBER_STATUS_NONE;                                \
+    (f)->fiber_w->status = FIBER_STATUS_NONE;                                \
+    (f)->mask   = (t);                                                       \
+    (f)->type   = TYPE_EVENTABLE;                                            \
 } while (0)
 
 #ifdef SYS_UNIX
@@ -235,27 +236,29 @@ ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 	// used by two fibers that one is a reader and the other is a writer,
 	// because there're two different objects for reader and writer.
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		if (!(fe->busy & EVENT_BUSY_READ)) {
-			int ret;
 
-			fe->in.read_ctx.buf = buf;
-			fe->in.read_ctx.len = (int) count;
+#define SET_READ(f) do {                                                     \
+    (f)->in.read_ctx.buf = buf;                                              \
+    (f)->in.read_ctx.len = (int) count;                                      \
+    (f)->mask |= EVENT_READ;                                                 \
+} while (0)
+
+		int ret;
+
+		if (!(fe->busy & EVENT_BUSY_READ)) {
+			SET_READ(fe);
 
 			fe->busy |= EVENT_BUSY_READ;
 			ret = iocp_wait_read(fe);
 			fe->busy &= ~EVENT_BUSY_READ;
-			return ret;
 		} else {
-			int ret;
-
 			FILE_ALLOC(fe, 0, fe->fd);
-			fe->in.read_ctx.buf = buf;
-			fe->in.read_ctx.len = (int) count;
+			SET_READ(fe);
 
 			ret = iocp_wait_read(fe);
 			file_event_unrefer(fe);
-			return ret;
 		}
+		return ret;
 	}
 #endif
 
@@ -268,12 +271,30 @@ ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 
 #ifdef HAS_IO_URING
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		fe->in.readv_ctx.iov = iov;
-		fe->in.readv_ctx.cnt = iovcnt;
-		fe->in.readv_ctx.off = 0;
-		fe->mask |= EVENT_READV;
 
-		return iocp_wait_read(fe);
+#define SET_READV(f) do {                                                    \
+    (f)->in.readv_ctx.iov = iov;                                             \
+    (f)->in.readv_ctx.cnt = iovcnt;                                          \
+    (f)->in.readv_ctx.off = 0;                                               \
+    (f)->mask |= EVENT_READV;                                                \
+} while (0)
+
+		int ret;
+
+		if (!(fe->busy & EVENT_BUSY_READ)) {
+			SET_READV(fe);
+
+			fe->busy |= EVENT_BUSY_READ;
+			ret = iocp_wait_read(fe);
+			fe->busy &= ~EVENT_BUSY_READ;
+		} else {
+			FILE_ALLOC(fe, 0, fe->fd);
+			SET_READV(fe);
+
+			ret = iocp_wait_read(fe);
+			file_event_unrefer(fe);
+		}
+		return ret;
 	}
 #endif
 
@@ -286,11 +307,29 @@ ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
 
 #ifdef HAS_IO_URING
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		fe->in.recvmsg_ctx.msg   = msg;
-		fe->in.recvmsg_ctx.flags = flags;
-		fe->mask |= EVENT_RECVMSG;
 
-		return iocp_wait_read(fe);
+#define SET_RECVMSG(f) do {                                                  \
+    (f)->in.recvmsg_ctx.msg   = msg;                                         \
+    (f)->in.recvmsg_ctx.flags = flags;                                       \
+    (f)->mask |= EVENT_RECVMSG;                                              \
+} while (0)
+
+		int ret;
+
+		if (!(fe->busy & EVENT_BUSY_READ)) {
+			SET_RECVMSG(fe);
+
+			fe->busy |= EVENT_BUSY_READ;
+			ret = iocp_wait_read(fe);
+			fe->busy &= ~EVENT_BUSY_READ;
+		} else {
+			FILE_ALLOC(fe, 0, fe->fd);
+			SET_RECVMSG(fe);
+
+			ret = iocp_wait_read(fe);
+			file_event_unrefer(fe);
+		}
+		return ret;
 	}
 #endif
 
@@ -309,12 +348,30 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 	}
 #elif defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		fe->in.recv_ctx.buf   = buf;
-		fe->in.recv_ctx.len   = (unsigned) len;
-		fe->in.recv_ctx.flags = flags;
-		fe->mask |= EVENT_RECV;
 
-		return iocp_wait_read(fe);
+#define SET_RECV(f) do {                                                     \
+    (f)->in.recv_ctx.buf   = buf;                                            \
+    (f)->in.recv_ctx.len   = (unsigned) len;                                 \
+    (f)->in.recv_ctx.flags = flags;                                          \
+    (f)->mask |= EVENT_RECV;                                                 \
+} while (0)
+
+		int ret;
+
+		if (!(fe->busy & EVENT_BUSY_READ)) {
+			SET_RECV(fe);
+
+			fe->busy |= EVENT_BUSY_READ;
+			ret = iocp_wait_read(fe);
+			fe->busy &= ~EVENT_BUSY_READ;
+		} else {
+			FILE_ALLOC(fe, 0, fe->fd);
+			SET_RECV(fe);
+
+			ret = iocp_wait_read(fe);
+			file_event_unrefer(fe);
+		}
+		return ret;
 	}
 #endif
 
@@ -332,14 +389,32 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 	}
 #elif  defined(HAS_IO_URING) && defined(IO_URING_HAS_RECVFROM)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		fe->in.recvfrom_ctx.buf      = buf;
-		fe->in.recvfrom_ctx.len      = (unsigned) len;
-		fe->in.recvfrom_ctx.flags    = flags;
-		fe->in.recvfrom_ctx.src_addr = src_addr;
-		fe->in.recvfrom_ctx.addrlen  = addrlen;
-		fe->mask |= EVENT_RECVFROM;
 
-		return iocp_wait_read(fe);
+#define SET_RECVFROM(f) do {                                                 \
+    (f)->in.recvfrom_ctx.buf      = buf;                                     \
+    (f)->in.recvfrom_ctx.len      = (unsigned) len;                          \
+    (f)->in.recvfrom_ctx.flags    = flags;                                   \
+    (f)->in.recvfrom_ctx.src_addr = src_addr;                                \
+    (f)->in.recvfrom_ctx.addrlen  = addrlen;                                 \
+    (f)->mask |= EVENT_RECVFROM;                                             \
+} while (0)
+
+		int ret;
+
+		if (!(fe->busy & EVENT_BUSY_READ)) {
+			SET_RECVFROM(fe);
+
+			fe->busy |= EVENT_BUSY_READ;
+			ret = iocp_wait_read(fe);
+			fe->busy &= ~EVENT_BUSY_READ;
+		} else {
+			FILE_ALLOC(fe, 0, fe->fd);
+			SET_RECVFROM(fe);
+
+			ret = iocp_wait_read(fe);
+			file_event_unrefer(fe);
+		}
+		return ret;
 	}
 #endif
 
