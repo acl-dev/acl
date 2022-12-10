@@ -18,6 +18,9 @@ FIBER_API int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex);
 FIBER_API int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *mutex);
 FIBER_API int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex);
 
+FIBER_API void acl_fiber_mutex_profile(void);
+FIBER_API int acl_fiber_mutex_deadcheck(void);
+
 #ifdef __cplusplus
 }
 #endif

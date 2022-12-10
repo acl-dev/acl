@@ -5,6 +5,8 @@ typedef struct SYNC_TIMER SYNC_TIMER;
 typedef struct SYNC_WAITER SYNC_WAITER;
 
 struct ACL_FIBER_MUTEX {
+	RING me;
+	long owner;
 	unsigned flags;
 	ARRAY  *waiters;
 	pthread_mutex_t lock;
