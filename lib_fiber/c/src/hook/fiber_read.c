@@ -14,9 +14,7 @@ static int uring_wait_read(FILE_EVENT *fe)
 		// Must clear the EVENT_READ flags in order to set IO event
 		// for each IO process.
 		fe->mask &= ~EVENT_READ;
-#ifdef HAS_IO_URING
 		fe->reader_ctx.res = 0;
-#endif
 
 		if (fiber_wait_read(fe) < 0) {
 			return -1;
@@ -33,11 +31,9 @@ static int uring_wait_read(FILE_EVENT *fe)
 			return -1;
 		}
 
-#ifdef HAS_IO_URING
 		if (fe->reader_ctx.res >= 0) {
 			return fe->reader_ctx.res;
 		}
-#endif
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);
