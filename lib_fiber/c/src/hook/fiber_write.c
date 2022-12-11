@@ -61,19 +61,15 @@ static int iocp_wait_write(FILE_EVENT *fe)
 		int err;
 
 		fe->mask &= ~EVENT_WRITE;
-#ifdef HAS_IO_URING
 		fe->writer_ctx.res = -1;
-#endif
 
 		if (wait_write(fe) == -1) {
 			return -1;
 		}
 
-#ifdef HAS_IO_URING
 		if (fe->writer_ctx.res >= 0) {
 			return fe->writer_ctx.res;
 		}
-#endif
 
 		err = acl_fiber_last_error();
 		fiber_save_errno(err);

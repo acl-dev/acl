@@ -319,7 +319,7 @@ int rename(const char *oldpath, const char *newpath)
 	return renameat(AT_FDCWD, oldpath, AT_FDCWD, newpath);
 }
 
-# ifdef HAS_STATX
+#ifdef HAS_STATX
 int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	struct statx *statxbuf)
 {
@@ -559,6 +559,10 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 	return ret;
 }
 
+// It has lowly efficient by using splice to complete sendfile process.
+//#define	USE_SPLICE
+
+#ifdef	USE_SPLICE
 ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 {
 	unsigned flags = SPLICE_F_MOVE | SPLICE_F_MORE | SPLICE_F_NONBLOCK;
@@ -590,5 +594,49 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 	close(pipefd[1]);
 	return ret;
 }
+#else
+ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
+{
+	ssize_t ret;
+	int err;
+	FILE_EVENT *fe;
+
+	CHECK_API("sys_sendfile64", sys_sendfile64);
+
+	while (1) {
+		ret = (*sys_sendfile64)(out_fd, in_fd, off, cnt);
+		if (ret >= 0) {
+			return ret;
+		}
+
+		err = acl_fiber_last_error();
+		fiber_save_errno(err);
+		if (!error_again(err)) {
+			return -1;
+		}
+
+		fe = fiber_file_open_write(out_fd);
+		CLR_POLLING(fe);
+
+		fe->mask |= EVENT_POLLOUT;
+		if (fiber_wait_write(fe) < 0) {
+			msg_error("%s(%d): fiber_wait_write error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), out_fd);
+			return -1;
+		}
+
+		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
+			msg_error("%s(%d): fd=%d error", __FUNCTION__,
+				__LINE__, out_fd);
+			return -1;
+		}
+
+		if (acl_fiber_canceled(fe->fiber_w)) {
+			acl_fiber_set_error(fe->fiber_w->errnum);
+			return -1;
+		}
+	}
+}
+#endif
 
 #endif // HAS_IO_URING

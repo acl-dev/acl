@@ -395,6 +395,9 @@ static void fiber_reader(ACL_FIBER *fb acl_unused, void *ctx)
 		if (ret <= 0) {
 			break;
 		}
+
+		printf(">>read count=%d\r\n", ret);
+
 		buf[ret] = 0;
 		printf("%s", buf);
 		fflush(stdout);
@@ -429,7 +432,8 @@ static void wait_and_sendfile(int in, struct FIBER_CTX *fc)
 		cfd = ACL_VSTREAM_SOCK(conn);
 		acl_vstream_free(conn);
 
-		printf(">>>begin call sendfile64 to fd=%d\r\n", cfd);
+		printf(">>>begin sendfile64 to fd=%d, off=%d, len=%d\r\n",
+			cfd, (int) fc->off, (int) fc->len);
 
 #ifdef	__linux__
 		ret = sendfile64(cfd, in, &fc->off, fc->len);
@@ -456,6 +460,8 @@ static void fiber_sendfile(ACL_FIBER *fiber acl_unused, void *ctx)
 		printf("open %s error %s\r\n", fc->frompath, strerror(errno));
 		return;
 	}
+
+	printf("open %s ok\r\n", fc->frompath);
 
 	wait_and_sendfile(in, fc);
 	close(in);
