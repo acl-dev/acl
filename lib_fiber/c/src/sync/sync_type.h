@@ -9,6 +9,7 @@ struct ACL_FIBER_MUTEX {
 	long owner;
 	unsigned flags;
 	ARRAY  *waiters;
+	ARRAY  *waiting_threads;
 	pthread_mutex_t lock;
 	pthread_mutex_t thread_lock;
 };
@@ -28,7 +29,7 @@ typedef struct SYNC_OBJ {
 #define	SYNC_OBJ_T_FIBER	1
 #define	SYNC_OBJ_T_THREAD	2
 
-	pthread_t tid;
+	unsigned long tid;
 	FIBER_BASE *base;
 	ATOMIC *atomic;
 	long long atomic_value;

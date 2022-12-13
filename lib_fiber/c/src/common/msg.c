@@ -239,7 +239,7 @@ static char *__main_buf = NULL;
 
 static void thread_free_buf(void *buf)
 {
-	if (__pthread_self() != main_thread_self()) {
+	if (pthread_self() != main_thread_self()) {
 		mem_free(buf);
 	}
 }
@@ -275,7 +275,7 @@ const char *last_serror(void)
 		buf = (char*) mem_malloc(__buf_size);
 		if (pthread_setspecific(__errbuf_key, buf) != 0)
 			abort();
-		if (__pthread_self() == main_thread_self()) {
+		if (pthread_self() == main_thread_self()) {
 			__main_buf = buf;
 			atexit(main_free_buf);
 		}

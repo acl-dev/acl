@@ -101,18 +101,6 @@ int array_succ_insert(ARRAY *a, int position, void *obj);
 #define array_insert array_succ_insert
 
 /**
- * 从动态数组中的指定位置删除某个动态对象, 删除后数组内元素的先后顺序保持不变,
- * 如果被删除位置在中间某个位置，为了保证元素的顺序性，内部将被删除元素后的所有元素
- * 都前移一个位置
- * @param a {ARRAY*} 动态数组指针
- * @param pos {int} 某个位置，不得越界
- * @param free_fn {void (*)(void*)} 用于释放动态数组内成员变量的释放函数指针，如果该
- *  指针为空，则不释放，否则用此函数进行释放动态对象
- * @return {int} 0: 成功；-1: 失败
- */
-int array_delete_idx(ARRAY *a, int pos, void (*free_fn)(void *));
-
-/**
  * 从动态数组中的指定位置删除某个对象，删除后数组内元素的先后顺序有可能发生了改变,
  * 因为删除后会自动将数组中最后的元素移至该位置处
  * @param a {ARRAY*} 动态数组指针

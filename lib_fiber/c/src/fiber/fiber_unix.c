@@ -118,7 +118,7 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 #if	defined(SHARE_STACK)
 	if (from->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK
 		&& from->fiber.status != FIBER_STATUS_EXITING
-		&& from->fiber.id > 0) {
+		&& from->fiber.tid > 0) {
 
 		char stack_top = 0;
 		fiber_stack_save(from, &stack_top);

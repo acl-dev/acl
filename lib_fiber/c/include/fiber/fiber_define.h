@@ -100,6 +100,7 @@ typedef int socket_t;
  * The fiber struct type definition
  */
 typedef struct ACL_FIBER ACL_FIBER;
+typedef unsigned int acl_fiber_t;
 
 #ifdef __cplusplus
 }

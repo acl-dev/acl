@@ -24,7 +24,7 @@ static SYNC_TIMER *sync_timer_new(void)
 	pthread_mutex_init(&timer->lock, NULL);
 	timer->box = mbox_create(MBOX_T_MPSC);
 	timer->waiters = timer_cache_create();
-	timer->tid = __pthread_self();
+	timer->tid = (unsigned long) pthread_self();
 
 	out = mbox_out(timer->box);
 	assert(out != INVALID_SOCKET);
@@ -216,7 +216,7 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		// the out fd we got is owned by the other thread, and
 		// we just need to get the temporary FILE_EVENT from cache to
 		// bind with the out fd, and release it after mbox_send.
-		if (__pthread_self() == timer->tid) {
+		if (pthread_self() == timer->tid) {
 			fe = fiber_file_open_write(out);
 			same_thread = 1;
 		} else {

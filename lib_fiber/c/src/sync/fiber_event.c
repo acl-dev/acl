@@ -128,7 +128,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 #endif
 		__ll_lock(event);
 		event->owner = fiber ? fiber->base : NULL;
-		event->tid   = __pthread_self();
+		event->tid   = (unsigned long) pthread_self();
 		__ll_unlock(event);
 		return 0;
 	}
@@ -158,7 +158,7 @@ int acl_fiber_event_wait(ACL_FIBER_EVENT *event)
 			}
 
 			event->owner = fbase;
-			event->tid   = __pthread_self();
+			event->tid   = (unsigned long) pthread_self();
 			__ll_unlock(event);
 			break;
 		}
@@ -212,7 +212,7 @@ int acl_fiber_event_trywait(ACL_FIBER_EVENT *event)
 		ACL_FIBER *fiber = acl_fiber_running();
 		__ll_lock(event);
 		event->owner     = fiber ? fiber->base : NULL;
-		event->tid       = __pthread_self();
+		event->tid       = (unsigned long) pthread_self();
 		__ll_unlock(event);
 		return 0;
 	}
@@ -230,11 +230,11 @@ int acl_fiber_event_notify(ACL_FIBER_EVENT *event)
 			__FILE__, __LINE__, __FUNCTION__, owner, event->owner);
 		return -1;
 	} else if (UNLIKELY(event->owner == NULL
-		&& event->tid != __pthread_self())) {
+		&& event->tid != (unsigned long) pthread_self())) {
 
 		event_ferror(event, "%s(%d), %s: tid(%lu) isn't owner(%lu)",
 			__FILE__, __LINE__, __FUNCTION__,
-			event->tid, __pthread_self());
+			event->tid, (unsigned long) pthread_self());
 		return -1;
 	}
 

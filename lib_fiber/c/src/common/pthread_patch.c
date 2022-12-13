@@ -321,18 +321,23 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex)
 	return 0;
 }
 
-unsigned long __pthread_self(void)
+unsigned long pthread_self(void)
 {
 	return GetCurrentThreadId();
 }
 
-#elif	defined(__linux__) || defined(__APPLE__) || defined(MINGW)
-unsigned long __pthread_self(void)
+#elif	defined(__linux__)
+unsigned long pthread_self(void)
+{
+	return (unsigned long) gettid();
+}
+#elif	defined(__APPLE__)
+unsigned long pthread_self(void)
 {
 	return (unsigned long) pthread_self();
 }
 #elif	defined(__FreeBSD__)
-unsigned long __pthread_self(void)
+unsigned long pthread_self(void)
 {
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 9)
 	return (unsigned long) pthread_getthreadid_np();
@@ -341,5 +346,8 @@ unsigned long __pthread_self(void)
 #endif
 }
 #else
-#error	"unknown OS"
+unsigned long pthread_self(void)
+{
+	return (unsigned long) pthread_self();
+}
 #endif

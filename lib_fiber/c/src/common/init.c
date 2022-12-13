@@ -12,10 +12,11 @@ void lib_init(void)
 {
 	static int __have_inited = 0;
 
-	if (__have_inited)
+	if (__have_inited) {
 		return;
+	}
 	__have_inited = 1;
-	var_main_tid = __pthread_self();
+	var_main_tid = pthread_self();
 }
 
 unsigned long main_thread_self(void)

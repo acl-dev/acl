@@ -497,7 +497,7 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 
 	// we must check the fiber carefully here.
 	if (fe == NULL || tc->fiber != fe->fiber_r
-		|| tc->fiber->id != fe->fiber_r->id) {
+		|| tc->fiber->fid != fe->fiber_r->fid) {
 
 		mem_free(ctx);
 		return;

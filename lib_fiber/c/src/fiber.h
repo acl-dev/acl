@@ -49,7 +49,7 @@ struct ACL_FIBER {
 	unsigned long  tid;
 	fiber_status_t status;
 	RING           me;
-	unsigned       id;
+	unsigned int   fid;
 	unsigned       slot;
 	long long      when;
 	int            errnum;

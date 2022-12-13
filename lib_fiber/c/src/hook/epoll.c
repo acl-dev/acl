@@ -71,7 +71,7 @@ static void fiber_on_exit(void *ctx)
 		return;
 	}
 
-	SNPRINTF(key, sizeof(key), "%u", curr->id);
+	SNPRINTF(key, sizeof(key), "%u", curr->fid);
 	tmp = (EPOLL_EVENT *) htable_find(ee->epoll->ep_events, key);
 
 	if (tmp == NULL) {
@@ -177,7 +177,7 @@ static EPOLL *epoll_alloc(int epfd)
 		}
 
 		__epfds = array_create(5, ARRAY_F_UNORDER);
-		if (__pthread_self() == main_thread_self()) {
+		if (pthread_self() == main_thread_self()) {
 			__main_epfds = __epfds;
 			atexit(main_thread_free);
 		} else if (pthread_setspecific(__once_key, __epfds) != 0) {
@@ -306,7 +306,7 @@ static EPOLL_EVENT *epoll_event_find(int epfd, int create)
 		return NULL;
 	}
 
-	SNPRINTF(key, sizeof(key), "%u", curr->id);
+	SNPRINTF(key, sizeof(key), "%u", curr->fid);
 	ee = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
 	if (ee != NULL) {
 		ee->epoll = ep;

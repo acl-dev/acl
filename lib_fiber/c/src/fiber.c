@@ -33,7 +33,6 @@ typedef struct THREAD {
 	ACL_FIBER *running;
 	ACL_FIBER *original;
 	int        errnum;
-	unsigned   idgen;
 	int        count;
 	size_t     switched;
 	size_t     switched_old;
@@ -45,6 +44,9 @@ typedef struct THREAD {
 	size_t     stack_dlen;
 #endif
 } THREAD;
+
+static ATOMIC   *__idgen_atomic = NULL;
+static long long __idgen_value  = 0;
 
 static THREAD          *__main_fiber   = NULL;
 static __thread THREAD *__thread_fiber = NULL;
@@ -150,6 +152,10 @@ static void thread_init(void)
 		msg_fatal("%s(%d), %s: pthread_key_create error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
+
+	__idgen_atomic = atomic_new();
+	atomic_set(__idgen_atomic, &__idgen_value);
+	atomic_int64_set(__idgen_atomic, 0);
 }
 
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
@@ -172,7 +178,6 @@ static void fiber_check(void)
 	__thread_fiber->fibers   = NULL;
 	__thread_fiber->size     = 0;
 	__thread_fiber->slot     = 0;
-	__thread_fiber->idgen    = 0;
 	__thread_fiber->count    = 0;
 	__thread_fiber->nlocal   = 0;
 
@@ -185,7 +190,7 @@ static void fiber_check(void)
 	ring_init(&__thread_fiber->ready);
 	ring_init(&__thread_fiber->dead);
 
-	if (__pthread_self() == main_thread_self()) {
+	if (pthread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
 		atexit(fiber_schedule_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
@@ -692,6 +697,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 {
 	ACL_FIBER *fiber = NULL;
 	RING *head;
+	unsigned long id;
 
 	fiber_check();
 
@@ -701,17 +707,18 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 		fiber = __fiber_alloc_fn(fiber_start, attr);
-		fiber->tid = __pthread_self();
+		fiber->tid = (unsigned long) pthread_self();
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);
 	}
 
-	__thread_fiber->idgen++;
-	if (__thread_fiber->idgen == 0) { /* Overflow ? */
-		__thread_fiber->idgen++;
+	id = atomic_int64_add_fetch(__idgen_atomic, 1);
+	if (id <= 0) {  /* Overflow ? */
+		atomic_int64_set(__idgen_atomic, 0);
+		id = atomic_int64_add_fetch(__idgen_atomic, 1);
 	}
 
-	fiber->id     = __thread_fiber->idgen;
+	fiber->fid    = id;
 	fiber->errnum = 0;
 	fiber->signum = 0;
 	fiber->fn     = fn;
@@ -793,7 +800,7 @@ int acl_fiber_use_share_stack(const ACL_FIBER *fiber)
 
 unsigned int acl_fiber_id(const ACL_FIBER *fiber)
 {
-	return fiber ? fiber->id : 0;
+	return fiber ? fiber->fid : 0;
 }
 
 unsigned int acl_fiber_self(void)
@@ -864,7 +871,8 @@ void acl_fiber_schedule(void)
 	for (;;) {
 		head = ring_pop_head(&__thread_fiber->ready);
 		if (head == NULL) {
-			msg_info("thread-%lu: NO FIBER NOW", __pthread_self());
+			msg_info("thread-%lu: NO FIBER NOW",
+				(unsigned long) pthread_self());
 			break;
 		}
 
@@ -918,7 +926,8 @@ void acl_fiber_switch(void)
 
 	head = ring_pop_head(&__thread_fiber->ready);
 	if (head == NULL) {
-		msg_info("thread-%lu: NO FIBER in ready", __pthread_self());
+		msg_info("thread-%lu: NO FIBER in ready",
+			(unsigned long) pthread_self());
 		fiber_swap(current, __thread_fiber->original);
 		return;
 	}
