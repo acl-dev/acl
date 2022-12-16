@@ -30,7 +30,7 @@ typedef struct SYNC_OBJ {
 #define	SYNC_OBJ_T_FIBER	1
 #define	SYNC_OBJ_T_THREAD	2
 
-	unsigned long tid;
+	long tid;
 	FIBER_BASE *base;
 	ATOMIC *atomic;
 	long long atomic_value;

@@ -36,8 +36,8 @@ public:
 	 * 协程，然后子类的重载的 run 方法将被回调，如果 running 为 true 时，
 	 * 则禁止调用 start 方法
 	 * @param stack_size {size_t} 创建的协程对象的栈大小
-	 * @param 是否采用共享栈方式(若要采用共享栈方式，必须在编译 libfiber.a
-	 *  时将编译开关 SHARE_STACK 打开)
+	 * @param share_stack {bool} 是否采用共享栈方式(若要采用共享栈方式，
+	 *  必须在编译 libfiber.a 时将编译开关 SHARE_STACK 打开)
 	 */
 	void start(size_t stack_size = 320000, bool share_stack = false);
 

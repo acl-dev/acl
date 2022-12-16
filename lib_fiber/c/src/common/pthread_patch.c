@@ -321,33 +321,30 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex)
 	return 0;
 }
 
-unsigned long pthread_self(void)
+long thread_self(void)
 {
-	return GetCurrentThreadId();
+	return (long) GetCurrentThreadId();
 }
 
 #elif	defined(__linux__)
-unsigned long pthread_self(void)
+long thread_self(void)
 {
-	return (unsigned long) gettid();
+	return (long) gettid();
 }
 #elif	defined(__APPLE__)
-unsigned long pthread_self(void)
+long thread_self(void)
 {
-	return (unsigned long) pthread_self();
+	return (long) pthread_self();
 }
 #elif	defined(__FreeBSD__)
-unsigned long pthread_self(void)
+long thread_self(void)
 {
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 9)
-	return (unsigned long) pthread_getthreadid_np();
+	return (long) pthread_getthreadid_np();
 #else
-	return (unsigned long) pthread_self();
+	return (long) pthread_self();
 #endif
 }
 #else
-unsigned long pthread_self(void)
-{
-	return (unsigned long) pthread_self();
-}
+# error "Unknown OS"
 #endif

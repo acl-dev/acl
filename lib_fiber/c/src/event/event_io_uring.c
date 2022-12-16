@@ -656,7 +656,7 @@ EVENT *event_io_uring_create(int size)
 		abort();
 	} else {
 		printf("%s(%d): thread-%lu init io_uring ok, size=%zd\r\n",
-			__FUNCTION__, __LINE__, pthread_self(), eu->sqe_size);
+			__FUNCTION__, __LINE__, thread_self(), eu->sqe_size);
 	}
 
 	if (!(params.features & IORING_FEAT_FAST_POLL)) {

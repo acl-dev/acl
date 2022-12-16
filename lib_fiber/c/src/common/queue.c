@@ -46,7 +46,7 @@ QUEUE *queue_new(void)
 	que->error = QUEUE_OK;
 	que->quit = 0;
 	que->nlink = 0;
-	que->owner = (unsigned long) pthread_self();
+	que->owner = thread_self();
 	que->check_owner = 0;
 	
 	return que;
@@ -75,9 +75,9 @@ void queue_free(QUEUE *que, QUEUE_FREE_FN free_fn)
 		return;
 	}
 
-	if (que->check_owner && (unsigned long) pthread_self() != que->owner) {
+	if (que->check_owner && thread_self() != que->owner) {
 		msg_error("%s: cur tid(%lu) != owner(%lu)!", __FUNCTION__,
-			(unsigned long) pthread_self(), que->owner);
+			thread_self(), que->owner);
 		return;
 	}
 

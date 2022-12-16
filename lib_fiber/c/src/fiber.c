@@ -190,7 +190,7 @@ static void fiber_check(void)
 	ring_init(&__thread_fiber->ready);
 	ring_init(&__thread_fiber->dead);
 
-	if (pthread_self() == main_thread_self()) {
+	if (thread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
 		atexit(fiber_schedule_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
@@ -707,7 +707,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	head = ring_pop_head(&__thread_fiber->dead);
 	if (head == NULL) {
 		fiber = __fiber_alloc_fn(fiber_start, attr);
-		fiber->tid = (unsigned long) pthread_self();
+		fiber->tid = thread_self();
 	} else {
 		fiber = APPL(head, ACL_FIBER, me);
 	}
@@ -871,8 +871,7 @@ void acl_fiber_schedule(void)
 	for (;;) {
 		head = ring_pop_head(&__thread_fiber->ready);
 		if (head == NULL) {
-			msg_info("thread-%lu: NO FIBER NOW",
-				(unsigned long) pthread_self());
+			msg_info("thread-%lu: NO FIBER NOW", thread_self());
 			break;
 		}
 
@@ -926,8 +925,7 @@ void acl_fiber_switch(void)
 
 	head = ring_pop_head(&__thread_fiber->ready);
 	if (head == NULL) {
-		msg_info("thread-%lu: NO FIBER in ready",
-			(unsigned long) pthread_self());
+		msg_info("thread-%lu: NO FIBER in ready", thread_self());
 		fiber_swap(current, __thread_fiber->original);
 		return;
 	}

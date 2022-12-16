@@ -127,7 +127,7 @@ static void thread_init(void)
 	__thread_fiber->cache     = array_create(100, ARRAY_F_UNORDER);
 	__thread_fiber->cache_max = 1000;
 
-	if (pthread_self() == main_thread_self()) {
+	if (thread_self() == main_thread_self()) {
 		__main_fiber = __thread_fiber;
 		atexit(fiber_io_main_free);
 	} else if (pthread_setspecific(__fiber_key, __thread_fiber) != 0) {
@@ -230,7 +230,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			}
 
 			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u, events=%d",
-				__FUNCTION__, __LINE__, (unsigned long) pthread_self(),
+				__FUNCTION__, __LINE__, thread_self(),
 				ev->waiter, ring_size(&ev->events));
 			break;
 		}
@@ -254,7 +254,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 	}
 
 	msg_info("%s(%d), tid=%lu: IO fiber exit now",
-		__FUNCTION__, __LINE__, (unsigned long) pthread_self());
+		__FUNCTION__, __LINE__, thread_self());
 
 	// Don't set ev_fiber NULL here, using fiber_io_clear() to set it NULL
 	// in acl_fiber_schedule() after scheduling finished.

@@ -169,7 +169,7 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 		// For the independent thread, only lock the thread mutex.
 		if (!var_hook_sys_api) {
 			pthread_mutex_unlock(&mutex->lock);
-			thread_waiter_add(mutex, (unsigned long) pthread_self());
+			thread_waiter_add(mutex, thread_self());
 			return pthread_mutex_lock(&mutex->thread_lock);
 		}
 
@@ -211,7 +211,7 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 
 		// For the independent thread, only lock the thread mutex.
 		if (!var_hook_sys_api) {
-			thread_waiter_add(mutex, (unsigned long) pthread_self());
+			thread_waiter_add(mutex, thread_self());
 			return pthread_mutex_lock(&mutex->thread_lock);
 		}
 
@@ -251,10 +251,10 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 	}
 	if (ret == 0) {
 		unsigned id = acl_fiber_self();  // 0 will return in no fiber mode.
-		long me = id == 0 ? -pthread_self() : (long) id;
+		long me = id == 0 ? -thread_self() : (long) id;
 		mutex->owner = me;
 		if (me < 0) {
-			thread_waiter_remove(mutex, pthread_self());
+			thread_waiter_remove(mutex, thread_self());
 		}
 
 		mutex->fiber = acl_fiber_running();
@@ -267,7 +267,7 @@ int acl_fiber_mutex_trylock(ACL_FIBER_MUTEX *mutex)
 	int ret = pthread_mutex_trylock(&mutex->thread_lock);
 	if (ret == 0) {
 		unsigned id = acl_fiber_self();
-		long me = id == 0 ? -pthread_self() : (long) id;
+		long me = id == 0 ? -thread_self() : (long) id;
 		mutex->owner = me;
 	}
 	return ret;
@@ -302,7 +302,7 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 	}
 
 	if (fiber) {
-		if ((unsigned long) pthread_self() == fiber->tid) {
+		if (thread_self() == fiber->tid) {
 			acl_fiber_ready(fiber);
 		} else {
 			sync_waiter_wakeup(fiber->sync, fiber);

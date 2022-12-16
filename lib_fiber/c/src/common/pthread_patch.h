@@ -43,7 +43,7 @@ int pthread_mutex_unlock(pthread_mutex_t *mutex);
 
 #endif // _WIN32 || _WIN64
 
-unsigned long __pthread_self(void);
+long thread_self(void);
 
 #ifdef	__cplusplus
 }
