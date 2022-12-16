@@ -107,6 +107,29 @@ static bool test_type(acl::redis_key& redis, int n)
 	return true;
 }
 
+static bool test_keys_pattern(acl::redis_key& redis, const char* pattern)
+{
+	std::vector<acl::string> values;
+	int ret = redis.keys_pattern(pattern, &values);
+	printf("ret=%d, pattern=%s\n", ret, pattern);
+	if (ret < 0) {
+		printf("keys_pattern error=%s, pattern=%s\r\n",
+			redis.result_error(), pattern);
+		return false;
+	} else if (ret == 0) {
+		printf("Not match pattern=%s\r\n", pattern);
+		return true;
+	}
+
+	printf("The matched values:\r\n");
+	for (std::vector<acl::string>::const_iterator cit = values.begin();
+		cit != values.end(); ++cit) {
+		printf("   %s\r\n", (*cit).c_str());
+	}
+
+	return true;
+}
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
@@ -115,17 +138,18 @@ static void usage(const char* procname)
 		"-C connect_timeout[default: 10]\r\n"
 		"-T rw_timeout[default: 10]\r\n"
 		"-c [use cluster mode]\r\n"
-		"-a cmd[del|expire|ttl|exists|type|all]\r\n",
+		"-a cmd[del|expire|ttl|exists|type|all|keys_pattern]\r\n"
+		"-p pattern\r\n",
 		procname);
 }
 
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	acl::string addr("127.0.0.1:6379"), cmd;
+	acl::string addr("127.0.0.1:6379"), cmd, pattern("none*");
 	bool cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:T:a:c")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:T:a:cp:")) > 0)
 	{
 		switch (ch)
 		{
@@ -146,6 +170,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'a':
 			cmd = optarg;
+			break;
+		case 'p':
+			pattern = optarg;
 			break;
 		case 'c':
 			cluster_mode = true;
@@ -181,6 +208,8 @@ int main(int argc, char* argv[])
 		ret = test_exists(redis, n);
 	else if (cmd == "type")
 		ret = test_type(redis, n);
+	else if (cmd == "keys_pattern")
+		ret = test_keys_pattern(redis, pattern);
 	else if (cmd == "all")
 	{
 		ret = test_expire(redis, n)
