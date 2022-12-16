@@ -79,7 +79,7 @@ struct FILE_EVENT {
 	socket_t   fd;
 	int id;
 	unsigned status;
-#define	STATUS_NONE		0
+#define	STATUS_NONE		(unsigned) (0)
 #define	STATUS_CONNECTING	(unsigned) (1 << 0)	// In connecting status
 #define	STATUS_READABLE		(unsigned) (1 << 1)	// Ready for reading
 #define	STATUS_WRITABLE		(unsigned) (1 << 2)	// Ready for writing
@@ -121,7 +121,7 @@ struct FILE_EVENT {
 #define	IS_CLOSED(x)		((x)->status & STATUS_CLOSED)
 
 	unsigned type;
-#define	TYPE_NONE		(unsigned) 0
+#define	TYPE_NONE		(unsigned) (0)
 #define	TYPE_SPIPE		(unsigned) (1 << 0)
 #define	TYPE_FILE		(unsigned) (1 << 1)
 #define	TYPE_BADFD		(unsigned) (1 << 2)
@@ -135,7 +135,7 @@ struct FILE_EVENT {
 #define	EVENT_DEL_WRITE		(unsigned) (1 << 3)
 
 	unsigned mask;
-#define	EVENT_NONE		0
+#define	EVENT_NONE		(unsigned) (0)
 #define	EVENT_DIRECT		(unsigned) (1 << 0)
 #define	EVENT_SYSIO		(unsigned) (1 << 1)
 #define	EVENT_READ		(unsigned) (1 << 2)
@@ -295,7 +295,7 @@ struct FILE_EVENT {
 #endif
 	short refer;
 	short busy;
-#define	EVENT_BUSY_NONE		0
+#define	EVENT_BUSY_NONE		(0)
 #define	EVENT_BUSY_READ		(1 << 0)
 #define	EVENT_BUSY_WRITE	(1 << 1)
 };
