@@ -7,6 +7,7 @@ typedef struct SYNC_WAITER SYNC_WAITER;
 struct ACL_FIBER_MUTEX {
 	RING me;
 	long owner;
+	ACL_FIBER *fiber;
 	unsigned flags;
 	ARRAY  *waiters;
 	ARRAY  *waiting_threads;

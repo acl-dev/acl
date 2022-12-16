@@ -256,6 +256,8 @@ int acl_fiber_mutex_lock(ACL_FIBER_MUTEX *mutex)
 		if (me < 0) {
 			thread_waiter_remove(mutex, pthread_self());
 		}
+
+		mutex->fiber = acl_fiber_running();
 	}
 	return ret;
 }
@@ -278,10 +280,23 @@ int acl_fiber_mutex_unlock(ACL_FIBER_MUTEX *mutex)
 
 	pthread_mutex_lock(&mutex->lock);
 	fiber = (ACL_FIBER*) array_pop_front(mutex->waiters);
-	pthread_mutex_unlock(&mutex->lock);
+
+	// Just a sanity check!
+	if (acl_fiber_running() != mutex->fiber) {
+		msg_error("%s(%d): not the onwer fiber=%p, fiber=%p",
+			__FUNCTION__, __LINE__, acl_fiber_running(),
+			mutex->fiber);
+	}
 
 	mutex->owner = 0;
+	mutex->fiber = NULL;
+
 	ret = pthread_mutex_unlock(&mutex->thread_lock);
+
+	// Unlock the internal prive lock must behind the public thread_lock,
+	// or else the waiter maybe be skipped added in lock waiting process.
+	pthread_mutex_unlock(&mutex->lock);
+
 	if (ret != 0) {
 		return ret;
 	}
