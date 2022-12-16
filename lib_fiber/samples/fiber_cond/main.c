@@ -118,8 +118,7 @@ static void do_consume(void)
 			break;
 		}
 	}
-
-	acl_fiber_mutex_unlock(__mutex);
+	//acl_fiber_mutex_unlock(__mutex);
 }
 
 static void fiber_consumer(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
