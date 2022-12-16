@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,10 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Fri Dec 16 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-1-20221216.13
+- feature: one fd can be opered by multiple fibers in io_uring mode
+- bugfix: fixed one bug in fiber_mutex.c
 
 * Wed Dec 01 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-0-20221201.20
 - feature: fiber module supports io_uring
