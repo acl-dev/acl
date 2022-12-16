@@ -13,6 +13,7 @@
 #include <time.h>
 
 #include "msg.h"
+#include "pthread_patch.h"
 #include "queue.h"
 
 #ifdef __linux__
@@ -29,7 +30,7 @@ struct QUEUE {
 	int   quit;
 	int   nlink;
 	char  check_owner;
-	unsigned long owner;
+	long  owner;
 	pthread_mutex_t lock;
 	pthread_cond_t  cond;
 };
