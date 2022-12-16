@@ -1,4 +1,4 @@
-%define release_id 1
+%define release_id 2
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,9 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Fri Dec 16 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-2-20221216.14
+- bugfix: use syscall(SYS_gettid) other than gettid() for CentOS OS.
 
 * Fri Dec 16 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-1-20221216.13
 - feature: one fd can be opered by multiple fibers in io_uring mode

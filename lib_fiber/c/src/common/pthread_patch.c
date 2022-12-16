@@ -327,9 +327,12 @@ long thread_self(void)
 }
 
 #elif	defined(__linux__)
+
+#include <sys/syscall.h>
+
 long thread_self(void)
 {
-	return (long) gettid();
+	return (long) syscall(SYS_gettid);
 }
 #elif	defined(__APPLE__)
 long thread_self(void)
