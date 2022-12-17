@@ -712,10 +712,10 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		fiber = APPL(head, ACL_FIBER, me);
 	}
 
-	id = atomic_int64_add_fetch(__idgen_atomic, 1);
+	id = (unsigned long) atomic_int64_add_fetch(__idgen_atomic, 1);
 	if (id <= 0) {  /* Overflow ? */
 		atomic_int64_set(__idgen_atomic, 0);
-		id = atomic_int64_add_fetch(__idgen_atomic, 1);
+		id = (unsigned long) atomic_int64_add_fetch(__idgen_atomic, 1);
 	}
 
 	fiber->fid    = id;

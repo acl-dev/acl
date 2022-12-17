@@ -94,7 +94,7 @@ private:
 			fb->start();
 		}
 
-		usleep(100000);
+		//usleep(100000);
 		acl::fiber::schedule_with(__event_type);
 		printf("producer fiber thread-%lu exit!\r\n", acl::thread::self());
 		return NULL;

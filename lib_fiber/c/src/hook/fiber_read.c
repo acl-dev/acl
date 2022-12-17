@@ -344,7 +344,7 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 
 #if defined(HAS_IOCP)
 	if (EVENT_IS_IOCP(fiber_io_event())) {
-		return file_iocp_read(fe, buf, len);
+		return fiber_iocp_read(fe, buf, len);
 	}
 #elif defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
@@ -385,7 +385,7 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 
 #if  defined(HAS_IOCP)
 	if (EVENT_IS_IOCP(fiber_io_event())) {
-		return file_iocp_read(fe, buf, len);
+		return fiber_iocp_read(fe, buf, len);
 	}
 #elif  defined(HAS_IO_URING) && defined(IO_URING_HAS_RECVFROM)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
