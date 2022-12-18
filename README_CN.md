@@ -323,4 +323,4 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 - Github:   https://github.com/acl-dev/acl
 - Gitee:    https://gitee.com/acl-dev/acl
 - 微 博：   http://weibo.com/zsxxsz
-- QQ 群:    693868497
+- QQ 群:    705290654
