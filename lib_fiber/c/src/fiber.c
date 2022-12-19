@@ -146,6 +146,14 @@ static void fiber_schedule_main_free(void)
 	}
 }
 
+static void free_atomic_onexit(void)
+{
+	if (__idgen_atomic != NULL) {
+		atomic_free(__idgen_atomic);
+		__idgen_atomic = NULL;
+	}
+}
+
 static void thread_init(void)
 {
 	if (pthread_key_create(&__fiber_key, thread_free) != 0) {
@@ -156,6 +164,7 @@ static void thread_init(void)
 	__idgen_atomic = atomic_new();
 	atomic_set(__idgen_atomic, &__idgen_value);
 	atomic_int64_set(__idgen_atomic, 0);
+	atexit(free_atomic_onexit);
 }
 
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;

@@ -11,6 +11,7 @@ public:
 	void done(void) {
 		box_.push(NULL);
 		if (--refer_ == 0) {
+			printf("done delete this\r\n");
 			delete this;
 		}
 	}
@@ -18,6 +19,7 @@ public:
 	void wait(void) {
 		box_.pop();
 		if (--refer_ == 0) {
+			printf("wait delete this\r\n");
 			delete this;
 		}
 	}
@@ -28,6 +30,8 @@ private:
 
 	~wait_box(void) {}
 };
+
+class fiber_stop;
 
 class fiber_waiter : public acl::fiber {
 public:
@@ -43,10 +47,14 @@ public:
 			::close(fd);
 			printf(">>close fd=%d ok<<\r\n", fd);
 		}
+		printf(">>begin wait box\n");
 		box_->wait();
+		printf(">>box wait ok\n");
 	}
 
 private:
+	friend class fiber_stop;
+
 	~fiber_waiter(void) {}
 
 private:
@@ -64,12 +72,15 @@ private:
 
 		printf("bind %s ok\r\n", addr);
 
+		ss_.set_peer("127.0.0.1:8089");
+		const char* data = "hello world!\r\n";
+		(void) ss_.write(data, strlen(data));
 		while (!stop_) {
 			char buf[1024];
 			int ret = ss_.read(buf, sizeof(buf) - 1, false);
 			if (ret == -1) {
-				printf("fiber_waiter-> read error %s\r\n",
-					acl::last_serror());
+				printf("fiber_waiter-> read error %s, sock=%d\r\n",
+					acl::last_serror(), ss_.sock_handle());
 				break;
 			}
 			buf[ret] = 0;
@@ -78,7 +89,6 @@ private:
 
 		box_->done();
 		printf("fiber_waiter-> will exit!\r\n");
-		delete this;
 	}
 };
 
@@ -99,19 +109,23 @@ private:
 		printf("fiber_stop-> call stopping...\r\n");
 		waiter_->stop();
 		printf("fiber_stop-> will exit!\r\n");
+		printf("fiber_stop-> delete waiter\r\n");
+		delete waiter_;
+		printf("fiber_stop-> delete me\r\n");
+		delete this;
 	}
 };
 
-class thread_runner : public acl::thread
-{
+class thread_runner : public acl::thread {
 public:
 	thread_runner(acl::fiber_event_t event_type)
 	: event_type_(event_type)
 	{
 	}
 
-protected:
 	~thread_runner(void) {}
+
+protected:
 
 	// @override
 	void* run(void) {
@@ -123,7 +137,6 @@ protected:
 
 		acl::fiber::schedule_with(event_type_);
 		printf("fiber schedule stopped\r\n");
-		delete this;
 		return NULL;
 	}
 
@@ -173,6 +186,7 @@ int main(int argc, char *argv[])
 	acl::thread* runner = new thread_runner(event_type);
 	runner->start();
 	runner->wait();
+	delete runner;
 
 	return 0;
 }

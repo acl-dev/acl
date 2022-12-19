@@ -1,2 +1,2 @@
 include ../Makefile_cpp.in
-PROG = fiber_wait
+PROG = fiber_stop

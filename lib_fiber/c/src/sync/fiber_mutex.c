@@ -107,11 +107,20 @@ static void thread_waiter_remove(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 	pthread_mutex_unlock(&mutex->lock);
 }
 
+static void free_locks_onexit(void)
+{
+	if (__locks) {
+		mem_free(__locks);
+		__locks = NULL;
+	}
+}
+
 static void thread_once(void)
 {
 	pthread_mutex_init(&__lock, NULL);
 	__locks = (THREAD_MUTEXES*) mem_malloc(sizeof(THREAD_MUTEXES));
 	ring_init(&__locks->head);
+	atexit(free_locks_onexit);
 }
 
 ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flags)
