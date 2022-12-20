@@ -137,6 +137,7 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 			pfd->fe->r_timeout = timeout;
 #endif
 			event_add_read(ev, pfd->fe, read_callback);
+			pfd->fe->fiber_r = acl_fiber_running();
 			SET_READWAIT(pfd->fe);
 		}
 		if (pfd->pfd->events & POLLOUT) {
@@ -145,6 +146,7 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 			pfd->fe->w_timeout = timeout;
 #endif
 			event_add_write(ev, pfd->fe, write_callback);
+			pfd->fe->fiber_w = acl_fiber_running();
 			SET_WRITEWAIT(pfd->fe);
 		}
 
