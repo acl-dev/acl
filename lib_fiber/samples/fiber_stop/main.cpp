@@ -65,7 +65,7 @@ private:
 	// @override
 	void run(void) {
 		const char* addr = "127.0.0.1:8088";
-		if (!ss_.bind_udp(addr)) {
+		if (!ss_.bind_udp(addr, 10)) {
 			printf("bind %s error %s\r\n", addr, acl::last_serror());
 			exit(1);
 		}
@@ -105,7 +105,7 @@ private:
 	// @override
 	void run(void) {
 		printf("fiber_stop-> wait for one second\r\n");
-		sleep(1);
+		sleep(3);
 		printf("fiber_stop-> call stopping...\r\n");
 		waiter_->stop();
 		printf("fiber_stop-> will exit!\r\n");

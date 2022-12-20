@@ -150,6 +150,9 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 
 		pfd->fe->pfd      = pfd;
 		pfd->pfd->revents = 0;
+
+		// Add one reference to avoid fe being freeed in advanced.
+		file_event_refer(pfd->fe);
 	}
 
 	if (timeout >= 0) {
@@ -190,7 +193,11 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 #endif
 			event_del_write(ev, pfd->fe);
 		}
+
 		pfd->fe->pfd = NULL;
+
+		// Unrefer the fe because we don't need it again.
+		file_event_unrefer(pfd->fe);
 		pfd->fe      = NULL;
 	}
 }
