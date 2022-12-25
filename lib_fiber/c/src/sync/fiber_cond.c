@@ -211,28 +211,25 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 
 	// If the waiter is a fiber, we should use sync_timer_wakeup() to
 	// notify the fiber, or if it's a thread, we should use the
-	// fbase_event_wakeup() to notify it.
+	// fbase_event_wakeup() to wakeup it.
 	// That is to say, a fiber waiter is managed by the sync_timer, and
 	// the thread waiter uses a temporary IO to wait for a notice.
 	if (obj->type == SYNC_OBJ_T_FIBER) {
 		sync_timer_wakeup(obj->timer, obj);
-	} else if (obj->type == SYNC_OBJ_T_THREAD) {
-		if (var_hook_sys_api) {
-			socket_t out = obj->base->event_out;
-			// The waiter is a thread, the out fd is temporaryly
-			// created by the thread waiter, so we just use one
-			// temporary FILE_EVENT to bind the out fd, and
-			// release it after notify the waiter thread.
-			FILE_EVENT *fe = fiber_file_cache_get(out);
-			fe->mask |= EVENT_SYSIO;
-			ret = fbase_event_wakeup(obj->base);
-			fiber_file_cache_put(fe);
-		} else {
-			ret = fbase_event_wakeup(obj->base);
-		}
+	}
+	// else: obj->type == SYNC_OBJ_T_THREAD
+	else if (var_hook_sys_api) {
+		socket_t out = obj->base->event_out;
+		// The waiter is a thread, the out fd is temporaryly
+		// created by the thread waiter, so we just use one
+		// temporary FILE_EVENT to bind the out fd, and
+		// release it after notify the waiter thread.
+		FILE_EVENT *fe = fiber_file_cache_get(out);
+		fe->mask |= EVENT_SYSIO;
+		ret = fbase_event_wakeup(obj->base);
+		fiber_file_cache_put(fe);
 	} else {
-		msg_fatal("%s(%d): unknown type=%d",
-			__FUNCTION__, __LINE__, obj->type);
+		ret = fbase_event_wakeup(obj->base);
 	}
 
 	// Unrefer the waiter object, which will be really freed when its

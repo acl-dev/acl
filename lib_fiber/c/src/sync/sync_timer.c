@@ -143,7 +143,7 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 		//assert(obj->fb->status == FIBER_STATUS_SUSPEND);
 
 		switch (msg->action) {
-		case SYNC_ACTION_AWAIT:
+		case SYNC_ACTION_AWAIT:  // This will be deprecated!
 			assert (obj->delay >= 0);
 			obj->expire = event_get_stamp(ev) + obj->delay;
 			timer_cache_add(timer->waiters, obj->expire, &obj->me);
