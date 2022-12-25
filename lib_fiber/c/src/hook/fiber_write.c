@@ -150,6 +150,10 @@ ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count)
 	}
 #endif
 
+	if (sys_write == NULL) {
+		hook_once();
+	}
+
 	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
@@ -191,6 +195,10 @@ ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 		return ret;
 	}
 #endif
+
+	if (sys_writev == NULL) {
+		hook_once();
+	}
 
 	CHECK_SET_NBLOCK(fe->fd);
 
@@ -234,6 +242,10 @@ ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
 		return ret;
 	}
 #endif
+
+	if (sys_send == NULL) {
+		hook_once();
+	}
 
 	CHECK_SET_NBLOCK(fe->fd);
 
@@ -280,6 +292,10 @@ ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 	}
 #endif
 
+	if (sys_sendto == NULL) {
+		hook_once();
+	}
+
 	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
@@ -322,6 +338,11 @@ ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
 		return ret;
 	}
 #endif
+
+	if (sys_sendmsg == NULL) {
+		hook_once();
+	}
+
 	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
@@ -341,6 +362,10 @@ ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t cou
 		return file_sendfile(out_fd, in_fd, offset, count);
 	}
 #endif
+
+	if (sys_sendfile64 == NULL) {
+		hook_once();
+	}
 
 	CHECK_SET_NBLOCK(out_fd);
 

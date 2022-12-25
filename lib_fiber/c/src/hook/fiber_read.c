@@ -162,24 +162,27 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 #define FIBER_READ(_fn, _fe, ...) do {                                       \
     ssize_t ret;                                                             \
     int err;                                                                 \
-    if (IS_READABLE(_fe)) {                                                  \
-        CLR_READABLE(_fe);                                                   \
-    } else if (fiber_wait_read(_fe) < 0) {                                   \
+    if (IS_READABLE((_fe))) {                                                \
+        CLR_READABLE((_fe));                                                 \
+    } else if (fiber_wait_read((_fe)) < 0) {                                 \
         return -1;                                                           \
     }                                                                        \
-    if (acl_fiber_canceled(_fe->fiber_r)) {                                  \
-        acl_fiber_set_error(_fe->fiber_r->errnum);                           \
+    if (acl_fiber_canceled((_fe)->fiber_r)) {                                \
+        acl_fiber_set_error((_fe)->fiber_r->errnum);                         \
         return -1;                                                           \
     }                                                                        \
-    ret = (*_fn)(_fe->fd, __VA_ARGS__);                                      \
+    if ((_fn) == NULL) {                                                     \
+        hook_once();                                                         \
+    }                                                                        \
+    ret = (*_fn)((_fe)->fd, __VA_ARGS__);                                    \
     if (ret >= 0) {                                                          \
         return ret;                                                          \
     }                                                                        \
     err = acl_fiber_last_error();                                            \
     fiber_save_errno(err);                                                   \
     if (!error_again(err)) {                                                 \
-        if (!(_fe->type & TYPE_EVENTABLE)) {                                 \
-            fiber_file_free(_fe);                                            \
+        if (!((_fe)->type & TYPE_EVENTABLE)) {                               \
+            fiber_file_free((_fe));                                          \
         }                                                                    \
         return -1;                                                           \
     }                                                                        \
@@ -188,24 +191,27 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 #define FIBER_READ(_fn, _fe, _args...) do {                                  \
     ssize_t ret;                                                             \
     int err;                                                                 \
-    if (IS_READABLE(_fe)) {                                                  \
-        CLR_READABLE(_fe);                                                   \
-    } else if (fiber_wait_read(_fe) < 0) {                                   \
+    if (IS_READABLE((_fe))) {                                                \
+        CLR_READABLE((_fe));                                                 \
+    } else if (fiber_wait_read((_fe)) < 0) {                                 \
         return -1;                                                           \
     }                                                                        \
-    if (acl_fiber_canceled(_fe->fiber_r)) {                                  \
-        acl_fiber_set_error(_fe->fiber_r->errnum);                           \
+    if (acl_fiber_canceled((_fe)->fiber_r)) {                                \
+        acl_fiber_set_error((_fe)->fiber_r->errnum);                         \
         return -1;                                                           \
     }                                                                        \
-    ret = (*_fn)(_fe->fd, ##_args);                                          \
+    if ((_fn) == NULL) {                                                     \
+        hook_once();                                                         \
+    }                                                                        \
+    ret = (*_fn)((_fe)->fd, ##_args);                                        \
     if (ret >= 0) {                                                          \
         return ret;                                                          \
     }                                                                        \
     err = acl_fiber_last_error();                                            \
     fiber_save_errno(err);                                                   \
     if (!error_again(err)) {                                                 \
-        if (!(_fe->type & TYPE_EVENTABLE)) {                                 \
-            fiber_file_free(_fe);                                            \
+        if (!((_fe)->type & TYPE_EVENTABLE)) {                               \
+            fiber_file_free((_fe));                                          \
         }                                                                    \
         return -1;                                                           \
     }                                                                        \
