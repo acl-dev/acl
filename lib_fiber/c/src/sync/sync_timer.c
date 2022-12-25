@@ -190,48 +190,32 @@ SYNC_TIMER *sync_timer_get(void)
 
 void sync_timer_await(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
-	if (obj->delay >= 0) {
-		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
-		msg->obj = obj;
-		msg->action = SYNC_ACTION_AWAIT;
-		mbox_send(timer->box, msg);
-	}
+	EVENT *ev = fiber_io_event();
+
+	assert (obj->delay >= 0);
+	obj->expire = event_get_stamp(ev) + obj->delay;
+	timer_cache_add(timer->waiters, obj->expire, &obj->me);
 }
 
 void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
-	SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
-	msg->obj = obj;
-	msg->action = SYNC_ACTION_WAKEUP;
+	if (!var_hook_sys_api) {
+		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+		msg->obj = obj;
+		msg->action = SYNC_ACTION_WAKEUP;
 
-	if (var_hook_sys_api) {
+		mbox_send(timer->box, msg);
+	} else if (thread_self() != timer->tid) {
+		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+		msg->obj = obj;
+		msg->action = SYNC_ACTION_WAKEUP;
 		socket_t out = mbox_out(timer->box);
-		FILE_EVENT *fe;
-		int same_thread;
-
-		// If the current fiber is in the same thread with the one
-		// to be noticed, the out fd is owned by the current thread
-		// and the FILE_EVENT with the out fd should be in long time
-		// status, so we use fiber_file_open_write to get it, or else
-		// the out fd we got is owned by the other thread, and
-		// we just need to get the temporary FILE_EVENT from cache to
-		// bind with the out fd, and release it after mbox_send.
-		if (thread_self() == timer->tid) {
-			fe = fiber_file_open_write(out);
-			same_thread = 1;
-		} else {
-			fe = fiber_file_cache_get(out);
-			same_thread = 0;
-		}
+		FILE_EVENT *fe = fiber_file_cache_get(out);
 
 		fe->mask |= EVENT_SYSIO;
-
 		mbox_send(timer->box, msg);
-
-		if (!same_thread) {
-			fiber_file_cache_put(fe);
-		}
+		fiber_file_cache_put(fe);
 	} else {
-		mbox_send(timer->box, msg);
-	}
+		handle_wakeup(timer, obj);
+	} 
 }
