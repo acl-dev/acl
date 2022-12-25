@@ -246,7 +246,7 @@ static void usage(const char *procname)
 		" -s producer_threads_alone_count\r\n"
 		" -r consumer_threads_alone_count\r\n"
 		" -n total_loop_count\r\n"
-		" -t wait_timeout[default: -1]\r\n"
+		" -t wait_timeout_ms[default: -1]\r\n"
 		" -D [if open debug log to stdout]\r\n"
 		, procname);
 }
