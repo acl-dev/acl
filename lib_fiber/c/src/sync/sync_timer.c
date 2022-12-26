@@ -143,7 +143,7 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 		//assert(obj->fb->status == FIBER_STATUS_SUSPEND);
 
 		switch (msg->action) {
-		case SYNC_ACTION_AWAIT:  // This will be deprecated!
+		case SYNC_ACTION_AWAIT:
 			assert (obj->delay >= 0);
 			obj->expire = event_get_stamp(ev) + obj->delay;
 			timer_cache_add(timer->waiters, obj->expire, &obj->me);
@@ -190,11 +190,21 @@ SYNC_TIMER *sync_timer_get(void)
 
 void sync_timer_await(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
+#if 1
+	SYNC_MSG *msg;
+
+	assert (obj->delay >= 0);
+	msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
+	msg->obj = obj;
+	msg->action = SYNC_ACTION_AWAIT;
+	mbox_send(timer->box, msg);
+#else
 	EVENT *ev = fiber_io_event();
 
 	assert (obj->delay >= 0);
 	obj->expire = event_get_stamp(ev) + obj->delay;
 	timer_cache_add(timer->waiters, obj->expire, &obj->me);
+#endif
 }
 
 void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
