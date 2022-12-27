@@ -29,7 +29,7 @@ TIMER_CACHE *timer_cache_create(void);
 unsigned timer_cache_size(TIMER_CACHE *cache);
 void timer_cache_free(TIMER_CACHE *cache);
 void timer_cache_add(TIMER_CACHE *cache, long long expire, RING *entry);
-void timer_cache_remove(TIMER_CACHE *cache, long long expire, RING *entry);
+int  timer_cache_remove(TIMER_CACHE *cache, long long expire, RING *entry);
 void timer_cache_free_node(TIMER_CACHE *cache, TIMER_CACHE_NODE *node);
 int timer_cache_remove_exist(TIMER_CACHE *cache, long long expire, RING *entry);
 

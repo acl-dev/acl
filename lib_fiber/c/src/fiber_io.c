@@ -188,6 +188,9 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 		}
 
 		while ((fb = (ACL_FIBER*) array_pop_back(timers->objs))) {
+			// Set the flag that the fiber wakeuped for the
+			// timer's arriving.
+			fb->flag |= FIBER_F_TIMER;
 			acl_fiber_ready(fb);
 		}
 
@@ -327,6 +330,9 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 
 	WAITER_DEC(__thread_fiber->event);
 
+	// Clear the flag been set in wakeup_timers.
+	fiber->flag &= ~FIBER_F_TIMER;
+
 	if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
 		ev->timeout = -1;
 	}
@@ -380,16 +386,45 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	return fiber;
 }
 
-void acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
+int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 {
-	long long when;
+	// The previous timer with the fiber must be removed first.
+	int ret = timer_cache_remove(__thread_fiber->ev_timer,
+			fiber->when, &fiber->me);
 
+	if (ret == 0) {
+		msg_error("%s(%d): not found fiber=%p, fid=%d",
+			__FUNCTION__, __LINE__, fiber, acl_fiber_id(fiber));
+		return -1;
+	}
+
+	fiber_timer_add(fiber, milliseconds);
+	return 0;
+}
+
+void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds)
+{
+	EVENT *ev = fiber_io_event();
+	long long now = event_get_stamp(ev);
+	TIMER_CACHE_NODE *timer;
+
+	fiber->when = now + milliseconds;
+	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
+	timer = TIMER_FIRST(__thread_fiber->ev_timer);
+
+	if (timer->expire <= now) {
+		ev->timeout = 0;
+	} else {
+		ev->timeout = (int) (fiber->when - now);
+	}
+}
+
+int fiber_timer_del(ACL_FIBER *fiber)
+{
 	fiber_io_check();
 
-	when = fiber_io_stamp();
-	when += milliseconds;
-	fiber->when = when;
-	fiber->status = FIBER_STATUS_READY;
+	return timer_cache_remove(__thread_fiber->ev_timer,
+			fiber->when, &fiber->me);
 }
 
 unsigned int acl_fiber_sleep(unsigned int seconds)

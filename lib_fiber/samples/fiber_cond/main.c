@@ -95,9 +95,9 @@ static void do_consume(void)
 		}
 
 		if (ret != 0) {
-			printf("thread-%lu, fiber-%d: timedwait error=%s\r\n",
+			printf("thread-%lu, fiber-%d: timedwait error=%s, timeout=%d\r\n",
 				(unsigned long) pthread_self(),
-				acl_fiber_self(), strerror(ret));
+				acl_fiber_self(), strerror(ret), __wait_timeout);
 			continue;
 		}
 

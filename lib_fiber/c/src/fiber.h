@@ -62,6 +62,7 @@ struct ACL_FIBER {
 #define	FIBER_F_CLOSED		(unsigned) (1 << 2)
 #define	FIBER_F_SIGNALED	(unsigned) (1 << 3)
 #define	FIBER_F_CANCELED	(FIBER_F_KILLED | FIBER_F_CLOSED | FIBER_F_SIGNALED)
+#define	FIBER_F_TIMER		(unsigned) (1 << 4)
 
 	RING           holding;
 	ACL_FIBER_LOCK *waiting;
@@ -123,6 +124,8 @@ int fiber_wait_read(FILE_EVENT *fe);
 int fiber_wait_write(FILE_EVENT *fe);
 
 EVENT *fiber_io_event(void);
+void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds);
+int fiber_timer_del(ACL_FIBER *fiber);
 
 FILE_EVENT *fiber_file_open_read(socket_t fd);
 FILE_EVENT *fiber_file_open_write(socket_t fd);

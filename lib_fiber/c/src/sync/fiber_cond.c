@@ -108,8 +108,9 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	array_delete_obj(cond->waiters, obj, NULL);
 	UNLOCK_COND(cond);
 
-	if (obj->status & SYNC_STATUS_TIMEOUT) {
+	if (fiber->flag & FIBER_F_TIMER) {
 		// The obj has been deleted in sync_timer.c when timeout.
+		fiber->flag &= ~FIBER_F_TIMER;
 		sync_obj_unrefer(obj);
 		return FIBER_ETIME;
 	}

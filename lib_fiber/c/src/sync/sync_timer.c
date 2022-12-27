@@ -83,7 +83,8 @@ static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 			// be returned if the obj has been in the cond, or else
 			// -1 will return, so we just set the DELAYED flag.
 			if (fiber_cond_delete_waiter(obj->cond, obj) == 0) {
-				obj->status = SYNC_STATUS_TIMEOUT;
+				//obj->status = SYNC_STATUS_TIMEOUT;
+				obj->fb->flag |= FIBER_F_TIMER;
 				acl_fiber_ready(obj->fb);
 			} else {
 				obj->status = SYNC_STATUS_DELAYED;
@@ -109,7 +110,25 @@ static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 	return 100;
 }
 
-static void handle_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
+#define	USE_GLOBAL_TIMER
+
+#if defined(USE_GLOBAL_TIMER)
+static void wakeup_waiter(SYNC_TIMER *timer UNUSED, SYNC_OBJ *obj)
+{
+	// The fiber must has been wakeuped by the other fiber or thread.
+
+	// No timer has been set if delay < 0, 
+	if (obj->delay < 0) {
+		acl_fiber_ready(obj->fb);
+	}
+	// The wakeup is earlier than the timer if deleting timer successfully.
+	else if (fiber_timer_del(obj->fb) == 1) {
+		acl_fiber_ready(obj->fb);
+	}
+	// else: The fiber has been wakeuped by the timer.
+}
+#else
+static void wakeup_waiter(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
 	if (obj->delay < 0) {
 		acl_fiber_ready(obj->fb);
@@ -118,10 +137,10 @@ static void handle_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		acl_fiber_ready(obj->fb);
 	} else if (obj->status & SYNC_STATUS_DELAYED) {
 		acl_fiber_ready(obj->fb);
-	} else {
-		msg_error("%s(%d): no obj=%p", __FUNCTION__, __LINE__, obj);
 	}
+	// else: the fiber has been wakeuped by the timer.
 }
+#endif
 
 static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 {
@@ -143,6 +162,7 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 		//assert(obj->fb->status == FIBER_STATUS_SUSPEND);
 
 		switch (msg->action) {
+#if !defined(USE_GLOBAL_TIMER)
 		case SYNC_ACTION_AWAIT:
 			assert (obj->delay >= 0);
 			obj->expire = event_get_stamp(ev) + obj->delay;
@@ -151,8 +171,9 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 				delay = obj->delay;
 			}
 			break;
+#endif
 		case SYNC_ACTION_WAKEUP:
-			handle_wakeup(timer, obj);
+			wakeup_waiter(timer, obj);
 			break;
 		default:
 			msg_fatal("%s(%d): unkown action=%d",
@@ -190,7 +211,11 @@ SYNC_TIMER *sync_timer_get(void)
 
 void sync_timer_await(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
-#if 1
+#if defined(USE_GLOBAL_TIMER)
+	(void) timer;
+	assert (obj->delay >= 0);
+	fiber_timer_add(obj->fb, obj->delay);
+#else
 	SYNC_MSG *msg;
 
 	assert (obj->delay >= 0);
@@ -198,12 +223,6 @@ void sync_timer_await(SYNC_TIMER *timer, SYNC_OBJ *obj)
 	msg->obj = obj;
 	msg->action = SYNC_ACTION_AWAIT;
 	mbox_send(timer->box, msg);
-#else
-	EVENT *ev = fiber_io_event();
-
-	assert (obj->delay >= 0);
-	obj->expire = event_get_stamp(ev) + obj->delay;
-	timer_cache_add(timer->waiters, obj->expire, &obj->me);
 #endif
 }
 
@@ -226,6 +245,6 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		mbox_send(timer->box, msg);
 		fiber_file_cache_put(fe);
 	} else {
-		handle_wakeup(timer, obj);
+		wakeup_waiter(timer, obj);
 	} 
 }

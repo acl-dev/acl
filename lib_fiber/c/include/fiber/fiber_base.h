@@ -273,8 +273,9 @@ FIBER_API ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds,
  * Reset the timer milliseconds time before the timer fiber wakeup
  * @param timer {ACL_FIBER*} the fiber created by acl_fiber_create_timer
  * @param milliseconds {unsigned int} the new timer wakeup milliseconds
+ * @return {int} return 0 if rest timer success, else return -1 if failed
  */
-FIBER_API void acl_fiber_reset_timer(ACL_FIBER* timer, unsigned int milliseconds);
+FIBER_API int acl_fiber_reset_timer(ACL_FIBER* timer, unsigned int milliseconds);
 
 /**
  * Set the DNS service addr
