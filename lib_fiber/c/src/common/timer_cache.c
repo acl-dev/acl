@@ -26,6 +26,7 @@ TIMER_CACHE *timer_cache_create(void)
 		offsetof(TIMER_CACHE_NODE, node));
 	ring_init(&cache->caches);
 	cache->cache_max = 1000;
+	cache->objs = array_create(100, ARRAY_F_UNORDER);
 
 	return cache;
 }
@@ -54,6 +55,7 @@ void timer_cache_free(TIMER_CACHE *cache)
 		mem_free(node);
 	}
 
+	array_free(cache->objs, NULL);
 	mem_free(cache);
 }
 

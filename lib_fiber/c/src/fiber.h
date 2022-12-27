@@ -53,7 +53,6 @@ struct ACL_FIBER {
 	unsigned       slot;
 	long long      when;
 	int            errnum;
-	int            sys;
 	int            signum;
 	unsigned int   oflag;
 	unsigned int   flag;
@@ -107,9 +106,6 @@ int fbase_event_wakeup(FIBER_BASE *fbase);
 /* in fiber_schedule.c */
 void fiber_save_errno(int errnum);
 void fiber_exit(int exit_code);
-void fiber_system(void);
-void fiber_count_inc(void);
-void fiber_count_dec(void);
 
 /* in fiber_io.c */
 extern int var_maxfd;

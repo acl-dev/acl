@@ -70,7 +70,7 @@ static void thread_init(void)
 static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 {
 	long long now = event_get_stamp(ev), expire = -1;
-	TIMER_CACHE_NODE *node = avl_first(&timer->waiters->tree), *next;
+	TIMER_CACHE_NODE *node = TIMER_FIRST(timer->waiters), *next;
 	RING_ITER iter;
 
 	expire = node ? node->expire : -1;
@@ -90,7 +90,7 @@ static int check_expire(EVENT *ev, SYNC_TIMER *timer)
 			}
 		}
 
-		next = AVL_NEXT(&timer->waiters->tree, node);
+		next = TIMER_NEXT(timer->waiters, node);
 
 		// Remove all the waiters in the node and remove the node.
 		timer_cache_free_node(timer->waiters, node);

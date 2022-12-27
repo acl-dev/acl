@@ -433,7 +433,7 @@ static void event_process_poll(EVENT *ev)
 	RING *head;
 	POLL_EVENT *pe;
 	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = avl_first(&ev->poll_list->tree), *next;
+	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->poll_list), *next;
 
 	/* Check and call all the pe's callback which was timeout except the
 	 * pe which has been ready and been removed from ev->poll_list. The
@@ -441,7 +441,7 @@ static void event_process_poll(EVENT *ev)
 	 * hook/poll.c.
 	 */
 	while (node && node->expire >= 0 && node->expire <= now) {
-		next = AVL_NEXT(&ev->poll_list->tree, node);
+		next = TIMER_NEXT(ev->poll_list, node);
 
 		// Call all the pe's callback with the same expire time.
 		ring_foreach(iter, &node->ring) {
@@ -468,10 +468,10 @@ static void event_process_epoll(EVENT *ev)
 	RING *head;
 	EPOLL_EVENT *ee;
 	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = avl_first(&ev->epoll_list->tree), *next;
+	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->epoll_list), *next;
 
 	while (node && node->expire >= 0 && node->expire <= now) {
-		next = AVL_NEXT(&ev->epoll_list->tree, node);
+		next = TIMER_NEXT(ev->epoll_list, node);
 
 		ring_foreach(iter, &node->ring) {
 			ee = TO_APPL(iter.ptr, EPOLL_EVENT, me);

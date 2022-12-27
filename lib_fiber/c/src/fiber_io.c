@@ -3,24 +3,25 @@
 
 #include "fiber/libfiber.h"
 #include "common/gettimeofday.h"
+#include "common/array.h"
+#include "common/timer_cache.h"
 #include "event.h"
 #include "hook/hook.h"
 #include "hook/io.h"
 #include "fiber.h"
 
 typedef struct {
-	EVENT     *event;
-	ACL_FIBER *ev_fiber;
-	RING       ev_timer;
-	int        nsleeping;
-	int        io_stop;
+	EVENT       *event;
+	ACL_FIBER   *ev_fiber;
+	TIMER_CACHE *ev_timer;
+	int          io_stop;
 #ifdef SYS_WIN
-	HTABLE     *events;
+	HTABLE      *events;
 #else
 	FILE_EVENT **events;
 #endif
-	ARRAY      *cache;
-	int         cache_max;
+	ARRAY       *cache;
+	int          cache_max;
 } FIBER_TLS;
 
 static FIBER_TLS *__main_fiber = NULL;
@@ -68,6 +69,8 @@ static void thread_free(void *ctx)
 		tf->event = NULL;
 	}
 
+	timer_cache_free(tf->ev_timer);
+
 #ifdef SYS_WIN
 	htable_free(tf->events, NULL);
 #else
@@ -113,9 +116,8 @@ static void thread_init(void)
 	__thread_fiber->event = event_create(var_maxfd);
 	__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
 			__thread_fiber->event, STACK_SIZE);
-	__thread_fiber->nsleeping = 0;
 	__thread_fiber->io_stop   = 0;
-	ring_init(&__thread_fiber->ev_timer);
+	__thread_fiber->ev_timer  = timer_cache_create();
 
 #ifdef SYS_WIN
 	__thread_fiber->events = htable_create(var_maxfd);
@@ -143,24 +145,19 @@ static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
 void fiber_io_check(void)
 {
-	if (__thread_fiber != NULL) {
-		if (__thread_fiber->ev_fiber == NULL) {
-			__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
-				__thread_fiber->event, STACK_SIZE);
-			__thread_fiber->nsleeping = 0;
-			__thread_fiber->io_stop   = 0;
-			ring_init(&__thread_fiber->ev_timer);
+	if (__thread_fiber == NULL) {
+		if (pthread_once(&__once_control, thread_once) != 0) {
+			printf("%s(%d), %s: pthread_once error %s\r\n",
+				__FILE__, __LINE__, __FUNCTION__, last_serror());
+			abort();
 		}
-		return;
-	}
 
-	if (pthread_once(&__once_control, thread_once) != 0) {
-		printf("%s(%d), %s: pthread_once error %s\r\n",
-			__FILE__, __LINE__, __FUNCTION__, last_serror());
-		abort();
+		thread_init();
+	} else if (__thread_fiber->ev_fiber == NULL) {
+		__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
+				__thread_fiber->event, STACK_SIZE);
+		__thread_fiber->io_stop   = 0;
 	}
-
-	thread_init();
 }
 
 EVENT *fiber_io_event(void)
@@ -175,27 +172,50 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
+static void wakeup_timers(TIMER_CACHE *timers, long long now)
+{
+	TIMER_CACHE_NODE *node = TIMER_FIRST(timers), *next;
+	ACL_FIBER *fb;
+	RING_ITER iter;
+
+	while (node && node->expire <= now) {
+		// Add the fiber objects into temp array, because the
+		// ACL_FIBER::me will be used in acl_fiber_ready that we
+		// shouldn't use it in the walk through the node's ring.
+		ring_foreach(iter, &node->ring) {
+			fb = ring_to_appl(iter.ptr, ACL_FIBER, me);
+			array_append(timers->objs, fb);
+		}
+
+		while ((fb = (ACL_FIBER*) array_pop_back(timers->objs))) {
+			acl_fiber_ready(fb);
+		}
+
+		next = TIMER_NEXT(timers, node);
+		timer_cache_free_node(timers, node);
+		node = next;
+	}
+}
+
 static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 {
 	EVENT *ev = (EVENT *) ctx;
-	ACL_FIBER *timer;
+	TIMER_CACHE_NODE *timer;
 	long long now, last = 0, left;
-
-	fiber_system();
 
 	for (;;) {
 		while (acl_fiber_yield() > 0) {}
 
-		timer = FIRST_FIBER(&__thread_fiber->ev_timer);
+		timer = TIMER_FIRST(__thread_fiber->ev_timer);
 		if (timer == NULL) {
 			left = -1;
 		} else {
 			now  = event_get_stamp(__thread_fiber->event);
 			last = now;
-			if (now >= timer->when) {
+			if (now >= timer->expire) {
 				left = 0;
 			} else {
-				left = timer->when - now;
+				left = timer->expire - now;
 			}
 		}
 
@@ -217,40 +237,30 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			 */
 			while (acl_fiber_yield() > 0) {}
 
-			if (/*ev->fdcount > 0 || */ ev->waiter > 0) {
+			if (ev->waiter > 0) {
 				continue;
 			} else if (ring_size(&ev->events) > 0) {
 				continue;
 			}
 			
+#if 0
 			// Only sleep fiber alive ?
-			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
+			timer = TIMER_FIRST(__thread_fiber->ev_timer);
 			if (timer) {
 				continue;
 			}
+#endif
 
-			msg_info("%s(%d), tid=%lu: fdcount=0, waiter=%u, events=%d",
+			msg_info("%s(%d), tid=%lu: waiter=%u, events=%d",
 				__FUNCTION__, __LINE__, thread_self(),
 				ev->waiter, ring_size(&ev->events));
 			break;
 		}
 
 		now = event_get_stamp(__thread_fiber->event);
-		if (now - last < left) {
-			continue;
+		if (now - last >= left && timer) {
+			wakeup_timers(__thread_fiber->ev_timer, now);
 		}
-
-		do {
-			ring_detach(&timer->me);
-
-			if (!timer->sys && --__thread_fiber->nsleeping == 0) {
-				fiber_count_dec();
-			}
-
-			timer->status = FIBER_STATUS_NONE;
-			acl_fiber_ready(timer);
-			timer = FIRST_FIBER(&__thread_fiber->ev_timer);
-		} while (timer != NULL && now >= timer->when);
 	}
 
 	msg_info("%s(%d), tid=%lu: IO fiber exit now",
@@ -275,7 +285,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 {
 	long long when, now;
 	ACL_FIBER *fiber;
-	RING_ITER iter;
+	TIMER_CACHE_NODE *timer;
 	EVENT *ev;
 
 	if (!var_hook_sys_api) {
@@ -290,31 +300,15 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	now = event_get_stamp(ev);
 	when = now + milliseconds;
 
-	/* The timers in the ring were stored from small to large in ascending
-	 * order, and we walk through the ring from head to tail until the
-	 * current time is less than the timer's stamp, and the new timer will
-	 * be prepend to the timer found.
-	 */
-	ring_foreach(iter, &__thread_fiber->ev_timer) {
-		fiber = ring_to_appl(iter.ptr, ACL_FIBER, me);
-		if (when < fiber->when) {
-			break;
-		}
-	}
-
 	fiber = acl_fiber_running();
 	fiber->when = when;
 	ring_detach(&fiber->me);
-	ring_prepend(iter.ptr, &fiber->me);
-
-	if (!fiber->sys && __thread_fiber->nsleeping++ == 0) {
-		fiber_count_inc();
-	}
+	timer_cache_add(__thread_fiber->ev_timer, when, &fiber->me);
 
 #ifdef	CHECK_MIN
 	/* Compute the event waiting interval according the timers' head */
-	fiber = FIRST_FIBER(&__thread_fiber->ev_timer);
-	if (fiber->when <= now) {
+	timer = TIMER_FIRST(__thread_fiber->ev_timer);
+	if (timer->expire <= now) {
 		/* If the first timer has been expired, we should wakeup it
 		 * immediately, so the event waiting interval should be set 0.
 		 */
@@ -327,9 +321,13 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	ev->timeout = 10;
 #endif
 
+	WAITER_INC(__thread_fiber->event);
+
 	acl_fiber_switch();
 
-	if (ring_size(&__thread_fiber->ev_timer) == 0) {
+	WAITER_DEC(__thread_fiber->event);
+
+	if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
 		ev->timeout = -1;
 	}
 
@@ -481,9 +479,15 @@ int fiber_wait_write(FILE_EVENT *fe)
 	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
 	SET_WRITEWAIT(fe);
 
-	WAITER_INC(__thread_fiber->event);
+	if (!(fe->type & TYPE_INTERNAL)) {
+		WAITER_INC(__thread_fiber->event);
+	}
+
 	acl_fiber_switch();
-	WAITER_DEC(__thread_fiber->event);
+
+	if (!(fe->type & TYPE_INTERNAL)) {
+		WAITER_DEC(__thread_fiber->event);
+	}
 
 	return ret;
 }

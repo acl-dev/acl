@@ -7,6 +7,7 @@
 #include "fiber/libfiber.h"
 
 static int __fibers_count = 2;
+static int __sleep_count  = 10;
 
 enum {
 	SELECT_SLEEP = 1,
@@ -32,10 +33,10 @@ static void poll_sleep(int seconds)
 
 static void sleep_main(ACL_FIBER *fiber, void *ctx)
 {
-	int *n = (int *) ctx;
+	int *n = (int *) ctx, i;
 	time_t last, now;
 
-	while (1) {
+	for (i = 0; i < __sleep_count; i++) {
 		switch (__sleep_way) {
 		case SELECT_SLEEP:
 			select_sleep(1);
@@ -47,7 +48,7 @@ static void sleep_main(ACL_FIBER *fiber, void *ctx)
 			acl_fiber_sleep(1);
 			break;
 		}
-		printf("fiber-%d wakeup\r\n", acl_fiber_self());
+		printf("fiber-%d wakeup %d\r\n", acl_fiber_self(), i);
 	}
 
 	printf("fiber-%d: begin sleep %d\r\n", acl_fiber_id(fiber), *n);
@@ -68,14 +69,17 @@ static void sleep_main(ACL_FIBER *fiber, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -c nfibers -s sleep_way[select|poll|normal]\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -c nfibers\r\n"
+		" -n sleep_count\r\n"
+		" -s sleep_way[select|poll|normal]\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int   ch, i;
 
-	while ((ch = getopt(argc, argv, "hc:s:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:s:n:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -89,6 +93,9 @@ int main(int argc, char *argv[])
 			} else if (strcasecmp(optarg, "poll") == 0) {
 				__sleep_way = POLL_SLEEP;
 			}
+			break;
+		case 'n':
+			__sleep_count = atoi(optarg);
 			break;
 		default:
 			break;

@@ -33,7 +33,6 @@ typedef struct THREAD {
 	ACL_FIBER *running;
 	ACL_FIBER *original;
 	int        errnum;
-	int        count;
 	size_t     switched;
 	size_t     switched_old;
 	int        nlocal;
@@ -187,7 +186,6 @@ static void fiber_check(void)
 	__thread_fiber->fibers   = NULL;
 	__thread_fiber->size     = 0;
 	__thread_fiber->slot     = 0;
-	__thread_fiber->count    = 0;
 	__thread_fiber->nlocal   = 0;
 
 #ifdef	SHARE_STACK
@@ -428,10 +426,6 @@ static void fiber_swap(ACL_FIBER *from, ACL_FIBER *to)
 		if (n > MAX_CACHE) {
 			n -= MAX_CACHE;
 			fiber_kick(n);
-		}
-
-		if (!from->sys) {
-			__thread_fiber->count--;
 		}
 
 		__thread_fiber->fibers[slot] =
@@ -783,8 +777,6 @@ ACL_FIBER *acl_fiber_create2(const ACL_FIBER_ATTR *attr,
 {
 	ACL_FIBER *fiber = fiber_alloc(fn, arg, attr);
 
-	__thread_fiber->count++;
-
 	if (__thread_fiber->slot >= __thread_fiber->size) {
 		__thread_fiber->size  += 128;
 		__thread_fiber->fibers = (ACL_FIBER **) mem_realloc(
@@ -903,24 +895,6 @@ void acl_fiber_schedule(void)
 	fiber_io_clear();
 	fiber_hook_api(0);
 	__scheduled = 0;
-}
-
-void fiber_system(void)
-{
-	if (!__thread_fiber->running->sys) {
-		__thread_fiber->running->sys = 1;
-		__thread_fiber->count--;
-	}
-}
-
-void fiber_count_inc(void)
-{
-	__thread_fiber->count++;
-}
-
-void fiber_count_dec(void)
-{
-	__thread_fiber->count--;
 }
 
 void acl_fiber_switch(void)

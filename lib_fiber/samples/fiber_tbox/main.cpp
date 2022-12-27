@@ -39,7 +39,6 @@ static void push_one(acl::fiber_tbox<myobj>& tbox)
 		printf("diff=%lld sleep %d ms\r\n", p - c, __delay);
 		acl::fiber::delay(100);
 	}
-
 }
 
 class fiber_producer : public acl::fiber
