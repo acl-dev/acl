@@ -67,85 +67,24 @@ static void thread_init(void)
 	}
 }
 
-static int check_expire(EVENT *ev, SYNC_TIMER *timer)
-{
-	long long now = event_get_stamp(ev), expire = -1;
-	TIMER_CACHE_NODE *node = TIMER_FIRST(timer->waiters), *next;
-	RING_ITER iter;
-
-	expire = node ? node->expire : -1;
-
-	while (node && node->expire >= 0 && node->expire <= now) {
-		ring_foreach(iter, &node->ring) {
-			SYNC_OBJ *obj = ring_to_appl(iter.ptr, SYNC_OBJ, me);
-
-			// Try to delete the obj from cond's waiters, 0 will
-			// be returned if the obj has been in the cond, or else
-			// -1 will return, so we just set the DELAYED flag.
-			if (fiber_cond_delete_waiter(obj->cond, obj) == 0) {
-				//obj->status = SYNC_STATUS_TIMEOUT;
-				obj->fb->flag |= FIBER_F_TIMER;
-				acl_fiber_ready(obj->fb);
-			} else {
-				obj->status = SYNC_STATUS_DELAYED;
-			}
-		}
-
-		next = TIMER_NEXT(timer->waiters, node);
-
-		// Remove all the waiters in the node and remove the node.
-		timer_cache_free_node(timer->waiters, node);
-
-		node = next;
-	}
-
-	if (node && node->expire > expire) {
-		expire = node->expire;
-	}
-
-	if (expire > now) {
-		return (int) (expire - now);
-	}
-	// xxx?
-	return 100;
-}
-
-#define	USE_GLOBAL_TIMER
-
-#if defined(USE_GLOBAL_TIMER)
 static void wakeup_waiter(SYNC_TIMER *timer UNUSED, SYNC_OBJ *obj)
 {
-	// The fiber must has been wakeuped by the other fiber or thread.
+	// The fiber must has been awakened by the other fiber or thread.
 
-	// No timer has been set if delay < 0, 
 	if (obj->delay < 0) {
+		// No timer has been set if delay < 0, 
+		acl_fiber_ready(obj->fb);
+	} else if (fiber_timer_del(obj->fb) == 1) {
+		// Wakeup the waiting fiber before the timer arrives,
+		// just remove it from the timer.
 		acl_fiber_ready(obj->fb);
 	}
-	// The wakeup is earlier than the timer if deleting timer successfully.
-	else if (fiber_timer_del(obj->fb) == 1) {
-		acl_fiber_ready(obj->fb);
-	}
-	// else: The fiber has been wakeuped by the timer.
+	// else: The fiber has been awakened by the timer.
 }
-#else
-static void wakeup_waiter(SYNC_TIMER *timer, SYNC_OBJ *obj)
-{
-	if (obj->delay < 0) {
-		acl_fiber_ready(obj->fb);
-	} else if (timer_cache_remove_exist(timer->waiters,
-			obj->expire, &obj->me)) {
-		acl_fiber_ready(obj->fb);
-	} else if (obj->status & SYNC_STATUS_DELAYED) {
-		acl_fiber_ready(obj->fb);
-	}
-	// else: the fiber has been wakeuped by the timer.
-}
-#endif
 
 static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 {
 	SYNC_TIMER *timer = (SYNC_TIMER*) ctx;
-	EVENT *ev = fiber_io_event();
 	SYNC_OBJ *obj;
 	int delay = -1, res;
 
@@ -153,7 +92,6 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 		SYNC_MSG *msg = mbox_read(timer->box, delay, &res);
 
 		if (msg == NULL) {
-			delay = check_expire(ev, timer);
 			continue;
 		}
 
@@ -162,16 +100,6 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 		//assert(obj->fb->status == FIBER_STATUS_SUSPEND);
 
 		switch (msg->action) {
-#if !defined(USE_GLOBAL_TIMER)
-		case SYNC_ACTION_AWAIT:
-			assert (obj->delay >= 0);
-			obj->expire = event_get_stamp(ev) + obj->delay;
-			timer_cache_add(timer->waiters, obj->expire, &obj->me);
-			if (delay == -1 || obj->delay < delay) {
-				delay = obj->delay;
-			}
-			break;
-#endif
 		case SYNC_ACTION_WAKEUP:
 			wakeup_waiter(timer, obj);
 			break;
@@ -181,9 +109,9 @@ static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
 			break;
 		}
 
+		// Decrease reference to the obj added in sync_timer_wakeup.
+		sync_obj_unrefer(obj);
 		mem_free(msg);
-
-		delay = check_expire(ev, timer);
 
 		if (timer_cache_size(timer->waiters) == 0) {
 			delay = -1;
@@ -209,32 +137,24 @@ SYNC_TIMER *sync_timer_get(void)
 	return timer;
 }
 
-void sync_timer_await(SYNC_TIMER *timer, SYNC_OBJ *obj)
-{
-#if defined(USE_GLOBAL_TIMER)
-	(void) timer;
-	assert (obj->delay >= 0);
-	fiber_timer_add(obj->fb, obj->delay);
-#else
-	SYNC_MSG *msg;
-
-	assert (obj->delay >= 0);
-	msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
-	msg->obj = obj;
-	msg->action = SYNC_ACTION_AWAIT;
-	mbox_send(timer->box, msg);
-#endif
-}
-
 void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 {
 	if (!var_hook_sys_api) {
+		// If the current notifier is a thread, just send message.
+
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
 		msg->obj = obj;
 		msg->action = SYNC_ACTION_WAKEUP;
 
+		// Add a reference to the obj when it's on the fly to avoid
+		// the obj was freed in advance, because the obj will be used
+		// in fiber_waiting().
+		sync_obj_refer(obj);
 		mbox_send(timer->box, msg);
 	} else if (thread_self() != timer->tid) {
+		// If the current notifier is a fiber of another thread, send
+		// message with the temporary FILE_EVENT.
+
 		SYNC_MSG *msg = (SYNC_MSG*) mem_malloc(sizeof(SYNC_MSG));
 		msg->obj = obj;
 		msg->action = SYNC_ACTION_WAKEUP;
@@ -242,9 +162,14 @@ void sync_timer_wakeup(SYNC_TIMER *timer, SYNC_OBJ *obj)
 		FILE_EVENT *fe = fiber_file_cache_get(out);
 
 		fe->mask |= EVENT_SYSIO;
+
+		sync_obj_refer(obj);
 		mbox_send(timer->box, msg);
 		fiber_file_cache_put(fe);
 	} else {
+		// If the current notifier is a fiber in the same thread with
+		// the one to be awakened, just wakeup it directly.
+
 		wakeup_waiter(timer, obj);
 	} 
 }

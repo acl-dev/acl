@@ -93,13 +93,20 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	UNLOCK_COND(cond);
 
 	if (delay >= 0) {
-		sync_timer_await(obj->timer, obj);
+		// Add the current fiber to the timer which will be awakened
+		// when the timer arrives before the fiber being awakened by
+		// other fiber or thread.
+		fiber_timer_add(obj->fb, obj->delay);
 	}
 
 	FIBER_UNLOCK(mutex);
 
 	WAITER_INC(ev);
+
+	// Hang the current fiber and will wakeup if the timer arrives or
+	// be awakened by the other fiber or thread.
 	acl_fiber_switch();
+
 	WAITER_DEC(ev);
 
 	FIBER_LOCK(mutex);
@@ -237,15 +244,5 @@ int acl_fiber_cond_signal(ACL_FIBER_COND *cond)
 	// reference is zero. It's safely that the waiter object is used
 	// by multiple threads with using the reference way.
 	sync_obj_unrefer(obj);
-	return ret;
-}
-
-int fiber_cond_delete_waiter(ACL_FIBER_COND *cond, SYNC_OBJ *obj)
-{
-	int ret;
-
-	LOCK_COND(cond);
-	ret = array_delete_obj(cond->waiters, obj, NULL);
-	UNLOCK_COND(cond);
 	return ret;
 }

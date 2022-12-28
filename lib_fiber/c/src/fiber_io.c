@@ -172,6 +172,38 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
+void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds)
+{
+	EVENT *ev = fiber_io_event();
+	long long now = event_get_stamp(ev);
+	TIMER_CACHE_NODE *timer;
+
+	fiber->when = now + milliseconds;
+	ring_detach(&fiber->me);
+	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
+
+	/* Compute the event waiting interval according the timers' head */
+	timer = TIMER_FIRST(__thread_fiber->ev_timer);
+
+	if (timer->expire <= now) {
+		/* If the first timer has been expired, we should wakeup it
+		 * immediately, so the event waiting interval should be set 0.
+		 */
+		ev->timeout = 0;
+	} else {
+		/* Then we use the interval between the first timer and now */
+		ev->timeout = (int) (fiber->when - now);
+	}
+}
+
+int fiber_timer_del(ACL_FIBER *fiber)
+{
+	fiber_io_check();
+
+	return timer_cache_remove(__thread_fiber->ev_timer,
+			fiber->when, &fiber->me);
+}
+
 static void wakeup_timers(TIMER_CACHE *timers, long long now)
 {
 	TIMER_CACHE_NODE *node = TIMER_FIRST(timers), *next;
@@ -261,8 +293,12 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		}
 
 		now = event_get_stamp(__thread_fiber->event);
-		if (now - last >= left && timer) {
+		if (now - last >= left) {
 			wakeup_timers(__thread_fiber->ev_timer, now);
+		}
+
+		if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
+			__thread_fiber->event->timeout = -1;
 		}
 	}
 
@@ -282,13 +318,10 @@ void fiber_io_clear(void)
 	}
 }
 
-#define CHECK_MIN
-
 unsigned int acl_fiber_delay(unsigned int milliseconds)
 {
-	long long when, now;
+	long long now;
 	ACL_FIBER *fiber;
-	TIMER_CACHE_NODE *timer;
 	EVENT *ev;
 
 	if (!var_hook_sys_api) {
@@ -296,33 +329,8 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 		return 0;
 	}
 
-	fiber_io_check();
-
-	ev = fiber_io_event();
-
-	now = event_get_stamp(ev);
-	when = now + milliseconds;
-
 	fiber = acl_fiber_running();
-	fiber->when = when;
-	ring_detach(&fiber->me);
-	timer_cache_add(__thread_fiber->ev_timer, when, &fiber->me);
-
-#ifdef	CHECK_MIN
-	/* Compute the event waiting interval according the timers' head */
-	timer = TIMER_FIRST(__thread_fiber->ev_timer);
-	if (timer->expire <= now) {
-		/* If the first timer has been expired, we should wakeup it
-		 * immediately, so the event waiting interval should be set 0.
-		 */
-		ev->timeout = 0;
-	} else {
-		/* Then we use the interval between the first timer and now */
-		ev->timeout = (int) (fiber->when - now);
-	}
-#else
-	ev->timeout = 10;
-#endif
+	fiber_timer_add(fiber, milliseconds);
 
 	WAITER_INC(__thread_fiber->event);
 
@@ -333,16 +341,13 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	// Clear the flag been set in wakeup_timers.
 	fiber->flag &= ~FIBER_F_TIMER;
 
-	if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
-		ev->timeout = -1;
-	}
-
+	ev = fiber_io_event();
 	now = event_get_stamp(ev);
-	if (now < when) {
+	if (now <= fiber->when) {
 		return 0;
 	}
 
-	return (unsigned int) (now - when);
+	return (unsigned int) (now - fiber->when);
 }
 
 static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
@@ -389,9 +394,7 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 {
 	// The previous timer with the fiber must be removed first.
-	int ret = timer_cache_remove(__thread_fiber->ev_timer,
-			fiber->when, &fiber->me);
-
+	int ret = fiber_timer_del(fiber);
 	if (ret == 0) {
 		msg_error("%s(%d): not found fiber=%p, fid=%d",
 			__FUNCTION__, __LINE__, fiber, acl_fiber_id(fiber));
@@ -400,31 +403,6 @@ int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 
 	fiber_timer_add(fiber, milliseconds);
 	return 0;
-}
-
-void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds)
-{
-	EVENT *ev = fiber_io_event();
-	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *timer;
-
-	fiber->when = now + milliseconds;
-	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
-	timer = TIMER_FIRST(__thread_fiber->ev_timer);
-
-	if (timer->expire <= now) {
-		ev->timeout = 0;
-	} else {
-		ev->timeout = (int) (fiber->when - now);
-	}
-}
-
-int fiber_timer_del(ACL_FIBER *fiber)
-{
-	fiber_io_check();
-
-	return timer_cache_remove(__thread_fiber->ev_timer,
-			fiber->when, &fiber->me);
 }
 
 unsigned int acl_fiber_sleep(unsigned int seconds)

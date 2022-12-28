@@ -40,7 +40,6 @@ typedef struct SYNC_OBJ {
 
 	int status;
 #define	SYNC_STATUS_TIMEOUT	(1 << 0)
-#define	SYNC_STATUS_DELAYED	(1 << 1)
 } SYNC_OBJ;
 
 typedef struct SYNC_MSG {
