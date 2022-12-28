@@ -1,0 +1,6 @@
+LOG|print
+tbox_thread_wait|0|0|delay=100,count=10,min_diff=5
+tbox_fiber_wait|0|0|delay=100,count=10,min_diff=5,nfiber=2
+tbox_fiber_wait|-1|0|delay=100,count=10,min_diff=0,nfiber=1
+tbox_fiber_consume|0|0|delay=100,count=10,consumers=2,producers=2
+tbox_fiber_consume|0|0|delay=100,count=100000,consumers=2,producers=2
