@@ -28,7 +28,7 @@ AUT_LINE *aut_line_new(const ACL_CFG_LINE *cfg_line)
 		"%s", cfg_line->value[0]);
 	test_line->obj_type  = AUT_OBJ_OUTER;
 
-	return (test_line);
+	return test_line;
 }
 
 void aut_line_free(void *ctx)
@@ -60,10 +60,10 @@ const ACL_ARRAY *aut_args_get(const char *cmd_name)
 		if (test_line == NULL)
 			break;
 		if (strcasecmp(cmd_name, test_line->cmd_name) == 0)
-			return (test_line->argv);
+			return test_line->argv;
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 int aut_size(void)
@@ -75,7 +75,7 @@ int aut_size(void)
 		aut_log_fatal("%s: var_aut_line_array=NULL", myname);
 
 	n = acl_array_size(var_aut_line_array);
-	return (n);
+	return n;
 }
 
 AUT_LINE *aut_index(int idx)
@@ -92,11 +92,11 @@ AUT_LINE *aut_index(int idx)
 	if (idx < 0 || idx > n) {
 		printf("%s: idx=%d, acl_array_size=%d, err_msg=invalid idx\n",
 			myname, idx, n);
-		return (NULL);
+		return NULL;
 	}
 
 	test_line = (AUT_LINE *) acl_array_index(var_aut_line_array, idx);
-	return (test_line);
+	return test_line;
 }
 
 /* 比较所给的命令字与配置行中的命令字是否相等 */
@@ -106,10 +106,10 @@ int aut_line_cmdcmp(const AUT_LINE *test_line, const char *cmd_name)
 
 	if (test_line == NULL || cmd_name == NULL) {
 		printf("%s: input error\n", myname);
-		return (-1);
+		return -1;
 	}
 
-	return (strcasecmp(test_line->cmd_name, cmd_name));
+	return strcasecmp(test_line->cmd_name, cmd_name);
 }
 
 /* 比较程序执行结果与配置行中的期望结果值 */
@@ -119,12 +119,12 @@ int aut_line_resultcmp(const AUT_LINE *test_line, int value)
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
-		return (-1);
+		return -1;
 	}
 
 	if (test_line->result == value)
-		return (0);
-	return (1);
+		return 0;
+	return 1;
 }
 
 /* 取得该配置行在配置文件中的行号 */
@@ -134,16 +134,16 @@ int aut_line_number(const AUT_LINE *test_line)
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
-		return (-1);
+		return -1;
 	}
-	return (test_line->line_number);
+	return test_line->line_number;
 }
 
 int aut_line_valid_linenum(const AUT_LINE *test_line)
 {
 	if (test_line == NULL)
-		return (-1);
-	return (test_line->valid_line_idx);
+		return -1;
+	return test_line->valid_line_idx;
 }
 
 /* 取得该配置行的命令字 */
@@ -153,10 +153,10 @@ const char *aut_line_cmdname(const AUT_LINE *test_line)
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
-		return (NULL);
+		return NULL;
 	}
 
-	return (test_line->cmd_name);
+	return test_line->cmd_name;
 }
 
 /* 取得该配置行中配置参数的个数 */
@@ -166,10 +166,10 @@ int aut_line_argc(const AUT_LINE *test_line)
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
-		return (-1);
+		return -1;
 	}
 
-	return (test_line->argc);
+	return test_line->argc;
 }
 
 const char *aut_line_getvalue(const AUT_LINE *test_line, const char *name)
@@ -180,7 +180,11 @@ const char *aut_line_getvalue(const AUT_LINE *test_line, const char *name)
 
 	if (test_line == NULL || name == NULL || *name == 0) {
 		printf("%s: input error\n", myname);
-		return (NULL);
+		return NULL;
+	}
+
+	if (test_line->argv == NULL) {
+		return NULL;
 	}
 
 	n = acl_array_size(test_line->argv);
@@ -190,10 +194,10 @@ const char *aut_line_getvalue(const AUT_LINE *test_line, const char *name)
 		if (arg == NULL || arg->name == NULL)
 			break;
 		if (strcasecmp(name, arg->name) == 0)
-			return (arg->value);
+			return arg->value;
 	}
 
-	return (NULL);
+	return NULL;
 }
 
 /* 取得该配置行中参数内容  */
@@ -203,10 +207,10 @@ const char *aut_line_argstr(const AUT_LINE *test_line)
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
-		return (NULL);
+		return NULL;
 	}
 
-	return (test_line->args_str);
+	return test_line->args_str;
 }
 
 /* 取得该配置行中的期望结果值 */
@@ -216,10 +220,10 @@ int aut_line_result(const AUT_LINE *test_line)
 
 	if (test_line == NULL) {
 		printf("%s: input error\n", myname);
-		return (-1);
+		return -1;
 	}
 
-	return (test_line->result);
+	return test_line->result;
 }
 
 /* 判断是否停止继续执行的配置行 */
@@ -231,8 +235,8 @@ int aut_line_stop(const AUT_LINE *test_line)
 		aut_log_fatal("%s: input error", myname);
 
 	if (strcasecmp(test_line->cmd_name, VAR_AUT_STOP) == 0)
-		return (1);
-	return (0);
+		return 1;
+	return 0;
 }
 
 /* 判断是否是保留配置行 */
@@ -244,8 +248,8 @@ int aut_line_reserved(AUT_LINE *test_line)
 		aut_log_fatal("%s: input error", myname);
 
 	if (strcasecmp(test_line->cmd_name, VAR_AUT_LOG) == 0)
-		return (1);
-	return (0);
+		return 1;
+	return 0;
 }
 
 /* 将用户自己的参数项存储在 test_line 内的 arg_inner 中 */
@@ -257,7 +261,7 @@ int aut_line_add_arg(AUT_LINE *test_line, void *arg)
 		aut_log_fatal("%s: input error", myname);
 
 	test_line->arg_outer = arg;
-	return (0);
+	return 0;
 }
 
 void aut_line_del_arg(AUT_LINE *test_line, void (*free_fn) (void *))
@@ -272,8 +276,8 @@ void aut_line_del_arg(AUT_LINE *test_line, void (*free_fn) (void *))
 void *aut_line_get_arg(const AUT_LINE *test_line)
 {
 	if (test_line == NULL)
-		return (NULL);
-	return (test_line->arg_outer);
+		return NULL;
+	return test_line->arg_outer;
 }
 
 int aut_end_linenum(int start_linenum)
@@ -284,20 +288,20 @@ int aut_end_linenum(int start_linenum)
 
 	if (var_aut_line_array == NULL) {
 		printf("%s: var_aut_line_array=NULL\n", myname);
-		return (-1);
+		return -1;
 	}
 
 	test_line_start = aut_index(start_linenum);
 	if (test_line_start == NULL)
-		return (-1);
+		return -1;
 
 	if (strcasecmp(test_line_start->cmd_name, VAR_AUT_LOOP_BEGIN) == 0)
 		test_line_end = aut_loop_end(test_line_start);
 
 	if (test_line_end == NULL)
-		return (-1);
+		return -1;
 
-	return (aut_line_number(test_line_end));
+	return aut_line_number(test_line_end);
 }
 
 const AUT_LINE *aut_lookup_from_line(const AUT_LINE *test_line, int flag)
@@ -307,7 +311,7 @@ const AUT_LINE *aut_lookup_from_line(const AUT_LINE *test_line, int flag)
 	int   i, n;
 
 	if (test_line == NULL)
-		return (NULL);
+		return NULL;
 
 	n = aut_size();
 	for (i = aut_line_valid_linenum(test_line) + 1; i < n; i++) {
@@ -318,9 +322,9 @@ const AUT_LINE *aut_lookup_from_line(const AUT_LINE *test_line, int flag)
 			continue;
 		token = (AUT_CMD_TOKEN *) dst_line->arg_inner;
 		if (token->flag == flag)
-			return (dst_line);
+			return dst_line;
 	}
 
-	return (NULL);
+	return NULL;
 }
 

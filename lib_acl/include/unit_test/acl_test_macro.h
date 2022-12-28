@@ -27,6 +27,23 @@ extern "C" {
 	__value__ = atoi(__ptr__);  \
 } while (0)
 
+#define AUT_STR(__test_line__, __name__, __value__, __def__) do {  \
+	__value__ = aut_line_getvalue(__test_line__, __name__);  \
+	if (__value__ == NULL) {  \
+		__value__ = __def__; \
+	}  \
+} while (0)
+
+#define AUT_INT(__test_line__, __name__, __value__, __def__) do {  \
+	const char *__ptr__;  \
+	__ptr__ = aut_line_getvalue(__test_line__, __name__);  \
+	if (__ptr__ == NULL) {  \
+		__value__ = __def__;  \
+	} else {  \
+		__value__ = atoi(__ptr__);  \
+	}  \
+} while (0)
+
 #define AUT_RETURN_ERROR(__test_line__) do {  \
 	printf("%s(%d): %s error, line=%d\n",  \
 		__FILE__, __LINE__,  \
