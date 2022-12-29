@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "test_io.h"
+
+#ifdef	__linux__
 #include <sys/eventfd.h>
+#endif
 
 int test_eventfd(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
