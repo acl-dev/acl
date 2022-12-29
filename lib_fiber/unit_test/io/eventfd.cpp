@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "test_io.h"
-
+#include <sys/eventfd.h>
 
 int test_eventfd(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
@@ -12,27 +12,37 @@ int test_eventfd(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 		return -1;
 	}
 
-	go[=] {
+	long long out = 0, in = 1000000;
+
+	go[=, &out] {
 		long long n;
 		ssize_t ret = read(fd, &n, sizeof(n));
 		if (ret != sizeof(n)) {
 			printf("read from eventfd %d error %s\r\n",
 				fd, acl::last_serror());
-			return -1;
+		} else {
+			out = n;
 		}
 	};
 
 	go[=] {
-		long long n = 1000000;
+		long long n = in;
 		ssize_t ret = write(fd, &n, sizeof(n));
 		if (ret != sizeof(n)) {
 			printf("write to eventfd %d error %s\r\n",
 				fd, acl::last_serror());
-			return -1;
 		}
 	};
 
 	acl::fiber::schedule();
+
+	if (out == in) {
+		printf("Ok, the result read from eventfd: %lld\r\n", out);
+	} else {
+		printf("Err, the result is %lld, but need %lld\r\n", out, in);
+	}
+
+	return 0;
 #else
 	printf("eventfd only be supported on Linux\r\n");
 	return 0;
