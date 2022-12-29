@@ -172,8 +172,10 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		return 1;
 #endif
 	} else {
+#if defined(__linux__)
 		// Try to check if the fd can be monitored by the current
-		// event engine by really add_read/del_read it.
+		// event engine by really add_read/del_read it. Just fixed
+		// some problems on Ubuntu when using epoll.
 
 		if (ev->add_read(ev, fe) == -1) {
 			fe->type = TYPE_FILE;
@@ -189,6 +191,11 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
 		acl_fiber_set_error(0);
 		return 1;
+#else
+		fe->type = TYPE_FILE;
+		acl_fiber_set_error(0);
+		return 0;
+#endif
 	}
 }
 #endif // !SYS_WIN
