@@ -4,3 +4,5 @@ tbox_fiber_wait|0|0|delay=100,count=10,min_diff=5,nfiber=2
 tbox_fiber_wait|-1|0|delay=100,count=10,min_diff=0,nfiber=1
 tbox_fiber_consume|0|0|delay=100,count=10,consumers=2,producers=2
 tbox_fiber_consume|0|0|delay=100,count=100000,consumers=2,producers=2
+tbox_mixed_consume|0|0|threads_consumer=1,threads_producer=1,threads_consumer_alone=0,threads_producer_alone=0,fibers=10,delay=100,count=1000
+tbox_mixed_consume|0|0|threads_consumer=2,threads_producer=2,threads_consumer_alone=2,threads_producer_alone=2,fibers=10,delay=100,count=1000
