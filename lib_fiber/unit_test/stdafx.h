@@ -9,3 +9,4 @@
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/libfiber.h"
 #include "fiber/libfiber.hpp"
+#include "fiber/go_fiber.hpp"

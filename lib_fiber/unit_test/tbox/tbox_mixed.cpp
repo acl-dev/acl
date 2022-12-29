@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include <vector>
-#include "fiber/go_fiber.hpp"
 #include "test_tbox.h"
 
 class test_obj {
@@ -38,12 +37,20 @@ private:
 	void* run(void) {
 		for (int i = 0; i < nfiber_; i++) {
 			go[&] {
+				struct timeval begin, end;
 				for (int j = 0; j < count_; j++) {
+					gettimeofday(&begin, NULL);
 					test_obj* o = tbox_.pop(delay_);
+					gettimeofday(&end, NULL);
+
 					if (o) {
 						delete o;
 						ncount_++;
+						continue;
 					}
+
+					int cost = (int) acl::stamp_sub(end, begin);
+					printf("Fiber pop timeout delay=%d, cost=%d\r\n", delay_, cost);
 				}
 			};
 		}
@@ -113,11 +120,18 @@ private:
 	// @override
 	void* run(void) {
 		for (int i = 0; i < count_; i++) {
+			struct timeval begin, end;
+			gettimeofday(&begin, NULL);
 			test_obj* o = tbox_.pop(delay_);
+			gettimeofday(&end, NULL);
+
 			if (o) {
 				delete o;
 				ncount_++;
+				continue;
 			}
+			int cost = (int) acl::stamp_sub(end, begin);
+			printf("Thread pop timeout, delay=%d, cost=%d\r\n", delay_, cost);
 		}
 		return NULL;
 	}
