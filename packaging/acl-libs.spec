@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,13 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Dec 29 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-3-20221229.17
+- optimize: use AVL to handle the global timer to improve the timer's performance
+- optimize: fiber_cond use the global timer module
+- optimize: optimize fiber_mutex
+- optimize: implement a new sendfile for io-uring
+- test: add unit_test module for fiber module
 
 * Fri Dec 16 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-2-20221216.14
 - bugfix: use syscall(SYS_gettid) other than gettid() for CentOS OS.

@@ -109,7 +109,7 @@ endif
 ##############################################################################
 
 .PHONY = check help all_lib all samples all clean install uninstall uninstall_all build_one
-VERSION = 3.6.0-0
+VERSION = 3.6.0-3
 
 default: build_one acl_master
 help h:
