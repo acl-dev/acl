@@ -8,3 +8,4 @@ tbox_mixed_consume|0|0|threads_consumer=1,threads_producer=1,threads_consumer_al
 tbox_mixed_consume|0|0|threads_consumer=2,threads_producer=2,threads_consumer_alone=2,threads_producer_alone=2,fibers=10,delay=500,count=1000
 file_load|0|0|filename=main.cpp
 file_load|0|0|filename=Makefile.in,show=1
+test_eventfd|0|0|
