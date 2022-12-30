@@ -118,6 +118,7 @@ set(sources
 	${src}/fiber
 	${src}/common
 	${src}/event
+	${src}/sync
 	${src}/hook
 	${src}/dns
 )
