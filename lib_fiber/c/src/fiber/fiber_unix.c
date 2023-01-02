@@ -12,48 +12,88 @@
 # endif
 #endif
 
-# if defined(USE_BOOST_JMP)
-#  include "boost_jmp.h"
-# elif defined(USE_JMP_DEF)
-#  define USE_JMP
-#  include "x86_jmp.h"
-# elif defined(USE_JMP_EXP)
-#  define USE_JMP
-#  include "exp_jmp.h"
-# else
-#  define SETJMP(ctx) sigsetjmp(ctx, 0)
-#  define LONGJMP(ctx) siglongjmp(ctx, 1)
-# endif
+#if defined(USE_BOOST_JMP)
+# include "boost_jmp.h"
+#elif defined(USE_JMP_DEF)
+# define USE_JMP
+# include "x86_jmp.h"
+#elif defined(USE_JMP_EXP)
+# define USE_JMP
+# include "exp_jmp.h"
+#else
+# define SETJMP(ctx) sigsetjmp(ctx, 0)
+# define LONGJMP(ctx) siglongjmp(ctx, 1)
+#endif  // USE_BOOST_JMP
 
-# ifdef USE_VALGRIND
-#  include <valgrind/valgrind.h>
-# endif
+#ifdef USE_VALGRIND
+# include <valgrind/valgrind.h>
+#endif
 
 typedef struct FIBER_UNIX {
 	ACL_FIBER fiber;
-# ifdef USE_VALGRIND
+#ifdef	USE_VALGRIND
 	unsigned int vid;
-# endif
+#endif
 
-# if	defined(USE_BOOST_JMP)
+#if	defined(USE_BOOST_JMP)
 	fcontext_t fcontext;
 	char      *stack;
-# else
-#  if	defined(USE_JMP_DEF)
-#   if defined(__x86_64__)
+#else
+# if	defined(USE_JMP_DEF)
+#  if defined(__x86_64__)
 	unsigned long long env[10];
-#   else
+#  else
 	sigjmp_buf env;
-#   endif
-#  elif	defined(USE_JMP_EXP)
-	label_t env;
 #  endif
-	ucontext_t *context;
+# elif	defined(USE_JMP_EXP)
+	label_t env;
 # endif
+	ucontext_t *context;
+#endif
 	size_t size;
 	char  *buff;
 	size_t dlen;
 } FIBER_UNIX;
+
+#ifdef	DEBUG_STACK
+#include <libunwind.h>
+void acl_fiber_stack(ACL_FIBER *fiber)
+{
+	FIBER_UNIX *fb = (FIBER_UNIX*) fiber;
+	unw_cursor_t cursor;
+	unw_word_t offset, pc;
+	char fname[128];
+	int ret;
+
+	if (fb->context == NULL) {
+		return;
+	}
+
+	ret = unw_init_local(&cursor, fb->context);
+	if (ret != 0) {
+		printf("unw_init_local error, ret=%d\r\n", ret);
+		return;
+	}
+
+	printf(">>size of context=%zd, fiber size=%zd, %zd\n", sizeof(ucontext_t),
+		sizeof(FIBER_UNIX), sizeof(ACL_FIBER));
+	while (unw_step(&cursor) > 0) {
+		ret = unw_get_proc_name(&cursor, fname, sizeof(fname), &offset);
+		if (ret != 0) {
+			printf("unw_get_proc_name error =%d\n", ret);
+		} else {
+			unw_get_reg(&cursor, UNW_REG_IP, &pc);
+			printf("0x%lx:(%s()+0x%lx)\n", pc, fname, offset);
+		}
+	}
+}
+#else
+void acl_fiber_stack(ACL_FIBER *fiber)
+{
+	printf("%s(%d): Not supported, fiber-%d\r\n",
+		__FUNCTION__, __LINE__, acl_fiber_id(fiber));
+}
+#endif
 
 #if	defined(USE_BOOST_JMP)
 # if	defined(SHARE_STACK)
@@ -108,7 +148,7 @@ static void fiber_stack_restore(FIBER_UNIX *curr)
 
 #endif
 
-static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
+void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 {
 	// The shared stack mode isn't supported in USE_BOOST_JMP current,
 	// which may be supported in future.
@@ -116,35 +156,36 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 	// the fiber's running stack should be copied from the shared running
 	// stack to the fiber's private memory.
 #if	defined(SHARE_STACK)
-	if (from->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK
-		&& from->fiber.status != FIBER_STATUS_EXITING
-		&& from->fiber.tid > 0) {
+	if (from->oflag & ACL_FIBER_ATTR_SHARE_STACK
+		&& from->status != FIBER_STATUS_EXITING
+		&& from->tid > 0) {
 
 		char stack_top = 0;
-		fiber_stack_save(from, &stack_top);
+		fiber_stack_save((FIBER_UNIX*) from, &stack_top);
 	}
 #endif
 
 #if	defined(USE_BOOST_JMP)
-	swap_fcontext(from, to);
+	swap_fcontext((FIBER_UNIX*) from, (FIBER_UNIX*) to);
 #elif	defined(USE_JMP)
 
 	/* Use setcontext() for the initial jump, as it allows us to set up
 	 * a stack, but continue with longjmp() as it's much faster.
 	 */
-	if (SETJMP(&from->env) == 0) {
-		/* Context just be used once for set up a stack, which will
-		 * be freed in fiber_start. The context in __thread_fiber
-		 * was set NULL.
+	if (SETJMP(&((FIBER_UNIX*) from)->env) == 0) {
+		/* If the fiber was ready for the first time, just call the
+		 * setcontext() for the fiber to start, else just jump to the
+		 * fiber's running stack.
 		 */
-		if (to->context != NULL) {
-			setcontext(to->context);
+		if (to->flag & FIBER_F_STARTED) {
+			LONGJMP(&((FIBER_UNIX*) to)->env);
 		} else {
-			LONGJMP(&to->env);
+			setcontext(((FIBER_UNIX*) to)->context);
 		}
 	}
 #else	// Use the default context swap API
-	if (swapcontext(from->context, to->context) < 0) {
+	if (swapcontext(((FIBER_UNIX*) from)->context,
+			((FIBER_UNIX*) to)->context) < 0) {
 		msg_fatal("%s(%d), %s: swapcontext error %s",
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
@@ -163,33 +204,17 @@ static void fiber_unix_swap(FIBER_UNIX *from, FIBER_UNIX *to)
 #endif
 }
 
-static void fiber_unix_free(ACL_FIBER *fiber)
-{
-	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
-
-#ifdef USE_VALGRIND
-	VALGRIND_STACK_DEREGISTER(fb->vid);
-#endif
-
-#if	!defined(USE_BOOST_JMP)
-	if (fb->context) {
-		stack_free(fb->context);
-	}
-#endif
-	stack_free(fb->buff);
-	mem_free(fb);
-}
-
 #if	defined(USE_BOOST_JMP)
 
 static void fiber_unix_start(transfer_t arg)
 {
 	s_jump_t *jmp = (s_jump_t*) arg.data;
 	jmp->from->fcontext = arg.fctx;
-	jmp->to->fiber.start_fn(&jmp->to->fiber);
+	jmp->to->fiber.flag |= FIBER_F_STARTED;
+	fiber_start(&jmp->to->fiber);
 }
 
-#else
+#else	// !USE_BOOST_JMP
 
 union cc_arg
 {
@@ -207,19 +232,22 @@ static void fiber_unix_start(unsigned int x, unsigned int y)
 
 	fb = (FIBER_UNIX *)arg.p;
 
-#ifdef	USE_JMP
-	/* When using setjmp/longjmp, the context just be used only once */
+#if	defined(USE_JMP)
+	/* When using setjmp/longjmp, the context just be used only once,
+	 * so we can free it here to save some memory.
+	 */
 	if (fb->context != NULL) {
 		stack_free(fb->context);
 		fb->context = NULL;
 	}
 #endif
-	fb->fiber.start_fn(&fb->fiber);
+	fb->fiber.flag |= FIBER_F_STARTED;
+	fiber_start(&fb->fiber);
 }
 
 #endif // !USE_BOOST_JMP
 
-static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
+void fiber_real_init(ACL_FIBER *fiber, size_t size)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
 #if	!defined(USE_BOOST_JMP)
@@ -309,8 +337,24 @@ static void fiber_unix_init(ACL_FIBER *fiber, size_t size)
 #endif
 }
 
-ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *),
-		const ACL_FIBER_ATTR *attr)
+void fiber_real_free(ACL_FIBER *fiber)
+{
+	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
+
+#ifdef USE_VALGRIND
+	VALGRIND_STACK_DEREGISTER(fb->vid);
+#endif
+
+#if	!defined(USE_BOOST_JMP)
+	if (fb->context) {
+		stack_free(fb->context);
+	}
+#endif
+	stack_free(fb->buff);
+	mem_free(fb);
+}
+
+ACL_FIBER *fiber_real_alloc(const ACL_FIBER_ATTR *attr)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
 	size_t size = attr ? attr->stack_size : 128000;
@@ -319,25 +363,17 @@ ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *),
 	fb->buff           = (char *) stack_alloc(size);
 	fb->size           = size;
 	fb->fiber.oflag    = attr ? attr->oflag : 0;
-	fb->fiber.init_fn  = fiber_unix_init;
-	fb->fiber.free_fn  = fiber_unix_free;
-	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
-	fb->fiber.start_fn = start_fn;
 
 	return (ACL_FIBER *) fb;
 }
 
-ACL_FIBER *fiber_unix_origin(void)
+ACL_FIBER *fiber_real_origin(void)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) mem_calloc(1, sizeof(*fb));
 
 #ifdef	USE_BOOST_JMP
 	fb->size           = 32 * 1024;
 	fb->buff           = (char *) stack_alloc(fb->size);
-	fb->fiber.init_fn  = fiber_unix_init;
-	fb->fiber.free_fn  = fiber_unix_free;
-	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*))fiber_unix_swap;
-	fb->fiber.start_fn = NULL;
 
 #elif	defined(USE_JMP)
 	/* Set context NULL when using setjmp that setcontext will not be
@@ -347,8 +383,6 @@ ACL_FIBER *fiber_unix_origin(void)
 #else
 	fb->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
 #endif
-	fb->fiber.free_fn = fiber_unix_free;
-	fb->fiber.swap_fn = (void (*)(ACL_FIBER*, ACL_FIBER*)) fiber_unix_swap;
 
 	return &fb->fiber;
 }

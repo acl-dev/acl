@@ -57,12 +57,13 @@ struct ACL_FIBER {
 	unsigned int   oflag;
 	unsigned int   flag;
 
-#define	FIBER_F_SAVE_ERRNO	(unsigned) (1 << 0)
-#define	FIBER_F_KILLED		(unsigned) (1 << 1)
-#define	FIBER_F_CLOSED		(unsigned) (1 << 2)
-#define	FIBER_F_SIGNALED	(unsigned) (1 << 3)
+#define	FIBER_F_STARTED		(unsigned) (1 << 0)
+#define	FIBER_F_SAVE_ERRNO	(unsigned) (1 << 1)
+#define	FIBER_F_KILLED		(unsigned) (1 << 2)
+#define	FIBER_F_CLOSED		(unsigned) (1 << 3)
+#define	FIBER_F_SIGNALED	(unsigned) (1 << 4)
 #define	FIBER_F_CANCELED	(FIBER_F_KILLED | FIBER_F_CLOSED | FIBER_F_SIGNALED)
-#define	FIBER_F_TIMER		(unsigned) (1 << 4)
+#define	FIBER_F_TIMER		(unsigned) (1 << 5)
 
 	RING           holding;
 	ACL_FIBER_LOCK *waiting;
@@ -71,11 +72,6 @@ struct ACL_FIBER {
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
-
-	void (*init_fn)(ACL_FIBER *, size_t);
-	void (*free_fn)(ACL_FIBER *);
-	void (*swap_fn)(ACL_FIBER *, ACL_FIBER *);
-	void (*start_fn)(ACL_FIBER *);
 
 	void (*fn)(ACL_FIBER *, void *);
 	void  *arg;
@@ -88,6 +84,7 @@ extern __thread int var_hook_sys_api;
 FIBER_BASE *fbase_alloc(unsigned flag);
 void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
+void fiber_start(ACL_FIBER *fiber);
 ACL_FIBER *fiber_origin(void);
 
 #ifdef	SHARE_STACK
@@ -139,18 +136,11 @@ void fiber_file_cache_put(FILE_EVENT *fe);
 /* in hook/epoll.c */
 int  epoll_event_close(int epfd);
 
-/* in fiber/fiber_unix.c */
-#ifdef SYS_UNIX
-ACL_FIBER *fiber_unix_origin(void);
-ACL_FIBER *fiber_unix_alloc(void (*start_fn)(ACL_FIBER *),
-		const ACL_FIBER_ATTR *attr);
-#endif
-
-/* in fiber/fiber_win.c */
-#ifdef SYS_WIN
-ACL_FIBER *fiber_win_origin(void);
-ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *),
-		const ACL_FIBER_ATTR *attr);
-#endif
+/* in fiber/fiber_unix.c, fiber/fiber_win.c */
+ACL_FIBER *fiber_real_origin(void);
+ACL_FIBER *fiber_real_alloc(const ACL_FIBER_ATTR *attr);
+void fiber_real_init(ACL_FIBER *fiber, size_t size);
+void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to);
+void fiber_real_free(ACL_FIBER *fiber);
 
 #endif

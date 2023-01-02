@@ -19,12 +19,6 @@ FIBER_API void acl_fiber_attr_init(ACL_FIBER_ATTR *attr);
 FIBER_API void acl_fiber_attr_setstacksize(ACL_FIBER_ATTR *attr, size_t size);
 FIBER_API void acl_fiber_attr_setsharestack(ACL_FIBER_ATTR *attr, int on);
 
-typedef ACL_FIBER *((*FIBER_ALLOC_FN)(void (*)(ACL_FIBER *), const ACL_FIBER_ATTR *));
-typedef ACL_FIBER *((*FIBER_ORIGIN_FN)(void));
-
-FIBER_API void acl_fiber_register(FIBER_ALLOC_FN alloc_fn,
-	FIBER_ORIGIN_FN origin_fn);
-
 FIBER_API ACL_FIBER *acl_fiber_alloc(size_t size, void **pptr);
 
 /**
@@ -57,6 +51,8 @@ FIBER_API ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 
 FIBER_API ACL_FIBER* acl_fiber_create2(const ACL_FIBER_ATTR *attr,
 	void (*fn)(ACL_FIBER*, void*), void* arg);
+
+FIBER_API void acl_fiber_stack(ACL_FIBER *fiber);
 
 /**
  * Get the fibers count in deading status

@@ -24,14 +24,14 @@ typedef struct FIBER_WIN {
 	LPVOID context;
 } FIBER_WIN;
 
-static void fiber_win_free(ACL_FIBER *fiber)
+void fiber_real_free(ACL_FIBER *fiber)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) fiber;
 	DeleteFiber(fb->context);
 	stack_free(fb);
 }
 
-static void fiber_win_swap(ACL_FIBER *from, ACL_FIBER *to)
+void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 {
 	FIBER_WIN *fb_to = (FIBER_WIN *) to;
 	SwitchToFiber(fb_to->context);
@@ -43,8 +43,10 @@ static void WINAPI fiber_win_start(LPVOID ctx)
 	fb->fiber.start_fn(&fb->fiber);
 }
 
-static void fiber_win_init(FIBER_WIN *fb, size_t size)
+void fiber_real_init(ACL_FIBER *fiber, size_t size)
 {
+	FIBER_WIN *fb = (FIBER_WIN*) fiber;
+
 	if (fb->context) {
 		DeleteFiber(fb->context);
 	}
@@ -62,22 +64,17 @@ static void fiber_win_init(FIBER_WIN *fb, size_t size)
 	}
 }
 
-ACL_FIBER *fiber_win_alloc(void (*start_fn)(ACL_FIBER *),
-		const ACL_FIBER_ATTR *attr)
+ACL_FIBER *fiber_real_alloc(const ACL_FIBER_ATTR *attr)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) mem_calloc(1, sizeof(*fb));
 	size_t size = attr ? attr->stack_size : 128000;
 
-	fb->fiber.init_fn  = (void (*)(ACL_FIBER*, size_t)) fiber_win_init;
-	fb->fiber.free_fn  = fiber_win_free;
-	fb->fiber.swap_fn  = (void (*)(ACL_FIBER*, ACL_FIBER*)) fiber_win_swap;
-	fb->fiber.start_fn = start_fn;
 	fb->context        = NULL;
 
 	return (ACL_FIBER *) fb;
 }
 
-ACL_FIBER *fiber_win_origin(void)
+ACL_FIBER *fiber_real_origin(void)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) mem_calloc(1, sizeof(*fb));
 
@@ -86,9 +83,6 @@ ACL_FIBER *fiber_win_origin(void)
 #else
 	fb->context = ConvertThreadToFiber(NULL);
 #endif
-
-	fb->fiber.free_fn = fiber_win_free;
-	fb->fiber.swap_fn = (void(*)(ACL_FIBER*, ACL_FIBER*)) fiber_win_swap;
 
 	return (ACL_FIBER *) fb;
 }
