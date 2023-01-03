@@ -63,7 +63,7 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 static void WINAPI fiber_win_start(LPVOID ctx)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) ctx;
-	fiber_start(&fb->fiber, fb->fn, fn->arg);
+	fiber_start(&fb->fiber, fb->fn, fb->arg);
 }
 
 void fiber_real_init(ACL_FIBER *fiber, size_t size,
