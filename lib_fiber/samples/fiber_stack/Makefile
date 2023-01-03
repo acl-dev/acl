@@ -1,3 +1,3 @@
 include ../Makefile.in
 SYSLIB += -lunwind -lunwind-x86_64
-PROG = dead_lock
+PROG = fiber_stack

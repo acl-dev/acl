@@ -59,43 +59,68 @@ typedef struct FIBER_UNIX {
 
 #ifdef	DEBUG_STACK
 #include <libunwind.h>
-void acl_fiber_stack(ACL_FIBER *fiber)
+
+ACL_FIBER_STACK *acl_fiber_stacktrace(ACL_FIBER *fiber, size_t max)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX*) fiber;
 	unw_cursor_t cursor;
-	unw_word_t offset, pc;
-	char fname[128];
-	int ret;
+	unw_word_t off, pc;
+	ACL_FIBER_STACK *stack;
+	char name[128];
+	int  ret;
 
 	if (fb->context == NULL) {
-		return;
+		return NULL;
 	}
 
 	ret = unw_init_local(&cursor, fb->context);
 	if (ret != 0) {
 		printf("unw_init_local error, ret=%d\r\n", ret);
-		return;
+		return NULL;
 	}
 
-	printf(">>size of context=%zd, fiber size=%zd, %zd\n", sizeof(ucontext_t),
-		sizeof(FIBER_UNIX), sizeof(ACL_FIBER));
-	while (unw_step(&cursor) > 0) {
-		ret = unw_get_proc_name(&cursor, fname, sizeof(fname), &offset);
+	stack = (ACL_FIBER_STACK*) mem_malloc(sizeof(ACL_FIBER_STACK));
+	stack->frames = (ACL_FIBER_FRAME*) mem_malloc(max * sizeof(ACL_FIBER_FRAME));
+	stack->count = 0;
+	stack->size  = max;
+
+	while (unw_step(&cursor) > 0 && stack->count < stack->size) {
+		ret = unw_get_proc_name(&cursor, name, sizeof(name), &off);
 		if (ret != 0) {
 			printf("unw_get_proc_name error =%d\n", ret);
 		} else {
 			unw_get_reg(&cursor, UNW_REG_IP, &pc);
-			printf("0x%lx:(%s()+0x%lx)\n", pc, fname, offset);
+			stack->frames[stack->count].func = mem_strdup(name);
+			stack->frames[stack->count].pc   = (long) pc;
+			stack->frames[stack->count].off  = (long) off;
+			stack->count++;
 		}
 	}
+
+	return stack;
 }
 #else
-void acl_fiber_stack(ACL_FIBER *fiber)
+ACL_FIBER_STACK *acl_fiber_stacktrace(ACL_FIBER *fiber, size_t max)
 {
-	printf("%s(%d): Not supported, fiber-%d\r\n",
-		__FUNCTION__, __LINE__, acl_fiber_id(fiber));
+	printf("%s(%d): Not supported, fiber-%d, max=%zd\r\n",
+		__FUNCTION__, __LINE__, acl_fiber_id(fiber), max);
+	return NULL;
 }
 #endif
+
+void acl_fiber_stackfree(ACL_FIBER_STACK *stack)
+{
+	size_t i;
+
+	if (stack) {
+		for (i = 0; i < stack->count; i++) {
+			mem_free(stack->frames[i].func);
+		}
+
+		mem_free(stack->frames);
+		mem_free(stack);
+	}
+}
 
 #if	defined(USE_BOOST_JMP)
 # if	defined(SHARE_STACK)

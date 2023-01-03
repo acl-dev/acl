@@ -20,6 +20,21 @@ static pthread_once_t  __once_control = PTHREAD_ONCE_INIT;
 static THREAD_MUTEXES *__locks = NULL;
 static pthread_mutex_t __lock;
 
+static void show_stack(ACL_FIBER *fb)
+{
+	ACL_FIBER_STACK *stack = acl_fiber_stacktrace(fb, 50);
+
+	if (stack) {
+		size_t i;
+
+		for (i = 0; i < stack->count; i++) {
+			printf("    0x%lx:(%s()+0x%lx)\n", stack->frames[i].pc,
+				stack->frames[i].func, stack->frames[i].off);
+		}
+		acl_fiber_stackfree(stack);
+	}
+}
+
 static void show_status(struct ACL_FIBER_MUTEX *mutex)
 {
 	ITER iter;
@@ -39,6 +54,7 @@ static void show_status(struct ACL_FIBER_MUTEX *mutex)
 	foreach(iter, mutex->waiters) {
 		ACL_FIBER *fb = (ACL_FIBER*) iter.data;
 		printf("    waiter => fiber-%u\r\n", acl_fiber_id(fb));
+		show_stack(fb);
 	}
 	foreach(iter, mutex->waiting_threads) {
 		THREAD_WAITER *waiter = (THREAD_WAITER*) iter.data;

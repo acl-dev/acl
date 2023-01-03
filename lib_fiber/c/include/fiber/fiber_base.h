@@ -52,7 +52,20 @@ FIBER_API ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 FIBER_API ACL_FIBER* acl_fiber_create2(const ACL_FIBER_ATTR *attr,
 	void (*fn)(ACL_FIBER*, void*), void* arg);
 
-FIBER_API void acl_fiber_stack(ACL_FIBER *fiber);
+typedef struct ACL_FIBER_FRAME {
+	char *func;
+	long  pc;
+	long  off;
+} ACL_FIBER_FRAME;
+
+typedef struct ACL_FIBER_STACK {
+	ACL_FIBER_FRAME *frames;
+	size_t count;
+	size_t size;
+} ACL_FIBER_STACK;
+
+FIBER_API ACL_FIBER_STACK *acl_fiber_stacktrace(ACL_FIBER *fiber, size_t max);
+FIBER_API void acl_fiber_stackfree(ACL_FIBER_STACK *stack);
 
 /**
  * Get the fibers count in deading status
