@@ -29,13 +29,13 @@ static void *thread_main(void *arg)
 	MUTEX_CTX *ctx = (MUTEX_CTX*) arg;
 
 	sleep(1);
-	printf("thread-%lu begin to lock %p\r\n", pthread_self(), ctx->locks[0]);
+	printf("thread-%lu begin to lock %p\r\n", (long) pthread_self(), ctx->locks[0]);
 	acl_fiber_mutex_lock(ctx->locks[0]);
-	printf("thread-%lu lock %p ok\r\n", pthread_self(), ctx->locks[0]);
+	printf("thread-%lu lock %p ok\r\n", (long) pthread_self(), ctx->locks[0]);
 
-	printf("thread-%lu begin to lock %p\r\n", pthread_self(), ctx->locks[1]);
+	printf("thread-%lu begin to lock %p\r\n", (long) pthread_self(), ctx->locks[1]);
 	acl_fiber_mutex_lock(ctx->locks[1]);
-	printf("thread-%lu lock %p ok\r\n", pthread_self(), ctx->locks[1]);
+	printf("thread-%lu lock %p ok\r\n", (long) pthread_self(), ctx->locks[1]);
 
 	return NULL;
 }
