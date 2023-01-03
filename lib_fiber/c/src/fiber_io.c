@@ -350,9 +350,15 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	return (unsigned int) (now - fiber->when);
 }
 
+typedef struct {
+	void *ctx;
+	void (*timer_fn)(ACL_FIBER *, void *);
+} TIMER_CTX;
+
 static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 {
 	long long now, left;
+	TIMER_CTX *tc = (TIMER_CTX*) ctx;
 
 	now = fiber_io_stamp();
 
@@ -370,7 +376,8 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 		}
 	}
 
-	fiber->timer_fn(fiber, ctx);
+	tc->timer_fn(fiber, tc->ctx);
+	mem_free(tc);
 	fiber_exit(0);
 }
 
@@ -379,15 +386,18 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 {
 	long long when;
 	ACL_FIBER *fiber;
+	TIMER_CTX *tc = (TIMER_CTX*) mem_malloc(sizeof(TIMER_CTX));
+
+	tc->timer_fn = fn;
+	tc->ctx      = ctx;
 
 	fiber_io_check();
 
 	when = fiber_io_stamp();
 	when += milliseconds;
 
-	fiber           = acl_fiber_create(fiber_timer_callback, ctx, size);
-	fiber->when     = when;
-	fiber->timer_fn = fn;
+	fiber       = acl_fiber_create(fiber_timer_callback, tc, size);
+	fiber->when = when;
 	return fiber;
 }
 

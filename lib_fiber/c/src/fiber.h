@@ -65,17 +65,15 @@ struct ACL_FIBER {
 #define	FIBER_F_CANCELED	(FIBER_F_KILLED | FIBER_F_CLOSED | FIBER_F_SIGNALED)
 #define	FIBER_F_TIMER		(unsigned) (1 << 5)
 
+#ifdef	DEBUG_LOCK
 	RING           holding;
 	ACL_FIBER_LOCK *waiting;
+#endif
 
 	struct SYNC_WAITER *sync;
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
-
-	void (*fn)(ACL_FIBER *, void *);
-	void  *arg;
-	void (*timer_fn)(ACL_FIBER *, void *);
 };
 
 /* in fiber.c */
@@ -84,7 +82,7 @@ extern __thread int var_hook_sys_api;
 FIBER_BASE *fbase_alloc(unsigned flag);
 void fbase_free(FIBER_BASE *fbase);
 void fiber_free(ACL_FIBER *fiber);
-void fiber_start(ACL_FIBER *fiber);
+void fiber_start(ACL_FIBER *fiber, void (*fn)(ACL_FIBER *, void *), void *arg);
 ACL_FIBER *fiber_origin(void);
 
 #ifdef	SHARE_STACK
@@ -139,7 +137,8 @@ int  epoll_event_close(int epfd);
 /* in fiber/fiber_unix.c, fiber/fiber_win.c */
 ACL_FIBER *fiber_real_origin(void);
 ACL_FIBER *fiber_real_alloc(const ACL_FIBER_ATTR *attr);
-void fiber_real_init(ACL_FIBER *fiber, size_t size);
+void fiber_real_init(ACL_FIBER *fiber, size_t size,
+	void (*fn)(ACL_FIBER *, void *), void *arg);
 void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to);
 void fiber_real_free(ACL_FIBER *fiber);
 

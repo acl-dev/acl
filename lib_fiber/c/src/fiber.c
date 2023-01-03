@@ -633,11 +633,11 @@ void fiber_free(ACL_FIBER *fiber)
 	fiber_real_free(fiber);
 }
 
-void fiber_start(ACL_FIBER *fiber)
+void fiber_start(ACL_FIBER *fiber, void (*fn)(ACL_FIBER *, void *), void *arg)
 {
 	int i;
 
-	fiber->fn(fiber, fiber->arg);
+	fn(fiber, arg);
 
 	for (i = 0; i < fiber->nlocal; i++) {
 		if (fiber->locals[i] == NULL) {
@@ -694,15 +694,15 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->fid    = id;
 	fiber->errnum = 0;
 	fiber->signum = 0;
-	fiber->fn     = fn;
-	fiber->arg    = arg;
 	fiber->oflag  = attr ? attr->oflag : 0;
 	fiber->flag   = 0;
 	fiber->status = FIBER_STATUS_NONE;
 
+#ifdef	DEBUG_LOCK
 	fiber->waiting = NULL;
 	ring_init(&fiber->holding);
-	fiber_real_init(fiber, attr ? attr->stack_size : 128000);
+#endif
+	fiber_real_init(fiber, attr ? attr->stack_size : 128000, fn, arg);
 
 	return fiber;
 }

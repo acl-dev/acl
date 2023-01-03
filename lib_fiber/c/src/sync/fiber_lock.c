@@ -40,7 +40,9 @@ static int __lock(ACL_FIBER_LOCK *lk, int block)
 
 	if (lk->owner == NULL) {
 		lk->owner = acl_fiber_running();
+#ifdef	DEBUG_LOCK
 		ring_prepend(&curr->holding, &lk->me);
+#endif
 		return 0;
 	}
 
@@ -52,7 +54,10 @@ static int __lock(ACL_FIBER_LOCK *lk, int block)
 	}
 
 	ring_prepend(&lk->waiting, &curr->me);
+
+#ifdef	DEBUG_LOCK
 	curr->waiting = lk;
+#endif
 
 	ev = fiber_io_event();
 	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit

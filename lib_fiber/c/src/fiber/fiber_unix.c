@@ -38,6 +38,8 @@ typedef struct FIBER_UNIX {
 #if	defined(USE_BOOST_JMP)
 	fcontext_t fcontext;
 	char      *stack;
+	void (*fn)(ACL_FIBER *, void *);
+	void *arg;
 #else
 # if	defined(USE_JMP_DEF)
 #  if defined(__x86_64__)
@@ -103,17 +105,17 @@ void acl_fiber_stack(ACL_FIBER *fiber)
 typedef struct {
 	FIBER_UNIX *from;
 	FIBER_UNIX *to;
-} s_jump_t;
+} JUMP_CTX;
 
 static void swap_fcontext(FIBER_UNIX *from, FIBER_UNIX *to)
 {
-	s_jump_t jump, *jmp;
+	JUMP_CTX jump, *jmp;
 	transfer_t trans;
 	
 	jump.from  = from;
 	jump.to    = to;
 	trans      = jump_fcontext(to->fcontext, &jump);
-	jmp        = (s_jump_t*) trans.data;
+	jmp        = (JUMP_CTX*) trans.data;
 	jmp->from->fcontext = trans.fctx;
 }
 
@@ -208,15 +210,21 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 
 static void fiber_unix_start(transfer_t arg)
 {
-	s_jump_t *jmp = (s_jump_t*) arg.data;
+	JUMP_CTX *jmp = (JUMP_CTX*) arg.data;
 	jmp->from->fcontext = arg.fctx;
 	jmp->to->fiber.flag |= FIBER_F_STARTED;
-	fiber_start(&jmp->to->fiber);
+	fiber_start(&jmp->to->fiber, jmp->to->fn, jmp->to->arg);
 }
 
 #else	// !USE_BOOST_JMP
 
-union cc_arg
+typedef struct {
+	FIBER_UNIX *fb;
+	void (*fn)(ACL_FIBER *, void *);
+	void *arg;
+} FIBER_CTX;
+
+union FIBER_ARG
 {
 	void *p;
 	int   i[2];
@@ -224,13 +232,21 @@ union cc_arg
 
 static void fiber_unix_start(unsigned int x, unsigned int y)
 {
-	union  cc_arg arg;
+	union FIBER_ARG carg;
 	FIBER_UNIX *fb;
+	void (*fn)(ACL_FIBER *, void *);
+	void *arg;
+	FIBER_CTX  *ctx;
 
-	arg.i[0] = x;
-	arg.i[1] = y;
+	carg.i[0] = x;
+	carg.i[1] = y;
 
-	fb = (FIBER_UNIX *)arg.p;
+	ctx = (FIBER_CTX*) carg.p;
+	fb  = ctx->fb;
+	fn  = ctx->fn;
+	arg = ctx->arg;
+
+	mem_free(ctx);
 
 #if	defined(USE_JMP)
 	/* When using setjmp/longjmp, the context just be used only once,
@@ -242,17 +258,19 @@ static void fiber_unix_start(unsigned int x, unsigned int y)
 	}
 #endif
 	fb->fiber.flag |= FIBER_F_STARTED;
-	fiber_start(&fb->fiber);
+	fiber_start(&fb->fiber, fn, arg);
 }
 
 #endif // !USE_BOOST_JMP
 
-void fiber_real_init(ACL_FIBER *fiber, size_t size)
+void fiber_real_init(ACL_FIBER *fiber, size_t size,
+	void (*fn)(ACL_FIBER *, void *), void *arg)
 {
 	FIBER_UNIX *fb = (FIBER_UNIX *) fiber;
 #if	!defined(USE_BOOST_JMP)
 	FIBER_UNIX *origin;
-	union cc_arg carg;
+	union FIBER_ARG carg;
+	FIBER_CTX *ctx;
 	sigset_t zero;
 #endif
 	
@@ -267,6 +285,9 @@ void fiber_real_init(ACL_FIBER *fiber, size_t size)
 	}
 
 #if	defined(USE_BOOST_JMP)
+	fb->fn  = fn;
+	fb->arg = arg;
+
 # if	defined(SHARE_STACK)
 	if (fb->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK) {
 		fb->stack = fiber_share_stack_bottom();
@@ -283,9 +304,7 @@ void fiber_real_init(ACL_FIBER *fiber, size_t size)
 	fb->fcontext = make_fcontext(fb->stack, fb->size,
 		(void(*)(transfer_t)) fiber_unix_start);
 # endif
-#else
-	carg.p = fiber;
-
+#else	// !USE_BOOST_JMP
 	if (fb->context == NULL) {
 		fb->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
 	}
@@ -305,7 +324,7 @@ void fiber_real_init(ACL_FIBER *fiber, size_t size)
 			__FILE__, __LINE__, __FUNCTION__, last_serror());
 	}
 
-#if	defined(SHARE_STACK)
+# if	defined(SHARE_STACK)
 	if (fb->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK) {
 		fb->context->uc_stack.ss_sp   = fiber_share_stack_addr();
 		fb->context->uc_stack.ss_size = fiber_share_stack_size();
@@ -313,13 +332,19 @@ void fiber_real_init(ACL_FIBER *fiber, size_t size)
 		fb->context->uc_stack.ss_sp   = fb->buff;
 		fb->context->uc_stack.ss_size = fb->size;
 	}
-#else
+# else
 	fb->context->uc_stack.ss_sp   = fb->buff;
 	fb->context->uc_stack.ss_size = fb->size;
-#endif
+# endif
 
 	origin = (FIBER_UNIX*) fiber_origin();
 	fb->context->uc_link = origin->context;
+
+	ctx      = (FIBER_CTX*) mem_malloc(sizeof(FIBER_CTX));
+	ctx->fb  = fb;
+	ctx->fn  = fn;
+	ctx->arg = arg;
+	carg.p   = ctx;
 
 	makecontext(fb->context, (void(*)(void)) fiber_unix_start,
 		2, carg.i[0], carg.i[1]);

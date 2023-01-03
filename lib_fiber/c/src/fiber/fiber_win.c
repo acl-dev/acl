@@ -22,7 +22,15 @@
 typedef struct FIBER_WIN {
 	ACL_FIBER fiber;
 	LPVOID context;
+	void (*fn)(ACL_FIBER *, void *);
+	void *arg;
 } FIBER_WIN;
+
+void acl_fiber_stack(ACL_FIBER *fiber)
+{
+	printf("%s(%d): Not supported, fiber-%d\r\n",
+		__FUNCTION__, __LINE__, acl_fiber_id(fiber));
+}
 
 void fiber_real_free(ACL_FIBER *fiber)
 {
@@ -40,16 +48,20 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 static void WINAPI fiber_win_start(LPVOID ctx)
 {
 	FIBER_WIN *fb = (FIBER_WIN *) ctx;
-	fb->fiber.start_fn(&fb->fiber);
+	fiber_start(&fb->fiber, fb->fn, fn->arg);
 }
 
-void fiber_real_init(ACL_FIBER *fiber, size_t size)
+void fiber_real_init(ACL_FIBER *fiber, size_t size,
+	void (*fn)(ACL_FIBER *, void *), void *arg)
 {
 	FIBER_WIN *fb = (FIBER_WIN*) fiber;
 
 	if (fb->context) {
 		DeleteFiber(fb->context);
 	}
+
+	fb->fn  = fn;
+	fb->arg = arg;
 
 #ifdef HAS_FIBER_EX
 	fb->context = CreateFiberEx(0, size, FIBER_FLAG_FLOAT_SWITCH,
