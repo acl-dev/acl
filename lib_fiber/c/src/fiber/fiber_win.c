@@ -111,6 +111,8 @@ ACL_FIBER *fiber_real_origin(void)
 	fb->context = ConvertThreadToFiber(NULL);
 #endif
 
+	fb->fiber.flag = FIBER_F_STARTED;
+
 	return (ACL_FIBER *) fb;
 }
 

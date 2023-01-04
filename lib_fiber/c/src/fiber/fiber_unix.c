@@ -434,6 +434,12 @@ ACL_FIBER *fiber_real_origin(void)
 	fb->context = (ucontext_t *) stack_alloc(sizeof(ucontext_t));
 #endif
 
+	/* The origin fiber must be set FIBER_F_STARTED indicating the origin
+	 * fiber has been started, which will be used as checking condition
+	 * when swaping from the other fiber to the origin fiber.
+	 */ 
+	fb->fiber.flag = FIBER_F_STARTED;
+
 	return &fb->fiber;
 }
 
