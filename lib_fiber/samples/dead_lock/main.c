@@ -60,11 +60,17 @@ static void fiber_check(ACL_FIBER *fb, void *ctx)
 	(void) ctx;
 
 	while (1) {
+		ACL_FIBER_MUTEX_STATS *stats;
+
 		sleep(1);
 		printf("\r\n");
 		//acl_fiber_mutex_profile();
-		acl_fiber_mutex_deadcheck();
-		printf("-----------------------------------------------\r\n");
+		stats = acl_fiber_mutex_deadcheck();
+		if (stats) {
+			acl_fiber_mutex_stats_show(stats);
+			acl_fiber_mutex_stats_free(stats);
+		}
+		printf("===============================================\r\n");
 	}
 }
 

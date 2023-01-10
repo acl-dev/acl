@@ -194,7 +194,46 @@ static void add_waiters(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
 	}
 }
 
-static int check_deadlock2(MUTEX_CHECK *check)
+static ACL_FIBER_MUTEX_STATS *create_mutex_stats(HTABLE *table)
+{
+	int i = 0, j;
+	ITER iter1, iter2;
+	ACL_FIBER_MUTEX_STATS *stats = (ACL_FIBER_MUTEX_STATS*)
+		mem_malloc(sizeof(ACL_FIBER_MUTEX_STATS));
+
+	stats->count = htable_used(table);
+	stats->stats = (ACL_FIBER_MUTEX_STAT*) mem_malloc(
+		stats->count * sizeof(ACL_FIBER_MUTEX_STAT));
+
+	foreach(iter1, table) {
+		MUTEX_OWNER *owner = (MUTEX_OWNER*) iter1.data;
+
+		stats->stats[i].fiber   = owner->fiber;
+		stats->stats[i].waiting = owner->waiting;
+		stats->stats[i].count   = array_size(owner->holding);
+		if (stats->stats[i].count == 0) {
+			stats->stats[i].holding = NULL;
+			i++;
+			continue;
+		}
+
+		stats->stats[i].holding = (ACL_FIBER_MUTEX**) mem_malloc(
+			stats->stats[i].count * sizeof(ACL_FIBER_MUTEX*));
+
+		j = 0;
+		foreach(iter2, owner->holding) {
+			ACL_FIBER_MUTEX *mutex = (ACL_FIBER_MUTEX*) iter2.data;
+			stats->stats[i].holding[j] = mutex;
+			j++;
+		}
+
+		i++;
+	}
+
+	return stats;
+}
+
+static ACL_FIBER_MUTEX_STATS *check_deadlock2(MUTEX_CHECK *check)
 {
 	HTABLE *table = htable_create(100);
 	int  deadlocked = 0;
@@ -215,7 +254,7 @@ static int check_deadlock2(MUTEX_CHECK *check)
 		}
 
 		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(owner->fiber));
-		htable_enter(table, hkey, owner->fiber);
+		htable_enter(table, hkey, owner);
 
 		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
 		if (htable_find(table, hkey) != NULL) {
@@ -225,25 +264,19 @@ static int check_deadlock2(MUTEX_CHECK *check)
 		}
 	}
 
-	if (deadlocked) {
-		foreach(iter, table) {
-			ACL_FIBER *fiber = (ACL_FIBER*) iter.data;
-			printf("fiber-%d\r\n", acl_fiber_id(fiber));
-			show_stack(fiber);
-		}
-	} else {
-		printf("No deadlock\r\n");
+	if (!deadlocked || htable_used(table) == 0) {
+		htable_free(table, NULL);
+		return NULL;
 	}
 
-	htable_free(table, NULL);
-	return deadlocked;
+	return create_mutex_stats(table);
 }
 
-static int check_deadlock(THREAD_MUTEXES *mutexes)
+static ACL_FIBER_MUTEX_STATS *check_deadlock(THREAD_MUTEXES *mutexes)
 {
 	MUTEX_CHECK *check;
 	RING_ITER iter;
-	int ret;
+	ACL_FIBER_MUTEX_STATS *stats;
 
 	check = (MUTEX_CHECK*) mem_malloc(sizeof(MUTEX_CHECK));
 	check->owners  = htable_create(100);
@@ -253,12 +286,10 @@ static int check_deadlock(THREAD_MUTEXES *mutexes)
 		ACL_FIBER_MUTEX *mutex;
 		mutex  = RING_TO_APPL(iter.ptr, ACL_FIBER_MUTEX, me);
 
-#if 1
 		if (array_size(mutex->waiters) <= 0
 			&& array_size(mutex->waiting_threads) <= 0) {
 			continue;
 		}
-#endif
 
 		add_owner(check, mutex);
 	}
@@ -267,35 +298,76 @@ static int check_deadlock(THREAD_MUTEXES *mutexes)
 		ACL_FIBER_MUTEX *mutex;
 		mutex  = RING_TO_APPL(iter.ptr, ACL_FIBER_MUTEX, me);
 
-#if 1
-
 		if (array_size(mutex->waiters) <= 0
 			&& array_size(mutex->waiting_threads) <= 0) {
 			continue;
 		}
-#endif
 
 		add_waiters(check, mutex);
 	}
 
-	ret = check_deadlock2(check);
+	stats = check_deadlock2(check);
 
 	htable_free(check->owners, (void (*)(void*)) free_owner);
 	htable_free(check->waiters, (void (*)(void*)) free_waiter);
 	mem_free(check);
-	return ret;
+	return stats;
 }
 
-int acl_fiber_mutex_deadcheck(void)
+ACL_FIBER_MUTEX_STATS *acl_fiber_mutex_deadcheck(void)
 {
 	if (__locks != NULL) {
-		int ret;
+		ACL_FIBER_MUTEX_STATS *stats;
+
 		pthread_mutex_lock(&__lock);
-		ret = check_deadlock(__locks);
+		stats = check_deadlock(__locks);
 		pthread_mutex_unlock(&__lock);
-		return ret;
+		return stats;
 	} else {
-		return 0;
+		return NULL;
+	}
+}
+
+void acl_fiber_mutex_stats_free(ACL_FIBER_MUTEX_STATS *stats)
+{
+	size_t i;
+
+	if (!stats) {
+		return;
+	}
+
+	for (i = 0; i < stats->count; i++) {
+		mem_free(stats->stats[i].holding);
+	}
+
+	mem_free(stats->stats);
+	mem_free(stats);
+}
+
+static void show_mutex_stat(const ACL_FIBER_MUTEX_STAT *stat)
+{
+	size_t i;
+
+	printf("fiber-%d\r\n", acl_fiber_id(stat->fiber));
+	show_stack(stat->fiber);
+
+	for (i = 0; i < stat->count; i++) {
+		printf("Holding mutex=%p\r\n", stat->holding[i]);
+	}
+	printf("Waiting for mutex=%p\r\n", stat->waiting);
+}
+
+void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats)
+{
+	size_t i;
+
+	if (!stats) {
+		return;
+	}
+
+	for (i = 0; i < stats->count; i++) {
+		show_mutex_stat(&stats->stats[i]);
+		printf("-----------------------------------------------\r\n");
 	}
 }
 
