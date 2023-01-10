@@ -72,7 +72,6 @@ void acl_fiber_mutex_profile(void)
 		return;
 	}
 
-	//printf(">>>begin to check\n");
 	pthread_mutex_lock(&__lock);
 	ring_foreach(iter, &__locks->head) {
 		ACL_FIBER_MUTEX *lock =
@@ -80,22 +79,224 @@ void acl_fiber_mutex_profile(void)
 		show_status(lock);
 	}
 	pthread_mutex_unlock(&__lock);
-	//printf("\r\n");
+}
+
+typedef struct {
+	ACL_FIBER *fiber;
+	long owner;
+	ARRAY *holding;
+	ACL_FIBER_MUTEX *waiting;
+	int  idx;
+	char hkey[64];
+} MUTEX_OWNER;
+
+typedef struct {
+	ACL_FIBER_MUTEX *mutex;
+	ARRAY *waiters;
+	char hkey[64];
+} MUTEX_WAITER;
+
+typedef struct {
+	HTABLE *owners;
+	int owner_idx;
+	HTABLE *waiters;
+} MUTEX_CHECK;
+
+static MUTEX_OWNER *create_owner(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
+{
+	MUTEX_OWNER *owner = (MUTEX_OWNER*) mem_malloc(sizeof(MUTEX_OWNER));
+
+	owner->fiber   = mutex->fiber;
+	owner->owner   = mutex->owner;
+	owner->holding = array_create(10, ARRAY_F_UNORDER);
+	owner->waiting = NULL;
+	owner->idx     = check->owner_idx++;
+
+	array_append(owner->holding, mutex);
+
+	snprintf(owner->hkey, sizeof(owner->hkey), "%ld", owner->owner);
+	htable_enter(check->owners, owner->hkey, owner);
+	return owner;
+}
+
+static void free_owner(MUTEX_OWNER *owner)
+{
+	array_free(owner->holding, NULL);
+	mem_free(owner);
+}
+
+static MUTEX_OWNER *find_owner(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
+{
+	MUTEX_OWNER *owner;
+	char hkey[64];
+
+	snprintf(hkey, sizeof(hkey), "%ld", mutex->owner);
+	owner = (MUTEX_OWNER*) htable_find(check->owners, hkey);
+	return owner;
+}
+
+static void add_owner(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
+{
+	MUTEX_OWNER *owner = find_owner(check, mutex);
+
+	if (owner == NULL) {
+		owner = create_owner(check, mutex);
+	} else {
+		array_append(owner->holding, mutex);
+	}
+
+}
+
+static MUTEX_WAITER *create_waiter(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
+{
+	MUTEX_WAITER *waiter = (MUTEX_WAITER*) mem_malloc(sizeof(MUTEX_WAITER));
+
+	snprintf(waiter->hkey, sizeof(waiter->hkey), "%p", mutex);
+	waiter->waiters = array_create(10, ARRAY_F_UNORDER);
+	htable_enter(check->waiters, waiter->hkey, waiter);
+	return waiter;
+}
+
+static void free_waiter(MUTEX_WAITER *waiter)
+{
+	array_free(waiter->waiters, NULL);
+	mem_free(waiter);
+}
+
+static MUTEX_WAITER *find_waiter(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
+{
+	char hkey[64];
+
+	snprintf(hkey, sizeof(hkey), "%p", mutex);
+	return (MUTEX_WAITER*) htable_find(check->waiters, hkey);
+}
+
+static void add_waiters(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
+{
+	ITER iter;
+	MUTEX_WAITER *waiter = find_waiter(check, mutex);
+
+	if (waiter == NULL) {
+		waiter = create_waiter(check, mutex);
+	}
+
+	foreach(iter, mutex->waiters) {
+		ACL_FIBER *fiber = (ACL_FIBER*) iter.data;
+		char hkey[64];
+		MUTEX_OWNER *owner;
+
+		array_append(waiter->waiters, fiber);
+		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
+		owner = (MUTEX_OWNER*) htable_find(check->owners, hkey);
+		if (owner) {
+			owner->waiting = mutex;
+		}
+	}
+}
+
+static int check_deadlock2(MUTEX_CHECK *check)
+{
+	HTABLE *table = htable_create(100);
+	int  deadlocked = 0;
+	ITER iter;
+
+	foreach(iter, check->owners) {
+		MUTEX_OWNER *owner = (MUTEX_OWNER*) iter.data;
+		ACL_FIBER *fiber;
+		char hkey[64];
+
+		if (owner->waiting == NULL) {
+			continue;
+		}
+
+		fiber = owner->waiting->fiber;
+		if (fiber == NULL) {
+			continue;
+		}
+
+		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(owner->fiber));
+		htable_enter(table, hkey, owner->fiber);
+
+		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
+		if (htable_find(table, hkey) != NULL) {
+			deadlocked = 1;
+			printf("DeadLock happened!\r\n");
+			break;
+		}
+	}
+
+	if (deadlocked) {
+		foreach(iter, table) {
+			ACL_FIBER *fiber = (ACL_FIBER*) iter.data;
+			printf("fiber-%d\r\n", acl_fiber_id(fiber));
+			show_stack(fiber);
+		}
+	} else {
+		printf("No deadlock\r\n");
+	}
+
+	htable_free(table, NULL);
+	return deadlocked;
+}
+
+static int check_deadlock(THREAD_MUTEXES *mutexes)
+{
+	MUTEX_CHECK *check;
+	RING_ITER iter;
+	int ret;
+
+	check = (MUTEX_CHECK*) mem_malloc(sizeof(MUTEX_CHECK));
+	check->owners  = htable_create(100);
+	check->waiters = htable_create(100);
+
+	ring_foreach(iter, &mutexes->head) {
+		ACL_FIBER_MUTEX *mutex;
+		mutex  = RING_TO_APPL(iter.ptr, ACL_FIBER_MUTEX, me);
+
+#if 1
+		if (array_size(mutex->waiters) <= 0
+			&& array_size(mutex->waiting_threads) <= 0) {
+			continue;
+		}
+#endif
+
+		add_owner(check, mutex);
+	}
+
+	ring_foreach(iter, &mutexes->head) {
+		ACL_FIBER_MUTEX *mutex;
+		mutex  = RING_TO_APPL(iter.ptr, ACL_FIBER_MUTEX, me);
+
+#if 1
+
+		if (array_size(mutex->waiters) <= 0
+			&& array_size(mutex->waiting_threads) <= 0) {
+			continue;
+		}
+#endif
+
+		add_waiters(check, mutex);
+	}
+
+	ret = check_deadlock2(check);
+
+	htable_free(check->owners, (void (*)(void*)) free_owner);
+	htable_free(check->waiters, (void (*)(void*)) free_waiter);
+	mem_free(check);
+	return ret;
 }
 
 int acl_fiber_mutex_deadcheck(void)
 {
-	RING_ITER iter;
-
-	if (__locks == NULL) {
+	if (__locks != NULL) {
+		int ret;
+		pthread_mutex_lock(&__lock);
+		ret = check_deadlock(__locks);
+		pthread_mutex_unlock(&__lock);
+		return ret;
+	} else {
 		return 0;
 	}
-
-	pthread_mutex_lock(&__lock);
-	ring_foreach(iter, &__locks->head) {
-	}
-	pthread_mutex_unlock(&__lock);
-	return 0;
 }
 
 static void thread_waiter_add(ACL_FIBER_MUTEX *mutex, unsigned long tid)
@@ -162,6 +363,7 @@ ACL_FIBER_MUTEX *acl_fiber_mutex_create(unsigned flags)
 	pthread_mutex_lock(&__lock);
 	ring_prepend(&__locks->head, &mutex->me);
 	pthread_mutex_unlock(&__lock);
+
 	return mutex;
 }
 
