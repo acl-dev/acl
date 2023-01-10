@@ -69,6 +69,8 @@ static void fiber_check(ACL_FIBER *fb, void *ctx)
 		if (stats) {
 			acl_fiber_mutex_stats_show(stats);
 			acl_fiber_mutex_stats_free(stats);
+		} else {
+			printf("No deadlock happened!\r\n");
 		}
 		printf("===============================================\r\n");
 	}

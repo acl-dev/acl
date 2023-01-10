@@ -44,12 +44,6 @@ struct EPOLL {
 
 /****************************************************************************/
 
-#ifdef SYS_WIN
-# define SNPRINTF _snprintf
-#else
-# define SNPRINTF snprintf
-#endif
-
 static void epoll_event_free(EPOLL_EVENT *ee)
 {
 	mem_free(ee);

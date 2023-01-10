@@ -6,9 +6,11 @@
 #if defined(_WIN32) || defined(_WIN64)
 # define LIKELY
 # define UNLIKELY
+# define SNPRINTF _snprintf
 #else
 # define LIKELY(x)   __builtin_expect(!!(x), 1)
 # define UNLIKELY(x) __builtin_expect(!!(x), 0)
+# define SNPRINTF snprintf
 #endif
 
 #ifndef _GNU_SOURCE

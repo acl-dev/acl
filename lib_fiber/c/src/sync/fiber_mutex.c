@@ -114,7 +114,7 @@ static MUTEX_OWNER *create_owner(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
 
 	array_append(owner->holding, mutex);
 
-	snprintf(owner->hkey, sizeof(owner->hkey), "%ld", owner->owner);
+	SNPRINTF(owner->hkey, sizeof(owner->hkey), "%ld", owner->owner);
 	htable_enter(check->owners, owner->hkey, owner);
 	return owner;
 }
@@ -130,7 +130,7 @@ static MUTEX_OWNER *find_owner(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
 	MUTEX_OWNER *owner;
 	char hkey[64];
 
-	snprintf(hkey, sizeof(hkey), "%ld", mutex->owner);
+	SNPRINTF(hkey, sizeof(hkey), "%ld", mutex->owner);
 	owner = (MUTEX_OWNER*) htable_find(check->owners, hkey);
 	return owner;
 }
@@ -151,7 +151,7 @@ static MUTEX_WAITER *create_waiter(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
 {
 	MUTEX_WAITER *waiter = (MUTEX_WAITER*) mem_malloc(sizeof(MUTEX_WAITER));
 
-	snprintf(waiter->hkey, sizeof(waiter->hkey), "%p", mutex);
+	SNPRINTF(waiter->hkey, sizeof(waiter->hkey), "%p", mutex);
 	waiter->waiters = array_create(10, ARRAY_F_UNORDER);
 	htable_enter(check->waiters, waiter->hkey, waiter);
 	return waiter;
@@ -167,7 +167,7 @@ static MUTEX_WAITER *find_waiter(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
 {
 	char hkey[64];
 
-	snprintf(hkey, sizeof(hkey), "%p", mutex);
+	SNPRINTF(hkey, sizeof(hkey), "%p", mutex);
 	return (MUTEX_WAITER*) htable_find(check->waiters, hkey);
 }
 
@@ -186,7 +186,7 @@ static void add_waiters(MUTEX_CHECK *check, ACL_FIBER_MUTEX *mutex)
 		MUTEX_OWNER *owner;
 
 		array_append(waiter->waiters, fiber);
-		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
+		SNPRINTF(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
 		owner = (MUTEX_OWNER*) htable_find(check->owners, hkey);
 		if (owner) {
 			owner->waiting = mutex;
@@ -253,10 +253,10 @@ static ACL_FIBER_MUTEX_STATS *check_deadlock2(MUTEX_CHECK *check)
 			continue;
 		}
 
-		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(owner->fiber));
+		SNPRINTF(hkey, sizeof(hkey), "%d", acl_fiber_id(owner->fiber));
 		htable_enter(table, hkey, owner);
 
-		snprintf(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
+		SNPRINTF(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
 		if (htable_find(table, hkey) != NULL) {
 			deadlocked = 1;
 			printf("DeadLock happened!\r\n");
