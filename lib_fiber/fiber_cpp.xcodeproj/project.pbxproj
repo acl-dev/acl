@@ -28,6 +28,8 @@
 		070F361520902FDA00672EDC /* master_fiber.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 070F360B20902FDA00672EDC /* master_fiber.cpp */; };
 		070F361620902FDA00672EDC /* stdafx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 070F360C20902FDA00672EDC /* stdafx.cpp */; };
 		070F361720902FDA00672EDC /* stdafx.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 070F360D20902FDA00672EDC /* stdafx.hpp */; };
+		0722FFCA296F01790021E02A /* fiber_mutex_stat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0722FFC9296F01790021E02A /* fiber_mutex_stat.cpp */; };
+		0722FFCC296F019E0021E02A /* fiber_mutex_stat.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 0722FFCB296F019E0021E02A /* fiber_mutex_stat.hpp */; };
 		07BED4D221BA278D0060BBE4 /* fiber_cond.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 07BED4D121BA278D0060BBE4 /* fiber_cond.cpp */; };
 		07BED4D421BA27B70060BBE4 /* fiber_cond.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4D321BA27B70060BBE4 /* fiber_cond.hpp */; };
 		07BED4D621BA27BE0060BBE4 /* fiber_tbox.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 07BED4D521BA27BE0060BBE4 /* fiber_tbox.hpp */; };
@@ -77,6 +79,8 @@
 		070F360B20902FDA00672EDC /* master_fiber.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = master_fiber.cpp; path = ../lib_fiber/cpp/src/master_fiber.cpp; sourceTree = "<group>"; };
 		070F360C20902FDA00672EDC /* stdafx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = stdafx.cpp; path = ../lib_fiber/cpp/src/stdafx.cpp; sourceTree = "<group>"; };
 		070F360D20902FDA00672EDC /* stdafx.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; name = stdafx.hpp; path = ../lib_fiber/cpp/src/stdafx.hpp; sourceTree = "<group>"; };
+		0722FFC9296F01790021E02A /* fiber_mutex_stat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_mutex_stat.cpp; path = cpp/src/fiber_mutex_stat.cpp; sourceTree = "<group>"; };
+		0722FFCB296F019E0021E02A /* fiber_mutex_stat.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_mutex_stat.hpp; sourceTree = "<group>"; };
 		07BED4D121BA278D0060BBE4 /* fiber_cond.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fiber_cond.cpp; path = cpp/src/fiber_cond.cpp; sourceTree = "<group>"; };
 		07BED4D321BA27B70060BBE4 /* fiber_cond.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_cond.hpp; sourceTree = "<group>"; };
 		07BED4D521BA27BE0060BBE4 /* fiber_tbox.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = fiber_tbox.hpp; sourceTree = "<group>"; };
@@ -154,6 +158,7 @@
 		070F35F220902DB100672EDC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				0722FFC9296F01790021E02A /* fiber_mutex_stat.cpp */,
 				07C51B9E292BA87300231646 /* fiber_redis_pipeline.cpp */,
 				70147AAA292616E600367292 /* fiber_mutex.cpp */,
 				702452EF2897BD0D00B7449B /* wait_group.cpp */,
@@ -178,6 +183,7 @@
 		070F35F320902DDC00672EDC /* fiber */ = {
 			isa = PBXGroup;
 			children = (
+				0722FFCB296F019E0021E02A /* fiber_mutex_stat.hpp */,
 				07C51BA0292BA88200231646 /* fiber_redis_pipeline.hpp */,
 				70F62E4F2926432F0010B1F6 /* fiber_mutex.hpp */,
 				70147AA6292616CE00367292 /* go_fiber.hpp */,
@@ -230,6 +236,7 @@
 				702452F22897BD2300B7449B /* wait_group.hpp in Headers */,
 				70147AA7292616CE00367292 /* http_server.hpp in Headers */,
 				070F35E720902D9800672EDC /* fiber_cpp.h in Headers */,
+				0722FFCC296F019E0021E02A /* fiber_mutex_stat.hpp in Headers */,
 				07BED4D621BA27BE0060BBE4 /* fiber_tbox.hpp in Headers */,
 				070F35FD20902DDC00672EDC /* fiber.hpp in Headers */,
 				70E41F5726F3293E0068042B /* winapi_hook.hpp in Headers */,
@@ -324,6 +331,7 @@
 				070F361520902FDA00672EDC /* master_fiber.cpp in Sources */,
 				70E41F5826F3293E0068042B /* winapi_hook.cpp in Sources */,
 				070F361020902FDA00672EDC /* fiber_lock.cpp in Sources */,
+				0722FFCA296F01790021E02A /* fiber_mutex_stat.cpp in Sources */,
 				07BED4E922AFCB060060BBE4 /* keeper_conns.cpp in Sources */,
 				07BED4EB22AFCB060060BBE4 /* keeper_waiter.cpp in Sources */,
 				070F361120902FDA00672EDC /* fiber_sem.cpp in Sources */,
