@@ -25,7 +25,6 @@ CFLAGS = -c -g -W \
 -Wcast-qual \
 -DUSE_FAST_RING \
 -O3 \
-#-DDEBUG_STACK \
 #-DUSE_VALGRIND \
 #-DUSE_INLINE_MEMCPY\
 #-DUSE_FAST_TIME \
@@ -132,6 +131,13 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	endif
 	ifeq ($(HAS_RENAMEAT2), yes)
 		CFLAGS += -DHAS_RENAMEAT2
+	endif
+
+	ifeq ($(DEBUG_STACK), yes)
+		CFLAGS += -DDEBUG_STACK
+	endif
+	ifeq ($(debug_stack), yes)
+		CFLAGS += -DDEBUG_STACK
 	endif
 endif
 
