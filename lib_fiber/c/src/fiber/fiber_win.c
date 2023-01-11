@@ -26,7 +26,7 @@ typedef struct FIBER_WIN {
 	void *arg;
 } FIBER_WIN;
 
-ACL_FIBER_STACK *acl_fiber_stacktrace(ACL_FIBER *fiber, size_t max)
+ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 {
 	printf("%s(%d): Not supported, fiber-%d, max=%zd\r\n",
 		__FUNCTION__, __LINE__, acl_fiber_id(fiber), max);
