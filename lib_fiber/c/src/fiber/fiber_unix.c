@@ -73,7 +73,7 @@ ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 		return NULL;
 	}
 
-	ret = unw_init_local(&cursor, fb->context);
+	ret = unw_init_local(&cursor, (unw_context_t*) fb->context);
 	if (ret != 0) {
 		printf("unw_init_local error, ret=%d\r\n", ret);
 		return NULL;
