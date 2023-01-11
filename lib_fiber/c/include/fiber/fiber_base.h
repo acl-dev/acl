@@ -10,7 +10,7 @@ extern "C" {
 
 typedef struct ACL_FIBER_ATTR {
 	unsigned int   oflag;
-#define	ACL_FIBER_ATTR_SHARE_STACK	(unsigned) 1 << 0
+#define	ACL_FIBER_ATTR_SHARE_STACK	(unsigned) (1 << 0)
 
 	size_t stack_size;
 } ACL_FIBER_ATTR;
@@ -64,7 +64,7 @@ typedef struct ACL_FIBER_STACK {
 	size_t size;
 } ACL_FIBER_STACK;
 
-FIBER_API ACL_FIBER_STACK *acl_fiber_stacktrace(ACL_FIBER *fiber, size_t max);
+FIBER_API ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max);
 FIBER_API void acl_fiber_stackfree(ACL_FIBER_STACK *stack);
 
 /**

@@ -1,5 +1,7 @@
 #pragma once
 #include <stddef.h>
+#include <string>
+#include <vector>
 #include "fiber_cpp_define.hpp"
 
 struct ACL_FIBER;
@@ -14,6 +16,17 @@ typedef enum
 	FIBER_EVENT_T_WMSG,	// Windows
 	FIBER_EVENT_T_IO_URING,	// Linux
 } fiber_event_t;
+
+class FIBER_CPP_API fiber_frame
+{
+public:
+	fiber_frame(void) : pc(0), off(0) {}
+	~fiber_frame(void) {}
+
+	std::string func;
+	long pc;
+	long off;
+};
 
 /**
  * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
@@ -86,6 +99,7 @@ public:
 	 */
 	void set_errno(int errnum);
 
+public:
 	/**
 	 * 获得本次操作的出错信息
 	 * @return {const char*}
@@ -246,6 +260,15 @@ public:
 	 */
 	static void fiber_create(void (*fn)(ACL_FIBER*, void*),
 			void* ctx, size_t size);
+
+	/**
+	 * 获得指定协程的堆栈
+	 * @param fb {const fiber&}
+	 * @param out {std::vector<stack_frame>&} 存放结果数据
+	 * @param max {size_t} 指定获取栈的最大深度
+	 */
+	static void stacktrace(const fiber& fb, std::vector<fiber_frame>& out,
+			size_t max = 50);
 
 protected:
 	/**

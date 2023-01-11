@@ -299,6 +299,25 @@ void fiber::fiber_create(void (*fn)(ACL_FIBER*, void*), void* ctx, size_t size)
 	acl_fiber_create(fn, (void*) ctx, size);
 }
 
+void fiber::stacktrace(const fiber& fb, std::vector<fiber_frame>& out, size_t max)
+{
+	ACL_FIBER *f = fb.get_fiber();
+	ACL_FIBER_STACK *stack = acl_fiber_stacktrace(f, max);
+	if (stack == NULL) {
+		return;
+	}
+
+	for (size_t i = 0; i < stack->count; i++) {
+		fiber_frame frame;
+		frame.func = stack->frames[i].func;
+		frame.pc   = stack->frames[i].pc;
+		frame.off  = stack->frames[i].off;
+		out.push_back(frame);
+	}
+
+	acl_fiber_stackfree(stack);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer(void)

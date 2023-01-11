@@ -60,9 +60,9 @@ typedef struct FIBER_UNIX {
 #ifdef	DEBUG_STACK
 #include <libunwind.h>
 
-ACL_FIBER_STACK *acl_fiber_stacktrace(ACL_FIBER *fiber, size_t max)
+ACL_FIBER_STACK *acl_fiber_stacktrace(const ACL_FIBER *fiber, size_t max)
 {
-	FIBER_UNIX *fb = (FIBER_UNIX*) fiber;
+	const FIBER_UNIX *fb = (const FIBER_UNIX*) fiber;
 	unw_cursor_t cursor;
 	unw_word_t off, pc;
 	ACL_FIBER_STACK *stack;
