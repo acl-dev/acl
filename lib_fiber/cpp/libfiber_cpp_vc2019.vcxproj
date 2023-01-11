@@ -316,6 +316,7 @@
     <ClInclude Include="include\fiber\fiber_event.hpp" />
     <ClInclude Include="include\fiber\fiber_lock.hpp" />
     <ClInclude Include="include\fiber\fiber_mutex.hpp" />
+    <ClInclude Include="include\fiber\fiber_mutex_stat.hpp" />
     <ClInclude Include="include\fiber\fiber_redis_pipeline.hpp" />
     <ClInclude Include="include\fiber\fiber_sem.hpp" />
     <ClInclude Include="include\fiber\fiber_tbox.hpp" />
@@ -345,6 +346,7 @@
     <ClCompile Include="src\fiber_event.cpp" />
     <ClCompile Include="src\fiber_lock.cpp" />
     <ClCompile Include="src\fiber_mutex.cpp" />
+    <ClCompile Include="src\fiber_mutex_stat.cpp" />
     <ClCompile Include="src\fiber_redis_pipeline.cpp" />
     <ClCompile Include="src\fiber_sem.cpp" />
     <ClCompile Include="src\fiber_server.cpp" />

@@ -4,6 +4,8 @@
 
 #include "fiber_lock.hpp"
 #include "fiber_event.hpp"
+#include "fiber_mutex.hpp"
+#include "fiber_mutex_stat.hpp"
 #include "fiber_cond.hpp"
 #include "wait_group.hpp"
 #include "fiber_sem.hpp"

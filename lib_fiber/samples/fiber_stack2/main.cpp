@@ -50,14 +50,12 @@ private:
 
 	void run(void)
 	{
-		std::vector<acl::fiber_frame> stack;
-
 		for (int i = 0; i < count_; i++) {
+			std::vector<acl::fiber_frame> stack;
 			acl::fiber::stacktrace(*fb_, stack, 50);
 			show_stack(stack);
 			printf("\r\n");
 
-			stack.clear();
 			sleep(2);
 		}
 

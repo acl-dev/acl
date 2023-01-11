@@ -259,7 +259,6 @@ static ACL_FIBER_MUTEX_STATS *check_deadlock2(MUTEX_CHECK *check)
 		SNPRINTF(hkey, sizeof(hkey), "%d", acl_fiber_id(fiber));
 		if (htable_find(table, hkey) != NULL) {
 			deadlocked = 1;
-			printf("DeadLock happened!\r\n");
 			break;
 		}
 	}
@@ -314,7 +313,7 @@ static ACL_FIBER_MUTEX_STATS *check_deadlock(THREAD_MUTEXES *mutexes)
 	return stats;
 }
 
-ACL_FIBER_MUTEX_STATS *acl_fiber_mutex_deadcheck(void)
+ACL_FIBER_MUTEX_STATS *acl_fiber_mutex_deadlock(void)
 {
 	if (__locks != NULL) {
 		ACL_FIBER_MUTEX_STATS *stats;

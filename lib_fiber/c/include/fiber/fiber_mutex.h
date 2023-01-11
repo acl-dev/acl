@@ -32,7 +32,7 @@ typedef struct ACL_FIBER_MUTEX_STATS {
 
 
 FIBER_API void acl_fiber_mutex_profile(void);
-FIBER_API ACL_FIBER_MUTEX_STATS *acl_fiber_mutex_deadcheck(void);
+FIBER_API ACL_FIBER_MUTEX_STATS *acl_fiber_mutex_deadlock(void);
 FIBER_API void acl_fiber_mutex_stats_free(ACL_FIBER_MUTEX_STATS *stats);
 FIBER_API void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats);
 

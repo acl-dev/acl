@@ -1,5 +1,7 @@
 #pragma once
+#include <vector>
 #include "fiber_cpp_define.hpp"
+#include "fiber_mutex_stat.hpp"
 
 struct ACL_FIBER_MUTEX;
 
@@ -12,7 +14,13 @@ namespace acl {
 class FIBER_CPP_API fiber_mutex
 {
 public:
-	fiber_mutex(void);
+	/**
+	 * 构造函数
+	 * @param mutex {ACL_FIBER_MUTEX*} 非空时,将用 C 的锁对象创建 C++ 锁
+	 *  对象,否则内部自动创建 C 锁对象;如果非空时,在本对象析构时该传入的
+	 *  C 锁对象需由应用层自行释放.
+	 */
+	fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
 	~fiber_mutex(void);
 
 	/**
@@ -43,8 +51,16 @@ public:
 		return mutex_;
 	}
 
+	/**
+	 * 进行全局死锁检测
+	 * @param out {fiber_mutex_stats&} 存储结果集
+	 * @return {bool} 返回 true 表示存在死锁问题, 死锁信息存放在 out 中
+	 */
+	static bool deadlock(fiber_mutex_stats& out);
+
 private:
 	ACL_FIBER_MUTEX* mutex_;
+	ACL_FIBER_MUTEX* mutex_internal_;
 
 	fiber_mutex(const fiber_mutex&);
 	void operator=(const fiber_mutex&);

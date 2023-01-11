@@ -17,9 +17,8 @@ typedef enum
 	FIBER_EVENT_T_IO_URING,	// Linux
 } fiber_event_t;
 
-class FIBER_CPP_API fiber_frame
+struct FIBER_CPP_API fiber_frame
 {
-public:
 	fiber_frame(void) : pc(0), off(0) {}
 	~fiber_frame(void) {}
 
@@ -34,6 +33,9 @@ public:
 class FIBER_CPP_API fiber
 {
 public:
+	fiber(void);
+	fiber(ACL_FIBER *fb);
+
 	/**
 	 * 构造函数
 	 * @param running {bool} 当为 true 时，则表示当前协程已启动，仅是声明
@@ -41,7 +43,8 @@ public:
 	 *  象的 start 方法启动新协程; 当为 false 时，则需要调用 start 方法来
 	 *  启动新协程
 	 */
-	fiber(bool running = false);
+	fiber(bool running);
+
 	virtual ~fiber(void);
 
 	/**
@@ -86,6 +89,12 @@ public:
 	 * @return {unsigned int}
 	 */
 	static unsigned int self(void);
+
+	/**
+	 * 获得指定协程对象的ID号
+	 * @return {unsigned int}
+	 */
+	static unsigned int id(const fiber& fb);
 
 	/**
 	 * 获得当前协程在执行某个系统 API 出错时的错误号

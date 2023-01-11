@@ -4,7 +4,17 @@
 
 namespace acl {
 
-fiber::fiber(bool running /* = false */)
+fiber::fiber(void)
+{
+	f_ = NULL;
+}
+
+fiber::fiber(ACL_FIBER *f)
+{
+	f_ = f;
+}
+
+fiber::fiber(bool running)
 {
 	if (running) {
 		f_ = acl_fiber_running();
@@ -29,6 +39,12 @@ unsigned int fiber::get_id(void) const
 unsigned int fiber::self(void)
 {
 	return acl_fiber_self();
+}
+
+unsigned int fiber::id(const fiber& fb)
+{
+	ACL_FIBER *f = fb.get_fiber();
+	return f ? acl_fiber_id(f) : 0;
 }
 
 int fiber::get_errno(void) const

@@ -75,6 +75,9 @@
     <ClCompile Include="src\fiber_mutex.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="src\fiber_mutex_stat.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="src\tcp_keeper.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -138,6 +141,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\fiber_mutex.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="include\fiber\fiber_mutex_stat.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="include\fiber\http_server.hpp">
