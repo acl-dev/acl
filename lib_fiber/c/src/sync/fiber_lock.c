@@ -59,6 +59,7 @@ static int __lock(ACL_FIBER_LOCK *lk, int block)
 	curr->waiting = lk;
 #endif
 
+	curr->status = FIBER_STATUS_WAIT_LOCK;
 	ev = fiber_io_event();
 	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
@@ -161,6 +162,7 @@ static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 	curr = acl_fiber_running();
 	ring_prepend(&lk->rwaiting, &curr->me);
 
+	curr->status = FIBER_STATUS_WAIT_LOCK;
 	ev = fiber_io_event();
 	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();
@@ -199,6 +201,7 @@ static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 	curr = acl_fiber_running();
 	ring_prepend(&lk->wwaiting, &curr->me);
 
+	curr->status = FIBER_STATUS_WAIT_LOCK;
 	ev = fiber_io_event();
 	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();

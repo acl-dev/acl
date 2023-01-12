@@ -16,7 +16,8 @@ struct ACL_FIBER_MUTEX {
 };
 
 struct ACL_FIBER_COND {
-	ARRAY          *waiters;
+	RING   me;
+	ARRAY *waiters;
 	pthread_mutex_t mutex;
 };
 

@@ -332,6 +332,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	fiber = acl_fiber_running();
 	fiber_timer_add(fiber, milliseconds);
 
+	fiber->status = FIBER_STATUS_DELAY;
 	WAITER_INC(__thread_fiber->event);
 
 	acl_fiber_switch();

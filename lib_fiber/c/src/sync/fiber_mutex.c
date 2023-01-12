@@ -281,6 +281,7 @@ static ACL_FIBER_MUTEX_STATS *check_deadlock(THREAD_MUTEXES *mutexes)
 	check->owners  = htable_create(100);
 	check->waiters = htable_create(100);
 
+	/* Walk through all mutexes, adding all owners into the hash table. */
 	ring_foreach(iter, &mutexes->head) {
 		ACL_FIBER_MUTEX *mutex;
 		mutex  = RING_TO_APPL(iter.ptr, ACL_FIBER_MUTEX, me);
@@ -369,6 +370,8 @@ void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats)
 		printf("-----------------------------------------------\r\n");
 	}
 }
+
+/****************************************************************************/
 
 static void thread_waiter_add(ACL_FIBER_MUTEX *mutex, unsigned long tid)
 {
@@ -484,6 +487,7 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 
 		pthread_mutex_unlock(&mutex->lock);
 
+		fiber->status = FIBER_STATUS_WAIT_MUTEX;
 		ev = fiber_io_event();
 		WAITER_INC(ev);
 		acl_fiber_switch();
@@ -526,6 +530,7 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 
 		pthread_mutex_unlock(&mutex->lock);
 
+		fiber->status = FIBER_STATUS_WAIT_MUTEX;
 		ev = fiber_io_event();
 		WAITER_INC(ev);
 		acl_fiber_switch();
