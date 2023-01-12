@@ -9,15 +9,46 @@
 #include "sync_type.h"
 #include "sync_timer.h"
 
+typedef struct {
+	RING head;
+} THREAD_CONDS;
+
+static pthread_once_t  __once_control = PTHREAD_ONCE_INIT;
+static THREAD_CONDS   *__conds = NULL;
+static pthread_mutex_t __lock;
+
+static void free_conds_onexit(void)
+{
+	if (__conds) {
+		mem_free(__conds);
+		__conds = NULL;
+	}
+}
+
+static void thread_once(void)
+{
+	pthread_mutex_init(&__lock, NULL);
+	__conds = (THREAD_CONDS*) mem_malloc(sizeof(THREAD_CONDS));
+	ring_init(&__conds->head);
+	atexit(free_conds_onexit);
+}
+
 ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
 {
 #ifdef SYS_UNIX
 	pthread_mutexattr_t attr;
 #endif
-	ACL_FIBER_COND *cond = (ACL_FIBER_COND *)
-		mem_calloc(1, sizeof(ACL_FIBER_COND));
+	ACL_FIBER_COND *cond;
 
+	if (pthread_once(&__once_control, thread_once) != 0) {
+		printf("%s(%d), %s: pthread_once error %s\r\n",
+			__FILE__, __LINE__, __FUNCTION__, last_serror());
+		abort();
+	}
+
+	cond = (ACL_FIBER_COND *) mem_calloc(1, sizeof(ACL_FIBER_COND));
 	cond->waiters = array_create(10, ARRAY_F_UNORDER);
+	ring_init(&cond->me);
 
 #ifdef SYS_UNIX
 	pthread_mutexattr_init(&attr);
@@ -28,11 +59,19 @@ ACL_FIBER_COND *acl_fiber_cond_create(unsigned flag fiber_unused)
 	pthread_mutex_init(&cond->mutex, NULL);
 #endif
 
+	pthread_mutex_lock(&__lock);
+	ring_prepend(&__conds->head, &cond->me);
+	pthread_mutex_unlock(&__lock);
+
 	return cond;
 }
 
 void acl_fiber_cond_free(ACL_FIBER_COND *cond)
 {
+	pthread_mutex_lock(&__lock);
+	ring_detach(&cond->me);
+	pthread_mutex_unlock(&__lock);
+	
 	array_free(cond->waiters, NULL);
 	pthread_mutex_destroy(&cond->mutex);
 	mem_free(cond);
@@ -101,6 +140,7 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 
 	FIBER_UNLOCK(mutex);
 
+	fiber->status = FIBER_STATUS_WAIT_COND;
 	WAITER_INC(ev);
 
 	// Hang the current fiber and will wakeup if the timer arrives or
