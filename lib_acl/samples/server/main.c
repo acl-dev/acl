@@ -33,7 +33,10 @@ static void thread_run(void *arg)
 	
 static void run(const char *addr)
 {
-	ACL_VSTREAM *sstream = acl_vstream_listen(addr, 128);
+	unsigned flag = ACL_INET_FLAG_REUSEPORT;
+	int bufsize = 4096, timeout = 10;
+	ACL_VSTREAM *sstream = acl_vstream_listen_ex(addr, 128,
+			flag, bufsize, timeout);
 	acl_pthread_pool_t *pool;
 
 	if (sstream == NULL) {
@@ -50,7 +53,6 @@ static void run(const char *addr)
 			break;
 		}
 		printf("accept one client\r\n");
-		acl_vstream_close(client); continue;
 		acl_pthread_pool_add(pool, thread_run, client);
 	}
 
