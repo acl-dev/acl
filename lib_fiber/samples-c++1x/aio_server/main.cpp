@@ -317,7 +317,7 @@ static void aio_run(bool use_reactor, acl::aio_handle& handle,
 #if 0
 	struct epoll_event event;
 	int pfd = epoll_create(100);
-	int epfd = fcntl(pfd, F_DUPFD);
+	int epfd = fcntl(pfd, F_DUPFD_CLOEXEC, 0);
 	printf(">>>epfd=%d, pfd=%d\n", epfd, pfd);
 	event.events = EPOLLIN;
 	event.data.ptr = sstream;
