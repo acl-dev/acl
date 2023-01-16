@@ -306,11 +306,26 @@ private:
 	long long delay_;
 };
 
+#include <sys/epoll.h>
+
 static void aio_run(bool use_reactor, acl::aio_handle& handle,
 	acl::aio_listen_stream* sstream)
 {
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
 	io_accept_callback callback;
+
+#if 0
+	struct epoll_event event;
+	int pfd = epoll_create(100);
+	int epfd = fcntl(pfd, F_DUPFD);
+	printf(">>>epfd=%d, pfd=%d\n", epfd, pfd);
+	event.events = EPOLLIN;
+	event.data.ptr = sstream;
+	int ret = epoll_ctl(epfd, EPOLL_CTL_ADD, sstream->sock_handle(), &event);
+	printf(">>>epoll add ret=%d\n", ret);
+	ret = epoll_ctl(epfd, EPOLL_CTL_DEL, sstream->sock_handle(), &event);
+	printf(">>>epoll del ret=%d\n", ret);
+#endif
 
 	if (use_reactor) {
 		sstream->add_listen_callback(&callback);
@@ -405,6 +420,7 @@ int main(int argc, char* argv[])
 	// 初始化ACL库(尤其是在WIN32下一定要调用此函数，在UNIX平台下可不调用)
 	acl::acl_cpp_init();
 
+	acl::fiber::stdout_open(true);
 	acl::log::stdout_open(true);
 
 

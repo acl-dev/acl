@@ -205,29 +205,31 @@ int epoll_try_register(int epfd)
 	ITER iter;
 
 	if (epfd < 0) {
-		return 0;
+		return -1;
 	}
 
 	ev = fiber_io_event();
 	if (ev == NULL) {
-		return 0;
+		return -1;
 	}
 
 	sys_epfd = event_handle(ev);
 	assert(sys_epfd >= 0);
 
 	if (epfd == sys_epfd) {
-		return epoll_alloc(epfd) == NULL ? 0 : 1;
+		EPOLL *ep = epoll_alloc(epfd);
+		return ep->epfd;
 	}
 
 	foreach(iter, __epfds) {
 		EPOLL *tmp = (EPOLL *) iter.data;
 		if (tmp->epfd == epfd) {
-			return epoll_alloc(epfd) == NULL ? 0 : 1;
+			EPOLL *ep = epoll_alloc(epfd);
+			return ep->epfd;
 		}
 	}
 
-	return 0;
+	return -1;
 }
 
 static void epoll_free(EPOLL *ep)

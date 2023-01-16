@@ -21,20 +21,17 @@ int fcntl(int fd, int cmd, ...)
 
 	switch (cmd) {
 	case F_DUPFD:
-		if (var_hook_sys_api && epoll_try_register(fd) == 1) {
-			ret = 0;
-		} else {
+		if (!var_hook_sys_api || (ret = epoll_try_register(fd)) == -1) {
 			arg_int = va_arg(ap, int);
 			ret = (*sys_fcntl)(fd, cmd, arg_int);
 		}
 		break;
 	case F_DUPFD_CLOEXEC:
-		if (var_hook_sys_api && epoll_try_register(fd) == 1) {
-			close_on_exec(fd, 1);
-			ret = 0;
-		} else {
+		if (!var_hook_sys_api || (ret = epoll_try_register(fd)) == -1) {
 			arg_int = va_arg(ap, int);
 			ret = (*sys_fcntl)(fd, cmd, arg_int);
+		} else {
+			close_on_exec(fd, 1);
 		}
 		break;
 	case F_GETFD:
