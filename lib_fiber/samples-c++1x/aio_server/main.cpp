@@ -306,7 +306,7 @@ private:
 	long long delay_;
 };
 
-#include <sys/epoll.h>
+//#include <sys/epoll.h>
 
 static void aio_run(bool use_reactor, acl::aio_handle& handle,
 	acl::aio_listen_stream* sstream)
