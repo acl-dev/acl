@@ -49,6 +49,9 @@ gethostbyname_fn *sys_gethostbyname         = NULL;
 sleep_fn    __sys_sleep                     = NULL;
 sleep_fn    *sys_sleep                      = NULL;
 
+fcntl_fn    __sys_fcntl                     = NULL;
+fcntl_fn    *sys_fcntl                      = NULL;
+
 setsockopt_fn __sys_setsockopt              = NULL;
 setsockopt_fn *sys_setsockopt               = NULL;
 
@@ -232,6 +235,7 @@ static void hook_api(void)
 	LOAD_FN("connect", connect_fn, __sys_connect, sys_connect);
 	LOAD_FN("setsockopt", setsockopt_fn, __sys_setsockopt, sys_setsockopt);
 	LOAD_FN("sleep", sleep_fn, __sys_sleep, sys_sleep);
+	LOAD_FN("fcntl", fcntl_fn, __sys_fcntl, sys_fcntl);
 	LOAD_FN("read", read_fn, __sys_read, sys_read);
 	LOAD_FN("readv", readv_fn, __sys_readv, sys_readv);
 	LOAD_FN("recv", recv_fn, __sys_recv, sys_recv);

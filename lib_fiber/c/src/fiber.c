@@ -17,10 +17,8 @@
 
 #ifdef	HOOK_ERRNO
 typedef int  *(*errno_fn)(void);
-typedef int   (*fcntl_fn)(int, int, ...);
 
 static errno_fn __sys_errno     = NULL;
-static fcntl_fn __sys_fcntl     = NULL;
 #endif
 
 typedef struct THREAD {
@@ -233,7 +231,6 @@ static void fiber_init(void)
 #else
 	__sys_errno   = (errno_fn) dlsym(RTLD_NEXT, "__errno_location");
 #endif
-	__sys_fcntl   = (fcntl_fn) dlsym(RTLD_NEXT, "fcntl");
 
 	(void) pthread_mutex_unlock(&__lock);
 #endif
@@ -263,55 +260,6 @@ int *__errno_location(void)
 	} else {
 		return &__thread_fiber->original.errnum;
 	}
-}
-
-#endif
-
-#if 0
-
-int fcntl(int fd, int cmd, ...)
-{
-	long arg;
-	struct flock *lock;
-	va_list ap;
-	int ret;
-
-	if (__sys_fcntl == NULL) {
-		fiber_init();
-	}
-
-	va_start(ap, cmd);
-
-	switch (cmd) {
-	case F_GETFD:
-	case F_GETFL:
-		ret = __sys_fcntl(fd, cmd);
-		break;
-	case F_SETFD:
-	case F_SETFL:
-		arg = va_arg(ap, long);
-		ret = __sys_fcntl(fd, cmd, arg);
-		break;
-	case F_GETLK:
-	case F_SETLK:
-	case F_SETLKW:
-		lock = va_arg(ap, struct flock*);
-		ret = __sys_fcntl(fd, cmd, lock);
-		break;
-	default:
-		ret = -1;
-		msg_error("%s(%d), %s: unknown cmd: %d, fd: %d",
-			__FILE__, __LINE__, __FUNCTION__, cmd, fd);
-		break;
-	}
-
-	va_end(ap);
-
-	if (ret < 0) {
-		fiber_save_errno(acl_fiber_last_error());
-	}
-
-	return ret;
 }
 
 #endif

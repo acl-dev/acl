@@ -37,6 +37,7 @@ typedef socket_t (WSAAPI *WSAAccept_fn)(SOCKET, struct sockaddr FAR *,
 
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__) || defined(MINGW)
 
+typedef int (*fcntl_fn)(int, int, ...);
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
 typedef ssize_t  (*read_fn)(socket_t, void *, size_t);
@@ -138,8 +139,9 @@ extern WSAAccept_fn         *sys_WSAAccept;
 
 #elif defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  || defined(MINGW) // SYS_UNIX
 
-extern sleep_fn             *sys_sleep;
+extern fcntl_fn             *sys_fcntl;
 extern setsockopt_fn        *sys_setsockopt;
+extern sleep_fn             *sys_sleep;
 
 extern read_fn              *sys_read;
 extern readv_fn             *sys_readv;
@@ -183,6 +185,11 @@ extern pwrite_fn            *sys_pwrite;
 
 // in hook.c
 void hook_once(void);
+
+#if defined(__linux__)
+// in epoll.c
+int epoll_try_register(int epfd);
+#endif
 
 #ifdef __cplusplus
 }

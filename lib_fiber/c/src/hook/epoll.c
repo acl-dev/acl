@@ -198,6 +198,38 @@ static EPOLL *epoll_alloc(int epfd)
 	return ep;
 }
 
+int epoll_try_register(int epfd)
+{
+	int sys_epfd;
+	EVENT *ev;
+	ITER iter;
+
+	if (epfd < 0) {
+		return 0;
+	}
+
+	ev = fiber_io_event();
+	if (ev == NULL) {
+		return 0;
+	}
+
+	sys_epfd = event_handle(ev);
+	assert(sys_epfd >= 0);
+
+	if (epfd == sys_epfd) {
+		return epoll_alloc(epfd) == NULL ? 0 : 1;
+	}
+
+	foreach(iter, __epfds) {
+		EPOLL *tmp = (EPOLL *) iter.data;
+		if (tmp->epfd == epfd) {
+			return epoll_alloc(epfd) == NULL ? 0 : 1;
+		}
+	}
+
+	return 0;
+}
+
 static void epoll_free(EPOLL *ep)
 {
 	ITER iter;
@@ -324,7 +356,7 @@ int epoll_create(int size fiber_unused)
 {
 	EVENT *ev;
 	EPOLL *ep;
-	int    epfd;
+	int    sys_epfd;
 
 	if (sys_epoll_create == NULL) {
 		hook_once();
@@ -338,16 +370,16 @@ int epoll_create(int size fiber_unused)
 	assert(ev);
 
 	// Get the current thread's epoll fd.
-	epfd = event_handle(ev);
-	if (epfd < 0) {
+	sys_epfd = event_handle(ev);
+	if (sys_epfd < 0) {
 		msg_error("%s(%d), %s: invalid event_handle %d",
-			__FILE__, __LINE__, __FUNCTION__, epfd);
-		return epfd;
+			__FILE__, __LINE__, __FUNCTION__, sys_epfd);
+		return sys_epfd;
 	}
 
 	// The epoll fd will be duplicated in the below function, and the new
 	// fd will be returned to the caller.
-	ep = epoll_alloc(epfd);
+	ep = epoll_alloc(sys_epfd);
 	return ep->epfd;
 }
 
