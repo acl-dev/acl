@@ -66,4 +66,20 @@ private:
 	void operator=(const fiber_mutex&);
 };
 
+class FIBER_CPP_API fiber_mutex_guard
+{
+public:
+	fiber_mutex_guard(fiber_mutex& mutex) : mutex_(mutex) {
+		mutex_.lock();
+	}
+
+	~fiber_mutex_guard(void) {
+		mutex_.unlock();
+	}
+
+private:
+	fiber_mutex& mutex_;
+
+};
+
 } // namespace acl
