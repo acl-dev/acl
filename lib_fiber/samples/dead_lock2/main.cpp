@@ -68,7 +68,7 @@ private:
 	}
 
 	void show(const acl::fiber_mutex_stat& stat) {
-		printf("fiber-%d:\r\n", acl::fiber::id(*stat.fb));
+		printf("fiber-%d:\r\n", acl::fiber::fiber_id(*stat.fb));
 
 		std::vector<acl::fiber_frame> stack;
 		acl::fiber::stacktrace(*stat.fb, stack, 50);

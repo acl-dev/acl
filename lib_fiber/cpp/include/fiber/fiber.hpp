@@ -94,7 +94,7 @@ public:
 	 * 获得指定协程对象的ID号
 	 * @return {unsigned int}
 	 */
-	static unsigned int id(const fiber& fb);
+	static unsigned int fiber_id(const fiber& fb);
 
 	/**
 	 * 获得当前协程在执行某个系统 API 出错时的错误号

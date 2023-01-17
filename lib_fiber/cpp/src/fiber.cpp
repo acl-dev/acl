@@ -41,7 +41,7 @@ unsigned int fiber::self(void)
 	return acl_fiber_self();
 }
 
-unsigned int fiber::id(const fiber& fb)
+unsigned int fiber::fiber_id(const fiber& fb)
 {
 	ACL_FIBER *f = fb.get_fiber();
 	return f ? acl_fiber_id(f) : 0;
