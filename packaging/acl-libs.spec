@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Thu Jan 19 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.0-4-20230119.15
+- feature: add fiber's stack backtrace
+- feature: add fiber mutex dead lock checking
+- feature: hook fcntl API on Linux for Rust user
 
 * Thu Dec 29 2022 shuxin.zheng shuxin.zheng@qq.com 3.6.0-3-20221229.17
 - optimize: use AVL to handle the global timer to improve the timer's performance
