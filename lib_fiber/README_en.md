@@ -243,11 +243,11 @@ private:
 	void run(void) {
 		char buf[256];
 			while (true) {
-			int ret = conn->read(buf, sizeof(buf), false);
+			int ret = conn_->read(buf, sizeof(buf), false);
 			if (ret <= 0) {
 				break;
 			}
-			if (conn->write(buf, ret) != ret) {
+			if (conn_->write(buf, ret) != ret) {
 				break;
 			}
 		}
@@ -258,18 +258,18 @@ private:
 
 class fiber_server : public acl::fiber {
 public:
-	fiber_server(acl::server_socket* server) : server_(server) {}
+	fiber_server(acl::server_socket& server) : server_(server) {}
 
 private:
-	~fiber_server(void) { delete server_; }
+	~fiber_server(void) {}
 
 private:
-	acl::server_socket* server_;
+	acl::server_socket& server_;
 
 	// @override
 	void run(void) {
 		while (true) {
-			acl::socket_stream* conn = server.accept();
+			acl::socket_stream* conn = server_.accept();
 			if (conn) {
 				acl::fiber* fb = new fiber_client(conn);
 				fb->start();
