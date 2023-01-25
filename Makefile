@@ -92,6 +92,8 @@ ifeq ($(findstring Darwin, $(OSNAME)), Darwin)
 	RPATH = macos
 	SYSLIB +=  -rdynamic -L/usr/lib -liconv
 	LDFLAGS = -dynamiclib -shared
+	INC_ACL = /usr/local/include/acl-lib
+	LIB_ACL = /usr/local/lib
 endif
 
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
@@ -172,14 +174,14 @@ packinstall:
 	@cp -Rf lib_protocol/include/* $(INC_ACL)/protocol/
 	@echo "copying libacl_all.a $(LIB_ACL)/libacl_all.a";
 	@cp -f libacl_all.a $(LIB_ACL)/libacl_all.a;
-	@if test "$(OSNAME)" = "Linux"; then \
+	@if test "$(OSNAME)" = "Linux" || test "$(OSNAME)" = "Darwin"; then \
 		$(shell mkdir -p $(INC_ACL)/fiber) \
 		$(shell mkdir -p $(INC_ACL)/fiber/detail) \
 		echo "copying lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/"; \
-		cp -f lib_fiber/c/include/fiber/* $(INC_ACL)/fiber/; \
+		cp -f lib_fiber/c/include/fiber/*.h $(INC_ACL)/fiber/; \
 		echo "copying lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/"; \
-		cp -f lib_fiber/cpp/include/fiber/* $(INC_ACL)/fiber/; \
-		cp -f lib_fiber/cpp/include/fiber/detail/* $(INC_ACL)/fiber/detail/; \
+		cp -f lib_fiber/cpp/include/fiber/*.hpp $(INC_ACL)/fiber/; \
+		cp -f lib_fiber/cpp/include/fiber/detail/*.hpp $(INC_ACL)/fiber/detail/; \
 		echo "copying lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a"; \
 		cp -f lib_fiber/lib/libfiber.a $(LIB_ACL)/libfiber.a; \
 		echo "copying lib_fiber/lib/libfiber_cpp.a $(LIB_ACL)/libfiber_cpp.a"; \
