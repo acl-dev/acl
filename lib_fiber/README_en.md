@@ -9,6 +9,8 @@
 * [SAMPLES](#samples)
     * [One server sample](#one-server-sample)
     * [One client sample](#one-client-sample)
+    * [Coroutine server with c++](#coroutine-server-with-c)
+    * [Coroutine server with c++11](#coroutine-server-with-c11)
 	* [Windows GUI sample](#windows-gui-sample)
 	* [More SAMPLES](#more-samples)
 * [BUILDING](#building)
@@ -27,19 +29,17 @@
 <!-- vim-markdown-toc -->
 
 ## About
-The libfiber project comes from the coroutine module of the [acl project](#https://github.com/acl-dev/acl) in lib_fiber directory of which. It can be used on OS platfroms including Linux, FreeBSD, MacOS, and Windows, which supports select, poll, epoll, kqueue, iocp, and even Windows GUI messages for different platfrom. With libfiber, you can write network application services having the high performance and large cocurrent more easily than the traditional asynchronus  framework with event-driven model. <b>What's more</b>, with the help of libfiber, you can even write network module of the Windows GUI application written by MFC, wtl or other GUI framework on Windows in coroutine way. That's realy amazing.
+The libfiber project comes from the coroutine module of the [acl project](#https://github.com/acl-dev/acl) in lib_fiber directory of which. It can be used on OS platfroms including Linux, FreeBSD, MacOS, and Windows, which supports select, poll, epoll, io-uring, kqueue, iocp, and even Windows GUI messages for different platfrom. With libfiber, you can write network application services having the high performance and large cocurrent more easily than the traditional asynchronus  framework with event-driven model. <b>What's more</b>, with the help of libfiber, you can even write network module of the Windows GUI application written by MFC, wtl or other GUI framework on Windows in coroutine way. That's realy amazing.
 
 ## Which IO events are supported ?
-The libfiber supports many events including select/poll/epoll/kqueue/iocp, and Windows GUI messages.
+The libfiber supports many events including select/poll/epoll/io-uring/kqueue/iocp, and Windows GUI messages.
 
-Event|Linux|BSD|Mac|Windows
------|----|------|---|---
-<b>select</b>|yes|yes|yes|yes
-<b>poll</b>|yes|yes|yes|yes
-<b>epoll</b>|yes|no|no|no
-<b>kqueue</b>|no|yes|yes|no
-<b>iocp</b>|no|no|no|yes
-<b>Win GUI message</b>|no|no|no|yes
+Platform|Event type
+--------|----------
+Linux|select, poll, epoll, io-uring
+BSD|select, poll, kqueue
+Mac|select, poll, kqueue
+Windows|select, poll, iocp, GUI Message
 
 ## SAMPLES
 
@@ -63,7 +63,7 @@ static void fiber_client(ACL_FIBER *fb, void *ctx)
 	char buf[8192];
 
 	while (1) {
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		int ret = acl_fiber_recv(*pfd, buf, sizeof(buf), 0);
 #else
 		int ret = recv(*pfd, buf, sizeof(buf), 0);
@@ -76,7 +76,7 @@ static void fiber_client(ACL_FIBER *fb, void *ctx)
 			}
 			break;
 		}
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		if (acl_fiber_send(*pfd, buf, ret, 0) < 0) {
 #else
 		if (send(*pfd, buf, ret, 0) < 0) {
@@ -125,7 +125,7 @@ int main(void)
 {
 	int event_mode = FIBER_EVENT_KERNEL;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 	socket_init();
 #endif
 
@@ -135,7 +135,7 @@ int main(void)
 	// start the fiber schedule process
 	acl_fiber_schedule_with(event_mode);
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 	socket_end();
 #endif
 
@@ -172,7 +172,7 @@ static void fiber_client(ACL_FIBER *fb, void *ctx)
 	}
 
 	for (i = 0; i < 1024; i++) {
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		if (acl_fiber_send(cfd, s, strlen(s), 0) <= 0) {
 #else
 		if (send(cfd, s, strlen(s), 0) <= 0) {
@@ -181,7 +181,7 @@ static void fiber_client(ACL_FIBER *fb, void *ctx)
 			break;
 		}
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 		ret = acl_fiber_recv(cfd, buf, sizeof(buf), 0);
 #else
 		ret = recv(cfd, buf, sizeof(buf), 0);
@@ -191,7 +191,7 @@ static void fiber_client(ACL_FIBER *fb, void *ctx)
 		}
 	}
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 	acl_fiber_close(cfd);
 #else
 	close(cfd);
@@ -205,7 +205,7 @@ int main(void)
 
 	int i;
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 	socket_init();
 #endif
 
@@ -215,10 +215,119 @@ int main(void)
 
 	acl_fiber_schedule_with(event_mode);
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_WIN32)
 	socket_end();
 #endif
 
+	return 0;
+}
+```
+
+### Coroutine server with c++
+
+```c++
+#include "acl_cpp/lib_acl.hpp"
+#include "fiber/libfiber.hpp"
+
+class fiber_client : public acl::fiber {
+public:
+	fiber_client(acl::socket_stream* conn) : conn_(conn) {}
+
+private:
+	~fiber_client(void) { delete conn_; }
+
+private:
+	acl::socket_stream* conn_;
+
+	// @override
+	void run(void) {
+		char buf[256];
+			while (true) {
+			int ret = conn->read(buf, sizeof(buf), false);
+			if (ret <= 0) {
+				break;
+			}
+			if (conn->write(buf, ret) != ret) {
+				break;
+			}
+		}
+
+		delete this;
+	}
+};
+
+class fiber_server : public acl::fiber {
+public:
+	fiber_server(acl::server_socket* server) : server_(server) {}
+
+private:
+	~fiber_server(void) { delete server_; }
+
+private:
+	acl::server_socket* server_;
+
+	// @override
+	void run(void) {
+		while (true) {
+			acl::socket_stream* conn = server.accept();
+			if (conn) {
+				acl::fiber* fb = new fiber_client(conn);
+				fb->start();
+			}
+		}
+
+		delete this;
+	}
+};
+
+int main(void) {
+	const char* addr = "127.0.0.1:8088";
+	acl::server_socket server;
+	if (!server.open(addr)) {
+		return 1;
+	}
+
+	// Create one server coroutine to wait for connection.
+	acl::fiber* fb = new fiber_server(server);
+	fb->start();
+
+	acl::fiber::schedule();  // Start the coroutine scheculde process.
+	return 0;
+}
+```
+
+### Coroutine server with c++11
+
+```c++
+#include "acl_cpp/lib_acl.hpp"
+#include "fiber/go_fiber.hpp"
+
+int main(void) {
+	const char* addr = "127.0.0.1:8088";
+	acl::server_socket server;
+	if (!server.open(addr)) {
+		return 1;
+	}
+
+	// Create one server coroutine to wait for connection.
+	go[&] {
+		while (true) {
+			acl::socket_stream* conn = server.accept();
+			if (conn) {
+				// Create one client coroutine to handle the connection.
+				go[=] {
+					char buf[256];
+					int ret = conn->read(buf, sizeof(buf), false);
+					if (ret > 0) {
+						(void) conn->write(buf, ret);
+					}
+					delete conn;
+				};
+			}
+		}
+	};
+
+	acl::fiber::schedule();  // Start the coroutine scheculde process.
 	return 0;
 }
 ```
@@ -250,7 +359,7 @@ fiber_client: fiber_client.c
 ```
 
 ### On Windows
-You can open the [fiber_vc2012.sln](fiber_vc2012.sln)/ [fiber_vc2013.sln](fiber_vc2013.sln)/[fiber_vc2015.sln](fiber_vc2015.sln) with vc2012/vc2013/vc2015, and build the libfiber library and the [samples](samples) included.
+You can build libfiber with vc2012/vc2013/vc2019.
 
 ## Benchmark
 The picture below show the IOPS (io echo per-second) benchmark written by libfiber, comparing with the samples writen by [libmill](https://github.com/sustrik/libmill), golang and [libco](https://github.com/Tencent/libco). The samples written by libmill and libco are in [directory](benchmark), the sample written by golang is in [here](https://github.com/acl-dev/master-go/tree/master/examples/echo), and the sample written by libfiber is in [server sample directory](samples/server). The testing client is in [here](https://github.com/acl-dev/acl/tree/master/lib_fiber/samples/client2) from the [acl project](https://github.com/acl-dev/acl/).
