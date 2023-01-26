@@ -248,12 +248,9 @@ void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
 	acl_fiber_schedule_set_event(etype);
 }
 
-void fiber::schedule(void)
+void fiber::schedule(fiber_event_t type /* FIBER_EVENT_T_KERNEL */)
 {
-	if (!winapi_hook()) {
-		perror("hook API for windows error");
-	}
-	acl_fiber_schedule();
+	schedule_with(type);
 }
 
 void fiber::schedule_with(fiber_event_t type)

@@ -150,8 +150,9 @@ public:
 
 	/**
 	 * 启动协程运行的调度过程
+	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
 	 */
-	static void schedule(void);
+	static void schedule(fiber_event_t type = FIBER_EVENT_T_KERNEL);
 
 	/**
 	 * 启动协程调度时指定事件引擎类型，调用本方法等于同时调用了 schedule_init
