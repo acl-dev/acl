@@ -310,12 +310,12 @@ int main(void) {
     }
 
     // Create one server coroutine to wait for connection.
-    go[&] {
+    go[=, &server] {
         while (true) {
             acl::socket_stream* conn = server.accept();
             if (conn) {
                 // Create one client coroutine to handle the connection.
-                go[=] {
+                go[conn] {
                     char buf[256];
                     while (true) {
                         int ret = conn->read(buf, sizeof(buf), false);
