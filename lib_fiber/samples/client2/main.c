@@ -188,7 +188,7 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		printf("fiber-%d: connect %s:%d error %s\r\n",
 			acl_fiber_self(), __server_ip, __server_port,
 			acl_last_serror());
-		exit (1);
+		return;
 	} else {
 		__total_clients++;
 		printf("fiber-%d: connect %s:%d ok, clients: %d, fd: %d\r\n",
