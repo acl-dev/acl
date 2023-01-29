@@ -230,6 +230,23 @@ ACL_VSTREAM acl_vstream_fstd[] = {
 #define	LEN	ACL_VSTRING_LEN
 #define	STR	acl_vstring_str
 
+static unsigned __def_wbuf_size = 512;
+static unsigned __def_rbuf_size = 4096;
+
+void acl_vstream_set_wbuf_size(unsigned size)
+{
+	if (size > 0) {
+		__def_wbuf_size = size;
+	}
+}
+
+void acl_vstream_set_rbuf_size(unsigned size)
+{
+	if (size > 0) {
+		__def_rbuf_size = size;
+	}
+}
+
 void acl_vstream_init()
 {
 	static int __called = 0;
@@ -667,7 +684,7 @@ int acl_vstream_unread(ACL_VSTREAM *fp, const void *ptr, size_t length)
 
 		/* 如果读缓冲区后部分空间够用, 则只需后移缓冲区中的数据 */
 
-		if (fp->read_buf_len - fp->read_cnt > (acl_off_t) length) {
+		if (fp->read_buf_len > fp->read_cnt + length) {
 			if (fp->read_cnt > 0) {
 				__vstream_memmove(fp, n);
 			}
@@ -1966,8 +1983,8 @@ int acl_vstream_buffed_writen(ACL_VSTREAM *fp, const void *vptr, size_t dlen)
 	}
 
 	if (fp->wbuf == NULL) {
-		fp->wbuf_size = 8192;
-		fp->wbuf = acl_mymalloc(fp->wbuf_size);
+		fp->wbuf_size = __def_wbuf_size;
+		fp->wbuf = (unsigned char*) acl_mymalloc(fp->wbuf_size);
 	}
 
 	if (dlen >= (size_t) fp->wbuf_size) {
@@ -2131,9 +2148,9 @@ void acl_vstream_buffed_space(ACL_VSTREAM *fp)
 		return;
 	}
 	if (fp->wbuf == NULL) {
-		fp->wbuf_size = 8192;
+		fp->wbuf_size = __def_wbuf_size;
 		fp->wbuf_dlen = 0;
-		fp->wbuf = acl_mymalloc(fp->wbuf_size);
+		fp->wbuf = (unsigned char*) acl_mymalloc(fp->wbuf_size);
 	}
 }
 
@@ -2200,7 +2217,7 @@ ACL_VSTREAM *acl_vstream_fhopen(ACL_FILE_HANDLE fh, unsigned int oflags)
 	}
 
 	fp = acl_vstream_fdopen(ACL_SOCKET_INVALID, oflags,
-		4096, -1, ACL_VSTREAM_TYPE_FILE);
+		__def_rbuf_size, -1, ACL_VSTREAM_TYPE_FILE);
 	if (fp == NULL) {
 		return NULL;
 	}
@@ -2245,8 +2262,6 @@ void acl_socket_close_hook(int (*close_fn)(ACL_SOCKET))
 
 /* 定义流的缓冲区的默认大小 */
 
-#define ACL_VSTREAM_DEF_MAXLEN  8192
-
 ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	size_t buflen, int rw_timeout, int fdtype)
 {
@@ -2264,10 +2279,10 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 
 	/* XXX: 只有非监听流才需要有读缓冲区 */
 	/* XXX: 目前 UDP 服务端口号在 MASTER 框架中暂时当监听套接口用，所以
-	   需要给其分配读缓冲区
+	 * 需要给其分配读缓冲区.
 	 */
-	if (buflen < ACL_VSTREAM_DEF_MAXLEN) {
-		buflen = ACL_VSTREAM_DEF_MAXLEN;
+	if (buflen < __def_rbuf_size) {
+		buflen = __def_rbuf_size;
 	}
 	fp->read_buf     = (unsigned char *) acl_mymalloc(buflen + 1);
 	fp->read_buf_len = (int) buflen;
@@ -2294,7 +2309,7 @@ ACL_VSTREAM *acl_vstream_fdopen(ACL_SOCKET fd, unsigned int oflags,
 	fp->read_ptr         = fp->read_buf;
 	fp->oflags           = oflags;
 	fp->omode            = 0600;
-	fp->close_handle_lnk = acl_array_create(8);
+	fp->close_handle_lnk = NULL; /* acl_array_create(8); */
 	/* Fixed. when the rw_timeout <= 0, we should force to set it -1. */
 	fp->rw_timeout       = rw_timeout <= 0 ? -1 : rw_timeout;
 
@@ -2416,13 +2431,15 @@ ACL_VSTREAM *acl_vstream_clone(const ACL_VSTREAM *from)
 	to->ioctl_write_ctx  = NULL;
 	to->fdp              = NULL;
 	to->context          = from->context;
-	to->close_handle_lnk = acl_array_create(8);
 	to->oflags           = from->oflags;
 	to->omode            = from->omode;
 
 	if (from->close_handle_lnk == NULL) {
+		to->close_handle_lnk = NULL;
 		return to;
 	}
+
+	to->close_handle_lnk = acl_array_create(8);
 
 	n = acl_array_size(from->close_handle_lnk);
 	for (i = 0; i < n; i++) {
@@ -3176,6 +3193,7 @@ int acl_vstream_close(ACL_VSTREAM *fp)
 
 static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 {
+#if 0
 	struct sockaddr *sa = (struct sockaddr *)
 		acl_mycalloc(1, sizeof(ACL_SOCKADDR));
 
@@ -3187,6 +3205,19 @@ static struct sockaddr *set_sock_addr(const char *addr, size_t *sa_size)
 	acl_myfree(sa);
 	*sa_size = 0;
 	return NULL;
+#else
+	ACL_SOCKADDR sa;
+
+	*sa_size = acl_sane_pton(addr, (struct sockaddr*) &sa);
+	if (*sa_size > 0) {
+		struct sockaddr *buf = (struct sockaddr*) acl_mymalloc(*sa_size);
+		memcpy(buf, &sa, *sa_size);
+		return buf;
+	}
+
+	*sa_size = 0;
+	return NULL;
+#endif
 }
 
 void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)

@@ -92,9 +92,9 @@ typedef struct MBLOCK {
   * with heap memory. Therefore, some dangling pointer bugs will be masked.
   */
 
-/*
-#define	NO_SHARED_EMPTY_STRINGS
-*/
+#if 0
+# define NO_SHARED_EMPTY_STRINGS
+#endif
 
 #ifndef NO_SHARED_EMPTY_STRINGS
 static char empty_string[] = "";
@@ -179,6 +179,12 @@ size_t acl_default_get_memlimit(void)
 	return __malloc_limit;
 }
 
+#if 0
+# define SAFE_MEM
+#endif
+
+#ifdef SAFE_MEM
+
 void *acl_default_malloc(const char *filename, int line, size_t len)
 {
 	const char *myname = "acl_default_malloc";
@@ -192,10 +198,11 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	acl_trace_info();
 #endif
 
-	if (filename && *filename)
+	if (filename && *filename) {
 		SET_FILE(pname, filename);
-	else
+	} else {
 		pname = __FILENAME_UNKNOWN;
+	}
 
 	if (len < 1) {
 		acl_msg_warn("%s(%d), %s: malloc: length %ld invalid",
@@ -205,10 +212,10 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	}
 
 	new_len = SPACE_FOR(len);
-	if (new_len <= 0)
+	if (new_len <= 0) {
 		acl_msg_fatal("%s(%d): new_len(%d) <= 0",
 			myname, __LINE__, (int) new_len);
-	else if (new_len >= __malloc_limit) {
+	} else if (new_len >= __malloc_limit) {
 		acl_msg_warn("%s(%d): new_len(%d) too large",
 			myname, __LINE__, (int) new_len);
 		acl_trace_info();
@@ -239,23 +246,6 @@ void *acl_default_malloc(const char *filename, int line, size_t len)
 	return ptr;
 }
 
-void *acl_default_calloc(const char *filename, int line,
-	size_t nmemb, size_t size)
-{
-	void *ptr;
-	int   n;
-
-#ifdef 	DEBUG_MEM
-	__ncalloc++;
-	//printf("calloc: %llu, file=%s, line=%d\r\n", __ncalloc, filename, line);
-#endif
-	n = (int) (nmemb * size);
-	ptr = acl_default_malloc(filename, line, n);
-	acl_assert(ptr);
-	memset(ptr, FILLER, n);
-	return ptr;
-}
-
 /* acl_default_realloc - reallocate memory or bust */
 
 void *acl_default_realloc(const char *filename, int line,
@@ -266,14 +256,16 @@ void *acl_default_realloc(const char *filename, int line,
 	size_t old_len, new_len;
 	const char *pname = NULL;
 
-	if (filename && *filename)
+	if (filename && *filename) {
 		SET_FILE(pname, filename);
-	else
+	} else {
 		pname = __FILENAME_UNKNOWN;
+	}
 
 #ifndef NO_SHARED_EMPTY_STRINGS
-	if (ptr == empty_string)
+	if (ptr == empty_string) {
 		return acl_default_malloc(pname, line, len);
+	}
 #endif
 
 	if (len < 1) {
@@ -283,16 +275,17 @@ void *acl_default_realloc(const char *filename, int line,
 		len = 128;
 	}
 
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return acl_default_malloc(pname, line, len);
+	}
 
 	CHECK_IN_PTR(ptr, real_ptr, old_len, pname, line);
 
 	new_len = SPACE_FOR(len);
-	if (new_len <= 0)
+	if (new_len <= 0) {
 		acl_msg_fatal("%s(%d): new_len(%d) <= 0",
 			myname, __LINE__, (int) new_len);
-	else if (new_len >= __malloc_limit) {
+	} else if (new_len >= __malloc_limit) {
 		acl_msg_warn("%s(%d): new_len(%d) too large",
 			myname, __LINE__, (int) new_len);
 		acl_trace_info();
@@ -308,13 +301,15 @@ void *acl_default_realloc(const char *filename, int line,
 #endif
 
 #ifdef	_USE_GLIB
-	if ((real_ptr = (MBLOCK *) g_realloc((char *) real_ptr, new_len)) == 0)
+	if ((real_ptr = (MBLOCK *) g_realloc((char *) real_ptr, new_len)) == 0) {
 		acl_msg_fatal("%s(%d)->%s: realloc: insufficient memory: %s",
 			pname, line, myname, strerror(errno));
+	}
 #else
-	if ((real_ptr = (MBLOCK *) realloc((char *) real_ptr, new_len)) == 0)
+	if ((real_ptr = (MBLOCK *) realloc((char *) real_ptr, new_len)) == 0) {
 		acl_msg_fatal("%s(%d)->%s: realloc: insufficient memory: %s",
 			pname, line, myname, strerror(errno));
+	}
 #endif
 	CHECK_OUT_PTR(ptr, real_ptr, len);
 #if 0
@@ -334,19 +329,20 @@ void acl_default_free(const char *filename, int line, void *ptr)
 	size_t len;
 	const char *pname = NULL;
 
-	if (filename && *filename)
+	if (filename && *filename) {
 		SET_FILE(pname, filename);
-	else
+	} else {
 		pname = __FILENAME_UNKNOWN;
+	}
 
 	if (ptr == NULL) {
 		acl_msg_error("%s(%d)->%s: ptr null", pname, line, myname);
 		return;
 	}
 
-# ifndef NO_SHARED_EMPTY_STRINGS
+#ifndef NO_SHARED_EMPTY_STRINGS
 	if (ptr != empty_string) {
-# endif
+#endif
 		CHECK_IN_PTR(ptr, real_ptr, len, pname, line);
 /*
 		memset((char *) real_ptr, FILLER, SPACE_FOR(len));
@@ -363,9 +359,60 @@ void acl_default_free(const char *filename, int line, void *ptr)
 #else
 		free((char *) real_ptr);
 #endif
-# ifndef NO_SHARED_EMPTY_STRINGS
+
+#ifndef NO_SHARED_EMPTY_STRINGS
 	} 
-# endif
+#endif
+}
+
+#else
+
+void *acl_default_malloc(const char *filename acl_unused, int line acl_unused,
+	size_t len)
+{
+	return malloc(len);
+}
+
+void *acl_default_realloc(const char *filename acl_unused, int line acl_unused,
+	void *ptr, size_t len)
+{
+#ifndef NO_SHARED_EMPTY_STRINGS
+	if (ptr == empty_string) {
+		return acl_default_malloc(filename, line, len);
+	}
+#endif
+	return realloc(ptr, len);
+}
+
+void acl_default_free(const char *filename acl_unused, int line acl_unused,
+	void *ptr)
+{
+#ifndef NO_SHARED_EMPTY_STRINGS
+	if (ptr != empty_string) {
+#endif
+		free(ptr);
+#ifndef NO_SHARED_EMPTY_STRINGS
+	}
+#endif
+}
+
+#endif  /* !SAFE_MEM */
+
+void *acl_default_calloc(const char *filename, int line,
+	size_t nmemb, size_t size)
+{
+	void *ptr;
+	int   n;
+
+#ifdef 	DEBUG_MEM
+	__ncalloc++;
+	//printf("calloc: %llu, file=%s, line=%d\r\n", __ncalloc, filename, line);
+#endif
+	n = (int) (nmemb * size);
+	ptr = acl_default_malloc(filename, line, n);
+	acl_assert(ptr);
+	memset(ptr, FILLER, n);
+	return ptr;
 }
 
 /* acl_default_strdup - save string to heap */
@@ -374,26 +421,37 @@ char *acl_default_strdup(const char *filename, int line, const char *str)
 {
 	const char *myname = "acl_default_strdup";
 	const char *pname = NULL;
+	size_t len;
+	char *result;
 
-	if (filename && *filename)
+	if (filename && *filename) {
 		SET_FILE(pname, filename);
-	else
+	} else {
 		pname = __FILENAME_UNKNOWN;
+	}
 
-	if (str == 0)
+	if (str == 0) {
 		acl_msg_fatal("%s(%d)->%s: null pointer argument",
 			pname, line, myname);
+	}
 
 #ifndef NO_SHARED_EMPTY_STRINGS
-	if (*str == 0)
+	if (*str == 0) {
 		return (char *) empty_string;
+	}
 #endif
 
 #ifdef 	DEBUG_MEM
 	__nstrdup++;
 #endif
 
-	return strcpy(acl_default_malloc(pname, line, strlen(str) + 1), str);
+	len = strlen(str);
+	result = (char*) acl_default_malloc(pname, line, len + 1);
+	if (len > 0) {
+		memcpy(result, str, len);
+	}
+	result[len] = 0;
+	return result;
 }
 
 /* acl_default_strndup - save substring to heap */
@@ -406,28 +464,35 @@ char *acl_default_strndup(const char *filename, int line,
 	char *cp;
 	const char *pname = NULL;
 
-	if (filename && *filename)
+	if (filename && *filename) {
 		SET_FILE(pname, filename);
-	else
+	} else {
 		pname = __FILENAME_UNKNOWN;
+	}
 
-	if (str == 0)
+	if (str == 0) {
 		acl_msg_fatal("%s(%d)->%s: null pointer argument",
 			pname, line, myname);
+	}
 
 #ifndef NO_SHARED_EMPTY_STRINGS
-	if (*str == 0)
+	if (*str == 0) {
 		return (char *) empty_string;
+	}
 #endif
 
-	if ((cp = memchr(str, 0, len)) != 0)
+	if ((cp = (char*) memchr(str, 0, len)) != 0) {
 		len = cp - str;
+	}
 
 #ifdef 	DEBUG_MEM
 	__nstrndup++;
 #endif
 
-	result = memcpy(acl_default_malloc(pname, line, len + 1), str, len);
+	result = (char*) acl_default_malloc(pname, line, len + 1);
+	if (len > 0) {
+		memcpy(result, str, len);
+	}
 	result[len] = 0;
 	return result;
 }
@@ -440,14 +505,16 @@ void *acl_default_memdup(const char *filename, int line,
 	const char *myname = "acl_default_memdup";
 	const char *pname = NULL;
 
-	if (filename && *filename)
+	if (filename && *filename) {
 		SET_FILE(pname, filename);
-	else
+	} else {
 		pname = __FILENAME_UNKNOWN;
+	}
 
-	if (ptr == 0)
+	if (ptr == 0) {
 		acl_msg_fatal("%s(%d)->%s: null pointer argument",
 			pname, line, myname);
+	}
 
 #ifdef 	DEBUG_MEM
 	__nmemdup++;

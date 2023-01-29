@@ -85,11 +85,11 @@ struct ACL_VSTREAM {
 	acl_off_t sys_offset;           /**< cached seek info */
 
 	unsigned char *wbuf;            /**< used when call acl_vstream_buffed_writen */
-	int   wbuf_size;                /**< used when call acl_vstream_buffed_writen */
+	unsigned wbuf_size;             /**< used when call acl_vstream_buffed_writen */
 	int   wbuf_dlen;                /**< used when call acl_vstream_buffed_writen */
 
 	unsigned char *read_buf;        /**< read buff */
-	int   read_buf_len;             /**< read_buf's capacity */
+	unsigned read_buf_len;             /**< read_buf's capacity */
 	int   read_cnt;                 /**< data's length in read_buf */
 	unsigned char *read_ptr;        /**< pointer to next position in read_buf */
 	int   read_ready;               /**< if the system buffer has some data */
@@ -213,6 +213,18 @@ extern ACL_API ACL_VSTREAM acl_vstream_fstd[];  /**< pre-defined streams */
  * 对于_WIN32来说，如果想要用标准输入输出，则需要调用此函数进行初始化
  */
 ACL_API void acl_vstream_init(void);
+
+/**
+ * 设置内部使用的缺省值用来批示写缓冲区大小
+ * @poaram size {unsigned}
+ */
+ACL_API void acl_vstream_set_wbuf_size(unsigned size);
+
+/**
+ * 设置内部使用的缺省值用来批示读缓冲区的最小值
+ * @poaram size {unsigned}
+ */
+ACL_API void acl_vstream_set_rbuf_size(unsigned size);
 
 /**
  * 功能: 探测流中有多少数据, 包含缓冲区中的数据与系统缓冲区的数据
@@ -824,7 +836,7 @@ ACL_API const char *acl_vstream_strerror(ACL_VSTREAM *fp);
   (stream_ptr)->wbuf_size == 0 ?                                             \
     (acl_vstream_buffed_space((stream_ptr)),                                 \
         ((stream_ptr)->wbuf[(size_t) (stream_ptr)->wbuf_dlen++] = (ch)))     \
-    : ((stream_ptr)->wbuf_dlen == stream_ptr->wbuf_size ?                    \
+    : ((unsigned) (stream_ptr)->wbuf_dlen == stream_ptr->wbuf_size ?         \
         (acl_vstream_fflush((stream_ptr)) == ACL_VSTREAM_EOF ?               \
           ACL_VSTREAM_EOF                                                    \
           : ((stream_ptr)->wbuf[(size_t) (stream_ptr)->wbuf_dlen++] = (ch))) \

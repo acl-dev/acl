@@ -22,7 +22,7 @@ HttpServletResponse::HttpServletResponse(socket_stream& stream)
 : stream_(stream)
 , request_(NULL)
 {
-	dbuf_internal_ = NEW dbuf_guard;
+	dbuf_internal_ = NEW dbuf_guard(1, 100);
 	dbuf_ = dbuf_internal_;
 
 	client_ = new (dbuf_->dbuf_alloc(sizeof(http_client)))
