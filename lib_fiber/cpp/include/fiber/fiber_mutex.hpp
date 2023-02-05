@@ -58,6 +58,11 @@ public:
 	 */
 	static bool deadlock(fiber_mutex_stats& out);
 
+	/**
+	 * 检测死锁, 并将所有进入死锁状态的协程栈打印至标准输出
+	 */
+	static void deadlock_show(void);
+
 private:
 	ACL_FIBER_MUTEX* mutex_;
 	ACL_FIBER_MUTEX* mutex_internal_;

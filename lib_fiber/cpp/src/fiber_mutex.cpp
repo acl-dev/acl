@@ -63,4 +63,38 @@ bool fiber_mutex::deadlock(fiber_mutex_stats& out)
 	return true;
 }
 
+static void show(const fiber_mutex_stat& s)
+{
+	printf("fiber-%d:\r\n", fiber::fiber_id(*s.fb));
+	fiber::stackshow(*s.fb);
+
+	for (std::vector<ACL_FIBER_MUTEX*>::const_iterator
+		cit = s.holding.begin(); cit != s.holding.end(); ++cit) {
+		printf("Holding mutex=%p\r\n", *cit);
+	}
+	printf("Waiting for mutex=%p\r\n", s.waiting);
+}
+
+static void show(const fiber_mutex_stats& ss)
+{
+	for (std::vector<fiber_mutex_stat>::const_iterator
+		cit = ss.stats.begin(); cit != ss.stats.end(); ++cit) {
+
+		show(*cit);
+		printf("\r\n");
+	}
+}
+
+void fiber_mutex::deadlock_show(void)
+{
+	fiber_mutex_stats ss;
+	if (!deadlock(ss)) {
+		printf("No deadlock happened!\r\n");
+		return;
+	}
+
+	printf("Deadlock happened!\r\n");
+	show(ss);
+}
+
 } // namespace acl

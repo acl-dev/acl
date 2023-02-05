@@ -280,6 +280,13 @@ public:
 	static void stacktrace(const fiber& fb, std::vector<fiber_frame>& out,
 			size_t max = 50);
 
+	/**
+	 * 输出指定协程的栈至标准输出
+	 * @param fb {const fiber&}
+	 * @param max {size_t} 可以显示栈的最大深度
+	 */
+	static void stackshow(const fiber& fb, size_t max = 50);
+
 protected:
 	/**
 	 * 虚函数，子类须实现本函数，当通过调用 start 方法启动协程后，本

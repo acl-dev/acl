@@ -331,6 +331,19 @@ void fiber::stacktrace(const fiber& fb, std::vector<fiber_frame>& out, size_t ma
 	acl_fiber_stackfree(stack);
 }
 
+void fiber::stackshow(const fiber& fb, size_t max /* = 50 */)
+{
+	std::vector<fiber_frame> stack;
+	stacktrace(fb, stack, max);
+
+	for (std::vector<fiber_frame>::const_iterator cit = stack.begin();
+		cit != stack.end(); ++cit) {
+
+		printf("0x%lx(%s)+0x%lx\r\n",
+			(*cit).pc, (*cit).func.c_str(), (*cit).off);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer(void)
