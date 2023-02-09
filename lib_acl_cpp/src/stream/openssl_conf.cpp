@@ -65,8 +65,8 @@ static ssl_comp_pop __ssl_comp_pop;
 typedef void (*ssl_clear_error_fn)(void);
 static ssl_clear_error_fn __ssl_clear_error;
 
-//#  define SSLV23_METHOD		"SSLv23_method"
-#  define SSLV23_METHOD			"TLS_method"
+#  define SSLV23_METHOD		"SSLv23_method"
+//#  define SSLV23_METHOD			"TLS_method"
 typedef const SSL_METHOD* (*sslv23_method_fn)(void);
 static sslv23_method_fn __sslv23_method;
 
@@ -93,6 +93,10 @@ static ssl_ctx_set_client_ca_fn __ssl_ctx_set_client_ca;
 #  define SSL_CTX_USE_CERT_CHAN		"SSL_CTX_use_certificate_chain_file"
 typedef int (*ssl_ctx_use_cert_chain_fn)(SSL_CTX*, const char*);
 static ssl_ctx_use_cert_chain_fn __ssl_ctx_use_cert_chain;
+
+#  define SSL_CTX_USE_CERT		"SSL_CTX_use_certificate_file"
+typedef int (*ssl_ctx_use_cert_fn)(SSL_CTX*, const char*, int type);
+static ssl_ctx_use_cert_fn __ssl_ctx_use_cert;
 
 #  define SSL_CTX_USE_PKEY_FILE		"SSL_CTX_use_PrivateKey_file"
 typedef int (*ssl_ctx_use_pkey_fn)(SSL_CTX*, const char*, int);
@@ -204,6 +208,7 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_LOAD_CLIENT_CA, ssl_load_client_ca_fn, __ssl_load_client_ca);
 	LOAD_SSL(SSL_CTX_SET_CLIENT_CA, ssl_ctx_set_client_ca_fn, __ssl_ctx_set_client_ca);
 	LOAD_SSL(SSL_CTX_USE_CERT_CHAN, ssl_ctx_use_cert_chain_fn, __ssl_ctx_use_cert_chain);
+	LOAD_SSL(SSL_CTX_USE_CERT, ssl_ctx_use_cert_fn, __ssl_ctx_use_cert);
 	LOAD_SSL(SSL_CTX_USE_PKEY_FILE, ssl_ctx_use_pkey_fn, __ssl_ctx_use_pkey);
 	LOAD_SSL(SSL_CTX_CHECK_PKEY, ssl_ctx_check_pkey_fn, __ssl_ctx_check_pkey);
 	LOAD_SSL(SSL_CTX_SET_DEF_PASS, ssl_ctx_set_def_pass_fn, __ssl_ctx_set_def_pass);
@@ -296,6 +301,7 @@ static void openssl_dll_load(void)
 #  define __ssl_load_client_ca		SSL_load_client_CA_file
 #  define __ssl_ctx_set_client_ca	SSL_CTX_set_client_CA_list
 #  define __ssl_ctx_use_cert_chain	SSL_CTX_use_certificate_chain_file
+#  define __ssl_ctx_use_cert		SSL_CTX_use_certificate_file
 #  define __ssl_ctx_use_pkey		SSL_CTX_use_PrivateKey_file
 #  define __ssl_ctx_check_pkey		SSL_CTX_check_private_key
 #  define __ssl_ctx_set_def_pass	SSL_CTX_set_default_passwd_cb_userdata
@@ -345,6 +351,34 @@ bool openssl_conf::load(void)
 #endif
 }
 
+int openssl_conf::ssl_servername(SSL *ssl, int *ad, void *arg)
+{
+	(void) ad;
+	openssl_conf* conf = (openssl_conf*) arg;
+
+	const char* host = SSL_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
+	if (host == NULL) {
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	printf(">>>host=%s\r\n", host);
+
+	if (strcmp(host, "www.iqiyi.com") == 0 || conf->ssl_ctxes_.empty()) {
+		printf(">>>Don't reset ssl_ctx for iq domain\r\n");
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	SSL_CTX* ctx = conf->ssl_ctxes_[0];
+
+	if (SSL_set_SSL_CTX(ssl, ctx) == ctx) {
+		//SSL_set_options(ssl_conn, SSL_CTX_get_options(__ssl_ctx));
+		printf("reset ctx_tv=%p ok\r\n", ctx);
+		return SSL_TLSEXT_ERR_OK;
+	}
+	printf("reset ctx=%p error\r\n", ctx);
+	return SSL_TLSEXT_ERR_NOACK;
+}
+
 bool openssl_conf::init_once(void)
 {
 #ifdef HAS_OPENSSL_DLL
@@ -361,12 +395,6 @@ bool openssl_conf::init_once(void)
 		return false;
 	}
 	assert(init_status_ == CONF_INIT_NIL);
-
-	ssl_ctx_ = (void*) __ssl_ctx_new(__sslv23_method());
-
-	if (timeout_ > 0) {
-		__ssl_ctx_set_timeout((SSL_CTX*) ssl_ctx_, timeout_);
-	}
 
 # if OPENSSL_VERSION_NUMBER >= 0x10100003L
 	if (__ssl_init(OPENSSL_INIT_LOAD_CONFIG, NULL) == 0) {
@@ -396,6 +424,7 @@ bool openssl_conf::init_once(void)
 	}
 #  endif
 # endif
+	ssl_ctx_ = create_ssl_ctx();
 	init_status_ = CONF_INIT_OK;
 	return true;
 #else
@@ -404,9 +433,30 @@ bool openssl_conf::init_once(void)
 #endif // HAS_OPENSSL
 }
 
+SSL_CTX* openssl_conf::create_ssl_ctx(void)
+{
+	SSL_CTX* ctx = __ssl_ctx_new(__sslv23_method());
+
+	if (timeout_ > 0) {
+		__ssl_ctx_set_timeout(ctx, timeout_);
+	}
+
+
+	SSL_CTX_set_tlsext_servername_callback(ctx, ssl_servername);
+	SSL_CTX_set_tlsext_servername_arg(ctx, this);
+
+	return ctx;
+}
+
+SSL_CTX* openssl_conf::get_ssl_ctx(void) const
+{
+	return ssl_ctx_;
+}
+
 openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 : server_side_(server_side)
 , ssl_ctx_(NULL)
+, ssl_ctx_inited_(false)
 , timeout_(timeout)
 , init_status_(CONF_INIT_NIL)
 {
@@ -434,7 +484,7 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 	}
 
 #ifdef HAS_OPENSSL
-	__ssl_ctx_set_verify_depth((SSL_CTX*) ssl_ctx_, 5);
+	__ssl_ctx_set_verify_depth(ssl_ctx_, 5);
 
 	STACK_OF(X509_NAME)* list = __ssl_load_client_ca(ca_file);
 	if (list == NULL) {
@@ -446,7 +496,7 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 	// always leaved an error in the error queue. -- nginx
 	__ssl_clear_error();
 
-	__ssl_ctx_set_client_ca((SSL_CTX*) ssl_ctx_, list);
+	__ssl_ctx_set_client_ca(ssl_ctx_, list);
 	return true;
 #else
 	logger_error("HAS_OPENSSL not defined!");
@@ -473,25 +523,40 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	}
 
 #ifdef HAS_OPENSSL
-	SSL_CTX* ssl_ctx = (SSL_CTX*) ssl_ctx_;
+	SSL_CTX* ctx;
 
-	if (!__ssl_ctx_use_cert_chain(ssl_ctx, crt_file)) {
+	if (!ssl_ctx_inited_) {
+		ctx = ssl_ctx_;
+		ssl_ctx_inited_ = true;
+	} else {
+		ctx = create_ssl_ctx();
+		ssl_ctxes_.push_back(ctx);
+	}
+
+#if 0
+	if (__ssl_ctx_use_cert_chain(ctx, crt_file) != 1) {
 		logger_error("use crt chain file(%s) error", crt_file);
 		return false;
 	}
+#else
+	if (__ssl_ctx_use_cert(ctx, crt_file, SSL_FILETYPE_PEM) != 1) {
+		logger_error("use crt file(%s) error", crt_file);
+		return false;
+	}
+#endif
 
-	if (!__ssl_ctx_use_pkey(ssl_ctx, key_file, SSL_FILETYPE_PEM)) {
+	if (__ssl_ctx_use_pkey(ctx, key_file, SSL_FILETYPE_PEM) != 1) {
 		logger_error("load private key(%s) error", key_file);
 		return false;
 	}
 
-	if (!__ssl_ctx_check_pkey(ssl_ctx)) {
+	if (!__ssl_ctx_check_pkey(ctx)) {
 		logger_error("check private key(%s) error", key_file);
 		return false;
 	}
 
 	if (key_pass && *key_pass) {
-		__ssl_ctx_set_def_pass(ssl_ctx, (void*) key_pass);
+		__ssl_ctx_set_def_pass(ctx, (void*) key_pass);
 	}
 
 	return true;

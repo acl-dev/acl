@@ -5,6 +5,9 @@
 #include "../stdlib/string.hpp"
 #include "sslbase_conf.hpp"
 
+typedef struct ssl_st SSL;
+typedef struct ssl_ctx_st SSL_CTX;
+
 namespace acl {
 
 class openssl_io;
@@ -68,22 +71,24 @@ public:
 		return server_side_;
 	}
 
-	void* get_ssl_ctx(void) const
-	{
-		return ssl_ctx_;
-	}
+	SSL_CTX* get_ssl_ctx(void) const;
 
 private:
 	friend class openssl_io;
 
-	bool   server_side_;
-	void*  ssl_ctx_;
-	int    timeout_;
-	string crt_file_;
+	bool      server_side_;
+	SSL_CTX* ssl_ctx_;	// The default SSL_CTX;
+	bool     ssl_ctx_inited_;
+	std::vector<SSL_CTX*> ssl_ctxes_;
+	int      timeout_;
+	string   crt_file_;
 	unsigned init_status_;
 	thread_mutex lock_;
 
 	bool init_once(void);
+	SSL_CTX* create_ssl_ctx(void);
+
+	static int ssl_servername(SSL *ssl, int *ad, void *arg);
 };
 
 } // namespace acl
