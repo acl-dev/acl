@@ -10,6 +10,7 @@ typedef struct ssl_ctx_st SSL_CTX;
 
 namespace acl {
 
+class token_tree;
 class openssl_io;
 
 class ACL_CPP_API openssl_conf : public sslbase_conf {
@@ -66,27 +67,50 @@ public:
 public:
 	bool setup_certs(void* ssl);
 
+	/**
+	 * 是否为 SSL 服务模式
+	 * @return {bool}
+	 */
 	bool is_server_side(void) const
 	{
 		return server_side_;
 	}
 
+	/**
+	 * 获得缺省的服务端证书
+	 * @return {SSL_CTX*}
+	 */
 	SSL_CTX* get_ssl_ctx(void) const;
+
+	/**
+	 * 添加外部已经初始完毕的 SSL_CTX
+	 * @param {SSL_CTX*} 由用户自自己初始化好的 SSL_CTX 对象，传入后其所有
+	 *  权将归 openssl_conf 内部统一管理并释放
+	 */
+	void push_ssl_ctx(SSL_CTX* ctx);
 
 private:
 	friend class openssl_io;
 
-	bool      server_side_;
-	SSL_CTX* ssl_ctx_;	// The default SSL_CTX;
-	bool     ssl_ctx_inited_;
-	std::vector<SSL_CTX*> ssl_ctxes_;
-	int      timeout_;
-	string   crt_file_;
-	unsigned init_status_;
+	bool         server_side_;
+	SSL_CTX*     ssl_ctx_;		// The default SSL_CTX.
+	token_tree*  ssl_ctx_table_;	// Holding the map of host/SSL_CTX.
+	int          ssl_ctx_count_;
+	int          timeout_;
+	string       crt_file_;
+	unsigned     init_status_;
 	thread_mutex lock_;
 
 	bool init_once(void);
+
 	SSL_CTX* create_ssl_ctx(void);
+	void add_ssl_ctx(SSL_CTX* ctx);
+	SSL_CTX* find_ssl_ctx(const char* host);
+
+	int on_servername(SSL* ssl, const char*host);
+	void get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts);
+	void bind_host_ctx(SSL_CTX* ctx, string& host);
+	bool create_host_key(string& host, string& key, size_t skip = 0);
 
 	static int ssl_servername(SSL *ssl, int *ad, void *arg);
 };

@@ -11,6 +11,7 @@
 
 #ifndef ACL_PREPARE_COMPILE
 # include "acl_cpp/stdlib/log.hpp"
+# include "acl_cpp/stdlib/token_tree.hpp"
 # include "acl_cpp/stream/openssl_io.hpp"
 # include "acl_cpp/stream/openssl_conf.hpp"
 #endif
@@ -18,6 +19,8 @@
 #ifdef HAS_OPENSSL
 #include "openssl/ssl.h"
 #include "openssl/err.h"
+#include "openssl/x509.h"
+#include "openssl/x509v3.h"
 #endif
 
 #if defined(HAS_OPENSSL)
@@ -65,8 +68,7 @@ static ssl_comp_pop __ssl_comp_pop;
 typedef void (*ssl_clear_error_fn)(void);
 static ssl_clear_error_fn __ssl_clear_error;
 
-#  define SSLV23_METHOD		"SSLv23_method"
-//#  define SSLV23_METHOD			"TLS_method"
+#  define SSLV23_METHOD			"TLS_method"
 typedef const SSL_METHOD* (*sslv23_method_fn)(void);
 static sslv23_method_fn __sslv23_method;
 
@@ -113,6 +115,74 @@ static ssl_ctx_set_def_pass_fn __ssl_ctx_set_def_pass;
 #  define SSL_CTX_SET_TIMEOUT		"SSL_CTX_set_timeout"
 typedef long (*ssl_ctx_set_timeout_fn)(SSL_CTX*, long);
 static ssl_ctx_set_timeout_fn __ssl_ctx_set_timeout;
+
+#  define SSL_CTX_CALLBACK_CTRL		"SSL_CTX_callback_ctrl"
+typedef long (*ssl_ctx_callback_ctrl_fn)(SSL_CTX*, int, void (*)(void));
+static ssl_ctx_callback_ctrl_fn __ssl_ctx_callback_ctrl;
+
+#  define SSL_CTX_CTRL			"SSL_CTX_ctrl"
+typedef long (*ssl_ctx_ctrl_fn)(SSL_CTX*, int, long, void*);
+static ssl_ctx_ctrl_fn __ssl_ctx_ctrl;
+
+#  define ASN1_STRING_PRINT_EX		"ASN1_STRING_print_ex"
+typedef int (*asn1_string_print_ex_fn)(BIO*, const ASN1_STRING*, unsigned long);
+static asn1_string_print_ex_fn __asn1_string_print_ex;
+
+#  define BIO_NEW			"BIO_new"
+typedef BIO *(*bio_new_fn)(const BIO_METHOD*);
+static bio_new_fn __bio_new;
+
+#  define BIO_S_MEM			"BIO_s_mem"
+typedef const BIO_METHOD *(*bio_s_mem_fn)(void);
+static bio_s_mem_fn __bio_s_mem;
+
+#  define BIO_CTRL			"BIO_ctrl"
+typedef long (*bio_ctrl_fn)(BIO*, int, long, void*);
+static bio_ctrl_fn __bio_ctrl;
+
+#  define BIO_READ			"BIO_read"
+typedef int (*bio_read_fn)(BIO*, void*, int);
+static bio_read_fn __bio_read;
+
+#  define BIO_FREE			"BIO_free"
+typedef int (*bio_free_fn)(BIO*);;
+static bio_free_fn __bio_free;
+
+#  define SSL_CTX_GET0_CERTIFICATE	"SSL_CTX_get0_certificate"
+typedef X509 *(*ssl_ctx_get0_certificate_fn)(const SSL_CTX*);
+static ssl_ctx_get0_certificate_fn __ssl_ctx_get0_certificate;
+
+#  define X509_GET_EXT_D2I		"X509_get_ext_d2i"
+typedef void *(*x509_get_ext_d2i_fn)(const X509*, int, int*, int*);
+static x509_get_ext_d2i_fn __x509_get_ext_d2i;
+
+#  define SSL_GET_SERVERNAME		"SSL_get_servername"
+typedef const char *(*ssl_get_servername_fn)(const SSL*, const int);
+static ssl_get_servername_fn __ssl_get_servername;
+
+#  define SSL_GET_SSL_CTX		"SSL_get_SSL_CTX"
+typedef SSL_CTX *(*ssl_get_ssl_ctx_fn)(const SSL*);
+static ssl_get_ssl_ctx_fn __ssl_get_ssl_ctx;
+
+#  define SSL_SET_SSL_CTX		"SSL_set_SSL_CTX"
+typedef SSL_CTX *(*ssl_set_ssl_ctx_fn)(SSL*, SSL_CTX*);
+static ssl_set_ssl_ctx_fn __ssl_set_ssl_ctx;
+
+#  define SSL_CTX_GET_OPTION		"SSL_CTX_get_options"
+typedef unsigned long (*ssl_ctx_get_options_fn)(const SSL_CTX*);
+static ssl_ctx_get_options_fn __ssl_ctx_get_options;
+
+#  define SSL_SET_OPTIONS		"SSL_set_options"
+typedef unsigned long (*ssl_set_options_fn)(SSL*, unsigned long);
+static ssl_set_options_fn __ssl_set_options;
+
+#define OPENSSL_SK_NUM			"OPENSSL_sk_num"
+typedef int (*openssl_sk_num_fn)(const OPENSSL_STACK*);
+static openssl_sk_num_fn __openssl_sk_num;
+
+#define OPENSSL_SK_VALUE		"OPENSSL_sk_value"
+typedef void *(*openssl_sk_value_fn)(const OPENSSL_STACK*, int);
+static openssl_sk_value_fn __openssl_sk_value;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -213,6 +283,23 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_CTX_CHECK_PKEY, ssl_ctx_check_pkey_fn, __ssl_ctx_check_pkey);
 	LOAD_SSL(SSL_CTX_SET_DEF_PASS, ssl_ctx_set_def_pass_fn, __ssl_ctx_set_def_pass);
 	LOAD_SSL(SSL_CTX_SET_TIMEOUT, ssl_ctx_set_timeout_fn, __ssl_ctx_set_timeout);
+	LOAD_SSL(SSL_CTX_CALLBACK_CTRL, ssl_ctx_callback_ctrl_fn, __ssl_ctx_callback_ctrl);
+	LOAD_SSL(SSL_CTX_CTRL, ssl_ctx_ctrl_fn, __ssl_ctx_ctrl);
+	LOAD_SSL(ASN1_STRING_PRINT_EX, asn1_string_print_ex_fn, __asn1_string_print_ex);
+	LOAD_SSL(BIO_NEW, bio_new_fn, __bio_new);
+	LOAD_SSL(BIO_S_MEM, bio_s_mem_fn, __bio_s_mem);
+	LOAD_SSL(BIO_CTRL, bio_ctrl_fn, __bio_ctrl);
+	LOAD_SSL(BIO_READ, bio_read_fn, __bio_read);
+	LOAD_SSL(BIO_FREE, bio_free_fn, __bio_free);
+	LOAD_SSL(SSL_CTX_GET0_CERTIFICATE, ssl_ctx_get0_certificate_fn, __ssl_ctx_get0_certificate);
+	LOAD_SSL(X509_GET_EXT_D2I, x509_get_ext_d2i_fn, __x509_get_ext_d2i);
+	LOAD_SSL(SSL_GET_SERVERNAME, ssl_get_servername_fn, __ssl_get_servername);
+	LOAD_SSL(SSL_GET_SSL_CTX, ssl_get_ssl_ctx_fn, __ssl_get_ssl_ctx);
+	LOAD_SSL(SSL_SET_SSL_CTX, ssl_set_ssl_ctx_fn, __ssl_set_ssl_ctx);
+	LOAD_SSL(SSL_CTX_GET_OPTION, ssl_ctx_get_options_fn, __ssl_ctx_get_options);
+	LOAD_SSL(SSL_SET_OPTIONS, ssl_set_options_fn, __ssl_set_options);
+	LOAD_SSL(OPENSSL_SK_NUM, openssl_sk_num_fn, __openssl_sk_num);
+	LOAD_SSL(OPENSSL_SK_VALUE, openssl_sk_value_fn, __openssl_sk_value);
 	return true;
 }
 
@@ -306,6 +393,23 @@ static void openssl_dll_load(void)
 #  define __ssl_ctx_check_pkey		SSL_CTX_check_private_key
 #  define __ssl_ctx_set_def_pass	SSL_CTX_set_default_passwd_cb_userdata
 #  define __ssl_ctx_set_timeout		SSL_CTX_set_timeout
+#  define __ssl_ctx_callback_ctrl	SSL_CTX_callback_ctrl
+#  define __ssl_ctx_ctrl		SSL_CTX_ctrl
+#  define __asn1_string_print_ex	ASN1_STRING_print_ex
+#  define __bio_new			BIO_new
+#  define __bio_s_mem			BIO_s_mem
+#  define __bio_ctrl			BIO_ctrl
+#  define __bio_read			BIO_read 
+#  define __bio_free			BIO_free
+#  define __ssl_ctx_get0_certificate	SSL_CTX_get0_certificate
+#  define __x509_get_ext_d2i		X509_get_ext_d2i
+#  define __ssl_get_servername		SSL_get_servername
+#  define __ssl_get_ssl_ctx		SSL_get_SSL_CTX
+#  define __ssl_set_ssl_ctx		SSL_set_SSL_CTX
+#  define __ssl_ctx_get_options		SSL_CTX_get_options
+#  define __ssl_set_options		SSL_set_options
+#  define __openssl_sk_num		OPENSSL_sk_num
+#  define __openssl_sk_value		OPENSSL_sk_value
 # endif // !HAS_OPENSSL_DLL
 
 #endif  // HAS_OPENSSL
@@ -349,34 +453,6 @@ bool openssl_conf::load(void)
 	logger_warn("link openssl library in static way!");
 	return true;
 #endif
-}
-
-int openssl_conf::ssl_servername(SSL *ssl, int *ad, void *arg)
-{
-	(void) ad;
-	openssl_conf* conf = (openssl_conf*) arg;
-
-	const char* host = SSL_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
-	if (host == NULL) {
-		return SSL_TLSEXT_ERR_NOACK;
-	}
-
-	printf(">>>host=%s\r\n", host);
-
-	if (strcmp(host, "www.iqiyi.com") == 0 || conf->ssl_ctxes_.empty()) {
-		printf(">>>Don't reset ssl_ctx for iq domain\r\n");
-		return SSL_TLSEXT_ERR_NOACK;
-	}
-
-	SSL_CTX* ctx = conf->ssl_ctxes_[0];
-
-	if (SSL_set_SSL_CTX(ssl, ctx) == ctx) {
-		//SSL_set_options(ssl_conn, SSL_CTX_get_options(__ssl_ctx));
-		printf("reset ctx_tv=%p ok\r\n", ctx);
-		return SSL_TLSEXT_ERR_OK;
-	}
-	printf("reset ctx=%p error\r\n", ctx);
-	return SSL_TLSEXT_ERR_NOACK;
 }
 
 bool openssl_conf::init_once(void)
@@ -435,17 +511,24 @@ bool openssl_conf::init_once(void)
 
 SSL_CTX* openssl_conf::create_ssl_ctx(void)
 {
+#ifdef HAS_OPENSSL
 	SSL_CTX* ctx = __ssl_ctx_new(__sslv23_method());
 
 	if (timeout_ > 0) {
 		__ssl_ctx_set_timeout(ctx, timeout_);
 	}
 
+	// SSL_CTX_set_tlsext_servername_callback(ctx, ssl_servername);
+	// SSL_CTX_set_tlsext_servername_arg(ctx, this);
 
-	SSL_CTX_set_tlsext_servername_callback(ctx, ssl_servername);
-	SSL_CTX_set_tlsext_servername_arg(ctx, this);
+	__ssl_ctx_callback_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_CB,
+		(void (*)(void)) ssl_servername);
+	__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG, 0, this);
 
 	return ctx;
+#else
+	return NULL;
+#endif
 }
 
 SSL_CTX* openssl_conf::get_ssl_ctx(void) const
@@ -453,10 +536,228 @@ SSL_CTX* openssl_conf::get_ssl_ctx(void) const
 	return ssl_ctx_;
 }
 
+#ifdef HAS_OPENSSL
+/* convert an ASN.1 string to a UTF-8 string (escaping control characters) */  
+static char *asn1_string_to_utf8(ASN1_STRING *asn1str)
+{
+	char *result = NULL;
+	BIO *bio;
+	int len;
+
+	if ((bio = __bio_new(__bio_s_mem())) == NULL) {
+		return NULL;
+	}
+
+	__asn1_string_print_ex(bio, asn1str, ASN1_STRFLGS_ESC_CTRL |
+			ASN1_STRFLGS_UTF8_CONVERT);
+
+	// len = BIO_pending(bio);
+	// BIO_pending(b) => (int)BIO_ctrl(b,BIO_CTRL_PENDING,0,NULL)
+	len = __bio_ctrl(bio, BIO_CTRL_PENDING, 0, NULL);
+	if (len > 0) {
+		result = (char*) malloc(len + 1);
+		len = __bio_read(bio, result, len);
+		result[len] = 0;
+	}
+
+	__bio_free(bio);
+	return result;
+}
+#endif
+
+void openssl_conf::get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts)
+{
+#ifdef HAS_OPENSSL
+	X509* x509 = __ssl_ctx_get0_certificate(ctx);
+	if (x509 == NULL) {
+		logger_error("SSL_CTX_get0_certificate NULL");
+		return;
+	}
+
+	STACK_OF(GENERAL_NAME) *names = (struct stack_st_GENERAL_NAME*)
+		__x509_get_ext_d2i(x509, NID_subject_alt_name, NULL, NULL);
+	if (names == NULL) {
+		return;
+	}
+
+	//for (int i = 0; i < sk_GENERAL_NAME_num(names); i++) {
+	for (int i = 0; i < __openssl_sk_num((const OPENSSL_STACK*) names); i++) {
+		//GENERAL_NAME *name = sk_GENERAL_NAME_value(names, i);
+		GENERAL_NAME *name = (GENERAL_NAME*)
+			__openssl_sk_value((const OPENSSL_STACK*) names, i);
+		if (name->type != GEN_DNS) {
+			continue;
+		}
+
+		char* host = asn1_string_to_utf8(name->d.ia5);
+		if (host) {
+			hosts.push_back(host);
+			free(host);
+		}
+	}
+#else
+	(void) ctx;
+	(void) hosts;
+#endif
+}
+
+void openssl_conf::add_ssl_ctx(SSL_CTX* ctx)
+{
+	std::vector<string> hosts;
+	get_hosts(ctx, hosts);
+
+	if (hosts.empty()) {
+		return;
+	}
+
+	for (std::vector<string>::iterator cit = hosts.begin();
+		cit != hosts.end(); ++cit) {
+		bind_host_ctx(ctx, *cit);
+	}
+}
+
+void openssl_conf::bind_host_ctx(SSL_CTX* ctx, string& host)
+{
+	string key;
+	if (!create_host_key(host, key)) {
+		return;
+	}
+
+	if (ssl_ctx_table_ == NULL) {
+		ssl_ctx_table_ = NEW token_tree;
+	}
+
+	if (ssl_ctx_table_->find(key) != NULL) {
+		return;
+	}
+
+	ssl_ctx_table_->insert(key, ctx);
+	// printf(">>>add one host=%s, key=%s\r\n", host.c_str(), key.c_str());
+}
+
+bool openssl_conf::create_host_key(string& host, string& key, size_t skip /* 0 */)
+{
+	key.clear();
+
+	std::vector<string>& tokens = host.split2(".");
+	if (tokens.empty() || tokens.size() <= skip) {
+		return false;
+	}
+
+	// Reverse the host name splitted with '.'. for example:
+	// www.sina.com --> com.sina.com
+	// *.sina.com   --> com.sina.
+	// The last char '*' will be changed to '.' above.
+	// When skip == 1, then "www.sina.com --> com.sina"
+
+	int size = (int) tokens.size();
+	for (int i = size - 1; i >= (int) skip; --i) {
+		const string& token = tokens[i];
+		if (i != size - 1) {
+			key += ".";
+		}
+		if (token == "*") {
+			break;
+		}
+		key += token;
+	}
+
+	return true;
+}
+
+SSL_CTX* openssl_conf::find_ssl_ctx(const char* host)
+{
+	string host_buf(host), key;
+	if (!create_host_key(host_buf, key)) {
+		return NULL;
+	}
+
+	//printf(">>>host=%s, key=%s\r\n", host, key.c_str());
+
+	const token_node* node = ssl_ctx_table_->find(key);
+	if (node != NULL) {
+		SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
+		return ctx;
+	}
+
+	// Try the wildcard matching process, and cut off the last item
+	// in the host name.
+	if (!create_host_key(host_buf, key, 1)) {
+		return NULL;
+	}
+
+	// The char '.' must be appended in order to wildcard matching,
+	// because the wildcard host's lst char must be '.'.
+	key += ".";
+
+	node = ssl_ctx_table_->find(key);
+	if (node != NULL) {
+		SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
+		return ctx;
+	}
+
+	//printf("Not found key=%s\r\n", key.c_str());
+	return NULL;
+}
+
+int openssl_conf::on_servername(SSL* ssl, const char*host)
+{
+#ifdef HAS_OPENSSL
+	SSL_CTX* ctx = find_ssl_ctx(host);
+	if (ctx == NULL) {
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	SSL_CTX* orig;
+	if ((orig = __ssl_get_ssl_ctx(ssl)) == ctx) {
+		//printf(">>>use default ssl_ctx\n");
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	if (__ssl_set_ssl_ctx(ssl, ctx) == ctx) {
+		__ssl_set_options(ssl, __ssl_ctx_get_options(orig));
+		//printf("reset ctx ok\r\n");
+		return SSL_TLSEXT_ERR_OK;
+	}
+	//printf("reset ctx=%p error\r\n", ctx);
+	return SSL_TLSEXT_ERR_NOACK;
+#else
+	(void) ssl;
+	(void) host;
+	return 0;
+#endif
+}
+
+int openssl_conf::ssl_servername(SSL *ssl, int *ad, void *arg)
+{
+#ifdef HAS_OPENSSL
+	(void) ad;
+
+	openssl_conf* conf = (openssl_conf*) arg;
+
+	if (conf->ssl_ctx_table_ == NULL) {
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	const char* host = __ssl_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
+	if (host == NULL) {
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	return conf->on_servername(ssl, host);
+#else
+	(void) ssl;
+	(void) ad;
+	(void) arg;
+	return 0;
+#endif
+}
+
 openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 : server_side_(server_side)
 , ssl_ctx_(NULL)
-, ssl_ctx_inited_(false)
+, ssl_ctx_table_(NULL)
+, ssl_ctx_count_(0)
 , timeout_(timeout)
 , init_status_(CONF_INIT_NIL)
 {
@@ -465,10 +766,20 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 openssl_conf::~openssl_conf(void)
 {
 #ifdef HAS_OPENSSL
-	if (ssl_ctx_) {
-		__ssl_ctx_free((SSL_CTX *) ssl_ctx_);
+	if (ssl_ctx_table_) {
+		const token_node* node = ssl_ctx_table_->first_node();
+		while (node) {
+			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
+			if (ctx) {
+				__ssl_ctx_free(ssl_ctx_);
+			}
+			node = ssl_ctx_table_->next_node();
+		}
+	} else if (ssl_ctx_) {
+		__ssl_ctx_free(ssl_ctx_);
 	}
 #endif
+	delete ssl_ctx_table_;
 }
 
 bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
@@ -525,12 +836,10 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 #ifdef HAS_OPENSSL
 	SSL_CTX* ctx;
 
-	if (!ssl_ctx_inited_) {
+	if (ssl_ctx_count_ == 0) {
 		ctx = ssl_ctx_;
-		ssl_ctx_inited_ = true;
 	} else {
 		ctx = create_ssl_ctx();
-		ssl_ctxes_.push_back(ctx);
 	}
 
 #if 0
@@ -559,11 +868,35 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 		__ssl_ctx_set_def_pass(ctx, (void*) key_pass);
 	}
 
+	++ssl_ctx_count_;
+	add_ssl_ctx(ctx);
+
 	return true;
 #else
 	(void) key_pass;
 	logger_error("HAS_OPENSSL not defined!");
 	return false;
+#endif
+}
+
+void openssl_conf::push_ssl_ctx(SSL_CTX* ctx)
+{
+	if (ctx == NULL) {
+		return;
+	}
+
+#ifdef HAS_OPENSSL
+	if (ssl_ctx_count_++ == 0) {
+		// Replace the default ssl_ctx_ when ssl_ctx_ hasn't
+		// been inited with one certificate yet if the ctx
+		// isn't same as ssl_ctx_.
+		if (ssl_ctx_ && ssl_ctx_ != ctx) {
+			__ssl_ctx_free(ssl_ctx_);
+		}
+		ssl_ctx_ = ctx;  // Reset ssl_ctx_ to the new ctx.
+	}
+
+	add_ssl_ctx(ctx);
 #endif
 }
 
