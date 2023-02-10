@@ -335,7 +335,7 @@ int main(void) {
     // acl::FIBER_EVENT_T_KERNEL,
     // acl::FIBER_EVENT_T_POLL,
     // acl::FIBER_EVENT_T_SELECT,
-    // acl::FIBER_EVENT_T_IO_URING(Linux6.xx)
+    // acl::FIBER_EVENT_T_IO_URING(Linux5.1+)
     // acl::FIBER_EVENT_T_WMSG(Win GUI)
     acl::fiber_event_t type = acl::FIBER_EVENT_T_KERNEL;
     acl::fiber::schedule_with(type);  // Start the coroutine scheculde process.
