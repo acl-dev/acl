@@ -172,7 +172,7 @@ openssl_io::~openssl_io(void)
 {
 #ifdef HAS_OPENSSL
 	if (ssl_) {
-		__ssl_free((SSL*) ssl_);
+		__ssl_free(ssl_);
 	}
 #endif
 }
@@ -235,13 +235,13 @@ bool openssl_io::handshake(void)
 
 #ifdef HAS_OPENSSL
 	while (true) {
-		int ret = __ssl_do_handshake((SSL*) ssl_);
+		int ret = __ssl_do_handshake(ssl_);
 		if (ret == 1) {
 			handshake_ok_ = true;
 			return true;
 		}
 
-		int err = __ssl_get_error((SSL*) ssl_, ret);
+		int err = __ssl_get_error(ssl_, ret);
 		switch (err) {
 		case SSL_ERROR_WANT_READ:
 		case SSL_ERROR_WANT_WRITE:
@@ -267,7 +267,7 @@ bool openssl_io::on_close(bool alive)
 	}
 
 #ifdef HAS_OPENSSL
-	if (__ssl_in_init((SSL*) ssl_)) {
+	if (__ssl_in_init(ssl_)) {
 		// OpenSSL 1.0.2f complains if SSL_shutdown() is called during
 		// an SSL handshake, while previous versions always return 0.
 		// Avoid calling SSL_shutdown() if handshake wasn't completed.
@@ -275,18 +275,18 @@ bool openssl_io::on_close(bool alive)
 		return true;
 	}
 
-	int mode = __ssl_get_shutdown((SSL*) ssl_);
+	int mode = __ssl_get_shutdown(ssl_);
 	mode |= SSL_RECEIVED_SHUTDOWN;
 	mode |= SSL_SENT_SHUTDOWN;
-	__ssl_set_quiet_shutdown((SSL*) ssl_, 1);
-	__ssl_set_shutdown((SSL*) ssl_, mode);
+	__ssl_set_quiet_shutdown(ssl_, 1);
+	__ssl_set_shutdown(ssl_, mode);
 
-	int ret = __ssl_shutdown((SSL*) ssl_);
+	int ret = __ssl_shutdown(ssl_);
 	if (ret == 1 || __err_peek_error() == 0) {
 		return true;
 	}
 
-	int err = __ssl_get_error((SSL*) ssl_, ret);
+	int err = __ssl_get_error(ssl_, ret);
 	switch (err) {
 	case SSL_ERROR_WANT_READ:
 	case SSL_ERROR_WANT_WRITE:
@@ -318,7 +318,7 @@ int openssl_io::read(void* buf, size_t len)
 			return -1;
 		}
 
-		int ret = __ssl_read((SSL*) ssl_, ptr, len);
+		int ret = __ssl_read(ssl_, ptr, len);
 		if (ret > 0) {
 			nbytes += ret;
 			ptr += ret;
@@ -333,7 +333,7 @@ int openssl_io::read(void* buf, size_t len)
 
 		this->stream_->read_ready = 0;
 
-		int err = __ssl_get_error((SSL*) ssl_, ret);
+		int err = __ssl_get_error(ssl_, ret);
 
 		switch (err) {
 		case SSL_ERROR_WANT_READ:
@@ -383,7 +383,7 @@ int openssl_io::send(const void* buf, size_t len)
 			return -1;
 		}
 
-		int ret = __ssl_write((SSL*) ssl_, ptr, len);
+		int ret = __ssl_write(ssl_, ptr, len);
 		if (ret > 0) {
 			nbytes += ret;
 			ptr += ret;
@@ -392,7 +392,7 @@ int openssl_io::send(const void* buf, size_t len)
 			break;
 		}
 
-		int err = __ssl_get_error((SSL*) ssl_, ret);
+		int err = __ssl_get_error(ssl_, ret);
 		switch (err) {
 		case SSL_ERROR_WANT_READ:
 		case SSL_ERROR_WANT_WRITE:

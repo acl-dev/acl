@@ -3,6 +3,7 @@
 #include "sslbase_io.hpp"
 
 struct ACL_VSTREAM;
+typedef struct ssl_st SSL;
 
 namespace acl {
 
@@ -42,7 +43,7 @@ protected:
 
 private:
 	openssl_conf& conf_;
-	void* ssl_;
+	SSL* ssl_;
 };
 
 } // namespace acl

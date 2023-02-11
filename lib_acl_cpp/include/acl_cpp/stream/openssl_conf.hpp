@@ -71,19 +71,27 @@ public:
 	 * 是否为 SSL 服务模式
 	 * @return {bool}
 	 */
-	bool is_server_side(void) const
-	{
+	bool is_server_side(void) const {
 		return server_side_;
 	}
 
 	/**
-	 * 获得缺省的服务端证书
+	 * 获得缺省的SSL_CTX对象
 	 * @return {SSL_CTX*}
 	 */
 	SSL_CTX* get_ssl_ctx(void) const;
 
 	/**
-	 * 添加外部已经初始完毕的 SSL_CTX
+	 * 服务模式下,创建 SSL_CTX 对象,内部自动设置 SNI 回调过程,虽然内部也是
+	 * 通过调用 SSL_CTX_new() API 创建 SSL_CTX 对象,但内部会自动区分动态
+	 * 加载或静态加载的 SSL_CTX_new() API.
+	 * @return {SSL_CTX*} 返回 NULL 表示未开启 OpenSSL 功能
+	 */
+	SSL_CTX* create_ssl_ctx(void);
+
+	/**
+	 * 服务模式下, 添加外部已经初始完毕的 SSL_CTX, 该对象必须是由上面
+	 * create_ssl_ctx() 创建的,以适配动态或静态加载 OpenSSL 的不同方式.
 	 * @param {SSL_CTX*} 由用户自自己初始化好的 SSL_CTX 对象，传入后其所有
 	 *  权将归 openssl_conf 内部统一管理并释放
 	 */
@@ -103,7 +111,6 @@ private:
 
 	bool init_once(void);
 
-	SSL_CTX* create_ssl_ctx(void);
 	void add_ssl_ctx(SSL_CTX* ctx);
 	SSL_CTX* find_ssl_ctx(const char* host);
 

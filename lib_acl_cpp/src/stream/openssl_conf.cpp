@@ -531,6 +531,27 @@ SSL_CTX* openssl_conf::create_ssl_ctx(void)
 #endif
 }
 
+void openssl_conf::push_ssl_ctx(SSL_CTX* ctx)
+{
+	if (ctx == NULL) {
+		return;
+	}
+
+#ifdef HAS_OPENSSL
+	if (ssl_ctx_count_++ == 0) {
+		// Replace the default ssl_ctx_ when ssl_ctx_ hasn't
+		// been inited with one certificate yet if the ctx
+		// isn't same as ssl_ctx_.
+		if (ssl_ctx_ && ssl_ctx_ != ctx) {
+			__ssl_ctx_free(ssl_ctx_);
+		}
+		ssl_ctx_ = ctx;  // Reset ssl_ctx_ to the new ctx.
+	}
+
+	add_ssl_ctx(ctx);
+#endif
+}
+
 SSL_CTX* openssl_conf::get_ssl_ctx(void) const
 {
 	return ssl_ctx_;
@@ -876,27 +897,6 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	(void) key_pass;
 	logger_error("HAS_OPENSSL not defined!");
 	return false;
-#endif
-}
-
-void openssl_conf::push_ssl_ctx(SSL_CTX* ctx)
-{
-	if (ctx == NULL) {
-		return;
-	}
-
-#ifdef HAS_OPENSSL
-	if (ssl_ctx_count_++ == 0) {
-		// Replace the default ssl_ctx_ when ssl_ctx_ hasn't
-		// been inited with one certificate yet if the ctx
-		// isn't same as ssl_ctx_.
-		if (ssl_ctx_ && ssl_ctx_ != ctx) {
-			__ssl_ctx_free(ssl_ctx_);
-		}
-		ssl_ctx_ = ctx;  // Reset ssl_ctx_ to the new ctx.
-	}
-
-	add_ssl_ctx(ctx);
 #endif
 }
 
