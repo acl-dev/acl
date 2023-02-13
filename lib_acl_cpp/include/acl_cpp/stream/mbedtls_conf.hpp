@@ -109,6 +109,9 @@ public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
 
+public:
+	mbedtls_ssl_config* create_ssl_config(void);
+
 private:
 	friend class mbedtls_io;
 
@@ -118,16 +121,20 @@ private:
 
 	bool  server_side_;
 
+	int conf_count_;
+	std::vector<mbedtls_ssl_config*> conf_table_;
 	mbedtls_ssl_config* conf_;
+
+	const int* ciphers_;
 	void* entropy_;
 	void* rnd_;
+
 	mbedtls_x509_crt* cacert_;
 	string crt_file_;
 	mbedtls_ssl_cache_context* cache_;
 	mbedtls_verify_t verify_mode_;
 	std::vector<std::pair<void*, void*> > cert_keys_;
 
-	std::vector<mbedtls_ssl_config*> confs_;
 
 private:
 	bool init_once(void);

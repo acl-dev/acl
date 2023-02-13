@@ -473,6 +473,39 @@ bool openssl_conf::load(void)
 #endif
 }
 
+//////////////////////////////////////////////////////////////////////////////
+
+openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
+: server_side_(server_side)
+, ssl_ctx_(NULL)
+, ssl_ctx_table_(NULL)
+, ssl_ctx_count_(0)
+, timeout_(timeout)
+, init_status_(CONF_INIT_NIL)
+{
+}
+
+openssl_conf::~openssl_conf(void)
+{
+#ifdef HAS_OPENSSL
+	if (ssl_ctx_table_) {
+		const token_node* node = ssl_ctx_table_->first_node();
+		while (node) {
+			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
+			if (ctx) {
+				logger("begin free ctx=%p", ctx);
+				__ssl_ctx_free(ctx);
+				logger("free ctx=%p ok", ctx);
+			}
+			node = ssl_ctx_table_->next_node();
+		}
+		delete ssl_ctx_table_;
+	} else if (ssl_ctx_) {
+		__ssl_ctx_free(ssl_ctx_);
+	}
+#endif
+}
+
 bool openssl_conf::init_once(void)
 {
 #ifdef HAS_OPENSSL_DLL
@@ -806,35 +839,6 @@ int openssl_conf::ssl_servername(SSL *ssl, int *ad, void *arg)
 	(void) ad;
 	(void) arg;
 	return 0;
-#endif
-}
-
-openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
-: server_side_(server_side)
-, ssl_ctx_(NULL)
-, ssl_ctx_table_(NULL)
-, ssl_ctx_count_(0)
-, timeout_(timeout)
-, init_status_(CONF_INIT_NIL)
-{
-}
-
-openssl_conf::~openssl_conf(void)
-{
-#ifdef HAS_OPENSSL
-	if (ssl_ctx_table_) {
-		const token_node* node = ssl_ctx_table_->first_node();
-		while (node) {
-			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
-			if (ctx) {
-				__ssl_ctx_free(ssl_ctx_);
-			}
-			node = ssl_ctx_table_->next_node();
-		}
-		delete ssl_ctx_table_;
-	} else if (ssl_ctx_) {
-		__ssl_ctx_free(ssl_ctx_);
-	}
 #endif
 }
 

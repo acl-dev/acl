@@ -550,9 +550,6 @@ bool mbedtls_conf::init_rand(void)
 		return false;
 	}
 
-	// 设置随机数生成器
-	__ssl_conf_rng(conf_, __ctr_drbg_random,
-		(mbedtls_ctr_drbg_context*) rnd_);
 	return true;
 #else
 	logger_error("HAS_MBEDTLS not defined!");
@@ -601,77 +598,7 @@ static int mutex_unlock(mbedtls_threading_mutex_t* mutex)
 }
 #endif
 
-bool mbedtls_conf::init_once(void)
-{
-#ifdef HAS_MBEDTLS_DLL
-	if (!load()) {
-		return false;
-	}
-#endif
-
-	thread_mutex_guard guard(lock_);
-	if (init_status_ == CONF_INIT_OK) {
-		return true;
-	} else if (init_status_ == CONF_INIT_ERR) {
-		return false;
-	}
-	assert(init_status_ == CONF_INIT_NIL);
-
-#if defined(HAS_MBEDTLS)
-# if defined(MBEDTLS_THREADING_ALT)
-	__threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
-# endif
-	__ssl_config_init(conf_);
-	__entropy_init((mbedtls_entropy_context*) entropy_);
-	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
-# ifdef DEBUG_SSL
-	__ssl_conf_dbg(conf_, my_debug, stdout);
-# endif
-
-	int ret;
-	if (server_side_) {
-		ret = __ssl_config_defaults(conf_,
-			MBEDTLS_SSL_IS_SERVER,
-			MBEDTLS_SSL_TRANSPORT_STREAM,
-			MBEDTLS_SSL_PRESET_DEFAULT);
-	} else {
-		ret = __ssl_config_defaults(conf_,
-			MBEDTLS_SSL_IS_CLIENT,
-			MBEDTLS_SSL_TRANSPORT_STREAM,
-			MBEDTLS_SSL_PRESET_DEFAULT);
-	}
-	if (ret != 0) {
-		init_status_ = CONF_INIT_ERR;
-		logger_error("ssl_config_defaults error=-0x%04x, side=%s",
-			ret, server_side_ ? "server" : "client");
-		return false;
-	}
-
-	if (!init_rand()) {
-		init_status_ = CONF_INIT_ERR;
-		return false;
-	}
-
-	set_authmode(conf_, verify_mode_);
-	__ssl_conf_endpoint(conf_, server_side_ ?
-		MBEDTLS_SSL_IS_SERVER : MBEDTLS_SSL_IS_CLIENT);
-
-	// Setup cipher_suites
-	const int* cipher_suites = __ssl_list_ciphersuites();
-	if (cipher_suites == NULL) {
-		init_status_ = CONF_INIT_ERR;
-		logger_error("ssl_list_ciphersuites null");
-		return false;
-	}
-
-	__ssl_conf_ciphersuites(conf_, cipher_suites);
-	init_status_ = CONF_INIT_OK;
-	return true;
-#else
-	logger_error("HAS_MBEDTLS not defined!");
-	return false;
-#endif // HAS_MBEDTLS
-}
+//////////////////////////////////////////////////////////////////////////////
 
 #define CONF_OWN_CERT_NIL	0
 #define CONF_OWN_CERT_OK	1
@@ -683,9 +610,11 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	server_side_ = server_side;
 	init_status_ = CONF_INIT_NIL;
 	cert_status_ = CONF_OWN_CERT_NIL;
-	conf_        = (mbedtls_ssl_config*) acl_mycalloc(1, sizeof(mbedtls_ssl_config));
+	conf_count_  = 0;
+	conf_        = NULL;
 	entropy_     = acl_mycalloc(1, sizeof(mbedtls_entropy_context));
 	rnd_         = acl_mycalloc(1, sizeof(mbedtls_ctr_drbg_context));
+	ciphers_     = NULL;
 	cacert_      = NULL;
 	cache_       = NULL;
 	verify_mode_ = verify_mode;
@@ -695,9 +624,12 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	(void) server_side_;
 	(void) init_status_;
 	(void) cert_status_;
+	(void) conf_count_;
+	(void) conf_table_;
 	(void) conf_;
 	(void) entropy_;
 	(void) rnd_;
+	(void) ciphers_;
 	(void) cacert_;
 	(void) cache_;
 	(void) verify_mode_;
@@ -740,6 +672,98 @@ mbedtls_conf::~mbedtls_conf(void)
 		acl_myfree(cache_);
 	}
 #endif
+}
+
+bool mbedtls_conf::init_once(void)
+{
+#ifdef HAS_MBEDTLS_DLL
+	if (!load()) {
+		return false;
+	}
+#endif
+
+	thread_mutex_guard guard(lock_);
+	if (init_status_ == CONF_INIT_OK) {
+		return true;
+	} else if (init_status_ == CONF_INIT_ERR) {
+		return false;
+	}
+	assert(init_status_ == CONF_INIT_NIL);
+
+#if defined(HAS_MBEDTLS)
+# if defined(MBEDTLS_THREADING_ALT)
+	__threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
+# endif
+	__ssl_config_init(conf_);
+	__entropy_init((mbedtls_entropy_context*) entropy_);
+	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
+# ifdef DEBUG_SSL
+	__ssl_conf_dbg(conf_, my_debug, stdout);
+# endif
+
+	if (!init_rand()) {
+		init_status_ = CONF_INIT_ERR;
+		return false;
+	}
+
+	// Setup cipher_suites
+	ciphers_ = __ssl_list_ciphersuites();
+	if (ciphers_ == NULL) {
+		init_status_ = CONF_INIT_ERR;
+		logger_error("ssl_list_ciphersuites null");
+		return false;
+	}
+
+	// 创建缺省的 mbedtls_ssl_config
+	conf_ = create_ssl_config();
+	if (conf_ == NULL) {
+		init_status_ = CONF_INIT_ERR;
+		return false;
+	}
+
+	init_status_ = CONF_INIT_OK;
+	return true;
+#else
+	logger_error("HAS_MBEDTLS not defined!");
+	return false;
+#endif // HAS_MBEDTLS
+}
+
+mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
+{
+
+	mbedtls_ssl_config* conf = (mbedtls_ssl_config*)
+		acl_mycalloc(1, sizeof(mbedtls_ssl_config));
+
+	int ret;
+	if (server_side_) {
+		ret = __ssl_config_defaults(conf_,
+			MBEDTLS_SSL_IS_SERVER,
+			MBEDTLS_SSL_TRANSPORT_STREAM,
+			MBEDTLS_SSL_PRESET_DEFAULT);
+	} else {
+		ret = __ssl_config_defaults(conf_,
+			MBEDTLS_SSL_IS_CLIENT,
+			MBEDTLS_SSL_TRANSPORT_STREAM,
+			MBEDTLS_SSL_PRESET_DEFAULT);
+	}
+
+	if (ret != 0) {
+		logger_error("ssl_config_defaults error=-0x%04x, side=%s",
+			ret, server_side_ ? "server" : "client");
+		return NULL;
+	}
+
+	// 设置随机数生成器
+	__ssl_conf_rng(conf_, __ctr_drbg_random,
+		(mbedtls_ctr_drbg_context*) rnd_);
+
+	set_authmode(conf_, verify_mode_);
+	__ssl_conf_endpoint(conf_, server_side_ ?
+		MBEDTLS_SSL_IS_SERVER : MBEDTLS_SSL_IS_CLIENT);
+	__ssl_conf_ciphersuites(conf_, ciphers_);
+
+	return conf;
 }
 
 void mbedtls_conf::free_ca(void)
@@ -814,6 +838,14 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	}
 
 #ifdef HAS_MBEDTLS
+	mbedtls_ssl_config* conf;
+
+	if (conf_count_ == 0) {
+		conf = conf_;
+	} else {
+		conf = create_ssl_config();
+	}
+
 	int ret = 0;
 	X509_CRT *cert = NULL;
 	PKEY *pkey = NULL;
@@ -837,7 +869,7 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 		goto ERR;
 	}
 
-	ret = __ssl_conf_own_cert(conf_, cert, pkey);
+	ret = __ssl_conf_own_cert(conf, cert, pkey);
 	if (ret != 0) {
 		goto ERR;
 	}
