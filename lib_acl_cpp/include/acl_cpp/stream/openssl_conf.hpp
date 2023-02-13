@@ -3,6 +3,7 @@
 #include <vector>
 #include "../stdlib/thread_mutex.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/token_tree.hpp"
 #include "sslbase_conf.hpp"
 
 typedef struct ssl_st SSL;
@@ -133,12 +134,12 @@ private:
 	void add_ssl_ctx(SSL_CTX* ctx);
 	SSL_CTX* find_ssl_ctx(const char* host);
 
-	int on_servername(SSL* ssl, const char*host);
 	void get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts);
-	void bind_host_ctx(SSL_CTX* ctx, string& host);
+	size_t bind_host(SSL_CTX* ctx, string& host);
 	bool create_host_key(string& host, string& key, size_t skip = 0);
 
-	static int ssl_servername(SSL *ssl, int *ad, void *arg);
+	int on_sni_callback(SSL* ssl, const char*host);
+	static int sni_callback(SSL *ssl, int *ad, void *arg);
 };
 
 } // namespace acl

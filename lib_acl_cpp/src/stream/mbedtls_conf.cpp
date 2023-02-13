@@ -11,6 +11,7 @@
 #ifdef HAS_MBEDTLS
 # include "mbedtls-2.7.12/threading_alt.h"
 # include "mbedtls-2.7.12/ssl.h"
+# include "mbedtls-2.7.12/ssl_internal.h" // for mbedtls_x509_crt, mbedtls_pk_context,
 # include "mbedtls-2.7.12/error.h"
 # include "mbedtls-2.7.12/ctr_drbg.h"
 # include "mbedtls-2.7.12/entropy.h"
@@ -71,6 +72,7 @@
 #  define SSL_CONF_CA_CHAIN_NAME	"mbedtls_ssl_conf_ca_chain"
 #  define SSL_CONF_OWN_CERT_NAME	"mbedtls_ssl_conf_own_cert"
 #  define SSL_CONF_AUTHMODE_NAME	"mbedtls_ssl_conf_authmode"
+#  define SSL_CONF_SNI			"mbedtls_ssl_conf_sni"
 #  ifdef DEBUG_SSL
 #   define SSL_CONF_DBG_NAME		"mbedtls_ssl_conf_dbg"
 #  endif
@@ -81,6 +83,7 @@
 #  define SSL_CACHE_GET_NAME		"mbedtls_ssl_cache_get"
 
 #  define SSL_SETUP_NAME		"mbedtls_ssl_setup"
+#  define SSL_SET_CERT			"mbedtls_ssl_set_hs_own_cert"
 
 #  ifdef MBEDTLS_THREADING_ALT
 typedef void (*threading_set_alt_fn)(
@@ -130,6 +133,13 @@ typedef void (*ssl_conf_ca_chain_fn)(mbedtls_ssl_config*, X509_CRT*,
                        mbedtls_x509_crl*);
 typedef int  (*ssl_conf_own_cert_fn)(mbedtls_ssl_config*, X509_CRT*, PKEY*);
 typedef void (*ssl_conf_authmode_fn)(mbedtls_ssl_config*, int);
+
+typedef void (*ssl_conf_sni_fn)(mbedtls_ssl_config*,
+		int (*f_sni)(void*, mbedtls_ssl_context*,
+			const unsigned char*,
+			size_t),
+		void*);
+
 # ifdef DEBUG_SSL
 typedef void (*ssl_conf_dbg_fn)(mbedtls_ssl_config*,
 		void (*)(void*, int, const char*, int , const char*), void*);
@@ -141,6 +151,8 @@ typedef int  (*ssl_cache_set_fn)(void*, const mbedtls_ssl_session*);;
 typedef int  (*ssl_cache_get_fn)(void*, mbedtls_ssl_session*);
 
 typedef int  (*ssl_setup_fn)(mbedtls_ssl_context*, mbedtls_ssl_config*);
+typedef int  (*ssl_set_cert_fn)(mbedtls_ssl_context*,
+		mbedtls_x509_crt*, mbedtls_pk_context*);
 
 # ifdef MBEDTLS_THREADING_ALT
 static threading_set_alt_fn		__threading_set_alt;
@@ -181,6 +193,7 @@ static ssl_conf_session_cache_fn	__ssl_conf_session_cache;
 static ssl_conf_ca_chain_fn		__ssl_conf_ca_chain;
 static ssl_conf_own_cert_fn		__ssl_conf_own_cert;
 static ssl_conf_authmode_fn		__ssl_conf_authmode;
+static ssl_conf_sni_fn			__ssl_conf_sni;
 # ifdef DEBUG_SSL
 static ssl_conf_dbg_fn			__ssl_conf_dbg;
 # endif
@@ -191,6 +204,7 @@ static ssl_cache_set_fn			__ssl_cache_set;
 static ssl_cache_get_fn			__ssl_cache_get;
 
 static ssl_setup_fn			__ssl_setup;
+static ssl_set_cert_fn			__ssl_set_cert;
 
 static acl_pthread_once_t __mbedtls_once = ACL_PTHREAD_ONCE_INIT;
 static acl::string* __crypto_path_buf  = NULL;
@@ -324,6 +338,7 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_CONF_CA_CHAIN_NAME, ssl_conf_ca_chain_fn, __ssl_conf_ca_chain);
 	LOAD_SSL(SSL_CONF_OWN_CERT_NAME, ssl_conf_own_cert_fn, __ssl_conf_own_cert);
 	LOAD_SSL(SSL_CONF_AUTHMODE_NAME, ssl_conf_authmode_fn, __ssl_conf_authmode);
+	LOAD_SSL(SSL_CONF_SNI, ssl_conf_sni_fn, __ssl_conf_sni);
 # ifdef DEBUG_SSL
 	LOAD_SSL(SSL_CONF_DBG_NAME, ssl_conf_dbg_fn, __ssl_conf_dbg);
 # endif
@@ -334,6 +349,7 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_CACHE_GET_NAME, ssl_cache_get_fn, __ssl_cache_get);
 
 	LOAD_SSL(SSL_SETUP_NAME, ssl_setup_fn, __ssl_setup);
+	LOAD_SSL(SSL_SET_CERT, ssl_set_cert_fn, __ssl_set_cert);
 	return true;
 }
 
@@ -598,6 +614,14 @@ static int mutex_unlock(mbedtls_threading_mutex_t* mutex)
 }
 #endif
 
+int mbedtls_conf::sni_callback(void* arg, mbedtls_ssl_context* ssl,
+	const unsigned char* name, size_t name_len)
+{
+	mbedtls_conf* mconf = (mbedtls_conf*) arg;
+
+	return mconf->on_sni_callback(ssl, name, name_len);
+}
+
 //////////////////////////////////////////////////////////////////////////////
 
 #define CONF_OWN_CERT_NIL	0
@@ -611,6 +635,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	init_status_ = CONF_INIT_NIL;
 	cert_status_ = CONF_OWN_CERT_NIL;
 	conf_count_  = 0;
+	conf_table_  = NULL;
 	conf_        = NULL;
 	entropy_     = acl_mycalloc(1, sizeof(mbedtls_entropy_context));
 	rnd_         = acl_mycalloc(1, sizeof(mbedtls_ctr_drbg_context));
@@ -654,8 +679,23 @@ mbedtls_conf::~mbedtls_conf(void)
 		__pk_free((PKEY*) pkey);
 		acl_myfree(pkey);
 	}
-	__ssl_config_free(conf_);
-	acl_myfree(conf_);
+
+	if (conf_table_) {
+		const token_node* node = conf_table_->first_node();
+		while (node) {
+			mbedtls_ssl_config* conf =
+				(mbedtls_ssl_config*) node->get_ctx();
+			if (conf) {
+				__ssl_config_free(conf_);
+				acl_myfree(conf_);
+			}
+			node = conf_table_->next_node();
+		}
+	} else if (conf_) {
+		__ssl_config_free(conf_);
+		acl_myfree(conf_);
+	}
+
 	acl_myfree(entropy_);
 
 	// 使用 havege_random 随机数生成器时，在一些虚机上并不能保证随机性,
@@ -694,12 +734,8 @@ bool mbedtls_conf::init_once(void)
 # if defined(MBEDTLS_THREADING_ALT)
 	__threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
 # endif
-	__ssl_config_init(conf_);
 	__entropy_init((mbedtls_entropy_context*) entropy_);
 	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
-# ifdef DEBUG_SSL
-	__ssl_conf_dbg(conf_, my_debug, stdout);
-# endif
 
 	if (!init_rand()) {
 		init_status_ = CONF_INIT_ERR;
@@ -729,20 +765,58 @@ bool mbedtls_conf::init_once(void)
 #endif // HAS_MBEDTLS
 }
 
+int mbedtls_conf::on_sni_callback(mbedtls_ssl_context* ssl,
+	const unsigned char* name, size_t name_len)
+{
+	if (name == NULL || *name == 0 || name_len == 0) {
+		return 0;
+	}
+
+	string host;
+	host.copy(name, name_len);
+
+	mbedtls_ssl_config* conf = find_ssl_config(host);
+	if (conf == NULL) {
+		return 0;
+	}
+	(void) conf;
+
+	if (conf->key_cert == NULL) {
+		return 0;
+	}
+
+	mbedtls_x509_crt*   cert = conf->key_cert->cert;
+	mbedtls_pk_context* pkey = conf->key_cert->key;
+	if (cert == NULL  || pkey == NULL) {
+		return 0;
+	}
+
+	return __ssl_set_cert(ssl, cert, pkey);
+	(void) ssl; (void) name; (void) name_len;
+	return 0;
+}
+
 mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 {
 
+#if defined(HAS_MBEDTLS)
 	mbedtls_ssl_config* conf = (mbedtls_ssl_config*)
 		acl_mycalloc(1, sizeof(mbedtls_ssl_config));
 
+	__ssl_config_init(conf);
+
+# ifdef DEBUG_SSL
+	__ssl_conf_dbg(conf, my_debug, stdout);
+# endif
+
 	int ret;
 	if (server_side_) {
-		ret = __ssl_config_defaults(conf_,
+		ret = __ssl_config_defaults(conf,
 			MBEDTLS_SSL_IS_SERVER,
 			MBEDTLS_SSL_TRANSPORT_STREAM,
 			MBEDTLS_SSL_PRESET_DEFAULT);
 	} else {
-		ret = __ssl_config_defaults(conf_,
+		ret = __ssl_config_defaults(conf,
 			MBEDTLS_SSL_IS_CLIENT,
 			MBEDTLS_SSL_TRANSPORT_STREAM,
 			MBEDTLS_SSL_PRESET_DEFAULT);
@@ -755,15 +829,129 @@ mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 	}
 
 	// 设置随机数生成器
-	__ssl_conf_rng(conf_, __ctr_drbg_random,
+	__ssl_conf_rng(conf, __ctr_drbg_random,
 		(mbedtls_ctr_drbg_context*) rnd_);
 
-	set_authmode(conf_, verify_mode_);
-	__ssl_conf_endpoint(conf_, server_side_ ?
+	set_authmode(conf, verify_mode_);
+	__ssl_conf_endpoint(conf, server_side_ ?
 		MBEDTLS_SSL_IS_SERVER : MBEDTLS_SSL_IS_CLIENT);
-	__ssl_conf_ciphersuites(conf_, ciphers_);
-
+	__ssl_conf_ciphersuites(conf, ciphers_);
+	__ssl_conf_sni(conf, sni_callback, this);
 	return conf;
+#else
+	return NULL;
+#endif
+}
+
+void mbedtls_conf::add_ssl_config(mbedtls_ssl_config* conf)
+{
+	std::vector<string> hosts;
+	get_hosts(conf, hosts);
+
+	if (hosts.empty()) {
+		return;
+	}
+
+	size_t n = 0;
+	for (std::vector<string>::iterator cit = hosts.begin();
+		cit != hosts.end(); ++cit) {
+		n += bind_host(conf, *cit);
+	}
+
+	if (n > 0) {
+		conf_count_++;
+	}
+}
+
+void mbedtls_conf::get_hosts(const mbedtls_ssl_config* conf,
+	std::vector<string>& hosts)
+{
+	(void) conf;
+	(void) hosts;
+}
+
+size_t mbedtls_conf::bind_host(mbedtls_ssl_config* conf, string& host)
+{
+	string key;
+	if (!create_host_key(host, key)) {
+		return 0;
+	}
+
+	if (conf_table_ == NULL) {
+		conf_table_ = NEW token_tree;
+	}
+
+	if (conf_table_->find(key) != NULL) {
+		return 0;
+	}
+
+	conf_table_->insert(key, conf);
+	return 1;
+}
+
+bool mbedtls_conf::create_host_key(string& host, string& key, size_t skip /* 0 */)
+{
+	key.clear();
+
+	std::vector<string>& tokens = host.split2(".");
+	if (tokens.empty() || tokens.size() <= skip) {
+		return false;
+	}
+
+	// Reverse the host name splitted with '.'. for example:
+	// www.sina.com --> com.sina.com
+	// *.sina.com   --> com.sina.
+	// The last char '*' will be changed to '.' above.
+	// When skip == 1, then "www.sina.com --> com.sina"
+
+	int size = (int) tokens.size();
+	for (int i = size - 1; i >= (int) skip; --i) {
+		const string& token = tokens[i];
+		if (i != size - 1) {
+			key += ".";
+		}
+		if (token == "*") {
+			break;
+		}
+		key += token;
+	}
+
+	return true;
+}
+
+mbedtls_ssl_config* mbedtls_conf::find_ssl_config(const char* host)
+{
+	string host_buf(host), key;
+	if (!create_host_key(host_buf, key)) {
+		return NULL;
+	}
+
+	//printf(">>>host=%s, key=%s\r\n", host, key.c_str());
+
+	const token_node* node = conf_table_->find(key);
+	if (node != NULL) {
+		mbedtls_ssl_config* cf = (mbedtls_ssl_config*) node->get_ctx();
+		return cf;
+	}
+
+	// Try the wildcard matching process, and cut off the last item
+	// in the host name.
+	if (!create_host_key(host_buf, key, 1)) {
+		return NULL;
+	}
+
+	// The char '.' must be appended in order to wildcard matching,
+	// because the wildcard host's lst char must be '.'.
+	key += ".";
+
+	node = conf_table_->find(key);
+	if (node != NULL) {
+		mbedtls_ssl_config* cf = (mbedtls_ssl_config*) node->get_ctx();
+		return cf;
+	}
+
+	//printf("Not found key=%s\r\n", key.c_str());
+	return NULL;
 }
 
 void mbedtls_conf::free_ca(void)
@@ -831,9 +1019,18 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	const char* key_pass)
 {
-	if (crt_file == NULL || crt_file[0] == '\0' ||
-		key_file == NULL || key_file[0] == '\0') {
-		logger_error("crt_file or key_file null");
+	if (crt_file == NULL || *crt_file == 0) {
+		logger_error("crt_file can't be null nor empty");
+		return false;
+	}
+
+	if (key_file == NULL || *key_file == 0) {
+		logger_error("key_file can't be null nor empty");
+		return false;
+	}
+
+	if (!init_once()) {
+		logger_error("init_once error");
 		return false;
 	}
 
@@ -849,11 +1046,6 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	int ret = 0;
 	X509_CRT *cert = NULL;
 	PKEY *pkey = NULL;
-
-	if (!init_once()) {
-		logger_error("init_once error");
-		return false;
-	}
 
 	cert = static_cast<X509_CRT*>(acl_mycalloc(1, sizeof(X509_CRT)));
 	__x509_crt_init(cert);
@@ -876,6 +1068,8 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 
 	cert_keys_.push_back(std::make_pair(cert, pkey));
 	cert_status_ = CONF_OWN_CERT_OK;
+
+	add_ssl_config(conf);
 	return true;
 ERR:
 	logger_error("add cert (%s:%s) error: -0x%04x", crt_file, key_file, -ret);

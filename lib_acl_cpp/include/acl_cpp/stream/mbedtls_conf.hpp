@@ -2,12 +2,14 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/thread_mutex.hpp"
 #include "../stdlib/string.hpp"
+#include "../stdlib/token_tree.hpp"
 #include "sslbase_conf.hpp"
 #include <vector>
 
 typedef struct mbedtls_x509_crt mbedtls_x509_crt;
 typedef struct mbedtls_ssl_config  mbedtls_ssl_config;
 typedef struct mbedtls_ssl_cache_context mbedtls_ssl_cache_context;
+typedef struct mbedtls_ssl_context mbedtls_ssl_context;
 
 namespace acl {
 
@@ -121,8 +123,8 @@ private:
 
 	bool  server_side_;
 
-	int conf_count_;
-	std::vector<mbedtls_ssl_config*> conf_table_;
+	int         conf_count_;
+	token_tree* conf_table_;
 	mbedtls_ssl_config* conf_;
 
 	const int* ciphers_;
@@ -135,6 +137,17 @@ private:
 	mbedtls_verify_t verify_mode_;
 	std::vector<std::pair<void*, void*> > cert_keys_;
 
+	void get_hosts(const mbedtls_ssl_config* conf, std::vector<string>& hosts);
+	size_t bind_host(mbedtls_ssl_config* conf, string& host);
+	bool create_host_key(string& host, string& key, size_t skip = 0);
+
+	void add_ssl_config(mbedtls_ssl_config* conf);
+	mbedtls_ssl_config* find_ssl_config(const char* host);
+
+	int on_sni_callback(mbedtls_ssl_context* ssl,
+		const unsigned char* name, size_t name_len);
+	static int sni_callback(void* arg, mbedtls_ssl_context* ssl,
+		const unsigned char* name, size_t name_len);
 
 private:
 	bool init_once(void);

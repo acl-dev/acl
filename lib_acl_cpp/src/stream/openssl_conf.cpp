@@ -493,9 +493,7 @@ openssl_conf::~openssl_conf(void)
 		while (node) {
 			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
 			if (ctx) {
-				logger("begin free ctx=%p", ctx);
 				__ssl_ctx_free(ctx);
-				logger("free ctx=%p ok", ctx);
 			}
 			node = ssl_ctx_table_->next_node();
 		}
@@ -569,11 +567,11 @@ SSL_CTX* openssl_conf::create_ssl_ctx(void)
 		__ssl_ctx_set_timeout(ctx, timeout_);
 	}
 
-	// SSL_CTX_set_tlsext_servername_callback(ctx, ssl_servername);
+	// SSL_CTX_set_tlsext_servername_callback(ctx, sni_callback);
 	// SSL_CTX_set_tlsext_servername_arg(ctx, this);
 
 	__ssl_ctx_callback_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_CB,
-		(void (*)(void)) ssl_servername);
+		(void (*)(void)) sni_callback);
 	__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG, 0, this);
 
 	return ctx;
@@ -654,6 +652,27 @@ static char *asn1_string_to_utf8(ASN1_STRING *asn1str)
 }
 #endif
 
+void openssl_conf::add_ssl_ctx(SSL_CTX* ctx)
+{
+	std::vector<string> hosts;
+	get_hosts(ctx, hosts);
+
+	if (hosts.empty()) {
+		return;
+	}
+
+	size_t n = 0;
+
+	for (std::vector<string>::iterator cit = hosts.begin();
+		cit != hosts.end(); ++cit) {
+		n += bind_host(ctx, *cit);
+	}
+
+	if (n > 0) {
+		ssl_ctx_count_++;
+	}
+}
+
 void openssl_conf::get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts)
 {
 #ifdef HAS_OPENSSL
@@ -690,26 +709,11 @@ void openssl_conf::get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts)
 #endif
 }
 
-void openssl_conf::add_ssl_ctx(SSL_CTX* ctx)
-{
-	std::vector<string> hosts;
-	get_hosts(ctx, hosts);
-
-	if (hosts.empty()) {
-		return;
-	}
-
-	for (std::vector<string>::iterator cit = hosts.begin();
-		cit != hosts.end(); ++cit) {
-		bind_host_ctx(ctx, *cit);
-	}
-}
-
-void openssl_conf::bind_host_ctx(SSL_CTX* ctx, string& host)
+size_t openssl_conf::bind_host(SSL_CTX* ctx, string& host)
 {
 	string key;
 	if (!create_host_key(host, key)) {
-		return;
+		return 0;
 	}
 
 	if (ssl_ctx_table_ == NULL) {
@@ -717,11 +721,12 @@ void openssl_conf::bind_host_ctx(SSL_CTX* ctx, string& host)
 	}
 
 	if (ssl_ctx_table_->find(key) != NULL) {
-		return;
+		return 0;
 	}
 
-	ssl_ctx_table_->insert(key, ctx);
 	// printf(">>>add one host=%s, key=%s\r\n", host.c_str(), key.c_str());
+	ssl_ctx_table_->insert(key, ctx);
+	return 1;
 }
 
 bool openssl_conf::create_host_key(string& host, string& key, size_t skip /* 0 */)
@@ -789,7 +794,7 @@ SSL_CTX* openssl_conf::find_ssl_ctx(const char* host)
 	return NULL;
 }
 
-int openssl_conf::on_servername(SSL* ssl, const char*host)
+int openssl_conf::on_sni_callback(SSL* ssl, const char*host)
 {
 #ifdef HAS_OPENSSL
 	SSL_CTX* ctx = find_ssl_ctx(host);
@@ -817,7 +822,7 @@ int openssl_conf::on_servername(SSL* ssl, const char*host)
 #endif
 }
 
-int openssl_conf::ssl_servername(SSL *ssl, int *ad, void *arg)
+int openssl_conf::sni_callback(SSL *ssl, int *ad, void *arg)
 {
 #ifdef HAS_OPENSSL
 	(void) ad;
@@ -833,7 +838,7 @@ int openssl_conf::ssl_servername(SSL *ssl, int *ad, void *arg)
 		return SSL_TLSEXT_ERR_NOACK;
 	}
 
-	return conf->on_servername(ssl, host);
+	return conf->on_sni_callback(ssl, host);
 #else
 	(void) ssl;
 	(void) ad;
@@ -879,12 +884,12 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	const char* key_pass /* NULL */)
 {
 	if (crt_file == NULL || *crt_file == 0) {
-		logger_error("crt_file empty");
+		logger_error("crt_file can't be null nor empty");
 		return false;
 	}
 
 	if (key_file == NULL || *key_file == 0) {
-		logger_error("key_file empty");
+		logger_error("key_file can't be null nor empty");
 		return false;
 	}
 
@@ -928,9 +933,7 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 		__ssl_ctx_set_def_pass(ctx, (void*) key_pass);
 	}
 
-	++ssl_ctx_count_;
 	add_ssl_ctx(ctx);
-
 	return true;
 #else
 	(void) key_pass;
