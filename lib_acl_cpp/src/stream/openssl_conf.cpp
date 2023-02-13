@@ -440,6 +440,24 @@ void openssl_conf::set_libpath(const char* libcrypto, const char* libssl)
 #endif
 }
 
+void* openssl_conf::get_libssl_handle(void)
+{
+#ifdef HAS_OPENSSL_DLL
+	return __openssl_ssl_dll;
+#else
+	return NULL;
+#endif
+}
+
+void* openssl_conf::get_libcrypto_handle(void)
+{
+#ifdef HAS_OPENSSL_DLL
+	return __openssl_crypto_dll;
+#else
+	return NULL;
+#endif
+}
+
 bool openssl_conf::load(void)
 {
 #ifdef HAS_OPENSSL_DLL

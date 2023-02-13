@@ -60,6 +60,19 @@ public:
 	 */
 	static bool load(void);
 
+	/**
+	 * 调用 load() 成功加载 OpenSSL 动态库后，调用本静态函数获得 libssl
+	 * 动态加载库句柄，从而可以从该句柄中获得指定函数指针
+	 * @return {void*} 返回 NULL 表示还未加载
+	 */
+	static void* get_libssl_handle(void);
+
+	/**
+	 * 获得 libcrypto 动态加载库句柄
+	 * @return {void*} 返回 NULL 表示还未加载
+	 */
+	static void* get_libcrypto_handle(void);
+
 public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
