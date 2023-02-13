@@ -557,6 +557,23 @@ SSL_CTX* openssl_conf::get_ssl_ctx(void) const
 	return ssl_ctx_;
 }
 
+void openssl_conf::get_ssl_ctxes(std::vector<SSL_CTX*>& out)
+{
+#ifdef HAS_OPENSSL
+	if (ssl_ctx_table_) {
+		const token_node* node = ssl_ctx_table_->first_node();
+		while (node) {
+			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
+			if (ctx) {
+				out.push_back(ctx);
+			}
+		}
+	}
+#else
+	(void) out;
+#endif
+}
+
 #ifdef HAS_OPENSSL
 /* convert an ASN.1 string to a UTF-8 string (escaping control characters) */  
 static char *asn1_string_to_utf8(ASN1_STRING *asn1str)
@@ -796,11 +813,11 @@ openssl_conf::~openssl_conf(void)
 			}
 			node = ssl_ctx_table_->next_node();
 		}
+		delete ssl_ctx_table_;
 	} else if (ssl_ctx_) {
 		__ssl_ctx_free(ssl_ctx_);
 	}
 #endif
-	delete ssl_ctx_table_;
 }
 
 bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)

@@ -82,6 +82,12 @@ public:
 	SSL_CTX* get_ssl_ctx(void) const;
 
 	/**
+	 * 获得所有的已经初始完成的 SSL_CTX 对象
+	 * @param out {std::vector<SSL_CTX*>&}
+	 */
+	void get_ssl_ctxes(std::vector<SSL_CTX*>& out);
+
+	/**
 	 * 服务模式下,创建 SSL_CTX 对象,内部自动设置 SNI 回调过程,虽然内部也是
 	 * 通过调用 SSL_CTX_new() API 创建 SSL_CTX 对象,但内部会自动区分动态
 	 * 加载或静态加载的 SSL_CTX_new() API.
