@@ -551,7 +551,7 @@ bool mbedtls_conf::init_rand(void)
 	}
 
 	// 设置随机数生成器
-	__ssl_conf_rng((mbedtls_ssl_config*) conf_, __ctr_drbg_random,
+	__ssl_conf_rng(conf_, __ctr_drbg_random,
 		(mbedtls_ctr_drbg_context*) rnd_);
 	return true;
 #else
@@ -621,21 +621,21 @@ bool mbedtls_conf::init_once(void)
 # if defined(MBEDTLS_THREADING_ALT)
 	__threading_set_alt(mutex_init, mutex_free, mutex_lock, mutex_unlock);
 # endif
-	__ssl_config_init((mbedtls_ssl_config*) conf_);
+	__ssl_config_init(conf_);
 	__entropy_init((mbedtls_entropy_context*) entropy_);
 	__ctr_drbg_init((mbedtls_ctr_drbg_context*) rnd_);
 # ifdef DEBUG_SSL
-	__ssl_conf_dbg((mbedtls_ssl_config*) conf_, my_debug, stdout);
+	__ssl_conf_dbg(conf_, my_debug, stdout);
 # endif
 
 	int ret;
 	if (server_side_) {
-		ret = __ssl_config_defaults((mbedtls_ssl_config*) conf_,
+		ret = __ssl_config_defaults(conf_,
 			MBEDTLS_SSL_IS_SERVER,
 			MBEDTLS_SSL_TRANSPORT_STREAM,
 			MBEDTLS_SSL_PRESET_DEFAULT);
 	} else {
-		ret = __ssl_config_defaults((mbedtls_ssl_config*) conf_,
+		ret = __ssl_config_defaults(conf_,
 			MBEDTLS_SSL_IS_CLIENT,
 			MBEDTLS_SSL_TRANSPORT_STREAM,
 			MBEDTLS_SSL_PRESET_DEFAULT);
@@ -652,8 +652,8 @@ bool mbedtls_conf::init_once(void)
 		return false;
 	}
 
-	set_authmode((mbedtls_ssl_config*) conf_, verify_mode_);
-	__ssl_conf_endpoint((mbedtls_ssl_config*) conf_, server_side_ ?
+	set_authmode(conf_, verify_mode_);
+	__ssl_conf_endpoint(conf_, server_side_ ?
 		MBEDTLS_SSL_IS_SERVER : MBEDTLS_SSL_IS_CLIENT);
 
 	// Setup cipher_suites
@@ -664,7 +664,7 @@ bool mbedtls_conf::init_once(void)
 		return false;
 	}
 
-	__ssl_conf_ciphersuites((mbedtls_ssl_config*) conf_, cipher_suites);
+	__ssl_conf_ciphersuites(conf_, cipher_suites);
 	init_status_ = CONF_INIT_OK;
 	return true;
 #else
@@ -683,7 +683,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	server_side_ = server_side;
 	init_status_ = CONF_INIT_NIL;
 	cert_status_ = CONF_OWN_CERT_NIL;
-	conf_        = acl_mycalloc(1, sizeof(mbedtls_ssl_config));
+	conf_        = (mbedtls_ssl_config*) acl_mycalloc(1, sizeof(mbedtls_ssl_config));
 	entropy_     = acl_mycalloc(1, sizeof(mbedtls_entropy_context));
 	rnd_         = acl_mycalloc(1, sizeof(mbedtls_ctr_drbg_context));
 	cacert_      = NULL;
@@ -722,7 +722,7 @@ mbedtls_conf::~mbedtls_conf(void)
 		__pk_free((PKEY*) pkey);
 		acl_myfree(pkey);
 	}
-	__ssl_config_free((mbedtls_ssl_config*) conf_);
+	__ssl_config_free(conf_);
 	acl_myfree(conf_);
 	acl_myfree(entropy_);
 
@@ -736,7 +736,7 @@ mbedtls_conf::~mbedtls_conf(void)
 #endif
 
 	if (cache_) {
-		__ssl_cache_free((mbedtls_ssl_cache_context*) cache_);
+		__ssl_cache_free(cache_);
 		acl_myfree(cache_);
 	}
 #endif
@@ -746,7 +746,7 @@ void mbedtls_conf::free_ca(void)
 {
 #ifdef HAS_MBEDTLS
 	if (cacert_) {
-		__x509_crt_free((X509_CRT*) cacert_);
+		__x509_crt_free(cacert_);
 		acl_myfree(cacert_);
 		cacert_ = NULL;
 	}
@@ -765,11 +765,11 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 
 	int  ret;
 
-	cacert_ = acl_mycalloc(1, sizeof(X509_CRT));
-	__x509_crt_init((X509_CRT*) cacert_);
+	cacert_ = (mbedtls_x509_crt*) acl_mycalloc(1, sizeof(X509_CRT));
+	__x509_crt_init(cacert_);
 
 	if (ca_path && *ca_path) {
-		ret = __x509_crt_parse_path((X509_CRT*) cacert_, ca_path);
+		ret = __x509_crt_parse_path(cacert_, ca_path);
 		if (ret != 0) {
 			logger_error("x509_crt_parse_path(%s) error: -0x%04x",
 				ca_path, -ret);
@@ -784,7 +784,7 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 		return false;
 	}
 
-	ret = __x509_crt_parse_file((X509_CRT*) cacert_, ca_file);
+	ret = __x509_crt_parse_file(cacert_, ca_file);
 	if (ret != 0) {
 		logger_error("x509_crt_parse_path(%s) error: -0x%04x",
 			ca_path, -ret);
@@ -792,8 +792,7 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 		return false;
 	} else {
 		// Setup ca cert
-		__ssl_conf_ca_chain((mbedtls_ssl_config*) conf_,
-			((X509_CRT*) cacert_)->next, NULL);
+		__ssl_conf_ca_chain(conf_, cacert_->next, NULL);
 		return true;
 	}
 #else
@@ -838,7 +837,7 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 		goto ERR;
 	}
 
-	ret = __ssl_conf_own_cert((mbedtls_ssl_config*)conf_, cert, pkey);
+	ret = __ssl_conf_own_cert(conf_, cert, pkey);
 	if (ret != 0) {
 		goto ERR;
 	}
@@ -906,17 +905,18 @@ void mbedtls_conf::enable_cache(bool on)
 		if (cache_ != NULL) {
 			return;
 		}
-		cache_ = acl_mycalloc(1, sizeof(mbedtls_ssl_cache_context));
-		__ssl_cache_init((mbedtls_ssl_cache_context*) cache_);
+		cache_ = (mbedtls_ssl_cache_context*)
+			acl_mycalloc(1, sizeof(mbedtls_ssl_cache_context));
+		__ssl_cache_init(cache_);
 	} else if (cache_ != NULL) {
-		__ssl_cache_free((mbedtls_ssl_cache_context*) cache_);
+		__ssl_cache_free(cache_);
 		acl_myfree(cache_);
 		cache_ = NULL;
 	}
 
 	// Setup cache only for server-side
 	if (server_side_ && cache_ != NULL) {
-		__ssl_conf_session_cache((mbedtls_ssl_config*) conf_, cache_,
+		__ssl_conf_session_cache(conf_, cache_,
 			__ssl_cache_get, __ssl_cache_set);
 	}
 #else
@@ -932,8 +932,7 @@ bool mbedtls_conf::setup_certs(void* ssl)
 		return false;
 	}
 
-	int ret = __ssl_setup((mbedtls_ssl_context*) ssl,
-			(mbedtls_ssl_config*) conf_);
+	int ret = __ssl_setup((mbedtls_ssl_context*) ssl, conf_);
 	if (ret != 0) {
 		logger_error("ssl_setup error:-0x%04x", -ret);
 		return false;

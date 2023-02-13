@@ -5,6 +5,10 @@
 #include "sslbase_conf.hpp"
 #include <vector>
 
+typedef struct mbedtls_x509_crt mbedtls_x509_crt;
+typedef struct mbedtls_ssl_config  mbedtls_ssl_config;
+typedef struct mbedtls_ssl_cache_context mbedtls_ssl_cache_context;
+
 namespace acl {
 
 /**
@@ -75,8 +79,7 @@ public:
 	 * 获得随机数生成器的熵对象
 	 * @return {void*}，返回值为 entropy_context 类型
 	 */
-	void* get_entropy(void)
-	{
+	void* get_entropy(void) const {
 		return entropy_;
 	}
 
@@ -115,14 +118,16 @@ private:
 
 	bool  server_side_;
 
-	void* conf_;
+	mbedtls_ssl_config* conf_;
 	void* entropy_;
 	void* rnd_;
-	void* cacert_;
+	mbedtls_x509_crt* cacert_;
 	string crt_file_;
-	void* cache_;
+	mbedtls_ssl_cache_context* cache_;
 	mbedtls_verify_t verify_mode_;
 	std::vector<std::pair<void*, void*> > cert_keys_;
+
+	std::vector<mbedtls_ssl_config*> confs_;
 
 private:
 	bool init_once(void);
