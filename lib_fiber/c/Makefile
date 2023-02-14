@@ -118,7 +118,8 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -DSHARE_STACK
 
-# If HAS_IO_URING=yes or has_io_uring=yes has been set in environment, we
+# If HAS_IO_URING=yes or has_io_uring=yes has been set in environment,
+# or you run "$make HAS_IO_URING=yes", the io_uring engine will be used.
 # will use io_uring.
 	ifeq ($(HAS_IO_URING), yes)
 		CFLAGS += -DHAS_IO_URING

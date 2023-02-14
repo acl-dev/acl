@@ -78,10 +78,27 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
-	CFLAGS += -DHAS_POLARSSL_DLL
-	CFLAGS += -DHAS_MBEDTLS_DLL
-	CFLAGS += -DHAS_OPENSSL_DLL
+
+	ifeq ($(OPENSSL_STATIC), yes)
+		CFLAGS += -DHAS_OPENSSL
+	else
+		CFLAGS += -DHAS_OPENSSL_DLL
+	endif
+
 	CFLAGS += -I../include/openssl-1.1.1q
+
+	ifeq ($(POLARSSL_STATIC), yes)
+		CFLAGS += -DHAS_POLARSSL
+	else
+		CFLAGS += -DHAS_POLARSSL_DLL
+	endif
+
+	ifeq ($(MBEDTLS_STATIC), yes)
+		CFLAGS += -DHAS_MBEDTLS
+	else
+		CFLAGS += -DHAS_MBEDTLS_DLL
+	endif
+
 	shared_ldflags = -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
 endif
 
@@ -96,11 +113,27 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -flto \
 		  -Os
 	CFLAGS += -Wshadow
-	CFLAGS += -DHAS_POLARSSL_DLL
-	CFLAGS += -DHAS_MBEDTLS_DLL
-	CFLAGS += -DHAS_OPENSSL_DLL
-	CFLAGS += -I../include/openssl-1.1.1q
 	UNIXTYPE = MACOSX
+
+	ifeq ($(OPENSSL_STATIC), yes)
+		CFLAGS += -DHAS_OPENSSL
+	else
+		CFLAGS += -DHAS_OPENSSL_DLL
+	endif
+
+	CFLAGS += -I../include/openssl-1.1.1q
+
+	ifeq ($(POLARSSL_STATIC), yes)
+		CFLAGS += -DHAS_POLARSSL
+	else
+		CFLAGS += -DHAS_POLARSSL_DLL
+	endif
+	ifeq ($(MBEDTLS_STATIC), yes)
+		CFLAGS += -DHAS_MBEDTLS
+	else
+		CFLAGS += -DHAS_MBEDTLS_DLL
+	endif
+
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
 endif
 
@@ -109,11 +142,29 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -Wshadow
 	CFLAGS += -O3
-	CFLAGS += -DHAS_POLARSSL_DLL
-	CFLAGS += -DHAS_MBEDTLS_DLL
-	CFLAGS += -DHAS_OPENSSL_DLL
-#	CFLAGS += -DHAS_OPENSSL
+
+#	When running "$make OPENSSL_STATIC=yes", the openssl's libs will be
+#	linked in static mode, or the libs will be loaded in dynamic way.
+
+	ifeq ($(OPENSSL_STATIC), yes)
+		CFLAGS += -DHAS_OPENSSL
+	else
+		CFLAGS += -DHAS_OPENSSL_DLL
+	endif
 	CFLAGS += -I../include/openssl-1.1.1q
+
+	ifeq ($(POLARSSL_STATIC), yes)
+		CFLAGS += -DHAS_POLARSSL
+	else
+		CFLAGS += -DHAS_POLARSSL_DLL
+	endif
+
+	ifeq ($(MBEDTLS_STATIC), yes)
+		CFLAGS += -DHAS_MBEDTLS
+	else
+		CFLAGS += -DHAS_MBEDTLS_DLL
+	endif
+
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl
 endif
 
