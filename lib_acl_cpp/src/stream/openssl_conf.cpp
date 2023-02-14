@@ -186,7 +186,6 @@ static openssl_sk_value_fn __openssl_sk_value;
 
 //////////////////////////////////////////////////////////////////////////////
 
-static acl_pthread_once_t __openssl_once = ACL_PTHREAD_ONCE_INIT;
 static acl::string* __crypto_path_buf = NULL;
 static acl::string* __ssl_path_buf    = NULL;
 
@@ -201,8 +200,9 @@ static const char* __crypto_path = "libcrypto.so";
 static const char* __ssl_path    = "libssl.so";
 #  endif
 
-ACL_DLL_HANDLE __openssl_crypto_dll = NULL;
-ACL_DLL_HANDLE __openssl_ssl_dll    = NULL;
+ACL_DLL_HANDLE __openssl_crypto_dll   = NULL;
+ACL_DLL_HANDLE __openssl_ssl_dll      = NULL;
+static acl_pthread_once_t __load_once = ACL_PTHREAD_ONCE_INIT;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -461,7 +461,7 @@ void* openssl_conf::get_libcrypto_handle(void)
 bool openssl_conf::load(void)
 {
 #ifdef HAS_OPENSSL_DLL
-	acl_pthread_once(&__openssl_once, openssl_dll_load);
+	acl_pthread_once(&__load_once, openssl_dll_load);
 	if (__openssl_ssl_dll == NULL) {
 		logger_error("load openssl error");
 		return false;
@@ -473,7 +473,57 @@ bool openssl_conf::load(void)
 #endif
 }
 
+#ifdef HAS_OPENSSL
+static int __once_inited = CONF_INIT_NIL;
+#endif
+
+void openssl_conf::once(void)
+{
+#ifdef HAS_OPENSSL_DLL
+	if (!load()) {
+		__once_inited = CONF_INIT_ERR;
+		return;
+	}
+#endif
+
+#ifdef HAS_OPENSSL
+# if OPENSSL_VERSION_NUMBER >= 0x10100003L
+	if (__ssl_init(OPENSSL_INIT_LOAD_CONFIG, NULL) == 0) {
+		logger_error("OPENSSL_init_ssl error");
+		__once_inited = CONF_INIT_ERR;
+	} else {
+		// OPENSSL_init_ssl() may leave errors in the error queue
+		// while returning success -- nginx
+		__ssl_clear_error();
+		__once_inited = CONF_INIT_OK;
+	}
+# else
+	__ssl_config(NULL);
+	__ssl_library_init();
+	__ssl_load_error_strings();
+	__ssl_add_all_algorithms();
+	__once_inited = CONF_INIT_OK;
+# endif
+
+# if OPENSSL_VERSION_NUMBER >= 0x0090800fL
+#  ifndef SSL_OP_NO_COMPRESSION
+	// Disable gzip compression in OpenSSL prior to 1.0.0 version,
+	// this saves about 522K per connection. -- nginx
+	STACK_OF(SSL_COMP)* ssl_comp_methods = __ssl_comp_get_methods();
+	int n = __ssl_comp_num(ssl_comp_methods);
+	while (n--) {
+		(void) __ssl_comp_pop(ssl_comp_methods);
+	}
+#  endif
+# endif
+#endif  // HAS_OPENSSL
+}
+
 //////////////////////////////////////////////////////////////////////////////
+
+#ifdef HAS_OPENSSL
+static acl_pthread_once_t __openssl_once = ACL_PTHREAD_ONCE_INIT;
+#endif
 
 openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 : server_side_(server_side)
@@ -481,8 +531,30 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 , ssl_ctx_table_(NULL)
 , ssl_ctx_count_(0)
 , timeout_(timeout)
-, init_status_(CONF_INIT_NIL)
 {
+#ifdef HAS_OPENSSL
+	// Init OpenSSL globally, and the dynamic libs will be loaded
+	// automatically when HAS_OPENSSL_DLL has been defined.
+	acl_pthread_once(&__openssl_once, openssl_conf::once);
+
+	if (__once_inited == CONF_INIT_ERR) {
+		status_ = CONF_INIT_ERR;
+		logger_error("Init OpenSSL failed!");
+	} else if (server_side_) {
+		// We shouldn't create ssl_ctx_ in server mode which will
+		// be created when loading certificate in add_cert().
+		status_ = CONF_INIT_OK;
+	} else {
+		// In client mode, ssl_ctx_ will be set automatically
+		// in create_ssl_ctx() for the first calling.
+		(void) create_ssl_ctx();
+		status_ = CONF_INIT_OK;
+	}
+#else
+	status_ = CONF_INIT_ERR;
+	logger_error("HAS_OPENSSL not defined!");
+#endif // HAS_OPENSSL
+
 }
 
 openssl_conf::~openssl_conf(void)
@@ -498,75 +570,32 @@ openssl_conf::~openssl_conf(void)
 #endif
 }
 
-bool openssl_conf::init_once(void)
-{
-#ifdef HAS_OPENSSL_DLL
-	if (!load()) {
-		return false;
-	}
-#endif
-
-#ifdef HAS_OPENSSL
-	thread_mutex_guard guard(lock_);
-	if (init_status_ == CONF_INIT_OK) {
-		return true;
-	} else if (init_status_ == CONF_INIT_ERR) {
-		return false;
-	}
-	assert(init_status_ == CONF_INIT_NIL);
-
-# if OPENSSL_VERSION_NUMBER >= 0x10100003L
-	if (__ssl_init(OPENSSL_INIT_LOAD_CONFIG, NULL) == 0) {
-		logger_error("OPENSSL_init_ssl error");
-		init_status_ = CONF_INIT_ERR;
-		return false;
-	}
-
-	// OPENSSL_init_ssl() may leave errors in the error queue
-	// while returning success -- nginx
-	__ssl_clear_error();
-# else
-	__ssl_config(NULL);
-	__ssl_library_init();
-	__ssl_load_error_strings();
-	__ssl_add_all_algorithms();
-# endif
-
-# if OPENSSL_VERSION_NUMBER >= 0x0090800fL
-#  ifndef SSL_OP_NO_COMPRESSION
-	// Disable gzip compression in OpenSSL prior to 1.0.0 version,
-	// this saves about 522K per connection. -- nginx
-	STACK_OF(SSL_COMP)* ssl_comp_methods = __ssl_comp_get_methods();
-	int n = __ssl_comp_num(ssl_comp_methods);
-	while (n--) {
-		(void) __ssl_comp_pop(ssl_comp_methods);
-	}
-#  endif
-# endif
-	ssl_ctx_ = create_ssl_ctx();
-	init_status_ = CONF_INIT_OK;
-	return true;
-#else
-	logger_error("HAS_OPENSSL not defined!");
-	return false;
-#endif // HAS_OPENSSL
-}
-
 SSL_CTX* openssl_conf::create_ssl_ctx(void)
 {
 #ifdef HAS_OPENSSL
+	if (status_ != CONF_INIT_OK) {
+		logger_error("OpenSSL not init , status=%d", (int) status_);
+		return NULL;
+	}
+
 	SSL_CTX* ctx = __ssl_ctx_new(__sslv23_method());
 
 	if (timeout_ > 0) {
 		__ssl_ctx_set_timeout(ctx, timeout_);
 	}
 
-	// SSL_CTX_set_tlsext_servername_callback(ctx, sni_callback);
-	// SSL_CTX_set_tlsext_servername_arg(ctx, this);
+	if (server_side_) {
+		// SSL_CTX_set_tlsext_servername_callback(ctx, sni_callback);
+		// SSL_CTX_set_tlsext_servername_arg(ctx, this);
 
-	__ssl_ctx_callback_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_CB,
-		(void (*)(void)) sni_callback);
-	__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG, 0, this);
+		__ssl_ctx_callback_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_CB,
+				(void (*)(void)) sni_callback);
+		__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG, 0, this);
+	}
+
+	if (ssl_ctx_ == NULL) {
+		ssl_ctx_ = ctx;
+	}
 
 	ssl_ctxes_.insert(ctx);
 	return ctx;
@@ -575,29 +604,33 @@ SSL_CTX* openssl_conf::create_ssl_ctx(void)
 #endif
 }
 
-void openssl_conf::push_ssl_ctx(SSL_CTX* ctx)
+bool openssl_conf::push_ssl_ctx(SSL_CTX* ctx)
 {
 	if (ctx == NULL) {
-		return;
+		return false;
+	}
+
+	if (!server_side_) {
+		logger_error("Can't be used in client mode!");
+		return false;
 	}
 
 #ifdef HAS_OPENSSL
-	if (ssl_ctx_count_++ == 0) {
-		// Replace the default ssl_ctx_ when ssl_ctx_ hasn't
-		// been inited with one certificate yet if the ctx
-		// isn't same as ssl_ctx_.
-		if (ssl_ctx_ && ssl_ctx_ != ctx) {
-			__ssl_ctx_free(ssl_ctx_);
-		}
-		ssl_ctx_ = ctx;  // Reset ssl_ctx_ to the new ctx.
-	}
-
-	add_ssl_ctx(ctx);
+	map_ssl_ctx(ctx);
+	return true;
+#else
+	logger_error("HAS_OPENSSL not been set yet!");
+	return false;
 #endif
 }
 
 SSL_CTX* openssl_conf::get_ssl_ctx(void) const
 {
+	// The ssl_ctx_ should be created in client mode, and in server mode,
+	// it should also be created when loading certificate.
+	if (ssl_ctx_ == NULL) {
+		logger_error("ssl_ctx_ not created yet!");
+	}
 	return ssl_ctx_;
 }
 
@@ -642,7 +675,7 @@ static char *asn1_string_to_utf8(ASN1_STRING *asn1str)
 }
 #endif
 
-void openssl_conf::add_ssl_ctx(SSL_CTX* ctx)
+void openssl_conf::map_ssl_ctx(SSL_CTX* ctx)
 {
 	std::vector<string> hosts;
 	get_hosts(ctx, hosts);
@@ -751,6 +784,10 @@ bool openssl_conf::create_host_key(string& host, string& key, size_t skip /* 0 *
 
 SSL_CTX* openssl_conf::find_ssl_ctx(const char* host)
 {
+	if (ssl_ctx_table_ == NULL) {
+		return NULL;
+	}
+
 	string host_buf(host), key;
 	if (!create_host_key(host_buf, key)) {
 		return NULL;
@@ -839,13 +876,13 @@ int openssl_conf::sni_callback(SSL *ssl, int *ad, void *arg)
 
 bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 {
-	if (ca_file == NULL) {
-		logger_error("ca_file NULL");
+	if (status_ != CONF_INIT_OK) {
+		logger_error("OpenSSL not init , status=%d", (int) status_);
 		return false;
 	}
 
-	if (!init_once()) {
-		logger_error("init_once error");
+	if (ca_file == NULL) {
+		logger_error("ca_file NULL");
 		return false;
 	}
 
@@ -873,6 +910,11 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	const char* key_pass /* NULL */)
 {
+	if (status_ != CONF_INIT_OK) {
+		logger_error("OpenSSL not init , status=%d", (int) status_);
+		return false;
+	}
+
 	if (crt_file == NULL || *crt_file == 0) {
 		logger_error("crt_file can't be null nor empty");
 		return false;
@@ -883,19 +925,8 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 		return false;
 	}
 
-	if (!init_once()) {
-		logger_error("init_once error");
-		return false;
-	}
-
 #ifdef HAS_OPENSSL
-	SSL_CTX* ctx;
-
-	if (ssl_ctx_count_ == 0) {
-		ctx = ssl_ctx_;
-	} else {
-		ctx = create_ssl_ctx();
-	}
+	SSL_CTX* ctx = create_ssl_ctx();
 
 #if 0
 	if (__ssl_ctx_use_cert_chain(ctx, crt_file) != 1) {
@@ -923,7 +954,7 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 		__ssl_ctx_set_def_pass(ctx, (void*) key_pass);
 	}
 
-	add_ssl_ctx(ctx);
+	map_ssl_ctx(ctx);
 	return true;
 #else
 	(void) key_pass;
@@ -955,20 +986,6 @@ bool openssl_conf::set_key(const char* key_file, const char* key_pass /* NULL */
 
 void openssl_conf::enable_cache(bool /* on */)
 {
-	if (!init_once()) {
-		logger_error("init_once error");
-	}
-}
-
-bool openssl_conf::setup_certs(void* ssl)
-{
-	(void) ssl;
-
-	if (!init_once()) {
-		logger_error("init_once error");
-		return false;
-	}
-	return true;
 }
 
 sslbase_io* openssl_conf::create(bool nblock)

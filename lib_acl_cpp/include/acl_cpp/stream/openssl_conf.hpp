@@ -2,7 +2,6 @@
 #include "../acl_cpp_define.hpp"
 #include <vector>
 #include <set>
-#include "../stdlib/thread_mutex.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/token_tree.hpp"
 #include "sslbase_conf.hpp"
@@ -80,8 +79,6 @@ public:
 	sslbase_io* create(bool nblock);
 
 public:
-	bool setup_certs(void* ssl);
-
 	/**
 	 * 是否为 SSL 服务模式
 	 * @return {bool}
@@ -115,12 +112,12 @@ public:
 	 * create_ssl_ctx() 创建的,以适配动态或静态加载 OpenSSL 的不同方式.
 	 * @param {SSL_CTX*} 由用户自自己初始化好的 SSL_CTX 对象，传入后其所有
 	 *  权将归 openssl_conf 内部统一管理并释放
+	 * @return {bool} 返回 false 表示添加失败，原因可能是 ctx 为 NULL，或
+	 *  当前 openssl_conf 对象为客户端模式
 	 */
-	void push_ssl_ctx(SSL_CTX* ctx);
+	bool push_ssl_ctx(SSL_CTX* ctx);
 
 private:
-	friend class openssl_io;
-
 	bool         server_side_;
 	SSL_CTX*     ssl_ctx_;		// The default SSL_CTX.
 	token_tree*  ssl_ctx_table_;	// Holding the map of host/SSL_CTX.
@@ -128,12 +125,11 @@ private:
 	std::set<SSL_CTX*> ssl_ctxes_;	// Holding all ctx just for freeing.
 	int          timeout_;
 	string       crt_file_;
-	unsigned     init_status_;
-	thread_mutex lock_;
+	unsigned     status_;
 
-	bool init_once(void);
+	static void once(void);
 
-	void add_ssl_ctx(SSL_CTX* ctx);
+	void map_ssl_ctx(SSL_CTX* ctx);
 	SSL_CTX* find_ssl_ctx(const char* host);
 
 	void get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts);

@@ -160,9 +160,7 @@ openssl_io::openssl_io(openssl_conf& conf, bool server_side, bool nblock)
 , conf_(conf)
 , ssl_(NULL)
 {
-#ifdef HAS_OPENSSL
-	conf.init_once();
-#else
+#ifndef HAS_OPENSSL
 	(void) conf_;
 	(void) ssl_;
 #endif
@@ -195,7 +193,13 @@ bool openssl_io::open(ACL_VSTREAM* s)
 	++(*refers_);
 
 #ifdef HAS_OPENSSL
-	SSL* ssl = __ssl_new((SSL_CTX*) conf_.get_ssl_ctx());
+	SSL_CTX* ctx = conf_.get_ssl_ctx();
+	if (ctx == NULL) {
+		logger_error("The default SSL_CTX in conf_ is null");
+		return false;
+	}
+
+	SSL* ssl = __ssl_new(ctx);
 
 	if (!__ssl_set_fd(ssl, ACL_VSTREAM_SOCK(s))) {
 		logger_error("SSL_set_fd error");
