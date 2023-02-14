@@ -488,19 +488,13 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 openssl_conf::~openssl_conf(void)
 {
 #ifdef HAS_OPENSSL
-	if (ssl_ctx_table_) {
-		const token_node* node = ssl_ctx_table_->first_node();
-		while (node) {
-			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
-			if (ctx) {
-				__ssl_ctx_free(ctx);
-			}
-			node = ssl_ctx_table_->next_node();
-		}
-		delete ssl_ctx_table_;
-	} else if (ssl_ctx_) {
-		__ssl_ctx_free(ssl_ctx_);
+	for (std::set<SSL_CTX*>::iterator it = ssl_ctxes_.begin();
+		it != ssl_ctxes_.end(); ++it) {
+		__ssl_ctx_free(*it);
+
 	}
+
+	delete ssl_ctx_table_;
 #endif
 }
 
@@ -574,6 +568,7 @@ SSL_CTX* openssl_conf::create_ssl_ctx(void)
 		(void (*)(void)) sni_callback);
 	__ssl_ctx_ctrl(ctx, SSL_CTRL_SET_TLSEXT_SERVERNAME_ARG, 0, this);
 
+	ssl_ctxes_.insert(ctx);
 	return ctx;
 #else
 	return NULL;
@@ -609,14 +604,9 @@ SSL_CTX* openssl_conf::get_ssl_ctx(void) const
 void openssl_conf::get_ssl_ctxes(std::vector<SSL_CTX*>& out)
 {
 #ifdef HAS_OPENSSL
-	if (ssl_ctx_table_) {
-		const token_node* node = ssl_ctx_table_->first_node();
-		while (node) {
-			SSL_CTX* ctx = (SSL_CTX*) node->get_ctx();
-			if (ctx) {
-				out.push_back(ctx);
-			}
-		}
+	for (std::set<SSL_CTX*>::iterator it = ssl_ctxes_.begin();
+		it != ssl_ctxes_.end(); ++it) {
+		out.push_back(*it);
 	}
 #else
 	(void) out;

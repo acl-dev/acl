@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
+#include <set>
 #include "../stdlib/thread_mutex.hpp"
 #include "../stdlib/string.hpp"
 #include "../stdlib/token_tree.hpp"
@@ -124,6 +125,7 @@ private:
 	SSL_CTX*     ssl_ctx_;		// The default SSL_CTX.
 	token_tree*  ssl_ctx_table_;	// Holding the map of host/SSL_CTX.
 	int          ssl_ctx_count_;
+	std::set<SSL_CTX*> ssl_ctxes_;	// Holding all ctx just for freeing.
 	int          timeout_;
 	string       crt_file_;
 	unsigned     init_status_;
