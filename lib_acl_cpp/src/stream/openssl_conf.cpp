@@ -529,7 +529,6 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 : server_side_(server_side)
 , ssl_ctx_(NULL)
 , ssl_ctx_table_(NULL)
-, ssl_ctx_count_(0)
 , timeout_(timeout)
 {
 #ifdef HAS_OPENSSL
@@ -680,19 +679,9 @@ void openssl_conf::map_ssl_ctx(SSL_CTX* ctx)
 	std::vector<string> hosts;
 	get_hosts(ctx, hosts);
 
-	if (hosts.empty()) {
-		return;
-	}
-
-	size_t n = 0;
-
 	for (std::vector<string>::iterator cit = hosts.begin();
 		cit != hosts.end(); ++cit) {
-		n += bind_host(ctx, *cit);
-	}
-
-	if (n > 0) {
-		ssl_ctx_count_++;
+		bind_host(ctx, *cit);
 	}
 }
 
@@ -732,11 +721,11 @@ void openssl_conf::get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts)
 #endif
 }
 
-size_t openssl_conf::bind_host(SSL_CTX* ctx, string& host)
+void openssl_conf::bind_host(SSL_CTX* ctx, string& host)
 {
 	string key;
 	if (!create_host_key(host, key)) {
-		return 0;
+		return;
 	}
 
 	if (ssl_ctx_table_ == NULL) {
@@ -744,12 +733,10 @@ size_t openssl_conf::bind_host(SSL_CTX* ctx, string& host)
 	}
 
 	if (ssl_ctx_table_->find(key) != NULL) {
-		return 0;
+		// printf(">>>add one host=%s, key=%s\r\n",
+		// 	host.c_str(), key.c_str());
+		ssl_ctx_table_->insert(key, ctx);
 	}
-
-	// printf(">>>add one host=%s, key=%s\r\n", host.c_str(), key.c_str());
-	ssl_ctx_table_->insert(key, ctx);
-	return 1;
 }
 
 bool openssl_conf::create_host_key(string& host, string& key, size_t skip /* 0 */)

@@ -121,7 +121,6 @@ private:
 	bool         server_side_;
 	SSL_CTX*     ssl_ctx_;		// The default SSL_CTX.
 	token_tree*  ssl_ctx_table_;	// Holding the map of host/SSL_CTX.
-	int          ssl_ctx_count_;
 	std::set<SSL_CTX*> ssl_ctxes_;	// Holding all ctx just for freeing.
 	int          timeout_;
 	string       crt_file_;
@@ -133,7 +132,7 @@ private:
 	SSL_CTX* find_ssl_ctx(const char* host);
 
 	void get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts);
-	size_t bind_host(SSL_CTX* ctx, string& host);
+	void bind_host(SSL_CTX* ctx, string& host);
 	bool create_host_key(string& host, string& key, size_t skip = 0);
 
 	int on_sni_callback(SSL* ssl, const char*host);

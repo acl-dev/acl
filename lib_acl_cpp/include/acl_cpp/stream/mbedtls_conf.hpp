@@ -115,17 +115,15 @@ public:
 	mbedtls_ssl_config* create_ssl_config(void);
 
 private:
-	friend class mbedtls_io;
+	//friend class mbedtls_io;
 
-	unsigned init_status_;
-	unsigned cert_status_;
-	thread_mutex lock_;
-
+	unsigned status_;
 	bool  server_side_;
 
 	int         conf_count_;
 	token_tree* conf_table_;
 	mbedtls_ssl_config* conf_;
+	std::set<mbedtls_ssl_config*> confs_;
 
 	const int* ciphers_;
 	void* entropy_;
@@ -135,24 +133,26 @@ private:
 	string crt_file_;
 	mbedtls_ssl_cache_context* cache_;
 	mbedtls_verify_t verify_mode_;
-	std::vector<std::pair<void*, void*> > cert_keys_;
+	std::vector<std::pair<mbedtls_x509_crt*, void*> > cert_keys_;
 
-	void get_hosts(const mbedtls_ssl_config* conf, std::vector<string>& hosts);
-	size_t bind_host(mbedtls_ssl_config* conf, string& host);
 	bool create_host_key(string& host, string& key, size_t skip = 0);
+	void get_hosts(const mbedtls_x509_crt& cert, std::vector<string>& hosts);
+	void bind_host(mbedtls_ssl_config* conf, string& host);
 
-	void add_ssl_config(mbedtls_ssl_config* conf);
+	void map_ssl_config(mbedtls_ssl_config* conf, const mbedtls_x509_crt& cert);
 	mbedtls_ssl_config* find_ssl_config(const char* host);
 
+private:
 	int on_sni_callback(mbedtls_ssl_context* ssl,
 		const unsigned char* name, size_t name_len);
 	static int sni_callback(void* arg, mbedtls_ssl_context* ssl,
 		const unsigned char* name, size_t name_len);
 
 private:
-	bool init_once(void);
 	bool init_rand(void);
 	void free_ca(void);
+
+	static void once(void);
 };
 
 } // namespace acl
