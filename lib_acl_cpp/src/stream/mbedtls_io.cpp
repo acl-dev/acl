@@ -179,6 +179,8 @@ const char* mbedtls_io::ssl_strerror(int err)
 	ebf_[0] = 0;
 #ifdef HAS_MBEDTLS
 	__ssl_strerror(err, ebf_, len);
+#else
+	(void) err;
 #endif
 	return ebf_;
 }

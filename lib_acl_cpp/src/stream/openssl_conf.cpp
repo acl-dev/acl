@@ -475,18 +475,16 @@ bool openssl_conf::load(void)
 
 #ifdef HAS_OPENSSL
 static int __once_inited = CONF_INIT_NIL;
-#endif
 
-void openssl_conf::once(void)
+static void openssl_once(void)
 {
-#ifdef HAS_OPENSSL_DLL
-	if (!load()) {
+# ifdef HAS_OPENSSL_DLL
+	if (!openssl_conf::load()) {
 		__once_inited = CONF_INIT_ERR;
 		return;
 	}
-#endif
+# endif
 
-#ifdef HAS_OPENSSL
 # if OPENSSL_VERSION_NUMBER >= 0x10100003L
 	if (__ssl_init(OPENSSL_INIT_LOAD_CONFIG, NULL) == 0) {
 		logger_error("OPENSSL_init_ssl error");
@@ -516,8 +514,8 @@ void openssl_conf::once(void)
 	}
 #  endif
 # endif
-#endif  // HAS_OPENSSL
 }
+#endif  // HAS_OPENSSL
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -534,20 +532,21 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 #ifdef HAS_OPENSSL
 	// Init OpenSSL globally, and the dynamic libs will be loaded
 	// automatically when HAS_OPENSSL_DLL has been defined.
-	acl_pthread_once(&__openssl_once, openssl_conf::once);
+	acl_pthread_once(&__openssl_once, openssl_once);
+	status_ = __once_inited;
 
-	if (__once_inited == CONF_INIT_ERR) {
-		status_ = CONF_INIT_ERR;
-		logger_error("Init OpenSSL failed!");
-	} else if (server_side_) {
+	if (status_ == CONF_INIT_OK) {
 		// We shouldn't create ssl_ctx_ in server mode which will
 		// be created when loading certificate in add_cert().
-		status_ = CONF_INIT_OK;
-	} else {
 		// In client mode, ssl_ctx_ will be set automatically
 		// in create_ssl_ctx() for the first calling.
-		(void) create_ssl_ctx();
-		status_ = CONF_INIT_OK;
+		if (!server_side_ && !(ssl_ctx_ = create_ssl_ctx())) {
+			status_  = CONF_INIT_ERR;
+		}
+	}
+
+	if (status_ == CONF_INIT_ERR) {
+		logger_error("Init MbedTLS failed!");
 	}
 #else
 	status_ = CONF_INIT_ERR;
@@ -711,6 +710,7 @@ void openssl_conf::get_hosts(const SSL_CTX* ctx, std::vector<string>& hosts)
 
 		char* host = asn1_string_to_utf8(name->d.ia5);
 		if (host) {
+			//logger(">>>get host %s", host);
 			hosts.push_back(host);
 			free(host);
 		}
@@ -732,9 +732,8 @@ void openssl_conf::bind_host(SSL_CTX* ctx, string& host)
 		ssl_ctx_table_ = NEW token_tree;
 	}
 
-	if (ssl_ctx_table_->find(key) != NULL) {
-		// printf(">>>add one host=%s, key=%s\r\n",
-		// 	host.c_str(), key.c_str());
+	if (ssl_ctx_table_->find(key) == NULL) {
+		logger("add host=%s, key=%s", host.c_str(), key.c_str());
 		ssl_ctx_table_->insert(key, ctx);
 	}
 }

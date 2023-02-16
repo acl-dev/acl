@@ -126,8 +126,6 @@ private:
 	string       crt_file_;
 	unsigned     status_;
 
-	static void once(void);
-
 	void map_ssl_ctx(SSL_CTX* ctx);
 	SSL_CTX* find_ssl_ctx(const char* host);
 

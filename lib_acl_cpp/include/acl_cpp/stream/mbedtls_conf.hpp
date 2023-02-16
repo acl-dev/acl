@@ -151,8 +151,6 @@ private:
 private:
 	bool init_rand(void);
 	void free_ca(void);
-
-	static void once(void);
 };
 
 } // namespace acl
