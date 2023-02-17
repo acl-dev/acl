@@ -9,16 +9,29 @@
 //#define DEBUG_SSL
 
 #ifdef HAS_MBEDTLS
-# include "mbedtls-2.7.12/threading_alt.h"
-# include "mbedtls-2.7.12/ssl.h"
-# include "mbedtls-2.7.12/ssl_internal.h" // for mbedtls_x509_crt, mbedtls_pk_context,
-# include "mbedtls-2.7.12/error.h"
-# include "mbedtls-2.7.12/ctr_drbg.h"
-# include "mbedtls-2.7.12/entropy.h"
-# include "mbedtls-2.7.12/certs.h"
-# include "mbedtls-2.7.12/x509_crt.h"
-# include "mbedtls-2.7.12/x509.h"
-# include "mbedtls-2.7.12/ssl_cache.h"
+# include "mbedtls/version.h"
+# if MBEDTLS_VERSION_MAJOR==2 && MBEDTLS_VERSION_MINOR==7 && MBEDTLS_VERSION_PATCH==12
+#  include "mbedtls/2.7.12/threading_alt.h"
+#  include "mbedtls/2.7.12/ssl.h"
+#  include "mbedtls/2.7.12/ssl_internal.h" // for mbedtls_x509_crt, mbedtls_pk_context,
+#  include "mbedtls/2.7.12/error.h"
+#  include "mbedtls/2.7.12/ctr_drbg.h"
+#  include "mbedtls/2.7.12/entropy.h"
+#  include "mbedtls/2.7.12/certs.h"
+#  include "mbedtls/2.7.12/x509_crt.h"
+#  include "mbedtls/2.7.12/x509.h"
+#  include "mbedtls/2.7.12/ssl_cache.h"
+# elif MBEDTLS_VERSION_MAJOR==3 && MBEDTLS_VERSION_MINOR==3 && MBEDTLS_VERSION_PATCH==0
+#  include "mbedtls/3.3.0/mbedtls/ssl.h"
+#  include "mbedtls/3.3.0/mbedtls/error.h"
+#  include "mbedtls/3.3.0/mbedtls/ctr_drbg.h"
+#  include "mbedtls/3.3.0/mbedtls/entropy.h"
+#  include "mbedtls/3.3.0/mbedtls/x509_crt.h"
+#  include "mbedtls/3.3.0/mbedtls/x509.h"
+#  include "mbedtls/3.3.0/mbedtls/ssl_cache.h"
+# else
+#  error "Unsupport the current version"
+# endif
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
@@ -711,17 +724,19 @@ mbedtls_conf::~mbedtls_conf(void)
 	free_ca();
 
 	for (size_t i = 0; i != cert_keys_.size(); i++) {
-		void* cert = cert_keys_[i].first;
-		__x509_crt_free((X509_CRT*) cert);
-		acl_myfree(cert);
+		MBEDTLS_CERT_KEY* ck = cert_keys_[i];
 
-		void* pkey = cert_keys_[i].second;
-		__pk_free((PKEY*) pkey);
-		acl_myfree(pkey);
+		__x509_crt_free(ck->cert);
+		acl_myfree(ck->cert);
+
+		__pk_free((PKEY*) ck->pkey);
+		acl_myfree(ck->pkey);
+
+		delete ck;
 	}
 
-	for (std::set<mbedtls_ssl_config*>::iterator it = confs_.begin();
-		it != confs_.end(); ++it) {
+	for (std::set<mbedtls_ssl_config*>::iterator it = certs_.begin();
+		it != certs_.end(); ++it) {
 
 		mbedtls_ssl_config* conf = *it;
 		__ssl_config_free(conf);
@@ -763,17 +778,13 @@ int mbedtls_conf::on_sni_callback(mbedtls_ssl_context* ssl,
 	string host;
 	host.copy(name, name_len);
 
-	mbedtls_ssl_config* conf = find_ssl_config(host);
-	if (conf == NULL) {
+	MBEDTLS_CERT_KEY* ck = find_ssl_config(host);
+	if (ck == NULL) {
 		return 0;
 	}
 
-	if (conf->key_cert == NULL) {
-		return 0;
-	}
-
-	mbedtls_x509_crt*   cert = conf->key_cert->cert;
-	mbedtls_pk_context* pkey = conf->key_cert->key;
+	mbedtls_x509_crt*   cert = ck->cert;
+	mbedtls_pk_context* pkey = (mbedtls_pk_context*) ck->pkey;
 	if (cert == NULL  || pkey == NULL) {
 		return 0;
 	}
@@ -834,22 +845,21 @@ mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 		conf_ = conf;
 	}
 
-	confs_.insert(conf);
+	certs_.insert(conf);
 	return conf;
 #else
 	return NULL;
 #endif
 }
 
-void mbedtls_conf::map_ssl_config(mbedtls_ssl_config* conf,
-	const mbedtls_x509_crt& cert)
+void mbedtls_conf::map_cert(const mbedtls_x509_crt& cert, MBEDTLS_CERT_KEY* ck)
 {
 	std::vector<string> hosts;
 	get_hosts(cert, hosts);
 
 	for (std::vector<string>::iterator cit = hosts.begin();
 		cit != hosts.end(); ++cit) {
-		bind_host(conf, *cit);
+		bind_host(*cit, ck);
 	}
 }
 
@@ -885,7 +895,7 @@ void mbedtls_conf::get_hosts(const mbedtls_x509_crt& cert,
 #endif
 }
 
-void mbedtls_conf::bind_host(mbedtls_ssl_config* conf, string& host)
+void mbedtls_conf::bind_host(string& host, MBEDTLS_CERT_KEY* ck)
 {
 	string key;
 	if (!create_host_key(host, key)) {
@@ -898,7 +908,7 @@ void mbedtls_conf::bind_host(mbedtls_ssl_config* conf, string& host)
 
 	if (conf_table_->find(key) == NULL) {
 		logger("add host=%s, key=%s", host.c_str(), key.c_str());
-		conf_table_->insert(key, conf);
+		conf_table_->insert(key, ck);
 	}
 }
 
@@ -932,7 +942,7 @@ bool mbedtls_conf::create_host_key(string& host, string& key, size_t skip /* 0 *
 	return true;
 }
 
-mbedtls_ssl_config* mbedtls_conf::find_ssl_config(const char* host)
+MBEDTLS_CERT_KEY* mbedtls_conf::find_ssl_config(const char* host)
 {
 	string host_buf(host), key;
 	if (!create_host_key(host_buf, key)) {
@@ -943,8 +953,8 @@ mbedtls_ssl_config* mbedtls_conf::find_ssl_config(const char* host)
 
 	const token_node* node = conf_table_->find(key);
 	if (node != NULL) {
-		mbedtls_ssl_config* cf = (mbedtls_ssl_config*) node->get_ctx();
-		return cf;
+		MBEDTLS_CERT_KEY* ck = (MBEDTLS_CERT_KEY*) node->get_ctx();
+		return ck;
 	}
 
 	// Try the wildcard matching process, and cut off the last item
@@ -959,8 +969,8 @@ mbedtls_ssl_config* mbedtls_conf::find_ssl_config(const char* host)
 
 	node = conf_table_->find(key);
 	if (node != NULL) {
-		mbedtls_ssl_config* cf = (mbedtls_ssl_config*) node->get_ctx();
-		return cf;
+		MBEDTLS_CERT_KEY* ck = (MBEDTLS_CERT_KEY*) node->get_ctx();
+		return ck;
 	}
 
 	//printf("Not found key=%s\r\n", key.c_str());
@@ -1043,6 +1053,18 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	}
 
 #ifdef HAS_MBEDTLS
+# define FREE_CERT_KEY do { \
+	logger_error("add cert (%s:%s) error: -0x%04x", crt_file, key_file, -ret); \
+	if (cert) { \
+		__x509_crt_free(cert); \
+		acl_myfree(cert); \
+	} \
+	if (pkey) { \
+		__pk_free(pkey); \
+		acl_myfree(pkey); \
+	} \
+} while (0)
+
 	mbedtls_ssl_config* conf = create_ssl_config();
 
 	X509_CRT *cert = NULL;
@@ -1052,38 +1074,32 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	__x509_crt_init(cert);
 	int ret = __x509_crt_parse_file(cert, crt_file);
 	if (ret != 0) {
-		goto ERR;
+		FREE_CERT_KEY;
+		return false;
 	}
 
 	pkey = static_cast<PKEY*>(acl_mycalloc(1, sizeof(PKEY)));
 	__pk_init(pkey);
 	ret = __pk_parse_keyfile(pkey, key_file, key_pass ? key_pass : "");
 	if (ret != 0) {
-		goto ERR;
+		FREE_CERT_KEY;
+		return false;
 	}
 
 	ret = __ssl_conf_own_cert(conf, cert, pkey);
 	if (ret != 0) {
-		goto ERR;
+		FREE_CERT_KEY;
+		return false;
 	}
 
 	// Save the cert and pkey just for being freed in ~mbedtls_conf();
-	cert_keys_.push_back(std::make_pair(cert, pkey));
+	MBEDTLS_CERT_KEY* ck = new MBEDTLS_CERT_KEY;
+	ck->cert = cert;
+	ck->pkey = pkey;
 
-	map_ssl_config(conf, *cert);
+	cert_keys_.push_back(ck);
+	map_cert(*cert, ck);
 	return true;
-ERR:
-	logger_error("add cert (%s:%s) error: -0x%04x", crt_file, key_file, -ret);
-	if (cert) {
-		__x509_crt_free(cert);
-		acl_myfree(cert);
-	}
-
-	if (pkey) {
-		__pk_free(pkey);
-		acl_myfree(pkey);
-	}
-	return false;
 #else
 	(void) crt_file;
 	(void) key_file;

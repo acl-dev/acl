@@ -7,12 +7,23 @@
 #endif
 
 #ifdef HAS_MBEDTLS
-# include "mbedtls-2.7.12/ssl.h"
-# include "mbedtls-2.7.12/havege.h"
-# include "mbedtls-2.7.12/error.h"
-# include "mbedtls-2.7.12/ctr_drbg.h"
-# include "mbedtls-2.7.12/entropy.h"
-# include "mbedtls-2.7.12/net_sockets.h"
+# include "mbedtls/version.h"
+# if MBEDTLS_VERSION_MAJOR==2 && MBEDTLS_VERSION_MINOR==7 && MBEDTLS_VERSION_PATCH==12
+#  include "mbedtls/2.7.12/ssl.h"
+#  include "mbedtls/2.7.12/havege.h"
+#  include "mbedtls/2.7.12/error.h"
+#  include "mbedtls/2.7.12/ctr_drbg.h"
+#  include "mbedtls/2.7.12/entropy.h"
+#  include "mbedtls/2.7.12/net_sockets.h"
+# elif MBEDTLS_VERSION_MAJOR==3 && MBEDTLS_VERSION_MINOR==3 && MBEDTLS_VERSION_PATCH==0
+#  include "mbedtls/3.3.0/mbedtls/ssl.h"
+#  include "mbedtls/3.3.0/mbedtls/error.h"
+#  include "mbedtls/3.3.0/mbedtls/ctr_drbg.h"
+#  include "mbedtls/3.3.0/mbedtls/entropy.h"
+#  include "mbedtls/3.3.0/mbedtls/net_sockets.h"
+# else
+#  error "Unsupport the current version"
+# endif
 #endif
  
 #ifndef ACL_PREPARE_COMPILE

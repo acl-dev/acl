@@ -13,6 +13,11 @@ typedef struct mbedtls_ssl_context mbedtls_ssl_context;
 
 namespace acl {
 
+typedef struct MBEDTLS_CERT_KEY {
+	mbedtls_x509_crt* cert;
+	void* pkey;
+} MBEDTLS_CERT_KEY;
+
 /**
  * SSL 证书校验级别类型定义
  */
@@ -115,15 +120,13 @@ public:
 	mbedtls_ssl_config* create_ssl_config(void);
 
 private:
-	//friend class mbedtls_io;
-
 	unsigned status_;
 	bool  server_side_;
 
 	int         conf_count_;
 	token_tree* conf_table_;
 	mbedtls_ssl_config* conf_;
-	std::set<mbedtls_ssl_config*> confs_;
+	std::set<mbedtls_ssl_config*> certs_;
 
 	const int* ciphers_;
 	void* entropy_;
@@ -133,14 +136,15 @@ private:
 	string crt_file_;
 	mbedtls_ssl_cache_context* cache_;
 	mbedtls_verify_t verify_mode_;
-	std::vector<std::pair<mbedtls_x509_crt*, void*> > cert_keys_;
+
+	std::vector<MBEDTLS_CERT_KEY*> cert_keys_;
 
 	bool create_host_key(string& host, string& key, size_t skip = 0);
 	void get_hosts(const mbedtls_x509_crt& cert, std::vector<string>& hosts);
-	void bind_host(mbedtls_ssl_config* conf, string& host);
+	void bind_host(string& host, MBEDTLS_CERT_KEY* ck);
 
-	void map_ssl_config(mbedtls_ssl_config* conf, const mbedtls_x509_crt& cert);
-	mbedtls_ssl_config* find_ssl_config(const char* host);
+	void map_cert(const mbedtls_x509_crt& cert, MBEDTLS_CERT_KEY* ck);
+	MBEDTLS_CERT_KEY* find_ssl_config(const char* host);
 
 private:
 	int on_sni_callback(mbedtls_ssl_context* ssl,
