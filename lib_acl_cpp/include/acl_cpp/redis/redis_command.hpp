@@ -1,7 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
-#include "../stdlib/tbox.hpp"
 #include <map>
 #include <list>
 #include <vector>
@@ -324,12 +323,12 @@ public:
 	 * 直接组合 redis 协议命令方式，从 redis 服务器获得结果
 	 * @param argc {size_t} 后面数组中数组元素个数
 	 * @param argv {const char*[]} redis 命令组成的数组
-	 * @param lens {size_t[]} argv 中数组元素的长度
+	 * @param lens {const size_t[]} argv 中数组元素的长度
 	 * @param nchild {size_t} 有的 redis 命令需要获取多个结果集，如：subop
 	 * @return {const redis_result*} 返回的结果集
 	 */
 	const redis_result* request(size_t argc, const char* argv[],
-		size_t lens[], size_t nchild = 0);
+		const size_t lens[], size_t nchild = 0);
 
 	/**
 	 * 直接组合 redis 协议命令方式，从 redis 服务器获得结果
@@ -349,19 +348,19 @@ public:
 	 * 根据请求命令字列表创建 redis 请求协议数据
 	 * @param argc {size_t} 命令参数个数
 	 * @param argv {const char* []} 命令参数数组
-	 * @param lens {size_t []} 每个命令参数长度数组
+	 * @param lens {const size_t []} 每个命令参数长度数组
 	 * @param out {string&} 存放创建结果
 	 */
 	static void build_request(size_t argc, const char* argv[],
-		size_t lens[], string& out);
+		const size_t lens[], string& out);
 
 	/**
 	 * 根据命令字列表创建 redis 请求协议并存储于 redis_command 中，以备在请求时使用
 	 * @param argc {size_t} 命令参数个数
 	 * @param argv {const char* []} 命令参数数组
-	 * @param lens {size_t []} 每个命令参数长度数组
+	 * @param lens {const size_t []} 每个命令参数长度数组
 	 */
-	void build_request(size_t argc, const char* argv[], size_t lens[]);
+	void build_request(size_t argc, const char* argv[], const size_t lens[]);
 
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
@@ -516,10 +515,10 @@ protected:
 	void argv_space(size_t n);
 
 	// build request in one request buffer
-	void build_request1(size_t argc, const char* argv[], size_t lens[]);
+	void build_request1(size_t argc, const char* argv[], const size_t lens[]);
 
 	// build request with slice request obj
-	void build_request2(size_t argc, const char* argv[], size_t lens[]);
+	void build_request2(size_t argc, const char* argv[], const size_t lens[]);
 
 protected:
 	/************************** respond ********************************/

@@ -127,7 +127,7 @@ public:
 	 * return all data's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const char**}
 	 */
-	const char** gets_argv(void) const
+	const char** get_argv(void) const
 	{
 		return (const char**) argv_;
 	}

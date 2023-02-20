@@ -967,7 +967,7 @@ void redis_command::clear_request(void)
 	}
 }
 
-void redis_command::build_request(size_t argc, const char* argv[], size_t lens[])
+void redis_command::build_request(size_t argc, const char* argv[], const size_t lens[])
 {
 	if (pipeline_) {
 		redis_pipeline_message& msg = get_pipeline_message();
@@ -980,7 +980,7 @@ void redis_command::build_request(size_t argc, const char* argv[], size_t lens[]
 	}
 }
 
-void redis_command::build_request1(size_t argc, const char* argv[], size_t lens[])
+void redis_command::build_request1(size_t argc, const char* argv[], const size_t lens[])
 {
 	if (request_buf_ == NULL) {
 		request_buf_ = NEW string(256);
@@ -991,7 +991,7 @@ void redis_command::build_request1(size_t argc, const char* argv[], size_t lens[
 }
 
 void redis_command::build_request(size_t argc, const char* argv[],
-	size_t lens[], string& out)
+	const size_t lens[], string& out)
 {
 //#define	USE_FORMAT
 //#define	USE_SNPRINTF
@@ -1029,7 +1029,7 @@ void redis_command::build_request(size_t argc, const char* argv[],
 	//printf("%s:\r\n%s\r\n", __FUNCTION__, out.c_str());
 }
 
-void redis_command::build_request2(size_t argc, const char* argv[], size_t lens[])
+void redis_command::build_request2(size_t argc, const char* argv[], const size_t lens[])
 {
 	size_t size = 1 + argc * 3;
 	if (request_obj_ == NULL) {
@@ -1537,7 +1537,7 @@ void redis_command::build(const char* cmd, const char* key,
 /////////////////////////////////////////////////////////////////////////////
 
 const redis_result* redis_command::request(size_t argc, const char* argv[],
-	size_t lens[], size_t nchild /* = 0 */)
+	const size_t lens[], size_t nchild /* = 0 */)
 {
 	build_request(argc, argv, lens);
 	const redis_result* result = run(nchild);
