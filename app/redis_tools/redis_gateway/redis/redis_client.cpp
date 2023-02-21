@@ -38,7 +38,8 @@ void redis_client::put_data(acl::dbuf_pool* dbuf, redis_object* obj,
 	obj->put(buf, len);
 }
 
-redis_object* redis_client::get_error(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_error(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	acl::string& buf = conn.get_buf();
 	buf.clear();
@@ -55,7 +56,8 @@ redis_object* redis_client::get_error(acl::socket_stream& conn, acl::dbuf_pool* 
 	return obj;
 }
 
-redis_object* redis_client::get_status(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_status(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	acl::string& buf = conn.get_buf();
 	buf.clear();
@@ -72,7 +74,8 @@ redis_object* redis_client::get_status(acl::socket_stream& conn, acl::dbuf_pool*
 	return obj;
 }
 
-redis_object* redis_client::get_integer(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_integer(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	acl::string& buf = conn.get_buf();
 	buf.clear();
@@ -89,7 +92,8 @@ redis_object* redis_client::get_integer(acl::socket_stream& conn, acl::dbuf_pool
 	return obj;
 }
 
-redis_object* redis_client::get_string(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_string(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	acl::string& sbuf = conn.get_buf();
 	sbuf.clear();
@@ -119,14 +123,14 @@ redis_object* redis_client::get_string(acl::socket_stream& conn, acl::dbuf_pool*
 	// ¶Á \r\n
 	sbuf.clear();
 	if (conn_.gets(sbuf) == false) {
-		logger_error("gets error, server: %s",
-				conn.get_peer(true));
+		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
 	return obj;
 }
 
-redis_object* redis_client::get_array(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_array(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	acl::string& buf = conn.get_buf();
 	buf.clear();
@@ -155,7 +159,8 @@ redis_object* redis_client::get_array(acl::socket_stream& conn, acl::dbuf_pool* 
 	return obj;
 }
 
-redis_object* redis_client::get_line(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_line(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	if (buff_ == NULL) {
 		buff_ = new acl::string(256);
@@ -174,27 +179,41 @@ redis_object* redis_client::get_line(acl::socket_stream& conn, acl::dbuf_pool* d
 	}
 
 	tokens_ = &(buff_->split2(" \t"));
-	redis_object* obj = new(dbuf) redis_object(dbuf);
 
+	redis_object* obj = new(dbuf) redis_object(dbuf);
+	obj->set_type(REDIS_OBJECT_ARRAY);
 	obj->set_size(tokens_->size());
 
+	size_t i = 0;
 	for (std::vector<acl::string>::const_iterator cit = tokens_->begin();
 		cit != tokens_->end(); ++cit) {
-		obj->put((*cit).c_str(), (*cit).size());
+
+		redis_object* child = new(dbuf) redis_object(dbuf);
+		child->set_type(REDIS_OBJECT_STRING);
+		child->set_size(1);
+		child->put((*cit).c_str(), (*cit).size());
+		obj->put(child, i++);
 	}
 
+	//printf(">>>Obj type=%d, size=%zd\n", (int) obj->get_type(),
+	//		obj->get_size());
 	return obj;
 }
 
-redis_object* redis_client::get_object(acl::socket_stream& conn, acl::dbuf_pool* dbuf)
+redis_object* redis_client::get_object(acl::socket_stream& conn,
+	acl::dbuf_pool* dbuf)
 {
 	char ch;
 	if (conn.read(ch) == false) {
+		/*
 		logger_warn("read char error: %s, server: %s, fd: %u",
 			acl::last_serror(), conn.get_peer(true),
 			(unsigned) conn.sock_handle());
+		*/
 		return NULL;
 	}
+
+	//printf(">>>>in get_object ch=%c\n", ch);
 
 	switch (ch) {
 	case '-':	// ERROR
@@ -255,9 +274,24 @@ const redis_object* redis_client::read_reply(acl::dbuf_pool& dbuf,
 	return NULL;
 }
 
-const redis_object* redis_client::read_request(acl::dbuf_pool& dbuf)
+bool redis_client::read_request(acl::dbuf_pool& dbuf,
+	std::vector<const redis_object*>& out)
 {
-	redis_object* obj = get_object(conn_, &dbuf);
-	return obj;
+	while (true) {
+		redis_object* obj = get_object(conn_, &dbuf);
+		if (obj == NULL) {
+			return false;
+		}
+
+		out.push_back(obj);
+
+		// Try to check if there're some data in the reading buffer.
+		ACL_VSTREAM* fp = conn_.get_vstream();
+		if (fp->read_cnt <= 0) {
+			break;
+		}
+	}
+
+	return true;
 
 }

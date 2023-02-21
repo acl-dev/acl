@@ -12,7 +12,8 @@ public:
 
 	const redis_object* read_reply(acl::dbuf_pool& dbuf,
 		size_t nchildren = 0, int* rw_timeout = NULL);
-	const redis_object* read_request(acl::dbuf_pool& dbuf);
+	bool read_request(acl::dbuf_pool& dbuf,
+		std::vector<const redis_object*>& out);
 
 private:
 	acl::socket_stream& conn_;

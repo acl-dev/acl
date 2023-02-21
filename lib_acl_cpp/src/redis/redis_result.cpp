@@ -181,9 +181,10 @@ size_t redis_result::get_length() const
 	return len;
 }
 
-int redis_result::argv_to_string(string& buf) const
+int redis_result::argv_to_string(string& buf, bool clear_auto /* = true */) const
 {
-	buf.clear();
+	if (clear_auto)
+		buf.clear();
 
 	if (idx_ == 0)
 		return 0;

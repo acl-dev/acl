@@ -5,15 +5,25 @@ class redis_object;
 
 class redis_transfer {
 public:
-	redis_transfer(acl::socket_stream& conn, acl::redis_command& cmd,
-		const redis_object& req);
+	redis_transfer(acl::socket_stream& conn,
+		acl::redis_client_pipeline& pipeline);
 
 	~redis_transfer(void);
 
-	bool run(void);
+	bool run(const std::vector<const redis_object*>& reqs);
 
 private:
-	acl::socket_stream& conn_;
-	acl::redis_command& cmd_;
-	const redis_object& req_;
+	acl::socket_stream&         conn_;
+	acl::redis_client_pipeline& pipeline_;
+
+
+	bool build_reply(const acl::redis_result& result, acl::string& buff);
+	bool reply_add_object(const acl::redis_result& obj, acl::string& buff);
+	bool reply_add_array(const acl::redis_result& obj, acl::string& buff);
+	bool reply_add_string(const acl::redis_result& obj, acl::string& buff);
+	bool reply_add_integer(const acl::redis_result& obj, acl::string& buff);
+	bool reply_add_status(const acl::redis_result& obj, acl::string& buff);
+	bool reply_add_error(const acl::redis_result& obj, acl::string& buff);
+
+	bool redirect2me(void);
 };

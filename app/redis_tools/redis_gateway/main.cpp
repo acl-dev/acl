@@ -18,8 +18,9 @@ int main(int argc, char *argv[])
 		// 禁止生成 acl_master.log 日志
 		acl::master_log_enable(false);
 
-		const char* addr = "127.0.0.1|16379";
-		printf("listen: %s\r\n", addr);
+		//const char* addr = "127.0.0.1|16379";
+		//printf("listen: %s\r\n", addr);
+		const char* addr = NULL;
 		ms.run_alone(addr, argc >= 3 ? argv[2] : NULL);
 	} else {
 #if defined(_WIN32) || defined(_WIN64)

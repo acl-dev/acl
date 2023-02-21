@@ -53,19 +53,21 @@ void master_service::on_accept(acl::socket_stream& conn)
 	acl::dbuf_guard* dbuf = new acl::dbuf_guard;
 	redis_client client(conn);
 
+	redis_transfer transfer(conn, *redis_pipeline_);
+
+	std::vector<const redis_object*> objs;
+
 	while (true) {
-		const redis_object* obj = client.read_request(dbuf->get_dbuf());
-		if (obj == NULL) {
-			logger_error("read client request error!");
+		if (!client.read_request(dbuf->get_dbuf(), objs)) {
+			//logger_error("read client request error!");
 			break;
 		}
 
-		acl::redis cmd(redis_pipeline_);
-		redis_transfer transfer(conn, cmd, *obj);
-		if (!transfer.run()) {
+		if (!transfer.run(objs)) {
 			break;
 		}
 
+		objs.clear();
 		dbuf->dbuf_reset();
 	}
 
@@ -84,7 +86,8 @@ void master_service::proc_on_listen(acl::server_socket& ss)
 
 void master_service::proc_on_init(void)
 {
-	redis_pipeline_ = new acl::redis_client_pipeline(var_cfg_redis_addrs);
+	//redis_pipeline_ = new acl::redis_client_pipeline(var_cfg_redis_addrs);
+	redis_pipeline_ = new acl::fiber_redis_pipeline(var_cfg_redis_addrs);
 	if (var_cfg_redis_pass && *var_cfg_redis_pass) {
 		redis_pipeline_->set_password(var_cfg_redis_pass);
 	}
