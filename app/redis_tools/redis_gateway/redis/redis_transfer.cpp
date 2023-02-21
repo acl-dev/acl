@@ -163,19 +163,53 @@ bool redis_transfer::reply_add_error(const acl::redis_result& obj,
 
 bool redis_transfer::redirect2me(void) {
 	acl::string buff;
-	buff += "*1\r\n";
+
+	buff += "*4\r\n";
+
 	buff += "*3\r\n";
 	buff += ":0\r\n";
-	buff += ":16383\r\n";
+	buff += ":4000\r\n";
 	buff += "*3\r\n";
 	buff += "$9\r\n";
 	buff += "127.0.0.1\r\n";
 	buff += ":16379\r\n";
 	buff += "$40\r\n";
 	buff += "5c17f9e161196446a9be4aa1c62c5e1518ece030\r\n";
+
+	buff += "*3\r\n";
+	buff += ":4001\r\n";
+	buff += ":8000\r\n";
+	buff += "*3\r\n";
+	buff += "$9\r\n";
+	buff += "127.0.0.1\r\n";
+	buff += ":16379\r\n";
+	buff += "$40\r\n";
+	buff += "6c17f9e161196446a9be4aa1c62c5e1518ece030\r\n";
+
+	buff += "*3\r\n";
+	buff += ":8001\r\n";
+	buff += ":12000\r\n";
+	buff += "*3\r\n";
+	buff += "$9\r\n";
+	buff += "127.0.0.1\r\n";
+	buff += ":16379\r\n";
+	buff += "$40\r\n";
+	buff += "7c17f9e161196446a9be4aa1c62c5e1518ece030\r\n";
+
+	buff += "*3\r\n";
+	buff += ":12001\r\n";
+	buff += ":16383\r\n";
+	buff += "*3\r\n";
+	buff += "$9\r\n";
+	buff += "127.0.0.1\r\n";
+	buff += ":16379\r\n";
+	buff += "$40\r\n";
+	buff += "8c17f9e161196446a9be4aa1c62c5e1518ece030\r\n";
+
 	if (conn_.write(buff) == (int) buff.size()) {
 		return true;
 	}
+
 	logger_error("reply to client error");
 	return false;
 }
