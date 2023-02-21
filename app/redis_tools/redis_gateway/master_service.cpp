@@ -53,7 +53,7 @@ void master_service::on_accept(acl::socket_stream& conn)
 	acl::dbuf_guard* dbuf = new acl::dbuf_guard;
 	redis_client client(conn);
 
-	redis_transfer transfer(conn, *redis_pipeline_);
+	redis_transfer transfer(*dbuf, conn, *redis_pipeline_);
 
 	std::vector<const redis_object*> objs;
 

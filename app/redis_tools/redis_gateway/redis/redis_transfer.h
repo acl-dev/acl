@@ -5,7 +5,7 @@ class redis_object;
 
 class redis_transfer {
 public:
-	redis_transfer(acl::socket_stream& conn,
+	redis_transfer(acl::dbuf_guard& dbuf, acl::socket_stream& conn,
 		acl::redis_client_pipeline& pipeline);
 
 	~redis_transfer(void);
@@ -13,6 +13,7 @@ public:
 	bool run(const std::vector<const redis_object*>& reqs);
 
 private:
+	acl::dbuf_guard&            dbuf_;
 	acl::socket_stream&         conn_;
 	acl::redis_client_pipeline& pipeline_;
 

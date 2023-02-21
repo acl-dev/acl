@@ -2,19 +2,18 @@
 #include "redis_object.h"
 #include "redis_request.h"
 
-redis_request::redis_request(acl::redis_client_pipeline& pipeline)
-: cmd_(&pipeline)
+redis_request::redis_request(acl::dbuf_guard* dbuf,
+	acl::redis_client_pipeline* pipeline)
+: dbuf_(dbuf)
+, cmd_(pipeline)
 {
 	size_ = 100;
 	argc_ = 0;
-	argv_ = new const char* [size_];
-	lens_ = new size_t [size_];
+	argv_ = (const char**) dbuf_->dbuf_alloc(sizeof(const char*) * size_);
+	lens_ = (size_t*) dbuf_->dbuf_alloc(sizeof(size_t) * size_);
 }
 
-redis_request::~redis_request(void) {
-	delete [] argv_;
-	delete [] lens_;
-}
+redis_request::~redis_request(void) {}
 
 acl::redis_pipeline_message& redis_request::get_message(void) {
 	return cmd_.get_pipeline_message();
@@ -26,7 +25,8 @@ void redis_request::build_request(const redis_object& obj) {
 
 #if 0
 	for (size_t i = 0; i < argc_; i++) {
-		printf(">>argv[%zd]=%s, lens[%zd]=%zd\r\n", i, argv_[i], i, lens_[i]);
+		printf(">>argv[%zd]=%s, lens[%zd]=%zd\r\n",
+			i, argv_[i], i, lens_[i]);
 	}
 #endif
 
@@ -67,19 +67,6 @@ void redis_request::add_array(const redis_object& obj) {
 	for (size_t i = 0; i < size; i++) {
 		const redis_object* child = children[i];
 		add_object(*child);
-#if 0
-		switch (child->get_type()) {
-		case REDIS_OBJECT_ARRAY:
-			add_array(*child);
-			break;
-		case REDIS_OBJECT_STRING:
-			add_string(*child);
-			break;
-		default:
-			add_object(*child);
-			break;
-		}
-#endif
 	}
 }
 

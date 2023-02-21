@@ -3,43 +3,37 @@
 #include "redis_request.h"
 #include "redis_transfer.h"
 
-redis_transfer::redis_transfer(acl::socket_stream& conn,
+redis_transfer::redis_transfer(acl::dbuf_guard& dbuf, acl::socket_stream& conn,
 	acl::redis_client_pipeline& pipeline)
-: conn_(conn)
+: dbuf_(dbuf)
+, conn_(conn)
 , pipeline_(pipeline)
 {
 }
 
 redis_transfer::~redis_transfer(void) {}
 
-
-void free_requests(std::vector<redis_request*>& requests) {
-	for (std::vector<redis_request*>::iterator it = requests.begin();
-		it != requests.end(); ++it) {
-
-		delete *it;
-	}
-}
-
 bool redis_transfer::run(const std::vector<const redis_object*>& reqs) {
 	std::vector<redis_request*> requests;
+	requests.reserve(200);
 
 #define	EQ	!acl_strcasecmp
 
 	for (std::vector<const redis_object*>::const_iterator cit = reqs.begin();
 		cit != reqs.end(); ++cit) {
 
-		redis_request* request = new redis_request(pipeline_);
+		//redis_request* request = new redis_request(&pipeline_);
+		redis_request* request = dbuf_.create<redis_request>
+			(&dbuf_, &pipeline_);
 		request->build_request(**cit);
 		const char** argv = request->get_argv();
 		size_t argc = request->get_argc();
 		if (argc >= 2) {
 			if (EQ(argv[0], "CLUSTER") && EQ(argv[1], "SLOTS")) {
-				delete request;
 				if (!redirect2me()) {
-					free_requests(requests);
 					return false;
 				}
+				continue;
 			}
 		}
 
@@ -47,6 +41,12 @@ bool redis_transfer::run(const std::vector<const redis_object*>& reqs) {
 		acl::redis_pipeline_message& msg = request->get_message();
 		pipeline_.push(&msg);
 	}
+
+#if 0
+	if (requests.size() > 50) {
+		printf(">>>request size=%zd\n", requests.size());
+	}
+#endif
 
 	acl::string buff(256);
 
@@ -58,8 +58,6 @@ bool redis_transfer::run(const std::vector<const redis_object*>& reqs) {
 		if (result != NULL) {
 			build_reply(*result, buff);
 		}
-
-		delete *it;
 	}
 
 	//printf(">>>>reply=[%s]\r\n", buff.c_str());

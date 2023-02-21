@@ -2,9 +2,10 @@
 
 class redis_object;
 
-class redis_request {
+class redis_request : public acl::dbuf_obj {
 public:
-	redis_request(acl::redis_client_pipeline& pipeline);
+	redis_request(acl::dbuf_guard* dbuf,
+		acl::redis_client_pipeline* pipeline);
 	~redis_request(void);
 
 	void build_request(const redis_object& obj);
@@ -24,6 +25,7 @@ public:
 	acl::redis_pipeline_message& get_message(void);
 
 private:
+	acl::dbuf_guard* dbuf_;
 	acl::redis   cmd_;
 	size_t       size_;
 	size_t       argc_;
@@ -33,6 +35,4 @@ private:
 	void add_object(const redis_object& obj);
 	void add_array(const redis_object& obj);
 	void add_string(const redis_object& obj);
-
-
 };

@@ -92,16 +92,14 @@ private:
 		// send all request commands
 		for (std::vector<redis_command*>::iterator it = commands.begin();
 			it != commands.end(); ++it) {
-			acl::redis_pipeline_message& msg =
-				(*it)->get_message();
+			acl::redis_pipeline_message& msg = (*it)->get_message();
 			pipeline_.push(&msg);
 		}
 
 		// wait for all results
 		for (std::vector<redis_command*>::iterator it = commands.begin();
 			it != commands.end(); ++it) {
-			acl::redis_pipeline_message& msg =
-				(*it)->get_message();
+			acl::redis_pipeline_message& msg = (*it)->get_message();
 			const acl::redis_result* result = msg.wait();
 			if (result == NULL) {
 				printf("wait result error\r\n");
