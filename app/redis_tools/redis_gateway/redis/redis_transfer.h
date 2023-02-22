@@ -16,6 +16,7 @@ private:
 	acl::dbuf_guard&            dbuf_;
 	acl::socket_stream&         conn_;
 	acl::redis_client_pipeline& pipeline_;
+	acl::string                 buff_;
 
 
 	bool build_reply(const acl::redis_result& result, acl::string& buff);

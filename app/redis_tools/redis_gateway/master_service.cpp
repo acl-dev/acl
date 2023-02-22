@@ -68,7 +68,7 @@ void master_service::on_accept(acl::socket_stream& conn)
 		}
 
 		objs.clear();
-		dbuf->dbuf_reset();
+		dbuf->dbuf_reset(0);
 	}
 
 	delete dbuf;

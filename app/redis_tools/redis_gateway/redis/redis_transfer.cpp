@@ -8,6 +8,7 @@ redis_transfer::redis_transfer(acl::dbuf_guard& dbuf, acl::socket_stream& conn,
 : dbuf_(dbuf)
 , conn_(conn)
 , pipeline_(pipeline)
+, buff_(256)
 {
 }
 
@@ -43,12 +44,12 @@ bool redis_transfer::run(const std::vector<const redis_object*>& reqs) {
 	}
 
 #if 0
-	if (requests.size() > 50) {
+	if (requests.size() > 100) {
 		printf(">>>request size=%zd\n", requests.size());
 	}
 #endif
 
-	acl::string buff(256);
+	buff_.clear();
 
 	for (std::vector<redis_request*>::iterator it = requests.begin();
 		it != requests.end(); ++it) {
@@ -56,13 +57,13 @@ bool redis_transfer::run(const std::vector<const redis_object*>& reqs) {
 		acl::redis_pipeline_message& msg = (*it)->get_message();
 		const acl::redis_result* result = msg.wait();
 		if (result != NULL) {
-			build_reply(*result, buff);
+			build_reply(*result, buff_);
 		}
 	}
 
-	//printf(">>>>reply=[%s]\r\n", buff.c_str());
+	//printf(">>>>reply=[%s]\r\n", buff_.c_str());
 
-	if (conn_.write(buff) == (int) buff.size()) {
+	if (conn_.write(buff_) == (int) buff_.size()) {
 		return true;
 	}
 
