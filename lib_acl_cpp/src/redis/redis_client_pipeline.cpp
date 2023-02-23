@@ -77,6 +77,12 @@ bool redis_pipeline_channel::flush_all(void)
 #endif
 	}
 
+#if 0
+	if (msgs_.size() > 10) {
+		logger(">>>messages size is %zd<<<<", msgs_.size());
+	}
+#endif
+
 	bool retried = false;
 	while (true) {
 		socket_stream* conn = client_->get_stream(false);
