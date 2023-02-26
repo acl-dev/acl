@@ -21,8 +21,9 @@ char *acl_lowercase(char *s)
 {
 	char *cp = s;
 
-	if (s == NULL)
+	if (s == NULL) {
 		return NULL;
+	}
 
 	while (*cp) {
 		*cp = tolower(*cp);
@@ -36,8 +37,9 @@ char *acl_lowercase2(char *s, size_t n)
 {
 	char *cp = s;
 
-	if (s == NULL)
+	if (s == NULL) {
 		return NULL;
+	}
 
 	while (*cp && n > 0) {
 		*cp = tolower(*cp);
@@ -52,8 +54,9 @@ char *acl_lowercase3(const char *s, char *buf, size_t size)
 {
 	char *cp = buf;
 
-	if (s == NULL || *s == 0 || buf == NULL)
+	if (s == NULL || *s == 0 || buf == NULL) {
 		return NULL;
+	}
 
 	while (size > 1 && *s) {
 		*cp++ = tolower(*s++);
@@ -68,8 +71,9 @@ char *acl_uppercase(char *s)
 {
 	char *cp = s;
 
-	if (s == NULL)
+	if (s == NULL) {
 		return NULL;
+	}
 
 	while (*cp) {
 		*cp = toupper(*cp);
@@ -83,8 +87,9 @@ char *acl_uppercase2(char *s, size_t n)
 {
 	char *cp = s;
 
-	if (s == NULL)
-		return (NULL);
+	if (s == NULL) {
+		return NULL;
+	}
 
 	while (*cp && n > 0) {
 		*cp = toupper(*cp);
@@ -99,15 +104,16 @@ char *acl_uppercase3(const char *s, char *buf, size_t size)
 {
 	char *cp = buf;
 
-	if (s == NULL || *s == 0 || buf == NULL)
-		return(NULL);
+	if (s == NULL || *s == 0 || buf == NULL) {
+		return NULL;
+	}
 
 	while (size > 1 && *s) {
 		*cp++ = toupper(*s++);
 		size--;
 	}
-	*cp = 0;
 
+	*cp = 0;
 	return buf;
 }
 
@@ -131,8 +137,9 @@ char *acl_strtok(char **src, const char *sep)
 	 * Separate off one token.
 	 */
 	end = start + strcspn(start, sep);
-	if (*end != 0)
+	if (*end != 0) {
 		*end++ = 0;
+	}
 	*src = end;
 	return start;
 }
@@ -143,8 +150,9 @@ char *acl_strline(char **src)
 	char *end = *src;
 	int   backslash = 0, nr = 0;
 
-	if (start == NULL)
-		return (NULL);
+	if (start == NULL) {
+		return NULL;
+	}
 
 	while (*end) {
 		switch (*end) {
@@ -155,8 +163,9 @@ char *acl_strline(char **src)
 			nr++;
 			break;
 		case '\n':
-			if (backslash == 0)
+			if (backslash == 0) {
 				goto TAG_END;
+			}
 			memmove(end - (backslash + nr), end + 1, strlen(end + 1));
 			backslash = 0;
 			nr = 0;
@@ -177,8 +186,9 @@ TAG_END:
 
 		/* (*src) pointer to the next postion after '\n' */
 		*src = end + 1;
-	} else
+	} else {
 		*src = 0;
+	}
 
 	return start;
 }
@@ -194,8 +204,8 @@ char *acl_strtrim(char *str)
 		if (*ptr == ' ' || *ptr == '\t') {
 			memmove(ptr, ptr + 1, len--);
 		} else if (((*ptr) &0xff) == 0xa1
-			&& ((*(ptr + 1)) & 0xff) == 0xa1)
-		{
+			&& ((*(ptr + 1)) & 0xff) == 0xa1) {
+
 			/* 对于全角的空格为: '　', 即 0xa10xa1 */
 			len--;
 			memmove(ptr, ptr + 2, len--);
@@ -216,8 +226,9 @@ int acl_strstrip(const char *haystack, const char *needle,
 	int len, n, ncpy = 0;
 
 	if (haystack == NULL || *haystack == 0 || needle == NULL
-	    || *needle == 0 || buf == NULL || bsize <= 0)
+	    || *needle == 0 || buf == NULL || bsize <= 0) {
 		return -1;
+	}
 
 	src = haystack;
 	des = buf;
@@ -235,8 +246,9 @@ int acl_strstrip(const char *haystack, const char *needle,
 			break;
 		}
 		n = (int) (ptr - src);
-		if (bsize <= n)
+		if (bsize <= n) {
 			break;
+		}
 		ACL_SAFE_STRNCPY(des, src, bsize);
 		ncpy    += n;
 		bsize   -= n;
@@ -250,8 +262,9 @@ int acl_strstrip(const char *haystack, const char *needle,
 
 int acl_strtrunc_byln(char *str)
 {
-	if (str == NULL)
+	if (str == NULL) {
 		return -1;
+	}
 
 	while (*str) {
 		if (*str == '\r' || *str == '\n') {
@@ -275,17 +288,18 @@ static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 	char    *obj;
 	int     n;
 
-	if (ptr == NULL || *ptr == 0 || pbuf == NULL || sizeb <= 0)
+	if (ptr == NULL || *ptr == 0 || pbuf == NULL || sizeb <= 0) {
 		return NULL;
+	}
 
 	obj = pbuf;
 	n   = sizeb;
 
 	while (*ptr && n > 0) {
 		/* skip any useless '/'(in unix) or '\\'(in windows) */
-		if (*ptr == PATH_SEP_C && *(ptr + 1) == PATH_SEP_C)
-		    ;
-		else {
+		if (*ptr == PATH_SEP_C && *(ptr + 1) == PATH_SEP_C) {
+			/* Nothing */
+		} else {
 			*obj++ = *ptr;
 			n--;
 		}
@@ -293,12 +307,12 @@ static char *path_str_strip(const char *psrc, char *pbuf, int sizeb)
 		ptr++;
 	}
 
-	if (n <= 0)      /* 说明所给的缓冲区空间不够大 */
+	if (n <= 0) {     /* 说明所给的缓冲区空间不够大 */
 		return NULL;
+	}
 
 	/* 必须保证最后一个字符是以 '\0' 结束 */
 	*obj = 0;
-
 	return obj;
 }
 /*----------------------------------------------------------------------------
@@ -310,8 +324,9 @@ int acl_file_path_correct(const char *psrc_file_path, char *pbuf, int sizeb)
 	char    *ptr;
 
 	ptr = path_str_strip(psrc_file_path, pbuf, sizeb);
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return -1;
+	}
 	return 0;
 }
 /*----------------------------------------------------------------------------
@@ -328,14 +343,16 @@ int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb)
 	ptr = path_str_strip(psrc_dir, pbuf, sizeb);
 
 	/* 该函数若返回的结果不为空, 则 *ptr 定为 '\0' */
-	if (ptr == NULL)
+	if (ptr == NULL) {
 		return -1;
+	}
 
 	/* 为了保证最后一个字符肯定为 '/'(unix) or '\\'(windows), 需做如下处理 */
 
 	if (*(ptr - 1) != PATH_SEP_C) {
-		if (ptr >= pbuf + sizeb) /* 说明所给的内存空间不够 */
+		if (ptr >= pbuf + sizeb) { /* 说明所给的内存空间不够 */
 			return -1;
+		}
 		*ptr++ = PATH_SEP_C;
 		*ptr = 0;
 	}
@@ -347,18 +364,22 @@ int acl_dir_getpath(const char *pathname, char *pbuf, int bsize)
 	char *ptr;
 	int   n;
 
-	if (pathname == NULL || pbuf == NULL || bsize <= 0)
+	if (pathname == NULL || pbuf == NULL || bsize <= 0) {
 		return -1;
+	}
 	
 	n = acl_file_path_correct(pathname, pbuf, bsize);
-	if (n < 0)
+	if (n < 0) {
 		return -1;
+	}
 	ptr = strrchr(pbuf, PATH_SEP_C);
-	if (ptr != NULL)
+	if (ptr != NULL) {
 		*ptr = 0;
+	}
 	if (ptr == pbuf) { /* such as "/tmp.txt", I'll left "/" */
-		if (bsize >= 2)
+		if (bsize >= 2) {
 			*(ptr + 1) = 0;
+		}
 	}
 
 	return 0;
@@ -373,8 +394,9 @@ size_t acl_strnlen(const char * s, size_t count)
 {
         const char *sc;
 
-        for (sc = s; count-- && *sc != '\0'; ++sc)
+        for (sc = s; count-- && *sc != '\0'; ++sc) {
                 /* nothing */;
+	}
         return sc - s;
 }
 
@@ -383,8 +405,9 @@ long long acl_atoll(const char *s)
 	long long num = 0;
 	int neg = 0;
 
-	while (isspace((int) (*s)))
+	while (isspace((int) (*s))) {
 		s++;
+	}
 
 	if (*s == '-') {	
 		neg = 1;
@@ -396,8 +419,9 @@ long long acl_atoll(const char *s)
 		s++;
 	}
 
-	if (neg)
+	if (neg) {
 		num = -num;
+	}
 	return num;
 }
 
@@ -423,15 +447,17 @@ acl_int64 acl_atoi64(const char *str)
 
 const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size)
 {
-	if (size < 21)
+	if (size < 21) {
 		return NULL;
+	}
 	return _ui64toa(value, buf, 10);
 }
 
 const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 {
-	if (size < 21)
+	if (size < 21) {
 		return NULL;
+	}
 	return _i64toa(value, buf, 10);
 }
 
@@ -457,8 +483,9 @@ acl_int64 acl_atoi64(const char *str)
 
 const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size)
 {
-	if (size < 21)
+	if (size < 21) {
 		return NULL;
+	}
 
 	snprintf(buf, size, "%llu", value);
 	return buf;
@@ -466,8 +493,9 @@ const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size)
 
 const char *acl_i64toa(acl_int64 value, char *buf, size_t size)
 {
-	if (size < 21)
+	if (size < 21) {
 		return NULL;
+	}
 
 	snprintf(buf, size, "%lld", value);
 	return buf;
@@ -493,8 +521,9 @@ static void x64toa(acl_uint64 val, char *buf, size_t size,
 	firstdig = p;           /* save pointer to first digit */
 
 	do {
-		if (size-- <= 0)
+		if (size-- <= 0) {
 			break;
+		}
 
 		digval = (unsigned) (val % radix);
 		val /= radix;   /* get next digit */
@@ -591,10 +620,12 @@ int acl_find_blank_line(const char *s, int n, ACL_LINE_STATE *state)
 
 	while (n > 0) {
 		ret = get_blank_line(s, n, state);
-		if (state->finish)
+		if (state->finish) {
 			return ret;
-		if (ret == 0)
+		}
+		if (ret == 0) {
 			return 0;
+		}
 		s += n - ret;
 		n = ret;
 	}

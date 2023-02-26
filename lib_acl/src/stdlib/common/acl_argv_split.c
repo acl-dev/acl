@@ -26,19 +26,21 @@ ACL_ARGV *acl_argv_split(const char *str, const char *delim)
 ACL_ARGV *acl_argv_split3(const char *str, const char *delim,
 	ACL_DBUF_POOL *dbuf)
 {
-	ACL_ARGV *argvp = acl_argv_alloc2(1, dbuf);
+	ACL_ARGV *argvp = acl_argv_alloc2(5, dbuf);
 	char   *saved_string =
 		dbuf ? acl_dbuf_pool_strdup(dbuf, str) : acl_mystrdup(str);
 	char   *bp = saved_string;
 	char   *arg;
 
-	while ((arg = acl_mystrtok(&bp, delim)) != 0)
+	while ((arg = acl_mystrtok(&bp, delim)) != 0) {
 		acl_argv_add(argvp, arg, (char *) 0);
+	}
 	acl_argv_terminate(argvp);
-	if (dbuf)
+	if (dbuf) {
 		acl_dbuf_pool_free(dbuf, saved_string);
-	else
+	} else {
 		acl_myfree(saved_string);
+	}
 	return argvp;
 }
 
@@ -58,13 +60,15 @@ ACL_ARGV *acl_argv_splitn4(const char *str, const char *delim,
 	char   *bp = saved_string;
 	char   *arg;
 
-	while (n-- > 0 && (arg = acl_mystrtok(&bp, delim)) != 0)
+	while (n-- > 0 && (arg = acl_mystrtok(&bp, delim)) != 0) {
 		acl_argv_add(argvp, arg, (char *) 0);
+	}
 	acl_argv_terminate(argvp);
-	if (dbuf)
+	if (dbuf) {
 		acl_dbuf_pool_free(dbuf, saved_string);
-	else
+	} else {
 		acl_myfree(saved_string);
+	}
 	return argvp;
 }
 
@@ -78,13 +82,15 @@ ACL_ARGV *acl_argv_split_append(ACL_ARGV *argvp, const char *str,
 	char   *bp = saved_string;
 	char   *arg;
 
-	while ((arg = acl_mystrtok(&bp, delim)) != 0)
+	while ((arg = acl_mystrtok(&bp, delim)) != 0) {
 		acl_argv_add(argvp, arg, (char *) 0);
+	}
 	acl_argv_terminate(argvp);
-	if (argvp->dbuf)
+	if (argvp->dbuf) {
 		acl_dbuf_pool_free(argvp->dbuf, saved_string);
-	else
+	} else {
 		acl_myfree(saved_string);
+	}
 	return argvp;
 }
 
@@ -99,13 +105,15 @@ ACL_ARGV *acl_argv_splitn_append(ACL_ARGV *argvp, const char *str,
 	char   *bp = saved_string;
 	char   *arg;
 
-	while (n-- > 0 && (arg = acl_mystrtok(&bp, delim)) != 0)
+	while (n-- > 0 && (arg = acl_mystrtok(&bp, delim)) != 0) {
 		acl_argv_add(argvp, arg, (char *) 0);
+	}
 	acl_argv_terminate(argvp);
-	if (argvp->dbuf)
+	if (argvp->dbuf) {
 		acl_dbuf_pool_free(argvp->dbuf, saved_string);
-	else
+	} else {
 		acl_myfree(saved_string);
+	}
 	return argvp;
 }
 
@@ -166,12 +174,11 @@ ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,
 		str++;;
 	}
 
-	if (LEN(buf) > 0)
+	if (LEN(buf) > 0) {
 		acl_argv_add(argvp, STR(buf), NULL);
+	}
 
 	acl_argv_terminate(argvp);
-
 	acl_vstring_free(buf);
-
 	return argvp;
 }
