@@ -221,6 +221,11 @@ int http_hdr_res_parse(HTTP_HDR_RES *hdr_res)
 	/* data format: xxx info */
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hdr->entry_lnk, 0);
 
+	if (http_hdr_parse_version(hdr, entry->name) < 0) {
+		acl_msg_error("no HTTP/1.x in %s %s", entry->name, entry->value);
+		return (-1);
+	}
+
 	ptr = entry->value;
 	while (*ptr == ' ' || *ptr == '\t')
 		ptr++;
