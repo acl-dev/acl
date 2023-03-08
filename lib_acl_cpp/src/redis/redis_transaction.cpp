@@ -50,6 +50,9 @@ bool redis_transaction::unwatch()
 	const char* argv[1];
 	size_t lens[1];
 
+	argv[0] = "UNWATCH";
+	lens[0] = strlen(argv[0]);
+
 	build_request(1, argv, lens);
 	return check_status();
 }
