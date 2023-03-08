@@ -9,7 +9,9 @@
 int fcntl(int fd, int cmd, ...)
 {
 	int     arg_int, ret;
+#if	defined(F_GETOWN_EX) || defined(F_SETOWN_EX)
 	struct  f_owner_ex * arg_owner;
+#endif
 	struct  flock *arg_lock;
 	va_list ap;
 
@@ -26,6 +28,7 @@ int fcntl(int fd, int cmd, ...)
 			ret = (*sys_fcntl)(fd, cmd, arg_int);
 		}
 		break;
+#ifdef	F_DUPFD_CLOEXEC
 	case F_DUPFD_CLOEXEC:
 		if (!var_hook_sys_api || (ret = epoll_try_register(fd)) == -1) {
 			arg_int = va_arg(ap, int);
@@ -34,12 +37,15 @@ int fcntl(int fd, int cmd, ...)
 			close_on_exec(fd, 1);
 		}
 		break;
+#endif
 	case F_GETFD:
 	case F_GETFL:
 	case F_GETOWN:
 	case F_GETSIG:
 	case F_GETLEASE:
+#ifdef	F_GETPIPE_SZ
 	case F_GETPIPE_SZ:
+#endif
 		ret = (*sys_fcntl)(fd, cmd);
 		break;
 	case F_SETFD:
@@ -48,7 +54,9 @@ int fcntl(int fd, int cmd, ...)
 	case F_SETSIG:
 	case F_SETLEASE:
 	case F_NOTIFY:
+#ifdef	F_SETPIPE_SZ
 	case F_SETPIPE_SZ:
+#endif
 		arg_int= va_arg(ap, long);
 		ret = (*sys_fcntl)(fd, cmd, arg_int);
 		break;
@@ -58,14 +66,18 @@ int fcntl(int fd, int cmd, ...)
 		arg_lock = va_arg(ap, struct flock*);
 		ret = (*sys_fcntl)(fd, cmd, arg_lock);
 		break;
+#ifdef	F_GETOWN_EX
 	case F_GETOWN_EX:
 		arg_owner = va_arg(ap, struct f_owner_ex *);
 		ret = (*sys_fcntl)(fd, cmd, arg_owner);
 		break;
+#endif
+#ifdef	F_SETOWN_EX
 	case F_SETOWN_EX:
 		arg_owner = va_arg(ap, struct f_owner_ex *);
 		ret = (*sys_fcntl)(fd, cmd, arg_owner);
 		break;
+#endif
 	default:
 		ret = -1;
 		msg_error("%s(%d), %s: unknown cmd: %d, fd: %d",
