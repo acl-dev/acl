@@ -1,8 +1,8 @@
-%define release_id 4
+%define release_id 0
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.0
+Version:        3.6.1
 Release:        %{release_id}
 Group:          System/Libs
 License:        IBM
@@ -44,6 +44,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Wed Mar 08 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-0-20230308.11
+- feature: SSL module in acl including Openssl and MbedTLS supports multiple certificates in server side.
+- feature: support MbedTLS 3.3.0 version.
+- optimize: optimize memory usage.
 
 * Thu Jan 19 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.0-4-20230119.15
 - feature: add fiber's stack backtrace
