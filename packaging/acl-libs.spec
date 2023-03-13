@@ -13,14 +13,14 @@ Source:         http://example.com/%{name}-%{version}.tar.gz
 
 %description
 
-One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS http://blog.csdn.net/zsxxsz/.
+One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IOS https://acl-dev.cn/.
 
 %prep
 %setup -q
 
 %build
-make -j 4
-make -C lib_fiber
+make -j 4 build_one
+make -j 4 -C lib_fiber
 
 %install
 
