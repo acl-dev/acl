@@ -22,8 +22,10 @@ tar:
 
 libs: tar
 	@mkdir -p {BUILD,BUILDROOT,SRPMS,SPECS}
-	@rpmbuild --define "_topdir ${PWD}" --define "_sourcedir ${PWD}" --define "_rpmdir ${PWD}" ${DEBUGINFO} -bb $(PKG_NAME).spec
-	@echo Binary PRM for $(PKG_NAME) has been created under ${PWD}/`rpm --eval '%{_arch}'`
+	@rpmbuild --define "_topdir ${PWD}" --define "_sourcedir ${PWD}" \
+		--define "_rpmdir ${PWD}" ${DEBUGINFO} -bb $(PKG_NAME).spec
+	@echo Binary PRM for $(PKG_NAME) has been created under ${PWD}/ \
+		`rpm --eval '%{_arch}'`
 
 clean cl:
 	@rm -rf $(PKG_NAME)-$(PKG_VERSION)

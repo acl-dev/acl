@@ -10,8 +10,8 @@ function pack() {
     cd ..
     PROJECT_NAME="${PKG_NAME}-${PKG_VERSION}"
     git archive --format=tar --prefix=$PROJECT_NAME/ HEAD | (tar xpf -)
-	tar zcpf ${PROJECT_NAME}.tar.gz ${PROJECT_NAME}
-	/bin/mv -f ${PROJECT_NAME}.tar.gz packaging
+    tar zcpf ${PROJECT_NAME}.tar.gz ${PROJECT_NAME}
+    /bin/mv -f ${PROJECT_NAME}.tar.gz packaging/
     rm -rf ${PKG_NAME}-${PKG_VERSION}
     cd -
 }
@@ -22,12 +22,12 @@ function help() {
 
 # 检测rpmbuild是否可使用--nodebuginfo参数
 function debuginfo() {
-	local exist_debuginfo=`rpmbuild --help |grep 'nodebuginfo' |wc -l`
-	if [ ${exist_debuginfo} -eq 1 ]; then
-		echo "--nodebuginfo"
-	else
-		echo ""
-	fi
+    local exist_debuginfo=`rpmbuild --help | grep 'nodebuginfo' | wc -l`
+    if [ ${exist_debuginfo} -eq 1 ]; then
+        echo "--nodebuginfo"
+    else
+        echo ""
+    fi
 }
 
 
@@ -40,7 +40,7 @@ if [ "$1" == "" ]; then
 elif [ "$1" == "pack" ];then
     pack $2
 elif [ "$1" == "debuginfo" ];then
-	debuginfo
+    debuginfo
 elif [ "$1" == "test" ];then
     run_test
 else
