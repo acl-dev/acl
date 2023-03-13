@@ -24,7 +24,7 @@ acl master framework
 %define HAS_SYSTEMD %( if [ -f /usr/lib/systemd/systemd -a -d /usr/lib/systemd/system ]; then echo "1" ; else echo "0"; fi )
 
 make -j 4
-make -j 4 -C lib_fiber
+#make -j 4 -C lib_fiber
 
 %install
 mkdir -p $RPM_BUILD_ROOT/opt/soft/services/
