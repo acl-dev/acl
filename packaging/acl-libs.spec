@@ -5,7 +5,7 @@ Name:           acl-libs
 Version:        3.6.1
 Release:        %{release_id}
 Group:          System/Libs
-License:        IBM
+License:        LGPL3.0,IBM
 URL:            https://github.com/acl-dev/
 Packager:       Zhang Qiang <155281969@qq.com>, Wang Haibin <634648088@qq.com>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
@@ -20,7 +20,7 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 %build
 make -j 4 build_one
-#make -j 4 -C lib_fiber
+make -j 4 -C lib_fiber
 
 %install
 

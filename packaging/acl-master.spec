@@ -5,7 +5,7 @@ Name:           acl-master
 Version:        3.5.4
 Release:        %{release_id}
 Group:          System Environment/Tools
-License:        IBM
+License:        LGPL3.0,IBM
 URL:            https://github.com/acl-dev/
 Packager:       Zhang Qiang <155281969@qq.com>, Wang Haibin <634648088@qq.com>
 BuildRoot:      %{_tmppath}/%{name}-%{version}-root
