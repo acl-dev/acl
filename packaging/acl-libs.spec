@@ -20,7 +20,7 @@ One advanced C/C++ library for Linux/Mac/FreeBSD/Solaris(x86)/Windows/Android/IO
 
 %build
 make -j 4 build_one
-make -j 4 -C lib_fiber
+#make -j 4 -C lib_fiber
 
 %install
 
