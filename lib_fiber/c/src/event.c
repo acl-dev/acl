@@ -523,7 +523,11 @@ int event_process(EVENT *ev, int timeout)
 	// call the system event waiting API for any event arriving.
 	ret = ev->event_wait(ev, timeout);
 
-	(void) event_set_stamp(ev);  // reset the stamp after event waiting.
+	// reset the stamp after event waiting only if timeout not 0 that
+	// we can decrease the times of calling gettimeofday() API.
+	if (timeout != 0) {
+		(void) event_set_stamp(ev);
+	}
 
 #ifdef HAS_POLL
 	event_process_poll(ev);
