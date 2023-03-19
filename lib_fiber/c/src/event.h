@@ -17,6 +17,16 @@
 
 #include "fiber/libfiber.h"
 
+#if defined(USE_CLOCK_GETTIME)
+# ifdef CLOCK_REALTIME_COARSE
+#  define CLODK_ID CLOCK_REALTIME_COARSE
+# elif defined(CLOCK_REALTIME)
+#  define CLOCK_ID CLOCK_REALTIME
+# else
+#  undef USE_CLOCK_GETTIME
+# endif
+#endif
+
 #if defined(USE_FAST_TIME)
 # define SET_TIME(x) do { \
     struct timeval _tv; \
@@ -26,7 +36,7 @@
 #elif defined(USE_CLOCK_GETTIME)
 # define SET_TIME(x) do { \
     struct timespec _ts; \
-    if (clock_gettime(CLOCK_REALTIME_COARSE, &_ts) == 0) { \
+    if (clock_gettime(CLOCK_ID, &_ts) == 0) { \
         (x) = ((long long) _ts.tv_sec) * 1000 + ((long long) _ts.tv_nsec) / 1000000; \
     } else { \
         abort(); \
