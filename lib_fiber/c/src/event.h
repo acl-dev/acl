@@ -18,16 +18,28 @@
 #include "fiber/libfiber.h"
 
 #if defined(USE_FAST_TIME)
-#define SET_TIME(x) do { \
+# define SET_TIME(x) do { \
     struct timeval _tv; \
     acl_fiber_gettimeofday(&_tv, NULL); \
     (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
 } while (0)
+#elif defined(USE_CLOCK_GETTIME)
+# define SET_TIME(x) do { \
+    struct timespec _ts; \
+    if (clock_gettime(CLOCK_REALTIME_COARSE, &_ts) == 0) { \
+        (x) = ((long long) _ts.tv_sec) * 1000 + ((long long) _ts.tv_nsec) / 1000000; \
+    } else { \
+        abort(); \
+    } \
+} while (0)
 #else
-#define SET_TIME(x) do { \
-struct timeval _tv; \
-    gettimeofday(&_tv, NULL); \
-    (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
+# define SET_TIME(x) do { \
+    struct timeval _tv; \
+    if (gettimeofday(&_tv, NULL) == 0) { \
+        (x) = ((long long) _tv.tv_sec) * 1000 + ((long long) _tv.tv_usec)/ 1000; \
+    } else { \
+        abort(); \
+    } \
 } while (0)
 #endif
 

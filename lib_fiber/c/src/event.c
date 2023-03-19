@@ -119,7 +119,7 @@ void event_free(EVENT *ev)
 
 long long event_set_stamp(EVENT *ev)
 {
-	SET_TIME(ev->stamp);  // decrease the SET_TIME's calling count.
+	SET_TIME(ev->stamp);  // Reduce the SET_TIME's calling count.
 	return ev->stamp;
 }
 
