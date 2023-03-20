@@ -23,18 +23,18 @@
 #ifndef ACL_CLIENT_ONLY
 
 #define SKIP_SPACE(x) { while (*x == ' ' || *x == '\t') x++; }
+#define ADDR_LEN	64
 
-namespace acl
-{
+namespace acl {
 
 #define COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
 
 HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
-	session& store, socket_stream& stream,
+	session* sess, socket_stream& stream,
 	const char* charset /* = NULL */, int body_limit /* = 102400 */)
 : req_error_(HTTP_REQ_OK)
 , res_(res)
-, store_(store)
+, sess_(sess)
 , http_session_(NULL)
 , stream_(stream)
 , body_limit_(body_limit)
@@ -42,6 +42,8 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
 , cookies_inited_(false)
 , client_(NULL)
 , method_(HTTP_METHOD_UNKNOWN)
+, localAddr_(NULL)
+, remoteAddr_(NULL)
 , request_type_(HTTP_REQUEST_NORMAL)
 , parse_body_(true)
 , mime_(NULL)
@@ -53,7 +55,7 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
 	dbuf_internal_ = NEW dbuf_guard(1, 100);
 	dbuf_ = dbuf_internal_;
 
-	COPY(cookie_name_, "ACL_SESSION_ID");
+	cookie_name_ = dbuf_->dbuf_strdup("ACL_SESSION_ID");
 	ACL_VSTREAM* in = stream.get_vstream();
 	if (in == ACL_VSTREAM_IN) {
 		cgi_mode_ = true;
@@ -61,9 +63,9 @@ HttpServletRequest::HttpServletRequest(HttpServletResponse& res,
 		cgi_mode_ = false;
 	}
 	if (charset && *charset) {
-		COPY(localCharset_, charset);
+		localCharset_ = dbuf_->dbuf_strdup(charset);
 	} else {
-		localCharset_[0] = 0;
+		localCharset_ = NULL;
 	}
 	rw_timeout_ = 60;
 }
@@ -259,21 +261,25 @@ HttpSession& HttpServletRequest::getSession(bool create /* = true */,
 		return *http_session_;
 	}
 
-	http_session_ = dbuf_->create<HttpSession, session&>(store_);
+	if (sess_ == NULL) {
+		sess_ = dbuf_->create<memcache_session>("127.0.0.1|11211");
+	}
+
+	http_session_ = dbuf_->create<HttpSession, session&>(*sess_);
 	const char* sid;
 
 	if ((sid = getCookieValue(cookie_name_)) != NULL) {
-		store_.set_sid(sid);
+		sess_->set_sid(sid);
 	} else if (create) {
 		// 获得唯一 ID 标识符
-		sid = store_.get_sid();
+		sid = sess_->get_sid();
 		// 生成 cookie 对象，并分别向请求对象和响应对象添加 cookie
 		HttpCookie* cookie = dbuf_->create<HttpCookie, const char*,
 			const char*, dbuf_guard*>(cookie_name_, sid, dbuf_);
 		res_.addCookie(cookie);
 		setCookie(cookie_name_, sid);
 	} else if (sid_in != NULL && *sid_in != 0) {
-		store_.set_sid(sid_in);
+		sess_->set_sid(sid_in);
 		// 生成 cookie 对象，并分别向请求对象和响应对象添加 cookie
 		HttpCookie* cookie = dbuf_->create<HttpCookie, const char*,
 			const char*, dbuf_guard*>(cookie_name_, sid_in, dbuf_);
@@ -338,7 +344,7 @@ const char* HttpServletRequest::getCharacterEncoding(void) const
 
 const char* HttpServletRequest::getLocalCharset(void) const
 {
-	return localCharset_[0] ? localCharset_ : NULL;
+	return localCharset_ ? localCharset_ : NULL;
 }
 
 const char* HttpServletRequest::getLocalAddr(void) const
@@ -354,8 +360,14 @@ const char* HttpServletRequest::getLocalAddr(void) const
 	if (*ptr == 0) {
 		return NULL;
 	}
+
+
+	if (localAddr_ == NULL) {
+		const_cast<HttpServletRequest*>(this)->localAddr_ = (char*)
+			dbuf_->dbuf_alloc(ADDR_LEN);
+	}
 	safe_snprintf(const_cast<HttpServletRequest*>(this)->localAddr_,
-		sizeof(localAddr_), "%s", ptr);
+		ADDR_LEN, "%s", ptr);
 	char* p = (char*) strchr(localAddr_, ':');
 	if (p) {
 		*p = 0;
@@ -404,8 +416,14 @@ const char* HttpServletRequest::getRemoteAddr(void) const
 		logger_warn("get_peer return empty string");
 		return NULL;
 	}
+
+	if (remoteAddr_ == NULL) {
+		const_cast<HttpServletRequest*>(this)->remoteAddr_ = (char*)
+			dbuf_->dbuf_alloc(ADDR_LEN);
+	}
+
 	safe_snprintf(const_cast<HttpServletRequest*>(this)->remoteAddr_,
-		sizeof(remoteAddr_), "%s", ptr);
+		ADDR_LEN, "%s", ptr);
 	char* p = (char*) strchr(remoteAddr_, ':');
 	if (p) {
 		*p = 0;
@@ -671,7 +689,7 @@ void HttpServletRequest::parseParameters(const char* str)
 		HTTP_PARAM* param = (HTTP_PARAM*)
 			dbuf_->dbuf_calloc(sizeof(HTTP_PARAM));
 
-		if (localCharset_[0] != 0 && requestCharset
+		if (localCharset_ && requestCharset
 			&& strcasecmp(requestCharset, localCharset_)) {
 
 			buf.clear();

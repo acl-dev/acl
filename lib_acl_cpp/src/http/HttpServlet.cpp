@@ -13,39 +13,17 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-HttpServlet::HttpServlet(socket_stream* stream, session* session)
-: req_(NULL)
-, res_(NULL)
-, parse_body_(true)
-, stream_(stream)
+void HttpServlet::init(void)
 {
-	init();
-
-	if (session == NULL) {
-		session_ = NEW memcache_session("127.0.0.1|11211");
-		session_ptr_ = session_;
-	} else {
-		session_ = session;
-		session_ptr_ = NULL;
-	}
+	first_            = true;
+	local_charset_    = NULL;
+	rw_timeout_       = 60;
+	parse_body_limit_ = 0;
 }
 
-HttpServlet::HttpServlet(socket_stream* stream,
-	const char* memcache_addr /* = "127.0.0.1:11211" */)
-: req_(NULL)
-, res_(NULL)
-, stream_(stream)
-{
-	init();
-
-	session_     = NEW memcache_session(memcache_addr);
-	session_ptr_ = session_;
-}
-
-HttpServlet::HttpServlet()
+HttpServlet::HttpServlet(void)
 {
 	init();
 
@@ -53,22 +31,43 @@ HttpServlet::HttpServlet()
 	res_         = NULL;
 	stream_      = NULL;
 	session_     = NULL;
-	session_ptr_ = NULL;
 }
 
-void HttpServlet::init()
+HttpServlet::HttpServlet(socket_stream* stream)
+: req_(NULL)
+, res_(NULL)
+, session_(NULL)
+, stream_(stream)
 {
-	first_             = true;
-	local_charset_[0]  = 0;
-	rw_timeout_        = 60;
-	parse_body_limit_  = 0;
+	init();
+}
+
+HttpServlet::HttpServlet(socket_stream* stream, session* session)
+: req_(NULL)
+, res_(NULL)
+, parse_body_(true)
+, session_(session)
+, stream_(stream)
+{
+	init();
+}
+
+HttpServlet::HttpServlet(socket_stream* stream, const char*)
+: req_(NULL)
+, res_(NULL)
+, session_(NULL)
+, stream_(stream)
+{
+	init();
 }
 
 HttpServlet::~HttpServlet(void)
 {
+	if (local_charset_) {
+		acl_myfree(local_charset_);
+	}
 	delete req_;
 	delete res_;
-	delete session_ptr_;
 }
 
 #define COPY(x, y) ACL_SAFE_STRNCPY((x), (y), sizeof((x)))
@@ -76,9 +75,13 @@ HttpServlet::~HttpServlet(void)
 HttpServlet& HttpServlet::setLocalCharset(const char* charset)
 {
 	if (charset && *charset) {
-		COPY(local_charset_, charset);
-	} else {
-		local_charset_[0] =0;
+		if (local_charset_) {
+			acl_myfree(local_charset_);
+		}
+		local_charset_ = acl_mystrdup(charset);
+	} else if (local_charset_) {
+		acl_myfree(local_charset_);
+		local_charset_ = NULL;
 	}
 	return *this;
 }
@@ -161,7 +164,7 @@ bool HttpServlet::start(void)
 	delete res_;
 
 	res_ = NEW HttpServletResponse(*out);
-	req_ = NEW HttpServletRequest(*res_, *session_, *in, local_charset_,
+	req_ = NEW HttpServletRequest(*res_, session_, *in, local_charset_,
 			parse_body_limit_);
 	req_->setParseBody(parse_body_);
 

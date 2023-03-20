@@ -15,8 +15,7 @@ class HttpServletResponse;
 /**
  * 处理 HTTP 客户端请求的基类，子类需要继承该类
  */
-class ACL_CPP_API HttpServlet : public noncopyable
-{
+class ACL_CPP_API HttpServlet : public noncopyable {
 public:
 	/**
 	 * 构造函数
@@ -27,17 +26,18 @@ public:
 	 * @param session {session*} 每一个 HttpServlet 对象一个 session 对象
 	 */
 	HttpServlet(socket_stream* stream, session* session);
+	HttpServlet(socket_stream* stream);
 
 	/**
-	 * 构造函数
+	 * 构造函数（该函数已经废弃，请用其它构造方法）
 	 * @param stream {socket_stream*} 当在 acl_master 服务器框架控制下
 	 *  运行时，该参数必须非空；当在 apache 下以 CGI 方式运行时，该参数
 	 *  设为 NULL；另外，该函数内部不会关闭流连接，应用应自行处理流对象
 	 *  的关闭情况，这样可以方便与 acl_master 架构结合
 	 * @param memcache_addr {const char*}
 	 */
-	HttpServlet(socket_stream* stream,
-		const char* memcache_addr = "127.0.0.1|11211");
+	//@ACL_DEPRECATED
+	HttpServlet(socket_stream* stream, const char* memcache_addr);
 
 	HttpServlet(void);
 	virtual ~HttpServlet(void) = 0;
@@ -210,13 +210,12 @@ protected:
 
 private:
 	session* session_;
-	session* session_ptr_;
 	socket_stream* stream_;
-	bool first_;
-	char local_charset_[32];
-	int  rw_timeout_;
-	int  parse_body_limit_;
-	bool try_old_ws_;
+	bool  first_;
+	char* local_charset_;
+	int   rw_timeout_;
+	int   parse_body_limit_;
+	bool  try_old_ws_;
 
 	void init();
 };

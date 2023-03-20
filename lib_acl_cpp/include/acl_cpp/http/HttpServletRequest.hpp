@@ -28,13 +28,12 @@ class HttpServletResponse;
  * 与 HTTP 客户端请求相关的类，该类不应被继承，用户也不需要
  * 定义或创建该类对象
  */
-class ACL_CPP_API HttpServletRequest : public noncopyable
-{
+class ACL_CPP_API HttpServletRequest : public noncopyable {
 public:
 	/**
 	 * 构造函数
 	 * @param res {HttpServletResponse&}
-	 * @param store {session&} 存储会话数据的对象
+	 * @param sess {session*} 存储会话数据的对象
 	 * @param stream {socket_stream&} 数据流，内部不会主动关闭流
 	 * @param charset {const char*} 本地字符集，该值非空时，
 	 *  内部会自动将 HTTP 请求的数据转换为本地字符集，否则不转换
@@ -42,7 +41,7 @@ public:
 	 *  类型时，此参数限制数据体的长度；当数据体为数据流或 MIME
 	 *  格式或 on 为 false，此参数无效
 	 */
-	HttpServletRequest(HttpServletResponse& res, session& store,
+	HttpServletRequest(HttpServletResponse& res, session* sess,
 		socket_stream& stream, const char* charset = NULL,
 		int body_limit = 102400);
 	~HttpServletRequest(void);
@@ -401,9 +400,9 @@ private:
 	dbuf_guard* dbuf_internal_;
 	dbuf_guard* dbuf_;
 	http_request_error_t req_error_;
-	char cookie_name_[64];
+	char* cookie_name_;
 	HttpServletResponse& res_;
-	session& store_;
+	session* sess_;
 	HttpSession* http_session_;
 	socket_stream& stream_;
 	int  body_limit_;
@@ -415,9 +414,9 @@ private:
 	http_method_t method_;
 	bool cgi_mode_;
 	http_ctype content_type_;
-	char localAddr_[32];
-	char remoteAddr_[32];
-	char localCharset_[32];
+	char* localAddr_;
+	char* remoteAddr_;
+	char* localCharset_;
 	int  rw_timeout_;
 	std::vector<HTTP_PARAM*> params_;
 	http_request_t request_type_;

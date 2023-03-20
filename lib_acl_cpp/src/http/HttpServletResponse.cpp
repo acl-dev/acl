@@ -15,8 +15,7 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
 HttpServletResponse::HttpServletResponse(socket_stream& stream)
 : stream_(stream)
