@@ -339,9 +339,11 @@ int acl_read_poll_wait(ACL_SOCKET fd, int delay)
 			if (acl_last_error() == ACL_EINTR) {
 				break;
 			}
+			/*
 			acl_msg_error("%s(%d), %s: poll error(%s), fd: %d",
 				__FILE__, __LINE__, myname,
 				acl_last_serror(), (int) fd);
+			*/
 			return -1;
 		case 0:
 			/*

@@ -409,8 +409,8 @@ bool websocket::read_frame_head(void)
 
 	if (client_.read(buf, 2) == -1) {
 		if (last_error() != ACL_ETIMEDOUT) {
-			logger_error("read first two char error: %d, %s",
-				last_error(), last_serror());
+			//logger_error("read first two char error: %d, %s",
+			//	last_error(), last_serror());
 		}
 		return false;
 	}

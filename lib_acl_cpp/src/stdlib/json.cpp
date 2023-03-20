@@ -448,7 +448,8 @@ json::json(const char* data /* NULL */, dbuf_guard* dbuf /* NULL */)
 	if (dbuf) {
 		dbuf_ = dbuf;
 	} else {
-		dbuf_ = dbuf_internal_ = NEW dbuf_guard;
+#define	JSON_DBUF_NBLOCK	1
+		dbuf_ = dbuf_internal_ = NEW dbuf_guard(JSON_DBUF_NBLOCK);
 	}
 
 	json_ = acl_json_dbuf_alloc(dbuf_->get_dbuf().get_dbuf());

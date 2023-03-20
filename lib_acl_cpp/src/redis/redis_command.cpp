@@ -39,7 +39,9 @@ void redis_command::init(void)
 	result_         = NULL;
 	pipe_msg_       = NULL;
 	addr_[0]        = 0;
-	dbuf_           = new dbuf_pool();
+
+#define	REDIS_DBUF_NBLOCK	1
+	dbuf_           = new (REDIS_DBUF_NBLOCK) dbuf_pool();
 }
 
 redis_command::redis_command(void)
