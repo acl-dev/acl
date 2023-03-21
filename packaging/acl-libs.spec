@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Mar 21 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-1-20230321.10
+- optimize: optimize fiber's performance by reducing the number of calling getting time;
+- optimize: optimize fiber's performance by using clock_gettimeofday replacing gettimeofday;
+- optimize: reduce objects' size of HTTP module by using COW(copy on write).
 
 * Wed Mar 08 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-0-20230308.11
 - feature: SSL module in acl including Openssl and MbedTLS supports multiple certificates in server side.
