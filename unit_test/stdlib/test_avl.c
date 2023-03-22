@@ -24,7 +24,14 @@ static int compare_fn(const void *v1, const void *v2)
 {
 	const MY_TYPE *m1 = (const MY_TYPE*) v1, *m2 = (const MY_TYPE*) v2;
 
-	return (strcmp(m1->name, m2->name));
+	int ret = strcmp(m1->name, m2->name);
+	if (ret < 0) {
+		return -1;
+	} else if (ret > 0) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 int test_avl_create(AUT_LINE *test_line acl_unused, void *arg acl_unused)

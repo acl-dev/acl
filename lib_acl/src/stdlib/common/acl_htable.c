@@ -46,7 +46,7 @@ static void *htable_iter_head(ACL_ITER *iter, ACL_HTABLE *table)
 		iter->data = NULL;
 		iter->key = NULL;
 	}
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* htable_iter_next */
@@ -61,7 +61,7 @@ static void *htable_iter_next(ACL_ITER *iter, ACL_HTABLE *table)
 		if (ptr != NULL) {
 			iter->data = ptr->value;
 			iter->key = ptr->key.c_key;
-			return (iter->ptr);
+			return iter->ptr;
 		}
 	}
 
@@ -79,7 +79,7 @@ static void *htable_iter_next(ACL_ITER *iter, ACL_HTABLE *table)
 		iter->data = NULL;
 		iter->key = NULL;
 	}
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* htable_iter_tail */
@@ -108,7 +108,7 @@ static void *htable_iter_tail(ACL_ITER *iter, ACL_HTABLE *table)
 		iter->data = NULL;
 		iter->key = NULL;
 	}
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* htable_iter_prev */
@@ -123,7 +123,7 @@ static void *htable_iter_prev(ACL_ITER *iter, ACL_HTABLE *table)
 		if (ptr != NULL) {
 			iter->data = ptr->value;
 			iter->key = ptr->key.c_key;
-			return (iter->ptr);
+			return iter->ptr;
 		}
 	}
 
@@ -141,14 +141,14 @@ static void *htable_iter_prev(ACL_ITER *iter, ACL_HTABLE *table)
 		iter->data = NULL;
 		iter->key = NULL;
 	}
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* htable_iter_info */
 
 static ACL_HTABLE_INFO *htable_iter_info(ACL_ITER *iter, struct ACL_HTABLE *table acl_unused)
 {
-	return (iter->ptr ? (ACL_HTABLE_INFO*) iter->ptr : NULL);
+	return iter->ptr ? (ACL_HTABLE_INFO*) iter->ptr : NULL;
 }
 
 /* __def_hash_fn - hash a string */
@@ -192,23 +192,27 @@ static int htable_size(ACL_HTABLE *table, unsigned size)
 
 	size |= 1;
 
-	if (table->slice)
+	if (table->slice) {
 		table->data = h = (ACL_HTABLE_INFO **)
 			acl_slice_pool_alloc(__FILE__, __LINE__, table->slice,
 					size * sizeof(ACL_HTABLE_INFO *));
-	else
+	} else {
 		table->data = h = (ACL_HTABLE_INFO **)
 			acl_mymalloc(size * sizeof(ACL_HTABLE_INFO *));
-	if(table->data == NULL)
-		return(-1);
+	}
+
+	if(table->data == NULL) {
+		return -1;
+	}
 
 	table->size = size;
 	table->used = 0;
 
-	while (size-- > 0)
+	while (size-- > 0) {
 		*h++ = 0;
+	}
 
-	return(0);
+	return 0;
 }
 
 /* htable_grow - extend existing table */
@@ -224,8 +228,9 @@ static int htable_grow(ACL_HTABLE *table)
 	unsigned n;
 
 	ret = htable_size(table, 2 * old_size);
-	if (ret < 0)
-		return(-1);
+	if (ret < 0) {
+		return -1;
+	}
 
 	while (old_size-- > 0) {
 		for (ht = *h0++; ht; ht = next) {
@@ -236,11 +241,13 @@ static int htable_grow(ACL_HTABLE *table)
 		}
 	}
 
-	if (table->slice)
+	if (table->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, old_entries);
-	else
+	} else {
 		acl_myfree(old_entries);
-	return(0);
+	}
+
+	return 0;
 }
 
 #define	_RWLOCK_TYPE	acl_pthread_mutex_t
@@ -257,44 +264,48 @@ static int __init_table_rwlock(ACL_HTABLE *table, int enable)
 	int   ret;
 
 	if (enable && table->rwlock == NULL) {
-		if (table->slice)
+		if (table->slice) {
 			table->rwlock = acl_slice_pool_calloc(__FILE__, __LINE__,
-						table->slice, 1, sizeof(_RWLOCK_TYPE));
-		else
+				table->slice, 1, sizeof(_RWLOCK_TYPE));
+		} else {
 			table->rwlock = acl_mycalloc(1, sizeof(_RWLOCK_TYPE));
+		}
+
 		if (table->rwlock == NULL) {
-			acl_msg_error("%s(%s): calloc error(%s)",
-				__FILE__, myname, acl_last_strerror(tbuf, sizeof(tbuf)));
-			return (-1);
+			acl_msg_error("%s(%s): calloc error(%s)", __FILE__,
+				myname, acl_last_strerror(tbuf, sizeof(tbuf)));
+			return -1;
 		}
 
 		ret = _RWLOCK_INIT(table->rwlock, NULL);
 		if (ret) {
-			acl_msg_error("%s(%d): init rwlock error(%s)",
-				__FILE__, __LINE__, acl_strerror(ret, tbuf, sizeof(tbuf)));
-			if (table->slice)
+			acl_msg_error("%s(%d): init rwlock error(%s)", __FILE__,
+				__LINE__, acl_strerror(ret, tbuf, sizeof(tbuf)));
+			if (table->slice) {
 				acl_slice_pool_free(__FILE__, __LINE__, table->rwlock);
-			else
+			} else {
 				acl_myfree(table->rwlock);
-			return (-1);
+			}
+			return -1;
 		}
 	} else if (!enable && table->rwlock) {
 		_RWLOCK_DESTROY(table->rwlock);
-		if (table->slice)
+		if (table->slice) {
 			acl_slice_pool_free(__FILE__, __LINE__, table->rwlock);
-		else
+		} else {
 			acl_myfree(table->rwlock);
+		}
 		table->rwlock = NULL;
 	}
 
-	return (0);
+	return 0;
 }
 
 /* acl_htable_create - create initial hash table */
 
 ACL_HTABLE *acl_htable_create(int size, unsigned int flag)
 {
-	return (acl_htable_create3(size, flag, NULL));
+	return acl_htable_create3(size, flag, NULL);
 }
 
 ACL_HTABLE *acl_htable_create3(int size, unsigned int flag, ACL_SLICE_POOL *slice)
@@ -305,13 +316,15 @@ ACL_HTABLE *acl_htable_create3(int size, unsigned int flag, ACL_SLICE_POOL *slic
 	if (slice) {
 		table = (ACL_HTABLE *) acl_slice_pool_calloc(__FILE__, __LINE__,
 				slice, 1, sizeof(ACL_HTABLE));
-		if (table == NULL)
-			return (NULL);
+		if (table == NULL) {
+			return NULL;
+		}
 		table->slice = slice;
 	} else {
 		table =	(ACL_HTABLE *) acl_mycalloc(1, sizeof(ACL_HTABLE));
-		if (table == NULL)
-			return (NULL);
+		if (table == NULL) {
+			return NULL;
+		}
 		table->slice = NULL;
 	}
 
@@ -320,10 +333,11 @@ ACL_HTABLE *acl_htable_create3(int size, unsigned int flag, ACL_SLICE_POOL *slic
 
 	ret = htable_size(table, size < 13 ? 13 : size);
 	if(ret < 0) {
-		if (table->slice)
+		if (table->slice) {
 			acl_slice_pool_free(__FILE__, __LINE__, table);
-		else
+		} else {
 			acl_myfree(table);
+		}
 		return(NULL);
 	}
 
@@ -338,40 +352,39 @@ ACL_HTABLE *acl_htable_create3(int size, unsigned int flag, ACL_SLICE_POOL *slic
 	if ((flag & ACL_HTABLE_FLAG_USE_LOCK)) {
 		ret = __init_table_rwlock(table, 1);
 		if (ret < 0) {
-			if (table->slice)
+			if (table->slice) {
 				acl_slice_pool_free(__FILE__, __LINE__, table);
-			else
+			} else {
 				acl_myfree(table);
-			return (NULL);
+			}
+			return NULL;
 		}
-	} else
+	} else {
 		table->rwlock = NULL;
+	}
 
-	return (table);
+	return table;
 }
 
 #ifdef ACL_BCB_COMPILER
 static void LOCK_TABLE_READ(const ACL_HTABLE *table)
 {
 	if (table->rwlock && _RWLOCK_RDLOCK(table->rwlock) != 0) {
-		acl_msg_fatal("%s(%d): read lock error",
-			__FILE__, __LINE__);
+		acl_msg_fatal("%s(%d): read lock error", __FILE__, __LINE__);
 	}
 }
 
 static void LOCK_TABLE_WRITE(const ACL_HTABLE *table)
 {
 	if (table->rwlock && _RWLOCK_WRLOCK(table->rwlock) != 0) {
-		acl_msg_fatal("%s(%d): write lock error",
-			__FILE__, __LINE__);
+		acl_msg_fatal("%s(%d): write lock error", __FILE__, __LINE__);
 	}
 }
 
 static void UNLOCK_TABLE(const ACL_HTABLE *table)
 {
 	if (table->rwlock && _RWLOCK_UNLOCK(table->rwlock) != 0) {
-		acl_msg_fatal("%s(%d): unlock error",
-			__FILE__, __LINE__);
+		acl_msg_fatal("%s(%d): unlock error", __FILE__, __LINE__);
 	}
 }
 #else
@@ -379,7 +392,7 @@ static void UNLOCK_TABLE(const ACL_HTABLE *table)
 	int   _ret; \
 	if (_table->rwlock && (_ret = _RWLOCK_RDLOCK(_table->rwlock))) { \
 		acl_msg_fatal("%s(%d): read lock error(%s)", \
-				__FILE__, __LINE__, strerror(_ret)); \
+			__FILE__, __LINE__, strerror(_ret)); \
 	} \
 } while (0)
 
@@ -387,7 +400,7 @@ static void UNLOCK_TABLE(const ACL_HTABLE *table)
 	int   _ret; \
 	if (_table->rwlock && (_ret = _RWLOCK_WRLOCK(_table->rwlock))) { \
 		acl_msg_fatal("%s(%d): write lock error(%s)", \
-				__FILE__, __LINE__, strerror(_ret)); \
+			__FILE__, __LINE__, strerror(_ret)); \
 	} \
 } while (0)
 
@@ -395,7 +408,7 @@ static void UNLOCK_TABLE(const ACL_HTABLE *table)
 	int   _ret; \
 	if (_table->rwlock && (_ret = _RWLOCK_UNLOCK(_table->rwlock))) { \
 		acl_msg_fatal("%s(%d): unlock error(%s)", \
-				__FILE__, __LINE__, strerror(_ret)); \
+			__FILE__, __LINE__, strerror(_ret)); \
 	} \
 } while (0)
 #endif
@@ -405,24 +418,28 @@ void acl_htable_ctl(ACL_HTABLE *table, int name, ...)
 	const char *myname = "acl_htable_ctl";
 	va_list ap;
 
-	if (table == NULL)
+	if (table == NULL) {
 		return;
+	}
 
 	va_start(ap, name);
 	for (; name != ACL_HTABLE_CTL_END; name = va_arg(ap, int)) {
 		switch (name) {
 		case ACL_HTABLE_CTL_HASH_FN:
 			table->hash_fn = va_arg(ap, ACL_HASH_FN);
-			if (table->hash_fn == NULL)
+			if (table->hash_fn == NULL) {
 				table->hash_fn = __def_hash_fn;
+			}
 			break;
 		case ACL_HTABLE_CTL_RWLOCK:
-			if (__init_table_rwlock(table, va_arg(ap, int)) < 0)
+			if (__init_table_rwlock(table, va_arg(ap, int)) < 0) {
 				acl_msg_fatal("%s: init rwlock error", myname);
+			}
 
 			break;
 		default:
 			acl_msg_fatal("%s: bad name %d", myname, name);
+			break;
 		}
 	}
 	va_end(ap);
@@ -430,15 +447,17 @@ void acl_htable_ctl(ACL_HTABLE *table, int name, ...)
 
 int acl_htable_errno(ACL_HTABLE *table)
 {
-	if (table == NULL)
-		return (ACL_HTABLE_STAT_INVAL);
-	return (table->status);
+	if (table == NULL) {
+		return ACL_HTABLE_STAT_INVAL;
+	}
+	return table->status;
 }
 
 void acl_htable_set_errno(ACL_HTABLE *table, int error)
 {
-	if (table)
+	if (table) {
 		table->status = error;
+	}
 }
 
 #define	STREQ(x,y) (x == y || (x[0] == y[0] && strcmp(x,y) == 0))
@@ -455,27 +474,29 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 	const char *key;
 
 #undef RETURN
-#define RETURN(x) do \
-{ \
+#define RETURN(x) do { \
 	if (keybuf) { \
-		if (table->slice) \
+		if (table->slice) { \
 			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
-		else \
+		} else { \
 			acl_myfree(keybuf); \
+		} \
 	} \
 	return (x); \
 } while (0)
 
 	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
+		if (table->slice) {
 			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key_in);
-		else
+		} else {
 			keybuf = acl_mystrdup(key_in);
+		}
 		acl_lowercase(keybuf);
 		key = keybuf;
-	} else
+	} else {
 		key = key_in;
+	}
 
 	table->status = ACL_HTABLE_STAT_OK;
 	hash = table->hash_fn(key, strlen(key));
@@ -498,30 +519,34 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 		}
 	}
 
-	if (table->slice)
+	if (table->slice) {
 		ht = (ACL_HTABLE_INFO*) acl_slice_pool_alloc(__FILE__, __LINE__,
 				table->slice, sizeof(ACL_HTABLE_INFO));
-	else
+	} else {
 		ht = (ACL_HTABLE_INFO *) acl_mymalloc(sizeof(ACL_HTABLE_INFO));
+	}
+
 	if (ht == NULL) {
 		acl_msg_error("%s(%d): alloc error", myname, __LINE__);
 		RETURN (NULL);
 	}
 
-	if ((table->flag & ACL_HTABLE_FLAG_KEY_REUSE))
+	if ((table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
 		ht->key.c_key = key;
-	else {
-		if (table->slice)
+	} else {
+		if (table->slice) {
 			ht->key.key = acl_slice_pool_strdup(__FILE__, __LINE__,
-						table->slice, key);
-		else
+				table->slice, key);
+		} else {
 			ht->key.key = acl_mystrdup(key);
+		}
 		if (ht->key.key == NULL) {
 			acl_msg_error("%s(%d): alloc error", myname, __LINE__);
-			if (table->slice)
+			if (table->slice) {
 				acl_slice_pool_free(__FILE__, __LINE__, ht);
-			else
+			} else {
 				acl_myfree(ht);
+			}
 			RETURN (NULL);
 		}
 	}
@@ -532,8 +557,8 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 	RETURN (ht);
 }
 
-int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
-	void (*callback)(ACL_HTABLE_INFO *ht, void *arg), void *arg)
+ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
+	const char *key_in, void *value)
 {
 	const char *myname = "acl_htable_enter_r";
 	ACL_HTABLE_INFO *ht;
@@ -543,27 +568,29 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 	const char *key;
 
 #undef RETURN
-#define RETURN(x) do \
-{ \
+#define RETURN(x) do { \
 	if (keybuf) { \
-		if (table->slice) \
+		if (table->slice) { \
 			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
-		else \
+		} else { \
 			acl_myfree(keybuf); \
+		} \
 	} \
 	return (x); \
 } while (0)
 
 	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
+		if (table->slice) {
 			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key_in);
-		else
+		} else {
 			keybuf = acl_mystrdup(key_in);
+		}
 		acl_lowercase(keybuf);
 		key = keybuf;
-	} else
+	} else {
 		key = key_in;
+	}
 
 	hash = table->hash_fn(key, strlen(key));
 
@@ -574,7 +601,7 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 		ret = htable_grow(table);
 		if(ret < 0) {
 			UNLOCK_TABLE(table);
-			RETURN (-1);
+			RETURN (NULL);
 		}
 	}
 
@@ -585,37 +612,33 @@ int acl_htable_enter_r(ACL_HTABLE *table, const char *key_in, void *value,
 			acl_msg_info("%s(%d): duplex key(%s) exist",
 				myname, __LINE__, key);
 			table->status = ACL_HTABLE_STAT_DUPLEX_KEY;
-			if (callback)
-				callback(ht, arg);
 			UNLOCK_TABLE(table);
-			RETURN (0);
+			RETURN (ht);
 		}
 	}
 
-	if (table->slice)
+	if (table->slice) {
 		ht = (ACL_HTABLE_INFO*) acl_slice_pool_alloc(__FILE__, __LINE__,
 				table->slice, sizeof(ACL_HTABLE_INFO));
-	else
+	} else {
 		ht = (ACL_HTABLE_INFO *) acl_mymalloc(sizeof(ACL_HTABLE_INFO));
+	}
 
-	if ((table->flag & ACL_HTABLE_FLAG_KEY_REUSE))
+	if ((table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
 		ht->key.c_key = key;
-	else if (table->slice)
+	} else if (table->slice) {
 		ht->key.key = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key);
-	else
+	} else {
 		ht->key.key = acl_mystrdup(key);
+	}
 
 	ht->hash  = hash;
 	ht->value = value;
 	htable_link(table, ht, n);
 
-	if (callback)
-		callback(ht, arg);
-
 	UNLOCK_TABLE(table);
-
-	RETURN (0);
+	RETURN (ht);
 }
 /* acl_htable_find - lookup value */
 
@@ -626,8 +649,7 @@ void *acl_htable_find(ACL_HTABLE *table, const char *key)
 	return ht != NULL ? ht->value : NULL;
 }
 
-int  acl_htable_find_r(ACL_HTABLE *table, const char *key_in,
-	void (*callback)(void *value, void *arg), void *arg)
+void *acl_htable_find_r(ACL_HTABLE *table, const char *key_in)
 {
 	ACL_HTABLE_INFO *ht;
 	unsigned  n;
@@ -635,27 +657,29 @@ int  acl_htable_find_r(ACL_HTABLE *table, const char *key_in,
 	const char *key;
 
 #undef RETURN
-#define RETURN(x) do \
-{ \
+#define RETURN(x) do { \
 	if (keybuf) { \
-		if (table->slice) \
+		if (table->slice) { \
 			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
-		else \
+		} else { \
 			acl_myfree(keybuf); \
+		} \
 	} \
 	return (x); \
 } while (0)
 
 	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
+		if (table->slice) {
 			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key_in);
-		else
+		} else {
 			keybuf = acl_mystrdup(key_in);
+		}
 		acl_lowercase(keybuf);
 		key = keybuf;
-	} else
+	} else {
 		key = key_in;
+	}
 
 	n = table->hash_fn(key, strlen(key));
 
@@ -665,16 +689,15 @@ int  acl_htable_find_r(ACL_HTABLE *table, const char *key_in,
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
-			if (callback)
-				callback(ht->value, arg);
+			void *value = ht->value;
 
 			if (!(table->flag & ACL_HTABLE_FLAG_MSLOOK)) {
 				UNLOCK_TABLE(table);
-				RETURN (0);
+				RETURN (value);
 			}
 			if (ht == table->data[n]) {
 				UNLOCK_TABLE(table);
-				RETURN (0);
+				RETURN (value);
 			}
 			if (ht->next) {
 				ht->prev->next = ht->next;
@@ -688,13 +711,12 @@ int  acl_htable_find_r(ACL_HTABLE *table, const char *key_in,
 			table->data[n] = ht;
 
 			UNLOCK_TABLE(table);
-			RETURN (0);
+			RETURN (value);
 		}
 	}
 
 	UNLOCK_TABLE(table);
-
-	RETURN (-1);
+	RETURN (NULL);
 }
 
 /* acl_htable_locate - lookup entry */
@@ -707,27 +729,29 @@ ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key_in)
 	const char *key;
 
 #undef RETURN
-#define RETURN(x) do \
-{ \
+#define RETURN(x) do { \
 	if (keybuf) { \
-		if (table->slice) \
+		if (table->slice) { \
 			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
-		else \
+		} else { \
 			acl_myfree(keybuf); \
+		} \
 	} \
 	return (x); \
 } while (0)
 
 	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
+		if (table->slice) {
 			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key_in);
-		else
+		} else {
 			keybuf = acl_mystrdup(key_in);
+		}
 		acl_lowercase(keybuf);
 		key = keybuf;
-	} else
+	} else {
 		key = key_in;
+	}
 
 	n = table->hash_fn(key, strlen(key));
 
@@ -735,10 +759,12 @@ ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key_in)
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
-			if (!(table->flag & ACL_HTABLE_FLAG_MSLOOK))
+			if (!(table->flag & ACL_HTABLE_FLAG_MSLOOK)) {
 				RETURN (ht);
-			if (ht == table->data[n])
+			}
+			if (ht == table->data[n]) {
 				RETURN (ht);
+			}
 			if (ht->next) {
 				ht->prev->next = ht->next;
 				ht->next->prev = ht->prev;
@@ -756,8 +782,7 @@ ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key_in)
 	RETURN (NULL);
 }
 
-int acl_htable_locate_r(ACL_HTABLE *table, const char *key_in,
-	void (*callback)(ACL_HTABLE_INFO *ht, void *arg), void *arg)
+ACL_HTABLE_INFO *acl_htable_locate_r(ACL_HTABLE *table, const char *key_in)
 {
 	ACL_HTABLE_INFO *ht;
 	unsigned  n;
@@ -765,8 +790,7 @@ int acl_htable_locate_r(ACL_HTABLE *table, const char *key_in,
 	const char *key;
 
 #undef RETURN
-#define RETURN(x) do \
-{ \
+#define RETURN(x) do { \
 	if (keybuf) { \
 		if (table->slice) \
 			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
@@ -777,15 +801,17 @@ int acl_htable_locate_r(ACL_HTABLE *table, const char *key_in,
 } while (0)
 
 	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
+		if (table->slice) {
 			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key_in);
-		else
+		} else {
 			keybuf = acl_mystrdup(key_in);
+		}
 		acl_lowercase(keybuf);
 		key = keybuf;
-	} else
+	} else {
 		key = key_in;
+	}
 
 	n = table->hash_fn(key, strlen(key));
 
@@ -795,16 +821,14 @@ int acl_htable_locate_r(ACL_HTABLE *table, const char *key_in,
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
-			if (callback)
-				callback(ht, arg);
 			UNLOCK_TABLE(table);
-			RETURN (0);
+			RETURN (ht);
 		}
 	}
 
 	UNLOCK_TABLE(table);
 
-	RETURN (-1);
+	RETURN (NULL);
 }
 
 void acl_htable_delete_entry(ACL_HTABLE *table, ACL_HTABLE_INFO *ht,
@@ -812,24 +836,32 @@ void acl_htable_delete_entry(ACL_HTABLE *table, ACL_HTABLE_INFO *ht,
 {
 	ACL_HTABLE_INFO **h = table->data + ht->hash % table->size;
 
-	if (ht->next)
+	if (ht->next) {
 		ht->next->prev = ht->prev;
-	if (ht->prev)
-		ht->prev->next = ht->next;
-	else
-		*h = ht->next;
-	if (!(table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
-		if (table->slice)
-			acl_slice_pool_free(__FILE__, __LINE__, ht->key.key);
-		else
-			acl_myfree(ht->key.key);
 	}
-	if (free_fn && ht->value)
+	if (ht->prev) {
+		ht->prev->next = ht->next;
+	} else {
+		*h = ht->next;
+	}
+
+	if (!(table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
+		if (table->slice) {
+			acl_slice_pool_free(__FILE__, __LINE__, ht->key.key);
+		} else {
+			acl_myfree(ht->key.key);
+		}
+	}
+
+	if (free_fn && ht->value) {
 		(*free_fn) (ht->value);
-	if (table->slice)
+	}
+
+	if (table->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, ht);
-	else
+	} else {
 		acl_myfree(ht);
+	}
 	table->used--;
 }
 
@@ -845,27 +877,29 @@ int acl_htable_delete(ACL_HTABLE *table, const char *key_in,
 	const char *key;
 
 #undef RETURN
-#define RETURN(x) do \
-{ \
+#define RETURN(x) do { \
 	if (keybuf) { \
-		if (table->slice) \
+		if (table->slice) { \
 			acl_slice_pool_free(__FILE__, __LINE__, keybuf); \
-		else \
+		} else { \
 			acl_myfree(keybuf); \
+		} \
 	} \
 	return (x); \
 } while (0)
 
 	if ((table->flag & ACL_HTABLE_FLAG_KEY_LOWER)) {
-		if (table->slice)
+		if (table->slice) {
 			keybuf = acl_slice_pool_strdup(__FILE__, __LINE__,
 					table->slice, key_in);
-		else
+		} else {
 			keybuf = acl_mystrdup(key_in);
+		}
 		acl_lowercase(keybuf);
 		key = keybuf;
-	} else
+	} else {
 		key = key_in;
+	}
 
 	n = table->hash_fn(key, strlen(key));
 
@@ -899,38 +933,47 @@ void acl_htable_free(ACL_HTABLE *table, void (*free_fn) (void *))
 		for (ht = *h++; ht; ht = next) {
 			next = ht->next;
 			if (!(table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
-				if (table->slice)
+				if (table->slice) {
 					acl_slice_pool_free(__FILE__, __LINE__,
 						ht->key.key);
-				else
+				} else {
 					acl_myfree(ht->key.key);
+				}
 			}
-			if (free_fn && ht->value)
+
+			if (free_fn && ht->value) {
 				(*free_fn) (ht->value);
-			if (table->slice)
+			}
+
+			if (table->slice) {
 				acl_slice_pool_free(__FILE__, __LINE__, ht);
-			else
+			} else {
 				acl_myfree(ht);
+			}
 		}
 	}
 
-	if (table->slice)
+	if (table->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, table->data);
-	else
+	} else {
 		acl_myfree(table->data);
+	}
+
 	table->data = 0;
 	if (table->rwlock) {
 		_RWLOCK_DESTROY(table->rwlock);
-		if (table->slice)
+		if (table->slice) {
 			acl_slice_pool_free(__FILE__, __LINE__, table->rwlock);
-		else
+		} else {
 			acl_myfree(table->rwlock);
+		}
 	}
 
-	if (table->slice)
+	if (table->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, table);
-	else
+	} else {
 		acl_myfree(table);
+	}
 }
 
 int acl_htable_reset(ACL_HTABLE *table, void (*free_fn) (void *))
@@ -949,27 +992,36 @@ int acl_htable_reset(ACL_HTABLE *table, void (*free_fn) (void *))
 		for (ht = *h++; ht; ht = next) {
 			next = ht->next;
 			if (!(table->flag & ACL_HTABLE_FLAG_KEY_REUSE)) {
-				if (table->slice)
-					acl_slice_pool_free(__FILE__, __LINE__, ht->key.key);
-				else
+				if (table->slice) {
+					acl_slice_pool_free(__FILE__, __LINE__,
+						ht->key.key);
+				} else {
 					acl_myfree(ht->key.key);
+				}
 			}
-			if (free_fn && ht->value)
+
+			if (free_fn && ht->value) {
 				(*free_fn) (ht->value);
-			if (table->slice)
+			}
+
+			if (table->slice) {
 				acl_slice_pool_free(__FILE__, __LINE__, ht);
-			else
+			} else {
 				acl_myfree(ht);
+			}
 		}
 	}
-	if (table->slice)
+
+	if (table->slice) {
 		acl_slice_pool_free(__FILE__, __LINE__, table->data);
-	else
+	} else {
 		acl_myfree(table->data);
+	}
+
 	ret = htable_size(table, table->init_size < 13 ? 13 : table->init_size);
 
 	UNLOCK_TABLE(table);
-	return (ret);
+	return ret;
 }
 
 const ACL_HTABLE_INFO *acl_htable_iter_head(ACL_HTABLE *table, ACL_HTABLE_ITER *iter)
@@ -986,15 +1038,16 @@ const ACL_HTABLE_INFO *acl_htable_iter_head(ACL_HTABLE *table, ACL_HTABLE_ITER *
 		}
 	}
 
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 const ACL_HTABLE_INFO *acl_htable_iter_next(ACL_HTABLE_ITER *iter)
 {
 	if (iter->ptr) {
 		iter->ptr = iter->ptr->next;
-		if (iter->ptr != NULL)
-			return (iter->ptr);
+		if (iter->ptr != NULL) {
+			return iter->ptr;
+		}
 	}
 
 	for (iter->i++; iter->i < iter->size; iter->i++) {
@@ -1004,7 +1057,7 @@ const ACL_HTABLE_INFO *acl_htable_iter_next(ACL_HTABLE_ITER *iter)
 		}
 	}
 
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 const ACL_HTABLE_INFO *acl_htable_iter_tail(ACL_HTABLE *table, ACL_HTABLE_ITER *iter)
@@ -1021,15 +1074,16 @@ const ACL_HTABLE_INFO *acl_htable_iter_tail(ACL_HTABLE *table, ACL_HTABLE_ITER *
 		}
 	}
 
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter)
 {
 	if (iter->ptr) {
 		iter->ptr = iter->ptr->next;
-		if (iter->ptr != NULL)
-			return (iter->ptr);
+		if (iter->ptr != NULL) {
+			return iter->ptr;
+		}
 	}
 
 	for (iter->i--; iter->i >= 0; iter->i--) {
@@ -1039,7 +1093,7 @@ const ACL_HTABLE_INFO *acl_htable_iter_prev(ACL_HTABLE_ITER *iter)
 		}
 	}
 
-	return (iter->ptr);
+	return iter->ptr;
 }
 
 /* acl_htable_walk - iterate over hash table */
@@ -1051,31 +1105,35 @@ void acl_htable_walk(ACL_HTABLE *table, void (*action)(ACL_HTABLE_INFO *, void *
 	ACL_HTABLE_INFO *ht;
 
 	LOCK_TABLE_READ(table);
-	while (i-- > 0)
-		for (ht = *h++; ht; ht = ht->next)
+	while (i-- > 0) {
+		for (ht = *h++; ht; ht = ht->next) {
 			(*action) (ht, arg);
+		}
+	}
 	UNLOCK_TABLE(table);
 }
 
 int acl_htable_size(const ACL_HTABLE *table)
 {
-	if (table)
-		return (table->size);
-	else
-		return (0);
+	if (table) {
+		return table->size;
+	} else {
+		return 0;
+	}
 }
 
 int acl_htable_used(const ACL_HTABLE *table)
 {
-	if (table)
-		return (table->used);
-	else
-		return (0);
+	if (table) {
+		return table->used;
+	} else {
+		return 0;
+	}
 }
 
 ACL_HTABLE_INFO **acl_htable_data(ACL_HTABLE *table)
 {
-	return ((ACL_HTABLE_INFO**) table->data);
+	return (ACL_HTABLE_INFO**) table->data;
 }
 
 /* acl_htable_list - list all table members */
@@ -1089,14 +1147,17 @@ ACL_HTABLE_INFO **acl_htable_list(const ACL_HTABLE *table)
 
 	if (table != 0) {
 		list = (ACL_HTABLE_INFO **) acl_mymalloc(sizeof(*list) * (table->used + 1));
-		for (i = 0; i < table->size; i++)
-			for (member = table->data[i]; member != 0; member = member->next)
+		for (i = 0; i < table->size; i++) {
+			for (member = table->data[i]; member != 0; member = member->next) {
 				list[count++] = member;
+			}
+		}
 	} else {
 		list = (ACL_HTABLE_INFO **) acl_mymalloc(sizeof(*list));
 	}
+
 	list[count] = 0;
-	return (list);
+	return list;
 }
 
 void acl_htable_stat(const ACL_HTABLE *table)
@@ -1109,10 +1170,12 @@ void acl_htable_stat(const ACL_HTABLE *table)
 	for(i = 0; i < table->size; i++) {
 		count = 0;
 		member = table->data[i];
-		for(; member != 0; member = member->next)
+		for(; member != 0; member = member->next) {
 			count++;
-		if(count > 0)
+		}
+		if(count > 0) {
 			printf("chains[%d]: count[%d]\n", i, count);
+		}
 	}
 
 	printf("hash stat all values for each key:\n");
@@ -1120,8 +1183,9 @@ void acl_htable_stat(const ACL_HTABLE *table)
 		member = table->data[i];
 		if(member) {
 			printf("chains[%d]: ", i);
-			for(; member != 0; member = member->next)
+			for(; member != 0; member = member->next) {
 				printf("[%s]", member->key.c_key);
+			}
 			printf("\n");
 		}
 	}

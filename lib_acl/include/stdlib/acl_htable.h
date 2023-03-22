@@ -146,14 +146,12 @@ ACL_API ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table,
  * @param key 键, 在函数内部会复制此 key 键
  * @param value 用户自己的特定数据项(可以由类型硬转化而来, 但是此数据项必须
  *  不能堆栈变量)
- * @param callback 如果该函数指针不为空，则当添加成功后便调用该函数
- * @param arg callback 的参数之一
- * @return {int} 0 表示 添加成功，-1 表示添加失败
+ * @return 所分配的哈希表项的指针, == NULL: 表示内部分配内存出错, 为严重的错误
  *  注：如果在添加时该哈希争键存在，则返回已经存在的哈希项，使用者应该通过调用
  *  acl_htable_last_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
  */
-ACL_API int acl_htable_enter_r(ACL_HTABLE *table, const char *key, void *value,
-		void (*callback)(ACL_HTABLE_INFO *ht, void *arg), void *arg);
+ACL_API ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
+		const char *key, void *value);
 
 /**
  * 由所给的 key 键查寻某一特定哈希项
@@ -169,13 +167,10 @@ ACL_API ACL_HTABLE_INFO *acl_htable_locate(ACL_HTABLE *table, const char *key);
  * 函数内部会自动保证互斥操作
  * @param table 哈希表指针
  * @param key 键
- * @param callback 查到所要求的键值后如果该指针非空则调用之
- * @param arg callback 参数之一
  * @return 不为空指针: 表示查到了对应于 key 键的哈希项
  *         为空: 表示未查到对应于 key 键的哈希项
  */
-ACL_API int acl_htable_locate_r(ACL_HTABLE *table, const char *key,
-		void (*callback)(ACL_HTABLE_INFO *ht, void *arg), void *arg);
+ACL_API ACL_HTABLE_INFO *acl_htable_locate_r(ACL_HTABLE *table, const char *key);
 
 /**
  * 由所给的 key 键查寻用户的数据项
@@ -191,13 +186,10 @@ ACL_API void *acl_htable_find(ACL_HTABLE *table, const char *key);
  * 函数内部会自动保证互斥操作
  * @param table 哈希表指针
  * @param key 键
- * @param callback 当查到所要求的键值后，如果该函数指针不为空则调用之
- * @param arg callback 的参数之一
  * @return 不为空: 表示查到了对应于 key 键的数据项, 用户可以根据用户自己的
  *  数据类型进行转换; 为空: 表示未查到对应于 key 键的数据项
  */
-ACL_API int  acl_htable_find_r(ACL_HTABLE *table, const char *key,
-		void (*callback)(void *value, void *arg), void *arg);
+ACL_API void *acl_htable_find_r(ACL_HTABLE *table, const char *key);
 
 /**
  * 根据所给的 key 键删除某一哈希项

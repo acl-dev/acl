@@ -156,14 +156,16 @@ static void __htable_rwlock_fn(void *arg)
 */
 
 	ACL_SAFE_STRNCPY(thr_ctx->key, key, sizeof(thr_ctx->key));
-	if (acl_htable_enter_r(ctx->table, key, (char *) thr_ctx, NULL, NULL) == -1)
+	if (acl_htable_enter_r(ctx->table, key, (char *) thr_ctx) == NULL) {
 		acl_msg_fatal("insert into htable error(%s), key(%s)",
 				strerror(errno), key);
+	}
 
 	printf("search key: %s\n", key);
-	thr_ctx = (__THR_CTX *) acl_htable_find(ctx->table, key);
-	if (thr_ctx == NULL)
+	thr_ctx = (__THR_CTX *) acl_htable_find_r(ctx->table, key);
+	if (thr_ctx == NULL) {
 		acl_msg_fatal("%s: not find key(%s)", myname, key);
+	}
 	printf("ok, add and find, key=%s\n", key);
 }
 
@@ -180,7 +182,7 @@ int test_htable_rwlock(AUT_LINE *test_line, void *arg acl_unused)
 	hash_fn = __get_hash_fn(ptr);
 
 	__rwlock_ctx.test_line = test_line;
-	__rwlock_ctx.table = acl_htable_create(10, 0);
+	__rwlock_ctx.table = acl_htable_create(10, ACL_HTABLE_FLAG_USE_LOCK);
 
 	acl_htable_ctl(__rwlock_ctx.table,
 			ACL_HTABLE_CTL_RWLOCK, TRUE,
