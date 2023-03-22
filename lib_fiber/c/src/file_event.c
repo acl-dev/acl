@@ -59,6 +59,10 @@ FILE_EVENT *file_event_alloc(socket_t fd)
 
 static void file_event_free(FILE_EVENT *fe)
 {
+	if (fe->mbox_wsem) {
+		acl_fiber_sem_free(fe->mbox_wsem);
+	}
+
 	memset(fe, 0, sizeof(*fe));
 	mem_free(fe);
 }

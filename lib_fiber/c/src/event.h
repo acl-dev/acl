@@ -294,7 +294,10 @@ struct FILE_EVENT {
 	struct __kernel_timespec wts;
 	int           r_timeout;
 	int           w_timeout;
+
 #endif
+
+	ACL_FIBER_SEM* mbox_wsem; // Used in sync_waiter_wakeup.c
 
 #ifdef HAS_IOCP
 	char          packet[512];  // Just for UDP packet

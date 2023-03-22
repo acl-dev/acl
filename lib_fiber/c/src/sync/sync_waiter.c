@@ -102,13 +102,40 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		// to send data, because the fd is shared by multiple threads
 		// and which can't use io_uring directly, so we set the mask
 		// as EVENT_SYSIO to use system write API.
+
 		socket_t out = mbox_out(waiter->box);
-		FILE_EVENT *fe = fiber_file_cache_get(out);
+
+		// If the FILE_EVENT got from fiber_file_get() isn't NULL,
+		// there must be one fiber suspended due to write waiting
+		// with the waiter->box fd. And the current fiber must
+		// wait for the previous fiber to return and release the sem.
+
+		FILE_EVENT *fe = fiber_file_get(out);
+
+		if (fe == NULL) {
+			fe = fiber_file_cache_get(out);
+			// COW(Copy on write) to avoid unnecessary waste:
+			// alloc sem binding the fe if necessary.
+			if (fe->mbox_wsem == NULL) {
+				fe->mbox_wsem = acl_fiber_sem_create(1);
+			}
+		} else {
+			assert(fe->mbox_wsem);
+		}
+
+		// Reduce the sem number and maybe be suspended if sem is 0.
+		acl_fiber_sem_wait(fe->mbox_wsem);
 
 		fe->mask |= EVENT_SYSIO;
 
+		// The fe mabye be used again in mbox_send->acl_fiber_write
+		// ->fiber_file_open_write->fiber_file_get.
 		mbox_send(waiter->box, fb);
-		fiber_file_cache_put(fe);
+
+		// If no other fiber is suspended by the sem, then release it.
+		if (acl_fiber_sem_post(fe->mbox_wsem) == 1) {
+			fiber_file_cache_put(fe);
+		}
 	} else {
 		mbox_send(waiter->box, fb);
 	}
