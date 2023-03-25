@@ -359,6 +359,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\websocket.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\stdafx.cpp"
 				>
 				<FileConfiguration
@@ -410,6 +414,10 @@
 			</File>
 			<File
 				RelativePath=".\master_service.h"
+				>
+			</File>
+			<File
+				RelativePath=".\websocket.h"
 				>
 			</File>
 			<File

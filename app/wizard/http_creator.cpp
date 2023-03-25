@@ -40,6 +40,8 @@ static bool create_threads(file_tmpl& tmpl)
 		{ "http_service.h",	"http_service.h"	},
 		{ "http_service.cpp",	"http_service.cpp"	},
 		{ "http_servlet.h",	"http_servlet.h"	},
+		{ "websocket.cpp",	"websocket.cpp"		},
+		{ "websocket.h",	"websocket.h"		},
 
 		{ NULL, NULL }
 	};
@@ -63,6 +65,8 @@ static bool create_fiber(file_tmpl& tmpl)
 		{ "http_service.h",	"http_service.h"	},
 		{ "http_service.cpp",	"http_service.cpp"	},
 		{ "http_servlet.h",	"http_servlet.h"	},
+		{ "websocket.cpp",	"websocket.cpp"		},
+		{ "websocket.h",	"websocket.h"		},
 
 		{ NULL, NULL }
 	};
@@ -89,6 +93,8 @@ static bool create_proc(file_tmpl& tmpl)
 		{ "http_service.h",	"http_service.h"	},
 		{ "http_service.cpp",	"http_service.cpp"	},
 		{ "http_servlet.h",	"http_servlet.h"	},
+		{ "websocket.cpp",	"websocket.cpp"		},
+		{ "websocket.h",	"websocket.h"		},
 
 		{ NULL, NULL }
 	};

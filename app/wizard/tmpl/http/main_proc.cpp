@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "master_service.h"
 #include "http_service.h"
+#include "websocket.h"
 
 #if __cplusplus >= 201103L	// Support c++11 ?
 # define USE_LAMBDA
@@ -118,8 +119,11 @@ int main(int argc, char* argv[])
 			buf.format("Default(%s): hello world!\r\n", path);
 			res.setContentLength(buf.size());
 			return res.write(buf);
+		}).Websocket("/", [](HttpRequest& req, HttpResponse& res) {
+			return wesocket_run(req, res);
 		});
 #else
+		.Websocket("/", wesocket_run)
 		.Default(http_get_default);
 #endif
 
