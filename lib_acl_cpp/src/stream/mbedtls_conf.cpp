@@ -707,6 +707,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 	(void) verify_mode;
 	(void) server_side_;
 	(void) status_;
+	(void) conf_count_;
 	(void) conf_table_;
 	(void) conf_;
 	(void) entropy_;

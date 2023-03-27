@@ -1,4 +1,6 @@
 cmake_minimum_required(VERSION 3.2.0)
+project(acl_cpp)
+
 #set(CMAKE_BUILD_TYPE Release)
 #set(CMAKE_BUILD_TYPE Release CACHE STRING "set build type to release")
 
@@ -67,12 +69,14 @@ set(mysql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/mysql)
 set(pgsql_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/pgsql)
 set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
 set(polarssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+set(openssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/openssl-1.1.1q)
 
 include_directories(#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 	${mysql_include}
 	${pgsql_include}
 	${sqlite_include}
 	${polarssl_include}
+	${openssl_include}
 	${acl_include}
 	${proto_include}
 	${CMAKE_CURRENT_SOURCE_DIR}/src
@@ -197,7 +201,6 @@ if (${UNIX_OS})
 		message(STATUS "HAS_MBEDTLS_DLL been set, mbedtls enable!")
 	elseif (HAS_OPENSSL_DLL MATCHES "YES")
 		add_definitions("-DHAS_OPENSSL_DLL")
-		add_definitions("-I../include/openssl-1.1.1q")
 		message(STATUS "HAS_OPENSSL_DLL been set, openssl enable!")
 	else()
 		message(STATUS "SSL disable!")

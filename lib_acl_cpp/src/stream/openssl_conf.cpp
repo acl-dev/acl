@@ -550,6 +550,7 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 	}
 #else
 	status_ = CONF_INIT_ERR;
+	(void) timeout_;
 	logger_error("HAS_OPENSSL not defined!");
 #endif // HAS_OPENSSL
 
