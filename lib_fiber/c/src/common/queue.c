@@ -122,7 +122,7 @@ static int queue_wait(QUEUE *que, const struct timespec *ptimeo)
 			status = pthread_cond_wait(&que->cond, &que->lock);
 		}
 
-		if (ptimeo && status == ETIMEDOUT) {
+		if (ptimeo && status == FIBER_ETIME) {
 			status = pthread_mutex_unlock(&que->lock);
 			if (status != 0) {
 				msg_error("%s(%d): unlock error(%s)",

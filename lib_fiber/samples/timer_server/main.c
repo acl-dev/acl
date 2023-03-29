@@ -19,12 +19,12 @@ static void io_timer(ACL_FIBER *fiber, void *ctx)
 
 	assert(fiber == ft->timer);
 
-	acl_fiber_set_errno(ft->fiber, ETIMEDOUT);
+	acl_fiber_set_errno(ft->fiber, FIBER_ETIME);
 	acl_fiber_keep_errno(ft->fiber, 1);
 
 	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
 		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
-		ETIMEDOUT, acl_fiber_errno(ft->fiber));
+		FIBER_ETIME, acl_fiber_errno(ft->fiber));
 
 	acl_fiber_ready(ft->fiber);
 }
@@ -54,7 +54,7 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 				acl_last_serror(), errno, acl_fiber_errno(fiber),
 				SOCK(cstream), count);
 
-			if (errno != ETIMEDOUT)
+			if (errno != FIBER_ETIME)
 				break;
 
 			if (++ntimeout > 2)

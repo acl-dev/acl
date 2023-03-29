@@ -158,7 +158,7 @@ static bool client_login(user_client* uc)
 			printf("%s(%d): gets error %s\r\n",
 				__FUNCTION__, __LINE__, acl::last_serror());
 
-			if (errno == ETIMEDOUT)
+			if (errno == FIBER_ETIME)
 			{
 				printf("Login timeout\r\n");
 				uc->get_stream().write("Login timeout\r\n");
@@ -311,7 +311,7 @@ static void fiber_reader(user_client* client)
 				break;
 			}
 
-			if (errno == ETIMEDOUT)
+			if (errno == FIBER_ETIME)
 			{
 				if (conn.write("ping\r\n") == -1)
 				{

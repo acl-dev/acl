@@ -230,7 +230,7 @@ int acl_read_epoll_wait(ACL_SOCKET fd, int delay)
 			if (delay == 0) {
 				acl_set_error(ACL_EAGAIN);
 			} else {
-				acl_set_error(ACL_ETIME);
+				acl_set_error(ACL_ETIMEDOUT);
 			}
 			ret = -1;
 			break;

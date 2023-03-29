@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 #include "fiber/lib_fiber.hpp"
+#include "fiber/go_fiber.hpp"
 #include "stamp.h"
 #include "user_client.h"
 
@@ -93,8 +94,8 @@ static void fiber_reader(user_client* client)
 			break;
 		}
 
-		if (errno == ETIMEDOUT)
-			printf("ETIMEDOUT\r\n");
+		if (errno == FIBER_ETIME)
+			printf("FIBER_ETIME\r\n");
 		else if (errno == EAGAIN)
 			printf("EAGAIN\r\n");
 		else {
