@@ -59,8 +59,8 @@ bool mqtt_client::send(mqtt_message& message) {
 	}
 
 	if (conn_->write(buff) == -1) {
-		conn_->close();
-		logger_error("send message error=%s", last_serror());
+		//conn_->close();
+		//logger_error("send message error=%s", last_serror());
 		return false;
 	}
 
@@ -71,8 +71,8 @@ mqtt_message* mqtt_client::get_message(void) {
 	mqtt_header header(MQTT_RESERVED_MIN);
 
 	if (!read_header(header)) {
-		conn_->close();
-		logger_error("get header error");
+		//conn_->close();
+		//logger_error("get header error");
 		return NULL;
 	}
 
@@ -92,7 +92,7 @@ mqtt_message* mqtt_client::get_message(void) {
 bool mqtt_client::read_header(mqtt_header& header) {
 	char ch;
 	if (!conn_->read(ch)) {
-		logger_error("read header type error: %s", last_serror());
+		//logger_error("read header type error: %s", last_serror());
 		return false;
 	}
 
