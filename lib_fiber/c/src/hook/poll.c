@@ -379,9 +379,11 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 				pe->nready = -1;
 			}
 
+#if 0
 			msg_info("%s(%d), %s: fiber-%u was killed, %s, timeout=%d",
 				__FILE__, __LINE__, __FUNCTION__,
 				acl_fiber_id(pe->fiber), last_serror(), timeout);
+#endif
 			break;
 		}
 
