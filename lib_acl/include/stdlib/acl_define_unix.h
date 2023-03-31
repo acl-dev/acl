@@ -53,7 +53,7 @@
 
 # define ACL_API
 
-#if 0
+#if 1
 # define	ACL_ETIMEDOUT		ETIMEDOUT
 #else
 # define	ACL_ETIMEDOUT		ETIME

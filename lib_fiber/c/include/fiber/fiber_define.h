@@ -60,7 +60,8 @@ typedef int socklen_t;
 typedef int socket_t;
 
 # define	FIBER_ETIMEDOUT		ETIMEDOUT
-# define	FIBER_ETIME		ETIME
+# define	FIBER_ETIME		ETIMEDOUT
+//# define	FIBER_ETIME		ETIME
 # define	FIBER_ENOMEM		ENOMEM
 # define	FIBER_EINVAL		EINVAL
 # define	FIBER_ECONNREFUSED	ECONNREFUSED
