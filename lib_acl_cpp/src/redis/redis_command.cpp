@@ -209,7 +209,12 @@ void redis_command::set_pipeline(redis_client_pipeline* pipeline)
 // 分析重定向信息，获得重定向的服务器地址
 const char* redis_command::get_addr(const char* info)
 {
-	char* cmd = dbuf_->dbuf_strdup(info);
+	return get_addr(dbuf_, info);
+}
+
+const char* redis_command::get_addr(dbuf_pool* dbuf, const char* info)
+{
+	char* cmd = dbuf->dbuf_strdup(info);
 	char* slot = strchr(cmd, ' ');
 	if (slot == NULL) {
 		return NULL;
@@ -241,7 +246,7 @@ redis_pipeline_message& redis_command::get_pipeline_message(void)
 	assert(pipeline_);
 
 	box<redis_pipeline_message>* box = pipeline_->create_box();
-	pipe_msg_ = NEW redis_pipeline_message(this, redis_pipeline_t_cmd, box);
+	pipe_msg_ = NEW redis_pipeline_message(redis_pipeline_t_cmd, box);
 	pipe_msg_->refer();
 	return *pipe_msg_;
 }
@@ -382,7 +387,7 @@ const redis_result* redis_command::run(size_t nchild /* = 0 */,
 {
 	if (pipeline_ != NULL) {
 		redis_pipeline_message& msg = get_pipeline_message();
-		msg.set_option(nchild, timeout);
+		msg.set_option(dbuf_, nchild, timeout);
 		result_ = pipeline_->run(msg);
 
 		return result_;
@@ -975,7 +980,7 @@ void redis_command::build_request(size_t argc, const char* argv[], const size_t 
 		redis_pipeline_message& msg = get_pipeline_message();
 		build_request1(argc, argv, lens);
 		msg.set_request(request_buf_);
-		//msg.set_request(argc, argv, lens);
+		msg.set_slot(slot_);
 	} else if (slice_req_) {
 		build_request2(argc, argv, lens);
 	} else {

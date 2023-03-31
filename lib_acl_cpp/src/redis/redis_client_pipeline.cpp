@@ -48,7 +48,7 @@ bool redis_pipeline_channel::start_thread(void)
 void redis_pipeline_channel::stop_thread(void)
 {
 	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
-	redis_pipeline_message message(NULL, redis_pipeline_t_stop, box);
+	redis_pipeline_message message(redis_pipeline_t_stop, box);
 	push(&message);
 	this->wait();
 }
@@ -68,14 +68,7 @@ bool redis_pipeline_channel::flush_all(void)
 
 	for (std::vector<redis_pipeline_message*>::iterator it = msgs_.begin();
 		it != msgs_.end(); ++it) {
-#if 0
-		string* req = (*it)->get_cmd()->get_request_buf();
-		buf_.append(req->c_str(), req->size());
-#else
-//		redis_command::build_request((*it)->argc_, (*it)->argv_,
-//			(*it)->lens_, buf_);
-		buf_.append((*it)->req_);
-#endif
+		buf_.append((*it)->get_request());
 	}
 
 #if 0
@@ -124,8 +117,10 @@ void redis_pipeline_channel::all_failed()
 bool redis_pipeline_channel::wait_one(socket_stream& conn,
 	redis_pipeline_message& msg)
 {
-	dbuf_pool* dbuf = msg.get_cmd()->get_dbuf();
-	int* timeout = msg.get_timeout();
+	dbuf_pool* dbuf = msg.get_dbuf();
+	assert(dbuf);
+
+	const int* timeout = msg.get_timeout();
 	if (timeout) {
 		conn.set_rw_timeout(*timeout);
 	}
@@ -160,7 +155,7 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		logger_error("error info null");
 		msg.push(result);
 	} else if (EQ(ptr, "MOVED") || EQ(ptr, "ASK")) {
-		const char* addr = msg.get_cmd()->get_addr(ptr);
+		const char* addr = redis_command::get_addr(dbuf, ptr);
 		if (addr == NULL) {
 			logger_error("no redirect addr got");
 			msg.push(result);
@@ -366,7 +361,7 @@ void redis_client_pipeline::start_thread(void)
 void redis_client_pipeline::stop_thread(void)
 {
 	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
-	redis_pipeline_message message(NULL, redis_pipeline_t_stop, box);
+	redis_pipeline_message message(redis_pipeline_t_stop, box);
 	push(&message);
 	this->wait();  // Wait for the thread to exit
 }
@@ -421,7 +416,7 @@ void* redis_client_pipeline::run(void)
 				break;
 			}
 
-			int slot = msg->get_cmd()->get_slot();
+			int slot = msg->get_slot();
 
 			// When coming from redis_pipeline_channel, the type
 			// will be redis_pipeline_t_redirect or

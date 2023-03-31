@@ -11,6 +11,7 @@
 namespace acl {
 
 class token_tree;
+class socket_stream;
 class redis_client;
 
 typedef enum {
@@ -26,37 +27,23 @@ typedef enum {
  */
 class redis_pipeline_message {
 public:
-	redis_pipeline_message(redis_command* cmd, redis_pipeline_type_t type,
+	redis_pipeline_message(redis_pipeline_type_t type,
 		box<redis_pipeline_message>* box)
-	: cmd_(cmd)
-	, type_(type)
-	, nchild_(0)
-	, timeout_(NULL)
+	: type_(type)
 	, box_(box)
+	, timeout_(-1)
+	, nchild_(0)
+	, dbuf_(NULL)
+	, req_(NULL)
+	, slot_(-1)
 	, result_(NULL)
 	, addr_(NULL)
 	, redirect_count_(0)
-#if 0
-	, argc_(0)
-	, argv_(NULL)
-	, lens_(NULL)
-#endif
-	, req_(NULL)
 	{
-#if 0
-		size_ = 10;
-		argc_ = 0;
-		argv_ = new const char* [size_];
-		lens_ = new size_t [size_];
-#endif
 	}
 
 	~redis_pipeline_message(void) {
 		delete box_;
-#if 0
-		delete [] argv_;
-		delete [] lens_;
-#endif
 	}
 
 	void refer(void) {
@@ -78,49 +65,46 @@ public:
 		return type_;
 	}
 
-	redis_command* get_cmd(void) {
-		return cmd_;
-	}
+public:
+	// These thredd APIs are called in redis_command.cpp
 
-	void set_option(size_t nchild, int* timeout) {
+	// Called in redis_command::run().
+	void set_option(dbuf_pool* dbuf, size_t nchild, int* timeout) {
+		dbuf_    = dbuf;
 		nchild_  = nchild;
-		timeout_ = timeout;
+		timeout_ = timeout ? *timeout : -1;
 		result_  = NULL;
 		addr_    = NULL;
 		redirect_count_ = 0;
 	}
 
+	// Called in redis_command::build_request().
 	void set_request(const string* req) {
-		req_ = req;
+		req_  = req;
 	}
 
-#if 0
-	void set_request(size_t argc, const char** argv, const size_t* lens) {
-		// When running in coroutine of shared stack mode,
-		// the variables on stack are volatile, so we should save
-		// the request data in heap.
-#if 0
-		argc_    = argc;
-		argv_    = argv;
-		lens_    = lens;
-#else
-		if (argc > size_) {
-			delete [] argv_;
-			delete [] lens_;
-			size_ = argc;
-			argv_ = new const char* [size_];
-			lens_ = new size_t [size_];
-		}
-
-		argc_ = argc;
-		for (size_t i = 0; i < argc_; i++) {
-			argv_[i] = argv[i];
-			lens_[i] = lens[i];
-		}
-#endif
+	// Called in redis_command::build_request().
+	void set_slot(int slot) {
+		slot_ = slot;
 	}
-#endif
 
+public:
+	// Called in redis_pipeline_channel::flush_all().
+	const string* get_request(void) const {
+		return req_;
+	}
+
+	// Called in redis_pipeline_channel::wait_one().
+	dbuf_pool* get_dbuf(void) const {
+		return dbuf_;
+	}
+
+	// Called in redis_client_pipeline::run().
+	int get_slot(void) const {
+		return slot_;
+	}
+
+	// Called in redis_pipeline_channel::wait_one().
 	void set_addr(const char* addr) {
 		addr_ = addr;
 		if (addr) {
@@ -128,14 +112,17 @@ public:
 		}
 	}
 
+	// Called in redis_pipeline_channel::wait_one().
 	size_t get_nchild(void) const {
 		return nchild_;
 	}
 
-	int* get_timeout(void) const {
-		return timeout_;
+	// Called in redis_pipeline_channel::wait_one().
+	const int* get_timeout(void) const {
+		return timeout_ == -1 ? NULL : &timeout_;
 	}
 
+public:
 	void push(const redis_result* result) {
 		result_ = result;
 		box_->push(this, false);
@@ -150,30 +137,28 @@ public:
 		return addr_;
 	}
 
+	// Called in redis_pipeline_channel::wait_one().
 	size_t get_redirect_count(void) const {
 		return redirect_count_;
 	}
 
 private:
-	redis_command* cmd_;
-	redis_pipeline_type_t type_;
-	size_t nchild_;
-	int* timeout_;
+	redis_pipeline_type_t        type_;
 	box<redis_pipeline_message>* box_;
 
-	const redis_result* result_;
-	const char* addr_;
-	size_t redirect_count_;
-	atomic_long refers_;  // The msg will be freed when refers_ is 0.
- 
-public:
-/*
-	size_t       size_;
-	size_t       argc_;
-	const char** argv_;
-	size_t*      lens_;
-*/
+	int           timeout_;
+	size_t        nchild_;
+	dbuf_pool*    dbuf_;
 	const string* req_;
+	int           slot_;
+
+
+	const redis_result* result_;
+	const char*         addr_;
+	size_t              redirect_count_;
+
+	// The msg will be freed when refers_ is 0.
+	atomic_long refers_;
 };
 
 class redis_client_pipeline;

@@ -243,6 +243,7 @@ protected:
 private:
 	acl::redis_client_pipeline& conns_;
 	acl::string cmd_;
+	//acl::redis redis;
 	int n_;
 };
 

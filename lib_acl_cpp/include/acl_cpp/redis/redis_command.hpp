@@ -482,6 +482,7 @@ protected:
 
 public:
 	const char* get_addr(const char* info);
+	static const char* get_addr(dbuf_pool* dbuf, const char* info);
 	void set_client_addr(const char* addr);
 	void set_client_addr(redis_client& conn);
 
