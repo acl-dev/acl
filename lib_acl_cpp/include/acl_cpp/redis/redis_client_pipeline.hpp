@@ -36,20 +36,27 @@ public:
 	, result_(NULL)
 	, addr_(NULL)
 	, redirect_count_(0)
+#if 0
 	, argc_(0)
 	, argv_(NULL)
 	, lens_(NULL)
+#endif
+	, req_(NULL)
 	{
+#if 0
 		size_ = 10;
 		argc_ = 0;
 		argv_ = new const char* [size_];
 		lens_ = new size_t [size_];
+#endif
 	}
 
 	~redis_pipeline_message(void) {
 		delete box_;
+#if 0
 		delete [] argv_;
 		delete [] lens_;
+#endif
 	}
 
 	void refer(void) {
@@ -83,6 +90,11 @@ public:
 		redirect_count_ = 0;
 	}
 
+	void set_request(const string* req) {
+		req_ = req;
+	}
+
+#if 0
 	void set_request(size_t argc, const char** argv, const size_t* lens) {
 		// When running in coroutine of shared stack mode,
 		// the variables on stack are volatile, so we should save
@@ -107,6 +119,7 @@ public:
 		}
 #endif
 	}
+#endif
 
 	void set_addr(const char* addr) {
 		addr_ = addr;
@@ -154,10 +167,13 @@ private:
 	atomic_long refers_;  // The msg will be freed when refers_ is 0.
  
 public:
+/*
 	size_t       size_;
 	size_t       argc_;
 	const char** argv_;
 	size_t*      lens_;
+*/
+	const string* req_;
 };
 
 class redis_client_pipeline;

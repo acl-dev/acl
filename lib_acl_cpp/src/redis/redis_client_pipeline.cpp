@@ -72,8 +72,9 @@ bool redis_pipeline_channel::flush_all(void)
 		string* req = (*it)->get_cmd()->get_request_buf();
 		buf_.append(req->c_str(), req->size());
 #else
-		redis_command::build_request((*it)->argc_, (*it)->argv_,
-			(*it)->lens_, buf_);
+//		redis_command::build_request((*it)->argc_, (*it)->argv_,
+//			(*it)->lens_, buf_);
+		buf_.append((*it)->req_);
 #endif
 	}
 
