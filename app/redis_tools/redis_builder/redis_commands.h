@@ -23,6 +23,7 @@ private:
 	int rw_timeout_;
 	bool prefer_master_;
 	acl::redis_client_cluster* conns_;
+	acl::redis_client_pipeline* pipeline_;
 	std::map<acl::string, REDIS_CMD> redis_cmds_;
 	acl::string all_cmds_perm_;
 
@@ -69,6 +70,14 @@ private:
 		acl::atomic_long& deleted, acl::atomic_long& error,
 		acl::atomic_long& notfound);
 	void parallel_remove(int cocurrent,
+		const std::vector<acl::string>& keys,
+		acl::atomic_long& deleted, acl::atomic_long& error,
+		acl::atomic_long& notfound);
+	void parallel_remove(acl::thread_pool& threads,
+		const std::vector<acl::string>& keys,
+		acl::atomic_long& deleted, acl::atomic_long& error,
+		acl::atomic_long& notfound);
+	void remove(acl::redis& redis,
 		const std::vector<acl::string>& keys,
 		acl::atomic_long& deleted, acl::atomic_long& error,
 		acl::atomic_long& notfound);

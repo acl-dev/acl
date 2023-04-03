@@ -156,6 +156,14 @@ static bool test_type(acl::redis& cmd, int n)
 	return true;
 }
 
+static void hash_slot(const char* key)
+{
+	//acl::redis_command cmd;
+	//cmd.hash_slot(key);
+	//printf("key=%s, slot=%d\r\n", key, cmd.get_slot());
+	printf("key=%s, slot=%d\r\n", key, acl_hash_crc16(key, strlen(key)) % 16384);
+}
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
@@ -165,6 +173,7 @@ static void usage(const char* procname)
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-T rw_timeout[default: 10]\r\n"
+		"-H hash_slot_key\r\n"
 		"-a cmd[set|del|expire|ttl|exists|type|all]\r\n",
 		procname);
 }
@@ -174,12 +183,15 @@ int main(int argc, char* argv[])
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10, dbnum = 0;
 	acl::string addr("127.0.0.1:6379"), command, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:T:a:p:d:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:T:a:p:d:H:")) > 0)
 	{
 		switch (ch)
 		{
 		case 'h':
 			usage(argv[0]);
+			return 0;
+		case 'H':
+			hash_slot(optarg);
 			return 0;
 		case 's':
 			addr = optarg;
