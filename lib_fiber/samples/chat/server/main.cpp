@@ -7,6 +7,9 @@
 
 #define	STACK_SIZE	32000
 
+#define	GO	go_share
+//#define	GO	go_stack
+
 static int __rw_timeout = 0;
 
 static acl::channel<int> __chan_monitor;
@@ -266,7 +269,7 @@ static void fiber_reader(user_client* client)
 	}
 
 	// 登入成功，则创建写协程用来向客户端发送消息
-	go_share(STACK_SIZE) [&] {
+	GO(STACK_SIZE) [&] {
 		__nwriter++;
 		fiber_writer(client);
 	};
@@ -368,7 +371,7 @@ static void fiber_client(acl::socket_stream* conn)
 	user_client* client = new user_client(*conn);
 
 	// 创建从客户端连接读取数据的协程
-	go_share(STACK_SIZE) [=] {
+	GO(STACK_SIZE) [=] {
 		__nreader++;
 		fiber_reader(client);
 	};
@@ -401,7 +404,7 @@ static void fiber_accept(acl::server_socket& ss)
 		}
 
 		// 创建处理客户端对象的协程
-		go_share(STACK_SIZE) [=] {
+		GO(STACK_SIZE) [=] {
 			__nclients++;
 			fiber_client(conn);
 		};
@@ -467,7 +470,7 @@ int main(int argc, char *argv[])
 	printf("listen %s ok\r\n", addr);
 
 	// 创建服务器接收连接协程
-	go_share(8192)[&] {
+	go[&] {
 		fiber_accept(ss);
 	};
 

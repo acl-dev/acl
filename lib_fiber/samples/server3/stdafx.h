@@ -13,6 +13,7 @@
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/fiber.hpp"
+#include "fiber/libfiber.h"
 
 #ifdef	WIN32
 #define	snprintf _snprintf
