@@ -22,7 +22,8 @@ public:
 };
 
 #define	go                  acl::go_fiber()>
-#define	go_stack(size)      acl::go_fiber(size)>
+#define	go_stack(size)      acl::go_fiber(size, false)>
+#define	go_share(size)      acl::go_fiber(size, true)>
 
 #define	go_wait_fiber       acl::go_fiber()<
 #define	go_wait_thread      acl::go_fiber()<<
@@ -32,12 +33,12 @@ class go_fiber
 {
 public:
 	go_fiber(void) {}
-	go_fiber(size_t stack_size) : stack_size_(stack_size) {}
+	go_fiber(size_t stack_size, bool on) : stack_size_(stack_size), stack_share_(on) {}
 
 	void operator > (std::function<void()> fn)
 	{
 		fiber_ctx* ctx = new fiber_ctx(fn);
-		fiber::fiber_create(fiber_main, (void*) ctx, stack_size_);
+		fiber::fiber_create(fiber_main, (void*) ctx, stack_size_, stack_share_);
 	}
 
 	void operator < (std::function<void()> fn)
@@ -65,7 +66,8 @@ public:
 	}
 
 private:
-	size_t stack_size_ = 320000;
+	size_t stack_size_  = 320000;
+	bool   stack_share_ = false;
 
 	static void fiber_main(ACL_FIBER*, void* ctx)
 	{

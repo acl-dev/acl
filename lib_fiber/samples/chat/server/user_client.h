@@ -128,14 +128,22 @@ public:
 
 	void wait_exit(void)
 	{
+#ifdef	USE_CHAN
 		int mtype;
 		chan_exit_.pop(mtype);
+#else
+		chan_exit_.pop();
+#endif
 	}
 
 	void notify_exit(void)
 	{
+#ifdef	USE_CHAN
 		int mtype = MT_LOGOUT;
 		chan_exit_.put(mtype);
+#else
+		chan_exit_.push(NULL);
+#endif
 	}
 
 	void set_reader(void)
@@ -152,10 +160,11 @@ private:
 	acl::socket_stream& conn_;
 #ifdef	USE_CHAN
 	acl::channel<int> chan_msg_;
+	acl::channel<int> chan_exit_;
 #else
 	acl::fiber_sem	  sem_msg_;
+	acl::fiber_tbox<bool> chan_exit_;
 #endif
-	acl::channel<int> chan_exit_;
 	acl::string name_;
 	std::list<acl::string*> messages_;
 	bool exiting_ = false;

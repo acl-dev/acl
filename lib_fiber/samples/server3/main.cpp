@@ -49,7 +49,8 @@ static void test_file(void) {
 
 class fiber_server : public acl::fiber {
 public:
-	fiber_server(acl::server_socket& ss) : ss_(ss) {}
+	fiber_server(acl::server_socket& ss, bool stack_share)
+	: ss_(ss), stack_share_(stack_share) {}
 	~fiber_server(void) {}
 
 protected:
@@ -68,45 +69,50 @@ protected:
 			// create one fiber for one connection
 			fiber_client* fc = new fiber_client(conn);
 			// start the client fiber
-			fc->start();
+			fc->start(stack_share_ ? 8000 : 32000, stack_share_);
 		}
 	}
 
 private:
 	acl::server_socket& ss_;
+	bool stack_share_;
 };
 
 class thread_server : public acl::thread {
 public:
-	thread_server(acl::server_socket& ss) : ss_(ss) {}
+	thread_server(acl::server_socket& ss, bool stack_share)
+	: ss_(ss), stack_share_(stack_share)  {}
 	~thread_server(void) {}
 
 protected:
 	void* run(void) {
-		fiber_server fs(ss_);
-		fs.start();		// start listen fiber
+		fiber_server fs(ss_, stack_share_);
+
+		// start listen fiber
+		fs.start(stack_share_ ? 8000 : 32000, stack_share_);
 
 		acl::fiber::schedule();	// start fiber schedule
-
 		return NULL;
 	}
 
 private:
 	acl::server_socket& ss_;
+	bool stack_share_;
 };
 
 static void usage(const char* procname) {
-	printf("usage: %s -h [help] -s listen_addr -t nthreads\r\n", procname);
+	printf("usage: %s -h [help] -s listen_addr -t nthreads -S [if use stack sharing]\r\n", procname);
 }
 
 int main(int argc, char *argv[]) {
 	int  ch, nthreads = 1;
+	bool stack_share = false;
 
 	acl::acl_cpp_init();
 	acl::string addr("127.0.0.1:9006");
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:t:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:t:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -116,6 +122,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 't':
 			nthreads = atoi(optarg);
+			break;
+		case 'S':
+			stack_share = true;
 			break;
 		default:
 			break;
@@ -132,7 +141,7 @@ int main(int argc, char *argv[]) {
 	std::vector<acl::thread*> threads;
 
 	for (int i = 0; i < nthreads; i++) {
-		acl::thread* thread = new thread_server(ss);
+		acl::thread* thread = new thread_server(ss, stack_share);
 		thread->start();
 		threads.push_back(thread);
 	}

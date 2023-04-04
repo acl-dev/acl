@@ -36,6 +36,9 @@ typedef struct THREAD {
 	int        nlocal;
 
 #ifdef	SHARE_STACK
+# ifdef	USE_VALGRIND
+	unsigned int vid;
+# endif
 	char      *stack_buff;
 	size_t     stack_size;
 	size_t     stack_dlen;
@@ -89,6 +92,9 @@ static void thread_free(void *ctx)
 	}
 
 #ifdef	SHARE_STACK
+# ifdef	USE_VALGRIND
+	VALGRIND_STACK_DEREGISTER(tf->vid);
+# endif
 	mem_free(tf->stack_buff);
 #endif
 
@@ -159,6 +165,10 @@ static void fiber_check(void)
 #ifdef	SHARE_STACK
 	__thread_fiber->stack_size = __shared_stack_size;
 	__thread_fiber->stack_buff = mem_malloc(__thread_fiber->stack_size);
+# ifdef	USE_VALGRIND
+	__thread_fiber->vid = VALGRIND_STACK_REGISTER(__thread_fiber->stack_buff,
+			__thread_fiber->stack_buff + __shared_stack_size);
+# endif
 	__thread_fiber->stack_dlen = 0;
 #endif
 
