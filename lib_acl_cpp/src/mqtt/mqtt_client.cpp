@@ -38,7 +38,9 @@ bool mqtt_client::open(void) {
 }
 
 bool mqtt_client::send(mqtt_message& message) {
-	if (!open()) {
+	// If the addr_ isn't empty, we should try to connect the server,
+	// else the stream_ is set in the mqtt_client::mqtt_client().
+	if (!addr_.empty() && !open()) {
 		logger_error("connect server error: %s", last_serror());
 		return false;
 	}
@@ -48,18 +50,16 @@ bool mqtt_client::send(mqtt_message& message) {
 		logger_error("build mqtt message error");
 		return false;
 	}
+
 	if (buff.empty()) {
 		logger_error("mqtt message empty");
 		return false;
 	}
 
-	if (!open()) {
-		logger_error("open error");
-		return false;
-	}
-
 	if (conn_->write(buff) == -1) {
-		//conn_->close();
+		if (!addr_.empty()) {
+			conn_->close();
+		}
 		//logger_error("send message error=%s", last_serror());
 		return false;
 	}
@@ -71,7 +71,11 @@ mqtt_message* mqtt_client::get_message(void) {
 	mqtt_header header(MQTT_RESERVED_MIN);
 
 	if (!read_header(header)) {
-		//conn_->close();
+		// If the addr_ isn't empty, the conn_internal_ is in
+		// the client mode, so we can close it and try again.
+		if (!addr_.empty()) {
+			conn_->close();
+		}
 		//logger_error("get header error");
 		return NULL;
 	}

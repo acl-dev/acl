@@ -157,6 +157,11 @@ int mqtt_publish::update_topic_len(const char* data, int dlen) {
 		return -1;
 	}
 
+	if (n == 0) {
+		logger_error("invalid topic len=%d", n);
+		return -1;
+	}
+
 	dlen_     = n;
 	hlen_var_ = n + HDR_LEN_LEN;
 	status_   = MQTT_STAT_TOPIC_VAL;
@@ -239,8 +244,13 @@ int mqtt_publish::update_pktid(const char* data, int dlen) {
 }
 
 int mqtt_publish::update_payload(const char* data, int dlen) {
+	if ((size_t) payload_len_ <= payload_.size()) {
+		logger_error("finished, payload_'s size=%zd, payload_len_=%d",
+			payload_.size(), payload_len_);
+		return -1;
+	}
+
 	assert(data && dlen > 0);
-	assert((size_t) payload_len_ > payload_.size());
 
 	size_t i, left = (size_t) payload_len_ - payload_.size();
 	for (i = 0; i < left && dlen > 0; i++) {
