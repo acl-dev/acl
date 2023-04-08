@@ -601,7 +601,7 @@ static void patterns_addrs_add(ACL_ARGV *patterns,
 		const char  *pattern      = (const char *) iter.data;
 		const struct sockaddr *sa = &ifaddr->saddr.sa;
 
-		if (sa->sa_family == AF_INET) {
+		if (sa->sa_family == AF_INET || sa->sa_family == AF_UNSPEC) {
 			addr = ipv4_clone(pattern, ifaddr);
 			if (addr)
 				acl_array_append(addrs, addr);
