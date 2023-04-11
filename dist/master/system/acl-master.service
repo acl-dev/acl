@@ -11,9 +11,9 @@ IgnoreSIGPIPE=no
 KillMode=process
 GuessMainPID=no
 RemainAfterExit=no
-ExecStart=/etc/init.d/master start
-ExecStop=/etc/init.d/master stop
-ExecReload=/etc/init.d/master reload
+ExecStart=/etc/init.d/acl-master start
+ExecStop=/etc/init.d/acl-master stop
+ExecReload=/etc/init.d/acl-master reload
 
 [Install]
 WantedBy=multi-user.target

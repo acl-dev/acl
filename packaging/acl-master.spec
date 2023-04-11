@@ -1,8 +1,8 @@
-%define release_id 13
+%define release_id 0
 
 Summary: acl master framework
 Name:           acl-master
-Version:        3.5.4
+Version:        3.5.5
 Release:        %{release_id}
 Group:          System Environment/Tools
 License:        LGPL3.0,IBM
@@ -38,23 +38,23 @@ rm -rf %{buildroot}
 if [ "$1" == "1" ]; then
     echo "starting acl_master ..."
     %if %HAS_SYSTEMD == 1
-        systemctl enable master.service
+        systemctl enable acl-master.service
         systemctl daemon-reload
-        systemctl start master.service
+        systemctl start acl-master.service
     %else
-        /sbin/chkconfig --add master
-        service master start
+        /sbin/chkconfig --add acl-master
+        service acl-master start
     %endif
 fi
 
 %preun
 if [ "$1" == "0" ]; then
     %if %HAS_SYSTEMD == 1
-        systemctl stop master.service
-        systemctl disable master.service
+        systemctl stop acl-master.service
+        systemctl disable acl-master.service
     %else
-        service master stop
-        /sbin/chkconfig --del master
+        service acl-master stop
+        /sbin/chkconfig --del acl-master
     %endif
 fi
 
@@ -64,9 +64,9 @@ if [ "$1" -ge "1" ]; then
     echo "prepare restarting acl_master ..."
     %if %HAS_SYSTEMD == 1
         systemctl daemon-reload
-        systemctl restart master.service
+        systemctl restart acl-master.service
     %else
-        service master restart
+        service acl-master restart
     %endif
 fi
 
@@ -79,11 +79,11 @@ fi
 /opt/soft/acl-master/sbin
 /opt/soft/acl-master/sh
 /opt/soft/acl-master/var
-/etc/init.d/master
+/etc/init.d/acl-master
 %if %HAS_SYSTEMD==1
-/usr/lib/systemd/system/master.service
+/usr/lib/systemd/system/acl-master.service
 %else
-/etc/cron.d/master.cron
+/etc/cron.d/acl-master.cron
 %endif
 
 %changelog

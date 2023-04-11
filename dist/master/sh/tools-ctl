@@ -91,7 +91,7 @@ start()
 	check_master
 	if [ "$MASTER_RUNNING" != "yes" ]; then
 		echo "starting $MASTER_NAME ..."
-		service master start
+		service acl-master start
 	fi
 
 	check_master

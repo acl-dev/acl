@@ -9,7 +9,7 @@ pnum=`/sbin/pidof /opt/soft/acl-master/libexec/acl_master|wc -l`
 # be called every minute by crond.
 if [ $pnum == 0 -a -f $pidfile ]; then
     echo "acl_master stopped abnormally, try to start it."
-    /sbin/service master start
+    /sbin/service acl-master start
 else
     echo "acl_master is running"
 fi

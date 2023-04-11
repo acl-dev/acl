@@ -198,9 +198,9 @@ copy_all_file()
 	install_file a+x,go-wrx init.d/ $INIT_PATH
 
 	if [ -f $SYSTEMD ]; then
-		compare_or_replace a-x,go-wx system/master.service $SYSTEMD_PATH/master.service
+		compare_or_replace a-x,go-wx system/acl-master.service $SYSTEMD_PATH/acl-master.service
 	else
-		compare_or_replace a-x,go-wx cron.d/master.cron $CRON_PATH/master.cron
+		compare_or_replace a-x,go-wx cron.d/acl-master.cron $CRON_PATH/acl-master.cron
 	fi
 }
 
