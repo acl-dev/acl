@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 11 2023 shuxin.zheng@qq.com 3.5.5-0-20230411.14
+- rename service name from master to acl-master.
+
 * Tue Aug 31 2022 shuxin.zheng@qq.com 3.5.4-13-20220831.15
 - bugfix: merge the new acl to avoid that bug in managing module for sending reply big data.
 
