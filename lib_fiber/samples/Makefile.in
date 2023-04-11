@@ -74,7 +74,7 @@ endif
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 #	CFLAGS += -DLINUX2
-	SYSLIB += -lcrypt -rdynamic -ldl
+	SYSLIB += -lcrypt -rdynamic -ldl -lrt
 	ifeq ($(HAS_IO_URING), yes)
 		SYSLIB += -luring
 	endif

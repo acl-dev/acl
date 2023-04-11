@@ -79,7 +79,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	endif
 #	CFLAGS += -DLINUX2 -D_REENTRANT
 	CFLAGS += -D_REENTRANT
-	SYSLIB += -lcrypt
+	SYSLIB += -lcrypt -lrt
 endif
 
 #Path for SunOS

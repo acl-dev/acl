@@ -1,3 +1,5 @@
+#pragma once
+
 class redis_thread : public acl::thread
 {
 public:

@@ -115,7 +115,7 @@ void redis_thread::fiber_redis(ACL_FIBER *, void *ctx)
 
 	gettimeofday(&begin, NULL);
 	if (cmd == "set" || cmd == "all") {
-		n += redis_set(redis, begin, oper_count);
+		n += ::redis_set(redis, begin, oper_count);
 	}
 
 	if (cmd == "get" || cmd == "all") {
