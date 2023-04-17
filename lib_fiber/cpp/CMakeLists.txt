@@ -122,7 +122,7 @@ endforeach()
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
 	set(lib_output_path ${CMAKE_CURRENT_SOURCE_DIR}/../../android/lib/${ANDROID_ABI})
 else()
-	set(lib_output_path ${PROJECT_BINARY_DIR}/lib)
+	set(lib_output_path ${PROJECT_BINARY_DIR}/../lib)
 endif()
 
 set(LIBRARY_OUTPUT_PATH ${lib_output_path})

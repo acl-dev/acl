@@ -123,7 +123,6 @@ private:
 	unsigned status_;
 	bool  server_side_;
 
-	int         conf_count_;
 	token_tree* conf_table_;
 	mbedtls_ssl_config* conf_;
 	std::set<mbedtls_ssl_config*> certs_;
