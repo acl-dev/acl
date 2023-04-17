@@ -1,4 +1,4 @@
-%define release_id 0
+%define release_id 1
 
 Summary: acl master framework
 Name:           acl-master
@@ -87,6 +87,9 @@ fi
 %endif
 
 %changelog
+* Mon Apr 17 2023 shuxin.zheng@qq.com 3.5.5-1-20230417.11
+- bugfix: dead lock maybe happends when writing log after fork().
+
 * Wed Apr 11 2023 shuxin.zheng@qq.com 3.5.5-0-20230411.14
 - rename service name from master to acl-master.
 

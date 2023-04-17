@@ -300,6 +300,12 @@ void acl_master_spawn(ACL_MASTER_SERV *serv)
 	 * Disable exit handlers: they should be executed by the parent only.
 	 */
 	case 0:  /* child process */
+		/* We should reopen the master's log file to avoid dead lock
+		 * when calling pthread_mutex_lock before writing to log file
+		 * which was created by the parent process.
+		 */
+		acl_msg_close();
+		acl_msg_open(acl_var_master_log_file, "master-child");
 		start_child(serv);
 
 		/* NOTREACHED */
