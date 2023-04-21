@@ -6,6 +6,7 @@
 #include "acl_cpp/stdlib/snprintf.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
+#include "acl_cpp/stdlib/thread_mutex.hpp"
 #include "acl_cpp/db/mysql_conf.hpp"
 #include "acl_cpp/db/db_mysql.hpp"
 #endif
@@ -559,12 +560,26 @@ static void main_free_dummy(void)
 #endif
 
 static acl_pthread_once_t __thread_once_control = ACL_PTHREAD_ONCE_INIT;
+static thread_mutex* __mysql_init_lock = NULL;
+
+#ifndef HAVE_NO_ATEXIT
+static void free_mysql_init_lock(void)
+{
+	delete __mysql_init_lock;
+}
+#endif
 
 static void thread_once(void)
 {
 	if (acl_pthread_key_create(&__thread_key, thread_free_dummy) != 0) {
 		abort();
 	}
+
+	__mysql_init_lock = NEW thread_mutex;
+
+#ifndef HAVE_NO_ATEXIT
+	atexit(free_mysql_init_lock);
+#endif
 }
 
 bool db_mysql::dbopen(const char* charset /* = NULL */)
@@ -624,7 +639,10 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 		}
 	}
 
+	__mysql_init_lock->lock();
 	conn_ = __mysql_init(NULL);
+	__mysql_init_lock->unlock();
+
 	if (conn_ == NULL) {
 		logger_error("mysql init error");
 		return false;
