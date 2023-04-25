@@ -55,7 +55,7 @@ static __thread int __schedule_auto = 0;
 __thread int var_hook_sys_api   = 0;
 
 #ifdef	SHARE_STACK
-static size_t __shared_stack_size = 1024000;
+static size_t __shared_stack_size = 10240000;
 #endif
 
 static pthread_key_t __fiber_key;
