@@ -7,6 +7,8 @@ static int __oper_count = 100;
 static struct timeval __begin;
 static struct timeval __finish;
 
+acl::string addr("127.0.0.1:6379"), passwd;
+
 //#define USE_PIPELINE
 
 static void fiber_redis(ACL_FIBER *fiber, void *ctx)
@@ -15,9 +17,13 @@ static void fiber_redis(ACL_FIBER *fiber, void *ctx)
 	acl::redis_client_pipeline* pipeline = (acl::redis_client_pipeline*) ctx;
 	acl::redis cmd;
 	cmd.set_pipeline(pipeline);
-#else
+#elif 1
 	acl::redis_client_cluster *cluster = (acl::redis_client_cluster *) ctx;
 	acl::redis cmd(cluster);
+#else
+	(void) ctx;
+	acl::redis_client conn(addr, 0, 0);
+	acl::redis cmd(&conn);
 #endif
 
 	acl::string key, val;
@@ -102,15 +108,17 @@ static void usage(const char *procname)
 		" -n operation_count\r\n"
 		" -c fibers count\r\n"
 		" -t conn_timeout\r\n"
-		" -r rw_timeout\r\n", procname);
+		" -r rw_timeout\r\n"
+		" -S [if use sharing stack]\r\n"
+		, procname);
 }
 
 int main(int argc, char *argv[])
 {
 	int   ch, i, conn_timeout = 2, rw_timeout = 2;
-	acl::string addr("127.0.0.1:6379"), passwd;
+	bool share_stack = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:c:r:t:p:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:r:t:p:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -134,6 +142,9 @@ int main(int argc, char *argv[])
 		case 'p':
 			passwd = optarg;
 			break;
+		case 'S':
+			share_stack = true;
+			break;
 		default:
 			break;
 		}
@@ -144,26 +155,36 @@ int main(int argc, char *argv[])
 	acl_fiber_msg_stdout_enable(1);
 
 #ifdef USE_PIPELINE
-	acl::redis_client_pipeline pipeline(addr.c_str(), conn_timeout,
-		rw_timeout);
-	pipeline.start();
+	acl::redis_client_pipeline* pipeline =
+		new acl::redis_client_pipeline((addr.c_str(), conn_timeout,
+					rw_timeout);
+	pipeline->start();
 #else
-	acl::redis_client_cluster cluster;
-	cluster.set_password("default", passwd);
-	cluster.set(addr.c_str(), 0, conn_timeout, rw_timeout);
+	acl::redis_client_cluster* cluster = new acl::redis_client_cluster;
+	cluster->set_password("default", passwd);
+	cluster->set(addr.c_str(), 0, conn_timeout, rw_timeout);
 #endif
 
 	gettimeofday(&__begin, NULL);
 
+	ACL_FIBER_ATTR attr;
+	acl_fiber_attr_init(&attr);
+
+	acl_fiber_attr_setstacksize(&attr, 128000);
+	acl_fiber_attr_setsharestack(&attr, share_stack ? 1 : 0);
+
 	for (i = 0; i < __fibers_count; i++) {
 #ifdef USE_PIPELINE
-		acl_fiber_create(fiber_redis, &pipeline, 327680);
+		acl_fiber_create2(&attr, fiber_redis, pipeline);
 #else
-		acl_fiber_create(fiber_redis, &cluster, 327680);
+		acl_fiber_create2(&attr, fiber_redis, cluster);
 #endif
 	}
 
 	acl_fiber_schedule();
 
+	printf("Enter any key to exit ...");
+	fflush(stdout);
+	getchar();
 	return 0;
 }

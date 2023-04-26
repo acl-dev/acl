@@ -20,7 +20,8 @@
 #elif defined(USE_JMP_EXP)
 # define USE_JMP
 # include "exp_jmp.h"
-#else
+#elif defined(USE_JMP_SYS)
+# define USE_JMP
 # define SETJMP(ctx) sigsetjmp(ctx, 0)
 # define LONGJMP(ctx) siglongjmp(ctx, 1)
 #endif  // USE_BOOST_JMP
@@ -42,11 +43,9 @@ typedef struct FIBER_UNIX {
 	void *arg;
 #else
 # if	defined(USE_JMP_DEF)
-#  if defined(__x86_64__)
 	unsigned long long env[10];
-#  else
+# elif	defined(USE_JMP_SYS)
 	sigjmp_buf env;
-#  endif
 # elif	defined(USE_JMP_EXP)
 	label_t env;
 # endif
@@ -199,13 +198,21 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 	/* Use setcontext() for the initial jump, as it allows us to set up
 	 * a stack, but continue with longjmp() as it's much faster.
 	 */
+# if	defined(USE_JMP_SYS)
+	if (SETJMP(((FIBER_UNIX*) from)->env) == 0) {
+# else
 	if (SETJMP(&((FIBER_UNIX*) from)->env) == 0) {
+# endif
 		/* If the fiber was ready for the first time, just call the
 		 * setcontext() for the fiber to start, else just jump to the
 		 * fiber's running stack.
 		 */
 		if (to->flag & FIBER_F_STARTED) {
+# if	defined(USE_JMP_SYS)
+			LONGJMP(((FIBER_UNIX*) to)->env);
+#else
 			LONGJMP(&((FIBER_UNIX*) to)->env);
+#endif
 		} else {
 			setcontext(((FIBER_UNIX*) to)->context);
 		}

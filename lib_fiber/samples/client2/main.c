@@ -40,6 +40,7 @@ static int __max_fibers   = 100;
 static int __left_fibers  = 100;
 static int __read_data    = 1;
 static int __stack_size   = 32000;
+static int __stack_share  = 0;
 static struct timeval __begin;
 
 static int check_write(SOCKET fd, int timeout)
@@ -221,11 +222,16 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 {
 	int i;
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+	acl_fiber_attr_setstacksize(&attr, __stack_size);
+	acl_fiber_attr_setsharestack(&attr, __stack_share ? 1 : 0);
 
 	sleep(1); // just waiting for the IO event fiber to run first
 
 	for (i = 0; i < __max_fibers; i++) {
-		acl_fiber_create(fiber_connect, NULL, __stack_size);
+		acl_fiber_create2(&attr, fiber_connect, NULL);
 	}
 }
 
@@ -239,6 +245,7 @@ static void usage(const char *procname)
 		" -r io_timeout\r\n"
 		" -c max_fibers\r\n"
 		" -S [if using single IO, dafault: no]\r\n"
+		" -Z [if sharing fiber stack, default: no]\r\n"
 		" -d fiber_delay_ms\r\n"
 		" -z stack_size\r\n"
 		" -n max_loop\r\n"
@@ -272,7 +279,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:e:m:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:e:m:Z")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -318,6 +325,9 @@ int main(int argc, char *argv[])
 			} else if (strcasecmp(optarg, "io_uring") == 0) {
 				event_mode = FIBER_EVENT_IO_URING;
 			}
+			break;
+		case 'Z':
+			__stack_share = 1;
 			break;
 		default:
 			break;
