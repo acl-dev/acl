@@ -869,8 +869,9 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 		msg_error("%s(%d), %s: running: NULL",
 			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
-	} else
+	} else {
 		curr = __thread_fiber->running;
+	}
 
 	if (*key <= 0) {
 		*key = ++__thread_fiber->nlocal;
@@ -886,8 +887,9 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 		curr->nlocal = __thread_fiber->nlocal;
 		curr->locals = (FIBER_LOCAL **) mem_realloc(curr->locals,
 			curr->nlocal * sizeof(FIBER_LOCAL*));
-		for (i = n; i < curr->nlocal; i++)
+		for (i = n; i < curr->nlocal; i++) {
 			curr->locals[i] = NULL;
+		}
 	}
 
 	local = (FIBER_LOCAL *) mem_calloc(1, sizeof(FIBER_LOCAL));
@@ -915,8 +917,9 @@ void *acl_fiber_get_specific(int key)
 		msg_error("%s(%d), %s: running fiber NULL",
 			__FILE__, __LINE__, __FUNCTION__);
 		return NULL;
-	} else
+	} else {
 		curr = __thread_fiber->running;
+	}
 
 	if (key > curr->nlocal) {
 		return NULL;

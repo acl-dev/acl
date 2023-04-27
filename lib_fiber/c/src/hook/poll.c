@@ -276,8 +276,6 @@ static pollfds *pollfds_save(const struct pollfd *fds, nfds_t nfds)
 		mem_free(pfds->fds);
 		pfds->size = nfds + 1;
 		pfds->fds  = mem_malloc(sizeof(struct pollfd) * pfds->size);
-	} else {
-		pfds->nfds = nfds;
 	}
 
 	pfds->nfds = nfds;
