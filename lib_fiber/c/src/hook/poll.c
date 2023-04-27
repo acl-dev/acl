@@ -283,14 +283,12 @@ static pollfds *pollfds_save(const struct pollfd *fds, nfds_t nfds)
 	return pfds;
 }
 
-static void pollfds_copy(const pollfds *pfds, struct pollfd *fds)
+static void pollfds_copy(struct pollfd *fds, const pollfds *pfds)
 {
 	memcpy(fds, pfds->fds, sizeof(struct pollfd) * pfds->nfds);
 }
 
 #endif // SHARE_STACK
-
-//#define	MAX_TIMEOUT	200000000
 
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
@@ -321,12 +319,6 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	}
 
 	curr = acl_fiber_running();
-
-#if 0
-	if (timeout < 0) {
-		timeout = MAX_TIMEOUT;
-	}
-#endif
 
 	ev          = fiber_io_event();
 	old_timeout = ev->timeout;
@@ -376,12 +368,6 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			if (pe->nready == 0) {
 				pe->nready = -1;
 			}
-
-#if 0
-			msg_info("%s(%d), %s: fiber-%u was killed, %s, timeout=%d",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(pe->fiber), last_serror(), timeout);
-#endif
 			break;
 		}
 
@@ -408,7 +394,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 #ifdef SHARE_STACK
 	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
 		mem_free(pe);
-		pollfds_copy(pfds, fds);
+		pollfds_copy(fds, pfds);
 	}
 #endif
 
