@@ -12,11 +12,18 @@ $(function() {
         global: { useUTC: false }
     });
 
-    function CreateChart(container, title, yTitle) {
+    function CreateChart(container, titleIn, yTitle) {
+        var title = "";
+        for (i = 0; i < titleIn.length; i++) {
+            title += titleIn[i];
+            if (titleIn[i] == ':') {
+                title += "<br>";
+            }
+        }
         var chart = new Highcharts.Chart({
                 chart: {
                     type: 'spline',
-                    width: 300,
+                    width: 280,
                     height: 200,
                     animation: Highcharts.canvas,  // svg or canvas
                     marginRight: 10,
@@ -68,13 +75,13 @@ $(function() {
         var tr = $("<tr></tr>");
         tr.appendTo(table);
         var id = addr + "_conns";
-        var td = $("<td id='" + id + "' style='width: 110px; "
+        var td = $("<td id='" + id + "' style='width: 150px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
         allCharts[id] = CreateChart(id, addr, "总连接数");
 
         id = addr + "_qlen";
-        td = $("<td id='" + id + "' style='width: 110px; "
+        td = $("<td id='" + id + "' style='width: 150px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
         allCharts[id] = CreateChart(id, addr, "等待任务数");
@@ -84,13 +91,13 @@ $(function() {
         //tr = $("<tr></tr>");
         //tr.appendTo(table);
         id = addr + "_curr_threads";
-        td = $("<td id='" + id + "' style='width: 110px; "
+        td = $("<td id='" + id + "' style='width: 150px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
         allCharts[id] = CreateChart(id, addr, "总线程数");
 
         id = addr + "_busy_threads";
-        td = $("<td id='" + id + "' style='width: 110px; "
+        td = $("<td id='" + id + "' style='width: 150px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
         var chart = CreateChart(id, addr, "繁忙线程数");
@@ -101,7 +108,7 @@ $(function() {
         //tr = $("<tr></tr>");
         //tr.appendTo(table);
         id = addr + "_load";
-        td = $("<td id='" + id + "' style='width: 110px; "
+        td = $("<td id='" + id + "' style='width: 150px; "
                 + "height: 210px; margin: 0 auto'></td>");
         td.appendTo(tr);
         allCharts[id] = CreateChart(id, addr, "系统负载");
@@ -160,8 +167,9 @@ $(function() {
                     totalBusyThreads += busy_threads;
 
                     var chartConns = allCharts[addr + "_conns"];
-                    if (chartConns == null)
+                    if (chartConns == null) {
                         chartConns = CreateNode(addr);
+                    }
                 
                     var chartQlen = allCharts[addr + "_qlen"];
                     var chartCurrThreads = allCharts[addr + "_curr_threads"];
