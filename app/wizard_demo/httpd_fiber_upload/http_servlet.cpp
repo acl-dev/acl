@@ -46,6 +46,65 @@ bool http_servlet::doGet(request_t& req, response_t& res)
 	return doPost(req, res);
 }
 
+bool http_servlet::doPut(request_t& req, response_t& res)
+{
+	const char* filename = "./test.tmp";
+	long long length = req.getContentLength();
+	if (length <= 0) {
+		printf("invalid length=%lld\r\n", length);
+		return false;
+	}
+
+	const char* expect = req.getHeader("Expect");
+	if (expect && strcasecmp(expect, "100-continue") == 0) {
+		const char* reply = "HTTP/1.1 100 Continue\r\n\r\n";
+		acl::ostream& out = res.getOutputStream();
+		if (out.write(reply, strlen(reply)) == -1) {
+			printf("writer %s error\r\n", reply);
+			return false;
+		}
+		printf("reply: [%s]\r\n", reply);
+	}
+
+	acl::ofstream fp;
+	if (!fp.open_write(filename, true)) {
+		printf("open file %s error %s\r\n", filename, acl::last_serror());
+		return false;
+	}
+
+	acl::istream& in = req.getInputStream();
+	char buf[4096];
+	long long read_length = 0;
+
+	while (length > read_length) {
+		size_t size = (size_t) (length - read_length);
+		if (size > sizeof(buf)) {
+			size = sizeof(buf);
+		}
+
+		int ret = in.read(buf, size);
+		if (ret <= 0) {
+			break;
+		}
+
+		if (fp.write(buf, ret) == -1) {
+			logger_error("write error %s", acl::last_serror());
+			(void) doReplyPlain(req, res, "write to local file error");
+			return false;
+		}
+
+		read_length += ret;
+	}
+
+	if (in.eof()) {
+		logger_error("read error from http client");
+		return false;
+	}
+
+	printf("read over, total read=%lld\r\n", read_length);
+	return doReplyPlain(req, res, "+ok");
+}
+
 bool http_servlet::doPost(request_t& req, response_t& res)
 {
 	const char* ptr = req.getPathInfo();
@@ -135,7 +194,7 @@ bool http_servlet::onUpload(request_t& req, response_t& res)
 	if (!fp.open_write(path)) {
 		logger_error("open %s error %s",
 			path.c_str(), acl::last_serror());
-		return doReply(req, res, "open file error");
+		return doReplyXml(req, res, "open file error");
 	}
 
 	// 设置原始文件存入路径
@@ -181,7 +240,7 @@ bool http_servlet::upload(request_t& req, response_t& res,
 		//printf(">>>size: %d\r\n", ret);
 		if (fp.write(buf, ret) == -1) {
 			logger_error("write error %s", acl::last_serror());
-			(void) doReply(req, res, "write error");
+			(void) doReplyXml(req, res, "write error");
 			return false;
 		}
 
@@ -276,10 +335,10 @@ bool http_servlet::parse(request_t& req, response_t& res, acl::http_mime& mime)
 		}
 	}
 
-	return doReply(req, res, "OK");
+	return doReplyXml(req, res, "OK");
 }
 
-bool http_servlet::doReply(request_t& req, response_t& res, const char* info)
+bool http_servlet::doReplyXml(request_t& req, response_t& res, const char* info)
 {
 	// 创建 xml 格式的数据体
 	acl::xml1 body;
@@ -318,6 +377,18 @@ bool http_servlet::doReply(request_t& req, response_t& res, const char* info)
 
 	logger(">>%s<<", buf.c_str());
 	return res.write(buf) && res.write(NULL, 0);
+}
+
+bool http_servlet::doReplyPlain(request_t&, response_t& res, const char* info)
+{
+	size_t len = strlen(info);
+	res.setContentLength(len);
+	if (res.write(info, len) && res.write(NULL, 0)) {
+		printf("reply to client ok!\r\n");
+		return true;
+	}
+	printf("reply to client error!\r\n");
+	return false;
 }
 
 long long http_servlet::get_fsize(const char* dir, const char* filename)

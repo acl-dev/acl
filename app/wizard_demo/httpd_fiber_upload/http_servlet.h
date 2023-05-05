@@ -14,6 +14,9 @@ protected:
 	bool doPost(request_t&, response_t&);
 
 	// @override
+	bool doPut(request_t&, response_t&);
+
+	// @override
 	bool doError(request_t&, response_t&);
 
 	// @override
@@ -28,7 +31,8 @@ private:
 	bool upload(request_t& req, response_t& res, long long content_length,
 		acl::ofstream& fp, acl::http_mime& mime);
 	bool parse(request_t& req, response_t& res, acl::http_mime& mime);
-	bool doReply(request_t& req, response_t& res, const char* info);
+	bool doReplyXml(request_t& req, response_t& res, const char* info);
+	bool doReplyPlain(request_t& req, response_t& res, const char* info);
 	long long get_fsize(const char* dir, const char* filename);
 
 	void reset(void);

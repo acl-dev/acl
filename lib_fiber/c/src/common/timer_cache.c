@@ -3,6 +3,7 @@
 #include "memory.h"
 #include "timer_cache.h"
 
+#if 0
 static int avl_cmp_fn(const void *v1, const void *v2)
 {
 	const TIMER_CACHE_NODE *n1 = (const TIMER_CACHE_NODE*) v1;
@@ -17,13 +18,26 @@ static int avl_cmp_fn(const void *v1, const void *v2)
 		return 0;
 	}
 }
+#else
+static int avl_cmp_fn(const TIMER_CACHE_NODE *n1, const TIMER_CACHE_NODE *n2)
+{
+	if (n1->expire < n2->expire) {
+		return -1;
+	} else if (n1->expire > n2->expire) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+#endif
 
 TIMER_CACHE *timer_cache_create(void)
 {
 	TIMER_CACHE *cache = mem_malloc(sizeof(TIMER_CACHE));
 
-	avl_create(&cache->tree, avl_cmp_fn, sizeof(TIMER_CACHE_NODE),
-		offsetof(TIMER_CACHE_NODE, node));
+	avl_create(&cache->tree,
+		(int (*)(const void*, const void*)) avl_cmp_fn,
+		sizeof(TIMER_CACHE_NODE), offsetof(TIMER_CACHE_NODE, node));
 	ring_init(&cache->caches);
 	cache->cache_max = 1000;
 	cache->objs = array_create(100, ARRAY_F_UNORDER);
