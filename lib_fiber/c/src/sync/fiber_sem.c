@@ -99,7 +99,10 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 		return -1;
 	}
 
-	return --sem->num;
+	/* Needn't decrease the sem number, because the notifier has decreased
+	 * it for me.
+	 */
+	return sem->num;
 }
 
 int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem)
@@ -154,7 +157,8 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	ring_detach(&ready->me);
 	acl_fiber_ready(ready);
 
-	num = sem->num;
+	/* Help the fiber to be wakeup to decrease the sem number. */
+	num = sem->num--;
 
 	if (!(sem->flags & ACL_FIBER_SEM_F_ASYNC)) {
 		acl_fiber_yield();
