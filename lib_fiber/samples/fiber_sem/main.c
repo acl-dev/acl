@@ -58,16 +58,20 @@ static void fiber_killer(ACL_FIBER *fiber acl_unused, void *ctx)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -n sem_max -c fibers_count\r\n", procname);
+	printf("usage: %s -h [help]\r\n"
+		" -n sem_max\r\n"
+		" -c fibers_count\r\n"
+		" -A [if wakeup the waiter in async mode, default: false]\r\n",
+		procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int  ch, nfibers = __fibers_count, i, sem_max = 2;
+	int  ch, nfibers = __fibers_count, i, sem_max = 2, async_mode = 0;
 	ACL_FIBER_SEM *sem;
 	struct WAITERS waiters;
 
-	while ((ch = getopt(argc, argv, "hn:c:")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:c:A")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -78,6 +82,9 @@ int main(int argc, char *argv[])
 		case 'c':
 			nfibers = atoi(optarg);
 			break;
+		case 'A':
+			async_mode = 1;
+			break;
 		default:
 			break;
 		}
@@ -85,7 +92,8 @@ int main(int argc, char *argv[])
 
 	__fibers_count = nfibers;
 
-	sem = acl_fiber_sem_create(sem_max);
+	sem = acl_fiber_sem_create2(sem_max, async_mode ?
+			ACL_FIBER_SEM_F_ASYNC : 0);
 
 	for (i = 0; i < nfibers; i++) {
 		acl_fiber_create(fiber_main, sem, 128000);
@@ -99,6 +107,7 @@ int main(int argc, char *argv[])
 		waiters.waiters[i] = acl_fiber_create(fiber_waiter,
 			waiters.sem, 128000);
 	}
+
 	acl_fiber_create(fiber_killer, &waiters, 128000);
 
 	acl_fiber_schedule();

@@ -7,10 +7,15 @@ struct ACL_FIBER_SEM;
 
 namespace acl {
 
+typedef enum {
+	fiber_sem_t_def   = 0,
+	fiber_sem_t_async = (1 << 0),
+} fiber_sem_attr_t;
+
 class FIBER_CPP_API fiber_sem
 {
 public:
-	fiber_sem(int max);
+	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_def);
 	~fiber_sem(void);
 
 	int wait(void);

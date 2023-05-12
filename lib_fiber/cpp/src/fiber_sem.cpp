@@ -3,9 +3,15 @@
 
 namespace acl {
 
-fiber_sem::fiber_sem(int max)
+fiber_sem::fiber_sem(int max, fiber_sem_attr_t attr)
 {
-	sem_ = acl_fiber_sem_create(max);
+	unsigned flags = 0;
+
+	if (attr & fiber_sem_t_async) {
+		flags |= ACL_FIBER_SEM_F_ASYNC;
+	}
+
+	sem_ = acl_fiber_sem_create2(max, flags);
 }
 
 fiber_sem::~fiber_sem(void)

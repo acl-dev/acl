@@ -6,16 +6,23 @@
 
 struct ACL_FIBER_SEM {
 	int num;
+	unsigned flags;
 	RING waiting;
 	unsigned long tid;
 };
 
 ACL_FIBER_SEM *acl_fiber_sem_create(int num)
 {
+	return acl_fiber_sem_create2(num, 0);
+}
+
+ACL_FIBER_SEM *acl_fiber_sem_create2(int num, unsigned flags)
+{
 	ACL_FIBER_SEM *sem = (ACL_FIBER_SEM *) mem_malloc(sizeof(ACL_FIBER_SEM));
 
-	sem->tid = 0;
-	sem->num = num;
+	sem->tid   = 0;
+	sem->num   = num;
+	sem->flags = flags;
 	ring_init(&sem->waiting);
 	return sem;
 }
@@ -91,7 +98,8 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 			__FUNCTION__, __LINE__, acl_fiber_id(curr));
 		return -1;
 	}
-	return sem->num;
+
+	return --sem->num;
 }
 
 int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem)
@@ -137,8 +145,9 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	}
 #endif
 
+	sem->num++;
+
 	if ((ready = FIRST_FIBER(&sem->waiting)) == NULL) {
-		sem->num++;
 		return sem->num;
 	}
 
@@ -146,6 +155,10 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	acl_fiber_ready(ready);
 
 	num = sem->num;
-	acl_fiber_yield();
+
+	if (!(sem->flags & ACL_FIBER_SEM_F_ASYNC)) {
+		acl_fiber_yield();
+	}
+
 	return num;
 }

@@ -15,8 +15,12 @@ typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 /**
  * Create one fiber semaphore, and binding it with the current thread
  * @param num {int} the initial value of the semaphore, must >= 0
+ * @param flags {unsigned} the flags defined as ACL_FIBER_SEM_F_XXX
  * @return {ACL_FIBER_SEM *}
  */
+FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create2(int num, unsigned flags);
+#define ACL_FIBER_SEM_F_ASYNC	(1 << 0)	/* If notifying in async mode */
+
 FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 
 /**
