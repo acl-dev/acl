@@ -116,6 +116,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"-s redis_addr[127.0.0.1:6379]\r\n"
+		"-p passwd\r\n"
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 0]\r\n"
@@ -127,10 +128,10 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 0;
-	acl::string addr("127.0.0.1:6379"), cmd;
+	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 	bool cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:a:c")) > 0)
+	while ((ch = getopt(argc, argv, "hs:n:C:I:a:cp:")) > 0)
 	{
 		switch (ch)
 		{
@@ -155,6 +156,9 @@ int main(int argc, char* argv[])
 		case 'c':
 			cluster_mode = true;
 			break;
+		case 'p':
+			passwd = optarg;
+			break;
 		default:
 			break;
 		}
@@ -163,10 +167,16 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
+	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	acl::redis_client_cluster cluster;
 	cluster.set(addr.c_str(), 100, conn_timeout, rw_timeout);
 
-	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
+	if (!passwd.empty())
+	{
+		client.set_password(passwd);
+		cluster.set_password("default", passwd);
+	}
+
 
 	acl::redis_pubsub redis;
 
