@@ -104,9 +104,9 @@ static void usage(const char* procname)
 		"-p passwd\r\n"
 		"-n count\r\n"
 		"-m msg_count\r\n"
-		"-C connect_timeout[default: 10]\r\n"
+		"-c connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 0]\r\n"
-		"-c [use cluster mode]\r\n"
+		"-C [use cluster mode]\r\n"
 		"-a cmd[subscribe|publish]\r\n",
 		procname);
 }
@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 	bool cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:m:C:I:a:cp:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:m:c:I:a:Cp:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -131,7 +131,7 @@ int main(int argc, char* argv[])
 		case 'm':
 			cnt = atoi(optarg);
 			break;
-		case 'C':
+		case 'c':
 			conn_timeout = atoi(optarg);
 			break;
 		case 'I':
@@ -140,7 +140,7 @@ int main(int argc, char* argv[])
 		case 'a':
 			cmd = optarg;
 			break;
-		case 'c':
+		case 'C':
 			cluster_mode = true;
 			break;
 		case 'p':
@@ -167,8 +167,10 @@ int main(int argc, char* argv[])
 	acl::redis_pubsub redis;
 
 	if (cluster_mode) {
+		printf("use cluster mode\r\n");
 		redis.set_cluster(&cluster);
 	} else {
+		printf("use single mode\r\n");
 		redis.set_client(&client);
 	}
 
