@@ -2,6 +2,7 @@
 
 static acl::string __channel_prefix("test_channel");
 static int __count = 0;
+static bool __show = false;
 
 static bool get_msg(acl::redis_pubsub& redis, int cnt)
 {
@@ -17,7 +18,7 @@ static bool get_msg(acl::redis_pubsub& redis, int cnt)
 			return false;
 		}
 
-		if (++__count < 10) {
+		if (++__count < 10 || __show) {
 			printf("get message from channel %s, msg=%s\r\n",
 				channel.c_str(), msg.c_str());
 		}
@@ -31,7 +32,7 @@ static bool test_subscribe(acl::redis_pubsub& redis, int n, int cnt)
 	acl::string channel;
 
 	for (int i = 0; i < n; i++) {
-		channel.format("%s_1_%d", __channel_prefix.c_str(), i);
+		channel.format("%s_%d", __channel_prefix.c_str(), i);
 
 		redis.clear();
 		int ret = redis.subscribe(channel, NULL);
@@ -45,6 +46,19 @@ static bool test_subscribe(acl::redis_pubsub& redis, int n, int cnt)
 	}
 
 	printf(">>>subscribe channels total: %d\r\n", n);
+
+	acl::redis_client* client = redis.get_client();
+	if (client) {
+		acl::socket_stream* conn = client->get_stream(false);
+		const char* peer_addr;
+		if (conn) {
+			peer_addr = conn->get_peer(true);
+		} else {
+			peer_addr = "";
+		}
+		printf("subscribe client on addr=%s, peer=%s\r\n",
+			client->get_addr(), peer_addr);
+	}
 
 	for (int i = 0; i < n; i++) {
 		if (get_msg(redis, cnt) == false) {
@@ -63,17 +77,17 @@ static bool pub_msg(acl::redis_pubsub& redis, const char* channel, int n)
 
 	for (int i = 0; i < n; i++) {
 		redis.clear();
-		msg.format("msg_1_%s", channel);
+		msg.format("msg_%s_%d", channel, i);
 
 		int ret = redis.publish(channel, msg.c_str(), msg.length());
-		if (ret <= 0) {
+		if (ret < 0) {
 			printf("publish to %s %s error(%s), ret: %d\r\n",
 				channel, msg.c_str(),
 				redis.result_error(), ret);
 			return false;
 		}
 
-		if (++__count < 10) {
+		if (++__count < 10 || __show) {
 			printf("publish ok, channel=%s, msg=%s\r\n",
 				channel, msg.c_str());
 		}
@@ -87,7 +101,7 @@ static bool test_publish(acl::redis_pubsub& redis, int n, int cnt)
 	acl::string channel;
 
 	for (int i = 0; i < n; i++) {
-		channel.format("%s_1_%d", __channel_prefix.c_str(), i);
+		channel.format("%s_%d", __channel_prefix.c_str(), i);
 		if (!pub_msg(redis, channel, cnt)) {
 			return false;
 		}
@@ -107,6 +121,7 @@ static void usage(const char* procname)
 		"-c connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 0]\r\n"
 		"-C [use cluster mode]\r\n"
+		"-S [if show messages]\r\n"
 		"-a cmd[subscribe|publish]\r\n",
 		procname);
 }
@@ -117,7 +132,7 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 	bool cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:m:c:I:a:Cp:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:m:c:I:a:Cp:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -145,6 +160,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'p':
 			passwd = optarg;
+			break;
+		case 'S':
+			__show = true;
 			break;
 		default:
 			break;
