@@ -480,11 +480,19 @@ ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 }
 
 # ifdef HAS_MMSG
+#  if defined(HOOK_MMSG_UBUNTU)
+int recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
+	int flags, struct timespec *timeout)
+{
+	return acl_fiber_recvmmsg(sockfd, msgvec, vlen, flags, timeout);
+}
+#  elif defined(HOOK_MMSG_CENTOS)
 int recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 	int flags, const struct timespec *timeout)
 {
 	return acl_fiber_recvmmsg(sockfd, msgvec, vlen, flags, timeout);
 }
+#  endif
 
 int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, int flags)
 {

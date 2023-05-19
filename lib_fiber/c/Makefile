@@ -120,6 +120,14 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
 	CFLAGS += -DSHARE_STACK
 
+	ifeq ($(HOOK_MMSG_UBUNTU), yes)
+		CFLAGS += -DHOOK_MMSG_UBUNTU
+	endif
+
+	ifeq ($(HOOK_MMSG_CENTOS), yes)
+		CFLAGS += -DHOOK_MMSG_CENTOS
+	endif
+
 # If HAS_IO_URING=yes or has_io_uring=yes has been set in environment,
 # or you run "$make HAS_IO_URING=yes", the io_uring engine will be used.
 # will use io_uring.
