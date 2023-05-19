@@ -348,8 +348,13 @@ ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
 # pragma message("NOTICE: recvmmsg not support in io-uring mode!")
 	return -1;
 #endif
+	if (timeout != NULL) {
+		int delay = timeout->tv_sec * 1000 + timeout->tv_nsec / 1000000;
+		if (delay >= 0 && read_wait(fe->fd, delay) == -1) {
+			return -1;
+		}
+	}
 
-	(void) timeout;
 	FIBER_READ(sys_recvmmsg, fe, msgvec, vlen, flags, NULL);
 }
 # endif // HAS_MMSG
