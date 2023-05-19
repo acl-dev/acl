@@ -73,6 +73,15 @@ writev_fn   *sys_writev                     = NULL;
 sendmsg_fn  __sys_sendmsg                   = NULL;
 sendmsg_fn  *sys_sendmsg                    = NULL;
 
+# ifdef HAS_MMSG
+recvmmsg_fn  __sys_recvmmsg                 = NULL;
+recvmmsg_fn  *sys_recvmmsg                  = NULL;
+
+sendmmsg_fn  __sys_sendmmsg                 = NULL;
+sendmmsg_fn  *sys_sendmmsg                  = NULL;
+
+# endif
+
 # ifdef __USE_LARGEFILE64
 sendfile64_fn __sys_sendfile64              = NULL;
 sendfile64_fn *sys_sendfile64               = NULL;
@@ -246,6 +255,11 @@ static void hook_api(void)
 	LOAD_FN("send", send_fn, __sys_send, sys_send);
 	LOAD_FN("sendto", sendto_fn, __sys_sendto, sys_sendto);
 	LOAD_FN("sendmsg", sendmsg_fn, __sys_sendmsg, sys_sendmsg);
+
+# ifdef HAS_MMSG
+	LOAD_FN("recvmmsg", recvmmsg_fn, __sys_recvmmsg, sys_recvmmsg);
+	LOAD_FN("sendmmsg", sendmmsg_fn, __sys_sendmmsg, sys_sendmmsg);
+#endif
 
 # ifdef __USE_LARGEFILE64
 	LOAD_FN("sendfile64", sendfile64_fn, __sys_sendfile64, sys_sendfile64);

@@ -79,6 +79,9 @@ typedef int socket_t;
 # define	FIBER_ECONNABORTED	ECONNABORTED
 # define	FIBER_EINPROGRESS	EINPROGRESS
 
+# ifdef		MSG_WAITFORONE
+#  define	HAS_MMSG
+# endif
 #endif
 
 #ifdef FIBER_LIB

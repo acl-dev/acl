@@ -351,7 +351,32 @@ ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
 		CHECK_WRITE_RESULT(fe, n);
 	}
 }
+
+# ifdef HAS_MMSG
+int fiber_sendmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec, unsigned int vlen,
+	int flags)
+{
+	CLR_POLLING(fe);
+
+#if defined(HAS_IO_URING)
+# pragma message("NOTICE: sendmmsg not support in io-uring mode!")
+	return -1;
 #endif
+
+	if (sys_sendmmsg == NULL) {
+		hook_once();
+	}
+
+	CHECK_SET_NBLOCK(fe->fd);
+
+	while (1) {
+		ssize_t n = (*sys_sendmmsg)(fe->fd, msgvec, vlen, flags);
+
+		CHECK_WRITE_RESULT(fe, n);
+	}
+}
+# endif // HAS_MMSG
+#endif  // SYS_UNIX
 
 #if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
 

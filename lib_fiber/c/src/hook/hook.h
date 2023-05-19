@@ -53,6 +53,12 @@ typedef ssize_t  (*sendto_fn)(socket_t, const void *, size_t, int,
 	const struct sockaddr *, socklen_t);
 typedef ssize_t  (*sendmsg_fn)(socket_t, const struct msghdr *, int);
 
+# ifdef HAS_MMSG
+typedef int (*recvmmsg_fn)(int, struct mmsghdr *, unsigned int,
+	int, const struct timespec *);
+typedef int (*sendmmsg_fn)(int, struct mmsghdr *, unsigned int, int);
+# endif
+
 # ifdef  __USE_LARGEFILE64
 typedef ssize_t  (*sendfile64_fn)(socket_t, int, off64_t*, size_t);
 # endif
@@ -151,6 +157,11 @@ extern write_fn             *sys_write;
 extern writev_fn            *sys_writev;
 extern sendmsg_fn           *sys_sendmsg;
 
+# ifdef HAS_MMSG
+extern recvmmsg_fn          *sys_recvmmsg;
+extern sendmmsg_fn          *sys_sendmmsg;
+# endif
+
 # ifdef __USE_LARGEFILE64
 extern sendfile64_fn        *sys_sendfile64;
 # endif
@@ -196,4 +207,3 @@ int epoll_try_register(int epfd);
 #endif
 
 #endif
-

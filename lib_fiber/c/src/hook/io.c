@@ -237,7 +237,6 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 }
 
 #ifdef SYS_UNIX
-
 ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
@@ -257,6 +256,29 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 	fe = fiber_file_open_read(sockfd);
 	return fiber_recvmsg(fe, msg, flags);
 }
+
+# ifdef HAS_MMSG
+int acl_fiber_recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
+	int flags, const struct timespec *timeout)
+{
+	FILE_EVENT *fe;
+
+	if (IS_INVALID(sockfd)) {
+		return -1;
+	}
+
+	if (sys_recvmmsg == NULL) {
+		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_recvmmsg)(sockfd, msgvec, vlen, flags, timeout);
+	}
+
+	fe = fiber_file_open_read(sockfd);
+	return fiber_recvmmsg(fe, msgvec, vlen, flags, timeout);
+}
+# endif
 #endif
 
 /****************************************************************************/
@@ -375,6 +397,29 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 	fe = fiber_file_open_write(sockfd);
 	return fiber_sendmsg(fe, msg, flags);
 }
+
+# ifdef HAS_MMSG
+int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
+	int flags)
+{
+	FILE_EVENT *fe;
+
+	if (IS_INVALID(sockfd)) {
+		return -1;
+	}
+
+	if (sys_sendmmsg == NULL) {
+		hook_once();
+	}
+
+	if (!var_hook_sys_api) {
+		return (*sys_sendmmsg)(sockfd, msgvec, vlen, flags);
+	}
+
+	fe = fiber_file_open_write(sockfd);
+	return fiber_sendmmsg(fe, msgvec, vlen, flags);
+}
+# endif
 #endif
 
 /****************************************************************************/
@@ -433,6 +478,20 @@ ssize_t sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
 	return acl_fiber_sendmsg(sockfd, msg, flags);
 }
+
+# ifdef HAS_MMSG
+int recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
+	int flags, const struct timespec *timeout)
+{
+	return acl_fiber_recvmmsg(sockfd, msgvec, vlen, flags, timeout);
+}
+
+int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, int flags)
+{
+	return acl_fiber_sendmmsg(sockfd, msgvec, vlen, flags);
+}
+# endif
+
 #endif // SYS_UNIX
 
 /****************************************************************************/

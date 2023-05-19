@@ -2,7 +2,7 @@
 #include "common.h"
 
 #include "fiber.h"
-#include "hook.h"
+#include "hook.h"  // Must before "io.h" for the defined HAS_MMSG
 #include "io.h"
 
 #if defined(HAS_IO_URING)
@@ -337,6 +337,22 @@ ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
 
 	FIBER_READ(sys_recvmsg, fe, msg, flags);
 }
+
+# ifdef HAS_MMSG
+ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
+	unsigned int vlen, int flags, const struct timespec *timeout)
+{
+	CLR_POLLING(fe);
+
+#ifdef HAS_IO_URING
+# pragma message("NOTICE: recvmmsg not support in io-uring mode!")
+	return -1;
+#endif
+
+	(void) timeout;
+	FIBER_READ(sys_recvmmsg, fe, msgvec, vlen, flags, NULL);
+}
+# endif // HAS_MMSG
 
 #endif  // SYS_UNIX
 

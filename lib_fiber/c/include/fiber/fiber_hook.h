@@ -65,6 +65,13 @@ FIBER_API ssize_t acl_fiber_read(socket_t, void* buf, size_t count);
 FIBER_API ssize_t acl_fiber_readv(socket_t, const struct iovec* iov, int iovcnt);
 FIBER_API ssize_t acl_fiber_recvmsg(socket_t, struct msghdr* msg, int flags);
 
+# ifdef HAS_MMSG
+FIBER_API int acl_fiber_recvmmsg(int sockfd, struct mmsghdr *msgvec,
+	unsigned int vlen, int flags, const struct timespec *timeout);
+FIBER_API int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec,
+	unsigned int vlen, int flags);
+# endif
+
 FIBER_API ssize_t acl_fiber_write(socket_t, const void* buf, size_t count);
 FIBER_API ssize_t acl_fiber_writev(socket_t, const struct iovec* iov, int iovcnt);
 FIBER_API ssize_t acl_fiber_sendmsg(socket_t, const struct msghdr* msg, int flags);

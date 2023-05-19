@@ -28,11 +28,22 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len);
 ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count);
 ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
 
+# ifdef HAS_MMSG
+ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
+	unsigned int vlen, int flags, const struct timespec *timeout);
+# endif
+
 // in fiber_write.c
 int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len);
 
 ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count);
 ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);
+
+# ifdef HAS_MMSG
+int fiber_sendmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec, unsigned int vlen,
+	int flags);
+# endif
+
 # if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
 ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count);
 # endif
