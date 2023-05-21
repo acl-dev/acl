@@ -89,6 +89,8 @@ http_method_t HttpServletRequest::getMethod(string* method_s /* = NULL */) const
 
 	if (!readHeaderCalled_) {
 		const_cast<HttpServletRequest*>(this)->readHeader(method_s);
+	} else if (method_s) {
+		methodString(method_, *method_s);
 	}
 	return method_;
 }
@@ -721,6 +723,45 @@ void HttpServletRequest::parseParameters(const char* str)
 	}
 
 	acl_argv_free(tokens);
+}
+
+void HttpServletRequest::methodString(http_method_t type, string &buf)
+{
+	switch (type) {
+	case HTTP_METHOD_GET:
+		buf = "GET";
+		break;
+	case HTTP_METHOD_POST:
+		buf = "POST";
+		break;
+	case HTTP_METHOD_PUT:
+		buf = "PUT";
+		break;
+	case HTTP_METHOD_CONNECT:
+		buf = "CONNECT";
+		break;
+	case HTTP_METHOD_PURGE:
+		buf = "PURGE";
+		break;
+	case HTTP_METHOD_DELETE:
+		buf = "DELETE";
+		break;
+	case HTTP_METHOD_HEAD:
+		buf = "HEAD";
+		break;
+	case HTTP_METHOD_OPTION:
+		buf = "OPTION";
+		break;
+	case HTTP_METHOD_PROPFIND:
+		buf = "PROPFIND";
+		break;
+	case HTTP_METHOD_PATCH:
+		buf = "PATCH";
+		break;
+	default:
+		buf = "OTHER";
+		break;
+	}
 }
 
 // Content-Type: application/x-www-form-urlencoded; charset=utf-8

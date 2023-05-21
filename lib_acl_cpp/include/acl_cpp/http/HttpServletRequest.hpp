@@ -62,6 +62,13 @@ public:
 	http_method_t getMethod(string* method_s = NULL) const;
 
 	/**
+	 * 将 HTTP 请求方法类型转换为可描述性字符串
+	 * @param type {http_method_t}
+	 * @param buf  {string&} 存放结果字符串
+	 */
+	static void methodString(http_method_t type, string& buf);
+
+	/**
 	 * 获得 HTTP 客户端请求的所有 cookie 对象集合
 	 * @return {const std::vector<HttpCookie*>&}
 	 */

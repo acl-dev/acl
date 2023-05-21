@@ -109,7 +109,7 @@ static bool ws_msg(acl::websocket& in, acl::websocket& out)
 	return false;
 }
 
-bool wesocket_run(HttpRequest& req, HttpResponse&)
+bool websocket_run(HttpRequest& req, HttpResponse&)
 {
 	acl::socket_stream& conn = req.getSocketStream();
 	acl::websocket in(conn), out(conn);

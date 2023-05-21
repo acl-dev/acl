@@ -1,3 +1,3 @@
 #pragma once
 
-bool wesocket_run(HttpRequest& req, HttpResponse&);
+bool websocket_run(HttpRequest& req, HttpResponse&);

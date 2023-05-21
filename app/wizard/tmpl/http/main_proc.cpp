@@ -8,10 +8,12 @@
 #endif
 
 #ifndef USE_LAMBDA
-static bool http_get_default(const char* path, HttpRequest&, HttpResponse& res)
+static bool http_get_default(const char* path, HttpRequest& req, HttpResponse& res)
 {
-	acl::string buf;
-	buf.format("%s: hello world!\r\n", path);
+	acl::string buf, method_buf;
+	acl::http_method_t method = req.getMethod(&method_buf);
+	buf.format("%s: hello world!, method=%d, %s\r\n",
+		path, (int) method, method_buf.c_str());
 	res.setContentLength(buf.size());
 	return res.write(buf);
 }
@@ -120,10 +122,10 @@ int main(int argc, char* argv[])
 			res.setContentLength(buf.size());
 			return res.write(buf);
 		}).Websocket("/", [](HttpRequest& req, HttpResponse& res) {
-			return wesocket_run(req, res);
+			return websocket_run(req, res);
 		});
 #else
-		.Websocket("/", wesocket_run)
+		.Websocket("/", websocket_run)
 		.Default(http_get_default);
 #endif
 

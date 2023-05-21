@@ -105,5 +105,14 @@ bool http_servlet::doService(int type, HttpRequest& req, HttpResponse& res)
 	$<GET_COOKIES> 
 	*/
 
+	const char* expect = req.getHeader("Expect");
+	if (expect && strcasecmp(expect, "100-continue") == 0) {
+		const char* reply = "HTTP/1.1 100 Continue\r\n\r\n";
+		acl::ostream& out = res.getOutputStream();
+		if (out.write(reply, strlen(reply)) == -1) {
+			return false;
+		}
+	}
+
 	return service_.doService(type, req, res);
 }
