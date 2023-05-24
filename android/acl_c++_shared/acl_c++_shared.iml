@@ -109,6 +109,9 @@
     <content url="file://$MODULE_DIR$/../../include/mysql">
       <sourceFolder url="file://$MODULE_DIR$/../../include/mysql" />
     </content>
+    <content url="file://$MODULE_DIR$/../../include/openssl-1.1.1q">
+      <sourceFolder url="file://$MODULE_DIR$/../../include/openssl-1.1.1q" />
+    </content>
     <content url="file://$MODULE_DIR$/../../include/pgsql">
       <sourceFolder url="file://$MODULE_DIR$/../../include/pgsql" />
     </content>
