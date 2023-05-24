@@ -320,6 +320,7 @@
     <ClInclude Include="include\fiber\fiber_redis_pipeline.hpp" />
     <ClInclude Include="include\fiber\fiber_sem.hpp" />
     <ClInclude Include="include\fiber\fiber_tbox.hpp" />
+    <ClInclude Include="include\fiber\fiber_tbox2.hpp" />
     <ClInclude Include="include\fiber\go_fiber.hpp" />
     <ClInclude Include="include\fiber\http_server.hpp" />
     <ClInclude Include="include\fiber\http_servlet.hpp" />

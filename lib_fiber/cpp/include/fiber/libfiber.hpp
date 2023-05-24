@@ -12,6 +12,7 @@
 
 #if defined(ACL_CPP_API)
 # include "fiber_tbox.hpp"
+# include "fiber_tbox2.hpp"
 # include "wait_group.hpp"
 # include "master_fiber.hpp"
 # include "fiber_redis_pipeline.hpp"

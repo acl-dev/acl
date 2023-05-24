@@ -95,6 +95,9 @@
     <ClInclude Include="include\fiber\fiber_tbox.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="include\fiber\fiber_tbox2.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="include\fiber\lib_fiber.hpp">
       <Filter>头文件</Filter>
     </ClInclude>

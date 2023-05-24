@@ -23,14 +23,12 @@ namespace acl {
  *
  * acl::fiber_tbox<myobj> fiber_tbox;
  *
- * void thread_producer(void)
- * {
+ * void thread_producer(void) {
  *     myobj* o = new myobj;
  *     fiber_tbox.push(o);
  * }
  *
- * void thread_consumer(void)
- * {
+ * void thread_consumer(void) {
  *     myobj* o = fiber_tbox.pop();
  *     o->test();
  *     delete o;
@@ -49,8 +47,7 @@ public:
 	 */
 	fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
 
-	~fiber_tbox(void)
-	{
+	~fiber_tbox(void) {
 		clear(free_obj_);
 	}
 
@@ -58,8 +55,7 @@ public:
 	 * 清理消息队列中未被消费的消息对象
 	 * @param free_obj {bool} 释放调用 delete 方法删除消息对象
 	 */
-	void clear(bool free_obj = false)
-	{
+	void clear(bool free_obj = false) {
 		if (free_obj) {
 			for (typename std::list<T*>::iterator it =
 				tbox_.begin(); it != tbox_.end(); ++it) {
@@ -82,8 +78,7 @@ public:
 	 * @return {bool}
 	 * @override
 	 */
-	bool push(T* t, bool notify_first = true)
-	{
+	bool push(T* t, bool notify_first = true) {
 		// 先加锁
 		if (mutex_.lock() == false) {
 			abort();
@@ -126,8 +121,7 @@ public:
 	 *  判断是否获得了一个空消息对象
 	 * @override
 	 */
-	T* pop(int wait_ms = -1, bool* found = NULL)
-	{
+	T* pop(int wait_ms = -1, bool* found = NULL) {
 		bool found_flag;
 		if (mutex_.lock() == false) {
 			abort();
@@ -170,21 +164,18 @@ public:
 	 * 返回当前存在于消息队列中的消息数量
 	 * @return {size_t}
 	 */
-	size_t size(void) const
-	{
+	size_t size(void) const {
 		return size_;
 	}
 
 public:
-	void lock(void)
-	{
+	void lock(void) {
 		if (mutex_.lock() == false) {
 			abort();
 		}
 	}
 
-	void unlock(void)
-	{
+	void unlock(void) {
 		if (mutex_.unlock() == false) {
 			abort();
 		}
@@ -201,8 +192,7 @@ private:
 	fiber_mutex   mutex_;
 	fiber_cond    cond_;
 
-	T* peek(bool& found_flag)
-	{
+	T* peek(bool& found_flag) {
 		typename std::list<T*>::iterator it = tbox_.begin();
 		if (it == tbox_.end()) {
 			found_flag = false;
@@ -217,4 +207,3 @@ private:
 };
 
 } // namespace acl
-
