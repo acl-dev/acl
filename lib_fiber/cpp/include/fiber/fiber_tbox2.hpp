@@ -37,8 +37,9 @@ namespace acl {
  * }
  */
 
-// The base box<T> defined in acl_cpp/stdlib/box.hpp, so you must include
-// box.hpp first before including fiber_tbox2.hpp
+// The fiber_tbox2 has an object copying process in push/pop which is suitable
+// for transfering the object managed by std::shared_ptr.
+
 template<typename T>
 class fiber_tbox2 {
 public:
