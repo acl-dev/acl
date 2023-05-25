@@ -764,84 +764,6 @@ static void servers_daemon(int count, int fdtype, int nthreads)
 }
 #endif
 
-static void server_alone_open(FIBER_SERVER *server, ACL_ARGV *addrs)
-{
-	const char *myname = "server_alone_open";
-	ACL_ITER iter;
-	unsigned flag = ACL_INET_FLAG_NONE;
-	int i = 0;
-
-	if (var_fiber_master_reuseport) {
-		flag |= ACL_INET_FLAG_REUSEPORT;
-	}
-
-	acl_foreach(iter, addrs) {
-		const char* addr = (const char*) iter.data;
-		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
-				flag, 0, 0);
-		if (sstream != NULL) {
-			acl_msg_info("%s: thread-%lu, listen %s ok", myname,
-				(unsigned long) acl_pthread_self(), addr);
-#if !defined(_WIN32) && !defined(_WIN64)
-			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
-#endif
-			server->sstreams[i++] = sstream;
-		} else {
-			acl_msg_fatal("%s(%d): thread-%lu, listen %s error(%s)",
-				myname, __LINE__, (long) acl_pthread_self(),
-				addr, acl_last_serror());
-		}
-	}
-}
-
-static void servers_alone(const char *addrs, int fdtype, int nthreads)
-{
-	ACL_ARGV* tokens = acl_argv_split(addrs, ";, \t");
-	int i;
-
-	__servers = servers_alloc(nthreads, tokens->argc, fdtype);
-
-	for (i = 0; i < nthreads; i++) {
-		server_alone_open(__servers[i], tokens);
-	}
-
-	acl_argv_free(tokens);
-}
-
-static int is_ipaddr(const char *addr)
-{
-	// Just only the port, such as: 8088
-	if (acl_alldig(addr)) {
-		return 1;
-	}
-
-	// Such as: ip:port, or ip|port, or :port, or |port
-	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
-		return 1;
-	}
-
-	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
-		return 1;
-	}
-
-	return 0;
-}
-
-static void correct_addr(const char *addr, char *buf, size_t size)
-{
-	if (is_ipaddr(addr)) {
-		ACL_SAFE_STRNCPY(buf, addr, size);
-	} else {
-		const char *pri = !strcmp(acl_var_fiber_master_private, "y") ?
-			"private" : "public";
-#if defined(_WIN32) || defined(_WIN64)
-		_snprintf(buf, size, "%s/%s/%s", acl_var_fiber_queue_dir, pri, addr);
-#else
-		snprintf(buf, size, "%s/%s/%s", acl_var_fiber_queue_dir, pri, addr);
-#endif
-	}
-}
-
 static void server_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 {
 	const char *myname = "server_open";
@@ -855,28 +777,37 @@ static void server_open(FIBER_SERVER *server, ACL_ARGV *addrs)
 
 	acl_foreach(iter, addrs) {
 		const char* addr = (const char*) iter.data;
-		char addrbuf[512];
-
-		correct_addr(addr, addrbuf, sizeof(addrbuf));
-		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addrbuf, 128,
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
 				flag, 0, 0);
-		if (sstream != NULL) {
-			acl_msg_info("%s: listen %s ok", myname, addr);
-#if !defined(_WIN32) && !defined(_WIN64)
-			acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
-#endif
-			server->sstreams[i++] = sstream;
-		} else {
+		if (sstream == NULL) {
 			acl_msg_fatal("%s(%d): listen %s error(%s)",
 				myname, __LINE__, addr, acl_last_serror());
 		}
+
+		acl_msg_info("%s: listen %s ok", myname, addr);
+
+#if !defined(_WIN32) && !defined(_WIN64)
+		acl_close_on_exec(ACL_VSTREAM_SOCK(sstream), ACL_CLOSE_ON_EXEC);
+#endif
+		server->sstreams[i++] = sstream;
 	}
 }
 
 static void servers_open(const char *addrs, int fdtype, int nthreads)
 {
-	ACL_ARGV* tokens = acl_argv_split(addrs, ";, \t");
+	const char *pri = !strcmp(acl_var_fiber_master_private, "y") ?
+		"private" : "public";
+	char *unix_path = acl_concatenate(acl_var_fiber_queue_dir, "/",
+			pri, NULL);
+	ACL_ARGV* tokens = acl_search_addrs(addrs, unix_path);
 	int i;
+
+	acl_myfree(unix_path);
+
+	if (tokens == NULL) {
+		acl_msg_fatal("%s(%d), %s: can't find valid addrs from %s",
+			__FILE__, __LINE__, __FUNCTION__, addrs);
+	}
 
 	__servers = servers_alloc(nthreads, tokens->argc, fdtype);
 
@@ -1245,7 +1176,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 	parse_args();
 
 #if defined(_WIN32) || defined(_WIN64)
-	servers_alone(addrs, fdtype, acl_var_fiber_threads);
+	servers_open(addrs, fdtype, acl_var_fiber_threads);
 #else
 	if (root_dir) {
 		root_dir = acl_var_fiber_queue_dir;
@@ -1284,7 +1215,7 @@ void acl_fiber_server_main(int argc, char *argv[],
 			addrs = acl_var_fiber_master_service;
 		}
 		assert(addrs && *addrs);
-		servers_alone(addrs, fdtype, acl_var_fiber_threads);
+		servers_open(addrs, fdtype, acl_var_fiber_threads);
 	} else if (var_fiber_master_reuseport) {
 		assert(acl_var_fiber_master_service);
 		assert(*acl_var_fiber_master_service);

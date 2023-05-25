@@ -56,6 +56,16 @@ ACL_API void acl_free_ifaddrs(ACL_IFCONF *ifconf);
  */
 ACL_API ACL_IFCONF *acl_ifconf_search(const char *pattern);
 
+/**
+ * 扫描本机所有网卡 IP, 将匹配的地址集合返回
+ * @param patterns {const char*}
+ * @param unix_path {const char*} 当所匹配的地址为 unix domain 类型时, 该路径
+ *  为全路径的前缀路径
+ * @return {ACL_ARGV*} 返回非空时则返回对象中存放以字符串表示的地址集合, 用完
+ *  后需调用 acl_argv_free 释放;如果返回 NULL 则表示没有找到匹配的地址
+ */
+ACL_API ACL_ARGV *acl_search_addrs(const char *patterns, const char *unix_path);
+
 #ifdef	__cplusplus
 }
 #endif

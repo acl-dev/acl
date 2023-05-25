@@ -618,12 +618,19 @@ static void patterns_addrs_add(ACL_ARGV *patterns,
 
 ACL_IFCONF *acl_ifconf_search(const char *patterns)
 {
-	ACL_IFCONF *ifconf = acl_get_ifaddrs(), *ifconf2;
+	ACL_IFCONF *ifconf, *ifconf2;
 	ACL_ARGV   *patterns_tokens;
 	ACL_HTABLE *table;
 	ACL_ARRAY  *addrs;
 	ACL_ITER    iter;
 
+	if (patterns == NULL || *patterns == 0) {
+		acl_msg_error("%s(%d), %s: patterns null",
+			__FILE__, __LINE__, __FUNCTION__);
+		return NULL;
+	}
+
+	ifconf = acl_get_ifaddrs();
 	if (ifconf == NULL) {
 		acl_msg_error("%s(%d), %s:  acl_get_ifaddrs error %s",
 			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
@@ -685,4 +692,63 @@ ACL_IFCONF *acl_ifconf_search(const char *patterns)
 	acl_htable_free(table, NULL);
 	acl_array_free(addrs, acl_myfree_fn);
 	return ifconf2;
+}
+
+/*--------------------------------------------------------------------------*/
+
+static int is_ipaddr(const char *addr)
+{
+	/* Just only the port, such as: 8088 */
+	if (acl_alldig(addr)) {
+		return 1;
+	}
+
+	/* Such as: ip:port, or ip|port, or :port, or |port */
+	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
+		return 1;
+	}
+
+	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
+		return 1;
+	}
+
+	return 0;
+}
+
+static char *get_addr(const char *addr, const char *path)
+{
+	char *buf;
+
+	if (is_ipaddr(addr) || path == NULL || *path == 0) {
+		buf = acl_mystrdup(addr);
+		return buf;
+	}
+
+	buf = acl_concatenate(path, "/", addr, NULL);           
+	return buf;
+}
+
+ACL_ARGV *acl_search_addrs(const char *patterns, const char *unix_path)
+{
+	ACL_IFCONF *ifconf = acl_ifconf_search(patterns);
+	ACL_ITER iter;
+	ACL_ARGV *addrs;
+
+	if (ifconf == NULL) {
+		acl_msg_error("%s(%d): acl_ifconf_search null",
+			__FUNCTION__, __LINE__);
+		return NULL;
+	}
+
+	addrs = acl_argv_alloc(1);
+
+	acl_foreach(iter, ifconf) {
+		const ACL_IFADDR *ifaddr = (const ACL_IFADDR *) iter.data;
+		char *addr = get_addr(ifaddr->addr, unix_path);
+		acl_argv_add(addrs, addr, NULL);
+		acl_myfree(addr);
+	}
+
+	acl_free_ifaddrs(ifconf);
+	return addrs;
 }

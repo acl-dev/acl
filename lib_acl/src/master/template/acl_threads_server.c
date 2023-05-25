@@ -1246,50 +1246,29 @@ static ACL_VSTREAM **server_daemon_open(ACL_EVENT *event,
 
 #endif
 
-static int is_ipaddr(const char *addr)
-{
-	// Just only the port, such as: 8088
-	if (acl_alldig(addr)) {
-		return 1;
-	}
-
-	// Such as: ip:port, or ip|port, or :port, or |port
-	if (strrchr(addr, ':') || strrchr(addr, ACL_ADDR_SEP)) {
-		return 1;
-	}
-
-	if (acl_valid_ipv6_hostaddr(addr, 0) || acl_valid_ipv4_hostaddr(addr, 0)) {
-		return 1;
-	}
-
-	return 0;
-}
-
-static void correct_addr(const char *addr, char *buf, size_t size)
-{
-	if (is_ipaddr(addr)) {
-		ACL_SAFE_STRNCPY(buf, addr, size);
-	} else {
-		const char *pri = !strcmp(acl_var_threads_master_private, "y") ?
-			"private" : "public";
-#if defined(_WIN32) || defined(_WIN64)
-		_snprintf(buf, size, "%s/%s/%s", acl_var_threads_queue_dir, pri, addr);
-#else
-		snprintf(buf, size, "%s/%s/%s", acl_var_threads_queue_dir, pri, addr);
-#endif
-	}
-}
-
 static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	acl_pthread_pool_t *threads, const char *addrs)
 {
 	const char   *myname = "server_alone_open";
-	ACL_ARGV*     tokens = acl_argv_split(addrs, ";, \t");
+	const char *pri = !strcmp(acl_var_threads_master_private, "y") ?
+		"private" : "public";
+	char *unix_path = acl_concatenate(acl_var_threads_queue_dir, "/",
+			pri, NULL);
+	ACL_ARGV*     tokens = acl_search_addrs(addrs, unix_path);
 	ACL_ITER      iter;
 	int           i;
 	unsigned flag = ACL_INET_FLAG_NONE;
-	ACL_VSTREAM **streams = (ACL_VSTREAM **)
-		acl_mycalloc(tokens->argc + 1, sizeof(ACL_VSTREAM *));
+	ACL_VSTREAM **streams;
+
+	acl_myfree(unix_path);
+
+	if (tokens == NULL) {
+		acl_msg_fatal("%s(%d), %s: can't find valid addrs from %s",
+			__FILE__, __LINE__, __FUNCTION__, addrs);
+	}
+
+	streams = (ACL_VSTREAM **) acl_mycalloc(tokens->argc + 1, sizeof(ACL_VSTREAM *));
+
 
 	if (var_threads_master_reuseport) {
 		flag |= ACL_INET_FLAG_REUSEPORT;
@@ -1302,14 +1281,11 @@ static ACL_VSTREAM **server_alone_open(ACL_EVENT *event,
 	i = 0;
 	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
-		char addrbuf[512];
-
-		correct_addr(addr, addrbuf, sizeof(addrbuf));
-		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addrbuf, 128,
+		ACL_VSTREAM* sstream = acl_vstream_listen_ex(addr, 128,
 				flag, 0, 0);
 		if (sstream == NULL) {
 			acl_msg_error("%s(%d): listen %s error(%s)",
-				myname, __LINE__, addrbuf, acl_last_serror());
+				myname, __LINE__, addr, acl_last_serror());
 			exit(2);
 		}
 
