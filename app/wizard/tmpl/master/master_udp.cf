@@ -46,7 +46,7 @@ service server
 #	需要预先启动的进程数，该值不应大于 master_maxproc
 	master_prefork = 1
 #	进程程序名
-	master_command = $<PROGRAM>
+	master_command = {install_path}/sbin/$<PROGRAM>
 #	进程日志记录文件
 	master_log = {install_path}/var/log/$<PROGRAM>.log
 #	调试日志方式，格式：tag:level; tag:level; tab:level, 如：all:1; 101:2

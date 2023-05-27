@@ -80,6 +80,9 @@ bool file_tmpl::create_common()
 	if (!copy_and_replace("valgrind.sh", "valgrind.sh", true)) {
 		return false;
 	}
+	if (!copy_and_replace("setup.sh", "setup.sh", true)) {
+		return false;
+	}
 
 	string file;
 
