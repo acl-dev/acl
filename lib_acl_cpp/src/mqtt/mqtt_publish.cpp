@@ -60,20 +60,19 @@ mqtt_publish& mqtt_publish::set_payload(unsigned len, const char* data /* NULL *
 }
 
 bool mqtt_publish::to_string(string& out) {
-	if (pkt_id_ == 0) {
-		logger_error("pkt_id should > 0, pkt_id=%u", pkt_id_);
-		return false;
-	}
-
+	mqtt_header& header = this->get_header();
 	unsigned len = (unsigned) topic_.size() + 2 + payload_len_;
-	mqtt_qos_t qos = this->get_header().get_qos();
-	if (qos != MQTT_QOS0) {
+	mqtt_qos_t qos = header.get_qos();
+
+	if (qos > MQTT_QOS0) {
+		if (pkt_id_ == 0) {
+			logger_error("pkt_id should > 0, pkt_id=%u", pkt_id_);
+			return false;
+		}
 		len += 2;
 	}
 
-	mqtt_header& header = this->get_header();
-
-	if (header.is_dup() && header.get_qos() == MQTT_QOS0) {
+	if (header.is_dup() && qos == MQTT_QOS0) {
 		header.set_dup(false);
 	}
 

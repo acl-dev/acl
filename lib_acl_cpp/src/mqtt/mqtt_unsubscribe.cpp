@@ -51,10 +51,13 @@ mqtt_unsubscribe& mqtt_unsubscribe::add_topic(const char* topic) {
 }
 
 bool mqtt_unsubscribe::to_string(string& out) {
+	/*
 	if (pkt_id_ == 0) {
 		logger_error("pkt_id=0 invalid");
 		return false;
 	}
+	*/
+
 	if (topics_.empty()) {
 		logger_error("no topic available!");
 		return false;
