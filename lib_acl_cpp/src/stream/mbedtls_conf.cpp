@@ -841,6 +841,7 @@ mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 		MBEDTLS_SSL_IS_SERVER : MBEDTLS_SSL_IS_CLIENT);
 	__ssl_conf_ciphersuites(conf, ciphers_);
 
+	// conf_ will be set to the first one.
 	if (conf_ == NULL) {
 		conf_ = conf;
 	}
@@ -1020,11 +1021,14 @@ bool mbedtls_conf::load_ca(const char* ca_file, const char* ca_path)
 			ca_path, -ret);
 		free_ca();
 		return false;
-	} else {
-		// Setup ca cert
-		__ssl_conf_ca_chain(conf_, cacert_->next, NULL);
-		return true;
 	}
+
+	if (conf_ == NULL) {
+		conf_ = create_ssl_config();
+	}
+	// Setup ca cert
+	__ssl_conf_ca_chain(conf_, cacert_->next, NULL);
+	return true;
 #else
 	(void) ca_file;
 	(void) ca_path;
@@ -1065,7 +1069,16 @@ bool mbedtls_conf::add_cert(const char* crt_file, const char* key_file,
 	} \
 } while (0)
 
-	mbedtls_ssl_config* conf = create_ssl_config();
+	mbedtls_ssl_config* conf;
+	if (server_side_) {
+		conf = create_ssl_config();
+	}
+	// There's only one cert conf in client side mode.
+	else if (conf_) {
+		conf = conf_;
+	} else {
+		conf = conf_ = create_ssl_config();
+	}
 
 	X509_CRT *cert = NULL;
 	PKEY *pkey = NULL;
@@ -1181,12 +1194,17 @@ bool mbedtls_conf::setup_certs(void* ssl)
 		return false;
 	}
 
+	// If the default conf_ null, maybe the load_ca() and add_cert()
+	// didn't called before, so we just create a new one as the default.
+	if (conf_ == NULL) {
+		conf_ = create_ssl_config();
+	}
+
 	int ret = __ssl_setup((mbedtls_ssl_context*) ssl, conf_);
 	if (ret != 0) {
 		logger_error("ssl_setup error:-0x%04x", -ret);
 		return false;
 	}
-
 	return true;
 #else
 	(void) ssl;

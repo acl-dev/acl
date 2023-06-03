@@ -553,7 +553,6 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 	(void) timeout_;
 	logger_error("HAS_OPENSSL not defined!");
 #endif // HAS_OPENSSL
-
 }
 
 openssl_conf::~openssl_conf(void)
@@ -874,6 +873,9 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 	}
 
 #ifdef HAS_OPENSSL
+	if (ssl_ctx_ == NULL) {
+		create_ssl_ctx();  // ssl_ctx_ will be set in it.
+	}
 	__ssl_ctx_set_verify_depth(ssl_ctx_, 5);
 
 	STACK_OF(X509_NAME)* list = __ssl_load_client_ca(ca_file);
@@ -913,8 +915,14 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 	}
 
 #ifdef HAS_OPENSSL
-	SSL_CTX* ctx = create_ssl_ctx();
-
+	SSL_CTX* ctx;
+	if (server_side_) {
+		ctx = create_ssl_ctx();
+	} else if (ssl_ctx_) {
+		ctx = ssl_ctx_;
+	} else {
+		ctx = ssl_ctx_ = create_ssl_ctx();
+	}
 #if 0
 	if (__ssl_ctx_use_cert_chain(ctx, crt_file) != 1) {
 		logger_error("use crt chain file(%s) error", crt_file);
