@@ -1,4 +1,4 @@
-%define release_id 2
+%define release_id 3
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,15 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Jun 06 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-3-20230606.11
+- bugfix: fixed some bugs in mqtt module;
+- bugfix: redis_client_pipeline shouldn't use stack objects in sharing stack mode;
+- performance: optimize redis_builder's performance for removing redis objectsx;
+- feature: fiber_sem using async mode;
+- feature: add fiber_tbox2 for transfering objects such add shared_ptr;
+- feature: sendmmsg/recvmmsg were hooked in fiber IO module;
+- feature: service templates in the mode of fiber or thread can bind wildcad addresses.
 
 * Wed Mar 22 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-2-20230322.15
 - bugfix: fixed one bug in fiber_mutex module where some resouce collision maybe happen.
