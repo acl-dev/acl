@@ -65,7 +65,7 @@ static void usage(const char* procname) {
 int main(int argc, char *argv[]) {
 	int  ch;
 	bool readable = false;
-	acl::string addr = "0.0.0.0:9000";
+	acl::string addr = "0.0.0.0|9000";
 	acl::string event_type("kernel");
 
 	acl::acl_cpp_init();

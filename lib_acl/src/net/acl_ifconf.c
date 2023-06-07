@@ -384,7 +384,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 	IP_ADAPTER_INFO info_temp, *infos, *info;
 	ACL_IFCONF *ifconf;
 	ULONG len = 0;
-	int   j;
+	int   j, has_local = 0;
 
 	if (GetAdaptersInfo(&info_temp, &len) != ERROR_BUFFER_OVERFLOW) {
 		acl_msg_error("%s(%d): GetAdaptersInfo eror(%s)",
@@ -400,7 +400,7 @@ ACL_IFCONF *acl_get_ifaddrs()
 		return NULL;
 	}
 
-	ifconf = ifconf_create((int) (len / sizeof(IP_ADAPTER_INFO) + 1));
+	ifconf = ifconf_create((int) (len / sizeof(IP_ADAPTER_INFO) + 2));
 
 	for (info = infos, j = 0; info != NULL; info = info->Next) {
 		if (info->Type == MIB_IF_TYPE_LOOPBACK)
@@ -414,6 +414,8 @@ ACL_IFCONF *acl_get_ifaddrs()
 		SAFE_COPY(ifconf->addrs[j].desc, info->Description);
 		SAFE_COPY(ifconf->addrs[j].addr,
 			info->IpAddressList.IpAddress.String);
+		if (!strcmp(ifconf->addrs[j].addr, "127.0.0.1"))
+			has_local = 1;
 
 		ifconf->addrs[j].saddr.in.sin_addr.s_addr
 			= inet_addr(ifconf->addrs[j].addr);
@@ -423,6 +425,19 @@ ACL_IFCONF *acl_get_ifaddrs()
 			ifconf->addrs = (ACL_IFADDR*) acl_myrealloc(
 				ifconf->addrs, ifconf->length * sizeof(ACL_IFADDR));
 		}
+	}
+
+	if (!has_local) {
+		if (j == ifconf->length) {
+			ifconf->length *= 2;
+			ifconf->addrs = (ACL_IFADDR*) acl_myrealloc(
+				ifconf->addrs, ifconf->length * sizeof(ACL_IFADDR));
+		}
+
+		SAFE_COPY(ifconf->addrs[j].name, "localhost");
+		SAFE_COPY(ifconf->addrs[j].desc, "localhost");
+		SAFE_COPY(ifconf->addrs[j].addr, "127.0.0.1");
+		j++;
 	}
 
 	acl_myfree(infos);
@@ -730,10 +745,11 @@ static char *get_addr(const char *addr, const char *path)
 
 ACL_ARGV *acl_search_addrs(const char *patterns, const char *unix_path)
 {
-	ACL_IFCONF *ifconf = acl_ifconf_search(patterns);
+	ACL_IFCONF *ifconf;
 	ACL_ITER iter;
 	ACL_ARGV *addrs;
 
+	ifconf = acl_ifconf_search(patterns);
 	if (ifconf == NULL) {
 		acl_msg_error("%s(%d): acl_ifconf_search null",
 			__FUNCTION__, __LINE__);
