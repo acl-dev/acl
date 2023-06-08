@@ -90,7 +90,11 @@ int main(int argc, char *argv[])
 	mf.set_cfg_bool(var_conf_bool_tab);
 
 	if (argc >= 2 && strcasecmp(argv[1], "alone") == 0) {
+		//const char* addr = "127.0.0.1|8088";
 		const char* addr = "0.0.0.0|8088";
+		//const char* addr = "*.*.*.*|8088";
+		//const char* addr = "192.168.*.*|8088";
+		//const char* addr = "|8088";
 
 		printf("listen: %s\r\n", addr);
 		acl::log::stdout_open(true);
