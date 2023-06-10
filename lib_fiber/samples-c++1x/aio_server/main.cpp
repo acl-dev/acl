@@ -16,11 +16,9 @@ static int   __timeout = 0;
 /**
  * 延迟读回调处理类
  */
-class timer_reader: public acl::aio_timer_reader
-{
+class timer_reader: public acl::aio_timer_reader {
 public:
-	timer_reader(int delay)
-	{
+	timer_reader(int delay) {
 		delay_ = delay;
 		std::cout << "timer_reader init, delay: " << delay << std::endl;
 	}
@@ -30,16 +28,14 @@ protected:
 
 	// aio_timer_reader 的子类必须重载 destroy 方法
 	// @override
-	void destroy(void)
-	{
+	void destroy(void) {
 		std::cout << "timer_reader delete, delay: "  << delay_ << std::endl;
 		delete this;
 	}
 
 	// 重载基类回调方法
 	// @override
-	void timer_callback(unsigned int id)
-	{
+	void timer_callback(unsigned int id) {
 		std::cout << "timer_reader(" << id
 			<< "): timer_callback, delay: " << delay_ << std::endl;
 
@@ -54,11 +50,9 @@ private:
 /**
  * 延迟写回调处理类
  */
-class timer_writer: public acl::aio_timer_writer
-{
+class timer_writer: public acl::aio_timer_writer {
 public:
-	timer_writer(int delay)
-	{
+	timer_writer(int delay) {
 		delay_ = delay;
 		std::cout << "timer_writer init, delay: " << delay << std::endl;
 	}
@@ -68,16 +62,14 @@ protected:
 
 	// aio_timer_reader 的子类必须重载 destroy 方法
 	// @override
-	void destroy(void)
-	{
+	void destroy(void) {
 		std::cout << "timer_writer delete, delay: " << delay_ << std::endl;
 		delete this;
 	}
 
 	// 重载基类回调方法
 	// @override
-	void timer_callback(unsigned int id)
-	{
+	void timer_callback(unsigned int id) {
 		std::cout << "timer_writer(" << id << "): timer_callback, delay: "
 			<< delay_ << std::endl;
 
@@ -92,16 +84,13 @@ private:
 /**
  * 异步客户端流的回调类的子类
  */
-class io_callback : public acl::aio_callback
-{
+class io_callback : public acl::aio_callback {
 public:
 	io_callback(acl::aio_socket_stream* client)
-	: client_(client)
-	, i_(0) {}
+	: client_(client), i_(0) {}
 
 protected:
-	~io_callback(void)
-	{
+	~io_callback(void) {
 		std::cout << "delete io_callback now ..." << std::endl;
 	}
 
@@ -111,8 +100,7 @@ protected:
 	 * @param len {int} 读到的数据长度
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool read_callback(char* data, int len)
-	{
+	bool read_callback(char* data, int len) {
 		i_++;
 		if (i_ < 5) {
 			std::cout << ">>gets(i:" << i_ << "): "
@@ -176,16 +164,14 @@ protected:
 	 * 实现父类中的虚函数，客户端流的写成功回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool write_callback(void)
-	{
+	bool write_callback(void) {
 		return true;
 	}
 
 	/**
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 */
-	void close_callback(void)
-	{
+	void close_callback(void) {
 		// 必须在此处删除该动态分配的回调类对象以防止内存泄露
 		delete this;
 	}
@@ -194,8 +180,7 @@ protected:
 	 * 实现父类中的虚函数，客户端流的超时回调过程
 	 * @return {bool} 返回 true 表示继续，否则希望关闭该异步流
 	 */
-	bool timeout_callback(void)
-	{
+	bool timeout_callback(void) {
 		std::cout << "Timeout, delete it ..." << std::endl;
 		return (false);
 	}
@@ -213,8 +198,8 @@ class io_accept_callback : public acl::aio_accept_callback
 {
 public:
 	io_accept_callback(void) {}
-	~io_accept_callback(void)
-	{
+
+	~io_accept_callback(void) {
 		printf(">>io_accept_callback over!\n");
 	}
 
@@ -223,8 +208,7 @@ public:
 	 * @param client {aio_socket_stream*} 异步客户端流
 	 * @return {bool} 返回 true 以通知监听流继续监听
 	 */
-	bool accept_callback(acl::aio_socket_stream* client)
-	{
+	bool accept_callback(acl::aio_socket_stream* client) {
 		printf("proactor accept one\r\n");
 		return handle_client(client);
 	}
@@ -234,8 +218,7 @@ public:
 	 * @param server {acl::aio_listen_stream&} 异步监听流
 	 * @return {bool}
 	 */
-	bool listen_callback(acl::aio_listen_stream& server)
-	{
+	bool listen_callback(acl::aio_listen_stream& server) {
 		// reactor 模式下需要用户自己调用 accept 方法
 		acl::aio_socket_stream* client = server.accept();
 		if (client == NULL) {
@@ -248,8 +231,7 @@ public:
 	}
 
 private:
-	bool handle_client(acl::aio_socket_stream* client)
-	{
+	bool handle_client(acl::aio_socket_stream* client) {
 		// 创建异步客户端流的回调对象并与该异步流进行绑定
 		io_callback* callback = new io_callback(client);
 
@@ -309,8 +291,7 @@ private:
 //#include <sys/epoll.h>
 
 static void aio_run(bool use_reactor, acl::aio_handle& handle,
-	acl::aio_listen_stream* sstream)
-{
+	acl::aio_listen_stream* sstream) {
 	// 创建回调类对象，当有新连接到达时自动调用此类对象的回调过程
 	io_accept_callback callback;
 
@@ -351,8 +332,7 @@ static void aio_run(bool use_reactor, acl::aio_handle& handle,
 }
 
 static acl::aio_listen_stream* bind_addr(acl::aio_handle& handle,
-	const acl::string& addr)
-{
+	const acl::string& addr) {
 	// 创建监听异步流
 	acl::aio_listen_stream* sstream = new acl::aio_listen_stream(&handle);
 
@@ -371,45 +351,43 @@ static acl::aio_listen_stream* bind_addr(acl::aio_handle& handle,
 	return sstream;
 }
 
-static void usage(const char* procname)
-{
+static void usage(const char* procname) {
 	printf("usage: %s -h[help]\r\n"
-		"	-l ip:port\r\n"
-		"	-L line_max_length\r\n"
-		"	-t timeout\r\n"
-		"	-r [use reactor mode other proactor mode, default: proactor mode]\r\n"
-		"	-f [if use fiber mode]\r\n"
-		"	-k[use kernel event: epoll/iocp/kqueue/devpool]\r\n",
+		" -s ip:port, default: 127.0.0.1:9001\r\n"
+		" -d line_max_length\r\n"
+		" -t timeout\r\n"
+		" -R [use reactor mode other proactor mode, default: proactor mode]\r\n"
+		" -F [if use fiber mode]\r\n"
+		" -K [use kernel event: epoll/iocp/kqueue/devpool]\r\n",
 		procname);
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
 	bool use_kernel = false, use_reactor = false, use_fiber = false;
+	acl::string addr("127.0.0.1:9001");
 	int  ch;
-	acl::string addr(":9001");
 
-	while ((ch = getopt(argc, argv, "l:hkL:t:rf")) > 0) {
+	while ((ch = getopt(argc, argv, "s:hKd:t:RF")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
-		case 'l':
+		case 's':
 			addr = optarg;
 			break;
-		case 'k':
+		case 'K':
 			use_kernel = true;
 			break;
-		case 'L':
+		case 'd':
 			__max = atoi(optarg);
 			break;
 		case 't':
 			__timeout = atoi(optarg);
 			break;
-		case 'r':
+		case 'R':
 			use_reactor = true;
 			break;
-		case 'f':
+		case 'F':
 			use_fiber = true;
 			break;
 		default:
@@ -422,7 +400,6 @@ int main(int argc, char* argv[])
 
 	acl::fiber::stdout_open(true);
 	acl::log::stdout_open(true);
-
 
 	if (use_fiber) {
 		go[&] {
