@@ -132,12 +132,13 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 
+#if 0
 					if (client->get_conn().write(buf, ret) != ret) {
 						break;
 					} else {
 						continue;
 					}
-
+#endif
 					++nmsgs;
 					auto msg = std::make_shared<message>(client, nmsgs, buf, ret);
 					box.push(msg);
