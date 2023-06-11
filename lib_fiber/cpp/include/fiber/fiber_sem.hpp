@@ -21,6 +21,8 @@ public:
 	int trywait(void);
 	int post(void);
 
+	size_t num(void) const;
+
 private:
 	ACL_FIBER_SEM* sem_;
 	fiber_sem(const fiber_sem&);
@@ -47,10 +49,29 @@ private:
 template<typename T>
 class fiber_sbox {
 public:
-	fiber_sbox(bool free_obj = true)
-	: sem_(0), size_(0), free_obj_(free_obj) {}
+	fiber_sbox(bool free_obj = true) : sem_(0), free_obj_(free_obj) {}
 
 	~fiber_sbox(void) { clear(free_obj_); }
+
+	void push(T* t) {
+		sbox_.push_back(t);
+		sem_.post();
+	}
+
+	T* pop(void) {
+		sem_.wait();
+		T* t = sbox_.front();
+		sbox_.pop_front();
+		return t;
+	}
+
+private:
+	fiber_sem     sem_;
+	std::list<T*> sbox_;
+	bool          free_obj_;
+
+	fiber_sbox(const fiber_sbox&);
+	void operator=(const fiber_sbox&);
 
 	void clear(bool free_obj = false) {
 		if (free_obj) {
@@ -62,44 +83,36 @@ public:
 		}
 		sbox_.clear();
 	}
+};
 
-	void push(T* t) {
+template<typename T>
+class fiber_sbox2 {
+public:
+	fiber_sbox2(void): sem_(0) {}
+	~fiber_sbox2(void) {}
+
+	void push(T t) {
 		sbox_.push_back(t);
 		sem_.post();
 	}
 
-	T* pop(bool* found = NULL) {
+	T pop(void) {
 		sem_.wait();
-		bool found_flag;
-		T* t = peek(found_flag);
-		assert(found_flag);
-		if (found) {
-			*found = true;
-		}
+		T t = sbox_.front();
+		sbox_.pop_front();
 		return t;
+	}
+
+	size_t size(void) const {
+		return sem_.num();
 	}
 
 private:
-	fiber_sem     sem_;
-	std::list<T*> sbox_;
-	size_t        size_;
-	bool          free_obj_;
+	fiber_sem    sem_;
+	std::list<T> sbox_;
 
-	fiber_sbox(const fiber_sbox&);
-	void operator=(const fiber_sbox&);
-
-	T* peek(bool& found_flag) {
-		typename std::list<T*>::iterator it = sbox_.begin();
-		if (it == sbox_.end()) {
-			found_flag = false;
-			return NULL;
-		}
-		found_flag = true;
-		size_--;
-		T* t = *it;
-		sbox_.erase(it);
-		return t;
-	}
+	fiber_sbox2(const fiber_sbox2&);
+	void operator=(const fiber_sbox2&);
 };
 
 } // namespace acl

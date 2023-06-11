@@ -53,6 +53,11 @@ int acl_fiber_sem_num(ACL_FIBER_SEM *sem)
 	return sem->num;
 }
 
+int acl_fiber_sem_waiters_num(ACL_FIBER_SEM *sem)
+{
+	return ring_size(&sem->waiting);
+}
+
 int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 {
 	ACL_FIBER *curr;
