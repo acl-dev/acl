@@ -125,7 +125,7 @@ int main(int argc, char* argv[]) {
 		};
 	}
 
-	std::atomic<long> nusers, nmsgs;
+	std::atomic<long> nusers(0), nmsgs(0);
 
 	go[&nusers, &nmsgs] {
 		while (true) {
