@@ -9,8 +9,7 @@ namespace acl {
  * 可用于协程之间、线程之间以及协程与线程之间，通过事件等待/通知方式进行同步的
  * 的事件混合锁
  */
-class FIBER_CPP_API fiber_event
-{
+class FIBER_CPP_API fiber_event {
 public:
 	/**
 	 * 构造方法
@@ -49,8 +48,7 @@ public:
 	 * 返回 C 版本的事件对象
 	 * @return {ACL_FIBER_EVENT*}
 	 */
-	ACL_FIBER_EVENT* get_event(void) const
-	{
+	ACL_FIBER_EVENT* get_event(void) const {
 		return event_;
 	}
 

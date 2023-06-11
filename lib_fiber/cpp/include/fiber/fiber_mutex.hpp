@@ -11,8 +11,7 @@ namespace acl {
  * 可用于同一线程内的协程之间以及不同线程之间的协程之间的互斥锁, 同时还可以用在
  * 线程之间以及协程与独立线程之间的互斥.
  */
-class FIBER_CPP_API fiber_mutex
-{
+class FIBER_CPP_API fiber_mutex {
 public:
 	/**
 	 * 构造函数
@@ -46,8 +45,7 @@ public:
 	 * 返回 C 版本的互斥锁对象
 	 * @return {ACL_FIBER_MUTEX*}
 	 */
-	ACL_FIBER_MUTEX* get_mutex(void) const
-	{
+	ACL_FIBER_MUTEX* get_mutex(void) const {
 		return mutex_;
 	}
 
@@ -71,8 +69,7 @@ private:
 	void operator=(const fiber_mutex&);
 };
 
-class FIBER_CPP_API fiber_mutex_guard
-{
+class FIBER_CPP_API fiber_mutex_guard {
 public:
 	fiber_mutex_guard(fiber_mutex& mutex) : mutex_(mutex) {
 		mutex_.lock();

@@ -12,8 +12,7 @@ typedef enum {
 	fiber_sem_t_async = (1 << 0),
 } fiber_sem_attr_t;
 
-class FIBER_CPP_API fiber_sem
-{
+class FIBER_CPP_API fiber_sem {
 public:
 	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_def);
 	~fiber_sem(void);
@@ -28,16 +27,13 @@ private:
 	const fiber_sem& operator=(const fiber_sem&);
 };
 
-class FIBER_CPP_API fiber_sem_guard
-{
+class FIBER_CPP_API fiber_sem_guard {
 public:
-	fiber_sem_guard(fiber_sem& sem) : sem_(sem)
-	{
+	fiber_sem_guard(fiber_sem& sem) : sem_(sem) {
 		(void) sem_.wait();
 	}
 
-	~fiber_sem_guard(void)
-	{
+	~fiber_sem_guard(void) {
 		sem_.post();
 	}
 
@@ -49,16 +45,14 @@ private:
 };
 
 template<typename T>
-class fiber_sbox
-{
+class fiber_sbox {
 public:
 	fiber_sbox(bool free_obj = true)
 	: sem_(0), size_(0), free_obj_(free_obj) {}
 
 	~fiber_sbox(void) { clear(free_obj_); }
 
-	void clear(bool free_obj = false)
-	{
+	void clear(bool free_obj = false) {
 		if (free_obj) {
 			for (typename std::list<T*>::iterator it =
 				sbox_.begin(); it != sbox_.end(); ++it) {
@@ -69,14 +63,12 @@ public:
 		sbox_.clear();
 	}
 
-	void push(T* t)
-	{
+	void push(T* t) {
 		sbox_.push_back(t);
 		sem_.post();
 	}
 
-	T* pop(bool* found = NULL)
-	{
+	T* pop(bool* found = NULL) {
 		sem_.wait();
 		bool found_flag;
 		T* t = peek(found_flag);
@@ -96,8 +88,7 @@ private:
 	fiber_sbox(const fiber_sbox&);
 	void operator=(const fiber_sbox&);
 
-	T* peek(bool& found_flag)
-	{
+	T* peek(bool& found_flag) {
 		typename std::list<T*>::iterator it = sbox_.begin();
 		if (it == sbox_.end()) {
 			found_flag = false;

@@ -10,8 +10,7 @@ class fiber_mutex;
 /**
  * 可用在协程之间，线程之间，协程与线程之间的条件变量
  */
-class FIBER_CPP_API fiber_cond
-{
+class FIBER_CPP_API fiber_cond {
 public:
 	fiber_cond(void);
 	~fiber_cond(void);
@@ -36,8 +35,7 @@ public:
 	 * 返回 C 版本的条件变量对象
 	 * @return {ACL_FIBER_COND*}
 	 */
-	ACL_FIBER_COND* get_cond(void) const
-	{
+	ACL_FIBER_COND* get_cond(void) const {
 		return cond_;
 	}
 
@@ -49,4 +47,3 @@ private:
 };
 
 }
-

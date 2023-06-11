@@ -9,8 +9,7 @@ namespace acl {
 /**
  * 仅能用于同一线程内部的协程之间进行互斥的互斥锁
  */
-class FIBER_CPP_API fiber_lock
-{
+class FIBER_CPP_API fiber_lock {
 public:
 	fiber_lock(void);
 	~fiber_lock(void);
@@ -43,8 +42,7 @@ private:
 /**
  * 仅能用在同一线程内的协程之间进行互斥的读写锁
  */
-class FIBER_CPP_API fiber_rwlock
-{
+class FIBER_CPP_API fiber_rwlock {
 public:
 	fiber_rwlock(void);
 	~fiber_rwlock(void);
