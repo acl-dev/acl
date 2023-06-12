@@ -265,8 +265,9 @@ public:
 	 * @param ctx {void*} 传递给协程执行函数的参数
 	 * @param size {size_t} 协程栈大小
 	 * @param share_stack {bool} 是否创建共享栈协程
+	 * @return {ACL_FIBER*}
 	 */
-	static void fiber_create(void (*fn)(ACL_FIBER*, void*),
+	static ACL_FIBER* fiber_create(void (*fn)(ACL_FIBER*, void*),
 			void* ctx, size_t size, bool share_stack = false);
 
 	/**

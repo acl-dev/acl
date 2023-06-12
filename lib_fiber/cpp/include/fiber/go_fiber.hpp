@@ -35,9 +35,9 @@ public:
 	go_fiber(void) {}
 	go_fiber(size_t stack_size, bool on) : stack_size_(stack_size), stack_share_(on) {}
 
-	void operator > (std::function<void()> fn) {
+	ACL_FIBER* operator > (std::function<void()> fn) {
 		fiber_ctx* ctx = new fiber_ctx(fn);
-		fiber::fiber_create(fiber_main, (void*) ctx, stack_size_, stack_share_);
+		return fiber::fiber_create(fiber_main, (void*) ctx, stack_size_, stack_share_);
 	}
 
 	void operator < (std::function<void()> fn) {

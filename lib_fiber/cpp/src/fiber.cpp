@@ -308,7 +308,7 @@ void fiber::stdout_open(bool on)
 	acl_fiber_msg_stdout_enable(on ? 1 : 0);
 }
 
-void fiber::fiber_create(void (*fn)(ACL_FIBER*, void*), void* ctx,
+ACL_FIBER* fiber::fiber_create(void (*fn)(ACL_FIBER*, void*), void* ctx,
 	size_t stack_size, bool share_stack /* false */)
 {
 	ACL_FIBER_ATTR attr;
@@ -316,7 +316,7 @@ void fiber::fiber_create(void (*fn)(ACL_FIBER*, void*), void* ctx,
 	acl_fiber_attr_setstacksize(&attr, stack_size);
 	acl_fiber_attr_setsharestack(&attr, share_stack ? 1 : 0);
 
-	acl_fiber_create2(&attr, fn, ctx);
+	return acl_fiber_create2(&attr, fn, ctx);
 }
 
 void fiber::stacktrace(const fiber& fb, std::vector<fiber_frame>& out, size_t max)

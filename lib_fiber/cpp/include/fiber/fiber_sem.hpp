@@ -49,7 +49,9 @@ private:
 template<typename T>
 class fiber_sbox {
 public:
-	fiber_sbox(bool free_obj = true) : sem_(0), free_obj_(free_obj) {}
+	fiber_sbox(bool free_obj = true, bool async = true)
+	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_def)
+	, free_obj_(free_obj) {}
 
 	~fiber_sbox(void) { clear(free_obj_); }
 
@@ -58,10 +60,19 @@ public:
 		sem_.post();
 	}
 
-	T* pop(void) {
-		sem_.wait();
+	T* pop(bool* found = NULL) {
+		if (sem_.wait() < 0) {
+			if (found) {
+				*found = false;
+			}
+			return NULL;
+		}
+
 		T* t = sbox_.front();
 		sbox_.pop_front();
+		if (found) {
+			*found = true;
+		}
 		return t;
 	}
 
@@ -88,7 +99,9 @@ private:
 template<typename T>
 class fiber_sbox2 {
 public:
-	fiber_sbox2(void): sem_(0) {}
+	fiber_sbox2(bool async = true)
+	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_def) {}
+
 	~fiber_sbox2(void) {}
 
 	void push(T t) {
@@ -96,11 +109,14 @@ public:
 		sem_.post();
 	}
 
-	T pop(void) {
-		sem_.wait();
-		T t = sbox_.front();
+	bool pop(T& t) {
+		if (sem_.wait() < 0) {
+			return false;
+		}
+
+		t = sbox_.front();
 		sbox_.pop_front();
-		return t;
+		return true;
 	}
 
 	size_t size(void) const {
