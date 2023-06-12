@@ -48,28 +48,6 @@ private:
 
 using shared_message = std::shared_ptr<message>;
 
-class mybox {
-public:
-	mybox(void) : sem_(0) {}
-	~mybox(void) {}
-
-	void push(shared_message msg) {
-		msgs_.emplace_back(msg);
-		sem_.post();
-	}
-
-	shared_message pop(void) {
-		(void) sem_.wait();
-		shared_message msg = msgs_.front();
-		msgs_.pop_front();
-		return msg;
-	}
-
-private:
-	acl::fiber_sem sem_;
-	std::list<shared_message> msgs_;
-};
-
 static void usage(const char* procname) {
 	printf("usage: %s -h[help]\r\n"
 		" -s ip:port, default: 127.0.0.1:9001\r\n"
@@ -109,7 +87,7 @@ int main(int argc, char* argv[]) {
 
 	printf("listen on %s, fiber pool: %d\r\n", addr.c_str(), nfibers);
 
-	mybox box;
+	acl::fiber_sbox2<shared_message> box;
 
 	for (int i = 0; i < nfibers; i++) {
 		go[&box] {
@@ -125,7 +103,7 @@ int main(int argc, char* argv[]) {
 		};
 	}
 
-	std::atomic<long> nusers, nmsgs;
+	std::atomic<long> nusers(0), nmsgs(0);
 
 	go[&nusers, &nmsgs] {
 		while (true) {
@@ -136,7 +114,7 @@ int main(int argc, char* argv[]) {
 
 	go[&ss, &box, &nusers, &nmsgs] {
 		while (true) {
-			acl::socket_stream* conn = ss.accept();
+			auto conn = ss.accept();
 			if (conn == NULL) {
 				printf("accept error %s\r\n", acl::last_serror());
 				break;
@@ -154,12 +132,13 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 
+#if 0
 					if (client->get_conn().write(buf, ret) != ret) {
 						break;
 					} else {
 						continue;
 					}
-
+#endif
 					++nmsgs;
 					auto msg = std::make_shared<message>(client, nmsgs, buf, ret);
 					box.push(msg);

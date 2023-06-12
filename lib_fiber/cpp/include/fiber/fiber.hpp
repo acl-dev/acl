@@ -8,8 +8,7 @@ struct ACL_FIBER;
 
 namespace acl {
 
-typedef enum 
-{
+typedef enum {
 	FIBER_EVENT_T_KERNEL,	// Linux: epoll, FreeBSD: kquque, Windows: iocp
 	FIBER_EVENT_T_POLL,	// Linux, FreeBSD, MacOS, Windows
 	FIBER_EVENT_T_SELECT,	// Linux, FreeBSD, MacOS, Windows
@@ -17,8 +16,7 @@ typedef enum
 	FIBER_EVENT_T_IO_URING,	// Linux
 } fiber_event_t;
 
-struct FIBER_CPP_API fiber_frame
-{
+struct FIBER_CPP_API fiber_frame {
 	fiber_frame(void) : pc(0), off(0) {}
 	~fiber_frame(void) {}
 
@@ -30,8 +28,7 @@ struct FIBER_CPP_API fiber_frame
 /**
  * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
  */
-class FIBER_CPP_API fiber
-{
+class FIBER_CPP_API fiber {
 public:
 	fiber(void);
 	fiber(ACL_FIBER *fb);
@@ -268,8 +265,9 @@ public:
 	 * @param ctx {void*} 传递给协程执行函数的参数
 	 * @param size {size_t} 协程栈大小
 	 * @param share_stack {bool} 是否创建共享栈协程
+	 * @return {ACL_FIBER*}
 	 */
-	static void fiber_create(void (*fn)(ACL_FIBER*, void*),
+	static ACL_FIBER* fiber_create(void (*fn)(ACL_FIBER*, void*),
 			void* ctx, size_t size, bool share_stack = false);
 
 	/**
@@ -308,8 +306,7 @@ private:
 /**
  * 可用作定时器的协程类
  */
-class FIBER_CPP_API fiber_timer
-{
+class FIBER_CPP_API fiber_timer {
 public:
 	fiber_timer(void);
 	virtual ~fiber_timer(void) {}
@@ -342,8 +339,7 @@ private:
  * 定时器管理协程
  */
 template <typename T>
-class fiber_trigger : public fiber
-{
+class fiber_trigger : public fiber {
 public:
 	fiber_trigger(timer_trigger<T>& timer)
 	: delay_(100)
@@ -354,37 +350,35 @@ public:
 
 	virtual ~fiber_trigger(void) {}
 
-	void add(T* o)
-	{
+	void add(T* o) {
 		mbox_.push(o);
 	}
 
-	void del(T* o)
-	{
+	void del(T* o) {
 		timer_.del(o);
 	}
 
-	timer_trigger<T>& get_trigger(void)
-	{
+	timer_trigger<T>& get_trigger(void) {
 		return timer_;
 	}
 
 	// @override
-	void run(void)
-	{
+	void run(void) {
 		while (!stop_) {
 			T* o = mbox_.pop(delay_);
-			if (o)
+			if (o) {
 				timer_.add(o);
+			}
 
 			long long next = timer_.trigger();
 			long long curr = get_curr_stamp();
-			if (next == -1)
+			if (next == -1) {
 				delay_ = 100;
-			else {
+			} else {
 				delay_ = next - curr;
-				if (delay_ <= 0)
+				if (delay_ <= 0) {
 					delay_ = 1;
+				}
 			}
 		}
 	}

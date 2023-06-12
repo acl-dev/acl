@@ -77,9 +77,16 @@ FIBER_API int acl_fiber_sem_post(ACL_FIBER_SEM* sem);
 /**
  * Get the specificed semaphore's value
  * @param sem {ACL_FIBER_SEM*} created by acl_fiber_sem_create
- * @retur {int} current semaphore's value returned
+ * @return {int} current semaphore's value returned
  */
 FIBER_API int acl_fiber_sem_num(ACL_FIBER_SEM* sem);
+
+/**
+ * Get the number of the waiters for the semaphore.
+ * @param sem {ACL_FIBER_SEM*} created by acl_fiber_sem_create
+ * @return {int} the waiters' number.
+ */
+FIBER_API int acl_fiber_sem_waiters_num(ACL_FIBER_SEM *sem);
 
 #ifdef __cplusplus
 }

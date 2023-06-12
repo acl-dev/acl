@@ -34,4 +34,9 @@ int fiber_sem::post(void)
 	return acl_fiber_sem_post(sem_);
 }
 
+size_t fiber_sem::num(void) const
+{
+	return (size_t) acl_fiber_sem_num(sem_);
+}
+
 }

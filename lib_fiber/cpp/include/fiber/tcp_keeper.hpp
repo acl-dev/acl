@@ -13,8 +13,7 @@ class thread_mutex;
  * 这对于 ping rtt 较长（如：10ms 以上）比较有价值，可以有效地减少因网络 rtt
  * 造成的连接时间损耗
  */
-class tcp_keeper : public thread
-{
+class tcp_keeper : public thread {
 public:
 	tcp_keeper(void);
 	~tcp_keeper(void);

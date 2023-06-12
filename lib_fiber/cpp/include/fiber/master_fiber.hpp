@@ -11,8 +11,7 @@ class socket_stream;
 /**
  * 基于协程方式的网络服务类
  */
-class FIBER_CPP_API master_fiber : public master_base
-{
+class FIBER_CPP_API master_fiber : public master_base {
 public:
 	/**
 	 * 在 acl_master 框架下运行本网络服务对象
@@ -36,9 +35,9 @@ public:
 	const char* get_conf_path(void) const;
 
 protected:
-	master_fiber();
+	master_fiber(void);
 
-	virtual ~master_fiber();
+	virtual ~master_fiber(void);
 
 	/**
 	 * 虚函数，当协程服务器接收到客户端连接后调用本函数
