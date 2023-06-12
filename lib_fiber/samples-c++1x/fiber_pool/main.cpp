@@ -53,20 +53,25 @@ static void usage(const char* procname) {
 		" -s ip:port, default: 127.0.0.1:9001\r\n"
 		" -c fiber_pool_count [default: 100] \r\n"
 		" -r timeout\r\n"
+		" -S [if in sync mode, default: false]\r\n"
 		, procname);
 }
 
 int main(int argc, char* argv[]) {
 	acl::string addr("127.0.0.1:9001");
+	bool sync = false;
 	int  ch, nfibers = 100;
 
-	while ((ch = getopt(argc, argv, "hs:c:r:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:Sc:r:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
 			addr = optarg;
+			break;
+		case 'S':
+			sync = true;
 			break;
 		case 'c':
 			nfibers = atoi(optarg);
@@ -92,7 +97,11 @@ int main(int argc, char* argv[]) {
 	for (int i = 0; i < nfibers; i++) {
 		go[&box] {
 			while (true) {
-				shared_message msg = box.pop();
+				shared_message msg;
+				if (!box.pop(msg)) {
+					printf("POP end!\r\n");
+					break;
+				}
 				auto client = msg->get_client();
 				auto data = msg->get_data();
 				if (client->get_conn().write(data.c_str(), data.size()) == -1) {
@@ -112,7 +121,7 @@ int main(int argc, char* argv[]) {
 		}
 	};
 
-	go[&ss, &box, &nusers, &nmsgs] {
+	go[&ss, &box, &nusers, &nmsgs, sync] {
 		while (true) {
 			auto conn = ss.accept();
 			if (conn == NULL) {
@@ -124,7 +133,7 @@ int main(int argc, char* argv[]) {
 
 			auto client = std::make_shared<client_socket>(conn, nusers);
 
-			go[&box, &nmsgs, client] {
+			go[&box, &nmsgs, client, sync] {
 				char buf[4096];
 				while (true) {
 					int ret = client->get_conn().read(buf, sizeof(buf), false);
@@ -132,13 +141,14 @@ int main(int argc, char* argv[]) {
 						break;
 					}
 
-#if 0
-					if (client->get_conn().write(buf, ret) != ret) {
-						break;
-					} else {
-						continue;
+					if (sync) {
+						if (client->get_conn().write(buf, ret) != ret) {
+							break;
+						} else {
+							continue;
+						}
 					}
-#endif
+
 					++nmsgs;
 					auto msg = std::make_shared<message>(client, nmsgs, buf, ret);
 					box.push(msg);
