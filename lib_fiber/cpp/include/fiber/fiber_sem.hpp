@@ -76,6 +76,10 @@ public:
 		return t;
 	}
 
+	size_t size(void) const {
+		return sem_.num();
+	}
+
 private:
 	fiber_sem     sem_;
 	std::list<T*> sbox_;
