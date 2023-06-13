@@ -1,4 +1,4 @@
-%define release_id 3
+%define release_id 4
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,11 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Tue Jun 13 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-4-20230613.10
+- feature: add fiber_sbox2 class;
+- optimize: optimize fiber_sbox class;
+- bugfix: Fixed bug in acl_get_ifaddrs on windows.
 
 * Tue Jun 06 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-3-20230606.11
 - bugfix: fixed some bugs in mqtt module;
