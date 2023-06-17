@@ -114,20 +114,21 @@ install_file()
 }
 
 ###############################################################################
-INSTALL_PATH=
+INSTALL_PATH=/opt/soft/acl-master
 
 if [ $# -lt 1 ]
 then
 #	echo "parameter not enougth($#)"
-	echo "usage:$0 install_path"
-	exit 1
+#	echo "usage:$0 install_path"
+	echo "Using the default path: $INSTALL_PATH"
 fi
 
 if [ $# -eq 2 ]
 then
     PREFIX_PATH=$1
     INSTALL_PATH=$2
-else
+elif [ $# -gt 2 ]
+then
     INSTALL_PATH=$1
     PREFIX_PATH=
 fi
