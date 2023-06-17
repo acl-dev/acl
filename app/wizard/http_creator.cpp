@@ -102,34 +102,40 @@ static bool create_proc(file_tmpl& tmpl)
 	return tmpl.files_copy(name, tab);
 }
 
-static bool create_service(file_tmpl& tmpl)
+static bool create_service(file_tmpl& tmpl, const char* type)
 {
-	printf("choose master_service type:\r\n");
-	printf("	t: for master_threads\r\n"
-		"	f: for master_fiber\r\n"
-		"	p: for master_proc\r\n");
-	printf(">");
-	fflush(stdout);
-
 	char  buf[256];
-	int   n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-	if (n == ACL_VSTREAM_EOF) {
-		return false;
-	} else if (strcasecmp(buf, "t") == 0) {
+	if (type == NULL || *type == 0) {
+		printf("choose master_service type:\r\n");
+		printf("	t: for master_threads\r\n"
+				"	f: for master_fiber\r\n"
+				"	p: for master_proc\r\n");
+		printf(">");
+		fflush(stdout);
+
+		int   n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
+		if (n == ACL_VSTREAM_EOF) {
+			return false;
+		}
+
+		type = buf;
+	}
+
+	if (strcasecmp(type, "t") == 0) {
 		create_threads(tmpl);
-	} else if (strcasecmp(buf, "p") == 0) {
+	} else if (strcasecmp(type, "p") == 0) {
 		create_proc(tmpl);
-	} else if (strcasecmp(buf, "f") == 0) {
+	} else if (strcasecmp(type, "f") == 0) {
 		create_fiber(tmpl);
 	} else {
-		printf("invalid: %s\r\n", buf);
+		printf("invalid type: %s\r\n", type);
 		return false;
 	}
 
 	return true;
 }
 
-static bool create_http_servlet(file_tmpl& tmpl)
+static bool create_http_servlet(file_tmpl& tmpl, const char* type)
 {
 	tpl_t* tpl = tmpl.open_tpl("http_servlet.cpp");
 	if (tpl == NULL) {
@@ -158,50 +164,49 @@ static bool create_http_servlet(file_tmpl& tmpl)
 	tpl_free(tpl);
 
 	// 设置服务器模板类型
-	return create_service(tmpl);
+	return create_service(tmpl, type);
 }
 
-void http_creator()
+void http_creator(const char* name, const char* type)
 {
+	bool loop;
 	file_tmpl tmpl;
+
+	if (name && *name && type && *type) {
+		loop = true;
+	} else {
+		loop = false;
+	}
 
 	// 设置源程序所在目录
 	tmpl.set_path_from("tmpl/http");
 
 	while (true) {
-		printf("please input your program name: ");
-		fflush(stdout);
-
 		char buf[256];
 		int  n;
 
-		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-		if (n == ACL_VSTREAM_EOF) {
-			break;
+		if (name == NULL || *name == 0) {
+			printf("please input your program name: ");
+			fflush(stdout);
+			n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
+			if (n == ACL_VSTREAM_EOF) {
+				break;
+			}
+
+			if (n == 0) {
+				acl::safe_snprintf(buf, sizeof(buf), "http_demo");
+			}
+
+			name = buf;
 		}
 
-		if (n == 0) {
-			acl::safe_snprintf(buf, sizeof(buf), "http_demo");
-		}
+		tmpl.set_project_name(name);
 
-		tmpl.set_project_name(buf);
 		// 创建目录
 		tmpl.create_dirs();
 
-		printf("please choose one http application type:\r\n");
-		printf("s: http servlet\r\n");
-		printf(">");
-		fflush(stdout);
-
-		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-		if (n == ACL_VSTREAM_EOF) {
-			break;
-		} else if (strcasecmp(buf, "s") == 0) {
-			tmpl.create_common();
-			create_http_servlet(tmpl);
-		} else {
-			printf("unknown flag: %s\r\n", buf);
-		}
+		tmpl.create_common();
+		create_http_servlet(tmpl, type);
 		break;
 	}
 }

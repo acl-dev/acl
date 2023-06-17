@@ -137,12 +137,19 @@ static bool create_master_udp(file_tmpl& tmpl)
 		{ NULL, NULL }
 	};
 
-	return tmpl. files_copy(name, tab);
+	return tmpl.files_copy(name, tab);
 }
 
-void master_creator()
+void master_creator(const char* name, const char* type)
 {
 	file_tmpl tmpl;
+	bool loop;
+
+	if (name && *name && type && *type) {
+		loop = true;
+	} else {
+		loop = false;
+	}
 
 	// 设置源程序所在目录
 	tmpl.set_path_from("tmpl/master");
@@ -151,73 +158,88 @@ void master_creator()
 		char buf[256];
 		int  n;
 
-		printf("please input your program name: ");
-		fflush(stdout);
+		if (name == NULL || *name == 0) {
+			printf("please input your program name: ");
+			fflush(stdout);
 
-		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-		if (n == ACL_VSTREAM_EOF) {
-			break;
+			n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
+			if (n == ACL_VSTREAM_EOF) {
+				break;
+			}
+
+			if (n == 0) {
+				acl::safe_snprintf(buf, sizeof(buf), "master_service");
+			}
+			name = buf;
 		}
 
-		if (n == 0) {
-			acl::safe_snprintf(buf, sizeof(buf), "master_service");
-		}
+		// 设置项目名称, 一般与服务程序名相同
+		tmpl.set_project_name(name);
 
-		tmpl.set_project_name(buf);
 		// 创建目录
 		tmpl.create_dirs();
 
-		printf("choose master_service type:\r\n");
-		printf("	t: for master_threads\r\n"
-			"	p: for master_proc\r\n"
-			"	a: for master_aio\t\n"
-			"	g: for master_trigger\r\n"
-			"	r: for master_rpc\r\n"
-			"	u: for master_udp\r\n"
-			"	f: for master_fiber\r\n"
-			"	o: for other service\r\n"
-			"	s: skip choose, try again\r\n");
-		printf(">");
-		fflush(stdout);
+		if (type == NULL || *type == 0) {
+			printf("choose master_service type:\r\n");
+			printf("	t: for master_threads\r\n"
+				"	p: for master_proc\r\n"
+				"	a: for master_aio\t\n"
+				"	g: for master_trigger\r\n"
+				"	r: for master_rpc\r\n"
+				"	u: for master_udp\r\n"
+				"	f: for master_fiber\r\n"
+				"	o: for other service\r\n"
+				"	s: skip choose, try again\r\n");
+			printf(">");
+			fflush(stdout);
 
-		n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
-		if (n == ACL_VSTREAM_EOF) {
-			break;
-		} else if (strcasecmp(buf, "t") == 0) {
+			n = acl_vstream_gets_nonl(ACL_VSTREAM_IN, buf, sizeof(buf));
+			if (n == ACL_VSTREAM_EOF) {
+				break;
+			}
+
+			type = buf;
+		}
+
+		if (strcasecmp(type, "t") == 0) {
 			tmpl.create_common();
 			create_master_threads(tmpl);
 			break;
-		} else if (strcasecmp(buf, "p") == 0) {
+		} else if (strcasecmp(type, "p") == 0) {
 			tmpl.create_common();
 			create_master_proc(tmpl);
 			break;
-		} else if (strcasecmp(buf, "a") == 0) {
+		} else if (strcasecmp(type, "a") == 0) {
 			tmpl.create_common();
 			create_master_aio(tmpl);
 			break;
-		} else if (strcasecmp(buf, "r") == 0) {
+		} else if (strcasecmp(type, "r") == 0) {
 			tmpl.create_common();
 			create_master_rpc(tmpl);
 			break;
-		} else if (strcasecmp(buf, "g") == 0) {
+		} else if (strcasecmp(type, "g") == 0) {
 			tmpl.create_common();
 			create_master_trigger(tmpl);
 			break;
-		} else if (strcasecmp(buf, "u") == 0) {
+		} else if (strcasecmp(type, "u") == 0) {
 			tmpl.create_common();
 			create_master_udp(tmpl);
 			break;
-		} else if (strcasecmp(buf, "f") == 0) {
+		} else if (strcasecmp(type, "f") == 0) {
 			tmpl.create_common();
 			create_master_fiber(tmpl);
 			break;
-		} else if (strcasecmp(buf, "o") == 0) {
+		} else if (strcasecmp(type, "o") == 0) {
 			tmpl.create_other();
 			break;
-		} else if (strcasecmp(buf, "s") == 0) {
+		} else if (strcasecmp(type, "s") == 0) {
 			break;
 		} else {
-			printf("unknown ch: %s\r\n", buf);
+			printf("unknown ch: %s\r\n", type);
+		}
+
+		if (!loop) {
+			break;
 		}
 	}
 
