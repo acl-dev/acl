@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "file_tmpl.h"
 
-
 file_tmpl::file_tmpl(void)
 {
 }
@@ -157,6 +156,17 @@ bool file_tmpl::create_common()
 	};
 
 	return files_copy(name, tab);
+}
+
+bool file_tmpl::create_other()
+{
+	if (!copy_and_replace("setup-other.sh", "setup.sh", true)) {
+		return false;
+	}
+
+	acl::string path(project_name_);
+	path += ".cf";
+	return copy_and_replace("master_other.cf", path);
 }
 
 bool file_tmpl::file_copy(const char* from, const char* to_in)

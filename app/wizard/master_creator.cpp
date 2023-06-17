@@ -175,6 +175,7 @@ void master_creator()
 			"	r: for master_rpc\r\n"
 			"	u: for master_udp\r\n"
 			"	f: for master_fiber\r\n"
+			"	o: for other service\r\n"
 			"	s: skip choose, try again\r\n");
 		printf(">");
 		fflush(stdout);
@@ -210,14 +211,16 @@ void master_creator()
 			tmpl.create_common();
 			create_master_fiber(tmpl);
 			break;
+		} else if (strcasecmp(buf, "o") == 0) {
+			tmpl.create_other();
+			break;
 		} else if (strcasecmp(buf, "s") == 0) {
-			goto END;
+			break;
 		} else {
 			printf("unknown ch: %s\r\n", buf);
 		}
 	}
 
-END:
 	for (int i = 0; i < 78; i++) {
 		putchar('-');
 	}

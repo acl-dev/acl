@@ -23,6 +23,7 @@ public:
 	bool copy_and_replace(const char* from,
 		const char* to, bool exec = false);
 	bool create_common();
+	bool create_other();
 
 	bool file_copy(const char* from, const char* to);
 	bool files_copy(const char* name, const FILE_FROM_TO* tab);
