@@ -2,15 +2,15 @@
 #include <memory>
 #include <atomic>
 
+using shared_stream = std::shared_ptr<acl::socket_stream>;
+
 class client_socket {
 public:
-	client_socket(acl::socket_stream* conn, std::atomic<long>& nusers)
+	client_socket(shared_stream conn, std::atomic<long>& nusers)
 	: conn_(conn), nusers_(nusers) {}
 
 	~client_socket(void) {
-		printf("delete conn=%p\r\n", conn_);
 		--nusers_;
-		delete conn_;
 	}
 
 	acl::socket_stream& get_conn(void) {
@@ -18,7 +18,7 @@ public:
 	}
 
 private:
-	acl::socket_stream* conn_;
+	shared_stream conn_;
 	std::atomic<long>& nusers_;
 };
 
@@ -116,15 +116,16 @@ int main(int argc, char* argv[]) {
 
 	go[&nusers, &nmsgs] {
 		while (true) {
-			std::cout << "client count: " << nusers << "; message count: " << nmsgs << std::endl;
+			std::cout << "client count: " << nusers
+				<< "; message count: " << nmsgs << std::endl;
 			::sleep(1);
 		}
 	};
 
 	go[&ss, &box, &nusers, &nmsgs, sync] {
 		while (true) {
-			auto conn = ss.accept();
-			if (conn == NULL) {
+			auto conn = ss.shared_accept();
+			if (conn.get() == NULL) {
 				printf("accept error %s\r\n", acl::last_serror());
 				break;
 			}

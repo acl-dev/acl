@@ -6,6 +6,10 @@
 #include <WinSock2.h>
 #endif
 
+#if __cplusplus >= 201103L
+#include <memory>
+#endif
+
 namespace acl {
 
 class socket_stream;
@@ -98,9 +102,19 @@ public:
 	 *  若在指定时间内未获得客户端连接，则返回 NULL
 	 * @param etimed {bool*} 当此指针非 NULL 时，如果因超时导致该函数返回
 	 *  NULL，则此值被置为 true
-	 * @return {socket_stream*} 返回空表示接收失败或超时
+	 * @return {socket_stream*} 返回空表示接收失败或超时, 返回的流对象在用
+	 *  完用户需要自行 delete 流对象.
 	 */
 	socket_stream* accept(int timeout = -1, bool* etimed = NULL);
+
+#if __cplusplus >= 201103L
+	// 使用 c++11 shared_ptr 方式获得客户端流对象, 更安全地使用流对象
+	std::shared_ptr<socket_stream> shared_accept(int timeout = -1,
+			bool* etimed = NULL) {
+		std::shared_ptr<socket_stream> ss(accept(timeout, etimed));
+		return ss;
+	}
+#endif
 
 	/**
 	 * 获得监听的地址
