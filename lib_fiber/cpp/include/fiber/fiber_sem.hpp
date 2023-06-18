@@ -8,13 +8,13 @@ struct ACL_FIBER_SEM;
 namespace acl {
 
 typedef enum {
-	fiber_sem_t_def   = 0,
+	fiber_sem_t_sync  = 0,
 	fiber_sem_t_async = (1 << 0),
 } fiber_sem_attr_t;
 
 class FIBER_CPP_API fiber_sem {
 public:
-	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_def);
+	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
 	~fiber_sem(void);
 
 	int wait(void);
@@ -50,7 +50,7 @@ template<typename T>
 class fiber_sbox {
 public:
 	fiber_sbox(bool free_obj = true, bool async = true)
-	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_def)
+	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync)
 	, free_obj_(free_obj) {}
 
 	~fiber_sbox(void) { clear(free_obj_); }
@@ -104,7 +104,7 @@ template<typename T>
 class fiber_sbox2 {
 public:
 	fiber_sbox2(bool async = true)
-	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_def) {}
+	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync) {}
 
 	~fiber_sbox2(void) {}
 
