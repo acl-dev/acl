@@ -5,6 +5,13 @@
 #include "fiber.hpp"
 #include "fiber_tbox.hpp"
 
+// __cplusplus:
+//    199711L (C++98 or C++03)
+//    201103L (C++11)
+//    201402L (C++14)
+//    201703L (C++17)
+//    202002L (C++20)
+
 #if __cplusplus >= 201103L      // Support c++11 ?
 
 struct ACL_FIBER;
