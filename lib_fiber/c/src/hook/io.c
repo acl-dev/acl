@@ -271,6 +271,11 @@ int acl_fiber_recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 		hook_once();
 	}
 
+	if (sys_recvmmsg == NULL) {
+		printf("%s(%d): sys_recvmmsg NULL\r\n", __FUNCTION__, __LINE__);
+		return -1;
+	}
+
 	if (!var_hook_sys_api) {
 		return (*sys_recvmmsg)(sockfd, msgvec, vlen, flags, timeout);
 	}
@@ -410,6 +415,11 @@ int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 
 	if (sys_sendmmsg == NULL) {
 		hook_once();
+	}
+
+	if (sys_sendmmsg == NULL) {
+		printf("%s(%d): sys_sendmmsg NULL\r\n", __FUNCTION__, __LINE__);
+		return -1;
 	}
 
 	if (!var_hook_sys_api) {
