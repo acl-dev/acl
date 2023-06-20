@@ -1,3 +1,3 @@
 include ../Makefile_cpp.in
-CFLAGS += -std=c++11
+CFLAGS += -std=c++14
 PROG = fiber_pool

@@ -108,6 +108,25 @@ public:
 
 	~fiber_sbox2(void) {}
 
+#if __cplusplus >= 201103L      // Support c++11 ?
+
+	void push(T t) {
+		sbox_.emplace_back(std::move(t));
+		sem_.post();
+	}
+
+	bool pop(T& t) {
+		if (sem_.wait() < 0) {
+			return false;
+		}
+
+		t = std::move(sbox_.front());
+		sbox_.pop_front();
+		return true;
+	}
+
+#else
+
 	void push(T t) {
 		sbox_.push_back(t);
 		sem_.post();
@@ -122,6 +141,8 @@ public:
 		sbox_.pop_front();
 		return true;
 	}
+
+#endif
 
 	size_t size(void) const {
 		return sem_.num();
