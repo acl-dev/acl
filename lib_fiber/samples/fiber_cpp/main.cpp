@@ -47,24 +47,27 @@ static void fiber4(const acl::string& buf)
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -n fibers_count -S\r\n", procname);
+	printf("usage: %s -h [help] -n fibers_count -m maxfd -S\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	int  ch, n = 10;
+	int  ch, n = 10, maxfd = 0;
 	bool share_stack = false;
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hn:S")) > 0) {
+	while ((ch = getopt(argc, argv, "hn:m:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 'n':
 			n = atoi(optarg);
+			break;
+		case 'm':
+			maxfd = atoi(optarg);
 			break;
 		case 'S':
 			share_stack = true;
@@ -73,6 +76,9 @@ int main(int argc, char *argv[])
 			break;
 		}
 	}
+
+	int ret = acl::fiber::set_fdlimit(maxfd);
+	printf("Current maxfd=%d\r\n", ret);
 
 	for (int i = 0; i < n; i++) {
 		acl::fiber* f = new myfiber();

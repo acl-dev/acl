@@ -134,6 +134,13 @@ public:
 	static void stdout_open(bool on);
 
 	/**
+	 * 设置本进程最大可创建的句柄数量
+	 * @param max {int} >= 0 时有效
+	 * @return {int} 返回当前可用的最大句柄数量
+	 */
+	static int set_fdlimit(int max);
+
+	/**
 	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当
 	 * 创建协程后不必显式调用 schedule 或 schedule_with 来启动协程调度器
 	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
