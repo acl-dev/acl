@@ -207,6 +207,9 @@ void http_creator(const char* name, const char* type)
 
 		tmpl.create_common();
 		create_http_servlet(tmpl, type);
-		break;
+
+		if (!loop) {
+			break;
+		}
 	}
 }
