@@ -1,6 +1,10 @@
 #ifndef ACL_DEFINE_UNIX_INCLUDE_H
 #define ACL_DEFINE_UNIX_INCLUDE_H
 
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 #include "acl_define_linux.h"
 #include "acl_define_sunx86.h"
 #include "acl_define_bsd.h"
