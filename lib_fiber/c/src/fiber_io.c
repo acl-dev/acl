@@ -466,6 +466,8 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
+	fe->fiber_r = NULL;
+
 	if (!(fe->type & TYPE_INTERNAL)) {
 		WAITER_DEC(__thread_fiber->event);
 	}
@@ -508,6 +510,8 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 	acl_fiber_switch();
+
+	fe->fiber_w = NULL;
 
 	if (!(fe->type & TYPE_INTERNAL)) {
 		WAITER_DEC(__thread_fiber->event);

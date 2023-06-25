@@ -187,6 +187,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			pfd->fe->mask &= ~EVENT_POLLIN;
 #endif
 			event_del_read(ev, pfd->fe);
+			pfd->fe->fiber_r = NULL;
 		}
 		if (pfd->pfd->events & POLLOUT) {
 			CLR_WRITEWAIT(pfd->fe);
@@ -194,6 +195,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			pfd->fe->mask &= ~EVENT_POLLOUT;
 #endif
 			event_del_write(ev, pfd->fe);
+			pfd->fe->fiber_w = NULL;
 		}
 
 		pfd->fe->pfd = NULL;
@@ -318,20 +320,19 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		return sys_poll ? (*sys_poll)(fds, nfds, timeout) : -1;
 	}
 
-	curr = acl_fiber_running();
-
+	curr        = acl_fiber_running();
 	ev          = fiber_io_event();
 	old_timeout = ev->timeout;
 
 #ifdef SHARE_STACK
 	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
-		pfds      = pollfds_save(fds, nfds);
-		pe        = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
-		pe->fds   = pollfd_alloc(pe, pfds->fds, nfds);
+		pfds    = pollfds_save(fds, nfds);
+		pe      = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
+		pe->fds = pollfd_alloc(pe, pfds->fds, nfds);
 	} else {
-		pfds      = NULL;
-		pe        = &pevent;
-		pe->fds   = pollfd_alloc(pe, fds, nfds);
+		pfds    = NULL;
+		pe      = &pevent;
+		pe->fds = pollfd_alloc(pe, fds, nfds);
 	}
 #else
 	pe        = &pevent;
