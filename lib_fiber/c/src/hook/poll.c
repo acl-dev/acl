@@ -68,13 +68,13 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd;
-	RING_ITER iter;
-	//RING *iter = fe->pfds.succ, *next = iter;
+	//RING_ITER iter;
+	RING *iter = fe->pfds.succ, *next = iter;
 
 	event_del_read(ev, fe);
 	SET_READABLE(fe);
 
-#if 0
+#if 1
 	// Walk througth the RING list, handle each poll event, and one RING
 	// node maybe be detached after it has been handled without any poll
 	// event bound with it again.
@@ -83,7 +83,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 		pfd = ring_to_appl(iter, POLLFD, me);
 		if (pfd->pfd->events & POLLIN) {
 			handle_poll_read(ev, fe, pfd);
-			break;
 		}
 	}
 #else
@@ -135,19 +134,18 @@ static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd;
-	//RING *iter = fe->pfds.succ, *next = iter;
-	RING_ITER iter;
+	//RING_ITER iter;
+	RING *iter = fe->pfds.succ, *next = iter;
 
 	event_del_write(ev, fe);
 	SET_WRITABLE(fe);
 
-#if 0
+#if 1
 	for (; iter != &fe->pfds; iter = next) {
 		next = next->succ;
 		pfd = ring_to_appl(iter, POLLFD, me);
 		if (pfd->pfd->events & POLLOUT) {
 			handle_poll_write(ev, fe, pfd);
-			break;
 		}
 	}
 #else
@@ -241,7 +239,9 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 
 		// Unrefer the fe because we don't need it again.
 		//file_event_unrefer(pfd->fe);
-		pfd->fe      = NULL;
+
+		ring_detach(&pfd->me);
+		pfd->fe = NULL;
 	}
 }
 
