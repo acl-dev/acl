@@ -86,12 +86,14 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 			}
 
 			if ((fds.revents & (POLLHUP | POLLERR))) {
+				/*
 				acl_msg_error("%s(%d), %s: %s, %s, %s, fd=%d",
 					__FILE__, __LINE__, myname,
 					acl_last_serror(),
 					fds.revents & POLLHUP ? "POLLHUP" : "0",
 					fds.revents & POLLERR ? "POLLERR" : "0",
 					fd);
+				*/
 				acl_set_error(ACL_ECONNREFUSED);
 				return -1;
 			}

@@ -79,7 +79,9 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	for (; iter != &fe->pfds; iter = next) {
 		next = next->succ;
 		pfd = ring_to_appl(iter, POLLFD, me);
-		handle_poll_read(ev, fe, pfd);
+		if (pfd->pfd->events & POLLIN) {
+			handle_poll_read(ev, fe, pfd);
+		}
 	}
 }
 
@@ -129,7 +131,9 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	for (; iter != &fe->pfds; iter = next) {
 		next = next->succ;
 		pfd = ring_to_appl(iter, POLLFD, me);
-		handle_poll_write(ev, fe, pfd);
+		if (pfd->pfd->events & POLLOUT) {
+			handle_poll_write(ev, fe, pfd);
+		}
 	}
 }
 
