@@ -1,3 +1,4 @@
+#include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
@@ -8,11 +9,11 @@
 #include <unistd.h>
 #include <poll.h>
 #endif
-#include "lib_acl.h"
 #include "fiber/libfiber.h"
 
 #if defined(_WIN32) || defined(_WIN64)
-# define POLL	WSAPoll
+//# define POLL	WSAPoll
+# define POLL	acl_fiber_poll
 # define CLOSE	acl_fiber_close
 # define LISTEN	acl_fiber_listen
 # define ACCEPT	acl_fiber_accept
