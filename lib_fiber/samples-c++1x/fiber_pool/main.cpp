@@ -5,7 +5,8 @@ static void usage(const char* procname) {
 	printf("usage: %s -h[help]\r\n"
 		" -s ip:port, default: 127.0.0.1:9001\r\n"
 		" -c fiber_pool_count [default: 100] \r\n"
-		" -r timeout\r\n"
+		" -r read_timeout\r\n"
+		" -w write_timeout\r\n"
 		" -S [if in sync mode, default: false]\r\n"
 		, procname);
 }
@@ -13,9 +14,9 @@ static void usage(const char* procname) {
 int main(int argc, char* argv[]) {
 	acl::string addr("127.0.0.1:9001");
 	bool sync = false, use_unique = false;
-	int  ch, nfibers = 100;
+	int  ch, nfibers = 100, rtimeo = -1, wtimeo = -1;
 
-	while ((ch = getopt(argc, argv, "hs:Sc:r:U")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:Sc:r:w:U")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -32,6 +33,12 @@ int main(int argc, char* argv[]) {
 		case 'U':
 			use_unique = true;
 			break;
+		case 'r':
+			rtimeo = atoi(optarg);
+			break;
+		case 'w':
+			wtimeo = atoi(optarg);
+			break;
 		default:
 			break;
 		}
@@ -47,7 +54,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "unique_ptr should be used for c++14" << std::endl;
 #endif
 	} else {
-		server_pool_run(addr, sync, nfibers);
+		server_pool_run(addr, sync, nfibers, rtimeo, wtimeo);
 	}
 
 	return 0;

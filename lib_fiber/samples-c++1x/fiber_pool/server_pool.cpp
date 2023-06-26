@@ -3,6 +3,7 @@
 #include <atomic>
 #include "server_pool.h"
 
+static int __rtimeo = 0, __wtimeo = 0;
 using shared_stream = std::shared_ptr<acl::socket_stream>;
 
 class socket_client {
@@ -49,12 +50,16 @@ private:
 
 using shared_message = std::shared_ptr<message>;
 
-void server_pool_run(const char* addr, bool sync, int nfibers) {
+void server_pool_run(const char* addr, bool sync, int nfibers,
+		int rtimeo, int wtimeo) {
 	acl::server_socket ss;
 	if (!ss.open(addr)) {
 		printf("listen %s error %s\r\n", addr, acl::last_serror());
 		return;
 	}
+
+	__rtimeo = rtimeo;
+	__wtimeo = wtimeo;
 
 	printf("listen on %s, fiber pool: %d\r\n", addr, nfibers);
 
@@ -70,6 +75,15 @@ void server_pool_run(const char* addr, bool sync, int nfibers) {
 				}
 				auto client = msg->get_client();
 				auto data = msg->get_data();
+
+				if (__wtimeo > 0) {
+					int fd = client->get_conn().sock_handle();
+					if (acl_write_wait(fd , __wtimeo) < 0) {
+						printf("write wait error\r\n");
+						break;
+					}
+				}
+
 				if (client->get_conn().write(data.c_str(), data.size()) == -1) {
 					printf("write error: %s\r\n", acl::last_serror());
 					break;
@@ -80,6 +94,7 @@ void server_pool_run(const char* addr, bool sync, int nfibers) {
 
 	std::atomic<long> nusers(0), nmsgs(0);
 
+#if 0
 	go[&nusers, &nmsgs] {
 		while (true) {
 			std::cout << "client count: " << nusers
@@ -87,6 +102,7 @@ void server_pool_run(const char* addr, bool sync, int nfibers) {
 			::sleep(1);
 		}
 	};
+#endif
 
 	go[&ss, &box, &nusers, &nmsgs, sync] {
 		while (true) {
@@ -103,6 +119,14 @@ void server_pool_run(const char* addr, bool sync, int nfibers) {
 			go[&box, &nmsgs, client, sync] {
 				char buf[4096];
 				while (true) {
+					if (__rtimeo > 0) {
+						int fd = client->get_conn().sock_handle();
+						if (acl_read_wait(fd, __rtimeo) < 0) {
+							printf("read wait error\r\n");
+							break;
+						}
+					}
+
 					int ret = client->get_conn().read(buf, sizeof(buf), false);
 					if (ret <= 0) {
 						break;

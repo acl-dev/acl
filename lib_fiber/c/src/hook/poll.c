@@ -81,6 +81,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 		pfd = ring_to_appl(iter, POLLFD, me);
 		if (pfd->pfd->events & POLLIN) {
 			handle_poll_read(ev, fe, pfd);
+			break;
 		}
 	}
 }
@@ -133,6 +134,7 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 		pfd = ring_to_appl(iter, POLLFD, me);
 		if (pfd->pfd->events & POLLOUT) {
 			handle_poll_write(ev, fe, pfd);
+			break;
 		}
 	}
 }
@@ -214,8 +216,6 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			event_del_write(ev, pfd->fe);
 			pfd->fe->fiber_w = NULL;
 		}
-
-		ring_init(&pfd->fe->pfds);
 
 		// Unrefer the fe because we don't need it again.
 		//file_event_unrefer(pfd->fe);
