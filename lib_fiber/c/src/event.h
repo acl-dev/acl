@@ -197,7 +197,7 @@ struct FILE_EVENT {
 	event_proc   *r_proc;
 	event_proc   *w_proc;
 #ifdef HAS_POLL
-	POLLFD       *pfd;
+	RING          pfds;
 #endif
 #ifdef HAS_EPOLL
 	EPOLL_CTX    *epx;

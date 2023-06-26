@@ -8,6 +8,7 @@
 #ifdef HAS_POLL
 
 struct POLLFD {
+	RING me;
 	FILE_EVENT *fe;
 	POLL_EVENT *pe;
 	struct pollfd *pfd;
@@ -23,20 +24,9 @@ struct POLLFD {
  * and POLLIN flag will be set in the specified FILE_EVENT that will be used
  * by the application called acl_fiber_poll().
  */
-static void read_callback(EVENT *ev, FILE_EVENT *fe)
+static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 {
-	POLLFD *pfd = fe->pfd;
-
-	/* In iocp mode on windows, the pfd maybe be set NULL when more
-	 * overlapped events happened by IO or poll events.
-	 */
-	if (pfd == NULL) {
-		return;
-	}
-
 	assert(pfd->pfd->events & POLLIN);
-
-	event_del_read(ev, fe);
 
 	pfd->pfd->revents |= POLLIN;
 
@@ -51,7 +41,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (!(pfd->pfd->events & POLLOUT)) {
-		fe->pfd = NULL;
+		ring_detach(&pfd->me);
 		pfd->fe = NULL;
 	}
 
@@ -73,23 +63,32 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	pfd->pe->nready++;
+}
+
+static void read_callback(EVENT *ev, FILE_EVENT *fe)
+{
+	POLLFD *pfd;
+	RING *iter = fe->pfds.succ, *next = iter;
+
+	event_del_read(ev, fe);
 	SET_READABLE(fe);
+
+	// Walk througth the RING list, handle each poll event, and one RING
+	// node maybe be detached after it has been handled without any poll
+	// event bound with it again.
+	for (; iter != &fe->pfds; iter = next) {
+		next = next->succ;
+		pfd = ring_to_appl(iter, POLLFD, me);
+		handle_poll_read(ev, fe, pfd);
+	}
 }
 
 /**
  * Similiar to read_callback except that the POLLOUT flag will be set in it.
  */
-static void write_callback(EVENT *ev, FILE_EVENT *fe)
+static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 {
-	POLLFD *pfd = fe->pfd;
-
-	if (pfd == NULL) {
-		return;
-	}
-
 	assert(pfd->pfd->events & POLLOUT);
-
-	event_del_write(ev, fe);
 
 	pfd->pfd->revents |= POLLOUT;
 
@@ -104,7 +103,7 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (!(pfd->pfd->events & POLLIN)) {
-		fe->pfd = NULL;
+		ring_detach(&pfd->me);
 		pfd->fe = NULL;
 	}
 
@@ -117,7 +116,21 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	pfd->pe->nready++;
+}
+
+static void write_callback(EVENT *ev, FILE_EVENT *fe)
+{
+	POLLFD *pfd;
+	RING *iter = fe->pfds.succ, *next = iter;
+
+	event_del_write(ev, fe);
 	SET_WRITABLE(fe);
+
+	for (; iter != &fe->pfds; iter = next) {
+		next = next->succ;
+		pfd = ring_to_appl(iter, POLLFD, me);
+		handle_poll_write(ev, fe, pfd);
+	}
 }
 
 /**
@@ -150,7 +163,7 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 			SET_WRITEWAIT(pfd->fe);
 		}
 
-		pfd->fe->pfd      = pfd;
+		ring_prepend(&pfd->fe->pfds, &pfd->me);
 		pfd->pfd->revents = 0;
 
 		// Add one reference to avoid fe being freeed in advanced.
@@ -198,7 +211,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			pfd->fe->fiber_w = NULL;
 		}
 
-		pfd->fe->pfd = NULL;
+		ring_init(&pfd->fe->pfds);
 
 		// Unrefer the fe because we don't need it again.
 		//file_event_unrefer(pfd->fe);
@@ -236,6 +249,7 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 		pfds[i].pe  = pe;
 		pfds[i].pfd = &fds[i];
 		pfds[i].pfd->revents = 0;
+		ring_init(&pfds[i].me);
 		SET_POLLING(pfds[i].fe);
 	}
 
