@@ -1,0 +1,50 @@
+service $<PROGRAM> {
+#	进程是否禁止运行
+	master_disable = no
+
+#	服务类型, 当为 none 时, 则表示由子进程自行监听服务地址
+	master_type = none
+
+#	当子进程异常退出时，如果该值非空，则将子进程异常退出的消息通知该服务
+#	master_notify_addr = /opt/soft/acl-master/var/public/monitor.sock
+
+#	程序异常时的邮件通知接收者
+#	master_notify_recipients = xxx@xxx.com
+
+#	是否需要 chroot: n -- no, y -- yes
+	master_chroot = n
+
+#	最大进程数
+	master_maxproc = 1
+
+#	预启动进程数，该值不得大于 master_maxproc
+	master_prefork = 1
+
+#	进程程序名
+	master_command = {install_path}/sbin/redis-server
+
+#	指定程序版本, 方便管理模块获取
+	master_version = 1.0.0-0
+
+#	进程日志记录文件
+	master_log = {install_path}/var/log/$<PROGRAM>.log
+
+#	子进程标准输出信息转存日志文件
+	master_stdout = {install_path}/var/log/$<PROGRAM>.stdout
+
+#	子进程标准错误输出信息转存日志文件
+	master_stderr = {install_path}/var/log/$<PROGRAM>.stderr
+
+#	进程启动参数, acl_master 会以此配置项做为参数来启动子进程
+	master_args =
+
+#	如果该项非空, 则程序启动后将被切换至该目录
+	master_home = {install_path}
+
+#	针对由 Golang 编写的服务, 可以帮助其切换用户运行身份
+#	master_owner = nobody
+
+#	传递给服务子进程的环境变量, 可以通过 getenv("SERVICE_ENV") 获得此值
+#	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
+#			sync_action:E_LOG_SEM, sem_name:/tmp/ioctl_echo.sem
+}

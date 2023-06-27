@@ -6,6 +6,10 @@
 #include <WinSock2.h>
 #endif
 
+#if __cplusplus >= 201103L
+#include <memory>
+#endif
+
 namespace acl {
 
 class socket_stream;
@@ -13,9 +17,9 @@ class socket_stream;
 enum {
 	OPEN_FLAG_NONE      = 0,
 	OPEN_FLAG_NONBLOCK  = 1,	// 非阻塞模式
-	OPEN_FLAG_REUSEPORT = 1 << 1,	// 端口复用，要求 Linux3.0 以上
-	OPEN_FLAG_FASTOPEN  = 1 << 2,	// 是否启用 Fast open（实验阶段）
-	OPEN_FLAG_EXCLUSIVE = 1 << 3,	// 是否禁止复用地址
+	OPEN_FLAG_REUSEPORT = (1 << 1),	// 端口复用，要求 Linux3.0 以上
+	OPEN_FLAG_FASTOPEN  = (1 << 2),	// 是否启用 Fast open（实验阶段）
+	OPEN_FLAG_EXCLUSIVE = (1 << 3),	// 是否禁止复用地址
 };
 
 /**
@@ -98,16 +102,26 @@ public:
 	 *  若在指定时间内未获得客户端连接，则返回 NULL
 	 * @param etimed {bool*} 当此指针非 NULL 时，如果因超时导致该函数返回
 	 *  NULL，则此值被置为 true
-	 * @return {socket_stream*} 返回空表示接收失败或超时
+	 * @return {socket_stream*} 返回空表示接收失败或超时, 返回的流对象在用
+	 *  完用户需要自行 delete 流对象.
 	 */
 	socket_stream* accept(int timeout = -1, bool* etimed = NULL);
+
+#if __cplusplus >= 201103L
+	// 使用 c++11 shared_ptr 方式获得客户端流对象, 更安全地使用流对象
+	using shared_stream = std::shared_ptr<socket_stream>;
+
+	shared_stream shared_accept(int timeout = -1, bool* etimed = NULL) {
+		shared_stream ss(accept(timeout, etimed));
+		return ss;
+	}
+#endif
 
 	/**
 	 * 获得监听的地址
 	 * @return {const char*} 返回值非空指针
 	 */
-	const char* get_addr(void) const
-	{
+	const char* get_addr(void) const {
 		return addr_.c_str();
 	}
 
@@ -116,11 +130,10 @@ public:
 	 * @return {int}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	SOCKET sock_handle(void) const
+	SOCKET sock_handle(void) const {
 #else
-	int sock_handle(void) const
+	int sock_handle(void) const {
 #endif
-	{
 		return fd_;
 	}
 

@@ -224,78 +224,85 @@ static void hook_api(void)
 #ifdef SYS_UNIX
 
 # ifdef MINGW
-#  define LOAD_FN(name, type, fn, fp) do { \
+#  define LOAD_FN(name, type, fn, fp, fatal) do { \
 	(fn) = (type) dlsym(RTLD_DEFAULT, name); \
-	assert((fn)); \
+	if ((fn) == NULL) { \
+		assert((fatal) != 1); \
+	} \
 	(fp) = &(fn); \
 } while (0)
 # else
-#  define LOAD_FN(name, type, fn, fp) do { \
+#  define LOAD_FN(name, type, fn, fp, fatal) do { \
 	(fn) = (type) dlsym(RTLD_NEXT, name); \
-	assert((fn)); \
+	if ((fn) == NULL) { \
+		const char* e = dlerror(); \
+		printf("%s(%d): name=%s not found: %s\r\n", \
+			__FUNCTION__, __LINE__, name, e ? e : "unknown"); \
+		assert((fatal) != 1); \
+	} \
 	(fp) = &(fn); \
 } while (0)
 # endif
 
-	LOAD_FN("socket", socket_fn, __sys_socket, sys_socket);
-	LOAD_FN("close", close_fn, __sys_close, sys_close);
-	LOAD_FN("listen", listen_fn, __sys_listen, sys_listen);
-	LOAD_FN("accept", accept_fn, __sys_accept, sys_accept);
-	LOAD_FN("connect", connect_fn, __sys_connect, sys_connect);
-	LOAD_FN("setsockopt", setsockopt_fn, __sys_setsockopt, sys_setsockopt);
-	LOAD_FN("sleep", sleep_fn, __sys_sleep, sys_sleep);
-	LOAD_FN("fcntl", fcntl_fn, __sys_fcntl, sys_fcntl);
-	LOAD_FN("read", read_fn, __sys_read, sys_read);
-	LOAD_FN("readv", readv_fn, __sys_readv, sys_readv);
-	LOAD_FN("recv", recv_fn, __sys_recv, sys_recv);
-	LOAD_FN("recvfrom", recvfrom_fn, __sys_recvfrom, sys_recvfrom);
-	LOAD_FN("recvmsg", recvmsg_fn, __sys_recvmsg, sys_recvmsg);
-	LOAD_FN("write", write_fn, __sys_write, sys_write);
-	LOAD_FN("writev", writev_fn, __sys_writev, sys_writev);
-	LOAD_FN("send", send_fn, __sys_send, sys_send);
-	LOAD_FN("sendto", sendto_fn, __sys_sendto, sys_sendto);
-	LOAD_FN("sendmsg", sendmsg_fn, __sys_sendmsg, sys_sendmsg);
+	LOAD_FN("socket", socket_fn, __sys_socket, sys_socket, 1);
+	LOAD_FN("close", close_fn, __sys_close, sys_close, 1);
+	LOAD_FN("listen", listen_fn, __sys_listen, sys_listen, 1);
+	LOAD_FN("accept", accept_fn, __sys_accept, sys_accept, 1);
+	LOAD_FN("connect", connect_fn, __sys_connect, sys_connect, 1);
+	LOAD_FN("setsockopt", setsockopt_fn, __sys_setsockopt, sys_setsockopt, 1);
+	LOAD_FN("sleep", sleep_fn, __sys_sleep, sys_sleep, 1);
+	LOAD_FN("fcntl", fcntl_fn, __sys_fcntl, sys_fcntl, 1);
+	LOAD_FN("read", read_fn, __sys_read, sys_read, 1);
+	LOAD_FN("readv", readv_fn, __sys_readv, sys_readv, 1);
+	LOAD_FN("recv", recv_fn, __sys_recv, sys_recv, 1);
+	LOAD_FN("recvfrom", recvfrom_fn, __sys_recvfrom, sys_recvfrom, 1);
+	LOAD_FN("recvmsg", recvmsg_fn, __sys_recvmsg, sys_recvmsg, 1);
+	LOAD_FN("write", write_fn, __sys_write, sys_write, 1);
+	LOAD_FN("writev", writev_fn, __sys_writev, sys_writev, 1);
+	LOAD_FN("send", send_fn, __sys_send, sys_send, 1);
+	LOAD_FN("sendto", sendto_fn, __sys_sendto, sys_sendto, 1);
+	LOAD_FN("sendmsg", sendmsg_fn, __sys_sendmsg, sys_sendmsg, 1);
 
 # ifdef HAS_MMSG
-	LOAD_FN("recvmmsg", recvmmsg_fn, __sys_recvmmsg, sys_recvmmsg);
-	LOAD_FN("sendmmsg", sendmmsg_fn, __sys_sendmmsg, sys_sendmmsg);
-#endif
+	LOAD_FN("recvmmsg", recvmmsg_fn, __sys_recvmmsg, sys_recvmmsg, 0);
+	LOAD_FN("sendmmsg", sendmmsg_fn, __sys_sendmmsg, sys_sendmmsg, 0);
+# endif
 
 # ifdef __USE_LARGEFILE64
-	LOAD_FN("sendfile64", sendfile64_fn, __sys_sendfile64, sys_sendfile64);
+	LOAD_FN("sendfile64", sendfile64_fn, __sys_sendfile64, sys_sendfile64, 0);
 # endif
-	LOAD_FN("pread", pread_fn, __sys_pread, sys_pread);
-	LOAD_FN("pwrite", pwrite_fn, __sys_pwrite, sys_pwrite);
-	LOAD_FN("poll", poll_fn, __sys_poll, sys_poll);
-	LOAD_FN("select", select_fn, __sys_select, sys_select);
+	LOAD_FN("pread", pread_fn, __sys_pread, sys_pread, 1);
+	LOAD_FN("pwrite", pwrite_fn, __sys_pwrite, sys_pwrite, 1);
+	LOAD_FN("poll", poll_fn, __sys_poll, sys_poll, 1);
+	LOAD_FN("select", select_fn, __sys_select, sys_select, 1);
 
 # ifdef	HAS_EPOLL
-	LOAD_FN("epoll_create", epoll_create_fn, __sys_epoll_create, sys_epoll_create);
+	LOAD_FN("epoll_create", epoll_create_fn, __sys_epoll_create, sys_epoll_create, 1);
 
-	LOAD_FN("epoll_wait", epoll_wait_fn, __sys_epoll_wait, sys_epoll_wait);
+	LOAD_FN("epoll_wait", epoll_wait_fn, __sys_epoll_wait, sys_epoll_wait, 1);
 
-	LOAD_FN("epoll_ctl", epoll_ctl_fn, __sys_epoll_ctl, sys_epoll_ctl);
+	LOAD_FN("epoll_ctl", epoll_ctl_fn, __sys_epoll_ctl, sys_epoll_ctl, 1);
 # endif // HAS_EPOLL
 
 # ifdef	HAS_IO_URING
-	LOAD_FN("openat", openat_fn, __sys_openat, sys_openat);
-	LOAD_FN("unlink", unlink_fn, __sys_unlink, sys_unlink);
+	LOAD_FN("openat", openat_fn, __sys_openat, sys_openat, 1);
+	LOAD_FN("unlink", unlink_fn, __sys_unlink, sys_unlink, 1);
 # ifdef HAS_STATX
-	LOAD_FN("statx", statx_fn, __sys_statx, sys_statx);
+	LOAD_FN("statx", statx_fn, __sys_statx, sys_statx, 1);
 # endif
 # ifdef HAS_RENAMEAT2
-	LOAD_FN("renameat2", renameat2_fn, __sys_renameat2, sys_renameat2);
+	LOAD_FN("renameat2", renameat2_fn, __sys_renameat2, sys_renameat2, 1);
 # endif
-	LOAD_FN("mkdirat", mkdirat_fn, __sys_mkdirat, sys_mkdirat);
-	LOAD_FN("splice", splice_fn, __sys_splice, sys_splice);
+	LOAD_FN("mkdirat", mkdirat_fn, __sys_mkdirat, sys_mkdirat, 1);
+	LOAD_FN("splice", splice_fn, __sys_splice, sys_splice, 1);
 # endif
 
-	LOAD_FN("getaddrinfo", getaddrinfo_fn, __sys_getaddrinfo, sys_getaddrinfo);
-	LOAD_FN("freeaddrinfo", freeaddrinfo_fn, __sys_freeaddrinfo, sys_freeaddrinfo);
-	LOAD_FN("gethostbyname", gethostbyname_fn, __sys_gethostbyname, sys_gethostbyname);
+	LOAD_FN("getaddrinfo", getaddrinfo_fn, __sys_getaddrinfo, sys_getaddrinfo, 1);
+	LOAD_FN("freeaddrinfo", freeaddrinfo_fn, __sys_freeaddrinfo, sys_freeaddrinfo, 1);
+	LOAD_FN("gethostbyname", gethostbyname_fn, __sys_gethostbyname, sys_gethostbyname, 1);
 
 # ifndef __APPLE__
-	LOAD_FN("gethostbyname_r", gethostbyname_r_fn, __sys_gethostbyname_r, sys_gethostbyname_r);
+	LOAD_FN("gethostbyname_r", gethostbyname_r_fn, __sys_gethostbyname_r, sys_gethostbyname_r, 1);
 # endif
 #elif defined(SYS_WIN)
 	__sys_socket    = socket;

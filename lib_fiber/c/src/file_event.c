@@ -19,7 +19,7 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	fe->w_proc = NULL;
 
 #ifdef HAS_POLL
-	fe->pfd    = NULL;
+	ring_init(&fe->pfds);
 #endif
 
 #ifdef	HAS_IO_URING

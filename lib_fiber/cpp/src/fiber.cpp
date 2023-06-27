@@ -308,6 +308,11 @@ void fiber::stdout_open(bool on)
 	acl_fiber_msg_stdout_enable(on ? 1 : 0);
 }
 
+int fiber::set_fdlimit(int max)
+{
+	return acl_fiber_set_fdlimit(max);
+}
+
 ACL_FIBER* fiber::fiber_create(void (*fn)(ACL_FIBER*, void*), void* ctx,
 	size_t stack_size, bool share_stack /* false */)
 {

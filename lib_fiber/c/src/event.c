@@ -353,7 +353,9 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (fe->mask & EVENT_READ) {
-		if (fe->me.parent == &fe->me) {
+		if (fe->mask & EVENT_DIRECT) {
+			(void) ev->del_read(ev, fe);
+		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 
@@ -370,7 +372,9 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe)
 	}
 
 	if (fe->mask & EVENT_WRITE) {
-		if (fe->me.parent == &fe->me) {
+		if (fe->mask & EVENT_DIRECT) {
+			(void) ev->del_write(ev, fe);
+		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 		}
 

@@ -47,6 +47,10 @@ typedef int socklen_t;
 
 #else
 
+# ifndef _GNU_SOURCE
+#  define _GNU_SOURCE
+# endif
+
 # include <errno.h>
 # include <sys/types.h>
 # include <sys/socket.h>
@@ -79,7 +83,8 @@ typedef int socket_t;
 # define	FIBER_ECONNABORTED	ECONNABORTED
 # define	FIBER_EINPROGRESS	EINPROGRESS
 
-# ifdef		MSG_WAITFORONE
+# include <sys/syscall.h>
+# if defined(SYS_recvmmsg) && defined(SYS_sendmmsg)
 #  define	HAS_MMSG
 # endif
 #endif

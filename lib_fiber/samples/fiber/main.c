@@ -1,3 +1,4 @@
+//#define _GNU_SOURCE
 #include "lib_acl.h"
 #include <stdio.h>
 #include <stdlib.h>

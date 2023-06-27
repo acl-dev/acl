@@ -32,18 +32,50 @@ static long long int __total_count = 0;
 static int __total_clients         = 0;
 static int __total_error_clients   = 0;
 
-static int __show_max     = 10;
-static int __show_count   = 0;
-static int __fiber_delay  = 0;
-static int __conn_timeout = -1;
-static int __io_timeout   = -1;
-static int __max_loop     = 10000;
-static int __max_fibers   = 100;
-static int __left_fibers  = 100;
-static int __read_data    = 1;
-static int __stack_size   = 32000;
-static int __stack_share  = 0;
+static int __show_max      = 10;
+static int __show_count    = 0;
+static int __fiber_delay   = 0;
+static int __conn_timeout  = -1;
+static int __read_timeout  = -1;
+static int __write_timeout = -1;
+static int __max_loop      = 10000;
+static int __max_fibers    = 100;
+static int __left_fibers   = 100;
+static int __read_data     = 1;
+static int __stack_size    = 32000;
+static int __stack_share   = 0;
+
 static struct timeval __begin;
+
+static int check_read(SOCKET fd, int timeout)
+{
+	struct pollfd pfd;
+	int n;
+
+	memset(&pfd, 0, sizeof(struct pollfd));
+	pfd.fd = fd;
+	pfd.events = POLLIN;
+
+#if defined(_WIN32) || defined(_WIN64)
+	n = acl_fiber_poll(&pfd, 1, timeout);
+#else
+	n = poll(&pfd, 1, timeout);
+#endif
+	if (n < 0) {
+		printf("poll error: %s\r\n", acl_last_serror());
+		return -1;
+	}
+
+	if (n == 0) {
+		return 0;
+	}
+	if (pfd.revents & POLLIN) {
+		return 1;
+	} else {
+		printf(">>>poll return n=%d read no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
+		return 0;
+	}
+}
 
 static int check_write(SOCKET fd, int timeout)
 {
@@ -55,7 +87,7 @@ static int check_write(SOCKET fd, int timeout)
 	pfd.events = POLLOUT;
 
 #if defined(_WIN32) || defined(_WIN64)
-	n = WSAPoll(&pfd, 1, timeout);
+	n = acl_fiber_poll(&pfd, 1, timeout);
 #else
 	n = poll(&pfd, 1, timeout);
 #endif
@@ -91,6 +123,11 @@ static void echo_client(SOCKET fd)
 	const char *str = "hello world\r\n";
 
 	for (i = 0; i < __max_loop; i++) {
+		if (__write_timeout > 0 && check_write(fd, __write_timeout * 1000) <= 0) {
+			printf("write wait error=%s, fd=%d\r\n", acl_last_serror(), fd);
+			break;
+		}
+
 #if defined(_WIN32) || defined(_WIN64)
 		if (acl_fiber_send(fd, str, strlen(str), 0) <= 0) {
 #else
@@ -110,6 +147,11 @@ static void echo_client(SOCKET fd)
 				acl_fiber_yield();
 			}
 			continue;
+		}
+
+		if (__read_timeout > 0 && (ret = check_read(fd, __read_timeout * 1000)) <= 0) {
+			printf("read wait error=%s, fd=%d, ret=%d\r\n", acl_last_serror(), fd, ret);
+			break;
 		}
 
 #if defined(_WIN32) || defined(_WIN64)
@@ -243,7 +285,8 @@ static void usage(const char *procname)
 		" -s server_ip\r\n"
 		" -p server_port\r\n"
 		" -t connt_timeout\r\n"
-		" -r io_timeout\r\n"
+		" -r read_timeout\r\n"
+		" -w write_timeout\r\n"
 		" -c max_fibers\r\n"
 		" -S [if using single IO, dafault: no]\r\n"
 		" -Z [if sharing fiber stack, default: no]\r\n"
@@ -280,7 +323,7 @@ int main(int argc, char *argv[])
 
 	snprintf(__server_ip, sizeof(__server_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:Sd:z:e:m:Z")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:p:t:r:w:Sd:z:e:m:Z")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -293,7 +336,10 @@ int main(int argc, char *argv[])
 			__conn_timeout = atoi(optarg);
 			break;
 		case 'r':
-			__io_timeout = atoi(optarg);
+			__read_timeout = atoi(optarg);
+			break;
+		case 'w':
+			__write_timeout = atoi(optarg);
 			break;
 		case 'n':
 			__max_loop = atoi(optarg);

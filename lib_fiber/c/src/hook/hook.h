@@ -200,6 +200,7 @@ void hook_once(void);
 #if defined(__linux__)
 // in epoll.c
 int epoll_try_register(int epfd);
+int epoll_close(int epfd);
 #endif
 
 #ifdef __cplusplus
