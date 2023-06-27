@@ -64,11 +64,11 @@ int WINAPI acl_fiber_close(socket_t fd)
 	}
 
 #ifdef	HAS_EPOLL
-	/* when the fd was closed by epoll_event_close normally, the fd
+	/* when the fd was closed by epoll_close normally, the fd
 	 * must be a epoll fd which was created by epoll_create function
 	 * hooked in hook_net.c
 	 */
-	if (epoll_event_close(fd) == 0) {
+	if (epoll_close(fd) == 0) {
 		return 0;
 	}
 #endif

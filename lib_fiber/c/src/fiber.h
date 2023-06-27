@@ -136,9 +136,6 @@ void fiber_file_close(FILE_EVENT *fe);
 FILE_EVENT *fiber_file_cache_get(socket_t fd);
 void fiber_file_cache_put(FILE_EVENT *fe);
 
-/* in hook/epoll.c */
-int  epoll_event_close(int epfd);
-
 /* in fiber/fiber_unix.c, fiber/fiber_win.c */
 ACL_FIBER *fiber_real_origin(void);
 ACL_FIBER *fiber_real_alloc(const ACL_FIBER_ATTR *attr);

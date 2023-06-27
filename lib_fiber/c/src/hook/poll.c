@@ -189,6 +189,7 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 			SET_WRITEWAIT(pfd->fe);
 		}
 
+		// Append the POLLFD to the FILE_EVENT's list.
 		ring_prepend(&pfd->fe->pfds, &pfd->me);
 		pfd->pfd->revents = 0;
 
@@ -213,7 +214,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 	for (i = 0; i < pe->nfds; i++) {
 		POLLFD *pfd = &pe->fds[i];
 
-		/* maybe has been cleaned in read_callback/write_callback */
+		/* Maybe has been cleaned in read_callback/write_callback. */
 		if (pfd->fe == NULL) {
 			continue;
 		}
@@ -240,6 +241,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 		// Unrefer the fe because we don't need it again.
 		//file_event_unrefer(pfd->fe);
 
+		// Remove the POLLFD from the FILE_EVENT.
 		ring_detach(&pfd->me);
 		pfd->fe = NULL;
 	}

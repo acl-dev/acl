@@ -10,14 +10,17 @@
 
 /****************************************************************************/
 
+/**
+ * One socket fd has one EPOLL_CTX in epoll mode witch was set in FILE_EVENT.
+ */
 struct EPOLL_CTX {
-	int  fd;
-	int  op;
-	int  mask;
-	int  rmask;
-	FILE_EVENT  *fe;
-	EPOLL_EVENT *ee;
-	epoll_data_t data;
+	int  fd;		// The socket fd.
+	int  op;		// Same with the epoll_ctl's op.
+	int  mask;		// The event mask been set.
+	int  rmask;		// The result event mask.
+	FILE_EVENT  *fe;	// Refer to the FILE_EVENT with the socket fd.
+	EPOLL_EVENT *ee;	// Refer to the fiber's EPOLL_EVENT.
+	epoll_data_t data;	// Same as the system epoll_data_t.
 };
 
 /**
@@ -29,10 +32,14 @@ struct EPOLL_CTX {
  *                                                   |- socket EPOLL_CTX
  *                                                   |- socket EPOLL_CTX
  *                                                   |- ...
+ * Notice: one EPOLL_EVENT can only belong to one fiber, and one fiber can
+ * have only one EPOLL_EVENT; And EPOLL::ep_events holds multiple EPOLL_EVENT;
+ * One EPOLL object is bound with one epoll fd duplicated with the system
+ * epoll fd owned by the scheduling thread.
  */
 struct EPOLL {
-	int         epfd;
-	EPOLL_CTX **fds;
+	int         epfd;	// Duplicate the current thread's epoll fd.
+	EPOLL_CTX **fds;	// Hold EPOLL_CTX objects of the epfd.
 	size_t      nfds;
 
 	// Store all EPOLL_EVENT, every fiber should use its own EPOLL_EVENT,
@@ -104,6 +111,9 @@ static EPOLL_EVENT *epoll_event_alloc(void)
 /****************************************************************************/
 
 static ARRAY     *__main_epfds = NULL;
+
+// Hold the EPOLL objects of one thread; And the EPOLL object was created in
+// epoll_create/epoll_try_register as below.
 static __thread ARRAY *__epfds = NULL;
 
 static pthread_key_t  __once_key;
@@ -153,6 +163,7 @@ static void thread_init(void)
 	}
 }
 
+// Create one EPOLL for the specified epfd.
 static EPOLL *epoll_alloc(int epfd)
 { 
 	EPOLL *ep;
@@ -179,7 +190,7 @@ static EPOLL *epoll_alloc(int epfd)
 		}
 	}
 
-	ep = mem_malloc(sizeof(EPOLL));
+	ep = (EPOLL*) mem_malloc(sizeof(EPOLL));
 	array_append(__epfds, ep);
 
 	/* Duplicate the current thread's epoll fd, so we can assosiate the
@@ -190,6 +201,7 @@ static EPOLL *epoll_alloc(int epfd)
 
 	ep->nfds = maxfd;
 	ep->fds  = (EPOLL_CTX **) mem_malloc(maxfd * sizeof(EPOLL_CTX *));
+
 	for (i = 0; i < maxfd; i++) {
 		ep->fds[i] = NULL;
 	}
@@ -198,6 +210,7 @@ static EPOLL *epoll_alloc(int epfd)
 	return ep;
 }
 
+// Maybe called by the fcntl API being hooked.
 int epoll_try_register(int epfd)
 {
 	int sys_epfd;
@@ -258,7 +271,8 @@ static void epoll_free(EPOLL *ep)
 	mem_free(ep);
 }
 
-int epoll_event_close(int epfd)
+// Close and free one EPOLL with the specified epfd.
+int epoll_close(int epfd)
 {
 	EVENT *ev;
 	int sys_epfd;
@@ -303,9 +317,13 @@ int epoll_event_close(int epfd)
 	epoll_free(ep);
 	array_delete(__epfds, pos, NULL);
 
+	// Because the epfd was created by dup, so it should be closed by the
+	// system close API directly.
 	return (*sys_close)(epfd);
 }
 
+// Find the EPOLL_EVENT for the current fiber with the specified epfd, and
+// new one will be created if not found and create is true.
 static EPOLL_EVENT *epoll_event_find(int epfd, int create)
 {
 	ACL_FIBER *curr = acl_fiber_running();
@@ -320,6 +338,7 @@ static EPOLL_EVENT *epoll_event_find(int epfd, int create)
 		return NULL;
 	}
 
+	// First, we should find the EPOLL with the specified epfd.
 	foreach(iter, __epfds) {
 		EPOLL *tmp = (EPOLL *) iter.data;
 		if (tmp->epfd == epfd) {
@@ -334,16 +353,22 @@ static EPOLL_EVENT *epoll_event_find(int epfd, int create)
 		return NULL;
 	}
 
+	// Then, trying to find the EPOLL_EVENT of the current fiber.
 	SNPRINTF(key, sizeof(key), "%u", curr->fid);
+
 	ee = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
 	if (ee != NULL) {
 		ee->epoll = ep;
 		return ee;
 	}
 
+	// If not found, create one if needed by the caller or else return NULL.
 	if (create) {
 		ee = epoll_event_alloc();
 		ee->epoll = ep;
+
+		// Store the current fiber's EPOLL_EVENT into the htable with
+		// the key associated withe fiber's ID.
 		htable_enter(ep->ep_events, key, ee);
 
 		return ee;
@@ -354,6 +379,7 @@ static EPOLL_EVENT *epoll_event_find(int epfd, int create)
 
 /****************************************************************************/
 
+// Hook the system API to create one epoll fd.
 int epoll_create(int size fiber_unused)
 {
 	EVENT *ev;
@@ -386,6 +412,7 @@ int epoll_create(int size fiber_unused)
 }
 
 #ifdef EPOLL_CLOEXEC
+// Hook the system API.
 int epoll_create1(int flags)
 {
 	int epfd = epoll_create(100);
@@ -407,6 +434,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	EPOLL       *ep;
 
 	assert(epx);
+	assert(epx->fd == fe->fd);
 	assert(epx->mask & EVENT_READ);
 
 	ee = epx->ee;
@@ -423,9 +451,14 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 		return;
 	}
 
+	assert(ep->fds[epx->fd] == epx);
+
+	// Save the fd IO event's result to the result receiver been set in
+	// epoll_wait as below.
 	ee->events[ee->nready].events |= EPOLLIN;
-	memcpy(&ee->events[ee->nready].data, &ep->fds[epx->fd]->data,
-		sizeof(ep->fds[epx->fd]->data));
+
+	// Restore the data been set in epoll_ctl_add.
+	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
 
 	if (ee->nready == 0) {
 		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
@@ -446,6 +479,7 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	EPOLL       *ep;
 
 	assert(epx);
+	assert(epx->fd == fe->fd);
 	assert(epx->mask & EVENT_WRITE);
 
 	ee = epx->ee;
@@ -458,9 +492,10 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 		return;
 	}
 
+	assert(ep->fds[epx->fd] == epx);
+
 	ee->events[ee->nready].events |= EPOLLOUT;
-	memcpy(&ee->events[ee->nready].data, &ep->fds[epx->fd]->data,
-		sizeof(ep->fds[epx->fd]->data));
+	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
 
 	if (ee->nready == 0) {
 		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
@@ -478,61 +513,68 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 	struct epoll_event *event, int fd, int op)
 {
 	EPOLL *ep = ee->epoll;
+	EPOLL_CTX *epx = ep->fds[fd];
 
-	if (ep->fds[fd] == NULL) {
-		ep->fds[fd] = (EPOLL_CTX *) mem_malloc(sizeof(EPOLL_CTX));
+	if (epx == NULL) {
+		epx = ep->fds[fd] = (EPOLL_CTX *) mem_malloc(sizeof(EPOLL_CTX));
 	}
 
-	ep->fds[fd]->fd      = fd;
-	ep->fds[fd]->op      = op;
-	ep->fds[fd]->mask    = EVENT_NONE;
-	ep->fds[fd]->rmask   = EVENT_NONE;
-	ep->fds[fd]->ee      = ee;
+	epx->fd    = fd;
+	epx->op    = op;
+	epx->mask  = EVENT_NONE;
+	epx->rmask = EVENT_NONE;
+	epx->ee    = ee;
 
-	memcpy(&ep->fds[fd]->data, &event->data, sizeof(event->data));
+	// Save the fd's context in epx bound with the fd.
+	memcpy(&epx->data, &event->data, sizeof(event->data));
 
 	if (event->events & EPOLLIN) {
-		ep->fds[fd]->mask   |= EVENT_READ;
-		ep->fds[fd]->fe      = fiber_file_open_read(fd);
-		ep->fds[fd]->fe->epx = ep->fds[fd];
+		epx->mask   |= EVENT_READ;
+		epx->fe      = fiber_file_open_read(fd);
+		epx->fe->epx = epx;
 
-		event_add_read(ev, ep->fds[fd]->fe, read_callback);
-		SET_READWAIT(ep->fds[fd]->fe);
+		event_add_read(ev, epx->fe, read_callback);
+		SET_READWAIT(epx->fe);
 	}
 
 	if (event->events & EPOLLOUT) {
-		ep->fds[fd]->mask   |= EVENT_WRITE;
-		ep->fds[fd]->fe      = fiber_file_open_write(fd);
-		ep->fds[fd]->fe->epx = ep->fds[fd];
+		epx->mask   |= EVENT_WRITE;
+		epx->fe      = fiber_file_open_write(fd);
+		epx->fe->epx = epx;
 
-		event_add_write(ev, ep->fds[fd]->fe, write_callback);
-		SET_WRITEWAIT(ep->fds[fd]->fe);
+		event_add_write(ev, epx->fe, write_callback);
+		SET_WRITEWAIT(epx->fe);
 	}
 }
 
 static void epoll_ctl_del(EVENT *ev, EPOLL_EVENT *ee, int fd)
 {
 	EPOLL *ep = ee->epoll;
+	EPOLL_CTX *epx = ep->fds[fd];
 
-	if (ep->fds[fd]->mask & EVENT_READ) {
-		event_del_read(ev, ep->fds[fd]->fe);
-		CLR_READWAIT(ep->fds[fd]->fe);
+	assert(epx);
+
+	if (epx->mask & EVENT_READ) {
+		assert(epx->fe);
+		event_del_read(ev, epx->fe);
+		CLR_READWAIT(epx->fe);
 	}
 
-	if (ep->fds[fd]->mask & EVENT_WRITE) {
-		event_del_write(ev, ep->fds[fd]->fe);
-		CLR_WRITEWAIT(ep->fds[fd]->fe);
+	if (epx->mask & EVENT_WRITE) {
+		assert(epx->fe);
+		event_del_write(ev, epx->fe);
+		CLR_WRITEWAIT(epx->fe);
 	}
 
-	ep->fds[fd]->fd      = -1;
-	ep->fds[fd]->op      = 0;
-	ep->fds[fd]->mask    = EVENT_NONE;
-	ep->fds[fd]->rmask   = EVENT_NONE;
-	ep->fds[fd]->fe->epx = NULL;
-	ep->fds[fd]->fe      = NULL;
-	memset(&ep->fds[fd]->data, 0, sizeof(ep->fds[fd]->data));
+	epx->fd      = -1;
+	epx->op      = 0;
+	epx->mask    = EVENT_NONE;
+	epx->rmask   = EVENT_NONE;
+	epx->fe->epx = NULL;
+	epx->fe      = NULL;
+	memset(&epx->data, 0, sizeof(epx->data));
 
-	mem_free(ep->fds[fd]);
+	mem_free(epx);
 	ep->fds[fd] = NULL;
 }
 
@@ -549,6 +591,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 		return sys_epoll_ctl ?  (*sys_epoll_ctl)(epfd, op, fd, event) : -1;
 	}
 
+	// Get the fiber's EPOLL_EVENT with the specified epfd.
 	ee = epoll_event_find(epfd, 1);
 	if (ee == NULL) {
 		msg_error("%s(%d), %s: not exist epfd=%d",
