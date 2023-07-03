@@ -533,7 +533,7 @@ const std::vector<json_node*>& json::getElementsByTagName(const char* tag) const
 	acl_foreach(iter, a) {
 		ACL_JSON_NODE *tmp = (ACL_JSON_NODE*) iter.data;
 		json_node* node = dbuf_->create<json_node>
-		        (tmp, const_cast<json*>(this));
+			(tmp, const_cast<json*>(this));
 		const_cast<json*>(this)->nodes_query_.push_back(node);
 	}
 
@@ -554,7 +554,7 @@ const std::vector<json_node*>& json::getElementsByTags(const char* tags) const
 	acl_foreach(iter, a) {
 		ACL_JSON_NODE *tmp = (ACL_JSON_NODE*) iter.data;
 		json_node* node = dbuf_->create<json_node>
-		        (tmp, const_cast<json*>(this));
+			(tmp, const_cast<json*>(this));
 		const_cast<json*>(this)->nodes_query_.push_back(node);
 	}
 
@@ -688,6 +688,16 @@ json_node& json::create_node(const char* tag, json_node& node)
 		tag, node.get_json_node());
 	json_node* n = dbuf_->create<json_node>(tmp, this);
 	return *n;
+}
+
+void json::remove(json_node* node)
+{
+	if (node) {
+		ACL_JSON_NODE* n = node->get_json_node();
+		if (n) {
+			acl_json_node_delete(n);
+		}
+	}
 }
 
 json_node& json::duplicate_node(const json_node* node)

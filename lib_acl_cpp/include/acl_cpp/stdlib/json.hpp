@@ -14,6 +14,8 @@ struct ACL_ITER;
  * 可以直接使用该类，如果在服务端执行且非常注重性能，建议直接使用 ACL 库的
  * json 解析器，因为该类也是调用了 ACL 库中的 json 解析过程，并且有二次拷贝
  * 过程，可能会稍微影响一些性能，但对于一般的应用这点影响是微不足道的
+ * 整个 json 对象及其附属 json 节点对象均是构建内部的 dbuf 对象上, 所以其内部
+ * 创建的 json 节点对象均会在 json 对象析构时一起释放.
  */
 
 namespace acl {
@@ -24,8 +26,7 @@ class json;
 /**
  * json 节点，该类对象必须以 json.create_node() 方式创建
  */
-class ACL_CPP_API json_node : public dbuf_obj
-{
+class ACL_CPP_API json_node : public dbuf_obj {
 public:
 	/**
 	 * 取得本 json 节点的标签名
@@ -436,8 +437,7 @@ private:
 	} node_val_;
 };
 
-class ACL_CPP_API json : public pipe_stream, public dbuf_obj
-{
+class ACL_CPP_API json : public pipe_stream, public dbuf_obj {
 public:
 	/**
 	 * 构造函数，可用于解析 json 字符串或生成 json 对象
@@ -520,8 +520,7 @@ public:
 	 *  当调用方法 clear/getElementsByTagName/getElementsByTags 后，节点
 	 *  不能再被引用，因为节点的内存被自动释放
 	 */
-	const std::vector<json_node*>&
-		getElementsByTagName(const char* tag) const;
+	const std::vector<json_node*>& getElementsByTagName(const char* tag) const;
 
 	/**
 	 * 从 json 对象中获得所有的与给定多级标签名相同的 json 节点的集合
@@ -541,8 +540,7 @@ public:
 	 *  当调用方法 clear/getElementsByTagName/getElementsByTags 后，节点
 	 *  不能再被引用，因为节点的内存被自动释放
 	 */
-	const std::vector<json_node*>&
-		getElementsByTags(const char* tags) const;
+	const std::vector<json_node*>& getElementsByTags(const char* tags) const;
 
 	/**
 	 * 从 json 对象中获得所有的与给定多级标签名相同的 json 节点的集合
@@ -714,6 +712,14 @@ public:
 	 */
 	json_node& create_node(const char* tag, json_node& node);
 
+	/**
+	 * 将指定的 json 节点从 json 对象中删除, 同时释放其内存资源, 调用本函数
+	 * 后应用将不得再使用该 json 节点对象.
+	 * @param node {json_node*} 该 json 节点及其包含的子节点将会从 json 对
+	 *  象中删除, 其所占用的内存资源将会在 json 对象析构时随 dbuf 销毁.
+	 */
+	void remove(json_node* node);
+
 	/////////////////////////////////////////////////////////////////////
 
 	/**
@@ -731,6 +737,8 @@ public:
 	 * @return {json_node&} 当前目标 json 对象中新创建的 json 节点
 	 */
 	json_node& duplicate_node(const json_node& node);
+
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 获得根节点对象
