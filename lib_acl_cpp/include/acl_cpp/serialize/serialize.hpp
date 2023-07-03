@@ -4,12 +4,10 @@
 #include "../stdlib/json.hpp"
 #include <string>
 
-namespace acl
-{
+namespace acl {
 
 template<typename T>
-bool deserialize(json& j, T& o, string* err = NULL)
-{
+bool deserialize(json& j, T& o, string* err = NULL) {
 	if (!j.finish())
 	{
 		if (err)
@@ -30,12 +28,10 @@ bool deserialize(json& j, T& o, string* err = NULL)
 }
 
 template<typename T>
-void serialize(T& o, string& buf)
-{
+void serialize(T& o, string& buf) {
 	json j;
 	json_node& n = gson(j, o);
 	(void) n.to_string(&buf);
-	buf += "\r\n";
 }
 
 } // namespace acl
