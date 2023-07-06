@@ -247,7 +247,7 @@ const char* md5::get_digest(void) const
 
 const char* md5::get_string(void) const
 {
-	const_cast<md5*>(this)->hex_encode(digest_,
+	const_cast<md5*>(this)->hex_encode(digest_, 16,
 		(char*) digest_s_, sizeof(digest_s_));
 	return (const char*) digest_s_;
 }
@@ -280,7 +280,7 @@ const char* md5::md5_string(const void *dat, size_t dlen,
 	md5.finish();
 
 	const unsigned char* d = (const unsigned char*) md5.get_digest();
-	hex_encode(d, out, size);
+	hex_encode(d, 16, out, size);
 	return out;
 }
 
@@ -327,43 +327,33 @@ acl_int64 md5::md5_file(istream& in, const void *key, size_t klen,
 	md5.finish();
 
 	const char* ptr = md5.get_digest();
-	hex_encode(ptr, out, size);
+	hex_encode(ptr, 16, out, size);
 	return n;
 }
 
-const char* md5::hex_encode(const void *in, char* out, size_t size)
-{
-	size_t i;
-	char  buf[34];  // xxx: 必须是 34 个字节
-	char *ptr;
-	unsigned char digest[16];
+static const unsigned char hex_chars[] = "0123456789abcdef";
 
-	if (size < 33) {
+#define UCHAR_PTR(x) ((const unsigned char *)(x))
+
+const char* md5::hex_encode(const void* in, size_t len, char* out, size_t size)
+{
+	// size 长度至少应该为: len * 2 + 1
+	if (size < 2 * len + 1) {
 		abort();
 	}
 
-	memcpy(digest, in, 16);
+	const unsigned char *cp;
+	int     ch;
+	size_t  count, i = 0;
 
-	for (i = 0; i < 16; i++) {
-#if _MSC_VER >= 1500
-		sprintf_s(&(buf[2 * i]), 3, "%02x", (unsigned char) digest[i]);
-		sprintf_s(&(buf[2 * i + 1]), 3, "%02x",
-			(unsigned char) (digest[i] << 4));
-#else
-		sprintf(&(buf[2 * i]), "%02x", (unsigned char) digest[i]);
-		sprintf(&(buf[2 * i + 1]), "%02x",
-			(unsigned char) (digest[i] << 4));
-#endif
+	for (cp = UCHAR_PTR(in), count = len; count > 0; count--, cp++) {
+		ch = *cp;
+		out[i++] = hex_chars[(ch >> 4) & 0xf];
+		out[i++] = hex_chars[ch & 0xf];
 	}
 
-	ptr = out;
-
-	for (i = 0; i < 32; i++) {
-		*ptr++ = buf[i];
-	}
-
-	*ptr = '\0';
-	return (out);
+	out[i] = 0;
+	return out;
 }
 
 } // namespace acl

@@ -22,7 +22,7 @@ static int __max_sections = DEF_DEBUG_SECTIONS;
 
 static int *__debug_levels = NULL;
 
-void acl_debug_end()
+void acl_debug_end(void)
 {
 	if (__debug_levels != NULL) {
 		acl_myfree(__debug_levels);

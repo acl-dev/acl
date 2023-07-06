@@ -113,7 +113,7 @@ static ICMP_PKT* timer_popup(ICMP_TIMER* timer)
 	return (pkt);
 }
 
-ICMP_TIMER *icmp_timer_new()
+ICMP_TIMER *icmp_timer_new(void)
 {
 	ICMP_TIMER *timer;
 
