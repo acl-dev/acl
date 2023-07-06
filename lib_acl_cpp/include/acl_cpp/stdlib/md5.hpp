@@ -6,8 +6,7 @@ namespace acl {
 
 class istream;
 
-class ACL_CPP_API md5 : public noncopyable
-{
+class ACL_CPP_API md5 : public noncopyable {
 public:
 	md5(void);
 	~md5(void);
@@ -112,15 +111,17 @@ public:
 #endif
 
 	/**
-	 * 将 16 字节长度的 MD5 二进制结果转换为 32 字节长度的字符串
-	 * @param in {const void*} 128 位(即 16 字节)的 md5 值，即 in 的数据长度
-	 *  至少应该 >= 16，否则会引起内存起越界
+	 * 通过将一个字节变成两个字节, 将二进制数据转换为字符串数据.
+	 * @param in {const void*} 输入的二进制数据地址
+	 * @param len {size_t} in 的长度
 	 * @param out {char*} 存储字符串形式的结果
-	 * @param size {size_t} out 内存大小，至少为 33 字节，否则内部产生断言
-	 * @return {const char*} 返回存储结果的地址(即 out 地址)，
-	 *  且返回值为以 \0 结尾的 32 字节长度(不含 \0)字符串
+	 * @param size {size_t} out 内存大小, 至少为 len * 2 + 1,
+	 *  最后一个字节存 \0
+	 * @return {const char*} 返回存储结果的地址(即 out 地址),
+	 *  且返回值为以 \0 结尾的字符串.
 	 */
-	static const char* hex_encode(const void *in, char* out, size_t size);
+	static const char* hex_encode(const void *in, size_t len,
+		char* out, size_t size);
 
 private:
 	unsigned int buf_[4];
