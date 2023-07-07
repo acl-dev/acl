@@ -332,12 +332,13 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	fiber = acl_fiber_running();
 	fiber_timer_add(fiber, milliseconds);
 
-	fiber->status = FIBER_STATUS_DELAY;
+	fiber->wstatus |= FIBER_WAIT_DELAY;
 	WAITER_INC(__thread_fiber->event);
 
 	acl_fiber_switch();
 
 	WAITER_DEC(__thread_fiber->event);
+	fiber->wstatus &= ~FIBER_WAIT_DELAY;
 
 	// Clear the flag been set in wakeup_timers.
 	fiber->flag &= ~FIBER_F_TIMER;
@@ -457,7 +458,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return ret;
 	}
 
-	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
+	fe->fiber_r->wstatus |= FIBER_WAIT_READ;
 	SET_READWAIT(fe);
 
 	if (!(fe->type & TYPE_INTERNAL)) {
@@ -466,6 +467,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
+	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
 
 	if (!(fe->type & TYPE_INTERNAL)) {
@@ -502,7 +504,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 		return ret;
 	}
 
-	fe->fiber_w->status = FIBER_STATUS_WAIT_WRITE;
+	fe->fiber_w->wstatus |= FIBER_WAIT_WRITE;
 	SET_WRITEWAIT(fe);
 
 	if (!(fe->type & TYPE_INTERNAL)) {
@@ -511,6 +513,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
+	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
 	fe->fiber_w = NULL;
 
 	if (!(fe->type & TYPE_INTERNAL)) {
@@ -703,8 +706,6 @@ void fiber_file_close(FILE_EVENT *fe)
 
 	if (IS_READWAIT(fe) && fe->fiber_r && fe->fiber_r != curr
 		&& fe->fiber_r->status != FIBER_STATUS_EXITING) {
-		//&& fe->fiber_r->status >= FIBER_STATUS_WAIT_READ
-		//&& fe->fiber_r->status <= FIBER_STATUS_EPOLL_WAIT) {
 
 		// The current fiber is closing the other fiber's fd, and the
 		// other fiber hoding the fd is blocked by waiting for the
@@ -726,8 +727,6 @@ void fiber_file_close(FILE_EVENT *fe)
 
 	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
 		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
-		//&& fe->fiber_w->status >= FIBER_STATUS_WAIT_READ
-		//&& fe->fiber_w->status <= FIBER_STATUS_EPOLL_WAIT) {
 
 		CLR_WRITEWAIT(fe);
 		SET_CLOSING(fe);

@@ -219,7 +219,7 @@ static BTREE_NODE *btree_delete_node(ACL_BTREE *tree, BTREE_NODE *z)
 /* Exported functions                                                        */
 /*****************************************************************************/
 
-ACL_BTREE *acl_btree_create()
+ACL_BTREE *acl_btree_create(void)
 {
 	ACL_BTREE *t = (ACL_BTREE*) acl_mymalloc(sizeof(ACL_BTREE));
 

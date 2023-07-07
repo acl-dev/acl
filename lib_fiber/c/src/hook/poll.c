@@ -394,11 +394,13 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		}
 
 		pe->nready = 0;
-		pe->fiber->status = FIBER_STATUS_POLL_WAIT;
+		pe->fiber->wstatus |= FIBER_WAIT_POLL;
 
 		WAITER_INC(ev);
 		acl_fiber_switch();
 		WAITER_DEC(ev);
+
+		pe->fiber->wstatus &= ~FIBER_WAIT_POLL;
 
 		if (pe->nready == 0 && pe->expire >= 0) {
 			timer_cache_remove(ev->poll_list, pe->expire, &pe->me);

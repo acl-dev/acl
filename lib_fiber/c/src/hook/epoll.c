@@ -687,11 +687,13 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	while (1) {
 		timer_cache_add(ev->epoll_list, ee->expire, &ee->me);
 
-		ee->fiber->status = FIBER_STATUS_EPOLL_WAIT;
+		ee->fiber->wstatus |= FIBER_WAIT_EPOLL;
 
 		WAITER_INC(ev);
 		acl_fiber_switch();
 		WAITER_DEC(ev);
+
+		ee->fiber->wstatus &= ~FIBER_WAIT_EPOLL;
 
 		if (ee->nready == 0) {
 			timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);

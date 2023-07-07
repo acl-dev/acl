@@ -22,13 +22,13 @@
 
 /*----------------------------------------------------------------------------*/
 
-void zdb_init()
+void zdb_init(void)
 {
 	/* 初始化文件句柄 */
 	acl_fhandle_init(1000, 100, 0);
 }
 
-void zdb_end()
+void zdb_end(void)
 {
 	/* 需要关闭所有存储句柄 */
 	acl_fhandle_end();

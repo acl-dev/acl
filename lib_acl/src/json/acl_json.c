@@ -331,7 +331,7 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 	return NULL;
 }
 
-ACL_JSON *acl_json_alloc()
+ACL_JSON *acl_json_alloc(void)
 {
 	return acl_json_dbuf_alloc(NULL);
 }

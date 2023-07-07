@@ -140,7 +140,8 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 
 	FIBER_UNLOCK(mutex);
 
-	fiber->status = FIBER_STATUS_WAIT_COND;
+	fiber->wstatus |= FIBER_WAIT_COND;
+
 	WAITER_INC(ev);
 
 	// Hang the current fiber and will wakeup if the timer arrives or
@@ -148,6 +149,8 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	acl_fiber_switch();
 
 	WAITER_DEC(ev);
+
+	fiber->wstatus &= ~FIBER_WAIT_COND;
 
 	FIBER_LOCK(mutex);
 

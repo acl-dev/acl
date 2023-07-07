@@ -132,7 +132,7 @@ static void get_main_thread_id(void)
 }
 #endif
 
-unsigned long acl_main_thread_self()
+unsigned long acl_main_thread_self(void)
 {
 #ifdef ACL_UNIX
 	return ((unsigned long) acl_var_main_tid);

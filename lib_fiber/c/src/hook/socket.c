@@ -505,8 +505,7 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 
 	// we can kill the fiber only if the fiber is waiting
 	// for readable ore writable of IO process.
-	if (fe->fiber_r->status == FIBER_STATUS_WAIT_READ
-		|| fe->fiber_w->status == FIBER_STATUS_WAIT_WRITE) {
+	if (fe->fiber_r->wstatus & (FIBER_WAIT_READ | FIBER_WAIT_WRITE)) {
 
 		tc->fiber->errnum = FIBER_EAGAIN;
 		acl_fiber_signal(tc->fiber, SIGINT);

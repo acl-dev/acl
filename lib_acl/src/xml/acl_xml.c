@@ -403,7 +403,7 @@ void acl_xml_encode_enable(ACL_XML *xml, int on)
 		xml->flag &=~ACL_XML_FLAG_XML_ENCODE;
 }
 
-ACL_XML *acl_xml_alloc()
+ACL_XML *acl_xml_alloc(void)
 {
 	return acl_xml_dbuf_alloc(NULL);
 }

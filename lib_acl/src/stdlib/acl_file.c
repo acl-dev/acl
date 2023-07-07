@@ -248,7 +248,7 @@ char *acl_gets_nonl(char *buf, size_t size)
 		== ACL_VSTREAM_EOF ? NULL : buf;
 }
 
-int acl_getchar()
+int acl_getchar(void)
 {
 	return acl_vstream_getc(ACL_VSTREAM_IN);
 }

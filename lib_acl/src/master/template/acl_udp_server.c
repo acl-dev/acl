@@ -409,7 +409,7 @@ void acl_udp_server_request_timer(ACL_EVENT_NOTIFY_TIME timer_fn,
 		arg, delay, keep);
 }
 
-ACL_VSTREAM **acl_udp_server_streams()
+ACL_VSTREAM **acl_udp_server_streams(void)
 {
 	UDP_SERVER *server = (UDP_SERVER *) acl_pthread_getspecific(__server_key);
 	acl_assert(server);

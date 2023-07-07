@@ -13,22 +13,26 @@ extern void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
 #endif
 */
 
-typedef enum {
-	FIBER_STATUS_NONE,
-	FIBER_STATUS_READY,
-	FIBER_STATUS_SUSPEND,
-	FIBER_STATUS_RUNNING,
-	FIBER_STATUS_WAIT_READ,
-	FIBER_STATUS_WAIT_WRITE,
-	FIBER_STATUS_POLL_WAIT,
-	FIBER_STATUS_EPOLL_WAIT,
-	FIBER_STATUS_WAIT_MUTEX,
-	FIBER_STATUS_WAIT_COND,
-	FIBER_STATUS_WAIT_LOCK,
-	FIBER_STATUS_WAIT_SEM,
-	FIBER_STATUS_DELAY,
-	FIBER_STATUS_EXITING,
-} fiber_status_t;
+enum {
+	FIBER_STATUS_NONE	= (0),
+	FIBER_STATUS_READY	= (1 << 0),
+	FIBER_STATUS_RUNNING	= (1 << 1),
+	FIBER_STATUS_SUSPEND	= (1 << 2),
+	FIBER_STATUS_EXITING	= (1 << 3),
+};
+
+enum {
+	FIBER_WAIT_NONE		= (0),
+	FIBER_WAIT_READ		= (1 << 1),
+	FIBER_WAIT_WRITE	= (1 << 2),
+	FIBER_WAIT_POLL		= (1 << 3),
+	FIBER_WAIT_EPOLL	= (1 << 4),
+	FIBER_WAIT_MUTEX	= (1 << 5),
+	FIBER_WAIT_COND		= (1 << 6),
+	FIBER_WAIT_LOCK		= (1 << 7),
+	FIBER_WAIT_SEM		= (1 << 8),
+	FIBER_WAIT_DELAY	= (1 << 9),
+};
 
 typedef struct {
 	void  *ctx;
@@ -51,14 +55,15 @@ struct SYNC_WAITER;
 
 struct ACL_FIBER {
 	FIBER_BASE    *base;
-	long           tid;
-	fiber_status_t status;
 	RING           me;
+	long           tid;
 	unsigned int   fid;
 	unsigned       slot;
 	long long      when;
 	int            errnum;
 	int            signum;
+	unsigned short status;
+	unsigned short wstatus;
 	unsigned int   oflag;
 	unsigned int   flag;
 

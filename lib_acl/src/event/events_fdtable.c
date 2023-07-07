@@ -18,7 +18,7 @@
 #include "events.h"
 #include "events_fdtable.h"
 
-ACL_EVENT_FDTABLE *event_fdtable_alloc()
+ACL_EVENT_FDTABLE *event_fdtable_alloc(void)
 {
 	ACL_EVENT_FDTABLE *fdp = acl_mycalloc(1, sizeof(ACL_EVENT_FDTABLE));
 	fdp->fdidx = -1;

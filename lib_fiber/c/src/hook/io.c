@@ -11,7 +11,8 @@
 #define IS_INVALID(fd) (fd == INVALID_SOCKET)
 #endif
 
-#ifdef SYS_UNIX
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+
 unsigned int sleep(unsigned int seconds)
 {
 	if (!var_hook_sys_api) {
@@ -29,6 +30,7 @@ int close(socket_t fd)
 {
 	return acl_fiber_close(fd);
 }
+
 #endif
 
 int WINAPI acl_fiber_close(socket_t fd)
@@ -66,7 +68,7 @@ int WINAPI acl_fiber_close(socket_t fd)
 #ifdef	HAS_EPOLL
 	/* when the fd was closed by epoll_close normally, the fd
 	 * must be a epoll fd which was created by epoll_create function
-	 * hooked in hook_net.c
+	 * hooked in epoll.c
 	 */
 	if (epoll_close(fd) == 0) {
 		return 0;
@@ -237,6 +239,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 }
 
 #ifdef SYS_UNIX
+
 ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
@@ -284,11 +287,13 @@ int acl_fiber_recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 	return fiber_recvmmsg(fe, msgvec, vlen, flags, timeout);
 }
 # endif
+
 #endif
 
 /****************************************************************************/
 
 #ifdef SYS_UNIX
+
 ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 {
 	FILE_EVENT *fe;
@@ -328,6 +333,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 	fe = fiber_file_open_write(fd);
 	return fiber_writev(fe, iov, iovcnt);
 }
+
 #endif
 
 #ifdef SYS_WIN
@@ -383,6 +389,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 }
 
 #ifdef SYS_UNIX
+
 ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 {
 	FILE_EVENT *fe;
@@ -430,11 +437,13 @@ int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 	return fiber_sendmmsg(fe, msgvec, vlen, flags);
 }
 # endif
+
 #endif
 
 /****************************************************************************/
 
 #if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+
 ssize_t read(socket_t fd, void *buf, size_t count)
 {
 	return acl_fiber_read(fd, buf, count);
@@ -451,7 +460,7 @@ ssize_t recv(socket_t sockfd, void *buf, size_t len, int flags)
 }
 
 ssize_t recvfrom(socket_t sockfd, void *buf, size_t len, int flags,
-		 struct sockaddr *src_addr, socklen_t *addrlen)
+	struct sockaddr *src_addr, socklen_t *addrlen)
 {
 	return acl_fiber_recvfrom(sockfd, buf, len, flags, src_addr, addrlen);
 }
@@ -460,9 +469,11 @@ ssize_t recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 {
 	return acl_fiber_recvmsg(sockfd, msg, flags);
 }
+
 #endif  // SYS_UNIX
 
 #if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+
 ssize_t write(socket_t fd, const void *buf, size_t count)
 {
 	return acl_fiber_write(fd, buf, count);
@@ -479,7 +490,7 @@ ssize_t send(socket_t sockfd, const void *buf, size_t len, int flags)
 }
 
 ssize_t sendto(socket_t sockfd, const void *buf, size_t len, int flags,
-	       const struct sockaddr *dest_addr, socklen_t addrlen)
+	const struct sockaddr *dest_addr, socklen_t addrlen)
 {
 	return acl_fiber_sendto(sockfd, buf, len, flags, dest_addr, addrlen);
 }

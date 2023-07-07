@@ -487,11 +487,14 @@ static int fiber_mutex_lock_once(ACL_FIBER_MUTEX *mutex)
 
 		pthread_mutex_unlock(&mutex->lock);
 
-		fiber->status = FIBER_STATUS_WAIT_MUTEX;
+		fiber->wstatus |= FIBER_WAIT_MUTEX;
+
 		ev = fiber_io_event();
 		WAITER_INC(ev);
 		acl_fiber_switch();
 		WAITER_DEC(ev);
+
+		fiber->wstatus &= ~FIBER_WAIT_MUTEX;
 
 		if (++wakeup > 5) {
 			wakeup = 0;
@@ -530,11 +533,14 @@ static int fiber_mutex_lock_try(ACL_FIBER_MUTEX *mutex)
 
 		pthread_mutex_unlock(&mutex->lock);
 
-		fiber->status = FIBER_STATUS_WAIT_MUTEX;
+		fiber->wstatus |= FIBER_WAIT_MUTEX;
+
 		ev = fiber_io_event();
 		WAITER_INC(ev);
 		acl_fiber_switch();
 		WAITER_DEC(ev);
+
+		fiber->wstatus &= ~FIBER_WAIT_MUTEX;
 
 		if (++wakeup > 5) {
 			wakeup = 0;

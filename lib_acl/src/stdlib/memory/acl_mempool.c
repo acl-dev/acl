@@ -288,7 +288,7 @@ void acl_mempool_ctl(int name, ...)
 	va_end(ap);
 }
 
-int acl_mempool_total_allocated()
+int acl_mempool_total_allocated(void)
 {
 	int   n;
 
@@ -303,7 +303,7 @@ int acl_mempool_total_allocated()
 	return (n);
 }
 
-void acl_mempool_status()
+void acl_mempool_status(void)
 {
 	if (__var_allocator) {
 		mem_pool_status(__var_allocator);
