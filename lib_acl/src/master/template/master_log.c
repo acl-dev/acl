@@ -42,7 +42,7 @@ void master_log_open(const char *procname)
 	}
 }
 
-void master_log_close()
+void master_log_close(void)
 {
 	if (var_master_log_opened) {
 		acl_msg_close();

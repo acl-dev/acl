@@ -140,12 +140,12 @@ const char *acl_single_server_conf(void)
 	return __conf_file;
 }
 
-ACL_EVENT *acl_single_server_event()
+ACL_EVENT *acl_single_server_event(void)
 {
 	return __eventp;
 }
 
-ACL_VSTREAM **acl_single_server_sstreams()
+ACL_VSTREAM **acl_single_server_sstreams(void)
 {
 	return __sstreams;
 }

@@ -208,7 +208,7 @@ static const ACL_TIMER_INFO *timer_iter_info(ACL_ITER *iter, struct ACL_TIMER *t
 	return (info);
 }
 
-ACL_TIMER *acl_timer_new()
+ACL_TIMER *acl_timer_new(void)
 {
 	ACL_TIMER *timer;
 

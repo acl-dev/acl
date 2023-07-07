@@ -377,7 +377,7 @@ void acl_xml3_slash(ACL_XML3 *xml, int ignore)
 		xml->flag &=~ACL_XML3_FLAG_IGNORE_SLASH;
 }
 
-ACL_XML3 *acl_xml3_alloc()
+ACL_XML3 *acl_xml3_alloc(void)
 {
 	return acl_xml3_dbuf_alloc(NULL);
 }
