@@ -996,7 +996,7 @@ int acl_write_to_log(const char *fmt, ...)
 	return ret;
 }
 
-void acl_close_log()
+void acl_close_log(void)
 {
 	ACL_LOG *log;
 

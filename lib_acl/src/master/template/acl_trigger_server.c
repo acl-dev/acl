@@ -135,7 +135,7 @@ const char *acl_trigger_server_conf(void)
 	return __conf_file;
 }
 
-ACL_EVENT *acl_trigger_server_event()
+ACL_EVENT *acl_trigger_server_event(void)
 {
 	return __eventp;
 }

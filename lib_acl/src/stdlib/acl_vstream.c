@@ -247,7 +247,7 @@ void acl_vstream_set_rbuf_size(unsigned size)
 	}
 }
 
-void acl_vstream_init()
+void acl_vstream_init(void)
 {
 	static int __called = 0;
 
