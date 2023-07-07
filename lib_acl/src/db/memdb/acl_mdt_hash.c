@@ -112,7 +112,7 @@ static void mdt_hash_free(ACL_MDT *mdt)
 	acl_myfree(mdt_hash);
 }
 
-ACL_MDT *acl_mdt_hash_create()
+ACL_MDT *acl_mdt_hash_create(void)
 {
 	ACL_MDT_HASH *mdt;
 

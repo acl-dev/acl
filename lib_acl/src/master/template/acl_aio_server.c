@@ -273,17 +273,17 @@ const char *acl_aio_server_conf(void)
 	return __conf_file;
 }
 
-ACL_EVENT *acl_aio_server_event()
+ACL_EVENT *acl_aio_server_event(void)
 {
 	return acl_aio_event(__h_aio);
 }
 
-ACL_AIO* acl_aio_server_handle()
+ACL_AIO* acl_aio_server_handle(void)
 {
 	return __h_aio;
 }
 
-ACL_ASTREAM **acl_aio_server_streams()
+ACL_ASTREAM **acl_aio_server_streams(void)
 {
 	if (__sstreams == NULL)
 		acl_msg_warn("listen streams null!");

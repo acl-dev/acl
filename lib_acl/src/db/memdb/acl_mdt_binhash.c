@@ -123,7 +123,7 @@ static void mdt_binhash_free(ACL_MDT *mdt)
 	acl_myfree(mdt_bhash);
 }
 
-ACL_MDT *acl_mdt_binhash_create()
+ACL_MDT *acl_mdt_binhash_create(void)
 {
 	ACL_MDT_BHASH *mdt;
 

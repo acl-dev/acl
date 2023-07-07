@@ -194,7 +194,7 @@ static void mdt_avl_free(ACL_MDT *mdt)
 	acl_myfree(mdt_avl);
 }
 
-ACL_MDT *acl_mdt_avl_create()
+ACL_MDT *acl_mdt_avl_create(void)
 {
 	ACL_MDT_AVL *mdt;
 
