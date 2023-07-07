@@ -27,7 +27,6 @@ int acl_valid_hostname(const char *name, int gripe)
 	char   *myname = "acl_valid_hostname";
 	const char *cp;
 	int     label_length = 0;
-	int     label_count = 0;
 	int     non_numeric = 0;
 	int     ch;
 
@@ -45,8 +44,6 @@ int acl_valid_hostname(const char *name, int gripe)
 	 */
 	for (cp = name; (ch = *(const unsigned char *) cp) != 0; cp++) {
 		if (ACL_ISALNUM(ch) || ch == '_') {		/* grr.. */
-			if (label_length == 0)
-				label_count++;
 			label_length++;
 			if (label_length > ACL_VALID_LABEL_LEN) {
 				if (gripe)
