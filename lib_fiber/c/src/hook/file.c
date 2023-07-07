@@ -529,7 +529,7 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 	// The same fd_in maybe be shared by multiple fibers, so we should
 	// alloc one new FILE_EVENT for each operation.
 	FILE_ALLOC(fe, EVENT_SPLICE);
-	fe->fiber_r->status = FIBER_STATUS_WAIT_READ;
+	fe->fiber_r->wstatus |= FIBER_WAIT_READ;
 
 	event_uring_splice(ev, fe, fd_in, off_in, fd_out, off_out, len, flags,
 		sqe_flags, IORING_OP_SPLICE);
@@ -538,6 +538,7 @@ ssize_t splice(int fd_in, loff_t *poff_in, int fd_out,
 	acl_fiber_switch();
 	WAITER_DEC(ev);
 
+	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->mask &= ~EVENT_SPLICE;
 
 	if (fe->reader_ctx.res < 0) {

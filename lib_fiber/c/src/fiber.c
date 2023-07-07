@@ -649,12 +649,13 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		id = (unsigned long) atomic_int64_add_fetch(__idgen_atomic, 1);
 	}
 
-	fiber->fid    = id;
-	fiber->errnum = 0;
-	fiber->signum = 0;
-	fiber->oflag  = attr ? attr->oflag : 0;
-	fiber->flag   = 0;
-	fiber->status = FIBER_STATUS_NONE;
+	fiber->fid     = id;
+	fiber->errnum  = 0;
+	fiber->signum  = 0;
+	fiber->oflag   = attr ? attr->oflag : 0;
+	fiber->flag    = 0;
+	fiber->status  = FIBER_STATUS_NONE;
+	fiber->wstatus = FIBER_WAIT_NONE;
 
 #ifdef	DEBUG_LOCK
 	fiber->waiting = NULL;
