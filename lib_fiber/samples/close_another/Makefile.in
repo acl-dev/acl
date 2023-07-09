@@ -60,10 +60,10 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 		RPATH = linux64
 	endif
 	ifeq ($(HAS_IO_URING), yes)
-		SYSLIB += -luring
+		SYSLIB += -luring-ffi
 	endif
 	ifeq ($(has_io_uring), yes)
-		SYSLIB += -luring
+		SYSLIB += -luring-ffi
 	endif
 #	CFLAGS += -DLINUX2 -D_REENTRANT
 	CFLAGS += -D_REENTRANT
