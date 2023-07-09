@@ -44,7 +44,7 @@ int fiber_sendmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec, unsigned int vlen,
 	int flags);
 # endif
 
-# if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
+# if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK)
 ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count);
 # endif
 

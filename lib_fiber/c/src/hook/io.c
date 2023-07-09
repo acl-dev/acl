@@ -11,7 +11,7 @@
 #define IS_INVALID(fd) (fd == INVALID_SOCKET)
 #endif
 
-#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 unsigned int sleep(unsigned int seconds)
 {
@@ -442,7 +442,7 @@ int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 
 /****************************************************************************/
 
-#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 ssize_t read(socket_t fd, void *buf, size_t count)
 {
@@ -472,7 +472,7 @@ ssize_t recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 
 #endif  // SYS_UNIX
 
-#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 ssize_t write(socket_t fd, const void *buf, size_t count)
 {
@@ -525,7 +525,7 @@ int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, int flags)
 
 /****************************************************************************/
 
-#if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
+#if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK)
 
 ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
