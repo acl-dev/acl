@@ -294,6 +294,8 @@ static void pollfds_copy(struct pollfd *fds, const pollfds *pfds)
 	memcpy(fds, pfds->fds, sizeof(struct pollfd) * pfds->nfds);
 }
 
+#endif // SHARE_STACK
+
 /**
  * This callback will be called from event_process_poll() in event.c and the
  * fiber blocked after calling acl_fiber_switch() in acl_fiber_poll() will
@@ -305,8 +307,6 @@ static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
 		acl_fiber_ready(pe->fiber);
 	}
 }
-
-#endif // SHARE_STACK
 
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
