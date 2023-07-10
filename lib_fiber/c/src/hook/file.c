@@ -616,7 +616,7 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 			return -1;
 		}
 
-		fe = fiber_file_open_write(out_fd);
+		fe = fiber_file_open(out_fd);
 		CLR_POLLING(fe);
 
 		fe->mask |= EVENT_POLLOUT;

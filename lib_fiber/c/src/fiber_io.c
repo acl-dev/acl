@@ -277,7 +277,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			} else if (ring_size(&ev->events) > 0) {
 				continue;
 			}
-			
+
 #if 0
 			// Only sleep fiber alive ?
 			timer = TIMER_FIRST(__thread_fiber->ev_timer);
@@ -581,7 +581,7 @@ void fiber_file_set(FILE_EVENT *fe)
 #endif
 }
 
-FILE_EVENT *fiber_file_open_read(socket_t fd)
+FILE_EVENT *fiber_file_open(socket_t fd)
 {
 	FILE_EVENT *fe = fiber_file_get(fd);
 
@@ -600,23 +600,6 @@ FILE_EVENT *fiber_file_open_read(socket_t fd)
 	 */
 	// Don't set fiber_r here, which will be set in fiber_wait_read()
 	//fe->fiber_r = acl_fiber_running();
-	return fe;
-}
-
-FILE_EVENT *fiber_file_open_write(socket_t fd)
-{
-	FILE_EVENT *fe = fiber_file_get(fd);
-
-	if (fe == NULL) {
-		fe = file_event_alloc(fd);
-		fiber_file_set(fe);
-#ifdef	HAS_IO_URING
-		if (var_hook_sys_api && EVENT_IS_IO_URING(fiber_io_event())) {
-			fe->mask |= EVENT_DIRECT;
-		}
-#endif
-	}
-
 	// Don't set fiber_w here, which will be set in fiber_wait_write()
 	//fe->fiber_w = acl_fiber_running();
 	return fe;

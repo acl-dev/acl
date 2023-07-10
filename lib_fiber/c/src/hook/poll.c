@@ -265,11 +265,7 @@ static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 	nfds_t  i;
 
 	for (i = 0; i < nfds; i++) {
-		if (fds[i].events & POLLIN) {
-			pfds[i].fe = fiber_file_open_read(fds[i].fd);
-		} else {
-			pfds[i].fe = fiber_file_open_write(fds[i].fd);
-		}
+		pfds[i].fe = fiber_file_open(fds[i].fd);
 #ifdef HAS_IOCP
 		pfds[i].fe->rbuf  = NULL;
 		pfds[i].fe->rsize = 0;

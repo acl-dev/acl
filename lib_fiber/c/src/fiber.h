@@ -132,8 +132,7 @@ EVENT *fiber_io_event(void);
 void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds);
 int fiber_timer_del(ACL_FIBER *fiber);
 
-FILE_EVENT *fiber_file_open_read(socket_t fd);
-FILE_EVENT *fiber_file_open_write(socket_t fd);
+FILE_EVENT *fiber_file_open(socket_t fd);
 void fiber_file_set(FILE_EVENT *fe);
 FILE_EVENT *fiber_file_get(socket_t fd);
 void fiber_file_free(FILE_EVENT *fe);

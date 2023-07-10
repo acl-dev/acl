@@ -530,7 +530,7 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 
 	if (event->events & EPOLLIN) {
 		epx->mask   |= EVENT_READ;
-		epx->fe      = fiber_file_open_read(fd);
+		epx->fe      = fiber_file_open(fd);
 		epx->fe->epx = epx;
 
 		event_add_read(ev, epx->fe, read_callback);
@@ -539,7 +539,7 @@ static void epoll_ctl_add(EVENT *ev, EPOLL_EVENT *ee,
 
 	if (event->events & EPOLLOUT) {
 		epx->mask   |= EVENT_WRITE;
-		epx->fe      = fiber_file_open_write(fd);
+		epx->fe      = fiber_file_open(fd);
 		epx->fe->epx = epx;
 
 		event_add_write(ev, epx->fe, write_callback);

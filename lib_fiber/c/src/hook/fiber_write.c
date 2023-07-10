@@ -410,7 +410,7 @@ ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t cou
 			return -1;
 		}
 
-		fe = fiber_file_open_write(out_fd);
+		fe = fiber_file_open(out_fd);
 		CLR_POLLING(fe);
 
 		if (fiber_wait_write(fe) < 0) {
