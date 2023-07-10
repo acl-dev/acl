@@ -180,7 +180,7 @@ void WINAPI acl_fiber_freeaddrinfo(struct addrinfo *res)
 	resolver_freeaddrinfo(res);
 }
 
-#ifdef SYS_UNIX
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 int getaddrinfo(const char *node, const char *service,
 	const struct addrinfo* hints, struct addrinfo **res)

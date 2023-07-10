@@ -442,7 +442,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return nready;
 }
 
-#ifdef SYS_UNIX
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	return acl_fiber_poll(fds, nfds, timeout);
