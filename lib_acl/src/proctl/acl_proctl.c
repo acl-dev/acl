@@ -316,7 +316,7 @@ void acl_proctl_deamon_init(const char *progname acl_unused)
 	acl_msg_fatal("%s(%d): not support!", myname, __LINE__);
 }
 
-void acl_proctl_daemon_loop()
+void acl_proctl_daemon_loop(void)
 {
 	const char *myname = "acl_proctl_daemon_loop";
 
