@@ -6,5 +6,8 @@ static AUT_FN_ITEM __test_fn_tab[] = {
 	/* In eventfd.cpp */
 	{ "test_eventfd",	"test_eventfd",		test_eventfd,		NULL,		0		},
 
+	/* In poll.cpp */
+	{ "test_poll",		"test_poll",		test_poll,		NULL,		0		},
+
 	{ NULL, NULL, NULL, NULL, 0 },
 };

@@ -378,7 +378,7 @@ int fiber_sendmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec, unsigned int vlen,
 # endif // HAS_MMSG
 #endif  // SYS_UNIX
 
-#if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
+#if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK)
 
 ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {
@@ -410,7 +410,7 @@ ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t cou
 			return -1;
 		}
 
-		fe = fiber_file_open_write(out_fd);
+		fe = fiber_file_open(out_fd);
 		CLR_POLLING(fe);
 
 		if (fiber_wait_write(fe) < 0) {

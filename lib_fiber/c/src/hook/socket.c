@@ -142,7 +142,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 
 #ifdef HAS_IO_URING
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
-		fe = fiber_file_open_read(sockfd);
+		fe = fiber_file_open(sockfd);
 		return fiber_iocp_accept(fe);
 	}
 #endif
@@ -170,7 +170,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 		return INVALID_SOCKET;
 	}
 
-	fe = fiber_file_open_read(sockfd);
+	fe = fiber_file_open(sockfd);
 
 	while (1) {
 		if (fiber_wait_read(fe) < 0) {
@@ -320,7 +320,7 @@ int WINAPI acl_fiber_connect(socket_t sockfd, const struct sockaddr *addr,
 		return sys_connect ? (*sys_connect)(sockfd, addr, addrlen) : -1;
 	}
 
-	fe = fiber_file_open_write(sockfd);
+	fe = fiber_file_open(sockfd);
 
 	SET_NDUBLOCK(fe);
 

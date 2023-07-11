@@ -59,11 +59,11 @@ void fbase_event_open(FIBER_BASE *fbase)
 			__FILE__, __LINE__, __FUNCTION__, (int) fbase->event_in);
 	}
 
-	fbase->in = fiber_file_open_read(fbase->event_in);
+	fbase->in = fiber_file_open(fbase->event_in);
 	if (fbase->event_in == fbase->event_out) {
 		fbase->out = fbase->in;
 	} else {
-		fbase->out = fiber_file_open_write(fbase->event_out);
+		fbase->out = fiber_file_open(fbase->event_out);
 	}
 
 #if defined(HAS_IO_URING)

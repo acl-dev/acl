@@ -11,7 +11,7 @@
 #define IS_INVALID(fd) (fd == INVALID_SOCKET)
 #endif
 
-#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 unsigned int sleep(unsigned int seconds)
 {
@@ -148,7 +148,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		return (*sys_read)(fd, buf, count);
 	}
 
-	fe = fiber_file_open_read(fd);
+	fe = fiber_file_open(fd);
 	return fiber_read(fe, buf, count);
 }
 
@@ -168,7 +168,7 @@ ssize_t acl_fiber_readv(socket_t fd, const struct iovec *iov, int iovcnt)
 		return (*sys_readv)(fd, iov, iovcnt);
 	}
 
-	fe = fiber_file_open_read(fd);
+	fe = fiber_file_open(fd);
 	return fiber_readv(fe, iov, iovcnt);
 }
 
@@ -207,7 +207,7 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		return (*sys_recv)(sockfd, buf, len, flags);
 	}
 
-	fe = fiber_file_open_read(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_recv(fe, buf, len, flags);
 }
 
@@ -234,7 +234,7 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 				src_addr, addrlen);
 	}
 
-	fe = fiber_file_open_read(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_recvfrom(fe, buf, len, flags, src_addr, addrlen);
 }
 
@@ -256,7 +256,7 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 		return (*sys_recvmsg)(sockfd, msg, flags);
 	}
 
-	fe = fiber_file_open_read(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_recvmsg(fe, msg, flags);
 }
 
@@ -283,7 +283,7 @@ int acl_fiber_recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 		return (*sys_recvmmsg)(sockfd, msgvec, vlen, flags, timeout);
 	}
 
-	fe = fiber_file_open_read(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_recvmmsg(fe, msgvec, vlen, flags, timeout);
 }
 # endif
@@ -310,7 +310,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		return (*sys_write)(fd, buf, count);
 	}
 
-	fe = fiber_file_open_write(fd);
+	fe = fiber_file_open(fd);
 	return fiber_write(fe, buf, count);
 }
 
@@ -330,7 +330,7 @@ ssize_t acl_fiber_writev(socket_t fd, const struct iovec *iov, int iovcnt)
 		return (*sys_writev)(fd, iov, iovcnt);
 	}
 
-	fe = fiber_file_open_write(fd);
+	fe = fiber_file_open(fd);
 	return fiber_writev(fe, iov, iovcnt);
 }
 
@@ -356,7 +356,7 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 		return (int) (*sys_send)(sockfd, buf, len, flags);
 	}
 
-	fe = fiber_file_open_write(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_send(fe, buf, len, flags);
 }
 
@@ -384,7 +384,7 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 				dest_addr, addrlen);
 	}
 
-	fe = fiber_file_open_write(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_sendto(fe, buf, len, flags, dest_addr, addrlen);
 }
 
@@ -406,7 +406,7 @@ ssize_t acl_fiber_sendmsg(socket_t sockfd, const struct msghdr *msg, int flags)
 		return (*sys_sendmsg)(sockfd, msg, flags);
 	}
 
-	fe = fiber_file_open_write(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_sendmsg(fe, msg, flags);
 }
 
@@ -433,7 +433,7 @@ int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 		return (*sys_sendmmsg)(sockfd, msgvec, vlen, flags);
 	}
 
-	fe = fiber_file_open_write(sockfd);
+	fe = fiber_file_open(sockfd);
 	return fiber_sendmmsg(fe, msgvec, vlen, flags);
 }
 # endif
@@ -442,7 +442,7 @@ int acl_fiber_sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 
 /****************************************************************************/
 
-#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 ssize_t read(socket_t fd, void *buf, size_t count)
 {
@@ -472,7 +472,7 @@ ssize_t recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 
 #endif  // SYS_UNIX
 
-#if defined(SYS_UNIX) && !defined(DISABLE_HOOK_IO)
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 
 ssize_t write(socket_t fd, const void *buf, size_t count)
 {
@@ -525,7 +525,7 @@ int sendmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen, int flags)
 
 /****************************************************************************/
 
-#if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK_IO)
+#if defined(__USE_LARGEFILE64) && !defined(DISABLE_HOOK)
 
 ssize_t sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t count)
 {

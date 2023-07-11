@@ -68,13 +68,11 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd;
-	//RING_ITER iter;
 	RING *iter = fe->pfds.succ, *next = iter;
 
 	event_del_read(ev, fe);
 	SET_READABLE(fe);
 
-#if 1
 	// Walk througth the RING list, handle each poll event, and one RING
 	// node maybe be detached after it has been handled without any poll
 	// event bound with it again.
@@ -85,15 +83,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 			handle_poll_read(ev, fe, pfd);
 		}
 	}
-#else
-	ring_foreach(iter, &fe->pfds) {
-		pfd = ring_to_appl(iter.ptr, POLLFD, me);
-		if (pfd->pfd->events & POLLIN) {
-			handle_poll_read(ev, fe, pfd);
-			break;
-		}
-	}
-#endif
 }
 
 /**
@@ -134,13 +123,11 @@ static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	POLLFD *pfd;
-	//RING_ITER iter;
 	RING *iter = fe->pfds.succ, *next = iter;
 
 	event_del_write(ev, fe);
 	SET_WRITABLE(fe);
 
-#if 1
 	for (; iter != &fe->pfds; iter = next) {
 		next = next->succ;
 		pfd = ring_to_appl(iter, POLLFD, me);
@@ -148,15 +135,6 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 			handle_poll_write(ev, fe, pfd);
 		}
 	}
-#else
-	ring_foreach(iter, &fe->pfds) {
-		pfd = ring_to_appl(iter.ptr, POLLFD, me);
-		if (pfd->pfd->events & POLLOUT) {
-			handle_poll_write(ev, fe, pfd);
-			break;
-		}
-	}
-#endif
 }
 
 /**
@@ -247,29 +225,13 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 	}
 }
 
-/**
- * This callback will be called from event_process_poll() in event.c and the
- * fiber blocked after calling acl_fiber_switch() in acl_fiber_poll() will
- * wakeup and continue to run.
- */
-static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
-{
-	if (pe->fiber->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(pe->fiber);
-	}
-}
-
 static POLLFD *pollfd_alloc(POLL_EVENT *pe, struct pollfd *fds, nfds_t nfds)
 {
 	POLLFD *pfds = (POLLFD *) mem_malloc(nfds * sizeof(POLLFD));
 	nfds_t  i;
 
 	for (i = 0; i < nfds; i++) {
-		if (fds[i].events & POLLIN) {
-			pfds[i].fe = fiber_file_open_read(fds[i].fd);
-		} else {
-			pfds[i].fe = fiber_file_open_write(fds[i].fd);
-		}
+		pfds[i].fe = fiber_file_open(fds[i].fd);
 #ifdef HAS_IOCP
 		pfds[i].fe->rbuf  = NULL;
 		pfds[i].fe->rsize = 0;
@@ -334,6 +296,18 @@ static void pollfds_copy(struct pollfd *fds, const pollfds *pfds)
 
 #endif // SHARE_STACK
 
+/**
+ * This callback will be called from event_process_poll() in event.c and the
+ * fiber blocked after calling acl_fiber_switch() in acl_fiber_poll() will
+ * wakeup and continue to run.
+ */
+static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
+{
+	if (pe->fiber->status != FIBER_STATUS_READY) {
+		acl_fiber_ready(pe->fiber);
+	}
+}
+
 int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	long long now;
@@ -367,6 +341,8 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	old_timeout = ev->timeout;
 
 #ifdef SHARE_STACK
+	// In shared stack mode, the fds input must be save to the dynamic
+	// memory to avoid memory collision accessed by different fibers.
 	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
 		pfds    = pollfds_save(fds, nfds);
 		pe      = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
@@ -446,7 +422,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return nready;
 }
 
-#ifdef SYS_UNIX
+#if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
 int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
 	return acl_fiber_poll(fds, nfds, timeout);

@@ -24,14 +24,14 @@ static SYNC_WAITER *sync_waiter_new(void)
 
 	out = mbox_out(waiter->box);
 	assert(out != INVALID_SOCKET);
-	fe = fiber_file_open_write(out);
+	fe = fiber_file_open(out);
 	assert(fe);
 	fe->type |= TYPE_INTERNAL | TYPE_EVENTABLE;
 
 	in = mbox_in(waiter->box);
 	assert(in != INVALID_SOCKET);
 	if (in != out) {
-		fe = fiber_file_open_read(in);
+		fe = fiber_file_open(in);
 		assert(fe);
 		fe->type |= TYPE_INTERNAL | TYPE_EVENTABLE;
 	}
@@ -129,7 +129,7 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 		fe->mask |= EVENT_SYSIO;
 
 		// The fe mabye be used again in mbox_send->acl_fiber_write
-		// ->fiber_file_open_write->fiber_file_get.
+		// ->fiber_file_open->fiber_file_get.
 		mbox_send(waiter->box, fb);
 
 		// If no other fiber is suspended by the sem, then release it.

@@ -9,3 +9,5 @@ tbox_mixed_consume|0|0|threads_consumer=2,threads_producer=2,threads_consumer_al
 file_load|0|0|filename=main.cpp
 file_load|0|0|filename=Makefile.in,show=1
 test_eventfd|0|0|
+test_poll|0|0|shared_stack=0
+test_poll|0|0|shared_stack=1
