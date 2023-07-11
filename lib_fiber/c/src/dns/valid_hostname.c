@@ -10,7 +10,6 @@ int valid_hostname(const char *name, int gripe)
 	char   *myname = "valid_hostname";
 	const char *cp;
 	int     label_length = 0;
-	int     label_count = 0;
 	int     non_numeric = 0;
 	int     ch;
 
@@ -28,8 +27,6 @@ int valid_hostname(const char *name, int gripe)
 	 */
 	for (cp = name; (ch = *(const unsigned char *) cp) != 0; cp++) {
 		if (isalnum(ch) || ch == '_') {		/* grr.. */
-			if (label_length == 0)
-				label_count++;
 			label_length++;
 			if (label_length > VALID_LABEL_LEN) {
 				if (gripe)
