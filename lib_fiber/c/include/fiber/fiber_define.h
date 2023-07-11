@@ -84,7 +84,7 @@ typedef int socket_t;
 # define	FIBER_EINPROGRESS	EINPROGRESS
 
 # include <sys/syscall.h>
-# if defined(SYS_recvmmsg) && defined(SYS_sendmmsg)
+# if defined(SYS_recvmmsg) && defined(SYS_sendmmsg) && !defined(ANDROID)
 #  define	HAS_MMSG
 # endif
 #endif
