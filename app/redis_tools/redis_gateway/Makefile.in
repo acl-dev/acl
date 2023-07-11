@@ -83,7 +83,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	endif
 	has_io_uring=$(HAS_IO_URING)
 	ifeq ($(has_io_uring), yes)
-		SYSLIB += -luring
+		SYSLIB += -luring-ffi
 	endif
 
 	CFLAGS += -DLINUX2 -D_REENTRANT

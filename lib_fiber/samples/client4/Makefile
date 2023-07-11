@@ -1,5 +1,5 @@
 include ../Makefile.in
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-	SYSLIB += -luring
+	SYSLIB += -luring-ffi
 endif
 PROG = client
