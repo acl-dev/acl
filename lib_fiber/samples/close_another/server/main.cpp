@@ -99,6 +99,7 @@ private:
 		int fd = conn.sock_handle();
 
 		if (use_kill_) {
+			printf("Kill fiber-%d\r\n", it->second->get_id());
 			it->second->kill();
 		} else {
 			// Must unbind the socket with the conn object

@@ -451,13 +451,19 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	fiber_io_check();
 
+	curr = acl_fiber_running();
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	}
+
 	// When return 0 just let it go continue
 	ret = event_add_read(__thread_fiber->event, fe, read_callback);
 	if (ret <= 0) {
 		return ret;
 	}
 
-	fe->fiber_r = curr = acl_fiber_running();
+	fe->fiber_r = curr;
 	fe->fiber_r->wstatus |= FIBER_WAIT_READ;
 	SET_READWAIT(fe);
 
@@ -503,12 +509,18 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	fiber_io_check();
 
+	curr = acl_fiber_running();
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	}
+
 	ret = event_add_write(__thread_fiber->event, fe, write_callback);
 	if (ret <= 0) {
 		return ret;
 	}
 
-	fe->fiber_w = curr = acl_fiber_running();
+	fe->fiber_w = curr;
 	fe->fiber_w->wstatus |= FIBER_WAIT_WRITE;
 	SET_WRITEWAIT(fe);
 
