@@ -56,8 +56,8 @@ private:
 
 static void usage(const char* procname) {
 	printf("usage: %s -h [help] -s server_addr\r\n"
-		" -c max_fibers\r\n"
-		" -n connect_count\r\n"
+		" -c max_fibers [default: 10]\r\n"
+		" -n connect_count [default: 10]\r\n"
 		, procname);
 }
 

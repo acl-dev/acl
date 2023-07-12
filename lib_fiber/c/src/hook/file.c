@@ -631,11 +631,6 @@ ssize_t file_sendfile(socket_t out_fd, int in_fd, off64_t *off, size_t cnt)
 				__LINE__, out_fd);
 			return -1;
 		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
-			return -1;
-		}
 	}
 }
 #endif

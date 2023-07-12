@@ -32,6 +32,7 @@ protected:
 		int fd = conn_->sock_handle();
 		char buf[8192];
 		while (true) {
+			printf(">>>fiber begin to read from fd=%d\r\n", conn_->sock_handle());
 			int ret = conn_->read(buf, sizeof(buf), false);
 			if (ret == -1) {
 				printf("read error=%s, fd=%d, %d\r\n",
@@ -102,8 +103,8 @@ private:
 		} else {
 			// Must unbind the socket with the conn object
 			// to avoid closing the socket twice.
-			conn.unbind_sock();
-			printf("Kick the old fd=%d, my fd=%d\r\n",
+			//conn.unbind_sock();
+			printf("Close the old fd=%d, my fd=%d\r\n",
 				fd, conn_->sock_handle());
 			close(fd);
 		}
@@ -111,15 +112,18 @@ private:
 		printf("Kick old %s, old fd=%d, my fd=%d\r\n", name_.c_str(),
 			fd, conn_->sock_handle());
 
+#if 0
 		if (conn_->format("Welcome %s!\r\n", name_.c_str()) <= 0) {
 			printf("write to %s error %s\r\n",
 				name_.c_str(), acl::last_serror());
 			return false;
 		}
+#endif
 
 		it = __users.find(name_);
 		if (it == __users.end()) {
 			__users[name_] = this;
+			printf("Add new one ok!\r\n");
 			return true;
 		} else {
 			printf("The other one has already logined!\r\n");
@@ -128,7 +132,9 @@ private:
 	}
 
 	~fiber_client(void) {
+		printf(">>>Begin delete conn=%p, fd=%d\r\n", conn_, conn_->sock_handle());
 		delete conn_;
+		printf(">>>Delete ok, conn=%p\r\n\r\n", conn_);
 	}
 };
 
