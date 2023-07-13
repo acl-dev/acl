@@ -59,6 +59,15 @@ void fiber::set_errno(int errnum)
 	}
 }
 
+void fiber::clear(void)
+{
+	ACL_FIBER *curr = acl_fiber_running();
+	if (curr) {
+		acl_fiber_clear(curr);
+	}
+}
+
+
 const char* fiber::last_serror(void)
 {
 	return acl_fiber_last_serror();

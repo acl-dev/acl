@@ -434,6 +434,14 @@ int acl_fiber_canceled(ACL_FIBER *fiber)
 	return fiber && (fiber->flag & FIBER_F_CANCELED);
 }
 
+void acl_fiber_clear(ACL_FIBER *fiber)
+{
+	if (fiber) {
+		fiber->errnum = 0;
+		fiber->flag &= ~FIBER_F_CANCELED;
+	}
+}
+
 void acl_fiber_kill(ACL_FIBER *fiber)
 {
 	fiber->errnum = ECANCELED;
