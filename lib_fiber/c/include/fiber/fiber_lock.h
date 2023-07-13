@@ -36,8 +36,9 @@ FIBER_API void acl_fiber_lock_free(ACL_FIBER_LOCK* l);
  * Lock the specified fiber mutex, return immediately when locked, or will
  * wait until the mutex can be used
  * @param l {ACL_FIBER_LOCK*} created by acl_fiber_lock_create
+ * @return {int} successful when return 0, or error return -1
  */
-FIBER_API void acl_fiber_lock_lock(ACL_FIBER_LOCK* l);
+FIBER_API int acl_fiber_lock_lock(ACL_FIBER_LOCK* l);
 
 /**
  * Try lock the specified fiber mutex, return immediately no matter the mutex
@@ -73,14 +74,15 @@ FIBER_API void acl_fiber_rwlock_free(ACL_FIBER_RWLOCK* l);
  * function will return immediately; otherwise, the caller will wait for all
  * write locking be released. Read lock on it will successful when returning
  * @param l {ACL_FIBER_RWLOCK*} created by acl_fiber_rwlock_create
+ * @return {int} successful when return 0, or error if return -1
  */
-FIBER_API void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK* l);
+FIBER_API int acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK* l);
 
 /**
  * Try to locking the Readonly lock, return immediately no matter locking
  * is successful.
  * @param l {ACL_FIBER_RWLOCK*} crated by acl_fiber_rwlock_create
- * @retur {int} 1 returned when successfully locked, or 0 returned if locking
+ * @retur {int} 0 returned when successfully locked, or -1 returned if locking
  *  operation is failed.
  */
 FIBER_API int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK* l);
@@ -88,14 +90,15 @@ FIBER_API int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK* l);
 /**
  * Lock the rwlock in Write Lock mode, return until no any one locking it
  * @param l {ACL_FIBER_RWLOCK*} created by acl_fiber_rwlock_create
+ * @return {int} return 0 if successful, -1 if error.
  */
-FIBER_API void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK* l);
+FIBER_API int acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK* l);
 
 /**
  * Try to lock the rwlock in Write Lock mode. return immediately no matter
  * locking is successful.
  * @param l {ACL_FIBER_RWLOCK*} created by acl_fiber_rwlock_create
- * @return {int} 1 returned when locking successfully, or 0 returned when
+ * @return {int} 0 returned when locking successfully, or -1 returned when
  *  locking failed
  */
 FIBER_API int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK* l);
