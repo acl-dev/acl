@@ -446,11 +446,16 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
  */
 int fiber_wait_read(FILE_EVENT *fe)
 {
+	ACL_FIBER *curr;
 	int ret;
 
 	fiber_io_check();
 
-	fe->fiber_r = acl_fiber_running();
+	curr = acl_fiber_running();
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	}
 
 	// When return 0 just let it go continue
 	ret = event_add_read(__thread_fiber->event, fe, read_callback);
@@ -458,6 +463,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return ret;
 	}
 
+	fe->fiber_r = curr;
 	fe->fiber_r->wstatus |= FIBER_WAIT_READ;
 	SET_READWAIT(fe);
 
@@ -472,6 +478,11 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	if (!(fe->type & TYPE_INTERNAL)) {
 		WAITER_DEC(__thread_fiber->event);
+	}
+
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
 	}
 
 	return ret;
@@ -493,17 +504,23 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 
 int fiber_wait_write(FILE_EVENT *fe)
 {
+	ACL_FIBER *curr;
 	int ret;
 
 	fiber_io_check();
 
-	fe->fiber_w = acl_fiber_running();
+	curr = acl_fiber_running();
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	}
 
 	ret = event_add_write(__thread_fiber->event, fe, write_callback);
 	if (ret <= 0) {
 		return ret;
 	}
 
+	fe->fiber_w = curr;
 	fe->fiber_w->wstatus |= FIBER_WAIT_WRITE;
 	SET_WRITEWAIT(fe);
 
@@ -518,6 +535,11 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	if (!(fe->type & TYPE_INTERNAL)) {
 		WAITER_DEC(__thread_fiber->event);
+	}
+
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
 	}
 
 	return ret;
@@ -670,9 +692,10 @@ void fiber_file_free(FILE_EVENT *fe)
 	}
 }
 
-void fiber_file_close(FILE_EVENT *fe)
+int fiber_file_close(FILE_EVENT *fe)
 {
 	ACL_FIBER *curr;
+	int n = 0;
 
 	assert(fe);
 	fiber_io_check();
@@ -687,42 +710,64 @@ void fiber_file_close(FILE_EVENT *fe)
 
 	curr = acl_fiber_running();
 
-	if (IS_READWAIT(fe) && fe->fiber_r && fe->fiber_r != curr
-		&& fe->fiber_r->status != FIBER_STATUS_EXITING) {
+	if (fe->fiber_r && fe->fiber_r != curr) {
+		n++;
 
-		// The current fiber is closing the other fiber's fd, and the
-		// other fiber hoding the fd is blocked by waiting for the
-		// fd to be ready, so we just notify the blocked fiber to
-		// wakeup from read waiting status.
+		if (IS_READWAIT(fe)
+			&& fe->fiber_r->status == FIBER_STATUS_SUSPEND) {
 
-		SET_CLOSING(fe);
-		CLR_READWAIT(fe);
+			// The current fiber is closing the other fiber's fd,
+			// and the other fiber hoding the fd is blocked by
+			// waiting for the fd to be ready, so we just notify
+			// the blocked fiber to wakeup from read waiting status.
+
+			SET_CLOSING(fe);
+			CLR_READWAIT(fe);
+
 #ifdef HAS_IO_URING
-		if (EVENT_IS_IO_URING(__thread_fiber->event)) {
-			file_cancel(__thread_fiber->event, fe, CANCEL_IO_READ);
-		} else {
+			if (EVENT_IS_IO_URING(__thread_fiber->event)) {
+				file_cancel(__thread_fiber->event, fe,
+					CANCEL_IO_READ);
+			} else {
+				acl_fiber_kill(fe->fiber_r);
+			}
+#else
 			acl_fiber_kill(fe->fiber_r);
-		}
-#else
-		acl_fiber_kill(fe->fiber_r);
 #endif
-	}
-
-	if (IS_WRITEWAIT(fe) && fe->fiber_w && fe->fiber_w != curr
-		&& fe->fiber_w->status != FIBER_STATUS_EXITING) {
-
-		CLR_WRITEWAIT(fe);
-		SET_CLOSING(fe);
-#ifdef HAS_IO_URING
-		if (EVENT_IS_IO_URING(__thread_fiber->event)) {
-			file_cancel(__thread_fiber->event, fe, CANCEL_IO_WRITE);
 		} else {
-			acl_fiber_kill(fe->fiber_w);
+			// If the reader fiber isn't blocked by the read wait,
+			// maybe it has been in the ready queue, just set flag.
+			fe->fiber_r->flag |= FIBER_F_KILLED;
+			fe->fiber_r->errnum = ECANCELED;
 		}
-#else
-		acl_fiber_kill(fe->fiber_w);
-#endif
 	}
+
+	if (fe->fiber_w && fe->fiber_w != curr) {
+		n++;
+
+		if (IS_WRITEWAIT(fe)
+			&& fe->fiber_w->status == FIBER_STATUS_SUSPEND) {
+
+			CLR_WRITEWAIT(fe);
+			SET_CLOSING(fe);
+
+#ifdef HAS_IO_URING
+			if (EVENT_IS_IO_URING(__thread_fiber->event)) {
+				file_cancel(__thread_fiber->event, fe,
+					CANCEL_IO_WRITE);
+			} else {
+				acl_fiber_kill(fe->fiber_w);
+			}
+#else
+			acl_fiber_kill(fe->fiber_w);
+#endif
+		} else {
+			fe->fiber_w->flag |= FIBER_F_KILLED;
+			fe->fiber_w->errnum = ECANCELED;
+		}
+	}
+
+	return n;
 }
 
 /****************************************************************************/

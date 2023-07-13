@@ -77,20 +77,16 @@ static int __lock(ACL_FIBER_LOCK *lk, int block)
 		return 0;
 	}
 
-	if (acl_fiber_killed(curr)) {
-		msg_info("%s(%d), %s: lock fiber-%u was killed",
-			__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(curr));
-	} else {
-		msg_error("%s(%d), %s: qlock: owner=%p self=%p oops",
-			__FILE__, __LINE__, __FUNCTION__, lk->owner, curr);
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
 	}
 
 	return -1;
 }
 
-void acl_fiber_lock_lock(ACL_FIBER_LOCK *lk)
+int acl_fiber_lock_lock(ACL_FIBER_LOCK *lk)
 {
-	__lock(lk, 1);
+	return __lock(lk, 1);
 }
 
 int acl_fiber_lock_trylock(ACL_FIBER_LOCK *lk)
@@ -154,11 +150,11 @@ static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 
 	if (lk->writer == NULL && FIRST_FIBER(&lk->wwaiting) == NULL) {
 		lk->readers++;
-		return 1;
+		return 0;
 	}
 
 	if (!block) {
-		return 0;
+		return -1;
 	}
 
 	curr = acl_fiber_running();
@@ -176,12 +172,16 @@ static int __rlock(ACL_FIBER_RWLOCK *lk, int block)
 	/* if switch to me because other killed me, I should detach myself */
 	ring_detach(&curr->me);
 
-	return 1;
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	}
+	return 0;
 }
 
-void acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK *lk)
+int acl_fiber_rwlock_rlock(ACL_FIBER_RWLOCK *lk)
 {
-	(void) __rlock(lk, 1);
+	return __rlock(lk, 1);
 }
 
 int acl_fiber_rwlock_tryrlock(ACL_FIBER_RWLOCK *lk)
@@ -196,11 +196,11 @@ static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 
 	if (lk->writer == NULL && lk->readers == 0) {
 		lk->writer = acl_fiber_running();
-		return 1;
+		return 0;
 	}
 
 	if (!block) {
-		return 0;
+		return -1;
 	}
 
 	curr = acl_fiber_running();
@@ -218,12 +218,16 @@ static int __wlock(ACL_FIBER_RWLOCK *lk, int block)
 	/* if switch to me because other killed me, I should detach myself */
 	ring_detach(&curr->me);
 
-	return 1;
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	}
+	return 0;
 }
 
-void acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK *lk)
+int acl_fiber_rwlock_wlock(ACL_FIBER_RWLOCK *lk)
 {
-	__wlock(lk, 1);
+	return __wlock(lk, 1);
 }
 
 int acl_fiber_rwlock_trywlock(ACL_FIBER_RWLOCK *lk)

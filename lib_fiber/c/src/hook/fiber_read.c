@@ -26,11 +26,6 @@ static int uring_wait_read(FILE_EVENT *fe)
 			return -1;
 		}
 
-		if (acl_fiber_canceled(fe->fiber_r)) {
-			acl_fiber_set_error(fe->fiber_r->errnum);
-			return -1;
-		}
-
 		if (fe->reader_ctx.res >= 0) {
 			return fe->reader_ctx.res;
 		}
@@ -88,11 +83,6 @@ static int iocp_wait_read(FILE_EVENT *fe)
 			return -1;
 		}
 
-		if (acl_fiber_canceled(fe->fiber_r)) {
-			acl_fiber_set_error(fe->fiber_r->errnum);
-			return -1;
-		}
-
 		if (fe->res >= 0) {
 			return fe->res;
 		}
@@ -143,7 +133,6 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 // -1: The fd isn't a valid descriptor, just return error, and
 //   the fe should be freed.
 
-// After calling acl_fiber_canceled():
 // If the suspending fiber wakeup for the reason that it was
 // killed by the other fiber which called acl_fiber_kill and
 // want to close the fd owned by the current fiber, we just
@@ -165,10 +154,6 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
     if (IS_READABLE((_fe))) {                                                \
         CLR_READABLE((_fe));                                                 \
     } else if (fiber_wait_read((_fe)) < 0) {                                 \
-        return -1;                                                           \
-    }                                                                        \
-    if (acl_fiber_canceled((_fe)->fiber_r)) {                                \
-        acl_fiber_set_error((_fe)->fiber_r->errnum);                         \
         return -1;                                                           \
     }                                                                        \
     if ((_fn) == NULL) {                                                     \
@@ -194,10 +179,6 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
     if (IS_READABLE((_fe))) {                                                \
         CLR_READABLE((_fe));                                                 \
     } else if (fiber_wait_read((_fe)) < 0) {                                 \
-        return -1;                                                           \
-    }                                                                        \
-    if (acl_fiber_canceled((_fe)->fiber_r)) {                                \
-        acl_fiber_set_error((_fe)->fiber_r->errnum);                         \
         return -1;                                                           \
     }                                                                        \
     if ((_fn) == NULL) {                                                     \

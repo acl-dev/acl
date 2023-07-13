@@ -46,11 +46,6 @@ static int wait_write(FILE_EVENT *fe)
 		return -1;
 	}
 
-	if (acl_fiber_canceled(fe->fiber_w)) {
-		acl_fiber_set_error(fe->fiber_w->errnum);
-		return -1;
-	}
-
 	return 0;
 }
 
@@ -429,11 +424,6 @@ ssize_t fiber_sendfile64(socket_t out_fd, int in_fd, off64_t *offset, size_t cou
 		if (fe->mask & (EVENT_ERR | EVENT_HUP | EVENT_NVAL)) {
 			msg_error("%s(%d): fd=%d error",
 				__FUNCTION__, __LINE__, out_fd);
-			return -1;
-		}
-
-		if (acl_fiber_canceled(fe->fiber_w)) {
-			acl_fiber_set_error(fe->fiber_w->errnum);
 			return -1;
 		}
 	}

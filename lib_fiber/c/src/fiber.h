@@ -64,8 +64,8 @@ struct ACL_FIBER {
 	int            signum;
 	unsigned short status;
 	unsigned short wstatus;
-	unsigned int   oflag;
-	unsigned int   flag;
+	unsigned int   oflag;	// The flags for creating fiber.
+	unsigned int   flag;	// The flags for the fiber's running status.
 
 #define	FIBER_F_STARTED		(unsigned) (1 << 0)
 #define	FIBER_F_SAVE_ERRNO	(unsigned) (1 << 1)
@@ -136,7 +136,7 @@ FILE_EVENT *fiber_file_open(socket_t fd);
 void fiber_file_set(FILE_EVENT *fe);
 FILE_EVENT *fiber_file_get(socket_t fd);
 void fiber_file_free(FILE_EVENT *fe);
-void fiber_file_close(FILE_EVENT *fe);
+int fiber_file_close(FILE_EVENT *fe);
 FILE_EVENT *fiber_file_cache_get(socket_t fd);
 void fiber_file_cache_put(FILE_EVENT *fe);
 

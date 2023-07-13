@@ -105,6 +105,11 @@ public:
 	 */
 	void set_errno(int errnum);
 
+	/**
+	 * 清除当前协程的错误号及标记位
+	 */
+	static void clear(void);
+
 public:
 	/**
 	 * 获得本次操作的出错信息

@@ -84,6 +84,14 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 		return -1;
 	}
 
+	// Sanity check befor suspending.
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		//msg_info("%s(%d): fiber-%d be killed",
+		//	__FUNCTION__, __LINE__, acl_fiber_id(curr));
+		return -1;
+	}
+
 	ring_prepend(&sem->waiting, &curr->me);
 
 	curr->wstatus |= FIBER_WAIT_SEM;
@@ -101,9 +109,10 @@ int acl_fiber_sem_wait(ACL_FIBER_SEM *sem)
 	 */
 	ring_detach(&curr->me);
 
-	if (acl_fiber_killed(curr)) {
-		msg_info("%s(%d): fiber-%d be killed",
-			__FUNCTION__, __LINE__, acl_fiber_id(curr));
+	if (acl_fiber_canceled(curr)) {
+		acl_fiber_set_error(curr->errnum);
+		//msg_info("%s(%d): fiber-%d be killed",
+		//	__FUNCTION__, __LINE__, acl_fiber_id(curr));
 		return -1;
 	}
 

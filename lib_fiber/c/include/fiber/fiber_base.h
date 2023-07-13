@@ -176,6 +176,12 @@ FIBER_API int acl_fiber_closed(ACL_FIBER* fiber);
 FIBER_API int acl_fiber_canceled(ACL_FIBER* fiber);
 
 /**
+ * Clear the fiber's flag and errnum to 0.
+ * @param fiber {ACL_FIBER*}
+ */
+FIBER_API void acl_fiber_clear(ACL_FIBER *fiber);
+
+/**
  * Wakeup the suspended fiber with the assosiated signal number
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h

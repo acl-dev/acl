@@ -85,23 +85,14 @@ int WINAPI acl_fiber_close(socket_t fd)
 		return ret;
 	}
 
-	// If the fd is in the status waiting for IO ready, the current fiber
-	// is trying to close the other fiber's fd, so, we should wakeup the
-	// suspending fiber and wait for its returning back, the process is:
-	// ->killer kill the fiber which is suspending and holding the fd;
-	// ->suspending fiber wakeup and return;
-	// ->killer closing the fd and free the fe.
+	ret = fiber_file_close(fe);
 
-	// If the fd isn't in waiting status, we don't know which fiber is
-	// holding the fd, but we can close it and free the fe with it.
-	// If the current fiber is holding the fd, we just close it ok, else
-	// if the other fiber is holding it, the IO API such as acl_fiber_read
-	// should hanlding the fd carefully, the process is:
-	// ->killer closing the fd and free fe owned by itself or other fiber;
-	// ->if fd was owned by the other fiber, calling API like acl_fiber_read
-	//   will return -1 after fiber_wait_read returns.
-
-	fiber_file_close(fe);
+	// If the return value more than 0, the fe has just been bound with
+	// the other fiber, we just return here and the fe will really be
+	// closed and freed by the last one binding the fe.
+	if (ret > 0) {
+		return 0;
+	}
 
 	ev = fiber_io_event();
 	if (ev && ev->close_sock) {

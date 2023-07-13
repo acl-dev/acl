@@ -40,6 +40,8 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 		pfd->pfd->revents |= POLLNVAL;
 	}
 
+	pfd->fe->fiber_r = NULL;
+
 	if (!(pfd->pfd->events & POLLOUT)) {
 		ring_detach(&pfd->me);
 		pfd->fe = NULL;
@@ -103,6 +105,8 @@ static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 	if (fe->mask & EVENT_NVAL) {
 		pfd->pfd->revents |= POLLNVAL;
 	}
+
+	pfd->fe->fiber_w = NULL;
 
 	if (!(pfd->pfd->events & POLLIN)) {
 		ring_detach(&pfd->me);

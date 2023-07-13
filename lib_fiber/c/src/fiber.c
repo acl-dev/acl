@@ -434,6 +434,14 @@ int acl_fiber_canceled(ACL_FIBER *fiber)
 	return fiber && (fiber->flag & FIBER_F_CANCELED);
 }
 
+void acl_fiber_clear(ACL_FIBER *fiber)
+{
+	if (fiber) {
+		fiber->errnum = 0;
+		fiber->flag &= ~FIBER_F_CANCELED;
+	}
+}
+
 void acl_fiber_kill(ACL_FIBER *fiber)
 {
 	fiber->errnum = ECANCELED;
@@ -468,36 +476,12 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 
 	fiber->signum = signum;
 
-	if (fiber == curr) { // Just return if kill myself
-		return;
+	// Just only wakeup the suspended fiber.
+	if (fiber->status == FIBER_STATUS_SUSPEND) {
+		ring_detach(&fiber->me); // This is safety!
+		
+		acl_fiber_ready(fiber);
 	}
-
-	ring_detach(&curr->me);
-	ring_detach(&fiber->me);
-
-	/* Add the current fiber and signaled fiber in the head of the ready */
-#if 0
-	fiber_ready(fiber);
-	fiber_yield();
-#elif 1
-	/* First add current fiber, then the signaled fiber, and the signaled
-	 * fiber will run first, then the current fiber.
-	 */
-
-	curr->status = FIBER_STATUS_READY;
-	ring_append(&__thread_fiber->ready, &curr->me);
-
-	fiber->status = FIBER_STATUS_READY;
-	ring_append(&__thread_fiber->ready, &fiber->me);
-#else
-	fiber->status = FIBER_STATUS_READY;
-	ring_prepend(&__thread_fiber->ready, &fiber->me);
-
-	curr->status = FIBER_STATUS_READY;
-	ring_prepend(&__thread_fiber->ready, &curr->me);
-#endif
-	acl_fiber_switch();
-	fiber->flag &= ~FIBER_F_SIGNALED;
 }
 
 int acl_fiber_signum(ACL_FIBER *fiber)
@@ -538,6 +522,9 @@ int acl_fiber_yield(void)
 	}
 
 	__thread_fiber->switched_old = __thread_fiber->switched;
+
+	// Reset the current fiber's status in order to be added to
+	// ready queue again.
 	__thread_fiber->running->status = FIBER_STATUS_NONE;
 	acl_fiber_ready(__thread_fiber->running);
 	acl_fiber_switch();
@@ -674,7 +661,7 @@ void acl_fiber_schedule_init(int on)
 void acl_fiber_attr_init(ACL_FIBER_ATTR *attr)
 {
 	attr->oflag = 0;
-	attr->stack_size  = 128000;
+	attr->stack_size = 128000;
 }
 
 void acl_fiber_attr_setstacksize(ACL_FIBER_ATTR *attr, size_t size)

@@ -7,8 +7,11 @@
 void file_event_init(FILE_EVENT *fe, socket_t fd)
 {
 	ring_init(&fe->me);
-	fe->fiber_r  = acl_fiber_running();
-	fe->fiber_w  = acl_fiber_running();
+
+	// XXX: don't set fiber_r/fiber_w here!
+	// fe->fiber_r = acl_fiber_running();
+	// fe->fiber_w = acl_fiber_running();
+
 	fe->fd     = fd;
 	fe->id     = -1;
 	fe->status = STATUS_NONE;
