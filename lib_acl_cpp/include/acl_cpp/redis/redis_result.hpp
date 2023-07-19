@@ -204,6 +204,7 @@ private:
 	friend class redis_client;
 	void clear(void);
 
+public:
 	redis_result& set_type(redis_result_t type);
 	redis_result& set_size(size_t size);
 	redis_result& put(const char* buf, size_t len);

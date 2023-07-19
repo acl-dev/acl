@@ -12,21 +12,21 @@ namespace pkv {
 
 class rdb : public db {
 public:
-	rdb(void);
-	~rdb(void);
+	rdb();
+	~rdb() override;
 
 protected:
 	// @override
-	bool open(const char* path);
+	bool open(const char* path) override;
 
 	// @override
-	bool set(const std::string& key, const std::string& value);
+	bool set(const std::string& key, const std::string& value) override;
 
 	// @override
-	bool get(const std::string& key, std::string& value);
+	bool get(const std::string& key, std::string& value) override;
 
 	// @override
-	bool del(const std::string& key);
+	bool del(const std::string& key) override;
 
 private:
 	std::string path_;

@@ -12,9 +12,9 @@ using namespace rocksdb;
 
 namespace pkv {
 
-rdb::rdb(void) : db_(NULL) {}
+rdb::rdb() : db_(nullptr) {}
 
-rdb::~rdb(void) {
+rdb::~rdb() {
     delete db_;
 }
 
