@@ -12,6 +12,7 @@ CFLAGS = -c -g -W \
 -D_REENTRANT \
 -D_POSIX_PTHREAD_SEMANTICS \
 -D_USE_FAST_MACRO
+CFLAGS += --std=c++17
 
 ###########################################################
 #Check system:
@@ -45,9 +46,6 @@ ifeq ($(findstring g++, $(CC)), g++)
 	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
 	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
 	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 7 \) ] && echo true)
-	ifeq ($(GCC_VER), true)
-		CFLAGS += --std=c++17
-	endif
 endif
 
 # For FreeBSD
@@ -64,7 +62,8 @@ endif
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 #	CC += -arch x86_64 -arch arm64
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
-		  -Wno-invalid-offsetof
+		  -Wno-invalid-offsetof \
+		  -DHAS_ROCKSDB
 	UNIXTYPE = MACOSX
 	SYSLIB += -liconv -rdynamic -lz
 	RPATH = macos
@@ -86,7 +85,7 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 		SYSLIB += -luring-ffi
 	endif
 
-	CFLAGS += -DLINUX2 -D_REENTRANT
+	CFLAGS += -DLINUX2 -D_REENTRANT -DHAS_ROCKSDB
 	SYSLIB += -lcrypt -lz -lunwind -lunwind-generic
 endif
 
@@ -152,6 +151,7 @@ LDFLAGS = -L$(ACL_PATH)/lib_fiber/lib -lfiber_cpp \
 	  -L$(ACL_PATH)/lib_acl_cpp/lib -lacl_cpp \
 	  -L$(ACL_PATH)/lib_protocol/lib -lprotocol \
 	  -L$(ACL_PATH)/lib_acl/lib -lacl -lfiber \
+	  -lrocksdb -Wl,-rpath,/usr/local/lib \
 	  $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
