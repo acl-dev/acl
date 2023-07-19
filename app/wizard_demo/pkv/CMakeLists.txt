@@ -79,6 +79,7 @@ add_definitions(
     "-Wno-deprecated-declarations"
     "-fPIC"
     "-std=c++17"
+    "-DHAS_ROCKSDB"
 )
 
 #find_library(acl_lib acl_all PATHS /usr/lib /usr/local/lib)

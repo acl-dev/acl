@@ -7,6 +7,7 @@
 
 //#include <iostream>
 //#include <tchar.h>
+#include <memory>
 
 // TODO: 在此处引用程序要求的附加头文件
 
