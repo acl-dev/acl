@@ -1,8 +1,16 @@
 #include "stdafx.h"
+#include "proto/redis_parser.h"
 #include "master_service.h"
 
-int main(int argc, char *argv[])
-{
+static void test_redis_parse(const char* file) {
+    if (pkv::test_redis_parse(file)) {
+        printf(">>>>>>>Test OK<<<<<<<<<\r\n");
+    } else {
+        printf(">>>>>>>Test Error<<<<<<<\r\n");
+    }
+}
+
+int main(int argc, char *argv[]) {
     acl::acl_cpp_init();
     master_service& ms = acl::singleton2<master_service>::get_instance();
 
@@ -12,7 +20,14 @@ int main(int argc, char *argv[])
     ms.set_cfg_str(var_conf_str_tab);
     ms.set_cfg_bool(var_conf_bool_tab);
 
-    if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
+    if (argc >= 2 && strcasecmp(argv[1], "test") == 0) {
+        const char* file = "hash.txt";
+        if (argc >= 3) {
+            file = argv[2];
+        }
+        test_redis_parse(file);
+        return 0;
+    } else if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
         // 日志输出至标准输出
         acl::log::stdout_open(true);
         // 禁止生成 acl_master.log 日志

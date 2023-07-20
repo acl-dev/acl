@@ -1,0 +1,17 @@
+*8
+$5
+HMSET
+$15
+hash_test_key_0
+$5
+attr1
+$10
+val1_attr1
+$5
+attr2
+$10
+val2_attr2
+$5
+attr3
+$10
+val3_attr3

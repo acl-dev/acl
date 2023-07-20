@@ -391,6 +391,7 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h[help]\r\n"
 		"-s redis_addr[127.0.0.1:6379]\r\n"
+		"-p passwd\r\n"
 		"-n count\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
@@ -403,10 +404,10 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int  ch, n = 1, conn_timeout = 10, rw_timeout = 10;
-	acl::string addr("127.0.0.1:6379"), cmd;
+	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 	bool slice_req = false, cluster_mode = false;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:a:Sc")) > 0)
+	while ((ch = getopt(argc, argv, "hs:p:n:C:I:a:Sc")) > 0)
 	{
 		switch (ch)
 		{
@@ -415,6 +416,9 @@ int main(int argc, char* argv[])
 			return 0;
 		case 's':
 			addr = optarg;
+			break;
+		case 'p':
+			passwd = optarg;
 			break;
 		case 'n':
 			n = atoi(optarg);
@@ -450,9 +454,16 @@ int main(int argc, char* argv[])
 
 	acl::redis_hash redis;
 	if (cluster_mode)
+	{
+		if (!passwd.empty())
+			cluster.set_password("default", passwd);
 		redis.set_cluster(&cluster);
-	else
+	} else
+	{
+		if (!passwd.empty())
+			client.set_password(passwd);
 		redis.set_client(&client);
+	}
 
 	bool ret;
 
