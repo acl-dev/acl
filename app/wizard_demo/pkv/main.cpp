@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
 
         const char* addr = "|8887";
         printf("listen: %s\r\n", addr);
-        ms.run_alone(addr, argc >= 3 ? argv[2] : NULL);
+        ms.run_alone(addr, argc >= 3 ? argv[2] : nullptr);
     } else {
 #if defined(_WIN32) || defined(_WIN64)
         const char* addr = "|8887";

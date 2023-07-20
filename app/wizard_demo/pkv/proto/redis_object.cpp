@@ -3,14 +3,12 @@
 //
 
 #include "stdafx.h"
-#include "redis_type.h"
 #include "redis_object.h"
 
 namespace pkv {
 
-redis_object::redis_object(acl::dbuf_pool* dbuf, redis_object* parent) {
+redis_object::redis_object(acl::dbuf_pool* dbuf) {
     dbuf_   = dbuf;
-    parent_ = parent;
     status_ = redis_s_begin;
     cnt_    = 0;
     rr_     = nullptr;
@@ -78,7 +76,7 @@ const char* redis_object::parse_object(const char* data, size_t& len) {
         cnt_ = 0;
         status_ = redis_s_finish;
     } else {
-        obj_ = std::make_shared<redis_object>(dbuf_, this);
+        obj_ = std::make_shared<redis_object>(dbuf_);
     }
     return data;
 }
@@ -264,7 +262,7 @@ const char* redis_object::parse_arlen(const char* data, size_t& len) {
 
     buf_.clear();
     status_ = redis_s_array;
-    obj_ = std::make_shared<redis_object>(dbuf_, this);
+    obj_ = std::make_shared<redis_object>(dbuf_);
     return data;
 }
 
@@ -348,7 +346,7 @@ bool redis_object::to_string(acl::string& out) const {
     if (!objs_.empty()) {
         out.format_append("*%zd%s", objs_.size(), CRLF);
 
-        for (auto obj : objs_) {
+        for (const auto& obj : objs_) {
             if (!obj->to_string(out)) {
                 return false;
             }

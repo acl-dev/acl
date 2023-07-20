@@ -3,7 +3,6 @@
 //
 
 #include "stdafx.h"
-#include "redis_type.h"
 #include "redis_parser.h"
 
 namespace pkv {
@@ -11,7 +10,7 @@ namespace pkv {
 redis_parser::redis_parser() {
     curr_   = nullptr;
     dbuf_   = new (1) acl::dbuf_pool();
-    curr_ = std::make_shared<redis_object>(dbuf_, nullptr);
+    curr_ = std::make_shared<redis_object>(dbuf_);
 }
 
 redis_parser::~redis_parser() {
@@ -23,7 +22,7 @@ const char* redis_parser::update(const char* data, size_t& len) {
         data = curr_->update(data, len);
         if (curr_->finish()) {
             objs_.emplace_back(curr_);
-            curr_ = std::make_shared<redis_object>(dbuf_, nullptr);
+            curr_ = std::make_shared<redis_object>(dbuf_);
         } else if (curr_->failed()) {
             break;
         }
@@ -31,13 +30,9 @@ const char* redis_parser::update(const char* data, size_t& len) {
 
     return data;
 }
-bool redis_parser::to_string(acl::string& out) const {
-    size_t i = 0;
-    for (auto obj : objs_) {
-        if (i++ > 0) {
-            out += "----------------------------------------------------------\r\n";
-        }
 
+bool redis_parser::to_string(acl::string& out) const {
+    for (const auto& obj : objs_) {
         if (!obj->to_string(out)) {
             return false;
         }
@@ -45,6 +40,8 @@ bool redis_parser::to_string(acl::string& out) const {
 
     return true;
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 bool test_redis_parse(const char* filepath) {
     acl::string buf;

@@ -13,24 +13,24 @@ using shared_redis = std::shared_ptr<redis_object>;
 
 class redis_object {
 public:
-    redis_object(acl::dbuf_pool* dbuf, redis_object* parent);
+    explicit redis_object(acl::dbuf_pool* dbuf);
     ~redis_object() = default;
 
     const char* update(const char* data, size_t& len);
 
-    bool finish() const {
+    [[nodiscard]] bool finish() const {
         return status_ == redis_s_finish;
     }
 
-    bool failed() const {
+    [[nodiscard]] bool failed() const {
         return status_ == redis_s_null;
     }
 
-    int get_status() const {
+    [[nodiscard]] int get_status() const {
         return status_;
     }
 
-    acl::redis_result_t get_type() const {
+    [[nodiscard]] acl::redis_result_t get_type() const {
         return rr_ ? rr_->get_type() : acl::REDIS_RESULT_UNKOWN;
     }
 
@@ -39,7 +39,6 @@ public:
 
 private:
     acl::dbuf_pool* dbuf_;
-    redis_object* parent_;
     int status_;
 
     int cnt_;
