@@ -19,10 +19,12 @@ public:
 
 private:
     acl::dbuf_pool* dbuf_;
-    std::vector<shared_redis> objs_;
-    shared_redis curr_;
+    std::vector<redis_object*> objs_;
+    redis_object* curr_;
 };
 
 bool test_redis_parse(const char* filepath);
+bool test_redis_parse_once(const char* filepath);
+bool test_redis_parse_stream(const char* filepath);
 
 } // namespace pkv

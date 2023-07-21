@@ -8,14 +8,23 @@
 
 namespace pkv {
 
-class redis_object;
-using shared_redis = std::shared_ptr<redis_object>;
+//class redis_object;
+//using shared_redis = std::shared_ptr<redis_object>;
 
 class redis_object {
 public:
     explicit redis_object(acl::dbuf_pool* dbuf);
+
+    redis_object(const redis_object&) = delete;
+    void operator=(const redis_object&) = delete;
+
+    void *operator new(size_t size, acl::dbuf_pool* pool);
+    void operator delete(void* ptr, acl::dbuf_pool* pool);
+
+private:
     ~redis_object() = default;
 
+public:
     const char* update(const char* data, size_t& len);
 
     [[nodiscard]] bool finish() const {
@@ -31,7 +40,7 @@ public:
     }
 
     [[nodiscard]] acl::redis_result_t get_type() const {
-        return rr_ ? rr_->get_type() : acl::REDIS_RESULT_UNKOWN;
+        return me_ ? me_->get_type() : acl::REDIS_RESULT_UNKOWN;
     }
 
 public:
@@ -39,18 +48,18 @@ public:
 
 private:
     acl::dbuf_pool* dbuf_;
-    int status_;
+    int status_ = redis_s_begin;
+    acl::redis_result* me_ = nullptr;
+    std::vector<redis_object*> objs_;
 
-    int cnt_;
     std::string buf_;
-    acl::redis_result* rr_;
-    std::vector<shared_redis> objs_;
-    shared_redis obj_;
+    int cnt_ = 0;
+    redis_object* obj_ = nullptr;
 
 private:
     static void put_data(acl::dbuf_pool*, acl::redis_result*, const char*, size_t);
     const char* get_line(const char*, size_t&, bool&);
-    const char* get_length(const char*, size_t&, int&);
+    const char* get_length(const char*, size_t&, int&, bool&);
     const char* get_data(const char*, size_t&, size_t);
 
     const char* parse_object(const char*, size_t&);
