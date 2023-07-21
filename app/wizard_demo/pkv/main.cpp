@@ -1,13 +1,27 @@
 #include "stdafx.h"
-#include "proto/redis_parser.h"
+#include "proto/redis_coder.h"
 #include "master_service.h"
 
-static void test_redis_parse(const char* file) {
-    if (pkv::test_redis_parse(file)) {
-        printf(">>>>>>>Test OK<<<<<<<<<\r\n");
-    } else {
-        printf(">>>>>>>Test Error<<<<<<<\r\n");
+static bool test_redis_coder(const char* file) {
+#if 1
+    printf(">>>>>>>>Begin to test redis parsing<<<<<<<<<\r\n");
+    if (!pkv::test_redis_parse(file)) {
+        printf(">>>>>>>Test redis parsing Error<<<<<<<\r\n");
+        return false;
     }
+    printf(">>>>>>>Test redis parsing successfully<<<<<<<<<\r\n");
+#endif
+
+    printf("\r\n");
+
+    printf(">>>>>>>>>Begin to test redis building<<<<<<<<\r\n");
+    if (!pkv::test_redis_build()) {
+        printf(">>>>>Test redis building Error<<<<<<<<\r\n");
+        return false;
+    }
+    printf(">>>>>>>Test redis building successfully<<<<<<<\r\n");
+
+    return true;
 }
 
 int main(int argc, char *argv[]) {
@@ -25,7 +39,7 @@ int main(int argc, char *argv[]) {
         if (argc >= 3) {
             file = argv[2];
         }
-        test_redis_parse(file);
+        test_redis_coder(file);
         return 0;
     } else if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
         // 日志输出至标准输出

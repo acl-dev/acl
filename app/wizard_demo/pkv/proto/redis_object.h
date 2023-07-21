@@ -13,7 +13,7 @@ namespace pkv {
 
 class redis_object {
 public:
-    explicit redis_object(acl::dbuf_pool* dbuf);
+    explicit redis_object(acl::dbuf_pool* dbuf, redis_object* parent);
 
     redis_object(const redis_object&) = delete;
     void operator=(const redis_object&) = delete;
@@ -44,10 +44,17 @@ public:
     }
 
 public:
+    redis_object& set_status(const std::string& data, bool return_parent = false);
+    redis_object& set_error(const std::string& data, bool return_parent = false);
+    redis_object& set_number(int n, bool return_parent = false);
+    redis_object& set_string(const std::string& data, bool return_parent = false);
+    redis_object& create_child();
+
     bool to_string(acl::string& out) const;
 
 private:
     acl::dbuf_pool* dbuf_;
+    redis_object* parent_;
     int status_ = redis_s_begin;
     acl::redis_result* me_ = nullptr;
     std::vector<redis_object*> objs_;
@@ -65,7 +72,6 @@ private:
     const char* parse_object(const char*, size_t&);
 
 public:
-    const char* parse_null(const char* data, size_t& len);
     const char* parse_begin(const char* data, size_t& len);
     const char* parse_status(const char* data, size_t& len);
     const char* parse_error(const char* data, size_t& len);

@@ -7,7 +7,6 @@
 namespace pkv {
 
 enum {
-    redis_s_null,
     redis_s_begin,
     redis_s_status,
     redis_s_error,
@@ -17,6 +16,7 @@ enum {
     redis_s_strend,
     redis_s_arlen,
     redis_s_array,
+    redis_s_null,
     redis_s_finish,
 };
 

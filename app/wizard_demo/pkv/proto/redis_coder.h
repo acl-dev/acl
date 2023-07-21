@@ -8,12 +8,19 @@
 
 namespace pkv {
 
-class redis_parser {
+class redis_coder {
 public:
-    redis_parser();
-    ~redis_parser();
+    redis_coder();
+    ~redis_coder();
 
     const char* update(const char* data, size_t& len);
+
+    [[nodiscard]] const std::vector<redis_object*>& get_objects() const {
+        return objs_;
+    }
+
+public:
+    [[nodiscard]] redis_object& create_object();
 
     bool to_string(acl::string& out) const;
 
@@ -26,5 +33,7 @@ private:
 bool test_redis_parse(const char* filepath);
 bool test_redis_parse_once(const char* filepath);
 bool test_redis_parse_stream(const char* filepath);
+
+bool test_redis_build();
 
 } // namespace pkv
