@@ -8,7 +8,6 @@
 namespace pkv {
 
 redis_coder::redis_coder() {
-    curr_ = nullptr;
     dbuf_ = new (1) acl::dbuf_pool();
     curr_ = new(dbuf_) redis_object(dbuf_, nullptr);
 }

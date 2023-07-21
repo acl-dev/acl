@@ -19,6 +19,10 @@ public:
         return objs_;
     }
 
+    [[nodiscard]] redis_object* get_curr() const {
+        return curr_;
+    }
+
 public:
     [[nodiscard]] redis_object& create_object();
 
