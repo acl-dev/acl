@@ -45,20 +45,15 @@ master_service::~master_service(void)
 void master_service::on_accept(acl::socket_stream& conn)
 {
 	logger(">>>accept connection: %d", conn.sock_handle());
-	conn.set_rw_timeout(var_cfg_io_timeout);
+	//conn.set_rw_timeout(var_cfg_io_timeout);
 
-	acl::string buf;
+        char buf[8192];
+        size_t n = sizeof(buf) - 1;
 
-	while (true) {
-		if (!conn.gets(buf, false)) {
-			break;
-		}
-
-		if (conn.write(buf) == -1) {
-			logger_error("write error!");
-			break;
-		}
-	}
+        int ret = conn.read(buf, sizeof(n), false);
+        if (ret <= 0) {
+            return;
+        }
 }
 
 void master_service::proc_pre_jail(void)

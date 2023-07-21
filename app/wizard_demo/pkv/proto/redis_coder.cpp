@@ -147,7 +147,9 @@ bool test_redis_parse_stream(const char* filepath) {
     }
 
     printf("%s\r\n", out.c_str());
-    printf(">>%s(%d): build successfully<<\r\n", __func__, __LINE__);
+    const char* cmd = parser.get_objects()[0]->get_cmd();
+    printf(">>%s(%d): build successfully, cmd=%s<<\r\n",
+           __func__, __LINE__, cmd ? cmd : "unknown");
     return true;
 }
 
@@ -156,8 +158,9 @@ bool test_redis_parse_stream(const char* filepath) {
 bool test_redis_build() {
     redis_coder builder;
 
-#if 0
     auto& obj = builder.create_object();
+
+#if 0
     obj.create_child().set_string("HMSET");
     obj.create_child().set_string("hash-key");
     obj.create_child().set_string("field1");
@@ -167,8 +170,7 @@ bool test_redis_build() {
     obj.create_child().set_string("field3");
     obj.create_child().set_string("value3");
 #else
-    builder.create_object()
-        .create_child().set_string("HMSET", true)
+    obj.create_child().set_string("HMSET", true)
         .create_child().set_string("hash-key", true)
         .create_child().set_string("field1", true)
         .create_child().set_string("value1", true)
@@ -180,7 +182,9 @@ bool test_redis_build() {
 
     acl::string buf;
     if (builder.to_string(buf)) {
-        printf("%s(%d): build redis successfully\r\n", __func__, __LINE__);
+        const char* cmd = obj.get_cmd();
+        printf("%s(%d): build redis successfully, cmd=%s\r\n",
+               __func__, __LINE__, cmd ? cmd : "unknown");
         printf("[%s]\r\n", buf.c_str());
     } else {
         printf("%s(%d): build redis failed\r\n", __func__, __LINE__);

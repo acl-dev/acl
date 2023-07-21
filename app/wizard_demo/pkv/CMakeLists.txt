@@ -47,6 +47,7 @@ include_directories(
 set(base_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(src_paths
     ${base_path}
+    ${base_path}/dao
     ${base_path}/db
     ${base_path}/db/rocksdb
     ${base_path}/db/wt

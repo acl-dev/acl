@@ -43,6 +43,8 @@ public:
         return me_ ? me_->get_type() : acl::REDIS_RESULT_UNKOWN;
     }
 
+    [[nodiscard]] const char* get_cmd() const;
+
 public:
     redis_object& set_status(const std::string& data, bool return_parent = false);
     redis_object& set_error(const std::string& data, bool return_parent = false);

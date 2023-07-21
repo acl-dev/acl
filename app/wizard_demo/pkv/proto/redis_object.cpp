@@ -21,6 +21,22 @@ void redis_object::operator delete(void*, acl::dbuf_pool*) {
     logger_error("DELETE NOW!");
 }
 
+const char* redis_object::get_cmd() const {
+    if (me_ == nullptr) {
+        return nullptr;
+    }
+
+    if (me_->get_type() == acl::REDIS_RESULT_STRING) {
+        return me_->get(0);
+    }
+
+    if (objs_.empty() || me_->get_type() != acl::REDIS_RESULT_ARRAY) {
+        return nullptr;
+    }
+
+    return objs_[0]->get_cmd();
+}
+
 struct status_machine {
     /* ×´Ì¬Âë */
     int status;
