@@ -23,6 +23,8 @@ public:
         return curr_;
     }
 
+    void clear();
+
 public:
     [[nodiscard]] redis_object& create_object();
 

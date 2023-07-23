@@ -16,6 +16,10 @@ redis_coder::~redis_coder() {
     dbuf_->destroy();
 }
 
+void redis_coder::clear() {
+    objs_.clear();
+}
+
 const char* redis_coder::update(const char* data, size_t& len) {
     while (len > 0) {
         data = curr_->update(data, len);

@@ -47,7 +47,7 @@ int main(int argc, char *argv[]) {
         // 禁止生成 acl_master.log 日志
         acl::master_log_enable(false);
 
-        const char* addr = "|8887";
+        const char* addr = nullptr;
         printf("listen: %s\r\n", addr);
         ms.run_alone(addr, argc >= 3 ? argv[2] : nullptr);
     } else {

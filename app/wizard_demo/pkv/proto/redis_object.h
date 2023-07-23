@@ -45,6 +45,12 @@ public:
 
     [[nodiscard]] const char* get_cmd() const;
 
+    [[nodiscard]] const char* get_str() const;
+
+    [[nodiscard]] const std::vector<redis_object*>& get_objects() const {
+        return objs_;
+    }
+
 public:
     redis_object& set_status(const std::string& data, bool return_parent = false);
     redis_object& set_error(const std::string& data, bool return_parent = false);

@@ -47,6 +47,7 @@ include_directories(
 set(base_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(src_paths
     ${base_path}
+    ${base_path}/action
     ${base_path}/dao
     ${base_path}/db
     ${base_path}/db/rocksdb
@@ -105,7 +106,7 @@ set(output_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_path})
 link_directories(${output_path})
 
-add_executable(pkv ${src_files})
+add_executable(pkv ${src_files} action/redis_handler.cpp action/redis_handler.h)
 target_link_libraries(pkv ${lib_all})
 
 ###############################################################################

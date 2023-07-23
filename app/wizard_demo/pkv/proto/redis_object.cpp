@@ -37,6 +37,14 @@ const char* redis_object::get_cmd() const {
     return objs_[0]->get_cmd();
 }
 
+const char* redis_object::get_str() const {
+    if (me_->get_type() == acl::REDIS_RESULT_STRING) {
+        return me_->get(0);
+    }
+
+    return nullptr;
+}
+
 struct status_machine {
     /* ×´Ì¬Âë */
     int status;
