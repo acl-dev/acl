@@ -8,21 +8,16 @@
 
 namespace pkv {
 
-//class redis_object;
-//using shared_redis = std::shared_ptr<redis_object>;
+class redis_object;
+using shared_redis = std::shared_ptr<redis_object>;
 
 class redis_object {
 public:
-    explicit redis_object(acl::dbuf_pool* dbuf, redis_object* parent);
+    explicit redis_object(redis_object* parent);
+    ~redis_object() = default;
 
     redis_object(const redis_object&) = delete;
     void operator=(const redis_object&) = delete;
-
-    void *operator new(size_t size, acl::dbuf_pool* pool);
-    void operator delete(void* ptr, acl::dbuf_pool* pool);
-
-private:
-    ~redis_object() = default;
 
 public:
     const char* update(const char* data, size_t& len);
@@ -47,7 +42,7 @@ public:
 
     [[nodiscard]] const char* get_str() const;
 
-    [[nodiscard]] const std::vector<redis_object*>& get_objects() const {
+    [[nodiscard]] const std::vector<shared_redis>& get_objects() const {
         return objs_;
     }
 
@@ -65,11 +60,11 @@ private:
     redis_object* parent_;
     int status_ = redis_s_begin;
     acl::redis_result* me_ = nullptr;
-    std::vector<redis_object*> objs_;
+    std::vector<shared_redis> objs_;
 
     std::string buf_;
     int cnt_ = 0;
-    redis_object* obj_ = nullptr;
+    shared_redis obj_ = nullptr;
 
 private:
     static void put_data(acl::dbuf_pool*, acl::redis_result*, const char*, size_t);

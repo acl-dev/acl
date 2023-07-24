@@ -7,18 +7,9 @@
 
 namespace pkv {
 
-redis_object::redis_object(acl::dbuf_pool* dbuf, redis_object* parent) {
-    dbuf_   = dbuf;
+redis_object::redis_object(redis_object* parent) {
+    dbuf_   = new (1) acl::dbuf_pool();
     parent_ = parent ? parent : this;
-}
-
-void *redis_object::operator new(size_t size, acl::dbuf_pool* dbuf) {
-    void* ptr = dbuf->dbuf_alloc(size);
-    return ptr;
-}
-
-void redis_object::operator delete(void*, acl::dbuf_pool*) {
-    logger_error("DELETE NOW!");
 }
 
 const char* redis_object::get_cmd() const {
@@ -105,7 +96,7 @@ const char* redis_object::parse_object(const char* data, size_t& len) {
         cnt_ = 0;
         status_ = redis_s_finish;
     } else {
-        obj_ = new(dbuf_) redis_object(dbuf_, this);
+        obj_ = std::make_shared<redis_object>(this);
     }
     return data;
 }
@@ -288,7 +279,7 @@ const char* redis_object::parse_arlen(const char* data, size_t& len) {
 
     buf_.clear();
     status_ = redis_s_array;
-    obj_ = new(dbuf_) redis_object(dbuf_, this);
+    obj_ = std::make_shared<redis_object>(this);
     return data;
 }
 
@@ -453,8 +444,8 @@ redis_object& redis_object::set_string(const std::string &data,
 }
 
 redis_object& redis_object::create_child() {
-    auto obj = new(dbuf_) redis_object(dbuf_, this);
-    objs_.push_back(obj);
+    auto obj = std::make_shared<redis_object>(this);
+    objs_.emplace_back(obj);
 
     if (me_ == nullptr) {
         // The last one is NULL.

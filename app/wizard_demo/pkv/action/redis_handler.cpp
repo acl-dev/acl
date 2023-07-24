@@ -9,6 +9,8 @@
 
 namespace pkv {
 
+#define EQ  !strcasecmp
+
 redis_handler::redis_handler(shared_db& db, const redis_coder& parser,
      acl::socket_stream& conn)
 : db_(db)
@@ -22,7 +24,7 @@ bool redis_handler::handle() {
     if (objs.empty()) {
         return true;
     }
-    for (auto obj : objs) {
+    for (const auto& obj : objs) {
         if (!handle_one(*obj)) {
             return false;
         }
@@ -43,8 +45,6 @@ bool redis_handler::handle_one(const redis_object &obj) {
     }
 
     //printf(">>>cmd=%s\r\n", cmd);
-
-#define EQ  !strcasecmp
 
     if (EQ(cmd, "HSET")) {
         return hset(obj);

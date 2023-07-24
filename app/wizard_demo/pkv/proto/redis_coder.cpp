@@ -8,12 +8,7 @@
 namespace pkv {
 
 redis_coder::redis_coder() {
-    dbuf_ = new (1) acl::dbuf_pool();
-    curr_ = new(dbuf_) redis_object(dbuf_, nullptr);
-}
-
-redis_coder::~redis_coder() {
-    dbuf_->destroy();
+    curr_ = std::make_shared<redis_object>(nullptr);
 }
 
 void redis_coder::clear() {
@@ -25,7 +20,7 @@ const char* redis_coder::update(const char* data, size_t& len) {
         data = curr_->update(data, len);
         if (curr_->finish()) {
             objs_.push_back(curr_);
-            curr_ = new(dbuf_) redis_object(dbuf_, nullptr);
+            curr_ = std::make_shared<redis_object>(nullptr);
         } else if (curr_->failed()) {
             break;
         }
@@ -35,8 +30,8 @@ const char* redis_coder::update(const char* data, size_t& len) {
 }
 
 redis_object& redis_coder::create_object() {
-    auto obj = new(dbuf_) redis_object(dbuf_, nullptr);
-    objs_.push_back(obj);
+    auto obj = std::make_shared<redis_object>(nullptr);
+    objs_.emplace_back(obj);
     return *obj;
 }
 
