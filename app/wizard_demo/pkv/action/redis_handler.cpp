@@ -24,6 +24,9 @@ bool redis_handler::handle() {
     if (objs.empty()) {
         return true;
     }
+
+    //if (objs.size() >= 2) { printf(">>>objs=%zd\r\n", objs.size()); }
+
     for (const auto& obj : objs) {
         if (!handle_one(*obj)) {
             return false;

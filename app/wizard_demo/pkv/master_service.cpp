@@ -41,16 +41,17 @@ void master_service::on_accept(acl::socket_stream& conn) {
     //conn.set_rw_timeout(var_cfg_io_timeout);
 
     pkv::redis_coder parser;
-    char buf[8192];
-    size_t n = sizeof(buf) - 1;
+    char buf[20480];
 
     while(true) {
-        int ret = conn.read(buf, sizeof(n) - 1, false);
+        int ret = conn.read(buf, sizeof(buf) - 1, false);
         if (ret <= 0) {
             break;
         }
+
         buf[ret] = 0;
-        //printf("[%s]\r\n", buf);
+
+	//if (ret >= 512) { printf("[%s]\r\n", buf); }
 
         size_t len = (size_t) ret;
         const char* data = parser.update(buf, len);
