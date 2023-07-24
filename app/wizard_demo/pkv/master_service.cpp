@@ -37,7 +37,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 using namespace pkv;
 
 void master_service::on_accept(acl::socket_stream& conn) {
-    logger(">>>accept connection: %d", conn.sock_handle());
+    //logger(">>>accept connection: %d", conn.sock_handle());
     //conn.set_rw_timeout(var_cfg_io_timeout);
 
     pkv::redis_coder parser;

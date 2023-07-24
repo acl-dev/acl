@@ -32,6 +32,9 @@ private:
     bool hmset(const redis_object& obj);
     bool hmget(const redis_object& obj);
     bool hgetall(const redis_object& obj);
+    bool set(const redis_object& obj);
+    bool get(const redis_object& obj);
+    bool del(const redis_object& obj);
 };
 
 }
