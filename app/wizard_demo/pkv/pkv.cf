@@ -24,7 +24,7 @@ service pkv
 	master_stop_wait = false
 
 #	当系统支持 SO_REUSEPORT 时，是否启用该功能
-	master_reuseport = no
+	master_reuseport = yes
 #	当启用 SO_REUSEPORT 时(即 master_reuseport=yes 时), 是否需要 acl_master
 #	也监听该地址, 对于使用旧版 acl(< 3.5.3-17) 编写的服务, 必须将此项设为
 #	yes, 即: master_reuseport_listen = yes; 对于使用 acl 版本 >= 3.5.3-17
@@ -76,6 +76,7 @@ service pkv
 
 #	事件引擎: kernel, poll, select, io_uring
 	fiber_schedule_event = kernel
+#	fiber_schedule_event = io_uring
 #	是否允许产生 core 文件
 #	fiber_enable_core = 1
 #	core 文件大小限制，-1 表示不限制 core 文件大小，0 表示禁止产生 core，> 0 表示 core 文件最大大小
@@ -87,7 +88,7 @@ service pkv
 #	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
 	fiber_idle_limit = 0
 #	每个进程启动的线程数
-	fiber_threads = 1
+	fiber_threads = 8
 #	进程运行时所在的路径
 	fiber_queue_dir = {install_path}/var
 #	读写超时时间, 单位为秒

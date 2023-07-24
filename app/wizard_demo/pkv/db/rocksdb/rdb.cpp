@@ -36,7 +36,8 @@ bool rdb::open(const char* path) {
 bool rdb::set(const std::string& key, const std::string& value) {
     Status s = db_->Put(WriteOptions(), key, value);
     if (!s.ok()) {
-        logger_error("put to %s error: %s", path_.c_str(), s.getState());
+        logger_error("put to %s error: %s, key=%s",
+	    path_.c_str(), s.getState(), key.c_str());
         return false;
     }
 
@@ -46,8 +47,8 @@ bool rdb::set(const std::string& key, const std::string& value) {
 bool rdb::get(const std::string& key, std::string& value) {
     Status s = db_->Get(ReadOptions(), key, &value);
     if (!s.ok()) {
-        logger_error("get from %s error: %s", path_.c_str(),
-                     s.getState());
+        logger_error("get from %s error: %s, key=%s, data=%zd",
+            path_.c_str(), s.getState(), key.c_str(), value.size());
         return false;
     }
 

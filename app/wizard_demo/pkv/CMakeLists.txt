@@ -88,18 +88,20 @@ add_definitions(
 #find_library(fiber_cpp_lib fiber_cpp PATHS /usr/lib /usr/local/lib)
 #find_library(fiber_lib fiber PATHS /usr/lib /usr/local/lib)
 
-find_library(rocksdb_lib rocksdb PATHS /usr/lib /usr/local/lib)
+#find_library(rocksdb_lib rocksdb PATHS /usr/lib /usr/local/lib)
 
-set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a ${home_path}/lib_fiber/lib/libfiber.a)
+set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a)
+set(fiber ${home_path}/lib_fiber/lib/libfiber.a)
+set(rocksdb /usr/local/lib/librocksdb.a)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 #    set(lib_all  ${lib_global} ${lib_rpc} ${fiber_cpp_lib} ${acl_lib} ${fiber_lib}
     set(lib_all ${acl_all}
-        ${rocksdb_lib} -Wl,-rpath,/usr/local/lib -liconv -lz -lpthread -ldl)
+        ${rocksdb} ${fiber} -liconv -lz -lpthread -ldl)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 #    set(lib_all  ${lib_global} ${lib_rpc} ${fiber_cpp_lib} ${acl_lib} ${fiber_lib}
     set(lib_all ${acl_all}
-        -lrocksdb -Wl,-rpath,/usr/local/lib -liconv -lz -lpthread -ldl)
+        ${rocksdb} -lwiredtiger ${fiber} -luring -liconv -lz -lpthread -ldl)
 endif()
 
 set(output_path ${CMAKE_CURRENT_SOURCE_DIR})

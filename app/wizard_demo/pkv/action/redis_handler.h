@@ -35,6 +35,7 @@ private:
     bool set(const redis_object& obj);
     bool get(const redis_object& obj);
     bool del(const redis_object& obj);
+    bool type(const redis_object& obj);
 };
 
 }

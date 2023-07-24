@@ -14,7 +14,7 @@ using shared_redis = std::shared_ptr<redis_object>;
 class redis_object {
 public:
     explicit redis_object(redis_object* parent);
-    ~redis_object() = default;
+    ~redis_object();
 
     redis_object(const redis_object&) = delete;
     void operator=(const redis_object&) = delete;

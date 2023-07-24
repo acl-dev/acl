@@ -64,10 +64,15 @@ bool redis_handler::handle_one(const redis_object &obj) {
         return get(obj);
     } else if (EQ(cmd, "DEL")) {
         return del(obj);
+    } else if (EQ(cmd, "TYPE")) {
+        return type(obj);
     }
 
+    acl::string err;
+    err.format("%s not support yet", cmd);
     logger_error("cmd=%s not support!", cmd);
-    return false;
+    builder_.create_object().set_error(err);
+    return true;
 }
 
 bool redis_handler::hset(const redis_object &obj) {
@@ -305,6 +310,11 @@ bool redis_handler::del(const redis_object &obj) {
     }
 
     builder_.create_object().set_number(1);
+    return true;
+}
+
+bool redis_handler::type(const redis_object &obj) {
+    builder_.create_object().set_status("string");
     return true;
 }
 

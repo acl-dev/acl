@@ -54,6 +54,12 @@ int fcntl(int fd, int cmd, ...)
 	case F_SETSIG:
 	case F_SETLEASE:
 	case F_NOTIFY:
+#ifdef	F_GET_RW_HINT
+	case F_GET_RW_HINT:
+#endif
+#ifdef	F_SET_RW_HINT
+	case F_SET_RW_HINT:
+#endif
 #ifdef	F_SETPIPE_SZ
 	case F_SETPIPE_SZ:
 #endif

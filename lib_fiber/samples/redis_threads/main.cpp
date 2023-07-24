@@ -78,12 +78,12 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < nthreads; i++) {
 		redis_thread* thread;
 		if (use_global_cluster) {
-			thread = new redis_thread(cluster, fibers_max,
+			thread = new redis_thread(i, cluster, fibers_max,
 				stack_size, oper_count, cmd);
 		} else {
-			thread = new redis_thread(addr, passwd, conn_timeout,
-				rw_timeout, fibers_max, stack_size,
-				oper_count, cmd);
+			thread = new redis_thread(i, addr, passwd,
+				conn_timeout, rw_timeout, fibers_max,
+				stack_size, oper_count, cmd);
 		}
 		thread->set_detachable(false);
 		thread->set_stacksize(stack_size * (fibers_max + 6400));

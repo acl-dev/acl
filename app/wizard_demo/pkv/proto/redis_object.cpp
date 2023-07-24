@@ -12,6 +12,10 @@ redis_object::redis_object(redis_object* parent) {
     parent_ = parent ? parent : this;
 }
 
+redis_object::~redis_object() {
+    dbuf_->destroy();
+}
+
 const char* redis_object::get_cmd() const {
     if (me_ == nullptr) {
         return nullptr;
