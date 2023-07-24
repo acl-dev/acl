@@ -2,11 +2,11 @@
 
 static acl::string __keypre("test_key_cluster");
 
-static bool test_del(acl::redis_key& cmd, int i)
+static bool test_del(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
 
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 	int ret = cmd.del(key.c_str());
 	if (ret < 0) {
 		printf("del key: %s error: %s\r\n",
@@ -18,11 +18,11 @@ static bool test_del(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_expire(acl::redis_key& cmd, int i)
+static bool test_expire(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
 
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 	if (cmd.expire(key.c_str(), 100) < 0) {
 		printf("expire key: %s error: %s\r\n",
 			key.c_str(), cmd.result_error());
@@ -34,12 +34,12 @@ static bool test_expire(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_ttl(acl::redis_key& cmd, int i)
+static bool test_ttl(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
 	int ttl;
 
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 	if ((ttl = cmd.ttl(key.c_str())) < 0) {
 		printf("get ttl key: %s error: %s\r\n",
 			key.c_str(), cmd.result_error());
@@ -50,11 +50,11 @@ static bool test_ttl(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_exists(acl::redis_key& cmd, int i)
+static bool test_exists(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
 
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 	if (!cmd.exists(key.c_str())) {
 		if (i < 10) {
 			printf("no exists key: %s\r\n", key.c_str());
@@ -67,11 +67,11 @@ static bool test_exists(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_type(acl::redis_key& cmd, int i)
+static bool test_type(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
 
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 	acl::redis_key_t ret = cmd.type(key.c_str());
 	if (ret == acl::REDIS_KEY_NONE) {
 		printf("unknown type key: %s\r\n", key.c_str());
@@ -82,10 +82,10 @@ static bool test_type(acl::redis_key& cmd, int i)
 	return true;
 }
 
-static bool test_set(acl::redis_string& cmd, int i)
+static bool test_set(acl::redis_string& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 
 	acl::string value;
 	value.format("value_%s", key.c_str());
@@ -99,10 +99,10 @@ static bool test_set(acl::redis_string& cmd, int i)
 	return ret;
 }
 
-static bool test_get(acl::redis_string& cmd, int i)
+static bool test_get(acl::redis_string& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
-	key.format("%s_%d", __keypre.c_str(), i);
+	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 
 	acl::string value;
 
@@ -115,10 +115,10 @@ static bool test_get(acl::redis_string& cmd, int i)
 	return ret;
 }
 
-static bool test_hmset(acl::redis_hash& cmd, int i)
+static bool test_hmset(acl::redis_hash& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
-	key.format("hash-%s-%d", __keypre.c_str(), i);
+	key.format("hash-%s-%zd-%zd-%d", __keypre.c_str(), tid, fid, i);
 
 	std::map<acl::string, acl::string> attrs;
 	attrs["name1"] = "value1";
@@ -135,10 +135,10 @@ static bool test_hmset(acl::redis_hash& cmd, int i)
 	return true;
 }
 
-static bool test_hmget(acl::redis_hash& cmd, int i)
+static bool test_hmget(acl::redis_hash& cmd, size_t tid, size_t fid, int i)
 {
 	acl::string key;
-	key.format("hash-%s-%d", __keypre.c_str(), i);
+	key.format("hash-%s-%zd-%zd-%d", __keypre.c_str(), tid, fid, i);
 
 	std::vector<acl::string> names;
 	names.push_back("name1");
@@ -170,8 +170,11 @@ static int __threads_exit = 0;
 class test_fiber : public acl::fiber
 {
 public:
-	test_fiber(acl::redis_client_pipeline& conns, const char* cmd, int n)
-	: conns_(conns)
+	test_fiber(size_t tid, size_t fid, acl::redis_client_pipeline& conns,
+		const char* cmd, int n)
+	: tid_(tid)
+	, fid_(fid)
+	, conns_(conns)
 	, cmd_(cmd)
 	, n_(n)
 	{}
@@ -188,35 +191,35 @@ protected:
 
 		for (int i = 0; i < n_; i++) {
 			if (cmd_ == "set") {
-				ret = test_set(redis, i);
+				ret = test_set(redis, tid_, fid_, i);
 			} else if (cmd_ == "get") {
-				ret = test_get(redis, i);
+				ret = test_get(redis, tid_, fid_, i);
 			} else if (cmd_ == "del") {
-				ret = test_del(redis, i);
+				ret = test_del(redis, tid_, fid_, i);
 			} else if (cmd_ == "expire") {
-				ret = test_expire(redis, i);
+				ret = test_expire(redis, tid_, fid_, i);
 			} else if (cmd_ == "ttl") {
-				ret = test_ttl(redis, i);
+				ret = test_ttl(redis, tid_, fid_, i);
 			} else if (cmd_ == "exists") {
-				ret = test_exists(redis, i);
+				ret = test_exists(redis, tid_, fid_, i);
 			} else if (cmd_ == "type") {
-				ret = test_type(redis, i);
+				ret = test_type(redis, tid_, fid_, i);
 			} else if (cmd_ == "all") {
-				if (!test_set(redis, i)
-				    || !test_get(redis, i)
-				    || !test_exists(redis, i)
-				    || !test_type(redis, i)
-				    || !test_expire(redis, i)
-				    || !test_ttl(redis, i)
-				    || !test_del(redis, i)) {
+				if (!test_set(redis, tid_, fid_, i)
+				    || !test_get(redis, tid_, fid_, i)
+				    || !test_exists(redis, tid_, fid_, i)
+				    || !test_type(redis, tid_, fid_, i)
+				    || !test_expire(redis, tid_, fid_, i)
+				    || !test_ttl(redis, tid_, fid_, i)
+				    || !test_del(redis, tid_, fid_, i)) {
 					ret = false;
 				} else {
 					ret = true;
 				}
 			} else if (cmd_ == "hmset") {
-				ret = test_hmset(redis, i);
+				ret = test_hmset(redis, tid_, fid_, i);
 			} else if (cmd_ == "hmget") {
-				ret = test_hmget(redis, i);
+				ret = test_hmget(redis, tid_, fid_, i);
 			} else {
 				printf("unknown cmd: %s\r\n", cmd_.c_str());
 				break;
@@ -241,6 +244,8 @@ protected:
 	}
 
 private:
+	size_t tid_;
+	size_t fid_;
 	acl::redis_client_pipeline& conns_;
 	acl::string cmd_;
 	//acl::redis redis;
@@ -250,10 +255,12 @@ private:
 class test_thread : public acl::thread
 {
 public:
-	test_thread(acl::locker& locker, acl::redis_client_pipeline& conns,
-		const char* cmd, int n, size_t nfibers, size_t stack_size,
-		bool share_stack)
-	: locker_(locker)
+	test_thread(size_t tid, acl::locker& locker,
+		acl::redis_client_pipeline& conns,
+		const char* cmd, int n, size_t nfibers,
+		size_t stack_size, bool share_stack)
+	: tid_(tid)
+	, locker_(locker)
 	, conns_(conns)
 	, cmd_(cmd)
 	, n_(n)
@@ -269,7 +276,7 @@ protected:
 	{
 		std::vector<acl::fiber*> fibers;
 		for (size_t i = 0; i < nfibers_; i++) {
-			test_fiber* fb = new test_fiber(conns_, cmd_, n_);
+			test_fiber* fb = new test_fiber(tid_, i, conns_, cmd_, n_);
 			fibers.push_back(fb);
 			fb->start(stack_size_, share_stack_);
 		}
@@ -288,6 +295,7 @@ protected:
 	}
 
 private:
+	size_t tid_;
 	acl::locker& locker_;
 	acl::redis_client_pipeline& conns_;
 	acl::string cmd_;
@@ -393,8 +401,9 @@ int main(int argc, char* argv[])
 
 	std::vector<test_thread*> threads;
 	for (int i = 0; i < max_threads; i++) {
-		test_thread* thread = new test_thread(locker, *pipeline,
-			cmd.c_str(), n, nfibers, stack_size, share_stack);
+		test_thread* thread = new test_thread((size_t) i, locker,
+			*pipeline, cmd.c_str(), n, nfibers,
+			stack_size, share_stack);
 		threads.push_back(thread);
 		thread->set_detachable(true);
 		thread->start();

@@ -246,8 +246,9 @@ redis_result* redis_client::get_string(socket_stream& conn, dbuf_pool* dbuf)
 	redis_result* rr = new(dbuf) redis_result(dbuf);
 	rr->set_type(REDIS_RESULT_STRING);
 	int len = atoi(sbuf.c_str());
-	if (len < 0)
+	if (len <= 0) {
 		return rr;
+	}
 
 	char* buf;
 
@@ -315,8 +316,9 @@ redis_result* redis_client::get_array(socket_stream& conn, dbuf_pool* dbuf)
 	redis_result* rr = new(dbuf) redis_result(dbuf);
 	rr->set_type(REDIS_RESULT_ARRAY);
 	int count = atoi(buf.c_str());
-	if (count <= 0)
+	if (count <= 0) {
 		return rr;
+	}
 
 	rr->set_size((size_t) count);
 

@@ -3,7 +3,7 @@ CC      = g++
 CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Wno-long-long \
 -Wpointer-arith -Werror -Wshadow -O3 \
--D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO -std=c++11
+-D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO -std=c++17
 
 #-Waggregate-return
 ###########################################################
@@ -65,10 +65,11 @@ endif
 
 CFLAGS += -I. -I../.. -I../../../include -I../../../../lib_acl/include -I../../../../lib_protocol/include
 EXTLIBS =
-CFLAGS += -I/home/zsx/download/db/rocksdb/include
+#CFLAGS += -I/home/zsx/download/db/rocksdb/include
 #EXTLIBS = -L/home/zsx/download/db/rocksdb/build -lrocksdb -Wl,-rpath=/home/zsx/download/db/rocksdb/build \
 # -L/home/zsx/download/snappy/build -lsnappy
-EXTLIBS = /home/zsx/download/db/rocksdb/build/librocksdb.a
+#EXTLIBS = /home/zsx/download/db/rocksdb/build/librocksdb.a
+EXTLIBS = -lrocksdb -Wl,-rpath,/usr/local/lib
 LDFLAGS = -L../../../lib -l_acl_cpp -L../../../../lib_protocol/lib -l_protocol -L../../../../lib_acl/lib -l_acl \
 	$(EXTLIBS) $(SYSLIB)
 

@@ -18,25 +18,24 @@ static double stamp_sub(const struct timeval *from,
 	return (res.tv_sec * 1000.0 + res.tv_usec/1000.0);
 }
 
-static int redis_set(acl::redis& cmd, const struct timeval& begin, int count)
+static int redis_set(int tid, int fid, acl::redis& cmd,
+	const struct timeval& begin, int count)
 {
 	acl::string key, val;
 	int i = 0;
 
 	for (; i < count; i++) {
-		key.format("key-%lu-%d-%d", acl::thread::self(),
-			acl_fiber_self(), i);
-		val.format("val-%lu-%d-%d", acl::thread::self(),
-			acl_fiber_self(), i);
+		key.format("key-%d-%d-%d", tid, fid, i);
+		val.format("val-%d-%d-%d", tid, fid, i);
 
 		if (cmd.set(key, val) == false) {
 			printf("fiber-%d: set error: %s, key: %s\r\n",
-				acl_fiber_self(), cmd.result_error(),
+				acl::fiber::self(), cmd.result_error(),
 				key.c_str());
 			break;
 		} else if (i < 5) {
 			printf("fiber-%d: set ok, key: %s\r\n",
-				acl_fiber_self(), key.c_str());
+				acl::fiber::self(), key.c_str());
 		}
 
 		cmd.clear();
@@ -50,20 +49,24 @@ static int redis_set(acl::redis& cmd, const struct timeval& begin, int count)
 	return i;
 }
 
-static int redis_get(acl::redis& cmd, const struct timeval& begin, int count)
+static int redis_get(int tid, int fid, acl::redis& cmd,
+	const struct timeval& begin, int count)
 {
 	acl::string key, val;
 	int i = 0;
 	for (; i < count; i++) {
-		key.format("key-%lu-%d-%d", acl::thread::self(),
-			acl_fiber_self(), i);
+		key.format("key-%d-%d-%d", tid, fid, i);
 
 		if (cmd.get(key, val) == false) {
 			printf("fiber-%d: get error: %s, key: %s\r\n",
-				acl_fiber_self(), cmd.result_error(),
+				acl::fiber::self(), cmd.result_error(),
 				key.c_str());
 			break;
+		} else if (i < 5) {
+			printf("fiber-%d: get ok, key: %s, val: %s\r\n",
+				acl::fiber::self(), key.c_str(), val.c_str());
 		}
+
 		val.clear();
 		cmd.clear();
 	}
@@ -76,17 +79,17 @@ static int redis_get(acl::redis& cmd, const struct timeval& begin, int count)
 	return i;
 }
 
-static int redis_del(acl::redis& cmd, const struct timeval& begin, int count)
+static int redis_del(int tid, int fid, acl::redis& cmd,
+	const struct timeval& begin, int count)
 {
 	acl::string key;
 	int i = 0;
 	for (; i < count; i++) {
-		key.format("key-%lu-%d-%d", acl::thread::self(),
-			acl_fiber_self(), i);
+		key.format("key-%d-%d-%d", tid, fid, i);
 
 		if (cmd.del_one(key) < 0) {
 			printf("fiber-%d: del error: %s, key: %s\r\n",
-				acl_fiber_self(), cmd.result_error(),
+				acl::fiber::self(), cmd.result_error(),
 				key.c_str());
 			break;
 		}
@@ -102,39 +105,64 @@ static int redis_del(acl::redis& cmd, const struct timeval& begin, int count)
 	return i;
 }
 
-void redis_thread::fiber_redis(ACL_FIBER *, void *ctx)
-{
-	redis_thread* thread = (redis_thread*) ctx;
-	acl::redis_client_cluster *cluster = &thread->get_cluster();
-	acl::redis redis(cluster);
-	int oper_count = thread->get_oper_count();
-	const acl::string& cmd = thread->get_cmd();
+///////////////////////////////////////////////////////////////////////////////
 
-	int n = 0;
-	struct timeval begin;
-
-	gettimeofday(&begin, NULL);
-	if (cmd == "set" || cmd == "all") {
-		n += ::redis_set(redis, begin, oper_count);
+class fiber_redis : public acl::fiber {
+public:
+	fiber_redis(int fid, redis_thread& thread)
+	: fid_(fid), thread_(thread)
+	{
 	}
 
-	if (cmd == "get" || cmd == "all") {
-		gettimeofday(&begin, NULL);
-		n += redis_get(redis, begin, oper_count);
+private:
+	~fiber_redis() {}
+
+protected:
+	// @override
+	void run() {
+		acl::redis_client_cluster *cluster = &thread_.get_cluster();
+		acl::redis redis(cluster);
+		int oper_count = thread_.get_oper_count();
+		const acl::string& cmd = thread_.get_cmd();
+
+		int n = 0;
+		struct timeval begin;
+
+		if (cmd == "set" || cmd == "all") {
+			gettimeofday(&begin, NULL);
+			n += redis_set(thread_.get_tid(), fid_, redis,
+				begin, oper_count);
+		}
+
+		if (cmd == "get" || cmd == "all") {
+			gettimeofday(&begin, NULL);
+			n += redis_get(thread_.get_tid(), fid_, redis,
+				begin, oper_count);
+		}
+
+		if (cmd == "del" || cmd == "all") {
+			gettimeofday(&begin, NULL);
+			n += redis_del(thread_.get_tid(), fid_, redis,
+				begin, oper_count);
+		}
+
+		thread_.fiber_dec(n);
+
+		delete this;
 	}
 
-	if (cmd == "del" || cmd == "all") {
-		gettimeofday(&begin, NULL);
-		n += redis_del(redis, begin, oper_count);
-	}
+private:
+	int fid_;
+	redis_thread& thread_;
+};
 
-	thread->fiber_dec(n);
-}
+///////////////////////////////////////////////////////////////////////////////
 
-redis_thread::redis_thread(const char* addr, const char* passwd,
+redis_thread::redis_thread(int tid, const char* addr, const char* passwd,
 	int conn_timeout, int rw_timeout, int fibers_max, int stack_size,
 	int oper_count, const char* cmd)
-: addr_(addr)
+: tid_(tid)
+, addr_(addr)
 , passwd_(passwd)
 , conn_timeout_(conn_timeout)
 , rw_timeout_(rw_timeout)
@@ -152,9 +180,10 @@ redis_thread::redis_thread(const char* addr, const char* passwd,
 	cluster_->set_password("default", passwd_);
 }
 
-redis_thread::redis_thread(acl::redis_client_cluster& cluster, int fibers_max,
-	int stack_size, int oper_count, const char* cmd)
-: fibers_max_(fibers_max)
+redis_thread::redis_thread(int tid, acl::redis_client_cluster& cluster,
+	int fibers_max, int stack_size, int oper_count, const char* cmd)
+: tid_(tid)
+, fibers_max_(fibers_max)
 , fibers_cnt_(fibers_max)
 , stack_size_(stack_size)
 , oper_count_(oper_count)
@@ -174,10 +203,11 @@ void* redis_thread::run(void)
 	gettimeofday(&begin_, NULL);
 
 	for (int i = 0; i < fibers_max_; i++) {
-		acl_fiber_create(fiber_redis, this, stack_size_);
+		acl::fiber* fb = new fiber_redis(i, *this);
+		fb->start();
 	}
 
-	acl_fiber_schedule();
+	acl::fiber::schedule();
 
 	return NULL;
 }

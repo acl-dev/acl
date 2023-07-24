@@ -1,0 +1,17 @@
+*8
+$5
+HMSET
+$8
+hash-key
+$6
+field1
+$6
+vaule1
+$6
+field2
+$6
+vaule2
+$6
+field3
+$6
+vaule3
