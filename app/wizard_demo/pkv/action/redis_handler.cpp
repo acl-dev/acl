@@ -25,7 +25,7 @@ bool redis_handler::handle() {
         return true;
     }
 
-    //if (objs.size() >= 2) { printf(">>>objs=%zd\r\n", objs.size()); }
+    //if (objs.size() >= 20) { printf(">>>objs=%zd\r\n", objs.size()); }
 
     for (const auto& obj : objs) {
         if (!handle_one(*obj)) {

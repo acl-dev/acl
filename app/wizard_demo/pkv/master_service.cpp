@@ -41,7 +41,7 @@ void master_service::on_accept(acl::socket_stream& conn) {
     //conn.set_rw_timeout(var_cfg_io_timeout);
 
     pkv::redis_coder parser;
-    char buf[20480];
+    char buf[128000];
 
     while(true) {
         int ret = conn.read(buf, sizeof(buf) - 1, false);
