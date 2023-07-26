@@ -386,8 +386,7 @@ bool redis_object::to_string(std::string& out) const {
 #endif
 
     if (!objs_.empty()) {
-        out += objs_.size();
-        out += CRLF;
+        out.append("*").append(std::to_string(objs_.size())).append(CRLF);
 
         for (const auto& obj : objs_) {
             if (!obj->to_string(out)) {
@@ -400,22 +399,17 @@ bool redis_object::to_string(std::string& out) const {
 
     switch (type_) {
     case REDIS_OBJ_STATUS:
-        out += "+";
-        out.append(buf_.c_str(), buf_.size());
-        out.append(CRLF);
+        out.append("+").append(buf_.c_str(), buf_.size()).append(CRLF);
         break;
     case REDIS_OBJ_ERROR:
-        out.append("-");
-        out.append(buf_.c_str(), buf_.size());
-        out.append(CRLF);
+        out.append("-").append(buf_.c_str(), buf_.size()).append(CRLF);
         break;
     case REDIS_OBJ_INTEGER:
         out.append(":").append(buf_.c_str(), buf_.size()).append(CRLF);
         break;
     case REDIS_OBJ_STRING:
-        out.append("$");
-        out += buf_.size();
-        out.append(CRLF).append(buf_.c_str(), buf_.size()).append(CRLF);
+        out.append("$").append(std::to_string(buf_.size())).append(CRLF)
+            .append(buf_.c_str(), buf_.size()).append(CRLF);
         break;
     //case acl::REDIS_RESULT_ARRAY:
     //    break;
@@ -442,9 +436,7 @@ redis_object& redis_object::set_error(const std::string& data,
 
 redis_object& redis_object::set_number(int n, bool return_parent) {
     type_ = REDIS_OBJ_INTEGER;
-
-    std::string buf = std::to_string(n);
-    buf_ = buf;
+    buf_ = std::to_string(n);
     return return_parent ? *parent_ : *this;
 }
 

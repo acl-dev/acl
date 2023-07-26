@@ -125,7 +125,7 @@ bool test_redis_parse_once(const char* filepath) {
         return false;
     }
 
-    if (out != buf.c_str()) {
+    if (out != std::string(buf.c_str())) {
         printf(">>>%s: build failed<<<\r\n", __func__);
         printf("output:\r\n|%s|\r\n", out.c_str());
         printf("input:\r\n|%s|\r\n", buf.c_str());
@@ -175,7 +175,7 @@ bool test_redis_parse_stream(const char* filepath) {
         return false;
     }
 
-    if (out != buf.c_str()) {
+    if (out != std::string(buf.c_str())) {
         printf("%s\r\n", out.c_str());
         printf(">>%s(%d): build failed<<\r\n", __func__, __LINE__);
         return false;

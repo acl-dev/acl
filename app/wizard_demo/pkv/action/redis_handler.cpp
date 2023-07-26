@@ -115,7 +115,7 @@ bool redis_handler::set(const redis_object &obj) {
         return false;
     }
 
-#if 1
+#if 0
     std::string buff;
     coder_.create_object().set_string(value);
     coder_.to_string(buff);
