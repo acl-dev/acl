@@ -88,11 +88,19 @@ add_definitions(
 #find_library(fiber_cpp_lib fiber_cpp PATHS /usr/lib /usr/local/lib)
 #find_library(fiber_lib fiber PATHS /usr/lib /usr/local/lib)
 
-#find_library(rocksdb_lib rocksdb PATHS /usr/lib /usr/local/lib)
-
 set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a)
 set(fiber ${home_path}/lib_fiber/lib/libfiber.a)
-set(rocksdb /usr/local/lib/librocksdb.a)
+
+find_library(rocksdb_lib rocksdb PATHS /usr/lib /usr/local/lib)
+#set(rocksdb /usr/local/lib/librocksdb.a)
+set(rocksdb -lrocksdb)
+
+find_library(jemalloc jemalloc PATHS /usr/lib /usr/local/lib)
+set(jemalloc -ljemalloc)
+
+#set(wt -lwiredtiger)
+#set(uring -luring)
+#set(iconv -liconv)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 #    set(lib_all  ${lib_global} ${lib_rpc} ${fiber_cpp_lib} ${acl_lib} ${fiber_lib}
@@ -101,7 +109,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 #    set(lib_all  ${lib_global} ${lib_rpc} ${fiber_cpp_lib} ${acl_lib} ${fiber_lib}
     set(lib_all ${acl_all}
-        ${rocksdb} -lwiredtiger ${fiber} -luring -liconv -lz -lpthread -ldl)
+        ${rocksdb} ${wt} ${fiber} ${uring} ${iconv} ${jemalloc}  -lz -lpthread -ldl)
 endif()
 
 set(output_path ${CMAKE_CURRENT_SOURCE_DIR})

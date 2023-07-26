@@ -7,25 +7,51 @@
 
 namespace pkv {
 
-redis_object::redis_object(redis_object* parent) {
-    dbuf_   = new (1) acl::dbuf_pool();
-    parent_ = parent ? parent : this;
+redis_object::redis_object(std::vector<redis_object*>& cache, size_t cache_max)
+: parent_(this)
+, cache_max_(cache_max)
+, cache_(cache)
+{
 }
 
 redis_object::~redis_object() {
-    dbuf_->destroy();
+    for (auto obj : objs_) {
+        delete obj;
+    }
+}
+
+void redis_object::set_parent(redis_object* parent) {
+	if (parent) {
+		parent_ = parent;
+	}
+}
+
+void redis_object::reset() {
+    for (auto obj : objs_) {
+        if (cache_.size() < cache_max_) {
+            obj->reset();
+            cache_.emplace_back(obj);
+	} else {
+            delete obj;
+	}
+    }
+
+    status_ = redis_s_begin;
+    type_   = REDIS_OBJ_UNKOWN;
+    parent_ = this;
+    obj_    = nullptr;
+    cnt_    = 0;
+
+    objs_.clear();
+    buf_.clear();
 }
 
 const char* redis_object::get_cmd() const {
-    if (me_ == nullptr) {
-        return nullptr;
+    if (type_ == REDIS_OBJ_STRING) {
+        return buf_.c_str();
     }
 
-    if (me_->get_type() == acl::REDIS_RESULT_STRING) {
-        return me_->get(0);
-    }
-
-    if (objs_.empty() || me_->get_type() != acl::REDIS_RESULT_ARRAY) {
+    if (objs_.empty() || type_ != REDIS_OBJ_ARRAY) {
         return nullptr;
     }
 
@@ -33,8 +59,8 @@ const char* redis_object::get_cmd() const {
 }
 
 const char* redis_object::get_str() const {
-    if (me_->get_type() == acl::REDIS_RESULT_STRING) {
-        return me_->get(0);
+    if (type_ == REDIS_OBJ_STRING) {
+        return buf_.c_str();
     }
 
     return nullptr;
@@ -97,11 +123,17 @@ const char* redis_object::parse_object(const char* data, size_t& len) {
 
     if (objs_.size() == (size_t) cnt_) {
         obj_ = nullptr;
-        cnt_ = 0;
+        //cnt_ = 0;
         status_ = redis_s_finish;
+    } else if (cache_.empty()) {
+	obj_ = new redis_object(cache_, cache_max_);
+    	obj_->set_parent(this);
     } else {
-        obj_ = std::make_shared<redis_object>(this);
+        obj_ = cache_.back();
+    	obj_->set_parent(this);
+        cache_.pop_back();
     }
+
     return data;
 }
 
@@ -138,7 +170,7 @@ const char* redis_object::parse_begin(const char* data, size_t& len) {
 
 const char* redis_object::parse_status(const char* data, size_t& len) {
     bool found = false;
-    data = get_line(data, len, found);
+    data = get_line(data, len, buf_, found);
     if (!found) {
         assert(len == 0);
         return data;
@@ -149,19 +181,14 @@ const char* redis_object::parse_status(const char* data, size_t& len) {
         return data;
     }
 
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_STATUS);
-    me_->set_size(1);
-    put_data(dbuf_, me_, buf_.c_str(), buf_.length());
-    buf_.clear();
-
+    type_ = REDIS_OBJ_STATUS;
     status_ = redis_s_finish;
     return data;
 }
 
 const char* redis_object::parse_error(const char* data, size_t& len) {
     bool found = false;
-    data = get_line(data, len, found);
+    data = get_line(data, len, buf_, found);
     if (!found) {
         assert(len == 0);
         return data;
@@ -172,19 +199,14 @@ const char* redis_object::parse_error(const char* data, size_t& len) {
         return data;
     }
 
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_ERROR);
-    me_->set_size(1);
-    put_data(dbuf_, me_, buf_.c_str(), buf_.length());
-    buf_.clear();
-
+    type_ = REDIS_OBJ_ERROR;
     status_ = redis_s_finish;
     return data;
 }
 
 const char* redis_object::parse_number(const char* data, size_t& len) {
     bool found = false;
-    data = get_line(data, len, found);
+    data = get_line(data, len, buf_, found);
     if (!found) {
         assert(len == 0);
         return data;
@@ -195,12 +217,7 @@ const char* redis_object::parse_number(const char* data, size_t& len) {
         return data;
     }
 
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_INTEGER);
-    me_->set_size(1);
-    put_data(dbuf_, me_, buf_.c_str(), buf_.length());
-    buf_.clear();
-
+    type_ = REDIS_OBJ_INTEGER;
     status_ = redis_s_finish;
     return data;
 }
@@ -213,43 +230,33 @@ const char* redis_object::parse_strlen(const char* data, size_t& len) {
         return data;
     }
 
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_STRING);
-
     if (cnt_ <= 0) {
         status_ = redis_s_finish;
         return data;
     }
 
-    me_->set_size((size_t) cnt_);
-    buf_.clear();
-
+    type_ = REDIS_OBJ_STRING;
     status_ = redis_s_string;
     return data;
 }
 
 const char* redis_object::parse_string(const char* data, size_t& len) {
-    assert (me_ != nullptr);
-
+    buf_.reserve((size_t) cnt_);
     data = get_data(data, len, (size_t) cnt_);
     if (buf_.size() == (size_t) cnt_) {
         status_ = redis_s_strend;
-        put_data(dbuf_, me_, buf_.c_str(), buf_.length());
-        buf_.clear();
-        cnt_ = 0;
     }
 
     return data;
 }
 
 const char* redis_object::parse_strend(const char* data, size_t& len) {
-    assert (me_ != nullptr);
-
     bool found = false;
-    data = get_line(data, len, found);
+    std::string buf;
+    data = get_line(data, len, buf, found);
 
     // If the buf_ not empty, some data other '\r\n' got.
-    if (!buf_.empty()) {
+    if (!buf.empty()) {
         status_ = redis_s_null;
         return data;
     }
@@ -271,24 +278,27 @@ const char* redis_object::parse_arlen(const char* data, size_t& len) {
         return data;
     }
 
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_ARRAY);
-
     if (cnt_ <= 0) {
         status_ = redis_s_finish;
         return data;
     }
 
-    me_->set_size((size_t) cnt_);
-
-    buf_.clear();
+    type_ = REDIS_OBJ_ARRAY;
     status_ = redis_s_array;
-    obj_ = std::make_shared<redis_object>(this);
+
+    if (cache_.empty()) {
+        obj_ = new redis_object(cache_, cache_max_);
+    	obj_->set_parent(this);
+    } else {
+        obj_ = cache_.back();
+    	obj_->set_parent(this);
+	cache_.pop_back();
+    }
+
     return data;
 }
 
 const char* redis_object::parse_array(const char* data, size_t& len) {
-    assert(me_ != nullptr);
     assert(obj_ != nullptr);
 
     return parse_object(data, len);
@@ -299,16 +309,30 @@ const char* redis_object::get_data(const char* data, size_t& len, size_t want) {
     assert(n < want);
 
     want -= n;
+
+#if 1
+    if (want > len) {
+        want = len;
+	len = 0;
+    } else {
+        len -= want;
+    }
+
+    buf_.append(data, want);
+    data += want;
+#else
     for (size_t i = 0; i < want && len > 0; i++) {
         buf_.push_back(*data++);
         len--;
     }
+#endif
+
     return data;
 }
 
 const char* redis_object::get_length(const char* data, size_t& len,
       int& res, bool& found) {
-    data = get_line(data, len, found);
+    data = get_line(data, len, buf_, found);
     if (!found) {
         assert(len == 0);
         return data;
@@ -331,7 +355,8 @@ const char* redis_object::get_length(const char* data, size_t& len,
     return data;
 }
 
-const char* redis_object::get_line(const char* data, size_t& len, bool& found) {
+const char* redis_object::get_line(const char* data, size_t& len,
+	std::string& buf, bool& found) {
     while (len > 0) {
         switch (*data) {
         case '\r':
@@ -344,23 +369,12 @@ const char* redis_object::get_line(const char* data, size_t& len, bool& found) {
             found = true;
             return data;
         default:
-            buf_.push_back(*data++);
+            buf.push_back(*data++);
             len--;
             break;
         }
     }
     return data;
-}
-
-void redis_object::put_data(acl::dbuf_pool* dbuf, acl::redis_result* rr,
-      const char* data, size_t len) {
-    char* buf = (char*) dbuf->dbuf_alloc(len + 1);
-    if (len > 0) {
-        memcpy(buf, data, len);
-    }
-
-    buf[len] = 0;
-    rr->put(buf, len);
 }
 
 bool redis_object::to_string(acl::string& out) const {
@@ -381,83 +395,80 @@ bool redis_object::to_string(acl::string& out) const {
         }
     }
 
-    if (me_ == nullptr) {
-        return false;
-    }
+    //assert(!buf_.empty());
 
-    switch (me_->get_type()) {
-    case acl::REDIS_RESULT_STATUS:
-        out.format_append("+%s%s", me_->get_status(), CRLF);
+    switch (type_) {
+    case REDIS_OBJ_STATUS:
+        out.format_append("+%s%s", buf_.c_str(), CRLF);
         break;
-    case acl::REDIS_RESULT_ERROR:
-        out.format_append("-%s%s", me_->get_error(), CRLF);
+    case REDIS_OBJ_ERROR:
+        out.format_append("-%s%s", buf_.c_str(), CRLF);
         break;
-    case acl::REDIS_RESULT_INTEGER:
-        out.format_append(":%lld%s", me_->get_integer64(), CRLF);
+    case REDIS_OBJ_INTEGER:
+        out.format_append(":%s%s", buf_.c_str(), CRLF);
         break;
-    case acl::REDIS_RESULT_STRING:
-        out.format_append("$%zd%s", me_->get_length(), CRLF);
-        me_->argv_to_string(out, false);
-        out += CRLF;
+    case REDIS_OBJ_STRING:
+        out.format_append("$%zd%s%s%s", buf_.size(), CRLF, buf_.c_str(), CRLF);
         break;
     //case acl::REDIS_RESULT_ARRAY:
     //    break;
     default:
         break;
     }
+
     return true;
 }
 
 redis_object& redis_object::set_status(const std::string& data,
       bool return_parent) {
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_STATUS);
-    me_->set_size(1);
-    put_data(dbuf_, me_, data.c_str(), data.length());
+    type_ = REDIS_OBJ_STATUS;
+    buf_ = data;
     return return_parent ? *parent_ : *this;
 }
 
 redis_object& redis_object::set_error(const std::string& data,
       bool return_parent) {
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_ERROR);
-    me_->set_size(1);
-    put_data(dbuf_, me_, data.c_str(), data.length());
+    type_ = REDIS_OBJ_ERROR;
+    buf_ = data;
     return return_parent ? *parent_ : *this;
 }
 
 redis_object& redis_object::set_number(int n, bool return_parent) {
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_INTEGER);
-    me_->set_size(1);
+    type_ = REDIS_OBJ_INTEGER;
 
     std::string buf = std::to_string(n);
-    put_data(dbuf_, me_, buf.c_str(), buf.length());
+    buf_ = buf;
     return return_parent ? *parent_ : *this;
 }
 
 redis_object& redis_object::set_string(const std::string &data,
       bool return_parent) {
-    me_ = new(dbuf_) acl::redis_result(dbuf_);
-    me_->set_type(acl::REDIS_RESULT_STRING);
-    me_->set_size(data.size());
+    type_ = REDIS_OBJ_STRING;
     if (!data.empty()) {
-        put_data(dbuf_, me_, data.c_str(), data.length());
+        buf_ = data;
     }
     return return_parent ? *parent_ : *this;
 }
 
 redis_object& redis_object::create_child() {
-    auto obj = std::make_shared<redis_object>(this);
-    objs_.emplace_back(obj);
-
-    if (me_ == nullptr) {
-        // The last one is NULL.
-        me_ = new(dbuf_) acl::redis_result(dbuf_);
-        me_->set_type(acl::REDIS_RESULT_ARRAY);
+    redis_object* obj;
+    if (cache_.empty()) {
+        obj = new redis_object(cache_, cache_max_);
+    	obj->set_parent(this);
+        objs_.emplace_back(obj);
+    } else {
+        obj = cache_.back();
+    	obj->set_parent(this);
+	cache_.pop_back();
+        objs_.emplace_back(obj);
     }
 
-    me_->set_size(objs_.size());
+    if (obj_ == nullptr) {
+        // The last one is NULL.
+        type_ = REDIS_OBJ_ARRAY;
+    }
+
+    cnt_ = objs_.size();
     return *obj;
 }
 

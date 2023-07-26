@@ -7,11 +7,33 @@
 
 namespace pkv {
 
-redis_coder::redis_coder() {
-    curr_ = std::make_shared<redis_object>(nullptr);
+redis_coder::redis_coder(size_t cache_max) {
+    cache_max_ = cache_max;
+    curr_ = new redis_object(cache_, cache_max_);
+}
+
+redis_coder::~redis_coder() {
+    for (auto obj : objs_) {
+        delete obj;
+    }
+
+    for (auto obj : cache_) {
+        delete obj;
+    }
+
+    delete curr_;
 }
 
 void redis_coder::clear() {
+    for (auto obj : objs_) {
+        if (cache_.size() < cache_max_) {
+            obj->reset();
+            cache_.emplace_back(obj);
+	} else {
+            delete obj; 	
+	}
+    }
+
     objs_.clear();
 }
 
@@ -19,8 +41,14 @@ const char* redis_coder::update(const char* data, size_t& len) {
     while (len > 0) {
         data = curr_->update(data, len);
         if (curr_->finish()) {
-            objs_.push_back(curr_);
-            curr_ = std::make_shared<redis_object>(nullptr);
+            objs_.emplace_back(curr_);
+
+	    if (cache_.empty()) {
+                curr_ = new redis_object(cache_, cache_max_);
+	    } else {
+                curr_ = cache_.back();
+		cache_.pop_back();
+	    }
         } else if (curr_->failed()) {
             break;
         }
@@ -30,7 +58,15 @@ const char* redis_coder::update(const char* data, size_t& len) {
 }
 
 redis_object& redis_coder::create_object() {
-    auto obj = std::make_shared<redis_object>(nullptr);
+    redis_object* obj;
+
+    if (cache_.empty()) {
+    	obj = new redis_object(cache_, cache_max_);
+    } else {
+        obj = cache_.back();
+	cache_.pop_back();
+    }
+
     objs_.emplace_back(obj);
     return *obj;
 }

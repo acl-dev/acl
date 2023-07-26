@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
-	acl_fiber_msg_stdout_enable(1);
+	acl::fiber::stdout_open(true);
 
 	std::vector<acl::thread*> threads;
 	int stack_size = STACK_SIZE;
