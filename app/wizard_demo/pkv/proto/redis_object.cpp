@@ -377,7 +377,7 @@ const char* redis_object::get_line(const char* data, size_t& len,
     return data;
 }
 
-bool redis_object::to_string(acl::string& out) const {
+bool redis_object::to_string(std::string& out) const {
 #define USE_UNIX_CRLF
 #ifdef USE_UNIX_CRLF
 #define CRLF    "\n"
@@ -386,7 +386,8 @@ bool redis_object::to_string(acl::string& out) const {
 #endif
 
     if (!objs_.empty()) {
-        out.format_append("*%zd%s", objs_.size(), CRLF);
+        out += objs_.size();
+        out += CRLF;
 
         for (const auto& obj : objs_) {
             if (!obj->to_string(out)) {
@@ -399,16 +400,22 @@ bool redis_object::to_string(acl::string& out) const {
 
     switch (type_) {
     case REDIS_OBJ_STATUS:
-        out.format_append("+%s%s", buf_.c_str(), CRLF);
+        out += "+";
+        out.append(buf_.c_str(), buf_.size());
+        out.append(CRLF);
         break;
     case REDIS_OBJ_ERROR:
-        out.format_append("-%s%s", buf_.c_str(), CRLF);
+        out.append("-");
+        out.append(buf_.c_str(), buf_.size());
+        out.append(CRLF);
         break;
     case REDIS_OBJ_INTEGER:
-        out.format_append(":%s%s", buf_.c_str(), CRLF);
+        out.append(":").append(buf_.c_str(), buf_.size()).append(CRLF);
         break;
     case REDIS_OBJ_STRING:
-        out.format_append("$%zd%s%s%s", buf_.size(), CRLF, buf_.c_str(), CRLF);
+        out.append("$");
+        out += buf_.size();
+        out.append(CRLF).append(buf_.c_str(), buf_.size()).append(CRLF);
         break;
     //case acl::REDIS_RESULT_ARRAY:
     //    break;

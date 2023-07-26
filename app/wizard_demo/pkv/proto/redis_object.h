@@ -68,7 +68,7 @@ public:
     redis_object& set_string(const std::string& data, bool return_parent = false);
     redis_object& create_child();
 
-    bool to_string(acl::string& out) const;
+    bool to_string(std::string& out) const;
 
 private:
     int status_ = redis_s_begin;

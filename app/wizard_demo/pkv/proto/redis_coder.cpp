@@ -71,7 +71,7 @@ redis_object& redis_coder::create_object() {
     return *obj;
 }
 
-bool redis_coder::to_string(acl::string& out) const {
+bool redis_coder::to_string(std::string& out) const {
     for (const auto& obj : objs_) {
         if (!obj->to_string(out)) {
             return false;
@@ -118,14 +118,14 @@ bool test_redis_parse_once(const char* filepath) {
 
     printf(">>>%s: parse success<<<\r\n", __func__);
 
-    acl::string out;
+    std::string out;
 
     if (!parser.to_string(out)) {
         printf(">>>%s: build failed<<<\r\n", __func__);
         return false;
     }
 
-    if (out != buf) {
+    if (out != buf.c_str()) {
         printf(">>>%s: build failed<<<\r\n", __func__);
         printf("output:\r\n|%s|\r\n", out.c_str());
         printf("input:\r\n|%s|\r\n", buf.c_str());
@@ -134,7 +134,7 @@ bool test_redis_parse_once(const char* filepath) {
         filetmp += ".tmp";
         acl::ofstream fp;
         if (fp.open_trunc(filetmp)) {
-            fp.write(out);
+            fp.write(out.c_str(), out.size());
         }
 
         return false;
@@ -168,14 +168,14 @@ bool test_redis_parse_stream(const char* filepath) {
     }
     printf(">>%s(%d): parse successfully<<<\r\n", __func__, __LINE__);
 
-    acl::string out;
+    std::string out;
 
     if (!parser.to_string(out)) {
         printf(">>%s(%d): build failed<<\r\n", __func__, __LINE__);
         return false;
     }
 
-    if (out != buf) {
+    if (out != buf.c_str()) {
         printf("%s\r\n", out.c_str());
         printf(">>%s(%d): build failed<<\r\n", __func__, __LINE__);
         return false;
@@ -215,7 +215,7 @@ bool test_redis_build() {
         .create_child().set_string("value3", true);
 #endif
 
-    acl::string buf;
+    std::string buf;
     if (builder.to_string(buf)) {
         const char* cmd = obj.get_cmd();
         printf("%s(%d): build redis successfully, cmd=%s\r\n",
