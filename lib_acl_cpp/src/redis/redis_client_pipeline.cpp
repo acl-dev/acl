@@ -73,7 +73,8 @@ bool redis_pipeline_channel::flush_all(void)
 
 #if 0
 	if (msgs_.size() > 10) {
-		logger(">>>messages size is %zd<<<<", msgs_.size());
+		logger(">>>messages size is %zd, buf size=%zd<<<<",
+			msgs_.size(), buf_.size());
 	}
 #endif
 

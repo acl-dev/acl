@@ -4,22 +4,23 @@
 
 #pragma once
 
+#include <vector>
 #include "redis_object.h"
 
 namespace pkv {
 
 class redis_coder {
 public:
-    redis_coder();
-    ~redis_coder() = default;
+    redis_coder(size_t cache_max = 10000);
+    ~redis_coder();
 
     const char* update(const char* data, size_t& len);
 
-    [[nodiscard]] const std::vector<shared_redis>& get_objects() const {
+    [[nodiscard]] const std::vector<redis_object*>& get_objects() const {
         return objs_;
     }
 
-    [[nodiscard]] shared_redis get_curr() const {
+    [[nodiscard]] redis_object* get_curr() const {
         return curr_;
     }
 
@@ -31,8 +32,10 @@ public:
     bool to_string(acl::string& out) const;
 
 private:
-    std::vector<shared_redis> objs_;
-    shared_redis curr_;
+    std::vector<redis_object*> objs_;
+    std::vector<redis_object*> cache_;
+    size_t cache_max_;
+    redis_object* curr_;
 };
 
 bool test_redis_parse(const char* filepath);

@@ -88,7 +88,7 @@ service pkv
 #	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
 	fiber_idle_limit = 0
 #	每个进程启动的线程数
-	fiber_threads = 8
+	fiber_threads = 1
 #	进程运行时所在的路径
 	fiber_queue_dir = {install_path}/var
 #	读写超时时间, 单位为秒
@@ -105,7 +105,7 @@ service pkv
 #	fiber_dispatch_type = default
 
 #	线程的堆栈空间大小，单位为字节
-	fiber_stack_size = 64000
+	fiber_stack_size = 256000
 #	允许访问 udserver 的客户端IP地址范围
 #	fiber_access_allow = 127.0.0.1:255.255.255.255, 127.0.0.1:127.0.0.1
 	fiber_access_allow = all
@@ -144,4 +144,5 @@ service pkv
 #	debug_mem = 1
 #	是否在一个线程中连接读
 #	loop_read = 1
+	buf_size = 8192
 }

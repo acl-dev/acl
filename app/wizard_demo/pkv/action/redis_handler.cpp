@@ -24,6 +24,19 @@ bool redis_handler::handle() {
     if (objs.empty()) {
         return true;
     }
+
+#if 0
+    {
+	acl::string tmp;
+	for (size_t i = 0; i < objs.size(); i++) {
+		tmp += "+OK\r\n";
+	}
+	return conn_.write(tmp.c_str(), tmp.size()) == (int) tmp.size();
+    }
+#endif
+
+    //if (objs.size() >= 20) { printf(">>>objs=%zd\r\n", objs.size()); }
+
     for (const auto& obj : objs) {
         if (!handle_one(*obj)) {
             return false;
@@ -32,8 +45,15 @@ bool redis_handler::handle() {
 
     acl::string buf;
     if (!builder_.to_string(buf)) {
+        builder_.clear();
         return false;
     }
+
+    builder_.clear();
+
+    //if (objs.size() >= 20) { printf("reply len=%zd\r\n", buf.size()); }
+
+    //printf(">>>buf=[%s]\r\n", buf.c_str());
     return conn_.write(buf) != -1;
 }
 
@@ -45,8 +65,17 @@ bool redis_handler::handle_one(const redis_object &obj) {
     }
 
     //printf(">>>cmd=%s\r\n", cmd);
-
-    if (EQ(cmd, "HSET")) {
+    //
+    //
+    if (EQ(cmd, "SET")) {
+        return set(obj);
+    } else if (EQ(cmd, "GET")) {
+        return get(obj);
+    } else if (EQ(cmd, "DEL")) {
+        return del(obj);
+    } else if (EQ(cmd, "TYPE")) {
+        return type(obj);
+    } else if (EQ(cmd, "HSET")) {
         return hset(obj);
     } else if (EQ(cmd, "HGET")) {
         return hget(obj);
@@ -58,20 +87,124 @@ bool redis_handler::handle_one(const redis_object &obj) {
         return hmget(obj);
     } else if (EQ(cmd, "HGETALL")) {
         return hgetall(obj);
-    } else if (EQ(cmd, "SET")) {
-        return set(obj);
-    } else if (EQ(cmd, "GET")) {
-        return get(obj);
-    } else if (EQ(cmd, "DEL")) {
-        return del(obj);
-    } else if (EQ(cmd, "TYPE")) {
-        return type(obj);
     }
 
     acl::string err;
     err.format("%s not support yet", cmd);
     logger_error("cmd=%s not support!", cmd);
     builder_.create_object().set_error(err);
+    return true;
+}
+
+bool redis_handler::set(const redis_object &obj) {
+    auto& objs = obj.get_objects();
+    if (objs.size() < 3) {
+        logger_error("invalid SET params' size=%zd", objs.size());
+        return false;
+    }
+
+    auto key = objs[1]->get_str();
+    if (key == nullptr || *key == 0) {
+        logger_error("key null");
+        return false;
+    }
+
+    auto value = objs[2]->get_str();
+    if (value == nullptr || *value == 0) {
+        logger_error("value null");
+        return false;
+    }
+
+#if 1
+    acl::string buff;
+    coder_.create_object().set_string(value);
+    coder_.to_string(buff);
+    coder_.clear();
+
+# if 1
+    if (!db_->set(key, buff.c_str())) {
+        logger_error("db set error, key=%s", key);
+        return false;
+    }
+# endif
+#endif
+
+    builder_.create_object().set_status("OK");
+    return true;
+}
+
+bool redis_handler::get(const redis_object &obj) {
+    auto& objs = obj.get_objects();
+    if (objs.size() < 2) {
+        logger_error("invalid GET params' size=%zd", objs.size());
+        return false;
+    }
+
+    auto key = objs[1]->get_str();
+    if (key == nullptr || *key == 0) {
+        logger_error("key null");
+        return false;
+    }
+
+    std::string buff;
+    if (!db_->get(key, buff) || buff.empty()) {
+        logger_error("db get error, key=%s", key);
+        return false;
+    }
+
+    redis_coder builder;
+    size_t len = buff.size();
+    (void) builder.update(buff.c_str(), len);
+    if (len > 0) {
+        logger_error("invalid buff in db, key=%s", key);
+        return false;
+    }
+
+    auto& objs2 = builder.get_objects();
+    if (objs2.size() != 1) {
+        logger_error("invalid object in db, key=%s, size=%zd", key, objs2.size());
+        return false;
+    }
+
+    auto o = objs2[0];
+    if (o->get_type() != REDIS_OBJ_STRING) {
+        logger_error("invalid object type=%d, key=%s", (int) o->get_type(), key);
+        return false;
+    }
+
+    auto v = o->get_str();
+    if (v == nullptr || *v == 0) {
+        logger_error("value null, key=%s", key);
+        return false;
+    }
+    builder_.create_object().set_string(v);
+    return true;
+}
+
+bool redis_handler::del(const redis_object &obj) {
+    auto& objs = obj.get_objects();
+    if (objs.size() < 2) {
+        logger_error("invalid SET params' size=%zd", objs.size());
+        return false;
+    }
+
+    auto key = objs[1]->get_str();
+    if (key == nullptr || *key == 0) {
+        logger_error("key null");
+        return false;
+    }
+
+    if (!db_->del(key)) {
+        logger_error("db del error, key=%s", key);
+        return false;
+    }
+
+    builder_.create_object().set_number(1);
+    return true;
+}
+
+bool redis_handler::type(const redis_object &obj) {
+    builder_.create_object().set_status("string");
     return true;
 }
 
@@ -163,7 +296,7 @@ bool redis_handler::hget(const redis_object &obj) {
     }
 
     auto array = objs2[0];
-    if (array->get_type() != acl::REDIS_RESULT_ARRAY) {
+    if (array->get_type() != REDIS_OBJ_ARRAY) {
         logger_error("invalid array object, key=%s", key);
         return false;
     }
@@ -206,115 +339,6 @@ bool redis_handler::hmget(const redis_object &obj) {
 
 bool redis_handler::hgetall(const redis_object &obj) {
 
-    return true;
-}
-
-bool redis_handler::set(const redis_object &obj) {
-    auto& objs = obj.get_objects();
-    if (objs.size() < 3) {
-        logger_error("invalid SET params' size=%zd", objs.size());
-        return false;
-    }
-
-    auto key = objs[1]->get_str();
-    if (key == nullptr || *key == 0) {
-        logger_error("key null");
-        return false;
-    }
-
-    auto value = objs[2]->get_str();
-    if (value == nullptr || *value == 0) {
-        logger_error("value null");
-        return false;
-    }
-
-    redis_coder builder;
-    builder.create_object().set_string(value);
-
-    acl::string buff;
-    builder.to_string(buff);
-
-    if (!db_->set(key, buff.c_str())) {
-        logger_error("db set error, key=%s", key);
-        return false;
-    }
-
-    builder_.create_object().set_status("OK");
-    return true;
-}
-
-bool redis_handler::get(const redis_object &obj) {
-    auto& objs = obj.get_objects();
-    if (objs.size() < 2) {
-        logger_error("invalid GET params' size=%zd", objs.size());
-        return false;
-    }
-
-    auto key = objs[1]->get_str();
-    if (key == nullptr || *key == 0) {
-        logger_error("key null");
-        return false;
-    }
-
-    std::string buff;
-    if (!db_->get(key, buff) || buff.empty()) {
-        logger_error("db get error, key=%s", key);
-        return false;
-    }
-
-    redis_coder builder;
-    size_t len = buff.size();
-    (void) builder.update(buff.c_str(), len);
-    if (len > 0) {
-        logger_error("invalid buff in db, key=%s", key);
-        return false;
-    }
-
-    auto& objs2 = builder.get_objects();
-    if (objs2.size() != 1) {
-        logger_error("invalid object in db, key=%s, size=%zd", key, objs2.size());
-        return false;
-    }
-
-    auto o = objs2[0];
-    if (o->get_type() != acl::REDIS_RESULT_STRING) {
-        logger_error("invalid object type=%d, key=%s", (int) o->get_type(), key);
-        return false;
-    }
-
-    auto v = o->get_str();
-    if (v == nullptr || *v == 0) {
-        logger_error("value null, key=%s", key);
-        return false;
-    }
-    builder_.create_object().set_string(v);
-    return true;
-}
-
-bool redis_handler::del(const redis_object &obj) {
-    auto& objs = obj.get_objects();
-    if (objs.size() < 2) {
-        logger_error("invalid SET params' size=%zd", objs.size());
-        return false;
-    }
-
-    auto key = objs[1]->get_str();
-    if (key == nullptr || *key == 0) {
-        logger_error("key null");
-        return false;
-    }
-
-    if (!db_->del(key)) {
-        logger_error("db del error, key=%s", key);
-        return false;
-    }
-
-    builder_.create_object().set_number(1);
-    return true;
-}
-
-bool redis_handler::type(const redis_object &obj) {
-    builder_.create_object().set_status("string");
     return true;
 }
 
