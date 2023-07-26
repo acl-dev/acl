@@ -29,7 +29,7 @@ public:
 public:
     [[nodiscard]] redis_object& create_object();
 
-    bool to_string(acl::string& out) const;
+    bool to_string(std::string& out) const;
 
 private:
     std::vector<redis_object*> objs_;

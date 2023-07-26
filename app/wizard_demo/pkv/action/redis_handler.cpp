@@ -27,7 +27,7 @@ bool redis_handler::handle() {
 
 #if 0
     {
-	acl::string tmp;
+	std::string tmp;
 	for (size_t i = 0; i < objs.size(); i++) {
 		tmp += "+OK\r\n";
 	}
@@ -43,7 +43,7 @@ bool redis_handler::handle() {
         }
     }
 
-    acl::string buf;
+    std::string buf;
     if (!builder_.to_string(buf)) {
         builder_.clear();
         return false;
@@ -54,7 +54,7 @@ bool redis_handler::handle() {
     //if (objs.size() >= 20) { printf("reply len=%zd\r\n", buf.size()); }
 
     //printf(">>>buf=[%s]\r\n", buf.c_str());
-    return conn_.write(buf) != -1;
+    return conn_.write(buf.c_str(), buf.size()) != -1;
 }
 
 bool redis_handler::handle_one(const redis_object &obj) {
@@ -89,8 +89,8 @@ bool redis_handler::handle_one(const redis_object &obj) {
         return hgetall(obj);
     }
 
-    acl::string err;
-    err.format("%s not support yet", cmd);
+    std::string err;
+    err.append(cmd).append("not support yet");
     logger_error("cmd=%s not support!", cmd);
     builder_.create_object().set_error(err);
     return true;
@@ -115,8 +115,8 @@ bool redis_handler::set(const redis_object &obj) {
         return false;
     }
 
-#if 1
-    acl::string buff;
+#if 0
+    std::string buff;
     coder_.create_object().set_string(value);
     coder_.to_string(buff);
     coder_.clear();
@@ -238,7 +238,7 @@ bool redis_handler::hset(const redis_object &obj) {
         .create_child().set_string(name, true)
         .create_child().set_string(value, true);
 
-    acl::string buff;
+    std::string buff;
     if (!builder.to_string(buff)) {
         logger_error("build data error");
         return false;
