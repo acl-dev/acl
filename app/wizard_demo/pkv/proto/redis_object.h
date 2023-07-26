@@ -10,12 +10,8 @@
 
 namespace pkv {
 
-class redis_object;
-using shared_redis = std::shared_ptr<redis_object>;
-
 typedef enum {
 	REDIS_OBJ_UNKOWN,
-	REDIS_OBJ_NIL,
 	REDIS_OBJ_ERROR,
 	REDIS_OBJ_STATUS,
 	REDIS_OBJ_INTEGER,
@@ -85,7 +81,7 @@ private:
     std::vector<redis_object*> objs_;
 
 private:
-    const char* get_line(const char*, size_t&, std::string&, bool&);
+    static const char* get_line(const char*, size_t&, std::string&, bool&);
     const char* get_length(const char*, size_t&, int&, bool&);
     const char* get_data(const char*, size_t&, size_t);
 

@@ -244,7 +244,7 @@ bool redis_handler::hset(const redis_object &obj) {
         return false;
     }
 
-    if (!db_->set(key, buff.c_str())) {
+    if (!db_->set(key, buff)) {
         logger_error("set key=%s, value=%s error", key, buff.c_str());
         return false;
     }

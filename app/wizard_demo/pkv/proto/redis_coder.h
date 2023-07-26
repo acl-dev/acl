@@ -11,7 +11,7 @@ namespace pkv {
 
 class redis_coder {
 public:
-    redis_coder(size_t cache_max = 10000);
+    explicit redis_coder(size_t cache_max = 10000);
     ~redis_coder();
 
     const char* update(const char* data, size_t& len);
