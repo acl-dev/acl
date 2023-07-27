@@ -7,6 +7,8 @@ public:
     master_service() = default;
     ~master_service() override = default;
 
+    void close_db();
+
 protected:
     // @override
     void on_accept(acl::socket_stream& conn) override;
@@ -27,7 +29,7 @@ protected:
     bool proc_on_sighup(acl::string&) override;
 
 private:
-    pkv::shared_db db_;
+    pkv::shared_db db_ = nullptr;
 
     void run(acl::socket_stream& conn, size_t size);
 };

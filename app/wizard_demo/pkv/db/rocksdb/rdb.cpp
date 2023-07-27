@@ -16,6 +16,7 @@ rdb::rdb() : db_(nullptr) {}
 
 rdb::~rdb() {
     delete db_;
+    logger("rdb in %s closed", path_.c_str());
 }
 
 bool rdb::open(const char* path) {

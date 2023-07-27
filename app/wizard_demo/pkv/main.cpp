@@ -1,6 +1,15 @@
 #include "stdafx.h"
+#include <signal.h>
 #include "proto/redis_coder.h"
 #include "master_service.h"
+
+static void on_sigint(int) {
+    master_service& ms = acl::singleton2<master_service>::get_instance();
+    logger("---Begin to close db---");
+    ms.close_db();
+    logger("---Close db ok---");
+    exit(0);
+}
 
 static bool test_redis_coder(const char* file) {
 #if 1
@@ -42,6 +51,8 @@ int main(int argc, char *argv[]) {
         test_redis_coder(file);
         return 0;
     } else if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
+        signal(SIGINT, on_sigint);
+
         // 日志输出至标准输出
         acl::log::stdout_open(true);
         // 禁止生成 acl_master.log 日志
