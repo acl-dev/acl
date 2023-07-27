@@ -12,7 +12,7 @@ static bool test_del(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 		printf("del key: %s error: %s\r\n",
 			key.c_str(), cmd.result_error());
 		return false;
-	} else if (i < 10) {
+	} else if (i < 1) {
 		printf("del ok, key: %s\r\n", key.c_str());
 	}
 	return true;
@@ -27,7 +27,7 @@ static bool test_expire(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 		printf("expire key: %s error: %s\r\n",
 			key.c_str(), cmd.result_error());
 		return false;
-	} else if (i < 10) {
+	} else if (i < 1) {
 		printf("expire ok, key: %s\r\n", key.c_str());
 	}
 
@@ -44,7 +44,7 @@ static bool test_ttl(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 		printf("get ttl key: %s error: %s\r\n",
 			key.c_str(), cmd.result_error());
 		return false;
-	} else if (i < 10) {
+	} else if (i < 1) {
 		printf("ttl ok, key: %s, ttl: %d\r\n", key.c_str(), ttl);
 	}
 	return true;
@@ -56,11 +56,11 @@ static bool test_exists(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 
 	key.format("%s_%zd_%zd_%d", __keypre.c_str(), tid, fid, i);
 	if (!cmd.exists(key.c_str())) {
-		if (i < 10) {
+		if (i < 1) {
 			printf("no exists key: %s\r\n", key.c_str());
 		}
 	} else {
-		if (i < 10) {
+		if (i < 1) {
 			printf("exists key: %s\r\n", key.c_str());
 		}
 	}
@@ -76,7 +76,7 @@ static bool test_type(acl::redis_key& cmd, size_t tid, size_t fid, int i)
 	if (ret == acl::REDIS_KEY_NONE) {
 		printf("unknown type key: %s\r\n", key.c_str());
 		return false;
-	} else if (i < 10) {
+	} else if (i < 1) {
 		printf("type ok, key: %s, ret: %d\r\n", key.c_str(), ret);
 	}
 	return true;
@@ -92,7 +92,7 @@ static bool test_set(acl::redis_string& cmd, size_t tid, size_t fid, int i)
 
 	bool ret = cmd.set(key.c_str(), value.c_str());
 	return ret;
-	if (i < 10) {
+	if (i < 1) {
 		printf("set key: %s, value: %s %s\r\n", key.c_str(),
 			value.c_str(), ret ? "ok" : "error");
 	}
@@ -107,7 +107,7 @@ static bool test_get(acl::redis_string& cmd, size_t tid, size_t fid, int i)
 	acl::string value;
 
 	bool ret = cmd.get(key.c_str(), value);
-	if (i < 10) {
+	if (i < 1) {
 		printf("get key: %s, value: %s %s, len: %d\r\n",
 			key.c_str(), value.c_str(), ret ? "ok" : "error",
 			(int) value.length());
@@ -152,7 +152,7 @@ static bool test_hmget(acl::redis_hash& cmd, size_t tid, size_t fid, int i)
 		return false;
 	}
 
-	if (i < 10) {
+	if (i < 1) {
 		printf("key=%s:", key.c_str());
 		assert(names.size() == values.size());
 		size_t n = names.size();

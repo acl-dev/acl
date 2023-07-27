@@ -2,19 +2,33 @@
 #include "util.h"
 
 static int __threads_exit = 0;
+static acl::string __cmd("del");
+static acl::atomic_long __count;
 
 class redis_command {
 public:
-	redis_command(acl::redis_client_pipeline& pipeline, const char* key)
-	: key_(key)
+	redis_command(acl::redis_client_pipeline& pipeline)
+	: cmd_(&pipeline)  // Must set pipeline before calling cmd_.get_pipeline_message()
 	, msg_(cmd_.get_pipeline_message())
 	{
 		cmd_.set_pipeline(&pipeline);
-		argc_ = 2;
-		argv_[0] = "del";
-		argv_[1] = key_;
+		msg_.set_option(cmd_.get_dbuf(), 1, NULL);
+
+		long long id = __count.fetch_add(1);
+		acl::string key;
+		key.format("key-%lld", id);
+		argv_[0] = __cmd.c_str();
+		argv_[1] = key;
 		lens_[0] = strlen(argv_[0]);
 		lens_[1] = strlen(argv_[1]);
+
+		if (__cmd == "set") {
+			argc_ = 3;
+			argv_[2] = "value";
+			lens_[2] = strlen(argv_[2]);
+		} else {
+			argc_ = 2;
+		}
 
 		// computer the hash slot for redis cluster node
 		cmd_.hash_slot(argv_[1]);
@@ -36,18 +50,18 @@ public:
 	}
 
 private:
-	acl::string key_;
 	acl::redis  cmd_;
 	acl::redis_pipeline_message& msg_;
 	size_t argc_;
-	const char* argv_[2];
-	size_t lens_[2];
+	const char* argv_[4];
+	size_t lens_[4];
 
 };
 
 class test_thread : public acl::thread {
 public:
-	test_thread(acl::locker& locker, acl::redis_client_pipeline& pipeline,
+	test_thread(acl::locker& locker,
+		acl::redis_client_pipeline& pipeline,
 		int once_count, int count)
 	: locker_(locker)
 	, pipeline_(pipeline)
@@ -61,30 +75,31 @@ public:
 protected:
 	// @override
 	void* run(void) {
-		acl::string key;
+		for (size_t i = 0; i < (size_t) count_; i++) {
+			run_once();
+		}
+
+		locker_.lock();
+		__threads_exit++;
+		locker_.unlock();
+		return NULL;
+	}
+
+	void run_once(void) {
 		// parepare for a lot of redis commands in one request
 		std::vector<redis_command*> commands;
 		for (size_t i = 0; i < (size_t) once_count_; i++) {
-			key.format("test-key-%d", (int) i);
-			redis_command* command = new redis_command(pipeline_, key);
+			redis_command* command = new redis_command(pipeline_);
 			commands.push_back(command);
 		}
 
-		for (size_t i = 0; i < (size_t) count_; i++) {
-			request(commands);
-		}
+		request(commands);
 
 		// free all requests commands
 		for (std::vector<redis_command*>::iterator it = commands.begin();
 			    it != commands.end(); ++it) {
 			delete *it;
 		}
-
-		locker_.lock();
-		__threads_exit++;
-		locker_.unlock();
-
-		return NULL;
 	}
 
 private:
@@ -136,7 +151,6 @@ int main(int argc, char* argv[]) {
 	int  ch, count = 10, once_count = 10;
 	int  max_threads = 10;
 	acl::string addr("127.0.0.1:6379"), passwd;
-	acl::string cmd("del");
 
 	while ((ch = getopt(argc, argv, "ha:s:N:n:t:p:")) > 0) {
 		switch (ch) {
@@ -144,7 +158,7 @@ int main(int argc, char* argv[]) {
 			usage(argv[0]);
 			return 0;
 		case 'a':
-			cmd = optarg;
+			__cmd = optarg;
 			break;
 		case 's':
 			addr = optarg;
@@ -214,7 +228,7 @@ int main(int argc, char* argv[]) {
 
 	long long int total = max_threads * once_count * count;
 	double inter = util::stamp_sub(&end, &begin);
-	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", cmd.c_str(),
+	printf("total %s: %lld, spent: %0.2f ms, speed: %0.2f\r\n", __cmd.c_str(),
 		total, inter, (total * 1000) /(inter > 0 ? inter : 1));
 
 	pipeline.stop_thread();

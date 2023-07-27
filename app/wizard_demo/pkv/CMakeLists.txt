@@ -80,9 +80,15 @@ add_definitions(
     "-Wno-error=deprecated-declarations"
     "-Wno-deprecated-declarations"
     "-fPIC"
-    "-std=c++17"
     "-DHAS_ROCKSDB"
+    "-DHAS_WT"
 )
+
+if (${BUILD_WITH_C11} MATCHES "YES")
+    add_definitions("-std=c++11")
+else()
+    add_definitions("-std=c++17")
+endif()
 
 #find_library(acl_lib acl_all PATHS /usr/lib /usr/local/lib)
 #find_library(fiber_cpp_lib fiber_cpp PATHS /usr/lib /usr/local/lib)
@@ -91,25 +97,21 @@ add_definitions(
 set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a)
 set(fiber ${home_path}/lib_fiber/lib/libfiber.a)
 
-find_library(rocksdb_lib rocksdb PATHS /usr/lib /usr/local/lib)
-#set(rocksdb /usr/local/lib/librocksdb.a)
-set(rocksdb -lrocksdb)
-
-find_library(jemalloc jemalloc PATHS /usr/lib /usr/local/lib)
-set(jemalloc -ljemalloc)
+find_library(jemalloc NAMES jemalloc PATHS /usr/lib /usr/local/lib)
+find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)
+find_library(wiredtiger NAMES wiredtiger PATHS /usr/lib /usr/local/lib)
 
 #set(wt -lwiredtiger)
 #set(uring -luring)
 #set(iconv -liconv)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-#    set(lib_all  ${lib_global} ${lib_rpc} ${fiber_cpp_lib} ${acl_lib} ${fiber_lib}
     set(lib_all ${acl_all}
-        ${rocksdb} ${fiber} -liconv -lz -lpthread -ldl)
+        ${rocksdb} ${wiredtiger} ${fiber} -liconv -lz -lpthread -ldl)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
-#    set(lib_all  ${lib_global} ${lib_rpc} ${fiber_cpp_lib} ${acl_lib} ${fiber_lib}
     set(lib_all ${acl_all}
-        ${rocksdb} ${wt} ${fiber} ${uring} ${iconv} ${jemalloc}  -lz -lpthread -ldl)
+        ${rocksdb} ${wiredtiger} ${fiber} ${uring} ${iconv} ${jemalloc}
+	-lz -lpthread -ldl)
 endif()
 
 set(output_path ${CMAKE_CURRENT_SOURCE_DIR})

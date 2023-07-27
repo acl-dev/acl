@@ -60,6 +60,10 @@
 #endif // !_WIN32 && !_WIN64
 
 extern acl::master_str_tbl var_conf_str_tab[];
+
+extern int var_cfg_disable_serialize;
+extern int var_cfg_disable_save;
 extern acl::master_bool_tbl var_conf_bool_tab[];
+
 extern acl::master_int_tbl var_conf_int_tab[];
 extern acl::master_int64_tbl var_conf_int64_tab[];

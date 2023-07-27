@@ -9,7 +9,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
-SYSLIB = -lpthread -lcrypt
+SYSLIB = -lpthread
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 
@@ -67,7 +67,8 @@ CFLAGS += -I. -I../.. -I../../../include -I../../../../lib_acl/include -I../../.
 EXTLIBS =
 CFLAGS += -I/home/zsx/download/db/wiredtiger/github
 #EXTLIBS = -L/home/zsx/download/db/wiredtiger/github/.libs -lwiredtiger -Wl,-rpath=/home/zsx/download/db/wiredtiger/github/.libs
-EXTLIBS = /usr/local/lib/libwiredtiger.a
+#EXTLIBS = /usr/local/lib/libwiredtiger.a
+EXTLIBS = -lwiredtiger
 SYSLIB += -ldl
 LDFLAGS = -L../../../lib -l_acl_cpp -L../../../../lib_protocol/lib -l_protocol -L../../../../lib_acl/lib -l_acl \
 	$(EXTLIBS) $(SYSLIB)

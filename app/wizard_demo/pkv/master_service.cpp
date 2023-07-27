@@ -4,27 +4,31 @@
 #include "master_service.h"
 
 static char *var_cfg_dbpath;
+static char *var_cfg_dbtype;
 
 acl::master_str_tbl var_conf_str_tab[] = {
-    { "dbpath",		"./dbpath",	&var_cfg_dbpath		},
+    { "dbpath",     "./dbpath",     &var_cfg_dbpath },
+    { "dbtype",     "rdb",          &var_cfg_dbtype },
 
-    { 0, 0, 0 }
+    { 0,    0,  0   }
 };
 
-static int  var_cfg_debug_enable;
+int var_cfg_disable_serialize;
+int var_cfg_disable_save;
 
 acl::master_bool_tbl var_conf_bool_tab[] = {
-    { "debug_enable",	1,		&var_cfg_debug_enable	},
+    { "disable_serialize", 0, &var_cfg_disable_serialize },
+    { "disable_save", 0, &var_cfg_disable_save },
 
-    { 0, 0, 0 }
+    { 0,    0,  0   }
 };
 
 static int  var_cfg_io_timeout;
 static int  var_cfg_buf_size;
 
 acl::master_int_tbl var_conf_int_tab[] = {
-    { "io_timeout",		120,		&var_cfg_io_timeout, 0, 0 },
-    { "buf_size",               8192,           &var_cfg_buf_size,   0, 0 },
+    { "io_timeout",     120,    &var_cfg_io_timeout,    0,  0   },
+    { "buf_size",       8192,   &var_cfg_buf_size,  0,  0 },
 
     { 0, 0 , 0 , 0, 0 }
 };
@@ -88,9 +92,21 @@ void master_service::proc_on_listen(acl::server_socket& ss) {
 
 void master_service::proc_on_init() {
     logger(">>>proc_on_init<<<");
-    db_ = db::create_rdb();
-    if (!db_->open(var_cfg_dbpath)) {
-        logger_error("open db(%s) error %s", var_cfg_dbpath, acl::last_serror());
+    if (strcasecmp(var_cfg_dbtype, "rdb") == 0) {
+        db_ = db::create_rdb();
+        if (!db_->open(var_cfg_dbpath)) {
+            logger_error("open db(%s) error %s", var_cfg_dbpath,
+                         acl::last_serror());
+            exit(1);
+        }
+    } else if (strcasecmp(var_cfg_dbtype, "wdb") == 0) {
+        db_ = db::create_wdb();
+        if (!db_->open(var_cfg_dbpath)) {
+            logger_error("open db(%s) error", var_cfg_dbpath);
+            exit(1);
+        }
+    } else {
+        logger_error("unknown dbtype=%s", var_cfg_dbtype);
         exit(1);
     }
 }

@@ -16,6 +16,7 @@ public:
     virtual bool del(const std::string& key) = 0;
 
     static shared_db create_rdb();
+    static shared_db create_wdb();
 };
 
 } // namespace pkv
