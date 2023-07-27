@@ -125,5 +125,5 @@ service pkv
 
 	buf_size = 8192
 	dbpath = ./db
-	dbtype = wdb
+	dbtype = rdb
 }

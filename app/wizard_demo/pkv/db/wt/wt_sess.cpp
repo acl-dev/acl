@@ -54,6 +54,7 @@ bool wt_sess::get(const std::string &key, std::string &value) {
     int ret = curs_->search(curs_);
     if (ret != 0) {
         logger("search key=%s error=%d", key.c_str(), ret);
+        curs_->reset(curs_);
         return false;
     }
 
@@ -61,6 +62,7 @@ bool wt_sess::get(const std::string &key, std::string &value) {
     ret = curs_->get_value(curs_, &v);
     if (ret != 0) {
         logger_error("get_value key=%s errort=%d", key.c_str(), ret);
+        curs_->reset(curs_);
         return false;
     }
 
@@ -73,8 +75,9 @@ bool wt_sess::del(const std::string &key) {
     assert(curs_);
     curs_->set_key(curs_, key.c_str());
     int ret = curs_->remove(curs_);
-    if (ret != 0) {
+    if (ret != 0 && ret != WT_NOTFOUND) {
         logger_error("remove key=%s error=%d", key.c_str(), ret);
+        curs_->reset(curs_);
         return false;
     }
 
