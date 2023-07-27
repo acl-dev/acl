@@ -124,6 +124,6 @@ service pkv
 #	应用自己的配置选项
 
 	buf_size = 8192
-	dbpath = ./db
+	dbpath = ./data
 	dbtype = rdb
 }
