@@ -5,6 +5,7 @@
 #pragma once
 
 #include <vector>
+#include "c++_patch.h"
 #include "redis_object.h"
 
 namespace pkv {
@@ -16,18 +17,18 @@ public:
 
     const char* update(const char* data, size_t& len);
 
-    [[nodiscard]] const std::vector<redis_object*>& get_objects() const {
+    NODISCARD const std::vector<redis_object*>& get_objects() const {
         return objs_;
     }
 
-    [[nodiscard]] redis_object* get_curr() const {
+    NODISCARD redis_object* get_curr() const {
         return curr_;
     }
 
     void clear();
 
 public:
-    [[nodiscard]] redis_object& create_object();
+    NODISCARD redis_object& create_object();
 
     bool to_string(std::string& out) const;
 

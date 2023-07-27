@@ -80,7 +80,7 @@ add_definitions(
     "-Wno-error=deprecated-declarations"
     "-Wno-deprecated-declarations"
     "-fPIC"
-    "-std=c++17"
+    "-std=c++11"
     "-DHAS_ROCKSDB"
     "-DHAS_WT"
 )

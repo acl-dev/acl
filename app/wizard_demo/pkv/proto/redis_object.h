@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include "c++_patch.h"
 #include "redis_type.h"
 
 namespace pkv {
@@ -33,27 +34,27 @@ public:
 public:
     const char* update(const char* data, size_t& len);
 
-    [[nodiscard]] bool finish() const {
+    NODISCARD bool finish() const {
         return status_ == redis_s_finish;
     }
 
-    [[nodiscard]] bool failed() const {
+    NODISCARD bool failed() const {
         return status_ == redis_s_null;
     }
 
-    [[nodiscard]] int get_status() const {
+    NODISCARD int get_status() const {
         return status_;
     }
 
-    [[nodiscard]] redis_obj_t get_type() const {
+    NODISCARD redis_obj_t get_type() const {
         return type_;
     }
 
-    [[nodiscard]] const char* get_cmd() const;
+    NODISCARD const char* get_cmd() const;
 
-    [[nodiscard]] const char* get_str() const;
+    NODISCARD const char* get_str() const;
 
-    [[nodiscard]] const std::vector<redis_object*>& get_objects() const {
+    NODISCARD const std::vector<redis_object*>& get_objects() const {
         return objs_;
     }
 
