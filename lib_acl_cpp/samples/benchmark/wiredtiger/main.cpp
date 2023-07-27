@@ -50,7 +50,7 @@ public:
 	~wdb_sess(void) {}
 
 	bool open(void) {
-		bool ret = db_.get_conn()->open_session(db_.get_conn(),
+		int ret = db_.get_conn()->open_session(db_.get_conn(),
 				NULL, NULL, &session_);
 		if (ret != 0) {
 			printf("open session failed, ret=%d\r\n", ret);

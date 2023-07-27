@@ -19,17 +19,24 @@ rdb::~rdb() {
 }
 
 bool rdb::open(const char* path) {
+    path_ = path;
+    path_ += "/rdb";
+
+    if (acl_make_dirs(path_.c_str(), 0755) == -1) {
+        logger_error("create %s error=%s", path_.c_str(), acl::last_serror());
+        return -1;
+    }
+
     Options options;
     options.IncreaseParallelism();
     // options.OptimizeLevelStyleCompaction();
     options.create_if_missing = true;
-    Status s = DB::Open(options, path, &db_);
+    Status s = DB::Open(options, path_.c_str(), &db_);
     if (!s.ok()) {
-        logger_error("open %s db error: %s", path, s.getState());
+        logger_error("open %s db error: %s", path_.c_str(), s.getState());
         return false;
     }
 
-    path_ = path;
     return true;
 }
 

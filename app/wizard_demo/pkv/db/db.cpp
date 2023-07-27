@@ -1,5 +1,13 @@
 #include "stdafx.h"
+
+#ifdef HAS_ROCKSDB
 #include "rocksdb/rdb.h"
+#endif
+
+#ifdef HAS_WT
+#include "wt/wdb.h"
+#endif
+
 #include "db.h"
 
 namespace pkv {
@@ -29,6 +37,14 @@ public:
 shared_db db::create_rdb() {
 #ifdef HAS_ROCKSDB
     return std::make_shared<rdb>();
+#else
+    return std::make_shared<dummy_db>();
+#endif
+}
+
+shared_db db::create_wdb() {
+#ifdef HAS_WT
+    return std::make_shared<wdb>();
 #else
     return std::make_shared<dummy_db>();
 #endif

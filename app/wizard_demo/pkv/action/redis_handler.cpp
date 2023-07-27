@@ -115,19 +115,19 @@ bool redis_handler::set(const redis_object &obj) {
         return false;
     }
 
-#if 0
-    std::string buff;
-    coder_.create_object().set_string(value);
-    coder_.to_string(buff);
-    coder_.clear();
+    if (!var_cfg_disable_serialize) {
+        std::string buff;
+        coder_.create_object().set_string(value);
+        coder_.to_string(buff);
+        coder_.clear();
 
-# if 1
-    if (!db_->set(key, buff.c_str())) {
-        logger_error("db set error, key=%s", key);
-        return false;
+        if (!var_cfg_disable_save) {
+            if (!db_->set(key, buff.c_str())) {
+                logger_error("db set error, key=%s", key);
+                return false;
+            }
+        }
     }
-# endif
-#endif
 
     builder_.create_object().set_status("OK");
     return true;
