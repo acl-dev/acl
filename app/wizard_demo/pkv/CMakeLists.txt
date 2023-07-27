@@ -80,10 +80,15 @@ add_definitions(
     "-Wno-error=deprecated-declarations"
     "-Wno-deprecated-declarations"
     "-fPIC"
-    "-std=c++11"
     "-DHAS_ROCKSDB"
     "-DHAS_WT"
 )
+
+if (${BUILD_WITH_C11} MATCHES "YES")
+    add_definitions("-std=c++11")
+else()
+    add_definitions("-std=c++17")
+endif()
 
 #find_library(acl_lib acl_all PATHS /usr/lib /usr/local/lib)
 #find_library(fiber_cpp_lib fiber_cpp PATHS /usr/lib /usr/local/lib)
