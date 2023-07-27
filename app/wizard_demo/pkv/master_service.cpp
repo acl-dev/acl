@@ -111,8 +111,15 @@ void master_service::proc_on_init() {
     }
 }
 
+void master_service::close_db() {
+    if (db_) {
+        db_ = nullptr;
+    }
+}
+
 void master_service::proc_on_exit() {
     logger(">>>proc_on_exit<<<");
+    close_db();
 }
 
 bool master_service::proc_on_sighup(acl::string&) {

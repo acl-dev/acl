@@ -17,6 +17,7 @@ wdb::wdb(size_t cache_max) : db_(nullptr), cache_max_(cache_max) {}
 wdb::~wdb() {
     if (db_) {
         db_->close(db_, nullptr);
+        logger("wdb in %s closed", path_.c_str());
     }
 }
 
