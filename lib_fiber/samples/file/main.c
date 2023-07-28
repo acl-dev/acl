@@ -16,6 +16,7 @@
 #endif
 #include "lib_acl.h"
 #include "fiber/libfiber.h"
+#include "../stamp.h"
 
 static int __open_flags = 0;
 static long long __write_size = 1024;
@@ -49,12 +50,16 @@ static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	const char *path = (const char*) ctx;
 	int   fd = open(path, __open_flags, 0600), ret;
+	struct timeval begin, end;
+	double cost, speed;
+
 	if (fd < 0) {
 		printf("open %s error %s\r\n", path, strerror(errno));
 		return;
 	}
 
 	printf("open %s ok, fd=%d\r\n", path, fd);
+	gettimeofday(&begin, NULL);
 
 	while (1) {
 		char buf[8192];
@@ -70,7 +75,13 @@ static void fiber_readfile(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 
 	ret = close(fd);
-	printf("close %s %s, fd=%d\r\n", path, ret == 0 ? "ok" : "error", fd);
+
+	gettimeofday(&end, NULL);
+	cost = stamp_sub(&end, &begin);
+	speed = (cost * 1000) / (cost > 0 ? cost : 0.001);
+
+	printf("close %s %s, fd=%d, cost=%.2f ms, speed=%.2f\r\n",
+		path, ret == 0 ? "ok" : "error", fd, cost, speed);
 }
 
 static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
@@ -79,6 +90,8 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 	int   fd = open(path, __open_flags, 0600);
 	long long i, n;
 	char  buf[10];
+	struct timeval begin, end;
+	double cost, speed;
 	if (fd < 0) {
 		printf("open %s error %s\r\n", path, strerror(errno));
 		exit(1);
@@ -87,6 +100,8 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 	build_dummy(buf, sizeof(buf));
 
 	printf("open %s ok, fd=%d\r\n", path, fd);
+
+	gettimeofday(&begin, NULL);
 
 	for (i = 0; i < __write_size; i++) {
 		n = i % 10;
@@ -101,7 +116,13 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 		printf("write CRLF error %s\r\n", strerror(errno));
 	}
 
-	printf("write over, total write=%lld\r\n", __write_size);
+	gettimeofday(&end, NULL);
+
+	cost = stamp_sub(&end, &begin);
+	speed = (__write_size * 1000) / (cost > 0 ? cost : 0.001);
+
+	printf("write over, total write=%lld, cost=%.2f ms, speed=%.2f\r\n",
+		__write_size, cost, speed);
 	n = close(fd);
 	printf("close %s %s, fd=%d\r\n", path, n == 0 ? "ok" : "error", fd);
 }
@@ -581,12 +602,13 @@ static void usage(const char *proc)
 		"  -o open_flags[O_RDONLY, O_WRONLY, O_RDWR, O_APPEND, O_CREAT, O_EXCL, O_TRUNC]\r\n"
 		"  -p offset\r\n"
 		"  -C [if check the process been blocked by disk IO]\r\n"
+		"  -D [if IO directly, default: 0]\r\n"
 		, proc);
 }
 
 int main(int argc, char *argv[])
 {
-	int ch;
+	int ch, direct = 0;
 	char buf[256], buf2[256], action[128];
 	struct FIBER_CTX ctx;
 
@@ -603,7 +625,7 @@ int main(int argc, char *argv[])
 
 #define	EQ(x, y)	!strcasecmp((x), (y))
 
-	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:C")) > 0) {
+	while ((ch = getopt(argc, argv, "hf:t:a:o:n:p:CD")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -649,6 +671,10 @@ int main(int argc, char *argv[])
 			} else if (EQ(optarg, "O_TRUNC")) {
 				__open_flags |= O_TRUNC;
 			}
+			break;
+		case 'D':
+			direct = 1;
+			break;
 		default:
 			break;
 		}
@@ -659,12 +685,40 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	acl_fiber_msg_stdout_enable(1);
 	acl_msg_stdout_enable(1);
 
 	if (__open_flags == 0) {
 		__open_flags = O_RDONLY;
 	}
+
+	if (direct) {
+		if (EQ(action, "read")) {
+			fiber_readfile(NULL, buf);
+		} else if (EQ(action, "write")) {
+			fiber_writefile(NULL, buf);
+		} else if (EQ(action, "unlink")) {
+			fiber_unlink(NULL, buf);
+		} else if (EQ(action, "stat")) {
+			fiber_filestat(NULL, buf);
+		} else if (EQ(action, "rename")) {
+			fiber_rename(NULL, &ctx);
+		} else if (EQ(action, "mkdir")) {
+			fiber_mkdir(NULL, buf);
+		} else if (EQ(action, "splice")) {
+			fiber_splice(NULL, &ctx);
+		} else if (EQ(action, "pread")) {
+			fiber_pread(NULL, &ctx);
+		} else if (EQ(action, "pwrite")) {
+			fiber_pwrite(NULL, &ctx);
+		} else {
+			printf("Unknown action=%s\r\n", action);
+			usage(argv[0]);
+		}
+
+		return 0;
+	}
+
+	acl_fiber_msg_stdout_enable(1);
 
 	if (EQ(action, "read")) {
 		acl_fiber_create(fiber_readfile, buf, 320000);

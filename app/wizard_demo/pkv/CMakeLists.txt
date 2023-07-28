@@ -102,7 +102,7 @@ find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)
 find_library(wiredtiger NAMES wiredtiger PATHS /usr/lib /usr/local/lib)
 
 #set(wt -lwiredtiger)
-#set(uring -luring)
+#set(uring -luring-ffi)
 #set(iconv -liconv)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
