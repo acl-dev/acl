@@ -101,7 +101,7 @@ static void fiber_writefile(ACL_FIBER *fiber acl_unused, void *ctx)
 		printf("write CRLF error %s\r\n", strerror(errno));
 	}
 
-	printf("write over!\r\n");
+	printf("write over, total write=%lld\r\n", __write_size);
 	n = close(fd);
 	printf("close %s %s, fd=%d\r\n", path, n == 0 ? "ok" : "error", fd);
 }

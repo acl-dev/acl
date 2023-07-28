@@ -66,7 +66,8 @@ static int iocp_wait_write(FILE_EVENT *fe)
 			return fe->writer_ctx.res;
 		}
 
-		err = acl_fiber_last_error();
+		err = -fe->writer_ctx.res;
+		acl_fiber_set_error(err);
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
