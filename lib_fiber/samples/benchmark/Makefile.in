@@ -1,0 +1,61 @@
+CC = gcc
+
+CFLAGS = -c -g -W -O3 \
+-Wall \
+-Wcast-qual \
+-Wcast-align \
+-Waggregate-return \
+-Wno-long-long \
+-Wmissing-prototypes \
+-Wpointer-arith \
+-Wshadow \
+-D_REENTRANT \
+-D_POSIX_PTHREAD_SEMANTICS \
+-D_USE_FAST_MACRO \
+-Wstrict-prototypes
+
+###########################################################
+
+ifeq ($(findstring gcc, $(CC)), gcc)
+endif
+
+#Sys libs for Linux:
+SYSLIB = -luring-ffi -lpthread -ldl -lrt
+
+###########################################################
+
+CFLAGS += -I.
+LDFLAGS = $(SYSLIB)
+
+###########################################################
+
+OUT_PATH = .
+OBJ_PATH = $(OUT_PATH)
+
+#Project's objs
+SRC = $(wildcard *.c)
+OBJ = $(patsubst %.c, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
+
+###########################################################
+
+.PHONY = all clean
+PROG =
+
+COMPILE = $(CC) $(CFLAGS)
+
+all: RM $(OBJ)
+	$(CC) $(OBJ) $(LDFLAGS) -o $(OBJ_PATH)/$(PROG)
+	@echo ""
+	@echo "All ok! Output:$(PROG)"
+	@echo ""
+$(OBJ_PATH)/%.o: %.c
+	$(COMPILE) $< -o $@
+RM:
+	rm -f $(PROG)
+clean cl:
+	rm -f $(PROG)
+	rm -f $(OBJ)
+
+rebuild rb: clean all
+
+###########################################################
