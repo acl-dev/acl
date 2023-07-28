@@ -105,8 +105,6 @@ int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 
 #define FILE_ALLOC(__fe, __type, _fd) do {                                   \
     (__fe) = file_event_alloc(_fd);                                          \
-    (__fe)->fiber_r->status = FIBER_STATUS_NONE;                             \
-    (__fe)->fiber_w->status = FIBER_STATUS_NONE;                             \
     (__fe)->mask   = (__type);                                               \
     (__fe)->type   = TYPE_EVENTABLE;                                         \
 } while (0)

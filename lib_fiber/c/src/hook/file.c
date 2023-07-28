@@ -15,23 +15,23 @@
 
 #include "../event/event_io_uring.h"
 
-#define	CHECK_API(name, fn) do {  \
-	if ((fn) == NULL) {  \
-		hook_once();  \
-		if ((fn) == NULL) {  \
-			msg_error("%s: %s NULL", __FUNCTION__, (name));  \
-			return -1;  \
-		}  \
-	}  \
+#define	CHECK_API(name, fn) do {                                             \
+	if ((fn) == NULL) {                                                  \
+		hook_once();                                                 \
+		if ((fn) == NULL) {                                          \
+			msg_error("%s: %s NULL", __FUNCTION__, (name));      \
+			return -1;                                           \
+		}                                                            \
+	}                                                                    \
 } while (0)
 
-#define	FILE_ALLOC(__fe, __type) do {  \
-	(__fe) = file_event_alloc(-1);  \
-	(__fe)->fiber_r->status = FIBER_STATUS_NONE;  \
-	(__fe)->fiber_w->status = FIBER_STATUS_NONE;  \
-	(__fe)->r_proc = file_read_callback;  \
-	(__fe)->mask   = (__type);  \
-	(__fe)->type   = TYPE_EVENTABLE | TYPE_FILE;  \
+#define	FILE_ALLOC(__fe, __type) do {                                        \
+	(__fe) = file_event_alloc(-1);                                       \
+	(__fe)->fiber_r         = acl_fiber_running();                       \
+	(__fe)->fiber_r->status = FIBER_STATUS_NONE;                         \
+	(__fe)->r_proc          = file_read_callback;                        \
+	(__fe)->mask            = (__type);                                  \
+	(__fe)->type            = TYPE_EVENTABLE | TYPE_FILE;                \
 } while (0)
 
 static void file_read_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
@@ -59,11 +59,8 @@ int file_close(EVENT *ev, FILE_EVENT *fe)
 
 	FILE_ALLOC(fe_tmp, EVENT_FILE_CANCEL);
 
-	fe_tmp->fd              = fe->fd;
-	fe_tmp->fiber_r         = acl_fiber_running();
-	fe_tmp->fiber_r->status = FIBER_STATUS_NONE;
-	fe_tmp->r_proc          = file_read_callback;
-	fe_tmp->mask           |= EVENT_FILE_CLOSE;
+	fe_tmp->fd    = fe->fd;
+	fe_tmp->mask |= EVENT_FILE_CLOSE;
 
 	if (fe->fiber_r && fe->fiber_r != fe_tmp->fiber_r) {
 		close_other = 1;
@@ -118,11 +115,8 @@ int file_cancel(EVENT *ev, FILE_EVENT *fe, int iotype)
 
 	FILE_ALLOC(fe_tmp, EVENT_FILE_CANCEL);
 
-	fe_tmp->fd              = fe->fd;
-	fe_tmp->fiber_r         = acl_fiber_running();
-	fe_tmp->fiber_r->status = FIBER_STATUS_NONE;
-	fe_tmp->r_proc          = file_read_callback;
-	fe_tmp->mask           |= EVENT_FILE_CANCEL;
+	fe_tmp->fd    = fe->fd;
+	fe_tmp->mask |= EVENT_FILE_CANCEL;
 
 	if (iotype == CANCEL_IO_READ) {
 		if (fe_tmp->fiber_r != fe->fiber_r) {
@@ -190,7 +184,8 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_OPENAT);
-	fe->var.path = strdup(pathname);
+
+	fe->var.path        = strdup(pathname);
 
 	event_uring_file_openat(ev, fe, dirfd, fe->var.path, flags, mode);
 
@@ -198,9 +193,12 @@ int openat(int dirfd, const char *pathname, int flags, ...)
 	acl_fiber_switch();
 	WAITER_DEC(ev);
 
-	fe->mask &= ~EVENT_FILE_OPENAT;
 	free(fe->var.path);
+
 	fe->var.path = NULL;
+	fe->fiber_r  = NULL;
+	fe->mask    &= ~EVENT_FILE_OPENAT;
+	fe->r_proc   = NULL;
 
 	if (fe->reader_ctx.res >= 0) {
 		fe->fd   = fe->reader_ctx.res;
@@ -243,6 +241,7 @@ int unlink(const char *pathname)
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_UNLINK);
+
 	fe->var.path = strdup(pathname);
 
 	event_uring_file_unlink(ev, fe, fe->var.path);
@@ -251,9 +250,11 @@ int unlink(const char *pathname)
 	acl_fiber_switch();
 	WAITER_DEC(ev);
 
-	fe->mask &= ~EVENT_FILE_UNLINK;
 	free(fe->var.path);
 	fe->var.path = NULL;
+	fe->mask    &= ~EVENT_FILE_UNLINK;
+	fe->fiber_r  = NULL;
+	fe->r_proc   = NULL;
 
 	if (fe->reader_ctx.res == 0) {
 		file_event_unrefer(fe);
@@ -284,6 +285,7 @@ int renameat2(int olddirfd, const char *oldpath,
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_RENAMEAT2);
+
 	fe->in.read_ctx.buf = strdup(oldpath);
 	fe->var.path = strdup(newpath);
 
@@ -297,6 +299,8 @@ int renameat2(int olddirfd, const char *oldpath,
 	fe->mask &= ~EVENT_FILE_RENAMEAT2;
 	free(fe->in.read_ctx.buf);
 	free(fe->var.path);
+	fe->fiber_r = NULL;
+	fe->r_proc  = NULL;
 
 	if (fe->reader_ctx.res == 0) {
 		file_event_unrefer(fe);
@@ -338,6 +342,7 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	}
 
 	FILE_ALLOC(fe, EVENT_FILE_STATX);
+
 	fe->in.read_ctx.buf = strdup(pathname);
 	fe->var.statxbuf = (struct statx*) malloc(sizeof(struct statx));
 	//memcpy(fe->var.statxbuf, statxbuf, sizeof(struct statx));
@@ -349,9 +354,11 @@ int statx(int dirfd, const char *pathname, int flags, unsigned int mask,
 	acl_fiber_switch();
 	WAITER_DEC(ev);
 
-	fe->mask &= ~EVENT_FILE_STATX;
 	free(fe->in.read_ctx.buf);
 	fe->in.read_ctx.buf = NULL;
+	fe->mask   &= ~EVENT_FILE_STATX;
+	fe->fiber_r = NULL;
+	fe->r_proc  = NULL;
 
 	if (fe->reader_ctx.res == 0) {
 		memcpy(statxbuf, fe->var.statxbuf, sizeof(struct statx));
@@ -410,6 +417,7 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	}
 
 	FILE_ALLOC(fe, EVENT_DIR_MKDIRAT);
+
 	fe->var.path = strdup(pathname);
 
 	event_uring_mkdirat(ev, fe, dirfd, fe->var.path, mode);
@@ -418,8 +426,12 @@ int mkdirat(int dirfd, const char *pathname, mode_t mode)
 	acl_fiber_switch();
 	WAITER_DEC(ev);
 
-	fe->mask &= ~EVENT_DIR_MKDIRAT;
 	free(fe->var.path);
+
+	fe->var.path = NULL;
+	fe->mask    &= ~EVENT_DIR_MKDIRAT;
+	fe->fiber_r  = NULL;
+	fe->r_proc   = NULL;
 
 	if (fe->reader_ctx.res == 0) {
 		file_event_unrefer(fe);
@@ -457,6 +469,7 @@ ssize_t pread(int fd, void *buf, size_t count, off_t offset)
 	// can pread or pwrite the same fd.
 
 	FILE_ALLOC(fe, EVENT_READ);
+
 	fe->fd = fd;
 	fe->in.read_ctx.off = offset;
 	ret = fiber_iocp_read(fe, buf, (int) count);
@@ -488,6 +501,7 @@ ssize_t pwrite(int fd, const void *buf, size_t count, off_t offset)
 	}
 
 	FILE_ALLOC(fe, EVENT_WRITE);
+
 	fe->fd = fd;
 	fe->out.write_ctx.off = offset;
 	ret = fiber_iocp_write(fe, buf, (int) count);
