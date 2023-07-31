@@ -30,10 +30,11 @@ redis_coder::~redis_coder() {
 void redis_coder::clear() {
     for (auto obj : objs_) {
         if (cache_.size() < cache_max_) {
-            obj->reset();
             cache_.emplace_back(obj);
+            obj->reset();
 	} else {
-            delete obj; 	
+            printf(">>>>coder delete o max=%zd, curr=%zd\n", cache_max_, cache_.size());
+            delete obj;
 	}
     }
 
@@ -65,9 +66,11 @@ redis_object& redis_coder::create_object() {
 
     if (cache_.empty()) {
     	obj = new redis_object(cache_, cache_max_);
+        printf(">>>>>>>>>>>%s-%d<<<<max=%zd<<<\n", __func__ , __LINE__, cache_max_);
     } else {
         obj = cache_.back();
 	cache_.pop_back();
+        //printf(">>>---->>>>>>>>%s-%d<<size=%zd<<<<<\n", __func__ , __LINE__, cache_.size());
     }
 
     objs_.emplace_back(obj);

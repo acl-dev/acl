@@ -53,6 +53,10 @@ void master_service::on_accept(acl::socket_stream& conn) {
 
 void master_service::run(acl::socket_stream& conn, size_t size) {
     std::vector<redis_object*> cache;
+    for (size_t i = 0; i < 5000000; i++) {
+        pkv::redis_object* o = new pkv::redis_object(cache, 5000000);
+        cache.emplace_back(o);
+    }
     pkv::redis_coder parser(cache);
     pkv::redis_handler handler(db_, parser, conn);
     char buf[size];

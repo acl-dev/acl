@@ -29,9 +29,10 @@ void redis_object::set_parent(redis_object* parent) {
 void redis_object::reset() {
     for (auto obj : objs_) {
         if (cache_.size() < cache_max_) {
-            obj->reset();
             cache_.emplace_back(obj);
+            obj->reset();
 	} else {
+            printf(">>>>delete o max=%zd, curr=%zd\n", cache_max_, cache_.size());
             delete obj;
 	}
     }
@@ -130,8 +131,8 @@ const char* redis_object::parse_object(const char* data, size_t& len) {
     	obj_->set_parent(this);
     } else {
         obj_ = cache_.back();
-    	obj_->set_parent(this);
         cache_.pop_back();
+        obj_->set_parent(this);
     }
 
     return data;
@@ -291,8 +292,8 @@ const char* redis_object::parse_arlen(const char* data, size_t& len) {
     	obj_->set_parent(this);
     } else {
         obj_ = cache_.back();
-    	obj_->set_parent(this);
 	cache_.pop_back();
+        obj_->set_parent(this);
     }
 
     return data;
@@ -457,8 +458,8 @@ redis_object& redis_object::create_child() {
         objs_.emplace_back(obj);
     } else {
         obj = cache_.back();
+        cache_.pop_back();
     	obj->set_parent(this);
-	cache_.pop_back();
         objs_.emplace_back(obj);
     }
 
