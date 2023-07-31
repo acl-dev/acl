@@ -49,9 +49,8 @@ set(src_paths
     ${base_path}
     ${base_path}/action
     ${base_path}/dao
-    ${base_path}/db
-    ${base_path}/db/rocksdb
-    ${base_path}/db/wt
+    ${base_path}/dao/rocksdb
+    ${base_path}/dao/wt
     ${base_path}/proto
 )
 
@@ -102,7 +101,7 @@ find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)
 find_library(wiredtiger NAMES wiredtiger PATHS /usr/lib /usr/local/lib)
 
 #set(wt -lwiredtiger)
-#set(uring -luring)
+#set(uring -luring-ffi)
 #set(iconv -liconv)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")

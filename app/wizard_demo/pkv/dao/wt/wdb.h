@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include "db/db.h"
+#include "../db.h"
 
 #ifdef HAS_WT
 

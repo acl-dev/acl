@@ -66,7 +66,8 @@ static int iocp_wait_write(FILE_EVENT *fe)
 			return fe->writer_ctx.res;
 		}
 
-		err = acl_fiber_last_error();
+		err = -fe->writer_ctx.res;
+		acl_fiber_set_error(err);
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
@@ -105,8 +106,6 @@ int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
 
 #define FILE_ALLOC(__fe, __type, _fd) do {                                   \
     (__fe) = file_event_alloc(_fd);                                          \
-    (__fe)->fiber_r->status = FIBER_STATUS_NONE;                             \
-    (__fe)->fiber_w->status = FIBER_STATUS_NONE;                             \
     (__fe)->mask   = (__type);                                               \
     (__fe)->type   = TYPE_EVENTABLE;                                         \
 } while (0)

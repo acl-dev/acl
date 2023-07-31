@@ -1,6 +1,6 @@
 #pragma once
 
-#include "db/db.h"
+#include "dao/db.h"
 
 class master_service : public acl::master_fiber {
 public:
