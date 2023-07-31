@@ -5,7 +5,7 @@
 #pragma once
 
 #include "proto/redis_coder.h"
-#include "db/db.h"
+#include "dao/db.h"
 
 namespace pkv {
 
