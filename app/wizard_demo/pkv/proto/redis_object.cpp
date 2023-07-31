@@ -434,7 +434,7 @@ redis_object& redis_object::set_error(const std::string& data,
     return return_parent ? *parent_ : *this;
 }
 
-redis_object& redis_object::set_number(int n, bool return_parent) {
+redis_object& redis_object::set_number(long long n, bool return_parent) {
     type_ = REDIS_OBJ_INTEGER;
     buf_ = std::to_string(n);
     return return_parent ? *parent_ : *this;

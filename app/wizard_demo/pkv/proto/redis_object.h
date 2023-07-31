@@ -61,7 +61,7 @@ public:
 public:
     redis_object& set_status(const std::string& data, bool return_parent = false);
     redis_object& set_error(const std::string& data, bool return_parent = false);
-    redis_object& set_number(int n, bool return_parent = false);
+    redis_object& set_number(long long n, bool return_parent = false);
     redis_object& set_string(const std::string& data, bool return_parent = false);
     redis_object& create_child();
 

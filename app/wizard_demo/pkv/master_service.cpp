@@ -52,7 +52,8 @@ void master_service::on_accept(acl::socket_stream& conn) {
 }
 
 void master_service::run(acl::socket_stream& conn, size_t size) {
-    pkv::redis_coder parser;
+    std::vector<redis_object*> cache;
+    pkv::redis_coder parser(cache);
     pkv::redis_handler handler(db_, parser, conn);
     char buf[size];
 
@@ -79,6 +80,10 @@ void master_service::run(acl::socket_stream& conn, size_t size) {
         }
 
         parser.clear();
+    }
+
+    for (auto obj : cache) {
+        delete obj;
     }
 }
 

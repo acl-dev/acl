@@ -12,7 +12,7 @@ namespace pkv {
 
 class redis_coder {
 public:
-    explicit redis_coder(size_t cache_max = 10000);
+    explicit redis_coder(std::vector<redis_object*>& cache, size_t cache_max = 10000);
     ~redis_coder();
 
     const char* update(const char* data, size_t& len);
@@ -27,14 +27,18 @@ public:
 
     void clear();
 
+    NODISCARD std::vector<redis_object*>& get_cache() const {
+        return cache_;
+    }
+
 public:
     NODISCARD redis_object& create_object();
 
     bool to_string(std::string& out) const;
 
 private:
+    std::vector<redis_object*>& cache_;
     std::vector<redis_object*> objs_;
-    std::vector<redis_object*> cache_;
     size_t cache_max_;
     redis_object* curr_;
 };

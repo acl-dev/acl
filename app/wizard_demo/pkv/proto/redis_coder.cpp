@@ -7,17 +7,20 @@
 
 namespace pkv {
 
-redis_coder::redis_coder(size_t cache_max) {
-    cache_max_ = cache_max;
-    curr_ = new redis_object(cache_, cache_max_);
+redis_coder::redis_coder(std::vector<redis_object*>& cache, size_t cache_max)
+: cache_(cache)
+, cache_max_(cache_max)
+{
+    if (cache_.empty()) {
+        curr_ = new redis_object(cache_, cache_max_);
+    } else {
+        curr_ = cache_.back();
+        cache_.pop_back();
+    }
 }
 
 redis_coder::~redis_coder() {
     for (auto obj : objs_) {
-        delete obj;
-    }
-
-    for (auto obj : cache_) {
         delete obj;
     }
 
@@ -105,7 +108,8 @@ bool test_redis_parse_once(const char* filepath) {
         return false;
     }
 
-    redis_coder parser;
+    std::vector<redis_object*> cache;
+    redis_coder parser(cache);
     const char* data = buf.c_str();
     size_t len = buf.size();
     const char* left = parser.update(data, len);
@@ -153,7 +157,8 @@ bool test_redis_parse_stream(const char* filepath) {
         return false;
     }
 
-    redis_coder parser;
+    std::vector<redis_object*> cache;
+    redis_coder parser(cache);
     const char* data = buf.c_str();
     size_t len = buf.size();
     for (size_t i = 0; i < len; i++) {
@@ -191,7 +196,8 @@ bool test_redis_parse_stream(const char* filepath) {
 //////////////////////////////////////////////////////////////////////////////
 
 bool test_redis_build() {
-    redis_coder builder;
+    std::vector<redis_object*> cache;
+    redis_coder builder(cache);
 
     auto& obj = builder.create_object();
 
