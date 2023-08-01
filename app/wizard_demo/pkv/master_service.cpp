@@ -51,13 +51,20 @@ void master_service::on_accept(acl::socket_stream& conn) {
     logger("Disconnect from peer, fd=%d", conn.sock_handle());
 }
 
+static __thread std::vector<redis_object*>* __cache = NULL;
+
 void master_service::run(acl::socket_stream& conn, size_t size) {
-    std::vector<redis_object*> cache;
-    for (size_t i = 0; i < 5000000; i++) {
-        pkv::redis_object* o = new pkv::redis_object(cache, 5000000);
-        cache.emplace_back(o);
+    if (__cache == NULL) {
+        __cache = new std::vector<redis_object*>;
+        for (size_t i = 0; i < 100000; i++) {
+            pkv::redis_object* o = new pkv::redis_object(*__cache, 100000);
+            __cache->emplace_back(o);
+        }
     }
-    pkv::redis_coder parser(cache);
+
+    printf(">>>cache size=%zd<<<<<\r\n", __cache->size());
+
+    pkv::redis_coder parser(*__cache);
     pkv::redis_handler handler(db_, parser, conn);
     char buf[size];
 
@@ -86,9 +93,7 @@ void master_service::run(acl::socket_stream& conn, size_t size) {
         parser.clear();
     }
 
-    for (auto obj : cache) {
-        delete obj;
-    }
+    printf(">>>>>client disconnect, cache's size=%zd cache=%p<<<<<<\r\n", __cache->size(), __cache);
 }
 
 void master_service::proc_pre_jail() {

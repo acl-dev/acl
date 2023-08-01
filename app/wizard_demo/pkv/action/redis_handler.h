@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <vector>
 #include "proto/redis_coder.h"
 #include "dao/db.h"
 
@@ -18,6 +19,18 @@ public:
     ~redis_handler() = default;
 
     bool handle();
+
+    std::vector<redis_object*>& get_cache() const {
+        return parser_.get_cache();
+    }
+
+    redis_coder& get_coder() {
+        return coder_;
+    }
+
+    shared_db& get_db() {
+        return db_;
+    }
 
 private:
     shared_db& db_;

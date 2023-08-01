@@ -3,14 +3,18 @@
 //
 
 #include "stdafx.h"
+#include "proto/redis_coder.h"
+#include "dao/db.h"
+
+#include "redis_handler.h"
 #include "redis_key.h"
 
 namespace pkv {
 
-redis_key::redis_key(shared_db& db, const redis_object& obj, redis_coder& base)
-: db_(db), obj_(obj), base_(base)
+redis_key::redis_key(redis_handler& handler, const redis_object& obj)
+: handler_(handler), obj_(obj)
 {
-    (void) base_;
+    (void) handler_;
 }
 
 bool redis_key::del(redis_coder& result) {
@@ -26,7 +30,7 @@ bool redis_key::del(redis_coder& result) {
         return false;
     }
 
-    if (!db_->del(key)) {
+    if (!handler_.get_db()->del(key)) {
         logger_error("db del error, key=%s", key);
         return false;
     }
@@ -36,6 +40,10 @@ bool redis_key::del(redis_coder& result) {
 }
 
 bool redis_key::type(redis_coder& result) {
+    auto& coder = handler_.get_coder();
+    coder.clear();
+
+    std::string buff;
     result.create_object().set_status("string");
     return true;
 }

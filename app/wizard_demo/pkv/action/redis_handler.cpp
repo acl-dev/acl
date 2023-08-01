@@ -69,19 +69,18 @@ bool redis_handler::handle_one(const redis_object &obj) {
     }
 
     //printf(">>>cmd=%s\r\n", cmd);
-    //
-    //
+
     if (EQ(cmd, "SET")) {
-        redis_string redis(db_, obj, parser_);
+        redis_string redis(*this, obj);
         return redis.set(builder_);
     } else if (EQ(cmd, "GET")) {
-        redis_string redis(db_, obj, parser_);
+        redis_string redis(*this, obj);
         return redis.get(builder_);
     } else if (EQ(cmd, "DEL")) {
-        redis_key redis(db_, obj, parser_);
+        redis_key redis(*this, obj);
         return redis.del(builder_);
     } else if (EQ(cmd, "TYPE")) {
-        redis_key redis(db_, obj, parser_);
+        redis_key redis(*this, obj);
         return redis.type(builder_);
     } else if (EQ(cmd, "HSET")) {
         return hset(obj);

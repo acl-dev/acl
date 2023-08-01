@@ -12,7 +12,8 @@ namespace pkv {
 
 class redis_coder {
 public:
-    explicit redis_coder(std::vector<redis_object*>& cache, size_t cache_max = 5000000);
+    explicit redis_coder(std::vector<redis_object*>& cache,
+        size_t cache_max = 100000);
     ~redis_coder();
 
     const char* update(const char* data, size_t& len);
@@ -48,5 +49,6 @@ bool test_redis_parse_once(const char* filepath);
 bool test_redis_parse_stream(const char* filepath);
 
 bool test_redis_build();
+size_t redis_build_bench(size_t max);
 
 } // namespace pkv

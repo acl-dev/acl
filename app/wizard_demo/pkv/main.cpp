@@ -11,7 +11,7 @@ static void on_sigint(int) {
     exit(0);
 }
 
-static bool test_redis_coder(const char* file) {
+static bool test_redis_coder(const char* file, size_t max) {
 #if 1
     printf(">>>>>>>>Begin to test redis parsing<<<<<<<<<\r\n");
     if (!pkv::test_redis_parse(file)) {
@@ -30,6 +30,16 @@ static bool test_redis_coder(const char* file) {
     }
     printf(">>>>>>>Test redis building successfully<<<<<<<\r\n");
 
+    struct timeval begin, end;
+
+    printf(">>>begin benchmark\r\n");
+    gettimeofday(&begin, NULL);
+    size_t n = pkv::redis_build_bench(max);
+    gettimeofday(&end, NULL);
+    double cost = acl::stamp_sub(end, begin);
+    double speed = (n * 1000) / (cost > 0 ? cost : 0.00001);
+    printf(">>>Over, count=%zd, cost=%.2f, speed=%.2f\r\n", n, cost, speed);
+
     return true;
 }
 
@@ -45,10 +55,15 @@ int main(int argc, char *argv[]) {
 
     if (argc >= 2 && strcasecmp(argv[1], "test") == 0) {
         const char* file = "hash.txt";
+        size_t max = 2000000;
+
         if (argc >= 3) {
             file = argv[2];
         }
-        test_redis_coder(file);
+        if (argc >= 4) {
+            max = std::atoi(argv[3]);
+        }
+        test_redis_coder(file, max);
         return 0;
     } else if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
         signal(SIGINT, on_sigint);

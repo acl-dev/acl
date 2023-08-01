@@ -23,13 +23,17 @@ typedef enum {
 class redis_object {
 public:
     explicit redis_object(std::vector<redis_object*>& cache, size_t cache_max);
-    ~redis_object();
+
+    void destroy();
 
     redis_object(const redis_object&) = delete;
     void operator=(const redis_object&) = delete;
 
     void set_parent(redis_object* parent);
     void reset();
+
+private:
+    ~redis_object();
 
 public:
     const char* update(const char* data, size_t& len);

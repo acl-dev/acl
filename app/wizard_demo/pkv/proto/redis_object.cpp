@@ -7,6 +7,20 @@
 
 namespace pkv {
 
+#if 1
+#define EMPTY(x) ((x).size() == 0)
+#else
+#define EMPTY(x) ((x).empty())
+#endif
+
+#if 0
+#define LIKELY(x)   __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define LIKELY(x)       (x)
+#define UNLIKELY(x)     (x)
+#endif
+
 redis_object::redis_object(std::vector<redis_object*>& cache, size_t cache_max)
 : parent_(this)
 , cache_max_(cache_max)
@@ -15,9 +29,11 @@ redis_object::redis_object(std::vector<redis_object*>& cache, size_t cache_max)
 }
 
 redis_object::~redis_object() {
-    for (auto obj : objs_) {
-        delete obj;
-    }
+    reset();
+}
+
+void redis_object::destroy() {
+    delete this;
 }
 
 void redis_object::set_parent(redis_object* parent) {
@@ -29,12 +45,11 @@ void redis_object::set_parent(redis_object* parent) {
 void redis_object::reset() {
     for (auto obj : objs_) {
         if (cache_.size() < cache_max_) {
-            cache_.emplace_back(obj);
+            cache_.push_back(obj);
             obj->reset();
-	} else {
-            printf(">>>>delete o max=%zd, curr=%zd\n", cache_max_, cache_.size());
+        } else {
             delete obj;
-	}
+        }
     }
 
     status_ = redis_s_begin;
@@ -52,7 +67,7 @@ const char* redis_object::get_cmd() const {
         return buf_.c_str();
     }
 
-    if (objs_.empty() || type_ != REDIS_OBJ_ARRAY) {
+    if (UNLIKELY(EMPTY(objs_) || type_ != REDIS_OBJ_ARRAY)) {
         return nullptr;
     }
 
@@ -120,13 +135,13 @@ const char* redis_object::parse_object(const char* data, size_t& len) {
         return data;
     }
 
-    objs_.emplace_back(obj_);
+    objs_.push_back(obj_);
 
     if (objs_.size() == (size_t) cnt_) {
         obj_ = nullptr;
         //cnt_ = 0;
         status_ = redis_s_finish;
-    } else if (cache_.empty()) {
+    } else if (UNLIKELY(EMPTY(cache_))) {
 	obj_ = new redis_object(cache_, cache_max_);
     	obj_->set_parent(this);
     } else {
@@ -177,7 +192,7 @@ const char* redis_object::parse_status(const char* data, size_t& len) {
         return data;
     }
 
-    if (buf_.empty()) {
+    if (UNLIKELY(EMPTY(buf_))) {
         status_ = redis_s_null;
         return data;
     }
@@ -195,7 +210,7 @@ const char* redis_object::parse_error(const char* data, size_t& len) {
         return data;
     }
 
-    if (buf_.empty()) {
+    if (UNLIKELY(EMPTY(buf_))) {
         status_ = redis_s_null;
         return data;
     }
@@ -213,7 +228,7 @@ const char* redis_object::parse_number(const char* data, size_t& len) {
         return data;
     }
 
-    if (buf_.empty()) {
+    if (UNLIKELY(EMPTY(buf_))) {
         status_ = redis_s_null;
         return data;
     }
@@ -257,7 +272,7 @@ const char* redis_object::parse_strend(const char* data, size_t& len) {
     data = get_line(data, len, buf, found);
 
     // If the buf_ not empty, some data other '\r\n' got.
-    if (!buf.empty()) {
+    if (UNLIKELY(!EMPTY(buf))) {
         status_ = redis_s_null;
         return data;
     }
@@ -287,7 +302,7 @@ const char* redis_object::parse_arlen(const char* data, size_t& len) {
     type_ = REDIS_OBJ_ARRAY;
     status_ = redis_s_array;
 
-    if (cache_.empty()) {
+    if (UNLIKELY(EMPTY(cache_))) {
         obj_ = new redis_object(cache_, cache_max_);
     	obj_->set_parent(this);
     } else {
@@ -339,7 +354,7 @@ const char* redis_object::get_length(const char* data, size_t& len,
         return data;
     }
 
-    if (buf_.empty()) {
+    if (UNLIKELY(EMPTY(buf_))) {
         status_ = redis_s_null;
         return data;
     }
@@ -386,7 +401,7 @@ bool redis_object::to_string(std::string& out) const {
 #define CRLF    "\r\n"
 #endif
 
-    if (!objs_.empty()) {
+    if (!EMPTY(objs_)) {
         out.append("*").append(std::to_string(objs_.size())).append(CRLF);
 
         for (const auto& obj : objs_) {
@@ -396,7 +411,7 @@ bool redis_object::to_string(std::string& out) const {
         }
     }
 
-    //assert(!buf_.empty());
+    //assert(UNLIKELY(!EMPTY(buf_)));
 
     switch (type_) {
     case REDIS_OBJ_STATUS:
@@ -444,7 +459,7 @@ redis_object& redis_object::set_number(long long n, bool return_parent) {
 redis_object& redis_object::set_string(const std::string &data,
       bool return_parent) {
     type_ = REDIS_OBJ_STRING;
-    if (!data.empty()) {
+    if (UNLIKELY(!EMPTY(data))) {
         buf_ = data;
     }
     return return_parent ? *parent_ : *this;
@@ -452,16 +467,16 @@ redis_object& redis_object::set_string(const std::string &data,
 
 redis_object& redis_object::create_child() {
     redis_object* obj;
-    if (cache_.empty()) {
+    if (cache_.size() == 0) {
         obj = new redis_object(cache_, cache_max_);
     	obj->set_parent(this);
-        objs_.emplace_back(obj);
     } else {
         obj = cache_.back();
         cache_.pop_back();
     	obj->set_parent(this);
-        objs_.emplace_back(obj);
     }
+
+    objs_.push_back(obj);
 
     if (obj_ == nullptr) {
         // The last one is NULL.

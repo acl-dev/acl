@@ -7,11 +7,25 @@
 
 namespace pkv {
 
+#if 1
+#define EMPTY(x) ((x).size() == 0)
+#else
+#define EMPTY(x) ((x).empty())
+#endif
+
+#if 0
+#define LIKELY(x)   __builtin_expect(!!(x), 1)
+#define UNLIKELY(x) __builtin_expect(!!(x), 0)
+#else
+#define LIKELY(x)       (x)
+#define UNLIKELY(x)     (x)
+#endif
+
 redis_coder::redis_coder(std::vector<redis_object*>& cache, size_t cache_max)
 : cache_(cache)
 , cache_max_(cache_max)
 {
-    if (cache_.empty()) {
+    if (UNLIKELY(EMPTY(cache_))) {
         curr_ = new redis_object(cache_, cache_max_);
     } else {
         curr_ = cache_.back();
@@ -20,24 +34,25 @@ redis_coder::redis_coder(std::vector<redis_object*>& cache, size_t cache_max)
 }
 
 redis_coder::~redis_coder() {
-    for (auto obj : objs_) {
-        delete obj;
-    }
+    clear();
 
-    delete curr_;
+    if (cache_.size() < cache_max_) {
+        cache_.push_back(curr_);
+        curr_->reset();
+    } else {
+        curr_->destroy();
+    }
 }
 
 void redis_coder::clear() {
     for (auto obj : objs_) {
         if (cache_.size() < cache_max_) {
-            cache_.emplace_back(obj);
+            cache_.push_back(obj);
             obj->reset();
 	} else {
-            printf(">>>>coder delete o max=%zd, curr=%zd\n", cache_max_, cache_.size());
-            delete obj;
+            obj->destroy();
 	}
     }
-
     objs_.clear();
 }
 
@@ -45,9 +60,9 @@ const char* redis_coder::update(const char* data, size_t& len) {
     while (len > 0) {
         data = curr_->update(data, len);
         if (curr_->finish()) {
-            objs_.emplace_back(curr_);
+            objs_.push_back(curr_);
 
-	    if (cache_.empty()) {
+	    if (UNLIKELY(EMPTY(cache_))) {
                 curr_ = new redis_object(cache_, cache_max_);
 	    } else {
                 curr_ = cache_.back();
@@ -64,16 +79,14 @@ const char* redis_coder::update(const char* data, size_t& len) {
 redis_object& redis_coder::create_object() {
     redis_object* obj;
 
-    if (cache_.empty()) {
+    if (UNLIKELY(EMPTY(cache_))) {
     	obj = new redis_object(cache_, cache_max_);
-        printf(">>>>>>>>>>>%s-%d<<<<max=%zd<<<\n", __func__ , __LINE__, cache_max_);
     } else {
         obj = cache_.back();
 	cache_.pop_back();
-        //printf(">>>---->>>>>>>>%s-%d<<size=%zd<<<<<\n", __func__ , __LINE__, cache_.size());
     }
 
-    objs_.emplace_back(obj);
+    objs_.push_back(obj);
     return *obj;
 }
 
@@ -236,6 +249,27 @@ bool test_redis_build() {
     }
 
     return true;
+}
+
+size_t redis_build_bench(size_t max) {
+        std::vector<redis_object*> cache;
+        redis_coder builder(cache, 1000);
+        size_t i = 0;
+
+        for (; i < max; i++) {
+            std::string buff;
+            builder.create_object()
+                .create_child().set_string("string", true)
+                .create_child().set_number(-1);
+            builder.create_object().set_status("hello world!");
+//            builder.create_object().set_status("hello world!");
+//            builder.create_object().set_number(-1);
+//            builder.create_object().set_number(-1);
+            builder.to_string(buff);
+            builder.clear();
+        }
+
+        return i;
 }
 
 //////////////////////////////////////////////////////////////////////////////
