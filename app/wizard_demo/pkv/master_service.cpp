@@ -62,8 +62,6 @@ void master_service::run(acl::socket_stream& conn, size_t size) {
         }
     }
 
-    printf(">>>cache size=%zd<<<<<\r\n", __cache->size());
-
     pkv::redis_coder parser(*__cache);
     pkv::redis_handler handler(db_, parser, conn);
     char buf[size];
@@ -92,8 +90,6 @@ void master_service::run(acl::socket_stream& conn, size_t size) {
 
         parser.clear();
     }
-
-    printf(">>>>>client disconnect, cache's size=%zd cache=%p<<<<<<\r\n", __cache->size(), __cache);
 }
 
 void master_service::proc_pre_jail() {

@@ -123,7 +123,7 @@ service pkv
 ############################################################################
 #	应用自己的配置选项
 
-	disable_serialize = 0
+	disable_serialize = 1
 	disable_save = 1
 	buf_size = 8192
 	dbpath = ./data

@@ -5,7 +5,6 @@
 #include "stdafx.h"
 #include "proto/redis_coder.h"
 #include "proto/redis_object.h"
-#include "dao/db.h"
 
 #include "redis_handler.h"
 #include "redis_string.h"
@@ -13,7 +12,7 @@
 namespace pkv {
 
 redis_string::redis_string(redis_handler& handler, const redis_object &obj)
-: handler_(handler), obj_(obj)
+: redis_command(handler, obj)
 {}
 
 bool redis_string::set(redis_coder& result) {
