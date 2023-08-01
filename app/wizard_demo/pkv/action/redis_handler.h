@@ -20,15 +20,15 @@ public:
 
     bool handle();
 
-    std::vector<redis_object*>& get_cache() const {
+    NODISCARD std::vector<redis_object*>& get_cache() const {
         return parser_.get_cache();
     }
 
-    redis_coder& get_coder() {
+    NODISCARD redis_coder& get_coder() {
         return coder_;
     }
 
-    shared_db& get_db() {
+    NODISCARD shared_db& get_db() {
         return db_;
     }
 

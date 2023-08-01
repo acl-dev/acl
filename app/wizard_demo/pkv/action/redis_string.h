@@ -11,7 +11,7 @@ class redis_coder;
 
 class redis_string : public redis_command {
 public:
-    redis_string(redis_handler& handler, const redis_object &obj);
+    redis_string(redis_handler& handler, const redis_object& obj);
     ~redis_string() override = default;
 
     bool set(redis_coder& result);
