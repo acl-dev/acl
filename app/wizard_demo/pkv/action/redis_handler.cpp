@@ -8,6 +8,7 @@
 #include "redis_key.h"
 #include "redis_string.h"
 #include "redis_hash.h"
+#include "redis_server.h"
 #include "redis_handler.h"
 
 namespace pkv {
@@ -101,6 +102,9 @@ bool redis_handler::handle_one(const redis_object &obj) {
     } else if (EQ(cmd, "HGETALL")) {
         redis_hash redis(*this, obj);
         return redis.hgetall(builder_);
+    } else if (EQ(cmd, "CONFIG")) {
+        redis_server redis(*this, obj);
+        return redis.config(builder_);
     }
 
     std::string err;

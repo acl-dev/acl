@@ -394,7 +394,7 @@ const char* redis_object::get_line(const char* data, size_t& len,
 }
 
 bool redis_object::to_string(std::string& out) const {
-#define USE_UNIX_CRLF
+//#define USE_UNIX_CRLF
 #ifdef USE_UNIX_CRLF
 #define CRLF    "\n"
 #else

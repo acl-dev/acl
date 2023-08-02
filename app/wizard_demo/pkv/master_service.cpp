@@ -73,6 +73,7 @@ void master_service::run(acl::socket_stream& conn, size_t size) {
         }
 
         buf[ret] = 0;
+	//printf("%s", buf); fflush(stdout);
 
         size_t len = (size_t) ret;
         const char* data = parser.update(buf, len);
