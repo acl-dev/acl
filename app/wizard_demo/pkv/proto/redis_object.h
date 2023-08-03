@@ -20,9 +20,11 @@ typedef enum {
 	REDIS_OBJ_ARRAY,
 } redis_obj_t;
 
+class redis_ocache;
+
 class redis_object {
 public:
-    explicit redis_object(std::vector<redis_object*>& cache, size_t cache_max);
+    explicit redis_object(redis_ocache& cache);
 
     void destroy();
 
@@ -81,8 +83,7 @@ private:
     std::string buf_;
     int cnt_ = 0;
 
-    size_t cache_max_;
-    std::vector<redis_object*>& cache_;
+    redis_ocache& cache_;
     std::vector<redis_object*> objs_;
 
 private:

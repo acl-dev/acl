@@ -117,7 +117,7 @@ set(output_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_path})
 link_directories(${output_path})
 
-add_executable(pkv ${src_files} action/redis_handler.cpp action/redis_handler.h)
+add_executable(pkv ${src_files} action/redis_handler.cpp action/redis_handler.h proto/redis_ocache.cpp proto/redis_ocache.h)
 target_link_libraries(pkv ${lib_all})
 
 ###############################################################################

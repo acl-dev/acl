@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+#include "redis_ocache.h"
 #include "redis_object.h"
 
 namespace pkv {
@@ -21,9 +22,8 @@ namespace pkv {
 #define UNLIKELY(x)     (x)
 #endif
 
-redis_object::redis_object(std::vector<redis_object*>& cache, size_t cache_max)
+redis_object::redis_object(redis_ocache& cache)
 : parent_(this)
-, cache_max_(cache_max)
 , cache_(cache)
 {
 }
@@ -44,12 +44,7 @@ void redis_object::set_parent(redis_object* parent) {
 
 void redis_object::reset() {
     for (auto obj : objs_) {
-        if (cache_.size() < cache_max_) {
-            cache_.push_back(obj);
-            obj->reset();
-        } else {
-            delete obj;
-        }
+        cache_.put(obj);
     }
 
     status_ = redis_s_begin;
@@ -141,12 +136,8 @@ const char* redis_object::parse_object(const char* data, size_t& len) {
         obj_ = nullptr;
         //cnt_ = 0;
         status_ = redis_s_finish;
-    } else if (UNLIKELY(EMPTY(cache_))) {
-	obj_ = new redis_object(cache_, cache_max_);
-    	obj_->set_parent(this);
     } else {
-        obj_ = cache_.back();
-        cache_.pop_back();
+        obj_ = cache_.get();
         obj_->set_parent(this);
     }
 
@@ -302,14 +293,8 @@ const char* redis_object::parse_arlen(const char* data, size_t& len) {
     type_ = REDIS_OBJ_ARRAY;
     status_ = redis_s_array;
 
-    if (UNLIKELY(EMPTY(cache_))) {
-        obj_ = new redis_object(cache_, cache_max_);
-    	obj_->set_parent(this);
-    } else {
-        obj_ = cache_.back();
-	cache_.pop_back();
-        obj_->set_parent(this);
-    }
+    obj_ = cache_.get();
+    obj_->set_parent(this);
 
     return data;
 }
@@ -394,7 +379,7 @@ const char* redis_object::get_line(const char* data, size_t& len,
 }
 
 bool redis_object::to_string(std::string& out) const {
-//#define USE_UNIX_CRLF
+#define USE_UNIX_CRLF
 #ifdef USE_UNIX_CRLF
 #define CRLF    "\n"
 #else
@@ -466,15 +451,8 @@ redis_object& redis_object::set_string(const std::string &data,
 }
 
 redis_object& redis_object::create_child() {
-    redis_object* obj;
-    if (cache_.size() == 0) {
-        obj = new redis_object(cache_, cache_max_);
-    	obj->set_parent(this);
-    } else {
-        obj = cache_.back();
-        cache_.pop_back();
-    	obj->set_parent(this);
-    }
+    redis_object* obj = cache_.get();
+    obj->set_parent(this);
 
     objs_.push_back(obj);
 

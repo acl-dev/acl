@@ -11,6 +11,7 @@
 namespace pkv {
 
 class redis_object;
+class redis_ocache;
 
 class redis_handler {
 public:
@@ -20,7 +21,7 @@ public:
 
     bool handle();
 
-    NODISCARD std::vector<redis_object*>& get_cache() const {
+    NODISCARD redis_ocache& get_cache() const {
         return parser_.get_cache();
     }
 

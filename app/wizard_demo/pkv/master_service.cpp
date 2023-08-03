@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "proto/redis_ocache.h"
 #include "proto/redis_coder.h"
 #include "action/redis_handler.h"
 #include "master_service.h"
@@ -51,14 +52,14 @@ void master_service::on_accept(acl::socket_stream& conn) {
     logger("Disconnect from peer, fd=%d", conn.sock_handle());
 }
 
-static __thread std::vector<redis_object*>* __cache = NULL;
+static __thread redis_ocache* __cache = NULL;
 
 void master_service::run(acl::socket_stream& conn, size_t size) {
     if (__cache == NULL) {
-        __cache = new std::vector<redis_object*>;
+        __cache = new redis_ocache;
         for (size_t i = 0; i < 100000; i++) {
-            pkv::redis_object* o = new pkv::redis_object(*__cache, 100000);
-            __cache->emplace_back(o);
+            pkv::redis_object* o = new pkv::redis_object(*__cache);
+            __cache->put(o);
         }
     }
 
