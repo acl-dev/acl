@@ -125,7 +125,7 @@ service pkv
 
 	disable_serialize = 1
 	disable_save = 1
-	buf_size = 8192
+	buf_size = 81920
 	dbpath = ./data
 	dbtype = wdb
 }

@@ -6,6 +6,8 @@
 #include "wdb.h"
 #include "wt_sess.h"
 
+#ifdef HAS_WT
+
 namespace pkv {
 
 wt_sess::wt_sess(wdb &db) : db_(db), sess_(nullptr), curs_(nullptr) {}
@@ -86,3 +88,5 @@ bool wt_sess::del(const std::string &key) {
 }
 
 } // namespace pkv
+
+#endif // HAS_WT

@@ -19,7 +19,6 @@ static bool test_redis_coder(const char* file, size_t max) {
         return false;
     }
     printf(">>>>>>>Test redis parsing successfully<<<<<<<<<\r\n");
-#endif
 
     printf("\r\n");
 
@@ -29,6 +28,8 @@ static bool test_redis_coder(const char* file, size_t max) {
         return false;
     }
     printf(">>>>>>>Test redis building successfully<<<<<<<\r\n");
+
+#endif
 
     struct timeval begin, end;
 

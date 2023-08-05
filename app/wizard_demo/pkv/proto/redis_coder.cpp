@@ -56,6 +56,7 @@ const char* redis_coder::update(const char* data, size_t& len) {
 
 redis_object& redis_coder::create_object() {
     redis_object* obj = cache_.get();
+    assert(obj);
     objs_.push_back(obj);
     return *obj;
 }

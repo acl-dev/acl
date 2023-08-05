@@ -25,6 +25,9 @@ namespace pkv {
 redis_ocache::redis_ocache(size_t max) : max_(max) {
 #ifndef USE_VECTOR
     cache_ = new redis_object* [max];
+    for (size_t i = 0; i < max; i++) {
+        cache_[i] = NULL;
+    }
     pos_ = 0;
 #endif
 }
@@ -53,7 +56,7 @@ redis_object *redis_ocache::get() {
     }
 #else
     if (pos_ > 0) {
-        return cache_[pos_--];
+        return cache_[--pos_];
     } else {
         return new redis_object(*this);
     }
@@ -70,8 +73,9 @@ void redis_ocache::put(redis_object* obj) {
     }
 #else
     if (pos_ < max_) {
+        assert(obj);
         cache_[pos_++] = obj;
-        obj->reset();
+    	obj->reset();
     } else {
         obj->destroy();
     }

@@ -4,6 +4,8 @@
 
 #pragma once
 
+#ifdef HAS_WT
+
 #include <wiredtiger.h>
 
 namespace pkv {
@@ -31,3 +33,5 @@ private:
 };
 
 } // namespace pkv
+
+#endif // HAS_WT

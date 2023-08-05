@@ -11,7 +11,7 @@ class redis_object;
 
 class redis_ocache {
 public:
-    redis_ocache(size_t max = 10000);
+    redis_ocache(size_t max = 100);
     ~redis_ocache();
 
     redis_object* get();
