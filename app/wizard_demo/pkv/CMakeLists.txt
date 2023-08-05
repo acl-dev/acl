@@ -48,8 +48,9 @@ set(src_paths
     ${base_path}
     ${base_path}/action
     ${base_path}/dao
-    ${base_path}/dao/rocksdb
-    ${base_path}/dao/wt
+    ${base_path}/db
+    ${base_path}/db/rocksdb
+    ${base_path}/db/wt
     ${base_path}/proto
 )
 
@@ -93,7 +94,7 @@ endif()
 set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a)
 set(fiber ${home_path}/lib_fiber/lib/libfiber.a)
 
-set(lib_all ${acl_all})
+set(lib_all ${acl_all} -lyyjson)
 
 if(${HAS_ROCKSDB} MATCHES "YES")
     find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)

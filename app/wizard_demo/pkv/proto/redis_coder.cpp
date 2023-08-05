@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "redis_ocache.h"
 #include "redis_coder.h"
+#include "dao/string_dao.h"
 
 namespace pkv {
 
@@ -223,6 +224,7 @@ bool test_redis_build() {
 }
 
 size_t redis_build_bench(size_t max) {
+#if 0
         redis_ocache cache;
         redis_coder builder(cache);
         size_t i = 0;
@@ -233,13 +235,28 @@ size_t redis_build_bench(size_t max) {
                 .create_child().set_string("string", true)
                 .create_child().set_number(-1);
             builder.create_object().set_status("hello world!");
-//            builder.create_object().set_status("hello world!");
-//            builder.create_object().set_number(-1);
-//            builder.create_object().set_number(-1);
+            builder.create_object().set_status("hello world!");
+            builder.create_object().set_number(-1);
+            builder.create_object().set_number(-1);
             builder.to_string(buff);
             builder.clear();
         }
+#else
+        size_t i = 0;
+        string_dao dao;
 
+        for (; i < max; i++) {
+            std::string buff;
+            dao.set_string("hello world");
+            if (!dao.to_string(buff)) {
+                printf("to_string error\r\n");
+                break;
+            }
+            if (i == 0) {
+                printf("%s\r\n", buff.c_str());
+            }
+        }
+#endif
         return i;
 }
 

@@ -6,7 +6,7 @@
 
 #include <vector>
 #include "proto/redis_coder.h"
-#include "dao/db.h"
+#include "db/db.h"
 
 namespace pkv {
 
