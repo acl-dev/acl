@@ -5,7 +5,7 @@
 #include "stdafx.h"
 #include "redis_ocache.h"
 #include "redis_coder.h"
-#include "dao/string_dao.h"
+#include "dao/string.h"
 
 namespace pkv {
 
@@ -243,10 +243,10 @@ size_t redis_build_bench(size_t max) {
         }
 #else
         size_t i = 0;
-        string_dao dao;
 
         for (; i < max; i++) {
             std::string buff;
+            dao::string dao;
             dao.set_string("hello world");
             if (!dao.to_string(buff)) {
                 printf("to_string error\r\n");

@@ -8,7 +8,7 @@ static void on_sigint(int) {
     logger("---Begin to close db---");
     ms.close_db();
     logger("---Close db ok---");
-    exit(0);
+    _exit(0);
 }
 
 static bool test_redis_coder(const char* file, size_t max) {
@@ -46,13 +46,6 @@ static bool test_redis_coder(const char* file, size_t max) {
 
 int main(int argc, char *argv[]) {
     acl::acl_cpp_init();
-    master_service& ms = acl::singleton2<master_service>::get_instance();
-
-    // 设置配置参数表
-    ms.set_cfg_int(var_conf_int_tab);
-    ms.set_cfg_int64(var_conf_int64_tab);
-    ms.set_cfg_str(var_conf_str_tab);
-    ms.set_cfg_bool(var_conf_bool_tab);
 
     if (argc >= 2 && strcasecmp(argv[1], "test") == 0) {
         const char* file = "hash.txt";
@@ -66,7 +59,17 @@ int main(int argc, char *argv[]) {
         }
         test_redis_coder(file, max);
         return 0;
-    } else if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
+    }
+
+    master_service& ms = acl::singleton2<master_service>::get_instance();
+
+    // 设置配置参数表
+    ms.set_cfg_int(var_conf_int_tab);
+    ms.set_cfg_int64(var_conf_int64_tab);
+    ms.set_cfg_str(var_conf_str_tab);
+    ms.set_cfg_bool(var_conf_bool_tab);
+
+    if (argc == 1 || (argc >= 2 && strcasecmp(argv[1], "alone") == 0)) {
         signal(SIGINT, on_sigint);
 
         // 日志输出至标准输出

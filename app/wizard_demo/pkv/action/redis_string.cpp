@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "proto/redis_coder.h"
 #include "proto/redis_object.h"
+#include "dao/string.h"
 
 #include "redis_handler.h"
 #include "redis_string.h"
@@ -34,6 +35,7 @@ bool redis_string::set(redis_coder& result) {
         return false;
     }
 
+#if 0
     if (!var_cfg_disable_serialize) {
         std::string buff;
         auto& coder = handler_.get_coder();
@@ -53,6 +55,16 @@ bool redis_string::set(redis_coder& result) {
             }
         }
     }
+#else
+    if (!var_cfg_disable_save) {
+        dao::string dao;
+
+        if (!dao.set(handler_.get_db(), key, value)) {
+            logger_error("db set error, key=%s", key);
+            return false;
+        }
+    }
+#endif
 
     result.create_object().set_status("OK");
     return true;
@@ -71,6 +83,7 @@ bool redis_string::get(redis_coder& result) {
         return false;
     }
 
+#if 0
     std::string buff;
     if (!handler_.get_db()->get(key, buff) || buff.empty()) {
         logger_error("db get error, key=%s", key);
@@ -106,8 +119,16 @@ bool redis_string::get(redis_coder& result) {
         logger_error("value null, key=%s", key);
         return false;
     }
-
     result.create_object().set_string(v);
+#else
+    std::string buff;
+    dao::string dao;
+    if (!dao.get(handler_.get_db(), key, buff)) {
+        return false;
+    }
+    result.create_object().set_string(buff);
+#endif
+
     return true;
 }
 
