@@ -10,8 +10,11 @@ public:
     hash();
     ~hash() override = default;
 
+    int hdel(shared_db& db, const std::string& key, const std::string& name);
+
     bool hset(shared_db& db, const std::string& key, const std::string& name,
             const std::string& value);
+
     bool hget(shared_db& db, const std::string& key, const std::string& name,
             std::string& value);
 
@@ -24,13 +27,11 @@ public:
 public:
     bool to_string(std::string& out);
 
-protected:
-    const char* build();
-
 private:
     std::map<std::string, std::string> fields_;
+
+    const char* build();
 };
 
 } // namespace dao
-
 } // namespace pkv

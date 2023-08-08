@@ -11,8 +11,8 @@ bool hash::to_string(std::string& out) {
 }
 
 const char* hash::build() {
-    if (finished_) {
-        return result_;
+    if (this->finished_) {
+        return this->result_;
     }
 
     this->create_writer();
@@ -30,7 +30,7 @@ const char* hash::build() {
 
     this->result_ = yyjson_mut_write(this->w_doc_, 0, NULL);
 
-    finished_ = true;
+    this->finished_ = true;
     return result_;
 }
 
@@ -41,10 +41,36 @@ bool hash::hset(shared_db& db, const std::string& key, const std::string& name,
     fields_[name] = value;
 
     if (build() == nullptr) {
+        logger_error("build for hset error, key=%s, name=%s, value=%s",
+              key.c_str(), name.c_str(), value.c_str());
         return false;
     }
     //printf(">>>%s<<<\r\n", this->result_);
     return this->save(db, key, this->result_);
+}
+
+int hash::hdel(shared_db& db, const std::string& key, const std::string& name) {
+    if (!hgetall(db, key)) {
+        return -1;
+    }
+    auto it = fields_.find(name);
+    if (it == fields_.end()) {
+        return 0;
+    }
+
+    fields_.erase(it);
+
+    if (fields_.empty()) {
+        db->del(key);
+    } else if (build() == nullptr) {
+        logger_error("build for hset error, key=%s, name=%s",
+              key.c_str(), name.c_str());
+        return -1;
+    } else if (!this->save(db, key, this->result_)) {
+        return -1;
+    }
+
+    return 1;
 }
 
 // { "type": "hash", "expire": -1, "data": { "name1": "value1", "name2": "value2" }}
@@ -53,9 +79,11 @@ bool hash::hget(shared_db& db, const std::string& key, const std::string& name,
         std::string& value) {
     auto data = this->read(db, key);
     if (data == nullptr) {
+        logger_error("db read error, key=%s", key.c_str());
         return false;
     }
     if (strcasecmp(type_.c_str(), "hash") != 0) {
+        logger_error("nvalid type=%s, key=%s", type_.c_str(), key.c_str());
         return false;
     }
 
@@ -82,9 +110,11 @@ bool hash::hgetall(shared_db& db, const std::string& key) {
 
     auto data = this->read(db, key);
     if (data == nullptr) {
+        logger_error("db read error, key=%s", key.c_str());
         return false;
     }
     if (strcasecmp(type_.c_str(), "hash") != 0) {
+        logger_error("nvalid type=%s, key=%s", type_.c_str(), key.c_str());
         return false;
     }
 

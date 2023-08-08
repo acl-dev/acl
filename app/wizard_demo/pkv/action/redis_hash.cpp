@@ -81,7 +81,28 @@ bool redis_hash::hget(redis_coder &result) {
 }
 
 bool redis_hash::hdel(redis_coder &result) {
-    return false;
+    auto& objs = obj_.get_objects();
+    if (objs.size() < 3) {
+        logger_error("invalid HDEL params' size=%zd < 3", objs.size());
+        return false;
+    }
+
+    auto key = objs[1]->get_str();
+    if (key == nullptr || *key == 0) {
+        logger_error("key null");
+        return false;
+    }
+
+    auto name = objs[2]->get_str();
+    if (name == nullptr || *name == 0) {
+        logger_error("name null");
+        return false;
+    }
+
+    dao::hash dao;
+    int ret = dao.hdel(handler_.get_db(), key, name);
+    result.create_object().set_number(ret);
+    return true;
 }
 
 bool redis_hash::hmset(redis_coder &result) {
@@ -93,7 +114,31 @@ bool redis_hash::hmget(redis_coder &result) {
 }
 
 bool redis_hash::hgetall(redis_coder &result) {
-    return false;
+    auto& objs = obj_.get_objects();
+    if (objs.size() < 2) {
+        logger_error("invalid HGETALL command's size=%zd < 2", objs.size());
+        return false;
+    }
+
+    auto key = objs[1]->get_str();
+    if (key == nullptr || *key == 0) {
+        logger_error("key null");
+        return false;
+    }
+
+    dao::hash dao;
+    if (!dao.hgetall(handler_.get_db(), key)) {
+        logger_error("dao.hgetall error, key=%s", key);
+        return false;
+    }
+
+    auto& fields = dao.get_fields();
+    auto& obj = result.create_object();
+    for (const auto& it : fields) {
+        obj.create_child().set_string(it.first, true)
+            .create_child().set_string(it.second);
+    }
+    return true;
 }
 
 } // namespace pkv
