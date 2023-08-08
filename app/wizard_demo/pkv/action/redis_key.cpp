@@ -86,9 +86,9 @@ bool redis_key::type(redis_coder& result) {
         return false;
     }
 
-    auto type = objs3[0]->get_str();
+    auto obj_type = objs3[0]->get_str();
 
-    result.create_object().set_status(type);
+    result.create_object().set_status(obj_type);
     return true;
 }
 

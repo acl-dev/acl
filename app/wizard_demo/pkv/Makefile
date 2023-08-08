@@ -18,4 +18,6 @@ all:
 clean cl:
 	@(rm -rf build pkv)
 
+help h:
+	@echo "\"make BUILD_WITH_C11=YES\"" to build with c++11 or to build with c++17.
 rebuild rb: cl all
