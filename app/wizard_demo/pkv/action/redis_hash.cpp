@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "proto/redis_coder.h"
 #include "proto/redis_object.h"
+#include "dao/hash.h"
 
 #include "redis_handler.h"
 #include "redis_hash.h"
@@ -40,25 +41,11 @@ bool redis_hash::hset(redis_coder &result) {
         return false;
     }
 
-    auto& coder = handler_.get_coder();
-    coder.clear();
-
-    coder.create_object()
-        .create_child().set_string(name, true)
-        .create_child().set_string(value, true);
-
-    std::string buff;
-    if (!coder.to_string(buff)) {
-        logger_error("build data error");
+    dao::hash dao;
+    if (!dao.hset(handler_.get_db(), key, name, value)) {
         return false;
     }
 
-    if (!handler_.get_db()->set(key, buff)) {
-        logger_error("set key=%s, value=%s error", key, buff.c_str());
-        return false;
-    }
-
-    //printf(">set key=%s, value=%s ok\n", key, buff.c_str());
     result.create_object().set_number(1);
     return true;
 }
@@ -83,54 +70,14 @@ bool redis_hash::hget(redis_coder &result) {
     }
 
     std::string buff;
-    if (!handler_.get_db()->get(key, buff) || buff.empty()) {
-        logger_error("db get key=%s error", key);
+    dao::hash dao;
+    if (!dao.hget(handler_.get_db(), key, name, buff)) {
         return false;
     }
 
     //printf(">>hget: [%s]\r\n", buff.c_str());
-
-    auto& coder = handler_.get_coder();
-    coder.clear();
-
-    size_t len = buff.size();
-    (void) coder.update(buff.c_str(), len);
-    if (len > 0) {
-        logger_error("invalid buff in db for key=%s", key);
-        return false;
-    }
-
-    auto& objs2 = coder.get_objects();
-    if (objs2.size() != 1) {
-        logger_error("invalid object in db, key=%s, objs=%zd", key, objs2.size());
-        return false;
-    }
-
-    auto array = objs2[0];
-    if (array->get_type() != REDIS_OBJ_ARRAY) {
-        logger_error("invalid array object, key=%s", key);
-        return false;
-    }
-    auto& objs3 = array->get_objects();
-    if (objs3.empty() || objs3.size() % 2 != 0) {
-        logger_error("invalid array objects' size=%zd, key=%s", objs3.size(), key);
-        return false;
-    }
-    for (size_t i = 0; i < objs3.size();) {
-        auto n = objs3[i++]->get_str();
-        auto v = objs3[i++]->get_str();
-        if (n == nullptr || *n == 0 || v == nullptr || *v == 0) {
-            logger_error("no value set in db, key=%s", key);
-            return false;
-        }
-        if (strcmp(name, n) == 0) {
-            result.create_object().set_string(v);
-            return true;
-        }
-    }
-
-    logger_error("Not found, key=%s, name=%s", key, name);
-    return false;
+    result.create_object().set_string(buff);
+    return true;
 }
 
 bool redis_hash::hdel(redis_coder &result) {

@@ -70,7 +70,7 @@ bool redis_handler::handle_one(const redis_object &obj) {
         return false;
     }
 
-    //printf(">>>cmd=%s\r\n", cmd);
+    //printf(">>>%s(%d): cmd=%s\r\n", __func__, __LINE__, cmd);
 
     if (EQ(cmd, "SET")) {
         redis_string redis(*this, obj);

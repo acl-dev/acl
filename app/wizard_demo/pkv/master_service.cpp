@@ -45,11 +45,11 @@ using namespace pkv;
 
 void master_service::on_accept(acl::socket_stream& conn) {
     //conn.set_rw_timeout(var_cfg_io_timeout);
-    logger(">>>accept connection: %d", conn.sock_handle());
+    //logger(">>>accept connection: %d", conn.sock_handle());
 
     run(conn, var_cfg_buf_size);
 
-    logger("Disconnect from peer, fd=%d", conn.sock_handle());
+    //logger("Disconnect from peer, fd=%d", conn.sock_handle());
 }
 
 static __thread redis_ocache* __cache = NULL;

@@ -63,7 +63,8 @@ bool redis_key::type(redis_coder& result) {
     size_t len = buff.size();
     (void) coder.update(buff.c_str(), len);
     if (len > 0) {
-        logger_error("invalid buff in db, key=%s", key);
+        logger_error("invalid data in db, key=%s, buff=%s, size=%zd, left=%zd",
+                key, buff.c_str(), buff.size(), len);
         return false;
     }
 

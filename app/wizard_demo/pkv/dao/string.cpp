@@ -4,30 +4,7 @@
 namespace pkv {
 namespace dao {
 
-string::string() : finished_(false), data_(nullptr), result_(nullptr) {
-    doc_ = yyjson_mut_doc_new(NULL);
-    root_ = yyjson_mut_obj(doc_);
-    yyjson_mut_doc_set_root(doc_, root_);
-}
-
-string::~string() {
-    if (result_) {
-        free(result_);
-    }
-    yyjson_mut_doc_free(doc_);
-}
-
-void string::reset() {
-    yyjson_mut_doc_free(doc_);
-
-    finished_ = false;
-    data_ = nullptr;
-    result_ = nullptr;
-
-    doc_ = yyjson_mut_doc_new(NULL);
-    root_ = yyjson_mut_obj(doc_);
-    yyjson_mut_doc_set_root(doc_, root_);
-}
+string::string() : data_(nullptr) {}
 
 bool string::to_string(std::string& out) {
     auto res = build();
@@ -44,14 +21,16 @@ void string::set_string(const char* data) {
 }
 
 const char* string::build() {
-    if (finished_) {
-        return result_;
+    if (this->finished_) {
+        return this->result_;
     }
 
-    yyjson_mut_obj_add_str(doc_, root_, "type", "string");
-    yyjson_mut_obj_add_int(doc_, root_, "expire", -1);
-    yyjson_mut_obj_add_str(doc_, root_, "data", data_);
-    result_ = yyjson_mut_write(doc_, 0, NULL);
+    this->create_writer();
+
+    yyjson_mut_obj_add_str(this->w_doc_, this->w_root_, "type", "string");
+    yyjson_mut_obj_add_int(this->w_doc_, this->w_root_, "expire", -1);
+    yyjson_mut_obj_add_str(this->w_doc_, this->w_root_, "data", data_);
+    this->result_ = yyjson_mut_write(this->w_doc_, 0, NULL);
 
     finished_ = true;
     return result_;
@@ -59,19 +38,35 @@ const char* string::build() {
 
 bool string::set(shared_db& db, const std::string& key, const char* data) {
     data_ = data;
-    return this->save(db, key);
+    if (build() == nullptr) {
+        return false;
+    }
+    return this->save(db, key, this->result_);
 }
 
 bool string::get(shared_db& db, const std::string& key, std::string& out) {
-    if (!this->read(db, key, out)) {
+    auto data = this->read(db, key);
+    if (data == nullptr) {
         return false;
     }
-
-    if (strcasecmp(type_.c_str(), "string") != 0) {
+    if (strcasecmp(this->type_.c_str(), "string") != 0) {
         logger_error("invalid type=%s, key=%s", type_.c_str(), key.c_str());
         return false;
     }
-    return true;
+
+    auto type = yyjson_get_type(data);
+    if (type != YYJSON_TYPE_STR) {
+        logger_error("invalid json_node type=%d", (int) type);
+        return false;
+    }
+
+    auto v = yyjson_get_str(data);
+    auto n = yyjson_get_len(data);
+    if (v && n > 0) {
+        out.append(v, n);
+        return true;
+    }
+    return false;
 }
 
 } // namespace dao
