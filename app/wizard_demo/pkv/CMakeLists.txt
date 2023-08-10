@@ -94,7 +94,8 @@ endif()
 set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a)
 set(fiber ${home_path}/lib_fiber/lib/libfiber.a)
 
-set(lib_all ${acl_all} -lyyjson)
+find_library(yyjson NAMES yyjson PATHS /usr/lib /usr/local/lib)
+set(lib_all ${acl_all} ${yyjson})
 
 if(${HAS_ROCKSDB} MATCHES "YES")
     find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)
