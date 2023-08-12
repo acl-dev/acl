@@ -12,7 +12,56 @@
 
 namespace pkv {
 
-wdb::wdb(size_t cache_max) : db_(nullptr), cache_max_(cache_max) {}
+size_t __cache_max = 10000;
+static __thread std::vector<wt_sess*>* __sessions = nullptr;
+
+static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
+
+static void thread_on_exit(void*) {
+        for (std::vector<wt_sess*>::iterator it = __sessions->begin();
+                it != __sessions->end(); ++it) {
+            delete *it;
+        }
+
+        delete __sessions;
+}
+
+static acl_pthread_key_t __free_sess_key;
+
+static void thread_init_once() {
+    acl_pthread_key_create(&__free_sess_key, thread_on_exit);
+}
+
+static wt_sess *get_session(wdb& db) {
+    if (__sessions == nullptr) {
+        __sessions = new std::vector<wt_sess*>;
+        acl_pthread_once(&once_control, thread_init_once);
+    } else if (!__sessions->empty()) {
+        auto sess = __sessions->back();
+        __sessions->pop_back();
+        return sess;
+    }
+
+    auto sess = new wt_sess(db);
+    if (sess->open()) {
+        return sess;
+    }
+
+    delete sess;
+    return nullptr;
+}
+
+static void put_session(wt_sess* sess) {
+    if (__sessions->size() < __cache_max) {
+        __sessions->emplace_back(sess);
+    } else {
+        delete sess;
+    }
+}
+
+wdb::wdb(size_t cache_max) : db_(nullptr) {
+    __cache_max = cache_max;
+}
 
 wdb::~wdb() {
     if (db_) {
@@ -39,7 +88,7 @@ bool wdb::open(const char *path) {
 }
 
 bool wdb::set(const std::string &key, const std::string &value) {
-    auto sess = get_session();
+    auto sess = get_session(*this);
     if (sess == nullptr) {
         return false;
     }
@@ -50,7 +99,7 @@ bool wdb::set(const std::string &key, const std::string &value) {
 }
 
 bool wdb::get(const std::string &key, std::string &value) {
-    auto sess = get_session();
+    auto sess = get_session(*this);
     if (sess == nullptr) {
         return false;
     }
@@ -61,7 +110,7 @@ bool wdb::get(const std::string &key, std::string &value) {
 }
 
 bool wdb::del(const std::string &key) {
-    auto sess = get_session();
+    auto sess = get_session(*this);
     if (sess == nullptr) {
         return false;
     }
@@ -69,30 +118,6 @@ bool wdb::del(const std::string &key) {
     bool ret = sess->del(key);
     put_session(sess);
     return ret;
-}
-
-wt_sess *wdb::get_session() {
-    if (sessions_.empty()) {
-        auto sess = new wt_sess(*this);
-        if (sess->open()) {
-            return sess;
-        }
-
-        delete sess;
-        return nullptr;
-    }
-
-    auto sess = sessions_.back();
-    sessions_.pop_back();
-    return sess;
-}
-
-void wdb::put_session(wt_sess* sess) {
-    if (sessions_.size() < cache_max_) {
-        sessions_.emplace_back(sess);
-    } else {
-        delete sess;
-    }
 }
 
 } // namespace pkv

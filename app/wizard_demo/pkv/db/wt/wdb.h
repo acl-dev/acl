@@ -40,12 +40,6 @@ public:
 private:
     std::string path_;
     WT_CONNECTION *db_;
-
-    std::vector<wt_sess*> sessions_;
-    size_t cache_max_;
-
-    wt_sess* get_session();
-    void put_session(wt_sess* sess);
 };
 
 } // namespace pkv
