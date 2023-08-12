@@ -85,7 +85,7 @@ int main(int argc, char *argv[]) {
         acl::master_log_enable(false);
 
         const char* addr = nullptr;
-        printf("listen: %s\r\n", addr);
+        //printf("listen: %s\r\n", addr);
         ms.run_alone(addr, argc >= 3 ? argv[2] : nullptr);
     } else {
 #if defined(_WIN32) || defined(_WIN64)
