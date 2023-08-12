@@ -17,25 +17,24 @@ redis_hash::redis_hash(redis_handler &handler, const redis_object &obj)
 {}
 
 bool redis_hash::hset(redis_coder &result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 4) {
-        logger_error("invalid HSET command's size=%zd < 4", objs.size());
+    if (obj_.size() < 4) {
+        logger_error("invalid HSET command's size=%zd < 4", obj_.size());
         return false;
     }
 
-    auto key = objs[1]->get_str();
+    auto key = obj_[1];
     if (key == nullptr || *key == 0) {
         logger_error("key null");
         return false;
     }
 
-    auto name = objs[2]->get_str();
+    auto name = obj_[2];
     if (name == nullptr || *name == 0) {
         logger_error("name null");
         return false;
     }
 
-    auto value = objs[3]->get_str();
+    auto value = obj_[3];
     if (value == nullptr || *value == 0) {
         logger_error("value null");
         return false;
@@ -51,19 +50,18 @@ bool redis_hash::hset(redis_coder &result) {
 }
 
 bool redis_hash::hget(redis_coder &result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 3) {
-        logger_error("invalid HGET command's size=%zd < 3", objs.size());
+    if (obj_.size() < 3) {
+        logger_error("invalid HGET command's size=%zd < 3", obj_.size());
         return false;
     }
 
-    auto key = objs[1]->get_str();
+    auto key = obj_[1];
     if (key == nullptr || *key == 0) {
         logger_error("key null");
         return false;
     }
 
-    auto name = objs[2]->get_str();
+    auto name = obj_[2];
     if (name == nullptr || *name == 0) {
         logger_error("name null");
         return false;
@@ -81,19 +79,18 @@ bool redis_hash::hget(redis_coder &result) {
 }
 
 bool redis_hash::hdel(redis_coder &result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 3) {
-        logger_error("invalid HDEL params' size=%zd < 3", objs.size());
+    if (obj_.size() < 3) {
+        logger_error("invalid HDEL params' size=%zd < 3", obj_.size());
         return false;
     }
 
-    auto key = objs[1]->get_str();
+    auto key = obj_[1];
     if (key == nullptr || *key == 0) {
         logger_error("key null");
         return false;
     }
 
-    auto name = objs[2]->get_str();
+    auto name = obj_[2];
     if (name == nullptr || *name == 0) {
         logger_error("name null");
         return false;
@@ -114,13 +111,12 @@ bool redis_hash::hmget(redis_coder &result) {
 }
 
 bool redis_hash::hgetall(redis_coder &result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 2) {
-        logger_error("invalid HGETALL command's size=%zd < 2", objs.size());
+    if (obj_.size() < 2) {
+        logger_error("invalid HGETALL command's size=%zd < 2", obj_.size());
         return false;
     }
 
-    auto key = objs[1]->get_str();
+    auto key = obj_[1];
     if (key == nullptr || *key == 0) {
         logger_error("key null");
         return false;

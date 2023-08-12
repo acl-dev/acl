@@ -18,19 +18,18 @@ redis_server::redis_server(redis_handler &handler, const redis_object &obj)
 {}
 
 bool redis_server::config(redis_coder &result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 3) {
-        logger_error("invalid CONFIG command's size=%zd < 3", objs.size());
+    if (obj_.size() < 3) {
+        logger_error("invalid CONFIG command's size=%zd < 3", obj_.size());
         return false;
     }
 
-    auto oper = objs[1]->get_str();
+    auto oper = obj_[1];
     if (oper == nullptr || *oper == 0) {
         logger_error("key null");
         return false;
     }
 
-    auto name = objs[2]->get_str();
+    auto name = obj_[2];
     if (name == nullptr || *name == 0) {
         logger_error("name null");
         return false;

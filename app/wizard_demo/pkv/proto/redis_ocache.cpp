@@ -55,7 +55,7 @@ redis_object *redis_ocache::get() {
         return obj;
     }
 #else
-    if (pos_ > 0) {
+    if (LIKELY(pos_ > 0)) {
         return cache_[--pos_];
     } else {
         return new redis_object(*this);
@@ -72,7 +72,7 @@ void redis_ocache::put(redis_object* obj) {
         obj->destroy();
     }
 #else
-    if (pos_ < max_) {
+    if (LIKELY(pos_ < max_)) {
         assert(obj);
         cache_[pos_++] = obj;
     	obj->reset();

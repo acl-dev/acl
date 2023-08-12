@@ -33,14 +33,21 @@ static bool test_redis_coder(const char* file, size_t max) {
 
     struct timeval begin, end;
 
-    printf(">>>begin benchmark\r\n");
+    printf(">>>Begin to build benchmark\r\n");
     gettimeofday(&begin, NULL);
     size_t n = pkv::redis_build_bench(max);
     gettimeofday(&end, NULL);
     double cost = acl::stamp_sub(end, begin);
     double speed = (n * 1000) / (cost > 0 ? cost : 0.00001);
-    printf(">>>Over, count=%zd, cost=%.2f, speed=%.2f\r\n", n, cost, speed);
+    printf(">>>Build ok, count=%zd, cost=%.2f, speed=%.2f\r\n", n, cost, speed);
 
+    printf(">>>Begin to parse benchmark\r\n");
+    gettimeofday(&begin, NULL);
+    n = pkv::redis_parse_bench(file, max);
+    gettimeofday(&end, NULL);
+    cost = acl::stamp_sub(end, begin);
+    speed = (n * 1000) / (cost > 0 ? cost : 0.00001);
+    printf(">>>Parse ok, count=%zd, cost=%.2f, speed=%.2f\r\n", n, cost, speed);
     return true;
 }
 

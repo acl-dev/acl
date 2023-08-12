@@ -65,6 +65,7 @@ endforeach()
 add_definitions(
     "-g"
     "-W"
+    "-O3"
     "-Wall"
     "-Werror"
     "-Wshadow"

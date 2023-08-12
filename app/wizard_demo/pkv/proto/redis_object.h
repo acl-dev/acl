@@ -34,7 +34,7 @@ public:
     void set_parent(redis_object* parent);
     void reset();
 
-private:
+//private:
     ~redis_object();
 
 public:
@@ -60,9 +60,11 @@ public:
 
     NODISCARD const char* get_str() const;
 
-    NODISCARD const std::vector<redis_object*>& get_objects() const {
-        return objs_;
+    NODISCARD size_t size() const {
+        return objs_ ? objs_->size() : 0;
     }
+
+    NODISCARD const char* operator[](size_t i) const;
 
 public:
     redis_object& set_status(const std::string& data, bool return_parent = false);
@@ -84,7 +86,7 @@ private:
     int cnt_ = 0;
 
     redis_ocache& cache_;
-    std::vector<redis_object*> objs_;
+    std::vector<redis_object*>* objs_;
 
 private:
     static const char* get_line(const char*, size_t&, std::string&, bool&);

@@ -50,5 +50,6 @@ bool test_redis_parse_stream(const char* filepath);
 
 bool test_redis_build();
 size_t redis_build_bench(size_t max);
+size_t redis_parse_bench(const char* filepath, size_t max);
 
 } // namespace pkv

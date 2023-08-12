@@ -225,39 +225,78 @@ bool test_redis_build() {
 
 size_t redis_build_bench(size_t max) {
 #if 0
-        redis_ocache cache;
-        redis_coder builder(cache);
-        size_t i = 0;
+    redis_ocache cache;
+    size_t i = 0;
 
-        for (; i < max; i++) {
-            std::string buff;
-            builder.create_object()
-                .create_child().set_string("string", true)
-                .create_child().set_number(-1);
-            builder.create_object().set_status("hello world!");
-            builder.create_object().set_status("hello world!");
-            builder.create_object().set_number(-1);
-            builder.create_object().set_number(-1);
-            builder.to_string(buff);
-            builder.clear();
-        }
+    for (; i < max; i++) {
+        redis_object obj(cache);
+
+        obj.set_number(-1);
+    }
+#elif 1
+    redis_ocache cache;
+    redis_coder builder(cache);
+    size_t i = 0;
+
+    for (; i < max; i++) {
+        std::string buff;
+
+        // builder.create_object()
+        //  .create_child().set_string("string", true)
+        //  .create_child().set_number(-1);
+        //builder.create_object().set_status("hello world!");
+        //builder.create_object().set_status("hello world!");
+        //builder.create_object().set_number(-1);
+        builder.create_object().set_number(-1);
+        builder.to_string(buff);
+        builder.clear();
+    }
 #else
-        size_t i = 0;
+    size_t i = 0;
 
-        for (; i < max; i++) {
-            std::string buff;
-            dao::string dao;
-            dao.set_string("hello world");
-            if (!dao.to_string(buff)) {
-                printf("to_string error\r\n");
-                break;
-            }
-            if (i == 0) {
-                printf("%s\r\n", buff.c_str());
-            }
+    for (; i < max; i++) {
+        std::string buff;
+        dao::string dao;
+        dao.set_string("hello world");
+        if (!dao.to_string(buff)) {
+            printf("to_string error\r\n");
+            break;
         }
+        if (i == 0) {
+            printf("%s\r\n", buff.c_str());
+        }
+    }
 #endif
         return i;
+}
+
+size_t redis_parse_bench(const char* filepath, size_t max) {
+    acl::string buff;
+    if (!acl::ifstream::load(filepath, buff)) {
+        printf("Load from %s error %s\r\n", filepath, acl::last_serror());
+        return 0;
+    }
+
+    printf("Load ok:\r\n%s\r\n", buff.c_str());
+
+    redis_ocache cache;
+    redis_coder parser(cache);
+
+    size_t i = 0;
+
+    for (; i < max; i++) {
+        const char* data = buff.c_str();
+        size_t len = buff.size();
+
+        (void) parser.update(data, len);
+        if (len > 0) {
+            printf("parse error, left=%zd\r\n", len);
+            break;
+        }
+        parser.clear();
+    }
+
+    return i;
 }
 
 //////////////////////////////////////////////////////////////////////////////

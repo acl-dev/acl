@@ -17,19 +17,18 @@ redis_string::redis_string(redis_handler& handler, const redis_object &obj)
 {}
 
 bool redis_string::set(redis_coder& result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 3) {
-        logger_error("invalid SET params' size=%zd", objs.size());
+    if (obj_.size() < 3) {
+        logger_error("invalid SET params' size=%zd", obj_.size());
         return false;
     }
 
-    auto key = objs[1]->get_str();
+    auto key = obj_[1];
     if (key == nullptr || *key == 0) {
         logger_error("key null");
         return false;
     }
 
-    auto value = objs[2]->get_str();
+    auto value = obj_[2];
     if (value == nullptr || *value == 0) {
         logger_error("value null");
         return false;
@@ -71,13 +70,12 @@ bool redis_string::set(redis_coder& result) {
 }
 
 bool redis_string::get(redis_coder& result) {
-    auto& objs = obj_.get_objects();
-    if (objs.size() < 2) {
-        logger_error("invalid GET params' size=%zd", objs.size());
+    if (obj_.size() < 2) {
+        logger_error("invalid GET params' size=%zd", obj_.size());
         return false;
     }
 
-    auto key = objs[1]->get_str();
+    auto key = obj_[1];
     if (key == nullptr || *key == 0) {
         logger_error("key null");
         return false;
