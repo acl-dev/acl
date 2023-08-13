@@ -33,6 +33,12 @@ protected:
     bool del(const std::string& key) override;
 
 public:
+    // @override
+    const char* get_dbtype() const override {
+        return "wdb";
+    }
+
+public:
     WT_CONNECTION* get_db() const {
         return db_;
     }

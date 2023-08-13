@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <signal.h>
 #include "test/test_coder.h"
+#include "test/test_db.h"
 #include "master_service.h"
 
 static void on_sigint(int) {
@@ -51,6 +52,10 @@ static bool test_redis_coder(const char* file, size_t max) {
     return true;
 }
 
+static void test_db(const char* dbpath, size_t max) {
+    pkv::test_db::bench(dbpath, max);
+}
+
 int main(int argc, char *argv[]) {
     acl::acl_cpp_init();
 
@@ -65,6 +70,7 @@ int main(int argc, char *argv[]) {
             max = std::atoi(argv[3]);
         }
         test_redis_coder(file, max);
+        test_db("./data/test", max);
         return 0;
     }
 

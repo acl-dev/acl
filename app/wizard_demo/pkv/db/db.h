@@ -15,6 +15,9 @@ public:
     virtual bool get(const std::string& key, std::string& value) = 0;
     virtual bool del(const std::string& key) = 0;
 
+public:
+    virtual const char* get_dbtype() const = 0;
+
     static shared_db create_rdb();
     static shared_db create_wdb();
 };

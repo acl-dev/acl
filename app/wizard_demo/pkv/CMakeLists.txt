@@ -135,7 +135,7 @@ set(output_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_path})
 link_directories(${output_path})
 
-add_executable(pkv ${src_files} test/test_coder.cpp test/test_coder.h)
+add_executable(pkv ${src_files} test/test_coder.cpp test/test_coder.h test/test_db.cpp test/test_db.h)
 target_link_libraries(pkv ${lib_all})
 
 ###############################################################################

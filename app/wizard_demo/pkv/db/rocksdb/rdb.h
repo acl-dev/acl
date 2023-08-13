@@ -28,6 +28,12 @@ protected:
     // @override
     bool del(const std::string& key) override;
 
+public:
+    // @override
+    const char* get_dbtype() const override {
+        return "rdb";
+    }
+
 private:
     std::string path_;
     rocksdb::DB* db_;
