@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include <signal.h>
-#include "proto/redis_coder.h"
+#include "test/test_coder.h"
 #include "master_service.h"
 
 static void on_sigint(int) {

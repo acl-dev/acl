@@ -3,8 +3,8 @@
 //
 
 #include "stdafx.h"
-#include "proto/redis_object.h"
-#include "proto/redis_coder.h"
+#include "coder/redis_object.h"
+#include "coder/redis_coder.h"
 #include "redis_key.h"
 #include "redis_string.h"
 #include "redis_hash.h"

@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "proto/redis_ocache.h"
-#include "proto/redis_coder.h"
+#include "coder/redis_ocache.h"
+#include "coder/redis_coder.h"
 #include "action/redis_handler.h"
 #include "master_service.h"
 

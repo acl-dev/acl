@@ -5,7 +5,7 @@
 #pragma once
 
 #include <vector>
-#include "proto/redis_coder.h"
+#include "coder/redis_coder.h"
 #include "db/db.h"
 
 namespace pkv {

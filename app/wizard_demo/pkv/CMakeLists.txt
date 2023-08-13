@@ -46,12 +46,13 @@ include_directories(
 set(base_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(src_paths
     ${base_path}
+    ${base_path}/test
+    ${base_path}/coder
     ${base_path}/action
     ${base_path}/dao
     ${base_path}/db
     ${base_path}/db/rocksdb
     ${base_path}/db/wt
-    ${base_path}/proto
 )
 
 foreach(iter ${src_paths})
@@ -134,7 +135,7 @@ set(output_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_path})
 link_directories(${output_path})
 
-add_executable(pkv ${src_files})
+add_executable(pkv ${src_files} test/test_coder.cpp test/test_coder.h)
 target_link_libraries(pkv ${lib_all})
 
 ###############################################################################

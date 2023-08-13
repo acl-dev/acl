@@ -3,7 +3,7 @@
 //
 
 #include "stdafx.h"
-#include "proto/redis_coder.h"
+#include "coder/redis_coder.h"
 #include "dao/key.h"
 
 #include "redis_handler.h"
