@@ -3,86 +3,12 @@
 //
 
 #include "stdafx.h"
-#include "redis_coder.h"
+#include "coder/redis_ocache.h"
+#include "coder/redis_coder.h"
+
+#include "test_coder.h"
 
 namespace pkv {
-
-redis_coder::redis_coder(size_t cache_max) {
-    cache_max_ = cache_max;
-    curr_ = new redis_object(cache_, cache_max_);
-}
-
-redis_coder::~redis_coder() {
-    for (auto obj : objs_) {
-        delete obj;
-    }
-
-    for (auto obj : cache_) {
-        delete obj;
-    }
-
-    delete curr_;
-}
-
-void redis_coder::clear() {
-    for (auto obj : objs_) {
-        if (cache_.size() < cache_max_) {
-            obj->reset();
-            cache_.emplace_back(obj);
-	} else {
-            delete obj; 	
-	}
-    }
-
-    objs_.clear();
-}
-
-const char* redis_coder::update(const char* data, size_t& len) {
-    while (len > 0) {
-        data = curr_->update(data, len);
-        if (curr_->finish()) {
-            objs_.emplace_back(curr_);
-
-	    if (cache_.empty()) {
-                curr_ = new redis_object(cache_, cache_max_);
-	    } else {
-                curr_ = cache_.back();
-		cache_.pop_back();
-	    }
-        } else if (curr_->failed()) {
-            break;
-        }
-    }
-
-    return data;
-}
-
-redis_object& redis_coder::create_object() {
-    redis_object* obj;
-
-    if (cache_.empty()) {
-    	obj = new redis_object(cache_, cache_max_);
-    } else {
-        obj = cache_.back();
-	cache_.pop_back();
-    }
-
-    objs_.emplace_back(obj);
-    return *obj;
-}
-
-bool redis_coder::to_string(std::string& out) const {
-    for (const auto& obj : objs_) {
-        if (!obj->to_string(out)) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
 
 bool test_redis_parse(const char* filepath) {
     if (!test_redis_parse_once(filepath)) {
@@ -105,7 +31,8 @@ bool test_redis_parse_once(const char* filepath) {
         return false;
     }
 
-    redis_coder parser;
+    redis_ocache cache;
+    redis_coder parser(cache);
     const char* data = buf.c_str();
     size_t len = buf.size();
     const char* left = parser.update(data, len);
@@ -153,7 +80,8 @@ bool test_redis_parse_stream(const char* filepath) {
         return false;
     }
 
-    redis_coder parser;
+    redis_ocache cache;
+    redis_coder parser(cache);
     const char* data = buf.c_str();
     size_t len = buf.size();
     for (size_t i = 0; i < len; i++) {
@@ -191,7 +119,8 @@ bool test_redis_parse_stream(const char* filepath) {
 //////////////////////////////////////////////////////////////////////////////
 
 bool test_redis_build() {
-    redis_coder builder;
+    redis_ocache cache;
+    redis_coder builder(cache);
 
     auto& obj = builder.create_object();
 
@@ -229,6 +158,80 @@ bool test_redis_build() {
     return true;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
+size_t redis_build_bench(size_t max) {
+#if 0
+    redis_ocache cache;
+    size_t i = 0;
+
+    for (; i < max; i++) {
+        redis_object obj(cache);
+
+        obj.set_number(-1);
+    }
+#elif 1
+    redis_ocache cache;
+    redis_coder builder(cache);
+    size_t i = 0;
+
+    for (; i < max; i++) {
+        std::string buff;
+
+        // builder.create_object()
+        //  .create_child().set_string("string", true)
+        //  .create_child().set_number(-1);
+        //builder.create_object().set_status("hello world!");
+        //builder.create_object().set_status("hello world!");
+        //builder.create_object().set_number(-1);
+        builder.create_object().set_number(-1);
+        builder.to_string(buff);
+        builder.clear();
+    }
+#else
+    size_t i = 0;
+
+    for (; i < max; i++) {
+        std::string buff;
+        dao::string dao;
+        dao.set_string("hello world");
+        if (!dao.to_string(buff)) {
+            printf("to_string error\r\n");
+            break;
+        }
+        if (i == 0) {
+            printf("%s\r\n", buff.c_str());
+        }
+    }
+#endif
+        return i;
+}
+
+size_t redis_parse_bench(const char* filepath, size_t max) {
+    acl::string buff;
+    if (!acl::ifstream::load(filepath, buff)) {
+        printf("Load from %s error %s\r\n", filepath, acl::last_serror());
+        return 0;
+    }
+
+    printf("Load ok:\r\n%s\r\n", buff.c_str());
+
+    redis_ocache cache;
+    redis_coder parser(cache);
+
+    size_t i = 0;
+
+    for (; i < max; i++) {
+        const char* data = buff.c_str();
+        size_t len = buff.size();
+
+        (void) parser.update(data, len);
+        if (len > 0) {
+            printf("parse error, left=%zd\r\n", len);
+            break;
+        }
+        parser.clear();
+    }
+
+    return i;
+}
+
 } // namespace pkv

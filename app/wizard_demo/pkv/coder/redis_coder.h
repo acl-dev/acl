@@ -10,9 +10,11 @@
 
 namespace pkv {
 
+class redis_ocache;
+
 class redis_coder {
 public:
-    explicit redis_coder(size_t cache_max = 10000);
+    explicit redis_coder(redis_ocache& cache);
     ~redis_coder();
 
     const char* update(const char* data, size_t& len);
@@ -27,15 +29,18 @@ public:
 
     void clear();
 
+    NODISCARD redis_ocache& get_cache() const {
+        return cache_;
+    }
+
 public:
     NODISCARD redis_object& create_object();
 
     bool to_string(std::string& out) const;
 
 private:
+    redis_ocache& cache_;
     std::vector<redis_object*> objs_;
-    std::vector<redis_object*> cache_;
-    size_t cache_max_;
     redis_object* curr_;
 };
 
@@ -44,5 +49,7 @@ bool test_redis_parse_once(const char* filepath);
 bool test_redis_parse_stream(const char* filepath);
 
 bool test_redis_build();
+size_t redis_build_bench(size_t max);
+size_t redis_parse_bench(const char* filepath, size_t max);
 
 } // namespace pkv

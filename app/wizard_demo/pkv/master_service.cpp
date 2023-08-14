@@ -1,5 +1,6 @@
 #include "stdafx.h"
-#include "proto/redis_coder.h"
+#include "coder/redis_ocache.h"
+#include "coder/redis_coder.h"
 #include "action/redis_handler.h"
 #include "master_service.h"
 
@@ -44,15 +45,25 @@ using namespace pkv;
 
 void master_service::on_accept(acl::socket_stream& conn) {
     //conn.set_rw_timeout(var_cfg_io_timeout);
-    logger(">>>accept connection: %d", conn.sock_handle());
+    //logger(">>>accept connection: %d", conn.sock_handle());
 
     run(conn, var_cfg_buf_size);
 
-    logger("Disconnect from peer, fd=%d", conn.sock_handle());
+    //logger("Disconnect from peer, fd=%d", conn.sock_handle());
 }
 
+static __thread redis_ocache* __cache = NULL;
+
 void master_service::run(acl::socket_stream& conn, size_t size) {
-    pkv::redis_coder parser;
+    if (__cache == NULL) {
+        __cache = new redis_ocache;
+        for (size_t i = 0; i < 100000; i++) {
+            pkv::redis_object* o = new pkv::redis_object(*__cache);
+            __cache->put(o);
+        }
+    }
+
+    pkv::redis_coder parser(*__cache);
     pkv::redis_handler handler(db_, parser, conn);
     char buf[size];
 
@@ -63,6 +74,7 @@ void master_service::run(acl::socket_stream& conn, size_t size) {
         }
 
         buf[ret] = 0;
+        //printf("%s", buf); fflush(stdout);
 
         size_t len = (size_t) ret;
         const char* data = parser.update(buf, len);

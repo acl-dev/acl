@@ -20,16 +20,22 @@ typedef enum {
 	REDIS_OBJ_ARRAY,
 } redis_obj_t;
 
+class redis_ocache;
+
 class redis_object {
 public:
-    explicit redis_object(std::vector<redis_object*>& cache, size_t cache_max);
-    ~redis_object();
+    explicit redis_object(redis_ocache& cache);
+
+    void destroy();
 
     redis_object(const redis_object&) = delete;
     void operator=(const redis_object&) = delete;
 
     void set_parent(redis_object* parent);
     void reset();
+
+//private:
+    ~redis_object();
 
 public:
     const char* update(const char* data, size_t& len);
@@ -54,14 +60,16 @@ public:
 
     NODISCARD const char* get_str() const;
 
-    NODISCARD const std::vector<redis_object*>& get_objects() const {
-        return objs_;
+    NODISCARD size_t size() const {
+        return objs_ ? objs_->size() : 0;
     }
+
+    NODISCARD const char* operator[](size_t i) const;
 
 public:
     redis_object& set_status(const std::string& data, bool return_parent = false);
     redis_object& set_error(const std::string& data, bool return_parent = false);
-    redis_object& set_number(int n, bool return_parent = false);
+    redis_object& set_number(long long n, bool return_parent = false);
     redis_object& set_string(const std::string& data, bool return_parent = false);
     redis_object& create_child();
 
@@ -77,9 +85,8 @@ private:
     std::string buf_;
     int cnt_ = 0;
 
-    size_t cache_max_;
-    std::vector<redis_object*>& cache_;
-    std::vector<redis_object*> objs_;
+    redis_ocache& cache_;
+    std::vector<redis_object*>* objs_;
 
 private:
     static const char* get_line(const char*, size_t&, std::string&, bool&);

@@ -1,19 +1,23 @@
+//
+// Created by shuxin ¡¡¡¡zheng on 2023/7/27.
+//
+
 #pragma once
 
 #include "../db.h"
 
-#ifdef HAS_ROCKSDB
+#ifdef HAS_WT
 
-namespace rocksdb {
-    class DB;
-}
+typedef struct __wt_connection WT_CONNECTION;
 
 namespace pkv {
 
-class rdb : public db {
+class wt_sess;
+
+class wdb : public db {
 public:
-    rdb();
-    ~rdb() override;
+    explicit wdb(size_t cache_max = 10000);
+    ~wdb() override;
 
 protected:
     // @override
@@ -28,11 +32,22 @@ protected:
     // @override
     bool del(const std::string& key) override;
 
+public:
+    // @override
+    const char* get_dbtype() const override {
+        return "wdb";
+    }
+
+public:
+    WT_CONNECTION* get_db() const {
+        return db_;
+    }
+
 private:
     std::string path_;
-    rocksdb::DB* db_;
+    WT_CONNECTION *db_;
 };
 
 } // namespace pkv
 
-#endif // HAS_ROCKSDB
+#endif // HAS_WT

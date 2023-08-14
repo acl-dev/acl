@@ -18,7 +18,7 @@ public:
 		acl::string key;
 		key.format("key-%lld", id);
 		argv_[0] = __cmd.c_str();
-		argv_[1] = key;
+		argv_[1] = key.c_str();
 		lens_[0] = strlen(argv_[0]);
 		lens_[1] = strlen(argv_[1]);
 
@@ -28,6 +28,10 @@ public:
 			lens_[2] = strlen(argv_[2]);
 		} else {
 			argc_ = 2;
+		}
+
+		if (id == 0) {
+			printf("first key=%s\r\n", key.c_str());
 		}
 
 		// computer the hash slot for redis cluster node

@@ -4,34 +4,44 @@
 
 #pragma once
 
-#include "proto/redis_coder.h"
-#include "dao/db.h"
+#include <vector>
+#include "coder/redis_coder.h"
+#include "db/db.h"
 
 namespace pkv {
 
 class redis_object;
+class redis_ocache;
 
 class redis_handler {
 public:
-    explicit redis_handler(shared_db& db, const redis_coder& parser,
+    explicit redis_handler(shared_db& db, redis_coder& parser,
         acl::socket_stream& conn);
     ~redis_handler() = default;
 
     bool handle();
 
+    NODISCARD redis_ocache& get_cache() const {
+        return parser_.get_cache();
+    }
+
+    NODISCARD redis_coder& get_coder() {
+        return coder_;
+    }
+
+    NODISCARD shared_db& get_db() {
+        return db_;
+    }
+
 private:
     shared_db& db_;
-    const redis_coder& parser_;
+    redis_coder& parser_;
+    acl::socket_stream& conn_;
     redis_coder builder_;
     redis_coder coder_;
-    acl::socket_stream& conn_;
 
     bool handle_one(const redis_object& obj);
 
-    bool set(const redis_object& obj);
-    bool get(const redis_object& obj);
-    bool del(const redis_object& obj);
-    bool type(const redis_object& obj);
     bool hset(const redis_object& obj);
     bool hget(const redis_object& obj);
     bool hdel(const redis_object& obj);

@@ -88,7 +88,7 @@ service pkv
 #	每个进程实例的空闲超时时间，超过此值后进程实例主动退出
 	fiber_idle_limit = 0
 #	每个进程启动的线程数
-	fiber_threads = 1
+	fiber_threads = 4
 #	进程运行时所在的路径
 	fiber_queue_dir = {install_path}/var
 #	读写超时时间, 单位为秒

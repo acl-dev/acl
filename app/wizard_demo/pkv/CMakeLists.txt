@@ -35,7 +35,6 @@ set(acl_cpp_path ${home_path}/lib_acl_cpp)
 set(fiber_path ${home_path}/lib_fiber/c)
 set(fiber_cpp_path ${home_path}/lib_fiber/cpp)
 
-
 include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${acl_path}/include
@@ -47,11 +46,13 @@ include_directories(
 set(base_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(src_paths
     ${base_path}
+    ${base_path}/test
+    ${base_path}/coder
     ${base_path}/action
     ${base_path}/dao
-    ${base_path}/dao/rocksdb
-    ${base_path}/dao/wt
-    ${base_path}/proto
+    ${base_path}/db
+    ${base_path}/db/rocksdb
+    ${base_path}/db/wt
 )
 
 foreach(iter ${src_paths})
@@ -65,6 +66,7 @@ endforeach()
 add_definitions(
     "-g"
     "-W"
+    "-O3"
     "-Wall"
     "-Werror"
     "-Wshadow"
@@ -79,8 +81,6 @@ add_definitions(
     "-Wno-error=deprecated-declarations"
     "-Wno-deprecated-declarations"
     "-fPIC"
-    "-DHAS_ROCKSDB"
-    "-DHAS_WT"
 )
 
 if (${BUILD_WITH_C11} MATCHES "YES")
@@ -96,28 +96,46 @@ endif()
 set(acl_all ${home_path}/lib_fiber/lib/libfiber_cpp.a ${home_path}/libacl_all.a)
 set(fiber ${home_path}/lib_fiber/lib/libfiber.a)
 
-find_library(jemalloc NAMES jemalloc PATHS /usr/lib /usr/local/lib)
-find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)
-find_library(wiredtiger NAMES wiredtiger PATHS /usr/lib /usr/local/lib)
+find_library(yyjson NAMES yyjson PATHS /usr/lib /usr/local/lib)
+set(lib_all ${acl_all} ${yyjson})
+
+if(${HAS_ROCKSDB} MATCHES "YES")
+    find_library(rocksdb NAMES rocksdb PATHS /usr/lib /usr/local/lib)
+    add_definitions("-DHAS_ROCKSDB")
+    set(lib_all ${lib_all} ${rocksdb})
+endif()
+
+if(${HAS_WT} MATCHES "YES")
+    find_library(wiredtiger NAMES wiredtiger PATHS /usr/lib /usr/local/lib)
+    add_definitions("-DHAS_WT")
+    set(lib_all ${lib_all} ${wiredtiger})
+endif()
+
+if(${HAS_JEMALLOC} MATCHES "YES")
+    find_library(jemalloc NAMES jemalloc PATHS /usr/lib /usr/local/lib)
+    add_definitions("-DHAS_JEAMALLOC")
+    set(lib_all ${lib_all} ${jemalloc})
+endif()
 
 #set(wt -lwiredtiger)
 #set(uring -luring-ffi)
 #set(iconv -liconv)
 
+set(lib_all ${lib_all} ${fiber})
+
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-    set(lib_all ${acl_all}
-        ${rocksdb} ${wiredtiger} ${fiber} -liconv -lz -lpthread -ldl)
+    set(lib_all ${lib_all} -liconv)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
-    set(lib_all ${acl_all}
-        ${rocksdb} ${wiredtiger} ${fiber} ${uring} ${iconv} ${jemalloc}
-	-lz -lpthread -ldl)
+    set(lib_all ${lib_all} ${uring} ${iconv} ${jemalloc})
 endif()
+
+set(lib_all ${lib_all} -lz -lpthread -ldl)
 
 set(output_path ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_path})
 link_directories(${output_path})
 
-add_executable(pkv ${src_files} action/redis_handler.cpp action/redis_handler.h)
+add_executable(pkv ${src_files} test/test_coder.cpp test/test_coder.h test/test_db.cpp test/test_db.h)
 target_link_libraries(pkv ${lib_all})
 
 ###############################################################################

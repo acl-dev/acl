@@ -1,14 +1,28 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
-#include <yyjson.h>
-#include "simdjson.h"
-#include <cjson/cJSON.h>
-#include <rapidjson/reader.h>
+
+#ifdef HAS_CJSON
+# include <cjson/cJSON.h>
+#endif
+
+#ifdef HAS_YYJSON
+# include <yyjson.h>
+#endif
+
+#ifdef HAS_SIMDJSON
+# include "simdjson.h"
+#endif
+
+
+#ifdef HAS_RAPIDJSON
+# include <rapidjson/reader.h>
+#endif
 
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
+#ifdef HAS_YYJSON
 static int yyjson_test(const acl::string& data, int count) {
 	size_t dlen = data.size();
 	int i;
@@ -25,7 +39,9 @@ static int yyjson_test(const acl::string& data, int count) {
 
 	return i;
 }
+#endif
 
+#ifdef HAS_SIMDJSON
 static int simdjson_test(const acl::string& in, int count) {
 	int i;
 
@@ -37,7 +53,10 @@ static int simdjson_test(const acl::string& in, int count) {
 
 	return i;
 }
+#endif
 
+
+#ifdef HAS_CJSON
 static int cjson_test(const acl::string& in, int count) {
 	int i;
 
@@ -53,7 +72,9 @@ static int cjson_test(const acl::string& in, int count) {
 
 	return i;
 }
+#endif
 
+#ifdef HAS_RAPIDJSON
 using namespace rapidjson;
 using namespace std;
 
@@ -86,6 +107,7 @@ static int rapidjson_test(const acl::string& in, int count) {
 
 	return i;
 }
+#endif
 
 static int acl_cppjson_test(const acl::string& data, int count) {
 	int i;
@@ -155,21 +177,27 @@ int main(int argc, char* argv[]) {
 	size_t dlen = data.size();
 
 	struct timeval begin;
+	struct timeval end;
+	int count;
+	double cost, speed, size;
+
+#ifdef HAS_YYJSON
 	gettimeofday(&begin, NULL);
 
-	int count = yyjson_test(data, max);
+	count = yyjson_test(data, max);
 
-	struct timeval end;
 	gettimeofday(&end, NULL);
-	double cost = acl::stamp_sub(end, begin);
-	double speed = (count * 1000) / (cost > 0 ? cost : 0.1);
-	double size = (dlen * speed) / (1024 * 1024);
+	cost = acl::stamp_sub(end, begin);
+	speed = (count * 1000) / (cost > 0 ? cost : 0.1);
+	size = (dlen * speed) / (1024 * 1024);
 
 	printf("yyjson: count=%d, cost=%.2f ms, speed=%.2f, size=%.2f MB\r\n",
 		max, cost, speed, size);
+#endif
 
 	/////////////////////////////////////////////////////////////////////
 
+#ifdef HAS_SIMDJSON
 	gettimeofday(&begin, NULL);
 	count = simdjson_test(data, max);
 	gettimeofday(&end, NULL);
@@ -180,9 +208,11 @@ int main(int argc, char* argv[]) {
 
 	printf("simdjson: count=%d, cost=%.2f ms, speed=%.2f, size=%.2f MB\r\n",
 		max, cost, speed, size);
+#endif
 
 	/////////////////////////////////////////////////////////////////////
 
+#ifdef HAS_CJSON
 	gettimeofday(&begin, NULL);
 	count = cjson_test(data, max);
 	gettimeofday(&end, NULL);
@@ -193,10 +223,11 @@ int main(int argc, char* argv[]) {
 
 	printf("cjson: count=%d, cost=%.2f ms, speed=%.2f, size=%.2f MB\r\n",
 		max, cost, speed, size);
-
+#endif
 
 	/////////////////////////////////////////////////////////////////////
 
+#ifdef HAS_RAPIDJSON
 	gettimeofday(&begin, NULL);
 	count = rapidjson_test(data, max);
 	gettimeofday(&end, NULL);
@@ -207,7 +238,7 @@ int main(int argc, char* argv[]) {
 
 	printf("rapidjson: count=%d, cost=%.2f ms, speed=%.2f, size=%.2f MB\r\n",
 		max, cost, speed, size);
-
+#endif
 
 	/////////////////////////////////////////////////////////////////////
 
