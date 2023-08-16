@@ -326,9 +326,10 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 		return true;
 	}
 
-	acl_assert(in);
-	acl_assert(len >= 0);
-	acl_assert(out);
+	if (in == NULL || len < 0 || out == NULL) {
+		logger_warn("invalid args, in=%p, len=%d, out=%p", in, len, out);
+		return false;
+	}
 
 	int   pos = 0;
 	int   dlen, nbuf, ret;
@@ -336,7 +337,10 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 	zstream_->avail_out = 0;
 
 	while (true) {
-		acl_assert(len >= 0);
+		if (len < 0) {
+			logger_error("when update, invalid len=%d", len);
+			return false;
+		}
 
 		nbuf = (int) (out->capacity() - out->length());
 
@@ -361,11 +365,21 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 
 		ret = func(zstream_, flag);
 		if (ret == Z_STREAM_END) {
-			acl_assert(flag == Z_FINISH || func == __inflate);
 			finished_ = true;
 
+			if (flag != Z_FINISH && func != __inflate) {
+				logger_error("flag=%d, func=%p, inflate=%p",
+					flag, func, __inflate);
+				return false;
+			}
+
 			// 修改输出缓冲区的指针位置
-			acl_assert(nbuf >= (int) zstream_->avail_out);
+			if (nbuf < (int) zstream_->avail_out) {
+				logger_error("Pos err, nbuf=%d, avail_out=%d",
+					nbuf, (int) zstream_->avail_out);
+				return false;
+			}
+
 			dlen += nbuf - zstream_->avail_out;
 			out->set_offset((ssize_t) dlen);
 
@@ -381,7 +395,12 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 		}
 
 		// 修改输出缓冲区的指针位置
-		acl_assert(nbuf >= (int) zstream_->avail_out);
+		if (nbuf < (int) zstream_->avail_out) {
+			logger_error("nbuf=%d, avail_out=%d",
+				nbuf, (int) zstream_->avail_out);
+			return false;
+		}
+
 		dlen += nbuf - zstream_->avail_out;
 		out->set_offset((ssize_t) dlen);
 
@@ -392,7 +411,12 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 		}
 
 		// 更新输入数据的下一个位置
-		acl_assert(len >= (int) zstream_->avail_in);
+		if (len < (int) zstream_->avail_in) {
+			logger_error("Pos err, len=%d, avail_in=%d",
+				len, (int) zstream_->avail_in);
+			return false;
+		}
+
 		pos += len - zstream_->avail_in;
 
 		// 更新剩余数据长度
@@ -414,8 +438,15 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 		return true;
 	}
 
-	acl_assert(zstream_->avail_in == 0);
-	acl_assert(zstream_->next_in == NULL);
+	if (zstream_->avail_in != 0) {
+		logger_warn("not completed, avali_in not 0");
+		return false;
+	}
+
+	if (zstream_->next_in != NULL) {
+		logger_warn("not completed, next_in not NULL");
+		return false;
+	}
 
 	int   dlen, nbuf, ret;
 
@@ -442,11 +473,20 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 
 		ret = func(zstream_, flag);
 		if (ret == Z_STREAM_END) {
-			acl_assert(flag == Z_FINISH || func == __inflate);
 			finished_ = true;
+			if (flag != Z_FINISH && func != __inflate) {
+				logger_error("flag=%d, fnc=%p, inflate=%p",
+					flag, func, __inflate);
+				return false;
+			}
 
 			// 修改输出缓冲区的指针位置
-			acl_assert(nbuf >= (int) zstream_->avail_out);
+			if (nbuf < (int) zstream_->avail_out) {
+				logger_error("Pos err, nbuf=%d, avail_out=%d",
+					nbuf, (int) zstream_->avail_out);
+				return false;
+			}
+
 			dlen += nbuf - zstream_->avail_out;
 			out->set_offset((ssize_t) dlen);
 
@@ -463,7 +503,12 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 			}
 
 			// 修改输出缓冲区的指针位置
-			acl_assert(nbuf >= (int) zstream_->avail_out);
+			if (nbuf < (int) zstream_->avail_out) {
+				logger_error("Pos err, nbuf=%d, avail_out=%d",
+					nbuf, (int) zstream_->avail_out);
+				return false;
+			}
+
 			dlen += nbuf - zstream_->avail_out;
 			out->set_offset((ssize_t) dlen);
 		} else if (ret != Z_OK) {
@@ -472,7 +517,12 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 			return false;
 		} else if (zstream_->avail_out == 0) {
 			// 修改输出缓冲区的指针位置
-			acl_assert(nbuf >= (int) zstream_->avail_out);
+			if (nbuf < (int) zstream_->avail_out) {
+				logger_error("Pos err, nbuf=%d, avail_out=%d",
+					nbuf, (int) zstream_->avail_out);
+				return false;
+			}
+
 			dlen += nbuf - zstream_->avail_out;
 			out->set_offset((size_t) dlen);
 		} else {
