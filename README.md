@@ -47,6 +47,7 @@ Architecture diagram:
     * [5.3. Who are using acl?](#53-who-are-using-acl)
     * [5.4. License](#54-license)
     * [5.5. Reference](#55-reference)
+    * [5.6. Thanks](#56-thanks)
 
 <hr>
 
@@ -437,3 +438,7 @@ If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 - Gitee:    https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
 - QQ Group: 705290654
+
+## 5.6. Thanks
+
+Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a> for the supporting of Acl development.
