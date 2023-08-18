@@ -2,6 +2,7 @@
 
 # Acl -- One Advanced C/C++ Library for Unix/Windows
 
+
 # 0. About Acl project
 The Acl (Advanced C/C++ Library) project a is powerful multi-platform network communication library and service framework, suppoting LINUX, WIN32, Solaris, FreeBSD, MacOS, AndroidOS, iOS. Many applications written by Acl run on these devices with Linux, Windows, iPhone and Android and serve billions of users. There are some important modules in Acl project, including network communcation, server framework, application protocols, multiple coders, etc. The common protocols such as HTTP/SMTP/ICMP//MQTT/Redis/Memcached/Beanstalk/Handler Socket are implemented in Acl, and the codec library such as XML/JSON/MIME/BASE64/UUCODE/QPCODE/RFC2047/RFC1035, etc., are also included in Acl. Acl also provides unified abstract interface for popular databases such as Mysql, Postgresql, Sqlite. Using Acl library users can write database application more easily, quickly and safely.
 
@@ -46,6 +47,7 @@ Architecture diagram:
     * [5.3. Who are using acl?](#53-who-are-using-acl)
     * [5.4. License](#54-license)
     * [5.5. Reference](#55-reference)
+    * [5.6. Thanks](#56-thanks)
 
 <hr>
 
@@ -436,3 +438,7 @@ If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 - Gitee:    https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
 - QQ Group: 705290654
+
+## 5.6. Thanks
+
+Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a> for the supporting of Acl development.
