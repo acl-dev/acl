@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "util.h"
 
+static acl::atomic_long __count;
+static int __meter = 10000;
+
 static acl::string __keypre("test_key_cluster");
 
 static bool test_del(acl::redis& cmd, int i)
@@ -202,6 +205,13 @@ protected:
 			}
 			*/
 
+			long long n = ++__count;
+			if (n % __meter == 0) {
+				char tmp[64];
+				snprintf(tmp, sizeof(tmp), "%lld", n);
+				acl::meter_time(__FILE__, __LINE__, tmp);
+			}
+
 			cmd_string.clear();
 			cmd_key.clear();
 		}
@@ -229,6 +239,7 @@ static void usage(const char* procname)
 		"-r retry_for_cluster_resnum[default: 10]\r\n"
 		"-p password [set the password of redis cluster]\r\n"
 		"-m [if use mbox in pipeline mode, default: false]\r\n"
+		"-b meter_base[default: 10000]\r\n"
 		"-a cmd[set|get|expire|ttl|exists|type|del]\r\n",
 		procname);
 }
@@ -240,7 +251,7 @@ int main(int argc, char* argv[])
 	acl::box_type_t btype = acl::BOX_TYPE_TBOX;
 	acl::string addr("127.0.0.1:6379"), cmd("del"), passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:t:a:p:m")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:b:t:a:p:m")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -250,6 +261,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'n':
 			n = atoi(optarg);
+			break;
+		case 'b':
+			__meter = atoi(optarg);
 			break;
 		case 't':
 			max_threads = atoi(optarg);
