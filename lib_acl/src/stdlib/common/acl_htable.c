@@ -513,8 +513,8 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
 			table->status = ACL_HTABLE_STAT_DUPLEX_KEY;
-			acl_msg_info("%s(%d): duplex key(%s) exist",
-				myname, __LINE__, key);
+			//acl_msg_info("%s(%d): duplex key(%s) exist",
+			//	myname, __LINE__, key);
 			RETURN (ht);
 		}
 	}
