@@ -513,8 +513,6 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
 			table->status = ACL_HTABLE_STAT_DUPLEX_KEY;
-			//acl_msg_info("%s(%d): duplex key(%s) exist",
-			//	myname, __LINE__, key);
 			RETURN (ht);
 		}
 	}
@@ -560,7 +558,12 @@ ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table, const char *key_in, void *v
 ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
 	const char *key_in, void *value)
 {
-	const char *myname = "acl_htable_enter_r";
+	return acl_htable_enter_r2(table, key_in, value, NULL);
+}
+
+ACL_HTABLE_INFO *acl_htable_enter_r2(ACL_HTABLE *table,
+	const char *key_in, void *value, void **old_holder)
+{
 	ACL_HTABLE_INFO *ht;
 	int   ret;
 	unsigned hash, n;
@@ -609,9 +612,11 @@ ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
 
 	for (ht = table->data[n]; ht; ht = ht->next) {
 		if (STREQ(key, ht->key.c_key)) {
-			acl_msg_info("%s(%d): duplex key(%s) exist",
-				myname, __LINE__, key);
 			table->status = ACL_HTABLE_STAT_DUPLEX_KEY;
+			if (old_holder) {
+				*old_holder = ht->value;
+				ht->value = value;
+			}
 			UNLOCK_TABLE(table);
 			RETURN (ht);
 		}
@@ -638,6 +643,10 @@ ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
 	htable_link(table, ht, n);
 
 	UNLOCK_TABLE(table);
+
+	if (old_holder) {
+		*old_holder = NULL;
+	}
 	RETURN (ht);
 }
 /* acl_htable_find - lookup value */
