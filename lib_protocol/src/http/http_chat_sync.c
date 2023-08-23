@@ -88,7 +88,12 @@ static int hdr_ready(HTTP_HDR *hdr, const char *line, int dlen)
 
 static int hdr_get(HTTP_HDR *hdr, ACL_VSTREAM *stream, int timeout)
 {
+/* 当使用协程共享栈时，如果将此BUFF设的过大，会增大共享栈的空间大小，造成内存浪费 */
+#ifdef HTTP_READ_BUF8192
 	char  buf[8192];
+#else
+	char  buf[4912];
+#endif
 	int   ret;
 
 	stream->rw_timeout = timeout;
