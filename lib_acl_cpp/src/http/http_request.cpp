@@ -19,8 +19,7 @@
 #include "acl_cpp/http/http_request.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 #define RESET_RANGE() do \
 { \

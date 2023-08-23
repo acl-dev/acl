@@ -16,8 +16,9 @@
 #include "acl_cpp/http/http_client.hpp"
 #endif
 
-namespace acl
-{
+#define	HTTP_BUF_SIZE	4096
+
+namespace acl {
 
 http_client::http_client(void)
 : stream_(NULL)
@@ -1009,7 +1010,7 @@ int http_client::read_response_body(string& out, bool clean, int* real_size)
 	}
 
 	int   saved_count = (int) out.length();
-	char  buf[8192];
+	char  buf[HTTP_BUF_SIZE];
 
 READ_AGAIN:  // 对于有 GZIP 头数据，可能需要重复读
 
@@ -1116,7 +1117,7 @@ int http_client::read_request_body(string& out, bool clean, int* real_size)
 		out.clear();
 	}
 
-	char  buf[8192];
+	char  buf[HTTP_BUF_SIZE];
 
 	int ret = (int) http_req_body_get_sync(req_, vstream, buf, sizeof(buf));
 

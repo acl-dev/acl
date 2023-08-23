@@ -32,7 +32,6 @@ typedef struct HTTP_CHAT_CTX {
 /*----------------------------------------------------------------------------*/
 static HTTP_CHAT_CTX *new_ctx(void)
 {
-	const char *myname = "new_ctx";
 	HTTP_CHAT_CTX *ctx;
 
 	ctx = (HTTP_CHAT_CTX*) acl_mycalloc(1, sizeof(HTTP_CHAT_CTX));
@@ -40,7 +39,7 @@ static HTTP_CHAT_CTX *new_ctx(void)
 		char  ebuf[256];
 
 		acl_msg_fatal("%s, %s(%d): calloc error(%s)",
-			__FILE__, myname, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
+			__FILE__, __FUNCTION__, __LINE__, acl_last_strerror(ebuf, sizeof(ebuf)));
 	}
 
 	return ctx;
@@ -89,11 +88,7 @@ static int hdr_ready(HTTP_HDR *hdr, const char *line, int dlen)
 static int hdr_get(HTTP_HDR *hdr, ACL_VSTREAM *stream, int timeout)
 {
 /* 当使用协程共享栈时，如果将此BUFF设的过大，会增大共享栈的空间大小，造成内存浪费 */
-#ifdef HTTP_READ_BUF8192
-	char  buf[8192];
-#else
-	char  buf[4912];
-#endif
+	char  buf[HTTP_BUF_SIZE];
 	int   ret;
 
 	stream->rw_timeout = timeout;
@@ -168,13 +163,12 @@ static http_off_t chunked_data_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 
 static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 {
-	const char *myname = "chunked_hdr_get";
 #if defined(ACL_WINDOWS) && _MSC_VER >= 1500
 	char  ext[64];
 #else
 	char *ext = NULL;
 #endif
-	char  buf[HTTP_BSIZE];
+	char  buf[HTTP_BUF_SIZE];
 	int   ret, n, chunk_len;
 
 	n = acl_vstream_gets(ctx->stream, buf, sizeof(buf));
@@ -197,7 +191,7 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 
 	if (ret < 0 || chunk_len < 0) {
 		acl_msg_error("%s(%d): chunked hdr(%s) invalid, dlen(%d), "
-			"'\\n': %d, %d", myname, __LINE__, buf, n, buf[0], '\n');
+			"'\\n': %d, %d", __FUNCTION__, __LINE__, buf, n, buf[0], '\n');
 		return -1;
 	}
 
@@ -207,13 +201,12 @@ static int chunked_hdr_get(HTTP_CHAT_CTX *ctx)
 
 static int chunked_sep_gets(HTTP_CHAT_CTX *ctx)
 {
-	const char *myname = "chunked_sep_gets2";
-	char  buf[HTTP_BSIZE];
+	char  buf[HTTP_BUF_SIZE];
 	int   n;
 
 	n = acl_vstream_gets(ctx->stream, buf, sizeof(buf));
 	if (n == ACL_VSTREAM_EOF) {
-		acl_msg_error("%s(%d): gets sep line error", myname, __LINE__);
+		acl_msg_error("%s(%d): gets sep line error", __FUNCTION__, __LINE__);
 		return -1;
 	}
 
@@ -223,14 +216,13 @@ static int chunked_sep_gets(HTTP_CHAT_CTX *ctx)
 
 static int chunked_trailer_get(HTTP_CHAT_CTX *ctx)
 {
-	const char *myname = "chunked_tailer_get2";
-	char  buf[HTTP_BSIZE];
+	char  buf[HTTP_BUF_SIZE];
 	int   n;
 
 	while (1) {
 		n = acl_vstream_gets(ctx->stream, buf, sizeof(buf));
 		if (n == ACL_VSTREAM_EOF) {
-			acl_msg_error("%s(%d): get line error", myname, __LINE__);
+			acl_msg_error("%s(%d): get line error", __FUNCTION__, __LINE__);
 			return -1;
 		}
 		ctx->body_len += n;
@@ -244,7 +236,6 @@ static int chunked_trailer_get(HTTP_CHAT_CTX *ctx)
 
 static http_off_t body_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 {
-	const char *myname = "body_get";
 	http_off_t   ret;
 
 	/* Transfer-Encoding: chunked 的优先级要高于 Conteng-Length */
@@ -284,7 +275,7 @@ static http_off_t body_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 			return ret;
 		} else {
 			acl_msg_error("%s(%d): unknown oper status(%d)",
-				myname, __LINE__, ctx->chunk.chunk_oper);
+				__FUNCTION__, __LINE__, ctx->chunk.chunk_oper);
 			return -1;
 		}
 	}
@@ -362,7 +353,6 @@ http_off_t http_res_body_get_sync(HTTP_RES *respond, ACL_VSTREAM *stream,
 
 void http_chat_sync_reqctl(HTTP_REQ *request, int name, ...)
 {
-	const char *myname = "http_chat_sync_reqctl";
 	va_list ap;
 	int   n;
 
@@ -379,7 +369,7 @@ void http_chat_sync_reqctl(HTTP_REQ *request, int name, ...)
 			break;
 		default:
 			acl_msg_panic("%s, %s(%d): bad name %d",
-				myname, __FILE__, __LINE__, name);
+				__FUNCTION__, __FILE__, __LINE__, name);
 			break;
 		}
 	}
@@ -388,7 +378,6 @@ void http_chat_sync_reqctl(HTTP_REQ *request, int name, ...)
 
 void http_chat_sync_resctl(HTTP_RES *respond, int name, ...)
 {
-	const char *myname = "http_chat_sync_resctl";
 	va_list ap;
 	int   n;
 
@@ -405,7 +394,7 @@ void http_chat_sync_resctl(HTTP_RES *respond, int name, ...)
 			break;
 		default:
 			acl_msg_panic("%s, %s(%d): bad name %d",
-				myname, __FILE__, __LINE__, name);
+				__FUNCTION__, __FILE__, __LINE__, name);
 			break;
 		}
 	}
