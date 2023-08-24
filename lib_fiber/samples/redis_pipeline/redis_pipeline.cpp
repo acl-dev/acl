@@ -320,7 +320,7 @@ static void usage(const char* procname)
 		"-s one_redis_addr[127.0.0.1:6379]\r\n"
 		"-F [if using fiber_redis_pipeline, default: false]\r\n"
 		"-n count[default: 10]\r\n"
-		"-m meter_base[default: 10000]\r\\n"
+		"-m meter_base[default: 10000]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-t max_threads[default: 10]\r\n"
