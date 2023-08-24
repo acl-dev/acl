@@ -241,8 +241,8 @@ static ACL_MDT_NOD *mdt_add(ACL_MDT *mdt, void *data, unsigned int dlen,
 			/* 在表索引中增加新的索引数据项 */
 			mdt->idx_add(idx, keys[i], rec);
 		} else if (idx->flag & ACL_MDT_FLAG_UNI) {
-			acl_msg_warn("%s(%d): duplex key, key_label(%s), key(%s)",
-				myname, __LINE__, key_labels[i], keys[i]);
+			//acl_msg_warn("%s(%d): duplex key, key_label(%s), key(%s)",
+			//	myname, __LINE__, key_labels[i], keys[i]);
 			mdt_node_free(mdt, node, NULL);
 			return (NULL);
 		}
