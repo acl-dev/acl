@@ -24,12 +24,11 @@ static void __hdr_init(HTTP_HDR *hh)
 
 HTTP_HDR *http_hdr_new(size_t size)
 {
-	const char *myname = "http_hdr_new";
 	HTTP_HDR *hh;
 
 	if (size != sizeof(HTTP_HDR_REQ) && size != sizeof(HTTP_HDR_RES))
 		acl_msg_fatal("%s, %s(%d): size(%d) invalid",
-			__FILE__, myname, __LINE__, (int) size);
+			__FILE__, __FUNCTION__, __LINE__, (int) size);
 
 	hh = (HTTP_HDR*) acl_mycalloc(1, (int) size);
 	hh->entry_lnk = acl_array_create(__http_hdr_def_entry);
@@ -153,7 +152,6 @@ HTTP_HDR_ENTRY *http_hdr_entry_new(const char *data)
 HTTP_HDR_ENTRY *http_hdr_entry_head(char *data)
 {
 	/* data format: GET / HTTP/1.1 or 200 OK */
-	const char *myname = "http_hdr_entry_head";
 	char *ptr, *pname, *psep = NULL;
 	HTTP_HDR_ENTRY *entry;
 
@@ -168,7 +166,7 @@ HTTP_HDR_ENTRY *http_hdr_entry_head(char *data)
 	}
 	if (*ptr == 0) {
 		acl_msg_error("%s, %s(%d): invalid data=%s",
-			__FILE__, myname, __LINE__, data);
+			__FILE__, __FUNCTION__, __LINE__, data);
 		return (NULL);
 	}
 	while (*ptr == ' ' || *ptr == '\t')
@@ -177,7 +175,7 @@ HTTP_HDR_ENTRY *http_hdr_entry_head(char *data)
 		if (psep)
 			*psep = ' ';
 		acl_msg_error("%s, %s(%d): invalid data=%s",
-			__FILE__, myname, __LINE__, data);
+			__FILE__, __FUNCTION__, __LINE__, data);
 		return (NULL);
 	}
 
@@ -188,7 +186,6 @@ HTTP_HDR_ENTRY *http_hdr_entry_head(char *data)
 HTTP_HDR_ENTRY *http_hdr_entry_new2(char *data)
 {
 /* data format: Content-Length: 245 */
-	const char *myname = "http_hdr_entry_new2";
 	char *ptr, *pname, *psep = NULL;
 	HTTP_HDR_ENTRY *entry;
 
@@ -203,7 +200,7 @@ HTTP_HDR_ENTRY *http_hdr_entry_new2(char *data)
 	}
 	if (*ptr == 0) {
 		acl_msg_error("%s, %s(%d): invalid data=%s",
-			__FILE__, myname, __LINE__, data);
+			__FILE__, __FUNCTION__, __LINE__, data);
 		return (NULL);
 	}
 	while (*ptr == ':' || *ptr == ' ' || *ptr == '\t')
@@ -212,7 +209,7 @@ HTTP_HDR_ENTRY *http_hdr_entry_new2(char *data)
 		if (psep)
 			*psep = ':';
 		acl_msg_error("%s, %s(%d): invalid data=%s",
-			__FILE__, myname, __LINE__, data);
+			__FILE__, __FUNCTION__, __LINE__, data);
 		return (NULL);
 	}
 
@@ -224,20 +221,17 @@ HTTP_HDR_ENTRY *http_hdr_entry_new2(char *data)
 
 void http_hdr_append_entry(HTTP_HDR *hh, HTTP_HDR_ENTRY *entry)
 {
-	const char *myname = "http_hdr_append_entry";
-
-	if (acl_array_append(hh->entry_lnk, entry) < 0)
+	if (acl_array_append(hh->entry_lnk, entry) < 0) {
 		acl_msg_fatal("%s, %s(%d): acl_array_append error(%s)",
-			__FILE__, myname, __LINE__, acl_last_serror());
+			__FILE__, __FUNCTION__, __LINE__, acl_last_serror());
+	}
 }
 
 int http_hdr_parse_version(HTTP_HDR *hh, const char *data)
 {
-	const char *myname = "http_hdr_parse_version";
-
-	if (hh == NULL)
-		acl_msg_fatal("%s, %s(%d): hh null",
-				__FILE__, myname, __LINE__);
+	if (hh == NULL) {
+		acl_msg_fatal("%s, %s(%d): hh null", __FILE__, __FUNCTION__, __LINE__);
+	}
 
 	if (data == NULL || *data == 0)
 		return -1;
@@ -261,13 +255,13 @@ int http_hdr_parse_version(HTTP_HDR *hh, const char *data)
 
 static HTTP_HDR_ENTRY *__get_hdr_entry(const HTTP_HDR *hh, const char *name)
 {
-	const char *myname = "__get_hdr_entry";
 	HTTP_HDR_ENTRY *entry;
 	ACL_ITER iter;
 
-	if (hh->entry_lnk == NULL)
+	if (hh->entry_lnk == NULL) {
 		acl_msg_fatal("%s, %s(%d): entry_lnk null",
-			__FILE__, myname, __LINE__);
+			__FILE__, __FUNCTION__, __LINE__);
+	}
 
 	acl_foreach(iter, hh->entry_lnk) {
 		entry = (HTTP_HDR_ENTRY *) iter.data;
@@ -296,12 +290,11 @@ char *http_hdr_entry_value(const HTTP_HDR *hh, const char *name)
 int http_hdr_entry_replace(HTTP_HDR *hh, const char *name,
 	const char *value, int force)
 {
-	const char *myname = "http_hdr_entry_replace";
 	HTTP_HDR_ENTRY *entry;
 
 	if (hh == NULL || name == NULL || value == NULL) {
 		acl_msg_error("%s, %s(%d): input invalid",
-			__FILE__, myname, __LINE__);
+			__FILE__, __FUNCTION__, __LINE__);
 		return -1;
 	}
 
@@ -378,12 +371,11 @@ int http_hdr_entry_replace2(HTTP_HDR *hh, const char *name,
 
 void http_hdr_entry_off(HTTP_HDR *hh, const char *name)
 {
-	const char *myname = "http_hdr_entry_off";
 	HTTP_HDR_ENTRY *entry;
 
 	if (hh == NULL || name == NULL)
 		acl_msg_fatal("%s, %s(%d): input invalid",
-			__FILE__, myname, __LINE__);
+			__FILE__, __FUNCTION__, __LINE__);
 
 	entry = __get_hdr_entry(hh, name);
 	if (entry == NULL)
@@ -396,9 +388,6 @@ void http_hdr_entry_off(HTTP_HDR *hh, const char *name)
 
 int http_hdr_parse(HTTP_HDR *hh)
 {
-	/*
-	const char *myname = "http_hdr_parse";
-	*/
 	int keep_alive = -1;
 	HTTP_HDR_ENTRY *entry;
 	ACL_ITER iter;
@@ -460,7 +449,7 @@ int http_hdr_parse(HTTP_HDR *hh)
 #endif
 			if (hh->content_length < 0) {
 				acl_msg_error("%s: content_length(%s) invalid",
-						myname, entry->value);
+						__FUNCTION__, entry->value);
 				return (-1);
 			}
 			care_cnt++;
@@ -514,7 +503,7 @@ int http_hdr_parse(HTTP_HDR *hh)
 			if (hh->content_length < 0) {
 				/*
 				acl_msg_error("%s: content_length(%s) invalid",
-					myname, entry->value);
+					__FUNCTION__, entry->value);
 				return (-1);
 				*/
 				hh->content_length = -1;
@@ -560,22 +549,21 @@ int http_hdr_parse(HTTP_HDR *hh)
 
 void http_hdr_print(const HTTP_HDR *hh, const char *msg)
 {
-	const char *myname = "http_hdr_print";
 	HTTP_HDR_ENTRY *entry;
 	int   n, i;
 
 	if (hh == NULL)
 		acl_msg_fatal("%s, %s(%d): invalid input",
-				__FILE__, myname, __LINE__);
+				__FILE__, __FUNCTION__, __LINE__);
 	n = acl_array_size(hh->entry_lnk);
 	if (n <= 0) {
 		acl_msg_info("%s, %s(%d): array empty",
-				__FILE__, myname, __LINE__);
+				__FILE__, __FUNCTION__, __LINE__);
 		return;
 	}
 
 	printf("------------- in %s - msg=(%s)----------------\r\n",
-		myname, msg ? msg : "");
+		__FUNCTION__, msg ? msg : "");
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
 		printf("%s %s\r\n", entry->name, entry->value);
@@ -591,25 +579,24 @@ void http_hdr_print(const HTTP_HDR *hh, const char *msg)
 
 void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 {
-	const char *myname = "http_hdr_fprint";
 	HTTP_HDR_ENTRY *entry;
 	int   n, i;
 
 	if (fp == NULL || hh == NULL) {
-		acl_msg_error("%s(%d): input invalid", myname, __LINE__);
+		acl_msg_error("%s(%d): input invalid", __FUNCTION__, __LINE__);
 		return;
 	}
 
 	n = acl_array_size(hh->entry_lnk);
 	if (n <= 0) {
 		acl_msg_info("%s, %s(%d): array empty",
-			myname, __FILE__, __LINE__);
+			__FUNCTION__, __FILE__, __LINE__);
 		return;
 	}
 
 	if (msg && *msg)
 		acl_vstream_fprintf(fp, "---------- in %s - (%s) -------\r\n",
-			myname, msg);
+			__FUNCTION__, msg);
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)
 		acl_vstream_fprintf(fp, "%s %s\r\n", entry->name, entry->value);
@@ -628,25 +615,24 @@ void http_hdr_fprint(ACL_VSTREAM *fp, const HTTP_HDR *hh, const char *msg)
 
 void http_hdr_sprint(ACL_VSTRING *bf, const HTTP_HDR *hh, const char *msg)
 {
-	const char *myname = "http_hdr_fprint";
 	HTTP_HDR_ENTRY *entry;
 	int   n, i;
 
 	if (bf == NULL || hh == NULL) {
-		acl_msg_error("%s(%d): input invalid", myname, __LINE__);
+		acl_msg_error("%s(%d): input invalid", __FUNCTION__, __LINE__);
 		return;
 	}
 
 	n = acl_array_size(hh->entry_lnk);
 	if (n <= 0) {
 		acl_msg_info("%s, %s(%d): array empty",
-			myname, __FILE__, __LINE__);
+			__FUNCTION__, __FILE__, __LINE__);
 		return;
 	}
 
 	if (msg && *msg)
 		acl_vstring_sprintf(bf, "----------- in %s - (%s)-------\r\n",
-			myname, msg);
+			__FUNCTION__, msg);
 
 	entry = (HTTP_HDR_ENTRY *) acl_array_index(hh->entry_lnk, 0);
 	if (entry)

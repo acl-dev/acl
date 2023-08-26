@@ -20,6 +20,9 @@ typedef struct ACL_MDB ACL_MDB;
 #define ACL_MDT_FLAG_UNI		(1 << 0)	/**< 表示唯一 */
 #define	ACL_MDT_FLAG_KMR		(1 << 1)	/**< 表示重用键内存 */
 #define ACL_MDT_FLAG_DMR		(1 << 2)	/**< 表示重用值内存 */
+/**< 当存在重复键，且同时指定了 ACL_MDT_FLAG_UNI | ACL_MDT_FLAG_OOV 时则使用新值覆盖旧值 */
+#define ACL_MDT_FLAG_OOV		(1 << 3)
+
 #define	ACL_MDT_FLAG_SLICE1		(1 << 10)	/**< 启用 ACL_SLICE_FLAG_GC1 */
 #define	ACL_MDT_FLAG_SLICE2		(1 << 11)	/**< 启用 ACL_SLICE_FLAG_GC2 */
 #define	ACL_MDT_FLAG_SLICE3		(1 << 12)	/**< 启用 ACL_SLICE_FLAG_GC3 */

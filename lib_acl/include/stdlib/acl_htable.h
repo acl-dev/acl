@@ -135,7 +135,7 @@ ACL_API void acl_htable_set_errno(ACL_HTABLE *table, int error);
  *  不能堆栈变量)
  * @return 所分配的哈希表项的指针, == NULL: 表示内部分配内存出错, 为严重的错误
  *  注：如果在添加时该哈希争键存在，则返回已经存在的哈希项，使用者应该通过调用
- *  acl_htable_last_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
+ *  acl_htable_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
  */
 ACL_API ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table,
 		const char *key, void *value);
@@ -146,10 +146,15 @@ ACL_API ACL_HTABLE_INFO *acl_htable_enter(ACL_HTABLE *table,
  * @param key 键, 在函数内部会复制此 key 键
  * @param value 用户自己的特定数据项(可以由类型硬转化而来, 但是此数据项必须
  *  不能堆栈变量)
+ * @param old_holder {void**} 当 key 存在且本项非空时，则内部会自动用新值替换
+ *  旧值，且用 old_holder 存放旧值地址以方便应用释放
  * @return 所分配的哈希表项的指针, == NULL: 表示内部分配内存出错, 为严重的错误
  *  注：如果在添加时该哈希争键存在，则返回已经存在的哈希项，使用者应该通过调用
- *  acl_htable_last_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
+ *  acl_htable_errno() 来查看是否重复添加同一个键值(ACL_HTABLE_STAT_DUPLEX_KEY)
  */
+ACL_API ACL_HTABLE_INFO *acl_htable_enter_r2(ACL_HTABLE *table,
+		const char *key, void *value, void **old_holder);
+
 ACL_API ACL_HTABLE_INFO *acl_htable_enter_r(ACL_HTABLE *table,
 		const char *key, void *value);
 

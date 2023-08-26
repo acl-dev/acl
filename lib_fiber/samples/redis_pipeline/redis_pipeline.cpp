@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+static int __meter = 10000;
+static acl::atomic_long __count;
 static acl::string __keypre("test_key_cluster");
 
 static bool test_del(acl::redis_key& cmd, size_t tid, size_t fid, int i)
@@ -239,6 +241,13 @@ protected:
 			}
 			*/
 
+			long long n = ++__count;
+			if (n % __meter == 0) {
+				char tmp[64];
+				snprintf(tmp, sizeof(tmp), "%lld", n);
+				acl::meter_time(__FILE__, __LINE__, tmp);
+			}
+
 			redis.clear();
 		}
 	}
@@ -311,6 +320,7 @@ static void usage(const char* procname)
 		"-s one_redis_addr[127.0.0.1:6379]\r\n"
 		"-F [if using fiber_redis_pipeline, default: false]\r\n"
 		"-n count[default: 10]\r\n"
+		"-m meter_base[default: 10000]\r\n"
 		"-C connect_timeout[default: 10]\r\n"
 		"-I rw_timeout[default: 10]\r\n"
 		"-t max_threads[default: 10]\r\n"
@@ -332,7 +342,7 @@ int main(int argc, char* argv[])
 	bool share_stack = false, use_fiber_tbox = false;
 	acl::string addr("127.0.0.1:6379"), cmd, passwd;
 
-	while ((ch = getopt(argc, argv, "hs:n:C:I:t:c:a:p:Sz:F")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:m:C:I:t:c:a:p:Sz:F")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -342,6 +352,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'n':
 			n = atoi(optarg);
+			break;
+		case 'm':
+			__meter = atoi(optarg);
 			break;
 		case 'C':
 			conn_timeout = atoi(optarg);
