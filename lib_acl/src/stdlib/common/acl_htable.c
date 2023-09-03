@@ -413,6 +413,21 @@ static void UNLOCK_TABLE(const ACL_HTABLE *table)
 } while (0)
 #endif
 
+void acl_htable_lock_read(ACL_HTABLE *table)
+{
+	LOCK_TABLE_READ(table);
+}
+
+void acl_htable_lock_write(ACL_HTABLE *table)
+{
+	LOCK_TABLE_WRITE(table);
+}
+
+void acl_htable_unlock(ACL_HTABLE *table)
+{
+	UNLOCK_TABLE(table);
+}
+
 void acl_htable_ctl(ACL_HTABLE *table, int name, ...)
 {
 	const char *myname = "acl_htable_ctl";

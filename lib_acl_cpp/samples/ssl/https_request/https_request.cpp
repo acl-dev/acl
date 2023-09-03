@@ -2,11 +2,12 @@
 #include "https_request.h"
 
 https_request::https_request(acl::sslbase_conf* ssl_conf, const char* addr,
-	const char* host, const char* url)
+	const char* host, const char* url, bool debug)
 : request_(addr)
 , host_(host)
 , url_(url)
 , to_charset_("utf-8")
+, debug_(debug)
 {
 	printf("server addr: %s\r\n", addr);
 	printf("host: %s\r\n", host);
@@ -35,6 +36,12 @@ void* https_request::run(void)
 		printf("send request error\r\n");
 		return NULL;
 	}
+
+	acl::http_client* conn = request_.get_client();
+	conn->print_header("http response header");
+
+	int http_status = request_.http_status();
+	printf(">>>http status=%d\r\n", http_status);
 
 	const char* ptr = request_.header_value("Content-Type");
 	if (ptr == NULL || *ptr == 0) {
@@ -71,12 +78,20 @@ void* https_request::run(void)
 
 bool https_request::do_plain(acl::http_request& req)
 {
+	printf("Begin get body in plain\r\n");
+
 	acl::string body;
 	if (!req.get_body(body, to_charset_)) {
 		logger_error("get http body error");
 		return false;
 	}
-	printf("plain body:\r\n(%s)\r\n", body.c_str());
+
+	if (debug_) {
+		printf("plain body:\r\n(%s)\r\n", body.c_str());
+	} else {
+		printf("plain body length: %zd\r\n", body.size());
+	}
+
 	return true;
 }
 

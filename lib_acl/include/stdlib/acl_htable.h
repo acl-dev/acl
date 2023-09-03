@@ -127,6 +127,10 @@ ACL_API int acl_htable_errno(ACL_HTABLE *table);
  */
 ACL_API void acl_htable_set_errno(ACL_HTABLE *table, int error);
 
+ACL_API void acl_htable_lock_read(ACL_HTABLE *table);
+ACL_API void acl_htable_lock_write(ACL_HTABLE *table);
+ACL_API void acl_htable_unlock(ACL_HTABLE *table);
+
 /**
  * 往哈希表里添加新的项
  * @param table 哈希表指针

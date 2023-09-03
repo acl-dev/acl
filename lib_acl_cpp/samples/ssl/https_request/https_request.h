@@ -4,7 +4,7 @@ class https_request : public acl::thread
 {
 public:
 	https_request(acl::sslbase_conf* ssl_conf, const char* addr,
-		const char* host, const char* url);
+		const char* host, const char* url, bool debug);
 	~https_request(void);
 
 public:
@@ -16,6 +16,7 @@ private:
 	acl::string host_;
 	acl::string url_;
 	acl::string to_charset_;
+	bool debug_;
 
 	// 处理 text/plain 类型数据
 	bool do_plain(acl::http_request& req);
