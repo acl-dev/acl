@@ -2,6 +2,8 @@
 #include "../../util.h"
 #include "https_request.h"
 
+static bool __debug = false;
+
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
@@ -12,7 +14,9 @@ static void usage(const char* procname)
 		" -L data_length [default: 1024]\r\n"
 		" -c cocurrent [default: 1]\r\n"
 		" -S [use ssl, default: no]\r\n"
-		" -n count [default: 10]\r\n", procname);
+		" -n count [default: 10]\r\n"
+		" -D [if show data]\r\n"
+		, procname);
 }
 
 int main(int argc, char* argv[])
@@ -26,7 +30,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hf:s:c:n:SH:U:")) > 0) {
+	while ((ch = getopt(argc, argv, "hf:s:c:n:SH:U:D")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -52,6 +56,9 @@ int main(int argc, char* argv[])
 		case 'U':
 			url = optarg;
 			break;
+		case 'D':
+			__debug = true;
+			break;
 		default:
 			break;
 		}
@@ -76,6 +83,7 @@ int main(int argc, char* argv[])
 		const std::vector<acl::string>& libs = libpath.split2(";, \t");
 		if (libs.size() != 2) {
 			printf("invalid libpath=%s\r\n", libpath.c_str());
+			printf("usage: -f 'libcrypto.so;libssl.so'\r\n");
 			return 1;
 		}
 
@@ -100,7 +108,7 @@ int main(int argc, char* argv[])
 
 	for (int i = 0; i < cocurrent; i++) {
 		https_request* thread = new https_request(
-			use_ssl ? ssl_conf : NULL, server_addr, host, url);
+			use_ssl ? ssl_conf : NULL, server_addr, host, url, __debug);
 
 		thread->set_detachable(false);
 		threads.push_back(thread);
