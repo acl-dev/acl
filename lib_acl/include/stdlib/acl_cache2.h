@@ -46,6 +46,28 @@ struct ACL_CACHE2 {
 };
 
 /**
+ * static void free_callback(const ACL_CACHE2_INFO *info, void *value) {
+ * 	printf("Free key=%s\r\n", info->key);
+ * 	free(value);
+ * }
+ *
+ * void test() {
+ * 	ACL_CACHE2 *cache = acl_cache2_create(100, free_callback);
+ * 	const char *key = "test-key";
+ * 	char *buf = strdup("test-value"), *value;
+ * 	acl_cache2_enter(cache, key, value, 100);
+ * 	value = (char*) acl_cache2_find(cache, key);
+ * 	printf("The key=%s, value=%s\r\n", key, value ? value : "Not found");
+ * 	ACL_ITER iter;
+ * 	acl_foreach(iter, cache) {
+ * 		value = (char*) iter.data;
+ * 		key = iter.key;
+ * 		...
+ * 	}
+ * }
+ */
+
+/**
  * 创建一个缓存池，并设置每个缓存对象的最大缓存时长及该缓存池的空间容量限制
  * @param max_size {int} 该缓存池的容量限制，若该值 <= 0，则内部不会限制缓存量
  * @param free_fn {void (*)(void*)} 用户级的释放缓存对象的函数
