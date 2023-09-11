@@ -169,6 +169,6 @@ clean:
 	rm -f $(PROG)
 	rm -f $(OBJ)
 install:
-	cp $(PROG) ../../../dist/master/libexec/$(RPATH)/
+	cp $(PROG) ../../../dist/master/sbin/$(RPATH)/
 	cp $(PROG).cf ../../../dist/master/conf/service/
 ###########################################################
