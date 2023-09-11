@@ -1,2 +1,2 @@
 include ../Makefile.in
-PROG = base64
+PROG = coder
