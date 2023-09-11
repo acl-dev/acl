@@ -104,10 +104,10 @@ CFLAGS += -I$(ACL_PATH)/lib_acl/include \
 	  -I$(ACL_PATH)/lib_fiber/c/include \
 	  -I$(ACL_PATH)/lib_fiber/cpp/include
 EXTLIBS =
-LDFLAGS = -L$(ACL_PATH)/lib_fiber/lib -l_fiber_cpp -l_fiber \
+LDFLAGS = -L$(ACL_PATH)/lib_fiber/lib -lfiber_cpp \
 	  -L$(ACL_PATH)/lib_acl_cpp/lib -l_acl_cpp \
 	  -L$(ACL_PATH)/lib_protocol/lib -l_protocol \
-	  -L$(ACL_PATH)/lib_acl/lib -l_acl \
+	  -L$(ACL_PATH)/lib_acl/lib -l_acl -lfiber \
 	  $(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
