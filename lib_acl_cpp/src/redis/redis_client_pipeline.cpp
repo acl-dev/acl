@@ -86,7 +86,7 @@ bool redis_pipeline_channel::flush_all(void)
 				return true;
 			}
 
-			logger_error("write error=%s, addr=%s, buf=%s",
+			logger_error("Write error=%s, addr=%s, buf=%s",
 				last_serror(), addr_.c_str(), buf_.c_str());
 		}
 
@@ -100,7 +100,7 @@ bool redis_pipeline_channel::flush_all(void)
 
 		// Reopen the new connection
 		if (!((connect_client*) client_)->open()) {
-			logger_error("reopen connection failed!");
+			logger_error("Reopen connection failed!");
 			return false;
 		}
 		retried = true;
@@ -135,13 +135,13 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 	}
 
 	if (result == NULL) {
-		logger_error("can't get result");
+		logger_error("Can't get result");
 		return false;
 	}
 
 	int type = result->get_type();
 	if (type == REDIS_RESULT_UNKOWN) {
-		logger_warn("unknown type=%d", (int) type);
+		logger_warn("Unknown type=%d", (int) type);
 		msg.push(result);
 		return true;
 	} else if (type != REDIS_RESULT_ERROR) {
@@ -158,10 +158,10 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 	} else if (EQ(ptr, "MOVED") || EQ(ptr, "ASK")) {
 		const char* addr = redis_command::get_addr(dbuf, ptr);
 		if (addr == NULL) {
-			logger_error("no redirect addr got");
+			logger_error("No redirect addr got");
 			msg.push(result);
 		} if (msg.get_redirect_count() >= 5) {
-			logger_error("redirect count(%d) exceed limit(5)",
+			logger_error("Redirect count(%d) exceed limit(5)",
 				(int) msg.get_redirect_count());
 			msg.push(result);
 		} else {
@@ -183,7 +183,7 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 		pipeline_.push(m);
 		return false; // Return false to break the loop process.
 	} else {
-		logger_error("unknown error: %s", ptr);
+		logger_error("Unknown error: %s", ptr);
 		msg.push(result);
 	}
 	return true;
@@ -197,7 +197,7 @@ bool redis_pipeline_channel::wait_results(void)
 
 	socket_stream* conn = client_->get_stream(false);
 	if (conn == NULL) {
-		logger_error("get_stream null");
+		logger_error("Get_stream null");
 		return false;
 	}
 
@@ -221,7 +221,7 @@ bool redis_pipeline_channel::wait_results(void)
 	// If we can't get the first result, the socket maybe be disconnected,
 	// so we should return false and retry again.
 	if (it == msgs_.begin()) {
-		logger_error("get the first result failed");
+		logger_error("Get the first result failed");
 		return false;
 	}
 
@@ -244,7 +244,7 @@ bool redis_pipeline_channel::handle_messages(void)
 
 	while (true) {
 		if (!flush_all()) {
-			logger_error("all failed ...");
+			logger_error("All failed ...");
 			break;
 		}
 
@@ -254,14 +254,14 @@ bool redis_pipeline_channel::handle_messages(void)
 		}
 
 		if (retried) {
-			logger_error("retried failed");
+			logger_error("Retried failed");
 			break;
 		}
 		retried = true;
 
 		client_->close();
 		if (!((connect_client*) client_)->open()) {
-			logger_error("reopen failed");
+			logger_error("Reopen failed");
 			break;
 		}
 	}
@@ -424,8 +424,8 @@ void* redis_client_pipeline::run(void)
 	}
 
 	if (channels_->first_node() == NULL) {
-		logger_error("no channel created!");
-		return NULL;
+		logger_warn("No channel created in the beginning!");
+		// return NULL;
 	}
 
 	redis_pipeline_channel* channel;
@@ -468,7 +468,7 @@ void* redis_client_pipeline::run(void)
 
 			channel = get_channel(slot);
 			if (channel == NULL) {
-				logger_error("channel null, slot=%d", slot);
+				logger_error("Channel null, slot=%d", slot);
 				msg->push(NULL);
 				timeout = -1;
 			} else {
@@ -569,7 +569,7 @@ void redis_client_pipeline::set_all_slot(void)
 
 	const std::vector<redis_slot*>* slots = cluster.cluster_slots();
 	if (slots == NULL) {
-		logger("can't get cluster slots");
+		logger("Can't get cluster slots");
 		return;
 	}
 
