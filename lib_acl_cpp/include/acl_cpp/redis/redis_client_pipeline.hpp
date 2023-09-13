@@ -19,7 +19,10 @@ typedef enum {
 	redis_pipeline_t_redirect,	// Should redirect to another node
  	redis_pipeline_t_clusterdonw,	// The redis node has been down
 	redis_pipeline_t_stop,		// The current channel should stop
+	redis_pipeline_t_channel_closed,// The channel will be closed
 } redis_pipeline_type_t;
+
+class redis_pipeline_channel;
 
 /**
  * The message for transfering between redis command, redis client pipline
@@ -39,6 +42,7 @@ public:
 	, result_(NULL)
 	, addr_(NULL)
 	, redirect_count_(0)
+	, channel_(NULL)
 	{
 	}
 
@@ -123,6 +127,15 @@ public:
 	}
 
 public:
+	void set_channel(redis_pipeline_channel* channel) {
+		channel_ = channel;
+	}
+
+	redis_pipeline_channel* get_channel(void) const {
+		return channel_;
+	}
+
+public:
 	void push(const redis_result* result) {
 		result_ = result;
 		box_->push(this, false);
@@ -159,6 +172,8 @@ private:
 
 	// The msg will be freed when refers_ is 0.
 	atomic_long refers_;
+
+	redis_pipeline_channel* channel_;
 };
 
 class redis_client_pipeline;
@@ -291,9 +306,6 @@ private:
 	// Start one pipeline channel thread with the specified redis address
 	redis_pipeline_channel* start_channel(const char* addr);
 
-	// Stop one pipeline channel thread with the specified redis address
-	void stop_channel(const char* addr);
-
 	// Get one pipeline channel thread with the specified hash slot
 	redis_pipeline_channel* get_channel(int slot);
 
@@ -303,6 +315,13 @@ private:
 	// When one redis node down, we should clear the node's hash slot map
 	// and stop the pipeline channel thread
 	void cluster_down(const redis_pipeline_message& msg);
+
+	// Stop one pipeline channel thread with the specified redis address,
+	// delete the channel thread after the thread exited.
+	void stop_channel(const char* addr);
+
+	// Delete the channel when one channel closed message got.
+	void channel_closed(redis_pipeline_channel* channel);
 };
 
 /**
