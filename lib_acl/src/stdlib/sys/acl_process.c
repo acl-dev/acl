@@ -101,13 +101,16 @@ const char *acl_getcwd()
 	return (ptr);
 }
 #elif	defined(ACL_MACOSX)
+#include <libproc.h>
+
 const char *acl_process_path(void)
 {
 	const char *myname = "acl_process_path";
 	char *buf_ptr = get_tls_buf();
 	ssize_t   ret;
 
-	ret = readlink("/proc/curproc/file", buf_ptr, BUF_SIZE);
+	// ret = readlink("/proc/curproc/file", buf_ptr, BUF_SIZE);
+	ret = proc_pidpath(getpid(), buf_ptr, BUF_SIZE);
 	if (ret < 0) {
 		acl_msg_error("%s(%d): readlink error(%s)",
 			myname, __LINE__, acl_last_serror());
