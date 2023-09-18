@@ -101,7 +101,9 @@ const char *acl_getcwd()
 	return (ptr);
 }
 #elif	defined(ACL_MACOSX)
+# ifdef MAC_HAS_PROC
 #include <libproc.h>
+# endif
 
 const char *acl_process_path(void)
 {
@@ -109,8 +111,11 @@ const char *acl_process_path(void)
 	char *buf_ptr = get_tls_buf();
 	ssize_t   ret;
 
-	// ret = readlink("/proc/curproc/file", buf_ptr, BUF_SIZE);
+# ifdef MAC_HAS_PROC
 	ret = proc_pidpath(getpid(), buf_ptr, BUF_SIZE);
+# else
+	ret = readlink("/proc/curproc/file", buf_ptr, BUF_SIZE);
+# endif
 	if (ret < 0) {
 		acl_msg_error("%s(%d): readlink error(%s)",
 			myname, __LINE__, acl_last_serror());
