@@ -38,6 +38,8 @@ extern int   acl_var_udp_monitor_netlink;
 extern int   acl_var_udp_non_block;
 extern char *acl_var_udp_reuse_port;
 extern char *acl_var_udp_private;
+extern char *acl_var_udp_multicast_addr;
+extern int   acl_var_udp_multicast_loopback;
 
 #ifdef	__cplusplus
 }

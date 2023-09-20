@@ -139,7 +139,7 @@ static void usage(const char* proc) {
 }
 
 int main(int argc, char* argv[]) {
-	acl::string multicast_addr = "225.0.0.38", local_iface = "0.0.0.0";
+	acl::string multicast_addr, local_iface = "0.0.0.0";
 	int ch, nsenders = 1, nreaders = 0, port = 8089, count = 10000;
 	acl::atomic_long write_counter, read_counter;
 	bool echo = false, loopback = false;
@@ -176,6 +176,12 @@ int main(int argc, char* argv[]) {
 		default:
 			break;
 		}
+	}
+
+	if (multicast_addr.empty()) {
+		printf("multicast_addr empty!\r\n");
+		usage(argv[0]);
+		return 0;
 	}
 
 	acl::log::stdout_open(true);

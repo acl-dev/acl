@@ -106,12 +106,14 @@ int   acl_var_udp_threads_detached;
 int   acl_var_udp_non_block;
 int   acl_var_udp_fatal_on_bind_error;
 int   acl_var_udp_monitor_netlink;
+int   acl_var_udp_multicast_loopback;
 
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ "udp_threads_detached", 1, &acl_var_udp_threads_detached },
 	{ "master_nonblock", 1, &acl_var_udp_non_block },
 	{ "udp_fatal_on_bind_error", 0, &acl_var_udp_fatal_on_bind_error },
 	{ "udp_monitor_netlink", 1, &acl_var_udp_monitor_netlink },
+	{ "master_multicase_loopback", 0, &acl_var_udp_multicast_loopback },
 
 	{ 0, 0, 0 },
 };
@@ -124,6 +126,7 @@ char *acl_var_udp_log_debug;
 char *acl_var_udp_private;
 char *acl_var_udp_reuse_port;
 static int var_udp_reuse_port = 0;
+char *acl_var_udp_multicast_addr;
 
 static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "udp_queue_dir", "/opt/acl_master/var/queue", &acl_var_udp_queue_dir },
@@ -132,7 +135,8 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
 	{ "udp_event_mode", "select", &acl_var_udp_event_mode },
 	{ "master_debug", "", &acl_var_udp_log_debug },
 	{ "master_private", "n", &acl_var_udp_private },
-	{ "master_reuseport", "yes", &acl_var_udp_reuse_port},
+	{ "master_reuseport", "yes", &acl_var_udp_reuse_port },
+	{ "master_multicast_addr", "", &acl_var_udp_multicast_addr },
 
         { 0, 0, 0 },
 };
@@ -677,9 +681,7 @@ static int __fdtype = ACL_VSTREAM_TYPE_LISTEN | ACL_VSTREAM_TYPE_LISTEN_INET;
 static ACL_VSTREAM *server_bind_one(const char *addr)
 {
 	ACL_VSTREAM *stream;
-	ACL_SOCKET   fd;
 	unsigned flag = 0;
-	char     local[MAX];
 
 	if (acl_var_udp_non_block) {
 		flag |= ACL_INET_FLAG_NBLOCK;
@@ -689,23 +691,56 @@ static ACL_VSTREAM *server_bind_one(const char *addr)
 		flag |= ACL_INET_FLAG_REUSEPORT;
 	}
 
-	fd = acl_udp_bind(addr, flag);
-	if (fd == ACL_SOCKET_INVALID) {
-		acl_msg_warn("%s(%d), %s: bind %s error %s", __FILE__,
+	if (acl_var_udp_multicast_loopback) {
+		flag |= ACL_INET_FLAG_MULTILOOP_ON;
+	}
+
+	if (*acl_var_udp_multicast_addr != 0 && acl_valid_hostaddr(addr, 0)
+		 && !acl_valid_unix(addr)) {
+		char buf[MAX], *sep, iface[64];
+		int port = 0;
+
+		acl_snprintf(buf, sizeof(buf), "%s", addr);
+
+		if ((sep = strchr(buf, '|')) || (sep = strchr(buf, ':'))) {
+			const char *ptr;
+
+			*sep++ = 0;
+			port = atoi(sep);
+			if (buf[0] == 0) {
+				ptr = "0.0.0.0";
+			} else {
+				ptr = buf;
+			}
+
+			acl_snprintf(iface, sizeof(iface), "%s", ptr);
+		} else if (acl_alldig(buf)) {
+			port = atoi(buf);
+			acl_snprintf(iface, sizeof(iface), "0.0.0.0");
+		} else {
+			acl_msg_error("%s(%d), %s: invalid udp addr=%s",
+				__FILE__, __LINE__, __FUNCTION__, addr);
+			return NULL;
+		}
+
+		acl_msg_info("Begin bind multicast addr=%s, iface=%s, port=%d",
+			acl_var_udp_multicast_addr, iface, port);
+
+		stream = acl_vstream_bind_multicast(acl_var_udp_multicast_addr,
+				iface, port, acl_var_udp_rw_timeout, flag);
+	} else {
+		stream = acl_vstream_bind(addr, acl_var_udp_rw_timeout, flag);
+	}
+
+	if (stream == NULL) {
+		acl_msg_error("%s(%d), %s: bind %s error %s", __FILE__,
 			__LINE__, __FUNCTION__, addr, acl_last_serror());
 		return NULL;
 	}
 
 #ifdef ACL_UNIX
-	acl_close_on_exec(fd, ACL_CLOSE_ON_EXEC);
+	acl_close_on_exec(ACL_VSTREAM_SOCK(stream), ACL_CLOSE_ON_EXEC);
 #endif
-
-	stream = acl_vstream_fdopen(fd, O_RDWR, acl_var_udp_buf_size,
-			acl_var_udp_rw_timeout, __fdtype);
-
-	acl_getsockname(fd, local, sizeof(local));
-	acl_vstream_set_local(stream, local);
-	acl_vstream_set_udp_io(stream);
 
 	return stream;
 }
