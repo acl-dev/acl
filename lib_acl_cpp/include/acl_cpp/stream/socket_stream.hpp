@@ -82,6 +82,28 @@ public:
 		int rw_timeout = -1, unsigned flags = 0);
 
 	/**
+	 * 当 bind_multicast 成功后，可以调用本方法设置广播包的 TTL 值
+	 * @param ttl {int} 该值的范围为 1--255
+	 * @return {bool} 设置是否成功
+	 */
+	bool multicast_set_ttl(int ttl);
+
+	/**
+	 * 当 bind_multicast 成功后，可以调用本方法设置广播包的本地 IP 地址
+	 * @param iface {const char*}
+	 * @return {bool} 设置是否成功
+	 */
+	bool multicast_set_if(const char* iface);
+
+	/**
+	 * 当 bind_multicast 成功后，可以调用本方法设置离开组播
+	 * @param addr {const char*} 广播 IP
+	 * @param iface {const char*} 本地 IP
+	 * @return {bool} 是否成功
+	 */
+	bool multicast_drop(const char *addr, const char *iface);
+
+	/**
 	 * 关闭套接口读操作
 	 * @return {bool}
 	 */

@@ -120,6 +120,36 @@ bool socket_stream::bind_multicast(const char *addr, const char *iface,
 	return true;
 }
 
+bool socket_stream::multicast_set_ttl(int ttl)
+{
+	if (eof_ || stream_ == NULL) {
+		logger_error("Socket not opened yet");
+		return false;
+	}
+
+	return acl_multicast_set_ttl(ACL_VSTREAM_SOCK(stream_), ttl) == 0;
+}
+
+bool socket_stream::multicast_set_if(const char *iface)
+{
+	if (eof_ || stream_ == NULL) {
+		logger_error("Socket not opened yet");
+		return false;
+	}
+
+	return acl_multicast_set_if(ACL_VSTREAM_SOCK(stream_), iface) == 0;
+}
+
+bool socket_stream::multicast_drop(const char *addr, const char *iface)
+{
+	if (eof_ || stream_ == NULL) {
+		logger_error("Socket not opened yet");
+		return false;
+	}
+
+	return acl_multicast_drop(ACL_VSTREAM_SOCK(stream_), addr, iface) == 0;
+}
+
 bool socket_stream::shutdown_read(void)
 {
 	if (stream_ == NULL) {
