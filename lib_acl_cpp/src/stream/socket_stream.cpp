@@ -82,6 +82,11 @@ static unsigned to_oflags(unsigned flags)
 	if (flags & OPEN_FLAG_EXCLUSIVE) {
 		oflags |= ACL_INET_FLAG_EXCLUSIVE;
 	}
+
+	if (flags & OPEN_FLAG_MULTICAST_LOOP) {
+		oflags |= ACL_INET_FLAG_MULTILOOP_ON;
+	}
+
 	return oflags;
 }
 

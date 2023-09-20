@@ -63,9 +63,9 @@ ifneq ($(SYSPATH),)
 endif
 ###########################################################
 
-CFLAGS += -I. -I.. -I../.. -I../../../include -I../../../../lib_acl/include -I../../../../lib_protocol/include
+CFLAGS += -I. -I.. -I../.. -I../../include -I../../../lib_acl/include -I../../../lib_protocol/include
 EXTLIBS =
-LDFLAGS = -L../../../lib -l_acl_cpp -L../../../../lib_protocol/lib -l_protocol -L../../../../lib_acl/lib -l_acl \
+LDFLAGS = -L../../lib -l_acl_cpp -L../../../lib_protocol/lib -l_protocol -L../../../lib_acl/lib -l_acl \
 	$(EXTLIBS) $(SYSLIB)
 
 COMPILE = $(CC) $(CFLAGS)
@@ -79,7 +79,7 @@ OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: ../../%.cpp
+$(OBJ_PATH)/%.o: ../%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean

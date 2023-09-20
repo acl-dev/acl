@@ -366,7 +366,9 @@ void acl_vstream_set_udp_io(ACL_VSTREAM *stream)
 static int join_multicast(ACL_SOCKET sock, const char *addr,
 	const char *iface, int enable_loop)
 {
+	int on;
 	struct ip_mreq mreq;
+
 	memset(&mreq, 0, sizeof(mreq));
 
 	mreq.imr_multiaddr.s_addr = inet_addr(addr);
@@ -374,15 +376,15 @@ static int join_multicast(ACL_SOCKET sock, const char *addr,
 		htonl(INADDR_ANY) : inet_addr(iface);
 
 	if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
-		       (const char*) &mreq, sizeof(mreq)) == -1) {
+		 (const char*) &mreq, sizeof(mreq)) == -1) {
 		acl_msg_error("%s(%d), %s: setsockopt %d error %s", __FILE__,
 			__LINE__, __FUNCTION__, (int) sock, acl_last_serror());
 		return -1;
 	}
 
-	int on = enable_loop;
+	on = enable_loop;
 	if (setsockopt(sock,IPPROTO_IP, IP_MULTICAST_LOOP,
-	       (const char*) &on, sizeof(on)) == -1) {
+		 (const char*) &on, sizeof(on)) == -1) {
 		acl_msg_error("%s(%d), %s: setsockopt IP_MULTICAST_LOOP error %s",
 			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 		return -1;
@@ -402,9 +404,9 @@ static int multicast_write(ACL_SOCKET fd, const void *buf, size_t size,
 {
 	int   ret;
 
-	if (stream->sa_peer_len == 0) {
+	if (stream->sa_local_len == 0) {
 		acl_msg_error("%s, %s(%d): peer addr null",
-		      __FUNCTION__, __FILE__, __LINE__);
+			__FUNCTION__, __FILE__, __LINE__);
 		return -1;
 	}
 
