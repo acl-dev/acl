@@ -81,8 +81,6 @@ $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: ../../%.cpp
 	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: ../%.cpp
-	$(COMPILE) $< -o $@
 
 .PHONY = all clean
 all: RM $(OBJ)
