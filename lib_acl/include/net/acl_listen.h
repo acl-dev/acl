@@ -16,6 +16,7 @@ extern "C" {
 #define ACL_INET_FLAG_REUSEPORT		(1 << 1)
 #define ACL_INET_FLAG_FASTOPEN		(1 << 2)
 #define ACL_INET_FLAG_EXCLUSIVE		(1 << 3)
+#define	ACL_INET_FLAG_MULTILOOP_ON	(1 << 4)
 
 /**
  * 监听套接字接收外来客户端连接

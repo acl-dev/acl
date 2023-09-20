@@ -42,16 +42,30 @@ master_service::~master_service(void)
 {
 }
 
+static acl::atomic_long __counter;
+
 void master_service::on_read(acl::socket_stream* stream)
 {
 	int   n;
-	char  buf[4096];
+	char  buf[512];
 
 	if ((n = stream->read(buf, sizeof(buf), false)) == -1) {
 		return;
 	}
 
-	logger("read from %s, %d bytes", stream->get_peer(), n);
+	long long cnt = ++__counter;
+
+	if (cnt < 100) {
+		buf[n] = 0;
+		logger("read from %s, %d bytes: %s", stream->get_peer(), n, buf);
+	} else if (cnt % 10000 == 0) {
+		buf[n] = 0;
+
+		char tmp[1024];
+		snprintf(tmp, sizeof(tmp), "count=%lld, %s", cnt, buf);
+		acl::meter_time("Read udp", __LINE__, tmp);
+	}
+
 	stream->write(buf, n);
 }
 

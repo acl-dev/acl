@@ -360,3 +360,169 @@ void acl_vstream_set_udp_io(ACL_VSTREAM *stream)
 		ACL_VSTREAM_CTL_CONTEXT, stream->context,
 		ACL_VSTREAM_CTL_END);
 }
+
+/****************************************************************************/
+
+static int join_multicast(ACL_SOCKET sock, const char *addr,
+	const char *iface, int enable_loop)
+{
+	int on;
+	struct ip_mreq mreq;
+
+	memset(&mreq, 0, sizeof(mreq));
+
+	mreq.imr_multiaddr.s_addr = inet_addr(addr);
+	mreq.imr_interface.s_addr = strcmp(iface, "0.0.0.0") == 0 ?
+		htonl(INADDR_ANY) : inet_addr(iface);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP,
+		 (const char*) &mreq, sizeof(mreq)) == -1) {
+		acl_msg_error("%s(%d), %s: setsockopt %d error %s", __FILE__,
+			__LINE__, __FUNCTION__, (int) sock, acl_last_serror());
+		return -1;
+	}
+
+	on = enable_loop;
+	if (setsockopt(sock,IPPROTO_IP, IP_MULTICAST_LOOP,
+		 (const char*) &on, sizeof(on)) == -1) {
+		acl_msg_error("%s(%d), %s: setsockopt IP_MULTICAST_LOOP error %s",
+			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
+		return -1;
+	}
+
+	return 0;
+}
+
+static int multicast_read(ACL_SOCKET fd, void *buf, size_t size,
+	int timeout acl_unused, ACL_VSTREAM *stream, void *arg acl_unused)
+{
+	return udp_read(fd, buf, size, timeout, stream, arg);
+}
+
+static int multicast_write(ACL_SOCKET fd, const void *buf, size_t size,
+	int timeout acl_unused, ACL_VSTREAM *stream, void *arg acl_unused)
+{
+	int   ret;
+
+	if (stream->sa_local_len == 0) {
+		acl_msg_error("%s, %s(%d): peer addr null",
+			__FUNCTION__, __FILE__, __LINE__);
+		return -1;
+	}
+
+	/* 与 UDP 单发不同之处使用了 local 保存的地址做为目标地址，因为其存放着组播地址 */
+	ret = (int) sendto(fd, buf, (int) size, 0,
+			(struct sockaddr*) stream->sa_local,
+			(int) stream->sa_local_len);
+	return ret;
+}
+
+ACL_VSTREAM *acl_vstream_bind_multicast(const char *addr, const char *iface,
+	int port, int timeout, unsigned flag)
+{
+	ACL_SOCKET   sock;
+	ACL_VSTREAM *stream;
+	char addrbuf[256];
+	int enable_loop = (flag & ACL_INET_FLAG_MULTILOOP_ON) ? 1 : 0;
+
+#if defined(_WIN32) || defined(_WIN64)
+	acl_snprintf(addrbuf, sizeof(addrbuf), "%s|%d", iface, port);
+#else
+	acl_snprintf(addrbuf, sizeof(addrbuf), "%s|%d", addr, port);
+#endif
+
+	sock = acl_udp_bind(addrbuf, flag);
+	if (sock == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s(%d), %s: bind addr %s error %s", __FILE__,
+			__LINE__, __FUNCTION__, addrbuf, acl_last_serror());
+		return NULL;
+	}
+
+	if (join_multicast(sock, addr, iface, enable_loop) == -1) {
+		acl_socket_close(sock);
+		return NULL;
+	}
+
+	stream = acl_vstream_fdopen(sock, O_RDWR, 4096, -1, ACL_VSTREAM_TYPE_SOCK);
+	stream->rw_timeout = timeout;
+
+	/* 设置本地绑定地址，该地址同时用做外发地址 */
+	acl_snprintf(addrbuf, sizeof(addrbuf), "%s|%d", addr, port);
+	acl_vstream_set_local(stream, addrbuf);
+
+	acl_vstream_ctl(stream,
+		ACL_VSTREAM_CTL_READ_FN, multicast_read,
+		ACL_VSTREAM_CTL_WRITE_FN, multicast_write,
+		ACL_VSTREAM_CTL_CONTEXT, stream->context,
+		ACL_VSTREAM_CTL_END);
+	return stream;
+}
+
+int acl_multicast_set_ttl(ACL_SOCKET sock, int ttl)
+{
+	if (ttl < 0) {
+		acl_msg_error("%s: invalid ttl=%d", __FUNCTION__, ttl);
+		return -1;
+	}
+
+	if (sock == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s: invalid socket", __FUNCTION__ );
+		return -1;
+	}
+
+	if (setsockopt(sock,  IPPROTO_IP,IP_TTL,
+	       (const char*) &ttl, sizeof(ttl)) == -1) {
+		acl_msg_error("%s: setsockopt IP_TTL error %s, sock=%d",
+		     __FUNCTION__, acl_last_serror(), sock);
+		return -1;
+	}
+	return 0;
+}
+
+int acl_multicast_set_if(ACL_SOCKET sock, const char *addr)
+{
+	struct in_addr in;
+	if (addr == NULL || *addr == 0) {
+		acl_msg_error("%s: addr null", __FUNCTION__);
+		return -1;
+	}
+
+	if (sock == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s: invalid socket", __FUNCTION__);
+		return -1;
+	}
+
+	in.s_addr = inet_addr(addr);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_IF,
+	       (const char*) &in, sizeof(in)) < 0) {
+		acl_msg_error("%s: set IP_MULTICAST_IF error=%s, addr=%s",
+		     __FUNCTION__, acl_last_serror(), addr);
+		return -1;
+	}
+
+	return 0;
+}
+
+int acl_multicast_drop(ACL_SOCKET sock, const char *addr, const char *iface)
+{
+	if (sock == ACL_SOCKET_INVALID) {
+		acl_msg_error("%s: invalid socket", __FUNCTION__);
+		return -1;
+	}
+
+	struct ip_mreq ipmr;
+	memset(&ipmr, 0, sizeof(ipmr));
+
+	ipmr.imr_interface.s_addr = strcmp(iface, "0.0.0.0") == 0 ?
+		htonl(INADDR_ANY) : inet_addr(iface);
+	ipmr.imr_multiaddr.s_addr = inet_addr(addr);
+
+	if (setsockopt(sock, IPPROTO_IP, IP_DROP_MEMBERSHIP,
+	       (const char*)&ipmr, sizeof(ipmr)) == -1) {
+		acl_msg_error("%s: set IP_DROP_MEMBERSHIP error=%s",
+			__FUNCTION__, acl_last_serror());
+		return -1;
+	}
+	return 0;
+}

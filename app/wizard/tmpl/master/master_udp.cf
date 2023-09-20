@@ -62,6 +62,10 @@ service server
 #	master_env = logme:FALSE, priority:E_LOG_INFO, action:E_LOG_PER_DAY, flush:sync_flush, imit_size:512,\
 #			sync_action:E_LOG_SEM, sem_name:/tmp/udp_echo.sem
 
+#	设置组播地址，当该地址非空时，则自动切换成组播模式
+#	master_multicast_addr = 
+#	是否允许组播发送数据时可以回送，即打开：IP_MULTICAST_LOOP
+#	master_multicase_loopback = 0
 #	在启动时如果绑定某个地址失败，是否让进程崩溃
 #	udp_fatal_on_bind_error = 0
 #	启动时创建的固定线程数

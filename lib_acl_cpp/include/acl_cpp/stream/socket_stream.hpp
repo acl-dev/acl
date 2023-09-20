@@ -60,14 +60,48 @@ public:
 		time_unit_t unit = time_unit_s);
 
 	/**
-	 * 绑定本地 UDP 地址，创建 UDP 网络流对象
+	 * 绑定本地 UDP 地址，创建 UDP 通信对象
 	 * @param addr {const char*} 本机地址，格式：ip:port；该地址也可以为
 	 *  UNIX 域套接字或 Linux 抽象域套接字（Linux abstract unix socket）
 	 * @param rw_timeout {int} 读写超时时间(秒)
-	 * @param flag {unsigned} 该标志位的定义参加 server_socket.hpp
+	 * @param flags {unsigned} 该标志位的定义参加 server_socket.hpp
 	 * @return {bool} 绑定是否成功
 	 */
-	bool bind_udp(const char* addr, int rw_timeout = -1, unsigned flag = 0);
+	bool bind_udp(const char* addr, int rw_timeout = -1, unsigned flags = 0);
+
+	/**
+	 * 绑定并创建组播套接口通信对象
+	 * @param addr {const char*} 组播 IP 地址
+	 * @param iface {const char*} 本机用来收发数据包的 IP 地址
+	 * @param port {int} 组播端口号
+	 * @param rw_timeout {int} IO 读写超时时间
+	 * @param flags {unsigned} 该标志位的定义参加 server_socket.hpp
+	 * @return {bool} 绑定是否成功
+	 */
+	bool bind_multicast(const char* addr, const char* iface, int port,
+		int rw_timeout = -1, unsigned flags = 0);
+
+	/**
+	 * 当 bind_multicast 成功后，可以调用本方法设置广播包的 TTL 值
+	 * @param ttl {int} 该值的范围为 1--255
+	 * @return {bool} 设置是否成功
+	 */
+	bool multicast_set_ttl(int ttl);
+
+	/**
+	 * 当 bind_multicast 成功后，可以调用本方法设置广播包的本地 IP 地址
+	 * @param iface {const char*}
+	 * @return {bool} 设置是否成功
+	 */
+	bool multicast_set_if(const char* iface);
+
+	/**
+	 * 当 bind_multicast 成功后，可以调用本方法设置离开组播
+	 * @param addr {const char*} 广播 IP
+	 * @param iface {const char*} 本地 IP
+	 * @return {bool} 是否成功
+	 */
+	bool multicast_drop(const char *addr, const char *iface);
 
 	/**
 	 * 关闭套接口读操作

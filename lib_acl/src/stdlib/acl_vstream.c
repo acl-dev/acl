@@ -3240,7 +3240,7 @@ void acl_vstream_set_local(ACL_VSTREAM *fp, const char *addr)
 		acl_myfree(fp->sa_local);
 	}
 
-	fp->sa_local     = set_sock_addr(addr, &fp->sa_local_size);
+	fp->sa_local = set_sock_addr(addr, &fp->sa_local_size);
 	if (fp->sa_local) {
 		if (fp->sa_local->sa_family == AF_INET) {
 			fp->type |= ACL_VSTREAM_TYPE_INET4;

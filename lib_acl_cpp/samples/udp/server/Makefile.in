@@ -74,14 +74,12 @@ LINK = $(CC) $(OBJ) $(LDFLAGS)
 OBJ_PATH = .
 
 #Project's objs
-SRC = $(wildcard *.cpp) $(wildcard ../*.cpp) $(wildcard ../../*.cpp)
+SRC = $(wildcard *.cpp) $(wildcard ../../*.cpp)
 OBJ = $(patsubst %.cpp, $(OBJ_PATH)/%.o, $(notdir $(SRC)))
 
 $(OBJ_PATH)/%.o: %.cpp
 	$(COMPILE) $< -o $@
 $(OBJ_PATH)/%.o: ../../%.cpp
-	$(COMPILE) $< -o $@
-$(OBJ_PATH)/%.o: ../%.cpp
 	$(COMPILE) $< -o $@
 
 .PHONY = all clean
