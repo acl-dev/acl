@@ -117,6 +117,43 @@ ACL_API ACL_VSTREAM *acl_vstream_bind(const char *addr, int rw_timeout, unsigned
  */
 ACL_API void acl_vstream_set_udp_io(ACL_VSTREAM *stream);
 
+/**
+ * 创建组播对象
+ * @param addr {const char*} 组播IP地址
+ * @param iface {const char*} 本机收发数据包的 IP 地址
+ * @param port {int} 本机收发数据包的 Port
+ * @param timeout {int} IO 超时时间（秒）
+ * @param flag {unsigned} 标志位
+ * @return {ACL_VSTREAM*} 返回 NULL 表示绑定失败
+ */
+ACL_API ACL_VSTREAM *acl_vstream_bind_multicast(const char *addr,
+	const char *iface, int port, int timeout, unsigned flag);
+
+/**
+ * 设置组播的 TTL 选项 (1--255)
+ * @param sock {ACL_SOCKET}
+ * @param ttl {int}
+ * @return {int} 返回 -1 表示出错，0 表示成功
+ */
+ACL_API int acl_multicast_set_ttl(ACL_SOCKET sock, int ttl);
+
+/**
+ * 设置组播绑定的本地地址
+ * @param sock {ACL_SOCKET}
+ * @param addr {const char*}
+ * @return {int} 返回 0 表示成功，-1 表示失败
+ */
+ACL_API int acl_multicast_set_if(ACL_SOCKET sock, const char *addr);
+
+/**
+ * 离开组播，调用此 API 成功后将不再接收组播数据包
+ * @param sock {ACL_SOCKET}
+ * @param addr {const char*} 组播 IP
+ * @param iface {const char*} 本机绑定的接收 IP
+ * @return {int} 返回 0 表示成功，-1 表示失败
+ */
+ACL_API int acl_multicast_drop(ACL_SOCKET sock, const char *addr, const char *iface);
+
 #ifdef __cplusplus
 }
 #endif

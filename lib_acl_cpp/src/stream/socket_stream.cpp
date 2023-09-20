@@ -59,32 +59,59 @@ bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 	return true;
 }
 
+// 将 C++ API 的 flags 转变为 C API 的 flags.
+static unsigned to_oflags(unsigned flags)
+{
+	unsigned oflags = 0;
+
+	if (flags & OPEN_FLAG_NONBLOCK) {
+		oflags |= ACL_NON_BLOCKING;
+	} else {
+		oflags |= ACL_BLOCKING;
+	}
+
+	if (flags & OPEN_FLAG_REUSEPORT) {
+		oflags |= ACL_INET_FLAG_REUSEPORT;
+	}
+
+	// It's only useful for TCP.
+	if (flags & OPEN_FLAG_FASTOPEN) {
+		oflags |= ACL_INET_FLAG_FASTOPEN;
+	}
+
+	if (flags & OPEN_FLAG_EXCLUSIVE) {
+		oflags |= ACL_INET_FLAG_EXCLUSIVE;
+	}
+	return oflags;
+}
+
 bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */,
-	unsigned flag /* = 0 */)
+	unsigned flags /* = 0 */)
 {
 	if (stream_) {
 		acl_vstream_close(stream_);
 	}
 
-	unsigned oflag = 0;
+	unsigned oflags = to_oflags(flags);
+	stream_ = acl_vstream_bind(addr, rw_timeout, oflags);
+	if (stream_ == NULL) {
+		return false;
+	}
+	eof_    = false;
+	opened_ = true;
+	return true;
+}
 
-	if (flag & OPEN_FLAG_NONBLOCK) {
-		oflag |= ACL_NON_BLOCKING;
-	} else {
-		oflag |= ACL_BLOCKING;
+bool socket_stream::bind_multicast(const char *addr, const char *iface,
+	int port, int rw_timeout, unsigned int flags)
+{
+	if (stream_) {
+		acl_vstream_close(stream_);
 	}
 
-	if (flag & OPEN_FLAG_REUSEPORT) {
-		oflag |= ACL_INET_FLAG_REUSEPORT;
-	}
-	if (flag & OPEN_FLAG_FASTOPEN) {
-		oflag |= ACL_INET_FLAG_FASTOPEN;
-	}
-	if (flag & OPEN_FLAG_EXCLUSIVE) {
-		oflag |= ACL_INET_FLAG_EXCLUSIVE;
-	}
-
-	stream_ = acl_vstream_bind(addr, rw_timeout, oflag);
+	unsigned oflags = to_oflags(flags);
+	stream_ = acl_vstream_bind_multicast(addr, iface, port,
+			rw_timeout, oflags);
 	if (stream_ == NULL) {
 		return false;
 	}
