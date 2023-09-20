@@ -24,7 +24,7 @@ function compare_or_replace() {
 RPATH=
 function guess_os() {
 	os_name=`uname -s`
-	os_type=`uname -p`
+	os_type=`uname -m`
 	case $os_name in
 	Linux)
 		case $os_type in
