@@ -435,14 +435,23 @@ bool redis_builder::build_cluster()
 	std::vector<acl::redis_node*>::const_iterator cit;
 
 	for (++it; it != masters_.end(); ++it) {
+		printf("%s(%d): begin cluster_meet addr=%s\r\n",
+			__FUNCTION__, __LINE__, (*it)->get_addr());
 		if (!cluster_meet(master, **it)) {
+			printf("%s(%d): cluster_meet error, addr=%s\r\n",
+				__FUNCTION__, __LINE__, (*it)->get_addr());
 			return false;
 		}
+		printf("%s: cluster_meet ok, addr=%s\r\n",
+			__FUNCTION__, (*it)->get_addr());
+
 		const std::vector<acl::redis_node*>* slaves = (*it)->get_slaves();
 		for (cit = slaves->begin(); cit != slaves->end(); ++cit) {
 			all_slaves.push_back(*cit);
 		}
 	}
+
+	printf("%s: Begin to wait for nodes' connections ...\r\n", __FUNCTION__);
 
 	while (true) {
 		int nwait = 0;
@@ -487,15 +496,15 @@ bool redis_builder::cluster_meet(acl::redis& redis, const acl::redis_node& node)
 	acl::string buf(node.get_addr());
 	const std::vector<acl::string>& tokens = buf.split2(":");
 	if (tokens.size() != 2) {
-		printf("%s: invalid addr: %s\r\n",
-			__FUNCTION__, node.get_addr());
+		printf("%s(%d): invalid addr: %s\r\n",
+			__FUNCTION__, __LINE__, node.get_addr());
 		return false;
 	}
 
 	if (!redis.cluster_meet(tokens[0].c_str(), atoi(tokens[1].c_str()))) {
-		printf("%s: cluster meet %s %s error: %s\r\n",
-			__FUNCTION__, tokens[0].c_str(), tokens[1].c_str(),
-			redis.result_error());
+		printf("%s(%d): cluster meet %s %s error: %s\r\n",
+			__FUNCTION__, __LINE__, tokens[0].c_str(),
+			tokens[1].c_str(), redis.result_error());
 		return false;
 	}
 
@@ -637,8 +646,8 @@ bool redis_builder::cluster_meeting(acl::redis& redis, const char* addr)
 
 		time_t now = time(NULL);
 		if (now - last_check_ >= 1) {
-			printf("%s waiting for %s, nodes: %d, %d\r\n", myaddr,
-				addr, (int) nodes->size(), (int) nslaves);
+			printf("%s: %s waiting for %s, nodes: %zd, %zd\r\n",
+				__FUNCTION__, myaddr, addr, nodes->size(), nslaves);
 			last_check_ = now;
 		}
 
