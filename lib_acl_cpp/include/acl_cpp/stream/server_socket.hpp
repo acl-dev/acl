@@ -14,13 +14,17 @@ namespace acl {
 
 class socket_stream;
 
+#if __cplusplus >= 201103L
+using shared_stream = std::shared_ptr<socket_stream>;
+#endif
+
 enum {
-	OPEN_FLAG_NONE      = 0,
-	OPEN_FLAG_NONBLOCK  = 1,	// 非阻塞模式
-	OPEN_FLAG_REUSEPORT = (1 << 1),	// 端口复用，要求 Linux3.0 以上
-	OPEN_FLAG_FASTOPEN  = (1 << 2),	// 是否启用 Fast open（实验阶段）
-	OPEN_FLAG_EXCLUSIVE = (1 << 3),	// 是否禁止复用地址
-	OPEN_FLAG_MULTICAST_LOOP = (1 << 4),	// 是否允许组播时接收回路包
+	OPEN_FLAG_NONE           = 0,
+	OPEN_FLAG_NONBLOCK       = 1,        // 非阻塞模式
+	OPEN_FLAG_REUSEPORT      = (1 << 1), // 端口复用，要求 Linux3.0 以上
+	OPEN_FLAG_FASTOPEN       = (1 << 2), // 是否启用 Fast open（实验阶段）
+	OPEN_FLAG_EXCLUSIVE      = (1 << 3), // 是否禁止复用地址
+	OPEN_FLAG_MULTICAST_LOOP = (1 << 4), // 是否允许组播时接收回路包
 };
 
 /**
@@ -110,7 +114,6 @@ public:
 
 #if __cplusplus >= 201103L
 	// 使用 c++11 shared_ptr 方式获得客户端流对象, 更安全地使用流对象
-	using shared_stream = std::shared_ptr<socket_stream>;
 
 	shared_stream shared_accept(int timeout = -1, bool* etimed = NULL) {
 		shared_stream ss(accept(timeout, etimed));
