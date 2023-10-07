@@ -104,7 +104,7 @@ int acl_master_flow_put(int len)
 		acl_msg_panic("%s: bad length %d", myname, len);
 
 	/* Write or discard N bytes. */
-	memset(buf, 0, len > BUFFER_SIZE ? BUFFER_SIZE : len);
+	memset(buf, 0, (size_t) len > BUFFER_SIZE ? BUFFER_SIZE : (size_t) len);
 
 	for (count = len; count > 0; count -= n) {
 		n = write((int) ACL_MASTER_FLOW_WRITE, buf,
