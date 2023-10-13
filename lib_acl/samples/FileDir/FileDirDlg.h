@@ -56,7 +56,7 @@ public:
 	afx_msg void OnBnClickedButtonAvlAdd();
 	afx_msg void OnBnClickedButtonAvlFind();
 private:
-	avl_tree_t m_avlTree;
+	acl_avl_tree_t m_avlTree;
 public:
 	static int compare_fn(const void* v1, const void* v2);
 	afx_msg void OnBnClickedButtonWalk();

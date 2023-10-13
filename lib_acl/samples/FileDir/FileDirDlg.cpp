@@ -26,7 +26,7 @@ typedef struct MY_TYPE
 {
 	char  name[256];
 	char  value[256];
-	avl_node_t  node;
+	acl_avl_node_t  node;
 } MY_TYPE;
 
 
@@ -74,7 +74,7 @@ CFileDirDlg::CFileDirDlg(CWnd* pParent /*=NULL*/)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
-	avl_create(&m_avlTree, compare_fn, sizeof(MY_TYPE), offsetof(MY_TYPE, node));
+	acl_avl_create(&m_avlTree, compare_fn, sizeof(MY_TYPE), offsetof(MY_TYPE, node));
 }
 
 void CFileDirDlg::DoDataExchange(CDataExchange* pDX)
@@ -387,7 +387,7 @@ void CFileDirDlg::OnBnClickedButtonAvlAdd()
 	}
 
 	snprintf(m.name, sizeof(m.name), "%s", m_avlName.GetString());
-	pm = (MY_TYPE*) avl_find(&m_avlTree, &m, NULL);
+	pm = (MY_TYPE*) acl_avl_find(&m_avlTree, &m, NULL);
 	if (pm != NULL) {
 		CString msg;
 
@@ -400,7 +400,7 @@ void CFileDirDlg::OnBnClickedButtonAvlAdd()
 	pm = (MY_TYPE*) acl_mycalloc(1, sizeof(MY_TYPE));
 	snprintf(pm->name, sizeof(pm->name), "%s", m_avlName.GetString());
 	snprintf(pm->value, sizeof(pm->value), "%s", m_avlValue.GetString());
-	avl_add(&m_avlTree, pm);
+	acl_avl_add(&m_avlTree, pm);
 	MessageBox("Add ok!", "ok");
 	// m_avlName.Empty();
 	m_avlValue.Empty();
@@ -421,7 +421,7 @@ void CFileDirDlg::OnBnClickedButtonAvlFind()
 
 	snprintf(m.name, sizeof(m.name), m_avlName.GetString());
 
-	ptr = (MY_TYPE*) avl_find(&m_avlTree, &m, NULL);
+	ptr = (MY_TYPE*) acl_avl_find(&m_avlTree, &m, NULL);
 	if (ptr) {
 		m_avlValue.Format("%s", ptr->value);
 	} else {
@@ -447,7 +447,7 @@ void CFileDirDlg::OnBnClickedButtonWalk()
 	CString msg;
 	int   n = 0;
 
-	next = (MY_TYPE*) avl_first(&m_avlTree);
+	next = (MY_TYPE*) acl_avl_first(&m_avlTree);
 	while (next) {
 		msg.Format(">>name(%s), value(%s)\r\n", next->name, next->value);
 		DebugWinAppend(msg);
@@ -473,8 +473,8 @@ void CFileDirDlg::OnEnChangeEditAvlName()
 void CFileDirDlg::OnBnClickedButtonTest()
 {
 	// TODO: 在此添加控件通知处理程序代码
-	avl_node_t *node = (avl_node_t*) acl_mycalloc(1, sizeof(avl_node_t)), *pnode;
-	avl_index_t where;
+	acl_avl_node_t *node = (acl_avl_node_t*) acl_mycalloc(1, sizeof(acl_avl_node_t)), *pnode;
+	acl_avl_index_t where;
 
 	where = AVL_MKINDEX(node, 1);
 	pnode = AVL_INDEX2NODE(where);
@@ -510,7 +510,7 @@ void CFileDirDlg::OnBnClickedButtonAvlAddBat()
 
 	for (i = 0; i < 100; i++) {
 		snprintf(m.name, sizeof(m.name), "%d", i);
-		pm = (MY_TYPE*) avl_find(&m_avlTree, &m, NULL);
+		pm = (MY_TYPE*) acl_avl_find(&m_avlTree, &m, NULL);
 		if (pm != NULL) {
 			msg.Format(">>key(%s) already exist, value(%s)\r\n",
 				pm->name, pm->value);
@@ -521,7 +521,7 @@ void CFileDirDlg::OnBnClickedButtonAvlAddBat()
 		pm = (MY_TYPE*) acl_mycalloc(1, sizeof(MY_TYPE));
 		snprintf(pm->name, sizeof(pm->name), "%d", i);
 		snprintf(pm->value, sizeof(pm->value), "value(%d)", i);
-		avl_add(&m_avlTree, pm);
+		acl_avl_add(&m_avlTree, pm);
 		msg.Format(">>add one, key(%s), value(%s)\r\n", pm->name, pm->value);
 		DebugWinAppend(msg);
 		n++;
@@ -543,11 +543,11 @@ void CFileDirDlg::OnBnClickedButtonAvlDel()
 	}
 
 	snprintf(m.name, sizeof(m.name), "%s", m_avlName.GetString());
-	pm = (MY_TYPE*) avl_find(&m_avlTree, &m, NULL);
+	pm = (MY_TYPE*) acl_avl_find(&m_avlTree, &m, NULL);
 	if (!pm) {
 		MessageBox("not find", "ok");
 	} else {
-		avl_remove(&m_avlTree, pm);
+		acl_avl_remove(&m_avlTree, pm);
 		MessageBox("Delete ok!", "ok");
 	}
 	m_avlName.Empty();
