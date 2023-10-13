@@ -45,19 +45,19 @@
  *
  *	- The AVL specific data structures are physically embedded as fields
  *	  in the "using" data structures.  To maintain generality the code
- *	  must constantly translate between "avl_node_t *" and containing
+ *	  must constantly translate between "fiber_avl_node_t *" and containing
  *	  data structure "void *"s by adding/subracting the avl_offset.
  *
  *	- Since the AVL data is always embedded in other structures, there is
  *	  no locking or memory allocation in the AVL routines. This must be
  *	  provided for by the enclosing data structure's semantics. Typically,
- *	  avl_insert()/_add()/_remove()/avl_insert_here() require some kind of
+ *	  fiber_avl_insert()/_add()/_remove()/fiber_avl_insert_here() require some kind of
  *	  exclusive write lock. Other operations require a read lock.
  *
  *      - The implementation uses iteration instead of explicit recursion,
  *	  since it is intended to run on limited size kernel stacks. Since
  *	  there is no recursion stack present to move "up" in the tree,
- *	  there is an explicit "parent" link in the avl_node_t.
+ *	  there is an explicit "parent" link in the fiber_avl_node_t.
  *
  *      - The left/right children pointers of a node are in an array.
  *	  In the code, variables (instead of constants) are used to represent
@@ -81,11 +81,11 @@
  *	  allows using half as much code (and hence cache footprint) for tree
  *	  manipulations and eliminates many conditional branches.
  *
- *	- The avl_index_t is an opaque "cookie" used to find nodes at or
+ *	- The fiber_avl_index_t is an opaque "cookie" used to find nodes at or
  *	  adjacent to where a new value would be inserted in the tree. The value
- *	  is a modified "avl_node_t *".  The bottom bit (normally 0 for a
+ *	  is a modified "fiber_avl_node_t *".  The bottom bit (normally 0 for a
  *	  pointer) is set to indicate if that the new node has a value greater
- *	  than the value of the indicated "avl_node_t *".
+ *	  than the value of the indicated "fiber_avl_node_t *".
  */
 
 #include "stdafx.h"
@@ -123,10 +123,10 @@ static const int  avl_balance2child[]	= {0, 0, 1};
  * otherwise next node
  */
 void *
-avl_walk(avl_tree_t *tree, void	*oldnode, int left)
+fiber_avl_walk(fiber_avl_tree_t *tree, void	*oldnode, int left)
 {
 	size_t off = tree->avl_offset;
-	avl_node_t *node = AVL_DATA2NODE(oldnode, off);
+	fiber_avl_node_t *node = AVL_DATA2NODE(oldnode, off);
 	int right = 1 - left;
 	int was_child;
 
@@ -170,10 +170,10 @@ avl_walk(avl_tree_t *tree, void	*oldnode, int left)
  * (leftmost child from root of tree)
  */
 void *
-avl_first(avl_tree_t *tree)
+fiber_avl_first(fiber_avl_tree_t *tree)
 {
-	avl_node_t *node;
-	avl_node_t *prev = NULL;
+	fiber_avl_node_t *node;
+	fiber_avl_node_t *prev = NULL;
 	size_t off = tree->avl_offset;
 
 	for (node = tree->avl_root; node != NULL; node = node->avl_child[0])
@@ -189,10 +189,10 @@ avl_first(avl_tree_t *tree)
  * (rightmost child from root of tree)
  */
 void *
-avl_last(avl_tree_t *tree)
+fiber_avl_last(fiber_avl_tree_t *tree)
 {
-	avl_node_t *node;
-	avl_node_t *prev = NULL;
+	fiber_avl_node_t *node;
+	fiber_avl_node_t *prev = NULL;
 	size_t off = tree->avl_offset;
 
 	for (node = tree->avl_root; node != NULL; node = node->avl_child[1])
@@ -206,17 +206,17 @@ avl_last(avl_tree_t *tree)
 /*
  * Access the node immediately before or after an insertion point.
  *
- * "avl_index_t" is a (avl_node_t *) with the bottom bit indicating a child
+ * "fiber_avl_index_t" is a (fiber_avl_node_t *) with the bottom bit indicating a child
  *
  * Return value:
  *	NULL: no node in the given direction
  *	"void *"  of the found tree node
  */
 void *
-avl_nearest(avl_tree_t *tree, avl_index_t where, int direction)
+fiber_avl_nearest(fiber_avl_tree_t *tree, fiber_avl_index_t where, int direction)
 {
 	int child = AVL_INDEX2CHILD(where);
-	avl_node_t *node = AVL_INDEX2NODE(where);
+	fiber_avl_node_t *node = AVL_INDEX2NODE(where);
 	void *data;
 	size_t off = tree->avl_offset;
 
@@ -228,7 +228,7 @@ avl_nearest(avl_tree_t *tree, avl_index_t where, int direction)
 	if (child != direction)
 		return (data);
 
-	return (avl_walk(tree, data, direction));
+	return (fiber_avl_walk(tree, data, direction));
 }
 
 
@@ -242,10 +242,10 @@ avl_nearest(avl_tree_t *tree, avl_index_t where, int direction)
  *	"void *"  of the found tree node
  */
 void *
-avl_find(avl_tree_t *tree, void *value, avl_index_t *where)
+fiber_avl_find(fiber_avl_tree_t *tree, void *value, fiber_avl_index_t *where)
 {
-	avl_node_t *node;
-	avl_node_t *prev = NULL;
+	fiber_avl_node_t *node;
+	fiber_avl_node_t *prev = NULL;
 	int child = 0;
 	int diff;
 	size_t off = tree->avl_offset;
@@ -290,18 +290,18 @@ avl_find(avl_tree_t *tree, void *value, avl_index_t *where)
  * -2 or +2.
  */
 static int
-avl_rotation(avl_tree_t *tree, avl_node_t *node, int balance)
+avl_rotation(fiber_avl_tree_t *tree, fiber_avl_node_t *node, int balance)
 {
 	int left = !(balance < 0);	/* when balance = -2, left will be 0 */
 	int right = 1 - left;
 	int left_heavy = balance >> 1;
 	int right_heavy = -left_heavy;
-	avl_node_t *parent = AVL_XPARENT(node);
-	avl_node_t *child = node->avl_child[left];
-	avl_node_t *cright;
-	avl_node_t *gchild;
-	avl_node_t *gright;
-	avl_node_t *gleft;
+	fiber_avl_node_t *parent = AVL_XPARENT(node);
+	fiber_avl_node_t *child = node->avl_child[left];
+	fiber_avl_node_t *cright;
+	fiber_avl_node_t *gchild;
+	fiber_avl_node_t *gright;
+	fiber_avl_node_t *gleft;
 	int which_child = AVL_XCHILD(node);
 	int child_bal = AVL_XBALANCE(child);
 
@@ -459,20 +459,20 @@ avl_rotation(avl_tree_t *tree, avl_node_t *node, int balance)
 
 
 /*
- * Insert a new node into an AVL tree at the specified (from avl_find()) place.
+ * Insert a new node into an AVL tree at the specified (from fiber_avl_find()) place.
  *
- * Newly inserted nodes are always leaf nodes in the tree, since avl_find()
- * searches out to the leaf positions.  The avl_index_t indicates the node
+ * Newly inserted nodes are always leaf nodes in the tree, since fiber_avl_find()
+ * searches out to the leaf positions.  The fiber_avl_index_t indicates the node
  * which will be the parent of the new node.
  *
  * After the node is inserted, a single rotation further up the tree may
  * be necessary to maintain an acceptable AVL balance.
  */
 void
-avl_insert(avl_tree_t *tree, void *new_data, avl_index_t where)
+fiber_avl_insert(fiber_avl_tree_t *tree, void *new_data, fiber_avl_index_t where)
 {
-	avl_node_t *node;
-	avl_node_t *parent = AVL_INDEX2NODE(where);
+	fiber_avl_node_t *node;
+	fiber_avl_node_t *parent = AVL_INDEX2NODE(where);
 	int old_balance;
 	int new_balance;
 	int which_child = AVL_INDEX2CHILD(where);
@@ -559,13 +559,13 @@ avl_insert(avl_tree_t *tree, void *new_data, avl_index_t where)
  * is correctly ordered at every step of the way in DEBUG kernels.
  */
 void
-avl_insert_here(
-	avl_tree_t *tree,
+fiber_avl_insert_here(
+	fiber_avl_tree_t *tree,
 	void *new_data,
 	void *here,
 	int direction)
 {
-	avl_node_t *node;
+	fiber_avl_node_t *node;
 	int child = direction;	/* rely on AVL_BEFORE == 0, AVL_AFTER == 1 */
 #ifdef DEBUG
 	int diff;
@@ -612,16 +612,16 @@ avl_insert_here(
 	}
 	ASSERT(node->avl_child[child] == NULL);
 
-	avl_insert(tree, new_data, AVL_MKINDEX(node, child));
+	fiber_avl_insert(tree, new_data, AVL_MKINDEX(node, child));
 }
 
 /*
  * Add a new node to an AVL tree.
  */
 void
-avl_add(avl_tree_t *tree, void *new_node)
+fiber_avl_add(fiber_avl_tree_t *tree, void *new_node)
 {
-	avl_index_t where = 0;
+	fiber_avl_index_t where = 0;
 
 	/*
 	 * This is unfortunate.  We want to call panic() here, even for
@@ -629,13 +629,13 @@ avl_add(avl_tree_t *tree, void *new_node)
 	 * in libc or else the rtld build process gets confused.  So, all we can
 	 * do in userland is resort to a normal ASSERT().
 	 */
-	if (avl_find(tree, new_node, &where) != NULL)
+	if (fiber_avl_find(tree, new_node, &where) != NULL)
 #ifdef _KERNEL
-		panic("avl_find() succeeded inside avl_add()");
+		panic("fiber_avl_find() succeeded inside fiber_avl_add()");
 #else
 		ASSERT(0);
 #endif
-	avl_insert(tree, new_node, where);
+	fiber_avl_insert(tree, new_node, where);
 }
 
 /*
@@ -662,12 +662,12 @@ avl_add(avl_tree_t *tree, void *new_node)
  * height due to a rotation.
  */
 void
-avl_remove(avl_tree_t *tree, void *data)
+fiber_avl_remove(fiber_avl_tree_t *tree, void *data)
 {
-	avl_node_t *delete;
-	avl_node_t *parent;
-	avl_node_t *node;
-	avl_node_t tmp;
+	fiber_avl_node_t *delete;
+	fiber_avl_node_t *parent;
+	fiber_avl_node_t *node;
+	fiber_avl_node_t tmp;
 	int old_balance;
 	int new_balance;
 	int left;
@@ -808,11 +808,11 @@ avl_remove(avl_tree_t *tree, void *data)
 }
 
 #define	AVL_REINSERT(tree, obj)		\
-	avl_remove((tree), (obj));	\
-	avl_add((tree), (obj))
+	fiber_avl_remove((tree), (obj));	\
+	fiber_avl_add((tree), (obj))
 
 boolean_t
-avl_update_lt(avl_tree_t *t, void *obj)
+fiber_avl_update_lt(fiber_avl_tree_t *t, void *obj)
 {
 	void *neighbor;
 
@@ -829,7 +829,7 @@ avl_update_lt(avl_tree_t *t, void *obj)
 }
 
 boolean_t
-avl_update_gt(avl_tree_t *t, void *obj)
+fiber_avl_update_gt(fiber_avl_tree_t *t, void *obj)
 {
 	void *neighbor;
 
@@ -846,7 +846,7 @@ avl_update_gt(avl_tree_t *t, void *obj)
 }
 
 boolean_t
-avl_update(avl_tree_t *t, void *obj)
+fiber_avl_update(fiber_avl_tree_t *t, void *obj)
 {
 	void *neighbor;
 
@@ -869,13 +869,13 @@ avl_update(avl_tree_t *t, void *obj)
  * initialize a new AVL tree
  */
 void
-avl_create(avl_tree_t *tree, int (*compar) (const void *, const void *),
+fiber_avl_create(fiber_avl_tree_t *tree, int (*compar) (const void *, const void *),
     size_t size, size_t offset)
 {
 	ASSERT(tree);
 	ASSERT(compar);
 	ASSERT(size > 0);
-	ASSERT(size >= offset + sizeof (avl_node_t));
+	ASSERT(size >= offset + sizeof (fiber_avl_node_t));
 #ifdef _LP64
 	ASSERT((offset & 0x7) == 0);
 #endif
@@ -892,7 +892,7 @@ avl_create(avl_tree_t *tree, int (*compar) (const void *, const void *),
  */
 /* ARGSUSED */
 void
-avl_destroy(avl_tree_t *tree fiber_unused)
+fiber_avl_destroy(fiber_avl_tree_t *tree fiber_unused)
 {
 	ASSERT(tree);
 	ASSERT(tree->avl_numnodes == 0);
@@ -904,14 +904,14 @@ avl_destroy(avl_tree_t *tree fiber_unused)
  * Return the number of nodes in an AVL tree.
  */
 ulong_t
-avl_numnodes(avl_tree_t *tree)
+fiber_avl_numnodes(fiber_avl_tree_t *tree)
 {
 	ASSERT(tree);
 	return (tree->avl_numnodes);
 }
 
 boolean_t
-avl_is_empty(avl_tree_t *tree)
+fiber_avl_is_empty(fiber_avl_tree_t *tree)
 {
 	ASSERT(tree);
 	return (tree->avl_numnodes == 0);
@@ -929,20 +929,20 @@ avl_is_empty(avl_tree_t *tree)
  *	void *cookie = NULL;
  *	my_data_t *node;
  *
- *	while ((node = avl_destroy_nodes(tree, &cookie)) != NULL)
+ *	while ((node = fiber_avl_destroy_nodes(tree, &cookie)) != NULL)
  *		free(node);
- *	avl_destroy(tree);
+ *	fiber_avl_destroy(tree);
  *
- * The cookie is really an avl_node_t to the current node's parent and
+ * The cookie is really an fiber_avl_node_t to the current node's parent and
  * an indication of which child you looked at last.
  *
  * On input, a cookie value of CHILDBIT indicates the tree is done.
  */
 void *
-avl_destroy_nodes(avl_tree_t *tree, void **cookie)
+fiber_avl_destroy_nodes(fiber_avl_tree_t *tree, void **cookie)
 {
-	avl_node_t	*node;
-	avl_node_t	*parent;
+	fiber_avl_node_t	*node;
+	fiber_avl_node_t	*parent;
 	int		child;
 	void		*first;
 	size_t		off = tree->avl_offset;
@@ -951,7 +951,7 @@ avl_destroy_nodes(avl_tree_t *tree, void **cookie)
 	 * Initial calls go to the first node or it's right descendant.
 	 */
 	if (*cookie == NULL) {
-		first = avl_first(tree);
+		first = fiber_avl_first(tree);
 
 		/*
 		 * deal with an empty tree
@@ -969,7 +969,7 @@ avl_destroy_nodes(avl_tree_t *tree, void **cookie)
 	/*
 	 * If there is no parent to return to we are done.
 	 */
-	parent = (avl_node_t *)((uintptr_t)(*cookie) & ~CHILDBIT);
+	parent = (fiber_avl_node_t *)((uintptr_t)(*cookie) & ~CHILDBIT);
 	if (parent == NULL) {
 		if (tree->avl_root != NULL) {
 			ASSERT(tree->avl_numnodes == 1);

@@ -84,9 +84,9 @@ extern "C" {
 
 #ifndef _LP64
 
-struct avl_node {
-	struct avl_node *avl_child[2];	/* left/right children */
-	struct avl_node *avl_parent;	/* this node's parent */
+struct fiber_avl_node {
+	struct fiber_avl_node *avl_child[2];	/* left/right children */
+	struct fiber_avl_node *avl_parent;	/* this node's parent */
 	unsigned short avl_child_index;	/* my index in parent's avl_child[] */
 	short avl_balance;		/* balance value: -1, 0, +1 */
 };
@@ -114,8 +114,8 @@ struct avl_node {
  *
  */
 
-struct avl_node {
-	struct avl_node *avl_child[2];	/* left/right children nodes */
+struct fiber_avl_node {
+	struct fiber_avl_node *avl_child[2];	/* left/right children nodes */
 	uintptr_t avl_pcb;		/* parent, child_index, balance */
 };
 
@@ -124,7 +124,7 @@ struct avl_node {
  *
  * pointer to the parent of the current node is the high order bits
  */
-#define	AVL_XPARENT(n)		((struct avl_node *)((n)->avl_pcb & ~7))
+#define	AVL_XPARENT(n)		((struct fiber_avl_node *)((n)->avl_pcb & ~7))
 #define	AVL_SETPARENT(n, p)						\
 	((n)->avl_pcb = (((n)->avl_pcb & 7) | (uintptr_t)(p)))
 
@@ -153,23 +153,23 @@ struct avl_node {
  * the value of "o" is tree->avl_offset
  */
 #define	AVL_NODE2DATA(n, o)	((void *)((uintptr_t)(n) - (o)))
-#define	AVL_DATA2NODE(d, o)	((struct avl_node *)((uintptr_t)(d) + (o)))
+#define	AVL_DATA2NODE(d, o)	((struct fiber_avl_node *)((uintptr_t)(d) + (o)))
 
 /*
- * macros used to create/access an avl_index_t
+ * macros used to create/access an fiber_avl_index_t
  */
-#define	AVL_INDEX2NODE(x)	((avl_node_t *)((x) & ~1))
+#define	AVL_INDEX2NODE(x)	((fiber_avl_node_t *)((x) & ~1))
 #define	AVL_INDEX2CHILD(x)	((x) & 1)
-#define	AVL_MKINDEX(n, c)	((avl_index_t)(n) | (c))
+#define	AVL_MKINDEX(n, c)	((fiber_avl_index_t)(n) | (c))
 
 
 /*
  * The tree structure. The fields avl_root, avl_compar, and avl_offset come
- * first since they are needed for avl_find().  We want them to fit into
- * a single 64 byte cache line to make avl_find() as fast as possible.
+ * first since they are needed for fiber_avl_find().  We want them to fit into
+ * a single 64 byte cache line to make fiber_avl_find() as fast as possible.
  */
-struct avl_tree {
-	struct avl_node *avl_root;	/* root node in tree */
+struct fiber_avl_tree {
+	struct fiber_avl_node *avl_root;	/* root node in tree */
 	int (*avl_compar)(const void *, const void *);
 	size_t avl_offset;		/* offsetof(type, avl_link_t field) */
 	ulong_t avl_numnodes;		/* number of nodes in the tree */
@@ -180,7 +180,7 @@ struct avl_tree {
 /*
  * This will only by used via AVL_NEXT() or AVL_PREV()
  */
-void *avl_walk(struct avl_tree *, void *, int);
+void *fiber_avl_walk(struct fiber_avl_tree *, void *, int);
 
 #ifdef	__cplusplus
 }
