@@ -36,7 +36,7 @@
 
 typedef struct ZDB_IO_BLK {
 	zdb_off_t off;
-	avl_node_t node;
+	acl_avl_node_t node;
 	char *dat;
 	size_t dlen;
 	unsigned int flag;
@@ -46,7 +46,7 @@ typedef struct ZDB_IO_BLK {
 } ZDB_IO_BLK;
 
 struct ZDB_IO {
-	avl_tree_t blk_tree;	/* 存储所有需要同步至磁盘的缓存数据块 */
+	acl_avl_tree_t blk_tree;	/* 存储所有需要同步至磁盘的缓存数据块 */
 	ACL_CACHE *blk_cache;	/* 存储所有缓存数据块 */
 	size_t blk_len;
 	ACL_SLICE *blk_slice;
@@ -69,7 +69,7 @@ static void io_blk_free(ZDB_IO_BLK *blk)
 	if ((blk->flag & BLK_F_DIRTY)) {
 		ZDB_IO *io = blk->io;
 
-		avl_remove(&io->blk_tree, blk);
+		acl_avl_remove(&io->blk_tree, blk);
 
 #ifdef	PWRITE
 		ret = PWRITE(IO_HANDLE(io), blk->dat, blk->dlen, blk->off);
@@ -163,7 +163,7 @@ void zdb_io_cache_open(ZDB_STORE *store, size_t blk_len)
 
 	io->store = store;
 	io->blk_len = blk_len;
-	avl_create(&io->blk_tree, cmp_fn, sizeof(ZDB_IO_BLK),
+	acl_avl_create(&io->blk_tree, cmp_fn, sizeof(ZDB_IO_BLK),
 			offsetof(ZDB_IO_BLK, node));
 	io->blk_cache = acl_cache_create(store->cache_max,
 		store->cache_timeout, free_blk_cache);
@@ -186,7 +186,7 @@ void zdb_io_cache_close(ZDB_STORE *store)
 		return;
 
 	(void) zdb_io_cache_sync(store);
-	avl_destroy(&store->io->blk_tree);
+	acl_avl_destroy(&store->io->blk_tree);
 	acl_vstring_free(store->io->buf);
 	acl_cache_free(store->io->blk_cache);
 	if (store->io->dat_slice)
@@ -208,7 +208,7 @@ int zdb_io_cache_sync(ZDB_STORE *store)
 		return (0);
 
 	while (1) {
-		blk_first = (ZDB_IO_BLK*) avl_first(&io->blk_tree);
+		blk_first = (ZDB_IO_BLK*) acl_avl_first(&io->blk_tree);
 		if (blk_first == NULL)
 			break;
 
@@ -225,9 +225,9 @@ int zdb_io_cache_sync(ZDB_STORE *store)
 			if (blk_iter->off + (int) blk_iter->dlen != blk_next->off)
 				break;
 
-			avl_remove(&io->blk_tree, blk_iter);
+			acl_avl_remove(&io->blk_tree, blk_iter);
 
-			/* 防止在 io_blk_free 再次调用 avl_remove */
+			/* 防止在 io_blk_free 再次调用 acl_avl_remove */
 			blk_iter->flag &= ~BLK_F_DIRTY;
 			blk_iter = blk_next;
 			acl_vstring_memcat(io->buf, blk_iter->dat, blk_iter->dlen);
@@ -262,8 +262,8 @@ int zdb_io_cache_sync(ZDB_STORE *store)
 
 		dlen += (int) LEN(io->buf);
 		if (n == 0) {
-			avl_remove(&io->blk_tree, blk_first);
-			/* 防止在 io_blk_free 再次调用 avl_remove */
+			acl_avl_remove(&io->blk_tree, blk_first);
+			/* 防止在 io_blk_free 再次调用 acl_avl_remove */
 			blk_first->flag &= ~BLK_F_DIRTY;
 		}
 	}
@@ -289,10 +289,10 @@ static void zdb_io_cache_add(ZDB_IO *io, const void *buf,
 	if (dirty) {
 		blk->flag |= BLK_F_DIRTY;
 		/* 添加进写缓存中 */
-		avl_add(&io->blk_tree, blk);
+		acl_avl_add(&io->blk_tree, blk);
 
 		/* 同步写缓存中的数据块至磁盘 */
-		if ((int) avl_numnodes(&io->blk_tree) >= io->store->wback_max) {
+		if ((int) acl_avl_numnodes(&io->blk_tree) >= io->store->wback_max) {
 			(void) zdb_io_cache_sync(io->store);
 		}
 	}
@@ -323,7 +323,7 @@ static int zdb_io_cache_write(ZDB_IO *io, const void *buf,
 			return (int) (len);
 		/* 需要添加进写缓存 */
 		blk->flag |= BLK_F_DIRTY;
-		avl_add(&io->blk_tree, blk);
+		acl_avl_add(&io->blk_tree, blk);
 		return (int) (len);
 	}
 

@@ -92,7 +92,7 @@ typedef struct ACL_MDT_IDX_BHASH {
  */
 typedef struct ACL_MDT_IDX_AVL {
 	ACL_MDT_IDX idx;
-	avl_tree_t avl;
+	acl_avl_tree_t avl;
 	ACL_SLICE *slice;		/* ÄÚ´æ·ÖÅä³Ø */
 } ACL_MDT_IDX_AVL;
 

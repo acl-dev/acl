@@ -23,7 +23,7 @@
 
 struct EVENT_TIMERS {
 	ACL_HTABLE *table;		/**< 哈希表用于按键值查询      */
-	avl_tree_t  avl;		/**< 用于按时间排序的平衡二叉树 */
+	acl_avl_tree_t  avl;		/**< 用于按时间排序的平衡二叉树 */
 };
 
 typedef struct TIMER_INFO TIMER_INFO;
@@ -47,7 +47,7 @@ struct TIMER_INFO {
 /* 具有相同过期时间截的元素存放里该树节点上 */
 struct TIMER_NODE {
 	acl_int64   when;
-	avl_node_t  node;
+	acl_avl_node_t  node;
 	TIMER_INFO *head;
 	TIMER_INFO *tail;
 };
@@ -78,13 +78,13 @@ void event_timer_create(ACL_EVENT *eventp)
 {
 	eventp->timers = (EVENT_TIMERS*) acl_mymalloc(sizeof(EVENT_TIMERS));
 	eventp->timers->table = acl_htable_create(1024, 0);
-	avl_create(&eventp->timers->avl, avl_cmp_fn, sizeof(TIMER_INFO),
+	acl_avl_create(&eventp->timers->avl, avl_cmp_fn, sizeof(TIMER_INFO),
 		   offsetof(TIMER_NODE, node));
 }
 
 acl_int64 event_timer_when(ACL_EVENT *eventp)
 {
-	TIMER_NODE *node = avl_first(&eventp->timers->avl);
+	TIMER_NODE *node = acl_avl_first(&eventp->timers->avl);
 	return node ? node->when : -1;
 }
 
@@ -92,7 +92,7 @@ void event_timer_free(ACL_EVENT *eventp)
 {
 	TIMER_NODE *node, *next;
 
-	node = (TIMER_NODE*) avl_first(&eventp->timers->avl);
+	node = (TIMER_NODE*) acl_avl_first(&eventp->timers->avl);
 	while (node) {
 		next = AVL_NEXT(&eventp->timers->avl, node);
 		acl_myfree(node);
@@ -138,7 +138,7 @@ static int node_unlink(ACL_EVENT *eventp, TIMER_INFO *info)
 	info->node = NULL;
 
 	if (node->head == NULL) {
-		avl_remove(&eventp->timers->avl, node);
+		acl_avl_remove(&eventp->timers->avl, node);
 		acl_myfree(node);
 		return 1;
 	}
@@ -180,7 +180,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 	}
 
 	iter.when = eventp->present + delay;
-	node = (TIMER_NODE*) avl_find(&eventp->timers->avl, &iter, NULL);
+	node = (TIMER_NODE*) acl_avl_find(&eventp->timers->avl, &iter, NULL);
 	if (node == NULL) {
 		node = (TIMER_NODE*) acl_mycalloc(1, sizeof(TIMER_NODE));
 		node->when = iter.when;
@@ -188,7 +188,7 @@ acl_int64 event_timer_request(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callback,
 		 * Insert the request at the right place. Timer requests are
 		 * kept sorted to reduce lookup overhead in the event loop.
 		 */
-		avl_add(&eventp->timers->avl, node);
+		acl_avl_add(&eventp->timers->avl, node);
 	}
 
 	node_link(node, info);
@@ -214,7 +214,7 @@ static acl_int64 timer_cancel(ACL_EVENT *eventp, TIMER_INFO *info)
 	acl_assert(info->node);
 
 	node = info->node;
-	first = avl_first(&eventp->timers->avl);
+	first = acl_avl_first(&eventp->timers->avl);
 	if (first == node) {
 		first = AVL_NEXT(&eventp->timers->avl, first);
 		if (node_unlink(eventp, info) == 0) {
@@ -284,7 +284,7 @@ void event_timer_trigger(ACL_EVENT *eventp)
 	SET_TIME(eventp->present);
 
 	/* collect all the timers that should be triggered */
-	iter = avl_first(&eventp->timers->avl);
+	iter = acl_avl_first(&eventp->timers->avl);
 	while (iter) {
 		if (iter->when > eventp->present) {
 			break;

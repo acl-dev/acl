@@ -14,7 +14,7 @@
 typedef struct {
 	ACL_CACHE2  cache;		/**< 封装了 ACL_CACHE2 */
 	ACL_HTABLE *table;		/**< 哈希表用于按键值查询 */
-	avl_tree_t  avl;		/**< 用于按时间排序的平衡二叉树 */
+	acl_avl_tree_t  avl;		/**< 用于按时间排序的平衡二叉树 */
 
 	acl_pthread_mutex_t lock;       /**< 缓存池锁 */
 } CACHE;
@@ -25,7 +25,7 @@ typedef struct CACHE_INFO CACHE_INFO;
 typedef struct TREE_NODE {
 	CACHE_INFO *head;
 	CACHE_INFO *tail;
-	avl_node_t  node;
+	acl_avl_node_t  node;
 
 	time_t when_timeout;
 } TREE_NODE;
@@ -49,7 +49,7 @@ static void *cache_iter_head(ACL_ITER *iter, struct ACL_CACHE2 *cache2)
 	iter->i    = 0;
 	iter->size = cache2->size;
 
-	node = avl_first(&cache->avl);
+	node = acl_avl_first(&cache->avl);
 	if (node == NULL) {
 		iter->ptr  = NULL;
 		iter->data = NULL;
@@ -105,7 +105,7 @@ static void *cache_iter_tail(ACL_ITER *iter, struct ACL_CACHE2 *cache2)
 	iter->i    = cache2->size - 1;
 	iter->size = cache2->size;
 
-	node = avl_last(&cache->avl);
+	node = acl_avl_last(&cache->avl);
 	if (node == NULL) {
 		iter->ptr  = NULL;
 		iter->data = NULL;
@@ -186,7 +186,7 @@ ACL_CACHE2 *acl_cache2_create(int max_size,
 
 	cache = (CACHE *) acl_mycalloc(1, sizeof(CACHE));
 	cache->table = acl_htable_create(max_size, 0);
-	avl_create(&cache->avl, avl_cmp_fn, sizeof(TREE_NODE),
+	acl_avl_create(&cache->avl, avl_cmp_fn, sizeof(TREE_NODE),
 		offsetof(TREE_NODE, node));
 	acl_pthread_mutex_init(&cache->lock, NULL);
 
@@ -212,7 +212,7 @@ void acl_cache2_free(ACL_CACHE2 *cache2)
 		return;
 	}
 
-	node = (TREE_NODE*) avl_first(&cache->avl);
+	node = (TREE_NODE*) acl_avl_first(&cache->avl);
 	while (node) {
 		info = node->head;
 		node = AVL_NEXT(&cache->avl, node);
@@ -229,7 +229,7 @@ void acl_cache2_free(ACL_CACHE2 *cache2)
 		}
 	}       
 
-	avl_destroy(&cache->avl);
+	acl_avl_destroy(&cache->avl);
 	acl_htable_free(cache->table, NULL);
 	acl_pthread_mutex_destroy(&cache->lock);
 	acl_myfree(cache);
@@ -260,11 +260,11 @@ static ACL_CACHE2_INFO *cache2_enter(CACHE *cache, const char *key,
 	 */
 
 	iter.when_timeout = timeout > 0 ? when_timeout : 0;
-	node = (TREE_NODE*) avl_find(&cache->avl, &iter, NULL);
+	node = (TREE_NODE*) acl_avl_find(&cache->avl, &iter, NULL);
 	if (node == NULL) {
 		node = (TREE_NODE*) acl_mycalloc(1, sizeof(TREE_NODE));
 		node->when_timeout = iter.when_timeout;
-		avl_add(&cache->avl, node);
+		acl_avl_add(&cache->avl, node);
 	}
 
 	/* 将具有相同过期时间截的元素用双向链表连接起来 */
@@ -326,7 +326,7 @@ ACL_CACHE2_INFO *acl_cache2_enter(ACL_CACHE2 *cache2,
 
 	/* 如果缓存池依然满，则采用 LRU 策略删除最旧的数据 */
 
-	node = (TREE_NODE*) avl_first(&cache->avl);
+	node = (TREE_NODE*) acl_avl_first(&cache->avl);
 	while (node && cache2->size >= cache2->max_size) {
 		if (node->when_timeout == 0) {
 			node = AVL_NEXT(&cache->avl, node);
@@ -433,7 +433,7 @@ int acl_cache2_delete(ACL_CACHE2 *cache2, ACL_CACHE2_INFO *info2)
 
 	/* 当具有相同过期时间截的节点里的元素为空时，则可将该节点删除 */
 	if (node->head == NULL) {
-		avl_remove(&cache->avl, node);
+		acl_avl_remove(&cache->avl, node);
 		acl_myfree(node);
 	}
 	return 0;
@@ -471,7 +471,7 @@ int acl_cache2_timeout(ACL_CACHE2 *cache2)
 		return n;
 	}
 
-	node = (TREE_NODE*) avl_first(&cache->avl);
+	node = (TREE_NODE*) acl_avl_first(&cache->avl);
 	while (1) {
 		if (node == NULL || node->when_timeout > now) {
 			break;
@@ -524,16 +524,16 @@ ACL_CACHE2_INFO *acl_cache2_update2(ACL_CACHE2 *cache2,
 	}
 
 	if (node->head == NULL) {
-		avl_remove(&cache->avl, node);
+		acl_avl_remove(&cache->avl, node);
 		acl_myfree(node);
 	}
 
 	iter.when_timeout = timeout > 0 ? (time(NULL) + timeout) : 0;
-	node = (TREE_NODE*) avl_find(&cache->avl, &iter, NULL);
+	node = (TREE_NODE*) acl_avl_find(&cache->avl, &iter, NULL);
 	if (node == NULL) {
 		node = (TREE_NODE*) acl_mycalloc(1, sizeof(TREE_NODE));
 		node->when_timeout = iter.when_timeout;
-		avl_add(&cache->avl, node);
+		acl_avl_add(&cache->avl, node);
 	}
 
 	if (node->tail == NULL) {
@@ -590,14 +590,14 @@ ACL_CACHE2_INFO *acl_cache2_upsert(ACL_CACHE2 *cache2,
 ACL_CACHE2_INFO *acl_cache2_head(ACL_CACHE2 *cache2)
 {
 	CACHE     *cache = (CACHE *) cache2;
-	TREE_NODE *node  = (TREE_NODE *) avl_first(&cache->avl);
+	TREE_NODE *node  = (TREE_NODE *) acl_avl_first(&cache->avl);
 	return node ? (ACL_CACHE2_INFO *) node->head : NULL;
 }
 
 ACL_CACHE2_INFO *acl_cache2_tail(ACL_CACHE2 *cache2)
 {
 	CACHE     *cache = (CACHE *) cache2;
-	TREE_NODE *node  = (TREE_NODE *) avl_last(&cache->avl);
+	TREE_NODE *node  = (TREE_NODE *) acl_avl_last(&cache->avl);
 	return node ? (ACL_CACHE2_INFO *) node->tail : NULL;
 }
 
@@ -678,7 +678,7 @@ void acl_cache2_walk(ACL_CACHE2 *cache2,
 		return;
 	}
 
-	node = (TREE_NODE*) avl_first(&cache->avl);
+	node = (TREE_NODE*) acl_avl_first(&cache->avl);
 	while (1) {
 		if (node == NULL) {
 			break;
@@ -705,7 +705,7 @@ int acl_cache2_clean(ACL_CACHE2 *cache2, int force)
 		return 0;
 	}
 
-	node = (TREE_NODE*) avl_first(&cache->avl);
+	node = (TREE_NODE*) acl_avl_first(&cache->avl);
 	while (node) {
 		info = node->head;
 		node = AVL_NEXT(&cache->avl, node);

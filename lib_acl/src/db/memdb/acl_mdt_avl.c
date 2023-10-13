@@ -32,7 +32,7 @@ typedef struct {
 		const char *c_key;
 	} key;
 	ACL_MDT_REC *rec;
-	avl_node_t node;
+	acl_avl_node_t node;
 } TREE_NODE;
 #ifdef  PACK_STRUCT
 #pragma pack(0)
@@ -70,7 +70,7 @@ static ACL_MDT_IDX *mdt_idx_create(ACL_MDT *mdt, size_t init_capacity acl_unused
 	unsigned int rtgc_off = 0;
 
 	idx = (ACL_MDT_IDX_AVL*) acl_mycalloc(1, sizeof(ACL_MDT_IDX_AVL));
-	avl_create(&idx->avl, cmp_fn, sizeof(TREE_NODE), offsetof(TREE_NODE, node));
+	acl_avl_create(&idx->avl, cmp_fn, sizeof(TREE_NODE), offsetof(TREE_NODE, node));
 
 	if ((mdt->tbl_flag & ACL_MDT_FLAG_SLICE_RTGC_OFF))
 		rtgc_off = 1;
@@ -96,11 +96,11 @@ static void mdt_idx_free(ACL_MDT_IDX *idx)
 	TREE_NODE *pnode;
 
 	while (1) {
-		pnode = (TREE_NODE*) avl_first(&idx_avl->avl);
+		pnode = (TREE_NODE*) acl_avl_first(&idx_avl->avl);
 		if (pnode == NULL)
 			break;
 
-		avl_remove(&idx_avl->avl, pnode);
+		acl_avl_remove(&idx_avl->avl, pnode);
 		if (!(idx->flag & ACL_MDT_FLAG_KMR))
 			acl_myfree(pnode->key.key);
 
@@ -110,7 +110,7 @@ static void mdt_idx_free(ACL_MDT_IDX *idx)
 			acl_myfree(pnode);
 	}
 
-	avl_destroy(&idx_avl->avl);
+	acl_avl_destroy(&idx_avl->avl);
 	acl_myfree(idx->name);
 	if (idx_avl->slice)
 		acl_slice_destroy(idx_avl->slice);
@@ -139,7 +139,7 @@ static void mdt_idx_add(ACL_MDT_IDX *idx, const char *key, ACL_MDT_REC *rec)
 		pnode->key.key = acl_mystrdup(key);
 
 	pnode->rec = rec;
-	avl_add(&idx_avl->avl, pnode);
+	acl_avl_add(&idx_avl->avl, pnode);
 	rec->key = pnode->key.c_key;
 }
 
@@ -155,7 +155,7 @@ static ACL_MDT_REC *mdt_idx_get(ACL_MDT_IDX *idx, const char *key)
 	TREE_NODE  node, *pnode;
 
 	node.key.c_key = key;
-	pnode = (TREE_NODE*) avl_find(&idx_avl->avl, &node, NULL);
+	pnode = (TREE_NODE*) acl_avl_find(&idx_avl->avl, &node, NULL);
 	return (pnode ? pnode->rec : NULL);
 }
 
@@ -172,10 +172,10 @@ static void mdt_idx_del(ACL_MDT_IDX *idx, const char *key)
 	TREE_NODE node, *pnode;
 
 	node.key.c_key = key;
-	pnode = (TREE_NODE*) avl_find(&idx_avl->avl, &node, NULL);
+	pnode = (TREE_NODE*) acl_avl_find(&idx_avl->avl, &node, NULL);
 	if (pnode == NULL)
 		acl_msg_fatal("%s: key(%s) not exist", myname, key);
-	avl_remove(&idx_avl->avl, pnode);
+	acl_avl_remove(&idx_avl->avl, pnode);
 	if (!(idx->flag & ACL_MDT_FLAG_KMR))
 		acl_myfree(pnode->key.key);
 	if (idx_avl->slice)
