@@ -314,11 +314,11 @@ int openssl_io::read(void* buf, size_t len)
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 
 	while (len > 0) {
-		time_t begin = time(NULL);
+		//time_t begin = time(NULL);
 		if (acl_read_wait(fd, timeout) < 0) {
-			time_t end = time(NULL);
-			logger_error("acl_read_wait error=%s, fd=%d, cost=%ld",
-				last_serror(), (int) fd, (long) (end - begin));
+			//time_t end = time(NULL);
+			//logger_error("acl_read_wait error=%s, fd=%d, cost=%ld",
+			//	last_serror(), (int) fd, (long) (end - begin));
 			return -1;
 		}
 
@@ -379,11 +379,11 @@ int openssl_io::send(const void* buf, size_t len)
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 
 	while (len > 0) {
-		time_t begin = time(NULL);
+		//time_t begin = time(NULL);
 		if (acl_write_wait(fd, timeout) < 0) {
-			time_t end = time(NULL);
-			logger_error("acl_write_wait error=%s, fd=%d, cost=%ld",
-				last_serror(), (int) fd, (long) (end - begin));
+			//time_t end = time(NULL);
+			//logger_error("acl_write_wait error=%s, fd=%d, cost=%ld",
+			//	last_serror(), (int) fd, (long) (end - begin));
 			return -1;
 		}
 
