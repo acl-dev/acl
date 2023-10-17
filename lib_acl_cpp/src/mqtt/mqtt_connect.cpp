@@ -183,7 +183,6 @@ static struct {
 	{ MQTT_STAT_WILL_TOPIC_LEN,	&mqtt_connect::update_will_topic_len},
 	{ MQTT_STAT_WILL_TOPIC_VAL,	&mqtt_connect::update_will_topic_val},
 	{ MQTT_STAT_WILL_MSG_LEN,	&mqtt_connect::update_will_msg_len  },
-	{ MQTT_STAT_WILL_MSG_LEN,	&mqtt_connect::update_will_msg_len  },
 	{ MQTT_STAT_WILL_MSG_VAL,	&mqtt_connect::update_will_msg_val  },
 };
 

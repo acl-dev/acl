@@ -195,6 +195,8 @@ endif
 
 ###########################################################
 
+$(shell mkdir -p ../lib)
+
 LIB_PATH_DST = ../lib
 OBJ_PATH_DST = ./debug
 
