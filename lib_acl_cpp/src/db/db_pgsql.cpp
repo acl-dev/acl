@@ -93,7 +93,10 @@ static void __pgsql_dll_load(void)
 	__pgsql_dll = acl_dlopen(path);
 
 	if (__pgsql_dll == NULL) {
-		logger_fatal("load %s error: %s", path, acl_dlerror());
+		logger_error("load %s error: %s", path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	// 记录动态库路径，以便于在动态库卸载时输出库路径名
@@ -101,82 +104,121 @@ static void __pgsql_dll_load(void)
 
 	__dbconnect = (PQconnectdb_fn) acl_dlsym(__pgsql_dll, "PQconnectdb");
 	if (__dbconnect == NULL) {
-		logger_fatal("load PQconnectdb from %s error %s",
+		logger_error("load PQconnectdb from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbstatus = (PQstatus_fn) acl_dlsym(__pgsql_dll, "PQstatus");
 	if (__dbstatus == NULL) {
-		logger_fatal("load PQstatus from %s error %s",
+		logger_error("load PQstatus from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbexec = (PQexec_fn) acl_dlsym(__pgsql_dll, "PQexec");
 	if (__dbexec == NULL) {
-		logger_fatal("load PQexec from %s error %s",
+		logger_error("load PQexec from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbresult_status = (PQresultStatus_fn)
 		acl_dlsym(__pgsql_dll, "PQresultStatus");
 	if (__dbresult_status == NULL) {
-		logger_fatal("load PQresultStatus from %s error %s",
+		logger_error("load PQresultStatus from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dberror_message = (PQerrorMessage_fn)
 		acl_dlsym(__pgsql_dll, "PQerrorMessage");
 	if (__dberror_message == NULL) {
-		logger_fatal("load PQerrorMessage from %s error %s",
+		logger_error("load PQerrorMessage from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbfinish = (PQfinish_fn) acl_dlsym(__pgsql_dll, "PQfinish");
 	if (__dbfinish == NULL) {
-		logger_fatal("load PQfinish_fn from %s error %s",
+		logger_error("load PQfinish_fn from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbclear = (PQclear_fn) acl_dlsym(__pgsql_dll, "PQclear");
 	if (__dbclear == NULL) {
-		logger_fatal("load PQclear from %s error %s",
+		logger_error("load PQclear from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbnfields = (PQnfields_fn) acl_dlsym(__pgsql_dll, "PQnfields");
 	if (__dbnfields == NULL) {
-		logger_fatal("loas PQnfields from %s error %s",
+		logger_error("loas PQnfields from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbfname = (PQfname_fn) acl_dlsym(__pgsql_dll, "PQfname");
 	if (__dbfname == NULL) {
-		logger_fatal("load PQfname from %s error %s",
+		logger_error("load PQfname from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbntuples = (PQntuples_fn) acl_dlsym(__pgsql_dll, "PQntuples");
 	if (__dbntuples == NULL) {
-		logger_fatal("load PQntuples from %s error %s",
+		logger_error("load PQntuples from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbget_value = (PQgetvalue_fn) acl_dlsym(__pgsql_dll, "PQgetvalue");
 	if (__dbget_value == NULL) {
-		logger_fatal("load PQgetvalue from %s error %s",
+		logger_error("load PQgetvalue from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbget_length = (PQgetlength_fn) acl_dlsym(__pgsql_dll, "PQgetlength");
 	if (__dbget_length == NULL) {
-		logger_fatal("load PQgetlength from %s error %s",
+		logger_error("load PQgetlength from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	__dbcmd_tuples = (PQcmdTuples_fn) acl_dlsym(__pgsql_dll, "PQcmdTuples");
 	if (__dbcmd_tuples == NULL) {
-		logger_fatal("load PQcmdTuples from %s error %s",
+		logger_error("load PQcmdTuples from %s error %s",
 			path, acl_dlerror());
+		acl_dlclose(__pgsql_dll);
+		__pgsql_dll = NULL;
+		return;
 	}
 
 	logger("%s loaded!", path);
@@ -293,16 +335,26 @@ void db_pgsql::sane_pgsql_init(const char* dbaddr, const char* dbname,
 
 #ifdef HAS_PGSQL_DLL
 	acl_pthread_once(&__pgsql_once, __pgsql_dll_load);
+	if (__pgsql_dll == NULL) {
+		ptr = acl::db_handle::get_loadpath();
+		logger_fatal("Load mysql error: %s, path=%s",
+			acl_dlerror(), ptr ? ptr : "unkonwn");
+	}
 #endif
 	conn_ = NULL;
 }
 
-void db_pgsql::load(void)
+bool db_pgsql::load(void)
 {
 #ifdef HAS_PGSQL_DLL
 	acl_pthread_once(&__pgsql_once, __pgsql_dll_load);
+	if (__pgsql_dll == NULL) {
+		return false;
+	}
+	return true;
 #else
-	logger_warn("link pgsql library in static way!");
+	logger_warn("Don't load pgsql library in static way!");
+	return false;
 #endif
 }
 

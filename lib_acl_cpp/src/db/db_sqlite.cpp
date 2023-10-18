@@ -128,7 +128,10 @@
 
 	__sqlite_dll = acl_dlopen(path);
 	if (__sqlite_dll == NULL) {
-		logger_fatal("load %s error: %s", path, acl_last_serror());
+		logger_error("load %s error: %s", path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite_path = path;
@@ -136,217 +139,310 @@
 	__sqlite3_libversion = (sqlite3_libversion_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_libversion");
 	if (__sqlite3_libversion == NULL) {
-		logger_fatal("load sqlite3_libversion from %s error: %s",
+		logger_error("load sqlite3_libversion from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_open = (sqlite3_open_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_open");
 	if (__sqlite3_open == NULL) {
-		logger_fatal("load sqlite3_open from %s error: %s",
+		logger_error("load sqlite3_open from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_close = (sqlite3_close_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_close");
 	if (__sqlite3_close == NULL) {
-		logger_fatal("load sqlite3_close from %s error: %s",
+		logger_error("load sqlite3_close from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_get_table = (sqlite3_get_table_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_get_table");
 	if (__sqlite3_get_table == NULL) {
-		logger_fatal("load sqlite3_get_table from %s error: %s",
+		logger_error("load sqlite3_get_table from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_free_table = (sqlite3_free_table_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_free_table");
 	if (__sqlite3_free_table == NULL) {
-		logger_fatal("load sqlite3_free_table from %s error: %s",
+		logger_error("load sqlite3_free_table from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_busy_handler = (sqlite3_busy_handler_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_busy_handler");
 	if (__sqlite3_busy_handler == NULL) {
-		logger_fatal("load sqlite3_busy_handler from %s error: %s",
+		logger_error("load sqlite3_busy_handler from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_errmsg = (sqlite3_errmsg_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_errmsg");
 	if (__sqlite3_errmsg == NULL) {
-		logger_fatal("load sqlite3_errmsg from %s error: %s",
+		logger_error("load sqlite3_errmsg from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_errcode = (sqlite3_errcode_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_errcode");
 	if (__sqlite3_errcode == NULL) {
-		logger_fatal("load sqlite3_errcode from %s error: %s",
+		logger_error("load sqlite3_errcode from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_changes = (sqlite3_changes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_changes");
 	if (__sqlite3_changes == NULL) {
-		logger_fatal("load sqlite3_changes from %s error: %s",
+		logger_error("load sqlite3_changes from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_total_changes = (sqlite3_total_changes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_total_changes");
 	if (__sqlite3_total_changes == NULL) {
-		logger_fatal("load sqlite3_total_changes from %s error: %s",
+		logger_error("load sqlite3_total_changes from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_busy_timeout = (sqlite3_busy_timeout_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_busy_timeout");
 	if (__sqlite3_busy_timeout == NULL) {
-		logger_fatal("load sqlite3_busy_timeout from %s error: %s",
+		logger_error("load sqlite3_busy_timeout from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_prepare_v2 = (sqlite3_prepare_v2_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_prepare_v2");
 	if (__sqlite3_prepare_v2 == NULL) {
-		logger_fatal("load sqlite3_prepare_v2 from %s error: %s",
+		logger_error("load sqlite3_prepare_v2 from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_step = (sqlite3_step_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_step");
 	if (__sqlite3_step == NULL) {
-		logger_fatal("load sqlite3_step from %s error: %s",
+		logger_error("load sqlite3_step from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_exec = (sqlite3_exec_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_exec");
 	if (__sqlite3_exec == NULL) {
-		logger_fatal("load sqlite3_exec from %s error: %s",
+		logger_error("load sqlite3_exec from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 	__sqlite3_reset = (sqlite3_reset_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_reset");
 	if (__sqlite3_reset == NULL) {
-		logger_fatal("load sqlite3_reset from %s error: %s",
+		logger_error("load sqlite3_reset from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_bind_blob = (sqlite3_bind_blob_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_bind_blob");
 	if (__sqlite3_bind_blob == NULL) {
-		logger_fatal("load sqlite3_bind_blob from %s error: %s",
+		logger_error("load sqlite3_bind_blob from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_bind_int = (sqlite3_bind_int_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_bind_int");
 	if (__sqlite3_bind_int == NULL) {
-		logger_fatal("load sqlite3_bind_int from %s error: %s",
+		logger_error("load sqlite3_bind_int from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_bind_int64 = (sqlite3_bind_int64_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_bind_int64");
 	if (__sqlite3_bind_int64 == NULL) {
-		logger_fatal("load sqlite3_bind_int64 from %s error: %s",
+		logger_error("load sqlite3_bind_int64 from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_bind_text = (sqlite3_bind_text_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_bind_text");
 	if (__sqlite3_bind_text == NULL) {
-		logger_fatal("load sqlite3_bind_text from %s error: %s",
+		logger_error("load sqlite3_bind_text from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_count = (sqlite3_column_count_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_count");
 	if (__sqlite3_column_count == NULL) {
-		logger_fatal("load sqlite3_column_count from %s error: %s",
+		logger_error("load sqlite3_column_count from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_type = (sqlite3_column_type_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_type");
 	if (__sqlite3_column_type == NULL) {
-		logger_fatal("load sqlite3_column_type from %s error: %s",
+		logger_error("load sqlite3_column_type from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_bytes = (sqlite3_column_bytes_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_bytes");
 	if (__sqlite3_column_bytes == NULL) {
-		logger_fatal("load sqlite3_column_bytes from %s error: %s",
+		logger_error("load sqlite3_column_bytes from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_name = (sqlite3_column_name_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_name");
 	if (__sqlite3_column_name == NULL) {
-		logger_fatal("load sqlite3_column_name from %s error: %s",
+		logger_error("load sqlite3_column_name from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_data_count = (sqlite3_data_count_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_data_count");
 	if (__sqlite3_data_count == NULL) {
-		logger_fatal("load sqlite3_data_count from %s error: %s",
+		logger_error("load sqlite3_data_count from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_int = (sqlite3_column_int_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_int");
 	if (__sqlite3_column_int == NULL) {
-		logger_fatal("load sqlite3_column_int from %s error: %s",
+		logger_error("load sqlite3_column_int from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_int64 = (sqlite3_column_int64_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_int64");
 	if (__sqlite3_column_int64 == NULL) {
-		logger_fatal("load sqlite3_column_int64 from %s error: %s",
+		logger_error("load sqlite3_column_int64 from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_double = (sqlite3_column_double_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_double");
 	if (__sqlite3_column_double == NULL) {
-		logger_fatal("load sqlite3_column_double from %s error: %s",
+		logger_error("load sqlite3_column_double from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_blob = (sqlite3_column_blob_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_blob");
 	if (__sqlite3_column_blob == NULL) {
-		logger_fatal("load sqlite3_column_blob from %s error: %s",
+		logger_error("load sqlite3_column_blob from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_column_text = (sqlite3_column_text_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_column_text");
 	if (__sqlite3_column_text == NULL) {
-		logger_fatal("load sqlite3_column_text from %s error: %s",
+		logger_error("load sqlite3_column_text from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_finalize = (sqlite3_finalize_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_finalize");
 	if (__sqlite3_finalize == NULL) {
-		logger_fatal("load sqlite3_finalize from %s error: %s",
+		logger_error("load sqlite3_finalize from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	__sqlite3_free = (sqlite3_free_fn)
 		acl_dlsym(__sqlite_dll, "sqlite3_free");
 	if (__sqlite3_free == NULL) {
-		logger_fatal("load sqlite3_free from %s error: %s",
+		logger_error("load sqlite3_free from %s error: %s",
 			path, acl_last_serror());
+		 acl_dlclose(__sqlite_dll);
+		 __sqlite_dll = NULL;
+		 return;
 	}
 
 	logger("%s loaded", path);
@@ -432,6 +528,20 @@ static void sqlite_rows_save(char** results, int nrow,
 
 //////////////////////////////////////////////////////////////////////////
 
+bool db_sqlite::load(void)
+{
+#ifdef HAS_SQLITE_DLL
+	acl_pthread_once(&__sqlite_once, __sqlite_dll_load);
+	if (__sqlite_dll == NULL) {
+		return false;
+	}
+	return true;
+#else
+	logger_warn("Don't load sqlite library in static way!");
+	return false;
+#endif
+}
+
 db_sqlite::db_sqlite(const char* dbfile, const char* charset /* ="utf-8" */)
 : db_(NULL)
 , dbfile_(dbfile)
@@ -446,6 +556,11 @@ db_sqlite::db_sqlite(const char* dbfile, const char* charset /* ="utf-8" */)
 	acl_assert(dbfile && *dbfile);
 #ifdef HAS_SQLITE_DLL
 	acl_pthread_once(&__sqlite_once, __sqlite_dll_load);
+	if (__sqlite_dll == NULL) {
+		const char* ptr = acl::db_handle::get_loadpath();
+		logger_fatal("Load mysql error: %s, path=%s",
+			acl_dlerror(), ptr ? ptr : "unkonwn");
+	}
 #endif
 }
 
