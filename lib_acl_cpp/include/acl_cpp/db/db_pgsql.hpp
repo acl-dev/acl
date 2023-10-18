@@ -17,7 +17,7 @@ public:
 	db_pgsql(const pgsql_conf& conf);
 	~db_pgsql(void);
 
-	static void load(void);
+	static bool load(void);
 
 	/********************************************************************/
 	/*         以下为基类 db_handle 的虚接口                            */

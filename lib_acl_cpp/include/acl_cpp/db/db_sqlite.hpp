@@ -17,11 +17,17 @@ class ACL_CPP_API db_sqlite : public db_handle
 {
 public:
 	/**
-	 * 构造函数
+	 * 构造函数(内部会自动加载sqlite动态库)
 	 * @param charset {const char*} 本地字符集(gbk, utf-8, ...)
 	 */
 	db_sqlite(const char* dbfile, const char* charset = "utf-8");
 	~db_sqlite(void);
+
+	/**
+	 * 显式动态加载 sqlite 动态库
+	 * @return {bool}
+	 */
+	static bool load(void);
 
 	/**
 	 * 返回当前的 sqlite 的版本信息
