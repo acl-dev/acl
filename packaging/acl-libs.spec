@@ -1,4 +1,4 @@
-%define release_id 5
+%define release_id 6
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
@@ -44,6 +44,14 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Fri Oct 20 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-6-20231020.18
+- feature: Add support for udp multicast;
+- bugfix: Fixed one dead loop bugin mqtt_connect.cpp;
+- workaroud: Add prefix on avl API to avoid API conlision;
+- optimize: Optimize acl_htable module;
+- feature: Add some supports for c++11/c++17;
+- feature: Add proc_pidpath() on MacOS.
 
 * Tue Jun 13 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-4-20230613.10
 - feature: add fiber_sbox2 class;
