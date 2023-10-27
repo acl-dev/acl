@@ -479,6 +479,7 @@ private:
 	size_t incr_;			// 增加新的 dbuf_objs_link 时的
 					// capacity 大小
 	dbuf_pool* dbuf_;		// 内存池对象
+	dbuf_pool* dbuf_internal_;	// 内存池对象
 
 	// 此处之所以使用自实现的 dbuf_obj 数组对象，而没有使用 std::vector，
 	// 一方面使数组对象也在 dbuf_pool 内存池上创建，另一方面可以避免

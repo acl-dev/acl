@@ -125,9 +125,10 @@ dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf, size_t capacity /* = 500 */)
 , size_(0)
 {
 	if (dbuf == NULL) {
-		dbuf_ = new (nblock_) acl::dbuf_pool;
+		dbuf_ = dbuf_internal_ = new (nblock_) acl::dbuf_pool;
 	} else {
 		dbuf_ = dbuf;
+		dbuf_internal_ = NULL;
 	}
 
 	init(capacity);
@@ -138,7 +139,7 @@ dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 500 */)
 , incr_(500)
 , size_(0)
 {
-	dbuf_ = new (nblock_) acl::dbuf_pool;
+	dbuf_ = dbuf_internal_ = new (nblock_) acl::dbuf_pool;
 	init(capacity);
 }
 
@@ -154,7 +155,9 @@ dbuf_guard::~dbuf_guard(void)
 		link = link->next;
 	}
 
-	dbuf_->destroy();
+	if (dbuf_internal_) {
+		dbuf_internal_->destroy();
+	}
 }
 
 bool dbuf_guard::dbuf_reset(size_t reserve /* = 0 */)

@@ -38,7 +38,7 @@
 #  define logger_fatal(fmt, args...)  \
 	acl::log::fatal4("none", __LINE__, __FUNCTION__, fmt, ##args)
 #  define logger_debug(section, level, fmt, args...)  \
-	acl::log::msg6(section, level, __FUNCTION__, __LINE__, __FUNCTION__, fmt, ##args)
+	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 # else
 #  define logger(fmt, args...)  \
 	acl::log::msg4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
@@ -49,7 +49,7 @@
 #  define logger_fatal(fmt, args...)  \
 	acl::log::fatal4(__FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 #  define logger_debug(section, level, fmt, args...)  \
-	acl::log::msg6(section, level, __FUNCTION__, __LINE__, __FUNCTION__, fmt, ##args)
+	acl::log::msg6(section, level, __FILE__, __LINE__, __FUNCTION__, fmt, ##args)
 # endif
 
 #endif
