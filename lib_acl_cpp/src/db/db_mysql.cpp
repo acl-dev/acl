@@ -985,7 +985,7 @@ bool db_mysql::rollback(void)
 namespace acl
 {
 
-void db_mysql::load(void)
+bool db_mysql::load(void)
 {
 	logger_fatal("Please #define HAS_MYSQL_DLL first");
 	return false;
