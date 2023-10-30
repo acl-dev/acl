@@ -150,6 +150,13 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	ifeq ($(debug_stack), yes)
 		CFLAGS += -DDEBUG_STACK
 	endif
+
+	ifeq ($(USE_TCMALLOC), yes)
+		CFLAGS += -DUSE_TCMALLOC
+	endif
+	ifeq ($(USE_TCMALLOC), YES)
+		CFLAGS += -DUSE_TCMALLOC
+	endif
 endif
 
 # For CYGWIN
