@@ -1,4 +1,11 @@
 #include "stdafx.h"
+
+#if defined(SYS_UNIX) && defined(USE_TCMALLOC)
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+#endif
+
 #include "common.h"
 
 #include "fiber.h"
@@ -39,23 +46,33 @@ int WINAPI acl_fiber_close(socket_t fd)
 	FILE_EVENT *fe;
 	EVENT *ev;
 
+
+# ifndef USE_TCMALLOC
 	if (sys_close == NULL) {
 		hook_once();
-		if (sys_close == NULL) {
-			msg_error("%s: sys_close NULL", __FUNCTION__);
-			return -1;
-		}
 	}
+# endif
 
 	if (!var_hook_sys_api) {
+# ifdef USE_TCMALLOC
+		return syscall(SYS_close, fd);
+# else
 		// In thread mode, we only need to free the fe, because
 		// no fiber was bound with the fe.
 		fe = fiber_file_get(fd);
 		if (fe) {
 			fiber_file_free(fe);
 		}
+
 		return (*sys_close)(fd);
+# endif
 	}
+
+# ifdef USE_TCMALLOC
+	if (sys_close == NULL) {
+		hook_once();
+	}
+# endif
 
 	if (IS_INVALID(fd)) {
 		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
@@ -131,6 +148,15 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 		return -1;
 	}
 
+# ifdef USE_TCMALLOC
+	if (!var_hook_sys_api) {
+		return syscall(SYS_read, fd, buf, count);
+	}
+
+	if (sys_read == NULL) {
+		hook_once();
+	}
+# else
 	if (sys_read == NULL) {
 		hook_once();
 	}
@@ -138,6 +164,7 @@ ssize_t acl_fiber_read(socket_t fd, void *buf, size_t count)
 	if (!var_hook_sys_api) {
 		return (*sys_read)(fd, buf, count);
 	}
+# endif
 
 	fe = fiber_file_open(fd);
 	return fiber_read(fe, buf, count);
@@ -293,6 +320,15 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 		return -1;
 	}
 
+# ifdef USE_TCMALLOC
+	if (!var_hook_sys_api) {
+		return syscall(SYS_write, fd, buf, count);
+	}
+
+	if (sys_write == NULL) {
+		hook_once();
+	}
+# else
 	if (sys_write == NULL) {
 		hook_once();
 	}
@@ -300,6 +336,7 @@ ssize_t acl_fiber_write(socket_t fd, const void *buf, size_t count)
 	if (!var_hook_sys_api) {
 		return (*sys_write)(fd, buf, count);
 	}
+# endif
 
 	fe = fiber_file_open(fd);
 	return fiber_write(fe, buf, count);
