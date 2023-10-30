@@ -988,6 +988,7 @@ namespace acl
 void db_mysql::load(void)
 {
 	logger_fatal("Please #define HAS_MYSQL_DLL first");
+	return false;
 }
 
 void db_mysql::sane_mysql_init(const char*, const char*,
