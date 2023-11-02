@@ -142,10 +142,16 @@ FIBER_API void acl_fiber_keep_errno(ACL_FIBER* fiber, int yesno);
 FIBER_API int acl_fiber_status(const ACL_FIBER* fiber);
 
 /**
- * Kill the suspended fiber and notify it to exit
+ * Kill the suspended fiber and notify it to exit in asynchronous mode
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  */
 FIBER_API void acl_fiber_kill(ACL_FIBER* fiber);
+
+/**
+ * Kill the suspended fiber and notify it to exit in synchronous mode
+ * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
+ */
+FIBER_API void acl_fiber_kill_wait(ACL_FIBER* fiber);
 
 /**
  * Check if the specified fiber has been killed
@@ -182,11 +188,18 @@ FIBER_API int acl_fiber_canceled(ACL_FIBER* fiber);
 FIBER_API void acl_fiber_clear(ACL_FIBER *fiber);
 
 /**
- * Wakeup the suspended fiber with the assosiated signal number
+ * Wakeup the suspended fiber with the assosiated signal number asynchronously
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h
  */
 FIBER_API void acl_fiber_signal(ACL_FIBER* fiber, int signum);
+
+/**
+ * Wakeup the suspended fiber with the assosiated signal number synchronously
+ * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
+ * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h
+ */
+FIBER_API void acl_fiber_signal_wait(ACL_FIBER* fiber, int signum);
 
 /**
  * Get the signal number got from other fiber
