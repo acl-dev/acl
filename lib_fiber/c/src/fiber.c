@@ -442,13 +442,7 @@ void acl_fiber_clear(ACL_FIBER *fiber)
 	}
 }
 
-void acl_fiber_kill(ACL_FIBER *fiber)
-{
-	fiber->errnum = ECANCELED;
-	acl_fiber_signal(fiber, SIGTERM);
-}
-
-void acl_fiber_signal(ACL_FIBER *fiber, int signum)
+static void fiber_signal(ACL_FIBER *fiber, int signum, int sync)
 {
 	ACL_FIBER *curr = __thread_fiber->running;
 
@@ -481,7 +475,34 @@ void acl_fiber_signal(ACL_FIBER *fiber, int signum)
 		ring_detach(&fiber->me); // This is safety!
 		
 		acl_fiber_ready(fiber);
+
+		// Yield myself if in synchronous mode.
+		if (sync) {
+			acl_fiber_yield();
+		}
 	}
+}
+
+void acl_fiber_signal(ACL_FIBER *fiber, int signum)
+{
+	fiber_signal(fiber, signum, 0);
+}
+
+void acl_fiber_signal_wait(ACL_FIBER *fiber, int signum)
+{
+	fiber_signal(fiber, signum, 1);
+}
+
+void acl_fiber_kill(ACL_FIBER *fiber)
+{
+	fiber->errnum = ECANCELED;
+	fiber_signal(fiber, SIGTERM, 0);
+}
+
+void acl_fiber_kill_wait(ACL_FIBER *fiber)
+{
+	fiber->errnum = ECANCELED;
+	fiber_signal(fiber, SIGTERM, 1);
 }
 
 int acl_fiber_signum(ACL_FIBER *fiber)

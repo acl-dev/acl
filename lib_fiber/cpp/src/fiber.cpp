@@ -202,14 +202,18 @@ void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 	me->run();
 }
 
-bool fiber::kill(void)
+bool fiber::kill(bool sync)
 {
 	if (f_ == NULL) {
 		return false;
 	} else if (acl_fiber_killed(f_)) {
 		return true;
 	}
-	acl_fiber_kill(f_);
+	if (sync) {
+		acl_fiber_kill_wait(f_);
+	} else {
+		acl_fiber_kill(f_);
+	}
 	return true;
 }
 
