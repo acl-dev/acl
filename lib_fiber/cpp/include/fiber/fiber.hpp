@@ -56,7 +56,8 @@ public:
 
 	/**
 	 * 在本协程运行时调用此函数通知该协程退出
-	 * @param sync {bool} 是否采用同步方式，即等待被kill协程后本协程才返回
+	 * @param sync {bool} 是否采用同步方式，即是否等待被 kill 协程返回后
+	 *  本协程才返回
 	 * @return {bool} 返回 false 表示本协程未启动或已经退出
 	 */
 	bool kill(bool sync = false);
