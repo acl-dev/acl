@@ -5,8 +5,7 @@
 
 namespace acl {
 
-class ACL_CPP_API mysql_conf
-{
+class ACL_CPP_API mysql_conf {
 public:
 	/**
 	 * ¹¹Ôìº¯Êý

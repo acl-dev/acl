@@ -11,8 +11,7 @@ namespace acl {
 
 class pgsql_conf;
 
-class ACL_CPP_API db_pgsql : public db_handle
-{
+class ACL_CPP_API db_pgsql : public db_handle {
 public:
 	db_pgsql(const pgsql_conf& conf);
 	~db_pgsql(void);
