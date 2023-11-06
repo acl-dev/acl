@@ -1497,7 +1497,9 @@ string& string::replace(char from, char to)
 string& string::truncate(size_t n)
 {
 	acl_vstring_truncate(vbf_, n);
-	TERM(vbf_);
+	// No need to append '\0' because which has been added
+	// in acl_vstring_truncate().
+	//TERM(vbf_);
 	return *this;
 }
 
