@@ -111,6 +111,7 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 		.setKeepAlive(req.isKeepAlive())
 		.setContentLength(fsize)
 		.setContentType("application/octet-stream")
+		.setHeader("Content-Type", "application/octet-stream")
 		// 设置 HTTP 头中的文件名
 		.setHeader("Content-Disposition", hdr_entry.c_str());
 
@@ -125,10 +126,16 @@ bool http_servlet::transfer_file(acl::HttpServletRequest& req,
 	while (!in.eof())
 	{
 		int ret = in.read(buf, sizeof(buf), false);
-		if (ret == -1)
+		if (ret == -1) {
+			printf("Read over from %s, total read=%lld\r\n", filepath_.c_str(), n);
 			break;
+		}
 		if (res.write(buf, ret) == false)
+		{
+			printf("Write to client error %s, total read=%lld\r\n",
+				acl::last_serror(), n);
 			return false;
+		}
 		n += ret;
 		//acl_doze(100);  // 休息 100 ms 便于测试
 	}

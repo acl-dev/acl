@@ -67,6 +67,8 @@ protected:
 	 */
 	virtual void proc_on_init();
 
+	virtual void proc_on_listen(acl::server_socket& ss);
+
 	/**
 	 * 当子进程需要退出时框架将回调此函数，框架决定子进程是否退出取决于：
 	 * 1) 如果此函数返回 true 则子进程立即退出，否则：
