@@ -96,6 +96,11 @@ void master_service::proc_on_init()
 {
 }
 
+void master_service::proc_on_listen(acl::server_socket& ss)
+{
+	printf("Listen ok, addr=%s\r\n", ss.get_addr());
+}
+
 bool master_service::proc_exit_timer(size_t nclients, size_t nthreads)
 {
 	if (nclients == 0 || nthreads == 0)

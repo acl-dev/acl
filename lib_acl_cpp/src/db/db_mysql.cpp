@@ -562,7 +562,7 @@ db_mysql::~db_mysql(void)
 #else
 	if (conn_) {
 #endif
-		__mysql_close(conn_);
+		__mysql_close((MYSQL*) conn_);
 	}
 }
 
@@ -585,7 +585,7 @@ const char* db_mysql::dbtype(void) const
 int db_mysql::get_errno(void) const
 {
 	if (conn_) {
-		return __mysql_errno(conn_);
+		return __mysql_errno((MYSQL*) conn_);
 	} else {
 		return -1;
 	}
@@ -594,7 +594,7 @@ int db_mysql::get_errno(void) const
 const char* db_mysql::get_error(void) const
 {
 	if (conn_) {
-		return __mysql_error(conn_);
+		return __mysql_error((MYSQL*) conn_);
 	} else {
 		return "mysql not opened yet!";
 	}
@@ -713,7 +713,7 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	}
 
 	__mysql_init_lock->lock();
-	conn_ = __mysql_init(NULL);
+	conn_ = (void*) __mysql_init(NULL);
 	__mysql_init_lock->unlock();
 
 	if (conn_ == NULL) {
@@ -723,24 +723,24 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 
 	if (conn_timeout_ > 0) {
 #if MYSQL_VERSION_ID >= 50500
-		__mysql_options(conn_, MYSQL_OPT_CONNECT_TIMEOUT,
+		__mysql_options((MYSQL*) conn_, MYSQL_OPT_CONNECT_TIMEOUT,
 			(const void*) &conn_timeout_);
 #else
-		__mysql_options(conn_, MYSQL_OPT_CONNECT_TIMEOUT,
+		__mysql_options((MYSQL*) conn_, MYSQL_OPT_CONNECT_TIMEOUT,
 			(const char*) &conn_timeout_);
 #endif
 	}
 
 	if (rw_timeout_ > 0) {
 #if MYSQL_VERSION_ID >= 50500
-		__mysql_options(conn_, MYSQL_OPT_READ_TIMEOUT,
+		__mysql_options((MYSQL*) conn_, MYSQL_OPT_READ_TIMEOUT,
 			(const void*) &rw_timeout_);
-		__mysql_options(conn_, MYSQL_OPT_WRITE_TIMEOUT,
+		__mysql_options((MYSQL*) conn_, MYSQL_OPT_WRITE_TIMEOUT,
 			(const void*) &rw_timeout_);
 #else
-		__mysql_options(conn_, MYSQL_OPT_READ_TIMEOUT,
+		__mysql_options((MYSQL*) conn_, MYSQL_OPT_READ_TIMEOUT,
 			(const char*) &rw_timeout_);
-		__mysql_options(conn_, MYSQL_OPT_WRITE_TIMEOUT,
+		__mysql_options((MYSQL*) conn_, MYSQL_OPT_WRITE_TIMEOUT,
 			(const char*) &rw_timeout_);
 #endif
 	}
@@ -748,33 +748,33 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	my_bool reconnect = 1;
 
 #if MYSQL_VERSION_ID >= 50500
-	__mysql_options(conn_, MYSQL_OPT_RECONNECT, (const void*) &reconnect);
+	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT, (const void*) &reconnect);
 #else
-	__mysql_options(conn_, MYSQL_OPT_RECONNECT, (const char*) &reconnect);
+	__mysql_options((MYSQL*) conn_, MYSQL_OPT_RECONNECT, (const char*) &reconnect);
 #endif
 
-	if (__mysql_open(conn_, db_host, dbuser_ ? dbuser_ : "",
+	if (__mysql_open((MYSQL*) conn_, db_host, dbuser_ ? dbuser_ : "",
 		dbpass_ ? dbpass_ : "", dbname_, db_port,
 		db_unix, dbflags_) == NULL) {
 
 		logger_error("connect mysql error(%s), db_host=%s, db_port=%d,"
 			" db_unix=%s, db_name=%s, db_user=%s, db_pass=%s,"
 			" dbflags=%ld",
-			__mysql_error(conn_),
+			__mysql_error((MYSQL*) conn_),
 			db_host ? db_host : "null", db_port,
 			db_unix ? db_unix : "null",
 			dbname_ ? dbname_ : "null",
 			dbuser_ ? dbuser_ : "null",
 			dbpass_ ? dbpass_ : "null", dbflags_);
 
-		__mysql_close(conn_);
+		__mysql_close((MYSQL*) conn_);
 		conn_ = NULL;
 		return false;
 	}
 #if 0
 	logger("connect mysql ok(%s), db_host=%s, db_port=%d, "
 		"db_unix=%s, db_name=%s, db_user=%s, db_pass=%s, dbflags=%ld",
-		__mysql_error(conn_),
+		__mysql_error((MYSQL*) conn_),
 		db_host ? db_host : "null", db_port,
 		db_unix ? db_unix : "null",
 		dbname_ ? dbname_ : "null",
@@ -787,19 +787,19 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 	}
 
 	if (!charset_.empty()) {
-		if (__mysql_set_character_set(conn_, charset_.c_str())) {
+		if (__mysql_set_character_set((MYSQL*) conn_, charset_.c_str())) {
 			logger_error("set mysql to %s error %s",
-				charset_.c_str(), __mysql_error(conn_));
+				charset_.c_str(), __mysql_error((MYSQL*) conn_));
 		} else {
 			//logger("set mysql charset to %s, %s", charset_.c_str(),
-			//	__mysql_character_set_name(conn_));
+			//	__mysql_character_set_name((MYSQL*) conn_));
 		}
 	}
 
 #if MYSQL_VERSION_ID >= 50000
-	if (__mysql_autocommit(conn_, auto_commit_ ? 1 : 0) != 0) {
+	if (__mysql_autocommit((MYSQL*) conn_, auto_commit_ ? 1 : 0) != 0) {
 		logger_error("mysql_autocommit error");
-		__mysql_close(conn_);
+		__mysql_close((MYSQL*) conn_);
 		conn_ = NULL;
 		return false;
 	}
@@ -822,7 +822,7 @@ bool db_mysql::close(void)
 #else
 	if (conn_) {
 #endif
-		__mysql_close(conn_);
+		__mysql_close((MYSQL*) conn_);
 		conn_ = NULL;
 	}
 	return true;
@@ -835,14 +835,14 @@ bool db_mysql::sane_mysql_query(const char* sql)
 		return false;
 	}
 
-	if (__mysql_query(conn_, sql) == 0) {
+	if (__mysql_query((MYSQL*) conn_, sql) == 0) {
 		return true;
 	}
 
-	int errnum = __mysql_errno(conn_);
+	int errnum = __mysql_errno((MYSQL*) conn_);
 	if (errnum != CR_SERVER_LOST && errnum != CR_SERVER_GONE_ERROR) {
 		logger_error("db(%s): sql(%s) error(%s)",
-			dbname_, sql, __mysql_error(conn_));
+			dbname_, sql, __mysql_error((MYSQL*) conn_));
 		return false;
 	}
 
@@ -852,12 +852,12 @@ bool db_mysql::sane_mysql_query(const char* sql)
 		logger_error("reopen db(%s) error", dbname_);
 		return false;
 	}
-	if (__mysql_query(conn_, sql) == 0) {
+	if (__mysql_query((MYSQL*) conn_, sql) == 0) {
 		return true;
 	}
 
 	logger_error("db(%s), sql(%s) error(%s)",
-		dbname_, sql, __mysql_error(conn_));
+		dbname_, sql, __mysql_error((MYSQL*) conn_));
 	return false;
 }
 
@@ -869,11 +869,11 @@ bool db_mysql::tbl_exists(const char* tbl_name)
 	if (!sane_mysql_query(sql)) {
 		return false;
 	}
-	MYSQL_RES *my_res = __mysql_store_result(conn_);
+	MYSQL_RES *my_res = __mysql_store_result((MYSQL*) conn_);
 	if (my_res == NULL) {
-		if (__mysql_errno(conn_) != 0) {
+		if (__mysql_errno((MYSQL*) conn_) != 0) {
 			logger_error("db(%s), sql(%s) error(%s)",
-				dbname_, sql, __mysql_error(conn_));
+				dbname_, sql, __mysql_error((MYSQL*) conn_));
 			close();
 		}
 		return false;
@@ -897,11 +897,11 @@ bool db_mysql::sql_select(const char* sql, db_rows* result /* = NULL */)
 	if (!sane_mysql_query(sql)) {
 		return false;
 	}
-	MYSQL_RES *my_res = __mysql_store_result(conn_);
+	MYSQL_RES *my_res = __mysql_store_result((MYSQL*) conn_);
 	if (my_res == NULL) {
-		if (__mysql_errno(conn_) != 0) {
+		if (__mysql_errno((MYSQL*) conn_) != 0) {
 			logger_error("db(%s), sql(%s) error(%s)",
-				dbname_, sql, __mysql_error(conn_));
+				dbname_, sql, __mysql_error((MYSQL*) conn_));
 			close();
 		}
 		return false;
@@ -931,7 +931,7 @@ bool db_mysql::sql_update(const char* sql)
 	if (!sane_mysql_query(sql)) {
 		return false;
 	}
-	int ret = (int) __mysql_affected_rows(conn_);
+	int ret = (int) __mysql_affected_rows((MYSQL*) conn_);
 	if (ret == -1) {
 		return false;
 	}
@@ -945,7 +945,7 @@ int db_mysql::affect_count(void) const
 		return -1;
 	}
 
-	return (int) __mysql_affected_rows(conn_);
+	return (int) __mysql_affected_rows((MYSQL*) conn_);
 }
 
 bool db_mysql::begin_transaction(void)

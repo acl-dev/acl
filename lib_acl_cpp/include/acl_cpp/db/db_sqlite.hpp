@@ -13,8 +13,7 @@ namespace acl {
 class charset_conv;
 class sqlite_cursor;
 
-class ACL_CPP_API db_sqlite : public db_handle
-{
+class ACL_CPP_API db_sqlite : public db_handle {
 public:
 	/**
 	 * 构造函数(内部会自动加载sqlite动态库)

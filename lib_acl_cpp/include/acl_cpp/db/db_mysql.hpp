@@ -5,14 +5,13 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
 
-typedef struct st_mysql MYSQL;
+//typedef struct st_mysql MYSQL;
 
 namespace acl {
 
 class mysql_conf;
 
-class ACL_CPP_API db_mysql : public db_handle
-{
+class ACL_CPP_API db_mysql : public db_handle {
 public:
 	/**
 	 * 构造函数方式一
@@ -55,9 +54,9 @@ public:
 	/**
 	 * 直接获得 mysql 的连接句柄，如果返回 NULL 则表示 mysql 还没有打开
 	 * 或出错时内部自动关闭了 mysql 连接
-	 * @return {MYSQL*}
+	 * @return {void*} 类型同 MYSQL*
 	 */
-	MYSQL* get_conn(void) const
+	void* get_conn(void) const
 	{
 		return conn_;
 	}
@@ -153,14 +152,13 @@ private:
 	int    conn_timeout_;
 	int    rw_timeout_;
 	bool   auto_commit_;
-	MYSQL* conn_;
+	void*  conn_;	// MYSQL 对象指针
 
 	bool sane_mysql_query(const char* sql);
 	void sane_mysql_init(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
 		unsigned long dbflags, bool auto_commit,
-		int conn_timeout, int rw_timeout,
-		const char* charset);
+		int conn_timeout, int rw_timeout, const char* charset);
 };
 
 } // namespace acl

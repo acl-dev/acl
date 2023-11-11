@@ -786,6 +786,16 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 			if (acl_getsockname(fd, local, sizeof(local)) < 0) {
 				memset(local, 0, sizeof(local));
 			}
+
+			// On windows, the client socket will use the non-block attribute
+			// of the listen socket, because we've set the listen socket in
+			// non-blocking status, so we should set the client socket again
+			// in blocking status.
+			// And on unix the client socket will not use it from
+			// the listen socket, and we set it to be in blocking
+			// status is harmless.
+			acl_non_blocking(fd, ACL_BLOCKING);
+
 			client_open(event, threads, fd, remote, local);
 			continue;
 		}
