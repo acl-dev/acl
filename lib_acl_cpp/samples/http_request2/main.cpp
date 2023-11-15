@@ -11,10 +11,12 @@ using namespace acl;
 class http_request_test
 {
 public:
-	http_request_test(const char* server_addr,
-		const char* stype, const char* charset)
+	http_request_test(const char* server_addr, const char* domain,
+		const char* url, const char* stype, const char* charset)
 	{
 		server_addr_= server_addr;
+		domain_ = domain;
+		url_ = url;
 		stype_ = stype;
 		charset_ = charset;
 		to_charset_ = "gb2312";
@@ -32,8 +34,9 @@ public:
 		ctype << stype_ << "; charset=" << charset_;
 
 		http_header& hdr = req.request_header();  // 请求头对象的引用
-		hdr.set_url("/");
+		hdr.set_url(url_);
 		hdr.set_content_type(ctype);
+		hdr.set_host(domain_);
 
 		// 发送 HTTP 请求数据
 		if (req.request(NULL, 0) == false)
@@ -62,6 +65,8 @@ public:
 
 private:
 	string server_addr_;	// web 服务器地址
+	string domain_;		// Host字段
+	string url_;		// URL
 	string stype_;		// 请求数据的子数据类型
 	string charset_;	// 本地请求数据文件的字符集
 	string to_charset_;	// 将服务器响应数据转为本地字符集
@@ -71,16 +76,18 @@ private:
 
 static void usage(const char* procname)
 {
-	printf("usage: %s -h[help] -s server_addr\r\n", procname);
+	printf("usage: %s -h[help] -s server_addr -H host -U url\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
 	int   ch;
 	string server_addr("127.0.0.1:8888");
+	string domain("test.com");
+	string url("/");
 	string stype("html"), charset("gb2312");
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0)
+	while ((ch = getopt(argc, argv, "hs:H:U:")) > 0)
 	{
 		switch (ch)
 		{
@@ -90,6 +97,12 @@ int main(int argc, char* argv[])
 		case 's':
 			server_addr = optarg;
 			break;
+		case 'H':
+			domain = optarg;
+			break;
+		case 'U':
+			url = optarg;
+			break;
 		default:
 			usage(argv[0]);
 			return 0;
@@ -98,7 +111,7 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 	log::stdout_open(true);
-	http_request_test test(server_addr, stype, charset);
+	http_request_test test(server_addr, domain, url, stype, charset);
 	test.run();
 
 	return 0;

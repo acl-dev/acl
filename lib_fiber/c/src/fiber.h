@@ -57,7 +57,7 @@ struct ACL_FIBER {
 	FIBER_BASE    *base;
 	RING           me;
 	long           tid;
-	unsigned int   fid;
+	unsigned       fid;
 	unsigned       slot;
 	long long      when;
 	int            errnum;
