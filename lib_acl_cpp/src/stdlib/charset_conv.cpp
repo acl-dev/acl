@@ -141,7 +141,7 @@ charset_conv::~charset_conv()
 {
 #ifdef  HAVE_H_ICONV
 	if (m_iconv != (iconv_t) -1) {
-		__iconv_close(m_iconv);
+		__iconv_close((iconv_t) m_iconv);
 	} if (m_pInBuf) {
 		acl_vstring_free(m_pInBuf);
 	}
@@ -168,7 +168,7 @@ void charset_conv::reset()
 
 #ifdef  HAVE_H_ICONV
 	if (m_iconv != (iconv_t) -1) {
-		__iconv_close(m_iconv);
+		__iconv_close((iconv_t) m_iconv);
 		m_iconv = (iconv_t) - 1;
 	}
 	m_fromCharset[0] = 0;
@@ -234,7 +234,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 		m_pUtf8Pre = &UTF8_HEADER[3];
 	}
 
-	if (m_iconv != (iconv_t) -1
+	if ((iconv_t) m_iconv != (iconv_t) -1
 		&& EQ(m_fromCharset, fromCharset)
 		&& EQ(m_toCharset, toCharset)) {
 
@@ -245,9 +245,9 @@ bool charset_conv::update_begin(const char* fromCharset,
 	SCOPY(m_toCharset, toCharset, sizeof(m_toCharset));
 
 	if (m_iconv != (iconv_t) -1) {
-		__iconv_close(m_iconv);
+		__iconv_close((iconv_t) m_iconv);
 	}
-	m_iconv = __iconv_open(toCharset, fromCharset);
+	m_iconv = (iconv_t) __iconv_open(toCharset, fromCharset);
 	if (m_iconv == (iconv_t) -1) {
 		logger_error("iconv_open(%s, %s) error(%s)",
 			toCharset, fromCharset, last_serror());
@@ -281,7 +281,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 #elif defined(ACL_FREEBSD)
 		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
-		__iconv(m_iconv, &pi, &zi, &po, &zo);
+		__iconv((iconv_t) m_iconv, &pi, &zi, &po, &zo);
 #endif
 		return true;
 	}
@@ -378,7 +378,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 #elif defined(ACL_FREEBSD)
 		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
 #else
-		ret = __iconv(m_iconv, &pIn, &nIn, &pOut, &nOut);
+		ret = __iconv((iconv_t) m_iconv, &pIn, &nIn, &pOut, &nOut);
 #endif
 
 		if (ret != (size_t) -1) {
@@ -415,7 +415,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 #elif defined(ACL_FREEBSD)
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
-			__iconv(m_iconv, &pi, &zi, &po, &zo);
+			__iconv((iconv_t) m_iconv, &pi, &zi, &po, &zo);
 #endif
 
 			// 遇到无效的多字节序列，pIn 指向第一个无效的位置
@@ -459,7 +459,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 #elif defined(ACL_FREEBSD)
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
-			__iconv(m_iconv, &pi, &zi, &po, &zo);
+			__iconv((iconv_t) m_iconv, &pi, &zi, &po, &zo);
 #endif
 
 			// 输入的多字节序列不完整，pIn 指向该不完整的位置

@@ -189,15 +189,15 @@ int fbase_event_wakeup(FIBER_BASE *fbase)
 		if (var_hook_sys_api) {
 #ifdef	HAS_EVENTFD
 			// The eventfd can only use write API.
-			ret = fiber_write(fbase->out, (char*) &n, sizeof(n));
+			ret = (int) fiber_write(fbase->out, (char*) &n, sizeof(n));
 #else
-			ret = fiber_send(fbase->out, (char*) &n, sizeof(n), 0);
+			ret = (int) fiber_send(fbase->out, (char*) &n, sizeof(n), 0);
 #endif
 		} else {
 #ifdef	HAS_EVENTFD
-			ret = acl_fiber_write(fd, (char*) &n, sizeof(n));
+			ret = (int) acl_fiber_write(fd, (char*) &n, sizeof(n));
 #else
-			ret = acl_fiber_send(fd, (char*) &n, sizeof(n), 0);
+			ret = (int) acl_fiber_send(fd, (char*) &n, sizeof(n), 0);
 #endif
 		}
 

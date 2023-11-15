@@ -657,7 +657,7 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 		id = (unsigned long) atomic_int64_add_fetch(__idgen_atomic, 1);
 	}
 
-	fiber->fid     = id;
+	fiber->fid     = (unsigned) id;
 	fiber->errnum  = 0;
 	fiber->signum  = 0;
 	fiber->oflag   = attr ? attr->oflag : 0;
