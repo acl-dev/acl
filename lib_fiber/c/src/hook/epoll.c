@@ -431,7 +431,6 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	EPOLL_CTX   *epx = fe->epx;
 	EPOLL_EVENT *ee;
-	EPOLL       *ep;
 
 	assert(epx);
 	assert(epx->fd == fe->fd);
@@ -440,8 +439,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	ee = epx->ee;
 	assert(ee);
 
-	ep = ee->epoll;
-	assert(ep);
+	assert(ee->epoll);
 
 	// If the ready count exceeds the maxevents been set which limits the
 	// the buffer space to hold the the ready fds, we just return to let
@@ -451,7 +449,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 		return;
 	}
 
-	assert(ep->fds[epx->fd] == epx);
+	assert(ee->epoll->fds[epx->fd] == epx);
 
 	// Save the fd IO event's result to the result receiver been set in
 	// epoll_wait as below.
@@ -476,7 +474,6 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 {
 	EPOLL_CTX   *epx = fe->epx;
 	EPOLL_EVENT *ee;
-	EPOLL       *ep;
 
 	assert(epx);
 	assert(epx->fd == fe->fd);
@@ -485,14 +482,13 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	ee = epx->ee;
 	assert(ee);
 
-	ep = ee->epoll;
-	assert(ep);
+	assert(ee->epoll);
 
 	if (ee->nready >= ee->maxevents) {
 		return;
 	}
 
-	assert(ep->fds[epx->fd] == epx);
+	assert(ee->epoll->fds[epx->fd] == epx);
 
 	ee->events[ee->nready].events |= EPOLLOUT;
 	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
