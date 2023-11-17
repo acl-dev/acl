@@ -60,9 +60,12 @@ ACL_API ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *listen_stream,
  *  域套接地址：/tmp/test.sock，对于 Linux 平台，如果首字母为 '@' 则表示连接本
  *  地的抽象UNIX域套接口(Linux abstract unix domain socket)；
  *  如果连接一个TCP服务器，则地址格式为:
- *  remote_addr[@local_ip], 如: www.sina.com|80@60.28.250.199, 意思是绑定
- *  本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80 端口, 如果由OS
- *  自动绑定本地 IP 地址，则可以写为：www.sina.com:80
+ *  remote_addr[@local_ip][@interface], 如:
+ *  1. www.sina.com|80@60.28.250.199@interface, 意思是绑定本的网卡地址为:
+ *     60.28.250.199, 可以绑定本地网卡 interface，远程连接 www.sina.com 的 80 端口;
+ *  2.  211.150.111.12|80@192.168.1.1，表示仅绑定本地地址；
+ *  3. 211.150.111.12|80@@interface，表示仅绑定本地指定网卡;
+ *  4. 如果由OS 自动绑定本地 IP 地址，则可以写为：www.sina.com:80;
  * @param block_mode {int} 阻塞连接还是非阻塞连接，ACL_BLOCKING, ACL_NON_BLOCKING
  * @param conn_timeout {int} 连接超时时间(秒)
  * @param rw_timeout {int} 连接流成功后的读写超时时间，单位为秒

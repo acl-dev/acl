@@ -79,7 +79,10 @@ ACL_API ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
  * 远程连接网络服务器地址
  * @param addr {const char*} 远程服务器的监听地址，如：192.168.0.1|80，
  *  当本机有多个网卡地址且想通过某个指定网卡连接服务器时的地址格式：
- *  remote_ip|remote_port@local_ip，如：211.150.111.12|80@192.168.1.1
+ *  remote_ip|remote_port@local_ip@interface，如：
+ *    211.150.111.12|80@192.168.1.1
+ *    211.150.111.12|80@192.168.1.1@interface
+ *    211.150.111.12|80@@interface
  * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
  * @param timeout {int} 连接超时时间(毫秒级)，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
  * @param h_error {int*} 当连接失败时存储失败原因错误号

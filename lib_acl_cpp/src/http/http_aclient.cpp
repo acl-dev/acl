@@ -88,11 +88,12 @@ http_aclient& http_aclient::enable_ssl(bool yes)
 	return *this;
 }
 
-bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout)
+bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout,
+	const char *local_addr, const char *interface)
 {
 	ACL_AIO* aio = handle_.get_handle();
-	if (acl_aio_connect_addr(aio, addr, conn_timeout,
-		connect_callback, this) == -1) {
+	if (acl_aio_connect_addr2(aio, addr, local_addr, interface,
+		conn_timeout, connect_callback, this) == -1) {
 
 		logger_error("connect %s error %s", addr, last_serror());
 		return false;

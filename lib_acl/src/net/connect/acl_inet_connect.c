@@ -34,6 +34,19 @@
 
 #endif
 
+struct addr_res {
+    int peer_family;
+    char buf[2 * sizeof(ACL_SOCKADDR) + 128];
+    ACL_SOCKADDR peer_in;
+    ACL_SOCKADDR local_in;
+    struct addrinfo  peer_buf;
+    struct addrinfo  local_buf;
+    struct addrinfo *peer_res0;
+    struct addrinfo *local_res0;
+    const char *interface;
+    const char *peer_port;
+};
+
 static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 {
 	const struct addrinfo *res;
@@ -55,13 +68,45 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 	return -1;
 }
 
+static int bind_interface(ACL_SOCKET sock, const char *interface)
+{
+#ifdef SO_BINDTODEVICE
+	if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
+		interface, (socklen_t) strlen(interface) + 1) == 0) {
+		return 0;
+	}
+	acl_msg_warn("%s(%d): bind interface=%s error=%s",
+		__FUNCTION__, __LINE__, acl_last_serror(), interface);
+	return -1;
+#elif defined(IP_BOUND_IF)
+	int idx = if_nametoindex(interface);
+	if (idx == 0) {
+		acl_msg_warn("%s(%d): if_nametoindex error=%s, interface=%s",
+			__FUNCTION__, __LINE__, acl_last_serror(), interface);
+		return -1;
+	}
+
+	if (setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx)) == 0) {
+		return 0;
+	}
+	acl_msg_warn("%s(%d): bind interface=%s error=%s",
+		__FUNCTION__, __LINE__, interface, acl_last_serror());
+	return -1;
+#else
+	acl_msg_warn("%s(%d): not support bind interface=%s, sock=%d",
+		__FUNCTION__, __LINE__, interface, (int) sock);
+	return -1;
+#endif
+}
+
 /* connect_one - try to connect to one address */
 
 static ACL_SOCKET connect_one(const struct addrinfo *peer,
-	const struct addrinfo *local0, int blocking, int timeout)
+	const struct addr_res *local, int blocking, int timeout)
 {
 	ACL_SOCKET  sock;
 	int         on;
+	struct addrinfo *local0 = local->local_res0;
 
 	sock = socket(peer->ai_family, peer->ai_socktype, peer->ai_protocol);
 
@@ -89,6 +134,10 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 			__FUNCTION__, __LINE__, acl_last_serror(), sock);
 		acl_socket_close(sock);
 		return ACL_SOCKET_INVALID;
+	}
+
+	if (local->interface != NULL) {
+		bind_interface(sock, local->interface);
 	}
 
 	/* Timed connect. */
@@ -256,33 +305,40 @@ static struct addrinfo *resolve_addr(const char *name, const char *service)
 	return NULL;
 }
 
-struct addr_res {
-	int peer_family;
-	char buf[2 * sizeof(ACL_SOCKADDR) + 128];
-	ACL_SOCKADDR peer_in;
-	ACL_SOCKADDR local_in;
-	struct addrinfo  peer_buf;
-	struct addrinfo  local_buf;
-	struct addrinfo *peer_res0;
-	struct addrinfo *local_res0;
-	const char *peer_port;
-};
-
 static int parse_addr(const char *addr, struct addr_res *res)
 {
 	char *ptr;
-	const char *peer, *local;
+	const char *peer, *local = NULL;
 
 	res->peer_family = PF_UNSPEC;
+	res->interface   = NULL;
 
 	snprintf(res->buf, sizeof(res->buf) - 1, "%s", addr);
+	ptr = res->buf;
 	peer = res->buf;
-	ptr  = strchr(res->buf, '@');
-	if (ptr != NULL) {
-		*ptr  = 0;
-		local = *++ptr == 0 ? NULL : ptr;
+
+	/* @local_ip */
+	if ((ptr = strchr(ptr, '@')) != NULL) {
+		*ptr++ = 0;
+		local = ptr;
 	} else {
+		ptr = res->buf;  /* Reset the ptr to res->buf */
+	}
+
+	/* The second '@' for @local_interface */
+	if ((ptr = strchr(ptr, '@')) != NULL) {
+		*ptr++ = 0;
+		res->interface = ptr;
+	}
+
+	/* Sanity check */
+
+	if (local && *local == 0) {
 		local = NULL;
+	}
+
+	if (res->interface && *res->interface == 0) {
+		res->interface = NULL;
 	}
 
 	if (acl_valid_ipv6_hostaddr(peer, 0)) {
@@ -326,11 +382,14 @@ static int parse_addr(const char *addr, struct addr_res *res)
 		return -1;
 	}
 
-	if (local == NULL) {
+	if (local != NULL) {
+		res->local_res0 = try_numeric_addr(PF_UNSPEC, local, "0",
+			&res->local_buf, &res->local_in);
+		if (res->local_res0 == NULL) {
+			res->local_res0 = resolve_addr(local, "0");
+		}
+	} else {
 		res->local_res0 = NULL;
-	} else if ((res->local_res0 = try_numeric_addr(PF_UNSPEC, local, "0",
-		 &res->local_buf, &res->local_in)) == NULL) {
-		res->local_res0 = resolve_addr(local, "0");
 	}
 
 	return 0;
@@ -357,7 +416,7 @@ ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 	sock = ACL_SOCKET_INVALID;
 
 	for (res = ares.peer_res0; res != NULL ; res = res->ai_next) {
-		sock = connect_one(res, ares.local_res0, blocking, timeout);
+		sock = connect_one(res, &ares, blocking, timeout);
 		if (sock != ACL_SOCKET_INVALID) {
 			break;
 		}
