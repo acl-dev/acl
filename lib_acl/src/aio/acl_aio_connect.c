@@ -180,6 +180,12 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 
 ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 {
+	return acl_aio_connect2(aio, addr, NULL, NULL, timeout);
+}
+
+ACL_ASTREAM *acl_aio_connect2(ACL_AIO *aio, const char *addr,
+	const char *local_addr, const char *interface, int timeout)
+{
 	const char *myname = "acl_aio_connect";
 	ACL_ASTREAM *conn;
 	ACL_VSTREAM *cstream;
@@ -189,6 +195,10 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 	}
 
 #ifdef ACL_EVENTS_STYLE_IOCP
+	/* XXX: 暂不支持 Windows 平台。*/
+	(void) local_addr;
+	(void) interface;
+
 	if (aio->event_mode == ACL_EVENT_KERNEL) {
 		ACL_SOCKET connfd = WSASocket(AF_INET, SOCK_STREAM,
 			IPPROTO_TCP, 0, 0, WSA_FLAG_OVERLAPPED);
@@ -202,8 +212,28 @@ ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 				0, 0, aio->rbuf_size);
 	}
 #else
-	cstream = acl_vstream_connect(addr, ACL_NON_BLOCKING,
+	if (local_addr != NULL || interface != NULL) {
+		ACL_VSTRING *buf = acl_vstring_alloc(128);
+		acl_vstring_strcat(buf, addr);
+		if (local_addr) {
+			acl_vstring_strcat(buf, "@");
+			acl_vstring_strcat(buf, local_addr);
+		}
+		if (interface) {
+			/* If local_addr is NULL, one '@' should be appended */
+			if (local_addr == NULL) {
+				acl_vstring_strcat(buf, "@");
+			}
+			acl_vstring_strcat(buf, "@");
+			acl_vstring_strcat(buf, interface);
+		}
+		cstream = acl_vstream_connect(acl_vstring_str(buf), ACL_NON_BLOCKING,
 			0, 0, aio->rbuf_size);
+		acl_vstring_free(buf);
+	} else {
+		cstream = acl_vstream_connect(addr, ACL_NON_BLOCKING,
+			0, 0, aio->rbuf_size);
+	}
 #endif
 
 	if (cstream == NULL) {
@@ -425,6 +455,14 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum,
 }
 
 int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
+	 ACL_AIO_CONNECT_ADDR_FN callback, void *context)
+{
+	return acl_aio_connect_addr2(aio, addr, NULL, NULL,
+		timeout, callback, context);
+}
+
+int acl_aio_connect_addr2(ACL_AIO *aio, const char *addr,
+	const char *local_addr, const char *inteface, int timeout,
 	ACL_AIO_CONNECT_ADDR_FN callback, void *context)
 {
 	char buf[128], *ptr;
@@ -468,7 +506,8 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 			return -1;
 		}
 
-		if ((conn = acl_aio_connect(aio, addr, timeout)) == NULL) {
+		conn = acl_aio_connect2(aio, addr, local_addr, inteface, timeout);
+		if (conn == NULL) {
 			resolve_ctx_free(ctx);
 			return -1;
 		}
@@ -485,6 +524,7 @@ int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
 	} else {
+		/* XXX: Not support binding local IP and interface now. */
 		acl_dns_lookup(aio->dns, buf, dns_lookup_callback, ctx);
 		return 0;
 	}

@@ -47,10 +47,12 @@ public:
 	 *  在 acl 库中规定如果地址第一个字节为 @，则认为是 Linux 抽象域套接字
 	 *  （abstract unix domain socket）不过需注意该功能仅有 Linux 平台支持,
 	 *  举例，如：@/tmp/test.sock；;
-	 *  如果连接一个TCP服务器，则地址格式为: remote_addr[@local_ip],
-	 *  如: www.sina.com:80@60.28.250.199,
-	 *  意思是绑定本的网卡地址为: 60.28.250.199, 远程连接 www.sina.com 的 80,
-	 *  如果由OS自动绑定本地 IP 地址，则可以写为：www.sina.com:80
+	 *  remote_addr[@local_ip][@interface], 如:
+	 *  1. www.sina.com|80@60.28.250.199@interface, 意思是绑定本的网卡地址为:
+	 *     60.28.250.199, 可以绑定本地网卡 interface，远程连接 www.sina.com 的 80 端口;
+	 *  2.  211.150.111.12|80@192.168.1.1，表示仅绑定本地地址；
+	 *  3. 211.150.111.12|80@@interface，表示仅绑定本地指定网卡;
+	 *  4. 如果由OS 自动绑定本地 IP 地址，则可以写为：www.sina.com:80;
 	 * @param conn_timeout {int} 连接超时时间(单位值取决于 use_ms)
 	 * @param rw_timeout {int} 读写超时时间(单位值取决于 use_ms)
 	 * @param unit {time_unit_t} 超时时间的时间单位

@@ -7,8 +7,8 @@ static void usage(const char *proc)
 		"	-n loop_count[default: 10]\r\n"
 		"	-i inter count to print\r\n"
 		"	-l data size[default: 4096]\r\n"
-        "   -m [if timeout's unit using ms]\r\n"
-        "   -r [if read echo data from server]\r\n"
+		"	-m [if timeout's unit using ms]\r\n"
+		"	-r [if read echo data from server]\r\n"
 		, proc);
 }
 
@@ -38,12 +38,12 @@ int   main(int argc, char *argv[])
 		case 'i':
 			inter = atoi(optarg);
 			break;
-        case 'r':
-            read_result = 1;
-            break;
-        case 'm':
-            set_ms = 1;
-            break;
+		case 'r':
+			read_result = 1;
+			break;
+		case 'm':
+			set_ms = 1;
+			break;
 		default:
 			break;
 		}
@@ -54,12 +54,14 @@ int   main(int argc, char *argv[])
 		return 1;
 	}
 
+	acl_msg_stdout_enable(1);
+
 	/* 连接服务器 */
-    if (set_ms) {
-        client = acl_vstream_timed_connect(addr, ACL_BLOCKING, 100, 100, 4096, NULL);
-    } else {
-        client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
-    }
+	if (set_ms) {
+		client = acl_vstream_timed_connect(addr, ACL_BLOCKING, 100, 100, 4096, NULL);
+	} else {
+		client = acl_vstream_connect(addr, ACL_BLOCKING, 10, 10, 4096);
+	}
 
 	if (client == NULL) {
 		printf("connect %s error %s\r\n", addr, acl_last_serror());
@@ -72,7 +74,7 @@ int   main(int argc, char *argv[])
 	buf = (char*) acl_mymalloc(len);
 	snprintf(buf, len, "%d\r\n", len);
 
-    buf2 = (char*) acl_mymalloc(len);
+	buf2 = (char*) acl_mymalloc(len);
 
 	memset(buf, 'X', len);
 
@@ -86,19 +88,19 @@ int   main(int argc, char *argv[])
 			snprintf(line, sizeof(line), "curr: %d, total: %d", i, count);
 			ACL_METER_TIME(line);
 		}
-        if (read_result == 0) {
-            continue;
-        }
+		if (read_result == 0) {
+			continue;
+		}
 
-        if (acl_vstream_readn(client, buf2, len) != len) {
-            printf("read echo from server error\r\n");
-            break;
-        }
+		if (acl_vstream_readn(client, buf2, len) != len) {
+			printf("read echo from server error\r\n");
+			break;
+		}
 	}
 
-    acl_myfree(buf);
-    acl_myfree(buf2);
-    acl_vstream_close(client);
+	acl_myfree(buf);
+	acl_myfree(buf2);
+	acl_vstream_close(client);
 
 	return 0;
 }
