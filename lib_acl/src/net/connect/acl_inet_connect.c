@@ -102,20 +102,24 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	/* Check and try to bind the local IP address. */
 	if (local0 != NULL) {
 		if (bind_local(sock, peer->ai_family, local0) < 0) {
+#if defined(CHECK_BIND_LOCAL_ERROR)
 			acl_msg_error("%s(%d): bind local error %s, fd=%d",
 				__FUNCTION__, __LINE__, acl_last_serror(), sock);
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
+#endif
 		}
 	}
 	/* Check and try bind the local network interface. */
 	else if (local->interface != NULL) {
 		if (acl_bind_interface(sock, local->interface) == -1) {
+#if defined(CHECK_BIND_LOCAL_ERROR)
 			acl_msg_error("%s(%d): bind interface=%s error=%s",
 				__FUNCTION__, __LINE__, local->interface,
 				acl_last_serror());
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
+#endif
 		}
 	}
 
@@ -353,14 +357,9 @@ static int parse_addr(const char *addr, struct addr_res *res)
 		/* First, check if the local is IP address. */
 		res->local_res0 = try_numeric_addr(PF_UNSPEC, local, "0",
 			&res->local_buf, &res->local_in);
-		if (res->local_res0 != NULL) {
-			return 0;
-		}
-
-		/* Try to resolve the address from nameserver. */
-		res->local_res0 = resolve_addr(local, "0");
-		if (res->local_res0 != NULL) {
-			return 0;
+		if (res->local_res0 == NULL) {
+			/* Try to resolve the address from nameserver. */
+			res->local_res0 = resolve_addr(local, "0");
 		}
 	}
 	return 0;
