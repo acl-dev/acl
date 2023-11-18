@@ -208,16 +208,16 @@ int aio_socket_stream::enable_open_callback(aio_open_callback* callback /* = NUL
 aio_socket_stream* aio_socket_stream::open(aio_handle* handle,
 	const char* addr, int timeout)
 {
-	return open(handle, addr, NULL, NULL, timeout);
+	return open(handle, addr, NULL, timeout);
 }
 
 aio_socket_stream* aio_socket_stream::open(aio_handle* handle, const char* addr,
-	const char* local_addr, const char *interface, int timeout)
+	const char* local, int timeout)
 {
 	acl_assert(handle);
 
 	ACL_ASTREAM* astream = acl_aio_connect2(handle->get_handle(), addr,
-		local_addr, interface, timeout);
+					local, timeout);
 	if (astream == NULL) {
 		return NULL;
 	}
