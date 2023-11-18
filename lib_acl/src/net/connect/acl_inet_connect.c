@@ -30,6 +30,7 @@
 #include "net/acl_tcp_ctl.h"
 #include "net/acl_netdb.h"
 #include "net/acl_valid_hostname.h"
+#include "net/acl_sane_socket.h"
 #include "net/acl_connect.h"
 
 #endif
@@ -68,37 +69,6 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 	return -1;
 }
 
-static int bind_interface(ACL_SOCKET sock, const char *interface)
-{
-#ifdef SO_BINDTODEVICE
-	if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
-		interface, (socklen_t) strlen(interface) + 1) == 0) {
-		return 0;
-	}
-	acl_msg_warn("%s(%d): bind interface=%s error=%s",
-		__FUNCTION__, __LINE__, acl_last_serror(), interface);
-	return -1;
-#elif defined(IP_BOUND_IF)
-	int idx = if_nametoindex(interface);
-	if (idx == 0) {
-		acl_msg_warn("%s(%d): if_nametoindex error=%s, interface=%s",
-			__FUNCTION__, __LINE__, acl_last_serror(), interface);
-		return -1;
-	}
-
-	if (setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx)) == 0) {
-		return 0;
-	}
-	acl_msg_warn("%s(%d): bind interface=%s error=%s",
-		__FUNCTION__, __LINE__, interface, acl_last_serror());
-	return -1;
-#else
-	acl_msg_warn("%s(%d): not support bind interface=%s, sock=%d",
-		__FUNCTION__, __LINE__, interface, (int) sock);
-	return -1;
-#endif
-}
-
 /* connect_one - try to connect to one address */
 
 static ACL_SOCKET connect_one(const struct addrinfo *peer,
@@ -129,15 +99,28 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 			__FILE__, __LINE__, acl_last_serror());
 	}
 
-	if (local0 != NULL && bind_local(sock, peer->ai_family, local0) < 0) {
-		acl_msg_error("%s(%d): bind local error %s, fd=%d",
-			__FUNCTION__, __LINE__, acl_last_serror(), sock);
-		acl_socket_close(sock);
-		return ACL_SOCKET_INVALID;
+	/* Check and try to bind the local IP address. */
+	if (local0 != NULL) {
+		if (bind_local(sock, peer->ai_family, local0) < 0) {
+#if defined(CHECK_BIND_LOCAL_ERROR)
+			acl_msg_error("%s(%d): bind local error %s, fd=%d",
+				__FUNCTION__, __LINE__, acl_last_serror(), sock);
+			acl_socket_close(sock);
+			return ACL_SOCKET_INVALID;
+#endif
+		}
 	}
-
-	if (local->interface != NULL) {
-		bind_interface(sock, local->interface);
+	/* Check and try bind the local network interface. */
+	else if (local->interface != NULL) {
+		if (acl_bind_interface(sock, local->interface) == -1) {
+#if defined(CHECK_BIND_LOCAL_ERROR)
+			acl_msg_error("%s(%d): bind interface=%s error=%s",
+				__FUNCTION__, __LINE__, local->interface,
+				acl_last_serror());
+			acl_socket_close(sock);
+			return ACL_SOCKET_INVALID;
+#endif
+		}
 	}
 
 	/* Timed connect. */
@@ -307,38 +290,26 @@ static struct addrinfo *resolve_addr(const char *name, const char *service)
 
 static int parse_addr(const char *addr, struct addr_res *res)
 {
-	char *ptr;
-	const char *peer, *local = NULL;
+	char *ptr, *local;
+	const char *peer;
 
 	res->peer_family = PF_UNSPEC;
-	res->interface   = NULL;
 
 	snprintf(res->buf, sizeof(res->buf) - 1, "%s", addr);
-	ptr = res->buf;
 	peer = res->buf;
 
-	/* @local_ip */
-	if ((ptr = strchr(ptr, '@')) != NULL) {
-		*ptr++ = 0;
-		local = ptr;
-	} else {
-		ptr = res->buf;  /* Reset the ptr to res->buf */
+	/* @local_ip or #local_interface */
+
+	if ((local = strchr(res->buf, '@')) != NULL) {
+		if (*++local == 0) {
+			local = NULL;
+		}
 	}
 
-	/* The second '@' for @local_interface */
-	if ((ptr = strchr(ptr, '@')) != NULL) {
-		*ptr++ = 0;
-		res->interface = ptr;
-	}
-
-	/* Sanity check */
-
-	if (local && *local == 0) {
-		local = NULL;
-	}
-
-	if (res->interface && *res->interface == 0) {
-		res->interface = NULL;
+	if (local == NULL && (ptr = strchr(res->buf, '#')) != NULL) {
+		if (*++ptr != 0) {
+			res->interface = ptr;
+		}
 	}
 
 	if (acl_valid_ipv6_hostaddr(peer, 0)) {
@@ -383,15 +354,14 @@ static int parse_addr(const char *addr, struct addr_res *res)
 	}
 
 	if (local != NULL) {
+		/* First, check if the local is IP address. */
 		res->local_res0 = try_numeric_addr(PF_UNSPEC, local, "0",
 			&res->local_buf, &res->local_in);
 		if (res->local_res0 == NULL) {
+			/* Try to resolve the address from nameserver. */
 			res->local_res0 = resolve_addr(local, "0");
 		}
-	} else {
-		res->local_res0 = NULL;
 	}
-
 	return 0;
 }
 

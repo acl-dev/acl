@@ -180,11 +180,11 @@ static void __connect_notify_callback(int event_type, ACL_EVENT *event,
 
 ACL_ASTREAM *acl_aio_connect(ACL_AIO *aio, const char *addr, int timeout)
 {
-	return acl_aio_connect2(aio, addr, NULL, NULL, timeout);
+	return acl_aio_connect2(aio, addr, NULL, timeout);
 }
 
 ACL_ASTREAM *acl_aio_connect2(ACL_AIO *aio, const char *addr,
-	const char *local_addr, const char *interface, int timeout)
+	const char *local, int timeout)
 {
 	const char *myname = "acl_aio_connect";
 	ACL_ASTREAM *conn;
@@ -195,9 +195,8 @@ ACL_ASTREAM *acl_aio_connect2(ACL_AIO *aio, const char *addr,
 	}
 
 #ifdef ACL_EVENTS_STYLE_IOCP
-	/* XXX: 暂不支持 Windows 平台。*/
-	(void) local_addr;
-	(void) interface;
+	/* XXX: Windows 平台下暂不支持绑定本机网卡及本机 IP. */
+	(void) local;
 
 	if (aio->event_mode == ACL_EVENT_KERNEL) {
 		ACL_SOCKET connfd = WSASocket(AF_INET, SOCK_STREAM,
@@ -212,21 +211,10 @@ ACL_ASTREAM *acl_aio_connect2(ACL_AIO *aio, const char *addr,
 				0, 0, aio->rbuf_size);
 	}
 #else
-	if (local_addr != NULL || interface != NULL) {
+	if (local != NULL && (*local == '@' || *local == '#')) {
 		ACL_VSTRING *buf = acl_vstring_alloc(128);
 		acl_vstring_strcat(buf, addr);
-		if (local_addr) {
-			acl_vstring_strcat(buf, "@");
-			acl_vstring_strcat(buf, local_addr);
-		}
-		if (interface) {
-			/* If local_addr is NULL, one '@' should be appended */
-			if (local_addr == NULL) {
-				acl_vstring_strcat(buf, "@");
-			}
-			acl_vstring_strcat(buf, "@");
-			acl_vstring_strcat(buf, interface);
-		}
+		acl_vstring_strcat(buf, local);
 		cstream = acl_vstream_connect(acl_vstring_str(buf), ACL_NON_BLOCKING,
 			0, 0, aio->rbuf_size);
 		acl_vstring_free(buf);
@@ -457,12 +445,11 @@ static void dns_lookup_callback(ACL_DNS_DB *db, void *context, int errnum,
 int acl_aio_connect_addr(ACL_AIO *aio, const char *addr, int timeout,
 	 ACL_AIO_CONNECT_ADDR_FN callback, void *context)
 {
-	return acl_aio_connect_addr2(aio, addr, NULL, NULL,
-		timeout, callback, context);
+	return acl_aio_connect_addr2(aio, addr, NULL, timeout, callback, context);
 }
 
 int acl_aio_connect_addr2(ACL_AIO *aio, const char *addr,
-	const char *local_addr, const char *inteface, int timeout,
+	const char *local, int timeout,
 	ACL_AIO_CONNECT_ADDR_FN callback, void *context)
 {
 	char buf[128], *ptr;
@@ -506,7 +493,7 @@ int acl_aio_connect_addr2(ACL_AIO *aio, const char *addr,
 			return -1;
 		}
 
-		conn = acl_aio_connect2(aio, addr, local_addr, inteface, timeout);
+		conn = acl_aio_connect2(aio, addr, local, timeout);
 		if (conn == NULL) {
 			resolve_ctx_free(ctx);
 			return -1;

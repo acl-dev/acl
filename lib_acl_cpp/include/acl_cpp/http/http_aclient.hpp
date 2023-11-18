@@ -114,12 +114,13 @@ public:
 	 *  服务器地址，如果地址为 IP 则不需要先设置域名服务器地址
 	 * @param conn_timeout {int} 连接超时时间（秒）
 	 * @param rw_timeout {int} 网络 IO 读写超时时间（秒）
- 	 * @param local_addr {const char*} 本地网卡地址（非空时绑定指定网卡地址）
-	 * @param interface {const char*} 本地网卡名（非空时绑定指定网卡）
+	 * @param local {const char*} 本地网卡IP地址或网卡名，如果非空时，第一个字母
+	 *  为 @ 表示后面跟的是 IP 地址，如果为 # 表示后面跟的是网卡名，如：
+	 *  @127.0.0.1, #eth1
 	 * @return {bool} 返回 false 表示连接失败，返回 true 表示进入异步连接中
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout,
-		const char *local_addr = NULL, const char *interface = NULL);
+		const char *local = NULL);
 
 	/**
 	 * 异步关闭连接

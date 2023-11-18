@@ -62,15 +62,16 @@ public:
 	 * @param handle {aio_handle*} 异步引擎句柄
 	 * @param addr {const char*} 远程服务器的地址，地址格式为：
 	 *  针对TCP：IP:Port 或 针对域套接口：{filePath}
- 	 * @param local_addr {const char*} 本地网卡地址（非空时绑定指定网卡地址）
-	 * @param interface {const char*} 本地网卡名（非空时绑定指定网卡）
+ 	 * @param local {const char*} 本地网卡IP地址或网卡名，如果非空时，第一个字母
+ 	 *  为 @ 表示后面跟的是 IP 地址，如果为 # 表示后面跟的是网卡名，如：
+ 	 *  @127.0.0.1 表示要绑定本地回路 IP 地址，#lo 表示绑定本地回路网卡名
 	 * @param timeout {int} 连接超时时间(秒)
 	 * @return {aio_socket_stream*} 如果连接立即返回失败则该函数返回 NULL，
 	 *  返回非 NULL 对象只是表示正处于连接过程中，至于连接是否超时或连接是否失败
 	 *  应通过回调函数来判断
 	 */
 	static aio_socket_stream* open(aio_handle* handle, const char* addr,
-		const char* local_addr, const char *interface, int timeout);
+		const char* local, int timeout);
 	static aio_socket_stream* open(aio_handle* handle,
 	       const char* addr, int timeout);
 

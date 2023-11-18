@@ -139,3 +139,34 @@ int acl_is_listening_socket(ACL_SOCKET fd)
 {
 	return acl_check_socket(fd) == 1;
 }
+
+int acl_bind_interface(ACL_SOCKET sock, const char *interface)
+{
+#ifdef SO_BINDTODEVICE
+	if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
+		interface, (socklen_t) strlen(interface) + 1) == 0) {
+		return 0;
+	}
+	acl_msg_warn("%s(%d): bind interface=%s error=%s",
+		__FUNCTION__, __LINE__, acl_last_serror(), interface);
+	return -1;
+#elif defined(IP_BOUND_IF)
+	int idx = if_nametoindex(interface);
+	if (idx == 0) {
+		acl_msg_warn("%s(%d): if_nametoindex error=%s, interface=%s",
+			__FUNCTION__, __LINE__, acl_last_serror(), interface);
+		return -1;
+	}
+
+	if (setsockopt(sock, IPPROTO_IP, IP_BOUND_IF, &idx, sizeof(idx)) == 0) {
+		return 0;
+	}
+	acl_msg_warn("%s(%d): bind interface=%s error=%s",
+		__FUNCTION__, __LINE__, interface, acl_last_serror());
+	return -1;
+#else
+	acl_msg_warn("%s(%d): not support bind interface=%s, sock=%d",
+		     __FUNCTION__, __LINE__, interface, (int) sock);
+	return -1;
+#endif
+}
