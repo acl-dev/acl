@@ -65,10 +65,10 @@ ACL_API int acl_is_listening_socket(ACL_SOCKET fd);
 /**
  * 将大接口绑定指定的网卡上（必须在调用connect, bind系统API之前调用）
  * @param sock {ACL_SOCKET}
- * @param interface {const char*} 网卡名
+ * @param iface {const char*} 网卡名
  * @return {int} 返回 0 表示绑定成功，-1 表示失败
  */
-ACL_API int acl_bind_interface(ACL_SOCKET sock, const char *interface);
+ACL_API int acl_bind_interface(ACL_SOCKET sock, const char *iface);
 
 #ifdef	__cplusplus
 }

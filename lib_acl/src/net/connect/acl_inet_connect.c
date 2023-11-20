@@ -44,7 +44,7 @@ struct addr_res {
     struct addrinfo  local_buf;
     struct addrinfo *peer_res0;
     struct addrinfo *local_res0;
-    const char *interface;
+    const char *iface;
     const char *peer_port;
 };
 
@@ -111,11 +111,11 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 		}
 	}
 	/* Check and try bind the local network interface. */
-	else if (local->interface != NULL) {
-		if (acl_bind_interface(sock, local->interface) == -1) {
+	else if (local->iface != NULL) {
+		if (acl_bind_interface(sock, local->iface) == -1) {
 #if defined(CHECK_BIND_LOCAL_ERROR)
 			acl_msg_error("%s(%d): bind interface=%s error=%s",
-				__FUNCTION__, __LINE__, local->interface,
+				__FUNCTION__, __LINE__, local->iface,
 				acl_last_serror());
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
@@ -308,7 +308,7 @@ static int parse_addr(const char *addr, struct addr_res *res)
 
 	if (local == NULL && (ptr = strchr(res->buf, '#')) != NULL) {
 		if (*++ptr != 0) {
-			res->interface = ptr;
+			res->iface = ptr;
 		}
 	}
 
