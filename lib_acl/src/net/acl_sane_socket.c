@@ -140,21 +140,21 @@ int acl_is_listening_socket(ACL_SOCKET fd)
 	return acl_check_socket(fd) == 1;
 }
 
-int acl_bind_interface(ACL_SOCKET sock, const char *interface)
+int acl_bind_interface(ACL_SOCKET sock, const char *iface)
 {
 #ifdef SO_BINDTODEVICE
 	if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE,
-		interface, (socklen_t) strlen(interface) + 1) == 0) {
+		iface, (socklen_t) strlen(iface) + 1) == 0) {
 		return 0;
 	}
 	acl_msg_warn("%s(%d): bind interface=%s error=%s",
-		__FUNCTION__, __LINE__, acl_last_serror(), interface);
+		__FUNCTION__, __LINE__, acl_last_serror(), iface);
 	return -1;
 #elif defined(IP_BOUND_IF)
-	int idx = if_nametoindex(interface);
+	int idx = if_nametoindex(iface);
 	if (idx == 0) {
 		acl_msg_warn("%s(%d): if_nametoindex error=%s, interface=%s",
-			__FUNCTION__, __LINE__, acl_last_serror(), interface);
+			__FUNCTION__, __LINE__, acl_last_serror(), iface);
 		return -1;
 	}
 
@@ -162,11 +162,11 @@ int acl_bind_interface(ACL_SOCKET sock, const char *interface)
 		return 0;
 	}
 	acl_msg_warn("%s(%d): bind interface=%s error=%s",
-		__FUNCTION__, __LINE__, interface, acl_last_serror());
+		__FUNCTION__, __LINE__, iface, acl_last_serror());
 	return -1;
 #else
 	acl_msg_warn("%s(%d): not support bind interface=%s, sock=%d",
-		     __FUNCTION__, __LINE__, interface, (int) sock);
+		__FUNCTION__, __LINE__, iface, (int) sock);
 	return -1;
 #endif
 }
