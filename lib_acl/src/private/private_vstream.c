@@ -692,7 +692,7 @@ ACL_VSTREAM *private_vstream_connect_ex(const char *addr, int block_mode,
 	ptr = strchr(addr, ':');
 	if (ptr)
 		fd = acl_inet_connect_ex(addr, ACL_BLOCKING,
-			conn_timeout, he_errorp);
+			conn_timeout, (unsigned*) he_errorp);
 #ifdef	ACL_WINDOWS
 	else
 		return (NULL);
