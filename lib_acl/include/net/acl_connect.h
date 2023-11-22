@@ -12,7 +12,19 @@ extern "C" {
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#endif  
+#endif
+
+#define ACL_CONNECT_F_NONE		0		/* Nonthing */
+#define ACL_CONNECT_F_SYS_ERR		(1 << 0)	/* 需查系统 errno */
+#define ACL_CONNECT_F_CREATE_SOCKET_ERR	(1 << 1)	/* 创建 socket 出错 */
+#define ACL_CONNECT_F_REUSE_ADDR_ERR	(1 << 2)	/* 重复使用绑定地址出错 */
+#define ACL_CONNECT_F_BIND_IP_OK	(1 << 3)	/* 绑定本机 IP 成功 */
+#define ACL_CONNECT_F_BIND_IP_ERR	(1 << 4)	/* 绑定本机 IP 失败 */
+#define ACL_CONNECT_F_BIND_IFACE_OK	(1 << 5)	/* 绑定本机网卡成功 */
+#define ACL_CONNECT_F_BIND_IFACE_ERR	(1 << 6)	/* 绑定本机网卡失败 */
+#define ACL_CONNECT_F_SO_ERROR		(1 << 7)	/* socket 出错 */
+#define ACL_CONNECT_F_INPROGRESS	(1 << 8);	/* 正在连接过程中 */
+#define ACL_CONNECT_F_WAIT_ERR		(1 << 9)	/* 等待连接建连失败 */
 
 /* in acl_sane_connect.c */
 /**
@@ -44,8 +56,11 @@ ACL_API int acl_timed_connect(ACL_SOCKET fd, const struct sockaddr * sa,
  * @param sa {const struct sockaddr*} 服务器监听地址
  * @param len {socklen_t} sa 的地址长度
  * @param timeout {int} 连接超时时间(毫秒级)
+ * @param flags {unsigned*} 非空时用来存放连接失败的错误信息或连接的其它标记位
  * @return {int} 0: 连接成功; -1: 连接失败
  */
+ACL_API int acl_timed_connect_ms2(ACL_SOCKET fd, const struct sockaddr * sa,
+		socklen_t len, int timeout, unsigned *flags);
 ACL_API int acl_timed_connect_ms(ACL_SOCKET fd, const struct sockaddr * sa,
 		socklen_t len, int timeout);
 
@@ -69,11 +84,12 @@ ACL_API ACL_SOCKET acl_inet_connect(const char *addr, int blocking, int timeout)
  *  remote_ip|remote_port@local_ip，如：211.150.111.12|80@192.168.1.1
  * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
  * @param timeout {int} 连接超时时间(秒级)，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
- * @param h_error {int*} 当连接失败时存储失败原因错误号
- * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败 
+ * @param flags {unsigned*} 非空时用来存放连接失败的错误信息或连接的其它标记位
+ * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败
  */
-ACL_API ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
-		int timeout, int *h_error);
+ACL_API ACL_SOCKET acl_inet_connect2(const char *addr, int blocking,
+		int timeout, unsigned *flags);
+#define acl_inet_connect_ex	acl_inet_connect2
 
 /**
  * 远程连接网络服务器地址
@@ -85,11 +101,11 @@ ACL_API ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
  *    211.150.111.12|80#interface
  * @param blocking {int} 阻塞模式还是非阻塞模式, ACL_BLOCKING 或 ACL_NON_BLOCKING
  * @param timeout {int} 连接超时时间(毫秒级)，如果 blocking 为 ACL_NON_BLOCKING 则该值将被忽略
- * @param h_error {int*} 当连接失败时存储失败原因错误号
+ * @param flags {unsigned*} 非空时用来存放连接失败的错误信息或连接的其它标记位
  * @return {ACL_SOCKET} 如果返回 ACL_SOCKET_INVALID 表示连接失败
  */
 ACL_API ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
-		int timeout, int *h_error);
+		int timeout, unsigned *flags);
 
 #ifdef	ACL_UNIX
 

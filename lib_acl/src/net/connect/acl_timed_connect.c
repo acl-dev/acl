@@ -28,16 +28,22 @@ int acl_timed_connect(ACL_SOCKET sock, const struct sockaddr *sa,
 }
 
 int acl_timed_connect_ms(ACL_SOCKET sock, const struct sockaddr *sa,
-	socklen_t len, int timeout)
+	 socklen_t len, int timeout)
+{
+	return acl_timed_connect_ms2(sock, sa, len, timeout, NULL);
+}
+
+int acl_timed_connect_ms2(ACL_SOCKET sock, const struct sockaddr *sa,
+	socklen_t len, int timeout, unsigned *flags)
 {
 	int   err;
 
 	/*
 	 * Sanity check. Just like with timed_wait(), the timeout must be a
-	 * positive number.
+	 * positive number or 0.
 	 */
 	if (timeout < 0) {
-		acl_msg_panic("timed_connect: bad timeout: %d", timeout);
+		acl_msg_warn("timed_connect: bad timeout: %d", timeout);
 	}
 
 	/*
@@ -51,19 +57,32 @@ int acl_timed_connect_ms(ACL_SOCKET sock, const struct sockaddr *sa,
 
 #ifdef	ACL_UNIX
 	if (errno != ACL_EINPROGRESS) {
+		if (flags) {
+			*flags |= ACL_CONNECT_F_SYS_ERR;
+		}
 		return -1;
 	}
 #elif defined(ACL_WINDOWS)
 	if (errno != ACL_EINPROGRESS && errno != ACL_EWOULDBLOCK) {
+		if (flags) {
+			*flags |= ACL_CONNECT_F_SYS_ERR;
+		}
 		return -1;
 	}
 #endif
+
+	if (flags) {
+		*flags |= ACL_CONNECT_F_INPROGRESS;
+	}
 
 	/*
 	 * A connection is in progress. Wait for a limited amount of time for
 	 * something to happen. If nothing happens, report an error.
 	 */
-	if (acl_write_wait_ms(sock, timeout) < 0) {
+	if (timeout >= 0 && acl_write_wait_ms(sock, timeout) < 0) {
+		if (flags) {
+			*flags |= ACL_CONNECT_F_WAIT_ERR;
+		}
 		return -1;
 	}
 
@@ -84,6 +103,9 @@ int acl_timed_connect_ms(ACL_SOCKET sock, const struct sockaddr *sa,
 			acl_set_error(ACL_ENOTCONN);
 		}
 #endif
+		if (flags) {
+			*flags |= ACL_CONNECT_F_SO_ERROR;
+		}
 		return -1;
 	}
 

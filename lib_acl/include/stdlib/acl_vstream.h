@@ -128,6 +128,9 @@ struct ACL_VSTREAM {
 #define ACL_VSTREAM_FLAG_US		(1 << 21)	/**< 微秒超时级别 */
 #define ACL_VSTREAM_FLAG_NS		(1 << 22)	/**< 纳秒超时级别 */
 
+#define ACL_VSTREAM_FLAG_BIND_IFACE_OK	(1 << 23)	/**< 绑定本机网卡成功 */
+#define ACL_VSTREAM_FLAG_BIND_IP_OK	(1 << 24)	/**< 绑定本机 IP 成功 */
+
 /* 设置毫秒级超时 */
 #define ACL_VSTREAM_SET_MS(x)	((x)->flag |= ACL_VSTREAM_FLAG_MS)
 /* 设置微秒级超时 */

@@ -72,7 +72,7 @@ static int bind_local(ACL_SOCKET sock, int family, const struct addrinfo *res0)
 /* connect_one - try to connect to one address */
 
 static ACL_SOCKET connect_one(const struct addrinfo *peer,
-	const struct addr_res *local, int blocking, int timeout)
+	const struct addr_res *local, int blocking, int timeout, unsigned *flags)
 {
 	ACL_SOCKET  sock;
 	int         on;
@@ -83,6 +83,9 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	if (sock == ACL_SOCKET_INVALID) {
 		acl_msg_error("%s(%d): create socket error: %s",
 			__FUNCTION__, __LINE__, acl_last_serror());
+		if (flags) {
+			*flags |= ACL_CONNECT_F_CREATE_SOCKET_ERR;
+		}
 		return ACL_SOCKET_INVALID;
 	}
 
@@ -93,8 +96,10 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 
 	on = 1;
 	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR,
-		(const void *) &on, sizeof(on)) < 0) {
-
+		  (const void *) &on, sizeof(on)) < 0) {
+		if (flags) {
+			*flags |= ACL_CONNECT_F_REUSE_ADDR_ERR;
+		}
 		acl_msg_warn("%s(%d): setsockopt(SO_REUSEADDR): %s",
 			__FILE__, __LINE__, acl_last_serror());
 	}
@@ -102,17 +107,25 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 	/* Check and try to bind the local IP address. */
 	if (local0 != NULL) {
 		if (bind_local(sock, peer->ai_family, local0) < 0) {
+			if (flags) {
+				*flags |= ACL_CONNECT_F_BIND_IP_ERR;
+			}
 #if defined(CHECK_BIND_LOCAL_ERROR)
 			acl_msg_error("%s(%d): bind local error %s, fd=%d",
 				__FUNCTION__, __LINE__, acl_last_serror(), sock);
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
 #endif
+		} else if (flags) {
+			*flags |= ACL_CONNECT_F_BIND_IP_OK;
 		}
 	}
 	/* Check and try bind the local network interface. */
 	else if (local->iface != NULL) {
 		if (acl_bind_interface(sock, local->iface) == -1) {
+			if (flags) {
+				*flags |= ACL_CONNECT_F_BIND_IFACE_ERR;
+			}
 #if defined(CHECK_BIND_LOCAL_ERROR)
 			acl_msg_error("%s(%d): bind interface=%s error=%s",
 				__FUNCTION__, __LINE__, local->iface,
@@ -120,6 +133,8 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 			acl_socket_close(sock);
 			return ACL_SOCKET_INVALID;
 #endif
+		} else if (flags) {
+			*flags |= ACL_CONNECT_F_BIND_IFACE_OK;
 		}
 	}
 
@@ -130,8 +145,8 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 		if (acl_timed_connect_ms(sock, peer->ai_addr,
 			(socklen_t) peer->ai_addrlen, timeout) < 0) {
 #else
-		if (acl_timed_connect_ms(sock, peer->ai_addr,
-			peer->ai_addrlen, timeout) < 0) {
+		if (acl_timed_connect_ms2(sock, peer->ai_addr,
+			peer->ai_addrlen, timeout, flags) < 0) {
 #endif
 #ifdef ACL_WINDOWS
 			int err = acl_last_error();
@@ -209,14 +224,14 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 
 ACL_SOCKET acl_inet_connect(const char *addr, int blocking, int timeout)
 {
-	int   h_error = 0;
-	return acl_inet_connect_ex(addr, blocking, timeout, &h_error);
+	unsigned flags = 0;
+	return acl_inet_connect2(addr, blocking, timeout, &flags);
 }
 
-ACL_SOCKET acl_inet_connect_ex(const char *addr, int blocking,
-	int timeout, int *h_error)
+ACL_SOCKET acl_inet_connect2(const char *addr, int blocking,
+	int timeout, unsigned *flags)
 {
-	return acl_inet_timed_connect(addr, blocking, timeout * 1000, h_error);
+	return acl_inet_timed_connect(addr, blocking, timeout * 1000, flags);
 }
 
 static struct addrinfo *try_numeric_addr(int family, const char *name,
@@ -366,14 +381,14 @@ static int parse_addr(const char *addr, struct addr_res *res)
 }
 
 ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
-	int timeout, int *h_error)
+	int timeout, unsigned *flags)
 {
 	ACL_SOCKET  sock;
 	struct addr_res ares;
 	struct addrinfo *res;
 
-	if (h_error) {
-		*h_error = 0;
+	if (flags) {
+		*flags = 0;
 	}
 
 	/* we should fill the ares with 0 to init all members int it. */
@@ -386,7 +401,7 @@ ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 	sock = ACL_SOCKET_INVALID;
 
 	for (res = ares.peer_res0; res != NULL ; res = res->ai_next) {
-		sock = connect_one(res, &ares, blocking, timeout);
+		sock = connect_one(res, &ares, blocking, timeout, flags);
 		if (sock != ACL_SOCKET_INVALID) {
 			break;
 		}

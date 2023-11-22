@@ -168,44 +168,47 @@ ACL_VSTREAM *acl_vstream_accept(ACL_VSTREAM *sstream, char *ipbuf, int bsize)
 }
 
 ACL_VSTREAM *acl_vstream_timed_connect(const char *addr, int block_mode,
-	int connect_timeout, int rw_timeout, int rw_bufsize, int *error)
+	int conn_timeout, int rw_timeout, int rw_bufsize, unsigned *flags)
 {
-	const char *myname = "acl_vstream_timed_connect";
 	ACL_VSTREAM *client;
-	ACL_SOCKET connfd;
+	ACL_SOCKET fd;
 	int  family = 0;
 	char buf[256];
+	unsigned f = 0;
 
 	if (addr == NULL || *addr == 0) {
-		acl_msg_error("%s: addr null", myname);
+		acl_msg_error("%s(%d): addr null", __FUNCTION__, __LINE__);
 		return NULL;
 	}
 
 #if defined(ACL_UNIX)
 	if (acl_valid_unix(addr)) {
-		connfd = acl_unix_connect(addr, block_mode, connect_timeout);
+		fd = acl_unix_connect(addr, block_mode, conn_timeout);
 	} else
 #endif
 	{
-		connfd = acl_inet_timed_connect(addr, block_mode,
-			     connect_timeout, error);
+		fd = acl_inet_timed_connect(addr, block_mode, conn_timeout, &f);
 	}
 
-	if (connfd == ACL_SOCKET_INVALID) {
+	if (flags) {
+		*flags = f;
+	}
+
+	if (fd == ACL_SOCKET_INVALID) {
 		return NULL;
 	}
 
-	client = acl_vstream_fdopen(connfd, ACL_VSTREAM_FLAG_RW,
+	client = acl_vstream_fdopen(fd, ACL_VSTREAM_FLAG_RW,
 		    rw_bufsize, rw_timeout, ACL_VSTREAM_TYPE_SOCK);
 	if (client == NULL) {
-		acl_socket_close(connfd);
+		acl_socket_close(fd);
 		return NULL;
 	}
 
 	/* must set the IO timeout in ms unit */
 	ACL_VSTREAM_SET_MS(client);
 
-	family = acl_getsockfamily(connfd);
+	family = acl_getsockfamily(fd);
 
 	switch (family) {
 #ifdef ACL_UNIX
@@ -231,16 +234,23 @@ ACL_VSTREAM *acl_vstream_timed_connect(const char *addr, int block_mode,
 		acl_vstream_set_peer(client, buf);
 	}
 
+	if (f & ACL_CONNECT_F_BIND_IP_OK) {
+		client->flag |= ACL_VSTREAM_FLAG_BIND_IP_OK;
+	}
+
+	if (f & ACL_CONNECT_F_BIND_IFACE_OK) {
+		client->flag |= ACL_VSTREAM_FLAG_BIND_IFACE_OK;
+	}
 	return client;
 }
 
-ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
-	int block_mode, int connect_timeout, int rw_timeout,
-	int rw_bufsize, int *error)
+ACL_VSTREAM *acl_vstream_connect2(const char *addr,
+	int block_mode, int conn_timeout, int rw_timeout,
+	int rw_bufsize, unsigned *flags)
 {
 	ACL_VSTREAM *conn = acl_vstream_timed_connect(addr, block_mode,
-		 connect_timeout * 1000, rw_timeout * 1000,
-		rw_bufsize, error);
+		conn_timeout * 1000, rw_timeout * 1000,
+		rw_bufsize, flags);
 
 	/* reset rw_timeout with second unit */
 	if (conn) {
@@ -253,7 +263,7 @@ ACL_VSTREAM *acl_vstream_connect_ex(const char *addr,
 ACL_VSTREAM *acl_vstream_connect(const char *addr, int block_mode,
 	int connect_timeout, int rw_timeout, int rw_bufsize)
 {
-	return acl_vstream_connect_ex(addr, block_mode, connect_timeout,
+	return acl_vstream_connect2(addr, block_mode, connect_timeout,
 			rw_timeout, rw_bufsize, NULL);
 }
 
