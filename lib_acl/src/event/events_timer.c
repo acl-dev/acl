@@ -90,13 +90,11 @@ acl_int64 event_timer_when(ACL_EVENT *eventp)
 
 void event_timer_free(ACL_EVENT *eventp)
 {
-	TIMER_NODE *node, *next;
+	TIMER_NODE *node;
 
-	node = (TIMER_NODE*) acl_avl_first(&eventp->timers->avl);
-	while (node) {
-		next = AVL_NEXT(&eventp->timers->avl, node);
+	while ((node = (TIMER_NODE*) acl_avl_first(&eventp->timers->avl))) {
+		acl_avl_remove(&eventp->timers->avl, node);
 		acl_myfree(node);
-		node = next;
 	}
 
 	acl_htable_free(eventp->timers->table, acl_myfree_fn);

@@ -52,12 +52,11 @@ unsigned timer_cache_size(TIMER_CACHE *cache)
 
 void timer_cache_free(TIMER_CACHE *cache)
 {
-	TIMER_CACHE_NODE *node = fiber_avl_first(&cache->tree), *next;
+	TIMER_CACHE_NODE *node;
 
-	while (node != NULL) {
-		next = AVL_NEXT(&cache->tree, node);
+	while ((node = fiber_avl_first(&cache->tree))) {
+		fiber_avl_remove(&cache->tree, node);
 		mem_free(node);
-		node = next;
 	}
 
 	while (1) {
