@@ -184,6 +184,15 @@ static openssl_sk_num_fn __openssl_sk_num;
 typedef void *(*openssl_sk_value_fn)(const OPENSSL_STACK*, int);
 static openssl_sk_value_fn __openssl_sk_value;
 
+#define SSL_CTX_SET_VERIFY		"SSL_CTX_set_verify"
+typedef int (*ssl_ctx_set_verify_fn)(SSL_CTX *ctx,int mode,
+			int (*callback)(int, X509_STORE_CTX *));
+static ssl_ctx_set_verify_fn __ssl_ctx_set_verify;
+
+#define SSL_CTX_LOAD_VERIFY_LOCATIONS		"SSL_CTX_load_verify_locations"
+typedef int (*ssl_ctx_load_verify_locations_fn)(const SSL_CTX*, const char*, const char*);
+static ssl_ctx_load_verify_locations_fn __ssl_ctx_load_verify_locations;
+
 //////////////////////////////////////////////////////////////////////////////
 
 static acl::string* __crypto_path_buf = NULL;
@@ -300,6 +309,8 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_SET_OPTIONS, ssl_set_options_fn, __ssl_set_options);
 	LOAD_SSL(OPENSSL_SK_NUM, openssl_sk_num_fn, __openssl_sk_num);
 	LOAD_SSL(OPENSSL_SK_VALUE, openssl_sk_value_fn, __openssl_sk_value);
+	LOAD_SSL(SSL_CTX_SET_VERIFY, ssl_ctx_set_verify_fn, __ssl_ctx_set_verify);
+	LOAD_SSL(SSL_CTX_LOAD_VERIFY_LOCATIONS, ssl_ctx_load_verify_locations_fn, __ssl_ctx_load_verify_locations);
 	return true;
 }
 
@@ -410,6 +421,8 @@ static void openssl_dll_load(void)
 #  define __ssl_set_options		SSL_set_options
 #  define __openssl_sk_num		OPENSSL_sk_num
 #  define __openssl_sk_value		OPENSSL_sk_value
+#  define __ssl_ctx_set_verify		SSL_CTX_set_verify
+#  define __ssl_ctx_load_verify_locations		SSL_CTX_load_verify_loactions
 # endif // !HAS_OPENSSL_DLL
 
 #endif  // HAS_OPENSSL
@@ -876,6 +889,14 @@ bool openssl_conf::load_ca(const char* ca_file, const char* /* ca_path */)
 	if (ssl_ctx_ == NULL) {
 		create_ssl_ctx();  // ssl_ctx_ will be set in it.
 	}
+
+	// If is the double check on server side ?
+	if (server_side_) {
+		__ssl_ctx_set_verify(ssl_ctx_, SSL_VERIFY_PEER
+				| SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
+		return __ssl_ctx_load_verify_locations(ssl_ctx_,ca_file,NULL) > 0;
+	}
+
 	__ssl_ctx_set_verify_depth(ssl_ctx_, 5);
 
 	STACK_OF(X509_NAME)* list = __ssl_load_client_ca(ca_file);
@@ -916,7 +937,7 @@ bool openssl_conf::add_cert(const char* crt_file, const char* key_file,
 
 #ifdef HAS_OPENSSL
 	SSL_CTX* ctx;
-	if (server_side_) {
+	if (server_side_ && !ssl_ctx_) {
 		ctx = create_ssl_ctx();
 	} else if (ssl_ctx_) {
 		ctx = ssl_ctx_;

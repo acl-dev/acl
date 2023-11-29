@@ -1305,7 +1305,8 @@ int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool)
 		("%s(%d): worker threads exit ok, conter: %d",
 		 myname, __LINE__, thr_pool->count);
 
-	sleep(1);
+	/* Don't sleep here to avoid delay thread pool's destroying process. */
+	/* sleep(1); */
 	s1 = acl_pthread_mutex_destroy(&thr_pool->poller_mutex);
 	s2 = acl_pthread_cond_destroy(&thr_pool->poller_cond);
 

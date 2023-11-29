@@ -609,6 +609,7 @@ void acl_dns_close(ACL_DNS *dns)
 	}
 	if (dns->astream != NULL) {
 		acl_aio_iocp_close(dns->astream);
+		acl_aio_del_close_hook(dns->astream, dns_lookup_close, dns);
 		dns->astream = NULL;
 	}
 	acl_array_destroy(dns->dns_list, acl_myfree_fn);
