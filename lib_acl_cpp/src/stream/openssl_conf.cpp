@@ -422,7 +422,7 @@ static void openssl_dll_load(void)
 #  define __openssl_sk_num		OPENSSL_sk_num
 #  define __openssl_sk_value		OPENSSL_sk_value
 #  define __ssl_ctx_set_verify		SSL_CTX_set_verify
-#  define __ssl_ctx_load_verify_locations		SSL_CTX_load_verify_loactions
+#  define __ssl_ctx_load_verify_locations		SSL_CTX_load_verify_locations
 # endif // !HAS_OPENSSL_DLL
 
 #endif  // HAS_OPENSSL
