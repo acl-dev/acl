@@ -18,7 +18,7 @@ def setup(app):
     app.add_css_file("main_stylesheet.css")
 
 extensions = ['breathe']
-breathe_projects = { 'acldocs': '../html' }
+breathe_projects = { 'acldocs': '../xml' }
 templates_path = ['_templates']
 html_static_path = ['_static']
 source_suffix = '.rst'
