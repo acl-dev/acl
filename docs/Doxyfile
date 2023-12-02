@@ -1,0 +1,19 @@
+PROJECT_NAME      = "Acl"
+XML_OUTPUT        = xml
+INPUT             = ../lib_acl_cpp/include/ \
+		    ../lib_protoco/include/ \
+		    ../lib_acl/include/
+GENERATE_LATEX    = NO
+GENERATE_MAN      = NO
+GENERATE_RTF      = NO
+CASE_SENSE_NAMES  = NO
+GENERATE_HTML     = NO
+GENERATE_XML      = YES
+RECURSIVE         = YES
+QUIET             = YES
+JAVADOC_AUTOBRIEF = YES
+WARN_IF_UNDOCUMENTED = NO
+WARN_AS_ERROR = NO
+ENABLE_PREPROCESSING = YES
+MACRO_EXPANSION      = YES
+EXPAND_ONLY_PREDEF   = YES
