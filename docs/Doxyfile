@@ -1,6 +1,6 @@
 PROJECT_NAME      = "Acl"
 XML_OUTPUT        = xml
-INPUT             = ../lib_acl/include/
+INPUT             = ../lib_protocol/include/
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
 GENERATE_RTF      = NO
