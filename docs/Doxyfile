@@ -1,7 +1,7 @@
 PROJECT_NAME      = "Acl"
 XML_OUTPUT        = xml
 INPUT             = ../lib_acl_cpp/include/ \
-		    ../lib_protoco/include/ \
+		    ../lib_protocol/include/ \
 		    ../lib_acl/include/
 GENERATE_LATEX    = NO
 GENERATE_MAN      = NO
