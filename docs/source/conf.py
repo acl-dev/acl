@@ -27,7 +27,7 @@ project = 'acldocs'
 copyright = 'Copyright 2023 The Acl Authors.'
 author = 'zsxxsz'
 
-#html_logo = 'image/ea_big.png'
+html_logo = 'image/acl_big.png'
 
 exclude_patterns = []
 highlight_language = 'c++'
