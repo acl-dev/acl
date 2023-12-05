@@ -214,7 +214,7 @@ void run(void) {
 
   while (true) {
     acl::socket_stream* conn = server.accept(); // Wait for connection.
-    if (conn == NULl) {
+    if (conn == NULL) {
       break;
     }
     std::thread thread([=] {  // Start one thread to handle the connection.
