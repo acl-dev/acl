@@ -142,20 +142,20 @@ void event_fire(ACL_EVENT *ev)
 
 			if (r_timeout > 0 && r_callback) {
 				fdp->r_ttl = ev->present + fdp->r_timeout;
-				fdp->r_callback(ACL_EVENT_RW_TIMEOUT, ev,
+				r_callback(ACL_EVENT_RW_TIMEOUT, ev,
 					fdp->stream, fdp->r_context);
 			}
 
 			/* ready[i] maybe been set NULL in r_callback */
 			if (w_timeout > 0 && w_callback && ready[i]) {
 				fdp->w_ttl = ev->present + fdp->w_timeout;
-				fdp->w_callback(ACL_EVENT_RW_TIMEOUT, ev,
+				w_callback(ACL_EVENT_RW_TIMEOUT, ev,
 					fdp->stream, fdp->w_context);
 			}
 			continue;
 		}
 
-		if ((type & (ACL_EVENT_READ | ACL_EVENT_ACCEPT))) {
+		if ((type & (ACL_EVENT_READ | ACL_EVENT_ACCEPT)) && fdp->r_callback) {
 			fdp->event_type &= ~(ACL_EVENT_READ | ACL_EVENT_ACCEPT);
 			if (fdp->r_timeout > 0)
 				fdp->r_ttl = ev->present + fdp->r_timeout;
@@ -178,7 +178,7 @@ void event_fire(ACL_EVENT *ev)
 		if (ready[i] == NULL)
 			continue;
 
-		if ((type & (ACL_EVENT_WRITE | ACL_EVENT_CONNECT))) {
+		if ((type & (ACL_EVENT_WRITE | ACL_EVENT_CONNECT)) && fdp->w_callback) {
 			if (fdp->w_timeout > 0)
 				fdp->w_ttl = ev->present + fdp->w_timeout;
 			fdp->event_type &= ~(ACL_EVENT_WRITE | ACL_EVENT_CONNECT);
