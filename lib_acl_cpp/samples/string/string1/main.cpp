@@ -271,6 +271,17 @@ static void test7(void)
 	ACL_METER_TIME(">> end ACL_VSTRING: acl_vstring_sprintf");
 }
 
+static void test8(void)
+{
+	acl::string s = "ok";
+	acl::string s1 = "ok", *sp = &s1;
+
+
+	printf("s==\"ok\" : %s, \"ok\"==s : %s\r\n",
+		s == "ok" ? "yes" : "no", "ok" == s ? "yes" : "no");
+	printf("sp=s : %s\r\n", sp == s ? "yes" : "no");
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 static void test_main(void)
@@ -429,6 +440,9 @@ int main(void)
 	{
 		printf("%s\r\n", (*cit).c_str());
 	}
+
+	test8();
+
 #ifdef WIN32
 	printf("enter any key to exit\r\n");
 	getchar();
