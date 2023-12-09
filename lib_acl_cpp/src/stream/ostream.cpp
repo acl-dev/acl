@@ -178,4 +178,8 @@ int ostream::push_pop(const char* in, size_t len,
 	return (int) len;
 }
 
+void ostream::set_wbuf_size(size_t n) {
+	acl_vstream_set_wbuf_size((unsigned) n);
+}
+
 } // namespace acl
