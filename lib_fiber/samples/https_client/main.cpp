@@ -12,17 +12,18 @@ static int __total_clients         = 0;
 static int __total_error_clients   = 0;
 static acl::sslbase_conf* __ssl_conf;
 
-static int __conn_timeout = 0;
-static int __rw_timeout   = 0;
-static int __max_loop     = 10000;
-static int __max_fibers   = 100;
+static int __conn_timeout = 10;
+static int __rw_timeout   = 10;
+static int __max_loop     = 1;
+static int __max_fibers   = 1;
 static int __left_fibers  = 100;
 static struct timeval __begin;
+static acl::string __host;
 
 static void http_client(ACL_FIBER *fiber, const char* addr)
 {
 	acl::string body;
-	acl::http_request req(addr, 0, 0);
+	acl::http_request req(addr, __conn_timeout, __rw_timeout);
 	acl::http_header& hdr = req.request_header();
 
 	req.set_ssl(__ssl_conf);
@@ -31,7 +32,15 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 		hdr.set_url("/")
 			.set_content_type("text/plain")
 			.set_keep_alive(true);
+		if (!__host.empty()) {
+			hdr.set_host(__host);
+		}
 
+		if (i == 0) {
+			acl::string hdrbuf;
+			hdr.build_request(hdrbuf);
+			printf("request header:\r\n%s\r\n", hdrbuf.c_str());
+		}
 		if (!req.request(NULL, 0)) {
 			printf("send request error\r\n");
 			break;
@@ -53,7 +62,7 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 	}
 }
 
-static void fiber_connect(ACL_FIBER *fiber, void *ctx)
+static void fiber_client(ACL_FIBER *fiber, void *ctx)
 {
 	const char *addr = (const char *) ctx;
 
@@ -74,8 +83,6 @@ static void fiber_connect(ACL_FIBER *fiber, void *ctx)
 			__total_clients, __total_error_clients,
 			__total_count, spent,
 			(__total_count * 1000) / (spent > 0 ? spent : 1));
-
-		//acl_fiber_schedule_stop();
 	}
 }
 
@@ -84,7 +91,7 @@ static void fiber_main(ACL_FIBER *fiber acl_unused, void *ctx)
 	char *addr = (char *) ctx;
 
 	for (int i = 0; i < __max_fibers; i++) {
-		acl_fiber_create(fiber_connect, addr, STACK_SIZE);
+		acl_fiber_create(fiber_client, addr, STACK_SIZE);
 	}
 }
 
@@ -96,7 +103,9 @@ static void usage(const char *procname)
 		" -t connt_timeout\r\n"
 		" -r rw_timeout\r\n"
 		" -c max_fibers\r\n"
-		" -n max_loop\r\n", procname);
+		" -n max_loop\r\n"
+		" -H host\r\n"
+		, procname);
 }
 
 int main(int argc, char *argv[])
@@ -104,16 +113,18 @@ int main(int argc, char *argv[])
 	int   ch;
 	char  addr[256];
 #ifdef __APPLE__
-	acl::string libpath("../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib");
+	//acl::string libpath("../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib");
+	acl::string libpath("/usr/local/lib/libcrypto.dylib; /usr/local/lib/libssl.dylib");
 #else
-	acl::string libpath("../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so");
+	//acl::string libpath("../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so");
+	acl::string libpath("/usr/local/lib64/libcrypto.so; /usr/local/lib/libssl.so");
 #endif
        
 	acl_msg_stdout_enable(1);
 
 	snprintf(addr, sizeof(addr), "%s", "0.0.0.0:9001");
 
-	while ((ch = getopt(argc, argv, "hc:n:s:t:r:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "hc:n:s:t:r:l:H:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -137,6 +148,9 @@ int main(int argc, char *argv[])
 		case 'l':
 			libpath = optarg;
 			break;
+		case 'H':
+			__host = optarg;
+			break;
 		default:
 			break;
 		}
@@ -159,10 +173,22 @@ int main(int argc, char *argv[])
 	} else if (libpath.find("polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(libpath);
 		if (!acl::polarssl_conf::load()) {
-			printf("load %s error\n", libpath.c_str());
+			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
 		__ssl_conf = new acl::polarssl_conf;
+	} else if (libpath.find("crypto") != NULL) {
+		const std::vector<acl::string>& libs = libpath.split2("; \t");
+		if (libs.size() != 2) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+		if (!acl::openssl_conf::load()) {
+			printf("load %s error\r\n", libpath.c_str());
+			return 1;
+		}
+		__ssl_conf = new acl::openssl_conf;
 	} else {
 		printf("invalid ssl lib=%s\r\n", libpath.c_str());
 		return 1;

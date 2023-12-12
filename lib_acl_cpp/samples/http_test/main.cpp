@@ -5,6 +5,16 @@ using namespace acl;
 
 int main(void)
 {
+	const char* url = "https://127.0.0.1:9001";
+	acl::http_url parser;
+	if (!parser.parse(url)) {
+		printf("invalid url\n");
+		return 1;
+	}
+	printf("domain=%s, port=%d, url=%s\r\n", parser.get_domain(), parser.get_port(), parser.get_url_path());
+
+	return 0;
+
 	const char* data = "U_TRS1=000000f6.66721803.4fd1681c.8c48b73a; path=/; expires=Mon, 06-Jun-22 02:49:00 GMT; domain=.sina.com.cn";
 	HttpCookie* cookie = new HttpCookie();
 
