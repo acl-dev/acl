@@ -16,7 +16,7 @@ static int __conn_timeout = 10;
 static int __rw_timeout   = 10;
 static int __max_loop     = 1;
 static int __max_fibers   = 1;
-static int __left_fibers  = 100;
+static int __left_fibers  = __max_fibers;
 static struct timeval __begin;
 static acl::string __host;
 
@@ -25,6 +25,8 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 	acl::string body;
 	acl::http_request req(addr, __conn_timeout, __rw_timeout);
 	acl::http_header& hdr = req.request_header();
+
+	acl::istream::set_rbuf_size(20480);
 
 	req.set_ssl(__ssl_conf);
 
@@ -52,8 +54,13 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 		}
 
 		if (i < 1) {
-			printf(">>>fiber-%d: body: %s\r\n",
-				acl_fiber_id(fiber), body.c_str());
+			if (body.size() < 100) {
+				printf(">>>fiber-%d: body: %s\r\n",
+					acl_fiber_id(fiber), body.c_str());
+			} else {
+				printf(">>>fiber-%d: body len: %zd\r\n",
+					acl_fiber_id(fiber), body.size());
+			}
 		}
 
 		__total_count++;
