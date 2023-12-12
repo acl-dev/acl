@@ -5,8 +5,7 @@
 #include "acl_cpp/http/http_utils.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 bool http_utils::get_addr(const char* url, char* addr, size_t size)
 {
@@ -156,17 +155,24 @@ const char* http_url::parse_domain(const char *url) {
 		logger_error("invalid url: %s", url);
 		return NULL;
 	}
+
+	char buf[512];
+	size_t size;
+
 	const char* ptr = strchr(url, '/');
 	if (ptr == NULL) {
-		domain_ = url;
-		return NULL;
+		// Url format: domain:port
+		ptr = "/";
+		size = strlen(url) + 1; // The last byte is for '\0'.
+	} else {
+		// Url format: domain:port/xxx
+		size = ptr - url + 1;
 	}
 
-	char buf[256];
-	size_t size = ptr - url + 1;
 	if (size > sizeof(buf)) { // xxx: sanity check
 		size = sizeof(buf);
 	}
+
 	ACL_SAFE_STRNCPY(buf, url, size);
 
 	// fixme: Is it error if buf contains IPV6 Addr ---zsx
