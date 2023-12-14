@@ -277,9 +277,27 @@ static bool load_from_ssl(void)
 
 #  if defined(_WIN32) || defined(_WIN64)
 	LOAD_CRYPTO(SSL_CLEAR_ERROR, ssl_clear_error_fn, __ssl_clear_error);
-#else
+	LOAD_CRYPTO(ASN1_STRING_PRINT_EX, asn1_string_print_ex_fn, __asn1_string_print_ex);
+	LOAD_CRYPTO(OPENSSL_SK_NUM, openssl_sk_num_fn, __openssl_sk_num);
+	LOAD_CRYPTO(OPENSSL_SK_VALUE, openssl_sk_value_fn, __openssl_sk_value);
+	LOAD_CRYPTO(BIO_NEW, bio_new_fn, __bio_new);
+	LOAD_CRYPTO(BIO_S_MEM, bio_s_mem_fn, __bio_s_mem);
+	LOAD_CRYPTO(BIO_CTRL, bio_ctrl_fn, __bio_ctrl);
+	LOAD_CRYPTO(BIO_READ, bio_read_fn, __bio_read);
+	LOAD_CRYPTO(BIO_FREE, bio_free_fn, __bio_free);
+	LOAD_CRYPTO(X509_GET_EXT_D2I, x509_get_ext_d2i_fn, __x509_get_ext_d2i);
+#  else
 	LOAD_SSL(SSL_CLEAR_ERROR, ssl_clear_error_fn, __ssl_clear_error);
-#endif
+	LOAD_SSL(ASN1_STRING_PRINT_EX, asn1_string_print_ex_fn, __asn1_string_print_ex);
+	LOAD_SSL(OPENSSL_SK_NUM, openssl_sk_num_fn, __openssl_sk_num);
+	LOAD_SSL(OPENSSL_SK_VALUE, openssl_sk_value_fn, __openssl_sk_value);
+	LOAD_SSL(BIO_NEW, bio_new_fn, __bio_new);
+	LOAD_SSL(BIO_S_MEM, bio_s_mem_fn, __bio_s_mem);
+	LOAD_SSL(BIO_CTRL, bio_ctrl_fn, __bio_ctrl);
+	LOAD_SSL(BIO_READ, bio_read_fn, __bio_read);
+	LOAD_SSL(BIO_FREE, bio_free_fn, __bio_free);
+	LOAD_SSL(X509_GET_EXT_D2I, x509_get_ext_d2i_fn, __x509_get_ext_d2i);
+#  endif
 	LOAD_SSL(SSLV23_METHOD, sslv23_method_fn, __sslv23_method);
 	LOAD_SSL(SSL_CTX_NEW, ssl_ctx_new_fn, __ssl_ctx_new);
 	LOAD_SSL(SSL_CTX_FREE, ssl_ctx_free_fn, __ssl_ctx_free);
@@ -294,21 +312,12 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_CTX_SET_TIMEOUT, ssl_ctx_set_timeout_fn, __ssl_ctx_set_timeout);
 	LOAD_SSL(SSL_CTX_CALLBACK_CTRL, ssl_ctx_callback_ctrl_fn, __ssl_ctx_callback_ctrl);
 	LOAD_SSL(SSL_CTX_CTRL, ssl_ctx_ctrl_fn, __ssl_ctx_ctrl);
-	LOAD_SSL(ASN1_STRING_PRINT_EX, asn1_string_print_ex_fn, __asn1_string_print_ex);
-	LOAD_SSL(BIO_NEW, bio_new_fn, __bio_new);
-	LOAD_SSL(BIO_S_MEM, bio_s_mem_fn, __bio_s_mem);
-	LOAD_SSL(BIO_CTRL, bio_ctrl_fn, __bio_ctrl);
-	LOAD_SSL(BIO_READ, bio_read_fn, __bio_read);
-	LOAD_SSL(BIO_FREE, bio_free_fn, __bio_free);
 	LOAD_SSL(SSL_CTX_GET0_CERTIFICATE, ssl_ctx_get0_certificate_fn, __ssl_ctx_get0_certificate);
-	LOAD_SSL(X509_GET_EXT_D2I, x509_get_ext_d2i_fn, __x509_get_ext_d2i);
 	LOAD_SSL(SSL_GET_SERVERNAME, ssl_get_servername_fn, __ssl_get_servername);
 	LOAD_SSL(SSL_GET_SSL_CTX, ssl_get_ssl_ctx_fn, __ssl_get_ssl_ctx);
 	LOAD_SSL(SSL_SET_SSL_CTX, ssl_set_ssl_ctx_fn, __ssl_set_ssl_ctx);
 	LOAD_SSL(SSL_CTX_GET_OPTION, ssl_ctx_get_options_fn, __ssl_ctx_get_options);
 	LOAD_SSL(SSL_SET_OPTIONS, ssl_set_options_fn, __ssl_set_options);
-	LOAD_SSL(OPENSSL_SK_NUM, openssl_sk_num_fn, __openssl_sk_num);
-	LOAD_SSL(OPENSSL_SK_VALUE, openssl_sk_value_fn, __openssl_sk_value);
 	LOAD_SSL(SSL_CTX_SET_VERIFY, ssl_ctx_set_verify_fn, __ssl_ctx_set_verify);
 	LOAD_SSL(SSL_CTX_LOAD_VERIFY_LOCATIONS, ssl_ctx_load_verify_locations_fn, __ssl_ctx_load_verify_locations);
 	return true;
