@@ -227,6 +227,13 @@ public:
 	istream& operator>>(int& n);
 	istream& operator>>(short& n);
 	istream& operator>>(char& ch);
+
+public:
+	/**
+	 * 进程初始化时可以调用此方法设置进程级别的读缓存区大小，内部缺省值为4096
+	 * @param n {size_t}
+	 */
+	static void set_rbuf_size(size_t n);
 };
 
 } // namespace acl

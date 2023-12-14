@@ -1952,4 +1952,14 @@ string& string::parse_int64(acl_uint64 n)
 	return s;
 }
 
+bool operator==(const string* s,const string& str)
+{
+	return (str == s);
+}
+
+bool operator==(const char* s,const string& str)
+{
+	return (str == s);
+}
+
 } // namespace acl

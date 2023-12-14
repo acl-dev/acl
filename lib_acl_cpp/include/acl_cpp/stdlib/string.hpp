@@ -1320,6 +1320,13 @@ private:
 };
 
 /**
+ * string s = "ok";
+ * printf("first: %s\r\n", "ok" == s ? "true" : "false");
+ */
+bool operator==(const string* s,const string& str);
+bool operator==(const char* s,const string& str);
+
+/**
  * 模板函数，可用在以下场景:
  * string s1, s2;
  * T v;

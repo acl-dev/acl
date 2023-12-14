@@ -145,11 +145,10 @@ static void usage(const char* procname)
 		"-d dbnum[default: 0]\r\n"
 		"-n count\r\n"
 		"-t connect_timeout and rw_timeout[default: 10]\r\n"
-		"-a cmd[set|del|expire|ttl|exists|type|all]\r\n",
-		procname);
+		"-a cmd[set|del|expire|ttl|exists|type|all]\r\n", procname);
+
 	printf("sample:\r\n\r\n"
-		"%s -s 127.0.0.1:6379 -c -L ./libpolarssl.so -a set\r\n",
-		procname);
+		"%s -s 127.0.0.1:6379 -c -L ./libpolarssl.so -a set\r\n", procname);
 }
 
 int main(int argc, char* argv[])
@@ -158,6 +157,14 @@ int main(int argc, char* argv[])
 	acl::string addr("127.0.0.1:6379"), command, passwd;
 	acl::string ssl_libpath, ca_file, crt_file, key_file;
 	bool cluster_mode = false;
+
+#if defined(_WIN32) || defined(_WIN64)
+	ssl_libpath = "libcrypto-1_1.dll;libssl-1_1.dll";
+#elif defined(__linux__)
+	ssl_libpath = "/usr/local/lib64/libcrypto.so; /usr/local/lib64/libcrypto.so";
+#elif defined(__APPLE__)
+	ssl_libpath = "/usr/local/lib/libcrypto.dylib; /usr/local/lib/libssl.dylib";
+#endif
 
 	while ((ch = getopt(argc, argv, "hs:n:t:a:p:d:L:cC:S:K:")) > 0) {
 		switch (ch) {
@@ -210,8 +217,9 @@ int main(int argc, char* argv[])
 
 	acl::redis_client client(addr.c_str(), conn_timeout, rw_timeout);
 	client.set_password(passwd);
-	if (dbnum > 0)
+	if (dbnum > 0) {
 		client.set_db(dbnum);
+	}
 
 	acl::redis_client_cluster cluster;
 	cluster.set(addr.c_str(), 0, conn_timeout, rw_timeout);
@@ -226,27 +234,41 @@ int main(int argc, char* argv[])
 
 		// load libpolarssl.so dynamically
 		if (!acl::mbedtls_conf::load()) {
-			printf("load %s error %s\r\n", ssl_libpath.c_str(),
+			printf("Load %s error %s\r\n", ssl_libpath.c_str(),
 				acl::last_serror());
 			return 1;
-		} else {
-			ssl_conf = new acl::mbedtls_conf(false);
 		}
+
+		ssl_conf = new acl::mbedtls_conf(false);
 	} else if (ssl_libpath.find("polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(ssl_libpath);
 
 		// load libpolarssl.so dynamically
 		if (!acl::polarssl_conf::load()) {
-			printf("load %s error %s\r\n", ssl_libpath.c_str(),
+			printf("Load %s error %s\r\n", ssl_libpath.c_str(),
 				acl::last_serror());
 			return 1;
-		} else {
-			ssl_conf = new acl::polarssl_conf(false);
 		}
-	} else {
-		printf("invalid ssl path=%s\r\n", ssl_libpath.c_str());
-	}
 
+		ssl_conf = new acl::polarssl_conf(false);
+	} else if (ssl_libpath.find("crypto") != NULL) {
+		const std::vector<acl::string>& libs = ssl_libpath.split2("; \t");
+		if (libs.size() != 2) {
+			printf("Invalid ssl libs=%s\r\n", ssl_libpath.c_str());
+			return 1;
+		}
+
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+		if (!acl::openssl_conf::load()) {
+			printf("Load ssl(%s) error(%s)\r\n",
+				ssl_libpath.c_str(), acl::last_serror());
+			return 1;
+		}
+
+		ssl_conf = new acl::openssl_conf(false);
+	} else {
+		printf("Invalid ssl path=%s\r\n", ssl_libpath.c_str());
+	}
 
 	//////////////////////////////////////////////////////////////////////
 
@@ -255,15 +277,15 @@ int main(int argc, char* argv[])
 	if (ssl_conf && !ca_file.empty() && !crt_file.empty()
 		&& !key_file.empty()) {
 		if (!ssl_conf->load_ca(ca_file, NULL)) {
-			printf("load %s error\r\n", ca_file.c_str());
+			printf("Load %s error\r\n", ca_file.c_str());
 			return 1;
 		}
 		if (!ssl_conf->add_cert(crt_file)) {
-			printf("add cert %s error\r\n", crt_file.c_str());
+			printf("Add cert %s error\r\n", crt_file.c_str());
 			return 1;
 		}
 		if (!ssl_conf->set_key(key_file)) {
-			printf("set key %s error\r\n", key_file.c_str());
+			printf("Set key %s error\r\n", key_file.c_str());
 			return 1;
 		}
 	}

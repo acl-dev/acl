@@ -162,8 +162,12 @@ public:
 		return (0);
 	}
 
-protected:
-private:
+public:
+	/**
+	 * 进程初始化时可以调用此方法设置内部写缓存区的大小，内部缺省为 512
+	 * @param n {size_t}
+	 */
+	static void set_wbuf_size(size_t n);
 };
 
 } // namespace acl

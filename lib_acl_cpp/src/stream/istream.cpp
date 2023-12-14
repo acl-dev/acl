@@ -403,4 +403,9 @@ istream& istream::operator>>(char& ch)
 	return *this;
 }
 
+void istream::set_rbuf_size(size_t n)
+{
+	acl_vstream_set_rbuf_size((unsigned) n);
+}
+
 } // namespace acl

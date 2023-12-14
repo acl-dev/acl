@@ -5,7 +5,7 @@
 
 #define	 STACK_SIZE	128000
 
-static int __rw_timeout = 0;
+static int __rw_timeout = 10;
 static acl::string __ssl_crt("./ssl_crt.pem");
 static acl::string __ssl_key("./ssl_key.pem");
 static acl::sslbase_conf* __ssl_conf;
@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
 {
 	acl::string addr(":9001");
 #ifdef __APPLE__
-	acl::string libpath("../libmbedtls_all.dylib");
+	acl::string libpath("/usr/local/lib/libcrypto.dylib; /usr/local/lib/libssl.dylib");
 #else
-	acl::string libpath("../libmbedtls_all.so");
+	acl::string libpath("/usr/local/lib64/libcrypto.so; /usr/local/lib/libssl.so");
 #endif
 	int  ch;
 
@@ -175,6 +175,18 @@ int main(int argc, char *argv[])
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
+	} else if (libpath.find("crypto") != NULL) {
+		const std::vector<acl::string>& libs = libpath.split2("; \t");
+		if (libs.size() != 2) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+		if (!acl::openssl_conf::load()) {
+			printf("load %s error\r\n", libpath.c_str());
+			return 1;
+		}
+		__ssl_conf = new acl::openssl_conf(true);
 	} else {
 		printf("invalid ssl lib=%s\r\n", libpath.c_str());
 		return 1;
