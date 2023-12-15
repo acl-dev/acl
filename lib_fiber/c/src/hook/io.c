@@ -226,7 +226,11 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 	}
 
 	fe = fiber_file_open(sockfd);
+#ifdef SYS_WIN
+	return (int) fiber_recv(fe, buf, len, flags);
+#else
 	return fiber_recv(fe, buf, len, flags);
+#endif
 }
 
 #ifdef SYS_WIN
@@ -253,7 +257,12 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 	}
 
 	fe = fiber_file_open(sockfd);
+
+#ifdef SYS_WIN
+	return (int) fiber_recvfrom(fe, buf, len, flags, src_addr, addrlen);
+#else
 	return fiber_recvfrom(fe, buf, len, flags, src_addr, addrlen);
+#endif
 }
 
 #ifdef SYS_UNIX
@@ -385,7 +394,12 @@ ssize_t acl_fiber_send(socket_t sockfd, const void *buf, size_t len, int flags)
 	}
 
 	fe = fiber_file_open(sockfd);
+
+#ifdef SYS_WIN
+	return (int) fiber_send(fe, buf, len, flags);
+#else
 	return fiber_send(fe, buf, len, flags);
+#endif
 }
 
 #ifdef SYS_WIN
@@ -413,7 +427,12 @@ ssize_t acl_fiber_sendto(socket_t sockfd, const void *buf, size_t len,
 	}
 
 	fe = fiber_file_open(sockfd);
+
+#ifdef SYS_WIN
+	return (int) fiber_sendto(fe, buf, len, flags, dest_addr, addrlen);
+#else
 	return fiber_sendto(fe, buf, len, flags, dest_addr, addrlen);
+#endif
 }
 
 #ifdef SYS_UNIX

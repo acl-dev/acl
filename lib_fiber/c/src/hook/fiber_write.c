@@ -244,7 +244,11 @@ ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
 	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
+#ifdef SYS_WIN
+		int n = (int) (*sys_send)(fe->fd, buf, (int) len, flags);
+#else
 		int n = (int) (*sys_send)(fe->fd, buf, len, flags);
+#endif
 
 		CHECK_WRITE_RESULT(fe, n);
 	}
@@ -293,8 +297,13 @@ ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 	CHECK_SET_NBLOCK(fe->fd);
 
 	while (1) {
+#ifdef SYS_WIN
+		int n = (int) (*sys_sendto)(fe->fd, buf, (int) len, flags,
+				dest_addr, addrlen);
+#else
 		int n = (int) (*sys_sendto)(fe->fd, buf, len, flags,
 				dest_addr, addrlen);
+#endif
 
 		CHECK_WRITE_RESULT(fe, n);
 	}

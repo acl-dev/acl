@@ -346,7 +346,11 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 
 #if defined(HAS_IOCP)
 	if (EVENT_IS_IOCP(fiber_io_event())) {
+# ifdef SYS_WIN
+		return (ssize_t) fiber_iocp_read(fe, buf, (int) len);
+# else
 		return fiber_iocp_read(fe, buf, len);
+# endif
 	}
 #elif defined(HAS_IO_URING)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
@@ -377,7 +381,11 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 	}
 #endif
 
+#ifdef SYS_WIN
+	FIBER_READ(sys_recv, fe, buf, (int) len, flags);
+#else
 	FIBER_READ(sys_recv, fe, buf, len, flags);
+#endif
 }
 
 ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
@@ -387,7 +395,7 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 
 #if  defined(HAS_IOCP)
 	if (EVENT_IS_IOCP(fiber_io_event())) {
-		return fiber_iocp_read(fe, buf, len);
+		return fiber_iocp_read(fe, buf, (int) len);
 	}
 #elif  defined(HAS_IO_URING) && defined(IO_URING_HAS_RECVFROM)
 	if (EVENT_IS_IO_URING(fiber_io_event())) {
@@ -420,5 +428,9 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 	}
 #endif
 
+#ifdef SYS_WIN
+	FIBER_READ(sys_recvfrom, fe, buf, (int) len, flags, src_addr, addrlen);
+#else
 	FIBER_READ(sys_recvfrom, fe, buf, len, flags, src_addr, addrlen);
+#endif
 }
