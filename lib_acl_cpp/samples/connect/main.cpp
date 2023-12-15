@@ -5,7 +5,7 @@
 class client : public acl::thread
 {
 public:
-	client(const char* addr) : addr_(addr) {}
+	client(const char* addr, int n) : addr_(addr), n_(n) {}
 	~client(void) {}
 
 protected:
@@ -23,7 +23,7 @@ protected:
 
 		printf("connect %s ok, my addr=%s\r\n",
 			addr_.c_str(), conn.get_local(true));
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < n_; i++) {
 			if (conn.format("thread-%ld: hello world\r\n",
 				acl::thread::self()) == -1) {
 
@@ -50,6 +50,7 @@ protected:
 
 private:
 	acl::string addr_;
+	int n_;
 };
 
 static void add_servers(std::vector<acl::string>& servers, const char* s)
@@ -64,23 +65,46 @@ static void add_servers(std::vector<acl::string>& servers, const char* s)
 	}
 }
 
+static void load_servers(std::vector<acl::string>& servers, const char* f)
+{
+	acl::ifstream fp;
+	if (!fp.open_read(f)) {
+		printf("Open %s error %s\r\n", f, acl::last_serror());
+		return;
+	}
+
+	acl::string buf;
+	while (!fp.eof()) {
+		if (!fp.gets(buf)) {
+			break;
+		}
+		servers.push_back(buf);
+	}
+}
+
 static void usage(const char* procname)
 {
-	printf("usage: %s -h [help] -s server_list\r\n", procname);
+	printf("usage: %s -h [help] -s server_list -f ip_file -n count\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
 	std::vector<acl::string> addrs;
-	int ch;
+	int ch, n = 0;
 
-	while ((ch = getopt(argc, argv, "hs:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:f:n:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
 		case 's':
 			add_servers(addrs, optarg);
+			break;
+		case 'f':
+			load_servers(addrs, optarg);
+			break;
+		case 'n':
+			n = atoi(optarg);
 			break;
 		default:
 			break;
@@ -97,7 +121,7 @@ int main(int argc, char* argv[])
 	for (std::vector<acl::string>::const_iterator cit = addrs.begin();
 		cit != addrs.end(); ++cit) {
 
-		acl::thread* thr = new client(*cit);
+		acl::thread* thr = new client(*cit, n);
 		threads.push_back(thr);
 		thr->start();
 	}
