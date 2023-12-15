@@ -201,7 +201,7 @@ bool openssl_io::open(ACL_VSTREAM* s)
 
 	SSL* ssl = __ssl_new(ctx);
 
-	if (!__ssl_set_fd(ssl, ACL_VSTREAM_SOCK(s))) {
+	if (!__ssl_set_fd(ssl, (int) ACL_VSTREAM_SOCK(s))) {
 		logger_error("SSL_set_fd error");
 		__ssl_free(ssl);
 		return false;
@@ -322,7 +322,7 @@ int openssl_io::read(void* buf, size_t len)
 			return -1;
 		}
 
-		int ret = __ssl_read(ssl_, ptr, len);
+		int ret = __ssl_read(ssl_, ptr, (int) len);
 		if (ret > 0) {
 			nbytes += ret;
 			ptr += ret;
@@ -387,7 +387,7 @@ int openssl_io::send(const void* buf, size_t len)
 			return -1;
 		}
 
-		int ret = __ssl_write(ssl_, ptr, len);
+		int ret = __ssl_write(ssl_, ptr, (int) len);
 		if (ret > 0) {
 			nbytes += ret;
 			ptr += ret;
