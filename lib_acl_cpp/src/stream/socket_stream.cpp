@@ -90,7 +90,7 @@ static unsigned to_oflags(unsigned flags)
 	return oflags;
 }
 
-bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = 0 */,
+bool socket_stream::bind_udp(const char* addr, int rw_timeout /* = -1 */,
 	unsigned flags /* = 0 */)
 {
 	if (stream_) {

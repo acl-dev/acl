@@ -1,4 +1,6 @@
 #include "stdafx.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <getopt.h>
 
@@ -78,8 +80,17 @@ static void load_servers(std::vector<acl::string>& servers, const char* f)
 		if (!fp.gets(buf)) {
 			break;
 		}
+		if (acl_valid_ipv6_hostaddr(buf.c_str(), 0)) {
+			printf("Valid IPv6 addr=%s\r\n", buf.c_str());
+		} else {
+			printf("Invalid IPv6 addr=%s\r\n", buf.c_str());
+		}
 		servers.push_back(buf);
 	}
+
+	printf("Enter any key to continue...");
+	fflush(stdout);
+	getchar();
 }
 
 static void usage(const char* procname)
