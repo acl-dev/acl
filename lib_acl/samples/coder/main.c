@@ -15,7 +15,7 @@ static void b64_encode(const char *ptr)
 	acl_vstring_free(str);
 }
 
-static void b64_decode(const char *ptr)
+static void b64_decode(const char *ptr, int verbose)
 {
 	ACL_VSTRING *str = acl_vstring_alloc(1);
 	const char *p;
@@ -29,10 +29,17 @@ static void b64_decode(const char *ptr)
 	DECODE(str, ptr, strlen(ptr));
 
 	p = acl_vstring_str(str);
-	printf(">>>decode result:|%s|\n>>>orignal str: {%s}, len: %d\n",
-		p, ptr, (int) ACL_VSTRING_LEN(str));
-	b64_encode(p);
-	printf("len: %d, %d\n", (int) ACL_VSTRING_LEN(str), (int) strlen(p));
+	if (verbose) {
+		printf(">>>decode result:|%s|\n>>>orignal str: {%s}, len: %d\n",
+			p, ptr, (int) ACL_VSTRING_LEN(str));
+	} else {
+		printf("%s\n", p);
+	}
+
+	if (verbose) {
+		b64_encode(p);
+		printf("len: %d, %d\n", (int) ACL_VSTRING_LEN(str), (int) strlen(p));
+	}
 
 	acl_vstring_free(str);
 }
@@ -70,6 +77,7 @@ static void usage(const char *prog)
 	printf("usage: %s -s string\r\n"
 		" -a action[default: encode, encode|decode]\r\n"
 		" -t type [default: base64, base64|bin|crc32]\r\n"
+		" -V [verbose]\r\n"
 		" -h help]\n", prog);
 }
 
@@ -79,7 +87,7 @@ static void usage(const char *prog)
 
 int main(int argc, char *argv[])
 {
-	int ch, encode = 1, type = BASE64_TYPE;
+	int ch, encode = 1, type = BASE64_TYPE, verbose = 0;
 	char *buf = NULL;
 
 	if (argc == 1) {
@@ -87,7 +95,7 @@ int main(int argc, char *argv[])
 		exit (1);
 	}
 
-	while ((ch = getopt(argc, argv, "s:a:t:h")) > 0) {
+	while ((ch = getopt(argc, argv, "s:a:t:hV")) > 0) {
 		switch (ch) {
 		case 's':
 			buf = strdup(optarg);
@@ -107,6 +115,9 @@ int main(int argc, char *argv[])
 		case 'h':
 			usage(argv[0]);
 			return 0;
+		case 'V':
+			verbose = 1;
+			break;
 		default:
 			usage(argv[0]);
 			return 0;
@@ -124,7 +135,7 @@ int main(int argc, char *argv[])
 		if (encode) {
 			b64_encode(buf);
 		} else {
-			b64_decode(buf);
+			b64_decode(buf, verbose);
 		}
 		break;
 	case BIN_TYPE:
