@@ -102,18 +102,19 @@ bool mqtt_client::read_header(mqtt_header& header) {
 
 	// update the first char for mqtt_type_t
 	if (header.update(&ch, 1) != 0) {
-		logger_error("invalid header type=%d", (int) ch);
+		logger_debug(DEBUG_MQTT, 1, "invalid header type=%d", (int) ch);
 		return false;
 	}
 
 	for (int i = 0; i < 4; i++) {
 		if (!conn_->read(ch)) {
-			logger_error("read one char error: %s, i=%d",
+			logger_debug(DEBUG_MQTT, 1, "read char error: %s, i=%d",
 				last_serror(), i);
 			return false;
 		}
 		if (header.update(&ch, 1) != 0) {
-			logger_error("header_update error, ch=%d", (int) ch);
+			logger_debug(DEBUG_MQTT, 1, "header_update error, ch=%d",
+				(int) ch);
 			return false;
 		}
 		if (header.finished()) {
@@ -122,7 +123,7 @@ bool mqtt_client::read_header(mqtt_header& header) {
 	}
 
 	if (!header.finished()) {
-		logger_error("get mqtt header error");
+		logger_debug(DEBUG_MQTT, 1, "get mqtt header error");
 		return false;
 	}
 
@@ -140,7 +141,8 @@ bool mqtt_client::read_message(const mqtt_header& header, mqtt_message& body) {
 		size_t size = sizeof(buf) > len ? len : sizeof(buf);
 		int n = conn_->read(buf, size);
 		if (n == -1) {
-			logger_error("read body error: %s", last_serror());
+			logger_debug(DEBUG_MQTT, 1, "read body error: %s",
+				last_serror());
 			return false;
 		}
 
@@ -148,16 +150,16 @@ bool mqtt_client::read_message(const mqtt_header& header, mqtt_message& body) {
 
 		n = body.update(buf, (int) size);
 		if (n == -1) {
-			logger_error("update body error");
+			logger_debug(DEBUG_MQTT, 1, "update body error");
 			return false;
 		} else if (n != 0) {
-			logger_error("invalid body data");
+			logger_debug(DEBUG_MQTT, 1, "invalid body data");
 			return false;
 		}
 	}
 
 	if (!body.finished()) {
-		logger_error("body not finished!");
+		logger_debug(DEBUG_MQTT, 1, "body not finished!");
 		return false;
 	}
 	return true;

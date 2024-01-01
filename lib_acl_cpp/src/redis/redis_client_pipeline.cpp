@@ -61,6 +61,7 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg)
 bool redis_pipeline_channel::flush_all(void)
 {
 	if (msgs_.empty()) {
+		logger("The messages are empty!");
 		return true;
 	}
 
@@ -92,6 +93,7 @@ bool redis_pipeline_channel::flush_all(void)
 
 		// Return false if we have retried
 		if (retried) {
+			logger_error("Retried failed!");
 			return false;
 		}
 
@@ -253,6 +255,8 @@ bool redis_pipeline_channel::handle_messages(void)
 			return true;
 		}
 
+		logger_warn("wait results failed, try again!");
+
 		if (retried) {
 			logger_error("Retried failed");
 			break;
@@ -264,6 +268,7 @@ bool redis_pipeline_channel::handle_messages(void)
 			logger_error("Reopen failed");
 			break;
 		}
+		logger("Connection opened OK, addr=%s", client_->get_addr());
 	}
 
 	all_failed();
