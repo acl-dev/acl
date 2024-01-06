@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "thread_mutex.hpp"
 #include "thread_cond.hpp"
-#include "noncopyable.hpp"
-#include "box.hpp"
 
 namespace acl {
 
@@ -38,13 +36,12 @@ namespace acl {
  */
 
 template<typename T>
-class tbox2 : public box<T> {
+class tbox2 {
 public:
 	/**
 	 * 构造方法
 	 */
-	tbox2()
-	: size_(0), cond_(&lock_) {}
+	tbox2() : size_(0), cond_(&lock_) {}
 
 	~tbox2() {}
 
@@ -52,7 +49,7 @@ public:
 	 * 清理消息队列中未被消费的消息对象
 	 */
 	void clear() {
-		tbox_.clear();
+		box_.clear();
 	}
 
 	/**
@@ -68,7 +65,7 @@ public:
 			abort();
 		}
 
-		tbox_.push_back(t);
+		box_.push_back(t);
 		size_++;
 
 		if (notify_first) {
@@ -146,19 +143,19 @@ private:
 	tbox2(const tbox2&) {}
 	const tbox2& operator=(const tbox2&);
 private:
-	std::list<T> tbox_;
+	std::list<T> box_;
 	size_t       size_;
 	thread_mutex lock_;
 	thread_cond  cond_;
 
 	bool peek(T& t) {
-		typename std::list<T>::iterator it = tbox_.begin();
-		if (it == tbox_.end()) {
+		typename std::list<T>::iterator it = box_.begin();
+		if (it == box_.end()) {
 			return false;
 		}
 		size_--;
 		t = *it;
-		tbox_.erase(it);
+		box_.erase(it);
 		return true;
 	}
 };
