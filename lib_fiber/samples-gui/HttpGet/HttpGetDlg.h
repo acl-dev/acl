@@ -45,6 +45,7 @@ public:
 	afx_msg void OnBnClickedStartGet();
 	afx_msg void OnBnClickedReset();
 	afx_msg void OnBnClickedRadio();
+	afx_msg void OnBnClickedCheckPost();
 
 private:
 	CProgressCtrl m_progress;
@@ -55,6 +56,7 @@ private:
 
 	long long m_length;
 	UINT m_lastPos;
+	BOOL m_usePost;
 
 public:
 	void SetError(const char* fmt, ...);

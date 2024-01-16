@@ -53,6 +53,7 @@ CHttpGetDlg::CHttpGetDlg(CWnd* pParent /*=nullptr*/)
 , m_url("http://www.baidu.com/")
 , m_length(-1)
 , m_lastPos(0)
+, m_usePost(FALSE)
 , m_downType(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
@@ -66,6 +67,7 @@ void CHttpGetDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_REQUEST_HEAD, m_request);
 	DDX_Control(pDX, IDC_RESPONSE, m_response);
 	DDX_Radio(pDX, IDC_RADIO_FIBER, m_downType);
+	DDX_Check(pDX, IDC_CHECK_POST, m_usePost);
 }
 
 BEGIN_MESSAGE_MAP(CHttpGetDlg, CDialogEx)
@@ -78,6 +80,7 @@ BEGIN_MESSAGE_MAP(CHttpGetDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RESET, &CHttpGetDlg::OnBnClickedReset)
 	ON_BN_CLICKED(IDC_RADIO_FIBER, &CHttpGetDlg::OnBnClickedRadio)
 	ON_BN_CLICKED(IDC_RADIO_THREAD, &CHttpGetDlg::OnBnClickedRadio)
+	ON_BN_CLICKED(IDC_CHECK_POST, &CHttpGetDlg::OnBnClickedCheckPost)
 END_MESSAGE_MAP()
 
 
@@ -202,7 +205,7 @@ void CHttpGetDlg::OnBnClickedStartGet()
 		go[=] {
 			CHttpClient client(*this, *url);
 			delete url;
-			client.run();
+			client.run(m_usePost);
 		};
 	} else if (m_downType == HTTP_DOWNLOAD_THREAD) {
 		go[=] {
@@ -308,4 +311,11 @@ void CHttpGetDlg::OnBnClickedRadio()
 	default:
 		break;
 	}
+}
+
+
+void CHttpGetDlg::OnBnClickedCheckPost()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
 }

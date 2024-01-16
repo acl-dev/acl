@@ -18,7 +18,7 @@ CHttpClient::CHttpClient(acl::fiber_tbox<CHttpMsg>& box, const CString& url)
 
 CHttpClient::~CHttpClient() {}
 
-void CHttpClient::run()
+void CHttpClient::run(BOOL usePost)
 {
 	acl::http_url hu;
 	if (!hu.parse(m_url.GetString())) {
@@ -44,6 +44,11 @@ void CHttpClient::run()
 	header.set_url(url.GetString()).accept_gzip(true).set_host(domain);
 
 	acl::string head;
+	if (usePost) {
+		header.set_method(acl::HTTP_METHOD_POST);
+		header.set_content_length(0);
+	}
+
 	header.build_request(head);
 	SetRequestHead(head.c_str());
 
