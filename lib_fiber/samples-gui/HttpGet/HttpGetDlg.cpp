@@ -50,12 +50,24 @@ END_MESSAGE_MAP()
 
 CHttpGetDlg::CHttpGetDlg(CWnd* pParent /*=nullptr*/)
 : CDialogEx(IDD_HTTPGET_DIALOG, pParent)
+, m_dosFp(NULL)
 , m_url("http://www.baidu.com/")
 , m_length(-1)
 , m_lastPos(0)
+, m_usePost(FALSE)
 , m_downType(0)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+	acl::log::stdout_open(true);
+}
+
+CHttpGetDlg::~CHttpGetDlg()
+{
+	if (m_dosFp) {
+		fclose(m_dosFp);
+		m_dosFp = NULL;
+		FreeConsole();
+	}
 }
 
 void CHttpGetDlg::DoDataExchange(CDataExchange* pDX)
@@ -66,6 +78,7 @@ void CHttpGetDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_REQUEST_HEAD, m_request);
 	DDX_Control(pDX, IDC_RESPONSE, m_response);
 	DDX_Radio(pDX, IDC_RADIO_FIBER, m_downType);
+	DDX_Check(pDX, IDC_CHECK_POST, m_usePost);
 }
 
 BEGIN_MESSAGE_MAP(CHttpGetDlg, CDialogEx)
@@ -78,6 +91,9 @@ BEGIN_MESSAGE_MAP(CHttpGetDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_RESET, &CHttpGetDlg::OnBnClickedReset)
 	ON_BN_CLICKED(IDC_RADIO_FIBER, &CHttpGetDlg::OnBnClickedRadio)
 	ON_BN_CLICKED(IDC_RADIO_THREAD, &CHttpGetDlg::OnBnClickedRadio)
+	ON_BN_CLICKED(IDC_CHECK_POST, &CHttpGetDlg::OnBnClickedCheckPost)
+	ON_BN_CLICKED(IDC_BROWSER, &CHttpGetDlg::OnBnClickedBrowser)
+ON_BN_CLICKED(IDC_DOS_OPEN, &CHttpGetDlg::OnBnClickedDosOpen)
 END_MESSAGE_MAP()
 
 
@@ -195,6 +211,9 @@ void CHttpGetDlg::OnBnClickedStartGet()
 		return;
 	}
 
+	CString filePath;
+	GetDlgItem(IDC_FILE)->GetWindowText(filePath);
+
 	m_progress.SetPos(0);
 	m_lastPos = 0;
 
@@ -202,7 +221,7 @@ void CHttpGetDlg::OnBnClickedStartGet()
 		go[=] {
 			CHttpClient client(*this, *url);
 			delete url;
-			client.run();
+			client.run(m_usePost, filePath.IsEmpty() ? NULL : filePath.GetString());
 		};
 	} else if (m_downType == HTTP_DOWNLOAD_THREAD) {
 		go[=] {
@@ -210,7 +229,7 @@ void CHttpGetDlg::OnBnClickedStartGet()
 			std::thread thread([&] {
 				CHttpClient client(box, *url);
 				delete url;
-				client.run();
+				client.run(m_usePost, filePath.IsEmpty() ? NULL : filePath.GetString());
 			});
 
 			thread.detach();
@@ -307,5 +326,47 @@ void CHttpGetDlg::OnBnClickedRadio()
 		break;
 	default:
 		break;
+	}
+}
+
+
+void CHttpGetDlg::OnBnClickedCheckPost()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	UpdateData(TRUE);
+}
+
+
+void CHttpGetDlg::OnBnClickedBrowser()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	CFileDialog file(TRUE,"文件","",OFN_HIDEREADONLY,"FILE(*.*)|*.*||",NULL);
+	if(file.DoModal()==IDOK)
+	{
+		CString pathname;
+
+		pathname=file.GetPathName();
+		GetDlgItem(IDC_FILE)->SetWindowText(pathname);
+		UpdateData(TRUE);
+	}
+}
+
+
+void CHttpGetDlg::OnBnClickedDosOpen()
+{
+	// TODO: 在此添加控件通知处理程序代码
+	if (m_dosFp == NULL) {
+		//GetDlgItem(IDC_OPEN_DOS)->EnableWindow(FALSE);
+		UpdateData();
+		AllocConsole();
+		m_dosFp = freopen("CONOUT$","w+t",stdout);
+		CString info(_T("Close DOS"));
+		GetDlgItem(IDC_DOS_OPEN)->SetWindowText(info);
+	} else {
+		fclose(m_dosFp);
+		m_dosFp = NULL;
+		FreeConsole();
+		CString info(_T("Open DOS"));
+		GetDlgItem(IDC_DOS_OPEN)->SetWindowText(info);
 	}
 }

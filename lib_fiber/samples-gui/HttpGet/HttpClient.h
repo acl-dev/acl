@@ -28,7 +28,7 @@ public:
 	CHttpClient(acl::fiber_tbox<CHttpMsg>& mBox, const CString& url);
 	~CHttpClient();
 
-	void run();
+	void run(BOOL usePost = TRUE, const char *filePath = NULL);
 
 private:
 	CHttpGetDlg* m_hWin;

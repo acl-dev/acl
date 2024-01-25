@@ -15,15 +15,15 @@ class CHttpGetDlg : public CDialogEx
 // 构造
 public:
 	CHttpGetDlg(CWnd* pParent = nullptr);	// 标准构造函数
+	~CHttpGetDlg();
 
 // 对话框数据
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_HTTPGET_DIALOG };
 #endif
 
-	protected:
+protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
-
 
 // 实现
 protected:
@@ -45,8 +45,12 @@ public:
 	afx_msg void OnBnClickedStartGet();
 	afx_msg void OnBnClickedReset();
 	afx_msg void OnBnClickedRadio();
+	afx_msg void OnBnClickedCheckPost();
+	afx_msg void OnBnClickedBrowser();
+	afx_msg void OnBnClickedDosOpen();
 
 private:
+	FILE* m_dosFp;
 	CProgressCtrl m_progress;
 	CString m_url;
 	int m_downType;
@@ -55,6 +59,7 @@ private:
 
 	long long m_length;
 	UINT m_lastPos;
+	BOOL m_usePost;
 
 public:
 	void SetError(const char* fmt, ...);

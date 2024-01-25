@@ -21,6 +21,11 @@
 #define IDC_RADIO_FIBER                 1009
 #define IDC_RADIO2                      1010
 #define IDC_RADIO_THREAD                1010
+#define IDC_CHECK_POST                  1011
+#define IDC_FILE                        1012
+#define IDC_BROWSER                     1013
+#define IDC_BUTTON3                     1014
+#define IDC_DOS_OPEN                    1014
 
 // Next default values for new objects
 // 
@@ -28,7 +33,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1011
+#define _APS_NEXT_CONTROL_VALUE         1015
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
