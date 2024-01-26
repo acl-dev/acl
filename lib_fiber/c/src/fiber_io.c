@@ -432,8 +432,10 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	/* If the reader fiber has been set in ready status when the
 	 * other fiber killed the reader fiber, the reader fiber should
 	 * not be set in ready queue again.
+	 * We should check if fe->fiber_r is NULL, which maybe set NULL if
+	 * the other fiber acl_fiber_kill() the fiber_r before.
 	 */
-	if (fe->fiber_r->status != FIBER_STATUS_READY) {
+	if (fe->fiber_r && fe->fiber_r->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(fe->fiber_r);
 	}
 }
@@ -497,7 +499,7 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	 * other fiber killed the writer fiber, the writer fiber should
 	 * not be set in ready queue again.
 	 */
-	if (fe->fiber_w->status != FIBER_STATUS_READY) {
+	if (fe->fiber_w && fe->fiber_w->status != FIBER_STATUS_READY) {
 		acl_fiber_ready(fe->fiber_w);
 	}
 }

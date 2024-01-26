@@ -925,9 +925,9 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 
 	ret = acl_read_fd(ACL_VSTREAM_SOCK(conn), buf, sizeof(buf) - 1, &fd);
 	if (ret <= 0 || fd < 0) {
-		acl_msg_warn("%s(%d), %s: read from master_dispatch(%s) error",
+		acl_msg_warn("%s(%d), %s: read from master_dispatch(%s) error %s",
 			__FUNCTION__, __LINE__, myname,
-			acl_var_aio_dispatch_addr);
+			acl_var_aio_dispatch_addr, acl_last_serror());
 
 		acl_event_disable_read(event, conn);
 		acl_vstream_close(conn);
