@@ -61,7 +61,7 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg)
 bool redis_pipeline_channel::flush_all(void)
 {
 	if (msgs_.empty()) {
-		logger("The messages are empty!");
+		//logger("The messages are empty!");
 		return true;
 	}
 
