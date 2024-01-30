@@ -45,10 +45,9 @@ Architecture diagram:
 * [5. More about](#5-more-about)
     * [5.1. Samples](#51-samples)
     * [5.2. FAQ](#52-faq)
-    * [5.3. Who are using acl?](#53-who-are-using-acl)
-    * [5.4. License](#54-license)
-    * [5.5. Reference](#55-reference)
-    * [5.6. Thanks](#56-thanks)
+    * [5.3. License](#53-license)
+    * [5.4. Reference](#54-reference)
+    * [5.5. Thanks](#55-thanks)
 
 <hr>
 
@@ -420,26 +419,16 @@ There are a lot of examples in the acl library for reference, please refer to: [
 ## 5.2. FAQ
 If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 
-## 5.3. Who are using acl?
-[![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
-[![263](res/logo/logo_263.png)](http://www.263.net/)
-[![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
-[![v1](res/logo/logo_v1.png)](http://www.v1.cn/)
-[![ksyun](res/logo/logo_ksyun.png)](https://www.ksyun.com/)
-[![weibangong](res/logo/logo_weibangong.png)](https://www.weibangong.com/)
-[![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
-[![foundao](res/logo/logo_foundao.png)](http://www.foundao.com/)
-
-## 5.4. License
+## 5.3. License
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
-## 5.5. Reference
+## 5.4. Reference
 - Web site: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
 - Gitee:    https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
 - QQ Group: 705290654
 
-## 5.6. Thanks
+## 5.5. Thanks
 
-Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a> for the supporting of Acl development.
+Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a>.

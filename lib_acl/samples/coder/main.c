@@ -72,11 +72,26 @@ static void crc32_encode(const char *ptr, size_t len)
 	printf("hash result: %u\r\n", hash);
 }
 
+static char *load_from(const char *filename)
+{
+	char *data = acl_vstream_loadfile(filename);
+	char *ptr = strchr(data, '\r');
+	if (ptr == NULL) {
+		ptr = strchr(data, '\n');
+	}
+	if (ptr) {
+		*ptr = 0;
+	}
+	return data;
+}
+
 static void usage(const char *prog)
 {
 	printf("usage: %s -s string\r\n"
 		" -a action[default: encode, encode|decode]\r\n"
 		" -t type [default: base64, base64|bin|crc32]\r\n"
+		" -f filename\r\n"
+		" -s string\r\n"
 		" -V [verbose]\r\n"
 		" -h help]\n", prog);
 }
@@ -95,10 +110,13 @@ int main(int argc, char *argv[])
 		exit (1);
 	}
 
-	while ((ch = getopt(argc, argv, "s:a:t:hV")) > 0) {
+	while ((ch = getopt(argc, argv, "s:f:a:t:hV")) > 0) {
 		switch (ch) {
 		case 's':
-			buf = strdup(optarg);
+			buf = acl_mystrdup(optarg);
+			break;
+		case 'f':
+			buf = load_from(optarg);
 			break;
 		case 'a':
 			if (strcasecmp(optarg, "decode") == 0) {
@@ -153,7 +171,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (buf) {
-		free(buf);
+		acl_myfree(buf);
 	}
 
 #if 0
