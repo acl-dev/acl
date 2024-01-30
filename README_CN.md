@@ -49,9 +49,8 @@
     * [3.5、图例](#35图例)
     * [3.6、acl 库中有大量示例可供参考，请参考：SAMPLES.md](#36acl-库中有大量示例可供参考请参考samplesmd)
     * [3.7、acl 使用 FAQ](#37acl-使用-faq-参考-faqmd)
-* [四、谁在使用acl](#四谁在使用acl)
-* [五、使用许可](#五使用许可)
-* [六、参考](#六参考)
+* [四、使用许可](#四使用许可)
+* [五、参考](#五参考)
 
 <!-- vim-markdown-toc -->
 
@@ -305,20 +304,10 @@ acl 工程是一个跨平台（支持LINUX，WIN32，Solaris，MacOS，FreeBSD�
 ### 3.6、acl 库中有大量示例可供参考，请参考：[SAMPLES.md](SAMPLES.md)
 ### 3.7、acl 使用 FAQ 参考 [FAQ.md](FAQ.md)
 
-## 四、谁在使用acl
-[![iqiyi](res/logo/logo_iqiyi.png)](http://www.iqiyi.com/)
-[![263](res/logo/logo_263.png)](http://www.263.net/)
-[![hexun](res/logo/logo_hexun.png)](http://www.hexun.com/)
-[![v1](res/logo/logo_v1.png)](http://www.v1.cn/)
-[![ksyun](res/logo/logo_ksyun.png)](https://www.ksyun.com/)
-[![weibangong](res/logo/logo_weibangong.png)](https://www.weibangong.com/)
-[![xianyou](res/logo/logo_xianyou.png)](http://www.i3game.com/)
-[![foundao](res/logo/logo_foundao.png)](http://www.foundao.com/)
-
-## 五、使用许可
+## 四、使用许可
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
-## 六、参考
+## 五、参考
 - WEB 站点: https://blog.csdn.net/zsxxsz
 - Github:   https://github.com/acl-dev/acl
 - Gitee:    https://gitee.com/acl-dev/acl
