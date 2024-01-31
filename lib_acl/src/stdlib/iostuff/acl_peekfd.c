@@ -37,9 +37,11 @@ int acl_peekfd(ACL_SOCKET fd)
 	 * Anticipate a series of system-dependent code fragments.
 	 */
 #ifdef ACL_UNIX
-	return (ioctl(fd, FIONREAD, (char *) &count) < 0 ? -1 : count);
+	return ioctl(fd, FIONREAD, (char *) &count) < 0 ? -1 : count;
 #elif defined(ACL_WINDOWS)
-	return (ioctlsocket(fd, FIONREAD, (unsigned long *) &count) < 0
-		? -1 : count);
+	return ioctlsocket(fd, FIONREAD, (unsigned long *) &count) < 0
+		? -1 : count;
+#else
+	return 0;
 #endif
 }

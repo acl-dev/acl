@@ -923,9 +923,6 @@ static void dispatch_receive(int event_type acl_unused, ACL_EVENT *event,
 		acl_msg_fatal("%s(%d), %s: conn invalid",
 			__FUNCTION__, __LINE__, myname);
 
-	/* XXX: Must reset the read_ready flag been set in event trigger */
-	conn->read_ready = 0;
-
 	ret = acl_read_fd(ACL_VSTREAM_SOCK(conn), buf, sizeof(buf) - 1, &fd);
 	if (ret <= 0 || fd < 0) {
 		acl_msg_warn("%s(%d), %s: read from master_dispatch(%s) error %s",
