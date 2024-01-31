@@ -29,14 +29,19 @@ void event_check_fds(ACL_EVENT *ev)
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
-			} else if (fdp->stream->read_ready && !fdp->listener) {
+			} else if (fdp->stream->read_ready && !fdp->listener
+				 && acl_peekfd(ACL_VSTREAM_SOCK(fdp->stream)) > 0) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
 			} else if (fdp->r_ttl > 0 && ev->present > fdp->r_ttl) {
+				fdp->stream->read_ready = 0;
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
+			} else {
+
+				fdp->stream->read_ready = 0;
 			}
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 			if (fdp->w_ttl > 0 && ev->present > fdp->w_ttl) {
@@ -68,7 +73,11 @@ int event_prepare(ACL_EVENT *ev)
 			fdp->fdidx_ready = ev->ready_cnt;
 			ev->ready[ev->ready_cnt++] = fdp;
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)) {
-			if (fdp->stream->read_ready && !fdp->listener) {
+			/* If the read_ready has been set, we should check
+			 * if the fd can be readable first.
+			 */
+			if (fdp->stream->read_ready && !fdp->listener
+				 && acl_peekfd(sockfd) > 0) {
 				fdp->event_type |= ACL_EVENT_READ;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
@@ -78,11 +87,14 @@ int event_prepare(ACL_EVENT *ev)
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
 			} else if (fdp->r_ttl > 0 && ev->present > fdp->r_ttl) {
+				fdp->stream->read_ready = 0;
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
 				fdp->fdidx_ready = ev->ready_cnt;
 				ev->ready[ev->ready_cnt++] = fdp;
-			} else
+			} else {
+				fdp->stream->read_ready = 0;
 				nwait++;
+			}
 		} else if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)) {
 			if (fdp->w_ttl > 0 && ev->present > fdp->w_ttl) {
 				fdp->event_type |= ACL_EVENT_RW_TIMEOUT;
