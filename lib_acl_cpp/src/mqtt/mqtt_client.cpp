@@ -21,14 +21,16 @@ mqtt_client::mqtt_client(socket_stream& conn)
 {
 }
 
-mqtt_client::~mqtt_client(void) { delete conn_internal_; }
+mqtt_client::~mqtt_client() {
+	delete conn_internal_;
+}
 
-bool mqtt_client::open(void) {
+bool mqtt_client::open() {
 	if (conn_->opened()) {
 		return true;
 	}
 
-	if (!conn_->open(addr_, conn_timeout_, rw_timeout_)) {
+	if (!conn_->open(addr_.c_str(), conn_timeout_, rw_timeout_)) {
 		logger_error("connect redis %s error: %s",
 			addr_.c_str(), last_serror());
 		return false;
@@ -67,7 +69,7 @@ bool mqtt_client::send(mqtt_message& message) {
 	return true;
 }
 
-mqtt_message* mqtt_client::get_message(void) {
+mqtt_message* mqtt_client::get_message() {
 	mqtt_header header(MQTT_RESERVED_MIN);
 
 	if (!read_header(header)) {
