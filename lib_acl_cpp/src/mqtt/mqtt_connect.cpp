@@ -19,7 +19,7 @@ enum {
 	MQTT_STAT_WILL_MSG_VAL,
 };
 
-mqtt_connect::mqtt_connect(void)
+mqtt_connect::mqtt_connect()
 : mqtt_message(MQTT_CONNECT)
 , finished_(false)
 , dlen_(0)
@@ -41,7 +41,7 @@ mqtt_connect::mqtt_connect(const mqtt_header& header)
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
-mqtt_connect::~mqtt_connect(void) {}
+mqtt_connect::~mqtt_connect() {}
 
 void mqtt_connect::set_keep_alive(unsigned short keep_alive) {
 	keep_alive_ = keep_alive;
@@ -97,11 +97,11 @@ void mqtt_connect::set_will_msg(const char* msg) {
 	}
 }
 
-void mqtt_connect::clean_session(void) {
+void mqtt_connect::clean_session() {
 	conn_flags_ |= 0x02;
 }
 
-bool mqtt_connect::has_session(void) const {
+bool mqtt_connect::has_session() const {
 	return conn_flags_ & 0x02 ? true : false;
 }
 

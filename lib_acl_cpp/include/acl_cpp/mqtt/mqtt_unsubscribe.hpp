@@ -13,7 +13,7 @@ public:
 	 * constructor for creating MQTT_PUBACK mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_unsubscribe(void);
+	mqtt_unsubscribe();
 
 	/**
 	 * constructor for creating MQTT_PUBACK mqtt message object.
@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_unsubscribe(const mqtt_header& header);
 
-	~mqtt_unsubscribe(void);
+	~mqtt_unsubscribe();
 
 	/**
 	 * set the message id.
@@ -39,9 +39,9 @@ public:
 
 	/**
 	 * get all the topics.
-	 * @return {const std::vector<string>&}
+	 * @return {const std::vector<std::string>&}
 	 */
-	const std::vector<string>& get_topics(void) const {
+	const std::vector<std::string>& get_topics() const {
 		return topics_;
 	}
 
@@ -53,7 +53,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -65,18 +65,18 @@ public:
 	int update_topic_val(const char* data, int dlen);
 
 private:
-	unsigned status_;
-	bool finished_;
+	unsigned short  pkt_id_;
 	char buff_[2];
 	unsigned dlen_;
+	unsigned status_;
 
-	unsigned short  pkt_id_;
-	std::vector<string> topics_;
+	std::vector<std::string> topics_;
 
 	unsigned body_len_;
 	unsigned nread_;
 
-	string topic_;
+	std::string topic_;
+	bool finished_;
 };
 
 } // namespace acl

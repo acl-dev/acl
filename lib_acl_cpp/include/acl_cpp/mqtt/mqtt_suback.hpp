@@ -14,7 +14,7 @@ public:
 	 * constructor for creating MQTT_SUBACK mqtt message object.
 	 * @see mqtt_ack
 	 */
-	mqtt_suback(void);
+	mqtt_suback();
 
 	/**
 	 * constructor for creating MQTT_SUBACK mqtt message object.
@@ -22,7 +22,7 @@ public:
 	 */
 	mqtt_suback(const mqtt_header& header);
 
-	~mqtt_suback(void);
+	~mqtt_suback();
 
 	/**
 	 * set the messsage's id.
@@ -49,7 +49,7 @@ public:
 	 * get the messsage's id.
 	 * @return {unsigned short} some error happened if return 0.
 	 */
-	unsigned short get_pkt_id(void) const {
+	unsigned short get_pkt_id() const {
 		return pkt_id_;
 	}
 
@@ -57,7 +57,7 @@ public:
 	 * get all qoses of the topics.
 	 * @return {const std::vector<mqtt_qos_t>&}
 	 */
-	const std::vector<mqtt_qos_t>& get_qoses(void) const {
+	const std::vector<mqtt_qos_t>& get_qoses() const {
 		return qoses_;
 	}
 
@@ -69,7 +69,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -80,16 +80,16 @@ public:
 	int update_topic_qos(const char* data, int dlen);
 
 private:
-	unsigned status_;
-	bool finished_;
+	unsigned short pkt_id_;
 	char buff_[2];
 	unsigned dlen_;
+	unsigned status_;
 
-	unsigned short pkt_id_;
 	std::vector<mqtt_qos_t> qoses_;
 
 	unsigned body_len_;
 	unsigned nread_;
+	bool finished_;
 };
 
 } // namespace acl

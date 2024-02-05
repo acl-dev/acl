@@ -51,7 +51,7 @@ void mqtt_message::pack_add(unsigned short n, string& out) {
 	out.append(&ch, 1);
 }
 
-void mqtt_message::pack_add(const string& s, string& out) {
+void mqtt_message::pack_add(const std::string& s, string& out) {
 	unsigned short n = (unsigned short) s.size();
 
 	unsigned char ch = MOSQ_MSB(n);
@@ -61,7 +61,7 @@ void mqtt_message::pack_add(const string& s, string& out) {
 	out.append(&ch, 1);
 
 	if (n > 0) {
-		out += s;
+		out.append(s.c_str(), s.size());
 	}
 }
 

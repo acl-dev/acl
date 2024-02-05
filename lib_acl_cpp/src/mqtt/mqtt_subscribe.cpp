@@ -12,29 +12,29 @@ enum {
 	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_subscribe::mqtt_subscribe(void)
+mqtt_subscribe::mqtt_subscribe()
 : mqtt_message(MQTT_SUBSCRIBE)
-, finished_(false)
-, dlen_(0)
 , pkt_id_(0)
+, dlen_(0)
 , body_len_(0)
 , nread_(0)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
 }
 
 mqtt_subscribe::mqtt_subscribe(const mqtt_header& header)
 : mqtt_message(MQTT_SUBSCRIBE)
-, finished_(false)
-, dlen_(0)
 , pkt_id_(0)
+, dlen_(0)
 , nread_(0)
+, finished_(false)
 {
 	status_   = MQTT_STAT_HDR_VAR; /* just for update */
 	body_len_ = header.get_remaining_length();
 }
 
-mqtt_subscribe::~mqtt_subscribe(void) {}
+mqtt_subscribe::~mqtt_subscribe() {}
 
 mqtt_subscribe& mqtt_subscribe::set_pkt_id(unsigned short id) {
 	if (id > 0) {

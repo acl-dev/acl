@@ -13,7 +13,7 @@ public:
 	 * constructor for creating MQTT_PUBREC mqtt message object.
 	 * @see mqtt_ack
 	 */
-	mqtt_pubrec(void);
+	mqtt_pubrec();
 
 	/**
 	 * constructor for creating MQTT_PUBREC mqtt message object.
@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_pubrec(const mqtt_header& header);
 
-	~mqtt_pubrec(void);
+	~mqtt_pubrec();
 };
 
 } // namespace acl

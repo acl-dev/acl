@@ -11,29 +11,29 @@ enum {
 	MQTT_STAT_TOPIC_VAL,
 };
 
-mqtt_unsubscribe::mqtt_unsubscribe(void)
+mqtt_unsubscribe::mqtt_unsubscribe()
 : mqtt_message(MQTT_UNSUBSCRIBE)
-, finished_(false)
-, dlen_(0)
 , pkt_id_(0)
+, dlen_(0)
 , body_len_(0)
 , nread_(0)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
 }
 
 mqtt_unsubscribe::mqtt_unsubscribe(const mqtt_header& header)
 : mqtt_message(header)
-, finished_(false)
-, dlen_(0)
 , pkt_id_(0)
+, dlen_(0)
 , nread_(0)
+, finished_(false)
 {
 	status_   = MQTT_STAT_HDR_VAR; /* just for update */
 	body_len_ = header.get_remaining_length();
 }
 
-mqtt_unsubscribe::~mqtt_unsubscribe(void) {}
+mqtt_unsubscribe::~mqtt_unsubscribe() {}
 
 mqtt_unsubscribe& mqtt_unsubscribe::set_pkt_id(unsigned short id) {
 	if (id > 0) {

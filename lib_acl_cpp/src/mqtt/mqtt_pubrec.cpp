@@ -5,7 +5,7 @@
 
 namespace acl {
 
-mqtt_pubrec::mqtt_pubrec(void)
+mqtt_pubrec::mqtt_pubrec()
 : mqtt_ack(MQTT_PUBREC)
 {
 }
@@ -15,6 +15,6 @@ mqtt_pubrec::mqtt_pubrec(const mqtt_header& header)
 {
 }
 
-mqtt_pubrec::~mqtt_pubrec(void) {}
+mqtt_pubrec::~mqtt_pubrec() {}
 
 } // namespace acl

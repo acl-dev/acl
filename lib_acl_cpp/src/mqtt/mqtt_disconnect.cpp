@@ -5,7 +5,7 @@
 
 namespace acl {
 
-mqtt_disconnect::mqtt_disconnect(void)
+mqtt_disconnect::mqtt_disconnect()
 : mqtt_message(MQTT_DISCONNECT)
 {
 }
@@ -15,7 +15,7 @@ mqtt_disconnect::mqtt_disconnect(const mqtt_header& header)
 {
 }
 
-mqtt_disconnect::~mqtt_disconnect(void) {}
+mqtt_disconnect::~mqtt_disconnect() {}
 
 bool mqtt_disconnect::to_string(string& out) {
 	mqtt_header& header = this->get_header();

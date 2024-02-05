@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_ack(const mqtt_header& header);
 
-	virtual ~mqtt_ack(void);
+	virtual ~mqtt_ack();
 
 	/**
 	 * set the mqtt message's id.
@@ -33,7 +33,7 @@ public:
 	 * get the mqtt message's id
 	 * @return {unsigned short} if some error happened, 0 will be returned.
 	 */
-	unsigned short get_pkt_id(void) const {
+	unsigned short get_pkt_id() const {
 		return pkt_id_;
 	}
 
@@ -45,7 +45,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -54,12 +54,11 @@ public:
 	int update_header_var(const char* data, int dlen);
 
 private:
-	unsigned status_;
-	bool finished_;
+	unsigned short pkt_id_;
 	char hbuf_[2];
 	unsigned hlen_;
-
-	unsigned short pkt_id_;
+	unsigned status_;
+	bool finished_;
 };
 
 } // namespace acl

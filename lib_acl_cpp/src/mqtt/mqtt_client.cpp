@@ -62,6 +62,7 @@ bool mqtt_client::send(mqtt_message& message) {
 		if (!addr_.empty()) {
 			conn_->close();
 		}
+
 		//logger_error("send message error=%s", last_serror());
 		return false;
 	}

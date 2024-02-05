@@ -18,7 +18,7 @@ mqtt_aclient::mqtt_aclient(aio_handle& handle, sslbase_conf* ssl_conf)
 	header_ = NEW mqtt_header(MQTT_RESERVED_MIN);
 }
 
-mqtt_aclient::~mqtt_aclient(void) {
+mqtt_aclient::~mqtt_aclient() {
 	delete header_;
 	delete body_;
 }
@@ -64,7 +64,7 @@ bool mqtt_aclient::open(aio_socket_stream* conn) {
 
 }
 
-void mqtt_aclient::close(void) {
+void mqtt_aclient::close() {
 	if (conn_) {
 		conn_->close();
 	}
@@ -141,7 +141,7 @@ bool mqtt_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	sslbase_io* ssl_io = ssl_conf_->create(true);
 
 	if (!host_.empty()) {
-		ssl_io->set_sni_host(host_);
+		ssl_io->set_sni_host(host_.c_str());
 	}
 
 	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
@@ -165,7 +165,7 @@ int mqtt_aclient::connect_callback(const ACL_ASTREAM_CTX* ctx) {
 	return me->handle_connect(ctx) ? 0 : -1;
 }
 
-bool mqtt_aclient::open_done(void) {
+bool mqtt_aclient::open_done() {
 	if (!this->on_open()) {
 		return false;
 	}
@@ -174,20 +174,20 @@ bool mqtt_aclient::open_done(void) {
 	return message_await();
 }
 
-bool mqtt_aclient::timeout_callback(void) {
+bool mqtt_aclient::timeout_callback() {
 	return this->on_read_timeout();
 }
 
-void mqtt_aclient::close_callback(void) {
+void mqtt_aclient::close_callback() {
 	this->on_disconnect();
 	this->destroy();
 }
 
-bool mqtt_aclient::read_wakeup(void) {
+bool mqtt_aclient::read_wakeup() {
 	return handle_ssl_handshake();
 }
 
-bool mqtt_aclient::handle_ssl_handshake(void) {
+bool mqtt_aclient::handle_ssl_handshake() {
 	sslbase_io* ssl_io = (sslbase_io*) conn_->get_hook();
 	if (ssl_io == NULL) {
 		logger_error("no ssl_io hooked!");
@@ -234,7 +234,7 @@ bool mqtt_aclient::send(mqtt_message& message) {
 	return true;
 }
 
-bool mqtt_aclient::message_await(void) {
+bool mqtt_aclient::message_await() {
 	if (conn_) {
 		conn_->keep_read(true);
 		conn_->add_read_callback(this);
@@ -318,4 +318,5 @@ int mqtt_aclient::handle_data(char* data, int len) {
 
 	return left;
 }
+
 } // namespace acl

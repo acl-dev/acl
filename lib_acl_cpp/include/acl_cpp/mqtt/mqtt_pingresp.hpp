@@ -13,7 +13,7 @@ public:
 	 * constructor for creating MQTT_PINGRESP mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_pingresp(void);
+	mqtt_pingresp();
 
 	/**
 	 * constructor for creating MQTT_PINGRESP mqtt message object.
@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_pingresp(const mqtt_header& header);
 
-	~mqtt_pingresp(void);
+	~mqtt_pingresp();
 
 protected:
 	// @override
@@ -32,7 +32,7 @@ protected:
 		return dlen;
 	}
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return true;
 	}
 };

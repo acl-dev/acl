@@ -5,7 +5,7 @@
 
 namespace acl {
 
-mqtt_pingresp::mqtt_pingresp(void)
+mqtt_pingresp::mqtt_pingresp()
 : mqtt_message(MQTT_PINGRESP)
 {
 }
@@ -15,7 +15,7 @@ mqtt_pingresp::mqtt_pingresp(const mqtt_header& header)
 {
 }
 
-mqtt_pingresp::~mqtt_pingresp(void) {}
+mqtt_pingresp::~mqtt_pingresp() {}
 
 bool mqtt_pingresp::to_string(string& out) {
 	mqtt_header& header = this->get_header();

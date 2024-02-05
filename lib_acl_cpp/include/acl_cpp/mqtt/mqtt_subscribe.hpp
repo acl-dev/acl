@@ -13,7 +13,7 @@ public:
 	 * constructor for creating MQTT_SUBSCRIBE mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_subscribe(void);
+	mqtt_subscribe();
 
 	/**
 	 * constructor for creating MQTT_SUBSCRIBE mqtt message object.
@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_subscribe(const mqtt_header& header);
 
-	~mqtt_subscribe(void);
+	~mqtt_subscribe();
 
 	/**
 	 * set message's id
@@ -42,15 +42,15 @@ public:
 	 * get the messsage's id.
 	 * @return {unsigned short} should return the value that > 0 && <= 65535.
 	 */
-	unsigned short get_pkt_id(void) const {
+	unsigned short get_pkt_id() const {
 		return pkt_id_;
 	}
 
 	/**
 	 * get all the topics.
-	 * @return {const std::vector<string>&}
+	 * @return {const std::vector<std::string>&}
 	 */
-	const std::vector<string>& get_topics(void) const {
+	const std::vector<std::string>& get_topics() const {
 		return topics_;
 	}
 
@@ -58,7 +58,7 @@ public:
 	 * get all the qoses of all topics.
 	 * @return {const std::vector<mqtt_qos_t>&}
 	 */
-	const std::vector<mqtt_qos_t>& get_qoses(void) const {
+	const std::vector<mqtt_qos_t>& get_qoses() const {
 		return qoses_;
 	}
 
@@ -70,7 +70,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -83,19 +83,19 @@ public:
 	int update_topic_qos(const char* data, int dlen);
 
 private:
-	unsigned status_;
-	bool finished_;
-	char buff_[2];
+	unsigned short pkt_id_;
+	char     buff_[2];
 	unsigned dlen_;
+	unsigned status_;
 
-	unsigned short          pkt_id_;
-	std::vector<string>     topics_;
-	std::vector<mqtt_qos_t> qoses_;
+	std::vector<std::string> topics_;
+	std::vector<mqtt_qos_t>  qoses_;
 
 	unsigned body_len_;
 	unsigned nread_;
 
-	string topic_;
+	std::string topic_;
+	bool finished_;
 };
 
 } // namespace acl

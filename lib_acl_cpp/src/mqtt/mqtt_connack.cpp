@@ -11,27 +11,27 @@ enum {
 
 mqtt_connack::mqtt_connack(void)
 : mqtt_message(MQTT_CONNACK)
-, finished_(false)
 , dlen_(0)
-, session_(false)
 , conn_flags_(0)
 , connack_code_(MQTT_CONNACK_OK)
+, session_(false)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
 mqtt_connack::mqtt_connack(const mqtt_header& header)
 : mqtt_message(header)
-, finished_(false)
 , dlen_(0)
-, session_(false)
 , conn_flags_(0)
 , connack_code_(MQTT_CONNACK_OK)
+, session_(false)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
-mqtt_connack::~mqtt_connack(void) {}
+mqtt_connack::~mqtt_connack() {}
 
 mqtt_connack& mqtt_connack::set_session(bool on) {
 	session_ = on;

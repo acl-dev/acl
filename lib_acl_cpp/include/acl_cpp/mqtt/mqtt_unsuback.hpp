@@ -13,7 +13,7 @@ public:
 	 * constructor for creating MQTT_UNPUBACK mqtt message object.
 	 * @see mqtt_ack
 	 */
-	mqtt_unsuback(void);
+	mqtt_unsuback();
 
 	/**
 	 * constructor for creating MQTT_UNPUBACK mqtt message object.
@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_unsuback(const mqtt_header& header);
 
-	~mqtt_unsuback(void);
+	~mqtt_unsuback();
 };
 
 } // namespace acl
