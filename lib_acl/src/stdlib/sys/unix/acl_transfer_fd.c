@@ -57,14 +57,9 @@ int acl_read_fd(int fd, void *ptr, int nbytes, int *recv_fd)
 	struct iovec iov[1];
 	int n;
 #if defined(HAVE_MSGHDR_MSG_CONTROL) && !defined(MINGW)
-	const char *myname = "acl_read_fd";
 	union {
 		struct cmsghdr cm;
-	# ifdef	ACL_MACOSX
-		char   control[1024];
-	# else
 		char   control[CMSG_SPACE(sizeof(int))];
-	# endif
 	} control_un;
 
 	struct cmsghdr *cmptr;
@@ -97,10 +92,10 @@ int acl_read_fd(int fd, void *ptr, int nbytes, int *recv_fd)
 	{
 		if (cmptr->cmsg_level != SOL_SOCKET)
 			acl_msg_fatal("%s: control level != SOL_SOCKET",
-				myname);
+				__FUNCTION__);
 		if (cmptr->cmsg_type != SCM_RIGHTS)
 			acl_msg_fatal("%s: control type != SCM_RIGHTS",
-				myname);
+				__FUNCTION__);
 #if 0
 		*recv_fd = *((int *) CMSG_DATA(cmptr));
 #else
@@ -129,11 +124,7 @@ int acl_write_fd(int fd, void *ptr, int nbytes, int send_fd)
 	int *fdptr;
 	union {
 		struct cmsghdr cm;
-	# ifdef	ACL_MACOSX
-		char   control[1024];
-	# else
 		char   control[CMSG_SPACE(sizeof(int))];
-	# endif
 	} control_un;
 
 	msg.msg_control = control_un.control;

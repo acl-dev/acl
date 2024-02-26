@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../stdlib/string.hpp"
+#include <string>
 #include "../connpool/connect_client.hpp"
 #include "../stream/socket_stream.hpp"
 
@@ -30,7 +30,7 @@ public:
 	 */
 	mqtt_client(acl::socket_stream& conn);
 
-	~mqtt_client(void);
+	~mqtt_client();
 
 	/**
 	 * send ont mqtt message to the peer mqtt.
@@ -46,7 +46,7 @@ public:
 	 * mqtt message object with the mqtt type from mqtt header.
 	 * @return {mqtt_message*} return NULL if reading error or data invalid.
 	 */
-	mqtt_message* get_message(void);
+	mqtt_message* get_message();
 
 public:
 	/**
@@ -68,16 +68,16 @@ public:
 	 * get the socket_stream with the current mqtt_client object
 	 * @return {sock_stream*} return NULL if no connection opened.
 	 */
-	socket_stream* sock_stream(void) const {
+	socket_stream* sock_stream() const {
 		return conn_;
 	}
 
 protected:
 	// @override
-	bool open(void);
+	bool open();
 
 private:
-	string addr_;
+	std::string addr_;
 	int conn_timeout_;
 	int rw_timeout_;
 

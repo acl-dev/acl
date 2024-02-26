@@ -11,23 +11,23 @@ enum {
 
 mqtt_ack::mqtt_ack(mqtt_type_t type)
 : mqtt_message(type)
-, finished_(false)
-, hlen_(0)
 , pkt_id_(0)
+, hlen_(0)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
 mqtt_ack::mqtt_ack(const mqtt_header& header)
 : mqtt_message(header)
-, finished_(false)
-, hlen_(0)
 , pkt_id_(0)
+, hlen_(0)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
-mqtt_ack::~mqtt_ack(void) {}
+mqtt_ack::~mqtt_ack() {}
 
 void mqtt_ack::set_pkt_id(unsigned short id) {
 	if (id > 0) {

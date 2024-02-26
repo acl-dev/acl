@@ -5,7 +5,7 @@
 
 namespace acl {
 
-mqtt_puback::mqtt_puback(void)
+mqtt_puback::mqtt_puback()
 : mqtt_ack(MQTT_PUBACK)
 {
 }
@@ -15,6 +15,6 @@ mqtt_puback::mqtt_puback(const mqtt_header& header)
 {
 }
 
-mqtt_puback::~mqtt_puback(void) {}
+mqtt_puback::~mqtt_puback() {}
 
 } // namespace acl

@@ -50,12 +50,12 @@ enum {
 };
 
 mqtt_header::mqtt_header(mqtt_type_t type)
-: status_(MQTT_STAT_HDR_TYPE)
-, finished_(false)
+: hlen_(0)
+, dlen_(0)
+, status_(MQTT_STAT_HDR_TYPE)
 , type_(type)
 , hflags_(0)
-, dlen_(0)
-, hlen_(0)
+, finished_(false)
 {
 	assert(type >= MQTT_RESERVED_MIN && type < MQTT_RESERVED_MAX);
 	if (__constrains[type].id == MQTT_NEED) {
@@ -63,9 +63,9 @@ mqtt_header::mqtt_header(mqtt_type_t type)
 }
 
 mqtt_header::mqtt_header(const mqtt_header& header)
-: status_(MQTT_STAT_HDR_TYPE)
+: hlen_(0)
+, status_(MQTT_STAT_HDR_TYPE)
 , finished_(false)
-, hlen_(0)
 {
 	type_   = header.get_type();
 	hflags_ = header.get_header_flags();

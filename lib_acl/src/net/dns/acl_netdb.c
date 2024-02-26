@@ -350,6 +350,7 @@ ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
 		ACL_SOCKADDR *sa = (ACL_SOCKADDR *) res->ai_addr;
 		ACL_HOSTNAME *h_host;
 		char ip[64];
+		int port = 0;
 
 		memset(&saddr, 0, sizeof(saddr));
 		saddr.sa.sa_family = res->ai_family;
@@ -361,6 +362,7 @@ ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
 			}
 			memcpy(&saddr.in.sin_addr, &sa->in.sin_addr,
 				sizeof(saddr.in.sin_addr));
+			port = sa->in.sin_port;
 #ifdef AF_INET6
 		} else if (res->ai_family == AF_INET6) {
 			if (inet_ntop(res->ai_family, &sa->in6.sin6_addr,
@@ -370,6 +372,7 @@ ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
 			}
 			memcpy(&saddr.in6.sin6_addr, &sa->in6.sin6_addr,
 				sizeof(saddr.in6.sin6_addr));
+			port = sa->in6.sin6_port;
 #endif
 		} else {
 			continue;
@@ -378,7 +381,7 @@ ACL_DNS_DB *acl_gethostbyname2(const char *name, int socktype,
 		h_host = (ACL_HOSTNAME*) acl_mycalloc(1, sizeof(ACL_HOSTNAME));
 		memcpy(&h_host->saddr, &saddr, sizeof(h_host->saddr));
 		ACL_SAFE_STRNCPY(h_host->ip, ip, sizeof(h_host->ip));
-		h_host->hport = 0;
+		h_host->hport = ntohs(port);
 
 		(void) acl_array_append(db->h_db, h_host);
 		db->size++;

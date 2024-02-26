@@ -63,7 +63,7 @@ class mqtt_client : public acl::mqtt_aclient {
 public:
 	mqtt_client(acl::aio_handle& handle, mqtt_manager& manager);
 
-	const std::set<acl::string>& get_topics(void) const {
+	const std::set<std::string>& get_topics(void) const {
 		return topics_;
 	}
 
@@ -90,7 +90,7 @@ protected:
 
 private:
 	mqtt_manager& manager_;
-	std::set<acl::string> topics_;
+	std::set<std::string> topics_;
 
 	bool handle_connect(const acl::mqtt_message& body);
 	bool handle_subscribe(const acl::mqtt_message& body);
@@ -165,15 +165,15 @@ bool mqtt_manager::add(const char* topic, mqtt_client* client) {
 }
 
 bool mqtt_manager::del(mqtt_client* client) {
-	const std::set<acl::string>& topics = client->get_topics();
+	const std::set<std::string>& topics = client->get_topics();
 	if (topics.empty()) {
 		printf("no topics in client=%p\r\n", client);
 		return false;
 	}
 
-	for (std::set<acl::string>::const_iterator cit
+	for (std::set<std::string>::const_iterator cit
 		 = topics.begin(); cit != topics.end(); ++cit) {
-		del(*cit, client);
+		del((*cit).c_str(), client);
 	}
 	return true;
 }
@@ -243,7 +243,7 @@ bool mqtt_client::handle_connect(const acl::mqtt_message&) {
 
 bool mqtt_client::handle_subscribe(const acl::mqtt_message& body) {
 	const acl::mqtt_subscribe& subscribe = (const acl::mqtt_subscribe&) body;
-	const std::vector<acl::string>& topics = subscribe.get_topics();
+	const std::vector<std::string>& topics = subscribe.get_topics();
 	const std::vector<acl::mqtt_qos_t>& qoses = subscribe.get_qoses();
 
 	if (topics.empty()) {
@@ -262,9 +262,9 @@ bool mqtt_client::handle_subscribe(const acl::mqtt_message& body) {
 	for (size_t i = 0; i < n; i++) {
 		printf("%s => topic=%s, qos=%s\r\n", __FUNCTION__,
 			topics[i].c_str(), acl::mqtt_qos_desc(qoses[i]));
-		topics_.insert(topics[i]);
+		topics_.insert(topics[i].c_str());
 
-		if (!manager_.add(topics[i], this)) {
+		if (!manager_.add(topics[i].c_str(), this)) {
 			printf("add to manager error, this=%p\r\n", this);
 			return false;
 		}

@@ -13,7 +13,7 @@ public:
 	 * constructor for creating MQTT_DISCONNECT mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_disconnect(void);
+	mqtt_disconnect();
 
 	/**
 	 * constructor for creating MQTT_DISCONNECT mqtt message object.
@@ -21,7 +21,7 @@ public:
 	 */
 	mqtt_disconnect(const mqtt_header& header);
 
-	~mqtt_disconnect(void);
+	~mqtt_disconnect();
 
 protected:
 	// @override
@@ -33,7 +33,7 @@ protected:
 	}
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return true;
 	}
 };

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "../stdlib/string.hpp"
 #include "mqtt_header.hpp"
 
@@ -17,7 +18,7 @@ public:
 	 * create message object to be used for sending message to peer.
 	 * @param type {mqtt_type_t}
 	 */
-	mqtt_message(mqtt_type_t type);
+	explicit mqtt_message(mqtt_type_t type);
 
 	/**
 	 * create message object after receiving message data from peer,
@@ -27,12 +28,12 @@ public:
 	 * @param header {const mqtt_header&} created from the mqtt data and
 	 * passed to the message object to be created.
 	 */
-	mqtt_message(const mqtt_header& header);
+	explicit mqtt_message(const mqtt_header& header);
 
 	/**
 	 * virtual destructor.
 	 */
-	virtual ~mqtt_message(void);
+	virtual ~mqtt_message();
 
 public:
 	/**
@@ -63,7 +64,7 @@ public:
 	 * been completed.
 	 * @return {bool}
 	 */
-	virtual bool finished(void) const {
+	virtual bool finished() const {
 		return false;
 	}
 
@@ -72,7 +73,7 @@ public:
 	 * change some information of the header.
 	 * @return {mqtt_header&}
 	 */
-	mqtt_header& get_header(void) {
+	mqtt_header& get_header() {
 		return header_;
 	}
 
@@ -81,7 +82,7 @@ public:
 	 * getting some information from it.
 	 * @return {const mqtt_header&}
 	 */
-	const mqtt_header& get_header(void) const {
+	const mqtt_header& get_header() const {
 		return header_;
 	}
 
@@ -105,7 +106,7 @@ protected:
 	void pack_add(unsigned short n, string& out);
 
 	// add string data to string buffer when building mqtt message.
-	void pack_add(const string& s, string& out);
+	void pack_add(const std::string& s, string& out);
 
 	// parse one short from mqtt data.
 	bool unpack_short(const char* data, size_t len, unsigned short& out);

@@ -13,29 +13,29 @@ enum {
 	MQTT_STAT_PAYLOAD,
 };
 
-mqtt_publish::mqtt_publish(void)
+mqtt_publish::mqtt_publish()
 : mqtt_message(MQTT_PUBLISH)
-, finished_(false)
+, pkt_id_(0)
 , dlen_(0)
 , hlen_var_(0)
-, pkt_id_(0)
 , payload_len_(0)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR;  // just for update()
 }
 
 mqtt_publish::mqtt_publish(const mqtt_header& header)
 : mqtt_message(header)
-, finished_(false)
+, pkt_id_(0)
 , dlen_(0)
 , hlen_var_(0)
-, pkt_id_(0)
+, finished_(false)
 {
 	status_      = MQTT_STAT_HDR_VAR;  // just for update()
 	payload_len_ = header.get_remaining_length();
 }
 
-mqtt_publish::~mqtt_publish(void) {}
+mqtt_publish::~mqtt_publish() {}
 
 mqtt_publish& mqtt_publish::set_topic(const char* topic) {
 	topic_ = topic;

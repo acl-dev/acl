@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "mqtt_message.hpp"
 
 namespace acl {
@@ -22,7 +23,7 @@ public:
 	 * constructor for creating MQTT_CONNECT mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_connect(void);
+	mqtt_connect();
 
 	/**
 	 * constructor for creating MQTT_CONNECT mqtt message object.
@@ -30,7 +31,7 @@ public:
 	 */
 	mqtt_connect(const mqtt_header& header);
 
-	~mqtt_connect(void);
+	~mqtt_connect();
 
 protected:
 	// @override
@@ -40,7 +41,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -52,37 +53,37 @@ public:
 	void set_will_qos(mqtt_qos_t qos);
 	void set_will_topic(const char* topic);
 	void set_will_msg(const char* msg);
-	void clean_session(void);
+	void clean_session();
 
-	unsigned short get_keep_alive(void) const {
+	unsigned short get_keep_alive() const {
 		return keep_alive_;
 	}
 
-	const char* get_cid(void) const {
+	const char* get_cid() const {
 		return cid_.empty() ? NULL : cid_.c_str();;
 	}
 
-	const char* get_username(void) const {
+	const char* get_username() const {
 		return username_.empty() ? NULL : username_.c_str();
 	}
 
-	const char* get_passwd(void) const {
+	const char* get_passwd() const {
 		return passwd_.empty() ? NULL : passwd_.c_str();
 	}
 
-	mqtt_qos_t get_will_qos(void) const {
+	mqtt_qos_t get_will_qos() const {
 		return will_qos_;
 	}
 
-	const char* get_will_topic(void) const {
+	const char* get_will_topic() const {
 		return will_topic_.empty() ? NULL : will_topic_.c_str();
 	}
 
-	const char* get_will_msg(void) const {
+	const char* get_will_msg() const {
 		return will_msg_.empty() ? NULL : will_msg_.c_str();
 	}
 
-	bool has_session(void) const;
+	bool has_session() const;
 
 private:
 	unsigned status_;
@@ -94,11 +95,11 @@ private:
 	unsigned char  conn_flags_;
 	unsigned short keep_alive_;
 
-	string cid_;
-	string username_;
-	string passwd_;
-	string will_topic_;
-	string will_msg_;
+	std::string cid_;
+	std::string username_;
+	std::string passwd_;
+	std::string will_topic_;
+	std::string will_msg_;
 
 public:
 	// (internal)

@@ -74,7 +74,7 @@ public:
 	 * mqtt header constructor, usually for building mqtt message.
 	 * @param type {mqtt_type_t}
 	 */
-	mqtt_header(mqtt_type_t type);
+	explicit mqtt_header(mqtt_type_t type);
 
 	/**
 	 * mqtt header constructor, usually for parsing mqtt message.
@@ -82,7 +82,7 @@ public:
 	 */
 	mqtt_header(const mqtt_header& header);
 
-	virtual ~mqtt_header(void);
+	virtual ~mqtt_header();
 
 public:
 	/**
@@ -110,14 +110,14 @@ public:
 	 * check if the mqtt header has completed.
 	 * @return {bool}
 	 */
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
 	/**
 	 * reset the status of the mqtt header object for reusing the object.
 	 */
-	void reset(void);
+	void reset();
 
 public:
 	/**
@@ -166,7 +166,7 @@ public:
 	 * get the mqtt message type.
 	 * @return {mqtt_type_t}
 	 */
-	mqtt_type_t get_type(void) const {
+	mqtt_type_t get_type() const {
 		return type_;
 	}
 
@@ -174,7 +174,7 @@ public:
 	 * get the mqtt header flags.
 	 * @return {unsigned char}
 	 */
-	unsigned char get_header_flags(void) const {
+	unsigned char get_header_flags() const {
 		return hflags_;
 	}
 
@@ -182,7 +182,7 @@ public:
 	 * get the length of the mqtt message body.
 	 * @return {unsigned}
 	 */
-	unsigned get_remaining_length(void) const {
+	unsigned get_remaining_length() const {
 		return dlen_;
 	}
 
@@ -190,30 +190,29 @@ public:
 	 * get the mqtt message's qos.
 	 * @return {mqtt_qos_t}
 	 */
-	mqtt_qos_t get_qos(void) const;
+	mqtt_qos_t get_qos() const;
 
 	/**
 	 * check if the duplicated flag has been set in header.
 	 * @return {bool}
 	 */
-	bool is_dup(void) const;
+	bool is_dup() const;
 
 	/**
 	 * check if the remain flag has been set in header.
 	 * @return  {bool}
 	 */
-	bool is_remain(void) const;
+	bool is_remain() const;
 
 private:
+	char hbuf_[4];
+	unsigned hlen_;
+	unsigned dlen_;
 	unsigned status_;
-	bool finished_;
 
 	mqtt_type_t type_;
 	unsigned char hflags_:4;
-	unsigned dlen_;
-
-	char hbuf_[4];
-	unsigned hlen_;
+	bool finished_;
 
 public:
 	// parsing mqtt header in streaming mode, return the length of left

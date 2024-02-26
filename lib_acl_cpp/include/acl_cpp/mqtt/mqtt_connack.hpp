@@ -25,7 +25,7 @@ public:
 	 * constructor for creating MQTT_CONNACK mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_connack(void);
+	mqtt_connack();
 
 	/**
 	 * constructor for creating MQTT_CONNACK mqtt message object.
@@ -33,7 +33,7 @@ public:
 	 */
 	mqtt_connack(const mqtt_header& header);
 
-	~mqtt_connack(void);
+	~mqtt_connack();
 
 	/**
 	 * set the session control for the connection
@@ -53,7 +53,7 @@ public:
 	 * get the session control status
 	 * @return {bool}
 	 */
-	bool get_session(void) const {
+	bool get_session() const {
 		return session_;
 	}
 
@@ -61,7 +61,7 @@ public:
 	 * get the connect resturn code
 	 * @return {unsigned char} defined as MQTT_CONNACK_XXX above.
 	 */
-	unsigned char get_connack_code(void) const {
+	unsigned char get_connack_code() const {
 		return connack_code_;
 	}
 
@@ -73,7 +73,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -88,13 +88,13 @@ public:
 
 private:
 	unsigned status_;
-	bool finished_;
-	char buff_[2];
 	int  dlen_;
+	char buff_[2];
 
-	bool session_;
 	unsigned char conn_flags_;
 	unsigned char connack_code_;
+	bool session_;
+	bool finished_;
 };
 
 } // namespace acl

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include "mqtt_message.hpp"
 
 namespace acl {
@@ -13,7 +14,7 @@ public:
 	 * constructor for creating MQTT_PUBLISH mqtt message object.
 	 * @see mqtt_message
 	 */
-	mqtt_publish(void);
+	mqtt_publish();
 
 	/**
 	 * constructor for creating MQTT_PUBLISH mqtt message object.
@@ -21,7 +22,7 @@ public:
 	 */
 	mqtt_publish(const mqtt_header& header);
 
-	~mqtt_publish(void);
+	~mqtt_publish();
 
 	/**
 	 * set the message topic.
@@ -49,15 +50,15 @@ public:
 	 * get the message's topic.
 	 * @return {const char*}
 	 */
-	const char* get_topic(void) const {
-		return topic_.c_str();
+	const char* get_topic() const {
+		return topic_.empty() ? "" : topic_.c_str();
 	}
 
 	/**
 	 * get the message's id.
 	 * @return {unsigned short} the message will be invalid if return 0.
 	 */
-	unsigned short get_pkt_id(void) const {
+	unsigned short get_pkt_id() const {
 		return pkt_id_;
 	}
 
@@ -65,7 +66,7 @@ public:
 	 * get the length of the payload.
 	 * @return {unsigned}
 	 */
-	unsigned get_payload_len(void) const {
+	unsigned get_payload_len() const {
 		return payload_len_;
 	}
 
@@ -73,7 +74,7 @@ public:
 	 * get the palyload.
 	 * @return {const string&}
 	 */
-	const string& get_payload(void) const {
+	const string& get_payload() const {
 		return payload_;
 	}
 
@@ -85,7 +86,7 @@ protected:
 	int update(const char* data, int dlen);
 
 	// @override
-	bool finished(void) const {
+	bool finished() const {
 		return finished_;
 	}
 
@@ -100,16 +101,16 @@ public:
 	int update_payload(const char* data, int dlen);
 
 private:
-	unsigned status_;
-	bool finished_;
+	unsigned short pkt_id_;
 	char buff_[2];
 	int  dlen_;
+	unsigned status_;
 	unsigned hlen_var_;
 
-	string topic_;
-	unsigned short pkt_id_;
-	unsigned payload_len_;
+	std::string topic_;
 	string payload_;
+	unsigned payload_len_;
+	bool finished_;
 };
 
 } // namespace acl

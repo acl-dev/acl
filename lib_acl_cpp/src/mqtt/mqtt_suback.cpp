@@ -10,29 +10,29 @@ enum {
 	MQTT_STAT_TOPIC_QOS,
 };
 
-mqtt_suback::mqtt_suback(void)
+mqtt_suback::mqtt_suback()
 : mqtt_message(MQTT_SUBACK)
-, finished_(false)
-, dlen_(0)
 , pkt_id_(0)
+, dlen_(0)
 , body_len_(0)
 , nread_(0)
+, finished_(false)
 {
 	status_ = MQTT_STAT_HDR_VAR; /* just for update */
 }
 
 mqtt_suback::mqtt_suback(const mqtt_header& header)
 : mqtt_message(MQTT_SUBACK)
-, finished_(false)
-, dlen_(0)
 , pkt_id_(0)
+, dlen_(0)
 , nread_(0)
+, finished_(false)
 {
 	status_   = MQTT_STAT_HDR_VAR; /* just for update */
 	body_len_ = header.get_remaining_length();
 }
 
-mqtt_suback::~mqtt_suback(void) {}
+mqtt_suback::~mqtt_suback() {}
 
 mqtt_suback& mqtt_suback::set_pkt_id(unsigned short id) {
 	pkt_id_ = id;
