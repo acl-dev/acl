@@ -43,10 +43,12 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 	/* [host]:port, [host]:, [host] */
 	else if (*cp == '[') {
 		*host = ++cp;
-		if ((cp = acl_split_at(cp, ']')) == 0)
+		if ((cp = acl_split_at(cp, ']')) == 0) {
 			return "missing \"]\"";
-		if (*cp && *cp++ != ':')
+		}
+		if (*cp && *cp++ != ':') {
 			return "garbage after \"]\"";
+		}
 		*port = *cp ? cp : def_service;
 	}
 	/* host#port, host#, host, #port */
@@ -63,8 +65,9 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 		*port = def_service ? def_service : NULL;
 	}
 
-	if (*host == 0)
+	if (*host == 0) {
 		return "missing host information";
+	}
 
 	/*
 	 * if (*port == 0)
@@ -82,11 +85,13 @@ const char *acl_host_port(char *buf, char **host, char *def_host,
 		return "valid hostname or network address required";
 	}
 
-	if (*port == 0)
+	if (*port == 0) {
 		return NULL;
+	}
 
-	if (*port != def_service && ACL_ISDIGIT(**port) && !acl_alldig(*port))
+	if (*port != def_service && ACL_ISDIGIT(**port) && !acl_alldig(*port)) {
 		return "garbage after numerical service";
+	}
 
 	return NULL;
 }
@@ -109,14 +114,16 @@ static int host_port(char *buf, char **host, char **port)
 		return -1;
 	}
 
-	if (*host && **host == 0)
-		*host = 0;
-	if (*host == NULL)
+	if (*host && **host == 0) {
+		*host = NULL;
+	}
+	if (*host == NULL) {
 #if defined(AF_INET6) && !defined(ACL_WINDOWS)
 		*host = "0";
 #else
 		*host = "0.0.0.0";
 #endif
+	}
 
 	return 0;
 }
@@ -130,11 +137,16 @@ struct addrinfo *acl_host_addrinfo2(const char *addr, int type, int family)
 {
 	int    err;
 	struct addrinfo hints, *res0;
-	char  *buf = acl_mystrdup(addr);
+	char  buf[260];  /* 253(max length of domain) + 1('|') + 5 (port) */
 	char *host = NULL, *port = NULL;
 
+	ACL_SAFE_STRNCPY(buf, addr, sizeof(buf));
+
 	if (host_port(buf, &host, &port) < 0) {
-		acl_myfree(buf);
+		return NULL;
+	}
+
+	if (host == NULL || *host == 0) {
 		return NULL;
 	}
 
@@ -153,13 +165,12 @@ struct addrinfo *acl_host_addrinfo2(const char *addr, int type, int family)
 #elif	!defined(ACL_FREEBSD)
 	hints.ai_flags    = AI_V4MAPPED | AI_ADDRCONFIG;
 #endif
+
 	if ((err = getaddrinfo(host, port, &hints, &res0))) {
 		acl_msg_error("%s(%d): getaddrinfo error %s, host=%s, addr=%s",
 			__FILE__, __LINE__, gai_strerror(err), host, addr);
-		acl_myfree(buf);
 		return NULL;
 	}
 
-	acl_myfree(buf);
 	return res0;
 }
