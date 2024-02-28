@@ -44,10 +44,11 @@ Architecture diagram:
 
 * [5. More about](#5-more-about)
     * [5.1. Samples](#51-samples)
-    * [5.2. FAQ](#52-faq)
-    * [5.3. License](#53-license)
-    * [5.4. Reference](#54-reference)
-    * [5.5. Thanks](#55-thanks)
+    * [5.2. More simple demos](#52-more-simple-demos)
+    * [5.3. FAQ](#53-faq)
+    * [5.4. License](#54-license)
+    * [5.5. Reference](#55-reference)
+    * [5.6. Thanks](#56-thanks)
 
 <hr>
 
@@ -416,19 +417,21 @@ void run(void) {
 ## 5.1. Samples
 There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
 
-## 5.2. FAQ
+## 5.2. More simple demos
+There are many small demos showing how to use acl library easily in [https://github.com/acl-dev/demo/](demos)
+
+## 5.3. FAQ
 If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
 
-## 5.3. License
+## 5.4. License
 - LGPL-v3 license (see [LICENSE.txt](LICENSE.txt) in the acl project)
 
-## 5.4. Reference
-- Web site: https://blog.csdn.net/zsxxsz
+## 5.5. Reference
+- Web site: https://acl-dev.cn/
 - Github:   https://github.com/acl-dev/acl
 - Gitee:    https://gitee.com/acl-dev/acl
 - Weibo:    http://weibo.com/zsxxsz
-- QQ Group: 705290654
 
-## 5.5. Thanks
+## 5.6. Thanks
 
 Thanks <a href=https://jb.gg/OpenSourceSupport target=_blank><img widith=100 height=50 src=res/logo/clion_icon.png /> </a>.
