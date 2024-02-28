@@ -418,7 +418,7 @@ void run(void) {
 There are a lot of examples in the acl library for reference, please refer to: [SAMPLES.md](SAMPLES.md)
 
 ## 5.2. More simple demos
-There are many small demos showing how to use acl library easily in [https://github.com/acl-dev/demo/](demos)
+There are many small demos showing how to use acl library easily in [Demos](https://github.com/acl-dev/demo/)
 
 ## 5.3. FAQ
 If you have some questions when using Acl, please see [FAQ.md](FAQ.md).
