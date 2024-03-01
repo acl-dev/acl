@@ -57,6 +57,7 @@ private:
 	static void service_pre_jail(void*);
 	static void service_init(void*);
 	static void thread_init(void*); 
+	static int  service_pre_exit(void*);
 	static void service_exit(void*);
 	static int  service_on_sighup(void*, ACL_VSTRING*);
 

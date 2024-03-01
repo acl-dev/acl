@@ -14,8 +14,7 @@ class socket_stream;
 /**
  * acl_master 服务器框架中进程方式的模板类，该类对象只能有一个实例运行
  */
-class ACL_CPP_API master_proc : public master_base
-{
+class ACL_CPP_API master_proc : public master_base {
 public:
 	/**
 	 * 开始运行，调用该函数是指该服务进程是在 acl_master 服务框架
@@ -64,6 +63,9 @@ private:
 
 	// 当进程切换用户身份后调用的回调函数
 	static void service_init(void*);
+
+	// 当进程退出前调用的回调函数
+	static int service_pre_exit(void*);
 
 	// 当进程退出时调用的回调函数
 	static void service_exit(void*);

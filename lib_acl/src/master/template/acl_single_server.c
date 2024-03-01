@@ -116,6 +116,7 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
   */
 static ACL_MASTER_SERVER_ON_LISTEN_FN __service_listen;
 static ACL_SINGLE_SERVER_FN           __service_main;
+static ACL_MASTER_SERVER_PRE_EXIT_FN  __service_pre_exit;
 static ACL_MASTER_SERVER_EXIT_FN      __service_exit;
 static ACL_MASTER_SERVER_SIGHUP_FN    __sighup_handler;
 
@@ -158,6 +159,9 @@ static void single_server_exit(void)
 	if (acl_var_single_disable_core_onexit)
 		acl_set_core_limit(0);
 #endif
+
+	if (__service_pre_exit)
+		__service_pre_exit(__service_ctx);
 
 	if (__service_exit)
 		__service_exit(__service_ctx);
@@ -539,6 +543,9 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 			break;
 		case ACL_MASTER_SERVER_LOOP:
 			loop = va_arg(ap, ACL_MASTER_SERVER_LOOP_FN);
+			break;
+		case ACL_MASTER_SERVER_PRE_EXIT:
+			__service_pre_exit = va_arg(ap, ACL_MASTER_SERVER_PRE_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_exit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);

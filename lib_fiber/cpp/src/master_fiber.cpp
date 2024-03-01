@@ -29,6 +29,7 @@ void master_fiber::run(int argc, char** argv)
 	acl_fiber_server_main(argc, argv, service_on_accept, this,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_PRE_EXIT, service_pre_exit,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
@@ -92,6 +93,13 @@ void master_fiber::service_init(void* ctx)
 	acl_assert(mf != NULL);
 	mf->proc_inited_ = true;
 	mf->proc_on_init();
+}
+
+int master_fiber::service_pre_exit(void* ctx)
+{
+	master_fiber* mf = (master_fiber *) ctx;
+	acl_assert(mf != NULL);
+	return mf->proc_pre_exit() ? 1 : 0;
 }
 
 void master_fiber::service_exit(void* ctx)

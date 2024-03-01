@@ -8,8 +8,7 @@
 
 struct ACL_EVENT;
 
-namespace acl
-{
+namespace acl {
 
 class server_socket;
 class event_timer;
@@ -18,8 +17,7 @@ class string;
 ACL_CPP_API void master_log_enable(bool yes);
 ACL_CPP_API bool master_log_enabled(void);
 
-class ACL_CPP_API master_base : public noncopyable
-{
+class ACL_CPP_API master_base : public noncopyable {
 public:
 	/**
 	 * 设置 bool 类型的配置项
@@ -99,7 +97,16 @@ protected:
 	virtual void proc_on_init() {}
 
 	/**
-	 * 当进程退出前调用的回调函数
+	 * 在进程退出前先调用此虚方法，如果子类实现返回 false，则会休眠1秒后
+	 * 继续调用该虚方法，直至子类实现返回 true 为止，这给应用层一个决定
+	 * 是否立刻退出的方法
+	 *
+	 */
+	virtual bool proc_pre_exit() { return true; }
+
+	/**
+	 * 当进程退出前调用的回调函数，该函数返回后进程将正式退出，注意该方法
+	 * 会在上面 proc_pre_exit 调用后调用
 	 */
 	virtual void proc_on_exit() {}
 

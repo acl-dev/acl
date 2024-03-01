@@ -45,6 +45,7 @@ void master_aio::run_daemon(int argc, char** argv)
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_PRE_EXIT, service_pre_exit,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
 		ACL_MASTER_SERVER_BOOL_TABLE, conf_.get_bool_cfg(),
@@ -131,6 +132,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	}
 	close_all_listener(sstreams);
 	handle_->check();
+	service_pre_exit(this);
 	service_exit(this);
 	return true;
 }
@@ -209,6 +211,13 @@ void master_aio::service_init(void* ctx)
 
 	ma->proc_inited_ = true;
 	ma->proc_on_init();
+}
+
+int master_aio::service_pre_exit(void* ctx)
+{
+	master_aio* ma = (master_aio *) ctx;
+	acl_assert(ma != NULL);
+	return ma->proc_pre_exit() ? 1 : 0;
 }
 
 void master_aio::service_exit(void* ctx)

@@ -36,6 +36,7 @@ void master_udp::run(int argc, char** argv)
 		ACL_MASTER_SERVER_ON_UNBIND, service_on_unbind,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_PRE_EXIT, service_pre_exit,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
 		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
@@ -174,6 +175,13 @@ void master_udp::service_init(void* ctx)
 
 	mu->proc_inited_ = true;
 	mu->proc_on_init();
+}
+
+int master_udp::service_pre_exit(void* ctx)
+{
+	master_udp* mu = (master_udp *) ctx;
+	acl_assert(mu != NULL);
+	return mu->proc_pre_exit() ? 1 : 0;
 }
 
 void master_udp::service_exit(void* ctx)

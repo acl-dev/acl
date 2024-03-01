@@ -9,8 +9,7 @@ struct ACL_VSTRING;
 
 namespace acl {
 
-class ACL_CPP_API master_udp : public master_base
-{
+class ACL_CPP_API master_udp : public master_base {
 public:
 	/**
 	 * 开始运行，调用该函数是指该服务进程是在 acl_master 服务框架
@@ -99,6 +98,9 @@ private:
 
 	// 当进程切换用户身份后调用的回调函数
 	static void service_init(void*);
+
+	// 当进程退出时调用的回调函数
+	static int service_pre_exit(void*);
 
 	// 当进程退出时调用的回调函数
 	static void service_exit(void*);
