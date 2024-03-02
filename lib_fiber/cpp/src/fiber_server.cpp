@@ -118,6 +118,24 @@ const char *acl_fiber_server_conf(void)
 	return __conf_file;
 }
 
+long long acl_fiber_server_users_count_add(int n)
+{
+	if (__clock) {
+		return acl_atomic_clock_users_add(__clock, n);
+	} else {
+		return 0;
+	}
+}
+
+long long acl_fiber_server_users_count()
+{
+	if (__clock) {
+		return acl_atomic_clock_users(__clock);
+	} else {
+		return 0;
+	}
+}
+
 static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;

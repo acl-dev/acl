@@ -155,4 +155,14 @@ int master_fiber::service_on_sighup(void* ctx, ACL_VSTRING* buf)
 	return ret ? 0 : -1;
 }
 
+long long master_fiber::users_count()
+{
+	return acl_fiber_server_users_count();
+}
+
+long long master_fiber::users_count_add(int n)
+{
+	return acl_fiber_server_users_count_add(n);
+}
+
 } // namespace acl

@@ -34,6 +34,19 @@ public:
 	 */
 	const char* get_conf_path(void) const;
 
+	/**
+	 * 获得当前服务总连接数
+	 * @return {long long}
+	 */
+	long long users_count();
+
+	/**
+	 * 修改当前服务连接数
+	 * @param n {int} 增加或减少（可以为负数）的连接数值
+	 * @return {long long} 返回修改的连接数
+	 */
+	long long users_count_add(int n);
+
 protected:
 	master_fiber(void);
 
