@@ -17,8 +17,7 @@ class socket_stream;
  * 线程池服务器框架类，该类为纯虚类，子类需要实现其中的纯虚函数，
  * 每一个进程仅能有一个该类对象实例，否则程序会被终止
  */
-class ACL_CPP_API master_threads : public master_base
-{
+class ACL_CPP_API master_threads : public master_base {
 public:
 	/**
 	 * 开始运行，调用该函数是指该服务进程是在 acl_master 服务框架
@@ -210,6 +209,9 @@ private:
 
 	// 当进程需要退出时调用此函数，由应用来确定进程是否需要退出
 	static int service_exit_timer(void*, size_t, size_t);
+
+	// 当进程退出时调用的回调函数
+	static int service_pre_exit(void*);
 
 	// 当进程退出时调用的回调函数
 	static void service_exit(void*);

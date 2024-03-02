@@ -34,6 +34,7 @@ void master_proc::run_daemon(int argc, char** argv)
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
+		ACL_MASTER_SERVER_PRE_EXIT, service_pre_exit,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_SIGHUP, service_on_sighup,
 		ACL_MASTER_SERVER_INT_TABLE, conf_.get_int_cfg(),
@@ -135,6 +136,7 @@ bool master_proc::run_alone(const char* addrs, const char* path /* = NULL */,
 
 	close_all_listener(sstreams);
 	acl_event_free(eventp);
+	service_pre_exit(this);
 	service_exit(this);
 
 	return true;
@@ -184,6 +186,14 @@ void master_proc::service_init(void* ctx)
 
 	mp->proc_inited_ = true;
 	mp->proc_on_init();
+}
+
+int master_proc::service_pre_exit(void* ctx)
+{
+	master_proc* mp = (master_proc *) ctx;
+	acl_assert(mp != NULL);
+
+	return mp->proc_pre_exit() ? 1 : 0;
 }
 
 void master_proc::service_exit(void* ctx)

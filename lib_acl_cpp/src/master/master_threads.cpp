@@ -32,6 +32,7 @@ void master_threads::run(int argc, char** argv)
 		ACL_MASTER_SERVER_PRE_INIT, service_pre_jail,
 		ACL_MASTER_SERVER_POST_INIT, service_init,
 		ACL_MASTER_SERVER_EXIT_TIMER, service_exit_timer,
+		ACL_MASTER_SERVER_PRE_EXIT, service_pre_exit,
 		ACL_MASTER_SERVER_EXIT, service_exit,
 		ACL_MASTER_SERVER_THREAD_INIT, thread_init,
 		ACL_MASTER_SERVER_THREAD_EXIT, thread_exit,
@@ -182,6 +183,13 @@ int master_threads::service_exit_timer(void* ctx, size_t nclients,
 	master_threads* mt = (master_threads *) ctx;
 	acl_assert(mt != NULL);
 	return mt->proc_exit_timer(nclients, nthreads) == true ? 1 : 0;
+}
+
+int master_threads::service_pre_exit(void* ctx)
+{
+	master_threads* mt = (master_threads *) ctx;
+	acl_assert(mt != NULL);
+	return mt->proc_pre_exit() ? 1 : 0;
 }
 
 void master_threads::service_exit(void* ctx)

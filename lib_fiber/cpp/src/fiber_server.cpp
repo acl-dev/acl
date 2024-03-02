@@ -88,6 +88,7 @@ static int    __daemon_mode = 0;
 static void (*__service)(void*, ACL_VSTREAM*) = NULL;
 static void  *__service_ctx = NULL;
 static char   __service_name[256];
+static int  (*__service_preexit)(void*) = NULL;
 static void (*__service_onexit)(void*) = NULL;
 static char  *__deny_info = NULL;
 static ACL_MASTER_SERVER_ON_LISTEN_FN   __server_on_listen = NULL;
@@ -115,6 +116,24 @@ typedef struct FIBER_SERVER {
 const char *acl_fiber_server_conf(void)
 {
 	return __conf_file;
+}
+
+long long acl_fiber_server_users_count_add(int n)
+{
+	if (__clock) {
+		return acl_atomic_clock_users_add(__clock, n);
+	} else {
+		return 0;
+	}
+}
+
+long long acl_fiber_server_users_count()
+{
+	if (__clock) {
+		return acl_atomic_clock_users(__clock);
+	} else {
+		return 0;
+	}
 }
 
 static void fiber_client(ACL_FIBER *fiber acl_unused, void *ctx)
@@ -370,11 +389,21 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 		__FILE__, __LINE__, __FUNCTION__);
 
 	/* the user's callback will be called here */
-	acl_msg_info("%s(%d), %s: calling server_onexit ...",
-		__FILE__, __LINE__, __FUNCTION__);
-	main_server_onexit();
-	acl_msg_info("%s(%d), %s: call server_onexit ok",
-		__FILE__, __LINE__, __FUNCTION__);
+	if (__service_preexit) {
+		while (true) {
+			acl_msg_info("%s(%d), %s: calling server_pre_exit ...",
+				__FILE__, __LINE__, __FUNCTION__);
+
+			if (__service_preexit(__service_ctx)) {
+				break;
+			}
+
+			acl_fiber_sleep(1);
+		}
+
+		acl_msg_info("%s(%d), %s: server_pre_exit ok",
+			__FILE__, __LINE__, __FUNCTION__);
+	}
 
 	while (!acl_var_fiber_quick_abort) {
 		if (acl_atomic_clock_users(__clock) <= 0) {
@@ -399,6 +428,13 @@ static void main_fiber_monitor_master(ACL_FIBER *fiber, void *ctx)
 			__FILE__, __LINE__, __FUNCTION__, n,
 			acl_atomic_clock_users(__clock));
 	}
+
+	/* the user's callback will be called here */
+	acl_msg_info("%s(%d), %s: calling server_onexit ...",
+		__FILE__, __LINE__, __FUNCTION__);
+	main_server_onexit();
+	acl_msg_info("%s(%d), %s: call server_onexit ok",
+		__FILE__, __LINE__, __FUNCTION__);
 
 	/* then notify all threads' fiber schedule to stop */
 	acl_msg_info("%s(%d), %s: stopping servers ...",
@@ -997,6 +1033,10 @@ static void parse_args(void)
 		case ACL_MASTER_SERVER_ON_LISTEN:
 			__server_on_listen = va_arg(__ap_dest,
 				ACL_MASTER_SERVER_ON_LISTEN_FN);
+			break;
+		case ACL_MASTER_SERVER_PRE_EXIT:
+			__service_preexit =
+				va_arg(__ap_dest, ACL_MASTER_SERVER_PRE_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_onexit =

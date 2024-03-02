@@ -186,6 +186,7 @@ static void *__service_ctx;
 static char  __service_name[256];
 static void (*__server_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 static ACL_THREADS_SERVER_FN		__service_main;
+static ACL_MASTER_SERVER_PRE_EXIT_FN	__server_preexit;
 static ACL_MASTER_SERVER_EXIT_FN	__server_onexit;
 static ACL_MASTER_SERVER_ON_LISTEN_FN	__server_on_listen;
 static ACL_MASTER_SERVER_ON_ACCEPT_FN	__server_on_accept;
@@ -421,15 +422,21 @@ static void server_exiting(int type acl_unused, ACL_EVENT *event, void *ctx)
 #endif /* ACL_UNIX */
 	}
 
-	if (__server_exit_timer != NULL
+	if (__server_preexit && !__server_preexit(__service_ctx)) {
+		acl_msg_info("%s: prepare exiting, client: %d, threads: %d",
+			myname, n, nthreads);
+		acl_event_request_timer(event, server_exiting, ctx, 1000000, 0);
+	} else if (__server_exit_timer != NULL
 		&& __server_exit_timer(__service_ctx, n, nthreads) != 0) {
 
 		acl_msg_info("%s: master disconnect -- timer exiting, "
 			"client: %d, threads: %d", myname, n, nthreads);
+		__server_preexit(__service_ctx);
 		server_exit();
 	} else if (n <= 0) {
 		acl_msg_info("%s: master disconnect -- exiting, "
 			"clinet: %d, threads: %d", myname, n, nthreads);
+		__server_preexit(__service_ctx);
 		server_exit();
 	} else if (__aborting && acl_var_threads_quick_abort) {
 		acl_msg_info("%s: master disconnect -- quick exiting, "
@@ -1481,6 +1488,10 @@ void acl_threads_server_main(int argc, char * argv[],
 		case ACL_MASTER_SERVER_EXIT_TIMER:
 			__server_exit_timer =
 				va_arg(ap, ACL_MASTER_SERVER_EXIT_TIMER_FN);
+			break;
+		case ACL_MASTER_SERVER_PRE_EXIT:
+			__server_preexit =
+				va_arg(ap, ACL_MASTER_SERVER_PRE_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__server_onexit =

@@ -34,6 +34,19 @@ public:
 	 */
 	const char* get_conf_path(void) const;
 
+	/**
+	 * 获得当前服务总连接数
+	 * @return {long long}
+	 */
+	long long users_count();
+
+	/**
+	 * 修改当前服务连接数
+	 * @param n {int} 增加或减少（可以为负数）的连接数值
+	 * @return {long long} 返回修改的连接数
+	 */
+	long long users_count_add(int n);
+
 protected:
 	master_fiber(void);
 
@@ -57,6 +70,7 @@ private:
 	static void service_pre_jail(void*);
 	static void service_init(void*);
 	static void thread_init(void*); 
+	static int  service_pre_exit(void*);
 	static void service_exit(void*);
 	static int  service_on_sighup(void*, ACL_VSTRING*);
 

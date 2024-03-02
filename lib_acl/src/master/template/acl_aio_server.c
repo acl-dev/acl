@@ -164,6 +164,7 @@ static pthread_mutex_t __counter_mutex;
 
 static ACL_AIO_SERVER_FN              __service_main;
 static ACL_AIO_SERVER2_FN             __service2_main;
+static ACL_MASTER_SERVER_PRE_EXIT_FN  __service_preexit;
 static ACL_MASTER_SERVER_EXIT_FN      __service_onexit;
 static ACL_MASTER_SERVER_ON_LISTEN_FN __service_on_listen;
 static ACL_MASTER_SERVER_SIGHUP_FN    __sighup_handler;
@@ -328,16 +329,28 @@ static void disable_listen(void)
 	__sstreams = NULL;
 }
 
+static void aio_server_timeout(int type, ACL_EVENT *event, void *context);
+
 /* aio_server_exit - normal termination */
 
 static void aio_server_exit(void)
 {
+	if (__service_preexit && !__service_preexit(__service_ctx)) {
+		acl_msg_info("%s: prepare exiting", __FUNCTION__);
+		acl_var_aio_idle_limit = 1;
+		acl_aio_request_timer(__h_aio, aio_server_timeout, (void*) __h_aio,
+			(acl_int64) acl_var_aio_idle_limit * 1000000, 0);
+		return;
+	}
+
 #ifdef ACL_UNIX
 	if (acl_var_aio_disable_core_onexit)
 		acl_set_core_limit(0);
 #endif
 	if (__service_onexit)
 		__service_onexit(__service_ctx);
+
+	acl_msg_info("master disconnect -- exiting");
 	exit(0);
 }
 
@@ -393,7 +406,6 @@ static void aio_server_abort(ACL_ASTREAM *astream, void *context acl_unused)
 		__listen_disabled = 1;
 
 	if (acl_var_aio_quick_abort) {
-		acl_msg_info("master disconnect -- exiting");
 		aio_server_exit();
 	} else if ((n = get_client_count()) > 0) {
 		/* set idle timeout to 1 second */
@@ -401,7 +413,6 @@ static void aio_server_abort(ACL_ASTREAM *astream, void *context acl_unused)
 		acl_aio_request_timer(__h_aio, aio_server_timeout, (void*) aio,
 			(acl_int64) acl_var_aio_idle_limit * 1000000, 0);
 	} else {
-		acl_msg_info("master disconnect -- exiting");
 		aio_server_exit();
 	}
 }
@@ -427,6 +438,7 @@ static void aio_server_use_timer(int type acl_unused,
 	}
 
 	acl_msg_info("use limit -- exiting");
+
 	aio_server_exit();
 }
 
@@ -1286,7 +1298,7 @@ static void run_loop(const char *procname)
 		}
 	}
 
-    /* not reached here */
+	/* not reached here */
     
 	/* acl_vstring_free(buf); */
 	/* aio_server_exit(); */
@@ -1407,6 +1419,10 @@ static void server_main(int argc, char **argv, va_list ap)
 			break;
 		case ACL_MASTER_SERVER_POST_INIT:
 			post_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
+			break;
+		case ACL_MASTER_SERVER_PRE_EXIT:
+			__service_preexit =
+				va_arg(ap, ACL_MASTER_SERVER_PRE_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_onexit =

@@ -153,6 +153,7 @@ typedef struct UDP_SERVER {
   * Global state.
   */
 static ACL_UDP_SERVER_FN                __service_main;
+static ACL_MASTER_SERVER_PRE_EXIT_FN    __service_pre_exit;
 static ACL_MASTER_SERVER_EXIT_FN        __service_exit;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
 static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler;
@@ -466,12 +467,16 @@ static void servers_stop(void)
 
 /* udp_server_exit - normal termination */
 
+static void udp_server_timeout(int type, ACL_EVENT *event, void *context);
+
 static void udp_server_exit(void)
 {
 	int i;
 	long long n = 0;
 
-	if (__service_exiting) {
+	if (__service_pre_exit && !__service_pre_exit(__service_ctx)) {
+		acl_event_request_timer(__main_event,
+			udp_server_timeout, __main_event, 1000000, 0);
 		return;
 	}
 
@@ -480,6 +485,10 @@ static void udp_server_exit(void)
 		acl_set_core_limit(0);
 	}
 #endif
+
+	if (__service_exiting) {
+		return;
+	}
 
 	__service_exiting = 1;
 
@@ -1167,6 +1176,9 @@ void acl_udp_server_main(int argc, char **argv, ACL_UDP_SERVER_FN service, ...)
 			break;
 		case ACL_MASTER_SERVER_POST_INIT:
 			post_init = va_arg(ap, ACL_MASTER_SERVER_INIT_FN);
+			break;
+		case ACL_MASTER_SERVER_PRE_EXIT:
+			__service_pre_exit = va_arg(ap, ACL_MASTER_SERVER_PRE_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_exit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);

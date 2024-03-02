@@ -112,9 +112,10 @@ static ACL_CONFIG_STR_TABLE __conf_str_tab[] = {
  /*
   * Global state.
   */
-static ACL_TRIGGER_SERVER_FN       __service_main;
-static ACL_MASTER_SERVER_EXIT_FN   __service_exit;
-static ACL_MASTER_SERVER_SIGHUP_FN __sighup_handler;
+static ACL_TRIGGER_SERVER_FN           __service_main;
+static ACL_MASTER_SERVER_PRE_EXIT_FN   __service_pre_exit;
+static ACL_MASTER_SERVER_EXIT_FN       __service_exit;
+static ACL_MASTER_SERVER_SIGHUP_FN     __sighup_handler;
 static void (*__service_accept) (int, ACL_EVENT *, ACL_VSTREAM *, void *);
 
 static int           use_count;
@@ -140,10 +141,18 @@ ACL_EVENT *acl_trigger_server_event(void)
 	return __eventp;
 }
 
+static void trigger_server_timeout(int type, ACL_EVENT *event, void *context);
+
 /* trigger_server_exit - normal termination */
 
 static void trigger_server_exit(void)
 {
+	if (__service_pre_exit && !__service_pre_exit(__service_ctx)) {
+		acl_event_request_timer(__eventp, trigger_server_timeout, NULL,
+			1000000, 0);
+		return;
+	}
+
 #ifdef ACL_UNIX
 	if (acl_var_trigger_disable_core_onexit)
 		acl_set_core_limit(0);
@@ -517,6 +526,9 @@ void acl_trigger_server_main(int argc, char **argv, ACL_TRIGGER_SERVER_FN servic
 			break;
 		case ACL_MASTER_SERVER_LOOP:
 			loop = va_arg(ap, ACL_MASTER_SERVER_LOOP_FN);
+			break;
+		case ACL_MASTER_SERVER_PRE_EXIT:
+			__service_pre_exit = va_arg(ap, ACL_MASTER_SERVER_PRE_EXIT_FN);
 			break;
 		case ACL_MASTER_SERVER_EXIT:
 			__service_exit = va_arg(ap, ACL_MASTER_SERVER_EXIT_FN);
