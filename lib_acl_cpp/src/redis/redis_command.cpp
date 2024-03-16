@@ -41,7 +41,12 @@ void redis_command::init(void)
 	addr_[0]        = 0;
 
 #define	REDIS_DBUF_NBLOCK	1
+
+#ifdef ACL_DBUF_HOOK_NEW
 	dbuf_           = new (REDIS_DBUF_NBLOCK) dbuf_pool();
+#else
+	dbuf_           = new dbuf_pool(REDIS_DBUF_NBLOCK);
+#endif
 }
 
 redis_command::redis_command(void)

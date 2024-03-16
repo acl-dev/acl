@@ -7,18 +7,29 @@
 namespace acl
 {
 
-dbuf_pool::dbuf_pool(void)
+dbuf_pool::dbuf_pool(size_t nblock /* = 2 */)
 {
+#ifdef ACL_DBUF_HOOK_NEW
+	(void) nblock;
+#else
+	pool_ = acl_dbuf_pool_create(4096 * nblock);
+	mysize_ = sizeof(dbuf_pool);
+#endif
 }
 
 dbuf_pool::~dbuf_pool(void)
 {
+#ifndef ACL_DBUF_HOOK_NEW
+	acl_dbuf_pool_destroy(pool_);
+#endif
 }
 
 void dbuf_pool::destroy(void)
 {
 	delete this;
 }
+
+#ifdef ACL_DBUF_HOOK_NEW
 
 void *dbuf_pool::operator new(size_t size, size_t nblock /* = 2 */)
 {
@@ -38,19 +49,21 @@ void *dbuf_pool::operator new(size_t size, size_t nblock /* = 2 */)
 	return dbuf;
 }
 
-#if defined(_WIN32) || defined(_WIN64)
+# if defined(_WIN32) || defined(_WIN64)
 void dbuf_pool::operator delete(void* ptr, size_t)
 {
 	dbuf_pool* dbuf = (dbuf_pool*) ptr;
 	acl_dbuf_pool_destroy(dbuf->pool_);
 }
-#endif
+# endif
 
 void dbuf_pool::operator delete(void* ptr)
 {
 	dbuf_pool* dbuf = (dbuf_pool*) ptr;
 	acl_dbuf_pool_destroy(dbuf->pool_);
 }
+
+#endif // ACL_DBUF_HOOK_NEW
 
 bool dbuf_pool::dbuf_reset(size_t reserve /* = 0 */)
 {
@@ -129,7 +142,11 @@ dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf, size_t capacity /* = 500 */)
 , size_(0)
 {
 	if (dbuf == NULL) {
+#ifdef DBUF_HOOK_NEW
 		dbuf_ = dbuf_internal_ = new (nblock_) acl::dbuf_pool;
+#else
+		dbuf_ = dbuf_internal_ = new acl::dbuf_pool(nblock_);
+#endif
 	} else {
 		dbuf_ = dbuf;
 		dbuf_internal_ = NULL;
@@ -143,7 +160,11 @@ dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 500 */)
 , incr_(500)
 , size_(0)
 {
+#ifdef DBUF_HOOK_NEW
 	dbuf_ = dbuf_internal_ = new (nblock_) acl::dbuf_pool;
+#else
+	dbuf_ = dbuf_internal_ = new acl::dbuf_pool(nblock_);
+#endif
 	init(capacity);
 }
 

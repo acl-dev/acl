@@ -40,7 +40,11 @@ int main(int argc, char* argv[])
 
 	acl::log::stdout_open(true);
 
+#ifdef ACL_DBUF_HOOK_NEW
 	acl::dbuf_pool* dbuf = new (100) acl::dbuf_pool;
+#else
+	acl::dbuf_pool* dbuf = new acl::dbuf_pool(100);
+#endif
 
 	for (int i = 0; i < 102400; i++)
 		dbuf->dbuf_alloc(10);

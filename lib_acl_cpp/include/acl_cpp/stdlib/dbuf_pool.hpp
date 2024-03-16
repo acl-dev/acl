@@ -5,8 +5,7 @@
 
 struct ACL_DBUF_POOL;
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 会话类的内存链管理类，该类仅提供内存分配函数，在整个类对象被析构时该内存链
@@ -14,13 +13,18 @@ namespace acl
  * 该类实际上是封装了 lib_acl 中的 ACL_DBUF_POOL 结构及方法
  */
 
-class ACL_CPP_API dbuf_pool // : public noncopyable
-{
+#if 0
+#ifndef ACL_DBUF_HOOK_NEW
+# define ACL_DBUF_HOOK_NEW
+#endif
+#endif
+
+class ACL_CPP_API dbuf_pool { // : public noncopyable
 public:
 	/**
 	 * 该类对象必须动态创建
 	 */
-	dbuf_pool();
+	dbuf_pool(size_t nblock = 2);
 
 	/**
 	 * 该类对象必须要动态创建，所以隐藏了析构函数，使用者需要调用 destroy
@@ -28,6 +32,7 @@ public:
 	 */
 	void destroy();
 
+#ifdef ACL_DBUF_HOOK_NEW
 	/**
 	 * 重载 new/delete 操作符，使 dbuf_pool 对象本身也创建在内存池上，
 	 * 从而减少了 malloc/free 的次数
@@ -36,10 +41,11 @@ public:
 	 */
 	static void *operator new(size_t size, size_t nblock = 2);
 
-#if defined(_WIN32) || defined(_WIN64)
+# if defined(_WIN32) || defined(_WIN64)
 	static void operator delete(void* ptr, size_t);
-#endif
+# endif
 	static void operator delete(void* ptr);
+#endif // ACL_DBUF_HOOK_NEW
 
 	/**
 	 * 重置内存池的状态以便于重复使用该内存池对象
@@ -158,8 +164,7 @@ class dbuf_guard;
 /**
  * 在会话内存池对象上分配的对象基础类
  */
-class ACL_CPP_API dbuf_obj //: public noncopyable
-{
+class ACL_CPP_API dbuf_obj { //: public noncopyable
 public:
 	/**
 	 * 构造函数
@@ -207,8 +212,7 @@ private:
  * 会话内存池管理器，由该类对象管理 dbuf_pool 对象及在其上分配的对象，当该类
  * 对象销毁时，dbuf_pool 对象及在上面均被释放。
  */
-class ACL_CPP_API dbuf_guard // : public noncopyable
-{
+class ACL_CPP_API dbuf_guard { // : public noncopyable
 public:
 	/**
 	 * 构造函数
