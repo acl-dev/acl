@@ -30,7 +30,7 @@ typedef int (*ACL_VSTREAM_WAITPID_FN) (pid_t, ACL_WAIT_STATUS_T *, int);
 typedef struct ACL_VSTREAM_POPEN_ARGS {
 	char  **argv;
 	char   *command;
-	int     privileged;
+	int     priv;
 	char  **env;
 	char  **export;
 	char   *shell;
@@ -53,7 +53,7 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 	 */
 	args->argv       = 0;
 	args->command    = 0;
-	args->privileged = 0;
+	args->priv       = 0;
 	args->env        = 0;
 	args->export     = 0;
 	args->shell      = 0;
@@ -93,7 +93,7 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 			break;
 #ifdef	ACL_UNIX
 		case ACL_VSTREAM_POPEN_UID:
-			args->privileged = 1;
+			args->priv = 1;
 #ifdef MINGW
 			args->uid = (uid_t) va_arg(ap, int);
 #else
@@ -101,7 +101,7 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 #endif
 			break;
 		case ACL_VSTREAM_POPEN_GID:
-			args->privileged = 1;
+			args->priv = 1;
 #ifdef MINGW
 			args->gid = (gid_t) va_arg(ap, int);
 #else
@@ -122,11 +122,11 @@ static void vstream_parse_args(ACL_VSTREAM_POPEN_ARGS *args, va_list ap)
 			" or ACL_VSTREAM_POPEN_COMMAND", myname);
 	}
 #ifdef	ACL_UNIX
-	if (args->privileged != 0 && args->uid == 0) {
-		acl_msg_panic("%s: privileged uid", myname);
+	if (args->priv != 0 && args->uid == 0) {
+		acl_msg_panic("%s: priv uid", myname);
 	}
-	if (args->privileged != 0 && args->gid == 0) {
-		acl_msg_panic("%s: privileged gid", myname);
+	if (args->priv != 0 && args->gid == 0) {
+		acl_msg_panic("%s: priv gid", myname);
 	}
 #endif
 }
@@ -214,7 +214,7 @@ ACL_VSTREAM *acl_vstream_popen(int flags,...)
 		/*
 		 * Don't try to become someone else unless the user specified it.
 		 */
-		if (args.privileged) {
+		if (args.priv) {
 			acl_set_ugid(args.uid, args.gid);
 		}
 

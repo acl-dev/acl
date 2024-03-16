@@ -24,7 +24,12 @@ extern "C" {
   */
 #if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
 #include <stdint.h>
-#include <sys/epoll.h>
+#ifdef COSMOCC
+# include <libc/sysv/consts/epoll.h>
+# include <libc/sock/epoll.h>
+#else
+# include <sys/epoll.h>
+#endif
 
 #define	EVENT_NAME	"epoll"
 

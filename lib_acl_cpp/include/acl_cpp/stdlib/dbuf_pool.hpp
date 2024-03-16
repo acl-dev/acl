@@ -34,12 +34,12 @@ public:
 	 * @param size {size_t} 由编译传入的 dbuf_pool 对象的长度大小
 	 * @param nblock {size_t} 内部采用的内存块（4096）的倍数
 	 */
-	void *operator new(size_t size, size_t nblock = 2);
+	static void *operator new(size_t size, size_t nblock = 2);
 
 #if defined(_WIN32) || defined(_WIN64)
-	void operator delete(void* ptr, size_t);
+	static void operator delete(void* ptr, size_t);
 #endif
-	void operator delete(void* ptr);
+	static void operator delete(void* ptr);
 
 	/**
 	 * 重置内存池的状态以便于重复使用该内存池对象

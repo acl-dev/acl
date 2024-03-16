@@ -19,8 +19,10 @@ extern "C" {
 
 # if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX) || defined(ALPINE) || defined(MINGW)
 #  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE
-# else
+# elif defined(PTHREAD_MUTEX_RECURSIVE_NP)
 #  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE_NP
+# else
+#  define ACL_PTHREAD_MUTEX_RECURSIVE	PTHREAD_MUTEX_RECURSIVE
 # endif
 
 typedef pthread_t acl_pthread_t;

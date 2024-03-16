@@ -41,11 +41,13 @@ static struct addrinfo *create_addrinfo(const char *ip, short port,
 		sa.in6.sin6_family = AF_INET6;
 		sa.in6.sin6_port   = htons(port);
 
+#ifndef COSMOCC
 		if (ptr && *ptr) {
 			if (!(in6->sin6_scope_id = if_nametoindex(ptr))) {
 				return NULL;
 			}
 		}
+#endif
 		if (inet_pton(AF_INET6, buf, &sa.in6.sin6_addr) <= 0) {
 			return NULL;
 		}

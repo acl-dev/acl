@@ -326,7 +326,7 @@ long thread_self(void)
 	return (long) GetCurrentThreadId();
 }
 
-#elif	defined(__linux__)
+#elif	defined(__linux__) || defined(COSMOCC)
 
 #include <sys/syscall.h>
 

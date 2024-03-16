@@ -154,8 +154,10 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 # elif defined(MINGW)
 	n2 = 0;
-# else
+# elif defined(PTHREAD_MUTEX_RECURSIVE_NP)
 	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE_NP);
+# else
+	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
 # endif
 	thread_mutex_init(lock, !n1 && !n2 ? &attr : NULL);
 #else

@@ -90,6 +90,14 @@ ifeq ($(findstring clang++, $(CC)), clang++)
 		  -Wno-invalid-offsetof
 endif
 
+ifeq ($(findstring cosmocc, $(CC)), cosmocc)
+	CFLAGS += -DCOSMOCC
+	CFLAGS += -Wno-implicit-fallthrough
+	CFLAGS += -DLINUX2
+	AR = cosmoar
+
+endif
+
 ifeq ($(findstring arm64, $(UNIXNAME)), arm64)
 	JMP_CTX = USE_BOOST_JMP
 endif
@@ -222,6 +230,7 @@ SRC = $(wildcard $(SRC_PATH_SRC)/*.c) \
       $(wildcard $(SRC_PATH_SRC)/sync/*.c)
 
 #ASM_OBJ=$(OBJ_PATH_DST)/setjmp.o $(OBJ_PATH_DST)/make_gas.o $(OBJ_PATH_DST)/jump_gas.o
+
 ASM_OBJ=$(OBJ_PATH_DST)/make_gas.o $(OBJ_PATH_DST)/jump_gas.o
 OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC))) $(ASM_OBJ)
 
