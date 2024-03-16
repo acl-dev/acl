@@ -1,7 +1,7 @@
 #ifndef	__DEFINE_INCLUDE_H__
 #define	__DEFINE_INCLUDE_H__
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(LINUX2)
 # define LINUX
 # define SYS_UNIX
 # define HAS_SELECT

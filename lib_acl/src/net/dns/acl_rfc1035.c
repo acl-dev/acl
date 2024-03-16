@@ -1000,11 +1000,13 @@ static size_t save_addr2rr(int type, const char *src, ACL_RFC1035_RR *rr)
 		in6.sin6_port   = htons(0);
 
 #if defined(ACL_UNIX) || (defined(ACL_WINDOWS) && _MSC_VER >= 1600)
+# ifndef COSMOCC
 		if (ptr && *ptr && !(in6.sin6_scope_id = if_nametoindex(ptr))) {
 			acl_msg_error("%s(%d): if_nametoindex error %s",
 				__FUNCTION__, __LINE__, acl_last_serror());
 			return 0;
 		}
+# endif
 #endif
 		if (inet_pton(AF_INET6, buf, &in6.sin6_addr) == 0) {
 			acl_msg_error("%s(%d): invalid addr=%s",

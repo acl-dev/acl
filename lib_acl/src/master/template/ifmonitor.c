@@ -7,6 +7,9 @@
 
 #include <stdlib.h>
 #include <string.h>
+
+#ifndef COSMOCC
+
 #include <linux/netlink.h>
 //#include <linux/route.h>
 #include <linux/rtnetlink.h>
@@ -117,5 +120,6 @@ void netlink_monitor(ACL_EVENT *event, monitor_callback callback, void *ctx)
 
 	acl_event_enable_read(event, stream, 0, netlink_callback, nc);
 }
+#endif /* COSMOCC */
 
 #endif /* ACL_LINUX */

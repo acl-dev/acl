@@ -19,7 +19,7 @@
 # if defined(ALPINE)
 #  include <sys/eventfd.h>
 #  define HAS_EVENTFD
-# else
+# elif !defined(COSMOCC)
 #  include <linux/version.h>
 #  if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,22)
 #   include <sys/eventfd.h>

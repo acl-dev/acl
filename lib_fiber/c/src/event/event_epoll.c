@@ -7,7 +7,14 @@
 #define __USE_GNU
 #endif
 #include <dlfcn.h>
-#include <sys/epoll.h>
+
+#ifdef COSMOCC
+# include <libc/sysv/consts/epoll.h>
+# include <libc/sock/epoll.h>
+#else
+# include <sys/epoll.h>
+#endif
+
 #include "event.h"
 #include "event_epoll.h"
 

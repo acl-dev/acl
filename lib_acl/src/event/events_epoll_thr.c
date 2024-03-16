@@ -33,7 +33,13 @@
 #ifdef	ACL_EVENTS_KERNEL_STYLE
 #if (ACL_EVENTS_KERNEL_STYLE == ACL_EVENTS_STYLE_EPOLL)
 
-#include <sys/epoll.h>
+#ifdef COSMOCC
+# include <libc/sysv/consts/epoll.h>
+# include <libc/sock/epoll.h>
+#else
+# include <sys/epoll.h>
+#endif
+
 #include "events_fdtable.h"
 #include "events.h"
 

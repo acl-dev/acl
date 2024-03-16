@@ -20,7 +20,7 @@ ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 	int flags, const struct sockaddr *dest_addr, socklen_t addrlen);
 ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags);
 
-#if defined(__linux__) || defined(__APPLE__) || defined(__FreeBSD__)  || defined(MINGW) // SYS_UNIX
+#if defined(__linux__) || defined(LINUX2) || defined(__APPLE__) || defined(__FreeBSD__)  || defined(MINGW) // SYS_UNIX
 
 // in fiber_read.c
 int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len);

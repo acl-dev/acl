@@ -1018,11 +1018,13 @@ static size_t save_addr2rr(int type, const char *src, RFC1035_RR *rr)
 		in6.sin6_port   = htons(0);
 
 #if defined(SYS_UNIX) || (defined(SYS_WIN) && _MSC_VER >= 1600)
+# if !defined(COSMOCC)
 		if (ptr && *ptr && !(in6.sin6_scope_id = if_nametoindex(ptr))) {
 			msg_error("%s(%d): if_nametoindex error %s",
 				__FUNCTION__, __LINE__, last_serror());
 			return 0;
 		}
+# endif
 #endif
 		if (inet_pton(AF_INET6, buf, &in6.sin6_addr) == 0) {
 			msg_error("%s(%d): invalid addr=%s",

@@ -25,10 +25,15 @@ void *dbuf_pool::operator new(size_t size, size_t nblock /* = 2 */)
 	if (nblock == 0) {
 		nblock = 2;
 	}
+
 	ACL_DBUF_POOL* pool = acl_dbuf_pool_create(4096 * nblock);
-	dbuf_pool* dbuf     = (dbuf_pool*) acl_dbuf_pool_alloc(pool, size);
-	dbuf->pool_         = pool;
-	dbuf->mysize_       = size;
+	assert(pool);
+
+	dbuf_pool* dbuf = (dbuf_pool*) acl_dbuf_pool_alloc(pool, size);
+	assert(dbuf);
+
+	dbuf->pool_   = pool;
+	dbuf->mysize_ = size;
 
 	return dbuf;
 }
@@ -49,8 +54,7 @@ void dbuf_pool::operator delete(void* ptr)
 
 bool dbuf_pool::dbuf_reset(size_t reserve /* = 0 */)
 {
-	return acl_dbuf_pool_reset(pool_, mysize_ + reserve) == 0
-		? true : false;
+	return acl_dbuf_pool_reset(pool_, mysize_ + reserve) == 0;
 }
 
 void* dbuf_pool::dbuf_alloc(size_t len)

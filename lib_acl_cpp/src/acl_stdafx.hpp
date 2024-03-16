@@ -51,9 +51,13 @@
 #endif  // ACL_CPP_DEBUG_MEM
 
 #if defined(ACL_UNIX)
-#include <pthread.h>
-#include <unistd.h>
-#include <zlib.h>
+# include <pthread.h>
+# include <unistd.h>
+# ifdef COSMOCC
+#  include <third_party/zlib/zlib.h>
+# else
+#  include <zlib.h>
+# endif
 #endif
 
 // 加入下面一行可以加快在 VC 下的编译速度
@@ -66,4 +70,3 @@
 #define	ACL_CPP_DEBUG_HTTP_NET		42
 #define	DEBUG_MQTT			43
 #define ACL_CPP_DEBUG_MAX 		70
-

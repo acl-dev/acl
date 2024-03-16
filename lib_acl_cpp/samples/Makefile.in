@@ -47,6 +47,15 @@ ifeq ($(findstring clang++, $(CC)), clang++)
 		  -Wno-invalid-offsetof
 endif
 
+ifeq ($(findstring cosmoc+, $(CC)), cosmoc+)
+	CFLAGS += -DCOSMOCC
+	CFLAGS += -DLINUX2
+	CFLAGS += -Wno-implicit-fallthrough
+	CFLAGS += -fexceptions
+
+endif
+
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(OSNAME)), FreeBSD)
 	CFLAGS += -DFREEBSD

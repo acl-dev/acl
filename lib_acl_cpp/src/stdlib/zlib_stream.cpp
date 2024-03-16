@@ -2,6 +2,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 # include "zlib-1.2.11/zlib.h"
+#elif defined(COSMOCC)
+# include <third_party/zlib/zlib.h>
 #else
 # include <zlib.h>
 #endif
@@ -187,11 +189,16 @@ static void __zlib_dll_load(void)
 
 # else
 //#  define __deflateInit         deflateInit_
-#  define __deflateInit2        deflateInit2_
+#  ifdef COSMOCC
+#   define __deflateInit2        deflateInit2
+#   define __inflateInit2        inflateInit2
+#  else
+#   define __deflateInit2        deflateInit2_
+#   define __inflateInit2        inflateInit2_
+#  endif
 #  define __deflate             deflate
 #  define __deflateReset	deflateReset
 #  define __deflateEnd          deflateEnd
-#  define __inflateInit2        inflateInit2_
 #  define __inflate             inflate
 #  define __inflateReset	inflateReset
 #  define __inflateEnd          inflateEnd
@@ -551,9 +558,14 @@ bool zlib_stream::zip_begin(zlib_level_t level /* = zlib_default */,
 	is_compress_ = true;
 //	int ret = __deflateInit(zstream_, level, ZLIB_VERSION, sizeof(z_stream));
 
+#ifdef COSMOCC
+	int ret = __deflateInit2(zstream_, level, Z_DEFLATED,
+			wbits, mlevel, Z_DEFAULT_STRATEGY);
+#else
 	int ret = __deflateInit2(zstream_, level, Z_DEFLATED,
 			wbits, mlevel, Z_DEFAULT_STRATEGY, ZLIB_VERSION,
 			(int) sizeof(z_stream));
+#endif
 	if (ret != Z_OK) {
 		logger_error("deflateInit error");
 		return false;
@@ -639,8 +651,12 @@ bool zlib_stream::unzip_begin(bool have_zlib_header /* = true */,
 	finished_    = false;
 	is_compress_ = false;
 
+#ifdef COSMOCC
+	int   ret = __inflateInit2(zstream_, have_zlib_header ?  wsize : -wsize);
+#else
 	int   ret = __inflateInit2(zstream_, have_zlib_header ?
 		wsize : -wsize, ZLIB_VERSION, sizeof(z_stream));
+#endif
 	if (ret != Z_OK) {
 		logger_error("inflateInit error");
 		return (false);

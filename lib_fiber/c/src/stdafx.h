@@ -62,9 +62,14 @@
 #define GETPID _getpid
 #endif
 
-#if defined(__linux__)
+#if defined(__linux__) || defined(LINUX2)
 # include <sys/sendfile.h>
-# include <sys/epoll.h>
+# ifdef COSMOCC
+#  include <libc/sysv/consts/epoll.h>
+#  include <libc/sock/epoll.h>
+# else
+#  include <sys/epoll.h>
+# endif
 
 /*
 # if !defined(__aarch64__) && !defined(__arm__)

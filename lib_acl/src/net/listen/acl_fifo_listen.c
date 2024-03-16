@@ -18,6 +18,10 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#ifdef COSMOCC
+#include <libc/calls/syscall-sysv.internal.h>
+#endif
+
 /* Utility library. */
 
 #include "stdlib/acl_msg.h"
@@ -53,7 +57,12 @@ int acl_fifo_listen(const char *path, int permissions, int block_mode)
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 		return -1;
 	}
+
+#ifdef COSMOCC
+	if (sys_mkfifo(path, permissions) < 0) {
+#else
 	if (mkfifo(path, permissions) < 0) {
+#endif
 		acl_msg_error("%s: create fifo %s: %s", myname, path,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 		return -1;

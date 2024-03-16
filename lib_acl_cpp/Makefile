@@ -73,6 +73,15 @@ ifeq ($(findstring clang++, $(CC)), clang++)
 		  -Wno-invalid-offsetof
 endif
 
+ifeq ($(findstring cosmoc+, $(CC)), cosmoc+)
+	CFLAGS += -DCOSMOCC
+	CFLAGS += -Wno-implicit-fallthrough
+	CFLAGS += -DLINUX2
+	CFLAGS += -fexceptions
+	AR = cosmoar
+
+endif
+
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
@@ -159,10 +168,12 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 		CFLAGS += -DHAS_POLARSSL_DLL
 	endif
 
-	ifeq ($(MBEDTLS_STATIC), yes)
-		CFLAGS += -DHAS_MBEDTLS
-	else
-		CFLAGS += -DHAS_MBEDTLS_DLL
+	ifneq ($(findstring cosmoc+, $(CC)), cosmoc+)
+		ifeq ($(MBEDTLS_STATIC), yes)
+			CFLAGS += -DHAS_MBEDTLS
+		else
+			CFLAGS += -DHAS_MBEDTLS_DLL
+		endif
 	endif
 
 	shared_ldflags = -lprotocol -lacl -lrt -lpthread -lz -ldl

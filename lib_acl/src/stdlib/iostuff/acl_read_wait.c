@@ -26,7 +26,12 @@
 
 #include "init/acl_init.h"
 #include "thread/acl_pthread.h"
+#ifdef COSMOCC
+#include <libc/sysv/consts/epoll.h>
+#include <libc/sock/epoll.h>
+#else
 #include <sys/epoll.h>
+#endif
 
 typedef struct EPOLL_CTX
 {

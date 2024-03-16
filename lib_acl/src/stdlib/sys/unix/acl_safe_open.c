@@ -34,9 +34,9 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 {
 	struct stat local_statbuf;
 	struct stat lstat_st;
-	int     saved_error;
+	int    saved_error;
+	char   tbuf[256];
 	ACL_VSTREAM *fp;
-	char  tbuf[256];
 
 	/*
 	 * Open an existing file.
@@ -49,7 +49,7 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 				path, acl_last_strerror(tbuf, sizeof(tbuf)));
 		}
 		acl_set_error(saved_error);
-		return (0);
+		return 0;
 	}
 
 	/*
@@ -57,19 +57,23 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 	 * link (so that someone can't lure us into clobbering a sensitive file
 	 * by making a hard link to it), and it must be a non-symlink file.
 	 */
-	if (fstat_st == 0)
+	if (fstat_st == 0) {
 		fstat_st = &local_statbuf;
+	}
+
 	if (fstat(ACL_VSTREAM_FILE(fp), fstat_st) < 0) {
 		acl_msg_fatal("%s: bad open file status: %s", path,
 			acl_last_strerror(tbuf, sizeof(tbuf)));
 	} else if (S_ISDIR(fstat_st->st_mode)) {
-		if (why)
+		if (why) {
 			acl_vstring_sprintf(why, "file is a directory");
+		}
 		acl_set_error(EISDIR);
 	} else if (fstat_st->st_nlink != 1) {
-		if (why)
+		if (why) {
 			acl_vstring_sprintf(why, "file has %d hard links",
-					(int) fstat_st->st_nlink);
+				(int) fstat_st->st_nlink);
+		}
 		acl_set_error(EPERM);
 	}
 
@@ -90,15 +94,18 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 	 * delivering mail to a world-writable mailbox directory.
 	 */
 	else if (lstat(path, &lstat_st) < 0) {
-		if (why)
+		if (why) {
 			acl_vstring_sprintf(why, "file status changed unexpectedly: %s",
 				acl_last_strerror(tbuf, sizeof(tbuf)));
+		}
 		acl_set_error(EPERM);
 	} else if (S_ISLNK(lstat_st.st_mode)) {
-		if (lstat_st.st_uid == 0)
-			return (fp);
-		if (why)
+		if (lstat_st.st_uid == 0) {
+			return fp;
+		}
+		if (why) {
 			acl_vstring_sprintf(why, "file is a symbolic link");
+		}
 		acl_set_error(EPERM);
 	} else if (fstat_st->st_dev != lstat_st.st_dev
 		   || fstat_st->st_ino != lstat_st.st_ino
@@ -107,8 +114,9 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 #endif
 		   || fstat_st->st_nlink != lstat_st.st_nlink
 		   || fstat_st->st_mode != lstat_st.st_mode) {
-		if (why)
+		if (why) {
 			acl_vstring_sprintf(why, "file status changed unexpectedly");
+		}
 		acl_set_error(EPERM);
 	}
 
@@ -116,14 +124,14 @@ static ACL_VSTREAM *acl_safe_open_exist(const char *path, int flags,
 	 * We are almost there...
 	 */
 	else {
-		return (fp);
+		return fp;
 	}
 
 	/*
 	 * End up here in case of fstat()/lstat() problems or inconsistencies.
 	 */
 	acl_vstream_fclose(fp);
-	return (0);
+	return 0;
 }
 
 /* acl_safe_open_create - create new file */
@@ -140,10 +148,11 @@ static ACL_VSTREAM *acl_safe_open_create(const char *path, int flags, int mode,
 	 */
 	fp = acl_vstream_fopen(path, flags | (O_CREAT | O_EXCL), mode, 4096);
 	if (fp == 0) {
-		if (why)
+		if (why) {
 			acl_vstring_sprintf(why, "cannot create file exclusively: %s",
 				acl_last_strerror(tbuf, sizeof(tbuf)));
-		return (0);
+		}
+		return 0;
 	}
 
 	/*
@@ -161,22 +170,23 @@ static ACL_VSTREAM *acl_safe_open_create(const char *path, int flags, int mode,
 	/*
 	 * Optionally look up the file attributes.
 	 */
-	if (st != 0 && fstat(ACL_VSTREAM_FILE(fp), st) < 0)
+	if (st != 0 && fstat(ACL_VSTREAM_FILE(fp), st) < 0) {
 		acl_msg_fatal("%s: bad open file status: %s",
 			path, acl_last_strerror(tbuf, sizeof(tbuf)));
+	}
 
 	/*
 	 * We are almost there...
 	 */
 	else {
-		return (fp);
+		return fp;
 	}
 
 	/*
 	 * End up here in case of trouble.
 	 */
 	acl_vstream_fclose(fp);
-	return (0);
+	return 0;
 }
 
 /* acl_safe_open - safely open or create file */
@@ -185,22 +195,20 @@ ACL_VSTREAM *acl_safe_open(const char *path, int flags, int mode,
 	struct stat * st, uid_t user, gid_t group, ACL_VSTRING *why)
 {
 	ACL_VSTREAM *fp;
-
-	switch (flags & (O_CREAT | O_EXCL)) {
+	unsigned f = ((unsigned) flags) & (O_CREAT | O_EXCL);
 
 	/*
 	 * Open an existing file, carefully.
 	 */
-	case 0:
+	if (f == 0) {
 		return (acl_safe_open_exist(path, flags, st, why));
-
+	} else if (f == (O_CREAT | O_EXCL)) {
 		/*
 		 * Create a new file, carefully.
 		 */
-	case O_CREAT | O_EXCL:
-		return (acl_safe_open_create(path, flags, mode,
-						st, user, group, why));
-
+		return acl_safe_open_create(path, flags, mode,
+				st, user, group, why);
+	} else if (f == O_CREAT) {
 		/*
 		 * Open an existing file or create a new one, carefully.
 		 * When opening an existing file, we are prepared to deal
@@ -208,26 +216,25 @@ ACL_VSTREAM *acl_safe_open(const char *path, int flags, int mode,
 		 * are prepared for "file exists" errors only. Any other
 		 * error means we better give up trying.
 		 */
-	case O_CREAT:
 		fp = acl_safe_open_exist(path, flags, st, why);
 		if (fp == 0 && acl_last_error() == ENOENT) {
 			fp = acl_safe_open_create(path, flags, mode, st,
-						user, group, why);
-			if (fp == 0 && acl_last_error() == EEXIST)
+				user, group, why);
+			if (fp == 0 && acl_last_error() == EEXIST) {
 				fp = acl_safe_open_exist(path, flags, st, why);
+			}
 		}
-		return (fp);
-
+		return fp;
+	} else {
 		/*
 		 * Interface violation. Sorry, but we must be strict.
 		 */
-	default:
 		acl_msg_panic("acl_safe_open: O_EXCL flag without O_CREAT flag");
 	}
 
 	/* no reache here */
 
-	return (NULL);
+	return NULL;
 }
 
 #endif /* ACL_UNIX */

@@ -35,6 +35,7 @@ static void test1(int nblock, int capacity, int incr, int max, int pos) {
 	dbuf.set_increment((size_t) incr);
 	myobj* o;
 	std::list<myobj*, acl::dbuf_allocator<myobj*> > objs;
+	//std::list<myobj*> objs;
 
 	for (int i = 0; i < max; i++) {
 		o = dbuf.create<myobj>(&dbuf, i);
@@ -65,8 +66,6 @@ static void test1(int nblock, int capacity, int incr, int max, int pos) {
 
 	objs.clear();
 	dbuf.dbuf_reset();
-
-	printf("\r\n----------------Again---------------\r\n");
 
 	for (int i = 0; i < max; i++) {
 		o = dbuf.create<myobj>(&dbuf, i);
