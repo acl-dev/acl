@@ -317,7 +317,7 @@ void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout)
 		if (fs->nrefer == 0) {
 			acl_debug(__debug_section, 2)
 				("%s: fpath: %s, when_free: %ld, now: %ld",
-				myname, PATH(fs->fp), fs->when_free, now);
+				myname, PATH(fs->fp), (long) fs->when_free, (long) now);
 			__fhandle_close(fs);
 		}
 		iter = iter_next;
