@@ -155,6 +155,8 @@ struct addrinfo *acl_host_addrinfo2(const char *addr, int type, int family)
 	hints.ai_socktype = type;
 #ifdef	ACL_MACOSX
 	hints.ai_flags    = AI_DEFAULT;
+#elif	defined(ACL_OHOS)
+	hints.ai_flags    = 0;
 #elif	defined(ACL_ANDROID)
 	hints.ai_flags    = AI_ADDRCONFIG;
 #elif	defined(ACL_WINDOWS)
