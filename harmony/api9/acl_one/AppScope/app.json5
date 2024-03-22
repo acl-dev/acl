@@ -1,6 +1,6 @@
 {
   "app": {
-    "bundleName": "com.example.api9",
+    "bundleName": "com.example.acl_one",
     "vendor": "example",
     "versionCode": 1000000,
     "versionName": "1.0.0",
