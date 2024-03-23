@@ -484,6 +484,8 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	return acl_fiber_connect(sockfd, addr, addrlen);
 }
 
+#ifdef CREAT_TIMER_FIBER
+
 typedef struct TIMEOUT_CTX {
 	ACL_FIBER *fiber;
 	int        sockfd;
@@ -536,11 +538,15 @@ static void send_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 	mem_free(ctx);
 }
 
+#endif  // CREAT_TIMER_FIBER
+
 int setsockopt(int sockfd, int level, int optname,
 	const void *optval, socklen_t optlen)
 {
 	size_t val;
+#ifdef CREAT_TIMER_FIBER
 	TIMEOUT_CTX *ctx;
+#endif
 	const struct timeval *tm;
 
 	if (sys_setsockopt == NULL) {
@@ -583,6 +589,7 @@ int setsockopt(int sockfd, int level, int optname,
 		return -1;
 	}
 
+#ifdef CREAT_TIMER_FIBER
 	ctx = (TIMEOUT_CTX*) mem_malloc(sizeof(TIMEOUT_CTX));
 	ctx->fiber  = acl_fiber_running();
 	ctx->sockfd = sockfd;
@@ -599,6 +606,11 @@ int setsockopt(int sockfd, int level, int optname,
 		msg_error("Invalid optname=%d", optname);
 		return -1;
 	}
+#else
+	val *= 1000;
+	fiber_timer_add(acl_fiber_running(), val);
+	return 0;
+#endif
 }
 
 #endif

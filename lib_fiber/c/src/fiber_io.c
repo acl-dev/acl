@@ -495,11 +495,21 @@ int fiber_wait_read(FILE_EVENT *fe)
 	}
 
 	if (acl_fiber_canceled(curr)) {
-		acl_fiber_set_error(curr->errnum);
 		// If the IO has been canceled, we should try to remove the
 		// IO read event, because the wakeup process wasn't from
 		// read_callback normally.
 		event_del_read(__thread_fiber->event, fe);
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	} else if (curr->flag & FIBER_F_TIMER) {
+		// If the IO reading timeout set in setsockopt.
+		curr->flag &= ~FIBER_F_TIMER;
+		event_del_read(__thread_fiber->event, fe);
+		acl_fiber_set_errno(curr, FIBER_ETIME);
+		acl_fiber_set_error(FIBER_ETIME);
+
+		acl_fiber_set_errno(curr, FIBER_EAGAIN);
+		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
 	// else: the IO read event should has been removed in read_callback.
@@ -557,8 +567,16 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 	if (acl_fiber_canceled(curr)) {
-		acl_fiber_set_error(curr->errnum);
 		event_del_write(__thread_fiber->event, fe);
+		acl_fiber_set_error(curr->errnum);
+		return -1;
+	} else if (curr->flag & FIBER_F_TIMER) {
+		curr->flag &= ~FIBER_F_TIMER;
+		event_del_write(__thread_fiber->event, fe);
+		//acl_fiber_set_errno(curr, FIBER_EAGAIN);
+		//acl_fiber_set_error(FIBER_EAGAIN);
+		acl_fiber_set_errno(curr, FIBER_ETIME);
+		acl_fiber_set_error(FIBER_ETIME);
 		return -1;
 	}
 
