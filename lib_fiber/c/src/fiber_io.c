@@ -172,7 +172,7 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
-void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds)
+void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
 {
 	EVENT *ev = fiber_io_event();
 	long long now = event_get_stamp(ev);
@@ -318,7 +318,7 @@ void fiber_io_clear(void)
 	}
 }
 
-unsigned int acl_fiber_delay(unsigned int milliseconds)
+size_t acl_fiber_delay(size_t milliseconds)
 {
 	long long now;
 	ACL_FIBER *fiber;
@@ -349,7 +349,7 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 		return 0;
 	}
 
-	return (unsigned int) (now - fiber->when);
+	return (size_t) (now - fiber->when);
 }
 
 typedef struct {
@@ -370,7 +370,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 			break;
 		}
 
-		acl_fiber_delay((unsigned int) left);
+		acl_fiber_delay((size_t) left);
 
 		now = fiber_io_stamp();
 		if (fiber->when <= now) {
@@ -383,7 +383,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 	fiber_exit(0);
 }
 
-ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
+ACL_FIBER *acl_fiber_create_timer(size_t milliseconds, size_t size,
 	void (*fn)(ACL_FIBER *, void *), void *ctx)
 {
 	long long when;
@@ -403,7 +403,7 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	return fiber;
 }
 
-int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
+int acl_fiber_reset_timer(ACL_FIBER *fiber, size_t milliseconds)
 {
 	// The previous timer with the fiber must be removed first.
 	int ret = fiber_timer_del(fiber);
@@ -417,7 +417,7 @@ int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 	return 0;
 }
 
-unsigned int acl_fiber_sleep(unsigned int seconds)
+size_t acl_fiber_sleep(size_t seconds)
 {
 	return acl_fiber_delay(seconds * 1000) / 1000;
 }

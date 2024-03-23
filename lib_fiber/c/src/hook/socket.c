@@ -490,12 +490,12 @@ typedef struct TIMEOUT_CTX {
 	unsigned   id;
 } TIMEOUT_CTX;
 
-static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
+static void read_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 {
 	TIMEOUT_CTX *tc = (TIMEOUT_CTX*) ctx;
 	FILE_EVENT *fe = fiber_file_get(tc->sockfd);
 
-	// we must check the fiber carefully here.
+	// We must check the fiber carefully here.
 	if (fe == NULL || tc->fiber != fe->fiber_r
 		|| tc->fiber->fid != fe->fiber_r->fid) {
 
@@ -503,10 +503,32 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 		return;
 	}
 
-	// we can kill the fiber only if the fiber is waiting
+	// We can kill the fiber only if the fiber is waiting
 	// for readable ore writable of IO process.
-	if (fe->fiber_r->wstatus & (FIBER_WAIT_READ | FIBER_WAIT_WRITE)) {
+	if (fe->fiber_r->wstatus & FIBER_WAIT_READ) {
+		tc->fiber->errnum = FIBER_EAGAIN;
+		acl_fiber_signal(tc->fiber, SIGINT);
+	}
 
+	mem_free(ctx);
+}
+
+static void send_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
+{
+	TIMEOUT_CTX *tc = (TIMEOUT_CTX*) ctx;
+	FILE_EVENT *fe = fiber_file_get(tc->sockfd);
+
+	// We must check the fiber carefully here.
+	if (fe == NULL || tc->fiber != fe->fiber_w
+		|| tc->fiber->fid != fe->fiber_w->fid) {
+
+		mem_free(ctx);
+		return;
+	}
+
+	// We can kill the fiber only if the fiber is waiting
+	// for readable ore writable of IO process.
+	if (fe->fiber_w->wstatus & FIBER_WAIT_READ) {
 		tc->fiber->errnum = FIBER_EAGAIN;
 		acl_fiber_signal(tc->fiber, SIGINT);
 	}
@@ -564,8 +586,19 @@ int setsockopt(int sockfd, int level, int optname,
 	ctx = (TIMEOUT_CTX*) mem_malloc(sizeof(TIMEOUT_CTX));
 	ctx->fiber  = acl_fiber_running();
 	ctx->sockfd = sockfd;
-	acl_fiber_create_timer((unsigned) val * 1000, 64000, fiber_timeout, ctx);
-	return 0;
+
+	if (optname == SO_RCVTIMEO) {
+		val *= 1000;
+		acl_fiber_create_timer(val, 4096, read_timeout, ctx);
+		return 0;
+	} else if (optname == SO_SNDTIMEO) {
+		val *= 1000;
+		acl_fiber_create_timer(val, 4096, send_timeout, ctx);
+		return 0;
+	} else {
+		msg_error("Invalid optname=%d", optname);
+		return -1;
+	}
 }
 
 #endif

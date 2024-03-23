@@ -102,7 +102,7 @@ void fiber::ready(fiber& f)
 	}
 }
 
-unsigned int fiber::delay(unsigned int milliseconds)
+size_t fiber::delay(size_t milliseconds)
 {
 	return acl_fiber_delay(milliseconds);
 }
