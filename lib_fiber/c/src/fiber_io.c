@@ -223,6 +223,11 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			// Set the flag that the fiber wakeuped for the
 			// timer's arriving.
 			fb->flag |= FIBER_F_TIMER;
+
+			// The fb->me was be appended in fiber_timer_add, and
+			// we detatch fb->me from timer node and append it to
+			// the ready ring in acl_fiber_ready.
+			ring_detach(&fb->me);
 			acl_fiber_ready(fb);
 		}
 
@@ -342,6 +347,13 @@ size_t acl_fiber_delay(size_t milliseconds)
 
 	// Clear the flag been set in wakeup_timers.
 	fiber->flag &= ~FIBER_F_TIMER;
+
+	if (acl_fiber_killed(fiber)) {
+		// If been killed, the fiber must has been detatched from the
+		// timer node in acl_fiber_signal(); We call fiber_timer_del
+		// here in order to try to free the timer node.
+		fiber_timer_del(fiber);
+	}
 
 	ev = fiber_io_event();
 	now = event_get_stamp(ev);
@@ -484,8 +496,13 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	if (acl_fiber_canceled(curr)) {
 		acl_fiber_set_error(curr->errnum);
+		// If the IO has been canceled, we should try to remove the
+		// IO read event, because the wakeup process wasn't from
+		// read_callback normally.
+		event_del_read(__thread_fiber->event, fe);
 		return -1;
 	}
+	// else: the IO read event should has been removed in read_callback.
 
 	return ret;
 }
@@ -541,6 +558,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	if (acl_fiber_canceled(curr)) {
 		acl_fiber_set_error(curr->errnum);
+		event_del_write(__thread_fiber->event, fe);
 		return -1;
 	}
 

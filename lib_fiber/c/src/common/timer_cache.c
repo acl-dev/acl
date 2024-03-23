@@ -104,12 +104,18 @@ int timer_cache_remove(TIMER_CACHE *cache, long long expire, RING *entry)
 	}
 
 	if (entry->parent != &node->ring) {
+		// Maybe the fiber has been append to the other ring.
+		if (ring_size(&node->ring) == 0) {
+			timer_cache_free_node(cache, node);
+		}
 		return 0;
 	}
 
+	// Detach the fiber from the current timer node.
 	ring_detach(entry);
 
 	if (ring_size(&node->ring) == 0) {
+		// If the timer node is empty, just free it now.
 		timer_cache_free_node(cache, node);
 	}
 	return 1;
