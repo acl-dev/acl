@@ -505,8 +505,6 @@ int fiber_wait_read(FILE_EVENT *fe)
 		// If the IO reading timeout set in setsockopt.
 		curr->flag &= ~FIBER_F_TIMER;
 		event_del_read(__thread_fiber->event, fe);
-		acl_fiber_set_errno(curr, FIBER_ETIME);
-		acl_fiber_set_error(FIBER_ETIME);
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
@@ -573,10 +571,9 @@ int fiber_wait_write(FILE_EVENT *fe)
 	} else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
 		event_del_write(__thread_fiber->event, fe);
-		//acl_fiber_set_errno(curr, FIBER_EAGAIN);
-		//acl_fiber_set_error(FIBER_EAGAIN);
-		acl_fiber_set_errno(curr, FIBER_ETIME);
-		acl_fiber_set_error(FIBER_ETIME);
+
+		acl_fiber_set_errno(curr, FIBER_EAGAIN);
+		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
 
