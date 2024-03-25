@@ -54,7 +54,7 @@ static void http_client(ACL_FIBER *fiber, const char* addr)
 		}
 
 		if (i < 1) {
-			if (body.size() < 100) {
+			if (body.size() < 1000) {
 				printf(">>>fiber-%d: body: %s\r\n",
 					acl_fiber_id(fiber), body.c_str());
 			} else {

@@ -44,15 +44,18 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 
 	printf("ssl handshake_ok\r\n");
 
-	acl::string buf;
+	char buf[2048];
 
 	while (true) {
-		if (!conn->gets(buf, false)) {
-			printf("gets error: %s\r\n", acl::last_serror());
+		int ret = conn->read(buf, sizeof(buf) - 1, false);
+		if (ret < 0) {
+			printf("read error: %s\r\n", acl::last_serror());
 			break;
 		}
+		buf[ret] = 0;
+		printf(">>>read: %s, cnt=%d\r\n", buf, ret);
 
-		if (conn->write(buf) == -1) {
+		if (conn->write(buf, ret) == -1) {
 			printf("write error: %s\r\n", acl::last_serror());
 			break;
 		}

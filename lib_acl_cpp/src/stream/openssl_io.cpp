@@ -313,12 +313,18 @@ int openssl_io::read(void* buf, size_t len)
 	int timeout = nblock_ ? 0 : this->stream_->rw_timeout;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 
+//#define DEBUG_READ_TIMEOUT
+
 	while (len > 0) {
-		//time_t begin = time(NULL);
+#ifdef DEBUG_READ_TIMEOUT
+		time_t begin = time(NULL);
+#endif
 		if (acl_read_wait(fd, timeout) < 0) {
-			//time_t end = time(NULL);
-			//logger_error("acl_read_wait error=%s, fd=%d, cost=%ld",
-			//	last_serror(), (int) fd, (long) (end - begin));
+#ifdef DEBUG_READ_TIMEOUT
+			time_t end = time(NULL);
+			logger_error("read_wait error=%s, fd=%d, cost=%ld, ttl=%d",
+				last_serror(), (int) fd, (long) (end - begin), timeout);
+#endif
 			return -1;
 		}
 

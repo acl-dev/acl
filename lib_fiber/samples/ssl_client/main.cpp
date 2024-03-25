@@ -5,7 +5,7 @@
 
 #define	 STACK_SIZE	128000
 
-static int __rw_timeout   = 0;
+static int __rw_timeout   = -1;
 static int __conn_timeout = 0;
 static int __max_fibers   = 100;
 static int __left_fibers  = 100;
@@ -69,6 +69,16 @@ static void run(const char* addr)
 	printf("fiber-%d: connect %s ok, clients: %d, fd: %d\r\n",
 		acl_fiber_self(), addr, __total_clients, conn.sock_handle());
 
+	if (conn.write("h", 1) == -1) {
+		printf("write h error\n");
+		return;
+	}
+#if 1
+	printf("write h\r\n"); sleep(3);
+	conn.write("e", 1); printf("write e\n"); sleep(3);
+	conn.write("\r\n", 2); printf("write crlf\n"); sleep(3);
+#endif
+
 	acl::string buf;
 	const char req[] = "hello world\r\n";
 
@@ -77,11 +87,17 @@ static void run(const char* addr)
 			printf("write error: %s\r\n", acl::last_serror());
 			break;
 		}
+		//sleep(1);
 
 		if (!conn.gets(buf, false)) {
 			printf("gets error: %s\r\n", acl::last_serror());
 			break;
 		}
+
+		if (i < 5) {
+			printf(">>>gets: %s\r\n", buf.c_str());
+		}
+
 		buf.clear();
 		__total_count++;
 	}
@@ -215,7 +231,7 @@ int main(int argc, char *argv[])
 		}
 		acl::openssl_conf::set_libpath(libs[0], libs[1]);
 		if (acl::openssl_conf::load()) {
-			__ssl_conf = new acl::openssl_conf(false);
+			__ssl_conf = new acl::openssl_conf;
 		} else {
 			printf("load %s error\r\n", libpath.c_str());
 		}

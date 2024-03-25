@@ -66,15 +66,15 @@ int main(int argc, char* argv[])
 
 	acl::sslbase_conf* ssl_conf = NULL;
 	if (libpath.find("mbedtls")) {
-		ssl_conf = new acl::mbedtls_conf(false);
 		acl::mbedtls_conf::set_libpath(libpath.c_str());
+		ssl_conf = new acl::mbedtls_conf(false);
 		if (!acl::mbedtls_conf::load()) {
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
 	} else if (libpath.find("polarssl")) {
-		ssl_conf = new acl::polarssl_conf;
 		acl::polarssl_conf::set_libpath(libpath);
+		ssl_conf = new acl::polarssl_conf;
 		if (!acl::polarssl_conf::load()) {
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
