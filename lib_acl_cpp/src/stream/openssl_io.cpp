@@ -305,13 +305,46 @@ bool openssl_io::on_close(bool alive)
 #endif
 }
 
+static bool set_sock_timeout(ACL_SOCKET fd, int opt, int timeout)
+{
+	if (timeout <= 0) {
+		return true;
+	}
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+	timeout *= 1000; // From seconds to millisecond.
+	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+#else   // Must be Linux.
+	struct timeval tm;
+	tm.tv_sec  = timeout;
+	tm.tv_usec = 0;
+
+	if (setsockopt(fd, SOL_SOCKET, opt, &tm, sizeof(tm)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+#endif
+	return true;
+}
+
 int openssl_io::read(void* buf, size_t len)
 {
 #ifdef HAS_OPENSSL
 	size_t nbytes = 0;
 	char*  ptr = (char*) buf;
-	int timeout = nblock_ ? 0 : this->stream_->rw_timeout;
+	int timeo = nblock_ ? 0 : this->stream_->rw_timeout;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
+	bool opt = conf_.is_sockopt_timeout();
+
+	if (timeo > 0 && opt && !set_sock_timeout(fd, SO_RCVTIMEO, timeo)) {
+		logger_error("Can't set read timeout, fd=%d", fd);
+		return -1;
+	}
 
 //#define DEBUG_READ_TIMEOUT
 
@@ -319,16 +352,19 @@ int openssl_io::read(void* buf, size_t len)
 #ifdef DEBUG_READ_TIMEOUT
 		time_t begin = time(NULL);
 #endif
-		if (acl_read_wait(fd, timeout) < 0) {
+		if (timeo > 0 && !opt && acl_read_wait(fd, timeo) < 0) {
 #ifdef DEBUG_READ_TIMEOUT
 			time_t end = time(NULL);
 			logger_error("read_wait error=%s, fd=%d, cost=%ld, ttl=%d",
-				last_serror(), (int) fd, (long) (end - begin), timeout);
+				last_serror(), (int) fd, (long) (end - begin), timeo);
 #endif
 			return -1;
 		}
 
 		int ret = __ssl_read(ssl_, ptr, (int) len);
+
+		this->stream_->read_ready = 0;
+
 		if (ret > 0) {
 			nbytes += ret;
 			ptr += ret;
@@ -337,37 +373,36 @@ int openssl_io::read(void* buf, size_t len)
 			break;
 		}
 
+
 		if (nbytes > 0) {
 			break;
 		}
 
-		this->stream_->read_ready = 0;
 
 		int err = __ssl_get_error(ssl_, ret);
 
-		switch (err) {
-		case SSL_ERROR_WANT_READ:
-		case SSL_ERROR_WANT_WRITE:
-			if (nblock_) {
-				return ACL_VSTREAM_EOF;
+		if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+			if (nblock_ || opt) {
+				break;
 			}
-			break;
-		case SSL_ERROR_ZERO_RETURN:
-		case SSL_ERROR_SYSCALL:
-		default:
+		} else {
+			// SSL_ERROR_ZERO_RETURN, SSL_ERROR_SYSCALL, others.
+
 			/*
 			if (ERR_peek_error() == 0) {
 			}
 			*/
-			return ACL_VSTREAM_EOF;
+			return -1;
 		}
 	}
 
+#if 0
 	if (len == 0) {
 		this->stream_->read_ready = 1;
 	}
+#endif
 
-	return nbytes > 0 ? (int) nbytes : ACL_VSTREAM_EOF;
+	return nbytes > 0 ? (int) nbytes : -1;
 #else
 	(void) buf;
 	(void) len;
@@ -381,12 +416,18 @@ int openssl_io::send(const void* buf, size_t len)
 #ifdef HAS_OPENSSL
 	size_t nbytes = 0;
 	char*  ptr = (char*) buf;
-	int timeout = nblock_ ? 0 : this->stream_->rw_timeout;
+	int timeo = nblock_ ? 0 : this->stream_->rw_timeout;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
+	bool opt = conf_.is_sockopt_timeout();
+
+	if (timeo > 0 && opt && !set_sock_timeout(fd, SO_SNDTIMEO, timeo)) {
+		logger_error("Can't set send timeout, fd=%d", fd);
+		return -1;
+	}
 
 	while (len > 0) {
 		//time_t begin = time(NULL);
-		if (acl_write_wait(fd, timeout) < 0) {
+		if (timeo > 0 && !opt && acl_write_wait(fd, timeo) < 0) {
 			//time_t end = time(NULL);
 			//logger_error("acl_write_wait error=%s, fd=%d, cost=%ld",
 			//	last_serror(), (int) fd, (long) (end - begin));
@@ -402,19 +443,28 @@ int openssl_io::send(const void* buf, size_t len)
 			break;
 		}
 
-		int err = __ssl_get_error(ssl_, ret);
-		switch (err) {
-		case SSL_ERROR_WANT_READ:
-		case SSL_ERROR_WANT_WRITE:
-			break;
-		case SSL_ERROR_SYSCALL:
-		default:
+		if (nbytes > 0) {
 			break;
 		}
-		break;
+
+		int err = __ssl_get_error(ssl_, ret);
+
+		if (err == SSL_ERROR_WANT_READ || err == SSL_ERROR_WANT_WRITE) {
+			if (nblock_ || opt) {
+				break;
+			}
+		} else {
+			// SSL_ERROR_ZERO_RETURN, SSL_ERROR_SYSCALL, others.
+
+			/*
+			if (ERR_peek_error() == 0) {
+			}
+			*/
+			return -1;
+		}
 	}
 
-	return nbytes > 0 ? (int) nbytes : ACL_VSTREAM_EOF;
+	return nbytes > 0 ? (int) nbytes : -1;
 #else
 	(void) buf;
 	(void) len;
