@@ -3,14 +3,13 @@
 
 static void set_timeout(ACL_VSTREAM *cstream, int rw_timeout)
 {
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+	if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
+		SO_RCVTIMEO, &rw_timeout, sizeof(rw_timeout)) < 0) {
+#else
 	struct timeval tm;
 	tm.tv_sec  = rw_timeout;
 	tm.tv_usec = 0;
-
-#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
-	if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
-		SO_RCVTIMEO, &__rw_timeout, sizeof(__rw_timeout)) < 0) {
-#else
 	if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
 		SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
 #endif
