@@ -546,6 +546,9 @@ int setsockopt(int sockfd, int level, int optname,
 	size_t val;
 #ifdef CREAT_TIMER_FIBER
 	TIMEOUT_CTX *ctx;
+#else
+	FILE_EVENT *fe;
+	ACL_FIBER *curr;
 #endif
 	const struct timeval *tm;
 
@@ -607,8 +610,34 @@ int setsockopt(int sockfd, int level, int optname,
 		return -1;
 	}
 #else
+	curr = acl_fiber_running();
+	fe = fiber_file_open(sockfd);
+
+	if (val <= 0) {
+		fiber_timer_del(curr);
+		if (optname == SO_RCVTIMEO) {
+			fe->mask &= ~EVENT_SO_RCVTIMEO;
+			fe->r_timeout = -1;
+		} else if (optname == SO_SNDTIMEO) {
+			fe->mask &= ~EVENT_SO_SNDTIMEO;
+			fe->w_timeout = -1;
+		}
+		return 0;
+	}
+
 	val *= 1000;
-	fiber_timer_add(acl_fiber_running(), val);
+	if (optname == SO_RCVTIMEO) {
+		fe->mask |= EVENT_SO_RCVTIMEO;
+		fe->r_timeout = val;
+	} else if (optname == SO_SNDTIMEO) {
+		fe->mask |= EVENT_SO_SNDTIMEO;
+		fe->w_timeout = val;
+	} else {
+		msg_fatal("%s: Invalid optname=%d", __FUNCTION__, optname);
+	}
+
+	// We just set the flags here, and the timer will be add in
+	// fiber_wait_read or fiber_wait_write.
 	return 0;
 #endif
 }

@@ -179,7 +179,7 @@ void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
 	TIMER_CACHE_NODE *timer;
 
 	fiber->when = now + milliseconds;
-	ring_detach(&fiber->me);
+	ring_detach(&fiber->me);  // Detch the previous binding.
 	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
 
 	/* Compute the event waiting interval according the timers' head */
@@ -485,6 +485,10 @@ int fiber_wait_read(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
+	if (fe->mask & EVENT_SO_RCVTIMEO && fe->r_timeout > 0) {
+		fiber_timer_add(curr, fe->r_timeout);
+	}
+
 	acl_fiber_switch();
 
 	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
@@ -503,6 +507,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return -1;
 	} else if (curr->flag & FIBER_F_TIMER) {
 		// If the IO reading timeout set in setsockopt.
+		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
 		curr->flag &= ~FIBER_F_TIMER;
 		event_del_read(__thread_fiber->event, fe);
 
@@ -553,6 +558,11 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	if (!(fe->type & TYPE_INTERNAL)) {
 		WAITER_INC(__thread_fiber->event);
+	}
+
+
+	if (fe->mask & EVENT_SO_SNDTIMEO && fe->w_timeout > 0) {
+		fiber_timer_add(curr, fe->w_timeout);
 	}
 
 	acl_fiber_switch();

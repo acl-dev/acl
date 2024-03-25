@@ -199,6 +199,9 @@ struct FILE_EVENT {
 #define	EVENT_SENDMSG		(unsigned) (1 << 28)
 #endif // HAS_IO_URING
 
+#define	EVENT_SO_RCVTIMEO	(unsigned) (1 << 29)
+#define	EVENT_SO_SNDTIMEO	(unsigned) (1 << 30)
+
 	event_proc   *r_proc;
 	event_proc   *w_proc;
 #ifdef HAS_POLL
@@ -230,7 +233,7 @@ struct FILE_EVENT {
 			int flags;
 		} recv_ctx;
 
-#if defined(IO_URING_HAS_RECVFROM)
+# if defined(IO_URING_HAS_RECVFROM)
 		struct {
 			char *buf;
 			unsigned len;
@@ -238,7 +241,7 @@ struct FILE_EVENT {
 			struct sockaddr *src_addr;
 			socklen_t *addrlen;
 		} recvfrom_ctx;
-#endif
+# endif
 
 		struct {
 			struct msghdr *msg;
@@ -265,7 +268,7 @@ struct FILE_EVENT {
 			int flags;
 		} send_ctx;
 
-#if defined(IO_URING_HAS_SENDTO)
+# if defined(IO_URING_HAS_SENDTO)
 		struct {
 			const void *buf;
 			unsigned len;
@@ -273,7 +276,7 @@ struct FILE_EVENT {
 			const struct sockaddr *dest_addr;
 			socklen_t addrlen;
 		} sendto_ctx;
-#endif
+# endif
 
 		struct {
 			const struct msghdr *msg;
@@ -287,9 +290,9 @@ struct FILE_EVENT {
 			socklen_t          len;
 		} peer;
 
-#ifdef HAS_STATX
+# ifdef HAS_STATX
 		struct statx *statxbuf;
-#endif
+# endif
 		char  *path;
 	} var;
 
@@ -297,10 +300,11 @@ struct FILE_EVENT {
 	struct IO_URING_CTX writer_ctx;
 	struct __kernel_timespec rts;
 	struct __kernel_timespec wts;
+
+#endif  // HAS_IO_URING
+
 	int           r_timeout;
 	int           w_timeout;
-
-#endif
 
 	ACL_FIBER_SEM* mbox_wsem; // Used in sync_waiter_wakeup.c
 
@@ -322,7 +326,8 @@ struct FILE_EVENT {
 			socklen_t          len;
 		} peer;
 	} var;
-#endif
+#endif  // HAS_IOCP
+
 	short refer;
 	short busy;
 #define	EVENT_BUSY_NONE		(0)
