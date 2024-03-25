@@ -23,7 +23,7 @@ static bool ssl_init(acl::socket_stream& conn)
 {
 	assert(__ssl_conf);
 
-	acl::sslbase_io* ssl = __ssl_conf->open(false, false);
+	acl::sslbase_io* ssl = __ssl_conf->create(false);
 
 	if (conn.setup_hook(ssl) == ssl) {
 		printf("setup_hook error\r\n");
@@ -32,7 +32,7 @@ static bool ssl_init(acl::socket_stream& conn)
 	}
 
 	if (!__check_ssl) {
-		printf("ssl handshake_ok\r\n");
+		printf("ssl handshake ok, no check ssl\r\n");
 		return true;
 	}
 
@@ -47,7 +47,7 @@ static bool ssl_init(acl::socket_stream& conn)
 		return false;
 	}
 
-	printf("ssl handshake_ok\r\n");
+	printf("ssl handshake ok\r\n");
 	return true;
 }
 
@@ -202,11 +202,26 @@ int main(int argc, char *argv[])
 		}
 	} else if (libpath.find("polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(libpath);
-		if (!acl::polarssl_conf::load()) {
+		if (acl::polarssl_conf::load()) {
 			__ssl_conf = new acl::polarssl_conf;
 		} else {
 			printf("load %s error\r\n", libpath.c_str());
 		}
+	} else if (libpath.find("crypto") != NULL) {
+		const std::vector<acl::string>& libs = libpath.split2("; \t");
+		if (libs.size() != 2) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+		if (acl::openssl_conf::load()) {
+			__ssl_conf = new acl::openssl_conf(false);
+		} else {
+			printf("load %s error\r\n", libpath.c_str());
+		}
+	} else {
+		printf("invalid libpath=%s\r\n", libpath.c_str());
+		return 1;
 	}
 
 	gettimeofday(&__begin, NULL);

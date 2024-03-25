@@ -4,7 +4,7 @@
 
 #define	 STACK_SIZE	128000
 
-static int __rw_timeout = 0;
+static int __rw_timeout = 5;
 static acl::string __ssl_crt("./ssl_crt.pem");
 static acl::string __ssl_key("./ssl_key.pem");
 static acl::sslbase_conf *__ssl_conf = NULL;
@@ -63,15 +63,31 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 	delete conn;
 }
 
-static acl::sslbase_conf* ssl_init(bool use_mbedtls, const acl::string& crt,
+enum ssl_type_t {
+	ssl_type_openssl,
+	ssl_type_mbedtls,
+	ssl_type_polarssl,
+};
+
+static acl::sslbase_conf* ssl_init(ssl_type_t type, const acl::string& crt,
 	const acl::string& key)
 {
 	acl::sslbase_conf* conf;
-	if (use_mbedtls) {
+	switch (type) {
+	case ssl_type_openssl:
+		conf = new acl::openssl_conf(true);
+		break;
+	case ssl_type_mbedtls:
 		conf = new acl::mbedtls_conf(true);
-	} else {
+		break;
+	case ssl_type_polarssl:
 		conf = new acl::polarssl_conf;
+		break;
+	default:
+		printf("Unknown ssl type=%d\r\n", (int) type);
+		return NULL;
 	}
+
 	conf->enable_cache(1);
 
 	if (!conf->add_cert(crt)) {
@@ -180,14 +196,26 @@ int main(int argc, char *argv[])
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
-		__ssl_conf = ssl_init(true, __ssl_crt, __ssl_key);
+		__ssl_conf = ssl_init(ssl_type_mbedtls, __ssl_crt, __ssl_key);
 	} else if (libpath.find("polarssl") != NULL) {
 		acl::polarssl_conf::set_libpath(libpath);
 		if (!acl::polarssl_conf::load()) {
 			printf("load %s error\r\n", libpath.c_str());
 			return 1;
 		}
-		__ssl_conf = ssl_init(false, __ssl_crt, __ssl_key);
+		__ssl_conf = ssl_init(ssl_type_polarssl, __ssl_crt, __ssl_key);
+	} else if (libpath.find("crypto") != NULL) {
+		const std::vector<acl::string>& libs = libpath.split2("; \t");
+		if (libs.size() != 2) {
+			printf("invalid libpath=%s\r\n", libpath.c_str());
+			return 1;
+		}
+		acl::openssl_conf::set_libpath(libs[0], libs[1]);
+		if (!acl::openssl_conf::load()) {
+			printf("load %s error\r\n", libpath.c_str());
+			return 1;
+		}
+		__ssl_conf = ssl_init(ssl_type_openssl, __ssl_crt, __ssl_key);
 	} else {
 		printf("invalid libpath=%s\r\n", libpath.c_str());
 		return 1;
