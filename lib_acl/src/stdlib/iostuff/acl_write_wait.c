@@ -74,7 +74,7 @@ int acl_write_wait_ms(ACL_SOCKET fd, int timeout)
 			end = time(NULL);
 			acl_msg_error("%s(%d), %s: poll return 0, delay=%d, "
 				"fd=%d, cost=%ld", __FILE__, __LINE__,
-				myname, delay, fd, end - begin);
+				myname, delay, fd, (long) ( end - begin));
 			return -1;
 		default:
 			if (fds.revents & POLLNVAL) {

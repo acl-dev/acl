@@ -190,7 +190,7 @@ static int event_uring_add_write(EVENT_URING *ep, FILE_EVENT *fe)
 
 		TRY_SUBMMIT(ep);
 	} else if (fe->mask & EVENT_POLLOUT) {
-		add_write_wait(ep, fe, fe->r_timeout);
+		add_write_wait(ep, fe, fe->w_timeout);
 	} else if (fe->mask & EVENT_CONNECT) {
 		non_blocking(fe->fd, 1);
 		struct io_uring_sqe *sqe = io_uring_get_sqe(&ep->ring);

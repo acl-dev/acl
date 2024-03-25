@@ -9,6 +9,7 @@ static int __rw_timeout = 10;
 static acl::string __ssl_crt("./ssl_crt.pem");
 static acl::string __ssl_key("./ssl_key.pem");
 static acl::sslbase_conf* __ssl_conf;
+static bool __shared_stack = false;
 
 static void http_server(ACL_FIBER *, void *ctx)
 {
@@ -80,6 +81,14 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 {
 	const char* addr = (const char* ) ctx;
 	acl::server_socket server;
+	ACL_FIBER_ATTR attr;
+
+	acl_fiber_attr_init(&attr);
+
+	if (__shared_stack) {
+		acl_fiber_attr_setstacksize(&attr, 4096);
+		acl_fiber_attr_setsharestack(&attr, 1);
+	}
 
 	ssl_init(*__ssl_conf, __ssl_crt, __ssl_key);
 
@@ -99,7 +108,11 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 
 		client->set_rw_timeout(__rw_timeout);
 		printf("accept one: %d\r\n", client->sock_handle());
-		acl_fiber_create(http_server, client, STACK_SIZE);
+		if (__shared_stack) {
+			acl_fiber_create2(&attr, http_server, client);
+		} else {
+			acl_fiber_create(http_server, client, STACK_SIZE);
+		}
 	}
 
 	exit (0);
@@ -108,6 +121,7 @@ static void fiber_accept(ACL_FIBER *, void *ctx)
 static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
+		" -S [use shared stack]\r\n"
 		" -l ssl_lib_path\r\n"
 		" -s listen_addr\r\n"
 		" -r rw_timeout\r\n"
@@ -128,7 +142,7 @@ int main(int argc, char *argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:r:c:k:l:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:r:c:k:l:S")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -147,6 +161,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'l':
 			libpath = optarg;
+			break;
+		case 'S':
+			__shared_stack =true;
 			break;
 		default:
 			break;

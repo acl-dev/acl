@@ -47,15 +47,17 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 	memset(&info, 0, sizeof(SYSTEM_INFO));
 	GetSystemInfo(&info);
 	page_size = info.dwPageSize;
-	if (page_size <= 0)
+	if (page_size <= 0) {
 		page_size = 4096;
+	}
 #else
 	page_size = 4096;
 #endif
 
 	size = (block_size / (size_t) page_size) * (size_t) page_size;
-	if (size < (size_t) page_size)
+	if (size < (size_t) page_size) {
 		size = page_size;
+	}
 
 	/* xxx: 为了尽量保证在调用 acl_mymalloc 分配内存时为内存页的整数倍，
 	 * 需要减去 sizeof(ACL_DBUF) 和 16 字节，其中 16 字节是 acl_mymalloc
@@ -78,7 +80,7 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 	pool->head       = (ACL_DBUF*) pool->buf;
 	pool->head->next = NULL;
 	pool->head->keep = 1;
-	pool->head->used = 0;
+	pool->head->used = 1;
 	pool->head->size = size;
 	pool->head->addr = pool->head->buf;
 	pool->count      = 1;
@@ -93,10 +95,13 @@ void acl_dbuf_pool_destroy(ACL_DBUF_POOL *pool)
 	while (iter) {
 		tmp = iter;
 		iter = iter->next;
-		if ((char*) tmp == pool->buf)
+		if ((char*) tmp == pool->buf) {
 			break;
-		if (tmp->size > pool->block_size)
+		}
+		if (tmp->size > pool->block_size) {
 			pool->huge--;
+		}
+
 #ifdef	USE_VALLOC
 		free(tmp);
 #else

@@ -5,7 +5,8 @@
 #include <unistd.h>
 #include "fiber/libfiber.h"
 
-static int __rw_timeout = 0;
+static int __rw_timeout = 5;
+static time_t __last = 0;
 
 typedef struct {
 	ACL_FIBER *fiber;
@@ -16,17 +17,20 @@ typedef struct {
 static void io_timer(ACL_FIBER *fiber, void *ctx)
 {
 	FIBER_TIMER *ft = (FIBER_TIMER *) ctx;
+	time_t now = time(NULL);
 
 	assert(fiber == ft->timer);
 
 	acl_fiber_set_errno(ft->fiber, FIBER_ETIME);
 	acl_fiber_keep_errno(ft->fiber, 1);
 
-	printf("timer-%d wakeup, set fiber-%d, errno: %d, %d\r\n",
-		acl_fiber_id(fiber), acl_fiber_id(ft->fiber),
-		FIBER_ETIME, acl_fiber_errno(ft->fiber));
+	printf("timer-%d wakeup: cost %ld seconds, set fiber-%d, errno: %d, %d, %s\r\n",
+		acl_fiber_id(fiber), now - __last, acl_fiber_id(ft->fiber),
+		FIBER_ETIME, acl_fiber_errno(ft->fiber), acl_fiber_last_serror());
 
-	acl_fiber_ready(ft->fiber);
+	__last = now;
+	//acl_fiber_ready(ft->fiber);
+	acl_fiber_signal(ft->fiber, SIGINT);
 }
 
 static void echo_client(ACL_FIBER *fiber, void *ctx)
@@ -45,8 +49,11 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 #define	SOCK ACL_VSTREAM_SOCK
 
 	while (1) {
+		__last = time(NULL);
+
 		printf("begin read\n");
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
+		printf("read return: %d\r\n", ret);
 
 		if (ret == ACL_VSTREAM_EOF) {
 			printf("fiber-%d, gets error: %s, %d, %d, fd: %d, "
@@ -54,30 +61,34 @@ static void echo_client(ACL_FIBER *fiber, void *ctx)
 				acl_last_serror(), errno, acl_fiber_errno(fiber),
 				SOCK(cstream), count);
 
-			if (errno != FIBER_ETIME)
+			if (errno != FIBER_ETIME) {
+				printf("Some error happened!\r\n");
 				break;
+			}
 
-			if (++ntimeout > 2)
-			{
+			if (++ntimeout > 2) {
 				printf("too many timeout: %d\r\n", ntimeout);
 				break;
 			}
 
-			printf("ntimeout: %d\r\n", ntimeout);
-			ft->timer = acl_fiber_create_timer(__rw_timeout * 1000,
-					320000, io_timer, ft);
+			printf("Timeout count: %d\r\n", ntimeout);
 		}
 
-		acl_fiber_reset_timer(ft->timer, __rw_timeout * 1000);
-		buf[ret] = 0;
-		//printf("gets line: %s", buf);
+		if (ret > 0) {
+			buf[ret] = 0;
+			//printf("gets line: %s", buf);
 
-		if (acl_vstream_writen(cstream, buf, ret) == ACL_VSTREAM_EOF) {
-			printf("write error, fd: %d\r\n", SOCK(cstream));
-			break;
+			if (acl_vstream_writen(cstream, buf, ret) == ACL_VSTREAM_EOF) {
+				printf("write error, fd: %d\r\n", SOCK(cstream));
+				break;
+			}
 		}
 
 		count++;
+
+		acl_fiber_clear(ft->fiber);
+		acl_fiber_reset_timer(ft->timer, __rw_timeout * 1000);
+		printf("\r\n");
 	}
 
 	acl_myfree(ft);

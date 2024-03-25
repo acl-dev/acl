@@ -31,9 +31,9 @@ void file_event_init(FILE_EVENT *fe, socket_t fd)
 	memset(&fe->var, 0, sizeof(fe->var));
 	memset(&fe->reader_ctx, 0, sizeof(fe->reader_ctx));
 	memset(&fe->writer_ctx, 0, sizeof(fe->writer_ctx));
+#endif
 	fe->r_timeout = -1;
 	fe->w_timeout = -1;
-#endif
 
 #ifdef HAS_IOCP
 	fe->rbuf    = NULL;

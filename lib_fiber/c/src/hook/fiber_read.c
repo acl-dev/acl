@@ -201,8 +201,8 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 
 #define FILE_ALLOC(f, t, fd) do {                                            \
     (f) = file_event_alloc(fd);                                              \
-    (f)->mask = (t);                                                       \
-    (f)->type = TYPE_EVENTABLE;                                            \
+    (f)->mask = (t);                                                         \
+    (f)->type = TYPE_EVENTABLE;                                              \
 } while (0)
 
 #ifdef SYS_UNIX

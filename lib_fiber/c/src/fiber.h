@@ -129,7 +129,7 @@ int fiber_wait_read(FILE_EVENT *fe);
 int fiber_wait_write(FILE_EVENT *fe);
 
 EVENT *fiber_io_event(void);
-void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds);
+void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds);
 int fiber_timer_del(ACL_FIBER *fiber);
 
 FILE_EVENT *fiber_file_open(socket_t fd);

@@ -550,6 +550,7 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 , ssl_ctx_(NULL)
 , ssl_ctx_table_(NULL)
 , timeout_(timeout)
+, sockopt_timeout_(false)
 {
 #ifdef HAS_OPENSSL
 	// Init OpenSSL globally, and the dynamic libs will be loaded
@@ -589,6 +590,12 @@ openssl_conf::~openssl_conf(void)
 	delete ssl_ctx_table_;
 #endif
 }
+
+void openssl_conf::use_sockopt_timeout(bool yes)
+{
+	sockopt_timeout_ = yes;
+}
+
 
 SSL_CTX* openssl_conf::create_ssl_ctx(void)
 {

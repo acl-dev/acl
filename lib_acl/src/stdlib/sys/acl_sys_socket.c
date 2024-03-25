@@ -145,23 +145,6 @@ int acl_socket_close(ACL_SOCKET fd)
 int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg acl_unused)
 {
-#if 0
-	WSABUF wsaData;
-	DWORD dwBytes = 0;
-	DWORD flags = 0;
-	int   ret;
-
-	wsaData.len = (u_long) size;
-	wsaData.buf = (char*) buf;
-	ret = WSARecv(fd, &wsaData, 1, &dwBytes, &flags, NULL, NULL);
-	if (ret == SOCKET_ERROR) {
-		return -1;
-	}
-	if (dwBytes == 0) {
-		return -1;
-	}
-	return dwBytes;
-#else
 	if (fp != NULL && fp->read_ready) {
 		fp->read_ready = 0;
 	} else if (timeout > 0) {
@@ -174,25 +157,25 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 		}
 	}
 
-# if defined(_WIN32) || defined(_WIN64)
-#  ifdef SYS_WSA_API
+#if defined(_WIN32) || defined(_WIN64)
+# ifdef SYS_WSA_API
 	WSABUF wsabuf;
 	wsabuf.buf = buf;
 	wsabuf.len = (int) size;
 	DWORD flags = 0;
 	return WSARecv(fd, &wsabuf, (int) size, 0, &flags, 0, 0);
-#  else
-	return __sys_recv(fd, buf, (int) size, 0);
-#  endif
 # else
 	return __sys_recv(fd, buf, (int) size, 0);
 # endif
+#else
+	return __sys_recv(fd, buf, (int) size, 0);
 #endif
 }
 
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
+#ifdef ACL_WRITE_FIRST
 	int   ret, error;
 
 	ret = __sys_send(fd, buf, (int) size, 0);
@@ -207,13 +190,14 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 
 	error = acl_last_error();
 
-#if ACL_EWOULDBLOCK == ACL_EAGAIN
+# if ACL_EWOULDBLOCK == ACL_EAGAIN
 	if (error != ACL_EWOULDBLOCK) {
-#else
+# else
 	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
-#endif
+# endif
 		return ret;
 	}
+#endif
 
 #ifdef ACL_WRITEABLE_CHECK
 	if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
@@ -225,8 +209,10 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	}
 
 	return __sys_send(fd, buf, (int) size, 0);
-#else
+#elif defined(ACL_WRITE_FIRST)
 	return ret;
+#else
+# error "One of ACL_WRITE_FIRST or ACL_WRITEABLE_CHECK must be defined at least!"
 #endif
 }
 
@@ -459,6 +445,7 @@ int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
+#ifdef ACL_WRITE_FIRST
 	int ret, error;
 
 	ret = (int) __sys_write(fd, buf, size);
@@ -472,32 +459,38 @@ int acl_socket_write(ACL_SOCKET fd, const void *buf, size_t size,
 
 	error = acl_last_error();
 
-#if ACL_EWOULDBLOCK == ACL_EAGAIN
+# if ACL_EWOULDBLOCK == ACL_EAGAIN
 	if (error != ACL_EWOULDBLOCK) {
-#else
+# else
 	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
-#endif
+# endif
 		return ret;
 	}
-
-#ifdef ACL_WRITEABLE_CHECK
-	if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
-		if (acl_write_wait_ms(fd, timeout) < 0) {
-			return -1;
-		}
-	} else if (acl_write_wait(fd, timeout) < 0) {
-		return -1;
-	}
-
-	ret = __sys_write(fd, buf, size);
 #endif
 
+#ifdef ACL_WRITEABLE_CHECK
+	if (timeout > 0) {
+		if (fp != NULL && ACL_VSTREAM_IS_MS(fp)) {
+			if (acl_write_wait_ms(fd, timeout) < 0) {
+				return -1;
+			}
+		} else if (acl_write_wait(fd, timeout) < 0) {
+			return -1;
+		}
+	}
+
+	return __sys_write(fd, buf, size);
+#elif defined(ACL_WRITE_FIRST)
 	return ret;
+#else
+# error "One of ACL_WRITE_FIRST or ACL_WRITEABLE_CHECK must be defined at least!"
+#endif
 }
 
 int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 	int timeout, ACL_VSTREAM *fp acl_unused, void *arg acl_unused)
 {
+#ifdef ACL_WRITE_FIRST
 	int ret, error;
 
 	ret = (int) __sys_writev(fd, vec, count);
@@ -511,23 +504,26 @@ int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec, int count,
 
 	error = acl_last_error();
 
-#if ACL_EWOULDBLOCK == ACL_EAGAIN
+# if ACL_EWOULDBLOCK == ACL_EAGAIN
 	if (error != ACL_EWOULDBLOCK) {
-#else
+# else
 	if (error != ACL_EWOULDBLOCK && error != ACL_EAGAIN) {
-#endif
+# endif
 		return ret;
 	}
+#endif
 
 #ifdef ACL_WRITEABLE_CHECK
 	if (acl_write_wait(fd, timeout) < 0) {
 		return -1;
 	}
 
-	ret = __sys_writev(fd, vec, count);
-#endif
-
+	return __sys_writev(fd, vec, count);
+#elif defined(ACL_WRITE_FIRST)
 	return ret;
+#else
+# error "One of ACL_WRITE_FIRST or ACL_WRITEABLE_CHECK must be defined at least!"
+#endif
 }
 
 #else

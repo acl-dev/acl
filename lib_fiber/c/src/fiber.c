@@ -472,7 +472,10 @@ static void fiber_signal(ACL_FIBER *fiber, int signum, int sync)
 
 	// Just only wakeup the suspended fiber.
 	if (fiber->status == FIBER_STATUS_SUSPEND) {
+#if 0
+		// The fiber will be detached at first in acl_fiber_ready.
 		ring_detach(&fiber->me); // This is safety!
+#endif
 		
 		acl_fiber_ready(fiber);
 
@@ -526,10 +529,14 @@ void fiber_exit(int exit_code)
 void acl_fiber_ready(ACL_FIBER *fiber)
 {
 	if (fiber->status != FIBER_STATUS_EXITING) {
+#if 0
 		if (fiber->status == FIBER_STATUS_READY) {
 			ring_detach(&fiber->me);
 		}
-
+#else
+		// Detache the other binding before such as timer binding.
+		ring_detach(&fiber->me);
+#endif
 		fiber->status = FIBER_STATUS_READY;
 		assert(__thread_fiber);
 		ring_prepend(&__thread_fiber->ready, &fiber->me);

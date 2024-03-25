@@ -1,0 +1,48 @@
+{
+  "float": [
+    {
+      "name": "text_input_width",
+      "value": "300"
+    },
+    {
+      "name": "button_font_size",
+      "value": "16"
+    },
+    {
+      "name": "button_height",
+      "value": "40"
+    },
+    {
+      "name": "text_input_height",
+      "value": "40"
+    },
+    {
+      "name": "default_fontSize",
+      "value": "30"
+    },
+    {
+      "name": "image_height",
+      "value": "30"
+    },
+    {
+      "name": "image_width",
+      "value": "30"
+    },
+    {
+      "name": "border_radius",
+      "value": "28"
+    },
+    {
+      "name": "default_row_height",
+      "value": "56"
+    },
+    {
+      "name": "default_margin",
+      "value": "12"
+    },
+    {
+      "name": "default_padding",
+      "value": "12"
+    }
+  ]
+}

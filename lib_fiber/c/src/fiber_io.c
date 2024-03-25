@@ -172,14 +172,14 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
-void fiber_timer_add(ACL_FIBER *fiber, unsigned milliseconds)
+void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
 {
 	EVENT *ev = fiber_io_event();
 	long long now = event_get_stamp(ev);
 	TIMER_CACHE_NODE *timer;
 
 	fiber->when = now + milliseconds;
-	ring_detach(&fiber->me);
+	ring_detach(&fiber->me);  // Detch the previous binding.
 	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
 
 	/* Compute the event waiting interval according the timers' head */
@@ -223,6 +223,11 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			// Set the flag that the fiber wakeuped for the
 			// timer's arriving.
 			fb->flag |= FIBER_F_TIMER;
+
+			// The fb->me was be appended in fiber_timer_add, and
+			// we detatch fb->me from timer node and append it to
+			// the ready ring in acl_fiber_ready.
+			ring_detach(&fb->me);
 			acl_fiber_ready(fb);
 		}
 
@@ -318,7 +323,7 @@ void fiber_io_clear(void)
 	}
 }
 
-unsigned int acl_fiber_delay(unsigned int milliseconds)
+size_t acl_fiber_delay(size_t milliseconds)
 {
 	long long now;
 	ACL_FIBER *fiber;
@@ -343,13 +348,20 @@ unsigned int acl_fiber_delay(unsigned int milliseconds)
 	// Clear the flag been set in wakeup_timers.
 	fiber->flag &= ~FIBER_F_TIMER;
 
+	if (acl_fiber_killed(fiber)) {
+		// If been killed, the fiber must has been detatched from the
+		// timer node in acl_fiber_signal(); We call fiber_timer_del
+		// here in order to try to free the timer node.
+		fiber_timer_del(fiber);
+	}
+
 	ev = fiber_io_event();
 	now = event_get_stamp(ev);
 	if (now <= fiber->when) {
 		return 0;
 	}
 
-	return (unsigned int) (now - fiber->when);
+	return (size_t) (now - fiber->when);
 }
 
 typedef struct {
@@ -370,7 +382,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 			break;
 		}
 
-		acl_fiber_delay((unsigned int) left);
+		acl_fiber_delay((size_t) left);
 
 		now = fiber_io_stamp();
 		if (fiber->when <= now) {
@@ -383,7 +395,7 @@ static void fiber_timer_callback(ACL_FIBER *fiber, void *ctx)
 	fiber_exit(0);
 }
 
-ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
+ACL_FIBER *acl_fiber_create_timer(size_t milliseconds, size_t size,
 	void (*fn)(ACL_FIBER *, void *), void *ctx)
 {
 	long long when;
@@ -403,7 +415,7 @@ ACL_FIBER *acl_fiber_create_timer(unsigned int milliseconds, size_t size,
 	return fiber;
 }
 
-int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
+int acl_fiber_reset_timer(ACL_FIBER *fiber, size_t milliseconds)
 {
 	// The previous timer with the fiber must be removed first.
 	int ret = fiber_timer_del(fiber);
@@ -417,7 +429,7 @@ int acl_fiber_reset_timer(ACL_FIBER *fiber, unsigned int milliseconds)
 	return 0;
 }
 
-unsigned int acl_fiber_sleep(unsigned int seconds)
+size_t acl_fiber_sleep(size_t seconds)
 {
 	return acl_fiber_delay(seconds * 1000) / 1000;
 }
@@ -473,6 +485,10 @@ int fiber_wait_read(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
+	if (fe->mask & EVENT_SO_RCVTIMEO && fe->r_timeout > 0) {
+		fiber_timer_add(curr, fe->r_timeout);
+	}
+
 	acl_fiber_switch();
 
 	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
@@ -483,9 +499,23 @@ int fiber_wait_read(FILE_EVENT *fe)
 	}
 
 	if (acl_fiber_canceled(curr)) {
+		// If the IO has been canceled, we should try to remove the
+		// IO read event, because the wakeup process wasn't from
+		// read_callback normally.
+		event_del_read(__thread_fiber->event, fe);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
+	} else if (curr->flag & FIBER_F_TIMER) {
+		// If the IO reading timeout set in setsockopt.
+		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
+		curr->flag &= ~FIBER_F_TIMER;
+		event_del_read(__thread_fiber->event, fe);
+
+		acl_fiber_set_errno(curr, FIBER_EAGAIN);
+		acl_fiber_set_error(FIBER_EAGAIN);
+		return -1;
 	}
+	// else: the IO read event should has been removed in read_callback.
 
 	return ret;
 }
@@ -530,6 +560,11 @@ int fiber_wait_write(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
+
+	if (fe->mask & EVENT_SO_SNDTIMEO && fe->w_timeout > 0) {
+		fiber_timer_add(curr, fe->w_timeout);
+	}
+
 	acl_fiber_switch();
 
 	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
@@ -540,7 +575,15 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 	if (acl_fiber_canceled(curr)) {
+		event_del_write(__thread_fiber->event, fe);
 		acl_fiber_set_error(curr->errnum);
+		return -1;
+	} else if (curr->flag & FIBER_F_TIMER) {
+		curr->flag &= ~FIBER_F_TIMER;
+		event_del_write(__thread_fiber->event, fe);
+
+		acl_fiber_set_errno(curr, FIBER_EAGAIN);
+		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
 

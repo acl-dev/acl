@@ -484,18 +484,20 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen)
 	return acl_fiber_connect(sockfd, addr, addrlen);
 }
 
+#ifdef CREAT_TIMER_FIBER
+
 typedef struct TIMEOUT_CTX {
 	ACL_FIBER *fiber;
 	int        sockfd;
 	unsigned   id;
 } TIMEOUT_CTX;
 
-static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
+static void read_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 {
 	TIMEOUT_CTX *tc = (TIMEOUT_CTX*) ctx;
 	FILE_EVENT *fe = fiber_file_get(tc->sockfd);
 
-	// we must check the fiber carefully here.
+	// We must check the fiber carefully here.
 	if (fe == NULL || tc->fiber != fe->fiber_r
 		|| tc->fiber->fid != fe->fiber_r->fid) {
 
@@ -503,10 +505,9 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 		return;
 	}
 
-	// we can kill the fiber only if the fiber is waiting
+	// We can kill the fiber only if the fiber is waiting
 	// for readable ore writable of IO process.
-	if (fe->fiber_r->wstatus & (FIBER_WAIT_READ | FIBER_WAIT_WRITE)) {
-
+	if (fe->fiber_r->wstatus & FIBER_WAIT_READ) {
 		tc->fiber->errnum = FIBER_EAGAIN;
 		acl_fiber_signal(tc->fiber, SIGINT);
 	}
@@ -514,11 +515,41 @@ static void fiber_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
 	mem_free(ctx);
 }
 
+static void send_timeout(ACL_FIBER *fiber UNUSED, void *ctx)
+{
+	TIMEOUT_CTX *tc = (TIMEOUT_CTX*) ctx;
+	FILE_EVENT *fe = fiber_file_get(tc->sockfd);
+
+	// We must check the fiber carefully here.
+	if (fe == NULL || tc->fiber != fe->fiber_w
+		|| tc->fiber->fid != fe->fiber_w->fid) {
+
+		mem_free(ctx);
+		return;
+	}
+
+	// We can kill the fiber only if the fiber is waiting
+	// for readable ore writable of IO process.
+	if (fe->fiber_w->wstatus & FIBER_WAIT_READ) {
+		tc->fiber->errnum = FIBER_EAGAIN;
+		acl_fiber_signal(tc->fiber, SIGINT);
+	}
+
+	mem_free(ctx);
+}
+
+#endif  // CREAT_TIMER_FIBER
+
 int setsockopt(int sockfd, int level, int optname,
 	const void *optval, socklen_t optlen)
 {
 	size_t val;
+#ifdef CREAT_TIMER_FIBER
 	TIMEOUT_CTX *ctx;
+#else
+	FILE_EVENT *fe;
+	ACL_FIBER *curr;
+#endif
 	const struct timeval *tm;
 
 	if (sys_setsockopt == NULL) {
@@ -561,11 +592,54 @@ int setsockopt(int sockfd, int level, int optname,
 		return -1;
 	}
 
+#ifdef CREAT_TIMER_FIBER
 	ctx = (TIMEOUT_CTX*) mem_malloc(sizeof(TIMEOUT_CTX));
 	ctx->fiber  = acl_fiber_running();
 	ctx->sockfd = sockfd;
-	acl_fiber_create_timer((unsigned) val * 1000, 64000, fiber_timeout, ctx);
+
+	if (optname == SO_RCVTIMEO) {
+		val *= 1000;
+		acl_fiber_create_timer(val, 4096, read_timeout, ctx);
+		return 0;
+	} else if (optname == SO_SNDTIMEO) {
+		val *= 1000;
+		acl_fiber_create_timer(val, 4096, send_timeout, ctx);
+		return 0;
+	} else {
+		msg_error("Invalid optname=%d", optname);
+		return -1;
+	}
+#else
+	curr = acl_fiber_running();
+	fe = fiber_file_open(sockfd);
+
+	if (val <= 0) {
+		fiber_timer_del(curr);
+		if (optname == SO_RCVTIMEO) {
+			fe->mask &= ~EVENT_SO_RCVTIMEO;
+			fe->r_timeout = -1;
+		} else if (optname == SO_SNDTIMEO) {
+			fe->mask &= ~EVENT_SO_SNDTIMEO;
+			fe->w_timeout = -1;
+		}
+		return 0;
+	}
+
+	val *= 1000;
+	if (optname == SO_RCVTIMEO) {
+		fe->mask |= EVENT_SO_RCVTIMEO;
+		fe->r_timeout = val;
+	} else if (optname == SO_SNDTIMEO) {
+		fe->mask |= EVENT_SO_SNDTIMEO;
+		fe->w_timeout = val;
+	} else {
+		msg_fatal("%s: Invalid optname=%d", __FUNCTION__, optname);
+	}
+
+	// We just set the flags here, and the timer will be add in
+	// fiber_wait_read or fiber_wait_write.
 	return 0;
+#endif
 }
 
 #endif

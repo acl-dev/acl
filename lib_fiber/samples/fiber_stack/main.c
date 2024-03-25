@@ -6,7 +6,7 @@
 #include "fiber/libfiber.h"
 
 static int __stack_size = 320000;
-static int __rw_timeout = 0;
+static int __rw_timeout = 5;
 static int __echo_data  = 0;
 static int __setsockopt_timeout = 0;
 
@@ -32,6 +32,8 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 #endif
 			printf("%s: setsockopt error: %s\r\n",
 				__FUNCTION__, acl_last_serror());
+		} else {
+			printf("%s: setsockopt ok for readtimeout\r\n", __FUNCTION__);
 		}
 	}
 
@@ -78,6 +80,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 
+#if 1
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
 			printf("get first line error\r\n");
@@ -88,6 +91,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 			acl_vstream_close(cstream);
 			continue;
 		}
+#endif
 
 		//printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
 		acl_fiber_create(echo_client, cstream, __stack_size);
@@ -183,6 +187,7 @@ int main(int argc, char *argv[])
 
 	__listen_fiber = acl_fiber_create(fiber_accept, sstream, 327680);
 
+	if (0)
 	acl_fiber_create(fiber_sleep, NULL, 327680);
 
 	printf("call fiber_schedule\r\n");

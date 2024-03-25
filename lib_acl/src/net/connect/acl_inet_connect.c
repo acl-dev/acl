@@ -217,6 +217,7 @@ static ACL_SOCKET connect_one(const struct addrinfo *peer,
 #endif
 		return ACL_SOCKET_INVALID;
 	}
+
 	return sock;
 }
 
@@ -284,6 +285,8 @@ static struct addrinfo *resolve_addr(const char *name, const char *service)
 	hints.ai_flags    = 0;
 #elif	defined(ACL_MACOSX)
 	hints.ai_flags    = AI_DEFAULT;
+#elif	defined(ACL_OHOS)
+	hints.ai_flags    = 0;
 #elif	defined(ACL_ANDROID)
 	hints.ai_flags    = AI_ADDRCONFIG;
 #elif defined(ACL_WINDOWS)
@@ -298,8 +301,8 @@ static struct addrinfo *resolve_addr(const char *name, const char *service)
 		return res0;
 	}
 
-	acl_msg_error("%s(%d), %s: getaddrinfo error %s, peer=%s",
-		__FILE__, __LINE__, __FUNCTION__, gai_strerror(err), name);
+	acl_msg_error("%s(%d), %s: getaddrinfo error(%d) %s, peer=%s",
+		__FILE__, __LINE__, __FUNCTION__, err, gai_strerror(err), name);
 	return NULL;
 }
 
@@ -363,9 +366,13 @@ static int parse_addr(const char *addr, struct addr_res *res)
 
 	res->peer_res0 = try_numeric_addr(res->peer_family, peer,
 		res->peer_port, &res->peer_buf, &res->peer_in);
-	if (res->peer_res0 == NULL && (res->peer_res0 =
-		 resolve_addr(peer, res->peer_port)) == NULL) {
-		return -1;
+	if (res->peer_res0 == NULL) {
+		res->peer_res0 = resolve_addr(peer, res->peer_port);
+		if (res->peer_res0 == NULL) {
+			acl_msg_error("%s(%d): resolve %s|%s error",
+				__FUNCTION__, __LINE__, peer, res->peer_port);
+			return -1;
+		}
 	}
 
 	if (local != NULL) {

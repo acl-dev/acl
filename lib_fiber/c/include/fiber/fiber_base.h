@@ -274,36 +274,36 @@ FIBER_API void acl_fiber_schedule_stop(void);
 
 /**
  * Let the current fiber sleep for a while
- * @param milliseconds {unsigned int} the milliseconds to sleep
+ * @param milliseconds {size_t} the milliseconds to sleep
  * @return {unsigned int} the rest milliseconds returned after wakeup
  */
-FIBER_API unsigned int acl_fiber_delay(unsigned int milliseconds);
+FIBER_API size_t acl_fiber_delay(size_t milliseconds);
 
 /**
  * Let the current fiber sleep for a while
- * @param seconds {unsigned int} the seconds to sleep
- * @return {unsigned int} the rest seconds returned after wakeup
+ * @param seconds {size_t} the seconds to sleep
+ * @return {size_t} the rest seconds returned after wakeup
  */
-FIBER_API unsigned int acl_fiber_sleep(unsigned int seconds);
+FIBER_API size_t acl_fiber_sleep(size_t seconds);
 
 /**
  * Create one fiber timer
- * @param milliseconds {unsigned int} the timer wakeup milliseconds
+ * @param milliseconds {size_t} the timer wakeup milliseconds
  * @param size {size_t} the virtual memory of the created fiber
  * @param fn {void (*)(ACL_FIBER*, void*)} the callback when fiber wakeup
  * @param ctx {void*} the second parameter of the callback fn
  * @return {ACL_FIBER*} the new created fiber returned
  */
-FIBER_API ACL_FIBER* acl_fiber_create_timer(unsigned int milliseconds,
+FIBER_API ACL_FIBER* acl_fiber_create_timer(size_t milliseconds,
 	size_t size, void (*fn)(ACL_FIBER*, void*), void* ctx);
 
 /**
  * Reset the timer milliseconds time before the timer fiber wakeup
  * @param timer {ACL_FIBER*} the fiber created by acl_fiber_create_timer
- * @param milliseconds {unsigned int} the new timer wakeup milliseconds
+ * @param milliseconds {size_t} the new timer wakeup milliseconds
  * @return {int} return 0 if rest timer success, else return -1 if failed
  */
-FIBER_API int acl_fiber_reset_timer(ACL_FIBER* timer, unsigned int milliseconds);
+FIBER_API int acl_fiber_reset_timer(ACL_FIBER* timer, size_t milliseconds);
 
 /**
  * Set the DNS service addr

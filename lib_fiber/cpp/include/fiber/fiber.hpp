@@ -202,10 +202,10 @@ public:
 
 	/**
 	 * 使当前运行的协程休眠指定毫秒数
-	 * @param milliseconds {unsigned int} 指定要休眠的毫秒数
-	 * @return {unsigned int} 本协程休眠后再次被唤醒后剩余的毫秒数
+	 * @param milliseconds {size_t} 指定要休眠的毫秒数
+	 * @return {size_t} 本协程休眠后再次被唤醒后剩余的毫秒数
 	 */
-	static unsigned int delay(unsigned int milliseconds);
+	static size_t delay(size_t milliseconds);
 
 	/**
 	 * 获得处于存活状态的协程数量

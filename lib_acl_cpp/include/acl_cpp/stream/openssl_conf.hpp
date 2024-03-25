@@ -117,12 +117,28 @@ public:
 	 */
 	bool push_ssl_ctx(SSL_CTX* ctx);
 
+	/**
+	 * 在设置读写超时时，是否使用 setsockopt()
+	 * @param yes {bool} 如果为 true 则使用 setsockopt 设置读写超时，否则
+	 *  使用 acl_read_wait/acl_write_wait 检查超时情景.
+	 */
+	void use_sockopt_timeout(bool yes);
+
+	/**
+	 * 是否需要使用 setsockopt() 设置网络超时时间.
+	 * @return {bool}
+	 */
+	bool is_sockopt_timeout() const {
+		return sockopt_timeout_;
+	}
+
 private:
 	bool         server_side_;
 	SSL_CTX*     ssl_ctx_;		// The default SSL_CTX.
 	token_tree*  ssl_ctx_table_;	// Holding the map of host/SSL_CTX.
 	std::set<SSL_CTX*> ssl_ctxes_;	// Holding all ctx just for freeing.
 	int          timeout_;
+	bool         sockopt_timeout_;
 	string       crt_file_;
 	unsigned     status_;
 
