@@ -22,23 +22,39 @@ static void set_timeout(ACL_VSTREAM *cstream, int rw_timeout)
 void echo_client(ACL_VSTREAM *cstream, int rw_timeout, int echo_data)
 {
 	char  buf[8192];
-	int   ret, count = 0;
+	int   ret, count = 0, ecnt = 0;
 
 #define	SOCK ACL_VSTREAM_SOCK
 
-	while (1) {
-		if (rw_timeout > 0) {
-			set_timeout(cstream, rw_timeout);
-		}
+	if (rw_timeout > 0) {
+		set_timeout(cstream, rw_timeout);
+	}
 
+	while (1) {
+		time_t begin = time(NULL);
 		ret = acl_vstream_read(cstream, buf, sizeof(buf) - 1);
+		time_t end = time(NULL);
+
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("gets error: %s, fd: %d, count: %d\r\n",
-				acl_last_serror(), SOCK(cstream), count);
+			if (errno == EAGAIN && ++ecnt <= 3) {
+				printf("EAGAIN, try again, fd: %d, cost=%ld\r\n",
+					SOCK(cstream), end - begin);
+				continue;
+			}
+			printf("read error: %s, fd: %d, count: %d, timeout count=%d\r\n",
+				acl_last_serror(), SOCK(cstream), count, ecnt);
 			break;
 		}
 		buf[ret] = 0;
 		//printf("gets line: %s", buf);
+
+#if 1
+		if (rw_timeout >= 5) {
+			rw_timeout = 2;
+			set_timeout(cstream, rw_timeout);
+			printf(">>reset read timeout to %d\r\n", rw_timeout);
+		}
+#endif
 
 		if (!echo_data) {
 			count++;

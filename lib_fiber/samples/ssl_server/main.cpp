@@ -45,15 +45,26 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 	printf("ssl handshake_ok\r\n");
 
 	char buf[2048];
+	size_t n = 0, eagain = 0;
 
 	while (true) {
 		int ret = conn->read(buf, sizeof(buf) - 1, false);
 		if (ret < 0) {
-			printf("read error: %s\r\n", acl::last_serror());
-			break;
+			if (errno != EAGAIN) {
+				printf(">>>read error: %s\r\n", acl::last_serror());
+				break;
+			}
+
+			printf(">>>read timeout %zd times\r\n", ++eagain);
+			if (eagain >= 3) {
+				break;
+			}
 		}
 		buf[ret] = 0;
-		printf(">>>read: %s, cnt=%d\r\n", buf, ret);
+
+		if (n++ < 5) {
+			printf(">>>read cnt=%d, data=%s\r\n", ret, buf);
+		}
 
 		if (conn->write(buf, ret) == -1) {
 			printf("write error: %s\r\n", acl::last_serror());
@@ -219,6 +230,7 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 		__ssl_conf = ssl_init(ssl_type_openssl, __ssl_crt, __ssl_key);
+		((acl::openssl_conf*) __ssl_conf)->use_sockopt_timeout(true);
 	} else {
 		printf("invalid libpath=%s\r\n", libpath.c_str());
 		return 1;

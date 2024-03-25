@@ -69,16 +69,6 @@ static void run(const char* addr)
 	printf("fiber-%d: connect %s ok, clients: %d, fd: %d\r\n",
 		acl_fiber_self(), addr, __total_clients, conn.sock_handle());
 
-	if (conn.write("h", 1) == -1) {
-		printf("write h error\n");
-		return;
-	}
-#if 1
-	printf("write h\r\n"); sleep(3);
-	conn.write("e", 1); printf("write e\n"); sleep(3);
-	conn.write("\r\n", 2); printf("write crlf\n"); sleep(3);
-#endif
-
 	acl::string buf;
 	const char req[] = "hello world\r\n";
 
@@ -87,9 +77,8 @@ static void run(const char* addr)
 			printf("write error: %s\r\n", acl::last_serror());
 			break;
 		}
-		//sleep(1);
 
-		if (!conn.gets(buf, false)) {
+		if (!conn.gets(buf, true)) {
 			printf("gets error: %s\r\n", acl::last_serror());
 			break;
 		}
@@ -100,6 +89,7 @@ static void run(const char* addr)
 
 		buf.clear();
 		__total_count++;
+		//sleep(8);
 	}
 
 	printf("close one connection: %d, %s\r\n",
