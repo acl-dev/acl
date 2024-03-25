@@ -207,6 +207,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			CLR_READWAIT(pfd->fe);
 #ifdef	HAS_IO_URING
 			pfd->fe->mask &= ~EVENT_POLLIN;
+			pfd->fe->r_timeout = -1;
 #endif
 			event_del_read(ev, pfd->fe);
 			pfd->fe->fiber_r = NULL;
@@ -215,6 +216,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			CLR_WRITEWAIT(pfd->fe);
 #ifdef	HAS_IO_URING
 			pfd->fe->mask &= ~EVENT_POLLOUT;
+			pfd->fe->w_timeout = -1;
 #endif
 			event_del_write(ev, pfd->fe);
 			pfd->fe->fiber_w = NULL;
