@@ -89,7 +89,7 @@ static void run(const char* addr)
 
 		buf.clear();
 		__total_count++;
-		//sleep(8);
+		sleep(8);
 	}
 
 	printf("close one connection: %d, %s\r\n",

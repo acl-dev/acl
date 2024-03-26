@@ -182,6 +182,33 @@ void openssl_io::destroy(void)
 	}
 }
 
+static bool set_sock_timeo(ACL_SOCKET fd, int opt, int timeout)
+{
+	if (timeout <= 0) {
+		return true;
+	}
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+	timeout *= 1000; // From seconds to millisecond.
+	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+#else   // Must be Linux.
+	struct timeval tm;
+	tm.tv_sec  = timeout;
+	tm.tv_usec = 0;
+
+	if (setsockopt(fd, SOL_SOCKET, opt, &tm, sizeof(tm)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+#endif
+	return true;
+}
+
 bool openssl_io::open(ACL_VSTREAM* s)
 {
 	if (s == NULL) {
@@ -193,6 +220,20 @@ bool openssl_io::open(ACL_VSTREAM* s)
 	++(*refers_);
 
 #ifdef HAS_OPENSSL
+	if (!nblock_ && conf_.is_sockopt_timeout() && s->rw_timeout > 0) {
+		ACL_SOCKET fd = ACL_VSTREAM_SOCK(s);
+
+		if (!set_sock_timeo(fd, SO_RCVTIMEO, s->rw_timeout)) {
+			logger_error("set recv timeout error");
+			return false;
+		}
+
+		if (!set_sock_timeo(fd, SO_SNDTIMEO, s->rw_timeout)) {
+			logger_error("set send timeout error");
+			return false;
+		}
+	}
+
 	SSL_CTX* ctx = conf_.get_ssl_ctx();
 	if (ctx == NULL) {
 		logger_error("The default SSL_CTX in conf_ is null");
@@ -238,6 +279,9 @@ bool openssl_io::handshake(void)
 	}
 
 #ifdef HAS_OPENSSL
+	int timeo = nblock_ ? 0 : this->stream_->rw_timeout, ntried = 0;
+	bool opt = conf_.is_sockopt_timeout();
+
 	while (true) {
 		int ret = __ssl_do_handshake(ssl_);
 		if (ret == 1) {
@@ -246,14 +290,21 @@ bool openssl_io::handshake(void)
 		}
 
 		int err = __ssl_get_error(ssl_, ret);
+
 		switch (err) {
 		case SSL_ERROR_WANT_READ:
 		case SSL_ERROR_WANT_WRITE:
 			if (nblock_) {
 				return true;
 			}
+			if (opt && timeo > 0) {
+				// Try three times.
+				if (++ntried > 3) {
+					return false;
+				}
+			}
 			break;
-		case SSL_ERROR_ZERO_RETURN:
+		//case SSL_ERROR_ZERO_RETURN:
 		default:
 			return false;
 		}
@@ -305,33 +356,6 @@ bool openssl_io::on_close(bool alive)
 #endif
 }
 
-static bool set_sock_timeout(ACL_SOCKET fd, int opt, int timeout)
-{
-	if (timeout <= 0) {
-		return true;
-	}
-
-#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
-	timeout *= 1000; // From seconds to millisecond.
-	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
-		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
-			last_serror(), timeout, opt, (int) fd);
-		return false;
-	}
-#else   // Must be Linux.
-	struct timeval tm;
-	tm.tv_sec  = timeout;
-	tm.tv_usec = 0;
-
-	if (setsockopt(fd, SOL_SOCKET, opt, &tm, sizeof(tm)) < 0) {
-		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
-			last_serror(), timeout, opt, (int) fd);
-		return false;
-	}
-#endif
-	return true;
-}
-
 int openssl_io::read(void* buf, size_t len)
 {
 #ifdef HAS_OPENSSL
@@ -340,11 +364,6 @@ int openssl_io::read(void* buf, size_t len)
 	int timeo = nblock_ ? 0 : this->stream_->rw_timeout;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 	bool opt = conf_.is_sockopt_timeout();
-
-	if (timeo > 0 && opt && !set_sock_timeout(fd, SO_RCVTIMEO, timeo)) {
-		logger_error("Can't set read timeout, fd=%d", fd);
-		return -1;
-	}
 
 //#define DEBUG_READ_TIMEOUT
 
@@ -419,11 +438,6 @@ int openssl_io::send(const void* buf, size_t len)
 	int timeo = nblock_ ? 0 : this->stream_->rw_timeout;
 	ACL_SOCKET fd = ACL_VSTREAM_SOCK(this->stream_);
 	bool opt = conf_.is_sockopt_timeout();
-
-	if (timeo > 0 && opt && !set_sock_timeout(fd, SO_SNDTIMEO, timeo)) {
-		logger_error("Can't set send timeout, fd=%d", fd);
-		return -1;
-	}
 
 	while (len > 0) {
 		//time_t begin = time(NULL);
