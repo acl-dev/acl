@@ -20,7 +20,7 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 		acl::sslbase_io* ssl = __ssl_conf->create(false);
 
 		if (conn->setup_hook(ssl) == ssl) {
-			printf("setup_hook error\r\n");
+			printf("setup_hook error: %s\r\n", acl::last_serror());
 			ssl->destroy();
 			delete conn;
 			return;
@@ -28,21 +28,22 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 
 		if (__check_ssl) {
 			if (!ssl->handshake()) {
-				printf("ssl handshake error\r\n");
-				ssl->destroy();
+				printf("ssl handshake error: %s\r\n", acl::last_serror());
+				//ssl->destroy();
 				delete conn;
 				return;
 			}
-			if (ssl->handshake_ok()) {
-				printf("ssl handshake error\r\n");
-				ssl->destroy();
+			if (!ssl->handshake_ok()) {
+				printf("ssl handshake error: %s\r\n", acl::last_serror());
+				//ssl->destroy();
 				delete conn;
 				return;
 			}
+			printf(">>>check ssl ok<<<\n");
 		}
 	}
 
-	printf("ssl handshake_ok\r\n");
+	printf("At last, ssl handshake_ok\r\n");
 
 	char buf[2048];
 	size_t n = 0, eagain = 0;
