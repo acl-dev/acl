@@ -60,7 +60,9 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 			if (eagain >= 3) {
 				break;
 			}
+			continue;
 		}
+
 		buf[ret] = 0;
 
 		if (n++ < 5) {
