@@ -441,8 +441,8 @@ int  event_checkfd(EVENT *ev, FILE_EVENT *fe);
 int  event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 int  event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 
-void event_del_read(EVENT *ev, FILE_EVENT *fe);
-void event_del_write(EVENT *ev, FILE_EVENT *fe);
+void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly);
+void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly);
 int  event_process(EVENT *ev, int left);
 
 #endif

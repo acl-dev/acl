@@ -72,7 +72,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	POLLFD *pfd;
 	RING *iter = fe->pfds.succ, *next = iter;
 
-	event_del_read(ev, fe);
+	event_del_read(ev, fe, 0);
 	SET_READABLE(fe);
 
 	// Walk througth the RING list, handle each poll event, and one RING
@@ -129,7 +129,7 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	POLLFD *pfd;
 	RING *iter = fe->pfds.succ, *next = iter;
 
-	event_del_write(ev, fe);
+	event_del_write(ev, fe, 0);
 	SET_WRITABLE(fe);
 
 	for (; iter != &fe->pfds; iter = next) {
@@ -209,7 +209,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			pfd->fe->mask &= ~EVENT_POLLIN;
 			pfd->fe->r_timeout = -1;
 #endif
-			event_del_read(ev, pfd->fe);
+			event_del_read(ev, pfd->fe, 0);
 			pfd->fe->fiber_r = NULL;
 		}
 		if (pfd->pfd->events & POLLOUT) {
@@ -218,7 +218,7 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 			pfd->fe->mask &= ~EVENT_POLLOUT;
 			pfd->fe->w_timeout = -1;
 #endif
-			event_del_write(ev, pfd->fe);
+			event_del_write(ev, pfd->fe, 0);
 			pfd->fe->fiber_w = NULL;
 		}
 

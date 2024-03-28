@@ -439,7 +439,7 @@ size_t acl_fiber_sleep(size_t seconds)
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_READWAIT(fe);
-	event_del_read(ev, fe);
+	event_del_read(ev, fe, 0);
 
 	/* If the reader fiber has been set in ready status when the
 	 * other fiber killed the reader fiber, the reader fiber should
@@ -502,11 +502,11 @@ int fiber_wait_read(FILE_EVENT *fe)
 		// If the IO has been canceled, we should try to remove the
 		// IO read event, because the wakeup process wasn't from
 		// read_callback normally.
-#if 0
+#if 1
 		// Don't call event_del_read here, because it's a buffered
 		// delete read operation; We'll real delete read operation on
 		// the fd in event_close.
-		event_del_read(__thread_fiber->event, fe);
+		event_del_read(__thread_fiber->event, fe, 1);
 #endif
 		acl_fiber_set_error(curr->errnum);
 		return -1;
@@ -514,11 +514,11 @@ int fiber_wait_read(FILE_EVENT *fe)
 		// If the IO reading timeout set in setsockopt.
 		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
 		curr->flag &= ~FIBER_F_TIMER;
-#if 0
+#if 1
 		// Don't call event_del_read here, because it's a buffered
 		// delete read operation; We'll real delete read operation on
 		// the fd in event_close.
-		event_del_read(__thread_fiber->event, fe);
+		event_del_read(__thread_fiber->event, fe, 1);
 #endif
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
@@ -533,7 +533,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 static void write_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_WRITEWAIT(fe);
-	event_del_write(ev, fe);
+	event_del_write(ev, fe, 0);
 
 	/* If the writer fiber has been set in ready status when the
 	 * other fiber killed the writer fiber, the writer fiber should
@@ -585,15 +585,15 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 	if (acl_fiber_canceled(curr)) {
-#if 0
-		event_del_write(__thread_fiber->event, fe);
+#if 1
+		event_del_write(__thread_fiber->event, fe, 1);
 #endif
 		acl_fiber_set_error(curr->errnum);
 		return -1;
 	} else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
-#if 0
-		event_del_write(__thread_fiber->event, fe);
+#if 1
+		event_del_write(__thread_fiber->event, fe, 1);
 #endif
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
