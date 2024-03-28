@@ -552,13 +552,13 @@ static void epoll_ctl_del(EVENT *ev, EPOLL_EVENT *ee, int fd)
 
 	if (epx->mask & EVENT_READ) {
 		assert(epx->fe);
-		event_del_read(ev, epx->fe);
+		event_del_read(ev, epx->fe, 0);
 		CLR_READWAIT(epx->fe);
 	}
 
 	if (epx->mask & EVENT_WRITE) {
 		assert(epx->fe);
-		event_del_write(ev, epx->fe);
+		event_del_write(ev, epx->fe, 0);
 		CLR_WRITEWAIT(epx->fe);
 	}
 
