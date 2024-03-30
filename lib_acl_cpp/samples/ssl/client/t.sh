@@ -1,9 +1,9 @@
 #!/bin/sh
 os=$(echo `uname -s`)
 if [ $os == "Darwin" ]; then
-	./client -s "0.0.0.0|2443" -L "../libmbedcrypto.dylib;../libmbedx509.dylib;../libmbedtls.dylib" -c 10 -n 100
+	./client -s "127.0.0.1|2443" -l "/usr/local/lib64/libcrypto.dylib;/usr/local/lib64/libssl.dylib" -c 1 -n 1
 elif [ $os == "Linux" ]; then
-	./client -s "0.0.0.0|2443" -L "../libmbedcrypto.so;../libmbedx509.so;../libmbedtls.so" -c 10 -n 100
+	./client -s "127.0.0.1|2443" -l "/usr/local/lib64/libcrypto.so;/usr/local/lib64/libssl.so" -c 1 -n 1
 else
 	echo "unknown os=$os"
 fi

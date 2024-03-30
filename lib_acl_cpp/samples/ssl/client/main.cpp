@@ -34,13 +34,12 @@ private:
 		}
 
 		do_echo(conn);
-
 		return NULL;
 	}
 
 	bool setup_ssl(acl::socket_stream& conn) {
 		bool non_block = false;
-		acl::sslbase_io* ssl = ssl_conf_.open(non_block);
+		acl::sslbase_io* ssl = ssl_conf_.create(non_block);
 
 		// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 		// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
@@ -49,8 +48,8 @@ private:
 			ssl->destroy();
 			return false;
 		}
-		printf("ssl setup ok!\r\n");
 
+		printf("ssl setup ok!\r\n");
 		return true;
 	}
 
@@ -58,6 +57,7 @@ private:
 		const char* data = "hello world!\r\n";
 		int i;
 		for (i = 0; i < count_; i++) {
+			//sleep(8);
 			if (conn.write(data, strlen(data)) == -1) {
 				break;
 			}
@@ -94,31 +94,99 @@ static void start_clients(acl::sslbase_conf& ssl_conf, const acl::string addr,
 	}
 }
 
+static acl::sslbase_conf* load_mbedtls(acl::string& ssl_libs)
+{
+	if (ssl_libs.empty()) {
+#if defined(__APPLE__)
+		ssl_libs = "../libmbedtls.dylib";
+#elif defined(__linux__)
+		ssl_libs = "../libmbedtls.so";
+#elif defined(_WIN32) || defined(_WIN64)
+		ssl_libs = "../mbedtls.dll";
+#else
+# error "unknown OS type"
+#endif
+	}
+
+	// 设置 MbedTLS 动态库路径
+	const std::vector<acl::string>& libs = ssl_libs.split2(",; \t");
+	if (libs.size() == 1) {
+		acl::mbedtls_conf::set_libpath(libs[0]);
+	} else if (libs.size() == 3) {
+		// libcrypto, libx509, libssl);
+		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
+	} else {
+		printf("invalid ssl_lib=%s\r\n", ssl_libs.c_str());
+		return NULL;
+	}
+
+	// 加载 MbedTLS 动态库
+	if (!acl::mbedtls_conf::load()) {
+		printf("load %s error\r\n", ssl_libs.c_str());
+		return NULL;
+	}
+
+	// 初始化服务端模式下的全局 SSL 配置对象
+	bool server_side = false;
+
+	// SSL 证书校验级别
+	acl::mbedtls_verify_t verify_mode = acl::MBEDTLS_VERIFY_NONE;
+
+	return new acl::mbedtls_conf(server_side, verify_mode);
+}
+
+static acl::sslbase_conf* load_openssl(acl::string& ssl_libs)
+{
+#if defined(__APPLE__)
+	acl::string libcrypto = "/usr/local/lib/libcrypto.dylib";
+	acl::string libssl    = "/usr/local/lib/libssl.dylib";
+#elif defined(__linux__)
+	acl::string libcrypto = "/usr/local/lib64/libcrypto.so";
+	acl::string libssl    = "/usr/local/lib64/libssl.so";
+#else
+# error "Unsupport OS!"
+#endif
+	if (!ssl_libs.empty()) {
+		const std::vector<acl::string>& libs = ssl_libs.split2(",; \t");
+		if (libs.size() >= 2) {
+			libcrypto = libs[0];
+			libssl = libs[1];
+		} else {
+			libssl = libs[0];
+		}
+	}
+
+	// 设置 OpenSSL 动态库的加载路径
+	acl::openssl_conf::set_libpath(libcrypto, libssl);
+
+	// 动态加载 OpenSSL 动态库
+	if (!acl::openssl_conf::load()) {
+		printf("load ssl error=%s, crypto=%s, ssl=%s\r\n",
+				acl::last_serror(), libcrypto.c_str(), libssl.c_str());
+		return NULL;
+	}
+
+	// 初始化客户端模式下的全局 SSL 配置对象
+	bool server_side = false;
+	return new acl::openssl_conf(server_side);
+}
+
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -s listen_addr\r\n"
-		" -L ssl_libs_path\r\n"
-		" -c cocurrent\r\n"
-		" -n count\r\n"
+		" -t ssl_type[default: openssl]\r\n"
+		" -l ssl_libs_path[default: /usr/local/lib64/libcrypto.so;/usr/local/lib64/libssl.so]\r\n"
+		" -c cocurrent[default: 10]\r\n"
+		" -n count[default: 10]\r\n"
 		, procname);
 }
 
 int main(int argc, char* argv[]) {
 	acl::string addr = "0.0.0.0|2443";
-#if defined(__APPLE__)
-	acl::string ssl_lib = "../libmbedtls.dylib";
-#elif defined(__linux__)
-	acl::string ssl_lib = "../libmbedtls.so";
-#elif defined(_WIN32) || defined(_WIN64)
-	acl::string ssl_path = "../mbedtls.dll";
-
-	acl::acl_cpp_init();
-#else
-# error "unknown OS type"
-#endif
-
+	acl::string ssl_libs, ssl_type = "openssl";
 	int ch, cocurrent = 10, count = 10;
-	while ((ch = getopt(argc, argv, "hs:L:c:n:")) > 0) {
+
+	while ((ch = getopt(argc, argv, "hs:l:c:n:t:")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -126,14 +194,17 @@ int main(int argc, char* argv[]) {
 		case 's':
 			addr = optarg;
 			break;
-		case 'L':
-			ssl_lib = optarg;
+		case 'l':
+			ssl_libs = optarg;
 			break;
 		case 'c':
 			cocurrent = atoi(optarg);
 			break;
 		case 'n':
 			count = atoi(optarg);
+			break;
+		case 't':
+			ssl_type = optarg;
 			break;
 		default:
 			break;
@@ -142,32 +213,22 @@ int main(int argc, char* argv[]) {
 
 	acl::log::stdout_open(true);
 
-	// 设置 MbedTLS 动态库路径
-	const std::vector<acl::string>& libs = ssl_lib.split2(",; \t");
-	if (libs.size() == 1) {
-		acl::mbedtls_conf::set_libpath(libs[0]);
-	} else if (libs.size() == 3) {
-		// libcrypto, libx509, libssl);
-		acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
+	acl::sslbase_conf* ssl_conf;
+
+	if (ssl_type == "mbedtls") {
+		ssl_conf = load_mbedtls(ssl_libs);
+	} else if (ssl_type == "openssl") {
+		ssl_conf = load_openssl(ssl_libs);
 	} else {
-		printf("invalid ssl_lib=%s\r\n", ssl_lib.c_str());
+		printf("Not support ssl type=%s\r\n", ssl_type.c_str());
 		return 1;
 	}
 
-	// 加载 MbedTLS 动态库
-	if (!acl::mbedtls_conf::load()) {
-		printf("load %s error\r\n", ssl_lib.c_str());
+	if (!ssl_conf) {
+		printf("Load ssl error, libs=%s\r\n", ssl_libs.c_str());
 		return 1;
 	}
 
-	// 初始化客户端模式下的全局 SSL 配置对象
-	bool server_side = false;
-
-	// SSL 证书校验级别
-	acl::mbedtls_verify_t verify_mode = acl::MBEDTLS_VERIFY_NONE;
-
-	acl::mbedtls_conf ssl_conf(server_side, verify_mode);
-
-	start_clients(ssl_conf, addr, cocurrent, count);
+	start_clients(*ssl_conf, addr, cocurrent, count);
 	return 0;
 }

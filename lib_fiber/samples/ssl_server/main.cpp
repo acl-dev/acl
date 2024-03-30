@@ -29,13 +29,11 @@ static void echo_fiber(ACL_FIBER *, void *ctx)
 		if (__check_ssl) {
 			if (!ssl->handshake()) {
 				printf("ssl handshake error: %s\r\n", acl::last_serror());
-				//ssl->destroy();
 				delete conn;
 				return;
 			}
 			if (!ssl->handshake_ok()) {
 				printf("ssl handshake error: %s\r\n", acl::last_serror());
-				//ssl->destroy();
 				delete conn;
 				return;
 			}
@@ -227,6 +225,8 @@ int main(int argc, char *argv[])
 			printf("invalid libpath=%s\r\n", libpath.c_str());
 			return 1;
 		}
+
+		printf(">>>cryp=%s, ssl=%s\n", libs[0].c_str(), libs[1].c_str());
 		acl::openssl_conf::set_libpath(libs[0], libs[1]);
 		if (!acl::openssl_conf::load()) {
 			printf("load %s error\r\n", libpath.c_str());
