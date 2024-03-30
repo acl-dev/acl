@@ -120,7 +120,7 @@ public:
 	/**
 	 * 在设置读写超时时，是否使用 setsockopt()
 	 * @param yes {bool} 如果为 true 则使用 setsockopt 设置读写超时，否则
-	 *  使用 acl_read_wait/acl_write_wait 检查超时情景.
+	 *  使用 acl_read_wait/acl_write_wait 检查超时情景，内部缺省值为 true.
 	 */
 	void use_sockopt_timeout(bool yes);
 

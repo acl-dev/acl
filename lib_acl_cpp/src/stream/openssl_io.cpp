@@ -282,6 +282,8 @@ bool openssl_io::handshake(void)
 	int timeo = nblock_ ? 0 : this->stream_->rw_timeout, ntried = 0;
 	bool opt = conf_.is_sockopt_timeout();
 
+	time_t begin = time(NULL);
+
 	while (true) {
 		int ret = __ssl_do_handshake(ssl_);
 		if (ret == 1) {
@@ -298,8 +300,13 @@ bool openssl_io::handshake(void)
 				return true;
 			}
 			if (opt && timeo > 0) {
-				// Try three times.
-				if (++ntried > 3) {
+				time_t now = time(NULL);
+				if (now - begin >= timeo) {
+					return false;
+				}
+
+				// Try two times.
+				if (++ntried > 2) {
 					return false;
 				}
 			}

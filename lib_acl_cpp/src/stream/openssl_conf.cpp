@@ -550,7 +550,7 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 , ssl_ctx_(NULL)
 , ssl_ctx_table_(NULL)
 , timeout_(timeout)
-, sockopt_timeout_(false)
+, sockopt_timeout_(true)
 {
 #ifdef HAS_OPENSSL
 	// Init OpenSSL globally, and the dynamic libs will be loaded
