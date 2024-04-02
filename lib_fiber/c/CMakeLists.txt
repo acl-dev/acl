@@ -153,10 +153,12 @@ endif()
 
 link_directories(${lib_output_path})
 
-install(TARGETS fiber_static
-	EXPORT fiber_static-targets
-	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	install(TARGETS fiber_static
+		EXPORT fiber_static-targets
+		ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	)
+endif()
 
 if (CMAKE_INSTALL_INCLUDEDIR MATCHES "")
 	set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
@@ -183,10 +185,12 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	add_library(fiber_shared SHARED ${lib_src})
 	SET_TARGET_PROPERTIES(fiber_shared PROPERTIES OUTPUT_NAME "fiber")
 
-	install(TARGETS fiber_shared
-		EXPORT fiber_shared-targets
-		LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-	)
+	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+		install(TARGETS fiber_shared
+			EXPORT fiber_shared-targets
+			LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+		)
+	endif()
 endif()
 
 ##############################################################################

@@ -191,10 +191,12 @@ endif()
 
 link_directories(${lib_output_path})
 
-install(TARGETS acl_static
-	EXPORT acl_static-targets
-	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-)
+if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	install(TARGETS acl_static
+		EXPORT acl_static-targets
+		ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	)
+endif()
 
 if (CMAKE_INSTALL_INCLUDEDIR MATCHES "")
 	set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
@@ -229,10 +231,12 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 		SET_TARGET_PROPERTIES(acl_shared PROPERTIES OUTPUT_NAME "acl")
 	endif()
 
-	install(TARGETS acl_shared
-		EXPORT acl_shared-targets
-		LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-	)
+	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+		install(TARGETS acl_shared
+			EXPORT acl_shared-targets
+			LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+		)
+	endif()
 endif()
 
 
