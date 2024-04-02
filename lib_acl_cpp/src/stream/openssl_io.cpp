@@ -182,20 +182,22 @@ void openssl_io::destroy(void)
 	}
 }
 
+#ifdef HAS_OPENSSL
+
 static bool set_sock_timeo(ACL_SOCKET fd, int opt, int timeout)
 {
 	if (timeout <= 0) {
 		return true;
 	}
 
-#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+# if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
 	timeout *= 1000; // From seconds to millisecond.
 	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
 		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
 			last_serror(), timeout, opt, (int) fd);
 		return false;
 	}
-#else   // Must be Linux.
+# else   // Must be Linux.
 	struct timeval tm;
 	tm.tv_sec  = timeout;
 	tm.tv_usec = 0;
@@ -205,9 +207,11 @@ static bool set_sock_timeo(ACL_SOCKET fd, int opt, int timeout)
 			last_serror(), timeout, opt, (int) fd);
 		return false;
 	}
-#endif
+# endif
 	return true;
 }
+
+#endif
 
 bool openssl_io::open(ACL_VSTREAM* s)
 {
