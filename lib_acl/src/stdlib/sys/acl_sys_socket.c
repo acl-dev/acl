@@ -35,6 +35,11 @@
 
 #endif
 
+
+#if !defined(ACL_WRITE_FIRST) && !defined(ACL_WRITEABLE_CHECK)
+# define ACL_WRITE_FIRST
+#endif
+
 #ifdef ACL_UNIX
 static acl_read_fn   __sys_read   = read;
 static acl_write_fn  __sys_write  = write;
