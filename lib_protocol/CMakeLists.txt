@@ -139,6 +139,19 @@ endif()
 
 link_directories(${lib_output_path})
 
+install(TARGETS protocol_static
+	EXPORT protocol_static-targets
+	ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+)
+
+if (CMAKE_INSTALL_INCLUDEDIR MATCHES "")
+	set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
+endif()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/protocol/"
+)
+
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
@@ -158,13 +171,20 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	if (ACL_BUILD_SHARED_ONE MATCHES "YES")
 		set(lc_flags "${lib_output_path}/libacl.a")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
-		add_library(protocol SHARED ${lib_src})
+		add_library(protocol_shared SHARED ${lib_src})
 	else()
 		set(lc_flags "-Wl,-rpath,. -L${lib_output_path} -lacl")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
-		add_library(protocol SHARED ${lib_src})
-		target_link_libraries(protocol acl)
+		add_library(protocol_shared SHARED ${lib_src})
+		target_link_libraries(protocol_shared acl)
 	endif()
+
+	SET_TARGET_PROPERTIES(protocol_shared PROPERTIES OUTPUT_NAME "protocol")
+
+	install(TARGETS protocol_shared
+		EXPORT protocol_shared-targets
+		LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	)
 endif()
 
 ##############################################################################
