@@ -191,6 +191,21 @@ endif()
 
 link_directories(${lib_output_path})
 
+if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	install(TARGETS acl_static
+		EXPORT acl_static-targets
+		ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	)
+endif()
+
+if (CMAKE_INSTALL_INCLUDEDIR MATCHES "")
+	set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
+endif()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/acl/"
+)
+
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
@@ -208,7 +223,21 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	endif()
 
 	set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
-	add_library(acl SHARED ${lib_src})
+	add_library(acl_shared SHARED ${lib_src})
+
+	if (${WIN_OS})
+		SET_TARGET_PROPERTIES(acl_shared PROPERTIES OUTPUT_NAME "libacl")
+	else()
+		SET_TARGET_PROPERTIES(acl_shared PROPERTIES OUTPUT_NAME "acl")
+	endif()
+
+	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+		install(TARGETS acl_shared
+			EXPORT acl_shared-targets
+			LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+		)
+	endif()
 endif()
+
 
 ##############################################################################

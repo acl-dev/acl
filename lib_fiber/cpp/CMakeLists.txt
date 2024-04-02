@@ -139,6 +139,21 @@ endif()
 
 link_directories(${lib_output_path})
 
+if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+	install(TARGETS fiber_cpp_static
+		EXPORT fiber_cpp_static-targets
+		ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+	)
+endif()
+
+if (CMAKE_INSTALL_INCLUDEDIR MATCHES "")
+	set(CMAKE_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_PREFIX}/include)
+endif()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/fiber/
+	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/fiber_cpp"
+)
+
 if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
@@ -161,12 +176,21 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	if (ACL_BUILD_SHARED_ONE MATCHES "YES")
 		set(lc_ldflags "${lib_output_path}/libacl_cpp.a ${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a ${lib_output_path}/libfiber.a")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
-		add_library(fiber_cpp SHARED ${lib_src})
+		add_library(fiber_cpp_shared SHARED ${lib_src})
 	else()
 		set(lc_ldflags "-Wl,-rpath,. -L${lib_output_path} -lacl_cpp -lprotocol -lacl -lfiber")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
-		add_library(fiber_cpp SHARED ${lib_src})
-		target_link_libraries(fiber_cpp acl_cpp protocol acl fiber)
+		add_library(fiber_cpp_shared SHARED ${lib_src})
+		target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
+	endif()
+
+	SET_TARGET_PROPERTIES(fiber_cpp_shared PROPERTIES OUTPUT_NAME "fiber_cpp")
+
+	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
+		install(TARGETS fiber_cpp_shared
+			EXPORT fiber_cpp_shared-targets
+			LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
+		)
 	endif()
 endif()
 
