@@ -36,6 +36,9 @@ CFLAGS += -I/usr/local/include
 
 shared_ldflags = -lprotocol -lacl -lz -lpthread
 
+STATIC_LIBNAME = libacl_cpp.a
+SHARED_LIBNAME = libacl_cpp.so
+
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
@@ -144,6 +147,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 	endif
 
 	shared_ldflags = -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
+	SHARED_LIBNAME = libacl_cpp.dylib
 endif
 
 # For Linux
@@ -300,8 +304,6 @@ OBJS_DEF = $(patsubst %.cpp, $(DEF_PATH_DST)/%.inc, $(notdir $(wildcard src/*.cp
 VERSION = 1.1.1.2
 DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
 
-STATIC_LIBNAME = libacl_cpp.a
-SHARED_LIBNAME = libacl_cpp.so
 PCH = src/acl_stdafx.hpp.gch
 
 lib: static

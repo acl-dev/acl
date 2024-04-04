@@ -154,7 +154,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/fiber/
 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/fiber_cpp"
 )
 
-if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+#if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+if (ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
 			set(sys_ldflags "-shared -lz")
@@ -167,6 +168,7 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 		set(sys_ldflags "-shared -liconv -lz -lpthread -ldl")
 		target_compile_options(fiber_cpp_static PRIVATE
 			-fvisibility=hidden -fvisibility-inlines-hidden)
+		set(CMAKE_MACOSX_RPATH 1)
 	elseif (${UNIX_OS})
 		set(sys_ldflags "-shared -lz -lpthread -ldl")
 		target_compile_options(fiber_cpp_static PRIVATE
@@ -178,10 +180,10 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
 		add_library(fiber_cpp_shared SHARED ${lib_src})
 	else()
-		set(lc_ldflags "-Wl,-rpath,. -L${lib_output_path} -lacl_cpp -lprotocol -lacl -lfiber")
+		set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${CMAKE_INSTALL_PREFIX}/lib -lacl_cpp -lprotocol -lacl -lfiber")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
 		add_library(fiber_cpp_shared SHARED ${lib_src})
-		target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
+#		target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
 	endif()
 
 	SET_TARGET_PROPERTIES(fiber_cpp_shared PROPERTIES OUTPUT_NAME "fiber_cpp")

@@ -10,7 +10,12 @@ RANLIB  = ${ENV_RANLIB}
 FLAGS   = ${ENV_FLAGS}
 
 # default lib name
-LIB_NAME  = libacl.a
+# LIB_NAME  = libacl.a
+
+STATIC_OLD_LIBNAME = lib_acl.a
+SHARED_OLD_LIBNAME = lib_acl.so
+STATIC_LIBNAME = libacl.a
+SHARED_LIBNAME = libacl.so
 
 #-fno-strict-aliasing \
 #CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align
@@ -120,6 +125,8 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -Os
 	UNIXTYPE = MACOSX
 	RPATH = macos
+	SHARED_LIBNAME = libacl.dylib
+	SHARED_OLD_LIBNAME = lib_acl.dylib
 endif
 
 # For Linux
@@ -324,11 +331,6 @@ OBJS_DEF     = $(INIT_DEF) $(PRIV_DEF) $(STDLIB_DEF) \
 ###########################################################
 .PHONY = all static shared clean cl clean_lib rebuild rb
 
-STATIC_OLD_LIBNAME = lib_acl.a
-SHARED_OLD_LIBNAME = lib_acl.so
-STATIC_LIBNAME = libacl.a
-SHARED_LIBNAME = libacl.so
-
 all: static shared
 
 $(shell mkdir -p $(DEF_PATH_DST))
@@ -359,31 +361,34 @@ static: $(OBJS_DST)
 		ln -s $(STATIC_LIBNAME) $(STATIC_OLD_LIBNAME))
 	@echo 'build $(LIB_PATH_DST)/$(STATIC_LIBNAME) ok!'
 
-#shared_ldflags = -lmysqlclient -lrt -lpthread -ldl
-shared_ldflags = -lrt -lpthread -ldl
 #shared: depends $(OBJS_DST)
+
 shared: $(OBJS_DST)
 	@echo ''
 	@echo 'creating $(SHARED_LIBNAME)'
 	@if test -n "$(rpath)" && test "$(UNIXTYPE)" = "LINUX"; then \
 		echo "building for linux"; \
+		shared_ldflags=-lrt -lpthread -ldl; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
-			-L$(rpath) $(shared_ldflags) -Wl,-rpath,$(rpath); \
+			$(shared_ldflags) -Wl,-rpath,$(rpath); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "SUNOS5"; then \
 		echo "building for sunos5"; \
+		shared_ldflags=-lrt -lpthread -ldl; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
-			-L$(rpath) $(shared_ldflags); \
+			$(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
 		echo "building for Darwin"; \
+		shared_ldflags=-lpthread; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
-			-L$(rpath) -lpthread; \
+			$(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "FREEBSD"; then \
 		echo "building for FreeBSD"; \
+		shared_ldflags=-lrt -lpthread -ldl; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJS_DST) \
-			-L$(rpath) -lpthread; \
+			$(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	else \
 		echo 'skip build $(SHARED_LIBNAME); usage: make shared rpath=xxx'; \

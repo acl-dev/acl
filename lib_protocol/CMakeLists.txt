@@ -154,7 +154,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/protocol/"
 )
 
-if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+#if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+if (ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
 			set(sys_ldflags "-shared -lz")
@@ -168,6 +169,10 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	elseif (${UNIX_OS})
 		set(sys_ldflags "-shared -lz -lpthread -ldl")
 		target_compile_options(protocol_static PRIVATE -fvisibility=hidden)
+
+		if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+			set(CMAKE_MACOSX_RPATH 1)
+		endif()
 	endif()
 
 	if (ACL_BUILD_SHARED_ONE MATCHES "YES")
@@ -175,10 +180,10 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
 		add_library(protocol_shared SHARED ${lib_src})
 	else()
-		set(lc_flags "-Wl,-rpath,. -L${lib_output_path} -lacl")
+		set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${CMAKE_INSTALL_PREFIX}/lib -lacl")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
 		add_library(protocol_shared SHARED ${lib_src})
-		target_link_libraries(protocol_shared acl)
+#		target_link_libraries(protocol_shared acl)
 	endif()
 
 	SET_TARGET_PROPERTIES(protocol_shared PROPERTIES OUTPUT_NAME "protocol")

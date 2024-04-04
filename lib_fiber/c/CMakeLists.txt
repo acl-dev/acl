@@ -168,7 +168,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/fiber/
 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/fiber"
 )
 
-if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+#if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+if (ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
 			set(sys_ldflags "-shared -O3")
@@ -179,6 +180,10 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	elseif (${UNIX_OS})
 		set(sys_ldflags "-shared -O3")
 		target_compile_options(fiber_static PRIVATE -fvisibility=hidden)
+
+		if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+			set(CMAKE_MACOSX_RPATH 1)
+		endif()
 	endif()
 
 	set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
