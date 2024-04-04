@@ -8,7 +8,7 @@ project(acl)
 #message(project_dir=${PROJECT_SOURCE_DIR})
 
 if (${CMAKE_BINARY_DIR} STREQUAL ${CMAKE_CURRENT_SOURCE_DIR})
-	message(FATAL_ERROR "Please into another dir to build!")
+	message(FATAL_ERROR "Please into another dir to build! ${CMAKE_BINARY_DIR}, ${CMAKE_CURRENT_SOURCE_DIR}")
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
@@ -206,7 +206,8 @@ install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
 	DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/acl-lib/acl/"
 )
 
-if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED MATCHES "YES")
+#if ((NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR) AND ACL_BUILD_SHARED MATCHES "YES")
+if (ACL_BUILD_SHARED MATCHES "YES")
 	if (CMAKE_SYSTEM_NAME MATCHES "Android")
 		if (ANDROID_STL MATCHES "gnustl_shared")
 			set(sys_ldflags "-shared")
@@ -220,6 +221,10 @@ if (NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND ACL_BUILD_SHARED 
 	elseif (${UNIX_OS})
 		set(sys_ldflags "-shared -lpthread -ldl")
 		target_compile_options(acl_static PRIVATE -fvisibility=hidden)
+
+		if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
+			set(CMAKE_MACOSX_RPATH 1)
+		endif()
 	endif()
 
 	set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")

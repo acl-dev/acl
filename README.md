@@ -173,6 +173,8 @@ Acl not only wraps the system DNS API, such as getaddrinfo and gethostbyname, bu
 ## 3.1. Compiling Acl on different platforms
 Acl project currently supports Linux, Windows, MacOS, FreeBSD, Solaris, Android, and iOS.
 - **Linux/UNIX:** The compiler is gcc/clang, enter **`acl/`** directory and run **`make`**, then libacl_all.a and libacl_all.so will be generated in acl/ directory, libacl_all.a is consist of three libraries including lib_acl.a, lib_protocol.a and libacl_cpp.a;
+You can also use cmake to build and install Acl libs by running cmake-build.sh script in Acl directory; 
+And xmake can also compiling Acl when you run xmake in Acl directory.
 - **Windows:** Can be compiled with VS2003/VS2008/VS2010/VS2012/VS2013/VS2015/VS2019. (If you need to compile with VS6/VS2005, you can refer to the compilation conditions of VS2003);
 - **MacOS/iOS:** Compiled with xcode;
 - **Android:** Open Adnroid's project in **`acl/android/acl_c++_shared/`** with **`Android Studio`**;

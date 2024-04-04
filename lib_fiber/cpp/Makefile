@@ -29,7 +29,12 @@ CFLAGS = -c -g -W \
 #just for freebsd's iconv.h
 CFLAGS += -I/usr/local/include -I../../lib_acl/src/master
 
-shared_ldflags = -lacl_cpp -lprotocol -lacl -lz -lpthread
+shared_ldflags = -lacl_cpp -lprotocol -lacl -lfiber -lz -lpthread
+
+STATIC_LIBNAME = libfiber_cpp.a
+SHARED_LIBNAME = libfiber_cpp.so
+STATIC_OLD_LIBNAME = lib_fiber_cpp.a
+SHARED_OLD_LIBNAME = lib_fiber_cpp.so
 
 ###########################################################
 #Check system:
@@ -71,7 +76,7 @@ endif
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	UNIXTYPE = FREEBSD
-	shared_ldflags = -lacl_cpp -lprotocol -lacl -L/usr/local/lib -liconv -lz -lpthread
+	shared_ldflags = -lacl_cpp -lprotocol -lacl -lfiber -L/usr/local/lib -liconv -lz -lpthread
 endif
 
 # For Darwin
@@ -81,13 +86,15 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -Wno-invalid-offsetof \
 		  -Wno-unused-private-field
 	UNIXTYPE = MACOSX
-	shared_ldflags = -lacl_cpp -lprotocol -lacl -L/usr/lib -liconv -lz -lpthread
+	shared_ldflags = -lacl_cpp -lprotocol -lacl -lfiber -L/usr/lib -liconv -lz -lpthread
+	SHARED_LIBNAME = libfiber_cpp.dylib
+	SHARED_OLD_LIBNAME = lib_fiber_cpp.dylib
 endif
 
 # For Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 	UNIXTYPE = LINUX
-	shared_ldflags = -lacl_cpp -lprotocol -lacl -lrt -lpthread -lz -ldl
+	shared_ldflags = -lacl_cpp -lprotocol -lacl -lfiber -lrt -lpthread -lz -ldl
 endif
 
 # For CYGWIN
@@ -146,11 +153,6 @@ OBJ = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC)))
 .PHONY = static shared clean
 VERSION = 0.9
 DATE_NOW = 20`date +%y`.`date +%m`.`date +%d`
-
-STATIC_LIBNAME = libfiber_cpp.a
-SHARED_LIBNAME = libfiber_cpp.so
-STATIC_OLD_LIBNAME = lib_fiber_cpp.a
-SHARED_OLD_LIBNAME = lib_fiber_cpp.so
 
 lib: static
 all: static shared sample

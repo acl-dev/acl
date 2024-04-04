@@ -35,6 +35,9 @@ CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 UNIXTYPE = LINUX
 
+STATIC_LIBNAME = libprotocol.a
+SHARED_LIBNAME = libprotocol.so
+
 ifeq ($(CC),)
         CC = gcc
 endif
@@ -86,6 +89,7 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 		  -flto \
 		  -Os
 	UNIXTYPE = MACOSX
+	SHARED_LIBNAME = libprotocol.dylib
 endif
 
 # For Linux
@@ -168,9 +172,6 @@ OBJS_DST = $(BASE_OBJ) $(HTTP_OBJ) $(ICMP_OBJ) $(SMTP_OBJ)
 
 LIB_ACL_PATH = ../lib_acl
 CFLAGS += -I $(LIB_ACL_PATH)/include
-
-STATIC_LIBNAME = libprotocol.a
-SHARED_LIBNAME = libprotocol.so
 
 ###########################################################
 

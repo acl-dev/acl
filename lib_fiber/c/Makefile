@@ -50,6 +50,13 @@ CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
 UNIXTYPE = LINUX
 
+###########################################################
+
+STATIC_LIBNAME = libfiber.a
+SHARED_LIBNAME = libfiber.so
+STATIC_OLD_LIBNAME = lib_fiber.a
+SHARED_OLD_LIBNAME = lib_fiber.so
+
 ifeq ($(CC),)
         CC = gcc
 endif
@@ -117,10 +124,13 @@ endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	UNIXTYPE = MACOSX
 #	CC += -arch x86_64 -arch arm64
 	CFLAGS += -DMACOSX -Wno-invalid-source-encoding \
 		  -Wno-invalid-offsetof \
 		  -Wno-deprecated-declarations
+	SHARED_LIBNAME = libfiber.dylib
+	SHARED_OLD_LIBNAME = lib_fiber.dylib
 endif
 
 # For Linux
@@ -236,13 +246,6 @@ OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC))) $(ASM_OBJ)
 
 ###########################################################
 
-STATIC_LIBNAME = libfiber.a
-SHARED_LIBNAME = libfiber.so
-STATIC_OLD_LIBNAME = lib_fiber.a
-SHARED_OLD_LIBNAME = lib_fiber.so
-
-###########################################################
-
 .PHONY = static shared clean
 COMPILE = $(CC) $(CFLAGS) -O3
 COMPILE_FIBER = $(CC) $(CFLAGS) 
@@ -275,6 +278,7 @@ shared: $(OBJ)
 			-R$(rpath) -L$(rpath) $(shared_ldflags); \
 		echo 'build $(rpath)/$(SHARED_LIBNAME) ok!'; \
 	elif test -n "$(rpath)" && test "$(UNIXTYPE)" = "MACOSX"; then \
+		shared_ldflags = -lpthread; \
 		echo "building for Darwin"; \
 		$(CC) -shared -o $(rpath)/$(SHARED_LIBNAME) $(OBJ) \
 			-R$(rpath) -L$(rpath) -lpthread; \
