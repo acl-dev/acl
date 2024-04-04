@@ -176,11 +176,24 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 	endif()
 
 	if (ACL_BUILD_SHARED_ONE MATCHES "YES")
-		set(lc_ldflags "${lib_output_path}/libacl_cpp.a ${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a ${lib_output_path}/libfiber.a")
-		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
+#		set(lc_ldflags "${CMAKE_INSTALL_PREFIX}/lib/libacl_cpp.a \
+#				${CMAKE_INSTALL_PREFIX}/lib/libprotocol.a \
+#				${CMAKE_INSTALL_PREFIX}/lib/libacl.a \
+#				${CMAKE_INSTALL_PREFIX}/lib/libfiber.a")
+#		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
+
+		set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
 		add_library(fiber_cpp_shared SHARED ${lib_src})
+		target_link_libraries(fiber_cpp_shared
+				${lib_output_path}/libfiber_cpp.a
+				${lib_output_path}/libacl_cpp.a
+				${lib_output_path}/libprotocol.a
+				${lib_output_path}/libacl.a
+				${lib_output_path}/libfiber.a)
 	else()
-		set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${CMAKE_INSTALL_PREFIX}/lib -lacl_cpp -lprotocol -lacl -lfiber")
+		set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib \
+				-L${CMAKE_INSTALL_PREFIX}/lib \
+				-lacl_cpp -lprotocol -lacl -lfiber")
 		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
 		add_library(fiber_cpp_shared SHARED ${lib_src})
 #		target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)

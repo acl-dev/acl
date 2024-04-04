@@ -220,7 +220,7 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 		target_compile_options(acl_static PRIVATE -fvisibility=hidden)
 	elseif (${UNIX_OS})
 		set(sys_ldflags "-shared -lpthread -ldl")
-		target_compile_options(acl_static PRIVATE -fvisibility=hidden)
+#		target_compile_options(acl_static PRIVATE -fvisibility=hidden)
 
 		if (CMAKE_SYSTEM_NAME MATCHES "Darwin")
 			set(CMAKE_MACOSX_RPATH 1)
