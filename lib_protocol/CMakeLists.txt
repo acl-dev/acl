@@ -175,22 +175,11 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 		endif()
 	endif()
 
-	if (ACL_BUILD_SHARED_ONE MATCHES "YES")
-#		set(lc_flags "${lib_output_path}/libacl.a")
-#		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
-
-		set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
-		add_library(protocol_shared SHARED ${lib_src})
-		target_link_libraries(protocol_shared
-				${lib_output_path}/libprotocol.a
-				${lib_output_path}/libacl.a)
-	else()
-		set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib \
-			-L${CMAKE_INSTALL_PREFIX}/lib -lacl")
-		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
-		add_library(protocol_shared SHARED ${lib_src})
-#		target_link_libraries(protocol_shared acl)
-	endif()
+	set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib \
+		-L${CMAKE_INSTALL_PREFIX}/lib")
+	set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
+	add_library(protocol_shared SHARED ${lib_src})
+	target_link_libraries(protocol_shared acl)
 
 	SET_TARGET_PROPERTIES(protocol_shared PROPERTIES OUTPUT_NAME "protocol")
 
