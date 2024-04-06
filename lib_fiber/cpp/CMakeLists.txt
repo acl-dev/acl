@@ -175,16 +175,11 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 			-fvisibility=hidden -fvisibility-inlines-hidden)
 	endif()
 
-	if (ACL_BUILD_SHARED_ONE MATCHES "YES")
-		set(lc_ldflags "${lib_output_path}/libacl_cpp.a ${lib_output_path}/libprotocol.a ${lib_output_path}/libacl.a ${lib_output_path}/libfiber.a")
-		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
-		add_library(fiber_cpp_shared SHARED ${lib_src})
-	else()
-		set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${CMAKE_INSTALL_PREFIX}/lib -lacl_cpp -lprotocol -lacl -lfiber")
-		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
-		add_library(fiber_cpp_shared SHARED ${lib_src})
-#		target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
-	endif()
+	set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib \
+			-L${CMAKE_INSTALL_PREFIX}/lib")
+	set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
+	add_library(fiber_cpp_shared SHARED ${lib_src})
+	target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
 
 	SET_TARGET_PROPERTIES(fiber_cpp_shared PROPERTIES OUTPUT_NAME "fiber_cpp")
 

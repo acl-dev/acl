@@ -92,5 +92,5 @@ add_subdirectory(lib_fiber/c fiber)
 add_subdirectory(lib_fiber/cpp fiber_cpp)
 
 if (ACL_BUILD_SHARED MATCHES "YES")
-	add_dependencies(fiber_cpp_shared acl_cpp_shared protocol_shared acl_shared fiber)
+	add_dependencies(fiber_cpp_shared acl_cpp_shared protocol_shared acl_shared fiber_shared)
 endif()
