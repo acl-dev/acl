@@ -293,8 +293,7 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 			-fvisibility=hidden -fvisibility-inlines-hidden)
 	endif()
 
-	set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib \
-		-L${CMAKE_INSTALL_PREFIX}/lib ")
+	set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
 	set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
 	add_library(acl_cpp_shared SHARED ${lib_src})
 	target_link_libraries(acl_cpp_shared protocol acl)
