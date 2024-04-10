@@ -122,8 +122,8 @@ int acl_dbuf_pool_reset(ACL_DBUF_POOL *pool, size_t off)
 	ACL_DBUF *iter = pool->head, *tmp;
 
 	if (off > pool->off) {
-		acl_msg_warn("warning: %s(%d) off(%ld) > pool->off(%ld)",
-			__FUNCTION__, __LINE__, (long) off, (long) pool->off);
+		//acl_msg_warn("warning: %s(%d) off(%ld) > pool->off(%ld)",
+		//	__FUNCTION__, __LINE__, (long) off, (long) pool->off);
 		return -1;
 	} else if (off == pool->off) {
 		return 0;
