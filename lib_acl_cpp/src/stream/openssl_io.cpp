@@ -190,7 +190,14 @@ static bool set_sock_timeo(ACL_SOCKET fd, int opt, int timeout)
 		return true;
 	}
 
-# if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+# if defined(_WIN32) || defined(_WIN64)
+	timeout *= 1000; // From seconds to millisecond.
+	if (setsockopt(fd, SOL_SOCKET, opt, (const char*) &timeout, sizeof(timeout)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+# elif defined(__APPLE__)
 	timeout *= 1000; // From seconds to millisecond.
 	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
 		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
