@@ -1,11 +1,11 @@
 #include "acl_stdafx.hpp"
 
-#if 0
-#if defined(_WIN32) || defined(_WIN64)
-# include "zlib-1.2.11/zlib.h"
-#else
-# include <zlib.h>
-#endif
+#ifndef COSMOCC
+# if defined(_WIN32) || defined(_WIN64)
+#  include "zlib-1.2.11/zlib.h"
+# else
+#  include <zlib.h>
+# endif
 #endif
 
 #ifndef ACL_PREPARE_COMPILE
