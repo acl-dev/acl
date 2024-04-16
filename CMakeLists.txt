@@ -82,15 +82,11 @@ endif()
 add_subdirectory(lib_acl acl)
 add_subdirectory(lib_protocol protocol)
 add_subdirectory(lib_acl_cpp acl_cpp)
-
-if (ACL_BUILD_SHARED MATCHES "YES")
-	add_dependencies(protocol_shared acl_shared)
-	add_dependencies(acl_cpp_shared protocol_shared acl_shared)
-endif()
-
 add_subdirectory(lib_fiber/c fiber)
 add_subdirectory(lib_fiber/cpp fiber_cpp)
 
 if (ACL_BUILD_SHARED MATCHES "YES")
+	add_dependencies(protocol_shared acl_shared)
+	add_dependencies(acl_cpp_shared protocol_shared acl_shared)
 	add_dependencies(fiber_cpp_shared acl_cpp_shared protocol_shared acl_shared fiber_shared)
 endif()

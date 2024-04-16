@@ -117,6 +117,9 @@ else()
 endif()
 
 foreach(iter ${sources})
+	if (ACL_BUILD_VERBOSE MATCHES "YES")
+		message(STATUS ">>add dir ${iter}")
+	endif()
 	aux_source_directory(${iter} lib_src)
 endforeach()
 
