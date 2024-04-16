@@ -127,8 +127,10 @@ set(sources
 )
 
 foreach(iter ${sources})
+	if (ACL_BUILD_VERBOSE MATCHES "YES")
+		message(STATUS ">>add dir ${iter}")
+	endif()
 	aux_source_directory(${iter} lib_src)
-	message(STATUS ">>add dir ${iter}")
 endforeach()
 
 list(APPEND lib_src ${src}/fiber/boost/make_gas.S

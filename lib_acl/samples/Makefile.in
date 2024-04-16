@@ -137,7 +137,7 @@ ACL_LIB    = $(ACL_PATH)/lib
 
 EXTLIBS =
 CFLAGS += -I$(ACL_INC)
-LDFLAGS = -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_LIB) -Wl,-rpath,$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 
 ###########################################################
 

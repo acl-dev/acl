@@ -156,7 +156,10 @@ FIBER_LIB  = $(FIBER_PATH)/lib
 
 EXTLIBS =
 CFLAGS += -I.. -I$(PRO_INC) -I$(ACL_INC) -I$(FIBER_INC)
-LDFLAGS = -L$(PRO_LIB) -lprotocol -L$(ACL_LIB) -lacl -L$(FIBER_LIB) -lfiber $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(PRO_LIB) -lprotocol -Wl,-rpath,$(PRO_LIB) \
+	-L$(ACL_LIB) -lacl -Wl,-rpath,$(ACL_LIB) \
+	-L$(FIBER_LIB) -lfiber -Wl,-rpath,$(FIBER_LIB) \
+	$(EXTLIBS) $(SYSLIB)
 
 ###########################################################
 

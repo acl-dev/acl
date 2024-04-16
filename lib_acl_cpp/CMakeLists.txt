@@ -125,6 +125,9 @@ set(sources
 )
 
 foreach(iter ${sources})
+	if (ACL_BUILD_VERBOSE MATCHES "YES")
+		message(STATUS ">>add dir ${iter}")
+	endif()
 	aux_source_directory(${iter} lib_src)
 endforeach()
 
@@ -152,7 +155,7 @@ if (${UNIX_OS})
 	if (!CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 		add_definitions("-Wno-unused-private-field"
 			"-Wno-unused-const-variable"
-			)
+		)
 	endif()
 
 	if (!CMAKE_BUILD_TYPE STREQUAL "RELEASE")
@@ -197,26 +200,32 @@ if (${UNIX_OS})
 	if (HAS_POLARSSL MATCHES "YES")
 		add_definitions("-DHAS_POLARSSL")
 		message(STATUS "HAS_POLARSSL been set, polarssl enable!")
-	elseif (HAS_MBEDTLS MATCHES "YES")
-		add_definitions("-DHAS_MBEDTLS")
-		message(STATUS "HAS_MBEDTLS been set, mbedtls enable!")
-	elseif (HAS_OPENSSL MATCHES "YES")
-		add_definitions("-DHAS_OPENSSL")
-		message(STATUS "HAS_OPENSSL been set, openssl enable!")
 	elseif (HAS_POLARSSL_DLL MATCHES "YES")
 		add_definitions("-DHAS_POLARSSL_DLL")
 		message(STATUS "HAS_POLARSSL_DLL been set, polarssl enable!")
+	else()
+		message(STATUS "polarssl disable!")
+	endif()
+
+	if (HAS_MBEDTLS MATCHES "YES")
+		add_definitions("-DHAS_MBEDTLS")
+		message(STATUS "HAS_MBEDTLS been set, mbedtls enable!")
 	elseif (HAS_MBEDTLS_DLL MATCHES "YES")
 		add_definitions("-DHAS_MBEDTLS_DLL")
 		message(STATUS "HAS_MBEDTLS_DLL been set, mbedtls enable!")
+	else()
+		message(STATUS "mbedtls disable!")
+	endif()
+
+	if (HAS_OPENSSL MATCHES "YES")
+		add_definitions("-DHAS_OPENSSL")
+		message(STATUS "HAS_OPENSSL been set, openssl enable!")
 	elseif (HAS_OPENSSL_DLL MATCHES "YES")
 		add_definitions("-DHAS_OPENSSL_DLL")
 		message(STATUS "HAS_OPENSSL_DLL been set, openssl enable!")
 	else()
-		message(STATUS "SSL disable!")
+		message(STATUS "openssl disable!")
 	endif()
-
-
 elseif (${WIN_OS})
 	add_definitions(
 		"-Ycacl_stdafx.hpp"

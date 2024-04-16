@@ -137,7 +137,7 @@ EXTLIBS =
 #CFLAGS += -I$(ACL_INC) -I$(PROTO_INC)
 #LDFLAGS = -L$(ACL_LIB) -L$(PROTO_LIB) -l_protocol -lacl $(EXTLIBS) $(SYSLIB)
 CFLAGS += -I$(ACL_INC)
-LDFLAGS = -L$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
+LDFLAGS = -L$(ACL_LIB) -Wl,-rpath,$(ACL_LIB) -lacl $(EXTLIBS) $(SYSLIB)
 
 
 ###########################################################
