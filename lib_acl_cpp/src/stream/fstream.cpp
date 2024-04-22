@@ -150,6 +150,11 @@ bool fstream::create(const char* path)
 
 acl_off_t fstream::fseek(acl_off_t offset, int whence)
 {
+	if (stream_ == NULL) {
+		logger_error("stream_ null");
+		return -1;
+	}
+
 	acl_off_t ret = acl_vstream_fseek(stream_, offset, whence);
 	eof_ = ret >= 0 ? false : true;
 	return ret;
@@ -157,6 +162,10 @@ acl_off_t fstream::fseek(acl_off_t offset, int whence)
 
 acl_off_t fstream::ftell(void)
 {
+	if (stream_ == NULL) {
+		logger_error("stream_ null");
+		return -1;
+	}
 	acl_off_t ret = acl_vstream_ftell(stream_);
 	eof_ = ret >= 0 ? false : true;
 	return ret;
@@ -164,6 +173,11 @@ acl_off_t fstream::ftell(void)
 
 bool fstream::ftruncate(acl_off_t length)
 {
+	if (stream_ == NULL) {
+		logger_error("stream_ null");
+		return false;
+	}
+
 	// 需要先将文件指针移到开始位置
 	if (fseek(0, SEEK_SET) < 0) {
 		return false;
@@ -173,6 +187,10 @@ bool fstream::ftruncate(acl_off_t length)
 
 acl_int64 fstream::fsize(void) const
 {
+	if (stream_ == NULL) {
+		logger_error("stream_ null");
+		return -1;
+	}
 	return acl_vstream_fsize(stream_);
 }
 
@@ -183,7 +201,7 @@ acl_int64 fstream::fsize(const char* path)
 
 ACL_FILE_HANDLE fstream::file_handle(void) const
 {
-	return ACL_VSTREAM_FILE(stream_);
+	return stream_ ? ACL_VSTREAM_FILE(stream_) : ACL_FILE_INVALID;
 }
 
 bool fstream::lock(bool exclude /* = true */)
