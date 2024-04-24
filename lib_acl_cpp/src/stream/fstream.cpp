@@ -215,9 +215,14 @@ bool fstream::lock(bool exclude /* = true */)
 		return false;
 	}
 
-	int ret = acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL,
-		exclude ? ACL_FLOCK_OP_EXCLUSIVE : ACL_FLOCK_OP_SHARED);
-	return ret == 0;
+#ifdef	ACL_HAS_FLOCK_LOCK
+	// Use flock mode first when flock is supported by OS.
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FLOCK,
+		exclude ?  LOCK_EX : LOCK_SH) == 0;
+#else
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL,
+		exclude ? ACL_FLOCK_OP_EXCLUSIVE : ACL_FLOCK_OP_SHARED) == 0;
+#endif
 }
 
 bool fstream::try_lock(bool exclude /* = true */)
@@ -231,13 +236,14 @@ bool fstream::try_lock(bool exclude /* = true */)
 		return false;
 	}
 
-	int oper =ACL_FLOCK_OP_NOWAIT;
-	if (exclude) {
-		oper |= ACL_FLOCK_OP_EXCLUSIVE;
-	} else {
-		oper |= ACL_FLOCK_OP_SHARED;
-	}
-	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL, oper) == 0;
+#ifdef	ACL_HAS_FLOCK_LOCK
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FLOCK,
+		exclude ?  (LOCK_EX | LOCK_NB) : (LOCK_SH | LOCK_NB)) == 0;
+#else
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL,
+		exclude ? (ACL_FLOCK_OP_NOWAIT | ACL_FLOCK_OP_EXCLUSIVE)
+			: (ACL_FLOCK_OP_NOWAIT | ACL_FLOCK_OP_SHARED)) == 0;
+#endif
 }
 
 bool fstream::unlock(void)
@@ -251,7 +257,11 @@ bool fstream::unlock(void)
 		return false;
 	}
 
+#ifdef	ACL_HAS_FLOCK_LOCK
+	return acl_myflock(fd, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) == 0;
+#else
 	return acl_myflock(fd, ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_NONE) == 0;
+#endif
 }
 
 } // namespace acl
