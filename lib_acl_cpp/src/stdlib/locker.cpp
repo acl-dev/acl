@@ -127,8 +127,12 @@ bool locker::lock(void)
 		return true;
 	}
 
+#ifdef	ACL_HAS_FLOCK_LOCK
+	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FLOCK, LOCK_EX) == 0) {
+#else
 	int operation = ACL_FLOCK_OP_EXCLUSIVE;
 	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0) {
+#endif
 		return true;
 	}
 
@@ -155,8 +159,12 @@ bool locker::try_lock(void)
 		return true;
 	}
 
+#ifdef	ACL_HAS_FLOCK_LOCK
+	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FLOCK, (LOCK_EX | LOCK_NB)) == 0) {
+#else
 	int operation = ACL_FLOCK_OP_EXCLUSIVE | ACL_FLOCK_OP_NOWAIT;
 	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, operation) == 0) {
+#endif
 		return true;
 	}
 
@@ -193,8 +201,11 @@ bool locker::unlock(void)
 		return ret;
 	}
 
-	int operation = ACL_FLOCK_STYLE_FCNTL;
-	if (acl_myflock(fHandle_, operation, ACL_FLOCK_OP_NONE) == -1) {
+#ifdef	ACL_HAS_FLOCK_LOCK
+	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FLOCK, ACL_FLOCK_OP_NONE) == -1) {
+#else
+	if (acl_myflock(fHandle_, ACL_FLOCK_STYLE_FCNTL, ACL_FLOCK_OP_NONE) == -1) {
+#endif
 		return false;
 	}
 	return ret;
