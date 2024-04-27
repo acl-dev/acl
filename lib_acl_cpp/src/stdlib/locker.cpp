@@ -1,7 +1,11 @@
 
 #include "acl_stdafx.hpp"
+#ifdef ACL_HAS_FLOCK_LOCK
+# include <sys/file.h>
+#endif
+
 #ifndef ACL_PREPARE_COMPILE
-#include "acl_cpp/stdlib/locker.hpp"
+# include "acl_cpp/stdlib/locker.hpp"
 #endif
 
 /*

@@ -1,8 +1,13 @@
 #include "acl_stdafx.hpp"
+
+#ifdef ACL_HAS_FLOCK_LOCK
+# include <sys/file.h>
+#endif
+
 #ifndef ACL_PREPARE_COMPILE
-#include "acl_cpp/stdlib/log.hpp"
-#include "acl_cpp/stdlib/util.hpp"
-#include "acl_cpp/stream/fstream.hpp"
+# include "acl_cpp/stdlib/log.hpp"
+# include "acl_cpp/stdlib/util.hpp"
+# include "acl_cpp/stream/fstream.hpp"
 #endif
 
 namespace acl {
