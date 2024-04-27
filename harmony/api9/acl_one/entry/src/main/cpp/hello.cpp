@@ -8,12 +8,17 @@ public:
     http_thread(const char* url) : url_(url) {}
     ~http_thread() = default;
     
-    const acl::string& result() const {
+    const acl::string& get_body() const {
         return body_;
+    }
+    
+    const acl::string& get_head() const {
+        return head_;;
     }
 
  protected:
     std::string url_;
+    acl::string head_;
     acl::string body_;
 
     // @override
@@ -23,9 +28,7 @@ public:
     }
     
     bool url_get() {
-        const char* addr = "110.242.68.4|80";
-        addr = "www.baidu.com:80";
-        // addr = "110.242.68.3";
+        const char* addr = "www.baidu.com:80";
         acl::http_request req(addr, 5);
         req.request_header().set_url("/")
             .set_host("www.baidu.com");
@@ -44,9 +47,8 @@ public:
             log_error("%s: get http body error!", __func__);
             return false;
         }
-        
-        int f = AI_ADDRCONFIG;
-        struct sockaddr sa;
+
+        req.get_client()->sprint_header(head_);
         log_info("%s: http response body: %s", __func__, body_.c_str());
         return true;
     }
@@ -71,25 +73,23 @@ static napi_value HttpGet(napi_env env, napi_callback_info info)
 
     log_info( "%s: url=%s", __func__, url);
 
-#if 0
-    napi_value result;
-    if (napi_create_string_utf8(env, url, strlen(url), &result) != napi_ok) {
-        return nullptr;
-    }
-    return result;
-#else 
     http_thread http(url);
     http.set_detachable(false);
     http.start();
     http.wait();
     
-    const acl::string& body = http.result();
-    if (body.empty()) {
-        log_info("%s: http resply body empty!", __func__);
+    const acl::string& body = http.get_body();
+    acl::string head = http.get_head();
+
+    if (body.empty() || head.empty()) {
+        log_info("%s: http reply body or head empty!", __func__);
         return nullptr;
     }
+    
+    head.format_append("\r\nBody length: %zd\r\n", body.length());
+
     napi_value result;
-    res = napi_create_string_utf8(env, body.c_str(), body.size(), &result);
+    res = napi_create_string_utf8(env, head.c_str(), head.size(), &result);
     if (res != napi_ok) {
         log_info("%s: napi_create_string_utf8 error=%d", __func__, res);
         return nullptr;
@@ -97,7 +97,6 @@ static napi_value HttpGet(napi_env env, napi_callback_info info)
     
     log_info("%s: At last, http body length=%zd", __func__, body.size());
     return result;
-#endif
 }
 
 static napi_value Add(napi_env env, napi_callback_info info)
