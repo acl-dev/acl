@@ -510,7 +510,7 @@ void acl_fiber_kill_wait(ACL_FIBER *fiber)
 
 int acl_fiber_signum(ACL_FIBER *fiber)
 {
-	if (fiber) {
+	if (fiber == NULL) {
 		fiber = acl_fiber_running();
 	}
 	return fiber ? fiber->signum : 0;
