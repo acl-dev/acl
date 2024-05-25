@@ -149,7 +149,7 @@ private:
 	void bind_host(SSL_CTX* ctx, string& host);
 	bool create_host_key(string& host, string& key, size_t skip = 0);
 
-	int on_sni_callback(SSL* ssl, const char*host);
+	int on_sni_callback(SSL* ssl);
 	static int sni_callback(SSL *ssl, int *ad, void *arg);
 };
 

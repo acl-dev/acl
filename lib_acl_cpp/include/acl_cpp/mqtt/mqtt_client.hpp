@@ -21,16 +21,17 @@ public:
 	 * @param conn_timeout {int} the timeout for connecting mqtt server.
 	 * @param rw_timeout {int} the timeout for reading from mqtt connection.
 	 */
-	mqtt_client(const char* addr, int conn_timeout = 10, int rw_timeout = 10);
+	explicit mqtt_client(const char* addr, int conn_timeout = 10, int rw_timeout = 10);
 
 	/**
 	 * used to construct one mqtt client for connecting mqtt server, or
 	 * receiving from mqtt client.
 	 * @param conn {acl::socket_stream&}
+	 * @param conn_timeout {int} the timeout for connecting mqtt server.
 	 */
-	mqtt_client(acl::socket_stream& conn);
+	explicit mqtt_client(acl::socket_stream& conn, int conn_timeout = 10);
 
-	~mqtt_client();
+	 ~mqtt_client();
 
 	/**
 	 * send ont mqtt message to the peer mqtt.

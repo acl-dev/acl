@@ -596,7 +596,6 @@ void openssl_conf::use_sockopt_timeout(bool yes)
 	sockopt_timeout_ = yes;
 }
 
-
 SSL_CTX* openssl_conf::create_ssl_ctx()
 {
 #ifdef HAS_OPENSSL
@@ -836,10 +835,35 @@ SSL_CTX* openssl_conf::find_ssl_ctx(const char* host)
 	return NULL;
 }
 
-int openssl_conf::on_sni_callback(SSL* ssl, const char*host)
+int openssl_conf::on_sni_callback(SSL* ssl)
 {
 #ifdef HAS_OPENSSL
-	SSL_CTX* ctx = find_ssl_ctx(host);
+	string host;
+
+	const char* sni = __ssl_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
+	if (sni == NULL || *sni == 0) {
+		if (checker_ && !checker_->check(sni, host)) {
+			return SSL_TLSEXT_ERR_ALERT_FATAL;
+		}
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	if (checker_) {
+		if (!checker_->check(sni, host)) {
+			return SSL_TLSEXT_ERR_ALERT_FATAL;
+		}
+		if (host.empty()) {
+			host = sni;
+		}
+	} else {
+		host = sni;
+	}
+
+	if (ssl_ctx_table_ == NULL) {
+		return SSL_TLSEXT_ERR_NOACK;
+	}
+
+	SSL_CTX* ctx = find_ssl_ctx(host.c_str());
 	if (ctx == NULL) {
 		return SSL_TLSEXT_ERR_NOACK;
 	}
@@ -859,7 +883,6 @@ int openssl_conf::on_sni_callback(SSL* ssl, const char*host)
 	return SSL_TLSEXT_ERR_NOACK;
 #else
 	(void) ssl;
-	(void) host;
 	return 0;
 #endif
 }
@@ -870,17 +893,7 @@ int openssl_conf::sni_callback(SSL *ssl, int *ad, void *arg)
 	(void) ad;
 
 	openssl_conf* conf = (openssl_conf*) arg;
-
-	if (conf->ssl_ctx_table_ == NULL) {
-		return SSL_TLSEXT_ERR_NOACK;
-	}
-
-	const char* host = __ssl_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
-	if (host == NULL) {
-		return SSL_TLSEXT_ERR_NOACK;
-	}
-
-	return conf->on_sni_callback(ssl, host);
+	return conf->on_sni_callback(ssl);
 #else
 	(void) ssl;
 	(void) ad;

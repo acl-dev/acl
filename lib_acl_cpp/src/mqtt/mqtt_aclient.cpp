@@ -23,10 +23,32 @@ mqtt_aclient::~mqtt_aclient() {
 	delete body_;
 }
 
-void mqtt_aclient::set_host(const char* host) {
+mqtt_aclient& mqtt_aclient::set_host(const char* host) {
 	if (host && *host) {
 		host_ = host;
+	} else {
+		host_.clear();
 	}
+
+	return *this;
+}
+
+mqtt_aclient& mqtt_aclient::set_sni_prefix(const char *prefix) {
+	if (prefix && *prefix) {
+		sni_prefix_ = prefix;
+	} else {
+		sni_prefix_.clear();
+	}
+	return *this;
+}
+
+mqtt_aclient& mqtt_aclient::set_sni_suffix(const char *suffix) {
+	if (suffix && *suffix) {
+		sni_suffix_ = suffix;
+	} else {
+		sni_suffix_.clear();
+	}
+	return *this;
 }
 
 bool mqtt_aclient::open(const char* addr, int conn_timeout, int rw_timeout) {
@@ -141,7 +163,9 @@ bool mqtt_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	sslbase_io* ssl_io = ssl_conf_->create(true);
 
 	if (!host_.empty()) {
-		ssl_io->set_sni_host(host_.c_str());
+		ssl_io->set_sni_host(host_.c_str(),
+			sni_prefix_.empty() ? NULL : sni_prefix_.c_str(),
+			sni_suffix_.empty() ? NULL : sni_suffix_.c_str());
 	}
 
 	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {

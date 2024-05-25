@@ -7,8 +7,7 @@
 # include "acl_cpp/stream/sslbase_io.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 sslbase_io::sslbase_io(sslbase_conf& conf, bool server_side,
 	bool nblock /* = false */)
@@ -21,7 +20,7 @@ sslbase_io::sslbase_io(sslbase_conf& conf, bool server_side,
 	refers_ = NEW atomic_long(0);
 }
 
-sslbase_io::~sslbase_io(void)
+sslbase_io::~sslbase_io()
 {
 	delete refers_;
 }
@@ -34,10 +33,18 @@ void sslbase_io::set_non_blocking(bool yes)
 	nblock_ = yes;
 }
 
-void sslbase_io::set_sni_host(const char *host)
+void sslbase_io::set_sni_host(const char *host, const char* prefix /* NULL */,
+	const char* suffix /* NULL */)
 {
 	if (host && *host) {
-		sni_host_ = host;
+		sni_host_.clear();
+		if (prefix && *prefix) {
+			sni_host_ = prefix;
+		}
+		sni_host_ += host;
+		if (suffix && *suffix) {
+			sni_host_ += suffix;
+		}
 	}
 }
 

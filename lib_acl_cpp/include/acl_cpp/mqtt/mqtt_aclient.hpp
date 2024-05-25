@@ -16,20 +16,20 @@ class mqtt_message;
 class ACL_CPP_API mqtt_aclient : public aio_open_callback {
 public:
 	/**
-	 * constructor
+	 * Constructor
 	 * @param handle {aio_handle&}
 	 * @param ssl_conf {sslbase_conf*} if not NULL, ssl will be used
 	 */
-	mqtt_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
+	explicit mqtt_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
 
 	/**
-	 * because the subclass object was created dynamically, the method
+	 * Because the subclass object was created dynamically, the method
 	 * will be called when the subclass object is to be freed.
 	 */
 	virtual void destroy() = 0;
 
 	/**
-	 * get the ssl conf object passed in constructor.
+	 * Get the ssl conf object passed in constructor.
 	 * @return {sslbase_conf*} return NULL if not set.
 	 */
 	sslbase_conf* get_ssl_conf() const {
@@ -37,7 +37,7 @@ public:
 	}
 
 	/**
-	 * connect the remote mqtt server, when connected with the server,
+	 * Connect the remote mqtt server, when connected with the server,
 	 * the callback on_connect() will be called
 	 * @param addr {const char*} the mqtt server's addr with the format
 	 *  ip|port, or domain|port
@@ -49,7 +49,7 @@ public:
 	bool open(const char* addr, int conn_timeout, int rw_timeout);
 
 	/**
-	 * called when connect or accept one connection
+	 * Called when connect or accept one connection
 	 * @param conn {aio_socket_stream*}
 	 * @return bool {bool} if return false, you should call destroy() to
 	 *  delete the subclass object
@@ -57,12 +57,12 @@ public:
 	bool open(aio_socket_stream* conn);
 
 	/**
-	 * close the connection with the mqtt server async
+	 * Close the connection with the mqtt server async
 	 */
 	void close();
 
 	/**
-	 * get the connection with the mqtt server
+	 * Get the connection with the mqtt server
 	 * @return {aio_socket_stream*} return NULL if not connected
 	 */
 	aio_socket_stream* get_conn() const {
@@ -70,11 +70,15 @@ public:
 	}
 
 	/**
-	 * set the remote host name to specify the SSL SNI for SSL handshake,
+	 * Set the remote host name to specify the SSL SNI for SSL handshake,
 	 * used to connect one mqtt server as a connection client.
 	 * @param host {const char*} the host name
+	 * @return {mqtt_aclient&}
 	 */
-	void set_host(const char* host);
+	mqtt_aclient& set_host(const char* host);
+
+	mqtt_aclient& set_sni_prefix(const char* prefix);
+	mqtt_aclient& set_sni_suffix(const char* suffix);
 
 public:
 	/**
@@ -150,6 +154,8 @@ protected:
 private:
 	aio_handle& handle_;
 	sslbase_conf* ssl_conf_;
+	std::string sni_prefix_;
+	std::string sni_suffix_;
 	aio_socket_stream* conn_;
 	int rw_timeout_;
 	std::string host_;

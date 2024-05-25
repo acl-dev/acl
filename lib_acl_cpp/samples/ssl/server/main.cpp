@@ -5,6 +5,35 @@
 #include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 
+//////////////////////////////////////////////////////////////////////////////
+
+class ssl_sni_checker : public acl::ssl_sni_checker {
+public:
+	ssl_sni_checker() {}
+	~ssl_sni_checker() {}
+
+	// @override
+	bool check(const char* sni, acl::string& host) {
+		if (sni == NULL || *sni == 0) {
+			printf("Invalid SNI\r\n");
+			return false;
+		}
+
+		host = sni;
+
+		int pos;
+		if ((pos = host.find(':')) > 0 || (pos = host.find('|')) > 0) {
+			host.truncate((size_t) pos);
+		}
+
+		printf("Check sni successfully, sni=%s, %zd, host=%s, %zd\r\n",
+			sni, strlen(sni), host.c_str(), host.size());
+		return true;
+	}
+};
+
+//////////////////////////////////////////////////////////////////////////////
+
 class echo_thread : public acl::thread {
 public:
 	echo_thread(acl::sslbase_conf& ssl_conf, acl::socket_stream* conn,
@@ -81,6 +110,8 @@ private:
 	}
 };
 
+//////////////////////////////////////////////////////////////////////////////
+
 static void start_server(const acl::string& addr, acl::sslbase_conf& ssl_conf,
 	  int rw_timeout, int times) {
 
@@ -103,6 +134,8 @@ static void start_server(const acl::string& addr, acl::sslbase_conf& ssl_conf,
 		thr->start();
 	}
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 static bool ssl_init(const acl::string& ssl_crt, const acl::string& ssl_key,
 	acl::sslbase_conf& ssl_conf) {
@@ -186,13 +219,18 @@ static acl::sslbase_conf* load_openssl(acl::string& ssl_libs)
 	// ¶¯Ì¬¼ÓÔØ OpenSSL ¶¯Ì¬¿â
 	if (!acl::openssl_conf::load()) {
 		printf("load ssl error=%s, crypto=%s, ssl=%s\r\n",
-				acl::last_serror(), libcrypto.c_str(), libssl.c_str());
+			acl::last_serror(), libcrypto.c_str(), libssl.c_str());
 		return NULL;
 	}
 
 	bool server_side = true;
-	return new acl::openssl_conf(server_side);
+
+	acl::sslbase_conf* conf =  new acl::openssl_conf(server_side);
+	conf->set_sni_checker(new ssl_sni_checker());
+	return conf;
 }
+
+//////////////////////////////////////////////////////////////////////////////
 
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
@@ -271,6 +309,8 @@ int main(int argc, char* argv[]) {
 
 	start_server(addr, *ssl_conf, rw_timeout, times);
 
+	acl::ssl_sni_checker* checker = ssl_conf->get_sni_checker();
+	delete checker;
 	delete ssl_conf;
 	return 0;
 }

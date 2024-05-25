@@ -1,6 +1,7 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 #include <vector>
+#include <string>
 #include "../connpool/connect_client.hpp"
 #include "http_header.hpp"
 
@@ -17,8 +18,7 @@ class json;
 /**
  * HTTP 客户端请求类，该类对象支持长连接，同时当连接断时会自动重试
  */
-class ACL_CPP_API http_request : public connect_client
-{
+class ACL_CPP_API http_request : public connect_client {
 public:
 	/**
 	 * 构造函数：通过该构造函数传入的 socket_stream 流对象并
@@ -36,7 +36,7 @@ public:
 	 *  被销毁时，传入的 client 流对象不会被销毁，需应用自行销毁；如果该
 	 *  值为 false 时，则当本对象销毁时，client 流对象也将被销毁
 	 */
-	http_request(socket_stream* client, int conn_timeout = 60,
+	explicit http_request(socket_stream* client, int conn_timeout = 60,
 		bool unzip = true, bool stream_fixed = true);
 
 	/**
@@ -47,10 +47,10 @@ public:
 	 * @param rw_timeout {int} IO 读写超时时间(秒)
 	 * @param unzip {bool} 是否对服务器响应的数据自动进行解压
 	 */
-	http_request(const char* addr, int conn_timeout = 60,
+	explicit http_request(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 60, bool unzip = true);
 
-	virtual ~http_request(void);
+	virtual ~http_request();
 
 	/**
 	 * 设置在读取服务响应数据时是否针对压缩数据进行解压
@@ -67,12 +67,39 @@ public:
 	http_request& set_ssl(sslbase_conf* conf);
 
 	/**
+	 * 设置 SSL 握手时的 SNI 字段，调用此 API 设置 SSL SNI 字段后，在调用本类的
+	 * reset() API 时，不会自动清理本 API 设置的值，如果需要清理，则需要重新调用
+	 * 本方法并将相应参数置空，则相应字段自动清空
+	 * @param sni {const char*} 如果为 NULL，则自动将使用 HTTP 头中的 Host 字段
+	 * @return {http_request&}
+	 */
+	http_request& set_ssl_sni(const char* sni);
+
+	/**
+	 * 设置 SSL 握手时的 SNI 字段前缀，调用此 API 设置 SSL SNI 字段前缀后，
+	 * 在调用本类的 reset() API 时，不会自动清理本 API 设置的值，如果需要清理，
+	 * 则需要重新调用并设置空值
+	 * @param prefix {const char*} SNI 前缀
+	 * @return {http_request&}
+	 */
+	http_request& set_ssl_sni_prefix(const char* prefix);
+
+	/**
+	 * 设置 SSL 握手时的 SNI 字段后缀，调用此 API 设置 SSL SNI 字段前缀后，
+	 * 在调用本类的 reset() API 时，不会自动清理本 API 设置的值，如果需要清理，
+	 * 则需要重新调用并设置空值
+	 * @param suffix {const char*} SNI 后缀
+	 * @return {http_request&}
+	 */
+	http_request& set_ssl_sni_suffix(const char* prefix);
+
+	/**
 	 * 获得 HTTP 请求头对象，然后在返回的 HTTP 请求头对象中添加
 	 * 自己的请求头字段或 http_header::reset()重置请求头状态，
 	 * 参考：http_header 类
 	 * @return {http_header&}
 	 */
-	http_header& request_header(void);
+	http_header& request_header();
 
 	/**
 	 * 设置本地字符集，当本地字符集非空时，则边接收数据边进行字符集转换
@@ -133,13 +160,13 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 body_length(void) const;
 #else
-	long long int body_length(void) const;
+	long long int body_length() const;
 #endif
 	/**
 	 * HTTP 数据流(响应流是否允许保持长连接)
 	 * @return {bool}
 	 */
-	bool keep_alive(void) const;
+	bool keep_alive() const;
 
 	/**
 	 * 获得 HTTP 响应头中某个字段名的字段值
@@ -240,7 +267,7 @@ public:
 	 * range 的请求时，此函数检查服务器返回的数据是否支持 range
 	 * @return {bool}
 	 */
-	bool support_range(void) const;
+	bool support_range() const;
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
@@ -265,9 +292,9 @@ public:
 	 */
 	__int64 get_range_max(void) const;
 #else
-	long long int get_range_from(void) const;
-	long long int get_range_to(void) const;
-	long long int get_range_max(void) const;
+	long long int get_range_from() const;
+	long long int get_range_to() const;
+	long long int get_range_max() const;
 #endif
 
 	/**
@@ -275,7 +302,7 @@ public:
 	 * @return {const std::vector<HttpCookie*>*} 返回空表示
 	 *  没有 cookie 对象或连接流为空
 	 */
-	const std::vector<HttpCookie*>* get_cookies(void) const;
+	const std::vector<HttpCookie*>* get_cookies() const;
 
 	/**
 	 * 获得服务器返回的 Set-Cookie 设置的某个 cookie 对象
@@ -294,12 +321,12 @@ public:
 	 * 服务器响应的头部分数据，参考：http_client 类
 	 * @return {http_client*} 当返回空时表示流出错了
 	 */
-	http_client* get_client(void) const;
+	http_client* get_client() const;
 
 	/**
 	 * 重置请求状态，在同一个连接的多次请求时会调用此函数
 	 */
-	void reset(void);
+	void reset();
 
 protected:
 	/**
@@ -312,6 +339,9 @@ private:
 	char addr_[128];
 	bool unzip_;
 	sslbase_conf* ssl_conf_;
+	std::string sni_host_;
+	std::string sni_prefix_;
+	std::string sni_suffix_;
 	char local_charset_[64];
 	charset_conv* conv_;
         http_client* client_;
@@ -332,11 +362,11 @@ private:
 
 	bool send_request(const void* data, size_t len);
 	bool try_open(bool* reuse_conn);
-	void close(void);
-	void create_cookies(void);
+	void close();
+	void create_cookies();
 	http_pipe* get_pipe(const char* to_charset);
 	void set_charset_conv();
-	void check_range(void);
+	void check_range();
 };
 
 } // namespace acl

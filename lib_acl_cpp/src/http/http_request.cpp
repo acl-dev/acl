@@ -21,11 +21,10 @@
 
 namespace acl {
 
-#define RESET_RANGE() do \
-{ \
-	range_from_ = -1; \
-	range_to_ = -1; \
-	range_max_ = -1; \
+#define RESET_RANGE() do {	\
+	range_from_ = -1;	\
+	range_to_ = -1;		\
+	range_max_ = -1;	\
 } while(0)
 
 http_request::http_request(socket_stream* client, int conn_timeout /* = 60 */,
@@ -105,7 +104,7 @@ http_request::http_request(const char* addr, int conn_timeout /* = 60 */,
 	RESET_RANGE();
 }
 
-http_request::~http_request(void)
+http_request::~http_request()
 {
 	close();
 
@@ -117,13 +116,13 @@ http_request::~http_request(void)
 	}
 }
 
-void http_request::close(void)
+void http_request::close()
 {
 	delete client_;
 	client_ = NULL;
 }
 
-void http_request::reset(void)
+void http_request::reset()
 {
 	if (cookies_) {
 		std::vector<HttpCookie*>::iterator it = cookies_->begin();
@@ -153,6 +152,36 @@ http_request& http_request::set_unzip(bool on)
 http_request& http_request::set_ssl(sslbase_conf* ssl_conf)
 {
 	ssl_conf_ = ssl_conf;
+	return *this;
+}
+
+http_request& http_request::set_ssl_sni(const char *sni)
+{
+	if (sni && *sni) {
+		sni_host_ = sni;
+	} else {
+		sni_host_.clear();
+	}
+	return *this;
+}
+
+http_request& http_request::set_ssl_sni_prefix(const char *prefix)
+{
+	if (prefix && *prefix) {
+		sni_prefix_ = prefix;
+	} else {
+		sni_prefix_.clear();
+	}
+	return *this;
+}
+
+http_request& http_request::set_ssl_sni_suffix(const char *suffix)
+{
+	if (suffix && *suffix) {
+		sni_suffix_ = suffix;
+	} else {
+		sni_suffix_.clear();
+	}
 	return *this;
 }
 
@@ -186,9 +215,16 @@ bool http_request::try_open(bool* reuse_conn)
 	}
 
 	sslbase_io* ssl = ssl_conf_->create(false);
-	const char* host = header_.get_host();
+	const char* host;
+	if (sni_host_.empty()) {
+		host = header_.get_host();
+	} else {
+		host = sni_host_.c_str();
+	}
 	if (host && *host) {
-		ssl->set_sni_host(host);
+		ssl->set_sni_host(host,
+			sni_prefix_.empty() ? NULL : sni_prefix_.c_str(),
+			sni_suffix_.empty() ? NULL : sni_suffix_.c_str());
 	}
 	if (client_->get_stream().setup_hook(ssl) == ssl) {
 		logger_error("open client ssl error to: %s", addr_);
@@ -205,7 +241,7 @@ http_header& http_request::request_header()
 	return header_;
 }
 
-http_client* http_request::get_client(void) const
+http_client* http_request::get_client() const
 {
 	return client_;
 }

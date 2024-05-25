@@ -166,7 +166,7 @@ openssl_io::openssl_io(openssl_conf& conf, bool server_side, bool nblock)
 #endif
 }
 
-openssl_io::~openssl_io(void)
+openssl_io::~openssl_io()
 {
 #ifdef HAS_OPENSSL
 	if (ssl_) {
@@ -175,7 +175,7 @@ openssl_io::~openssl_io(void)
 #endif
 }
 
-void openssl_io::destroy(void)
+void openssl_io::destroy()
 {
 	if (--(*refers_) <= 0) {
 		delete this;
@@ -276,7 +276,7 @@ bool openssl_io::open(ACL_VSTREAM* s)
 #endif
 }
 
-bool openssl_io::handshake(void)
+bool openssl_io::handshake()
 {
 	if (handshake_ok_) {
 		return true;
