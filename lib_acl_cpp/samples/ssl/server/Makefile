@@ -12,4 +12,4 @@ ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 endif
 
 PROG = server
-EXTLIBS += -L../../../lib/linux64 -ldl -lz
+EXTLIBS += -L../../../lib -ldl -lz

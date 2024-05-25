@@ -20,13 +20,13 @@ public:
 	 * @param nblock {bool} 是否为非阻塞模式
 	 */
 	sslbase_io(sslbase_conf& conf, bool server_side, bool nblock = false);
-	virtual ~sslbase_io(void);
+	virtual ~sslbase_io();
 
 	/**
 	 * ssl 握手纯虚方法
 	 * @return {bool}
 	 */
-	virtual bool handshake(void) = 0;
+	virtual bool handshake() = 0;
 
 	/**
 	 * 设置套接字为阻塞模式/非阻塞模式
@@ -38,8 +38,7 @@ public:
 	 * 判断当前设置的 SSL IO 是否阻塞模式还是非阻塞模式
 	 * @return {bool} 返回 true 则表示为非阻塞模式，否则为阻塞模式
 	 */
-	bool is_non_blocking(void) const
-	{
+	bool is_non_blocking() const {
 		return nblock_;
 	}
 
@@ -47,8 +46,7 @@ public:
 	 * 判断 SSL 握手是否成功
 	 * @return {bool}
 	 */
-	bool handshake_ok(void)
-	{
+	bool handshake_ok() const {
 		return handshake_ok_;
 	}
 
@@ -56,7 +54,8 @@ public:
 	 * 设置 SNI HOST 字段
 	 * @param host {const char*}
 	 */
-	void set_sni_host(const char* host);
+	void set_sni_host(const char* host, const char* prefix = NULL,
+		const char* suffix = NULL);
 
 protected:
 	sslbase_conf& base_conf_;

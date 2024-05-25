@@ -14,14 +14,15 @@ mqtt_client::mqtt_client(const char* addr, int conn_timeout, int rw_timeout)
 	conn_ = conn_internal_ = NEW socket_stream;
 }
 
-mqtt_client::mqtt_client(socket_stream& conn)
-: rw_timeout_(0)
+mqtt_client::mqtt_client(socket_stream& conn, int conn_timeout)
+: conn_timeout_(conn_timeout)
+, rw_timeout_(conn.get_rw_timeout())
 , conn_(&conn)
 , conn_internal_(NULL)
 {
 }
 
-mqtt_client::~mqtt_client() {
+ mqtt_client::~mqtt_client() {
 	delete conn_internal_;
 }
 

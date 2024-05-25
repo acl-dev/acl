@@ -1,5 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
+#include <string>
 #include "../stream/aio_socket_stream.hpp"
 #if !defined(_WIN32) && !defined(_WIN64)
 #include <netinet/in.h>  // just for "struct sockaddr_storage"
@@ -31,27 +32,26 @@ class http_header;
  * 另外，对于 HTTP 协议，根据用户设置，可以自动解压 GZIP 响应数据，这样在回调
  * 方法 on_http_res_body() 中收到的便是解压后的明文数据。
  */
-class ACL_CPP_API http_aclient : public aio_open_callback
-{
+class ACL_CPP_API http_aclient : public aio_open_callback {
 public:
 	/**
 	 * 构造函数
 	 * @param handle {aio_handle&} 异步通信事件引擎句柄
 	 * @param ssl_conf {sslbase_conf*} 非 NULL 时自动采用 SSL 通信方式
 	 */
-	http_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
-	virtual ~http_aclient(void);
+	explicit http_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
+	virtual ~http_aclient();
 
 	/**
 	 * 当对象销毁时的回调方法，子类必须实现
 	 */
-	virtual void destroy(void) = 0;
+	virtual void destroy() = 0;
 
 	/**
 	 * 获得 HTTP 请求头，以便于应用添加 HTTP 请求头中的字段内容
 	 * @return {http_header&}
 	 */
-	http_header& request_header(void);
+	http_header& request_header();
 
 	/**
 	 * 针对 HTTP 协议的响应数据是否自动进行解压
@@ -64,8 +64,7 @@ public:
 	 * 是否针对 GZIP 压缩数据自动进行解压
 	 * @return {bool}
 	 */
-	bool is_unzip_body(void) const
-	{
+	bool is_unzip_body() const {
 		return unzip_;
 	}
 
@@ -83,10 +82,30 @@ public:
 	 * 获得设置的 SSL 配置
 	 * @return {sslbase_conf*} 为 NULL 表示未设置
 	 */
-	sslbase_conf* get_ssl_conf(void) const
-	{
+	sslbase_conf* get_ssl_conf() const {
 		return ssl_conf_;
 	}
+
+	/**
+	 * 设置 SSL 握手时的 SNI 字段
+	 * @param sni {const char*} 如果为 NULL，则自动将使用 HTTP 头中的 Host 字段
+	 * @return {http_request&}
+	 */
+	http_aclient& set_ssl_sni(const char* sni);
+
+	/**
+	 * 设置 SSL 握手时的 SNI 字段前缀
+	 * @param prefix {const char*} SNI 前缀
+	 * @return {http_request&}
+	 */
+	http_aclient& set_ssl_sni_prefix(const char* prefix);
+
+	/**
+	 * 设置 SSL 握手时的 SNI 字段后缀
+	 * @param suffix {const char*} SNI 后缀
+	 * @return {http_request&}
+	 */
+	http_aclient& set_ssl_sni_suffix(const char* prefix);
 
 	/**
 	 * 当构造函数中 ssl_conf 参数非空时，可以调用此方法来设置是否启用 SSL
@@ -101,8 +120,7 @@ public:
 	 * 判断内部是否启用了 ssl 功能
 	 * @return {bool}
 	 */
-	bool is_enable_ssl(void) const
-	{
+	bool is_enable_ssl() const {
 		return ssl_enable_ && ssl_conf_;
 	}
 
@@ -125,7 +143,7 @@ public:
 	/**
 	 * 异步关闭连接
 	 */
-	void close(void);
+	void close();
 
 	/**
 	 * 获得本次连接（无论成功或失败）所使用的 DNS 服务地址
@@ -145,8 +163,7 @@ public:
 	 * 连接成功后可调用本方法获得异步连接对象
 	 * @return {aio_socket_stream*}
 	 */
-	aio_socket_stream* get_conn(void) const
-	{
+	aio_socket_stream* get_conn() const {
 		return conn_;
 	}
 
@@ -156,43 +173,44 @@ protected:
 	 * 并调用 send_request 方法向 WEB 服务器发送 HTTP 请求
 	 * @return {bool} 该方法如果返回 false 则内部会自动关闭连接
 	 */
-	virtual bool on_connect(void) = 0;
+	virtual bool on_connect() = 0;
 
 	/**
 	 * 当域名解析失败时的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
 	 */
-	virtual void on_ns_failed(void) {}
+	virtual void on_ns_failed() {}
 
 	/**
 	 * 当连接超时后的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
 	 */
-	virtual void on_connect_timeout(void) {}
+	virtual void on_connect_timeout() {}
 
 	/**
 	 * 当连接失败后的回调方法，在调用本方法后，内部自动调用 this->destroy() 方法
 	 */
-	virtual void on_connect_failed(void) {}
+	virtual void on_connect_failed() {}
 
 	/**
 	 * 当网络读超时时的回调方法
 	 * @return {bool} 当读超时回调方法返回 true，则内部会继续读数据，如果
 	 *  返回 false，则该连接将会被关闭，接着回调 on_disconnect() 虚方法
 	 */
-	virtual bool on_read_timeout(void) { return false; }
+	virtual bool on_read_timeout() {
+		return false;
+	}
 
 	/**
 	 * 对于连接成功后连接关闭后的回调方法，内部调用此方法后便立即回调
 	 * destroy() 方法
 	 */
-	virtual void on_disconnect(void) {};
+	virtual void on_disconnect() {};
 
 	/**
 	 * 当接收到 WEB 服务端的响应头时的回调方法
 	 * @param header {const http_header&}
 	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
 	 */
-	virtual bool on_http_res_hdr(const http_header& header)
-	{
+	virtual bool on_http_res_hdr(const http_header& header) {
 		(void) header;
 		return true;
 	}
@@ -204,8 +222,7 @@ protected:
 	 * @param dlen {size_t} 本次读到的 data 数据的长度
 	 * @return {bool} 返回 false 则将会关闭连接，否则继续读
 	 */
-	virtual bool on_http_res_body(char* data, size_t dlen)
-	{
+	virtual bool on_http_res_body(char* data, size_t dlen) {
 		(void) data;
 		(void) dlen;
 		return true;
@@ -216,8 +233,7 @@ protected:
 	 * @param success {bool} 是否成功读完 HTTP 响应体数据
 	 * @return {bool} 如果成功读完数据体后返回 false 则会关闭连接
 	 */
-	virtual bool on_http_res_finish(bool success)
-	{
+	virtual bool on_http_res_finish(bool success) {
 		(void) success;
 		return true;
 	}
@@ -226,8 +242,7 @@ protected:
 	 * 当 websocket 握手成功后的回调方法
 	 * @return {bool} 返回 false 表示需要关闭连接，否则继续
 	 */
-	virtual bool on_ws_handshake(void)
-	{
+	virtual bool on_ws_handshake() {
 		// 开始异步读 websocket 数据
 		this->ws_read_wait(0);
 		return true;
@@ -237,24 +252,26 @@ protected:
 	 * 当 websocket 握手失败后的回调方法
 	 * @param status {int} 服务器返回的 HTTP 响应状态码
 	 */
-	virtual void on_ws_handshake_failed(int status) { (void) status; }
+	virtual void on_ws_handshake_failed(int status) {
+		(void) status;
+	}
 
 	/**
 	 * 当读到一个 text 类型的帧时的回调方法
 	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
 	 */
-	virtual bool on_ws_frame_text(void) { return true; }
+	virtual bool on_ws_frame_text() { return true; }
 
 	/**
 	 * 当读到一个 binary 类型的帧时的回调方法
 	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
 	 */
-	virtual bool on_ws_frame_binary(void) { return true; }
+	virtual bool on_ws_frame_binary() { return true; }
 
 	/**
 	 * 当读到一个关闭帧数据时的回调方法
 	 */
-	virtual void on_ws_frame_closed(void) {}
+	virtual void on_ws_frame_closed() {}
 
 	/**
 	 * 在 websocket 通信方式，当读到数据体时的回调方法
@@ -262,8 +279,7 @@ protected:
 	 * @param dlen {size_t} 读到的数据长度
 	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
 	 */
-	virtual bool on_ws_frame_data(char* data, size_t dlen)
-	{
+	virtual bool on_ws_frame_data(char* data, size_t dlen) {
 		(void) data;
 		(void) dlen;
 		return true;
@@ -273,7 +289,7 @@ protected:
 	 * 当读完一帧数据时的回调方法
 	 * @return {bool} 返回 true 表示继续读，否则则要求关闭连接
 	 */
-	virtual bool on_ws_frame_finish(void) { return true; }
+	virtual bool on_ws_frame_finish() { return true; }
 
 	/**
 	 * 当收到 ping 数据包时的回调方法，当该回调方法返回后，如果用户没有将
@@ -281,8 +297,7 @@ protected:
 	 * 冲区清理掉，则该方法返回后不会给对接发 pong 信息
 	 * @param data {string&} 读到的数据
 	 */
-	virtual void on_ws_frame_ping(string& data)
-	{
+	virtual void on_ws_frame_ping(string& data) {
 		(void) data;
 	}
 
@@ -290,8 +305,7 @@ protected:
 	 * 收到 pong 数据时的回调方法
 	 * @param data {string&} 读到的数据
 	 */
-	virtual void on_ws_frame_pong(string& data)
-	{
+	virtual void on_ws_frame_pong(string& data) {
 		(void) data;
 	}
 
@@ -316,8 +330,7 @@ public:
 	 * 当调用 ws_handshake() 时，内部会填充与 websocket 相关的请求头信息，
 	 * 同时通过此回调告之调用者最终发给 websocket 服务器完整的请求头信息
 	 */
-	virtual void ws_handshake_before(http_header& reqhdr)
-	{
+	virtual void ws_handshake_before(http_header& reqhdr) {
 		(void) reqhdr;
 	}
 
@@ -367,16 +380,16 @@ public:
 
 protected:
 	// @override dummy
-	bool open_callback(void) { return true; }
+	bool open_callback() { return true; }
 
 	// @override
-	bool timeout_callback(void);
+	bool timeout_callback();
 
 	// @override
-	void close_callback(void);
+	void close_callback();
 
 	// @override
-	bool read_wakeup(void);
+	bool read_wakeup();
 
 	// @override
 	bool read_callback(char* data, int len);
@@ -390,6 +403,9 @@ protected:
 	aio_handle&        handle_;
 	sslbase_conf*      ssl_conf_;		// 非空时才允许启用 SSL 功能
 	bool               ssl_enable_;		// 是否启用 SSL 功能
+	std::string        sni_host_;
+	std::string        sni_prefix_;
+	std::string        sni_suffix_;
 	aio_socket_stream* conn_;
 	socket_stream*     stream_;
 	http_header*       header_;
@@ -403,7 +419,7 @@ protected:
 	struct sockaddr_storage serv_addr_;	// 所连接的应用服务器地址
 
 	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
-	bool handle_ssl_handshake(void);
+	bool handle_ssl_handshake();
 
 	bool handle_res_hdr(int status);
 
@@ -415,11 +431,11 @@ protected:
 	bool res_plain_finish(char* data, int dlen);
 	bool res_unzip_finish(zlib_stream& zstream, char* data, int dlen);
 
-	bool handle_websocket(void);
-	bool handle_ws_data(void);
-	bool handle_ws_ping(void);
-	bool handle_ws_pong(void);
-	bool handle_ws_other(void);
+	bool handle_websocket();
+	bool handle_ws_data();
+	bool handle_ws_ping();
+	bool handle_ws_pong();
+	bool handle_ws_other();
 
 private:
 	static int connect_callback(const ACL_ASTREAM_CTX* ctx);

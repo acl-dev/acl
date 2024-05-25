@@ -2,13 +2,11 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class connect_pool;
 
-class ACL_CPP_API connect_client : public noncopyable
-{
+class ACL_CPP_API connect_client : public noncopyable {
 public:
 	connect_client(void)
 	: conn_timeout_(5)
@@ -22,16 +20,14 @@ public:
 	 * 获得该连接对象最近一次被使用的时间截
 	 * @return {time_t}
 	 */
-	time_t get_when()
-	{
+	time_t get_when() const {
 		return when_;
 	}
 
 	/**
 	 * 设置该连接对象当前被使用的时间截
 	 */
-	void set_when(time_t when)
-	{
+	void set_when(time_t when) {
 		when_ = when;
 	}
 
@@ -46,8 +42,7 @@ public:
 	 * 连接对象会调用 set_pool 设置连接池对象句柄
 	 * @return {connect_pool*}
 	 */
-	connect_pool* get_pool() const
-	{
+	connect_pool* get_pool() const {
 		return pool_;
 	}
 
@@ -58,10 +53,9 @@ public:
 	 * @param conn_timeout {int} 网络连接超时时间(秒)
 	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
 	 */
-	virtual void set_timeout(int conn_timeout, int rw_timeout)
-	{
+	virtual void set_timeout(int conn_timeout, int rw_timeout) {
 		conn_timeout_ = conn_timeout;
-		rw_timeout_ = rw_timeout;
+		rw_timeout_   = rw_timeout;
 	}
 
 protected:
@@ -73,8 +67,7 @@ protected:
 	time_t when_;
 	connect_pool* pool_;
 
-	void set_pool(connect_pool* pool)
-	{
+	void set_pool(connect_pool* pool) {
 		pool_ = pool;
 	}
 };

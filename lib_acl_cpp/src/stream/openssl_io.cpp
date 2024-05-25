@@ -166,7 +166,7 @@ openssl_io::openssl_io(openssl_conf& conf, bool server_side, bool nblock)
 #endif
 }
 
-openssl_io::~openssl_io(void)
+openssl_io::~openssl_io()
 {
 #ifdef HAS_OPENSSL
 	if (ssl_) {
@@ -175,7 +175,7 @@ openssl_io::~openssl_io(void)
 #endif
 }
 
-void openssl_io::destroy(void)
+void openssl_io::destroy()
 {
 	if (--(*refers_) <= 0) {
 		delete this;
@@ -197,14 +197,7 @@ static bool set_sock_timeo(ACL_SOCKET fd, int opt, int timeout)
 			last_serror(), timeout, opt, (int) fd);
 		return false;
 	}
-# elif defined(__APPLE__)
-	timeout *= 1000; // From seconds to millisecond.
-	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
-		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
-			last_serror(), timeout, opt, (int) fd);
-		return false;
-	}
-# else   // Must be Linux.
+# else   // Must be Linux or __APPLE__.
 	struct timeval tm;
 	tm.tv_sec  = timeout;
 	tm.tv_usec = 0;
@@ -283,7 +276,7 @@ bool openssl_io::open(ACL_VSTREAM* s)
 #endif
 }
 
-bool openssl_io::handshake(void)
+bool openssl_io::handshake()
 {
 	if (handshake_ok_) {
 		return true;

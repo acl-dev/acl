@@ -41,6 +41,8 @@ private:
 		bool non_block = false;
 		acl::sslbase_io* ssl = ssl_conf_.create(non_block);
 
+		ssl->set_sni_host(addr_);
+
 		// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 		// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程
 		if (conn.setup_hook(ssl) == ssl) {

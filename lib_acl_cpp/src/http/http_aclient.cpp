@@ -45,7 +45,7 @@ http_aclient::http_aclient(aio_handle& handle, sslbase_conf* ssl_conf /* NULL */
 	ssl_enable_ = true;
 }
 
-http_aclient::~http_aclient(void)
+http_aclient::~http_aclient()
 {
 	if (http_res_) {
 		http_res_free(http_res_);
@@ -65,7 +65,7 @@ http_aclient::~http_aclient(void)
 	delete zstream_;
 }
 
-http_header& http_aclient::request_header(void)
+http_header& http_aclient::request_header()
 {
 	return *header_;
 }
@@ -88,6 +88,36 @@ http_aclient& http_aclient::enable_ssl(bool yes)
 	return *this;
 }
 
+http_aclient& http_aclient::set_ssl_sni(const char *sni)
+{
+	if (sni && *sni) {
+	    sni_host_ = sni;
+	} else {
+	    sni_host_.clear();
+	}
+	return *this;
+}
+
+http_aclient& http_aclient::set_ssl_sni_prefix(const char *prefix)
+{
+	if (prefix && *prefix) {
+	    sni_prefix_ = prefix;
+	} else {
+	    sni_prefix_.clear();
+	}
+	return *this;
+}
+
+http_aclient& http_aclient::set_ssl_sni_suffix(const char *suffix)
+{
+	if (suffix && *suffix) {
+	    sni_suffix_ = suffix;
+	} else {
+	    sni_suffix_.clear();
+	}
+	return *this;
+}
+
 bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout,
 	const char *local)
 {
@@ -102,7 +132,7 @@ bool http_aclient::open(const char* addr, int conn_timeout, int rw_timeout,
 	return true;
 }
 
-void http_aclient::close(void)
+void http_aclient::close()
 {
 	if (conn_) {
 		conn_->close();
@@ -180,9 +210,16 @@ bool http_aclient::handle_connect(const ACL_ASTREAM_CTX *ctx)
 	// 因为配置了 SSL 通信方式，所以需要创建 SSL IO 过程，开始 SSL 握手
 	sslbase_io* ssl_io = ssl_conf_->create(true);
 
-	const char* host = header_->get_host();
+	const char* host;
+	if (sni_host_.empty()) {
+		host = header_->get_host();
+	} else {
+		host = sni_host_.c_str();
+	}
 	if (host && *host) {
-		ssl_io->set_sni_host(host);
+		ssl_io->set_sni_host(host,
+			sni_prefix_.empty() ? NULL : sni_prefix_.c_str(),
+			sni_suffix_.empty() ? NULL : sni_suffix_.c_str());
 	}
 
 	if (conn_->setup_hook(ssl_io) == ssl_io || !ssl_io->handshake()) {
@@ -209,12 +246,12 @@ int http_aclient::connect_callback(const ACL_ASTREAM_CTX *ctx)
 	return me->handle_connect(ctx) ? 0 : -1;
 }
 
-bool http_aclient::timeout_callback(void)
+bool http_aclient::timeout_callback()
 {
 	return this->on_read_timeout();
 }
 
-void http_aclient::close_callback(void)
+void http_aclient::close_callback()
 {
 	// 网络关闭时回调子类重载方法
 	this->on_disconnect();
@@ -222,7 +259,7 @@ void http_aclient::close_callback(void)
 	this->destroy();
 }
 
-bool http_aclient::handle_ws_ping(void)
+bool http_aclient::handle_ws_ping()
 {
 	if (buff_ == NULL) {
 		buff_ = NEW string(1024);
@@ -255,7 +292,7 @@ bool http_aclient::handle_ws_ping(void)
 	}
 }
 
-bool http_aclient::handle_ws_pong(void)
+bool http_aclient::handle_ws_pong()
 {
 	if (buff_ == NULL) {
 		buff_ = NEW string(1024);
@@ -280,7 +317,7 @@ bool http_aclient::handle_ws_pong(void)
 	}
 }
 
-bool http_aclient::handle_ws_other(void)
+bool http_aclient::handle_ws_other()
 {
 	if (buff_ == NULL) {
 		buff_ = NEW string(1024);
@@ -304,7 +341,7 @@ bool http_aclient::handle_ws_other(void)
 	}
 }
 
-bool http_aclient::handle_ws_data(void)
+bool http_aclient::handle_ws_data()
 {
 	char buf[8192];
 	size_t size = sizeof(buf) - 1;
@@ -328,7 +365,7 @@ bool http_aclient::handle_ws_data(void)
 	}
 }
 
-bool http_aclient::handle_websocket(void)
+bool http_aclient::handle_websocket()
 {
 	acl_assert(ws_in_);
 
@@ -382,7 +419,7 @@ bool http_aclient::handle_websocket(void)
 // SSL 握手和读 Websocket 数据帧阶段，该方法都会被多次调用。
 // 当启用 SSL 模式时，在 SSL 握手阶段，该方法会被多次调用，直至 SSL 握手成功
 // 或失败；在读取 Websocket 数据帧阶段，该方法也会被多次调用，用来一直读取数据帧
-bool http_aclient::read_wakeup(void)
+bool http_aclient::read_wakeup()
 {
 	// 如果 websocket 非 NULL，则说明进入到 websocket 通信方式，
 	// 该触发条件在 http_res_hdr_cllback 中注册
@@ -398,7 +435,7 @@ bool http_aclient::read_wakeup(void)
 	}
 }
 
-bool http_aclient::handle_ssl_handshake(void)
+bool http_aclient::handle_ssl_handshake()
 {
 	// 否则，则是第一次进行 SSL 握手阶段的 IO 过程
 	sslbase_io* ssl_io = (sslbase_io*) conn_->get_hook();
