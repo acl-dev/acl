@@ -578,7 +578,7 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 #endif // HAS_OPENSSL
 }
 
-openssl_conf::~openssl_conf(void)
+openssl_conf::~openssl_conf()
 {
 #ifdef HAS_OPENSSL
 	for (std::set<SSL_CTX*>::iterator it = ssl_ctxes_.begin();
@@ -597,7 +597,7 @@ void openssl_conf::use_sockopt_timeout(bool yes)
 }
 
 
-SSL_CTX* openssl_conf::create_ssl_ctx(void)
+SSL_CTX* openssl_conf::create_ssl_ctx()
 {
 #ifdef HAS_OPENSSL
 	if (status_ != CONF_INIT_OK) {
@@ -651,7 +651,7 @@ bool openssl_conf::push_ssl_ctx(SSL_CTX* ctx)
 #endif
 }
 
-SSL_CTX* openssl_conf::get_ssl_ctx(void) const
+SSL_CTX* openssl_conf::get_ssl_ctx() const
 {
 	// The ssl_ctx_ should be created in client mode, and in server mode,
 	// it should also be created when loading certificate.

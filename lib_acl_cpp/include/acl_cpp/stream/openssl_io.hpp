@@ -16,16 +16,16 @@ public:
 	/*
 	 * @override stream_hook
 	 */
-	void destroy(void);
+	void destroy();
 
 	/**
 	 * @override sslbase_io
 	 * @return {bool}
 	 */
-	bool handshake(void);
+	bool handshake();
 
 protected:
-	~openssl_io(void);
+	~openssl_io();
 
 	// 实现 stream_hook 类的虚方法
 

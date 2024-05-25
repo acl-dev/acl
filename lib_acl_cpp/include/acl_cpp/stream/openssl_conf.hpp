@@ -16,8 +16,8 @@ class openssl_io;
 
 class ACL_CPP_API openssl_conf : public sslbase_conf {
 public:
-	openssl_conf(bool server_side = false, int timeout = 30);
-	~openssl_conf(void);
+	explicit openssl_conf(bool server_side = false, int timeout = 30);
+	~openssl_conf();
 
 	/**
 	 * @override
@@ -59,20 +59,20 @@ public:
 	 * 显式调用本方法，动态加载 libssl.so 动态库
 	 * @return {bool} 加载是否成功
 	 */
-	static bool load(void);
+	static bool load();
 
 	/**
 	 * 调用 load() 成功加载 OpenSSL 动态库后，调用本静态函数获得 libssl
 	 * 动态加载库句柄，从而可以从该句柄中获得指定函数指针
 	 * @return {void*} 返回 NULL 表示还未加载
 	 */
-	static void* get_libssl_handle(void);
+	static void* get_libssl_handle();
 
 	/**
 	 * 获得 libcrypto 动态加载库句柄
 	 * @return {void*} 返回 NULL 表示还未加载
 	 */
-	static void* get_libcrypto_handle(void);
+	static void* get_libcrypto_handle();
 
 public:
 	// @override sslbase_conf
@@ -83,7 +83,7 @@ public:
 	 * 是否为 SSL 服务模式
 	 * @return {bool}
 	 */
-	bool is_server_side(void) const {
+	bool is_server_side() const {
 		return server_side_;
 	}
 
@@ -91,7 +91,7 @@ public:
 	 * 获得缺省的SSL_CTX对象
 	 * @return {SSL_CTX*}
 	 */
-	SSL_CTX* get_ssl_ctx(void) const;
+	SSL_CTX* get_ssl_ctx() const;
 
 	/**
 	 * 获得所有的已经初始完成的 SSL_CTX 对象
@@ -105,7 +105,7 @@ public:
 	 * 加载或静态加载的 SSL_CTX_new() API.
 	 * @return {SSL_CTX*} 返回 NULL 表示未开启 OpenSSL 功能
 	 */
-	SSL_CTX* create_ssl_ctx(void);
+	SSL_CTX* create_ssl_ctx();
 
 	/**
 	 * 服务模式下, 添加外部已经初始完毕的 SSL_CTX, 该对象必须是由上面

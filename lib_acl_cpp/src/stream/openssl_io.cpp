@@ -197,14 +197,7 @@ static bool set_sock_timeo(ACL_SOCKET fd, int opt, int timeout)
 			last_serror(), timeout, opt, (int) fd);
 		return false;
 	}
-# elif defined(__APPLE__)
-	timeout *= 1000; // From seconds to millisecond.
-	if (setsockopt(fd, SOL_SOCKET, opt, &timeout, sizeof(timeout)) < 0) {
-		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
-			last_serror(), timeout, opt, (int) fd);
-		return false;
-	}
-# else   // Must be Linux.
+# else   // Must be Linux or __APPLE__.
 	struct timeval tm;
 	tm.tv_sec  = timeout;
 	tm.tv_usec = 0;
