@@ -189,9 +189,21 @@ typedef int (*ssl_ctx_set_verify_fn)(SSL_CTX *ctx,int mode,
 			int (*callback)(int, X509_STORE_CTX *));
 static ssl_ctx_set_verify_fn __ssl_ctx_set_verify;
 
-#define SSL_CTX_LOAD_VERIFY_LOCATIONS		"SSL_CTX_load_verify_locations"
+#define SSL_CTX_LOAD_VERIFY_LOCATIONS	"SSL_CTX_load_verify_locations"
 typedef int (*ssl_ctx_load_verify_locations_fn)(const SSL_CTX*, const char*, const char*);
 static ssl_ctx_load_verify_locations_fn __ssl_ctx_load_verify_locations;
+
+#define SSL_GET_EX_NEW_INDEX		"CRYPTO_get_ex_new_index"
+typedef int (*ssl_get_ex_new_index_fn)(int, long, void*, CRYPTO_EX_new *, CRYPTO_EX_dup *, CRYPTO_EX_free *);
+static ssl_get_ex_new_index_fn		__ssl_get_ex_new_index;
+
+#define SSL_SET_EX_DATA			"SSL_set_ex_data"
+typedef int (*ssl_set_ex_data_fn)(SSL*, int, void*);
+static ssl_set_ex_data_fn		__ssl_set_ex_data;
+
+#define SSL_GET_EX_DATA			"SSL_get_ex_data"
+typedef void* (*ssl_get_ex_data_fn)(const SSL*, int);
+static ssl_get_ex_data_fn		__ssl_get_ex_data;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -274,6 +286,10 @@ static bool load_from_ssl(void)
 	LOAD_SSL(SSL_COMP_POP, ssl_comp_pop, __ssl_comp_pop);
 #   endif
 #  endif
+
+	LOAD_SSL(SSL_SET_EX_DATA, ssl_set_ex_data_fn, __ssl_set_ex_data);
+	LOAD_SSL(SSL_GET_EX_DATA, ssl_get_ex_data_fn, __ssl_get_ex_data);
+	LOAD_CRYPTO(SSL_GET_EX_NEW_INDEX, ssl_get_ex_new_index_fn, __ssl_get_ex_new_index);
 
 #  if defined(_WIN32) || defined(_WIN64)
 	LOAD_CRYPTO(SSL_CLEAR_ERROR, ssl_clear_error_fn, __ssl_clear_error);
@@ -432,6 +448,9 @@ static void openssl_dll_load(void)
 #  define __openssl_sk_value		OPENSSL_sk_value
 #  define __ssl_ctx_set_verify		SSL_CTX_set_verify
 #  define __ssl_ctx_load_verify_locations		SSL_CTX_load_verify_locations
+#  define __ssl_get_ex_new_index	CRYPTO_get_ex_new_index
+#  define __ssl_set_ex_data		SSL_set_ex_data
+#  define __ssl_get_ex_data		SSL_get_ex_data
 # endif // !HAS_OPENSSL_DLL
 
 #endif  // HAS_OPENSSL
@@ -543,6 +562,7 @@ static void openssl_once(void)
 
 #ifdef HAS_OPENSSL
 static acl_pthread_once_t __openssl_once = ACL_PTHREAD_ONCE_INIT;
+static int private_data_index = 0;
 #endif
 
 openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
@@ -566,10 +586,14 @@ openssl_conf::openssl_conf(bool server_side /* false */, int timeout /* 30 */)
 		if (!server_side_ && !(ssl_ctx_ = create_ssl_ctx())) {
 			status_  = CONF_INIT_ERR;
 		}
+
+		private_data_index = __ssl_get_ex_new_index(CRYPTO_EX_INDEX_SSL,
+			0, this, NULL, NULL, NULL);
+		logger("SSL private_data_index=%d", private_data_index);
 	}
 
 	if (status_ == CONF_INIT_ERR) {
-		logger_error("Init MbedTLS failed!");
+		logger_error("Init OpenSSL failed!");
 	}
 #else
 	status_ = CONF_INIT_ERR;
@@ -840,16 +864,23 @@ int openssl_conf::on_sni_callback(SSL* ssl)
 #ifdef HAS_OPENSSL
 	string host;
 
+	openssl_io *io;
+	if (private_data_index > 0) {
+		io = (openssl_io*) __ssl_get_ex_data(ssl, private_data_index);
+	} else {
+		io = NULL;
+	}
+
 	const char* sni = __ssl_get_servername(ssl, TLSEXT_NAMETYPE_host_name);
 	if (sni == NULL || *sni == 0) {
-		if (checker_ && !checker_->check(sni, host)) {
+		if (checker_ && !checker_->check(io, sni, host)) {
 			return SSL_TLSEXT_ERR_ALERT_FATAL;
 		}
 		return SSL_TLSEXT_ERR_NOACK;
 	}
 
 	if (checker_) {
-		if (!checker_->check(sni, host)) {
+		if (!checker_->check(io, sni, host)) {
 			return SSL_TLSEXT_ERR_ALERT_FATAL;
 		}
 		if (host.empty()) {
@@ -1036,6 +1067,18 @@ void openssl_conf::enable_cache(bool /* on */)
 sslbase_io* openssl_conf::create(bool nblock)
 {
 	return NEW openssl_io(*this, server_side_, nblock);
+}
+
+void openssl_conf::bind(SSL *ssl, acl::openssl_io *io)
+{
+#ifdef HAS_OPENSSL
+	if (private_data_index > 0) {
+		__ssl_set_ex_data(ssl, private_data_index, io);
+	}
+#else
+	(void) ssl;
+	(void) io;
+#endif
 }
 
 } // namespace acl

@@ -51,11 +51,25 @@ public:
 	}
 
 	/**
-	 * 设置 SNI HOST 字段
+	 * 客户端用来设置 SNI HOST 字段
 	 * @param host {const char*}
 	 */
 	void set_sni_host(const char* host, const char* prefix = NULL,
 		const char* suffix = NULL);
+
+	/**
+	 * 服务端设置客户端是否发送了 SNI 信息
+	 * @param yes {bool}
+	 */
+	void set_has_sni(bool yes);
+
+	/**
+	 * 服务端判断客户端是否发送了 SNI 信息
+	 * @return {bool}
+	 */
+	bool has_sni() const {
+		return has_sni_;
+	}
 
 protected:
 	sslbase_conf& base_conf_;
@@ -64,7 +78,8 @@ protected:
 	bool handshake_ok_;
 	atomic_long* refers_;
 	ACL_VSTREAM* stream_;
-	string sni_host_;	// just for SNI
+	string sni_host_;	// Just for client to set SNI.
+	bool has_sni_;		// Just for server to check SNI.
 };
 
 } // namespace acl

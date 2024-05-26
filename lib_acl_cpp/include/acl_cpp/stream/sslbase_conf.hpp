@@ -4,6 +4,8 @@
 
 namespace acl {
 
+class sslbase_io;
+
 class ACL_CPP_API ssl_sni_checker {
 public:
 	ssl_sni_checker() {}
@@ -15,10 +17,8 @@ public:
 	 * @param host {acl::string&} 从 sni 中提取的 host 字段
 	 * @return {bool} 检查是否合法
 	 */
-	virtual bool check(const char* sni, string& host) = 0;
+	virtual bool check(sslbase_io* io, const char* sni, string& host) = 0;
 };
-
-class sslbase_io;
 
 class ACL_CPP_API sslbase_conf : public noncopyable {
 public:

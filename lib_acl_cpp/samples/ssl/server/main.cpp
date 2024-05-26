@@ -13,7 +13,13 @@ public:
 	~ssl_sni_checker() {}
 
 	// @override
-	bool check(const char* sni, acl::string& host) {
+	bool check(acl::sslbase_io* io, const char* sni, acl::string& host) {
+		if (io) {
+			io->set_has_sni(true);
+		}
+
+		printf("ssl_sni_checker::check: sslbase_io=%p\n", io);
+
 		if (sni == NULL || *sni == 0) {
 			printf("Invalid SNI\r\n");
 			return false;
@@ -77,7 +83,8 @@ private:
 			return false;
 		}
 
-		printf("ssl handshake ok!\r\n");
+		printf("ssl handshake ok, sslbase_io=%p, has sni=%s\r\n",
+			ssl, ssl->has_sni() ? "yes" : "no");
 		return true;
 	}
 
