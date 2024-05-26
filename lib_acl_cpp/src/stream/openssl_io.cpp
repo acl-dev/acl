@@ -245,6 +245,7 @@ bool openssl_io::open(ACL_VSTREAM* s)
 	}
 
 	SSL* ssl = __ssl_new(ctx);
+	openssl_conf::bind(ssl, this);
 
 	if (!__ssl_set_fd(ssl, (int) ACL_VSTREAM_SOCK(s))) {
 		logger_error("SSL_set_fd error");

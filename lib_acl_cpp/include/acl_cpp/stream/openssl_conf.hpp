@@ -78,6 +78,9 @@ public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
 
+	// Bind io with ssl.
+	static void bind(SSL* ssl, openssl_io* io);
+
 public:
 	/**
 	 * 是否为 SSL 服务模式
