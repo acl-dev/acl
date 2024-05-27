@@ -16,12 +16,19 @@ public:
 	bool check(acl::sslbase_io* io, const char* sni, acl::string& host) {
 		if (io) {
 			io->set_has_sni(true);
+			acl::sslbase_io* me = (acl::sslbase_io*) io->get_ctx();
+			if (io != me) {
+				printf("Invalid io=%p, me=%p\r\n", io, me);
+				return false;
+			}
+			printf("ssl_sni_checker::check: sslbase_io=%p\r\n", io);
+		} else {
+			printf("ssl_sni_checker::check: sslbase_io=NULL\r\n");
 		}
 
-		printf("ssl_sni_checker::check: sslbase_io=%p\n", io);
 
 		if (sni == NULL || *sni == 0) {
-			printf("Invalid SNI\r\n");
+			printf("Invalid SNI=%p\r\n", sni);
 			return false;
 		}
 
@@ -73,6 +80,9 @@ private:
 	bool setup_ssl(void) {
 		bool non_block = false;
 		acl::sslbase_io* ssl = ssl_conf_.create(non_block);
+
+		// 设置私有对象，在 ssl_sni_checker::check() 中检查
+		ssl->set_ctx(ssl);
 
 		// 对于使用 SSL 方式的流对象，需要将 SSL IO 流对象注册至网络
 		// 连接流对象中，即用 ssl io 替换 stream 中默认的底层 IO 过程

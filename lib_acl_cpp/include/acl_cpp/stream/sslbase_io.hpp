@@ -71,6 +71,20 @@ public:
 		return has_sni_;
 	}
 
+	/**
+	 * 设置本 SSL IO 对象的绑定对象，方便应用处理自身业务逻辑
+	 * @param ctx {void*}
+	 */
+	void set_ctx(void* ctx);
+
+	/**
+	 * 获得由 set_ctx() 设置的绑定对象
+	 * @return {void*}
+	 */
+	void* get_ctx() const {
+		return ctx_;
+	}
+
 protected:
 	sslbase_conf& base_conf_;
 	bool server_side_;
@@ -80,6 +94,7 @@ protected:
 	ACL_VSTREAM* stream_;
 	string sni_host_;	// Just for client to set SNI.
 	bool has_sni_;		// Just for server to check SNI.
+	void* ctx_;		// The context for every SSL IO.
 };
 
 } // namespace acl
