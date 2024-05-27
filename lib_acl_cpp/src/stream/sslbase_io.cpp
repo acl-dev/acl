@@ -17,6 +17,7 @@ sslbase_io::sslbase_io(sslbase_conf& conf, bool server_side,
 , handshake_ok_(false)
 , stream_(NULL)
 , has_sni_(false)
+, ctx_(NULL)
 {
 	refers_ = NEW atomic_long(0);
 }
@@ -51,6 +52,10 @@ void sslbase_io::set_sni_host(const char *host, const char* prefix /* NULL */,
 
 void sslbase_io::set_has_sni(bool yes) {
 	has_sni_ = yes;
+}
+
+void sslbase_io::set_ctx(void *ctx) {
+	ctx_ = ctx;
 }
 
 } // namespace acl
