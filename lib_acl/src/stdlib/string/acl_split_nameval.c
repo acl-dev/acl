@@ -12,6 +12,11 @@
 
 const char *acl_split_nameval(char *buf, char **name, char **value)
 {
+	return acl_split_nameval2(buf, name, value, '=');
+}
+
+const char *acl_split_nameval2(char *buf, char **name, char **value, char sep)
+{
 	char   *np;				/* name substring */
 	char   *vp;				/* value substring */
 	char   *cp;
@@ -30,18 +35,20 @@ const char *acl_split_nameval(char *buf, char **name, char **value)
 }
 
 	SKIP(buf, np, ACL_ISSPACE(*np));		/* find name begin */
-	if (*np == 0)
-		return ("missing attribute name");
+	if (*np == 0) {
+		return "missing attribute name";
+	}
 	SKIP(np, ep, !ACL_ISSPACE(*ep) && *ep != '=');	/* find name end */
 	SKIP(ep, cp, ACL_ISSPACE(*cp));			/* skip blanks before '=' */
-	if (*cp != '=')				/* need '=' */
-		return ("missing '=' after attribute name");
+	if (*cp != sep)	{			/* need '=' */
+		return "missing '=' after attribute name";
+	}
 	*ep = 0;				/* terminate name */
 	cp++;					/* skip over '=' */
-	SKIP(cp, vp, ACL_ISSPACE(*vp));		/* skip leading blanks */
+	SKIP(cp, vp, ACL_ISSPACE(*vp));	/* skip leading blanks */
 	TRIM(vp);				/* trim trailing blanks */
 	*name = np;
 	*value = vp;
-	return (NULL);
+	return NULL;
 }
 
