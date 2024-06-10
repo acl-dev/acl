@@ -1324,8 +1324,8 @@ private:
  * string s = "ok";
  * printf("first: %s\r\n", "ok" == s ? "true" : "false");
  */
-bool operator==(const string* s,const string& str);
-bool operator==(const char* s,const string& str);
+bool operator==(const string* s, const string& str);
+bool operator==(const char* s, const string& str);
 
 /**
  * 模板函数，可用在以下场景:
@@ -1350,6 +1350,36 @@ string operator+(T v, const string& rhs) {
  */
 
 } // namespce acl
+
+// acl::string s1 = "hello world!";
+// std::string s2;
+// s2 += s1;
+std::string& operator += (std::string& l, const acl::string& r) {
+	l += r.c_str();
+	return l;
+}
+
+// std::string s1;
+// acl::string s2;
+// if (s1 == s2) {}
+bool operator == (const std::string& l, const acl::string& r) {
+	return l.size() == r.size() && !r.ncompare(l.c_str(), l.size());
+}
+
+// acl::string s1;
+// std::string s2;
+// if (s1 == s2) {}
+bool operator == (const acl::string& l, const std::string& r) {
+	return l.size() == r.size() && !l.ncompare(r.c_str(), l.size());
+}
+
+#include <iostream>
+// acl::string s = "hello world!";
+// std::cout << s << std::endl;
+std::ostream& operator << (std::ostream& o, const acl::string& s) {
+	o << s.c_str();
+	return o;
+}
 
 // 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
 #if __cplusplus >= 201103L      // Support c++11 ?
