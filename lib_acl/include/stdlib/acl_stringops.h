@@ -46,8 +46,18 @@ ACL_API const char *acl_safe_basename(const char *path);
  * @param buf {char*} 输入的字符串, 不能为空
  * @param name {char**} 存储结果的地址指针，不能为空
  * @param value {char**} 存储结果的地址指针，不能为空
+ * @param sep {char} 分隔符
  * @return {const char*} 出错原因，如果为空则表示解析成功，否则表示解析失败并返回
  *  失败原因
+ */
+ACL_API const char *acl_split_nameval2(char *buf, char **name, char **value, char sep);
+
+/**
+ * 功能同 acl_split_nameval2，只是限定了分隔符为 '='
+ * @param buf {char*}
+ * @param name {char**}
+ * @param value {char**}
+ * @return {const char*}
  */
 ACL_API const char *acl_split_nameval(char *buf, char **name, char **value);
 

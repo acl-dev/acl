@@ -5,6 +5,7 @@
 #include <string>
 #include <stdarg.h>
 #include <utility>
+#include <iostream>
 
 struct ACL_VSTRING;
 struct ACL_LINE_STATE;
@@ -28,7 +29,7 @@ public:
 	 */
 	string(size_t n, bool bin);
 	explicit string(size_t n);
-	string(void);
+	string();
 
 	/**
 	 * 构造函数
@@ -64,7 +65,7 @@ public:
 	string(int fd, size_t max, size_t n, size_t offset = 0);
 #endif
 
-	~string(void);
+	~string();
 
 	/**
 	 * 设置字符串类对象为二进制处理模式
@@ -93,7 +94,7 @@ public:
 	 * 返回当前缓冲区的最大长度限制，若返回值 <= 0 则表示没有限制
 	 * @return {int}
 	 */
-	int get_max(void) const;
+	int get_max() const;
 
 	/**
 	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
@@ -648,10 +649,10 @@ public:
 	bool operator>(const string& s) const;
 
 	/**
-	 * 计算当前字符串的哈希值
+	 * 计算当前字符串的哈希值，只为C++11中的 std::unordered_xxx 类容器使用
 	 * @return {size_t}
 	 */
-	size_t hash(void) const;
+	size_t hash() const;
 
 	/**
 	 * 将当前对象直接转为字符串指针（即将内部缓冲区直接导出）
@@ -684,7 +685,7 @@ public:
 	 * 在缓冲区尾部添加 \0 以便应用使用时的安全性, 添加的 \0 不增加长度
 	 * @return {string&} 当前字符串对象的引用
 	 */
-	string& terminate(void);
+	string& terminate();
 
 	/**
 	 * 比较两个字符串对象的内容是否相同（区分大小写）
@@ -792,7 +793,7 @@ public:
 	 * 方法以重置内部查询状态
 	 * @return {string&}
 	 */
-	string& find_reset(void);
+	string& find_reset();
 
 	/**
 	 * 查找指定字符在当前对象缓冲区的位置（下标从 0 开始）
@@ -872,7 +873,7 @@ public:
 	 * 返回当前对象缓冲区中第一个不含数据的尾部地址
 	 * @return {char*} 返回值为 NULL 则说明内部数据为空，即 empty() == true
 	 */
-	char* buf_end(void);
+	char* buf_end();
 
 	/**
 	 * 返回当前对象缓冲区的起始地址
@@ -914,7 +915,7 @@ public:
 	 * 返回当前对象内部所用的 acl C 库中的 ACL_VSTRING 对象地址
 	 * @return {ACL_VSTRING*} 返回值永远非空
 	 */
-	ACL_VSTRING* vstring(void) const;
+	ACL_VSTRING* vstring() const;
 
 	/**
 	 * 将当前对象的缓冲区的下标位置移至指定位置
@@ -955,11 +956,12 @@ public:
 	/**
 	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会
 	 * 自动去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
+	 * @param sep {char} 用户可以通过此参数指定自己的分隔符
 	 * @return {std::pair<string, string>&} 如果当前对象存储的字符串
 	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符
 	 *  串对象为空串,返回的结果不需要释放，其引用了当前对象的一个内部地址
 	 */
-	std::pair<string, string>& split_nameval(void);
+	std::pair<string, string>& split_nameval(char sep = '=');
 
 	/**
 	 * 将字符串拷贝到当前对象的缓冲区中
@@ -1154,13 +1156,13 @@ public:
 	 * 将当前对象的数据缓冲区中的数据均转为小写
 	 * @return {string&} 当前对象的引用
 	 */
-	string& lower(void);
+	string& lower();
 
 	/**
 	 * 将当前对象的数据缓冲区中的数据均转为大写
 	 * @return {string&} 当前对象的引用
 	 */
-	string& upper(void);
+	string& upper();
 
 	/**
 	 * 从当前缓冲区中将指定偏移量指定长度的数据拷贝至目标缓冲区中
@@ -1177,7 +1179,7 @@ public:
 	 * 将当前对象的数据缓冲区中的数据进行 base64 转码
 	 * @return {string&} 当前对象的引用
 	 */
-	string& base64_encode(void);
+	string& base64_encode();
 
 	/**
 	 * 将输入的源数据进行 base64 转码并存入当前对象的缓冲区中
@@ -1193,7 +1195,7 @@ public:
 	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
 	 *  调用 string::empty() 返回 true
 	 */
-	string& base64_decode(void);
+	string& base64_decode();
 
 	/**
 	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
@@ -1300,7 +1302,7 @@ public:
 	 * s1 = s2 + v;
 	 */
 	template<typename T>
-	string operator+(T v) {
+	string operator + (T v) {
 		string s(*this);
 		s += v;
 		return s;
@@ -1323,8 +1325,8 @@ private:
  * string s = "ok";
  * printf("first: %s\r\n", "ok" == s ? "true" : "false");
  */
-bool operator==(const string* s,const string& str);
-bool operator==(const char* s,const string& str);
+bool operator == (const string* s, const string& str);
+bool operator == (const char* s, const string& str);
 
 /**
  * 模板函数，可用在以下场景:
@@ -1333,7 +1335,7 @@ bool operator==(const char* s,const string& str);
  * s1 = v + s2;
  */
 template<typename T>
-string operator+(T v, const string& rhs) {
+string operator + (T v, const string& rhs) {
 	string s;
 	s = v;
 	s += rhs;
@@ -1348,17 +1350,39 @@ string operator+(T v, const string& rhs) {
  * s = 1000 + s1 + " " + s2 + 1000;
  */
 
+// acl::string s1 = "hello world!";
+// std::string s2;
+// s2 += s1;
+std::string& operator += (std::string& l, const acl::string& r);
+
+// std::string s1;
+// acl::string s2;
+// if (s1 == s2) {}
+bool operator == (const std::string& l, const acl::string& r);
+
+// acl::string s1;
+// std::string s2;
+// if (s1 == s2) {}
+bool operator == (const acl::string& l, const std::string& r);
+
+// acl::string s = "hello world!";
+// std::cout << s << std::endl;
+std::ostream& operator << (std::ostream& o, const acl::string& s);
+
 } // namespce acl
 
-// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
 #if __cplusplus >= 201103L      // Support c++11 ?
 namespace std {
+
+// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
+
 template <>
 struct hash<acl::string> {
 	size_t operator()(const acl::string& key) const {
 		return key.hash();
 	}
 };
+
 } // namespace std
 
-#endif
+#endif	// __cplusplus >= 201103L

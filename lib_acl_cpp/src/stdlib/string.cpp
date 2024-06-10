@@ -21,6 +21,12 @@
 #define AT(x, n) acl_vstring_charat((x), (n))
 #define	END(x) acl_vstring_end((x))
 
+#if __cplusplus >= 201103L      // Support c++11 ?
+# define	NIL	nullptr
+#else
+# define	NIL	NULL
+#endif
+
 namespace acl {
 
 void string::init(size_t len)
@@ -29,15 +35,15 @@ void string::init(size_t len)
 		len = 1;
 	}
 	vbf_               = ALLOC(len);
-	list_tmp_          = NULL;
-	vector_tmp_        = NULL;
-	pair_tmp_          = NULL;
-	scan_ptr_          = NULL;
-	line_state_        = NULL;
+	list_tmp_          = NIL;
+	vector_tmp_        = NIL;
+	pair_tmp_          = NIL;
+	scan_ptr_          = NIL;
+	line_state_        = NIL;
 	line_state_offset_ = 0;
 }
 
-string::string(void)
+string::string()
 : use_bin_(false)
 {
 	init(64);
@@ -69,7 +75,7 @@ string::string(const string& s)
 string::string(const char* s)
 : use_bin_(false)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		init(128);
 		TERM(vbf_);
 		return;
@@ -85,7 +91,7 @@ string::string(const void* s, size_t n)
 : use_bin_(false)
 {
 	init(n + 1);
-	if (s != NULL && n > 0) {
+	if (s != NIL && n > 0) {
 		MCP(vbf_, (const char*) s, n);
 	}
 	TERM(vbf_);
@@ -101,15 +107,15 @@ string::string(ACL_FILE_HANDLE fd, size_t max, size_t n, size_t offset /* 0 */)
 	} else {
 		vbf_ = ALLOC(n);
 	}
-	list_tmp_          = NULL;
-	vector_tmp_        = NULL;
-	pair_tmp_          = NULL;
-	scan_ptr_          = NULL;
-	line_state_        = NULL;
+	list_tmp_          = NIL;
+	vector_tmp_        = NIL;
+	pair_tmp_          = NIL;
+	scan_ptr_          = NIL;
+	line_state_        = NIL;
 	line_state_offset_ = 0;
 }
 
-string::~string(void)
+string::~string()
 {
 	FREE(vbf_);
 	delete list_tmp_;
@@ -126,7 +132,7 @@ string& string::set_bin(bool bin)
 	return *this;
 }
 
-bool string::get_bin(void) const
+bool string::get_bin() const
 {
 	return use_bin_;
 }
@@ -137,7 +143,7 @@ string& string::set_max(int max)
 	return *this;
 }
 
-int string::get_max(void) const
+int string::get_max() const
 {
 	return (int) vbf_->maxlen;
 }
@@ -216,7 +222,7 @@ char& string::operator [](int n)
 
 string& string::operator =(const char* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 	
@@ -241,7 +247,7 @@ string& string::operator =(const string& s)
 
 string& string::operator =(const string* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 	
@@ -267,7 +273,7 @@ string& string::operator =(const std::string& s)
 
 string& string::operator =(const std::string* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 	
@@ -382,7 +388,7 @@ string& string::operator =(unsigned char n)
 
 string& string::operator +=(const char* s)
 {
-	if (s != NULL && *s != 0) {
+	if (s != NIL && *s != 0) {
 		SCAT(vbf_, s);
 	}
 	return *this;
@@ -399,7 +405,7 @@ string& string::operator +=(const string& s)
 
 string& string::operator +=(const string* s)
 {
-	if (s != NULL && !s->empty()) {
+	if (s != NIL && !s->empty()) {
 		MCAT(vbf_, STR(s->vbf_), LEN(s->vbf_));
 		TERM(vbf_);
 	}
@@ -417,7 +423,7 @@ string& string::operator +=(const std::string& s)
 
 string& string::operator +=(const std::string* s)
 {
-	if (s != NULL && !s->empty()) {
+	if (s != NIL && !s->empty()) {
 		MCAT(vbf_, s->c_str(), s->size());
 		TERM(vbf_);
 	}
@@ -528,7 +534,7 @@ string& string::operator <<(const string& s)
 
 string& string::operator <<(const string* s)
 {
-	if (s == NULL ) {
+	if (s == NIL ) {
 		return *this;
 	}
 
@@ -544,7 +550,7 @@ string& string::operator <<(const std::string& s)
 
 string& string::operator <<(const std::string* s)
 {
-	if (s == NULL ) {
+	if (s == NIL ) {
 		return *this;
 	}
 
@@ -554,7 +560,7 @@ string& string::operator <<(const std::string* s)
 
 string& string::operator <<(const char* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 
@@ -640,15 +646,15 @@ string& string::push_back(unsigned char ch, bool term /* true */)
     return *this;
 }
 
-string& string::terminate(void)
+string& string::terminate()
 {
 	TERM(vbf_);
 	return *this;
 }
 
-char* string::buf_end(void)
+char* string::buf_end()
 {
-	if (scan_ptr_ == NULL) {
+	if (scan_ptr_ == NIL) {
 		scan_ptr_ = STR(vbf_);
 	}
 	char *pEnd = acl_vstring_end(vbf_);
@@ -656,26 +662,26 @@ char* string::buf_end(void)
 		if (!empty()) {
 			clear();
 		}
-		return NULL;
+		return NIL;
 	}
 	return pEnd;
 }
 
 bool string::scan_line(string& out, bool nonl /* = true */,
-	size_t* n /* = NULL */, bool move /* = false */)
+	size_t* n /* = NIL */, bool move /* = false */)
 {
 	if (n) {
 		*n = 0;
 	}
 
 	char* pEnd = buf_end();
-	if (pEnd == NULL) {
+	if (pEnd == NIL) {
 		return false;
 	}
 	
 	size_t len = pEnd - scan_ptr_;
 	char *ln = (char*) memchr(scan_ptr_, '\n', len);
-	if (ln == NULL) {
+	if (ln == NIL) {
 		return false;
 	}
 
@@ -686,7 +692,7 @@ bool string::scan_line(string& out, bool nonl /* = true */,
 		ln--;
 		len--;
 		if (ln >= scan_ptr_ && *ln == '\r') {
-			ln--;
+			// ln--;
 			len--;
 		}
 		if (len > 0) {
@@ -721,12 +727,12 @@ bool string::scan_line(string& out, bool nonl /* = true */,
 
 size_t string::scan_buf(void* pbuf, size_t n, bool move /* = false */)
 {
-	if (pbuf == NULL || n == 0) {
+	if (pbuf == NIL || n == 0) {
 		return 0;
 	}
 
 	const char *pEnd = buf_end();
-	if (pEnd == NULL) {
+	if (pEnd == NIL) {
 		return 0;
 	}
 
@@ -745,9 +751,9 @@ size_t string::scan_buf(void* pbuf, size_t n, bool move /* = false */)
 	return len;
 }
 
-size_t string::scan_move(void)
+size_t string::scan_move()
 {
-	if (scan_ptr_ == NULL) {
+	if (scan_ptr_ == NIL) {
 		return 0;
 	}
 
@@ -766,7 +772,7 @@ size_t string::scan_move(void)
 }
 size_t string::operator >>(string* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return 0;
 	}
 
@@ -786,7 +792,7 @@ size_t string::operator >>(string& s)
 
 size_t string::operator >>(std::string* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return 0;
 	}
 
@@ -846,32 +852,32 @@ size_t string::operator >>(unsigned char& n)
 
 bool string::operator ==(const string& s) const
 {
-	return compare(s) == 0 ? true : false;
+	return compare(s) == 0;
 }
 
 bool string::operator==(const string* s) const
 {
-	return compare(s) == 0 ? true : false;
+	return compare(s) == 0;
 }
 
 bool string::operator ==(const char* s) const
 {
-	return compare(s) == 0 ? true : false;
+	return compare(s) == 0;
 }
 
 bool string::operator !=(const string& s) const
 {
-	return compare(s) != 0 ? true : false;
+	return compare(s) != 0;
 }
 
 bool string::operator !=(const string* s) const
 {
-	return compare(s) != 0 ? true : false;
+	return compare(s) != 0;
 }
 
 bool string::operator !=(const char* s) const
 {
-	return compare(s) != 0 ? true : false;
+	return compare(s) != 0;
 }
 
 bool string::operator <(const string& s) const
@@ -908,28 +914,28 @@ bool string::operator >(const string& s) const
 	return false;
 }
 
-string::operator const char *(void) const
+string::operator const char *() const
 {
 	return STR(vbf_);
 }
 
-string::operator const void *(void) const
+string::operator const void *() const
 {
 	return (void*) STR(vbf_);
 }
 
-string::operator const std::string (void) const
+string::operator const std::string () const
 {
 	if (!this->empty()) {
 		std::string temp(this->c_str());
 		return temp;
 	} else {
-		std::string temp("");
+		std::string temp;
 		return temp;
 	}
 }
 
-size_t string::hash(void) const
+size_t string::hash() const
 {
 	if (empty()) {
 		return 0;
@@ -947,31 +953,31 @@ bool string::equal(const string& s, bool case_sensitive /* = true */) const
 	size_t n = n1 > n2 ? n2 : n1;
 
 	if (case_sensitive) {
-		return memcmp(STR(vbf_), STR(s.vbf_), n) == 0 ? true : false;
+		return memcmp(STR(vbf_), STR(s.vbf_), n) == 0;
 	}
 
-	return acl_strcasecmp(STR(vbf_), STR(s.vbf_)) == 0 ? true : false;
+	return acl_strcasecmp(STR(vbf_), STR(s.vbf_)) == 0;
 }
 
 bool string::begin_with(const char* s, bool case_sensitive /* = true */) const
 {
-	return ncompare(s, strlen(s), case_sensitive) == 0 ? true : false;
+	return ncompare(s, strlen(s), case_sensitive) == 0;
 }
 
 bool string::begin_with(const void* v, size_t n) const
 {
-	if (v == NULL || n == 0) {
+	if (v == NIL || n == 0) {
 		return false;
 	}
 	if (n > LEN(vbf_)) {
 		return false;
 	}
-	return memcmp(STR(vbf_), v, n) == 0 ? true : false;
+	return memcmp(STR(vbf_), v, n) == 0;
 }
 
 bool string::begin_with(const char* s, size_t len, bool case_sensitive /* = true */) const
 {
-	return ncompare(s, len, case_sensitive) == 0 ? true : false;
+	return ncompare(s, len, case_sensitive) == 0;
 }
 
 bool string::begin_with(const string& s, bool case_sensitive /* = true */) const
@@ -993,7 +999,7 @@ int string::compare(const string& s) const
 
 int string::compare(const string* s) const
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return 1;
 	}
 
@@ -1009,7 +1015,7 @@ int string::compare(const string* s) const
 
 int string::compare(const char* s, bool case_sensitive) const
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return 1;
 	}
 
@@ -1022,7 +1028,7 @@ int string::compare(const char* s, bool case_sensitive) const
 
 int string::compare(const void* ptr, size_t len) const
 {
-	if (ptr == NULL) {
+	if (ptr == NIL) {
 		return 1;
 	}
 
@@ -1038,7 +1044,7 @@ int string::compare(const void* ptr, size_t len) const
 
 int string::ncompare(const char* s, size_t len, bool case_sensitive/* = true */) const
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return 1;
 	}
 
@@ -1051,7 +1057,7 @@ int string::ncompare(const char* s, size_t len, bool case_sensitive/* = true */)
 
 int string::rncompare(const char* s, size_t len, bool case_sensitive/* =true */) const
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return 1;
 	}
 
@@ -1064,12 +1070,12 @@ int string::rncompare(const char* s, size_t len, bool case_sensitive/* =true */)
 
 bool string::end_with(const char* s, bool case_sensitive /* = true */) const
 {
-	return rncompare(s, strlen(s), case_sensitive) == 0 ? true : false;
+	return rncompare(s, strlen(s), case_sensitive) == 0;
 }
 
 bool string::end_with(const char* s, size_t len, bool case_sensitive /* = true */) const
 {
-	return rncompare(s, len, case_sensitive) == 0 ? true : false;
+	return rncompare(s, len, case_sensitive) == 0;
 }
 
 bool string::end_with(const string& s, bool case_sensitive /* = true */) const
@@ -1079,17 +1085,17 @@ bool string::end_with(const string& s, bool case_sensitive /* = true */) const
 
 bool string::end_with(const void* v, size_t n) const
 {
-	if (v == NULL || n == 0) {
+	if (v == NIL || n == 0) {
 		return false;
 	}
 	if (n > LEN(vbf_)) {
 		return false;
 	}
 	size_t skip = LEN(vbf_) - n;
-	return memcpy(STR(vbf_) + skip, v, n) == 0 ? true : false;
+	return memcpy(STR(vbf_) + skip, v, n) == 0;
 }
 
-char* string::c_str(void) const
+char* string::c_str() const
 {
 	if (scan_ptr_) {
 		return scan_ptr_;
@@ -1097,12 +1103,12 @@ char* string::c_str(void) const
 	return STR(vbf_);
 }
 
-void* string::buf(void) const
+void* string::buf() const
 {
 	return STR(vbf_);
 }
 
-size_t string::length(void) const
+size_t string::length() const
 {
 	if (scan_ptr_) {
 		return LEN(vbf_) - (scan_ptr_ - STR(vbf_));
@@ -1110,12 +1116,12 @@ size_t string::length(void) const
 	return LEN(vbf_);
 }
 
-size_t string::size(void) const
+size_t string::size() const
 {
 	return length();
 }
 
-size_t string::capacity(void) const
+size_t string::capacity() const
 {
 	return CAP(vbf_);
 }
@@ -1141,20 +1147,20 @@ string& string::reserve(size_t n)
 	return *this;
 }
 
-bool string::empty(void) const
+bool string::empty() const
 {
 	return LEN(vbf_) > 0 ? false : true;
 }
 
-ACL_VSTRING* string::vstring(void) const
+ACL_VSTRING* string::vstring() const
 {
 	return vbf_;
 }
 
-int string::find_blank_line(int* left_count /* = NULL */,
-	string* out /* = NULL */)
+int string::find_blank_line(int* left_count /* = NIL */,
+	string* out /* = NIL */)
 {
-	if (line_state_ == NULL) {
+	if (line_state_ == NIL) {
 		line_state_ = (ACL_LINE_STATE*) acl_line_state_alloc();
 	}
 
@@ -1167,13 +1173,13 @@ int string::find_blank_line(int* left_count /* = NULL */,
 	char* s = STR(vbf_) + line_state_->offset;
 	int   ret = acl_find_blank_line(s, nleft, line_state_);
 
-	if (left_count != NULL) {
+	if (left_count != NIL) {
 		*left_count = ret;
 	}
 
 	if (line_state_->finish) {
 		acl_line_state_reset(line_state_, line_state_->offset);
-		if (out != NULL) {
+		if (out != NIL) {
 			out->append(STR(vbf_) + line_state_offset_,
 				line_state_->offset - line_state_offset_);
 		}
@@ -1185,7 +1191,7 @@ int string::find_blank_line(int* left_count /* = NULL */,
 	return 0;
 }
 
-string& string::find_reset(void)
+string& string::find_reset()
 {
 	if (line_state_) {
 		acl_line_state_reset(line_state_, 0);
@@ -1197,7 +1203,7 @@ string& string::find_reset(void)
 int string::find(char ch) const
 {
 	char *ptr = acl_vstring_memchr(vbf_, ch);
-	if (ptr == NULL) {
+	if (ptr == NIL) {
 		return -1;
 	}
 	return (int)(ptr - STR(vbf_));
@@ -1205,8 +1211,8 @@ int string::find(char ch) const
 
 char* string::find(const char* needle, bool case_sensitive) const
 {
-	if (needle == NULL || *needle == 0) {
-		return NULL;
+	if (needle == NIL || *needle == 0) {
+		return NIL;
 	}
 
 	if (case_sensitive) {
@@ -1218,8 +1224,8 @@ char* string::find(const char* needle, bool case_sensitive) const
 
 char* string::rfind(const char* needle, bool case_sensitive) const
 {
-	if (needle == NULL || *needle == 0) {
-		return NULL;
+	if (needle == NIL || *needle == 0) {
+		return NIL;
 	}
 
 	if (case_sensitive) {
@@ -1249,13 +1255,13 @@ string string::right(size_t n)
 
 std::list<acl::string>& string::split(const char* sep, bool quoted /* = false */)
 {
-	if (list_tmp_ == NULL) {
+	if (list_tmp_ == NIL) {
 		list_tmp_ = NEW std::list<acl::string>;
 	} else {
 		list_tmp_->clear();
 	}
 
-	if (sep == NULL || *sep == 0) {
+	if (sep == NIL || *sep == 0) {
 		return *list_tmp_;
 	}
 
@@ -1279,13 +1285,13 @@ std::list<acl::string>& string::split(const char* sep, bool quoted /* = false */
 
 std::vector<acl::string>& string::split2(const char* sep, bool quoted /* = false */)
 {
-	if (vector_tmp_ == NULL) {
+	if (vector_tmp_ == NIL) {
 		vector_tmp_ = NEW std::vector<acl::string>;
 	} else {
 		vector_tmp_->clear();
 	}
 
-	if (sep == NULL || *sep == 0) {
+	if (sep == NIL || *sep == 0) {
 		return *vector_tmp_;
 	}
 
@@ -1307,15 +1313,15 @@ std::vector<acl::string>& string::split2(const char* sep, bool quoted /* = false
 	return *vector_tmp_;
 }
 
-std::pair<acl::string, acl::string>& string::split_nameval()
+std::pair<acl::string, acl::string>& string::split_nameval(char sep)
 {
 	char *name, *value;
 
-	if (pair_tmp_ == NULL) {
+	if (pair_tmp_ == NIL) {
 		pair_tmp_ = NEW std::pair<acl::string, acl::string>;
 	}
 
-	if (acl_split_nameval(STR(vbf_), &name, &value) != NULL) {
+	if (acl_split_nameval2(STR(vbf_), &name, &value, sep) != NIL) {
 		pair_tmp_->first = "";
 		pair_tmp_->second = "";
 		return *pair_tmp_;
@@ -1327,7 +1333,7 @@ std::pair<acl::string, acl::string>& string::split_nameval()
 
 string& string::copy(const char* ptr)
 {
-	if (ptr == NULL) {
+	if (ptr == NIL) {
 		return *this;
 	}
 
@@ -1337,7 +1343,7 @@ string& string::copy(const char* ptr)
 
 string& string::copy(const void* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1348,7 +1354,7 @@ string& string::copy(const void* ptr, size_t len)
 
 string& string::memmove(const char* ptr)
 {
-	if (ptr == NULL) {
+	if (ptr == NIL) {
 		return *this;
 	}
 
@@ -1357,7 +1363,7 @@ string& string::memmove(const char* ptr)
 
 string& string::memmove(const char* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1372,7 +1378,7 @@ string& string::append(const string& s)
 
 string& string::append(const string* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 
@@ -1381,7 +1387,7 @@ string& string::append(const string* s)
 
 string& string::append(const char* ptr)
 {
-	if (ptr == NULL) {
+	if (ptr == NIL) {
 		return *this;
 	}
 
@@ -1391,7 +1397,7 @@ string& string::append(const char* ptr)
 
 string& string::append(const void* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1402,7 +1408,7 @@ string& string::append(const void* ptr, size_t len)
 
 string& string::prepend(const char* s)
 {
-	if (s == NULL || *s == 0) {
+	if (s == NIL || *s == 0) {
 		return *this;
 	}
 
@@ -1412,7 +1418,7 @@ string& string::prepend(const char* s)
 
 string& string::prepend(const void* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1423,7 +1429,7 @@ string& string::prepend(const void* ptr, size_t len)
 
 string& string::insert(size_t start, const void* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1433,7 +1439,7 @@ string& string::insert(size_t start, const void* ptr, size_t len)
 
 string& string::format(const char* fmt, ...)
 {
-	if (fmt == NULL || *fmt == 0) {
+	if (fmt == NIL || *fmt == 0) {
 		return *this;
 	}
 
@@ -1447,7 +1453,7 @@ string& string::format(const char* fmt, ...)
 
 string& string::vformat(const char* fmt, va_list ap)
 {
-	if (fmt == NULL || *fmt == 0) {
+	if (fmt == NIL || *fmt == 0) {
 		return *this;
 	}
 
@@ -1457,7 +1463,7 @@ string& string::vformat(const char* fmt, va_list ap)
 
 string& string::format_append(const char* fmt, ...)
 {
-	if (fmt == NULL || *fmt == 0) {
+	if (fmt == NIL || *fmt == 0) {
 		return *this;
 	}
 
@@ -1471,7 +1477,7 @@ string& string::format_append(const char* fmt, ...)
 
 string& string::vformat_append(const char* fmt, va_list ap)
 {
-	if (fmt == NULL || *fmt == 0) {
+	if (fmt == NIL || *fmt == 0) {
 		return *this;
 	}
 
@@ -1505,7 +1511,7 @@ string& string::truncate(size_t n)
 
 string& string::strip(const char* needle, bool each /* false */)
 {
-	if (needle == NULL || *needle == 0) {
+	if (needle == NIL || *needle == 0) {
 		return *this;
 	}
 
@@ -1513,15 +1519,15 @@ string& string::strip(const char* needle, bool each /* false */)
 	char* ptr;
 
 	if (each) {
-		ACL_VSTRING* pVbf = NULL;
+		ACL_VSTRING* pVbf = NIL;
 
 		while (true) {
-			if ((ptr = acl_mystrtok(&src, needle)) == NULL) {
-				// 如果此时 pVbf 为 NULL，则说明源串内容
+			if ((ptr = acl_mystrtok(&src, needle)) == NIL) {
+				// 如果此时 pVbf 为 NIL，则说明源串内容
 				// 全部为匹配字符，在这种情况下，第一次
-				// 调用 acl_mystrtok 就会返回 NULL，此时
+				// 调用 acl_mystrtok 就会返回 NIL，此时
 				// 需要清空源缓冲区内容
-				if (pVbf == NULL) {
+				if (pVbf == NIL) {
 					RSET(vbf_);
 					TERM(vbf_);
 				}
@@ -1531,7 +1537,7 @@ string& string::strip(const char* needle, bool each /* false */)
 
 			// 采用写时拷贝技术，当源缓冲区均不含任何匹配字符
 			// 时，不必分配临时缓冲区
-			if (pVbf == NULL) {
+			if (pVbf == NIL) {
 				pVbf = acl_vstring_alloc(LEN(vbf_) + 1);
 			}
 
@@ -1539,9 +1545,9 @@ string& string::strip(const char* needle, bool each /* false */)
 			SCAT(pVbf, ptr);
 		}
 		
-		// 如果临时缓冲区非 NULL，则说明源数据存在部分匹配数据，
+		// 如果临时缓冲区非 NIL，则说明源数据存在部分匹配数据，
 		// 需要将临时缓冲区设为正式缓冲区并需释放源缓冲区
-		if (pVbf != NULL) {
+		if (pVbf != NIL) {
 			FREE(vbf_);
 			vbf_ = pVbf;
 		}
@@ -1550,19 +1556,19 @@ string& string::strip(const char* needle, bool each /* false */)
 	}
 
 	size_t len = strlen(needle), n;
-	ACL_VSTRING* pVbf = NULL;
+	ACL_VSTRING* pVbf = NIL;
 
 	while (true) {
 		ptr = strstr(src, needle);
-		if (ptr == NULL) {
-			if (pVbf != NULL) {
+		if (ptr == NIL) {
+			if (pVbf != NIL) {
 				SCAT(pVbf, src);
 			}
 			break;
 		}
 
 		// 采用写时延迟分配策略
-		if (pVbf == NULL) {
+		if (pVbf == NIL) {
 			pVbf = acl_vstring_alloc(LEN(vbf_));
 		}
 
@@ -1575,14 +1581,14 @@ string& string::strip(const char* needle, bool each /* false */)
 		src += n + len;
 	}
 
-	if (pVbf != NULL) {
+	if (pVbf != NIL) {
 		FREE(vbf_);
 		vbf_ = pVbf;
 	}
 	return *this;
 }
 
-string& string::trim_left_space(void)
+string& string::trim_left_space()
 {
 	char* pBegin = STR(vbf_);
 	char* pEnd = acl_vstring_end(vbf_);
@@ -1604,7 +1610,7 @@ string& string::trim_left_space(void)
 	return *this;
 }
 
-string& string::trim_right_space(void)
+string& string::trim_right_space()
 {
 	char* pBegin = STR(vbf_);
 	char* pEnd = acl_vstring_end(vbf_);
@@ -1626,12 +1632,12 @@ string& string::trim_right_space(void)
 	return *this;
 }
 
-string& string::trim_space(void)
+string& string::trim_space()
 {
 	return strip(" \t", true);
 }
 
-string& string::trim_left_line(void)
+string& string::trim_left_line()
 {
 	char* pBegin = STR(vbf_);
 	char* pEnd   = acl_vstring_end(vbf_);
@@ -1662,7 +1668,7 @@ string& string::trim_left_line(void)
 	return *this;
 }
 
-string& string::trim_right_line(void)
+string& string::trim_right_line()
 {
 	char* pBegin = STR(vbf_);
 	char* pEnd   = acl_vstring_end(vbf_);
@@ -1688,27 +1694,27 @@ string& string::trim_right_line(void)
 	return *this;
 }
 
-string& string::trim_line(void)
+string& string::trim_line()
 {
 	return strip("\r\n", true);
 }
 
-string& string::clear(void)
+string& string::clear()
 {
 	RSET(vbf_);
 	TERM(vbf_);
-	scan_ptr_ = NULL;
+	scan_ptr_ = NIL;
 	find_reset();
 	return *this;
 }
 
-string& string::lower(void)
+string& string::lower()
 {
 	acl_lowercase(STR(vbf_));
 	return *this;
 }
 
-string& string::upper(void)
+string& string::upper()
 {
 	acl_uppercase(STR(vbf_));
 	return *this;
@@ -1728,7 +1734,7 @@ size_t string::substr(string& out, size_t p /* = 0 */, size_t len /* = 0 */) con
 	return n;
 }
 
-string& string::base64_encode(void)
+string& string::base64_encode()
 {
 	size_t dlen = length();
 	if (dlen == 0) {
@@ -1744,7 +1750,7 @@ string& string::base64_encode(void)
 
 string& string::base64_encode(const void* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1752,7 +1758,7 @@ string& string::base64_encode(const void* ptr, size_t len)
 	return *this;
 }
 
-string& string::base64_decode(void)
+string& string::base64_decode()
 {
 	size_t dlen = length();
 	if (dlen == 0) {
@@ -1760,7 +1766,7 @@ string& string::base64_decode(void)
 	}
 	size_t n = (dlen * 3) / 4;
 	ACL_VSTRING *s = ALLOC(n) ;
-	if (acl_vstring_base64_decode(s, c_str(), (int) dlen) == NULL) {
+	if (acl_vstring_base64_decode(s, c_str(), (int) dlen) == NIL) {
 		RSET(s);
 	}
 	FREE(vbf_);
@@ -1771,11 +1777,11 @@ string& string::base64_decode(void)
 
 string& string::base64_decode(const char* s)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 
-	if (acl_vstring_base64_decode(vbf_, s, (int) strlen(s)) == NULL) {
+	if (acl_vstring_base64_decode(vbf_, s, (int) strlen(s)) == NIL) {
 		RSET(vbf_);
 	}
 
@@ -1785,12 +1791,12 @@ string& string::base64_decode(const char* s)
 
 string& string::base64_decode(const void* ptr, size_t len)
 {
-	if (ptr == NULL || len == 0) {
+	if (ptr == NIL || len == 0) {
 		return *this;
 	}
 
 	if (acl_vstring_base64_decode(vbf_,
-		(const char*) ptr, (int) len) == NULL) {
+		(const char*) ptr, (int) len) == NIL) {
 
 		RSET(vbf_);
 	}
@@ -1798,31 +1804,31 @@ string& string::base64_decode(const void* ptr, size_t len)
 	return *this;
 }
 
-string& string::url_encode(const char* s, dbuf_pool* dbuf /* = NULL */)
+string& string::url_encode(const char* s, dbuf_pool* dbuf /* = NIL */)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 
-	char *ptr = acl_url_encode(s, dbuf ? dbuf->get_dbuf() : NULL);
+	char *ptr = acl_url_encode(s, dbuf ? dbuf->get_dbuf() : NIL);
 
 	(*this) = ptr;
-	if (dbuf == NULL) {
+	if (dbuf == NIL) {
 		acl_myfree(ptr);
 	}
 	return *this;
 }
 
-string& string::url_decode(const char* s, dbuf_pool* dbuf /* = NULL */)
+string& string::url_decode(const char* s, dbuf_pool* dbuf /* = NIL */)
 {
-	if (s == NULL) {
+	if (s == NIL) {
 		return *this;
 	}
 
-	char *ptr = acl_url_decode(s, dbuf ? dbuf->get_dbuf() : NULL);
+	char *ptr = acl_url_decode(s, dbuf ? dbuf->get_dbuf() : NIL);
 
 	(*this) = ptr;
-	if (dbuf == NULL) {
+	if (dbuf == NIL) {
 		acl_myfree(ptr);
 	}
 	return *this;
@@ -1830,7 +1836,7 @@ string& string::url_decode(const char* s, dbuf_pool* dbuf /* = NULL */)
 
 string& string::hex_encode(const void* s, size_t len)
 {
-	if (s == NULL || len == 0) {
+	if (s == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1840,7 +1846,7 @@ string& string::hex_encode(const void* s, size_t len)
 
 string& string::hex_decode(const char* s, size_t len)
 {
-	if (s == NULL || len == 0) {
+	if (s == NIL || len == 0) {
 		return *this;
 	}
 
@@ -1850,7 +1856,7 @@ string& string::hex_decode(const char* s, size_t len)
 
 string& string::basename(const char* path)
 {
-	if (path == NULL) {
+	if (path == NIL) {
 		return *this;
 	}
 
@@ -1860,7 +1866,7 @@ string& string::basename(const char* path)
 
 string& string::dirname(const char* path)
 {
-	if (path == NULL) {
+	if (path == NIL) {
 		return *this;
 	}
 
@@ -1880,10 +1886,10 @@ static void buf_free(void* arg)
 	delete s;
 }
 
-static string* __main_buf = NULL;
+static string* __main_buf = NIL;
 
 #ifndef HAVE_NO_ATEXIT
-static void main_buf_free(void)
+static void main_buf_free()
 {
 	if (__main_buf) {
 		delete __main_buf;
@@ -1893,7 +1899,7 @@ static void main_buf_free(void)
 
 static acl_pthread_key_t __buf_key;
 
-static void prepare_once(void)
+static void prepare_once()
 {
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self()) {
 #ifndef HAVE_NO_ATEXIT
@@ -1907,12 +1913,12 @@ static void prepare_once(void)
 
 static acl_pthread_once_t __buf_once = ACL_PTHREAD_ONCE_INIT;
 
-static string& get_buf(void)
+static string& get_buf()
 {
 	acl_pthread_once(&__buf_once, prepare_once);
 
 	string* s = (string*) acl_pthread_getspecific(__buf_key);
-	if (s != NULL) {
+	if (s != NIL) {
 		return *s;
 	}
 
@@ -1952,14 +1958,32 @@ string& string::parse_int64(acl_uint64 n)
 	return s;
 }
 
-bool operator==(const string* s,const string& str)
+bool operator == (const acl::string* s,const acl::string& str)
 {
 	return (str == s);
 }
 
-bool operator==(const char* s,const string& str)
+bool operator == (const char* s,const acl::string& str)
 {
 	return (str == s);
+}
+
+std::string& operator += (std::string& l, const acl::string& r) {
+	l += r.c_str();
+	return l;
+}
+
+bool operator == (const std::string& l, const acl::string& r) {
+	return l.size() == r.size() && !r.ncompare(l.c_str(), l.size());
+}
+
+bool operator == (const acl::string& l, const std::string& r) {
+	return l.size() == r.size() && !l.ncompare(r.c_str(), l.size());
+}
+
+std::ostream& operator << (std::ostream& o, const acl::string& s) {
+	o << s.c_str();
+	return o;
 }
 
 } // namespace acl
