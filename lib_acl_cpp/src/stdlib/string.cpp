@@ -1958,14 +1958,32 @@ string& string::parse_int64(acl_uint64 n)
 	return s;
 }
 
-bool operator==(const string* s,const string& str)
+bool operator == (const acl::string* s,const acl::string& str)
 {
 	return (str == s);
 }
 
-bool operator==(const char* s,const string& str)
+bool operator == (const char* s,const acl::string& str)
 {
 	return (str == s);
+}
+
+std::string& operator += (std::string& l, const acl::string& r) {
+	l += r.c_str();
+	return l;
+}
+
+bool operator == (const std::string& l, const acl::string& r) {
+	return l.size() == r.size() && !r.ncompare(l.c_str(), l.size());
+}
+
+bool operator == (const acl::string& l, const std::string& r) {
+	return l.size() == r.size() && !l.ncompare(r.c_str(), l.size());
+}
+
+std::ostream& operator << (std::ostream& o, const acl::string& s) {
+	o << s.c_str();
+	return o;
 }
 
 } // namespace acl

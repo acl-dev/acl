@@ -5,6 +5,7 @@
 #include <string>
 #include <stdarg.h>
 #include <utility>
+#include <iostream>
 
 struct ACL_VSTRING;
 struct ACL_LINE_STATE;
@@ -1301,7 +1302,7 @@ public:
 	 * s1 = s2 + v;
 	 */
 	template<typename T>
-	string operator+(T v) {
+	string operator + (T v) {
 		string s(*this);
 		s += v;
 		return s;
@@ -1324,8 +1325,8 @@ private:
  * string s = "ok";
  * printf("first: %s\r\n", "ok" == s ? "true" : "false");
  */
-bool operator==(const string* s, const string& str);
-bool operator==(const char* s, const string& str);
+bool operator == (const string* s, const string& str);
+bool operator == (const char* s, const string& str);
 
 /**
  * 模板函数，可用在以下场景:
@@ -1334,7 +1335,7 @@ bool operator==(const char* s, const string& str);
  * s1 = v + s2;
  */
 template<typename T>
-string operator+(T v, const string& rhs) {
+string operator + (T v, const string& rhs) {
 	string s;
 	s = v;
 	s += rhs;
@@ -1349,47 +1350,39 @@ string operator+(T v, const string& rhs) {
  * s = 1000 + s1 + " " + s2 + 1000;
  */
 
-} // namespce acl
-
 // acl::string s1 = "hello world!";
 // std::string s2;
 // s2 += s1;
-std::string& operator += (std::string& l, const acl::string& r) {
-	l += r.c_str();
-	return l;
-}
+std::string& operator += (std::string& l, const acl::string& r);
 
 // std::string s1;
 // acl::string s2;
 // if (s1 == s2) {}
-bool operator == (const std::string& l, const acl::string& r) {
-	return l.size() == r.size() && !r.ncompare(l.c_str(), l.size());
-}
+bool operator == (const std::string& l, const acl::string& r);
 
 // acl::string s1;
 // std::string s2;
 // if (s1 == s2) {}
-bool operator == (const acl::string& l, const std::string& r) {
-	return l.size() == r.size() && !l.ncompare(r.c_str(), l.size());
-}
+bool operator == (const acl::string& l, const std::string& r);
 
-#include <iostream>
 // acl::string s = "hello world!";
 // std::cout << s << std::endl;
-std::ostream& operator << (std::ostream& o, const acl::string& s) {
-	o << s.c_str();
-	return o;
-}
+std::ostream& operator << (std::ostream& o, const acl::string& s);
 
-// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
+} // namespce acl
+
 #if __cplusplus >= 201103L      // Support c++11 ?
 namespace std {
+
+// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
+
 template <>
 struct hash<acl::string> {
 	size_t operator()(const acl::string& key) const {
 		return key.hash();
 	}
 };
+
 } // namespace std
 
-#endif
+#endif	// __cplusplus >= 201103L
