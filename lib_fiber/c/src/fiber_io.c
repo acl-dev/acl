@@ -334,6 +334,11 @@ size_t acl_fiber_delay(size_t milliseconds)
 		return 0;
 	}
 
+	if (milliseconds == 0) {
+		acl_fiber_yield();
+		return 0;
+	}
+
 	fiber = acl_fiber_running();
 	fiber_timer_add(fiber, milliseconds);
 
