@@ -5,7 +5,7 @@
 #include "fiber.h"
 #include "hook.h"
 
-#ifdef HAS_POLL
+#if defined(HAS_POLL)
 
 struct POLLFD {
 	RING me;
