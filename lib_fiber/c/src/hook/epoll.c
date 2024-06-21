@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#ifdef	HAS_EPOLL
+#if defined(HAS_EPOLL) && !defined(DISABLE_HOOK)
 
 #include "common.h"
 #include "fiber/libfiber.h"

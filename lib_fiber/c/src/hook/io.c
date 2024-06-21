@@ -1,9 +1,9 @@
 #include "stdafx.h"
 
 #if defined(SYS_UNIX) && defined(USE_TCMALLOC)
-#include <unistd.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
+# include <unistd.h>
+# include <sys/syscall.h>
+# include <sys/types.h>
 #endif
 
 #include "common.h"
@@ -13,9 +13,9 @@
 #include "io.h"
 
 #ifdef SYS_UNIX
-#define IS_INVALID(fd) (fd <= INVALID_SOCKET)
+# define IS_INVALID(fd) (fd <= INVALID_SOCKET)
 #elif defined(_WIN32) || defined(_WIN64)
-#define IS_INVALID(fd) (fd == INVALID_SOCKET)
+# define IS_INVALID(fd) (fd == INVALID_SOCKET)
 #endif
 
 #if defined(SYS_UNIX) && !defined(DISABLE_HOOK)
@@ -47,16 +47,16 @@ int WINAPI acl_fiber_close(socket_t fd)
 	EVENT *ev;
 
 
-# ifndef USE_TCMALLOC
+#ifndef USE_TCMALLOC
 	if (sys_close == NULL) {
 		hook_once();
 	}
-# endif
+#endif
 
 	if (!var_hook_sys_api) {
-# ifdef USE_TCMALLOC
+#ifdef USE_TCMALLOC
 		return syscall(SYS_close, fd);
-# else
+#else
 		// In thread mode, we only need to free the fe, because
 		// no fiber was bound with the fe.
 		fe = fiber_file_get(fd);
@@ -65,14 +65,14 @@ int WINAPI acl_fiber_close(socket_t fd)
 		}
 
 		return (*sys_close)(fd);
-# endif
+#endif
 	}
 
-# ifdef USE_TCMALLOC
+#ifdef USE_TCMALLOC
 	if (sys_close == NULL) {
 		hook_once();
 	}
-# endif
+#endif
 
 	if (IS_INVALID(fd)) {
 		msg_error("%s(%d): invalid fd=%u", __FUNCTION__, __LINE__, fd);
@@ -225,6 +225,18 @@ ssize_t acl_fiber_recv(socket_t sockfd, void *buf, size_t len, int flags)
 		return (*sys_recv)(sockfd, buf, len, flags);
 	}
 
+#ifdef MSG_DONTWAIT
+	if ((flags & MSG_DONTWAIT)) {
+		return (*sys_recv)(sockfd, buf, len, flags);
+	}
+#endif
+
+#ifdef MSG_PEEK
+	if ((flags & MSG_PEEK)) {
+		return (*sys_recv)(sockfd, buf, len, flags);
+	}
+#endif
+
 	fe = fiber_file_open(sockfd);
 #ifdef SYS_WIN
 	return (int) fiber_recv(fe, buf, len, flags);
@@ -256,6 +268,20 @@ ssize_t acl_fiber_recvfrom(socket_t sockfd, void *buf, size_t len,
 				src_addr, addrlen);
 	}
 
+#ifdef MSG_DONTWAIT
+	if ((flags & MSG_DONTWAIT)) {
+		return (*sys_recvfrom)(sockfd, buf, len, flags,
+		       		src_addr, addrlen);
+	}
+#endif
+
+#ifdef MSG_PEEK
+	if ((flags & MSG_PEEK)) {
+		return (*sys_recvfrom)(sockfd, buf, len, flags,
+		       		src_addr, addrlen);
+	}
+#endif
+
 	fe = fiber_file_open(sockfd);
 
 #ifdef SYS_WIN
@@ -282,6 +308,18 @@ ssize_t acl_fiber_recvmsg(socket_t sockfd, struct msghdr *msg, int flags)
 	if (!var_hook_sys_api) {
 		return (*sys_recvmsg)(sockfd, msg, flags);
 	}
+
+# ifdef MSG_DONTWAIT
+	if ((flags & MSG_DONTWAIT)) {
+		return (*sys_recvmsg)(sockfd, msg, flags);
+	}
+# endif
+
+# ifdef MSG_PEEK
+	if ((flags & MSG_PEEK)) {
+		return (*sys_recvmsg)(sockfd, msg, flags);
+	}
+# endif
 
 	fe = fiber_file_open(sockfd);
 	return fiber_recvmsg(fe, msg, flags);
@@ -313,9 +351,9 @@ int acl_fiber_recvmmsg(int sockfd, struct mmsghdr *msgvec, unsigned int vlen,
 	fe = fiber_file_open(sockfd);
 	return fiber_recvmmsg(fe, msgvec, vlen, flags, timeout);
 }
-# endif
+# endif  // HAS_MMSG
 
-#endif
+#endif   // SYS_UNIX
 
 /****************************************************************************/
 
