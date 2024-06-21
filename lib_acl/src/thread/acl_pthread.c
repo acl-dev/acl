@@ -52,8 +52,9 @@ void acl_pthread_end(void)
 
 	tls_value_list_free();
 
-	if (__thread_ended)
+	if (__thread_ended) {
 		return;
+	}
 
 	__thread_ended = 1;
 	acl_pthread_mutex_destroy(&__thread_lock);
@@ -85,9 +86,10 @@ static void acl_pthread_init_once(void)
 	}
 
 	__tls_value_list_key = TlsAlloc();
-	if (__tls_value_list_key == ACL_TLS_OUT_OF_INDEXES)
+	if (__tls_value_list_key == ACL_TLS_OUT_OF_INDEXES) {
 		acl_msg_fatal("%s(%d): TlsAlloc error(%s)",
 			myname, __LINE__, acl_last_serror());
+	}
 	if (__tls_value_list_key < 0 || __tls_value_list_key
 		>= ACL_PTHREAD_KEYS_MAX)
 	{
@@ -137,26 +139,29 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 #endif
 {
 	acl_pthread_t *thread = (acl_pthread_t *) data;
-	void *return_arg;
+	//void *return_arg;
 	ACL_FIFO *tls_value_list_ptr = tls_value_list_get();
 	unsigned long *tid = 0;
 
 	/* 只是为了避免与主线程的 h_thread->handle = handle 产生冲突 */
-	if (__thread_inited)
+	if (__thread_inited) {
 		acl_pthread_mutex_lock(&__thread_lock);
-	if (__thread_inited)
+	}
+
+	if (__thread_inited) {
 		acl_pthread_mutex_unlock(&__thread_lock);
+	}
 
 	thread->id = acl_pthread_self();
-
-	return_arg = (void*) thread->start_routine(thread->routine_arg);
+	thread->return_arg = (void*) thread->start_routine(thread->routine_arg);
 
 	/* 释放由 acl_pthread_setspecific 添加的线程局部变量 */
 	while (1) {
 		TLS_VALUE *tls_value = private_fifo_pop(tls_value_list_ptr);
 
-		if (tls_value == NULL)
+		if (tls_value == NULL) {
 			break;
+		}
 
 		if (tls_value->tls_key == NULL
 			|| tls_value->tls_key->destructor == NULL
@@ -181,7 +186,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 	}
 
 	acl_default_free(__FILE__, __LINE__, thread);
-	return (DWORD) return_arg;
+	return 0;
 }
 
 int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
@@ -210,18 +215,20 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 		return ACL_ENOMEM;
 	}
 
-	if (attr != NULL)
+	if (attr != NULL) {
 		h_thread->detached = attr->detached;
-	else
+	} else {
 		h_thread->detached = 0;
+	}
 	h_thread->start_routine = start_routine;
 	h_thread->routine_arg   = arg;
 
 	if (__thread_inited) {
 		acl_pthread_mutex_lock(&__thread_lock);
 		flag = 0;
-	} else
+	} else {
 		flag = CREATE_SUSPENDED;
+	}
 
 #define	MIN_STACK	(1024 * 4096)
 
@@ -243,10 +250,11 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 			&id);
 #endif
 
-	if (__thread_inited)
+	if (__thread_inited) {
 		acl_pthread_mutex_unlock(&__thread_lock);
-	else if (flag == CREATE_SUSPENDED && handle != 0)
+	} else if (flag == CREATE_SUSPENDED && handle != 0) {
 		ResumeThread(handle);
+	}
 	if (handle == 0) {
 		acl_msg_error("%s, %s(%d): CreateThread error(%s)",
 			__FILE__, myname, __LINE__, acl_last_serror());
@@ -316,9 +324,9 @@ int acl_pthread_once(acl_pthread_once_t *once_control,
 		LONG prev = InterlockedCompareExchange(
 			once_control, 1, ACL_PTHREAD_ONCE_INIT);
 #endif
-		if (prev == 2)
+		if (prev == 2) {
 			return 0;
-		else if (prev == 0) {
+		} else if (prev == 0) {
 			/* 只有第一个线程才会至此 */
 			init_routine();
 			/* 将 *conce_control 重新赋值以使后续线程不进入 while
@@ -475,13 +483,16 @@ int acl_pthread_detach(acl_pthread_t thread)
 {
 	const char *myname = "acl_pthread_detach";
 
-	if (thread.detached)
+	if (thread.detached) {
 		return -1;
-	if (thread.handle == 0)
+	}
+
+	if (thread.handle == 0) {
 		return -1;
+	}
 
 	if (!CloseHandle(thread.handle)) {
-		acl_msg_error("close handle error(%s)", acl_last_serror());
+		acl_msg_error("%s: close handle error(%s)", myname, acl_last_serror());
 	}
 	return 0;
 }
@@ -489,11 +500,10 @@ int acl_pthread_detach(acl_pthread_t thread)
 int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 {
 	const char *myname = "acl_pthread_join";
-	void *return_arg;
+	//void *return_arg;
 
 	if (thread.detached) {
-		acl_msg_error("%s(%d): thread has been detached",
-			myname, __LINE__);
+		acl_msg_error("%s(%d): thread been detached", myname, __LINE__);
 		return -1;
 	}
 	if (thread.handle == 0) {
@@ -502,14 +512,20 @@ int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 	}
 
 	WaitForSingleObject(thread.handle, INFINITE);
+
+#if 0
 	if (GetExitCodeThread(thread.handle, (LPDWORD) &return_arg)) {
 		if (thread_return != NULL)
 			*thread_return = return_arg;
 	}
+#else
+	if (thread_return != NULL) {
+		*thread_return = thread.return_arg;
+	}
+#endif
 
 	if (!CloseHandle(thread.handle)) {
-		acl_msg_error("close handle error(%s)", 
-			acl_last_serror());
+		acl_msg_error("close handle error(%s)", acl_last_serror());
 	}
 	return 0;
 }
@@ -535,10 +551,12 @@ static void pthread_atexit_done(void *arg)
 
 	while (1) {
 		id_ptr = (pthread_atexit_t*) private_fifo_pop(id_list);
-		if (id_ptr == NULL)
+		if (id_ptr == NULL) {
 			break;
-		if (id_ptr->free_fn)
+		}
+		if (id_ptr->free_fn) {
 			id_ptr->free_fn(id_ptr->arg);
+		}
 		acl_default_free(__FILE__, __LINE__, id_ptr);
 	}
 	private_fifo_free(id_list, NULL);
@@ -678,8 +696,9 @@ static void tls_ctx_free(void *ctx)
 #ifndef HAVE_NO_ATEXIT
 static void main_tls_ctx_free(void)
 {
-	if (__main_tls_ctx)
+	if (__main_tls_ctx) {
 		tls_ctx_free(__main_tls_ctx);
+	}
 }
 #endif
 
@@ -696,8 +715,9 @@ static void tls_ctx_once_init(void)
 #ifndef HAVE_NO_ATEXIT
 		atexit(main_tls_ctx_free);
 #endif
-	} else
+	} else {
 		acl_pthread_key_create(&__tls_ctx_key, tls_ctx_free);
+	}
 }
 
 void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
@@ -756,8 +776,9 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 
 	/* 找出一个空位 */
 	for (i = 0; i < acl_tls_ctx_max; i++) {
-		if (tls_ctxes[i].key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES)
+		if (tls_ctxes[i].key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES) {
 			break;
+		}
 	}
 
 	/* 如果没有空位可用则返回空并置错误标志位 */
@@ -808,8 +829,9 @@ int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
 		return ACL_EINVAL;
 	}
 	/* 如果该键值存在旧数据则首先需要释放掉旧数据 */
-	if (tls_ctxes[(long) key].ptr != NULL && tls_ctxes[(long) key].free_fn != NULL)
+	if (tls_ctxes[(long) key].ptr != NULL && tls_ctxes[(long) key].free_fn != NULL) {
 		tls_ctxes[(long) key].free_fn(tls_ctxes[(long) key].ptr);
+	}
 
 	tls_ctxes[(long) key].free_fn = free_fn;
 	tls_ctxes[(long) key].ptr = ptr;

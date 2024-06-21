@@ -330,7 +330,7 @@ size_t acl_fiber_delay(size_t milliseconds)
 	EVENT *ev;
 
 	if (!var_hook_sys_api) {
-		doze(milliseconds);
+		doze((unsigned) milliseconds);
 		return 0;
 	}
 
