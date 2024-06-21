@@ -137,7 +137,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 #endif
 {
 	acl_pthread_t *thread = (acl_pthread_t *) data;
-	void *return_arg;
+	//void *return_arg;
 	ACL_FIFO *tls_value_list_ptr = tls_value_list_get();
 	unsigned long *tid = 0;
 
@@ -148,8 +148,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 		acl_pthread_mutex_unlock(&__thread_lock);
 
 	thread->id = acl_pthread_self();
-
-	return_arg = (void*) thread->start_routine(thread->routine_arg);
+	thread->return_arg = (void*) thread->start_routine(thread->routine_arg);
 
 	/* 释放由 acl_pthread_setspecific 添加的线程局部变量 */
 	while (1) {
@@ -181,7 +180,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 	}
 
 	acl_default_free(__FILE__, __LINE__, thread);
-	return (DWORD) return_arg;
+	return 0;
 }
 
 int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
@@ -489,7 +488,7 @@ int acl_pthread_detach(acl_pthread_t thread)
 int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 {
 	const char *myname = "acl_pthread_join";
-	void *return_arg;
+	//void *return_arg;
 
 	if (thread.detached) {
 		acl_msg_error("%s(%d): thread has been detached",
@@ -502,10 +501,17 @@ int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 	}
 
 	WaitForSingleObject(thread.handle, INFINITE);
+
+#if 0
 	if (GetExitCodeThread(thread.handle, (LPDWORD) &return_arg)) {
 		if (thread_return != NULL)
 			*thread_return = return_arg;
 	}
+#else
+	if (thread_return != NULL) {
+		*thread_return = thread.return_arg;
+	}
+#endif
 
 	if (!CloseHandle(thread.handle)) {
 		acl_msg_error("close handle error(%s)", 

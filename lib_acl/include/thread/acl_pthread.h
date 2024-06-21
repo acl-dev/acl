@@ -124,6 +124,7 @@ struct acl_pthread_t {
 	HANDLE handle;
 	void *(*start_routine)(void *);
 	void *routine_arg;
+	void *return_arg;
 	char  detached;
 };
 
