@@ -3,7 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <dlfcn.h>
+#include <ucontext.h>
 #include <libunwind.h>
+#include "libmm.h"
 
 static void stacktrace(void)
 {
@@ -35,8 +37,6 @@ static void stacktrace(void)
 	}
 }
 
-typedef void *(*malloc_fn)(size_t);
-static malloc_fn __malloc_fn = NULL;
 static size_t total_size = 0;
 static bool __check = false;
 static pthread_mutex_t __lock;
@@ -45,7 +45,6 @@ static pthread_once_t once_control = PTHREAD_ONCE_INIT;
 
 static void once_init(void)
 {
-	__malloc_fn = (malloc_fn) dlsym(RTLD_NEXT, "malloc");
 	pthread_mutex_init(&__lock, NULL);
 }
 
@@ -69,7 +68,7 @@ void *malloc(size_t size)
 		return NULL;
 	}
 
-	ptr = __malloc_fn(size);
+	ptr = mymalloc(size);
 	if (ptr && __check) {
 		if (size == 8208) {
 			//abort();
