@@ -89,7 +89,6 @@ void wait_group::wait(void)
 			}
 
 			logger_fatal("Reused before previous wait has returned");
-			return;
 		}
 	}
 }
