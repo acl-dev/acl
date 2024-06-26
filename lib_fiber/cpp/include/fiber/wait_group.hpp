@@ -1,4 +1,5 @@
 #pragma once
+#include "acl_cpp/stdlib/atomic.hpp"
 
 namespace acl {
 
@@ -9,12 +10,12 @@ public:
 	wait_group(void);
 	~wait_group(void);
 
-	void add(size_t n);
+	void add(int n);
 	void done(void);
-	size_t wait(void);
+	void wait(void);
 
 private:
-	size_t count_;
+	atomic_long state_;
 	fiber_tbox<unsigned long>* box_;
 };
 

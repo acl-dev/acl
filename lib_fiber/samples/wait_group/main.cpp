@@ -71,7 +71,7 @@ private:
 	// @override
 	void run(void) {
 		size_t ret = sync_.wait();
-		printf("All threads and fibers were done, ret=%zd\r\n", ret);
+		printf("All threads and fibers were done\r\n");
 	}
 };
 
