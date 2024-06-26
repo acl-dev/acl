@@ -6,8 +6,7 @@ static int __delay = 1;
 
 //////////////////////////////////////////////////////////////////////////////
 
-class fiber_notifier : public acl::fiber
-{
+class fiber_notifier : public acl::fiber {
 public:
 	fiber_notifier(acl::wait_group& sync) : sync_(sync) {}
 
@@ -32,8 +31,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-class thread_notifier : public acl::thread
-{
+class thread_notifier : public acl::thread {
 public:
 	thread_notifier(acl::wait_group& sync) : sync_(sync) {}
 
@@ -59,8 +57,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-class fiber_waiter : public acl::fiber
-{
+class fiber_waiter : public acl::fiber {
 public:
 	fiber_waiter(acl::wait_group& sync) : sync_(sync) {}
 	~fiber_waiter(void) {}
@@ -70,15 +67,14 @@ private:
 
 	// @override
 	void run(void) {
-		size_t ret = sync_.wait();
-		printf("All threads and fibers were done, ret=%zd\r\n", ret);
+		sync_.wait();
+		printf("All threads and fibers were done\r\n");
 	}
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
-static void usage(const char* procname)
-{
+static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -e event_type[kernel|poll|select|io_uring]\r\n"
 		" -t threads_count[default: 1]\r\n"
@@ -87,8 +83,7 @@ static void usage(const char* procname)
 		, procname);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	int  ch, threads_count = 1, fibers_count = 1;
 	acl::fiber_event_t event_type = acl::FIBER_EVENT_T_KERNEL;
 
