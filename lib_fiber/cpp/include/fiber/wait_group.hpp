@@ -1,11 +1,13 @@
 #pragma once
-#include "acl_cpp/stdlib/atomic.hpp"
+#include "fiber_cpp_define.hpp"
+
+//#include "acl_cpp/stdlib/atomic.hpp"
 
 namespace acl {
 
 template<typename T> class fiber_tbox;
 
-class wait_group {
+class FIBER_CPP_API wait_group {
 public:
 	wait_group(void);
 	~wait_group(void);

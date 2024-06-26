@@ -17,68 +17,81 @@ wait_group::~wait_group(void)
 
 void wait_group::add(int n)
 {
-    long long state = state_.add_fetch((long long)n << 32);
+	long long state = state_.add_fetch((long long)n << 32);
+
 	//高32位为任务数量
-    int c = (int)(state >> 32);
+	int c = (int)(state >> 32);
+
 	//低32位为等待者数量
-    uint32_t w =  (uint32_t)state;
+	unsigned w =  (unsigned)state;
+
 	//count不能小于0
-    if(c < 0){
-        acl_msg_fatal("wait_group: negative wait_group counter");
-    }
-    if(w != 0 && n > 0 && c == n){
-        acl_msg_fatal("wait_group: add called concurrently with wait");
-    }
-    if(c > 0 || w ==0){
-        return;
-    }
+	if (c < 0){
+		logger_fatal("Negative wait_group counter");
+	}
+
+	if (w != 0 && n > 0 && c == n){
+		logger_fatal("Add called concurrently with wait");
+	}
+
+	if (c > 0 || w == 0) {
+		return;
+	}
+
 	//检查state是否被修改
-    if(state_ != state){
-        acl_msg_fatal("wait_group: add called concurrently with wait");
-    }
+	if (state_ != state) {
+		logger_fatal("Add called concurrently with wait");
+	}
+
 	//这里count为0了，清空state并唤醒所有等待者
-    state_ = 0;
-    for (size_t i = 0; i < w; i++) {
+	state_ = 0;
+
+	for (size_t i = 0; i < w; i++) {
 #ifdef	_DEBUG
-        unsigned long* tid = new unsigned long;
-        *tid = acl::thread::self();
-        box_->push(tid);
+		unsigned long* tid = new unsigned long;
+		*tid = acl::thread::self();
+		box_->push(tid);
 #else
-        box_->push(NULL);
+		box_->push(NULL);
 #endif
-    }
+	}
 }
 
 void wait_group::done(void)
 {
-    add(-1);
+	add(-1);
 }
 
 void wait_group::wait(void)
 {
-    for(;;){
-        long long state = state_;
-        int c = (int)(state >> 32);
-        uint32_t w =  (uint32_t)state;
+	for(;;) {
+		long long state = state_;
+		int c = (int) (state >> 32);
+
 		//没有任务直接返回
-        if(c == 0) return;
+		if (c == 0) {
+			return;
+		}
+
 		//等待者数量加一，失败的话重新获取state
-        if(state_.cas(state, state + 1) == state){
-            bool found;
+		if (state_.cas(state, state + 1) == state) {
+			bool found;
 #ifdef	_DEBUG
-            unsigned long* tid = box_->pop(-1, &found);
-            assert(found);
-            delete tid;
+			unsigned long* tid = box_->pop(-1, &found);
+			assert(found);
+			delete tid;
 #else
-            (void) box_->pop(-1, &found);
-            assert(found);
+			(void) box_->pop(-1, &found);
+			assert(found);
 #endif
-            if(state_ != 0){
-                acl_msg_fatal("wait_group: wait_group is reused before previous wait has returned");
-            }
-            return;
-        }
-    }
+			if(state_ == 0) {
+				return;
+			}
+
+			logger_fatal("Reused before previous wait has returned");
+			return;
+		}
+	}
 }
 
 } // namespace acl
