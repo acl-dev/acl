@@ -5,6 +5,9 @@
 extern "C" {
 #endif
 
+void *mymalloc(size_t size);
+void print_mem_list();
+
 //void start_check(void);
 //void stop_check(void);
 

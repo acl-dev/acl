@@ -19,11 +19,9 @@ CFLAGS = -c -g -W \
 
 ###########################################################
 #Check system:
-SYSLIB =
 CHECKSYSRES = @echo "Unknow system type!";exit 1
 UNIXNAME = $(shell uname -sm)
-UNIXTYPE = LINUX
-polarssl =
+shared_ldflags =
 
 ifeq ($(CC),)
         CC = g++
@@ -42,6 +40,17 @@ ifeq ($(findstring clang++, $(CC)), clang++)
 		  -Wno-invalid-offsetof
 endif
 
+# For Linux
+ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
+	shared_ldflags += -lunwind -lunwind-x86_64 -lz -lpthread
+endif
+
+# For Darwin
+ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
+	CFLAGS += -D_XOPEN_SOURCE -Wno-deprecated-declarations
+	shared_ldflags += -lz -lpthread
+endif
+
 #Find system type.
 ifneq ($(SYSPATH),)
 	CHECKSYSRES = @echo "System is $(shell uname -sm)"
@@ -53,7 +62,6 @@ LIB_PATH_DST = .
 DEF_PATH_DST = ./debug
 
 CFLAGS += -I.
-shared_ldflags = -lunwind -lunwind-x86_64 -lz -lpthread
 
 #Project's objs
 OBJS_DST = $(patsubst %.cpp, $(OBJ_PATH_DST)/%.o, $(notdir $(wildcard ./*.cpp)))
