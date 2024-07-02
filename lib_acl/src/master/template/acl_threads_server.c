@@ -204,26 +204,30 @@ static void dispatch_open(ACL_EVENT *event, acl_pthread_pool_t *threads);
 
 static void lock_closing_time(void)
 {
-	if (acl_pthread_mutex_lock(&__closing_time_mutex) != 0)
+	if (acl_pthread_mutex_lock(&__closing_time_mutex) != 0) {
 		abort();
+	}
 }
 
 static void unlock_closing_time(void)
 {
-	if (acl_pthread_mutex_unlock(&__closing_time_mutex) != 0)
+	if (acl_pthread_mutex_unlock(&__closing_time_mutex) != 0) {
 		abort();
+	}
 }
 
 static void lock_counter(void)
 {
-	if (acl_pthread_mutex_lock(&__counter_mutex) != 0)
+	if (acl_pthread_mutex_lock(&__counter_mutex) != 0) {
 		abort();
+	}
 }
 
 static void unlock_counter(void)
 {
-	if (acl_pthread_mutex_unlock(&__counter_mutex) != 0)
+	if (acl_pthread_mutex_unlock(&__counter_mutex) != 0) {
 		abort();
+	}
 }
 
 static void update_closing_time(void)
@@ -251,11 +255,16 @@ static void increase_client_counter(void)
 	unlock_counter();
 }
 
-static void decrease_client_counter(void)
+static int decrease_client_counter(void)
 {
+	int left;
+
 	lock_counter();
-	__client_count--;
+	--__client_count;
+	left = __client_count;
 	unlock_counter();
+
+	return left;
 }
 
 static int get_client_count(void)
@@ -456,6 +465,11 @@ static void server_timeout(int type acl_unused, ACL_EVENT *event, void *ctx)
 	const char *myname = "server_timeout";
 	time_t last, inter;
 
+	/* sanity check to avoid exiting early */
+	if (get_client_count() > 0) {
+		return;
+	}
+
 	last  = last_closing_time();
 	inter = time(NULL) - last;
 
@@ -638,7 +652,11 @@ static void decrease_counter_callback(ACL_VSTREAM *stream acl_unused,
 	void *arg acl_unused)
 {
 	update_closing_time();
-	decrease_client_counter();
+
+	if (decrease_client_counter() == 0 && acl_var_threads_idle_limit > 0) {
+		acl_event_request_timer(__event, server_timeout, __threads,
+			(acl_int64) acl_var_threads_idle_limit * 1000000, 0);
+	}
 }
 
 static READ_CTX *create_job(ACL_EVENT *event, acl_pthread_pool_t *threads,
@@ -753,7 +771,7 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 {
 	const char *myname = "server_accept_sock";
 	ACL_SOCKET listen_fd = ACL_VSTREAM_SOCK(stream), fd;
-	int   time_left = -1, i = 0, delay_listen = 0, sock_type, errnum;
+	int   i = 0, delay_listen = 0, sock_type, errnum;
 	char  remote[64], local[64];
 	acl_pthread_pool_t *threads = (acl_pthread_pool_t*) ctx;
 
@@ -768,10 +786,7 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 	}
 
 	if (acl_var_threads_idle_limit > 0) {
-		time_left = (int) ((acl_event_cancel_timer(event,
-			server_timeout, threads) + 999999) / 1000000);
-	} else {
-		time_left = acl_var_threads_idle_limit;
+		acl_event_cancel_timer(event, server_timeout, threads);
 	}
 
 	while (i++ < acl_var_threads_max_accept) {
@@ -834,11 +849,6 @@ static void server_accept_sock(int event_type, ACL_EVENT *event,
 	} else {
 		acl_event_enable_listen(event, stream, 0,
 			__server_accept, threads);
-	}
-
-	if (time_left > 0) {
-		acl_event_request_timer(event, server_timeout, threads,
-			(acl_int64) time_left * 1000000, 0);
 	}
 }
 
