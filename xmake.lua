@@ -20,6 +20,7 @@ add_defines("ACL_WRITEABLE_CHECK", "ACL_PREPARE_COMPILE")
 -- for the windows platform (msvc)
 if is_plat("windows") then 
     add_ldflags("-nodefaultlib:\"msvcrt.lib\"")
+    set_encodings("source:utf-8")
 end
 -- for the windows platform (msvc)
 if is_plat("windows") then 
