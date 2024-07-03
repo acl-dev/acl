@@ -60,7 +60,7 @@ bool queue_file::create(const char* home, const char* queueName,
 	unsigned int n;
 
 	while (true) {
-		// ²úÉú²¿·ÖÎÄ¼şÃû
+		// äº§ç”Ÿéƒ¨åˆ†æ–‡ä»¶å
 		memset(&tv, 0, sizeof(tv));
 		gettimeofday(&tv, NULL);
 		safe_snprintf(m_partName, sizeof(m_partName),
@@ -74,7 +74,7 @@ bool queue_file::create(const char* home, const char* queueName,
 			__counter = 0;
 		}
 
-		// ¼ÆËã¶ÓÁĞ×ÓÄ¿Â¼
+		// è®¡ç®—é˜Ÿåˆ—å­ç›®å½•
 		n = queue_manager::hash_queueSub(m_partName, width);
 		safe_snprintf(m_queueSub, sizeof(m_queueSub), "%u", n);
 
@@ -87,7 +87,7 @@ bool queue_file::create(const char* home, const char* queueName,
 		dir_exist = false;
 
 		while (true) {
-			// ÅÅËüĞÔ´´½¨Î¨Ò»ÎÄ¼ş
+			// æ’å®ƒæ€§åˆ›å»ºå”¯ä¸€æ–‡ä»¶
 			if (fp->open(buf.c_str(), O_RDWR | O_CREAT | O_EXCL, 0600)) {
 				goto END;
 			}
@@ -98,7 +98,7 @@ bool queue_file::create(const char* home, const char* queueName,
 				break;
 			}
 
-			// ³¢ÊÔĞÔ´´½¨Ä¿Â¼
+			// å°è¯•æ€§åˆ›å»ºç›®å½•
 			buf.clear();
 			buf << m_home << PATH_SEP << m_queueName << PATH_SEP << m_queueSub;
 			if (acl_make_dirs(buf.c_str(), 0700) == -1) {
@@ -129,7 +129,7 @@ END:
 	m_fp = fp;
 	m_filePath = buf.c_str();
 
-	// ´ò¿ª¶ÓÁĞÎÄ¼ş¶ÔÏóËø
+	// æ‰“å¼€é˜Ÿåˆ—æ–‡ä»¶å¯¹è±¡é”
 	if (!m_locker.open(m_fp->file_handle())) {
 		logger_error("open lock for %s error(%s)",
 			m_filePath.c_str(), last_serror());
@@ -192,7 +192,7 @@ bool queue_file::open(const char* home, const char* queueName,
 		ACL_SAFE_STRNCPY(m_extName, extName, sizeof(m_extName));
 	}
 
-	// ´ò¿ª¶ÓÁĞÎÄ¼ş¶ÔÏóËø
+	// æ‰“å¼€é˜Ÿåˆ—æ–‡ä»¶å¯¹è±¡é”
 	if (!m_locker.open(m_fp->file_handle())) {
 		logger_error("open lock for %s error(%s)",
 			m_filePath.c_str(), last_serror());
@@ -201,7 +201,7 @@ bool queue_file::open(const char* home, const char* queueName,
 		m_bLockerOpened = true;
 	}
 
-	// XXX, ĞèÒª·ÖÎö¸ÃÈ«Â·¾¶, ÒÔÌáÈ¡ĞèÒªµÄ×Ö¶Î
+	// XXX, éœ€è¦åˆ†æè¯¥å…¨è·¯å¾„, ä»¥æå–éœ€è¦çš„å­—æ®µ
 	return true;
 }
 
@@ -320,7 +320,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 			<< PATH_SEP << m_partName << "." << extName;
 
 #ifdef ACL_WINDOWS
-		// ÔÚwin32ÏÂ±ØĞëÏÈ¹Ø±ÕÎÄ¼ş¾ä±ú
+		// åœ¨win32ä¸‹å¿…é¡»å…ˆå…³é—­æ–‡ä»¶å¥æŸ„
 		this->close();
 #endif
 
@@ -328,7 +328,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 			break;
 		}
 
-		// Èç¹û·µ»Ø´íÎóÔ­ÒòÊÇÄ¿±êÂ·¾¶²»´æÔÚ£¬Ôò³¢ÊÔ´´½¨Ä¿Â¼½á¹¹
+		// å¦‚æœè¿”å›é”™è¯¯åŸå› æ˜¯ç›®æ ‡è·¯å¾„ä¸å­˜åœ¨ï¼Œåˆ™å°è¯•åˆ›å»ºç›®å½•ç»“æ„
 
 		if (once_again || acl_last_error() != ENOENT) {
 			logger_error("move from %s to %s error(%s), errno: %d, %d",
@@ -337,14 +337,14 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 			return false;
 		}
 
-		// ÉèÖÃÖØÊÔ±êÖ¾Î»
+		// è®¾ç½®é‡è¯•æ ‡å¿—ä½
 		once_again = true;
 
 		buf.clear();
 		buf << m_home << PATH_SEP << queueName
 			<< PATH_SEP << m_queueSub;
 
-		// ´´½¨¶ÓÁĞÄ¿Â¼
+		// åˆ›å»ºé˜Ÿåˆ—ç›®å½•
 		if (acl_make_dirs(buf.c_str(), 0700) == -1) {
 			logger_error("mkdir: %s error(%s)",
 				buf.c_str(), last_serror());
@@ -353,7 +353,7 @@ bool queue_file::move_file(const char* queueName, const char* extName)
 	}
 
 #ifdef ACL_WINDOWS
-	// win32 ÏÂĞèÒªÖØĞÂÔÙ´ò¿ª
+	// win32 ä¸‹éœ€è¦é‡æ–°å†æ‰“å¼€
 	return open(m_home, queueName, m_queueSub, m_partName, extName);
 #else
 	if (m_queueName != queueName) {

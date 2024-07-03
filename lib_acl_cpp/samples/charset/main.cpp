@@ -5,7 +5,7 @@
 
 static int test1(void)
 {
-	const char* s = "ÖĞ¹úÈËÃñ¹²ºÍ¹ú";
+	const char* s = "ä¸­å›½äººæ°‘å…±å’Œå›½";
 	acl::charset_conv conv;
 	acl::string out, out2, out3;
 	acl::fstream out_fp;
@@ -102,7 +102,7 @@ static int test1(void)
 	}
 	printf("ok, hz to gb2312: %s, len: %d\n", out2.c_str(), (int) out2.length());
 
-	///////////////////////    Á÷Ê½½âÎö¹ı³Ì²âÊÔ   ///////////////////////
+	///////////////////////    æµå¼è§£æè¿‡ç¨‹æµ‹è¯•   ///////////////////////
 
 	/////////////////////////////////////////////////////////////////////
 

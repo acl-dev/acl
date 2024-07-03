@@ -55,8 +55,8 @@ typedef struct EVENT_KERNEL {
 } EVENT_KERNEL;
 
 /**
- * ¶ÔÓÚ epoll/kqueue/devpoll ÕâĞ©ÄÚºË¼¶²Ù×÷£¬µ±ÃèÊö·û¹Ø±ÕÊ±¸ÃÃèÊö·û½«
- * »á×Ô¶¯´ÓÄÚºË¼à¿ØÖĞÈ¥³ı
+ * å¯¹äº epoll/kqueue/devpoll è¿™äº›å†…æ ¸çº§æ“ä½œï¼Œå½“æè¿°ç¬¦å…³é—­æ—¶è¯¥æè¿°ç¬¦å°†
+ * ä¼šè‡ªåŠ¨ä»å†…æ ¸ç›‘æ§ä¸­å»é™¤
  */
 #undef	EVENT_AUTO_DEL
 
@@ -164,7 +164,7 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 
 		stream->fdp = (void *) fdp;
-		/* Ìí¼ÓÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı */
+		/* æ·»åŠ æµå…³é—­æ—¶çš„å›è°ƒå‡½æ•° */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 #ifdef	USE_FDMAP
 		acl_fdmap_add(ev->fdmap, sockfd, fdp);
@@ -173,12 +173,12 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		goto END;
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_DEL_READ)) {
 
-		/* Í£Ö¹½ûÖ¹¶Á¼àÌı¹ı³Ì */
+		/* åœæ­¢ç¦æ­¢è¯»ç›‘å¬è¿‡ç¨‹ */
 
 		acl_assert((fdp->flag & EVENT_FDTABLE_FLAG_READ));
 
-		/* ÖØĞÂÆôÓÃ¶Á¼àÌı¹ı³Ì, ÒòÎªÖ®Ç°µÄ¹ı³ÌÊÇÕıÔÚ²ğ³ı¶Á¼àÌı¹ı³Ìµ«
-		 * »¹Ã»ÓĞÕıÊ½²ğ³ı£¬ËùÒÔÖ»ĞèÒªÇå³ı²ğ³ı±êÖ¾Î»¼´¿É
+		/* é‡æ–°å¯ç”¨è¯»ç›‘å¬è¿‡ç¨‹, å› ä¸ºä¹‹å‰çš„è¿‡ç¨‹æ˜¯æ­£åœ¨æ‹†é™¤è¯»ç›‘å¬è¿‡ç¨‹ä½†
+		 * è¿˜æ²¡æœ‰æ­£å¼æ‹†é™¤ï¼Œæ‰€ä»¥åªéœ€è¦æ¸…é™¤æ‹†é™¤æ ‡å¿—ä½å³å¯
 		 */
 
 		fdp->flag &= ~EVENT_FDTABLE_FLAG_DEL_READ;
@@ -253,7 +253,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		acl_ring_append(&ev->fdp_delay_list, &fdp->delay_entry);
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 		stream->fdp = (void *) fdp;
-		/* Ìí¼ÓÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı */
+		/* æ·»åŠ æµå…³é—­æ—¶çš„å›è°ƒå‡½æ•° */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 #ifdef	USE_FDMAP
 		acl_fdmap_add(ev->fdmap, sockfd, fdp);
@@ -618,7 +618,7 @@ static void event_set_all(ACL_EVENT *eventp)
 	EVENT_KERNEL *ev = (EVENT_KERNEL *) eventp;
 	ACL_EVENT_FDTABLE *fdp;
 
-	/* ÓÅÏÈ´¦ÀíÌí¼Ó¶Á/Ğ´¼à¿ØÈÎÎñ, ÕâÑù¿ÉÒÔ°Ñ ADD ÖĞ¼äÌ¬×ª»»³ÉÕıÊ½×´Ì¬ */
+	/* ä¼˜å…ˆå¤„ç†æ·»åŠ è¯»/å†™ç›‘æ§ä»»åŠ¡, è¿™æ ·å¯ä»¥æŠŠ ADD ä¸­é—´æ€è½¬æ¢æˆæ­£å¼çŠ¶æ€ */
 
 	eventp->ready_cnt = 0;
 
@@ -629,7 +629,7 @@ static void event_set_all(ACL_EVENT *eventp)
 		event_check_fds(eventp);
 	}
 
-	/* ´¦ÀíÈÎÎñÏî */
+	/* å¤„ç†ä»»åŠ¡é¡¹ */
 
 	while (1) {
 		ACL_RING *r = acl_ring_pop_head(&ev->fdp_delay_list);
@@ -668,11 +668,11 @@ static void event_loop(ACL_EVENT *eventp)
 		delay = DELAY_MIN;
 	}
 
-	/* µ÷ÕûÊÂ¼şÒıÇæµÄÊ±¼ä½Ø */
+	/* è°ƒæ•´äº‹ä»¶å¼•æ“çš„æ—¶é—´æˆª */
 
 	SET_TIME(eventp->present);
 
-	/* ¸ù¾İ¶¨Ê±Æ÷ÈÎÎñµÄ×î½üÈÎÎñ¼ÆËã epoll/kqueue/devpoll µÄ¼ì²â³¬Ê±ÉÏÏŞ */
+	/* æ ¹æ®å®šæ—¶å™¨ä»»åŠ¡çš„æœ€è¿‘ä»»åŠ¡è®¡ç®— epoll/kqueue/devpoll çš„æ£€æµ‹è¶…æ—¶ä¸Šé™ */
 
 	when = event_timer_when(eventp);
 	if (when > 0) {
@@ -684,7 +684,7 @@ static void event_loop(ACL_EVENT *eventp)
 		}
 	}
 
-	/* ÉèÖÃÃèÊö×Ö¶ÔÏóµÄ×´Ì¬£¬Ìí¼Ó/É¾³ıÖ®Ç°ÉèÖÃµÄÃèÊö×Ö¶ÔÏó */
+	/* è®¾ç½®æè¿°å­—å¯¹è±¡çš„çŠ¶æ€ï¼Œæ·»åŠ /åˆ é™¤ä¹‹å‰è®¾ç½®çš„æè¿°å­—å¯¹è±¡ */
 
 	event_set_all(eventp);
 
@@ -696,13 +696,13 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 	}
 
-	/* Èç¹ûÒÑ¾­ÓĞÃèÊö×Ö×¼±¸ºÃÔò¼ì²â³¬Ê±Ê±¼äÖÃ 0 */
+	/* å¦‚æœå·²ç»æœ‰æè¿°å­—å‡†å¤‡å¥½åˆ™æ£€æµ‹è¶…æ—¶æ—¶é—´ç½® 0 */
 
 	if (eventp->ready_cnt > 0) {
 		delay = 0;
 	}
 
-	/* µ÷ÓÃ epoll/kquque/devpoll ÏµÍ³µ÷ÓÃ¼ì²â¿ÉÓÃÃèÊö×Ö */
+	/* è°ƒç”¨ epoll/kquque/devpoll ç³»ç»Ÿè°ƒç”¨æ£€æµ‹å¯ç”¨æè¿°å­— */
 
 	EVENT_BUFFER_READ(nready, ev->event_fd, ev->event_buf,
 		ev->event_fdslots, (int) (delay / 1000));
@@ -724,7 +724,7 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 	}
 
-	/* ¼ì²é¼ì²â½á¹û */
+	/* æ£€æŸ¥æ£€æµ‹ç»“æœ */
 
 	for (bp = ev->event_buf; bp < ev->event_buf + nready; bp++) {
 #ifdef	USE_FDMAP
@@ -746,17 +746,17 @@ static void event_loop(ACL_EVENT *eventp)
 		}
 #endif
 
-		/* Èç¹û¸ÃÃèÊö×Ö¶ÔÏóÒÑ¾­ÔÚ±»ÉèÖÃÎªÒì³£»ò³¬Ê±×´Ì¬Ôò¼ÌĞø */
+		/* å¦‚æœè¯¥æè¿°å­—å¯¹è±¡å·²ç»åœ¨è¢«è®¾ç½®ä¸ºå¼‚å¸¸æˆ–è¶…æ—¶çŠ¶æ€åˆ™ç»§ç»­ */
 
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
 		}
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿É¶Á */
+		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å¯è¯» */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ)
 		    && EVENT_TEST_READ(bp)) {
-			/* ¸ø¸ÃÃèÊö×Ö¶ÔÏó¸½¼Ó¿É¶ÁÊôĞÔ */
+			/* ç»™è¯¥æè¿°å­—å¯¹è±¡é™„åŠ å¯è¯»å±æ€§ */
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0) {
 
@@ -768,19 +768,19 @@ static void event_loop(ACL_EVENT *eventp)
 			if (fdp->listener) {
 				fdp->event_type |= ACL_EVENT_ACCEPT;
 			}
-			/* ¸ÃÃèÊö×Ö¿É¶ÁÔòÉèÖÃ ACL_VSTREAM µÄÏµÍ³¿É¶Á±êÖ¾´Ó¶ø
-			 * ´¥·¢ ACL_VSTREAM Á÷ÔÚ¶ÁÊ±µ÷ÓÃÏµÍ³µÄ read º¯Êı
+			/* è¯¥æè¿°å­—å¯è¯»åˆ™è®¾ç½® ACL_VSTREAM çš„ç³»ç»Ÿå¯è¯»æ ‡å¿—ä»è€Œ
+			 * è§¦å‘ ACL_VSTREAM æµåœ¨è¯»æ—¶è°ƒç”¨ç³»ç»Ÿçš„ read å‡½æ•°
 			 */
 			else {
 				fdp->stream->read_ready = 1;
 			}
 		}
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿ÉĞ´ */
+		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å¯å†™ */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 		    && EVENT_TEST_WRITE(bp)) {
-			/* ¸ø¸ÃÃèÊö×Ö¶ÔÏó¸½¼Ó¿ÉĞ´ÊôĞÔ */
+			/* ç»™è¯¥æè¿°å­—å¯¹è±¡é™„åŠ å¯å†™å±æ€§ */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
 			    | ACL_EVENT_WRITE)) == 0) {
@@ -792,7 +792,7 @@ static void event_loop(ACL_EVENT *eventp)
 
 #ifdef	EVENT_TEST_ERROR
 		if (EVENT_TEST_ERROR(bp)) {
-			/* Èç¹û³öÏÖÒì³£ÔòÉèÖÃÒì³£ÊôĞÔ */
+			/* å¦‚æœå‡ºç°å¼‚å¸¸åˆ™è®¾ç½®å¼‚å¸¸å±æ€§ */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
 			    | ACL_EVENT_WRITE)) == 0) {
@@ -808,7 +808,7 @@ TAG_DONE:
 
 	event_timer_trigger(eventp);
 
-	/* ´¦Àí×¼±¸ºÃµÄÃèÊö×ÖÊÂ¼ş */
+	/* å¤„ç†å‡†å¤‡å¥½çš„æè¿°å­—äº‹ä»¶ */
 	if (eventp->ready_cnt > 0) {
 		event_fire(eventp);
 	}

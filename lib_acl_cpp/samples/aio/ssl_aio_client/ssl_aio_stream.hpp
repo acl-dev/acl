@@ -13,21 +13,21 @@ class ACL_CPP_API ssl_aio_stream
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı£¬´´½¨ÍøÂçÒì²½¿Í»§¶ËÁ÷
-	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú
-	 * @param stream {ACL_ASTREAM*} ·Ç×èÈûÁ÷
-	 * @param opened {bool} ¸ÃÁ÷ÊÇ·ñÒÑ¾­Óë·şÎñ¶ËÕı³£½¨Á¢ÁËÁ¬½Ó£¬Èç¹ûÊÇÔò×Ô¶¯
-	 *  hook ¶ÁĞ´¹ı³Ì¼°¹Ø±Õ/³¬Ê±¹ı³Ì£¬·ñÔò½ö hook ¹Ø±Õ/³¬Ê±¹ı³Ì
-	 * @param use_ssl {bool} ÊÇ·ñÊ¹ÓÃ SSL Ì×½Ó¿Ú
+	 * æ„é€ å‡½æ•°ï¼Œåˆ›å»ºç½‘ç»œå¼‚æ­¥å®¢æˆ·ç«¯æµ
+	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
+	 * @param stream {ACL_ASTREAM*} éé˜»å¡æµ
+	 * @param opened {bool} è¯¥æµæ˜¯å¦å·²ç»ä¸æœåŠ¡ç«¯æ­£å¸¸å»ºç«‹äº†è¿æ¥ï¼Œå¦‚æœæ˜¯åˆ™è‡ªåŠ¨
+	 *  hook è¯»å†™è¿‡ç¨‹åŠå…³é—­/è¶…æ—¶è¿‡ç¨‹ï¼Œå¦åˆ™ä»… hook å…³é—­/è¶…æ—¶è¿‡ç¨‹
+	 * @param use_ssl {bool} æ˜¯å¦ä½¿ç”¨ SSL å¥—æ¥å£
 	 */
 	ssl_aio_stream(aio_handle* handle, ACL_ASTREAM* stream,
 		bool opened = false, bool use_ssl = true);
 
 	/**
-	 * ¹¹Ôìº¯Êı£¬´´½¨ÍøÂçÒì²½¿Í»§¶ËÁ÷£¬²¢ hook ¶ÁĞ´¹ı³Ì¼°¹Ø±Õ/³¬Ê±¹ı³Ì
-	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú
-	 * @param fd {ACL_SOCKET} Á¬½ÓÌ×½Ó¿Ú¾ä±ú
-	 * @param use_ssl {bool} ÊÇ·ñÊ¹ÓÃ SSL Ì×½Ó¿Ú
+	 * æ„é€ å‡½æ•°ï¼Œåˆ›å»ºç½‘ç»œå¼‚æ­¥å®¢æˆ·ç«¯æµï¼Œå¹¶ hook è¯»å†™è¿‡ç¨‹åŠå…³é—­/è¶…æ—¶è¿‡ç¨‹
+	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
+	 * @param fd {ACL_SOCKET} è¿æ¥å¥—æ¥å£å¥æŸ„
+	 * @param use_ssl {bool} æ˜¯å¦ä½¿ç”¨ SSL å¥—æ¥å£
 	 */
 #ifdef	WIN32
 	ssl_aio_stream(aio_handle* handle, SOCKET fd, bool use_ssl = true);
@@ -36,27 +36,27 @@ public:
 #endif
 
 	/**
-	 * ´ò¿ªÓëÔ¶³Ì·şÎñÆ÷µÄÁ¬½Ó£¬²¢×Ô¶¯ hook Á÷µÄ¹Ø±Õ¡¢³¬Ê±ÒÔ¼°Á¬½Ó³É¹¦
-	 * Ê±µÄ»Øµ÷´¦Àí¹ı³Ì
-	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú
-	 * @param addr {const char*} Ô¶³Ì·şÎñÆ÷µÄµØÖ·£¬µØÖ·¸ñÊ½Îª£º
-	 *  Õë¶ÔTCP£ºIP:Port »ò Õë¶ÔÓòÌ×½Ó¿Ú£º{filePath}
-	 * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(Ãë)
-	 * @param use_ssl {bool} ÊÇ·ñÊ¹ÓÃ SSL Ì×½Ó¿Ú
-	 * @return {bool} Èç¹ûÁ¬½ÓÁ¢¼´·µ»ØÊ§°ÜÔò¸Ãº¯Êı·µ»Ø false£¬Èç¹û·µ»Ø
-	 *  true Ö»ÊÇ±íÊ¾Õı´¦ÓÚÁ¬½Ó¹ı³ÌÖĞ£¬ÖÁÓÚÁ¬½ÓÊÇ·ñ³¬Ê±»òÁ¬½ÓÊÇ·ñÊ§°Ü
-	 *  Ó¦Í¨¹ı»Øµ÷º¯ÊıÀ´ÅĞ¶Ï
+	 * æ‰“å¼€ä¸è¿œç¨‹æœåŠ¡å™¨çš„è¿æ¥ï¼Œå¹¶è‡ªåŠ¨ hook æµçš„å…³é—­ã€è¶…æ—¶ä»¥åŠè¿æ¥æˆåŠŸ
+	 * æ—¶çš„å›è°ƒå¤„ç†è¿‡ç¨‹
+	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
+	 * @param addr {const char*} è¿œç¨‹æœåŠ¡å™¨çš„åœ°å€ï¼Œåœ°å€æ ¼å¼ä¸ºï¼š
+	 *  é’ˆå¯¹TCPï¼šIP:Port æˆ– é’ˆå¯¹åŸŸå¥—æ¥å£ï¼š{filePath}
+	 * @param timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´(ç§’)
+	 * @param use_ssl {bool} æ˜¯å¦ä½¿ç”¨ SSL å¥—æ¥å£
+	 * @return {bool} å¦‚æœè¿æ¥ç«‹å³è¿”å›å¤±è´¥åˆ™è¯¥å‡½æ•°è¿”å› falseï¼Œå¦‚æœè¿”å›
+	 *  true åªæ˜¯è¡¨ç¤ºæ­£å¤„äºè¿æ¥è¿‡ç¨‹ä¸­ï¼Œè‡³äºè¿æ¥æ˜¯å¦è¶…æ—¶æˆ–è¿æ¥æ˜¯å¦å¤±è´¥
+	 *  åº”é€šè¿‡å›è°ƒå‡½æ•°æ¥åˆ¤æ–­
 	 */
 	static ssl_aio_stream* open(aio_handle* handle,
 		const char* addr, int timeout, bool use_ssl = true);
 
 	/**
-	 * ¸Ãº¯ÊıÓÃÀ´¶ÔÒÑ¾­´ò¿ªµÄÁ÷½øĞĞ²Ù×÷£¬ÒÔÔÊĞíºóÆÚ½«Á÷ÉèÎª SSL Ä£Ê½
-	 * »ò·Ç SSL Ä£Ê½
-	 * @param on {bool} ÊÇ·ñÆôÓÃ SSL Ä£Ê½£¬µ±¸Ã²ÎÊıÎª false Ê±£¬Èç¹û
-	 *  µ±Ç°Á÷ÒÑ¾­ÊÇ SSL Ä£Ê½£¬Ôò¹Ø±Õ SSL Ä£Ê½£¬Èç¹ûµ±Ç°Á÷Îª·Ç SSL
-	 *  Ä£Ê½£¬ÔòÖ±½Ó·µ»Ø£»µ±¸Ã²ÎÊıÎª true Ê±£¬Èç¹ûµ±Ç°Á÷ÒÑ¾­ÊÇ SSL
-	 *  Ä£Ê½£¬ÔòÖ±½Ó·µ»Ø£¬Èç¹ûµ±Ç°Á÷Îª·Ç SSL Ä£Ê½£¬Ôò´ò¿ª SSL Ä£Ê½
+	 * è¯¥å‡½æ•°ç”¨æ¥å¯¹å·²ç»æ‰“å¼€çš„æµè¿›è¡Œæ“ä½œï¼Œä»¥å…è®¸åæœŸå°†æµè®¾ä¸º SSL æ¨¡å¼
+	 * æˆ–é SSL æ¨¡å¼
+	 * @param on {bool} æ˜¯å¦å¯ç”¨ SSL æ¨¡å¼ï¼Œå½“è¯¥å‚æ•°ä¸º false æ—¶ï¼Œå¦‚æœ
+	 *  å½“å‰æµå·²ç»æ˜¯ SSL æ¨¡å¼ï¼Œåˆ™å…³é—­ SSL æ¨¡å¼ï¼Œå¦‚æœå½“å‰æµä¸ºé SSL
+	 *  æ¨¡å¼ï¼Œåˆ™ç›´æ¥è¿”å›ï¼›å½“è¯¥å‚æ•°ä¸º true æ—¶ï¼Œå¦‚æœå½“å‰æµå·²ç»æ˜¯ SSL
+	 *  æ¨¡å¼ï¼Œåˆ™ç›´æ¥è¿”å›ï¼Œå¦‚æœå½“å‰æµä¸ºé SSL æ¨¡å¼ï¼Œåˆ™æ‰“å¼€ SSL æ¨¡å¼
 	 * @return {bool}
 	 */
 	bool open_ssl(bool on);
@@ -65,7 +65,7 @@ protected:
 	virtual ~ssl_aio_stream();
 
 	/**
-	* »ùÀà aio_open_callback µÄĞé½Ó¿Ú
+	* åŸºç±» aio_open_callback çš„è™šæ¥å£
 	*/
 	virtual bool open_callback();
 private:

@@ -5,7 +5,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// Ã…Ã¤Ã–ÃƒÃ„ÃšÃˆÃÃÃ®
 
 char *var_cfg_guard_manager;
 char *var_cfg_master_ctld;

@@ -265,7 +265,7 @@ ACL_DNS_DB *dns_cache_lookup(DNS_CACHE *dns_cache, const char *name)
 	} else
 		cache_lock(dns_cache);
 
-	cache_timer_fn(dns_cache); /* 先启动定时清理器，将过期的DNS解析去掉 */
+	cache_timer_fn(dns_cache); /* 鍏堝惎鍔ㄥ畾鏃舵竻鐞嗗櫒锛屽皢杩囨湡鐨凞NS瑙ｆ瀽鍘绘帀 */
 
 	ACL_SAFE_STRNCPY(buf, name, sizeof(buf));
 	acl_lowercase(buf);

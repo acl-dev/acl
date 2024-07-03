@@ -3,7 +3,7 @@
 // Used by lib_ctrl.RC
 //
 
-// пб╤тоС╣добр╩п╘д╛хож╣
+// Ф√╟Е╞╧Х╠║Г └Д╦▀Д╦─Д╨⌡И╩≤Х╝╓Е─╪
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

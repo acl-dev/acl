@@ -271,7 +271,7 @@ stream_hook* stream::setup_hook(stream_hook* hook)
 		acl_vstream_add_object(stream_, HOOK_KEY, this);
 
 		if (!hook->open(stream_)) {
-			// Èç¹û´ò¿ªÊ§°Ü£¬Ôò»Ö¸´
+			// å¦‚æžœæ‰“å¼€å¤±è´¥ï¼Œåˆ™æ¢å¤
 
 			stream_->fread_fn  = read_fn;
 			stream_->fwrite_fn = write_fn;
@@ -289,7 +289,7 @@ stream_hook* stream::setup_hook(stream_hook* hook)
 		acl_tcp_set_nodelay(ACL_VSTREAM_SOCK(stream_));
 
 		if (!hook->open(stream_)) {
-			// Èç¹û´ò¿ªÊ§°Ü£¬Ôò»Ö¸´
+			// å¦‚æžœæ‰“å¼€å¤±è´¥ï¼Œåˆ™æ¢å¤
 
 			stream_->read_fn  = read_fn;
 			stream_->write_fn = write_fn;

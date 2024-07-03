@@ -8,127 +8,127 @@ extern "C" {
 #include "acl_define.h"
 #include "acl_iterator.h"
 
-/* ËµÃ÷£º¸Ãº¯Êý¿âÄÚ²¿ËùÓÃµÄÄÚ´æ·ÖÅäÎ´²ÉÓÃÄÚ´æ³Ø·½Ê½ */
+/* è¯´æ˜Žï¼šè¯¥å‡½æ•°åº“å†…éƒ¨æ‰€ç”¨çš„å†…å­˜åˆ†é…æœªé‡‡ç”¨å†…å­˜æ± æ–¹å¼ */
 
 typedef struct ACL_STACK ACL_STACK;
 
 /**
- * Õ»ÀàÐÍ¶¨Òå
+ * æ ˆç±»åž‹å®šä¹‰
  */
 struct ACL_STACK {
 	int   capacity;
 	int   count;
 	void **items;
 
-	/* Ìí¼Ó¼°µ¯³ö */
+	/* æ·»åŠ åŠå¼¹å‡º */
 
-	/* ÏòÕ»Î²²¿Ìí¼Ó¶¯Ì¬¶ÔÏó */
+	/* å‘æ ˆå°¾éƒ¨æ·»åŠ åŠ¨æ€å¯¹è±¡ */
 	void  (*push_back)(struct ACL_STACK*, void*);
-	/* ÏòÕ»Í·²¿Ìí¼Ó¶¯Ì¬¶ÔÏó */
+	/* å‘æ ˆå¤´éƒ¨æ·»åŠ åŠ¨æ€å¯¹è±¡ */
 	void  (*push_front)(struct ACL_STACK*, void*);
-	/* µ¯³öÕ»Î²²¿¶¯Ì¬¶ÔÏó */
+	/* å¼¹å‡ºæ ˆå°¾éƒ¨åŠ¨æ€å¯¹è±¡ */
 	void *(*pop_back)(struct ACL_STACK*);
-	/* µ¯³öÕ»Í·²¿¶¯Ì¬¶ÔÏó */
+	/* å¼¹å‡ºæ ˆå¤´éƒ¨åŠ¨æ€å¯¹è±¡ */
 	void *(*pop_front)(struct ACL_STACK*);
 
 	/* for acl_iterator */
 
-	/* È¡µü´úÆ÷Í·º¯Êý */
+	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
 	void *(*iter_head)(ACL_ITER*, struct ACL_STACK*);
-	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
 	void *(*iter_next)(ACL_ITER*, struct ACL_STACK*);
-	/* È¡µü´úÆ÷Î²º¯Êý */
+	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_STACK*);
-	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_STACK*);
 };
 
 /**
- * Ôö¼ÓÕ»¿Õ¼ä´óÐ¡
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @param count {int} Ôö¼ÓµÄ¿Õ¼ä´óÐ¡
+ * å¢žåŠ æ ˆç©ºé—´å¤§å°
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @param count {int} å¢žåŠ çš„ç©ºé—´å¤§å°
  */
 ACL_API void acl_stack_space(ACL_STACK *s, int count);
 
 /**
- * ´´½¨Ò»¸öÕ»ÈÝÆ÷¶ÔÏó
- * @param init_size {int} Õ»µÄ³õÊ¼»¯¿Õ¼ä´óÐ¡£¬±ØÐë > 0
- * @return {ACL_STACK*} ÐÂ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
+ * åˆ›å»ºä¸€ä¸ªæ ˆå®¹å™¨å¯¹è±¡
+ * @param init_size {int} æ ˆçš„åˆå§‹åŒ–ç©ºé—´å¤§å°ï¼Œå¿…é¡» > 0
+ * @return {ACL_STACK*} æ–°åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
  */
 ACL_API ACL_STACK *acl_stack_create(int init_size);
 
 /**
- * Çå¿ÕÕ»ÀïµÄ¶ÔÏó£¬µ«²»Ïú»ÙÕ»ÈÝÆ÷¶ÔÏó
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @param free_fn {void (*)(void*)} Èç¹û²»Îª¿Õ£¬Ôò»áÓÃ´Ëº¯Êý»Øµ÷Õ»ÀïµÄÃ¿Ò»¸ö¶ÔÏó
+ * æ¸…ç©ºæ ˆé‡Œçš„å¯¹è±¡ï¼Œä½†ä¸é”€æ¯æ ˆå®¹å™¨å¯¹è±¡
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @param free_fn {void (*)(void*)} å¦‚æžœä¸ä¸ºç©ºï¼Œåˆ™ä¼šç”¨æ­¤å‡½æ•°å›žè°ƒæ ˆé‡Œçš„æ¯ä¸€ä¸ªå¯¹è±¡
  */
 ACL_API void acl_stack_clean(ACL_STACK *s, void (*free_fn)(void *));
 
 /**
- * Çå¿ÕÕ»ÈÝÆ÷ÀïµÄ¶ÔÏó²¢Ïú»ÙÕ»ÈÝÆ÷
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @param free_fn {void (*)(void*)} Èç¹û²»Îª¿Õ£¬Ôò»áÓÃ´Ëº¯Êý»Øµ÷Õ»ÀïµÄÃ¿Ò»¸ö¶ÔÏó
+ * æ¸…ç©ºæ ˆå®¹å™¨é‡Œçš„å¯¹è±¡å¹¶é”€æ¯æ ˆå®¹å™¨
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @param free_fn {void (*)(void*)} å¦‚æžœä¸ä¸ºç©ºï¼Œåˆ™ä¼šç”¨æ­¤å‡½æ•°å›žè°ƒæ ˆé‡Œçš„æ¯ä¸€ä¸ªå¯¹è±¡
  */
 ACL_API void acl_stack_destroy(ACL_STACK *s, void (*free_fn)(void *));
 
 /**
- * ÍùÕ»ÈÝÆ÷Î²²¿Ìí¼ÓÐÂµÄ¶ÔÏó
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
+ * å¾€æ ˆå®¹å™¨å°¾éƒ¨æ·»åŠ æ–°çš„å¯¹è±¡
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
  * @param obj {void*}
  */
 ACL_API void acl_stack_append(ACL_STACK *s, void *obj);
 #define	acl_stack_push	acl_stack_append
 
 /**
- * ÍùÕ»ÈÝÆ÷µÄÍ·²¿Ìí¼ÓÐÂµÄ¶ÔÏó
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
+ * å¾€æ ˆå®¹å™¨çš„å¤´éƒ¨æ·»åŠ æ–°çš„å¯¹è±¡
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
  * @param obj {void*}
- * ×¢£º´Ë²Ù×÷µÄÐ§ÂÊÒª±È acl_stack_append µÍ£¬ÒòÎªÆäÄÚÈÝÐèÒªÒÆ¶¯ËùÓÐµÄ¶ÔÏóÎ»ÖÃ
+ * æ³¨ï¼šæ­¤æ“ä½œçš„æ•ˆçŽ‡è¦æ¯” acl_stack_append ä½Žï¼Œå› ä¸ºå…¶å†…å®¹éœ€è¦ç§»åŠ¨æ‰€æœ‰çš„å¯¹è±¡ä½ç½®
  */
 ACL_API void acl_stack_prepend(ACL_STACK *s, void *obj);
 
 /**
- * ´ÓÕ»ÈÝÆ÷ÀïÉ¾³ýÄ³¸ö¶ÔÏó
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @param position {int} Õ»ÈÝÆ÷µÄÎ»ÖÃ
- * @param free_fn {void (*)(void*)} Èç¹û²»Îª¿Õ£¬ÔòÓÃ´Ëº¯Êý»Øµ÷±»É¾³ý¶ÔÏó
+ * ä»Žæ ˆå®¹å™¨é‡Œåˆ é™¤æŸä¸ªå¯¹è±¡
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @param position {int} æ ˆå®¹å™¨çš„ä½ç½®
+ * @param free_fn {void (*)(void*)} å¦‚æžœä¸ä¸ºç©ºï¼Œåˆ™ç”¨æ­¤å‡½æ•°å›žè°ƒè¢«åˆ é™¤å¯¹è±¡
  */
 ACL_API void acl_stack_delete(ACL_STACK *s, int position, void (*free_fn)(void *));
 
 /**
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @param obj {void*} ±»É¾³ý¶ÔÏóµÄµØÖ·
- * @param free_fn {void (*)(void*)} Èç¹û²»Îª¿Õ£¬ÔòÓÃ´Ëº¯Êý»Øµ÷±»É¾³ý¶ÔÏó
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @param obj {void*} è¢«åˆ é™¤å¯¹è±¡çš„åœ°å€
+ * @param free_fn {void (*)(void*)} å¦‚æžœä¸ä¸ºç©ºï¼Œåˆ™ç”¨æ­¤å‡½æ•°å›žè°ƒè¢«åˆ é™¤å¯¹è±¡
  */
 ACL_API void acl_stack_delete_obj(ACL_STACK *s, void *obj, void (*free_fn)(void *));
 
 /**
- * ·µ»ØÕ»ÈÝÆ÷ÖÐÄ³¸öÎ»ÖÃµÄ¶ÔÏóµØÖ·
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @param position {int} Õ»ÈÝÆ÷ÖÐµÄÎ»ÖÃ
- * @return {void*} != NULL: ok; == NULL: error»ò²»´æÔÚ
+ * è¿”å›žæ ˆå®¹å™¨ä¸­æŸä¸ªä½ç½®çš„å¯¹è±¡åœ°å€
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @param position {int} æ ˆå®¹å™¨ä¸­çš„ä½ç½®
+ * @return {void*} != NULL: ok; == NULL: erroræˆ–ä¸å­˜åœ¨
  */
 ACL_API void *acl_stack_index(ACL_STACK *s, int position);
 
 /**
- * ·µ»ØÕ»ÈÝÆ÷ÖÐµ±Ç°µÄ¶ÔÏó¸öÊý
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @return {int} ¶ÔÏó¸öÊý
+ * è¿”å›žæ ˆå®¹å™¨ä¸­å½“å‰çš„å¯¹è±¡ä¸ªæ•°
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @return {int} å¯¹è±¡ä¸ªæ•°
  */
 ACL_API int acl_stack_size(const ACL_STACK *s);
 
 /**
- * ·µ»ØÕ»ÖÐÎ²²¿µÄ¶ÔÏóµØÖ·, Í¬Ê±½«¸Ã¶ÔÏó´ÓÕ»ÖÐÒÆ³ý
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @return {void*} ¶ÔÏóµØÖ·, == NULL ±íÊ¾µ±Ç°¶ÔÏóÎª¿Õ
+ * è¿”å›žæ ˆä¸­å°¾éƒ¨çš„å¯¹è±¡åœ°å€, åŒæ—¶å°†è¯¥å¯¹è±¡ä»Žæ ˆä¸­ç§»é™¤
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @return {void*} å¯¹è±¡åœ°å€, == NULL è¡¨ç¤ºå½“å‰å¯¹è±¡ä¸ºç©º
  */
 ACL_API void *acl_stack_pop(ACL_STACK *s);
 #define acl_stack_pop_tail acl_stack_pop
 
 /**
- * ·µ»ØÕ»ÖÐ×îºóÌí¼ÓµÄ¶ÔÏóµØÖ·, µ«²»½«¸Ã¶ÔÏó´ÓÕ»ÖÐÒÆ³ý
- * @param s {ACL_STACK*} ´´½¨µÄÕ»ÈÝÆ÷¶ÔÏó
- * @return {void*} ¶ÔÏóµØÖ·, == NULL ±íÊ¾µ±Ç°¶ÔÏóÎª¿Õ
+ * è¿”å›žæ ˆä¸­æœ€åŽæ·»åŠ çš„å¯¹è±¡åœ°å€, ä½†ä¸å°†è¯¥å¯¹è±¡ä»Žæ ˆä¸­ç§»é™¤
+ * @param s {ACL_STACK*} åˆ›å»ºçš„æ ˆå®¹å™¨å¯¹è±¡
+ * @return {void*} å¯¹è±¡åœ°å€, == NULL è¡¨ç¤ºå½“å‰å¯¹è±¡ä¸ºç©º
  */
 ACL_API void *acl_stack_top(ACL_STACK *s);
 

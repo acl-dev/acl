@@ -16,8 +16,8 @@
 #include "../../private/private_array.h"
 #include "malloc_vars.h"
 
-/* xxx: Èç¹ûÏëÒªÊ¹ÓÃ pthread_spinlock_t Ôò²»¿É½« stdlib.h ·ÅÔÚÇ°Ãæ,
- * ·ñÔò±àÒë±¨´í
+/* xxx: å¦‚æœæƒ³è¦ä½¿ç”¨ pthread_spinlock_t åˆ™ä¸å¯å°† stdlib.h æ”¾åœ¨å‰é¢,
+ * å¦åˆ™ç¼–è¯‘æŠ¥é”™
  */
 
 #ifdef ACL_UNIX
@@ -53,18 +53,18 @@ typedef acl_pthread_mutex_t mylock_t;
 #include "thread/acl_pthread.h"
 
 struct ACL_MEM_SLICE {
-	ACL_SLICE_POOL *slice_pool;	/* ÄÚ´æÇĞÆ¬³Ø */
-	mylock_t  lock;			/* »¥³âËø */
-	ACL_ARRAY *list;		/* ½Ó¹ÜÆäËüÏß³ÌµÄÊÍ·ÅÄÚ´æµÄ¶ÓÁĞ */
-	acl_pthread_key_t  tls_key;	/* Ïß³Ì¾Ö²¿´æ´¢¶ÔÓ¦µÄ¼ü */
-	unsigned long tid;		/* ÓµÓĞ´ËÏß³Ì³Ø¶ÔÏóµÄÏß³ÌIDºÅ */
-	unsigned int  nalloc;		/* µ÷ÓÃÄÚ´æ·ÖÅäµÄ´ÎÊı */
-	unsigned int  nalloc_gc;	/* ·ÖÅä¶àÉÙ´ÎÄÚ´æºó×Ô¶¯µ÷ÓÃÄÚ´æÀ¬»ø»ØÊÕ */
-	unsigned int  slice_flag;	/* ÄÚ´æÇĞÆ¬´´½¨Ê±µÄ±êÖ¾Î», Èç ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF */
-	ACL_ARRAY *slice_list;		/* ËùÓĞÏß³ÌµÄÄÚ´æ³ØµÄ¼¯ºÏ */
-	acl_pthread_mutex_t *slice_list_lock; /* ²Ù×÷È«¾Ö __mem_slice_list µÄ»¥³âËø */
-	int  delay_free;		/* µ±±¾Ïß³ÌÍË³öÊ±£¬ÒòÎª»¹ÓĞÄÚ´æÆ¬±»ÆäËüÏß³ÌÕ¼ÓÃ×Å£¬
-					 * ËùÒÔ²»ÄÜÁ¢¼´ÊÍ·Å£¬ĞèÒªÓÉÖ÷Ïß³Ì»òÆäËüÏß³ÌĞ­ÖúÊÍ·Å
+	ACL_SLICE_POOL *slice_pool;	/* å†…å­˜åˆ‡ç‰‡æ±  */
+	mylock_t  lock;			/* äº’æ–¥é” */
+	ACL_ARRAY *list;		/* æ¥ç®¡å…¶å®ƒçº¿ç¨‹çš„é‡Šæ”¾å†…å­˜çš„é˜Ÿåˆ— */
+	acl_pthread_key_t  tls_key;	/* çº¿ç¨‹å±€éƒ¨å­˜å‚¨å¯¹åº”çš„é”® */
+	unsigned long tid;		/* æ‹¥æœ‰æ­¤çº¿ç¨‹æ± å¯¹è±¡çš„çº¿ç¨‹IDå· */
+	unsigned int  nalloc;		/* è°ƒç”¨å†…å­˜åˆ†é…çš„æ¬¡æ•° */
+	unsigned int  nalloc_gc;	/* åˆ†é…å¤šå°‘æ¬¡å†…å­˜åè‡ªåŠ¨è°ƒç”¨å†…å­˜åƒåœ¾å›æ”¶ */
+	unsigned int  slice_flag;	/* å†…å­˜åˆ‡ç‰‡åˆ›å»ºæ—¶çš„æ ‡å¿—ä½, å¦‚ ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF */
+	ACL_ARRAY *slice_list;		/* æ‰€æœ‰çº¿ç¨‹çš„å†…å­˜æ± çš„é›†åˆ */
+	acl_pthread_mutex_t *slice_list_lock; /* æ“ä½œå…¨å±€ __mem_slice_list çš„äº’æ–¥é” */
+	int  delay_free;		/* å½“æœ¬çº¿ç¨‹é€€å‡ºæ—¶ï¼Œå› ä¸ºè¿˜æœ‰å†…å­˜ç‰‡è¢«å…¶å®ƒçº¿ç¨‹å ç”¨ç€ï¼Œ
+					 * æ‰€ä»¥ä¸èƒ½ç«‹å³é‡Šæ”¾ï¼Œéœ€è¦ç”±ä¸»çº¿ç¨‹æˆ–å…¶å®ƒçº¿ç¨‹ååŠ©é‡Šæ”¾
 					 */
 };
 
@@ -74,9 +74,9 @@ struct ACL_MEM_SLICE {
 /*----------------------------------------------------------------------------*/
 
 typedef struct {
-	size_t length;			/* µ÷ÓÃÕßÏ£Íû·ÖÅäµÄÄÚ´æ´óĞ¡ */
-	int    signature;		/* Ç©Ãû */
-	ACL_MEM_SLICE *mem_slice;	/* ËùÊôµÄÄÚ´æÇĞÆ¬¶ÔÏó */
+	size_t length;			/* è°ƒç”¨è€…å¸Œæœ›åˆ†é…çš„å†…å­˜å¤§å° */
+	int    signature;		/* ç­¾å */
+	ACL_MEM_SLICE *mem_slice;	/* æ‰€å±çš„å†…å­˜åˆ‡ç‰‡å¯¹è±¡ */
 	union {
 		ALIGN_TYPE align;
 		char  payload[1];
@@ -158,7 +158,7 @@ static acl_pthread_mutex_t *__mem_slice_list_lock = NULL;
 
 static int mem_slice_gc(ACL_MEM_SLICE *mem_slice);
 
-/* Ïß³ÌÍË³öÇ°ĞèÒªµ÷ÓÃ´Ëº¯ÊıÊÍ·Å×Ô¼ºµÄÏß³Ì¾Ö²¿ÄÚ´æ´æ´¢³Ø */
+/* çº¿ç¨‹é€€å‡ºå‰éœ€è¦è°ƒç”¨æ­¤å‡½æ•°é‡Šæ”¾è‡ªå·±çš„çº¿ç¨‹å±€éƒ¨å†…å­˜å­˜å‚¨æ±  */
 
 static void mem_slice_free(ACL_MEM_SLICE *mem_slice)
 {
@@ -170,7 +170,7 @@ static void mem_slice_free(ACL_MEM_SLICE *mem_slice)
 		return;
 	}
 
-	/* ÏÈ»ØÊÕ±¾ÉíÏß³ÌµÄÀ¬»øÄÚ´æÆ¬ */
+	/* å…ˆå›æ”¶æœ¬èº«çº¿ç¨‹çš„åƒåœ¾å†…å­˜ç‰‡ */
 	mem_slice_gc(mem_slice);
 
 	if ((n = acl_slice_pool_used(mem_slice->slice_pool)) > 0) {
@@ -183,7 +183,7 @@ static void mem_slice_free(ACL_MEM_SLICE *mem_slice)
 		if (__mem_slice_list_lock)
 			thread_mutex_unlock(__mem_slice_list_lock);
 
-		/* ¾¡Á¿»ØÊÕÒ»Ğ©ÒÑ¾­ÍêÈ«ÊÍ·ÅµÄÄÚ´æ */
+		/* å°½é‡å›æ”¶ä¸€äº›å·²ç»å®Œå…¨é‡Šæ”¾çš„å†…å­˜ */
 		acl_slice_pool_gc(mem_slice->slice_pool);
 	} else {
 		acl_msg_info("%s(%d): thread(%ld) free mem slice now",
@@ -192,7 +192,7 @@ static void mem_slice_free(ACL_MEM_SLICE *mem_slice)
 		private_array_destroy(mem_slice->list, NULL);
 		mem_slice->list = NULL;
 
-		/* ½«×ÓÏß³ÌµÄÏß³Ì¾Ö²¿´æ´¢ÄÚ´æ³Ø´ÓÈ«¾ÖÄÚ´æ³Ø¾ä±ú¼¯ºÏÖĞÉ¾³ı */
+		/* å°†å­çº¿ç¨‹çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨å†…å­˜æ± ä»å…¨å±€å†…å­˜æ± å¥æŸ„é›†åˆä¸­åˆ é™¤ */
 		if (__mem_slice_list_lock)
 			thread_mutex_lock(__mem_slice_list_lock);
 		private_array_delete_obj(__mem_slice_list, mem_slice, NULL);
@@ -314,11 +314,11 @@ static void *tls_mem_alloc(const char *filename, int line, size_t len)
 	MBLOCK *real_ptr;
 
 	if (mem_slice == NULL) {
-		/* Ã¿¸ö×ÓÏß³Ì»ñµÃ×Ô¼ºµÄÏß³Ì¾Ö²¿´æ´¢ÄÚ´æ³Ø */
+		/* æ¯ä¸ªå­çº¿ç¨‹è·å¾—è‡ªå·±çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨å†…å­˜æ±  */
 		mem_slice = mem_slice_create();
 		mem_slice->slice_list = __mem_slice_list;
 
-		/* ½«×ÓÏß³ÌµÄÏß³Ì¾Ö²¿´æ´¢ÄÚ´æ³ØÖÃÈëÈ«¾ÖÄÚ´æ³Ø¾ä±ú¼¯ºÏÖĞ */
+		/* å°†å­çº¿ç¨‹çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨å†…å­˜æ± ç½®å…¥å…¨å±€å†…å­˜æ± å¥æŸ„é›†åˆä¸­ */
 		if (__mem_slice_list_lock)
 			thread_mutex_lock(__mem_slice_list_lock);
 		private_array_push(__mem_slice_list, mem_slice);
@@ -409,7 +409,7 @@ static int mem_slice_gc(ACL_MEM_SLICE *mem_slice)
 {
 	int   n = 0;
 
-	/* ÊÍ·ÅÓÉÆäËüÏß³Ì½»»¹µÄÄÚ´æÆ¬ */
+	/* é‡Šæ”¾ç”±å…¶å®ƒçº¿ç¨‹äº¤è¿˜çš„å†…å­˜ç‰‡ */
 
 	MUTEX_LOCK(mem_slice);
 	while (1) {
@@ -421,7 +421,7 @@ static int mem_slice_gc(ACL_MEM_SLICE *mem_slice)
 		n++;
 	}
 	MUTEX_UNLOCK(mem_slice);
-	/* ÊµÊ±½øĞĞÀ¬»ø»ØÊÕ? */
+	/* å®æ—¶è¿›è¡Œåƒåœ¾å›æ”¶? */
 	if ((mem_slice->slice_flag & ACL_SLICE_FLAG_RTGC_OFF) == 0)
 		acl_slice_pool_gc(mem_slice->slice_pool);
 	return n;
@@ -442,7 +442,7 @@ void acl_mem_slice_destroy(void)
 
 	if (mem_slice == NULL)
 		return;
-	/* ÊÍ·Å¸ÃÏß³ÌËùÓµÓĞµÄÄÚ´æÇĞÆ¬³Ø¶ÔÏó */
+	/* é‡Šæ”¾è¯¥çº¿ç¨‹æ‰€æ‹¥æœ‰çš„å†…å­˜åˆ‡ç‰‡æ± å¯¹è±¡ */
 	mem_slice_free(mem_slice);
 	acl_pthread_setspecific(__mem_slice_key, NULL);
 	if ((unsigned long) acl_pthread_self() == acl_main_thread_self())
@@ -474,7 +474,7 @@ void acl_mem_slice_delay_destroy(void)
 			private_array_destroy(mem_slice->list, NULL);
 			mem_slice->list = NULL;
 
-			/* ½«×ÓÏß³ÌµÄÏß³Ì¾Ö²¿´æ´¢ÄÚ´æ³Ø´ÓÈ«¾ÖÄÚ´æ³Ø¾ä±ú¼¯ºÏÖĞÉ¾³ı */
+			/* å°†å­çº¿ç¨‹çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨å†…å­˜æ± ä»å…¨å±€å†…å­˜æ± å¥æŸ„é›†åˆä¸­åˆ é™¤ */
 			private_array_delete_obj(__mem_slice_list, mem_slice, NULL);
 			acl_default_free(__FILE__, __LINE__, mem_slice);
 		} else
@@ -505,12 +505,12 @@ ACL_MEM_SLICE *acl_mem_slice_init(int base, int nslice,
 	else if (__mem_list_init_size > 1000000)
 		__mem_list_init_size = 1000000;
 
-	/* Ö÷Ïß³Ì»ñµÃ×Ô¼ºµÄÏß³Ì¾Ö²¿´æ´¢ÄÚ´æ³Ø */
+	/* ä¸»çº¿ç¨‹è·å¾—è‡ªå·±çš„çº¿ç¨‹å±€éƒ¨å­˜å‚¨å†…å­˜æ±  */
 	mem_slice = mem_slice_create();
 	if (mem_slice == NULL)
 		acl_msg_fatal("%s(%d): mem_slice null", myname, __LINE__);
 
-	/* ´´½¨½ø³Ì¿Õ¼äÄÚÈ«¾ÖµÄÄÚ´æ³Ø¼¯ºÏ¶ÔÏó, Æä´æ´¢ËùÓĞÏß³ÌµÄ´æ´¢ÄÚ´æ³Ø¾ä±ú */
+	/* åˆ›å»ºè¿›ç¨‹ç©ºé—´å†…å…¨å±€çš„å†…å­˜æ± é›†åˆå¯¹è±¡, å…¶å­˜å‚¨æ‰€æœ‰çº¿ç¨‹çš„å­˜å‚¨å†…å­˜æ± å¥æŸ„ */
 	__mem_slice_list = private_array_create(10);
 	__mem_slice_list_lock = thread_mutex_create();
 	private_array_push(__mem_slice_list, mem_slice);

@@ -15,49 +15,49 @@ namespace acl {
 class dbuf_pool;
 
 /**
- * ����Ϊ�ַ��������֧࣬�ִ󲿷� std::string �еĹ��ܣ�ͬʱ֧���䲻֧�ֵ�һЩ
- * ���ܣ������ڲ��Զ���֤���һ���ַ�Ϊ \0
+ * 该类为字符串处理类，支持大部分 std::string 中的功能，同时支持其不支持的一些
+ * 功能；该类内部自动保证最后一个字符为 \0
  */
 class ACL_CPP_API string {
 public:
 	/**
-	 * ���캯��
-	 * @param n {size_t} ��ʼʱ������ڴ��С
-	 * @param bin {bool} �Ƿ��Զ����Ʒ�ʽ�������������󣬸�ֵΪ true ʱ��
-	 *  �򵱵��� += int|int64|short|char ����� << int|int64|short|char
-	 *  ʱ���򰴶����Ʒ�ʽ�����������ı���ʽ����
+	 * 构造函数
+	 * @param n {size_t} 初始时分配的内存大小
+	 * @param bin {bool} 是否以二进制方式构建缓冲区对象，该值为 true 时，
+	 *  则当调用 += int|int64|short|char 或调用 << int|int64|short|char
+	 *  时，则按二进制方式处理，否则按文本方式处理
 	 */
 	string(size_t n, bool bin);
 	explicit string(size_t n);
 	string();
 
 	/**
-	 * ���캯��
-	 * @param s {const string&} Դ�ַ������󣬳�ʼ�����������ڲ��Զ�����
-	 *  ���ַ���
+	 * 构造函数
+	 * @param s {const string&} 源字符串对象，初始化后的类对象内部自动复制
+	 *  该字符串
 	 */
 	string(const string& s);
 
 	/**
-	 * ���캯��
-	 * @param s {const char*} �ڲ��Զ��ø��ַ�����ʼ�������s ������
-	 *  �� \0 ��β
+	 * 构造函数
+	 * @param s {const char*} 内部自动用该字符串初始化类对象，s 必须是
+	 *  以 \0 结尾
 	 */
 	string(const char* s);
 
 	/**
-	 * ���캯��
-	 * @param s {const char*} Դ��������
-	 * @param n {size_t} s ���������ݳ���
+	 * 构造函数
+	 * @param s {const char*} 源缓冲内容
+	 * @param n {size_t} s 缓冲区数据长度
 	 */
 	string(const void* s, size_t n);
 
 	/**
-	 * �����ڴ�ӳ���ļ���ʽ�������
-	 * @param fd {int} �ļ����
-	 * @param max {size_t} ��ӳ������ռ��С
-	 * @param n {size_t} ��ʼ����С
-	 * @param offset {size_t} �ڴ�ӳ���ļ��е���ʼλ��
+	 * 采用内存映射文件方式构造对象
+	 * @param fd {int} 文件句柄
+	 * @param max {size_t} 所映射的最大空间大小
+	 * @param n {size_t} 初始化大小
+	 * @param offset {size_t} 内存映射文件中的起始位置
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	string(void* fd, size_t max, size_t n, size_t offset = 0);
@@ -68,121 +68,121 @@ public:
 	~string();
 
 	/**
-	 * �����ַ��������Ϊ�����ƴ���ģʽ
-	 * @param bin {bool} ����ֵΪ true ʱ���������ַ��������Ϊ�����ƴ���
-	 *  ��ʽ������Ϊ�ı���ʽ��Ϊ true ʱ���򵱵��� += int|int64|short|char
-	 *  ����� << int|int64|short|char ʱ���򰴶����Ʒ�ʽ�����������ı�
-	 *  ��ʽ����
+	 * 设置字符串类对象为二进制处理模式
+	 * @param bin {bool} 当该值为 true 时，则设置字符串类对象为二进制处理
+	 *  方式；否则为文本方式；为 true 时，则当调用 += int|int64|short|char
+	 *  或调用 << int|int64|short|char 时，则按二进制方式处理，否则按文本
+	 *  方式处理
 	 * @return {string&}
 	 */
 	string& set_bin(bool bin);
 
 	/**
-	 * ���û���������󳤶ȣ��Ա��⻺�������
+	 * 设置缓冲区的最大长度，以避免缓冲区溢出
 	 * @param max {int}
 	 * @return {string&}
 	 */
 	string& set_max(int  max);
 
 	/**
-	 * �жϵ�ǰ�ַ���������Ƿ�Ϊ�����ƴ�����ʽ 
-	 * @return {bool} ����ֵΪ true ʱ���ʾΪ�����Ʒ�ʽ
+	 * 判断当前字符串类对象是否为二进制处理方式 
+	 * @return {bool} 返回值为 true 时则表示为二进制方式
 	 */
 	bool get_bin() const;
 
 	/**
-	 * ���ص�ǰ����������󳤶����ƣ�������ֵ <= 0 ���ʾû������
+	 * 返回当前缓冲区的最大长度限制，若返回值 <= 0 则表示没有限制
 	 * @return {int}
 	 */
 	int get_max() const;
 
 	/**
-	 * �����ַ������±���ָ��λ�õ��ַ��������������Ϊ�Ϸ�ֵ��������
-	 * �ڲ���������
-	 * @param n {size_t} ָ����λ�ã���ֵ >= 0 �� < �ַ�������)�����Խ��
-	 *  ���������
-	 * @return {char} ����ָ��λ�õ��ַ�
+	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
+	 * 内部产生断言
+	 * @param n {size_t} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界
+	 *  则产生断言
+	 * @return {char} 返回指定位置的字符
 	 */
 	char operator[](size_t n) const;
 
 	/**
-	 * �����ַ������±���ָ��λ�õ��ַ��������������Ϊ�Ϸ�ֵ��������
-	 * �ڲ���������
-	 * @param n {int} ָ����λ�ã���ֵ >= 0 �� < �ַ�������)�����Խ�磬
-	 *  ���������
-	 * @return {char} ����ָ��λ�õ��ַ�
+	 * 根据字符数组下标获得指定位置的字符，输入参数必须为合法值，否则则
+	 * 内部产生断言
+	 * @param n {int} 指定的位置（该值 >= 0 且 < 字符串长度)，如果越界，
+	 *  则产生断言
+	 * @return {char} 返回指定位置的字符
 	 */
 	char operator[](int n) const;
 
 	/**
-	 * ��ֵ��ֵ���أ��û�����ֱ��ʹ�ö���������±���и�ֵ������±���ֵ
-	 * Խ�磬���ڲ����Զ����仺�����ռ�
-	 * @param n {size_t} �����±�λ��
+	 * 左值赋值重载，用户可以直接使用对象的数组下标进行赋值，如果下标组值
+	 * 越界，则内部会自动扩充缓冲区空间
+	 * @param n {size_t} 数组下标位置
 	 * @return {char&}
 	 */
 	char& operator[](size_t n);
 
 	/**
-	 * ��ֵ��ֵ���أ��û�����ֱ��ʹ�ö���������±���и�ֵ������±���ֵ
-	 * Խ�磬���ڲ����Զ����仺�����ռ�
-	 * @param n {int} �����±�λ�ã���ֵ���� >= 0
+	 * 左值赋值重载，用户可以直接使用对象的数组下标进行赋值，如果下标组值
+	 * 越界，则内部会自动扩充缓冲区空间
+	 * @param n {int} 数组下标位置，该值必须 >= 0
 	 * @return {char&}
 	 */
 	char& operator[](int n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param s {const char*} Դ�ַ���
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param s {const char*} 源字符串
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const char* s);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param s {const string&} Դ�ַ�������
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param s {const string&} 源字符串对象
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const string& s);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param s {const string*} Դ�ַ�������
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param s {const string*} 源字符串对象
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const string* s);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param s {const std::string&} Դ�ַ�������
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param s {const std::string&} 源字符串对象
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const std::string& s);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param s {const std::string*} Դ�ַ�������
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param s {const std::string*} 源字符串对象
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(const std::string* s);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {long long int} Դ 64 λ���ų�����������ǰ����ĵ�ǰ״̬Ϊ
-	 *  ������ģʽ����ú�������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���
-	 *  ʽ��ֵ���ַ������󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ�
+	 * 对目标字符串类对象赋值
+	 * @param n {long long int} 源 64 位符号长整数，若当前对象的当前状态为
+	 *  二进制模式，则该函数便会以二进制方式赋值给字符串对象，否则以文本方
+	 *  式赋值给字符串对象；关于二进制模式还是文本方式，其含义参见
 	 *  set_bin(bool)
-	 * @return {string&} ���ص�ǰ�ֶ�������ã����ڶԸ�������������в���
+	 * @return {string&} 返回当前字对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(__int64 n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {unsinged long long int} Դ 64 λ�޷��ų����������ַ�������
-	 *  �ĵ�ǰ״̬Ϊ������ģʽ����ú�������Զ����Ʒ�ʽ��ֵ���ַ�������
-	 *  �������ı���ʽ��ֵ���ַ������󣻹��ڶ�����ģʽ�����ı���ʽ���京��
-	 *  �μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {unsinged long long int} 源 64 位无符号长整数，若字符串对象
+	 *  的当前状态为二进制模式，则该函数便会以二进制方式赋值给字符串对象，
+	 *  否则以文本方式赋值给字符串对象；关于二进制模式还是文本方式，其含义
+	 *  参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned __int64);
 #else
@@ -191,126 +191,126 @@ public:
 #endif
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�з����ַ������ַ�������ĵ�ǰ״̬Ϊ������ģʽ��
-	 *  ��ú�������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ����
-	 *  �������󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源有符号字符；若字符串对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字
+	 *  符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(char n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�޷����ַ���������ĵ�ǰ״̬Ϊ������ģʽ����ú���
-	 *  ����Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ���ַ�������
-	 *  ���ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源无符号字符；若对象的当前状态为二进制模式，则该函数
+	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
+	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned char n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�з��ų����ͣ�������ǰ״̬Ϊ������ģʽ����ú���
-	 *  ����Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ���ַ�������
-	 *  ���ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源有符号长整型；若对象当前状态为二进制模式，则该函数
+	 *  便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串对象；
+	 *  关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(long n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�޷��ų����ͣ����ֶ���ĵ�ǰ״̬Ϊ������ģʽ��
-	 *  ��ú�������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ��
-	 *  �ַ������󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源无符号长整型；若字对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给
+	 *  字符串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned long n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�з������ͣ����ַ�������ĵ�ǰ״̬Ϊ������ģʽ��
-	 *  ��ú�������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ���ַ�
-	 *  �����󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源有符号整型；若字符串对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
+	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(int n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�޷������ͣ����ַ�������ĵ�ǰ״̬Ϊ������ģʽ��
-	 *  ��ú�������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ���ַ�
-	 *  �����󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源无符号整型；若字符串对象的当前状态为二进制模式，
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
+	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned int n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�з��Ŷ����ͣ����ַ�������ĵ�ǰ״̬Ϊ������ģʽ,
-	 *  ��ú�������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ���ַ�
-	 *  �����󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源有符号短整型；若字符串对象的当前状态为二进制模式,
+	 *  则该函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符
+	 *  串对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(short n);
 
 	/**
-	 * ��Ŀ���ַ��������ֵ
-	 * @param n {char} Դ�޷��Ŷ����ͣ�������ĵ�ǰ״̬Ϊ������ģʽ�����
-	 *  ��������Զ����Ʒ�ʽ��ֵ���ַ������󣬷������ı���ʽ��ֵ���ַ���
-	 *  ���󣻹��ڶ�����ģʽ�����ı���ʽ���京��μ� set_bin(bool)
-	 * @return {string&} ���ص�ǰ��������ã����ڶԸ�������������в���
+	 * 对目标字符串类对象赋值
+	 * @param n {char} 源无符号短整型；若对象的当前状态为二进制模式，则该
+	 *  函数便会以二进制方式赋值给字符串对象，否则以文本方式赋值给字符串
+	 *  对象；关于二进制模式还是文本方式，其含义参见 set_bin(bool)
+	 * @return {string&} 返回当前对象的引用，便于对该类对象连续进行操作
 	 */
 	string& operator=(unsigned short n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const char*} Դ�ַ���ָ��
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const char*} 源字符串指针
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(const char* s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const string&} Դ�ַ�����������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const string&} 源字符串对象引用
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(const string& s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const string*} Դ�ַ�������ָ��
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const string*} 源字符串对象指针
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(const string* s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const std::string&} Դ�ַ�����������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const std::string&} 源字符串对象引用
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(const std::string& s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const std::string*} Դ�ַ�������ָ��
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const std::string*} 源字符串对象指针
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(const std::string* s);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * ��Ŀ���ַ�������β�������з��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long long int} Դ 64 λ�з�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long long int} 源 64 位有符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(__int64 n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long long int} Դ 64 λ�޷�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long long int} 源 64 位无符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(unsigned __int64 n);
 #else
@@ -319,117 +319,117 @@ public:
 #endif
 
 	/**
-	 * ��Ŀ���ַ�������β�������з��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з��ų�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号长整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(long n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷��ų�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号长整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(unsigned long n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������з����������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(int n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷����������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(unsigned int n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������з��Ŷ��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з��Ŷ�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号短整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号短整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(short n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷��Ŷ��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷��Ŷ�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号短整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号短整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(unsigned short n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������з����ַ�����ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з����ַ�
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号字符，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号字符
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(char n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷����ַ�����ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷����ַ�
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号字符，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号字符
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator+=(unsigned char n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const string&} Դ�ַ�����������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const string&} 源字符串对象引用
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(const string& s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const string*} Դ�ַ�������ָ��
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const string*} 源字符串对象指针
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(const string* s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const std::string&} Դ�ַ�����������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const std::string&} 源字符串对象引用
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(const std::string& s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const std::string*} Դ�ַ�������ָ��
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const std::string*} 源字符串对象指针
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(const std::string* s);
 
 	/**
-	 * ��Ŀ���ַ�������β�������ַ���
-	 * @param s {const char*} Դ�ַ���ָ��
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加字符串
+	 * @param s {const char*} 源字符串指针
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(const char* s);
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * ��Ŀ���ַ�������β�������з��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long long int} Դ 64 λ�з�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long long int} 源 64 位有符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(__int64 n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long long int} Դ 64 λ�޷�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long long int} 源 64 位无符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(unsigned __int64 n);
 #else
@@ -438,109 +438,109 @@ public:
 #endif
 
 	/**
-	 * ��Ŀ���ַ�������β�������з��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з��ų�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号长整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(long n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷��ų��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷��ų�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号长整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号长整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(unsigned long n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������з����������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(int n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷����������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷�������
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(unsigned int n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������з��Ŷ��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з��Ŷ�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号短整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号短整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(short n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷��Ŷ��������֣���ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷��Ŷ�����
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号短整型数字，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号短整数
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(unsigned short n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������з����ַ�����ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�з����ַ�
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加有符号字符，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源有符号字符
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(char n);
 
 	/**
-	 * ��Ŀ���ַ�������β�������޷����ַ�����ΪĿ���ַ�������Ϊ
-	 * �����Ʒ�ʽʱ���򰴶��������ַ�ʽ���ӣ������ı���ʽ����
-	 * @param n {long} Դ�޷����ַ�
-	 * @return {string&} Ŀ���ַ������������
+	 * 向目标字符串对象尾部添加无符号字符，当为目标字符串对象为
+	 * 二进制方式时，则按二进制数字方式添加；否则按文本方式添加
+	 * @param n {long} 源无符号字符
+	 * @return {string&} 目标字符串对象的引用
 	 */
 	string& operator<<(unsigned char n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ���ַ�������
-	 * @param s {string*} Ŀ���ַ�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标字符串对象
+	 * @param s {string*} 目标字符串对象
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(string* s);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ���ַ�������
-	 * @param s {string&} Ŀ���ַ�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标字符串对象
+	 * @param s {string&} 目标字符串对象
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(string& s);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ���ַ�������
-	 * @param s {std::string*} Ŀ���ַ�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标字符串对象
+	 * @param s {std::string*} 目标字符串对象
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(std::string* s);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ���ַ�������
-	 * @param s {std::string&} Ŀ���ַ�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标字符串对象
+	 * @param s {std::string&} 目标字符串对象
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(std::string& s);
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 64 λ�з�������
-	 * @param n {string*} Ŀ�� 64 λ�з�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 64 位有符号整数
+	 * @param n {string*} 目标 64 位有符号整数
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(__int64& n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 64 λ�޷�������
-	 * @param n {string*} Ŀ�� 64 λ�޷�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 64 位无符号整数
+	 * @param n {string*} 目标 64 位无符号整数
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned __int64& n);
 #else
@@ -549,156 +549,156 @@ public:
 #endif
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 32 λ�з�������
-	 * @param n {string*} Ŀ�� 32 λ�з�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 32 位有符号整数
+	 * @param n {string*} 目标 32 位有符号整数
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(int& n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 32 λ�޷�������
-	 * @param n {string*} Ŀ�� 32 λ�޷�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 32 位无符号整数
+	 * @param n {string*} 目标 32 位无符号整数
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned int& n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 16 λ�з�������
-	 * @param n {string*} Ŀ�� 16 λ�з�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 16 位有符号整数
+	 * @param n {string*} 目标 16 位有符号整数
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(short& n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 16 λ�޷�������
-	 * @param n {string*} Ŀ�� 16 λ�޷�������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 16 位无符号整数
+	 * @param n {string*} 目标 16 位无符号整数
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned short& n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 8 λ�з����ַ�
-	 * @param n {string*} Ŀ�� 16 λ�з����ַ�
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 8 位有符号字符
+	 * @param n {string*} 目标 16 位有符号字符
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(char& n);
 
 	/**
-	 * ���ַ��������е����ݸ���Ŀ�� 8 λ�޷����ַ�
-	 * @param n {string*} Ŀ�� 16 λ�޷����ַ�
-	 * @return {size_t} ���ؿ�����ʵ���ֽ�����empty() == true ʱ���򷵻� 0
+	 * 将字符串对象中的内容赋予目标 8 位无符号字符
+	 * @param n {string*} 目标 16 位无符号字符
+	 * @return {size_t} 返回拷贝的实际字节数，empty() == true 时，则返回 0
 	 */
 	size_t operator>>(unsigned char& n);
 
 	/**
-	 * �жϵ�ǰ������������������ַ������������Ƿ���ȣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�����������
-	 * @return {bool} ���� true ��ʾ�ַ���������ͬ
+	 * 判断当前对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象引用
+	 * @return {bool} 返回 true 表示字符串内容相同
 	 */
 	bool operator==(const string& s) const;
 
 	/**
-	 * �жϵ�ǰ������������������ַ������������Ƿ���ȣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�������ָ��
-	 * @return {bool} ���� true ��ʾ�ַ���������ͬ
+	 * 判断当前对象的内容与所给的字符串对象内容是否相等（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象指针
+	 * @return {bool} 返回 true 表示字符串内容相同
 	 */
 	bool operator==(const string* s) const;
 
 	/**
-	 * �жϵ�ǰ������������������ַ��������Ƿ���ȣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�������ָ��
-	 * @return {bool} ���� true ��ʾ�ַ���������ͬ
+	 * 判断当前对象的内容与所给的字符串内容是否相等（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象指针
+	 * @return {bool} 返回 true 表示字符串内容相同
 	 */
 	bool operator==(const char* s) const;
 
 	/**
-	 * �жϵ�ǰ������������������ַ������������Ƿ񲻵ȣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�����������
-	 * @return {bool} ���� true ��ʾ�ַ������ݲ�ͬ
+	 * 判断当前对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象引用
+	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
 	bool operator!=(const string& s) const;
 
 	/**
-	 * �жϵ�ǰ������������������ַ������������Ƿ񲻵ȣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�������ָ��
-	 * @return {bool} ���� true ��ʾ�ַ������ݲ�ͬ
+	 * 判断当前对象的内容与所给的字符串对象内容是否不等（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象指针
+	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
 	bool operator!=(const string* s) const;
 
 	/**
-	 * �жϵ�ǰ������������������ַ��������Ƿ񲻵ȣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�������ָ��
-	 * @return {bool} ���� true ��ʾ�ַ������ݲ�ͬ
+	 * 判断当前对象的内容与所给的字符串内容是否不等（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象指针
+	 * @return {bool} 返回 true 表示字符串内容不同
 	 */
 	bool operator!=(const char* s) const;
 
 	/**
-	 * �жϵ�ǰ����������Ƿ�С���������ַ����������ݣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�����������
-	 * @return {bool} ���� true ��ʾ��ǰ�ַ������������С��������ַ���
-	 *  ��������
+	 * 判断当前对象的内容是否小于所给的字符串对象内容（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象引用
+	 * @return {bool} 返回 true 表示当前字符串对象的内容小于输入的字符串
+	 *  对象内容
 	 */
 	bool operator<(const string& s) const;
 
 	/**
-	 * �жϵ�ǰ����������Ƿ�����������ַ����������ݣ��ڲ����ִ�Сд��
-	 * @param s {const string&} ������ַ�����������
-	 * @return {bool} ���� true ��ʾ��ǰ�ַ�����������ݴ���������ַ���
-	 *  ��������
+	 * 判断当前对象的内容是否大于所给的字符串对象内容（内部区分大小写）
+	 * @param s {const string&} 输入的字符串对象引用
+	 * @return {bool} 返回 true 表示当前字符串对象的内容大于输入的字符串
+	 *  对象内容
 	 */
 	bool operator>(const string& s) const;
 
 	/**
-	 * ���㵱ǰ�ַ����Ĺ�ϣֵ��ֻΪC++11�е� std::unordered_xxx ������ʹ��
+	 * 计算当前字符串的哈希值，只为C++11中的 std::unordered_xxx 类容器使用
 	 * @return {size_t}
 	 */
 	size_t hash() const;
 
 	/**
-	 * ����ǰ����ֱ��תΪ�ַ���ָ�루�����ڲ�������ֱ�ӵ�����
-	 * @return {const char*} ����ֵ��ԶΪ�ǿ�ָ�룬�п���Ϊ�մ�
+	 * 将当前对象直接转为字符串指针（即将内部缓冲区直接导出）
+	 * @return {const char*} 返回值永远为非空指针，有可能为空串
 	 */
 	operator const char*() const;
 
 	/**
-	 * ����ǰ�ַ�������ֱ��תΪͨ��ָ�루�����ڲ�������ֱ�ӵ�����
-	 * @return {const char*} ����ֵ��ԶΪ�ǿ�ָ��
+	 * 将当前字符串对象直接转为通用指针（即将内部缓冲区直接导出）
+	 * @return {const char*} 返回值永远为非空指针
 	 */
 	operator const void*() const;
 
 	/**
-	 * �� acl::string תΪ std::string
+	 * 将 acl::string 转为 std::string
 	 * @return {const std::string}
 	 */
 	operator const std::string() const;
 
 	/**
-	 * ��һ���з����ַ����ӽ���ǰ�ַ��������β��
-	 * @param ch {char} �з����ַ�
-	 * @param term {bool} �Ƿ���Ҫ��β��׷�� \0,׷�ӵ� \0 �����ӳ���
-	 * @return {string&} ��ǰ�ַ������������
+	 * 将一个有符号字符添加进当前字符串对象的尾部
+	 * @param ch {char} 有符号字符
+	 * @param term {bool} 是否需要在尾部追加 \0,追加的 \0 不增加长度
+	 * @return {string&} 当前字符串对象的引用
 	 */
 	string& push_back(char ch, bool term = true);
 	string& push_back(unsigned char ch, bool term = true);
 
 	/**
-	 * �ڻ�����β������ \0 �Ա�Ӧ��ʹ��ʱ�İ�ȫ��, ���ӵ� \0 �����ӳ���
-	 * @return {string&} ��ǰ�ַ������������
+	 * 在缓冲区尾部添加 \0 以便应用使用时的安全性, 添加的 \0 不增加长度
+	 * @return {string&} 当前字符串对象的引用
 	 */
 	string& terminate();
 
 	/**
-	 * �Ƚ������ַ�������������Ƿ���ͬ�����ִ�Сд��
-	 * @param s {const string&} ������ַ������������
-	 * @param case_sensitive {bool} Ϊ true ��ʾ���ִ�Сд
-	 * @return {bool} ���� true ��ʾ�������
+	 * 比较两个字符串对象的内容是否相同（区分大小写）
+	 * @param s {const string&} 输入的字符串对象的引用
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {bool} 返回 true 表示二者相等
 	 */
 	bool equal(const string& s, bool case_sensitive = true) const;
 
 	/**
-	 * ��鵱ǰ string �����Ƿ���ָ�����ַ�����ʼ
+	 * 检查当前 string 对象是否以指定的字符串开始
 	 * @param s {const char*}
-	 * @param case_sensitive {bool} �Ƿ����ִ�Сд
+	 * @param case_sensitive {bool} 是否区分大小写
 	 * @return {bool}
 	 */
 	bool begin_with(const char* s, bool case_sensitive = true) const;
@@ -707,9 +707,9 @@ public:
 	bool begin_with(const void* v, size_t len) const;
 
 	/**
-	 * ��鵱ǰ string �����Ƿ���ָ�����ַ�������
+	 * 检查当前 string 对象是否以指定的字符串结束
 	 * @param s {const char*}
-	 * @param case_sensitive {bool} �Ƿ����ִ�Сд
+	 * @param case_sensitive {bool} 是否区分大小写
 	 * @return {bool}
 	 */
 	bool end_with(const char* s, bool case_sensitive = true) const;
@@ -718,562 +718,562 @@ public:
 	bool end_with(const void* v, size_t len) const;
 
 	/**
-	 * �Ƚ������ַ�������������Ƿ���ͬ�����ִ�Сд��
-	 * @param s {const string&} ������ַ������������
-	 * @return {int} 0����ʾ������ͬ�� > 0����ǰ�ַ������ݴ�����������ݣ�
-	 *  < 0 ����ǰ�ַ�������С�����������
+	 * 比较两个字符串对象的内容是否相同（区分大小写）
+	 * @param s {const string&} 输入的字符串对象的引用
+	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
+	 *  < 0 ：当前字符串内容小于输入的内容
 	 */
 	int compare(const string& s) const;
 
 	/**
-	 * �Ƚ������ַ�������������Ƿ���ͬ�����ִ�Сд��
-	 * @param s {const string&} ������ַ��������ָ��
-	 * @return {int} 0����ʾ������ͬ�� > 0����ǰ�ַ������ݴ�����������ݣ�
-	 *  < 0 ����ǰ�ַ�������С�����������
+	 * 比较两个字符串对象的内容是否相同（区分大小写）
+	 * @param s {const string&} 输入的字符串对象的指针
+	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
+	 *  < 0 ：当前字符串内容小于输入的内容
 	 */
 	int compare(const string* s) const;
 
 	/**
-	 * �Ƚ������ַ����������Ƿ���ͬ
-	 * @param s {const string&} ������ַ������������
-	 * @param case_sensitive {bool} Ϊ true ��ʾ���ִ�Сд
-	 * @return {int} 0����ʾ������ͬ�� > 0����ǰ�ַ������ݴ�����������ݣ�
-	 *  < 0 ����ǰ�ַ�������С�����������
+	 * 比较两个字符串的内容是否相同
+	 * @param s {const string&} 输入的字符串对象的引用
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {int} 0：表示二者相同； > 0：当前字符串内容大于输入的内容；
+	 *  < 0 ：当前字符串内容小于输入的内容
 	 */
 	int compare(const char* s, bool case_sensitive = true) const;
 
 	/**
-	 * �Ƚϵ�ǰ����Ļ����������Ƿ��������Ļ�������������ͬ
-	 * @param ptr {const void*} ����Ļ�������ַ
-	 * @param len {size_t} ptr �Ļ����������ݳ���
-	 * @return {int} ���ؽ����������:
-	 *  0����ʾ������ͬ��
-	 *  > 0����ǰ���󻺳������ݴ�����������ݣ�
-	 *  < 0 ����ǰ���󻺳�����С�����������
+	 * 比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同
+	 * @param ptr {const void*} 输入的缓冲区地址
+	 * @param len {size_t} ptr 的缓冲区内数据长度
+	 * @return {int} 返回结果含义如下:
+	 *  0：表示二者相同；
+	 *  > 0：当前对象缓冲区内容大于输入的内容；
+	 *  < 0 ：当前对象缓冲内容小于输入的内容
 	 */
 	int compare(const void* ptr, size_t len) const;
 
 	/**
-	 * �Ƚϵ�ǰ���󻺳��������Ƿ��������Ļ�������������ͬ���޶��Ƚ����ݳ���
-	 * @param s {const void*} ����Ļ�������ַ
-	 * @param len {size_t} ptr �Ļ����������ݳ���
-	 * @param case_sensitive {bool} Ϊ true ��ʾ���ִ�Сд
-	 * @return {int} 0����ʾ������ͬ�� > 0����ǰ���󻺳������ݴ�����������ݣ�
-	 *  < 0 ����ǰ���󻺳�����С�����������
+	 * 比较当前对象缓冲区内容是否与所给的缓冲区的内容相同，限定比较数据长度
+	 * @param s {const void*} 输入的缓冲区地址
+	 * @param len {size_t} ptr 的缓冲区内数据长度
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {int} 0：表示二者相同； > 0：当前对象缓冲区内容大于输入的内容；
+	 *  < 0 ：当前对象缓冲内容小于输入的内容
 	 */
 	int ncompare(const char* s, size_t len, bool case_sensitive = true) const;
 
 	/**
-	 * ��β����ǰ�Ƚϵ�ǰ����Ļ����������Ƿ��������Ļ�������������ͬ��
-	 * �޶��Ƚ����ݳ���
-	 * @param s {const void*} ����Ļ�������ַ
-	 * @param len {size_t} ptr �Ļ����������ݳ���
-	 * @param case_sensitive {bool} Ϊ true ��ʾ���ִ�Сд
-	 * @return {int} 0����ʾ������ͬ��
-	 *  > 0����ǰ���󻺳������ݴ�����������ݣ�
-	 *  < 0 ����ǰ���󻺳�����С�����������
+	 * 从尾部向前比较当前对象的缓冲区内容是否与所给的缓冲区的内容相同，
+	 * 限定比较数据长度
+	 * @param s {const void*} 输入的缓冲区地址
+	 * @param len {size_t} ptr 的缓冲区内数据长度
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {int} 0：表示二者相同；
+	 *  > 0：当前对象缓冲区内容大于输入的内容；
+	 *  < 0 ：当前对象缓冲内容小于输入的内容
 	 */
 	int rncompare(const char* s, size_t len, bool case_sensitive = true) const;
 
 	/**
-	 * �ڵ�ǰ�ַ����������в��ҿ��е�λ�ã�����ѭ�����ñ������Ի�����е�
-	 * ��������������
-	 * @param left_count {int*} ����ָ��ǿ�ʱ�洢��ǰ�ַ���ʣ������ݳ���
-	 * @param buf {string*} ���ҵ�����ʱ������һ�ο���(�����ÿ���)��
-	 *  ���ο���(�����ÿ���)֮������ݴ���ڸû������ڣ�ע���ڲ���������
-	 *  ��ոû���������Ϊ��������׷�ӷ�ʽ
-	 * @return {int} ���� 0 ��ʾδ�ҵ����У�����ֵ > 0 ��ʾ���е���һ��
-	 *  λ��(��Ϊ��Ҫ�ҵ�һ�����з��ص��Ǹÿ��е���һ��λ�ã��������ҵ�
-	 *  �����򷵻�ֵһ������ 0)������ֵ < 0 ��ʾ�ڲ�����
+	 * 在当前字符串缓冲区中查找空行的位置，可以循环调用本方法以获得所有的
+	 * 符合条件的内容
+	 * @param left_count {int*} 当该指针非空时存储当前字符串剩余的数据长度
+	 * @param buf {string*} 当找到空行时，则将上一次空行(不含该空行)和
+	 *  本次空行(包含该空行)之间的数据存放于该缓冲区内，注：内部并不负责
+	 *  清空该缓冲区，因为采用数据追加方式
+	 * @return {int} 返回 0 表示未找到空行；返回值 > 0 表示空行的下一个
+	 *  位置(因为需要找到一个空行返回的是该空行的下一个位置，所以若找到
+	 *  空行则返回值一定大于 0)；返回值 < 0 表示内部出错
 	 */
 	int find_blank_line(int* left_count = NULL, string* buf = NULL);
 
 	/**
-	 * �����ڲ���ѯ״̬������Ҫ���¿�ʼ���� find_blank_line ʱ��Ҫ���ñ�
-	 * �����������ڲ���ѯ״̬
+	 * 重置内部查询状态，当需要重新开始调用 find_blank_line 时需要调用本
+	 * 方法以重置内部查询状态
 	 * @return {string&}
 	 */
 	string& find_reset();
 
 	/**
-	 * ����ָ���ַ��ڵ�ǰ���󻺳�����λ�ã��±�� 0 ��ʼ��
-	 * @param n {char} Ҫ���ҵ��з����ַ�
-	 * @return {int} �ַ��ڻ������е�λ�ã�������ֵ < 0 ���ʾ������
+	 * 查找指定字符在当前对象缓冲区的位置（下标从 0 开始）
+	 * @param n {char} 要查找的有符号字符
+	 * @return {int} 字符在缓冲区中的位置，若返回值 < 0 则表示不存在
 	 */
 	int find(char n) const;
 
 	/**
-	 * ����ָ���ַ����ڵ�ǰ���󻺳�������ʼλ�ã��±�� 0 ��ʼ��
-	 * @param needle {const char*} Ҫ���ҵ��з����ַ���
-	 * @param case_sensitive {bool} Ϊ true ��ʾ���ִ�Сд
-	 * @return {char*} �ַ����ڻ������е���ʼλ�ã����ؿ�ָ�����ʾ������
+	 * 查找指定字符串在当前对象缓冲区的起始位置（下标从 0 开始）
+	 * @param needle {const char*} 要查找的有符号字符串
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {char*} 字符串在缓冲区中的起始位置，返回空指针则表示不存在
 	 */
 	char* find(const char* needle, bool case_sensitive=true) const;
 
 	/**
-	 * ��β����ǰ����ָ���ַ����ڵ�ǰ���󻺳�������ʼλ�ã��±�� 0 ��ʼ��
-	 * @param needle {const char*} Ҫ���ҵ��з����ַ���
-	 * @param case_sensitive {bool} Ϊ true ��ʾ���ִ�Сд
-	 * @return {char*} �ַ����ڻ������е���ʼλ�ã�������ֵΪ��ָ�����ʾ������
+	 * 从尾部向前查找指定字符串在当前对象缓冲区的起始位置（下标从 0 开始）
+	 * @param needle {const char*} 要查找的有符号字符串
+	 * @param case_sensitive {bool} 为 true 表示区分大小写
+	 * @return {char*} 字符串在缓冲区中的起始位置，若返回值为空指针则表示不存在
 	 */
 	char* rfind(const char* needle, bool case_sensitive=true) const;
 
 	/**
-	 * ���شӵ�ǰ�ַ��������л�����ָ��λ�����������
-	 * @param n {size_t} �±�λ�ã�����ֵ���ڵ��ڵ�ǰ�ַ��������ݳ���ʱ��
-	 *  �򷵻������ַ������󣻷���ֵ��������ֵָ��λ�õ��ַ�����
-	 * @return {string} ����ֵΪһ�����Ķ��󣬲���Ҫ�����ͷţ��ú�����Ч��
-	 *  ���ܲ���̫��
+	 * 返回从当前字符串对象中缓冲区指定位置以左的内容
+	 * @param n {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
+	 *  则返回整个字符串对象；返回值不包含该值指定位置的字符内容
+	 * @return {string} 返回值为一完整的对象，不需要单独释放，该函数的效率
+	 *  可能并不太高
 	 */
 	string left(size_t n);
 
 	/**
-	 * ���شӵ�ǰ�ַ��������л�����ָ��λ�����ҵ�����
-	 * @param n {size_t} �±�λ�ã�����ֵ���ڵ��ڵ�ǰ�ַ��������ݳ���ʱ��
-	 *  �򷵻ص��ַ�����������Ϊ�գ�����ֵ��������ֵָ��λ�õ��ַ�����
-	 * @return {const string} ����ֵΪһ�����Ķ��󣬲���Ҫ�����ͷţ���
-	 *  ������Ч�ʿ��ܲ���̫��
+	 * 返回从当前字符串对象中缓冲区指定位置以右的内容
+	 * @param n {size_t} 下标位置，当该值大于等于当前字符串的数据长度时，
+	 *  则返回的字符串对象内容为空；返回值不包含该值指定位置的字符内容
+	 * @return {const string} 返回值为一完整的对象，不需要单独释放，该
+	 *  函数的效率可能并不太高
 	 */
 	string right(size_t n);
 
 	/**
-	 * ����ǰ����Ļ������ݿ���һ����������Ŀ�껺����
-	 * @param buf {void*} Ŀ�껺������ַ
-	 * @param size {size_t} buf ����������
-	 * @param move {bool} �ڿ��������ݺ��Ƿ���Ҫ�������������ǰ�ƶ���
-	 *  ����ǰ����ѿ���������
-	 * @return {size_t} ���ؿ�����ʵ���ֽ������� empty() == true ʱ���򷵻� 0
+	 * 将当前对象的缓冲内容拷贝一部分数据至目标缓冲内
+	 * @param buf {void*} 目标缓冲区地址
+	 * @param size {size_t} buf 缓冲区长度
+	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并
+	 *  覆盖前面的已拷贝的数据
+	 * @return {size_t} 返回拷贝的实际字节数，当 empty() == true 时，则返回 0
 	 */
 	size_t scan_buf(void* buf, size_t size, bool move = false);
 
 	/**
-	 * �ӵ�ǰ����Ļ������п���һ������(����"\r\n")��Ŀ�껺�����ڣ�������
-	 * ��������Ŀ�껺��������Դ��������δ�����������ݻᷢ���ƶ������Ǳ�
-	 * ��������������
-	 * @param out {string&} Ŀ�껺�����������ڲ��������Զ���ոû�����
-	 * @param nonl {bool} ���ص�һ�������Ƿ�ȥ��β���� "\r\n" �� "\n"
-	 * @param n {size_t*} �ò���Ϊ�ǿ�ָ��ʱ����洢�����������ݳ��ȣ�����
-	 *  ��һ�������� nonl Ϊ true ʱ����õ�ַ�洢 0
-	 * @param move {bool} �ڿ��������ݺ��Ƿ���Ҫ�������������ǰ�ƶ���
-	 *  ����ǰ����ѿ���������
-	 * @return {bool} �Ƿ񿽱���һ�����������ݣ�������� false ����Ҫ����
-	 *  empty() == true ���жϵ�ǰ���������Ƿ�������
+	 * 从当前对象的缓冲区中拷贝一行数据(包含"\r\n")至目标缓冲区内，当数据
+	 * 被拷贝至目标缓冲区后，在源缓冲区内未被拷贝的数据会发生移动并覆盖被
+	 * 拷贝的数据区域
+	 * @param out {string&} 目标缓冲区，函数内部不会先自动清空该缓冲区
+	 * @param nonl {bool} 返回的一行数据是否去掉尾部的 "\r\n" 或 "\n"
+	 * @param n {size_t*} 该参数为非空指针时，则存储拷贝到的数据长度；当读
+	 *  到一个空行且 nonl 为 true 时，则该地址存储 0
+	 * @param move {bool} 在拷贝完数据后，是否需要将后面的数据向前移动并
+	 *  覆盖前面的已拷贝的数据
+	 * @return {bool} 是否拷贝了一个完整行数据，如果返回 false 还需要根据
+	 *  empty() == true 来判断当前缓冲区中是否还有数据
 	 */
 	bool scan_line(string& out, bool nonl = true, size_t* n = NULL,
 		bool move = false);
 
 	/**
-	 * ��ʹ�� scan_xxx �෽���Ի��������в���ʱδָ�� move ����������ñ�
-	 * ��������ʹ��������ʣ���������ǰ�ƶ����������ײ�
-	 * @return {size_t} �ƶ����ֽ���
+	 * 当使用 scan_xxx 类方法对缓冲区进行操作时未指定 move 动作，则调用本
+	 * 函数可以使缓冲区内剩余的数据向前移动至缓冲区首部
+	 * @return {size_t} 移动的字节数
 	 */
 	size_t scan_move();
 
 	/**
-	 * ���ص�ǰ���󻺳����е�һ���������ݵ�β����ַ
-	 * @return {char*} ����ֵΪ NULL ��˵���ڲ�����Ϊ�գ��� empty() == true
+	 * 返回当前对象缓冲区中第一个不含数据的尾部地址
+	 * @return {char*} 返回值为 NULL 则说明内部数据为空，即 empty() == true
 	 */
 	char* buf_end();
 
 	/**
-	 * ���ص�ǰ���󻺳�������ʼ��ַ
-	 * @return {void*} ���ص�ַ��Զ�ǿ�
+	 * 返回当前对象缓冲区的起始地址
+	 * @return {void*} 返回地址永远非空
 	 */
 	void* buf() const;
 
 	/**
-	 * ���ַ�����ʽ���ص�ǰ���󻺳�������ʼ��ַ
-	 * @return {char*} ���ص�ַ��Զ�ǿ�
+	 * 以字符串方式返回当前对象缓冲区的起始地址
+	 * @return {char*} 返回地址永远非空
 	 */
 	char* c_str() const;
 
 	/**
-	 * ���ص�ǰ�����ַ����ĳ��ȣ�����\0��
-	 * @return {size_t} ����ֵ >= 0
+	 * 返回当前对象字符串的长度（不含\0）
+	 * @return {size_t} 返回值 >= 0
 	 */
 	size_t length() const;
 
 	/**
-	 * ���ص�ǰ�����ַ����ĳ��ȣ�����\0���������� length ��ͬ
-	 * @return {size_t} ����ֵ >= 0
+	 * 返回当前对象字符串的长度（不含\0），功能与 length 相同
+	 * @return {size_t} 返回值 >= 0
 	 */
 	size_t size() const;
 
 	/**
-	 * ���ص�ǰ����Ļ������Ŀռ䳤�ȣ���ֵ >= �����������ݳ���
-	 * @return {size_t} ����ֵ > 0
+	 * 返回当前对象的缓冲区的空间长度，该值 >= 缓冲区内数据长度
+	 * @return {size_t} 返回值 > 0
 	 */
 	size_t capacity() const;
 
 	/**
-	 * �жϵ�ǰ����Ļ����������ݳ����Ƿ�Ϊ 0
-	 * @return {bool} ���� true ��ʾ����Ϊ��
+	 * 判断当前对象的缓冲区内数据长度是否为 0
+	 * @return {bool} 返回 true 表示数据为空
 	 */
 	bool empty() const;
 
 	/**
-	 * ���ص�ǰ�����ڲ����õ� acl C ���е� ACL_VSTRING �����ַ
-	 * @return {ACL_VSTRING*} ����ֵ��Զ�ǿ�
+	 * 返回当前对象内部所用的 acl C 库中的 ACL_VSTRING 对象地址
+	 * @return {ACL_VSTRING*} 返回值永远非空
 	 */
 	ACL_VSTRING* vstring() const;
 
 	/**
-	 * ����ǰ����Ļ��������±�λ������ָ��λ��
-	 * @param n {size_t} Ŀ���±�λ�ã�����ֵ >= capacity ʱ���ڲ���
-	 *  ���·������Щ���ڴ�
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象的缓冲区的下标位置移至指定位置
+	 * @param n {size_t} 目标下标位置，当该值 >= capacity 时，内部会
+	 *  重新分配更大些的内存
+	 * @return {string&} 当前对象的引用
 	 */
 	string& set_offset(size_t n);
 
 	/**
-	 * ���øú�������Ԥ�ȱ�֤����Ҫ�Ļ�������С
-	 * @param n {size_t} ϣ���Ļ������ռ��Сֵ
-	 * @return {string&} ��ǰ���������
+	 * 调用该函数可以预先保证所需要的缓冲区大小
+	 * @param n {size_t} 希望的缓冲区空间大小值
+	 * @return {string&} 当前对象的引用
 	 */
 	string& space(size_t n);
 	string& reserve(size_t n);
 
 	/**
-	 * ����ǰ����洢���ַ������зָ�
-	 * @param sep {const char*} ���зָ�ʱ�ķָ���
-	 * @param quoted {bool} ��Ϊ true ʱ��������ɵ�/˫������������
-	 *  �ַ������ݣ������ָ����ʱҪ�� sep �в��ô��ڵ�/˫��
-	 * @return {std::list<string>&} ���� list ��ʽ�ķָ��������صĽ��
-	 *  ����Ҫ�ͷţ��������˵�ǰ�����һ���ڲ�ָ��
+	 * 将当前对象存储的字符串进行分割
+	 * @param sep {const char*} 进行分割时的分割标记
+	 * @param quoted {bool} 当为 true 时，则对于由单/双引号引起来的
+	 *  字符串内容，不做分割，但此时要求 sep 中不得存在单/双号
+	 * @return {std::list<string>&} 返回 list 格式的分割结果，返回的结果
+	 *  不需要释放，其引用了当前对象的一个内部指针
 	 */
 	std::list<string>& split(const char* sep, bool quoted = false);
 
 	/**
-	 * ����ǰ����洢���ַ������зָ�
-	 * @param sep {const char*} ���зָ�ʱ�ķָ���
-	 * @param quoted {bool} ��Ϊ true ʱ��������ɵ�/˫������������
-	 *  �ַ������ݣ������ָ����ʱҪ�� sep �в��ô��ڵ�/˫��
-	 * @return {std::vector<string>&} ���� vector ��ʽ�ķָ��������ص�
-	 *  �������Ҫ�ͷţ��������˵�ǰ�����һ���ڲ�ָ��
+	 * 将当前对象存储的字符串进行分割
+	 * @param sep {const char*} 进行分割时的分割标记
+	 * @param quoted {bool} 当为 true 时，则对于由单/双引号引起来的
+	 *  字符串内容，不做分割，但此时要求 sep 中不得存在单/双号
+	 * @return {std::vector<string>&} 返回 vector 格式的分割结果，返回的
+	 *  结果不需要释放，其引用了当前对象的一个内部指针
 	 */
 	std::vector<string>& split2(const char* sep, bool quoted = false);
 
 	/**
-	 * �� '=' Ϊ�ָ�������ǰ����洢���ַ����ָ�� name/value �ԣ��ָ�ʱ��
-	 * �Զ�ȥ��Դ�ַ�������ʼ������β���Լ��ָ��� '=' ���ߵĿո� TAB
-	 * @param sep {char} �û�����ͨ���˲���ָ���Լ��ķָ���
-	 * @return {std::pair<string, string>&} �����ǰ����洢���ַ���
-	 *  �����Ϸָ��������������ϸ�� name=value��ʽ�����򷵻صĽ�����ַ�
-	 *  ������Ϊ�մ�,���صĽ������Ҫ�ͷţ��������˵�ǰ�����һ���ڲ���ַ
+	 * 以 '=' 为分隔符将当前对象存储的字符串分割成 name/value 对，分割时会
+	 * 自动去掉源字符串的起始处、结尾处以及分隔符 '=' 两边的空格及 TAB
+	 * @param sep {char} 用户可以通过此参数指定自己的分隔符
+	 * @return {std::pair<string, string>&} 如果当前对象存储的字符串
+	 *  不符合分割条件（即不是严格的 name=value格式），则返回的结果中字符
+	 *  串对象为空串,返回的结果不需要释放，其引用了当前对象的一个内部地址
 	 */
 	std::pair<string, string>& split_nameval(char sep = '=');
 
 	/**
-	 * ���ַ�����������ǰ����Ļ�������
-	 * @param ptr {const char*} Դ�ַ�����ַ������ '\0' ����
-	 * @return {string&} ��ǰ���������
+	 * 将字符串拷贝到当前对象的缓冲区中
+	 * @param ptr {const char*} 源字符串地址，需以 '\0' 结束
+	 * @return {string&} 当前对象的引用
 	 */
 	string& copy(const char* ptr);
 
 	/**
-	 * ��Դ���ݵĶ������ݿ�������ǰ����Ļ�������
-	 * @param ptr {const void*} Դ���ݵ�ַ
-	 * @param len {size_t} ptr Դ���ݳ���
-	 * @return {string&} ��ǰ���������
+	 * 将源数据的定长数据拷贝至当前对象的缓冲区中
+	 * @param ptr {const void*} 源数据地址
+	 * @param len {size_t} ptr 源数据长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& copy(const void* ptr, size_t len);
 
 	/**
-	 * ��Դ�ַ����������ƶ�����ǰ����Ļ������У��ڲ����Զ��ж�Դ����
-	 * ��ַ�Ƿ���ڵ�ǰ����Ļ�������
-	 * @param src {const char*} Դ���ݵ�ַ
-	 * @return {string&} ��ǰ���������
+	 * 将源字符串的数据移动至当前对象的缓冲区中，内部会自动判断源数据
+	 * 地址是否就在当前对象的缓冲区中
+	 * @param src {const char*} 源数据地址
+	 * @return {string&} 当前对象的引用
 	 */
 	string& memmove(const char* src);
 
 	/**
-	 * ��Դ�ַ����������ƶ�����ǰ����Ļ������У��ڲ����Զ��ж�Դ����
-	 * ��ַ�Ƿ���ڵ�ǰ����Ļ�������
-	 * @param src {const char*} Դ���ݵ�ַ
-	 * @param len {size_t} �ƶ����ݵĳ���
-	 * @return {string&} ��ǰ���������
+	 * 将源字符串的数据移动至当前对象的缓冲区中，内部会自动判断源数据
+	 * 地址是否就在当前对象的缓冲区中
+	 * @param src {const char*} 源数据地址
+	 * @param len {size_t} 移动数据的长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& memmove(const char* src, size_t len);
 
 	/**
-	 * ��ָ���ַ��������ڵ�ǰ�������ݻ��������ݵ�β��
-	 * @param s {const string&} Դ���ݶ�������
-	 * @return {string&} ��ǰ���������
+	 * 将指定字符串添加在当前对象数据缓冲区数据的尾部
+	 * @param s {const string&} 源数据对象引用
+	 * @return {string&} 当前对象的引用
 	 */
 	string& append(const string& s);
 
 	/**
-	 * ��ָ���ַ��������ڵ�ǰ�������ݻ��������ݵ�β��
-	 * @param s {const string&} Դ���ݶ���ָ��
-	 * @return {string&} ��ǰ���������
+	 * 将指定字符串添加在当前对象数据缓冲区数据的尾部
+	 * @param s {const string&} 源数据对象指针
+	 * @return {string&} 当前对象的引用
 	 */
 	string& append(const string* s);
 
 	/**
-	 * ��ָ���ַ��������ڵ�ǰ�������ݻ��������ݵ�β��
-	 * @param s {const string&} Դ���ݶ���ָ��
-	 * @return {string&} ��ǰ���������
+	 * 将指定字符串添加在当前对象数据缓冲区数据的尾部
+	 * @param s {const string&} 源数据对象指针
+	 * @return {string&} 当前对象的引用
 	 */
 	string& append(const char* s);
 
 	/**
-	 * ��ָ���������е����������ڵ�ǰ�������ݻ��������ݵ�β��
-	 * @param ptr {const void*} Դ���ݶ���ָ��
-	 * @param len {size_t} ptr ���ݳ���
-	 * @return {string&} ��ǰ���������
+	 * 将指定缓冲区中的数据添加在当前对象数据缓冲区数据的尾部
+	 * @param ptr {const void*} 源数据对象指针
+	 * @param len {size_t} ptr 数据长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& append(const void* ptr, size_t len);
 
 	/**
-	 * ��ָ���ַ������������ڵ�ǰ�������ݻ��������ݵ��ײ�
-	 * @param s {const char*} Դ���ݵ�ַ
-	 * @return {string&} ��ǰ���������
+	 * 将指定字符串数据添加在当前对象数据缓冲区数据的首部
+	 * @param s {const char*} 源数据地址
+	 * @return {string&} 当前对象的引用
 	 */
 	string& prepend(const char* s);
 
 	/**
-	 * ��ָ���ڴ����������ڵ�ǰ�������ݻ��������ݵ��ײ�
-	 * @param ptr {const void*} Դ���ݵ�ַ
-	 * @param len {size_t} ptr ���ݳ���
-	 * @return {string&} ��ǰ���������
+	 * 将指定内存数据添加在当前对象数据缓冲区数据的首部
+	 * @param ptr {const void*} 源数据地址
+	 * @param len {size_t} ptr 数据长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& prepend(const void* ptr, size_t len);
 
 	/**
-	 * ���ڴ����ݲ���ָ���±�λ�ÿ�ʼ�ĵ�ǰ���󻺳�����
-	 * @param start {size_t} ��ǰ���󻺳����Ŀ�ʼ�����±�ֵ
-	 * @param ptr {const void*} �ڴ����ݵĵ�ַ
-	 * @param len {size_t} �ڴ����ݵĳ���
-	 * @return {string&} ��ǰ���������
+	 * 将内存数据插入指定下标位置开始的当前对象缓冲区中
+	 * @param start {size_t} 当前对象缓冲区的开始插入下标值
+	 * @param ptr {const void*} 内存数据的地址
+	 * @param len {size_t} 内存数据的长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& insert(size_t start, const void* ptr, size_t len);
 
 	/**
-	 * ����ʽ��ʽ���������ݣ������� sprintf �ӿڷ�ʽ��
-	 * @param fmt {const char*} ��ʽ�ַ���
-	 * @param ... �������
-	 * @return {string&} ��ǰ���������
+	 * 带格式方式的添加数据（类似于 sprintf 接口方式）
+	 * @param fmt {const char*} 格式字符串
+	 * @param ... 变参数据
+	 * @return {string&} 当前对象的引用
 	 */
 	string& format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * ����ʽ��ʽ���������ݣ������� vsprintf �ӿڷ�ʽ��
-	 * @param fmt {const char*} ��ʽ�ַ���
-	 * @param ap {va_list} �������
-	 * @return {string&} ��ǰ���������
+	 * 带格式方式的添加数据（类似于 vsprintf 接口方式）
+	 * @param fmt {const char*} 格式字符串
+	 * @param ap {va_list} 变参数据
+	 * @return {string&} 当前对象的引用
 	 */
 	string& vformat(const char* fmt, va_list ap);
 
 	/**
-	 * ����ʽ��ʽ�ڵ�ǰ�����β����������
-	 * @param fmt {const char*} ��ʽ�ַ���
-	 * @param ... �������
-	 * @return {string&} ��ǰ���������
+	 * 带格式方式在当前对象的尾部添加数据
+	 * @param fmt {const char*} 格式字符串
+	 * @param ... 变参数据
+	 * @return {string&} 当前对象的引用
 	 */
 	string& format_append(const char* fmt, ...)  ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * ����ʽ��ʽ�ڵ�ǰ�����β����������
-	 * @param fmt {const char*} ��ʽ�ַ���
-	 * @param ap {va_list} �������
-	 * @return {string&} ��ǰ���������
+	 * 带格式方式在当前对象的尾部添加数据
+	 * @param fmt {const char*} 格式字符串
+	 * @param ap {va_list} 变参数据
+	 * @return {string&} 当前对象的引用
 	 */
 	string& vformat_append(const char* fmt, va_list ap);
 
 	/**
-	 * ����ǰ�����е����ݵ��ַ������滻
-	 * @param from {char} Դ�ַ�
-	 * @param to {char} Ŀ���ַ�
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象中的数据的字符进行替换
+	 * @param from {char} 源字符
+	 * @param to {char} 目标字符
+	 * @return {string&} 当前对象的引用
 	 */
 	string& replace(char from, char to);
 
 	/**
-	 * ����ǰ��������ݽض̣��������ڲ��ƶ��±�ָ���ַ
-	 * @param n {size_t} ���ݽض̺�����ݳ��ȣ������ֵ >= ��ǰ������
-	 *  ���ݳ��ȣ����ڲ������κα仯
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象的数据截短，缓冲区内部移动下标指针地址
+	 * @param n {size_t} 数据截短后的数据长度，如果该值 >= 当前缓冲区
+	 *  数据长度，则内部不做任何变化
+	 * @return {string&} 当前对象的引用
 	 */
 	string& truncate(size_t n);
 
 	/**
-	 * �ڵ�ǰ����Ļ�����������ȥ��ָ�����ַ������ݣ��ڴ��������лᷢ��
-	 * �����ƶ����
-	 * @param needle {const char*} ָ����Ҫȥ�����ַ�������
-	 * @param each {bool} ��Ϊ true ʱ����ÿһ�������� needle �е��ַ���
-	 *  ���ڵ�ǰ����Ļ�������ȥ�������򣬽��ڵ�ǰ���󻺳�����ȥ��������
-	 *  needle �ַ���
-	 * @return {string&} ��ǰ���������
-	 *  �� acl::string s("hello world!");
-	 *  �� s.strip("hel", true), ����Ϊ�� s == "o word!"
-	 *  �� s.strip("hel", false), ����Ϊ: s = "lo world!"
+	 * 在当前对象的缓冲区数据中去掉指定的字符串内容，在处理过程中会发生
+	 * 数据移动情况
+	 * @param needle {const char*} 指定需要去掉的字符串数据
+	 * @param each {bool} 当为 true 时，则每一个出现在 needle 中的字符都
+	 *  会在当前对象的缓存区中去掉；否则，仅在当前对象缓冲区中去掉完整的
+	 *  needle 字符串
+	 * @return {string&} 当前对象的引用
+	 *  如 acl::string s("hello world!");
+	 *  若 s.strip("hel", true), 则结果为： s == "o word!"
+	 *  若 s.strip("hel", false), 则结果为: s = "lo world!"
 	 */
 	string& strip(const char* needle, bool each = false);
 
 	/**
-	 * ����ǰ���󻺳�����ߵĿհף������ո�TAB��ȥ��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象缓冲区左边的空白（包含空格及TAB）去掉
+	 * @return {string&} 当前对象的引用
 	 */
 	string& trim_left_space();
 
 	/**
-	 * ����ǰ���󻺳����ұߵĿհף������ո�TAB��ȥ��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象缓冲区右边的空白（包含空格及TAB）去掉
+	 * @return {string&} 当前对象的引用
 	 */
 	string& trim_right_space();
 
 	/**
-	 * ����ǰ���󻺳��������еĿհף������ո�TAB��ȥ��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象缓冲区中所有的空白（包含空格及TAB）去掉
+	 * @return {string&} 当前对象的引用
 	 */
 	string& trim_space();
 
 	/**
-	 * ����ǰ���󻺳�����ߵĻس����з�ȥ��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象缓冲区左边的回车换行符去掉
+	 * @return {string&} 当前对象的引用
 	 */
 	string& trim_left_line();
 
 	/**
-	 * ����ǰ���󻺳����ұߵĻس����з�ȥ��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象缓冲区右边的回车换行符去掉
+	 * @return {string&} 当前对象的引用
 	 */
 	string& trim_right_line();
 
 	/**
-	 * ����ǰ���󻺳��������еĻس����з�ȥ��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象缓冲区中所有的回车换行符去掉
+	 * @return {string&} 当前对象的引用
 	 */
 	string& trim_line();
 
 	/**
-	 * ��յ�ǰ��������ݻ�����
-	 * @return {string&} ��ǰ���������
+	 * 清空当前对象的数据缓冲区
+	 * @return {string&} 当前对象的引用
 	 */
 	string& clear();
 
 	/**
-	 * ����ǰ��������ݻ������е����ݾ�תΪСд
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象的数据缓冲区中的数据均转为小写
+	 * @return {string&} 当前对象的引用
 	 */
 	string& lower();
 
 	/**
-	 * ����ǰ��������ݻ������е����ݾ�תΪ��д
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象的数据缓冲区中的数据均转为大写
+	 * @return {string&} 当前对象的引用
 	 */
 	string& upper();
 
 	/**
-	 * �ӵ�ǰ�������н�ָ��ƫ����ָ�����ȵ����ݿ�����Ŀ�껺������
-	 * @param out {string&} Ŀ�껺�������ڲ�����׷�ӷ�ʽ��������ոö���
-	 * @param p {size_t} ��ǰ����������ʼλ��
-	 * @param len {size_t} �� p ��ʼλ�ÿ�ʼ������������������ֵΪ 0 ʱ
-	 *  �򿽱�ָ�� p λ�ú����е����ݣ����򿽱�ָ�����ȵ����ݣ���ָ����
-	 *  ���ݳ��ȴ���ʵ��Ҫ�����ĳ��ȣ��������ʵ�ʴ��ڵ�����
-	 * @return {size_t} ���ؿ�����ʵ�����ݳ��ȣ�p Խ��ʱ��÷���ֵΪ 0
+	 * 从当前缓冲区中将指定偏移量指定长度的数据拷贝至目标缓冲区中
+	 * @param out {string&} 目标缓冲区，内部采用追加方式，并不清空该对象
+	 * @param p {size_t} 当前缓冲区的起始位置
+	 * @param len {size_t} 从 p 起始位置开始拷贝的数据量，当该值为 0 时
+	 *  则拷贝指定 p 位置后所有的数据，否则拷贝指定长度的数据，若指定的
+	 *  数据长度大于实际要拷贝的长度，则仅拷贝实际存在的数据
+	 * @return {size_t} 返回拷贝的实际数据长度，p 越界时则该返回值为 0
 	 */
 	size_t substr(string& out, size_t p = 0, size_t len = 0) const;
 
 	/**
-	 * ����ǰ��������ݻ������е����ݽ��� base64 ת��
-	 * @return {string&} ��ǰ���������
+	 * 将当前对象的数据缓冲区中的数据进行 base64 转码
+	 * @return {string&} 当前对象的引用
 	 */
 	string& base64_encode();
 
 	/**
-	 * �������Դ���ݽ��� base64 ת�벢���뵱ǰ����Ļ�������
-	 * @param ptr {const void*} Դ���ݵĵ�ַ
-	 * @param len {size_t} Դ���ݳ���
-	 * @return {string&} ��ǰ���������
+	 * 将输入的源数据进行 base64 转码并存入当前对象的缓冲区中
+	 * @param ptr {const void*} 源数据的地址
+	 * @param len {size_t} 源数据长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& base64_encode(const void* ptr, size_t len);
 
 	/**
-	 * �����ǰ����Ļ������е������Ǿ� base64 ����ģ���˺�������Щ
-	 * ���ݽ��н���
-	 * @return {string&} ��ǰ��������ã����������������ڲ��������ᱻ�Զ���գ�
-	 *  ���� string::empty() ���� true
+	 * 如果当前对象的缓冲区中的数据是经 base64 编码的，则此函数将这些
+	 * 数据进行解码
+	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
+	 *  调用 string::empty() 返回 true
 	 */
 	string& base64_decode();
 
 	/**
-	 * ������� base64 ��������ݽ��н��벢���뵱ǰ����Ļ�������
-	 * @param s {const char*} �� base64 �����Դ����
-	 * @return {string&} ��ǰ��������ã����������������ڲ��������ᱻ�Զ���գ�
-	 *  ���� string::empty() ���� true
+	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
+	 * @param s {const char*} 经 base64 编码的源数据
+	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
+	 *  调用 string::empty() 返回 true
 	 */
 	string& base64_decode(const char* s);
 
 	/**
-	 * ������� base64 ��������ݽ��н��벢���뵱ǰ����Ļ�������
-	 * @param ptr {const void*} �� base64 �����Դ����
-	 * @param len {size_t} ptr ���ݳ���
-	 * @return {string&} ��ǰ��������ã����������������ڲ��������ᱻ�Զ���գ�
-	 *  ���� string::empty() ���� true
+	 * 将输入的 base64 编码的数据进行解码并存入当前对象的缓冲区中
+	 * @param ptr {const void*} 经 base64 编码的源数据
+	 * @param len {size_t} ptr 数据长度
+	 * @return {string&} 当前对象的引用，如果解码出错，则内部缓冲区会被自动清空，
+	 *  调用 string::empty() 返回 true
 	 */
 	string& base64_decode(const void* ptr, size_t len);
 
 	/**
-	 * �������Դ���ݽ��� url ���벢���뵱ǰ����Ļ�������
-	 * @param s {const char*} Դ����
-	 * @param dbuf {dbuf_pool*} �ڴ�ض�������ǿգ����ڲ��Ķ�̬�ڴ���
-	 *  �ö����Ϸ����ҵ����������ͷŸö���ʱ�ڲ���ʱ��̬�ڴ���֮���ͷţ�
-	 *  ����ʹ�� acl_mymalloc ���䲢�Զ��ͷ�
-	 * @return {string&} ��ǰ���������
+	 * 将输入的源数据进行 url 编码并存入当前对象的缓冲区中
+	 * @param s {const char*} 源数据
+	 * @param dbuf {dbuf_pool*} 内存池对象，如果非空，则内部的动态内存在
+	 *  该对象上分配且当调用者在释放该对象时内部临时动态内存随之被释放，
+	 *  否则使用 acl_mymalloc 分配并自动释放
+	 * @return {string&} 当前对象的引用
 	 */
 	string& url_encode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
-	 * ��������� url �����Դ���ݽ��벢���뵱ǰ����Ļ�������
-	 * @param s {const char*} �� url �����Դ����
-	 * @param dbuf {dbuf_pool*} �ڴ�ض�������ǿգ����ڲ��Ķ�̬�ڴ���
-	 *  �ö����Ϸ����ҵ����������ͷŸö���ʱ�ڲ���ʱ��̬�ڴ���֮���ͷţ�
-	 * @return {string&} ��ǰ���������
+	 * 将输入的用 url 编码的源数据解码并存入当前对象的缓冲区中
+	 * @param s {const char*} 经 url 编码的源数据
+	 * @param dbuf {dbuf_pool*} 内存池对象，如果非空，则内部的动态内存在
+	 *  该对象上分配且当调用者在释放该对象时内部临时动态内存随之被释放，
+	 * @return {string&} 当前对象的引用
 	 */
 	string& url_decode(const char* s, dbuf_pool* dbuf = NULL);
 
 	/**
-	 * ��Դ���ݽ��� H2B ���벢���뵱ǰ����Ļ�������
-	 * @param s {const void*} Դ���ݵ�ַ
-	 * @param len {size_t} Դ���ݳ���
-	 * @return {string&} ��ǰ���������
+	 * 将源数据进行 H2B 编码并存入当前对象的缓冲区中
+	 * @param s {const void*} 源数据地址
+	 * @param len {size_t} 源数据长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& hex_encode(const void* s, size_t len);
 
 	/**
-	 * ��Դ���ݽ��� H2B ���벢���뵱ǰ����Ļ�������
-	 * @param s {const char*} Դ���ݵ�ַ
-	 * @param len {size_t} Դ���ݳ���
-	 * @return {string&} ��ǰ���������
+	 * 将源数据进行 H2B 解码并存入当前对象的缓冲区中
+	 * @param s {const char*} 源数据地址
+	 * @param len {size_t} 源数据长度
+	 * @return {string&} 当前对象的引用
 	 */
 	string& hex_decode(const char* s, size_t len);
 
 	/**
-	 * ���ļ�ȫ·������ȡ�ļ���
-	 * @param path {const char*} �ļ�ȫ·���ַ������ǿ��ַ���
-	 * @return {string&} ��ǰ���������
+	 * 从文件全路径中提取文件名
+	 * @param path {const char*} 文件全路径字符串，非空字符串
+	 * @return {string&} 当前对象的引用
 	 */
 	string& basename(const char* path);
 
 	/**
-	 * ���ļ�ȫ·������ȡ�ļ�����Ŀ¼
-	 * @param path {const char*} �ļ�ȫ·���ַ������ǿ��ַ���
-	 * @return {string&} ��ǰ���������
+	 * 从文件全路径中提取文件所在目录
+	 * @param path {const char*} 文件全路径字符串，非空字符串
+	 * @return {string&} 当前对象的引用
 	 */
 	string& dirname(const char* path);
 
 	/**
-	 * �� 32 λ�з�������תΪ�ַ����棨�ڲ�ʹ�����ֲ߳̾�������
-	 * @param n {int} 32 λ�з�������
-	 * @return {string&} ת�������������ã����������ڲ���һ���ֲ߳̾�����
+	 * 将 32 位有符号整数转为字符串存（内部使用了线程局部变量）
+	 * @param n {int} 32 位有符号整数
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
 	static string& parse_int(int n);
 
 	/**
-	 * �� 32 λ�޷�������תΪ�ַ����棨�ڲ�ʹ�����ֲ߳̾�������
-	 * @param n {int} 32 λ�޷�������
-	 * @return {string&} ת�������������ã����������ڲ���һ���ֲ߳̾�����
+	 * 将 32 位无符号整数转为字符串存（内部使用了线程局部变量）
+	 * @param n {int} 32 位无符号整数
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
 	static string& parse_int(unsigned int n);
 #if defined(_WIN32) || defined(_WIN64)
@@ -1281,22 +1281,22 @@ public:
 	static string& parse_int64(unsigned __int64 n);
 #else
 	/**
-	 * �� 64 λ�з�������תΪ�ַ����棨�ڲ�ʹ�����ֲ߳̾�������
-	 * @param n {long long int} 64 λ�з�������
-	 * @return {string&} ת�������������ã����������ڲ���һ���ֲ߳̾�����
+	 * 将 64 位有符号整数转为字符串存（内部使用了线程局部变量）
+	 * @param n {long long int} 64 位有符号整数
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
 	static string& parse_int64(long long int n);
 
 	/**
-	 * �� 64 λ�޷�������תΪ�ַ����棨�ڲ�ʹ�����ֲ߳̾�������
-	 * @param n {unsigned long long int} 64 λ�޷�������
-	 * @return {string&} ת�������������ã����������ڲ���һ���ֲ߳̾�����
+	 * 将 64 位无符号整数转为字符串存（内部使用了线程局部变量）
+	 * @param n {unsigned long long int} 64 位无符号整数
+	 * @return {string&} 转换结果对象的引用，其引用了内部的一个线程局部变量
 	 */
 	static string& parse_int64(unsigned long long int n);
 #endif
 
 	/**
-	 * ģ�庯�������������³���:
+	 * 模板函数，可用在以下场景:
 	 * string s1, s2;
 	 * T v;
 	 * s1 = s2 + v;
@@ -1329,7 +1329,7 @@ bool operator == (const string* s, const string& str);
 bool operator == (const char* s, const string& str);
 
 /**
- * ģ�庯�������������³���:
+ * 模板函数，可用在以下场景:
  * string s1, s2;
  * T v;
  * s1 = v + s2;
@@ -1343,7 +1343,7 @@ string operator + (T v, const string& rhs) {
 }
 
 /**
- * ʾ��:
+ * 示例:
  * string s, s1 = "hello", s2 = "world";
  * s = s1 + " " + s2;
  * s = ">" + s1 + " " + s2;
@@ -1374,7 +1374,7 @@ std::ostream& operator << (std::ostream& o, const acl::string& s);
 #if __cplusplus >= 201103L      // Support c++11 ?
 namespace std {
 
-// �����ϣ������ֻΪ����C++11�е� std::unordered_xxx ������ʹ��
+// 定义哈希方法，只为方便C++11中的 std::unordered_xxx 类容器使用
 
 template <>
 struct hash<acl::string> {

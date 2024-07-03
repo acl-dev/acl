@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 	int   ch;
 	char  url[256], dump[256];
 
-	acl_lib_init();  /* ³õÊ¼»¯ acl ¿â */
+	acl_lib_init();  /* Â³ÃµÃŠÂ¼Â»Â¯ acl Â¿Ã¢ */
 
 	url[0] = 0;
 	dump[0] = 0;

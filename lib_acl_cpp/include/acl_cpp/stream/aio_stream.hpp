@@ -13,7 +13,7 @@ struct ACL_VSTREAM;
 namespace acl {
 
 /**
- * �첽���ص���
+ * 异步流回调类
  */
 class ACL_CPP_API aio_callback : public noncopyable {
 public:
@@ -27,12 +27,12 @@ public:
 	}
 
 	/**
-	 * ���ص��麯�����ûص��������������� aio_istream ʵ���е�
-	 * gets/read �Ŀɶ������󱻵��ã����첽����ڲ���������������
-	 * �ݶ�����ֱ�Ӵ��ݸ��û�������
-	 * @param data {char*} ���������ݵ�ָ���ַ
-	 * @param len {int} ���������ݳ���(> 0)
-	 * @return {bool} �ú������� false ֪ͨ�첽����رո��첽��
+	 * 读回调虚函数，该回调函数当满足了类 aio_istream 实例中的
+	 * gets/read 的可读条件后被调用，由异步框架内部将符合条件的数
+	 * 据读出，直接传递给用户的子类
+	 * @param data {char*} 读到的数据的指针地址
+	 * @param len {int} 读到的数据长度(> 0)
+	 * @return {bool} 该函数返回 false 通知异步引擎关闭该异步流
 	 */
 	virtual bool read_callback(char* data, int len)
 	{
@@ -42,9 +42,9 @@ public:
 	}
 
 	/**
-	 * ���ص��麯�����ûص��������������� aio_istream ʵ���е�
-	 * read_wait �Ŀɶ��������첽���������ݿɶ�ʱ�����ã�����ʱʱ��
-	 * ���� timeout_callback�����쳣���ر�ʱ����� close_callback
+	 * 读回调虚函数，该回调函数当满足了类 aio_istream 实例中的
+	 * read_wait 的可读条件即异步流中有数据可读时被调用；当超时时会
+	 * 调用 timeout_callback，流异常被关闭时会调用 close_callback
 	 */
 	virtual bool read_wakeup(void)
 	{
@@ -52,8 +52,8 @@ public:
 	}
 
 	/**
-	 * д�ɹ���Ļص��麯��
-	 * @return {bool} �ú������� false ֪ͨ�첽����رո��첽��
+	 * 写成功后的回调虚函数
+	 * @return {bool} 该函数返回 false 通知异步引擎关闭该异步流
 	 */
 	virtual bool write_callback(void)
 	{
@@ -61,9 +61,9 @@ public:
 	}
 
 	/**
-	 * ���ص��麯�����ûص��������������� aio_ostream ʵ���е�
-	 * write_wait �Ŀ�д�������첽����дʱ�����ã�����ʱʱ��
-	 * ���� timeout_callback�����쳣���ر�ʱ����� close_callback
+	 * 读回调虚函数，该回调函数当满足了类 aio_ostream 实例中的
+	 * write_wait 的可写条件即异步流可写时被调用；当超时时会
+	 * 调用 timeout_callback，流异常被关闭时会调用 close_callback
 	 */
 	virtual bool write_wakeup(void)
 	{
@@ -80,103 +80,103 @@ class aio_handle;
 class stream_hook;
 
 /**
- * �첽�����࣬����Ϊ�����࣬���ܱ�ֱ��ʵ������ֻ�ܱ�����̳�ʹ��
- * ����ֻ���ڶ��Ϸ��䣬������ջ�Ϸ���
+ * 异步流基类，该类为纯虚类，不能被直接实例化，只能被子类继承使用
+ * 该类只能在堆上分配，不能在栈上分配
  */
 class ACL_CPP_API aio_stream : public noncopyable {
 public:
 	/**
-	 * ���캯��
+	 * 构造函数
 	 * @param handle {aio_handle*}
 	 */
 	aio_stream(aio_handle* handle);
 
 	/**
-	 * �ر��첽��
-	 * @param flush_out {bool} ��Ϊ true ʱ������Ҫ�ȷ��ͻ��徴������д��
-	 *  �ſ��Թرգ������򲻱�����д�������е����ݱ�ɹر�
+	 * 关闭异步流
+	 * @param flush_out {bool} 当为 true 时，则需要等发送缓冲敬的数据写完
+	 *  才可以关闭，否则则不必清理写缓冲区中的数据便可关闭
 	 */
 	void close(bool flush_out = false);
 
 	/**
-	 * ���ӹر�ʱ�Ļص������ָ�룬����ûص�������Ѿ����ڣ���ֻ��
-	 * ʹ�ö����ڴ򿪿���״̬
-	 * @param callback {aio_callback*} �̳� aio_callback ������ص������
-	 *  ���첽���ر�ǰ���ȵ��ô˻ص�������е� close_callback �ӿ�
+	 * 添加关闭时的回调类对象指针，如果该回调类对象已经存在，则只是
+	 * 使该对象处于打开可用状态
+	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
+	 *  当异步流关闭前会先调用此回调类对象中的 close_callback 接口
 	 */
 	void add_close_callback(aio_callback* callback);
 
 	/**
-	 * ���ӳ�ʱʱ�Ļص������ָ�룬����ûص�������Ѿ����ڣ���ֻ��
-	 * ʹ�ö����ڴ򿪿���״̬
-	 * @param callback {aio_callback*} �̳� aio_callback ������ص������
-	 *  ���첽���ر�ǰ���ȵ��ô˻ص�������е� timeout_callback �ӿ�
+	 * 添加超时时的回调类对象指针，如果该回调类对象已经存在，则只是
+	 * 使该对象处于打开可用状态
+	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
+	 *  当异步流关闭前会先调用此回调类对象中的 timeout_callback 接口
 	 */
 	void add_timeout_callback(aio_callback* callback);
 
 	/**
-	 * ɾ���ر�ʱ�Ļص������ָ��
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ���ɾ�����еĹرջص�����
-	 * @return {int} ���ر��ӻص����󼯺���ɾ���Ļص�����ĸ���
+	 * 删除关闭时的回调类对象指针
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则删除所有的关闭回调对象
+	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
 	 */
 	int del_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * ɾ����ʱʱ�Ļص������ָ��
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ���ɾ�����еĳ�ʱ�ص�����
-	 * @return {int} ���ر��ӻص����󼯺���ɾ���Ļص�����ĸ���
+	 * 删除超时时的回调类对象指针
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则删除所有的超时回调对象
+	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
 	 */
 	int del_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * ��ֹ�رյĻص�����󣬵������ӹرն��󼯺���ɾ��
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ����ֹ���еĹرջص�����
-	 * @return {int} ���ر��ӻص����󼯺��н��õĻص�����ĸ���
+	 * 禁止关闭的回调类对象，但并不从关闭对象集合中删除
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则禁止所有的关闭回调对象
+	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
 	 */
 	int disable_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * ��ֹ��ʱ�Ļص�����󣬵������ӳ�ʱ���󼯺���ɾ��
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ����ֹ���еĳ�ʱ�ص�����
-	 * @return {int} ���ر��ӻص����󼯺��н��õĻص�����ĸ���
+	 * 禁止超时的回调类对象，但并不从超时对象集合中删除
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则禁止所有的超时回调对象
+	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
 	 */
 	int disable_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * �������еĻص����󱻵���
-	 * @param callback {aio_callback*} ����ָ���Ļص����������ֵΪ�գ�
-	 *  ���������еĹرջص�����
-	 * @return {int} ���ر����õĻص�����ĸ���
+	 * 启用所有的回调对象被调用
+	 * @param callback {aio_callback*} 启用指定的回调对象，如果该值为空，
+	 *  则启用所有的关闭回调对象
+	 * @return {int} 返回被启用的回调对象的个数
 	 */
 	int enable_close_callback(aio_callback* callback = NULL);
 
 	/**
-	 * �������еĻص����󱻵���
-	 * @param callback {aio_callback*} ����ָ���Ļص����������ֵΪ�գ�
-	 *  ���������еĳ�ʱ�ص�����
-	 * @return {int} ���ر����õĻص�����ĸ���
+	 * 启用所有的回调对象被调用
+	 * @param callback {aio_callback*} 启用指定的回调对象，如果该值为空，
+	 *  则启用所有的超时回调对象
+	 * @return {int} 返回被启用的回调对象的个数
 	 */
 	int enable_timeout_callback(aio_callback* callback = NULL);
 
 	/**
-	 * ����첽������ ACL_ASTREAM
+	 * 获得异步流对象 ACL_ASTREAM
 	 * @return {ACL_ASTREAM*}
 	 */
 	ACL_ASTREAM* get_astream(void) const;
 
 	/**
-	 * ����첽�������е�ͬ�������� ACL_VSTREAM
+	 * 获得异步流对象中的同步流对象 ACL_VSTREAM
 	 * @return {ACL_VSTREAM*}
 	 */
 	ACL_VSTREAM* get_vstream(void) const;
 
 	/**
-	 * ����첽���е� SOCKET ������
-	 * @return {ACL_SOCKET} ���������򷵻� -1(UNIX) �� INVALID_SOCKET(win32)
+	 * 获得异步流中的 SOCKET 描述符
+	 * @return {ACL_SOCKET} 若不存在则返回 -1(UNIX) 或 INVALID_SOCKET(win32)
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET get_socket(void) const;
@@ -190,54 +190,54 @@ public:
 	}
 
 	/**
-	 * ���Զ�����ӵĵ�ַ
-	 * @param full {bool} �Ƿ���������ַ������IP:PORT������ò���
-	 *  Ϊ false��������� IP�����򷵻� IP:PORT
-	 * @return {const char*} Զ�����ӵ�ַ��������ֵ == '\0' ���ʾ
-	 *  �޷����Զ�����ӵ�ַ
+	 * 获得远程连接的地址
+	 * @param full {bool} 是否获得完整地址，即：IP:PORT，如果该参数
+	 *  为 false，则仅返回 IP，否则返回 IP:PORT
+	 * @return {const char*} 远程连接地址，若返回值 == '\0' 则表示
+	 *  无法获得远程连接地址
 	 */
 	const char* get_peer(bool full = false) const;
 
 	/**
-	 * ������ӵı��ص�ַ
-	 * @param full {bool} �Ƿ���������ַ������IP:PORT������ò���
-	 *  Ϊ false��������� IP�����򷵻� IP:PORT
-	 * @return {const char*} �����ӵı��ص�ַ��������ֵ == "" ���ʾ
-	 *  �޷���ñ��ص�ַ
+	 * 获得连接的本地地址
+	 * @param full {bool} 是否获得完整地址，即：IP:PORT，如果该参数
+	 *  为 false，则仅返回 IP，否则返回 IP:PORT
+	 * @return {const char*} 该连接的本地地址，若返回值 == "" 则表示
+	 *  无法获得本地地址
 	 */
 	const char* get_local(bool full = false) const;
 
 	/**
-	 * ����첽���¼����
+	 * 获得异步流事件句柄
 	 * @return {aio_handle&}
 	 */
 	aio_handle& get_handle(void) const;
 
 	/**
-	 * ���°��첽�¼����
+	 * 重新绑定异步事件句柄
 	 * @param handle {aio_handle&}
-	 * ע���÷��������ڶ��󴴽������һ�Σ�һ������ IO �������ֹ����
+	 * 注：该方法仅可在对象创建后调用一次，一旦进入 IO 过程则禁止调用
 	 */
 	void set_handle(aio_handle& handle);
 
 	/**
-	 * ע���д�������ڲ��Զ����� hook->open ���̣�����ɹ����򷵻�֮ǰ
-	 * ע��Ķ���(����ΪNULL)����ʧ���򷵻������������ͬ��ָ�룬Ӧ�ÿ���
-	 * ͨ���жϷ���ֵ������ֵ�Ƿ���ͬ���ж�ע���������Ƿ�ɹ�
-	 * xxx: �ڵ��ô˷���ǰ���뱣֤�������Ѿ�����
-	 * @param hook {stream_hook*} �ǿն���ָ��
-	 * @return {stream_hook*} ����ֵ������ֵ��ͬ���ʾ�ɹ�
+	 * 注册读写流对象，内部自动调用 hook->open 过程，如果成功，则返回之前
+	 * 注册的对象(可能为NULL)，若失败则返回与输入参数相同的指针，应用可以
+	 * 通过判断返回值与输入值是否相同来判断注册流对象是否成功
+	 * xxx: 在调用此方法前必须保证流连接已经创建
+	 * @param hook {stream_hook*} 非空对象指针
+	 * @return {stream_hook*} 返回值与输入值不同则表示成功
 	 */
 	stream_hook* setup_hook(stream_hook* hook);
 
 	/**
-	 * ��õ�ǰע�������д����
+	 * 获得当前注册的流读写对象
 	 * @return {stream_hook*}
 	 */
 	stream_hook* get_hook(void) const;
 
 	/**
-	 * ɾ����ǰע�������д���󲢷��ظö��󣬻ָ�ȱʡ�Ķ�д����
+	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
 	 * @return {stream_hook*}
 	 */
 	stream_hook* remove_hook(void);
@@ -250,25 +250,25 @@ protected:
 	virtual ~aio_stream(void);
 
 	/**
-	 * ͨ���˺�������̬�ͷ�ֻ���ڶ��Ϸ�����첽�������
+	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
 	 */
 	virtual void destroy(void);
 
 	/**
-	 * ����Ӧ�ڴ����ɹ�����øú���֪ͨ���������첽�������,
-	 * ͬʱע�����رռ�����ʱʱ�Ļص�����
+	 * 子类应在创建成功后调用该函数通知基类增加异步流句柄数,
+	 * 同时注册流关闭及流超时时的回调过程
 	 */
 	void enable_error(void);
 
 protected:
 	enum {
-		// �Ƿ������ hook_xxx ������Ӧ�ı�־λ
+		// 是否调用了 hook_xxx 函数对应的标志位
 		STATUS_HOOKED_ERROR = 1,
 		STATUS_HOOKED_READ  = 1 << 1,
 		STATUS_HOOKED_WRITE = 1 << 2,
 		STATUS_HOOKED_OPEN  = 1 << 3,
 
-		// ���� aio_socket_stream ����ʾ�Ƿ������ѽ���
+		// 对于 aio_socket_stream 流表示是否连接已建立
 		STATUS_CONN_OPENED  = 1 << 4,
 	};
 	unsigned status_;

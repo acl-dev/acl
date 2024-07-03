@@ -62,7 +62,7 @@ static void gc_timer(int event_type acl_unused, ACL_EVENT *event acl_unused,
 	ACL_AIO *aio = (ACL_AIO *) context;
 
 	acl_mem_slice_delay_destroy();
-	/* 设定定时器定时清理垃圾回收器 */
+	/* 璁惧畾瀹氭椂鍣ㄥ畾鏃舵竻鐞嗗瀮鍦惧洖鏀跺櫒 */
 	acl_aio_request_timer(aio, gc_timer, aio, 2, 0);
 }
 
@@ -76,7 +76,7 @@ static void *__runner_loop(void *arg)
 	printf("start one thread ok, id=%lu\n",
 		(unsigned long) acl_pthread_self());
 
-	/* 设定定时器定时清理垃圾回收器 */
+	/* 璁惧畾瀹氭椂鍣ㄥ畾鏃舵竻鐞嗗瀮鍦惧洖鏀跺櫒 */
 	if (__use_slice)
 		acl_aio_request_timer(aio, gc_timer, aio, 2, 0);
 

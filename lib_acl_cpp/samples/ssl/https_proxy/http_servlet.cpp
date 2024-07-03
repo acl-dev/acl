@@ -36,7 +36,7 @@ bool http_servlet::doError(acl::HttpServletRequest& req,
 
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf("<root error='error request' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -50,7 +50,7 @@ bool http_servlet::doUnknown(acl::HttpServletRequest& req,
 
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -132,7 +132,7 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	conn->header_disable("Accept-Encoding");
 	logger_request(req);
 
-	// Éú³ÉÍêÕûµÄ url£¬ÒÔ±¸ÏÂÃæÊ¹ÓÃ
+	// ç”Ÿæˆå®Œæ•´çš„ urlï¼Œä»¥å¤‡ä¸‹é¢ä½¿ç”¨
 	const char* host = req.getRemoteHost();
 	const char* uri = req.getRequestUri();
 	if (host == NULL || *host == 0)

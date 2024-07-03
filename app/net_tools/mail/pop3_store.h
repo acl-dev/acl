@@ -11,10 +11,10 @@ public:
 protected:
 	~pop3_store();
 
-	// »ùÀàÐéº¯Êý£º×ÓÏß³Ì´¦Àíº¯Êý
+	// åŸºç±»è™šå‡½æ•°ï¼šå­çº¿ç¨‹å¤„ç†å‡½æ•°
 	virtual void rpc_run();
 
-	// »ùÀàÐéº¯Êý£ºÖ÷Ïß³Ì´¦Àí¹ý³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
+	// åŸºç±»è™šå‡½æ•°ï¼šä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
 	virtual void rpc_onover();
 private:
 	bool ok_;

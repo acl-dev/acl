@@ -24,7 +24,7 @@
 /*---------------------------------------------------------------------------*/
 
 /**
- * ´ÓÊı¾İ±íÖĞ²éÑ¯Ä³¸öË÷Òı±íÏî
+ * ä»æ•°æ®è¡¨ä¸­æŸ¥è¯¢æŸä¸ªç´¢å¼•è¡¨é¡¹
  */
 static ACL_MDT_IDX *mdt_idx(const ACL_MDT *mdt, const char *key_label)
 {
@@ -40,7 +40,7 @@ static ACL_MDT_IDX *mdt_idx(const ACL_MDT *mdt, const char *key_label)
 	return (NULL);
 }
 
-/* ´´½¨¸ÃË÷Òı±íÀïµÄ¸÷¸öË÷Òı×Ö¶Î */
+/* åˆ›å»ºè¯¥ç´¢å¼•è¡¨é‡Œçš„å„ä¸ªç´¢å¼•å­—æ®µ */
 
 static  void mdt_idx_create(ACL_MDT *mdt, size_t init_capacity,
 	const char *key_labels[], unsigned int idx_flags[])
@@ -57,7 +57,7 @@ static  void mdt_idx_create(ACL_MDT *mdt, size_t init_capacity,
 	}
 }
 
-/* Ïú»ÙËùÓĞµÄË÷Òı */
+/* é”€æ¯æ‰€æœ‰çš„ç´¢å¼• */
 
 static void mdt_idx_free(ACL_MDT *mdt)
 {
@@ -73,10 +73,10 @@ static void mdt_idx_free(ACL_MDT *mdt)
 }
 
 /**
- * ÊÍ·ÅÄ³¸öÊı¾İ½áµã£¬Í¬Ê±¸ù¾İÓÃ»§µÄÊÍ·Å»Øµ÷À´ÊÍ·ÅÓÃ»§µÄÊı¾İ
- * @param mdt {ACL_MDT*} Êı¾İ±í¾ä±ú
- * @param node {ACL_MDT_NODE*} Ä³¸öÊı¾İ½áµãÖ¸Õë
- * @param onfree_fn ÔÚÊÍ·ÅÄ³¸öÊı¾İ½áµãÇ°µ÷ÓÃ¸Ãº¯Êı
+ * é‡Šæ”¾æŸä¸ªæ•°æ®ç»“ç‚¹ï¼ŒåŒæ—¶æ ¹æ®ç”¨æˆ·çš„é‡Šæ”¾å›è°ƒæ¥é‡Šæ”¾ç”¨æˆ·çš„æ•°æ®
+ * @param mdt {ACL_MDT*} æ•°æ®è¡¨å¥æŸ„
+ * @param node {ACL_MDT_NODE*} æŸä¸ªæ•°æ®ç»“ç‚¹æŒ‡é’ˆ
+ * @param onfree_fn åœ¨é‡Šæ”¾æŸä¸ªæ•°æ®ç»“ç‚¹å‰è°ƒç”¨è¯¥å‡½æ•°
  */
 static void mdt_node_free(ACL_MDT *mdt, ACL_MDT_NOD *node,
 	void (*onfree_fn)(void*, unsigned int))
@@ -95,9 +95,9 @@ static void mdt_node_free(ACL_MDT *mdt, ACL_MDT_NOD *node,
 }
 
 /**
- * ·ÖÅäÒ»¸öĞÂµÄÊı¾İÏî½áµã
- * @param data {void*} ÓÃ»§µÄ¶¯Ì¬Êı¾İÖ¸Õë
- * @return {ACL_MDT_NOD*} ²úÉúµÄĞÂµÄÊı¾İ½áµã
+ * åˆ†é…ä¸€ä¸ªæ–°çš„æ•°æ®é¡¹ç»“ç‚¹
+ * @param data {void*} ç”¨æˆ·çš„åŠ¨æ€æ•°æ®æŒ‡é’ˆ
+ * @return {ACL_MDT_NOD*} äº§ç”Ÿçš„æ–°çš„æ•°æ®ç»“ç‚¹
  */
 static ACL_MDT_NOD *mdt_node_new(ACL_MDT *mdt, void *data, unsigned int dlen)
 {
@@ -120,14 +120,14 @@ static ACL_MDT_NOD *mdt_node_new(ACL_MDT *mdt, void *data, unsigned int dlen)
 	node->nrefer = 0;
 	ring_init(&node->ref_head);
 
-	/* ½«Êı¾İ½áµãÖÃÈë±íµÄÊı¾İ½áµãË«ÏòÁ´ÖĞ */
+	/* å°†æ•°æ®ç»“ç‚¹ç½®å…¥è¡¨çš„æ•°æ®ç»“ç‚¹åŒå‘é“¾ä¸­ */
 	ring_prepend(&mdt->nod_head, &node->mdt_entry);
 	mdt->node_cnt++;
 	return (node);
 }
 
 /**
- * ¸ù¾İ¼ü key ´´½¨Ò»¸öĞÂµÄ½á¹û¼¯ºÏ¶ÔÏó
+ * æ ¹æ®é”® key åˆ›å»ºä¸€ä¸ªæ–°çš„ç»“æœé›†åˆå¯¹è±¡
  */
 static ACL_MDT_REC *mdt_rec_new(ACL_MDT *mdt)
 {
@@ -145,7 +145,7 @@ static ACL_MDT_REC *mdt_rec_new(ACL_MDT *mdt)
 }
 
 /**
- * ÊÍ·ÅÒ»¸ö½á¹û¼¯¶ÔÏó
+ * é‡Šæ”¾ä¸€ä¸ªç»“æœé›†å¯¹è±¡
  * @param rec {ACL_MDT_REC*}
  */
 static void mdt_rec_free(ACL_MDT *mdt, ACL_MDT_REC *rec)
@@ -157,9 +157,9 @@ static void mdt_rec_free(ACL_MDT *mdt, ACL_MDT_REC *rec)
 }
 
 /**
- * ÊÍ·ÅÒ»¸öÒıÓÃ½áµã£¬µ±¸ÃÒıÓÃ½áµãËùÒıÓÃµÄÊı¾İ½áµã»ò½á¹û¼¯ºÏµÄ¸÷×ÔÒıÓÃ
- * ¼ÆÊıÎª0Ê±±ã»á×Ô¶¯ÊÍ·ÅÊı¾İ½áµã»ò½á¹û¼¯ºÏ
- * @param ref {ACL_MDT_REF*} Ä³¸öÊı¾İ½áµãÖĞÓëÄ³Ë÷Òı¼üÏà¶ÔÓ¦µÄÒıÓÃ½áµã
+ * é‡Šæ”¾ä¸€ä¸ªå¼•ç”¨ç»“ç‚¹ï¼Œå½“è¯¥å¼•ç”¨ç»“ç‚¹æ‰€å¼•ç”¨çš„æ•°æ®ç»“ç‚¹æˆ–ç»“æœé›†åˆçš„å„è‡ªå¼•ç”¨
+ * è®¡æ•°ä¸º0æ—¶ä¾¿ä¼šè‡ªåŠ¨é‡Šæ”¾æ•°æ®ç»“ç‚¹æˆ–ç»“æœé›†åˆ
+ * @param ref {ACL_MDT_REF*} æŸä¸ªæ•°æ®ç»“ç‚¹ä¸­ä¸æŸç´¢å¼•é”®ç›¸å¯¹åº”çš„å¼•ç”¨ç»“ç‚¹
  */
 static void mdt_ref_del(ACL_MDT *mdt, ACL_MDT_REF *ref)
 {
@@ -174,7 +174,7 @@ static void mdt_ref_del(ACL_MDT *mdt, ACL_MDT_REF *ref)
 }
 
 /**
- * ´´½¨Ò»¸öĞÂµÄÒıÓÃ½áµã²¢½«Æä Óë node, rec ½øĞĞ¹ØÁª
+ * åˆ›å»ºä¸€ä¸ªæ–°çš„å¼•ç”¨ç»“ç‚¹å¹¶å°†å…¶ ä¸ node, rec è¿›è¡Œå…³è”
  * @param ref {ACL_MDT_REF*}
  * @parma node {ACL_MDT_NOD*}
  * @param rec {ACL_MDT_REC*}
@@ -188,27 +188,27 @@ static void mdt_ref_add(ACL_MDT *mdt, ACL_MDT_NOD *node, ACL_MDT_REC *rec)
 	else
 		ref = (ACL_MDT_REF *) acl_mycalloc(1, sizeof(ACL_MDT_REF));
 
-	/* ½«ÒıÓÃ½áµãÓëÊı¾İ½áµã½øĞĞ¹ØÁª */
+	/* å°†å¼•ç”¨ç»“ç‚¹ä¸æ•°æ®ç»“ç‚¹è¿›è¡Œå…³è” */
 	ref->node = node;
 	node->nrefer++;
-	/* ½«ÒıÓÃ½áµãÖÃÈëÊı¾İ½áµãµÄÒıÓÃ½áµã¼¯ºÏÖĞ */
+	/* å°†å¼•ç”¨ç»“ç‚¹ç½®å…¥æ•°æ®ç»“ç‚¹çš„å¼•ç”¨ç»“ç‚¹é›†åˆä¸­ */
 	ring_prepend(&node->ref_head, &ref->nod_entry);
 
-	/* ½«ÒıÓÃ½áµãÓë½á¹û¼¯½áµã½øĞĞ¹ØÁª */
+	/* å°†å¼•ç”¨ç»“ç‚¹ä¸ç»“æœé›†ç»“ç‚¹è¿›è¡Œå…³è” */
 	ref->rec = rec;
-	rec->nrefer++;  /* ½«ÒıÓÃ¼ÆÊı¼Ó1 */
-	/* ½«ÒıÓÃ½áµãÖÃÈë½á¹û¼¯ºÏµÄÒıÓÃ½áµã¼¯ºÏÖĞ */
+	rec->nrefer++;  /* å°†å¼•ç”¨è®¡æ•°åŠ 1 */
+	/* å°†å¼•ç”¨ç»“ç‚¹ç½®å…¥ç»“æœé›†åˆçš„å¼•ç”¨ç»“ç‚¹é›†åˆä¸­ */
 	ring_prepend(&rec->ref_head, &ref->rec_entry);
 }
 
 /**
- * Ïò±íÖĞÌí¼ÓÊı¾İ£¬Í¬Ê±Ìí¼ÓË÷ÒıÏî
- * @param mdt {ACL_MDT*} ±í
- * @param data {void*} Êı¾İÖ¸Õë
- * @param dlen {unsigned int} data Êı¾İ´óĞ¡
- * @param key_lables {const char*[]} Ë÷Òı¹Ø¼ü×Ö¶Î±êÊ¶
- * @param keys {const char*[]} Ë÷Òı¹Ø¼ü×Ö
- * @return {ACL_MDT_NOD*} ĞÂ´´½¨µÄ±í½áµã
+ * å‘è¡¨ä¸­æ·»åŠ æ•°æ®ï¼ŒåŒæ—¶æ·»åŠ ç´¢å¼•é¡¹
+ * @param mdt {ACL_MDT*} è¡¨
+ * @param data {void*} æ•°æ®æŒ‡é’ˆ
+ * @param dlen {unsigned int} data æ•°æ®å¤§å°
+ * @param key_lables {const char*[]} ç´¢å¼•å…³é”®å­—æ®µæ ‡è¯†
+ * @param keys {const char*[]} ç´¢å¼•å…³é”®å­—
+ * @return {ACL_MDT_NOD*} æ–°åˆ›å»ºçš„è¡¨ç»“ç‚¹
  */
 static ACL_MDT_NOD *mdt_add(ACL_MDT *mdt, void *data, unsigned int dlen,
 	const char *key_labels[], const char *keys[])
@@ -219,9 +219,9 @@ static ACL_MDT_NOD *mdt_add(ACL_MDT *mdt, void *data, unsigned int dlen,
 	ACL_MDT_REC *rec;
 	int   i;
 
-	/* ÏÈ½øĞĞ¸÷¸öË÷Òı×Ö¶ÎµÄÔ¼ÊøĞÔ¼ì²é */
+	/* å…ˆè¿›è¡Œå„ä¸ªç´¢å¼•å­—æ®µçš„çº¦æŸæ€§æ£€æŸ¥ */
 
-	node = mdt_node_new(mdt, data, dlen);  /* ½¨Á¢Êı¾İ½áµãÏî */
+	node = mdt_node_new(mdt, data, dlen);  /* å»ºç«‹æ•°æ®ç»“ç‚¹é¡¹ */
 
 	i = 0;
 	while (key_labels[i] != NULL && keys[i] != NULL) {
@@ -231,14 +231,14 @@ static ACL_MDT_NOD *mdt_add(ACL_MDT *mdt, void *data, unsigned int dlen,
 				myname, __LINE__, key_labels[i], mdt->name);
 			return (NULL);
 		}
-		/* ´Ó±íË÷ÒıÖĞ»ñµÃ¶ÔÓ¦ÓÚ¼üµÄË÷Òı¼ÇÂ¼½á¹û¼¯ */
+		/* ä»è¡¨ç´¢å¼•ä¸­è·å¾—å¯¹åº”äºé”®çš„ç´¢å¼•è®°å½•ç»“æœé›† */
 		rec = mdt->idx_get(idx, keys[i]);
 		if (rec == NULL) {
-			/* ´´½¨ĞÂµÄ¼ÇÂ¼½á¹û¼¯ */
+			/* åˆ›å»ºæ–°çš„è®°å½•ç»“æœé›† */
 			rec = mdt_rec_new(mdt);
-			/* ÒıÓÃÆäËù¶ÔÓ¦µÄË÷Òı±í */
+			/* å¼•ç”¨å…¶æ‰€å¯¹åº”çš„ç´¢å¼•è¡¨ */
 			rec->idx = idx;
-			/* ÔÚ±íË÷ÒıÖĞÔö¼ÓĞÂµÄË÷ÒıÊı¾İÏî */
+			/* åœ¨è¡¨ç´¢å¼•ä¸­å¢åŠ æ–°çš„ç´¢å¼•æ•°æ®é¡¹ */
 			mdt->idx_add(idx, keys[i], rec);
 		} else if (idx->flag & ACL_MDT_FLAG_UNI) {
 			//acl_msg_warn("%s(%d): duplex key, key_label(%s), key(%s)",
@@ -247,7 +247,7 @@ static ACL_MDT_NOD *mdt_add(ACL_MDT *mdt, void *data, unsigned int dlen,
 			return (NULL);
 		}
 
-		/* ´´½¨ĞÂµÄÒıÓÃ½áµã²¢½«ÓëÆäÊı¾İ½áµã¼°½á¹û¼¯ºÏ¶ÔÏó½øĞĞ¹ØÁª */
+		/* åˆ›å»ºæ–°çš„å¼•ç”¨ç»“ç‚¹å¹¶å°†ä¸å…¶æ•°æ®ç»“ç‚¹åŠç»“æœé›†åˆå¯¹è±¡è¿›è¡Œå…³è” */
 		mdt_ref_add(mdt, node, rec);
 		i++;
 	}
@@ -255,11 +255,11 @@ static ACL_MDT_NOD *mdt_add(ACL_MDT *mdt, void *data, unsigned int dlen,
 }
 
 /**
- * Ì½²âÄ³¸ö¼üÔÚ±íË÷ÒıÖĞÊÇ·ñ´æÔÚ
+ * æ¢æµ‹æŸä¸ªé”®åœ¨è¡¨ç´¢å¼•ä¸­æ˜¯å¦å­˜åœ¨
  * @param mdt {ACL_MDT*}
  * @param key_label {const char*}
  * @param key {const char*}
- * @return {int} 0: ²»´æÔÚ; 1: ´æÔÚ
+ * @return {int} 0: ä¸å­˜åœ¨; 1: å­˜åœ¨
  */
 static int mdt_probe(ACL_MDT *mdt, const char *key_label, const char *key)
 {
@@ -281,13 +281,13 @@ static int mdt_probe(ACL_MDT *mdt, const char *key_label, const char *key)
 }
 
 /**
- * ÔÚ±íË÷ÒıÖĞ¸ù¾İÄ³¸öË÷Òı¼üÖµ²éÑ¯½á¹û¼¯
+ * åœ¨è¡¨ç´¢å¼•ä¸­æ ¹æ®æŸä¸ªç´¢å¼•é”®å€¼æŸ¥è¯¢ç»“æœé›†
  * @param mdt {ACL_MDT*}
  * @param key_label {const char*}
  * @param key {const char*}
- * @param from {int} ÆğÊ¼Î»ÖÃ
- * @param limit {int} ¸öÊıÏŞÖÆ
- * @return {ACL_MDT_RES*} ²éÑ¯½á¹û¼¯, NULL: ½á¹ûÎª¿Õ, != NULL: ½á¹û¼¯·Ç¿Õ
+ * @param from {int} èµ·å§‹ä½ç½®
+ * @param limit {int} ä¸ªæ•°é™åˆ¶
+ * @return {ACL_MDT_RES*} æŸ¥è¯¢ç»“æœé›†, NULL: ç»“æœä¸ºç©º, != NULL: ç»“æœé›†éç©º
  */
 static ACL_MDT_RES *mdt_get(ACL_MDT *mdt, const char *key_label,
 	const char *key, int from, int limit)
@@ -339,12 +339,12 @@ static ACL_MDT_RES *mdt_get(ACL_MDT *mdt, const char *key_label,
 }
 
 /**
- * ¸ù¾İË÷ÒıÖµ´Ó±íÖĞÉ¾³ı¶ÔÓ¦ÓÚ¸ÃË÷ÒıÖµµÄ½á¹û¼¯
+ * æ ¹æ®ç´¢å¼•å€¼ä»è¡¨ä¸­åˆ é™¤å¯¹åº”äºè¯¥ç´¢å¼•å€¼çš„ç»“æœé›†
  * @param mdt {ACL_MDT*}
  * @param key_label {const char*}
  * @param key {const char*}
- * @param onfree_fn {void (*)(void*, unsigned int} »Øµ÷º¯Êı
- * @return {int} ±»É¾³ıµÄ½á¹û¼¯ÖĞ½áµãµÄ¸öÊı. -1: ³ö´í, >= 0: ok
+ * @param onfree_fn {void (*)(void*, unsigned int} å›è°ƒå‡½æ•°
+ * @return {int} è¢«åˆ é™¤çš„ç»“æœé›†ä¸­ç»“ç‚¹çš„ä¸ªæ•°. -1: å‡ºé”™, >= 0: ok
  */
 static int mdt_del(ACL_MDT *mdt, const char *key_label,
 	const char *key, void (*onfree_fn)(void*, unsigned int))
@@ -364,21 +364,21 @@ static int mdt_del(ACL_MDT *mdt, const char *key_label,
 		return (-1);
 	}
 
-	/* ²é³öÓë¸Ã×Ö¶ÎµÄ¼üÏà¹ØµÄ¼ÇÂ¼½á¹û¼¯ºÏ */
+	/* æŸ¥å‡ºä¸è¯¥å­—æ®µçš„é”®ç›¸å…³çš„è®°å½•ç»“æœé›†åˆ */
 	rec = mdt->idx_get(idx, key);
 	if (rec == NULL)
 		return (0);
 
-	/* ±éÀú¸Ã½á¹û¼¯ºÏÖĞµÄËùÓĞÒıÓÃ½áµã£¬ÕÒ³öÆäËùÊôµÄÊı¾İ½áµã */
+	/* éå†è¯¥ç»“æœé›†åˆä¸­çš„æ‰€æœ‰å¼•ç”¨ç»“ç‚¹ï¼Œæ‰¾å‡ºå…¶æ‰€å±çš„æ•°æ®ç»“ç‚¹ */
 	for (iter = ring_succ(&rec->ref_head); iter && rec->nrefer > 0;) {
 
 		ref = RING_TO_APPL(iter, ACL_MDT_REF, rec_entry);
 		iter = ring_succ(iter);
 
-		/* ±éÀú¸ÃÊôÓÚ¸ÃÊı¾İ½áµãµÄËùÓĞÒıÓÃ½áµã, ²¢É¾³ıÕâĞ©ÒıÓÃ½áµã */
-		node = ref->node;  /* Êı¾İ½áµã */
+		/* éå†è¯¥å±äºè¯¥æ•°æ®ç»“ç‚¹çš„æ‰€æœ‰å¼•ç”¨ç»“ç‚¹, å¹¶åˆ é™¤è¿™äº›å¼•ç”¨ç»“ç‚¹ */
+		node = ref->node;  /* æ•°æ®ç»“ç‚¹ */
 
-		/* ±éÀú¸ÃÊı¾İ½áµãµÄËùÓĞË÷ÒıÒıÓÃ½áµã */
+		/* éå†è¯¥æ•°æ®ç»“ç‚¹çš„æ‰€æœ‰ç´¢å¼•å¼•ç”¨ç»“ç‚¹ */
 		for (iter2 = ring_succ(&node->ref_head);
 			iter2 != NULL && node->nrefer > 0;) {
 
@@ -386,9 +386,9 @@ static int mdt_del(ACL_MDT *mdt, const char *key_label,
 			rec2 = ref2->rec;
 			iter2 = ring_succ(iter2);
 
-			mdt_ref_del(mdt, ref2);  /* É¾³ıÒıÓÃ */
+			mdt_ref_del(mdt, ref2);  /* åˆ é™¤å¼•ç”¨ */
 
-			/* ÔÚ×îÍâ²ãÑ­»·Î´Íê³ÉÖ®Ç°£¬ĞèÒª·ÀÖ¹ rec ±»ÌáÇ°ÊÍ·Å! */
+			/* åœ¨æœ€å¤–å±‚å¾ªç¯æœªå®Œæˆä¹‹å‰ï¼Œéœ€è¦é˜²æ­¢ rec è¢«æå‰é‡Šæ”¾! */
 			if (rec2->nrefer == 0 && rec2 != rec) {
 				mdt->idx_del(rec2->idx, rec2->key);
 				mdt_rec_free(mdt, rec2);
@@ -400,7 +400,7 @@ static int mdt_del(ACL_MDT *mdt, const char *key_label,
 				" tbl_name(%s), key_label(%s), key(%s)",
 				myname, __LINE__, node->nrefer,
 				mdt->name, key_label, key);
-		mdt_node_free(mdt, node, onfree_fn);  /* É¾³ıÊı¾İ½áµã */
+		mdt_node_free(mdt, node, onfree_fn);  /* åˆ é™¤æ•°æ®ç»“ç‚¹ */
 
 		n++;
 	}
@@ -410,20 +410,20 @@ static int mdt_del(ACL_MDT *mdt, const char *key_label,
 			" tbl_name(%s), key_label(%s), key(%s)",
 			myname, __LINE__, rec->nrefer,
 			mdt->name, key_label, key);
-	/* ´Óµ±Ç°Ë÷ÒıÖĞÉ¾³ı */
+	/* ä»å½“å‰ç´¢å¼•ä¸­åˆ é™¤ */
 	mdt->idx_del(rec->idx, rec->key);
 	mdt_rec_free(mdt, rec);
 
-	/* ·µ»ØËùÉ¾³ıµÄÒıÓÃ½áµãÊı */
+	/* è¿”å›æ‰€åˆ é™¤çš„å¼•ç”¨ç»“ç‚¹æ•° */
 	return (n);
 }
 
 /**
- * ´Ó±íÖĞÁĞ³öÒ»Ğ©½á¹û¼¯
+ * ä»è¡¨ä¸­åˆ—å‡ºä¸€äº›ç»“æœé›†
  * @param mdt {ACL_MDT*}
- * @param from {int} ÆğÊ¼Î»ÖÃ
- * @param limit {int} ¸öÊıÏŞÖÆ
- * @return {ACL_MDT_RES*} ½á¹û¼¯, NULL: ¿Õ, != NULL: ·Ç¿Õ
+ * @param from {int} èµ·å§‹ä½ç½®
+ * @param limit {int} ä¸ªæ•°é™åˆ¶
+ * @return {ACL_MDT_RES*} ç»“æœé›†, NULL: ç©º, != NULL: éç©º
  */
 static ACL_MDT_RES *mdt_list(ACL_MDT *mdt, int from, int limit)
 {
@@ -460,12 +460,12 @@ static ACL_MDT_RES *mdt_list(ACL_MDT *mdt, int from, int limit)
 }
 
 /**
- * ±éÀú±íÖĞµÄÊı¾İ¶ÔÏó
- * @param mdt {ACL_MDT*} ±í
- * @param walk_fn {int (*)(const void*, unsigned int)} ±éÀú±í¶ÔÏóµÄ»Øµ÷º¯Êı
- * @param from {int} ¿ªÊ¼±éÀú±íµÄÆğÊ¼Î»ÖÃ
- * @param limit {int} ±éÀú±í¶ÔÏóµÄ×î´ó¸öÊı
- * @return {int} ÒÑ¾­±éÀú¹ıµÄ±í¶ÔÏóµÄ¾ßÊı
+ * éå†è¡¨ä¸­çš„æ•°æ®å¯¹è±¡
+ * @param mdt {ACL_MDT*} è¡¨
+ * @param walk_fn {int (*)(const void*, unsigned int)} éå†è¡¨å¯¹è±¡çš„å›è°ƒå‡½æ•°
+ * @param from {int} å¼€å§‹éå†è¡¨çš„èµ·å§‹ä½ç½®
+ * @param limit {int} éå†è¡¨å¯¹è±¡çš„æœ€å¤§ä¸ªæ•°
+ * @return {int} å·²ç»éå†è¿‡çš„è¡¨å¯¹è±¡çš„å…·æ•°
  */
 static int mdt_walk(ACL_MDT *mdt, int (*walk_fn)(const void*, unsigned int),
 	int from, int limit)
@@ -491,7 +491,7 @@ static int mdt_walk(ACL_MDT *mdt, int (*walk_fn)(const void*, unsigned int),
 	return (n);
 }
 
-/* É¾³ıËùÓĞÊı¾İ½áµã */
+/* åˆ é™¤æ‰€æœ‰æ•°æ®ç»“ç‚¹ */
 
 static void mdt_nodes_free(ACL_MDT *mdt)
 {

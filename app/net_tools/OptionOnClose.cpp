@@ -1,4 +1,4 @@
-// OptionOnClose.cpp : ʵ���ļ�
+// OptionOnClose.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -6,7 +6,7 @@
 #include "OptionOnClose.h"
 
 
-// COptionOnClose �Ի���
+// COptionOnClose 对话框
 
 IMPLEMENT_DYNCREATE(COptionOnClose, CDialog)
 
@@ -40,7 +40,7 @@ void COptionOnClose::DoDataExchange(CDataExchange* pDX)
 BOOL COptionOnClose::OnInitDialog()
 {
 	CDialog::OnInitDialog();
-	return TRUE;  // ���ǽ��������õ��ؼ������򷵻� TRUE
+	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
 BEGIN_MESSAGE_MAP(COptionOnClose, CDialog)

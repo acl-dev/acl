@@ -6,15 +6,15 @@ extern "C" {
 #endif
 
 /**
- * �������й����л�ÿ�ִ�г���洢���ļ�ϵͳ�е�ȫ·��
- * @return {const char*} NULL: �޷����; != NULL: ����ֵ���ǳ�����
- *    �ļ�ϵͳ�ϵĴ洢ȫ·��
+ * 程序运行过程中获得可执行程序存储于文件系统中的全路径
+ * @return {const char*} NULL: 无法获得; != NULL: 返回值即是程序在
+ *    文件系统上的存储全路径
  */
 ACL_API const char *acl_process_path(void);
 
 /**
- * �������й����л��������·��
- * @return {const char*} NULL: �޷����; != NULL: ����ֵ��Ϊ���������·��
+ * 程序运行过程中获得其运行路径
+ * @return {const char*} NULL: 无法获得; != NULL: 返回值即为程序的运行路径
  */
 ACL_API const char *acl_getcwd(void);
 

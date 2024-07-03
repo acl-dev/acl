@@ -1,4 +1,4 @@
-// main.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// main.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 #include "stdafx.h"
 #include <assert.h>
@@ -65,7 +65,7 @@ private:
 
 	// @override
 	void* run(void) {
-		// ¸ø socket °²×° SSL IO ¹ı³Ì
+		// ç»™ socket å®‰è£… SSL IO è¿‡ç¨‹
 		if (!setup_ssl()) {
 			delete this;
 			return NULL;
@@ -81,11 +81,11 @@ private:
 		bool non_block = false;
 		acl::sslbase_io* ssl = ssl_conf_.create(non_block);
 
-		// ÉèÖÃË½ÓĞ¶ÔÏó£¬ÔÚ ssl_sni_checker::check() ÖĞ¼ì²é
+		// è®¾ç½®ç§æœ‰å¯¹è±¡ï¼Œåœ¨ ssl_sni_checker::check() ä¸­æ£€æŸ¥
 		ssl->set_ctx(ssl);
 
-		// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ĞèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
-		// Á¬½ÓÁ÷¶ÔÏóÖĞ£¬¼´ÓÃ ssl io Ìæ»» stream ÖĞÄ¬ÈÏµÄµ×²ã IO ¹ı³Ì
+		// å¯¹äºä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
+		// è¿æ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
 		if (conn_->setup_hook(ssl) == ssl) {
 			printf("setup ssl IO hook error, errno=%d, %s\r\n",
 				acl::last_error(), acl::last_serror());
@@ -159,7 +159,7 @@ static bool ssl_init(const acl::string& ssl_crt, const acl::string& ssl_key,
 
 	ssl_conf.enable_cache(true);
 
-	// ¼ÓÔØ SSL Ö¤Êé¼°Ö¤ÊéË½Ô¿
+	// åŠ è½½ SSL è¯ä¹¦åŠè¯ä¹¦ç§é’¥
 	if (!ssl_conf.add_cert(ssl_crt, ssl_key)) {
 		printf("add ssl crt=%s error\r\n", ssl_crt.c_str());
 		return false;
@@ -182,7 +182,7 @@ static acl::sslbase_conf* load_mbedtls(acl::string& ssl_libs)
 #endif
 	}
 
-	// ÉèÖÃ MbedTLS ¶¯Ì¬¿âÂ·¾¶
+	// è®¾ç½® MbedTLS åŠ¨æ€åº“è·¯å¾„
 	const std::vector<acl::string>& libs = ssl_libs.split2(",; \t");
 	if (libs.size() == 1) {
 		acl::mbedtls_conf::set_libpath(libs[0]);
@@ -194,16 +194,16 @@ static acl::sslbase_conf* load_mbedtls(acl::string& ssl_libs)
 		return NULL;
 	}
 
-	// ¼ÓÔØ MbedTLS ¶¯Ì¬¿â
+	// åŠ è½½ MbedTLS åŠ¨æ€åº“
 	if (!acl::mbedtls_conf::load()) {
 		printf("load %s error\r\n", ssl_libs.c_str());
 		return NULL;
 	}
 
-	// ³õÊ¼»¯·şÎñ¶ËÄ£Ê½ÏÂµÄÈ«¾Ö SSL ÅäÖÃ¶ÔÏó
+	// åˆå§‹åŒ–æœåŠ¡ç«¯æ¨¡å¼ä¸‹çš„å…¨å±€ SSL é…ç½®å¯¹è±¡
 	bool server_side = true;
 
-	// SSL Ö¤ÊéĞ£Ñé¼¶±ğ
+	// SSL è¯ä¹¦æ ¡éªŒçº§åˆ«
 	acl::mbedtls_verify_t verify_mode = acl::MBEDTLS_VERIFY_NONE;
 
 	return new acl::mbedtls_conf(server_side, verify_mode);
@@ -230,10 +230,10 @@ static acl::sslbase_conf* load_openssl(acl::string& ssl_libs)
 		}
 	}
 
-	// ÉèÖÃ OpenSSL ¶¯Ì¬¿âµÄ¼ÓÔØÂ·¾¶
+	// è®¾ç½® OpenSSL åŠ¨æ€åº“çš„åŠ è½½è·¯å¾„
 	acl::openssl_conf::set_libpath(libcrypto, libssl);
 
-	// ¶¯Ì¬¼ÓÔØ OpenSSL ¶¯Ì¬¿â
+	// åŠ¨æ€åŠ è½½ OpenSSL åŠ¨æ€åº“
 	if (!acl::openssl_conf::load()) {
 		printf("load ssl error=%s, crypto=%s, ssl=%s\r\n",
 			acl::last_serror(), libcrypto.c_str(), libssl.c_str());

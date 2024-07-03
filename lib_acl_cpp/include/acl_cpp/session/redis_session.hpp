@@ -19,33 +19,33 @@ public:
 		time_t ttl = 0, const char* sid = NULL);
 	~redis_session();
 
-	// »ùÀàĞéº¯Êı£¬Ïò redis ·şÎñ¶ËÉèÖÃ¹şÏ£ÊôĞÔÖµ
+	// åŸºç±»è™šå‡½æ•°ï¼Œå‘ redis æœåŠ¡ç«¯è®¾ç½®å“ˆå¸Œå±æ€§å€¼
 	bool set(const char* name, const char* value);
 
-	// »ùÀàĞéº¯Êı£¬Ïò redis ·şÎñ¶ËÉèÖÃ¹şÏ£ÊôĞÔÖµ
+	// åŸºç±»è™šå‡½æ•°ï¼Œå‘ redis æœåŠ¡ç«¯è®¾ç½®å“ˆå¸Œå±æ€§å€¼
 	bool set(const char* name, const void* value, size_t len);
 
-	// »ùÀàĞéº¯Êı£¬´Ó redis ·şÎñ¶ËµÄ¹şÏ£¶ÔÏóÖĞ»ñµÃ¶ÔÓ¦ÊôĞÔµÄÖµ
+	// åŸºç±»è™šå‡½æ•°ï¼Œä» redis æœåŠ¡ç«¯çš„å“ˆå¸Œå¯¹è±¡ä¸­è·å¾—å¯¹åº”å±æ€§çš„å€¼
 	const session_string* get_buf(const char* name);
 
-	// »ùÀàĞéº¯Êı£¬´Ó redis ·şÎñ¶ËµÄ¹şÏ£¶ÔÏóÖĞÉ¾³ıÄ³¸öÊôĞÔÖµ
+	// åŸºç±»è™šå‡½æ•°ï¼Œä» redis æœåŠ¡ç«¯çš„å“ˆå¸Œå¯¹è±¡ä¸­åˆ é™¤æŸä¸ªå±æ€§å€¼
 	bool del(const char* name);
 
-	// »ùÀà´¿Ğéº¯Êı£¬´Ó redis ÖĞÉ¾³ıÊı¾İ
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼Œä» redis ä¸­åˆ é™¤æ•°æ®
 	bool remove();
 
-	// »ùÀà´¿Ğéº¯Êı£¬´Ó redis ÖĞ»ñµÃÊı¾İ
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼Œä» redis ä¸­è·å¾—æ•°æ®
 	bool get_attrs(std::map<string, session_string>& attrs);
 
-	// »ùÀàĞéº¯Êı£¬´Ó redis ÖĞ»ñµÃÊı¾İ
+	// åŸºç±»è™šå‡½æ•°ï¼Œä» redis ä¸­è·å¾—æ•°æ®
 	bool get_attrs(const std::vector<string>& names,
 		std::vector<session_string>& values);
 
-	// »ùÀà´¿Ğéº¯Êı£¬Ïò redis ÖĞÌí¼Ó»òĞŞ¸ÄÊı¾İ
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼Œå‘ redis ä¸­æ·»åŠ æˆ–ä¿®æ”¹æ•°æ®
 	bool set_attrs(const std::map<string, session_string>& attrs);
 
 protected:
-	//ÖØĞÂÉèÖÃ session ÔÚ redis ÉÏµÄ»º´æÊ±¼ä
+	//é‡æ–°è®¾ç½® session åœ¨ redis ä¸Šçš„ç¼“å­˜æ—¶é—´
 	bool set_timeout(time_t ttl);
 
 private:

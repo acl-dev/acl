@@ -341,14 +341,14 @@ static void listen_cleanup(ACL_EVENT *event)
 	}
 
 	/**
-	 * ��ǰ�̷߳����߳�ʱ����Ҫ���ö�ʱ���رռ���������Ϊ���������¼�����
-	 * ���ǡ���פ�����ģ����ֱ�ӹرռ�������������¼�ѭ�����߳���
-	 * select() ʱ���������Ƿ����������˶�ʱ���رշ����󣬶�ʱ����������
-	 * �̿ռ����¼�ѭ���������߳̿ռ�����ͬ�ģ����Բ�����ɳ�ͻ������Ҫ
-	 * ��Ϊ�¼�ѭ���߳�����ִ�� select(), ��ִ�ж�ʱ������� select() ִ
-	 * �к�ʱ�������������������¼�������ɾ������ʹ�ü������Ѿ�׼����
-	 * Ҳ��������¼������б�ɾ�������ᱻ�������������´��¼�ѭ��ʱ
-	 * select �����õ��¼������оͲ����ڸü������ˡ�
+	 * 当前线程非主线程时，需要采用定时器关闭监听流，因为监听流在事件集合
+	 * 中是“常驻留”的，如果直接关闭监听流，会造成事件循环主线程在
+	 * select() 时报描述符非法，而当加了定时器关闭方法后，定时器的运行线
+	 * 程空间与事件循环的运行线程空间是相同的，所以不会造成冲突。这主要
+	 * 因为事件循环线程中先执行 select(), 后执行定时器，如果 select() 执
+	 * 行后定时器启动并将监听流从事件集合中删除，则即使该监听流已经准备好
+	 * 也会因其从事件集合中被删除而不会被触发，这样在下次事件循环时
+	 * select 所调用的事件集合中就不存在该监听流了。
 	 */
 
 	if ((unsigned long) acl_pthread_self() != acl_main_thread_self()) {
@@ -422,11 +422,11 @@ static void server_exiting(int type acl_unused, ACL_EVENT *event, void *ctx)
 	if (!__listen_disabled) {
 		__listen_disabled = 1;
 
-		/* �ر����м����׽ӿ� */
+		/* 关闭所有监听套接口 */
 		listen_cleanup(event);
 
 #ifdef ACL_UNIX
-		/* �ر��� TCP �����ɷ��� master_dispatch ��ͨ�� */
+		/* 关闭与 TCP 连接派发器 master_dispatch 的通道 */
 		dispatch_close(event);
 #endif /* ACL_UNIX */
 	}
@@ -1378,7 +1378,7 @@ void acl_threads_server_main(int argc, char * argv[],
 
 	/*******************************************************************/
 
-	/* ���ӽ����л��û�����֮ǰ������ acl_master ����־�������־ */
+	/* 在子进程切换用户身份之前，先用 acl_master 的日志句柄记日志 */
 	master_log_open(argv[0]);
 
 	/*

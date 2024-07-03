@@ -34,16 +34,16 @@ static void token_tree_test(const char *tokens, const char *test_tab[])
 }
 
 static const char *__test_tab[] = {
-	"ÖÐ¹ú",
-	"ÖÐ¹úÈËÃñ",
-	"ÖÐ¹úÈËÃñÒøÐÐ",
-	"ÖÐ¹úÈËÃñ½â·Å¾ü",
+	"ä¸­å›½",
+	"ä¸­å›½äººæ°‘",
+	"ä¸­å›½äººæ°‘é“¶è¡Œ",
+	"ä¸­å›½äººæ°‘è§£æ”¾å†›",
 	NULL
 };
 
 static void test(void)
 {
-	const char *tokens = "ÖÐ¹ú|p ÖÐ¹úÈË|p ÖÐ¹úÈËÃñ|p ÖÐ¹úÈËÃñÒøÐÐ|p";
+	const char *tokens = "ä¸­å›½|p ä¸­å›½äºº|p ä¸­å›½äººæ°‘|p ä¸­å›½äººæ°‘é“¶è¡Œ|p";
 
 	token_tree_test(tokens, __test_tab);
 }
@@ -52,10 +52,10 @@ static void test2(void)
 {
 	ACL_TOKEN *tree;
 	ACL_TOKEN *token;
-	const char *n1 = "Ãû³Æ1", *n2 = "Ãû³Æ2", *n3 = "Ãû³Æ3";
-	const char *v1 = "±äÁ¿1", *v2 = "±äÁ¿2", *v3 = "±äÁ¿3";
-	const char *s = "ÖÐ¹úÈËÃñÃû³Æ1£¬ÔÚÕâ¸öÊÀ½çÉÏ£¬ÄãÔÚÄÄ¶ùÃû³Æ2? "
-		"ÎÒ²»ÖªµÀÄãµÄÃû³Æ£¬ÄãÄÜ¸æËßÎÒÂð£¿ÎÒµÄÃû³Æ3ÊÇ...";
+	const char *n1 = "åç§°1", *n2 = "åç§°2", *n3 = "åç§°3";
+	const char *v1 = "å˜é‡1", *v2 = "å˜é‡2", *v3 = "å˜é‡3";
+	const char *s = "ä¸­å›½äººæ°‘åç§°1ï¼Œåœ¨è¿™ä¸ªä¸–ç•Œä¸Šï¼Œä½ åœ¨å“ªå„¿åç§°2? "
+		"æˆ‘ä¸çŸ¥é“ä½ çš„åç§°ï¼Œä½ èƒ½å‘Šè¯‰æˆ‘å—ï¼Ÿæˆ‘çš„åç§°3æ˜¯...";
 	const char *p = s;
 
 	if (1)
@@ -66,12 +66,12 @@ static void test2(void)
 		acl_token_tree_add(tree, n3, ACL_TOKEN_F_STOP, v3);
 	}
 	else
-		tree = acl_token_tree_create("Ãû³Æ1|p Ãû³Æ2|p Ãû³Æ3|p");
+		tree = acl_token_tree_create("åç§°1|p åç§°2|p åç§°3|p");
 
 	printf("-----------------------------------\n");
 
 	acl_token_tree_print(tree);
-	token = acl_token_tree_word_match(tree, "Ãû³Æ1");
+	token = acl_token_tree_word_match(tree, "åç§°1");
 	if (token)
 		printf("find, %s: %s\n", acl_token_name1(token),
 			(const char*) token->ctx);
@@ -113,37 +113,37 @@ static void token_word_test(const char *tokens, const char *test_tab[])
 static void test3(void)
 {
 	const char *tokens1 = "hello world he is a man he"
-		" ÖÐ ÖÐ»ª ÖÐ»ªÈË ÖÐ»ªÈËÃñ ÖÐ»ªÈËÃñ¹² ÖÐ»ªÈËÃñ¹²ºÍ ÖÐ»ªÈËÃñ¹²ºÍ¹ú"
-		" ÖÐ»ªÈËÃñ¹²ºÍ¹úÍòËê ÖÐ»ªÈËÃñ¹²ºÍ¹úÍòËêÍòÍòËê";
-	const char *tokens2 = "±ÈÀûÊ±|d ÖÐ¹ú|p ËµµÄ|d";
+		" ä¸­ ä¸­åŽ ä¸­åŽäºº ä¸­åŽäººæ°‘ ä¸­åŽäººæ°‘å…± ä¸­åŽäººæ°‘å…±å’Œ ä¸­åŽäººæ°‘å…±å’Œå›½"
+		" ä¸­åŽäººæ°‘å…±å’Œå›½ä¸‡å² ä¸­åŽäººæ°‘å…±å’Œå›½ä¸‡å²ä¸‡ä¸‡å²";
+	const char *tokens2 = "æ¯”åˆ©æ—¶|d ä¸­å›½|p è¯´çš„|d";
 
 	static const char *test1_tab[] = {
-		"ÖÐ»ª",
-		"ÖÐ»ªÈË",
-		"ÖÐ»ªÈËÃñ",
-		"ÖÐ»ªÈËÃñ¹²",
-		"ÖÐ»ªÈËÃñ¹²ºÍ",
-		"ÖÐ»ªÈËÃñ¹²ºÍ¹ú",
-		"ÖÐ»ªÈËÃñ¹²ºÍ¹úÍòËê",
-		"ÎÒÃÇÖÐ»ªÈËÃñ¹²ºÍ¹úÍòËê",
-		"ÎÒÃÇÖÐ»ªÈËÃñ¹²ºÍ¹úÍòËêÍòÍòËê",
+		"ä¸­åŽ",
+		"ä¸­åŽäºº",
+		"ä¸­åŽäººæ°‘",
+		"ä¸­åŽäººæ°‘å…±",
+		"ä¸­åŽäººæ°‘å…±å’Œ",
+		"ä¸­åŽäººæ°‘å…±å’Œå›½",
+		"ä¸­åŽäººæ°‘å…±å’Œå›½ä¸‡å²",
+		"æˆ‘ä»¬ä¸­åŽäººæ°‘å…±å’Œå›½ä¸‡å²",
+		"æˆ‘ä»¬ä¸­åŽäººæ°‘å…±å’Œå›½ä¸‡å²ä¸‡ä¸‡å²",
 		NULL
 	};
 
 	static const char *test2_tab[] = {
 		"hello",
 		"shello",
-		"ÖÐ»ªÈËÃñ¹²ºÍ¹ú",
-		"ÖÐ»ªÈËÃñ",
+		"ä¸­åŽäººæ°‘å…±å’Œå›½",
+		"ä¸­åŽäººæ°‘",
 		NULL
 	};
 
 	static const char *test3_tab[] = {
-		"ÖÐ¹ú",
-		"±ÈÀûÊ±",
-		"ÖÐ¹ú±ÈÀûÊ±",
-		"ÎÒËµµÄ¹ÊÊÂ",
-		"ÒËµµÄÖÐ¹",
+		"ä¸­å›½",
+		"æ¯”åˆ©æ—¶",
+		"ä¸­å›½æ¯”åˆ©æ—¶",
+		"æˆ‘è¯´çš„æ•…äº‹",
+		"å®œæ¡£é—¹æ³„",
 		NULL
 	};
 

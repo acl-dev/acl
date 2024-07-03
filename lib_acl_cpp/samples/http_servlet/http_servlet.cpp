@@ -1,4 +1,4 @@
-// http_servlet.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// http_servlet.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -39,14 +39,14 @@ public:
 		const char* cookie1 = req.getCookieValue("name1");
 		const char* cookie2 = req.getCookieValue("name2");
 
-		// ´´½¨ HTTP ÏìÓ¦Í·
+		// åˆ›å»º HTTP å“åº”å¤´
                 res.addCookie("name1", "value1");
 		res.addCookie("name2", "value2", ".test.com", "/", 3600 * 24);
 
-		// ÉèÖÃÏìÓ¦Í·µÄ×´Ì¬Âë
+		// è®¾ç½®å“åº”å¤´çš„çŠ¶æ€ç 
 		//res.setStatus(200);
 
-		// Á½ÖÖ·½Ê½¶¼¿ÉÒÔÉèÖÃ×Ö·û¼¯
+		// ä¸¤ç§æ–¹å¼éƒ½å¯ä»¥è®¾ç½®å­—ç¬¦é›†
 		if (0)
 			res.setContentType("text/xml; charset=gb2312");
 		else
@@ -58,7 +58,7 @@ public:
 		const char* param1 = req.getParameter("name1");
 		const char* param2 = req.getParameter("name2");
 
-		// ´´½¨ xml ¸ñÊ½µÄÊı¾İÌå
+		// åˆ›å»º xml æ ¼å¼çš„æ•°æ®ä½“
 		xml1 body;
 		body.get_root().add_child("root", true)
 			.add_child("sessions", true)
@@ -84,10 +84,10 @@ public:
 		string buf;
 		body.build_xml(buf);
 
-		// ·¢ËÍ http ÏìÓ¦Í·
+		// å‘é€ http å“åº”å¤´
 		if (res.sendHeader() == false)
 			return false;
-		// ·¢ËÍ http ÏìÓ¦Ìå
+		// å‘é€ http å“åº”ä½“
 		if (res.getOutputStream().write(buf) == -1)
 			return false;
 		return true;
@@ -120,22 +120,22 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	master_service service;
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
 //		format = (int (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0|8888 ...\r\n");
-		service.run_alone("0.0.0.0|8888", NULL, 0);  // µ¥¶ÀÔËĞĞ·½Ê½
+		service.run_alone("0.0.0.0|8888", NULL, 0);  // å•ç‹¬è¿è¡Œæ–¹å¼
 	}
 	else
 	{
 #ifdef	WIN32
 //		format = (void (*)(const char*, ...)) printf;
 		printf("listen: 0.0.0.0|8888 ...\r\n");
-		service.run_alone("0.0.0.0|8888", NULL, 1);  // µ¥¶ÀÔËĞĞ·½Ê½
+		service.run_alone("0.0.0.0|8888", NULL, 1);  // å•ç‹¬è¿è¡Œæ–¹å¼
 #else
-		service.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		service.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 #endif
 	}
 

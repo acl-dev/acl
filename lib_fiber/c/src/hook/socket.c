@@ -193,7 +193,7 @@ socket_t WINAPI acl_fiber_accept(socket_t sockfd, struct sockaddr *addr,
 			non_blocking(clifd, NON_BLOCKING);
 			tcp_nodelay(clifd, 1);
 			fe->iocp_sock = INVALID_SOCKET;
-			/* iocp ·½Ê½ÏÂ£¬Ğèµ÷ÓÃÏÂÃæ¹ı³ÌÒÔÔÊĞíµ÷ÓÃ
+			/* iocp æ–¹å¼ä¸‹ï¼Œéœ€è°ƒç”¨ä¸‹é¢è¿‡ç¨‹ä»¥å…è®¸è°ƒç”¨
 			 * getpeername/getsockname
 			 */
 			ret = setsockopt(clifd, SOL_SOCKET,

@@ -235,7 +235,7 @@ int CAclTrans::TransFile(const char *psPath)
 
 	iLen = strlen(sBuf);
 	if (m_bTrans)
-		Trans(sBuf);  // ��ʼת��
+		Trans(sBuf);  // ΏͺΚΌΧͺ»»
 	else if (strstr(psPath, ".html") != NULL)
 		Restore(sBuf);
 	else

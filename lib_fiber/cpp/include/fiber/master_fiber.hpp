@@ -9,41 +9,41 @@ namespace acl {
 class socket_stream;
 
 /**
- * »ùÓÚĞ­³Ì·½Ê½µÄÍøÂç·şÎñÀà
+ * åŸºäºåç¨‹æ–¹å¼çš„ç½‘ç»œæœåŠ¡ç±»
  */
 class FIBER_CPP_API master_fiber : public master_base {
 public:
 	/**
-	 * ÔÚ acl_master ¿ò¼ÜÏÂÔËĞĞ±¾ÍøÂç·şÎñ¶ÔÏó
-	 * @param argc {int} ´«ÈëµÄ²ÎÊıÊı×é´óĞ¡
-	 * @param argv {char**} ´«ÈëµÄ²ÎÊıÊı×é
+	 * åœ¨ acl_master æ¡†æ¶ä¸‹è¿è¡Œæœ¬ç½‘ç»œæœåŠ¡å¯¹è±¡
+	 * @param argc {int} ä¼ å…¥çš„å‚æ•°æ•°ç»„å¤§å°
+	 * @param argv {char**} ä¼ å…¥çš„å‚æ•°æ•°ç»„
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * ÒÔ¶ÀÁ¢ÔËĞĞÄ£Ê½Æô¶¯±¾ÍøÂç·şÎñ¶ÔÏó
-	 * @param addrs {const char*} ¼àÌıµÄ±¾»ú·şÎñµØÖ·ÁĞ±í£¬¸ñÊ½£º
+	 * ä»¥ç‹¬ç«‹è¿è¡Œæ¨¡å¼å¯åŠ¨æœ¬ç½‘ç»œæœåŠ¡å¯¹è±¡
+	 * @param addrs {const char*} ç›‘å¬çš„æœ¬æœºæœåŠ¡åœ°å€åˆ—è¡¨ï¼Œæ ¼å¼ï¼š
 	 *  ip:port, ip:port, ...
-	 * @param path {const char*} ·Ç NULL Ö¸¶¨ÅäÖÃÎÄ¼şÂ·¾¶
+	 * @param path {const char*} é NULL æŒ‡å®šé…ç½®æ–‡ä»¶è·¯å¾„
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL);
 
 	/**
-	 * »ñµÃÅäÖÃÎÄ¼şÂ·¾¶
-	 * @return {const char*} ·µ»ØÖµÎª NULL ±íÊ¾Ã»ÓĞÉèÅäÖÃÎÄ¼ş
+	 * è·å¾—é…ç½®æ–‡ä»¶è·¯å¾„
+	 * @return {const char*} è¿”å›å€¼ä¸º NULL è¡¨ç¤ºæ²¡æœ‰è®¾é…ç½®æ–‡ä»¶
 	 */
 	const char* get_conf_path(void) const;
 
 	/**
-	 * »ñµÃµ±Ç°·şÎñ×ÜÁ¬½ÓÊı
+	 * è·å¾—å½“å‰æœåŠ¡æ€»è¿æ¥æ•°
 	 * @return {long long}
 	 */
 	long long users_count();
 
 	/**
-	 * ĞŞ¸Äµ±Ç°·şÎñÁ¬½ÓÊı
-	 * @param n {int} Ôö¼Ó»ò¼õÉÙ£¨¿ÉÒÔÎª¸ºÊı£©µÄÁ¬½ÓÊıÖµ
-	 * @return {long long} ·µ»ØĞŞ¸ÄµÄÁ¬½ÓÊı
+	 * ä¿®æ”¹å½“å‰æœåŠ¡è¿æ¥æ•°
+	 * @param n {int} å¢åŠ æˆ–å‡å°‘ï¼ˆå¯ä»¥ä¸ºè´Ÿæ•°ï¼‰çš„è¿æ¥æ•°å€¼
+	 * @return {long long} è¿”å›ä¿®æ”¹çš„è¿æ¥æ•°
 	 */
 	long long users_count_add(int n);
 
@@ -53,14 +53,14 @@ protected:
 	virtual ~master_fiber(void);
 
 	/**
-	 * Ğéº¯Êı£¬µ±Ğ­³Ì·şÎñÆ÷½ÓÊÕµ½¿Í»§¶ËÁ¬½Óºóµ÷ÓÃ±¾º¯Êı
-	 * @param stream {socket_stream&} ¿Í»§¶ËÁ¬½Ó¶ÔÏó£¬±¾º¯Êı·µ»Øºó£¬Ğ­³Ì
-	 *  ·şÎñ¿ò¼Ü½«»á¹Ø±Õ¸ÃÁ¬½Ó¶ÔÏó
+	 * è™šå‡½æ•°ï¼Œå½“åç¨‹æœåŠ¡å™¨æ¥æ”¶åˆ°å®¢æˆ·ç«¯è¿æ¥åè°ƒç”¨æœ¬å‡½æ•°
+	 * @param stream {socket_stream&} å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡ï¼Œæœ¬å‡½æ•°è¿”å›åï¼Œåç¨‹
+	 *  æœåŠ¡æ¡†æ¶å°†ä¼šå…³é—­è¯¥è¿æ¥å¯¹è±¡
 	 */
 	virtual void on_accept(socket_stream& stream) = 0;
 
 	/**
-	 * µ±Ïß³Ì³õÊ¼»¯Ê±¸ÃĞé·½·¨½«±»µ÷ÓÃ
+	 * å½“çº¿ç¨‹åˆå§‹åŒ–æ—¶è¯¥è™šæ–¹æ³•å°†è¢«è°ƒç”¨
 	 */
 	virtual void thread_on_init(void) {}
 

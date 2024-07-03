@@ -9,7 +9,7 @@ public:
 	~CAioTimer();
 
 protected:
-	// ���ി�麯��
+	// »ùÀà´¿Ðéº¯Êý
 	virtual void timer_callback(unsigned int id);
 	virtual void destroy(void);
 private:

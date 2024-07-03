@@ -121,11 +121,11 @@ bool aio_listen_stream::open(ACL_ASTREAM* astream)
 
 	stream_ = astream;
 
-	// µ÷ÓÃ»ùÀàµÄ enable_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
-	// Í¬Ê±×¢²á¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
+	// è°ƒç”¨åŸºç±»çš„ enable_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
+	// åŒæ—¶æ³¨å†Œå…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
 	this->enable_error();
 
-	// ×¢²á¼àÌıÍ¨Öª¹ı³Ì
+	// æ³¨å†Œç›‘å¬é€šçŸ¥è¿‡ç¨‹
 	this->enable_listen();
 
 	return true;

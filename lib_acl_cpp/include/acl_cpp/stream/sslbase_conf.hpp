@@ -12,10 +12,10 @@ public:
 	virtual ~ssl_sni_checker() {}
 
 	/**
-	 * Ğé·½·¨ÓÃÀ´¼ì²éÊäÈëµÄsni hostÊÇ·ñºÏ·¨£¬×ÓÀà±ØĞëÊµÏÖ
-	 * @param sni {const char*} ¿Í»§¶Ë´«À´µÄ sni ×Ö¶Î
-	 * @param host {acl::string&} ´Ó sni ÖĞÌáÈ¡µÄ host ×Ö¶Î
-	 * @return {bool} ¼ì²éÊÇ·ñºÏ·¨
+	 * è™šæ–¹æ³•ç”¨æ¥æ£€æŸ¥è¾“å…¥çš„sni hostæ˜¯å¦åˆæ³•ï¼Œå­ç±»å¿…é¡»å®ç°
+	 * @param sni {const char*} å®¢æˆ·ç«¯ä¼ æ¥çš„ sni å­—æ®µ
+	 * @param host {acl::string&} ä» sni ä¸­æå–çš„ host å­—æ®µ
+	 * @return {bool} æ£€æŸ¥æ˜¯å¦åˆæ³•
 	 */
 	virtual bool check(sslbase_io* io, const char* sni, string& host) = 0;
 };
@@ -26,19 +26,19 @@ public:
 	virtual ~sslbase_conf() {}
 
 	/**
-	 * ´¿Ğé·½·¨£¬´´½¨ SSL IO ¶ÔÏó
-	 * @param nblock {bool} ÊÇ·ñÎª·Ç×èÈûÄ£Ê½
+	 * çº¯è™šæ–¹æ³•ï¼Œåˆ›å»º SSL IO å¯¹è±¡
+	 * @param nblock {bool} æ˜¯å¦ä¸ºéé˜»å¡æ¨¡å¼
 	 * @return {sslbase_io*}
 	 */
 	virtual sslbase_io* create(bool nblock) = 0;
 
 public:
 	/**
-	 * ¼ÓÔØ CA ¸ùÖ¤Êé(Ã¿¸öÅäÖÃÊµÀıÖ»Ğèµ÷ÓÃÒ»´Î±¾·½·¨)
-	 * @param ca_file {const char*} CA Ö¤ÊéÎÄ¼şÈ«Â·¾¶
-	 * @param ca_path {const char*} ¶à¸ö CA Ö¤ÊéÎÄ¼şËùÔÚÄ¿Â¼
-	 * @return {bool} ¼ÓÔØ  CA ¸ùÖ¤ÊéÊÇ·ñ³É¹¦
-	 * ×¢£ºÈç¹û ca_file¡¢ca_path ¾ù·Ç¿Õ£¬Ôò»áÒÀ´Î¼ÓÔØËùÓĞÖ¤Êé
+	 * åŠ è½½ CA æ ¹è¯ä¹¦(æ¯ä¸ªé…ç½®å®ä¾‹åªéœ€è°ƒç”¨ä¸€æ¬¡æœ¬æ–¹æ³•)
+	 * @param ca_file {const char*} CA è¯ä¹¦æ–‡ä»¶å…¨è·¯å¾„
+	 * @param ca_path {const char*} å¤šä¸ª CA è¯ä¹¦æ–‡ä»¶æ‰€åœ¨ç›®å½•
+	 * @return {bool} åŠ è½½  CA æ ¹è¯ä¹¦æ˜¯å¦æˆåŠŸ
+	 * æ³¨ï¼šå¦‚æœ ca_fileã€ca_path å‡éç©ºï¼Œåˆ™ä¼šä¾æ¬¡åŠ è½½æ‰€æœ‰è¯ä¹¦
 	 */
 	virtual bool load_ca(const char* ca_file, const char* ca_path) {
 		(void) ca_file;
@@ -47,11 +47,11 @@ public:
 	}
 
 	/**
-	 * Ìí¼ÓÒ»¸ö·şÎñ¶Ë/¿Í»§¶Ë×Ô¼ºµÄÖ¤Êé£¬¿ÉÒÔ¶à´Îµ÷ÓÃ±¾·½·¨¼ÓÔØ¶à¸öÖ¤Êé
-	 * @param crt_file {const char*} Ö¤ÊéÎÄ¼şÈ«Â·¾¶£¬·Ç¿Õ
-	 * @param key_file {const char*} ÃÜÔ¿ÎÄ¼şÈ«Â·¾¶£¬·Ç¿Õ
-	 * @param key_pass {const char*} ÃÜÔ¿ÎÄ¼şµÄÃÜÂë£¬Ã»ÓĞÃÜÔ¿ÃÜÂë¿ÉĞ´ NULL
-	 * @return {bool} Ìí¼ÓÖ¤ÊéÊÇ·ñ³É¹¦
+	 * æ·»åŠ ä¸€ä¸ªæœåŠ¡ç«¯/å®¢æˆ·ç«¯è‡ªå·±çš„è¯ä¹¦ï¼Œå¯ä»¥å¤šæ¬¡è°ƒç”¨æœ¬æ–¹æ³•åŠ è½½å¤šä¸ªè¯ä¹¦
+	 * @param crt_file {const char*} è¯ä¹¦æ–‡ä»¶å…¨è·¯å¾„ï¼Œéç©º
+	 * @param key_file {const char*} å¯†é’¥æ–‡ä»¶å…¨è·¯å¾„ï¼Œéç©º
+	 * @param key_pass {const char*} å¯†é’¥æ–‡ä»¶çš„å¯†ç ï¼Œæ²¡æœ‰å¯†é’¥å¯†ç å¯å†™ NULL
+	 * @return {bool} æ·»åŠ è¯ä¹¦æ˜¯å¦æˆåŠŸ
 	 */
 	virtual bool add_cert(const char* crt_file, const char* key_file,
 		const char* key_pass) {
@@ -61,15 +61,15 @@ public:
 		return false;
 	}
 
-	// ½öÎªÁË¼æÈİ¾ÉµÄAPI
+	// ä»…ä¸ºäº†å…¼å®¹æ—§çš„API
 	bool add_cert(const char* crt_file, const char* key_file) {
 		return add_cert(crt_file, key_file, NULL);
 	}
 
 	/**
-	 * Ìí¼ÓÒ»¸ö·şÎñ¶Ë/¿Í»§¶Ë×Ô¼ºµÄÖ¤Êé£¬¿ÉÒÔ¶à´Îµ÷ÓÃ±¾·½·¨¼ÓÔØ¶à¸öÖ¤Êé
-	 * @param crt_file {const char*} Ö¤ÊéÎÄ¼şÈ«Â·¾¶£¬·Ç¿Õ
-	 * @return {bool} Ìí¼ÓÖ¤ÊéÊÇ·ñ³É¹¦
+	 * æ·»åŠ ä¸€ä¸ªæœåŠ¡ç«¯/å®¢æˆ·ç«¯è‡ªå·±çš„è¯ä¹¦ï¼Œå¯ä»¥å¤šæ¬¡è°ƒç”¨æœ¬æ–¹æ³•åŠ è½½å¤šä¸ªè¯ä¹¦
+	 * @param crt_file {const char*} è¯ä¹¦æ–‡ä»¶å…¨è·¯å¾„ï¼Œéç©º
+	 * @return {bool} æ·»åŠ è¯ä¹¦æ˜¯å¦æˆåŠŸ
 	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
 	virtual bool add_cert(const char* crt_file) {
@@ -78,10 +78,10 @@ public:
 	}
 
 	/**
-	 * Ìí¼Ó·şÎñ¶Ë/¿Í»§¶ËµÄÃÜÔ¿(Ã¿¸öÅäÖÃÊµÀıÖ»Ğèµ÷ÓÃÒ»´Î±¾·½·¨)
-	 * @param key_file {const char*} ÃÜÔ¿ÎÄ¼şÈ«Â·¾¶£¬·Ç¿Õ
-	 * @param key_pass {const char*} ÃÜÔ¿ÎÄ¼şµÄÃÜÂë£¬Ã»ÓĞÃÜÔ¿ÃÜÂë¿ÉĞ´ NULL
-	 * @return {bool} ÉèÖÃÊÇ·ñ³É¹¦
+	 * æ·»åŠ æœåŠ¡ç«¯/å®¢æˆ·ç«¯çš„å¯†é’¥(æ¯ä¸ªé…ç½®å®ä¾‹åªéœ€è°ƒç”¨ä¸€æ¬¡æœ¬æ–¹æ³•)
+	 * @param key_file {const char*} å¯†é’¥æ–‡ä»¶å…¨è·¯å¾„ï¼Œéç©º
+	 * @param key_pass {const char*} å¯†é’¥æ–‡ä»¶çš„å¯†ç ï¼Œæ²¡æœ‰å¯†é’¥å¯†ç å¯å†™ NULL
+	 * @return {bool} è®¾ç½®æ˜¯å¦æˆåŠŸ
 	 * @deprecated use add_cert(const char*, const char*, const char*)
 	 */
 	virtual bool set_key(const char* key_file, const char* key_pass) {
@@ -90,22 +90,22 @@ public:
 		return false;
 	}
 
-	// ½öÎªÁË¼æÈİ¾ÉµÄAPI
+	// ä»…ä¸ºäº†å…¼å®¹æ—§çš„API
 	bool set_key(const char* key_file) {
 		return set_key(key_file, NULL);
 	}
 
 	/**
-	 * µ±Îª·şÎñ¶ËÄ£Ê½Ê±ÊÇ·ñÆôÓÃ»á»°»º´æ¹¦ÄÜ£¬ÓĞÖúÓÚÌá¸ß SSL ÎÕÊÖĞ§ÂÊ
+	 * å½“ä¸ºæœåŠ¡ç«¯æ¨¡å¼æ—¶æ˜¯å¦å¯ç”¨ä¼šè¯ç¼“å­˜åŠŸèƒ½ï¼Œæœ‰åŠ©äºæé«˜ SSL æ¡æ‰‹æ•ˆç‡
 	 * @param on {bool}
-	 * ×¢£º¸Ãº¯Êı½ö¶Ô·şÎñ¶ËÄ£Ê½ÓĞĞ§
+	 * æ³¨ï¼šè¯¥å‡½æ•°ä»…å¯¹æœåŠ¡ç«¯æ¨¡å¼æœ‰æ•ˆ
 	 */
 	virtual void enable_cache(bool on) {
 		(void) on;
 	}
 
 	/**
-	 * ÉèÖÃ¿Í»§¶Ë·¢ËÍµÄ SNI Ğ£ÑéÀà¶ÔÏó
+	 * è®¾ç½®å®¢æˆ·ç«¯å‘é€çš„ SNI æ ¡éªŒç±»å¯¹è±¡
 	 * @param checker {ssl_sni_checker*}
 	 */
 	void set_sni_checker(ssl_sni_checker* checker) {
@@ -113,7 +113,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃËùÉèÖÃµÄ SNI Ğ£Ñé¶ÔÏó
+	 * è·å¾—æ‰€è®¾ç½®çš„ SNI æ ¡éªŒå¯¹è±¡
 	 * @return {ssl_sni_checker*}
 	 */
 	ssl_sni_checker* get_sni_checker() const {

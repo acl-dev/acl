@@ -11,21 +11,21 @@ public:
 	~http_utils() {}
 
 	/**
-	 * ´ÓÍêÕûµÄ url ÖĞ»ñµÃ WEB ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºdomain:port
-	 * @param url {const char*} HTTP url£¬·Ç¿Õ
-	 * @param addr {char*} ´æ´¢½á¹û£¬´æ´¢¸ñÊ½£ºdomain:port
-	 * @param size {size_t} out »º³åÇø´óĞ¡
-	 * @return {bool} ÊÇ·ñ³É¹¦»ñµÃ
+	 * ä»å®Œæ•´çš„ url ä¸­è·å¾— WEB æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šdomain:port
+	 * @param url {const char*} HTTP urlï¼Œéç©º
+	 * @param addr {char*} å­˜å‚¨ç»“æœï¼Œå­˜å‚¨æ ¼å¼ï¼šdomain:port
+	 * @param size {size_t} out ç¼“å†²åŒºå¤§å°
+	 * @return {bool} æ˜¯å¦æˆåŠŸè·å¾—
 	 */
 	static bool get_addr(const char* url, char* addr, size_t size);
 
 	/**
-	 * ´ÓÍêÕûµÄ url ÖĞ»ñµÃ WEB ·şÎñÆ÷ IP µØÖ·¼°¶Ë¿ÚºÅ
-	 * @param url {const char*} HTTP url£¬·Ç¿Õ
-	 * @param domain {char*} ´æ´¢ÓòÃû
-	 * @param size {size_t} domain ÄÚ´æ´óĞ¡
-	 * @param port {unsigned short*} ´æ´¢¶Ë¿ÚºÅ´óĞ¡
-	 * @return {bool} ÊÇ·ñ³É¹¦»ñµÃ
+	 * ä»å®Œæ•´çš„ url ä¸­è·å¾— WEB æœåŠ¡å™¨ IP åœ°å€åŠç«¯å£å·
+	 * @param url {const char*} HTTP urlï¼Œéç©º
+	 * @param domain {char*} å­˜å‚¨åŸŸå
+	 * @param size {size_t} domain å†…å­˜å¤§å°
+	 * @param port {unsigned short*} å­˜å‚¨ç«¯å£å·å¤§å°
+	 * @return {bool} æ˜¯å¦æˆåŠŸè·å¾—
 	 */
 	static bool get_addr(const char* url, char* domain, size_t size,
 		unsigned short* port);
@@ -40,7 +40,7 @@ public:
 
 public:
 	/**
-	 * ·µ»Ø URL ÖĞµÄĞ­ÒéÀàĞÍ£ºhttp »ò https
+	 * è¿”å› URL ä¸­çš„åè®®ç±»å‹ï¼šhttp æˆ– https
 	 * @return {const char*}
 	 */
 	const char* get_proto(void) const {
@@ -48,15 +48,15 @@ public:
 	}
 
 	/**
-	 * ·µ»Ø URL ÖĞµÄÓòÃû×Ö¶Î
-	 * @return {const char*} ·µ»Ø¿Õ´®Ôò±íÊ¾Ã»ÓĞ¸Ã×Ö¶Î
+	 * è¿”å› URL ä¸­çš„åŸŸåå­—æ®µ
+	 * @return {const char*} è¿”å›ç©ºä¸²åˆ™è¡¨ç¤ºæ²¡æœ‰è¯¥å­—æ®µ
 	 */
 	const char* get_domain(void) const {
 		return domain_.c_str();
 	}
 
 	/**
-	 * ·µ»Ø¸ù¾İ URL ÌáÈ¡µÄ HTTP Ğ­Òé·şÎñ¶Ë¶Ë¿ÚºÅ£¬ÄÚ²¿È±Ê¡ÖµÎª 80
+	 * è¿”å›æ ¹æ® URL æå–çš„ HTTP åè®®æœåŠ¡ç«¯ç«¯å£å·ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º 80
 	 * @return {unsigned short}
 	 */
 	unsigned short get_port(void) const {
@@ -64,7 +64,7 @@ public:
 	}
 
 	/**
-	 * ·µ»Ø¸ù¾İ URL ÌáÈ¡µÄÏà¶ÔÂ·¾¶²¿·Ö£¨²»º¬ ? ºóÃæµÄ²ÎÊı£©
+	 * è¿”å›æ ¹æ® URL æå–çš„ç›¸å¯¹è·¯å¾„éƒ¨åˆ†ï¼ˆä¸å« ? åé¢çš„å‚æ•°ï¼‰
 	 * @return {const char*}
 	 */
 	const char* get_url_path(void) const {
@@ -72,7 +72,7 @@ public:
 	}
 
 	/**
-	 * ·µ»Ø´Ó URL ÖĞÌáÈ¡µÄ²ÎÊı×Ö¶Î
+	 * è¿”å›ä» URL ä¸­æå–çš„å‚æ•°å­—æ®µ
 	 * @return {const char*}
 	 */
 	const char* get_url_params(void) const {
@@ -80,7 +80,7 @@ public:
 	}
 
 	/**
-	 * ÇåÀí½âÎö¹ı³ÌÖĞµÄÖĞ¼ä×´Ì¬£¬ÒÔ±ãÖØ¸´Ê¹ÓÃ¸ÃÀà¶ÔÏó½âÎöÏÂÒ»¸ö URL
+	 * æ¸…ç†è§£æè¿‡ç¨‹ä¸­çš„ä¸­é—´çŠ¶æ€ï¼Œä»¥ä¾¿é‡å¤ä½¿ç”¨è¯¥ç±»å¯¹è±¡è§£æä¸‹ä¸€ä¸ª URL
 	 */
 	void reset(void);
 

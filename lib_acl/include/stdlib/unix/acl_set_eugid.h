@@ -12,10 +12,10 @@ extern "C" {
 #include <unistd.h>
 
 /**
- * ÉèÖÃ³ÌĞòµÄÓĞĞ§ÓÃ»§ ID ¼°ÓĞĞ§×é ID
- * @param euid {uid_t} ÓĞĞ§ÓÃ»§ ID
- * @param egid {gid_t} ÓĞĞ§×é ID
- * @return {int} 0 ±íÊ¾ÉèÖÃ³É¹¦£¬-1 ±íÊ¾ÉèÖÃÊ§°Ü
+ * è®¾ç½®ç¨‹åºçš„æœ‰æ•ˆç”¨æˆ· ID åŠæœ‰æ•ˆç»„ ID
+ * @param euid {uid_t} æœ‰æ•ˆç”¨æˆ· ID
+ * @param egid {gid_t} æœ‰æ•ˆç»„ ID
+ * @return {int} 0 è¡¨ç¤ºè®¾ç½®æˆåŠŸï¼Œ-1 è¡¨ç¤ºè®¾ç½®å¤±è´¥
  */
 int acl_set_eugid(uid_t euid, gid_t egid);
 

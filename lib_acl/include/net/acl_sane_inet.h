@@ -25,52 +25,52 @@ typedef union {
 } ACL_SOCKADDR;
 
 /**
- * ½« socket µØÖ·×ªÎª×Ö·û´®¸ñÊ½£¬Í¬Ê±Ö§³Ö IPV4 Óë IPV6 ¼° UNIX ÓòÌ×½Ó¿Ú
+ * å°† socket åœ°å€è½¬ä¸ºå­—ç¬¦ä¸²æ ¼å¼ï¼ŒåŒæ—¶æ”¯æŒ IPV4 ä¸ IPV6 åŠ UNIX åŸŸå¥—æ¥å£
  * @param sa {const struct sockaddr*}
- * @param buf {char*} ´æ´¢×ª»»½á¹û
- * @param size {size_t} buf ¿Õ¼ä´óĞ¡
- * @return {size_t} ·µ»Ø sockaddr µØÖ·Ëù¶ÔÓ¦µØÖ·ÀàĞÍµÄÊµ¼Ê³¤¶È£¬Èç¶ÔÓÚ IPV4 Ôò
- *  ¶ÔÓ¦ struct sockaddr_in µÄ½á¹¹Ìå³¤¶È£¬¶ÔÓÚ IPV6 Ôò¶ÔÓ¦ struct sockaddr_in6
- *  µÄ½á¹¹Ìå³¤¶È£¬·µ»ØÖµ 0 ±íÊ¾×ª»»³ö´í
+ * @param buf {char*} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @param size {size_t} buf ç©ºé—´å¤§å°
+ * @return {size_t} è¿”å› sockaddr åœ°å€æ‰€å¯¹åº”åœ°å€ç±»å‹çš„å®é™…é•¿åº¦ï¼Œå¦‚å¯¹äº IPV4 åˆ™
+ *  å¯¹åº” struct sockaddr_in çš„ç»“æ„ä½“é•¿åº¦ï¼Œå¯¹äº IPV6 åˆ™å¯¹åº” struct sockaddr_in6
+ *  çš„ç»“æ„ä½“é•¿åº¦ï¼Œè¿”å›å€¼ 0 è¡¨ç¤ºè½¬æ¢å‡ºé”™
  */
 ACL_API size_t acl_inet_ntop(const struct sockaddr *sa, char *buf, size_t size);
 
 /**
- * ½«×Ö·û´®±íÊ¾µÄµØÖ·×ªÎª socket µØÖ·£¬Ö§³Ö IPV4 Óë IPV6 ¼° UNIX ÓòÌ×½Ó¿Ú
- * @param af {int} µØÖ·ÀàĞÍ£¬AF_INET£¨IPV4£©»ò AF_INET6£¨IPV6£©
- * @param src {const char*} ×Ö·û´®±íÊ¾µÄµØÖ·£¬¿ÉÒÔÎª ip¡¢ip#port »ò ipv4:port
- * @param dst {struct sockaddr*} ´æ´¢×ª»»½á¹û
- * @return {size_t} ·µ»Ø¶ÔÓ¦  IPV4 »ò IPV6 µØÖ·½á¹¹ÌåµÄ´óĞ¡£¬Èç¶ÔÓÚ IPV4 Ôò
- *  ¶ÔÓ¦ struct sockaddr_in µÄ½á¹¹Ìå³¤¶È£¬¶ÔÓÚ IPV6 Ôò¶ÔÓ¦ struct sockaddr_in6
- *  µÄ½á¹¹Ìå³¤¶È£¬·µ»ØÖµ 0 ±íÊ¾×ª»»³ö´í
+ * å°†å­—ç¬¦ä¸²è¡¨ç¤ºçš„åœ°å€è½¬ä¸º socket åœ°å€ï¼Œæ”¯æŒ IPV4 ä¸ IPV6 åŠ UNIX åŸŸå¥—æ¥å£
+ * @param af {int} åœ°å€ç±»å‹ï¼ŒAF_INETï¼ˆIPV4ï¼‰æˆ– AF_INET6ï¼ˆIPV6ï¼‰
+ * @param src {const char*} å­—ç¬¦ä¸²è¡¨ç¤ºçš„åœ°å€ï¼Œå¯ä»¥ä¸º ipã€ip#port æˆ– ipv4:port
+ * @param dst {struct sockaddr*} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @return {size_t} è¿”å›å¯¹åº”  IPV4 æˆ– IPV6 åœ°å€ç»“æ„ä½“çš„å¤§å°ï¼Œå¦‚å¯¹äº IPV4 åˆ™
+ *  å¯¹åº” struct sockaddr_in çš„ç»“æ„ä½“é•¿åº¦ï¼Œå¯¹äº IPV6 åˆ™å¯¹åº” struct sockaddr_in6
+ *  çš„ç»“æ„ä½“é•¿åº¦ï¼Œè¿”å›å€¼ 0 è¡¨ç¤ºè½¬æ¢å‡ºé”™
  */
 ACL_API size_t acl_inet_pton(int af, const char *src, struct sockaddr *dst);
 
 /**
- * ½«×Ö·û´®±íÊ¾µÄµØÖ·×ªÎª socket µØÖ·£¬Ö§³Ö IPV4 Óë IPV6 ¼° UNIX ÓòÌ×½Ó¿Ú£¬
- * ÄÚ²¿½«×Ô¶¯Ì½²âËù¸øµØÖ·×Ö·û´®µÄµØÖ·ÀàĞÍ£¬¼´×Ô¶¯Çø·ÖÊÇ IPV4 »¹ÊÇ IPV6
- * @param src {const char*} ×Ö·û´®±íÊ¾µÄµØÖ·£¬¿ÉÒÔÎª ip¡¢ip#port »ò ipv4:port
- * @param dst {struct sockaddr*} ´æ´¢×ª»»½á¹û
- * @return {size_t} ·µ»Ø¶ÔÓ¦  IPV4 »ò IPV6 µØÖ·½á¹¹ÌåµÄ´óĞ¡£¬Èç¶ÔÓÚ IPV4 Ôò
- *  ¶ÔÓ¦ struct sockaddr_in µÄ½á¹¹Ìå³¤¶È£¬¶ÔÓÚ IPV6 Ôò¶ÔÓ¦ struct sockaddr_in6
- *  µÄ½á¹¹Ìå³¤¶È£¬·µ»ØÖµ 0 ±íÊ¾×ª»»³ö´í
+ * å°†å­—ç¬¦ä¸²è¡¨ç¤ºçš„åœ°å€è½¬ä¸º socket åœ°å€ï¼Œæ”¯æŒ IPV4 ä¸ IPV6 åŠ UNIX åŸŸå¥—æ¥å£ï¼Œ
+ * å†…éƒ¨å°†è‡ªåŠ¨æ¢æµ‹æ‰€ç»™åœ°å€å­—ç¬¦ä¸²çš„åœ°å€ç±»å‹ï¼Œå³è‡ªåŠ¨åŒºåˆ†æ˜¯ IPV4 è¿˜æ˜¯ IPV6
+ * @param src {const char*} å­—ç¬¦ä¸²è¡¨ç¤ºçš„åœ°å€ï¼Œå¯ä»¥ä¸º ipã€ip#port æˆ– ipv4:port
+ * @param dst {struct sockaddr*} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @return {size_t} è¿”å›å¯¹åº”  IPV4 æˆ– IPV6 åœ°å€ç»“æ„ä½“çš„å¤§å°ï¼Œå¦‚å¯¹äº IPV4 åˆ™
+ *  å¯¹åº” struct sockaddr_in çš„ç»“æ„ä½“é•¿åº¦ï¼Œå¯¹äº IPV6 åˆ™å¯¹åº” struct sockaddr_in6
+ *  çš„ç»“æ„ä½“é•¿åº¦ï¼Œè¿”å›å€¼ 0 è¡¨ç¤ºè½¬æ¢å‡ºé”™
  */
 ACL_API size_t acl_sane_pton(const char *src, struct sockaddr *dst);
 
 /**
- * ½«IPµØÖ·×ª»»³É×Ö·û´®¸ñÊ½
- * @param src {const unsigned char*} struct in_addr in.s_addr µÄÁ¬ĞøÄÚ´æ±íÊ¾
- * @param dst {char *} ´æ´¢×ª»»½á¹û
- * @param size {size_t} dst µÄ¿Õ¼ä´óĞ¡
+ * å°†IPåœ°å€è½¬æ¢æˆå­—ç¬¦ä¸²æ ¼å¼
+ * @param src {const unsigned char*} struct in_addr in.s_addr çš„è¿ç»­å†…å­˜è¡¨ç¤º
+ * @param dst {char *} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @param size {size_t} dst çš„ç©ºé—´å¤§å°
  * @return {const char*} NULL: error; !NULL: ok
  */
 ACL_API const char *acl_inet_ntop4(const unsigned char *src, char *dst, size_t size);
 
 /**
- * ½«IPµØÖ·×ª»»³É×Ö·û´®¸ñÊ½
+ * å°†IPåœ°å€è½¬æ¢æˆå­—ç¬¦ä¸²æ ¼å¼
  * @param in {struct in_addr}
- * @param dst {char *} ´æ´¢×ª»»½á¹û
- * @param size {size_t} dst µÄ¿Õ¼ä´óĞ¡
+ * @param dst {char *} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @param size {size_t} dst çš„ç©ºé—´å¤§å°
  * @return {const char*} NULL: error; !NULL: ok
  */
 ACL_API const char *acl_inet_ntoa(const struct in_addr in, char *dst, size_t size);
@@ -80,18 +80,18 @@ ACL_API const char *acl_inet6_ntoa(const struct in6_addr in6, char *buf, size_t 
 #endif
 
 /**
- * ÅĞ¶Ï¸ø¶¨µÄ×Ö·û´®ÊÇ·ñÊÇÕıÈ·µÄ ip µØÖ·
+ * åˆ¤æ–­ç»™å®šçš„å­—ç¬¦ä¸²æ˜¯å¦æ˜¯æ­£ç¡®çš„ ip åœ°å€
  * @param ip {const char *ip}
- * @return {int} != 0: ÊÇ; == 0: ·ñ
+ * @return {int} != 0: æ˜¯; == 0: å¦
  */
 ACL_API int acl_is_ip(const char *ip);
 ACL_API int acl_is_ipv4(const char *ip);
 ACL_API int acl_is_ipv6(const char *ip);
 
 /**
- * ÅĞ¶ÏËù¸øµÄ ip µØÖ·ÊÇ·ñ·ûºÏ xxx.xxx.xxx.xxx:port ¸ñÊ½
- * @param addr {const char*} IP:PORT µØÖ·
- * @return {int} 1: ·ûºÏ, 0: ²»·ûºÏ
+ * åˆ¤æ–­æ‰€ç»™çš„ ip åœ°å€æ˜¯å¦ç¬¦åˆ xxx.xxx.xxx.xxx:port æ ¼å¼
+ * @param addr {const char*} IP:PORT åœ°å€
+ * @return {int} 1: ç¬¦åˆ, 0: ä¸ç¬¦åˆ
  */
 ACL_API int acl_ipv4_addr_valid(const char *addr);
 

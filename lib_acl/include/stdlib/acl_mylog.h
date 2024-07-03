@@ -17,63 +17,63 @@ extern "C" {
 typedef struct ACL_LOG ACL_LOG;
 
 /**
- * ½«µ±Ç°µÄÊ±¼ä×ª»»³ÉÈÕÖ¾¼ÇÂ¼¸ñÊ½µÄÊ±¼ä¸ñÊ½
- * @param buf {char*} ÄÚ´æ´æ´¢Çø
- * @param size {size_t} buf µÄ¿Õ¼ä´óĞ¡
+ * å°†å½“å‰çš„æ—¶é—´è½¬æ¢æˆæ—¥å¿—è®°å½•æ ¼å¼çš„æ—¶é—´æ ¼å¼
+ * @param buf {char*} å†…å­˜å­˜å‚¨åŒº
+ * @param size {size_t} buf çš„ç©ºé—´å¤§å°
  */
 ACL_API void acl_logtime_fmt(char *buf, size_t size);
 
 /**
- * ÉèÖÃÊÇ·ñ¼ÇÂ¼Ïß³ÌIDºÅ£¬Ä¬ÈÏÇé¿öÏÂÊÇ²»¼ÇÂ¼µÄ
- * @param onoff {int} ·Ç 0 ±íÊ¾¼ÇÂ¼Ïß³ÌID£¬·ñÔò²»¼ÇÂ¼
+ * è®¾ç½®æ˜¯å¦è®°å½•çº¿ç¨‹IDå·ï¼Œé»˜è®¤æƒ…å†µä¸‹æ˜¯ä¸è®°å½•çš„
+ * @param onoff {int} é 0 è¡¨ç¤ºè®°å½•çº¿ç¨‹IDï¼Œå¦åˆ™ä¸è®°å½•
  */
 ACL_API void acl_log_add_tid(int onoff);
 
 /**
- * ÉèÖÃÈÕÖ¾µÄÎÄ¼şÁ÷¾ä±ú
- * @param fp {ACL_VSTREAM *} ÎÄ¼şÁ÷¾ä±ú
- * @param plog_pre {const char*} ÈÕÖ¾¼ÇÂ¼ĞÅÏ¢Ç°µÄÌáÊ¾ĞÅÏ¢£¬½¨ÒéÓÃ½ø³Ì
+ * è®¾ç½®æ—¥å¿—çš„æ–‡ä»¶æµå¥æŸ„
+ * @param fp {ACL_VSTREAM *} æ–‡ä»¶æµå¥æŸ„
+ * @param plog_pre {const char*} æ—¥å¿—è®°å½•ä¿¡æ¯å‰çš„æç¤ºä¿¡æ¯ï¼Œå»ºè®®ç”¨è¿›ç¨‹
  */
 ACL_API void acl_log_fp_set(ACL_VSTREAM *fp, const char *plog_pre);
 
 /**
- * ´ò¿ªÈÕÖ¾ÎÄ¼ş
- * @param recipients {const char*} ÈÕÖ¾½ÓÊÕÆ÷ÁĞ±í£¬ÓÉ "|" ·Ö¸ô£¬½ÓÊÕÆ÷
- *  ¿ÉÒÔÊÇ±¾µØÎÄ¼ş»òÔ¶³ÌÌ×½Ó¿Ú£¬Èç:
+ * æ‰“å¼€æ—¥å¿—æ–‡ä»¶
+ * @param recipients {const char*} æ—¥å¿—æ¥æ”¶å™¨åˆ—è¡¨ï¼Œç”± "|" åˆ†éš”ï¼Œæ¥æ”¶å™¨
+ *  å¯ä»¥æ˜¯æœ¬åœ°æ–‡ä»¶æˆ–è¿œç¨‹å¥—æ¥å£ï¼Œå¦‚:
  *  /tmp/test.log|UDP:127.0.0.1:12345|TCP:127.0.0.1:12345|UNIX:/tmp/test.sock
- *  ¸ÃÅäÖÃÒªÇó½«ËùÓĞÈÕÖ¾Í¬Ê±·¢¸ø /tmp/test.log, UDP:127.0.0.1:12345,
- *  TCP:127.0.0.1:12345 ºÍ UNIX:/tmp/test.sock ËÄ¸öÈÕÖ¾½ÓÊÕÆ÷¶ÔÏó
- * @param plog_pre {const char*} ÈÕÖ¾¼ÇÂ¼ĞÅÏ¢Ç°µÄÌáÊ¾ĞÅÏ¢£¬½¨ÒéÓÃ½ø³Ì
- *  ÃûÌîĞ´´ËÖµ
+ *  è¯¥é…ç½®è¦æ±‚å°†æ‰€æœ‰æ—¥å¿—åŒæ—¶å‘ç»™ /tmp/test.log, UDP:127.0.0.1:12345,
+ *  TCP:127.0.0.1:12345 å’Œ UNIX:/tmp/test.sock å››ä¸ªæ—¥å¿—æ¥æ”¶å™¨å¯¹è±¡
+ * @param plog_pre {const char*} æ—¥å¿—è®°å½•ä¿¡æ¯å‰çš„æç¤ºä¿¡æ¯ï¼Œå»ºè®®ç”¨è¿›ç¨‹
+ *  åå¡«å†™æ­¤å€¼
  */
 ACL_API int acl_open_log(const char *recipients, const char *plog_pre);
 
 /**
- * ÔÚµ÷ÓÃ acl_open_log Ç°£¬¿ÉÒÔµ÷ÓÃ±¾º¯ÊıÓÃÀ´Éè¶¨Õë¶ÔÈÕÖ¾ fd ÊÇ·ñµ÷ÓÃ
- * acl_close_on_exec£¬È±Ê¡Çé¿öÏÂ»á×Ô¶¯µ÷ÓÃ acl_close_on_exec
- * @param yes {int} ·Ç 0 ±íÊ¾µ÷ÓÃ acl_close_on_exec£¬·ñÔò±íÊ¾²»µ÷ÓÃ
+ * åœ¨è°ƒç”¨ acl_open_log å‰ï¼Œå¯ä»¥è°ƒç”¨æœ¬å‡½æ•°ç”¨æ¥è®¾å®šé’ˆå¯¹æ—¥å¿— fd æ˜¯å¦è°ƒç”¨
+ * acl_close_on_execï¼Œç¼ºçœæƒ…å†µä¸‹ä¼šè‡ªåŠ¨è°ƒç”¨ acl_close_on_exec
+ * @param yes {int} é 0 è¡¨ç¤ºè°ƒç”¨ acl_close_on_execï¼Œå¦åˆ™è¡¨ç¤ºä¸è°ƒç”¨
  */
 ACL_API void acl_log_close_onexec(int yes);
 
 /**
- * Ğ´ÈÕÖ¾
- * @param fmt {const char*} ¸ñÊ½²ÎÊı
- * @param ... ²ÎÊıĞòÁĞ
- * @return {int} Ğ´ÈëÈÕÖ¾ÎÄ¼şµÄÊı¾İÁ¿
+ * å†™æ—¥å¿—
+ * @param fmt {const char*} æ ¼å¼å‚æ•°
+ * @param ... å‚æ•°åºåˆ—
+ * @return {int} å†™å…¥æ—¥å¿—æ–‡ä»¶çš„æ•°æ®é‡
  */
 ACL_API int ACL_PRINTF(1, 2) acl_write_to_log(const char *fmt, ...);
 
 /**
- * Ğ´ÈÕÖ¾
- * @param info {const char*} ÈÕÖ¾ĞÅÏ¢µÄÌáÊ¾ĞÅÏ¢
- * @param fmt {const char*} ¸ñÊ½²ÎÊı
- * @param ap {va_list} ²ÎÊıÁĞ±í
- * @return {int} Ğ´ÈëÈÕÖ¾ÎÄ¼şµÄÊı¾İÁ¿
+ * å†™æ—¥å¿—
+ * @param info {const char*} æ—¥å¿—ä¿¡æ¯çš„æç¤ºä¿¡æ¯
+ * @param fmt {const char*} æ ¼å¼å‚æ•°
+ * @param ap {va_list} å‚æ•°åˆ—è¡¨
+ * @return {int} å†™å…¥æ—¥å¿—æ–‡ä»¶çš„æ•°æ®é‡
  */
 ACL_API int acl_write_to_log2(const char *info, const char *fmt, va_list ap);
 
 /**
- * ¹Ø±ÕÈÕÖ¾ÎÄ¼ş¾ä±ú
+ * å…³é—­æ—¥å¿—æ–‡ä»¶å¥æŸ„
  */
 ACL_API void acl_close_log(void);
 

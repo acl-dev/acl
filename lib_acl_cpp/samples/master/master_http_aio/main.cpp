@@ -3,17 +3,17 @@
 
 int main(int argc, char* argv[])
 {
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// ÉèÖÃÅäÖÃ²ÎÊı±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc >= 2 && strcmp(argv[1], "help") == 0) {
 		printf("usage: %s addr conf\r\n", argv[0]);
@@ -27,15 +27,15 @@ int main(int argc, char* argv[])
 		if (argc >= 4)
 			conf = argv[3];
 
-		ms.run_alone(addr, conf, acl::ENGINE_KERNEL);  // µ¥¶ÀÔËĞĞ·½Ê½
+		ms.run_alone(addr, conf, acl::ENGINE_KERNEL);  // å•ç‹¬è¿è¡Œæ–¹å¼
 	} else {
 #ifdef	WIN32
 		const char* addr = "127.0.0.1|8888";
 		printf("listen on: %s\r\n", addr);
 
-		ms.run_alone(addr, NULL, acl::ENGINE_SELECT);  // µ¥¶ÀÔËĞĞ·½Ê½
+		ms.run_alone(addr, NULL, acl::ENGINE_SELECT);  // å•ç‹¬è¿è¡Œæ–¹å¼
 #else
-		ms.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		ms.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 #endif
 	}
 

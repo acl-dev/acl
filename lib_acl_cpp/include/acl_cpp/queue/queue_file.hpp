@@ -19,41 +19,41 @@ public:
 	queue_file();
 
 	/**
-	 * »ñµÃÎÄ¼şÁ÷Ö¸Õë
-	 * @return {acl::fstream*} ÎÄ¼şÁ÷Ö¸Õë, Èç¹ûÎª NULL ÔòËµÃ÷ÎÄ¼ş»¹Î´´ò¿ª
+	 * è·å¾—æ–‡ä»¶æµæŒ‡é’ˆ
+	 * @return {acl::fstream*} æ–‡ä»¶æµæŒ‡é’ˆ, å¦‚æœä¸º NULL åˆ™è¯´æ˜æ–‡ä»¶è¿˜æœªæ‰“å¼€
 	 */
 	fstream* get_fstream(void) const;
 
 	/**
-	 * »ñµÃÎÄ¼ş´´½¨Ê±¼ä
-	 * @return {time_t}, ·µ»Ø×Ô 1970 ÄêÒÔÀ´µÄÃëÊı, Èç¹û·µ»ØÖµÎª (time_t) -1,
-	 *  Ôò±íÊ¾³ö´í
+	 * è·å¾—æ–‡ä»¶åˆ›å»ºæ—¶é—´
+	 * @return {time_t}, è¿”å›è‡ª 1970 å¹´ä»¥æ¥çš„ç§’æ•°, å¦‚æœè¿”å›å€¼ä¸º (time_t) -1,
+	 *  åˆ™è¡¨ç¤ºå‡ºé”™
 	 */
 	time_t get_ctime(void) const;
 
 	/**
-	 * ÏòÎÄ¼şÖĞĞ´Êı¾İ
-	 * @param data {const void*} Êı¾İµØÖ·
-	 * @param len {size} Êı¾İ³¤¶È
-	 * @return {bool} Ğ´Êı¾İÊÇ·ñ³É¹¦
+	 * å‘æ–‡ä»¶ä¸­å†™æ•°æ®
+	 * @param data {const void*} æ•°æ®åœ°å€
+	 * @param len {size} æ•°æ®é•¿åº¦
+	 * @return {bool} å†™æ•°æ®æ˜¯å¦æˆåŠŸ
 	 */
 	bool write(const void* data, size_t len);
 	int format(const char* fmt, ...) ACL_CPP_PRINTF(2, 3);
 	int vformat(const char* fmt, va_list ap);
 
 	/**
-	 * ´ÓÎÄ¼şÖĞ¶ÁÈ¡Êı¾İ
-	 * @param buf {void*} »º´æµØÖ·
-	 * @param len {size_t} buf ´óĞ¡
-	 * @return {int} ¶ÁÈ¡µÄÊı¾İ³¤¶È, -1: ±íÊ¾¶Á½áÊø»ò¶ÁÊ§°Ü»òÊäÈë²ÎÊı´íÎó,
-	 *  Ó¦¸Ã¹Ø±Õ¸ÃÎÄ¼ş¶ÔÏó, > 0: ±íÊ¾³É¹¦
+	 * ä»æ–‡ä»¶ä¸­è¯»å–æ•°æ®
+	 * @param buf {void*} ç¼“å­˜åœ°å€
+	 * @param len {size_t} buf å¤§å°
+	 * @return {int} è¯»å–çš„æ•°æ®é•¿åº¦, -1: è¡¨ç¤ºè¯»ç»“æŸæˆ–è¯»å¤±è´¥æˆ–è¾“å…¥å‚æ•°é”™è¯¯,
+	 *  åº”è¯¥å…³é—­è¯¥æ–‡ä»¶å¯¹è±¡, > 0: è¡¨ç¤ºæˆåŠŸ
 	 */
 	int read(void* buf, size_t len);
 
 	/**
-	 * È¡µÃ±¾¶ÓÁĞÎÄ¼şµÄ¼üÖµ, ¸ÃÖµ¼´ÊÇ¶ÓÁĞÎÄ¼şµÄ²¿·ÖÎÄ¼şÃû(²»º¬Â·¾¶,
-	 * À©Õ¹Ãû)
-	 * @return {const char*} ¶ÓÁĞÎÄ¼ş¼üÖµ
+	 * å–å¾—æœ¬é˜Ÿåˆ—æ–‡ä»¶çš„é”®å€¼, è¯¥å€¼å³æ˜¯é˜Ÿåˆ—æ–‡ä»¶çš„éƒ¨åˆ†æ–‡ä»¶å(ä¸å«è·¯å¾„,
+	 * æ‰©å±•å)
+	 * @return {const char*} é˜Ÿåˆ—æ–‡ä»¶é”®å€¼
 	 */
 	const char* key(void) const
 	{
@@ -61,7 +61,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¶ÓÁĞÎÄ¼şµÄ·ÃÎÊÈ«Â·¾¶
+	 * è·å¾—é˜Ÿåˆ—æ–‡ä»¶çš„è®¿é—®å…¨è·¯å¾„
 	 * @return {const char*}
 	 */
 	const char* get_filePath(void) const
@@ -70,7 +70,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¶ÓÁĞÎÄ¼şµÄ¸ùÂ·¾¶²¿·Ö(²»º¬¶ÓÁĞÄ¿Â¼)
+	 * è·å¾—é˜Ÿåˆ—æ–‡ä»¶çš„æ ¹è·¯å¾„éƒ¨åˆ†(ä¸å«é˜Ÿåˆ—ç›®å½•)
 	 * @return {const char*}
 	 */
 	const char* get_home(void) const
@@ -79,8 +79,8 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¸Ã¶ÓÁĞÎÄ¼şµÄ¶ÓÁĞÃû
-	 * @return {const char*} ¶ÓÁĞÃû³Æ
+	 * è·å¾—è¯¥é˜Ÿåˆ—æ–‡ä»¶çš„é˜Ÿåˆ—å
+	 * @return {const char*} é˜Ÿåˆ—åç§°
 	 */
 	const char* get_queueName(void) const
 	{
@@ -88,8 +88,8 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¶ÓÁĞ×ÓÄ¿Â¼
-	 * @return {const char*} ¶ÓÁĞ×ÓÄ¿Â¼Ãû
+	 * è·å¾—é˜Ÿåˆ—å­ç›®å½•
+	 * @return {const char*} é˜Ÿåˆ—å­ç›®å½•å
 	 */
 	const char* get_queueSub(void) const
 	{
@@ -97,8 +97,8 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¸Ã¶ÓÁĞÎÄ¼şµÄÀ©Õ¹Ãû
-	 * @return {const char*} À©Õ¹Ãû³Æ
+	 * è·å¾—è¯¥é˜Ÿåˆ—æ–‡ä»¶çš„æ‰©å±•å
+	 * @return {const char*} æ‰©å±•åç§°
 	 */
 	const char* get_extName(void) const
 	{
@@ -106,7 +106,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃÒÑ¾­Ğ´ÈëµÄÊı¾İ´óĞ¡³ß´ç
+	 * è·å¾—å·²ç»å†™å…¥çš„æ•°æ®å¤§å°å°ºå¯¸
 	 * @return {size_t}
 	 */
 	size_t get_fileSize() const
@@ -120,102 +120,102 @@ private:
 	~queue_file();
 
 	/**
-	 * ´´½¨ĞÂµÄ¶ÓÁĞÎÄ¼ş, ´´½¨Íê±Ïºó»á×Ô¶¯´´½¨¸ÃÎÄ¼şµÄ¼ÓËø¶ÔÏó
-	 * ¿ÉÒÔÖ±½Óµ÷ÓÃ¸ÃÎÄ¼şµÄ lock()/unlock()
-	 * @param home {const char*} ¶ÓÁĞÎÄ¼şËùÔÚ¸ùÂ·¾¶
-	 * @param queueName {const char*} ¶ÓÁĞÃû
-	 * @param extName {const char*} ¶ÓÁĞÎÄ¼şÀ©Õ¹Ãû
-	 * @param width {unsigned} ¶ÓÁĞ¶ş¼¶Ä¿Â¼µÄ¸öÊı
-	 * @return {bool} ´´½¨ĞÂ¶ÓÁĞÎÄ¼şÊÇ·ñ³É¹¦, Èç¹û·µ»Ø false ÔòËµÃ÷
-	 *  ÊäÈëµÄ path »ò extName ·Ç·¨
+	 * åˆ›å»ºæ–°çš„é˜Ÿåˆ—æ–‡ä»¶, åˆ›å»ºå®Œæ¯•åä¼šè‡ªåŠ¨åˆ›å»ºè¯¥æ–‡ä»¶çš„åŠ é”å¯¹è±¡
+	 * å¯ä»¥ç›´æ¥è°ƒç”¨è¯¥æ–‡ä»¶çš„ lock()/unlock()
+	 * @param home {const char*} é˜Ÿåˆ—æ–‡ä»¶æ‰€åœ¨æ ¹è·¯å¾„
+	 * @param queueName {const char*} é˜Ÿåˆ—å
+	 * @param extName {const char*} é˜Ÿåˆ—æ–‡ä»¶æ‰©å±•å
+	 * @param width {unsigned} é˜Ÿåˆ—äºŒçº§ç›®å½•çš„ä¸ªæ•°
+	 * @return {bool} åˆ›å»ºæ–°é˜Ÿåˆ—æ–‡ä»¶æ˜¯å¦æˆåŠŸ, å¦‚æœè¿”å› false åˆ™è¯´æ˜
+	 *  è¾“å…¥çš„ path æˆ– extName éæ³•
 	 */
 	bool create(const char* home, const char* queueName,
 		const char* extName, unsigned width);
 
 	/**
-	 * ´ò¿ªÒÑ¾­´æÔÚµÄ¶ÓÁĞÎÄ¼ş, ´ò¿ªºó»á×Ô¶¯´´½¨¸ÃÎÄ¼şµÄ¼ÓËø¶ÔÏó,
-	 * ¿ÉÒÔÖ±½Óµ÷ÓÃ¸ÃÎÄ¼şµÄ lock()/unlock()
-	 * @param filePath {const char*} ¶ÓÁĞÎÄ¼şÂ·¾¶
-	 * @return {bool} ´ò¿ª¶ÓÁĞÎÄ¼şÊÇ·ñ³É¹¦
+	 * æ‰“å¼€å·²ç»å­˜åœ¨çš„é˜Ÿåˆ—æ–‡ä»¶, æ‰“å¼€åä¼šè‡ªåŠ¨åˆ›å»ºè¯¥æ–‡ä»¶çš„åŠ é”å¯¹è±¡,
+	 * å¯ä»¥ç›´æ¥è°ƒç”¨è¯¥æ–‡ä»¶çš„ lock()/unlock()
+	 * @param filePath {const char*} é˜Ÿåˆ—æ–‡ä»¶è·¯å¾„
+	 * @return {bool} æ‰“å¼€é˜Ÿåˆ—æ–‡ä»¶æ˜¯å¦æˆåŠŸ
 	 */
 	bool open(const char* filePath);
 	bool open(const char* home, const char* queueName, const char* queueSub,
 		const char* partName, const char* extName);
 
 	/**
-	 * ¹Ø±Õµ±Ç°ÎÄ¼ş¾ä±ú
+	 * å…³é—­å½“å‰æ–‡ä»¶å¥æŸ„
 	 */
 	void close();
 
 	/**
-	 * ´Ó´ÅÅÌÉÏÉ¾³ı±¾¶ÓÁĞÎÄ¼ş
-	 * @return {bool} É¾³ıÊÇ·ñ³É¹¦
+	 * ä»ç£ç›˜ä¸Šåˆ é™¤æœ¬é˜Ÿåˆ—æ–‡ä»¶
+	 * @return {bool} åˆ é™¤æ˜¯å¦æˆåŠŸ
 	 */
 	bool remove();
 
 	/**
-	 * ½«¶ÓÁĞÎÄ¼ş´Óµ±Ç°¶ÓÁĞÖĞÒÆÖÁÄ¿±ê¶ÓÁĞÖĞ
-	 * @param queueName {const char*} Ä¿±ê¶ÓÁĞÃû³Æ
-	 * @param extName {const char*} Ä¿±êÀ©Õ¹Ãû³Æ
-	 * @return {bool} ÒÆ¶¯ÎÄ¼şÊÇ·ñ³É¹¦
+	 * å°†é˜Ÿåˆ—æ–‡ä»¶ä»å½“å‰é˜Ÿåˆ—ä¸­ç§»è‡³ç›®æ ‡é˜Ÿåˆ—ä¸­
+	 * @param queueName {const char*} ç›®æ ‡é˜Ÿåˆ—åç§°
+	 * @param extName {const char*} ç›®æ ‡æ‰©å±•åç§°
+	 * @return {bool} ç§»åŠ¨æ–‡ä»¶æ˜¯å¦æˆåŠŸ
 	 */
 	bool move_file(const char* queueName, const char* extName);
 
 	/**
-	 * ÉèÖÃ¶ÓÁĞÃû
-	 * @param queueName {const char*} ¶ÓÁĞÃû³Æ
+	 * è®¾ç½®é˜Ÿåˆ—å
+	 * @param queueName {const char*} é˜Ÿåˆ—åç§°
 	 */
 	void set_queueName(const char* queueName);
 
 	/**
-	 * ÉèÖÃ¶ÓÁĞÎÄ¼şµÄÀ©Õ¹Ãû
+	 * è®¾ç½®é˜Ÿåˆ—æ–‡ä»¶çš„æ‰©å±•å
 	 */
 	void set_extName(const char* extName);
 
 	/**
-	 * ¶Ôµ±Ç°¶ÓÁĞÎÄ¼ş¶ÔÏó¼ÓËø(°üÀ¨»¥³âËø¼°ÎÄ¼şËø)
-	 * @return {bool} ¼ÓËøÊÇ·ñ³É¹¦
+	 * å¯¹å½“å‰é˜Ÿåˆ—æ–‡ä»¶å¯¹è±¡åŠ é”(åŒ…æ‹¬äº’æ–¥é”åŠæ–‡ä»¶é”)
+	 * @return {bool} åŠ é”æ˜¯å¦æˆåŠŸ
 	 */
 	bool lock(void);
 
 	/**
-	 * ¶Ôµ±Ç°¶ÓÁĞÎÄ¼ş¶ÔÏó½âËø(°üÀ¨»¥³âËø¼°ÎÄ¼şËø)
-	 * @return {bool} ½âËøÊÇ·ñ³É¹¦
+	 * å¯¹å½“å‰é˜Ÿåˆ—æ–‡ä»¶å¯¹è±¡è§£é”(åŒ…æ‹¬äº’æ–¥é”åŠæ–‡ä»¶é”)
+	 * @return {bool} è§£é”æ˜¯å¦æˆåŠŸ
 	 */
 	bool unlock(void);
 
 private:
-	// ÎÄ¼şÁ÷¶ÔÏó
+	// æ–‡ä»¶æµå¯¹è±¡
 	fstream* m_fp;
 
-	// ¶ÓÁĞÎÄ¼şÏà¶ÔÓÚ¶ÓÁĞ¸ùÄ¿Â¼µÄÈ«Â·¾¶Ãû
+	// é˜Ÿåˆ—æ–‡ä»¶ç›¸å¯¹äºé˜Ÿåˆ—æ ¹ç›®å½•çš„å…¨è·¯å¾„å
 	string m_filePath;
 
-	// ¶ÓÁĞÎÄ¼şµÄ¸ùÂ·¾¶
+	// é˜Ÿåˆ—æ–‡ä»¶çš„æ ¹è·¯å¾„
 	char  m_home[MAXPATH255];
 
-	// ¶ÓÁĞÃû³Æ
+	// é˜Ÿåˆ—åç§°
 	char  m_queueName[32];
 
-	// ¶ÓÁĞÏÂµÄ×ÓÄ¿Â¼
+	// é˜Ÿåˆ—ä¸‹çš„å­ç›®å½•
 	char  m_queueSub[32];
 
-	// ¶ÓÁĞÎÄ¼şÃû, ²»°üÀ¨Â·¾¶, Ò²²»°üÀ¨ÎÄ¼şµÄÀ©Õ¹Ãû
+	// é˜Ÿåˆ—æ–‡ä»¶å, ä¸åŒ…æ‹¬è·¯å¾„, ä¹Ÿä¸åŒ…æ‹¬æ–‡ä»¶çš„æ‰©å±•å
 	char  m_partName[MAXPATH255];
 
-	// ¶ÓÁĞÎÄ¼şµÄÀ©Õ¹Ãû
+	// é˜Ÿåˆ—æ–‡ä»¶çš„æ‰©å±•å
 	char  m_extName[32];
 
-	// ¼ÓËø¶ÔÏó
+	// åŠ é”å¯¹è±¡
 	locker m_locker;
 
-	// µ±Ç°ÎÄ¼şÊÇ·ñÒÑ¾­±»¼ÓËøÁË
+	// å½“å‰æ–‡ä»¶æ˜¯å¦å·²ç»è¢«åŠ é”äº†
 	bool  m_bLocked;
 
-	// ÎÄ¼şËøÊÇ·ñÒÑ¾­´ò¿ªÁË
+	// æ–‡ä»¶é”æ˜¯å¦å·²ç»æ‰“å¼€äº†
 	bool  m_bLockerOpened;
 
-	// ÒÑ¾­Ğ´ÈëµÄÎÄ¼ş³ß´ç´óĞ¡
+	// å·²ç»å†™å…¥çš„æ–‡ä»¶å°ºå¯¸å¤§å°
 	size_t nwriten_;
 };
 

@@ -21,7 +21,7 @@
 
 #ifdef	ACL_WINDOWS
 
-/*--------------------  ACL_WINDOWS ÏÂÄ£ÄâÊµÏÖ Posix ±ê×¼½Ó¿Úº¯Êı ----------------*/
+/*--------------------  ACL_WINDOWS ä¸‹æ¨¡æ‹Ÿå®ç° Posix æ ‡å‡†æ¥å£å‡½æ•° ----------------*/
 
 #include <process.h>
 
@@ -70,7 +70,7 @@ void acl_pthread_end(void)
 	}
 }
 
-/* Ã¿¸ö½ø³ÌµÄÎ¨Ò»³õÊ¼»¯º¯Êı */
+/* æ¯ä¸ªè¿›ç¨‹çš„å”¯ä¸€åˆå§‹åŒ–å‡½æ•° */
 
 static void acl_pthread_init_once(void)
 {
@@ -102,7 +102,7 @@ static void acl_pthread_init_once(void)
 	__tls_key_list[__tls_value_list_key].key = __tls_value_list_key;
 }
 
-/* »ñµÃÏß³Ì¾Ö²¿±äÁ¿Á´±í */
+/* è·å¾—çº¿ç¨‹å±€éƒ¨å˜é‡é“¾è¡¨ */
 
 static ACL_FIFO *tls_value_list_get(void)
 {
@@ -143,7 +143,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 	ACL_FIFO *tls_value_list_ptr = tls_value_list_get();
 	unsigned long *tid = 0;
 
-	/* Ö»ÊÇÎªÁË±ÜÃâÓëÖ÷Ïß³ÌµÄ h_thread->handle = handle ²úÉú³åÍ» */
+	/* åªæ˜¯ä¸ºäº†é¿å…ä¸ä¸»çº¿ç¨‹çš„ h_thread->handle = handle äº§ç”Ÿå†²çª */
 	if (__thread_inited) {
 		acl_pthread_mutex_lock(&__thread_lock);
 	}
@@ -155,7 +155,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 	thread->id = acl_pthread_self();
 	thread->return_arg = (void*) thread->start_routine(thread->routine_arg);
 
-	/* ÊÍ·ÅÓÉ acl_pthread_setspecific Ìí¼ÓµÄÏß³Ì¾Ö²¿±äÁ¿ */
+	/* é‡Šæ”¾ç”± acl_pthread_setspecific æ·»åŠ çš„çº¿ç¨‹å±€éƒ¨å˜é‡ */
 	while (1) {
 		TLS_VALUE *tls_value = private_fifo_pop(tls_value_list_ptr);
 
@@ -177,7 +177,7 @@ static DWORD WINAPI RunThreadWrap(LPVOID data)
 
 	private_fifo_free(tls_value_list_ptr, NULL);
 
-	/* Èç¹ûÏß³Ì´´½¨Ê±Îª·ÖÀë·½Ê½ÔòĞèÒª¹Ø±ÕÏß³Ì¾ä±ú */
+	/* å¦‚æœçº¿ç¨‹åˆ›å»ºæ—¶ä¸ºåˆ†ç¦»æ–¹å¼åˆ™éœ€è¦å…³é—­çº¿ç¨‹å¥æŸ„ */
 	if (thread->detached) {
 		if (!CloseHandle(thread->handle)) {
 			acl_msg_error("close handle error(%s)", 
@@ -265,7 +265,7 @@ int  acl_pthread_create(acl_pthread_t *thread, acl_pthread_attr_t *attr,
 	thread->id            = id;
 	thread->handle        = 0;
 
-	/* ¸ù¾İÏß³ÌµÄÊôĞÔÀ´È·¶¨Ïß³Ì´´½¨Ê±ÊÇ·ÖÀëÄ£Ê½»¹ÊÇ·Ç·ÖÀëÄ£Ê½ */
+	/* æ ¹æ®çº¿ç¨‹çš„å±æ€§æ¥ç¡®å®šçº¿ç¨‹åˆ›å»ºæ—¶æ˜¯åˆ†ç¦»æ¨¡å¼è¿˜æ˜¯éåˆ†ç¦»æ¨¡å¼ */
 
 	if (attr != NULL && attr->detached) {
 		thread->detached = 1;
@@ -304,17 +304,17 @@ int acl_pthread_once(acl_pthread_once_t *once_control,
 		return ACL_EINVAL;
 	}
 
-	/* Ö»ÓĞµÚÒ»¸öµ÷ÓÃ InterlockedCompareExchange µÄÏß³Ì²Å»áÖ´ĞĞ
-	 * init_routine, ºóĞøÏß³ÌÓÀÔ¶ÔÚ InterlockedCompareExchange
-	 * ÍâÔËĞĞ£¬²¢ÇÒÒ»Ö±½øÈë¿ÕÑ­»·Ö±ÖÁµÚÒ»¸öÏß³ÌÖ´ĞĞ init_routine
-	 * Íê±Ï²¢ÇÒ½« *once_control ÖØĞÂ¸³Öµ, Ö»ÓĞÔÚ¶àºË»·¾³ÖĞ¶à¸öÏß³Ì
-	 * Í¬Ê±ÔËĞĞÖÁ´ËÊ±²ÅÓĞ¿ÉÄÜ³öÏÖ¶ÌÔİµÄºóĞøÏß³Ì¿ÕÑ­»·ÏÖÏó£¬Èç¹û
-	 * ¶à¸öÏß³ÌË³ĞòÖÁ´Ë£¬ÔòÒòÎª *once_control ÒÑ¾­±»µÚÒ»¸öÏß³ÌÖØĞÂ
-	 * ¸³Öµ¶ø²»»á½øÈëÑ­»·ÌåÄÚÖ»ËùÒÔÈç´Ë´¦Àí£¬ÊÇÎªÁË±£Ö¤ËùÓĞÏß³ÌÔÚ
-	 * µ÷ÓÃ acl_pthread_once ·µ»ØÇ° init_routine ±ØĞë±»µ÷ÓÃÇÒ½öÄÜ
-	 * ±»µ÷ÓÃÒ»´Î, µ«ÔÚVC6ÏÂ£¬InterlockedCompareExchange ½Ó¿Ú¶¨Òå
-	 * ÓĞĞ©¹ÖÒì£¬ĞèÒª×öÓ²ĞÔÖ¸¶¨²ÎÊıÀàĞÍ£¬²Î¼û <Windows ¸ß¼¶±à³ÌÖ¸ÄÏ>
-	 * Jeffrey Richter, 366 Ò³
+	/* åªæœ‰ç¬¬ä¸€ä¸ªè°ƒç”¨ InterlockedCompareExchange çš„çº¿ç¨‹æ‰ä¼šæ‰§è¡Œ
+	 * init_routine, åç»­çº¿ç¨‹æ°¸è¿œåœ¨ InterlockedCompareExchange
+	 * å¤–è¿è¡Œï¼Œå¹¶ä¸”ä¸€ç›´è¿›å…¥ç©ºå¾ªç¯ç›´è‡³ç¬¬ä¸€ä¸ªçº¿ç¨‹æ‰§è¡Œ init_routine
+	 * å®Œæ¯•å¹¶ä¸”å°† *once_control é‡æ–°èµ‹å€¼, åªæœ‰åœ¨å¤šæ ¸ç¯å¢ƒä¸­å¤šä¸ªçº¿ç¨‹
+	 * åŒæ—¶è¿è¡Œè‡³æ­¤æ—¶æ‰æœ‰å¯èƒ½å‡ºç°çŸ­æš‚çš„åç»­çº¿ç¨‹ç©ºå¾ªç¯ç°è±¡ï¼Œå¦‚æœ
+	 * å¤šä¸ªçº¿ç¨‹é¡ºåºè‡³æ­¤ï¼Œåˆ™å› ä¸º *once_control å·²ç»è¢«ç¬¬ä¸€ä¸ªçº¿ç¨‹é‡æ–°
+	 * èµ‹å€¼è€Œä¸ä¼šè¿›å…¥å¾ªç¯ä½“å†…åªæ‰€ä»¥å¦‚æ­¤å¤„ç†ï¼Œæ˜¯ä¸ºäº†ä¿è¯æ‰€æœ‰çº¿ç¨‹åœ¨
+	 * è°ƒç”¨ acl_pthread_once è¿”å›å‰ init_routine å¿…é¡»è¢«è°ƒç”¨ä¸”ä»…èƒ½
+	 * è¢«è°ƒç”¨ä¸€æ¬¡, ä½†åœ¨VC6ä¸‹ï¼ŒInterlockedCompareExchange æ¥å£å®šä¹‰
+	 * æœ‰äº›æ€ªå¼‚ï¼Œéœ€è¦åšç¡¬æ€§æŒ‡å®šå‚æ•°ç±»å‹ï¼Œå‚è§ <Windows é«˜çº§ç¼–ç¨‹æŒ‡å—>
+	 * Jeffrey Richter, 366 é¡µ
 	 */
 	while (1) {
 #ifdef MS_VC6
@@ -327,21 +327,21 @@ int acl_pthread_once(acl_pthread_once_t *once_control,
 		if (prev == 2) {
 			return 0;
 		} else if (prev == 0) {
-			/* Ö»ÓĞµÚÒ»¸öÏß³Ì²Å»áÖÁ´Ë */
+			/* åªæœ‰ç¬¬ä¸€ä¸ªçº¿ç¨‹æ‰ä¼šè‡³æ­¤ */
 			init_routine();
-			/* ½« *conce_control ÖØĞÂ¸³ÖµÒÔÊ¹ºóĞøÏß³Ì²»½øÈë while
-			 * Ñ­»·»ò´Ó while Ñ­»·ÖĞÌø³ö
+			/* å°† *conce_control é‡æ–°èµ‹å€¼ä»¥ä½¿åç»­çº¿ç¨‹ä¸è¿›å…¥ while
+			 * å¾ªç¯æˆ–ä» while å¾ªç¯ä¸­è·³å‡º
 			 */
 			InterlockedExchange(once_control, 2);
 			return 0;
 		} else {
 			acl_assert(prev == 1);
 
-			/* ·ÀÖ¹¿ÕÑ­»·¹ı¶àµØÀË·ÑCPU */
+			/* é˜²æ­¢ç©ºå¾ªç¯è¿‡å¤šåœ°æµªè´¹CPU */
 			Sleep(1);  /** sleep 1ms */
 		}
 	}
-	return 1;  /* ²»¿É´ï´úÂë£¬±ÜÃâ±àÒëÆ÷±¨¾¯¸æ */
+	return 1;  /* ä¸å¯è¾¾ä»£ç ï¼Œé¿å…ç¼–è¯‘å™¨æŠ¥è­¦å‘Š */
 }
 #endif
 
@@ -455,7 +455,7 @@ int acl_pthread_setspecific(acl_pthread_key_t key, void *value)
 		if (tls_value->tls_key != NULL
 			&& tls_value->tls_key->key == key)
 		{
-			/* Èç¹ûÏàÍ¬µÄ¼ü´æÔÚÔòĞèÒªÏÈÊÍ·Å¾ÉÊı¾İ */
+			/* å¦‚æœç›¸åŒçš„é”®å­˜åœ¨åˆ™éœ€è¦å…ˆé‡Šæ”¾æ—§æ•°æ® */
 			if (tls_value->tls_key->destructor && tls_value->value)
 				tls_value->tls_key->destructor(tls_value->value);
 			tls_value->tls_key = NULL;
@@ -532,7 +532,7 @@ int acl_pthread_join(acl_pthread_t thread, void **thread_return)
 
 #endif /* ACL_WINDOWS */
 
-/*----------------- ¿çÆ½Ì¨µÄÍ¨ÓÃº¯Êı¼¯£¬ÊÇ Posix ±ê×¼µÄÀ©Õ¹ ----------------*/
+/*----------------- è·¨å¹³å°çš„é€šç”¨å‡½æ•°é›†ï¼Œæ˜¯ Posix æ ‡å‡†çš„æ‰©å±• ----------------*/
 
 /*--------------------------------------------------------------------------*/
 
@@ -676,7 +676,7 @@ int acl_pthread_tls_get_max(void)
 	return acl_tls_ctx_max;
 }
 
-/* Ïß³ÌÍË³öÊ±µ÷ÓÃ´Ëº¯ÊıÊÍ·ÅÊôÓÚ±¾Ïß³ÌµÄ¾Ö²¿±äÁ¿ */
+/* çº¿ç¨‹é€€å‡ºæ—¶è°ƒç”¨æ­¤å‡½æ•°é‡Šæ”¾å±äºæœ¬çº¿ç¨‹çš„å±€éƒ¨å˜é‡ */
 
 static void tls_ctx_free(void *ctx)
 {
@@ -691,7 +691,7 @@ static void tls_ctx_free(void *ctx)
 	acl_default_free(__FILE__, __LINE__, tls_ctxes);
 }
 
-/* Ö÷Ïß³ÌÍË³öÊ±ÊÍ·Å¾Ö²¿±äÁ¿ */
+/* ä¸»çº¿ç¨‹é€€å‡ºæ—¶é‡Šæ”¾å±€éƒ¨å˜é‡ */
 
 #ifndef HAVE_NO_ATEXIT
 static void main_tls_ctx_free(void)
@@ -734,7 +734,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 	}
 	tls_ctxes = (TLS_CTX*) acl_pthread_getspecific(__tls_ctx_key);
 	if (tls_ctxes == NULL) {
-		/* ÒòÎª¸ÃÏß³ÌÖĞ²»´æÔÚ¸ÃÏß³Ì¾Ö²¿±äÁ¿£¬ËùÒÔĞèÒª·ÖÅäÒ»¸öĞÂµÄ */
+		/* å› ä¸ºè¯¥çº¿ç¨‹ä¸­ä¸å­˜åœ¨è¯¥çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œæ‰€ä»¥éœ€è¦åˆ†é…ä¸€ä¸ªæ–°çš„ */
 		tls_ctxes = (TLS_CTX*) acl_default_malloc(__FILE__, __LINE__,
 				acl_tls_ctx_max * sizeof(TLS_CTX));
 		if (acl_pthread_setspecific(__tls_ctx_key, tls_ctxes) != 0) {
@@ -744,7 +744,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 				(unsigned long) acl_pthread_self());
 			return NULL;
 		}
-		/* ³õÊ¼»¯ */
+		/* åˆå§‹åŒ– */
 		for (i = 0; i < acl_tls_ctx_max; i++) {
 			tls_ctxes[i].key = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
 			tls_ctxes[i].ptr = NULL;
@@ -758,7 +758,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 		}
 	}
 
-	/* Èç¹û¸Ã¼üÒÑ¾­´æÔÚÔòÈ¡³ö¶ÔÓ¦Êı¾İ */
+	/* å¦‚æœè¯¥é”®å·²ç»å­˜åœ¨åˆ™å–å‡ºå¯¹åº”æ•°æ® */
 	if ((long) (*key_ptr) > 0 && (long) (*key_ptr) < acl_tls_ctx_max) {
 		if (tls_ctxes[(long) (*key_ptr)].key == *key_ptr)
 			return tls_ctxes[(long) (*key_ptr)].ptr;
@@ -774,14 +774,14 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 		return NULL;
 	}
 
-	/* ÕÒ³öÒ»¸ö¿ÕÎ» */
+	/* æ‰¾å‡ºä¸€ä¸ªç©ºä½ */
 	for (i = 0; i < acl_tls_ctx_max; i++) {
 		if (tls_ctxes[i].key == (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES) {
 			break;
 		}
 	}
 
-	/* Èç¹ûÃ»ÓĞ¿ÕÎ»¿ÉÓÃÔò·µ»Ø¿Õ²¢ÖÃ´íÎó±êÖ¾Î» */
+	/* å¦‚æœæ²¡æœ‰ç©ºä½å¯ç”¨åˆ™è¿”å›ç©ºå¹¶ç½®é”™è¯¯æ ‡å¿—ä½ */
 	if (i == acl_tls_ctx_max) {
 		acl_msg_error("%s(%d): no space for tls key", myname, __LINE__);
 		*key_ptr = (acl_pthread_key_t) ACL_TLS_OUT_OF_INDEXES;
@@ -789,7 +789,7 @@ void *acl_pthread_tls_get(acl_pthread_key_t *key_ptr)
 		return NULL;
 	}
 
-	/* ÎªĞÂ·ÖÅäµÄ¼ü³õÊ¼»¯Ïß³Ì¾Ö²¿Êı¾İ¶ÔÏó */
+	/* ä¸ºæ–°åˆ†é…çš„é”®åˆå§‹åŒ–çº¿ç¨‹å±€éƒ¨æ•°æ®å¯¹è±¡ */
 	tls_ctxes[i].key = (acl_pthread_key_t) i;
 	tls_ctxes[i].free_fn = NULL;
 	tls_ctxes[i].ptr = NULL;
@@ -828,7 +828,7 @@ int acl_pthread_tls_set(acl_pthread_key_t key, void *ptr,
 		acl_set_error(ACL_EINVAL);
 		return ACL_EINVAL;
 	}
-	/* Èç¹û¸Ã¼üÖµ´æÔÚ¾ÉÊı¾İÔòÊ×ÏÈĞèÒªÊÍ·Åµô¾ÉÊı¾İ */
+	/* å¦‚æœè¯¥é”®å€¼å­˜åœ¨æ—§æ•°æ®åˆ™é¦–å…ˆéœ€è¦é‡Šæ”¾æ‰æ—§æ•°æ® */
 	if (tls_ctxes[(long) key].ptr != NULL && tls_ctxes[(long) key].free_fn != NULL) {
 		tls_ctxes[(long) key].free_fn(tls_ctxes[(long) key].ptr);
 	}

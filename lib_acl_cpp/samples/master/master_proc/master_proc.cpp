@@ -1,4 +1,4 @@
-// master_proc.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// master_proc.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -40,9 +40,9 @@ public:
 	~master_proc_test() {}
 protected:
 	/**
-	 * »ùÀà´¿Ğéº¯Êı£ºµ±½ÓÊÕµ½Ò»¸ö¿Í»§¶ËÁ¬½ÓÊ±µ÷ÓÃ´Ëº¯Êı
-	 * @param stream {aio_socket_stream*} ĞÂ½ÓÊÕµ½µÄ¿Í»§¶ËÒì²½Á÷¶ÔÏó
-	 * ×¢£º¸Ãº¯Êı·µ»Øºó£¬Á÷Á¬½Ó½«»á±»¹Ø±Õ£¬ÓÃ»§²»Ó¦Ö÷¶¯¹Ø±Õ¸ÃÁ÷
+	 * åŸºç±»çº¯è™šå‡½æ•°ï¼šå½“æ¥æ”¶åˆ°ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥æ—¶è°ƒç”¨æ­¤å‡½æ•°
+	 * @param stream {aio_socket_stream*} æ–°æ¥æ”¶åˆ°çš„å®¢æˆ·ç«¯å¼‚æ­¥æµå¯¹è±¡
+	 * æ³¨ï¼šè¯¥å‡½æ•°è¿”å›åï¼Œæµè¿æ¥å°†ä¼šè¢«å…³é—­ï¼Œç”¨æˆ·ä¸åº”ä¸»åŠ¨å…³é—­è¯¥æµ
 	 */
 	virtual void on_accept(socket_stream* stream)
 	{
@@ -91,19 +91,19 @@ protected:
 		return true;
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İÇ°µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½å‰è°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_pre_jail()
 	{
 		format("proc_pre_jail\r\n");
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_on_init()
 	{
 		format("proc init\r\n");
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÍË³öÇ°µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_on_exit()
 	{
 		format("proc exit\r\n");
@@ -116,24 +116,24 @@ int main(int argc, char* argv[])
 {
 	master_proc_test& mp = singleton2<master_proc_test>::get_instance();
 
-	// ÉèÖÃÅäÖÃ²ÎÊı±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	mp.set_cfg_int(var_conf_int_tab);
 	mp.set_cfg_int64(NULL);
 	mp.set_cfg_str(var_conf_str_tab);
 	mp.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
-		mp.run_alone("127.0.0.1:8888", NULL, 5);  // µ¥¶ÀÔËĞĞ·½Ê½
+		mp.run_alone("127.0.0.1:8888", NULL, 5);  // å•ç‹¬è¿è¡Œæ–¹å¼
 	}
 	else
 	{
 #ifdef	WIN32
-		mp.run_alone("127.0.0.1:8888", NULL, 5);  // µ¥¶ÀÔËĞĞ·½Ê½
+		mp.run_alone("127.0.0.1:8888", NULL, 5);  // å•ç‹¬è¿è¡Œæ–¹å¼
 #else
-		mp.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		mp.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 #endif
 	}
 

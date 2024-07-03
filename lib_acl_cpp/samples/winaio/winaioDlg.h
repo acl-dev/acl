@@ -1,4 +1,4 @@
-// winaioDlg.h : Í·ÎÄ¼ş
+// winaioDlg.h : å¤´æ–‡ä»¶
 //
 
 #pragma once
@@ -11,26 +11,26 @@ class CAioTimer;
 class acl::aio_handle;
 class acl::aio_listen_stream;
 
-// CwinaioDlg ¶Ô»°¿ò
+// CwinaioDlg å¯¹è¯æ¡†
 class CwinaioDlg : public CDialog
 {
-// ¹¹Ôì
+// æ„é€ 
 public:
-	CwinaioDlg(CWnd* pParent = NULL);	// ±ê×¼¹¹Ôìº¯Êı
+	CwinaioDlg(CWnd* pParent = NULL);	// æ ‡å‡†æ„é€ å‡½æ•°
 	~CwinaioDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_WINAIO_DIALOG };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV æ”¯æŒ
 
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	HICON m_hIcon;
 
-	// Éú³ÉµÄÏûÏ¢Ó³Éäº¯Êı
+	// ç”Ÿæˆçš„æ¶ˆæ¯æ˜ å°„å‡½æ•°
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();
@@ -42,7 +42,7 @@ public:
 	afx_msg void OnBnClickedSetTimer();
 	afx_msg void OnBnClickedDelTimer();
 protected:
-	// acl::aio_handle ÀàĞéº¯Êı
+	// acl::aio_handle ç±»è™šå‡½æ•°
 	void on_increase();
 	void on_decrease();
 private:

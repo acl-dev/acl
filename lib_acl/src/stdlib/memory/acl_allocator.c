@@ -130,7 +130,7 @@ ACL_ALLOCATOR *acl_allocator_create(size_t mem_limit)
 	if (allocator->pool_config_fn)
 		allocator->pool_config_fn(allocator, mem_limit);
 
-	/* 创建两个默认的内存分配类型池 */
+	/* 鍒涘缓涓や釜榛樿鐨勫唴瀛樺垎閰嶇被鍨嬫睜 */
 	mem_pool_create(allocator);
 	vstring_pool_create(allocator);
 

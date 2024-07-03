@@ -7,11 +7,11 @@ public:
 		const char* dns_ip, int dns_port);
 
 private:
-	// ÒªÇóÀàÊµÀı±ØĞëÊÇ¶¯Ì¬´´½¨
+	// è¦æ±‚ç±»å®ä¾‹å¿…é¡»æ˜¯åŠ¨æ€åˆ›å»º
 	~http_job();
 
 protected:
-	// »ùÀà´¿Ğéº¯Êı
+	// åŸºç±»çº¯è™šå‡½æ•°
 	virtual void* run();
 	
 private:

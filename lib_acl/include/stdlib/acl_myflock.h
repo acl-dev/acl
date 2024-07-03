@@ -8,36 +8,36 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * ¶Ô´ò¿ªµÄÎÄ¼ş¾ä±ú½øĞĞ¼ÓËø
- * @param fd {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param lock_style {int} ÏµÍ³Ìá¹©µÄAPI¼ÓËøÀàĞÍ£¨½ö¶ÔUNIXÓĞĞ§£©
+ * å¯¹æ‰“å¼€çš„æ–‡ä»¶å¥æŸ„è¿›è¡ŒåŠ é”
+ * @param fd {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param lock_style {int} ç³»ç»Ÿæä¾›çš„APIåŠ é”ç±»å‹ï¼ˆä»…å¯¹UNIXæœ‰æ•ˆï¼‰
  *  ACL_FLOCK_STYLE_FLOCK or ACL_FLOCK_STYLE_FCNTL
- * @param operation {int} ¼ÓËø²Ù×÷·½Ê½, ACL_FLOCK_OP_XXX
- * @return {int} 0: ¼ÓËø³É¹¦; -1: ¼ÓËøÊ§°Ü
+ * @param operation {int} åŠ é”æ“ä½œæ–¹å¼, ACL_FLOCK_OP_XXX
+ * @return {int} 0: åŠ é”æˆåŠŸ; -1: åŠ é”å¤±è´¥
  */
 ACL_API int acl_myflock(ACL_FILE_HANDLE fd, int lock_style, int operation);
 
 /*
  * Lock styles.
  */
-#define ACL_FLOCK_STYLE_FLOCK     1  /**< µ÷ÓÃ flock º¯Êı¼ÓËø(unix) */
-#define ACL_FLOCK_STYLE_FCNTL     2  /**< µ÷ÓÃ fcntl º¯Êı¼ÓËø(unix) */
+#define ACL_FLOCK_STYLE_FLOCK     1  /**< è°ƒç”¨ flock å‡½æ•°åŠ é”(unix) */
+#define ACL_FLOCK_STYLE_FCNTL     2  /**< è°ƒç”¨ fcntl å‡½æ•°åŠ é”(unix) */
 
 /*
  * Lock request types.
  */
-#define ACL_FLOCK_OP_NONE         0  /**< ½âËø */
-#define ACL_FLOCK_OP_SHARED       1  /**< ¹²ÏíËø */
-#define ACL_FLOCK_OP_EXCLUSIVE    2  /**< ÅÅËü¶ÀÏíËø */
+#define ACL_FLOCK_OP_NONE         0  /**< è§£é” */
+#define ACL_FLOCK_OP_SHARED       1  /**< å…±äº«é” */
+#define ACL_FLOCK_OP_EXCLUSIVE    2  /**< æ’å®ƒç‹¬äº«é” */
 
 /**
- * ÎŞµÈ´ı¼ÓËø, ¿ÉÒÔÓë ACL_FLOCK_OP_SHARED, »ò ACL_FLOCK_OP_EXCLUSIVE ÏàÓë,
- * ¿ÉÒÔÓë ACL_FLOCK_OP_SHARED ÏàÓë
+ * æ— ç­‰å¾…åŠ é”, å¯ä»¥ä¸ ACL_FLOCK_OP_SHARED, æˆ– ACL_FLOCK_OP_EXCLUSIVE ç›¸ä¸,
+ * å¯ä»¥ä¸ ACL_FLOCK_OP_SHARED ç›¸ä¸
  */
 #define ACL_FLOCK_OP_NOWAIT       4
 
 /**
- * ¼ÓËø·½Ê½µÄÎ»¼¯ºÏ
+ * åŠ é”æ–¹å¼çš„ä½é›†åˆ
  */
 #define ACL_FLOCK_OP_BITS \
 	(ACL_FLOCK_OP_SHARED | ACL_FLOCK_OP_EXCLUSIVE | ACL_FLOCK_OP_NOWAIT)

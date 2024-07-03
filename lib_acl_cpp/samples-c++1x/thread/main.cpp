@@ -10,7 +10,7 @@ static void thread_main(void)
 
 int main(void)
 {
-	// ³õÊ¼»¯ acl ¿â
+	// Â³ÃµÃŠÂ¼Â»Â¯ acl Â¿Ã¢
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 

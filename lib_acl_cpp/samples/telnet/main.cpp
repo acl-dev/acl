@@ -72,14 +72,14 @@ static void run(ACL_EVENT* event)
 {
 	acl::socket_stream udp;
 
-	// 绑定本地地址
+	// 鍫傞殔鎺涜彲鑿
 	if (udp.bind_udp(__local_addr) == false) {
 		printf("bind addr %s error %s\r\n",
 			__server_addr, acl::last_serror());
 		return;
 	}
 
-	// 设置远程服务地址
+	// 鎵㈢鍫堟渶鐫ｆ槩鑿
 	udp.set_peer(__server_addr);
 	printf("local addr: %s, set peer addr: %s\r\n",
 		udp.get_local(true), __server_addr);

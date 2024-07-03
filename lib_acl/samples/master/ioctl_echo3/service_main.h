@@ -9,28 +9,28 @@ extern "C" {
 #endif
 
 /**
- * ³õÊ¼»¯º¯Êı£¬·şÎñÆ÷Ä£°å¿ò¼ÜÆô¶¯ºó½öµ÷ÓÃ¸Ãº¯ÊıÒ»´Î
- * @param init_ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
+ * åˆå§‹åŒ–å‡½æ•°ï¼ŒæœåŠ¡å™¨æ¨¡æ¿æ¡†æ¶å¯åŠ¨åä»…è°ƒç”¨è¯¥å‡½æ•°ä¸€æ¬¡
+ * @param init_ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
  */
 extern void service_init(void *init_ctx);
 
 /**
- * ½ø³ÌÍË³öÊ±µÄ»Øµ÷º¯Êı
- * @param exist_ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
+ * è¿›ç¨‹é€€å‡ºæ—¶çš„å›è°ƒå‡½æ•°
+ * @param exist_ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
  */
 extern void service_exit(void *exit_ctx);
 
 /**
- * µ±·şÎñÆ÷½ÓÊÕµ½ĞÂÁ¬½ÓÊ±µ÷ÓÃ´Ëº¯Êı
- * @param stream {ACL_VSTREAM*} ¿Í»§¶ËÊı¾İÁ¬½ÓÁ÷
- * @return {int} Èç¹û·µ»ØÖµ < 0£¬ Ôò±íÊ¾·şÎñÆ÷Ï£Íû¹Ø±Õ¸ÃÁ¬½Ó
+ * å½“æœåŠ¡å™¨æ¥æ”¶åˆ°æ–°è¿æ¥æ—¶è°ƒç”¨æ­¤å‡½æ•°
+ * @param stream {ACL_VSTREAM*} å®¢æˆ·ç«¯æ•°æ®è¿æ¥æµ
+ * @return {int} å¦‚æœè¿”å›å€¼ < 0ï¼Œ åˆ™è¡¨ç¤ºæœåŠ¡å™¨å¸Œæœ›å…³é—­è¯¥è¿æ¥
  */
 extern int service_on_accept(void *ctx, ACL_VSTREAM *client);
 
 /**
- * Ğ­Òé´¦Àíº¯ÊıÈë¿Ú
- * @param stream {ACL_VSTREAM*} ¿Í»§¶ËÊı¾İÁ¬½ÓÁ÷
- * @param run_ctx {void*} ÓÃ»§×Ô¶¨ÒåÀàĞÍÖ¸Õë
+ * åè®®å¤„ç†å‡½æ•°å…¥å£
+ * @param stream {ACL_VSTREAM*} å®¢æˆ·ç«¯æ•°æ®è¿æ¥æµ
+ * @param run_ctx {void*} ç”¨æˆ·è‡ªå®šä¹‰ç±»å‹æŒ‡é’ˆ
  */
 extern int service_main(void *run_ctx, ACL_VSTREAM *stream);
 

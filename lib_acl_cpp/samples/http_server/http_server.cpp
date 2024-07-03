@@ -1,4 +1,4 @@
-// http_server.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌÐòµÄÈë¿Úµã¡£
+// http_server.cpp : å®šä¹‰æŽ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -12,7 +12,7 @@ static int var_data_size = 1024;
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›žè°ƒç±»çš„å­ç±»
  */
 class handle_io : public aio_callback
 {
@@ -35,19 +35,19 @@ public:
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖÐµÄÐéº¯Êý£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ý³Ì
+	 * å®žçŽ°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›žè°ƒè¿‡ç¨‹
 	 */
 	void close_callback()
 	{
 		printf("Closed now.\r\n");
 
-		// ±ØÐëÔÚ´Ë´¦É¾³ý¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æÐ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›žè°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		delete this;
 	}
 
 	/**
-	 * ÊµÏÖ¸¸ÀàÖÐµÄÐéº¯Êý£¬¿Í»§¶ËÁ÷µÄ³¬Ê±»Øµ÷¹ý³Ì
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌÐø£¬·ñÔòÏ£Íû¹Ø±Õ¸ÃÒì²½Á÷
+	 * å®žçŽ°çˆ¶ç±»ä¸­çš„è™šå‡½æ•°ï¼Œå®¢æˆ·ç«¯æµçš„è¶…æ—¶å›žè°ƒè¿‡ç¨‹
+	 * @return {bool} è¿”å›ž true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™å¸Œæœ›å…³é—­è¯¥å¼‚æ­¥æµ
 	 */
 	bool timeout_callback()
 	{
@@ -57,14 +57,14 @@ public:
 
 	virtual bool read_wakeup()
 	{
-		// ²âÊÔ×´Ì¬
+		// æµ‹è¯•çŠ¶æ€
 		rpc_read_wait_del();
 		rpc_add();
 
-		// ´ÓÒì²½¼àÌý¼¯ºÏÖÐÈ¥µô¶Ô¸ÃÒì²½Á÷µÄ¼à¿Ø
+		// ä»Žå¼‚æ­¥ç›‘å¬é›†åˆä¸­åŽ»æŽ‰å¯¹è¯¥å¼‚æ­¥æµçš„ç›‘æŽ§
 		client_->disable_read();
 
-		// ·¢ÆðÒ»¸ö http »á»°¹ý³Ì
+		// å‘èµ·ä¸€ä¸ª http ä¼šè¯è¿‡ç¨‹
 		rpc_manager::get_instance().fork(http_);
 
 		return true;
@@ -78,7 +78,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * Òì²½¼àÌýÁ÷µÄ»Øµ÷ÀàµÄ×ÓÀà
+ * å¼‚æ­¥ç›‘å¬æµçš„å›žè°ƒç±»çš„å­ç±»
  */
 class handle_accept : public aio_accept_callback
 {
@@ -94,37 +94,37 @@ public:
 	}
 
 	/**
-	 * »ùÀàÐéº¯Êý£¬µ±ÓÐÐÂÁ¬½Óµ½´ïºóµ÷ÓÃ´Ë»Øµ÷¹ý³Ì
-	 * @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
-	 * @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌýÁ÷¼ÌÐø¼àÌý
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“æœ‰æ–°è¿žæŽ¥åˆ°è¾¾åŽè°ƒç”¨æ­¤å›žè°ƒè¿‡ç¨‹
+	 * @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
+	 * @return {bool} è¿”å›ž true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
 	 */
 	bool accept_callback(acl::aio_socket_stream* client)
 	{
-		// Èç¹ûÔÊÐíÔÚÖ÷Ïß³ÌÖÐÔ¤¶Á£¬ÔòÉèÖÃÁ÷µÄÔ¤¶Á±êÖ¾Î»
+		// å¦‚æžœå…è®¸åœ¨ä¸»çº¿ç¨‹ä¸­é¢„è¯»ï¼Œåˆ™è®¾ç½®æµçš„é¢„è¯»æ ‡å¿—ä½
 		if (preread_)
 		{
 			ACL_VSTREAM* vstream = client->get_vstream();
 			vstream->flag |= ACL_VSTREAM_FLAG_PREREAD;
 		}
 
-		// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øÐÐ°ó¶¨
+		// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›žè°ƒå¯¹è±¡å¹¶ä¸Žè¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
 		handle_io* callback = new handle_io(client);
 
-		// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ý³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›žè°ƒè¿‡ç¨‹
 		client->add_read_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄÐ´»Øµ÷¹ý³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›žè°ƒè¿‡ç¨‹
 		client->add_write_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ý³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›žè°ƒè¿‡ç¨‹
 		client->add_close_callback(callback);
 
-		// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ý³Ì
+		// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›žè°ƒè¿‡ç¨‹
 		client->add_timeout_callback(callback);
 
 		rpc_read_wait_add();
 
-		// ¼à¿ØÒì²½Á÷ÊÇ·ñ¿É¶Á
+		// ç›‘æŽ§å¼‚æ­¥æµæ˜¯å¦å¯è¯»
 		client->read_wait(10);
 
 		return (true);
@@ -204,7 +204,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ÊÇ·ñ²ÉÓÃÏß³Ì¾Ö²¿ÄÚ´æ³Ø
+	// æ˜¯å¦é‡‡ç”¨çº¿ç¨‹å±€éƒ¨å†…å­˜æ± 
 	if (use_mempool)
 		acl_mem_slice_init(8, 1024, 100000,
 			ACL_SLICE_FLAG_GC2 |
@@ -213,22 +213,22 @@ int main(int argc, char* argv[])
 
 	rpc_stats_init();
 
-	// ÔÊÐíÈÕÖ¾ÐÅÏ¢Êä³öÖÁÆÁÄ»
+	// å…è®¸æ—¥å¿—ä¿¡æ¯è¾“å‡ºè‡³å±å¹•
 	if (enable_stdout)
 		log::stdout_open(true);
 
-	// Òì²½Í¨ÐÅ¿ò¼Ü¾ä±ú£¬²ÉÓÃ select ÏµÍ³ api
+	// å¼‚æ­¥é€šä¿¡æ¡†æž¶å¥æŸ„ï¼Œé‡‡ç”¨ select ç³»ç»Ÿ api
 	aio_handle* handle = new aio_handle(use_kernel ? ENGINE_KERNEL : ENGINE_SELECT);
 
-	// ´´½¨¼àÌýÒì²½Á÷
+	// åˆ›å»ºç›‘å¬å¼‚æ­¥æµ
 	aio_listen_stream* sstream = new aio_listen_stream(handle);
 
-	// ¼àÌýÖ¸¶¨µÄµØÖ·
+	// ç›‘å¬æŒ‡å®šçš„åœ°å€
 	if (sstream->open(addr) == false)
 	{
 		printf("open %s error!\r\n", addr);
 		sstream->close();
-		// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌýÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+		// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 		handle->check();
 #ifdef WIN32
 		getchar();
@@ -236,12 +236,12 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	// ³õÊ¼»¯Òì²½ RPC Í¨ÐÅ·þÎñ¾ä±ú
+	// åˆå§‹åŒ–å¼‚æ­¥ RPC é€šä¿¡æœåŠ¡å¥æŸ„
 	rpc_manager::get_instance().init(handle, nthreads, rpc_addr);
 
-	// ´´½¨»Øµ÷Àà¶ÔÏó£¬µ±ÓÐÐÂÁ¬½Óµ½´ïÊ±×Ô¶¯µ÷ÓÃ´ËÀà¶ÔÏóµÄ»Øµ÷¹ý³Ì
+	// åˆ›å»ºå›žè°ƒç±»å¯¹è±¡ï¼Œå½“æœ‰æ–°è¿žæŽ¥åˆ°è¾¾æ—¶è‡ªåŠ¨è°ƒç”¨æ­¤ç±»å¯¹è±¡çš„å›žè°ƒè¿‡ç¨‹
 	handle_accept callback(preread);
-	// ½«»Øµ÷´¦ÀíÀà¶ÔÏóÓëÒì²½¼àÌýÁ÷°ó¶¨
+	// å°†å›žè°ƒå¤„ç†ç±»å¯¹è±¡ä¸Žå¼‚æ­¥ç›‘å¬æµç»‘å®š
 	sstream->add_accept_callback(&callback);
 
 	printf("Listen: %s ok!\r\n", addr);
@@ -249,7 +249,7 @@ int main(int argc, char* argv[])
 	time_t last = time(NULL), now;
 	while (true)
 	{
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌÐø£¬ÐèÒªÍË³ö
+		// å¦‚æžœè¿”å›ž false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (handle->check() == false)
 		{
 			printf("aio_server stop now ...\r\n");
@@ -260,20 +260,20 @@ int main(int argc, char* argv[])
 		if (now - last >= 1)
 		{
 			printf("\r\n------------------------------\r\n");
-			rpc_out(); // Êä³öµ±Ç° rpc ¶ÓÁÐµÄÊýÁ¿
+			rpc_out(); // è¾“å‡ºå½“å‰ rpc é˜Ÿåˆ—çš„æ•°é‡
 			rpc_req_out();
 			rpc_read_wait_out();
 			last = now;
 		}
 	}
 
-	// ¹Ø±Õ¼àÌýÁ÷²¢ÊÍ·ÅÁ÷¶ÔÏó
+	// å…³é—­ç›‘å¬æµå¹¶é‡Šæ”¾æµå¯¹è±¡
 	sstream->close();
 
-	// ¹Ø±Õ RPC ·þÎñ
+	// å…³é—­ RPC æœåŠ¡
 	rpc_manager::get_instance().finish();
 
-	// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌýÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+	// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 	handle->check();
 	delete handle;
 

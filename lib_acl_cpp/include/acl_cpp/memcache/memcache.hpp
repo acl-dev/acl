@@ -14,17 +14,17 @@ class socket_stream;
 typedef class memcache mem_cache;
 
 /**
- * memcached ¿Í»§¶ËÍ¨ĞÅĞ­Òé¿â£¬Ö§³Ö³¤Á¬½ÓÓë×Ô¶¯ÖØÁ¬
+ * memcached å®¢æˆ·ç«¯é€šä¿¡åè®®åº“ï¼Œæ”¯æŒé•¿è¿æ¥ä¸è‡ªåŠ¨é‡è¿
  */
 class ACL_CPP_API memcache : public connect_client
 {
 public:
 	/**
-	* ¹¹Ôìº¯Êı
-	* @param addr {const char*} memcached ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½Îª£º
-	*  ip:port£¬Èç: 127.0.0.1:11211
-	* @param conn_timeout {int} Á¬½Ó·şÎñÆ÷µÄ³¬Ê±Ê±¼ä(Ãë)
-	* @param rw_timeout {int} ÍøÂç IO ³¬Ê±Ê±¼ä(Ãë)
+	* æ„é€ å‡½æ•°
+	* @param addr {const char*} memcached æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ä¸ºï¼š
+	*  ip:portï¼Œå¦‚: 127.0.0.1:11211
+	* @param conn_timeout {int} è¿æ¥æœåŠ¡å™¨çš„è¶…æ—¶æ—¶é—´(ç§’)
+	* @param rw_timeout {int} ç½‘ç»œ IO è¶…æ—¶æ—¶é—´(ç§’)
 	*/
 	memcache(const char* addr = "127.0.0.1:11211", int conn_timeout = 30,
 		int rw_timeout = 10);
@@ -32,196 +32,196 @@ public:
 	~memcache();
 
 	/**
-	 * ÉèÖÃ key µÄÇ°×º£¬¼´Êµ¼ÊµÄ key ½«ÓÉ ¸ÃÇ°×º+Ô­Ê¼key ×é³É£¬È±Ê¡Ê±²»Éè
-	 * Ç°×º£¬µ±¶à¸öÓ¦ÓÃ¹²ÓÃÍ¬Ò»¸ö memcached ·şÎñÊ±£¬½¨ÒéÓ¦ÓÃÉèÖÃ×ÔÉíµÄ
-	 * key Ç°×º£¬ÕâÑù¿ÉÒÔ±ÜÃâÓëÆäËüÓ¦ÓÃµÄ key ²úÉúÖØ¸´ÎÊÌâ
-	 * @param keypre {const char*} ·Ç¿ÕÊ±ÉèÖÃ key Ç°×º£¬·ñÔòÈ¡Ïû key Ç°×º
+	 * è®¾ç½® key çš„å‰ç¼€ï¼Œå³å®é™…çš„ key å°†ç”± è¯¥å‰ç¼€+åŸå§‹key ç»„æˆï¼Œç¼ºçœæ—¶ä¸è®¾
+	 * å‰ç¼€ï¼Œå½“å¤šä¸ªåº”ç”¨å…±ç”¨åŒä¸€ä¸ª memcached æœåŠ¡æ—¶ï¼Œå»ºè®®åº”ç”¨è®¾ç½®è‡ªèº«çš„
+	 * key å‰ç¼€ï¼Œè¿™æ ·å¯ä»¥é¿å…ä¸å…¶å®ƒåº”ç”¨çš„ key äº§ç”Ÿé‡å¤é—®é¢˜
+	 * @param keypre {const char*} éç©ºæ—¶è®¾ç½® key å‰ç¼€ï¼Œå¦åˆ™å–æ¶ˆ key å‰ç¼€
 	 * @return {memcache&}
 	 */
 	memcache& set_prefix(const char* keypre);
 
 	/**
-	 * ÔÚ±£³ÖµÄ³¤Á¬½ÓÖĞ¶ÏÊ±ÊÇ·ñÒªÇó×Ô¶¯ÖØÁ¬£¬È±Ê¡Îª×Ô¶¯ÖØÁ¬
-	 * @param onoff {bool} Îª true Ê±±íÊ¾³¤Á¬½ÓÒâÍâ¶Ï¿ªºó×Ô¶¯ÖØÁ¬
+	 * åœ¨ä¿æŒçš„é•¿è¿æ¥ä¸­æ–­æ—¶æ˜¯å¦è¦æ±‚è‡ªåŠ¨é‡è¿ï¼Œç¼ºçœä¸ºè‡ªåŠ¨é‡è¿
+	 * @param onoff {bool} ä¸º true æ—¶è¡¨ç¤ºé•¿è¿æ¥æ„å¤–æ–­å¼€åè‡ªåŠ¨é‡è¿
 	 * @return {memcache&}
 	 */
 	memcache& auto_retry(bool onoff);
 
 	/**
-	 * ÉèÖÃÊÇ·ñÕë¶Ô KEY ¼üÖµ½øĞĞ±àÂë£¬È±ÉÙÊ±²»¶Ô key ±àÂë£¬µ±Ó¦ÓÃµÄ key ÖĞ
-	 * ¿ÉÄÜ»áÓĞÌØÊâ×Ö·û»ò¶ş½øÖÆÖµÊ±£¬½¨Òéµ÷ÓÃ´Ëº¯Êı¶Ô key ½øĞĞ±àÂë
-	 * @param onoff {bool} Îª true ±íÊ¾ÄÚ²¿ĞèÒª¶Ô key ½øĞĞ±àÂë
+	 * è®¾ç½®æ˜¯å¦é’ˆå¯¹ KEY é”®å€¼è¿›è¡Œç¼–ç ï¼Œç¼ºå°‘æ—¶ä¸å¯¹ key ç¼–ç ï¼Œå½“åº”ç”¨çš„ key ä¸­
+	 * å¯èƒ½ä¼šæœ‰ç‰¹æ®Šå­—ç¬¦æˆ–äºŒè¿›åˆ¶å€¼æ—¶ï¼Œå»ºè®®è°ƒç”¨æ­¤å‡½æ•°å¯¹ key è¿›è¡Œç¼–ç 
+	 * @param onoff {bool} ä¸º true è¡¨ç¤ºå†…éƒ¨éœ€è¦å¯¹ key è¿›è¡Œç¼–ç 
 	 * @return {memcache&}
 	 */
 	memcache& encode_key(bool onoff);
 
 	/**
-	* Ïò memcached ÖĞĞŞ¸Ä»òÌí¼ÓĞÂµÄÊı¾İ»º´æ¶ÔÏó
-	* @param key {const char*} ¼üÖµ
-	* @param klen {size_t} key ¼üÖµ³¤¶È
-	* @param dat {const void*} Êı¾İ
-	* @param dlen {size_t} data Êı¾İ³¤¶È
-	* @param timeout {time_t} »º´æ³¬Ê±Ê±¼ä(Ãë)
-	* @param flags {unsigned short} ¸½ÊôµÄ±êÖ¾Î»
-	* @return {bool} ÊÇ·ñ³É¹¦
+	* å‘ memcached ä¸­ä¿®æ”¹æˆ–æ·»åŠ æ–°çš„æ•°æ®ç¼“å­˜å¯¹è±¡
+	* @param key {const char*} é”®å€¼
+	* @param klen {size_t} key é”®å€¼é•¿åº¦
+	* @param dat {const void*} æ•°æ®
+	* @param dlen {size_t} data æ•°æ®é•¿åº¦
+	* @param timeout {time_t} ç¼“å­˜è¶…æ—¶æ—¶é—´(ç§’)
+	* @param flags {unsigned short} é™„å±çš„æ ‡å¿—ä½
+	* @return {bool} æ˜¯å¦æˆåŠŸ
 	*/
 	bool set(const char* key, size_t klen,
 		const void* dat, size_t dlen,
 		time_t timeout = 0, unsigned short flags = 0);
 
 	/**
-	* Ïò memcached ÖĞĞŞ¸Ä»òÌí¼ÓĞÂµÄÊı¾İ»º´æ¶ÔÏó
-	* @param key {const char*} ×Ö·û´®¼üÖµ
-	* @param dat {const void*} Êı¾İ
-	* @param dlen {size_t} data Êı¾İ³¤¶È
-	* @param timeout {time_t} »º´æ³¬Ê±Ê±¼ä(Ãë)
-	* @param flags {unsigned short} ¸½ÊôµÄ±êÖ¾Î»
-	* @return {bool} ÊÇ·ñ³É¹¦
+	* å‘ memcached ä¸­ä¿®æ”¹æˆ–æ·»åŠ æ–°çš„æ•°æ®ç¼“å­˜å¯¹è±¡
+	* @param key {const char*} å­—ç¬¦ä¸²é”®å€¼
+	* @param dat {const void*} æ•°æ®
+	* @param dlen {size_t} data æ•°æ®é•¿åº¦
+	* @param timeout {time_t} ç¼“å­˜è¶…æ—¶æ—¶é—´(ç§’)
+	* @param flags {unsigned short} é™„å±çš„æ ‡å¿—ä½
+	* @return {bool} æ˜¯å¦æˆåŠŸ
 	*/
 	bool set(const char* key, const void* dat, size_t dlen,
 		time_t timeout = 0, unsigned short flags = 0);
 
 	/**
-	* ¸üĞÂ memcached ÖĞÒÑ¾­´æÔÚµÄ¼üµÄ¹ıÆÚÈÕÆÚ£¬ÒòÎªÄ¿Ç° libmemcached Ã»ÓĞ
-	* Ìá¹©´Ë½Ó¿Ú£¬ËùÒÔ¸Ãº¯ÊıÊµÏÖµÄ·½Ê½ÊÇÏÈµ÷ÓÃ get È¡³ö¶ÔÓ¦¼üµÄÖµ£¬È»ºóÔÙ
-	* µ÷ÓÃ set ÖØĞÂÉèÖÃ¸Ã¼üµÄÖµ¼°¹ıÆÚÊ±¼ä
-	* @param key {const char*} ¼üÖµ
-	* @param klen {size_t} key ¼üÖµ³¤¶È
-	* @param timeout {time_t} ¹ıÆÚÊ±¼ä(Ãë)
-	* @return {bool} ÊÇ·ñ³É¹¦
+	* æ›´æ–° memcached ä¸­å·²ç»å­˜åœ¨çš„é”®çš„è¿‡æœŸæ—¥æœŸï¼Œå› ä¸ºç›®å‰ libmemcached æ²¡æœ‰
+	* æä¾›æ­¤æ¥å£ï¼Œæ‰€ä»¥è¯¥å‡½æ•°å®ç°çš„æ–¹å¼æ˜¯å…ˆè°ƒç”¨ get å–å‡ºå¯¹åº”é”®çš„å€¼ï¼Œç„¶åå†
+	* è°ƒç”¨ set é‡æ–°è®¾ç½®è¯¥é”®çš„å€¼åŠè¿‡æœŸæ—¶é—´
+	* @param key {const char*} é”®å€¼
+	* @param klen {size_t} key é”®å€¼é•¿åº¦
+	* @param timeout {time_t} è¿‡æœŸæ—¶é—´(ç§’)
+	* @return {bool} æ˜¯å¦æˆåŠŸ
 	*/
 	bool set(const char* key, size_t klen, time_t timeout = 0);
 
 	/**
-	* ¸üĞÂ memcached ÖĞÒÑ¾­´æÔÚµÄ¼üµÄ¹ıÆÚÈÕÆÚ£¬ÒòÎªÄ¿Ç° libmemcached Ã»ÓĞ
-	* Ìá¹©´Ë½Ó¿Ú£¬ËùÒÔ¸Ãº¯ÊıÊµÏÖµÄ·½Ê½ÊÇÏÈµ÷ÓÃ get È¡³ö¶ÔÓ¦¼üµÄÖµ£¬È»ºóÔÙ
-	* µ÷ÓÃ set ÖØĞÂÉèÖÃ¸Ã¼üµÄÖµ¼°¹ıÆÚÊ±¼ä
-	* @param key {const char*} ×Ö·û´®¼üÖµ
-	* @param timeout {time_t} ¹ıÆÚÊ±¼ä(Ãë)
-	* @return {bool} ÊÇ·ñ³É¹¦
+	* æ›´æ–° memcached ä¸­å·²ç»å­˜åœ¨çš„é”®çš„è¿‡æœŸæ—¥æœŸï¼Œå› ä¸ºç›®å‰ libmemcached æ²¡æœ‰
+	* æä¾›æ­¤æ¥å£ï¼Œæ‰€ä»¥è¯¥å‡½æ•°å®ç°çš„æ–¹å¼æ˜¯å…ˆè°ƒç”¨ get å–å‡ºå¯¹åº”é”®çš„å€¼ï¼Œç„¶åå†
+	* è°ƒç”¨ set é‡æ–°è®¾ç½®è¯¥é”®çš„å€¼åŠè¿‡æœŸæ—¶é—´
+	* @param key {const char*} å­—ç¬¦ä¸²é”®å€¼
+	* @param timeout {time_t} è¿‡æœŸæ—¶é—´(ç§’)
+	* @return {bool} æ˜¯å¦æˆåŠŸ
 	*/
 	bool set(const char* key, time_t timeout = 0);
 
 	/**
-	 * ÒÔÁ÷Ê½·½Ê½ÉÏ´«´óÊı¾İÊ±£¬¸Ãº¯Êı·¢ËÍÊı¾İÍ·
-	 * @param key {const char*} ¼üÖµ×Ö·û´®
-	 * @param dlen {size_t} Êı¾İÌåµÄÊı¾İ×Ü³¤¶È
-	 * @param timeout {time_t} Êı¾İµÄ¹ıÆÚÊ±¼ä(Ãë)
-	 * @param flags {unsigned short} ¸½ÊôµÄ±êÖ¾Î»
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä»¥æµå¼æ–¹å¼ä¸Šä¼ å¤§æ•°æ®æ—¶ï¼Œè¯¥å‡½æ•°å‘é€æ•°æ®å¤´
+	 * @param key {const char*} é”®å€¼å­—ç¬¦ä¸²
+	 * @param dlen {size_t} æ•°æ®ä½“çš„æ•°æ®æ€»é•¿åº¦
+	 * @param timeout {time_t} æ•°æ®çš„è¿‡æœŸæ—¶é—´(ç§’)
+	 * @param flags {unsigned short} é™„å±çš„æ ‡å¿—ä½
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool set_begin(const char* key, size_t dlen,
 		time_t timeout = 0, unsigned short flags = 0);
 
 	/**
-	 * Ñ­»·µ÷ÓÃ±¾º¯ÊıÉÏ´«Êı¾İÖµ£¬ÄÚ²¿»á×Ô¶¯¼ÆËãÒÑ¾­ÉÏ´«µÄÊı¾İ×ÜºÍÊÇ·ñ´ïµ½
-	 * ÁË set_begin ÖĞÉèÖÃµÄÊı¾İ×Ü³¤¶È£¬µ±´ïµ½ºó»á×Ô¶¯²¹Ò»¸ö "\r\n"£¬µ÷ÓÃ
-	 * Õß²»Ó¦ÔÙµ÷ÓÃ´Ëº¯ÊıÉÏ´«Êı¾İ£¬³ı·ÇÊÇÒ»¸öĞÂµÄÉÏ´«¹ı³Ì¿ªÊ¼ÁË
-	 * @param data {const void*} Êı¾İµØÖ·Ö¸Õë
-	 * @param len {data} data Êı¾İ³¤¶È
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * å¾ªç¯è°ƒç”¨æœ¬å‡½æ•°ä¸Šä¼ æ•°æ®å€¼ï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨è®¡ç®—å·²ç»ä¸Šä¼ çš„æ•°æ®æ€»å’Œæ˜¯å¦è¾¾åˆ°
+	 * äº† set_begin ä¸­è®¾ç½®çš„æ•°æ®æ€»é•¿åº¦ï¼Œå½“è¾¾åˆ°åä¼šè‡ªåŠ¨è¡¥ä¸€ä¸ª "\r\n"ï¼Œè°ƒç”¨
+	 * è€…ä¸åº”å†è°ƒç”¨æ­¤å‡½æ•°ä¸Šä¼ æ•°æ®ï¼Œé™¤éæ˜¯ä¸€ä¸ªæ–°çš„ä¸Šä¼ è¿‡ç¨‹å¼€å§‹äº†
+	 * @param data {const void*} æ•°æ®åœ°å€æŒ‡é’ˆ
+	 * @param len {data} data æ•°æ®é•¿åº¦
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool set_data(const void* data, size_t len);
 
 	/**
-	* ´Ó memcached ÖĞ»ñµÃ¶ÔÓ¦¼üÖµµÄ»º´æÊı¾İ
-	* @param key {const char*} ×Ö·û´®¼üÖµ
-	* @param klen {size_t} ¼üÖµ³¤¶È
-	* @param buf {string&} ´æ´¢½á¹ûµÄ»º³åÇø£¬ÄÚ²¿Ê×ÏÈ»áÇå¿Õ¸Ã»º³åÇø
-	* @param flags {unsigned short*} ´æ´¢¸½ÊôµÄ±êÖ¾Î»
-	* @return {bool} ·µ»Ø true ±íÊ¾ÕıÈ·»ñµÃ½á¹ûÖµ£¬·ñÔò±íÊ¾¼üÖµ¶ÔÓ¦µÄ
-	*  Êı¾İ²»´æÔÚ»ò³ö´í
+	* ä» memcached ä¸­è·å¾—å¯¹åº”é”®å€¼çš„ç¼“å­˜æ•°æ®
+	* @param key {const char*} å­—ç¬¦ä¸²é”®å€¼
+	* @param klen {size_t} é”®å€¼é•¿åº¦
+	* @param buf {string&} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒºï¼Œå†…éƒ¨é¦–å…ˆä¼šæ¸…ç©ºè¯¥ç¼“å†²åŒº
+	* @param flags {unsigned short*} å­˜å‚¨é™„å±çš„æ ‡å¿—ä½
+	* @return {bool} è¿”å› true è¡¨ç¤ºæ­£ç¡®è·å¾—ç»“æœå€¼ï¼Œå¦åˆ™è¡¨ç¤ºé”®å€¼å¯¹åº”çš„
+	*  æ•°æ®ä¸å­˜åœ¨æˆ–å‡ºé”™
 	*/
 	bool get(const char* key, size_t klen, string& buf,
 		unsigned short* flags = NULL);
 
 	/**
-	* ´Ó memcached ÖĞ»ñµÃ¶ÔÓ¦¼üÖµµÄ»º´æÊı¾İ
-	* @param key {const char*} ×Ö·û´®¼üÖµ
-	* @param buf {string&} ´æ´¢½á¹ûµÄ»º³åÇø£¬ÄÚ²¿Ê×ÏÈ»áÇå¿Õ¸Ã»º³åÇø
-	* @param flags {unsigned short*} ´æ´¢¸½ÊôµÄ±êÖ¾Î»
-	* @return {bool} ·µ»Ø true ±íÊ¾ÕıÈ·»ñµÃ½á¹ûÖµ£¬·ñÔò±íÊ¾¼üÖµ¶ÔÓ¦µÄ
-	*  Êı¾İ²»´æÔÚ»ò³ö´í
+	* ä» memcached ä¸­è·å¾—å¯¹åº”é”®å€¼çš„ç¼“å­˜æ•°æ®
+	* @param key {const char*} å­—ç¬¦ä¸²é”®å€¼
+	* @param buf {string&} å­˜å‚¨ç»“æœçš„ç¼“å†²åŒºï¼Œå†…éƒ¨é¦–å…ˆä¼šæ¸…ç©ºè¯¥ç¼“å†²åŒº
+	* @param flags {unsigned short*} å­˜å‚¨é™„å±çš„æ ‡å¿—ä½
+	* @return {bool} è¿”å› true è¡¨ç¤ºæ­£ç¡®è·å¾—ç»“æœå€¼ï¼Œå¦åˆ™è¡¨ç¤ºé”®å€¼å¯¹åº”çš„
+	*  æ•°æ®ä¸å­˜åœ¨æˆ–å‡ºé”™
 	*/
 	bool get(const char* key, string& buf, unsigned short* flags = NULL);
 
 	/**
-	 * Á÷Ê½·½Ê½´Ó·şÎñ¶Ë»ñÈ¡Êı¾İ£¬±¾º¯Êı·¢ËÍÇëÇóĞ­Òé
-	 * @param key {const void*} ¼üÖµ
-	 * @param klen {size_t} key ¼üÖµ³¤¶È
-	 * @param flags {unsigned short*} ´æ´¢¸½ÊôµÄ±êÖ¾Î»
-	 * @return {int} ·µ»ØÊı¾İÌåµÄ³¤¶È£¬·ÖÒÔÏÂÈıÖÖÇéĞÎ£º
-	 *   0£º±íÊ¾²»´æÔÚ
-	 *  -1£º±íÊ¾³ö´í
-	 *  >0£º±íÊ¾Êı¾İÌåµÄ³¤¶È
+	 * æµå¼æ–¹å¼ä»æœåŠ¡ç«¯è·å–æ•°æ®ï¼Œæœ¬å‡½æ•°å‘é€è¯·æ±‚åè®®
+	 * @param key {const void*} é”®å€¼
+	 * @param klen {size_t} key é”®å€¼é•¿åº¦
+	 * @param flags {unsigned short*} å­˜å‚¨é™„å±çš„æ ‡å¿—ä½
+	 * @return {int} è¿”å›æ•°æ®ä½“çš„é•¿åº¦ï¼Œåˆ†ä»¥ä¸‹ä¸‰ç§æƒ…å½¢ï¼š
+	 *   0ï¼šè¡¨ç¤ºä¸å­˜åœ¨
+	 *  -1ï¼šè¡¨ç¤ºå‡ºé”™
+	 *  >0ï¼šè¡¨ç¤ºæ•°æ®ä½“çš„é•¿åº¦
 	 */
 	int get_begin(const void* key, size_t klen, unsigned short* flags = NULL);
 
 	/**
-	 * Á÷Ê½·½Ê½´Ó·şÎñ¶Ë»ñÈ¡Êı¾İ£¬±¾º¯Êı·¢ËÍÇëÇóĞ­Òé
-	 * @param key {const char*} ¼üÖµ×Ö·û´®
-	 * @param flags {unsigned short*} ´æ´¢¸½ÊôµÄ±êÖ¾Î»
-	 * @return {int} ·µ»ØÊı¾İÌåµÄ³¤¶È£¬·ÖÒÔÏÂÈıÖÖÇéĞÎ£º
-	 *   0£º±íÊ¾²»´æÔÚ
-	 *  -1£º±íÊ¾³ö´í
-	 *  >0£º±íÊ¾Êı¾İÌåµÄ³¤¶È
+	 * æµå¼æ–¹å¼ä»æœåŠ¡ç«¯è·å–æ•°æ®ï¼Œæœ¬å‡½æ•°å‘é€è¯·æ±‚åè®®
+	 * @param key {const char*} é”®å€¼å­—ç¬¦ä¸²
+	 * @param flags {unsigned short*} å­˜å‚¨é™„å±çš„æ ‡å¿—ä½
+	 * @return {int} è¿”å›æ•°æ®ä½“çš„é•¿åº¦ï¼Œåˆ†ä»¥ä¸‹ä¸‰ç§æƒ…å½¢ï¼š
+	 *   0ï¼šè¡¨ç¤ºä¸å­˜åœ¨
+	 *  -1ï¼šè¡¨ç¤ºå‡ºé”™
+	 *  >0ï¼šè¡¨ç¤ºæ•°æ®ä½“çš„é•¿åº¦
 	 */
 	int get_begin(const char* key, unsigned short* flags = NULL);
 
 	/**
-	 * Á÷Ê½·½Ê½´Ó·şÎñ¶Ë»ñÈ¡Êı¾İ£¬Ñ­»·µ÷ÓÃ±¾º¯Êı½ÓÊÕÊı¾İ
-	 * @param buf {void*} »º³åÇøµØÖ·
-	 * @param size {size_t} »º³åÇø´óĞ¡
-	 * @return {int} ÒÑ¶Áµ½µÄÊı¾İ´óĞ¡£¬·ÖÎªÒÔÏÂÈıÖÖÇéĞÎ£º
-	 *  0£º±íÊ¾Êı¾İ¶ÁÍê
-	 *  > 0: ±íÊ¾±¾´Î¶Áµ½µÄÊı¾İ³¤¶È
-	 *  -1£º±íÊ¾³ö´í
+	 * æµå¼æ–¹å¼ä»æœåŠ¡ç«¯è·å–æ•°æ®ï¼Œå¾ªç¯è°ƒç”¨æœ¬å‡½æ•°æ¥æ”¶æ•°æ®
+	 * @param buf {void*} ç¼“å†²åŒºåœ°å€
+	 * @param size {size_t} ç¼“å†²åŒºå¤§å°
+	 * @return {int} å·²è¯»åˆ°çš„æ•°æ®å¤§å°ï¼Œåˆ†ä¸ºä»¥ä¸‹ä¸‰ç§æƒ…å½¢ï¼š
+	 *  0ï¼šè¡¨ç¤ºæ•°æ®è¯»å®Œ
+	 *  > 0: è¡¨ç¤ºæœ¬æ¬¡è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 *  -1ï¼šè¡¨ç¤ºå‡ºé”™
 	 */
 	int  get_data(void* buf, size_t size);
 
 	/**
-	* ´Ó memcached ÖĞÉ¾³ıÊı¾İ
-	* @param key {const char*} ¼üÖµ
-	* @param klen {size_t} ¼üÖµ³¤¶È
-	* @return {bool} É¾³ıÊÇ·ñ³É¹¦
+	* ä» memcached ä¸­åˆ é™¤æ•°æ®
+	* @param key {const char*} é”®å€¼
+	* @param klen {size_t} é”®å€¼é•¿åº¦
+	* @return {bool} åˆ é™¤æ˜¯å¦æˆåŠŸ
 	*/
 	bool del(const char* key, size_t klen);
 
 	/**
-	* ´Ó memcached ÖĞÉ¾³ıÊı¾İ
-	* @param key {const char*} ×Ö·û´®¼üÖµ
-	* @return {bool} É¾³ıÊÇ·ñ³É¹¦
+	* ä» memcached ä¸­åˆ é™¤æ•°æ®
+	* @param key {const char*} å­—ç¬¦ä¸²é”®å€¼
+	* @return {bool} åˆ é™¤æ˜¯å¦æˆåŠŸ
 	*/
 	bool del(const char* key);
 
 	/**
-	* »ñµÃÉÏ´Î²Ù×÷ memcached ´íÎóÃèÊöĞÅÏ¢
-	* @return {const char*} ´íÎóÃèÊöĞÅÏ¢£¬ÓÀ²»Îª¿Õ
+	* è·å¾—ä¸Šæ¬¡æ“ä½œ memcached é”™è¯¯æè¿°ä¿¡æ¯
+	* @return {const char*} é”™è¯¯æè¿°ä¿¡æ¯ï¼Œæ°¸ä¸ä¸ºç©º
 	*/
 	const char* last_serror() const;
 
 	/**
-	* »ñµÃÉÏ´Î²Ù×÷ memcached µÄ´íÎóºÅ
-	* @return {int} ´íÎóºÅ
+	* è·å¾—ä¸Šæ¬¡æ“ä½œ memcached çš„é”™è¯¯å·
+	* @return {int} é”™è¯¯å·
 	*/
 	int  last_error() const;
 
 	/**
-	* ´ò¿ªÓë memcached µÄÁ¬½Ó, ÒòÎª set/get/del ²Ù×÷¶¼»á×Ô¶¯´ò¿ªÓë
-	* memcached µÄÁ¬½Ó£¬ËùÒÔ²»±ØÏÔÊ¾µØµ÷ÓÃ´Ëº¯ÊıÀ´´ò¿ªÓë memcached
-	* µÄÁ¬½Ó
-	* @return {bool} ´ò¿ªÊÇ·ñ³É¹¦
+	* æ‰“å¼€ä¸ memcached çš„è¿æ¥, å› ä¸º set/get/del æ“ä½œéƒ½ä¼šè‡ªåŠ¨æ‰“å¼€ä¸
+	* memcached çš„è¿æ¥ï¼Œæ‰€ä»¥ä¸å¿…æ˜¾ç¤ºåœ°è°ƒç”¨æ­¤å‡½æ•°æ¥æ‰“å¼€ä¸ memcached
+	* çš„è¿æ¥
+	* @return {bool} æ‰“å¼€æ˜¯å¦æˆåŠŸ
 	*/
 	virtual bool open();
 
 	/**
-	* ¹Ø±ÕÓë memcached µÄÁ¬½Ó£¬Ò»°ã¸Ãº¯Êı²»ĞèÒªµ÷ÓÃ£¬ÒòÎªÀà¶ÔÏóÔÚ
-	* Îö¹¹Ê±»á×Ô¶¯µ÷ÓÃ´Ëº¯Êı
+	* å…³é—­ä¸ memcached çš„è¿æ¥ï¼Œä¸€èˆ¬è¯¥å‡½æ•°ä¸éœ€è¦è°ƒç”¨ï¼Œå› ä¸ºç±»å¯¹è±¡åœ¨
+	* ææ„æ—¶ä¼šè‡ªåŠ¨è°ƒç”¨æ­¤å‡½æ•°
 	*/
 	void close();
 
 	/**
-	* ÁĞ³ö memcached Á¬½ÓµÄÒ»Ğ©ÊôĞÔ£¬µ÷ÊÔÓÃ
+	* åˆ—å‡º memcached è¿æ¥çš„ä¸€äº›å±æ€§ï¼Œè°ƒè¯•ç”¨
 	*/
 	void property_list();
 
@@ -231,23 +231,23 @@ private:
 	bool get(const string& key, string& buf, unsigned short* flags);
 	const string& build_key(const char* key, size_t klen);
 
-	string* keypre_;         // ·Ç¿ÕÊ±£¬¸Ã×Ö·û´®±»Ìí¼ÓÔÚ KEY ÖµÇ°×é³ÉĞÂµÄ KEY
-	rfc2047 coder_;          // µ±ĞèÒª¶Ô KEY ±àÂëÊ±µÄ±àÂëÆ÷
-	bool  encode_key_;       // ÊÇ·ñĞèÒª¶Ô KEY ½øĞĞ±àÂë
+	string* keypre_;         // éç©ºæ—¶ï¼Œè¯¥å­—ç¬¦ä¸²è¢«æ·»åŠ åœ¨ KEY å€¼å‰ç»„æˆæ–°çš„ KEY
+	rfc2047 coder_;          // å½“éœ€è¦å¯¹ KEY ç¼–ç æ—¶çš„ç¼–ç å™¨
+	bool  encode_key_;       // æ˜¯å¦éœ€è¦å¯¹ KEY è¿›è¡Œç¼–ç 
 
-	bool  opened_;           // Á¬½ÓÊÇ·ñ´ò¿ª
-	bool  retry_;            // ÊÇ·ñÖ§³ÖÁ¬½ÓÖĞ¶ÏÖØÊÔ
-	char* addr_;             // ·şÎñµØÖ·(ip:port)
-	int   enum_;             // ³ö´íºÅ£¬Áô×÷½«À´À©³äÓÃ
-	string ebuf_;            // ´æ´¢³ö´íĞÅÏ¢
-	string kbuf_;            // ´æ´¢¾­×ªÂëºóµÄ KEY Öµ»º³åÇø
+	bool  opened_;           // è¿æ¥æ˜¯å¦æ‰“å¼€
+	bool  retry_;            // æ˜¯å¦æ”¯æŒè¿æ¥ä¸­æ–­é‡è¯•
+	char* addr_;             // æœåŠ¡åœ°å€(ip:port)
+	int   enum_;             // å‡ºé”™å·ï¼Œç•™ä½œå°†æ¥æ‰©å……ç”¨
+	string ebuf_;            // å­˜å‚¨å‡ºé”™ä¿¡æ¯
+	string kbuf_;            // å­˜å‚¨ç»è½¬ç åçš„ KEY å€¼ç¼“å†²åŒº
 
-	size_t content_length_;  // µ±²ÉÓÃÁ÷Ê½ÉÏ´«/ÏÂÔØ´óÊı¾İÊ±´ËÖµ¼ÇÂ¼Êı¾İÌåµÄ×Ü³¤¶È
-	size_t length_;          // ÒÑ¾­ÉÏ´«/ÏÂÔØµÄÊı¾İ×ÜºÍ
+	size_t content_length_;  // å½“é‡‡ç”¨æµå¼ä¸Šä¼ /ä¸‹è½½å¤§æ•°æ®æ—¶æ­¤å€¼è®°å½•æ•°æ®ä½“çš„æ€»é•¿åº¦
+	size_t length_;          // å·²ç»ä¸Šä¼ /ä¸‹è½½çš„æ•°æ®æ€»å’Œ
 
-	socket_stream* conn_;    // Óëºó¶Ë·şÎñµÄÁ¬½Ó¶ÔÏó
-	string req_line_;        // ´æ´¢ÇëÇóÊı¾İ
-	string res_line_;        // ´æ´¢ÏìÓ¦Êı¾İ
+	socket_stream* conn_;    // ä¸åç«¯æœåŠ¡çš„è¿æ¥å¯¹è±¡
+	string req_line_;        // å­˜å‚¨è¯·æ±‚æ•°æ®
+	string res_line_;        // å­˜å‚¨å“åº”æ•°æ®
 	bool error_happen(const char* line);
 };
 

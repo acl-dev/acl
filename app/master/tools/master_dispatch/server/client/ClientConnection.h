@@ -10,7 +10,7 @@ public:
 	bool expired() const;
 
 protected:
-	// ���ി�麯��
+	// »ùÀà´¿Ðéº¯Êý
 	void run();
 
 private:

@@ -59,7 +59,7 @@ static void html_decode_init(void)
 
 	__decode_token_tree = acl_token_new();
 
-	/* 暂且不兼容全角空格等字符 */
+	/* 鏆備笖涓嶅吋瀹瑰叏瑙掔┖鏍肩瓑瀛楃 */
 
 	for (i = 0; i < n; i++) {
 #if 0
@@ -74,7 +74,7 @@ static void html_decode_init(void)
 	}
 
 #ifndef HAVE_NO_ATEXIT
-	/* 进程退出时调用 html_decode_free 释放内存资源 */
+	/* 杩涚▼閫�鍑烘椂璋冪敤 html_decode_free 閲婃斁鍐呭瓨璧勬簮 */
 	atexit(html_decode_free);
 #endif
 }

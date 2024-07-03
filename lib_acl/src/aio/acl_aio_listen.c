@@ -45,7 +45,7 @@ static void __accept_notify_callback(int event_type,
 	}
 
 	for (i = 0; i < astream->accept_nloop; i++) {
-		/* cstream read_buf µÄ³¤¶È read_buf_len ¼Ì³Ğ×Ô¼àÌıÁ÷µÄ
+		/* cstream read_buf çš„é•¿åº¦ read_buf_len ç»§æ‰¿è‡ªç›‘å¬æµçš„
 		 * read_buf_len
 		 */
 		cstream = acl_vstream_accept(stream, NULL, 0);

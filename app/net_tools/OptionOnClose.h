@@ -2,23 +2,23 @@
 #include "afxwin.h"
 
 
-// COptionOnClose ¶Ô»°¿ò
+// COptionOnClose å¯¹è¯æ¡†
 
 class COptionOnClose : public CDialog
 {
 	DECLARE_DYNCREATE(COptionOnClose)
 
 public:
-	COptionOnClose(CWnd* pParent = NULL);   // ±ê×¼¹¹Ôìº¯Êı
+	COptionOnClose(CWnd* pParent = NULL);   // æ ‡å‡†æ„é€ å‡½æ•°
 	virtual ~COptionOnClose();
 
 	void init(BOOL QuitOnClose);
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_DIALOG_QUIT};
 
 protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 	virtual BOOL OnInitDialog();
 
 	DECLARE_MESSAGE_MAP()

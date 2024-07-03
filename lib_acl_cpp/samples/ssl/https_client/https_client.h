@@ -12,16 +12,16 @@ public:
 	void set_show_body(bool yes);
 
 protected:
-	virtual void* run();		// »ùÀàĞéº¯Êı£¬ÔÚ×ÓÏß³ÌÖĞ±»µ÷ÓÃ
+	virtual void* run();		// åŸºç±»è™šå‡½æ•°ï¼Œåœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨
 
 private:
-	acl::string server_addr_;	// ·şÎñÆ÷µØÖ·
-	acl::string domain_;		// ÓòÃû
-	bool  keep_alive_;		// ÊÇ·ñ²ÉÓÃ³¤Á¬½Ó·½Ê½
-	bool  accept_gzip_;		// ÊÇ·ñÖ§³ÖÑ¹Ëõ
-	int   count_;			// IO »á»°´ÎÊı
-	int   length_;			// Ã¿´Î IO µÄÊı¾İ³¤¶È
-	bool  show_body_;		// ÊÇ·ñÏÔÊ¾ÊÕµ½ÏìÓ¦Êı¾İÌå
+	acl::string server_addr_;	// æœåŠ¡å™¨åœ°å€
+	acl::string domain_;		// åŸŸå
+	bool  keep_alive_;		// æ˜¯å¦é‡‡ç”¨é•¿è¿æ¥æ–¹å¼
+	bool  accept_gzip_;		// æ˜¯å¦æ”¯æŒå‹ç¼©
+	int   count_;			// IO ä¼šè¯æ¬¡æ•°
+	int   length_;			// æ¯æ¬¡ IO çš„æ•°æ®é•¿åº¦
+	bool  show_body_;		// æ˜¯å¦æ˜¾ç¤ºæ”¶åˆ°å“åº”æ•°æ®ä½“
 	acl::sslbase_conf* ssl_conf_;
 
 	bool connect_server(acl::http_client& client);

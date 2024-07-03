@@ -13,43 +13,43 @@ extern "C" {
 #undef	USE_PRINTF_MACRO
 
 /**
- * µ±¼ÇÂ¼ÈÕÖ¾ĞÅÏ¢ÖÁÈÕÖ¾ÎÄ¼şÊ±£¬ĞèÒªµ÷ÓÃÈçÏÂµÄÈÕÖ¾¼ÇÂ¼º¯Êı
+ * å½“è®°å½•æ—¥å¿—ä¿¡æ¯è‡³æ—¥å¿—æ–‡ä»¶æ—¶ï¼Œéœ€è¦è°ƒç”¨å¦‚ä¸‹çš„æ—¥å¿—è®°å½•å‡½æ•°
  */
 
 #ifndef	USE_PRINTF_MACRO
 
 /**
- * Ò»°ã¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * ä¸€èˆ¬çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 FIBER_API void PRINTF(1, 2) msg_info(const char *fmt,...);
 
 /**
- * ¾¯¸æ¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * è­¦å‘Šçº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 FIBER_API void PRINTF(1, 2) msg_warn(const char *fmt,...);
 
 /**
- * ´íÎó¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * é”™è¯¯çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 FIBER_API void PRINTF(1, 2) msg_error(const char *fmt,...);
 
 /**
- * ÖÂÃü¼¶±ğÈÕÖ¾ĞÅÏ¢¼ÇÂ¼º¯Êı
- * @param fmt {const char*} ²ÎÊı¸ñÊ½
- * @param ... ±ä²ÎĞòÁĞ
+ * è‡´å‘½çº§åˆ«æ—¥å¿—ä¿¡æ¯è®°å½•å‡½æ•°
+ * @param fmt {const char*} å‚æ•°æ ¼å¼
+ * @param ... å˜å‚åºåˆ—
  */
 FIBER_API void PRINTF(1, 2) msg_fatal(const char *fmt,...);
 
 #else
 
 /**
- * µ±¼ÇÂ¼ÈÕÖ¾ĞÅÏ¢ÖÁ±ê×¼Êä³öÊ±£¬ĞèÒªµ÷ÓÃÈçÏÂµÄÈÕÖ¾¼ÇÂ¼º¯Êı
+ * å½“è®°å½•æ—¥å¿—ä¿¡æ¯è‡³æ ‡å‡†è¾“å‡ºæ—¶ï¼Œéœ€è¦è°ƒç”¨å¦‚ä¸‹çš„æ—¥å¿—è®°å½•å‡½æ•°
  */
 
 #include <stdio.h>
@@ -67,24 +67,24 @@ FIBER_API void PRINTF(1, 2) msg_fatal(const char *fmt,...);
 #endif
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢
- * @param buffer {char*} ´æ´¢´íÎóÃèÊöĞÅÏ¢µÄÄÚ´æ»º³åÇø
- * @param size {size_t} buffer µÄ¿Õ¼ä´óĞ¡
- * @return {const char*} ·µ»ØµÄµØÖ·Ó¦Óë buffer ÏàÍ¬
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯
+ * @param buffer {char*} å­˜å‚¨é”™è¯¯æè¿°ä¿¡æ¯çš„å†…å­˜ç¼“å†²åŒº
+ * @param size {size_t} buffer çš„ç©ºé—´å¤§å°
+ * @return {const char*} è¿”å›çš„åœ°å€åº”ä¸ buffer ç›¸åŒ
  */
 FIBER_API const char *last_strerror(char *buffer, size_t size);
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢£¬¸Ãº¯ÊıÄÚ²¿²ÉÓÃÁËÏß³Ì¾Ö²¿±äÁ¿£¬ËùÒÔÊÇ
- * Ïß³Ì°²È«µÄ£¬µ«Ê¹ÓÃÆğÀ´¸ü¼òµ¥Ğ©
- * @return {const char *} ·µ»Ø´íÎóÌáÊ¾ĞÅÏ¢ 
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯ï¼Œè¯¥å‡½æ•°å†…éƒ¨é‡‡ç”¨äº†çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œæ‰€ä»¥æ˜¯
+ * çº¿ç¨‹å®‰å…¨çš„ï¼Œä½†ä½¿ç”¨èµ·æ¥æ›´ç®€å•äº›
+ * @return {const char *} è¿”å›é”™è¯¯æç¤ºä¿¡æ¯ 
  */
 FIBER_API const char *last_serror(void);
 
 /**
- * Êä³öĞÅÏ¢ÖÁ±ê×¼Êä³ö
- * @param fmt {const char*} ¸ñÊ½²ÎÊı
- * @param ... ±ä²ÎĞòÁĞ
+ * è¾“å‡ºä¿¡æ¯è‡³æ ‡å‡†è¾“å‡º
+ * @param fmt {const char*} æ ¼å¼å‚æ•°
+ * @param ... å˜å‚åºåˆ—
  */
 FIBER_API void PRINTF(1, 2) msg_printf(const char *fmt,...);
 

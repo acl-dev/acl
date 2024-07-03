@@ -553,7 +553,7 @@ bool rfc822::check_addr(const char* in)
 
 	while (*at) {
 		if (*at == '@') {
-			// ±ØĞë±£Ö¤ @ Ç°Ò»¸ö×Ö·ûµÄÓĞĞ§ĞÔ×ñÊØ VALID1
+			// å¿…é¡»ä¿è¯ @ å‰ä¸€ä¸ªå­—ç¬¦çš„æœ‰æ•ˆæ€§éµå®ˆ VALID1
 			if (!VALID1(*(at - 1))) {
 				return false;
 			}

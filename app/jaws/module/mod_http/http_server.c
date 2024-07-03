@@ -216,7 +216,7 @@ static int http_doc_cache(HTTP_CLIENT *client, FILE_CACHE *cache)
 }
 
 /**     
- * ³É¹¦¶Áµ½HTTPÇëÇóÍ·ºóµÄ»Øµ÷º¯Êý
+ * æˆåŠŸè¯»åˆ°HTTPè¯·æ±‚å¤´åŽçš„å›žè°ƒå‡½æ•°
  */                     
 static int request_header_ready(int status, void *arg)
 {
@@ -230,7 +230,7 @@ static int request_header_ready(int status, void *arg)
 			http_client->entry.service)->file_path;
 	char *ptr;
 
-	/* ÏÈ½ûÖ¹¶Á²Ù×÷£¬ÒòÎªÄ¿Ç°»¹²»Ö§³Ö pipeline Ä£Ê½ */
+	/* å…ˆç¦æ­¢è¯»æ“ä½œï¼Œå› ä¸ºç›®å‰è¿˜ä¸æ”¯æŒ pipeline æ¨¡å¼ */
 	acl_aio_disable_read(http_client->entry.client);
 
 	if (status != HTTP_CHAT_OK) {
@@ -269,17 +269,17 @@ static int request_header_ready(int status, void *arg)
 	}
 
 	if (http_client->req_curr != NULL) {
-		/* Èç¹ûÇ°Ò»¸öÇëÇó»¹Î´´¦ÀíÍê±Ï£¬Ôò·µ»Ø */
+		/* å¦‚æžœå‰ä¸€ä¸ªè¯·æ±‚è¿˜æœªå¤„ç†å®Œæ¯•ï¼Œåˆ™è¿”å›ž */
 		return (0);
 	}
-	http_client->req_curr = req;  /* ÉèÖÃµ±Ç°¿ÉÒÔ´¦ÀíµÄÇëÇó */
+	http_client->req_curr = req;  /* è®¾ç½®å½“å‰å¯ä»¥å¤„ç†çš„è¯·æ±‚ */
 
-	/* ÏÈ¼ì²éÓÃ»§×Ô¶¨Òå¹ýÂËÆ÷ */
+	/* å…ˆæ£€æŸ¥ç”¨æˆ·è‡ªå®šä¹‰è¿‡æ»¤å™¨ */
 	if (http_client_req_filter(http_client)) {
-		/* ·µ»Ø -1 ½öÊÇÎªÁËÈÃÒì²½¿ò¼Ü×Ô¶¯¹Ø±Õ¸ÃÒì²½Á÷¶ÔÏó£¬
-		 * ÒòÎª¸ÃÒì²½Á÷ÒÑ¾­ÓëÊý¾ÝÁ÷·ÖÀë£¬ËùÒÔµ±¹Ø±ÕÒì²½Á÷
-		 * Ê±£¬²¢²»ÕæÕý¹Ø±ÕÓëä¯ÀÀÆ÷Ö®¼äµÄÊý¾ÝÁ÷£¬Ò²²»¹Ø±Õ
-		 * Óë·þÎñÆ÷Ö®¼äµÄÊý¾ÝÁ÷
+		/* è¿”å›ž -1 ä»…æ˜¯ä¸ºäº†è®©å¼‚æ­¥æ¡†æž¶è‡ªåŠ¨å…³é—­è¯¥å¼‚æ­¥æµå¯¹è±¡ï¼Œ
+		 * å› ä¸ºè¯¥å¼‚æ­¥æµå·²ç»ä¸Žæ•°æ®æµåˆ†ç¦»ï¼Œæ‰€ä»¥å½“å…³é—­å¼‚æ­¥æµ
+		 * æ—¶ï¼Œå¹¶ä¸çœŸæ­£å…³é—­ä¸Žæµè§ˆå™¨ä¹‹é—´çš„æ•°æ®æµï¼Œä¹Ÿä¸å…³é—­
+		 * ä¸ŽæœåŠ¡å™¨ä¹‹é—´çš„æ•°æ®æµ
 		 */
 		return (-1);
 	}

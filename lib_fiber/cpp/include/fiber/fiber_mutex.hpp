@@ -8,41 +8,41 @@ struct ACL_FIBER_MUTEX;
 namespace acl {
 
 /**
- * ¿ÉÓÃÓÚÍ¬Ò»Ïß³ÌÄÚµÄÐ­³ÌÖ®¼äÒÔ¼°²»Í¬Ïß³ÌÖ®¼äµÄÐ­³ÌÖ®¼äµÄ»¥³âËø, Í¬Ê±»¹¿ÉÒÔÓÃÔÚ
- * Ïß³ÌÖ®¼äÒÔ¼°Ð­³ÌÓë¶ÀÁ¢Ïß³ÌÖ®¼äµÄ»¥³â.
+ * å¯ç”¨äºŽåŒä¸€çº¿ç¨‹å†…çš„åç¨‹ä¹‹é—´ä»¥åŠä¸åŒçº¿ç¨‹ä¹‹é—´çš„åç¨‹ä¹‹é—´çš„äº’æ–¥é”, åŒæ—¶è¿˜å¯ä»¥ç”¨åœ¨
+ * çº¿ç¨‹ä¹‹é—´ä»¥åŠåç¨‹ä¸Žç‹¬ç«‹çº¿ç¨‹ä¹‹é—´çš„äº’æ–¥.
  */
 class FIBER_CPP_API fiber_mutex {
 public:
 	/**
-	 * ¹¹Ôìº¯Êý
-	 * @param mutex {ACL_FIBER_MUTEX*} ·Ç¿ÕÊ±,½«ÓÃ C µÄËø¶ÔÏó´´½¨ C++ Ëø
-	 *  ¶ÔÏó,·ñÔòÄÚ²¿×Ô¶¯´´½¨ C Ëø¶ÔÏó;Èç¹û·Ç¿ÕÊ±,ÔÚ±¾¶ÔÏóÎö¹¹Ê±¸Ã´«ÈëµÄ
-	 *  C Ëø¶ÔÏóÐèÓÉÓ¦ÓÃ²ã×ÔÐÐÊÍ·Å.
+	 * æž„é€ å‡½æ•°
+	 * @param mutex {ACL_FIBER_MUTEX*} éžç©ºæ—¶,å°†ç”¨ C çš„é”å¯¹è±¡åˆ›å»º C++ é”
+	 *  å¯¹è±¡,å¦åˆ™å†…éƒ¨è‡ªåŠ¨åˆ›å»º C é”å¯¹è±¡;å¦‚æžœéžç©ºæ—¶,åœ¨æœ¬å¯¹è±¡æžæž„æ—¶è¯¥ä¼ å…¥çš„
+	 *  C é”å¯¹è±¡éœ€ç”±åº”ç”¨å±‚è‡ªè¡Œé‡Šæ”¾.
 	 */
 	fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
 	~fiber_mutex(void);
 
 	/**
-	 * µÈ´ý»¥³âËø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·ñÔò±íÊ¾ÄÚ²¿³ö´í
+	 * ç­‰å¾…äº’æ–¥é”
+	 * @return {bool} è¿”å›ž true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå†…éƒ¨å‡ºé”™
 	 */
 	bool lock(void);
 
 	/**
-	 * ³¢ÊÔµÈ´ý»¥³âËø
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÓËø³É¹¦£¬·ñÔò±íÊ¾ËøÕýÔÚ±»Õ¼ÓÃ
+	 * å°è¯•ç­‰å¾…äº’æ–¥é”
+	 * @return {bool} è¿”å›ž true è¡¨ç¤ºåŠ é”æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºé”æ­£åœ¨è¢«å ç”¨
 	 */
 	bool trylock(void);
 
 	/**
-	 * »¥³âËøÓµÓÐÕßÊÍ·ÅËø²¢Í¨ÖªµÈ´ýÕß
-	 * @return {bool} ·µ»Ø true ±íÊ¾Í¨Öª³É¹¦£¬·ñÔò±íÊ¾ÄÚ²¿³ö´í
+	 * äº’æ–¥é”æ‹¥æœ‰è€…é‡Šæ”¾é”å¹¶é€šçŸ¥ç­‰å¾…è€…
+	 * @return {bool} è¿”å›ž true è¡¨ç¤ºé€šçŸ¥æˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå†…éƒ¨å‡ºé”™
 	 */
 	bool unlock(void);
 
 public:
 	/**
-	 * ·µ»Ø C °æ±¾µÄ»¥³âËø¶ÔÏó
+	 * è¿”å›ž C ç‰ˆæœ¬çš„äº’æ–¥é”å¯¹è±¡
 	 * @return {ACL_FIBER_MUTEX*}
 	 */
 	ACL_FIBER_MUTEX* get_mutex(void) const {
@@ -50,14 +50,14 @@ public:
 	}
 
 	/**
-	 * ½øÐÐÈ«¾ÖËÀËø¼ì²â
-	 * @param out {fiber_mutex_stats&} ´æ´¢½á¹û¼¯
-	 * @return {bool} ·µ»Ø true ±íÊ¾´æÔÚËÀËøÎÊÌâ, ËÀËøÐÅÏ¢´æ·ÅÔÚ out ÖÐ
+	 * è¿›è¡Œå…¨å±€æ­»é”æ£€æµ‹
+	 * @param out {fiber_mutex_stats&} å­˜å‚¨ç»“æžœé›†
+	 * @return {bool} è¿”å›ž true è¡¨ç¤ºå­˜åœ¨æ­»é”é—®é¢˜, æ­»é”ä¿¡æ¯å­˜æ”¾åœ¨ out ä¸­
 	 */
 	static bool deadlock(fiber_mutex_stats& out);
 
 	/**
-	 * ¼ì²âËÀËø, ²¢½«ËùÓÐ½øÈëËÀËø×´Ì¬µÄÐ­³ÌÕ»´òÓ¡ÖÁ±ê×¼Êä³ö
+	 * æ£€æµ‹æ­»é”, å¹¶å°†æ‰€æœ‰è¿›å…¥æ­»é”çŠ¶æ€çš„åç¨‹æ ˆæ‰“å°è‡³æ ‡å‡†è¾“å‡º
 	 */
 	static void deadlock_show(void);
 

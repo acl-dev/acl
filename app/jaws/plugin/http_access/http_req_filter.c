@@ -58,7 +58,7 @@ void http_request_forward(ACL_VSTREAM *client, HTTP_HDR_REQ *hdr_req, void *ctx)
 
 	buf = acl_vstring_alloc(256);
 
-	/* Éú³ÉÐÂµÄ url µØÖ· */
+	/* ç”Ÿæˆæ–°çš„ url åœ°å€ */
 	n = (int) strlen(host_ptr) - hdm->size_from;
 	acl_vstring_strcpy(buf, "http://");
 	if (n > 0)
@@ -66,12 +66,12 @@ void http_request_forward(ACL_VSTREAM *client, HTTP_HDR_REQ *hdr_req, void *ctx)
 	acl_vstring_strcat(buf, hdm->domain_to);
 	acl_vstring_strcat(buf, acl_vstring_str(hdr_req->url_part));
 
-	/* ²úÉúÖØ¶¨ÏòÍ· */
+	/* äº§ç”Ÿé‡å®šå‘å¤´ */
 	hdr_res = http_hdr_res_static(302);
 	http_hdr_put_str(&hdr_res->hdr, "Location", acl_vstring_str(buf));
 	http_hdr_put_str(&hdr_res->hdr, "Connection", "close");
 	
-	/* Éú³ÉÏìÓ¦Êý¾Ý°ü */
+	/* ç”Ÿæˆå“åº”æ•°æ®åŒ… */
 	http_hdr_build(&hdr_res->hdr, buf);
 
 	acl_vstream_writen(client, acl_vstring_str(buf), ACL_VSTRING_LEN(buf));

@@ -2,7 +2,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 
-// �����࣬������ʵ�ָ����еĴ���ӿ�
+// 纯虚类，子类须实现该类中的纯虚接口
 class ping_callback
 {
 public:
@@ -107,13 +107,13 @@ public:
 protected:
 	~ping();
 
-	// �����麯�������̴߳�������
+	// 基类虚函数：子线程处理函数
 	virtual void rpc_run();
 
-	// �����麯�������̴߳������̣��յ����߳�������ɵ���Ϣ
+	// 基类虚函数：主线程处理过程，收到子线程任务完成的消息
 	virtual void rpc_onover();
 
-	// �����麯�������̴߳������̣��յ����̵߳�֪ͨ��Ϣ
+	// 基类虚函数：主线程处理过程，收到子线程的通知消息
 	virtual void rpc_wakeup(void* ctx);
 
 protected:

@@ -5,11 +5,11 @@
 #include "notify.h"
 
 /*
-����9010�˿ڣ�֮����xml��ʽΪ<send_sms phone="�ֻ�����" message="��������" />
-�ɹ��򷵻�<send_sms result="succeeded" />
-ʧ���򷵻�<send_sms result="failed" />
+连接9010端口，之后发送xml格式为<send_sms phone="手机号码" message="短信内容" />
+成功则返回<send_sms result="succeeded" />
+失败则返回<send_sms result="failed" />
 
-֧�ֶ�����ӣ�ÿ�����ӿ����������ͣ������ӿɲ���
+支持多个连接，每个连接可以连续发送，长连接可不断
 122.49.0.234
 */
 

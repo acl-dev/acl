@@ -45,7 +45,7 @@ bool socket_stream::open(const char* addr, int conn_timeout, int rw_timeout,
 
 bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 {
-	// ÏÈ¹Ø±Õ¾ÉµÄÁ÷¶ÔÏó
+	// å…ˆå…³é—­æ—§çš„æµå¯¹è±¡
 	if (stream_) {
 		acl_vstream_close(stream_);
 	}
@@ -59,7 +59,7 @@ bool socket_stream::open(ACL_VSTREAM* vstream, bool udp_mode /* = false */)
 	return true;
 }
 
-// ½« C++ API µÄ flags ×ª±äÎª C API µÄ flags.
+// å°† C++ API çš„ flags è½¬å˜ä¸º C API çš„ flags.
 static unsigned to_oflags(unsigned flags)
 {
 	unsigned oflags = 0;
@@ -229,7 +229,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 		return "";
 	}
 
-	// xxx: acl_vstream ÖĞÃ»ÓĞ¶Ô´ËµØÖ·¸³Öµ
+	// xxx: acl_vstream ä¸­æ²¡æœ‰å¯¹æ­¤åœ°å€èµ‹å€¼
 	const char* ptr = ACL_VSTREAM_PEER(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char  buf[256];
@@ -287,7 +287,7 @@ const char* socket_stream::get_local(bool full /* = false */) const
 		return "";
 	}
 
-	// xxx: acl_vstream ÖĞÃ»ÓĞ¶Ô´ËµØÖ·¸³Öµ
+	// xxx: acl_vstream ä¸­æ²¡æœ‰å¯¹æ­¤åœ°å€èµ‹å€¼
 	const char* ptr = ACL_VSTREAM_LOCAL(stream_);
 	if (ptr == NULL || *ptr == 0) {
 		char buf[256];

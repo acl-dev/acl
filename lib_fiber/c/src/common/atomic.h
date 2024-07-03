@@ -9,73 +9,73 @@ extern "C"
 typedef struct ATOMIC ATOMIC;
 
 /**
- * ����ԭ�Ӷ���
- * @return {ATOMIC*} �����´����Ķ���
+ * 创建原子对象
+ * @return {ATOMIC*} 返回新创建的对象
  */
 ATOMIC *atomic_new(void);
 
 /**
- * �ͷ�ԭ�Ӷ���
- * @param self {ATOMIC*} ԭ�Ӷ���
+ * 释放原子对象
+ * @param self {ATOMIC*} 原子对象
  */
 void atomic_free(ATOMIC *self);
 
 /**
- * ��ָ��������ԭ�Ӷ���󶨣��Ա��ڶԸö������ԭ�Ӳ���
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param value {void*} �������Ķ���ͨ��ԭ�Ӷ���ʵ�ֶԸö����ԭ�Ӳ���
+ * 将指定对象与原子对象绑定，以便于对该对象进行原子操作
+ * @param self {ATOMIC*} 原子对象
+ * @param value {void*} 被操作的对象，通过原子对象实现对该对象的原子操作
  */
 void atomic_set(ATOMIC *self, void *value);
 
 /**
- * �Ƚϲ��������󣬵�ԭ�Ӷ���󶨵Ķ���������Ƚ϶�����ͬʱ�������¶�����
- * ����֮ǰ�󶨵Ķ���
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param cmp {void*} ���Ƚ϶���ָ��
- * @param value {void*} ��ԭ�Ӷ�������Ƚ϶�����ͬʱ�Ὣ�ö�����ԭ�Ӷ����
- * @return {void*} ����ԭ�Ӷ���֮ǰ�󶨵Ķ���
+ * 比较并交换对象，当原子对象绑定的对象与给定比较对象相同时才设置新对象且
+ * 返回之前绑定的对象
+ * @param self {ATOMIC*} 原子对象
+ * @param cmp {void*} 待比较对象指针
+ * @param value {void*} 当原子对象与待比较对象相同时会将该对象与原子对象绑定
+ * @return {void*} 返回原子对象之前绑定的对象
  */
 void *atomic_cas(ATOMIC *self, void *cmp, void *value);
 
 /**
- * ��ԭ�Ӷ������¶�����а󶨣�������֮ǰ�󶨵Ķ���
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param value {void*} �����󶨵��¶���
- * @return {void*} ����֮ǰ�󶨵Ķ���
+ * 将原子对象与新对象进行绑定，并返回之前绑定的对象
+ * @param self {ATOMIC*} 原子对象
+ * @param value {void*} 将被绑定的新对象
+ * @return {void*} 返回之前绑定的对象
  */
 void *atomic_xchg(ATOMIC *self, void *value);
 
 /**
- * ������ atomic_set �󶨵Ķ���Ϊ��ֵ����ʱ�����Ե��ô˺������ñ��󶨶���
- * �ĳ�����ֵ
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param n {long long} ��ԭ�Ӷ������󶨵Ķ��󽫱���ֵΪ��ֵ
+ * 当调用 atomic_set 绑定的对象为数值对象时，可以调用此函数设置被绑定对象
+ * 的长整数值
+ * @param self {ATOMIC*} 原子对象
+ * @param n {long long} 被原子对象所绑定的对象将被赋值为此值
  */
 void atomic_int64_set(ATOMIC *self, long long n);
 
 /**
- * �Ȼ����ֵ�������洢������ֵ��Ȼ��������ָ����ֵ�洢�ڸ���ֵ������
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param n {long long} ����ֵ 
- * @return {long long} ��������֮ǰ������ֵ�����ֵ
+ * 先获得数值对象所存储的整数值，然后再增加指定的值存储于该数值对象中
+ * @param self {ATOMIC*} 原子对象
+ * @param n {long long} 增加值 
+ * @return {long long} 返回增加之前数据数值对象的值
  */
 long long atomic_int64_fetch_add(ATOMIC *self, long long n);
 
 /**
- * �����ݶ���洢��ֵ����ָ����ֵ�������ؽ��ֵ
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param n {long long} ����ֵ 
- * @return {long long} ��������֮���ֵ
+ * 对数据对象存储的值增加指定的值，并返回结果值
+ * @param self {ATOMIC*} 原子对象
+ * @param n {long long} 增加值 
+ * @return {long long} 返回增加之后的值
  */
 long long atomic_int64_add_fetch(ATOMIC *self, long long n);
 
 /**
- * �Ƚϲ���������ֵ����ԭ�Ӷ���洢������ֵ������Ƚ�����ֵ��ͬʱ������������
- * ֵ�ҷ���֮ǰ�洢������ֵ
- * @param self {ATOMIC*} ԭ�Ӷ���
- * @param cmp {long long} ���Ƚ�����ֵ
- * @param n {long long} ��ԭ�Ӷ�������Ƚ�����ֵ��ͬʱ�Ὣԭ�Ӷ�������Ϊ��ֵ
- * @return {long long} ����ԭ�Ӷ���֮ǰ�洢������ֵ
+ * 比较并交换整数值，当原子对象存储的整数值与给定比较整数值相同时才设置新整数
+ * 值且返回之前存储的整数值
+ * @param self {ATOMIC*} 原子对象
+ * @param cmp {long long} 待比较整数值
+ * @param n {long long} 当原子对象与待比较整数值相同时会将原子对象设置为此值
+ * @return {long long} 返回原子对象之前存储的整数值
  */
 long long atomic_int64_cas(ATOMIC *self, long long cmp, long long n);
 

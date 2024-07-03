@@ -11,7 +11,7 @@ static char *var_cfg_http_vhost_path;
 static char *var_cfg_http_vhost_default;
 
 static ACL_CFG_STR_TABLE __conf_str_tab[] = {
-	/* ÅäÖÃÏîÃû³Æ, ÅäÖÃÏîÈ±Ê¡Öµ, ´æ´¢ÅäÖÃÏîÖµµÄµØÖ· */
+	/* é…ç½®é¡¹åç§°, é…ç½®é¡¹ç¼ºçœå€¼, å­˜å‚¨é…ç½®é¡¹å€¼çš„åœ°å€ */
 
 	{ "http_filter_proxy", "HTTP_FILTER_PROXY", &var_cfg_http_filter_info },
 	{ "http_tmpl_path", "/opt/jaws/www/tmpl", &var_cfg_http_tmpl_path },
@@ -66,7 +66,7 @@ void module_service_init(ACL_DLL_ENV *dll_env, const char *cfg_dir)
 	else
 		memset(&__dll_env, 0, sizeof(ACL_DLL_ENV));
 
-	/* Èç¹û mem_slice ·Ç¿ÕÔòÉèÖÃÄÚ´æ·ÖÅä²ÉÓÃÇĞÆ¬·ÖÅä·½Ê½ */
+	/* å¦‚æœ mem_slice éç©ºåˆ™è®¾ç½®å†…å­˜åˆ†é…é‡‡ç”¨åˆ‡ç‰‡åˆ†é…æ–¹å¼ */
 	if (__dll_env.mem_slice) {
 		acl_mem_slice_set(__dll_env.mem_slice);
 		acl_msg_info("%s(%d): set mem slice now", myname, __LINE__);
@@ -95,7 +95,7 @@ void module_service_init(ACL_DLL_ENV *dll_env, const char *cfg_dir)
 	acl_xinetd_cfg_free(cfg);
 	acl_myfree(filepath);
 
-	/* ÊÇ·ñµ÷ÊÔÄÚ´æµÄ·ÖÎö×´Ì¬ */
+	/* æ˜¯å¦è°ƒè¯•å†…å­˜çš„åˆ†æçŠ¶æ€ */
 	if (var_cfg_http_debug_mem == 1) {
 		acl_memory_debug_start();
 		acl_memory_debug_stack(1);
@@ -109,23 +109,23 @@ void module_service_init(ACL_DLL_ENV *dll_env, const char *cfg_dir)
 				var_http_dll_env->mmd, "log.txt");
 	}
 
-	/* ÉèÖÃHTTP·şÎñÔËĞĞÄ£Ê½: ·şÎñÆ÷Ä£Ê½»¹ÊÇ´úÀíÄ£Ê½ */
+	/* è®¾ç½®HTTPæœåŠ¡è¿è¡Œæ¨¡å¼: æœåŠ¡å™¨æ¨¡å¼è¿˜æ˜¯ä»£ç†æ¨¡å¼ */
 	http_filter_set(var_cfg_http_filter_info);
-	/* ·şÎñÆ÷Ä£Ê½ÏÂ¼ÓÔØÅäÖÃ */
+	/* æœåŠ¡å™¨æ¨¡å¼ä¸‹åŠ è½½é…ç½® */
 	http_conf_load(var_cfg_http_vhost_path, var_cfg_http_vhost_default);
-	/* ¼ÓÔØHMTLÄ£°å */
+	/* åŠ è½½HMTLæ¨¡æ¿ */
 	http_tmpl_load(var_cfg_http_tmpl_path);
 
-	/* ³õÊ¼»¯Á¬½Ó³Ø */
+	/* åˆå§‹åŒ–è¿æ¥æ±  */
 	if (var_cfg_http_server_conn_limit < 10)
 		var_cfg_http_server_conn_limit = 10;
 
-	/* ÉèÖÃHTTP»º³åÇø´óĞ¡ */
+	/* è®¾ç½®HTTPç¼“å†²åŒºå¤§å° */
 	if (var_cfg_http_buf_size > 0) {
 		http_buf_size_set(var_cfg_http_buf_size);
 	}
 
-	/* ¼ÓÔØËùÓĞ¶¯Ì¬²å¼ş¿â²¢³õÊ¼»¯¶¯Ì¬¿â */
+	/* åŠ è½½æ‰€æœ‰åŠ¨æ€æ’ä»¶åº“å¹¶åˆå§‹åŒ–åŠ¨æ€åº“ */
 	http_plugin_load_all(dll_env, var_cfg_http_plugin_dlnames, var_cfg_http_plugin_cfgdir);
 }
 
@@ -133,7 +133,7 @@ SERVICE *module_service_create()
 {
 	HTTP_SERVICE *service;
 
-	/* ´´½¨ HTTP ·şÎñ¶ÔÏó */
+	/* åˆ›å»º HTTP æœåŠ¡å¯¹è±¡ */
 	service = http_service_new();
 	return ((SERVICE*) service);
 }

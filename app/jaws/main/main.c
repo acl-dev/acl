@@ -58,7 +58,7 @@ static void run_loop(ACL_AIO *aio, const char *listen_addr)
 		ACL_AIO_CTL_LISTEN_FN, listen_callback,
 		ACL_AIO_CTL_END);
 	acl_aio_listen(astream);
-	/* Éè¶¨¶¨Ê±Æ÷¶¨Ê±ÇåÀíÀ¬»ø»ØÊÕÆ÷ */
+	/* è®¾å®šå®šæ—¶å™¨å®šæ—¶æ¸…ç†åƒåœ¾å›æ”¶å™¨ */
 	acl_aio_request_timer(aio, gc_timer, aio, 2, 1);
 
 	while (1) {
@@ -136,10 +136,10 @@ static ACL_AIO *init(const char *procname, int use_slice, int open_log acl_unuse
 	else
 		var_mem_slice = NULL;
 
-	/* ³õÊ¼»¯ acl ¿â */
+	/* åˆå§‹åŒ– acl åº“ */
 	acl_init();
 
-	/* ¼ÓÔØÅäÖÃÎÄ¼ş */
+	/* åŠ è½½é…ç½®æ–‡ä»¶ */
 	cfg = acl_xinetd_cfg_load(conf);
 	if (cfg == NULL)
 		acl_msg_warn("load cfg(%s) error(%s)",

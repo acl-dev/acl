@@ -52,7 +52,7 @@ void* https_request::run(void)
 	acl::http_ctype ctype;
 	ctype.parse(ptr);
 
-	// ÏìÓ¦Í·Êı¾İÀàĞÍµÄ×ÓÀàĞÍ
+	// å“åº”å¤´æ•°æ®ç±»å‹çš„å­ç±»å‹
 	const char* stype = ctype.get_stype();
 
 	bool ret;

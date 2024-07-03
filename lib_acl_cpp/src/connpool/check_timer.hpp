@@ -29,7 +29,7 @@ public:
 	bool finish(bool graceful);
 
 protected:
-	// ���ി�麯��
+	// »ùÀà´¿Ðéº¯Êý
 	void timer_callback(unsigned int id);
 	void destroy(void) {}
 

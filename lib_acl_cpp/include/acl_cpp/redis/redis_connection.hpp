@@ -10,8 +10,8 @@ namespace acl
 class redis_client;
 
 /**
- * redis Connection Àà£¬°üº¬ÃüÁîÈçÏÂ£º
- * AUTH¡¢ECHO¡¢PING¡¢QUIT¡¢SELECT
+ * redis Connection ç±»ï¼ŒåŒ…å«å‘½ä»¤å¦‚ä¸‹ï¼š
+ * AUTHã€ECHOã€PINGã€QUITã€SELECT
  * redis connection command clss, including as below:
  * AUTH, ECHO, PING, QUIT, SELECT
  */
@@ -43,43 +43,43 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Á¬½ÓÖÁ redis-server Ê±½øĞĞÉí·İÑéÖ¤
+	 * è¿æ¥è‡³ redis-server æ—¶è¿›è¡Œèº«ä»½éªŒè¯
 	 * AUTH command to login the redis server.
-	 * @param passwd {const char*} ÔÚ redis ÅäÖÃÎÄ¼şÖĞÖ¸¶¨µÄÈÏÖ¤ÃÜÂë
+	 * @param passwd {const char*} åœ¨ redis é…ç½®æ–‡ä»¶ä¸­æŒ‡å®šçš„è®¤è¯å¯†ç 
 	 *  the password in redis-server configure
-	 * @return {bool} Éí·İÈÏÖ¤ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾ÈÏÖ¤Ê§°Ü»ò²Ù×÷Ê§°Ü
+	 * @return {bool} èº«ä»½è®¤è¯æ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºè®¤è¯å¤±è´¥æˆ–æ“ä½œå¤±è´¥
 	 *  return true if success, or false because auth failed or error.
 	 */
 	bool auth(const char* passwd);
 
 	/**
-	 * Ñ¡Ôñ redis-server ÖĞµÄÊı¾İ¿â ID
+	 * é€‰æ‹© redis-server ä¸­çš„æ•°æ®åº“ ID
 	 * SELECT command to select the DB id in redis-server
-	 * @param dbnum {int} redis Êı¾İ¿â ID
+	 * @param dbnum {int} redis æ•°æ®åº“ ID
 	 *  the DB id
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  return true if success, or false for failed.
 	 */
 	bool select(int dbnum);
 
 	/**
-	 * Ì½²â redis Á¬½ÓÊÇ·ñÕı³£
+	 * æ¢æµ‹ redis è¿æ¥æ˜¯å¦æ­£å¸¸
 	 * PING command for testing if the connection is OK
-	 * @return {bool} Á¬½ÓÊÇ·ñÕı³£
+	 * @return {bool} è¿æ¥æ˜¯å¦æ­£å¸¸
 	 *  return true if success
 	 */
 	bool ping();
 
 	/**
-	 * ²âÊÔÓÃÃüÁî£¬ÈÃ redis-server »ØÏÔ¸ø¶¨×Ö·û´®
+	 * æµ‹è¯•ç”¨å‘½ä»¤ï¼Œè®© redis-server å›æ˜¾ç»™å®šå­—ç¬¦ä¸²
 	 * ECHO command, request redis-server to echo something.
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  return true if success
 	 */
 	bool echo(const char* s);
 
 	/**
-	 * ¹Ø±Õ redis Á¬½Ó
+	 * å…³é—­ redis è¿æ¥
 	 * QUIT command to close the redis connection
 	 * @return {bool}
 	 *  return true if success

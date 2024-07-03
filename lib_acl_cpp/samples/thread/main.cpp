@@ -92,7 +92,7 @@ static void test_thread3(void)
 
 int main(void)
 {
-	// ³õÊ¼»¯ acl ¿â
+	// Â³ÃµÃŠÂ¼Â»Â¯ acl Â¿Ã¢
 	acl::acl_cpp_init();
 
 	test_thread();

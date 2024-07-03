@@ -17,7 +17,7 @@ static void http_proxy_req_get(HTTP_CLIENT *http_client);
 
 /*---------------------------------------------------------------------------*/
 
-/* µ±Ç°ÇëÇó´¦ÀíÍê±Ï, ÊÇ·ñ¼ÌĞøÏÂÒ»¸ö¿Í»§¶ËÇëÇó? */
+/* å½“å‰è¯·æ±‚å¤„ç†å®Œæ¯•, æ˜¯å¦ç»§ç»­ä¸‹ä¸€ä¸ªå®¢æˆ·ç«¯è¯·æ±‚? */
 
 static void http_proxy_server_complete(HTTP_CLIENT *http_client, int keep_alive)
 {
@@ -35,31 +35,31 @@ static void http_proxy_server_complete(HTTP_CLIENT *http_client, int keep_alive)
 	}
 
 	server = http_client->entry.server;
-	/* ÊÇ·ñÓ¦Óë·şÎñ¶Ë±£³Ö³¤Á¬½Ó? */
+	/* æ˜¯å¦åº”ä¸æœåŠ¡ç«¯ä¿æŒé•¿è¿æ¥? */
 	if (server == NULL) {
 		return;
 	}
 
-	/* ÏÈ½ûÖ¹¶Ô¸ÃÒì²½Á÷¼ÌĞø¼àÌı */
+	/* å…ˆç¦æ­¢å¯¹è¯¥å¼‚æ­¥æµç»§ç»­ç›‘å¬ */
 	acl_aio_disable_readwrite(server);
 
-	/* Çå³ıÒì²½Á÷µÄËùÓĞ¹´×Ó»Øµ÷º¯Êı£¬·ÀÖ¹ÔÚÁ÷½áÊøºó»Øµ÷±»µ÷ÓÃ */
+	/* æ¸…é™¤å¼‚æ­¥æµçš„æ‰€æœ‰å‹¾å­å›è°ƒå‡½æ•°ï¼Œé˜²æ­¢åœ¨æµç»“æŸåå›è°ƒè¢«è°ƒç”¨ */
 	acl_aio_clean_hooks(server);
 
 	sstream = acl_aio_vstream(server);
 
 	if (keep_alive) {
 		int   timeout = 60;
-		/* Óë·şÎñ¶ËÁ÷·ÖÀë */
+		/* ä¸æœåŠ¡ç«¯æµåˆ†ç¦» */
 		client_entry_detach(&http_client->entry, sstream);
 		ACL_VSTRING_RESET(&server->strbuf);
 
-		/* ½«Óë·şÎñ¶ËµÄÁ¬½ÓÁ÷ÖÃÈëÁ¬½Ó³ØÖĞ */
+		/* å°†ä¸æœåŠ¡ç«¯çš„è¿æ¥æµç½®å…¥è¿æ¥æ± ä¸­ */
 		conn_cache_push_stream(service->service.conn_cache,
 				server, timeout, NULL, NULL);
 	} else {
 		client_entry_detach(&http_client->entry, sstream);
-		/* ¹Ø±ÕÒì²½Á÷ */
+		/* å…³é—­å¼‚æ­¥æµ */
 		acl_aio_iocp_close(server);
 	}
 }
@@ -68,11 +68,11 @@ static void http_proxy_client_complete(HTTP_CLIENT *http_client, int keep_alive)
 {
 	ACL_ASTREAM *client;
 
-	/* ÖØÖÃÖØÊÔ´ÎÊı */
+	/* é‡ç½®é‡è¯•æ¬¡æ•° */
 	http_client->entry.nretry_on_error = 0;
 	http_client->entry.ip_ntry = 0;
 
-	/* Çå³ı±¾´Î»á»°Íê³É±êÖ¾Î» */
+	/* æ¸…é™¤æœ¬æ¬¡ä¼šè¯å®Œæˆæ ‡å¿—ä½ */
 	http_client->flag &= ~HTTP_FLAG_FINISH;
 
 	client = http_client->entry.client;
@@ -80,10 +80,10 @@ static void http_proxy_client_complete(HTTP_CLIENT *http_client, int keep_alive)
 		return;
 	}
 
-	/* Çå³ıÒì²½Á÷µÄËùÓĞ¹´×Ó»Øµ÷º¯Êı£¬·ÀÖ¹ÔÚÁ÷½áÊøºó»Øµ÷±»µ÷ÓÃ */
+	/* æ¸…é™¤å¼‚æ­¥æµçš„æ‰€æœ‰å‹¾å­å›è°ƒå‡½æ•°ï¼Œé˜²æ­¢åœ¨æµç»“æŸåå›è°ƒè¢«è°ƒç”¨ */
 	acl_aio_clean_hooks(client);
 
-	/* ÊÇ·ñÓ¦Óë¿Í»§¶Ë±£³Ö³¤Á¬½Ó? */
+	/* æ˜¯å¦åº”ä¸å®¢æˆ·ç«¯ä¿æŒé•¿è¿æ¥? */
 	if (keep_alive) {
 		if (http_client->req_curr) {
 			http_client_req_free(http_client->req_curr);
@@ -98,24 +98,24 @@ static void http_proxy_client_complete(HTTP_CLIENT *http_client, int keep_alive)
 			http_client->req_curr = NULL;
 		}
 		acl_aio_disable_readwrite(client);
-		/* Óë¿Í»§¶ËÁ÷·ÖÀë */
+		/* ä¸å®¢æˆ·ç«¯æµåˆ†ç¦» */
 		client_entry_detach(&http_client->entry, cstream);
-		/* ¹Ø±ÕÀÏµÄÒì²½Á÷ */
+		/* å…³é—­è€çš„å¼‚æ­¥æµ */
 		acl_aio_iocp_close(client);
 	}
 }
 
 static void http_proxy_complete(HTTP_CLIENT *http_client, int error_happen)
 {
-	/* ĞèÒªÌáÇ°ÖªµÀ·şÎñ¶ËÁ÷ºÍ¿Í»§¶ËÁ÷ÊÇ·ñÒÑ¾­±»·ÖÀë£¬ÒòÎªÏÂÃæ¾­¹ı
-	 * http_proxy_server_complete »ò http_proxy_client_complte ºó
-	 * http_client ËùÕ¼ÄÚ´æ¿ÉÄÜÒÑ¾­±»ÊÍ·Å£¬ÕâÑùÌáÇ°ÖªµÀ·şÎñ¶Ë/¿Í»§
-	 * ¶ËÁ÷µÄ×´Ì¬¿ÉÒÔ±ÜÃâÄÚ´æ·Ç·¨·ÃÎÊ
+	/* éœ€è¦æå‰çŸ¥é“æœåŠ¡ç«¯æµå’Œå®¢æˆ·ç«¯æµæ˜¯å¦å·²ç»è¢«åˆ†ç¦»ï¼Œå› ä¸ºä¸‹é¢ç»è¿‡
+	 * http_proxy_server_complete æˆ– http_proxy_client_complte å
+	 * http_client æ‰€å å†…å­˜å¯èƒ½å·²ç»è¢«é‡Šæ”¾ï¼Œè¿™æ ·æå‰çŸ¥é“æœåŠ¡ç«¯/å®¢æˆ·
+	 * ç«¯æµçš„çŠ¶æ€å¯ä»¥é¿å…å†…å­˜éæ³•è®¿é—®
 	 */
 	int  server_null = http_client->entry.server == NULL;
 	int  client_null = http_client->entry.client == NULL;
 
-	/* ÅĞ¶¨·şÎñ¶ËÁ÷ÊÇ·ñÓ¦±£³Ö³¤Á¬½Ó */
+	/* åˆ¤å®šæœåŠ¡ç«¯æµæ˜¯å¦åº”ä¿æŒé•¿è¿æ¥ */
 
 	if (var_cfg_http_server_keepalive && !error_happen
 		&& http_client->hdr_res
@@ -124,7 +124,7 @@ static void http_proxy_complete(HTTP_CLIENT *http_client, int error_happen)
 		http_client->flag |= HTTP_FLAG_SERVER_KEEP_ALIVE;
 	}
 
-	/* ÅĞ¶¨¿Í»§¶ËÁ÷ÊÇ·ñÓ¦±£³Ö³¤Á¬½Ó */
+	/* åˆ¤å®šå®¢æˆ·ç«¯æµæ˜¯å¦åº”ä¿æŒé•¿è¿æ¥ */
 
 	if (var_cfg_http_client_keepalive && !error_happen
 		&& (http_client->flag & HTTP_FLAG_SERVER_KEEP_ALIVE)
@@ -137,14 +137,14 @@ static void http_proxy_complete(HTTP_CLIENT *http_client, int error_happen)
 		http_client->flag &= ~HTTP_FLAG_CLIENT_KEEP_ALIVE;
 	}
 
-	/* Èç¹û·şÎñ¶ËÁ÷´¦ÓÚËø¶¨×´Ì¬Ôò²»Á¢¼´¹Ø±Õ·şÎñ¶ËÁ÷ */
+	/* å¦‚æœæœåŠ¡ç«¯æµå¤„äºé”å®šçŠ¶æ€åˆ™ä¸ç«‹å³å…³é—­æœåŠ¡ç«¯æµ */
 
 	if (!server_null && !(http_client->flag & HTTP_FLAG_SERVER_LOCKED)) {
 		http_proxy_server_complete(http_client,
 			(http_client->flag & HTTP_FLAG_SERVER_KEEP_ALIVE));
 	}
 
-	/* Èç¹û¿Í»§¶ËÁ÷´¦ÓÚËø¶¨×´Ì¬Ôò²»Á¢¼´¹Ø±Õ¿Í»§¶ËÁ÷ */
+	/* å¦‚æœå®¢æˆ·ç«¯æµå¤„äºé”å®šçŠ¶æ€åˆ™ä¸ç«‹å³å…³é—­å®¢æˆ·ç«¯æµ */
 
 	if (!client_null && !(http_client->flag & HTTP_FLAG_CLIENT_LOCKED)) {
 		http_proxy_client_complete(http_client,
@@ -154,16 +154,16 @@ static void http_proxy_complete(HTTP_CLIENT *http_client, int error_happen)
 
 /*---------------------------------------------------------------------------*/
 
-/* ·¢ËÍÏìÓ¦Êı¾İÖÁ¿Í»§¶Ë£¬ÎªÁË¼õÉÙIO´ÎÊı£¬ºÏ²¢ÏìÓ¦Í·Í¬ÏìÓ¦ÌåÊı¾İÒ»Æğ·¢ËÍ */
+/* å‘é€å“åº”æ•°æ®è‡³å®¢æˆ·ç«¯ï¼Œä¸ºäº†å‡å°‘IOæ¬¡æ•°ï¼Œåˆå¹¶å“åº”å¤´åŒå“åº”ä½“æ•°æ®ä¸€èµ·å‘é€ */
 
 static void send_to_client(HTTP_CLIENT *http_client, char *data, int dlen)
 {
 	int   hdr_len = (int) LEN(http_client->buf);
 
-	/* ÊÇ·ñÁ¬Í¬HTTPÏìÓ¦Í·Ò»Æğ·¢ËÍ? */
+	/* æ˜¯å¦è¿åŒHTTPå“åº”å¤´ä¸€èµ·å‘é€? */
 	if (hdr_len > 0) {
-		/* ½«HTTPÏìÓ¦Í·ºÍÒ»²¿·ÖÊı¾İÌåÒ»Æğ·¢ËÍ,
-		 * ÕâÑù¿ÉÒÔ¼õÉÙ IO Ğ´´ÎÊı
+		/* å°†HTTPå“åº”å¤´å’Œä¸€éƒ¨åˆ†æ•°æ®ä½“ä¸€èµ·å‘é€,
+		 * è¿™æ ·å¯ä»¥å‡å°‘ IO å†™æ¬¡æ•°
 		 */
 
 		struct iovec iov[2];
@@ -173,21 +173,21 @@ static void send_to_client(HTTP_CLIENT *http_client, char *data, int dlen)
 		iov[1].iov_base = (char*) data;
 		iov[1].iov_len  = dlen;
 
-		/* ±ØĞëÌá½»½«»º³åÇøÌáÇ°¸´Î»£¬µ«²»Ó°ÏìÄÚ²¿Êı¾İ */
+		/* å¿…é¡»æäº¤å°†ç¼“å†²åŒºæå‰å¤ä½ï¼Œä½†ä¸å½±å“å†…éƒ¨æ•°æ® */
 		ACL_VSTRING_RESET(http_client->buf);
-		/* ½«¿Í»§¶ËÁ÷¼ÓËø£¬·ÀÖ¹±»ÌáÇ°¹Ø±Õ */
+		/* å°†å®¢æˆ·ç«¯æµåŠ é”ï¼Œé˜²æ­¢è¢«æå‰å…³é—­ */
 		http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 		acl_aio_writev(http_client->entry.client, iov, 2);
 	} else {
-		/* ÏìÓ¦Í·ÒÑ¾­·¢ËÍ£¬´Ë´¦½ö·¢ËÍÏìÓ¦Ìå²¿·ÖÊı¾İ */
+		/* å“åº”å¤´å·²ç»å‘é€ï¼Œæ­¤å¤„ä»…å‘é€å“åº”ä½“éƒ¨åˆ†æ•°æ® */
 
-		/* ½«¿Í»§¶ËÁ÷¼ÓËø£¬·ÀÖ¹±»ÌáÇ°¹Ø±Õ */
+		/* å°†å®¢æˆ·ç«¯æµåŠ é”ï¼Œé˜²æ­¢è¢«æå‰å…³é—­ */
 		http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 		acl_aio_writen(http_client->entry.client, data, dlen);
 	}
 }
 
-/* »ñµÃ·şÎñÆ÷HTTPÊı¾İÌå²¢·¢ËÍÖÁä¯ÀÀÆ÷ */
+/* è·å¾—æœåŠ¡å™¨HTTPæ•°æ®ä½“å¹¶å‘é€è‡³æµè§ˆå™¨ */
 
 static void forward_respond_body_data(HTTP_CLIENT *http_client,
 	char *data, int dlen)
@@ -201,13 +201,13 @@ static void forward_respond_body_data(HTTP_CLIENT *http_client,
 	void *plugin_res_ctx = http_client->plugin_res_ctx;
 	HTTP_SERVICE *service = (HTTP_SERVICE*) http_client->entry.service;
 
-	/* ±éÀúËùÓĞµÄÊı¾İÌå¹ıÂËÆ÷ */
+	/* éå†æ‰€æœ‰çš„æ•°æ®ä½“è¿‡æ»¤å™¨ */
 	acl_foreach(iter, &service->respond_dat_plugins) {
 		HTTP_PLUGIN *tmp = (HTTP_PLUGIN*) iter.data;
 		int  stop = 0, ret;
 		ptr = tmp->data_filter(data_ptr, dlen, &ret, &stop, plugin_res_ctx);
 
-		/* ÊÍ·ÅÇ°Ò»¸ö¹ıÂËÆ÷·ÖÅäµÄ¶¯Ì¬ÄÚ´æ */
+		/* é‡Šæ”¾å‰ä¸€ä¸ªè¿‡æ»¤å™¨åˆ†é…çš„åŠ¨æ€å†…å­˜ */
 		if (last_plugin_buf && last_plugin_buf != data_saved && last_plugin_free)
 			last_plugin_free(last_plugin_buf, plugin_res_ctx);
 
@@ -224,16 +224,16 @@ static void forward_respond_body_data(HTTP_CLIENT *http_client,
 			break;
 	}
 
-	/* Ïò¿Í»§¶ËĞ´Êı¾İ */
+	/* å‘å®¢æˆ·ç«¯å†™æ•°æ® */
 	if (dlen > 0 && data)
 		send_to_client(http_client, data, dlen);
 
-	/* ÊÍ·ÅÇ°Ò»¸ö¹ıÂËÆ÷·ÖÅäµÄ¶¯Ì¬ÄÚ´æ */
+	/* é‡Šæ”¾å‰ä¸€ä¸ªè¿‡æ»¤å™¨åˆ†é…çš„åŠ¨æ€å†…å­˜ */
 	if (last_plugin_buf && last_plugin_buf != data_saved && last_plugin_free)
 		last_plugin_free(last_plugin_buf, plugin_res_ctx);
 }
 
-/* ³É¹¦´Ó·şÎñÆ÷¶Áµ½ÏìÓ¦ÌåÊı¾İµÄ»Øµ÷º¯Êı */
+/* æˆåŠŸä»æœåŠ¡å™¨è¯»åˆ°å“åº”ä½“æ•°æ®çš„å›è°ƒå‡½æ•° */
 
 static int read_respond_body_ready(int status, char *data, int dlen, void *arg)
 {
@@ -241,9 +241,9 @@ static int read_respond_body_ready(int status, char *data, int dlen, void *arg)
 
 acl_msg_info("%s(%d)", __FUNCTION__, __LINE__); /* only for test */
 	if (data == NULL || dlen <= 0) {
-		/* È¡Ïû·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
-		/* ÉèÖÃ»á»°Íê³É±êÖ¾Î» */
+		/* è®¾ç½®ä¼šè¯å®Œæˆæ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_FINISH;
 		http_proxy_complete(http_client, -1);
 		return (-1);
@@ -251,39 +251,39 @@ acl_msg_info("%s(%d)", __FUNCTION__, __LINE__); /* only for test */
 
 	http_client->total_size += dlen;
 
-	/* client Á÷ÓĞ¿ÉÄÜ±»ÌáÇ°¹Ø±ÕÁË */
+	/* client æµæœ‰å¯èƒ½è¢«æå‰å…³é—­äº† */
 	if (http_client->entry.client == NULL) {
-		/* È¡Ïû·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
-		/* ÉèÖÃ»á»°Íê³É±êÖ¾Î» */
+		/* è®¾ç½®ä¼šè¯å®Œæˆæ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_FINISH;
 		http_proxy_complete(http_client, -1);
 		return (-1);
 	}
 
 	if (status >= HTTP_CHAT_ERR_MIN) {
-		/* È¡Ïû·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
-		/* ÉèÖÃ»á»°Íê³É±êÖ¾Î» */
+		/* è®¾ç½®ä¼šè¯å®Œæˆæ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_FINISH;
 		http_proxy_complete(http_client, -1);
 		return (-1);
 	} else if (status == HTTP_CHAT_OK) {
-		/* ÉèÖÃ»á»°Íê³É±êÖ¾Î» */
+		/* è®¾ç½®ä¼šè¯å®Œæˆæ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_FINISH;
 #if 1
-		/* È¡Ïû·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 #endif
 	}
 
-	/* Èç¹û HTTP_FLAG_FINISH ±êÖ¾ÉèÖÃ£¬Ôò»áÔÚ forward_respond_body_data Ö®ºó
-	 * »Øµ÷º¯Êı send_respond_body_complete µ÷ÓÃ http_proxy_complete
+	/* å¦‚æœ HTTP_FLAG_FINISH æ ‡å¿—è®¾ç½®ï¼Œåˆ™ä¼šåœ¨ forward_respond_body_data ä¹‹å
+	 * å›è°ƒå‡½æ•° send_respond_body_complete è°ƒç”¨ http_proxy_complete
 	 */
 	forward_respond_body_data(http_client, data, dlen);
 #if 0
 	if (status == HTTP_CHAT_OK) {
-		/* È¡Ïû·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 		http_proxy_complete(http_client, 0);
 	}
@@ -292,18 +292,18 @@ acl_msg_info("%s(%d)", __FUNCTION__, __LINE__); /* only for test */
 	return (0);
 }
 
-/* ·¢ËÍÏìÓ¦ÌåÊı¾İÖÁ¿Í»§¶Ë, Èç¹ûÈ·¶¨ÒÑ¾­·¢ËÍÍê×îºóÒ»ÅúÊı¾İÔò´¥·¢½áÊø¹ı³Ì */
+/* å‘é€å“åº”ä½“æ•°æ®è‡³å®¢æˆ·ç«¯, å¦‚æœç¡®å®šå·²ç»å‘é€å®Œæœ€åä¸€æ‰¹æ•°æ®åˆ™è§¦å‘ç»“æŸè¿‡ç¨‹ */
 
 static int send_respond_body_complete(ACL_ASTREAM *client acl_unused, void *ctx)
 {
 	HTTP_CLIENT *http_client = (HTTP_CLIENT *) ctx;
 
-	/* È¡Ïû¿Í»§¶ËÁ÷µÄËø¶¨×´Ì¬, ´Ó¶øÔÊĞíµ±·şÎñÁ÷Òì³£¹Ø±ÕÊ±¿ÉÒÔÔÚ
-	 * on_close_server µÈº¯ÊıÀïµ÷ÓÃ http_proxy_complete Ê±Àï¹Ø±Õ¿Í»§Á÷!
+	/* å–æ¶ˆå®¢æˆ·ç«¯æµçš„é”å®šçŠ¶æ€, ä»è€Œå…è®¸å½“æœåŠ¡æµå¼‚å¸¸å…³é—­æ—¶å¯ä»¥åœ¨
+	 * on_close_server ç­‰å‡½æ•°é‡Œè°ƒç”¨ http_proxy_complete æ—¶é‡Œå…³é—­å®¢æˆ·æµ!
 	 */
 	http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
 
-	/* Èç¹ûÊÇ×îºóµÄÊı¾İÔòÍê³É±¾´Î»á»°¹ı³Ì */
+	/* å¦‚æœæ˜¯æœ€åçš„æ•°æ®åˆ™å®Œæˆæœ¬æ¬¡ä¼šè¯è¿‡ç¨‹ */
 	if ((http_client->flag & HTTP_FLAG_FINISH)) {
 		if ((http_client->flag & HTTP_FLAG_SERVER_CLOSED))
 			http_proxy_complete(http_client, -1);
@@ -313,28 +313,28 @@ static int send_respond_body_complete(ACL_ASTREAM *client acl_unused, void *ctx)
 	return (0);
 }
 
-/* ´«Êä·şÎñÆ÷ÏìÓ¦HTTPÊı¾İÌåÖÁä¯ÀÀÆ÷
- * µ÷ÓÃ¸Ã¹ı³ÌµÄº¯ÊıĞèÒª×¢ÒâÁ÷¹Ø±Õ±£»¤´ëÊ©
+/* ä¼ è¾“æœåŠ¡å™¨å“åº”HTTPæ•°æ®ä½“è‡³æµè§ˆå™¨
+ * è°ƒç”¨è¯¥è¿‡ç¨‹çš„å‡½æ•°éœ€è¦æ³¨æ„æµå…³é—­ä¿æŠ¤æªæ–½
  */
 
 static void forward_respond_hdr_body(HTTP_CLIENT *http_client)
 {
-	/* ´´½¨HTTPÏìÓ¦Ìå¶ÔÏó */
+	/* åˆ›å»ºHTTPå“åº”ä½“å¯¹è±¡ */
 	http_client->res = http_res_new(http_client->hdr_res);
 
-	/* Èç¹ûÏò¿Í»§Á÷·¢ËÍÏìÓ¦ÌåÊ§°Ü»á×Ô¶¯µ÷ÓÃÔÚ send_request_hdr_complete
-	 * ÀïÕë¶Ô¿Í»§Á÷ÉèÖÃµÄ»Øµ÷º¯Êı on_close_clinet
+	/* å¦‚æœå‘å®¢æˆ·æµå‘é€å“åº”ä½“å¤±è´¥ä¼šè‡ªåŠ¨è°ƒç”¨åœ¨ send_request_hdr_complete
+	 * é‡Œé’ˆå¯¹å®¢æˆ·æµè®¾ç½®çš„å›è°ƒå‡½æ•° on_close_clinet
 	 */
 
-	/* ÉèÖÃÏò¿Í»§Á÷·¢ËÍÊı¾İ³É¹¦µÄ»Øµ÷º¯Êı */
+	/* è®¾ç½®å‘å®¢æˆ·æµå‘é€æ•°æ®æˆåŠŸçš„å›è°ƒå‡½æ•° */
 	acl_aio_add_write_hook(http_client->entry.client,
 		send_respond_body_complete, http_client);
 
-	/* ½«·şÎñ¶ËÁ÷ÖÃÓÚËø¶¨×´Ì¬, ´Ó¶ø·ÀÖ¹±»ÌáÇ°¹Ø±Õ */
+	/* å°†æœåŠ¡ç«¯æµç½®äºé”å®šçŠ¶æ€, ä»è€Œé˜²æ­¢è¢«æå‰å…³é—­ */
 	http_client->flag |= HTTP_FLAG_SERVER_LOCKED;
 
 acl_msg_info("%s(%d)", __FUNCTION__, __LINE__); /* only for test */
-	/* ¿ªÊ¼´Ó·şÎñÆ÷¶ÁÈ¡HTTPÊı¾İÌåÊı¾İ */
+	/* å¼€å§‹ä»æœåŠ¡å™¨è¯»å–HTTPæ•°æ®ä½“æ•°æ® */
 	http_res_body_get_async(http_client->res,
 		http_client->entry.server,
 		read_respond_body_ready,
@@ -342,14 +342,14 @@ acl_msg_info("%s(%d)", __FUNCTION__, __LINE__); /* only for test */
 		http_client->entry.service->rw_timeout);
 }
 
-/* ·¢ËÍ·şÎñÆ÷ÏìÓ¦Í·ÖÁä¯ÀÀÆ÷ */
+/* å‘é€æœåŠ¡å™¨å“åº”å¤´è‡³æµè§ˆå™¨ */
 
 static int send_respond_hdr_complete(ACL_ASTREAM *client acl_unused, void *ctx)
 {
 	const char *myname = "send_respond_hdr_complete";
 	HTTP_CLIENT *http_client = (HTTP_CLIENT *) ctx;
 
-	/* È¡Ïû¿Í»§¶ËÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆå®¢æˆ·ç«¯æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
 
 	if (http_client->hdr_res == NULL) {
@@ -358,21 +358,21 @@ static int send_respond_hdr_complete(ACL_ASTREAM *client acl_unused, void *ctx)
 		return (0);
 	}
 
-	/* ÒòÎª½øÈë´Ëº¯Êıºó client µÄÒıÓÃÖµÒÑ¾­±» acl_aio_xxx ×Ô¶¯¼Ó1ÁË£¬
-	 * ËùÒÔÒ²Ğí²»±Øµ£ĞÄÖØ¸´¹Ø±ÕÁ÷µÄÏÖÏó·¢Éú
+	/* å› ä¸ºè¿›å…¥æ­¤å‡½æ•°å client çš„å¼•ç”¨å€¼å·²ç»è¢« acl_aio_xxx è‡ªåŠ¨åŠ 1äº†ï¼Œ
+	 * æ‰€ä»¥ä¹Ÿè®¸ä¸å¿…æ‹…å¿ƒé‡å¤å…³é—­æµçš„ç°è±¡å‘ç”Ÿ
 	 */
 	http_proxy_complete(http_client, 0);
 	return (0);
 }
 
-/* ½ö forward ÏìÓ¦Í·£¬ÒòÎªÃ»ÓĞÏìÓ¦Ìå */
+/* ä»… forward å“åº”å¤´ï¼Œå› ä¸ºæ²¡æœ‰å“åº”ä½“ */
 
 static void forward_respond_hdr(HTTP_CLIENT *http_client)
 {
 	acl_aio_add_write_hook(http_client->entry.client,
 		send_respond_hdr_complete, http_client);
 
-	/* Éè¶¨¿Í»§¶ËÁ÷ÎªËø¶¨×´Ì¬ */
+	/* è®¾å®šå®¢æˆ·ç«¯æµä¸ºé”å®šçŠ¶æ€ */
 	http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 
 	acl_aio_writen(http_client->entry.client,
@@ -382,7 +382,7 @@ static void forward_respond_hdr(HTTP_CLIENT *http_client)
 
 static void start_forward_respond(HTTP_CLIENT *http_client)
 {
-	/* ÊÇ·ñÓë·şÎñ¶Ë±£³Ö³¤Á¬½Ó? */
+	/* æ˜¯å¦ä¸æœåŠ¡ç«¯ä¿æŒé•¿è¿æ¥? */
 	if (!var_cfg_http_client_keepalive) {
 		http_hdr_entry_replace(&http_client->hdr_res->hdr,
 			"Connection", "close", 1);
@@ -397,10 +397,10 @@ static void start_forward_respond(HTTP_CLIENT *http_client)
 			"Proxy-Connection", "keep-alive", 0);
 	}
 
-	/* ÖØĞÂ×é³ÉHTTPÏìÓ¦Í· */
+	/* é‡æ–°ç»„æˆHTTPå“åº”å¤´ */
 	http_hdr_build(&http_client->hdr_res->hdr, http_client->buf);
 
-	/* ¶ÔÓÚ 3xx, 4xx µÄ·şÎñÆ÷ÏìÓ¦£¬²»Ó¦ÓĞÊı¾İÌå²¿·Ö */
+	/* å¯¹äº 3xx, 4xx çš„æœåŠ¡å™¨å“åº”ï¼Œä¸åº”æœ‰æ•°æ®ä½“éƒ¨åˆ† */
 
 	if (http_client->hdr_res->hdr.content_length == 0
 	    || (http_client->hdr_res->hdr.content_length == -1
@@ -408,23 +408,23 @@ static void start_forward_respond(HTTP_CLIENT *http_client)
 		&& http_client->hdr_res->reply_status > 300
 		&& http_client->hdr_res->reply_status < 400))
 	{
-		/* Èç¹ûÃ»ÓĞÊı¾İÌå£¬Ôò½ö·µ»ØÊı¾İÍ· */
+		/* å¦‚æœæ²¡æœ‰æ•°æ®ä½“ï¼Œåˆ™ä»…è¿”å›æ•°æ®å¤´ */
 		forward_respond_hdr(http_client);
 		return;
 	}
 
-	/* ½«Êı¾İÍ·Á¬Í¬Ò»²¿·ÖÊı¾İÌåÒ»Æğ·¢ËÍ¸ø¿Í»§¶Ë£¬´Ó¶ø¼õÉÙio´ÎÊı */
+	/* å°†æ•°æ®å¤´è¿åŒä¸€éƒ¨åˆ†æ•°æ®ä½“ä¸€èµ·å‘é€ç»™å®¢æˆ·ç«¯ï¼Œä»è€Œå‡å°‘ioæ¬¡æ•° */
 
-	/* xxx: ¶ÔÓÚÃ»ÓĞ content-length »ò content-length > 0
-	 * ¼°·şÎñÆ÷ÏìÓ¦×´Ì¬Âë²»Îª 3xx, 4xx µÄÇé¿ö
+	/* xxx: å¯¹äºæ²¡æœ‰ content-length æˆ– content-length > 0
+	 * åŠæœåŠ¡å™¨å“åº”çŠ¶æ€ç ä¸ä¸º 3xx, 4xx çš„æƒ…å†µ
 	 */
 	forward_respond_hdr_body(http_client);
 }
 
 /**
- * Õë¶ÔHTTPÏìÓ¦Í·µÄ¹ıÂËÆ÷´¦Àí¹ı³Ì£¬Èç¹û¸ù¾İ¸ÃÏìÓ¦Í·¹ıÂËÆ÷¾ö¶¨ÍêÈ«½Ó¹Ü
- * ¸ÃÏìÓ¦ÔòÖ÷³ÌĞò²»ÔÙ´¦Àí¸Ã·şÎñ¶ËÁ÷¼°¿Í»§¶ËÁ÷
- * ·µ»Ø 0 ±íÊ¾ËùÓĞ¹ıÂËÆ÷¾ù²»½Ó¹Ü¸ÃÏìÓ¦, ·ñÔò±íÊ¾½Ó¹Ü
+ * é’ˆå¯¹HTTPå“åº”å¤´çš„è¿‡æ»¤å™¨å¤„ç†è¿‡ç¨‹ï¼Œå¦‚æœæ ¹æ®è¯¥å“åº”å¤´è¿‡æ»¤å™¨å†³å®šå®Œå…¨æ¥ç®¡
+ * è¯¥å“åº”åˆ™ä¸»ç¨‹åºä¸å†å¤„ç†è¯¥æœåŠ¡ç«¯æµåŠå®¢æˆ·ç«¯æµ
+ * è¿”å› 0 è¡¨ç¤ºæ‰€æœ‰è¿‡æ»¤å™¨å‡ä¸æ¥ç®¡è¯¥å“åº”, å¦åˆ™è¡¨ç¤ºæ¥ç®¡
  */
 static int reply_plugin_takeover(HTTP_CLIENT *http_client)
 {
@@ -433,10 +433,10 @@ static int reply_plugin_takeover(HTTP_CLIENT *http_client)
 	HTTP_PLUGIN *plugin = NULL;
 	ACL_ITER iter;
 
-	/* xxx: plugin_res_ctx ¸Ã²ÎÊıÔÚÃ¿´ÎÇëÇó¶¼ÓĞ¿ÉÄÜ²»Ò»Ñù, Íâ¹ÒÄ£¿éÓ¦¸Ã×ÔĞĞ¹ÜÀí */
+	/* xxx: plugin_res_ctx è¯¥å‚æ•°åœ¨æ¯æ¬¡è¯·æ±‚éƒ½æœ‰å¯èƒ½ä¸ä¸€æ ·, å¤–æŒ‚æ¨¡å—åº”è¯¥è‡ªè¡Œç®¡ç† */
 	http_client->plugin_res_ctx = NULL;
 
-	/* ±éÀúËùÓĞµÄ²å¼ş»Øµ÷´¦Àíº¯Êı */
+	/* éå†æ‰€æœ‰çš„æ’ä»¶å›è°ƒå¤„ç†å‡½æ•° */
 
 	acl_foreach(iter, &service->respond_plugins) {
 		ACL_ASTREAM *client = http_client->entry.client;
@@ -464,7 +464,7 @@ static int reply_plugin_takeover(HTTP_CLIENT *http_client)
 		HTTP_HDR_RES *hdr_res;
 		void *plugin_res_ctx = http_client->plugin_res_ctx;
 
-		/* ½« http_client ÖĞµÄ hdr_req/hdr_res ÖÃ¿Õ */
+		/* å°† http_client ä¸­çš„ hdr_req/hdr_res ç½®ç©º */
 		if (http_client->req_curr) {
 			hdr_req = http_client->req_curr->hdr_req;
 			http_client->req_curr->hdr_req = NULL;
@@ -478,45 +478,45 @@ static int reply_plugin_takeover(HTTP_CLIENT *http_client)
 		hdr_res = http_client->hdr_res;
 		http_client->hdr_res = NULL;
 
-		/* ½«¿Í»§¶ËÊı¾İÁ÷Óë¸Ã´úÀí¶ÔÏó·ÖÀë */
+		/* å°†å®¢æˆ·ç«¯æ•°æ®æµä¸è¯¥ä»£ç†å¯¹è±¡åˆ†ç¦» */
 		client_entry_detach(&http_client->entry, client_stream);
 
-		/* ½«·şÎñ¶ËÊı¾İÓë¸Ã´úÀí¶ÔÏó·ÖÀë */
-		/* ÒòÎª entry ´úÀí¶ÔÏóµÄÒıÓÃ¼ÆÊıÎª0£¬ËùÒÔÆä»áÔÚ¸Ã·ÖÀëº¯Êı
-		 * ÖĞ×Ô¶¯±»ÊÍ·Å
+		/* å°†æœåŠ¡ç«¯æ•°æ®ä¸è¯¥ä»£ç†å¯¹è±¡åˆ†ç¦» */
+		/* å› ä¸º entry ä»£ç†å¯¹è±¡çš„å¼•ç”¨è®¡æ•°ä¸º0ï¼Œæ‰€ä»¥å…¶ä¼šåœ¨è¯¥åˆ†ç¦»å‡½æ•°
+		 * ä¸­è‡ªåŠ¨è¢«é‡Šæ”¾
 		 */
 		client_entry_detach(&http_client->entry, server_stream);
 
-		/* ½ûÖ¹Òì²½Á÷µÄ¶Á/Ğ´¼à¿Ø */
+		/* ç¦æ­¢å¼‚æ­¥æµçš„è¯»/å†™ç›‘æ§ */
 		acl_aio_disable_readwrite(client);
 		acl_aio_disable_readwrite(server);
 
-		/* Çå³ı»Øµ÷º¯Êı */
+		/* æ¸…é™¤å›è°ƒå‡½æ•° */
 		acl_aio_clean_hooks(client);
 		acl_aio_clean_hooks(server);
 
-		/* ½«¿Í»§¶ËÒì²½Á÷µÄÊı¾İÁ÷ÖÃ¿Õ */
+		/* å°†å®¢æˆ·ç«¯å¼‚æ­¥æµçš„æ•°æ®æµç½®ç©º */
 		acl_aio_ctl(client, ACL_AIO_CTL_STREAM, NULL, ACL_AIO_CTL_END);
-		/* ½«·şÎñ¶ËÒì²½Á÷µÄÊı¾İÁ÷ÖÃ¿Õ */
+		/* å°†æœåŠ¡ç«¯å¼‚æ­¥æµçš„æ•°æ®æµç½®ç©º */
 		acl_aio_ctl(server, ACL_AIO_CTL_STREAM, NULL, ACL_AIO_CTL_END);
 
-		/* xxx: Òì²½¹Ø±Õ client/server Òì²½Á÷ */
+		/* xxx: å¼‚æ­¥å…³é—­ client/server å¼‚æ­¥æµ */
 		acl_aio_iocp_close(client);
 		acl_aio_iocp_close(server);
 
-		/* ±ØĞëÁ÷ÓÉ·Ç×èÈûÄ£Ê½×ª»»Îª×èÈûÄ£Ê½ */
+		/* å¿…é¡»æµç”±éé˜»å¡æ¨¡å¼è½¬æ¢ä¸ºé˜»å¡æ¨¡å¼ */
 		acl_non_blocking(ACL_VSTREAM_SOCK(client_stream), ACL_BLOCKING);
 		acl_non_blocking(ACL_VSTREAM_SOCK(server_stream), ACL_BLOCKING);
 
-		/* µ÷ÓÃÔÚ·Ç×èÈûÍ¨ĞÅÊ±ÉèÖÃµÄ¹Ø±Õ»Øµ÷º¯Êı²¢Çå³ıÖ® */
+		/* è°ƒç”¨åœ¨éé˜»å¡é€šä¿¡æ—¶è®¾ç½®çš„å…³é—­å›è°ƒå‡½æ•°å¹¶æ¸…é™¤ä¹‹ */
 		acl_vstream_call_close_handles(client_stream);
 		acl_vstream_call_close_handles(server_stream);
 
-		/* ÖÁ´Ë£¬ÒÑ¾­½«¿Í»§¶ËÊı¾İÁ÷ÓÉ·Ç×èÈûÄ£Ê½×ª»»Îª×èÈûÄ£Ê½£¬Í¬Ê±¹Ø±Õ
-		 * ÁËÓë·şÎñ¶ËµÄÁ¬½ÓÁ÷£¬½«¸ÃÁ¬½ÓÇëÇó×ª¸øÏà¹Ø´úÀíÄ£¿é´¦Àí£¬Òì²½
-		 * ´úÀí²»ÔÙ´úÀí¸Ã¿Í»§¶ËµÄÇëÇó¼°·şÎñ¶ËµÄÏìÓ¦
-		 * ×¢Òâ£ºclient_stream, hdr_res, hdr_res ´Ë´¦²¢Î´ÊÍ·Å£¬
-		 * ĞèÒªÏÂÔØ´úÀíÄ£¿éÏÂÔØÍê±Ïºó×Ô¼ºµ¥¶ÀÊÍ·Å
+		/* è‡³æ­¤ï¼Œå·²ç»å°†å®¢æˆ·ç«¯æ•°æ®æµç”±éé˜»å¡æ¨¡å¼è½¬æ¢ä¸ºé˜»å¡æ¨¡å¼ï¼ŒåŒæ—¶å…³é—­
+		 * äº†ä¸æœåŠ¡ç«¯çš„è¿æ¥æµï¼Œå°†è¯¥è¿æ¥è¯·æ±‚è½¬ç»™ç›¸å…³ä»£ç†æ¨¡å—å¤„ç†ï¼Œå¼‚æ­¥
+		 * ä»£ç†ä¸å†ä»£ç†è¯¥å®¢æˆ·ç«¯çš„è¯·æ±‚åŠæœåŠ¡ç«¯çš„å“åº”
+		 * æ³¨æ„ï¼šclient_stream, hdr_res, hdr_res æ­¤å¤„å¹¶æœªé‡Šæ”¾ï¼Œ
+		 * éœ€è¦ä¸‹è½½ä»£ç†æ¨¡å—ä¸‹è½½å®Œæ¯•åè‡ªå·±å•ç‹¬é‡Šæ”¾
 		 */
 		plugin->forward.respond(client_stream, server_stream,
 				hdr_req, hdr_res, plugin_res_ctx);
@@ -530,7 +530,7 @@ static int http_request_reforward(HTTP_CLIENT *http_client);
 static int read_respond_hdr_timeout(ACL_ASTREAM *server, void *ctx);
 static int read_respond_hdr_error(ACL_ASTREAM *server, void *ctx);
 
-/* »ñµÃ·şÎñÆ÷ÏìÓ¦Í· */
+/* è·å¾—æœåŠ¡å™¨å“åº”å¤´ */
 static void begin_read_respond(HTTP_CLIENT *http_client);
 
 static int get_respond_hdr_ready(int status, void *arg)
@@ -540,7 +540,7 @@ static int get_respond_hdr_ready(int status, void *arg)
 	ACL_ASTREAM *client = http_client->entry.client;
 	ACL_ASTREAM *server = http_client->entry.server;
  
-	/* È¡Ïû·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 
 	/* xxx: sanity check */
@@ -554,9 +554,9 @@ static int get_respond_hdr_ready(int status, void *arg)
 		return (0);
 	}
 
-	/* ĞèÒª¹Ø±ÕÁ½¸ö»Øµ÷º¯Êı£¬·ÀÖ¹´¥·¢ read_respond_hdr_error
-	 * ºÍ read_respond_hdr_timeout ¹ı³Ì(read_respond_hdr_timeout »á´¥·¢
-	 * read_respond_hdr_error), ¶øÔÚ read_respond_hdr_error Àï»áµ÷ÓÃ
+	/* éœ€è¦å…³é—­ä¸¤ä¸ªå›è°ƒå‡½æ•°ï¼Œé˜²æ­¢è§¦å‘ read_respond_hdr_error
+	 * å’Œ read_respond_hdr_timeout è¿‡ç¨‹(read_respond_hdr_timeout ä¼šè§¦å‘
+	 * read_respond_hdr_error), è€Œåœ¨ read_respond_hdr_error é‡Œä¼šè°ƒç”¨
 	 * http_request_reforward
 	 */
 	acl_aio_ctl(server,
@@ -566,48 +566,48 @@ static int get_respond_hdr_ready(int status, void *arg)
 
 acl_msg_info("%s(%d)", __FUNCTION__, __LINE__); /* only for test */
 	if (status != HTTP_CHAT_OK) {
-		/* Èç¹û¶ÁÏìÓ¦Í·³öÏÖ´íÎóÔòĞèÒªÖØÊÔ */
+		/* å¦‚æœè¯»å“åº”å¤´å‡ºç°é”™è¯¯åˆ™éœ€è¦é‡è¯• */
 
-		/* ½øĞĞÖØÊÔ */
+		/* è¿›è¡Œé‡è¯• */
 		if (http_request_reforward(http_client) == 0) {
-			/* Èç¹ûÒÑ¾­¿ªÊ¼ÖØÊÔ¹ı³Ì£¬ÔòÖ±½Ó·µ»Ø */
+			/* å¦‚æœå·²ç»å¼€å§‹é‡è¯•è¿‡ç¨‹ï¼Œåˆ™ç›´æ¥è¿”å› */
 			return (0);
 		}
 
 		http_proxy_complete(http_client, -1);
-		/* xxx: Ó¦¸Ã·µ»Ø 5xx ĞÅÏ¢¸ø¿Í»§¶Ë */
+		/* xxx: åº”è¯¥è¿”å› 5xx ä¿¡æ¯ç»™å®¢æˆ·ç«¯ */
 		return (0);
 	}
 
-	/* ·ÖÎö HTTP ÏìÓ¦Í· */
+	/* åˆ†æ HTTP å“åº”å¤´ */
 
 	if (http_hdr_res_parse(http_client->hdr_res) < 0) {
-		/* Èç¹û·ÖÎöÏìÓ¦Í·Ê§°ÜÔòĞèÒªÖØÊÔ */
+		/* å¦‚æœåˆ†æå“åº”å¤´å¤±è´¥åˆ™éœ€è¦é‡è¯• */
 
 		acl_msg_error("%s: parse hdr_res error", myname);
-		/* ½øĞĞÖØÊÔ */
+		/* è¿›è¡Œé‡è¯• */
 		if (http_request_reforward(http_client) == 0) {
-			/* Èç¹ûÒÑ¾­¿ªÊ¼ÖØÊÔ¹ı³Ì£¬ÔòÖ±½Ó·µ»Ø */
+			/* å¦‚æœå·²ç»å¼€å§‹é‡è¯•è¿‡ç¨‹ï¼Œåˆ™ç›´æ¥è¿”å› */
 			return (0);
 		}
 
 		http_proxy_complete(http_client, -1);
-		/* xxx: Ó¦¸Ã·µ»Ø 5xx ĞÅÏ¢¸ø¿Í»§¶Ë */
+		/* xxx: åº”è¯¥è¿”å› 5xx ä¿¡æ¯ç»™å®¢æˆ·ç«¯ */
 		return (0);
 	}
 
-	/* ºöÂÔ 100 continue µÄ»ØÓ¦ */
+	/* å¿½ç•¥ 100 continue çš„å›åº” */
 	if (http_client->hdr_res->reply_status == 100) {
 		begin_read_respond(http_client);
 		return (0);
 	}
 
-	/* ÅĞ¶ÏÊÇ·ñĞèÒªÓÉÆäËü´úÀíÄ£¿é½Ó¹Ü */
+	/* åˆ¤æ–­æ˜¯å¦éœ€è¦ç”±å…¶å®ƒä»£ç†æ¨¡å—æ¥ç®¡ */
 	if (reply_plugin_takeover(http_client)) {
 		return (0);
 	}
 
-	/* ¿ªÊ¼×ª·¢·şÎñÆ÷·µ»ØµÄÊı¾İ¸ø¿Í»§¶Ë */
+	/* å¼€å§‹è½¬å‘æœåŠ¡å™¨è¿”å›çš„æ•°æ®ç»™å®¢æˆ·ç«¯ */
 	start_forward_respond(http_client);
 	return (0);
 }
@@ -617,38 +617,38 @@ static int read_respond_hdr_timeout(ACL_ASTREAM *server, void *ctx)
 	const char *myname = "read_respond_hdr_timeout";
 	HTTP_CLIENT *http_client = (HTTP_CLIENT *) ctx;
 
-	/* È¡Ïû·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 
-	/* È¡Ïû HTTP ÏìÓ¦Í·µÄ¶Á¹Ø±Õ»Øµ÷º¯Êı */
+	/* å–æ¶ˆ HTTP å“åº”å¤´çš„è¯»å…³é—­å›è°ƒå‡½æ•° */
 	acl_aio_clean_close_hooks(server);
 
 	if (http_client->entry.client == NULL) {
 		acl_msg_warn("%s(%d): client null", myname, __LINE__);
 		http_proxy_complete(http_client, -1);
-		/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ³¬Ê±»Øµ÷º¯Êı */
+		/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„è¶…æ—¶å›è°ƒå‡½æ•° */
 		return (-1);
 	}
 
-	/* ½øĞĞÖØÊÔ */
+	/* è¿›è¡Œé‡è¯• */
 	if (http_request_reforward(http_client) == 0) {
-		/* Èç¹ûÒÑ¾­¿ªÊ¼ÖØÊÔ¹ı³Ì£¬ÔòÖ±½Ó·µ»Ø */
-		/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ³¬Ê±»Øµ÷º¯Êı */
+		/* å¦‚æœå·²ç»å¼€å§‹é‡è¯•è¿‡ç¨‹ï¼Œåˆ™ç›´æ¥è¿”å› */
+		/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„è¶…æ—¶å›è°ƒå‡½æ•° */
 		return (-1);
 	}
 
-	/* Ëø¶¨¿Í»§¶ËÁ÷ */
+	/* é”å®šå®¢æˆ·ç«¯æµ */
 	http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 
-	/* ·µ»Ø¸ø¿Í»§¶Ë¶Á·şÎñ¶ËÏìÓ¦³¬Ê±ĞÅÏ¢ */
+	/* è¿”å›ç»™å®¢æˆ·ç«¯è¯»æœåŠ¡ç«¯å“åº”è¶…æ—¶ä¿¡æ¯ */
 	acl_aio_writen(http_client->entry.client,
 		HTTP_REPLY_TIMEOUT, (int) strlen(HTTP_REPLY_TIMEOUT));
 
-	/* ½âËø¿Í»§¶ËÁ÷ */
+	/* è§£é”å®¢æˆ·ç«¯æµ */
 	http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
 
 	http_proxy_complete(http_client, -1);
-	/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ³¬Ê±»Øµ÷º¯Êı */
+	/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„è¶…æ—¶å›è°ƒå‡½æ•° */
 	return (-1);
 }
 
@@ -657,55 +657,55 @@ static int read_respond_hdr_error(ACL_ASTREAM *server acl_unused, void *ctx)
 	const char *myname = "read_respond_hdr_error";
 	HTTP_CLIENT *http_client = (HTTP_CLIENT *) ctx;
 
-	/* È¡Ïû·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 
 	if (http_client->entry.client == NULL) {
 		acl_msg_warn("%s(%d): client null", myname, __LINE__);
-		/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+		/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 		http_proxy_complete(http_client, -1);
 		return (-1);
 	}
 
-	/* ½øĞĞÖØÊÔ */
+	/* è¿›è¡Œé‡è¯• */
 	if (http_request_reforward(http_client) == 0) {
-		/* Èç¹ûÒÑ¾­¿ªÊ¼ÖØÊÔ¹ı³Ì£¬ÔòÖ±½Ó·µ»Ø */
-		/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+		/* å¦‚æœå·²ç»å¼€å§‹é‡è¯•è¿‡ç¨‹ï¼Œåˆ™ç›´æ¥è¿”å› */
+		/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 		return (-1);
 	}
 
-	/* Ëø¶¨¿Í»§¶ËÁ÷ */
+	/* é”å®šå®¢æˆ·ç«¯æµ */
 	http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 
-	/* ·µ»Ø¸ø¿Í»§¶Ë¶Á·şÎñ¶ËÏìÓ¦³ö´íĞÅÏ¢ */
+	/* è¿”å›ç»™å®¢æˆ·ç«¯è¯»æœåŠ¡ç«¯å“åº”å‡ºé”™ä¿¡æ¯ */
 	acl_aio_writen(http_client->entry.client,
 		HTTP_REPLY_ERROR, (int) strlen(HTTP_REPLY_ERROR));
 
-	/* ½âËø¿Í»§¶ËÁ÷ */
+	/* è§£é”å®¢æˆ·ç«¯æµ */
 	http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
 
 	http_proxy_complete(http_client, -1);
-	/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+	/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 	return (-1);
 }
 
-/* XXX: ¸Ãº¯ÊıĞèÒª´¦ÓÚ¹Ø±Õ±£»¤×´Ì¬£¬¼´µ÷ÓÃ´Ëº¯ÊıµÄº¯ÊıĞèÒª¶Ô·şÎñ¶ËÁ÷¼Ó±£»¤´ëÊ© */
+/* XXX: è¯¥å‡½æ•°éœ€è¦å¤„äºå…³é—­ä¿æŠ¤çŠ¶æ€ï¼Œå³è°ƒç”¨æ­¤å‡½æ•°çš„å‡½æ•°éœ€è¦å¯¹æœåŠ¡ç«¯æµåŠ ä¿æŠ¤æªæ–½ */
 
 static void begin_read_respond(HTTP_CLIENT *http_client)
 {
-	/* Éú³ÉÒ»¸ö HTTP ÏìÓ¦Í· */
+	/* ç”Ÿæˆä¸€ä¸ª HTTP å“åº”å¤´ */
 	http_client->hdr_res = http_hdr_res_new();
 
-	/* Éè¶¨·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* è®¾å®šæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag |= HTTP_FLAG_SERVER_LOCKED;
 
-	/* ÉèÖÃ´Ó·şÎñÆ÷µÄ¶Á´íÎó¼°¶Á³¬Ê±µÄ»Øµ÷º¯Êı */
+	/* è®¾ç½®ä»æœåŠ¡å™¨çš„è¯»é”™è¯¯åŠè¯»è¶…æ—¶çš„å›è°ƒå‡½æ•° */
 	acl_aio_ctl(http_client->entry.server,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, read_respond_hdr_error, http_client,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, read_respond_hdr_timeout, http_client,
 		ACL_AIO_CTL_END);
 
-	/* ¿ªÊ¼¶Á·şÎñ¶ËµÄ HTTP ÏìÓ¦Í· */
+	/* å¼€å§‹è¯»æœåŠ¡ç«¯çš„ HTTP å“åº”å¤´ */
 	http_hdr_res_get_async(http_client->hdr_res,
 		http_client->entry.server,
 		get_respond_hdr_ready,
@@ -715,16 +715,16 @@ static void begin_read_respond(HTTP_CLIENT *http_client)
 
 /*----------------------------------------------------------------------------*/
 
-/* ·¢ËÍ×îºóÇëÇóÊı¾İÖÁ·şÎñÆ÷µÄ»Øµ÷º¯Êı, ÖÁ´Ëº¯Êı£¬Í¨ĞÅ·½Ïò·¢Éú
- * ¸Ä±ä£¬ÓÉÔ­À´µÄ´Ó¿Í»§Á÷¶ÁÊı¾İ¡¢Ïò·şÎñÁ÷Ğ´Êı¾İ±äÎª´Ó·şÎñÁ÷¶Á
- * Êı¾İ¡¢Ïò¿Í»§Á÷Ğ´Êı¾İ
+/* å‘é€æœ€åè¯·æ±‚æ•°æ®è‡³æœåŠ¡å™¨çš„å›è°ƒå‡½æ•°, è‡³æ­¤å‡½æ•°ï¼Œé€šä¿¡æ–¹å‘å‘ç”Ÿ
+ * æ”¹å˜ï¼Œç”±åŸæ¥çš„ä»å®¢æˆ·æµè¯»æ•°æ®ã€å‘æœåŠ¡æµå†™æ•°æ®å˜ä¸ºä»æœåŠ¡æµè¯»
+ * æ•°æ®ã€å‘å®¢æˆ·æµå†™æ•°æ®
  */
 
 static int send_request_body_complete(ACL_ASTREAM *server, void *context)
 {
 	HTTP_CLIENT *http_client = (HTTP_CLIENT*) context;
 
-	/* È¡Ïû·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 
 	/* xxx: sanity check */
@@ -733,19 +733,19 @@ static int send_request_body_complete(ACL_ASTREAM *server, void *context)
 		return (0);
 	}
 
-	/* Èç¹ûÇëÇóÌåÊı¾İ·¢ËÍÍê±ÏÔò¿ªÊ¼¶ÁÈ¡·şÎñÆ÷ÏìÓ¦ */
+	/* å¦‚æœè¯·æ±‚ä½“æ•°æ®å‘é€å®Œæ¯•åˆ™å¼€å§‹è¯»å–æœåŠ¡å™¨å“åº” */
 	if ((http_client->flag & HTTP_FLAG_REQEND)) {
-		/* È¡ÏûÖ®Ç°ÉèÖÃµÄ·¢ËÍÇëÇóÌå³É¹¦µÄ»Øµ÷º¯Êı */
+		/* å–æ¶ˆä¹‹å‰è®¾ç½®çš„å‘é€è¯·æ±‚ä½“æˆåŠŸçš„å›è°ƒå‡½æ•° */
 		acl_aio_del_write_hook(server, send_request_body_complete,
 				http_client);
 		http_client->flag &= ~HTTP_FLAG_REQEND;
-		/* ¿ªÊ¼¶ÁÈ¡·şÎñ¶ËµÄÏìÓ¦Êı¾İ */
+		/* å¼€å§‹è¯»å–æœåŠ¡ç«¯çš„å“åº”æ•°æ® */
 		begin_read_respond(http_client);
 	}
 	return (0);
 }
 
-/* ¶Áµ½Ò»Ğ©HTTPÇëÇóÌåÊı¾İ */
+/* è¯»åˆ°ä¸€äº›HTTPè¯·æ±‚ä½“æ•°æ® */
 
 static int read_request_body_ready(int status, char *data, int dlen, void *arg)
 {
@@ -755,68 +755,68 @@ static int read_request_body_ready(int status, char *data, int dlen, void *arg)
 	if (data == NULL || dlen <= 0) {
 		acl_msg_error("%s(%d): data: %s, dlen: %d",
 			myname, __LINE__, data ? "not null" : "null", dlen);
-		/* È¡Ïû¿Í»§Á÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆå®¢æˆ·æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
-		/* ÉèÖÃÇëÇó¹ı³ÌÍê±Ï±êÖ¾Î» */
+		/* è®¾ç½®è¯·æ±‚è¿‡ç¨‹å®Œæ¯•æ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_REQEND;
 		http_proxy_complete(http_client, -1);
 		return (0);
 	}
 
 	if (http_client->entry.server == NULL) {
-		/* ÓĞ¿ÉÄÜÔÚÏò·şÎñ¶ËĞ´Êı¾İÊ±³ö´í¶ø´¥·¢ÁË on_close_server ¹ı³Ì,
-		 * ´Ó¶øµ¼ÖÂ http_proxy_complete ¹ı³Ì±»µ÷ÓÃ
+		/* æœ‰å¯èƒ½åœ¨å‘æœåŠ¡ç«¯å†™æ•°æ®æ—¶å‡ºé”™è€Œè§¦å‘äº† on_close_server è¿‡ç¨‹,
+		 * ä»è€Œå¯¼è‡´ http_proxy_complete è¿‡ç¨‹è¢«è°ƒç”¨
 		 */
 
-		/* È¡Ïû¿Í»§Á÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆå®¢æˆ·æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
-		/* ÉèÖÃÇëÇó¹ı³ÌÍê±Ï±êÖ¾Î» */
+		/* è®¾ç½®è¯·æ±‚è¿‡ç¨‹å®Œæ¯•æ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_REQEND;
 		http_proxy_complete(http_client, -1);
 		return (0);
 	}
 
 	if (status >= HTTP_CHAT_ERR_MIN) {
-		/* È¡Ïû¿Í»§¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆå®¢æˆ·ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
-		/* ÉèÖÃÇëÇó¹ı³ÌÍê±Ï±êÖ¾Î» */
+		/* è®¾ç½®è¯·æ±‚è¿‡ç¨‹å®Œæ¯•æ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_REQEND;
 		http_proxy_complete(http_client, -1);
 		return (0);
 	} else if (status == HTTP_CHAT_OK) {
-		/* ÒÑ¾­¶ÁÍêÁËä¯ÀÀÆ÷±¾´Î»á»°µÄÇëÇóÊı¾İ */
+		/* å·²ç»è¯»å®Œäº†æµè§ˆå™¨æœ¬æ¬¡ä¼šè¯çš„è¯·æ±‚æ•°æ® */
 
-		/* ÒòÎªÒÑ¾­´Ó¿Í»§¶Ë¶ÁÍêÁË±¾´Î»á»°µÄÇëÇóÊı¾İ£¬ËùÒÔ´Ë´¦¿ÉÒÔ
-		 * È¡Ïû¿Í»§¶ËÁ÷Ëø¶¨×´Ì¬, ÒÔÔÊĞíµ±Ïò·şÎñ¶ËĞ´Êı¾İ³ö´íÊ±¿ÉÒÔÔÚ
-		 * on_close_server ÖĞ¹Ø±Õ¿Í»§¶ËÁ÷
+		/* å› ä¸ºå·²ç»ä»å®¢æˆ·ç«¯è¯»å®Œäº†æœ¬æ¬¡ä¼šè¯çš„è¯·æ±‚æ•°æ®ï¼Œæ‰€ä»¥æ­¤å¤„å¯ä»¥
+		 * å–æ¶ˆå®¢æˆ·ç«¯æµé”å®šçŠ¶æ€, ä»¥å…è®¸å½“å‘æœåŠ¡ç«¯å†™æ•°æ®å‡ºé”™æ—¶å¯ä»¥åœ¨
+		 * on_close_server ä¸­å…³é—­å®¢æˆ·ç«¯æµ
 		 */
 		http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
-		/* ÉèÖÃÇëÇó¹ı³ÌÍê±Ï±êÖ¾Î» */
+		/* è®¾ç½®è¯·æ±‚è¿‡ç¨‹å®Œæ¯•æ ‡å¿—ä½ */
 		http_client->flag |= HTTP_FLAG_REQEND;
 	}
 
-	/* Éè¶¨·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+	/* è®¾å®šæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag |= HTTP_FLAG_SERVER_LOCKED;
-	/* ½«À´×ÔÓÚä¯ÀÀÆ÷µÄÊı¾İÌå²¿·Ö·¢ËÍÖÁ·şÎñÆ÷ */
+	/* å°†æ¥è‡ªäºæµè§ˆå™¨çš„æ•°æ®ä½“éƒ¨åˆ†å‘é€è‡³æœåŠ¡å™¨ */
 	acl_aio_writen(http_client->entry.server, data, dlen);
 	return (0);
 }
 
-/* Èç¹ûÓĞÇëÇóÌåÔò×ª·¢ÇëÇóÌåÊı¾İÖÁ·şÎñÆ÷ */
+/* å¦‚æœæœ‰è¯·æ±‚ä½“åˆ™è½¬å‘è¯·æ±‚ä½“æ•°æ®è‡³æœåŠ¡å™¨ */
 
 static void forward_request_body(HTTP_CLIENT *http_client)
 {
-	/* ¸ù¾İÇëÇóÍ·¶ÔÏóÉú³ÉÇëÇóÌå¶ÔÏó */
+	/* æ ¹æ®è¯·æ±‚å¤´å¯¹è±¡ç”Ÿæˆè¯·æ±‚ä½“å¯¹è±¡ */
  	http_client->req_curr->req = http_req_new(http_client->req_curr->hdr_req);
 
-	/* ÉèÖÃ·¢ËÍÇëÇóÌå³É¹¦µÄ»Øµ÷º¯Êı */
+	/* è®¾ç½®å‘é€è¯·æ±‚ä½“æˆåŠŸçš„å›è°ƒå‡½æ•° */
 	acl_aio_add_write_hook(http_client->entry.server,
 		send_request_body_complete, http_client);
 
-	/* ½«¿Í»§¶ËÁ÷ÖÃÓÚËø¶¨×´Ì¬, ´Ó¶ø·ÀÖ¹±»ÌáÇ°¹Ø±Õ */
+	/* å°†å®¢æˆ·ç«¯æµç½®äºé”å®šçŠ¶æ€, ä»è€Œé˜²æ­¢è¢«æå‰å…³é—­ */
 	http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 
-	 /* ¿ªÊ¼¶Á¿Í»§¶ËÇëÇóÌåÊı¾İ */
+	 /* å¼€å§‹è¯»å®¢æˆ·ç«¯è¯·æ±‚ä½“æ•°æ® */
 	http_req_body_get_async(http_client->req_curr->req,
 		http_client->entry.client,
 		read_request_body_ready,
@@ -824,66 +824,66 @@ static void forward_request_body(HTTP_CLIENT *http_client)
 		http_client->entry.service->rw_timeout);
 }
 
-/* ·¢ËÍÇëÇóÍ·ÖÁ·şÎñÆ÷Ê±³ö´íµÄ»Øµ÷º¯Êı */
+/* å‘é€è¯·æ±‚å¤´è‡³æœåŠ¡å™¨æ—¶å‡ºé”™çš„å›è°ƒå‡½æ•° */
 static int send_request_hdr_complete(ACL_ASTREAM *server, void *ctx);
 
 static int send_request_hdr_error(ACL_ASTREAM *server acl_unused, void *ctx)
 {
 	HTTP_CLIENT *http_client = (HTTP_CLIENT *) ctx;
 
-	/* È¡Ïû·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 
-	/* Èç¹û½öÊÇ´«ÊäÇëÇóÍ·Ê±³ö´í£¬Ôò¿ÉÒÔ½øĞĞÖØÊÔ */
+	/* å¦‚æœä»…æ˜¯ä¼ è¾“è¯·æ±‚å¤´æ—¶å‡ºé”™ï¼Œåˆ™å¯ä»¥è¿›è¡Œé‡è¯• */
 	if (http_request_reforward(http_client) == 0) {
-		/* Èç¹ûÒÑ¾­¿ªÊ¼ÖØÊÔ¹ı³Ì£¬ÔòÖ±½Ó·µ»Ø */
-		/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+		/* å¦‚æœå·²ç»å¼€å§‹é‡è¯•è¿‡ç¨‹ï¼Œåˆ™ç›´æ¥è¿”å› */
+		/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 		return (-1);
 	}
 
-	/* ·ÀÖ¹Ïò¿Í»§Á÷Ğ´Êı¾İ³ö´íÊ±ÌáÇ°¹Ø±Õ¿Í»§Á÷ */
+	/* é˜²æ­¢å‘å®¢æˆ·æµå†™æ•°æ®å‡ºé”™æ—¶æå‰å…³é—­å®¢æˆ·æµ */
 	acl_aio_refer(http_client->entry.client);
 
-	/* ·µ»Ø¸ø¿Í»§¶Ë¶Á·şÎñ¶ËÏìÓ¦³ö´íĞÅÏ¢ */
+	/* è¿”å›ç»™å®¢æˆ·ç«¯è¯»æœåŠ¡ç«¯å“åº”å‡ºé”™ä¿¡æ¯ */
 	acl_aio_writen(http_client->entry.client,
 		HTTP_SEND_ERROR, (int) strlen(HTTP_SEND_ERROR));
 
-	/* »Ö¸´¿Í»§Á÷Îª¿É¹Ø±Õ×´Ì¬ */
+	/* æ¢å¤å®¢æˆ·æµä¸ºå¯å…³é—­çŠ¶æ€ */
 	acl_aio_unrefer(http_client->entry.client);
 
-	/* ¸Ã»á»°Íê±Ï */
+	/* è¯¥ä¼šè¯å®Œæ¯• */
 	http_proxy_complete(http_client, -1);
-	/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+	/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 	return (-1);
 }
 
-/* ·¢ËÍÇëÇóÍ·ÖÁ·şÎñÆ÷³É¹¦Ê±µÄ»Øµ÷º¯Êı */
+/* å‘é€è¯·æ±‚å¤´è‡³æœåŠ¡å™¨æˆåŠŸæ—¶çš„å›è°ƒå‡½æ•° */
 
 static int send_request_hdr_complete(ACL_ASTREAM *server acl_unused, void *ctx)
 {
 	HTTP_CLIENT *http_client = (HTTP_CLIENT *) ctx;
 
-	/* È¡Ïû·şÎñÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 
-	/* ¹Ø±ÕÉÏ´Î×¢²áµÄĞ´Íê³É¼°³ö´íµÄ»Øµ÷º¯Êı */
+	/* å…³é—­ä¸Šæ¬¡æ³¨å†Œçš„å†™å®ŒæˆåŠå‡ºé”™çš„å›è°ƒå‡½æ•° */
 	acl_aio_ctl(http_client->entry.server,
 		ACL_AIO_CTL_WRITE_HOOK_DEL, send_request_hdr_complete, http_client,
 		ACL_AIO_CTL_CLOSE_HOOK_DEL, send_request_hdr_error, http_client,
 		ACL_AIO_CTL_END);
 
 	if (http_client->req_curr->hdr_req->hdr.content_length > 0) {
-		/* Èç¹ûÓĞÇëÇóÌå£¬Ôò¶ÁÈ¡¿Í»§¶ËÇëÇóÌåÊı¾İ */
+		/* å¦‚æœæœ‰è¯·æ±‚ä½“ï¼Œåˆ™è¯»å–å®¢æˆ·ç«¯è¯·æ±‚ä½“æ•°æ® */
 		forward_request_body(http_client);
 	} else {
-		/* Ã»ÓĞÇëÇóÌå£¬Ôò¿ªÊ¼¶Á·şÎñ¶ËµÄ·µ»ØÊı¾İ */
+		/* æ²¡æœ‰è¯·æ±‚ä½“ï¼Œåˆ™å¼€å§‹è¯»æœåŠ¡ç«¯çš„è¿”å›æ•°æ® */
 		begin_read_respond(http_client);
 	}
 
 	return (0);
 }
 
-/* ÖØĞÂ¹¹½¨HTTPÇëÇóÍ· */
+/* é‡æ–°æ„å»ºHTTPè¯·æ±‚å¤´ */
 
 static void rebuild_request(HTTP_HDR_REQ *hdr_req, ACL_VSTRING *buf)
 {
@@ -891,7 +891,7 @@ static void rebuild_request(HTTP_HDR_REQ *hdr_req, ACL_VSTRING *buf)
 	HTTP_HDR_ENTRY *entry;
 	int   i = 0;
 
-	/* XXX: nginx ÓĞÊ±¶Ôº¬ÓĞ Proxy-Connection µÄÇëÇóÓĞÊ±»áÓĞÑÓ³Ù? */
+	/* XXX: nginx æœ‰æ—¶å¯¹å«æœ‰ Proxy-Connection çš„è¯·æ±‚æœ‰æ—¶ä¼šæœ‰å»¶è¿Ÿ? */
 #if 0
 	http_hdr_entry_off(&hdr_req->hdr, "Proxy-Connection");
 #endif
@@ -924,10 +924,10 @@ static void rebuild_request(HTTP_HDR_REQ *hdr_req, ACL_VSTRING *buf)
 	acl_vstring_strcat(buf, "\r\n");
 }
 
-/* Á¬½Ó·şÎñÆ÷³É¹¦£¬¿ªÊ¼Ïò·şÎñÆ÷·¢ËÍHTTPÇëÇóÍ· */
+/* è¿æ¥æœåŠ¡å™¨æˆåŠŸï¼Œå¼€å§‹å‘æœåŠ¡å™¨å‘é€HTTPè¯·æ±‚å¤´ */
 static void start_forward_request(HTTP_CLIENT *http_client)
 {
-	/* ·ÖÅä¶¯Ì¬ÄÚ´æ */
+	/* åˆ†é…åŠ¨æ€å†…å­˜ */
 	if (http_client->buf == NULL) {
 		http_client->buf = acl_vstring_alloc(HTTP_HDRLEN_DEF);
 	} else {
@@ -935,23 +935,23 @@ static void start_forward_request(HTTP_CLIENT *http_client)
 	}
 
 	if (var_cfg_http_proxy_connection_off) {
-		/* Ö÷ÒªÊÇÒ»Ğ©±È½ÏÈõµÄÀàËÆGFWµÄ¶«¶«ËÆºõ´¦Àí¸Ã×Ö¶ÎÓĞÎÊÌâ£¬»áÓĞÑÓ³Ù */
+		/* ä¸»è¦æ˜¯ä¸€äº›æ¯”è¾ƒå¼±çš„ç±»ä¼¼GFWçš„ä¸œä¸œä¼¼ä¹å¤„ç†è¯¥å­—æ®µæœ‰é—®é¢˜ï¼Œä¼šæœ‰å»¶è¿Ÿ */
 		http_hdr_entry_off(&http_client->req_curr->hdr_req->hdr, "Proxy-Connection");
 	}
 
-	/* ÖØĞÂ´´½¨ HTTP ÇëÇóÍ·ÖÁ http_client->buf ÖĞ */
+	/* é‡æ–°åˆ›å»º HTTP è¯·æ±‚å¤´è‡³ http_client->buf ä¸­ */
 	rebuild_request(http_client->req_curr->hdr_req, http_client->buf);
 
-	/* ÉèÖÃ»Øµ÷º¯Êı */
+	/* è®¾ç½®å›è°ƒå‡½æ•° */
 	acl_aio_ctl(http_client->entry.server,
 		ACL_AIO_CTL_WRITE_HOOK_ADD, send_request_hdr_complete, http_client,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, send_request_hdr_error, http_client,
 		ACL_AIO_CTL_END);
 
-	/* Ëø¶¨·şÎñ¶Ë */
+	/* é”å®šæœåŠ¡ç«¯ */
 	http_client->flag |= HTTP_FLAG_SERVER_LOCKED;
 
-	/* Ïò·şÎñÆ÷×ª·¢¿Í»§¶ËµÄHTTPÇëÇóÍ·Êı¾İ */
+	/* å‘æœåŠ¡å™¨è½¬å‘å®¢æˆ·ç«¯çš„HTTPè¯·æ±‚å¤´æ•°æ® */
 	acl_aio_writen(http_client->entry.server,
 		acl_vstring_str(http_client->buf),
 		(int) ACL_VSTRING_LEN(http_client->buf));
@@ -959,14 +959,14 @@ static void start_forward_request(HTTP_CLIENT *http_client)
 
 /*----------------------------------------------------------------------------*/
 
-/* ½«¿Í»§¶ËÇëÇóÊı¾İÖØĞÂÏòºó¶ËÆäËü·şÎñÆ÷·¢ËÍ */
+/* å°†å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®é‡æ–°å‘åç«¯å…¶å®ƒæœåŠ¡å™¨å‘é€ */
 
 static int http_request_reforward(HTTP_CLIENT *http_client)
 {
 	const char *myname = "http_request_reforward";
 	ACL_ASTREAM *server = http_client->entry.server;
 
-	/* Èç¹û²»ÊÇ´ÓÁ¬½Ó³ØÖĞÈ¡µÃµÄÁ¬½ÓÔò½«ÖØÊÔ´ÎÊı¼Ó 1 */
+	/* å¦‚æœä¸æ˜¯ä»è¿æ¥æ± ä¸­å–å¾—çš„è¿æ¥åˆ™å°†é‡è¯•æ¬¡æ•°åŠ  1 */
 	if (!http_client->entry.flag_conn_reuse)
 		http_client->entry.nretry_on_error++;
 
@@ -975,22 +975,22 @@ static int http_request_reforward(HTTP_CLIENT *http_client)
 		http_client->hdr_res = NULL;
 	}
 
-	/* ¶Ï¿ªÓë·şÎñ¶ËµÄÁ¬½Ó£¬µ«±£³ÖÓëä¯ÀÀÆ÷¶ËµÄÁ¬½Ó */
+	/* æ–­å¼€ä¸æœåŠ¡ç«¯çš„è¿æ¥ï¼Œä½†ä¿æŒä¸æµè§ˆå™¨ç«¯çš„è¿æ¥ */
 	if (server) {
-		/* Ê¹·şÎñÁ÷Óë¸Ã»á»°·ÖÀë */
+		/* ä½¿æœåŠ¡æµä¸è¯¥ä¼šè¯åˆ†ç¦» */
 		client_entry_detach(&http_client->entry, acl_aio_vstream(server));
-		/* È¡Ïû HTTP ÏìÓ¦Í·µÄ»Øµ÷º¯Êı */
+		/* å–æ¶ˆ HTTP å“åº”å¤´çš„å›è°ƒå‡½æ•° */
 		acl_aio_clean_hooks(server);
 		/* only for test */
 		if (acl_aio_iswset(server)) {
 			acl_msg_info("%s(%d): defer free(%d)\n", myname, __LINE__, ACL_VSTREAM_SOCK(server->stream));
                 } else
 			acl_msg_info("%s(%d): not defer free(%d)\n", myname, __LINE__, ACL_VSTREAM_SOCK(server->stream));
-		/* ½öÒì²½¹Ø±Õ·şÎñ¶ËÁ÷ */
+		/* ä»…å¼‚æ­¥å…³é—­æœåŠ¡ç«¯æµ */
 		acl_aio_iocp_close(server);
 	}
 
-	/* Èç¹ûÖØÊÔ´ÎÊı³¬¹ı¸ÃÓòÃûËù¶ÔÓ¦µÄIPÖ÷»ú¸öÊıÔò·µ»Ø´íÎó£¬²»ÔÙÖØÊÔ */
+	/* å¦‚æœé‡è¯•æ¬¡æ•°è¶…è¿‡è¯¥åŸŸåæ‰€å¯¹åº”çš„IPä¸»æœºä¸ªæ•°åˆ™è¿”å›é”™è¯¯ï¼Œä¸å†é‡è¯• */
 	if (http_client->entry.nretry_on_error > http_client->entry.dns_ctx.ip_cnt) {
 		acl_msg_error("%s(%d): has retried before(%d,%d), reuse connecion %s",
 			myname, __LINE__, http_client->entry.nretry_on_error,
@@ -999,7 +999,7 @@ static int http_request_reforward(HTTP_CLIENT *http_client)
 		return (-1);
 	}
 
-	/* Èç¹ûÖØÊÔ´ÎÊı³¬¹ı·§Öµ£¬Ôò²»ÔÙÖØÊÔÖ±½Ó·µ»Ø´íÎó */
+	/* å¦‚æœé‡è¯•æ¬¡æ•°è¶…è¿‡é˜€å€¼ï¼Œåˆ™ä¸å†é‡è¯•ç›´æ¥è¿”å›é”™è¯¯ */
 	if (http_client->entry.nretry_on_error >= MAX_RETRIED) {
 		acl_msg_error("%s(%d): has retried before(%d,%d)",
 			myname, __LINE__, http_client->entry.nretry_on_error,
@@ -1007,7 +1007,7 @@ static int http_request_reforward(HTTP_CLIENT *http_client)
 		return (-1);
 	}
 
-	/* ¿ªÊ¼ÖØÊÔÁ¬½ÓÏÂÒ»¸öIP */
+	/* å¼€å§‹é‡è¯•è¿æ¥ä¸‹ä¸€ä¸ªIP */
 	forward_start((CLIENT_ENTRY*) http_client);
 	return (0);
 }
@@ -1016,17 +1016,17 @@ static int http_request_reforward(HTTP_CLIENT *http_client)
 
 static char HTTP_CONNECT_FIRST[] = "HTTP/1.0 200 Connection established\r\n\r\n";
 
-/* µ±·şÎñ¶ËÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı */
+/* å½“æœåŠ¡ç«¯æµå…³é—­æ—¶çš„å›è°ƒå‡½æ•° */
 
 static int on_close_server(ACL_ASTREAM *server acl_unused, void *ctx)
 {
 	HTTP_CLIENT *http_client = (HTTP_CLIENT*) ctx;
 
-	/* È¡Ïû·şÎñ¶ËÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆæœåŠ¡ç«¯æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_SERVER_LOCKED;
 	http_client->flag |= HTTP_FLAG_SERVER_CLOSED | HTTP_FLAG_FINISH;
 	http_proxy_complete(http_client, -1);
-	/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+	/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 	return (-1);
 }
 
@@ -1035,11 +1035,11 @@ static int http_proxy_connect_complete(CLIENT_ENTRY *entry)
 	HTTP_CLIENT *http_client = (HTTP_CLIENT*) entry;
 	const char *method = http_client->req_curr->hdr_req->method;
 
-	/* Ìí¼Ó·şÎñÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı */
+	/* æ·»åŠ æœåŠ¡æµå…³é—­æ—¶çš„å›è°ƒå‡½æ•° */
 	acl_aio_add_close_hook(http_client->entry.server,
 		on_close_server, http_client);
 
-	/* CONNECT ÇëÇó, ×ªÏò´¿ TCP ´úÀíÄ£Ê½, ´Ó¶ø·½±ãÖ§³Ö SSL */
+	/* CONNECT è¯·æ±‚, è½¬å‘çº¯ TCP ä»£ç†æ¨¡å¼, ä»è€Œæ–¹ä¾¿æ”¯æŒ SSL */
 	if (var_cfg_http_method_connect_enable && strcasecmp(method, "CONNECT") == 0) {
 		if (entry->client == NULL) {
 			acl_msg_warn("%s(%d): client null", __FILE__, __LINE__);
@@ -1067,10 +1067,10 @@ static int http_proxy_connect_complete(CLIENT_ENTRY *entry)
 		acl_msg_error("%s(%d): method(%s) invalid",
 			__FILE__, __LINE__, method);
 		http_proxy_complete(http_client, -1);
-		return (0); /* ·µ»Ø£­1ÒÔÊ¹Òì²½¿ò¼Ü¹Ø±Õ¸ÃÒì²½Á÷ */
+		return (0); /* è¿”å›ï¼1ä»¥ä½¿å¼‚æ­¥æ¡†æ¶å…³é—­è¯¥å¼‚æ­¥æµ */
 	}
 
-	/* ´¦Àí GET¡¢POST ÇëÇó */
+	/* å¤„ç† GETã€POST è¯·æ±‚ */
 	start_forward_request(http_client);
 	return (0);
 }
@@ -1116,7 +1116,7 @@ static void http_proxy_connect_error(CLIENT_ENTRY *entry)
 static void nslookup_complete_fn(CLIENT_ENTRY *entry, int status)
 {
 	if (status == NSLOOKUP_OK) {
-		/* ÉèÖÃÁ¬½Ó³É¹¦ºóµÄ»Øµ÷º¯Êı */
+		/* è®¾ç½®è¿æ¥æˆåŠŸåçš„å›è°ƒå‡½æ•° */
 		entry->connect_notify_fn = http_proxy_connect_complete;
 		entry->connect_timeout_fn = http_proxy_connect_timeout;
 		entry->connect_error_fn = http_proxy_connect_error;
@@ -1133,24 +1133,24 @@ static void nslookup_complete_fn(CLIENT_ENTRY *entry, int status)
 static void handle_one(HTTP_CLIENT *http_client, HTTP_CLIENT_REQ *req)
 {
 	int   ret;
-	http_client->req_curr = req;  /* ÉèÖÃµ±Ç°¿ÉÒÔ´¦ÀíµÄÇëÇó */
+	http_client->req_curr = req;  /* è®¾ç½®å½“å‰å¯ä»¥å¤„ç†çš„è¯·æ±‚ */
 
-	/* ÏÈ¼ì²éÓÃ»§×Ô¶¨Òå¹ıÂËÆ÷ */
+	/* å…ˆæ£€æŸ¥ç”¨æˆ·è‡ªå®šä¹‰è¿‡æ»¤å™¨ */
 	if ((ret = http_client_req_filter(http_client))) {
-		/* Èç¹û·µ»Ø·Ç0ÖµÔò±íÊ¾ÇëÇó¹ıÂËÆ÷½Ó¹ÜÁË¸ÃÇëÇó */
+		/* å¦‚æœè¿”å›é0å€¼åˆ™è¡¨ç¤ºè¯·æ±‚è¿‡æ»¤å™¨æ¥ç®¡äº†è¯¥è¯·æ±‚ */
 		return;
 	}
 
-	/* ÉèÖÃDNS²éÑ¯»Øµ÷º¯Êı */
+	/* è®¾ç½®DNSæŸ¥è¯¢å›è°ƒå‡½æ•° */
 	http_client->entry.nslookup_notify_fn = nslookup_complete_fn;
 	http_client->entry.dns_errmsg = NULL;
 
-	/* ´Óä¯ÀÀÆ÷µÄÇëÇóÍ·ÖĞ»ñÈ¡·şÎñ¶ËµÄ¶Ë¿ÚºÅ */
+	/* ä»æµè§ˆå™¨çš„è¯·æ±‚å¤´ä¸­è·å–æœåŠ¡ç«¯çš„ç«¯å£å· */
 	dns_lookup(&http_client->entry, req->hdr_req->host, req->hdr_req->port);
 }
 
 /**
- * ³É¹¦¶Áµ½HTTPÇëÇóÍ·ºóµÄ»Øµ÷º¯Êı
+ * æˆåŠŸè¯»åˆ°HTTPè¯·æ±‚å¤´åçš„å›è°ƒå‡½æ•°
  */
 static int request_header_ready(int status, void *arg)
 {
@@ -1161,7 +1161,7 @@ static int request_header_ready(int status, void *arg)
 	static char *via_static = NULL;
 	static int   via_max = 256;
 
-	/* È¡Ïû¿Í»§¶ËÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆå®¢æˆ·ç«¯æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
 
 	if (status != HTTP_CHAT_OK) {
@@ -1184,7 +1184,7 @@ static int request_header_ready(int status, void *arg)
 		snprintf(via_static, via_max, "jaws-%d", getpid());
 	}
 
-	/* ¼ì²éÊÇ·ñ²úÉú»ØÂ·ÏÖÏó */
+	/* æ£€æŸ¥æ˜¯å¦äº§ç”Ÿå›è·¯ç°è±¡ */
 
 	via = http_hdr_entry_value(&req->hdr_req->hdr, "x-via-jaws");
 	if (via == NULL) {
@@ -1194,30 +1194,30 @@ static int request_header_ready(int status, void *arg)
 			myname, __LINE__, via, req->hdr_req->host,
 			acl_vstring_str(req->hdr_req->url_part));
 
-		/* Ëø¶¨¿Í»§¶ËÁ÷ */
+		/* é”å®šå®¢æˆ·ç«¯æµ */
 		http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 
 		acl_aio_writen(http_client->entry.client,
 			HTTP_REQUEST_LOOP,
 			(int) strlen(HTTP_REQUEST_LOOP));
 
-		/* È¡Ïû¿Í»§¶ËÁ÷µÄËø¶¨×´Ì¬ */
+		/* å–æ¶ˆå®¢æˆ·ç«¯æµçš„é”å®šçŠ¶æ€ */
 		http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
 		http_proxy_complete(http_client, -1);
 		return (0);
 	}
 
-	/* ¸ÃÇëÇóÒÑ¾­Íê³É£¬È¡ÏûÆäµÈ´ı×´Ì¬ */
+	/* è¯¥è¯·æ±‚å·²ç»å®Œæˆï¼Œå–æ¶ˆå…¶ç­‰å¾…çŠ¶æ€ */
 	req->flag &= ~CLIENT_READ_WAIT;
 
 	if (http_client->req_curr != NULL) {
-		/* Èç¹ûÇ°Ò»¸öÇëÇó»¹Î´´¦ÀíÍê±Ï£¬Ôò·µ»Ø */
+		/* å¦‚æœå‰ä¸€ä¸ªè¯·æ±‚è¿˜æœªå¤„ç†å®Œæ¯•ï¼Œåˆ™è¿”å› */
 		return (0);
 	}
 
-	/* µ±Ç°Ã»ÓĞÕıÔÚ´¦ÀíµÄÇëÇó¹ı³Ì£¬ËùÒÔ¿ªÊ¼´¦Àí¸ÃÇëÇó */
+	/* å½“å‰æ²¡æœ‰æ­£åœ¨å¤„ç†çš„è¯·æ±‚è¿‡ç¨‹ï¼Œæ‰€ä»¥å¼€å§‹å¤„ç†è¯¥è¯·æ±‚ */
 
-	/* ´Ó¶ÓÁĞÖĞµ¯³ö¸ÃÇëÇó£¬ÒÔÃâ±»ÖØ¸´Ê¹ÓÃ */
+	/* ä»é˜Ÿåˆ—ä¸­å¼¹å‡ºè¯¥è¯·æ±‚ï¼Œä»¥å…è¢«é‡å¤ä½¿ç”¨ */
 	if (acl_fifo_pop(&http_client->req_list) != req)
 		acl_msg_fatal("%s(%d): request invalid", myname, __LINE__);
 
@@ -1239,7 +1239,7 @@ static int http_proxy_next(HTTP_CLIENT *http_client)
 	return (0);
 }
 
-/* ·¢ËÍÏìÓ¦ÌåÖÁ¿Í»§¶ËÊ§°ÜÊ±µÄ»Øµ÷º¯Êı */
+/* å‘é€å“åº”ä½“è‡³å®¢æˆ·ç«¯å¤±è´¥æ—¶çš„å›è°ƒå‡½æ•° */
 
 static int on_close_client(ACL_ASTREAM *client acl_unused, void *ctx)
 {
@@ -1251,12 +1251,12 @@ static int on_close_client(ACL_ASTREAM *client acl_unused, void *ctx)
 		ACL_VSTREAM_SOCK(client->stream),
 		http_client->entry.server ? "not null" : "null");
 #endif
-	/* È¡Ïû¿Í»§¶ËÁ÷µÄËø¶¨×´Ì¬ */
+	/* å–æ¶ˆå®¢æˆ·ç«¯æµçš„é”å®šçŠ¶æ€ */
 	http_client->flag &= ~HTTP_FLAG_CLIENT_LOCKED;
-	/* ÉèÖÃ¿Í»§Á÷µÄ¹Ø±Õ×´Ì¬ */
+	/* è®¾ç½®å®¢æˆ·æµçš„å…³é—­çŠ¶æ€ */
 	http_client->flag |= HTTP_FLAG_CLIENT_CLOSED | HTTP_FLAG_FINISH;
 	http_proxy_complete(http_client, -1);
-	/* ±ØĞë·µ»Ø -1, ÒòÎª²»Ï£Íû¼ÌĞøµ÷ÓÃÆäËüµÄ¹Ø±Õ»Øµ÷º¯Êı */
+	/* å¿…é¡»è¿”å› -1, å› ä¸ºä¸å¸Œæœ›ç»§ç»­è°ƒç”¨å…¶å®ƒçš„å…³é—­å›è°ƒå‡½æ•° */
 	return (-1);
 }
 
@@ -1268,18 +1268,18 @@ static void http_proxy_req_get(HTTP_CLIENT *http_client)
 	req->hdr_req = http_hdr_req_new();
 	acl_fifo_push(&http_client->req_list, req);
 
-	/* ÉèÖÃ´Ó¿Í»§Á÷¶ÁÊı¾İÊ§°Ü»ò³öÏÖÆäËü´íÎóÊ±µÄ»Øµ÷º¯Êı */
+	/* è®¾ç½®ä»å®¢æˆ·æµè¯»æ•°æ®å¤±è´¥æˆ–å‡ºç°å…¶å®ƒé”™è¯¯æ—¶çš„å›è°ƒå‡½æ•° */
 	acl_aio_add_close_hook(http_client->entry.client,
 		on_close_client, http_client);
 
-	/* Ëø¶¨¿Í»§¶ËÁ÷ */
+	/* é”å®šå®¢æˆ·ç«¯æµ */
 	http_client->flag |= HTTP_FLAG_CLIENT_LOCKED;
 
 	http_client->total_size = 0;
 	http_client->flag &= ~HTTP_FLAG_CLIENT_KEEP_ALIVE;
 	http_client->flag &= ~HTTP_FLAG_SERVER_KEEP_ALIVE;
 
-	/* ¿ªÊ¼¶ÁÈ¡HTTPÇëÇóÍ· */
+	/* å¼€å§‹è¯»å–HTTPè¯·æ±‚å¤´ */
 	http_hdr_req_get_async(req->hdr_req,
 		http_client->entry.client,
 		request_header_ready,

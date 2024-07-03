@@ -1,4 +1,4 @@
-// mime.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// mime.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -61,10 +61,10 @@ static void header_out(const acl::mime* mime)
 	printf(">>>>To: %s, %s\n", to ? to : "null", out.c_str());
 }
 
-// ½âÎöÓÊ¼ş²¢Êä³öÓÊ¼şÍ·ĞÅÏ¢
+// è§£æé‚®ä»¶å¹¶è¾“å‡ºé‚®ä»¶å¤´ä¿¡æ¯
 static void test_mime_header(acl::mime& mime, const char* path)
 {
-	// ÒÔÏÂ½ö½âÎöÓÊ¼şÍ·²¿·Ö
+	// ä»¥ä¸‹ä»…è§£æé‚®ä»¶å¤´éƒ¨åˆ†
 
 	printf("\r\n");
 	ACL_METER_TIME("---------------parse header begin--------------------");
@@ -77,8 +77,8 @@ static void test_mime_header(acl::mime& mime, const char* path)
 	const char* ptr;
 	size_t n;
 
-	// ¿ªÊ¼ÓÊ¼ş½âÎö¹ı³Ì
-	mime.update_begin(path); // update_begin ÄÚ²¿»á×Ô¶¯µ÷ÓÃ reset()
+	// å¼€å§‹é‚®ä»¶è§£æè¿‡ç¨‹
+	mime.update_begin(path); // update_begin å†…éƒ¨ä¼šè‡ªåŠ¨è°ƒç”¨ reset()
 
 	while (1) {
 		if (fp.gets(buf, false) == false)
@@ -90,8 +90,8 @@ static void test_mime_header(acl::mime& mime, const char* path)
 
 		n = buf.length();
 
-		// Èç¹û·µ»Ø true ±íÊ¾Í·²¿½âÎöÍê±Ï, ÎªÁËÊ¹¸Ãº¯Êı·µ»Ø true,
-		// ±ØĞë±£Ö¤µ÷ÓÃ´Ëº¯ÊıµÄ×îºóÒ»ĞĞÊı¾İÎª "\r\n" ¼´¿ÕĞĞ
+		// å¦‚æœè¿”å› true è¡¨ç¤ºå¤´éƒ¨è§£æå®Œæ¯•, ä¸ºäº†ä½¿è¯¥å‡½æ•°è¿”å› true,
+		// å¿…é¡»ä¿è¯è°ƒç”¨æ­¤å‡½æ•°çš„æœ€åä¸€è¡Œæ•°æ®ä¸º "\r\n" å³ç©ºè¡Œ
 
 		(void) mime.update(ptr, n);
 	}
@@ -102,11 +102,11 @@ static void test_mime_header(acl::mime& mime, const char* path)
 	ACL_METER_TIME("---------------parse header end  --------------------");
 }
 
-// ½«ÓÊ¼şÕıÎÄÄÚÈİ±£´æÔÚ´ÅÅÌÉÏ
-// ½«ÓÊ¼şÕıÎÄÄÚÈİ±£´æÔÚ»º³åÇøÖĞ
-// ²ÉÓÃ¹ÜµÀÁ÷Ä£Ê½½«ÓÊ¼şÕıÎÄÄÚÈİ½øĞĞ×Ö·û¼¯×ª»»£¬ÇÒ±£´æÔÚ´ÅÅÌÉÏ
-// ½«ÓÊ¼şÖĞµÄ¸½¼ş±£´æÔÚ´ÅÅÌÉÏ
-// ½«½âÎöºóµÄÓÊ¼şÔÙÖØĞÂ×éºÏ²¢±£´æÔÚ´ÅÅÌÉÏ
+// å°†é‚®ä»¶æ­£æ–‡å†…å®¹ä¿å­˜åœ¨ç£ç›˜ä¸Š
+// å°†é‚®ä»¶æ­£æ–‡å†…å®¹ä¿å­˜åœ¨ç¼“å†²åŒºä¸­
+// é‡‡ç”¨ç®¡é“æµæ¨¡å¼å°†é‚®ä»¶æ­£æ–‡å†…å®¹è¿›è¡Œå­—ç¬¦é›†è½¬æ¢ï¼Œä¸”ä¿å­˜åœ¨ç£ç›˜ä¸Š
+// å°†é‚®ä»¶ä¸­çš„é™„ä»¶ä¿å­˜åœ¨ç£ç›˜ä¸Š
+// å°†è§£æåçš„é‚®ä»¶å†é‡æ–°ç»„åˆå¹¶ä¿å­˜åœ¨ç£ç›˜ä¸Š
 static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 {
 	mime.reset();
@@ -141,7 +141,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ½«ÓÊ¼şÕıÎÄÄÚÈİ±£´æÔÚ´ÅÅÌÉÏ
+	// å°†é‚®ä»¶æ­£æ–‡å†…å®¹ä¿å­˜åœ¨ç£ç›˜ä¸Š
 
 	printf("\r\n");
 
@@ -164,7 +164,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ½«ÓÊ¼şÕıÎÄÄÚÈİ±£´æÔÚ»º³åÇøÖĞ
+	// å°†é‚®ä»¶æ­£æ–‡å†…å®¹ä¿å­˜åœ¨ç¼“å†²åŒºä¸­
 
 	if (pBody)
 	{
@@ -180,7 +180,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ½«ÓÊ¼şÕıÎÄÄÚÈİÒÔ utf-8 ´æÔÚ´ÅÅÌÉÏ
+	// å°†é‚®ä»¶æ­£æ–‡å†…å®¹ä»¥ utf-8 å­˜åœ¨ç£ç›˜ä¸Š
 	if (pBody && is_text)
 	{
 		printf("\r\n");
@@ -215,7 +215,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ²ÉÓÃ¹ÜµÀÁ÷Ä£Ê½½«ÓÊ¼şÕıÎÄÄÚÈİ½øĞĞ×Ö·û¼¯×ª»»£¬ÇÒ±£´æÔÚ´ÅÅÌÉÏ
+	// é‡‡ç”¨ç®¡é“æµæ¨¡å¼å°†é‚®ä»¶æ­£æ–‡å†…å®¹è¿›è¡Œå­—ç¬¦é›†è½¬æ¢ï¼Œä¸”ä¿å­˜åœ¨ç£ç›˜ä¸Š
 
 	if (pBody)
 	{
@@ -251,7 +251,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ½«ÓÊ¼şÖĞµÄ¸½¼ş±£´æÔÚ´ÅÅÌÉÏ
+	// å°†é‚®ä»¶ä¸­çš„é™„ä»¶ä¿å­˜åœ¨ç£ç›˜ä¸Š
 
 	printf("---------------------------------------------------------\r\n");
 	printf(">>>> saving attach file now ...\r\n");
@@ -287,7 +287,7 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	printf(">>>> saved attach file ok ...\r\n");
 	//////////////////////////////////////////////////////////////////////
-	// ±éÀúËùÓĞ½Úµã
+	// éå†æ‰€æœ‰èŠ‚ç‚¹
 	printf("------------------------------------------------------\r\n");
 
 	acl::string tmp;
@@ -309,15 +309,15 @@ static void mime_test1(acl::mime& mime, const char* path, bool htmlFirst)
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ½«½âÎöºóµÄÓÊ¼şÔÙÖØĞÂ×éºÏ²¢±£´æÔÚ´ÅÅÌÉÏ
+	// å°†è§£æåçš„é‚®ä»¶å†é‡æ–°ç»„åˆå¹¶ä¿å­˜åœ¨ç£ç›˜ä¸Š
 
 	mime.save_mail("./var", "test.html");
 }
 
-// ½«Î»ÓÚÎÄ¼şÖĞµÄÓÊ¼şÄÚÈİ½øĞĞ½âÎö£¬²¢½«ÓÊ¼şÌåÊı¾İ×ª´¢ÓÚÁíÒ»¸öÄÚ´æ»º³åÖĞ
+// å°†ä½äºæ–‡ä»¶ä¸­çš„é‚®ä»¶å†…å®¹è¿›è¡Œè§£æï¼Œå¹¶å°†é‚®ä»¶ä½“æ•°æ®è½¬å‚¨äºå¦ä¸€ä¸ªå†…å­˜ç¼“å†²ä¸­
 static void mime_test2(acl::mime& mime, const char* path)
 {
-	// ÒÔÏÂ½ö½âÎöÓÊ¼şÍ·²¿·Ö
+	// ä»¥ä¸‹ä»…è§£æé‚®ä»¶å¤´éƒ¨åˆ†
 
 	printf("\r\n");
 	ACL_METER_TIME("---------------parse mail begin--------------------");
@@ -330,7 +330,7 @@ static void mime_test2(acl::mime& mime, const char* path)
 	const char* ptr;
 	size_t n;
 
-	// ¿ªÊ¼ÓÊ¼ş½âÎö¹ı³Ì
+	// å¼€å§‹é‚®ä»¶è§£æè¿‡ç¨‹
 	mime.update_begin(path);
 
 	while (1) {
@@ -339,8 +339,8 @@ static void mime_test2(acl::mime& mime, const char* path)
 		ptr = buf.c_str();
 		n = buf.length();
 
-		// Èç¹û·µ»Ø true ±íÊ¾Í·²¿½âÎöÍê±Ï, ÎªÁËÊ¹¸Ãº¯Êı·µ»Ø true,
-		// ±ØĞë±£Ö¤µ÷ÓÃ´Ëº¯ÊıµÄ×îºóÒ»ĞĞÊı¾İÎª "\r\n" ¼´¿ÕĞĞ
+		// å¦‚æœè¿”å› true è¡¨ç¤ºå¤´éƒ¨è§£æå®Œæ¯•, ä¸ºäº†ä½¿è¯¥å‡½æ•°è¿”å› true,
+		// å¿…é¡»ä¿è¯è°ƒç”¨æ­¤å‡½æ•°çš„æœ€åä¸€è¡Œæ•°æ®ä¸º "\r\n" å³ç©ºè¡Œ
 
 		//printf(">>>>%s", ptr);
 		if (mime.update(ptr, n) == true)
@@ -351,7 +351,7 @@ static void mime_test2(acl::mime& mime, const char* path)
 		buf.clear();
 	}
 
-	// ±ØĞëµ÷ÓÃ update_end
+	// å¿…é¡»è°ƒç”¨ update_end
 	mime.update_end();
 
 	acl::mime_body* pBody;
@@ -367,10 +367,10 @@ static void mime_test2(acl::mime& mime, const char* path)
 	ACL_METER_TIME("---------------parse mail end  --------------------");
 }
 
-// ½«Î»ÓÚÄÚ´æÖĞµÄÓÊ¼şÄÚÈİ½øĞĞ½âÎö£¬²¢½«ÓÊ¼şÌåÊı¾İ×ª´¢ÓÚÁíÒ»¸öÄÚ´æ»º³åÖĞ
+// å°†ä½äºå†…å­˜ä¸­çš„é‚®ä»¶å†…å®¹è¿›è¡Œè§£æï¼Œå¹¶å°†é‚®ä»¶ä½“æ•°æ®è½¬å‚¨äºå¦ä¸€ä¸ªå†…å­˜ç¼“å†²ä¸­
 static void mime_test3(acl::mime& mime, const char* path)
 {
-	// ÒÔÏÂ½ö½âÎöÓÊ¼şÍ·²¿·Ö
+	// ä»¥ä¸‹ä»…è§£æé‚®ä»¶å¤´éƒ¨åˆ†
 
 	printf("\r\n");
 	ACL_METER_TIME("---------------parse mail begin--------------------");
@@ -382,7 +382,7 @@ static void mime_test3(acl::mime& mime, const char* path)
 		return;
 	}
 
-	// ¿ªÊ¼ÓÊ¼ş½âÎö¹ı³Ì
+	// å¼€å§‹é‚®ä»¶è§£æè¿‡ç¨‹
 	mime.reset();
 	if (mime.update(buf.c_str(), buf.length()) != true)
 	{
@@ -390,7 +390,7 @@ static void mime_test3(acl::mime& mime, const char* path)
 		return;
 	}
 
-	// ±ØĞëµ÷ÓÃ update_end
+	// å¿…é¡»è°ƒç”¨ update_end
 	mime.update_end();
 
 	acl::mime_body* pBody;
@@ -410,7 +410,7 @@ static void mime_test3(acl::mime& mime, const char* path)
 	ACL_METER_TIME("---------------parse mail end  --------------------");
 }
 
-// ´øÆ«ÒÆÁ¿µÄMIME½âÎö¹ı³Ì£¬²¢½«ÓÊ¼şÌåÊı¾İ×ª´¢ÓÚÁíÒ»¸öÎÄ¼şÖĞ
+// å¸¦åç§»é‡çš„MIMEè§£æè¿‡ç¨‹ï¼Œå¹¶å°†é‚®ä»¶ä½“æ•°æ®è½¬å‚¨äºå¦ä¸€ä¸ªæ–‡ä»¶ä¸­
 static void mime_test4(acl::mime& mime, const char* path)
 {
 	mime.reset();
@@ -423,7 +423,7 @@ static void mime_test4(acl::mime& mime, const char* path)
 	acl::string buf;
 	size_t off = 0;
 
-	// ÏÈ¶ÁÎÄ¼şÍ·, ²¢ÂÔ¹ıÎÄ¼şÍ·
+	// å…ˆè¯»æ–‡ä»¶å¤´, å¹¶ç•¥è¿‡æ–‡ä»¶å¤´
 	while (true)
 	{
 		if (in.gets(buf, false) == false)
@@ -439,10 +439,10 @@ static void mime_test4(acl::mime& mime, const char* path)
 		buf.clear();
 	}
 
-	// ¿ªÊ¼½âÎöÓÊ¼şÍ·¼°ÓÊ¼şÌå²¿·Ö
+	// å¼€å§‹è§£æé‚®ä»¶å¤´åŠé‚®ä»¶ä½“éƒ¨åˆ†
 
 	mime.update_begin(path);
-	// ¿ªÊ¼¶ÁÓÊ¼ş
+	// å¼€å§‹è¯»é‚®ä»¶
 	while (true)
 	{
 		if (in.gets(buf, false) == false)
@@ -473,15 +473,15 @@ static void usage(const char* procname)
 		" -t test0/test1/test2/test3/test4\r\n"
 		" -f mail_file\r\n", procname);
 	
-	printf("test0: ½âÎöÓÊ¼ş²¢Êä³öÓÊ¼şÍ·ĞÅÏ¢\r\n"
-		"test1: ½«ÓÊ¼şÕıÎÄÄÚÈİ±£´æÔÚ´ÅÅÌÉÏ\r\n"
-		"\t½«ÓÊ¼şÕıÎÄÄÚÈİ±£´æÔÚ»º³åÇøÖĞ\r\n"
-		"\t²ÉÓÃ¹ÜµÀÁ÷Ä£Ê½½«ÓÊ¼şÕıÎÄÄÚÈİ½øĞĞ×Ö·û¼¯×ª»»£¬ÇÒ±£´æÔÚ´ÅÅÌÉÏ\r\n"
-		"\t½«ÓÊ¼şÖĞµÄ¸½¼ş±£´æÔÚ´ÅÅÌÉÏ\r\n"
-		"\t½«½âÎöºóµÄÓÊ¼şÔÙÖØĞÂ×éºÏ²¢±£´æÔÚ´ÅÅÌÉÏ\r\n");
-	printf("test2: ½«Î»ÓÚÎÄ¼şÖĞµÄÓÊ¼şÄÚÈİ½øĞĞ½âÎö£¬²¢½«ÓÊ¼şÌåÊı¾İ×ª´¢ÓÚÁíÒ»¸öÄÚ´æ»º³åÖĞ\r\n");
-	printf("test3: ½«Î»ÓÚÄÚ´æÖĞµÄÓÊ¼şÄÚÈİ½øĞĞ½âÎö£¬²¢½«ÓÊ¼şÌåÊı¾İ×ª´¢ÓÚÁíÒ»¸öÄÚ´æ»º³åÖĞ\r\n");
-	printf("test4: ´øÆ«ÒÆÁ¿µÄMIME½âÎö¹ı³Ì£¬²¢½«ÓÊ¼şÌåÊı¾İ×ª´¢ÓÚÁíÒ»¸öÎÄ¼şÖĞ(Àı×Ó£ºtest16.eml)\r\n");
+	printf("test0: è§£æé‚®ä»¶å¹¶è¾“å‡ºé‚®ä»¶å¤´ä¿¡æ¯\r\n"
+		"test1: å°†é‚®ä»¶æ­£æ–‡å†…å®¹ä¿å­˜åœ¨ç£ç›˜ä¸Š\r\n"
+		"\tå°†é‚®ä»¶æ­£æ–‡å†…å®¹ä¿å­˜åœ¨ç¼“å†²åŒºä¸­\r\n"
+		"\té‡‡ç”¨ç®¡é“æµæ¨¡å¼å°†é‚®ä»¶æ­£æ–‡å†…å®¹è¿›è¡Œå­—ç¬¦é›†è½¬æ¢ï¼Œä¸”ä¿å­˜åœ¨ç£ç›˜ä¸Š\r\n"
+		"\tå°†é‚®ä»¶ä¸­çš„é™„ä»¶ä¿å­˜åœ¨ç£ç›˜ä¸Š\r\n"
+		"\tå°†è§£æåçš„é‚®ä»¶å†é‡æ–°ç»„åˆå¹¶ä¿å­˜åœ¨ç£ç›˜ä¸Š\r\n");
+	printf("test2: å°†ä½äºæ–‡ä»¶ä¸­çš„é‚®ä»¶å†…å®¹è¿›è¡Œè§£æï¼Œå¹¶å°†é‚®ä»¶ä½“æ•°æ®è½¬å‚¨äºå¦ä¸€ä¸ªå†…å­˜ç¼“å†²ä¸­\r\n");
+	printf("test3: å°†ä½äºå†…å­˜ä¸­çš„é‚®ä»¶å†…å®¹è¿›è¡Œè§£æï¼Œå¹¶å°†é‚®ä»¶ä½“æ•°æ®è½¬å‚¨äºå¦ä¸€ä¸ªå†…å­˜ç¼“å†²ä¸­\r\n");
+	printf("test4: å¸¦åç§»é‡çš„MIMEè§£æè¿‡ç¨‹ï¼Œå¹¶å°†é‚®ä»¶ä½“æ•°æ®è½¬å‚¨äºå¦ä¸€ä¸ªæ–‡ä»¶ä¸­(ä¾‹å­ï¼štest16.eml)\r\n");
 }
 
 int main(int argc, char* argv[])

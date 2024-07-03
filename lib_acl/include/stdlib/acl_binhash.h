@@ -27,15 +27,15 @@ struct ACL_BINHASH {
 
 	/* for acl_iterator */
 
-	/* È¡µü´úÆ÷Í·º¯Êı */
+	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
 	void *(*iter_head)(ACL_ITER*, struct ACL_BINHASH*);
-	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êı */
+	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
 	void *(*iter_next)(ACL_ITER*, struct ACL_BINHASH*);
-	/* È¡µü´úÆ÷Î²º¯Êı */
+	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_BINHASH*);
-	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êı */
+	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_BINHASH*);
-	/* È¡µü´úÆ÷¹ØÁªµÄµ±Ç°ÈİÆ÷³ÉÔ±½á¹¹¶ÔÏó */
+	/* å–è¿­ä»£å™¨å…³è”çš„å½“å‰å®¹å™¨æˆå‘˜ç»“æ„å¯¹è±¡ */
 	ACL_BINHASH_INFO *(*iter_info)(ACL_ITER*, struct ACL_BINHASH*);
 };
 
@@ -47,17 +47,17 @@ struct ACL_BINHASH_INFO {
 		void *key;
 		const void *c_key;
 	} key;				/**
-					 * ¹şÏ£¼ü, Ö»ËùÒÔÈç´ËÉùÃ÷£¬ÊÇÒòÎªµ±´´½¨¹şÏ£±íµÄ±êÖ¾Î»Îª
-					 * ACL_BINHASH_FLAG_KEY_REUSE Ê±ĞèÒª¸´ÓÃÊäÈëµÄ¼ü¿Õ¼ä
+					 * å“ˆå¸Œé”®, åªæ‰€ä»¥å¦‚æ­¤å£°æ˜ï¼Œæ˜¯å› ä¸ºå½“åˆ›å»ºå“ˆå¸Œè¡¨çš„æ ‡å¿—ä½ä¸º
+					 * ACL_BINHASH_FLAG_KEY_REUSE æ—¶éœ€è¦å¤ç”¨è¾“å…¥çš„é”®ç©ºé—´
 					 */
-	int     key_len;                /**< ¹şÏ£¼ü³¤¶È */
-	void   *value;                  /**< ¹şÏ£¼üËù¶ÔÓ¦µÄÓÃ»§Êı¾İ */
+	int     key_len;                /**< å“ˆå¸Œé”®é•¿åº¦ */
+	void   *value;                  /**< å“ˆå¸Œé”®æ‰€å¯¹åº”çš„ç”¨æˆ·æ•°æ® */
 	struct ACL_BINHASH_INFO *next;  /**< colliding entry */
 	struct ACL_BINHASH_INFO *prev;  /**< colliding entry */
 };
 
 /**
- * ACL_BINHASH ±éÀúÓÃÀàĞÍ
+ * ACL_BINHASH éå†ç”¨ç±»å‹
  */
 typedef struct ACL_BINHASH_ITER {
 	/* public */
@@ -70,10 +70,10 @@ typedef struct ACL_BINHASH_ITER {
 } ACL_BINHASH_ITER;
 
 /**
- * ´´½¨Ò»¸ö¹şÏ£±í
- * @param size {int} ¹şÏ£±íµÄ³õÊ¼»¯´óĞ¡
- * @param flag {unsigned int} ¹şÏ£±íÊôĞÔ±êÖ¾Î», ACL_BINHASH_FLAG_xxx
- * @return {ACL_BINHASH*} ĞÂ´´½¨µÄ¹şÏ£±íÖ¸Õë
+ * åˆ›å»ºä¸€ä¸ªå“ˆå¸Œè¡¨
+ * @param size {int} å“ˆå¸Œè¡¨çš„åˆå§‹åŒ–å¤§å°
+ * @param flag {unsigned int} å“ˆå¸Œè¡¨å±æ€§æ ‡å¿—ä½, ACL_BINHASH_FLAG_xxx
+ * @return {ACL_BINHASH*} æ–°åˆ›å»ºçš„å“ˆå¸Œè¡¨æŒ‡é’ˆ
  */
 ACL_API ACL_BINHASH *acl_binhash_create(int size, unsigned int flag);
 #define	ACL_BINHASH_FLAG_KEY_REUSE	(1 << 0)
@@ -83,70 +83,70 @@ ACL_API ACL_BINHASH *acl_binhash_create(int size, unsigned int flag);
 #define	ACL_BINHASH_FLAG_SLICE3		(1 << 4)
 
 /**
- * Ïò¹şÏ£±íÖĞÌí¼Ó¶ÔÏó
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const void*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @param value {void*} ¼üÖµ
- * @return {ACL_BINHASH_INFO*} ĞÂ´´½¨µÄ¹şÏ£ÌõÄ¿Ö¸Õë
+ * å‘å“ˆå¸Œè¡¨ä¸­æ·»åŠ å¯¹è±¡
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const void*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @param value {void*} é”®å€¼
+ * @return {ACL_BINHASH_INFO*} æ–°åˆ›å»ºçš„å“ˆå¸Œæ¡ç›®æŒ‡é’ˆ
  */
 ACL_API ACL_BINHASH_INFO *acl_binhash_enter(ACL_BINHASH *table, const void *key, int key_len, void *value);
 
 /**
- * ´Ó¹şÏ£±íÖĞ¸ù¾İ¼üÃûÈ¡µÃ¶ÔÓ¦µÄ¹şÏ£ÌõÄ¿
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const void*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @return {ACL_BINHASH_INFO*} ¹şÏ£ÌõÄ¿Ö¸Õë
+ * ä»å“ˆå¸Œè¡¨ä¸­æ ¹æ®é”®åå–å¾—å¯¹åº”çš„å“ˆå¸Œæ¡ç›®
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const void*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @return {ACL_BINHASH_INFO*} å“ˆå¸Œæ¡ç›®æŒ‡é’ˆ
  */
 ACL_API ACL_BINHASH_INFO *acl_binhash_locate(ACL_BINHASH *table, const void *key, int key_len);
 
 /**
- * ²éÑ¯Ä³¸ö¹şÏ£¼üµÄ¼üÖµ
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const void*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @return {void*} ¹şÏ£¼üÖµ
+ * æŸ¥è¯¢æŸä¸ªå“ˆå¸Œé”®çš„é”®å€¼
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const void*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @return {void*} å“ˆå¸Œé”®å€¼
  */
 ACL_API void *acl_binhash_find(ACL_BINHASH *table, const void *key, int key_len);
 
 /**
- * É¾³ıÄ³¸ö¹şÏ£Ïî
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const void*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @param free_fn {void (*)(void*)} ÓÃÀ´ÊÍ·Å¹şÏ£¼üÖµµÄº¯ÊıÖ¸Õë£¬Èç¹ûÎª¿ÕÔò²»ÔÚÄÚ²¿ÊÍ·Å¼üÖµ
+ * åˆ é™¤æŸä¸ªå“ˆå¸Œé¡¹
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const void*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @param free_fn {void (*)(void*)} ç”¨æ¥é‡Šæ”¾å“ˆå¸Œé”®å€¼çš„å‡½æ•°æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºåˆ™ä¸åœ¨å†…éƒ¨é‡Šæ”¾é”®å€¼
  * @return {int} 0: ok, -1: error
  */
 ACL_API int acl_binhash_delete(ACL_BINHASH *table, const void *key, int key_len, void (*free_fn) (void *));
 
 /**
- * ÊÍ·Å¹şÏ£±í
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param free_fn {void (*)(void*)} Èç¹û²»Îª¿Õ£¬ÔòÓÃ´Ëº¯ÊıÀ´ÊÍ·Å¹şÏ£±íÄÚµÄËùÓĞ¼üÖµ
+ * é‡Šæ”¾å“ˆå¸Œè¡¨
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param free_fn {void (*)(void*)} å¦‚æœä¸ä¸ºç©ºï¼Œåˆ™ç”¨æ­¤å‡½æ•°æ¥é‡Šæ”¾å“ˆå¸Œè¡¨å†…çš„æ‰€æœ‰é”®å€¼
  */
 ACL_API void acl_binhash_free(ACL_BINHASH *table, void (*free_fn) (void *));
 
 /**
- * ±éÀúÕû¸ö¹şÏ£±í£¬²¢ÓÃÓÃ»§¸ø³öµÄ»Øµ÷º¯Êı²Ù×÷¹şÏ£±íÖĞµÄ¼üÖµ
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param walk_fn {void (*)(ACL_BINHASH_INFO*, void*)} ÔÚ±éÀú¹şÏ£±íÖĞµÄÃ¿¸öÔªËØÊ±µÄ»Øµ÷º¯Êı
- * @param arg {void*} ÓÃ»§´«µİµÄ²ÎÊı£¬×÷Îª²ÎÊıÔÚ walk_fn ÖĞ´«µİ
+ * éå†æ•´ä¸ªå“ˆå¸Œè¡¨ï¼Œå¹¶ç”¨ç”¨æˆ·ç»™å‡ºçš„å›è°ƒå‡½æ•°æ“ä½œå“ˆå¸Œè¡¨ä¸­çš„é”®å€¼
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param walk_fn {void (*)(ACL_BINHASH_INFO*, void*)} åœ¨éå†å“ˆå¸Œè¡¨ä¸­çš„æ¯ä¸ªå…ƒç´ æ—¶çš„å›è°ƒå‡½æ•°
+ * @param arg {void*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°ï¼Œä½œä¸ºå‚æ•°åœ¨ walk_fn ä¸­ä¼ é€’
  */
 ACL_API void acl_binhash_walk(ACL_BINHASH *table, void (*walk_fn) (ACL_BINHASH_INFO *, void *), void *arg);
 
 /**
- * ÁĞ³öµ±Ç°¹şÏ£±íÖĞµÄËùÓĞÔªËØÊı×éÁĞ±í
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @return {ACL_BINHASH_INFO*} ¹şÏ£±íÖĞËùÓĞÔªËØ×é³ÉµÄACL_BINHASH_INFOÊı×é, 
- *  ¸ÃÊı×éÖĞµÄ×îºóÒ»¸öÖ¸ÕëÎª NULL
+ * åˆ—å‡ºå½“å‰å“ˆå¸Œè¡¨ä¸­çš„æ‰€æœ‰å…ƒç´ æ•°ç»„åˆ—è¡¨
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @return {ACL_BINHASH_INFO*} å“ˆå¸Œè¡¨ä¸­æ‰€æœ‰å…ƒç´ ç»„æˆçš„ACL_BINHASH_INFOæ•°ç»„, 
+ *  è¯¥æ•°ç»„ä¸­çš„æœ€åä¸€ä¸ªæŒ‡é’ˆä¸º NULL
  */
 ACL_API ACL_BINHASH_INFO **acl_binhash_list(ACL_BINHASH *table);
 
 /**
- * »ñµÃ¹şÏ£±í²Ù×÷Ê±µÄ³ö´íºÅ
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
- * @return {int} ´íÎóºÅ
+ * è·å¾—å“ˆå¸Œè¡¨æ“ä½œæ—¶çš„å‡ºé”™å·
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @return {int} é”™è¯¯å·
  */
 ACL_API int acl_binhash_errno(ACL_BINHASH *table);
 #define ACL_BINHASH_STAT_OK		0
@@ -155,15 +155,15 @@ ACL_API int acl_binhash_errno(ACL_BINHASH *table);
 #define	ACL_BINHASH_STAT_NO_KEY		3
 
 /**
- * ·µ»Ø¹şÏ£±íµ±Ç°µÄÈİÆ÷¿Õ¼ä´óĞ¡
- * @param table ¹şÏ£±íÖ¸Õë
- * @return ¹şÏ£±íµÄÈİÆ÷¿Õ¼ä´óĞ¡
+ * è¿”å›å“ˆå¸Œè¡¨å½“å‰çš„å®¹å™¨ç©ºé—´å¤§å°
+ * @param table å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @return å“ˆå¸Œè¡¨çš„å®¹å™¨ç©ºé—´å¤§å°
  */
 ACL_API int acl_binhash_size(const ACL_BINHASH *table);
 
 /**
- * µ±Ç°¹şÏ£±íÖĞ¶ÔÏóµÄ¸öÊı
- * @param table {ACL_BINHASH*} ¹şÏ£±íÖ¸Õë
+ * å½“å‰å“ˆå¸Œè¡¨ä¸­å¯¹è±¡çš„ä¸ªæ•°
+ * @param table {ACL_BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
  * @return {int}
  */
 ACL_API int acl_binhash_used(ACL_BINHASH *table);
@@ -174,7 +174,7 @@ ACL_API const ACL_BINHASH_INFO *acl_binhash_iter_next(ACL_BINHASH_ITER *iter);
 ACL_API const ACL_BINHASH_INFO *acl_binhash_iter_tail(ACL_BINHASH *table, ACL_BINHASH_ITER *iter);
 ACL_API const ACL_BINHASH_INFO *acl_binhash_iter_prev(ACL_BINHASH_ITER *iter);
 
-/*--------------------  Ò»Ğ©·½±ã¿ì½İµÄºê²Ù×÷ --------------------------------*/
+/*--------------------  ä¸€äº›æ–¹ä¾¿å¿«æ·çš„å®æ“ä½œ --------------------------------*/
 
 #define	ACL_BINHASH_ITER_KEY(iter)	((iter).ptr->key.c_key)
 #define	acl_binhash_iter_key		ACL_BINHASH_ITER_KEY
@@ -183,7 +183,7 @@ ACL_API const ACL_BINHASH_INFO *acl_binhash_iter_prev(ACL_BINHASH_ITER *iter);
 #define	acl_binhash_iter_value		ACL_BINHASH_ITER_VALUE
 
 /**
- * ±éÀú ACL_BINHASH
+ * éå† ACL_BINHASH
  * @param iter {ACL_BINHASH_ITER}
  * @param table_ptr {ACL_BINHASH *}
  * @example:

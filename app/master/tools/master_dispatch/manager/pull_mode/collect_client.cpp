@@ -11,10 +11,10 @@ collect_client::collect_client(message_manager& manager, const char* server)
 
 void* collect_client::run()
 {
-	// ²ÉÓÃ url ±àÂë·½Ê½£º
+	// é‡‡ç”¨ url ç¼–ç æ–¹å¼ï¼š
 	// type=xxx
 
-	// ´´½¨ HTTP ÇëÇóÍ·
+	// åˆ›å»º HTTP è¯·æ±‚å¤´
 	acl::http_request req(server_);
 	req.request_header()
 		.set_url("/?type=xml&xml_meta=false")
@@ -23,7 +23,7 @@ void* collect_client::run()
 
 	req.set_timeout(var_cfg_conn_timeout, var_cfg_rw_timeout);
 
-	// ·¢ËÍ HTTP ÇëÇóÍ· & ¶ÁÈ¡ HTTP ÏìÓ¦Í·
+	// å‘é€ HTTP è¯·æ±‚å¤´ & è¯»å– HTTP å“åº”å¤´
 	if (req.request(NULL, 0) == false)
 	{
 		logger_error("request to server: %s", server_.c_str());
@@ -48,7 +48,7 @@ void* collect_client::run()
 		msg->add(buf.c_str(), buf.length());
 	}
 
-	// ÏòÏß³ÌÒì²½¶ÓÁĞÌí¼Ó²éÑ¯½á¹ûÏûÏ¢
+	// å‘çº¿ç¨‹å¼‚æ­¥é˜Ÿåˆ—æ·»åŠ æŸ¥è¯¢ç»“æœæ¶ˆæ¯
 	manager_.put(msg);
 	return NULL;
 }

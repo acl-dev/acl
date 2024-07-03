@@ -14,22 +14,22 @@ StatusIOCallback::~StatusIOCallback()
 	delete conn_;
 }
 
-// µ±¹ÜÀíÁ¬½ÓÓĞÊı¾İ¿É¶ÁÊ±
+// å½“ç®¡ç†è¿æ¥æœ‰æ•°æ®å¯è¯»æ—¶
 bool StatusIOCallback::read_wakeup()
 {
-	// ÏÈ½ûÖ¹Òì²½Á÷¼à¿Ø
+	// å…ˆç¦æ­¢å¼‚æ­¥æµç›‘æ§
 	conn_->get_conn()->disable_read();
 
-	// ·¢ÆğÒ»¸ö http ·şÎñ¶Ë»á»°¹ı³Ì£¬½«Ö®½»ÓÉ×ÓÏß³ÌÈ¥´¦Àí
+	// å‘èµ·ä¸€ä¸ª http æœåŠ¡ç«¯ä¼šè¯è¿‡ç¨‹ï¼Œå°†ä¹‹äº¤ç”±å­çº¿ç¨‹å»å¤„ç†
 	HttpServerRpc* rpc = new HttpServerRpc(conn_->get_conn());
 	rpc_manager::get_instance().fork(rpc);
 	return true;
 }
 
-// µ±·Ç×èÈûÁ÷±»¹Ø±ÕÊ±£¬¸Ã»Øµ÷º¯Êı½«±»µ÷ÓÃ
+// å½“éé˜»å¡æµè¢«å…³é—­æ—¶ï¼Œè¯¥å›è°ƒå‡½æ•°å°†è¢«è°ƒç”¨
 void StatusIOCallback::close_callback()
 {
-	// É¾³ı×Ô¼º
+	// åˆ é™¤è‡ªå·±
 	delete this;
 }
 

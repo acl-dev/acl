@@ -77,8 +77,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		fdp->flag &= ~EVENT_FDTABLE_FLAG_IOCP;
 	}
 
-	/* windows xp »·¾³ÏÂ£¬±ØÐëÔÚ¹Ø±ÕÌ×½Ó×ÖÖ®Ç°µ÷ÓÃ´ËºêÅÐ¶ÏÖØµþ IO
-	 * ÊÇ·ñ´¦ÓÚ STATUS_PENDING ×´Ì¬
+	/* windows xp çŽ¯å¢ƒä¸‹ï¼Œå¿…é¡»åœ¨å…³é—­å¥—æŽ¥å­—ä¹‹å‰è°ƒç”¨æ­¤å®åˆ¤æ–­é‡å  IO
+	 * æ˜¯å¦å¤„äºŽ STATUS_PENDING çŠ¶æ€
 	 */
 	if (fdp->event_read != NULL) {
 		is_completed = HasOverlappedIoCompleted(
@@ -87,7 +87,7 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		is_completed = FALSE;
 	}
 
-	/* ±ØÐëÔÚÊÍ·Å fdp->event_read/fdp->event_write Ç°¹Ø±ÕÌ×½Ó¿Ú¾ä±ú */
+	/* å¿…é¡»åœ¨é‡Šæ”¾ fdp->event_read/fdp->event_write å‰å…³é—­å¥—æŽ¥å£å¥æŸ„ */
 	if (ACL_VSTREAM_SOCK(stream) != ACL_SOCKET_INVALID
 		&& stream->close_fn) {
 		(void) stream->close_fn(ACL_VSTREAM_SOCK(stream));
@@ -100,8 +100,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	ACL_VSTREAM_FILE(stream) = ACL_FILE_INVALID;
 
 	if (fdp->event_read) {
-		/* Èç¹ûÍê³É¶Ë¿Ú´¦ÓÚÎ´¾ö×´Ì¬£¬Ôò²»ÄÜÊÍ·ÅÖØµþ½á¹¹£¬ÐèÔÚÖ÷Ñ­»·µÄ
-		 * GetQueuedCompletionStatus µ÷ÓÃºóÀ´ÊÍ·Å
+		/* å¦‚æžœå®Œæˆç«¯å£å¤„äºŽæœªå†³çŠ¶æ€ï¼Œåˆ™ä¸èƒ½é‡Šæ”¾é‡å ç»“æž„ï¼Œéœ€åœ¨ä¸»å¾ªçŽ¯çš„
+		 * GetQueuedCompletionStatus è°ƒç”¨åŽæ¥é‡Šæ”¾
 		 */
 		if (is_completed) {
 			acl_myfree(fdp->event_read);
@@ -112,8 +112,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 		fdp->event_read = NULL;
 	}
 	if (fdp->event_write) {
-		/* Èç¹ûÍê³É¶Ë¿Ú´¦ÓÚÎ´¾ö×´Ì¬£¬Ôò²»ÄÜÊÍ·ÅÖØµþ½á¹¹£¬ÐèÔÚÖ÷Ñ­»·µÄ
-		 * GetQueuedCompletionStatus µ÷ÓÃºóÀ´ÊÍ·Å
+		/* å¦‚æžœå®Œæˆç«¯å£å¤„äºŽæœªå†³çŠ¶æ€ï¼Œåˆ™ä¸èƒ½é‡Šæ”¾é‡å ç»“æž„ï¼Œéœ€åœ¨ä¸»å¾ªçŽ¯çš„
+		 * GetQueuedCompletionStatus è°ƒç”¨åŽæ¥é‡Šæ”¾
 		 */
 		if (HasOverlappedIoCompleted(&fdp->event_write->overlapped)) {
 			acl_myfree(fdp->event_write);
@@ -165,18 +165,18 @@ static ACL_EVENT_FDTABLE *read_enable(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 		stream->fdp = (void *) fdp;
 
-		/* Ìí¼ÓÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
+		/* æ·»åŠ æµå…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_ADD_READ)) {
 		goto END;
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_DEL_READ)) {
 
-		/* Í£Ö¹½ûÖ¹¶Á¼àÌý¹ý³Ì */
+		/* åœæ­¢ç¦æ­¢è¯»ç›‘å¬è¿‡ç¨‹ */
 
 		acl_assert((fdp->flag & EVENT_FDTABLE_FLAG_READ));
 
-		/* ÖØÐÂÆôÓÃ¶Á¼àÌý¹ý³Ì, ÒòÎªÖ®Ç°µÄ¹ý³ÌÊÇÕýÔÚ²ð³ý¶Á¼àÌý¹ý³Ìµ«
-		 * »¹Ã»ÓÐÕýÊ½²ð³ý£¬ËùÒÔÖ»ÐèÒªÇå³ý²ð³ý±êÖ¾Î»¼´¿É
+		/* é‡æ–°å¯ç”¨è¯»ç›‘å¬è¿‡ç¨‹, å› ä¸ºä¹‹å‰çš„è¿‡ç¨‹æ˜¯æ­£åœ¨æ‹†é™¤è¯»ç›‘å¬è¿‡ç¨‹ä½†
+		 * è¿˜æ²¡æœ‰æ­£å¼æ‹†é™¤ï¼Œæ‰€ä»¥åªéœ€è¦æ¸…é™¤æ‹†é™¤æ ‡å¿—ä½å³å¯
 		 */
 
 		fdp->flag &= ~EVENT_FDTABLE_FLAG_DEL_READ;
@@ -245,7 +245,7 @@ static void event_enable_write(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 		acl_ring_append(&ev->fdp_delay_list, &fdp->delay_entry);
 		fdp->flag |= EVENT_FDTABLE_FLAG_DELAY_OPER;
 		stream->fdp = (void *) fdp;
-		/* Ìí¼ÓÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
+		/* æ·»åŠ æµå…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
 		acl_vstream_add_close_handle(stream, stream_on_close, eventp);
 	} else if ((fdp->flag & EVENT_FDTABLE_FLAG_ADD_WRITE)) {
 		goto END;
@@ -667,7 +667,7 @@ static void event_set_all(ACL_EVENT *eventp)
 	ACL_EVENT_FDTABLE *fdp;
 	int   i;
 
-	/* ÓÅÏÈ´¦ÀíÌí¼Ó¶Á/Ð´¼à¿ØÈÎÎñ, ÕâÑù¿ÉÒÔ°Ñ ADD ÖÐ¼äÌ¬×ª»»³ÉÕýÊ½×´Ì¬ */
+	/* ä¼˜å…ˆå¤„ç†æ·»åŠ è¯»/å†™ç›‘æŽ§ä»»åŠ¡, è¿™æ ·å¯ä»¥æŠŠ ADD ä¸­é—´æ€è½¬æ¢æˆæ­£å¼çŠ¶æ€ */
 
 	eventp->ready_cnt = 0;
 
@@ -677,7 +677,7 @@ static void event_set_all(ACL_EVENT *eventp)
 		event_check_fds(eventp);
 	}
 
-	/* ´¦ÀíÈÎÎñÏî */
+	/* å¤„ç†ä»»åŠ¡é¡¹ */
 
 	while (1) {
 		ACL_RING *r = acl_ring_pop_head(&ev->fdp_delay_list);

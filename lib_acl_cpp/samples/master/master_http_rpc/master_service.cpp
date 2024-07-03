@@ -8,7 +8,7 @@
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_rpc_addr;
 acl::master_str_tbl var_conf_str_tab[] = {
@@ -45,31 +45,31 @@ master_service::~master_service()
 
 bool master_service::on_accept(acl::aio_socket_stream* client)
 {
-	// Èç¹ûÔÊĞíÔÚÖ÷Ïß³ÌÖĞÔ¤¶Á£¬ÔòÉèÖÃÁ÷µÄÔ¤¶Á±êÖ¾Î»
+	// å¦‚æœå…è®¸åœ¨ä¸»çº¿ç¨‹ä¸­é¢„è¯»ï¼Œåˆ™è®¾ç½®æµçš„é¢„è¯»æ ‡å¿—ä½
 	if (var_cfg_preread)
 	{
 		ACL_VSTREAM* vstream = client->get_vstream();
 		vstream->flag |= ACL_VSTREAM_FLAG_PREREAD;
 	}
 
-	// ´´½¨Òì²½¿Í»§¶ËÁ÷µÄ»Øµ÷¶ÔÏó²¢Óë¸ÃÒì²½Á÷½øĞĞ°ó¶¨
+	// åˆ›å»ºå¼‚æ­¥å®¢æˆ·ç«¯æµçš„å›è°ƒå¯¹è±¡å¹¶ä¸è¯¥å¼‚æ­¥æµè¿›è¡Œç»‘å®š
 	http_client* callback = new http_client(client);
 
-	// ×¢²áÒì²½Á÷µÄ¶Á»Øµ÷¹ı³Ì
+	// æ³¨å†Œå¼‚æ­¥æµçš„è¯»å›è°ƒè¿‡ç¨‹
 	client->add_read_callback(callback);
 
-	// ×¢²áÒì²½Á÷µÄĞ´»Øµ÷¹ı³Ì
+	// æ³¨å†Œå¼‚æ­¥æµçš„å†™å›è°ƒè¿‡ç¨‹
 	client->add_write_callback(callback);
 
-	// ×¢²áÒì²½Á÷µÄ¹Ø±Õ»Øµ÷¹ı³Ì
+	// æ³¨å†Œå¼‚æ­¥æµçš„å…³é—­å›è°ƒè¿‡ç¨‹
 	client->add_close_callback(callback);
 
-	// ×¢²áÒì²½Á÷µÄ³¬Ê±»Øµ÷¹ı³Ì
+	// æ³¨å†Œå¼‚æ­¥æµçš„è¶…æ—¶å›è°ƒè¿‡ç¨‹
 	client->add_timeout_callback(callback);
 
 	rpc_read_wait_add();
 
-	// ¼à¿ØÒì²½Á÷ÊÇ·ñ¿É¶Á
+	// ç›‘æ§å¼‚æ­¥æµæ˜¯å¦å¯è¯»
 	client->read_wait(0);
 
 	return true;

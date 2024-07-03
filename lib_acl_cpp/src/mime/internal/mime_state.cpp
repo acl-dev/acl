@@ -228,7 +228,7 @@ static MIME_NODE *mime_iter_next(ACL_ITER *it, MIME_STATE *state)
 
 	node = (MIME_NODE*) it->data;
 
-	/* ÏÈ±éÀúµ±Ç°½áµãµÄ×Ó½áµã */
+	/* å…ˆéåŽ†å½“å‰ç»“ç‚¹çš„å­ç»“ç‚¹ */
 
 	ring_ptr = acl_ring_succ(&node->children);
 	if (ring_ptr != &node->children) {
@@ -238,14 +238,14 @@ static MIME_NODE *mime_iter_next(ACL_ITER *it, MIME_STATE *state)
 		return ((MIME_NODE*) it->ptr);
 	}
 
-	/* Èç¹ûµ±Ç°½áµãÊÇ¸ù½áµãÔòÖ±½Ó·µ»Ø¿Õ */
+	/* å¦‚æžœå½“å‰ç»“ç‚¹æ˜¯æ ¹ç»“ç‚¹åˆ™ç›´æŽ¥è¿”å›žç©º */
 
 	if (node == state->root) {
 		it->ptr = it->data = NULL;
 		return (NULL);
 	}
 
-	/* µ±Ç°½áµãµÄ×Ó½áµã±éÀúÍê±Ï£¬ÔÙ±éÀúµ±Ç°½áµãµÄÐÖµÜ½áµã */
+	/* å½“å‰ç»“ç‚¹çš„å­ç»“ç‚¹éåŽ†å®Œæ¯•ï¼Œå†éåŽ†å½“å‰ç»“ç‚¹çš„å…„å¼Ÿç»“ç‚¹ */
 
 	parent = node->parent;
 	ring_ptr = acl_ring_succ(&node->node);
@@ -256,7 +256,7 @@ static MIME_NODE *mime_iter_next(ACL_ITER *it, MIME_STATE *state)
 		return ((MIME_NODE*) it->ptr);
 	}
 
-	/* µ±Ç°½áµãµÄÐÖµÜ½áµã±éÀúÍê±Ï£¬×îºó±éÀúµ±Ç°½áµãµÄ¸¸½áµãµÄÐÖµÜ½áµã */
+	/* å½“å‰ç»“ç‚¹çš„å…„å¼Ÿç»“ç‚¹éåŽ†å®Œæ¯•ï¼Œæœ€åŽéåŽ†å½“å‰ç»“ç‚¹çš„çˆ¶ç»“ç‚¹çš„å…„å¼Ÿç»“ç‚¹ */
 
 	do {
 		ring_ptr = acl_ring_succ(&parent->node);
@@ -272,7 +272,7 @@ static MIME_NODE *mime_iter_next(ACL_ITER *it, MIME_STATE *state)
 		}
 	} while (ring_ptr != &state->root->children);
 
-	/* ±éÀúÍêËùÓÐ½áµã */
+	/* éåŽ†å®Œæ‰€æœ‰ç»“ç‚¹ */
 
 	it->ptr = it->data = NULL;
 	return (NULL);
@@ -318,7 +318,7 @@ static MIME_NODE *mime_iter_prev(ACL_ITER *it, MIME_STATE *state)
 
 	node = (MIME_NODE*) it->data;
 
-	/* ÏÈ±éÀúµ±Ç°½áµãµÄ×Ó½áµã */
+	/* å…ˆéåŽ†å½“å‰ç»“ç‚¹çš„å­ç»“ç‚¹ */
 
 	ring_ptr = acl_ring_pred(&node->children);
 	if (ring_ptr != &node->children) {
@@ -328,14 +328,14 @@ static MIME_NODE *mime_iter_prev(ACL_ITER *it, MIME_STATE *state)
 		return ((MIME_NODE*) it->ptr);
 	}
 
-	/* Èç¹ûµ±Ç°½áµãÊÇ¸ù½áµãÔòÖ±½Ó·µ»Ø¿Õ */
+	/* å¦‚æžœå½“å‰ç»“ç‚¹æ˜¯æ ¹ç»“ç‚¹åˆ™ç›´æŽ¥è¿”å›žç©º */
 
 	if (node == state->root) {
 		it->ptr = it->data = NULL;
 		return (NULL);
 	}
 
-	/* µ±Ç°½áµãµÄ×Ó½áµã±éÀúÍê±Ï£¬ÔÙ±éÀúµ±Ç°½áµãµÄÐÖµÜ½áµã */
+	/* å½“å‰ç»“ç‚¹çš„å­ç»“ç‚¹éåŽ†å®Œæ¯•ï¼Œå†éåŽ†å½“å‰ç»“ç‚¹çš„å…„å¼Ÿç»“ç‚¹ */
 
 	parent = node->parent;
 	ring_ptr = acl_ring_pred(&node->node);
@@ -346,7 +346,7 @@ static MIME_NODE *mime_iter_prev(ACL_ITER *it, MIME_STATE *state)
 		return ((MIME_NODE*) it->ptr);
 	}
 
-	/* µ±Ç°½áµãµÄÐÖµÜ½áµã±éÀúÍê±Ï£¬×îºó±éÀúµ±Ç°½áµãµÄ¸¸½áµãµÄÐÖµÜ½áµã */
+	/* å½“å‰ç»“ç‚¹çš„å…„å¼Ÿç»“ç‚¹éåŽ†å®Œæ¯•ï¼Œæœ€åŽéåŽ†å½“å‰ç»“ç‚¹çš„çˆ¶ç»“ç‚¹çš„å…„å¼Ÿç»“ç‚¹ */
 
 	do {
 		ring_ptr = acl_ring_pred(&parent->node);
@@ -362,7 +362,7 @@ static MIME_NODE *mime_iter_prev(ACL_ITER *it, MIME_STATE *state)
 		}
 	} while (ring_ptr != &state->root->children);
 
-	/* ±éÀúÍêËùÓÐ½áµã */
+	/* éåŽ†å®Œæ‰€æœ‰ç»“ç‚¹ */
 
 	it->ptr = it->data = NULL;
 	return (NULL);

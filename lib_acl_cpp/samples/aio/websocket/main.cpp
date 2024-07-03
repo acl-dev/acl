@@ -174,7 +174,7 @@ protected:
 			return false;
 		}
 
-		// ¿ªÊ¼½øÈë websocket Òì²½¶Á¹ı³Ì
+		// å¼€å§‹è¿›å…¥ websocket å¼‚æ­¥è¯»è¿‡ç¨‹
 		this->ws_read_wait(5);
 		return true;
 	}
@@ -297,7 +297,7 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	// ¶¨Òå AIO ÊÂ¼şÒıÇæ
+	// å®šä¹‰ AIO äº‹ä»¶å¼•æ“
 	acl::aio_handle handle(acl::ENGINE_KERNEL);
 
 	//////////////////////////////////////////////////////////////////////
@@ -309,12 +309,12 @@ int main(int argc, char* argv[])
 	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
 		cit != name_servers.end(); ++cit) {
 
-		// ÉèÖÃ DNS ÓòÃû·şÎñÆ÷µØÖ·
+		// è®¾ç½® DNS åŸŸåæœåŠ¡å™¨åœ°å€
 		handle.set_dns((*cit).c_str(), 5);
 	}
 
 
-	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì WEB ·şÎñÆ÷
+	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹ WEB æœåŠ¡å™¨
 	websocket_client* conn = new websocket_client(handle, host);
 	if (!conn->open(addr, conn_timeout, rw_timeout)) {
 		printf("connect %s error\r\n", addr.c_str());
@@ -324,10 +324,10 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	(*conn).enable_debug(debug);		// ÊÇ·ñÆôÓÃµ÷ÊÔ·½Ê½
-	conn->unzip_body(true);			// Õë¶Ô HTTP ×Ô¶¯½âÑ¹
+	(*conn).enable_debug(debug);		// æ˜¯å¦å¯ç”¨è°ƒè¯•æ–¹å¼
+	conn->unzip_body(true);			// é’ˆå¯¹ HTTP è‡ªåŠ¨è§£å‹
 
-	// ÉèÖÃ HTTP ÇëÇóÍ·£¬Ò²¿É½«´Ë¹ı³Ì·ÅÔÚ conn->on_connect() Àï
+	// è®¾ç½® HTTP è¯·æ±‚å¤´ï¼Œä¹Ÿå¯å°†æ­¤è¿‡ç¨‹æ”¾åœ¨ conn->on_connect() é‡Œ
 	acl::http_header& head = conn->request_header();
 	head.set_url("/path?name1&name2")
 		.add_param("name3", "")
@@ -345,9 +345,9 @@ int main(int argc, char* argv[])
 	printf("[%s]\r\n", buf.c_str());
 	fflush(stdout);
 
-	// ¿ªÊ¼ AIO ÊÂ¼şÑ­»·¹ı³Ì
+	// å¼€å§‹ AIO äº‹ä»¶å¾ªç¯è¿‡ç¨‹
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			break;
 		}

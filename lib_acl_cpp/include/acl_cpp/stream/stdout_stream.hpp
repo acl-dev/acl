@@ -5,7 +5,7 @@
 namespace acl {
 
 /**
- * ±ê×¼Êä³öÁ÷£¬¸ÃÀà¶ÔÏó½öÄÜ½øĞĞĞ´²Ù×÷
+ * æ ‡å‡†è¾“å‡ºæµï¼Œè¯¥ç±»å¯¹è±¡ä»…èƒ½è¿›è¡Œå†™æ“ä½œ
  */
 class ACL_CPP_API stdout_stream : public ostream {
 public:

@@ -45,20 +45,20 @@ static int json_new_gid(ACL_VSTREAM *client, int keep_alive, ACL_JSON *json)
 /*--------------------------------------------------------------------------*/
 
 typedef struct PROTO_JSON {
-	/* ÃüÁî×Ö */
+	/* å‘½ä»¤å­— */
 	const char *cmd;
 
-	/* Ğ­Òé´¦Àíº¯Êı¾ä±ú */
+	/* åè®®å¤„ç†å‡½æ•°å¥æŸ„ */
 	int (*handle)(ACL_VSTREAM *client, int keep_alive, ACL_JSON*);
 } PROTO_JSON;
 
-/* Ğ­ÒéÃüÁî´¦Àíº¯ÊıÓ³Éä±í */
+/* åè®®å‘½ä»¤å¤„ç†å‡½æ•°æ˜ å°„è¡¨ */
 static PROTO_JSON __proto_json_tab[] = {
 	{ CMD_NEW_GID, json_new_gid },
 	{ NULL, NULL },
 };
 
-/* ´¦Àí json Êı¾İ¸ñÊ½µÄÇëÇó */
+/* å¤„ç† json æ•°æ®æ ¼å¼çš„è¯·æ±‚ */
 
 int http_json_service(ACL_VSTREAM *client,
 	HTTP_HDR_REQ *hdr_req, ACL_JSON *json)
@@ -68,9 +68,9 @@ int http_json_service(ACL_VSTREAM *client,
 	char  cmd[128];
 	int   ret, i, keep_alive = 0;
 
-	/* json Êı¾İ¸ñÊ½ÒªÇó: { cmd: xxx, tag: xxx:sid } */
+	/* json æ•°æ®æ ¼å¼è¦æ±‚: { cmd: xxx, tag: xxx:sid } */
 
-	/* »ñµÃ cmd ÃüÁî×Ö */
+	/* è·å¾— cmd å‘½ä»¤å­— */
 
 	a = acl_json_getElementsByTagName(json, "cmd");
 	if (a == NULL) {
@@ -79,7 +79,7 @@ int http_json_service(ACL_VSTREAM *client,
 		return (-1);
 	}
 
-	/* ´Ó JSON ¶ÔÏó»ñµÃÃüÁî×Ö */
+	/* ä» JSON å¯¹è±¡è·å¾—å‘½ä»¤å­— */
 	cmd[0] = 0;
 	acl_foreach(iter, a) {
 		ACL_JSON_NODE *node = (ACL_JSON_NODE*) iter.data;
@@ -96,10 +96,10 @@ int http_json_service(ACL_VSTREAM *client,
 		return (-1);
 	}
 
-	/* ¿Í»§¶ËÊÇ·ñÒªÇó±£³Ö³¤Á¬½Ó */
+	/* å®¢æˆ·ç«¯æ˜¯å¦è¦æ±‚ä¿æŒé•¿è¿æ¥ */
 	keep_alive = hdr_req->hdr.keep_alive;
 
-	/* ²éÑ¯¶ÔÓ¦ÃüÁîµÄ´¦Àíº¯Êı¶ÔÏó */
+	/* æŸ¥è¯¢å¯¹åº”å‘½ä»¤çš„å¤„ç†å‡½æ•°å¯¹è±¡ */
 	ret = -1;
 	for (i = 0; __proto_json_tab[i].cmd != NULL; i++) {
 		if (strcasecmp(cmd, __proto_json_tab[i].cmd) == 0) {
@@ -113,9 +113,9 @@ int http_json_service(ACL_VSTREAM *client,
 			__FILE__, __LINE__, __FUNCTION__, cmd);
 
 	if (ret < 0)
-		return (-1);  /* ³ö´í */
+		return (-1);  /* å‡ºé”™ */
 	else if (keep_alive)
-		return (1);  /* Õı³£ÇÒĞèÒª±£³Ö³¤Á¬½Ó */
+		return (1);  /* æ­£å¸¸ä¸”éœ€è¦ä¿æŒé•¿è¿æ¥ */
 	else
-		return (0);  /* Õı³£±ãÊÇ¶ÌÁ¬½Ó */
+		return (0);  /* æ­£å¸¸ä¾¿æ˜¯çŸ­è¿æ¥ */
 }

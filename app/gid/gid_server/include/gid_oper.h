@@ -7,40 +7,40 @@ extern "C" {
 
 #include "lib_acl.h"
 
-#define	GID_OK			200	/* Õı³£ */
-#define	GID_ERR_SID		500	/* »á»° ID ºÅ²»¶Ô */
-#define	GID_ERR_OVERRIDE	501	/* ´ïµ½×î´ó·ÖÅäÖµ */
-#define	GID_ERR_SAVE		502	/* ´æ´¢ÖÁ´ÅÅÌÊ±³ö´í */
+#define	GID_OK			200	/* æ­£å¸¸ */
+#define	GID_ERR_SID		500	/* ä¼šè¯ ID å·ä¸å¯¹ */
+#define	GID_ERR_OVERRIDE	501	/* è¾¾åˆ°æœ€å¤§åˆ†é…å€¼ */
+#define	GID_ERR_SAVE		502	/* å­˜å‚¨è‡³ç£ç›˜æ—¶å‡ºé”™ */
 
 /**
- * ¸ù¾İ´íÎóºÅ»ñµÃ×Ö·û´®ÃèÊö
- * @param errnum {int} ´íÎóºÅ
- * @return {const char*} ´íÎóÃèÊö
+ * æ ¹æ®é”™è¯¯å·è·å¾—å­—ç¬¦ä¸²æè¿°
+ * @param errnum {int} é”™è¯¯å·
+ * @return {const char*} é”™è¯¯æè¿°
  */
 const char *gid_serror(int errnum);
 
 /**
- * »ñÈ¡ÏÂÒ»¸öGIDºÅ
- * @param path {const char*} ÎÄ¼ş´æ´¢Â·¾¶
- * @param tag {const char*} ID±êÊ¶ºÅ
- * @param step {unsigned int} Ã¿´ÎµÄ²½½øÖµ
- * @param errnum {int*} Èô·Ç¿Õ£¬Ôò¼ÇÂ¼³ö´íÔ­Òò
- * @return {acl_int64}, Èç¹û·µ»ØÖµ < 0£¬Ôò±íÊ¾·ÖÅäÊ§°Ü£¬
- *  ³ö´íÔ­Òò²Î¿¼ errnum µÄ·µ»ØÖµ
+ * è·å–ä¸‹ä¸€ä¸ªGIDå·
+ * @param path {const char*} æ–‡ä»¶å­˜å‚¨è·¯å¾„
+ * @param tag {const char*} IDæ ‡è¯†å·
+ * @param step {unsigned int} æ¯æ¬¡çš„æ­¥è¿›å€¼
+ * @param errnum {int*} è‹¥éç©ºï¼Œåˆ™è®°å½•å‡ºé”™åŸå› 
+ * @return {acl_int64}, å¦‚æœè¿”å›å€¼ < 0ï¼Œåˆ™è¡¨ç¤ºåˆ†é…å¤±è´¥ï¼Œ
+ *  å‡ºé”™åŸå› å‚è€ƒ errnum çš„è¿”å›å€¼
  */
 acl_int64 gid_next(const char *path, const char *tag,
 	unsigned int step, int *errnum);
 
 /**
- * ³õÊ¼»¯£¬³ÌĞòÆô¶¯ºóÓ¦µ÷ÓÃ´Ëº¯Êı³õÊ¼»¯ÄÚ²¿¿â
- * @param fh_limit {int} »º´æµÄÎÄ¼ş¾ä±úµÄ×î´ó¸öÊı
- * @param sync_gid {int} Ã¿²úÉúÒ»¸öĞÂµÄ gid ºóÊÇ·ñÍ¬Ê±Í¬²½ÖÁ´ÅÅÌ
- * @param debug_section {int} µ÷ÓÃÓÃµÄ±êÇ©Öµ
+ * åˆå§‹åŒ–ï¼Œç¨‹åºå¯åŠ¨ååº”è°ƒç”¨æ­¤å‡½æ•°åˆå§‹åŒ–å†…éƒ¨åº“
+ * @param fh_limit {int} ç¼“å­˜çš„æ–‡ä»¶å¥æŸ„çš„æœ€å¤§ä¸ªæ•°
+ * @param sync_gid {int} æ¯äº§ç”Ÿä¸€ä¸ªæ–°çš„ gid åæ˜¯å¦åŒæ—¶åŒæ­¥è‡³ç£ç›˜
+ * @param debug_section {int} è°ƒç”¨ç”¨çš„æ ‡ç­¾å€¼
  */
 void gid_init(int fh_limit, int sync_gid, int debug_section);
 
 /**
- * ³ÌĞòÍË³öÇ°±ØĞëµ÷ÓÃ´Ëº¯Êı£¬ÒÔÊ¹ÄÚ´æÖĞÊı¾İË¢ĞÂÖÁ´ÅÅÌ
+ * ç¨‹åºé€€å‡ºå‰å¿…é¡»è°ƒç”¨æ­¤å‡½æ•°ï¼Œä»¥ä½¿å†…å­˜ä¸­æ•°æ®åˆ·æ–°è‡³ç£ç›˜
  */
 void gid_finish(void);
 

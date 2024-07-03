@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string>
 
-// std::string ²âÊÔ
+// std::string Â²Ã¢ÃŠÃ”
 
 static void test(void)
 {
@@ -120,7 +120,7 @@ static void test41(void)
 	buf += "hello world!";
 }
 
-// Ñ¹Á¦²âÊÔ acl::string
+// Ã‘Â¹ÃÂ¦Â²Ã¢ÃŠÃ” acl::string
 
 static void test4(void)
 {
@@ -178,7 +178,7 @@ static void test51(void)
 	buf += "hello world!";
 }
 
-// Ñ¹Á¦²âÊÔ std::string
+// Ã‘Â¹ÃÂ¦Â²Ã¢ÃŠÃ” std::string
 
 static void test5(void)
 {

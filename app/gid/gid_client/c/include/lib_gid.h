@@ -5,113 +5,113 @@
 extern "C" {
 #endif
 
-/* Í¨Ñ¶Ğ­Òé·½Ê½ */
-#define	GID_PROTO_CMDLINE	0	/* ÃüÁîĞĞ·½Ê½ */
-#define	GID_PROTO_JSON		1	/* http ·½Ê½£¬Êı¾İ¸ñÊ½Îª json ¸ñÊ½ */
-#define	GID_PROTO_XML		2	/* http ·½Ê½£¬Êı¾İ¸ñÊ½Îª xml ¸ñÊ½ */
+/* é€šè®¯åè®®æ–¹å¼ */
+#define	GID_PROTO_CMDLINE	0	/* å‘½ä»¤è¡Œæ–¹å¼ */
+#define	GID_PROTO_JSON		1	/* http æ–¹å¼ï¼Œæ•°æ®æ ¼å¼ä¸º json æ ¼å¼ */
+#define	GID_PROTO_XML		2	/* http æ–¹å¼ï¼Œæ•°æ®æ ¼å¼ä¸º xml æ ¼å¼ */
 
-/* ²Ù×÷ÃüÁî */
-#define	GID_CMD_NEXT	"new_gid"	/* »ñÈ¡ÏÂÒ»¸öÎ¨Ò» gid */
+/* æ“ä½œå‘½ä»¤ */
+#define	GID_CMD_NEXT	"new_gid"	/* è·å–ä¸‹ä¸€ä¸ªå”¯ä¸€ gid */
 
-/* ³ö´íÂë */
+/* å‡ºé”™ç  */
 
-/* ¿Í»§¶ËÏà¹ØµÄ´íÎóÂë */
-#define	GID_OK			200	/* Õı³£ */
-#define	GID_ERR_INIT		400	/* ¿âÎ´³õÊ¼»¯£¬Ó¦ÓÃÓ¦ÔÚ³ÌĞò³õÊ¼»¯Ê±µ÷ÓÃ³õÊ¼»¯º¯Êı gid_client_init */
-#define	GID_ERR_CONN		401	/* Á¬½Ó·şÎñÆ÷Ê§°Ü */
-#define	GID_ERR_IO		402	/* Óë·şÎñÆ÷Í¨ĞÅÊ§°Ü */
-#define	GID_ERR_PROTO		403	/* Ğ­Òé¸ñÊ½´íÎó */
-#define	GID_ERR_SERVER		404	/* ·şÎñÆ÷ÄÚ²¿³ö´í */
+/* å®¢æˆ·ç«¯ç›¸å…³çš„é”™è¯¯ç  */
+#define	GID_OK			200	/* æ­£å¸¸ */
+#define	GID_ERR_INIT		400	/* åº“æœªåˆå§‹åŒ–ï¼Œåº”ç”¨åº”åœ¨ç¨‹åºåˆå§‹åŒ–æ—¶è°ƒç”¨åˆå§‹åŒ–å‡½æ•° gid_client_init */
+#define	GID_ERR_CONN		401	/* è¿æ¥æœåŠ¡å™¨å¤±è´¥ */
+#define	GID_ERR_IO		402	/* ä¸æœåŠ¡å™¨é€šä¿¡å¤±è´¥ */
+#define	GID_ERR_PROTO		403	/* åè®®æ ¼å¼é”™è¯¯ */
+#define	GID_ERR_SERVER		404	/* æœåŠ¡å™¨å†…éƒ¨å‡ºé”™ */
 
-/* ·şÎñ¶ËÏà¹ØµÄ´íÎóÂë */
-#define GID_ERR_SID		500	/* »á»° ID ºÅ²»¶Ô */
-#define GID_ERR_OVERRIDE	501	/* ´ïµ½×î´ó·ÖÅäÖµ */
-#define GID_ERR_SAVE		502	/* ´æ´¢ÖÁ´ÅÅÌÊ±³ö´í */
+/* æœåŠ¡ç«¯ç›¸å…³çš„é”™è¯¯ç  */
+#define GID_ERR_SID		500	/* ä¼šè¯ ID å·ä¸å¯¹ */
+#define GID_ERR_OVERRIDE	501	/* è¾¾åˆ°æœ€å¤§åˆ†é…å€¼ */
+#define GID_ERR_SAVE		502	/* å­˜å‚¨è‡³ç£ç›˜æ—¶å‡ºé”™ */
 
 /**
- * ¿â³õÊ¼»¯º¯Êı£¬Ê¹ÓÃÕßÔÚ³ÌĞòÆô¶¯ºóÓ¦¸Ãµ÷ÓÃ¸Ãº¯Êı³õÊ¼»¯¿â
- * @param proto {int} Í¨ĞÅĞ­Òé¸ñÊ½£¬²Î¼ûÉÏÃæ£ºGID_PROTO_XXX
- * @param server_addr {const char*} gid ·şÎñÆ÷µØÖ·£¬¸ñÊ½£ºip:port »ò
- *  domain:port »ò unix Óò /xxx/xxx/xxx
+ * åº“åˆå§‹åŒ–å‡½æ•°ï¼Œä½¿ç”¨è€…åœ¨ç¨‹åºå¯åŠ¨ååº”è¯¥è°ƒç”¨è¯¥å‡½æ•°åˆå§‹åŒ–åº“
+ * @param proto {int} é€šä¿¡åè®®æ ¼å¼ï¼Œå‚è§ä¸Šé¢ï¼šGID_PROTO_XXX
+ * @param server_addr {const char*} gid æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ï¼šip:port æˆ–
+ *  domain:port æˆ– unix åŸŸ /xxx/xxx/xxx
  */
 void gid_client_init(int proto, const char *server_addr);
 
 /**
- * ¸ù¾İ´íÎóºÅ»ñµÃ´íÎóÃèÊö
- * @param errnum {int} ´íÎóºÅ£¬²Î¼ûÉÏÃæ£ºGID_ERR_XXX
- * @return {const char*} ´íÎóÃèÊöĞÅÏ¢
+ * æ ¹æ®é”™è¯¯å·è·å¾—é”™è¯¯æè¿°
+ * @param errnum {int} é”™è¯¯å·ï¼Œå‚è§ä¸Šé¢ï¼šGID_ERR_XXX
+ * @return {const char*} é”™è¯¯æè¿°ä¿¡æ¯
  */
 const char *gid_client_serror(int errnum);
 
 /**
- * ÉèÖÃ HTTP ÇëÇóÖĞµÄ URL£¬ÄÚ²¿ÓĞÈ±Ê¡Öµ£¬¿É²»Ö±½Óµ÷ÓÃ´Ëº¯Êı
- * @param url {const char*} URL ×Ö·û´®
+ * è®¾ç½® HTTP è¯·æ±‚ä¸­çš„ URLï¼Œå†…éƒ¨æœ‰ç¼ºçœå€¼ï¼Œå¯ä¸ç›´æ¥è°ƒç”¨æ­¤å‡½æ•°
+ * @param url {const char*} URL å­—ç¬¦ä¸²
  */
 void gid_client_set_url(const char *url);
 
 /**
- * ÉèÖÃ HTTP ÇëÇóÊÇ·ñ±£³Ö³¤Á¬½Ó£¬È±Ê¡Çé¿öÏÂ±£³Ö³¤Á¬½Ó
- * @param keepalive {int} ÊÇ·ñ±£³Ö³¤Á¬½Ó
+ * è®¾ç½® HTTP è¯·æ±‚æ˜¯å¦ä¿æŒé•¿è¿æ¥ï¼Œç¼ºçœæƒ…å†µä¸‹ä¿æŒé•¿è¿æ¥
+ * @param keepalive {int} æ˜¯å¦ä¿æŒé•¿è¿æ¥
  */
 void gid_client_set_keepalive(int keepalive);
 
 /**
- * ÔÚ³¤Á¬½ÓÇé¿öÏÂ£¬Èç¹ûÁ¬½ÓÖĞ¼äÒâÍâÖĞ¶Ï£¬ÉèÖÃÖØÊÔ´ÎÊı£¬È±Ê¡ÖµÎª 1
- * @param nretry {int} ×î´óÖØÊÔ´ÎÊı
+ * åœ¨é•¿è¿æ¥æƒ…å†µä¸‹ï¼Œå¦‚æœè¿æ¥ä¸­é—´æ„å¤–ä¸­æ–­ï¼Œè®¾ç½®é‡è¯•æ¬¡æ•°ï¼Œç¼ºçœå€¼ä¸º 1
+ * @param nretry {int} æœ€å¤§é‡è¯•æ¬¡æ•°
  */
 void gid_client_set_retry_limit(int nretry);
 
 /**
- * ÉèÖÃÁ¬½Ó gid ·şÎñÆ÷µÄÁ¬½Ó³¬Ê±Ê±¼ä£¨Ãë£©£¬È±Ê¡ÖµÎª 20 Ãë
- * @param timeout {int} ³¬Ê±Ê±¼ä£¨Ãë£©
+ * è®¾ç½®è¿æ¥ gid æœåŠ¡å™¨çš„è¿æ¥è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰ï¼Œç¼ºçœå€¼ä¸º 20 ç§’
+ * @param timeout {int} è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
  */
 void gid_client_set_conn_timeout(int timeout);
 
 /**
- * ÉèÖÃÍøÂçÍ¨ĞÅµÄ¶ÁĞ´³¬Ê±Ê±¼ä£¨Ãë£©£¬È±Ê¡ÖµÎª 20 Ãë
- * @param timeout {int} ³¬Ê±Ê±¼ä£¨Ãë£©
+ * è®¾ç½®ç½‘ç»œé€šä¿¡çš„è¯»å†™è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰ï¼Œç¼ºçœå€¼ä¸º 20 ç§’
+ * @param timeout {int} è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
  */
 void gid_client_set_rw_timeout(int timeout);
 
 /**
- * »ñµÃÏÂÒ»¸ö gid ºÅ
- * @param tag {const char*} ±êÊ¶Ãû³Æ£¬Èç¹ûÎª¿Õ£¬ÔòÄÚ²¿È±Ê¡Ê¹ÓÃ default ±êÇ©£¬
- *  ¸ÃÖµµÄ¸ñÊ½Îª£ºtag_name[:sid]£¬ÆäÖĞµÄ tag_name ÎªÕæÕıµÄ±êÊ¶Ãû£¬sid Îª·ÃÎÊ
- *  ¸Ã±êÊ¶¶ÔÏóµÄÊÚÈ¨IDºÅ£¬Èç¹û¸ÃÖµÓë·şÎñ¶ËµÄ sid ²»Æ¥Åä£¬Ôò½ûÖ¹·ÃÎÊ²¢·µ»Ø´íÎó£¬
- *  µ±·ÃÎÊÒ»¸öĞÂµÄ±êÊ¶¶ÔÏó²¢²úÉúµÚÒ»¸ö gid ÖµÊ±£¬ÆäÖĞÈç¹ûÉèÖÃÁË sid Ôò¸Ã sid
- *  ×Ô¶¯×öÎª¸Ã±êÊ¶¶ÔÏóµÄÊÚÈ¨IDºÅ£¬ÆäËü³ÌĞòÈôÏë·ÃÎÊ¸Ã±êÊ¶¶ÔÏóµÄ gid Ôò±ØĞëÌá¹©
- *  ¸ÃÊÚÈ¨ ID ºÅ
- * @param errnum {int*} ¸ÃÖ¸Õë·Ç¿ÕÊ±ÓÃÀ´¼ÇÂ¼³ö´íÊ±µÄ´íÎóºÅ
- * @return {long long int} »ñµÃµÄÏÂÒ»¸öÎ¨Ò» gid ºÅ£¬Èç¹û¸ÃÖµ < 0 Ôò±íÊ¾³ö´í
+ * è·å¾—ä¸‹ä¸€ä¸ª gid å·
+ * @param tag {const char*} æ ‡è¯†åç§°ï¼Œå¦‚æœä¸ºç©ºï¼Œåˆ™å†…éƒ¨ç¼ºçœä½¿ç”¨ default æ ‡ç­¾ï¼Œ
+ *  è¯¥å€¼çš„æ ¼å¼ä¸ºï¼štag_name[:sid]ï¼Œå…¶ä¸­çš„ tag_name ä¸ºçœŸæ­£çš„æ ‡è¯†åï¼Œsid ä¸ºè®¿é—®
+ *  è¯¥æ ‡è¯†å¯¹è±¡çš„æˆæƒIDå·ï¼Œå¦‚æœè¯¥å€¼ä¸æœåŠ¡ç«¯çš„ sid ä¸åŒ¹é…ï¼Œåˆ™ç¦æ­¢è®¿é—®å¹¶è¿”å›é”™è¯¯ï¼Œ
+ *  å½“è®¿é—®ä¸€ä¸ªæ–°çš„æ ‡è¯†å¯¹è±¡å¹¶äº§ç”Ÿç¬¬ä¸€ä¸ª gid å€¼æ—¶ï¼Œå…¶ä¸­å¦‚æœè®¾ç½®äº† sid åˆ™è¯¥ sid
+ *  è‡ªåŠ¨åšä¸ºè¯¥æ ‡è¯†å¯¹è±¡çš„æˆæƒIDå·ï¼Œå…¶å®ƒç¨‹åºè‹¥æƒ³è®¿é—®è¯¥æ ‡è¯†å¯¹è±¡çš„ gid åˆ™å¿…é¡»æä¾›
+ *  è¯¥æˆæƒ ID å·
+ * @param errnum {int*} è¯¥æŒ‡é’ˆéç©ºæ—¶ç”¨æ¥è®°å½•å‡ºé”™æ—¶çš„é”™è¯¯å·
+ * @return {long long int} è·å¾—çš„ä¸‹ä¸€ä¸ªå”¯ä¸€ gid å·ï¼Œå¦‚æœè¯¥å€¼ < 0 åˆ™è¡¨ç¤ºå‡ºé”™
  */
 long long int gid_next(const char *tag, int *errnum);
 
-/* Èç¹û»ñÈ¡ gid µÄº¯ÊıÊ¹ÓÃÓÃ»§Ìá¹©µÄÁ¬½ÓÃèÊö·û */
+/* å¦‚æœè·å– gid çš„å‡½æ•°ä½¿ç”¨ç”¨æˆ·æä¾›çš„è¿æ¥æè¿°ç¬¦ */
 
 /**
- * ²ÉÓÃÃüÁîĞĞ·½Ê½´Ó·şÎñ¶Ë»ñÈ¡ gid ºÅ
- * @param fd {int} Óë·şÎñÆ÷Á¬½ÓµÄÌ×½Ó×Ö
- * @param tag {const char*} ±êÊ¶Ãû³Æ£¬ÈôÎª¿ÕÔòÄÚ²¿È±Ê¡Ê¹ÓÃdefault
- * @param errnum {int*} ¸ÃÖ¸Õë·Ç¿ÕÊ±ÓÃÀ´¼ÇÂ¼³ö´íÊ±µÄ´íÎóºÅ
- * @return {long long int} »ñµÃµÄÏÂÒ»¸öÎ¨Ò» gid ºÅ£¬ *  Èç¹û¸ÃÖµÎª < 0 Ôò±íÊ¾³ö´í
+ * é‡‡ç”¨å‘½ä»¤è¡Œæ–¹å¼ä»æœåŠ¡ç«¯è·å– gid å·
+ * @param fd {int} ä¸æœåŠ¡å™¨è¿æ¥çš„å¥—æ¥å­—
+ * @param tag {const char*} æ ‡è¯†åç§°ï¼Œè‹¥ä¸ºç©ºåˆ™å†…éƒ¨ç¼ºçœä½¿ç”¨default
+ * @param errnum {int*} è¯¥æŒ‡é’ˆéç©ºæ—¶ç”¨æ¥è®°å½•å‡ºé”™æ—¶çš„é”™è¯¯å·
+ * @return {long long int} è·å¾—çš„ä¸‹ä¸€ä¸ªå”¯ä¸€ gid å·ï¼Œ *  å¦‚æœè¯¥å€¼ä¸º < 0 åˆ™è¡¨ç¤ºå‡ºé”™
  */
 long long int gid_cmdline_get(int fd, const char *tag, int *errnum);
 
 /**
- * ²ÉÓÃ http Ğ­ÒéÇÒÊı¾İ¸ñÊ½Îª json ¸ñÊ½£¬´Ó·şÎñ¶Ë»ñÈ¡ gid ºÅ
- * @param fd {int} Óë·şÎñÆ÷Á¬½ÓµÄÌ×½Ó×Ö
- * @param tag {const char*} ±êÊ¶Ãû³Æ£¬ÈôÎª¿ÕÔòÄÚ²¿È±Ê¡Ê¹ÓÃdefault
- * @param errnum {int*} ¸ÃÖ¸Õë·Ç¿ÕÊ±ÓÃÀ´¼ÇÂ¼³ö´íÊ±µÄ´íÎóºÅ
- * @return {long long int} »ñµÃµÄÏÂÒ»¸öÎ¨Ò» gid ºÅ£¬Èç¹û¸ÃÖµ < 0 Ôò±íÊ¾³ö´í
+ * é‡‡ç”¨ http åè®®ä¸”æ•°æ®æ ¼å¼ä¸º json æ ¼å¼ï¼Œä»æœåŠ¡ç«¯è·å– gid å·
+ * @param fd {int} ä¸æœåŠ¡å™¨è¿æ¥çš„å¥—æ¥å­—
+ * @param tag {const char*} æ ‡è¯†åç§°ï¼Œè‹¥ä¸ºç©ºåˆ™å†…éƒ¨ç¼ºçœä½¿ç”¨default
+ * @param errnum {int*} è¯¥æŒ‡é’ˆéç©ºæ—¶ç”¨æ¥è®°å½•å‡ºé”™æ—¶çš„é”™è¯¯å·
+ * @return {long long int} è·å¾—çš„ä¸‹ä¸€ä¸ªå”¯ä¸€ gid å·ï¼Œå¦‚æœè¯¥å€¼ < 0 åˆ™è¡¨ç¤ºå‡ºé”™
  */
 long long int gid_json_get(int fd, const char *tag, int *errnum);
 
 /**
- * ²ÉÓÃ http Ğ­ÒéÇÒÊı¾İ¸ñÊ½Îª xml ¸ñÊ½£¬´Ó·şÎñ¶Ë»ñÈ¡ gid ºÅ
- * @param fd {int} Óë·şÎñÆ÷Á¬½ÓµÄÌ×½Ó×Ö
- * @param tag {const char*} ±êÊ¶Ãû³Æ£¬ÈôÎª¿ÕÔòÄÚ²¿È±Ê¡Ê¹ÓÃdefault
- * @param errnum {int*} ¸ÃÖ¸Õë·Ç¿ÕÊ±ÓÃÀ´¼ÇÂ¼³ö´íÊ±µÄ´íÎóºÅ
- * @return {long long int} »ñµÃµÄÏÂÒ»¸öÎ¨Ò» gid ºÅ£¬Èç¹û¸ÃÖµ < 0 Ôò±íÊ¾³ö´í
+ * é‡‡ç”¨ http åè®®ä¸”æ•°æ®æ ¼å¼ä¸º xml æ ¼å¼ï¼Œä»æœåŠ¡ç«¯è·å– gid å·
+ * @param fd {int} ä¸æœåŠ¡å™¨è¿æ¥çš„å¥—æ¥å­—
+ * @param tag {const char*} æ ‡è¯†åç§°ï¼Œè‹¥ä¸ºç©ºåˆ™å†…éƒ¨ç¼ºçœä½¿ç”¨default
+ * @param errnum {int*} è¯¥æŒ‡é’ˆéç©ºæ—¶ç”¨æ¥è®°å½•å‡ºé”™æ—¶çš„é”™è¯¯å·
+ * @return {long long int} è·å¾—çš„ä¸‹ä¸€ä¸ªå”¯ä¸€ gid å·ï¼Œå¦‚æœè¯¥å€¼ < 0 åˆ™è¡¨ç¤ºå‡ºé”™
  */
 long long int gid_xml_get(int fd, const char *tag, int *errnum);
 

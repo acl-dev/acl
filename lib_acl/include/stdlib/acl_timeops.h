@@ -17,20 +17,20 @@ extern "C" {
 
 /* acl_str2time.c */
 /**
- * ½«Ê±¼ä×Ö·û´®×ª»»Îª time_t ÀàĞÍ
- * @param str Ê±¼ä×Ö·û´®¸ñÊ½Îª: year-month-mday(Èç: 2004-1-1)
- * @return time_t ÀàĞÍµÄÖµ
+ * å°†æ—¶é—´å­—ç¬¦ä¸²è½¬æ¢ä¸º time_t ç±»å‹
+ * @param str æ—¶é—´å­—ç¬¦ä¸²æ ¼å¼ä¸º: year-month-mday(å¦‚: 2004-1-1)
+ * @return time_t ç±»å‹çš„å€¼
  */
 ACL_API time_t acl_str2time_t(const char *str);
 
 /* acl_localtime.c */
 /**
- * ½«ÕûĞÍµÄÊ±¼ä×ª»»ÎªÖ¸¶¨µÄÊ±¼ä½á¹¹¶ÔÏó,ÀàËÆÓÚglibcÖĞµÄ localtime_r(), ¶ø glibc
- * ÊµÏÖµÄ localtime_r() ÄÚ²¿ÓĞËø, »áÓ°ÏìĞ§ÂÊ, Í¬Ê±¿ÉÄÜ»áÔì³Éfork()ºóµÄËÀËøÎÊÌâ,
- * ËùÒÔ½« Redis µÄ´úÂëÖĞµÄÊµÏÖ·ÅÔÚ´Ë´¦.
- * @param t {const time_t*} 1970.1.1ÒÔÀ´µÄÊ±¼äÖµ(Ãë¼¶)
- * @param result {struct tm*} ´æ·Å×ª»»½á¹û¶ÔÏó
- * @return {struct tm *} ·µ»ØÖµ·ÇNULL±íÊ¾×ª»»³É¹¦,·ñÔò±íÊ¾Ê§°Ü
+ * å°†æ•´å‹çš„æ—¶é—´è½¬æ¢ä¸ºæŒ‡å®šçš„æ—¶é—´ç»“æ„å¯¹è±¡,ç±»ä¼¼äºglibcä¸­çš„ localtime_r(), è€Œ glibc
+ * å®ç°çš„ localtime_r() å†…éƒ¨æœ‰é”, ä¼šå½±å“æ•ˆç‡, åŒæ—¶å¯èƒ½ä¼šé€ æˆfork()åçš„æ­»é”é—®é¢˜,
+ * æ‰€ä»¥å°† Redis çš„ä»£ç ä¸­çš„å®ç°æ”¾åœ¨æ­¤å¤„.
+ * @param t {const time_t*} 1970.1.1ä»¥æ¥çš„æ—¶é—´å€¼(ç§’çº§)
+ * @param result {struct tm*} å­˜æ”¾è½¬æ¢ç»“æœå¯¹è±¡
+ * @return {struct tm *} è¿”å›å€¼éNULLè¡¨ç¤ºè½¬æ¢æˆåŠŸ,å¦åˆ™è¡¨ç¤ºå¤±è´¥
  */
 ACL_API struct tm *acl_localtime_r(const time_t *t, struct tm *result);
 

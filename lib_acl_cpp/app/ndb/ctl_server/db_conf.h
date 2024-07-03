@@ -10,12 +10,12 @@ extern int   var_cfg_mysql_dbpool_timeout;
 extern int   var_cfg_mysql_dbpool_dbping;
 
 /**
- * ¼ÓÔØÅäÖÃÏî
- * @param path {const char*} ÅäÖÃÎÄ¼şÂ·¾¶
+ * åŠ è½½é…ç½®é¡¹
+ * @param path {const char*} é…ç½®æ–‡ä»¶è·¯å¾„
  */
 bool db_conf_load(const char* path);
 
 /**
- * Ğ¶ÔØÅäÖÃÄÚÈİÏîÄÚ´æ
+ * å¸è½½é…ç½®å†…å®¹é¡¹å†…å­˜
  */
 void db_conf_unload(void);

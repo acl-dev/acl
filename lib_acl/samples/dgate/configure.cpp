@@ -2,12 +2,12 @@
 #include <string.h>
 #include "configure.h"
 
-char *var_cfg_allow_ip;		// ÔÊĞí·ÃÎÊµÄ IP µØÖ··¶Î§
-char *var_cfg_domains;		// ±¾µØÓòÃûÓ³Éä¹ØÏµ
-char *var_cfg_domain_unknown;	// µ±ÓòÃû²»´æÔÚÊ±·µ»Ø¸ø¿Í»§¶ËµÄÆäËüÌæ»»µØÖ·
-char *var_cfg_dns_name;		// ±¾ÓòÃû·şÎñÆ÷µÄÃû³Æ
-char *var_cfg_dns_ip;		// ±¾ÓòÃû·şÎñÆ÷µÄ IP
-char *var_cfg_dns_neighbor_ip;	// ÉÏÓÎ DNS ·şÎñÆ÷ IP
+char *var_cfg_allow_ip;		// å…è®¸è®¿é—®çš„ IP åœ°å€èŒƒå›´
+char *var_cfg_domains;		// æœ¬åœ°åŸŸåæ˜ å°„å…³ç³»
+char *var_cfg_domain_unknown;	// å½“åŸŸåä¸å­˜åœ¨æ—¶è¿”å›ç»™å®¢æˆ·ç«¯çš„å…¶å®ƒæ›¿æ¢åœ°å€
+char *var_cfg_dns_name;		// æœ¬åŸŸåæœåŠ¡å™¨çš„åç§°
+char *var_cfg_dns_ip;		// æœ¬åŸŸåæœåŠ¡å™¨çš„ IP
+char *var_cfg_dns_neighbor_ip;	// ä¸Šæ¸¸ DNS æœåŠ¡å™¨ IP
 
 static ACL_CFG_STR_TABLE __conf_str_tab[] = {
 	{ "allow_ip", "0.0.0.0:255.255.255.254", &var_cfg_allow_ip },
@@ -19,15 +19,15 @@ static ACL_CFG_STR_TABLE __conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-int   var_cfg_hijack_unknown;	// ÊÇ·ñĞèÒª¶Ô²»´æÔÚÓòÃû½øĞĞ½Ù³Ö
+int   var_cfg_hijack_unknown;	// æ˜¯å¦éœ€è¦å¯¹ä¸å­˜åœ¨åŸŸåè¿›è¡ŒåŠ«æŒ
 
 static ACL_CFG_BOOL_TABLE __conf_bool_tab[] = {
 	{ "hijack_unknown", 0, &var_cfg_hijack_unknown },
 	{ 0, 0, 0 },
 };
 
-int   var_cfg_server_port;	// ±¾»ú°ó¶¨µÄ¶Ë¿ÚºÅ
-int   var_cfg_dns_neighbor_port;// ÉÏÓÎ DNS ·şÎñÆ÷ PORT
+int   var_cfg_server_port;	// æœ¬æœºç»‘å®šçš„ç«¯å£å·
+int   var_cfg_dns_neighbor_port;// ä¸Šæ¸¸ DNS æœåŠ¡å™¨ PORT
 
 static ACL_CFG_INT_TABLE __conf_int_tab[] = {
 	{ "server_port", 53, &var_cfg_server_port, 0, 0 },

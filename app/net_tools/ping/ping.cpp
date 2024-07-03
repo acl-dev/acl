@@ -78,7 +78,7 @@ ping::~ping()
 }
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³ÌÖĞÔËĞĞ
+// ä¸»çº¿ç¨‹ä¸­è¿è¡Œ
 
 void ping::rpc_onover()
 {
@@ -95,7 +95,7 @@ void ping::rpc_wakeup(void*)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³ÌÖĞÔËĞĞ
+// å­çº¿ç¨‹ä¸­è¿è¡Œ
 
 static ICMP_CHAT *__chat = NULL;
 
@@ -136,7 +136,7 @@ bool ping::load_file()
 static void display_res2(ICMP_CHAT *chat)
 {
 	if (chat) {
-		/* ÏÔÊ¾ PING µÄ½á¹û×Ü½á */
+		/* æ˜¾ç¤º PING çš„ç»“æœæ€»ç»“ */
 		icmp_stat(chat);
 		logger(">>>max pkts: %d", icmp_chat_seqno(chat));
 	}
@@ -147,7 +147,7 @@ static void display_res(void)
 	if (__chat) {
 		display_res2(__chat);
 
-		/* ÊÍ·Å ICMP ¶ÔÏó */
+		/* é‡Šæ”¾ ICMP å¯¹è±¡ */
 		icmp_chat_free(__chat);
 		__chat = NULL;
 	}
@@ -162,19 +162,19 @@ void ping::ping_all()
 	}
 
 	ACL_AIO *aio;
-	/* ´´½¨·Ç×èÈûÒì²½Í¨ĞÅ¾ä±ú */
+	/* åˆ›å»ºéé˜»å¡å¼‚æ­¥é€šä¿¡å¥æŸ„ */
 	aio = acl_aio_create(ACL_EVENT_SELECT);
 	acl_aio_set_keep_read(aio, 0);
-	/* ´´½¨ ICMP ¶ÔÏó */
+	/* åˆ›å»º ICMP å¯¹è±¡ */
 	__chat = icmp_chat_create(aio, 1);
 
-	// Ìí¼ÓÄ¿±ê IP µØÖ·
+	// æ·»åŠ ç›®æ ‡ IP åœ°å€
 	std::vector<host_status*>::iterator it = host_list_->begin();
 	for (; it != host_list_->end(); ++it)
 	{
 		//icmp_ping_one(__chat, NULL, (*cit)->get_ip(),
 		//	npkt_, delay_, timeout_);
-		// ´´½¨Ò»¸ö PING µÄ¶ÔÏó£¬²¢¶Ô¸Ã IP ½øĞĞ PING ²Ù×÷
+		// åˆ›å»ºä¸€ä¸ª PING çš„å¯¹è±¡ï¼Œå¹¶å¯¹è¯¥ IP è¿›è¡Œ PING æ“ä½œ
 		ICMP_HOST* host = icmp_host_new(__chat, NULL,
 			(*it)->get_ip(), npkt_, pkt_size_, delay_, timeout_);
 		host->enable_log = 1;
@@ -190,27 +190,27 @@ void ping::ping_all()
 	time_t last_signal = time(NULL), t;
 
 	while (1) {
-		/* Èç¹û PING ½áÊø£¬ÔòÍË³öÑ­»· */
+		/* å¦‚æœ PING ç»“æŸï¼Œåˆ™é€€å‡ºå¾ªç¯ */
 		if (icmp_chat_finish(__chat)) {
 			logger("over now!, hosts' size=%d, count=%d",
 				icmp_chat_size(__chat), icmp_chat_count(__chat));
 			break;
 		}
 
-		/* Òì²½ÊÂ¼şÑ­»·¹ı³Ì */
+		/* å¼‚æ­¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹ */
 		acl_aio_loop(aio);
 		t = time(NULL);
 		if (t - last_signal >= 1)
 		{
-			rpc_signal(NULL);  // Í¨ÖªÖ÷Ïß³Ì
+			rpc_signal(NULL);  // é€šçŸ¥ä¸»çº¿ç¨‹
 			last_signal = t;
 		}
 	}
 
-	/* ÏÔÊ¾ PING ½á¹û */
+	/* æ˜¾ç¤º PING ç»“æœ */
 	display_res();
 
-	/* Ïú»Ù·Ç×èÈû¾ä±ú */
+	/* é”€æ¯éé˜»å¡å¥æŸ„ */
 	acl_aio_free(aio);
 }
 
@@ -241,6 +241,6 @@ void ping::ping_stat_finish(ICMP_HOST* host, void* ctx)
 {
 	host_status* hs = (host_status*) ctx;
 	//hs->get_ping().curr_pkt_++;
-	icmp_stat_host(host, 0);  // ĞèÒªÏÈ¼ÆËãÒ»ÏÂ¸ÃÖ÷»úµÄÍ³¼ÆÖµ
+	icmp_stat_host(host, 0);  // éœ€è¦å…ˆè®¡ç®—ä¸€ä¸‹è¯¥ä¸»æœºçš„ç»Ÿè®¡å€¼
 	hs->set_statistics(&host->icmp_stat);
 }

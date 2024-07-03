@@ -71,109 +71,109 @@ struct ACL_EVENT_FDTABLE {
 typedef struct EVENT_TIMERS EVENT_TIMERS;
 
 struct	ACL_EVENT {
-	/* �¼��������Ʊ�ʶ */
+	/* 事件引擎名称标识 */
 	char  name[128];
 
 	/**
-	 * �¼�����:
+	 * 事件引擎:
 	 * ACL_EVENT_SELECT, ACL_EVENT_KERNEL,
 	 * ACL_EVENT_POLL, ACL_EVENT_WMSG
 	 */
 	int   event_mode;
-	/* ���¼������Ƿ��ڶ��̻߳�����ʹ�� */
+	/* 该事件引擎是否在多线程环境下使用 */
 	int   use_thread;
 
-	/* �����¼����汻Ƕ�׵��� */
+	/* 避免事件引擎被嵌套调用 */
 	int   nested;
-	/* ��ǰʱ���(΢�뼶) */
+	/* 当前时间截(微秒级) */
 	acl_int64 present;
 	acl_int64 last_check;
 	acl_int64 check_inter;
 	acl_int64 last_debug;
-	/* �¼���������ȴ�ʱ��(��) */
+	/* 事件引擎的最大等待时间(秒) */
 	int   delay_sec;
-	/* �¼���������ȴ�ʱ��(΢��) */
+	/* 事件引擎的最大等待时间(微秒) */
 	int   delay_usec;
-	/* ����ѭ��ǰ�����������ݿɶ��������ָ��� */
+	/* 本次循环前缓冲区有数据可读的描述字个数 */
 	int   read_ready;
 
-	/* ��ʱ������ */
+	/* 定时器集合 */
 	EVENT_TIMERS *timers;
-	/* ��Ҫ�������Ķ�ʱ������ */
+	/* 需要被触发的定时器容器 */
 	ACL_RING timers_ready;
 
 #if defined(_WIN32) || defined(_WIN64)
 	ACL_RING timer_head;
 #endif
 
-	/* �׽��������� */
+	/* 套接字最大个数 */
 	int   fdsize;
-	/* ��ǰ�׽��ָ��� */
+	/* 当前套接字个数 */
 	int   fdcnt;
-	/* ��һ����ȫ�����ʱ���±�λ�� */
+	/* 上一次做全量检查时的下标位置 */
 	int   fdpos;
-	/* �¼�ѭ��ʱ׼���õ��׽��ָ��� */
+	/* 事件循环时准备好的套接字个数 */
 	int   ready_cnt;
-	/* �׽����¼���������� */
+	/* 套接字事件对象表集合 */
 	ACL_EVENT_FDTABLE **fdtabs;
-	/* ׼���õ��׽����¼���������� */
+	/* 准备好的套接字事件对象表集合 */
 	ACL_EVENT_FDTABLE **ready;
-	/* ������������׽���ֵ */
+	/* 本进程中最大套接字值 */
 	ACL_SOCKET   maxfd;
 
-	/* �¼������ѭ�������� */
+	/* 事件引擎的循环检查过程 */
 	void (*loop_fn)(ACL_EVENT *ev);
-	/* ��Щ�¼����������Ҫ��ǰ���г�ʼ�� */
+	/* 有些事件引擎可能需要提前进行初始化 */
 	void (*init_fn)(ACL_EVENT *ev);
-	/* �ͷ��¼�������� */
+	/* 释放事件引擎对象 */
 	void (*free_fn)(ACL_EVENT *ev);
-	/* ���ڶ��߳���ʹ���¼�����ʱ����Ҫ�˽ӿڼ�ʱ�����¼����� */
+	/* 当在多线程下使用事件引擎时，需要此接口及时唤醒事件引擎 */
 	void (*add_dog_fn)(ACL_EVENT *ev);
 
-	/* ��ʼ���ĳ���׽��ֵĿɶ�״̬ */
+	/* 开始监控某个套接字的可读状态 */
 	void (*enable_read_fn)(ACL_EVENT *, ACL_VSTREAM *, int,
 		ACL_EVENT_NOTIFY_RDWR, void *);
-	/* ��ʼ���ĳ���׽��ֵĿ�д״̬ */
+	/* 开始监控某个套接字的可写状态 */
 	void (*enable_write_fn)(ACL_EVENT *, ACL_VSTREAM *, int,
 		ACL_EVENT_NOTIFY_RDWR, void *);
-	/* ��ʼ��ؼ����׽ӿڵĿɶ�״̬ */
+	/* 开始监控监听套接口的可读状态 */
 	void (*enable_listen_fn)(ACL_EVENT *, ACL_VSTREAM *, int,
 		ACL_EVENT_NOTIFY_RDWR, void *);
 
-	/* ֹͣ���ĳ���׽ӿڵĿɶ�״̬ */
+	/* 停止监控某个套接口的可读状态 */
 	void (*disable_read_fn)(ACL_EVENT *, ACL_VSTREAM *);
-	/* ֹͣ���ĳ���׽ӿڵĿ�д״̬ */
+	/* 停止监控某个套接口的可写状态 */
 	void (*disable_write_fn)(ACL_EVENT *, ACL_VSTREAM *);
-	/* ֹͣ���ĳ���׽ӿڵĶ���д״̬ */
+	/* 停止监控某个套接口的读、写状态 */
 	void (*disable_readwrite_fn)(ACL_EVENT *, ACL_VSTREAM *);
 
-	/* �׽ӿڵĿɶ�״̬�Ƿ񱻼�� */
+	/* 套接口的可读状态是否被监控 */
 	int  (*isrset_fn)(ACL_EVENT *, ACL_VSTREAM *);
-	/* �׽ӿڵĿ�д״̬�Ƿ񱻼�� */
+	/* 套接口的可写状态是否被监控 */
 	int  (*iswset_fn)(ACL_EVENT *, ACL_VSTREAM *);
-	/* �׽ӿڵ��쳣״̬�Ƿ񱻼�� */
+	/* 套接口的异常状态是否被监控 */
 	int  (*isxset_fn)(ACL_EVENT *, ACL_VSTREAM *);
 
-	/* ���Ӷ�ʱ������ */
+	/* 添加定时器任务 */
 	acl_int64 (*timer_request)(ACL_EVENT *, ACL_EVENT_NOTIFY_TIME,
 		void *, acl_int64, int);
-	/* ȡ����ʱ������ */
+	/* 取消定时器任务 */
 	acl_int64 (*timer_cancel)(ACL_EVENT *ev,
 		ACL_EVENT_NOTIFY_TIME, void *);
-	/* ���ö�ʱ���Ƿ�Ϊѭ��ִ�� */
+	/* 设置定时器是否为循环执行 */
 	void (*timer_keep)(ACL_EVENT *, ACL_EVENT_NOTIFY_TIME, void *, int);
-	/* ��ʱ���Ƿ�ѭ��ִ�е� */
+	/* 定时器是否循环执行的 */
 	int  (*timer_ifkeep)(ACL_EVENT *, ACL_EVENT_NOTIFY_TIME, void *);
 
-	/* ÿ�ε����¼��ص�����ǰ���ú���ָ��ǿ����ȵ��ô˺��� */
+	/* 每次调用事件回调函数前若该函数指针非空则先调用此函数 */
 	void (*fire_begin)(ACL_EVENT *, void *);
-	/* ÿ�ε����¼��ص����������ú���ָ��ǿ�����ô˺��� */
+	/* 每次调用事件回调函数后若该函数指针非空则调用此函数 */
 	void (*fire_end)(ACL_EVENT *, void *);
-	/* fire_begin/fire_finish �ĵڶ������� */
+	/* fire_begin/fire_finish 的第二个参数 */
 	void *fire_ctx;
 };
 
-/* ������������������뱣�ּ���ʱ��ǳ��� */
+/* 如果采用自旋锁，必须保持加锁时间非常短 */
 /*
 #ifdef	ACL_HAS_SPINLOCK
 #define	EVENT_USE_SPINLOCK

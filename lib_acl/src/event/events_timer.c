@@ -22,14 +22,14 @@
 #include "events.h"
 
 struct EVENT_TIMERS {
-	ACL_HTABLE *table;		/**< ¹þÏ£±íÓÃÓÚ°´¼üÖµ²éÑ¯      */
-	acl_avl_tree_t  avl;		/**< ÓÃÓÚ°´Ê±¼äÅÅÐòµÄÆ½ºâ¶þ²æÊ÷ */
+	ACL_HTABLE *table;		/**< å“ˆå¸Œè¡¨ç”¨äºŽæŒ‰é”®å€¼æŸ¥è¯¢      */
+	acl_avl_tree_t  avl;		/**< ç”¨äºŽæŒ‰æ—¶é—´æŽ’åºçš„å¹³è¡¡äºŒå‰æ ‘ */
 };
 
 typedef struct TIMER_INFO TIMER_INFO;
 typedef struct TIMER_NODE TIMER_NODE;
 
-/* Ã¿¸öÔªËØµÄÄÚ²¿¶ÔÏó£¬ËùÓÐÔªËØÁ¬½ÓÔÚÒ»Æð£¬Í¬Ê±±íÃ÷¸ÃÔªËØËùÊôµÄÊ÷½Úµã */
+/* æ¯ä¸ªå…ƒç´ çš„å†…éƒ¨å¯¹è±¡ï¼Œæ‰€æœ‰å…ƒç´ è¿žæŽ¥åœ¨ä¸€èµ·ï¼ŒåŒæ—¶è¡¨æ˜Žè¯¥å…ƒç´ æ‰€å±žçš„æ ‘èŠ‚ç‚¹ */
 struct TIMER_INFO {
 	TIMER_NODE *node;
 	TIMER_INFO *prev;
@@ -44,7 +44,7 @@ struct TIMER_INFO {
 	ACL_RING tmp;
 };
 
-/* ¾ßÓÐÏàÍ¬¹ýÆÚÊ±¼ä½ØµÄÔªËØ´æ·ÅÀï¸ÃÊ÷½ÚµãÉÏ */
+/* å…·æœ‰ç›¸åŒè¿‡æœŸæ—¶é—´æˆªçš„å…ƒç´ å­˜æ”¾é‡Œè¯¥æ ‘èŠ‚ç‚¹ä¸Š */
 struct TIMER_NODE {
 	acl_int64   when;
 	acl_avl_node_t  node;
@@ -57,7 +57,7 @@ struct TIMER_NODE {
 	snprintf(key, sizeof(key), "%p.%p", x1, x2);
 
 /**
- * AVL ÓÃµÄ±È½Ï»Øµ÷º¯Êý
+ * AVL ç”¨çš„æ¯”è¾ƒå›žè°ƒå‡½æ•°
  */
 static int avl_cmp_fn(const void *v1, const void *v2)
 {

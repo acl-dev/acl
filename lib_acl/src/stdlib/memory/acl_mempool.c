@@ -13,8 +13,8 @@
 #include "allocator.h"
 #include "malloc_vars.h"
 
-/* xxx: 如果想要使用 pthread_spinlock_t 则不可将 stdlib.h 放在前面,
- * 否则编译报错
+/* xxx: 濡傛灉鎯宠浣跨敤 pthread_spinlock_t 鍒欎笉鍙皢 stdlib.h 鏀惧湪鍓嶉潰,
+ * 鍚﹀垯缂栬瘧鎶ラ敊
  */
 
 #ifdef	ACL_UNIX

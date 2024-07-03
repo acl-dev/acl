@@ -133,7 +133,7 @@ int main(int argc, char* argv[])
 			max = 10;
 	}
 
-	// ³õÊ¼»¯ acl ¿â
+	// Â³ÃµÃŠÂ¼Â»Â¯ acl Â¿Ã¢
 	acl::acl_cpp_init();
 
 	acl::thread_queue queue;

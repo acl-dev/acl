@@ -21,7 +21,7 @@ void master_trigger::run_daemon(int argc, char** argv)
 #ifdef ACL_WINDOWS
 	logger_fatal("not support ACL_WINDOWS!");
 #else
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(has_called == false);
 	has_called   = true;
 	daemon_mode_ = true;
@@ -43,7 +43,7 @@ void master_trigger::run_daemon(int argc, char** argv)
 void master_trigger::run_alone(const char* path /* = NULL */,
 	int count /* = 1 */, int interval /* = 1 */)
 {
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(has_called == false);
 	has_called = true;
 	daemon_mode_ = false;
@@ -54,7 +54,7 @@ void master_trigger::run_alone(const char* path /* = NULL */,
 		interval = 1;
 	}
 
-	// ³õÊ¼»¯ÅäÖÃ²ÎÊı
+	// åˆå§‹åŒ–é…ç½®å‚æ•°
 	conf_.load(path);
 
 	service_pre_jail(this);
@@ -106,7 +106,7 @@ void master_trigger::service_pre_jail(void* ctx)
 #ifndef ACL_WINDOWS
 	if (mt->daemon_mode()) {
 		ACL_EVENT* eventp = acl_trigger_server_event();
-		mt->set_event(eventp);  // ÉèÖÃ»ùÀàµÄÊÂ¼şÒıÇæ¾ä±ú
+		mt->set_event(eventp);  // è®¾ç½®åŸºç±»çš„äº‹ä»¶å¼•æ“å¥æŸ„
 	}
 #endif
 

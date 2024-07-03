@@ -49,28 +49,28 @@ public:
 
 public:
 	/**
-	 * µ÷ÓÃ±¾º¯ÊıÉèÖÃÒ»¸ö¶¯Ì¬¿âµÄÈ«Â·¾¶
-	 * @param libcrypto {const char*} libcrypto.so ¶¯Ì¬¿âµÄÈ«Â·¾¶
-	 * @param libssl {const char*} libssl.so ¶¯Ì¬¿âµÄÈ«Â·¾¶
+	 * è°ƒç”¨æœ¬å‡½æ•°è®¾ç½®ä¸€ä¸ªåŠ¨æ€åº“çš„å…¨è·¯å¾„
+	 * @param libcrypto {const char*} libcrypto.so åŠ¨æ€åº“çš„å…¨è·¯å¾„
+	 * @param libssl {const char*} libssl.so åŠ¨æ€åº“çš„å…¨è·¯å¾„
 	 */
 	static void set_libpath(const char* libcrypto, const char* libssl);
 
 	/**
-	 * ÏÔÊ½µ÷ÓÃ±¾·½·¨£¬¶¯Ì¬¼ÓÔØ libssl.so ¶¯Ì¬¿â
-	 * @return {bool} ¼ÓÔØÊÇ·ñ³É¹¦
+	 * æ˜¾å¼è°ƒç”¨æœ¬æ–¹æ³•ï¼ŒåŠ¨æ€åŠ è½½ libssl.so åŠ¨æ€åº“
+	 * @return {bool} åŠ è½½æ˜¯å¦æˆåŠŸ
 	 */
 	static bool load();
 
 	/**
-	 * µ÷ÓÃ load() ³É¹¦¼ÓÔØ OpenSSL ¶¯Ì¬¿âºó£¬µ÷ÓÃ±¾¾²Ì¬º¯Êı»ñµÃ libssl
-	 * ¶¯Ì¬¼ÓÔØ¿â¾ä±ú£¬´Ó¶ø¿ÉÒÔ´Ó¸Ã¾ä±úÖĞ»ñµÃÖ¸¶¨º¯ÊıÖ¸Õë
-	 * @return {void*} ·µ»Ø NULL ±íÊ¾»¹Î´¼ÓÔØ
+	 * è°ƒç”¨ load() æˆåŠŸåŠ è½½ OpenSSL åŠ¨æ€åº“åï¼Œè°ƒç”¨æœ¬é™æ€å‡½æ•°è·å¾— libssl
+	 * åŠ¨æ€åŠ è½½åº“å¥æŸ„ï¼Œä»è€Œå¯ä»¥ä»è¯¥å¥æŸ„ä¸­è·å¾—æŒ‡å®šå‡½æ•°æŒ‡é’ˆ
+	 * @return {void*} è¿”å› NULL è¡¨ç¤ºè¿˜æœªåŠ è½½
 	 */
 	static void* get_libssl_handle();
 
 	/**
-	 * »ñµÃ libcrypto ¶¯Ì¬¼ÓÔØ¿â¾ä±ú
-	 * @return {void*} ·µ»Ø NULL ±íÊ¾»¹Î´¼ÓÔØ
+	 * è·å¾— libcrypto åŠ¨æ€åŠ è½½åº“å¥æŸ„
+	 * @return {void*} è¿”å› NULL è¡¨ç¤ºè¿˜æœªåŠ è½½
 	 */
 	static void* get_libcrypto_handle();
 
@@ -83,7 +83,7 @@ public:
 
 public:
 	/**
-	 * ÊÇ·ñÎª SSL ·şÎñÄ£Ê½
+	 * æ˜¯å¦ä¸º SSL æœåŠ¡æ¨¡å¼
 	 * @return {bool}
 	 */
 	bool is_server_side() const {
@@ -91,44 +91,44 @@ public:
 	}
 
 	/**
-	 * »ñµÃÈ±Ê¡µÄSSL_CTX¶ÔÏó
+	 * è·å¾—ç¼ºçœçš„SSL_CTXå¯¹è±¡
 	 * @return {SSL_CTX*}
 	 */
 	SSL_CTX* get_ssl_ctx() const;
 
 	/**
-	 * »ñµÃËùÓĞµÄÒÑ¾­³õÊ¼Íê³ÉµÄ SSL_CTX ¶ÔÏó
+	 * è·å¾—æ‰€æœ‰çš„å·²ç»åˆå§‹å®Œæˆçš„ SSL_CTX å¯¹è±¡
 	 * @param out {std::vector<SSL_CTX*>&}
 	 */
 	void get_ssl_ctxes(std::vector<SSL_CTX*>& out);
 
 	/**
-	 * ·şÎñÄ£Ê½ÏÂ,´´½¨ SSL_CTX ¶ÔÏó,ÄÚ²¿×Ô¶¯ÉèÖÃ SNI »Øµ÷¹ı³Ì,ËäÈ»ÄÚ²¿Ò²ÊÇ
-	 * Í¨¹ıµ÷ÓÃ SSL_CTX_new() API ´´½¨ SSL_CTX ¶ÔÏó,µ«ÄÚ²¿»á×Ô¶¯Çø·Ö¶¯Ì¬
-	 * ¼ÓÔØ»ò¾²Ì¬¼ÓÔØµÄ SSL_CTX_new() API.
-	 * @return {SSL_CTX*} ·µ»Ø NULL ±íÊ¾Î´¿ªÆô OpenSSL ¹¦ÄÜ
+	 * æœåŠ¡æ¨¡å¼ä¸‹,åˆ›å»º SSL_CTX å¯¹è±¡,å†…éƒ¨è‡ªåŠ¨è®¾ç½® SNI å›è°ƒè¿‡ç¨‹,è™½ç„¶å†…éƒ¨ä¹Ÿæ˜¯
+	 * é€šè¿‡è°ƒç”¨ SSL_CTX_new() API åˆ›å»º SSL_CTX å¯¹è±¡,ä½†å†…éƒ¨ä¼šè‡ªåŠ¨åŒºåˆ†åŠ¨æ€
+	 * åŠ è½½æˆ–é™æ€åŠ è½½çš„ SSL_CTX_new() API.
+	 * @return {SSL_CTX*} è¿”å› NULL è¡¨ç¤ºæœªå¼€å¯ OpenSSL åŠŸèƒ½
 	 */
 	SSL_CTX* create_ssl_ctx();
 
 	/**
-	 * ·şÎñÄ£Ê½ÏÂ, Ìí¼ÓÍâ²¿ÒÑ¾­³õÊ¼Íê±ÏµÄ SSL_CTX, ¸Ã¶ÔÏó±ØĞëÊÇÓÉÉÏÃæ
-	 * create_ssl_ctx() ´´½¨µÄ,ÒÔÊÊÅä¶¯Ì¬»ò¾²Ì¬¼ÓÔØ OpenSSL µÄ²»Í¬·½Ê½.
-	 * @param {SSL_CTX*} ÓÉÓÃ»§×Ô×Ô¼º³õÊ¼»¯ºÃµÄ SSL_CTX ¶ÔÏó£¬´«ÈëºóÆäËùÓĞ
-	 *  È¨½«¹é openssl_conf ÄÚ²¿Í³Ò»¹ÜÀí²¢ÊÍ·Å
-	 * @return {bool} ·µ»Ø false ±íÊ¾Ìí¼ÓÊ§°Ü£¬Ô­Òò¿ÉÄÜÊÇ ctx Îª NULL£¬»ò
-	 *  µ±Ç° openssl_conf ¶ÔÏóÎª¿Í»§¶ËÄ£Ê½
+	 * æœåŠ¡æ¨¡å¼ä¸‹, æ·»åŠ å¤–éƒ¨å·²ç»åˆå§‹å®Œæ¯•çš„ SSL_CTX, è¯¥å¯¹è±¡å¿…é¡»æ˜¯ç”±ä¸Šé¢
+	 * create_ssl_ctx() åˆ›å»ºçš„,ä»¥é€‚é…åŠ¨æ€æˆ–é™æ€åŠ è½½ OpenSSL çš„ä¸åŒæ–¹å¼.
+	 * @param {SSL_CTX*} ç”±ç”¨æˆ·è‡ªè‡ªå·±åˆå§‹åŒ–å¥½çš„ SSL_CTX å¯¹è±¡ï¼Œä¼ å…¥åå…¶æ‰€æœ‰
+	 *  æƒå°†å½’ openssl_conf å†…éƒ¨ç»Ÿä¸€ç®¡ç†å¹¶é‡Šæ”¾
+	 * @return {bool} è¿”å› false è¡¨ç¤ºæ·»åŠ å¤±è´¥ï¼ŒåŸå› å¯èƒ½æ˜¯ ctx ä¸º NULLï¼Œæˆ–
+	 *  å½“å‰ openssl_conf å¯¹è±¡ä¸ºå®¢æˆ·ç«¯æ¨¡å¼
 	 */
 	bool push_ssl_ctx(SSL_CTX* ctx);
 
 	/**
-	 * ÔÚÉèÖÃ¶ÁĞ´³¬Ê±Ê±£¬ÊÇ·ñÊ¹ÓÃ setsockopt()
-	 * @param yes {bool} Èç¹ûÎª true ÔòÊ¹ÓÃ setsockopt ÉèÖÃ¶ÁĞ´³¬Ê±£¬·ñÔò
-	 *  Ê¹ÓÃ acl_read_wait/acl_write_wait ¼ì²é³¬Ê±Çé¾°£¬ÄÚ²¿È±Ê¡ÖµÎª true.
+	 * åœ¨è®¾ç½®è¯»å†™è¶…æ—¶æ—¶ï¼Œæ˜¯å¦ä½¿ç”¨ setsockopt()
+	 * @param yes {bool} å¦‚æœä¸º true åˆ™ä½¿ç”¨ setsockopt è®¾ç½®è¯»å†™è¶…æ—¶ï¼Œå¦åˆ™
+	 *  ä½¿ç”¨ acl_read_wait/acl_write_wait æ£€æŸ¥è¶…æ—¶æƒ…æ™¯ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º true.
 	 */
 	void use_sockopt_timeout(bool yes);
 
 	/**
-	 * ÊÇ·ñĞèÒªÊ¹ÓÃ setsockopt() ÉèÖÃÍøÂç³¬Ê±Ê±¼ä.
+	 * æ˜¯å¦éœ€è¦ä½¿ç”¨ setsockopt() è®¾ç½®ç½‘ç»œè¶…æ—¶æ—¶é—´.
 	 * @return {bool}
 	 */
 	bool is_sockopt_timeout() const {

@@ -8,7 +8,7 @@ class socket_stream;
 class string;
 
 /**
- * tcp ipc Í¨ĞÅ½ÓÊÕÀà£¬ÄÚ²¿»á×Ô¶¯¶ÁÈ¡ÍêÊÂµÄÊı¾İ°ü
+ * tcp ipc é€šä¿¡æ¥æ”¶ç±»ï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨è¯»å–å®Œäº‹çš„æ•°æ®åŒ…
  */
 class ACL_CPP_API tcp_reader : public noncopyable
 {
@@ -17,13 +17,13 @@ public:
 	~tcp_reader(void) {}
 
 	/**
-	 * ´Ó¶Ô¶Ë¶ÁÈ¡Êı¾İ£¬Ã¿´ÎÖ»¶ÁÒ»¸öÊı¾İ°ü
-	 * @param out {string&} ´æ´¢Êı¾İ°ü£¬ÄÚ²¿²ÉÓÃ×·¼Ó·½Ê½Íù out Ìí¼ÓÊı¾İ
+	 * ä»å¯¹ç«¯è¯»å–æ•°æ®ï¼Œæ¯æ¬¡åªè¯»ä¸€ä¸ªæ•°æ®åŒ…
+	 * @param out {string&} å­˜å‚¨æ•°æ®åŒ…ï¼Œå†…éƒ¨é‡‡ç”¨è¿½åŠ æ–¹å¼å¾€ out æ·»åŠ æ•°æ®
 	 */
 	bool read(string& out);
 
 	/**
-	 * »ñµÃÁ¬½ÓÁ÷¶ÔÏó
+	 * è·å¾—è¿æ¥æµå¯¹è±¡
 	 * @return {acl::socket_stream&}
 	 */
 	acl::socket_stream& get_conn(void) const

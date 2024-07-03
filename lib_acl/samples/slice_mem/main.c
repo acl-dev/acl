@@ -3,11 +3,11 @@
 
 /*----------------------------------------------------------------------------*/
 
-/* Ïß³Ì³ØÖĞÄ³Ïß³ÌµÄÈÎÎñ´¦Àí¹ı³Ì */
+/* çº¿ç¨‹æ± ä¸­æŸçº¿ç¨‹çš„ä»»åŠ¡å¤„ç†è¿‡ç¨‹ */
 
 static void run_thread(void *arg)
 {
-	/* ÊÍ·ÅÖ÷Ïß³Ì·ÖÅäµÄÄÚ´æ */
+	/* é‡Šæ”¾ä¸»çº¿ç¨‹åˆ†é…çš„å†…å­˜ */
 	if (1)
 	acl_myfree(arg);
 }
@@ -20,16 +20,16 @@ static void thread_pool_tls(int nthread, int nalloc)
 	time_t begin = time(NULL);
 	int   i;
 
-	/* ´´½¨Ïß³Ì³Ø */
+	/* åˆ›å»ºçº¿ç¨‹æ±  */
 	thr_pool = acl_thread_pool_create(nthread, 0);
 
 	for (i = 0; i < nalloc; i++) {
-		/* Ö÷Ïß³Ì·ÖÅäÄÚ´æ */
+		/* ä¸»çº¿ç¨‹åˆ†é…å†…å­˜ */
 		if (1)
 		ptr = acl_mymalloc(64);
 		else
 		ptr = 0;
-		/* ÏòÏß³Ì³ØÖĞÌí¼ÓÈÎÎñ, ½«ĞÂÄÚ´æ´«µİ¸øÏß³Ì³Ø´¦Àí */
+		/* å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ä»»åŠ¡, å°†æ–°å†…å­˜ä¼ é€’ç»™çº¿ç¨‹æ± å¤„ç† */
 		/*
 		 * ACL_METER_TIME("--31--");
 		 */
@@ -41,7 +41,7 @@ static void thread_pool_tls(int nthread, int nalloc)
 		 */
 	}
 
-	/* ÊÍ·ÅÏß³Ì³Ø */
+	/* é‡Šæ”¾çº¿ç¨‹æ±  */
 	acl_pthread_pool_destroy(thr_pool);
 	printf(">>>%s: time cost: %ld\n", myname, (long) (time(NULL) - begin));
 }
@@ -164,11 +164,11 @@ int main(int argc, char *argv[])
 	if (use_slice) {
 		acl_mem_slice_destroy();
 
-		/* È¡ÏûÄÚ´æ¹ÜÀíµÄ¹´×Óº¯Êı£¬»Ö¸´ÎªÈ±Ê¡×´Ì¬ */
+		/* å–æ¶ˆå†…å­˜ç®¡ç†çš„å‹¾å­å‡½æ•°ï¼Œæ¢å¤ä¸ºç¼ºçœçŠ¶æ€ */
 		acl_mem_unhook();
 	}
 
-	/* È±Ê¡µÄÄÚ´æ·ÖÅäÓëÊÍ·Å */
+	/* ç¼ºçœçš„å†…å­˜åˆ†é…ä¸é‡Šæ”¾ */
 
 	ptr = acl_mymalloc(128);
 	acl_myfree(ptr);

@@ -72,8 +72,8 @@ static void test_thread_pool(int n)
 		threads->execute(&thread1);
 		threads->execute(&thread2);
 
-		// ÒòÎª thread1, thread2 ÊÇ¶ÑÕ»±äÁ¿£¬ËùÒÔ±ØÐëµ÷ÓÃ
-		// threads->stop µÈ´ý×ÓÏß³ÌÔËÐÐ½áÊø
+		// å› ä¸º thread1, thread2 æ˜¯å †æ ˆå˜é‡ï¼Œæ‰€ä»¥å¿…é¡»è°ƒç”¨
+		// threads->stop ç­‰å¾…å­çº¿ç¨‹è¿è¡Œç»“æŸ
 		threads->stop();
 		delete threads;
 	}
@@ -86,12 +86,12 @@ static void test_thread_pool(int n)
 		threads.execute(thread1);
 		threads.execute(thread2);
 
-		// ÎªÁË±£Ö¤ threads1, thread2 ¶¯Ì¬ÄÚ´æ±»ÕýÈ·ÊÍ·Å£¬
-		// ±ØÐëµ÷ÓÃ threads.stop µÈ´ý×ÓÏß³ÌÔËÐÐ½áÊøºóÔÚ
-		// Ö÷Ïß³ÌÖÐ½«ÆäÊÍ·Å
+		// ä¸ºäº†ä¿è¯ threads1, thread2 åŠ¨æ€å†…å­˜è¢«æ­£ç¡®é‡Šæ”¾ï¼Œ
+		// å¿…é¡»è°ƒç”¨ threads.stop ç­‰å¾…å­çº¿ç¨‹è¿è¡Œç»“æŸåŽåœ¨
+		// ä¸»çº¿ç¨‹ä¸­å°†å…¶é‡Šæ”¾
 		threads.stop();
 
-		// ÔÚÖ÷Ïß³ÌÖÐÊÍ·Å¶¯Ì¬·ÖÅäµÄ¶ÔÏó
+		// åœ¨ä¸»çº¿ç¨‹ä¸­é‡Šæ”¾åŠ¨æ€åˆ†é…çš„å¯¹è±¡
 		delete thread1;
 		delete thread2;
 	}
@@ -105,8 +105,8 @@ static void test_thread_pool(int n)
 		threads.execute(&thread1);
 		threads.execute(&thread2);
 
-		// ÒòÎª thread1, thread2 ÊÇ¶ÑÕ»±äÁ¿£¬ËùÒÔ±ØÐëµ÷ÓÃ
-		// threads->stop µÈ´ý×ÓÏß³ÌÔËÐÐ½áÊø
+		// å› ä¸º thread1, thread2 æ˜¯å †æ ˆå˜é‡ï¼Œæ‰€ä»¥å¿…é¡»è°ƒç”¨
+		// threads->stop ç­‰å¾…å­çº¿ç¨‹è¿è¡Œç»“æŸ
 		threads.stop();
 	}
 	else if (n == 3)
@@ -142,7 +142,7 @@ static void test_thread_pool(int n)
 	}
 	else if (n == 5)
 	{
-		// ¿ÉÒÔÖ±½ÓÊ¹ÓÃ»ùÀà
+		// å¯ä»¥ç›´æŽ¥ä½¿ç”¨åŸºç±»
 		static acl::thread_pool threads;
 		threads.set_idle(1);
 		threads.start();
@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
 {
 	int   ch, n = 0;
 
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	while ((ch = getopt(argc, argv, "hc:")) > 0)

@@ -27,41 +27,41 @@ class sslbase_io;
 class http_header;
 
 /**
- * HTTP ¿Í»§¶ËÒì²½Í¨ĞÅÀà£¬²»½öÖ§³Ö±ê×¼ HTTP Í¨ĞÅĞ­Òé£¬¶øÇÒÖ§³Ö Websocket Í¨ĞÅ£¬
- * ¶ÔÓÚ HTTP Ğ­Òé¼° Websocket Í¨ĞÅ¾ùÖ§³Ö SSL ¼ÓÃÜ´«Êä£»
- * ÁíÍâ£¬¶ÔÓÚ HTTP Ğ­Òé£¬¸ù¾İÓÃ»§ÉèÖÃ£¬¿ÉÒÔ×Ô¶¯½âÑ¹ GZIP ÏìÓ¦Êı¾İ£¬ÕâÑùÔÚ»Øµ÷
- * ·½·¨ on_http_res_body() ÖĞÊÕµ½µÄ±ãÊÇ½âÑ¹ºóµÄÃ÷ÎÄÊı¾İ¡£
+ * HTTP å®¢æˆ·ç«¯å¼‚æ­¥é€šä¿¡ç±»ï¼Œä¸ä»…æ”¯æŒæ ‡å‡† HTTP é€šä¿¡åè®®ï¼Œè€Œä¸”æ”¯æŒ Websocket é€šä¿¡ï¼Œ
+ * å¯¹äº HTTP åè®®åŠ Websocket é€šä¿¡å‡æ”¯æŒ SSL åŠ å¯†ä¼ è¾“ï¼›
+ * å¦å¤–ï¼Œå¯¹äº HTTP åè®®ï¼Œæ ¹æ®ç”¨æˆ·è®¾ç½®ï¼Œå¯ä»¥è‡ªåŠ¨è§£å‹ GZIP å“åº”æ•°æ®ï¼Œè¿™æ ·åœ¨å›è°ƒ
+ * æ–¹æ³• on_http_res_body() ä¸­æ”¶åˆ°çš„ä¾¿æ˜¯è§£å‹åçš„æ˜æ–‡æ•°æ®ã€‚
  */
 class ACL_CPP_API http_aclient : public aio_open_callback {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param handle {aio_handle&} Òì²½Í¨ĞÅÊÂ¼şÒıÇæ¾ä±ú
-	 * @param ssl_conf {sslbase_conf*} ·Ç NULL Ê±×Ô¶¯²ÉÓÃ SSL Í¨ĞÅ·½Ê½
+	 * æ„é€ å‡½æ•°
+	 * @param handle {aio_handle&} å¼‚æ­¥é€šä¿¡äº‹ä»¶å¼•æ“å¥æŸ„
+	 * @param ssl_conf {sslbase_conf*} é NULL æ—¶è‡ªåŠ¨é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
 	 */
 	explicit http_aclient(aio_handle& handle, sslbase_conf* ssl_conf = NULL);
 	virtual ~http_aclient();
 
 	/**
-	 * µ±¶ÔÏóÏú»ÙÊ±µÄ»Øµ÷·½·¨£¬×ÓÀà±ØĞëÊµÏÖ
+	 * å½“å¯¹è±¡é”€æ¯æ—¶çš„å›è°ƒæ–¹æ³•ï¼Œå­ç±»å¿…é¡»å®ç°
 	 */
 	virtual void destroy() = 0;
 
 	/**
-	 * »ñµÃ HTTP ÇëÇóÍ·£¬ÒÔ±ãÓÚÓ¦ÓÃÌí¼Ó HTTP ÇëÇóÍ·ÖĞµÄ×Ö¶ÎÄÚÈİ
+	 * è·å¾— HTTP è¯·æ±‚å¤´ï¼Œä»¥ä¾¿äºåº”ç”¨æ·»åŠ  HTTP è¯·æ±‚å¤´ä¸­çš„å­—æ®µå†…å®¹
 	 * @return {http_header&}
 	 */
 	http_header& request_header();
 
 	/**
-	 * Õë¶Ô HTTP Ğ­ÒéµÄÏìÓ¦Êı¾İÊÇ·ñ×Ô¶¯½øĞĞ½âÑ¹
+	 * é’ˆå¯¹ HTTP åè®®çš„å“åº”æ•°æ®æ˜¯å¦è‡ªåŠ¨è¿›è¡Œè§£å‹
 	 * @param on {bool}
 	 * @return {http_aclient&}
 	 */
 	http_aclient& unzip_body(bool on);
 
 	/**
-	 * ÊÇ·ñÕë¶Ô GZIP Ñ¹ËõÊı¾İ×Ô¶¯½øĞĞ½âÑ¹
+	 * æ˜¯å¦é’ˆå¯¹ GZIP å‹ç¼©æ•°æ®è‡ªåŠ¨è¿›è¡Œè§£å‹
 	 * @return {bool}
 	 */
 	bool is_unzip_body() const {
@@ -69,55 +69,55 @@ public:
 	}
 
 	/**
-	 * ³ı¿ÉÒÔÔÚ¹¹Ôìº¯ÊıÖĞÉèÖÃ SSL conf Íâ£¬»¹¿ÉÒÔÍ¨¹ı´Ë·½·¨ÉèÖÃ£¬Èç¹ûÔÚ
-	 * ¹¹Ôìº¯ÊıÖĞÉèÖÃµÄ ssl_conf Îª NULL£¬ÔòÄÚ²¿×Ô¶¯½« ssl_enable_ ÖÃÎª
-	 * false£¬Í¨¹ı±¾·½·¨ÉèÖÃÁË ssl_conf ºó»¹Ğèµ÷ÓÃÏÂÃæµÄ enable_ssl()
-	 * ·½·¨ÒÔÆôÓÃ ssl ¹¦ÄÜ
-	 * @param ssl_conf {sslbase_conf*} Îª NULL Ê±½«È¡Ïû SSL¹¦ÄÜ
+	 * é™¤å¯ä»¥åœ¨æ„é€ å‡½æ•°ä¸­è®¾ç½® SSL conf å¤–ï¼Œè¿˜å¯ä»¥é€šè¿‡æ­¤æ–¹æ³•è®¾ç½®ï¼Œå¦‚æœåœ¨
+	 * æ„é€ å‡½æ•°ä¸­è®¾ç½®çš„ ssl_conf ä¸º NULLï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨å°† ssl_enable_ ç½®ä¸º
+	 * falseï¼Œé€šè¿‡æœ¬æ–¹æ³•è®¾ç½®äº† ssl_conf åè¿˜éœ€è°ƒç”¨ä¸‹é¢çš„ enable_ssl()
+	 * æ–¹æ³•ä»¥å¯ç”¨ ssl åŠŸèƒ½
+	 * @param ssl_conf {sslbase_conf*} ä¸º NULL æ—¶å°†å–æ¶ˆ SSLåŠŸèƒ½
 	 * @return {http_aclient&}
 	 */
 	http_aclient& set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
-	 * »ñµÃÉèÖÃµÄ SSL ÅäÖÃ
-	 * @return {sslbase_conf*} Îª NULL ±íÊ¾Î´ÉèÖÃ
+	 * è·å¾—è®¾ç½®çš„ SSL é…ç½®
+	 * @return {sslbase_conf*} ä¸º NULL è¡¨ç¤ºæœªè®¾ç½®
 	 */
 	sslbase_conf* get_ssl_conf() const {
 		return ssl_conf_;
 	}
 
 	/**
-	 * ÉèÖÃ SSL ÎÕÊÖÊ±µÄ SNI ×Ö¶Î
-	 * @param sni {const char*} Èç¹ûÎª NULL£¬Ôò×Ô¶¯½«Ê¹ÓÃ HTTP Í·ÖĞµÄ Host ×Ö¶Î
+	 * è®¾ç½® SSL æ¡æ‰‹æ—¶çš„ SNI å­—æ®µ
+	 * @param sni {const char*} å¦‚æœä¸º NULLï¼Œåˆ™è‡ªåŠ¨å°†ä½¿ç”¨ HTTP å¤´ä¸­çš„ Host å­—æ®µ
 	 * @return {http_request&}
 	 */
 	http_aclient& set_ssl_sni(const char* sni);
 
 	/**
-	 * ÉèÖÃ SSL ÎÕÊÖÊ±µÄ SNI ×Ö¶ÎÇ°×º
-	 * @param prefix {const char*} SNI Ç°×º
+	 * è®¾ç½® SSL æ¡æ‰‹æ—¶çš„ SNI å­—æ®µå‰ç¼€
+	 * @param prefix {const char*} SNI å‰ç¼€
 	 * @return {http_request&}
 	 */
 	http_aclient& set_ssl_sni_prefix(const char* prefix);
 
 	/**
-	 * ÉèÖÃ SSL ÎÕÊÖÊ±µÄ SNI ×Ö¶Îºó×º
-	 * @param suffix {const char*} SNI ºó×º
+	 * è®¾ç½® SSL æ¡æ‰‹æ—¶çš„ SNI å­—æ®µåç¼€
+	 * @param suffix {const char*} SNI åç¼€
 	 * @return {http_request&}
 	 */
 	http_aclient& set_ssl_sni_suffix(const char* prefix);
 
 	/**
-	 * µ±¹¹Ôìº¯ÊıÖĞ ssl_conf ²ÎÊı·Ç¿ÕÊ±£¬¿ÉÒÔµ÷ÓÃ´Ë·½·¨À´ÉèÖÃÊÇ·ñÆôÓÃ SSL
-	 * ¹¦ÄÜ£¬Èç¹û ssl_conf ·Ç¿Õ£¬ÔòÄÚ²¿ ssl_enable_ È±Ê¡ÖµÎª true£¬¿ÉÒÔÍ¨
-	 * ¹ı±¾·½·¨¹Ø±Õ»ò¿ªÆô ssl ¹¦ÄÜ
+	 * å½“æ„é€ å‡½æ•°ä¸­ ssl_conf å‚æ•°éç©ºæ—¶ï¼Œå¯ä»¥è°ƒç”¨æ­¤æ–¹æ³•æ¥è®¾ç½®æ˜¯å¦å¯ç”¨ SSL
+	 * åŠŸèƒ½ï¼Œå¦‚æœ ssl_conf éç©ºï¼Œåˆ™å†…éƒ¨ ssl_enable_ ç¼ºçœå€¼ä¸º trueï¼Œå¯ä»¥é€š
+	 * è¿‡æœ¬æ–¹æ³•å…³é—­æˆ–å¼€å¯ ssl åŠŸèƒ½
 	 * @param yes {bool}
 	 * @return {http_aclient&}
 	 */
 	http_aclient& enable_ssl(bool yes);
 
 	/**
-	 * ÅĞ¶ÏÄÚ²¿ÊÇ·ñÆôÓÃÁË ssl ¹¦ÄÜ
+	 * åˆ¤æ–­å†…éƒ¨æ˜¯å¦å¯ç”¨äº† ssl åŠŸèƒ½
 	 * @return {bool}
 	 */
 	bool is_enable_ssl() const {
@@ -125,42 +125,42 @@ public:
 	}
 
 	/**
-	 * ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì WEB ·şÎñÆ÷
-	 * @param addr {const char*} Ô¶³Ì WEB ·şÎñÆ÷µØÖ·£¬¸ñÊ½Îª£º
-	 *  domain:port »ò ip:port, µ±µØÖ·ÎªÓòÃûÊ±£¬ÄÚ²¿×Ô¶¯½øĞĞÒì²½ÓòÃû½âÎö
-	 *  ¹ı³Ì£¬µ«ÒªÇóÔÚ³ÌĞò¿ªÊ¼Ê±±ØĞëÍ¨¹ı aio_handle::set_dns() ÉèÖÃ¹ıÓòÃû
-	 *  ·şÎñÆ÷µØÖ·£¬Èç¹ûµØÖ·Îª IP Ôò²»ĞèÒªÏÈÉèÖÃÓòÃû·şÎñÆ÷µØÖ·
-	 * @param conn_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @param rw_timeout {int} ÍøÂç IO ¶ÁĞ´³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @param local {const char*} ±¾µØÍø¿¨IPµØÖ·»òÍø¿¨Ãû£¬Èç¹û·Ç¿ÕÊ±£¬µÚÒ»¸ö×ÖÄ¸
-	 *  Îª @ ±íÊ¾ºóÃæ¸úµÄÊÇ IP µØÖ·£¬Èç¹ûÎª # ±íÊ¾ºóÃæ¸úµÄÊÇÍø¿¨Ãû£¬Èç£º
+	 * å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹ WEB æœåŠ¡å™¨
+	 * @param addr {const char*} è¿œç¨‹ WEB æœåŠ¡å™¨åœ°å€ï¼Œæ ¼å¼ä¸ºï¼š
+	 *  domain:port æˆ– ip:port, å½“åœ°å€ä¸ºåŸŸåæ—¶ï¼Œå†…éƒ¨è‡ªåŠ¨è¿›è¡Œå¼‚æ­¥åŸŸåè§£æ
+	 *  è¿‡ç¨‹ï¼Œä½†è¦æ±‚åœ¨ç¨‹åºå¼€å§‹æ—¶å¿…é¡»é€šè¿‡ aio_handle::set_dns() è®¾ç½®è¿‡åŸŸå
+	 *  æœåŠ¡å™¨åœ°å€ï¼Œå¦‚æœåœ°å€ä¸º IP åˆ™ä¸éœ€è¦å…ˆè®¾ç½®åŸŸåæœåŠ¡å™¨åœ°å€
+	 * @param conn_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @param rw_timeout {int} ç½‘ç»œ IO è¯»å†™è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @param local {const char*} æœ¬åœ°ç½‘å¡IPåœ°å€æˆ–ç½‘å¡åï¼Œå¦‚æœéç©ºæ—¶ï¼Œç¬¬ä¸€ä¸ªå­—æ¯
+	 *  ä¸º @ è¡¨ç¤ºåé¢è·Ÿçš„æ˜¯ IP åœ°å€ï¼Œå¦‚æœä¸º # è¡¨ç¤ºåé¢è·Ÿçš„æ˜¯ç½‘å¡åï¼Œå¦‚ï¼š
 	 *  @127.0.0.1, #eth1
-	 * @return {bool} ·µ»Ø false ±íÊ¾Á¬½ÓÊ§°Ü£¬·µ»Ø true ±íÊ¾½øÈëÒì²½Á¬½ÓÖĞ
+	 * @return {bool} è¿”å› false è¡¨ç¤ºè¿æ¥å¤±è´¥ï¼Œè¿”å› true è¡¨ç¤ºè¿›å…¥å¼‚æ­¥è¿æ¥ä¸­
 	 */
 	bool open(const char* addr, int conn_timeout, int rw_timeout,
 		const char *local = NULL);
 
 	/**
-	 * Òì²½¹Ø±ÕÁ¬½Ó
+	 * å¼‚æ­¥å…³é—­è¿æ¥
 	 */
 	void close();
 
 	/**
-	 * »ñµÃ±¾´ÎÁ¬½Ó£¨ÎŞÂÛ³É¹¦»òÊ§°Ü£©ËùÊ¹ÓÃµÄ DNS ·şÎñµØÖ·
-	 * @param out {string&} ´æ´¢½á¹û
-	 * @return {bool} ·µ»Ø false ±íÊ¾Ã»ÓĞ¿ÉÓÃµÄ DNS µØÖ·
+	 * è·å¾—æœ¬æ¬¡è¿æ¥ï¼ˆæ— è®ºæˆåŠŸæˆ–å¤±è´¥ï¼‰æ‰€ä½¿ç”¨çš„ DNS æœåŠ¡åœ°å€
+	 * @param out {string&} å­˜å‚¨ç»“æœ
+	 * @return {bool} è¿”å› false è¡¨ç¤ºæ²¡æœ‰å¯ç”¨çš„ DNS åœ°å€
 	 */
 	bool get_ns_addr(string& out) const;
 
 	/**
-	 * µ±Á¬½Ó³É¹¦¡¢Á¬½ÓÊ§°Ü»òÁ¬½Ó³¬Ê±Ê±¿Éµ÷ÓÃ´Ë·½·¨»ñµÃµ±Ç°ËùÁ¬½ÓÓÃµÄÓ¦ÓÃ·şÎñÆ÷µØÖ·
-	 * @param out {string&} ´æ´¢½á¹û
-	 * @return {bool} ·µ»Ø false ±íÊ¾»¹Ã»ÓĞÉèÖÃËùÁ¬½Ó·şÎñÆ÷µÄµØÖ·
+	 * å½“è¿æ¥æˆåŠŸã€è¿æ¥å¤±è´¥æˆ–è¿æ¥è¶…æ—¶æ—¶å¯è°ƒç”¨æ­¤æ–¹æ³•è·å¾—å½“å‰æ‰€è¿æ¥ç”¨çš„åº”ç”¨æœåŠ¡å™¨åœ°å€
+	 * @param out {string&} å­˜å‚¨ç»“æœ
+	 * @return {bool} è¿”å› false è¡¨ç¤ºè¿˜æ²¡æœ‰è®¾ç½®æ‰€è¿æ¥æœåŠ¡å™¨çš„åœ°å€
 	 */
 	bool get_server_addr(string& out) const;
 
 	/**
-	 * Á¬½Ó³É¹¦ºó¿Éµ÷ÓÃ±¾·½·¨»ñµÃÒì²½Á¬½Ó¶ÔÏó
+	 * è¿æ¥æˆåŠŸåå¯è°ƒç”¨æœ¬æ–¹æ³•è·å¾—å¼‚æ­¥è¿æ¥å¯¹è±¡
 	 * @return {aio_socket_stream*}
 	 */
 	aio_socket_stream* get_conn() const {
@@ -169,46 +169,46 @@ public:
 
 protected:
 	/**
-	 * µ±Á¬½Ó³É¹¦ºóµÄ»Øµ÷·½·¨£¬×ÓÀà±ØĞëÊµÏÖ£¬×ÓÀàÓ¦ÔÚ¸Ã·½·¨Àï¹¹Ôì HTTP ÇëÇó
-	 * ²¢µ÷ÓÃ send_request ·½·¨Ïò WEB ·şÎñÆ÷·¢ËÍ HTTP ÇëÇó
-	 * @return {bool} ¸Ã·½·¨Èç¹û·µ»Ø false ÔòÄÚ²¿»á×Ô¶¯¹Ø±ÕÁ¬½Ó
+	 * å½“è¿æ¥æˆåŠŸåçš„å›è°ƒæ–¹æ³•ï¼Œå­ç±»å¿…é¡»å®ç°ï¼Œå­ç±»åº”åœ¨è¯¥æ–¹æ³•é‡Œæ„é€  HTTP è¯·æ±‚
+	 * å¹¶è°ƒç”¨ send_request æ–¹æ³•å‘ WEB æœåŠ¡å™¨å‘é€ HTTP è¯·æ±‚
+	 * @return {bool} è¯¥æ–¹æ³•å¦‚æœè¿”å› false åˆ™å†…éƒ¨ä¼šè‡ªåŠ¨å…³é—­è¿æ¥
 	 */
 	virtual bool on_connect() = 0;
 
 	/**
-	 * µ±ÓòÃû½âÎöÊ§°ÜÊ±µÄ»Øµ÷·½·¨£¬ÔÚµ÷ÓÃ±¾·½·¨ºó£¬ÄÚ²¿×Ô¶¯µ÷ÓÃ this->destroy() ·½·¨
+	 * å½“åŸŸåè§£æå¤±è´¥æ—¶çš„å›è°ƒæ–¹æ³•ï¼Œåœ¨è°ƒç”¨æœ¬æ–¹æ³•åï¼Œå†…éƒ¨è‡ªåŠ¨è°ƒç”¨ this->destroy() æ–¹æ³•
 	 */
 	virtual void on_ns_failed() {}
 
 	/**
-	 * µ±Á¬½Ó³¬Ê±ºóµÄ»Øµ÷·½·¨£¬ÔÚµ÷ÓÃ±¾·½·¨ºó£¬ÄÚ²¿×Ô¶¯µ÷ÓÃ this->destroy() ·½·¨
+	 * å½“è¿æ¥è¶…æ—¶åçš„å›è°ƒæ–¹æ³•ï¼Œåœ¨è°ƒç”¨æœ¬æ–¹æ³•åï¼Œå†…éƒ¨è‡ªåŠ¨è°ƒç”¨ this->destroy() æ–¹æ³•
 	 */
 	virtual void on_connect_timeout() {}
 
 	/**
-	 * µ±Á¬½ÓÊ§°ÜºóµÄ»Øµ÷·½·¨£¬ÔÚµ÷ÓÃ±¾·½·¨ºó£¬ÄÚ²¿×Ô¶¯µ÷ÓÃ this->destroy() ·½·¨
+	 * å½“è¿æ¥å¤±è´¥åçš„å›è°ƒæ–¹æ³•ï¼Œåœ¨è°ƒç”¨æœ¬æ–¹æ³•åï¼Œå†…éƒ¨è‡ªåŠ¨è°ƒç”¨ this->destroy() æ–¹æ³•
 	 */
 	virtual void on_connect_failed() {}
 
 	/**
-	 * µ±ÍøÂç¶Á³¬Ê±Ê±µÄ»Øµ÷·½·¨
-	 * @return {bool} µ±¶Á³¬Ê±»Øµ÷·½·¨·µ»Ø true£¬ÔòÄÚ²¿»á¼ÌĞø¶ÁÊı¾İ£¬Èç¹û
-	 *  ·µ»Ø false£¬Ôò¸ÃÁ¬½Ó½«»á±»¹Ø±Õ£¬½Ó×Å»Øµ÷ on_disconnect() Ğé·½·¨
+	 * å½“ç½‘ç»œè¯»è¶…æ—¶æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} å½“è¯»è¶…æ—¶å›è°ƒæ–¹æ³•è¿”å› trueï¼Œåˆ™å†…éƒ¨ä¼šç»§ç»­è¯»æ•°æ®ï¼Œå¦‚æœ
+	 *  è¿”å› falseï¼Œåˆ™è¯¥è¿æ¥å°†ä¼šè¢«å…³é—­ï¼Œæ¥ç€å›è°ƒ on_disconnect() è™šæ–¹æ³•
 	 */
 	virtual bool on_read_timeout() {
 		return false;
 	}
 
 	/**
-	 * ¶ÔÓÚÁ¬½Ó³É¹¦ºóÁ¬½Ó¹Ø±ÕºóµÄ»Øµ÷·½·¨£¬ÄÚ²¿µ÷ÓÃ´Ë·½·¨ºó±ãÁ¢¼´»Øµ÷
-	 * destroy() ·½·¨
+	 * å¯¹äºè¿æ¥æˆåŠŸåè¿æ¥å…³é—­åçš„å›è°ƒæ–¹æ³•ï¼Œå†…éƒ¨è°ƒç”¨æ­¤æ–¹æ³•åä¾¿ç«‹å³å›è°ƒ
+	 * destroy() æ–¹æ³•
 	 */
 	virtual void on_disconnect() {};
 
 	/**
-	 * µ±½ÓÊÕµ½ WEB ·şÎñ¶ËµÄÏìÓ¦Í·Ê±µÄ»Øµ÷·½·¨
+	 * å½“æ¥æ”¶åˆ° WEB æœåŠ¡ç«¯çš„å“åº”å¤´æ—¶çš„å›è°ƒæ–¹æ³•
 	 * @param header {const http_header&}
-	 * @return {bool} ·µ»Ø false Ôò½«»á¹Ø±ÕÁ¬½Ó£¬·ñÔò¼ÌĞø¶Á
+	 * @return {bool} è¿”å› false åˆ™å°†ä¼šå…³é—­è¿æ¥ï¼Œå¦åˆ™ç»§ç»­è¯»
 	 */
 	virtual bool on_http_res_hdr(const http_header& header) {
 		(void) header;
@@ -216,11 +216,11 @@ protected:
 	}
 
 	/**
-	 * µ±½ÓÊÕµ½ WEB ·şÎñ¶ËµÄÏìÓ¦ÌåÊ±µÄ»Øµ÷·½·¨£¬¸Ã·½·¨¿ÉÄÜ»á±»¶à´Î»Øµ÷
-	 * Ö±µ½ÏìÓ¦Êı¾İ¶ÁÍê»ò³ö´í
-	 * @param data {char*} ¶Áµ½µÄ²¿·ÖÊı¾İÌåÄÚÈİ
-	 * @param dlen {size_t} ±¾´Î¶Áµ½µÄ data Êı¾İµÄ³¤¶È
-	 * @return {bool} ·µ»Ø false Ôò½«»á¹Ø±ÕÁ¬½Ó£¬·ñÔò¼ÌĞø¶Á
+	 * å½“æ¥æ”¶åˆ° WEB æœåŠ¡ç«¯çš„å“åº”ä½“æ—¶çš„å›è°ƒæ–¹æ³•ï¼Œè¯¥æ–¹æ³•å¯èƒ½ä¼šè¢«å¤šæ¬¡å›è°ƒ
+	 * ç›´åˆ°å“åº”æ•°æ®è¯»å®Œæˆ–å‡ºé”™
+	 * @param data {char*} è¯»åˆ°çš„éƒ¨åˆ†æ•°æ®ä½“å†…å®¹
+	 * @param dlen {size_t} æœ¬æ¬¡è¯»åˆ°çš„ data æ•°æ®çš„é•¿åº¦
+	 * @return {bool} è¿”å› false åˆ™å°†ä¼šå…³é—­è¿æ¥ï¼Œå¦åˆ™ç»§ç»­è¯»
 	 */
 	virtual bool on_http_res_body(char* data, size_t dlen) {
 		(void) data;
@@ -229,9 +229,9 @@ protected:
 	}
 
 	/**
-	 * µ±¶ÁÍê HTTP ÏìÓ¦Ìå»ò³ö´íºóµÄ»Øµ÷·½·¨
-	 * @param success {bool} ÊÇ·ñ³É¹¦¶ÁÍê HTTP ÏìÓ¦ÌåÊı¾İ
-	 * @return {bool} Èç¹û³É¹¦¶ÁÍêÊı¾İÌåºó·µ»Ø false Ôò»á¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»å®Œ HTTP å“åº”ä½“æˆ–å‡ºé”™åçš„å›è°ƒæ–¹æ³•
+	 * @param success {bool} æ˜¯å¦æˆåŠŸè¯»å®Œ HTTP å“åº”ä½“æ•°æ®
+	 * @return {bool} å¦‚æœæˆåŠŸè¯»å®Œæ•°æ®ä½“åè¿”å› false åˆ™ä¼šå…³é—­è¿æ¥
 	 */
 	virtual bool on_http_res_finish(bool success) {
 		(void) success;
@@ -239,45 +239,45 @@ protected:
 	}
 
 	/**
-	 * µ± websocket ÎÕÊÖ³É¹¦ºóµÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø false ±íÊ¾ĞèÒª¹Ø±ÕÁ¬½Ó£¬·ñÔò¼ÌĞø
+	 * å½“ websocket æ¡æ‰‹æˆåŠŸåçš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› false è¡¨ç¤ºéœ€è¦å…³é—­è¿æ¥ï¼Œå¦åˆ™ç»§ç»­
 	 */
 	virtual bool on_ws_handshake() {
-		// ¿ªÊ¼Òì²½¶Á websocket Êı¾İ
+		// å¼€å§‹å¼‚æ­¥è¯» websocket æ•°æ®
 		this->ws_read_wait(0);
 		return true;
 	}
 
 	/**
-	 * µ± websocket ÎÕÊÖÊ§°ÜºóµÄ»Øµ÷·½·¨
-	 * @param status {int} ·şÎñÆ÷·µ»ØµÄ HTTP ÏìÓ¦×´Ì¬Âë
+	 * å½“ websocket æ¡æ‰‹å¤±è´¥åçš„å›è°ƒæ–¹æ³•
+	 * @param status {int} æœåŠ¡å™¨è¿”å›çš„ HTTP å“åº”çŠ¶æ€ç 
 	 */
 	virtual void on_ws_handshake_failed(int status) {
 		(void) status;
 	}
 
 	/**
-	 * µ±¶Áµ½Ò»¸ö text ÀàĞÍµÄÖ¡Ê±µÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»åˆ°ä¸€ä¸ª text ç±»å‹çš„å¸§æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_text() { return true; }
 
 	/**
-	 * µ±¶Áµ½Ò»¸ö binary ÀàĞÍµÄÖ¡Ê±µÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»åˆ°ä¸€ä¸ª binary ç±»å‹çš„å¸§æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_binary() { return true; }
 
 	/**
-	 * µ±¶Áµ½Ò»¸ö¹Ø±ÕÖ¡Êı¾İÊ±µÄ»Øµ÷·½·¨
+	 * å½“è¯»åˆ°ä¸€ä¸ªå…³é—­å¸§æ•°æ®æ—¶çš„å›è°ƒæ–¹æ³•
 	 */
 	virtual void on_ws_frame_closed() {}
 
 	/**
-	 * ÔÚ websocket Í¨ĞÅ·½Ê½£¬µ±¶Áµ½Êı¾İÌåÊ±µÄ»Øµ÷·½·¨
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param dlen {size_t} ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * åœ¨ websocket é€šä¿¡æ–¹å¼ï¼Œå½“è¯»åˆ°æ•°æ®ä½“æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param dlen {size_t} è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_data(char* data, size_t dlen) {
 		(void) data;
@@ -286,24 +286,24 @@ protected:
 	}
 
 	/**
-	 * µ±¶ÁÍêÒ»Ö¡Êı¾İÊ±µÄ»Øµ÷·½·¨
-	 * @return {bool} ·µ»Ø true ±íÊ¾¼ÌĞø¶Á£¬·ñÔòÔòÒªÇó¹Ø±ÕÁ¬½Ó
+	 * å½“è¯»å®Œä¸€å¸§æ•°æ®æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @return {bool} è¿”å› true è¡¨ç¤ºç»§ç»­è¯»ï¼Œå¦åˆ™åˆ™è¦æ±‚å…³é—­è¿æ¥
 	 */
 	virtual bool on_ws_frame_finish() { return true; }
 
 	/**
-	 * µ±ÊÕµ½ ping Êı¾İ°üÊ±µÄ»Øµ÷·½·¨£¬µ±¸Ã»Øµ÷·½·¨·µ»Øºó£¬Èç¹ûÓÃ»§Ã»ÓĞ½«
-	 * data Êı¾İÇåÀí£¬ÔòÄÚ²¿»á×Ô¶¯¸ø¶Ô¶ËĞ´Èë pong ĞÅÏ¢£¬Èç¹ûÓÃ»§½« data »º
-	 * ³åÇøÇåÀíµô£¬Ôò¸Ã·½·¨·µ»Øºó²»»á¸ø¶Ô½Ó·¢ pong ĞÅÏ¢
-	 * @param data {string&} ¶Áµ½µÄÊı¾İ
+	 * å½“æ”¶åˆ° ping æ•°æ®åŒ…æ—¶çš„å›è°ƒæ–¹æ³•ï¼Œå½“è¯¥å›è°ƒæ–¹æ³•è¿”å›åï¼Œå¦‚æœç”¨æˆ·æ²¡æœ‰å°†
+	 * data æ•°æ®æ¸…ç†ï¼Œåˆ™å†…éƒ¨ä¼šè‡ªåŠ¨ç»™å¯¹ç«¯å†™å…¥ pong ä¿¡æ¯ï¼Œå¦‚æœç”¨æˆ·å°† data ç¼“
+	 * å†²åŒºæ¸…ç†æ‰ï¼Œåˆ™è¯¥æ–¹æ³•è¿”å›åä¸ä¼šç»™å¯¹æ¥å‘ pong ä¿¡æ¯
+	 * @param data {string&} è¯»åˆ°çš„æ•°æ®
 	 */
 	virtual void on_ws_frame_ping(string& data) {
 		(void) data;
 	}
 
 	/**
-	 * ÊÕµ½ pong Êı¾İÊ±µÄ»Øµ÷·½·¨
-	 * @param data {string&} ¶Áµ½µÄÊı¾İ
+	 * æ”¶åˆ° pong æ•°æ®æ—¶çš„å›è°ƒæ–¹æ³•
+	 * @param data {string&} è¯»åˆ°çš„æ•°æ®
 	 */
 	virtual void on_ws_frame_pong(string& data) {
 		(void) data;
@@ -311,69 +311,69 @@ protected:
 
 public:
 	/**
-	 * Ïò WEB ·şÎñÆ÷·¢ËÍ HTTP ÇëÇó£¬ÄÚ²¿ÔÚ·¢ËÍºó»á×Ô¶¯¿ªÊ¼¶Á HTTP ÏìÓ¦¹ı³Ì
-	 * @param body {const void*} HTTP ÇëÇóµÄÊı¾İÌå£¬µ±Îª NULL Ê±£¬ÄÚ²¿»á×Ô
-	 *  ¶¯²ÉÓÃ HTTP GET ·½·¨
-	 * @param len {size_t} body ·Ç NULL Ê±±íÊ¾Êı¾İÌåµÄ³¤¶È
+	 * å‘ WEB æœåŠ¡å™¨å‘é€ HTTP è¯·æ±‚ï¼Œå†…éƒ¨åœ¨å‘é€åä¼šè‡ªåŠ¨å¼€å§‹è¯» HTTP å“åº”è¿‡ç¨‹
+	 * @param body {const void*} HTTP è¯·æ±‚çš„æ•°æ®ä½“ï¼Œå½“ä¸º NULL æ—¶ï¼Œå†…éƒ¨ä¼šè‡ª
+	 *  åŠ¨é‡‡ç”¨ HTTP GET æ–¹æ³•
+	 * @param len {size_t} body é NULL æ—¶è¡¨ç¤ºæ•°æ®ä½“çš„é•¿åº¦
 	 */
 	void send_request(const void* body, size_t len);
 
 	/**
-	 * Óë·şÎñÆ÷½øĞĞ WEBSOCKET ÎÕÊÖ
-	 * @param key {const void*} ÉèÖÃµÄ key Öµ
-	 * @param len {size_t} key ÖµµÄ³¤¶È
+	 * ä¸æœåŠ¡å™¨è¿›è¡Œ WEBSOCKET æ¡æ‰‹
+	 * @param key {const void*} è®¾ç½®çš„ key å€¼
+	 * @param len {size_t} key å€¼çš„é•¿åº¦
 	 */
 	void ws_handshake(const void* key, size_t len);
 	void ws_handshake(const char* key = "123456789xxx");
 
 	/**
-	 * µ±µ÷ÓÃ ws_handshake() Ê±£¬ÄÚ²¿»áÌî³äÓë websocket Ïà¹ØµÄÇëÇóÍ·ĞÅÏ¢£¬
-	 * Í¬Ê±Í¨¹ı´Ë»Øµ÷¸æÖ®µ÷ÓÃÕß×îÖÕ·¢¸ø websocket ·şÎñÆ÷ÍêÕûµÄÇëÇóÍ·ĞÅÏ¢
+	 * å½“è°ƒç”¨ ws_handshake() æ—¶ï¼Œå†…éƒ¨ä¼šå¡«å……ä¸ websocket ç›¸å…³çš„è¯·æ±‚å¤´ä¿¡æ¯ï¼Œ
+	 * åŒæ—¶é€šè¿‡æ­¤å›è°ƒå‘Šä¹‹è°ƒç”¨è€…æœ€ç»ˆå‘ç»™ websocket æœåŠ¡å™¨å®Œæ•´çš„è¯·æ±‚å¤´ä¿¡æ¯
 	 */
 	virtual void ws_handshake_before(http_header& reqhdr) {
 		(void) reqhdr;
 	}
 
 	/**
-	 * ¿ªÊ¼Òì²½¶Á websocket Êı¾İ
-	 * @param timeout {int} ¶Á³¬Ê±Ê±¼ä£¬Èç¹û¸ÃÖµ <= 0£¬Ôò²»Éè¶Á³¬Ê±Ê±¼ä£¬
-	 *  ·ñÔòµ±¶Á³¬Ê±Ê±£¬³¬Ê±»Øµ÷·½·¨±ã»á±»µ÷ÓÃ£»
-	 *  ×¢Òâ£º
-	 *  ¸ÃÖµÓë open() ÖĞµÄ rw_timeout ÓĞËù²»Í¬£¬open() ·½·¨ÖĞµÄ¶Á³¬Ê±½öÏŞ
-	 *  ¶¨±ê×¼ HTTP IO ¹ı³Ì¼° SSL ÎÕÊÖ¹ı³ÌµÄ¶Á³¬Ê±£¬¶ø´Ë´¦µÄ¶Á³¬Ê±ÔòÓÃÀ´
-	 *  ÏŞÖÆÓë websocket Ïà¹ØµÄ¶Á³¬Ê±£¬ÕâÖ÷ÒªÊÇ¿¼ÂÇµ½ websocket Ó¦ÓÃºÜ¶à
-	 *  ¶¼ÊÇ³¤Á¬½Ó³¡¾°
+	 * å¼€å§‹å¼‚æ­¥è¯» websocket æ•°æ®
+	 * @param timeout {int} è¯»è¶…æ—¶æ—¶é—´ï¼Œå¦‚æœè¯¥å€¼ <= 0ï¼Œåˆ™ä¸è®¾è¯»è¶…æ—¶æ—¶é—´ï¼Œ
+	 *  å¦åˆ™å½“è¯»è¶…æ—¶æ—¶ï¼Œè¶…æ—¶å›è°ƒæ–¹æ³•ä¾¿ä¼šè¢«è°ƒç”¨ï¼›
+	 *  æ³¨æ„ï¼š
+	 *  è¯¥å€¼ä¸ open() ä¸­çš„ rw_timeout æœ‰æ‰€ä¸åŒï¼Œopen() æ–¹æ³•ä¸­çš„è¯»è¶…æ—¶ä»…é™
+	 *  å®šæ ‡å‡† HTTP IO è¿‡ç¨‹åŠ SSL æ¡æ‰‹è¿‡ç¨‹çš„è¯»è¶…æ—¶ï¼Œè€Œæ­¤å¤„çš„è¯»è¶…æ—¶åˆ™ç”¨æ¥
+	 *  é™åˆ¶ä¸ websocket ç›¸å…³çš„è¯»è¶…æ—¶ï¼Œè¿™ä¸»è¦æ˜¯è€ƒè™‘åˆ° websocket åº”ç”¨å¾ˆå¤š
+	 *  éƒ½æ˜¯é•¿è¿æ¥åœºæ™¯
 	 */
 	void ws_read_wait(int timeout = 0);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_TEXT ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {char*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_TEXT ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {char*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_text(char* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_BINARY ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {void*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_BINARY ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {void*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_binary(void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_PING ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {void*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_PING ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {void*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_ping(void* data, size_t len);
 
 	/**
-	 * Òì²½·¢ËÍÒ»¸ö FRAME_PONG ÀàĞÍµÄÊı¾İÖ¡
-	 * @param data {void*} ÄÚ²¿¿ÉÄÜÒòÌí¼ÓÑÚÂëÔ­Òò±»¸Ä±äÄÚÈİ
-	 * @param len {size_t} data Êı¾İ³¤¶È
+	 * å¼‚æ­¥å‘é€ä¸€ä¸ª FRAME_PONG ç±»å‹çš„æ•°æ®å¸§
+	 * @param data {void*} å†…éƒ¨å¯èƒ½å› æ·»åŠ æ©ç åŸå› è¢«æ”¹å˜å†…å®¹
+	 * @param len {size_t} data æ•°æ®é•¿åº¦
 	 * @return {bool}
 	 */
 	bool ws_send_pong(void* data, size_t len);
@@ -397,12 +397,12 @@ protected:
 protected:
 	unsigned           status_;
 	int                rw_timeout_;
-	int                gzip_header_left_;	// gzip ´«ÊäÊ±Ñ¹ËõÍ·²¿³¤¶È
+	int                gzip_header_left_;	// gzip ä¼ è¾“æ—¶å‹ç¼©å¤´éƒ¨é•¿åº¦
 	bool               keep_alive_;
-	bool               unzip_;		// ÊÇ·ñ×Ô¶¯½âÑ¹ÏìÓ¦ÌåÊı¾İ
+	bool               unzip_;		// æ˜¯å¦è‡ªåŠ¨è§£å‹å“åº”ä½“æ•°æ®
 	aio_handle&        handle_;
-	sslbase_conf*      ssl_conf_;		// ·Ç¿ÕÊ±²ÅÔÊĞíÆôÓÃ SSL ¹¦ÄÜ
-	bool               ssl_enable_;		// ÊÇ·ñÆôÓÃ SSL ¹¦ÄÜ
+	sslbase_conf*      ssl_conf_;		// éç©ºæ—¶æ‰å…è®¸å¯ç”¨ SSL åŠŸèƒ½
+	bool               ssl_enable_;		// æ˜¯å¦å¯ç”¨ SSL åŠŸèƒ½
 	std::string        sni_host_;
 	std::string        sni_prefix_;
 	std::string        sni_suffix_;
@@ -414,9 +414,9 @@ protected:
 	websocket*         ws_in_;
 	websocket*         ws_out_;
 	string*            buff_;
-	zlib_stream*       zstream_;		// ½âÑ¹¶ÔÏó
-	struct sockaddr_storage ns_addr_;	// ËùÊ¹ÓÃµÄ DNS ·şÎñÆ÷µØÖ·
-	struct sockaddr_storage serv_addr_;	// ËùÁ¬½ÓµÄÓ¦ÓÃ·şÎñÆ÷µØÖ·
+	zlib_stream*       zstream_;		// è§£å‹å¯¹è±¡
+	struct sockaddr_storage ns_addr_;	// æ‰€ä½¿ç”¨çš„ DNS æœåŠ¡å™¨åœ°å€
+	struct sockaddr_storage serv_addr_;	// æ‰€è¿æ¥çš„åº”ç”¨æœåŠ¡å™¨åœ°å€
 
 	bool handle_connect(const ACL_ASTREAM_CTX* ctx);
 	bool handle_ssl_handshake();

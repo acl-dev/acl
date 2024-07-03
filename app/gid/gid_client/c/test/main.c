@@ -30,7 +30,7 @@ static void test_get_gid(const char *tag, int n)
 	gettimeofday(&begin, NULL);
 
 	for (i = 0; i < n; i++) {
-		/* »ñµÃÎ¨Ò» gid ºÅ */
+		/* èŽ·å¾—å”¯ä¸€ gid å· */
 		gid = gid_next(tag, &errnum);
 		if (gid < 0) {
 			printf("error: %d, %s, gid: %lld\r\n",
@@ -137,7 +137,7 @@ int main(int argc, char *argv[])
 			ACL_SLICE_FLAG_RTGC_OFF |
 			ACL_SLICE_FLAG_LP64_ALIGN);
 
-	/* ³õÊ¼»¯ */
+	/* åˆå§‹åŒ– */
 	printf("proto: %d, addr: %s\n", proto, addr);
 	gid_client_init(proto, addr);
 

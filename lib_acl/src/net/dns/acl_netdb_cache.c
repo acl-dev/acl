@@ -110,7 +110,7 @@ void acl_netdb_cache_push(const ACL_DNS_DB *h_dns_db, int timeout)
 	char  buf[256];
 	CACHE *cache;
 
-	/* 如果禁止缓存，则直接返回 */
+	/* 濡傛灉绂佹缂撳瓨锛屽垯鐩存帴杩斿洖 */
 	if (__cache_timeout <= 0)
 		return;
 

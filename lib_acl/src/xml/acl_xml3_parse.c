@@ -24,13 +24,13 @@
 #define SKIP_WHILE(cond, ptr) { while(*(ptr) && (cond)) (ptr)++; }
 #define SKIP_SPACE(ptr) { while(IS_SPACE(*(ptr))) (ptr)++; }
 
-/* ×´Ì¬»úÊı¾İ½á¹¹ÀàĞÍ */
+/* çŠ¶æ€æœºæ•°æ®ç»“æ„ç±»å‹ */
 
 struct XML_STATUS_MACHINE {
-	/**< ×´Ì¬Âë */
+	/**< çŠ¶æ€ç  */
 	int   status;
 
-	/**< ×´Ì¬»ú´¦Àíº¯Êı */
+	/**< çŠ¶æ€æœºå¤„ç†å‡½æ•° */
 	char *(*callback) (ACL_XML3*, char*);
 };
 
@@ -342,7 +342,7 @@ static char *xml_parse_meta_comment(ACL_XML3 *xml, char *data)
 
 static char *xml_parse_meta_end(ACL_XML3 *xml, char *data)
 {
-	/* meta ±êÇ©ÊÇ×Ô¹Ø±ÕÀàĞÍ£¬Ö±½ÓÌøÖÁÓÒ±ß '>' ´¦ÀíÎ»ÖÃ */
+	/* meta æ ‡ç­¾æ˜¯è‡ªå…³é—­ç±»å‹ï¼Œç›´æ¥è·³è‡³å³è¾¹ '>' å¤„ç†ä½ç½® */
 	xml->curr_node->status = ACL_XML3_S_RGT;
 	return data;
 }
@@ -426,9 +426,9 @@ static char *xml_parse_attr(ACL_XML3 *xml, char *data)
 	if (*data == '/') {
 		data++;
 
-		/* ´Ë´¦·µ»Øºó»á´¥·¢±¾º¯ÊıÔÙ´Î±»µ÷ÓÃ£¬µ±ÏÂÒ»¸ö×Ö½ÚÎª '>' Ê±£¬
-		 * ÉÏÃæÍ¨¹ıµ÷ÓÃ xml_parse_check_self_closed ¼ì²éÊÇ·ñÎª×Ô·â±Õ
-		 * ±êÇ©: "/>"
+		/* æ­¤å¤„è¿”å›åä¼šè§¦å‘æœ¬å‡½æ•°å†æ¬¡è¢«è°ƒç”¨ï¼Œå½“ä¸‹ä¸€ä¸ªå­—èŠ‚ä¸º '>' æ—¶ï¼Œ
+		 * ä¸Šé¢é€šè¿‡è°ƒç”¨ xml_parse_check_self_closed æ£€æŸ¥æ˜¯å¦ä¸ºè‡ªå°é—­
+		 * æ ‡ç­¾: "/>"
 		 */
 		return data;
 	}
@@ -517,23 +517,23 @@ static char *xml_parse_attr_val(ACL_XML3 *xml, char *data)
 		data++;
 	}
 
-	/* µ±×´Ì¬·¢Éú¸Ä±äÊ±£¬ÔòËµÃ÷ÊôĞÔÖµÒÑ¾­Íê±Ï */
+	/* å½“çŠ¶æ€å‘ç”Ÿæ”¹å˜æ—¶ï¼Œåˆ™è¯´æ˜å±æ€§å€¼å·²ç»å®Œæ¯• */
 	if (xml->curr_node->status != ACL_XML3_S_AVAL) {
-		/* ½«¸Ã±êÇ©IDºÅÓ³ÉäÖÁ¹şÏ£±íÖĞ£¬ÒÔ±ãÓÚ¿ìËÙ²éÑ¯ */
+		/* å°†è¯¥æ ‡ç­¾IDå·æ˜ å°„è‡³å“ˆå¸Œè¡¨ä¸­ï¼Œä»¥ä¾¿äºå¿«é€ŸæŸ¥è¯¢ */
 		if (IS_ID(attr->name) && *attr->value != 0) {
 			char *ptr = attr->value;
 
-			/* ·ÀÖ¹ÖØ¸´ID±»²åÈëÏÖÏó */
+			/* é˜²æ­¢é‡å¤IDè¢«æ’å…¥ç°è±¡ */
 			if (acl_htable_find(xml->id_table, ptr) == NULL) {
 				acl_htable_enter(xml->id_table, ptr, attr);
 
-				/* µ±¸ÃÊôĞÔ±»¼ÓÈë¹şÏ£±íºó²Å»á¸³ÓÚ½Úµã id */
+				/* å½“è¯¥å±æ€§è¢«åŠ å…¥å“ˆå¸Œè¡¨åæ‰ä¼šèµ‹äºèŠ‚ç‚¹ id */
 				xml->curr_node->id = attr->value;
 			}
 		}
 
-		/* ±ØĞë½«¸Ã½ÚµãµÄµ±Ç°ÊôĞÔ¶ÔÏóÖÃ¿Õ£¬ÒÔ±ãÓÚ¼ÌĞø½âÎöÊ±
-		 * ¿ÉÒÔ´´½¨ĞÂµÄÊôĞÔ¶ÔÏó
+		/* å¿…é¡»å°†è¯¥èŠ‚ç‚¹çš„å½“å‰å±æ€§å¯¹è±¡ç½®ç©ºï¼Œä»¥ä¾¿äºç»§ç»­è§£ææ—¶
+		 * å¯ä»¥åˆ›å»ºæ–°çš„å±æ€§å¯¹è±¡
 		 */
 		xml->curr_node->curr_attr = NULL;
 	}
@@ -567,7 +567,7 @@ static char *xml_parse_text(ACL_XML3 *xml, char *data)
 			xml->curr_node->text_size = data - xml->curr_node->text;
 			xml->curr_node->status = ACL_XML3_S_RLT;
 			*data++ = 0;
-			/* ´Ë´¦¿É¶ÔÎÄ±¾ÄÚÈİ½øĞĞ xml ½âÂë */
+			/* æ­¤å¤„å¯å¯¹æ–‡æœ¬å†…å®¹è¿›è¡Œ xml è§£ç  */
 			break;
 		}
 
@@ -597,12 +597,12 @@ static char *xml_parse_right_lt(ACL_XML3 *xml, char *data)
 		return data;
 	}
 
-	/* ËµÃ÷Óöµ½ÁËµ±Ç°½ÚµãµÄ×Ó½Úµã */
+	/* è¯´æ˜é‡åˆ°äº†å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹ */
 
-	/* ÖØĞÂÉèÖÃµ±Ç°½Úµã×´Ì¬£¬ÒÔ±ãÓÚÆä±»×Ó½Úµãµ¯³öÊ±¿ÉÒÔÕÒµ½ "</" */
+	/* é‡æ–°è®¾ç½®å½“å‰èŠ‚ç‚¹çŠ¶æ€ï¼Œä»¥ä¾¿äºå…¶è¢«å­èŠ‚ç‚¹å¼¹å‡ºæ—¶å¯ä»¥æ‰¾åˆ° "</" */
 	xml->curr_node->status = ACL_XML3_S_TXT;
 
-	/* ´´½¨ĞÂµÄ×Ó½Úµã£¬²¢½«Æä¼ÓÈëÖÁµ±Ç°½ÚµãµÄ×Ó½Úµã¼¯ºÏÖĞ */
+	/* åˆ›å»ºæ–°çš„å­èŠ‚ç‚¹ï¼Œå¹¶å°†å…¶åŠ å…¥è‡³å½“å‰èŠ‚ç‚¹çš„å­èŠ‚ç‚¹é›†åˆä¸­ */
 
 	node = acl_xml3_node_alloc(xml);
 	acl_xml3_node_add_child(xml->curr_node, node);
@@ -615,8 +615,8 @@ static char *xml_parse_right_lt(ACL_XML3 *xml, char *data)
 	return data;
 }
 
-/* ÒòÎª¸Ã¸¸½ÚµãÆäÊµÎªÒ¶½Úµã£¬ËùÒÔĞèÒª¸üĞÂ¸½ÊôÓÚ¸ÃÎ±¸¸½ÚµãµÄ
- * ×Ó½ÚµãµÄÉî¶ÈÖµ£¬¶¼Ó¦Óë¸ÃÎ±¸¸½ÚµãÏàÍ¬
+/* å› ä¸ºè¯¥çˆ¶èŠ‚ç‚¹å…¶å®ä¸ºå¶èŠ‚ç‚¹ï¼Œæ‰€ä»¥éœ€è¦æ›´æ–°é™„å±äºè¯¥ä¼ªçˆ¶èŠ‚ç‚¹çš„
+ * å­èŠ‚ç‚¹çš„æ·±åº¦å€¼ï¼Œéƒ½åº”ä¸è¯¥ä¼ªçˆ¶èŠ‚ç‚¹ç›¸åŒ
  */ 
 static void update_children_depth(ACL_XML3_NODE *parent)
 {
@@ -630,7 +630,7 @@ static void update_children_depth(ACL_XML3_NODE *parent)
 	}
 }
 
-/* ²éÕÒÓëÓÒ±êÇ©ÏàÍ¬µÄ¸¸½Úµã */
+/* æŸ¥æ‰¾ä¸å³æ ‡ç­¾ç›¸åŒçš„çˆ¶èŠ‚ç‚¹ */
 static int search_match_node(ACL_XML3 *xml)
 {
 	ACL_XML3_NODE *parent, *node;
@@ -722,8 +722,8 @@ static char *xml_parse_right_tag(ACL_XML3 *xml, char *data)
 	if (ret != 0)
 		return data;
 
-	/* Èç¹û½Úµã±êÇ©ÃûÓë¿ªÊ¼±êÇ©Ãû²»Æ¥Åä£¬
-	 * ÔòĞèÒª¼ÌĞøÑ°ÕÒÕæÕıµÄ½áÊø±êÇ©
+	/* å¦‚æœèŠ‚ç‚¹æ ‡ç­¾åä¸å¼€å§‹æ ‡ç­¾åä¸åŒ¹é…ï¼Œ
+	 * åˆ™éœ€è¦ç»§ç»­å¯»æ‰¾çœŸæ­£çš„ç»“æŸæ ‡ç­¾
 	 */ 
 	if (curr_node->rtag_size > 0) {
 		char *ptr = curr_node->rtag + curr_node->rtag_size - 1;
@@ -733,7 +733,7 @@ static char *xml_parse_right_tag(ACL_XML3 *xml, char *data)
 
 	curr_node->rtag_size = data - curr_node->rtag;
 
-	/* ÖØĞÂÉèÖÃµ±Ç°½Úµã×´Ì¬£¬ÒÔ±ãÓÚÆä¿ÉÒÔÕÒµ½ "</" */
+	/* é‡æ–°è®¾ç½®å½“å‰èŠ‚ç‚¹çŠ¶æ€ï¼Œä»¥ä¾¿äºå…¶å¯ä»¥æ‰¾åˆ° "</" */
 	curr_node->status = ACL_XML3_S_TXT;
 
 	return data;
@@ -741,7 +741,7 @@ static char *xml_parse_right_tag(ACL_XML3 *xml, char *data)
 
 static char *xml_parse_right_gt(ACL_XML3 *xml, char *data)
 {
-	/* µ±Ç°½Úµã·ÖÎöÍê±Ï£¬ĞèÒªµ¯³öµ±Ç°½ÚµãµÄ¸¸½Úµã¼ÌĞø·ÖÎö */
+	/* å½“å‰èŠ‚ç‚¹åˆ†æå®Œæ¯•ï¼Œéœ€è¦å¼¹å‡ºå½“å‰èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹ç»§ç»­åˆ†æ */
 	ACL_XML3_NODE *parent = acl_xml3_node_parent(xml->curr_node);
 
 	if (parent == xml->root) {
@@ -781,7 +781,7 @@ char *acl_xml3_update(ACL_XML3 *xml, char *data)
 	if (!(xml->flag & ACL_XML3_FLAG_MULTI_ROOT) && xml->root_cnt > 0)
 		return data;
 
-	/* XML ½âÎöÆ÷×´Ì¬»úÑ­»·´¦Àí¹ı³Ì */
+	/* XML è§£æå™¨çŠ¶æ€æœºå¾ªç¯å¤„ç†è¿‡ç¨‹ */
 
 	while (*data) {
 		if (xml->curr_node == NULL) {

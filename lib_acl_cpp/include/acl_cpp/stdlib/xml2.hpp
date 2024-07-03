@@ -157,44 +157,44 @@ class ACL_CPP_API xml2 : public xml
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı£¬Ê¹ xml ¶ÔÏóÊ÷´´½¨ÔÚÖ¸¶¨ÄÚ´æÓ³ÉäÎÄ¼şÉÏ
-	 * @param filepath {const char*} ÄÚ´æÓ³ÉäÎÄ¼şÃû
-	 * @param max_len {size_t} ÄÚ´æÓ³ÉäÎÄ¼şµÄ×î´ó´óĞ¡£¬¼´ÄÚ´æÓ³ÉäÎÄ¼şÔÚ×Ô¶¯
-	 *  Ôö³¤Ê±²»Ó¦³¬¹ı´Ë´óĞ¡
-	 * @param data {const char*} ·Ç¿ÕÊ±×Ô¶¯µ÷ÓÃ½âÎö¹ı³Ì
-	 * @param init_len {size_t} ÄÚ´æÓ³ÉäÎÄ¼ş´´½¨Ê±µÄ³õÊ¼´óĞ¡
-	 * @param dbuf_nblock {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
-	 * @param dbuf_capacity {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
+	 * æ„é€ å‡½æ•°ï¼Œä½¿ xml å¯¹è±¡æ ‘åˆ›å»ºåœ¨æŒ‡å®šå†…å­˜æ˜ å°„æ–‡ä»¶ä¸Š
+	 * @param filepath {const char*} å†…å­˜æ˜ å°„æ–‡ä»¶å
+	 * @param max_len {size_t} å†…å­˜æ˜ å°„æ–‡ä»¶çš„æœ€å¤§å¤§å°ï¼Œå³å†…å­˜æ˜ å°„æ–‡ä»¶åœ¨è‡ªåŠ¨
+	 *  å¢é•¿æ—¶ä¸åº”è¶…è¿‡æ­¤å¤§å°
+	 * @param data {const char*} éç©ºæ—¶è‡ªåŠ¨è°ƒç”¨è§£æè¿‡ç¨‹
+	 * @param init_len {size_t} å†…å­˜æ˜ å°„æ–‡ä»¶åˆ›å»ºæ—¶çš„åˆå§‹å¤§å°
+	 * @param dbuf_nblock {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
+	 * @param dbuf_capacity {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
 	 */
 	xml2(const char* filepath, size_t max_len, const char* data = NULL,
 		size_t init_len = 8192, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
 
 	/**
-	 * ¹¹Ôìº¯Êı£¬Ê¹ xml ¶ÔÏóÊ÷´´½¨ÔÚÖ¸¶¨ÄÚ´æÓ³ÉäÎÄ¼şÉÏ
-	 * @param fp {fstream&} ÄÚ´æÓ³ÉäÎÄ¼ş¾ä±ú£¬¸ÃÎÄ¼ş¾ä±úÓ¦ÔÚ±¾ xml ¶ÔÏó
-	 *  ÊÍ·ÅÇ°Ò»Ö±±£³Ö´ò¿ª×´Ì¬£¬¼´ fp ±ØĞëÔÚ xml ¶ÔÏóÊÍ·Åºó²Å¿ÉÒÔ¹Ø±Õ
-	 * @param max_len {size_t} ÄÚ´æÓ³ÉäÎÄ¼şµÄ×î´ó´óĞ¡£¬¼´ÄÚ´æÓ³ÉäÎÄ¼şÔÚ×Ô¶¯
-	 *  Ôö³¤Ê±²»Ó¦³¬¹ı´Ë´óĞ¡
-	 * @param data {const char*} ·Ç¿ÕÊ±×Ô¶¯µ÷ÓÃ½âÎö¹ı³Ì
-	 * @param init_len {size_t} ÄÚ´æÓ³ÉäÎÄ¼ş´´½¨Ê±µÄ³õÊ¼´óĞ¡
-	 * @param dbuf_nblock {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
-	 * @param dbuf_capacity {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
+	 * æ„é€ å‡½æ•°ï¼Œä½¿ xml å¯¹è±¡æ ‘åˆ›å»ºåœ¨æŒ‡å®šå†…å­˜æ˜ å°„æ–‡ä»¶ä¸Š
+	 * @param fp {fstream&} å†…å­˜æ˜ å°„æ–‡ä»¶å¥æŸ„ï¼Œè¯¥æ–‡ä»¶å¥æŸ„åº”åœ¨æœ¬ xml å¯¹è±¡
+	 *  é‡Šæ”¾å‰ä¸€ç›´ä¿æŒæ‰“å¼€çŠ¶æ€ï¼Œå³ fp å¿…é¡»åœ¨ xml å¯¹è±¡é‡Šæ”¾åæ‰å¯ä»¥å…³é—­
+	 * @param max_len {size_t} å†…å­˜æ˜ å°„æ–‡ä»¶çš„æœ€å¤§å¤§å°ï¼Œå³å†…å­˜æ˜ å°„æ–‡ä»¶åœ¨è‡ªåŠ¨
+	 *  å¢é•¿æ—¶ä¸åº”è¶…è¿‡æ­¤å¤§å°
+	 * @param data {const char*} éç©ºæ—¶è‡ªåŠ¨è°ƒç”¨è§£æè¿‡ç¨‹
+	 * @param init_len {size_t} å†…å­˜æ˜ å°„æ–‡ä»¶åˆ›å»ºæ—¶çš„åˆå§‹å¤§å°
+	 * @param dbuf_nblock {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
+	 * @param dbuf_capacity {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
 	 */
 	xml2(fstream& fp, size_t max_len, const char* data = NULL,
 		size_t init_len = 8192, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
 
 	/**
-	 * ¹¹Ôìº¯Êı£¬Ê¹ xml ¶ÔÏóÊ÷´´½¨ÔÚÖ¸¶¨ÄÚ´æÓ³ÉäÎÄ¼şÉÏ
-	 * @param fd {ACL_FILE_HANDLE} ÄÚ´æÓ³ÉäÎÄ¼ş¾ä±ú£¬¸ÃÎÄ¼ş¾ä±úÓ¦ÔÚ±¾ xml
-	 *  ¶ÔÏóÊÍ·ÅÇ°Ò»Ö±±£³Ö´ò¿ª×´Ì¬£¬¼´ fp ±ØĞëÔÚ xml ¶ÔÏóÊÍ·Åºó²Å¿ÉÒÔ¹Ø±Õ
-	 * @param max_len {size_t} ÄÚ´æÓ³ÉäÎÄ¼şµÄ×î´ó´óĞ¡£¬¼´ÄÚ´æÓ³ÉäÎÄ¼şÔÚ×Ô¶¯
-	 *  Ôö³¤Ê±²»Ó¦³¬¹ı´Ë´óĞ¡
-	 * @param data {const char*} ·Ç¿ÕÊ±×Ô¶¯µ÷ÓÃ½âÎö¹ı³Ì
-	 * @param init_len {size_t} ÄÚ´æÓ³ÉäÎÄ¼ş´´½¨Ê±µÄ³õÊ¼´óĞ¡
-	 * @param dbuf_nblock {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
-	 * @param dbuf_capacity {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
+	 * æ„é€ å‡½æ•°ï¼Œä½¿ xml å¯¹è±¡æ ‘åˆ›å»ºåœ¨æŒ‡å®šå†…å­˜æ˜ å°„æ–‡ä»¶ä¸Š
+	 * @param fd {ACL_FILE_HANDLE} å†…å­˜æ˜ å°„æ–‡ä»¶å¥æŸ„ï¼Œè¯¥æ–‡ä»¶å¥æŸ„åº”åœ¨æœ¬ xml
+	 *  å¯¹è±¡é‡Šæ”¾å‰ä¸€ç›´ä¿æŒæ‰“å¼€çŠ¶æ€ï¼Œå³ fp å¿…é¡»åœ¨ xml å¯¹è±¡é‡Šæ”¾åæ‰å¯ä»¥å…³é—­
+	 * @param max_len {size_t} å†…å­˜æ˜ å°„æ–‡ä»¶çš„æœ€å¤§å¤§å°ï¼Œå³å†…å­˜æ˜ å°„æ–‡ä»¶åœ¨è‡ªåŠ¨
+	 *  å¢é•¿æ—¶ä¸åº”è¶…è¿‡æ­¤å¤§å°
+	 * @param data {const char*} éç©ºæ—¶è‡ªåŠ¨è°ƒç”¨è§£æè¿‡ç¨‹
+	 * @param init_len {size_t} å†…å­˜æ˜ å°„æ–‡ä»¶åˆ›å»ºæ—¶çš„åˆå§‹å¤§å°
+	 * @param dbuf_nblock {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
+	 * @param dbuf_capacity {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml2(void* fd,  size_t max_len, const char* data = NULL,

@@ -9,12 +9,12 @@
 typedef struct HTTP_CHAT_CTX {
 	HTTP_HDR  *hdr;
 	ACL_VSTREAM *stream;
-	unsigned int flag;                  /**<¡¡¼Ì³ÐµÄ±êÖ¾Î», defined as HTTP_CHAT_FLAG_XXX */
+	unsigned int flag;                  /**<ã€€ç»§æ‰¿çš„æ ‡å¿—ä½, defined as HTTP_CHAT_FLAG_XXX */
 	int   timeout;
 	short chunked;
-	http_off_t   chunk_len;             /**< µ±Ç°Êý¾Ý¿éËùÐèÒª¶ÁµÄÊý¾Ý³¤¶È(×Ö½Ú) */
-	http_off_t   read_cnt;              /**< µ±Ç°Êý¾Ý¿éËù¶ÁÊý¾Ý³¤¶È(×Ö½Ú) */
-	http_off_t   body_len;              /**< Ëù¶Áµ½Êý¾ÝÌå×Ü³¤¶È(×Ö½Ú) */
+	http_off_t   chunk_len;             /**< å½“å‰æ•°æ®å—æ‰€éœ€è¦è¯»çš„æ•°æ®é•¿åº¦(å­—èŠ‚) */
+	http_off_t   read_cnt;              /**< å½“å‰æ•°æ®å—æ‰€è¯»æ•°æ®é•¿åº¦(å­—èŠ‚) */
+	http_off_t   body_len;              /**< æ‰€è¯»åˆ°æ•°æ®ä½“æ€»é•¿åº¦(å­—èŠ‚) */
 	union {
 		HTTP_HDR_NOTIFY  hdr_notify;
 		HTTP_BODY_NOTIFY body_notify;
@@ -51,7 +51,7 @@ static void free_ctx(void *ctx)
 }
 
 /*----------------------------------------------------------------------------*/
-/* ·ÖÎöÒ»ÐÐÊý¾Ý, ÊÇ·ñÊÇÒ»¸öÍêÕûµÄHTTPÐ­ÒéÍ· */
+/* åˆ†æžä¸€è¡Œæ•°æ®, æ˜¯å¦æ˜¯ä¸€ä¸ªå®Œæ•´çš„HTTPåè®®å¤´ */
 
 static int hdr_ready(HTTP_HDR *hdr, const char *line, int dlen)
 {
@@ -83,11 +83,11 @@ static int hdr_ready(HTTP_HDR *hdr, const char *line, int dlen)
 	return HTTP_CHAT_CONTINUE;
 }
 
-/* Í¬²½¶ÁÈ¡Ò»¸öÍêÕûµÄHTTPÐ­ÒéÍ· */
+/* åŒæ­¥è¯»å–ä¸€ä¸ªå®Œæ•´çš„HTTPåè®®å¤´ */
 
 static int hdr_get(HTTP_HDR *hdr, ACL_VSTREAM *stream, int timeout)
 {
-/* µ±Ê¹ÓÃÐ­³Ì¹²ÏíÕ»Ê±£¬Èç¹û½«´ËBUFFÉèµÄ¹ý´ó£¬»áÔö´ó¹²ÏíÕ»µÄ¿Õ¼ä´óÐ¡£¬Ôì³ÉÄÚ´æÀË·Ñ */
+/* å½“ä½¿ç”¨åç¨‹å…±äº«æ ˆæ—¶ï¼Œå¦‚æžœå°†æ­¤BUFFè®¾çš„è¿‡å¤§ï¼Œä¼šå¢žå¤§å…±äº«æ ˆçš„ç©ºé—´å¤§å°ï¼Œé€ æˆå†…å­˜æµªè´¹ */
 	char  buf[HTTP_BUF_SIZE];
 	int   ret;
 
@@ -238,7 +238,7 @@ static http_off_t body_get(HTTP_CHAT_CTX *ctx, void *buf, int size)
 {
 	http_off_t   ret;
 
-	/* Transfer-Encoding: chunked µÄÓÅÏÈ¼¶Òª¸ßÓÚ Conteng-Length */
+	/* Transfer-Encoding: chunked çš„ä¼˜å…ˆçº§è¦é«˜äºŽ Conteng-Length */
 
 	if (!ctx->chunked) {
 		if (ctx->chunk_len > 0 && ctx->read_cnt >= ctx->chunk_len) {
@@ -287,7 +287,7 @@ http_off_t http_req_body_get_sync(HTTP_REQ *request, ACL_VSTREAM *stream,
 	HTTP_CHAT_CTX *ctx;
 
 	if (request->hdr_req->hdr.content_length == 0) {
-		/* À©Õ¹ÁËHTTPÇëÇóÐ­Òé²¿·Ö, ÔÊÐíÇëÇóÊý¾ÝÎª¿é´«Êä */
+		/* æ‰©å±•äº†HTTPè¯·æ±‚åè®®éƒ¨åˆ†, å…è®¸è¯·æ±‚æ•°æ®ä¸ºå—ä¼ è¾“ */
 		if (request->hdr_req->hdr.chunked == 0) {
 			return 0;
 		}
@@ -298,7 +298,7 @@ http_off_t http_req_body_get_sync(HTTP_REQ *request, ACL_VSTREAM *stream,
 		ctx->hdr       = &request->hdr_req->hdr;
 		ctx->stream    = stream;
 
-		/* À©Õ¹ÁËHTTPÇëÇóÐ­Òé²¿·Ö, ÔÊÐíÇëÇóÊý¾ÝÎª¿é´«Êä */
+		/* æ‰©å±•äº†HTTPè¯·æ±‚åè®®éƒ¨åˆ†, å…è®¸è¯·æ±‚æ•°æ®ä¸ºå—ä¼ è¾“ */
 		ctx->chunked   = request->hdr_req->hdr.chunked;
 		ctx->chunk_len = request->hdr_req->hdr.content_length;
 		ctx->body_len  = 0;
@@ -322,10 +322,10 @@ http_off_t http_res_body_get_sync(HTTP_RES *respond, ACL_VSTREAM *stream,
 	HTTP_CHAT_CTX *ctx;
 
 	if (respond->hdr_res->reply_status == 204) {
-		/* Èç¹û·þÎñÆ÷ÏìÓ¦×´Ì¬ÂëÎª 204 Ôò±íÊ¾Ã»ÓÐÊý¾ÝÌå */
+		/* å¦‚æžœæœåŠ¡å™¨å“åº”çŠ¶æ€ç ä¸º 204 åˆ™è¡¨ç¤ºæ²¡æœ‰æ•°æ®ä½“ */
 		return 0;
 	} else if (respond->hdr_res->hdr.content_length == 0) {
-		/* ¿é´«ÊäÐ­ÒéÓÅÏÈÓÚ content-length */
+		/* å—ä¼ è¾“åè®®ä¼˜å…ˆäºŽ content-length */
 		if (respond->hdr_res->hdr.chunked == 0) {
 			return 0;
 		}

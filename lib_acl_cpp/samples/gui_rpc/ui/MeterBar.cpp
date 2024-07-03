@@ -1,4 +1,4 @@
-// MeterBar.cpp : ÊµÏÖÎÄ¼þ
+// MeterBar.cpp : å®žçŽ°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -35,7 +35,7 @@ BOOL CMeterBar::SetParts(int nParts, int* pWidths)
 	return (TRUE);
 }
 
-// CMeterBar ÏûÏ¢´¦Àí³ÌÐò
+// CMeterBar æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 
 int CMeterBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -48,7 +48,7 @@ int CMeterBar::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//int tmp;
 	//int n = GetParts(0, &tmp);
 
-	// TODO:  ÔÚ´ËÌí¼ÓÄú×¨ÓÃµÄ´´½¨´úÂë
+	// TODO:  åœ¨æ­¤æ·»åŠ æ‚¨ä¸“ç”¨çš„åˆ›å»ºä»£ç 
 	//m_meter.Create(WS_CHILD | WS_VISIBLE, CRect(0, 0, 0, 0), this, 101);
 	//m_meter.Create("Press start timer to see me go",
 	//	WS_VISIBLE | WS_CHILD | WS_EX_CLIENTEDGE, CRect(0, 0, 0, 0), this, (HMENU) 101);
@@ -69,7 +69,7 @@ void CMeterBar::OnSize(UINT nType, int cx, int cy)
 {
 	CStatusBarCtrl::OnSize(nType, cx, cy);
 
-	// TODO: ÔÚ´Ë´¦Ìí¼ÓÏûÏ¢´¦Àí³ÌÐò´úÂë
+	// TODO: åœ¨æ­¤å¤„æ·»åŠ æ¶ˆæ¯å¤„ç†ç¨‹åºä»£ç 
 	int nTemp;
 	int nCount = GetParts(0, &nTemp);
 	if (nCount > 0) {

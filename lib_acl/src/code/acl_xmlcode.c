@@ -116,7 +116,7 @@ static void xml_decode_init(void)
 			ACL_TOKEN_F_STOP, &__tab[i]);
 
 #ifndef HAVE_NO_ATEXIT
-	/* 进程退出时调用 html_decode_free 释放内存资源 */
+	/* 杩涚▼閫�鍑烘椂璋冪敤 html_decode_free 閲婃斁鍐呭瓨璧勬簮 */
 	atexit(xml_decode_free);
 #endif
 }

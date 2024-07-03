@@ -13,68 +13,68 @@ extern "C" {
 #include <time.h>
 
 /**
- * Í¨ÓÃµÄ´æ´¢ÎÄ¼ş¾ä±ú¶ÔÏóÀàĞÍ¶¨Òå
+ * é€šç”¨çš„å­˜å‚¨æ–‡ä»¶å¥æŸ„å¯¹è±¡ç±»å‹å®šä¹‰
  */
 
 typedef struct ACL_FHANDLE	ACL_FHANDLE;
 
 struct ACL_FHANDLE {
-	ACL_VSTREAM *fp;			/**< ´æ´¢ÎÄ¼ş¾ä±ú */
-	acl_int64 fsize;			/**< ´æ´¢ÎÄ¼ş´óĞ¡ */
-	int   nrefer;				/**< ¸Ã´æ´¢¾ä±ú±»ÒıÓÃµÄ¼ÆÊıÖµ */
-	acl_pthread_mutex_t mutex;		/**< Ïß³ÌËø */
+	ACL_VSTREAM *fp;			/**< å­˜å‚¨æ–‡ä»¶å¥æŸ„ */
+	acl_int64 fsize;			/**< å­˜å‚¨æ–‡ä»¶å¤§å° */
+	int   nrefer;				/**< è¯¥å­˜å‚¨å¥æŸ„è¢«å¼•ç”¨çš„è®¡æ•°å€¼ */
+	acl_pthread_mutex_t mutex;		/**< çº¿ç¨‹é” */
 #if defined(_WIN32) || defined(_WIN64)
-	unsigned long tid;			/**< ´ò¿ª¸Ã´æ´¢µÄÏß³ÌºÅ */
-	unsigned long lock_mutex_tid;		/**< ¼ÓÏß³ÌËøµÄÏß³ÌºÅ */
+	unsigned long tid;			/**< æ‰“å¼€è¯¥å­˜å‚¨çš„çº¿ç¨‹å· */
+	unsigned long lock_mutex_tid;		/**< åŠ çº¿ç¨‹é”çš„çº¿ç¨‹å· */
 #else
-	acl_pthread_t tid;			/**< ´ò¿ª¸Ã´æ´¢µÄÏß³ÌºÅ */
-	acl_pthread_t lock_mutex_tid;		/**< ¼ÓÏß³ÌËøµÄÏß³ÌºÅ */
+	acl_pthread_t tid;			/**< æ‰“å¼€è¯¥å­˜å‚¨çš„çº¿ç¨‹å· */
+	acl_pthread_t lock_mutex_tid;		/**< åŠ çº¿ç¨‹é”çš„çº¿ç¨‹å· */
 #endif
-	unsigned int oflags;			/**< ´ò¿ªÊ±µÄ±êÖ¾Î» */
-#define	ACL_FHANDLE_O_FLOCK	(1 << 0)	/**< Ê¹ÓÃÎÄ¼şËø */
-#define	ACL_FHANDLE_O_MLOCK	(1 << 1)	/**< Ê¹ÓÃÏß³ÌËø */
-#define	ACL_FHANDLE_O_MKDIR	(1 << 2)	/**< ÊÇ·ñ×Ô¶¯¼ì²é²¢´´½¨²»´æÔÚµÄÄ¿Â¼ */
-#define	ACL_FHANDLE_O_NOATIME	(1 << 3)	/**< ´ò¿ªÎÄ¼şÊ±Ìí¼Ó O_NOATIME ±êÖ¾Î» */
-#define	ACL_FHANDLE_O_DIRECT	(1 << 4)	/**< ´ò¿ªÎÄ¼şÊ±Ìí¼Ó O_DIRECT ±êÖ¾Î» */
-#define	ACL_FHANDLE_O_SYNC	(1 << 5)	/**< ´ò¿ªÎÄ¼şÊ±Ìí¼Ó O_SYNC ±êÖ¾Î» */
-#define	ACL_FHANDLE_O_EXCL	(1 << 6)	/**< ´ò¿ªÎÄ¼şÊ±ÊÇ·ñÊÇ×Ô¶¯¼ÓËø */
+	unsigned int oflags;			/**< æ‰“å¼€æ—¶çš„æ ‡å¿—ä½ */
+#define	ACL_FHANDLE_O_FLOCK	(1 << 0)	/**< ä½¿ç”¨æ–‡ä»¶é” */
+#define	ACL_FHANDLE_O_MLOCK	(1 << 1)	/**< ä½¿ç”¨çº¿ç¨‹é” */
+#define	ACL_FHANDLE_O_MKDIR	(1 << 2)	/**< æ˜¯å¦è‡ªåŠ¨æ£€æŸ¥å¹¶åˆ›å»ºä¸å­˜åœ¨çš„ç›®å½• */
+#define	ACL_FHANDLE_O_NOATIME	(1 << 3)	/**< æ‰“å¼€æ–‡ä»¶æ—¶æ·»åŠ  O_NOATIME æ ‡å¿—ä½ */
+#define	ACL_FHANDLE_O_DIRECT	(1 << 4)	/**< æ‰“å¼€æ–‡ä»¶æ—¶æ·»åŠ  O_DIRECT æ ‡å¿—ä½ */
+#define	ACL_FHANDLE_O_SYNC	(1 << 5)	/**< æ‰“å¼€æ–‡ä»¶æ—¶æ·»åŠ  O_SYNC æ ‡å¿—ä½ */
+#define	ACL_FHANDLE_O_EXCL	(1 << 6)	/**< æ‰“å¼€æ–‡ä»¶æ—¶æ˜¯å¦æ˜¯è‡ªåŠ¨åŠ é” */
 
-	unsigned int status;			/**< ¸Ã´æ´¢ÎÄ¼ş¾ä±úµÄ×´Ì¬ */
-#define	ACL_FHANDLE_S_FLOCK_ON	(1 << 0)	/**< ¸Ã´æ´¢¾ä±úÒÑ¾­¼ÓÎÄ¼şËø */
-#define	ACL_FHANDLE_S_MUTEX_ON	(1 << 1)	/**< ¸Ã´æ´¢¾ä±úÒÑ¾­¼ÓÏß³ÌËø */
+	unsigned int status;			/**< è¯¥å­˜å‚¨æ–‡ä»¶å¥æŸ„çš„çŠ¶æ€ */
+#define	ACL_FHANDLE_S_FLOCK_ON	(1 << 0)	/**< è¯¥å­˜å‚¨å¥æŸ„å·²ç»åŠ æ–‡ä»¶é” */
+#define	ACL_FHANDLE_S_MUTEX_ON	(1 << 1)	/**< è¯¥å­˜å‚¨å¥æŸ„å·²ç»åŠ çº¿ç¨‹é” */
 
-	time_t  when_free;			/**< ÔÚÑÓ³Ù¹Ø±Õ»º´æ¶ÓÁĞÖĞ´æ»îµÄÊ±¼ä½Ø */
-	ACL_RING ring;				/**< »º´æÊı¾İ½áµã */
-	size_t size;				/**< ¸Ã ACL_FHANDLE ¶ÔÏóµÄÊµ¼Ê´óĞ¡ >= sizeof(ACL_FHANDLE) */
-	void (*on_close)(ACL_FHANDLE*);		/**< µ±¸ÃÎÄ¼ş»º´æ¾ä±úÕæÕı¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı£¬¿ÉÒÔÎª¿Õ */
+	time_t  when_free;			/**< åœ¨å»¶è¿Ÿå…³é—­ç¼“å­˜é˜Ÿåˆ—ä¸­å­˜æ´»çš„æ—¶é—´æˆª */
+	ACL_RING ring;				/**< ç¼“å­˜æ•°æ®ç»“ç‚¹ */
+	size_t size;				/**< è¯¥ ACL_FHANDLE å¯¹è±¡çš„å®é™…å¤§å° >= sizeof(ACL_FHANDLE) */
+	void (*on_close)(ACL_FHANDLE*);		/**< å½“è¯¥æ–‡ä»¶ç¼“å­˜å¥æŸ„çœŸæ­£å…³é—­æ—¶çš„å›è°ƒå‡½æ•°ï¼Œå¯ä»¥ä¸ºç©º */
 };
 
 #define	ACL_FHANDLE_PATH(x)	(ACL_VSTREAM_PATH((x)->fp))
 
 /**
- * ³õÊ¼»¯ÎÄ¼ş¾ä±ú²Ù×÷£¬¸Ãº¯ÊıĞëÔÚ³ÌĞòÔËĞĞ³õÊ¼»¯Ê±±»µ÷ÓÃÇÒÖ»ÄÜ±»µ÷ÓÃÒ»´Î
- * @param cache_size {int} ÄÚ²¿±»´ò¿ªÎÄ¼ş¾ä±úµÄ×î´ó¸öÊı
- * @param debug_section {int} µ÷ÊÔ¼¶±ğ
+ * åˆå§‹åŒ–æ–‡ä»¶å¥æŸ„æ“ä½œï¼Œè¯¥å‡½æ•°é¡»åœ¨ç¨‹åºè¿è¡Œåˆå§‹åŒ–æ—¶è¢«è°ƒç”¨ä¸”åªèƒ½è¢«è°ƒç”¨ä¸€æ¬¡
+ * @param cache_size {int} å†…éƒ¨è¢«æ‰“å¼€æ–‡ä»¶å¥æŸ„çš„æœ€å¤§ä¸ªæ•°
+ * @param debug_section {int} è°ƒè¯•çº§åˆ«
  * @param flags {unsigned int}
  */
 void acl_fhandle_init(int cache_size, int debug_section, unsigned int flags);
 #define	ACL_FHANDLE_F_LOCK	(1 << 0)
 
 /**
- * µ±³ÌĞòÍË³öÊ±ĞèÒªµ÷ÓÃ´Ëº¯ÊıÀ´ÊÍ·ÅÏµÍ³×ÊÔ´
+ * å½“ç¨‹åºé€€å‡ºæ—¶éœ€è¦è°ƒç”¨æ­¤å‡½æ•°æ¥é‡Šæ”¾ç³»ç»Ÿèµ„æº
  */
 void acl_fhandle_end(void);
 
 /**
- * ´ò¿ªÒ»¸öÎÄ¼ş
- * @param size {size_t} ·ÖÅä½á¹¹ FS_HANDDLE ĞèÒªµÄ¿Õ¼ä´óĞ¡
- * @param oflags {unsigned int} ´ò¿ªÎÄ¼ş¾ä±úÊ±µÄ±êÖ¾Î», ACL_FHANDLE_O_XXX
- * @param file_path {const char*} ÎÄ¼şÃû(°üº¬Â·¾¶)
- * @param on_open {int (*)(ACL_FHANDLE*, void*)} Èç¹û²»Îª¿Õ£¬
- *  Ôòµ±ÎÄ¼ş¾ä±ú±»³É¹¦´ò¿ªºó±ãµ÷ÓÃ´Ëº¯Êı
- * @param open_arg {void *} on_open µÄ»Øµ÷²ÎÊıÖ®Ò»
- * @param on_close {void (*)(ACL_FHANDLE*)} Èç¹û²»Îª¿Õ£¬
- *  Ôòµ±ÎÄ¼ş¾ä±ú±»ÕıÖ±¹Ø±ÕÊ±±ãµ÷ÓÃ´Ëº¯Êı
+ * æ‰“å¼€ä¸€ä¸ªæ–‡ä»¶
+ * @param size {size_t} åˆ†é…ç»“æ„ FS_HANDDLE éœ€è¦çš„ç©ºé—´å¤§å°
+ * @param oflags {unsigned int} æ‰“å¼€æ–‡ä»¶å¥æŸ„æ—¶çš„æ ‡å¿—ä½, ACL_FHANDLE_O_XXX
+ * @param file_path {const char*} æ–‡ä»¶å(åŒ…å«è·¯å¾„)
+ * @param on_open {int (*)(ACL_FHANDLE*, void*)} å¦‚æœä¸ä¸ºç©ºï¼Œ
+ *  åˆ™å½“æ–‡ä»¶å¥æŸ„è¢«æˆåŠŸæ‰“å¼€åä¾¿è°ƒç”¨æ­¤å‡½æ•°
+ * @param open_arg {void *} on_open çš„å›è°ƒå‚æ•°ä¹‹ä¸€
+ * @param on_close {void (*)(ACL_FHANDLE*)} å¦‚æœä¸ä¸ºç©ºï¼Œ
+ *  åˆ™å½“æ–‡ä»¶å¥æŸ„è¢«æ­£ç›´å…³é—­æ—¶ä¾¿è°ƒç”¨æ­¤å‡½æ•°
  */
 ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 	const char *file_path,
@@ -82,21 +82,21 @@ ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 	void (*on_close)(ACL_FHANDLE*));
 
 /**
- * ¹Ø±ÕÒ»¸öÎÄ¼ş¾ä±ú
+ * å…³é—­ä¸€ä¸ªæ–‡ä»¶å¥æŸ„
  * @param fs {ACL_FHANDLE*}
- * @param delay_timeout {int} Èç¹û > 0, ÔòÑÓ³Ù¸ÃÊ±¼äºó²ÅÕæÕı¹Ø±Õ,
- *  ·ñÔò£¬ÆäÒıÓÃ¼ÆÊıÎª 0 ÔòÁ¢¼´¹Ø±Õ
+ * @param delay_timeout {int} å¦‚æœ > 0, åˆ™å»¶è¿Ÿè¯¥æ—¶é—´åæ‰çœŸæ­£å…³é—­,
+ *  å¦åˆ™ï¼Œå…¶å¼•ç”¨è®¡æ•°ä¸º 0 åˆ™ç«‹å³å…³é—­
  */
 void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout);
 
 /**
- * ¶ÔÒ»¸öÎÄ¼ş¾ä±ú¼ÓËø(ÏÈ¼ÓÏß³ÌËøºó¼ÓÎÄ¼şËø)
+ * å¯¹ä¸€ä¸ªæ–‡ä»¶å¥æŸ„åŠ é”(å…ˆåŠ çº¿ç¨‹é”ååŠ æ–‡ä»¶é”)
  * @param fs {ACL_FHANDLE*}
  */
 void acl_fhandle_lock(ACL_FHANDLE *fs);
 
 /**
- * ¶ÔÒ»¸öÎÄ¼ş¾ä±ú½âËø(ÏÈ½âÎÄ¼şËøÔÙ½âÏß³ÌËø)
+ * å¯¹ä¸€ä¸ªæ–‡ä»¶å¥æŸ„è§£é”(å…ˆè§£æ–‡ä»¶é”å†è§£çº¿ç¨‹é”)
  * @param fs {ACL_FHANDLE*}
  */
 void acl_fhandle_unlock(ACL_FHANDLE *fs);

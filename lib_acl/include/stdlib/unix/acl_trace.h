@@ -6,13 +6,13 @@ extern "C" {
 #endif
 
 /**
- * ½«µ±Ç°º¯ÊıµÄ¶ÑÕ»Êä³öÖÁÖ¸¶¨ÎÄ¼şÖĞ
- * @param filepath {const char*} Ä¿±êÎÄ¼şÃû
+ * å°†å½“å‰å‡½æ•°çš„å †æ ˆè¾“å‡ºè‡³æŒ‡å®šæ–‡ä»¶ä¸­
+ * @param filepath {const char*} ç›®æ ‡æ–‡ä»¶å
  */
 void acl_trace_save(const char *filepath);
 
 /**
- * ½«µ±Ç°º¯ÊıµÄ¶ÑÕ»Êä³öÖÁÈÕÖ¾ÖĞ
+ * å°†å½“å‰å‡½æ•°çš„å †æ ˆè¾“å‡ºè‡³æ—¥å¿—ä¸­
  */
 void acl_trace_info(void);
 

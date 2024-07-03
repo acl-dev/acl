@@ -4,7 +4,7 @@
 WebsocketServlet_impl::WebsocketServlet_impl(acl::redis_client_cluster& cluster,
 	size_t max_conns)
 {
-	// ´´½¨ session ´æ´¢¶ÔÏó
+	// åˆ›å»º session å­˜å‚¨å¯¹è±¡
 	session_ = new acl::redis_session(cluster, max_conns);
 	step_    = 0;
 }
@@ -19,10 +19,10 @@ bool WebsocketServlet_impl::doUnknown(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// ·¢ËÍ http ÏìÓ¦Í·
+	// å‘é€ http å“åº”å¤´
 	if (res.sendHeader() == false)
 		return false;
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -37,9 +37,9 @@ bool WebsocketServlet_impl::doGet(acl::HttpServletRequest& req,
 bool WebsocketServlet_impl::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setContentEncoding(false)		// ÉèÖÃÊÇ·ñÑ¹ËõÊı¾İ
-		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
+	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setContentEncoding(false)		// è®¾ç½®æ˜¯å¦å‹ç¼©æ•°æ®
+		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
 
 	const char* ip = req.getLocalAddr();
 	if (ip == NULL || *ip == 0) {
@@ -68,8 +68,8 @@ bool WebsocketServlet_impl::doPost(acl::HttpServletRequest& req,
 
 	buf << "<script>g_url='ws://" << local_addr << "/'</script>";
 
-	// ·¢ËÍ http ÏìÓ¦Ìå£¬ÒòÎªÉèÖÃÁË chunk ´«ÊäÄ£Ê½£¬ËùÒÔĞèÒª¶àµ÷ÓÃÒ»´Î
-	// res.write ÇÒÁ½¸ö²ÎÊı¾ùÎª 0 ÒÔ±íÊ¾ chunk ´«ÊäÊı¾İ½áÊø
+	// å‘é€ http å“åº”ä½“ï¼Œå› ä¸ºè®¾ç½®äº† chunk ä¼ è¾“æ¨¡å¼ï¼Œæ‰€ä»¥éœ€è¦å¤šè°ƒç”¨ä¸€æ¬¡
+	// res.write ä¸”ä¸¤ä¸ªå‚æ•°å‡ä¸º 0 ä»¥è¡¨ç¤º chunk ä¼ è¾“æ•°æ®ç»“æŸ
 	return res.write(buf) && res.write(NULL, 0);
 }
 

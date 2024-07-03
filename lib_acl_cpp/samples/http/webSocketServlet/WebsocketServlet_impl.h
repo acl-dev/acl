@@ -22,7 +22,7 @@ protected:
 	//for websocket
 	/**
 	 * @override
-	 * websocket 关闭消息回调
+	 * websocket 鍏抽棴娑堟伅鍥炶皟
 	 * @return {void}
 	 */
 	void onClose(void) {}

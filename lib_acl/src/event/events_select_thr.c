@@ -111,7 +111,7 @@ static void event_enable_read(ACL_EVENT *eventp, ACL_VSTREAM *stream,
 
 	THREAD_UNLOCK(&event_thr->event.tb_mutex);
 
-	/* 主要是为了减少通知次数 */
+	/* 涓昏鏄负浜嗗噺灏戦�氱煡娆℃暟 */
 	if (event_thr->event.blocked && event_thr->event.evdog
 	    && event_dog_client(event_thr->event.evdog) != stream) {
 		event_dog_notify(event_thr->event.evdog);

@@ -47,7 +47,7 @@ static void forward_free(FWD_RES *fwd)
 	http_hdr_req_free(fwd->hdr_req);
 	http_hdr_res_free(fwd->hdr_res);
 	if (fwd->res) {
-		fwd->res->hdr_res = NULL;  /* ·ÀÖ¹ hdr_res ±»ÖØ¸´ÊÍ·Å */
+		fwd->res->hdr_res = NULL;  /* é˜²æ­¢ hdr_res è¢«é‡å¤é‡Šæ”¾ */
 		http_res_free(fwd->res);
 	}
 	acl_myfree(fwd);
@@ -125,7 +125,7 @@ static void forward_rewrite_thread(void *ctx)
 
 	ACL_VSTRING_TERMINATE(vbuf);
 
-	/* ¼òÌå×ª·±Ìå */
+	/* ç®€ä½“è½¬ç¹ä½“ */
 	acl_gbjt2ft(STR(vbuf), LEN(vbuf), STR(vbuf), LEN(vbuf));
 
 	ret = acl_vstream_writen(fwd->client, STR(vbuf), LEN(vbuf));

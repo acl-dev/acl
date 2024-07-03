@@ -17,15 +17,15 @@ typedef int (*ACL_MSGIO_NOTIFY_FN)(int msg_type, ACL_MSGIO *peer,
 				   const ACL_MSGIO_INFO *info, void *arg);
 
 /**
- * ��Ϣ���Ͷ���
+ * 消息类型定义
  */
 #define ACL_MSGIO_OK				0
-#define ACL_MSGIO_TIMEOUT			1	/* ��ʱ��Ϣ */
-#define ACL_MSGIO_EXCEPT			2	/* �쳣��Ϣ */
-#define ACL_MSGIO_CONNECT			3	/* ���ӳɹ���Ϣ */
-#define ACL_MSGIO_CONNECT_TIMEOUT		4	/* ���ӳ�ʱ��Ϣ */
-#define ACL_MSGIO_QUIT				5	/* �˳���Ϣ */
-#define	ACL_MSGIO_OPEN				6	/* ����������Ϣ */
+#define ACL_MSGIO_TIMEOUT			1	/* 超时消息 */
+#define ACL_MSGIO_EXCEPT			2	/* 异常消息 */
+#define ACL_MSGIO_CONNECT			3	/* 连接成功消息 */
+#define ACL_MSGIO_CONNECT_TIMEOUT		4	/* 连接超时消息 */
+#define ACL_MSGIO_QUIT				5	/* 退出消息 */
+#define	ACL_MSGIO_OPEN				6	/* 数据流打开消息 */
 
 #define ACL_MSGIO_USER				1000
 

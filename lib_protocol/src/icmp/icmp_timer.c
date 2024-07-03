@@ -5,8 +5,8 @@
 typedef struct TimerItem
 {
 	ICMP_PKT *pkt;
-	ACL_RING entry;		/* ÄÚ²¿ÓÃµÄ¶¨Ê±Á´ */
-	time_t when;		/* ±»´¥·¢µÄÊ±¼ä½Ø */
+	ACL_RING entry;		/* å†…éƒ¨ç”¨çš„å®šæ—¶é“¾ */
+	time_t when;		/* è¢«è§¦å‘çš„æ—¶é—´æˆª */
 } TimerItem;
 
 #define RING_TO_TIMER(r) \

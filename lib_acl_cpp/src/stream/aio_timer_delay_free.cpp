@@ -43,7 +43,7 @@ void aio_timer_delay_free::timer_callback(unsigned int /* id */)
 		}
 	}
 
-	// ²»¹ÜÊÂ¼şÒıÇæÊÇ·ñÉèÖÃÁËÖØ¸´¶¨Ê±Æ÷¹ı³Ì£¬ÖØÖÃ±¾¶¨Ê±Æ÷ÈÎÎñ
+	// ä¸ç®¡äº‹ä»¶å¼•æ“æ˜¯å¦è®¾ç½®äº†é‡å¤å®šæ—¶å™¨è¿‡ç¨‹ï¼Œé‡ç½®æœ¬å®šæ—¶å™¨ä»»åŠ¡
 	if (!gc_set_.empty()) {
 		handle_.set_timer(this, 100000, DELAY_TIMER_ID);
 	} else {

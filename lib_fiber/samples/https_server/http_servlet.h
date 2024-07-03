@@ -29,7 +29,7 @@ public:
 
 		res.setContentLength(len);
 
-		// 发送 http 响应体
+		// 路垄脣脥 http 脧矛脫娄脤氓
 		return res.write(buf, len) && res.write(NULL, 0);
 	}
 };

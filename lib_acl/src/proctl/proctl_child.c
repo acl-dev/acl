@@ -42,7 +42,7 @@ static void proctl_child_cmd_stop(ACL_VSTREAM *client, const char *filepath)
 	}
 
 	acl_vstream_fprintf(client, "+OK|%s is stopping\r\n", filepath);
-	acl_vstream_close(client);  /* ÏÔÊ½¹Ø±ÕÊÇÎªÁË½«Êı¾İ´«ÊäÍê */
+	acl_vstream_close(client);  /* æ˜¾å¼å…³é—­æ˜¯ä¸ºäº†å°†æ•°æ®ä¼ è¾“å®Œ */
 
 	if (__onexit_fn) {
 		acl_msg_info("%s(%d): call onexit_fn before exit, filepath(%s) ",
@@ -143,7 +143,7 @@ void proctl_child_atexit(void (*onexit_fn)(void*), void *arg)
 	__onexit_arg = arg;
 }
 
-/* ·şÎñ×Ó½ø³Ìµ¥¶À´¦ÀíÏûÏ¢µÄÏß³Ì */
+/* æœåŠ¡å­è¿›ç¨‹å•ç‹¬å¤„ç†æ¶ˆæ¯çš„çº¿ç¨‹ */
 void *proctl_child_thread(void *arg)
 {
 	const char *myname = "ptoctl_child_thread";
@@ -155,7 +155,7 @@ void *proctl_child_thread(void *arg)
 		acl_msg_error("%s(%d): local_listen error(%s), maybe there's another"
 			" instance is running", myname, __LINE__,
 			acl_last_strerror(ebuf, sizeof(ebuf)));
-		/* XXX: ´Ë´¦±ØĞëÒÔ0µÄ·½Ê½ÍË³ö³ÌĞòÔËĞĞ£¬ÒÔ·ÀÖ¹±»¸¸½ø³ÌÆµ·±Æô¶¯ */
+		/* XXX: æ­¤å¤„å¿…é¡»ä»¥0çš„æ–¹å¼é€€å‡ºç¨‹åºè¿è¡Œï¼Œä»¥é˜²æ­¢è¢«çˆ¶è¿›ç¨‹é¢‘ç¹å¯åŠ¨ */
 		exit(0);
 	}
 

@@ -6,7 +6,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// Ã…Ã¤Ã–ÃƒÃ„ÃšÃˆÃÃÃ®
 
 char* var_cfg_upstream_addr;
 char* var_cfg_display_disabled;

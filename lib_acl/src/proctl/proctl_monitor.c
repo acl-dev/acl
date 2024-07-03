@@ -12,7 +12,7 @@
 #include <windows.h>
 #include "proctl_internal.h"
 
-/* Á¬½ÓÄ³¸ö·şÎñ½ø³ÌµÄ¼àÌı½Ó¿Ú£¬·¢ËÍÍ£Ö¹ÏûÏ¢ */
+/* è¿æ¥æŸä¸ªæœåŠ¡è¿›ç¨‹çš„ç›‘å¬æ¥å£ï¼Œå‘é€åœæ­¢æ¶ˆæ¯ */
 static void proctl_monitor_stop_service(ACL_VSTREAM *client,
 	const char *filepath, const char *args)
 {
@@ -70,7 +70,7 @@ static void proctl_monitor_stop_service(ACL_VSTREAM *client,
 	acl_vstream_close(stream);
 }
 
-/* Í£Ö¹ËùÓĞ·şÎñ½ø³Ì */
+/* åœæ­¢æ‰€æœ‰æœåŠ¡è¿›ç¨‹ */
 static void proctl_monitor_stop_all_service(ACL_VSTREAM *client)
 {
 	ACL_ARGV *service_argv;
@@ -89,7 +89,7 @@ static void proctl_monitor_stop_all_service(ACL_VSTREAM *client)
 	proctl_service_free_all(service_argv);
 }
 
-/* Í£Ö¹Ä³¸ö·şÎñ½ø³Ì */
+/* åœæ­¢æŸä¸ªæœåŠ¡è¿›ç¨‹ */
 static int proctl_monitor_cmd_stop(ACL_VSTREAM *client,
 	const char *filepath, const char *args)
 {
@@ -118,7 +118,7 @@ static int proctl_monitor_cmd_stop(ACL_VSTREAM *client,
 	return (0);
 }
 
-/* Í¨ÖªÖ÷Ïß³Ì£¬Æô¶¯Ò»¸ö·şÎñ */
+/* é€šçŸ¥ä¸»çº¿ç¨‹ï¼Œå¯åŠ¨ä¸€ä¸ªæœåŠ¡ */
 static int proctl_monitor_cmd_start(ACL_VSTREAM *client,
 	const char *filepath, const char *args)
 {
@@ -156,7 +156,7 @@ static int proctl_monitor_cmd_start(ACL_VSTREAM *client,
 	return (0);
 }
 
-/* Í£Ö¹ËùÓĞµÄ·şÎñ£¬²¢ÍË³öÕû¸ö¿ØÖÆ½ø³Ì */
+/* åœæ­¢æ‰€æœ‰çš„æœåŠ¡ï¼Œå¹¶é€€å‡ºæ•´ä¸ªæ§åˆ¶è¿›ç¨‹ */
 static void proctl_monitor_cmd_quit(ACL_VSTREAM *client)
 {
 	const char *myname = "proctl_monitor_cmd_quit";
@@ -220,7 +220,7 @@ static void usage(ACL_VSTREAM *client)
 		"|-f|filepath|-a|args");
 }
 
-/* ¿ØÖÆ½ø³ÌµÄ¼àÌıÏß³Ì´¦ÀíÃüÁî×ÜÈë¿Ú */
+/* æ§åˆ¶è¿›ç¨‹çš„ç›‘å¬çº¿ç¨‹å¤„ç†å‘½ä»¤æ€»å…¥å£ */
 static int proctl_monitor_main(ACL_VSTREAM *client, int argc, char *argv[])
 {
 	const char *myname = "proctl_monitor_main";

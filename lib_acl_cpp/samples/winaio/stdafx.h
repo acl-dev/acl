@@ -1,54 +1,54 @@
-// stdafx.h : ��׼ϵͳ�����ļ��İ����ļ���
-// ���Ǿ���ʹ�õ��������ĵ�
-// ��Ŀ�ض��İ����ļ�
+// stdafx.h : 标准系统包含文件的包含文件，
+// 或是经常使用但不常更改的
+// 项目特定的包含文件
 
 #pragma once
 
 #ifdef VC2003
 
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN		// �� Windows ��ͷ���ų�����ʹ�õ�����
+#define VC_EXTRALEAN		// 从 Windows 标头中排除不常使用的资料
 #endif
 
-// ���������ʹ��������ָ����ƽ̨֮ǰ��ƽ̨�����޸�����Ķ��塣
-// �йز�ͬƽ̨����Ӧֵ��������Ϣ����ο� MSDN��
-#ifndef WINVER				// ����ʹ�� Windows 95 �� Windows NT 4 ����߰汾���ض����ܡ�
-#define WINVER 0x0400		//Ϊ Windows98 �� Windows 2000 �����°汾�ı�Ϊ�ʵ���ֵ��
+// 如果您必须使用下列所指定的平台之前的平台，则修改下面的定义。
+// 有关不同平台的相应值的最新信息，请参考 MSDN。
+#ifndef WINVER				// 允许使用 Windows 95 和 Windows NT 4 或更高版本的特定功能。
+#define WINVER 0x0400		//为 Windows98 和 Windows 2000 及更新版本改变为适当的值。
 #endif
 
-#ifndef _WIN32_WINNT		// ����ʹ�� Windows NT 4 ����߰汾���ض����ܡ�
-#define _WIN32_WINNT 0x0400		//Ϊ Windows98 �� Windows 2000 �����°汾�ı�Ϊ�ʵ���ֵ��
+#ifndef _WIN32_WINNT		// 允许使用 Windows NT 4 或更高版本的特定功能。
+#define _WIN32_WINNT 0x0400		//为 Windows98 和 Windows 2000 及更新版本改变为适当的值。
 #endif						
 
-#ifndef _WIN32_WINDOWS		// ����ʹ�� Windows 98 ����߰汾���ض����ܡ�
-#define _WIN32_WINDOWS 0x0410 //Ϊ Windows Me �����°汾�ı�Ϊ�ʵ���ֵ��
+#ifndef _WIN32_WINDOWS		// 允许使用 Windows 98 或更高版本的特定功能。
+#define _WIN32_WINDOWS 0x0410 //为 Windows Me 及更新版本改变为适当的值。
 #endif
 
-#ifndef _WIN32_IE			// ����ʹ�� IE 4.0 ����߰汾���ض����ܡ�
-#define _WIN32_IE 0x0400	//Ϊ IE 5.0 �����°汾�ı�Ϊ�ʵ���ֵ��
+#ifndef _WIN32_IE			// 允许使用 IE 4.0 或更高版本的特定功能。
+#define _WIN32_IE 0x0400	//为 IE 5.0 及更新版本改变为适当的值。
 #endif
 
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// ĳЩ CString ���캯��������ʽ��
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS	// 某些 CString 构造函数将是显式的
 
-// �ر� MFC ��ĳЩ��������������ȫ���Եľ�����Ϣ������
+// 关闭 MFC 对某些常见但经常被安全忽略的警告消息的隐藏
 #define _AFX_ALL_WARNINGS
 
-#include <afxwin.h>         // MFC ���ĺͱ�׼���
-#include <afxext.h>         // MFC ��չ
-#include <afxdisp.h>        // MFC �Զ�����
+#include <afxwin.h>         // MFC 核心和标准组件
+#include <afxext.h>         // MFC 扩展
+#include <afxdisp.h>        // MFC 自动化类
 
-#include <afxdtctl.h>		// Internet Explorer 4 �����ؼ��� MFC ֧��
+#include <afxdtctl.h>		// Internet Explorer 4 公共控件的 MFC 支持
 #ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>			// Windows �����ؼ��� MFC ֧��
+#include <afxcmn.h>			// Windows 公共控件的 MFC 支持
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-#include <afxsock.h>		// MFC �׽�����չ
+#include <afxsock.h>		// MFC 套接字扩展
 
 //////////////////////////////////////////////////////////////////////////////////////
 #else
-// stdafx.h : ��׼ϵͳ�����ļ��İ����ļ���
-// ���Ǿ���ʹ�õ��������ĵ�
-// �ض�����Ŀ�İ����ļ�
+// stdafx.h : 标准系统包含文件的包含文件，
+// 或是经常使用但不常更改的
+// 特定于项目的包含文件
 
 #pragma once
 
@@ -57,13 +57,13 @@
 #endif
 
 #ifndef VC_EXTRALEAN
-#define VC_EXTRALEAN            // �� Windows ͷ���ų�����ʹ�õ�����
+#define VC_EXTRALEAN            // 从 Windows 头中排除极少使用的资料
 #endif
 
-// ���� SDKDDKVer.h ��������߰汾�Ŀ��� Windows ƽ̨��
+// 包括 SDKDDKVer.h 将定义最高版本的可用 Windows 平台。
 
-// ���ҪΪ��ǰ�� Windows ƽ̨����Ӧ�ó�������� WinSDKVer.h������
-// WIN32_WINNT ������ΪҪ֧�ֵ�ƽ̨��Ȼ���ٰ��� SDKDDKVer.h��
+// 如果要为以前的 Windows 平台生成应用程序，请包括 WinSDKVer.h，并将
+// WIN32_WINNT 宏设置为要支持的平台，然后再包括 SDKDDKVer.h。
 
 #include <SDKDDKVer.h>
 
@@ -81,26 +81,26 @@
 //#define NEW new
 //#endif // _DEBUG
 
-#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // ĳЩ CString ���캯��������ʽ��
+#define _ATL_CSTRING_EXPLICIT_CONSTRUCTORS      // 某些 CString 构造函数将是显式的
 
-// �ر� MFC ��ĳЩ�����������ɷ��ĺ��Եľ�����Ϣ������
+// 关闭 MFC 对某些常见但经常可放心忽略的警告消息的隐藏
 #define _AFX_ALL_WARNINGS
 
-#include <afxwin.h>         // MFC ��������ͱ�׼���
-#include <afxext.h>         // MFC ��չ
+#include <afxwin.h>         // MFC 核心组件和标准组件
+#include <afxext.h>         // MFC 扩展
 
 
-#include <afxdisp.h>        // MFC �Զ�����
+#include <afxdisp.h>        // MFC 自动化类
 
 
 #ifndef _AFX_NO_OLE_SUPPORT
-#include <afxdtctl.h>           // MFC �� Internet Explorer 4 �����ؼ���֧��
+#include <afxdtctl.h>           // MFC 对 Internet Explorer 4 公共控件的支持
 #endif
 #ifndef _AFX_NO_AFXCMN_SUPPORT
-#include <afxcmn.h>             // MFC �� Windows �����ؼ���֧��
+#include <afxcmn.h>             // MFC 对 Windows 公共控件的支持
 #endif // _AFX_NO_AFXCMN_SUPPORT
 
-//#include <afxcontrolbars.h>     // �������Ϳؼ����� MFC ֧��
+//#include <afxcontrolbars.h>     // 功能区和控件条的 MFC 支持
 #include <afxsock.h>
 
 #include <map>

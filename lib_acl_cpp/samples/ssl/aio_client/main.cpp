@@ -23,17 +23,17 @@ typedef struct
 static bool connect_server(acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id);
 
 /**
- * ¿Í»§¶ËÒì²½Á¬½ÓÁ÷»Øµ÷º¯ÊıÀà
+ * å®¢æˆ·ç«¯å¼‚æ­¥è¿æ¥æµå›è°ƒå‡½æ•°ç±»
  */
 class client_io_callback : public acl::aio_open_callback
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param client {aio_socket_stream*} Òì²½Á¬½ÓÁ÷
-	 * @param ssl_conf {acl::sslbase_conf*} ·Ç¿ÕÊ±Ö¸¶¨ SSL Á¬½Ó·½Ê½
+	 * æ„é€ å‡½æ•°
+	 * @param client {aio_socket_stream*} å¼‚æ­¥è¿æ¥æµ
+	 * @param ssl_conf {acl::sslbase_conf*} éç©ºæ—¶æŒ‡å®š SSL è¿æ¥æ–¹å¼
 	 * @param ctx {IO_CTX*}
-	 * @param id {int} ±¾Á÷µÄIDºÅ
+	 * @param id {int} æœ¬æµçš„IDå·
 	 */
 	client_io_callback(acl::aio_socket_stream* client,
 		acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id)
@@ -59,10 +59,10 @@ public:
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı, µ±Òì²½Á÷¶Áµ½ËùÒªÇóµÄÊı¾İÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı
-	 * @param data {char*} ¶Áµ½µÄÊı¾İµØÖ·
-	 * @param len {int£ı ¶Áµ½µÄÊı¾İ³¤¶È
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµè¯»åˆ°æ‰€è¦æ±‚çš„æ•°æ®æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param len {intï½ è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool read_callback(char*, int len)
 	{
@@ -85,8 +85,8 @@ public:
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı, µ±Òì²½Á÷Ğ´³É¹¦Ê±µ÷ÓÃ´Ë»Øµ÷º¯Êı
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµå†™æˆåŠŸæ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
+	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool write_callback()
 	{
@@ -97,7 +97,7 @@ public:
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı, µ±¸ÃÒì²½Á÷¹Ø±ÕÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı
+	 * åŸºç±»è™šå‡½æ•°, å½“è¯¥å¼‚æ­¥æµå…³é—­æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•°
 	 */
 	void close_callback()
 	{
@@ -106,10 +106,10 @@ public:
 				<< ctx_->addr << " error: "
 				<< acl::last_serror();
 
-			// Èç¹ûÊÇµÚÒ»´ÎÁ¬½Ó¾ÍÊ§°Ü£¬ÔòÍË³ö
+			// å¦‚æœæ˜¯ç¬¬ä¸€æ¬¡è¿æ¥å°±å¤±è´¥ï¼Œåˆ™é€€å‡º
 			if (ctx_->nopen_total == 0) {
 				std::cout << ", first connect error, quit";
-				/* »ñµÃÒì²½ÒıÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
+				/* è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
 				client_->get_handle().stop();
 			}
 			std::cout << std::endl;
@@ -117,22 +117,22 @@ public:
 			return;
 		}
 
-		/* »ñµÃÒì²½ÒıÇæÖĞÊÜ¼à¿ØµÄÒì²½Á÷¸öÊı */
+		/* è·å¾—å¼‚æ­¥å¼•æ“ä¸­å—ç›‘æ§çš„å¼‚æ­¥æµä¸ªæ•° */
 		int nleft = client_->get_handle().length();
 		if (ctx_->nopen_total == ctx_->nopen_limit && nleft == 1) {
 			std::cout << "Id: " << id_ << " stop now! nstream: "
 				<< nleft << std::endl;
-			/* »ñµÃÒì²½ÒıÇæ¾ä±ú£¬²¢ÉèÖÃÎªÍË³ö×´Ì¬ */
+			/* è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œå¹¶è®¾ç½®ä¸ºé€€å‡ºçŠ¶æ€ */
 			client_->get_handle().stop();
 		}
 
-		// ±ØĞëÔÚ´Ë´¦É¾³ı¸Ã¶¯Ì¬·ÖÅäµÄ»Øµ÷Àà¶ÔÏóÒÔ·ÀÖ¹ÄÚ´æĞ¹Â¶
+		// å¿…é¡»åœ¨æ­¤å¤„åˆ é™¤è¯¥åŠ¨æ€åˆ†é…çš„å›è°ƒç±»å¯¹è±¡ä»¥é˜²æ­¢å†…å­˜æ³„éœ²
 		delete this;
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±Òì²½Á÷³¬Ê±Ê±µ÷ÓÃ´Ëº¯Êı
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“å¼‚æ­¥æµè¶…æ—¶æ—¶è°ƒç”¨æ­¤å‡½æ•°
+	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool timeout_callback()
 	{
@@ -144,7 +144,7 @@ public:
 
 	bool read_wakeup()
 	{
-		// È¡µÃÖ®Ç°Í¨¹ı setup_hook ×¢²áµÄ SSL IO¾ä±ú
+		// å–å¾—ä¹‹å‰é€šè¿‡ setup_hook æ³¨å†Œçš„ SSL IOå¥æŸ„
 		acl::sslbase_io* hook = (acl::sslbase_io*) client_->get_hook();
 
 		if (hook == NULL) {
@@ -153,56 +153,56 @@ public:
 		}
 
 		printf(">>>%s: begin handshake\n", __FUNCTION__);
-		// ³¢ÊÔ½øĞĞ SSL ÎÕÊÖ
+		// å°è¯•è¿›è¡Œ SSL æ¡æ‰‹
 		if (!hook->handshake()) {
 			logger_error("%s: ssl handshake failed", __FUNCTION__);
 			return false;
 		}
 
 		printf(">>>%s: end handshake\r\n", __FUNCTION__);
-		// SSL ÎÕÊÖ»¹Î´Íê³É£¬µÈ´ı±¾º¯ÊıÔÙ´Î±»´¥·¢
+		// SSL æ¡æ‰‹è¿˜æœªå®Œæˆï¼Œç­‰å¾…æœ¬å‡½æ•°å†æ¬¡è¢«è§¦å‘
 		if (!hook->handshake_ok()) {
 			printf(">>>%s: not handshake ok\r\n", __FUNCTION__);
 			return true;
 		}
 
-		// Èç¹û SSL ÎÕÊÖÒÑ¾­³É¹¦£¬Ôò¿ªÊ¼¶ÁÊı¾İ
+		// å¦‚æœ SSL æ¡æ‰‹å·²ç»æˆåŠŸï¼Œåˆ™å¼€å§‹è¯»æ•°æ®
 		
 		printf(">>>%s: ssl handshake ok\r\n", __FUNCTION__);
 
-		// ÓÉ reactor Ä£Ê½×ªÎª proactor Ä£Ê½£¬´Ó¶øÈ¡Ïû
-		// read_wakeup »Øµ÷¹ı³Ì
+		// ç”± reactor æ¨¡å¼è½¬ä¸º proactor æ¨¡å¼ï¼Œä»è€Œå–æ¶ˆ
+		// read_wakeup å›è°ƒè¿‡ç¨‹
 		client_->disable_read();
 
-		// ¿ªÊ¼Óë·şÎñ¶ËµÄ¶ÁĞ´¹ı³Ì
+		// å¼€å§‹ä¸æœåŠ¡ç«¯çš„è¯»å†™è¿‡ç¨‹
 		return begin_run();
 	}
 
 	/**
-	 * »ùÀàĞéº¯Êı, µ±Òì²½Á¬½Ó³É¹¦ºóµ÷ÓÃ´Ëº¯Êı
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌĞø£¬·ñÔò±íÊ¾ĞèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥è¿æ¥æˆåŠŸåè°ƒç”¨æ­¤å‡½æ•°
+	 * @return {bool} è¿”å›ç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool open_callback()
 	{
-		// Á¬½Ó³É¹¦£¬ÉèÖÃIO¶ÁĞ´»Øµ÷º¯Êı
+		// è¿æ¥æˆåŠŸï¼Œè®¾ç½®IOè¯»å†™å›è°ƒå‡½æ•°
 		client_->add_read_callback(this);
 		client_->add_write_callback(this);
 		ctx_->nopen_total++;
 
 		acl::assert_(id_ > 0);
 		if (ctx_->nopen_total < ctx_->nopen_limit) {
-			// ¿ªÊ¼½øĞĞÏÂÒ»¸öÁ¬½Ó¹ı³Ì
+			// å¼€å§‹è¿›è¡Œä¸‹ä¸€ä¸ªè¿æ¥è¿‡ç¨‹
 			if (!connect_server(ssl_conf_, ctx_, id_ + 1)) {
 				std::cout << "connect error!" << std::endl;
 			}
 		}
 
-		// ÉèÖÃ SSL ·½Ê½
+		// è®¾ç½® SSL æ–¹å¼
 		if (ssl_conf_) {
 			return setup_ssl(*ssl_conf_);
 		}
 
-		// ¿ªÊ¼Óë·şÎñ¶ËµÄ¶ÁĞ´¹ı³Ì
+		// å¼€å§‹ä¸æœåŠ¡ç«¯çš„è¯»å†™è¿‡ç¨‹
 		else {
 			return begin_run();
 		}
@@ -222,14 +222,14 @@ private:
 	{
 		acl::sslbase_io* ssl = ssl_conf.create(true);
 
-		// ½« SSL IO ¹ı³Ì×¢²áÖÁÒì²½Á÷ÖĞ
+		// å°† SSL IO è¿‡ç¨‹æ³¨å†Œè‡³å¼‚æ­¥æµä¸­
 		if (client_->setup_hook(ssl) == ssl) {
 			std::cout << "open ssl error!" << std::endl;
 			ssl->destroy();
 			return false;
 		}
 
-		// ¿ªÊ¼ SSL ÎÕÊÖ¹ı³Ì
+		// å¼€å§‹ SSL æ¡æ‰‹è¿‡ç¨‹
 		if (!ssl->handshake()) {
 			client_->remove_hook();
 			ssl->destroy();
@@ -241,7 +241,7 @@ private:
 			client_->disable_read();
 			return begin_run();
 		} else {
-			// ¿ªÊ¼Òì²½ SSL ÎÕÊÖ¹ı³Ì£¬Âú×ã¿É¶ÁÌõ¼şÊ±½«´¥·¢
+			// å¼€å§‹å¼‚æ­¥ SSL æ¡æ‰‹è¿‡ç¨‹ï¼Œæ»¡è¶³å¯è¯»æ¡ä»¶æ—¶å°†è§¦å‘
 			// read_wakeup
 			client_->read_wait(10);
 		}
@@ -252,7 +252,7 @@ private:
 	{
 		write_line();
 
-		// Òì²½´Ó·şÎñÆ÷¶ÁÈ¡Êı¾İ
+		// å¼‚æ­¥ä»æœåŠ¡å™¨è¯»å–æ•°æ®
 		//client_->read();
 		client_->gets(10, false);
 
@@ -261,7 +261,7 @@ private:
 
 	void write_line(void)
 	{
-		// Òì²½Ïò·şÎñÆ÷·¢ËÍÊı¾İ
+		// å¼‚æ­¥å‘æœåŠ¡å™¨å‘é€æ•°æ®
 		client_->write(buff_, dlen_);
 
 		if (nwrite_ >= ctx_->nwrite_limit) {
@@ -272,7 +272,7 @@ private:
 
 static bool connect_server(acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id)
 {
-	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì·şÎñÆ÷
+	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹æœåŠ¡å™¨
 	acl::aio_socket_stream* stream = acl::aio_socket_stream::open(
 			ctx->handle, ctx->addr, ctx->connect_timeout);
 	if (stream == NULL)
@@ -287,17 +287,17 @@ static bool connect_server(acl::sslbase_conf* ssl_conf, IO_CTX* ctx, int id)
 
 	acl_non_blocking(stream->sock_handle(), ACL_BLOCKING);
 
-	// ´´½¨Á¬½ÓºóµÄ»Øµ÷º¯ÊıÀà
+	// åˆ›å»ºè¿æ¥åçš„å›è°ƒå‡½æ•°ç±»
 	client_io_callback* callback = new
 		client_io_callback(stream, ssl_conf, ctx,  id);
 
-	// Ìí¼ÓÁ¬½Ó³É¹¦µÄ»Øµ÷º¯ÊıÀà
+	// æ·»åŠ è¿æ¥æˆåŠŸçš„å›è°ƒå‡½æ•°ç±»
 	stream->add_open_callback(callback);
 
-	// Ìí¼ÓÁ¬½ÓÊ§°Üºó»Øµ÷º¯ÊıÀà
+	// æ·»åŠ è¿æ¥å¤±è´¥åå›è°ƒå‡½æ•°ç±»
 	stream->add_close_callback(callback);
 
-	// Ìí¼ÓÁ¬½Ó³¬Ê±µÄ»Øµ÷º¯ÊıÀà
+	// æ·»åŠ è¿æ¥è¶…æ—¶çš„å›è°ƒå‡½æ•°ç±»
 	stream->add_timeout_callback(callback);
 
 	return true;
@@ -451,7 +451,7 @@ int main(int argc, char* argv[])
 	gettimeofday(&begin, NULL);
 
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			break;
 		}

@@ -27,7 +27,7 @@ bool server_manager::init(const char* server_list)
 
 bool server_manager::get_addr(const char* addr, acl::string& buf)
 {
-	// 数据格式：IP:PORT[:CONNECT_COUNT]
+	// 鏁版嵁鏍煎紡锛欼P:PORT[:CONNECT_COUNT]
 	ACL_ARGV* tokens = acl_argv_split(addr, ":|");
 	if (tokens->argc < 2)
 	{

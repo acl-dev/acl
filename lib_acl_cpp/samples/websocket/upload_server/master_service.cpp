@@ -3,7 +3,7 @@
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈÝÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_redis_servers;
 char *var_cfg_html_path;
@@ -78,7 +78,7 @@ bool master_service::thread_on_accept(acl::socket_stream* conn)
 	conn->set_rw_timeout(-1);
 	conn->set_tcp_non_blocking(false);
 
-	// Ê¹ÓÃ redis ¼¯ÈºÀ´´æ´¢ session
+	// ä½¿ç”¨ redis é›†ç¾¤æ¥å­˜å‚¨ session
 	http_servlet* servlet = new http_servlet(*session_server,
 			var_cfg_max_threads);
 	conn->set_ctx(servlet);
@@ -112,7 +112,7 @@ void master_service::thread_on_exit()
 
 void master_service::proc_on_init()
 {
-	// ´´½¨ redis ¼¯Èº¿Í»§¶Ë¶ÔÏó£¬²¢Ê¹ÓÃ redis ¼¯ÈºÀ´´æ´¢ session
+	// åˆ›å»º redis é›†ç¾¤å®¢æˆ·ç«¯å¯¹è±¡ï¼Œå¹¶ä½¿ç”¨ redis é›†ç¾¤æ¥å­˜å‚¨ session
 	session_server = new acl::redis_client_cluster;
 	session_server->init(NULL, var_cfg_redis_servers, var_cfg_max_threads);
 }

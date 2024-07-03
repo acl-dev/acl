@@ -4,7 +4,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// Ã…Ã¤Ã–ÃƒÃ„ÃšÃˆÃÃÃ®
 
 char *var_cfg_redis_addrs;
 acl::master_str_tbl var_conf_str_tab[] = {

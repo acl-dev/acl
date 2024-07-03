@@ -1,4 +1,4 @@
-// http_servlet.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// http_servlet.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 #include <assert.h>
 #include <getopt.h>
@@ -25,26 +25,26 @@ public:
 	{
 		acl::string body;
 
-		// ´Ó±¾µØÎÄ¼şÖĞ¼ÓÔØÇëÇóÊı¾İ
+		// ä»æœ¬åœ°æ–‡ä»¶ä¸­åŠ è½½è¯·æ±‚æ•°æ®
 		if (acl::ifstream::load(file_, &body) == false)
 		{
 			logger_error("load %s error", file_.c_str());
 			return false;
 		}
 
-		// ´´½¨  HTTP ÇëÇó¿Í»§¶Ë
+		// åˆ›å»º  HTTP è¯·æ±‚å®¢æˆ·ç«¯
 		acl::http_request req(server_addr_);
 
-		// Ìí¼Ó HTTP ÇëÇóÍ·×Ö¶Î
+		// æ·»åŠ  HTTP è¯·æ±‚å¤´å­—æ®µ
 
 		acl::string ctype("text/");
 		ctype << stype_ << "; charset=" << charset_;
 
-		acl::http_header& hdr = req.request_header();  // ÇëÇóÍ·¶ÔÏóµÄÒıÓÃ
+		acl::http_header& hdr = req.request_header();  // è¯·æ±‚å¤´å¯¹è±¡çš„å¼•ç”¨
 		hdr.set_url("/");
 		hdr.set_content_type(ctype);
 
-		// ·¢ËÍ HTTP ÇëÇóÊı¾İ
+		// å‘é€ HTTP è¯·æ±‚æ•°æ®
 		if (req.request(body.c_str(), body.length()) == false)
 		{
 			logger_error("send http request to %s error",
@@ -52,7 +52,7 @@ public:
 			return false;
 		}
 
-		// È¡³ö HTTP ÏìÓ¦Í·µÄÊı¾İ×Ö¶Î
+		// å–å‡º HTTP å“åº”å¤´çš„æ•°æ®å­—æ®µ
 		const char* p = req.header_value("Content-Type");
 		if (p == NULL || *p == 0)
 		{
@@ -60,11 +60,11 @@ public:
 			return false;
 		}
 
-		// ·ÖÎö HTTP ÏìÓ¦Í·µÄÊı¾İÀàĞÍ
+		// åˆ†æ HTTP å“åº”å¤´çš„æ•°æ®ç±»å‹
 		acl::http_ctype content_type;
 		content_type.parse(p);
 
-		// ÏìÓ¦Í·Êı¾İÀàĞÍµÄ×ÓÀàĞÍ
+		// å“åº”å¤´æ•°æ®ç±»å‹çš„å­ç±»å‹
 		const char* stype = content_type.get_stype();
 
 		bool ret;
@@ -82,7 +82,7 @@ public:
 	}
 
 private:
-	// ´¦Àí text/plain ÀàĞÍÊı¾İ
+	// å¤„ç† text/plain ç±»å‹æ•°æ®
 	bool do_plain(acl::http_request& req)
 	{
 		acl::string body;
@@ -95,7 +95,7 @@ private:
 		return true;
 	}
 
-	// ´¦Àí text/xml ÀàĞÍÊı¾İ
+	// å¤„ç† text/xml ç±»å‹æ•°æ®
 	bool do_xml(acl::http_request& req)
 	{
 		acl::xml1 body;
@@ -119,7 +119,7 @@ private:
 		return true;
 	}
 
-	// ´¦Àí text/json ÀàĞÍÊı¾İ
+	// å¤„ç† text/json ç±»å‹æ•°æ®
 	bool do_json(acl::http_request& req)
 	{
 		acl::json body;
@@ -146,11 +146,11 @@ private:
 	}
 
 private:
-	acl::string server_addr_;	// web ·şÎñÆ÷µØÖ·
-	acl::string file_;		// ±¾µØÇëÇóµÄÊı¾İÎÄ¼ş
-	acl::string stype_;		// ÇëÇóÊı¾İµÄ×ÓÊı¾İÀàĞÍ
-	acl::string charset_;		// ±¾µØÇëÇóÊı¾İÎÄ¼şµÄ×Ö·û¼¯
-	acl::string to_charset_;	// ½«·şÎñÆ÷ÏìÓ¦Êı¾İ×ªÎª±¾µØ×Ö·û¼¯
+	acl::string server_addr_;	// web æœåŠ¡å™¨åœ°å€
+	acl::string file_;		// æœ¬åœ°è¯·æ±‚çš„æ•°æ®æ–‡ä»¶
+	acl::string stype_;		// è¯·æ±‚æ•°æ®çš„å­æ•°æ®ç±»å‹
+	acl::string charset_;		// æœ¬åœ°è¯·æ±‚æ•°æ®æ–‡ä»¶çš„å­—ç¬¦é›†
+	acl::string to_charset_;	// å°†æœåŠ¡å™¨å“åº”æ•°æ®è½¬ä¸ºæœ¬åœ°å­—ç¬¦é›†
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -192,10 +192,10 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	// ½«ÈÕÖ¾Êä³öÖÁÆÁÄ»
+	// å°†æ—¥å¿—è¾“å‡ºè‡³å±å¹•
 	acl::log::stdout_open(true);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 	http_request_test request(server_addr, file, stype, charset);
 	request.run();
 

@@ -49,10 +49,10 @@ bool server_servlet::doUnknown(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=utf-8");
-	// ·¢ËÍ http ÏìÓ¦Í·
+	// å‘é€ http å“åº”å¤´
 	if (res.sendHeader() == false)
 		return false;
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -74,8 +74,8 @@ bool server_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
 	bool keep_alive = req.isKeepAlive();
-	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(keep_alive);		// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
+	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(keep_alive);		// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
 
 	const char* ctype = req.getContentType(false);
 	if (ctype == NULL)
@@ -128,7 +128,7 @@ bool server_servlet::doJson(acl::HttpServletRequest& req,
 	}
 
 	/*
-	 * Êı¾İ¸ñÊ½:
+	 * æ•°æ®æ ¼å¼:
 	 * {
 	 *     server: [
 	 *         {
@@ -156,7 +156,7 @@ bool server_servlet::doJson(acl::HttpServletRequest& req,
 	 * }
 	 */
 
-	// ½« JSON Êı¾İ×ªÎª XML Êı¾İµÄ¹ı³Ì
+	// å°† JSON æ•°æ®è½¬ä¸º XML æ•°æ®çš„è¿‡ç¨‹
 
 	acl::xml1 xml;
 	acl::xml_node& server_node = xml.create_node("server");
@@ -201,7 +201,7 @@ bool server_servlet::doJson(acl::HttpServletRequest& req,
 
 		while (proc != NULL)
 		{
-			// ´´½¨  proc XML ½áµã
+			// åˆ›å»º  proc XML ç»“ç‚¹
 			acl::xml_node& proc_node = xml.create_node("proc");
 			server_node.add_child(proc_node);
 
@@ -230,7 +230,7 @@ bool server_servlet::doJson(acl::HttpServletRequest& req,
 	acl::string data;
 	xml.build_xml(data);
 
-	// ½«Êı¾İÌí¼Ó½ø×´Ì¬¹ÜÀíÆ÷ÖĞ
+	// å°†æ•°æ®æ·»åŠ è¿›çŠ¶æ€ç®¡ç†å™¨ä¸­
 	status_manager::get_instance().set_status(key.c_str(), data.c_str());
 
 	return reply(req, res, "ok!");
@@ -268,7 +268,7 @@ bool server_servlet::doXml(acl::HttpServletRequest& req,
 	}
 
 	/**
-	 * Êı¾İ¸ñÊ½£º
+	 * æ•°æ®æ ¼å¼ï¼š
 	 * <server connx='xxx' used='xxx' qlen='xxx' max_threads='xxx'
 	 *  curr_threads='xxx' busy_threads='xxx' addr='xxx' load='xxx'>
 	 *   <proc>
@@ -289,7 +289,7 @@ bool server_servlet::doXml(acl::HttpServletRequest& req,
 	acl::xml_node* child = root.first_child();
 	acl::xml_node* server = NULL;
 
-	// ²éÕÒ server ½áµã
+	// æŸ¥æ‰¾ server ç»“ç‚¹
 	while (child != NULL)
 	{
 		const char* name = child->tag_name();
@@ -331,7 +331,7 @@ bool server_servlet::doXml(acl::HttpServletRequest& req,
 		return false;
 	}
 
-	// ½«Êı¾İÌí¼Ó½ø×´Ì¬¹ÜÀíÆ÷ÖĞ
+	// å°†æ•°æ®æ·»åŠ è¿›çŠ¶æ€ç®¡ç†å™¨ä¸­
 	status_manager::get_instance().set_status(key.c_str(), data.c_str());
 	return reply(req, res, "ok!");
 }

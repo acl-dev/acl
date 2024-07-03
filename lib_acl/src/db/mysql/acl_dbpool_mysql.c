@@ -291,8 +291,8 @@ static ACL_DB_HANDLE *__dbpool_mysql_peek(ACL_DB_POOL *db_pool)
 	ACL_DB_HANDLE_MYSQL *mysql_handle, *mysql_handle_slot = NULL;
 	int   i, n;
 	time_t now;
-	static time_t last_time;  /* ÒòÎªÔÚµ÷ÓÃ´Ëº¯ÊıÊ±ÒÑ¾­ÉÏËø,
-				   * ËùÒÔ´Ë´¦ÉùÃ÷Ò»¾²Ì¬±äÁ¿ÊÇÏß³Ì°²È«µÄ.
+	static time_t last_time;  /* å› ä¸ºåœ¨è°ƒç”¨æ­¤å‡½æ•°æ—¶å·²ç»ä¸Šé”,
+				   * æ‰€ä»¥æ­¤å¤„å£°æ˜ä¸€é™æ€å˜é‡æ˜¯çº¿ç¨‹å®‰å…¨çš„.
 				   */
 
 #undef	RETURN

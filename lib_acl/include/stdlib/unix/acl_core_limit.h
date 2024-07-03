@@ -9,11 +9,11 @@ extern "C" {
 #ifdef ACL_UNIX
 
 /**
- * µ÷ÓÃ´Ëº¯ÊýÉèÖÃ³ÌÐò±ÀÀ£Ê±²úÉúµÄ core ÎÄ¼þµÄ×î´óÖµ
- * @param max {long long int} ¸ù¾Ý max µÄÖµ·¶Î§²»Í¬£¬Éú³É core ¹æÔòÓÐËù²»Í¬£º
- *  1)   0£º½ûÖ¹Éú³É core ÎÄ¼þ
- *  2) < 0£ºÉú³É core ÎÄ¼þ£¬ÇÒ²»ÏÞÖÆ core ÎÄ¼þÉú³É´óÐ¡
- *  3) > 0£ºÉú³É core ÎÄ¼þ£¬ÇÒ core ÎÄ¼þ´óÐ¡ÓÉ max ¾ö¶¨
+ * è°ƒç”¨æ­¤å‡½æ•°è®¾ç½®ç¨‹åºå´©æºƒæ—¶äº§ç”Ÿçš„ core æ–‡ä»¶çš„æœ€å¤§å€¼
+ * @param max {long long int} æ ¹æ® max çš„å€¼èŒƒå›´ä¸åŒï¼Œç”Ÿæˆ core è§„åˆ™æœ‰æ‰€ä¸åŒï¼š
+ *  1)   0ï¼šç¦æ­¢ç”Ÿæˆ core æ–‡ä»¶
+ *  2) < 0ï¼šç”Ÿæˆ core æ–‡ä»¶ï¼Œä¸”ä¸é™åˆ¶ core æ–‡ä»¶ç”Ÿæˆå¤§å°
+ *  3) > 0ï¼šç”Ÿæˆ core æ–‡ä»¶ï¼Œä¸” core æ–‡ä»¶å¤§å°ç”± max å†³å®š
  */
 void acl_set_core_limit(long long int max);
 

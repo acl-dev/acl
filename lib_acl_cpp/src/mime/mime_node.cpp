@@ -137,7 +137,7 @@ bool mime_node::save(pipe_manager& out) const
 		return false;
 	}
 
-	// 当需要解码时查找匹配的解码器
+	// 褰撻渶瑕佽В鐮佹椂鏌ユ壘鍖归厤鐨勮В鐮佸櫒
 
 	mime_code* mime_decoder;
 	if (m_enableDecode) {
@@ -191,7 +191,7 @@ bool mime_node::save(pipe_manager& out, const char* src, int len) const
 		return true;
 	} 
 
-	// 当需要解码时查找匹配的解码器
+	// 褰撻渶瑕佽В鐮佹椂鏌ユ壘鍖归厤鐨勮В鐮佸櫒
 
 	mime_code* mime_decoder;
 	if (m_enableDecode) {

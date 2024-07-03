@@ -27,7 +27,7 @@ sqlite_manager::~sqlite_manager()
 
 sqlite_manager& sqlite_manager::add(const char* dbfile, size_t dblimit)
 {
-	// 调用基类 connect_manager::set 方法添加
+	// 璋冪敤鍩虹被 connect_manager::set 鏂规硶娣诲姞
 	set(dbfile, dblimit);
 	return *this;
 }

@@ -65,7 +65,7 @@ mysql_manager& mysql_manager::add(const char* dbaddr, const char* dbname,
 	conf->set_rw_timeout(rw_timeout);
 
 	dbs_[key] = conf;
-	// 调用基类 connect_manager::set 方法添加
+	// 璋冪敤鍩虹被 connect_manager::set 鏂规硶娣诲姞
 	set(key.c_str(), dblimit);
 
 	return *this;
@@ -82,7 +82,7 @@ mysql_manager& mysql_manager::add(const mysql_conf& conf)
 
 	mysql_conf* mc = NEW mysql_conf(conf);
 	dbs_[key] = mc;
-	// 调用基类 connect_manager::set 方法添加
+	// 璋冪敤鍩虹被 connect_manager::set 鏂规硶娣诲姞
 	set(key, conf.get_dblimit());
 
 	return *this;

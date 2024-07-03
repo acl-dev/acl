@@ -645,7 +645,7 @@ void acl_single_server_main(int argc, char **argv, ACL_SINGLE_SERVER_FN service,
 	acl_chroot_uid(root_dir, user_name);
 
 #ifdef ACL_UNIX
-	/* 设置子进程运行环境，允许产生 core 文件 */
+	/* 璁剧疆瀛愯繘绋嬭繍琛岀幆澧冿紝鍏佽浜х敓 core 鏂囦欢 */
 	if (acl_var_single_enable_core && acl_var_single_core_limit != 0) {
 		acl_set_core_limit(acl_var_single_core_limit);
 	}

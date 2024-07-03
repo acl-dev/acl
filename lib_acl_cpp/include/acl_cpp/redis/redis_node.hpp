@@ -11,7 +11,7 @@ namespace acl
 {
 
 /**
- * ¸ÃÀàÖ÷ÒªÓÃÓÚ redis_cluster ÃüÁîÀà»ñÈ¡ÓĞ¹Ø¼¯Èº redis ½áµãĞÅÏ¢
+ * è¯¥ç±»ä¸»è¦ç”¨äº redis_cluster å‘½ä»¤ç±»è·å–æœ‰å…³é›†ç¾¤ redis ç»“ç‚¹ä¿¡æ¯
  * this class is mainly used for redis_cluster command class to
  * get some information about the nodes in redis cluster
  */
@@ -19,32 +19,32 @@ class ACL_CPP_API redis_node : public noncopyable
 {
 public:
 	/**
-	 * µ±Ê¹ÓÃ´Ë¹¹Ôìº¯ÊıÊµÀı»¯Àà¶ÔÏóÊ±£¬ĞèÒªµ÷ÓÃ set_id ºÍ set_addr ·½·¨ÉèÖÃ
-	 * ¸Ã redis ½áµãµÄÎ¨Ò»±êÊ¶·û¼°·şÎñ¼àÌıµØÖ·£¬Í¬Ê±»¹¿Éµ÷ÓÃÆäËüµÄ set_xxx ÉèÖÃ·½·¨
+	 * å½“ä½¿ç”¨æ­¤æ„é€ å‡½æ•°å®ä¾‹åŒ–ç±»å¯¹è±¡æ—¶ï¼Œéœ€è¦è°ƒç”¨ set_id å’Œ set_addr æ–¹æ³•è®¾ç½®
+	 * è¯¥ redis ç»“ç‚¹çš„å”¯ä¸€æ ‡è¯†ç¬¦åŠæœåŠ¡ç›‘å¬åœ°å€ï¼ŒåŒæ—¶è¿˜å¯è°ƒç”¨å…¶å®ƒçš„ set_xxx è®¾ç½®æ–¹æ³•
 	 */
 	redis_node(void);
 	~redis_node(void);
 
 	/**
-	 * ³ıÁËÔÚ¹¹Ôìº¯ÊıÖĞµÄ²ÎÊıÖĞ´«Èë¸Ã½áµãµÄ ID ±êÊ¶·ûÍâ£¬»¹¿ÉÒÔÍ¨¹ı´Ëº¯ÊıÉèÖÃ
+	 * é™¤äº†åœ¨æ„é€ å‡½æ•°ä¸­çš„å‚æ•°ä¸­ä¼ å…¥è¯¥ç»“ç‚¹çš„ ID æ ‡è¯†ç¬¦å¤–ï¼Œè¿˜å¯ä»¥é€šè¿‡æ­¤å‡½æ•°è®¾ç½®
 	 * set the node's  ID
-	 * @param id {const char*} ¼¯ÈºÖĞ redis ½áµãµÄÎ¨Ò»±êÊ¶·û
+	 * @param id {const char*} é›†ç¾¤ä¸­ redis ç»“ç‚¹çš„å”¯ä¸€æ ‡è¯†ç¬¦
 	 *  the unique ID for one redis node in the reids cluster
 	 * @return {redis_node&}
 	 */
 	redis_node& set_id(const char* id);
 
 	/**
-	 * ³ıÁËÔÚ¹¹Ôìº¯ÊıÖĞµÄ²ÎÊıÖĞ´«Èë¸Ã½áµãµÄµØÖ·Íâ£¬»¹¿ÉÒÔÍ¨¹ı´Ëº¯ÊıÉèÖÃ
+	 * é™¤äº†åœ¨æ„é€ å‡½æ•°ä¸­çš„å‚æ•°ä¸­ä¼ å…¥è¯¥ç»“ç‚¹çš„åœ°å€å¤–ï¼Œè¿˜å¯ä»¥é€šè¿‡æ­¤å‡½æ•°è®¾ç½®
 	 * set the node's listening addr
-	 * @param addr {const char*} ¼¯ÈºÖĞ redis ½áµãµÄ·şÎñµØÖ·£¬¸ñÊ½£ºip:port
+	 * @param addr {const char*} é›†ç¾¤ä¸­ redis ç»“ç‚¹çš„æœåŠ¡åœ°å€ï¼Œæ ¼å¼ï¼šip:port
 	 *  the listening addr of one redis node in the reids cluster
 	 * @return {redis_node&}
 	 */
 	redis_node& set_addr(const char* addr);
 
 	/**
-	 * ÉèÖÃµ±Ç°½áµãµÄÀàĞÍ
+	 * è®¾ç½®å½“å‰ç»“ç‚¹çš„ç±»å‹
 	 * set the current node's type
 	 * @param type {const char*}
 	 * @return {redis_node&}
@@ -52,7 +52,7 @@ public:
 	redis_node& set_type(const char* type);
 
 	/**
-	 * ÉèÖÃµ±Ç°½áµãÊÇ·ñÎªµ±Ç°µÄÁ¬½Ó¶ÔÏó
+	 * è®¾ç½®å½“å‰ç»“ç‚¹æ˜¯å¦ä¸ºå½“å‰çš„è¿æ¥å¯¹è±¡
 	 * set if the current node is belonging to the current connection
 	 * @param yesno {bool}
 	 * @return {redis_node&}
@@ -60,16 +60,16 @@ public:
 	redis_node& set_myself(bool yesno);
 
 	/**
-	 * µ±±¾½áµãÎª´Ó½áµãÊ±£¬ÉèÖÃµ±Ç°½áµãµÄÖ÷½áµã
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä»ç»“ç‚¹æ—¶ï¼Œè®¾ç½®å½“å‰ç»“ç‚¹çš„ä¸»ç»“ç‚¹
 	 * setting current slave node's master node
-	 * @param master {const redis_node*} Ö÷½áµã¶ÔÏó
+	 * @param master {const redis_node*} ä¸»ç»“ç‚¹å¯¹è±¡
 	 *  the redis master node of the current slave in cluster
 	 * @return {redis_node&}
 	 */
 	redis_node& set_master(const redis_node* master);
 
 	/**
-	 * ÉèÖÃµ±Ç°½áµãÕı´¦ÓÚÎÕÊÖ½×¶Î
+	 * è®¾ç½®å½“å‰ç»“ç‚¹æ­£å¤„äºæ¡æ‰‹é˜¶æ®µ
 	 * set the current node being in handshaking status
 	 * @param yesno {bool}
 	 * @return {redis_node&}
@@ -77,7 +77,7 @@ public:
 	redis_node& set_handshaking(bool yesno);
 
 	/**
-	 * ÉèÖÃµ±Ç°½áµã´¦ÓÚÁ¬Ïß×´Ì¬
+	 * è®¾ç½®å½“å‰ç»“ç‚¹å¤„äºè¿çº¿çŠ¶æ€
 	 * set the node been connected in the cluster
 	 * @param yesno {bool}
 	 * @return {redis_node&}
@@ -85,62 +85,62 @@ public:
 	redis_node& set_connected(bool yesno);
 
 	/**
-	 * µ±±¾½áµãÎª´Ó½áµãÊ±£¬ÉèÖÃµ±Ç°½áµãµÄÖ÷½áµã±êÊ¶·û
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä»ç»“ç‚¹æ—¶ï¼Œè®¾ç½®å½“å‰ç»“ç‚¹çš„ä¸»ç»“ç‚¹æ ‡è¯†ç¬¦
 	 * setting current node's master node when the node is slave node
-	 * @param id {const char*} Ö÷½áµãÎ¨Ò»±êÊ¶·û
+	 * @param id {const char*} ä¸»ç»“ç‚¹å”¯ä¸€æ ‡è¯†ç¬¦
 	 *  the unique ID of the master node
 	 * @return {redis_node&}
 	 */
 	redis_node& set_master_id(const char* id);
 
 	/**
-	 * µ±±¾½áµãÎªÖ÷½áµãÊ±£¬Ìí¼ÓÒ»¸ö´Ó½áµã
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä¸»ç»“ç‚¹æ—¶ï¼Œæ·»åŠ ä¸€ä¸ªä»ç»“ç‚¹
 	 * add one slave node to the current node if it's one master node
-	 * @return {bool} Ìí¼ÓÊÇ·ñ³É¹¦£¬µ±´Ó½áµãÒÑ¾­´æÔÚÓÚµ±Ç°Ö÷½áµãÊ±Ôò·µ»Ø false
+	 * @return {bool} æ·»åŠ æ˜¯å¦æˆåŠŸï¼Œå½“ä»ç»“ç‚¹å·²ç»å­˜åœ¨äºå½“å‰ä¸»ç»“ç‚¹æ—¶åˆ™è¿”å› false
 	 *  false will be returned when the slave to be added is already
 	 *  existing in the current master node
 	 */
 	bool add_slave(redis_node* slave);
 
 	/**
-	 * µ±±¾½áµãÎªÖ÷½áµãÊ±£¬¸ù¾İ½áµãÎ¨Ò»±êÊ¶·ûÉ¾³ıÒ»¸ö´Ó½áµã
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä¸»ç»“ç‚¹æ—¶ï¼Œæ ¹æ®ç»“ç‚¹å”¯ä¸€æ ‡è¯†ç¬¦åˆ é™¤ä¸€ä¸ªä»ç»“ç‚¹
 	 * when the current node is a master node, this function will
 	 * remove one slave node by the unique ID
-	 * @param id {const char*} redis ½áµãÎ¨Ò»±êÊ¶·û
+	 * @param id {const char*} redis ç»“ç‚¹å”¯ä¸€æ ‡è¯†ç¬¦
 	 *  the unique ID of the redis node
-	 * @return {const redis_node*} ·µ»Ø±»É¾³ıµÄ´Ó½áµã£¬Èç¹û²»´æÔÚÔò·µ»Ø NULL
+	 * @return {const redis_node*} è¿”å›è¢«åˆ é™¤çš„ä»ç»“ç‚¹ï¼Œå¦‚æœä¸å­˜åœ¨åˆ™è¿”å› NULL
 	 *  the slave node according to the ID will be returned, and if
 	 *  not exists NULL will be returned
 	 */
 	redis_node* remove_slave(const char* id);
 
 	/**
-	 * µ±±¾½áµãÎªÖ÷½áµãÊ±£¬Çå¿Õ±¾½áµãµÄËùÓĞ´Ó½áµã
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä¸»ç»“ç‚¹æ—¶ï¼Œæ¸…ç©ºæœ¬ç»“ç‚¹çš„æ‰€æœ‰ä»ç»“ç‚¹
 	 * clear all the slave nodes in the current master node
-	 * @param free_all {bool} ÊÇ·ñĞèÒªÍ¬Ê±ÊÍ·ÅÕâĞ©´Ó½áµã
+	 * @param free_all {bool} æ˜¯å¦éœ€è¦åŒæ—¶é‡Šæ”¾è¿™äº›ä»ç»“ç‚¹
 	 *  if freeing the all slave nodes memory meanwhile
 	 */
 	void clear_slaves(bool free_all = false);
 
 	/**
-	 * µ±±¾½áµãÎªÖ÷½áµãÊ±£¬Ìí¼Ó¹şÏ£²Û·¶Î§
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä¸»ç»“ç‚¹æ—¶ï¼Œæ·»åŠ å“ˆå¸Œæ§½èŒƒå›´
 	 * add hash-slots range to the master node
-	 * @param min {size_t} ¹şÏ£²Û·¶Î§µÄÆğÊ¼Öµ
+	 * @param min {size_t} å“ˆå¸Œæ§½èŒƒå›´çš„èµ·å§‹å€¼
 	 *  the begin hash-slot of the slots range
-	 * @param max {size_t} ¹şÏ£²Û·¶Î§µÄ½áÊøÖµ
+	 * @param max {size_t} å“ˆå¸Œæ§½èŒƒå›´çš„ç»“æŸå€¼
 	 *  the end hash-slot of the slots range
 	 */
 	void add_slot_range(size_t min, size_t max);
 
 	/**
-	 * µ±±¾½áµãÎªÖ÷½áµãÊ±£¬Ôò»ñµÃÖ÷½áµãµÄ¹şÏ£²Û·¶Î§£¬µ±Îª´Ó½áµãÊ±Ôò»ñµÃÆä¶ÔÓ¦µÄ
-	 * Ö÷½áµãµÄ¹şÏ£²Û·¶Î§
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä¸»ç»“ç‚¹æ—¶ï¼Œåˆ™è·å¾—ä¸»ç»“ç‚¹çš„å“ˆå¸Œæ§½èŒƒå›´ï¼Œå½“ä¸ºä»ç»“ç‚¹æ—¶åˆ™è·å¾—å…¶å¯¹åº”çš„
+	 * ä¸»ç»“ç‚¹çš„å“ˆå¸Œæ§½èŒƒå›´
 	 * @return {const std::vector<std::pair<size_t, size_t> >&}
 	 */
 	const std::vector<std::pair<size_t, size_t> >& get_slots() const;
 
 	/**
-	 * »ñµÃµ±Ç°½áµãµÄÀàĞÍ
+	 * è·å¾—å½“å‰ç»“ç‚¹çš„ç±»å‹
 	 * get the node's type
 	 * @return {const char*}
 	 */
@@ -150,7 +150,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°½áµãÊÇ·ñÎªµ±Ç°µÄÁ¬½Ó¶ÔÏó½áµã
+	 * åˆ¤æ–­å½“å‰ç»“ç‚¹æ˜¯å¦ä¸ºå½“å‰çš„è¿æ¥å¯¹è±¡ç»“ç‚¹
 	 * check if the node belongs to the current connection
 	 * @return {bool}
 	 */
@@ -160,7 +160,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°½áµãÊÇ·ñÕı´¦ÓÚÎÕÊÖ½×¶Î
+	 * åˆ¤æ–­å½“å‰ç»“ç‚¹æ˜¯å¦æ­£å¤„äºæ¡æ‰‹é˜¶æ®µ
 	 * check if the node is in handshaking status
 	 * @return {bool}
 	 */
@@ -170,7 +170,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°½áµãÊÇ·ñÒÑ¾­´¦ÓÚÁ¬Ïß×´Ì¬
+	 * åˆ¤æ–­å½“å‰ç»“ç‚¹æ˜¯å¦å·²ç»å¤„äºè¿çº¿çŠ¶æ€
 	 * check if the node is connected in the cluster
 	 * @return {bool}
 	 */
@@ -180,7 +180,7 @@ public:
 	}
 
 	/**
-	 * µ±±¾½áµãÎª´Ó½áµãÊ±£¬»ñµÃ¸Ã´Ó½áµãµÄÖ÷½áµã¶ÔÏó
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä»ç»“ç‚¹æ—¶ï¼Œè·å¾—è¯¥ä»ç»“ç‚¹çš„ä¸»ç»“ç‚¹å¯¹è±¡
 	 * get the current slave's master node
 	 * @return {const redis_node*}
 	 */
@@ -190,7 +190,7 @@ public:
 	}
 
 	/**
-	 * µ±±¾½áµãÎª´Ó½áµãÊ±£¬»ñµÃ¸Ã´Ó½áµã¶ÔÓ¦µÄÖ÷½áµãµÄ ID ±êÊ¶
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä»ç»“ç‚¹æ—¶ï¼Œè·å¾—è¯¥ä»ç»“ç‚¹å¯¹åº”çš„ä¸»ç»“ç‚¹çš„ ID æ ‡è¯†
 	 * when the current node is slave, getting its master's ID
 	 * @return {const char*}
 	 */
@@ -200,7 +200,7 @@ public:
 	}
 
 	/**
-	 * µ±±¾½áµãÎªÖ÷½áµãÊ±£¬»ñµÃ¸ÃÖ÷½áµãµÄËùÓĞ´Ó½áµã
+	 * å½“æœ¬ç»“ç‚¹ä¸ºä¸»ç»“ç‚¹æ—¶ï¼Œè·å¾—è¯¥ä¸»ç»“ç‚¹çš„æ‰€æœ‰ä»ç»“ç‚¹
 	 * getting all the slaves of the master
 	 * @return {const std::vector<redis_node*>*}
 	 */
@@ -210,7 +210,7 @@ public:
 	}
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°½áµãÊÇ·ñÎª¼¯ÈºÖĞµÄÒ»¸öÖ÷½áµã
+	 * åˆ¤æ–­å½“å‰ç»“ç‚¹æ˜¯å¦ä¸ºé›†ç¾¤ä¸­çš„ä¸€ä¸ªä¸»ç»“ç‚¹
 	 * check if the current node is a master in the redis cluster
 	 * @return {bool}
 	 */
@@ -220,7 +220,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃµ±Ç°½áµãµÄ ID ±êÊ¶
+	 * è·å¾—å½“å‰ç»“ç‚¹çš„ ID æ ‡è¯†
 	 * get the unique ID of the current node, set in constructor
 	 * @return {const char*}
 	 */
@@ -230,7 +230,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃµ±Ç°½áµãµÄ¼àÌıµØÖ·
+	 * è·å¾—å½“å‰ç»“ç‚¹çš„ç›‘å¬åœ°å€
 	 * get the listening addr of the current node, set in constructor
 	 * @reutrn {const char*}
 	 */

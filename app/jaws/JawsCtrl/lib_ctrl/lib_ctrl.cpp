@@ -1,4 +1,4 @@
-// lib_ctrl.cpp : ¶¨Òå DLL µÄ³õÊ¼»¯Àý³Ì¡£
+// lib_ctrl.cpp : å®šä¹‰ DLL çš„åˆå§‹åŒ–ä¾‹ç¨‹ã€‚
 //
 
 #include "stdafx.h"
@@ -13,38 +13,38 @@ static AFX_EXTENSION_MODULE lib_ctrlDLL = { NULL, NULL };
 extern "C" int APIENTRY
 DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpReserved)
 {
-	// Èç¹ûÊ¹ÓÃ lpReserved£¬Çë½«´ËÒÆ³ý
+	// å¦‚æžœä½¿ç”¨ lpReservedï¼Œè¯·å°†æ­¤ç§»é™¤
 	UNREFERENCED_PARAMETER(lpReserved);
 
 	if (dwReason == DLL_PROCESS_ATTACH)
 	{
-		TRACE0("lib_ctrl.DLL ÕýÔÚ³õÊ¼»¯£¡\n");
+		TRACE0("lib_ctrl.DLL æ­£åœ¨åˆå§‹åŒ–ï¼\n");
 		
-		// À©Õ¹ DLL Ò»´ÎÐÔ³õÊ¼»¯
+		// æ‰©å±• DLL ä¸€æ¬¡æ€§åˆå§‹åŒ–
 		if (!AfxInitExtensionModule(lib_ctrlDLL, hInstance))
 			return 0;
 
-		// ½«´Ë DLL ²åÈëµ½×ÊÔ´Á´ÖÐ
-		// ×¢Òâ: Èç¹û´ËÀ©Õ¹ DLL ÓÉ
-		//  MFC ¹æÔò DLL(Èç ActiveX ¿Ø¼þ)ÒþÊ½Á´½Óµ½
-		//  ¶ø²»ÊÇÓÉ MFC Ó¦ÓÃ³ÌÐòÁ´½Óµ½£¬ÔòÐèÒª
-		//  ½«´ËÐÐ´Ó DllMain ÖÐÒÆ³ý²¢½«Æä·ÅÖÃÔÚÒ»¸ö
-		//  ´Ó´ËÀ©Õ¹ DLL µ¼³öµÄµ¥¶ÀµÄº¯ÊýÖÐ¡£Ê¹ÓÃ´ËÀ©Õ¹ DLL µÄ
-		//  ¹æÔò DLL È»ºóÓ¦ÏÔÊ½
-		//  µ÷ÓÃ¸Ãº¯ÊýÒÔ³õÊ¼»¯´ËÀ©Õ¹ DLL¡£·ñÔò£¬
-		//  CDynLinkLibrary ¶ÔÏó²»»á¸½¼Óµ½
-		//  ¹æÔò DLL µÄ×ÊÔ´Á´£¬²¢½«µ¼ÖÂÑÏÖØµÄ
-		//  ÎÊÌâ¡£
+		// å°†æ­¤ DLL æ’å…¥åˆ°èµ„æºé“¾ä¸­
+		// æ³¨æ„: å¦‚æžœæ­¤æ‰©å±• DLL ç”±
+		//  MFC è§„åˆ™ DLL(å¦‚ ActiveX æŽ§ä»¶)éšå¼é“¾æŽ¥åˆ°
+		//  è€Œä¸æ˜¯ç”± MFC åº”ç”¨ç¨‹åºé“¾æŽ¥åˆ°ï¼Œåˆ™éœ€è¦
+		//  å°†æ­¤è¡Œä»Ž DllMain ä¸­ç§»é™¤å¹¶å°†å…¶æ”¾ç½®åœ¨ä¸€ä¸ª
+		//  ä»Žæ­¤æ‰©å±• DLL å¯¼å‡ºçš„å•ç‹¬çš„å‡½æ•°ä¸­ã€‚ä½¿ç”¨æ­¤æ‰©å±• DLL çš„
+		//  è§„åˆ™ DLL ç„¶åŽåº”æ˜¾å¼
+		//  è°ƒç”¨è¯¥å‡½æ•°ä»¥åˆå§‹åŒ–æ­¤æ‰©å±• DLLã€‚å¦åˆ™ï¼Œ
+		//  CDynLinkLibrary å¯¹è±¡ä¸ä¼šé™„åŠ åˆ°
+		//  è§„åˆ™ DLL çš„èµ„æºé“¾ï¼Œå¹¶å°†å¯¼è‡´ä¸¥é‡çš„
+		//  é—®é¢˜ã€‚
 
 		new CDynLinkLibrary(lib_ctrlDLL);
 
 	}
 	else if (dwReason == DLL_PROCESS_DETACH)
 	{
-		TRACE0("lib_ctrl.DLL ÕýÔÚÖÕÖ¹£¡\n");
+		TRACE0("lib_ctrl.DLL æ­£åœ¨ç»ˆæ­¢ï¼\n");
 
-		// ÔÚµ÷ÓÃÎö¹¹º¯ÊýÖ®Ç°ÖÕÖ¹¸Ã¿â
+		// åœ¨è°ƒç”¨æžæž„å‡½æ•°ä¹‹å‰ç»ˆæ­¢è¯¥åº“
 		AfxTermExtensionModule(lib_ctrlDLL);
 	}
-	return 1;   // È·¶¨
+	return 1;   // ç¡®å®š
 }

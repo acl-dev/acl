@@ -39,13 +39,13 @@ void* CDelBOM::run(void)
 void CDelBOM::ScanDel(void)
 {
 	if (m_sPath.GetLength() == 0) {
-		MessageBox(NULL, "ÎÄ¼şÂ·¾¶Îª¿Õ£¡", "Error", 0);
+		MessageBox(NULL, "æ–‡ä»¶è·¯å¾„ä¸ºç©ºï¼", "Error", 0);
 		return;
 	}
 
 	acl::scan_dir scan;
 	if (!scan.open(m_sPath.GetString())) {
-		MessageBox(NULL, "´ò¿ªÎÄ¼şÂ·¾¶Ê§°Ü£¡", "Error", 0);
+		MessageBox(NULL, "æ‰“å¼€æ–‡ä»¶è·¯å¾„å¤±è´¥ï¼", "Error", 0);
 		return;
 	}
 
@@ -88,14 +88,14 @@ bool CDelBOM::DeleteBOM(const acl::string& filePath)
 	if (buf.size() < 3) {
 		return false;
 	}
-	// ÏÈÅĞ¶ÏÎÄ¼şÄÚÈİÇ°×ºÊÇ·ñÊÇBOM¸ñÊ½
+	// å…ˆåˆ¤æ–­æ–‡ä»¶å†…å®¹å‰ç¼€æ˜¯å¦æ˜¯BOMæ ¼å¼
 	if (buf[0] != (char) 0xEF || buf[1] != (char) 0xBB
 		|| buf[2] != (char) 0xBF) {
 
 		return false;
 	}
 
-	// ½«ÄÚÈİÖ¸ÕëÆ«ÒÆ 3 ¸ö×Ö½Ú£¬¼´È¥µôBOM¸ñÊ½
+	// å°†å†…å®¹æŒ‡é’ˆåç§» 3 ä¸ªå­—èŠ‚ï¼Œå³å»æ‰BOMæ ¼å¼
 	char* ptr = buf.c_str() + 3;
 
 	acl::ofstream fp;

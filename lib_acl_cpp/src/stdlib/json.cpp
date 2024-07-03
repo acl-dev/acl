@@ -239,7 +239,7 @@ const string& json_node::to_string(string* out /* = NULL */) const
 json_node& json_node::add_child(json_node* child, bool return_child /* = false */)
 {
 	ACL_JSON_NODE* node = child->get_json_node();
-	// ÏÈÌí¼Ó child ÖÁ¸¸½ÚµãÖĞ
+	// å…ˆæ·»åŠ  child è‡³çˆ¶èŠ‚ç‚¹ä¸­
 	acl_json_node_add_child(node_me_, node);
 	child->parent_ = this;
 	if (return_child) {

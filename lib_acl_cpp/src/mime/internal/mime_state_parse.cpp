@@ -137,7 +137,7 @@ static void mime_content_type(MIME_NODE *node, const HEADER_OPTS *header_info)
 			if (TOKEN_MATCH(state->token[0], "boundary")) {
 				if (node->boundary == NULL)
 					node->boundary = acl_vstring_alloc(256);
-				/* ĞèÒªÌí¼Ó "--" ×öÎª·Ö¸ô·ûµÄÇ°µ¼·û */
+				/* éœ€è¦æ·»åŠ  "--" åšä¸ºåˆ†éš”ç¬¦çš„å‰å¯¼ç¬¦ */
 				SCP(node->boundary, "--");
 				SCAT(node->boundary, state->token[2].u.value);
 				break;
@@ -173,7 +173,7 @@ static void mime_content_type(MIME_NODE *node, const HEADER_OPTS *header_info)
 			}
 		}
 
-		/* Èç¹ûÃ»ÓĞ×Ö·û¼¯, ÔòÈ±Ê¡²ÉÓÃ gb2312 */
+		/* å¦‚æœæ²¡æœ‰å­—ç¬¦é›†, åˆ™ç¼ºçœé‡‡ç”¨ gb2312 */
 		if (node->charset == NULL)
 			node->charset = acl_mystrdup("gb2312");
 	}
@@ -468,15 +468,15 @@ static void mime_header_line(MIME_NODE *node)
 		else if (header_info->type == HDR_CONTENT_TRANSFER_ENCODING)
 			mime_content_encoding(node, header_info);
 		else if (node == node->state->root) {
-			/* ËµÃ÷ÓÊ¼şÍ· */
+			/* è¯´æ˜é‚®ä»¶å¤´ */
 
 			if ((header_info->flags & HDR_OPT_RECIP)
 				&& (header_info->flags & HDR_OPT_EXTRACT))
 			{
-				/* ·ÖÎöÊÕ¼şÈËµØÖ·: To, Cc, Bcc */
+				/* åˆ†ææ”¶ä»¶äººåœ°å€: To, Cc, Bcc */
 				mail_rcpt(node, header_info);
 			} else if ((header_info->flags & HDR_OPT_SENDER)) {
-				/* ·ÖÎö·¢¼şÈËµØÖ·: From, Sender,
+				/* åˆ†æå‘ä»¶äººåœ°å€: From, Sender,
 				 * Replyto, Returnpath
 				 */
 				mail_from(node, header_info);
@@ -494,22 +494,22 @@ static void mime_header_line(MIME_NODE *node)
 			node->header_list->push_back(node->header_list, header);
 	}
 
-	ACL_VSTRING_RESET(node->buffer); /* Çå¿Õ»º³åÇø */
+	ACL_VSTRING_RESET(node->buffer); /* æ¸…ç©ºç¼“å†²åŒº */
 	node->last_ch = 0;
 	node->last_lf = 0;
 }
 
-/* ×´Ì¬»úÊı¾İ½á¹¹ÀàĞÍ */
+/* çŠ¶æ€æœºæ•°æ®ç»“æ„ç±»å‹ */
 
 struct MIME_STATUS_MACHINE {
-	/**< ×´Ì¬Âë */
+	/**< çŠ¶æ€ç  */
 	int   status;
 
-	/**< ×´Ì¬»ú´¦Àíº¯Êı */
+	/**< çŠ¶æ€æœºå¤„ç†å‡½æ•° */
 	int (*callback) (MIME_STATE*, const char*, int);
 };
 
-// ·ÖÎöÓÊ¼şÍ·¼° multipart ¸÷²¿·ÖµÄÍ·
+// åˆ†æé‚®ä»¶å¤´åŠ multipart å„éƒ¨åˆ†çš„å¤´
 static int mime_state_head(MIME_STATE *state, const char *s, int n)
 {
 	MIME_NODE *node = state->curr_node;
@@ -517,7 +517,7 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 	if (n <= 0)
 		return n;
 
-	/* Èç¹û»¹Î´ÕÒµ½»»ĞĞ·û£¬Ôò¼ÌĞø */
+	/* å¦‚æœè¿˜æœªæ‰¾åˆ°æ¢è¡Œç¬¦ï¼Œåˆ™ç»§ç»­ */
 
 	if (node->last_lf != '\n') {
 		while (n > 0) {
@@ -536,25 +536,25 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 		return n;
 	}
 
-	/* Èç¹ûÊı¾İÒÔ»»ĞĞ¿ªÊ¼£¬ ËµÃ÷µ±Ç°µÄÓÊ¼şÍ·½áÊø */
+	/* å¦‚æœæ•°æ®ä»¥æ¢è¡Œå¼€å§‹ï¼Œ è¯´æ˜å½“å‰çš„é‚®ä»¶å¤´ç»“æŸ */
 
 	if (*s == '\n') {
-		/* ÉÏ´ÎÊı¾İÎª: \n\r »ò \n */
+		/* ä¸Šæ¬¡æ•°æ®ä¸º: \n\r æˆ– \n */
 
 		state->curr_off++;
 		node->header_end = state->curr_off;
 
 		if (LEN(node->buffer) > 0) {
-			/* ´¦ÀíÍ·²¿µÄ×îºóÒ»ĞĞÊı¾İ */
+			/* å¤„ç†å¤´éƒ¨çš„æœ€åä¸€è¡Œæ•°æ® */
 			mime_header_line(node);
 			node->valid_line++;
 		}
 
-		/* ÂÔ¹ı¿ªÍ·ÎŞÓÃµÄ¿ÕĞĞ */
+		/* ç•¥è¿‡å¼€å¤´æ— ç”¨çš„ç©ºè¡Œ */
 		if (node->valid_line == 0)
 			return 0;
 
-		/* Èç¹ûµ±Ç°½áµãÎª multipart ¸ñÊ½, ÔòÖØÖÃ state->curr_bound */
+		/* å¦‚æœå½“å‰ç»“ç‚¹ä¸º multipart æ ¼å¼, åˆ™é‡ç½® state->curr_bound */
 		if (node->boundary != NULL)
 			state->curr_bound = STR(node->boundary);
 		state->curr_status = MIME_S_BODY;
@@ -564,24 +564,24 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 	if (*s == '\r') {
 		state->curr_off++;
 		if (node->last_ch == '\r') {
-			/* XXX: ³öÏÖÁË \n\r\r ÏÖÏó */
+			/* XXX: å‡ºç°äº† \n\r\r ç°è±¡ */
 			node->last_ch = '\r';
 			node->last_lf = 0;
 			return n - 1;
 		}
 
 		node->last_ch = '\r';
-		/* ·µ»Ø, ÒÔÆÚ´ıÏÂÒ»¸ö×Ö·ûÎª '\n' */
+		/* è¿”å›, ä»¥æœŸå¾…ä¸‹ä¸€ä¸ªå­—ç¬¦ä¸º '\n' */
 		return n - 1;
 	}
 
-	/* Çå³ı '\n' */
+	/* æ¸…é™¤ '\n' */
 	node->last_lf = 0;
 
-	/* Èç¹ûÊı¾İÒÔ¿Õ¸ñ»òTAB¿ªÊ¼£¬ ËµÃ÷Êı¾İ¸½ÊôÓÚÉÏÒ»ĞĞ */
+	/* å¦‚æœæ•°æ®ä»¥ç©ºæ ¼æˆ–TABå¼€å§‹ï¼Œ è¯´æ˜æ•°æ®é™„å±äºä¸Šä¸€è¡Œ */
 
 	if (IS_SPACE_TAB(*s)) {
-		/* ËµÃ÷±¾ĞĞÊı¾İ¸½ÊôÓÚÉÏÒ»ĞĞÊı¾İ */
+		/* è¯´æ˜æœ¬è¡Œæ•°æ®é™„å±äºä¸Šä¸€è¡Œæ•°æ® */
 		while (n > 0) {
 			node->last_ch = *s;
 			ADDCH(node->buffer, node->last_ch);
@@ -589,7 +589,7 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 			state->curr_off++;
 
 			if (node->last_ch == '\n') {
-				/* ´¦ÀíÍê±¾ÍêÕûĞĞÊı¾İ */
+				/* å¤„ç†å®Œæœ¬å®Œæ•´è¡Œæ•°æ® */
 				node->last_lf = '\n';
 				break;
 			}
@@ -599,7 +599,7 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 		return n;
 	}
 
-	/* ´¦ÀíÍ·²¿µÄÉÏÒ»ĞĞÊı¾İ */
+	/* å¤„ç†å¤´éƒ¨çš„ä¸Šä¸€è¡Œæ•°æ® */
 
 	if (LEN(node->buffer) > 0) {
 		mime_header_line(node);
@@ -609,7 +609,7 @@ static int mime_state_head(MIME_STATE *state, const char *s, int n)
 	return n;
 }
 
-// ·ÖÎö multipart ²¿·ÖÌå, µ±Æ¥Åäµ½Ò»¸öÍêÕûµÄ·Ö¸ô·ûºóÔò±íÃ÷¸Ã²¿·ÖÊı¾İÌå·ÖÎöÍê±Ï
+// åˆ†æ multipart éƒ¨åˆ†ä½“, å½“åŒ¹é…åˆ°ä¸€ä¸ªå®Œæ•´çš„åˆ†éš”ç¬¦ååˆ™è¡¨æ˜è¯¥éƒ¨åˆ†æ•°æ®ä½“åˆ†æå®Œæ¯•
 static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 	MIME_NODE *node, const char *s, int n, int *finish)
 {
@@ -623,7 +623,7 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 
 	for (; cp < end; cp++) {
 
-		// ¼ÇÂ¼ÏÂ \r\n µÄÎ»ÖÃ
+		// è®°å½•ä¸‹ \r\n çš„ä½ç½®
 		if (*cp == '\r')
 			last_cr_pos = curr_off;
 		else if (*cp == '\n')
@@ -642,15 +642,15 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 			bound_ptr = NULL;
 		} else if (*++bound_ptr == 0) {
 
-			/* ËµÃ÷ÍêÈ«Æ¥Åä */
+			/* è¯´æ˜å®Œå…¨åŒ¹é… */
 			*finish = 1;
 
 			node->body_end = (off_t) (curr_off - bound_len);
 			node->body_data_end = node->body_end;
 
-			// body_end ¼ÇÂ¼µÄÊÇÄ³¸ö½áµã×îºóµÄÎ»ÖÃ£¬¸ù¾İĞ­Òé,
-			// ÆäÖĞ»á°üº¬¸½¼ÓµÄ \r\n£¬ËùÒÔÕæÊµÊı¾İµÄ½áÊøÎ»ÖÃ
-			// body_data_end ÊÇÈ¥µôÕâĞ©Êı¾İºóµÄÎ»ÖÃ
+			// body_end è®°å½•çš„æ˜¯æŸä¸ªç»“ç‚¹æœ€åçš„ä½ç½®ï¼Œæ ¹æ®åè®®,
+			// å…¶ä¸­ä¼šåŒ…å«é™„åŠ çš„ \r\nï¼Œæ‰€ä»¥çœŸå®æ•°æ®çš„ç»“æŸä½ç½®
+			// body_data_end æ˜¯å»æ‰è¿™äº›æ•°æ®åçš„ä½ç½®
 			if (last_lf_pos + (off_t) bound_len == curr_off - 1)
 			{
 				node->body_data_end--;
@@ -672,18 +672,18 @@ static int mime_bound_body(MIME_STATE *state, const char * const boundary,
 	return (int) (n - ((const char*) cp - s));
 }
 
-// ·ÖÎöÓÊ¼şÌå»ò multipart ²¿·ÖÌå
+// åˆ†æé‚®ä»¶ä½“æˆ– multipart éƒ¨åˆ†ä½“
 static int mime_state_body(MIME_STATE *state, const char *s, int n)
 {
 	int   finish = 0;
 
 	if (state->curr_bound == NULL) {
 
-		/* Èç¹ûÃ»ÓĞ·Ö¸ô·û£¬ÔòËµÃ÷ÊÇÎÄ±¾ÀàĞÍ£¬¼´Ö»ÓĞÕıÎÄÄÚÈİ */
+		/* å¦‚æœæ²¡æœ‰åˆ†éš”ç¬¦ï¼Œåˆ™è¯´æ˜æ˜¯æ–‡æœ¬ç±»å‹ï¼Œå³åªæœ‰æ­£æ–‡å†…å®¹ */
 
 		state->curr_off += n;
 
-		/* ÒòÎª curr_off Ö¸ÏòÏÂÒ»¸öÆ«ÒÆÎ»ÖÃ£¬ËùÒÔ
+		/* å› ä¸º curr_off æŒ‡å‘ä¸‹ä¸€ä¸ªåç§»ä½ç½®ï¼Œæ‰€ä»¥
 		 * body_end = curr_off - 1
 		 */
 		state->curr_node->body_end = state->curr_off - 1;
@@ -699,13 +699,13 @@ static int mime_state_body(MIME_STATE *state, const char *s, int n)
 	return n;
 }
 
-// ²éÕÒ·Ö¸ô·ûºóµÄ "\r\n"
+// æŸ¥æ‰¾åˆ†éš”ç¬¦åçš„ "\r\n"
 static int mime_state_body_bound_crlf(MIME_STATE *state, const char *s, int n)
 {
 	if (n <= 0)
 		return n;
 
-	/* Èç¹û²»ÊÇ·Ö¸ô·ûµÄ×îºóÁ½¸ö "--" ÔòËµÃ÷»¹ÓÉÆäËü½áµãÓÉ±¾·Ö¸ô·û·Ö¸ô */
+	/* å¦‚æœä¸æ˜¯åˆ†éš”ç¬¦çš„æœ€åä¸¤ä¸ª "--" åˆ™è¯´æ˜è¿˜ç”±å…¶å®ƒç»“ç‚¹ç”±æœ¬åˆ†éš”ç¬¦åˆ†éš” */
 
 	if (*s == '\n') {
 		state->curr_node->last_lf_pos = state->curr_off;
@@ -721,28 +721,28 @@ static int mime_state_body_bound_crlf(MIME_STATE *state, const char *s, int n)
 			state->curr_node->body_end--;
 		*/
 
-		/* Èç¹û½áÊø·ûÎª "--\r\n", ËµÃ÷²»½ö½áµã½áÊø,
-		 * Í¬Ê±±¾½áµãµÄ¸¸½áµãÒ²½áÊø
+		/* å¦‚æœç»“æŸç¬¦ä¸º "--\r\n", è¯´æ˜ä¸ä»…ç»“ç‚¹ç»“æŸ,
+		 * åŒæ—¶æœ¬ç»“ç‚¹çš„çˆ¶ç»“ç‚¹ä¹Ÿç»“æŸ
 		 */
 		if (state->curr_node->bound_term[0] == '-'
 			&& state->curr_node->bound_term[1] == '-')
 		{
-			/* ËµÃ÷±¾·Ö¸ô·ûËùÔ¼ÊøµÄ½áµãÍê±Ï */
+			/* è¯´æ˜æœ¬åˆ†éš”ç¬¦æ‰€çº¦æŸçš„ç»“ç‚¹å®Œæ¯• */
 
 			if (state->curr_node == state->root) {
-				/* xxx: ±¾½áµã²»Ó¦Îª¸ù½áµã */
+				/* xxx: æœ¬ç»“ç‚¹ä¸åº”ä¸ºæ ¹ç»“ç‚¹ */
 				state->curr_status = MIME_S_TERM;
 			} else if (state->curr_node->parent == state->root) {
-				/* ËµÃ÷¸ù½áµãµÄÒ»¼¶×Ó½áµã¶¼½áÊø,
-				 * ÔòÕû·âÓÊ¼ş·ÖÎöÍê±Ï */
+				/* è¯´æ˜æ ¹ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹éƒ½ç»“æŸ,
+				 * åˆ™æ•´å°é‚®ä»¶åˆ†æå®Œæ¯• */
 				state->curr_status = MIME_S_TERM;
 			} else {
-				/* ËµÃ÷±¾½áµãÎª¸ù½áµãµÄ¶ş¼¶»òÒÔÉÏ½áµã, Í¬Ê±
-				 * ËµÃ÷±¾½áµãµÄ¸¸½áµãÒÑ¾­½áÊø, ÏÂÒ»²½ĞèÒªÕÒ
-				 * ³ö±¾½áµãµÄÒ¯Ò¯½áµãµÄ·Ö¸ô·û
+				/* è¯´æ˜æœ¬ç»“ç‚¹ä¸ºæ ¹ç»“ç‚¹çš„äºŒçº§æˆ–ä»¥ä¸Šç»“ç‚¹, åŒæ—¶
+				 * è¯´æ˜æœ¬ç»“ç‚¹çš„çˆ¶ç»“ç‚¹å·²ç»ç»“æŸ, ä¸‹ä¸€æ­¥éœ€è¦æ‰¾
+				 * å‡ºæœ¬ç»“ç‚¹çš„çˆ·çˆ·ç»“ç‚¹çš„åˆ†éš”ç¬¦
 				 */
 
-				/* Ö»ÓĞ¸ù½áµã root µÄ¸¸½áµãÎª NULL */
+				/* åªæœ‰æ ¹ç»“ç‚¹ root çš„çˆ¶ç»“ç‚¹ä¸º NULL */
 				acl_assert(state->curr_node->parent);
 				acl_assert(state->curr_node->parent->boundary);
 
@@ -784,23 +784,23 @@ static int mime_state_body_bound_crlf(MIME_STATE *state, const char *s, int n)
 		state->curr_node->last_ch = '\r';
 		state->curr_off++;
 		state->use_crlf = 1;
-		/* ÆÚ´ıÏÂÒ»¸ö×Ö·ûÎª '\n' */
+		/* æœŸå¾…ä¸‹ä¸€ä¸ªå­—ç¬¦ä¸º '\n' */
 		return n - 1;
 	} else if (*s == '-') {
 		state->curr_off++;
 		if (state->curr_node->bound_term[0] == '-') {
 			state->curr_node->bound_term[1] = '-';
-			/* ÆÚ´ıÏÂÒ»¸ö×Ö·ûÎª '\r' »ò '\n' */
+			/* æœŸå¾…ä¸‹ä¸€ä¸ªå­—ç¬¦ä¸º '\r' æˆ– '\n' */
 			return n - 1;
 		} else {
-			/* ÆÚ´ıÏÂÒ»¸ö×Ö·ûÎª '-' */
+			/* æœŸå¾…ä¸‹ä¸€ä¸ªå­—ç¬¦ä¸º '-' */
 			state->curr_node->bound_term[0] = '-';
 			return n - 1;
 		}
 	} else {
-		/* XXX: ·Ö¸ô·ûºó·Ç·¨×Ö·û ? */
+		/* XXX: åˆ†éš”ç¬¦åéæ³•å­—ç¬¦ ? */
 
-		/* µ¯³ö¸¸½áµã, ²¢¿ªÊ¼·ÖÎöÊôÓÚ¸Ã¸¸½áµãµÄÏÂÒ»¸ö½áµã */
+		/* å¼¹å‡ºçˆ¶ç»“ç‚¹, å¹¶å¼€å§‹åˆ†æå±äºè¯¥çˆ¶ç»“ç‚¹çš„ä¸‹ä¸€ä¸ªç»“ç‚¹ */
 
 		state->curr_node = state->curr_node->parent;
 		state->curr_off++;
@@ -828,7 +828,7 @@ static int mime_state_multi_bound(MIME_STATE *state, const char *s, int n)
 	const char *boundary = state->curr_bound;
 
 	for (cp = (const unsigned char *) s; cp < end; cp++) {
-		// ¼ÇÂ¼ÏÂ \r\n µÄÎ»ÖÃ
+		// è®°å½•ä¸‹ \r\n çš„ä½ç½®
 		if (*cp == '\r')
 			node->last_cr_pos = state->curr_off;
 		else if (*cp == '\n')
@@ -837,11 +837,11 @@ static int mime_state_multi_bound(MIME_STATE *state, const char *s, int n)
 		state->curr_off++;
 		if (node->bound_ptr != NULL) {
 			if (*cp != *node->bound_ptr) {
-				// ËµÃ÷Ö®Ç°µÄÆ¥ÅäÊ§Ğ§£¬ĞèÒªÖØĞÂÆ¥Åä£¬
-				// µ«±ØĞë½«Ö®Ç°Æ¥ÅäµÄ×Ö·û¿½±´
+				// è¯´æ˜ä¹‹å‰çš„åŒ¹é…å¤±æ•ˆï¼Œéœ€è¦é‡æ–°åŒ¹é…ï¼Œ
+				// ä½†å¿…é¡»å°†ä¹‹å‰åŒ¹é…çš„å­—ç¬¦æ‹·è´
 				node->bound_ptr = NULL;
 			} else if (*++node->bound_ptr == 0) {
-				// ËµÃ÷ÍêÈ«Æ¥Åä
+				// è¯´æ˜å®Œå…¨åŒ¹é…
 				state->curr_status = MIME_S_MULTI_BOUND_CRLF;
 				node->bound_ptr = NULL;
 				cp++;
@@ -852,7 +852,7 @@ static int mime_state_multi_bound(MIME_STATE *state, const char *s, int n)
 		if (!node->bound_ptr && *cp == *boundary) {
 			node->bound_ptr = boundary + 1;
 
-			/* ËµÃ÷ÍêÈ«Æ¥Åä */
+			/* è¯´æ˜å®Œå…¨åŒ¹é… */
 			if (*node->bound_ptr == 0) {
 				state->curr_status = MIME_S_MULTI_BOUND_CRLF;
 				node->bound_ptr = NULL;
@@ -874,7 +874,7 @@ static int mime_state_multi_bound_crlf(MIME_STATE *state, const char *s, int n)
 		node->last_lf_pos = state->curr_off;
 		state->curr_off++;
 
-		/* ÉèÖÃ multipart Ìå½áÊøÎ»ÖÃ£¬¸ÃÎ»ÖÃ°üº¬ÁËÆäËùÓĞ×Ó½áµãÊı¾İ */
+		/* è®¾ç½® multipart ä½“ç»“æŸä½ç½®ï¼Œè¯¥ä½ç½®åŒ…å«äº†å…¶æ‰€æœ‰å­ç»“ç‚¹æ•°æ® */
 		state->curr_node->bound_end = state->curr_off;
 
 		/*
@@ -897,7 +897,7 @@ static int mime_state_multi_bound_crlf(MIME_STATE *state, const char *s, int n)
 		state->curr_node->last_ch = '\r';
 		state->curr_off++;
 		state->use_crlf = 1;
-		/* ÆÚ´ıÏÂÒ»¸ö×Ö·ûÎª '\n' */
+		/* æœŸå¾…ä¸‹ä¸€ä¸ªå­—ç¬¦ä¸º '\n' */
 		return n - 1;
 	} else {
 		/* xxx */

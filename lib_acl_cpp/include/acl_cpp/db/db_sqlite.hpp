@@ -16,60 +16,60 @@ class sqlite_cursor;
 class ACL_CPP_API db_sqlite : public db_handle {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı(ÄÚ²¿»á×Ô¶¯¼ÓÔØsqlite¶¯Ì¬¿â)
-	 * @param charset {const char*} ±¾µØ×Ö·û¼¯(gbk, utf-8, ...)
+	 * æ„é€ å‡½æ•°(å†…éƒ¨ä¼šè‡ªåŠ¨åŠ è½½sqliteåŠ¨æ€åº“)
+	 * @param charset {const char*} æœ¬åœ°å­—ç¬¦é›†(gbk, utf-8, ...)
 	 */
 	db_sqlite(const char* dbfile, const char* charset = "utf-8");
 	~db_sqlite(void);
 
 	/**
-	 * ÏÔÊ½¶¯Ì¬¼ÓÔØ sqlite ¶¯Ì¬¿â
+	 * æ˜¾å¼åŠ¨æ€åŠ è½½ sqlite åŠ¨æ€åº“
 	 * @return {bool}
 	 */
 	static bool load(void);
 
 	/**
-	 * ·µ»Øµ±Ç°µÄ sqlite µÄ°æ±¾ĞÅÏ¢
+	 * è¿”å›å½“å‰çš„ sqlite çš„ç‰ˆæœ¬ä¿¡æ¯
 	 * @return {const char*}
 	 */
 	const char* version(void) const;
 
 	/**
-	 * µ±Êı¾İ¿â´ò¿ªºóÍ¨¹ı´Ëº¯Êı¶ÔÊı¾İ¿âµÄ²Ù×÷ÒıÇæ½øĞĞÅäÖÃ£¬
-	 * ½øĞĞÅäÖÃµÄÄÚÈİĞèÒªÑÏ¸ñ×ñÑ­ sqlite ±¾ÉíµÄÅäÖÃÑ¡ÏîÒªÇó
-	 * @param pragma {const char*} ÅäÖÃÑ¡ÏîÄÚÈİ£¬¸ñÊ½Îª£º
+	 * å½“æ•°æ®åº“æ‰“å¼€åé€šè¿‡æ­¤å‡½æ•°å¯¹æ•°æ®åº“çš„æ“ä½œå¼•æ“è¿›è¡Œé…ç½®ï¼Œ
+	 * è¿›è¡Œé…ç½®çš„å†…å®¹éœ€è¦ä¸¥æ ¼éµå¾ª sqlite æœ¬èº«çš„é…ç½®é€‰é¡¹è¦æ±‚
+	 * @param pragma {const char*} é…ç½®é€‰é¡¹å†…å®¹ï¼Œæ ¼å¼ä¸ºï¼š
 	 *  PRAGMA xxx=xxx
-	 *  Èç£ºPRAGMA synchronous = NORMAL
-	 * @return {bool} ÅäÖÃÊı¾İ¿âÊÇ·ñ³É¹¦
+	 *  å¦‚ï¼šPRAGMA synchronous = NORMAL
+	 * @return {bool} é…ç½®æ•°æ®åº“æ˜¯å¦æˆåŠŸ
 	 */
 	bool set_conf(const char* pragma);
 
 	/**
-	 * µ±Êı¾İ¿â´ò¿ªµ÷ÓÃ´Ëº¯Êı»ñµÃÊı¾İÒıÇæµÄÅäÖÃÑ¡Ïî
-	 * @param pragma {const char*} ÅäÖÃÑ¡ÏîÄÚÈİ£¬¸ñÊ½Îª£º
+	 * å½“æ•°æ®åº“æ‰“å¼€è°ƒç”¨æ­¤å‡½æ•°è·å¾—æ•°æ®å¼•æ“çš„é…ç½®é€‰é¡¹
+	 * @param pragma {const char*} é…ç½®é€‰é¡¹å†…å®¹ï¼Œæ ¼å¼ä¸ºï¼š
 	 *  PRAGMA xxx
-	 *  Èç£ºPRAGMA synchronous
-	 * @param out {string&} Èç¹û·µ»ØÖµ·Ç¿ÕÔò´æ´¢½á¹û
-	 * @return {const char*} Îª¿ÕÔòËµÃ÷¸ÃÅäÖÃ²»´æÔÚ»òÊı¾İ¿âÎ´´ò¿ª
+	 *  å¦‚ï¼šPRAGMA synchronous
+	 * @param out {string&} å¦‚æœè¿”å›å€¼éç©ºåˆ™å­˜å‚¨ç»“æœ
+	 * @return {const char*} ä¸ºç©ºåˆ™è¯´æ˜è¯¥é…ç½®ä¸å­˜åœ¨æˆ–æ•°æ®åº“æœªæ‰“å¼€
 	 */
 	const char* get_conf(const char* pragma, string& out);
 
 	/**
-	 * ÔÚÊı¾İ¿â´ò¿ªµÄÇé¿öÏÂÊäÈëÊı¾İ¿âÒıÇæµÄÅäÖÃÑ¡Ïî
-	 * @param pragma {const char*} Ö¸¶¨µÄÅäÖÃÑ¡Ïî£¬Èç¹û¸Ã²ÎÊıÎª¿Õ£¬
-	 *  ÔòÊä³öËùÓĞµÄÅäÖÃÑ¡Ïî£¬¸ñÊ½Îª£ºPRAGMA xxx£¬Èç£ºPRAGMA synchronous
+	 * åœ¨æ•°æ®åº“æ‰“å¼€çš„æƒ…å†µä¸‹è¾“å…¥æ•°æ®åº“å¼•æ“çš„é…ç½®é€‰é¡¹
+	 * @param pragma {const char*} æŒ‡å®šçš„é…ç½®é€‰é¡¹ï¼Œå¦‚æœè¯¥å‚æ•°ä¸ºç©ºï¼Œ
+	 *  åˆ™è¾“å‡ºæ‰€æœ‰çš„é…ç½®é€‰é¡¹ï¼Œæ ¼å¼ä¸ºï¼šPRAGMA xxxï¼Œå¦‚ï¼šPRAGMA synchronous
 	 */
 	void show_conf(const char* pragma = NULL);
 
 	/**
-	 * ×ÔÊı¾İ¿â´ò¿ªºóËùÓĞµÄÓ°ÏìµÄ¼ÇÂ¼ĞĞÊı
-	 * @return {int} Ó°ÏìµÄĞĞÊı£¬-1 ±íÊ¾³ö´í
+	 * è‡ªæ•°æ®åº“æ‰“å¼€åæ‰€æœ‰çš„å½±å“çš„è®°å½•è¡Œæ•°
+	 * @return {int} å½±å“çš„è¡Œæ•°ï¼Œ-1 è¡¨ç¤ºå‡ºé”™
 	 */
 	int affect_total_count(void) const;
 
 	/**
-	 * Ö±½Ó»ñµÃ sqlite µÄ¾ä±ú£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾ sqlite »¹Ã»ÓĞ´ò¿ª
-	 * »ò³ö´íÊ±ÄÚ²¿×Ô¶¯¹Ø±ÕÁË sqlite
+	 * ç›´æ¥è·å¾— sqlite çš„å¥æŸ„ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤º sqlite è¿˜æ²¡æœ‰æ‰“å¼€
+	 * æˆ–å‡ºé”™æ—¶å†…éƒ¨è‡ªåŠ¨å…³é—­äº† sqlite
 	 * @return {sqlite3*}
 	 */
 	sqlite3* get_conn(void) const
@@ -78,172 +78,172 @@ public:
 	}
 
 	/**
-	 * ×¼±¸ÓÎ±ê
+	 * å‡†å¤‡æ¸¸æ ‡
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
 	bool prepare(sqlite_cursor& cursor);
 
 	/**
-	 * Ö´ĞĞÏÂÒ»²½£¬Èç¹ûÊÇ²éÑ¯Àà¹ı³Ì£¬Ôò½«²éÑ¯½á¹û´æÈë¸ø¶¨µÄ²ÎÊıÖĞ
+	 * æ‰§è¡Œä¸‹ä¸€æ­¥ï¼Œå¦‚æœæ˜¯æŸ¥è¯¢ç±»è¿‡ç¨‹ï¼Œåˆ™å°†æŸ¥è¯¢ç»“æœå­˜å…¥ç»™å®šçš„å‚æ•°ä¸­
 	 * @param cursor {sqlite_cursor&}
 	 * @return {bool}
 	 */
 	bool next(sqlite_cursor& cursor, bool* done);
 
 	/********************************************************************/
-	/*            ÒÔÏÂÎªÒ»Ğ© sqlite3 µÄË½ÓĞ½Ó¿Ú                         */
+	/*            ä»¥ä¸‹ä¸ºä¸€äº› sqlite3 çš„ç§æœ‰æ¥å£                         */
 	/********************************************************************/
 
 	/**
-	 * ½«zSql³õÊ¼»¯Îª prepared statement
-	 * @param zSql {const char*} utf-8±àÂëµÄsql
-	 * @param nByte {int} zSqlµÄ×î´ó×Ö½Ú³¤¶È
-	 * @param ppStmt {sqlite3_stmt**} OUT: prepared statement¾ä±ú
-	 * @param pzTail {const char**} OUT: Ö¸ÏòzSqlÎ´Ê¹ÓÃ²¿·ÖµÄÖ¸Õë
-	 * @return {int} ³É¹¦·µ»Ø SQLITE_OK£¬·ñÔò·µ»ØÏàÓ¦µÄ´íÎó´úÂë
+	 * å°†zSqlåˆå§‹åŒ–ä¸º prepared statement
+	 * @param zSql {const char*} utf-8ç¼–ç çš„sql
+	 * @param nByte {int} zSqlçš„æœ€å¤§å­—èŠ‚é•¿åº¦
+	 * @param ppStmt {sqlite3_stmt**} OUT: prepared statementå¥æŸ„
+	 * @param pzTail {const char**} OUT: æŒ‡å‘zSqlæœªä½¿ç”¨éƒ¨åˆ†çš„æŒ‡é’ˆ
+	 * @return {int} æˆåŠŸè¿”å› SQLITE_OKï¼Œå¦åˆ™è¿”å›ç›¸åº”çš„é”™è¯¯ä»£ç 
 	 */
 	int sqlite3_prepare_v2(const char *zSql,
 		int nByte, sqlite3_stmt **ppStmt, const char **pzTail);
 
 	/**
-	 * ¼ÆËã prepared statement
+	 * è®¡ç®— prepared statement
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @return {int} ·µ»Ø SQLITE_BUSY, SQLITE_DONE, SQLITE_ROW,
-	 *          SQLITE_ERROR, »ò SQLITE_MISUSE
+	 * @return {int} è¿”å› SQLITE_BUSY, SQLITE_DONE, SQLITE_ROW,
+	 *          SQLITE_ERROR, æˆ– SQLITE_MISUSE
 	 */
 	int sqlite3_step(sqlite3_stmt *stmt);
 
 	/**
-	 * ½«prepared statementÖØÖÃÎª³õÊ¼»¯×´Ì¬
+	 * å°†prepared statementé‡ç½®ä¸ºåˆå§‹åŒ–çŠ¶æ€
 	 * @param pStmt {sqlite3_stmt*} prepared statement
-	 * @return {int} SQLITE_ROW, SQLITE_DONE »ò SQLITE_OK
+	 * @return {int} SQLITE_ROW, SQLITE_DONE æˆ– SQLITE_OK
 	 */
 	int sqlite3_reset(sqlite3_stmt *pStmt);
 
 	/**
-	 * ÊÍ·Å prepared statement ×ÊÔ´
-	 * @param stmt {sqlite3_stmt*} prepared statement¾ä±ú
-	 * @return {int} SQLITE_OK »òÆäËû´íÎó´úÂë
+	 * é‡Šæ”¾ prepared statement èµ„æº
+	 * @param stmt {sqlite3_stmt*} prepared statementå¥æŸ„
+	 * @return {int} SQLITE_OK æˆ–å…¶ä»–é”™è¯¯ä»£ç 
 	 */
 	int sqlite3_finalize(sqlite3_stmt *stmt);
 
 	/**
-	 * °ó¶¨¶ş½øÖÆÊı¾İ
+	 * ç»‘å®šäºŒè¿›åˆ¶æ•°æ®
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıË÷Òı
-	 * @param value {const void*} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıÊıÖµ
-	 * @param n {int} ²ÎÊıµÄ×Ö½Ú³¤¶È
-	 * @param destory {void(*)(void*)} ´«Èë²ÎÊıµÄÎö¹¹º¯Êı
-	 * @return {int} ³É¹¦·µ»Ø SQLITE_OK£¬·ñÔò·µ»ØÏàÓ¦µÄ´íÎó´úÂë
+	 * @param iCol {int} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°ç´¢å¼•
+	 * @param value {const void*} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°æ•°å€¼
+	 * @param n {int} å‚æ•°çš„å­—èŠ‚é•¿åº¦
+	 * @param destory {void(*)(void*)} ä¼ å…¥å‚æ•°çš„ææ„å‡½æ•°
+	 * @return {int} æˆåŠŸè¿”å› SQLITE_OKï¼Œå¦åˆ™è¿”å›ç›¸åº”çš„é”™è¯¯ä»£ç 
 	 */
 	int sqlite3_bind_blob(sqlite3_stmt *stmt, int iCol,
 		const void *value, int n, void(*destory)(void*));
 
 	/**
-	 * °ó¶¨intÀàĞÍÊı¾İ
+	 * ç»‘å®šintç±»å‹æ•°æ®
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıË÷Òı
-	 * @param value {int} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıÊıÖµ
-	 * @return {int} ³É¹¦·µ»Ø SQLITE_OK£¬·ñÔò·µ»ØÏàÓ¦µÄ´íÎó´úÂë
+	 * @param iCol {int} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°ç´¢å¼•
+	 * @param value {int} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°æ•°å€¼
+	 * @return {int} æˆåŠŸè¿”å› SQLITE_OKï¼Œå¦åˆ™è¿”å›ç›¸åº”çš„é”™è¯¯ä»£ç 
 	 */
 	int sqlite3_bind_int(sqlite3_stmt *stmt, int iCol, int value);
 
 	/**
-	 * °ó¶¨int64Êı¾İ
+	 * ç»‘å®šint64æ•°æ®
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıË÷Òı
-	 * @param value {long long int} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıÊıÖµ
-	 * @return {int} ³É¹¦·µ»Ø SQLITE_OK£¬·ñÔò·µ»ØÏàÓ¦µÄ´íÎó´úÂë
+	 * @param iCol {int} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°ç´¢å¼•
+	 * @param value {long long int} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°æ•°å€¼
+	 * @return {int} æˆåŠŸè¿”å› SQLITE_OKï¼Œå¦åˆ™è¿”å›ç›¸åº”çš„é”™è¯¯ä»£ç 
 	 */
 	int sqlite3_bind_int64(sqlite3_stmt* stmt, int iCol, long long int value);
 
 	/**
-	 * °ó¶¨textÊı¾İ
+	 * ç»‘å®štextæ•°æ®
 	 * @param stmt {sqlite3*} prepared statement
-	 * @param iCol {int} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıË÷Òı
-	 * @param value {const void*} ´ı°ó¶¨µ½sqlÖĞµÄ²ÎÊıÊıÖµ
-	 * @param n {int} ²ÎÊıµÄ×Ö½Ú³¤¶È
-	 * @param destory {void(*)(void*)} ´«Èë²ÎÊıµÄÎö¹¹º¯Êı
-	 * @return {int} ³É¹¦·µ»Ø SQLITE_OK£¬·ñÔò·µ»ØÏàÓ¦µÄ´íÎó´úÂë
+	 * @param iCol {int} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°ç´¢å¼•
+	 * @param value {const void*} å¾…ç»‘å®šåˆ°sqlä¸­çš„å‚æ•°æ•°å€¼
+	 * @param n {int} å‚æ•°çš„å­—èŠ‚é•¿åº¦
+	 * @param destory {void(*)(void*)} ä¼ å…¥å‚æ•°çš„ææ„å‡½æ•°
+	 * @return {int} æˆåŠŸè¿”å› SQLITE_OKï¼Œå¦åˆ™è¿”å›ç›¸åº”çš„é”™è¯¯ä»£ç 
 	 */
 	int sqlite3_bind_text(sqlite3_stmt *stmt, int iCol,
 		const char *value, int n, void(*destory)(void*));
 
 	/**
-	 * ·µ»Ø prepared statement ½á¹û¼¯µÄÁĞÊı
+	 * è¿”å› prepared statement ç»“æœé›†çš„åˆ—æ•°
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @return {int} ÁĞÊıÁ¿
+	 * @return {int} åˆ—æ•°é‡
 	 */
 	int sqlite3_column_count(sqlite3_stmt *stmt);
 
 	/**
-	 * ·µ»Ø²éÑ¯½á¹ûµÄ¶ÔÓ¦ÁĞµÄ¶ş½øÖÆ½á¹ûĞÅÏ¢
+	 * è¿”å›æŸ¥è¯¢ç»“æœçš„å¯¹åº”åˆ—çš„äºŒè¿›åˆ¶ç»“æœä¿¡æ¯
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} ÁĞË÷Òı
-	 * @return {const void*} Êı¾İÖ¸Õë
+	 * @param iCol {int} åˆ—ç´¢å¼•
+	 * @return {const void*} æ•°æ®æŒ‡é’ˆ
 	 */
 	const void *sqlite3_column_blob(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * ·µ»Ø²éÑ¯½á¹ûµÄ¶ÔÓ¦ÁĞµÄint½á¹ûĞÅÏ¢
+	 * è¿”å›æŸ¥è¯¢ç»“æœçš„å¯¹åº”åˆ—çš„intç»“æœä¿¡æ¯
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} ÁĞË÷Òı
-	 * @return {int} Êı¾İ
+	 * @param iCol {int} åˆ—ç´¢å¼•
+	 * @return {int} æ•°æ®
 	 */
 	int sqlite3_column_int(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * ·µ»Ø²éÑ¯½á¹ûµÄ¶ÔÓ¦ÁĞµÄint64½á¹ûĞÅÏ¢
+	 * è¿”å›æŸ¥è¯¢ç»“æœçš„å¯¹åº”åˆ—çš„int64ç»“æœä¿¡æ¯
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} ÁĞË÷Òı
-	 * @return {long long int} Êı¾İ
+	 * @param iCol {int} åˆ—ç´¢å¼•
+	 * @return {long long int} æ•°æ®
 	 */
 	long long int sqlite3_column_int64(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * ·µ»Ø²éÑ¯½á¹ûµÄ¶ÔÓ¦ÁĞµÄ utf-8 text ½á¹ûĞÅÏ¢
+	 * è¿”å›æŸ¥è¯¢ç»“æœçš„å¯¹åº”åˆ—çš„ utf-8 text ç»“æœä¿¡æ¯
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} ÁĞË÷Òı
-	 * @return {const unsigned char *} Êı¾İÖ¸Õë
+	 * @param iCol {int} åˆ—ç´¢å¼•
+	 * @return {const unsigned char *} æ•°æ®æŒ‡é’ˆ
 	 */
 	const unsigned char *sqlite3_column_text(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * ·µ»Ø²éÑ¯½á¹ûµÄ¶ÔÓ¦ÁĞµÄ½á¹ûĞÅÏ¢Êı¾İ×Ö½Ú³¤¶È
+	 * è¿”å›æŸ¥è¯¢ç»“æœçš„å¯¹åº”åˆ—çš„ç»“æœä¿¡æ¯æ•°æ®å­—èŠ‚é•¿åº¦
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} ÁĞË÷Òı
-	 * @return {const unsigned char *} Êı¾İÖ¸Õë
+	 * @param iCol {int} åˆ—ç´¢å¼•
+	 * @return {const unsigned char *} æ•°æ®æŒ‡é’ˆ
 	 */
 	int sqlite3_column_bytes(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * ·µ»Øselect½á¹û¼¯ÖĞÌØ¶¨ÁĞµÄÃû³Æ
+	 * è¿”å›selectç»“æœé›†ä¸­ç‰¹å®šåˆ—çš„åç§°
 	 * @param stmt {sqlite3_stmt*} prepared statement
-	 * @param iCol {int} ÁĞË÷Òı
-	 * @return {const char*} ÁĞÃû
+	 * @param iCol {int} åˆ—ç´¢å¼•
+	 * @return {const char*} åˆ—å
 	 */
 	const char *sqlite3_column_name(sqlite3_stmt *stmt, int iCol);
 
 	/**
-	 * Ö´ĞĞµ¥ÌõsqlÓï¾ä
-	 * @param sql {const char*} ´ıÖ´ĞĞµÄsqlÓï¾ä
-	 * @param callback {int (*)(void*,int,char**,char**)} callbackº¯Êı
-	 * @param arg {void*}callbackº¯ÊıµÄµÚÒ»¸ö²ÎÊı
-	 * @param errmsg {char**} ´íÎóĞÅÏ¢
-	 * @return {int} SQLITE_OK »òÆäËû´íÎóÂë
+	 * æ‰§è¡Œå•æ¡sqlè¯­å¥
+	 * @param sql {const char*} å¾…æ‰§è¡Œçš„sqlè¯­å¥
+	 * @param callback {int (*)(void*,int,char**,char**)} callbackå‡½æ•°
+	 * @param arg {void*}callbackå‡½æ•°çš„ç¬¬ä¸€ä¸ªå‚æ•°
+	 * @param errmsg {char**} é”™è¯¯ä¿¡æ¯
+	 * @return {int} SQLITE_OK æˆ–å…¶ä»–é”™è¯¯ç 
 	 */
 	int sqlite3_exec(const char *sql,
 		int(*callback)(void*,int,char**,char**), void *arg, char **errmsg);
 
 	/**
-	 * ÎªÊÍ·Å errmsg ¶øÌí¼ÓµÄ½Ó¿Ú
-	 * @param ptr {void*} ´ıÊÍ·ÅÊı¾İÖ¸Õë
+	 * ä¸ºé‡Šæ”¾ errmsg è€Œæ·»åŠ çš„æ¥å£
+	 * @param ptr {void*} å¾…é‡Šæ”¾æ•°æ®æŒ‡é’ˆ
 	 */
 	void sqlite3_free(void* ptr);
 
 	/********************************************************************/
-	/*            ÒÔÏÂÎª»ùÀà db_handle µÄĞé½Ó¿Ú                         */
+	/*            ä»¥ä¸‹ä¸ºåŸºç±» db_handle çš„è™šæ¥å£                         */
 	/********************************************************************/
 
 	/**
@@ -313,19 +313,19 @@ public:
 
 
 private:
-	// sqlite ÒıÇæ
+	// sqlite å¼•æ“
 	sqlite3* db_;
 
-	// Êı¾İ´æ´¢ÎÄ¼ş
+	// æ•°æ®å­˜å‚¨æ–‡ä»¶
 	string dbfile_;
 
-	// ×Ö·û¼¯×ªÂëÆ÷
+	// å­—ç¬¦é›†è½¬ç å™¨
 	charset_conv* conv_;
 
-	// ±¾µØ×Ö·û¼¯
+	// æœ¬åœ°å­—ç¬¦é›†
 	string charset_;
 
-	// ÕæÕıÖ´ĞĞSQL²éÑ¯µÄº¯Êı
+	// çœŸæ­£æ‰§è¡ŒSQLæŸ¥è¯¢çš„å‡½æ•°
 	bool exec_sql(const char* sql, db_rows* result = NULL);
 };
 

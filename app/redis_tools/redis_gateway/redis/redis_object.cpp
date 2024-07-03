@@ -245,7 +245,7 @@ redis_object& redis_object::put(const redis_object* rr, size_t idx)
 		children_idx_ = 0;
 	}
 
-	// +1 是为了确保最后一个数组元素可以被设为 NULL
+	// +1 鏄负浜嗙‘淇濇渶鍚庝竴涓暟缁勫厓绱犲彲浠ヨ璁句负 NULL
 	if (children_idx_ + 1 < children_size_) {
 		children_[children_idx_++] = rr;
 		return *this;

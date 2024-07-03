@@ -58,7 +58,7 @@ unsigned short acl_hash_crc16(const void *buf, size_t len)
 }
 
 #if 0
-/* ¸ÃÊµÏÖÓĞ¿ÉÄÜÔÚ64Î»ÏµÍ³´æÔÚÒ»¶¨ÎÊÌâ */
+/* è¯¥å®ç°æœ‰å¯èƒ½åœ¨64ä½ç³»ç»Ÿå­˜åœ¨ä¸€å®šé—®é¢˜ */
 
 static unsigned long m_table32n[256] = {
     0x00000000, 0x04C11DB7, 0x09823B6E, 0x0D4326D9, 0x130476DC, 0x17C56B6B, 0x1A864DB2, 0x1E475005,

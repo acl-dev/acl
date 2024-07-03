@@ -28,7 +28,7 @@ public:
 		res.setContentLength(buf.size());
 		res.setKeepAlive(true);
 
-		// 发送 http 响应体
+		// 路垄脣脥 http 脧矛脫娄脤氓
 		return res.write(buf) && res.write(NULL, 0);
 	}
 

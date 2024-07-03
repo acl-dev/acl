@@ -3,7 +3,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// Ã…Ã¤Ã–ÃƒÃ„ÃšÃˆÃÃÃ®
 
 static char *var_cfg_backend_addr;
 static char *var_cfg_request_file;

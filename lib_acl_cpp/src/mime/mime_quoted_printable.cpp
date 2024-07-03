@@ -106,8 +106,8 @@ void mime_quoted_printable::encode(string* out)
 	for (cp = CU_CHAR_PTR(m_encodeBuf), n = 0; cp < end; cp++) {
 		if (*cp == ' ' || *cp == '\t') {
 			if (cp + 1 == end) {
-				/* ÎÞ·¨È·¶¨ºóÃæ×Ö½ÚÊÇ·ñÊÇ»Ø³µ»»ÐÐ,
-				* ËùÒÔÔÝÊ±»º´æ¸ÃÊý¾Ý
+				/* æ— æ³•ç¡®å®šåŽé¢å­—èŠ‚æ˜¯å¦æ˜¯å›žè½¦æ¢è¡Œ,
+				* æ‰€ä»¥æš‚æ—¶ç¼“å­˜è¯¥æ•°æ®
 				*/
 				m_encodeBuf[0] = *cp;
 				m_encodeCnt = 1;
@@ -237,7 +237,7 @@ void mime_quoted_printable::decode(string* out)
 			continue;
 		}
 
-		/* '=' ºóÃæÐèÒªÓÐÁ½¸ö×Ö½Ú²Å¿É²Ù×÷ */
+		/* '=' åŽé¢éœ€è¦æœ‰ä¸¤ä¸ªå­—èŠ‚æ‰å¯æ“ä½œ */
 		if (m_decodeCnt == 1) {
 			m_decodeBuf[0] = *cp;
 			m_decodeCnt = 1;
@@ -251,12 +251,12 @@ void mime_quoted_printable::decode(string* out)
 
 		if (*(cp + 1) == '\r') {
 			if (*(cp + 2) == '\n') {
-				/* È¥µôÈí»Ø³µ»»ÐÐ */
+				/* åŽ»æŽ‰è½¯å›žè½¦æ¢è¡Œ */
 				cp += 3;
 				m_decodeCnt -= 3;
 			} else {
 				if (m_addInvalid) {
-					/* xxx: ½«·Ç·¨Êý¾ÝÔ­ÑùÕÕ°á */
+					/* xxx: å°†éžæ³•æ•°æ®åŽŸæ ·ç…§æ¬ */
 					out->push_back((char) (*(cp + 1)));
 					out->push_back((char) (*(cp + 2)));
 				}
@@ -264,7 +264,7 @@ void mime_quoted_printable::decode(string* out)
 				m_decodeCnt -= 3;
 			}
 		} else if (*(cp + 1) == '\n') {
-			/* xxx: unix ¸ñÊ½µÄÈí»»ÐÐ ? */
+			/* xxx: unix æ ¼å¼çš„è½¯æ¢è¡Œ ? */
 			cp += 2;
 			m_decodeCnt -= 2;
 		} else {
@@ -276,7 +276,7 @@ void mime_quoted_printable::decode(string* out)
 				out->push_back((char) result);
 			} else {
 				if (m_addInvalid) {
-					/* ½«·Ç·¨Êý¾ÝÔ­ÑùÕÕ°á */
+					/* å°†éžæ³•æ•°æ®åŽŸæ ·ç…§æ¬ */
 					out->push_back((char) first);
 					out->push_back((char) second);
 				}

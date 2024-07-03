@@ -73,7 +73,7 @@ void database::add_tbl(db_tbl* tbl)
 void database::add_idx_host(idx_host* host)
 {
 	lock_->lock();
-	// 需要检查是否是重复添加
+	// 闇�瑕佹鏌ユ槸鍚︽槸閲嶅娣诲姞
 	std::vector<idx_host*>::iterator it = idx_hosts_.begin();
 	for (; it != idx_hosts_.end(); it++)
 	{

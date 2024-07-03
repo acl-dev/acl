@@ -15,98 +15,98 @@ extern "C" {
 #include "stdlib/acl_binhash.h"
 #include "ring.h"
 
-/* ÓÃ»§²éÑ¯½á¹û¼¯ºÏ */
+/* ç”¨æˆ·æŸ¥è¯¢ç»“æžœé›†åˆ */
 struct ACL_MDT_RES {
-	ACL_ARRAY *a;			/* ½« ACL_MDT_NOD µÄ²éÑ¯½á¹û¼¯ºÏ´æ´¢ÔÚ´ËÊý×éÖÐ */
-	int   ipos;			/* ÏÂÒ»¸öÊý×éÔªËØÔÚ¶¯Ì¬Êý×éÖÐµÄÎ»ÖÃ */
+	ACL_ARRAY *a;			/* å°† ACL_MDT_NOD çš„æŸ¥è¯¢ç»“æžœé›†åˆå­˜å‚¨åœ¨æ­¤æ•°ç»„ä¸­ */
+	int   ipos;			/* ä¸‹ä¸€ä¸ªæ•°ç»„å…ƒç´ åœ¨åŠ¨æ€æ•°ç»„ä¸­çš„ä½ç½® */
 };
 
-/* Êý¾Ý½áµãµÄÊý¾Ý½á¹¹¶¨Òå(24 byte) */
+/* æ•°æ®ç»“ç‚¹çš„æ•°æ®ç»“æž„å®šä¹‰(24 byte) */
 struct ACL_MDT_NOD {
-	RING mdt_entry;			/* Á´½Ó½ø ACL_MDT ÖÐµÄ node_head */
-	RING ref_head;			/* ÒýÓÃ¸ÃÊý¾Ý½áµãµÄËùÓÐÒýÓÃ½áµãµÄ¼¯ºÏ */
-	void  *data;			/* ÓÃ»§¼¶Êý¾ÝÏîµÄÄÚ²¿±íÊ¾, ¿ÉÒÔÎª¸÷ÖÖÓÃ»§
-					 * Ëù×Ô¶¨ÒåµÄÊý¾ÝÀàÐÍ, Í¨¹ýÇ¿ÖÆÀàÐÍ×ª»»½«Æä
-					 * Í³Ò»×ª»¯Îª void * ÀàÐÍ, ÔÚ½¨Á¢Ë÷ÒýÊ±ÓÃ»§
-					 * ÐèÒªÒÔ×Ô¶¨ÒåÊý¾ÝÀàÐÍÖÐµÄÄ³Ð©×Ö¶ÎÎª¼üÖµ
-					 * À´½¨Á¢Ë÷Òý¼ÇÂ¼¼°Ë÷Òý±í, ´Ó¶ø½¨Á¢Ë÷ÒýÊý¾Ý¿â,
-					 * ×îÖÕ¸Ã data ×Ö¶ÎÖÐµÄ¼ü½«Óë ACL_MDT_REC ÖÐµÄ
-					 * key ÏàÍ¬²¢Ó³Éäµ½ ACL_MDT_REC ÖÐµÄ table
-					 * ¼¯ºÏÖÐ.
+	RING mdt_entry;			/* é“¾æŽ¥è¿› ACL_MDT ä¸­çš„ node_head */
+	RING ref_head;			/* å¼•ç”¨è¯¥æ•°æ®ç»“ç‚¹çš„æ‰€æœ‰å¼•ç”¨ç»“ç‚¹çš„é›†åˆ */
+	void  *data;			/* ç”¨æˆ·çº§æ•°æ®é¡¹çš„å†…éƒ¨è¡¨ç¤º, å¯ä»¥ä¸ºå„ç§ç”¨æˆ·
+					 * æ‰€è‡ªå®šä¹‰çš„æ•°æ®ç±»åž‹, é€šè¿‡å¼ºåˆ¶ç±»åž‹è½¬æ¢å°†å…¶
+					 * ç»Ÿä¸€è½¬åŒ–ä¸º void * ç±»åž‹, åœ¨å»ºç«‹ç´¢å¼•æ—¶ç”¨æˆ·
+					 * éœ€è¦ä»¥è‡ªå®šä¹‰æ•°æ®ç±»åž‹ä¸­çš„æŸäº›å­—æ®µä¸ºé”®å€¼
+					 * æ¥å»ºç«‹ç´¢å¼•è®°å½•åŠç´¢å¼•è¡¨, ä»Žè€Œå»ºç«‹ç´¢å¼•æ•°æ®åº“,
+					 * æœ€ç»ˆè¯¥ data å­—æ®µä¸­çš„é”®å°†ä¸Ž ACL_MDT_REC ä¸­çš„
+					 * key ç›¸åŒå¹¶æ˜ å°„åˆ° ACL_MDT_REC ä¸­çš„ table
+					 * é›†åˆä¸­.
 					 */
 
-	unsigned int dlen:24;		/* data Êý¾ÝµÄ³¤¶È */
-	unsigned int nrefer:8;		/* ÒýÓÃ¸ÃÊý¾Ý½áµãµÄ ACL_MDT_REF ÊýÁ¿ */
+	unsigned int dlen:24;		/* data æ•°æ®çš„é•¿åº¦ */
+	unsigned int nrefer:8;		/* å¼•ç”¨è¯¥æ•°æ®ç»“ç‚¹çš„ ACL_MDT_REF æ•°é‡ */
 };
 
-/* Ë÷Òý±íµÄË÷Òý¼ÇÂ¼Êý¾Ý½á¹¹¶¨Òå, Ë÷Òý±í(ACL_MDT)µÄË÷Òý¼¯ºÏ×Ö¶Î(table)
- * µÄ×é³Éµ¥Î»Îª ACL_REC, ¼´ ACL_MDT.table ÊÇÓÉÒ»ÏµÁÐ ACL_REC
- * Êý¾ÝË÷Òý¼ÇÂ¼×é³ÉµÄ.
+/* ç´¢å¼•è¡¨çš„ç´¢å¼•è®°å½•æ•°æ®ç»“æž„å®šä¹‰, ç´¢å¼•è¡¨(ACL_MDT)çš„ç´¢å¼•é›†åˆå­—æ®µ(table)
+ * çš„ç»„æˆå•ä½ä¸º ACL_REC, å³ ACL_MDT.table æ˜¯ç”±ä¸€ç³»åˆ— ACL_REC
+ * æ•°æ®ç´¢å¼•è®°å½•ç»„æˆçš„.
  * (12 byte)
  */
 struct ACL_MDT_REC {
-	RING ref_head;			/* ¾ßÓÐÏàÍ¬¼üÖµµÄ ACL_MDT_NOD_REF µÄ¼¯ºÏ */
-	ACL_MDT_IDX *idx;		/* ÒýÓÃÆäËùÊôµÄË÷Òý±í */
-	const char *key;		/* Ë÷Òý¼üÒýÓÃ */
-	unsigned int   nrefer:8;	/* ¸Ã½á¹û¼¯ºÏµÄ ACL_MDT_NODE_REF ÔªËØ×ÜºÍ */
+	RING ref_head;			/* å…·æœ‰ç›¸åŒé”®å€¼çš„ ACL_MDT_NOD_REF çš„é›†åˆ */
+	ACL_MDT_IDX *idx;		/* å¼•ç”¨å…¶æ‰€å±žçš„ç´¢å¼•è¡¨ */
+	const char *key;		/* ç´¢å¼•é”®å¼•ç”¨ */
+	unsigned int   nrefer:8;	/* è¯¥ç»“æžœé›†åˆçš„ ACL_MDT_NODE_REF å…ƒç´ æ€»å’Œ */
 };
 
 /**
- * ÒýÓÃ½áµã¶¨Òå(20 byte)
+ * å¼•ç”¨ç»“ç‚¹å®šä¹‰(20 byte)
  */
 struct ACL_MDT_REF {
-	RING nod_entry;			/* Óë ACL_MDT_NOD ¹ØÁª */
-	RING rec_entry;			/* Óë ACL_MDT_REC ¹ØÁª */
-	ACL_MDT_NOD *node;		/* ÒýÓÃ ACL_MDT_NOD */
-	ACL_MDT_REC *rec;		/* ÒýÓÃ ACL_MDT_REC */
+	RING nod_entry;			/* ä¸Ž ACL_MDT_NOD å…³è” */
+	RING rec_entry;			/* ä¸Ž ACL_MDT_REC å…³è” */
+	ACL_MDT_NOD *node;		/* å¼•ç”¨ ACL_MDT_NOD */
+	ACL_MDT_REC *rec;		/* å¼•ç”¨ ACL_MDT_REC */
 };
 
 /**
- * ±íµÄË÷Òý×Ö¶Î¶ÔÏóÀàÐÍ, Ë÷Òý±íÖÐÃ¿¸öË÷ÒýÏî¶¼ÓÐÒ»¸öË÷Òý×Ö¶Î¶ÔÏó
+ * è¡¨çš„ç´¢å¼•å­—æ®µå¯¹è±¡ç±»åž‹, ç´¢å¼•è¡¨ä¸­æ¯ä¸ªç´¢å¼•é¡¹éƒ½æœ‰ä¸€ä¸ªç´¢å¼•å­—æ®µå¯¹è±¡
  */
 struct ACL_MDT_IDX {
-	RING mdt_entry;			/* Á´½Ó½ø ACL_MDT ÖÐµÄ idx_head Á´±í */
-	char *name;			/* ×Ö¶ÎÃû³Æ */
-	ACL_MDT *mdt;			/* ·´ÏòÒýÓÃÆäËù´ÓÊôµÄË÷Òý±í */
-	unsigned int flag;		/* ¸ÃÊý¾Ý±íµÄÔ¼Êø±êÖ¾ */
+	RING mdt_entry;			/* é“¾æŽ¥è¿› ACL_MDT ä¸­çš„ idx_head é“¾è¡¨ */
+	char *name;			/* å­—æ®µåç§° */
+	ACL_MDT *mdt;			/* åå‘å¼•ç”¨å…¶æ‰€ä»Žå±žçš„ç´¢å¼•è¡¨ */
+	unsigned int flag;		/* è¯¥æ•°æ®è¡¨çš„çº¦æŸæ ‡å¿— */
 };
 
 /**
- * ±íË÷ÒýÒÔ¹þÏ£±í·½Ê½´æ´¢
+ * è¡¨ç´¢å¼•ä»¥å“ˆå¸Œè¡¨æ–¹å¼å­˜å‚¨
  */
 typedef struct ACL_MDT_IDX_HASH {
 	ACL_MDT_IDX idx;
-	ACL_HTABLE *table;		/* ÈÝÄÉË÷Òý¼ü¼°ÆäËù±êÊ¶Êý¾Ý½áµã¶ÔÏóµÄ¼¯ºÏ */
+	ACL_HTABLE *table;		/* å®¹çº³ç´¢å¼•é”®åŠå…¶æ‰€æ ‡è¯†æ•°æ®ç»“ç‚¹å¯¹è±¡çš„é›†åˆ */
 } ACL_MDT_IDX_HASH;
 
 /**
- * ±íË÷ÒýÒÔ¹þÏ£±í·½Ê½´æ´¢
+ * è¡¨ç´¢å¼•ä»¥å“ˆå¸Œè¡¨æ–¹å¼å­˜å‚¨
  */
 typedef struct ACL_MDT_IDX_BHASH {
 	ACL_MDT_IDX idx;
-	ACL_BINHASH *table;		/* ÈÝÄÉË÷Òý¼ü¼°ÆäËù±êÊ¶Êý¾Ý½áµã¶ÔÏóµÄ¼¯ºÏ */
+	ACL_BINHASH *table;		/* å®¹çº³ç´¢å¼•é”®åŠå…¶æ‰€æ ‡è¯†æ•°æ®ç»“ç‚¹å¯¹è±¡çš„é›†åˆ */
 } ACL_MDT_IDX_BHASH;
 
 /**
- * ±íË÷ÒýÒÔÆ½ÎÈ¶þ²æÊ÷·½Ê½´æ´¢
+ * è¡¨ç´¢å¼•ä»¥å¹³ç¨³äºŒå‰æ ‘æ–¹å¼å­˜å‚¨
  */
 typedef struct ACL_MDT_IDX_AVL {
 	ACL_MDT_IDX idx;
 	acl_avl_tree_t avl;
-	ACL_SLICE *slice;		/* ÄÚ´æ·ÖÅä³Ø */
+	ACL_SLICE *slice;		/* å†…å­˜åˆ†é…æ±  */
 } ACL_MDT_IDX_AVL;
 
-/* Ë÷Òý±íÊý¾Ý½á¹¹¶¨Òå, Ã¿¸öË÷Òý±íÔÚ½¨Á¢Ê±¾ÍÊÇÒÔÊý¾Ý½áµã(ACL_NODE)ÖÐµÄ
- * ÓÃ»§Êý¾Ý(data)ÖÐµÄÄ³¸öÊý¾Ý×Ö¶ÎÎª¼üÖµ½¨Á¢µÄ.
+/* ç´¢å¼•è¡¨æ•°æ®ç»“æž„å®šä¹‰, æ¯ä¸ªç´¢å¼•è¡¨åœ¨å»ºç«‹æ—¶å°±æ˜¯ä»¥æ•°æ®ç»“ç‚¹(ACL_NODE)ä¸­çš„
+ * ç”¨æˆ·æ•°æ®(data)ä¸­çš„æŸä¸ªæ•°æ®å­—æ®µä¸ºé”®å€¼å»ºç«‹çš„.
  */
 struct ACL_MDT {
-	RING idx_head;			/* Ë÷Òý×Ö¶Î¶ÔÏóÁ´±í */
-	RING nod_head;			/* ËùÓÐÊý¾Ý½áµãµÄ¼¯ºÏ */
+	RING idx_head;			/* ç´¢å¼•å­—æ®µå¯¹è±¡é“¾è¡¨ */
+	RING nod_head;			/* æ‰€æœ‰æ•°æ®ç»“ç‚¹çš„é›†åˆ */
 
-	char *name;			/* Ë÷Òý±íÃû³Æ */
-	int   node_cnt;			/* ËùÓÐÊý¾Ý½áµãµÄ×ÜºÍ */
-	int   error;			/* µ±³ö´íÊ±¼ÇÂ¼³ö´í×´Ì¬ºÅ */
-	unsigned int tbl_flag;		/* ±êÖ¾Î» */
+	char *name;			/* ç´¢å¼•è¡¨åç§° */
+	int   node_cnt;			/* æ‰€æœ‰æ•°æ®ç»“ç‚¹çš„æ€»å’Œ */
+	int   error;			/* å½“å‡ºé”™æ—¶è®°å½•å‡ºé”™çŠ¶æ€å· */
+	unsigned int tbl_flag;		/* æ ‡å¿—ä½ */
 
 	ACL_SLICE *nod_slice;
 	ACL_SLICE *rec_slice;
@@ -147,11 +147,11 @@ typedef struct ACL_MDT_AVL {
 	ACL_MDT mdt;
 } ACL_MDT_AVL;
 
-/* Ë÷ÒýÊý¾Ý¿âÊý¾Ý½á¹¹¶¨Òå */
+/* ç´¢å¼•æ•°æ®åº“æ•°æ®ç»“æž„å®šä¹‰ */
 struct ACL_MDB {
-	char   name[128];		/* Êý¾Ý¿âÃû³Æ */
-	char   type[32];		/* Êý¾Ý¿âÀàÐÍ: hash/avl */
-	ACL_HTABLE *tbls;		/* ÈÝÄÉËùÓÐË÷Òý±íµÄ¼¯ºÏ */
+	char   name[128];		/* æ•°æ®åº“åç§° */
+	char   type[32];		/* æ•°æ®åº“ç±»åž‹: hash/avl */
+	ACL_HTABLE *tbls;		/* å®¹çº³æ‰€æœ‰ç´¢å¼•è¡¨çš„é›†åˆ */
 };
 
 #ifdef __cplusplus

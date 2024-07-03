@@ -14,13 +14,13 @@ extern "C" {
 typedef struct SERVICE SERVICE;
 typedef struct CLIENT_ENTRY CLIENT_ENTRY;
 
-/* ¶¯Ì¬¿â¼ÓÔØº¯ÊıÀàĞÍ¶¨Òå */
+/* åŠ¨æ€åº“åŠ è½½å‡½æ•°ç±»å‹å®šä¹‰ */
 
-/* ·şÎñ³õÊ¼»¯º¯ÊıÀàĞÍ¶¨Òå */
+/* æœåŠ¡åˆå§‹åŒ–å‡½æ•°ç±»å‹å®šä¹‰ */
 typedef void (*module_service_init_fn)(ACL_DLL_ENV *dll_env, const char *cfgdir);
-/* ·şÎñ´´½¨º¯ÊıÀàĞÍ¶¨Òå */
+/* æœåŠ¡åˆ›å»ºå‡½æ•°ç±»å‹å®šä¹‰ */
 typedef SERVICE *(*module_service_create_fn)(void);
-/* ·şÎñÈë¿Úº¯ÊıÀàĞÍ¶¨Òå */
+/* æœåŠ¡å…¥å£å‡½æ•°ç±»å‹å®šä¹‰ */
 typedef void (*module_service_main_fn)(SERVICE *service, ACL_ASTREAM *stream);
 
 typedef struct {
@@ -30,21 +30,21 @@ typedef struct {
 } MODULE_SERVICE;
 
 struct SERVICE {
-	char  name[256];			/* ·şÎñÃû³Æ */
-	ACL_AIO *aio;				/* Òì²½IO¾ä±ú */
-	acl_pthread_pool_t *wq;			/* ÎªÁË¼æÈİÀÏµÄÍâ¹ÒÄ£¿éËùĞèÒªµÄÏß³Ì³Ø¾ä±ú */
-	ACL_ASTREAM *sstream;			/* ¼àÌıÌ×½Ó¿Ú */
-	int   conn_timeout;			/* Ä¬ÈÏµÄÁ¬½Ó³¬Ê±Ê±¼ä */
-	int   rw_timeout;			/* Ä¬ÈÏµÄIO³¬Ê±Ê±¼ä */
-	ACL_DNS *dns_handle;			/* ²ÉÓÃÖ±½Ó·¢ËÍDNSĞ­Òé·½Ê½²éÑ¯ */
-	DNS_SERVER *dns_server;			/* DNS²éÑ¯¾ä±ú */
-	ACL_HTABLE *dns_table;			/* DNS²éÑ¯¶ÔÏó¹şÏ£±í */
-	char  local_addr[256];			/* ¼àÌıµÄ±¾µØµØÖ· */
-	char **bind_ip_list;			/* ÔÚÁ¬½Ó·şÎñÆ÷Ê±ÔÊĞí°ó¶¨±¾»úµÄIPµØÖ·ÁĞ±í */
-	int   bind_ip_index;			/* µ±Ç°ĞèÒª°ó¶¨µÄIP */
+	char  name[256];			/* æœåŠ¡åç§° */
+	ACL_AIO *aio;				/* å¼‚æ­¥IOå¥æŸ„ */
+	acl_pthread_pool_t *wq;			/* ä¸ºäº†å…¼å®¹è€çš„å¤–æŒ‚æ¨¡å—æ‰€éœ€è¦çš„çº¿ç¨‹æ± å¥æŸ„ */
+	ACL_ASTREAM *sstream;			/* ç›‘å¬å¥—æ¥å£ */
+	int   conn_timeout;			/* é»˜è®¤çš„è¿æ¥è¶…æ—¶æ—¶é—´ */
+	int   rw_timeout;			/* é»˜è®¤çš„IOè¶…æ—¶æ—¶é—´ */
+	ACL_DNS *dns_handle;			/* é‡‡ç”¨ç›´æ¥å‘é€DNSåè®®æ–¹å¼æŸ¥è¯¢ */
+	DNS_SERVER *dns_server;			/* DNSæŸ¥è¯¢å¥æŸ„ */
+	ACL_HTABLE *dns_table;			/* DNSæŸ¥è¯¢å¯¹è±¡å“ˆå¸Œè¡¨ */
+	char  local_addr[256];			/* ç›‘å¬çš„æœ¬åœ°åœ°å€ */
+	char **bind_ip_list;			/* åœ¨è¿æ¥æœåŠ¡å™¨æ—¶å…è®¸ç»‘å®šæœ¬æœºçš„IPåœ°å€åˆ—è¡¨ */
+	int   bind_ip_index;			/* å½“å‰éœ€è¦ç»‘å®šçš„IP */
 
-	CONN_CACHE *conn_cache;			/* ³¤Á¬½ÓÁ¬½Ó³Ø¶ÔÏó */
-	MODULE_SERVICE *module;			/* ËùÊôµÄ·şÎñÄ£¿é */
+	CONN_CACHE *conn_cache;			/* é•¿è¿æ¥è¿æ¥æ± å¯¹è±¡ */
+	MODULE_SERVICE *module;			/* æ‰€å±çš„æœåŠ¡æ¨¡å— */
 };
 
 typedef struct DNS_RING {
@@ -54,36 +54,36 @@ typedef struct DNS_RING {
 } DNS_RING;
 
 struct CLIENT_ENTRY {
-	SERVICE *service;			/* Ö¸ÏòÒì²½´úÀí¾ä±ú */
-	ACL_ASTREAM *client;			/* À´×ÔÓÚ¿Í»§¶ËµÄÁ¬½ÓÁ÷ */
-	ACL_ASTREAM *server;			/* Á¬½ÓÖÁ·şÎñ¶ËµÄÁ¬½ÓÁ÷ */
+	SERVICE *service;			/* æŒ‡å‘å¼‚æ­¥ä»£ç†å¥æŸ„ */
+	ACL_ASTREAM *client;			/* æ¥è‡ªäºå®¢æˆ·ç«¯çš„è¿æ¥æµ */
+	ACL_ASTREAM *server;			/* è¿æ¥è‡³æœåŠ¡ç«¯çš„è¿æ¥æµ */
 
-	int   nrefer;				/* ÒıÓÃ¼ÆÊı */
+	int   nrefer;				/* å¼•ç”¨è®¡æ•° */
 
-	ACL_RING dns_entry;			/* DNS²éÑ¯±íµÄÄ³¸öÁ´½áµã */
-	char  domain_key[256];			/* ÓòÃû(Ğ¡Ğ´) */
-	char  domain_addr[64];			/* ÓòÃûËù¶ÔÓ¦µÄÒ»¸öIPµØÖ· */
+	ACL_RING dns_entry;			/* DNSæŸ¥è¯¢è¡¨çš„æŸä¸ªé“¾ç»“ç‚¹ */
+	char  domain_key[256];			/* åŸŸå(å°å†™) */
+	char  domain_addr[64];			/* åŸŸåæ‰€å¯¹åº”çš„ä¸€ä¸ªIPåœ°å€ */
 
-	DNS_CTX dns_ctx;			/* Óë·şÎñÆ÷ÓòÃûÏà¹ØµÄµØÖ·ĞÅÏ¢ */
-	int   ip_idx;				/* µ±Ç°ËùÒıÓÃµÄIPµØÖ·µÄË÷Òı */
-	int   ip_ntry;				/* ÖØÊÔ IP ´ÎÊı */
-	int   server_port;			/* ·şÎñ¶ËPORT */
-	char  client_ip[32];			/* ¿Í»§¶ËIPµØÖ· */
-	int   client_port;			/* ·şÎñ¶ËPORT */
+	DNS_CTX dns_ctx;			/* ä¸æœåŠ¡å™¨åŸŸåç›¸å…³çš„åœ°å€ä¿¡æ¯ */
+	int   ip_idx;				/* å½“å‰æ‰€å¼•ç”¨çš„IPåœ°å€çš„ç´¢å¼• */
+	int   ip_ntry;				/* é‡è¯• IP æ¬¡æ•° */
+	int   server_port;			/* æœåŠ¡ç«¯PORT */
+	char  client_ip[32];			/* å®¢æˆ·ç«¯IPåœ°å€ */
+	int   client_port;			/* æœåŠ¡ç«¯PORT */
 	const char *dns_errmsg;
 
 	struct {
-		time_t begin;			/* »á»°¿ªÊ¼Ê±¼ä½Ø */
-		time_t stamp;			/* ¶¯Ì¬¸Ä±äµÄÊ±¼ä½Ø */
+		time_t begin;			/* ä¼šè¯å¼€å§‹æ—¶é—´æˆª */
+		time_t stamp;			/* åŠ¨æ€æ”¹å˜çš„æ—¶é—´æˆª */
 
-		time_t dns_lookup;		/* DNS²éÑ¯Ê±¼ä(ÒÔÃëÎªµ¥Î») */
-		time_t connect;			/* Á¬½Ó·şÎñÆ÷µÄÊ±¼ä(ÒÔÃëÎªµ¥Î») */
+		time_t dns_lookup;		/* DNSæŸ¥è¯¢æ—¶é—´(ä»¥ç§’ä¸ºå•ä½) */
+		time_t connect;			/* è¿æ¥æœåŠ¡å™¨çš„æ—¶é—´(ä»¥ç§’ä¸ºå•ä½) */
 	} tm;
 
 	int   flag_has_replied;
 
-	int   flag_conn_reuse;			/* ÖØ¸´ÀûÓÃÁ¬½Ó³ØÖĞµÄÁ¬½Ó */
-	int   nretry_on_error;			/* ³ö´íÖØÊÔ´ÎÊı */
+	int   flag_conn_reuse;			/* é‡å¤åˆ©ç”¨è¿æ¥æ± ä¸­çš„è¿æ¥ */
+	int   nretry_on_error;			/* å‡ºé”™é‡è¯•æ¬¡æ•° */
 #define MAX_RETRIED	10
 
 	void (*free_fn)(CLIENT_ENTRY*);

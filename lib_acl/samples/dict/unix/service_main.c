@@ -4,7 +4,7 @@
 #include "http_service.h"
 #include "service_main.h"
 
-/* ÅäÖÃÎÄ¼şÏî */
+/* é…ç½®æ–‡ä»¶é¡¹ */
 char *var_cfg_mysql_dbaddr;
 char *var_cfg_mysql_dbuser;
 char *var_cfg_mysql_dbpass;
@@ -60,7 +60,7 @@ ACL_CONFIG_STR_TABLE service_conf_str_tab[] = {
 	{ 0, 0, 0 },
 };
 
-/* ³õÊ¼»¯º¯Êı */
+/* åˆå§‹åŒ–å‡½æ•° */
 void service_init(void *init_ctx)
 {
 	acl_init();
@@ -72,7 +72,7 @@ void service_exit(void *exit_ctx)
 	http_service_exit(exit_ctx);
 }
 
-/* Ğ­Òé´¦Àíº¯ÊıÈë¿Ú */
+/* åè®®å¤„ç†å‡½æ•°å…¥å£ */
 int service_main(ACL_VSTREAM *client, void *run_ctx acl_unused)
 {
 #ifdef	TEST_ECHO

@@ -11,7 +11,7 @@
 namespace acl {
 
 /**
- * ������ͬʱ��صĶ�ʱ����ļ���
+ * 具有相同时间截的定时任务的集合
  */
 template <typename T>
 class trigger_item : public noncopyable
@@ -23,7 +23,7 @@ public:
 	~trigger_item(void) {}
 
 	/**
-	 * ����һ����ʱ����
+	 * 添加一个定时任务
 	 * @pararm o {T*}
 	 */
 	void add(T* o)
@@ -32,10 +32,10 @@ public:
 	}
 
 	/**
-	 * ɾ��һ��������ͬʱ��صĶ�ʱ����
+	 * 删除一个具有相同时间截的定时任务
 	 * @pararm o {T*}
-	 * @return {int} ����ֵ >= 0 ��ʾʣ��ľ�����ͬʱ��صĶ�ʱ��������
-	 *  ���� -1 ��ʾ�ö�ʱ���񲻴���
+	 * @return {int} 返回值 >= 0 表示剩余的具有相同时间截的定时任务数，
+	 *  返回 -1 表示该定时任务不存在
 	 */
 	int del(T* o)
 	{
@@ -51,7 +51,7 @@ public:
 	}
 
 	/**
-	 * ��ȡ������ͬʱ��ص����ж�ʱ���񼯺�
+	 * 获取具有相同时间截的所有定时任务集合
 	 * @return {std::vector<T*>&}
 	 */
 	std::vector<T*>& get_objs(void)
@@ -65,16 +65,16 @@ private:
 };
 
 /**
- * ��ʱ���񴥷���������ͨ���������Ӷ�ʱ���񣬸���Ὣ���ڵ�������д���
- * ÿ����ʱ������� T ��Ҫʵ�����·������Ա����ɸô���������
+ * 定时任务触发管理器，通过本类添加定时任务，该类会将到期的任务进行触发
+ * 每个定时任务对象 T 需要实现以下方法，以便于由该触发器触发
  *
- * bool on_trigger(void);		// ��ʱʱ�䵽��ʱ�Ļص�����������ֵ��ʾ
- * 					// �Ƿ���Ҫ�ٴδ����ö�ʱ����
- * int get_ttl(void) const;		// ��ʱ���񵽴�ʱ��ʱ���������룩
- * void set_key(long long key);		// ������������ö�ʱ��������ļ�
- * long long get_key(void) const;	// ����� set_key ���õļ�
+ * bool on_trigger(void);		// 定时时间到期时的回调方法，返回值表示
+ * 					// 是否需要再次触发该定时任务
+ * int get_ttl(void) const;		// 定时任务到达时的时间间隔（毫秒）
+ * void set_key(long long key);		// 触发器设置与该定时任务关联的键
+ * long long get_key(void) const;	// 获得由 set_key 设置的键
  *
- * ��һ�� T ��ʵ�����������£�
+ * 如一个 T 的实例类声明如下：
  * class mytask
  * {
  * public:
@@ -120,7 +120,7 @@ public:
 	~timer_trigger(void) {}
 
 	/**
-	 * ����һ���������
+	 * 添加一个任务对象
 	 * @pararm o {T*}
 	 */
 	void add(T* o)
@@ -140,9 +140,9 @@ public:
 	}
 
 	/**
-	 * ɾ��һ����������ڲ����� o->get_key() ������ø��������ļ�
-	 * @pararm o {T*} ָ������ɾ�����������
-	 * @return {int} >= 0 ʱ��ʾʣ����������-1 ��ʾ��������󲻴���
+	 * 删除一个任务对象，内部调用 o->get_key() 方法获得该任务对象的键
+	 * @pararm o {T*} 指定将被删除的任务对象
+	 * @return {int} >= 0 时表示剩余的任务对象，-1 表示该任务对象不存在
 	 */
 	int del(T* o)
 	{
@@ -159,9 +159,9 @@ public:
 	}
 
 	/**
-	 * �������е��ڵĶ�ʱ����
-	 * @return {long long} ������һ�����������Ķ�ʱ�����ʱ��أ����� -1
-	 *  ��ʾû�ж�ʱ����
+	 * 触发所有到期的定时任务
+	 * @return {long long} 返回下一个将被触发的定时任务的时间截，返回 -1
+	 *  表示没有定时任务
 	 */
 	long long trigger(void)
 	{
@@ -193,7 +193,7 @@ private:
 	trigger_items_t items_;
 
 	/**
-	 * ����������ͬ��ʱʱ��ص���������
+	 * 触发具有相同定时时间截的所有任务
 	 * @pararm item {trigger_item<T>*}
 	 */
 	void trigger(trigger_item<T>* item)
@@ -222,23 +222,23 @@ private:
 };
 
 /**
- * ��ʱ�������̣߳����̴߳� mbox �л�ö�ʱ���񣬲����붨ʱ���񴥷����У�Ȼ��
- * ��ʱ�Ӵ���������ȡ���ڵ����񲢴���
+ * 定时器管理线程，该线程从 mbox 中获得定时任务，并加入定时任务触发器中，然后
+ * 定时从触发器中提取到期的任务并触发
  */
 template <typename T>
 class thread_trigger : public thread
 {
 public:
 	thread_trigger(void)
-	: delay_(100)  // ��ʼ��ʱ�ĳ�ʱ�ȴ�ʱ�䣨���룩
-	, stop_(false) // �Ƿ�ֹͣ�߳�
+	: delay_(100)  // 初始化时的超时等待时间（毫秒）
+	, stop_(false) // 是否停止线程
 	{
 	}
 
 	virtual ~thread_trigger(void) {}
 
 	/**
-	 * ����һ����ʱ�������
+	 * 添加一个定时任务对象
 	 * @pararm o {T*}
 	 */
 	void add(T* o)
@@ -247,7 +247,7 @@ public:
 	}
 
 	/**
-	 * ����Ҫɾ���Ķ�ʱ���������ʱ�����У�Ȼ��Ӷ�ʱ����ɾ��֮
+	 * 添加要删除的定时任务对象到临时队列中，然后从定时器中删除之
 	 * @pararm o {T*}
 	 */
 	void del(T* o)

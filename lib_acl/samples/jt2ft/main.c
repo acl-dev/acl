@@ -6,7 +6,7 @@
 static void test(void)
 {
 	ACL_FILE *fp = acl_fopen("ft.txt", "w+");
-	const char *jt = "³¡´¡·¡¾¡À¡Ã¡Å¡É¡abcdefg0123456";
+	const char *jt = "Â³Â¡Â´Â¡Â·Â¡Â¾Â¡Ã€Â¡ÃƒÂ¡Ã…Â¡Ã‰Â¡abcdefg0123456";
 	char  buf[256], buf2[256];
 	unsigned short *ptr;
 

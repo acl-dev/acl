@@ -1,4 +1,4 @@
-// mime.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// mime.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -24,7 +24,7 @@ using namespace acl;
 
 static void mime_test3(acl::mime& mime, const char* path, int count)
 {
-	// ÒÔÏÂ½ö½âÎöÓÊ¼şÍ·²¿·Ö
+	// ä»¥ä¸‹ä»…è§£æé‚®ä»¶å¤´éƒ¨åˆ†
 
 	acl::string buf;
 
@@ -37,9 +37,9 @@ static void mime_test3(acl::mime& mime, const char* path, int count)
 	char  info[256];
 	for (int i = 0; i < count; i++)
 	{
-		// ¿ªÊ¼ÓÊ¼ş½âÎö¹ı³Ì
+		// å¼€å§‹é‚®ä»¶è§£æè¿‡ç¨‹
 		mime.update(buf.c_str(), buf.length());
-		// ±ØĞëµ÷ÓÃ update_end
+		// å¿…é¡»è°ƒç”¨ update_end
 		mime.update_end();
 		mime.reset();
 

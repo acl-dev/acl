@@ -11,11 +11,11 @@ typedef enum
 	STATUS_T_DAT,
 } status_t;
 
-// Êı¾İÍ·
+// æ•°æ®å¤´
 struct DAT_HDR
 {
-	int  len;		// Êı¾İÌå³¤¶È
-	char cmd[64];		// ÃüÁî×Ö
+	int  len;		// æ•°æ®ä½“é•¿åº¦
+	char cmd[64];		// å‘½ä»¤å­—
 };
 
 class mythread : public acl::thread
@@ -44,7 +44,7 @@ protected:
 	{
 		acl::socket_stream conn;
 
-		// Á¬½Ó·şÎñÆ÷
+		// è¿æ¥æœåŠ¡å™¨
 		if (!conn.open(addr_.c_str(), __timeout, __timeout)) {
 			printf("connect %s error\r\n", addr_.c_str());
 			return NULL;
@@ -66,13 +66,13 @@ private:
 		req_hdr.len = htonl(length_);
 		ACL_SAFE_STRNCPY(req_hdr.cmd, "SEND", sizeof(req_hdr.cmd));
 
-		// ÏÈĞ´Êı¾İÍ·
+		// å…ˆå†™æ•°æ®å¤´
 		if (conn.write(&req_hdr, sizeof(req_hdr)) == -1) {
 			printf("write hdr to server failed\r\n");
 			return false;
 		}
 
-		// ÔÙĞ´Êı¾İÌå
+		// å†å†™æ•°æ®ä½“
 		if (conn.write(req_dat_, length_) == -1) {
 			printf("write dat to server failed\r\n");
 			return false;
@@ -80,27 +80,27 @@ private:
 
 		//////////////////////////////////////////////////////////////
 
-		// ÏÈ¶ÁÏìÓ¦Í·
+		// å…ˆè¯»å“åº”å¤´
 		DAT_HDR res;
 		if (conn.read(&res, sizeof(DAT_HDR)) == -1) {
 			printf("read DAT_HDR error\r\n");
 			return false;
 		}
 
-		// ½«ÏìÓ¦ÌåÊı¾İ³¤¶È×ªÎªÖ÷»ú×Ö½ÚĞò
+		// å°†å“åº”ä½“æ•°æ®é•¿åº¦è½¬ä¸ºä¸»æœºå­—èŠ‚åº
 		res.len = ntohl(res.len);
 		if (res.len <= 0) {
 			printf("invalid length: %d\r\n", res.len);
 			return false;
 		}
 
-		// ¼ì²âÊÇ·ñĞèÒªÖØĞÂ·ÖÅä¶ÁÏìÓ¦Êı¾İµÄÄÚ´æ
+		// æ£€æµ‹æ˜¯å¦éœ€è¦é‡æ–°åˆ†é…è¯»å“åº”æ•°æ®çš„å†…å­˜
 		if (res.len + 1 >= res_max_) {
 			res_max_ = res.len + 1;
 			res_dat_ = (char*) realloc(res_dat_, res_max_);
 		}
 
-		// ÔÙ¶ÁÏìÓ¦Ìå
+		// å†è¯»å“åº”ä½“
 		if (conn.read(res_dat_, res.len) == -1) {
 			printf("read data error, len: %d\r\n", res.len);
 			return false;

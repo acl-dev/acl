@@ -120,12 +120,12 @@ int notify(ACL_CACHE *smtp_notify_cache, ACL_CACHE *sms_notify_cache, const char
 			*p++ = 0;
 		to_mails->push_back(to_mails, to);
 
-		/* 简单地判断是否是手机号 */
+		/* 绠�鍗曞湴鍒ゆ柇鏄惁鏄墜鏈哄彿 */
 		if (p && strlen(p) == 11)
 			to_phones->push_back(to_phones, p);
 	}
 
-	/* 邮件通知 */
+	/* 閭欢閫氱煡 */
 	if (can_notify(smtp_notify_cache, proc, data))
 		(void) smtp_notify(proc, to_mails, pid,
 			info == NULL ? "program exception!" : info);
@@ -133,7 +133,7 @@ int notify(ACL_CACHE *smtp_notify_cache, ACL_CACHE *sms_notify_cache, const char
 		acl_msg_info("%s(%d): data(%s) not be send to smtp!",
 			__FUNCTION__, __LINE__, data);
 
-	/* 手机短信通知 */
+	/* 鎵嬫満鐭俊閫氱煡 */
 	if (can_notify_sms(sms_notify_cache, proc, data))
 		(void) sms_notify(proc, to_phones, pid,
 			info == NULL ? "program exception!" : info);

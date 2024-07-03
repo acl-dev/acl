@@ -3,7 +3,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_ssl_path;
 char *var_cfg_crt_file;
@@ -67,12 +67,12 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 		return hook;
 	}
 
-	// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ĞèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
-	// Á¬½ÓÁ÷¶ÔÏóÖĞ£¬¼´ÓÃ ssl io Ìæ»» stream ÖĞÄ¬ÈÏµÄµ×²ã IO ¹ı³Ì
+	// å¯¹äºä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
+	// è¿æ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
 
 	out_.puts("begin setup ssl hook...");
 
-	// ²ÉÓÃ×èÈû SSL ÎÕÊÖ·½Ê½
+	// é‡‡ç”¨é˜»å¡ SSL æ¡æ‰‹æ–¹å¼
 	acl::sslbase_io* ssl = conf.create(false);
 	if (conn.setup_hook(ssl) == ssl) {
 		logger_error("setup_hook error!");
@@ -174,7 +174,7 @@ void master_service::create_addrs_map()
 		return;
 	}
 
-	// Êı¾İ¸ñÊ½£ºdomain11:port11|domain12:port12, ...
+	// æ•°æ®æ ¼å¼ï¼šdomain11:port11|domain12:port12, ...
 	acl::string buf(var_cfg_addrs_map);
 	std::vector<acl::string>& addrs = buf.split2(" \t,;");
 	for (std::vector<acl::string>::iterator it = addrs.begin();
@@ -237,7 +237,7 @@ void master_service::proc_on_init()
 		return;
 	}
 
-	// ¼ÓÔØ·şÎñ¶Ë SSL Ö¤Êé
+	// åŠ è½½æœåŠ¡ç«¯ SSL è¯ä¹¦
 
 	if (use_mbedtls) {
 		server_ssl_conf_ = new acl::mbedtls_conf(true);
@@ -247,7 +247,7 @@ void master_service::proc_on_init()
 		return;
 	}
 
-	// ÔÊĞí·şÎñ¶ËµÄ SSL »á»°»º´æ¹¦ÄÜ
+	// å…è®¸æœåŠ¡ç«¯çš„ SSL ä¼šè¯ç¼“å­˜åŠŸèƒ½
 	server_ssl_conf_->enable_cache(var_cfg_session_cache ? true : false);
 
 	if (use_mbedtls) {
@@ -259,7 +259,7 @@ void master_service::proc_on_init()
 			return;
 		}
 	} else {
-		// Ìí¼Ó±¾µØ·şÎñµÄÖ¤Êé
+		// æ·»åŠ æœ¬åœ°æœåŠ¡çš„è¯ä¹¦
 		if (!server_ssl_conf_->add_cert(var_cfg_crt_file)) {
 			logger_error("add cert failed, crt: %s, key: %s",
 				var_cfg_crt_file, var_cfg_key_file);
@@ -267,7 +267,7 @@ void master_service::proc_on_init()
 			server_ssl_conf_ = NULL;
 			return;
 		}
-		// Ìí¼Ó±¾µØ·şÎñÃÜÔ¿
+		// æ·»åŠ æœ¬åœ°æœåŠ¡å¯†é’¥
 		if (!server_ssl_conf_->set_key(var_cfg_key_file)) {
 			logger_error("add key failed, crt: %s, key: %s",
 				var_cfg_crt_file, var_cfg_key_file);

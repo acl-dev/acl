@@ -100,10 +100,10 @@ bool client_servlet::doUnknown(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=utf-8");
-	// ·¢ËÍ http ÏìÓ¦Í·
+	// å‘é€ http å“åº”å¤´
 	if (res.sendHeader() == false)
 		return false;
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf("<root error='unkown request method' />\r\n");
 	(void) res.getOutputStream().write(buf);
 	return false;
@@ -119,14 +119,14 @@ bool client_servlet::get_servers()
 {
 	servers_.clear();
 
-	// ÏÈ´ÓÅäÖÃÖĞÈ¡µÃËùÓĞĞèÒª²éÑ¯µÄµØÖ·
+	// å…ˆä»é…ç½®ä¸­å–å¾—æ‰€æœ‰éœ€è¦æŸ¥è¯¢çš„åœ°å€
 	const std::vector<acl::string>& addrs =
 		server_manager::get_instance().get_addrs();
 	std::vector<acl::string>::const_iterator cit = addrs.begin();
 	for (; cit != addrs.end(); ++cit)
 		servers_.push_back(*cit);
 
-	// ÔÙ¸ù¾İÓòÃû½øĞĞ²éÑ¯
+	// å†æ ¹æ®åŸŸåè¿›è¡ŒæŸ¥è¯¢
 	lookup_dns();
 
 	if (servers_.empty())
@@ -174,7 +174,7 @@ bool client_servlet::doGet(acl::HttpServletRequest& req,
 	return doPost(req, res);
 }
 
-// Ê¹ÓÃ POP ÕË»§½øĞĞÉí·İÈÏÖ¤
+// ä½¿ç”¨ POP è´¦æˆ·è¿›è¡Œèº«ä»½è®¤è¯
 bool client_servlet::doLogin(const char* user, const char* pass)
 {
 	acl::socket_stream conn;
@@ -255,8 +255,8 @@ bool client_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
 	bool keep_alive = req.isKeepAlive();
-	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(keep_alive);		// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
+	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(keep_alive);		// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
 
 	const char* path = req.getPathInfo();
 	if (path == NULL || *path == 0)
@@ -272,13 +272,13 @@ bool client_servlet::doPost(acl::HttpServletRequest& req,
 		return reply_status(req, res, 404, "not found: %s", path);
 	}
 
-	// Èç¹ûÅäÖÃÖĞ²»ĞèÒªÉí·İÑéÖ¤£¬ÔòÖ±½Ó½øĞĞ´¦Àí
+	// å¦‚æœé…ç½®ä¸­ä¸éœ€è¦èº«ä»½éªŒè¯ï¼Œåˆ™ç›´æ¥è¿›è¡Œå¤„ç†
 	if (!var_cfg_auth_enable)
 		return doAction(req, res);
 
-	// ÏÂÃæ¿ªÊ¼ÓÃ»§Éí·İÈÏÖ¤¹ı³Ì
+	// ä¸‹é¢å¼€å§‹ç”¨æˆ·èº«ä»½è®¤è¯è¿‡ç¨‹
 
-	// ÏÈ¼ì²é session ÈÏÖ¤ĞÅÏ¢ÊÇ·ñ´æÔÚ
+	// å…ˆæ£€æŸ¥ session è®¤è¯ä¿¡æ¯æ˜¯å¦å­˜åœ¨
 	const char* user = req.getSession().getAttribute(var_cfg_session_key);
 	if (user && *user)
 	{
@@ -300,7 +300,7 @@ bool client_servlet::doPost(acl::HttpServletRequest& req,
 			ptr ? ptr : "null");
 	}
 
-	// ÔÙ¼ì²éÊäÈëµÄÓÊÏäÕËºÅ/ÃÜÂë²¢Í¨¹ı POP ·şÎñ½øĞĞÉí·İÑéÖ¤
+	// å†æ£€æŸ¥è¾“å…¥çš„é‚®ç®±è´¦å·/å¯†ç å¹¶é€šè¿‡ POP æœåŠ¡è¿›è¡Œèº«ä»½éªŒè¯
 
 	user = req.getParameter("user");
 	if (user == NULL || *user == 0)
@@ -317,7 +317,7 @@ bool client_servlet::doPost(acl::HttpServletRequest& req,
 		return false;
 	}
 
-	// ÆôÓÃ POP Éí·İÑéÖ¤¹ı³Ì
+	// å¯ç”¨ POP èº«ä»½éªŒè¯è¿‡ç¨‹
 	if (doLogin(user, pass) == false)
 	{
 		logger_error("login error, user: %s, pass: %s", user, pass);
@@ -326,7 +326,7 @@ bool client_servlet::doPost(acl::HttpServletRequest& req,
 
 	logger("user: %s pop login", user);
 
-	// ÈÏÖ¤Í¨¹ı£¬Ôò¼ÇÂ¼ session ÈÏÖ¤ĞÅÏ¢
+	// è®¤è¯é€šè¿‡ï¼Œåˆ™è®°å½• session è®¤è¯ä¿¡æ¯
 	req.getSession().setMaxAge(var_cfg_session_ttl);
 
 	if (req.getSession().setAttribute(var_cfg_session_key, user) == false)
@@ -345,12 +345,12 @@ bool client_servlet::doPost(acl::HttpServletRequest& req,
 bool client_servlet::doAction(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// ÉèÖÃ¿é´«Êä·½Ê½£¬Ôò¸øä¯ÀÀÆ÷ÒÔ¿é´«Êä·½Ê½»Ø¸´Êı¾İ
+	// è®¾ç½®å—ä¼ è¾“æ–¹å¼ï¼Œåˆ™ç»™æµè§ˆå™¨ä»¥å—ä¼ è¾“æ–¹å¼å›å¤æ•°æ®
 	res.setChunkedTransferEncoding(true)
 		.setContentType("text/xml; charset=utf-8")
 		.setKeepAlive(req.isKeepAlive());
 
-	// ÏÈĞ´Ò³Ãæ¿ªÊ¼²¿·Ö
+	// å…ˆå†™é¡µé¢å¼€å§‹éƒ¨åˆ†
 	if (res.format("<?xml version=\"1.0\"?><servers>") < 0)
 	{
 		logger_error("write head failed!");
@@ -367,14 +367,14 @@ bool client_servlet::doAction(acl::HttpServletRequest& req,
 	if (!ok)
 		return false;
 
-	// Êä³ö XML ½áÎ²±ê¼Ç
+	// è¾“å‡º XML ç»“å°¾æ ‡è®°
 	if (res.write((acl::string)"</servers>") == false)
 	{
 		logger_error("write html end failed");
 		return false;
 	}
 
-	// HTTP ¿é´«ÊäÄ£Ê½ÏÂ±ØĞë×îºóÒÔ²ÎÊıÎª¿Õ±íÊ¾´«Êä¹ı³Ì½áÊø
+	// HTTP å—ä¼ è¾“æ¨¡å¼ä¸‹å¿…é¡»æœ€åä»¥å‚æ•°ä¸ºç©ºè¡¨ç¤ºä¼ è¾“è¿‡ç¨‹ç»“æŸ
 	if (res.write(NULL, 0) == false)
 	{
 		logger_error("write chunked end failed");
@@ -399,32 +399,32 @@ bool client_servlet::doResponse(acl::HttpServletRequest&,
 bool client_servlet::doRequest(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// Æô¶¯¶àÏß³Ì£¬ÏòËùÓĞÈÕÖ¾²éÑ¯·şÎñÆ÷²éÑ¯ÈÕÖ¾ÄÚÈİ
+	// å¯åŠ¨å¤šçº¿ç¨‹ï¼Œå‘æ‰€æœ‰æ—¥å¿—æŸ¥è¯¢æœåŠ¡å™¨æŸ¥è¯¢æ—¥å¿—å†…å®¹
 
 	if (get_servers() == false)
 		return reply(req, res, "get all servers's addrs failed!");
 
-	// ¿ªÊ¼Æô¶¯Ïß³Ì³Ø£¬ÓÉ×ÓÏß³ÌÁ¬½ÓËùÓĞµÄ TCP ·Ö·¢Æ÷»ñµÃËùÓĞ·şÎñÆ÷µÄ×´Ì¬ĞÅÏ¢
+	// å¼€å§‹å¯åŠ¨çº¿ç¨‹æ± ï¼Œç”±å­çº¿ç¨‹è¿æ¥æ‰€æœ‰çš„ TCP åˆ†å‘å™¨è·å¾—æ‰€æœ‰æœåŠ¡å™¨çš„çŠ¶æ€ä¿¡æ¯
 	std::vector<collect_client*> collecters;
 	message_manager* manager = new message_manager;
 	std::vector<acl::string>::const_iterator cit = servers_.begin();
 	int  nthreads = 0;
 	for (; cit != servers_.end(); ++cit)
 	{
-		// ´´½¨µ¥¶ÀµÄÏß³Ì½øĞĞ´¦Àí
+		// åˆ›å»ºå•ç‹¬çš„çº¿ç¨‹è¿›è¡Œå¤„ç†
 		collect_client* collect = new collect_client(*manager,
 			(*cit).c_str());
 		collect->set_detachable(false);
 		collecters.push_back(collect);
 		nthreads++;
-		// Æô¶¯×ÓÏß³Ì´¦Àí¹ı³Ì
+		// å¯åŠ¨å­çº¿ç¨‹å¤„ç†è¿‡ç¨‹
 		collect->start();
 	}
 
-	// µÈ´ıËùÓĞ×ÓÏß³ÌµÄ²éÑ¯½á¹û
+	// ç­‰å¾…æ‰€æœ‰å­çº¿ç¨‹çš„æŸ¥è¯¢ç»“æœ
 	bool ok = wait_result(res, *manager, nthreads);
 
-	// ±éÀú²¢É¾³ıËùÓĞµÄ×ÓÏß³ÌÈÎÎñ¶ÔÏó
+	// éå†å¹¶åˆ é™¤æ‰€æœ‰çš„å­çº¿ç¨‹ä»»åŠ¡å¯¹è±¡
 	std::vector<collect_client*>::iterator it = collecters.begin();
 	for (; it != collecters.end(); ++it)
 	{
@@ -442,10 +442,10 @@ bool client_servlet::wait_result(acl::HttpServletResponse& res,
 	bool disconnected = false;
 	int  n = 0;
 
-	// Òì²½½ÓÊÕËùÓĞ×ÓÏß³ÌµÄ²éÑ¯½á¹ûÊı¾İ
+	// å¼‚æ­¥æ¥æ”¶æ‰€æœ‰å­çº¿ç¨‹çš„æŸ¥è¯¢ç»“æœæ•°æ®
 	while (n < nthreads)
 	{
-		// ´ÓÏûÏ¢¶ÓÁĞÖĞµ¯³ö×ÓÏß³ÌÍê³ÉµÄÈÎÎñ
+		// ä»æ¶ˆæ¯é˜Ÿåˆ—ä¸­å¼¹å‡ºå­çº¿ç¨‹å®Œæˆçš„ä»»åŠ¡
 		message* msg = manager.pop();
 		if (msg == NULL)
 		{
@@ -456,16 +456,16 @@ bool client_servlet::wait_result(acl::HttpServletResponse& res,
 
 		if (!disconnected)
 		{
-			// Ïòä¯ÀÀÆ÷Êä³öÄ³¸ö×ÓÏß³ÌµÄ²éÑ¯½á¹û
+			// å‘æµè§ˆå™¨è¾“å‡ºæŸä¸ªå­çº¿ç¨‹çš„æŸ¥è¯¢ç»“æœ
 			if (reply(res, *msg) < 0)
 				disconnected = true;
 		}
 
-		// É¾³ı¶¯Ì¬·ÖÅäµÄÈÕÖ¾ÏûÏ¢¶ÔÏó
+		// åˆ é™¤åŠ¨æ€åˆ†é…çš„æ—¥å¿—æ¶ˆæ¯å¯¹è±¡
 		delete msg;
 	}
 
-	// µ±½á¹ûÊıÁ¿ÓëËùÆô¶¯µÄÏß³ÌÊıÁ¿ÏàµÈÊ±£¬ËµÃ÷²éÑ¯Íê±Ï
+	// å½“ç»“æœæ•°é‡ä¸æ‰€å¯åŠ¨çš„çº¿ç¨‹æ•°é‡ç›¸ç­‰æ—¶ï¼Œè¯´æ˜æŸ¥è¯¢å®Œæ¯•
 	logger("All threads over!");
 	return !disconnected;
 }

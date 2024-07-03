@@ -93,7 +93,7 @@ public:
 		}
 	}
 
-	// »ùÀà ipc_request »á×Ô¶¯µ÷ÓÃ´Ë»Øµ÷´¦ÀíÇëÇó¹ý³Ì
+	// åŸºç±» ipc_request ä¼šè‡ªåŠ¨è°ƒç”¨æ­¤å›žè°ƒå¤„ç†è¯·æ±‚è¿‡ç¨‹
 	// @override
 	void run(ipc_client* ipc)
 	{
@@ -117,24 +117,24 @@ public:
 
 			acl_assert(hdr_res_);
 
-			// Èç¹û·þÎñÆ÷·µ»ØµÄÊÇÖØ¶¨ÏòÐÅÏ¢£¬Ôò½øÐÐÖØ¶¨Ïò·ÃÎÊ
+			// å¦‚æžœæœåŠ¡å™¨è¿”å›žçš„æ˜¯é‡å®šå‘ä¿¡æ¯ï¼Œåˆ™è¿›è¡Œé‡å®šå‘è®¿é—®
 
 			if ((hdr_res_->reply_status != 301
 				&& hdr_res_->reply_status != 302)
 				|| nredirect_limit == 0) {
 
-				// ·¢ËÍÏìÓ¦Í·ÊÕµ½ÏûÏ¢¸øÖ÷Ïß³Ì
+				// å‘é€å“åº”å¤´æ”¶åˆ°æ¶ˆæ¯ç»™ä¸»çº¿ç¨‹
 				report(ipc, HTTP_MSG_HDR);
 
-				// Á¬Ðø½ÓÊÕÏìÓ¦Ìå²¢·¢ÏìÓ¦ÌåÊÕµ½ÏûÏ¢¸øÖ÷Ïß³Ì
+				// è¿žç»­æŽ¥æ”¶å“åº”ä½“å¹¶å‘å“åº”ä½“æ”¶åˆ°æ¶ˆæ¯ç»™ä¸»çº¿ç¨‹
 				read_respond_body(ipc);
 				break;
 			}
 
-			// ¿ªÊ¼ÖØ¶¨Ïò¹ý³Ì
+			// å¼€å§‹é‡å®šå‘è¿‡ç¨‹
 
 			nredirect++;
-			// ·ÀÖ¹ÖØ¶¨Ïò´ÎÊýÌ«¶à¶øÔì³ÉÁËÑ­»·
+			// é˜²æ­¢é‡å®šå‘æ¬¡æ•°å¤ªå¤šè€Œé€ æˆäº†å¾ªçŽ¯
 			if (nredirect > nredirect_limit) {
 				report_error(ipc, HTTP_ERR_REDIRECT_MAX);
 				break;
@@ -163,8 +163,8 @@ public:
 	}
 
 #ifdef ACL_WINDOWS
-	// »ùÀà»á×Ô¶¯µ÷ÓÃ´Ë»Øµ÷´¦ÀíÇëÇó¹ý³Ì
-	// »ùÀàÐé½Ó¿Ú£¬Ê¹×ÓÏß³Ì¿ÉÒÔÔÚÖ´ÐÐÍêÈÎÎñºóÏòÖ÷Ïß³Ì·¢ËÍ ACL_WINDOWS ´°¿ÚÏûÏ¢
+	// åŸºç±»ä¼šè‡ªåŠ¨è°ƒç”¨æ­¤å›žè°ƒå¤„ç†è¯·æ±‚è¿‡ç¨‹
+	// åŸºç±»è™šæŽ¥å£ï¼Œä½¿å­çº¿ç¨‹å¯ä»¥åœ¨æ‰§è¡Œå®Œä»»åŠ¡åŽå‘ä¸»çº¿ç¨‹å‘é€ ACL_WINDOWS çª—å£æ¶ˆæ¯
 	// @override
 	void run(HWND hWnd)
 	{
@@ -188,24 +188,24 @@ public:
 
 			acl_assert(hdr_res_);
 
-			// Èç¹û·þÎñÆ÷·µ»ØµÄÊÇÖØ¶¨ÏòÐÅÏ¢£¬Ôò½øÐÐÖØ¶¨Ïò·ÃÎÊ
+			// å¦‚æžœæœåŠ¡å™¨è¿”å›žçš„æ˜¯é‡å®šå‘ä¿¡æ¯ï¼Œåˆ™è¿›è¡Œé‡å®šå‘è®¿é—®
 
 			if ((hdr_res_->reply_status != 301
 				&& hdr_res_->reply_status != 302)
 				|| nredirect_limit == 0) {
 
-				// ·¢ËÍÏìÓ¦Í·ÊÕµ½ÏûÏ¢¸øÖ÷Ïß³Ì
+				// å‘é€å“åº”å¤´æ”¶åˆ°æ¶ˆæ¯ç»™ä¸»çº¿ç¨‹
 				report(hWnd, HTTP_MSG_HDR);
 
-				// Á¬Ðø½ÓÊÕÏìÓ¦Ìå²¢·¢ÏìÓ¦ÌåÊÕµ½ÏûÏ¢¸øÖ÷Ïß³Ì
+				// è¿žç»­æŽ¥æ”¶å“åº”ä½“å¹¶å‘å“åº”ä½“æ”¶åˆ°æ¶ˆæ¯ç»™ä¸»çº¿ç¨‹
 				read_respond_body(hWnd);
 				break;
 			}
 
-			// ¿ªÊ¼ÖØ¶¨Ïò¹ý³Ì
+			// å¼€å§‹é‡å®šå‘è¿‡ç¨‹
 
 			nredirect++;
-			// ·ÀÖ¹ÖØ¶¨Ïò´ÎÊýÌ«¶à¶øÔì³ÉÁËÑ­»·
+			// é˜²æ­¢é‡å®šå‘æ¬¡æ•°å¤ªå¤šè€Œé€ æˆäº†å¾ªçŽ¯
 			if (nredirect > nredirect_limit) {
 				report_error(hWnd, HTTP_ERR_REDIRECT_MAX);
 				break;
@@ -265,7 +265,7 @@ private:
 		memcpy(data, &data_, sizeof(HTTP_IPC_DAT));
 		data->i_hdr_res = hdr_res_;
 		data->i_error = errnum;
-		// ÏòÖ÷Ïß³Ì·¢ËÍ½á¹û
+		// å‘ä¸»çº¿ç¨‹å‘é€ç»“æžœ
 		::PostMessage(hWnd, HTTP_MSG_ERR + WM_USER, 0, (LPARAM) data);
 	}
 
@@ -306,12 +306,12 @@ private:
 			return HTTP_ERR_REQ;
 		}
 
-		// Ð´ HTTP ÇëÇóÍ·
+		// å†™ HTTP è¯·æ±‚å¤´
 		if (!client_.write(hdr_req.c_str(), hdr_req.length())) {
 			return HTTP_ERR_SEND;
 		}
 
-		// Ñ­»·´ÓÇëÇó¶ÔÏóÖÐ»ñµÃÇëÇóÌåÊý¾Ý£¬²¢Ð´ HTTP ÇëÇóÌåÊý¾Ý
+		// å¾ªçŽ¯ä»Žè¯·æ±‚å¯¹è±¡ä¸­èŽ·å¾—è¯·æ±‚ä½“æ•°æ®ï¼Œå¹¶å†™ HTTP è¯·æ±‚ä½“æ•°æ®
 		while (true) {
 			const string* data = data_.callback->get_body();
 			if (data == NULL || data->empty()) {
@@ -355,7 +355,7 @@ private:
 	{
 		acl_assert(hdr_res_);
 
-		/* Èç¹û HTTP ÏìÓ¦Ã»ÓÐÊý¾ÝÌåÔò½öÊä³ö HTTP ÏìÓ¦Í·¼´¿É */
+		/* å¦‚æžœ HTTP å“åº”æ²¡æœ‰æ•°æ®ä½“åˆ™ä»…è¾“å‡º HTTP å“åº”å¤´å³å¯ */
 
 		if (hdr_res_->hdr.content_length == 0
 			|| (hdr_res_->hdr.content_length == -1
@@ -364,7 +364,7 @@ private:
 
 			data_.i_ptr  = NULL;
 			data_.i_dlen = 0;
-			// Èç¹ûÃ»ÓÐÊý¾ÝÌå£¬Ò²·¢ËÍÏûÏ¢Í¨Öªµ÷ÓÃÕßÊý¾Ý½áÊø
+			// å¦‚æžœæ²¡æœ‰æ•°æ®ä½“ï¼Œä¹Ÿå‘é€æ¶ˆæ¯é€šçŸ¥è°ƒç”¨è€…æ•°æ®ç»“æŸ
 			report(ipc, HTTP_MSG_DAT);
 			return;
 		}
@@ -407,7 +407,7 @@ private:
 	{
 		acl_assert(hdr_res_);
 
-		/* Èç¹û HTTP ÏìÓ¦Ã»ÓÐÊý¾ÝÌåÔò½öÊä³ö HTTP ÏìÓ¦Í·¼´¿É */
+		/* å¦‚æžœ HTTP å“åº”æ²¡æœ‰æ•°æ®ä½“åˆ™ä»…è¾“å‡º HTTP å“åº”å¤´å³å¯ */
 
 		if (hdr_res_->hdr.content_length == 0
 			|| (hdr_res_->hdr.content_length == -1
@@ -416,7 +416,7 @@ private:
 
 			data_.i_ptr = NULL;
 			data_.i_dlen = 0;
-			// Èç¹ûÃ»ÓÐÊý¾ÝÌå£¬Ò²·¢ËÍÏûÏ¢Í¨Öªµ÷ÓÃÕßÊý¾Ý½áÊø
+			// å¦‚æžœæ²¡æœ‰æ•°æ®ä½“ï¼Œä¹Ÿå‘é€æ¶ˆæ¯é€šçŸ¥è°ƒç”¨è€…æ•°æ®ç»“æŸ
 			report(hWnd, HTTP_MSG_DAT);
 			return;
 		}
@@ -464,8 +464,8 @@ private:
 		int   dlen_saved = dlen;
 		int   ret;
 
-		// ÒòÎª buf ÊÇ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔÓ¦¾¡Á¿ÈÃ buf ÌîÂú£¬
-		// ÕâÑù¿ÉÒÔ½ÚÊ¡ÄÚ´æ·ÖÅäµÄÏûºÄ
+		// å› ä¸º buf æ˜¯åŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥åº”å°½é‡è®© buf å¡«æ»¡ï¼Œ
+		// è¿™æ ·å¯ä»¥èŠ‚çœå†…å­˜åˆ†é…çš„æ¶ˆè€—
 
 		while (true) {
 			ret = (int) http_res_body_get_sync(res_, vstream_,
@@ -511,25 +511,25 @@ public:
 			if (dat->i_ptr && dat->i_dlen > 0) {
 				acl_myfree(dat->i_ptr);
 			} else {
-				// µ÷ÓÃÇëÇó¶ÔÏóµÄÏú»Ù¹ý³Ì
+				// è°ƒç”¨è¯·æ±‚å¯¹è±¡çš„é”€æ¯è¿‡ç¨‹
 				dat->callback->destroy();
 				if (dat->i_hdr_res) {
 					http_hdr_res_free(dat->i_hdr_res);
 				}
-				this->close();  // ×Ô¶¯´¥·¢Îö¹¹¹ý³Ì
+				this->close();  // è‡ªåŠ¨è§¦å‘æžæž„è¿‡ç¨‹
 			}
 			break;
 		case HTTP_MSG_ERR:
 			dat->callback->on_error(dat->i_error);
-			// µ÷ÓÃÇëÇó¶ÔÏóµÄÏú»Ù¹ý³Ì
+			// è°ƒç”¨è¯·æ±‚å¯¹è±¡çš„é”€æ¯è¿‡ç¨‹
 			dat->callback->destroy();
 			if (dat->i_hdr_res) {
 				http_hdr_res_free(dat->i_hdr_res);
 			}
-			this->close();  // ×Ô¶¯´¥·¢Îö¹¹¹ý³Ì
+			this->close();  // è‡ªåŠ¨è§¦å‘æžæž„è¿‡ç¨‹
 			break;
 		default:
-			// ³öÏÖÁËÒì³£ÏûÏ¢
+			// å‡ºçŽ°äº†å¼‚å¸¸æ¶ˆæ¯
 			logger_error("unknown ipc msg: %d", nMsg);
 			break;
 		}
@@ -591,7 +591,7 @@ void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam
 		if (dat->i_ptr && dat->i_dlen > 0) {
 			acl_myfree(dat->i_ptr);
 		} else {
-			// µ÷ÓÃÇëÇó¶ÔÏóµÄÏú»Ù¹ý³Ì
+			// è°ƒç”¨è¯·æ±‚å¯¹è±¡çš„é”€æ¯è¿‡ç¨‹
 			dat->callback->destroy();
 			if (dat->i_hdr_res) {
 				http_hdr_res_free(dat->i_hdr_res);
@@ -601,7 +601,7 @@ void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam
 		break;
 	case HTTP_MSG_ERR:
 		dat->callback->on_error(dat->i_error);
-		// µ÷ÓÃÇëÇó¶ÔÏóµÄÏú»Ù¹ý³Ì
+		// è°ƒç”¨è¯·æ±‚å¯¹è±¡çš„é”€æ¯è¿‡ç¨‹
 		dat->callback->destroy();
 		if (dat->i_hdr_res) {
 			http_hdr_res_free(dat->i_hdr_res);
@@ -609,7 +609,7 @@ void http_service::win32_proc(HWND hWnd, UINT nMsg, WPARAM wParam, LPARAM lParam
 		acl_myfree(dat);
 		break;
 	default:
-		// ³öÏÖÁËÒì³£ÏûÏ¢
+		// å‡ºçŽ°äº†å¼‚å¸¸æ¶ˆæ¯
 		logger_error("unknown ipc msg: %d", nMsg);
 		break;
 	}
@@ -622,13 +622,13 @@ void http_service::on_accept(aio_socket_stream* client)
 	ipc_client* ipc = NEW http_ipc(magic_);
 	ipc->open(client);
 
-	// Ìí¼ÓÏûÏ¢´¦Àí
+	// æ·»åŠ æ¶ˆæ¯å¤„ç†
 
 	ipc->append_message(HTTP_MSG_HDR);
 	ipc->append_message(HTTP_MSG_DAT);
 	ipc->append_message(HTTP_MSG_ERR);
 
-	// Òì²½µÈ´ýÏûÏ¢
+	// å¼‚æ­¥ç­‰å¾…æ¶ˆæ¯
 	ipc->wait();
 }
 
@@ -646,7 +646,7 @@ void http_service::on_close(void)
 void http_service::do_request(http_service_request* req)
 {
 	http_ipc_request* ipc_req = NEW http_ipc_request(req, nwait_);
-	// µ÷ÓÃ»ùÀà ipc_service ÇëÇó¹ý³Ì
+	// è°ƒç”¨åŸºç±» ipc_service è¯·æ±‚è¿‡ç¨‹
 	request(ipc_req);
 }
 

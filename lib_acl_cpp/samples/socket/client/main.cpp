@@ -21,14 +21,14 @@ int main(int argc, char* argv[])
 	else
 		printf("open %s ok\r\n", addr.c_str());
 
-	// Ì½²âÁ¬½ÓÊÇ·ñÕı³£
+	// æ¢æµ‹è¿æ¥æ˜¯å¦æ­£å¸¸
 	if (client.alive())
 		printf("first check: ok, status: %s\r\n", acl::last_serror());
 	else
 		printf("first check: disconnected, status: %s\r\n",
 			acl::last_serror());
 
-	// ¶Á·şÎñÆ÷¶ËĞ´ÈëµÄÒ»ĞĞÊı¾İ
+	// è¯»æœåŠ¡å™¨ç«¯å†™å…¥çš„ä¸€è¡Œæ•°æ®
 	acl::string buf;
 	if (client.gets(buf) == false)
 	{
@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
 	}
 	printf("gets: %s\r\n", buf.c_str());
 
-	// Ì½²âÁ¬½ÓÊÇ·ñÕı³£
+	// æ¢æµ‹è¿æ¥æ˜¯å¦æ­£å¸¸
 	if (client.alive())
 		printf("second check: ok, status: %s\r\n", acl::last_serror());
 	else
@@ -57,7 +57,7 @@ int main(int argc, char* argv[])
 
 	int  n = 10;
 	printf("sleep %d second\r\n", n);
-	// ĞİÏ¢Ò»ÏÂ£¬ÒÔ±£Ö¤·şÎñÆ÷¿Ï¶¨ÒÑ¾­¹Ø±ÕÁËÁ¬½Ó
+	// ä¼‘æ¯ä¸€ä¸‹ï¼Œä»¥ä¿è¯æœåŠ¡å™¨è‚¯å®šå·²ç»å…³é—­äº†è¿æ¥
 	for (int i = 0; i < n; i++)
 	{
 		sleep(1);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
 	}
 	printf("\r\n");
 
-	// ¼ì²éµÚÒ»´ÎĞ´ÈëÊ± write ÊÇ·ñ·µ»ØÊ§°Ü
+	// æ£€æŸ¥ç¬¬ä¸€æ¬¡å†™å…¥æ—¶ write æ˜¯å¦è¿”å›å¤±è´¥
 	if ((n = client.write(req.c_str(), req.length())) < 0)
 	{
 		printf("first write error, status: %s\n", acl::last_serror());
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 		printf("first write ok, ret: %d, status: %s\r\n",
 			n, acl::last_serror());
 
-	// ¼ì²éµÚ¶ş´ÎĞ´ÈëÊ± write ÊÇ·ñ·µ»ØÊ§°Ü
+	// æ£€æŸ¥ç¬¬äºŒæ¬¡å†™å…¥æ—¶ write æ˜¯å¦è¿”å›å¤±è´¥
 	if ((n = client.write(req.c_str(), req.length())) < 0)
 	{
 		printf("second write error, status: %s\n", acl::last_serror());
