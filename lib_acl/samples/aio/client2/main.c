@@ -33,7 +33,7 @@ static int on_close(ACL_ASTREAM *conn, void *ctx)
 	const char *server_addr = (const char*) ctx;
 
 	printf("fd=%d, disconnected from %s\r\n",
-		ACL_VSTREAM_SOCK(conn->stream), server_addr);
+		(int) ACL_VSTREAM_SOCK(conn->stream), server_addr);
 	__nclosed++;
 	return 0;
 }
@@ -53,7 +53,7 @@ static int on_read(ACL_ASTREAM *conn, void *ctx acl_unused,
 	if (__count % 50000 == 0) {
 		char buf[128];
 		snprintf(buf, sizeof(buf), "fd=%d, count=%lld",
-			ACL_VSTREAM_SOCK(conn->stream), __count);
+			(int) ACL_VSTREAM_SOCK(conn->stream), __count);
 		acl_meter_time(__FUNCTION__, __LINE__, buf);
 	}
 
@@ -62,7 +62,7 @@ static int on_read(ACL_ASTREAM *conn, void *ctx acl_unused,
 		return 0;
 	}
 
-	printf("begin close fd %d\r\n", ACL_VSTREAM_SOCK(conn->stream));
+	printf("begin close fd %d\r\n", (int) ACL_VSTREAM_SOCK(conn->stream));
 	return -1;
 }
 

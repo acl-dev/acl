@@ -36,7 +36,7 @@ static int __write_callback( ACL_ASTREAM *stream, void *context,
 static int __timeout_callback(ACL_ASTREAM *stream acl_unused,
 	void *context acl_unused)
 {
-	printf("timeout, sockfd=%d\r\n", ACL_VSTREAM_SOCK(acl_aio_vstream(stream)));
+	printf("timeout, sockfd=%d\r\n", (int) ACL_VSTREAM_SOCK(acl_aio_vstream(stream)));
 	return (-1);
 }
 
@@ -44,7 +44,7 @@ static int __close_callback(ACL_ASTREAM *stream, void *context)
 {
 	ECHO_COUNTER *counter = (ECHO_COUNTER *) context;
 
-	printf("closed, sockfd=%d\r\n", ACL_VSTREAM_SOCK(acl_aio_vstream(stream)));
+	printf("closed, sockfd=%d\r\n", (int) ACL_VSTREAM_SOCK(acl_aio_vstream(stream)));
 	__nconn--;
 	acl_myfree(counter);
 	return (-1);

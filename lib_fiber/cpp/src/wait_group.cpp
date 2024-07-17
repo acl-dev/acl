@@ -19,13 +19,13 @@ void wait_group::add(int n)
 {
 	long long state = state_.add_fetch((long long)n << 32);
 
-	//é«˜32ä½ä¸ºä»»åŠ¡æ•°é‡
+	//¸ß32Î»ÎªÈÎÎñÊıÁ¿
 	int c = (int)(state >> 32);
 
-	//ä½32ä½ä¸ºç­‰å¾…è€…æ•°é‡
+	//µÍ32Î»ÎªµÈ´ıÕßÊıÁ¿
 	unsigned w =  (unsigned)state;
 
-	//countä¸èƒ½å°äº0
+	//count²»ÄÜĞ¡ÓÚ0
 	if (c < 0){
 		logger_fatal("Negative wait_group counter");
 	}
@@ -38,12 +38,12 @@ void wait_group::add(int n)
 		return;
 	}
 
-	//æ£€æŸ¥stateæ˜¯å¦è¢«ä¿®æ”¹
+	//¼ì²éstateÊÇ·ñ±»ĞŞ¸Ä
 	if (state_ != state) {
 		logger_fatal("Add called concurrently with wait");
 	}
 
-	//è¿™é‡Œcountä¸º0äº†ï¼Œæ¸…ç©ºstateå¹¶å”¤é†’æ‰€æœ‰ç­‰å¾…è€…
+	//ÕâÀïcountÎª0ÁË£¬Çå¿Õstate²¢»½ĞÑËùÓĞµÈ´ıÕß
 	state_ = 0;
 
 	for (size_t i = 0; i < w; i++) {
@@ -68,12 +68,12 @@ void wait_group::wait(void)
 		long long state = state_;
 		int c = (int) (state >> 32);
 
-		//æ²¡æœ‰ä»»åŠ¡ç›´æ¥è¿”å›
+		//Ã»ÓĞÈÎÎñÖ±½Ó·µ»Ø
 		if (c == 0) {
 			return;
 		}
 
-		//ç­‰å¾…è€…æ•°é‡åŠ ä¸€ï¼Œå¤±è´¥çš„è¯é‡æ–°è·å–state
+		//µÈ´ıÕßÊıÁ¿¼ÓÒ»£¬Ê§°ÜµÄ»°ÖØĞÂ»ñÈ¡state
 		if (state_.cas(state, state + 1) == state) {
 			bool found;
 #ifdef	_DEBUG
