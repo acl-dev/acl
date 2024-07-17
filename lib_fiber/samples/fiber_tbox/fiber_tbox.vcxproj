@@ -157,6 +157,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\c\include;..\..\cpp\include;..\..\..\lib_acl\include;..\..\..\lib_acl_cpp\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -182,6 +183,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\c\include;..\..\cpp\include;..\..\..\lib_acl\include;..\..\..\lib_acl_cpp\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -208,6 +210,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\..\cpp\include; ..\..\..\lib_acl\include;..\; ..\..\..\lib_acl_cpp\include;..\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -234,6 +237,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\..\cpp\include; ..\..\..\lib_acl\include;..\; ..\..\..\lib_acl_cpp\include;..\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -260,6 +264,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\c\include;..\..\cpp\include;..\..\..\lib_acl\include;..\..\..\lib_acl_cpp\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -285,6 +290,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\c\include;..\..\cpp\include;..\..\..\lib_acl\include;..\..\..\lib_acl_cpp\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -312,6 +318,7 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\c\include;..\..\cpp\include;..\..\..\lib_acl\include;..\..\..\lib_acl_cpp\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -333,6 +340,7 @@
       <SDLCheck>false</SDLCheck>
       <AdditionalIncludeDirectories>..\;..\..\c\include;..\..\cpp\include;..\..\..\lib_acl\include;..\..\..\lib_acl_cpp\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
