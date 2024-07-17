@@ -37,7 +37,7 @@ static int  __read_timeout = -1;
 static int  __write_timeout = -1;
 static int  __echo_data  = 1;
 
-static int check_read(int fd, int timeout)
+static int check_read(SOCKET fd, int timeout)
 {
 	struct pollfd pfd;
 	int n;
@@ -58,12 +58,12 @@ static int check_read(int fd, int timeout)
 	if (pfd.revents & POLLIN) {
 		return 1;
 	} else {
-		printf(">>>poll return n=%d read no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
+		printf(">>>poll return n=%d read no ready,fd=%d, pfd=%p\n", n, (int) fd, &pfd);
 		return 0;
 	}
 }
 
-static int check_write(int fd, int timeout)
+static int check_write(SOCKET fd, int timeout)
 {
 	struct pollfd pfd;
 	int n;
@@ -84,7 +84,7 @@ static int check_write(int fd, int timeout)
 	if (pfd.revents & POLLOUT) {
 		return 1;
 	} else {
-		printf(">>>poll return n=%d write no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
+		printf(">>>poll return n=%d write no ready,fd=%d, pfd=%p\n", n, (int) fd, &pfd);
 		return 0;
 	}
 }
@@ -106,7 +106,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 				break;
 			}
 			if (ret == 0) {
-				printf("read timeout fd=%u\r\n", fd);
+				printf("read timeout fd=%u\r\n", (int) fd);
 				break;
 			}
 		}
@@ -118,7 +118,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 #endif
 		if (ret == 0) {
 			printf("read close by peer fd: %d, %s\r\n",
-				fd, acl_last_serror());
+				(int) fd, acl_last_serror());
 			break;
 		} else if (ret < 0) {
 			if (acl_last_error() == EINTR) {
@@ -126,7 +126,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 				continue;
 			}
 
-			printf("read error %s, fd: %u\n", acl_last_serror(), fd);
+			printf("read error %s, fd: %u\n", acl_last_serror(), (int) fd);
 			break;
 		}
 
@@ -143,7 +143,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 				break;
 			}
 			if (n == 0) {
-				printf("write wait timeout, fd=%d\r\n", fd);
+				printf("write wait timeout, fd=%d\r\n", (int) fd);
 				break;
 			}
 		}
@@ -156,13 +156,13 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			if (errno == EINTR) {
 				continue;
 			}
-			printf("write error, fd: %d\r\n", fd);
+			printf("write error, fd: %d\r\n", (int) fd);
 			break;
 		}
 	}
 
 	__socket_count--;
-	printf("%s: close %d, socket_count=%d\r\n", __FUNCTION__, fd, __socket_count);
+	printf("%s: close %d, socket_count=%d\r\n", __FUNCTION__, (int) fd, __socket_count);
 	CLOSE(fd);
 	free(pfd);
 
@@ -227,7 +227,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 
 		__nconnect++;
 		printf("fiber-%d: accept one, fd: %d, %p\r\n",
-			acl_fiber_self(), cfd, pfd);
+			acl_fiber_self(), (int) cfd, pfd);
 		acl_fiber_create2(attr, echo_client, pfd);
 	}
 

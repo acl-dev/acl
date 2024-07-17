@@ -140,7 +140,7 @@ int set_non_blocking(SOCKET fd, int on)
 
 int socket_is_non_blocking(SOCKET fd)
 {
-	printf("%s: Not support, fd=%d\r\n", __FUNCTION__, fd);
+	printf("%s: Not support, fd=%d\r\n", __FUNCTION__, (int) fd);
 	return -1;
 }
 

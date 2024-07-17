@@ -72,7 +72,7 @@ static int check_read(SOCKET fd, int timeout)
 	if (pfd.revents & POLLIN) {
 		return 1;
 	} else {
-		printf(">>>poll return n=%d read no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
+		printf(">>>poll return n=%d read no ready,fd=%d, pfd=%p\n", n, (int) fd, &pfd);
 		return 0;
 	}
 }
@@ -102,15 +102,15 @@ static int check_write(SOCKET fd, int timeout)
 	}
 
 	if (pfd.revents & POLLERR) {
-		printf(">>>POLLERR, fd=%d\r\n", fd);
+		printf(">>>POLLERR, fd=%d\r\n", (int) fd);
 		return -1;
 	} else if (pfd.revents & POLLHUP) {
-		printf(">>>POLLHUP, fd=%d\r\n", fd);
+		printf(">>>POLLHUP, fd=%d\r\n", (int) fd);
 		return -1;
 	} else if (pfd.revents & POLLOUT) {
 		return 1;
 	} else {
-		printf(">>>poll return n=%d write no ready,fd=%d, pfd=%p\n", n, fd, &pfd);
+		printf(">>>poll return n=%d write no ready,fd=%d, pfd=%p\n", n, (int) fd, &pfd);
 		return 0;
 	}
 }
@@ -124,12 +124,12 @@ static void echo_client(SOCKET fd)
 
 	for (i = 0; i < __max_loop; i++) {
 		if (__write_timeout > 0 && check_write(fd, __write_timeout * 1000) <= 0) {
-			printf("write wait error=%s, fd=%d\r\n", acl_last_serror(), fd);
+			printf("write wait error=%s, fd=%d\r\n", acl_last_serror(), (int) fd);
 			break;
 		}
 
 #if defined(_WIN32) || defined(_WIN64)
-		if (acl_fiber_send(fd, str, strlen(str), 0) <= 0) {
+		if (acl_fiber_send(fd, str, (int) strlen(str), 0) <= 0) {
 #else
 		if (write(fd, str, strlen(str)) <= 0) {
 #endif
@@ -150,7 +150,7 @@ static void echo_client(SOCKET fd)
 		}
 
 		if (__read_timeout > 0 && (ret = check_read(fd, __read_timeout * 1000)) <= 0) {
-			printf("read wait error=%s, fd=%d, ret=%d\r\n", acl_last_serror(), fd, ret);
+			printf("read wait error=%s, fd=%d, ret=%d\r\n", acl_last_serror(), (int) fd, ret);
 			break;
 		}
 
@@ -214,7 +214,7 @@ static SOCKET start_connect(void)
 		return INVALID_SOCKET;
 	}
 
-	printf("%s: WAITING FOR CONNECTING READY, fd=%d\r\n", __FUNCTION__, fd);
+	printf("%s: WAITING FOR CONNECTING READY, fd=%d\r\n", __FUNCTION__, (int) fd);
 
 	if (check_write(fd, __conn_timeout) <= 0) {
 		CLOSE(fd);
@@ -237,7 +237,7 @@ static void fiber_connect(ACL_FIBER *fiber acl_unused, void *ctx acl_unused)
 		__total_clients++;
 		printf("fiber-%d: connect %s:%d ok, clients: %d, fd: %d\r\n",
 			acl_fiber_self(), __server_ip, __server_port,
-			__total_clients, fd);
+			__total_clients, (int) fd);
 
 		echo_client(fd);
 	}
