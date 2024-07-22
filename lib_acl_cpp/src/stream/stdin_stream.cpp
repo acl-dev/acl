@@ -3,17 +3,16 @@
 #include "acl_cpp/stream/stdin_stream.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-stdin_stream::stdin_stream(void)
+stdin_stream::stdin_stream()
 {
 	stream_ = ACL_VSTREAM_IN;
 	eof_    = false;
 	opened_ = true;
 }
 
-stdin_stream::~stdin_stream(void)
+stdin_stream::~stdin_stream()
 {
 	stream_ = NULL;
 }

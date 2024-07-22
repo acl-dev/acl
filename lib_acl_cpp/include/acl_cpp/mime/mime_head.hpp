@@ -8,31 +8,29 @@
 
 namespace acl {
 
-typedef struct HEADER
-{
+typedef struct HEADER {
 	char *name;
 	char *value;
 } HEADER;
 
-class ACL_CPP_API mime_head : public noncopyable
-{
+class ACL_CPP_API mime_head : public noncopyable {
 public:
-	mime_head(void);
-	~mime_head(void);
+	mime_head();
+	~mime_head();
 
-	const string& get_boundary(void) const;
-	const char* get_ctype(void) const;
-	const char* get_stype(void) const;
-	const string& sender(void) const;
-	const string& from(void) const;
-	const string& replyto(void) const;
-	const string& returnpath(void) const;
-	const string& subject(void) const;
-	const std::list<char*>& to_list(void) const;
-	const std::list<char*>& cc_list(void) const;
-	const std::list<char*>& bcc_list(void) const;
-	const std::list<char*>& rcpt_list(void) const;
-	const std::list<HEADER*>& header_list(void) const;
+	const string& get_boundary() const;
+	const char* get_ctype() const;
+	const char* get_stype() const;
+	const string& sender() const;
+	const string& from() const;
+	const string& replyto() const;
+	const string& returnpath() const;
+	const string& subject() const;
+	const std::list<char*>& to_list() const;
+	const std::list<char*>& cc_list() const;
+	const std::list<char*>& bcc_list() const;
+	const std::list<char*>& rcpt_list() const;
+	const std::list<HEADER*>& header_list() const;
 	const char* header_value(const char* name) const;
 	int header_values(const char* name, std::list<const char*>* values) const;
 
@@ -51,7 +49,7 @@ public:
 
 	void build_head(string& buf, bool clean);
 
-	mime_head& reset(void);
+	mime_head& reset();
 
 protected:
 private:

@@ -68,7 +68,7 @@ server_socket::server_socket(ACL_SOCKET fd)
 	}
 }
 
-server_socket::server_socket(void)
+server_socket::server_socket()
 : backlog_(128)
 , unix_sock_(false)
 , fd_(ACL_SOCKET_INVALID)
@@ -77,14 +77,14 @@ server_socket::server_socket(void)
 	open_flag_ = 0;
 }
 
-server_socket::~server_socket(void)
+server_socket::~server_socket()
 {
 	if (fd_local_ != ACL_SOCKET_INVALID) {
 		acl_socket_close(fd_local_);
 	}
 }
 
-bool server_socket::opened(void) const
+bool server_socket::opened() const
 {
 	return fd_ != ACL_SOCKET_INVALID;
 }
@@ -135,7 +135,7 @@ bool server_socket::open(const char* addr)
 	return true;
 }
 
-ACL_SOCKET server_socket::unbind(void)
+ACL_SOCKET server_socket::unbind()
 {
 	ACL_SOCKET sock = fd_local_;
 	fd_local_ = ACL_SOCKET_INVALID;
@@ -143,7 +143,7 @@ ACL_SOCKET server_socket::unbind(void)
 	return sock;
 }
 
-bool server_socket::close(void)
+bool server_socket::close()
 {
 	if (fd_local_ == ACL_SOCKET_INVALID) {
 		return true;

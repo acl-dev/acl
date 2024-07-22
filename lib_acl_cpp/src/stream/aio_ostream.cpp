@@ -4,16 +4,15 @@
 #include "acl_cpp/stream/aio_ostream.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-aio_timer_writer::aio_timer_writer(void)
+aio_timer_writer::aio_timer_writer()
 : out_(NULL)
 {
 
 }
 
-aio_timer_writer::~aio_timer_writer(void)
+aio_timer_writer::~aio_timer_writer()
 {
 
 }
@@ -71,7 +70,7 @@ aio_ostream::aio_ostream(aio_handle* handle, ACL_SOCKET fd)
 	enable_write();
 }
 
-aio_ostream::~aio_ostream(void)
+aio_ostream::~aio_ostream()
 {
 	if (timer_writers_) {
 		std::list<aio_timer_writer*>::iterator it =
@@ -89,7 +88,7 @@ aio_ostream::~aio_ostream(void)
 	}
 }
 
-void aio_ostream::destroy(void)
+void aio_ostream::destroy()
 {
 	delete this;
 }
@@ -208,7 +207,7 @@ int aio_ostream::enable_write_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_ostream::enable_write(void)
+void aio_ostream::enable_write()
 {
 	acl_assert(stream_);
 
@@ -220,7 +219,7 @@ void aio_ostream::enable_write(void)
 	acl_aio_add_write_hook(stream_, write_callback, this);
 }
 
-void aio_ostream::disable_write(void)
+void aio_ostream::disable_write()
 {
 	acl_assert(stream_);
 	acl_aio_disable_write(stream_);
@@ -303,7 +302,7 @@ void aio_ostream::vformat_await(const char* fmt, va_list ap)
 	acl_aio_vfprintf(stream_, fmt, ap);
 }
 
-size_t aio_ostream::pending_length(void) const
+size_t aio_ostream::pending_length() const
 {
 	return acl_aio_send_pending(stream_);
 }

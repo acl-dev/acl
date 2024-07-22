@@ -9,8 +9,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define BUFLEN	32
 #define INTLEN	11
@@ -204,8 +203,9 @@ int redis_zset::zadd(const char* key, const std::vector<const char*>& members,
 	const std::vector<double>& scores)
 {
 	size_t size = scores.size();
-	if (size != members.size())
+	if (size != members.size()) {
 		return -1;
+	}
 
 	size_t argc = 2 + scores.size() * 2;
 	const char** argv = (const char**)
@@ -456,8 +456,9 @@ bool redis_zset::zincrby(const char* key, double inc,
 	build_request(4, argv, lens);
 
 	int ret = get_string(score, sizeof(score));
-	if (ret <= 0)
+	if (ret <= 0) {
 		return false;
+	}
 	if (result)
 		*result = atof(score);
 	return true;
@@ -505,10 +506,13 @@ int redis_zset::get_with_scores(std::vector<std::pair<string, double> >& out)
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return 0;
-	if (size % 2 != 0)
+	}
+
+	if (size % 2 != 0) {
 		return -1;
+	}
 
 	size /= 2;
 	out.reserve(size);
@@ -519,16 +523,18 @@ int redis_zset::get_with_scores(std::vector<std::pair<string, double> >& out)
 
 	for (size_t i = 0; i < size; i++) {
 		child = children[2 * i + 1];
-		if (child == NULL)
+		if (child == NULL) {
 			continue;
+		}
 
 		child->argv_to_string(buf);
 		score = atof(buf.c_str());
 		buf.clear();
 
 		child = children[2 * i];
-		if (child == NULL)
+		if (child == NULL) {
 			continue;
+		}
 
 		child->argv_to_string(buf);
 		out.push_back(std::make_pair(buf, score));
@@ -740,8 +746,9 @@ int redis_zset::zrem(const char* key, const char* first_member, ...)
 	va_list ap;
 	va_start(ap, first_member);
 	const char* member;
-	while ((member = va_arg(ap, const char*)) != NULL)
+	while ((member = va_arg(ap, const char*)) != NULL) {
 		members.push_back(member);
+	}
 
 	return zrem(key, members);
 }
@@ -905,8 +912,9 @@ bool redis_zset::zscore(const char* key, const char* member, size_t len,
 
 	char buf[BUFLEN];
 	int ret = get_string(buf, sizeof(buf));
-	if (ret <= 0)
+	if (ret <= 0) {
 		return false;
+	}
 	result = atof(buf);
 	return true;
 }
@@ -920,8 +928,9 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	const std::map<string, double>& keys, const char* aggregate)
 {
 	size_t num = keys.size();
-	if (num == 0)
+	if (num == 0) {
 		return -1;
+	}
 
 	size_t argc = num * 2 + 6;
 
@@ -964,8 +973,9 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	lens[i] = sizeof("AGGREGATE") - 1;
 	i++;
 
-	if (aggregate == NULL || *aggregate == 0)
+	if (aggregate == NULL || *aggregate == 0) {
 		aggregate = "SUM";
+	}
 	argv[i] = aggregate;
 	lens[i] = strlen(aggregate);
 	i++;
@@ -995,12 +1005,15 @@ int redis_zset::zstore(const char* cmd, const char* dst,
 	size_t argc = 3 + keys.size();
 
 	if (weights != NULL) {
-		if (weights->size() != keys.size())
+		if (weights->size() != keys.size()) {
 			return -1;
+		}
 		argc += weights->size() + 1;
 	}
-	if (aggregate != NULL && *aggregate != 0)
+
+	if (aggregate != NULL && *aggregate != 0) {
 		argc += 2;
+	}
 
 	const char** argv = (const char**)
 		dbuf_->dbuf_alloc(argc * sizeof(char*));
@@ -1154,17 +1167,21 @@ int redis_zset::zscan(const char* key, int cursor,
 	std::vector<std::pair<string, double> >& out,
 	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
 {
-	if (key == NULL || *key == 0 || cursor < 0)
+	if (key == NULL || *key == 0 || cursor < 0) {
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = scan_keys("ZSCAN", key, cursor,
 		size, pattern, count);
-	if (children == NULL)
-		return cursor;
 
-	if (size % 2 != 0)
+	if (children == NULL) {
+		return cursor;
+	}
+
+	if (size % 2 != 0) {
 		return -1;
+	}
 
 	out.reserve(out.size() + size);
 
@@ -1304,10 +1321,13 @@ int redis_zset::bzpop_result(string& member, double* score)
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return  0;
-	if (size != 3)
+	}
+
+	if (size != 3) {
 		return -1;
+	}
 
 	const redis_result* child;
 	child = children[1];

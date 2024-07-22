@@ -9,12 +9,11 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-master_threads::master_threads(void) {}
+master_threads::master_threads() {}
 
-master_threads::~master_threads(void) {}
+master_threads::~master_threads() {}
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -46,7 +45,7 @@ void master_threads::run(int argc, char** argv)
 		ACL_MASTER_SERVER_END);
 }
 
-const char* master_threads::get_conf_path(void) const
+const char* master_threads::get_conf_path() const
 {
 	if (daemon_mode_) {
 		const char* ptr = acl_threads_server_conf();
@@ -144,12 +143,12 @@ void master_threads::push_back(server_socket* ss)
 	servers_.push_back(ss);
 }
 
-acl_pthread_pool_t* master_threads::threads_pool(void) const
+acl_pthread_pool_t* master_threads::threads_pool() const
 {
 	return acl_threads_server_threads();
 }
 
-size_t master_threads::task_qlen(void) const
+size_t master_threads::task_qlen() const
 {
 	acl_pthread_pool_t* threads = threads_pool();
 	return threads ? acl_pthread_pool_qlen(threads) : 0;

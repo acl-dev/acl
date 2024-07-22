@@ -6,8 +6,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_hyperloglog::redis_hyperloglog()
 {

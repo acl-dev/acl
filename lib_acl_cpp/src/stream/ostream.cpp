@@ -50,7 +50,7 @@ int ostream::sendto(const void* data, size_t len,
 #endif
 }
 
-bool ostream::fflush(void)
+bool ostream::fflush()
 {
 	if (acl_vstream_fflush(stream_) == ACL_VSTREAM_EOF) {
 		return false;
@@ -159,8 +159,7 @@ ostream& ostream::operator<<(char ch)
 	return *this;
 }
 
-int ostream::push_pop(const char* in, size_t len,
-	string* out /* = NULL */ acl_unused, size_t max /* = 0 */ acl_unused)
+int ostream::push_pop(const char* in, size_t len, string* out, size_t max)
 {
 	if (in == NULL || len == 0) {
 		return 0;

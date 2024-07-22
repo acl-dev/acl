@@ -9,7 +9,7 @@
 
 namespace acl {
 
-stream::stream(void)
+stream::stream()
 : hook_(NULL)
 , stream_(NULL)
 , buf_(NULL)
@@ -21,7 +21,7 @@ stream::stream(void)
 {
 }
 
-stream::~stream(void)
+stream::~stream()
 {
 	if (hook_) {
 		hook_->destroy();
@@ -34,7 +34,7 @@ stream::~stream(void)
 	delete ctx_table_;
 }
 
-string& stream::get_buf(void)
+string& stream::get_buf()
 {
 	if (buf_ == NULL) {
 		buf_ = NEW string;
@@ -42,7 +42,7 @@ string& stream::get_buf(void)
 	return *buf_;
 }
 
-dbuf_pool& stream::get_dbuf(void)
+dbuf_pool& stream::get_dbuf()
 {
 	if (dbuf_ == NULL) {
 		dbuf_ = new dbuf_pool;
@@ -50,22 +50,22 @@ dbuf_pool& stream::get_dbuf(void)
 	return *dbuf_;
 }
 
-bool stream::eof(void) const
+bool stream::eof() const
 {
 	return eof_;
 }
 
-void stream::clear_eof(void)
+void stream::clear_eof()
 {
 	eof_ = false;
 }
 
-bool stream::opened(void) const
+bool stream::opened() const
 {
 	return opened_;
 }
 
-ACL_VSTREAM* stream::get_vstream(void) const
+ACL_VSTREAM* stream::get_vstream() const
 {
 	return stream_;
 }
@@ -99,7 +99,7 @@ void stream::set_time_unit(time_unit_t unit) {
 	}
 }
 
-int stream::get_rw_timeout(void) const
+int stream::get_rw_timeout() const
 {
 	if (stream_ == NULL) {
 		return -1;
@@ -107,7 +107,7 @@ int stream::get_rw_timeout(void) const
 	return stream_->rw_timeout;
 }
 
-ACL_VSTREAM* stream::unbind(void)
+ACL_VSTREAM* stream::unbind()
 {
 	eof_    = true;
 	opened_ = false;
@@ -116,9 +116,9 @@ ACL_VSTREAM* stream::unbind(void)
 	return vstream;
 }
 
-bool stream::close(void)
+bool stream::close()
 {
-	if (opened_ == false) {
+	if (!opened_) {
 		return false;
 	}
 	if (stream_ == NULL) {
@@ -138,7 +138,7 @@ bool stream::close(void)
 	int ret = acl_vstream_close(stream_);
 	stream_ = NULL;
 
-	return ret == 0 ? true : false;
+	return ret == 0;
 }
 
 void stream::open_stream(bool is_file /* = false */)
@@ -226,12 +226,12 @@ void* stream::del_ctx(const char* key /* = NULL */)
 	return ctx;
 }
 
-stream_hook* stream::get_hook(void) const
+stream_hook* stream::get_hook() const
 {
 	return hook_;
 }
 
-stream_hook* stream::remove_hook(void)
+stream_hook* stream::remove_hook()
 {
 	stream_hook* hook = hook_;
 	hook_ = NULL;

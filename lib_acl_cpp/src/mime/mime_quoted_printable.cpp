@@ -18,11 +18,11 @@ mime_quoted_printable::mime_quoted_printable(
 	reset();
 }
 
-mime_quoted_printable::~mime_quoted_printable(void)
+mime_quoted_printable::~mime_quoted_printable()
 {
 }
 
-void mime_quoted_printable::reset(void)
+void mime_quoted_printable::reset()
 {
 	m_encodeCnt = 0;
 	m_decodeCnt = 0;

@@ -9,10 +9,9 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-redis_role::redis_role(void)
+redis_role::redis_role()
 {
 }
 
@@ -21,7 +20,7 @@ redis_role::redis_role(redis_client* conn)
 {
 }
 
-bool redis_role::role(void)
+bool redis_role::role()
 {
 	const char* argv[1];
 	size_t lens[1];
@@ -88,7 +87,7 @@ bool redis_role::role_master(const redis_result** a, size_t n)
 	rr = a[2];
 	const redis_result** aa = rr->get_children(&n);
 	for (size_t i = 0; i < n; i++) {
-		if (add_one_slave(aa[i], role4master_) == false) {
+		if (!add_one_slave(aa[i], role4master_)) {
 			return false;
 		}
 	}

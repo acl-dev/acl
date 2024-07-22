@@ -4,11 +4,9 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_slot
-{
+class ACL_CPP_API redis_slot {
 public:
 	/**
 	 * 构造函数
@@ -21,13 +19,11 @@ public:
 	 *  the given redis-server's ip
 	 * @param port {int} 当前 redis-server 的监听端口
 	 *  the listening port of the given redis-server
-	 * 
 	 */
-	redis_slot(size_t slot_min, size_t slot_max,
-		const char* ip, int port);
+	redis_slot(size_t slot_min, size_t slot_max, const char* ip, int port);
 	redis_slot(const redis_slot& node);
 
-	~redis_slot(void);
+	~redis_slot();
 
 	/**
 	 * 将一个 redis 哈希槽从结点添加至当前结点中
@@ -42,8 +38,7 @@ public:
 	 * get the slave nodes of the current node
 	 * @return {const std::vector<redis_slot*>&}
 	 */
-	const std::vector<redis_slot*>& get_slaves() const
-	{
+	const std::vector<redis_slot*>& get_slaves() const {
 		return slaves_;
 	}
 
@@ -52,8 +47,7 @@ public:
 	 * get the ip of the current node
 	 * @return {const char*}
 	 */
-	const char* get_ip(void) const
-	{
+	const char* get_ip() const {
 		return ip_;
 	}
 
@@ -62,8 +56,7 @@ public:
 	 * get the port of the current node
 	 * @return {int}
 	 */
-	int get_port(void) const
-	{
+	int get_port() const {
 		return port_;
 	}
 
@@ -72,8 +65,7 @@ public:
 	 * get the min hash slot of the current node
 	 * @return {size_t}
 	 */
-	size_t get_slot_min(void) const
-	{
+	size_t get_slot_min() const {
 		return slot_min_;
 	}
 
@@ -82,8 +74,7 @@ public:
 	 * get the max hash slot of the current node
 	 * @return {size_t}
 	 */
-	size_t get_slot_max(void) const
-	{
+	size_t get_slot_max() const {
 		return slot_max_;
 	}
 

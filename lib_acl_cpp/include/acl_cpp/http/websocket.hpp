@@ -14,14 +14,12 @@
 #include "../acl_cpp_define.hpp"
 #include "../stdlib/noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class socket_stream;
 class aio_socket_stream;
 
-enum
-{
+enum {
 	FRAME_CONTINUATION = 0x00,
 	FRAME_TEXT         = 0x01,
 	FRAME_BINARY       = 0x02,
@@ -40,8 +38,7 @@ enum
 	FRAME_CTL_RSVF     = 0x0F,
 };
 
-struct frame_header
-{
+struct frame_header {
 	bool fin;
 	bool rsv1;
 	bool rsv2;
@@ -51,7 +48,7 @@ struct frame_header
 	unsigned long long payload_len;
 	unsigned int masking_key;
 
-	frame_header(void) {
+	frame_header() {
 		fin         = false;
 		rsv1        = false;
 		rsv2        = false;
@@ -68,27 +65,25 @@ class string;
 /**
  * websocket 基础类
  */
-class ACL_CPP_API websocket : public noncopyable
-{
+class ACL_CPP_API websocket : public noncopyable {
 public:
 	/**
 	 * 构造方法
 	 * @param client {socket_stream&}
 	 */
-	websocket(socket_stream& client);
-	~websocket(void);
+	explicit websocket(socket_stream& client);
+	~websocket();
 
 	/**
 	 * 当类对象被重复使用时，需要通过本方法将状态重重
 	 */
-	websocket& reset(void);
+	websocket& reset();
 
 	/**
 	 * 获得本类对象所绑定的 socket_stream 对象
 	 * @return {socket_stream&}
 	 */
-	socket_stream& get_stream(void) const
-	{
+	socket_stream& get_stream() const {
 		return client_;
 	}
 
@@ -229,7 +224,7 @@ public:
 	 * 读取数据帧帧头
 	 * @return {bool}
 	 */
-	bool read_frame_head(void);
+	bool read_frame_head();
 
 	/**
 	 * 读取数据帧数据体，需要循环调用本方法直至正常结束或出错
@@ -248,7 +243,7 @@ public:
 	 * @return {bool} 返回 true 表示读到了完整的 websocket 头，可以通过调用
 	 *  read_frame_data() 来读取数据体
 	 */
-	bool peek_frame_head(void);
+	bool peek_frame_head();
 
 	/**
 	 * 用在非阻塞网络通信中，尝试读取 websocket 数据体，可以循环调用本方法
@@ -266,20 +261,19 @@ public:
 	 * 判断当前是否已读完 websocket 帧头数据
 	 * @return {bool}
 	 */
-	bool is_head_finish(void) const;
+	bool is_head_finish() const;
 
 	/**
 	 * 判断当前网络连接是否已经断开
 	 * @return {bool}
 	 */
-	bool eof(void);
+	bool eof();
 
 	/**
 	 * 获得读到的数据帧的帧头
 	 * @return {const frame_header&}
 	 */
-	const frame_header& get_frame_header(void) const
-	{
+	const frame_header& get_frame_header() const {
 		return header_;
 	}
 
@@ -287,8 +281,7 @@ public:
 	 * 判断本帧是否为结束帧
 	 * @return {bool}
 	 */
-	bool frame_is_fin(void) const
-	{
+	bool frame_is_fin() const {
 		return header_.fin;
 	}
 
@@ -296,8 +289,7 @@ public:
 	 * 判断本帧是否设置了保留标志位
 	 * @return {bool}
 	 */
-	bool frame_is_rsv1(void) const
-	{
+	bool frame_is_rsv1() const {
 		return header_.rsv1;
 	}
 
@@ -305,8 +297,7 @@ public:
 	 * 判断本帧是否设置了保留标志位
 	 * @return {bool}
 	 */
-	bool frame_is_rsv2(void) const
-	{
+	bool frame_is_rsv2() const {
 		return header_.rsv2;
 	}
 
@@ -314,8 +305,7 @@ public:
 	 * 判断本帧是否设置了保留标志位
 	 * @return {bool}
 	 */
-	bool frame_is_rsv3(void) const
-	{
+	bool frame_is_rsv3() const {
 		return header_.rsv3;
 	}
 
@@ -323,8 +313,7 @@ public:
 	 * 获得本数据帧的状态码，参见上面：FRAME_XXX
 	 * @return {unsigned char}
 	 */
-	unsigned char get_frame_opcode(void) const
-	{
+	unsigned char get_frame_opcode() const {
 		return header_.opcode;
 	}
 
@@ -332,8 +321,7 @@ public:
 	 * 获得本数据帧是否设置了掩码
 	 * @return {bool}
 	 */
-	bool frame_has_mask(void) const
-	{
+	bool frame_has_mask() const {
 		return header_.mask;
 	}
 
@@ -341,8 +329,7 @@ public:
 	 * 获得本数据帧的数据体长度
 	 * @return {unsigned long long}
 	 */
-	unsigned long long get_frame_payload_len(void) const
-	{
+	unsigned long long get_frame_payload_len() const {
 		return header_.payload_len;
 	}
 
@@ -350,8 +337,7 @@ public:
 	 * 获得本数据帧的掩码值
 	 * @return {unsigned int}
 	 */
-	unsigned int get_frame_masking_key(void) const
-	{
+	unsigned int get_frame_masking_key() const {
 		return header_.masking_key;
 	}
 
@@ -359,8 +345,7 @@ public:
 	 * 获得本数据帧已读到的数据长度
 	 * @return {unsigned long long}
 	 */
-	unsigned long long get_frame_payload_nread(void) const
-	{
+	unsigned long long get_frame_payload_nread() const {
 		return payload_nread_;
 	}
 
@@ -377,13 +362,13 @@ private:
 	unsigned status_;
 	string*  peek_buf_;
 
-	void make_frame_header(void);
+	void make_frame_header();
 
 	void update_head_2bytes(unsigned char ch1, unsigned ch2);
-	bool peek_head_2bytes(void);
-	bool peek_head_len_2bytes(void);
-	bool peek_head_len_8bytes(void);
-	bool peek_head_masking_key(void);
+	bool peek_head_2bytes();
+	bool peek_head_len_2bytes();
+	bool peek_head_len_8bytes();
+	bool peek_head_masking_key();
 
 };
 

@@ -28,7 +28,7 @@ public:
 	 * @override stream_hook
 	 * 销毁 SSL IO 对象
 	 */
-	void destroy(void);
+	void destroy();
 
 	/**
 	 * @override sslbase_io
@@ -41,16 +41,16 @@ public:
 	 *  2.2、在非阻塞 IO 模式下仅代表本次握手过程中 IO 是成功的，还需要调用
 	 *       handshake_ok() 函数判断 SSL 握手是否成功
 	 */
-	bool handshake(void);
+	bool handshake();
 
 	/**
 	 * 检查对方证书是否有效（一般不必调用此函数）
 	 * @return {bool}
 	 */
-	bool check_peer(void);
+	bool check_peer();
 
 protected:
-	~mbedtls_io(void);
+	~mbedtls_io();
 
 	// 实现 stream_hook 类的虚方法
 

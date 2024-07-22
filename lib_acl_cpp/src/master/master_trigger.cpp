@@ -7,12 +7,11 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-master_trigger::master_trigger(void) {}
+master_trigger::master_trigger() {}
 
-master_trigger::~master_trigger(void) {}
+master_trigger::~master_trigger() {}
 
 static bool has_called = false;
 
@@ -72,7 +71,7 @@ void master_trigger::run_alone(const char* path /* = NULL */,
 	service_exit(this);
 }
 
-const char* master_trigger::get_conf_path(void) const
+const char* master_trigger::get_conf_path() const
 {
 #ifndef ACL_WINDOWS
 	if (daemon_mode_) {

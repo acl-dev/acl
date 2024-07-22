@@ -5,11 +5,11 @@
 
 namespace acl {
 
-ofstream::ofstream(void)
+ofstream::ofstream()
 {
 }
 
-ofstream::~ofstream(void)
+ofstream::~ofstream()
 {
 }
 

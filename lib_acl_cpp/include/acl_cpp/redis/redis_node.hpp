@@ -7,23 +7,21 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 该类主要用于 redis_cluster 命令类获取有关集群 redis 结点信息
  * this class is mainly used for redis_cluster command class to
  * get some information about the nodes in redis cluster
  */
-class ACL_CPP_API redis_node : public noncopyable
-{
+class ACL_CPP_API redis_node : public noncopyable {
 public:
 	/**
 	 * 当使用此构造函数实例化类对象时，需要调用 set_id 和 set_addr 方法设置
 	 * 该 redis 结点的唯一标识符及服务监听地址，同时还可调用其它的 set_xxx 设置方法
 	 */
-	redis_node(void);
-	~redis_node(void);
+	redis_node();
+	~redis_node();
 
 	/**
 	 * 除了在构造函数中的参数中传入该结点的 ID 标识符外，还可以通过此函数设置
@@ -144,8 +142,7 @@ public:
 	 * get the node's type
 	 * @return {const char*}
 	 */
-	const char* get_type() const
-	{
+	const char* get_type() const {
 		return type_.c_str();
 	}
 
@@ -154,8 +151,7 @@ public:
 	 * check if the node belongs to the current connection
 	 * @return {bool}
 	 */
-	bool is_myself() const
-	{
+	bool is_myself() const {
 		return myself_;
 	}
 
@@ -164,8 +160,7 @@ public:
 	 * check if the node is in handshaking status
 	 * @return {bool}
 	 */
-	bool is_handshaking() const
-	{
+	bool is_handshaking() const {
 		return handshaking_;
 	}
 
@@ -174,8 +169,7 @@ public:
 	 * check if the node is connected in the cluster
 	 * @return {bool}
 	 */
-	bool is_connected() const
-	{
+	bool is_connected() const {
 		return connected_;
 	}
 
@@ -184,8 +178,7 @@ public:
 	 * get the current slave's master node
 	 * @return {const redis_node*}
 	 */
-	const redis_node* get_master() const
-	{
+	const redis_node* get_master() const {
 		return master_;
 	}
 
@@ -194,8 +187,7 @@ public:
 	 * when the current node is slave, getting its master's ID
 	 * @return {const char*}
 	 */
-	const char* get_master_id() const
-	{
+	const char* get_master_id() const {
 		return master_id_.c_str();
 	}
 
@@ -204,8 +196,7 @@ public:
 	 * getting all the slaves of the master
 	 * @return {const std::vector<redis_node*>*}
 	 */
-	const std::vector<redis_node*>* get_slaves() const
-	{
+	const std::vector<redis_node*>* get_slaves() const {
 		return &slaves_;
 	}
 
@@ -214,8 +205,7 @@ public:
 	 * check if the current node is a master in the redis cluster
 	 * @return {bool}
 	 */
-	bool is_master() const
-	{
+	bool is_master() const {
 		return master_ == this;
 	}
 
@@ -224,8 +214,7 @@ public:
 	 * get the unique ID of the current node, set in constructor
 	 * @return {const char*}
 	 */
-	const char* get_id() const
-	{
+	const char* get_id() const {
 		return id_.c_str();
 	}
 
@@ -234,8 +223,7 @@ public:
 	 * get the listening addr of the current node, set in constructor
 	 * @reutrn {const char*}
 	 */
-	const char* get_addr() const
-	{
+	const char* get_addr() const {
 		return addr_.c_str();
 	}
 
@@ -244,8 +232,7 @@ public:
 	 * d52ea3cb4cdf7294ac1fb61c696ae6483377bcfc 127.0.0.1:16385@116385 master - 0 1428410625374 73 connected 5461-10922
 	 * @return return 127.0.0.1:16385@116385 for redis.4.x.x
 	 */
-	const char* get_addr_info() const
-	{
+	const char* get_addr_info() const {
 		return addr_info_.c_str();
 	}
 

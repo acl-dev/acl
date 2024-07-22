@@ -11,19 +11,18 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-master_aio::master_aio(void) : handle_(NULL) {}
+master_aio::master_aio() : handle_(NULL) {}
 
-master_aio::~master_aio(void)
+master_aio::~master_aio()
 {
 	if (!daemon_mode_) {
 		delete handle_;
 	}
 }
 
-aio_handle* master_aio::get_handle(void) const
+aio_handle* master_aio::get_handle() const
 {
 	acl_assert(handle_);
 	return handle_;
@@ -58,7 +57,7 @@ void master_aio::run_daemon(int argc, char** argv)
 #endif
 }
 
-const char* master_aio::get_conf_path(void) const
+const char* master_aio::get_conf_path() const
 {
 #ifndef ACL_WINDOWS
 	if (daemon_mode_) {
@@ -137,7 +136,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	return true;
 }
 
-void master_aio::stop(void)
+void master_aio::stop()
 {
 	acl_assert(handle_);
 	handle_->stop();
@@ -159,16 +158,14 @@ void master_aio::push_back(server_socket* ss)
 class aio_close_callback : public aio_callback
 {
 public:
-	aio_close_callback(aio_socket_stream* ss)
-	{
+	aio_close_callback(aio_socket_stream* ss) {
 		stream_ = ss->get_astream();
 	}
 
-	~aio_close_callback(void) {}
+	~aio_close_callback() {}
 
 protected:
-	void close_callback(void)
-	{
+	void close_callback() {
 #ifndef ACL_WINDOWS
 		// 通过下面调用通知服务器框架目前已经处理的连接个数，便于
 		// 服务器框架半驻留操作

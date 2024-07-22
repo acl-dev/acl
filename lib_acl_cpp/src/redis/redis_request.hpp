@@ -5,8 +5,7 @@
 
 struct iovec;
 
-namespace acl
-{
+namespace acl {
 
 class ACL_CPP_API redis_request
 {
@@ -18,13 +17,11 @@ public:
 	void reserve(size_t size);
 	void put(const char* data, size_t dlen);
 
-	struct iovec* get_iovec() const
-	{
+	struct iovec* get_iovec() const {
 		return iov_;
 	}
 
-	size_t get_size() const
-	{
+	size_t get_size() const {
 		return argc_;
 	}
 

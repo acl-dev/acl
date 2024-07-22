@@ -8,11 +8,11 @@
 
 namespace acl {
 
-socket_stream::socket_stream(void)
+socket_stream::socket_stream()
 {
 }
 
-socket_stream::~socket_stream(void)
+socket_stream::~socket_stream()
 {
 	close();
 }
@@ -155,7 +155,7 @@ bool socket_stream::multicast_drop(const char *addr, const char *iface)
 	return acl_multicast_drop(ACL_VSTREAM_SOCK(stream_), addr, iface) == 0;
 }
 
-bool socket_stream::shutdown_read(void)
+bool socket_stream::shutdown_read()
 {
 	if (stream_ == NULL) {
 		logger_error("stream_ null");
@@ -164,7 +164,7 @@ bool socket_stream::shutdown_read(void)
 	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RD) == 0;
 }
 
-bool socket_stream::shutdown_write(void)
+bool socket_stream::shutdown_write()
 {
 	if (stream_ == NULL) {
 		logger_error("stream_ null");
@@ -173,7 +173,7 @@ bool socket_stream::shutdown_write(void)
 	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_WR) == 0;
 }
 
-bool socket_stream::shutdown_readwrite(void)
+bool socket_stream::shutdown_readwrite()
 {
 	if (stream_ == NULL) {
 		logger_error("stream_ null");
@@ -182,7 +182,7 @@ bool socket_stream::shutdown_readwrite(void)
 	return acl_socket_shutdown(ACL_VSTREAM_SOCK(stream_), SHUT_RDWR) == 0;
 }
 
-ACL_SOCKET socket_stream::sock_handle(void) const
+ACL_SOCKET socket_stream::sock_handle() const
 {
 	if (stream_ == NULL) {
 		return ACL_SOCKET_INVALID;
@@ -190,7 +190,7 @@ ACL_SOCKET socket_stream::sock_handle(void) const
 	return ACL_VSTREAM_SOCK(stream_);
 }
 
-ACL_SOCKET socket_stream::unbind_sock(void)
+ACL_SOCKET socket_stream::unbind_sock()
 {
 	if (stream_ == NULL) {
 		return ACL_SOCKET_INVALID;
@@ -202,7 +202,7 @@ ACL_SOCKET socket_stream::unbind_sock(void)
 	return sock;
 }
 
-int socket_stream::sock_type(void) const
+int socket_stream::sock_type() const
 {
 	if (stream_ == NULL) {
 		return -1;
@@ -248,7 +248,7 @@ const char* socket_stream::get_peer(bool full /* = false */) const
 	}
 }
 
-const char* socket_stream::get_peer_ip(void) const
+const char* socket_stream::get_peer_ip() const
 {
 	if (stream_ == NULL) {
 		return "";
@@ -306,7 +306,7 @@ const char* socket_stream::get_local(bool full /* = false */) const
 	}
 }
 
-const char* socket_stream::get_local_ip(void) const
+const char* socket_stream::get_local_ip() const
 {
 	if (stream_ == NULL) {
 		return "";
@@ -354,7 +354,7 @@ const char* socket_stream::get_ip(const char* addr, std::string& out)
 	return out.c_str();
 }
 
-bool socket_stream::alive(void) const
+bool socket_stream::alive() const
 {
 	if (stream_ == NULL) {
 		return false;
@@ -365,7 +365,7 @@ bool socket_stream::alive(void) const
 	else
 		return false;
 #else
-	return acl_socket_alive(ACL_VSTREAM_SOCK(stream_)) ? true : false;
+	return acl_socket_alive(ACL_VSTREAM_SOCK(stream_)) != 0;
 #endif
 }
 
@@ -429,7 +429,7 @@ socket_stream& socket_stream::set_tcp_non_blocking(bool on)
 	return *this;
 }
 
-bool socket_stream::get_tcp_nodelay(void)
+bool socket_stream::get_tcp_nodelay() const
 {
 	ACL_SOCKET sock = sock_handle();
 	if (sock == ACL_SOCKET_INVALID) {
@@ -437,10 +437,10 @@ bool socket_stream::get_tcp_nodelay(void)
 		return false;
 	}
 
-	return acl_get_tcp_nodelay(sock) == 0 ? false : true;
+	return acl_get_tcp_nodelay(sock) != 0;
 }
 
-int socket_stream::get_tcp_solinger(void)
+int socket_stream::get_tcp_solinger() const
 {
 	ACL_SOCKET sock = sock_handle();
 	if (sock == ACL_SOCKET_INVALID) {
@@ -451,7 +451,7 @@ int socket_stream::get_tcp_solinger(void)
 	return acl_get_tcp_solinger(sock);
 }
 
-int socket_stream::get_tcp_sendbuf(void)
+int socket_stream::get_tcp_sendbuf() const
 {
 	ACL_SOCKET sock = sock_handle();
 	if (sock == ACL_SOCKET_INVALID) {
@@ -462,7 +462,7 @@ int socket_stream::get_tcp_sendbuf(void)
 	return acl_tcp_get_sndbuf(sock);
 }
 
-int socket_stream::get_tcp_recvbuf(void)
+int socket_stream::get_tcp_recvbuf() const
 {
 	ACL_SOCKET sock = sock_handle();
 	if (sock == ACL_SOCKET_INVALID) {
@@ -473,7 +473,7 @@ int socket_stream::get_tcp_recvbuf(void)
 	return acl_tcp_get_rcvbuf(sock);
 }
 
-bool socket_stream::get_tcp_non_blocking(void)
+bool socket_stream::get_tcp_non_blocking() const
 {
 	ACL_SOCKET sock = sock_handle();
 	if (sock == ACL_SOCKET_INVALID) {
@@ -481,7 +481,7 @@ bool socket_stream::get_tcp_non_blocking(void)
 		return false;
 	}
 
-	return acl_is_blocking(sock) == 0 ? true : false;
+	return acl_is_blocking(sock) == 0;
 }
 
 } // namespace acl

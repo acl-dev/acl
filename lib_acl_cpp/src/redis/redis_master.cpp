@@ -5,8 +5,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_master::redis_master(void)
 : port_(0)

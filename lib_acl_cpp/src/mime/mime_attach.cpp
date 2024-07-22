@@ -28,11 +28,11 @@ mime_attach::mime_attach(const char* emailFile, const MIME_NODE* node,
 	}
 }
 
-mime_attach::~mime_attach(void)
+mime_attach::~mime_attach()
 {
 }
 
-const char* mime_attach::get_filename(void) const
+const char* mime_attach::get_filename() const
 {
 	if (m_filename.empty()) {
 		return NULL;

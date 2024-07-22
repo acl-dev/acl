@@ -4,8 +4,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 class redis_client;
 
@@ -15,13 +14,12 @@ class redis_client;
  * redis connection command clss, including as below:
  * AUTH, ECHO, PING, QUIT, SELECT
  */
-class ACL_CPP_API redis_connection : virtual public redis_command
-{
+class ACL_CPP_API redis_connection : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_connection(void);
+	redis_connection();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -38,7 +36,7 @@ public:
 
 	redis_connection(redis_client_pipeline* pipeline);
 
-	virtual ~redis_connection(void);
+	virtual ~redis_connection();
 
 	/////////////////////////////////////////////////////////////////////
 

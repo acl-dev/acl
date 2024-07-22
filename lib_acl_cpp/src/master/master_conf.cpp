@@ -5,10 +5,9 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-master_conf::master_conf(void)
+master_conf::master_conf()
 {
 	path_       = NULL;
 	cfg_loaded_ = false;
@@ -25,12 +24,12 @@ master_conf::master_conf(void)
 	str_cfg_    = NULL;
 }
 
-master_conf::~master_conf(void)
+master_conf::~master_conf()
 {
 	reset();
 }
 
-void master_conf::reset(void)
+void master_conf::reset()
 {
 	if (path_) {
 		acl_myfree(path_);
@@ -91,12 +90,12 @@ void master_conf::load(const char* path)
 	load_str();
 }
 
-const char* master_conf::get_path(void) const
+const char* master_conf::get_path() const
 {
 	return path_;
 }
 
-void master_conf::load_bool(void)
+void master_conf::load_bool()
 {
 	if (!cfg_loaded_ || bool_cfg_ == NULL) {
 		return;
@@ -104,7 +103,7 @@ void master_conf::load_bool(void)
 	acl_xinetd_params_bool_table(cfg_, bool_cfg_);
 }
 
-void master_conf::load_int(void)
+void master_conf::load_int()
 {
 	if (!cfg_loaded_ || int_cfg_ == NULL) {
 		return;
@@ -112,7 +111,7 @@ void master_conf::load_int(void)
 	acl_xinetd_params_int_table(cfg_, int_cfg_);
 }
 
-void master_conf::load_int64(void)
+void master_conf::load_int64()
 {
 	if (!cfg_loaded_ || int64_cfg_ == NULL) {
 		return;
@@ -120,7 +119,7 @@ void master_conf::load_int64(void)
 	acl_xinetd_params_int64_table(cfg_, int64_cfg_);
 }
 
-void master_conf::load_str(void)
+void master_conf::load_str()
 {
 	if (!cfg_loaded_ || str_cfg_ == NULL) {
 		return;
@@ -217,22 +216,22 @@ void master_conf::set_cfg_str(master_str_tbl* table)
 	load_str();
 }
 
-ACL_CFG_INT_TABLE* master_conf::get_int_cfg(void) const
+ACL_CFG_INT_TABLE* master_conf::get_int_cfg() const
 {
 	return int_cfg_;
 }
 
-ACL_CFG_INT64_TABLE* master_conf::get_int64_cfg(void) const
+ACL_CFG_INT64_TABLE* master_conf::get_int64_cfg() const
 {
 	return int64_cfg_;
 }
 
-ACL_CFG_STR_TABLE* master_conf::get_str_cfg(void) const
+ACL_CFG_STR_TABLE* master_conf::get_str_cfg() const
 {
 	return str_cfg_;
 }
 
-ACL_CFG_BOOL_TABLE* master_conf::get_bool_cfg(void) const
+ACL_CFG_BOOL_TABLE* master_conf::get_bool_cfg() const
 {
 	return bool_cfg_;
 }

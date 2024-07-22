@@ -3,8 +3,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_request::redis_request()
 : iov_(NULL)
@@ -15,8 +14,9 @@ redis_request::redis_request()
 
 redis_request::~redis_request()
 {
-	if (iov_ != NULL)
+	if (iov_ != NULL) {
 		acl_myfree(iov_);
+	}
 }
 
 void redis_request::clear()
@@ -26,15 +26,17 @@ void redis_request::clear()
 
 void redis_request::reserve(size_t size)
 {
-	if (size_ >= size)
+	if (size_ >= size) {
 		return;
+	}
 
 	size_t len = size * sizeof(struct iovec);
 
-	if (iov_ == NULL)
+	if (iov_ == NULL) {
 		iov_ = (struct iovec*) acl_mymalloc(len);
-	else
+	} else {
 		iov_ = (struct iovec*) acl_myrealloc(iov_, len);
+	}
 
 	size_ = size;
 }

@@ -4,18 +4,16 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
 class websocket;
 class session;
 class HttpServletRequest;
 class HttpServletResponse;
 
-class ACL_CPP_API WebSocketServlet : public HttpServlet
-{
+class ACL_CPP_API WebSocketServlet : public HttpServlet {
 public:
-	WebSocketServlet(void);
+	WebSocketServlet();
 
 	/**
 	 * 构造函数
@@ -44,10 +42,10 @@ public:
 	 * 对象是否要求保持长连接来决定是否需要与客户端保持长连接.
 	 */
 
-	virtual ~WebSocketServlet(void);
+	virtual ~WebSocketServlet();
 
 	// @override
-	bool doRun(void);
+	bool doRun();
 
 	// @override
 	bool doRun(session& session, socket_stream* stream = NULL);
@@ -88,7 +86,7 @@ protected:
 	/**
 	 * websocket 关闭消息回调
 	 */
-	virtual void onClose(void) {}
+	virtual void onClose() {}
 
 	/**
 	 * websocket ping 消息回调.
@@ -131,7 +129,7 @@ protected:
 	 * 返回 websocket 对象，如果返回 NULL 表示还未建立 websocket 连接
 	 * @return {websocket*}
 	 */
-	websocket* get_websocket(void) const
+	websocket* get_websocket() const
 	{
 		return ws_;
 	}

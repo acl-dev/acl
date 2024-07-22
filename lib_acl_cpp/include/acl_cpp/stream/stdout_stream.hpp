@@ -9,8 +9,8 @@ namespace acl {
  */
 class ACL_CPP_API stdout_stream : public ostream {
 public:
-	stdout_stream(void);
-	~stdout_stream(void);
+	stdout_stream();
+	~stdout_stream();
 };
 
 } // namespace acl

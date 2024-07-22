@@ -2,15 +2,13 @@
 
 namespace acl {
 
-struct HTTP_PARAM 
-{
+struct HTTP_PARAM {
 	char* name;
 	char* value;
 };
 
 // HTTP 响应状态
-typedef enum
-{
+typedef enum {
 	HTTP_OK,                // 一切正常
 	HTTP_ERR_DNS,           // 域名解析失败
 	HTTP_ERR_CONN,          // 连接服务器失败
@@ -26,8 +24,7 @@ typedef enum
 } http_status_t;
 
 // HTTP 请求方法
-typedef enum
-{
+typedef enum {
 	HTTP_METHOD_UNKNOWN,    // 未知方法
 	HTTP_METHOD_GET,        // GET 方法
 	HTTP_METHOD_POST,       // POST 方法
@@ -42,8 +39,7 @@ typedef enum
 	HTTP_METHOD_OTHER,	// 其它的方法
 } http_method_t;
 
-typedef enum
-{
+typedef enum {
 	// Content-Type: application/x-www-form-urlencoded
 	HTTP_REQUEST_NORMAL,
 
@@ -63,8 +59,7 @@ typedef enum
 	HTTP_REQUEST_OTHER
 } http_request_t;
 
-typedef enum
-{
+typedef enum {
 	// ok
 	HTTP_REQ_OK,
 
@@ -75,8 +70,7 @@ typedef enum
 	HTTP_REQ_ERR_METHOD
 } http_request_error_t;
 
-typedef enum
-{
+typedef enum {
 	HTTP_MIME_PARAM,        // http mime 结点为参数类型
 	HTTP_MIME_FILE          // http mime 结点为文件类型
 } http_mime_t;

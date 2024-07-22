@@ -61,18 +61,18 @@ mime_node::mime_node(const char* emailFile, const MIME_NODE* node,
 	m_bodyEnd = node->body_data_end + off;
 }
 
-mime_node::~mime_node(void)
+mime_node::~mime_node()
 {
 	delete m_headers_;
 	delete m_pParent;
 }
 
-const char* mime_node::get_ctype_s(void) const
+const char* mime_node::get_ctype_s() const
 {
 	return m_pMimeNode->ctype_s ? m_pMimeNode->ctype_s : "";
 }
 
-const char* mime_node::get_stype_s(void) const
+const char* mime_node::get_stype_s() const
 {
 	return m_pMimeNode->stype_s ? m_pMimeNode->stype_s : "";
 }
@@ -91,7 +91,7 @@ const char* mime_node::header_value(const char* name) const
 	return NULL;
 }
 
-const std::map<string, string>& mime_node::get_headers(void) const
+const std::map<string, string>& mime_node::get_headers() const
 {
 	if (m_headers_ != NULL) {
 		return *m_headers_;
@@ -245,7 +245,7 @@ bool mime_node::save(string& out, const char* src /* = NULL */,
 	return save(manager, src, len);
 }
 
-mime_node* mime_node::get_parent(void) const
+mime_node* mime_node::get_parent() const
 {
 	if (m_pParent) {
 		return m_pParent;
@@ -261,12 +261,12 @@ mime_node* mime_node::get_parent(void) const
 	return m_pParent;
 }
 
-bool mime_node::has_parent(void) const
+bool mime_node::has_parent() const
 {
 	return m_pMimeNode->parent == NULL ? false : true;
 }
 
-int mime_node::parent_ctype(void) const
+int mime_node::parent_ctype() const
 {
 	if (m_pMimeNode->parent == NULL) {
 		return MIME_CTYPE_OTHER;
@@ -274,7 +274,7 @@ int mime_node::parent_ctype(void) const
 	return m_pMimeNode->parent->ctype;
 }
 
-int mime_node::parent_stype(void) const
+int mime_node::parent_stype() const
 {
 	if (m_pMimeNode->parent == NULL) {
 		return MIME_STYPE_OTHER;
@@ -282,7 +282,7 @@ int mime_node::parent_stype(void) const
 	return m_pMimeNode->parent->stype;
 }
 
-const char* mime_node::parent_ctype_s(void) const
+const char* mime_node::parent_ctype_s() const
 {
 	if (m_pMimeNode->parent == NULL) {
 		return "";
@@ -291,7 +291,7 @@ const char* mime_node::parent_ctype_s(void) const
 	return ptr ? ptr : "";
 }
 
-const char* mime_node::parent_stype_s(void) const
+const char* mime_node::parent_stype_s() const
 {
 	if (m_pMimeNode->parent == NULL) {
 		return "";
@@ -308,7 +308,7 @@ int mime_node::parent_encoding() const
 	return m_pMimeNode->parent->encoding;
 }
 
-char* mime_node::parent_charset(void) const
+char* mime_node::parent_charset() const
 {
 	if (m_pMimeNode->parent == NULL) {
 		return NULL;

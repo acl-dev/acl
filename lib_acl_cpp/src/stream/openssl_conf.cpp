@@ -481,7 +481,7 @@ void openssl_conf::set_libpath(const char* libcrypto, const char* libssl)
 #endif
 }
 
-void* openssl_conf::get_libssl_handle(void)
+void* openssl_conf::get_libssl_handle()
 {
 #ifdef HAS_OPENSSL_DLL
 	return __openssl_ssl_dll;
@@ -490,7 +490,7 @@ void* openssl_conf::get_libssl_handle(void)
 #endif
 }
 
-void* openssl_conf::get_libcrypto_handle(void)
+void* openssl_conf::get_libcrypto_handle()
 {
 #ifdef HAS_OPENSSL_DLL
 	return __openssl_crypto_dll;
@@ -499,7 +499,7 @@ void* openssl_conf::get_libcrypto_handle(void)
 #endif
 }
 
-bool openssl_conf::load(void)
+bool openssl_conf::load()
 {
 #ifdef HAS_OPENSSL_DLL
 	acl_pthread_once(&__load_once, openssl_dll_load);

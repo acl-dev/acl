@@ -16,11 +16,10 @@ namespace acl {
  * Content-Type: xxx/xxx; name=xxx
  * ...
  */
-class ACL_CPP_API http_ctype : public noncopyable
-{
+class ACL_CPP_API http_ctype : public noncopyable {
 public:
-	http_ctype(void);
-	~http_ctype(void);
+	http_ctype();
+	~http_ctype();
 
 	/**
 	 * 重载了 "=" 操作符进行对象的复制
@@ -44,33 +43,33 @@ public:
 	 * @return {const char*} 返回 NULL 说明没有该数据，一般是因为
 	 *  parse 失败导致的
 	 */
-	const char* get_ctype(void) const;
+	const char* get_ctype() const;
 
 	/**
 	 * 获得 Content-Type 字段值 text/html; charset=utf8 中的 html
 	 * @return {const char*} 返回 NULL 说明没有该数据
 	 */
-	const char* get_stype(void) const;
+	const char* get_stype() const;
 
 	/**
 	 * 获得 Content-Type 字段值 multipart/form-data; boundary=xxx
 	 * 中的 boundary 的值 xxx
 	 * @return {const char*} 返回 NULL 说明没有该数据
 	 */
-	const char* get_bound(void) const;
+	const char* get_bound() const;
 
 	/**
 	 * 获得 Content-Type: xxx/xxx; name=name_xxx
 	 * 中的 name 的值 name_xxx
 	 * @return {const char*} 返回 NULL 说明没有该数据
 	 */
-	const char* get_name(void) const;
+	const char* get_name() const;
 
 	/**
 	 * 获得 Content-Type 字段值 text/html; charset=utf8 中的 utf8
 	 * @return {const char*} 返回 NULL 说明没有该数据
 	 */
-	const char* get_charset(void) const;
+	const char* get_charset() const;
 
 private:
 	char* ctype_;
@@ -79,7 +78,7 @@ private:
 	char* charset_;
 	string* bound_;
 
-	void reset(void);
+	void reset();
 };
 
 } // namespace acl

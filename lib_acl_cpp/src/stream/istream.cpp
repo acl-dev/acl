@@ -227,7 +227,7 @@ bool istream::readtags(string* s, const string& tag)
 	return readtags(*s, tag);
 }
 
-int istream::getch(void)
+int istream::getch()
 {
 	int ret = acl_vstream_getc(stream_);
 	if (ret == ACL_VSTREAM_EOF) {
@@ -245,8 +245,8 @@ int istream::ugetch(int ch)
 	return ret;
 }
 
-bool istream::readable(void) const {
-	return acl_vstream_readable(stream_) != 0 ? true : false;
+bool istream::readable() const {
+	return acl_vstream_readable(stream_) != 0;
 }
 
 bool istream::gets_peek(string& buf, bool nonl /* = true */,
@@ -278,7 +278,7 @@ bool istream::gets_peek(string& buf, bool nonl /* = true */,
 		}
 	}
 
-	return ready ? true : false;
+	return ready != 0;
 }
 
 bool istream::gets_peek(string* buf, bool nonl /* = true */,
@@ -363,7 +363,7 @@ bool istream::readn_peek(string& buf, size_t cnt, bool clear /* = false */)
 			eof_ = true;
 		}
 	}
-	return ready ? true : false;
+	return ready != 0;
 }
 
 bool istream::readn_peek(string* buf, size_t cnt, bool clear /* = false */)

@@ -6,8 +6,7 @@
 
 namespace acl {
 
-class ACL_CPP_API mime_image : public mime_node
-{
+class ACL_CPP_API mime_image : public mime_node {
 public:
 	mime_image(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
@@ -16,9 +15,9 @@ public:
 	{
 	}
 
-	~mime_image(void) {}
+	~mime_image() {}
 
-	const char* get_location(void) const;
+	const char* get_location() const;
 };
 
 } // namespace acl

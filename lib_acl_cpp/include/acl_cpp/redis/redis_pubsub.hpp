@@ -6,16 +6,14 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_pubsub : virtual public redis_command
-{
+class ACL_CPP_API redis_pubsub : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_pubsub(void);
+	redis_pubsub();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -32,7 +30,7 @@ public:
 
 	redis_pubsub(redis_client_pipeline* pipeline);
 
-	virtual ~redis_pubsub(void);
+	virtual ~redis_pubsub();
 
 	/////////////////////////////////////////////////////////////////////
 

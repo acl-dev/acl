@@ -12,8 +12,7 @@
 
 namespace acl {
 
-enum
-{
+enum {
 	rfc2047_status_next,
 	rfc2047_status_data,
 	rfc2047_status_equal_question,
@@ -25,17 +24,16 @@ enum
 };
 
 rfc2047::rfc2047(bool strip_sp /* = true */, bool addCrlf /* = true */)
-	: m_pCurrentEntry(NULL)
-	, m_coder(NULL)
-	, m_status(rfc2047_status_next)
-	, m_stripSp(strip_sp)
-	, m_addCrlf(addCrlf)
-	, m_lastCh(0)
+: m_pCurrentEntry(NULL)
+, m_coder(NULL)
+, m_status(rfc2047_status_next)
+, m_stripSp(strip_sp)
+, m_addCrlf(addCrlf)
+, m_lastCh(0)
 {
-
 }
 
-rfc2047::~rfc2047(void)
+rfc2047::~rfc2047()
 {
 	reset();
 	delete m_coder;
@@ -61,12 +59,12 @@ void rfc2047::reset(bool strip_sp /* = true */)
 	m_coder = NULL;
 }
 
-const std::list<rfc2047_entry*>& rfc2047::get_list(void) const
+const std::list<rfc2047_entry*>& rfc2047::get_list() const
 {
 	return m_List;
 }
 
-void rfc2047::debug_rfc2047(void) const
+void rfc2047::debug_rfc2047() const
 {
 	std::list<rfc2047_entry*>::const_iterator cit = m_List.begin();
 	for (; cit != m_List.end(); ++cit) {

@@ -16,8 +16,8 @@ class string;
 
 class ACL_CPP_API ostream : virtual public stream , public pipe_stream {
 public:
-	ostream(void) {}
-	virtual ~ostream(void) {}
+	ostream() {}
+	virtual ~ostream() {}
 
 	/**
 	 * 写数据至输出流中
@@ -59,7 +59,7 @@ public:
 	 * 如果采用写缓冲方式，则最后需要调用本函数刷写缓冲区
 	 * @return {bool} 返回 false 表示写失败，有可能是连接关闭
 	 */
-	bool fflush(void);
+	bool fflush();
 
 	/**
 	 * 写数据至输出流中
@@ -154,9 +154,9 @@ public:
 	// pipe_stream 几个虚函数
 	// 因为是输出流，所以仅实现一个
 	virtual int push_pop(const char* in, size_t len,
-		string* out = NULL, size_t max = 0);
-	virtual int pop_end(string* out, size_t max = 0)
-	{
+		string* out, size_t max);
+
+	virtual int pop_end(string* out, size_t max) {
 		(void) out;
 		(void) max;
 		return (0);

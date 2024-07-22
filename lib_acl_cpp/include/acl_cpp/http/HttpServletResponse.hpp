@@ -27,8 +27,8 @@ public:
 	 * 构造函数
 	 * @param stream {socket_stream&} 数据流，内部不会自动关闭流
 	 */
-	HttpServletResponse(socket_stream& stream);
-	~HttpServletResponse(void);
+	explicit HttpServletResponse(socket_stream& stream);
+	~HttpServletResponse();
 
 	/**
 	 * 设置 HTTP 响应数据体的长度
@@ -167,7 +167,7 @@ public:
 	 * 获得 HTTP 响应头
 	 * @return {http_header&}
 	 */
-	http_header& getHttpHeader(void) const;
+	http_header& getHttpHeader() const;
 
 	/**
 	 * 向客户端发送 HTTP 数据体响应数据，可以循环调用此函数，
@@ -238,27 +238,26 @@ public:
 	 *  通过从 getOutputStream 获得的 socket 流写数据时，则本函数
 	 *  必须显式被调用
 	 */
-	bool sendHeader(void);
+	bool sendHeader();
 
 	/**
 	 * 获得 HTTP 响应对象的输出流对象，用户在调用 sendHeader 发送
 	 * 完 HTTP 响应头后，通过该输出流来发送 HTTP 数据体
 	 * @return {ostream&}
 	 */
-	ostream& getOutputStream(void) const;
+	ostream& getOutputStream() const;
 
 	/**
 	 * 获得 HTTP 双向流对象，由构造函数的参数输入
 	 * @return {socket_stream&}
 	 */
-	socket_stream& getSocketStream(void) const;
+	socket_stream& getSocketStream() const;
 
 	/**
 	 * 获得底层的 http_client 通信对象
 	 * @return {http_client*} 非 NULL
 	 */
-	http_client* getClient() const
-	{
+	http_client* getClient() const {
 		return client_;
 	}
 

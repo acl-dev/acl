@@ -8,27 +8,26 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
 void master_log_enable(bool yes)
 {
 	acl_master_log_enable(yes ? 1 : 0);
 }
 
-bool master_log_enabled(void)
+bool master_log_enabled()
 {
 	return acl_master_log_enabled() ? true : false;
 }
 
-master_base::master_base(void)
+master_base::master_base()
 {
 	daemon_mode_ = false;
 	proc_inited_ = false;
 	event_ = NULL;
 }
 
-master_base::~master_base(void)
+master_base::~master_base()
 {
 	for (std::vector<server_socket*>::iterator it = servers_.begin();
 		it != servers_.end(); ++it) {
@@ -75,7 +74,7 @@ master_base& master_base::set_cfg_str(master_str_tbl* table)
 	return *this;
 }
 
-bool master_base::daemon_mode(void) const
+bool master_base::daemon_mode() const
 {
 	return daemon_mode_;
 }

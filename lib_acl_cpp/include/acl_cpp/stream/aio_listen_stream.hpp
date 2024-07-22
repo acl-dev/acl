@@ -13,8 +13,8 @@ class aio_listen_stream;
  */
 class ACL_CPP_API aio_accept_callback : public aio_callback {
 public:
-	aio_accept_callback(void) {}
-	virtual ~aio_accept_callback(void) {}
+	aio_accept_callback() {}
+	virtual ~aio_accept_callback() {}
 
 	/**
 	 * 当接收到新的客户端流时的回调函数
@@ -34,8 +34,8 @@ public:
  */
 class ACL_CPP_API aio_listen_callback : public aio_callback {
 public:
-	aio_listen_callback(void) {}
-	virtual ~aio_listen_callback(void) {}
+	aio_listen_callback() {}
+	virtual ~aio_listen_callback() {}
 
 	virtual bool listen_callback(aio_listen_stream& ss) = 0;
 };
@@ -73,7 +73,7 @@ public:
 	 * 中的函数 listen_callback 里可以调用本方法来获得一个异步连接对象
 	 * @return {aio_socket_stream*} 返回 NULL 表示获得连接失败
 	 */
-	aio_socket_stream* accept(void);
+	aio_socket_stream* accept();
 
 	/**
 	 * 开始监听某个指定地址，可以为网络套接口，也可以为域套接口，
@@ -120,15 +120,15 @@ public:
 	 * 获得服务器监听地址
 	 * @return {const char*}
 	 */
-	const char* get_addr(void) const;
+	const char* get_addr() const;
 
 	/**
 	 * 重载基类方法，当异步流对象销毁时回调此方法
 	 */
-	virtual void destroy(void);
+	virtual void destroy();
 
 protected:
-	virtual ~aio_listen_stream(void);
+	virtual ~aio_listen_stream();
 
 private:
 	bool listen_hooked_;
@@ -136,7 +136,7 @@ private:
 	std::list<aio_accept_callback*> accept_callbacks_;
 	std::list<aio_listen_callback*> listen_callbacks_;
 
-	void enable_listen(void);
+	void enable_listen();
 	int accept_callback(aio_socket_stream* conn);
 	static int listen_callback(ACL_ASTREAM*, void*);
 };

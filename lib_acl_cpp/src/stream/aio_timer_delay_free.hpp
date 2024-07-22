@@ -3,17 +3,15 @@
 #include <set>
 #include "acl_cpp/stream/aio_timer_callback.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class aio_handle;
 class aio_delay_free;
 
-class aio_timer_delay_free : public aio_timer_callback
-{
+class aio_timer_delay_free : public aio_timer_callback {
 public:
 	aio_timer_delay_free(aio_handle& handle);
-	~aio_timer_delay_free(void);
+	~aio_timer_delay_free();
 
 	virtual void timer_callback(unsigned int id);
 	bool add(aio_delay_free* callback);

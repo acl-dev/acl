@@ -26,7 +26,7 @@ public:
 	 * @param session {session*} 每一个 HttpServlet 对象一个 session 对象
 	 */
 	HttpServlet(socket_stream* stream, session* session);
-	HttpServlet(socket_stream* stream);
+	explicit HttpServlet(socket_stream* stream);
 
 	/**
 	 * 构造函数（该函数已经废弃，请用其它构造方法）
@@ -39,16 +39,14 @@ public:
 	//@ACL_DEPRECATED
 	HttpServlet(socket_stream* stream, const char* memcache_addr);
 
-	HttpServlet(void);
-	virtual ~HttpServlet(void) = 0;
+	HttpServlet();
+	virtual ~HttpServlet() = 0;
 
-	session& getSession(void) const
-	{
+	session& getSession() const {
 		return *session_;
 	}
 
-	socket_stream* getStream(void) const
-	{
+	socket_stream* getStream() const {
 		return stream_;
 	}
 
@@ -93,7 +91,7 @@ public:
 	 *  返回 true 表示处理成功，调用此函数后应该继续通过判断请求/响应对象中
 	 *  是否需要保持长连接来确实最终是否保持长连接
 	 */
-	bool start(void);
+	bool start();
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数，
@@ -102,7 +100,7 @@ public:
 	 * @return {bool} 返回处理结果，返回 false 表示处理失败或处理成功且不保持
 	 *  长连接，应关闭连接
 	 */
-	virtual bool doRun(void);
+	virtual bool doRun();
 
 	/**
 	 * HttpServlet 对象开始运行，接收 HTTP 请求，并回调以下 doXXX 虚函数

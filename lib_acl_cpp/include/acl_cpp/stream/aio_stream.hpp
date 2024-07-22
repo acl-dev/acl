@@ -17,12 +17,11 @@ namespace acl {
  */
 class ACL_CPP_API aio_callback : public noncopyable {
 public:
-	aio_callback(void) {}
-	virtual ~aio_callback(void) {};
+	aio_callback() {}
+	virtual ~aio_callback() {};
 
-	virtual void close_callback(void) {}
-	virtual bool timeout_callback(void)
-	{
+	virtual void close_callback() {}
+	virtual bool timeout_callback() {
 		return false;
 	}
 
@@ -34,8 +33,7 @@ public:
 	 * @param len {int} 读到的数据长度(> 0)
 	 * @return {bool} 该函数返回 false 通知异步引擎关闭该异步流
 	 */
-	virtual bool read_callback(char* data, int len)
-	{
+	virtual bool read_callback(char* data, int len) {
 		(void) data;
 		(void) len;
 		return true;
@@ -46,8 +44,7 @@ public:
 	 * read_wait 的可读条件即异步流中有数据可读时被调用；当超时时会
 	 * 调用 timeout_callback，流异常被关闭时会调用 close_callback
 	 */
-	virtual bool read_wakeup(void)
-	{
+	virtual bool read_wakeup() {
 		return true;
 	}
 
@@ -55,8 +52,7 @@ public:
 	 * 写成功后的回调虚函数
 	 * @return {bool} 该函数返回 false 通知异步引擎关闭该异步流
 	 */
-	virtual bool write_callback(void)
-	{
+	virtual bool write_callback() {
 		return true;
 	}
 
@@ -65,8 +61,7 @@ public:
 	 * write_wait 的可写条件即异步流可写时被调用；当超时时会
 	 * 调用 timeout_callback，流异常被关闭时会调用 close_callback
 	 */
-	virtual bool write_wakeup(void)
-	{
+	virtual bool write_wakeup() {
 		return true;
 	}
 };
@@ -166,13 +161,13 @@ public:
 	 * 获得异步流对象 ACL_ASTREAM
 	 * @return {ACL_ASTREAM*}
 	 */
-	ACL_ASTREAM* get_astream(void) const;
+	ACL_ASTREAM* get_astream() const;
 
 	/**
 	 * 获得异步流对象中的同步流对象 ACL_VSTREAM
 	 * @return {ACL_VSTREAM*}
 	 */
-	ACL_VSTREAM* get_vstream(void) const;
+	ACL_VSTREAM* get_vstream() const;
 
 	/**
 	 * 获得异步流中的 SOCKET 描述符
@@ -182,8 +177,8 @@ public:
 	SOCKET get_socket(void) const;
 	SOCKET sock_handle(void) const
 #else
-	int get_socket(void) const;
-	int sock_handle(void) const
+	int get_socket() const;
+	int sock_handle() const
 #endif
 	{
 		return get_socket();
@@ -211,7 +206,7 @@ public:
 	 * 获得异步流事件句柄
 	 * @return {aio_handle&}
 	 */
-	aio_handle& get_handle(void) const;
+	aio_handle& get_handle() const;
 
 	/**
 	 * 重新绑定异步事件句柄
@@ -234,31 +229,31 @@ public:
 	 * 获得当前注册的流读写对象
 	 * @return {stream_hook*}
 	 */
-	stream_hook* get_hook(void) const;
+	stream_hook* get_hook() const;
 
 	/**
 	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
 	 * @return {stream_hook*}
 	 */
-	stream_hook* remove_hook(void);
+	stream_hook* remove_hook();
 
 protected:
 	aio_handle*  handle_;
 	ACL_ASTREAM* stream_;
 	stream_hook* hook_;
 
-	virtual ~aio_stream(void);
+	virtual ~aio_stream();
 
 	/**
 	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
 	 */
-	virtual void destroy(void);
+	virtual void destroy();
 
 	/**
 	 * 子类应在创建成功后调用该函数通知基类增加异步流句柄数,
 	 * 同时注册流关闭及流超时时的回调过程
 	 */
-	void enable_error(void);
+	void enable_error();
 
 protected:
 	enum {

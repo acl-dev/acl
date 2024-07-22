@@ -51,7 +51,7 @@ public:
 	 * 判断是否是由 acl_master 控制的 daemon 模式
 	 * @return {bool}
 	 */
-	bool daemon_mode(void) const;
+	bool daemon_mode() const;
 
 	/////////////////////////////////////////////////////////////////////
 	
@@ -126,8 +126,7 @@ protected:
 	 * 获得事件引擎够本
 	 * @return {ACL_EVENT*}
 	 */
-	ACL_EVENT* get_event(void) const
-	{
+	ACL_EVENT* get_event() const {
 		return event_;
 	}
 

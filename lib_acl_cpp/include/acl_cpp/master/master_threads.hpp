@@ -60,21 +60,21 @@ public:
 	 * 获得配置文件路径
 	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
 	 */
-	const char* get_conf_path(void) const;
+	const char* get_conf_path() const;
 
 	/**
 	 * 获得当前线程池队列中积压的待处理任务数，该 API 可以方便应用决定何时
 	 * 需要进行过载保护，在压力大的时候将后续的任务丢弃
 	 * @return {size_t}
 	 */
-	size_t task_qlen(void) const;
+	size_t task_qlen() const;
 
 public:
 	/**
 	 * 获得 lib_acl C 库中的线程池句柄
 	 * @return {acl_pthread_pool_t*}
 	 */
-	acl_pthread_pool_t* threads_pool(void) const;
+	acl_pthread_pool_t* threads_pool() const;
 
 protected:
 	// 该类不能直接被实例化
@@ -95,8 +95,7 @@ protected:
 	 * @param stream {socket_stream*}
 	 * @return {bool} 如果返回 false，则框架不再监控该流对象
 	 */
-	virtual bool keep_read(socket_stream* stream)
-	{
+	virtual bool keep_read(socket_stream* stream) {
 		(void) stream;
 		return true;
 	}
@@ -108,8 +107,7 @@ protected:
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
 	 *  必将该连接再传递至 thread_main 过程
 	 */
-	virtual bool thread_on_accept(socket_stream* stream)
-	{
+	virtual bool thread_on_accept(socket_stream* stream) {
 		(void) stream;
 		return true;
 	}
@@ -120,8 +118,7 @@ protected:
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，而不
 	 *  必将该连接再传递至 thread_main 过程
 	 */
-	virtual bool thread_on_handshake(socket_stream *stream)
-	{
+	virtual bool thread_on_handshake(socket_stream *stream) {
 		(void) stream;
 		return true;
 	}
@@ -133,8 +130,7 @@ protected:
 	 * @return {bool} 如果返回 false 则表示子类要求关闭连接，否则则要求
 	 *  继续监听该连接
 	 */
-	virtual bool thread_on_timeout(socket_stream* stream)
-	{
+	virtual bool thread_on_timeout(socket_stream* stream) {
 		(void) stream;
 		return false;
 	}
@@ -169,8 +165,7 @@ protected:
 	 * @return {bool} 返回 false 表示当前子进程还不能退出，否则表示当前
 	 *  子进程可以退出了
 	 */
-	virtual bool proc_exit_timer(size_t nclients, size_t nthreads)
-	{
+	virtual bool proc_exit_timer(size_t nclients, size_t nthreads) {
 		(void) nclients;
 		(void) nthreads;
 		return true;

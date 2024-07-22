@@ -14,8 +14,8 @@ class string;
 
 class ACL_CPP_API istream : virtual public stream {
 public:
-	istream(void) {}
-	virtual ~istream(void) {}
+	istream() {}
+	virtual ~istream() {}
 
 	/**
 	 * 从输入流中读数据
@@ -140,7 +140,7 @@ public:
 	 * @return {int} 所读字节的 ASCII 码值，如果返回值为 -1 则表示对方关闭或
 	 *  读出错
 	 */
-	int getch(void);
+	int getch();
 
 	/**
 	 * 向输入流中放加一个字节的数据
@@ -154,7 +154,7 @@ public:
 	 * 下面的 xxx_peek() 结合.
 	 * @return {bool}
 	 */
-	bool readable(void) const;
+	bool readable() const;
 
 	/**
 	 * 尝试性从输入流中读取一行数据

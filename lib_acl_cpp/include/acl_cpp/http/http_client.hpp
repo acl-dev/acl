@@ -22,14 +22,13 @@ class http_header;
  * 到 HTTP 客户端连接时创建一个对应的 HTTP 客户端流对象
  * 该客户端流对象可以支持长连接
  */
-class ACL_CPP_API http_client : public noncopyable
-{
+class ACL_CPP_API http_client : public noncopyable {
 public:
 	/**
 	 * 缺省的构造函数，使用此构造函数创建的 HTTP 客户端对象，需要显示地
 	 * 调用 http_client::open 来打开数据流
 	 */
-	http_client(void);
+	http_client();
 
 	/**
 	 * 根据已经连接成功的连接流对象创建 HTTP 客户端对象，但需要注意的是，
@@ -49,14 +48,14 @@ public:
 	http_client(socket_stream* client, bool is_request = false,
 		bool unzip = true, bool stream_fixed = true);
 
-	virtual ~http_client(void);
+	virtual ~http_client();
 
 	/**
 	 * 在支持长连接的多次请求中，可以手工调用此函数清除中间的数据对象，
 	 * 当然这不是必须的，因为在多次调用 read_head 时，read_head 会自动
 	 * 调用 reset 来清除上次请求过程中的是间对象
 	 */
-	void reset(void);
+	void reset();
 
 	/**
 	 * 连接远程 HTTP 服务器
@@ -94,7 +93,7 @@ public:
 	 * @return {ostream&} 返回输出流的引用，如果该流并不存在，
 	 *  则内部自动会产生断言，提示使用者应先将流打开
 	 */
-	ostream& get_ostream(void) const;
+	ostream& get_ostream() const;
 
 	/**
 	 * 当调用 http_client(socket_stream*, bool) 构造函数创建
@@ -103,7 +102,7 @@ public:
 	 * @return {istream&} 返回输入流的引用，如果该流并不存在，
 	 *  则内部自动会产生断言，提示使用者应先将流打开
 	 */
-	istream& get_istream(void) const;
+	istream& get_istream() const;
 
 	/**
 	 * 当调用 http_client(socket_stream*, bool) 构造函数创建
@@ -112,14 +111,14 @@ public:
 	 * @return {socket_stream&} 返回流的引用，如果该流并不存在，
 	 *  则内部自动会产生断言，提示使用者应先将流打开
 	 */
-	socket_stream& get_stream(void) const;
+	socket_stream& get_stream() const;
 
 	/**
 	 * 从 HTTP 服务器读取响应头数据或从 HTTP 客户端读取请求数据，
 	 * 在长连接的多次请求中，后续的请求会自动清除上次的中间数据对象
 	 * @return {bool} 是否成功
 	 */
-	bool read_head(void);
+	bool read_head();
 
 	/**
 	 * 获得 HTTP 请求的数据体或响应的数据体长度
@@ -128,7 +127,7 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
 	__int64 body_length(void) const;
 #else
-	long long int body_length(void) const;
+	long long int body_length() const;
 #endif
 
 	/**
@@ -180,22 +179,22 @@ public:
 	 * HTTP 数据流(请求流或响应流是否允许保持长连接)
 	 * @return {bool}
 	 */
-	bool is_keep_alive(void) const;
-	bool keep_alive(void) const;
+	bool is_keep_alive() const;
+	bool keep_alive() const;
 
 	/**
 	 * 当本对象为客户端请求对象时，本方法用来判断服务端返回的 HTTP 头中
 	 * 是否允许保持长连接
 	 * @return {bool}
 	 */
-	bool is_server_keep_alive(void) const;
+	bool is_server_keep_alive() const;
 
 	/**
 	 * 当本对象为服务端响应对象时，本方法用来判断客户端请求的 HTTP 头中
 	 * 是否允许保持长连接
 	 * @return {bool}
 	 */
-	bool is_client_keep_alive(void) const;
+	bool is_client_keep_alive() const;
 
 	/**
 	 * 获得 HTTP 请求头或响应头中某个字段名的字段值
@@ -241,25 +240,25 @@ public:
 	 * @return {int} 若返回值为 -1 则表示出错，或该会话过程
 	 *  不是向 HTTP 服务器请求数据过程
 	 */
-	int response_status(void) const;
+	int response_status() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 HOST 字段值
 	 * @return {const char*} 返回 NULL 表示不存在该字段
 	 */
-	const char* request_host(void) const;
+	const char* request_host() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 PORT 端口号
 	 * @return {int} 返回 -1 表示不存在
 	 */
-	int request_port(void) const;
+	int request_port() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 HTTP 方法：GET, POST, CONNECT
 	 * @return {const char*} 返回值为空表示不存在
 	 */
-	const char* request_method(void) const;
+	const char* request_method() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 URL 中除去 HTTP://domain 后的内容
@@ -267,7 +266,7 @@ public:
 	 * 函数应该返回：/cgi-bin/test?name=value
 	 * @return {const char*} 返回 NULL 表示不存在
 	 */
-	const char* request_url(void) const;
+	const char* request_url() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 URL 中的相对路径(不包含主机部分)，
@@ -275,7 +274,7 @@ public:
 	 * 函数应该返回：/path/test.cgi
 	 * @return {const char*} 返回 NULL 表示不存在
 	 */
-	const char* request_path(void) const;
+	const char* request_path() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 URL 中的所有参数，如：
@@ -283,7 +282,7 @@ public:
 	 * name=value
 	 * @return {const char*} 返回 NULL 表示不存在
 	 */
-	const char* request_params(void) const;
+	const char* request_params() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的 URL 中指定的参数值，如：
@@ -356,13 +355,13 @@ public:
 	 * 判断是否已经读完 HTTP 响应数据体
 	 * @return {bool}
 	 */
-	bool body_finish(void) const;
+	bool body_finish() const;
 
 	/**
 	 * 判断网络连接是否已经关闭
 	 * @return {bool}
 	 */
-	bool disconnected(void) const;
+	bool disconnected() const;
 
 	/**
 	 * 取得通过 read_head 读到的 HTTP 响应头对象，且当传入缓冲区
@@ -423,8 +422,8 @@ private:
 	unsigned gzip_total_in_;    // gzip 压缩前的总数据长度      
 	string* buf_;               // 内部缓冲区，用在按行读等操作中
 
-	bool read_request_head(void);
-	bool read_response_head(void);
+	bool read_request_head();
+	bool read_response_head();
 	int  read_request_body(char* buf, size_t size);
 	int  read_response_body(char* buf, size_t size);
 	int  read_request_body(string& out, bool clean, int* real_size);

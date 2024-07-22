@@ -8,8 +8,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT_LEN		11
 
@@ -77,7 +76,7 @@ bool redis_server::client_getname(string& buf)
 	lens[1] = sizeof("GETNAME") - 1;
 
 	build_request(2, argv, lens);
-	return get_string(buf) >0 ? true : false;
+	return get_string(buf) >0;
 }
 
 bool redis_server::client_kill(const char* addr)
@@ -261,15 +260,17 @@ int redis_server::info(std::map<string, string>& out)
 	while (!buf.empty()) {
 		line.clear();
 		buf.scan_line(line);
-		if (line.empty())
+		if (line.empty()) {
 			continue;
+		}
 
 		char* name = line.c_str();
 		if (*name == ':')
 			name++;
 		char* value = strchr(name, ':');
-		if (value == NULL || *(value + 1) == 0)
+		if (value == NULL || *(value + 1) == 0) {
 			continue;
+		}
 		*value++ = 0;
 		out[name] = value;
 	}
@@ -306,11 +307,13 @@ bool redis_server::get_command(string& buf)
 	clear_request();
 
 	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS)
+	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS) {
 		return false;
+	}
 	const char* status = result->get_status();
-	if (status == NULL || *status == '\0')
+	if (status == NULL || *status == '\0') {
 		return false;
+	}
 	buf = status;
 	return true;
 }
@@ -433,8 +436,9 @@ bool redis_server::get_time(time_t& stamp, int& escape)
 	build_request(1, argv, lens);
 
 	std::vector<string> tokens;
-	if (get_strings(tokens) <= 0 || tokens.size() < 2)
+	if (get_strings(tokens) <= 0 || tokens.size() < 2) {
 		return false;
+	}
 
 	stamp = atol(tokens[0].c_str());
 	escape = atoi(tokens[1].c_str());

@@ -8,13 +8,12 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT64_LEN	21
 #define FLOAT_LEN	32
 
-redis_hash::redis_hash(void)
+redis_hash::redis_hash()
 {
 }
 
@@ -38,7 +37,7 @@ redis_hash::redis_hash(redis_client_pipeline* pipeline)
 {
 }
 
-redis_hash::~redis_hash(void)
+redis_hash::~redis_hash()
 {
 }
 
@@ -425,10 +424,11 @@ bool redis_hash::hincrby(const char* key, const char* name,
 
 	bool success;
 
-	if (result != NULL)
+	if (result != NULL) {
 		*result = get_number64(&success);
-	else
+	} else {
 		(void) get_number64(&success);
+	}
 
 	return success;
 }

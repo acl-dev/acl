@@ -10,8 +10,7 @@ namespace acl {
  * 双向输入输出缓冲管道流, 该流不仅可接收输入数据，同时还可输出所
  * 输入的数据，纯虚基类，子类需要实现三个接口函数
  */
-class ACL_CPP_API pipe_stream : public noncopyable
-{
+class ACL_CPP_API pipe_stream : public noncopyable {
 public:
 	pipe_stream() {}
 	virtual ~pipe_stream() {}
@@ -25,8 +24,7 @@ public:
 	 *  表示没有限制，输出结果都存储在 out 缓冲区中
 	 * @return {int} 输出数据的长度，如果 < 0 则表示出错
 	 */
-	virtual int push_pop(const char* in, size_t len,
-		string* out, size_t max = 0) = 0;
+	virtual int push_pop(const char* in, size_t len, string* out, size_t max) = 0;
 
 	/**
 	 * 最后处理的输出数据接口
@@ -35,7 +33,7 @@ public:
 	 *  表示没有限制，输出结果都存储在 out 缓冲区中
 	 * @return {int} 输出数据的长度，如果 < 0 则表示出错
 	 */
-	virtual int pop_end(string* out, size_t max = 0) = 0;
+	virtual int pop_end(string* out, size_t max) = 0;
 
 	/**
 	 * 清空内部缓冲区
@@ -46,40 +44,33 @@ public:
 /**
  * 字符串处理双向管理流
  */
-class ACL_CPP_API pipe_string : public pipe_stream
-{
+class ACL_CPP_API pipe_string : public pipe_stream {
 public:
 	pipe_string();
 	pipe_string(string& s);
 	virtual ~pipe_string();
 
 	// pipe_stream 基类中的四个虚函数
-	virtual int push_pop(const char* in, size_t len,
-		string* out, size_t max = 0);
-	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear()
-	{
+	virtual int push_pop(const char* in, size_t len, string* out, size_t max);
+	virtual int pop_end(string* out, size_t max);
+	virtual void clear() {
 		m_pBuf->clear();
 		m_pos = 0;
 	}
 
-	string& get_buf() const
-	{
+	string& get_buf() const {
 		return (*m_pBuf);
 	}
 
-	char* c_str() const
-	{
+	char* c_str() const {
 		return (m_pBuf->c_str());
 	}
 
-	size_t length() const
-	{
+	size_t length() const {
 		return (m_pBuf->length());
 	}
 
-	bool empty() const
-	{
+	bool empty() const {
 		return (m_pBuf->empty());
 	}
 
@@ -94,8 +85,7 @@ private:
  * 输入接口，同时从所有管道流的输出接口中获得数据然后再将数据传递给
  * 下一个管道流的输入接口，以此类推，直到最后一个管道流
  */
-class ACL_CPP_API pipe_manager : public noncopyable
-{
+class ACL_CPP_API pipe_manager : public noncopyable {
 public:
 	pipe_manager();
 	~pipe_manager();

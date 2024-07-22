@@ -9,12 +9,11 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-master_udp::master_udp(void) {}
+master_udp::master_udp() {}
 
-master_udp::~master_udp(void)
+master_udp::~master_udp()
 {
 	for (std::vector<socket_stream*>::iterator it = sstreams_.begin();
 		it != sstreams_.end(); ++it) {
@@ -61,7 +60,7 @@ void master_udp::run_daemon(int argc, char** argv)
 #endif
 }
 
-const char* master_udp::get_conf_path(void) const
+const char* master_udp::get_conf_path() const
 {
 #ifndef ACL_WINDOWS
 	if (daemon_mode_) {
@@ -126,12 +125,12 @@ void master_udp::remove(socket_stream* ss)
 	logger_error("not found ss=%p", ss);
 }
 
-void master_udp::lock(void)
+void master_udp::lock()
 {
 	lock_.lock();
 }
 
-void master_udp::unlock(void)
+void master_udp::unlock()
 {
 	lock_.unlock();
 }

@@ -11,10 +11,9 @@
 #define INT_LEN		11
 #define LONG_LEN	21
 
-namespace acl
-{
+namespace acl {
 
-redis_stream::redis_stream(void)
+redis_stream::redis_stream()
 {
 }
 
@@ -38,7 +37,7 @@ redis_stream::redis_stream(redis_client_pipeline* pipeline)
 {
 }
 
-redis_stream::~redis_stream(void)
+redis_stream::~redis_stream()
 {
 }
 
@@ -58,7 +57,7 @@ bool redis_stream::xadd(const char* key, const std::map<string, string>& fields,
 
 	hash_slot(key);
 	build("XADD", key, id, fields);
-	return get_string(result) >= 0 ? true : false;
+	return get_string(result) >= 0;
 }
 
 bool redis_stream::xadd(const char* key, const std::vector<string>& names,
@@ -78,7 +77,7 @@ bool redis_stream::xadd(const char* key, const std::vector<string>& names,
 
 	hash_slot(key);
 	build("XADD", key, id, names, values);
-	return get_string(result) >= 0 ? true : false;
+	return get_string(result) >= 0;
 }
 
 bool redis_stream::xadd(const char* key, const std::vector<const char*>& names,
@@ -98,7 +97,7 @@ bool redis_stream::xadd(const char* key, const std::vector<const char*>& names,
 
 	hash_slot(key);
 	build("XADD", key, id, names, values);
-	return get_string(result) >= 0 ? true : false;
+	return get_string(result) >= 0;
 }
 
 bool redis_stream::xadd(const char* key, const char* names[],
@@ -118,7 +117,7 @@ bool redis_stream::xadd(const char* key, const char* names[],
 
 	hash_slot(key);
 	build("XADD", key, id, names, names_len, values, values_len, argc);
-	return get_string(result) >= 0 ? true : false;
+	return get_string(result) >= 0;
 }
 
 bool redis_stream::xadd_with_maxlen(const char* key, size_t maxlen,
@@ -173,7 +172,7 @@ bool redis_stream::xadd_with_maxlen(const char* key, size_t maxlen,
 
 	hash_slot(key);
 	build_request(i, argv_, argv_lens_);
-	return get_string(result) >= 0 ? true : false;
+	return get_string(result) >= 0;
 }
 
 int redis_stream::xlen(const char* key)

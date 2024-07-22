@@ -16,8 +16,7 @@ class HttpCookie;
 /**
  * HTTP 头类，可以构建请求头或响应头
 */
-class ACL_CPP_API http_header : public dbuf_obj
-{
+class ACL_CPP_API http_header : public dbuf_obj {
 public:
 	/**
 	 * 构造函数
@@ -66,12 +65,12 @@ public:
 	 */
 	http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf = NULL);
 
-	virtual ~http_header(void);
+	virtual ~http_header();
 
 	/**
 	 * 重置 HTTP 头信息同时将上次的临时资源释放
 	 */
-	void reset(void);
+	void reset();
 
 	//////////////////////////////////////////////////////////////////////
 	//            HTTP 请求与 HTTP 响应通用的方法函数
@@ -126,8 +125,7 @@ public:
 	}
 #else
 	http_header& set_content_length(long long int n);
-	long long int get_content_length() const
-	{
+	long long int get_content_length() const {
 		return content_length_;
 	}
 #endif
@@ -188,14 +186,13 @@ public:
 	/**
 	 * 检查当前头是否设置了保持长连接选项
 	 */
-	bool get_keep_alive() const
-	{
+	bool get_keep_alive() const {
 		return keep_alive_;
 	}
 
 	http_header& set_upgrade(const char* value = "websocket");
-	const char* get_upgrade(void) const
-	{
+
+	const char* get_upgrade() const {
 		return upgrade_;
 	}
 
@@ -236,7 +233,7 @@ public:
 	 * 判断是否是 HTTP 请求头
 	 * @return {bool} 返回 false 表明是 HTTP 响应头
 	 */
-	bool is_request(void) const;
+	bool is_request() const;
 
 	/**
 	 * 设置标志位，针对 HTTP 请求的 URI 中的 ? 问号被转义(即被转成 %3F)的请求是否
@@ -287,8 +284,7 @@ public:
 	 * 获得设置的 HTTP 请求头中的 HOST 字段
 	 * @return {const char*} 返回空指针表示没有设置 HOST 字段
 	 */
-	const char* get_host() const
-	{
+	const char* get_host() const {
 		return host_[0] == 0 ? NULL : host_;
 	}
 
@@ -361,29 +357,24 @@ public:
 	http_header& set_ws_protocol(const char* proto);
 	http_header& set_ws_version(int ver);
 
-	const char* get_ws_origin(void) const
-	{
+	const char* get_ws_origin() const {
 		return ws_origin_;
 	}
 
-	const char* get_ws_key(void) const
-	{
+	const char* get_ws_key() const {
 		return ws_sec_key_;
 	}
 
-	const char* get_ws_protocol(void) const
-	{
+	const char* get_ws_protocol() const {
 		return ws_sec_proto_;
 	}
 
-	int get_ws_version(void) const
-	{
+	int get_ws_version() const {
 		return ws_sec_ver_;
 	}
 
 	http_header& set_ws_accept(const char* key);
-	const char* get_ws_accept(void) const
-	{
+	const char* get_ws_accept() const {
 		return ws_sec_accept_;
 	}
 
@@ -408,12 +399,12 @@ public:
 	 * 获取通过 set_redirect 设置的允许的最大重定向次数
 	 * @return {unsigned int}
 	 */
-	unsigned int get_redirect(void) const;
+	unsigned int get_redirect() const;
 
 	/**
 	 * 当需要重定向时，会主动调用此函数允许子类做一些重置工作
 	 */
-	virtual void redicrect_reset(void) {}
+	virtual void redicrect_reset() {}
 
 	//////////////////////////////////////////////////////////////////////
 	//                       HTTP 响应方法函数
@@ -437,8 +428,7 @@ public:
 	 * 获得响应头中的 HTTP 状态字
 	 * @return {int} HTTP 响应状态码：1xx, 2xx, 3xx, 4xx, 5xx
 	 */
-	int get_status(void) const
-	{
+	int get_status() const {
 		return status_;
 	}
 
@@ -453,8 +443,7 @@ public:
 	 * 判断当前 HTTP 传输是否采用 chunked 传输方式
 	 * @return {bool}
 	 */
-	bool chunked_transfer(void) const
-	{
+	bool chunked_transfer() const {
 		return chunked_transfer_;
 	}
 
@@ -469,8 +458,7 @@ public:
 	 * 是否设置了 CGI 模式
 	 * @return {bool}
 	 */
-	bool is_cgi_mode() const
-	{
+	bool is_cgi_mode() const {
 		return cgi_mode_;
 	}
 
@@ -485,8 +473,7 @@ public:
 	 * 获得当前的数据传输是否设置了采用 gzip 压缩方式
 	 * @return {bool}
 	 */
-	bool is_transfer_gzip() const
-	{
+	bool is_transfer_gzip() const {
 		return transfer_gzip_;
 	}
 
@@ -533,8 +520,8 @@ private:
 	int   ws_sec_ver_;
 	char* ws_sec_accept_;
 
-	void init(void);                      // 初始化
-	void clear(void);
+	void init();                          // 初始化
+	void clear();
 	void build_common(string& buf) const; // 构建通用头
 
 	void add_res_cookie(const HTTP_HDR_ENTRY& entry);

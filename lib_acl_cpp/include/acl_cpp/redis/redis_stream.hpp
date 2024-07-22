@@ -5,66 +5,55 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-struct redis_stream_field
-{
+struct redis_stream_field {
 	string name;
 	string value;
 };
 
-struct redis_stream_message
-{
+struct redis_stream_message {
 	string id;
 	std::vector<redis_stream_field> fields;
 };
 
-struct redis_stream_messages
-{
+struct redis_stream_messages {
 	string key;
 	std::vector<redis_stream_message> messages;
 
-	bool empty(void) const
-	{
+	bool empty() const {
 		return messages.empty();
 	}
 
-	size_t size(void) const
-	{
+	size_t size() const {
 		return messages.size();
 	}
 };
 
-struct redis_xinfo_consumer
-{
+struct redis_xinfo_consumer {
 	string name;
 	size_t pending;
 	size_t idle;
 
-	redis_xinfo_consumer(void)
-	{
+	redis_xinfo_consumer() {
 		pending = 0;
 		idle    = 0;
 	}
 };
 
-struct redis_xinfo_group
-{
+struct redis_xinfo_group {
 	string name;
 	string last_delivered_id;
 	size_t consumers;
 	size_t pending;
 
-	redis_xinfo_group(void)
-	{
+	redis_xinfo_group() {
 		consumers = 0;
 		pending   = 0;
 	}
 };
 
-struct redis_stream_info
-{
+struct redis_stream_info {
 	size_t length;
 	size_t radix_tree_keys;
 	size_t radix_tree_nodes;
@@ -73,8 +62,7 @@ struct redis_stream_info
 	redis_stream_message first_entry;
 	redis_stream_message last_entry;
 
-	redis_stream_info(void)
-	{
+	redis_stream_info() {
 		length           = 0;
 		radix_tree_keys  = 0;
 		radix_tree_nodes = 0;
@@ -82,75 +70,64 @@ struct redis_stream_info
 	}
 };
 
-struct redis_pending_consumer
-{
+struct redis_pending_consumer {
 	string name;
 	size_t pending_number;
 
-	redis_pending_consumer(void)
-	{
+	redis_pending_consumer() {
 		pending_number = 0;
 	}
 };
 
-struct redis_pending_summary
-{
+struct redis_pending_summary {
 	string smallest_id;
 	string greatest_id;
 	std::vector<redis_pending_consumer> consumers;
 
-	bool empty(void) const
-	{
+	bool empty() const {
 		return consumers.empty();
 	}
 
-	size_t size(void) const
-	{
+	size_t size() const {
 		return consumers.size();
 	}
 };
 
-struct redis_pending_message
-{
+struct redis_pending_message {
 	string id;
 	string consumer;
 	unsigned long long elapsed;
 	size_t delivered;
 
-	redis_pending_message(void)
-	{
+	redis_pending_message() {
 		elapsed   = 0;
 		delivered = 0;
 	}
 };
 
-struct redis_pending_detail
-{
+struct redis_pending_detail {
 	std::map<string, redis_pending_message> messages;
 
-	bool empty(void) const
-	{
+	bool empty() const {
 		return messages.empty();
 	}
 
-	size_t size(void) const
-	{
+	size_t size() const {
 		return messages.size();
 	}
 };
 
-class ACL_CPP_API redis_stream : virtual public redis_command
-{
+class ACL_CPP_API redis_stream : virtual public redis_command {
 public:
-	redis_stream(void);
-	redis_stream(redis_client* conn);
-	redis_stream(redis_client_cluster* cluster);
-	redis_stream(redis_client_pipeline* pipeline);
+	redis_stream();
+	explicit redis_stream(redis_client* conn);
+	explicit redis_stream(redis_client_cluster* cluster);
+	explicit redis_stream(redis_client_pipeline* pipeline);
 
 	ACL_CPP_DEPRECATED
 	redis_stream(redis_client_cluster* cluster, size_t max_conns);
 
-	virtual ~redis_stream(void);
+	virtual ~redis_stream();
 
 	/////////////////////////////////////////////////////////////////////
 

@@ -10,8 +10,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT64_LEN	21
 #define INT_LEN		11
@@ -254,7 +253,7 @@ bool redis_string::get(const char* key, size_t len, string& buf)
 
 	hash_slot(key, len);
 	build_request(2, argv, lens);
-	return get_string(buf) >= 0 ? true : false;
+	return get_string(buf) >= 0;
 }
 
 const redis_result* redis_string::get(const char* key)
@@ -276,10 +275,12 @@ const redis_result* redis_string::get(const char* key, size_t len)
 	hash_slot(key, len);
 	build_request(2, argv, lens);
 	const redis_result* result = run();
-	if (result == NULL)
+	if (result == NULL) {
 		return NULL;
-	if (result->get_type() != REDIS_RESULT_STRING)
+	}
+	if (result->get_type() != REDIS_RESULT_STRING) {
 		return NULL;
+	}
 	return result;
 }
 
@@ -305,7 +306,7 @@ bool redis_string::getset(const char* key, size_t key_len,
 
 	hash_slot(key, key_len);
 	build_request(3, argv, lens);
-	return get_string(buf) >= 0 ? true : false;
+	return get_string(buf) >= 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -390,7 +391,7 @@ bool redis_string::getrange(const char* key, size_t key_len,
 
 	hash_slot(key, key_len);
 	build_request(4, argv, lens);
-	return get_string(buf) >= 0 ? true : false;
+	return get_string(buf) >= 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -422,7 +423,7 @@ bool redis_string::setbit_(const char* key, size_t len,
 
 	hash_slot(key, len);
 	build_request(4, argv, lens);
-	return get_number() >= 0 ? true : false;
+	return get_number() >= 0;
 }
 
 bool redis_string::getbit(const char* key, unsigned offset, int& bit)
@@ -450,8 +451,9 @@ bool redis_string::getbit(const char* key, size_t len,
 	hash_slot(key, len);
 	build_request(3, argv, lens);
 	int ret = get_number();
-	if (ret < 0)
+	if (ret < 0) {
 		return false;
+	}
 	bit = ret == 0 ? 0 : 1;
 	return true;
 }
@@ -561,8 +563,9 @@ int redis_string::bitop_and(const char* destkey, const char* key, ...)
 	va_list ap;
 	va_start(ap, key);
 	const char* ptr;
-	while ((ptr = va_arg(ap, const char*)) != NULL)
+	while ((ptr = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(ptr);
+	}
 	va_end(ap);
 	return bitop("AND", destkey, keys);
 }
@@ -575,8 +578,9 @@ int redis_string::bitop_or(const char* destkey, const char* key, ...)
 	va_list ap;
 	va_start(ap, key);
 	const char* ptr;
-	while ((ptr = va_arg(ap, const char*)) != NULL)
+	while ((ptr = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(ptr);
+	}
 	va_end(ap);
 	return bitop("OR", destkey, keys);
 }
@@ -589,8 +593,9 @@ int redis_string::bitop_xor(const char* destkey, const char* key, ...)
 	va_list ap;
 	va_start(ap, key);
 	const char* ptr;
-	while ((ptr = va_arg(ap, const char*)) != NULL)
+	while ((ptr = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(ptr);
+	}
 	va_end(ap);
 	return bitop("XOR", destkey, keys);
 }
@@ -734,14 +739,14 @@ bool redis_string::mget(const std::vector<string>& keys,
 	std::vector<string>* out /* = NULL */)
 {
 	build("MGET", NULL, keys);
-	return get_strings(out) >= 0 ? true : false;
+	return get_strings(out) >= 0;
 }
 
 bool redis_string::mget(const std::vector<const char*>& keys,
 	std::vector<string>* out /* = NULL */)
 {
 	build("MGET", NULL, keys);
-	return get_strings(out) >= 0 ? true : false;
+	return get_strings(out) >= 0;
 }
 
 bool redis_string::mget(std::vector<string>* out, const char* first_key, ...)
@@ -757,21 +762,21 @@ bool redis_string::mget(std::vector<string>* out, const char* first_key, ...)
 	va_end(ap);
 
 	build("MGET", NULL, keys);
-	return get_strings(out) >= 0 ? true : false;
+	return get_strings(out) >= 0;
 }
 
 bool redis_string::mget(const char* keys[], size_t argc,
 	std::vector<string>* out /* = NULL */)
 {
 	build("MGET", NULL, keys, argc);
-	return get_strings(out) >= 0 ? true : false;
+	return get_strings(out) >= 0;
 }
 
 bool redis_string::mget(const char* keys[], const size_t keys_len[],
 	size_t argc, std::vector<string>* out /* = NULL */)
 {
 	build("MGET", NULL, keys, keys_len, argc);
-	return get_strings(out) >= 0 ? true : false;
+	return get_strings(out) >= 0;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -808,11 +813,13 @@ bool redis_string::incrbyfloat(const char* key, double inc,
 
 	hash_slot(key);
 	build_request(3, argv, lens);
-	if (get_string(buf, FLOAT_LEN) <= 0)
+	if (get_string(buf, FLOAT_LEN) <= 0) {
 		return false;
+	}
 
-	if (result != NULL)
+	if (result != NULL) {
 		*result = atof(buf);
+	}
 	return true;
 }
 
@@ -852,10 +859,11 @@ bool redis_string::incoper(const char* cmd, const char* key, long long int* n,
 	build_request(argc, argv, lens);
 
 	bool success;
-	if (result != NULL)
+	if (result != NULL) {
 		*result = get_number64(&success);
-	else
+	} else {
 		(void) get_number64(&success);
+	}
 	return success;
 }
 

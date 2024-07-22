@@ -16,7 +16,7 @@ public:
 	 * 构造函数
 	 * @param handle {aio_handle*} 异步事件句柄
 	 */
-	aio_fstream(aio_handle* handle);
+	explicit aio_fstream(aio_handle* handle);
 
 #if defined(_WIN32) || defined(_WIN64)
 	aio_fstream(aio_handle* handle, HANDLE fd, unsigned int oflags = 0600);
@@ -77,11 +77,11 @@ public:
 	bool open_append(const char* path);
 
 protected:
-	~aio_fstream(void);
+	~aio_fstream();
 	/**
 	 * 通过此函数来动态释放只能在堆上分配的异步流类对象
 	 */
-	virtual void destroy(void);
+	virtual void destroy();
 
 private:
 };

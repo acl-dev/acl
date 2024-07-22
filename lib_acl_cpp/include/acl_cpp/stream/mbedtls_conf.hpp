@@ -44,7 +44,7 @@ public:
 	 */
 	mbedtls_conf(bool server_side = false,
 		mbedtls_verify_t verify_mode = MBEDTLS_VERIFY_NONE);
-	~mbedtls_conf(void);
+	~mbedtls_conf();
 
 	/**
 	 * @override
@@ -86,7 +86,7 @@ public:
 	 * 获得随机数生成器的熵对象
 	 * @return {void*}，返回值为 entropy_context 类型
 	 */
-	void* get_entropy(void) const {
+	void* get_entropy() const {
 		return entropy_;
 	}
 
@@ -110,14 +110,14 @@ public:
 	 * 显式调用本方法，动态加载 mbedtls 动态库
 	 * @return {bool} 加载是否成功
 	 */
-	static bool load(void);
+	static bool load();
 
 public:
 	// @override sslbase_conf
 	sslbase_io* create(bool nblock);
 
 public:
-	mbedtls_ssl_config* create_ssl_config(void);
+	mbedtls_ssl_config* create_ssl_config();
 
 private:
 	unsigned status_;
@@ -152,8 +152,8 @@ private:
 		const unsigned char* name, size_t name_len);
 
 private:
-	bool init_rand(void);
-	void free_ca(void);
+	bool init_rand();
+	void free_ca();
 };
 
 } // namespace acl

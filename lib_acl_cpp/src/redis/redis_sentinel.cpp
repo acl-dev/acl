@@ -11,10 +11,9 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-redis_sentinel::redis_sentinel(void)
+redis_sentinel::redis_sentinel()
 {
 }
 
@@ -23,7 +22,7 @@ redis_sentinel::redis_sentinel(redis_client* conn)
 {
 }
 
-redis_sentinel::~redis_sentinel(void)
+redis_sentinel::~redis_sentinel()
 {
 }
 
@@ -32,46 +31,47 @@ redis_sentinel::~redis_sentinel(void)
 static void master_add_member(const char* name, const char* value,
 	redis_master& out)
 {
-	if (strcasecmp(name, "name") == 0)
+	if (strcasecmp(name, "name") == 0) {
 		out.name_ = value;
-	else if (strcasecmp(name, "ip") == 0)
+	} else if (strcasecmp(name, "ip") == 0) {
 		out.ip_ = value;
-	else if (strcasecmp(name, "port") == 0)
+	} else if (strcasecmp(name, "port") == 0) {
 		out.port_ = atoi(value);
-	else if (strcasecmp(name, "runid") == 0)
+	} else if (strcasecmp(name, "runid") == 0) {
 		out.runid_ = value;
-	else if (strcasecmp(name, "flags") == 0)
+	} else if (strcasecmp(name, "flags") == 0) {
 		out.flags_ = value;
-	else if (strcasecmp(name, "link-pending-commands") == 0)
+	} else if (strcasecmp(name, "link-pending-commands") == 0) {
 		out.link_pending_commands_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "link-refcount") == 0)
+	} else if (strcasecmp(name, "link-refcount") == 0) {
 		out.link_refcount_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "last-ping-sent") == 0)
+	} else if (strcasecmp(name, "last-ping-sent") == 0) {
 		out.last_ping_sent_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "last-ok-ping-reply") == 0)
+	} else if (strcasecmp(name, "last-ok-ping-reply") == 0) {
 		out.last_ok_ping_reply_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "last-ping-reply") == 0)
+	} else if (strcasecmp(name, "last-ping-reply") == 0) {
 		out.last_ping_reply_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "down-after-milliseconds") == 0)
+	} else if (strcasecmp(name, "down-after-milliseconds") == 0) {
 		out.down_after_milliseconds_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "info-refresh") == 0)
+	} else if (strcasecmp(name, "info-refresh") == 0) {
 		out.info_refresh_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "role-reported") == 0)
+	} else if (strcasecmp(name, "role-reported") == 0) {
 		out.role_reported_ = value;
-	else if (strcasecmp(name, "role-reported-time") == 0)
+	} else if (strcasecmp(name, "role-reported-time") == 0) {
 		out.role_reported_time_ = (time_t) atol(value);
-	else if (strcasecmp(name, "config-epoch") == 0)
+	} else if (strcasecmp(name, "config-epoch") == 0) {
 		out.config_epoch_ = (time_t) atol(value);
-	else if (strcasecmp(name, "num-slaves") == 0)
+	} else if (strcasecmp(name, "num-slaves") == 0) {
 		out.num_slaves_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "num-other-sentinels") == 0)
+	} else if (strcasecmp(name, "num-other-sentinels") == 0) {
 		out.num_other_sentinels_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "quorum") == 0)
+	} else if (strcasecmp(name, "quorum") == 0) {
 		out.quorum_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "failover-timeout") == 0)
+	} else if (strcasecmp(name, "failover-timeout") == 0) {
 		out.failover_timeout_ = (unsigned) atoi(value);
-	else if (strcasecmp(name, "parallel-syncs") == 0)
+	} else if (strcasecmp(name, "parallel-syncs") == 0) {
 		out.parallel_syncs_ = (unsigned) atoi(value);
+	}
 }
 
 bool redis_sentinel::sentinel_master(const char* name, redis_master& out)
@@ -91,12 +91,12 @@ bool redis_sentinel::sentinel_master(const char* name, redis_master& out)
 	build_request(3, argv, lens);
 
 	std::map<string, string> result;
-	if (get_strings(result) < 0)
+	if (get_strings(result) < 0) {
 		return false;
+	}
 
 	for (std::map<string, string>::const_iterator cit = result.begin();
 		cit != result.end(); ++cit) {
-
 		master_add_member(cit->first, cit->second, out);
 	}
 
@@ -105,15 +105,19 @@ bool redis_sentinel::sentinel_master(const char* name, redis_master& out)
 
 static void add_master(const redis_result& in, std::vector<redis_master>& out)
 {
-	if (in.get_type() != REDIS_RESULT_ARRAY)
+	if (in.get_type() != REDIS_RESULT_ARRAY) {
 		return;
+	}
 
 	size_t size;
 	const redis_result** children = in.get_children(&size);
-	if (children == NULL)
+	if (children == NULL) {
 		return;
-	if (size % 2 != 0)
+	}
+
+	if (size % 2 != 0) {
 		return;
+	}
 
 	redis_master master;
 
@@ -131,8 +135,9 @@ static void add_master(const redis_result& in, std::vector<redis_master>& out)
 
 		rr = children[i];
 		i++;
-		if (rr->get_type() != REDIS_RESULT_STRING)
+		if (rr->get_type() != REDIS_RESULT_STRING) {
 			continue;
+		}
 		value.clear();
 		rr->argv_to_string(value);
 		master_add_member(name, value, master);
@@ -153,13 +158,15 @@ bool redis_sentinel::sentinel_masters(std::vector<redis_master>& out)
 
 	build_request(2, argv, lens);
 	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY) {
 		return false;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return true;
+	}
 
 	for (size_t i = 0; i < size; i++) {
 		const redis_result* child = children[i];
@@ -175,59 +182,64 @@ bool redis_sentinel::sentinel_masters(std::vector<redis_master>& out)
 static void slave_add_member(const char* name, const char* value,
 	redis_slave& out)
 {
-	if (EQ(name, "name"))
+	if (EQ(name, "name")) {
 		out.name_ = value;
-	else if (EQ(name, "ip"))
+	} else if (EQ(name, "ip")) {
 		out.ip_ = value;
-	else if (EQ(name, "port"))
+	} else if (EQ(name, "port")) {
 		out.port_ = atoi(value);
-	else if (EQ(name, "runid"))
+	} else if (EQ(name, "runid")) {
 		out.runid_ = value;
-	else if (EQ(name, "flags"))
+	} else if (EQ(name, "flags")) {
 		out.flags_ = value;
-	else if (EQ(name, "link-pending-commands"))
+	} else if (EQ(name, "link-pending-commands")) {
 		out.link_pending_commands_ = (unsigned) atoi(value);
-	else if (EQ(name, "link-refcount"))
+	} else if (EQ(name, "link-refcount")) {
 		out.link_refcount_ = (unsigned) atoi(value);
-	else if (EQ(name, "last-ping-sent"))
+	} else if (EQ(name, "last-ping-sent")) {
 		out.last_ping_sent_ = (unsigned) atoi(value);
-	else if (EQ(name, "last-ok-ping-reply"))
+	} else if (EQ(name, "last-ok-ping-reply")) {
 		out.last_ok_ping_reply_ = (unsigned) atoi(value);
-	else if (EQ(name, "last-ping-reply"))
+	} else if (EQ(name, "last-ping-reply")) {
 		out.last_ping_reply_ = (unsigned) atoi(value);
-	else if (EQ(name, "down-after-milliseconds"))
+	} else if (EQ(name, "down-after-milliseconds")) {
 		out.down_after_milliseconds_ = (unsigned) atoi(value);
-	else if (EQ(name, "info-refresh"))
+	} else if (EQ(name, "info-refresh")) {
 		out.info_refresh_ = (unsigned) atoi(value);
-	else if (EQ(name, "role-reported"))
+	} else if (EQ(name, "role-reported")) {
 		out.role_reported_ = value;
-	else if (EQ(name, "role-reported-time"))
+	} else if (EQ(name, "role-reported-time")) {
 		out.role_reported_time_ = (time_t) atol(value);
-	else if (EQ(name, "master-link-down-time"))
+	} else if (EQ(name, "master-link-down-time")) {
 		out.master_link_down_time_ = (time_t) atol(value);
-	else if (EQ(name, "master-link-status"))
+	} else if (EQ(name, "master-link-status")) {
 		out.master_link_status_ = value;
-	else if (EQ(name, "master-host"))
+	} else if (EQ(name, "master-host")) {
 		out.master_host_ = value;
-	else if (EQ(name, "master-port"))
+	} else if (EQ(name, "master-port")) {
 		out.master_port_ = atoi(value);
-	else if (EQ(name, "slave-priority"))
+	} else if (EQ(name, "slave-priority")) {
 		out.slave_priority_ = (unsigned) atoi(value);
-	else if (EQ(name, "slave-repl-offset"))
+	} else if (EQ(name, "slave-repl-offset")) {
 		out.slave_repl_offset_ = (unsigned long) atol(value);
+	}
 }
 
 static void add_slave(const redis_result& in, std::vector<redis_slave>& out)
 {
-	if (in.get_type() != REDIS_RESULT_ARRAY)
+	if (in.get_type() != REDIS_RESULT_ARRAY) {
 		return;
+	}
 
 	size_t size;
 	const redis_result** children = in.get_children(&size);
-	if (children == NULL)
+	if (children == NULL) {
 		return;
-	if (size % 2 != 0)
+	}
+
+	if (size % 2 != 0) {
 		return;
+	}
 
 	redis_slave slave;
 	string name, value;
@@ -244,8 +256,9 @@ static void add_slave(const redis_result& in, std::vector<redis_slave>& out)
 
 		rr = children[i];
 		i++;
-		if (rr->get_type() != REDIS_RESULT_STRING)
+		if (rr->get_type() != REDIS_RESULT_STRING) {
 			continue;
+		}
 		value.clear();
 		rr->argv_to_string(value);
 		slave_add_member(name, value, slave);
@@ -270,13 +283,15 @@ bool redis_sentinel::sentinel_slaves(const char* master_name,
 
 	build_request(3, argv, lens);
 	const redis_result* result = run();
-	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	if (result == NULL || result->get_type() != REDIS_RESULT_ARRAY) {
 		return false;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return true;
+	}
 
 	for (size_t i = 0; i < size; i++) {
 		const redis_result* child = children[i];
@@ -304,8 +319,9 @@ bool redis_sentinel::sentinel_get_master_addr_by_name(const char* master_name,
 
 	port = -1;
 	std::vector<string> result;
-	if (get_strings(&result) != 2)
+	if (get_strings(&result) != 2) {
 		return false;
+	}
 
 	ip = result[0];
 	port = atoi(result[1]);
@@ -348,7 +364,7 @@ bool redis_sentinel::sentinel_failover(const char* master_name)
 	return check_status();
 }
 
-bool redis_sentinel::sentinel_flushconfig(void)
+bool redis_sentinel::sentinel_flushconfig()
 {
 	const char* argv[2];
 	size_t lens[2];

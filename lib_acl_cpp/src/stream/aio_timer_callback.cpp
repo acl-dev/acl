@@ -4,16 +4,14 @@
 #include "acl_cpp/stream/aio_timer_callback.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 //////////////////////////////////////////////////////////////////////////
 
-class aio_timer_task
-{
+class aio_timer_task {
 public:
-	aio_timer_task(void) {}
-	~aio_timer_task(void) {}
+	aio_timer_task() {}
+	~aio_timer_task() {}
 
 private:
 	friend class aio_timer_callback;
@@ -31,7 +29,7 @@ aio_timer_callback::aio_timer_callback(bool keep /* = false */)
 	length_ = 0;
 }
 
-aio_timer_callback::~aio_timer_callback(void)
+aio_timer_callback::~aio_timer_callback()
 {
 	// 如果正在触发定时器的回调过程中析构过程被调用则会发生严重问题
 	if (locked()) {
@@ -42,7 +40,7 @@ aio_timer_callback::~aio_timer_callback(void)
 	clear();
 }
 
-int aio_timer_callback::clear(void)
+int aio_timer_callback::clear()
 {
 	int  n = 0;
 	std::list<aio_timer_task*>::iterator it = tasks_.begin();
@@ -55,12 +53,12 @@ int aio_timer_callback::clear(void)
 	return n;
 }
 
-bool aio_timer_callback::empty(void) const
+bool aio_timer_callback::empty() const
 {
 	return tasks_.empty();
 }
 
-size_t aio_timer_callback::length(void) const
+size_t aio_timer_callback::length() const
 {
 	return length_;
 }
@@ -70,12 +68,12 @@ void aio_timer_callback::keep_timer(bool on)
 	keep_ = on;
 }
 
-bool aio_timer_callback::keep_timer(void) const
+bool aio_timer_callback::keep_timer() const
 {
 	return keep_;
 }
 
-void aio_timer_callback::set_time(void)
+void aio_timer_callback::set_time()
 {
 	struct timeval now;
 	gettimeofday(&now, NULL);
@@ -161,7 +159,7 @@ acl_int64 aio_timer_callback::set_task(aio_timer_task* task)
 	return delay < 0 ? 0 : delay;
 }
 
-acl_int64 aio_timer_callback::trigger(void)
+acl_int64 aio_timer_callback::trigger()
 {
 	// sanity check
 	if (tasks_.empty()) {

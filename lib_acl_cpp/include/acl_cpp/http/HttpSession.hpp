@@ -13,15 +13,14 @@ class session;
 /**
  * 服务端 HttpSession 类，目前该类的数据存储只能支持存在 memcached 上
  */
-class ACL_CPP_API HttpSession : public dbuf_obj
-{
+class ACL_CPP_API HttpSession : public dbuf_obj {
 public:
 	/**
 	 * 构造函数
 	 * @param session {session&} 缓存对象
 	 */
-	HttpSession(session& session);
-	virtual ~HttpSession(void);
+	explicit HttpSession(session& session);
+	virtual ~HttpSession();
 
 	/**
 	 * 获得客户端在服务端存储的 session 的字符串属性值
@@ -103,14 +102,14 @@ public:
 	 * 使 session 从服务端的缓存中删除即使 session 失效
 	 * @return {bool} 是否使 session 失效
 	 */
-	virtual bool invalidate(void);
+	virtual bool invalidate();
 
 	/**
 	 * 获得所产生的 session ID 标识
 	 * @return {const char*} 永远返回以 '\0' 结尾的非空指针，可根据返回
 	 *  值是否为空串("\0")来判断 sid 是否存在
 	 */
-	const char* getSid(void) const;
+	const char* getSid() const;
 
 protected:
 	session& session_;

@@ -13,8 +13,7 @@ class ostream;
 class pipe_string;
 class string;
 
-class ACL_CPP_API mime_body : public mime_node
-{
+class ACL_CPP_API mime_body : public mime_node {
 public:
 	/**
 	 * 构造函数
@@ -37,7 +36,7 @@ public:
 	{
 	}
 
-	~mime_body(void) {}
+	~mime_body() {}
 
 	/**
 	 * 设置是否仅提取 HTML 数据, 如果为 true 则优先提取 HTML 数据,
@@ -46,8 +45,7 @@ public:
 	 * 取出纯文本数据
 	 * @param htmlFirst {bool}
 	 */
-	void set_status(bool htmlFirst)
-	{
+	void set_status(bool htmlFirst) {
 		m_htmlFirst = htmlFirst;
 	}
 
@@ -60,8 +58,7 @@ public:
 	 *  函数中所提供的 emailFile 的文件中提取邮件内容
 	 * @return {bool} 是否成功
 	 */
-	bool save_body(pipe_manager& out, const char* src = NULL,
-		int len = 0);
+	bool save_body(pipe_manager& out, const char* src = NULL, int len = 0);
 
 	/**
 	 * 转储邮件正文内容于输出流中
@@ -72,8 +69,7 @@ public:
 	 *  函数中所提供的 emailFile 的文件中提取邮件内容
 	 * @return {bool} 是否成功
 	 */
-	bool save_body(ostream& out, const char* src = NULL,
-		int len = 0);
+	bool save_body(ostream& out, const char* src = NULL, int len = 0);
 
 	/**
 	 * 转储邮件正文内容于目标文件中
@@ -84,8 +80,7 @@ public:
 	 *  函数中所提供的 emailFile 的文件中提取邮件内容
 	 * @return {bool} 是否成功
 	 */
-	bool save_body(const char* file_path, const char* src = NULL,
-		int len = 0);
+	bool save_body(const char* file_path, const char* src = NULL, int len = 0);
 
 	/**
 	 * 转储邮件正文内容于管道缓冲区内
@@ -96,8 +91,7 @@ public:
 	 *  函数中所提供的 emailFile 的文件中提取邮件内容
 	 * @return {bool} 是否成功
 	 */
-	bool save_body(pipe_string& out, const char* src = NULL,
-		int len = 0);
+	bool save_body(pipe_string& out, const char* src = NULL, int len = 0);
 
 	/**
 	 * 转储邮件正文内容于缓冲区中
@@ -108,14 +102,13 @@ public:
 	 *  函数中所提供的 emailFile 的文件中提取邮件内容
 	 * @return {bool} 是否成功
 	 */
-	bool save_body(string& out, const char* src = NULL,
-		int len = 0);
+	bool save_body(string& out, const char* src = NULL, int len = 0);
 
 	/**
 	 * 判断结点头部类型中的从类型是否 MIME_STYPE_HTML 类型
 	 * @return {bool}
 	 */
-	bool html_stype(void) const;
+	bool html_stype() const;
 
 private:
 	bool m_htmlFirst;

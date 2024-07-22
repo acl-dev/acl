@@ -25,8 +25,7 @@ namespace acl {
  * http_mime_node::get_value: 当结点为参数类型时，此函数获得
  *   参数值
  */
-class ACL_CPP_API http_mime_node : public mime_attach
-{
+class ACL_CPP_API http_mime_node : public mime_attach {
 public:
 	/**
 	 * @param path {const char*} 原始文件存放路径，不能为空
@@ -39,22 +38,20 @@ public:
 	http_mime_node(const char* path, const MIME_NODE* node,
 		bool decodeIt = true, const char* toCharset = "gb2312",
 		off_t off = 0);
-	~http_mime_node(void);
+	~http_mime_node();
 
 	/**
 	 * 获得该结点的类型
 	 * @return {http_mime_t}
 	 */
-	http_mime_t get_mime_type(void) const;
+	http_mime_t get_mime_type() const;
 
 	/**
 	 * 当 get_mime_type 返回的类型为 HTTP_MIME_PARAM 时，可以
 	 * 调用此函数获得参数值；参数名可以通过基类的 get_name() 获得
 	 * @return {const char*} 返回 NULL 表示参数不存在
 	 */
-	const char* get_value(void) const;
-
-protected:
+	const char* get_value() const;
 
 private:
 	http_mime_t mime_type_;
@@ -69,8 +66,7 @@ private:
  * http mime 解析器，该解析器为流式解析器，用户在使用时可以每次仅输入
  * 部分数据给 update 函数，当该函数返回 true 时表示解析完成且解析正确
  */
-class ACL_CPP_API http_mime : public dbuf_obj
-{
+class ACL_CPP_API http_mime : public dbuf_obj {
 public:
 	/**
 	 * 构建函数
@@ -79,7 +75,7 @@ public:
 	 *  参数内容转为本地字符集
 	 */
 	http_mime(const char* boundary, const char* local_charset  = "gb2312");
-	~http_mime(void);
+	~http_mime();
 
 	/**
 	 * 设置 MIME 数据的存储路径，当分析完 MIME 数据后，如果想要
@@ -108,7 +104,7 @@ public:
 	 * 获得所有的 MIME 结点
 	 * @return {const std::list<http_mimde_node*>&}
 	 */
-	const std::list<http_mime_node*>& get_nodes(void) const;
+	const std::list<http_mime_node*>& get_nodes() const;
 
 	/**
 	 * 根据变量名取得 HTTP MIME 结点

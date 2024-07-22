@@ -6,33 +6,31 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_set : virtual public redis_command
-{
+class ACL_CPP_API redis_set : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_set(void);
+	redis_set();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
 	 */
-	redis_set(redis_client* conn);
+	explicit redis_set(redis_client* conn);
 
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
-	redis_set(redis_client_cluster* cluster);
+	explicit redis_set(redis_client_cluster* cluster);
 
 	ACL_CPP_DEPRECATED
 	redis_set(redis_client_cluster* cluster, size_t max_conns);
 
-	redis_set(redis_client_pipeline* pipeline);
+	explicit redis_set(redis_client_pipeline* pipeline);
 
-	virtual ~redis_set(void);
+	virtual ~redis_set();
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -187,8 +185,7 @@ public:
 	int sdiff(std::vector<string>* members, const char* first_key, ...);
 	int sdiff(const std::vector<const char*>& keys,
 		std::vector<string>* members);
-	int sdiff(const std::vector<string>& keys,
-		std::vector<string>* members);
+	int sdiff(const std::vector<string>& keys, std::vector<string>* members);
 
 	/**
 	 * 返回一个集合的全部成员，该集合是所有给定集合的交集
@@ -204,10 +201,8 @@ public:
 	 *  it't not a set by the key.
 	 */
 	int sinter(std::vector<string>* members, const char* first_key, ...);
-	int sinter(const std::vector<const char*>& keys,
-		std::vector<string>* members);
-	int sinter(const std::vector<string>& keys,
-		std::vector<string>* members);
+	int sinter(const std::vector<const char*>& keys, std::vector<string>* members);
+	int sinter(const std::vector<string>& keys, std::vector<string>* members);
 
 	/**
 	 * 返回一个集合的全部成员，该集合是所有给定集合的并集
@@ -223,10 +218,8 @@ public:
 	 *  a set by the key.
 	 */
 	int sunion(std::vector<string>* members, const char* first_key, ...);
-	int sunion(const std::vector<const char*>& keys,
-		std::vector<string>* members);
-	int sunion(const std::vector<string>& keys,
-		std::vector<string>* members);
+	int sunion(const std::vector<const char*>& keys, std::vector<string>* members);
+	int sunion(const std::vector<string>& keys, std::vector<string>* members);
 
 	/**
 	 * 这个命令的作用和 SDIFF 类似，但它将结果保存到 dst 集合，而不是简单地返回结果集
@@ -327,8 +320,7 @@ public:
 	int srem(const char* key, const char* first_member, ...);
 	int srem(const char* key, const std::vector<string>& members);
 	int srem(const char* key, const std::vector<const char*>& members);
-	int srem(const char* key, const char* members[],
-		size_t lens[], size_t argc);
+	int srem(const char* key, const char* members[], size_t lens[], size_t argc);
 
 	/**
 	 * 命令用于迭代当前数据库中的数据库键

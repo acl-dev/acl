@@ -16,8 +16,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT_LEN	11
 
@@ -36,7 +35,7 @@ redis_client::redis_client(const char* addr, int conn_timeout /* = 60 */,
 	set_timeout(conn_timeout, rw_timeout);
 }
 
-redis_client::~redis_client(void)
+redis_client::~redis_client()
 {
 	acl_myfree(addr_);
 	if (pass_)
@@ -58,30 +57,34 @@ void redis_client::set_ssl_conf(sslbase_conf* ssl_conf)
 
 void redis_client::set_password(const char* pass)
 {
-	if (pass_)
+	if (pass_) {
 		acl_myfree(pass_);
-	if (pass && *pass)
+	}
+	if (pass && *pass) {
 		pass_ = acl_mystrdup(pass);
-	else
+	} else {
 		pass_ = NULL;
+	}
 }
 
 void redis_client::set_db(int dbnum)
 {
-	if (dbnum > 0)
+	if (dbnum > 0) {
 		dbnum_ = dbnum;
+	}
 }
 
 socket_stream* redis_client::get_stream(bool auto_connect /* true */)
 {
-	if (conn_.opened())
+	if (conn_.opened()) {
 		return (socket_stream*) &conn_;
-	else if (!auto_connect)
+	} else if (!auto_connect) {
 		return NULL;
-	else if (open())
+	} else if (open()) {
 		return (socket_stream*) &conn_;
-	else
+	} else {
 		return NULL;
+	}
 }
 
 bool redis_client::check_connection(socket_stream& conn)
@@ -104,11 +107,12 @@ bool redis_client::check_connection(socket_stream& conn)
 	return true;
 }
 
-bool redis_client::open(void)
+bool redis_client::open()
 {
-	if (conn_.opened())
+	if (conn_.opened()) {
 		return true;
-	if (conn_.open(addr_, conn_timeout_, rw_timeout_) == false) {
+	}
+	if (!conn_.open(addr_, conn_timeout_, rw_timeout_)) {
 		logger_error("connect redis %s error: %s",
 			addr_, last_serror());
 		return false;
@@ -130,7 +134,7 @@ bool redis_client::open(void)
 		// 设置当前连接的状态为认证状态，以避免进入死循环
 		authing_ = true;
 		redis_connection connection(this);
-		if (connection.auth(pass_) == false) {
+		if (!connection.auth(pass_)) {
 			authing_ = false;
 			conn_.close();
 			logger_error("auth error, addr: %s, passwd: %s",
@@ -142,7 +146,7 @@ bool redis_client::open(void)
 
 	if (dbnum_ > 0) {
 		redis_connection connection(this);
-		if (connection.select(dbnum_) == false) {
+		if (!connection.select(dbnum_)) {
 			conn_.close();
 			logger_error("select db error, db=%d", dbnum_);
 			return false;
@@ -151,13 +155,14 @@ bool redis_client::open(void)
 	return true;
 }
 
-void redis_client::close(void)
+void redis_client::close()
 {
-	if (conn_.opened())
+	if (conn_.opened()) {
 		conn_.close();
+	}
 }
 
-bool redis_client::eof(void) const
+bool redis_client::eof() const
 {
 	return conn_.eof();
 }
@@ -188,7 +193,7 @@ redis_result* redis_client::get_error(socket_stream& conn, dbuf_pool* dbuf)
 {
 	string& buf = conn.get_buf();
 	buf.clear();
-	if (conn_.gets(buf) == false) {
+	if (!conn_.gets(buf)) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
@@ -205,7 +210,7 @@ redis_result* redis_client::get_status(socket_stream& conn, dbuf_pool* dbuf)
 {
 	string& buf = conn.get_buf();
 	buf.clear();
-	if (conn_.gets(buf) == false) {
+	if (!conn_.gets(buf)) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
@@ -222,7 +227,7 @@ redis_result* redis_client::get_integer(socket_stream& conn, dbuf_pool* dbuf)
 {
 	string& buf = conn.get_buf();
 	buf.clear();
-	if (conn_.gets(buf) == false) {
+	if (!conn_.gets(buf)) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
@@ -239,7 +244,7 @@ redis_result* redis_client::get_string(socket_stream& conn, dbuf_pool* dbuf)
 {
 	string& sbuf = conn.get_buf();
 	sbuf.clear();
-	if (conn_.gets(sbuf) == false) {
+	if (!conn_.gets(sbuf)) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
@@ -265,9 +270,8 @@ redis_result* redis_client::get_string(socket_stream& conn, dbuf_pool* dbuf)
 
 		// 读 \r\n
 		sbuf.clear();
-		if (conn_.gets(sbuf) == false) {
-			logger_error("gets error, server: %s",
-				conn.get_peer(true));
+		if (! conn_.gets(sbuf)) {
+			logger_error("gets error, server: %s", conn.get_peer(true));
 			return NULL;
 		}
 		return rr;
@@ -297,7 +301,7 @@ redis_result* redis_client::get_string(socket_stream& conn, dbuf_pool* dbuf)
 	}
 	
 	sbuf.clear();
-	if (conn_.gets(sbuf) == false) {
+	if (!conn_.gets(sbuf)) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
@@ -308,7 +312,7 @@ redis_result* redis_client::get_array(socket_stream& conn, dbuf_pool* dbuf)
 {
 	string& buf = conn.get_buf();
 	buf.clear();
-	if (conn.gets(buf) == false) {
+	if (!conn.gets(buf)) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
 		return NULL;
 	}
@@ -324,8 +328,9 @@ redis_result* redis_client::get_array(socket_stream& conn, dbuf_pool* dbuf)
 
 	for (int i = 0; i < count; i++) {
 		redis_result* child = get_object(conn, dbuf);
-		if (child == NULL)
+		if (child == NULL) {
 			return NULL;
+		}
 		rr->put(child, i);
 	}
 
@@ -335,7 +340,7 @@ redis_result* redis_client::get_array(socket_stream& conn, dbuf_pool* dbuf)
 redis_result* redis_client::get_object(socket_stream& conn, dbuf_pool* dbuf)
 {
 	char ch;
-	if (conn.read(ch) == false) {
+	if (!conn.read(ch)) {
 		logger_warn("read char error: %s, server: %s, fd: %u",
 			last_serror(), conn.get_peer(true),
 			(unsigned) conn.sock_handle());
@@ -370,8 +375,9 @@ redis_result* redis_client::get_objects(socket_stream& conn,
 
 	for (size_t i = 0; i < nobjs; i++) {
 		redis_result* obj = get_object(conn, dbuf);
-		if (obj == NULL)
+		if (obj == NULL) {
 			return NULL;
+		}
 		objs->put(obj, i);
 	}
 	return objs;
@@ -385,16 +391,17 @@ const redis_result* redis_client::run(dbuf_pool* dbuf, const string& req,
 	redis_result* result;
 
 	while (true) {
-		if (open() == false) {
+		if (!open()) {
 			logger_error("open error: %s, addr: %s, req: %s",
 				last_serror(), addr_, req.c_str());
 			return NULL;
 		}
 
-		if (rw_timeout != NULL)
+		if (rw_timeout != NULL) {
 			conn_.set_rw_timeout(*rw_timeout);
+		}
 
-		if (check_addr_ && check_connection(conn_) == false) {
+		if (check_addr_ && !check_connection(conn_)) {
 			logger_error("CHECK_CONNECTION FAILED!");
 			close();
 			break;
@@ -417,8 +424,9 @@ const redis_result* redis_client::run(dbuf_pool* dbuf, const string& req,
 		else
 			result = get_object(conn_, dbuf);
 		if (result != NULL) {
-			if (rw_timeout != NULL)
+			if (rw_timeout != NULL) {
 				conn_.set_rw_timeout(rw_timeout_);
+			}
 			return result;
 		}
 #if defined(_WIN32) || defined(_WIN64)
@@ -465,13 +473,14 @@ const redis_result* redis_client::run(dbuf_pool* dbuf, const redis_request& req,
 	size_t size = req.get_size();
 
 	while (true) {
-		if (open() == false)
+		if (! open()) {
 			return NULL;
+		}
 
 		if (rw_timeout != NULL)
 			conn_.set_rw_timeout(*rw_timeout);
 
-		if (check_addr_ && check_connection(conn_) == false) {
+		if (check_addr_ && !check_connection(conn_)) {
 			logger_error("CHECK_CONNECTION FAILED!");
 			close();
 			break;
@@ -496,8 +505,9 @@ const redis_result* redis_client::run(dbuf_pool* dbuf, const redis_request& req,
 			result = get_object(conn_, dbuf);
 
 		if (result != NULL) {
-			if (rw_timeout != NULL)
+			if (rw_timeout != NULL) {
 				conn_.set_rw_timeout(rw_timeout_);
+			}
 			return result;
 		}
 

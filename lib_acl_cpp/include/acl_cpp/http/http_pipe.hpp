@@ -8,20 +8,19 @@ class charset_conv;
 class pipe_stream;
 class pipe_manager;
 
-class ACL_CPP_API http_pipe : public noncopyable
-{
+class ACL_CPP_API http_pipe : public noncopyable {
 public:
-	http_pipe(void);
-	virtual ~http_pipe(void);
+	http_pipe();
+	virtual ~http_pipe();
 	void set_charset(charset_conv* conv);
 	bool set_charset(const char* from, const char* to);
 	void append(pipe_stream* ps);
 	void reset();
 	bool update(const char* in, size_t len);
-	bool update_end(void);
+	bool update_end();
 
-	pipe_manager& get_manager(void);
-protected:
+	pipe_manager& get_manager();
+
 private:
 	pipe_manager manager_;
 	charset_conv* conv_;

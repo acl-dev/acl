@@ -9,8 +9,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define LONG_LEN	21
 
@@ -62,8 +61,9 @@ bool redis_script::eval_number(const char* script,
 	int& out)
 {
 	const redis_result* result = eval_cmd("EVAL", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return false;
+	}
 
 	bool success;
 	out = result->get_integer(&success);
@@ -76,8 +76,9 @@ bool redis_script::eval_number64(const char* script,
 	long long int& out)
 {
 	const redis_result* result = eval_cmd("EVAL", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return false;
+	}
 
 	bool success;
 	out = result->get_integer64(&success);
@@ -90,8 +91,9 @@ int redis_script::eval_string(const char* script,
 	string& out)
 {
 	const redis_result* result = eval_cmd("EVAL", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return -1;
+	}
 
 	return result->argv_to_string(out);
 }
@@ -101,11 +103,13 @@ bool redis_script::evalsha_status(const char* script,
 	const char* success /* = "OK" */)
 {
 	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return false;
+	}
 	const char* status = result->get_status();
-	if (status == NULL || strcasecmp(status, success) != 0)
+	if (status == NULL || strcasecmp(status, success) != 0) {
 		return false;
+	}
 	return true;
 }
 
@@ -115,8 +119,9 @@ bool redis_script::evalsha_number(const char* script,
 	int& out)
 {
 	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return false;
+	}
 
 	bool success;
 	out = result->get_integer(&success);
@@ -129,8 +134,9 @@ bool redis_script::evalsha_number64(const char* script,
 	long long int& out)
 {
 	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return false;
+	}
 
 	bool success;
 	out = result->get_integer64(&success);
@@ -143,8 +149,9 @@ int redis_script::evalsha_string(const char* script,
 	string& out)
 {
 	const redis_result* result = eval_cmd("EVALSHA", script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return -1;
+	}
 
 	return result->argv_to_string(out);
 }
@@ -226,13 +233,15 @@ int redis_script::eval_status(const char* cmd, const char* script,
 	const char* success /* = "OK" */)
 {
 	const redis_result* result = eval_cmd(cmd, script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return -1;
+	}
 
 	out.reserve(size);
 
@@ -243,10 +252,11 @@ int redis_script::eval_status(const char* cmd, const char* script,
 	for (size_t i = 0; i < size; i++) {
 		rr = children[i];
 		status = rr->get_status();
-		if (status != NULL && strcasecmp(status, success) == 0)
+		if (status != NULL && strcasecmp(status, success) == 0) {
 			out.push_back(true);
-		else
+		} else {
 			out.push_back(false);
+		}
 	}
 
 	return (int) size;
@@ -259,13 +269,15 @@ int redis_script::eval_number(const char* cmd, const char* script,
 	std::vector<bool>& status)
 {
 	const redis_result* result = eval_cmd(cmd, script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return 0;
+	}
 
 	out.reserve(size);
 
@@ -292,13 +304,15 @@ long long int redis_script::eval_number64(const char* cmd, const char* script,
 	std::vector<bool>& status)
 {
 	const redis_result* result = eval_cmd(cmd, script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return 0;
+	}
 
 	out.clear();
 	out.reserve(size);
@@ -324,13 +338,15 @@ int redis_script::eval_strings(const char* cmd, const char* script,
 	std::vector<string>& out)
 {
 	const redis_result* result = eval_cmd(cmd, script, keys, args);
-	if (result == NULL)
+	if (result == NULL) {
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = result->get_children(&size);
-	if (children == NULL || size == 0)
+	if (children == NULL || size == 0) {
 		return 0;
+	}
 
 	out.clear();
 	out.reserve(size);
@@ -414,8 +430,9 @@ const redis_result* redis_script::eval_cmd(const char* cmd,
 
 	acl_assert(i == argc);
 
-	if (keys.size() == 1)
+	if (keys.size() == 1) {
 		hash_slot(keys[0].c_str());
+	}
 
 	build_request(argc, argv, lens);
 	return run();
@@ -468,8 +485,9 @@ int redis_script::script_exists(const std::vector<string>& scripts,
 {
 	build("SCRIPT", "EXISTS", scripts);
 	int ret = get_status(out);
-	if (ret != (int) scripts.size())
+	if (ret != (int) scripts.size()) {
 		return -1;
+	}
 	return ret;
 }
 
@@ -478,8 +496,9 @@ int redis_script::script_exists(const std::vector<const char*>& scripts,
 {
 	build("SCRIPT", "EXISTS", scripts);
 	int ret = get_status(out);
-	if (ret != (int) scripts.size())
+	if (ret != (int) scripts.size()) {
 		return -1;
+	}
 	return ret;
 }
 
@@ -515,7 +534,7 @@ bool redis_script::script_load(const string& script, string& out)
 	lens[2] = strlen(script);
 
 	build_request(3, argv, lens);
-	return get_string(out) > 0 ? true : false;
+	return get_string(out) > 0;
 }
 
 bool redis_script::script_kill()

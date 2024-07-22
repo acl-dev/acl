@@ -8,8 +8,7 @@
 #include "acl_cpp/stream/aio_listen_stream.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 aio_listen_stream::aio_listen_stream(aio_handle *handle)
 : aio_stream(handle)
@@ -18,12 +17,12 @@ aio_listen_stream::aio_listen_stream(aio_handle *handle)
 	addr_[0] = 0;
 }
 
-aio_listen_stream::~aio_listen_stream(void)
+aio_listen_stream::~aio_listen_stream()
 {
 	accept_callbacks_.clear();
 }
 
-void aio_listen_stream::destroy(void)
+void aio_listen_stream::destroy()
 {
 	delete this;
 }
@@ -131,12 +130,12 @@ bool aio_listen_stream::open(ACL_ASTREAM* astream)
 	return true;
 }
 
-const char* aio_listen_stream::get_addr(void) const
+const char* aio_listen_stream::get_addr() const
 {
 	return addr_;
 }
 
-void aio_listen_stream::enable_listen(void)
+void aio_listen_stream::enable_listen()
 {
 	acl_assert(stream_);
 	if (listen_hooked_) {
@@ -194,7 +193,7 @@ int aio_listen_stream::listen_callback(ACL_ASTREAM*, void* ctx)
 	return 0;
 }
 
-aio_socket_stream* aio_listen_stream::accept(void)
+aio_socket_stream* aio_listen_stream::accept()
 {
 	acl_assert(stream_);
 

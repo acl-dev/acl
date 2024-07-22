@@ -10,8 +10,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT_LEN		11
 #define LONG_LEN	21
@@ -78,7 +77,7 @@ bool redis_list::lindex(const char* key, size_t idx, string& buf)
 
 	hash_slot(key);
 	build_request(3, argv, lens);
-	return get_string(buf) >= 0 ? true : false;
+	return get_string(buf) >= 0;
 }
 
 bool redis_list::lset(const char* key, int idx, const char* value)

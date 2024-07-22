@@ -35,7 +35,7 @@ mime_base64::mime_base64(bool addCrlf /* = false */, bool addInvalid /* = false 
 	init(to_b64_tab, un_b64_tab, '=');
 }
 
-mime_base64::~mime_base64(void)
+mime_base64::~mime_base64()
 {
 }
 

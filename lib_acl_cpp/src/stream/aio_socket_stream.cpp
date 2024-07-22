@@ -4,8 +4,7 @@
 #include "acl_cpp/stream/aio_socket_stream.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 aio_socket_stream::aio_socket_stream(aio_handle* handle,
 	ACL_ASTREAM* stream, bool opened /* = false */)
@@ -59,7 +58,7 @@ aio_socket_stream::aio_socket_stream(aio_handle* handle, ACL_SOCKET fd)
 	this->enable_write();
 }
 
-aio_socket_stream::~aio_socket_stream(void)
+aio_socket_stream::~aio_socket_stream()
 {
 	if (open_callbacks_) {
 		std::list<AIO_OPEN_CALLBACK*>::iterator
@@ -71,7 +70,7 @@ aio_socket_stream::~aio_socket_stream(void)
 	}
 }
 
-void aio_socket_stream::destroy(void)
+void aio_socket_stream::destroy()
 {
 	delete this;
 }
@@ -250,12 +249,12 @@ aio_socket_stream* aio_socket_stream::bind(aio_handle* handle, const char * addr
 	return stream;
 }
 
-bool aio_socket_stream::is_opened(void) const
+bool aio_socket_stream::is_opened() const
 {
 	return (status_ & STATUS_CONN_OPENED) ? true : false;
 }
 
-void aio_socket_stream::enable_open(void)
+void aio_socket_stream::enable_open()
 {
 	acl_assert(stream_);
 
