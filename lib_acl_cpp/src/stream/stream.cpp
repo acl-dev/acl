@@ -107,7 +107,7 @@ bool stream::set_rw_timeout(int n, bool use_sockopt /* false */)
 
 	if (!use_sockopt) {
 		stream_->rw_timeout = n;
-		return false;
+		return true;
 	}
 
 	stream_->rw_timeout = -1;
