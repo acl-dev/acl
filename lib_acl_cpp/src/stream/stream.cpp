@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
@@ -70,11 +71,52 @@ ACL_VSTREAM* stream::get_vstream() const
 	return stream_;
 }
 
-void stream::set_rw_timeout(int n)
+static bool set_sockopt_timeo(ACL_SOCKET fd, int opt, int timeout)
 {
-	if (stream_) {
-		stream_->rw_timeout = n;
+	if (timeout <= 0) {
+		return true;
 	}
+
+# if defined(_WIN32) || defined(_WIN64)
+	timeout *= 1000; // From seconds to millisecond.
+	if (setsockopt(fd, SOL_SOCKET, opt, (const char*) &timeout, sizeof(timeout)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+# else   // Must be Linux or __APPLE__.
+	struct timeval tm;
+	tm.tv_sec  = timeout;
+	tm.tv_usec = 0;
+
+	if (setsockopt(fd, SOL_SOCKET, opt, &tm, sizeof(tm)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+# endif
+
+	return true;
+}
+
+bool stream::set_rw_timeout(int n, bool use_sockopt /* false */)
+{
+	if (!stream_ || n <= 0) {
+		return false;
+	}
+
+	if (!use_sockopt) {
+		stream_->rw_timeout = n;
+		return false;
+	}
+
+	stream_->rw_timeout = -1;
+
+	if (!set_sockopt_timeo(ACL_VSTREAM_SOCK(stream_), SO_RCVTIMEO, n)) {
+		return false;
+	}
+
+	return set_sockopt_timeo(ACL_VSTREAM_SOCK(stream_), SO_SNDTIMEO, n);
 }
 
 void stream::set_time_unit(time_unit_t unit) {
@@ -99,12 +141,39 @@ void stream::set_time_unit(time_unit_t unit) {
 	}
 }
 
-int stream::get_rw_timeout() const
+int stream::get_rw_timeout(bool use_sockopt /* false */) const
 {
 	if (stream_ == NULL) {
 		return -1;
 	}
-	return stream_->rw_timeout;
+
+	if (!use_sockopt) {
+		return stream_->rw_timeout;
+	}
+
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream_);
+
+# if defined(_WIN32) || defined(_WIN64)
+	int timeout = 0, len = sizeof(timeout);
+	if (getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, &len) < 0) {
+		logger_error("getsockopt SO_RCVTIMEO error=%s, fd=%d",
+			last_serror(), (int) fd);
+		return -1;
+	}
+	return timeout / 1000;
+# else
+	struct timeval tm;
+	memset(&tm, 0, sizeof(tm));
+	socklen_t len = sizeof(tm);
+
+	if (getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tm, &len) < 0) {
+		logger_error("getsockopt SO_RCVTIMEO error=%s, fd=%d",
+			last_serror(), (int) fd);
+		return -1;
+	}
+
+	return tm.tv_sec;
+# endif
 }
 
 ACL_VSTREAM* stream::unbind()

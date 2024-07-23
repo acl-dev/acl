@@ -94,8 +94,10 @@ public:
 	 * 设置流的读写超时时间，只有当内部流对象建立后调用本方法才有效
 	 * @param n {int} 超时时间，该值 >= 0 则启用超时检测过程，否则将会一直
 	 *  阻塞直到可读或出错，该值的单位取决 于第二个参数
+	 * @param use_sockopt {bool} 是否使用 setsockopt 设置超时时间
+	 * @return {bool}
 	 */
-	void set_rw_timeout(int n);
+	bool set_rw_timeout(int n, bool use_sockopt = false);
 
 	/**
 	 * 设置内部超时时间单位类型，只有当内部流对象建立后调用本方法才有效
@@ -105,9 +107,10 @@ public:
 
 	/**
 	 * 获得当前流的读写超时时间
+	 * @param use_sockopt {bool} 是否获得由 setsockopt 设置的超时时间
 	 * @return {int} 获得流的读写超时时间(秒)
 	 */
-	int get_rw_timeout() const;
+	int get_rw_timeout(bool use_sockopt = false) const;
 
 	/**
 	 * 注册读写流对象，内部会自动调用 hook->open 过程，如果成功，则返回NULL
