@@ -46,6 +46,7 @@ typedef socket_t (WSAAPI *WSAAccept_fn)(SOCKET, struct sockaddr FAR *,
 
 typedef int (*fcntl_fn)(int, int, ...);
 typedef int (*setsockopt_fn)(socket_t, int, int, const void *, socklen_t);
+typedef int (*getsockopt_fn)(socket_t, int, int, void *, socklen_t*);
 typedef unsigned (*sleep_fn)(unsigned int seconds);
 typedef ssize_t  (*read_fn)(socket_t, void *, size_t);
 typedef ssize_t  (*readv_fn)(socket_t, const struct iovec *, int);
@@ -154,6 +155,7 @@ extern WSAAccept_fn         *sys_WSAAccept;
 
 extern fcntl_fn             *sys_fcntl;
 extern setsockopt_fn        *sys_setsockopt;
+extern getsockopt_fn        *sys_getsockopt;
 extern sleep_fn             *sys_sleep;
 
 extern read_fn              *sys_read;

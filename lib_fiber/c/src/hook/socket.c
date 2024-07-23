@@ -554,17 +554,16 @@ int setsockopt(int sockfd, int level, int optname,
 
 	if (sys_setsockopt == NULL) {
 		hook_once();
+
+		if (sys_setsockopt == NULL) {
+			msg_error("sys_setsockopt null");
+			return -1;
+		}
 	}
 
 	if (!var_hook_sys_api || (optname != SO_RCVTIMEO
 				&& optname != SO_SNDTIMEO)) {
-		return sys_setsockopt ? (*sys_setsockopt)(sockfd, level,
-			optname, optval, optlen) : -1;
-	}
-
-	if (sys_setsockopt == NULL) {
-		msg_error("sys_setsockopt null");
-		return -1;
+		return (*sys_setsockopt)(sockfd, level, optname, optval, optlen);
 	}
 
 	switch (optlen) {
@@ -588,6 +587,7 @@ int setsockopt(int sockfd, int level, int optname,
 		val = tm->tv_sec + tm->tv_usec / 1000000;
 		break;
 	default:
+		acl_fiber_set_error(FIBER_EINVAL);
 		msg_error("invalid optlen=%d", (int) optlen);
 		return -1;
 	}
@@ -638,6 +638,92 @@ int setsockopt(int sockfd, int level, int optname,
 
 	// We just set the flags here, and the timer will be add in
 	// fiber_wait_read or fiber_wait_write.
+	return 0;
+#endif
+}
+
+int getsockopt(int sockfd, int level, int optname,
+	void *optval, socklen_t *optlen)
+{
+	FILE_EVENT *fe;
+
+	if (sys_getsockopt == NULL) {
+		hook_once();
+
+		if (sys_getsockopt == NULL) {
+			msg_error("sys_getsockopt null");
+			return -1;
+		}
+	}
+
+	if (!var_hook_sys_api || (optname != SO_RCVTIMEO
+				&& optname != SO_SNDTIMEO)) {
+		return (*sys_getsockopt)(sockfd, level, optname, optval, optlen);
+	}
+
+	if (optval == NULL || optlen == NULL) {
+		acl_fiber_set_error(FIBER_EINVAL);
+		return -1;
+	}
+
+	fe = fiber_file_open(sockfd);
+
+#if defined(SYS_WIN)
+	if (*optlen < (socklen_t) sizeof(int)) {
+		acl_fiber_set_error(FIBER_EINVAL);
+		msg_error("optlen(%d) too short < %zd", (int) (*optlen), sizeof(int));
+		return -1;
+	}
+
+	if (optname == SO_RCVTIMEO) {
+		if (fe->r_timeout < 0) {
+			*((int*) optval) = fe->r_timeout;
+		} else {
+			*((int*) optval) = fe->r_timeout / 1000;
+		}
+	} else if (optname == SO_SNDTIMEO) {
+		if (fe->w_timeout < 0) {
+			*((int*) optval) = fe->w_timeout;
+		} else {
+			*((int*) optval) = fe->w_timeout / 1000;
+		}
+	} else {
+		return -1;  // xxx
+	}
+
+	*optlen = (socklen_t) sizeof(int);
+	return 0;
+#else
+	if (*optlen < (socklen_t) sizeof(struct timeval)) {
+		acl_fiber_set_error(FIBER_EINVAL);
+		msg_error("optlen(%d) too short < %zd",
+			(int) (*optlen), sizeof(struct timeval));
+		return -1;
+	}
+
+	if (optname == SO_RCVTIMEO) {
+		struct timeval *tm = (struct timeval*) optval;
+		if (fe->r_timeout < 0) {
+			tm->tv_sec  = 0;
+			tm->tv_usec = 0;
+		} else {
+			tm->tv_sec  = fe->r_timeout / 1000;
+			tm->tv_usec = 1000000 * (fe->r_timeout % 1000);
+		}
+	} else if (optname == SO_SNDTIMEO) {
+		struct timeval *tm = (struct timeval*) optval;
+		if (fe->w_timeout < 0) {
+			tm->tv_sec  = 0;
+			tm->tv_usec = 0;
+		} else {
+			tm->tv_sec  = fe->w_timeout / 1000;
+			tm->tv_usec = 1000000 * (fe->w_timeout % 1000);
+		}
+	} else {
+		return -1; // xxx
+	}
+
+	*optlen = (socklen_t) sizeof(struct timeval);
 	return 0;
 #endif
 }

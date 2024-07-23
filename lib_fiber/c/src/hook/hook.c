@@ -55,6 +55,9 @@ fcntl_fn    *sys_fcntl                      = NULL;
 setsockopt_fn __sys_setsockopt              = NULL;
 setsockopt_fn *sys_setsockopt               = NULL;
 
+getsockopt_fn __sys_getsockopt              = NULL;
+getsockopt_fn *sys_getsockopt               = NULL;
+
 read_fn     __sys_read                      = NULL;
 read_fn     *sys_read                       = NULL;
 
@@ -250,6 +253,7 @@ static void hook_api(void)
 	LOAD_FN("accept", accept_fn, __sys_accept, sys_accept, 1);
 	LOAD_FN("connect", connect_fn, __sys_connect, sys_connect, 1);
 	LOAD_FN("setsockopt", setsockopt_fn, __sys_setsockopt, sys_setsockopt, 1);
+	LOAD_FN("getsockopt", getsockopt_fn, __sys_getsockopt, sys_getsockopt, 1);
 	LOAD_FN("sleep", sleep_fn, __sys_sleep, sys_sleep, 1);
 	LOAD_FN("fcntl", fcntl_fn, __sys_fcntl, sys_fcntl, 1);
 	LOAD_FN("read", read_fn, __sys_read, sys_read, 1);
