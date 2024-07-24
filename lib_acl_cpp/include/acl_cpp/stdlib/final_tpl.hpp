@@ -33,8 +33,8 @@ private:
 #endif
 
 /*
- * Ìá¹©½ûÖ¹ÅÉÉúµÄ¹¦ÄÜ,ĞèÒª´Ë¹¦ÄÜµÄÀà¿ÉÒÔ´Ófinal_tplÅÉÉú,
- * ²¢½«ÀàÃû×÷ÎªÄ£°å²ÎÊı´«µİ
+ * æä¾›ç¦æ­¢æ´¾ç”Ÿçš„åŠŸèƒ½,éœ€è¦æ­¤åŠŸèƒ½çš„ç±»å¯ä»¥ä»final_tplæ´¾ç”Ÿ,
+ * å¹¶å°†ç±»åä½œä¸ºæ¨¡æ¿å‚æ•°ä¼ é€’
  * @example:
  * class my_final_class : public acl::final_tpl <my_final_class>
  * {
@@ -42,7 +42,7 @@ private:
  *   my_final_class() {}
  *   ~my_final_class() {}
  * }
- * ÕâÑù¾Í±£Ö¤ÁË my_final_class ÊÇ²»ÄÜ±»¼Ì³ĞµÄ
+ * è¿™æ ·å°±ä¿è¯äº† my_final_class æ˜¯ä¸èƒ½è¢«ç»§æ‰¿çš„
  */
 template<typename TFinalClass>
 class final_tpl : virtual public final_tpl_base<TFinalClass,

@@ -47,7 +47,7 @@
 # error "unknown OS type"
 #endif
 
-/* 内部结果类型定义 */
+/* 鍐呴儴缁撴灉绫诲瀷瀹氫箟 */
 
 struct ACL_AQUEUE_ITEM {
 	struct ACL_AQUEUE_ITEM *next;

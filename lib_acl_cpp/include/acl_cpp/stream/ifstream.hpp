@@ -12,26 +12,26 @@ public:
 	virtual ~ifstream(void) {}
 
 	/**
-	 * ÒÔÖ»¶Á·½Ê½´ò¿ªÒÑ¾­´æÔÚµÄÎÄ¼ş
-	 * @param path {const char*} ÎÄ¼şÃû
-	 * @return {bool} ´ò¿ªÎÄ¼şÊÇ·ñ³É¹¦
+	 * ä»¥åªè¯»æ–¹å¼æ‰“å¼€å·²ç»å­˜åœ¨çš„æ–‡ä»¶
+	 * @param path {const char*} æ–‡ä»¶å
+	 * @return {bool} æ‰“å¼€æ–‡ä»¶æ˜¯å¦æˆåŠŸ
 	 */
 	bool open_read(const char* path);
 
 	/**
-	 * ´Ó´ò¿ªµÄÎÄ¼şÁ÷ÖĞ¼ÓÔØ¸ÃÎÄ¼şÖĞµÄËùÓĞÄÚÈİµ½ÓÃ»§Ö¸¶¨»º³åÇøÄÚ
-	 * @param s {string*} ÓÃ»§»º³åÇø
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä»æ‰“å¼€çš„æ–‡ä»¶æµä¸­åŠ è½½è¯¥æ–‡ä»¶ä¸­çš„æ‰€æœ‰å†…å®¹åˆ°ç”¨æˆ·æŒ‡å®šç¼“å†²åŒºå†…
+	 * @param s {string*} ç”¨æˆ·ç¼“å†²åŒº
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool load(string* s);
 	bool load(string& s);
 
 	/**
-	 * ¼ÓÔØÎÄ¼şÖĞµÄÊı¾İÖÁÓÃ»§Ö¸¶¨»º³åÇø, ¸Ãº¯ÊıÊÇ¾²Ì¬³ÉÔ±±äÁ¿£¬
-	 * ¿ÉÖ±½ÓÊ¹ÓÃ
-	 * @param path {const char*} ÎÄ¼şÃû
-	 * @param s {string*} ÓÃ»§»º³åÇø
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * åŠ è½½æ–‡ä»¶ä¸­çš„æ•°æ®è‡³ç”¨æˆ·æŒ‡å®šç¼“å†²åŒº, è¯¥å‡½æ•°æ˜¯é™æ€æˆå‘˜å˜é‡ï¼Œ
+	 * å¯ç›´æ¥ä½¿ç”¨
+	 * @param path {const char*} æ–‡ä»¶å
+	 * @param s {string*} ç”¨æˆ·ç¼“å†²åŒº
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	static bool load(const char* path, string* s);
 	static bool load(const char* path, string& s);

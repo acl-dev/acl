@@ -27,7 +27,7 @@ public:
 protected:
 	~openssl_io();
 
-	// ÊµÏÖ stream_hook ÀàµÄÐé·½·¨
+	// å®žçŽ° stream_hook ç±»çš„è™šæ–¹æ³•
 
 	// @override stream_hook
 	bool open(ACL_VSTREAM* s);

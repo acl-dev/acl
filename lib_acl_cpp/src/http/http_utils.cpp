@@ -109,10 +109,10 @@ bool http_url::parse(const char *url) {
 	}
 
 	if (ptr == url) {
-		// 说明是仅含相对路径的 url
+		// 璇存槑鏄粎鍚浉瀵硅矾寰勭殑 url
 		return parse_url_part(url);
 	} else {
-		// 说明包含有完整路径的 url，下面先提取域名字段，再提取相对 url
+		// 璇存槑鍖呭惈鏈夊畬鏁磋矾寰勭殑 url锛屼笅闈㈠厛鎻愬彇鍩熷悕瀛楁锛屽啀鎻愬彇鐩稿 url
 		ptr = parse_domain(ptr);
 		if (ptr == NULL) {
 			url_path_ = "/";

@@ -4,7 +4,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈÝÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_redis_addrs;
 
@@ -93,12 +93,12 @@ acl::sslbase_io* master_service::setup_ssl(acl::socket_stream& conn,
 		return hook;
 	}
 
-	// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ÐèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
-	// Á¬½ÓÁ÷¶ÔÏóÖÐ£¬¼´ÓÃ ssl io Ìæ»» stream ÖÐÄ¬ÈÏµÄµ×²ã IO ¹ý³Ì
+	// å¯¹äºŽä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
+	// è¿žæŽ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
 
 	//logger("begin setup ssl hook...");
 
-	// ²ÉÓÃ×èÈû SSL ÎÕÊÖ·½Ê½
+	// é‡‡ç”¨é˜»å¡ž SSL æ¡æ‰‹æ–¹å¼
 	acl::sslbase_io* ssl = conf.create(false);
 	if (conn.setup_hook(ssl) == ssl) {
 		logger_error("setup_hook error!");
@@ -193,7 +193,7 @@ void master_service::proc_on_init(void)
 	redis_->init(NULL, var_cfg_redis_addrs, var_cfg_max_threads,
 		var_cfg_conn_timeout, var_cfg_rw_timeout);
 
-	// ÏÂÃæÓÃÀ´³õÊ¼»¯ SSL ¹¦ÄÜ
+	// ä¸‹é¢ç”¨æ¥åˆå§‹åŒ– SSL åŠŸèƒ½
 
 	if (var_cfg_crt_file == NULL || *var_cfg_crt_file == 0
 		|| var_cfg_key_file == NULL || *var_cfg_key_file == 0) {
@@ -241,10 +241,10 @@ void master_service::proc_on_init(void)
 		return;
 	}
 
-	// ÔÊÐí·þÎñ¶ËµÄ SSL »á»°»º´æ¹¦ÄÜ
+	// å…è®¸æœåŠ¡ç«¯çš„ SSL ä¼šè¯ç¼“å­˜åŠŸèƒ½
 	conf_->enable_cache(var_cfg_ssl_session_cache);
 
-	// Ìí¼Ó±¾µØ·þÎñµÄÖ¤Êé¼°·þÎñÃÜÔ¿
+	// æ·»åŠ æœ¬åœ°æœåŠ¡çš„è¯ä¹¦åŠæœåŠ¡å¯†é’¥
 	if (!conf_->add_cert(var_cfg_crt_file, var_cfg_key_file,
 			var_cfg_key_pass)) {
 		logger_error("add cert failed, crt: %s, key: %s",

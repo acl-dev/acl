@@ -10,8 +10,8 @@ namespace acl
 {
 
 /**
- * SQL ²éÑ¯Óï¾ä²éÑ¯Æ÷£¬¸ÃÀà»á×Ô¶¯¶Ô sql ÖĞµÄÒ»Ğ©ÌØÊâ×Ö·û½øĞĞ×ªÒå£¬Ê¹ÓÃ·½Ê½ÀàËÆÓÚ
- * java hibernate µÄ SQL Óï¾ä¹¹½¨·½Ê½
+ * SQL æŸ¥è¯¢è¯­å¥æŸ¥è¯¢å™¨ï¼Œè¯¥ç±»ä¼šè‡ªåŠ¨å¯¹ sql ä¸­çš„ä¸€äº›ç‰¹æ®Šå­—ç¬¦è¿›è¡Œè½¬ä¹‰ï¼Œä½¿ç”¨æ–¹å¼ç±»ä¼¼äº
+ * java hibernate çš„ SQL è¯­å¥æ„å»ºæ–¹å¼
  */
 class ACL_CPP_API query : public noncopyable
 {
@@ -20,77 +20,77 @@ public:
 	~query();
 
 	/**
-	 * ´´½¨ sql Óï¾ä£¬±ä²Î·½Ê½£¬ÓÃ·¨ºÍ printf ÀàËÆ
-	 * @param sql_fmt {const char*} sql Óï¾ä£¬¸ñÊ½Èç£º
+	 * åˆ›å»º sql è¯­å¥ï¼Œå˜å‚æ–¹å¼ï¼Œç”¨æ³•å’Œ printf ç±»ä¼¼
+	 * @param sql_fmt {const char*} sql è¯­å¥ï¼Œæ ¼å¼å¦‚ï¼š
 	 *  select * from xxx where name = :name and len >= %d
-	 *  ÆäÖĞµÄ :name, ½«ÓÉ set_parameter ÖĞµÄÖµ½øĞĞÌæ»», len ÎªÕûĞÎÖµ
+	 *  å…¶ä¸­çš„ :name, å°†ç”± set_parameter ä¸­çš„å€¼è¿›è¡Œæ›¿æ¢, len ä¸ºæ•´å½¢å€¼
 	 * @return {query&}
 	 */
 	query& create_sql(const char* sql_fmt, ...) ACL_CPP_PRINTF(2, 3);
 
 	/**
-	 * ´´½¨ sql Óï¾ä£¬·Ç±ä²Î·½Ê½
-	 * @param sql {const char*}  sql Óï¾ä£¬¸ñÊ½Èç£º
+	 * åˆ›å»º sql è¯­å¥ï¼Œéå˜å‚æ–¹å¼
+	 * @param sql {const char*}  sql è¯­å¥ï¼Œæ ¼å¼å¦‚ï¼š
 	 *  select * from xxx where name = :name and len >= :len
-	 *  ÆäÖĞµÄ :name, :len ½«ÓÉ set_parameter ÖĞµÄÖµ½øĞĞÌæ»»
+	 *  å…¶ä¸­çš„ :name, :len å°†ç”± set_parameter ä¸­çš„å€¼è¿›è¡Œæ›¿æ¢
 	 * @return {query&}
 	 */
 	query& create(const char* sql);
 
 	/**
-	 * ÉèÖÃ×Ö·û´®ÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {const char*} ±äÁ¿Öµ
+	 * è®¾ç½®å­—ç¬¦ä¸²ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {const char*} å˜é‡å€¼
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, const char *value);
 
 	/**
-	 * ÉèÖÃ×Ö·ûÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {char} ±äÁ¿Öµ
+	 * è®¾ç½®å­—ç¬¦ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {char} å˜é‡å€¼
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, char value);
 
 	/**
-	 * ÉèÖÃ 16 Î»¶ÌÕûÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {short} ±äÁ¿Öµ
+	 * è®¾ç½® 16 ä½çŸ­æ•´ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {short} å˜é‡å€¼
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, short value);
 
 	/**
-	 * ÉèÖÃ 32 Î»¶ÌÕûÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {int} ±äÁ¿Öµ
+	 * è®¾ç½® 32 ä½çŸ­æ•´ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {int} å˜é‡å€¼
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, int value);
 
 	/**
-	 * ÉèÖÃµ¥¾«¶È¸¡µãÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {float} µ¥¾«¶È¸¡µãÀàĞÍ
-	 * @param precision {int} Î²ÊıµÄ¾«¶ÈÖµ
+	 * è®¾ç½®å•ç²¾åº¦æµ®ç‚¹ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {float} å•ç²¾åº¦æµ®ç‚¹ç±»å‹
+	 * @param precision {int} å°¾æ•°çš„ç²¾åº¦å€¼
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, float value, int precision = 8);
 
 	/**
-	 * ÉèÖÃË«¾«¶È¸¡µãÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {double} Ë«¾«¶È¸¡µãÀàĞÍ
-	 * @param precision {int} Î²ÊıµÄ¾«¶ÈÖµ
+	 * è®¾ç½®åŒç²¾åº¦æµ®ç‚¹ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {double} åŒç²¾åº¦æµ®ç‚¹ç±»å‹
+	 * @param precision {int} å°¾æ•°çš„ç²¾åº¦å€¼
 	 * @return {query&}
 	 */
 	query& set_parameter(const char* name, double value, int precision = 8);
 
 	/**
-	 * ÉèÖÃ 64 Î»¶ÌÕûÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {long long int} ±äÁ¿Öµ
+	 * è®¾ç½® 64 ä½çŸ­æ•´ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {long long int} å˜é‡å€¼
 	 * @return {query&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -100,61 +100,61 @@ public:
 #endif
 
 	/**
-	 * ÉèÖÃÈÕÆÚ(time_t)ÀàĞÍµÄ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param value {time_t} ±äÁ¿Öµ
-	 * @param fmt {const char*} ÈÕÆÚ¸ñÊ½
+	 * è®¾ç½®æ—¥æœŸ(time_t)ç±»å‹çš„å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param value {time_t} å˜é‡å€¼
+	 * @param fmt {const char*} æ—¥æœŸæ ¼å¼
 	 * @return {query&}
 	 */
 	query& set_date(const char* name, time_t value,
 		const char* fmt = "%Y-%m-%d %H:%M:%S");
 
 	/**
-	 * ÒÔ±ä²Î·½Ê½ÉèÖÃ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param fmt {const char*} ±ä²ÎÖµ¸ñÊ½
+	 * ä»¥å˜å‚æ–¹å¼è®¾ç½®å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param fmt {const char*} å˜å‚å€¼æ ¼å¼
 	 * @return {query&}
 	 */
 	query& set_format(const char* name, const char* fmt, ...)
 		ACL_CPP_PRINTF(3, 4);
 
 	/**
-	 * ÒÔ±ä²Î·½Ê½ÉèÖÃ±äÁ¿Öµ
-	 * @param name {const char*} ±äÁ¿Ãû
-	 * @param fmt {const char*} ±ä²ÎÖµ¸ñÊ½
-	 * @param ap {va_list} ±ä²ÎÖµÁĞ±í
+	 * ä»¥å˜å‚æ–¹å¼è®¾ç½®å˜é‡å€¼
+	 * @param name {const char*} å˜é‡å
+	 * @param fmt {const char*} å˜å‚å€¼æ ¼å¼
+	 * @param ap {va_list} å˜å‚å€¼åˆ—è¡¨
 	 * @return {query&}
 	 */
 	query& set_vformat(const char* name, const char* fmt, va_list ap);
 
 	/**
-	 * ¶Ô²éÑ¯ sql Óï¾ä½øĞĞ×ªÒåºó·µ»Ø¸øµ÷ÓÃÕß
+	 * å¯¹æŸ¥è¯¢ sql è¯­å¥è¿›è¡Œè½¬ä¹‰åè¿”å›ç»™è°ƒç”¨è€…
 	 * @return {const string&}
 	 */
 	const string& to_string();
 
 	/**
-	 * Çå¿Õ²éÑ¯Æ÷ÉÏÒ»´ÎµÄ»º´æÊı¾İ£¬µ±¸Ã SQL ²éÑ¯Æ÷¶ÔÏó±»¶à´ÎÊ¹ÓÃÊ±£¬Ó¦¸ÃÌáÇ°µ÷ÓÃ
-	 * ±¾º¯ÊıÇå³ıÖ®Ç°µÄ SQL ²éÑ¯Æ÷×´Ì¬
+	 * æ¸…ç©ºæŸ¥è¯¢å™¨ä¸Šä¸€æ¬¡çš„ç¼“å­˜æ•°æ®ï¼Œå½“è¯¥ SQL æŸ¥è¯¢å™¨å¯¹è±¡è¢«å¤šæ¬¡ä½¿ç”¨æ—¶ï¼Œåº”è¯¥æå‰è°ƒç”¨
+	 * æœ¬å‡½æ•°æ¸…é™¤ä¹‹å‰çš„ SQL æŸ¥è¯¢å™¨çŠ¶æ€
 	 */
 	void reset();
 
 	/**
-	 * ¶Ô sql ÖĞµÄÒ»Ğ©ÌØÊâ×Ö·û½øĞĞ×ªÒå´¦Àí£¬ÒÔ·ÀÖ¹ SQL ×¢ÈëÎÊÌâ
-	 * @param in {const char*} ±äÁ¿Öµ
-	 * @param len {size_t} in Êı¾İ³¤¶È
-	 * @param out {string&} ´æ´¢×ª»»ºóµÄ½á¹ûµÄ»º³åÇø£¬¸Ã²ÎÊıÊäÈëºó»áÏÈ±»Çå¿Õ
-	 * @return {const string&} ×ªÒå´¦ÀíºóµÄ½á¹û(ÆäÊµÊÇ out µÄµØÖ·ÒıÓÃ)
+	 * å¯¹ sql ä¸­çš„ä¸€äº›ç‰¹æ®Šå­—ç¬¦è¿›è¡Œè½¬ä¹‰å¤„ç†ï¼Œä»¥é˜²æ­¢ SQL æ³¨å…¥é—®é¢˜
+	 * @param in {const char*} å˜é‡å€¼
+	 * @param len {size_t} in æ•°æ®é•¿åº¦
+	 * @param out {string&} å­˜å‚¨è½¬æ¢åçš„ç»“æœçš„ç¼“å†²åŒºï¼Œè¯¥å‚æ•°è¾“å…¥åä¼šå…ˆè¢«æ¸…ç©º
+	 * @return {const string&} è½¬ä¹‰å¤„ç†åçš„ç»“æœ(å…¶å®æ˜¯ out çš„åœ°å€å¼•ç”¨)
 	 */
 	static const string& escape(const char* in, size_t len, string& out);
 
 	/**
-	 * ½«Ê±¼ä×ª»»³É DateTime ¸ñÊ½µÄ×Ö·û´®(YYYY-MM-DD HH:MM:SS)
-	 * @param t {time_t} Ê±¼ä½Ø
-	 * @param out {string&} ´æ´¢×ª»»½á¹ûµÄ»º³åÇø
-	 * @param fmt {const char*} ÈÕÆÚ¸ñÊ½£¬ÔÚ _WIN32 ÏÂ±ØĞë±£Ö¤¸Ã¸ñÊ½µÄÕıÈ·ĞÔ£¬
-	 *  ·ñÔò _WIN32 API »á²úÉú¶ÏÑÔ£¬¸ñÊ½Èç£º"%Y-%m-%d %H:%M:%S"
-	 * @return {const char*} ×ª»»ºó»º³åÇøµØÖ·£¬Èô·µ»Ø NULL Ôò±íÊ¾×ª»»Ê§°Ü
+	 * å°†æ—¶é—´è½¬æ¢æˆ DateTime æ ¼å¼çš„å­—ç¬¦ä¸²(YYYY-MM-DD HH:MM:SS)
+	 * @param t {time_t} æ—¶é—´æˆª
+	 * @param out {string&} å­˜å‚¨è½¬æ¢ç»“æœçš„ç¼“å†²åŒº
+	 * @param fmt {const char*} æ—¥æœŸæ ¼å¼ï¼Œåœ¨ _WIN32 ä¸‹å¿…é¡»ä¿è¯è¯¥æ ¼å¼çš„æ­£ç¡®æ€§ï¼Œ
+	 *  å¦åˆ™ _WIN32 API ä¼šäº§ç”Ÿæ–­è¨€ï¼Œæ ¼å¼å¦‚ï¼š"%Y-%m-%d %H:%M:%S"
+	 * @return {const char*} è½¬æ¢åç¼“å†²åŒºåœ°å€ï¼Œè‹¥è¿”å› NULL åˆ™è¡¨ç¤ºè½¬æ¢å¤±è´¥
 	 */
 	static const char* to_date(time_t t, string& out,
 		const char* fmt = "%Y-%m-%d %H:%M:%S");

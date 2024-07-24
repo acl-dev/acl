@@ -72,7 +72,7 @@ void spool_add_worker(SPOOL *spool, ACL_VSTREAM *cstream)
 	if (cstream == NULL || spool == NULL)
 		acl_msg_fatal("%s(%d): input invalid", myname, __LINE__);
 	
-	/* 将客户端数据流的状态置入事件监控集合中 */
+	/* 灏嗗鎴风鏁版嵁娴佺殑鐘舵�佺疆鍏ヤ簨浠剁洃鎺ч泦鍚堜腑 */
 	acl_spool_enable_read(spool->h_spool,
 				cstream,
 				var_cfg_client_idle_limit,

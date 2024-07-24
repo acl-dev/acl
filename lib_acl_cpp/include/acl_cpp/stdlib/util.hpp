@@ -5,39 +5,39 @@ namespace acl
 {
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóºÅ
- * @return {int} ´íÎóºÅ
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯å·
+ * @return {int} é”™è¯¯å·
  */
 ACL_CPP_API int last_error(void);
 
 /**
- * ÊÖ¹¤ÉèÖÃ´íÎóºÅ
- * @param errnum {int} ´íÎóºÅ
+ * æ‰‹å·¥è®¾ç½®é”™è¯¯å·
+ * @param errnum {int} é”™è¯¯å·
  */
 ACL_CPP_API void set_error(int errnum);
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢£¬¸Ãº¯ÊıÄÚ²¿²ÉÓÃÁËÏß³Ì¾Ö²¿±äÁ¿£¬ËùÒÔÊÇÏß³Ì
- * °²È«µÄ£¬µ«Ê¹ÓÃÆğÀ´¸ü¼òµ¥Ğ©
- * @return {const char *} ·µ»Ø´íÎóÌáÊ¾ĞÅÏ¢ 
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯ï¼Œè¯¥å‡½æ•°å†…éƒ¨é‡‡ç”¨äº†çº¿ç¨‹å±€éƒ¨å˜é‡ï¼Œæ‰€ä»¥æ˜¯çº¿ç¨‹
+ * å®‰å…¨çš„ï¼Œä½†ä½¿ç”¨èµ·æ¥æ›´ç®€å•äº›
+ * @return {const char *} è¿”å›é”™è¯¯æç¤ºä¿¡æ¯ 
  */
 ACL_CPP_API const char* last_serror(void);
 
 /**
- * »ñµÃÉÏ´ÎÏµÍ³µ÷ÓÃ³ö´íÊ±µÄ´íÎóÃèÊöĞÅÏ¢
- * @param buf {char*} ´æ´¢´íÎóÃèÊöĞÅÏ¢µÄÄÚ´æ»º³åÇø
- * @param size {int} buffer µÄ¿Õ¼ä´óĞ¡
- * @return {const char*} ·µ»ØµÄµØÖ·Ó¦Óë buffer ÏàÍ¬
+ * è·å¾—ä¸Šæ¬¡ç³»ç»Ÿè°ƒç”¨å‡ºé”™æ—¶çš„é”™è¯¯æè¿°ä¿¡æ¯
+ * @param buf {char*} å­˜å‚¨é”™è¯¯æè¿°ä¿¡æ¯çš„å†…å­˜ç¼“å†²åŒº
+ * @param size {int} buffer çš„ç©ºé—´å¤§å°
+ * @return {const char*} è¿”å›çš„åœ°å€åº”ä¸ buffer ç›¸åŒ
  */
 ACL_CPP_API const char* last_serror(char* buf, size_t size);
 
 /**
- * ÀàËÆÓÚ±ê×¼CµÄ strerror, µ«¸Ãº¯ÊıÊÇ¿çÆ½Ì¨ÇÒÊÇÏß³Ì°²È«µÄ£¬»ñµÃ¶ÔÓ¦Ä³¸ö´íÎó
- * ºÅµÄ´íÎóÃèÊöĞÅÏ¢
- * @param errnum {int} ´íÎóºÅ
- * @param buf {char*} ´æ´¢´íÎóÃèÊöĞÅÏ¢µÄÄÚ´æ»º³åÇø
- * @param size {int} buffer »º³åÇøµÄ´óĞ¡
- * @return {const char*} ·µ»ØµÄµØÖ·Ó¦Óë buffer ÏàÍ¬
+ * ç±»ä¼¼äºæ ‡å‡†Cçš„ strerror, ä½†è¯¥å‡½æ•°æ˜¯è·¨å¹³å°ä¸”æ˜¯çº¿ç¨‹å®‰å…¨çš„ï¼Œè·å¾—å¯¹åº”æŸä¸ªé”™è¯¯
+ * å·çš„é”™è¯¯æè¿°ä¿¡æ¯
+ * @param errnum {int} é”™è¯¯å·
+ * @param buf {char*} å­˜å‚¨é”™è¯¯æè¿°ä¿¡æ¯çš„å†…å­˜ç¼“å†²åŒº
+ * @param size {int} buffer ç¼“å†²åŒºçš„å¤§å°
+ * @return {const char*} è¿”å›çš„åœ°å€åº”ä¸ buffer ç›¸åŒ
 */
 ACL_CPP_API const char* string_error(int errnum, char* buf, size_t size);
 

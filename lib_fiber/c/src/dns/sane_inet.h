@@ -6,36 +6,36 @@ extern "C" {
 #endif
 
 /**
- * ½«IPµØÖ·×ª»»³É×Ö·û´®¸ñÊ½
- * @param src {const unsigned char*} struct in_addr in.s_addr µÄÁ¬ĞøÄÚ´æ±íÊ¾
- * @param dst {char *} ´æ´¢×ª»»½á¹û
- * @param size {size_t} dst µÄ¿Õ¼ä´óĞ¡
+ * å°†IPåœ°å€è½¬æ¢æˆå­—ç¬¦ä¸²æ ¼å¼
+ * @param src {const unsigned char*} struct in_addr in.s_addr çš„è¿ç»­å†…å­˜è¡¨ç¤º
+ * @param dst {char *} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @param size {size_t} dst çš„ç©ºé—´å¤§å°
  * @return {const char*} NULL: error; !NULL: ok
  */
 const char *inet_ntop4(const unsigned char *src, char *dst, size_t size);
 
 /**
- * ½«IPµØÖ·×ª»»³É×Ö·û´®¸ñÊ½
+ * å°†IPåœ°å€è½¬æ¢æˆå­—ç¬¦ä¸²æ ¼å¼
  * @param in {struct in_addr}
- * @param dst {char *} ´æ´¢×ª»»½á¹û
- * @param size {size_t} dst µÄ¿Õ¼ä´óĞ¡
+ * @param dst {char *} å­˜å‚¨è½¬æ¢ç»“æœ
+ * @param size {size_t} dst çš„ç©ºé—´å¤§å°
  * @return {const char*} NULL: error; !NULL: ok
  */
 const char *sane_inet_ntoa(struct in_addr in, char *dst, size_t size);
 
 /**
- * ÅĞ¶Ï¸ø¶¨µÄ×Ö·û´®ÊÇ·ñÊÇÕıÈ·µÄ ip µØÖ·
+ * åˆ¤æ–­ç»™å®šçš„å­—ç¬¦ä¸²æ˜¯å¦æ˜¯æ­£ç¡®çš„ ip åœ°å€
  * @param ip {const char *ip}
- * @return {int} != 0: ÊÇ; == 0: ·ñ
+ * @return {int} != 0: æ˜¯; == 0: å¦
  */
 int is_ip(const char *ip);
 int is_ipv4(const char *ip);
 int is_ipv6(const char *ip);
 
 /**
- * ÅĞ¶ÏËù¸øµÄ ip µØÖ·ÊÇ·ñ·ûºÏ xxx.xxx.xxx.xxx:port ¸ñÊ½
- * @param addr {const char*} IP:PORT µØÖ·
- * @return {int} 1: ·ûºÏ, 0: ²»·ûºÏ
+ * åˆ¤æ–­æ‰€ç»™çš„ ip åœ°å€æ˜¯å¦ç¬¦åˆ xxx.xxx.xxx.xxx:port æ ¼å¼
+ * @param addr {const char*} IP:PORT åœ°å€
+ * @return {int} 1: ç¬¦åˆ, 0: ä¸ç¬¦åˆ
  */
 int ipv4_addr_valid(const char *addr);
 

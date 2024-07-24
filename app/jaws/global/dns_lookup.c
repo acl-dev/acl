@@ -21,7 +21,7 @@ static void inner_nslookup_error(CLIENT_ENTRY *entry)
 		acl_aio_refer(entry->client);
 		acl_aio_writen(entry->client, entry->dns_errmsg,
 			(int) strlen(entry->dns_errmsg));
-		/* »Ö¸´referÖµ */
+		/* æ¢å¤referå€¼ */
 		acl_aio_unrefer(entry->client);
 	}
 
@@ -60,7 +60,7 @@ static void inner_nslookup_complete(ACL_DNS_DB *dns_db, void *ctx,
 		inner_nslookup_error(entry);
 }
 
-/* ²éÑ¯DNSĞÅÏ¢£¬²ÉÓÃĞ­Òé·¢ËÍµÄ·½Ê½ */
+/* æŸ¥è¯¢DNSä¿¡æ¯ï¼Œé‡‡ç”¨åè®®å‘é€çš„æ–¹å¼ */
 static void inner_nslookup(SERVICE *service, CLIENT_ENTRY *entry,
 	const char *domain, int port)
 {
@@ -84,7 +84,7 @@ static void inner_nslookup(SERVICE *service, CLIENT_ENTRY *entry,
 
 /*----------------------------------------------------------------------------*/
 
-/* DNS²éÑ¯½á¹ûÖ®ºóµÄ»Øµ÷º¯Êı */
+/* DNSæŸ¥è¯¢ç»“æœä¹‹åçš„å›è°ƒå‡½æ•° */
 static void thrpool_nslookup_complete(const DNS_CTX *dns_ctx)
 {
 	const char *myname = "thrpool_nslookup_complte";
@@ -105,7 +105,7 @@ static void thrpool_nslookup_complete(const DNS_CTX *dns_ctx)
 	time(&now);
 	inter = now - dns_ctx->begin;
 
-	/* Èç¹û²éÑ¯Ê±¼ä¹ı³¤£¬Ôò¸ø³ö¾¯¸æĞÅÏ¢ */
+	/* å¦‚æœæŸ¥è¯¢æ—¶é—´è¿‡é•¿ï¼Œåˆ™ç»™å‡ºè­¦å‘Šä¿¡æ¯ */
 	if (inter >= 5)
 		acl_msg_warn("%s(%d): dns search time=%d, domain(%s)",
 			myname, __LINE__, time(NULL) - dns_ctx->begin,
@@ -131,17 +131,17 @@ static void thrpool_nslookup_complete(const DNS_CTX *dns_ctx)
 					__FILE__, __LINE__);
 
 			if (entry->dns_errmsg) {
-				/* XXX: ÒòÎª´Ë´¦¿ÉÄÜ»áÓĞÁ½´¦¹Ø±Õ client Á÷µÄµØ·½:
-				 * acl_aio_writen ¼° forward_complete£¬Îª·ÀÖ¹ÖØ¸´
-				 * ¹Ø±ÕÔì³ÉµÄÄÚ´æ·ÃÎÊ·Ç·¨£¬ĞèÒª * ÔÚµÚÒ»¸ö¿ÉÄÜ¹Ø±Õ
-				 * µÄº¯Êı(acl_aio_writen)µ÷ÓÃÇ°ÌáÉı client Á÷µÄ
-				 * ÒıÓÃÖµ£¬²¢ÇÒÔÚ¸Ãº¯Êı·µ»ØºóÔÙ»Ö¸´ÒıÓÃÖµ
+				/* XXX: å› ä¸ºæ­¤å¤„å¯èƒ½ä¼šæœ‰ä¸¤å¤„å…³é—­ client æµçš„åœ°æ–¹:
+				 * acl_aio_writen åŠ forward_completeï¼Œä¸ºé˜²æ­¢é‡å¤
+				 * å…³é—­é€ æˆçš„å†…å­˜è®¿é—®éæ³•ï¼Œéœ€è¦ * åœ¨ç¬¬ä¸€ä¸ªå¯èƒ½å…³é—­
+				 * çš„å‡½æ•°(acl_aio_writen)è°ƒç”¨å‰æå‡ client æµçš„
+				 * å¼•ç”¨å€¼ï¼Œå¹¶ä¸”åœ¨è¯¥å‡½æ•°è¿”å›åå†æ¢å¤å¼•ç”¨å€¼
 				 */
 
 				acl_aio_refer(entry->client);
 				acl_aio_writen(entry->client, entry->dns_errmsg,
 					(int) strlen(entry->dns_errmsg));
-				/* »Ö¸´referÖµ */
+				/* æ¢å¤referå€¼ */
 				acl_aio_unrefer(entry->client);
 			}
 
@@ -159,10 +159,10 @@ static void thrpool_nslookup_complete(const DNS_CTX *dns_ctx)
 					i, dns_ctx->ip[i]);
 		}
 		
-		/* ½«²éµÃµÄËùÓĞDNS½á¹û¶¼¿½±´ÖÁÇëÇó¶ÔÏóÖĞ */
+		/* å°†æŸ¥å¾—çš„æ‰€æœ‰DNSç»“æœéƒ½æ‹·è´è‡³è¯·æ±‚å¯¹è±¡ä¸­ */
 		memcpy(&entry->dns_ctx, dns_ctx, sizeof(entry->dns_ctx));
 
-		/* ÏÂÃæ×¢ÊÍ²¿·Ö±»´ò¿ª£¬±ã¿ÉÒÔ²âÊÔÁ¬½ÓÖØÊÔ¹¦ÄÜ:)-- zsx, 2008.2.28
+		/* ä¸‹é¢æ³¨é‡Šéƒ¨åˆ†è¢«æ‰“å¼€ï¼Œä¾¿å¯ä»¥æµ‹è¯•è¿æ¥é‡è¯•åŠŸèƒ½:)-- zsx, 2008.2.28
 		 * strcpy(proxy_entry->dns_ctx.ip[1], proxy_entry->dns_ctx.ip[0]);
 		 * strcpy(proxy_entry->dns_ctx.ip[0], "127.0.0.1");
 		 * if (proxy_entry->dns_ctx.ip_cnt < 2)
@@ -180,7 +180,7 @@ static void thrpool_nslookup_complete(const DNS_CTX *dns_ctx)
 			myname, __LINE__, list->nrefer);
 }
 
-/* ²éÑ¯DNSĞÅÏ¢£¬²ÉÓÃÍâ¹ÒÄ£¿éµÄ·½Ê½ */
+/* æŸ¥è¯¢DNSä¿¡æ¯ï¼Œé‡‡ç”¨å¤–æŒ‚æ¨¡å—çš„æ–¹å¼ */
 static void thrpool_nslookup(SERVICE *service, CLIENT_ENTRY *entry,
 	const char *domain, int port)
 {
@@ -195,7 +195,7 @@ static void thrpool_nslookup(SERVICE *service, CLIENT_ENTRY *entry,
 	dns_ctx.begin = entry->tm.stamp;
 	STRNCPY(dns_ctx.domain_key, domain, sizeof(dns_ctx.domain_key));
 	ptr = strchr(dns_ctx.domain_key, ':');
-	/* ½öÁôÏÂÓòÃû²¿·Ö */
+	/* ä»…ç•™ä¸‹åŸŸåéƒ¨åˆ† */
 	if (ptr)
 		*ptr = 0;
 
@@ -203,7 +203,7 @@ static void thrpool_nslookup(SERVICE *service, CLIENT_ENTRY *entry,
 	if (entry->server_port <= 0)
 		entry->server_port = 80;
 	
-	/* ½«ÓòÃû×Ö·û´®¶¼×ª»»³ÉĞ¡Ğ´£¬ÒÔ±ãÓÚ½øĞĞ¹şÏ£²éÑ¯ */
+	/* å°†åŸŸåå­—ç¬¦ä¸²éƒ½è½¬æ¢æˆå°å†™ï¼Œä»¥ä¾¿äºè¿›è¡Œå“ˆå¸ŒæŸ¥è¯¢ */
 	acl_lowercase(dns_ctx.domain_key);
 
 	dns_ctx.context = service;
@@ -211,36 +211,36 @@ static void thrpool_nslookup(SERVICE *service, CLIENT_ENTRY *entry,
 
 	STRNCPY(entry->domain_key, dns_ctx.domain_key, sizeof(entry->domain_key));
 
-	/* ÏÈ²éÑ¯DNS²éÑ¯±íÖĞÊÇ·ñÒÑ¾­°üº¬±¾´ÎĞèÒª±»²éÑ¯µÄÓòÃû */
+	/* å…ˆæŸ¥è¯¢DNSæŸ¥è¯¢è¡¨ä¸­æ˜¯å¦å·²ç»åŒ…å«æœ¬æ¬¡éœ€è¦è¢«æŸ¥è¯¢çš„åŸŸå */
 	list = (DNS_RING *) acl_htable_find(service->dns_table, dns_ctx.domain_key);
 	if (list) {
-		/* ½«±¾´Î¶ÔÍ¬Ò»ÓòÃûµÄ²éÑ¯Ìí¼Ó½øÍ¬Ò»¸ö²éÑ¯Á´ÖĞ */
+		/* å°†æœ¬æ¬¡å¯¹åŒä¸€åŸŸåçš„æŸ¥è¯¢æ·»åŠ è¿›åŒä¸€ä¸ªæŸ¥è¯¢é“¾ä¸­ */
 		acl_ring_prepend(&list->ring, &entry->dns_entry);
-		/* ½«²éÑ¯Á´¶ÔÏóµÄÒıÓÃ¼ÆÊı¼Ó1 */
+		/* å°†æŸ¥è¯¢é“¾å¯¹è±¡çš„å¼•ç”¨è®¡æ•°åŠ 1 */
 		list->nrefer++;
-		/* Èç¹û¸Ã²éÑ¯Á´ÒÑ¾­´æÔÚ£¬ËµÃ÷ÓĞ²éÑ¯ÈÎÎñµÈ´ı·µ»Ø£¬Æä·µ»Øºó»áÒ»Í¬½«
-		 * ±¾´ÎÈÎÎñ½øĞĞ´¥·¢£¬Èç¹û´Ë´¦´¥·¢ĞÂÈÎÎñ£¬Ôò»áÔì³ÉÄÚ´æ·ÃÎÊ³åÍ»£¬ÒòÎª
-		 * ²éÑ¯DNSµÄ¹ı³ÌÊÇÓÉÒ»×éÏß³Ì³Ø½øĞĞ²éÑ¯µÄ¡£
+		/* å¦‚æœè¯¥æŸ¥è¯¢é“¾å·²ç»å­˜åœ¨ï¼Œè¯´æ˜æœ‰æŸ¥è¯¢ä»»åŠ¡ç­‰å¾…è¿”å›ï¼Œå…¶è¿”å›åä¼šä¸€åŒå°†
+		 * æœ¬æ¬¡ä»»åŠ¡è¿›è¡Œè§¦å‘ï¼Œå¦‚æœæ­¤å¤„è§¦å‘æ–°ä»»åŠ¡ï¼Œåˆ™ä¼šé€ æˆå†…å­˜è®¿é—®å†²çªï¼Œå› ä¸º
+		 * æŸ¥è¯¢DNSçš„è¿‡ç¨‹æ˜¯ç”±ä¸€ç»„çº¿ç¨‹æ± è¿›è¡ŒæŸ¥è¯¢çš„ã€‚
 		 * (void) dns_server_lookup(proxy_entry->aio_proxy->dns_server, &dns_ctx);
 		 */
 		return;
 	}
 
-	/* ´´½¨Ò»¸öĞÂµÄ²éÑ¯Á´¶ÔÏó£¬²¢½«±¾´Î²éÑ¯ÈÎÎñ¼ÓÈë¸Ã²éÑ¯Á´ÖĞ¼°½«¸Ã²éÑ¯Á´¼ÓÈë²éÑ¯±íÖĞ */
+	/* åˆ›å»ºä¸€ä¸ªæ–°çš„æŸ¥è¯¢é“¾å¯¹è±¡ï¼Œå¹¶å°†æœ¬æ¬¡æŸ¥è¯¢ä»»åŠ¡åŠ å…¥è¯¥æŸ¥è¯¢é“¾ä¸­åŠå°†è¯¥æŸ¥è¯¢é“¾åŠ å…¥æŸ¥è¯¢è¡¨ä¸­ */
 
 	list = (DNS_RING *) acl_mycalloc(1, sizeof(DNS_RING));
 	acl_ring_init(&list->ring);
 	STRNCPY(list->domain_key, dns_ctx.domain_key, sizeof(list->domain_key));
 
-	/* ½«±¾´Î²éÑ¯ÈÎÎñ¼ÓÈëĞÂµÄ²éÑ¯Á´ÖĞÇÒ½«²éÑ¯Á´µÄÒıÓÃ¼ÆÊı¼Ó1 */
+	/* å°†æœ¬æ¬¡æŸ¥è¯¢ä»»åŠ¡åŠ å…¥æ–°çš„æŸ¥è¯¢é“¾ä¸­ä¸”å°†æŸ¥è¯¢é“¾çš„å¼•ç”¨è®¡æ•°åŠ 1 */
 	acl_ring_prepend(&list->ring, &entry->dns_entry);
 	list->nrefer++;
 
-	/* ½«ĞÂµÄ²éÑ¯Á´¼ÓÈë²éÑ¯±íÖĞ */
+	/* å°†æ–°çš„æŸ¥è¯¢é“¾åŠ å…¥æŸ¥è¯¢è¡¨ä¸­ */
 	if (acl_htable_enter(service->dns_table, list->domain_key, (char *) list) == NULL)
 		acl_msg_fatal("%s: add domain(%s) to table error", myname, list->domain_key);
 
-	/* ¿ªÊ¼Æô¶¯DNS²éÑ¯¹ı³Ì */
+	/* å¼€å§‹å¯åŠ¨DNSæŸ¥è¯¢è¿‡ç¨‹ */
 	(void) dns_server_lookup(service->dns_server, &dns_ctx);
 }
 

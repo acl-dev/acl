@@ -10,31 +10,31 @@ class ACL_CPP_API sqlite_manager : public connect_manager
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param charset {const char*} Êı¾İÎÄ¼şÃû×Ö·û¼¯
+	 * æ„é€ å‡½æ•°
+	 * @param charset {const char*} æ•°æ®æ–‡ä»¶åå­—ç¬¦é›†
 	 */
 	sqlite_manager(const char* charset = "utf-8");
 	~sqlite_manager();
 
 	/**
-	* @param dbfile {const char*} sqlite Êı¾İ¿âµÄÊı¾İÎÄ¼ş
-	* @param dblimit {size_t} Êı¾İ¿âÁ¬½Ó³Ø×î´óÁ¬½ÓÊıÏŞÖÆ
+	* @param dbfile {const char*} sqlite æ•°æ®åº“çš„æ•°æ®æ–‡ä»¶
+	* @param dblimit {size_t} æ•°æ®åº“è¿æ¥æ± æœ€å¤§è¿æ¥æ•°é™åˆ¶
 	* @return {sqlite_manager&}
 	 */
 	sqlite_manager& add(const char* dbfile, size_t dblimit);
 
 protected:
 	/**
-	 * »ùÀà connect_manager Ğéº¯ÊıµÄÊµÏÖ
-	 * @param addr {const char*} ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½£ºip:port
-	 * @param count {size_t} Á¬½Ó³ØµÄ´óĞ¡ÏŞÖÆ£¬¸ÃÖµÎª 0 Ê±Ã»ÓĞÏŞÖÆ
-	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼)
-	 * @return {connect_pool*} ·µ»Ø´´½¨µÄÁ¬½Ó³Ø¶ÔÏó
+	 * åŸºç±» connect_manager è™šå‡½æ•°çš„å®ç°
+	 * @param addr {const char*} æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šip:port
+	 * @param count {size_t} è¿æ¥æ± çš„å¤§å°é™åˆ¶ï¼Œè¯¥å€¼ä¸º 0 æ—¶æ²¡æœ‰é™åˆ¶
+	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹)
+	 * @return {connect_pool*} è¿”å›åˆ›å»ºçš„è¿æ¥æ± å¯¹è±¡
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);
 
 private:
-	// sqlite Êı¾İÎÄ¼şÃû
+	// sqlite æ•°æ®æ–‡ä»¶å
 	char* dbfile_;
 	char* charset_;
 	size_t dblimit_;

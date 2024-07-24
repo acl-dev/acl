@@ -109,7 +109,7 @@ bool mime_builder::save_as(acl::ofstream& fp)
 			return false;
 	}
 
-	// Ìí¼Ó×îºóÒ»¸ö·Ö¸ô·û
+	// æ·»åŠ æœ€åä¸€ä¸ªåˆ†éš”ç¬¦
 	return add_boundary(fp, true);
 }
 
@@ -188,7 +188,7 @@ bool mime_builder::add_boundary(acl::ofstream& fp, bool end /* = false */)
 bool mime_builder::add_attach(acl::ofstream& fp, const char* filepath)
 {
 	//////////////////////////////////////////////////////////////////////////
-	// ´´½¨Í·²¿·ÖĞÅÏ¢²¢Ğ´ÈëÓÊ¼şÖĞ
+	// åˆ›å»ºå¤´éƒ¨åˆ†ä¿¡æ¯å¹¶å†™å…¥é‚®ä»¶ä¸­
 
 	acl::string filebuf;
 	global::get_filename(filepath, filebuf);
@@ -210,7 +210,7 @@ bool mime_builder::add_attach(acl::ofstream& fp, const char* filepath)
 	}
 
 	//////////////////////////////////////////////////////////////////////////
-	// ¶ÁÈ¡¸½¼şÊı¾İ²¢Ğ´ÈëÓÊ¼şÖĞ
+	// è¯»å–é™„ä»¶æ•°æ®å¹¶å†™å…¥é‚®ä»¶ä¸­
 
 	acl::ifstream in;
 	if (in.open_read(filepath) == false)

@@ -3,7 +3,7 @@
 #include "master_service.h"
 
 ////////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈÝÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_libcrypto_path;
 char *var_cfg_libx509_path;
@@ -66,12 +66,12 @@ static acl::sslbase_io* setup_ssl(acl::socket_stream& conn, acl::sslbase_conf& c
 		return hook;
 	}
 
-	// ¶ÔÓÚÊ¹ÓÃ SSL ·½Ê½µÄÁ÷¶ÔÏó£¬ÐèÒª½« SSL IO Á÷¶ÔÏó×¢²áÖÁÍøÂç
-	// Á¬½ÓÁ÷¶ÔÏóÖÐ£¬¼´ÓÃ ssl io Ìæ»» stream ÖÐÄ¬ÈÏµÄµ×²ã IO ¹ý³Ì
+	// å¯¹äºŽä½¿ç”¨ SSL æ–¹å¼çš„æµå¯¹è±¡ï¼Œéœ€è¦å°† SSL IO æµå¯¹è±¡æ³¨å†Œè‡³ç½‘ç»œ
+	// è¿žæŽ¥æµå¯¹è±¡ä¸­ï¼Œå³ç”¨ ssl io æ›¿æ¢ stream ä¸­é»˜è®¤çš„åº•å±‚ IO è¿‡ç¨‹
 
 	//logger("begin setup ssl hook...");
 
-	// ²ÉÓÃ×èÈû SSL ÎÕÊÖ·½Ê½
+	// é‡‡ç”¨é˜»å¡ž SSL æ¡æ‰‹æ–¹å¼
 	acl::sslbase_io* ssl = conf.create(false);
 	if (conn.setup_hook(ssl) == ssl) {
 		logger_error("setup_hook error!");
@@ -190,11 +190,11 @@ void master_service::proc_on_init()
 		exit (1);
 	}
 
-	// ÔÊÐí·þÎñ¶ËµÄ SSL »á»°»º´æ¹¦ÄÜ
+	// å…è®¸æœåŠ¡ç«¯çš„ SSL ä¼šè¯ç¼“å­˜åŠŸèƒ½
 	conf_->enable_cache(var_cfg_session_cache);
 
 	if (use_polarssl) {
-		// Ìí¼Ó±¾µØ·þÎñµÄÖ¤Êé
+		// æ·»åŠ æœ¬åœ°æœåŠ¡çš„è¯ä¹¦
 		if (!conf_->add_cert(var_cfg_crt_file)) {
 			logger_error("add cert failed, crt: %s, key: %s",
 					var_cfg_crt_file, var_cfg_key_file);
@@ -203,7 +203,7 @@ void master_service::proc_on_init()
 			return;
 		}
 
-		// Ìí¼Ó±¾µØ·þÎñÃÜÔ¿
+		// æ·»åŠ æœ¬åœ°æœåŠ¡å¯†é’¥
 		if (!conf_->set_key(var_cfg_key_file)) {
 			logger_error("set private key error");
 			delete conf_;

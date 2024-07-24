@@ -79,7 +79,7 @@ bool http_servlet::doOther(HttpRequest&, HttpResponse& res, const char* method)
 {
 	res.setStatus(400);
 	res.setContentType("text/xml; charset=utf-8");
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='unkown method %s' />\r\n", method);
 	res.write(buf);
@@ -89,9 +89,9 @@ bool http_servlet::doOther(HttpRequest&, HttpResponse& res, const char* method)
 
 bool http_servlet::doService(int type, HttpRequest& req, HttpResponse& res)
 {
-	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
-	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
-	// memcached »ò redis ·şÎñÕı³£
+	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
+	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
+	// memcached æˆ– redis æœåŠ¡æ­£å¸¸
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0) {
@@ -100,7 +100,7 @@ bool http_servlet::doService(int type, HttpRequest& req, HttpResponse& res)
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	// Èç¹ûĞèÒªÈ¡µÃä¯ÀÀÆ÷ cookie Çë´ò¿ªÏÂÃæ×¢ÊÍ
+	// å¦‚æœéœ€è¦å–å¾—æµè§ˆå™¨ cookie è¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Š
 	/*
 	 
 	*/

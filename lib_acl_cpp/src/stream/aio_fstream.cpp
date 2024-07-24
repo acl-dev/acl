@@ -23,15 +23,15 @@ aio_fstream::aio_fstream(aio_handle* handle, ACL_FILE_HANDLE fd,
 	ACL_VSTREAM* vstream = acl_vstream_fhopen(fd, oflags);
 	stream_ = acl_aio_open(handle->get_handle(), vstream);
 
-	// µ÷ÓÃ»ùÀàµÄ enable_error ÒÔÏò handle ÖÐÔö¼ÓÒì²½Á÷¼ÆÊý,
-	// Í¬Ê±×¢²á¹Ø±Õ¼°³¬Ê±»Øµ÷¹ý³Ì
+	// è°ƒç”¨åŸºç±»çš„ enable_error ä»¥å‘ handle ä¸­å¢žåŠ å¼‚æ­¥æµè®¡æ•°,
+	// åŒæ—¶æ³¨å†Œå…³é—­åŠè¶…æ—¶å›žè°ƒè¿‡ç¨‹
 	this->enable_error();
 
-	// Ö»ÓÐµ±Á÷Á¬½Ó³É¹¦ºó²Å¿É hook IO ¶ÁÐ´×´Ì¬
-	// ×¢²á¶Á»Øµ÷¹ý³Ì
+	// åªæœ‰å½“æµè¿žæŽ¥æˆåŠŸåŽæ‰å¯ hook IO è¯»å†™çŠ¶æ€
+	// æ³¨å†Œè¯»å›žè°ƒè¿‡ç¨‹
 	this->enable_read();
 
-	// ×¢²áÐ´»Øµ÷¹ý³Ì
+	// æ³¨å†Œå†™å›žè°ƒè¿‡ç¨‹
 	this->enable_write();
 }
 
@@ -52,17 +52,17 @@ bool aio_fstream::open(const char* path, unsigned int oflags, unsigned int mode)
 	}
 	stream_ = acl_aio_open(handle_->get_handle(), fp);
 
-	// µ÷ÓÃ»ùÀàµÄ enable_error ÒÔÏò handle ÖÐÔö¼ÓÒì²½Á÷¼ÆÊý,
-	// Í¬Ê±×¢²á¹Ø±Õ¼°³¬Ê±»Øµ÷¹ý³Ì
+	// è°ƒç”¨åŸºç±»çš„ enable_error ä»¥å‘ handle ä¸­å¢žåŠ å¼‚æ­¥æµè®¡æ•°,
+	// åŒæ—¶æ³¨å†Œå…³é—­åŠè¶…æ—¶å›žè°ƒè¿‡ç¨‹
 	this->enable_error();
 
-	// Ö»ÓÐµ±Á÷Á¬½Ó³É¹¦ºó²Å¿É hook IO ¶ÁÐ´×´Ì¬
-	// hook ¶Á»Øµ÷¹ý³Ì
+	// åªæœ‰å½“æµè¿žæŽ¥æˆåŠŸåŽæ‰å¯ hook IO è¯»å†™çŠ¶æ€
+	// hook è¯»å›žè°ƒè¿‡ç¨‹
 	if ((oflags & (O_RDONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
 		this->enable_read();
 	}
 
-	// hook Ð´»Øµ÷¹ý³Ì
+	// hook å†™å›žè°ƒè¿‡ç¨‹
 	if ((oflags & (O_WRONLY | O_RDWR | O_APPEND | O_CREAT | O_TRUNC))) {
 		this->enable_write();
 	}

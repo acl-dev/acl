@@ -211,7 +211,7 @@ void redis_command::set_pipeline(redis_client_pipeline* pipeline)
 	pipeline_ = pipeline;
 }
 
-// ·ÖÎöÖØ¶¨ÏòÐÅÏ¢£¬»ñµÃÖØ¶¨ÏòµÄ·þÎñÆ÷µØÖ·
+// åˆ†æžé‡å®šå‘ä¿¡æ¯ï¼ŒèŽ·å¾—é‡å®šå‘çš„æœåŠ¡å™¨åœ°å€
 const char* redis_command::get_addr(const char* info)
 {
 	return get_addr(dbuf_, info);
@@ -281,7 +281,7 @@ void redis_command::hash_slot(const char* key, size_t len)
 {
 	int max_slot;
 
-	// Ö»ÓÐ¼¯ÈºÄ£Ê½²ÅÐèÒª¼ÆËã¹þÏ£²ÛÖµ
+	// åªæœ‰é›†ç¾¤æ¨¡å¼æ‰éœ€è¦è®¡ç®—å“ˆå¸Œæ§½å€¼
 	if (cluster_ != NULL) {
 		max_slot = cluster_->get_max_slot();
 	} else if (pipeline_ != NULL) {
@@ -294,7 +294,7 @@ void redis_command::hash_slot(const char* key, size_t len)
 		return;
 	}
 
-	// Èç¹û»º´æÁË¹þÏ£²ÛÖµ£¬Ôò²»±ØÖØÐÂ¼ÆËã
+	// å¦‚æžœç¼“å­˜äº†å“ˆå¸Œæ§½å€¼ï¼Œåˆ™ä¸å¿…é‡æ–°è®¡ç®—
 	if (slot_ >= 0 && slot_ < max_slot) {
 		return;
 	}
@@ -371,7 +371,7 @@ const char* redis_command::result_value(size_t i, size_t* len /* = NULL */) cons
 		return child->get(0, len);
 	}
 
-	// ´óÄÚ´æÓÐ¿ÉÄÜ±»ÇÐÆ¬³É¶à¸ö²»Á¬ÐøµÄÐ¡ÄÚ´æ
+	// å¤§å†…å­˜æœ‰å¯èƒ½è¢«åˆ‡ç‰‡æˆå¤šä¸ªä¸è¿žç»­çš„å°å†…å­˜
 	size = child->get_length();
 	size++;
 	char* buf = (char*) dbuf_->dbuf_alloc(size);

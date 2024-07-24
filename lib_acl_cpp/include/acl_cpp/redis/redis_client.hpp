@@ -17,9 +17,9 @@ class redis_command;
 class sslbase_conf;
 
 /**
- * redis ¿Í»§¶Ë¶ÔÏóÍøÂçÍ¨ĞÅÀà£¬Í¨¹ı´ËÀà½«×éÖ¯ºÃµÄ redis ÇëÇóÃüÁî·¢¸ø redis
- * ·şÎñ¶Ë£¬Í¬Ê±½ÓÊÕ redis ·şÎñ¶ËÏìÓ¦½á¹û£»¸ÃÀà¼Ì³ĞÓÚ connect_client Àà£¬Ö÷Òª
- * ÎªÁËÊ¹ÓÃÁ¬½Ó³Ø¹¦ÄÜ¡£
+ * redis å®¢æˆ·ç«¯å¯¹è±¡ç½‘ç»œé€šä¿¡ç±»ï¼Œé€šè¿‡æ­¤ç±»å°†ç»„ç»‡å¥½çš„ redis è¯·æ±‚å‘½ä»¤å‘ç»™ redis
+ * æœåŠ¡ç«¯ï¼ŒåŒæ—¶æ¥æ”¶ redis æœåŠ¡ç«¯å“åº”ç»“æœï¼›è¯¥ç±»ç»§æ‰¿äº connect_client ç±»ï¼Œä¸»è¦
+ * ä¸ºäº†ä½¿ç”¨è¿æ¥æ± åŠŸèƒ½ã€‚
  * redis client network IO class. The redis request is sent to server
  * and the server's respond is handled in this class. The class inherits
  * connect_client, which can use the connection pool function.
@@ -28,13 +28,13 @@ class ACL_CPP_API redis_client : public connect_client
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
+	 * æ„é€ å‡½æ•°
 	 * constructor
-	 * @param addr {const char*} redis-server ¼àÌıµØÖ·
+	 * @param addr {const char*} redis-server ç›‘å¬åœ°å€
 	 *  the redis-server listening addr
-	 * @param conn_timeout {int} Á¬½Ó redis-server µÄ³¬Ê±Ê±¼ä(Ãë)
+	 * @param conn_timeout {int} è¿æ¥ redis-server çš„è¶…æ—¶æ—¶é—´(ç§’)
 	 *  the timeout in seconds to connect the redis-server
-	 * @param rw_timeout {int} Óë redis-server ½øĞĞÍ¨ĞÅµÄ IO ³¬Ê±Ê±¼ä(Ãë)
+	 * @param rw_timeout {int} ä¸ redis-server è¿›è¡Œé€šä¿¡çš„ IO è¶…æ—¶æ—¶é—´(ç§’)
 	 *  the network IO timeout in seconds with the redis-server
 	 */
 	redis_client(const char* addr, int conn_timeout = 60,
@@ -42,22 +42,22 @@ public:
 	virtual ~redis_client(void);
 
 	/**
-	 * ÉèÖÃ SSL Í¨ĞÅ·½Ê½ÏÂµÄÅäÖÃ¾ä±ú£¬ÄÚ²¿È±Ê¡ÖµÎª NULL£¬Èç¹ûÉèÖÃÁË SSL Á¬
-	 * ½ÓÅäÖÃ¶ÔÏó£¬ÔòÄÚ²¿ÇĞ»»³É SSL Í¨ĞÅ·½Ê½
+	 * è®¾ç½® SSL é€šä¿¡æ–¹å¼ä¸‹çš„é…ç½®å¥æŸ„ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º NULLï¼Œå¦‚æœè®¾ç½®äº† SSL è¿
+	 * æ¥é…ç½®å¯¹è±¡ï¼Œåˆ™å†…éƒ¨åˆ‡æ¢æˆ SSL é€šä¿¡æ–¹å¼
 	 * set SSL communication with Redis-server if ssl_conf not NULL
 	 * @param ssl_conf {sslbase_conf*}
 	 */
 	void set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
-	 * µ÷ÓÃ±¾º¯ÊıÉèÖÃÁ¬½Ó redis ·şÎñµÄÁ¬½ÓÃÜÂë
+	 * è°ƒç”¨æœ¬å‡½æ•°è®¾ç½®è¿æ¥ redis æœåŠ¡çš„è¿æ¥å¯†ç 
 	 * @param pass {const char*}
 	 */
 	void set_password(const char* pass);
 
 	/**
-	 * ÉèÖÃ±¾Á¬½ÓËù¶ÔÓ¦µÄ db£¬µ±Á¬½Ó½¨Á¢ºóÈç¹ûÖ¸¶¨µÄ db Öµ´óÓÚ 0£¬ÔòÄÚ²¿×Ô¶¯
-	 * Ñ¡Ôñ¶ÔÓ¦µÄ db£¬×¢Òâ£º¸Ã¹¦ÄÜ½öÕë¶Ô·Ç¼¯ÈºÄ£Ê½
+	 * è®¾ç½®æœ¬è¿æ¥æ‰€å¯¹åº”çš„ dbï¼Œå½“è¿æ¥å»ºç«‹åå¦‚æœæŒ‡å®šçš„ db å€¼å¤§äº 0ï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨
+	 * é€‰æ‹©å¯¹åº”çš„ dbï¼Œæ³¨æ„ï¼šè¯¥åŠŸèƒ½ä»…é’ˆå¯¹éé›†ç¾¤æ¨¡å¼
 	 * if db > 0 in no cluster mode, select the db when the connection
 	 * is created.
 	 * @param dbnum {int}
@@ -65,7 +65,7 @@ public:
 	void set_db(int dbnum);
 
 	/**
-	 * »ñµÃ±¾Á¬½ÓËùÑ¡ÔñµÄ db
+	 * è·å¾—æœ¬è¿æ¥æ‰€é€‰æ‹©çš„ db
 	 * get db for the connection
 	 * @return {int}
 	 */
@@ -75,7 +75,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃµ±Ç°Á¬½ÓµÄ·şÎñÆ÷µØÖ·£¬¼´ÓÉ redis_client ¹¹ÔìÊ±´«ÈëµÄµØÖ·
+	 * è·å¾—å½“å‰è¿æ¥çš„æœåŠ¡å™¨åœ°å€ï¼Œå³ç”± redis_client æ„é€ æ—¶ä¼ å…¥çš„åœ°å€
 	 * @return {const char*}
 	 */
 	const char* get_addr(void) const
@@ -84,51 +84,51 @@ public:
 	}
 
 	/**
-	 * ÔÚ½øĞĞÃ¿¸öÃüÁî´¦ÀíÇ°£¬ÊÇ·ñÒªÇó¼ì²é socket ¾ä±úÓëµØÖ·µÄÆ¥ÅäÇé¿ö£¬µ±
-	 * ´ò¿ª¸ÃÑ¡ÏîÊ±£¬½«»áÑÏ¸ñ¼ì²éÆ¥ÅäÇé¿ö£¬µ«»áÓ°ÏìÒ»¶¨ĞÔÄÜ£¬Òò´Ë¸ÃÉèÖÃ½ö
-	 * ÓÃÔÚ DEBUG Ê±µÄÔËĞĞ³¡¾°
+	 * åœ¨è¿›è¡Œæ¯ä¸ªå‘½ä»¤å¤„ç†å‰ï¼Œæ˜¯å¦è¦æ±‚æ£€æŸ¥ socket å¥æŸ„ä¸åœ°å€çš„åŒ¹é…æƒ…å†µï¼Œå½“
+	 * æ‰“å¼€è¯¥é€‰é¡¹æ—¶ï¼Œå°†ä¼šä¸¥æ ¼æ£€æŸ¥åŒ¹é…æƒ…å†µï¼Œä½†ä¼šå½±å“ä¸€å®šæ€§èƒ½ï¼Œå› æ­¤è¯¥è®¾ç½®ä»…
+	 * ç”¨åœ¨ DEBUG æ—¶çš„è¿è¡Œåœºæ™¯
 	 * @param on {bool}
 	 */
 	void set_check_addr(bool on);
 
 	/**
-	 * ÅĞ¶Ï¸ÃÍøÂçÁ¬½Ó¶ÔÏóÊÇ·ñÒÑ¾­¹Ø±Õ
+	 * åˆ¤æ–­è¯¥ç½‘ç»œè¿æ¥å¯¹è±¡æ˜¯å¦å·²ç»å…³é—­
 	 * check if the connection has been finish
 	 * @return {bool}
 	 */
 	bool eof(void) const;
 
 	/**
-	 * ¹Ø±ÕÍøÂçÁ¬½Ó
+	 * å…³é—­ç½‘ç»œè¿æ¥
 	 * close the connection to the redis-server
 	 */
 	void close(void);
 
 	/**
-	 * »ñµÃÍøÂçÁ¬½ÓÁ÷£¬µ±Á¬½Ó¹Ø±ÕÊ±ÄÚ²¿»á×Ô¶¯ÖØÁ¬Ò»´Î
+	 * è·å¾—ç½‘ç»œè¿æ¥æµï¼Œå½“è¿æ¥å…³é—­æ—¶å†…éƒ¨ä¼šè‡ªåŠ¨é‡è¿ä¸€æ¬¡
 	 * get acl::socket_stream from the connection
-	 * @param auto_connect {bool} ÄÚ²¿ÊÇ·ñĞèÒª×Ô¶¯Á¬½Ó·şÎñ¶Ë
+	 * @param auto_connect {bool} å†…éƒ¨æ˜¯å¦éœ€è¦è‡ªåŠ¨è¿æ¥æœåŠ¡ç«¯
 	 *  if we should connect the redis server automaticlly
-	 * @return {acl::socket_stream*} Èç¹ûÁ¬½ÓÒÑ¾­¹Ø±ÕÔò·µ»Ø NULL
+	 * @return {acl::socket_stream*} å¦‚æœè¿æ¥å·²ç»å…³é—­åˆ™è¿”å› NULL
 	 *  NULL will be returned if the connectioin has been closed
 	 */
 	socket_stream* get_stream(bool auto_connect = true);
 
 	/**
-	 * ¶ÔÓÚÇëÇóÊı¾İ°ü£¬´Ëº¯ÊıÉèÖÃÔÚ×é×°ÇëÇóÊı¾İ°üµÄÊ±ºòºÏ³ÉÒ»¸öÊı¾İ°ü·¢ËÍ
+	 * å¯¹äºè¯·æ±‚æ•°æ®åŒ…ï¼Œæ­¤å‡½æ•°è®¾ç½®åœ¨ç»„è£…è¯·æ±‚æ•°æ®åŒ…çš„æ—¶å€™åˆæˆä¸€ä¸ªæ•°æ®åŒ…å‘é€
 	 * just for request package, setting flag for sending data with
 	 * multi data chunks; this is useful when the request data is large
-	 * @param on {bool} µ±Îª true Ê±Ôò²»»á½«ÇëÇóÊı¾İºÏ³ÉÒ»¸öÊı¾İ°ü·¢ËÍ
+	 * @param on {bool} å½“ä¸º true æ—¶åˆ™ä¸ä¼šå°†è¯·æ±‚æ•°æ®åˆæˆä¸€ä¸ªæ•°æ®åŒ…å‘é€
 	 *  if true the request data will not be combined one package
 	 */
 	void set_slice_request(bool on);
 
 	/**
-	 * ¶ÔÓÚÏìÓ¦Êı¾İ°ü£¬´Ëº¯ÊıÉèÖÃÊÇ·ñ½« redis-server ÏìÓ¦µÄÊı¾İ·Ö²ğ³É¶à¸öÊı¾İ¿é£¬
-	 * Õâ¶ÔÓÚ´óµÄÊı¾İ°üÓĞÓÃ´¦£¬¿ÉÒÔ²»±ØÒ»´ÎĞÔ·ÖÅäÒ»¸öÁ¬ĞøĞÔµÄ´óÄÚ´æ
+	 * å¯¹äºå“åº”æ•°æ®åŒ…ï¼Œæ­¤å‡½æ•°è®¾ç½®æ˜¯å¦å°† redis-server å“åº”çš„æ•°æ®åˆ†æ‹†æˆå¤šä¸ªæ•°æ®å—ï¼Œ
+	 * è¿™å¯¹äºå¤§çš„æ•°æ®åŒ…æœ‰ç”¨å¤„ï¼Œå¯ä»¥ä¸å¿…ä¸€æ¬¡æ€§åˆ†é…ä¸€ä¸ªè¿ç»­æ€§çš„å¤§å†…å­˜
 	 * just for response package, settint flag for receiving data
 	 * if split the large response data into multi little chunks
-	 * @param on {bool} µ±Îª true Ê±Ôò¶ÔÏìÓ¦Êı¾İ°ü½øĞĞ²ğ·Ö
+	 * @param on {bool} å½“ä¸º true æ—¶åˆ™å¯¹å“åº”æ•°æ®åŒ…è¿›è¡Œæ‹†åˆ†
 	 *  if true the response data will be splitted into multi little
 	 *  data, which is useful for large reponse data for avoiding
 	 *  malloc large continuously memory from system.
@@ -136,19 +136,19 @@ public:
 	void set_slice_respond(bool on);
 
 	/**
-	 * ÓÃÓÚ·Ç·ÖÆ¬·¢ËÍ·½Ê½£¬Ïò redis-server ·¢ËÍÇëÇóÊı¾İ£¬Í¬Ê±¶ÁÈ¡²¢·ÖÎö
-	 * ·şÎñ¶Ë·µ»ØµÄÏìÓ¦Êı¾İ
+	 * ç”¨äºéåˆ†ç‰‡å‘é€æ–¹å¼ï¼Œå‘ redis-server å‘é€è¯·æ±‚æ•°æ®ï¼ŒåŒæ—¶è¯»å–å¹¶åˆ†æ
+	 * æœåŠ¡ç«¯è¿”å›çš„å“åº”æ•°æ®
 	 * send request to redis-server, and read/anlyse response from server,
 	 * this function will be used for no-slice request mode.
-	 * @param pool {dbuf_pool*} ÄÚ´æ³Ø¹ÜÀíÆ÷¶ÔÏó
+	 * @param pool {dbuf_pool*} å†…å­˜æ± ç®¡ç†å™¨å¯¹è±¡
 	 *  memory pool manager
-	 * @param req {const string&} ÇëÇóÊı¾İ°ü
+	 * @param req {const string&} è¯·æ±‚æ•°æ®åŒ…
 	 *  the request package
-	 * @param nchildren {size_t} ÏìÓ¦Êı¾İÓĞ¼¸¸öÊı¾İ¶ÔÏó
+	 * @param nchildren {size_t} å“åº”æ•°æ®æœ‰å‡ ä¸ªæ•°æ®å¯¹è±¡
 	 *  the data object number in the server's response data
-	 * @return {const redis_result*} ¶Áµ½µÄ·şÎñÆ÷ÏìÓ¦¶ÔÏó£¬·µ»Ø NULL Ôò³ö´í,
-	 *  ¸Ã¶ÔÏó²»±ØÊÖ¹¤ÊÍ·Å£¬ÒòÎªÆäÊÇÔÚ pool ÄÚ´æ³Ø¶ÔÏóÉÏ¶¯Ì¬·ÖÅäµÄ£¬ËùÒÔµ±
-	 *  ÊÍ·Å pool Ê±¸Ã½á¹û¶ÔÏóÒ»Í¬±»ÊÍ·Å
+	 * @return {const redis_result*} è¯»åˆ°çš„æœåŠ¡å™¨å“åº”å¯¹è±¡ï¼Œè¿”å› NULL åˆ™å‡ºé”™,
+	 *  è¯¥å¯¹è±¡ä¸å¿…æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸ºå…¶æ˜¯åœ¨ pool å†…å­˜æ± å¯¹è±¡ä¸ŠåŠ¨æ€åˆ†é…çš„ï¼Œæ‰€ä»¥å½“
+	 *  é‡Šæ”¾ pool æ—¶è¯¥ç»“æœå¯¹è±¡ä¸€åŒè¢«é‡Šæ”¾
 	 *  the result object from server's response, NULL will be returned
 	 *  when some error happens; the result object needn't be freed
 	 *  manually, which was created in the pool object, and will be freed
@@ -159,9 +159,9 @@ public:
 		size_t nchildren, int* rw_timeout = NULL);
 
 	/**
-	 * ÓÃÓÚ·ÖÆ¬·¢ËÍÇëÇó·½Ê½
+	 * ç”¨äºåˆ†ç‰‡å‘é€è¯·æ±‚æ–¹å¼
 	 * just for sending proccess in slice request mode
-	 * @param req {const redis_request&} ÇëÇóÊı¾İ¶ÔÏó
+	 * @param req {const redis_request&} è¯·æ±‚æ•°æ®å¯¹è±¡
 	 *  request object
 	 */
 	const redis_result* run(dbuf_pool* pool, const redis_request& req,
@@ -171,7 +171,7 @@ public:
 		int* rw_timeout = NULL);
 
 protected:
-	// »ùÀàĞéº¯Êı
+	// åŸºç±»è™šå‡½æ•°
 	// @override
 	bool open(void);
 

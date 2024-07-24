@@ -34,8 +34,8 @@ void check_timer::timer_callback(unsigned int id)
 
 	connect_manager& manager = monitor_.get_manager();
 
-	// ÏÈÌáÈ¡ËùÓĞ·şÎñÆ÷µØÖ·£¬ÒòÎªÒª²Ù×÷µÄ¶ÔÏó´¦ÓÚ¶àÏß³Ì»·¾³ÖĞ£¬
-	// ËùÒÔĞèÒª½øĞĞ»¥³âËø±£»¤
+	// å…ˆæå–æ‰€æœ‰æœåŠ¡å™¨åœ°å€ï¼Œå› ä¸ºè¦æ“ä½œçš„å¯¹è±¡å¤„äºå¤šçº¿ç¨‹ç¯å¢ƒä¸­ï¼Œ
+	// æ‰€ä»¥éœ€è¦è¿›è¡Œäº’æ–¥é”ä¿æŠ¤
 	manager.lock();
 
 	const std::vector<connect_pool*>& pools = manager.get_pools();
@@ -62,7 +62,7 @@ void check_timer::timer_callback(unsigned int id)
 	//if (addrs_.empty())
 	//	logger_warn(">>>no addr been set!<<<");
 
-	// Á¬½ÓËùÓĞ·şÎñÆ÷µØÖ·
+	// è¿æ¥æ‰€æœ‰æœåŠ¡å™¨åœ°å€
 
 	struct timeval begin;
 	std::map<string, int>::iterator cit_next;
@@ -73,7 +73,7 @@ void check_timer::timer_callback(unsigned int id)
 		cit_next = cit;
 		++cit_next;
 
-		// Èç¹û¸ÃÖµ´óÓÚ 1 ÔòËµÃ÷¸ÃµØÖ·µÄÉÏÒ»¸ö¼ì²â»¹Î´½áÊø
+		// å¦‚æœè¯¥å€¼å¤§äº 1 åˆ™è¯´æ˜è¯¥åœ°å€çš„ä¸Šä¸€ä¸ªæ£€æµ‹è¿˜æœªç»“æŸ
 		if (cit->second > 1) {
 			continue;
 		}
@@ -101,7 +101,7 @@ void check_timer::timer_callback(unsigned int id)
 
 void check_timer::remove_client(const char* addr, check_client* checker)
 {
-	// ´Óµ±Ç°¼ì²é·şÎñÆ÷µØÖ·ÁĞ±íÖĞÉ¾³ıµ±Ç°µÄ¼ì²âµØÖ·
+	// ä»å½“å‰æ£€æŸ¥æœåŠ¡å™¨åœ°å€åˆ—è¡¨ä¸­åˆ é™¤å½“å‰çš„æ£€æµ‹åœ°å€
 	std::map<string, int>::iterator it1 = addrs_.find(addr);
 	if (it1 != addrs_.end()) {
 		addrs_.erase(it1);
@@ -109,7 +109,7 @@ void check_timer::remove_client(const char* addr, check_client* checker)
 		logger_warn("not found addr: %s", addr);
 	}
 
-	// ´Ó¼ì²âÁ¬½Ó¼¯ÈºÖĞÉ¾³ı±¾Á¬½Ó¶ÔÏó
+	// ä»æ£€æµ‹è¿æ¥é›†ç¾¤ä¸­åˆ é™¤æœ¬è¿æ¥å¯¹è±¡
 	for (std::vector<check_client*>::iterator it2 = checkers_.begin();
 		it2 != checkers_.end(); ++it2) {
 
@@ -126,7 +126,7 @@ bool check_timer::finish(bool graceful)
 		return true;
 	}
 
-	// ĞèÒªµÈ´ıËùÓĞ¼ì²âÁ¬½Ó¹Ø±Õ
+	// éœ€è¦ç­‰å¾…æ‰€æœ‰æ£€æµ‹è¿æ¥å…³é—­
 
 	if (id_ >= 0) {
 		handle_.del_timer(this, id_);
@@ -134,12 +134,12 @@ bool check_timer::finish(bool graceful)
 		keep_timer(false);
 	}
 
-	// ±éÀúµ±Ç°ËùÓĞÕıÔÚ¼ì²âµÄ´¦ÓÚ·Ç×èÈû×´Ì¬µÄÁ¬½Ó¼ì²â¶ÔÏó£¬Òì²½¹Ø±ÕÖ®
+	// éå†å½“å‰æ‰€æœ‰æ­£åœ¨æ£€æµ‹çš„å¤„äºéé˜»å¡çŠ¶æ€çš„è¿æ¥æ£€æµ‹å¯¹è±¡ï¼Œå¼‚æ­¥å…³é—­ä¹‹
 
 	for (std::vector<check_client*>::iterator it = checkers_.begin();
 		it != checkers_.end(); ++it) {
 
-		// ÔÚ×èÈû¼ì²â·½Ê½Èç¹û¸Ã¼ì²â¶ÔÏó´¦ÓÚ×èÈû×´Ì¬£¬Ôò²»ÄÜÖ±½Ó¹Ø±Õ
+		// åœ¨é˜»å¡æ£€æµ‹æ–¹å¼å¦‚æœè¯¥æ£€æµ‹å¯¹è±¡å¤„äºé˜»å¡çŠ¶æ€ï¼Œåˆ™ä¸èƒ½ç›´æ¥å…³é—­
 		if (!(*it)->blocked()) {
 			(*it)->close();
 		}

@@ -13,24 +13,24 @@ class MessageLite;
 namespace io {
 
 /**
- * Ê¹ÓÃ HTTP ´«ÊäĞ­Òé·¢ËÍ protobuf ÇëÇóÊı¾İÖÁ·şÎñ¶Ë£¬Í¬Ê±µÈ´ı·şÎñ¶ËÏìÓ¦½á¹û
+ * ä½¿ç”¨ HTTP ä¼ è¾“åè®®å‘é€ protobuf è¯·æ±‚æ•°æ®è‡³æœåŠ¡ç«¯ï¼ŒåŒæ—¶ç­‰å¾…æœåŠ¡ç«¯å“åº”ç»“æœ
  */
 class LIBPROTOBUF_EXPORT http_request
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı£¨Ò»£©£ºÊ¹ÓÃÊäÈëµÄ HTTP ÇëÇó¶ÔÏó£¬ÓÃ»§Ğè×ÔĞĞÊÍ·ÅÖ®£¬³¤Á¬½ÓÊ±
-	 * ¿ÉÒÔÊ¹ÓÃ±¾¹¹Ôìº¯Êı£¬´Ó¶øÔÊĞí¿Í»§¶ËÔÚÒ»¸öÁ¬½ÓÉÏ·¢ËÍ¶à´ÎÇëÇó
-	 * @param request {acl::http_request*} HTTP ¿Í»§¶ËÇëÇó¶ÔÏó£¬·Ç¿Õ
+	 * æ„é€ å‡½æ•°ï¼ˆä¸€ï¼‰ï¼šä½¿ç”¨è¾“å…¥çš„ HTTP è¯·æ±‚å¯¹è±¡ï¼Œç”¨æˆ·éœ€è‡ªè¡Œé‡Šæ”¾ä¹‹ï¼Œé•¿è¿æ¥æ—¶
+	 * å¯ä»¥ä½¿ç”¨æœ¬æ„é€ å‡½æ•°ï¼Œä»è€Œå…è®¸å®¢æˆ·ç«¯åœ¨ä¸€ä¸ªè¿æ¥ä¸Šå‘é€å¤šæ¬¡è¯·æ±‚
+	 * @param request {acl::http_request*} HTTP å®¢æˆ·ç«¯è¯·æ±‚å¯¹è±¡ï¼Œéç©º
 	 */
 	explicit http_request(acl::http_request* request);
 
 	/**
-	 * ¹¹Ôìº¯Êı£¨¶ş£©£ºÄÚ²¿´´½¨ HTTP ÇëÇó¶ÔÏó£¬ÓÃÍêºó×Ô¶¯ÊÍ·ÅÖ®£¬¶ÌÁ¬½ÓÊ±
-	 * ¿ÉÒÔÊ¹ÓÃ±¾¹¹Ôìº¯Êı
-	 * @param addr {const char*} http ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½£ºip:port
-	 * @param conn_timeout {int} Á¬½Ó·şÎñÆ÷µÄ³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @param rw_timeout {int} IO ³¬Ê±Ê±¼ä£¨Ãë£©
+	 * æ„é€ å‡½æ•°ï¼ˆäºŒï¼‰ï¼šå†…éƒ¨åˆ›å»º HTTP è¯·æ±‚å¯¹è±¡ï¼Œç”¨å®Œåè‡ªåŠ¨é‡Šæ”¾ä¹‹ï¼ŒçŸ­è¿æ¥æ—¶
+	 * å¯ä»¥ä½¿ç”¨æœ¬æ„é€ å‡½æ•°
+	 * @param addr {const char*} http æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šip:port
+	 * @param conn_timeout {int} è¿æ¥æœåŠ¡å™¨çš„è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @param rw_timeout {int} IO è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
 	 */
 	explicit http_request(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 60);
@@ -38,10 +38,10 @@ public:
 	~http_request();
 
 	/**
-	 * ·¢ËÍ¾­ protobuf ĞòÁĞ»¯µÄÊı¾İ°ü£¬Í¬Ê±½ÓÊÕ·şÎñÆ÷ÏìÓ¦µÄĞòÁĞ»¯Êı¾İ°ü
-	 * @param in {const MessageLite&} ¿Í»§¶ËÉú³ÉµÄÇëÇóÊı¾İ°ü
-	 * @param out {MessageLite*} ´æ´¢·şÎñ¶ËÏìÓ¦µÄÊı¾İ°ü
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * å‘é€ç» protobuf åºåˆ—åŒ–çš„æ•°æ®åŒ…ï¼ŒåŒæ—¶æ¥æ”¶æœåŠ¡å™¨å“åº”çš„åºåˆ—åŒ–æ•°æ®åŒ…
+	 * @param in {const MessageLite&} å®¢æˆ·ç«¯ç”Ÿæˆçš„è¯·æ±‚æ•°æ®åŒ…
+	 * @param out {MessageLite*} å­˜å‚¨æœåŠ¡ç«¯å“åº”çš„æ•°æ®åŒ…
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool rpc_request(const MessageLite& in, MessageLite* out);
 
@@ -78,30 +78,30 @@ private:
 };
 
 /**
- * ·şÎñ¶ËÊ¹ÓÃ±¾Àà¶ÔÏó½ÓÊÕ¿Í»§¶ËÇëÇó£¬Í¬Ê±½«½á¹û·µ»Ø¸ø¿Í»§¶Ë
+ * æœåŠ¡ç«¯ä½¿ç”¨æœ¬ç±»å¯¹è±¡æ¥æ”¶å®¢æˆ·ç«¯è¯·æ±‚ï¼ŒåŒæ—¶å°†ç»“æœè¿”å›ç»™å®¢æˆ·ç«¯
  */
 class LIBPROTOBUF_EXPORT http_response
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param response {acl::http_response*} Óë¿Í»§¶ËÏàÁ¬µÄ·şÎñ¶ËÁ¬½Ó¶ÔÏó
+	 * æ„é€ å‡½æ•°
+	 * @param response {acl::http_response*} ä¸å®¢æˆ·ç«¯ç›¸è¿çš„æœåŠ¡ç«¯è¿æ¥å¯¹è±¡
 	 */
 	explicit http_response(acl::http_response* response);
 
 	~http_response();
 
 	/**
-	 * ·şÎñ¶Ëµ÷ÓÃ±¾¹ı³Ì¶ÁÈ¡¿Í»§¶ËµÄÊı¾İÇëÇó
-	 * @param out {MessageLite*} ´æ´¢¿Í»§¶ËÇëÇóÊı¾İ
-	 * @return {bool} ¶Á¹ı³ÌÊÇ·ñ³É¹¦
+	 * æœåŠ¡ç«¯è°ƒç”¨æœ¬è¿‡ç¨‹è¯»å–å®¢æˆ·ç«¯çš„æ•°æ®è¯·æ±‚
+	 * @param out {MessageLite*} å­˜å‚¨å®¢æˆ·ç«¯è¯·æ±‚æ•°æ®
+	 * @return {bool} è¯»è¿‡ç¨‹æ˜¯å¦æˆåŠŸ
 	 */
 	bool read_request(MessageLite* out);
 
 	/**
-	 * ½«´¦Àí½á¹ûÍ¨¹ı±¾¹ı³Ì·µ»Ø¸ø¿Í»§¶Ë
-	 * @param int {const MessageLite&} ·şÎñ¶ËÉú³ÉµÄ½á¹ûÊı¾İ
-	 * @return {bool} Ğ´¹ı³ÌÊÇ·ñ³É¹¦
+	 * å°†å¤„ç†ç»“æœé€šè¿‡æœ¬è¿‡ç¨‹è¿”å›ç»™å®¢æˆ·ç«¯
+	 * @param int {const MessageLite&} æœåŠ¡ç«¯ç”Ÿæˆçš„ç»“æœæ•°æ®
+	 * @return {bool} å†™è¿‡ç¨‹æ˜¯å¦æˆåŠŸ
 	 */
 	bool send_response(const MessageLite& in);
 

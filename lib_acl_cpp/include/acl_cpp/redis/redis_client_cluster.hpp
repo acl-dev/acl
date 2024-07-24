@@ -15,8 +15,8 @@ class sslbase_conf;
 class redis_client_pool;
 
 /**
- * redis ¿Í»§¶Ë¼¯ÈºÀà£¬Í¨¹ı½«´ËÀà¶ÔÏó×¢²áÈë redis ¿Í»§¶ËÃüÁîÀà(redis_command)£¬
- * ÔòÊ¹ËùÓĞµÄ¿Í»§¶ËÃüÁî×Ô¶¯Ö§³Ö¼¯Èº°æ redis ÃüÁî¡£
+ * redis å®¢æˆ·ç«¯é›†ç¾¤ç±»ï¼Œé€šè¿‡å°†æ­¤ç±»å¯¹è±¡æ³¨å†Œå…¥ redis å®¢æˆ·ç«¯å‘½ä»¤ç±»(redis_command)ï¼Œ
+ * åˆ™ä½¿æ‰€æœ‰çš„å®¢æˆ·ç«¯å‘½ä»¤è‡ªåŠ¨æ”¯æŒé›†ç¾¤ç‰ˆ redis å‘½ä»¤ã€‚
  * redis client cluster class. The class's object is set in the redis_command
  * using redis_command::set_cluster(redis_cluster*), and all the redis client
  * command will support the redis cluster mode.
@@ -25,64 +25,64 @@ class ACL_CPP_API redis_client_cluster : public connect_manager
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı;
+	 * æ„é€ å‡½æ•°;
 	 * constructor
-	 * @param max_slot {int} ¹şÏ£²Û×î´óÖµ; the max hash-slot value of keys
+	 * @param max_slot {int} å“ˆå¸Œæ§½æœ€å¤§å€¼; the max hash-slot value of keys
 	 */
 	redis_client_cluster(int max_slot = 16384);
 	virtual ~redis_client_cluster(void);
 
 	/**
-	 * ¸ù¾İ¹şÏ£²ÛÖµ»ñµÃ¶ÔÓ¦µÄÁ¬½Ó³Ø;
+	 * æ ¹æ®å“ˆå¸Œæ§½å€¼è·å¾—å¯¹åº”çš„è¿æ¥æ± ;
 	 * get one connection pool with the given slot
-	 * @param slot {int} ¹şÏ£²ÛÖµ;
+	 * @param slot {int} å“ˆå¸Œæ§½å€¼;
 	 *  the hash-slot value of key
-	 * @return {redis_client_pool*} Èç¹û¶ÔÓ¦µÄ¹şÏ£²Û²»´æÔÚÔò·µ»Ø NULL;
+	 * @return {redis_client_pool*} å¦‚æœå¯¹åº”çš„å“ˆå¸Œæ§½ä¸å­˜åœ¨åˆ™è¿”å› NULL;
 	 *  return the connection pool of the hash-slot, and return NULL
 	 *  when the slot not exists
 	 */
 	redis_client_pool* peek_slot(int slot);
 
 	/**
-	 * ¶¯Ì¬ÉèÖÃ¹şÏ£²ÛÖµ¶ÔÓ¦µÄ redis ·şÎñµØÖ·£¬¸Ãº¯Êı±»µ÷ÓÃÊ±ÄÚ²¿ÓĞÏß³ÌËø±£»¤;
+	 * åŠ¨æ€è®¾ç½®å“ˆå¸Œæ§½å€¼å¯¹åº”çš„ redis æœåŠ¡åœ°å€ï¼Œè¯¥å‡½æ•°è¢«è°ƒç”¨æ—¶å†…éƒ¨æœ‰çº¿ç¨‹é”ä¿æŠ¤;
 	 * dynamicly set redis-server addr with one slot, which is protected
 	 * by thread mutex internal, no one will be set if the slot were
 	 * beyyond the max hash-slot
-	 * @param slot {int} ¹şÏ£²ÛÖµ;
+	 * @param slot {int} å“ˆå¸Œæ§½å€¼;
 	 *  the hash-slot
-	 * @param addr {const char*} redis ·şÎñÆ÷µØÖ·;
+	 * @param addr {const char*} redis æœåŠ¡å™¨åœ°å€;
 	 *  one redis-server addr
 	 */
 	void set_slot(int slot, const char* addr);
 
 	/**
-	 * ¸ø¶¨ redis ¼¯ÈºÖĞµÄÒ»¸ö½áµã£¬×Ô¶¯·¢ÏÖËùÓĞµÄ¹şÏ£²Û¶ÔÓ¦µÄ½áµãµØÖ·
+	 * ç»™å®š redis é›†ç¾¤ä¸­çš„ä¸€ä¸ªç»“ç‚¹ï¼Œè‡ªåŠ¨å‘ç°æ‰€æœ‰çš„å“ˆå¸Œæ§½å¯¹åº”çš„ç»“ç‚¹åœ°å€
 	 * according one node of the cluster, auto find all nodes with all
 	 * slots range
-	 * @param addr {const char*} ¼¯ÈºÖĞµÄÒ»¸ö·şÎñ½áµãµØÖ·£¬¸ñÊ½ ip:port
+	 * @param addr {const char*} é›†ç¾¤ä¸­çš„ä¸€ä¸ªæœåŠ¡ç»“ç‚¹åœ°å€ï¼Œæ ¼å¼ ip:port
 	 *  on server node's addr of the cluster, addr format is "ip:port"
-	 * @param max_conns {size_t} ¼¯ÈºÖĞÓëÃ¿¸ö½áµãËù½¨Á¬½Ó³ØµÄ×î´óÁ¬½ÓÏŞÖÆ
+	 * @param max_conns {size_t} é›†ç¾¤ä¸­ä¸æ¯ä¸ªç»“ç‚¹æ‰€å»ºè¿æ¥æ± çš„æœ€å¤§è¿æ¥é™åˆ¶
 	 *  the max connections limit for each connection pool
-	 * @param conn_timeout {int} Á¬½Ó³¬Ê±Ê±¼ä
+	 * @param conn_timeout {int} è¿æ¥è¶…æ—¶æ—¶é—´
 	 *  set the connection timeout
-	 * @param rw_timeout {int} IO ¶ÁĞ´³¬Ê±Ê±¼ä
+	 * @param rw_timeout {int} IO è¯»å†™è¶…æ—¶æ—¶é—´
 	 *  set the network io timeout
 	 */
 	void set_all_slot(const char* addr, size_t max_conns,
 		int conn_timeout = 30, int rw_timeout = 30);
 
 	/**
-	 * ¶¯Ì¬Çå³ı¹şÏ£²Û¶ÔÓ¦µÄ redis ·şÎñµØÖ·£¬ÒÔ±ãÓÚÖØĞÂ¼ÆËãÎ»ÖÃ£¬
-	 * ÄÚ²¿ÓĞÏß³ÌËø±£»¤»úÖÆ;
+	 * åŠ¨æ€æ¸…é™¤å“ˆå¸Œæ§½å¯¹åº”çš„ redis æœåŠ¡åœ°å€ï¼Œä»¥ä¾¿äºé‡æ–°è®¡ç®—ä½ç½®ï¼Œ
+	 * å†…éƒ¨æœ‰çº¿ç¨‹é”ä¿æŠ¤æœºåˆ¶;
 	 * dynamicly remove one slot and redis-server addr mapping, which is
 	 * protected by thread mutex
-	 * @param slot {int} ¹şÏ£²ÛÖµ;
+	 * @param slot {int} å“ˆå¸Œæ§½å€¼;
 	 *  hash-slot value
 	 */
 	void clear_slot(int slot);
 
 	/**
-	 * »ñµÃ¹şÏ£²Û×î´óÖµ;
+	 * è·å¾—å“ˆå¸Œæ§½æœ€å¤§å€¼;
 	 * get the max hash-slot
 	 * @return {int}
 	 */
@@ -93,15 +93,15 @@ public:
 
 	//////////////////////////////////////////////////////////////////////
 	/**
-	 * ÉèÖÃĞ­ÒéÖØ¶¨Ïò´ÎÊıµÄ·§Öµ£¬Ä¬ÈÏÖµÎª 15;
+	 * è®¾ç½®åè®®é‡å®šå‘æ¬¡æ•°çš„é˜€å€¼ï¼Œé»˜è®¤å€¼ä¸º 15;
 	 * set redirect limit for MOVE/ASK, default is 15
-	 * @param max {int} ÖØ¶¨Ïò´ÎÊı·§Öµ£¬Ö»ÓĞµ±¸ÃÖµ > 0 Ê±²ÅÓĞĞ§;
+	 * @param max {int} é‡å®šå‘æ¬¡æ•°é˜€å€¼ï¼Œåªæœ‰å½“è¯¥å€¼ > 0 æ—¶æ‰æœ‰æ•ˆ;
 	 *  the redirect times limit for MOVE/ASK commands
 	 */
 	void set_redirect_max(int max);
 
 	/**
-	 * ÉèÖÃĞ­ÒéÖØ¶¨Ïò´ÎÊıµÄ·§Öµ;
+	 * è®¾ç½®åè®®é‡å®šå‘æ¬¡æ•°çš„é˜€å€¼;
 	 * get redirect limit of MOVE/ASK commands in one redis redirect process
 	 * @return {int}
 	 */
@@ -111,24 +111,24 @@ public:
 	}
 
 	/**
-	 * µ±ÖØ¶¨Ïò´ÎÊı >= 2 Ê±ÔÊĞíĞİÃßµÄÊ±¼ä(ºÁÃë)£¬Ä¬ÈÏÖµÎª 100 ºÁÃë£¬ÕâÑù×öµÄ
-	 * ºÃ´¦ÊÇµ±Ò»¸ö redis ·şÎñÖ÷½áµãµôÏßºó£¬ÆäËü´Ó½áµãÉı¼¶ÎªÖ÷½áµãÊÇĞèÒª
-	 * Ê±¼äµÄ(ÓÉ redis.conf ÖĞµÄ cluster-node-timeout ÅäÖÃÏî¾ö¶¨)£¬ËùÒÔ
-	 * ÎªÁËÔÚÖØ¶¨ÏòµÄ´ÎÊı·¶Î§ÄÚ²»±¨´íĞèÒªµÈ´ı´Ó½áµãÉı¼¶ÎªÖ÷½áµã;
+	 * å½“é‡å®šå‘æ¬¡æ•° >= 2 æ—¶å…è®¸ä¼‘çœ çš„æ—¶é—´(æ¯«ç§’)ï¼Œé»˜è®¤å€¼ä¸º 100 æ¯«ç§’ï¼Œè¿™æ ·åšçš„
+	 * å¥½å¤„æ˜¯å½“ä¸€ä¸ª redis æœåŠ¡ä¸»ç»“ç‚¹æ‰çº¿åï¼Œå…¶å®ƒä»ç»“ç‚¹å‡çº§ä¸ºä¸»ç»“ç‚¹æ˜¯éœ€è¦
+	 * æ—¶é—´çš„(ç”± redis.conf ä¸­çš„ cluster-node-timeout é…ç½®é¡¹å†³å®š)ï¼Œæ‰€ä»¥
+	 * ä¸ºäº†åœ¨é‡å®šå‘çš„æ¬¡æ•°èŒƒå›´å†…ä¸æŠ¥é”™éœ€è¦ç­‰å¾…ä»ç»“ç‚¹å‡çº§ä¸ºä¸»ç»“ç‚¹;
 	 * if redirect happenning more than 2 in one redis command process,
 	 * the process can sleep for a one avoiding redirect too fast, you
 	 * can set the waiting time with microsecond here, default value is
 	 * 100 microseconds; this only happends when redis-server died.
-	 * @param n {int} Ã¿´ÎÖØ¶¨ÏòÊ±µÄĞİÏ¢Ê±¼ä(ºÁÃë)£¬Ä¬ÈÏÖµÎª 100 ºÁÃë;
+	 * @param n {int} æ¯æ¬¡é‡å®šå‘æ—¶çš„ä¼‘æ¯æ—¶é—´(æ¯«ç§’)ï¼Œé»˜è®¤å€¼ä¸º 100 æ¯«ç§’;
 	 * microseonds to sleep when redirect times are more than 2,
 	 * default is 100 ms
 	 */
 	void set_redirect_sleep(int n);
 
 	/**
-	 * »ñµÃ set_redirect_sleep ÉèÖÃµÄ»òÄ¬ÈÏµÄÊ±¼ä;
+	 * è·å¾— set_redirect_sleep è®¾ç½®çš„æˆ–é»˜è®¤çš„æ—¶é—´;
 	 * get sleep time set by set_redirect_sleep function
-	 * @return {int} µ¥Î»ÎªºÁÃë;
+	 * @return {int} å•ä½ä¸ºæ¯«ç§’;
 	 *  return sleep value in microsecond
 	 */
 	int get_redirect_sleep() const
@@ -137,8 +137,8 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃ SSL Í¨ĞÅ·½Ê½ÏÂµÄÅäÖÃ¾ä±ú£¬ÄÚ²¿È±Ê¡ÖµÎª NULL£¬Èç¹ûÉèÖÃÁË SSL Á¬
-	 * ½ÓÅäÖÃ¶ÔÏó£¬ÔòÄÚ²¿ÇĞ»»³É SSL Í¨ĞÅ·½Ê½
+	 * è®¾ç½® SSL é€šä¿¡æ–¹å¼ä¸‹çš„é…ç½®å¥æŸ„ï¼Œå†…éƒ¨ç¼ºçœå€¼ä¸º NULLï¼Œå¦‚æœè®¾ç½®äº† SSL è¿
+	 * æ¥é…ç½®å¯¹è±¡ï¼Œåˆ™å†…éƒ¨åˆ‡æ¢æˆ SSL é€šä¿¡æ–¹å¼
 	 * set SSL communication with Redis-server if ssl_conf not NULL
 	 * @param ssl_conf {sslbase_conf*}
 	 * @return {redis_client_cluster&}
@@ -146,20 +146,20 @@ public:
 	redis_client_cluster& set_ssl_conf(sslbase_conf* ssl_conf);
 
 	/**
-	 * ÉèÖÃÄ³¸ö redis ·şÎñÏàÓ¦µÄÁ¬½ÓÃÜÂë
+	 * è®¾ç½®æŸä¸ª redis æœåŠ¡ç›¸åº”çš„è¿æ¥å¯†ç 
 	 * set the password of one redis-server
-	 * @param addr {const char*} Ö¸¶¨µÄÄ³ redis ·şÎñÆ÷µØÖ·£¬µ±¸Ã²ÎÊıµÄÖµÎª
-	 *  default Ê±£¬ÔòÖ¸¶¨ÁË¼¯ÈºÖĞËùÓĞ redis ·şÎñÆ÷µÄÈ±Ê¡Á¬½ÓÃÜÂë
+	 * @param addr {const char*} æŒ‡å®šçš„æŸ redis æœåŠ¡å™¨åœ°å€ï¼Œå½“è¯¥å‚æ•°çš„å€¼ä¸º
+	 *  default æ—¶ï¼Œåˆ™æŒ‡å®šäº†é›†ç¾¤ä¸­æ‰€æœ‰ redis æœåŠ¡å™¨çš„ç¼ºçœè¿æ¥å¯†ç 
 	 *  the specified redis-server's addr, the default password of all
 	 *  redis-server will be set when the addr's value is 'default'
-	 * @param pass {const char*} Ö¸¶¨µÄ redis ·şÎñÆ÷Á¬½ÓÃÜÂë
+	 * @param pass {const char*} æŒ‡å®šçš„ redis æœåŠ¡å™¨è¿æ¥å¯†ç 
 	 *  the password of the specified redis-server
 	 * @return {redis_client_cluster&}
 	 */
 	redis_client_cluster& set_password(const char* addr, const char* pass);
 
 	/**
-	 * »ñµÃ redis ¼¯ÈºÖĞ·şÎñ½ÚµãÓëÁ¬½ÓÃÜÂëµÄ¶ÔÕÕ±í
+	 * è·å¾— redis é›†ç¾¤ä¸­æœåŠ¡èŠ‚ç‚¹ä¸è¿æ¥å¯†ç çš„å¯¹ç…§è¡¨
 	 * get all passwords of the redis cluster
 	 * @return {const std::map<string, string>&}
 	 */
@@ -169,7 +169,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¸ø¶¨µØÖ·µÄ redis ½ÚµãµÄÁ¬½ÓÃÜÂë£¬·µ»Ø NULL ±íÊ¾Î´ÉèÖÃ
+	 * è·å¾—ç»™å®šåœ°å€çš„ redis èŠ‚ç‚¹çš„è¿æ¥å¯†ç ï¼Œè¿”å› NULL è¡¨ç¤ºæœªè®¾ç½®
 	 * get the connection password of the specified addr for one redis,
 	 * NULL will be returned if password wasn't set
 	 * @param addr {const char*}
@@ -179,31 +179,31 @@ public:
 	const char* get_password(const char* addr) const;
 
 	/**
-	 * ÖØ¶¨ÏòÖÁÄ¿±ê redis ½Úµã
-	 * @param addr {const char*} Ä¿±ê redis ·şÎñµØÖ·
-	 * @param max_conns {size_t} Á¬½Ó³Ø×î´óÁ¬½ÓÊı
-	 * @return {redis_client*} »ñµÃÓëÄ¿±ê redis ½ÚµãµÄÁ¬½ÓÍ¨ĞÅ¶ÔÏó
+	 * é‡å®šå‘è‡³ç›®æ ‡ redis èŠ‚ç‚¹
+	 * @param addr {const char*} ç›®æ ‡ redis æœåŠ¡åœ°å€
+	 * @param max_conns {size_t} è¿æ¥æ± æœ€å¤§è¿æ¥æ•°
+	 * @return {redis_client*} è·å¾—ä¸ç›®æ ‡ redis èŠ‚ç‚¹çš„è¿æ¥é€šä¿¡å¯¹è±¡
 	 */
 	redis_client* redirect(const char* addr, size_t max_conns);
 
 	/**
-	 * ¸ù¾İ redis ¼¯ÈºµÄ²ÛºÅ»ñµÃÁ¬½Ó¶ÔÏó
-	 * @param slot {int} redis ¼¯Èº¼üÖµ¶ÔÓ¦µÄ´æ´¢²Û²ÛºÅ
-	 * @return {redis_client*} »ñµÃÓëÄ¿±ê redis ½ÚµãµÄÁ¬½ÓÍ¨ĞÅ¶ÔÏó
+	 * æ ¹æ® redis é›†ç¾¤çš„æ§½å·è·å¾—è¿æ¥å¯¹è±¡
+	 * @param slot {int} redis é›†ç¾¤é”®å€¼å¯¹åº”çš„å­˜å‚¨æ§½æ§½å·
+	 * @return {redis_client*} è·å¾—ä¸ç›®æ ‡ redis èŠ‚ç‚¹çš„è¿æ¥é€šä¿¡å¯¹è±¡
 	 */
 	redis_client* peek_conn(int slot);
 
 protected:
 	/**
-	 * »ùÀà´¿Ğéº¯Êı£¬ÓÃÀ´´´½¨Á¬½Ó³Ø¶ÔÏó£¬¸Ãº¯Êı·µ»ØºóÓÉ»ùÀàÉèÖÃÍøÂçÁ¬½Ó¼°IO ³¬Ê±Ê±¼ä
+	 * åŸºç±»çº¯è™šå‡½æ•°ï¼Œç”¨æ¥åˆ›å»ºè¿æ¥æ± å¯¹è±¡ï¼Œè¯¥å‡½æ•°è¿”å›åç”±åŸºç±»è®¾ç½®ç½‘ç»œè¿æ¥åŠIO è¶…æ—¶æ—¶é—´
 	 * virtual function of base class, which is used to create
 	 * the connection pool
-	 * @param addr {const char*} ·şÎñÆ÷¼àÌıµØÖ·£¬¸ñÊ½£ºip:port;
+	 * @param addr {const char*} æœåŠ¡å™¨ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šip:port;
 	 * the server addr for the connection pool, such as ip:port
-	 * @param count {size_t} Á¬½Ó³ØµÄ´óĞ¡ÏŞÖÆ£¬¸ÃÖµÃ»ÓĞ 0 Ê±ÔòÃ»ÓĞÏŞÖÆ
+	 * @param count {size_t} è¿æ¥æ± çš„å¤§å°é™åˆ¶ï¼Œè¯¥å€¼æ²¡æœ‰ 0 æ—¶åˆ™æ²¡æœ‰é™åˆ¶
 	 * the max connections in one connection pool, if it's 0 there
 	 * is no limit of the connections pool.
-	 * @param idx {size_t} ¸ÃÁ¬½Ó³Ø¶ÔÏóÔÚ¼¯ºÏÖĞµÄÏÂ±êÎ»ÖÃ(´Ó 0 ¿ªÊ¼);
+	 * @param idx {size_t} è¯¥è¿æ¥æ± å¯¹è±¡åœ¨é›†åˆä¸­çš„ä¸‹æ ‡ä½ç½®(ä» 0 å¼€å§‹);
 	 * the index of the connection pool in pool array
 	 */
 	connect_pool* create_pool(const char* addr, size_t count, size_t idx);

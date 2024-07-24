@@ -24,33 +24,33 @@ public:
 	~CConnectClientCallback();
 
 	/**
-	 * »ùÀàÐéº¯Êý, µ±Òì²½Á÷¶Áµ½ËùÒªÇóµÄÊý¾ÝÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êý
-	 * @param data {char*} ¶Áµ½µÄÊý¾ÝµØÖ·
-	 * @param len {int£ý ¶Áµ½µÄÊý¾Ý³¤¶È
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌÐø£¬·ñÔò±íÊ¾ÐèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµè¯»åˆ°æ‰€è¦æ±‚çš„æ•°æ®æ—¶è°ƒç”¨æ­¤å›žè°ƒå‡½æ•°
+	 * @param data {char*} è¯»åˆ°çš„æ•°æ®åœ°å€
+	 * @param len {intï½ è¯»åˆ°çš„æ•°æ®é•¿åº¦
+	 * @return {bool} è¿”å›žç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool read_callback(char* data, int len);
 
 	/**
-	 * »ùÀàÐéº¯Êý, µ±Òì²½Á÷Ð´³É¹¦Ê±µ÷ÓÃ´Ë»Øµ÷º¯Êý
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌÐø£¬·ñÔò±íÊ¾ÐèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥æµå†™æˆåŠŸæ—¶è°ƒç”¨æ­¤å›žè°ƒå‡½æ•°
+	 * @return {bool} è¿”å›žç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool write_callback();
 
 	/**
-	 * »ùÀàÐéº¯Êý, µ±¸ÃÒì²½Á÷¹Ø±ÕÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êý
+	 * åŸºç±»è™šå‡½æ•°, å½“è¯¥å¼‚æ­¥æµå…³é—­æ—¶è°ƒç”¨æ­¤å›žè°ƒå‡½æ•°
 	 */
 	void close_callback();
 
 	/**
-	 * »ùÀàÐéº¯Êý£¬µ±Òì²½Á÷³¬Ê±Ê±µ÷ÓÃ´Ëº¯Êý
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌÐø£¬·ñÔò±íÊ¾ÐèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“å¼‚æ­¥æµè¶…æ—¶æ—¶è°ƒç”¨æ­¤å‡½æ•°
+	 * @return {bool} è¿”å›žç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool timeout_callback();
 
 	/**
-	 * »ùÀàÐéº¯Êý, µ±Òì²½Á¬½Ó³É¹¦ºóµ÷ÓÃ´Ëº¯Êý
-	 * @return {bool} ·µ»Ø¸øµ÷ÓÃÕß true ±íÊ¾¼ÌÐø£¬·ñÔò±íÊ¾ÐèÒª¹Ø±ÕÒì²½Á÷
+	 * åŸºç±»è™šå‡½æ•°, å½“å¼‚æ­¥è¿žæŽ¥æˆåŠŸåŽè°ƒç”¨æ­¤å‡½æ•°
+	 * @return {bool} è¿”å›žç»™è°ƒç”¨è€… true è¡¨ç¤ºç»§ç»­ï¼Œå¦åˆ™è¡¨ç¤ºéœ€è¦å…³é—­å¼‚æ­¥æµ
 	 */
 	bool open_callback();
 

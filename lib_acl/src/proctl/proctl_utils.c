@@ -116,7 +116,7 @@ ACL_VSTREAM *local_listen()
 			myname, __LINE__, lock_file, acl_last_serror());
 	}
 
-	/* XXX: ж╩дэ╡исцох╫БеекЭкЬё╛ты╪с╧╡оМкЬё╛н╒хМ╠х╫охУ!!! */
+	/* XXX: Е▐╙Х┐╫И┤┤Г■╗Е┘┬Х╖ёФ▌▓Е╝┐И■│О╪▄Е├█Е┼═Е┘╠Д╨╚И■│О╪▄Е╬╝Х╫╞Ф╞■Х╬┐Е╪╠!!! */
 
 	if (acl_myflock(handle, 0, ACL_FLOCK_OP_NONE) == -1)
 		acl_msg_fatal("%s(%d): unlock file(%s) error(%s)",

@@ -151,7 +151,7 @@ void master_creator(const char* name, const char* type)
 		loop = false;
 	}
 
-	// ÉèÖÃÔ´³ÌĞòËùÔÚÄ¿Â¼
+	// è®¾ç½®æºç¨‹åºæ‰€åœ¨ç›®å½•
 	tmpl.set_path_from("tmpl/master");
 
 	while (true) {
@@ -173,10 +173,10 @@ void master_creator(const char* name, const char* type)
 			name = buf;
 		}
 
-		// ÉèÖÃÏîÄ¿Ãû³Æ, Ò»°ãÓë·şÎñ³ÌĞòÃûÏàÍ¬
+		// è®¾ç½®é¡¹ç›®åç§°, ä¸€èˆ¬ä¸æœåŠ¡ç¨‹åºåç›¸åŒ
 		tmpl.set_project_name(name);
 
-		// ´´½¨Ä¿Â¼
+		// åˆ›å»ºç›®å½•
 		tmpl.create_dirs();
 
 		if (type == NULL || *type == 0) {

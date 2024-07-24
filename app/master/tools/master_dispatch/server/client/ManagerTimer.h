@@ -3,8 +3,8 @@
 class ClientConnection;
 
 /**
- * ´¦Àí´ı´¦Àí¿Í»§¶ËÁ¬½Ó¶ÔÏóµÄ¶¨Ê±Æ÷£¬¸Ã¶¨Ê±Æ÷»á¶¨Ê±Æô¶¯£¬
- * ²é¿´¿Í»§¶Ë¹ÜÀíÆ÷ÀïÊÇ·ñ»¹ÓĞÎ´´¦Àí¿Í»§¶ËÁ¬½Ó²¢½øĞĞ´¦Àí
+ * å¤„ç†å¾…å¤„ç†å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡çš„å®šæ—¶å™¨ï¼Œè¯¥å®šæ—¶å™¨ä¼šå®šæ—¶å¯åŠ¨ï¼Œ
+ * æŸ¥çœ‹å®¢æˆ·ç«¯ç®¡ç†å™¨é‡Œæ˜¯å¦è¿˜æœ‰æœªå¤„ç†å®¢æˆ·ç«¯è¿æ¥å¹¶è¿›è¡Œå¤„ç†
  */
 class ManagerTimer : public acl::event_timer
 {
@@ -12,18 +12,18 @@ public:
 	ManagerTimer() {}
 
 	/**
-	 * Ïú»Ù¶¯Ì¬¶ÔÏó
+	 * é”€æ¯åŠ¨æ€å¯¹è±¡
 	 */
 	virtual void destroy();
 
 	/**
-	 * ¾²Ì¬·½·¨£¬ÓÃÀ´½«¿Í»§¶ËÁ¬½ÓÃèÊö×Ö´«µİ¸ø·şÎñ¶Ë
-	 * @param client {ClientConnection*} ·Ç¿Õ¶ÔÏó
+	 * é™æ€æ–¹æ³•ï¼Œç”¨æ¥å°†å®¢æˆ·ç«¯è¿æ¥æè¿°å­—ä¼ é€’ç»™æœåŠ¡ç«¯
+	 * @param client {ClientConnection*} éç©ºå¯¹è±¡
 	 */
 	static bool transfer(ClientConnection* client);
 
 protected:
-	// »ùÀàĞéº¯Êı
+	// åŸºç±»è™šå‡½æ•°
 	virtual void timer_callback(unsigned int id);
 
 private:

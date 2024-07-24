@@ -10,10 +10,10 @@ struct ACL_TOKEN;
 struct ACL_ITER;
 
 /**
- * ¶Ô ACL ¿âÖĞ XML ½âÎö¿âµÄ·â×°£¬·½±ã C++ ÓÃ»§Ê¹ÓÃ£¬Èç¹û²»Ì«×¢ÖØĞÔÄÜÒòËØ£¬
- * ¿ÉÒÔÖ±½ÓÊ¹ÓÃ¸ÃÀà£¬Èç¹ûÔÚ·şÎñ¶ËÖ´ĞĞÇÒ·Ç³£×¢ÖØĞÔÄÜ£¬½¨ÒéÖ±½ÓÊ¹ÓÃ ACL ¿âµÄ
- * XML ½âÎöÆ÷£¬ÒòÎª¸ÃÀàÒ²ÊÇµ÷ÓÃÁË ACL ¿âÖĞµÄ XML ½âÎö¹ı³Ì£¬²¢ÇÒÓĞ¶ş´Î¿½±´
- * ¹ı³Ì£¬¿ÉÄÜ»áÉÔÎ¢Ó°ÏìÒ»Ğ©ĞÔÄÜ£¬µ«¶ÔÓÚÒ»°ãµÄÓ¦ÓÃÕâµãÓ°ÏìÊÇÎ¢²»×ãµÀµÄ
+ * å¯¹ ACL åº“ä¸­ XML è§£æåº“çš„å°è£…ï¼Œæ–¹ä¾¿ C++ ç”¨æˆ·ä½¿ç”¨ï¼Œå¦‚æœä¸å¤ªæ³¨é‡æ€§èƒ½å› ç´ ï¼Œ
+ * å¯ä»¥ç›´æ¥ä½¿ç”¨è¯¥ç±»ï¼Œå¦‚æœåœ¨æœåŠ¡ç«¯æ‰§è¡Œä¸”éå¸¸æ³¨é‡æ€§èƒ½ï¼Œå»ºè®®ç›´æ¥ä½¿ç”¨ ACL åº“çš„
+ * XML è§£æå™¨ï¼Œå› ä¸ºè¯¥ç±»ä¹Ÿæ˜¯è°ƒç”¨äº† ACL åº“ä¸­çš„ XML è§£æè¿‡ç¨‹ï¼Œå¹¶ä¸”æœ‰äºŒæ¬¡æ‹·è´
+ * è¿‡ç¨‹ï¼Œå¯èƒ½ä¼šç¨å¾®å½±å“ä¸€äº›æ€§èƒ½ï¼Œä½†å¯¹äºä¸€èˆ¬çš„åº”ç”¨è¿™ç‚¹å½±å“æ˜¯å¾®ä¸è¶³é“çš„
  */
 
 namespace acl {
@@ -26,16 +26,16 @@ class ACL_CPP_API xml_attr : public dbuf_obj
 {
 public:
 	/**
-	 * »ñµÃÊôĞÔÃû
-	 * @return {const char*} ÊôĞÔÃû£¬ÓÀÔ¶²»»á·µ»Ø¿ÕÖ¸Õë£¬·µ»ØÖµ
-	 *  ÓĞ¿ÉÄÜÎª "\0"
+	 * è·å¾—å±æ€§å
+	 * @return {const char*} å±æ€§åï¼Œæ°¸è¿œä¸ä¼šè¿”å›ç©ºæŒ‡é’ˆï¼Œè¿”å›å€¼
+	 *  æœ‰å¯èƒ½ä¸º "\0"
 	 */
 	virtual const char* get_name(void) const = 0;
 
 	/**
-	 * »ñµÃÊôĞÔÖµ
-	 * @return {const char*} ÊôĞÔÖµ£¬ÓÀÔ¶²»»á·µ»Ø¿ÕÖ¸Õë£¬·µ»ØÖµ
-	 *  ÓĞ¿ÉÄÜÎª "\0"
+	 * è·å¾—å±æ€§å€¼
+	 * @return {const char*} å±æ€§å€¼ï¼Œæ°¸è¿œä¸ä¼šè¿”å›ç©ºæŒ‡é’ˆï¼Œè¿”å›å€¼
+	 *  æœ‰å¯èƒ½ä¸º "\0"
 	 */
 	virtual const char* get_value(void) const = 0;
 
@@ -52,88 +52,88 @@ class ACL_CPP_API xml_node : public dbuf_obj
 {
 public:
 	/**
-	 * È¡µÃ±¾ XML ½ÚµãµÄ±êÇ©Ãû
-	 * @return {const char*} ·µ»Ø XML ½Úµã±êÇ©Ãû£¬Èç¹û·µ»Ø¿Õ£¬ÔòËµÃ÷
-	 *  ²»´æÔÚ±êÇ© xxxx£¬ÒÔ·ÀÍòÒ»£¬µ÷ÓÃÕßĞèÒªÅĞ¶Ï·µ»ØÖµ
+	 * å–å¾—æœ¬ XML èŠ‚ç‚¹çš„æ ‡ç­¾å
+	 * @return {const char*} è¿”å› XML èŠ‚ç‚¹æ ‡ç­¾åï¼Œå¦‚æœè¿”å›ç©ºï¼Œåˆ™è¯´æ˜
+	 *  ä¸å­˜åœ¨æ ‡ç­¾ xxxxï¼Œä»¥é˜²ä¸‡ä¸€ï¼Œè°ƒç”¨è€…éœ€è¦åˆ¤æ–­è¿”å›å€¼
 	 */
 	virtual const char* tag_name(void) const = 0;
 
 	/**
-	 * Èç¹û¸Ã XML ½ÚµãµÄ ID ºÅÊôĞÔ²»´æÔÚ£¬Ôò·µ»Ø¿ÕÖ¸Õë
-	 * @return {const char*} µ± ID ÊôĞÔ´æÔÚÊ±·µ»Ø¶ÔÓ¦µÄÖµ£¬·ñÔò·µ»Ø¿Õ
+	 * å¦‚æœè¯¥ XML èŠ‚ç‚¹çš„ ID å·å±æ€§ä¸å­˜åœ¨ï¼Œåˆ™è¿”å›ç©ºæŒ‡é’ˆ
+	 * @return {const char*} å½“ ID å±æ€§å­˜åœ¨æ—¶è¿”å›å¯¹åº”çš„å€¼ï¼Œå¦åˆ™è¿”å›ç©º
 	 */
 	virtual const char* id(void) const = 0;
 
 	/**
-	 * ·µ»Ø¸Ã XML ½ÚµãµÄÕıÎÄÄÚÈİ
-	 * @return {const char*} ·µ»Ø¿ÕËµÃ÷Ã»ÓĞÕıÎÄÄÚÈİ
+	 * è¿”å›è¯¥ XML èŠ‚ç‚¹çš„æ­£æ–‡å†…å®¹
+	 * @return {const char*} è¿”å›ç©ºè¯´æ˜æ²¡æœ‰æ­£æ–‡å†…å®¹
 	 */
 	virtual const char* text(void) const = 0;
 
 	/**
-	 * ·µ»Ø¸Ã XML ½ÚµãµÄÄ³¸öÊôĞÔÖµ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @return {const char*} ÊôĞÔÖµ£¬Èç¹û·µ»Ø¿ÕÔòËµÃ÷¸ÃÊôĞÔ²»´æÔÚ
+	 * è¿”å›è¯¥ XML èŠ‚ç‚¹çš„æŸä¸ªå±æ€§å€¼
+	 * @param name {const char*} å±æ€§å
+	 * @return {const char*} å±æ€§å€¼ï¼Œå¦‚æœè¿”å›ç©ºåˆ™è¯´æ˜è¯¥å±æ€§ä¸å­˜åœ¨
 	 */
 	virtual const char* attr_value(const char* name) const = 0;
 
 	/**
-	 * ·µ»Ø¸Ã XML ½ÚµãµÄÄ³¸öÊôĞÔÖµµÄ±ã½İĞ´·¨
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @return {const char*} ÊôĞÔÖµ£¬Èç¹û·µ»Ø¿ÕÔòËµÃ÷¸ÃÊôĞÔ²»´æÔÚ
+	 * è¿”å›è¯¥ XML èŠ‚ç‚¹çš„æŸä¸ªå±æ€§å€¼çš„ä¾¿æ·å†™æ³•
+	 * @param name {const char*} å±æ€§å
+	 * @return {const char*} å±æ€§å€¼ï¼Œå¦‚æœè¿”å›ç©ºåˆ™è¯´æ˜è¯¥å±æ€§ä¸å­˜åœ¨
 	 */
 	const char* operator[](const char* name) const;
 
 	/**
-	 * ±éÀú½ÚµãµÄËùÓĞÊôĞÔÊ±£¬ĞèÒªµ÷ÓÃ´Ëº¯ÊıÀ´»ñµÃµÚÒ»¸öÊôĞÔ¶ÔÏó
-	 * @return {const xml_attr*} ·µ»ØµÚÒ»¸öÊôĞÔ¶ÔÏó£¬ÈôÎª¿Õ£¬Ôò±íÊ¾
-	 *  ¸Ã½ÚµãÃ»ÓĞÊôĞÔ
+	 * éå†èŠ‚ç‚¹çš„æ‰€æœ‰å±æ€§æ—¶ï¼Œéœ€è¦è°ƒç”¨æ­¤å‡½æ•°æ¥è·å¾—ç¬¬ä¸€ä¸ªå±æ€§å¯¹è±¡
+	 * @return {const xml_attr*} è¿”å›ç¬¬ä¸€ä¸ªå±æ€§å¯¹è±¡ï¼Œè‹¥ä¸ºç©ºï¼Œåˆ™è¡¨ç¤º
+	 *  è¯¥èŠ‚ç‚¹æ²¡æœ‰å±æ€§
 	 */
 	virtual const xml_attr* first_attr(void) const = 0;
 
 	/**
-	 * ±éÀú½ÚµãµÄËùÓĞÊôĞÔÊ±£¬µ÷ÓÃ±¾º¯Êı»ñµÃÏÂÒ»¸öÊôĞÔ¶ÔÏó
-	 * @return {const xml_attr*} ·µ»ØÏÂÒ»ÏÂÊôĞÔ¶ÔÏó£¬ÈôÎª¿Õ£¬Ôò±íÊ¾
-	 *  ±éÀúÍê±Ï
+	 * éå†èŠ‚ç‚¹çš„æ‰€æœ‰å±æ€§æ—¶ï¼Œè°ƒç”¨æœ¬å‡½æ•°è·å¾—ä¸‹ä¸€ä¸ªå±æ€§å¯¹è±¡
+	 * @return {const xml_attr*} è¿”å›ä¸‹ä¸€ä¸‹å±æ€§å¯¹è±¡ï¼Œè‹¥ä¸ºç©ºï¼Œåˆ™è¡¨ç¤º
+	 *  éå†å®Œæ¯•
 	 */
 	virtual const xml_attr* next_attr(void) const = 0;
 
 	/**
-	 * Ìí¼Ó XML ½ÚµãÊôĞÔ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param value {const char*} ÊôĞÔÖµ
+	 * æ·»åŠ  XML èŠ‚ç‚¹å±æ€§
+	 * @param name {const char*} å±æ€§å
+	 * @param value {const char*} å±æ€§å€¼
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& add_attr(const char* name, const char* value) = 0;
 
 	/**
-	 * Ìí¼Ó XML ½ÚµãÊôĞÔ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param n {char} ÊôĞÔÖµ
+	 * æ·»åŠ  XML èŠ‚ç‚¹å±æ€§
+	 * @param name {const char*} å±æ€§å
+	 * @param n {char} å±æ€§å€¼
 	 * @return {xml_node&}
 	 */
 	xml_node& add_attr(const char* name, char n);
 
 	/**
-	 * Ìí¼Ó XML ½ÚµãÊôĞÔ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param n {int} ÊôĞÔÖµ
+	 * æ·»åŠ  XML èŠ‚ç‚¹å±æ€§
+	 * @param name {const char*} å±æ€§å
+	 * @param n {int} å±æ€§å€¼
 	 * @return {xml_node&}
 	 */
 	xml_node& add_attr(const char* name, int n);
 
 	/**
-	 * Ìí¼Ó XML ½ÚµãÊôĞÔ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param n {size_t} ÊôĞÔÖµ
+	 * æ·»åŠ  XML èŠ‚ç‚¹å±æ€§
+	 * @param name {const char*} å±æ€§å
+	 * @param n {size_t} å±æ€§å€¼
 	 * @return {xml_node&}
 	 */
 	xml_node& add_attr(const char* name, size_t n);
 
 	/**
-	 * Ìí¼Ó XML ½ÚµãÊôĞÔ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param n {acl_int64} ÊôĞÔÖµ
+	 * æ·»åŠ  XML èŠ‚ç‚¹å±æ€§
+	 * @param name {const char*} å±æ€§å
+	 * @param n {acl_int64} å±æ€§å€¼
 	 * @return {xml_node&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -143,27 +143,27 @@ public:
 #endif
 
 	/**
-	 * ÉèÖÃ xml ½ÚµãµÄÎÄ±¾ÄÚÈİ
-	 * @param str {const char*} ×Ö·û´®ÄÚÈİ
-	 * @param append {bool} Ìí¼ÓÎÄ±¾Ê±ÊÇ²ÉÓÃ×·¼ÓÄ£Ê½»¹ÊÇ¸²¸ÇÄ£Ê½£¬Èç¹ûÎª×·¼ÓÄ£Ê½£¬
-	 *  Ôòµ±Ô­À´¸Ã½ÚµãÉÏÓĞÎÄ±¾ÄÚÈİÊ±£¬ĞÂÌí¼ÓµÄÄÚÈİÔÚÔ­ÎÄ±¾ºóÃæ×·¼Ó£¬·ñÔòÔò¸²¸Ç
+	 * è®¾ç½® xml èŠ‚ç‚¹çš„æ–‡æœ¬å†…å®¹
+	 * @param str {const char*} å­—ç¬¦ä¸²å†…å®¹
+	 * @param append {bool} æ·»åŠ æ–‡æœ¬æ—¶æ˜¯é‡‡ç”¨è¿½åŠ æ¨¡å¼è¿˜æ˜¯è¦†ç›–æ¨¡å¼ï¼Œå¦‚æœä¸ºè¿½åŠ æ¨¡å¼ï¼Œ
+	 *  åˆ™å½“åŸæ¥è¯¥èŠ‚ç‚¹ä¸Šæœ‰æ–‡æœ¬å†…å®¹æ—¶ï¼Œæ–°æ·»åŠ çš„å†…å®¹åœ¨åŸæ–‡æœ¬åé¢è¿½åŠ ï¼Œå¦åˆ™åˆ™è¦†ç›–
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& set_text(const char* str, bool append = false) = 0;
 
 	/**
-	 * ÉèÖÃ xml ½Úµã£¬Í¬Ê±½«Á÷¶ÔÏóÖĞµÄÊı¾İ×öÎª¸Ã½ÚµãµÄÎÄ±¾ÄÚÈİ
-	 * @param in {istream&} ÊäÈëÁ÷¶ÔÏó
-	 * @param off {size_t} ¶ÔÓÚÎÄ¼şÁ÷£¬ÔòÖ¸¶¨Òª¿½±´µÄÊı¾İµÄÆğÊ¼Î»ÖÃ
-	 * @param len {size_t} Òª¿½±´µÄ×î´óÊı¾İÁ¿£¬µ±Îª 0 Ê±£¬ÔòÒ»Ö±¿½±´µ½Á÷½áÊø
+	 * è®¾ç½® xml èŠ‚ç‚¹ï¼ŒåŒæ—¶å°†æµå¯¹è±¡ä¸­çš„æ•°æ®åšä¸ºè¯¥èŠ‚ç‚¹çš„æ–‡æœ¬å†…å®¹
+	 * @param in {istream&} è¾“å…¥æµå¯¹è±¡
+	 * @param off {size_t} å¯¹äºæ–‡ä»¶æµï¼Œåˆ™æŒ‡å®šè¦æ‹·è´çš„æ•°æ®çš„èµ·å§‹ä½ç½®
+	 * @param len {size_t} è¦æ‹·è´çš„æœ€å¤§æ•°æ®é‡ï¼Œå½“ä¸º 0 æ—¶ï¼Œåˆ™ä¸€ç›´æ‹·è´åˆ°æµç»“æŸ
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& set_text(istream& in, size_t off = 0,
 		size_t len = 0) = 0;
 
 	/**
-	 * ÉèÖÃ xml ½ÚµãµÄÎÄ±¾ÄÚÈİ
-	 * @param number {long long int} 64 Î»ÕûÊı
+	 * è®¾ç½® xml èŠ‚ç‚¹çš„æ–‡æœ¬å†…å®¹
+	 * @param number {long long int} 64 ä½æ•´æ•°
 	 * @return {xml_node&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -173,53 +173,53 @@ public:
 #endif
 
 	/**
-	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó
-	 * @param child {xml_node*} ×Ó½Úµã¶ÔÏó
-	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
-	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
-	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
+	 * ç»™æœ¬ xml èŠ‚ç‚¹æ·»åŠ  xml_node å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param child {xml_node*} å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param return_child {bool} æ˜¯å¦éœ€è¦æœ¬å‡½æ•°è¿”å›æ–°åˆ›å»ºçš„å­èŠ‚ç‚¹çš„å¼•ç”¨
+	 * @return {xml_node&} return_child ä¸º true è¿”å›å­èŠ‚ç‚¹çš„å¼•ç”¨ï¼Œ
+	 *  å¦åˆ™è¿”å›æœ¬ xml èŠ‚ç‚¹å¼•ç”¨
 	 */
 	virtual xml_node& add_child(xml_node* child,
 		bool return_child = false) = 0;
 	
 	/**
-	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó
-	 * @param child {xml_node&} ×Ó½Úµã¶ÔÏó
-	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
-	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
-	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
+	 * ç»™æœ¬ xml èŠ‚ç‚¹æ·»åŠ  xml_node å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param child {xml_node&} å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param return_child {bool} æ˜¯å¦éœ€è¦æœ¬å‡½æ•°è¿”å›æ–°åˆ›å»ºçš„å­èŠ‚ç‚¹çš„å¼•ç”¨
+	 * @return {xml_node&} return_child ä¸º true è¿”å›å­èŠ‚ç‚¹çš„å¼•ç”¨ï¼Œ
+	 *  å¦åˆ™è¿”å›æœ¬ xml èŠ‚ç‚¹å¼•ç”¨
 	 */
 	xml_node& add_child(xml_node& child, bool return_child = false);
 
 	/**
-	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó
-	 * @param tag {const char* tag} ×Ó½Úµã¶ÔÏóµÄ±êÇ©Ãû
-	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
-	 * @param str {const char*} ÎÄ±¾×Ö·û´®
-	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
-	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
+	 * ç»™æœ¬ xml èŠ‚ç‚¹æ·»åŠ  xml_node å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param tag {const char* tag} å­èŠ‚ç‚¹å¯¹è±¡çš„æ ‡ç­¾å
+	 * @param return_child {bool} æ˜¯å¦éœ€è¦æœ¬å‡½æ•°è¿”å›æ–°åˆ›å»ºçš„å­èŠ‚ç‚¹çš„å¼•ç”¨
+	 * @param str {const char*} æ–‡æœ¬å­—ç¬¦ä¸²
+	 * @return {xml_node&} return_child ä¸º true è¿”å›å­èŠ‚ç‚¹çš„å¼•ç”¨ï¼Œ
+	 *  å¦åˆ™è¿”å›æœ¬ xml èŠ‚ç‚¹å¼•ç”¨
 	 */
 	xml_node& add_child(const char* tag, bool return_child = false,
 		const char* str = NULL);
 
 	/**
-	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó
-	 * @param tag {const char* tag} ×Ó½Úµã¶ÔÏóµÄ±êÇ©Ãû
-	 * @param txt {long long int} ½ÚµãÖĞµÄÎÄ±¾ÄÚÈİ£¬·Ç¿Õ×Ö·û´®
-	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
-	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
-	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
+	 * ç»™æœ¬ xml èŠ‚ç‚¹æ·»åŠ  xml_node å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param tag {const char* tag} å­èŠ‚ç‚¹å¯¹è±¡çš„æ ‡ç­¾å
+	 * @param txt {long long int} èŠ‚ç‚¹ä¸­çš„æ–‡æœ¬å†…å®¹ï¼Œéç©ºå­—ç¬¦ä¸²
+	 * @param return_child {bool} æ˜¯å¦éœ€è¦æœ¬å‡½æ•°è¿”å›æ–°åˆ›å»ºçš„å­èŠ‚ç‚¹çš„å¼•ç”¨
+	 * @return {xml_node&} return_child ä¸º true è¿”å›å­èŠ‚ç‚¹çš„å¼•ç”¨ï¼Œ
+	 *  å¦åˆ™è¿”å›æœ¬ xml èŠ‚ç‚¹å¼•ç”¨
 	 */
 	xml_node& add_child(const char* tag, const char* txt,
 		bool return_child = false);
 
 	/**
-	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó
-	 * @param tag {const char* tag} ×Ó½Úµã¶ÔÏóµÄ±êÇ©Ãû
-	 * @param number {long long int} 64 Î»ÕûÊı
-	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
-	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
-	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
+	 * ç»™æœ¬ xml èŠ‚ç‚¹æ·»åŠ  xml_node å­èŠ‚ç‚¹å¯¹è±¡
+	 * @param tag {const char* tag} å­èŠ‚ç‚¹å¯¹è±¡çš„æ ‡ç­¾å
+	 * @param number {long long int} 64 ä½æ•´æ•°
+	 * @param return_child {bool} æ˜¯å¦éœ€è¦æœ¬å‡½æ•°è¿”å›æ–°åˆ›å»ºçš„å­èŠ‚ç‚¹çš„å¼•ç”¨
+	 * @return {xml_node&} return_child ä¸º true è¿”å›å­èŠ‚ç‚¹çš„å¼•ç”¨ï¼Œ
+	 *  å¦åˆ™è¿”å›æœ¬ xml èŠ‚ç‚¹å¼•ç”¨
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml_node& add_child(const char* tag, __int64 number,
@@ -230,77 +230,77 @@ public:
 #endif
 
 	/**
-	 * ¸ø±¾ xml ½ÚµãÌí¼Ó xml_node ×Ó½Úµã¶ÔÏó£¬Í¬Ê±Ê¹ÓÃÊäÈëÁ÷ÖĞµÄÄÚÈİ×öÎª½ÚµãµÄÎÄ±¾
-	 * @param tag {const char* tag} ×Ó½Úµã¶ÔÏóµÄ±êÇ©Ãû
-	 * @param in {istream&} ÊäÈëÁ÷¶ÔÏó
-	 * @param off {size_t} ¶ÔÓÚÎÄ¼şÁ÷£¬ÔòÖ¸¶¨Òª¿½±´µÄÊı¾İµÄÆğÊ¼Î»ÖÃ
-	 * @param len {size_t} Òª¿½±´µÄ×î´óÊı¾İÁ¿£¬µ±Îª 0 Ê±£¬ÔòÒ»Ö±¿½±´µ½Á÷½áÊø
-	 * @param return_child {bool} ÊÇ·ñĞèÒª±¾º¯Êı·µ»ØĞÂ´´½¨µÄ×Ó½ÚµãµÄÒıÓÃ
-	 * @return {xml_node&} return_child Îª true ·µ»Ø×Ó½ÚµãµÄÒıÓÃ£¬
-	 *  ·ñÔò·µ»Ø±¾ xml ½ÚµãÒıÓÃ
+	 * ç»™æœ¬ xml èŠ‚ç‚¹æ·»åŠ  xml_node å­èŠ‚ç‚¹å¯¹è±¡ï¼ŒåŒæ—¶ä½¿ç”¨è¾“å…¥æµä¸­çš„å†…å®¹åšä¸ºèŠ‚ç‚¹çš„æ–‡æœ¬
+	 * @param tag {const char* tag} å­èŠ‚ç‚¹å¯¹è±¡çš„æ ‡ç­¾å
+	 * @param in {istream&} è¾“å…¥æµå¯¹è±¡
+	 * @param off {size_t} å¯¹äºæ–‡ä»¶æµï¼Œåˆ™æŒ‡å®šè¦æ‹·è´çš„æ•°æ®çš„èµ·å§‹ä½ç½®
+	 * @param len {size_t} è¦æ‹·è´çš„æœ€å¤§æ•°æ®é‡ï¼Œå½“ä¸º 0 æ—¶ï¼Œåˆ™ä¸€ç›´æ‹·è´åˆ°æµç»“æŸ
+	 * @param return_child {bool} æ˜¯å¦éœ€è¦æœ¬å‡½æ•°è¿”å›æ–°åˆ›å»ºçš„å­èŠ‚ç‚¹çš„å¼•ç”¨
+	 * @return {xml_node&} return_child ä¸º true è¿”å›å­èŠ‚ç‚¹çš„å¼•ç”¨ï¼Œ
+	 *  å¦åˆ™è¿”å›æœ¬ xml èŠ‚ç‚¹å¼•ç”¨
 	 */
 	xml_node& add_child(const char* tag, istream& in,
 		size_t off = 0, size_t len = 0, bool return_child = false);
 
 	/**
-	 * »ñµÃ±¾½ÚµãµÄ¸¸¼¶½Úµã¶ÔÏóµÄÒıÓÃ
+	 * è·å¾—æœ¬èŠ‚ç‚¹çš„çˆ¶çº§èŠ‚ç‚¹å¯¹è±¡çš„å¼•ç”¨
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& get_parent(void) const = 0;
 
 	/**
-	 * ÉèÖÃ±¾½ÚµãµÄ¸¸¼¶½Úµã
-	 * @param node {xml_node*} ¸¸½Úµã
+	 * è®¾ç½®æœ¬èŠ‚ç‚¹çš„çˆ¶çº§èŠ‚ç‚¹
+	 * @param node {xml_node*} çˆ¶èŠ‚ç‚¹
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& set_parent(xml_node* node) = 0;
 
 	/**
-	 * ½«±¾½Úµã¼°Æä×Ó½Úµã´Ó xml Ê÷ÖĞ·ÖÀë£¬ÆäÄÚ´æ½«ÓÉ xml ¶ÔÏóÍ³Ò»ÊÍ·Å
-	 * @return {int} ·µ»Ø±»ÊÍ·ÅµÄ½Úµã¸öÊı
+	 * å°†æœ¬èŠ‚ç‚¹åŠå…¶å­èŠ‚ç‚¹ä» xml æ ‘ä¸­åˆ†ç¦»ï¼Œå…¶å†…å­˜å°†ç”± xml å¯¹è±¡ç»Ÿä¸€é‡Šæ”¾
+	 * @return {int} è¿”å›è¢«é‡Šæ”¾çš„èŠ‚ç‚¹ä¸ªæ•°
 	 */
 	virtual int detach(void) = 0;
 
 	/**
-	 * »ñµÃ±¾½ÚµãµÄµÚÒ»¸ö×Ó½Úµã£¬ĞèÒª±éÀú×Ó½ÚµãÊ±±ØĞëÊ×ÏÈµ÷ÓÃ´Ëº¯Êı
-	 * @return {xml_node*} ·µ»Ø¿Õ±íÊ¾Ã»ÓĞ×Ó½Úµã
+	 * è·å¾—æœ¬èŠ‚ç‚¹çš„ç¬¬ä¸€ä¸ªå­èŠ‚ç‚¹ï¼Œéœ€è¦éå†å­èŠ‚ç‚¹æ—¶å¿…é¡»é¦–å…ˆè°ƒç”¨æ­¤å‡½æ•°
+	 * @return {xml_node*} è¿”å›ç©ºè¡¨ç¤ºæ²¡æœ‰å­èŠ‚ç‚¹
 	 */
 	virtual xml_node* first_child(void) = 0;
 
 	/**
-	 * »ñµÃ±¾½ÚµãµÄÏÂÒ»¸ö×Ó½Úµã
-	 * @return {xml_node*} ·µ»Ø¿Õ±íÊ¾±éÀú¹ı³Ì½áÊø
+	 * è·å¾—æœ¬èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå­èŠ‚ç‚¹
+	 * @return {xml_node*} è¿”å›ç©ºè¡¨ç¤ºéå†è¿‡ç¨‹ç»“æŸ
 	 */
 	virtual xml_node* next_child(void) = 0;
 
 	/**
-	 * ·µ»Ø¸Ã XML ½ÚµãÔÚÕû¸ö XML Ê÷ÖĞµÄÉî¶È
+	 * è¿”å›è¯¥ XML èŠ‚ç‚¹åœ¨æ•´ä¸ª XML æ ‘ä¸­çš„æ·±åº¦
 	 * @return {int}
 	 */
 	virtual int depth(void) const = 0;
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°½ÚµãÊÇ·ñÎª xml ¶ÔÏóÖĞµÄ root ½Úµã
+	 * åˆ¤æ–­å½“å‰èŠ‚ç‚¹æ˜¯å¦ä¸º xml å¯¹è±¡ä¸­çš„ root èŠ‚ç‚¹
 	 * @return {bool}
 	 */
 	virtual bool is_root(void) const = 0;
 
 	/**
-	 * ·µ»Ø¸Ã xml ½ÚµãµÄÏÂÒ»¼¶×Ó½ÚµãµÄ¸öÊı
-	 * @return {int} ÓÀÔ¶ >= 0
+	 * è¿”å›è¯¥ xml èŠ‚ç‚¹çš„ä¸‹ä¸€çº§å­èŠ‚ç‚¹çš„ä¸ªæ•°
+	 * @return {int} æ°¸è¿œ >= 0
 	 */
 	virtual int children_count(void) const = 0;
 
 	/**
-	 * µ±ÔÚ±éÀú¸Ã xml ½ÚµãÊ±£¬ÄÚ²¿»á¶¯Ì¬²úÉúÒ»Ğ©ÁÙÊ± xml_node ¶ÔÏó£¬µ÷ÓÃ
-	 * ´Ëº¯Êı¿ÉÒÔÇå¿ÕÕâĞ©¶ÔÏó£¬Ò»µ©µ÷ÓÃ´Ëº¯Êı½øĞĞÁËÇå³ı£¬ÔòÓÉ
-	 * first_child/next_child ·µ»ØµÄ xml_node ½Úµã¶ÔÏó½«²»ÔÙ¿ÉÓÃ£¬·ñÔò»á
-	 * ²úÉúÄÚ´æ·Ç·¨·ÃÎÊ
+	 * å½“åœ¨éå†è¯¥ xml èŠ‚ç‚¹æ—¶ï¼Œå†…éƒ¨ä¼šåŠ¨æ€äº§ç”Ÿä¸€äº›ä¸´æ—¶ xml_node å¯¹è±¡ï¼Œè°ƒç”¨
+	 * æ­¤å‡½æ•°å¯ä»¥æ¸…ç©ºè¿™äº›å¯¹è±¡ï¼Œä¸€æ—¦è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œäº†æ¸…é™¤ï¼Œåˆ™ç”±
+	 * first_child/next_child è¿”å›çš„ xml_node èŠ‚ç‚¹å¯¹è±¡å°†ä¸å†å¯ç”¨ï¼Œå¦åˆ™ä¼š
+	 * äº§ç”Ÿå†…å­˜éæ³•è®¿é—®
 	 */
 	void clear(void);
 
 	/**
-	 * »ñµÃ xml ¶ÔÏóµÄÒıÓÃ
+	 * è·å¾— xml å¯¹è±¡çš„å¼•ç”¨
 	 * @return {xml&}
 	 */
 	xml& get_xml(void) const;
@@ -310,13 +310,13 @@ protected:
 	friend class dbuf_guard;
 
 	/**
-	 * xml ½Úµã¹¹Ôìº¯Êı
-	 * @param xml_ptr {xml*} xml Ê÷¶ÔÏó£¬·Ç¿Õ
+	 * xml èŠ‚ç‚¹æ„é€ å‡½æ•°
+	 * @param xml_ptr {xml*} xml æ ‘å¯¹è±¡ï¼Œéç©º
 	 */
 	xml_node(xml* xml_ptr);
 
 	/**
-	 * ÒªÇó¸Ã¶ÔÏó±ØĞëÊÇ¶¯Ì¬´´½¨µÄ
+	 * è¦æ±‚è¯¥å¯¹è±¡å¿…é¡»æ˜¯åŠ¨æ€åˆ›å»ºçš„
 	 */
 	virtual ~xml_node(void);
 
@@ -332,177 +332,177 @@ class ACL_CPP_API xml : public pipe_stream, public dbuf_obj
 {
 public:
 	/**
-	 * @param dbuf_nblock {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
-	 * @param dbuf_capacity {size_t} ÄÚ²¿ËùÓÃ dbuf_guard µÄ³õÊ¼»¯²ÎÊı
+	 * @param dbuf_nblock {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
+	 * @param dbuf_capacity {size_t} å†…éƒ¨æ‰€ç”¨ dbuf_guard çš„åˆå§‹åŒ–å‚æ•°
 	 */
 	xml(size_t dbuf_nblock = 2, size_t dbuf_capacity = 100);
 	virtual ~xml(void);
 
 	/**
-	 * ¶ÔÓÚ·Ç±ÕºÏµÄ±êÇ©£¬ÊÇ·ñĞèÒªºöÂÔ±ÕºÏ×Ö·û '/'£¬È±Ê¡Îª²»ºöÂÔ
+	 * å¯¹äºéé—­åˆçš„æ ‡ç­¾ï¼Œæ˜¯å¦éœ€è¦å¿½ç•¥é—­åˆå­—ç¬¦ '/'ï¼Œç¼ºçœä¸ºä¸å¿½ç•¥
 	 * @param on {bool}
 	 * @return {xml&}
 	 */
 	virtual xml& ignore_slash(bool on) = 0;
 
 	/**
-	 * ½âÎö xml ¶ÔÏóÊ±£¬ÊÇ·ñ×Ô¶¯½øĞĞ xml ½âÂë£¬È±Ê¡½âÂë
+	 * è§£æ xml å¯¹è±¡æ—¶ï¼Œæ˜¯å¦è‡ªåŠ¨è¿›è¡Œ xml è§£ç ï¼Œç¼ºçœè§£ç 
 	 * @param on {bool}
 	 * @return {xml&}
 	 */
 	virtual xml& xml_decode(bool on) = 0;
 
 	/**
-	 * ´´½¨ xml ¶ÔÏóÊ±£¬ÊÇ·ñ×Ô¶¯½øĞĞ xml ±àÂë£¬È±Ê¡±àÂë
+	 * åˆ›å»º xml å¯¹è±¡æ—¶ï¼Œæ˜¯å¦è‡ªåŠ¨è¿›è¡Œ xml ç¼–ç ï¼Œç¼ºçœç¼–ç 
 	 * @param on {bool}
 	 * @return {xml&}
 	 */
 	virtual xml& xml_encode(bool on) = 0;
 
 	/**
-	 * ½âÎö xml Ê±ÊÇ·ñÔÊĞíÓĞ¶à¸ö¸ù½Úµã£¨ÄÚ²¿È±Ê¡ÎªÔÊĞí£©
+	 * è§£æ xml æ—¶æ˜¯å¦å…è®¸æœ‰å¤šä¸ªæ ¹èŠ‚ç‚¹ï¼ˆå†…éƒ¨ç¼ºçœä¸ºå…è®¸ï¼‰
 	 * @param on {bool}
 	 * @retrn {xml&}
 	 */
 	virtual xml& xml_multi_root(bool on) = 0;
 
 	/**
-	 * ÒÔÁ÷Ê½·½Ê½Ñ­»·µ÷ÓÃ±¾º¯ÊıÌí¼Ó XML Êı¾İ£¬Ò²¿ÉÒÔÒ»´ÎĞÔÌí¼Ó
-	 * ÍêÕûµÄ XML Êı¾İ£¬Èç¹ûÊÇÖØ¸´Ê¹ÓÃ¸Ã XML ½âÎöÆ÷½âÎö¶à¸ö XML
-	 * ¶ÔÏó£¬ÔòÓ¦¸ÃÔÚ½âÎöÏÂÒ»¸ö XML ¶ÔÏóÇ°µ÷ÓÃ reset() ·½·¨À´Çå
-	 * ³ıÉÏÒ»´ÎµÄ½âÎö½á¹û
-	 * @param data {const char*} xml Êı¾İ
-	 * @return {const char*} µ±½âÎöÍê±ÏÊ±»¹ÓĞÊ£ÓàÊı¾İ£¬Ôò¸Ã·µ»ØÖµ·µ»Ø
-	 *  Ê£ÓàµÄÊı¾İ; Èç¹û data Îª '\0'£¬ÔòËµÃ÷ÒÑ¾­´¦ÀíÍêÊäÈëµÄÊı¾İ
+	 * ä»¥æµå¼æ–¹å¼å¾ªç¯è°ƒç”¨æœ¬å‡½æ•°æ·»åŠ  XML æ•°æ®ï¼Œä¹Ÿå¯ä»¥ä¸€æ¬¡æ€§æ·»åŠ 
+	 * å®Œæ•´çš„ XML æ•°æ®ï¼Œå¦‚æœæ˜¯é‡å¤ä½¿ç”¨è¯¥ XML è§£æå™¨è§£æå¤šä¸ª XML
+	 * å¯¹è±¡ï¼Œåˆ™åº”è¯¥åœ¨è§£æä¸‹ä¸€ä¸ª XML å¯¹è±¡å‰è°ƒç”¨ reset() æ–¹æ³•æ¥æ¸…
+	 * é™¤ä¸Šä¸€æ¬¡çš„è§£æç»“æœ
+	 * @param data {const char*} xml æ•°æ®
+	 * @return {const char*} å½“è§£æå®Œæ¯•æ—¶è¿˜æœ‰å‰©ä½™æ•°æ®ï¼Œåˆ™è¯¥è¿”å›å€¼è¿”å›
+	 *  å‰©ä½™çš„æ•°æ®; å¦‚æœ data ä¸º '\0'ï¼Œåˆ™è¯´æ˜å·²ç»å¤„ç†å®Œè¾“å…¥çš„æ•°æ®
 	 */
 	virtual const char* update(const char* data) = 0;
 
 	/**
-	 * ÅĞ¶Ï XML ½âÎöÊÇ·ñÍê±Ï
-	 * @param root_tag {const char*} ¸ù½Úµã±êÇ©Ãû£¬·Ç NULL ×Ö·û´®£¬ÓÃ¸Ã±êÇ©Ãû
-	 *  Óë xml ¶ÔÏóÖĞ×îÍâ²ãµÄ±êÇ©Ãû±È½ÏÊÇ·ñÏàÍ¬
+	 * åˆ¤æ–­ XML è§£ææ˜¯å¦å®Œæ¯•
+	 * @param root_tag {const char*} æ ¹èŠ‚ç‚¹æ ‡ç­¾åï¼Œé NULL å­—ç¬¦ä¸²ï¼Œç”¨è¯¥æ ‡ç­¾å
+	 *  ä¸ xml å¯¹è±¡ä¸­æœ€å¤–å±‚çš„æ ‡ç­¾åæ¯”è¾ƒæ˜¯å¦ç›¸åŒ
 	 * @return {bool}
 	 */
 	virtual bool complete(const char* root_tag) = 0;
 
 	/**
-	 * ÖØÖÃ XML ½âÎöÆ÷×´Ì¬£¬¸Ã XML ¶ÔÏó¿ÉÒÔÓÃÀ´¶Ô¶à¸ö XML Êı¾İ
-	 * ½øĞĞ½âÎö£¬ÔÚ·´¸´Ê¹ÓÃ±¾ XML ½âÎöÆ÷Ç°£¬ĞèÒªµ÷ÓÃ±¾º¯ÊıÖØÖÃ
-	 * ÄÚ²¿ XML ½âÎöÆ÷×´Ì¬£¬Çå³ıÉÏÒ»´ÎµÄ½âÎö½á¹û
+	 * é‡ç½® XML è§£æå™¨çŠ¶æ€ï¼Œè¯¥ XML å¯¹è±¡å¯ä»¥ç”¨æ¥å¯¹å¤šä¸ª XML æ•°æ®
+	 * è¿›è¡Œè§£æï¼Œåœ¨åå¤ä½¿ç”¨æœ¬ XML è§£æå™¨å‰ï¼Œéœ€è¦è°ƒç”¨æœ¬å‡½æ•°é‡ç½®
+	 * å†…éƒ¨ XML è§£æå™¨çŠ¶æ€ï¼Œæ¸…é™¤ä¸Šä¸€æ¬¡çš„è§£æç»“æœ
 	 */
 	virtual void reset(void) = 0;
 
 	/**
-	 * ´Ó½âÎöµÄ XML Ô­Ê¼Êı¾İÖĞ½öÌáÈ¡ÎÄ±¾²¿·Ö
-	 * @return {const string&} ·µ»Ø½á¹û»º³åÇøµÄÒıÓÃ£¬¸ÃÒıÓÃÊÇÄÚ
-	 *  ²¿±äÁ¿£¬ÓÃ»§²»ĞèÒªÊÍ·Å
+	 * ä»è§£æçš„ XML åŸå§‹æ•°æ®ä¸­ä»…æå–æ–‡æœ¬éƒ¨åˆ†
+	 * @return {const string&} è¿”å›ç»“æœç¼“å†²åŒºçš„å¼•ç”¨ï¼Œè¯¥å¼•ç”¨æ˜¯å†…
+	 *  éƒ¨å˜é‡ï¼Œç”¨æˆ·ä¸éœ€è¦é‡Šæ”¾
 	 */
 	virtual const string& getText(void);
 
 	/**
-	 * ´Ó XML ¶ÔÏóÖĞÈ¡µÃÄ³¸ö±êÇ©ÃûµÄËùÓĞ½Úµã¼¯ºÏ
-	 * @param tag {const char*} ±êÇ©Ãû(²»Çø·Ö´óĞ¡Ğ´)
-	 * @return {const std::vector<xml_node*>&} ·µ»Ø½á¹û¼¯µÄ¶ÔÏóÒıÓÃ£¬
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
-	 *  ×¢£º·µ»ØµÄÊı×éÖĞµÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
-	 *  ÒòÎª¸Ã¿âÄÚ²¿ÓĞ×Ô¶¯É¾³ıµÄ»úÖÆ
+	 * ä» XML å¯¹è±¡ä¸­å–å¾—æŸä¸ªæ ‡ç­¾åçš„æ‰€æœ‰èŠ‚ç‚¹é›†åˆ
+	 * @param tag {const char*} æ ‡ç­¾å(ä¸åŒºåˆ†å¤§å°å†™)
+	 * @return {const std::vector<xml_node*>&} è¿”å›ç»“æœé›†çš„å¯¹è±¡å¼•ç”¨ï¼Œ
+	 *  å¦‚æœæŸ¥è¯¢ç»“æœä¸ºç©ºï¼Œåˆ™è¯¥é›†åˆä¸ºç©ºï¼Œå³ï¼šempty() == true
+	 *  æ³¨ï¼šè¿”å›çš„æ•°ç»„ä¸­çš„ xml_node èŠ‚ç‚¹æ•°æ®å¯ä»¥ä¿®æ”¹ï¼Œä½†ä¸èƒ½åˆ é™¤è¯¥èŠ‚ç‚¹ï¼Œ
+	 *  å› ä¸ºè¯¥åº“å†…éƒ¨æœ‰è‡ªåŠ¨åˆ é™¤çš„æœºåˆ¶
 	 */
 	virtual const std::vector<xml_node*>&
 		getElementsByTagName(const char* tag) const = 0;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃ¶ÔÓ¦±êÇ©ÃûµÄµÚÒ»¸ö xml ½Úµã¶ÔÏó
-	 * @param tag {const char*} ±êÇ©Ãû(²»Çø·Ö´óĞ¡Ğ´)
-	 * @return {xml_node*} ·µ»Ø¿Õ±íÃ÷¸Ã±êÇ©¶ÔÓ¦µÄ xml ½Úµã²»´æÔÚ
+	 * ä» xml å¯¹è±¡ä¸­è·å¾—å¯¹åº”æ ‡ç­¾åçš„ç¬¬ä¸€ä¸ª xml èŠ‚ç‚¹å¯¹è±¡
+	 * @param tag {const char*} æ ‡ç­¾å(ä¸åŒºåˆ†å¤§å°å†™)
+	 * @return {xml_node*} è¿”å›ç©ºè¡¨æ˜è¯¥æ ‡ç­¾å¯¹åº”çš„ xml èŠ‚ç‚¹ä¸å­˜åœ¨
 	 */
 	virtual xml_node* getFirstElementByTag(const char* tag) const = 0;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃËùÓĞµÄÓë¸ø¶¨¶à¼¶±êÇ©ÃûÏàÍ¬µÄ xml ½ÚµãµÄ¼¯ºÏ
-	 * @param tags {const char*} ¶à¼¶±êÇ©Ãû£¬ÓÉ '/' ·Ö¸ô¸÷¼¶±êÇ©Ãû£¬ÈçÕë¶Ô xml Êı¾İ£º
+	 * ä» xml å¯¹è±¡ä¸­è·å¾—æ‰€æœ‰çš„ä¸ç»™å®šå¤šçº§æ ‡ç­¾åç›¸åŒçš„ xml èŠ‚ç‚¹çš„é›†åˆ
+	 * @param tags {const char*} å¤šçº§æ ‡ç­¾åï¼Œç”± '/' åˆ†éš”å„çº§æ ‡ç­¾åï¼Œå¦‚é’ˆå¯¹ xml æ•°æ®ï¼š
 	 *  <root> <first> <second> <third name="test1"> text1 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first> ...
-	 *  ¿ÉÒÔÍ¨¹ı¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎĞÔ²é³öËùÓĞ·ûºÏÌõ¼şµÄ½Úµã
-	 * @return {const std::vector<xml_node*>&} ·ûºÏÌõ¼şµÄ xml ½Úµã¼¯ºÏ, 
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
-	 *  ×¢£º·µ»ØµÄÊı×éÖĞµÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
-	 *  ÒòÎª¸Ã¿âÄÚ²¿ÓĞ×Ô¶¯É¾³ıµÄ»úÖÆ
+	 *  å¯ä»¥é€šè¿‡å¤šçº§æ ‡ç­¾åï¼šroot/first/second/third ä¸€æ¬¡æ€§æŸ¥å‡ºæ‰€æœ‰ç¬¦åˆæ¡ä»¶çš„èŠ‚ç‚¹
+	 * @return {const std::vector<xml_node*>&} ç¬¦åˆæ¡ä»¶çš„ xml èŠ‚ç‚¹é›†åˆ, 
+	 *  å¦‚æœæŸ¥è¯¢ç»“æœä¸ºç©ºï¼Œåˆ™è¯¥é›†åˆä¸ºç©ºï¼Œå³ï¼šempty() == true
+	 *  æ³¨ï¼šè¿”å›çš„æ•°ç»„ä¸­çš„ xml_node èŠ‚ç‚¹æ•°æ®å¯ä»¥ä¿®æ”¹ï¼Œä½†ä¸èƒ½åˆ é™¤è¯¥èŠ‚ç‚¹ï¼Œ
+	 *  å› ä¸ºè¯¥åº“å†…éƒ¨æœ‰è‡ªåŠ¨åˆ é™¤çš„æœºåˆ¶
 	 */
 	virtual const std::vector<xml_node*>&
 		getElementsByTags(const char* tags) const = 0;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃÖ¸¶¨¶à¼¶±êÇ©ÃûµÄµÚÒ»¸ö xml ½Úµã
-	 * @param tags {const char*} ¶à¼¶±êÇ©Ãû£¬ÓÉ '/' ·Ö¸ô¸÷¼¶±êÇ©Ãû£¬ÈçÕë¶Ô xml Êı¾İ£º
+	 * ä» xml å¯¹è±¡ä¸­è·å¾—æŒ‡å®šå¤šçº§æ ‡ç­¾åçš„ç¬¬ä¸€ä¸ª xml èŠ‚ç‚¹
+	 * @param tags {const char*} å¤šçº§æ ‡ç­¾åï¼Œç”± '/' åˆ†éš”å„çº§æ ‡ç­¾åï¼Œå¦‚é’ˆå¯¹ xml æ•°æ®ï¼š
 	 *  <root> <first> <second> <third name="test1"> text1 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test2"> text2 </third> </second> </first> ...
 	 *  <root> <first> <second> <third name="test3"> text3 </third> </second> </first> ...
-	 *  ¿ÉÒÔÍ¨¹ı¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎĞÔ²é³öËùÓĞ·ûºÏÌõ¼şµÄ½Úµã
-	 * @return {xml_node*} ·µ»Ø¿Õ±íÊ¾²»´æÔÚ
+	 *  å¯ä»¥é€šè¿‡å¤šçº§æ ‡ç­¾åï¼šroot/first/second/third ä¸€æ¬¡æ€§æŸ¥å‡ºæ‰€æœ‰ç¬¦åˆæ¡ä»¶çš„èŠ‚ç‚¹
+	 * @return {xml_node*} è¿”å›ç©ºè¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	virtual xml_node* getFirstElementByTags(const char* tags) const = 0;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃËùÓĞÓë¸ø¶¨ÊôĞÔÃû name µÄÊôĞÔÖµÏàÍ¬µÄ xml ½Úµã¼¯ºÏ
-	 * @param value {const char*} ÊôĞÔÃûÎª name µÄÊôĞÔÖµ
-	 * @return {const std::vector<xml_node*>&} ·µ»Ø½á¹û¼¯µÄ¶ÔÏóÒıÓÃ£¬
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
-	 *  ×¢£º·µ»ØµÄÊı×éÖĞµÄ xml_node ½ÚµãÊı¾İ¿ÉÒÔĞŞ¸Ä£¬µ«²»ÄÜÉ¾³ı¸Ã½Úµã£¬
-	 *  ÒòÎª¸Ã¿âÄÚ²¿ÓĞ×Ô¶¯É¾³ıµÄ»úÖÆ
+	 * ä» xml å¯¹è±¡ä¸­è·å¾—æ‰€æœ‰ä¸ç»™å®šå±æ€§å name çš„å±æ€§å€¼ç›¸åŒçš„ xml èŠ‚ç‚¹é›†åˆ
+	 * @param value {const char*} å±æ€§åä¸º name çš„å±æ€§å€¼
+	 * @return {const std::vector<xml_node*>&} è¿”å›ç»“æœé›†çš„å¯¹è±¡å¼•ç”¨ï¼Œ
+	 *  å¦‚æœæŸ¥è¯¢ç»“æœä¸ºç©ºï¼Œåˆ™è¯¥é›†åˆä¸ºç©ºï¼Œå³ï¼šempty() == true
+	 *  æ³¨ï¼šè¿”å›çš„æ•°ç»„ä¸­çš„ xml_node èŠ‚ç‚¹æ•°æ®å¯ä»¥ä¿®æ”¹ï¼Œä½†ä¸èƒ½åˆ é™¤è¯¥èŠ‚ç‚¹ï¼Œ
+	 *  å› ä¸ºè¯¥åº“å†…éƒ¨æœ‰è‡ªåŠ¨åˆ é™¤çš„æœºåˆ¶
 	 */
 	virtual const std::vector<xml_node*>&
 		getElementsByName(const char* value) const = 0;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃËùÓĞ¸ø¶¨ÊôĞÔÃû¼°ÊôĞÔÖµµÄ xml ½ÚµãÔªËØ¼¯ºÏ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param value {const char*} ÊôĞÔÖµ
-	 * @return {const std::vector<xml_node*>&} ·µ»Ø½á¹û¼¯µÄ¶ÔÏóÒıÓÃ£¬
-	 *  Èç¹û²éÑ¯½á¹ûÎª¿Õ£¬Ôò¸Ã¼¯ºÏÎª¿Õ£¬¼´£ºempty() == true
+	 * ä» xml å¯¹è±¡ä¸­è·å¾—æ‰€æœ‰ç»™å®šå±æ€§ååŠå±æ€§å€¼çš„ xml èŠ‚ç‚¹å…ƒç´ é›†åˆ
+	 * @param name {const char*} å±æ€§å
+	 * @param value {const char*} å±æ€§å€¼
+	 * @return {const std::vector<xml_node*>&} è¿”å›ç»“æœé›†çš„å¯¹è±¡å¼•ç”¨ï¼Œ
+	 *  å¦‚æœæŸ¥è¯¢ç»“æœä¸ºç©ºï¼Œåˆ™è¯¥é›†åˆä¸ºç©ºï¼Œå³ï¼šempty() == true
 	 */
 	virtual const std::vector<xml_node*>& getElementsByAttr(
 		const char* name, const char* value) const = 0;
 
 	/**
-	 * ´Ó xml ¶ÔÏóÖĞ»ñµÃÖ¸¶¨ id ÖµµÄ xml ½ÚµãÔªËØ
-	 * @param id {const char*} id Öµ
-	 * @return {const xml_node*} xml ½ÚµãÔªËØ, Èô·µ»Ø NULL Ôò±íÊ¾Ã»ÓĞ·ûºÏ
-	 *  Ìõ¼şµÄ xml ½Úµã, ·µ»ØÖµ²»ĞèÒªÊÍ·Å
+	 * ä» xml å¯¹è±¡ä¸­è·å¾—æŒ‡å®š id å€¼çš„ xml èŠ‚ç‚¹å…ƒç´ 
+	 * @param id {const char*} id å€¼
+	 * @return {const xml_node*} xml èŠ‚ç‚¹å…ƒç´ , è‹¥è¿”å› NULL åˆ™è¡¨ç¤ºæ²¡æœ‰ç¬¦åˆ
+	 *  æ¡ä»¶çš„ xml èŠ‚ç‚¹, è¿”å›å€¼ä¸éœ€è¦é‡Šæ”¾
 	 */
 	virtual xml_node* getElementById(const char* id) const = 0;
 
 	/**
-	 * ´´½¨Ò»¸ö xml_node ½Úµã¶ÔÏó
-	 * @param tag {const char*} ±êÇ©Ãû
-	 * @param txt {const char*} ÎÄ±¾×Ö·û´®
-	 * @return {xml_node*} ĞÂ²úÉúµÄ xml_node ¶ÔÏó²»ĞèÒªÓÃ»§ÊÖ¹¤ÊÍ·Å£¬ÒòÎª
-	 *  ÔÚ xml ¶ÔÏó±»ÊÍ·ÅÊ±ÕâĞ©½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷
-	 *  ÓÃ reset À´ÊÍ·ÅÕâĞ© xml_node ½Úµã¶ÔÏó
+	 * åˆ›å»ºä¸€ä¸ª xml_node èŠ‚ç‚¹å¯¹è±¡
+	 * @param tag {const char*} æ ‡ç­¾å
+	 * @param txt {const char*} æ–‡æœ¬å­—ç¬¦ä¸²
+	 * @return {xml_node*} æ–°äº§ç”Ÿçš„ xml_node å¯¹è±¡ä¸éœ€è¦ç”¨æˆ·æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸º
+	 *  åœ¨ xml å¯¹è±¡è¢«é‡Šæ”¾æ—¶è¿™äº›èŠ‚ç‚¹ä¼šè‡ªåŠ¨è¢«é‡Šæ”¾ï¼Œå½“ç„¶ç”¨æˆ·ä¹Ÿå¯ä»¥åœ¨ä¸ç”¨æ—¶è°ƒ
+	 *  ç”¨ reset æ¥é‡Šæ”¾è¿™äº› xml_node èŠ‚ç‚¹å¯¹è±¡
 	 */
 	virtual xml_node& create_node(const char* tag,
 		const char* txt = NULL) = 0;
 
 	/**
-	 * ´´½¨Ò»¸ö xml_node ½Úµã¶ÔÏó£¬Í¬Ê±Ö¸¶¨ÊäÈëÁ÷ÖĞµÄÄÚÈİ×öÎª½ÚµãÎÄ±¾ÄÚÈİ
-	 * @param tag {const char*} ±êÇ©Ãû
-	 * @param in {istream&} ÊäÈëÁ÷¶ÔÏó
-	 * @param off {size_t} ¶ÔÓÚÎÄ¼şÁ÷£¬ÔòÖ¸¶¨Òª¿½±´µÄÊı¾İµÄÆğÊ¼Î»ÖÃ
-	 * @param len {size_t} Òª¿½±´µÄ×î´óÊı¾İÁ¿£¬µ±Îª 0 Ê±£¬ÔòÒ»Ö±¿½±´µ½Á÷½áÊø
-	 * @return {xml_node*} ĞÂ²úÉúµÄ xml_node ¶ÔÏó²»ĞèÒªÓÃ»§ÊÖ¹¤ÊÍ·Å£¬ÒòÎª
-	 *  ÔÚ xml ¶ÔÏó±»ÊÍ·ÅÊ±ÕâĞ©½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷
-	 *  ÓÃ reset À´ÊÍ·ÅÕâĞ© xml_node ½Úµã¶ÔÏó
+	 * åˆ›å»ºä¸€ä¸ª xml_node èŠ‚ç‚¹å¯¹è±¡ï¼ŒåŒæ—¶æŒ‡å®šè¾“å…¥æµä¸­çš„å†…å®¹åšä¸ºèŠ‚ç‚¹æ–‡æœ¬å†…å®¹
+	 * @param tag {const char*} æ ‡ç­¾å
+	 * @param in {istream&} è¾“å…¥æµå¯¹è±¡
+	 * @param off {size_t} å¯¹äºæ–‡ä»¶æµï¼Œåˆ™æŒ‡å®šè¦æ‹·è´çš„æ•°æ®çš„èµ·å§‹ä½ç½®
+	 * @param len {size_t} è¦æ‹·è´çš„æœ€å¤§æ•°æ®é‡ï¼Œå½“ä¸º 0 æ—¶ï¼Œåˆ™ä¸€ç›´æ‹·è´åˆ°æµç»“æŸ
+	 * @return {xml_node*} æ–°äº§ç”Ÿçš„ xml_node å¯¹è±¡ä¸éœ€è¦ç”¨æˆ·æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸º
+	 *  åœ¨ xml å¯¹è±¡è¢«é‡Šæ”¾æ—¶è¿™äº›èŠ‚ç‚¹ä¼šè‡ªåŠ¨è¢«é‡Šæ”¾ï¼Œå½“ç„¶ç”¨æˆ·ä¹Ÿå¯ä»¥åœ¨ä¸ç”¨æ—¶è°ƒ
+	 *  ç”¨ reset æ¥é‡Šæ”¾è¿™äº› xml_node èŠ‚ç‚¹å¯¹è±¡
 	 */
 	virtual xml_node& create_node(const char* tag, istream& in,
 		size_t off = 0, size_t len = 0) = 0;
 
 	/**
-	 * ´´½¨Ò»¸ö xml_node ½Úµã¶ÔÏó
-	 * @param tag {const char*} ±êÇ©Ãû
-	 * @param number {long long int} 64 Î»ÕûÊı
-	 * @return {xml_node*} ĞÂ²úÉúµÄ xml_node ¶ÔÏó²»ĞèÒªÓÃ»§ÊÖ¹¤ÊÍ·Å£¬ÒòÎª
-	 *  ÔÚxml ¶ÔÏó±»ÊÍ·ÅÊ±ÕâĞ©½Úµã»á×Ô¶¯±»ÊÍ·Å£¬µ±È»ÓÃ»§Ò²¿ÉÒÔÔÚ²»ÓÃÊ±µ÷ÓÃ
-	 *  reset À´ÊÍ·ÅÕâĞ© xml_node ½Úµã¶ÔÏó
+	 * åˆ›å»ºä¸€ä¸ª xml_node èŠ‚ç‚¹å¯¹è±¡
+	 * @param tag {const char*} æ ‡ç­¾å
+	 * @param number {long long int} 64 ä½æ•´æ•°
+	 * @return {xml_node*} æ–°äº§ç”Ÿçš„ xml_node å¯¹è±¡ä¸éœ€è¦ç”¨æˆ·æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸º
+	 *  åœ¨xml å¯¹è±¡è¢«é‡Šæ”¾æ—¶è¿™äº›èŠ‚ç‚¹ä¼šè‡ªåŠ¨è¢«é‡Šæ”¾ï¼Œå½“ç„¶ç”¨æˆ·ä¹Ÿå¯ä»¥åœ¨ä¸ç”¨æ—¶è°ƒç”¨
+	 *  reset æ¥é‡Šæ”¾è¿™äº› xml_node èŠ‚ç‚¹å¯¹è±¡
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	xml_node& create_node(const char* tag, __int64 number);
@@ -511,66 +511,66 @@ public:
 #endif
 
 	/**
-	 * »ñµÃ¸ù½Úµã¶ÔÏó£¬µ«ĞèÒª×¢Òâ£¬¸Ã½ÚµãÎªĞé½Úµã£¬ÀïÃæ²»´æ·ÅÈÎºÎÊı¾İ£¬
-	 * ËüÊÇËùÓĞ xml ½Úµã¶ÔÏóµÄ×î¶¥²ã¸¸¶ÔÏó
+	 * è·å¾—æ ¹èŠ‚ç‚¹å¯¹è±¡ï¼Œä½†éœ€è¦æ³¨æ„ï¼Œè¯¥èŠ‚ç‚¹ä¸ºè™šèŠ‚ç‚¹ï¼Œé‡Œé¢ä¸å­˜æ”¾ä»»ä½•æ•°æ®ï¼Œ
+	 * å®ƒæ˜¯æ‰€æœ‰ xml èŠ‚ç‚¹å¯¹è±¡çš„æœ€é¡¶å±‚çˆ¶å¯¹è±¡
 	 * @return {xml_node&}
 	 */
 	virtual xml_node& get_root(void) = 0;
 
 	/**
-	 * ¿ªÊ¼±éÀú¸Ã xml ¶ÔÏó²¢»ñµÃµÚÒ»¸ö½Úµã
-	 * @return {xml_node*} ·µ»Ø¿Õ±íÊ¾¸Ã xml ¶ÔÏóÎª¿Õ½Úµã
-	 *  ×¢£º·µ»ØµÄ½Úµã¶ÔÏóÓÃ»§²»ÄÜÊÖ¹¤ÊÍ·Å£¬ÒòÎª¸Ã¶ÔÏó±»
-	 *  ÄÚ²¿¿â×Ô¶¯ÊÍ·Å
+	 * å¼€å§‹éå†è¯¥ xml å¯¹è±¡å¹¶è·å¾—ç¬¬ä¸€ä¸ªèŠ‚ç‚¹
+	 * @return {xml_node*} è¿”å›ç©ºè¡¨ç¤ºè¯¥ xml å¯¹è±¡ä¸ºç©ºèŠ‚ç‚¹
+	 *  æ³¨ï¼šè¿”å›çš„èŠ‚ç‚¹å¯¹è±¡ç”¨æˆ·ä¸èƒ½æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸ºè¯¥å¯¹è±¡è¢«
+	 *  å†…éƒ¨åº“è‡ªåŠ¨é‡Šæ”¾
 	 */
 	virtual xml_node* first_node(void) = 0;
 
 	/**
-	 * ±éÀú¸Ã xml ¶ÔÏóµÄÏÂÒ»¸ö xml ½Úµã
-	 * @return {xml_node*} ·µ»Ø¿Õ±íÊ¾±éÀúÍê±Ï
-	 *  ×¢£º·µ»ØµÄ½Úµã¶ÔÏóÓÃ»§²»ÄÜÊÖ¹¤ÊÍ·Å£¬ÒòÎª¸Ã¶ÔÏó±»
-	 *  ÄÚ²¿¿â×Ô¶¯ÊÍ·Å
+	 * éå†è¯¥ xml å¯¹è±¡çš„ä¸‹ä¸€ä¸ª xml èŠ‚ç‚¹
+	 * @return {xml_node*} è¿”å›ç©ºè¡¨ç¤ºéå†å®Œæ¯•
+	 *  æ³¨ï¼šè¿”å›çš„èŠ‚ç‚¹å¯¹è±¡ç”¨æˆ·ä¸èƒ½æ‰‹å·¥é‡Šæ”¾ï¼Œå› ä¸ºè¯¥å¯¹è±¡è¢«
+	 *  å†…éƒ¨åº“è‡ªåŠ¨é‡Šæ”¾
 	 */
 	virtual xml_node* next_node(void) = 0;
 
 	/**
-	 * ½« xml ¶ÔÏóÊ÷×ª³É×Ö·û´®
-	 * @param out {string&} ´æ´¢×ª»»½á¹ûµÄ»º³åÇø
+	 * å°† xml å¯¹è±¡æ ‘è½¬æˆå­—ç¬¦ä¸²
+	 * @param out {string&} å­˜å‚¨è½¬æ¢ç»“æœçš„ç¼“å†²åŒº
 	 */
 	virtual void build_xml(string& out) const { (void) out; };
 
 	/**
-	 * ½« xml ¶ÔÏó×ª»»Îª×Ö·û´®
-	 * @param len {size_t*} ·Ç NULL Ê±´æ·ÅÊı¾İ³¤¶È
-	 * @return {const char*} xml ×Ö·û´®
+	 * å°† xml å¯¹è±¡è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+	 * @param len {size_t*} é NULL æ—¶å­˜æ”¾æ•°æ®é•¿åº¦
+	 * @return {const char*} xml å­—ç¬¦ä¸²
 	 */
 	virtual const char* to_string(size_t* len = NULL) const = 0;
 
 	/**
-	 * »ñµÃµ±Ç° xml ¶ÔÏóÒÑ¾­·ÖÅäµÄÄÚ´æ´óĞ¡×ÜºÍ
+	 * è·å¾—å½“å‰ xml å¯¹è±¡å·²ç»åˆ†é…çš„å†…å­˜å¤§å°æ€»å’Œ
 	 * @return {size_t}
 	 */
 	virtual size_t space(void) const = 0;
 
 	/**
-	 * ½«¼ÇÂ¼ xml ÒÑ·ÖÅäÄÚ´æ´óĞ¡µÄ±äÁ¿Çå 0
+	 * å°†è®°å½• xml å·²åˆ†é…å†…å­˜å¤§å°çš„å˜é‡æ¸… 0
 	 */
 	virtual void space_clear(void) = 0;
 
 	/**
-	 * »ñµÃµ±Ç° xml ¶ÔÏóÖĞ xml ½ÚµãµÄ×ÜÊı
+	 * è·å¾—å½“å‰ xml å¯¹è±¡ä¸­ xml èŠ‚ç‚¹çš„æ€»æ•°
 	 * @return {size_t}
 	 */
 	virtual size_t node_count(void) const = 0;
 
 	/**
-	 * »ñµÃµ±Ç° xml ¶ÔÏóÖĞËùÓĞ xml ½ÚµãÊôĞÔµÄ×ÜÊı
+	 * è·å¾—å½“å‰ xml å¯¹è±¡ä¸­æ‰€æœ‰ xml èŠ‚ç‚¹å±æ€§çš„æ€»æ•°
 	 * @return {size_t}
 	 */
 	virtual size_t attr_count(void) const = 0;
 
 public:
-	// pipe_stream Ğéº¯ÊıÖØÔØ
+	// pipe_stream è™šå‡½æ•°é‡è½½
 
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);

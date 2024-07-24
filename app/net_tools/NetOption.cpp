@@ -1,4 +1,4 @@
-// NetOption.cpp : ʵ���ļ�
+// NetOption.cpp : 实现文件
 //
 
 #include "stdafx.h"
@@ -7,7 +7,7 @@
 #include ".\netoption.h"
 
 
-// CNetOption �Ի���
+// CNetOption 对话框
 
 IMPLEMENT_DYNAMIC(CNetOption, CDialog)
 
@@ -40,23 +40,23 @@ BOOL CNetOption::OnInitDialog()
 	if (m_smtpAddr.IsEmpty())
 		GetDlgItem(IDC_STATIC_SMTP_ADDR)->SetWindowText("X");
 	else
-		GetDlgItem(IDC_STATIC_SMTP_ADDR)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_SMTP_ADDR)->SetWindowText("√");
 	if (m_pop3Addr.IsEmpty())
 		GetDlgItem(IDC_STATIC_POP3_ADDR)->SetWindowText("X");
 	else
-		GetDlgItem(IDC_STATIC_POP3_ADDR)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_POP3_ADDR)->SetWindowText("√");
 	if (m_userAccount.IsEmpty())
 		GetDlgItem(IDC_STATIC_USER)->SetWindowText("X");
 	else
-		GetDlgItem(IDC_STATIC_USER)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_USER)->SetWindowText("√");
 	if (m_userPasswd.IsEmpty())
 		GetDlgItem(IDC_STATIC_PASS)->SetWindowText("X");
 	else
-		GetDlgItem(IDC_STATIC_PASS)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_PASS)->SetWindowText("√");
 	if (m_recipients.IsEmpty())
 		GetDlgItem(IDC_STATIC_RECIPIENTS)->SetWindowText("X");
 	else
-		GetDlgItem(IDC_STATIC_RECIPIENTS)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_RECIPIENTS)->SetWindowText("√");
 
 	if (m_smtpAddr.IsEmpty())
 		GetDlgItem(IDC_SMTP_ADDR)->SetFocus();
@@ -115,7 +115,7 @@ CNetOption& CNetOption::SetRecipients(const char* s)
 	if (s == NULL || *s == 0)
 		return *this;
 
-	ACL_ARGV* tokens = acl_argv_split(s, ",;���� \t\r\n");
+	ACL_ARGV* tokens = acl_argv_split(s, ",;，； \t\r\n");
 	ACL_ITER iter;
 	acl::string buf;
 	acl_foreach(iter, tokens)
@@ -132,8 +132,8 @@ CNetOption& CNetOption::SetRecipients(const char* s)
 void CNetOption::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
-	// TODO: �ڴ˴�������Ϣ�����������
-	// ��Ϊ��ͼ��Ϣ���� CDialog::OnPaint()
+	// TODO: 在此处添加消息处理程序代码
+	// 不为绘图消息调用 CDialog::OnPaint()
 	UpdateData(FALSE);
 }
 
@@ -142,14 +142,14 @@ int CNetOption::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CDialog::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
-	// TODO:  �ڴ�������ר�õĴ�������
+	// TODO:  在此添加您专用的创建代码
 
 	return 0;
 }
 
 void CNetOption::OnEnKillfocusSmtpAddr()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
 	if (m_smtpAddr.IsEmpty())
 	{
@@ -157,12 +157,12 @@ void CNetOption::OnEnKillfocusSmtpAddr()
 		GetDlgItem(IDC_SMTP_ADDR)->SetFocus();
 	}
 	else
-		GetDlgItem(IDC_STATIC_SMTP_ADDR)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_SMTP_ADDR)->SetWindowText("√");
 }
 
 void CNetOption::OnEnKillfocusPop3Addr()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
 	if (m_pop3Addr.IsEmpty())
 	{
@@ -170,12 +170,12 @@ void CNetOption::OnEnKillfocusPop3Addr()
 		GetDlgItem(IDC_POP3_ADDR)->SetFocus();
 	}
 	else
-		GetDlgItem(IDC_STATIC_POP3_ADDR)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_POP3_ADDR)->SetWindowText("√");
 }
 
 void CNetOption::OnEnKillfocusUserAccount()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
 	if (m_userAccount.IsEmpty())
 	{
@@ -183,12 +183,12 @@ void CNetOption::OnEnKillfocusUserAccount()
 		GetDlgItem(IDC_USER_ACCOUNT)->SetFocus();
 	}
 	else
-		GetDlgItem(IDC_STATIC_USER)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_USER)->SetWindowText("√");
 }
 
 void CNetOption::OnEnKillfocusUserPasswd()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
 	if (m_userPasswd.IsEmpty())
 	{
@@ -196,12 +196,12 @@ void CNetOption::OnEnKillfocusUserPasswd()
 		GetDlgItem(IDC_USER_PASSWD)->SetFocus();
 	}
 	else
-		GetDlgItem(IDC_STATIC_PASS)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_PASS)->SetWindowText("√");
 }
 
 void CNetOption::OnEnKillfocusRecipients()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
 	if (m_userAccount.IsEmpty())
 	{
@@ -209,17 +209,17 @@ void CNetOption::OnEnKillfocusRecipients()
 		GetDlgItem(IDC_RECIPIENTS)->SetFocus();
 	}
 	else
-		GetDlgItem(IDC_STATIC_USER)->SetWindowText("��");
+		GetDlgItem(IDC_STATIC_USER)->SetWindowText("√");
 }
 
 void CNetOption::OnBnClickedCancel()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	OnCancel();
 }
 
 void CNetOption::OnBnClickedOk()
 {
-	// TODO: �ڴ����ӿؼ�֪ͨ�����������
+	// TODO: 在此添加控件通知处理程序代码
 	OnOK();
 }

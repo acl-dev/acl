@@ -12,7 +12,7 @@ pgsql_conf::pgsql_conf(const char* dbaddr, const char* dbname)
 	acl_assert(dbaddr && *dbaddr);
 	acl_assert(dbname && *dbname);
 
-	// 地址格式：[dbname@]dbaddr
+	// 碌脴脰路赂帽脢陆拢潞[dbname@]dbaddr
 	const char* ptr = strchr(dbaddr, '@');
 	if (ptr != NULL) {
 		ptr++;

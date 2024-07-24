@@ -11,13 +11,13 @@ int main(void)
 
 #if 1
 	const char *text =
-		"��ջ� <xuganghui> changed: \r\n"
+		"Ðì¸Õ»Ô <xuganghui> changed: \r\n"
 		"What    |Removed             |Added\r\n"
 		"-------------------------------------\r\n"
 		"Status|NEW                   |ASSIGNED\r\n"
 		"AssignedTo|xuganghui         |zhengshuxin\r\n";
 #else
-	const char *text = "ȱ�� 410";
+	const char *text = "È±ÏÝ 410";
 #endif
 
 	ptr = text;

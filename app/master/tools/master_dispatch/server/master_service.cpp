@@ -10,12 +10,12 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// é…ç½®å†…å®¹é¡¹
 
 char *var_cfg_backend_service;
 char *var_cfg_status_servers;
 char *var_cfg_status_service;
-char *var_cfg_session_addr;  // memcache ·şÎñÆ÷µØÖ·£¬ÒÔ±¸½«À´Ê¹ÓÃ
+char *var_cfg_session_addr;  // memcache æœåŠ¡å™¨åœ°å€ï¼Œä»¥å¤‡å°†æ¥ä½¿ç”¨
 char *var_cfg_rpc_addr;
 char *var_cfg_manager_allow;
 char *var_cfg_service_name;
@@ -61,7 +61,7 @@ acl::master_int64_tbl var_conf_int64_tab[] = {
 	{ 0, 0 , 0 , 0, 0 }
 };
 
-// ±¾»ú IP µØÖ·£¬ÓÅÏÈ²ÉÓÃÄÚÍø IP
+// æœ¬æœº IP åœ°å€ï¼Œä¼˜å…ˆé‡‡ç”¨å†…ç½‘ IP
 acl::string var_cfg_local_addr;
 ;
 //////////////////////////////////////////////////////////////////////////////
@@ -84,12 +84,12 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 
 	IConnection* conn;
 
-	// ¸ù¾İ¿Í»§¶ËÁ¬½Ó·şÎñ¶Ë¿ÚºÅµÄ²»Í¬À´Çø·Ö²»Í¬µÄ·şÎñÓ¦ÓÃĞ­Òé
+	// æ ¹æ®å®¢æˆ·ç«¯è¿æ¥æœåŠ¡ç«¯å£å·çš„ä¸åŒæ¥åŒºåˆ†ä¸åŒçš„æœåŠ¡åº”ç”¨åè®®
 	const char* local = client->get_local(true);
 	if (acl_strrncasecmp(local, var_cfg_backend_service,
 		strlen(var_cfg_backend_service)) == 0)
 	{
-		// ´´½¨·şÎñ¶ÔÏó´¦ÀíÀ´×ÔÓÚºó¶Ë·şÎñÄ£¿éµÄÇëÇó
+		// åˆ›å»ºæœåŠ¡å¯¹è±¡å¤„ç†æ¥è‡ªäºåç«¯æœåŠ¡æ¨¡å—çš„è¯·æ±‚
 		conn = new ServerConnection(client);
 	}
 	else if (acl_strrncasecmp(local, var_cfg_status_service,
@@ -107,11 +107,11 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 			return false;
 		}
 
-		// ´´½¨·şÎñ¶ÔÏó´¦Àí×´Ì¬»ã±¨µÄÇëÇó
+		// åˆ›å»ºæœåŠ¡å¯¹è±¡å¤„ç†çŠ¶æ€æ±‡æŠ¥çš„è¯·æ±‚
 		conn = new StatusConnection(client);
 	}
 	else
-		// ´´½¨¶ÔÏó´¦ÀíÀ´×ÔÓÚÇ°¶Ë¿Í»§¶ËÄ£¿éµÄÇëÇó
+		// åˆ›å»ºå¯¹è±¡å¤„ç†æ¥è‡ªäºå‰ç«¯å®¢æˆ·ç«¯æ¨¡å—çš„è¯·æ±‚
 		conn = new ClientConnection(client, var_cfg_conn_expired);
 
 	conn->run();
@@ -122,11 +122,11 @@ bool master_service::on_accept(acl::aio_socket_stream* client)
 void master_service::find_addr_include(acl::string& name, acl::string& addr,
 	const char* nic_names, const char* net_addrs)
 {
-	ACL_IFCONF *ifconf;	/* Íø¿¨²éÑ¯½á¹û¶ÔÏó */
-	ACL_IFADDR *ifaddr;	/* Ã¿¸öÍø¿¨ĞÅÏ¢¶ÔÏó */
-	ACL_ITER iter;		/* ±éÀú¶ÔÏó */
+	ACL_IFCONF *ifconf;	/* ç½‘å¡æŸ¥è¯¢ç»“æœå¯¹è±¡ */
+	ACL_IFADDR *ifaddr;	/* æ¯ä¸ªç½‘å¡ä¿¡æ¯å¯¹è±¡ */
+	ACL_ITER iter;		/* éå†å¯¹è±¡ */
 
-	/* ²éÑ¯±¾»úËùÓĞÍø¿¨ĞÅÏ¢ */
+	/* æŸ¥è¯¢æœ¬æœºæ‰€æœ‰ç½‘å¡ä¿¡æ¯ */
 	ifconf = acl_get_ifaddrs();
 
 	if (ifconf == NULL)
@@ -145,7 +145,7 @@ void master_service::find_addr_include(acl::string& name, acl::string& addr,
 
 	bool find_nic;
 
-	/* ±éÀúËùÓĞÍø¿¨µÄĞÅÏ¢, ´ÓÖĞÕÒ³öÆ¥ÅäÄÚÍøÍø¿¨µØÖ·µÄÑ¡Ïî */
+	/* éå†æ‰€æœ‰ç½‘å¡çš„ä¿¡æ¯, ä»ä¸­æ‰¾å‡ºåŒ¹é…å†…ç½‘ç½‘å¡åœ°å€çš„é€‰é¡¹ */
 	acl_foreach(iter, ifconf)
 	{
 		ifaddr = (ACL_IFADDR*) iter.data;
@@ -157,7 +157,7 @@ void master_service::find_addr_include(acl::string& name, acl::string& addr,
 			continue;
 		}
 
-		// ÕÒµ½Íø¿¨ÃûÆ¥ÅäµÄµØÖ·
+		// æ‰¾åˆ°ç½‘å¡ååŒ¹é…çš„åœ°å€
 		find_nic = false;
 		for (std::vector<acl::string>::const_iterator cit
 			= names.begin(); cit != names.end(); ++cit)
@@ -173,7 +173,7 @@ void master_service::find_addr_include(acl::string& name, acl::string& addr,
 		if (find_nic == false)
 			continue;
 
-		// ÕÒµ½ IP µØÖ·Æ¥ÅäµÄµØÖ·
+		// æ‰¾åˆ° IP åœ°å€åŒ¹é…çš„åœ°å€
 		for (std::vector<acl::string>::const_iterator cit
 			= addrs.begin(); cit != addrs.end(); ++cit)
 		{
@@ -188,7 +188,7 @@ void master_service::find_addr_include(acl::string& name, acl::string& addr,
 			break;
 	}
 
-	/* ÊÍ·Å²éÑ¯½á¹û */
+	/* é‡Šæ”¾æŸ¥è¯¢ç»“æœ */
 	acl_free_ifaddrs(ifconf);
 
 	if (addr.empty())
@@ -215,42 +215,42 @@ void master_service::proc_on_init()
 	if (var_cfg_manage_timer <= 0)
 		var_cfg_manage_timer = 1;
 
-	// Æô¶¯ºóÌ¨¶¨Ê±Æ÷£¬ÓÃÀ´´¦ÀíÎ´´¦ÀíµÄÇ°¶Ë¿Í»§¶ËÁ¬½Ó
+	// å¯åŠ¨åå°å®šæ—¶å™¨ï¼Œç”¨æ¥å¤„ç†æœªå¤„ç†çš„å‰ç«¯å®¢æˆ·ç«¯è¿æ¥
 	manage_timer_ = new ManagerTimer();
 	manage_timer_->keep_timer(true);
 	manage_timer_->set_task(1, var_cfg_manage_timer * 1000000);
 
-	// µ÷ÓÃ»ùÀà·½·¨ÉèÖÃ¶¨Ê±Æ÷ÈÎÎñ
+	// è°ƒç”¨åŸºç±»æ–¹æ³•è®¾ç½®å®šæ—¶å™¨ä»»åŠ¡
 	proc_set_timer(manage_timer_);
 
-	// Èç¹ûÅäÖÃÁË×´Ì¬·şÎñÆ÷£¬ÔòÆô¶¯×´Ì¬»ã±¨¶¨Ê±Æ÷£¬¶¨Ê±Ïò×´Ì¬·şÎñÆ÷
-	// »ã±¨½ø³Ì×´Ì¬
+	// å¦‚æœé…ç½®äº†çŠ¶æ€æœåŠ¡å™¨ï¼Œåˆ™å¯åŠ¨çŠ¶æ€æ±‡æŠ¥å®šæ—¶å™¨ï¼Œå®šæ—¶å‘çŠ¶æ€æœåŠ¡å™¨
+	// æ±‡æŠ¥è¿›ç¨‹çŠ¶æ€
 	if (var_cfg_status_servers && *var_cfg_status_servers
 		&& var_cfg_status_timer > 0)
 	{
-		// Æô¶¯·şÎñÆ÷×´Ì¬»ã±¨¶¨Ê±Æ÷
+		// å¯åŠ¨æœåŠ¡å™¨çŠ¶æ€æ±‡æŠ¥å®šæ—¶å™¨
 		status_timer_ = new StatusTimer();
 		status_timer_->keep_timer(true);
 		status_timer_->set_task(1, var_cfg_status_timer * 1000000);
 		proc_set_timer(status_timer_);
 	}
 
-	// Èç¹ûÉèÖÃÁË×´Ì¬·şÎñ£¬ÔòÆô¶¯×´Ì¬»ã×Ü¶¨Ê±Æ÷£¬ÒÔµÈ´ı¹ÜÀí¶ËµÄÁ¬½ÓÇëÇó
+	// å¦‚æœè®¾ç½®äº†çŠ¶æ€æœåŠ¡ï¼Œåˆ™å¯åŠ¨çŠ¶æ€æ±‡æ€»å®šæ—¶å™¨ï¼Œä»¥ç­‰å¾…ç®¡ç†ç«¯çš„è¿æ¥è¯·æ±‚
 	if (var_cfg_status_service && *var_cfg_status_service
 		&& var_cfg_server_timer > 0)
 	{
-		// Æô¶¯Í³¼ÆËùÓĞ·şÎñÆ÷×´Ì¬¶¨Ê±Æ÷
+		// å¯åŠ¨ç»Ÿè®¡æ‰€æœ‰æœåŠ¡å™¨çŠ¶æ€å®šæ—¶å™¨
 		server_timer_ = new ServerTimer();
 		server_timer_->keep_timer(true);
 		server_timer_->set_task(1, var_cfg_server_timer * 1000000);
 		proc_set_timer(server_timer_);
 	}
 
-	// µ÷ÓÃ»ùÀàº¯Êı»ñµÃÒì²½ÒıÇæ¾ä±ú
+	// è°ƒç”¨åŸºç±»å‡½æ•°è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„
 	acl::aio_handle* handle = get_handle();
 	assert(handle != NULL);
 
-	// ³õÊ¼»¯ RPC ¿ò¼Ü
+	// åˆå§‹åŒ– RPC æ¡†æ¶
 	rpc_manager::get_instance().init(handle, var_cfg_rpc_nthreads,
 		var_cfg_rpc_addr);
 }

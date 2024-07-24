@@ -9,7 +9,7 @@ public:
 	~collect_client() {}
 
 protected:
-	// 基类 acl::thread 中虚方法
+	// 鍩虹被 acl::thread 涓櫄鏂规硶
 	void* run();
 
 private:

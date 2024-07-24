@@ -146,8 +146,8 @@ bool HttpServlet::start(void)
 	}
 
 	if (stream_ == NULL) {
-		// Êý¾ÝÁ÷Îª¿Õ£¬Ôòµ± CGI Ä£Ê½´¦Àí£¬½«±ê×¼ÊäÈëÊä³ö
-		// ×÷ÎªÊý¾ÝÁ÷
+		// æ•°æ®æµä¸ºç©ºï¼Œåˆ™å½“ CGI æ¨¡å¼å¤„ç†ï¼Œå°†æ ‡å‡†è¾“å…¥è¾“å‡º
+		// ä½œä¸ºæ•°æ®æµ
 		in = NEW socket_stream();
 		in->open(ACL_VSTREAM_IN);
 
@@ -159,7 +159,7 @@ bool HttpServlet::start(void)
 		cgi_mode = false;
 	}
 
-	// ÔÚ HTTP ³¤Á¬½ÓÖØ¸´ÇëÇóÇé¿öÏÂ£¬ÒÔ·ÀÍòÒ»£¬ÐèÒªÊ×ÏÈÉ¾³ýÇëÇó/ÏìÓ¦¶ÔÏó
+	// åœ¨ HTTP é•¿è¿žæŽ¥é‡å¤è¯·æ±‚æƒ…å†µä¸‹ï¼Œä»¥é˜²ä¸‡ä¸€ï¼Œéœ€è¦é¦–å…ˆåˆ é™¤è¯·æ±‚/å“åº”å¯¹è±¡
 	delete req_;
 	delete res_;
 
@@ -168,7 +168,7 @@ bool HttpServlet::start(void)
 			parse_body_limit_);
 	req_->setParseBody(parse_body_);
 
-	// ÉèÖÃ HttpServletRequest ¶ÔÏó
+	// è®¾ç½® HttpServletRequest å¯¹è±¡
 	res_->setHttpServletRequest(req_);
 
 	if (rw_timeout_ >= 0) {
@@ -180,7 +180,7 @@ bool HttpServlet::start(void)
 	string method_s(32);
 	http_method_t method = req_->getMethod(&method_s);
 
-	// ¸ù¾ÝÇëÇóµÄÖµ×Ô¶¯Éè¶¨ÊÇ·ñÐèÒª±£³Ö³¤Á¬½Ó
+	// æ ¹æ®è¯·æ±‚çš„å€¼è‡ªåŠ¨è®¾å®šæ˜¯å¦éœ€è¦ä¿æŒé•¿è¿žæŽ¥
 	if (!cgi_mode) {
 		res_->setKeepAlive(req_->isKeepAlive());
 	}
@@ -189,26 +189,26 @@ bool HttpServlet::start(void)
 
 	switch (method) {
 	case HTTP_METHOD_GET:
-		// ÏÈÉèÖÃ³¢ÊÔ¾É·½·¨±êÖ¾Îª false£¬Èç¹ûÓÃ»§Î´ÊµÏÖµ±Ç°Ðé·½·¨£¬Ôò
-		// »áµ÷ÓÃ»ùÀàÐé·½·¨£¬ÔÚÆäÖÐ»áÉèÖÃ¸Ã±êÖ¾Îª true£¬´Ó¶øÔÙ³¢ÊÔÊ¹ÓÃ
-		// ¾ÉµÄÐé½Ó¿Ú£¬ÕâÑù×öÖ÷ÒªÊÇÎªÁËÀúÊ·¼æÈÝÐÔÒòËØ¡£
+		// å…ˆè®¾ç½®å°è¯•æ—§æ–¹æ³•æ ‡å¿—ä¸º falseï¼Œå¦‚æžœç”¨æˆ·æœªå®žçŽ°å½“å‰è™šæ–¹æ³•ï¼Œåˆ™
+		// ä¼šè°ƒç”¨åŸºç±»è™šæ–¹æ³•ï¼Œåœ¨å…¶ä¸­ä¼šè®¾ç½®è¯¥æ ‡å¿—ä¸º trueï¼Œä»Žè€Œå†å°è¯•ä½¿ç”¨
+		// æ—§çš„è™šæŽ¥å£ï¼Œè¿™æ ·åšä¸»è¦æ˜¯ä¸ºäº†åŽ†å²å…¼å®¹æ€§å› ç´ ã€‚
 		try_old_ws_ = false;
 
-		// Èç¹û²»°üº¬ Websocket ÎÕÊÖÐÅÏ¢£¬Ôòµ±ÆÕÍ¨ GET ¹ý³Ì´¦Àí
+		// å¦‚æžœä¸åŒ…å« Websocket æ¡æ‰‹ä¿¡æ¯ï¼Œåˆ™å½“æ™®é€š GET è¿‡ç¨‹å¤„ç†
 		if (!upgradeWebsocket(*req_, *res_)) {
 			ret = doGet(*req_, *res_);
 		}
-		// µ±Îª Websocket ÎÕÊÖÇëÇóÊ±£¬ÏÈÏìÓ¦ÎÕÊÖÐÅÏ¢
+		// å½“ä¸º Websocket æ¡æ‰‹è¯·æ±‚æ—¶ï¼Œå…ˆå“åº”æ¡æ‰‹ä¿¡æ¯
 		else if (!res_->sendHeader()) {
 			ret = false;
 			logger_error("sendHeader error!");
 		}
-		// È»ºóµ÷ÓÃ Websocket ´¦Àí¹ý³Ì£¬Èç¹û·µ»Ø³É¹¦£¬ÔòËµÃ÷×ÓÀàÊµÏÖÁË
-		// ¸ÃÐé·½·¨£¬ËùÒÔÎÞÐèÔÙ´Î³¢ÊÔ¾É·½·¨
+		// ç„¶åŽè°ƒç”¨ Websocket å¤„ç†è¿‡ç¨‹ï¼Œå¦‚æžœè¿”å›žæˆåŠŸï¼Œåˆ™è¯´æ˜Žå­ç±»å®žçŽ°äº†
+		// è¯¥è™šæ–¹æ³•ï¼Œæ‰€ä»¥æ— éœ€å†æ¬¡å°è¯•æ—§æ–¹æ³•
 		else if (!(ret = doWebSocket(*req_, *res_))) {
-			// Èç¹û·µ»Ø false ÊÇÒòÎª×ÓÀàÎ´ÊµÏÖ doWebSocket Ôì³ÉµÄ
-			// (Èç¹ûµ÷ÓÃÁË»ùÀàµÄÐé·½·¨£¬ÔòÔÚÆäÖÐ»áÉèÖÃ try_old_ws_),
-			// ÔòÔÙ³¢ÊÔ¾ÉµÄ´¦Àí¹ý³Ì doWebsocket
+			// å¦‚æžœè¿”å›ž false æ˜¯å› ä¸ºå­ç±»æœªå®žçŽ° doWebSocket é€ æˆçš„
+			// (å¦‚æžœè°ƒç”¨äº†åŸºç±»çš„è™šæ–¹æ³•ï¼Œåˆ™åœ¨å…¶ä¸­ä¼šè®¾ç½® try_old_ws_),
+			// åˆ™å†å°è¯•æ—§çš„å¤„ç†è¿‡ç¨‹ doWebsocket
 			if (try_old_ws_) {
 				ret = doWebsocket(*req_, *res_);
 			}
@@ -246,7 +246,7 @@ bool HttpServlet::start(void)
 		break;
 	case HTTP_METHOD_UNKNOWN:
 	default:
-		ret = false; // ÓÐ¿ÉÄÜÊÇIOÊ§°Ü»òÎ´Öª·½·¨
+		ret = false; // æœ‰å¯èƒ½æ˜¯IOå¤±è´¥æˆ–æœªçŸ¥æ–¹æ³•
 
 		switch (req_->getLastError()) {
 		case HTTP_REQ_ERR_IO:
@@ -274,9 +274,9 @@ bool HttpServlet::start(void)
 	}
 
 	if (in != out) {
-		// Èç¹ûÊÇ±ê×¼ÊäÈëÊä³öÁ÷£¬ÔòÐèÒªÏÈ½«Êý¾ÝÁ÷Óë±ê×¼ÊäÈëÊä³ö½â°ó£¬
-		// È»ºó²ÅÄÜÊÍ·ÅÊý¾ÝÁ÷¶ÔÏó£¬Êý¾ÝÁ÷ÄÚ²¿»á×Ô¶¯ÅÐ¶ÏÁ÷¾ä±úºÏ·¨ÐÔ
-		// ÕâÑù¿ÉÒÔ±£Ö¤Óë¿Í»§¶Ë±£³Ö³¤Á¬½Ó
+		// å¦‚æžœæ˜¯æ ‡å‡†è¾“å…¥è¾“å‡ºæµï¼Œåˆ™éœ€è¦å…ˆå°†æ•°æ®æµä¸Žæ ‡å‡†è¾“å…¥è¾“å‡ºè§£ç»‘ï¼Œ
+		// ç„¶åŽæ‰èƒ½é‡Šæ”¾æ•°æ®æµå¯¹è±¡ï¼Œæ•°æ®æµå†…éƒ¨ä¼šè‡ªåŠ¨åˆ¤æ–­æµå¥æŸ„åˆæ³•æ€§
+		// è¿™æ ·å¯ä»¥ä¿è¯ä¸Žå®¢æˆ·ç«¯ä¿æŒé•¿è¿žæŽ¥
 		in->unbind();
 		out->unbind();
 		delete in;
@@ -296,7 +296,7 @@ bool HttpServlet::doRun(void)
 		return false;
 	}
 
-	// ·µ»Ø¸øÉÏ²ãµ÷ÓÃÕß£ºtrue ±íÊ¾¼ÌÐø±£³Ö³¤Á¬½Ó£¬·ñÔò±íÊ¾Ðè¶Ï¿ªÁ¬½Ó
+	// è¿”å›žç»™ä¸Šå±‚è°ƒç”¨è€…ï¼štrue è¡¨ç¤ºç»§ç»­ä¿æŒé•¿è¿žæŽ¥ï¼Œå¦åˆ™è¡¨ç¤ºéœ€æ–­å¼€è¿žæŽ¥
 	return req_->isKeepAlive()
 		&& res_->getHttpHeader().get_keep_alive();
 }

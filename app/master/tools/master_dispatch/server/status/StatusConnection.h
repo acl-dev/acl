@@ -2,7 +2,7 @@
 #include "IConnection.h"
 
 /**
- * ·þÎñ¶ËÁ¬½Ó¶ÔÏó
+ * æœåŠ¡ç«¯è¿žæŽ¥å¯¹è±¡
  */
 class StatusConnection : public IConnection
 {
@@ -11,9 +11,9 @@ public:
 	~StatusConnection() {}
 
 	/**
-	 * ¹Ø±Õ·þÎñ¶ËÁ¬½Ó£¬µ±Á¬½Ó¹Ø±ÕÊ±»á´¥·¢ ServiceIOCallback ÖÐµÄ
-	 * close_callback ¹ý³Ì£¬Í¬Ê±ÔÚ ServiceIOCallback ¶ÔÏóµÄÎö¹¹¹ý³Ì
-	 * ÖÐ»áÉ¾³ý·þÎñ¶Ë±¾·þÎñ¶ËÁ¬½Ó¶ÔÏó
+	 * å…³é—­æœåŠ¡ç«¯è¿žæŽ¥ï¼Œå½“è¿žæŽ¥å…³é—­æ—¶ä¼šè§¦å‘ ServiceIOCallback ä¸­çš„
+	 * close_callback è¿‡ç¨‹ï¼ŒåŒæ—¶åœ¨ ServiceIOCallback å¯¹è±¡çš„æžæž„è¿‡ç¨‹
+	 * ä¸­ä¼šåˆ é™¤æœåŠ¡ç«¯æœ¬æœåŠ¡ç«¯è¿žæŽ¥å¯¹è±¡
 	 */
 	void close();
 

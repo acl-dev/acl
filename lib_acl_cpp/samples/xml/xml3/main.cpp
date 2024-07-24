@@ -18,7 +18,7 @@ int main(void)
 	acl::json json;
 	json.update(data);
 
-	// ½« JSON Êı¾İ×ªÎª XML Êı¾İµÄ¹ı³Ì
+	// å°† JSON æ•°æ®è½¬ä¸º XML æ•°æ®çš„è¿‡ç¨‹
 
 	acl::xml1 xml;
 	acl::xml_node& server_node = xml.create_node("server");
@@ -63,7 +63,7 @@ int main(void)
 
 		while (proc != NULL)
 		{
-			// ´´½¨  proc XML ½áµã
+			// åˆ›å»º  proc XML ç»“ç‚¹
 			acl::xml_node& proc_node = xml.create_node("proc");
 			server_node.add_child(proc_node);
 

@@ -14,23 +14,23 @@ int main(int argc, char* argv[])
 			ACL_SLICE_FLAG_LP64_ALIGN);
 	}
 
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
 	master_service& ms = acl::singleton2<master_service>::get_instance();
 
-	// ÉèÖÃÅäÖÃ²ÎÊı±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	ms.set_cfg_int(var_conf_int_tab);
 	ms.set_cfg_str(var_conf_str_tab);
 	ms.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
 		const char* addr = "127.0.0.1|8888";
 		printf("listen on: %s\r\n", addr);
-		ms.run_alone(addr, NULL, acl::ENGINE_KERNEL);  // µ¥¶ÀÔËĞĞ·½Ê½
+		ms.run_alone(addr, NULL, acl::ENGINE_KERNEL);  // å•ç‹¬è¿è¡Œæ–¹å¼
 	}
 	else
 	{
@@ -38,9 +38,9 @@ int main(int argc, char* argv[])
 		const char* addr = "127.0.0.1|8888";
 		printf("listen on: %s\r\n", addr);
 
-		ms.run_alone(addr, NULL, acl::ENGINE_KERNEL);  // µ¥¶ÀÔËĞĞ·½Ê½
+		ms.run_alone(addr, NULL, acl::ENGINE_KERNEL);  // å•ç‹¬è¿è¡Œæ–¹å¼
 #else
-		ms.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		ms.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 #endif
 	}
 

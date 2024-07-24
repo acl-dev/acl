@@ -29,46 +29,46 @@ ACL_API void acl_memory_stat(void);
 ACL_API void acl_memory_alloc_stat(void);
 
 /**
- * ´ò¿ª¶¯Ì¬ÄÚ´æ³Ø¹¦ÄÜ
- * @param max_size {size_t} ÄÚ´æ³Ø×î´ó¿Õ¼ä´óĞ¡£¬µ¥Î»Îª×Ö½Ú
- * @param use_mutex {int} ÄÚ´æ³ØÄÚ²¿ÊÇ·ñ²ÉÓÃ»¥³âËø£¬Èç¹ûÊÇ¶àÏß³Ì³ÌĞòÔòÓ¦¸Ã
- *  ÉèÖÃ use_mutex Îª·Ç0Öµ
+ * æ‰“å¼€åŠ¨æ€å†…å­˜æ± åŠŸèƒ½
+ * @param max_size {size_t} å†…å­˜æ± æœ€å¤§ç©ºé—´å¤§å°ï¼Œå•ä½ä¸ºå­—èŠ‚
+ * @param use_mutex {int} å†…å­˜æ± å†…éƒ¨æ˜¯å¦é‡‡ç”¨äº’æ–¥é”ï¼Œå¦‚æœæ˜¯å¤šçº¿ç¨‹ç¨‹åºåˆ™åº”è¯¥
+ *  è®¾ç½® use_mutex ä¸ºé0å€¼
  */
 ACL_API void acl_mempool_open(size_t max_size, int use_mutex);
 
 /**
- * ¹Ø±ÕÄÚ´æ³Ø¹¦ÄÜ
+ * å…³é—­å†…å­˜æ± åŠŸèƒ½
  */
 ACL_API void acl_mempool_close(void);
 
 /**
- * µ±ÄÚ´æ³Ø´ò¿ªºó£¬¿ÉÒÔÍ¨¹ı´Ëº¯Êı¿ØÖÆÄÚ´æ³Ø×´Ì¬
+ * å½“å†…å­˜æ± æ‰“å¼€åï¼Œå¯ä»¥é€šè¿‡æ­¤å‡½æ•°æ§åˆ¶å†…å­˜æ± çŠ¶æ€
  */
 ACL_API void acl_mempool_ctl(int name, ...);
-#define	ACL_MEMPOOL_CTL_END         0  /**< ½áÊø±êÖ¾ */
-#define	ACL_MEMPOOL_CTL_MUTEX       1  /**< ¿ØÖÆÄÚ´æ³ØÊÇ·ñ¼ÓËø */
-#define	ACL_MEMPOOL_CTL_DISABLE     2  /**< ÊÇ·ñ¹Ø±ÕÄÚ´æ³Ø */
+#define	ACL_MEMPOOL_CTL_END         0  /**< ç»“æŸæ ‡å¿— */
+#define	ACL_MEMPOOL_CTL_MUTEX       1  /**< æ§åˆ¶å†…å­˜æ± æ˜¯å¦åŠ é” */
+#define	ACL_MEMPOOL_CTL_DISABLE     2  /**< æ˜¯å¦å…³é—­å†…å­˜æ±  */
 
 /**
- * µ±Ç°ÄÚ´æ³ØÒÑ¾­·ÖÅäµÄÄÚ´æ´óĞ¡
- * @return {int} ÒÑ¾­·ÖÅäµÄÄÚ´æ´óĞ¡
+ * å½“å‰å†…å­˜æ± å·²ç»åˆ†é…çš„å†…å­˜å¤§å°
+ * @return {int} å·²ç»åˆ†é…çš„å†…å­˜å¤§å°
  */
 ACL_API int acl_mempool_total_allocated(void);
 
 /**
- * ½«µ±Ç°µÄÄÚ´æ³Ø×´Ì¬ĞÅÏ¢Êä³öÖÁÈÕÖ¾»òÆÁÄ»ÖĞ
+ * å°†å½“å‰çš„å†…å­˜æ± çŠ¶æ€ä¿¡æ¯è¾“å‡ºè‡³æ—¥å¿—æˆ–å±å¹•ä¸­
  */
 ACL_API void acl_mempool_status(void);
 
-/*---------------- ACL¿âÖĞÈ±Ê¡µÄÄÚ´æ·ÖÅä¡¢ÊÍ·ÅµÈ¹ÜÀí½Ó¿Ú -------------------*/
+/*---------------- ACLåº“ä¸­ç¼ºçœçš„å†…å­˜åˆ†é…ã€é‡Šæ”¾ç­‰ç®¡ç†æ¥å£ -------------------*/
 
 /**
- * »ñµÃµ±Ç°ÄÚ´æÖ¸ÕëµÄÒ»Ğ©×´Ì¬ĞÅÏ¢£¬Èç¸ÃÄÚ´æµÄÊµ¼Ê´óĞ¡Óë¶ÔÍâ·ÖÅä´óĞ¡
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param ptr {void*} ¶¯Ì¬·ÖÅäµÄÄÚ´æÍâ²¿µØÖ·
- * @param len {size_t*} ´æ´¢¸ÃÄÚ´æµÄÍâ²¿¿ÉÓÃ´óĞ¡
- * @param real_len {size*} ´æ´¢¸ÃÄÚ´æµÄÊµ¼Ê´óĞ¡(ÒòÎªÄÚ²¿ÓĞÒ»Ğ©¿ØÖÆ×Ö½Ú)
+ * è·å¾—å½“å‰å†…å­˜æŒ‡é’ˆçš„ä¸€äº›çŠ¶æ€ä¿¡æ¯ï¼Œå¦‚è¯¥å†…å­˜çš„å®é™…å¤§å°ä¸å¯¹å¤–åˆ†é…å¤§å°
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param ptr {void*} åŠ¨æ€åˆ†é…çš„å†…å­˜å¤–éƒ¨åœ°å€
+ * @param len {size_t*} å­˜å‚¨è¯¥å†…å­˜çš„å¤–éƒ¨å¯ç”¨å¤§å°
+ * @param real_len {size*} å­˜å‚¨è¯¥å†…å­˜çš„å®é™…å¤§å°(å› ä¸ºå†…éƒ¨æœ‰ä¸€äº›æ§åˆ¶å­—èŠ‚)
  */
 ACL_API void acl_default_memstat(const char *filename, int line,
         void *ptr, size_t *len, size_t *real_len);
@@ -76,96 +76,96 @@ ACL_API void acl_default_memstat(const char *filename, int line,
 ACL_API void acl_default_meminfo(void);
 
 /**
- * ÉèÖÃÄÚ´æ·ÖÅä×î´ó±¨¾¯Öµ£¬¼´µ±µ÷ÓÃÕß·ÖÅäµÄÄÚ´æ´óĞ¡´ïµ½´Ë±¨¾¯Öµºó£¬ÄÚ²¿»á×Ô¶¯
- * ¼ÇÂ¼±¨¾¯ÈÕÖ¾£¬Í¬Ê±½«µ÷ÓÃ¶ÑÕ»´òÓ¡ÖÁÈÕÖ¾ÖĞ£»ÄÚ²¿È±ÉÙÖµÊÇ 100000000
- * @param len {size_t} ×î´ó±¨¾¯Öµ£¬¸ÃÖµ±ØĞë > 0
+ * è®¾ç½®å†…å­˜åˆ†é…æœ€å¤§æŠ¥è­¦å€¼ï¼Œå³å½“è°ƒç”¨è€…åˆ†é…çš„å†…å­˜å¤§å°è¾¾åˆ°æ­¤æŠ¥è­¦å€¼åï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨
+ * è®°å½•æŠ¥è­¦æ—¥å¿—ï¼ŒåŒæ—¶å°†è°ƒç”¨å †æ ˆæ‰“å°è‡³æ—¥å¿—ä¸­ï¼›å†…éƒ¨ç¼ºå°‘å€¼æ˜¯ 100000000
+ * @param len {size_t} æœ€å¤§æŠ¥è­¦å€¼ï¼Œè¯¥å€¼å¿…é¡» > 0
  */
 ACL_API void acl_default_set_memlimit(size_t len);
 
 /**
- * »ñµÃµ±Ç°ËùÉèÖÃµÄÄÚ´æ·ÖÅä×î´ó±¨¾¯Öµ´óĞ¡(ÄÚ²¿È±Ê¡ÖµÊÇ 100000000)
+ * è·å¾—å½“å‰æ‰€è®¾ç½®çš„å†…å­˜åˆ†é…æœ€å¤§æŠ¥è­¦å€¼å¤§å°(å†…éƒ¨ç¼ºçœå€¼æ˜¯ 100000000)
  * @return {size_t}
  */
 ACL_API size_t acl_default_get_memlimit(void);
 
 /**
- * ACL¿âÖĞÈ±Ê¡µÄÄÚ´æ·ÖÅäÆ÷½Ó¿Ú, ·ÖÅäÄÚ´æµ«²¢²»³õÊ¼»¯Ëù·ÖÅäÄÚ´æµÄÄÚÈİ
- * ÀàËÆÓÚ±ê×¼¿âÖĞµÄ malloc
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param size {size_t} ĞèÒªµÄÄÚ´æ´óĞ¡
- * @return {void*} ·ÖÅäµÄ¿ÉÓÃµØÖ·, Èç¹û·ÖÅäÊ§°Ü£¬ÔòÄÚ²¿»á×Ô¶¯coredump
- *   ĞèÒªµ÷ÓÃ acl_default_free ÊÍ·Å
+ * ACLåº“ä¸­ç¼ºçœçš„å†…å­˜åˆ†é…å™¨æ¥å£, åˆ†é…å†…å­˜ä½†å¹¶ä¸åˆå§‹åŒ–æ‰€åˆ†é…å†…å­˜çš„å†…å®¹
+ * ç±»ä¼¼äºæ ‡å‡†åº“ä¸­çš„ malloc
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param size {size_t} éœ€è¦çš„å†…å­˜å¤§å°
+ * @return {void*} åˆ†é…çš„å¯ç”¨åœ°å€, å¦‚æœåˆ†é…å¤±è´¥ï¼Œåˆ™å†…éƒ¨ä¼šè‡ªåŠ¨coredump
+ *   éœ€è¦è°ƒç”¨ acl_default_free é‡Šæ”¾
  */
 ACL_API void *acl_default_malloc(const char *filename, int line, size_t size);
 
 /**
- * ACL¿âÖĞÈ±Ê¡µÄÄÚ´æ·ÖÅäÆ÷½Ó¿Ú, ·ÖÅäÄÚ´æ²¢³õÊ¼»¯Ëù·ÖÅäÄÚ´æµÄÄÚÈİÎª0
- * ÀàËÆÓÚ±ê×¼¿âÖĞµÄ calloc
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param nmemb {size_t} ÄÚ´æ¿éµÄ¸öÊı
- * @param size {size_t} Ã¿¸öÄÚ´æ¿éµÄ´óĞ¡
- * @return {void*} ·ÖÅäµÄ¿ÉÓÃµØÖ·, Èç¹û·ÖÅäÊ§°Ü£¬ÔòÄÚ²¿»á×Ô¶¯coredump
- *   ĞèÒªµ÷ÓÃ acl_default_free ÊÍ·Å
+ * ACLåº“ä¸­ç¼ºçœçš„å†…å­˜åˆ†é…å™¨æ¥å£, åˆ†é…å†…å­˜å¹¶åˆå§‹åŒ–æ‰€åˆ†é…å†…å­˜çš„å†…å®¹ä¸º0
+ * ç±»ä¼¼äºæ ‡å‡†åº“ä¸­çš„ calloc
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param nmemb {size_t} å†…å­˜å—çš„ä¸ªæ•°
+ * @param size {size_t} æ¯ä¸ªå†…å­˜å—çš„å¤§å°
+ * @return {void*} åˆ†é…çš„å¯ç”¨åœ°å€, å¦‚æœåˆ†é…å¤±è´¥ï¼Œåˆ™å†…éƒ¨ä¼šè‡ªåŠ¨coredump
+ *   éœ€è¦è°ƒç”¨ acl_default_free é‡Šæ”¾
  */
 ACL_API void *acl_default_calloc(const char *filename, int line,
 		size_t nmemb, size_t size);
 
 /**
- * ACL¿âÖĞÈ±Ê¡µÄÄÚ´æ·ÖÅäÆ÷½Ó¿Ú, ÀàËÆÓÚ±ê×¼¿âµÄ realloc
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param ptr {void*} Ö®Ç°ÓÃACL¿âËù·ÖÅäµÄÄÚ´æµØÖ·
- * @param size {size_t} ĞèÒªµÄÄÚ´æ´óĞ¡
- * @return {void*} ·ÖÅäµÄ¿ÉÓÃµØÖ·, Èç¹û·ÖÅäÊ§°Ü£¬ÔòÄÚ²¿»á×Ô¶¯coredump
- *   ĞèÒªµ÷ÓÃ acl_default_free ÊÍ·Å
+ * ACLåº“ä¸­ç¼ºçœçš„å†…å­˜åˆ†é…å™¨æ¥å£, ç±»ä¼¼äºæ ‡å‡†åº“çš„ realloc
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param ptr {void*} ä¹‹å‰ç”¨ACLåº“æ‰€åˆ†é…çš„å†…å­˜åœ°å€
+ * @param size {size_t} éœ€è¦çš„å†…å­˜å¤§å°
+ * @return {void*} åˆ†é…çš„å¯ç”¨åœ°å€, å¦‚æœåˆ†é…å¤±è´¥ï¼Œåˆ™å†…éƒ¨ä¼šè‡ªåŠ¨coredump
+ *   éœ€è¦è°ƒç”¨ acl_default_free é‡Šæ”¾
  */
 ACL_API void *acl_default_realloc(const char *filename, int line,
 		void *ptr, size_t size);
 
 /**
- * ¸´ÖÆ×Ö·û´®£¬ÀàËÆÓÚ±ê×¼¿âÖĞµÄ strdup
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param str {const char*} Ô´×Ö·û´®µØÖ·
- * @return {char*} ĞÂ¸´ÖÆµÄ×Ö·û´®µØÖ·£¬ĞèÒªµ÷ÓÃ acl_default_free ÊÍ·Å
+ * å¤åˆ¶å­—ç¬¦ä¸²ï¼Œç±»ä¼¼äºæ ‡å‡†åº“ä¸­çš„ strdup
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param str {const char*} æºå­—ç¬¦ä¸²åœ°å€
+ * @return {char*} æ–°å¤åˆ¶çš„å­—ç¬¦ä¸²åœ°å€ï¼Œéœ€è¦è°ƒç”¨ acl_default_free é‡Šæ”¾
  */
 ACL_API char *acl_default_strdup(const char *filename, int line, const char *str);
 
 /**
- * ¸´ÖÆ×Ö·û´®£¬µ«ÏŞÖÆ×î´ó×Ö·û´®³¤¶È£¬ÀàËÆÓÚ±ê×¼¿âÖĞµÄ strndup
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param str {const char*} Ô´×Ö·û´®µØÖ·
- * @param len {size_t} ÏŞÖÆĞÂ×Ö·û´®µÄ×î´ó³¤¶ÈÖµ
- * @return {char*} ĞÂ¸´ÖÆµÄ×Ö·û´®µØÖ·£¬ĞèÒªµ÷ÓÃ acl_default_free ÊÍ·Å
+ * å¤åˆ¶å­—ç¬¦ä¸²ï¼Œä½†é™åˆ¶æœ€å¤§å­—ç¬¦ä¸²é•¿åº¦ï¼Œç±»ä¼¼äºæ ‡å‡†åº“ä¸­çš„ strndup
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param str {const char*} æºå­—ç¬¦ä¸²åœ°å€
+ * @param len {size_t} é™åˆ¶æ–°å­—ç¬¦ä¸²çš„æœ€å¤§é•¿åº¦å€¼
+ * @return {char*} æ–°å¤åˆ¶çš„å­—ç¬¦ä¸²åœ°å€ï¼Œéœ€è¦è°ƒç”¨ acl_default_free é‡Šæ”¾
  */
 ACL_API char *acl_default_strndup(const char *filename, int line,
 		const char *str, size_t len);
 
 /**
- * ¸´ÖÆÄÚ´æÊı¾İ
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
- * @param ptr {const void*} Ô´ÄÚ´æµØÖ·
- * @param len {size_t} Ô´ÄÚ´æÇøÓòµÄ³¤¶È
- * @return {void*} ĞÂ¸´ÖÆµÄÄÚ´æµØÖ· 
+ * å¤åˆ¶å†…å­˜æ•°æ®
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
+ * @param ptr {const void*} æºå†…å­˜åœ°å€
+ * @param len {size_t} æºå†…å­˜åŒºåŸŸçš„é•¿åº¦
+ * @return {void*} æ–°å¤åˆ¶çš„å†…å­˜åœ°å€ 
  */
 ACL_API void *acl_default_memdup(const char *filename, int line,
 		const void *ptr, size_t len);
 
 /**
- * ÊÍ·ÅÓÉ acl_devault_xxx Ëù·ÖÅäµÄÄÚ´æ¶¯Ì¬ÄÚ´æ
- * @param filename {const char*} µ÷ÓÃ¸Ãº¯ÊıµÄÎÄ¼şÃû£¬¿ÉÒÔÎª¿Õ
- * @param line {int} µ÷ÓÃ¸Ãº¯ÊıËùÔÚÔ´ÎÄ¼şÖĞµÄĞĞÊı
+ * é‡Šæ”¾ç”± acl_devault_xxx æ‰€åˆ†é…çš„å†…å­˜åŠ¨æ€å†…å­˜
+ * @param filename {const char*} è°ƒç”¨è¯¥å‡½æ•°çš„æ–‡ä»¶åï¼Œå¯ä»¥ä¸ºç©º
+ * @param line {int} è°ƒç”¨è¯¥å‡½æ•°æ‰€åœ¨æºæ–‡ä»¶ä¸­çš„è¡Œæ•°
  */
 ACL_API void  acl_default_free(const char *filename, int line, void *ptr);
 
-/*----- acl_mymalloc.h ÄÚ´æ¹ÜÀí½Ó¿ÚÖĞµÄºêµ÷ÓÃËùÊ¹ÓÃµÄÄÚ´æ¹ÜÀíº¯Êı½Ó¿Ú ------*/
+/*----- acl_mymalloc.h å†…å­˜ç®¡ç†æ¥å£ä¸­çš„å®è°ƒç”¨æ‰€ä½¿ç”¨çš„å†…å­˜ç®¡ç†å‡½æ•°æ¥å£ ------*/
 
-/* ¸Ãº¯Êı½Ó¿Ú¼¯ÆäÊµÊÇµ÷ÓÃÁËÆäËüµÄÄÚ´æ¹ÜÀíÀ´½øĞĞÄÚ´æµÄ·ÖÅäÓëÊÍ·ÅµÈ¹ÜÀí²Ù×÷µÄ£¬
- * ËüÌá¹©ÁË¸ß¼¶ºêµ÷ÓÃµÄÍâ²¿Ê¹ÓÃ½Ó¿Ú£¬·½±ãÓÃ»§²Ù×÷¡£
+/* è¯¥å‡½æ•°æ¥å£é›†å…¶å®æ˜¯è°ƒç”¨äº†å…¶å®ƒçš„å†…å­˜ç®¡ç†æ¥è¿›è¡Œå†…å­˜çš„åˆ†é…ä¸é‡Šæ”¾ç­‰ç®¡ç†æ“ä½œçš„ï¼Œ
+ * å®ƒæä¾›äº†é«˜çº§å®è°ƒç”¨çš„å¤–éƒ¨ä½¿ç”¨æ¥å£ï¼Œæ–¹ä¾¿ç”¨æˆ·æ“ä½œã€‚
  */
 
 ACL_API void *acl_malloc_glue(const char *filename, int line, size_t size);

@@ -15,24 +15,24 @@ extern "C" {
 #endif
 
 #define ACL_CONNECT_F_NONE		0		/* Nonthing */
-#define ACL_CONNECT_F_SYS_ERR		(1 << 0)	/* Ðè²éÏµÍ³ errno */
-#define ACL_CONNECT_F_CREATE_SOCKET_ERR	(1 << 1)	/* ´´½¨ socket ³ö´í */
-#define ACL_CONNECT_F_REUSE_ADDR_ERR	(1 << 2)	/* ÖØ¸´Ê¹ÓÃ°ó¶¨µØÖ·³ö´í */
-#define ACL_CONNECT_F_BIND_IP_OK	(1 << 3)	/* °ó¶¨±¾»ú IP ³É¹¦ */
-#define ACL_CONNECT_F_BIND_IP_ERR	(1 << 4)	/* °ó¶¨±¾»ú IP Ê§°Ü */
-#define ACL_CONNECT_F_BIND_IFACE_OK	(1 << 5)	/* °ó¶¨±¾»úÍø¿¨³É¹¦ */
-#define ACL_CONNECT_F_BIND_IFACE_ERR	(1 << 6)	/* °ó¶¨±¾»úÍø¿¨Ê§°Ü */
-#define ACL_CONNECT_F_SO_ERROR		(1 << 7)	/* socket ³ö´í */
-#define ACL_CONNECT_F_INPROGRESS	(1 << 8);	/* ÕýÔÚÁ¬½Ó¹ý³ÌÖÐ */
-#define ACL_CONNECT_F_WAIT_ERR		(1 << 9)	/* µÈ´ýÁ¬½Ó½¨Á¬Ê§°Ü */
+#define ACL_CONNECT_F_SYS_ERR		(1 << 0)	/* éœ€æŸ¥ç³»ç»Ÿ errno */
+#define ACL_CONNECT_F_CREATE_SOCKET_ERR	(1 << 1)	/* åˆ›å»º socket å‡ºé”™ */
+#define ACL_CONNECT_F_REUSE_ADDR_ERR	(1 << 2)	/* é‡å¤ä½¿ç”¨ç»‘å®šåœ°å€å‡ºé”™ */
+#define ACL_CONNECT_F_BIND_IP_OK	(1 << 3)	/* ç»‘å®šæœ¬æœº IP æˆåŠŸ */
+#define ACL_CONNECT_F_BIND_IP_ERR	(1 << 4)	/* ç»‘å®šæœ¬æœº IP å¤±è´¥ */
+#define ACL_CONNECT_F_BIND_IFACE_OK	(1 << 5)	/* ç»‘å®šæœ¬æœºç½‘å¡æˆåŠŸ */
+#define ACL_CONNECT_F_BIND_IFACE_ERR	(1 << 6)	/* ç»‘å®šæœ¬æœºç½‘å¡å¤±è´¥ */
+#define ACL_CONNECT_F_SO_ERROR		(1 << 7)	/* socket å‡ºé”™ */
+#define ACL_CONNECT_F_INPROGRESS	(1 << 8);	/* æ­£åœ¨è¿žæŽ¥è¿‡ç¨‹ä¸­ */
+#define ACL_CONNECT_F_WAIT_ERR		(1 << 9)	/* ç­‰å¾…è¿žæŽ¥å»ºè¿žå¤±è´¥ */
 
 /* in acl_sane_connect.c */
 /**
- * Ô¶³ÌÁ¬½Ó·þÎñÆ÷
- * @param sock {ACL_SOCKET} Ì×½Ó×Ö£¬ÔÚUNIXÆ½Ì¨ÏÂ»¹¿ÉÒÔÊÇÓòÌ×½Ó×Ö
- * @param sa {const struct sockaddr*} ·þÎñÆ÷¼àÌýµØÖ·
- * @param len {socklen_t} sa µÄµØÖ·³¤¶È
- * @return {int} 0: Á¬½Ó³É¹¦; -1: Á¬½ÓÊ§°Ü
+ * è¿œç¨‹è¿žæŽ¥æœåŠ¡å™¨
+ * @param sock {ACL_SOCKET} å¥—æŽ¥å­—ï¼Œåœ¨UNIXå¹³å°ä¸‹è¿˜å¯ä»¥æ˜¯åŸŸå¥—æŽ¥å­—
+ * @param sa {const struct sockaddr*} æœåŠ¡å™¨ç›‘å¬åœ°å€
+ * @param len {socklen_t} sa çš„åœ°å€é•¿åº¦
+ * @return {int} 0: è¿žæŽ¥æˆåŠŸ; -1: è¿žæŽ¥å¤±è´¥
  */
 ACL_API int acl_sane_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 		socklen_t len);
@@ -40,24 +40,24 @@ ACL_API int acl_sane_connect(ACL_SOCKET sock, const struct sockaddr * sa,
 /* in acl_timed_connect.c */
 
 /**
- * ´ø³¬Ê±Ê±¼äµØÔ¶³ÌÁ¬½Ó·þÎñÆ÷
- * @param fd {ACL_SOCKET} Ì×½Ó×Ö£¬ÔÚUNIXÆ½Ì¨ÏÂ»¹¿ÉÒÔÊÇÓòÌ×½Ó×Ö
- * @param sa {const struct sockaddr*} ·þÎñÆ÷¼àÌýµØÖ·
- * @param len {socklen_t} sa µÄµØÖ·³¤¶È
- * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(Ãë¼¶)
- * @return {int} 0: Á¬½Ó³É¹¦; -1: Á¬½ÓÊ§°Ü
+ * å¸¦è¶…æ—¶æ—¶é—´åœ°è¿œç¨‹è¿žæŽ¥æœåŠ¡å™¨
+ * @param fd {ACL_SOCKET} å¥—æŽ¥å­—ï¼Œåœ¨UNIXå¹³å°ä¸‹è¿˜å¯ä»¥æ˜¯åŸŸå¥—æŽ¥å­—
+ * @param sa {const struct sockaddr*} æœåŠ¡å™¨ç›‘å¬åœ°å€
+ * @param len {socklen_t} sa çš„åœ°å€é•¿åº¦
+ * @param timeout {int} è¿žæŽ¥è¶…æ—¶æ—¶é—´(ç§’çº§)
+ * @return {int} 0: è¿žæŽ¥æˆåŠŸ; -1: è¿žæŽ¥å¤±è´¥
  */
 ACL_API int acl_timed_connect(ACL_SOCKET fd, const struct sockaddr * sa,
 		socklen_t len, int timeout);
 
 /**
- * ´ø³¬Ê±Ê±¼äµØÔ¶³ÌÁ¬½Ó·þÎñÆ÷
- * @param fd {ACL_SOCKET} Ì×½Ó×Ö£¬ÔÚUNIXÆ½Ì¨ÏÂ»¹¿ÉÒÔÊÇÓòÌ×½Ó×Ö
- * @param sa {const struct sockaddr*} ·þÎñÆ÷¼àÌýµØÖ·
- * @param len {socklen_t} sa µÄµØÖ·³¤¶È
- * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(ºÁÃë¼¶)
- * @param flags {unsigned*} ·Ç¿ÕÊ±ÓÃÀ´´æ·ÅÁ¬½ÓÊ§°ÜµÄ´íÎóÐÅÏ¢»òÁ¬½ÓµÄÆäËü±ê¼ÇÎ»
- * @return {int} 0: Á¬½Ó³É¹¦; -1: Á¬½ÓÊ§°Ü
+ * å¸¦è¶…æ—¶æ—¶é—´åœ°è¿œç¨‹è¿žæŽ¥æœåŠ¡å™¨
+ * @param fd {ACL_SOCKET} å¥—æŽ¥å­—ï¼Œåœ¨UNIXå¹³å°ä¸‹è¿˜å¯ä»¥æ˜¯åŸŸå¥—æŽ¥å­—
+ * @param sa {const struct sockaddr*} æœåŠ¡å™¨ç›‘å¬åœ°å€
+ * @param len {socklen_t} sa çš„åœ°å€é•¿åº¦
+ * @param timeout {int} è¿žæŽ¥è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§)
+ * @param flags {unsigned*} éžç©ºæ—¶ç”¨æ¥å­˜æ”¾è¿žæŽ¥å¤±è´¥çš„é”™è¯¯ä¿¡æ¯æˆ–è¿žæŽ¥çš„å…¶å®ƒæ ‡è®°ä½
+ * @return {int} 0: è¿žæŽ¥æˆåŠŸ; -1: è¿žæŽ¥å¤±è´¥
  */
 ACL_API int acl_timed_connect_ms2(ACL_SOCKET fd, const struct sockaddr * sa,
 		socklen_t len, int timeout, unsigned *flags);
@@ -67,42 +67,42 @@ ACL_API int acl_timed_connect_ms(ACL_SOCKET fd, const struct sockaddr * sa,
 /* in acl_inet_connect.c */
 
 /**
- * Ô¶³ÌÁ¬½ÓÍøÂç·þÎñÆ÷µØÖ·
- * @param addr {const char*} Ô¶³Ì·þÎñÆ÷µÄ¼àÌýµØÖ·£¬Èç£º192.168.0.1|80, Èç¹ûÐè
- *  Òª°ó¶¨±¾µØµÄµØÖ·£¬Ôò¸ñÊ½Îª: remote_addr@local_ip,
- *  Èç: www.sina.com|80@60.28.250.199
- * @param blocking {int} ×èÈûÄ£Ê½»¹ÊÇ·Ç×èÈûÄ£Ê½, ACL_BLOCKING »ò ACL_NON_BLOCKING
- * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä£¬Èç¹û blocking Îª ACL_NON_BLOCKING Ôò¸ÃÖµ½«±»ºöÂÔ
- * @return {ACL_SOCKET} Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾Á¬½ÓÊ§°Ü 
+ * è¿œç¨‹è¿žæŽ¥ç½‘ç»œæœåŠ¡å™¨åœ°å€
+ * @param addr {const char*} è¿œç¨‹æœåŠ¡å™¨çš„ç›‘å¬åœ°å€ï¼Œå¦‚ï¼š192.168.0.1|80, å¦‚æžœéœ€
+ *  è¦ç»‘å®šæœ¬åœ°çš„åœ°å€ï¼Œåˆ™æ ¼å¼ä¸º: remote_addr@local_ip,
+ *  å¦‚: www.sina.com|80@60.28.250.199
+ * @param blocking {int} é˜»å¡žæ¨¡å¼è¿˜æ˜¯éžé˜»å¡žæ¨¡å¼, ACL_BLOCKING æˆ– ACL_NON_BLOCKING
+ * @param timeout {int} è¿žæŽ¥è¶…æ—¶æ—¶é—´ï¼Œå¦‚æžœ blocking ä¸º ACL_NON_BLOCKING åˆ™è¯¥å€¼å°†è¢«å¿½ç•¥
+ * @return {ACL_SOCKET} å¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºè¿žæŽ¥å¤±è´¥ 
  */
 ACL_API ACL_SOCKET acl_inet_connect(const char *addr, int blocking, int timeout);
 
 /**
- * Ô¶³ÌÁ¬½ÓÍøÂç·þÎñÆ÷µØÖ·
- * @param addr {const char*} Ô¶³Ì·þÎñÆ÷µÄ¼àÌýµØÖ·£¬Èç£º192.168.0.1|80£¬
- *  µ±±¾»úÓÐ¶à¸öÍø¿¨µØÖ·ÇÒÏëÍ¨¹ýÄ³¸öÖ¸¶¨Íø¿¨Á¬½Ó·þÎñÆ÷Ê±µÄµØÖ·¸ñÊ½£º
- *  remote_ip|remote_port@local_ip£¬Èç£º211.150.111.12|80@192.168.1.1
- * @param blocking {int} ×èÈûÄ£Ê½»¹ÊÇ·Ç×èÈûÄ£Ê½, ACL_BLOCKING »ò ACL_NON_BLOCKING
- * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(Ãë¼¶)£¬Èç¹û blocking Îª ACL_NON_BLOCKING Ôò¸ÃÖµ½«±»ºöÂÔ
- * @param flags {unsigned*} ·Ç¿ÕÊ±ÓÃÀ´´æ·ÅÁ¬½ÓÊ§°ÜµÄ´íÎóÐÅÏ¢»òÁ¬½ÓµÄÆäËü±ê¼ÇÎ»
- * @return {ACL_SOCKET} Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾Á¬½ÓÊ§°Ü
+ * è¿œç¨‹è¿žæŽ¥ç½‘ç»œæœåŠ¡å™¨åœ°å€
+ * @param addr {const char*} è¿œç¨‹æœåŠ¡å™¨çš„ç›‘å¬åœ°å€ï¼Œå¦‚ï¼š192.168.0.1|80ï¼Œ
+ *  å½“æœ¬æœºæœ‰å¤šä¸ªç½‘å¡åœ°å€ä¸”æƒ³é€šè¿‡æŸä¸ªæŒ‡å®šç½‘å¡è¿žæŽ¥æœåŠ¡å™¨æ—¶çš„åœ°å€æ ¼å¼ï¼š
+ *  remote_ip|remote_port@local_ipï¼Œå¦‚ï¼š211.150.111.12|80@192.168.1.1
+ * @param blocking {int} é˜»å¡žæ¨¡å¼è¿˜æ˜¯éžé˜»å¡žæ¨¡å¼, ACL_BLOCKING æˆ– ACL_NON_BLOCKING
+ * @param timeout {int} è¿žæŽ¥è¶…æ—¶æ—¶é—´(ç§’çº§)ï¼Œå¦‚æžœ blocking ä¸º ACL_NON_BLOCKING åˆ™è¯¥å€¼å°†è¢«å¿½ç•¥
+ * @param flags {unsigned*} éžç©ºæ—¶ç”¨æ¥å­˜æ”¾è¿žæŽ¥å¤±è´¥çš„é”™è¯¯ä¿¡æ¯æˆ–è¿žæŽ¥çš„å…¶å®ƒæ ‡è®°ä½
+ * @return {ACL_SOCKET} å¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºè¿žæŽ¥å¤±è´¥
  */
 ACL_API ACL_SOCKET acl_inet_connect2(const char *addr, int blocking,
 		int timeout, unsigned *flags);
 #define acl_inet_connect_ex	acl_inet_connect2
 
 /**
- * Ô¶³ÌÁ¬½ÓÍøÂç·þÎñÆ÷µØÖ·
- * @param addr {const char*} Ô¶³Ì·þÎñÆ÷µÄ¼àÌýµØÖ·£¬Èç£º192.168.0.1|80£¬
- *  µ±±¾»úÓÐ¶à¸öÍø¿¨µØÖ·ÇÒÏëÍ¨¹ýÄ³¸öÖ¸¶¨Íø¿¨Á¬½Ó·þÎñÆ÷Ê±µÄµØÖ·¸ñÊ½£º
- *  remote_ip|remote_port@local_ip »ò remote_ip|remote_port#local_ipinterface£¬
- *  Èç£º
+ * è¿œç¨‹è¿žæŽ¥ç½‘ç»œæœåŠ¡å™¨åœ°å€
+ * @param addr {const char*} è¿œç¨‹æœåŠ¡å™¨çš„ç›‘å¬åœ°å€ï¼Œå¦‚ï¼š192.168.0.1|80ï¼Œ
+ *  å½“æœ¬æœºæœ‰å¤šä¸ªç½‘å¡åœ°å€ä¸”æƒ³é€šè¿‡æŸä¸ªæŒ‡å®šç½‘å¡è¿žæŽ¥æœåŠ¡å™¨æ—¶çš„åœ°å€æ ¼å¼ï¼š
+ *  remote_ip|remote_port@local_ip æˆ– remote_ip|remote_port#local_ipinterfaceï¼Œ
+ *  å¦‚ï¼š
  *    211.150.111.12|80@192.168.1.1
  *    211.150.111.12|80#interface
- * @param blocking {int} ×èÈûÄ£Ê½»¹ÊÇ·Ç×èÈûÄ£Ê½, ACL_BLOCKING »ò ACL_NON_BLOCKING
- * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä(ºÁÃë¼¶)£¬Èç¹û blocking Îª ACL_NON_BLOCKING Ôò¸ÃÖµ½«±»ºöÂÔ
- * @param flags {unsigned*} ·Ç¿ÕÊ±ÓÃÀ´´æ·ÅÁ¬½ÓÊ§°ÜµÄ´íÎóÐÅÏ¢»òÁ¬½ÓµÄÆäËü±ê¼ÇÎ»
- * @return {ACL_SOCKET} Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾Á¬½ÓÊ§°Ü
+ * @param blocking {int} é˜»å¡žæ¨¡å¼è¿˜æ˜¯éžé˜»å¡žæ¨¡å¼, ACL_BLOCKING æˆ– ACL_NON_BLOCKING
+ * @param timeout {int} è¿žæŽ¥è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§)ï¼Œå¦‚æžœ blocking ä¸º ACL_NON_BLOCKING åˆ™è¯¥å€¼å°†è¢«å¿½ç•¥
+ * @param flags {unsigned*} éžç©ºæ—¶ç”¨æ¥å­˜æ”¾è¿žæŽ¥å¤±è´¥çš„é”™è¯¯ä¿¡æ¯æˆ–è¿žæŽ¥çš„å…¶å®ƒæ ‡è®°ä½
+ * @return {ACL_SOCKET} å¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºè¿žæŽ¥å¤±è´¥
  */
 ACL_API ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 		int timeout, unsigned *flags);
@@ -112,12 +112,12 @@ ACL_API ACL_SOCKET acl_inet_timed_connect(const char *addr, int blocking,
 /* in acl_unix_connect.c */
 
 /**
- * Á¬½Ó¼àÌýÓòÌ×½Ó×Ö·þÎñÆ÷
- * @param addr {const char*} ·þÎñÆ÷¼àÌýµÄÓòÌ×½Ó×ÖÈ«Â·¾¶, Èç: /tmp/test.sock£¬
- *  Õë¶Ô Linux Æ½Ì¨£¬Èç¹ûÊ××ÖÄ¸Îª @ ÔòÄÚ²¿×Ô¶¯²ÉÓÃ³éÏó UNIX ÓòÌ×½Ó¿Ú½øÐÐÁ¬½Ó
- * @param blocking {int} ×èÈûÄ£Ê½»¹ÊÇ·Ç×èÈûÄ£Ê½, ACL_BLOCKING »ò ACL_NON_BLOCKING
- * @param timeout {int} Á¬½Ó³¬Ê±Ê±¼ä£¬Èç¹û blocking Îª ACL_NON_BLOCKING Ôò¸ÃÖµ½«±»ºöÂÔ
- * @return {ACL_SOCKET} Èç¹û·µ»Ø ACL_SOCKET_INVALID ±íÊ¾Á¬½ÓÊ§°Ü 
+ * è¿žæŽ¥ç›‘å¬åŸŸå¥—æŽ¥å­—æœåŠ¡å™¨
+ * @param addr {const char*} æœåŠ¡å™¨ç›‘å¬çš„åŸŸå¥—æŽ¥å­—å…¨è·¯å¾„, å¦‚: /tmp/test.sockï¼Œ
+ *  é’ˆå¯¹ Linux å¹³å°ï¼Œå¦‚æžœé¦–å­—æ¯ä¸º @ åˆ™å†…éƒ¨è‡ªåŠ¨é‡‡ç”¨æŠ½è±¡ UNIX åŸŸå¥—æŽ¥å£è¿›è¡Œè¿žæŽ¥
+ * @param blocking {int} é˜»å¡žæ¨¡å¼è¿˜æ˜¯éžé˜»å¡žæ¨¡å¼, ACL_BLOCKING æˆ– ACL_NON_BLOCKING
+ * @param timeout {int} è¿žæŽ¥è¶…æ—¶æ—¶é—´ï¼Œå¦‚æžœ blocking ä¸º ACL_NON_BLOCKING åˆ™è¯¥å€¼å°†è¢«å¿½ç•¥
+ * @return {ACL_SOCKET} å¦‚æžœè¿”å›ž ACL_SOCKET_INVALID è¡¨ç¤ºè¿žæŽ¥å¤±è´¥ 
  */
 ACL_API ACL_SOCKET acl_unix_connect(const char *addr, int blocking, int timeout);
 

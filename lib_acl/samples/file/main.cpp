@@ -103,7 +103,7 @@ static int test_vstream(void)
 	local_time = localtime(&sbuf.st_mtime);
 	if (local_time) {
 		strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", local_time);
-		printf("修改时间，mtime=%s\r\n", buf);
+		printf("淇敼鏃堕棿锛宮time=%s\r\n", buf);
 	} else {
 		printf("mtime: error(%s)\r\n", acl_last_serror());
 	}
@@ -111,7 +111,7 @@ static int test_vstream(void)
 	local_time = localtime(&sbuf.st_ctime);
 	if (local_time) {
 		strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", local_time);
-		printf("创建时间，ctime=%s\r\n", buf);
+		printf("鍒涘缓鏃堕棿锛宑time=%s\r\n", buf);
 	} else {
 		printf("ctime: error(%s)\r\n", acl_last_serror());
 	}
@@ -119,7 +119,7 @@ static int test_vstream(void)
 	local_time = localtime(&sbuf.st_atime);
 	if (local_time) {
 		strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", local_time);
-		printf("访问时间，atime=%s\r\n", buf);
+		printf("璁块棶鏃堕棿锛宎time=%s\r\n", buf);
 	} else {
 		printf("atime: error(%s)\r\n", acl_last_serror());
 	}

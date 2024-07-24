@@ -84,20 +84,20 @@ static void timer_callback(int, ACL_EVENT* event, void* ctx)
 {
 	event_timer* timer = (event_timer*) ctx;
 
-	// ´¥·¢¶¨Ê±Æ÷ÖĞµÄËùÓĞ¶¨Ê±ÈÎÎñ
+	// è§¦å‘å®šæ—¶å™¨ä¸­çš„æ‰€æœ‰å®šæ—¶ä»»åŠ¡
 	acl_int64 next_delay = timer->trigger();
 
-	// Èç¹û¶¨Ê±Æ÷ÖĞµÄÈÎÎñÎª¿Õ»òÎ´ÉèÖÃ¶¨Ê±Æ÷µÄÖØ¸´Ê¹ÓÃ£¬ÔòÉ¾³ı¶¨Ê±Æ÷
+	// å¦‚æœå®šæ—¶å™¨ä¸­çš„ä»»åŠ¡ä¸ºç©ºæˆ–æœªè®¾ç½®å®šæ—¶å™¨çš„é‡å¤ä½¿ç”¨ï¼Œåˆ™åˆ é™¤å®šæ—¶å™¨
 	if (timer->empty() || !timer->keep_timer()) {
-		// É¾³ı¶¨Ê±Æ÷
+		// åˆ é™¤å®šæ—¶å™¨
 		acl_event_cancel_timer(event, timer_callback, timer);
 		timer->destroy();
 		return;
 	}
 
-	// Èç¹ûÔÊĞíÖØ¸´Ê¹ÓÃ¶¨Ê±Æ÷ÇÒ¶¨Ê±Æ÷ÖĞµÄÈÎÎñ·Ç¿Õ£¬ÔòÔÙ´ÎÉèÖÃ¸Ã¶¨Ê±Æ÷
+	// å¦‚æœå…è®¸é‡å¤ä½¿ç”¨å®šæ—¶å™¨ä¸”å®šæ—¶å™¨ä¸­çš„ä»»åŠ¡éç©ºï¼Œåˆ™å†æ¬¡è®¾ç½®è¯¥å®šæ—¶å™¨
 
-	//  ĞèÒªÖØÖÃ¶¨Ê±Æ÷µÄµ½´ïÊ±¼ä½Ø
+	//  éœ€è¦é‡ç½®å®šæ—¶å™¨çš„åˆ°è¾¾æ—¶é—´æˆª
 	acl_event_request_timer(event, timer_callback, timer,
 		next_delay < 0 ? 0 : next_delay, timer->keep_timer() ? 1 : 0);
 }

@@ -28,7 +28,7 @@ static void main_cache_free(void)
 {
 	if (main_cache) {
 		acl_array_free(main_cache, (void (*)(void*)) http_hdr_res_free);
-		/* ĞèÒª½«¸ÃÈ«¾ÖÖµÉèÎª NULL£¬ÒÔ±ãÓÚ http_hdr_res_free ÖĞµÄÅĞ¶Ï */
+		/* éœ€è¦å°†è¯¥å…¨å±€å€¼è®¾ä¸º NULLï¼Œä»¥ä¾¿äº http_hdr_res_free ä¸­çš„åˆ¤æ–­ */
 		main_cache = NULL;
 	}
 }
@@ -40,7 +40,7 @@ static void thread_cache_init(void)
 }
 #endif
 
-/* Éú³ÉÒ»¸öĞÂµÄ HTTP_HDR_RES Êı¾İ½á¹¹ */
+/* ç”Ÿæˆä¸€ä¸ªæ–°çš„ HTTP_HDR_RES æ•°æ®ç»“æ„ */
 
 HTTP_HDR_RES *http_hdr_res_new(void)
 {
@@ -109,7 +109,7 @@ static void __hdr_free_member(HTTP_HDR_RES *hh acl_unused)
 {
 }
 
-/* ÊÍ·ÅÒ»¸ö HTTP_HDR_RES ½á¹¹ */
+/* é‡Šæ”¾ä¸€ä¸ª HTTP_HDR_RES ç»“æ„ */
 
 void http_hdr_res_free(HTTP_HDR_RES *hh)
 {
@@ -119,9 +119,9 @@ void http_hdr_res_free(HTTP_HDR_RES *hh)
 		return;
 
 	/**
-	 * bugfix: Ôö¼ÓÅĞ¶Ï main_cache ÊÇ·ñÎª NULL£¬ÔÚ lib_acl_cpp ÖĞ²ÉÓÃ
-	 * µ¥ÀıÄ£Ê½ÏÂ£¬µ¥ÀıµÄÊÍ·Å»á±È main_cache_free µ÷ÓÃ¹ı³Ì¸üÍí£¬ËùÒÔ
-	 * »áÔì³ÉÄÚ´æ³åÍ» --- zsx, 2015.11.6
+	 * bugfix: å¢åŠ åˆ¤æ–­ main_cache æ˜¯å¦ä¸º NULLï¼Œåœ¨ lib_acl_cpp ä¸­é‡‡ç”¨
+	 * å•ä¾‹æ¨¡å¼ä¸‹ï¼Œå•ä¾‹çš„é‡Šæ”¾ä¼šæ¯” main_cache_free è°ƒç”¨è¿‡ç¨‹æ›´æ™šï¼Œæ‰€ä»¥
+	 * ä¼šé€ æˆå†…å­˜å†²çª --- zsx, 2015.11.6
 	 */
 	if (var_http_tls_cache <= 0 || main_cache == NULL) {
 		__hdr_free_member(hh);
@@ -274,8 +274,8 @@ int http_hdr_res_range(const HTTP_HDR_RES *hdr_res, http_off_t *range_from,
 		return (-1);
 
 	ACL_SAFE_STRNCPY(buf, value, sizeof(buf));
-	/* ÏìÓ¦µÄ Range Êı¾İ¸ñÊ½£ºContent-Range: bytes {range_from}-{range_to}/{total_length}
-	 * ÆäÖĞ: {range_from}, {range_to} µÄÏÂ±êÊÇ´Ó0¿ªÊ¼µÄ
+	/* å“åº”çš„ Range æ•°æ®æ ¼å¼ï¼šContent-Range: bytes {range_from}-{range_to}/{total_length}
+	 * å…¶ä¸­: {range_from}, {range_to} çš„ä¸‹æ ‡æ˜¯ä»0å¼€å§‹çš„
 	 */
 	/* Content-Range: bytes 2250000-11665200/11665201 */
 	/* value: bytes 2250000-11665200/11665201 */
@@ -313,7 +313,7 @@ int http_hdr_res_range(const HTTP_HDR_RES *hdr_res, http_off_t *range_from,
 	if (*range_to < 0)
 		return (-1);
 
-	/* ¿ÉÑ¡Ïî */
+	/* å¯é€‰é¡¹ */
 	if (total_length) {
 		*total_length = acl_atoi64(ptr);
 		if (*total_length < 0)

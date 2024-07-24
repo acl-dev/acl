@@ -404,11 +404,11 @@ static void event_loop(ACL_EVENT *eventp)
 		delay = DELAY_MIN;
 	}
 
-	/* µ÷ÕûÊÂ¼şÒıÇæµÄÊ±¼ä½Ø */
+	/* è°ƒæ•´äº‹ä»¶å¼•æ“çš„æ—¶é—´æˆª */
 
 	SET_TIME(eventp->present);
 
-	/* ¸ù¾İ¶¨Ê±Æ÷ÈÎÎñµÄ×î½üÈÎÎñ¼ÆËã poll µÄ¼ì²â³¬Ê±ÉÏÏŞ */
+	/* æ ¹æ®å®šæ—¶å™¨ä»»åŠ¡çš„æœ€è¿‘ä»»åŠ¡è®¡ç®— poll çš„æ£€æµ‹è¶…æ—¶ä¸Šé™ */
 	when = event_timer_when(eventp);
 	if (when >= 0) {
 		acl_int64 n = when - eventp->present;
@@ -419,26 +419,26 @@ static void event_loop(ACL_EVENT *eventp)
 		}
 	}
 
-	/* µ÷ÓÃ event_prepare ¼ì²éÓĞ¶àÉÙ¸öÃèÊö×ÖĞèÒªÍ¨¹ı poll ½øĞĞ¼ì²â */
+	/* è°ƒç”¨ event_prepare æ£€æŸ¥æœ‰å¤šå°‘ä¸ªæè¿°å­—éœ€è¦é€šè¿‡ poll è¿›è¡Œæ£€æµ‹ */
 
 	if (event_prepare(eventp) == 0) {
-		/* ËµÃ÷ÎŞĞë poll ¼ì²â */
+		/* è¯´æ˜æ— é¡» poll æ£€æµ‹ */
 
 		if (eventp->ready_cnt == 0) {
-			/* Îª±ÜÃâÑ­»·¹ı¿ì£¬ĞİÃßÒ»ÏÂ */
+			/* ä¸ºé¿å…å¾ªç¯è¿‡å¿«ï¼Œä¼‘çœ ä¸€ä¸‹ */
 			acl_doze(delay > DELAY_MIN ? (int) delay / 1000 : 1);
 		}
 
 		goto TAG_DONE;
 	}
 
-	/* Èç¹ûÒÑ¾­ÓĞÃèÊö×Ö×¼±¸ºÃÔò poll ¼ì²â³¬Ê±Ê±¼äÖÃ 0 */
+	/* å¦‚æœå·²ç»æœ‰æè¿°å­—å‡†å¤‡å¥½åˆ™ poll æ£€æµ‹è¶…æ—¶æ—¶é—´ç½® 0 */
 
 	if (eventp->ready_cnt > 0) {
 		delay = 0;
 	}
 
-	/* µ÷ÓÃ poll ÏµÍ³µ÷ÓÃ¼ì²â¿ÉÓÃÃèÊö×Ö */
+	/* è°ƒç”¨ poll ç³»ç»Ÿè°ƒç”¨æ£€æµ‹å¯ç”¨æè¿°å­— */
 #if defined(ACL_WINDOWS)
 	nready = WSAPoll(ev->fds, eventp->fdcnt, (int) (delay / 1000));
 #else
@@ -465,7 +465,7 @@ static void event_loop(ACL_EVENT *eventp)
 		goto TAG_DONE;
 	}
 
-	/* ¼ì²é poll µÄ¼ì²â½á¹û¼¯ºÏ */
+	/* æ£€æŸ¥ poll çš„æ£€æµ‹ç»“æœé›†åˆ */
 
 	for (i = 0; i < eventp->fdcnt; i++) {
 		fdp = acl_fdmap_ctx(ev->fdmap, (int) ev->fds[i].fd);
@@ -473,7 +473,7 @@ static void event_loop(ACL_EVENT *eventp)
 			continue;
 		}
 
-		/* Èç¹û¸ÃÃèÊö×Ö¶ÔÏóÒÑ¾­ÔÚ±»ÉèÖÃÎªÒì³£»ò³¬Ê±×´Ì¬Ôò¼ÌĞø */
+		/* å¦‚æœè¯¥æè¿°å­—å¯¹è±¡å·²ç»åœ¨è¢«è®¾ç½®ä¸ºå¼‚å¸¸æˆ–è¶…æ—¶çŠ¶æ€åˆ™ç»§ç»­ */
 
 		if ((fdp->event_type & (ACL_EVENT_XCPT | ACL_EVENT_RW_TIMEOUT))) {
 			continue;
@@ -481,11 +481,11 @@ static void event_loop(ACL_EVENT *eventp)
 
 		revents = ev->fds[i].revents;
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿É¶Á */
+		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å¯è¯» */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_READ) && (revents & POLLIN) ) {
 
-			/* ¸ø¸ÃÃèÊö×Ö¶ÔÏó¸½¼Ó¿É¶ÁÊôĞÔ */
+			/* ç»™è¯¥æè¿°å­—å¯¹è±¡é™„åŠ å¯è¯»å±æ€§ */
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0) {
 
@@ -498,20 +498,20 @@ static void event_loop(ACL_EVENT *eventp)
 				fdp->event_type |= ACL_EVENT_ACCEPT;
 			}
 
-			/* ¸ÃÃèÊö×Ö¿É¶ÁÔòÉèÖÃ ACL_VSTREAM µÄÏµÍ³¿É¶Á±êÖ¾´Ó¶ø
-			 * ´¥·¢ ACL_VSTREAM Á÷ÔÚ¶ÁÊ±µ÷ÓÃÏµÍ³µÄ read º¯Êı
+			/* è¯¥æè¿°å­—å¯è¯»åˆ™è®¾ç½® ACL_VSTREAM çš„ç³»ç»Ÿå¯è¯»æ ‡å¿—ä»è€Œ
+			 * è§¦å‘ ACL_VSTREAM æµåœ¨è¯»æ—¶è°ƒç”¨ç³»ç»Ÿçš„ read å‡½æ•°
 			 */
 			else {
 				fdp->stream->read_ready = 1;
 			}
 		}
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ¿ÉĞ´ */
+		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å¯å†™ */
 
 		if ((fdp->flag & EVENT_FDTABLE_FLAG_WRITE)
 			&& (revents & POLLOUT)) {
 
-			/* ¸ø¸ÃÃèÊö×Ö¶ÔÏó¸½¼Ó¿ÉĞ´ÊôĞÔ */
+			/* ç»™è¯¥æè¿°å­—å¯¹è±¡é™„åŠ å¯å†™å±æ€§ */
 
 			if ((fdp->event_type & (ACL_EVENT_READ
 				| ACL_EVENT_WRITE)) == 0) {
@@ -522,7 +522,7 @@ static void event_loop(ACL_EVENT *eventp)
 			}
 		}
 
-		/* ¼ì²éÃèÊö×ÖÊÇ·ñ³öÏÖÒì³£ */
+		/* æ£€æŸ¥æè¿°å­—æ˜¯å¦å‡ºç°å¼‚å¸¸ */
 
 		if (!fdp->event_type && (revents & (POLLHUP | POLLERR)) != 0) {
 			fdp->event_type |= ACL_EVENT_XCPT;
@@ -535,7 +535,7 @@ TAG_DONE:
 
 	event_timer_trigger(eventp);
 
-	/* ´¦Àí×¼±¸ºÃµÄÃèÊö×ÖÊÂ¼ş */
+	/* å¤„ç†å‡†å¤‡å¥½çš„æè¿°å­—äº‹ä»¶ */
 	if (eventp->ready_cnt > 0) {
 		event_fire(eventp);
 	}

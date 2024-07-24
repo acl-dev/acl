@@ -8,9 +8,9 @@
 namespace acl {
 
 /**
- * ÓÃÓÚÏß³ÌÖ®¼äµÄÏûÏ¢Í¨ÐÅ£¬Í¨¹ýÏß³ÌÌõ¼þ±äÁ¿¼°Ïß³ÌËøÊµÏÖ
+ * ç”¨äºŽçº¿ç¨‹ä¹‹é—´çš„æ¶ˆæ¯é€šä¿¡ï¼Œé€šè¿‡çº¿ç¨‹æ¡ä»¶å˜é‡åŠçº¿ç¨‹é”å®žçŽ°
  *
- * Ê¾Àý£º
+ * ç¤ºä¾‹ï¼š
  *
  * class myobj {
  * public:
@@ -39,24 +39,24 @@ template<typename T>
 class tbox2 {
 public:
 	/**
-	 * ¹¹Ôì·½·¨
+	 * æž„é€ æ–¹æ³•
 	 */
 	tbox2() : size_(0), cond_(&lock_) {}
 
 	~tbox2() {}
 
 	/**
-	 * ÇåÀíÏûÏ¢¶ÓÁÐÖÐÎ´±»Ïû·ÑµÄÏûÏ¢¶ÔÏó
+	 * æ¸…ç†æ¶ˆæ¯é˜Ÿåˆ—ä¸­æœªè¢«æ¶ˆè´¹çš„æ¶ˆæ¯å¯¹è±¡
 	 */
 	void clear() {
 		box_.clear();
 	}
 
 	/**
-	 * ·¢ËÍÏûÏ¢¶ÔÏó
-	 * @param t {T} ÏûÏ¢¶ÔÏó
-	 * @param notify_first {bool} Èç¹ûÎª true£¬ÔòÏÈÍ¨Öªºó½âËø£¬·ñÔòÏÈ½âËø
-	 *  ºóÍ¨Öª£¬×¢Òâ¶þÕßµÄÇø±ð
+	 * å‘é€æ¶ˆæ¯å¯¹è±¡
+	 * @param t {T} æ¶ˆæ¯å¯¹è±¡
+	 * @param notify_first {bool} å¦‚æžœä¸º trueï¼Œåˆ™å…ˆé€šçŸ¥åŽè§£é”ï¼Œå¦åˆ™å…ˆè§£é”
+	 *  åŽé€šçŸ¥ï¼Œæ³¨æ„äºŒè€…çš„åŒºåˆ«
 	 * @return {bool}
 	 * @override
 	 */
@@ -88,11 +88,11 @@ public:
 	}
 
 	/**
-	 * ½ÓÊÕÏûÏ¢¶ÔÏó
-	 * @param t {T&} µ±º¯Êý ·µ»Ø true Ê±´æ·Å½á¹û¶ÔÏó
-	 * @param wait_ms {int} >= 0 Ê±ÉèÖÃµÈ´ý³¬Ê±Ê±¼ä(ºÁÃë¼¶±ð)£¬
-	 *  ·ñÔòÓÀÔ¶µÈ´ýÖ±µ½¶Áµ½ÏûÏ¢¶ÔÏó»ò³ö´í
-	 * @return {bool} ÊÇ·ñ»ñµÃÏûÏ¢¶ÔÏó
+	 * æŽ¥æ”¶æ¶ˆæ¯å¯¹è±¡
+	 * @param t {T&} å½“å‡½æ•° è¿”å›ž true æ—¶å­˜æ”¾ç»“æžœå¯¹è±¡
+	 * @param wait_ms {int} >= 0 æ—¶è®¾ç½®ç­‰å¾…è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§åˆ«)ï¼Œ
+	 *  å¦åˆ™æ°¸è¿œç­‰å¾…ç›´åˆ°è¯»åˆ°æ¶ˆæ¯å¯¹è±¡æˆ–å‡ºé”™
+	 * @return {bool} æ˜¯å¦èŽ·å¾—æ¶ˆæ¯å¯¹è±¡
 	 * @override
 	 */
 	bool pop(T& t, int wait_ms = -1) {
@@ -108,7 +108,7 @@ public:
 				return true;
 			}
 
-			// ×¢Òâµ÷ÓÃË³Ðò£¬±ØÐëÏÈµ÷ÓÃ wait ÔÙÅÐ¶Ï wait_ms
+			// æ³¨æ„è°ƒç”¨é¡ºåºï¼Œå¿…é¡»å…ˆè°ƒç”¨ wait å†åˆ¤æ–­ wait_ms
 			if (!cond_.wait(n, true) && wait_ms >= 0) {
 				if (lock_.unlock() == false) {
 					abort();
@@ -119,7 +119,7 @@ public:
 	}
 
 	/**
-	 * ·µ»Øµ±Ç°´æÔÚÓÚÏûÏ¢¶ÓÁÐÖÐµÄÏûÏ¢ÊýÁ¿
+	 * è¿”å›žå½“å‰å­˜åœ¨äºŽæ¶ˆæ¯é˜Ÿåˆ—ä¸­çš„æ¶ˆæ¯æ•°é‡
 	 * @return {size_t}
 	 */
 	size_t size() const {

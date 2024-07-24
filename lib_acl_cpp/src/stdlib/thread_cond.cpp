@@ -76,7 +76,7 @@ bool thread_cond::block_wait(bool locked)
 		logger_error("pthread_cond_wait error %s", last_serror());
 	}
 
-	// Èç¹û±¾·½·¨ÄÚ²¿Ç°Ãæ¼ÓÁËËø£¬Ôò´Ë´¦ÐèÒª½âËø
+	// å¦‚æžœæœ¬æ–¹æ³•å†…éƒ¨å‰é¢åŠ äº†é”ï¼Œåˆ™æ­¤å¤„éœ€è¦è§£é”
 	if (locked_internal && !mutex_->unlock()) {
 		logger_error("mutex unlock error=%s", last_serror());
 		return false;

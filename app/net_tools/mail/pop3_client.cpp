@@ -85,7 +85,7 @@ struct UP_CTX
 };
 
 //////////////////////////////////////////////////////////////////////////
-// Ö÷Ïß³ÌÖÐÔËÐÐ
+// ä¸»çº¿ç¨‹ä¸­è¿è¡Œ
 
 void pop3_client::rpc_onover()
 {
@@ -105,7 +105,7 @@ void pop3_client::rpc_wakeup(void* ctx)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// ×ÓÏß³ÌÖÐÔËÐÐ
+// å­çº¿ç¨‹ä¸­è¿è¡Œ
 
 void pop3_client::rpc_run()
 {
@@ -114,7 +114,7 @@ void pop3_client::rpc_run()
 	gettimeofday(&begin, NULL);
 
 	//////////////////////////////////////////////////////////////////
-	// ÓòÃû½âÎö¹ý³Ì
+	// åŸŸåè§£æžè¿‡ç¨‹
 
 	gettimeofday(&last, NULL);
 	if (get_ip() == false)
@@ -122,7 +122,7 @@ void pop3_client::rpc_run()
 		up = new UP_CTX;
 		up->curr = 0;
 		up->total = 0;
-		up->msg.format("½âÎö pop3 ÓòÃû£º%s Ê§°Ü£¡",
+		up->msg.format("è§£æž pop3 åŸŸåï¼š%s å¤±è´¥ï¼",
 			pop3_addr_.c_str());
 		rpc_signal(up);
 		return;
@@ -133,12 +133,12 @@ void pop3_client::rpc_run()
 	pop3_addr.format("%s:%d", pop3_ip_.c_str(), pop3_port_);
 
 	//////////////////////////////////////////////////////////////////
-	// Ô¶³ÌÁ¬½Ó SMTP ·þÎñÆ÷
+	// è¿œç¨‹è¿žæŽ¥ SMTP æœåŠ¡å™¨
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("Á¬½Ó POP3 ·þÎñÆ÷ ...");
+	up->msg.format("è¿žæŽ¥ POP3 æœåŠ¡å™¨ ...");
 	rpc_signal(up);
 
 	acl::socket_stream conn;
@@ -149,7 +149,7 @@ void pop3_client::rpc_run()
 		up = new UP_CTX;
 		up->curr = 0;
 		up->total = 0;
-		up->msg.format("Á¬½Ó pop3 ·þÎñÆ÷£º%s Ê§°Ü£¡",
+		up->msg.format("è¿žæŽ¥ pop3 æœåŠ¡å™¨ï¼š%s å¤±è´¥ï¼",
 			pop3_addr.c_str());
 		rpc_signal(up);
 		return;
@@ -159,12 +159,12 @@ void pop3_client::rpc_run()
 	meter_.pop3_connect_elapsed = util::stamp_sub(&now, &last);
 
 	//////////////////////////////////////////////////////////////////
-	// »ñµÃ POP3 ·þÎñÆ÷µÄ»¶Ó­ÐÅÏ¢
+	// èŽ·å¾— POP3 æœåŠ¡å™¨çš„æ¬¢è¿Žä¿¡æ¯
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("½ÓÊÕ POP3 ·þÎñÆ÷»¶Ó­ÐÅÏ¢(Á¬½ÓºÄÊ± %.2f ºÁÃë) ...",
+	up->msg.format("æŽ¥æ”¶ POP3 æœåŠ¡å™¨æ¬¢è¿Žä¿¡æ¯(è¿žæŽ¥è€—æ—¶ %.2f æ¯«ç§’) ...",
 		meter_.pop3_connect_elapsed);
 	rpc_signal(up);
 
@@ -177,12 +177,12 @@ void pop3_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("»ñµÃ banner ºÄÊ± %.2f ºÁÃë£¬¿ªÊ¼ÈÏÖ¤ÕËºÅÐÅÏ¢ ...",
+	up->msg.format("èŽ·å¾— banner è€—æ—¶ %.2f æ¯«ç§’ï¼Œå¼€å§‹è®¤è¯è´¦å·ä¿¡æ¯ ...",
 		meter_.pop3_banner_elapsed);
 	rpc_signal(up);
 
 	//////////////////////////////////////////////////////////////////
-	// ÈÏÖ¤ÓÃ»§µÄÉí·Ý
+	// è®¤è¯ç”¨æˆ·çš„èº«ä»½
 
 	gettimeofday(&last, NULL);
 	if (pop3_auth(conn, auth_account_.c_str(),
@@ -195,17 +195,17 @@ void pop3_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("ÓÃ»§ÈÏÖ¤³É¹¦(ºÄÊ± %.2f ºÁÃë)",
+	up->msg.format("ç”¨æˆ·è®¤è¯æˆåŠŸ(è€—æ—¶ %.2f æ¯«ç§’)",
 		meter_.pop3_auth_elapsed);
 	rpc_signal(up);
 
 	//////////////////////////////////////////////////////////////////
-	// uidl ÓÃ»§ÊÕ¼þÏäµÄÓÊ¼þÁÐ±í
+	// uidl ç”¨æˆ·æ”¶ä»¶ç®±çš„é‚®ä»¶åˆ—è¡¨
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("ÁÐÓÃ»§ÊÕ¼þÏäÓÊ¼þ(UIDL) ...");
+	up->msg.format("åˆ—ç”¨æˆ·æ”¶ä»¶ç®±é‚®ä»¶(UIDL) ...");
 	rpc_signal(up);
 
 	std::vector<acl::string> uidl_list;
@@ -218,17 +218,17 @@ void pop3_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("ÓÃ»§ÊÕ¼þÏäÓÊ¼þÁÐ±í½áÊø(ºÄÊ± %.2f ºÁÃë)",
+	up->msg.format("ç”¨æˆ·æ”¶ä»¶ç®±é‚®ä»¶åˆ—è¡¨ç»“æŸ(è€—æ—¶ %.2f æ¯«ç§’)",
 		meter_.pop3_uidl_elapsed);
 	rpc_signal(up);
 
 	//////////////////////////////////////////////////////////////////
-	// LIST ÓÃ»§ÊÕ¼þÏäÓÊ¼þÁÐ±í
+	// LIST ç”¨æˆ·æ”¶ä»¶ç®±é‚®ä»¶åˆ—è¡¨
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("ÁÐÓÃ»§ÊÕ¼þÏäÓÊ¼þ³ß´ç(LIST) ...");
+	up->msg.format("åˆ—ç”¨æˆ·æ”¶ä»¶ç®±é‚®ä»¶å°ºå¯¸(LIST) ...");
 	rpc_signal(up);
 
 	std::vector<size_t> size_list_;
@@ -244,17 +244,17 @@ void pop3_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = 0;
-	up->msg.format("ÁÐÓÃ»§ÊÕ¼þÏäÓÊ¼þ³ß´ç(LIST) ºÄÊ± %.2f",
+	up->msg.format("åˆ—ç”¨æˆ·æ”¶ä»¶ç®±é‚®ä»¶å°ºå¯¸(LIST) è€—æ—¶ %.2f",
 		meter_.pop3_list_elapsed);
 	rpc_signal(up);
 
 	//////////////////////////////////////////////////////////////////
-	// ÊÕÈ¡ÓÃ»§ÊÕ¼þÀïµÄÓÊ¼þ
+	// æ”¶å–ç”¨æˆ·æ”¶ä»¶é‡Œçš„é‚®ä»¶
 
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = size_list_.size();
-	up->msg.format("¿ªÊ¼½ÓÊÕÊÕ¼þÏäÓÊ¼þ ...");
+	up->msg.format("å¼€å§‹æŽ¥æ”¶æ”¶ä»¶ç®±é‚®ä»¶ ...");
 	rpc_signal(up);
 
 	gettimeofday(&last, NULL);
@@ -269,12 +269,12 @@ void pop3_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = size_list_.size();
-	up->msg.format("½ÓÊÕÊÕ¼þÏäÓÊ¼þÍê³É£¬ºÄÊ± %0.2f",
+	up->msg.format("æŽ¥æ”¶æ”¶ä»¶ç®±é‚®ä»¶å®Œæˆï¼Œè€—æ—¶ %0.2f",
 		meter_.pop3_recv_elapsed);
 	rpc_signal(up);
 
 	//////////////////////////////////////////////////////////////////
-	// ÍË³öÓÊÏä
+	// é€€å‡ºé‚®ç®±
 
 	gettimeofday(&last, NULL);
 	pop3_quit(conn);
@@ -282,7 +282,7 @@ void pop3_client::rpc_run()
 	meter_.pop3_quit_elapsed = util::stamp_sub(&now, &last);
 
 	//////////////////////////////////////////////////////////////////
-	// Í³¼Æ×Ü¹²ºÄ·ÑµÄÊ±¼ä
+	// ç»Ÿè®¡æ€»å…±è€—è´¹çš„æ—¶é—´
 
 	gettimeofday(&now, NULL);
 	meter_.pop3_total_elapsed = util::stamp_sub(&now, &begin);
@@ -290,7 +290,7 @@ void pop3_client::rpc_run()
 	up = new UP_CTX;
 	up->curr = 0;
 	up->total = size_list_.size();
-	up->msg.format("ÊÕ¼þ¹ý³Ì¹²ºÄÊ± %0.2f",
+	up->msg.format("æ”¶ä»¶è¿‡ç¨‹å…±è€—æ—¶ %0.2f",
 		meter_.pop3_recv_elapsed);
 	rpc_signal(up);
 }
@@ -533,7 +533,7 @@ bool pop3_client::pop3_retr(acl::socket_stream& conn,
 		UP_CTX* up = new UP_CTX;
 		up->curr = i;
 		up->total = meter_.recved_limit;
-		up->msg.format("½ÓÊÕÓÊ¼þ(%d/%d), ÊÕµ½ %d ×Ö½Ú, %d ×Ö½Ú/Ãë",
+		up->msg.format("æŽ¥æ”¶é‚®ä»¶(%d/%d), æ”¶åˆ° %d å­—èŠ‚, %d å­—èŠ‚/ç§’",
 			(int) meter_.recved_count,
 			(int) meter_.recved_limit,
 			(int) meter_.recved_size,
@@ -611,8 +611,8 @@ bool pop3_client::pop3_retr_one(acl::socket_stream& conn, size_t idx)
 			up->total = meter_.recved_limit;
 			meter_.recved_speed = meter_.recved_size
 				/ (int) (now - recv_begin_);
-			up->msg.format("½ÓÊÕÓÊ¼þ(%d/%d), ÊÕµ½ %d ×Ö½Ú, "
-				"%d ×Ö½Ú/Ãë",
+			up->msg.format("æŽ¥æ”¶é‚®ä»¶(%d/%d), æ”¶åˆ° %d å­—èŠ‚, "
+				"%d å­—èŠ‚/ç§’",
 				(int) meter_.recved_count,
 				(int) meter_.recved_limit,
 				(int) meter_.recved_size,

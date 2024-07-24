@@ -1,4 +1,4 @@
-// rpc_download.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// rpc_download.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -36,23 +36,23 @@ public:
 	~http_down() {}
 protected:
 
-	// ×ÓÏß³Ì´¦Àíº¯Êı
+	// å­çº¿ç¨‹å¤„ç†å‡½æ•°
 	void rpc_run()
 	{
-		http_request req(addr_);  // HTTP ÇëÇó¶ÔÏó
+		http_request req(addr_);  // HTTP è¯·æ±‚å¯¹è±¡
 
-		// ÉèÖÃ HTTP ÇëÇóÍ·ĞÅÏ¢
+		// è®¾ç½® HTTP è¯·æ±‚å¤´ä¿¡æ¯
 		req.request_header().set_url(url_.c_str())
 			.set_content_type("text/html")
 			.set_host(addr_.c_str())
 			.set_method(HTTP_METHOD_GET);
 
-		// ²âÊÔÓÃ£¬ÏÔÊ¾ HTTP ÇëÇóÍ·ĞÅÏ¢ÄÚÈİ
+		// æµ‹è¯•ç”¨ï¼Œæ˜¾ç¤º HTTP è¯·æ±‚å¤´ä¿¡æ¯å†…å®¹
 		string header;
 		req.request_header().build_request(header);
 		printf("request: %s\r\n", header.c_str());
 
-		// ·¢ËÍ HTTP ÇëÇóÊı¾İ
+		// å‘é€ HTTP è¯·æ±‚æ•°æ®
 		if (req.request(NULL, 0) == false)
 		{
 			printf("send request error\r\n");
@@ -60,54 +60,54 @@ protected:
 			return;
 		}
 
-		// »ñµÃ HTTP ÇëÇóµÄÁ¬½Ó¶ÔÏó
+		// è·å¾— HTTP è¯·æ±‚çš„è¿æ¥å¯¹è±¡
 		http_client* conn = req.get_client();
 		assert(conn);
 		DOWN_CTX* ctx = new DOWN_CTX;
 		ctx->type = CTX_T_CONTENT_LENGTH;
 
-		// »ñµÃ HTTP ÏìÓ¦Êı¾İµÄÊı¾İÌå³¤¶È
+		// è·å¾— HTTP å“åº”æ•°æ®çš„æ•°æ®ä½“é•¿åº¦
 		ctx->length = (int) conn->body_length();
 		content_length_ = ctx->length;
 
-		// Í¨ÖªÖ÷Ïß³Ì
+		// é€šçŸ¥ä¸»çº¿ç¨‹
 		rpc_signal(ctx);
 
 		char buf[8192];
 		while (true)
 		{
-			// ¶Á HTTP ÏìÓ¦Êı¾İÌå
+			// è¯» HTTP å“åº”æ•°æ®ä½“
 			int ret = req.read_body(buf, sizeof(buf));
 			if (ret <= 0)
 			{
 				ctx = new DOWN_CTX;
 				ctx->type = CTX_T_END;
 				ctx->length = ret;
-				// Í¨ÖªÖ÷Ïß³Ì
+				// é€šçŸ¥ä¸»çº¿ç¨‹
 				rpc_signal(ctx);
 				break;
 			}
 			ctx = new DOWN_CTX;
 			ctx->type = CTX_T_PARTIAL_LENGTH;
 			ctx->length = ret;
-			// Í¨ÖªÖ÷Ïß³Ì
+			// é€šçŸ¥ä¸»çº¿ç¨‹
 			rpc_signal(ctx);
 		}
 	}
 
-	// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌÈÎÎñÍê³ÉµÄÏûÏ¢
+	// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹ä»»åŠ¡å®Œæˆçš„æ¶ˆæ¯
 	void rpc_onover()
 	{
 		printf("%s: read over now, total read: %d, content-length: %d\r\n",
 			addr_.c_str(), total_read_, content_length_);
 
-		// µ± HTTP ÏìÓ¦¶¼Íê³ÉÊ±£¬Í¨ÖªÖ÷Ïß³ÌÍ£Ö¹ÊÂ¼şÑ­»·¹ı³Ì
+		// å½“ HTTP å“åº”éƒ½å®Œæˆæ—¶ï¼Œé€šçŸ¥ä¸»çº¿ç¨‹åœæ­¢äº‹ä»¶å¾ªç¯è¿‡ç¨‹
 		__download_count--;
 		if (__download_count == 0)
 			handle_.stop();
 	}
 
-	// Ö÷Ïß³Ì´¦Àí¹ı³Ì£¬ÊÕµ½×ÓÏß³ÌµÄÍ¨ÖªÏûÏ¢
+	// ä¸»çº¿ç¨‹å¤„ç†è¿‡ç¨‹ï¼Œæ”¶åˆ°å­çº¿ç¨‹çš„é€šçŸ¥æ¶ˆæ¯
 	void rpc_wakeup(void* ctx)
 	{
 		DOWN_CTX* down_ctx = (DOWN_CTX*) ctx;
@@ -143,26 +143,26 @@ private:
 static void run(void)
 {
 	aio_handle handle;
-	rpc_service* service = new rpc_service(10);  // ´´½¨ rpc ·şÎñ¶ÔÏó
+	rpc_service* service = new rpc_service(10);  // åˆ›å»º rpc æœåŠ¡å¯¹è±¡
 
-	// ´ò¿ªÏûÏ¢·şÎñÆ÷
+	// æ‰“å¼€æ¶ˆæ¯æœåŠ¡å™¨
 	if (service->open(&handle) == false)
 	{
 		printf("open service error: %s\r\n", last_serror());
 		return;
 	}
 
-	// ÏÂÔØÒ³ÃæÄÚÈİ
+	// ä¸‹è½½é¡µé¢å†…å®¹
 
 	http_down down1(handle, "www.sina.com.cn:80", "http://www.sina.com.cn/");
-	service->rpc_fork(&down1);  // ·¢ÆğÒ»¸ö×èÈû»á»°¹ı³Ì
+	service->rpc_fork(&down1);  // å‘èµ·ä¸€ä¸ªé˜»å¡ä¼šè¯è¿‡ç¨‹
 	__download_count++;
 
 	http_down down2(handle, "www.hexun.com:80", "/");
-	service->rpc_fork(&down2);  // ·¢ÆğµÚ¶ş¸ö×èÈû»á»°¹ı³Ì
+	service->rpc_fork(&down2);  // å‘èµ·ç¬¬äºŒä¸ªé˜»å¡ä¼šè¯è¿‡ç¨‹
 	__download_count++;
 
-	// Òì²½ÊÂ¼şÑ­»·¹ı³Ì
+	// å¼‚æ­¥äº‹ä»¶å¾ªç¯è¿‡ç¨‹
 	while (true)
 	{
 		if (handle.check() == false)
@@ -170,7 +170,7 @@ static void run(void)
 	}
 
 	delete service;
-	handle.check(); // ±£Ö¤ÊÍ·ÅËùÓĞÑÓ³Ù¹Ø±ÕµÄÒì²½¶ÔÏó
+	handle.check(); // ä¿è¯é‡Šæ”¾æ‰€æœ‰å»¶è¿Ÿå…³é—­çš„å¼‚æ­¥å¯¹è±¡
 }
 
 int main(void)

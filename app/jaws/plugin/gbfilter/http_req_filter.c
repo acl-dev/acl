@@ -10,7 +10,7 @@ int http_request_filter(ACL_VSTREAM *client acl_unused, HTTP_HDR_REQ *hdr_req ac
 	   http_hdr_fprint(__logfp, &hdr_req->hdr, "http_request_filter");
 	 */
 
-	/* ¹Ø±ÕÑ¹ËõÇëÇó */
+	/* Î‰Î¨Â±Î¥Î¡Î‰Î›Ï…Î—Î»Î—Ïƒ */
 	http_hdr_entry_off(&hdr_req->hdr, "Accept-Encoding");
 	return (0);
 }

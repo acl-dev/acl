@@ -43,9 +43,9 @@ void http_redirect_init(void)
 	    || *var_cfg_http_domain_redirect == 0)
 		return;
 	
-	/* È¥µô¶àÓàµÄ¿Õ¸ñºÍËõ½ü */
+	/* å»æ‰å¤šä½™çš„ç©ºæ ¼å’Œç¼©è¿‘ */
 	acl_mystr_trim(var_cfg_http_domain_redirect);
-	/* Í³Ò»×ª»»ÎªĞ¡Ğ´ */
+	/* ç»Ÿä¸€è½¬æ¢ä¸ºå°å†™ */
 	acl_lowercase(var_cfg_http_domain_redirect);
 	argv = acl_argv_split(var_cfg_http_domain_redirect, ";");
 	acl_foreach(iter, argv) {

@@ -48,7 +48,7 @@ struct ACL_DNS_REQ {
 
 static int dns_stream_open(ACL_DNS *dns);
 
-/* ACL_VSTREAM: ´ÓÊý¾ÝÁ÷¶ÁÈ¡Êý¾ÝµÄ»Øµ÷º¯Êý */
+/* ACL_VSTREAM: ä»Žæ•°æ®æµè¯»å–æ•°æ®çš„å›žè°ƒå‡½æ•° */
 
 static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
@@ -56,7 +56,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 	ACL_DNS *dns = (ACL_DNS*) arg;
 	int      ret;
 
-	/* xxx: ±ØÐëÏÈ½«ÏµÍ³¿É¶Á±êÖ¾Î»ÖÃ0£¬ÒÔÃâÒýÆðÊÂ¼þÒýÇæµÄÖØ¸´´¥·¢ */
+	/* xxx: å¿…é¡»å…ˆå°†ç³»ç»Ÿå¯è¯»æ ‡å¿—ä½ç½®0ï¼Œä»¥å…å¼•èµ·äº‹ä»¶å¼•æ“Žçš„é‡å¤è§¦å‘ */
 	stream->read_ready = 0;
 
 	dns->addr_from.addr_len = sizeof(dns->addr_from.addr);
@@ -78,7 +78,7 @@ static int dns_read(ACL_SOCKET fd, void *buf, size_t size,
 	return ret;
 }
 
-/* ACL_VSTREAM: ÏòÊý¾ÝÁ÷Ð´È¡Êý¾ÝµÄ»Øµ÷º¯Êý */
+/* ACL_VSTREAM: å‘æ•°æ®æµå†™å–æ•°æ®çš„å›žè°ƒå‡½æ•° */
 
 static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 	int timeout acl_unused, ACL_VSTREAM *stream acl_unused, void *arg)
@@ -93,7 +93,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 			__FUNCTION__, __LINE__, dns->dns_list->count);
 	}
 
-	/* ¸ù¾Ýµ±Ç°IDºÅÈ¡Ä£»ñµÃÄ¿±êDNSµØÖ· */
+	/* æ ¹æ®å½“å‰IDå·å–æ¨¡èŽ·å¾—ç›®æ ‡DNSåœ°å€ */
 	i = dns->dns_idx++ % dns->dns_list->count;
 	if (dns->dns_idx == (unsigned) dns->dns_list->count) {
 		dns->dns_idx = 0;
@@ -121,7 +121,7 @@ static int dns_write(ACL_SOCKET fd, const void *buf, size_t size,
 	return ret;
 }
 
-/* ¸ù¾ÝDNS²éÑ¯½á¹ûÉú³É ACL_DNS_DB ¶ÔÏó */
+/* æ ¹æ®DNSæŸ¥è¯¢ç»“æžœç”Ÿæˆ ACL_DNS_DB å¯¹è±¡ */
 
 static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 	unsigned int *ttl_min)
@@ -143,7 +143,7 @@ static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 			saddr = &phost->saddr;
 
 #if defined(ACL_UNIX)
-			/* ÕâÑùÖ±½Ó¸³ÖµÒª±ÈÓÃ memcpy ¿ìÐ© */
+			/* è¿™æ ·ç›´æŽ¥èµ‹å€¼è¦æ¯”ç”¨ memcpy å¿«äº› */
 # ifdef MINGW
 			saddr->in.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);
@@ -155,7 +155,7 @@ static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 			saddr->in.sin_addr.s_addr =
 				*((unsigned int*) res->answer[i].rdata);
 #endif
-			/* Ä¿Ç°¸ÃÄ£¿é½öÖ§³Ö IPV4 */
+			/* ç›®å‰è¯¥æ¨¡å—ä»…æ”¯æŒ IPV4 */
 			saddr->sa.sa_family = AF_INET;
 
 			if (!inet_ntop(AF_INET, &saddr->in.sin_addr,
@@ -185,7 +185,7 @@ static ACL_DNS_DB *build_dns_db(const ACL_RFC1035_MESSAGE *res,
 				continue;
 			}
 
-			/* Ä¿Ç°¸ÃÄ£¿é½öÖ§³Ö IPV4 */
+			/* ç›®å‰è¯¥æ¨¡å—ä»…æ”¯æŒ IPV4 */
 			phost->saddr.sa.sa_family = AF_INET6;
 
 			phost->ttl = res->answer[i].ttl;
@@ -222,7 +222,7 @@ static int dns_safe_addr_check(ACL_DNS *dns)
 	char  from[64];
 	ACL_ITER iter;
 
-	/* ¼ì²éÏìÓ¦°üµÄ DNS µØÖ·Óë±¾µØÅäÖÃµÄµØÖ·ÊÇ·ñÆ¥Åä */
+	/* æ£€æŸ¥å“åº”åŒ…çš„ DNS åœ°å€ä¸Žæœ¬åœ°é…ç½®çš„åœ°å€æ˜¯å¦åŒ¹é… */
 	acl_foreach(iter, dns->dns_list) {
 		ACL_DNS_ADDR *addr = (ACL_DNS_ADDR*) iter.data;
 
@@ -281,16 +281,16 @@ static void dns_lookup_error(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 	req = acl_htable_find(dns->lookup_table, key);
 
 	if (req) {
-		/* È¡Ïû¶¨Ê±Æ÷ */
+		/* å–æ¶ˆå®šæ—¶å™¨ */
 		acl_aio_cancel_timer(dns->aio, dns->lookup_timeout, req);
 
-		/* ´Ó²éÑ¯ÁÐ±íÉ¾³ý¸Ã²éÑ¯¶ÔÏó */
+		/* ä»ŽæŸ¥è¯¢åˆ—è¡¨åˆ é™¤è¯¥æŸ¥è¯¢å¯¹è±¡ */
 		acl_htable_delete(dns->lookup_table, req->key, NULL);
 
-		/* Í¨ÖªÓ¦ÓÃ²éÑ¯Ê§°Ü */
+		/* é€šçŸ¥åº”ç”¨æŸ¥è¯¢å¤±è´¥ */
 		req->callback(NULL, req->ctx, res->rcode, res);
 
-		/* ÊÍ·Å¸Ã²éÑ¯¶ÔÏó */
+		/* é‡Šæ”¾è¯¥æŸ¥è¯¢å¯¹è±¡ */
 		acl_myfree(req);
 	}
 }
@@ -310,29 +310,29 @@ static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 		return;
 	}
 
-	/* È¡Ïû¶¨Ê±Æ÷ */
+	/* å–æ¶ˆå®šæ—¶å™¨ */
 	if (dns->aio != NULL) {
 		acl_aio_cancel_timer(dns->aio, dns->lookup_timeout, req);
 	} else {
 		acl_msg_warn("%s(%d): the dns is closed", __FUNCTION__, __LINE__);
 	}
 
-	/* ´Ó²éÑ¯ÁÐ±íÉ¾³ý¸Ã²éÑ¯¶ÔÏó */
+	/* ä»ŽæŸ¥è¯¢åˆ—è¡¨åˆ é™¤è¯¥æŸ¥è¯¢å¯¹è±¡ */
 	acl_htable_delete(dns->lookup_table, req->key, NULL);
 
-	/* ´´½¨ DNS ²éÑ¯½á¹û»º´æ¶ÔÏó£¬²¢¼ÓÈë±¾µØ»º´æÖÐ */
+	/* åˆ›å»º DNS æŸ¥è¯¢ç»“æžœç¼“å­˜å¯¹è±¡ï¼Œå¹¶åŠ å…¥æœ¬åœ°ç¼“å­˜ä¸­ */
 	dns_db = build_dns_db(res, (unsigned int*) &ttl_min);
 
-	/* ÉèÖÃ·µ»Ø±¾´Î²éÑ¯½á¹ûËùÊ¹ÓÃµÄ DNS ·þÎñÆ÷µØÖ·*/
+	/* è®¾ç½®è¿”å›žæœ¬æ¬¡æŸ¥è¯¢ç»“æžœæ‰€ä½¿ç”¨çš„ DNS æœåŠ¡å™¨åœ°å€*/
 	acl_netdb_set_ns(dns_db, &dns->addr_from.addr);
 
-	/* »Øµ÷º¯ÊýÓÃ»§µÄ»Øµ÷º¯Êý */
+	/* å›žè°ƒå‡½æ•°ç”¨æˆ·çš„å›žè°ƒå‡½æ•° */
 	req->callback(dns_db, req->ctx, res->rcode, res);
 
-	/* ÊÍ·Å¸Ã²éÑ¯¶ÔÏó */
+	/* é‡Šæ”¾è¯¥æŸ¥è¯¢å¯¹è±¡ */
 	acl_myfree(req);
 
-	/* Èç¹û»º´æ»úÖÆÔÊÐíÔò»º´æ¸Ã²éÑ¯½á¹û */
+	/* å¦‚æžœç¼“å­˜æœºåˆ¶å…è®¸åˆ™ç¼“å­˜è¯¥æŸ¥è¯¢ç»“æžœ */
 
 	if (dns->dns_cache == NULL || ttl_min <= 0
 		|| acl_cache2_enter(dns->dns_cache, res->query->name,
@@ -342,14 +342,14 @@ static void dns_lookup_ok(ACL_DNS *dns, ACL_RFC1035_MESSAGE *res)
 	}
 }
 
-/* ÓÐDNS·þÎñÆ÷Êý¾Ý¿É¶ÁÊ±µÄ»Øµ÷º¯Êý */
+/* æœ‰DNSæœåŠ¡å™¨æ•°æ®å¯è¯»æ—¶çš„å›žè°ƒå‡½æ•° */
 
 static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 	char *data, int dlen)
 {
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 	ACL_RFC1035_MESSAGE *res;
-	/* ½âÎöDNSÏìÓ¦Êý¾Ý°ü */
+	/* è§£æžDNSå“åº”æ•°æ®åŒ… */
 	res = acl_rfc1035_response_unpack(data, dlen);
 	if (res == NULL) {
 		return 0;
@@ -359,7 +359,7 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 		return 0;
 	}
 
-	/* ÊÇ·ñ¼ì²é DNS Ô´/Ä¿µÄµØÖ·, ÒÔ±£Ö¤°²È«ÐÔ */
+	/* æ˜¯å¦æ£€æŸ¥ DNS æº/ç›®çš„åœ°å€, ä»¥ä¿è¯å®‰å…¨æ€§ */
 
 	if ((dns->flag & ACL_DNS_FLAG_CHECK_DNS_IP)) {
 		if (dns_safe_addr_check(dns) < 0) {
@@ -368,7 +368,7 @@ static int dns_lookup_callback(ACL_ASTREAM *astream acl_unused, void *ctx,
 		}
 	}
 
-	/* ÊÇ·ñ¼ì²é DNS Ô´/Ä¿µÄÍøÂç, ÒÔ±£Ö¤°²È«ÐÔ */
+	/* æ˜¯å¦æ£€æŸ¥ DNS æº/ç›®çš„ç½‘ç»œ, ä»¥ä¿è¯å®‰å…¨æ€§ */
 
 	if ((dns->flag & ACL_DNS_FLAG_CHECK_DNS_NET)) {
 		if (dns_safe_net_check(dns) < 0) {
@@ -387,12 +387,12 @@ static void dns_stream_reopen_timer(int event_type acl_unused,
 {
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 
-	/* ´´½¨Ò»¸öÐÂµÄÌ×½Ó¿Ú */
+	/* åˆ›å»ºä¸€ä¸ªæ–°çš„å¥—æŽ¥å£ */
 	if (dns_stream_open(dns) == 0) {
-		/* Òì²½¶ÁDNS·þÎñÆ÷ÏìÓ¦Êý¾Ý */
+		/* å¼‚æ­¥è¯»DNSæœåŠ¡å™¨å“åº”æ•°æ® */
 		acl_aio_read(dns->astream);
 	} else if (dns->aio) {
-		/* ÉèÖÃ¶¨Ê±Æ÷ÖØÐÂ´ò¿ª UDP Ì×½Ó×Ö */
+		/* è®¾ç½®å®šæ—¶å™¨é‡æ–°æ‰“å¼€ UDP å¥—æŽ¥å­— */
 		acl_aio_request_timer(dns->aio, dns_stream_reopen_timer, dns,
 			2 * 1000000, 0);
 	} else {
@@ -400,7 +400,7 @@ static void dns_stream_reopen_timer(int event_type acl_unused,
 	}
 }
 
-/* Êý¾ÝÁ÷³ö´íÊ±µÄ»Øµ÷º¯Êý */
+/* æ•°æ®æµå‡ºé”™æ—¶çš„å›žè°ƒå‡½æ•° */
 
 static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused)
 {
@@ -408,12 +408,12 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 	ACL_DNS *dns = (ACL_DNS*) ctx;
 
 
-	/* ÉèÖÃ UDP ¾ä±úÎª NULL£¬ÒÔ·ÀÖ¹ÔÚÖØÐÂ´ò¿ªÇ°±»Ê¹ÓÃ£¬ÒòÎª±¾º¯Êý·µ»Øºó¸Ã
-	 * Òì²½Á÷¶ÔÏó½«»á±»¹Ø±Õ
+	/* è®¾ç½® UDP å¥æŸ„ä¸º NULLï¼Œä»¥é˜²æ­¢åœ¨é‡æ–°æ‰“å¼€å‰è¢«ä½¿ç”¨ï¼Œå› ä¸ºæœ¬å‡½æ•°è¿”å›žåŽè¯¥
+	 * å¼‚æ­¥æµå¯¹è±¡å°†ä¼šè¢«å…³é—­
 	 */
 	dns->astream = NULL;
 
-	/* ÉèÖÃ¶¨Ê±Æ÷ÖØÐÂ´ò¿ª UDP Ì×½Ó×Ö£¬²»Ó¦Á¢¼´´ò¿ª socket£¬ÒÔ·ÀÖ¹Æµ·±¹Ø±Õ */
+	/* è®¾ç½®å®šæ—¶å™¨é‡æ–°æ‰“å¼€ UDP å¥—æŽ¥å­—ï¼Œä¸åº”ç«‹å³æ‰“å¼€ socketï¼Œä»¥é˜²æ­¢é¢‘ç¹å…³é—­ */
 	if (dns->aio) {
 		acl_msg_warn("%s(%d): dns socket closed %s, re-open it in timer",
 			myname, __LINE__, acl_last_serror());
@@ -423,11 +423,11 @@ static int dns_lookup_close(ACL_ASTREAM *server acl_unused, void *ctx acl_unused
 	return -1;
 }
 
-/* ´´½¨DNS²éÑ¯µÄÒì²½Á÷ */
+/* åˆ›å»ºDNSæŸ¥è¯¢çš„å¼‚æ­¥æµ */
 
 static int dns_stream_open(ACL_DNS *dns)
 {
-	/* ndk9 ¾ÓÈ»ÒªÇó acl_vstream_bind Ç°¼Ó·µ»ØÀàÐÍ£¿*/
+	/* ndk9 å±…ç„¶è¦æ±‚ acl_vstream_bind å‰åŠ è¿”å›žç±»åž‹ï¼Ÿ*/
 	ACL_VSTREAM *stream = acl_vstream_bind("0.0.0.0:0", 0, 0);
 
 	if (stream == NULL) {
@@ -440,7 +440,7 @@ static int dns_stream_open(ACL_DNS *dns)
 		return -1;
 	}
 
-	/* ´´½¨Òì²½Á÷ */
+	/* åˆ›å»ºå¼‚æ­¥æµ */
 	dns->astream = acl_aio_open(dns->aio, stream);
 	acl_vstream_ctl(stream,
 		ACL_VSTREAM_CTL_READ_FN, dns_read,
@@ -448,11 +448,11 @@ static int dns_stream_open(ACL_DNS *dns)
 		ACL_VSTREAM_CTL_CONTEXT, dns,
 		ACL_VSTREAM_CTL_END);
 
-	/* ÉèÖÃ²éÑ¯Ì×½Ó¿Ú¿É¶Á¡¢¹Ø±ÕÊ±µÄ»Øµ÷º¯Êý */
+	/* è®¾ç½®æŸ¥è¯¢å¥—æŽ¥å£å¯è¯»ã€å…³é—­æ—¶çš„å›žè°ƒå‡½æ•° */
 	acl_aio_add_read_hook(dns->astream, dns_lookup_callback, dns);
 	acl_aio_add_close_hook(dns->astream, dns_lookup_close, dns);
 
-	/* ÉèÖÃ¸ÃÒì²½Á÷Îª³ÖÐø¶Á×´Ì¬ */
+	/* è®¾ç½®è¯¥å¼‚æ­¥æµä¸ºæŒç»­è¯»çŠ¶æ€ */
 	dns->astream->keep_read = 1;
 	return 0;
 }
@@ -465,7 +465,7 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain,
 
 	memset(buf, 0, sizeof(buf));
 
-	/* ´´½¨DNS²éÑ¯Êý¾Ý°ü */
+	/* åˆ›å»ºDNSæŸ¥è¯¢æ•°æ®åŒ… */
 	switch (req->type) {
 	case ACL_RFC1035_TYPE_A:
 		ret = acl_rfc1035_build_query4a(domain, buf, sizeof(buf),
@@ -485,7 +485,7 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain,
 		return;
 	}
 
-	/* ·¢ËÍÇëÇóDNS°ü */
+	/* å‘é€è¯·æ±‚DNSåŒ… */
 	if (dns->astream != NULL) {
 		acl_aio_writen(dns->astream, buf, (int) ret);
 	} else {
@@ -494,7 +494,7 @@ static void dns_lookup_send(ACL_DNS *dns, const char *domain,
 	}
 }
 
-/* ²éÑ¯³¬Ê±µÄ»Øµ÷º¯Êý */
+/* æŸ¥è¯¢è¶…æ—¶çš„å›žè°ƒå‡½æ•° */
 
 static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 	void *context)
@@ -521,7 +521,7 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 			dns_lookup_send(dns, domain, req);
 		}
 
-		/* ÉèÖÃ¶¨Ê±Æ÷ */
+		/* è®¾ç½®å®šæ—¶å™¨ */
 		if (dns->aio) {
 			acl_aio_request_timer(dns->aio, dns->lookup_timeout,
 				req, ((long long) dns->timeout) * 1000000, 0);
@@ -531,42 +531,42 @@ static void dns_lookup_timeout(int event_type, ACL_EVENT *event acl_unused,
 		return;
 	}
 
-	/* ´Ó²éÑ¯ÁÐ±íÉ¾³ý¸Ã²éÑ¯¶ÔÏó */
+	/* ä»ŽæŸ¥è¯¢åˆ—è¡¨åˆ é™¤è¯¥æŸ¥è¯¢å¯¹è±¡ */
 	acl_htable_delete(req->dns->lookup_table, req->key, NULL);
 
-	/* »Øµ÷º¯ÊýÓÃ»§µÄ»Øµ÷º¯Êý */
+	/* å›žè°ƒå‡½æ•°ç”¨æˆ·çš„å›žè°ƒå‡½æ•° */
 	req->callback(NULL, req->ctx, ACL_DNS_ERR_TIMEOUT, NULL);
 
-	/* ÊÍ·Å¸Ã²éÑ¯¶ÔÏó */
+	/* é‡Šæ”¾è¯¥æŸ¥è¯¢å¯¹è±¡ */
 	acl_myfree(req);
 }
 
 int acl_dns_init(ACL_DNS *dns, ACL_AIO *aio, int timeout)
 {
-	dns->flag       &= ~ACL_DNS_FLAG_ALLOC;  /* Ä¬ÈÏÎªÕ»¿Õ¼ä */
+	dns->flag       &= ~ACL_DNS_FLAG_ALLOC;  /* é»˜è®¤ä¸ºæ ˆç©ºé—´ */
 	dns->aio         = aio;
 	dns->timeout     = timeout > 0 ? timeout : 5;
 	dns->qid         = 0;
 	dns->dns_idx     = 0;
 	dns->retry_limit = 0;
 
-	/* ´´½¨DNS·þÎñÆ÷µØÖ·Êý×é */
+	/* åˆ›å»ºDNSæœåŠ¡å™¨åœ°å€æ•°ç»„ */
 	dns->dns_list       = acl_array_create(10);
 
-	/* ´´½¨²éÑ¯¶ÔÏó±í */
+	/* åˆ›å»ºæŸ¥è¯¢å¯¹è±¡è¡¨ */
 	dns->lookup_table   = acl_htable_create(1024, 0);
 
-	/* ÉèÖÃ DNS ²éÑ¯³¬Ê±µÄ»Øµ÷º¯Êý*/
+	/* è®¾ç½® DNS æŸ¥è¯¢è¶…æ—¶çš„å›žè°ƒå‡½æ•°*/
 	dns->lookup_timeout = dns_lookup_timeout;
 
-	/* ´ò¿ªÒì²½¶ÁÈ¡DNS·þÎñÆ÷ÏìÓ¦µÄÊý¾ÝÁ÷ */
+	/* æ‰“å¼€å¼‚æ­¥è¯»å–DNSæœåŠ¡å™¨å“åº”çš„æ•°æ®æµ */
 	if (dns_stream_open(dns) == -1) {
 		acl_msg_error("%s(%d), %s: dns_stream_open error=%s",
 			__FILE__, __LINE__, __FUNCTION__, acl_last_serror());
 		return -1;
 	}
 
-	/* ¿ªÊ¼Òì²½¶Á²éÑ¯½á¹û */
+	/* å¼€å§‹å¼‚æ­¥è¯»æŸ¥è¯¢ç»“æžœ */
 	acl_aio_read(dns->astream);
 	return 0;
 }
@@ -581,7 +581,7 @@ ACL_DNS *acl_dns_create(ACL_AIO *aio, int timeout)
 			__FILE__, __LINE__, __FUNCTION__);
 		return NULL;
 	}
-	dns->flag |= ACL_DNS_FLAG_ALLOC;  /* ÉèÖÃÎª¶Ñ·ÖÅäµÄ±äÁ¿ */
+	dns->flag |= ACL_DNS_FLAG_ALLOC;  /* è®¾ç½®ä¸ºå †åˆ†é…çš„å˜é‡ */
 	return dns;
 }
 
@@ -597,7 +597,7 @@ void acl_dns_close(ACL_DNS *dns)
 	if (dns->aio) {
 		dns->aio->dns = NULL;
 
-		/* ÖÃ¿Õºó£¬ÎªºóÐø¹ý³ÌÌáÊ¾µ±Ç°¶ÔÏóÕýÔÚ¹Ø±Õ¹ý³ÌÖÐ */
+		/* ç½®ç©ºåŽï¼Œä¸ºåŽç»­è¿‡ç¨‹æç¤ºå½“å‰å¯¹è±¡æ­£åœ¨å…³é—­è¿‡ç¨‹ä¸­ */
 		dns->aio = NULL;
 	}
 
@@ -651,7 +651,7 @@ static void cache_free_fn(const ACL_CACHE2_INFO *info acl_unused, void *arg)
 {
 	ACL_DNS_DB *dns_db = (ACL_DNS_DB*) arg;
 
-	/* ÊÍ·Å»º´æ¶ÔÏó */
+	/* é‡Šæ”¾ç¼“å­˜å¯¹è±¡ */
 	acl_netdb_free(dns_db);
 }
 
@@ -676,7 +676,7 @@ void acl_dns_add_dns(ACL_DNS *dns, const char *dns_ip,
 	addr = (ACL_DNS_ADDR*) acl_mycalloc(1, sizeof(ACL_DNS_ADDR));
 	addr->mask_length = mask_length;
 
-	/* ÉèÖÃDNS·þÎñÆ÷µØÖ· */
+	/* è®¾ç½®DNSæœåŠ¡å™¨åœ°å€ */
 
 	SAFE_COPY(addr->ip, dns_ip, sizeof(addr->ip));
 	addr->port = dns_port;
@@ -691,7 +691,7 @@ void acl_dns_add_dns(ACL_DNS *dns, const char *dns_ip,
 	acl_mask_addr((unsigned char*) &addr->in.s_addr,
 		sizeof(addr->in.s_addr), mask_length);
 
-	/* ½«¸ÃDNSµØÖ·Ìí¼Ó½øÊý×éÖÐ */
+	/* å°†è¯¥DNSåœ°å€æ·»åŠ è¿›æ•°ç»„ä¸­ */
 	(void) acl_array_append(dns->dns_list, addr);
 }
 
@@ -821,7 +821,7 @@ void acl_dns_lookup2(ACL_DNS *dns, const char *domain_in, unsigned short type,
 	ACL_DNS_REQ *req;
 	int i;
 
-	/* ÏÈ¼ì²éÊÇ·ñÆ¥ÅäÓòÃû×é */
+	/* å…ˆæ£€æŸ¥æ˜¯å¦åŒ¹é…åŸŸåç»„ */
 	if (dns->groups) {
 		ACL_DOMAIN_GROUP *dmgrp = NULL;
 		ACL_ITER iter;
@@ -831,11 +831,11 @@ void acl_dns_lookup2(ACL_DNS *dns, const char *domain_in, unsigned short type,
 
 #define NEQ acl_strrncasecmp
 
-			/* ÏÈÕÒµ½ÓòÃû×é¶ÔÏó */
+			/* å…ˆæ‰¾åˆ°åŸŸåç»„å¯¹è±¡ */
 			if (NEQ(tmp->group, domain_in, tmp->group_len)) {
 				continue;
 			}
-			/* ¼ì²é¸ÃÓòÃûÊÇ·ñÊÇÓòÃû×éµÄÀýÍâÓòÃû */
+			/* æ£€æŸ¥è¯¥åŸŸåæ˜¯å¦æ˜¯åŸŸåç»„çš„ä¾‹å¤–åŸŸå */
 			if (!tmp->excepts) {
 				dmgrp = tmp;
 				break;
@@ -860,7 +860,7 @@ END_FOREACH_TAG:
 
 	acl_lowercase(domain);
 
-	/* Èç¹û´ò¿ªDNS»º´æ¹¦ÄÜ£¬ÔòÓÅÏÈ²éÑ¯»º´æ */
+	/* å¦‚æžœæ‰“å¼€DNSç¼“å­˜åŠŸèƒ½ï¼Œåˆ™ä¼˜å…ˆæŸ¥è¯¢ç¼“å­˜ */
 	if (dns->dns_cache) {
 		ACL_DNS_DB *dns_db;
 		dns_db = acl_cache2_find(dns->dns_cache, domain);
@@ -874,7 +874,7 @@ END_FOREACH_TAG:
 	acl_lowercase(key);
 	req = (ACL_DNS_REQ*) acl_htable_find(dns->lookup_table, key);
 
-	/* XXX: ²»Ó¦´æÔÚÏàÍ¬µÄ¼ü´æÔÚ, ÒòÎª¸Ã¼üÊÇÓÉÓòÃû¼°×Ô¶¯ID×é³É */
+	/* XXX: ä¸åº”å­˜åœ¨ç›¸åŒçš„é”®å­˜åœ¨, å› ä¸ºè¯¥é”®æ˜¯ç”±åŸŸååŠè‡ªåŠ¨IDç»„æˆ */
 	if (req != NULL) {
 		acl_msg_warn("%s(%d): key(%s) exist",
 			__FUNCTION__, __LINE__, key);
@@ -882,7 +882,7 @@ END_FOREACH_TAG:
 		return;
 	}
 
-	/* ·ÖÅäÐÂµÄ²éÑ¯¶ÔÏó */
+	/* åˆ†é…æ–°çš„æŸ¥è¯¢å¯¹è±¡ */
 	req           = (ACL_DNS_REQ*) acl_mycalloc(1, sizeof(ACL_DNS_REQ));
 	req->dns      = dns;
 	req->callback = callback;
@@ -891,7 +891,7 @@ END_FOREACH_TAG:
 	req->qid      = dns->qid++;
 	SAFE_COPY(req->key, key, sizeof(req->key));
 
-	/* Ìí¼Ó½ø²éÑ¯¶ÔÏó±íÖÐ */
+	/* æ·»åŠ è¿›æŸ¥è¯¢å¯¹è±¡è¡¨ä¸­ */
 	if (acl_htable_enter(dns->lookup_table, key, req) == NULL) {
 		acl_msg_fatal("%s(%d): enter htable error(%s)",
 			__FUNCTION__, __LINE__, acl_last_serror());
@@ -901,7 +901,7 @@ END_FOREACH_TAG:
 		dns_lookup_send(dns, domain, req);
 	}
 
-	/* ÉèÖÃ¶¨Ê±Æ÷ */
+	/* è®¾ç½®å®šæ—¶å™¨ */
 	acl_aio_request_timer(dns->aio, dns->lookup_timeout,
 		req, ((long long) dns->timeout) * 1000000, 0);
 }

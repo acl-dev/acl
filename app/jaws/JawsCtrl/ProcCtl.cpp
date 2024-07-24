@@ -1,4 +1,4 @@
-// ProcCtl.cpp : ÊµÏÖÎÄ¼ş
+// ProcCtl.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -21,13 +21,13 @@ CProcCtl::~CProcCtl()
 
 BOOL CProcCtl::InitInstance()
 {
-	// TODO: ÔÚ´ËÖ´ĞĞÈÎÒâÖğÏß³Ì³õÊ¼»¯
+	// TODO: åœ¨æ­¤æ‰§è¡Œä»»æ„é€çº¿ç¨‹åˆå§‹åŒ–
 	return TRUE;
 }
 
 int CProcCtl::ExitInstance()
 {
-	// TODO: ÔÚ´ËÖ´ĞĞÈÎÒâÖğÏß³ÌÇåÀí
+	// TODO: åœ¨æ­¤æ‰§è¡Œä»»æ„é€çº¿ç¨‹æ¸…ç†
 	return CWinThread::ExitInstance();
 }
 
@@ -35,11 +35,11 @@ BEGIN_MESSAGE_MAP(CProcCtl, CWinThread)
 END_MESSAGE_MAP()
 
 
-// CProcCtl ÏûÏ¢´¦Àí³ÌĞò
+// CProcCtl æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 int CProcCtl::Run()
 {
-	// TODO: ÔÚ´ËÌí¼Ó×¨ÓÃ´úÂëºÍ/»òµ÷ÓÃ»ùÀà
+	// TODO: åœ¨æ­¤æ·»åŠ ä¸“ç”¨ä»£ç å’Œ/æˆ–è°ƒç”¨åŸºç±»
 
 	return CWinThread::Run();
 }

@@ -1,4 +1,4 @@
-﻿// JencodeDlg.cpp : 实现文件
+// JencodeDlg.cpp : 实现文件
 //
 
 #include "stdafx.h"

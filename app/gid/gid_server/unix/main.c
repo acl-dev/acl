@@ -60,7 +60,7 @@ static ACL_VSTREAM *init(const char *filepath)
 	if (cfg)
 		acl_xinetd_cfg_free(cfg);
 
-	signal(SIGINT, on_sigint); /* ×¢²á³ÌĞòÍË³ö»Øµ÷º¯Êı */
+	signal(SIGINT, on_sigint); /* æ³¨å†Œç¨‹åºé€€å‡ºå›è°ƒå‡½æ•° */
 	service_init(NULL);
 
 	return (sstream);

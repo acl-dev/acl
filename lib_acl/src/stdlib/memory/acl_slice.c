@@ -83,14 +83,14 @@ struct ACL_SLICE {
 
 	void *(*slice_alloc)(ACL_SLICE *slice);
 	void  (*slice_free)(ACL_SLICE *slice, void *ptr);
-	int   (*slice_gc)(ACL_SLICE *slice);  /* ·µ»Ø 1 ±íÊ¾ÒÑ¾­ÊÍ·ÅÍê±Ï */
+	int   (*slice_gc)(ACL_SLICE *slice);  /* è¿”å›ž 1 è¡¨ç¤ºå·²ç»é‡Šæ”¾å®Œæ¯• */
 	int   (*slice_used)(ACL_SLICE *slice);
 	void  (*slice_stat)(ACL_SLICE *slice, ACL_SLICE_STAT *sbuf);
 };
 
 #define	SLICE_OFF_SIZE		4
 
-/* MBUF1, MBUF2, MBUF3 µÄ»ù´¡ÀàÐÍ */
+/* MBUF1, MBUF2, MBUF3 çš„åŸºç¡€ç±»åž‹ */
 
 #define SIGNATURE		0xdead
 
@@ -101,8 +101,8 @@ typedef struct MBUF {
 } MBUF;
 
 /**
- * MBUF1: ±È½Ï½ÚÊ¡ÄÚ´æÄ£Ê½£¬µ«¸Ã·½Ê½ÔÚÀ¬»ø×Ô¶¯»ØÊÕÊ±±È½Ï·ÑÊ±£¬
- * ±È½ÏÊÊºÏÓÚ·ÖÅäµ«²»»ØÊÕµÄÇéÐÎ
+ * MBUF1: æ¯”è¾ƒèŠ‚çœå†…å­˜æ¨¡å¼ï¼Œä½†è¯¥æ–¹å¼åœ¨åžƒåœ¾è‡ªåŠ¨å›žæ”¶æ—¶æ¯”è¾ƒè´¹æ—¶ï¼Œ
+ * æ¯”è¾ƒé€‚åˆäºŽåˆ†é…ä½†ä¸å›žæ”¶çš„æƒ…å½¢
  */
 
 #define	SLICE1_HEAD_SIZE	SLICE_OFF_SIZE
@@ -120,8 +120,8 @@ typedef struct SLICE1 {
 } SLICE1;
 
 /**
- * MBUF2: ÄÚ´æÉÔÎ¢´óµã£¬µ«ÊµÊ±À¬»øµÄ×Ô¶¯»ØÊÕÐÔÄÜ±È½ÏºÃ, µ«Èç¹ûÄ³
- * ¸ö MBUF2 Ö»ÒªÓÐÒ»¸ö½áµã±»ÒýÓÃ, Ôò¸ÃÄÚ´æ±ã²»ÄÜ±»ÊÍ·Å¸øÏµÍ³
+ * MBUF2: å†…å­˜ç¨å¾®å¤§ç‚¹ï¼Œä½†å®žæ—¶åžƒåœ¾çš„è‡ªåŠ¨å›žæ”¶æ€§èƒ½æ¯”è¾ƒå¥½, ä½†å¦‚æžœæŸ
+ * ä¸ª MBUF2 åªè¦æœ‰ä¸€ä¸ªç»“ç‚¹è¢«å¼•ç”¨, åˆ™è¯¥å†…å­˜ä¾¿ä¸èƒ½è¢«é‡Šæ”¾ç»™ç³»ç»Ÿ
  */
 
 #define	SLICE2_HEAD_SIZE	(SLICE_OFF_SIZE + 4)
@@ -142,8 +142,8 @@ typedef struct SLICE2 {
 } SLICE2;
 
 /**
- * MBUF3: ÄÚ´æ¸ü´ó£¬µ±Ë³Ðò·ÖÅäÍ¬Ê±Ë³ÐòÊÍ·ÅÊ±»ØÊÕÄÚ´æÐ§¹û¸üºÃ,
- * µ«Èç¹ûÊÇËæ»úÊÍ·ÅÔòÐ§ÂÊÏÂ½µ·Ç³£À÷º¦£¬ÓÈÆäµ±½áµã±È½Ï¶àÊ±
+ * MBUF3: å†…å­˜æ›´å¤§ï¼Œå½“é¡ºåºåˆ†é…åŒæ—¶é¡ºåºé‡Šæ”¾æ—¶å›žæ”¶å†…å­˜æ•ˆæžœæ›´å¥½,
+ * ä½†å¦‚æžœæ˜¯éšæœºé‡Šæ”¾åˆ™æ•ˆçŽ‡ä¸‹é™éžå¸¸åŽ‰å®³ï¼Œå°¤å…¶å½“ç»“ç‚¹æ¯”è¾ƒå¤šæ—¶
  */
 
 #define	SLICE3_HEAD_SIZE	SLICE_OFF_SIZE
@@ -1292,7 +1292,7 @@ void acl_slice_pool_free(const char *filename, int line, void *buf)
 {
 	char *ptr = (char*) buf;
 
-	ptr -= sizeof(size_t);  /* ÒÆÖÁÄÚ´æÍ·µÄ±êÖ¾Î» */
+	ptr -= sizeof(size_t);  /* ç§»è‡³å†…å­˜å¤´çš„æ ‡å¿—ä½ */
 	if (*((size_t*) ptr) == 0) {
 		ptr -= sizeof(size_t);
 		__slice_free_fn(filename, line, ptr);
@@ -1307,7 +1307,7 @@ void *acl_slice_pool_alloc(const char *filename, int line,
 	char *ptr;
 	int   n;
 
-	size += sizeof(size_t);  /* Í·²¿Áô³ö¿Õ¼ä×öÎª±êÖ¾Î» */
+	size += sizeof(size_t);  /* å¤´éƒ¨ç•™å‡ºç©ºé—´åšä¸ºæ ‡å¿—ä½ */
 	if (asp == NULL || (int) size >= asp->base * asp->nslice) {
 		size += sizeof(size_t);
 		ptr = (char*) __slice_malloc_fn(filename, line, size);

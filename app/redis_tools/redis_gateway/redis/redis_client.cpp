@@ -120,7 +120,7 @@ redis_object* redis_client::get_string(acl::socket_stream& conn,
 	buf[len] = 0;
 	obj->put(buf, (size_t) len);
 
-	// ¶Á \r\n
+	// è¯» \r\n
 	sbuf.clear();
 	if (conn_.gets(sbuf) == false) {
 		logger_error("gets error, server: %s", conn.get_peer(true));
@@ -254,7 +254,7 @@ redis_object* redis_client::get_objects(acl::socket_stream& conn,
 const redis_object* redis_client::read_reply(acl::dbuf_pool& dbuf,
 	size_t nchildren /* = 0 */, int* rw_timeout /* = NULL */)
 {
-	// ÖØÖÃĞ­Òé´¦Àí×´Ì¬
+	// é‡ç½®åè®®å¤„ç†çŠ¶æ€
 	redis_object* obj;
 
 	while (true) {

@@ -13,7 +13,7 @@
 
 typedef struct HTTP_CLIENT {
 	ACL_ASTREAM *stream;
-	HTTP_HDR_REQ *hdr_req;                  /* HTTPĞ­ÒéÇëÇóÍ·Ö¸Õë */
+	HTTP_HDR_REQ *hdr_req;                  /* HTTPåè®®è¯·æ±‚å¤´æŒ‡é’ˆ */
 	HTTP_REQ *http_req;
 	ACL_VSTRING *sbuf;
 	ACL_VSTRING *key;

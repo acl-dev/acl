@@ -5,7 +5,7 @@
 
 int is_listen_socket(socket_t fd);
 
-// return: -1, AF_INET¡¢AF_INET6 »ò AF_UNIX
+// return: -1, AF_INETË‡Ë˜AF_INET6 Â»Åˆ AF_UNIX
 int getsockfamily(socket_t fd);
 
 // return: -1, SOCK_STREAM, SOCK_DGRAM

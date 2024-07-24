@@ -107,7 +107,7 @@ static int request_data_callback(ACL_ASTREAM *astream acl_unused, void *context,
 	}
 
 	respond_ctx = service_ctx_new(service, server,
-		SERVICE_CTX_TCP_RESPOND, request_ctx->id);  // 与请求端共享同一ID
+		SERVICE_CTX_TCP_RESPOND, request_ctx->id);  // 涓庤姹傜鍏变韩鍚屼竴ID
 	memcpy(respond_ctx->request_buf, data, len);
 	respond_ctx->request_len = len;
 	acl_aio_ctl(server,
@@ -158,5 +158,5 @@ void service_tcp_main(ACL_ASTREAM *client, SERVICE *service)
 		ACL_AIO_CTL_TIMEOUT, service->rw_timeout,
 		ACL_AIO_CTL_CTX, ctx,
 		ACL_AIO_CTL_END);
-	acl_aio_readn(client, 2);  // 读取两个字节
+	acl_aio_readn(client, 2);  // 璇诲彇涓や釜瀛楄妭
 }

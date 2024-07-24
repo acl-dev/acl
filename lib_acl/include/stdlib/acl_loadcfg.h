@@ -18,7 +18,7 @@ typedef struct ACL_CFG_LINE {
 			 * invalid line, but still be stored
 			 * here in pdata.
 			 */
-	int   line_number;	/* ¸ÃĞĞÔÚÅäÖÃÎÄ¼şÖĞµÄĞĞºÅ */
+	int   line_number;	/* è¯¥è¡Œåœ¨é…ç½®æ–‡ä»¶ä¸­çš„è¡Œå· */
 } ACL_CFG_LINE;
 
 typedef struct ACL_CFG_FN {

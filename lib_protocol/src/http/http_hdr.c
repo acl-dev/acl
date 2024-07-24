@@ -9,7 +9,7 @@ static int __http_hdr_def_entry = 25;
 static int __http_hdr_max_lines = 1024;
 
 /*-------------------------- for general http header -------------------------*/
-/* Éú³ÉÒ»¸öÐÂµÄ HTTP_HDR Êý¾Ý½á¹¹ */
+/* ç”Ÿæˆä¸€ä¸ªæ–°çš„ HTTP_HDR æ•°æ®ç»“æž„ */
 static void __hdr_init(HTTP_HDR *hh)
 {
 	hh->max_lines      = __http_hdr_max_lines;
@@ -20,7 +20,7 @@ static void __hdr_init(HTTP_HDR *hh)
 	hh->keep_alive     = 0;
 }
 
-/* ·ÖÅäÒ»¸öHTTPÐ­ÒéÍ·µÄ»ù´¡½á¹¹ */
+/* åˆ†é…ä¸€ä¸ªHTTPåè®®å¤´çš„åŸºç¡€ç»“æž„ */
 
 HTTP_HDR *http_hdr_new(size_t size)
 {
@@ -36,16 +36,16 @@ HTTP_HDR *http_hdr_new(size_t size)
 	return hh;
 }
 
-/* ¿ËÂ¡Ò»¸öHTTPÐ­ÒéÍ·µÄ»ù´¡½á¹¹ */
+/* å…‹éš†ä¸€ä¸ªHTTPåè®®å¤´çš„åŸºç¡€ç»“æž„ */
 
 void http_hdr_clone(const HTTP_HDR *src, HTTP_HDR *dst)
 {
-	ACL_ARRAY  *entry_lnk_saved = dst->entry_lnk;  /* ÏÈ±£ÁôÔ­Ö¸Õë */
+	ACL_ARRAY  *entry_lnk_saved = dst->entry_lnk;  /* å…ˆä¿ç•™åŽŸæŒ‡é’ˆ */
 	HTTP_HDR_ENTRY *entry, *entry_from;
 	int   i, n;
 
 	memcpy(dst, src, sizeof(HTTP_HDR));
-	dst->entry_lnk = entry_lnk_saved;  /* »Ö¸´Ô­Ê¼Ö¸Õë */
+	dst->entry_lnk = entry_lnk_saved;  /* æ¢å¤åŽŸå§‹æŒ‡é’ˆ */
 	dst->chat_ctx = NULL;  /* bugfix, 2008.10.7 , zsx */
 	dst->chat_free_ctx_fn = NULL;  /* bugfix, 2008.10.7 , zsx */
 
@@ -57,7 +57,7 @@ void http_hdr_clone(const HTTP_HDR *src, HTTP_HDR *dst)
 	}
 }
 
-/* ÊÍ·Å HTTP_HDR */
+/* é‡Šæ”¾ HTTP_HDR */
 
 void http_hdr_free(HTTP_HDR *hh)
 {
@@ -101,7 +101,7 @@ HTTP_HDR_ENTRY *http_hdr_entry_build(const char *name, const char *value)
 	return entry;
 }
 
-/* ¸ù¾Ý´«ÈëµÄÒ»ÐÐÊý¾Ý½øÐÐ·ÖÎö, Éú³ÉÒ»¸ö HTTP_HDR_ENTRY */
+/* æ ¹æ®ä¼ å…¥çš„ä¸€è¡Œæ•°æ®è¿›è¡Œåˆ†æž, ç”Ÿæˆä¸€ä¸ª HTTP_HDR_ENTRY */
 
 HTTP_HDR_ENTRY *http_hdr_entry_new(const char *data)
 {
@@ -217,7 +217,7 @@ HTTP_HDR_ENTRY *http_hdr_entry_new2(char *data)
 	return entry;
 }
 
-/* ½« HTTP_HDR_ENTRY ·ÅÈë HTTP_HDR ÖÐ */
+/* å°† HTTP_HDR_ENTRY æ”¾å…¥ HTTP_HDR ä¸­ */
 
 void http_hdr_append_entry(HTTP_HDR *hh, HTTP_HDR_ENTRY *entry)
 {
@@ -251,7 +251,7 @@ int http_hdr_parse_version(HTTP_HDR *hh, const char *data)
 
 /*----------------------------------------------------------------------------*/
 
-/* ¸ù¾Ý±äÁ¿ÃûÈ¡µÃºóÃæµÄÕû¸öÊý¾ÝÏî */
+/* æ ¹æ®å˜é‡åå–å¾—åŽé¢çš„æ•´ä¸ªæ•°æ®é¡¹ */
 
 static HTTP_HDR_ENTRY *__get_hdr_entry(const HTTP_HDR *hh, const char *name)
 {
@@ -381,7 +381,7 @@ void http_hdr_entry_off(HTTP_HDR *hh, const char *name)
 	if (entry == NULL)
 		return;
 
-	/* xxx: ÌÚÑ¶µÄÊÓÆµWEB·þÎñÆ÷²»Ö§³Ö´ËÖÖ·½Ê½ -- 2008-7-23, zsx */
+	/* xxx: è…¾è®¯çš„è§†é¢‘WEBæœåŠ¡å™¨ä¸æ”¯æŒæ­¤ç§æ–¹å¼ -- 2008-7-23, zsx */
 	/* entry->name[0] = '_'; */
 	entry->off = 1;
 }
@@ -531,8 +531,8 @@ int http_hdr_parse(HTTP_HDR *hh)
 		hh->keep_alive = 0;
 	}
 #else
-	/* ÔÊÐí keep_alive ´æÔÚÈýÖÖ¿ÉÄÜÐÔ£º
-	 * 0£º²»±£³Ö³¤Á¬½Ó£»1£º±£³Ö³¤Á¬½Ó£¬-1£ºÃ»ÓÐ¸Ã×Ö¶Î
+	/* å…è®¸ keep_alive å­˜åœ¨ä¸‰ç§å¯èƒ½æ€§ï¼š
+	 * 0ï¼šä¸ä¿æŒé•¿è¿žæŽ¥ï¼›1ï¼šä¿æŒé•¿è¿žæŽ¥ï¼Œ-1ï¼šæ²¡æœ‰è¯¥å­—æ®µ
 	 * --zsx, 2019.7.4
 	 */
 	if (keep_alive >= 0) {

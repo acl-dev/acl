@@ -8,21 +8,21 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * BASE64 ±àÂëº¯Êı
- * @param plain_in {const char*} ÊäÈëµÄÔ´ÄÚÈİÊı¾İ
- * @param len {int} plain_in µÄÊı¾İ³¤¶È
- * @return {unsigned char*} BASE64±àÂëºóµÄÊı¾İ£¬ĞèÓÃ acl_myfree ÊÍ·Å
+ * BASE64 ç¼–ç å‡½æ•°
+ * @param plain_in {const char*} è¾“å…¥çš„æºå†…å®¹æ•°æ®
+ * @param len {int} plain_in çš„æ•°æ®é•¿åº¦
+ * @return {unsigned char*} BASE64ç¼–ç åçš„æ•°æ®ï¼Œéœ€ç”¨ acl_myfree é‡Šæ”¾
  */
 ACL_API unsigned char *acl_base64_encode(const char *plain_in, int len);
 
 /**
- * BASE64 ½âÂëº¯Êı
- * @param code_in {const char*} ¾­BASE64±àÂëºóµÄÊı¾İ
- * @param ppresult {char**} Èç¹û½âÂë³É¹¦£¬Ôò´æ´¢½âÂë½á¹û£¬ÇÒ²»ÓÃÊ±ĞèÓÃ
- *  acl_myfree À´ÊÍ·ÅÆäÄÚ´æ¿Õ¼ä
- * @return {int} -1: ±íÊ¾½âÂëÊ§°ÜÇÒ *ppresult Ö¸ÏòNULL; >0: ±íÊ¾½âÂëºóµÄÊı¾İÄÚÈİ
- *  ³¤¶È£¬ÇÒ *ppresult Ö¸ÏòÒ»ĞÂ¶¯Ì¬·ÖÅäµÄÄÚ´æÇø£¬ÄÚ²¿´æ´¢½âÂë½á¹û£¬ĞèÓÃ acl_myfree
- *  ÊÍ·Å *ppresult µÄ¶¯Ì¬ÄÚ´æ
+ * BASE64 è§£ç å‡½æ•°
+ * @param code_in {const char*} ç»BASE64ç¼–ç åçš„æ•°æ®
+ * @param ppresult {char**} å¦‚æœè§£ç æˆåŠŸï¼Œåˆ™å­˜å‚¨è§£ç ç»“æœï¼Œä¸”ä¸ç”¨æ—¶éœ€ç”¨
+ *  acl_myfree æ¥é‡Šæ”¾å…¶å†…å­˜ç©ºé—´
+ * @return {int} -1: è¡¨ç¤ºè§£ç å¤±è´¥ä¸” *ppresult æŒ‡å‘NULL; >0: è¡¨ç¤ºè§£ç åçš„æ•°æ®å†…å®¹
+ *  é•¿åº¦ï¼Œä¸” *ppresult æŒ‡å‘ä¸€æ–°åŠ¨æ€åˆ†é…çš„å†…å­˜åŒºï¼Œå†…éƒ¨å­˜å‚¨è§£ç ç»“æœï¼Œéœ€ç”¨ acl_myfree
+ *  é‡Šæ”¾ *ppresult çš„åŠ¨æ€å†…å­˜
  */
 ACL_API int acl_base64_decode(const char *code_in, char **ppresult);
 

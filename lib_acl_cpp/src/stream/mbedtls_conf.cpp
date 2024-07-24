@@ -690,7 +690,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 			status_ = CONF_INIT_ERR;
 			logger_error("ssl_list_ciphersuites null");
 		}
-		// ¿Í»§¶ËÄ£Ê½ÏÂ´´½¨È±Ê¡µÄ mbedtls_ssl_config
+		// å®¢æˆ·ç«¯æ¨¡å¼ä¸‹åˆ›å»ºç¼ºçœçš„ mbedtls_ssl_config
 		else if (!server_side_ && !(conf_ = create_ssl_config())) {
 			status_ = CONF_INIT_ERR;
 		} else if (!init_rand()) {
@@ -751,8 +751,8 @@ mbedtls_conf::~mbedtls_conf(void)
 
 	acl_myfree(entropy_);
 
-	// Ê¹ÓÃ havege_random Ëæ»úÊıÉú³ÉÆ÷Ê±£¬ÔÚÒ»Ğ©Ğé»úÉÏ²¢²»ÄÜ±£Ö¤Ëæ»úĞÔ,
-	// ½¨ÒéÊ¹ÓÃ ctr_drbg_random Ëæ»úÊıÉú³ÉÆ÷
+	// ä½¿ç”¨ havege_random éšæœºæ•°ç”Ÿæˆå™¨æ—¶ï¼Œåœ¨ä¸€äº›è™šæœºä¸Šå¹¶ä¸èƒ½ä¿è¯éšæœºæ€§,
+	// å»ºè®®ä½¿ç”¨ ctr_drbg_random éšæœºæ•°ç”Ÿæˆå™¨
 #ifdef HAS_HAVEGE
 	acl_myfree(rnd_);
 #else
@@ -832,7 +832,7 @@ mbedtls_ssl_config* mbedtls_conf::create_ssl_config(void)
 		return NULL;
 	}
 
-	// ÉèÖÃËæ»úÊıÉú³ÉÆ÷
+	// è®¾ç½®éšæœºæ•°ç”Ÿæˆå™¨
 	__ssl_conf_rng(conf, __ctr_drbg_random,
 		(mbedtls_ctr_drbg_context*) rnd_);
 

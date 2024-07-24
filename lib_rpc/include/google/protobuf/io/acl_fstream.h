@@ -16,7 +16,7 @@ public:
 	explicit acl_ifstream(acl::istream* in, int block_size = -1);
 	~acl_ifstream();
 
-	//»ùÀà ZeroCopyInputStream Ğéº¯ÊıÊµÏÖ
+	//åŸºç±» ZeroCopyInputStream è™šå‡½æ•°å®ç°
 	bool Next(const void** data, int* size);
 	void BackUp(int count);
 	bool Skip(int count);
@@ -52,7 +52,7 @@ public:
 
 	bool Flush();
 
-	//»ùÀà ZeroCopyInputStream Ğéº¯ÊıÊµÏÖ
+	//åŸºç±» ZeroCopyInputStream è™šå‡½æ•°å®ç°
 	bool Next(void** data, int* size);
 	void BackUp(int count);
 	int64 ByteCount() const;

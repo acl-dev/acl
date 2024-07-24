@@ -42,7 +42,7 @@ static acl_pthread_mutex_t __fhandle_mutex;
 
 #if 1
 
-/* ¿ÉÇ¶Ì×Ê½¼ÓËø */
+/* å¯åµŒå¥—å¼åŠ é” */
 
 #define	LOCK_FS	do {  \
 	int  __ret;  \
@@ -101,7 +101,7 @@ static ACL_FHANDLE *__fhandle_alloc(size_t size, unsigned int oflags)
 static void __fhandle_free(ACL_FHANDLE *fs)
 {
 	if (fs->fp)
-		acl_vstream_fclose(fs->fp);  /* ÎÄ¼şËø×Ô¶¯ÊÍ·Å */
+		acl_vstream_fclose(fs->fp);  /* æ–‡ä»¶é”è‡ªåŠ¨é‡Šæ”¾ */
 	if ((fs->oflags & ACL_FHANDLE_O_MLOCK) != 0)
 		acl_pthread_mutex_destroy(&fs->mutex);
 	acl_myfree(fs);
@@ -121,20 +121,20 @@ ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 
 	LOCK_FS;
 
-	/* ÏÈ²éÑ¯»º´æÖĞÊÇ·ñ´æÔÚ */
+	/* å…ˆæŸ¥è¯¢ç¼“å­˜ä¸­æ˜¯å¦å­˜åœ¨ */
 	fs = (ACL_FHANDLE *) acl_htable_find(__fhandle_table, file_path);
 	if (fs) {
-		fs->nrefer++; /* Ôö¼ÓÒıÓÃ¼ÆÊı£¬ÒÔ·ÀÖ¹±»¶à´ÎÒıÓÃÊ±ÌáÇ°ÊÍ·Å */
-		/* Èç¹û¸Ã»º´æ¶ÔÏó´¦ÓÚÑÓ³Ù¹Ø±Õ¶ÓÁĞÖĞ£¬ÔòĞèÒª´ÓÖĞÉ¾³ı */
+		fs->nrefer++; /* å¢åŠ å¼•ç”¨è®¡æ•°ï¼Œä»¥é˜²æ­¢è¢«å¤šæ¬¡å¼•ç”¨æ—¶æå‰é‡Šæ”¾ */
+		/* å¦‚æœè¯¥ç¼“å­˜å¯¹è±¡å¤„äºå»¶è¿Ÿå…³é—­é˜Ÿåˆ—ä¸­ï¼Œåˆ™éœ€è¦ä»ä¸­åˆ é™¤ */
 		if (fs->when_free > 0) {
-			/* ´ÓÑÓ³Ù¹Ø±Õ»º³åÖĞÈ¥³ı */
+			/* ä»å»¶è¿Ÿå…³é—­ç¼“å†²ä¸­å»é™¤ */
 			acl_ring_detach(&fs->ring);
 			fs->when_free = 0;
 		}
 
 		UNLOCK_FS;
 
-		/* ÊÇ·ñ´ò¿ªºó×Ô¶¯¼ÓËø */
+		/* æ˜¯å¦æ‰“å¼€åè‡ªåŠ¨åŠ é” */
 		if ((oflags & ACL_FHANDLE_O_EXCL) != 0)
 			acl_fhandle_lock(fs);
 
@@ -144,14 +144,14 @@ ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 	/* sanity check */
 	size = size < sizeof(ACL_FHANDLE) ? sizeof(ACL_FHANDLE) : size;
 
-	/* ·ÖÅäĞÂµÄ»º´æ¶ÔÏó */
+	/* åˆ†é…æ–°çš„ç¼“å­˜å¯¹è±¡ */
 	fs = __fhandle_alloc(size, oflags);
 	fs->on_close = on_close;
 
-	/* ÊÇ·ñ×Ô¶¯¼ì²é²¢´´½¨²»´æÔÚµÄÄ¿Â¼ */
+	/* æ˜¯å¦è‡ªåŠ¨æ£€æŸ¥å¹¶åˆ›å»ºä¸å­˜åœ¨çš„ç›®å½• */
 	if ((oflags & ACL_FHANDLE_O_MKDIR) != 0) {
 		ACL_VSTRING *tmpbuf = acl_vstring_alloc(256);
-		/* ±ØĞë±£Ö¤Ä¿Â¼´æÔÚ£¬Èç¹û²»´æÔÚÔòÇ¿ĞĞ´´½¨¸ÃÄ¿Â¼ */
+		/* å¿…é¡»ä¿è¯ç›®å½•å­˜åœ¨ï¼Œå¦‚æœä¸å­˜åœ¨åˆ™å¼ºè¡Œåˆ›å»ºè¯¥ç›®å½• */
 		ptr = acl_sane_dirname(tmpbuf, file_path);
 		if (ptr && strcmp(ptr, ".") != 0)
 			acl_make_dirs(ptr, 0700);
@@ -167,7 +167,7 @@ ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 		fopen_flags |= O_SYNC;
 #endif
 
-	/* ´´½¨ĞÂÎÄ¼ş */
+	/* åˆ›å»ºæ–°æ–‡ä»¶ */
 	fs->fp = acl_vstream_fopen(file_path, fopen_flags, 0600, 4096);
 	if (fs->fp == NULL) {
 		UNLOCK_FS;
@@ -202,14 +202,14 @@ ACL_FHANDLE *acl_fhandle_open(size_t size, unsigned int oflags,
 
 	UNLOCK_FS;
 
-	/* ÊÇ·ñ´ò¿ªºó×Ô¶¯¼ÓËø */
+	/* æ˜¯å¦æ‰“å¼€åè‡ªåŠ¨åŠ é” */
 	if ((oflags & ACL_FHANDLE_O_EXCL) != 0)
 		acl_fhandle_lock(fs);
 
 	return (fs);
 }
 
-/* ÕæÕı¹Ø±Õ²¢ÊÍ·Å´æ´¢¶ÔÏó */
+/* çœŸæ­£å…³é—­å¹¶é‡Šæ”¾å­˜å‚¨å¯¹è±¡ */
 
 static void __fhandle_close(ACL_FHANDLE *fs)
 {
@@ -248,13 +248,13 @@ void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout)
 			return;
 		}
 
-		fs->when_free = time(NULL) + delay_timeout;  /* Ä¬ÈÏµÄ¹Ø±ÕÊ±¼ä½Ø */
+		fs->when_free = time(NULL) + delay_timeout;  /* é»˜è®¤çš„å…³é—­æ—¶é—´æˆª */
 		iter = &__fhandle_free_list;
 
-		/* Êı¾İÁ´µÄ´æ´¢·½Ê½Îª£¬ÓÉÍ· --> Î²£¬ÔòÊı¾İÓÉ ¾É --> ĞÂ, ¼´: Ê±¼äÖµ Ğ¡ --> ´ó */
+		/* æ•°æ®é“¾çš„å­˜å‚¨æ–¹å¼ä¸ºï¼Œç”±å¤´ --> å°¾ï¼Œåˆ™æ•°æ®ç”± æ—§ --> æ–°, å³: æ—¶é—´å€¼ å° --> å¤§ */
 		
-		/* ´ÓÎ²²¿¿ªÊ¼É¨Ãè£¬¼´É¨ÃèÊ±¼ä¹ıÆÚÖµÓÉ´óÏòĞ¡µÄ·½ÏòÉ¨ÃèËùÓĞ¶ÔÏó£¬ÕÒµ½
-		 * ¹ıÆÚÊ±¼äÖµ±Èµ±Ç°¶ÔÏóµÄÊ±¼äÖµĞ¡»òÏàµÈµÄµÚÒ»¸ö¶ÔÏó
+		/* ä»å°¾éƒ¨å¼€å§‹æ‰«æï¼Œå³æ‰«ææ—¶é—´è¿‡æœŸå€¼ç”±å¤§å‘å°çš„æ–¹å‘æ‰«ææ‰€æœ‰å¯¹è±¡ï¼Œæ‰¾åˆ°
+		 * è¿‡æœŸæ—¶é—´å€¼æ¯”å½“å‰å¯¹è±¡çš„æ—¶é—´å€¼å°æˆ–ç›¸ç­‰çš„ç¬¬ä¸€ä¸ªå¯¹è±¡
 		 */
 		acl_ring_foreach_reverse(ring_iter, &__fhandle_free_list) {
 			fhandle_iter = acl_ring_to_appl(ring_iter.ptr, ACL_FHANDLE, ring);
@@ -263,16 +263,16 @@ void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout)
 				break;
 			}
 		}
-		/* ·ÅÔÚ±ÈÉ¨Ãè¶ÔÏóºó´Ó¶ø±£³ÖÊı¾İÁ´µÄ´óĞ¡Ë³Ğò²»±ä */
+		/* æ”¾åœ¨æ¯”æ‰«æå¯¹è±¡åä»è€Œä¿æŒæ•°æ®é“¾çš„å¤§å°é¡ºåºä¸å˜ */
 		acl_ring_append(iter, &fs->ring);
 
-		/* ½âËø */
+		/* è§£é” */
 		if ((fs->status & ACL_FHANDLE_S_MUTEX_ON) != 0)
 			acl_fhandle_unlock(fs);
 
-		/* ÓÉÍ·²¿É¨ÃèµÄ·½·¨Ğ§ÂÊ½ÏµÍ
-		 * ´ÓÍ·²¿¿ªÊ¼É¨Ãè£¬¼´É¨ÃèÊ±¼ä¹ıÆÚÖµÓÉĞ¡Ïò´óµÄ·½ÏòÉ¨ÃèËùÓĞ¶ÔÏó£¬ÕÒµ½
-		 * ¹ıÆÚÊ±¼äÖµ±Èµ±Ç°¶ÔÏóµÄ¹ıÆÚÊ±¼ä´ó»òÏàµÈµÄµÚÒ»¸ö¶ÔÏó
+		/* ç”±å¤´éƒ¨æ‰«æçš„æ–¹æ³•æ•ˆç‡è¾ƒä½
+		 * ä»å¤´éƒ¨å¼€å§‹æ‰«æï¼Œå³æ‰«ææ—¶é—´è¿‡æœŸå€¼ç”±å°å‘å¤§çš„æ–¹å‘æ‰«ææ‰€æœ‰å¯¹è±¡ï¼Œæ‰¾åˆ°
+		 * è¿‡æœŸæ—¶é—´å€¼æ¯”å½“å‰å¯¹è±¡çš„è¿‡æœŸæ—¶é—´å¤§æˆ–ç›¸ç­‰çš„ç¬¬ä¸€ä¸ªå¯¹è±¡
 		 * acl_foreach_ring(iter_next, &__fhandle_free_list) {
 		 *	fhandle_iter = ACL_RING_TO_APPL(iter_next, ACL_FHANDLE, ring);
 		 *	if (fs->when_free <= fhandle_iter->when_free) {
@@ -280,12 +280,12 @@ void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout)
 		 *		break;
 		 *	}
 		 * }
-		 * ½«µ±Ç°¶ÔÏó·ÅÔÚÉ¨Ãè¶ÔÏóµÄÇ°Ãæ´Ó¶ø±£³ÖÊı¾İÁ´µÄ´óĞ¡Ë³Ğò²»±ä
+		 * å°†å½“å‰å¯¹è±¡æ”¾åœ¨æ‰«æå¯¹è±¡çš„å‰é¢ä»è€Œä¿æŒæ•°æ®é“¾çš„å¤§å°é¡ºåºä¸å˜
 		 * acl_ring_prepend(iter, &fs->ring);
 		 */
 		
 		if (acl_ring_size(&__fhandle_free_list) > __cache_max_size) {
-			/* µ¯³ö×îÀÏµÄ¶ÔÏó½øĞĞÊÍ·Å */
+			/* å¼¹å‡ºæœ€è€çš„å¯¹è±¡è¿›è¡Œé‡Šæ”¾ */
 			iter = acl_ring_pop_head(&__fhandle_free_list);
 			fs = ACL_RING_TO_APPL(iter, ACL_FHANDLE, ring);
 			if (fs->nrefer != 0)
@@ -300,8 +300,8 @@ void acl_fhandle_close(ACL_FHANDLE *fs, int delay_timeout)
 
 	(void) time(&now);
 
-	/* ÒòÎªÊı¾İÁ´ÖĞµÄ¶ÔÏóµÄ¹ıÆÚÊ±¼äÖµÓÉÍ· --> Î²ÊÇ°´ÓÉ Ğ¡ --> ´óµÄË³Ğò´æ´¢µÄ,
-	 * ËùÒÔÍ·²¿µÄÊı¾İÓ¦×îÏÈ¹ıÆÚ; ÊÍ·Åµô¹ıÆÚµÄÑÓÆÚ¹Ø±ÕµÄ»º´æ¶ÔÏó
+	/* å› ä¸ºæ•°æ®é“¾ä¸­çš„å¯¹è±¡çš„è¿‡æœŸæ—¶é—´å€¼ç”±å¤´ --> å°¾æ˜¯æŒ‰ç”± å° --> å¤§çš„é¡ºåºå­˜å‚¨çš„,
+	 * æ‰€ä»¥å¤´éƒ¨çš„æ•°æ®åº”æœ€å…ˆè¿‡æœŸ; é‡Šæ”¾æ‰è¿‡æœŸçš„å»¶æœŸå…³é—­çš„ç¼“å­˜å¯¹è±¡
 	 */
         for (iter = acl_ring_succ(&__fhandle_free_list); iter != &__fhandle_free_list;) {
 		fs = ACL_RING_TO_APPL(iter, ACL_FHANDLE, ring);
@@ -339,12 +339,12 @@ void acl_fhandle_lock(ACL_FHANDLE *fs)
 		acl_msg_error("%s(%d): ACL_FHANDLE_O_MLOCK not set", myname, __LINE__);
 		return;
 	}
-	/* ¼ÓÏß³ÌËø£¬Í¬Ê±ÔÊĞíÍ¬Ò»Ïß³Ì¿ÉÒÔ¶ÔÍ¬Ò»Ëø¼ÓËø¶à´Î */
+	/* åŠ çº¿ç¨‹é”ï¼ŒåŒæ—¶å…è®¸åŒä¸€çº¿ç¨‹å¯ä»¥å¯¹åŒä¸€é”åŠ é”å¤šæ¬¡ */
 	MUTEX_LOCK(&fs->mutex);
 	fs->status |= ACL_FHANDLE_S_MUTEX_ON;
 	fs->lock_mutex_tid = tid;
 
-	/* ¼Ó½ø³ÌÎÄ¼şËøÒÔ·ÀÖ¹²»Í¬½ø³ÌÍ¬Ê±·ÃÎÊ */
+	/* åŠ è¿›ç¨‹æ–‡ä»¶é”ä»¥é˜²æ­¢ä¸åŒè¿›ç¨‹åŒæ—¶è®¿é—® */
 	if ((fs->oflags & ACL_FHANDLE_O_FLOCK)
 		&& (fs->status & ACL_FHANDLE_S_FLOCK_ON) == 0)
 	{
@@ -377,7 +377,7 @@ void acl_fhandle_unlock(ACL_FHANDLE *fs)
 		return;
 	}
 
-	/* xxx: ±ØĞëÇå³ıÏß³ÌËøµÄËùÓĞÕß */
+	/* xxx: å¿…é¡»æ¸…é™¤çº¿ç¨‹é”çš„æ‰€æœ‰è€… */
 #ifdef ACL_WINDOWS
 	fs->lock_mutex_tid = (unsigned int) -1;
 #else
@@ -416,8 +416,8 @@ void acl_fhandle_init(int cache_size, int debug_section, unsigned int flags)
 	__cache_max_size = cache_size > 0 ? cache_size : 100;
 	__debug_section = debug_section;
 #ifdef ACL_WINDOWS
-	/* win32 ÏÂÎÄ¼şÃû¼°Â·¾¶ÃûÊÇ²»Çø·Ö´óĞ¡Ğ´µÄ£¬ËùÒÔ»ùÓÚÎÄ¼şÂ·¾¶Îª¼üµÄ¹şÏ£±í
-	 * ĞèÒªÉèÖÃÎª×Ô¶¯×ªÎªĞ¡Ğ´¼üÖµµÄÇé¿ö
+	/* win32 ä¸‹æ–‡ä»¶ååŠè·¯å¾„åæ˜¯ä¸åŒºåˆ†å¤§å°å†™çš„ï¼Œæ‰€ä»¥åŸºäºæ–‡ä»¶è·¯å¾„ä¸ºé”®çš„å“ˆå¸Œè¡¨
+	 * éœ€è¦è®¾ç½®ä¸ºè‡ªåŠ¨è½¬ä¸ºå°å†™é”®å€¼çš„æƒ…å†µ
 	 */
 	__fhandle_table = acl_htable_create(100, ACL_HTABLE_FLAG_KEY_LOWER);
 #else

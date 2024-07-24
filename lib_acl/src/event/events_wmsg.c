@@ -85,8 +85,8 @@ static void stream_on_close(ACL_VSTREAM *stream, void *arg)
 	snprintf(key, sizeof(key), "%d", sockfd);
 	acl_htable_delete(ev->htbl, key, NULL);
 
-	/* ��Ȼ��������ȡ���Ժ�Ķ�д��Ϣ������Ȼ����ȡ����Ϊ
-	 * closesocket �������� FD_CLOSE ��Ϣ
+	/* 虽然该设置能取消以后的读写消息，但依然不能取消因为
+	 * closesocket 而产生的 FD_CLOSE 消息
 	 */
 	WSAAsyncSelect(sockfd, ev->hWnd, 0, 0);
 
@@ -592,8 +592,8 @@ static void handleRead(EVENT_WMSG *ev, ACL_SOCKET sockfd)
 		fdp->r_callback(ACL_EVENT_READ, &ev->event,
 			fdp->stream, fdp->r_context);
 	} else if (fdp->r_callback != NULL) {
-		/* �������ֿɶ������� ACL_VSTREAM ��ϵͳ�ɶ���־�Ӷ�����
-		 * ACL_VSTREAM ���ڶ�ʱ����ϵͳ�� read ����
+		/* 该描述字可读则设置 ACL_VSTREAM 的系统可读标志从而触发
+		 * ACL_VSTREAM 流在读时调用系统的 read 函数
 		 */
 		fdp->stream->read_ready = 1;
 		fdp->r_callback(ACL_EVENT_READ, &ev->event,
@@ -776,7 +776,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		timer_fn  = timer->callback;
 		timer_arg = timer->context;
 
-		/* �����ʱ����ʱ���� > 0 ��������ʱ����ѭ�����ã��������趨ʱ�� */
+		/* 如果定时器的时间间隔 > 0 且允许定时器被循环调用，则再重设定时器 */
 		if (timer->delay > 0 && timer->keep) {
 			timer->ncount++;
 			eventp->timer_request(eventp, timer->callback,
@@ -802,7 +802,7 @@ static VOID CALLBACK event_timer_callback(HWND hwnd, UINT uMsg,
 		SET_TIME(eventp->present);
 		delay = (int) (timer->when - eventp->present + 999) / 1000;
 
-		/* Ҫ��ʱ�䶨ʱ���ļ�������� 1 ���� */
+		/* 要求时间定时器的间隔最少是 1 毫秒 */
 		if (delay < 1000) {
 			delay = 1000;
 		}
@@ -818,7 +818,7 @@ static acl_int64 event_set_timer(ACL_EVENT *eventp, ACL_EVENT_NOTIFY_TIME callba
 	acl_int64 when;
 	acl_int64 first_delay;
 
-	/* Ҫ��ʱ�䶨ʱ���ļ�������� 1 ���� */
+	/* 要求时间定时器的间隔最少是 1 毫秒 */
 	if (delay < 1000)
 		delay = 1000;
 

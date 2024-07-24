@@ -14,17 +14,17 @@ class mysql_conf;
 class ACL_CPP_API db_mysql : public db_handle {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı·½Ê½Ò»
-	 * @param dbaddr {const char*} Êı¾İ¿â¼àÌıµØÖ·£¬¿ÉÒÔÎª TCP Ì×½Ó¿Ú»òÔÚ UNIX
-	 *  Æ½Ì¨ÏÂµÄÓòÌ×½Ó¿Ú£¬¸ñÊ½Èç£º127.0.0.1:3306£¬»ò /tmp/mysql.sock
-	 * @param dbname {const char*} Êı¾İ¿âÃû³Æ£¬·Ç NULL
-	 * @param dbuser {const char*} Á¬½ÓÊı¾İ¿âÊ±µÄÓÃ»§Ãû
-	 * @param dbpass {const char*} Á¬½ÓÊı¾İ¿âÊ±µÄÓÃ»§ÃÜÂë
-	 * @param dbflags {unsigned long} Á¬½Ó MYSQL Ê±µÄ±êÖ¾Î»
-	 * @param auto_commit {bool} µ±¶ÔÊı¾İ¿â½øĞĞĞŞ¸ÄÊ±ÊÇ·ñ×Ô¶¯Ìá½»ÊÂÎñ
-	 * @param conn_timeout {int} Á¬½ÓÊı¾İ¿âµÄ³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @param rw_timeout {int} ½øĞĞÊı¾İ¿â²Ù×÷Ê±µÄ³¬Ê±Ê±¼ä£¨Ãë£©
-	 * @param charset {const char*} Á¬½ÓÊı¾İ¿âÊ±µÄ±¾µØ×Ö·û¼¯£¨gbk, utf8, ...£©
+	 * æ„é€ å‡½æ•°æ–¹å¼ä¸€
+	 * @param dbaddr {const char*} æ•°æ®åº“ç›‘å¬åœ°å€ï¼Œå¯ä»¥ä¸º TCP å¥—æ¥å£æˆ–åœ¨ UNIX
+	 *  å¹³å°ä¸‹çš„åŸŸå¥—æ¥å£ï¼Œæ ¼å¼å¦‚ï¼š127.0.0.1:3306ï¼Œæˆ– /tmp/mysql.sock
+	 * @param dbname {const char*} æ•°æ®åº“åç§°ï¼Œé NULL
+	 * @param dbuser {const char*} è¿æ¥æ•°æ®åº“æ—¶çš„ç”¨æˆ·å
+	 * @param dbpass {const char*} è¿æ¥æ•°æ®åº“æ—¶çš„ç”¨æˆ·å¯†ç 
+	 * @param dbflags {unsigned long} è¿æ¥ MYSQL æ—¶çš„æ ‡å¿—ä½
+	 * @param auto_commit {bool} å½“å¯¹æ•°æ®åº“è¿›è¡Œä¿®æ”¹æ—¶æ˜¯å¦è‡ªåŠ¨æäº¤äº‹åŠ¡
+	 * @param conn_timeout {int} è¿æ¥æ•°æ®åº“çš„è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @param rw_timeout {int} è¿›è¡Œæ•°æ®åº“æ“ä½œæ—¶çš„è¶…æ—¶æ—¶é—´ï¼ˆç§’ï¼‰
+	 * @param charset {const char*} è¿æ¥æ•°æ®åº“æ—¶çš„æœ¬åœ°å­—ç¬¦é›†ï¼ˆgbk, utf8, ...ï¼‰
 	 */
 	db_mysql(const char* dbaddr, const char* dbname,
 		const char* dbuser, const char* dbpass,
@@ -33,28 +33,28 @@ public:
 		const char* charset = "utf8");
 
 	/**
-	 * ¹¹Ôìº¯Êı·½Ê½¶ş£ºÊ¹ÓÃ²ÎÊıÅäÖÃÀà¶ÔÏó½øĞĞ¹¹Ôì
-	 * @param conf {const mysql_conf&} mysql Êı¾İ¿âÁ¬½ÓÅäÖÃÀà¶ÔÏó
+	 * æ„é€ å‡½æ•°æ–¹å¼äºŒï¼šä½¿ç”¨å‚æ•°é…ç½®ç±»å¯¹è±¡è¿›è¡Œæ„é€ 
+	 * @param conf {const mysql_conf&} mysql æ•°æ®åº“è¿æ¥é…ç½®ç±»å¯¹è±¡
 	 */
 	db_mysql(const mysql_conf& conf);
 	~db_mysql(void);
 
 	/**
-	 * »ñµÃ mysql ¿Í»§¶Ë¿âµÄ°æ±¾ºÅ
+	 * è·å¾— mysql å®¢æˆ·ç«¯åº“çš„ç‰ˆæœ¬å·
 	 * @return {unsigned long}
 	 */
 	unsigned long mysql_libversion(void) const;
 
 	/**
-	 * »ñµÃ mysql ¿Í»§¶Ë¿âµÄĞÅÏ¢
+	 * è·å¾— mysql å®¢æˆ·ç«¯åº“çš„ä¿¡æ¯
 	 * @return {const char*}
 	 */
 	const char* mysql_client_info(void) const;
 
 	/**
-	 * Ö±½Ó»ñµÃ mysql µÄÁ¬½Ó¾ä±ú£¬Èç¹û·µ»Ø NULL Ôò±íÊ¾ mysql »¹Ã»ÓĞ´ò¿ª
-	 * »ò³ö´íÊ±ÄÚ²¿×Ô¶¯¹Ø±ÕÁË mysql Á¬½Ó
-	 * @return {void*} ÀàĞÍÍ¬ MYSQL*
+	 * ç›´æ¥è·å¾— mysql çš„è¿æ¥å¥æŸ„ï¼Œå¦‚æœè¿”å› NULL åˆ™è¡¨ç¤º mysql è¿˜æ²¡æœ‰æ‰“å¼€
+	 * æˆ–å‡ºé”™æ—¶å†…éƒ¨è‡ªåŠ¨å…³é—­äº† mysql è¿æ¥
+	 * @return {void*} ç±»å‹åŒ MYSQL*
 	 */
 	void* get_conn(void) const
 	{
@@ -62,16 +62,16 @@ public:
 	}
 
 	/**
-	 * µ±¶¯Ì¬¼ÓÔØ libmysqlclient.so / libmysqlclient.dll Ê±£¬¿ÉÒÔµ÷ÓÃ±¾
-	 * ¾²Ì¬º¯ÊıÏÔÊ½¶¯Ì¬¼ÓÔØ mysql ¿Í»§¶Ë¿â£¬Èç¹û¼ÓÔØÊ§°Ü£¬ÄÚ²¿»á×Ô¶¯²úÉú
-	 * ¶ÏÑÔ£¬ÒÔÃâÔËĞĞÊ±³ö´í£¬Ò²¿É²»µ÷ÓÃ±¾º¯Êı£¬Ê¹ db_mysql Àà¶ÔÏóÄÚ²¿ÔÚ
-	 * Ê¹ÓÃÊ±ÒşÊ½¼ÓÔØ mysql ¶¯Ì¬¿â
-	 * @return {bool} ¼ÓÔØ Mysql ¶¯Ì¬¿âÊÇ·ñ³É¹¦
+	 * å½“åŠ¨æ€åŠ è½½ libmysqlclient.so / libmysqlclient.dll æ—¶ï¼Œå¯ä»¥è°ƒç”¨æœ¬
+	 * é™æ€å‡½æ•°æ˜¾å¼åŠ¨æ€åŠ è½½ mysql å®¢æˆ·ç«¯åº“ï¼Œå¦‚æœåŠ è½½å¤±è´¥ï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨äº§ç”Ÿ
+	 * æ–­è¨€ï¼Œä»¥å…è¿è¡Œæ—¶å‡ºé”™ï¼Œä¹Ÿå¯ä¸è°ƒç”¨æœ¬å‡½æ•°ï¼Œä½¿ db_mysql ç±»å¯¹è±¡å†…éƒ¨åœ¨
+	 * ä½¿ç”¨æ—¶éšå¼åŠ è½½ mysql åŠ¨æ€åº“
+	 * @return {bool} åŠ è½½ Mysql åŠ¨æ€åº“æ˜¯å¦æˆåŠŸ
 	 */
 	static bool load(void);
 
 	/********************************************************************/
-	/*         ÒÔÏÂÎª»ùÀà db_handle µÄĞé½Ó¿Ú                            */
+	/*         ä»¥ä¸‹ä¸ºåŸºç±» db_handle çš„è™šæ¥å£                            */
 	/********************************************************************/
 
 	/**
@@ -126,8 +126,8 @@ public:
 
 	/**
 	 * @override
-	 * »ùÀà db_handle µÄĞéº¯Êı£¬ÓÃÀ´±íÊ¾ÊÂÎñµÄ¿ªÊ¼£¬×¢ÒâÈôÒªÊ¹ÓÃÊÂÎñ·½Ê½£¬
-	 * ÔòĞèÒªÔÚ db_mysql µÄ¹¹Ôìº¯ÊıÖĞ´«ÈëµÄ²ÎÊı auto_commit Îª false
+	 * åŸºç±» db_handle çš„è™šå‡½æ•°ï¼Œç”¨æ¥è¡¨ç¤ºäº‹åŠ¡çš„å¼€å§‹ï¼Œæ³¨æ„è‹¥è¦ä½¿ç”¨äº‹åŠ¡æ–¹å¼ï¼Œ
+	 * åˆ™éœ€è¦åœ¨ db_mysql çš„æ„é€ å‡½æ•°ä¸­ä¼ å…¥çš„å‚æ•° auto_commit ä¸º false
 	 */
 	bool begin_transaction(void);
 
@@ -142,17 +142,17 @@ public:
 	bool rollback(void);
 
 private:
-	char*  dbaddr_;  // Êı¾İ¿â¼àÌıµØÖ·
-	char*  dbname_;  // Êı¾İ¿âÃû
-	char*  dbuser_;  // Êı¾İ¿âÕËºÅ
-	char*  dbpass_;  // Êı¾İ¿âÕËºÅÃÜÂë
-	string charset_; // Á¬½ÓÊı¾İ¿â²ÉÓÃµÄ×Ö·û¼¯
+	char*  dbaddr_;  // æ•°æ®åº“ç›‘å¬åœ°å€
+	char*  dbname_;  // æ•°æ®åº“å
+	char*  dbuser_;  // æ•°æ®åº“è´¦å·
+	char*  dbpass_;  // æ•°æ®åº“è´¦å·å¯†ç 
+	string charset_; // è¿æ¥æ•°æ®åº“é‡‡ç”¨çš„å­—ç¬¦é›†
 
 	unsigned long dbflags_;
 	int    conn_timeout_;
 	int    rw_timeout_;
 	bool   auto_commit_;
-	void*  conn_;	// MYSQL ¶ÔÏóÖ¸Õë
+	void*  conn_;	// MYSQL å¯¹è±¡æŒ‡é’ˆ
 
 	bool sane_mysql_query(const char* sql);
 	void sane_mysql_init(const char* dbaddr, const char* dbname,

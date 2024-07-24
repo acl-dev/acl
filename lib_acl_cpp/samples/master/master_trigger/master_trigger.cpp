@@ -1,4 +1,4 @@
-// master_trigger.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// master_trigger.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -40,25 +40,25 @@ public:
 	~master_trigger_test() {}
 
 protected:
-	// »ùÀà´¿Ğéº¯Êı£ºµ±´¥·¢Æ÷Ê±¼äµ½Ê±µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼šå½“è§¦å‘å™¨æ—¶é—´åˆ°æ—¶è°ƒç”¨æ­¤å‡½æ•°
 	virtual void on_trigger()
 	{
 		format("on trigger now\r\n");
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İÇ°µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½å‰è°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_pre_jail()
 	{
 		format("proc_pre_jail\r\n");
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_on_init()
 	{
 		format("proc init\r\n");
 	}
 
-	// »ùÀàĞéº¯Êı£º·şÎñ½ø³ÌÍË³öÇ°µ÷ÓÃ´Ëº¯Êı
+	// åŸºç±»è™šå‡½æ•°ï¼šæœåŠ¡è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨æ­¤å‡½æ•°
 	virtual void proc_on_exit()
 	{
 		format("proc exit\r\n");
@@ -72,24 +72,24 @@ int main(int argc, char* argv[])
 {
 	master_trigger_test mt;
 
-	// ÉèÖÃÅäÖÃ²ÎÊı±í
+	// è®¾ç½®é…ç½®å‚æ•°è¡¨
 	mt.set_cfg_int(var_conf_int_tab);
 	mt.set_cfg_int64(NULL);
 	mt.set_cfg_str(var_conf_str_tab);
 	mt.set_cfg_bool(var_conf_bool_tab);
 
-	// ¿ªÊ¼ÔËĞĞ
+	// å¼€å§‹è¿è¡Œ
 
 	if (argc == 1 || (argc >= 2 && strcmp(argv[1], "alone") == 0))
 	{
-		mt.run_alone(NULL, 5, 1);  // µ¥¶ÀÔËĞĞ·½Ê½
+		mt.run_alone(NULL, 5, 1);  // å•ç‹¬è¿è¡Œæ–¹å¼
 	}
 	else
 	{
 #ifdef	WIN32
-		mt.run_alone(NULL, 5, 1);  // µ¥¶ÀÔËĞĞ·½Ê½
+		mt.run_alone(NULL, 5, 1);  // å•ç‹¬è¿è¡Œæ–¹å¼
 #else
-		mt.run_daemon(argc, argv);  // acl_master ¿ØÖÆÄ£Ê½ÔËĞĞ
+		mt.run_daemon(argc, argv);  // acl_master æ§åˆ¶æ¨¡å¼è¿è¡Œ
 #endif
 	}
 

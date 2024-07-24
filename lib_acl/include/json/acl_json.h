@@ -16,12 +16,12 @@ typedef struct ACL_JSON ACL_JSON;
 typedef struct ACL_JSON_NODE ACL_JSON_NODE;
 
 struct ACL_JSON_NODE {
-	ACL_VSTRING *ltag;          /**< ±êÇ©Ãû */
-	ACL_VSTRING *text;          /**< µ±½ÚµãÎªÒ¶½ÚµãÊ±¸ÃÎÄ±¾ÄÚÈÝ·Ç¿Õ */
-	ACL_JSON_NODE *tag_node;    /**< µ±±êÇ©ÖµÎª json ½ÚµãÊ±´ËÏî·Ç¿Õ */
-	ACL_JSON_NODE *parent;      /**< ¸¸½Úµã */
-	ACL_RING children;          /**< ×Ó½Úµã¼¯ºÏ */
-	unsigned short type;        /**< ½ÚµãÀàÐÍ */
+	ACL_VSTRING *ltag;          /**< æ ‡ç­¾å */
+	ACL_VSTRING *text;          /**< å½“èŠ‚ç‚¹ä¸ºå¶èŠ‚ç‚¹æ—¶è¯¥æ–‡æœ¬å†…å®¹éžç©º */
+	ACL_JSON_NODE *tag_node;    /**< å½“æ ‡ç­¾å€¼ä¸º json èŠ‚ç‚¹æ—¶æ­¤é¡¹éžç©º */
+	ACL_JSON_NODE *parent;      /**< çˆ¶èŠ‚ç‚¹ */
+	ACL_RING children;          /**< å­èŠ‚ç‚¹é›†åˆ */
+	unsigned short type;        /**< èŠ‚ç‚¹ç±»åž‹ */
 #define	ACL_JSON_T_A_STRING      (1 << 0)
 #define	ACL_JSON_T_A_NUMBER      (1 << 1)
 #define	ACL_JSON_T_A_BOOL        (1 << 2)
@@ -41,439 +41,439 @@ struct ACL_JSON_NODE {
 #define ACL_JSON_T_PAIR          (1 << 14)
 #define	ACL_JSON_T_ELEMENT       (1 << 15)
 
-	unsigned short depth;       /**< µ±Ç°½ÚµãµÄÉî¶È */
+	unsigned short depth;       /**< å½“å‰èŠ‚ç‚¹çš„æ·±åº¦ */
 
 	/* private */
-	unsigned char quote;        /**< ·Ç 0 ±íÊ¾ ' »ò " */
-	unsigned char left_ch;      /**< ±¾½ÚµãµÄµÚÒ»¸ö×Ö·û: { or [ */
-	unsigned char right_ch;     /**< ±¾½ÚµãµÄ×îºóÒ»¸ö×Ö·û: } or ] */
-	unsigned backslash:1;       /**< ×ªÒå×Ö·û \ */
-	unsigned part_word:1;       /**< °ë¸öºº×ÖµÄÇé¿ö´¦Àí±êÖ¾Î» */
-	ACL_JSON *json;             /**< json ¶ÔÏó */
-	ACL_RING  node;             /**< µ±Ç°½Úµã */
+	unsigned char quote;        /**< éž 0 è¡¨ç¤º ' æˆ– " */
+	unsigned char left_ch;      /**< æœ¬èŠ‚ç‚¹çš„ç¬¬ä¸€ä¸ªå­—ç¬¦: { or [ */
+	unsigned char right_ch;     /**< æœ¬èŠ‚ç‚¹çš„æœ€åŽä¸€ä¸ªå­—ç¬¦: } or ] */
+	unsigned backslash:1;       /**< è½¬ä¹‰å­—ç¬¦ \ */
+	unsigned part_word:1;       /**< åŠä¸ªæ±‰å­—çš„æƒ…å†µå¤„ç†æ ‡å¿—ä½ */
+	ACL_JSON *json;             /**< json å¯¹è±¡ */
+	ACL_RING  node;             /**< å½“å‰èŠ‚ç‚¹ */
 
-	/* public: for acl_iterator, Í¨¹ý acl_foreach ÁÐ³ö¸Ã½ÚµãµÄÒ»¼¶×Ó½Úµã */
+	/* public: for acl_iterator, é€šè¿‡ acl_foreach åˆ—å‡ºè¯¥èŠ‚ç‚¹çš„ä¸€çº§å­èŠ‚ç‚¹ */
 
-	/* È¡µü´úÆ÷Í·º¯Êý */
+	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
 	ACL_JSON_NODE *(*iter_head)(ACL_ITER*, ACL_JSON_NODE*);
-	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
 	ACL_JSON_NODE *(*iter_next)(ACL_ITER*, ACL_JSON_NODE*);
-	/* È¡µü´úÆ÷Î²º¯Êý */
+	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
 	ACL_JSON_NODE *(*iter_tail)(ACL_ITER*, ACL_JSON_NODE*);
-	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
 	ACL_JSON_NODE *(*iter_prev)(ACL_ITER*, ACL_JSON_NODE*);
 };
 
 enum {
-	ACL_JSON_S_ROOT,	/**< ¸ù½Úµã */
-	ACL_JSON_S_OBJ,		/**< ±êÇ©¶ÔÏóÖµ */
+	ACL_JSON_S_ROOT,	/**< æ ¹èŠ‚ç‚¹ */
+	ACL_JSON_S_OBJ,		/**< æ ‡ç­¾å¯¹è±¡å€¼ */
 	ACL_JSON_S_MEMBER,
-	ACL_JSON_S_ARRAY,	/**< json ½Úµã array */
+	ACL_JSON_S_ARRAY,	/**< json èŠ‚ç‚¹ array */
 	ACL_JSON_S_ELEMENT,
 	ACL_JSON_S_PAIR,	/**< name:value pair */
-	ACL_JSON_S_NEXT,	/**< ÏÂÒ»¸ö½Úµã */
-	ACL_JSON_S_TAG,		/**< ¶ÔÏó±êÇ©Ãû */
-	ACL_JSON_S_VALUE,	/**< ½ÚµãÖµ´¦Àí¹ý³Ì */
-	ACL_JSON_S_COLON,	/**< Ã°ºÅ : */
+	ACL_JSON_S_NEXT,	/**< ä¸‹ä¸€ä¸ªèŠ‚ç‚¹ */
+	ACL_JSON_S_TAG,		/**< å¯¹è±¡æ ‡ç­¾å */
+	ACL_JSON_S_VALUE,	/**< èŠ‚ç‚¹å€¼å¤„ç†è¿‡ç¨‹ */
+	ACL_JSON_S_COLON,	/**< å†’å· : */
 	ACL_JSON_S_STRING,
 	ACL_JSON_S_STREND
 };
 
 struct ACL_JSON {
-	int   depth;                /**< ×î´óÉî¶È */
-	int   node_cnt;             /**< ½Úµã×ÜÊý, °üÀ¨ root ½Úµã */
-	ACL_JSON_NODE *root;        /**< json ¸ù½Úµã */
-	int   finish;               /**< ÊÇ·ñ·ÖÎö½áÊø */
-	unsigned flag;              /**< ±êÖ¾Î» */
-#define	ACL_JSON_FLAG_PART_WORD	(1 << 0)  /**< ÊÇ·ñ¼æÈÝ°ë¸öºº×Ö */
-#define ACL_JSON_FLAG_ADD_SPACE	(1 << 1)  /**< ´´½¨ json Ê±ÊÇ·ñÌí¿Õ¸ñ */
+	int   depth;                /**< æœ€å¤§æ·±åº¦ */
+	int   node_cnt;             /**< èŠ‚ç‚¹æ€»æ•°, åŒ…æ‹¬ root èŠ‚ç‚¹ */
+	ACL_JSON_NODE *root;        /**< json æ ¹èŠ‚ç‚¹ */
+	int   finish;               /**< æ˜¯å¦åˆ†æžç»“æŸ */
+	unsigned flag;              /**< æ ‡å¿—ä½ */
+#define	ACL_JSON_FLAG_PART_WORD	(1 << 0)  /**< æ˜¯å¦å…¼å®¹åŠä¸ªæ±‰å­— */
+#define ACL_JSON_FLAG_ADD_SPACE	(1 << 1)  /**< åˆ›å»º json æ—¶æ˜¯å¦æ·»ç©ºæ ¼ */
 
-	/* public: for acl_iterator, Í¨¹ý acl_foreach ¿ÉÒÔÁÐ³öËùÓÐ×Ó½Úµã */
+	/* public: for acl_iterator, é€šè¿‡ acl_foreach å¯ä»¥åˆ—å‡ºæ‰€æœ‰å­èŠ‚ç‚¹ */
 
-	/* È¡µü´úÆ÷Í·º¯Êý */
+	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
 	ACL_JSON_NODE *(*iter_head)(ACL_ITER*, ACL_JSON*);
-	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
 	ACL_JSON_NODE *(*iter_next)(ACL_ITER*, ACL_JSON*);
-	/* È¡µü´úÆ÷Î²º¯Êý */
+	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
 	ACL_JSON_NODE *(*iter_tail)(ACL_ITER*, ACL_JSON*);
-	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
 	ACL_JSON_NODE *(*iter_prev)(ACL_ITER*, ACL_JSON*);
 
 	/* private */
 
-	int   status;               /**< ×´Ì¬»úµ±Ç°½âÎö×´Ì¬ */
+	int   status;               /**< çŠ¶æ€æœºå½“å‰è§£æžçŠ¶æ€ */
 
-	ACL_JSON_NODE *curr_node;   /**< µ±Ç°ÕýÔÚ´¦ÀíµÄ json ½Úµã */
-	ACL_DBUF_POOL *dbuf;        /**< »á»°ÄÚ´æ³Ø¶ÔÏó */
-	ACL_DBUF_POOL *dbuf_inner;  /**< »á»°ÄÚ´æ³Ø¶ÔÏó */
+	ACL_JSON_NODE *curr_node;   /**< å½“å‰æ­£åœ¨å¤„ç†çš„ json èŠ‚ç‚¹ */
+	ACL_DBUF_POOL *dbuf;        /**< ä¼šè¯å†…å­˜æ± å¯¹è±¡ */
+	ACL_DBUF_POOL *dbuf_inner;  /**< ä¼šè¯å†…å­˜æ± å¯¹è±¡ */
 	size_t dbuf_keep;
 };
 
 /*----------------------------- in acl_json.c -----------------------------*/
 
 /**
- * ´´½¨Ò»¸ö json ½Úµã
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @return {ACL_JSON_NODE*} json ½Úµã¶ÔÏó
+ * åˆ›å»ºä¸€ä¸ª json èŠ‚ç‚¹
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @return {ACL_JSON_NODE*} json èŠ‚ç‚¹å¯¹è±¡
  */
 ACL_API ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json);
 
 /**
- * ½«Ä³¸ö json ½Úµã¼°Æä×Ó½Úµã´Ó json ¶ÔÏóÖÐÉ¾³ý, ²¢ÊÍ·Å¸Ã½Úµã¼°Æä×Ó½Úµã
- * ËùÕ¼¿Õ¼äº¯ÊýÀ´ÊÍ·Å¸Ã json ½ÚµãËùÕ¼ÄÚ´æ
- * @param node {ACL_JSON_NODE*} json ½Úµã
- * @return {int} ·µ»ØÉ¾³ýµÄ½Úµã¸öÊý
+ * å°†æŸä¸ª json èŠ‚ç‚¹åŠå…¶å­èŠ‚ç‚¹ä»Ž json å¯¹è±¡ä¸­åˆ é™¤, å¹¶é‡Šæ”¾è¯¥èŠ‚ç‚¹åŠå…¶å­èŠ‚ç‚¹
+ * æ‰€å ç©ºé—´å‡½æ•°æ¥é‡Šæ”¾è¯¥ json èŠ‚ç‚¹æ‰€å å†…å­˜
+ * @param node {ACL_JSON_NODE*} json èŠ‚ç‚¹
+ * @return {int} è¿”å›žåˆ é™¤çš„èŠ‚ç‚¹ä¸ªæ•°
  */
 ACL_API int acl_json_node_delete(ACL_JSON_NODE *node);
 
 /**
- * ÏòÄ³¸ö json ½ÚµãÌí¼ÓÐÖµÜ½Úµã(¸ÃÐÖµÜ½Úµã±ØÐëÊÇ¶ÀÁ¢µÄ json ½Úµã)
- * @param node1 {ACL_JSON_NODE*} Ïò±¾½ÚµãÌí¼Ó json ½Úµã
- * @param node2 {ACL_JSON_NODE*} ÐÂÌí¼ÓµÄÐÖµÜ json ½Úµã
+ * å‘æŸä¸ª json èŠ‚ç‚¹æ·»åŠ å…„å¼ŸèŠ‚ç‚¹(è¯¥å…„å¼ŸèŠ‚ç‚¹å¿…é¡»æ˜¯ç‹¬ç«‹çš„ json èŠ‚ç‚¹)
+ * @param node1 {ACL_JSON_NODE*} å‘æœ¬èŠ‚ç‚¹æ·»åŠ  json èŠ‚ç‚¹
+ * @param node2 {ACL_JSON_NODE*} æ–°æ·»åŠ çš„å…„å¼Ÿ json èŠ‚ç‚¹
  */
 ACL_API void acl_json_node_append(ACL_JSON_NODE *node1, ACL_JSON_NODE *node2);
 
 /**
- * ½«Ä³¸ö json ½Úµã×÷Îª×Ó½Úµã¼ÓÈëÄ³¸¸ json ½ÚµãÖÐ
- * @param parent {ACL_JSON_NODE*} ¸¸½Úµã
- * @param child {ACL_JSON_NODE*} ×Ó½Úµã
+ * å°†æŸä¸ª json èŠ‚ç‚¹ä½œä¸ºå­èŠ‚ç‚¹åŠ å…¥æŸçˆ¶ json èŠ‚ç‚¹ä¸­
+ * @param parent {ACL_JSON_NODE*} çˆ¶èŠ‚ç‚¹
+ * @param child {ACL_JSON_NODE*} å­èŠ‚ç‚¹
  */
 ACL_API void acl_json_node_add_child(
 	ACL_JSON_NODE *parent, ACL_JSON_NODE *child);
 
 /**
- * ½«Ò»¸ö JSON ¶ÔÏóµÄ JSON ½Úµã¸´ÖÆÖÁ JSON ¶ÔÏóÖÐµÄÒ»¸ö JSON ½ÚµãÖÐ£¬²¢·µ»Ø
- * Ä¿±êÐÂ´´½¨µÄ JSON ½Úµã
- * @param json {ACL_JSON*} Ä¿±ê JSON ¶ÔÏó
- * @param from {ACL_JSON_NODE*} Ô´ JSON ¶ÔÏóµÄÒ»¸ö JSON ½Úµã
- * @return {ACL_JSON_NODE*} ·µ»Ø·Ç¿Õ¶ÔÏóÖ¸Õë
+ * å°†ä¸€ä¸ª JSON å¯¹è±¡çš„ JSON èŠ‚ç‚¹å¤åˆ¶è‡³ JSON å¯¹è±¡ä¸­çš„ä¸€ä¸ª JSON èŠ‚ç‚¹ä¸­ï¼Œå¹¶è¿”å›ž
+ * ç›®æ ‡æ–°åˆ›å»ºçš„ JSON èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç›®æ ‡ JSON å¯¹è±¡
+ * @param from {ACL_JSON_NODE*} æº JSON å¯¹è±¡çš„ä¸€ä¸ª JSON èŠ‚ç‚¹
+ * @return {ACL_JSON_NODE*} è¿”å›žéžç©ºå¯¹è±¡æŒ‡é’ˆ
  */
 ACL_API ACL_JSON_NODE *acl_json_node_duplicate(
 	ACL_JSON *json, ACL_JSON_NODE *from);
 
 /**
- * »ñµÃÄ³¸ö json ½ÚµãµÄ¸¸½Úµã
- * @param node {ACL_JSON_NODE*} json ½Úµã
- * @return {ACL_JSON_NODE*} ¸¸½Úµã, Èç¹ûÎª NULL Ôò±íÊ¾Æä¸¸½Úµã²»´æÔÚ
+ * èŽ·å¾—æŸä¸ª json èŠ‚ç‚¹çš„çˆ¶èŠ‚ç‚¹
+ * @param node {ACL_JSON_NODE*} json èŠ‚ç‚¹
+ * @return {ACL_JSON_NODE*} çˆ¶èŠ‚ç‚¹, å¦‚æžœä¸º NULL åˆ™è¡¨ç¤ºå…¶çˆ¶èŠ‚ç‚¹ä¸å­˜åœ¨
  */
 ACL_API ACL_JSON_NODE *acl_json_node_parent(ACL_JSON_NODE *node);
 
 /**
- * »ñµÃÄ³¸ö json ½ÚµãµÄºóÒ»¸öÐÖµÜ½Úµã
- * @param node {ACL_JSON_NODE*} json ½Úµã
- * @return {ACL_JSON_NODE*} ¸ø¶¨ json ½ÚµãµÄºóÒ»¸öÐÖµÜ½Úµã, ÈôÎªNULLÔò±íÊ¾²»´æÔÚ
+ * èŽ·å¾—æŸä¸ª json èŠ‚ç‚¹çš„åŽä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹
+ * @param node {ACL_JSON_NODE*} json èŠ‚ç‚¹
+ * @return {ACL_JSON_NODE*} ç»™å®š json èŠ‚ç‚¹çš„åŽä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹, è‹¥ä¸ºNULLåˆ™è¡¨ç¤ºä¸å­˜åœ¨
  */
 ACL_API ACL_JSON_NODE *acl_json_node_next(ACL_JSON_NODE *node);
 
 /**
- * »ñµÃÄ³¸ö json ½ÚµãµÄÇ°Ò»¸öÐÖµÜ½Úµã
- * @param node {ACL_JSON_NODE*} json ½Úµã
- * @return {ACL_JSON_NODE*} ¸ø¶¨ json ½ÚµãµÄÇ°Ò»¸öÐÖµÜ½Úµã, ÈôÎªNULLÔò±íÊ¾²»´æÔÚ
+ * èŽ·å¾—æŸä¸ª json èŠ‚ç‚¹çš„å‰ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹
+ * @param node {ACL_JSON_NODE*} json èŠ‚ç‚¹
+ * @return {ACL_JSON_NODE*} ç»™å®š json èŠ‚ç‚¹çš„å‰ä¸€ä¸ªå…„å¼ŸèŠ‚ç‚¹, è‹¥ä¸ºNULLåˆ™è¡¨ç¤ºä¸å­˜åœ¨
  */
 ACL_API ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node);
 
 /**
- * ´´½¨Ò»¸ö json ¶ÔÏó
- * @return {ACL_JSON*} ÐÂ´´½¨µÄ json ¶ÔÏó
+ * åˆ›å»ºä¸€ä¸ª json å¯¹è±¡
+ * @return {ACL_JSON*} æ–°åˆ›å»ºçš„ json å¯¹è±¡
  */
 ACL_API ACL_JSON *acl_json_alloc(void);
 
 /**
- * ´´½¨Ò»¸ö json ¶ÔÏó
- * @param dbuf {ACL_DBUF_POOL*} ÄÚ´æ³Ø¶ÔÏó£¬µ±¸ÃÕë¶Ô·Ç NULL Ê±£¬Ôò json ¶ÔÏó
- *  ¼°ËùÊô½ÚµãÄÚ´æÔÚÆä»ù´¡ÉÏ½øÐÐ·ÖÅä£¬·ñÔò£¬ÄÚ²¿×Ô¶¯´´½¨Á¥ÊôÓÚ json µÄÄÚ´æ³Ø
- * @return {ACL_JSON*} ÐÂ´´½¨µÄ json ¶ÔÏó
+ * åˆ›å»ºä¸€ä¸ª json å¯¹è±¡
+ * @param dbuf {ACL_DBUF_POOL*} å†…å­˜æ± å¯¹è±¡ï¼Œå½“è¯¥é’ˆå¯¹éž NULL æ—¶ï¼Œåˆ™ json å¯¹è±¡
+ *  åŠæ‰€å±žèŠ‚ç‚¹å†…å­˜åœ¨å…¶åŸºç¡€ä¸Šè¿›è¡Œåˆ†é…ï¼Œå¦åˆ™ï¼Œå†…éƒ¨è‡ªåŠ¨åˆ›å»ºéš¶å±žäºŽ json çš„å†…å­˜æ± 
+ * @return {ACL_JSON*} æ–°åˆ›å»ºçš„ json å¯¹è±¡
  */
 ACL_API ACL_JSON *acl_json_dbuf_alloc(ACL_DBUF_POOL *dbuf);
 
 /**
- * ¸ù¾ÝÒ»¸ö JSON ¶ÔÏóµÄÒ»¸ö JSON ½Úµã´´½¨Ò»¸öÐÂµÄ JSON ¶ÔÏó
- * @param node {ACL_JSON_NODE*} Ô´ JSON ¶ÔÏóµÄÒ»¸ö JSON ½Úµã
- * @return {ACL_JSON*} ÐÂ´´½¨µÄ JSON ¶ÔÏó
+ * æ ¹æ®ä¸€ä¸ª JSON å¯¹è±¡çš„ä¸€ä¸ª JSON èŠ‚ç‚¹åˆ›å»ºä¸€ä¸ªæ–°çš„ JSON å¯¹è±¡
+ * @param node {ACL_JSON_NODE*} æº JSON å¯¹è±¡çš„ä¸€ä¸ª JSON èŠ‚ç‚¹
+ * @return {ACL_JSON*} æ–°åˆ›å»ºçš„ JSON å¯¹è±¡
  */
 ACL_API ACL_JSON *acl_json_create(ACL_JSON_NODE *node);
 
 /**
- * ¸ù¾ÝÒ»¸ö JSON ¶ÔÏóµÄÒ»¸ö JSON ½Úµã´´½¨Ò»¸öÐÂµÄ JSON ¶ÔÏó
- * @param dbuf {ACL_DBUF_POOL*} ÄÚ´æ³Ø¶ÔÏó£¬µ±¸ÃÕë¶Ô·Ç NULL Ê±£¬Ôò json ¶ÔÏó
- *  ¼°ËùÊô½ÚµãÄÚ´æÔÚÆä»ù´¡ÉÏ½øÐÐ·ÖÅä£¬·ñÔò£¬ÄÚ²¿×Ô¶¯´´½¨Á¥ÊôÓÚ json µÄÄÚ´æ³Ø
- * @param node {ACL_JSON_NODE*} Ô´ JSON ¶ÔÏóµÄÒ»¸ö JSON ½Úµã
- * @return {ACL_JSON*} ÐÂ´´½¨µÄ JSON ¶ÔÏó
+ * æ ¹æ®ä¸€ä¸ª JSON å¯¹è±¡çš„ä¸€ä¸ª JSON èŠ‚ç‚¹åˆ›å»ºä¸€ä¸ªæ–°çš„ JSON å¯¹è±¡
+ * @param dbuf {ACL_DBUF_POOL*} å†…å­˜æ± å¯¹è±¡ï¼Œå½“è¯¥é’ˆå¯¹éž NULL æ—¶ï¼Œåˆ™ json å¯¹è±¡
+ *  åŠæ‰€å±žèŠ‚ç‚¹å†…å­˜åœ¨å…¶åŸºç¡€ä¸Šè¿›è¡Œåˆ†é…ï¼Œå¦åˆ™ï¼Œå†…éƒ¨è‡ªåŠ¨åˆ›å»ºéš¶å±žäºŽ json çš„å†…å­˜æ± 
+ * @param node {ACL_JSON_NODE*} æº JSON å¯¹è±¡çš„ä¸€ä¸ª JSON èŠ‚ç‚¹
+ * @return {ACL_JSON*} æ–°åˆ›å»ºçš„ JSON å¯¹è±¡
  */
 ACL_API ACL_JSON *acl_json_dbuf_create(ACL_DBUF_POOL *dbuf, ACL_JSON_NODE *node);
 
 /**
- * ½«Ä³Ò»¸ö ACL_JSON_NODE ½Úµã×÷ÎªÒ»¸ö json ¶ÔÏóµÄ¸ù½Úµã£¬
- * ´Ó¶ø¿ÉÒÔ·½±ãµØ±éÀú³ö¸Ã½ÚµãµÄ¸÷¼¶×Ó½Úµã(ÔÚ±éÀú¹ý³ÌÖÐµÄËùÓÐ
- * ½Úµã²»º¬±¾½Úµã×ÔÉí)£¬¸Ã±éÀú·½Ê½ÓÐ±ðÓÚµ¥¶À
- * ±éÀúÄ³Ò»¸ö ACL_JSON_NODE ½ÚµãÊ±½öÄÜ±éÀúÆäÒ»¼¶×Ó½ÚµãµÄÇéÐÎ
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param node {ACL_JSON_NODE*} ACL_JSON_NODE ½Úµã
+ * å°†æŸä¸€ä¸ª ACL_JSON_NODE èŠ‚ç‚¹ä½œä¸ºä¸€ä¸ª json å¯¹è±¡çš„æ ¹èŠ‚ç‚¹ï¼Œ
+ * ä»Žè€Œå¯ä»¥æ–¹ä¾¿åœ°éåŽ†å‡ºè¯¥èŠ‚ç‚¹çš„å„çº§å­èŠ‚ç‚¹(åœ¨éåŽ†è¿‡ç¨‹ä¸­çš„æ‰€æœ‰
+ * èŠ‚ç‚¹ä¸å«æœ¬èŠ‚ç‚¹è‡ªèº«)ï¼Œè¯¥éåŽ†æ–¹å¼æœ‰åˆ«äºŽå•ç‹¬
+ * éåŽ†æŸä¸€ä¸ª ACL_JSON_NODE èŠ‚ç‚¹æ—¶ä»…èƒ½éåŽ†å…¶ä¸€çº§å­èŠ‚ç‚¹çš„æƒ…å½¢
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param node {ACL_JSON_NODE*} ACL_JSON_NODE èŠ‚ç‚¹
  */
 ACL_API void acl_json_foreach_init(ACL_JSON *json, ACL_JSON_NODE *node);
 
 /**
- * ÊÍ·ÅÒ»¸ö json ¶ÔÏó, Í¬Ê±ÊÍ·Å¸Ã¶ÔÏóÀïÈÝÄÉµÄËùÓÐ json ½Úµã
- * @param json {ACL_JSON*} json ¶ÔÏó
+ * é‡Šæ”¾ä¸€ä¸ª json å¯¹è±¡, åŒæ—¶é‡Šæ”¾è¯¥å¯¹è±¡é‡Œå®¹çº³çš„æ‰€æœ‰ json èŠ‚ç‚¹
+ * @param json {ACL_JSON*} json å¯¹è±¡
  */
 ACL_API void acl_json_free(ACL_JSON *json);
 
 /**
- * ÖØÖÃ json ½âÎöÆ÷¶ÔÏó
- * @param json {ACL_JSON*} json ¶ÔÏó
+ * é‡ç½® json è§£æžå™¨å¯¹è±¡
+ * @param json {ACL_JSON*} json å¯¹è±¡
  */
 ACL_API void acl_json_reset(ACL_JSON *json);
 
 /*------------------------- in acl_json_parse.c ---------------------------*/
 
 /**
- * ½âÎö json Êý¾Ý, ²¢³ÖÐøµØ×Ô¶¯Éú³É json ½ÚµãÊ÷
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param data {const char*} ÒÔ '\0' ½áÎ²µÄÊý¾Ý×Ö·û´®, ¿ÉÒÔÊÇÍêÕûµÄ json Êý¾Ý;
- *  Ò²¿ÉÒÔÊÇ²»ÍêÕûµÄ json Êý¾Ý, ÔÊÐíÑ­»·µ÷ÓÃ´Ëº¯Êý, ½«²»ÍêÕûÊý¾Ý³ÖÐøµØÊäÈë; ¸Ã²ÎÊý
- *  ÈôÎª NULL£¬ÔòÖ±½Ó·µ»Ø¿Õ´®µØÖ·£¬Òò´Ë½ûÖ¹Îª NULL
- * @return {const char*} µ±½âÎö½áÊøºó£¬¸Ã·µ»ØÖµ±íÊ¾Ê£ÓàÊý¾ÝµÄÖ¸ÕëµØÖ·
+ * è§£æž json æ•°æ®, å¹¶æŒç»­åœ°è‡ªåŠ¨ç”Ÿæˆ json èŠ‚ç‚¹æ ‘
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param data {const char*} ä»¥ '\0' ç»“å°¾çš„æ•°æ®å­—ç¬¦ä¸², å¯ä»¥æ˜¯å®Œæ•´çš„ json æ•°æ®;
+ *  ä¹Ÿå¯ä»¥æ˜¯ä¸å®Œæ•´çš„ json æ•°æ®, å…è®¸å¾ªçŽ¯è°ƒç”¨æ­¤å‡½æ•°, å°†ä¸å®Œæ•´æ•°æ®æŒç»­åœ°è¾“å…¥; è¯¥å‚æ•°
+ *  è‹¥ä¸º NULLï¼Œåˆ™ç›´æŽ¥è¿”å›žç©ºä¸²åœ°å€ï¼Œå› æ­¤ç¦æ­¢ä¸º NULL
+ * @return {const char*} å½“è§£æžç»“æŸåŽï¼Œè¯¥è¿”å›žå€¼è¡¨ç¤ºå‰©ä½™æ•°æ®çš„æŒ‡é’ˆåœ°å€
  */
 ACL_API const char* acl_json_update(ACL_JSON *json, const char *data);
 
 /**
- * ÅÐ¶Ï JSON ½âÎöÊÇ·ñÍê³É
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @return {int} ·µ»Ø·Ç 0 Öµ±íÊ¾½âÎöÍê³É£¬·ñÔò±íÊ¾Î´Íê³É
+ * åˆ¤æ–­ JSON è§£æžæ˜¯å¦å®Œæˆ
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @return {int} è¿”å›žéž 0 å€¼è¡¨ç¤ºè§£æžå®Œæˆï¼Œå¦åˆ™è¡¨ç¤ºæœªå®Œæˆ
  */
 ACL_API int acl_json_finish(ACL_JSON *json);
 
 /*------------------------- in acl_json_util.c ----------------------------*/
 
 /**
- * ´Ó json ¶ÔÏóÖÐ»ñµÃµÚÒ»¸öÓëËù¸ø±êÇ©ÃûÏàÍ¬µÄ json ½Úµã
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param tag {const char*} ±êÇ©Ãû³Æ
- * @return {ACL_JSON_NODE*} ·ûºÏÌõ¼þµÄ json ½Úµã, Èô·µ»Ø NULL Ôò
- *  ±íÊ¾Ã»ÓÐ·ûºÏÌõ¼þµÄ json ½Úµã
+ * ä»Ž json å¯¹è±¡ä¸­èŽ·å¾—ç¬¬ä¸€ä¸ªä¸Žæ‰€ç»™æ ‡ç­¾åç›¸åŒçš„ json èŠ‚ç‚¹
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param tag {const char*} æ ‡ç­¾åç§°
+ * @return {ACL_JSON_NODE*} ç¬¦åˆæ¡ä»¶çš„ json èŠ‚ç‚¹, è‹¥è¿”å›ž NULL åˆ™
+ *  è¡¨ç¤ºæ²¡æœ‰ç¬¦åˆæ¡ä»¶çš„ json èŠ‚ç‚¹
  */
 ACL_API ACL_JSON_NODE *acl_json_getFirstElementByTagName(
 	ACL_JSON *json, const char *tag);
 
 /**
- * ÊÍ·ÅÓÉ acl_json_getElementsByTagName, acl_json_getElementsByName,
- * µÈº¯Êý·µ»ØµÄ¶¯Ì¬Êý×é¶ÔÏó, ÒòÎª¸Ã¶¯Ì¬Êý×éÖÐµÄ
- * ÔªËØ¶¼ÊÇ ACL_JSON ¶ÔÏóÖÐÔªËØµÄÒýÓÃ, ËùÒÔÊÍ·Åµô¸Ã¶¯Ì¬Êý×éºó, Ö»Òª ACL_JSON
- * ¶ÔÏó²»ÊÍ·Å, ÔòÔ­À´´æÓÚ¸ÃÊý×éÖÐµÄÔªËØÒÀÈ»¿ÉÒÔÊ¹ÓÃ.
- * µ«²¢²»ÊÍ·ÅÀïÃæµÄ xml ½ÚµãÔªËØ
- * @param a {ACL_ARRAY*} ¶¯Ì¬Êý×é¶ÔÏó
+ * é‡Šæ”¾ç”± acl_json_getElementsByTagName, acl_json_getElementsByName,
+ * ç­‰å‡½æ•°è¿”å›žçš„åŠ¨æ€æ•°ç»„å¯¹è±¡, å› ä¸ºè¯¥åŠ¨æ€æ•°ç»„ä¸­çš„
+ * å…ƒç´ éƒ½æ˜¯ ACL_JSON å¯¹è±¡ä¸­å…ƒç´ çš„å¼•ç”¨, æ‰€ä»¥é‡Šæ”¾æŽ‰è¯¥åŠ¨æ€æ•°ç»„åŽ, åªè¦ ACL_JSON
+ * å¯¹è±¡ä¸é‡Šæ”¾, åˆ™åŽŸæ¥å­˜äºŽè¯¥æ•°ç»„ä¸­çš„å…ƒç´ ä¾ç„¶å¯ä»¥ä½¿ç”¨.
+ * ä½†å¹¶ä¸é‡Šæ”¾é‡Œé¢çš„ xml èŠ‚ç‚¹å…ƒç´ 
+ * @param a {ACL_ARRAY*} åŠ¨æ€æ•°ç»„å¯¹è±¡
  */
 ACL_API void acl_json_free_array(ACL_ARRAY *a);
 
 /**
- * ´Ó json ¶ÔÏóÖÐ»ñµÃËùÓÐµÄÓëËù¸ø±êÇ©ÃûÏàÍ¬µÄ json ½ÚµãµÄ¼¯ºÏ
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param tag {const char*} ±êÇ©Ãû³Æ
- * @return {ACL_ARRAY*} ·ûºÏÌõ¼þµÄ json ½Úµã¼¯ºÏ, ´æÓÚ ¶¯Ì¬Êý×éÖÐ, Èô·µ»Ø NULL Ôò
- *  ±íÊ¾Ã»ÓÐ·ûºÏÌõ¼þµÄ json ½Úµã, ·Ç¿ÕÖµÐèÒªµ÷ÓÃ acl_json_free_array ÊÍ·Å
+ * ä»Ž json å¯¹è±¡ä¸­èŽ·å¾—æ‰€æœ‰çš„ä¸Žæ‰€ç»™æ ‡ç­¾åç›¸åŒçš„ json èŠ‚ç‚¹çš„é›†åˆ
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param tag {const char*} æ ‡ç­¾åç§°
+ * @return {ACL_ARRAY*} ç¬¦åˆæ¡ä»¶çš„ json èŠ‚ç‚¹é›†åˆ, å­˜äºŽ åŠ¨æ€æ•°ç»„ä¸­, è‹¥è¿”å›ž NULL åˆ™
+ *  è¡¨ç¤ºæ²¡æœ‰ç¬¦åˆæ¡ä»¶çš„ json èŠ‚ç‚¹, éžç©ºå€¼éœ€è¦è°ƒç”¨ acl_json_free_array é‡Šæ”¾
  */
 ACL_API ACL_ARRAY *acl_json_getElementsByTagName(
 	ACL_JSON *json, const char *tag);
 
 /**
- * ´Ó json ¶ÔÏóÖÐ»ñµÃËùÓÐµÄÓë¸ø¶¨¶à¼¶±êÇ©ÃûÏàÍ¬µÄ json ½ÚµãµÄ¼¯ºÏ
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param tags {const char*} ¶à¼¶±êÇ©Ãû£¬ÓÉ '/' ·Ö¸ô¸÷¼¶±êÇ©Ãû£¬ÈçÕë¶Ô json Êý¾Ý£º
+ * ä»Ž json å¯¹è±¡ä¸­èŽ·å¾—æ‰€æœ‰çš„ä¸Žç»™å®šå¤šçº§æ ‡ç­¾åç›¸åŒçš„ json èŠ‚ç‚¹çš„é›†åˆ
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param tags {const char*} å¤šçº§æ ‡ç­¾åï¼Œç”± '/' åˆ†éš”å„çº§æ ‡ç­¾åï¼Œå¦‚é’ˆå¯¹ json æ•°æ®ï¼š
  *  { 'root': [
  *      'first': { 'second': { 'third': 'test1' } },
  *      'first': { 'second': { 'third': 'test2' } },
  *      'first': { 'second': { 'third': 'test3' } }
  *    ]
  *  }
- *  ¿ÉÒÔÍ¨¹ý¶à¼¶±êÇ©Ãû£ºroot/first/second/third Ò»´ÎÐÔ²é³öËùÓÐ·ûºÏÌõ¼þµÄ½Úµã
- * @return {ACL_ARRAY*} ·ûºÏÌõ¼þµÄ json ½Úµã¼¯ºÏ, ´æÓÚ ¶¯Ì¬Êý×éÖÐ, Èô·µ»Ø NULL Ôò
- *  ±íÊ¾Ã»ÓÐ·ûºÏÌõ¼þµÄ json ½Úµã, ·Ç¿ÕÖµÐèÒªµ÷ÓÃ acl_json_free_array ÊÍ·Å
+ *  å¯ä»¥é€šè¿‡å¤šçº§æ ‡ç­¾åï¼šroot/first/second/third ä¸€æ¬¡æ€§æŸ¥å‡ºæ‰€æœ‰ç¬¦åˆæ¡ä»¶çš„èŠ‚ç‚¹
+ * @return {ACL_ARRAY*} ç¬¦åˆæ¡ä»¶çš„ json èŠ‚ç‚¹é›†åˆ, å­˜äºŽ åŠ¨æ€æ•°ç»„ä¸­, è‹¥è¿”å›ž NULL åˆ™
+ *  è¡¨ç¤ºæ²¡æœ‰ç¬¦åˆæ¡ä»¶çš„ json èŠ‚ç‚¹, éžç©ºå€¼éœ€è¦è°ƒç”¨ acl_json_free_array é‡Šæ”¾
  */
 ACL_API ACL_ARRAY *acl_json_getElementsByTags(
 	ACL_JSON *json, const char *tags);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json Ò¶½Úµã
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} ±êÇ©Ãû£¬·Ç¿Õ
- * @param value {const char*} ±êÇ©Öµ£¬·Ç¿Õ
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json å¶èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} æ ‡ç­¾åï¼Œéžç©º
+ * @param value {const char*} æ ‡ç­¾å€¼ï¼Œéžç©º
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_text(ACL_JSON *json,
 	const char *name, const char *value);
 #define acl_json_create_leaf acl_json_create_text
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json ²¼¶ûÀàÐÍµÄÒ¶½Úµã
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} ±êÇ©Ãû£¬·Ç¿Õ
- * @param value {int} ²¼¶ûÀàÐÍÖµ
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json å¸ƒå°”ç±»åž‹çš„å¶èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} æ ‡ç­¾åï¼Œéžç©º
+ * @param value {int} å¸ƒå°”ç±»åž‹å€¼
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_bool(ACL_JSON *json,
 	const char *name, int value);
 
 /**
- * ¹¹Ôì json ¶ÔÏóÊ±´´½¨ json null ÀàÐÍµÄÒ¶½Úµã
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} ±êÇ©Ãû£¬·Ç¿Õ
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„é€  json å¯¹è±¡æ—¶åˆ›å»º json null ç±»åž‹çš„å¶èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} æ ‡ç­¾åï¼Œéžç©º
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_null(ACL_JSON *json, const char *name);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json int ÀàÐÍµÄÒ¶½Úµã
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} ±êÇ©Ãû£¬·Ç¿Õ
- * @param value {acl_int64} ÓÐ·ûºÅÕûÐÎÖµ
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json int ç±»åž‹çš„å¶èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} æ ‡ç­¾åï¼Œéžç©º
+ * @param value {acl_int64} æœ‰ç¬¦å·æ•´å½¢å€¼
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_int64(ACL_JSON *json,
 	const char *name, acl_int64 value);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json double ÀàÐÍµÄÒ¶½Úµã
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} ±êÇ©Ãû£¬·Ç¿Õ
- * @param value {double} ÓÐ·ûºÅÕûÐÎÖµ
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json double ç±»åž‹çš„å¶èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} æ ‡ç­¾åï¼Œéžç©º
+ * @param value {double} æœ‰ç¬¦å·æ•´å½¢å€¼
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_double(ACL_JSON *json,
 	const char *name, double value);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json double ÀàÐÍµÄÒ¶½Úµã
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} ±êÇ©Ãû£¬·Ç¿Õ
- * @param value {double} ÓÐ·ûºÅÕûÐÎÖµ
- * @param precision {int} Ð¡Êýµã¾«¶È£¬´óÓÚ 0 Ê±ÓÐÐ§£¬·ñÔòÈ¡È±Ê¡ÖµÎª 4
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json double ç±»åž‹çš„å¶èŠ‚ç‚¹
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} æ ‡ç­¾åï¼Œéžç©º
+ * @param value {double} æœ‰ç¬¦å·æ•´å½¢å€¼
+ * @param precision {int} å°æ•°ç‚¹ç²¾åº¦ï¼Œå¤§äºŽ 0 æ—¶æœ‰æ•ˆï¼Œå¦åˆ™å–ç¼ºçœå€¼ä¸º 4
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_double2(ACL_JSON *json,
 	const char *name, double value, int precision);
 
 /**
- * ¹¹½¨ json ¶ÔÏóµÄ×Ö·û´®½Úµã£¬°´ json ¹æ·¶£¬¸Ã½ÚµãÖ»ÄÜ¼ÓÈëÖÁÊý×é¶ÔÏóÖÐ
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
+ * æž„å»º json å¯¹è±¡çš„å­—ç¬¦ä¸²èŠ‚ç‚¹ï¼ŒæŒ‰ json è§„èŒƒï¼Œè¯¥èŠ‚ç‚¹åªèƒ½åŠ å…¥è‡³æ•°ç»„å¯¹è±¡ä¸­
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
  * @param text {const char*}
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_text(ACL_JSON *json,
 	const char *text);
 
 /**
- * ¹¹½¨ json ¶ÔÏóµÄÊýÖµ½Úµã£¬°´ json ¹æ·¶£¬¸Ã½ÚµãÖ»ÄÜ¼ÓÈëÖÁÊý×é¶ÔÏóÖÐ
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
+ * æž„å»º json å¯¹è±¡çš„æ•°å€¼èŠ‚ç‚¹ï¼ŒæŒ‰ json è§„èŒƒï¼Œè¯¥èŠ‚ç‚¹åªèƒ½åŠ å…¥è‡³æ•°ç»„å¯¹è±¡ä¸­
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
  * @param value {acl_int64}
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_int64(ACL_JSON *json,
 	acl_int64 value);
 /**
- * ¹¹½¨ json ¶ÔÏóµÄÊýÖµ½Úµã£¬°´ json ¹æ·¶£¬¸Ã½ÚµãÖ»ÄÜ¼ÓÈëÖÁÊý×é¶ÔÏóÖÐ
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
+ * æž„å»º json å¯¹è±¡çš„æ•°å€¼èŠ‚ç‚¹ï¼ŒæŒ‰ json è§„èŒƒï¼Œè¯¥èŠ‚ç‚¹åªèƒ½åŠ å…¥è‡³æ•°ç»„å¯¹è±¡ä¸­
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
  * @param value {double}
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_double(ACL_JSON *json,
 	double value);
 
 /**
- * ¹¹½¨ json ¶ÔÏóµÄ²¼¶û½Úµã£¬°´ json ¹æ·¶£¬¸Ã½ÚµãÖ»ÄÜ¼ÓÈëÖÁÊý×é¶ÔÏóÖÐ
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param value {int} ·Ç 0 ±íÊ¾ true£¬·ñÔò±íÊ¾ false
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡çš„å¸ƒå°”èŠ‚ç‚¹ï¼ŒæŒ‰ json è§„èŒƒï¼Œè¯¥èŠ‚ç‚¹åªèƒ½åŠ å…¥è‡³æ•°ç»„å¯¹è±¡ä¸­
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param value {int} éž 0 è¡¨ç¤º trueï¼Œå¦åˆ™è¡¨ç¤º false
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_bool(ACL_JSON *json, int value);
 
 /**
- * ¹¹½¨ json ¶ÔÏóµÄ null ½Úµã£¬°´ json ¹æ·¶£¬¸Ã½ÚµãÖ»ÄÜ¼ÓÈëÖÁÊý×é¶ÔÏóÖÐ
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡çš„ null èŠ‚ç‚¹ï¼ŒæŒ‰ json è§„èŒƒï¼Œè¯¥èŠ‚ç‚¹åªèƒ½åŠ å…¥è‡³æ•°ç»„å¯¹è±¡ä¸­
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array_null(ACL_JSON *json);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json ¶ÔÏó(¼´½ö°üº¬ {} µÄ¶ÔÏó)
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json å¯¹è±¡(å³ä»…åŒ…å« {} çš„å¯¹è±¡)
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_obj(ACL_JSON *json);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json Êý×é¶ÔÏó(¼´½ö°üº¬ [] µÄ¶ÔÏó)
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json æ•°ç»„å¯¹è±¡(å³ä»…åŒ…å« [] çš„å¯¹è±¡)
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_array(ACL_JSON *json);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±´´½¨ json ½Úµã¶ÔÏó(¼´ tagname: ACL_JSON_NODE)
- * @param json {ACL_JSON*} ÓÉ acl_json_alloc / acl_json_alloc1 ´´½¨
- * @param name {const char*} json ½ÚµãµÄ±êÇ©Ãû
- * @param value {ACL_JSON_NODE*} json ½Úµã¶ÔÏó×÷Îª±êÇ©Öµ
- * @return {ACL_JSON_NODE*} ÐÂ´´½¨µÄ½Úµã¶ÔÏó£¬ÔÚÊÍ·Å ACL_JSON ¶ÔÏóÊ±
- *  Ò»Æð±»ÊÍ·Å£¬ËùÒÔ²»ÐèÒªµ¥¶ÀÊÍ·Å
+ * æž„å»º json å¯¹è±¡æ—¶åˆ›å»º json èŠ‚ç‚¹å¯¹è±¡(å³ tagname: ACL_JSON_NODE)
+ * @param json {ACL_JSON*} ç”± acl_json_alloc / acl_json_alloc1 åˆ›å»º
+ * @param name {const char*} json èŠ‚ç‚¹çš„æ ‡ç­¾å
+ * @param value {ACL_JSON_NODE*} json èŠ‚ç‚¹å¯¹è±¡ä½œä¸ºæ ‡ç­¾å€¼
+ * @return {ACL_JSON_NODE*} æ–°åˆ›å»ºçš„èŠ‚ç‚¹å¯¹è±¡ï¼Œåœ¨é‡Šæ”¾ ACL_JSON å¯¹è±¡æ—¶
+ *  ä¸€èµ·è¢«é‡Šæ”¾ï¼Œæ‰€ä»¥ä¸éœ€è¦å•ç‹¬é‡Šæ”¾
  */
 ACL_API ACL_JSON_NODE *acl_json_create_node(ACL_JSON *json,
 	const char *name, ACL_JSON_NODE *value);
 
 /**
- * ¹¹½¨ json ¶ÔÏóÊ±£¬ÏòÒ»¸öÓÉ acl_json_create_obj »ò acl_json_create_array
- * ´´½¨µÄ json ½ÚµãÌí¼Ó×Ó½Úµã£¬¸Ã×Ó½Úµã¿ÉÒÔÊÇÓÉÈçÏÂ½Ó¿Ú´´½¨µÄ½Úµã:
+ * æž„å»º json å¯¹è±¡æ—¶ï¼Œå‘ä¸€ä¸ªç”± acl_json_create_obj æˆ– acl_json_create_array
+ * åˆ›å»ºçš„ json èŠ‚ç‚¹æ·»åŠ å­èŠ‚ç‚¹ï¼Œè¯¥å­èŠ‚ç‚¹å¯ä»¥æ˜¯ç”±å¦‚ä¸‹æŽ¥å£åˆ›å»ºçš„èŠ‚ç‚¹:
  * acl_json_create_leaf, acl_json_create_obj, acl_json_create_array
  */
 ACL_API void acl_json_node_append_child(ACL_JSON_NODE *parent,
 	ACL_JSON_NODE *child);
 
 /**
- * ½« json ¶ÔÏóµÄÒ»¸ö JSON ½Úµã×ª³É×Ö·û´®ÄÚÈÝ
- * @param node {ACL_JSON_NODE*} json ½Úµã¶ÔÏó
- * @param buf {ACL_VSTRING*} ´æ´¢½á¹û¼¯µÄ»º³åÇø£¬µ±¸Ã²ÎÊýÎª¿ÕÊ±Ôòº¯ÊýÄÚ²¿»á
- *  ×Ô¶¯·ÖÅäÒ»¶Î»º³åÇø£¬Ó¦ÓÃÓÃÍêºóÐèÒªÊÍ·Åµô£»·Ç¿Õº¯ÊýÄÚ²¿»áÖ±½Ó½«½á¹û´æ´¢ÆäÖÐ
- * @return {ACL_VSTRING*} json ½Úµã¶ÔÏó×ª»»³É×Ö·û´®ºóµÄ´æ´¢»º³åÇø£¬
- *  ¸Ã·µ»ØÖµÓÀÔ¶·Ç¿Õ£¬Ê¹ÓÃÕß¿ÉÒÔÍ¨¹ý ACL_VSTRING_LEN(x) ºêÀ´ÅÐ¶ÏÄÚÈÝÊÇ·ñÎª¿Õ£¬
- *  ·µ»ØµÄ ACL_VSTRING Ö¸ÕëÈç¹ûÎª¸Ãº¯ÊýÄÚ²¿´´½¨µÄ£¬ÔòÓÃ»§Ãû±ØÐëÓÃ
- *  acl_vstring_free ½øÐÐÊÍ·Å
+ * å°† json å¯¹è±¡çš„ä¸€ä¸ª JSON èŠ‚ç‚¹è½¬æˆå­—ç¬¦ä¸²å†…å®¹
+ * @param node {ACL_JSON_NODE*} json èŠ‚ç‚¹å¯¹è±¡
+ * @param buf {ACL_VSTRING*} å­˜å‚¨ç»“æžœé›†çš„ç¼“å†²åŒºï¼Œå½“è¯¥å‚æ•°ä¸ºç©ºæ—¶åˆ™å‡½æ•°å†…éƒ¨ä¼š
+ *  è‡ªåŠ¨åˆ†é…ä¸€æ®µç¼“å†²åŒºï¼Œåº”ç”¨ç”¨å®ŒåŽéœ€è¦é‡Šæ”¾æŽ‰ï¼›éžç©ºå‡½æ•°å†…éƒ¨ä¼šç›´æŽ¥å°†ç»“æžœå­˜å‚¨å…¶ä¸­
+ * @return {ACL_VSTRING*} json èŠ‚ç‚¹å¯¹è±¡è½¬æ¢æˆå­—ç¬¦ä¸²åŽçš„å­˜å‚¨ç¼“å†²åŒºï¼Œ
+ *  è¯¥è¿”å›žå€¼æ°¸è¿œéžç©ºï¼Œä½¿ç”¨è€…å¯ä»¥é€šè¿‡ ACL_VSTRING_LEN(x) å®æ¥åˆ¤æ–­å†…å®¹æ˜¯å¦ä¸ºç©ºï¼Œ
+ *  è¿”å›žçš„ ACL_VSTRING æŒ‡é’ˆå¦‚æžœä¸ºè¯¥å‡½æ•°å†…éƒ¨åˆ›å»ºçš„ï¼Œåˆ™ç”¨æˆ·åå¿…é¡»ç”¨
+ *  acl_vstring_free è¿›è¡Œé‡Šæ”¾
  */
 ACL_API ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *node, ACL_VSTRING *buf);
 
 /**
- * ½« json ¶ÔÏó×ª³É×Ö·û´®ÄÚÈÝ
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param buf {ACL_VSTRING*} ´æ´¢½á¹û¼¯µÄ»º³åÇø£¬µ±¸Ã²ÎÊýÎª¿ÕÊ±Ôòº¯ÊýÄÚ²¿»á
- *  ×Ô¶¯·ÖÅäÒ»¶Î»º³åÇø£¬Ó¦ÓÃÓÃÍêºóÐèÒªÊÍ·Åµô£»·Ç¿Õº¯ÊýÄÚ²¿»áÖ±½Ó½«½á¹û´æ´¢ÆäÖÐ
- * @return {ACL_VSTRING*} json ¶ÔÏó×ª»»³É×Ö·û´®ºóµÄ´æ´¢»º³åÇø£¬¸Ã·µ»ØÖµÓÀÔ¶·Ç¿Õ£¬
- *  Ê¹ÓÃÕß¿ÉÒÔÍ¨¹ý ACL_VSTRING_LEN(x) ºêÀ´ÅÐ¶ÏÄÚÈÝÊÇ·ñÎª¿Õ£¬·µ»ØµÄ ACL_VSTRING
- *  Ö¸ÕëÈç¹ûÎª¸Ãº¯ÊýÄÚ²¿´´½¨µÄ£¬ÔòÓÃ»§Ãû±ØÐëÓÃ acl_vstring_free ½øÐÐÊÍ·Å
+ * å°† json å¯¹è±¡è½¬æˆå­—ç¬¦ä¸²å†…å®¹
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param buf {ACL_VSTRING*} å­˜å‚¨ç»“æžœé›†çš„ç¼“å†²åŒºï¼Œå½“è¯¥å‚æ•°ä¸ºç©ºæ—¶åˆ™å‡½æ•°å†…éƒ¨ä¼š
+ *  è‡ªåŠ¨åˆ†é…ä¸€æ®µç¼“å†²åŒºï¼Œåº”ç”¨ç”¨å®ŒåŽéœ€è¦é‡Šæ”¾æŽ‰ï¼›éžç©ºå‡½æ•°å†…éƒ¨ä¼šç›´æŽ¥å°†ç»“æžœå­˜å‚¨å…¶ä¸­
+ * @return {ACL_VSTRING*} json å¯¹è±¡è½¬æ¢æˆå­—ç¬¦ä¸²åŽçš„å­˜å‚¨ç¼“å†²åŒºï¼Œè¯¥è¿”å›žå€¼æ°¸è¿œéžç©ºï¼Œ
+ *  ä½¿ç”¨è€…å¯ä»¥é€šè¿‡ ACL_VSTRING_LEN(x) å®æ¥åˆ¤æ–­å†…å®¹æ˜¯å¦ä¸ºç©ºï¼Œè¿”å›žçš„ ACL_VSTRING
+ *  æŒ‡é’ˆå¦‚æžœä¸ºè¯¥å‡½æ•°å†…éƒ¨åˆ›å»ºçš„ï¼Œåˆ™ç”¨æˆ·åå¿…é¡»ç”¨ acl_vstring_free è¿›è¡Œé‡Šæ”¾
  */
 ACL_API ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf);
 
 /**
- * Á÷Ê½ JSON ¶ÔÏó×ª×Ö·û´®´¦Àí¹ý³Ì£¬¼´¸Ãº¯ÊýÔÚ½« JSON ¶ÔÏó×ªÎª×Ö·û´®µÄ¹ý³ÌÖÐ£¬
- * Ò»±ß×ª»»Ò»±ß½«Êý¾ÝÍ¨¹ý»Øµ÷º¯ÊýÊä³ö¸øµ÷ÓÃÕß£¬µ÷ÓÃÕß¿ÉÒÔÏÞ¶¨³¤¶ÈÏÞ¶¨µ÷ÓÃ»Ø
- * µ÷º¯ÊýµÄÊ±»ú£»¸Ã´¦Àí¹ý³ÌÊÊÓ¦ÓÚµ±JSON¶ÔÏó×ª³ÉµÄ×Ö·û´®·Ç³£³¤Ê±(Èç³¬¹ý100 MB),
- * ÒòÎª²ÉÓÃÁ÷Ê½×ª»»·½Ê½£¬ËùÒÔ²¢²»ÐèÒª·ÖÅäÒ»¸ö´óÄÚ´æ
- * @param json {ACL_JSON*} json ¶ÔÏó
- * @param length {size_t} ÔÚ×ª»»Îª×Ö·û´®µÄ¹ý³ÌÖÐÈç¹û»º³åÇø³¤¶È³¬¹ý¸Ã³¤¶ÈÔò»Øµ÷
- *  ÓÃ»§Éè¶¨µÄ»Øµ÷º¯Êý
- * @param callback {int (*)(ACL_JSON*, ACL_VSTRING*, void*)} ÓÃ»§Éè¶¨µÄ»Øµ÷
- *  º¯Êý£¬µ±»Øµ÷º¯Êý¸øµÄµÚ¶þ¸ö²ÎÊýÎª NULL Ê±±íÊ¾´¦ÀíÍê±Ï£»Èç¹ûÓÃ»§ÔÚ¸Ã»Øµ÷
- *  µÄÄ³´Î±»µ÷ÓÃºó·µ»ØÖµ < 0 ÔòÍ£Ö¹´¦Àí¹ý³Ì
- * @param ctx {void*} callback º¯ÊýµÄ×îºóÒ»¸ö²ÎÊý
+ * æµå¼ JSON å¯¹è±¡è½¬å­—ç¬¦ä¸²å¤„ç†è¿‡ç¨‹ï¼Œå³è¯¥å‡½æ•°åœ¨å°† JSON å¯¹è±¡è½¬ä¸ºå­—ç¬¦ä¸²çš„è¿‡ç¨‹ä¸­ï¼Œ
+ * ä¸€è¾¹è½¬æ¢ä¸€è¾¹å°†æ•°æ®é€šè¿‡å›žè°ƒå‡½æ•°è¾“å‡ºç»™è°ƒç”¨è€…ï¼Œè°ƒç”¨è€…å¯ä»¥é™å®šé•¿åº¦é™å®šè°ƒç”¨å›ž
+ * è°ƒå‡½æ•°çš„æ—¶æœºï¼›è¯¥å¤„ç†è¿‡ç¨‹é€‚åº”äºŽå½“JSONå¯¹è±¡è½¬æˆçš„å­—ç¬¦ä¸²éžå¸¸é•¿æ—¶(å¦‚è¶…è¿‡100 MB),
+ * å› ä¸ºé‡‡ç”¨æµå¼è½¬æ¢æ–¹å¼ï¼Œæ‰€ä»¥å¹¶ä¸éœ€è¦åˆ†é…ä¸€ä¸ªå¤§å†…å­˜
+ * @param json {ACL_JSON*} json å¯¹è±¡
+ * @param length {size_t} åœ¨è½¬æ¢ä¸ºå­—ç¬¦ä¸²çš„è¿‡ç¨‹ä¸­å¦‚æžœç¼“å†²åŒºé•¿åº¦è¶…è¿‡è¯¥é•¿åº¦åˆ™å›žè°ƒ
+ *  ç”¨æˆ·è®¾å®šçš„å›žè°ƒå‡½æ•°
+ * @param callback {int (*)(ACL_JSON*, ACL_VSTRING*, void*)} ç”¨æˆ·è®¾å®šçš„å›žè°ƒ
+ *  å‡½æ•°ï¼Œå½“å›žè°ƒå‡½æ•°ç»™çš„ç¬¬äºŒä¸ªå‚æ•°ä¸º NULL æ—¶è¡¨ç¤ºå¤„ç†å®Œæ¯•ï¼›å¦‚æžœç”¨æˆ·åœ¨è¯¥å›žè°ƒ
+ *  çš„æŸæ¬¡è¢«è°ƒç”¨åŽè¿”å›žå€¼ < 0 åˆ™åœæ­¢å¤„ç†è¿‡ç¨‹
+ * @param ctx {void*} callback å‡½æ•°çš„æœ€åŽä¸€ä¸ªå‚æ•°
  */
 ACL_API void acl_json_building(ACL_JSON *json, size_t length,
 	int (*callback)(ACL_JSON *, ACL_VSTRING *, void *), void *ctx);

@@ -16,10 +16,10 @@ extern "C" {
 #include "acl_xinetd_cfg.h"
 
 /**
- * ´ÓÅäÖÃ¶ÔÏóÖĞÈ¡µÃÄ³¸öÅäÖÃÏîµÄÖµ
- * @param _xcp_ {ACL_XINETD_CFG_PARSER*} ÅäÖÃ¶ÔÏó
- * @param _name_ {const char*} ÅäÖÃÏîÃû
- * @param _obj_ {char*} ´æ´¢ÅäÖÃÏîµÄ×Ö·û´®ÀàĞÍµÄÖµ
+ * ä»é…ç½®å¯¹è±¡ä¸­å–å¾—æŸä¸ªé…ç½®é¡¹çš„å€¼
+ * @param _xcp_ {ACL_XINETD_CFG_PARSER*} é…ç½®å¯¹è±¡
+ * @param _name_ {const char*} é…ç½®é¡¹å
+ * @param _obj_ {char*} å­˜å‚¨é…ç½®é¡¹çš„å­—ç¬¦ä¸²ç±»å‹çš„å€¼
  */
 #define ACL_CFG_SET_ITEM_STR(_xcp_, _name_, _obj_) do {  \
 	ACL_XINETD_CFG_PARSER *_tmp_xcp_ = _xcp_; \
@@ -35,11 +35,11 @@ extern "C" {
 } while (0);
 
 /**
- * ´ÓÅäÖÃ¶ÔÏóÖĞÈ¡µÃÄ³¸öÅäÖÃÏîµÄÖµ
- * @param _xcp_ {ACL_XINETD_CFG_PARSER*} ÅäÖÃ¶ÔÏó
- * @param _name_ {const char*} ÅäÖÃÏîÃû
- * @param _obj_ {int} ´æ´¢ÅäÖÃÏîµÄÕûÊıÀàĞÍµÄÖµ
- * @param _def_ {int} Èç¹ûÅäÖÃÏî²»´æÔÚ£¬ÔòÓÃ´ËÈ±Ê¡Öµ
+ * ä»é…ç½®å¯¹è±¡ä¸­å–å¾—æŸä¸ªé…ç½®é¡¹çš„å€¼
+ * @param _xcp_ {ACL_XINETD_CFG_PARSER*} é…ç½®å¯¹è±¡
+ * @param _name_ {const char*} é…ç½®é¡¹å
+ * @param _obj_ {int} å­˜å‚¨é…ç½®é¡¹çš„æ•´æ•°ç±»å‹çš„å€¼
+ * @param _def_ {int} å¦‚æœé…ç½®é¡¹ä¸å­˜åœ¨ï¼Œåˆ™ç”¨æ­¤ç¼ºçœå€¼
  */
 #define ACL_CFG_SET_ITEM_INT(_xcp_, _name_, _obj_, _def_) do {  \
 	ACL_XINETD_CFG_PARSER *_tmp_xcp_ = _xcp_; \

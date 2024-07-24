@@ -9,85 +9,85 @@ extern "C" {
 #endif
 
 /**
- * »ñÈ¡¿ØÖÆ½ø³ÌµÄÖ´ĞĞ³ÌĞòËùÔÚµÄÂ·¾¶Î»ÖÃ
- * @param buf {char*} ´æ´¢½á¹ûµÄÄÚ´æÎ»ÖÃ, ·µ»ØµÄ½á¹ûµÄ½áÎ²
- *  ²»°üº¬ "\" »ò "/",¡¡Èç£º"C:\\test_path\\test1_path", ¶ø²»ÊÇ
+ * è·å–æ§åˆ¶è¿›ç¨‹çš„æ‰§è¡Œç¨‹åºæ‰€åœ¨çš„è·¯å¾„ä½ç½®
+ * @param buf {char*} å­˜å‚¨ç»“æœçš„å†…å­˜ä½ç½®, è¿”å›çš„ç»“æœçš„ç»“å°¾
+ *  ä¸åŒ…å« "\" æˆ– "/",ã€€å¦‚ï¼š"C:\\test_path\\test1_path", è€Œä¸æ˜¯
  *  "C:\\test_path\\test1_path\\"
- * @param size {size_t} buf µÄ¿Õ¼ä´óĞ¡
+ * @param size {size_t} buf çš„ç©ºé—´å¤§å°
  */
 ACL_API void acl_proctl_daemon_path(char *buf, size_t size);
 
 /**
- * ³õÊ¼»¯½ø³Ì¿ØÖÆ¿ò¼Ü£¨½ö acl_proctl_start ĞèÒª£©
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
+ * åˆå§‹åŒ–è¿›ç¨‹æ§åˆ¶æ¡†æ¶ï¼ˆä»… acl_proctl_start éœ€è¦ï¼‰
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
  */
 ACL_API void acl_proctl_deamon_init(const char *progname);
 
 /**
- * ¿ØÖÆ½ø³Ì×÷ÎªºóÌ¨·şÎñ½ø³ÌÔËĞĞ£¬¼àÊÓËùÓĞ×Ó½ø³ÌµÄÔËĞĞ×´Ì¬£¬
- * Èç¹û×Ó½ø³ÌÒì³£ÍË³öÔò»áÖØÆô¸Ã×Ó½ø³Ì
+ * æ§åˆ¶è¿›ç¨‹ä½œä¸ºåå°æœåŠ¡è¿›ç¨‹è¿è¡Œï¼Œç›‘è§†æ‰€æœ‰å­è¿›ç¨‹çš„è¿è¡ŒçŠ¶æ€ï¼Œ
+ * å¦‚æœå­è¿›ç¨‹å¼‚å¸¸é€€å‡ºåˆ™ä¼šé‡å¯è¯¥å­è¿›ç¨‹
  */
 ACL_API void acl_proctl_daemon_loop(void);
 
 /**
- * ÔÚ¿ØÖÆ½ø³ÌÆô¶¯ºó£¬Æô¶¯Ò»¸ö×Ó½ø³Ì
- * @param progchild {const char*} ×Ó½ø³ÌµÄ³ÌĞòÃû
- * @param argc {int} argv Êı×éµÄ³¤¶È
+ * åœ¨æ§åˆ¶è¿›ç¨‹å¯åŠ¨åï¼Œå¯åŠ¨ä¸€ä¸ªå­è¿›ç¨‹
+ * @param progchild {const char*} å­è¿›ç¨‹çš„ç¨‹åºå
+ * @param argc {int} argv æ•°ç»„çš„é•¿åº¦
  * @param argv {char* []}
  * @return 0: ok; -1: error
  */
 ACL_API int acl_proctl_deamon_start_one(const char *progchild, int argc, char *argv[]);
 
 /**
- * ÒÔÃüÁî·½Ê½Æô¶¯Ä³¸ö×Ó½ø³Ì
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
- * @param progchild {const char*} ×Ó½ø³Ì½ø³ÌÃû
- * @param argc {int} argv Êı×éµÄ³¤¶È
- * @param argv {char* []} ´«µİ¸ø×Ó½ø³ÌµÄ²ÎÊı
+ * ä»¥å‘½ä»¤æ–¹å¼å¯åŠ¨æŸä¸ªå­è¿›ç¨‹
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
+ * @param progchild {const char*} å­è¿›ç¨‹è¿›ç¨‹å
+ * @param argc {int} argv æ•°ç»„çš„é•¿åº¦
+ * @param argv {char* []} ä¼ é€’ç»™å­è¿›ç¨‹çš„å‚æ•°
  */
 ACL_API void acl_proctl_start_one(const char *progname,
 	const char *progchild, int argc, char *argv[]);
 
 /**
- * ÒÔÃüÁî·½Ê½Í£Ö¹Ä³¸ö×Ó½ø³Ì
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
- * @param progchild {const char*} ×Ó½ø³Ì½ø³ÌÃû
- * @param argc {int} argv Êı×éµÄ³¤¶È
- * @param argv {char* []} ´«µİ¸ø×Ó½ø³ÌµÄ²ÎÊı
+ * ä»¥å‘½ä»¤æ–¹å¼åœæ­¢æŸä¸ªå­è¿›ç¨‹
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
+ * @param progchild {const char*} å­è¿›ç¨‹è¿›ç¨‹å
+ * @param argc {int} argv æ•°ç»„çš„é•¿åº¦
+ * @param argv {char* []} ä¼ é€’ç»™å­è¿›ç¨‹çš„å‚æ•°
  */
 ACL_API void acl_proctl_stop_one(const char *progname,
 	const char *progchild, int argc, char *argv[]);
 
 /**
- * ÒÔÃüÁî·½Ê½Í£Ö¹ËùÓĞµÄ×Ó½ø³Ì
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
+ * ä»¥å‘½ä»¤æ–¹å¼åœæ­¢æ‰€æœ‰çš„å­è¿›ç¨‹
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
  */
 ACL_API void acl_proctl_stop_all(const char *progname);
 
 /**
- * ÒÔÃüÁî·½Ê½Í¨Öª¿ØÖÆ½ø³ÌÍ£Ö¹ËùÓĞµÄ×Ó½ø³Ì£¬²¢ÔÚ×Ó½ø³ÌÍË³öºó¿ØÖÆ½ø³ÌÒ²×Ô¶¯ÍË³ö
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
+ * ä»¥å‘½ä»¤æ–¹å¼é€šçŸ¥æ§åˆ¶è¿›ç¨‹åœæ­¢æ‰€æœ‰çš„å­è¿›ç¨‹ï¼Œå¹¶åœ¨å­è¿›ç¨‹é€€å‡ºåæ§åˆ¶è¿›ç¨‹ä¹Ÿè‡ªåŠ¨é€€å‡º
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
  */
 ACL_API void acl_proctl_quit(const char *progname);
 
 /**
- * ÁĞ³öµ±Ç°ËùÓĞÕıÔÚÔËĞĞµÄ·şÎñ½ø³Ì
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
+ * åˆ—å‡ºå½“å‰æ‰€æœ‰æ­£åœ¨è¿è¡Œçš„æœåŠ¡è¿›ç¨‹
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
  */
 ACL_API void acl_proctl_list(const char *progname);
 
 /**
- * Ì½²âÄ³¸ö·şÎñ½ø³ÌÊÇ·ñÔÚÔËĞĞ
- * @param progname {const char*} ¿ØÖÆ½ø³Ì½ø³ÌÃû
- * @param progchild {const char*} ×Ó½ø³Ì½ø³ÌÃû
+ * æ¢æµ‹æŸä¸ªæœåŠ¡è¿›ç¨‹æ˜¯å¦åœ¨è¿è¡Œ
+ * @param progname {const char*} æ§åˆ¶è¿›ç¨‹è¿›ç¨‹å
+ * @param progchild {const char*} å­è¿›ç¨‹è¿›ç¨‹å
  */
 ACL_API void acl_proctl_probe(const char *progname, const char *progchild);
 
 /**
- * ×Ó½ø³Ìµ÷ÓÃ½Ó¿Ú£¬Í¨¹ı´Ë½Ó¿ÚÓë¸¸½ø³ÌÖ®¼ä½¨Á¢¿ØÖÆ/±»¿ØÖÆ¹ØÏµ
- * @param progname {const char*} ×Ó½ø³Ì½ø³ÌÃû
- * @param onexit_fn {void (*)(void*)} Èç¹û·Ç¿ÕÔòµ±×Ó½ø³ÌÍË³öÊ±µ÷ÓÃµÄ»Øµ÷º¯Êı
- * @param arg {void*} onexit_fn ²ÎÊıÖ®Ò»
+ * å­è¿›ç¨‹è°ƒç”¨æ¥å£ï¼Œé€šè¿‡æ­¤æ¥å£ä¸çˆ¶è¿›ç¨‹ä¹‹é—´å»ºç«‹æ§åˆ¶/è¢«æ§åˆ¶å…³ç³»
+ * @param progname {const char*} å­è¿›ç¨‹è¿›ç¨‹å
+ * @param onexit_fn {void (*)(void*)} å¦‚æœéç©ºåˆ™å½“å­è¿›ç¨‹é€€å‡ºæ—¶è°ƒç”¨çš„å›è°ƒå‡½æ•°
+ * @param arg {void*} onexit_fn å‚æ•°ä¹‹ä¸€
  */
 ACL_API void acl_proctl_child(const char *progname, void (*onexit_fn)(void *), void *arg);
 

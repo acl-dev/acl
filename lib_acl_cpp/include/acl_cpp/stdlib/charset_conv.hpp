@@ -15,73 +15,73 @@ public:
 	~charset_conv(void);
 
 	/**
-	 * ÉèÖÃÊÇ·ñÔÊĞí½«ÎŞĞ§µÄ×Ö·û¼¯Ö±½Ó¿½±´
-	 * @param onoff {bool} µ±Îª true Ê±£¬Ôò×ªÂë¹ı³ÌÖĞÈç¹ûÓöµ½ÁË
-	 *  ·Ç·¨×Ö·û¼¯£¬ÔòÖ±½Ó¿½±´£¬·ñÔòÔòÌø¹ı£¬Ä¬ÈÏÇé¿öÏÂÊÇÖ±½Ó¿½±´
+	 * è®¾ç½®æ˜¯å¦å…è®¸å°†æ— æ•ˆçš„å­—ç¬¦é›†ç›´æ¥æ‹·è´
+	 * @param onoff {bool} å½“ä¸º true æ—¶ï¼Œåˆ™è½¬ç è¿‡ç¨‹ä¸­å¦‚æœé‡åˆ°äº†
+	 *  éæ³•å­—ç¬¦é›†ï¼Œåˆ™ç›´æ¥æ‹·è´ï¼Œå¦åˆ™åˆ™è·³è¿‡ï¼Œé»˜è®¤æƒ…å†µä¸‹æ˜¯ç›´æ¥æ‹·è´
 	 */
 	void set_add_invalid(bool onoff);
 
 	/**
-	 * ×ª»»º¯Êı
-	 * @param fromCharset {const char*} Ô´×Ö·û¼¯
-	 * @param toCharset {const char*} Ä¿±ê×Ö·û¼¯
-	 * @param in {const char*} ÊäÈëµÄÔ´Êı¾İµØÖ·(·Ç¿Õ)
-	 * @param n {size_t} ÊäÈëÔ´Êı¾İµÄ³¤¶È(>0)
-	 * @param out {string*} ´æ´¢×ª»»½á¹û
-	 * @return {bool} ×ª»»ÊÇ·ñ³É¹¦
+	 * è½¬æ¢å‡½æ•°
+	 * @param fromCharset {const char*} æºå­—ç¬¦é›†
+	 * @param toCharset {const char*} ç›®æ ‡å­—ç¬¦é›†
+	 * @param in {const char*} è¾“å…¥çš„æºæ•°æ®åœ°å€(éç©º)
+	 * @param n {size_t} è¾“å…¥æºæ•°æ®çš„é•¿åº¦(>0)
+	 * @param out {string*} å­˜å‚¨è½¬æ¢ç»“æœ
+	 * @return {bool} è½¬æ¢æ˜¯å¦æˆåŠŸ
 	 */
 	bool convert(const char* fromCharset, const char* toCharset,
 		const char* in, size_t n, string* out);
 
 	/**
-	 * Èç¹û×ª»»Ê§°Ü, ¸Ãº¯Êı·µ»Ø³ö´íÔ­Òò
-	 * @return {const char*} ³ö´íÔ­Òò
+	 * å¦‚æœè½¬æ¢å¤±è´¥, è¯¥å‡½æ•°è¿”å›å‡ºé”™åŸå› 
+	 * @return {const char*} å‡ºé”™åŸå› 
 	 */
 	const char* serror(void) const;
 
 	/**
-	 * ÖØÖÃ×ªÂë×´Ì¬, ¸Ã½âÎöÆ÷±ã¿ÉÖØ¸´Ê¹ÓÃ, µ«ÔÚÔÙ´ÎÊ¹ÓÃÇ°ĞèÒªµ÷ÓÃ
-	 * set(from, to) ÉèÖÃÔ´×Ö·û¼¯ÓëÄ¿±ê×Ö·û¼¯
+	 * é‡ç½®è½¬ç çŠ¶æ€, è¯¥è§£æå™¨ä¾¿å¯é‡å¤ä½¿ç”¨, ä½†åœ¨å†æ¬¡ä½¿ç”¨å‰éœ€è¦è°ƒç”¨
+	 * set(from, to) è®¾ç½®æºå­—ç¬¦é›†ä¸ç›®æ ‡å­—ç¬¦é›†
 	 */
 	void reset(void);
 
-	/* Á÷Ê½·ÖÎö¹ı³Ì£ºupdate_begin->update->update ... ->update_finish */
+	/* æµå¼åˆ†æè¿‡ç¨‹ï¼šupdate_begin->update->update ... ->update_finish */
 
 	/**
-	 * ³õÊ¼»¯Á÷Ê½·ÖÎöµÄÏà¹Ø²ÎÊı
-	 * @param fromCharset {const char*} Ô´×Ö·û¼¯
-	 * @param toCharset {const char*} Ä¿±ê×Ö·û¼¯
-	 * @return {bool} ³õÊ¼»¯ÊÇ·ñ³É¹¦
+	 * åˆå§‹åŒ–æµå¼åˆ†æçš„ç›¸å…³å‚æ•°
+	 * @param fromCharset {const char*} æºå­—ç¬¦é›†
+	 * @param toCharset {const char*} ç›®æ ‡å­—ç¬¦é›†
+	 * @return {bool} åˆå§‹åŒ–æ˜¯å¦æˆåŠŸ
 	 */
 	bool update_begin(const char* fromCharset, const char* toCharset);
 
 	/**
-	 * ÒÔÁ÷Ê½·½Ê½½øĞĞ×Ö·û¼¯×ª»»
-	 * @param in {const char*} Ô´×Ö·û´®
-	 * @param len {size_t} in ×Ö·û´®³¤¶È
-	 * @param out {string*} ´æ´¢×ª»»½á¹û
-	 * @return {bool} µ±Ç°×ª»»¹ı³ÌÊÇ·ñ³É¹¦
+	 * ä»¥æµå¼æ–¹å¼è¿›è¡Œå­—ç¬¦é›†è½¬æ¢
+	 * @param in {const char*} æºå­—ç¬¦ä¸²
+	 * @param len {size_t} in å­—ç¬¦ä¸²é•¿åº¦
+	 * @param out {string*} å­˜å‚¨è½¬æ¢ç»“æœ
+	 * @return {bool} å½“å‰è½¬æ¢è¿‡ç¨‹æ˜¯å¦æˆåŠŸ
 	 */
 	bool update(const char* in, size_t len, string* out);
 
 	/**
-	 * Á÷Ê½×ª»»½áÊøºóĞèÒªµ÷ÓÃ´Ëº¯ÊıÌáÈ¡×îºóµÄ×ª»»½á¹û
-	 * @param out {string*} ´æ´¢×ª»»½á¹û
+	 * æµå¼è½¬æ¢ç»“æŸåéœ€è¦è°ƒç”¨æ­¤å‡½æ•°æå–æœ€åçš„è½¬æ¢ç»“æœ
+	 * @param out {string*} å­˜å‚¨è½¬æ¢ç»“æœ
 	 */
 	void update_finish(string* out);
 
 	/**
-	 * ´´½¨×Ö·û¼¯×ª»»Æ÷
-	 * @param fromCharset {const char*} Ô´×Ö·û¼¯
-	 * @param toCharset {const char*} Ä¿±ê×Ö·û¼¯
-	 * @return {charset_conv*} Èç¹ûÊäÈë²ÎÊı·Ç·¨£¬»òÔ´×Ö·û¼¯
-	 *  ÓëÄ¿±ê×Ö·û¼¯ÏàÍ¬£¬»ò²»Ö§³ÖÁ½¸ö×Ö·û¼¯¼äµÄ×ª»»Ôò·µ»ØNULL£¬
-	 *  ÓÃÍêºóĞèÒªµ÷ÓÃ delete É¾³ı
+	 * åˆ›å»ºå­—ç¬¦é›†è½¬æ¢å™¨
+	 * @param fromCharset {const char*} æºå­—ç¬¦é›†
+	 * @param toCharset {const char*} ç›®æ ‡å­—ç¬¦é›†
+	 * @return {charset_conv*} å¦‚æœè¾“å…¥å‚æ•°éæ³•ï¼Œæˆ–æºå­—ç¬¦é›†
+	 *  ä¸ç›®æ ‡å­—ç¬¦é›†ç›¸åŒï¼Œæˆ–ä¸æ”¯æŒä¸¤ä¸ªå­—ç¬¦é›†é—´çš„è½¬æ¢åˆ™è¿”å›NULLï¼Œ
+	 *  ç”¨å®Œåéœ€è¦è°ƒç”¨ delete åˆ é™¤
 	 */
 	static charset_conv* create(const char* fromCharset,
 	                const char* toCharset);
 
-	// pipe_stream Ğéº¯ÊıÖØÔØ
+	// pipe_stream è™šå‡½æ•°é‡è½½
 
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
@@ -91,7 +91,7 @@ public:
 public:
 
 private:
-	bool m_addInvalid;  // Èç¹ûÓöµ½ÎŞĞ§µÄ×Ö·û¼¯£¬ÊÇ·ñÖ±½Ó¿½±´
+	bool m_addInvalid;  // å¦‚æœé‡åˆ°æ— æ•ˆçš„å­—ç¬¦é›†ï¼Œæ˜¯å¦ç›´æ¥æ‹·è´
 	string  m_errmsg;
 	string* m_pBuf;
 	char  m_fromCharset[32];
@@ -103,12 +103,12 @@ private:
 };
 
 /**
- * ¸Ã C-like API ¿ÉÒÔ¸ü·½±ã¿ì½İµØ·½±ã½øĞĞ×Ö·û¼¯×ª»»
- * @param in {const char*} ÊäÈë×Ö·û´®(·Ç¿Õ×Ö·û´®)
- * @param len {size_t} ÊäÈë×Ö·û´®³¤¶È(>0)
- * @param from_charset {const char*} Ô´×Ö·û¼¯±àÂë
- * @param to_charset {constchar*} Ä¿±ê×Ö·û¼¯±àÂë
- * @return {string} ·µ»ØµÄ string ¶ÔÏó·Ç¿ÕÊ±(¼´: !string.empty()) ±íÊ¾×ª»»³É¹¦
+ * è¯¥ C-like API å¯ä»¥æ›´æ–¹ä¾¿å¿«æ·åœ°æ–¹ä¾¿è¿›è¡Œå­—ç¬¦é›†è½¬æ¢
+ * @param in {const char*} è¾“å…¥å­—ç¬¦ä¸²(éç©ºå­—ç¬¦ä¸²)
+ * @param len {size_t} è¾“å…¥å­—ç¬¦ä¸²é•¿åº¦(>0)
+ * @param from_charset {const char*} æºå­—ç¬¦é›†ç¼–ç 
+ * @param to_charset {constchar*} ç›®æ ‡å­—ç¬¦é›†ç¼–ç 
+ * @return {string} è¿”å›çš„ string å¯¹è±¡éç©ºæ—¶(å³: !string.empty()) è¡¨ç¤ºè½¬æ¢æˆåŠŸ
  */
 ACL_CPP_API string strconv(const char* in, size_t len,
 	const char* from_charset, const char* to_charset);

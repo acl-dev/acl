@@ -19,7 +19,7 @@ protected:
 public:
 	 int BeginScan(void);
 private:
-	// 扫描的文件总数
+	// 鎵弿鐨勬枃浠舵�绘暟
 	int m_nFile, m_nDir;
 	__int64 m_nSize;
 public:

@@ -1,4 +1,4 @@
-// md5.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// md5.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -15,11 +15,11 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 
 	acl::smtp_client conn(addr, 60, 60);
 
-	// ÉèÖÃÊÇ·ñ²ÉÓÃ SSL Í¨ĞÅ·½Ê½
+	// è®¾ç½®æ˜¯å¦é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
 	if (use_ssl)
 		conn.set_ssl(&ssl_conf);
 
-	// ·¢ËÍĞÅ·â
+	// å‘é€ä¿¡å°
 	if (conn.send_envelope(message) == false)
 	{
 		printf("send envelope error: %d, %s\r\n",
@@ -27,20 +27,20 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 		return false;
 	}
 
-	// ¿ªÊ¼·¢ËÍÓÊ¼şÌåÊı¾İ
+	// å¼€å§‹å‘é€é‚®ä»¶ä½“æ•°æ®
 	if (conn.data_begin() == false)
 	{
 		printf("send data begin error: %d, %s\r\n",
 			conn.get_code(), conn.get_status());
 	}
 
-	const char* data = "From: \"Ö£Ê÷ĞÂ1\" <zsxxsz@263.net>\r\n"
-		"To: \"Ö£Ê÷ĞÂ2\" <zsxxsz@263.net>\r\n"
-		"Subject: ÄúºÃ£¬hello, world!\r\n"
+	const char* data = "From: \"éƒ‘æ ‘æ–°1\" <zsxxsz@263.net>\r\n"
+		"To: \"éƒ‘æ ‘æ–°2\" <zsxxsz@263.net>\r\n"
+		"Subject: æ‚¨å¥½ï¼Œhello, world!\r\n"
 		"\r\n"
 		"hello world!\r\n";
 
-	// ·¢ËÍÓÊ¼şÌåÊı¾İ
+	// å‘é€é‚®ä»¶ä½“æ•°æ®
 	if (conn.write(data, strlen(data)) == false)
 	{
 		printf("send data error: %d, %s\r\n",
@@ -48,7 +48,7 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 		return false;
 	}
 
-	// ·¢ËÍÍê±Ï
+	// å‘é€å®Œæ¯•
 	if (conn.data_end() == false)
 	{
 		printf("send data end error: %d, %s\r\n",
@@ -60,7 +60,7 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 		sender, recipients, conn.get_code(),
 		conn.get_status());
 
-	// ·¢ËÍ QUIT ÃüÁî
+	// å‘é€ QUIT å‘½ä»¤
 	if (conn.quit() == false)
 	{
 		printf("send quit error: %d, %s\r\n",
@@ -81,7 +81,7 @@ static bool send_mail(const char* addr, const char* sender, const char* pass,
 
 	acl::smtp_client conn(addr, 60, 60);
 
-	// ÉèÖÃÊÇ·ñ²ÉÓÃ SSL Í¨ĞÅ·½Ê½
+	// è®¾ç½®æ˜¯å¦é‡‡ç”¨ SSL é€šä¿¡æ–¹å¼
 	if (use_ssl)
 		conn.set_ssl(&ssl_conf);
 

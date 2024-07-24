@@ -22,7 +22,7 @@ namespace acl
 {
 
 /**
- * ¸ÃÀà¼Ì³ĞÁËËùÓĞ redis ÃüÁîÀà£¬Òò´Ë¿ÉÒÔÖ»Í¨¹ı´ËÀà¶ÔÏóÊ¹ÓÃËùÓĞµÄ redis ÃüÁî¡£
+ * è¯¥ç±»ç»§æ‰¿äº†æ‰€æœ‰ redis å‘½ä»¤ç±»ï¼Œå› æ­¤å¯ä»¥åªé€šè¿‡æ­¤ç±»å¯¹è±¡ä½¿ç”¨æ‰€æœ‰çš„ redis å‘½ä»¤ã€‚
  * inherit all the redis command class, which include all the commands
  * of Key, String, Hash, List, Set, SortedSet, Hyperloglog, Pub/Sub,
  * Transaction, Script, Connection, Server.
@@ -46,25 +46,25 @@ class ACL_CPP_API redis
 {
 public:
 	/**
-	 * ·Ç¼¯Èº·½Ê½µÄ¹¹Ôìº¯Êı
+	 * éé›†ç¾¤æ–¹å¼çš„æ„é€ å‡½æ•°
 	 * the constructor with no redis cluster
-	 * @param conn {redis_client*} Ò»¸ö redis ½ÚµãµÄÁ¬½Ó¶ÔÏó
+	 * @param conn {redis_client*} ä¸€ä¸ª redis èŠ‚ç‚¹çš„è¿æ¥å¯¹è±¡
 	 *  one redis node's connection
 	 */
 	redis(redis_client* conn = NULL);
 
 	/**
-	 * ¼¯Èº·½Ê½µÄ¹¹Ôìº¯Êı
+	 * é›†ç¾¤æ–¹å¼çš„æ„é€ å‡½æ•°
 	 * the constructor in redis cluster mode
-	 * @param cluster {redis_client_cluster*} ¼¯Èº¶ÔÏó
+	 * @param cluster {redis_client_cluster*} é›†ç¾¤å¯¹è±¡
 	 *  the redis cluster object
 	 */
 	redis(redis_client_cluster* cluster);
 
 	/**
-	 * pipeline ·½Ê½µÄ¹¹Ôìº¯Êı
+	 * pipeline æ–¹å¼çš„æ„é€ å‡½æ•°
 	 * the constructor in redis pipeline mode
-	 * @param pipeline {redis_client_pipeline*} pipeline ¶ÔÏó
+	 * @param pipeline {redis_client_pipeline*} pipeline å¯¹è±¡
 	 *  the redis pipeline object
 	 */
 	redis(redis_client_pipeline* pipeline);

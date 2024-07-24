@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ Éú³ÉµÄ°üº¬ÎÄ¼ş¡£
-// ¹© WinFiber.rc Ê¹ÓÃ
+// Microsoft Visual C++ ç”Ÿæˆçš„åŒ…å«æ–‡ä»¶ã€‚
+// ä¾› WinFiber.rc ä½¿ç”¨
 //
 #define IDM_ABOUTBOX                    0x0010
 #define IDD_ABOUTBOX                    100

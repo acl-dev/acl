@@ -42,7 +42,7 @@ memcache_session::~memcache_session(void)
 
 bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
 {
-	// Çå¿ÕÔ­ÓĞÊı¾İ
+	// æ¸…ç©ºåŸæœ‰æ•°æ®
 	attrs_clear(attrs);
 	const char* sid = get_sid();
 	if (sid == NULL || *sid == 0) {
@@ -54,7 +54,7 @@ bool memcache_session::get_attrs(std::map<string, session_string>& attrs)
 		return false;
 	}
 
-	// ·´ĞòÁĞ»¯
+	// ååºåˆ—åŒ–
 	deserialize(buf, attrs);
 	return true;
 }
@@ -67,7 +67,7 @@ bool memcache_session::set_attrs(const std::map<string, session_string>& attrs)
 	}
 
 	string buf;
-	serialize(attrs, buf);  // ĞòÁĞ»¯Êı¾İ
+	serialize(attrs, buf);  // åºåˆ—åŒ–æ•°æ®
 	time_t ttl = get_ttl();
 	return cache_->set(sid, buf.c_str(), buf.length(), ttl);
 }

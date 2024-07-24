@@ -20,12 +20,12 @@ typedef struct PROCTL_SERVICE {
 
 typedef struct PROCTL_MSG {
 	int  msg_type;
-#define PROCTL_MSG_NULL		0		/* ¿ÕÏûÏ¢ */
-#define PROCTL_MSG_START	1		/* Æô¶¯Ä³¸ö·þÎñ³ÌÐò */
-#define PROCTL_MSG_STOP		2		/* Í£Ö¹Ä³¸ö·þÎñ³ÌÐò */
-#define PROCTL_MSG_QUIT		3		/* Í£Ö¹ËùÓÐ·þÎñ³ÌÐò²¢ÍË³ö */
-#define PROCTL_MSG_LIST		4		/* ÁÐ³öµ±Ç°ÕýÔÚÔËÐÐµÄ·þÎñ³ÌÐò */
-#define PROCTL_MSG_CHECK	5		/* ¼ì²éÄ³¸ö·þÎñ³ÌÐòÊÇ·ñÔÚÔËÐÐ */
+#define PROCTL_MSG_NULL		0		/* ç©ºæ¶ˆæ¯ */
+#define PROCTL_MSG_START	1		/* å¯åŠ¨æŸä¸ªæœåŠ¡ç¨‹åº */
+#define PROCTL_MSG_STOP		2		/* åœæ­¢æŸä¸ªæœåŠ¡ç¨‹åº */
+#define PROCTL_MSG_QUIT		3		/* åœæ­¢æ‰€æœ‰æœåŠ¡ç¨‹åºå¹¶é€€å‡º */
+#define PROCTL_MSG_LIST		4		/* åˆ—å‡ºå½“å‰æ­£åœ¨è¿è¡Œçš„æœåŠ¡ç¨‹åº */
+#define PROCTL_MSG_CHECK	5		/* æ£€æŸ¥æŸä¸ªæœåŠ¡ç¨‹åºæ˜¯å¦åœ¨è¿è¡Œ */
 
 	PROCTL_SERVICE *service;
 	void *arg;

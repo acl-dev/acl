@@ -67,19 +67,19 @@
 #endif
 
 /**
- * see WINSOCK2.H, �û���ҪԤ�ȶ����ֵ������Ĭ��ֵΪ64�����⣬��ֵ�������̫��
- * �������� X64 ����ʱ������ˣ��ο� fd_set �Ľṹ���壺
+ * see WINSOCK2.H, 用户需要预先定义此值，因其默认值为64，此外，该值不能设得太大，
+ * 尤其是在 X64 编译时更是如此，参考 fd_set 的结构定义：
  * typedef struct fd_set {
  *   u_int fd_count;
  *   SOCKET  fd_array[FD_SETSIZE];
  * } fd_set;
- * ���� x64 �����£��� FD_SETSIZE=50000 ʱ���ýṹռ�Ŀռ��СΪ��
+ * 当在 x64 环境下，当 FD_SETSIZE=50000 时，该结构占的空间大小为：
  * 8 + sizeof(SOCKET) * FD_SETSIZE = 400008
- * ���� events_select_thr.c �ĺ��� event_loop ������������ fd_set ������
- * ��ú�������ռ�õ�ջ�ռ��С > 1MB���� VC Ĭ�ϵ�ջ��СΪ 1MB���򵱵��ô�
- * ����ʱ�ͻ�����߳�ջ�����
- * ����Ҫ�� FD_SSETSIZE ��úܴ�ʱ������Ҫ������ִ�г����ջ�ռ��С�����ڳ���
- * ��������ʱ��ѡ���У�������ջ������С��ѡ�����һЩ
+ * 而在 events_select_thr.c 的函数 event_loop 中声明了三个 fd_set 变量，
+ * 则该函数其所占用的栈空间大小 > 1MB，而 VC 默认的栈大小为 1MB，则当调用此
+ * 函数时就会造成线程栈溢出；
+ * 当需要将 FD_SSETSIZE 设得很大时，则需要调整可执行程序的栈空间大小，即在程序
+ * 编译链接时的选项中，将“堆栈保留大小”选项设大一些
  */
 # ifndef	FD_SETSIZE
 #  define	FD_SETSIZE	40000
@@ -188,7 +188,7 @@ typedef long ssize_t;
 
 ACL_API int acl_fstat(ACL_FILE_HANDLE fh, struct acl_stat *buf);
 
-/* �ֲ߳̾����� */
+/* 线程局部变量 */
 # if defined(ACL_BCB_COMPILER)
 #  define	__thread
 # else

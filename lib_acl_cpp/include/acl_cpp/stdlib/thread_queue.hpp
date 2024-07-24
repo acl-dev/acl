@@ -40,9 +40,9 @@ void*  tbox_pop(void*, int);
 size_t tbox_size(void*);
 
 /**
- * ÓÃÓÚÏß³ÌÖ®¼äµÄÏûÏ¢Í¨ÐÅ£¬Í¨¹ýÏß³ÌÌõ¼þ±äÁ¿¼°Ïß³ÌËøÊµÏÖ
+ * ç”¨äºŽçº¿ç¨‹ä¹‹é—´çš„æ¶ˆæ¯é€šä¿¡ï¼Œé€šè¿‡çº¿ç¨‹æ¡ä»¶å˜é‡åŠçº¿ç¨‹é”å®žçŽ°
  *
- * Ê¾Àý£º
+ * ç¤ºä¾‹ï¼š
  *
  * class myobj
  * {
@@ -84,9 +84,9 @@ public:
 	}
 
 	/**
-	 * ·¢ËÍÏûÏ¢¶ÔÏó
-	 * @param t {T*} ·Ç¿ÕÏûÏ¢¶ÔÏó
-	 * @return {bool} ·¢ËÍÊÇ·ñ³É¹¦
+	 * å‘é€æ¶ˆæ¯å¯¹è±¡
+	 * @param t {T*} éžç©ºæ¶ˆæ¯å¯¹è±¡
+	 * @return {bool} å‘é€æ˜¯å¦æˆåŠŸ
 	 */
 	bool push(T* t)
 	{
@@ -94,10 +94,10 @@ public:
 	}
 
 	/**
-	 * ½ÓÊÕÏûÏ¢¶ÔÏó
-	 * @param wait_ms {int} >= 0 Ê±ÉèÖÃ¶ÁµÈ´ý³¬Ê±Ê±¼ä(ºÁÃë¼¶±ð)£¬·ñÔò
-	 *  ÓÀÔ¶µÈ´ýÖ±µ½¶Áµ½ÏûÏ¢¶ÔÏó»ò³ö´í
-	 * @return {T*} ·Ç NULL ±íÊ¾»ñµÃÒ»¸öÏûÏ¢¶ÔÏó
+	 * æŽ¥æ”¶æ¶ˆæ¯å¯¹è±¡
+	 * @param wait_ms {int} >= 0 æ—¶è®¾ç½®è¯»ç­‰å¾…è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§åˆ«)ï¼Œå¦åˆ™
+	 *  æ°¸è¿œç­‰å¾…ç›´åˆ°è¯»åˆ°æ¶ˆæ¯å¯¹è±¡æˆ–å‡ºé”™
+	 * @return {T*} éž NULL è¡¨ç¤ºèŽ·å¾—ä¸€ä¸ªæ¶ˆæ¯å¯¹è±¡
 	 */
 	T* pop(int wait_ms = -1)
 	{
@@ -105,7 +105,7 @@ public:
 	}
 
 	/**
-	 * ·µ»Øµ±Ç°´æÔÚÓÚÏûÏ¢¶ÓÁÐÖÐµÄÏûÏ¢ÊýÁ¿
+	 * è¿”å›žå½“å‰å­˜åœ¨äºŽæ¶ˆæ¯é˜Ÿåˆ—ä¸­çš„æ¶ˆæ¯æ•°é‡
 	 * @return {size_t}
 	 */
 	size_t size(void) const

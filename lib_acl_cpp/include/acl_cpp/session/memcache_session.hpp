@@ -9,53 +9,53 @@ namespace acl {
 class memcache;
 
 /**
- * session Àà£¬¸ÃÀàÊ¹ÓÃ memcached ´æ´¢ session Êı¾İ
+ * session ç±»ï¼Œè¯¥ç±»ä½¿ç”¨ memcached å­˜å‚¨ session æ•°æ®
  */
 class ACL_CPP_API memcache_session : public session
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param cache_addr {const char*} memcached ·şÎñµØÖ·£¬¸ñÊ½£º
-	 *  IP:PORT£¬²»ÄÜÎª¿Õ
-	 * @param prefix {const char*} ÔÚ memcached ´æ´¢µÄ¼üÖµµÄÇ°×º
-	 * @param conn_timeout {int} Á¬½Ó memcached µÄ³¬Ê±Ê±¼ä(Ãë)
-	 * @param rw_timeout {int} Óë memcached Í¨Ñ¶µÄ IO ³¬Ê±Ê±¼ä(Ãë)
-	 * @param ttl {time_t} Éú´æÖÜÆÚ(Ãë)
-	 * @param sid {const char*} session ¶ÔÓ¦µÄ sid£¬µ±Îª¿ÕÊ±£¬ÄÚ²¿
-	 *  »á×Ô¶¯Éú³ÉÒ»¸ö£¬ÆäËüËµÃ÷Çë²Î¿¼»ùÀà session µÄËµÃ÷
-	 * @param encode_key {bool} ÊÇ·ñ¶Ô´æ´¢ÓÚ memcached µÄ¼üÖµ½øĞĞ±àÂë
+	 * æ„é€ å‡½æ•°
+	 * @param cache_addr {const char*} memcached æœåŠ¡åœ°å€ï¼Œæ ¼å¼ï¼š
+	 *  IP:PORTï¼Œä¸èƒ½ä¸ºç©º
+	 * @param prefix {const char*} åœ¨ memcached å­˜å‚¨çš„é”®å€¼çš„å‰ç¼€
+	 * @param conn_timeout {int} è¿æ¥ memcached çš„è¶…æ—¶æ—¶é—´(ç§’)
+	 * @param rw_timeout {int} ä¸ memcached é€šè®¯çš„ IO è¶…æ—¶æ—¶é—´(ç§’)
+	 * @param ttl {time_t} ç”Ÿå­˜å‘¨æœŸ(ç§’)
+	 * @param sid {const char*} session å¯¹åº”çš„ sidï¼Œå½“ä¸ºç©ºæ—¶ï¼Œå†…éƒ¨
+	 *  ä¼šè‡ªåŠ¨ç”Ÿæˆä¸€ä¸ªï¼Œå…¶å®ƒè¯´æ˜è¯·å‚è€ƒåŸºç±» session çš„è¯´æ˜
+	 * @param encode_key {bool} æ˜¯å¦å¯¹å­˜å‚¨äº memcached çš„é”®å€¼è¿›è¡Œç¼–ç 
 	 */
 	memcache_session(const char* cache_addr, int conn_timeout = 180,
 		int rw_timeout = 300, const char* prefix = NULL,
 		time_t ttl = 0, const char* sid = NULL, bool encode_key = true);
 
 	/**
-	 * ÒÔÊäÈëµÄ memcached µÄÁ¬½Ó¶ÔÏóÎª²ÎÊıµÄ¹¹Ôìº¯Êı
-	 * @param cache {memcache*} ÊäÈëµÄ memcached Á¬½Ó¶ÔÏó
-	 * @param auto_free {bool} µ±¸Ã²ÎÊıÎª true Ê±£¬ÔòÒªÇó¸Ã
-	 *  memcached_session ¶ÔÏóÎö¹¹º¯ÊıÖĞÊÍ·Å´«ÈëµÄ cache ¶ÔÏó£»
-	 *  ·ñÔòÔò½ûÖ¹ÔÚ memcached_session µÄÎö¹¹º¯ÊıÖĞÊÍ·Å cache ¶ÔÏó
-	 * @param ttl {time_t} Éú´æÖÜÆÚ(Ãë)
-	 * @param sid {const char*} session ¶ÔÓ¦µÄ sid£¬µ±Îª¿ÕÊ±£¬ÄÚ²¿
-	 *  »á×Ô¶¯Éú³ÉÒ»¸ö£¬ÆäËüËµÃ÷Çë²Î¿¼»ùÀà session µÄËµÃ÷
+	 * ä»¥è¾“å…¥çš„ memcached çš„è¿æ¥å¯¹è±¡ä¸ºå‚æ•°çš„æ„é€ å‡½æ•°
+	 * @param cache {memcache*} è¾“å…¥çš„ memcached è¿æ¥å¯¹è±¡
+	 * @param auto_free {bool} å½“è¯¥å‚æ•°ä¸º true æ—¶ï¼Œåˆ™è¦æ±‚è¯¥
+	 *  memcached_session å¯¹è±¡ææ„å‡½æ•°ä¸­é‡Šæ”¾ä¼ å…¥çš„ cache å¯¹è±¡ï¼›
+	 *  å¦åˆ™åˆ™ç¦æ­¢åœ¨ memcached_session çš„ææ„å‡½æ•°ä¸­é‡Šæ”¾ cache å¯¹è±¡
+	 * @param ttl {time_t} ç”Ÿå­˜å‘¨æœŸ(ç§’)
+	 * @param sid {const char*} session å¯¹åº”çš„ sidï¼Œå½“ä¸ºç©ºæ—¶ï¼Œå†…éƒ¨
+	 *  ä¼šè‡ªåŠ¨ç”Ÿæˆä¸€ä¸ªï¼Œå…¶å®ƒè¯´æ˜è¯·å‚è€ƒåŸºç±» session çš„è¯´æ˜
 	 */
 	memcache_session(memcache* cache, bool auto_free = false,
 		time_t ttl = 0, const char* sid = NULL);
 
 	~memcache_session(void);
 
-	// »ùÀà´¿Ğéº¯Êı£¬´Ó memcached ÖĞ»ñµÃÊı¾İ
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼Œä» memcached ä¸­è·å¾—æ•°æ®
 	bool get_attrs(std::map<string, session_string>& attrs);
 
-	// »ùÀà´¿Ğéº¯Êı£¬Ïò memcached ÖĞÌí¼Ó»òĞŞ¸ÄÊı¾İ
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼Œå‘ memcached ä¸­æ·»åŠ æˆ–ä¿®æ”¹æ•°æ®
 	bool set_attrs(const std::map<string, session_string>& attrs);
 
-	// »ùÀà´¿Ğéº¯Êı£¬´Ó memcached ÖĞÉ¾³ıÊı¾İ
+	// åŸºç±»çº¯è™šå‡½æ•°ï¼Œä» memcached ä¸­åˆ é™¤æ•°æ®
 	bool remove();
 
 protected:
-	//ÖØĞÂÉèÖÃ session ÔÚ memcached ÉÏµÄ»º´æÊ±¼ä
+	//é‡æ–°è®¾ç½® session åœ¨ memcached ä¸Šçš„ç¼“å­˜æ—¶é—´
 	bool set_timeout(time_t ttl);
 
 private:

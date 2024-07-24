@@ -34,12 +34,12 @@ static bool __has_called = false;
 void master_aio::run_daemon(int argc, char** argv)
 {
 #ifndef ACL_WINDOWS
-	// Ã¿¸ö½ø³ÌÖ»ÄÜÓĞÒ»¸öÊµÀıÔÚÔËĞĞ
+	// æ¯ä¸ªè¿›ç¨‹åªèƒ½æœ‰ä¸€ä¸ªå®ä¾‹åœ¨è¿è¡Œ
 	acl_assert(__has_called == false);
 	__has_called = true;
 	daemon_mode_ = true;
 
-	// µ÷ÓÃ acl ·şÎñÆ÷¿ò¼ÜµÄµ¥Ïß³Ì·Ç×èÈûÄ£°å
+	// è°ƒç”¨ acl æœåŠ¡å™¨æ¡†æ¶çš„å•çº¿ç¨‹éé˜»å¡æ¨¡æ¿
 	acl_aio_server2_main(argc, argv, service_main,
 		ACL_MASTER_SERVER_CTX, this,
 		ACL_MASTER_SERVER_ON_LISTEN, service_on_listen,
@@ -93,7 +93,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	ACL_ARGV* tokens = acl_argv_split(addrs, ";,| \t");
 	ACL_ITER iter;
 
-	// ³õÊ¼»¯ÅäÖÃ²ÎÊı
+	// åˆå§‹åŒ–é…ç½®å‚æ•°
 	conf_.load(path);
 
 	handle_ = NEW aio_handle(ht);
@@ -101,16 +101,16 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	ACL_AIO* aio = handle_->get_handle();
 	acl_assert(aio);
 	ACL_EVENT* eventp = acl_aio_event(aio);
-	set_event(eventp);  // ÉèÖÃ»ùÀàµÄÊÂ¼ş¾ä±ú
+	set_event(eventp);  // è®¾ç½®åŸºç±»çš„äº‹ä»¶å¥æŸ„
 
 	acl_foreach(iter, tokens) {
 		const char* addr = (const char*) iter.data;
 		aio_listen_stream* sstream = NEW aio_listen_stream(handle_);
-		// ¼àÌıÖ¸¶¨µÄµØÖ·
+		// ç›‘å¬æŒ‡å®šçš„åœ°å€
 		if (!sstream->open(addr)) {
 			logger_error("listen %s error: %s", addr, last_serror());
 			close_all_listener(sstreams);
-			// XXX: ÎªÁË±£Ö¤ÄÜ¹Ø±Õ¼àÌıÁ÷£¬Ó¦ÔÚ´Ë´¦ÔÙ check Ò»ÏÂ
+			// XXX: ä¸ºäº†ä¿è¯èƒ½å…³é—­ç›‘å¬æµï¼Œåº”åœ¨æ­¤å¤„å† check ä¸€ä¸‹
 			handle_->check();
 			acl_argv_free(tokens);
 			return (false);
@@ -124,7 +124,7 @@ bool master_aio::run_alone(const char* addrs, const char* path /* = NULL */,
 	service_pre_jail(this);
 	service_init(this);
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle_->check()) {
 			logger("aio_server stop now ...");
 			break;
@@ -170,8 +170,8 @@ protected:
 	void close_callback(void)
 	{
 #ifndef ACL_WINDOWS
-		// Í¨¹ıÏÂÃæµ÷ÓÃÍ¨Öª·şÎñÆ÷¿ò¼ÜÄ¿Ç°ÒÑ¾­´¦ÀíµÄÁ¬½Ó¸öÊı£¬±ãÓÚ
-		// ·şÎñÆ÷¿ò¼Ü°ë×¤Áô²Ù×÷
+		// é€šè¿‡ä¸‹é¢è°ƒç”¨é€šçŸ¥æœåŠ¡å™¨æ¡†æ¶ç›®å‰å·²ç»å¤„ç†çš„è¿æ¥ä¸ªæ•°ï¼Œä¾¿äº
+		// æœåŠ¡å™¨æ¡†æ¶åŠé©»ç•™æ“ä½œ
 		acl_aio_server_on_close(stream_);
 #endif // !ACL_WINDOWS
 		delete this;

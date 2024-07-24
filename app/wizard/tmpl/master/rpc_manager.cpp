@@ -21,10 +21,10 @@ void rpc_manager::init(acl::aio_handle& handle, int max_threads /* = 10 */,
 {
 	handle_ = &handle;
 
-	// 创建 rpc 服务对象
+	// 鍒涘缓 rpc 鏈嶅姟瀵硅薄
 	service_ = new acl::rpc_service(max_threads);
 
-	// 打开消息服务
+	// 鎵撳紑娑堟伅鏈嶅姟
 	if (!service_->open(handle_, addr && *addr ? addr : NULL)) {
 		logger_fatal("open service error: %s", acl::last_serror());
 	} else {

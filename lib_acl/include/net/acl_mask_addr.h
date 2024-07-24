@@ -8,11 +8,11 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * ¸ø¶¨ÍøÂçÑÚÂë³¤¶È¼°IPµØÖ·£¬»ñµÃÆäÍøÂçµØÖ·
- * @param addr_bytes {unsigned char*} ¸ø¶¨µÄÍøÂç×Ö½ÚĞò IP µØÖ·,
- *  (¿ÉÒÔÎªIPv4/IPv6), ¸Ã²ÎÊıÎªÖµ²ÎĞÍ£¬½á¹û´æÓÚ¸ÃµØÖ·ÖĞ
- * @param addr_byte_count {unsigned} addr_bytes µØÖ·³¤¶È
- * @param network_bits {unsigned} ÍøÂçÑÚÂëµÄ³¤¶È
+ * ç»™å®šç½‘ç»œæ©ç é•¿åº¦åŠIPåœ°å€ï¼Œè·å¾—å…¶ç½‘ç»œåœ°å€
+ * @param addr_bytes {unsigned char*} ç»™å®šçš„ç½‘ç»œå­—èŠ‚åº IP åœ°å€,
+ *  (å¯ä»¥ä¸ºIPv4/IPv6), è¯¥å‚æ•°ä¸ºå€¼å‚å‹ï¼Œç»“æœå­˜äºè¯¥åœ°å€ä¸­
+ * @param addr_byte_count {unsigned} addr_bytes åœ°å€é•¿åº¦
+ * @param network_bits {unsigned} ç½‘ç»œæ©ç çš„é•¿åº¦
  */
 ACL_API void acl_mask_addr(unsigned char *addr_bytes,
 		unsigned addr_byte_count, unsigned network_bits);

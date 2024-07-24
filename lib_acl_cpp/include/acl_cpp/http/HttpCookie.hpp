@@ -7,148 +7,148 @@
 namespace acl {
 
 /**
- * http Ğ­ÒéÍ·ÖĞ cookie ¶ÔÏóÀà
+ * http åè®®å¤´ä¸­ cookie å¯¹è±¡ç±»
  */
 class ACL_CPP_API HttpCookie : public dbuf_obj
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param name {const char*} cookie Ãû£¬Îª·Ç¿Õ×Ö·û´®ÇÒ×Ö·û´®³¤¶È > 0
-	 * @param value {const char*} cookie Öµ£¬Ö¸Õë·Ç¿Õ£¬×Ö·û´®³¤¶È¿ÉÒÔÎª 0
-	 * ×¢£ºÈç¹ûÊäÈëµÄÁ½¸ö²ÎÊı²»·ûºÏÌõ¼ş£¬ÄÚ²¿½«»á²úÉú¶ÏÑÔ
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * æ„é€ å‡½æ•°
+	 * @param name {const char*} cookie åï¼Œä¸ºéç©ºå­—ç¬¦ä¸²ä¸”å­—ç¬¦ä¸²é•¿åº¦ > 0
+	 * @param value {const char*} cookie å€¼ï¼ŒæŒ‡é’ˆéç©ºï¼Œå­—ç¬¦ä¸²é•¿åº¦å¯ä»¥ä¸º 0
+	 * æ³¨ï¼šå¦‚æœè¾“å…¥çš„ä¸¤ä¸ªå‚æ•°ä¸ç¬¦åˆæ¡ä»¶ï¼Œå†…éƒ¨å°†ä¼šäº§ç”Ÿæ–­è¨€
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	HttpCookie(const char* name, const char* value, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * µ±Ê¹ÓÃ¸Ã¹¹Ôìº¯ÊıÊ±£¬¿ÉÒÔÊ¹ÓÃ setCookie À´Ìí¼Ó cookie Ïî
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * å½“ä½¿ç”¨è¯¥æ„é€ å‡½æ•°æ—¶ï¼Œå¯ä»¥ä½¿ç”¨ setCookie æ¥æ·»åŠ  cookie é¡¹
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	HttpCookie(dbuf_guard* dbuf = NULL);
 
 	/**
-	 * ¿½±´¹¹Ôìº¯Êı
-	 * @param cookie {const HttpCookie*} ·Ç NULL£¬ ÄÚ²¿½«¸´ÖÆ¿½±´Æä³ÉÔ±±äÁ¿
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * æ‹·è´æ„é€ å‡½æ•°
+	 * @param cookie {const HttpCookie*} é NULLï¼Œ å†…éƒ¨å°†å¤åˆ¶æ‹·è´å…¶æˆå‘˜å˜é‡
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	HttpCookie(const HttpCookie* cookie, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * Îö¹¹º¯Êı
+	 * ææ„å‡½æ•°
 	 */
 	~HttpCookie(void);
 
 	/**
-	 * ¶ÔÓÚ Set-Cookie: xxx=xxx; domain=xxx; expires=xxx; path=xxx; max-age=xxx; ...
-	 * ÀàµÄÊı¾İ½øĞĞ·ÖÎö
-	 * @param value {const char*} ÀàËÆÓÚ xxx=xxx; domain=xxx; ... ÄÚÈİ
-	 * @return {bool} ´«ÈëµÄÊı¾İÊÇ·ñºÏ·¨
+	 * å¯¹äº Set-Cookie: xxx=xxx; domain=xxx; expires=xxx; path=xxx; max-age=xxx; ...
+	 * ç±»çš„æ•°æ®è¿›è¡Œåˆ†æ
+	 * @param value {const char*} ç±»ä¼¼äº xxx=xxx; domain=xxx; ... å†…å®¹
+	 * @return {bool} ä¼ å…¥çš„æ•°æ®æ˜¯å¦åˆæ³•
 	 */
 	bool setCookie(const char* value);
 
 	/**
-	 * ¶¯Ì¬´´½¨µÄÀà¶ÔÏóÍ¨¹ı´Ëº¯ÊıÊÍ·Å
+	 * åŠ¨æ€åˆ›å»ºçš„ç±»å¯¹è±¡é€šè¿‡æ­¤å‡½æ•°é‡Šæ”¾
 	 */
 	void destroy();
 
 	/**
-	 * ÉèÖÃ cookie µÄ×÷ÓÃÓò
-	 * @param domain {const char*} cookie ×÷ÓÃÓò
-	 * @return {HttpCookie&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® cookie çš„ä½œç”¨åŸŸ
+	 * @param domain {const char*} cookie ä½œç”¨åŸŸ
+	 * @return {HttpCookie&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	HttpCookie& setDomain(const char* domain);
 
 	/**
-	 * ÉèÖÃ cookie µÄ path ×Ö¶Î
-	 * @param path {const char*} path ×Ö¶ÎÖµ
-	 * @return {HttpCookie&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® cookie çš„ path å­—æ®µ
+	 * @param path {const char*} path å­—æ®µå€¼
+	 * @return {HttpCookie&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	HttpCookie& setPath(const char* path);
 
 	/**
-	 * ÉèÖÃ cookie µÄ¹ıÆÚÊ±¼ä¶Î£¬¼´ÓÃµ±Ç°Ê±¼ä¼ÓÊäÈëµÄÊ±¼ä¼´Îª cookie
-	 * µÄ¹ıÆÚÊ±¼ä
-	 * @param timeout {time_t} ¹ıÆÚÊ±¼äÖµ(µ¥Î»ÎªÃë)£¬µ±Ç°Ê±¼ä¼Ó¸ÃÊ±¼ä
-	 * ¼´ cookie µÄ¹ıÆÚÊ±¼ä
-	 * @return {HttpCookie&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® cookie çš„è¿‡æœŸæ—¶é—´æ®µï¼Œå³ç”¨å½“å‰æ—¶é—´åŠ è¾“å…¥çš„æ—¶é—´å³ä¸º cookie
+	 * çš„è¿‡æœŸæ—¶é—´
+	 * @param timeout {time_t} è¿‡æœŸæ—¶é—´å€¼(å•ä½ä¸ºç§’)ï¼Œå½“å‰æ—¶é—´åŠ è¯¥æ—¶é—´
+	 * å³ cookie çš„è¿‡æœŸæ—¶é—´
+	 * @return {HttpCookie&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	HttpCookie& setExpires(time_t timeout);
 
 	/**
-	 * ÉèÖÃ cookie µÄ¹ıÆÚÊ±¼ä½Ø×Ö·û´®
-	 * @param expires {const char*} ¹ıÆÚÊ±¼ä½Ø
-	 * @return {HttpCookie&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® cookie çš„è¿‡æœŸæ—¶é—´æˆªå­—ç¬¦ä¸²
+	 * @param expires {const char*} è¿‡æœŸæ—¶é—´æˆª
+	 * @return {HttpCookie&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	HttpCookie& setExpires(const char* expires);
 
 	/**
-	 * ÉèÖÃ cookie µÄÉú´æÖÜÆÚ
-	 * @param max_age {int} Éú´æÃëÊı
-	 * @return {HttpCookie&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® cookie çš„ç”Ÿå­˜å‘¨æœŸ
+	 * @param max_age {int} ç”Ÿå­˜ç§’æ•°
+	 * @return {HttpCookie&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	HttpCookie& setMaxAge(int max_age);
 
 	/**
-	 * Ìí¼ÓÓë¸Ã cookie ¶ÔÏóÆäËüÊôĞÔÖµ
-	 * @param name {const char*} ÊôĞÔÃû
-	 * @param value {const char*} ÊôĞÔÖµ
-	 * @return {HttpCookie&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * æ·»åŠ ä¸è¯¥ cookie å¯¹è±¡å…¶å®ƒå±æ€§å€¼
+	 * @param name {const char*} å±æ€§å
+	 * @param value {const char*} å±æ€§å€¼
+	 * @return {HttpCookie&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	HttpCookie& add(const char* name, const char* value);
 
 	/**
-	 * »ñµÃ cookie Ãû³Æ£¬È¡¾öÓÚ¹¹½¨º¯ÊıÊäÈëÖµ
-	 * @return {const char*} Îª³¤¶È´óÓÚ 0 µÄ×Ö·û´®£¬ÓÀÔ¶·Ç¿ÕÖ¸Õë
-	 * ×¢£ºÓÃ»§±ØĞëÔÚµ÷ÓÃ HttpCookie(const char*, const char*) ¹¹Ôì
-	 *     »òµ÷ÓÃ setCookie(const char*) ³É¹¦ºó²Å¿ÉÒÔµ÷ÓÃ¸Ãº¯Êı£¬
-	 *     ·ñÔò·µ»ØµÄÊı¾İÊÇ "\0"
+	 * è·å¾— cookie åç§°ï¼Œå–å†³äºæ„å»ºå‡½æ•°è¾“å…¥å€¼
+	 * @return {const char*} ä¸ºé•¿åº¦å¤§äº 0 çš„å­—ç¬¦ä¸²ï¼Œæ°¸è¿œéç©ºæŒ‡é’ˆ
+	 * æ³¨ï¼šç”¨æˆ·å¿…é¡»åœ¨è°ƒç”¨ HttpCookie(const char*, const char*) æ„é€ 
+	 *     æˆ–è°ƒç”¨ setCookie(const char*) æˆåŠŸåæ‰å¯ä»¥è°ƒç”¨è¯¥å‡½æ•°ï¼Œ
+	 *     å¦åˆ™è¿”å›çš„æ•°æ®æ˜¯ "\0"
 	 */
 	const char* getName(void) const;
 
 	/**
-	 * »ñµÃ cookie Öµ£¬È¡¾öÓÚ¹¹Ôìº¯ÊıÊäÈëÖµ
-	 * @return {const char*} ·Ç¿ÕÖ¸Õë£¬ÓĞ¿ÉÄÜÊÇ¿Õ×Ö·û´®("\0")
+	 * è·å¾— cookie å€¼ï¼Œå–å†³äºæ„é€ å‡½æ•°è¾“å…¥å€¼
+	 * @return {const char*} éç©ºæŒ‡é’ˆï¼Œæœ‰å¯èƒ½æ˜¯ç©ºå­—ç¬¦ä¸²("\0")
 	 */
 	const char* getValue(void) const;
 
 	/**
-	 * »ñµÃ×Ö·û´®¸ñÊ½µÄ¹ıÆÚÊ±¼ä
-	 * @return {const char*} ·Ç¿ÕÖ¸Õë£¬·µ»ØÖµÎª "\0" ±íÊ¾²»´æÔÚ
+	 * è·å¾—å­—ç¬¦ä¸²æ ¼å¼çš„è¿‡æœŸæ—¶é—´
+	 * @return {const char*} éç©ºæŒ‡é’ˆï¼Œè¿”å›å€¼ä¸º "\0" è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getExpires(void) const;
 
 	/**
-	 * »ñµÃ cookie ×÷ÓÃÓò
-	 * @return {const char*} ·Ç¿ÕÖ¸Õë£¬·µ»ØÖµÎª "\0" ±íÊ¾²»´æÔÚ
+	 * è·å¾— cookie ä½œç”¨åŸŸ
+	 * @return {const char*} éç©ºæŒ‡é’ˆï¼Œè¿”å›å€¼ä¸º "\0" è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getDomain(void) const;
 
 	/**
-	 * »ñµÃ cookie µÄ´æ´¢Â·¾¶
-	 * @return {const char*} ·Ç¿ÕÖ¸Õë£¬·µ»ØÖµÎª "\0" ±íÊ¾²»´æÔÚ
+	 * è·å¾— cookie çš„å­˜å‚¨è·¯å¾„
+	 * @return {const char*} éç©ºæŒ‡é’ˆï¼Œè¿”å›å€¼ä¸º "\0" è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getPath(void) const;
 
 	/**
-	 * »ñµÃ cookie µÄÉú´æÖÜÆÚ
-	 * @return {int} ·µ»Ø -1 Ê±±íÊ¾Ã»ÓĞ¸Ã Max-Age ×Ö¶Î
+	 * è·å¾— cookie çš„ç”Ÿå­˜å‘¨æœŸ
+	 * @return {int} è¿”å› -1 æ—¶è¡¨ç¤ºæ²¡æœ‰è¯¥ Max-Age å­—æ®µ
 	 */
 	int  getMaxAge(void) const;
 
 	/**
-	 * »ñµÃ¶ÔÓ¦²ÎÊıÃûµÄ²ÎÊıÖµ
-	 * @param name {const char*} ²ÎÊıÃû
-	 * @param case_insensitive {bool} ÊÇ·ñÇø·Ö´óĞ¡Ğ´£¬true ±íÊ¾
-	 *  ²»Çø·Ö´óĞ¡Ğ´
-	 * @return {const char*} ·Ç¿ÕÖ¸Õë£¬·µ»ØÖµÎª "\0" ±íÊ¾²»´æÔÚ
+	 * è·å¾—å¯¹åº”å‚æ•°åçš„å‚æ•°å€¼
+	 * @param name {const char*} å‚æ•°å
+	 * @param case_insensitive {bool} æ˜¯å¦åŒºåˆ†å¤§å°å†™ï¼Œtrue è¡¨ç¤º
+	 *  ä¸åŒºåˆ†å¤§å°å†™
+	 * @return {const char*} éç©ºæŒ‡é’ˆï¼Œè¿”å›å€¼ä¸º "\0" è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* getParam(const char* name,
 		bool case_insensitive = true) const;
 
 	/**
-	 * »ñµÃ¸Ã cookie ¶ÔÏóµÄ³ı cookie Ãû¼° cookie ÖµÖ®ÍâµÄ
-	 * ËùÓĞÊôĞÔ¼°ÊôĞÔÖµ
+	 * è·å¾—è¯¥ cookie å¯¹è±¡çš„é™¤ cookie ååŠ cookie å€¼ä¹‹å¤–çš„
+	 * æ‰€æœ‰å±æ€§åŠå±æ€§å€¼
 	 * @return {const std::list<HTTP_PARAM*>&}
 	 */
 	const std::list<HTTP_PARAM*>& getParams(void) const;

@@ -1,4 +1,4 @@
-﻿
+
 // HttpGetDlg.h: 头文件
 //
 

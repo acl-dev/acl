@@ -38,13 +38,13 @@ void* CAddBOM::run(void)
 void CAddBOM::ScanAdd(void)
 {
 	if (m_sPath.GetLength() == 0) {
-		MessageBox(NULL, "ÎÄ¼şÂ·¾¶Îª¿Õ£¡", "Error", 0);
+		MessageBox(NULL, "æ–‡ä»¶è·¯å¾„ä¸ºç©ºï¼", "Error", 0);
 		return;
 	}
 
 	acl::scan_dir scan;
 	if (!scan.open(m_sPath.GetString())) {
-		MessageBox(NULL, "´ò¿ªÎÄ¼şÂ·¾¶Ê§°Ü£¡", "Error", 0);
+		MessageBox(NULL, "æ‰“å¼€æ–‡ä»¶è·¯å¾„å¤±è´¥ï¼", "Error", 0);
 		return;
 	}
 

@@ -163,7 +163,7 @@ static bool create_http_servlet(file_tmpl& tmpl, const char* type)
 	printf("create %s ok.\r\n", filepath.c_str());
 	tpl_free(tpl);
 
-	// ÉèÖÃ·şÎñÆ÷Ä£°åÀàĞÍ
+	// è®¾ç½®æœåŠ¡å™¨æ¨¡æ¿ç±»å‹
 	return create_service(tmpl, type);
 }
 
@@ -178,7 +178,7 @@ void http_creator(const char* name, const char* type)
 		loop = false;
 	}
 
-	// ÉèÖÃÔ´³ÌĞòËùÔÚÄ¿Â¼
+	// è®¾ç½®æºç¨‹åºæ‰€åœ¨ç›®å½•
 	tmpl.set_path_from("tmpl/http");
 
 	while (true) {
@@ -202,7 +202,7 @@ void http_creator(const char* name, const char* type)
 
 		tmpl.set_project_name(name);
 
-		// ´´½¨Ä¿Â¼
+		// åˆ›å»ºç›®å½•
 		tmpl.create_dirs();
 
 		tmpl.create_common();

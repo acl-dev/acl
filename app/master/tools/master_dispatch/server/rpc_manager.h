@@ -1,7 +1,7 @@
 #pragma once
 
 /**
- * ±¾Àà¶ÔÏó½«×èÈûÈÎÎñ½»¸ø×ÓÏß³Ì´¦Àí£»ÎªÁË·½±ãÊ¹ÓÃ£¬½«¸ÃÀàÉùÃ÷Îªµ¥ÀıÀà
+ * æœ¬ç±»å¯¹è±¡å°†é˜»å¡ä»»åŠ¡äº¤ç»™å­çº¿ç¨‹å¤„ç†ï¼›ä¸ºäº†æ–¹ä¾¿ä½¿ç”¨ï¼Œå°†è¯¥ç±»å£°æ˜ä¸ºå•ä¾‹ç±»
  */
 class rpc_manager : public acl::singleton<rpc_manager>
 {
@@ -10,10 +10,10 @@ public:
 	~rpc_manager();
 
 	/**
-	 * ³õÊ¼»¯º¯Êı
-	 * @param handle {acl::aio_handle*} Òì²½ÒıÇæ¾ä±ú
-	 * @param max_threads {int} ×ÓÏß³Ì³ØµÄ×î´óÏß³ÌÊıÁ¿
-	 * @param rpc_addr {const char*} RPC Í¨µÀ¼àÌıµØÖ·
+	 * åˆå§‹åŒ–å‡½æ•°
+	 * @param handle {acl::aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
+	 * @param max_threads {int} å­çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°é‡
+	 * @param rpc_addr {const char*} RPC é€šé“ç›‘å¬åœ°å€
 	 */
 	void init(acl::aio_handle*, int max_threads = 10,
 		const char* rpc_addr = NULL);
@@ -21,13 +21,13 @@ public:
 	void finish();
 
 	/**
-	 * ·¢ÆğÒ»¸ö×èÈû¹ı³Ì£¬½«¸Ã¹ı³Ì½»ÓÉ×ÓÏß³Ì´¦Àí
-	 * @param req {acl::rpc_request*} ×èÈûÈÎÎñ¶ÔÏó
+	 * å‘èµ·ä¸€ä¸ªé˜»å¡è¿‡ç¨‹ï¼Œå°†è¯¥è¿‡ç¨‹äº¤ç”±å­çº¿ç¨‹å¤„ç†
+	 * @param req {acl::rpc_request*} é˜»å¡ä»»åŠ¡å¯¹è±¡
 	 */
 	void fork(acl::rpc_request* req);
 private:
-	// Òì²½ÏûÏ¢¾ä±ú
+	// å¼‚æ­¥æ¶ˆæ¯å¥æŸ„
 	acl::aio_handle* handle_;
-	// Òì²½ RPC Í¨ĞÅ·şÎñ¾ä±ú
+	// å¼‚æ­¥ RPC é€šä¿¡æœåŠ¡å¥æŸ„
 	acl::rpc_service* service_;
 };

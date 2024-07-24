@@ -48,10 +48,10 @@ HTTP_SERVICE *http_service_new()
 	service = (HTTP_SERVICE *) service_alloc("http", sizeof(HTTP_SERVICE));
 	service->file_path = acl_vstring_alloc(256);
 
-	/* ½«¶¯Ì¬²å¼þµÄ»Øµ÷º¯Êý¸³¸ø·þÎñ¶ÔÏó */
+	/* å°†åŠ¨æ€æ’ä»¶çš„å›žè°ƒå‡½æ•°èµ‹ç»™æœåŠ¡å¯¹è±¡ */
 	http_plugin_set_callback(service);
 
-	/* Õë¶ÔHTTP·þÎñÆ÷ÔËÐÐÄ£Ê½£¬³õÊ¼»¯ÎÄ¼þ»º´æ */
+	/* é’ˆå¯¹HTTPæœåŠ¡å™¨è¿è¡Œæ¨¡å¼ï¼Œåˆå§‹åŒ–æ–‡ä»¶ç¼“å­˜ */
 	file_cache_init();
 
 	return (service);

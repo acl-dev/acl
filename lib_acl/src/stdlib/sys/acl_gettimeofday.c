@@ -114,8 +114,8 @@ int gettimeofday1(struct timeval *tv, struct timezone *tz)
 	time_t now;
 	TIME_CTX_T *ctx = tls_calloc(sizeof(TIME_CTX_T));
 
-	/* Ã¿¸öÏß³Ìµ÷ÓÃ´Ëº¯ÊýÊ±¶¼ÐèÒª½øÐÐ³õÊ¼»¯£¬µ«ÎªÁË·ÀÖ¹¿ª»úÊ±¼äÌ«³¤
-	 * ¶øÔì³ÉÊ±ÖÓ¼ÆÊý¹éÁãÒç³ö£¬ËùÒÔÃ¿¸ô 1 ÌìÐ£¶ÔÒ»´Î»ù×¼Ê±¼ä
+	/* æ¯ä¸ªçº¿ç¨‹è°ƒç”¨æ­¤å‡½æ•°æ—¶éƒ½éœ€è¦è¿›è¡Œåˆå§‹åŒ–ï¼Œä½†ä¸ºäº†é˜²æ­¢å¼€æœºæ—¶é—´å¤ªé•¿
+	 * è€Œé€ æˆæ—¶é’Ÿè®¡æ•°å½’é›¶æº¢å‡ºï¼Œæ‰€ä»¥æ¯éš” 1 å¤©æ ¡å¯¹ä¸€æ¬¡åŸºå‡†æ—¶é—´
 	 */
 #define DAY_SEC	(3600 * 24)
 
@@ -123,11 +123,11 @@ int gettimeofday1(struct timeval *tv, struct timezone *tz)
 	if (now - ctx->last_init > DAY_SEC) {
 		ctx->last_init = now;
 
-		/* »ñµÃCPUµÄÊ±ÖÓÆµÂÊ */
+		/* èŽ·å¾—CPUçš„æ—¶é’Ÿé¢‘çŽ‡ */
 		if (!QueryPerformanceFrequency(&ctx->frequency))
 			acl_msg_fatal("%s(%d): Unable to get System Frequency(%s)",
 				__FILE__, __LINE__, acl_last_serror());
-		/* »ñµÃÏµÍ³Ê±¼ä(×Ô 1970 ÖÁ½ñ) */
+		/* èŽ·å¾—ç³»ç»Ÿæ—¶é—´(è‡ª 1970 è‡³ä»Š) */
 		GetSystemTimeAsFileTime(&ft);
 		li.LowPart  = ft.dwLowDateTime;
 		li.HighPart = ft.dwHighDateTime;
@@ -135,25 +135,25 @@ int gettimeofday1(struct timeval *tv, struct timezone *tz)
 		t -= EPOCHFILETIME;     /* Offset to the Epoch time */
 		t /= 10;                /* In microseconds */
 
-		/* ×ª»»³É±¾´Î¿ª»úºóµÄ»ù×¼Ê±¼ä */
+		/* è½¬æ¢æˆæœ¬æ¬¡å¼€æœºåŽçš„åŸºå‡†æ—¶é—´ */
 		ctx->tvbase.tv_sec  = (long)(t / 1000000);
 		ctx->tvbase.tv_usec = (long)(t % 1000000);
 
-		/* »ñµÃ±¾´Î¿ª»úºóµ½ÏÖÔÚµÄÊ±ÖÓ¼ÆÊý */
+		/* èŽ·å¾—æœ¬æ¬¡å¼€æœºåŽåˆ°çŽ°åœ¨çš„æ—¶é’Ÿè®¡æ•° */
 		if (!QueryPerformanceCounter(&ctx->stamp))
 			acl_msg_fatal("%s(%d): unable to get System time(%s)",
 				__FILE__, __LINE__, acl_last_serror());
 	}
 
-	/* ¿ªÊ¼»ñµÃÏÖÔÚµÄÊ±¼ä½Ø */
+	/* å¼€å§‹èŽ·å¾—çŽ°åœ¨çš„æ—¶é—´æˆª */
 
 	if (tv) {
-		/* »ñµÃ±¾´Î¿ª»úºóÖÁÏÖÔÚµÄÊ±ÖÓ¼ÆÊý  */
+		/* èŽ·å¾—æœ¬æ¬¡å¼€æœºåŽè‡³çŽ°åœ¨çš„æ—¶é’Ÿè®¡æ•°  */
 		if (!QueryPerformanceCounter(&stamp))
 			acl_msg_fatal("%s(%d): unable to get System time(%s)",
 				__FILE__, __LINE__, acl_last_serror());
 
-		/* ¼ÆËãµ±Ç°¾«È·Ê±¼ä½Ø */
+		/* è®¡ç®—å½“å‰ç²¾ç¡®æ—¶é—´æˆª */
 		t = (stamp.QuadPart - ctx->stamp.QuadPart) * 1000000 / ctx->frequency.QuadPart;
 		tv->tv_sec = ctx->tvbase.tv_sec + (long)(t / 1000000);
 		tv->tv_usec = ctx->tvbase.tv_usec + (long)(t % 1000000);

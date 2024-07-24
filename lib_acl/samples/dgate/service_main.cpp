@@ -75,7 +75,7 @@ SERVICE *service_create(const char *local_ip, short local_port,
 	ACL_VSTREAM *sstream;
 	char addr[64];
 
-	// ´´½¨Ìá¹© TCP ·½Ê½²éÑ¯Ê±µÄ¼àÌıÁ÷
+	// åˆ›å»ºæä¾› TCP æ–¹å¼æŸ¥è¯¢æ—¶çš„ç›‘å¬æµ
 	snprintf(addr, sizeof(addr), "%s:%d", local_ip, local_port);
 	sstream = acl_vstream_listen_ex(addr, 128, ACL_NON_BLOCKING, 1024, 10);
 	if (sstream == NULL) {

@@ -3,7 +3,7 @@
 class StatusConnection;
 
 /**
- * ·şÎñ¶ËÁ¬½Ó IO ´¦ÀíµÄ»Øµ÷´¦ÀíÀà
+ * æœåŠ¡ç«¯è¿æ¥ IO å¤„ç†çš„å›è°ƒå¤„ç†ç±»
  */
 class StatusIOCallback : public acl::aio_callback
 {
@@ -11,7 +11,7 @@ public:
 	StatusIOCallback(StatusConnection* conn);
 
 protected:
-	// »ùÀà aio_callback Ğéº¯Êı
+	// åŸºç±» aio_callback è™šå‡½æ•°
 
 	bool read_wakeup();
 	void close_callback();

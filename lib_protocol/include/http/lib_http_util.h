@@ -8,222 +8,222 @@ extern "C" {
 #endif
 
 typedef struct HTTP_UTIL {
-	HTTP_HDR_REQ *hdr_req;		/**< HTTP ÇëÇóÍ· */
-	HTTP_HDR_RES *hdr_res;		/**< HTTP ÏìÓ¦Í· */
-	HTTP_RES *http_res;		/**< HTTP ÏìÓ¦Ìå */
-	char  server_addr[256];		/**< Ô¶³Ì HTTP ·şÎñÆ÷µØÖ· */
-	ACL_VSTREAM *stream;		/**< Óë HTTP ·şÎñÆ÷½¨Á¢µÄÍøÂçÁ÷ */
-	int   conn_timeout;		/**< Á¬½Ó HTTP ·şÎñÆ÷µÄ³¬Ê±Ê±¼ä */
-	int   rw_timeout;		/**< Óë HTTP ·şÎñÆ÷Í¨ĞÅÊ±Ã¿´Î IO µÄ³¬Ê±Ê±¼ä */
-	ACL_VSTRING *req_buf;		/**< »º³åÇø */
-	int   res_body_dlen;		/**< HTTP ÏìÓ¦Êı¾İÌåµÄ³¤¶È */
-	ACL_VSTREAM *dump_stream;	/**< ×ª´¢½ÓÊÕÊı¾İµÄÁ÷ */
-	unsigned int   flag;		/**< ±êÖ¾Î» */
-#define	HTTP_UTIL_FLAG_SET_DUMP_FILE	(1 << 0)	/**< ÔÊĞí×ª´¢ÏìÓ¦ÌåÖÁÎÄ¼ş */
-#define	HTTP_UTIL_FLAG_SET_DUMP_STREAM	(1 << 1)	/**< ÔÊĞí×ª´¢ÏìÓ¦ÌåÖÁÁ÷ */
-#define	HTTP_UTIL_FLAG_HAS_RES_BODY	(1 << 2)	/**< ÓĞ HTTP ÏìÓ¦Ìå */
-#define	HTTP_UTIL_FLAG_NO_RES_BODY	(1 << 3)	/**< ÎŞ HTTP ÏìÓ¦Ìå */
+	HTTP_HDR_REQ *hdr_req;		/**< HTTP è¯·æ±‚å¤´ */
+	HTTP_HDR_RES *hdr_res;		/**< HTTP å“åº”å¤´ */
+	HTTP_RES *http_res;		/**< HTTP å“åº”ä½“ */
+	char  server_addr[256];		/**< è¿œç¨‹ HTTP æœåŠ¡å™¨åœ°å€ */
+	ACL_VSTREAM *stream;		/**< ä¸ HTTP æœåŠ¡å™¨å»ºç«‹çš„ç½‘ç»œæµ */
+	int   conn_timeout;		/**< è¿æ¥ HTTP æœåŠ¡å™¨çš„è¶…æ—¶æ—¶é—´ */
+	int   rw_timeout;		/**< ä¸ HTTP æœåŠ¡å™¨é€šä¿¡æ—¶æ¯æ¬¡ IO çš„è¶…æ—¶æ—¶é—´ */
+	ACL_VSTRING *req_buf;		/**< ç¼“å†²åŒº */
+	int   res_body_dlen;		/**< HTTP å“åº”æ•°æ®ä½“çš„é•¿åº¦ */
+	ACL_VSTREAM *dump_stream;	/**< è½¬å‚¨æ¥æ”¶æ•°æ®çš„æµ */
+	unsigned int   flag;		/**< æ ‡å¿—ä½ */
+#define	HTTP_UTIL_FLAG_SET_DUMP_FILE	(1 << 0)	/**< å…è®¸è½¬å‚¨å“åº”ä½“è‡³æ–‡ä»¶ */
+#define	HTTP_UTIL_FLAG_SET_DUMP_STREAM	(1 << 1)	/**< å…è®¸è½¬å‚¨å“åº”ä½“è‡³æµ */
+#define	HTTP_UTIL_FLAG_HAS_RES_BODY	(1 << 2)	/**< æœ‰ HTTP å“åº”ä½“ */
+#define	HTTP_UTIL_FLAG_NO_RES_BODY	(1 << 3)	/**< æ—  HTTP å“åº”ä½“ */
 } HTTP_UTIL;
 
 /**
- * ´´½¨Ò»¸ö HTTP_UTIL ÇëÇó¶ÔÏó
- * @param url {const char*} ÍêÕûµÄÇëÇó url
- * @param method {const char*} ÇëÇó·½·¨£¬ÓĞĞ§µÄÇëÇó·½·¨ÓĞ£ºGET, POST, HEAD, CONNECT
+ * åˆ›å»ºä¸€ä¸ª HTTP_UTIL è¯·æ±‚å¯¹è±¡
+ * @param url {const char*} å®Œæ•´çš„è¯·æ±‚ url
+ * @param method {const char*} è¯·æ±‚æ–¹æ³•ï¼Œæœ‰æ•ˆçš„è¯·æ±‚æ–¹æ³•æœ‰ï¼šGET, POST, HEAD, CONNECT
  * @return {HTTP_UTIL*}
  */
 HTTP_API HTTP_UTIL *http_util_req_new(const char *url, const char *method);
 
 /**
- * ¹¹½¨Ò»¸ö HTTP_UTIL ÏìÓ¦¶ÔÏó
- * @param status {int} ×´Ì¬Âë£¬ÓĞĞ§µÄ×´Ì¬ÂëÎª: 1xx, 2xx, 3xx, 4xx, 5xx
+ * æ„å»ºä¸€ä¸ª HTTP_UTIL å“åº”å¯¹è±¡
+ * @param status {int} çŠ¶æ€ç ï¼Œæœ‰æ•ˆçš„çŠ¶æ€ç ä¸º: 1xx, 2xx, 3xx, 4xx, 5xx
  * @return {HTTP_UTIL*}
  */
 HTTP_API HTTP_UTIL *http_util_res_new(int status);
 
 /**
- * ÊÍ·ÅÒ»¸ö HTTP_UTIL ¶ÔÏó
+ * é‡Šæ”¾ä¸€ä¸ª HTTP_UTIL å¯¹è±¡
  * @param http_util {HTTP_UTIL*}
  */
 HTTP_API void http_util_free(HTTP_UTIL *http_util);
 
 /**
- * ÉèÖÃ HTTP ÇëÇóÍ·ĞÅÏ¢, Èç: Accept-Encoding: gzip,deflate
+ * è®¾ç½® HTTP è¯·æ±‚å¤´ä¿¡æ¯, å¦‚: Accept-Encoding: gzip,deflate
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ÇëÇóÍ·ÖĞ×Ö¶ÎÃû³Æ, Èç Accept-Encoding
- * @param value {const char*} ÇëÇóÍ·ÖĞ×Ö¶ÎµÄÖµ, Èç gzip,deflate
+ * @param name {const char*} è¯·æ±‚å¤´ä¸­å­—æ®µåç§°, å¦‚ Accept-Encoding
+ * @param value {const char*} è¯·æ±‚å¤´ä¸­å­—æ®µçš„å€¼, å¦‚ gzip,deflate
  */
 HTTP_API void http_util_set_req_entry(HTTP_UTIL *http_util, const char *name, const char *value);
 
 /**
- * ¹Ø±Õ HTTP ÇëÇóÍ·ÖĞµÄÄ³¸öÇëÇó×Ö¶Î£¬¸ÃÇëÇó×Ö¶Î²»»á·¢Íù·şÎñÆ÷
+ * å…³é—­ HTTP è¯·æ±‚å¤´ä¸­çš„æŸä¸ªè¯·æ±‚å­—æ®µï¼Œè¯¥è¯·æ±‚å­—æ®µä¸ä¼šå‘å¾€æœåŠ¡å™¨
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ÇëÇóÍ·ÖĞ×Ö¶ÎÃû³Æ, Èç Accept-Encoding
+ * @param name {const char*} è¯·æ±‚å¤´ä¸­å­—æ®µåç§°, å¦‚ Accept-Encoding
  */
 HTTP_API void http_util_off_req_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * »ñµÃÇëÇóÍ·ÖĞÄ³¸ö×Ö¶ÎµÄÖµ
+ * è·å¾—è¯·æ±‚å¤´ä¸­æŸä¸ªå­—æ®µçš„å€¼
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ÇëÇóÍ·ÖĞ×Ö¶ÎÃû³Æ, Èç Accept-Encoding
- * @return {char*} Èç¹û·Ç¿ÕÔòÎªÇëÇó×Ö¶ÎÖµ£¬·ñÔò±íÃ÷¸Ã×Ö¶Î²»´æÔÚ
+ * @param name {const char*} è¯·æ±‚å¤´ä¸­å­—æ®µåç§°, å¦‚ Accept-Encoding
+ * @return {char*} å¦‚æœéç©ºåˆ™ä¸ºè¯·æ±‚å­—æ®µå€¼ï¼Œå¦åˆ™è¡¨æ˜è¯¥å­—æ®µä¸å­˜åœ¨
  */
 HTTP_API char *http_util_get_req_value(HTTP_UTIL *http_util, const char *name);
 
 /**
- * »ñµÃÇëÇóÍ·ÖĞÄ³¸ö×Ö¶ÎµÄ HTTP_HDR_ENTRY ¶ÔÏó
+ * è·å¾—è¯·æ±‚å¤´ä¸­æŸä¸ªå­—æ®µçš„ HTTP_HDR_ENTRY å¯¹è±¡
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ÇëÇóÍ·ÖĞ×Ö¶ÎÃû³Æ, Èç Accept-Encoding
- * @return {HTTP_HDR_ENTRY*} ÈôÎª¿ÕÔò±íÊ¾¸Ã×Ö¶Î²»´æÔÚ
+ * @param name {const char*} è¯·æ±‚å¤´ä¸­å­—æ®µåç§°, å¦‚ Accept-Encoding
+ * @return {HTTP_HDR_ENTRY*} è‹¥ä¸ºç©ºåˆ™è¡¨ç¤ºè¯¥å­—æ®µä¸å­˜åœ¨
  */
 HTTP_API HTTP_HDR_ENTRY *http_util_get_req_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * ÉèÖÃÇëÇóÍ·ÖĞ HTTP Êı¾İÌåµÄÊı¾İ³¤¶È
+ * è®¾ç½®è¯·æ±‚å¤´ä¸­ HTTP æ•°æ®ä½“çš„æ•°æ®é•¿åº¦
  * @param http_util {HTTP_UTIL*}
- * @param len {int} HTTP Êı¾İÌå³¤¶È(±ØĞë >= 0)
+ * @param len {int} HTTP æ•°æ®ä½“é•¿åº¦(å¿…é¡» >= 0)
  */
 HTTP_API void http_util_set_req_content_length(HTTP_UTIL *http_util, int len);
 
 /**
- * ÉèÖÃÇëÇóÍ·ÖĞ HTTP »á»°±£³Ö³¤Á¬½ÓµÄ´æ»îÊ±¼ä(µ¥Î»ÎªÃë)
+ * è®¾ç½®è¯·æ±‚å¤´ä¸­ HTTP ä¼šè¯ä¿æŒé•¿è¿æ¥çš„å­˜æ´»æ—¶é—´(å•ä½ä¸ºç§’)
  * @param http_util {HTTP_UTIL*}
- * @param timeout {int} HTTP ³¤Á¬½ÓµÄ´æ»îÊ±¼ä(µ¥Î»ÎªÃë)
+ * @param timeout {int} HTTP é•¿è¿æ¥çš„å­˜æ´»æ—¶é—´(å•ä½ä¸ºç§’)
  */
 HTTP_API void http_util_set_req_keep_alive(HTTP_UTIL *http_util, int timeout);
 
 /**
- * ÉèÖÃÇëÇóÍ·ÖĞ Connection ×Ö¶Î
+ * è®¾ç½®è¯·æ±‚å¤´ä¸­ Connection å­—æ®µ
  * @param http_util {HTTP_UTIL*}
- * @param value {const char*} ×Ö¶ÎÖµ£¬ÓĞĞ§µÄ×Ö¶ÎÎª: keep-alive, close
+ * @param value {const char*} å­—æ®µå€¼ï¼Œæœ‰æ•ˆçš„å­—æ®µä¸º: keep-alive, close
  */
 HTTP_API void http_util_set_req_connection(HTTP_UTIL *http_util, const char *value);
 
 /**
- * ÉèÖÃÇëÇóÍ·ÖĞµÄ Referer ×Ö¶Î
+ * è®¾ç½®è¯·æ±‚å¤´ä¸­çš„ Referer å­—æ®µ
  * @param http_util {HTTP_UTIL*}
- * @param refer {const char*} ÍêÕûµÄ url, Èç: http://www.test.com
+ * @param refer {const char*} å®Œæ•´çš„ url, å¦‚: http://www.test.com
  */
 HTTP_API void http_util_set_req_refer(HTTP_UTIL *http_util, const char *refer);
 
 /**
- * ÉèÖÃÇëÇóÍ·ÖĞµÄ Cookie ×Ö¶Î£¬²ÉÓÃµÄÊÇ×·¼Ó·½Ê½
+ * è®¾ç½®è¯·æ±‚å¤´ä¸­çš„ Cookie å­—æ®µï¼Œé‡‡ç”¨çš„æ˜¯è¿½åŠ æ–¹å¼
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} Cookie Ãû³Æ
- * @param value {const char*} Cookie Öµ
+ * @param name {const char*} Cookie åç§°
+ * @param value {const char*} Cookie å€¼
  */
 HTTP_API void http_util_set_req_cookie(HTTP_UTIL *http_util, const char *name, const char *value);
 
 /**
- * ÉèÖÃ HTTP ´úÀí·şÎñÆ÷µØÖ·
+ * è®¾ç½® HTTP ä»£ç†æœåŠ¡å™¨åœ°å€
  * @param http_util {HTTP_UTIL*}
- * @param proxy {const char*} ´úÀí·şÎñÆ÷µØÖ·£¬ÓĞĞ§¸ñÊ½Îª: IP:PORT, DOMAIN:PORT,
- *  Èç: 192.168.0.1:80, 192.168.0.2:8088, www.g.cn:80
+ * @param proxy {const char*} ä»£ç†æœåŠ¡å™¨åœ°å€ï¼Œæœ‰æ•ˆæ ¼å¼ä¸º: IP:PORT, DOMAIN:PORT,
+ *  å¦‚: 192.168.0.1:80, 192.168.0.2:8088, www.g.cn:80
  */
 HTTP_API void http_util_set_req_proxy(HTTP_UTIL *http_util, const char *proxy);
 
 /**
- * ÉèÖÃ HTTP ÏìÓ¦ÌåµÄ×ª´¢Á÷£¬ÉèÖÃºó HTTP ÏìÓ¦ÌåÊı¾İ±ã»áÍ¬Ê±Ïò¸ÃÁ÷×ª·¢
+ * è®¾ç½® HTTP å“åº”ä½“çš„è½¬å‚¨æµï¼Œè®¾ç½®å HTTP å“åº”ä½“æ•°æ®ä¾¿ä¼šåŒæ—¶å‘è¯¥æµè½¬å‘
  * @param http_util {HTTP_UTIL*}
- * @param stream {ACL_VSTREAM *} ×ª´¢Á÷
+ * @param stream {ACL_VSTREAM *} è½¬å‚¨æµ
  */
 HTTP_API void http_util_set_dump_stream(HTTP_UTIL *http_util, ACL_VSTREAM *stream);
 
 /**
- * ÉèÖÃ HTTP ÏìÓ¦ÌåµÄ×ª´¢ÎÄ¼ş£¬ÉèÖÃºó HTTP ÏìÓ¦ÌåÊı¾İ±ã»á×ª´¢ÓÚ¸ÃÎÄ¼ş
+ * è®¾ç½® HTTP å“åº”ä½“çš„è½¬å‚¨æ–‡ä»¶ï¼Œè®¾ç½®å HTTP å“åº”ä½“æ•°æ®ä¾¿ä¼šè½¬å‚¨äºè¯¥æ–‡ä»¶
  * @param http_util {HTTP_UTIL*}
- * @param filename {const char*} ×ª´¢ÎÄ¼şÃû
- * @return {int} Èç¹û·µ»ØÖµ < 0 Ôò±íÊ¾ÎŞ·¨´ò¿ª¸ÃÎÄ¼ş, ·ñÔò±íÊ¾´ò¿ªÎÄ¼ş³É¹¦
+ * @param filename {const char*} è½¬å‚¨æ–‡ä»¶å
+ * @return {int} å¦‚æœè¿”å›å€¼ < 0 åˆ™è¡¨ç¤ºæ— æ³•æ‰“å¼€è¯¥æ–‡ä»¶, å¦åˆ™è¡¨ç¤ºæ‰“å¼€æ–‡ä»¶æˆåŠŸ
  */
 HTTP_API int http_util_set_dump_file(HTTP_UTIL *http_util, const char *filename);
 
 /**
- * ´ò¿ªÔ¶³Ì HTTP ·şÎñÆ÷»ò´úÀí·şÎñÆ÷Á¬½Ó£¬Í¬Ê±¹¹½¨ HTTP ÇëÇóÍ·Êı¾İ²¢ÇÒ½«¸ÃÊı¾İ
- * ·¢¸øĞÂ½¨Á¢µÄÍøÂçÁ¬½Ó
+ * æ‰“å¼€è¿œç¨‹ HTTP æœåŠ¡å™¨æˆ–ä»£ç†æœåŠ¡å™¨è¿æ¥ï¼ŒåŒæ—¶æ„å»º HTTP è¯·æ±‚å¤´æ•°æ®å¹¶ä¸”å°†è¯¥æ•°æ®
+ * å‘ç»™æ–°å»ºç«‹çš„ç½‘ç»œè¿æ¥
  * @param http_util {HTTP_UTIL*}
- * @return {int} 0: ³É¹¦; -1: ÎŞ·¨´ò¿ªÁ¬½Ó»ò·¢ËÍÇëÇóÍ·Êı¾İÊ§°Ü
+ * @return {int} 0: æˆåŠŸ; -1: æ— æ³•æ‰“å¼€è¿æ¥æˆ–å‘é€è¯·æ±‚å¤´æ•°æ®å¤±è´¥
  */
 HTTP_API int http_util_req_open(HTTP_UTIL *http_util);
 
 /**
- * µ±²ÉÓÃ POST ·½·¨Ê±£¬¿ÉÒÔÍ¨¹ı´Ëº¯ÊıÏò HTTP ·şÎñÆ÷»ò´úÀí·şÎñÆ÷·¢ËÍÇëÇóÌåÊı¾İ,
- * ÔÚÒ»¸öÇëÇó¹ı³ÌÖĞ£¬¿ÉÒÔ¶à´Îµ÷ÓÃ±¾º¯ÊıÖ±ÖÁ·¢ËÍÍêÇëÇóÌåÊı¾İ
+ * å½“é‡‡ç”¨ POST æ–¹æ³•æ—¶ï¼Œå¯ä»¥é€šè¿‡æ­¤å‡½æ•°å‘ HTTP æœåŠ¡å™¨æˆ–ä»£ç†æœåŠ¡å™¨å‘é€è¯·æ±‚ä½“æ•°æ®,
+ * åœ¨ä¸€ä¸ªè¯·æ±‚è¿‡ç¨‹ä¸­ï¼Œå¯ä»¥å¤šæ¬¡è°ƒç”¨æœ¬å‡½æ•°ç›´è‡³å‘é€å®Œè¯·æ±‚ä½“æ•°æ®
  * @param http_util {HTTP_UTIL*}
- * @param data {const char*} ±¾´Î·¢ËÍµÄÊı¾İµØÖ·£¬±ØĞë·Ç¿Õ
- * @param dlen {size_t} data Êı¾İ³¤¶È, ±ØĞë´óÓÚ 0
- * @return {int} > 0 ±íÊ¾±¾´Î³É¹¦·¢ËÍµÄÊı¾İ; -1: ±íÊ¾·¢ËÍÊı¾İÊ§°Ü, Ó¦µ÷ÓÃ
- *  http_util_free ¹Ø±ÕÍøÂçÁ÷ÇÒÊÍ·ÅÄÚ´æ×ÊÔ´
+ * @param data {const char*} æœ¬æ¬¡å‘é€çš„æ•°æ®åœ°å€ï¼Œå¿…é¡»éç©º
+ * @param dlen {size_t} data æ•°æ®é•¿åº¦, å¿…é¡»å¤§äº 0
+ * @return {int} > 0 è¡¨ç¤ºæœ¬æ¬¡æˆåŠŸå‘é€çš„æ•°æ®; -1: è¡¨ç¤ºå‘é€æ•°æ®å¤±è´¥, åº”è°ƒç”¨
+ *  http_util_free å…³é—­ç½‘ç»œæµä¸”é‡Šæ”¾å†…å­˜èµ„æº
  */
 HTTP_API int http_util_put_req_data(HTTP_UTIL *http_util, const char *data, size_t dlen);
 
 /**
- * ·¢ËÍÍêÇëÇóÊı¾İºóµ÷ÓÃ´Ëº¯Êı´Ó HTTP ·şÎñÆ÷¶ÁÈ¡ÍêÕûµÄ HTTP ÏìÓ¦Í·
+ * å‘é€å®Œè¯·æ±‚æ•°æ®åè°ƒç”¨æ­¤å‡½æ•°ä» HTTP æœåŠ¡å™¨è¯»å–å®Œæ•´çš„ HTTP å“åº”å¤´
  * @param http_util {HTTP_UTIL*}
- * @return {int} 0: ³É¹¦; -1: Ê§°Ü
+ * @return {int} 0: æˆåŠŸ; -1: å¤±è´¥
  */
 HTTP_API int http_util_get_res_hdr(HTTP_UTIL *http_util);
 
 /**
- * ´Ó HTTP ÏìÓ¦Í·ÖĞ»ñµÃÄ³¸ö×Ö¶ÎÖµ
+ * ä» HTTP å“åº”å¤´ä¸­è·å¾—æŸä¸ªå­—æ®µå€¼
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ×Ö¶ÎÃû³Æ, Èç Content-Length
- * @return {char*} ¶ÔÓ¦ name µÄ×Ö¶ÎÖµ, Èç¹ûÎª¿ÕÔò±íÊ¾¸Ã×Ö¶Î²»´æÔÚ
+ * @param name {const char*} å­—æ®µåç§°, å¦‚ Content-Length
+ * @return {char*} å¯¹åº” name çš„å­—æ®µå€¼, å¦‚æœä¸ºç©ºåˆ™è¡¨ç¤ºè¯¥å­—æ®µä¸å­˜åœ¨
  */
 HTTP_API char *http_util_get_res_value(HTTP_UTIL *http_util, const char *name);
 
 /**
- * ´Ó HTTP ÏìÓ¦Í·ÖĞ»ñµÃÄ³¸ö×Ö¶Î¶ÔÏó
+ * ä» HTTP å“åº”å¤´ä¸­è·å¾—æŸä¸ªå­—æ®µå¯¹è±¡
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ×Ö¶ÎÃû³Æ, Èç Content-Length
- * @return {HTTP_HDR_ENTRY*} ¶ÔÓ¦ name µÄ×Ö¶Î¶ÔÏó, Èç¹ûÎª¿ÕÔò±íÊ¾¸Ã×Ö¶Î²»´æÔÚ
+ * @param name {const char*} å­—æ®µåç§°, å¦‚ Content-Length
+ * @return {HTTP_HDR_ENTRY*} å¯¹åº” name çš„å­—æ®µå¯¹è±¡, å¦‚æœä¸ºç©ºåˆ™è¡¨ç¤ºè¯¥å­—æ®µä¸å­˜åœ¨
  */
 HTTP_API HTTP_HDR_ENTRY *http_util_get_res_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄÄ³¸ö×Ö¶ÎÖµ
+ * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„æŸä¸ªå­—æ®µå€¼
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ×Ö¶ÎÃû³Æ, Èç Content-Type
- * @param value {const char*} ×Ö¶ÎÖµ, Èç text/html
+ * @param name {const char*} å­—æ®µåç§°, å¦‚ Content-Type
+ * @param value {const char*} å­—æ®µå€¼, å¦‚ text/html
  */
 HTTP_API void http_util_set_res_entry(HTTP_UTIL *http_util, const char *name, const char *value);
 
 /**
- * ¹Ø±Õ HTTP ÏìÓ¦Í·ÖĞµÄÄ³¸ö×Ö¶Î
+ * å…³é—­ HTTP å“åº”å¤´ä¸­çš„æŸä¸ªå­—æ®µ
  * @param http_util {HTTP_UTIL*}
- * @param name {const char*} ×Ö¶ÎÃû³Æ, Èç Content-Type
+ * @param name {const char*} å­—æ®µåç§°, å¦‚ Content-Type
  */
 HTTP_API void http_util_off_res_entry(HTTP_UTIL *http_util, const char *name);
 
 /**
- * ¶ÁÍê HTTP ÏìÓ¦Í·ºóµ÷ÓÃ´Ëº¯ÊıÅĞ¶ÏÊÇ·ñÓĞ HTTP ÏìÓ¦Ìå
+ * è¯»å®Œ HTTP å“åº”å¤´åè°ƒç”¨æ­¤å‡½æ•°åˆ¤æ–­æ˜¯å¦æœ‰ HTTP å“åº”ä½“
  * @param http_util {HTTP_UTIL*}
- * @return {int}  0: ±íÊ¾ÎŞÏìÓ¦Ìå; !0: ±íÊ¾ÓĞÏìÓ¦Ìå
+ * @return {int}  0: è¡¨ç¤ºæ— å“åº”ä½“; !0: è¡¨ç¤ºæœ‰å“åº”ä½“
  */
 HTTP_API int http_util_has_res_body(HTTP_UTIL *http_util);
 
 /**
- * ¶ÁÍê HTTP ÏìÓ¦Í·ºóµ÷ÓÃ´Ëº¯Êı´Ó HTTP ·şÎñÆ÷¶ÁÈ¡ HTTP Êı¾İÌåÊı¾İ£¬ĞèÒªÁ¬Ğøµ÷ÓÃ
- * ´Ëº¯Êı£¬Ö±ÖÁ·µ»ØÖµ <= 0, Èç¹ûÖ®Ç°ÉèÖÃÁË×ª´¢ÎÄ¼ş»ò×ª´¢ÔòÔÚ¶ÁÈ¡Êı¾İ¹ı³ÌÖĞÍ¬Ê±»á
- * ¿½±´Ò»·İÊı¾İ¸ø×ª´¢ÎÄ¼ş»ò×ª´¢Á÷
+ * è¯»å®Œ HTTP å“åº”å¤´åè°ƒç”¨æ­¤å‡½æ•°ä» HTTP æœåŠ¡å™¨è¯»å– HTTP æ•°æ®ä½“æ•°æ®ï¼Œéœ€è¦è¿ç»­è°ƒç”¨
+ * æ­¤å‡½æ•°ï¼Œç›´è‡³è¿”å›å€¼ <= 0, å¦‚æœä¹‹å‰è®¾ç½®äº†è½¬å‚¨æ–‡ä»¶æˆ–è½¬å‚¨åˆ™åœ¨è¯»å–æ•°æ®è¿‡ç¨‹ä¸­åŒæ—¶ä¼š
+ * æ‹·è´ä¸€ä»½æ•°æ®ç»™è½¬å‚¨æ–‡ä»¶æˆ–è½¬å‚¨æµ
  * @param http_util {HTTP_UTIL*}
- * @param buf {char *} ´æ´¢ HTTP ÏìÓ¦ÌåµÄ»º³åÇø
- * @param size {size_t} buf µÄ¿Õ¼ä´óĞ¡
- * @return {int} <= 0: ±íÊ¾¶Á½áÊø; > 0: ±íÊ¾±¾´Î¶Áµ½µÄÊı¾İ³¤¶È
+ * @param buf {char *} å­˜å‚¨ HTTP å“åº”ä½“çš„ç¼“å†²åŒº
+ * @param size {size_t} buf çš„ç©ºé—´å¤§å°
+ * @return {int} <= 0: è¡¨ç¤ºè¯»ç»“æŸ; > 0: è¡¨ç¤ºæœ¬æ¬¡è¯»åˆ°çš„æ•°æ®é•¿åº¦
  */
 HTTP_API int http_util_get_res_body(HTTP_UTIL *http_util, char *buf, size_t size);
 
 /**
- * ½«Ä³¸ö url µÄÏìÓ¦ÌåÊı¾İ×ª´¢ÖÁÄ³¸öÎÄ¼şÖĞ
- * @param url {const char*} ÍêÕûÇëÇó url, Èç: http://www.g.cn
- * @param dump {const char*} ×ª´¢ÎÄ¼şÃû
- * @return {int} ¶Áµ½µÄÏìÓ¦ÌåÊı¾İ³¤¶È, >=0: ±íÊ¾³É¹¦, -1: ±íÊ¾Ê§°Ü
+ * å°†æŸä¸ª url çš„å“åº”ä½“æ•°æ®è½¬å‚¨è‡³æŸä¸ªæ–‡ä»¶ä¸­
+ * @param url {const char*} å®Œæ•´è¯·æ±‚ url, å¦‚: http://www.g.cn
+ * @param dump {const char*} è½¬å‚¨æ–‡ä»¶å
+ * @return {int} è¯»åˆ°çš„å“åº”ä½“æ•°æ®é•¿åº¦, >=0: è¡¨ç¤ºæˆåŠŸ, -1: è¡¨ç¤ºå¤±è´¥
  */
 HTTP_API int http_util_dump_url(const char *url, const char *dump);
 
 /**
- * ½«Ä³¸ö url µÄÏìÓ¦ÌåÊı¾İ×ª´¢ÖÁÄ³¸öÁ÷ÖĞ
- * @param url {const char*} ÍêÕûÇëÇó url, Èç: http://www.g.cn
- * @param stream {ACL_VSTREAM *} ×ª´¢Á÷
- * @return {int} ¶Áµ½µÄÏìÓ¦ÌåÊı¾İ³¤¶È, >=0: ±íÊ¾³É¹¦, -1: ±íÊ¾Ê§°Ü
+ * å°†æŸä¸ª url çš„å“åº”ä½“æ•°æ®è½¬å‚¨è‡³æŸä¸ªæµä¸­
+ * @param url {const char*} å®Œæ•´è¯·æ±‚ url, å¦‚: http://www.g.cn
+ * @param stream {ACL_VSTREAM *} è½¬å‚¨æµ
+ * @return {int} è¯»åˆ°çš„å“åº”ä½“æ•°æ®é•¿åº¦, >=0: è¡¨ç¤ºæˆåŠŸ, -1: è¡¨ç¤ºå¤±è´¥
  */
 HTTP_API int http_util_dump_url_to_stream(const char *url, ACL_VSTREAM *stream);
 

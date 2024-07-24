@@ -23,10 +23,10 @@ typedef struct ACL_CHUNK {
 } ACL_CHUNK;
 
 struct ACL_CHAIN {
-	acl_int64 from_next;       /* µ±Ç°Á¬ĞøÊı¾İÁ´µÄÎ»ÖÃ */
-	acl_int64 off_begin;       /* Æ«ÒÆÁ¿ÆğÊ¼Î»ÖÃ */
+	acl_int64 from_next;       /* å½“å‰è¿ç»­æ•°æ®é“¾çš„ä½ç½® */
+	acl_int64 off_begin;       /* åç§»é‡èµ·å§‹ä½ç½® */
 
-	ACL_RING     ring;         /* ¶à¸ö DBUF Êı¾İ¿é×é³ÉµÄÊı¾İÁ´ */
+	ACL_RING     ring;         /* å¤šä¸ª DBUF æ•°æ®å—ç»„æˆçš„æ•°æ®é“¾ */
 	ACL_VSTRING  sbuf;
 };
 
@@ -52,7 +52,7 @@ static void acl_chunk_merge(ACL_CHUNK *chunk, const char *pdata,
 	char *tmpbuf, *ptr;
 	acl_int64 to = from + dlen, n, chunk_to = chunk->from + chunk->dlen;
 
-	/* sanity check: ±ØĞë±£Ö¤ĞÂÌíÊı¾İ±ØĞëÓëÊı¾İ¿éÓĞÊı¾İ½»²æ */
+	/* sanity check: å¿…é¡»ä¿è¯æ–°æ·»æ•°æ®å¿…é¡»ä¸æ•°æ®å—æœ‰æ•°æ®äº¤å‰ */
 
 	if (from < chunk->from) {
 		if (to < chunk->from)
@@ -201,7 +201,7 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 	acl_int64 to, n, chunk_to;
 
 	to = from + dlen;
-	/* ¹ıÂËµôÖØ¸´Êı¾İ */
+	/* è¿‡æ»¤æ‰é‡å¤æ•°æ® */
 	if (to < chain->from_next) {
 		acl_msg_warn("%s(%d): past data, to(" ACL_FMT_I64D ") < from_next("
 			ACL_FMT_I64D "), from=" ACL_FMT_I64D ", dlen=%d",
@@ -218,31 +218,31 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 	}
 
 	if (from == chain->from_next) {
-		/* ½«Á¬ĞøµÄÊı¾İ¿é¿½±´ÖÁÁ¬½ÓÊı¾İ»º³åÇøÖĞ */
+		/* å°†è¿ç»­çš„æ•°æ®å—æ‹·è´è‡³è¿æ¥æ•°æ®ç¼“å†²åŒºä¸­ */
 		acl_vstring_memcat(&chain->sbuf, pdata, dlen);
 		chain->from_next += dlen;
 
 		while ((chunk_iter = ACL_RING_FIRST_APPL(&chain->ring, ACL_CHUNK, entry)) != NULL) {
 			acl_int64 to_first;
 
-			/* Èç¹ûÓöµ½·ÇÁ¬½Ó¿éÔòÍË³öÑ­»· */
+			/* å¦‚æœé‡åˆ°éè¿æ¥å—åˆ™é€€å‡ºå¾ªç¯ */
 			if (to < chunk_iter->from)
 				break;
 
-			/* ´¦ÀíÁ¬½ÓÊı¾İ¿éµÄÇé¿ö */
+			/* å¤„ç†è¿æ¥æ•°æ®å—çš„æƒ…å†µ */
 
-			/* È¥µô¸Ã½»²æÊı¾İ¿éµÄÁ´½Ó½áµã */
+			/* å»æ‰è¯¥äº¤å‰æ•°æ®å—çš„é“¾æ¥ç»“ç‚¹ */
 			(void) acl_ring_pop_head(&chain->ring);
 
 			to_first = chunk_iter->from + chunk_iter->dlen;
 
-			/* Èç¹ûĞÂÊı¾İ¿é°üº¬¾ÉÊı¾İ¿é£¬ÔòÈ¥³ıÖØ¸´µÄ¾ÉÊı¾İ¿é */
+			/* å¦‚æœæ–°æ•°æ®å—åŒ…å«æ—§æ•°æ®å—ï¼Œåˆ™å»é™¤é‡å¤çš„æ—§æ•°æ®å— */
 			if (to >= to_first) {
 				acl_chunk_free(chunk_iter);
 				continue;
 			}
 
-			/* Êı¾İ¿é½»²æÇé¿ö */
+			/* æ•°æ®å—äº¤å‰æƒ…å†µ */
 
 			/* from <= to < to_first
 			 * chunk_iter->from <= from <= to < to_first
@@ -261,12 +261,12 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 		return;
 	}
 
-	/* ´¦Àí¾İ¿é²»Á¬ĞøÊıµÄÌí¼ÓÇéĞÎ */
+	/* å¤„ç†æ®å—ä¸è¿ç»­æ•°çš„æ·»åŠ æƒ…å½¢ */
 
 	/* chain->from_next < from <= to*/
 	chunk_iter = ACL_RING_FIRST_APPL(&chain->ring, ACL_CHUNK, entry);
 	if (chunk_iter == NULL) {
-		/* ËµÃ÷ÊÇµÚÒ»¸öÊı¾İ¿é */
+		/* è¯´æ˜æ˜¯ç¬¬ä¸€ä¸ªæ•°æ®å— */
 		chunk = acl_chunk_new(data, from, dlen);
 		acl_ring_append(&chain->ring, &chunk->entry);
 		return;
@@ -281,10 +281,10 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 		/* chunk_iter->from <= to */
 		if (from <= chunk_iter->from) {
 			if (to < chunk_iter->from) {
-				/* ËµÃ÷ĞÂÊı¾İ¿éÓëÊı¾İÁ´ÖĞµÄÊı¾İ¿éÎŞ½»¼¯ */
+				/* è¯´æ˜æ–°æ•°æ®å—ä¸æ•°æ®é“¾ä¸­çš„æ•°æ®å—æ— äº¤é›† */
 				/* from <= to < chunk_iter->from <= chunk_to */
 				chunk = acl_chunk_new(data, from, dlen);
-				/* Ç°²åÊı¾İ¿é½áµã */
+				/* å‰æ’æ•°æ®å—ç»“ç‚¹ */
 				acl_ring_prepend(&chunk_iter->entry, &chunk->entry);
 				return;
 			}
@@ -295,7 +295,7 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 				return;
 			}
 			/* else: from <= chunk_iter->from <= chunk_to < to */
-			/* ½»¼¯Êı¾İ¿ÉÄÜ´æÔÚÓÚ¶à¸öÊı¾İ½áµãÖĞ */
+			/* äº¤é›†æ•°æ®å¯èƒ½å­˜åœ¨äºå¤šä¸ªæ•°æ®ç»“ç‚¹ä¸­ */
 			chunk_saved = chunk_iter;
 			break;
 		} else if (from <= chunk_to) {
@@ -306,7 +306,7 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 				return;
 			}
 			/* else: chunk_iter->from < from <= chunk_to < to */
-			/* ½»¼¯Êı¾İ¿ÉÄÜ´æÔÚÓÚ¶à¸öÊı¾İ½áµãÖĞ */
+			/* äº¤é›†æ•°æ®å¯èƒ½å­˜åœ¨äºå¤šä¸ªæ•°æ®ç»“ç‚¹ä¸­ */
 			chunk_saved = chunk_iter;
 			break;
 		}
@@ -314,10 +314,10 @@ void acl_chain_add(ACL_CHAIN *chain, const void *data,
 	}
 
 	if (chunk_saved == NULL) {
-		/* ËµÃ÷ĞÂÊı¾İ¿éÓëÊı¾İÁ´ÖĞµÄÊı¾İ¿éÎŞ½»¼¯ */
+		/* è¯´æ˜æ–°æ•°æ®å—ä¸æ•°æ®é“¾ä¸­çš„æ•°æ®å—æ— äº¤é›† */
 		/* from <= to < chunk_iter->from <= chunk_to */
 		chunk = acl_chunk_new(data, from, dlen);
-		/* Ç°²åÊı¾İ¿é½áµã */
+		/* å‰æ’æ•°æ®å—ç»“ç‚¹ */
 		acl_ring_prepend(&chain->ring, &chunk->entry);
 
 		return;

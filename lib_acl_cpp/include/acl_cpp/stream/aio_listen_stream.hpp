@@ -8,8 +8,8 @@ class aio_socket_stream;
 class aio_listen_stream;
 
 /**
- * µ±Òì²½¼àÌıÁ÷½ÓÊÕµ½ĞÂµÄ¿Í»§¶ËÁ÷Ê±µ÷ÓÃ´Ë»Øµ÷ÀàÖĞµÄ»Øµ÷º¯Êı£¬¸ÃÀàÎª´¿ĞéÀà£¬
- * ÒªÇó×ÓÀà±ØĞëÊµÏÖ accept_callback »Øµ÷¹ı³Ì
+ * å½“å¼‚æ­¥ç›‘å¬æµæ¥æ”¶åˆ°æ–°çš„å®¢æˆ·ç«¯æµæ—¶è°ƒç”¨æ­¤å›è°ƒç±»ä¸­çš„å›è°ƒå‡½æ•°ï¼Œè¯¥ç±»ä¸ºçº¯è™šç±»ï¼Œ
+ * è¦æ±‚å­ç±»å¿…é¡»å®ç° accept_callback å›è°ƒè¿‡ç¨‹
  */
 class ACL_CPP_API aio_accept_callback : public aio_callback {
 public:
@@ -17,20 +17,20 @@ public:
 	virtual ~aio_accept_callback(void) {}
 
 	/**
-	 * µ±½ÓÊÕµ½ĞÂµÄ¿Í»§¶ËÁ÷Ê±µÄ»Øµ÷º¯Êı
-	 * @param client {aio_socket_stream*} ¿Í»§¶ËÒì²½Á¬½ÓÁ÷£¬
-	 *  ¿ÉÒÔ¶Ô´ËÁ÷½øĞĞ¶ÁĞ´²Ù×÷
-	 * @return {bool} Èç¹ûÏ£Íû¹Ø±Õ¸ÃÒì²½¼àÌıÁ÷£¬¿ÉÒÔ·µ»Ø false£¬
-	 *  Ò»°ã²»Ó¦·µ»Ø false
+	 * å½“æ¥æ”¶åˆ°æ–°çš„å®¢æˆ·ç«¯æµæ—¶çš„å›è°ƒå‡½æ•°
+	 * @param client {aio_socket_stream*} å®¢æˆ·ç«¯å¼‚æ­¥è¿æ¥æµï¼Œ
+	 *  å¯ä»¥å¯¹æ­¤æµè¿›è¡Œè¯»å†™æ“ä½œ
+	 * @return {bool} å¦‚æœå¸Œæœ›å…³é—­è¯¥å¼‚æ­¥ç›‘å¬æµï¼Œå¯ä»¥è¿”å› falseï¼Œ
+	 *  ä¸€èˆ¬ä¸åº”è¿”å› false
 	 */
 	virtual bool accept_callback(aio_socket_stream* client) = 0;
 };
 
 /**
- * µ±Òì²½¼àÌıÁ÷ÊÕµ½ÓĞĞÂÁ¬½Óµ½´ïÊÂ¼şÊ±µ÷ÓÃ´ËÀàÖĞµÄĞéº¯Êı£¬ÔÚÓÉ×ÓÀàÊµÏÖ¸ÃĞéº¯Êı
- * ÖĞµ÷ÓÃ accept() ÏµÍ³ API ½ÓÊÕ¿Í»§¶ËÁ¬½Ó£¬¸ÃÀàÓëÉÏÃæµÄ aio_accept_callback
- * ÓĞËù²»Í¬£¬ÔÚ aio_accept_callback::accept_callback() ±»µ÷ÓÃÊ±£¬¿Í»§¶ËÁ¬½Ó¶Ô
- * ÏóÒÑ¾­±»´´½¨£¬¶øÔÚ listen_callback() ÖĞ£¬ÔòĞèÒªÓ¦ÓÃ×Ô¼º½ÓÊÕÁ¬½Ó¶ÔÏó
+ * å½“å¼‚æ­¥ç›‘å¬æµæ”¶åˆ°æœ‰æ–°è¿æ¥åˆ°è¾¾äº‹ä»¶æ—¶è°ƒç”¨æ­¤ç±»ä¸­çš„è™šå‡½æ•°ï¼Œåœ¨ç”±å­ç±»å®ç°è¯¥è™šå‡½æ•°
+ * ä¸­è°ƒç”¨ accept() ç³»ç»Ÿ API æ¥æ”¶å®¢æˆ·ç«¯è¿æ¥ï¼Œè¯¥ç±»ä¸ä¸Šé¢çš„ aio_accept_callback
+ * æœ‰æ‰€ä¸åŒï¼Œåœ¨ aio_accept_callback::accept_callback() è¢«è°ƒç”¨æ—¶ï¼Œå®¢æˆ·ç«¯è¿æ¥å¯¹
+ * è±¡å·²ç»è¢«åˆ›å»ºï¼Œè€Œåœ¨ listen_callback() ä¸­ï¼Œåˆ™éœ€è¦åº”ç”¨è‡ªå·±æ¥æ”¶è¿æ¥å¯¹è±¡
  */
 class ACL_CPP_API aio_listen_callback : public aio_callback {
 public:
@@ -41,60 +41,60 @@ public:
 };
 
 /**
- * Òì²½¼àÌıÍøÂçÁ÷£¬¸ÃÀà½ÓÊÕÀ´×ÔÓÚ¿Í»§¶ËµÄÍâÀ´Á¬½Ó£¬Í¬Ê±¸ÃÀàÖ»ÄÜ
- * ÔÚ¶ÑÉÏ·ÖÅä£¬²»ÄÜÔÚÕ»·ÖÅä£¬Ó¦ÓÃ¿ÉÒÔµ÷ÓÃ close Ö÷¶¯¹Ø±ÕÁ÷£¬Á÷¹Ø±Õ
- * ºó¸ÃÒì²½Á÷¶ÔÏó×Ô¶¯ÊÍ·Å£¬ÎŞĞèµ÷ÓÃ delete É¾³ı¸ÃÀà¶ÔÏó
+ * å¼‚æ­¥ç›‘å¬ç½‘ç»œæµï¼Œè¯¥ç±»æ¥æ”¶æ¥è‡ªäºå®¢æˆ·ç«¯çš„å¤–æ¥è¿æ¥ï¼ŒåŒæ—¶è¯¥ç±»åªèƒ½
+ * åœ¨å †ä¸Šåˆ†é…ï¼Œä¸èƒ½åœ¨æ ˆåˆ†é…ï¼Œåº”ç”¨å¯ä»¥è°ƒç”¨ close ä¸»åŠ¨å…³é—­æµï¼Œæµå…³é—­
+ * åè¯¥å¼‚æ­¥æµå¯¹è±¡è‡ªåŠ¨é‡Šæ”¾ï¼Œæ— éœ€è°ƒç”¨ delete åˆ é™¤è¯¥ç±»å¯¹è±¡
  *
  */
 class ACL_CPP_API aio_listen_stream : public aio_stream {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı£¬ÓÃÒÔ¹¹ÔìÒì²½¼àÌıÁ÷
-	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú
+	 * æ„é€ å‡½æ•°ï¼Œç”¨ä»¥æ„é€ å¼‚æ­¥ç›‘å¬æµ
+	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„
 	 */
 	aio_listen_stream(aio_handle* handle);
 
 	/**
-	 * Ìí¼ÓÒì²½¼àÌıÁ÷½ÓÊÕµ½ĞÂ¿Í»§¶ËÁ÷Ê±µÄ»Øµ÷º¯Êı
+	 * æ·»åŠ å¼‚æ­¥ç›‘å¬æµæ¥æ”¶åˆ°æ–°å®¢æˆ·ç«¯æµæ—¶çš„å›è°ƒå‡½æ•°
 	 * @param callback {aio_accept_callback*}
 	 */
 	void add_accept_callback(aio_accept_callback* callback);
 
 	/**
-	 * Ìí¼ÓÒì²½¼àÌıÁ÷ÓĞ¿Í»§¶ËÁ¬½Óµ½´ïÊ±µÄ»Øµ÷º¯Êı
+	 * æ·»åŠ å¼‚æ­¥ç›‘å¬æµæœ‰å®¢æˆ·ç«¯è¿æ¥åˆ°è¾¾æ—¶çš„å›è°ƒå‡½æ•°
 	 * @param callback {aio_listen_stream*}
-	 *  ×¢Òâ£º±¾·½·¨ÓëÉÏÃæ add_accept_callback µÄÇø±ğ£¬±¾·½·¨ÊÇ reactor
-	 *  Ä£Ê½£¬¶ø add_accept_callback ÔòÊÇ proactor Ä£Ê½
+	 *  æ³¨æ„ï¼šæœ¬æ–¹æ³•ä¸ä¸Šé¢ add_accept_callback çš„åŒºåˆ«ï¼Œæœ¬æ–¹æ³•æ˜¯ reactor
+	 *  æ¨¡å¼ï¼Œè€Œ add_accept_callback åˆ™æ˜¯ proactor æ¨¡å¼
 	 */
 	void add_listen_callback(aio_listen_callback* callback);
 
 	/**
-	 * µ±µ÷ÓÃ add_listen_callback ·½Ê½Ê±£¬ÔÚ aio_listen_callback ×ÓÀà
-	 * ÖĞµÄº¯Êı listen_callback Àï¿ÉÒÔµ÷ÓÃ±¾·½·¨À´»ñµÃÒ»¸öÒì²½Á¬½Ó¶ÔÏó
-	 * @return {aio_socket_stream*} ·µ»Ø NULL ±íÊ¾»ñµÃÁ¬½ÓÊ§°Ü
+	 * å½“è°ƒç”¨ add_listen_callback æ–¹å¼æ—¶ï¼Œåœ¨ aio_listen_callback å­ç±»
+	 * ä¸­çš„å‡½æ•° listen_callback é‡Œå¯ä»¥è°ƒç”¨æœ¬æ–¹æ³•æ¥è·å¾—ä¸€ä¸ªå¼‚æ­¥è¿æ¥å¯¹è±¡
+	 * @return {aio_socket_stream*} è¿”å› NULL è¡¨ç¤ºè·å¾—è¿æ¥å¤±è´¥
 	 */
 	aio_socket_stream* accept(void);
 
 	/**
-	 * ¿ªÊ¼¼àÌıÄ³¸öÖ¸¶¨µØÖ·£¬¿ÉÒÔÎªÍøÂçÌ×½Ó¿Ú£¬Ò²¿ÉÒÔÎªÓòÌ×½Ó¿Ú£¬
-	 * @param addr {const char*} ¼àÌıµØÖ·£¬TCP¼àÌıµØÖ·»òÓò¼àÌıµØÖ·
-	 * ¸ñÊ½£º
-	 *   Õë¶ÔTCPÁ¬½Ó£ºIP:PORT£¬Èç£º127.0.0.1:9001
-	 *   Õë¶ÔÓòÌ×½Ó¿Ú£º{path}£¬Èç£º/tmp/my.sock£¬ÔÚ Linux Æ½Ì¨£¬»¹¿ÉÒÔÖ§³Ö
-	 *   Linux abstract unix domain socket£¬ĞèÒªµØÖ·Ê××Ö½ÚÎª'@'£¬ÔÚ Linux
-	 *   Æ½Ì¨ÏÂ£¬acl ÄÚ²¿Èç¹û¼ì²âµ½Â·¾¶Ê××Ö½ÚÎª '@'£¬ÔòÄÚ²¿×Ô¶¯ÇĞµ½ Linux
-	 *   abstract unix domain socket ¼àÌıÄ£Ê½£¨ÆäÖĞµÄ @ ·ûÖ»ÊÇÓÃÀ´±ê¼Ç£¬ÄÚ
-	 *   ²¿µÄ¼àÌıµØÖ·»á×Ô¶¯È¥µô£©
-	 * @param flag {unsigned} ´´½¨¼àÌıÌ×½Ó¿ÚÊ±µÄ´ò¿ª±êÖ¾Î»£¬¼û server_socket.hpp
-	 * @param qlen {int} Ö¸¶¨¼àÌıÌ×½Ó×Ö¼àÌı¶ÓÁĞµÄ³¤¶È
-	 * @return {bool} ¼àÌıÊÇ·ñ³É¹¦
+	 * å¼€å§‹ç›‘å¬æŸä¸ªæŒ‡å®šåœ°å€ï¼Œå¯ä»¥ä¸ºç½‘ç»œå¥—æ¥å£ï¼Œä¹Ÿå¯ä»¥ä¸ºåŸŸå¥—æ¥å£ï¼Œ
+	 * @param addr {const char*} ç›‘å¬åœ°å€ï¼ŒTCPç›‘å¬åœ°å€æˆ–åŸŸç›‘å¬åœ°å€
+	 * æ ¼å¼ï¼š
+	 *   é’ˆå¯¹TCPè¿æ¥ï¼šIP:PORTï¼Œå¦‚ï¼š127.0.0.1:9001
+	 *   é’ˆå¯¹åŸŸå¥—æ¥å£ï¼š{path}ï¼Œå¦‚ï¼š/tmp/my.sockï¼Œåœ¨ Linux å¹³å°ï¼Œè¿˜å¯ä»¥æ”¯æŒ
+	 *   Linux abstract unix domain socketï¼Œéœ€è¦åœ°å€é¦–å­—èŠ‚ä¸º'@'ï¼Œåœ¨ Linux
+	 *   å¹³å°ä¸‹ï¼Œacl å†…éƒ¨å¦‚æœæ£€æµ‹åˆ°è·¯å¾„é¦–å­—èŠ‚ä¸º '@'ï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨åˆ‡åˆ° Linux
+	 *   abstract unix domain socket ç›‘å¬æ¨¡å¼ï¼ˆå…¶ä¸­çš„ @ ç¬¦åªæ˜¯ç”¨æ¥æ ‡è®°ï¼Œå†…
+	 *   éƒ¨çš„ç›‘å¬åœ°å€ä¼šè‡ªåŠ¨å»æ‰ï¼‰
+	 * @param flag {unsigned} åˆ›å»ºç›‘å¬å¥—æ¥å£æ—¶çš„æ‰“å¼€æ ‡å¿—ä½ï¼Œè§ server_socket.hpp
+	 * @param qlen {int} æŒ‡å®šç›‘å¬å¥—æ¥å­—ç›‘å¬é˜Ÿåˆ—çš„é•¿åº¦
+	 * @return {bool} ç›‘å¬æ˜¯å¦æˆåŠŸ
 	 */
 	bool open(const char* addr, unsigned flag = 0, int qlen = 128);
 
 	/**
-	 * Ê¹ÓÃÌ×½Ó×Ö´´½¨¼àÌı¶ÔÏó£¬¸ÃÌ×½Ó×Ö¾ä±ú±ØĞëÒÑ¾­µ÷ÓÃÁË bind/listen ¹ı³Ì
+	 * ä½¿ç”¨å¥—æ¥å­—åˆ›å»ºç›‘å¬å¯¹è±¡ï¼Œè¯¥å¥—æ¥å­—å¥æŸ„å¿…é¡»å·²ç»è°ƒç”¨äº† bind/listen è¿‡ç¨‹
 	 * @param fd {int}
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	bool open(SOCKET fd);
@@ -103,27 +103,27 @@ public:
 #endif
 
 	/**
-	 * Ê¹ÓÃÍ¬²½Á÷¶ÔÏó´´½¨·Ç×èÈû¼àÌı¶ÔÏó
-	 * @param vstream {ACL_VSTREAM*} ·Ç¿Õ¶ÔÏó
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä½¿ç”¨åŒæ­¥æµå¯¹è±¡åˆ›å»ºéé˜»å¡ç›‘å¬å¯¹è±¡
+	 * @param vstream {ACL_VSTREAM*} éç©ºå¯¹è±¡
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool open(ACL_VSTREAM* vstream);
 
 	/**
-	 * Ê¹ÓÃ·Ç×èÈûÁ÷¶ÔÏó´´½¨·Ç×èÈû¼àÌı¶ÔÏó
-	 * @param astream {ACL_ASTREAM*} ·Ç¿Õ¶ÔÏó
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * ä½¿ç”¨éé˜»å¡æµå¯¹è±¡åˆ›å»ºéé˜»å¡ç›‘å¬å¯¹è±¡
+	 * @param astream {ACL_ASTREAM*} éç©ºå¯¹è±¡
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool open(ACL_ASTREAM* astream);
 
 	/**
-	 * »ñµÃ·şÎñÆ÷¼àÌıµØÖ·
+	 * è·å¾—æœåŠ¡å™¨ç›‘å¬åœ°å€
 	 * @return {const char*}
 	 */
 	const char* get_addr(void) const;
 
 	/**
-	 * ÖØÔØ»ùÀà·½·¨£¬µ±Òì²½Á÷¶ÔÏóÏú»ÙÊ±»Øµ÷´Ë·½·¨
+	 * é‡è½½åŸºç±»æ–¹æ³•ï¼Œå½“å¼‚æ­¥æµå¯¹è±¡é”€æ¯æ—¶å›è°ƒæ­¤æ–¹æ³•
 	 */
 	virtual void destroy(void);
 

@@ -176,14 +176,14 @@ int main(int argc, char *argv[])
 
 #if 0
 	{
-		char* p = "²Ë";
+		char* p = "Â²Ã‹";
 		char tmp[32];
 		strcpy(tmp, p);
 		p = tmp;
 		p++;
 		*p = 0;
 		b64_encode(tmp);
-		strcpy(tmp, "²ËÆ×");
+		strcpy(tmp, "Â²Ã‹Ã†Ã—");
 		p = tmp;
 		p++;
 		b64_encode(p);

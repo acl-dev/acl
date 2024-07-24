@@ -11,9 +11,9 @@ extern "C" {
 
 /* in acl_dbpool_null.c */
 /**
- * ´´½¨Ò»¸ö null ÀàĞÍµÄÊı¾İ¿âÁ¬½Ó³Ø
- * @param db_info ¼ÇÂ¼×ÅÓĞ¹ØÁ¬½ÓÊı¾İËùĞèÒªµÄĞÅÏ¢
- * @return DB_POOL * ·µ»ØÒ»¸öÄÜÓÃµÄÁ¬½Ó³Ø¾ä±ú
+ * åˆ›å»ºä¸€ä¸ª null ç±»å‹çš„æ•°æ®åº“è¿æ¥æ± 
+ * @param db_info è®°å½•ç€æœ‰å…³è¿æ¥æ•°æ®æ‰€éœ€è¦çš„ä¿¡æ¯
+ * @return DB_POOL * è¿”å›ä¸€ä¸ªèƒ½ç”¨çš„è¿æ¥æ± å¥æŸ„
  */
 extern ACL_DB_POOL *acl_dbpool_null_create(const ACL_DB_INFO *db_info);
 

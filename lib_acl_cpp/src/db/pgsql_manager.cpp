@@ -34,7 +34,7 @@ pgsql_manager& pgsql_manager::add(const pgsql_conf& conf)
 
 	pgsql_conf* mc = NEW pgsql_conf(conf);
 	dbs_[key] = mc;
-	// 调用基类 connect_manager::set 方法添加
+	// 璋冪敤鍩虹被 connect_manager::set 鏂规硶娣诲姞
 	set(key, conf.get_dblimit());
 
 	return *this;

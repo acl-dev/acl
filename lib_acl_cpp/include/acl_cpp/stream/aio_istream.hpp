@@ -10,16 +10,16 @@ namespace acl {
 class aio_istream;
 
 /**
- * �ӳ��첽�������࣬����Ϊ aio_timer_callback (see aio_handle.hpp)��
- * ��ν�ӳ��첽�������ǰ��첽����(aio_istream)���ڶ�ʱ���У�������
- * �������첽�����������(���� aio_handle �ļ���н��)����ָ��
- * ʱ�䵽����������첽������(�� timer_callback �ص��������½��첽
- * �����첽��������)��ͬʱ�ö�ʱ���Զ�����(���� destroy ����)��
- * ��������û��̳��� aio_timer_reader �࣬�����಻���ڶ��Ϸ���ģ�
- * ��������� destroy������ͬʱ������� destroy ��ִ������Դ�ͷŵ�
- * ��ز������������δ���� destroy���򵱶�ʱ���������ڲ����Զ�����
- * ���� aio_timer_reader �� destroy--��������� delete this����ʱ��
- * �ᵼ�·Ƿ��ڴ��ͷŲ���)
+ * 延迟异步读数据类，基类为 aio_timer_callback (see aio_handle.hpp)，
+ * 所谓延迟异步读，就是把异步读流(aio_istream)放在定时器中，将该异
+ * 步流的异步读操作解除绑定(即从 aio_handle 的监控中解除)，当指定
+ * 时间到达后再启动异步读操作(在 timer_callback 回调中再重新将异步
+ * 流的异步读操作绑定)，同时该定时器自动销毁(调用 destroy 方法)，
+ * 所以如果用户继承了 aio_timer_reader 类，且子类不是在堆上分配的，
+ * 则必须重载 destroy方法，同时在子类的 destroy 中执行与资源释放的
+ * 相关操作，如果子类未重载 destroy，则当定时器结束后内部会自动调用
+ * 基类 aio_timer_reader 的 destroy--该类调用了 delete this，此时就
+ * 会导致非法内存释放操作)
  * 
  */
 class ACL_CPP_API aio_timer_reader : public aio_timer_callback {
@@ -27,7 +27,7 @@ public:
 	aio_timer_reader(void) : in_(NULL) {}
 
 	/**
-	 * �� aio_istream �е��ô˺������ͷ����������Ӧ��ʵ�ָú���
+	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数
 	 */
 	virtual void destroy(void)
 	{
@@ -36,11 +36,11 @@ public:
 protected:
 	virtual ~aio_timer_reader(void) {}
 	/**
-	 * �ӳٶ�����ʱ�Ļص��������� aio_timer_callback ���м̳ж���
+	 * 延迟读数据时的回调函数，从 aio_timer_callback 类中继承而来
 	 */
 	virtual void timer_callback(unsigned int id);
 private:
-	// ���� aio_istream ����ֱ���޸ı����˽�г�Ա����
+	// 允许 aio_istream 可以直接修改本类的私有成员变量
 	friend class aio_istream;
 
 	aio_istream* in_;
@@ -52,22 +52,22 @@ private:
 };
 
 /**
- * �첽���������ඨ�壬����ֻ���ڶ��ϱ�ʵ������������ʱ��Ҫ���� close
- * �������ͷŸ������
+ * 异步读数据流类定义，该类只能在堆上被实例化，在析构时需要调用 close
+ * 函数以释放该类对象
  */
 class ACL_CPP_API aio_istream : virtual public aio_stream
 {
 public:
 	/**
-	 * ���캯��
-	 * @param handle {aio_handle*} �첽�¼�������
+	 * 构造函数
+	 * @param handle {aio_handle*} 异步事件引擎句柄
 	 */
 	aio_istream(aio_handle* handle);
 
 	/**
-	 * ���캯���������첽�������󣬲� hook �����̼��ر�/��ʱ����
-	 * @param handle {aio_handle*} �첽�¼�������
-	 * @param fd {int} �����׽ӿھ��
+	 * 构造函数，创建异步读流对象，并 hook 读过程及关闭/超时过程
+	 * @param handle {aio_handle*} 异步事件引擎句柄
+	 * @param fd {int} 连接套接口句柄
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	aio_istream(aio_handle* handle, SOCKET fd);
@@ -76,56 +76,56 @@ public:
 #endif
 
 	/**
-	 * ������ɶ�ʱ�Ļص������ָ�룬����ûص�������Ѿ����ڣ���ֻ��
-	 * ʹ�ö����ڴ򿪿���״̬
-	 * @param callback {aio_callback*} �̳� aio_callback ������ص������
-	 *  ���첽��������ʱ���ȵ��ô˻ص�������е� read_callback �ӿ�
+	 * 添加异可读时的回调类对象指针，如果该回调类对象已经存在，则只是
+	 * 使该对象处于打开可用状态
+	 * @param callback {aio_callback*} 继承 aio_callback 的子类回调类对象，
+	 *  当异步流有数据时会先调用此回调类对象中的 read_callback 接口
 	 */
 	void add_read_callback(aio_callback* callback);
 
 	/**
-	 * �Ӷ��ص����󼯺���ɾ��
-	 * @param callback {aio_read_callback*} ��ɾ���Ļص�����
-	 * ����ֵΪ�գ���ɾ�����еĻص�����
-	 * @return {int} ���ر��ӻص����󼯺���ɾ���Ļص�����ĸ���
+	 * 从读回调对象集合中删除
+	 * @param callback {aio_read_callback*} 被删除的回调对象，
+	 * 若该值为空，则删除所有的回调对象
+	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
 	 */
 
 	/**
-	 * �Ӷ��ص����󼯺���ɾ���ص�����
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ���ɾ�����еĶ��ص�����
-	 * @return {int} ���ر��ӻص����󼯺���ɾ���Ļص�����ĸ���
+	 * 从读回调对象集合中删除回调对象
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则删除所有的读回调对象
+	 * @return {int} 返回被从回调对象集合中删除的回调对象的个数
 	 */
 	int del_read_callback(aio_callback* callback = NULL);
 
 	/**
-	 * ��ֹ�ص������༯���е�ĳ���ص�����󣬵������ӻص������
-	 * ������ɾ����ֻ�ǲ������ö���
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ����ֹ���еĶ��ص�����
-	 * @return {int} ���ر��ӻص����󼯺��н��õĻص�����ĸ���
+	 * 禁止回调对象类集合中的某个回调类对象，但并不从回调类对象
+	 * 集合中删除，只是不被调用而已
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则禁止所有的读回调对象
+	 * @return {int} 返回被从回调对象集合中禁用的回调对象的个数
 	 */
 	int disable_read_callback(aio_callback* callback = NULL);
 
 	/**
-	 * �������еĻص����󱻵���
-	 * @param callback {aio_callback*} �� aio_callback �̳е��������ָ�룬
-	 *  ����ֵΪ�գ����������еĶ��ص�����
-	 * @return {int} ���ر����õĻص�����ĸ���
+	 * 启用所有的回调对象被调用
+	 * @param callback {aio_callback*} 从 aio_callback 继承的子类对象指针，
+	 *  若该值为空，则启用所有的读回调对象
+	 * @return {int} 返回被启用的回调对象的个数
 	 */
 	int enable_read_callback(aio_callback* callback = NULL);
 
 	/**
-	 * �첽��ȡһ�����ݣ����ӳ��첽��ʱ������������ô˹��̣�
-	 * ��ֻ�����һ���ӳٶ�������Ч
-	 * @param timeout {int} ����ʱʱ��(��)����Ϊ 0 ���ʾ
-	 *  ��Զ�ȴ�ֱ����������һ�����ݻ����
-	 * @param nonl {bool} �Ƿ��Զ�ȥ��β���Ļس����з�
-	 * @param delay {long long int} ����Է��������ݱȽϿ�ʱ���˲���
-	 *  ���� 0 ʱ�����ӳٽ��նԷ������ݣ���ֵ�����ӳٶ�����
-	 *  ��ʱ��(��λΪ΢��)
-	 * @param callback {aio_timer_reader*} ��ʱ������ʱ�Ļص����������
-	 *  �� delay > 0�������ֵΪ�գ������ȱʡ�Ķ���
+	 * 异步读取一行数据，当延迟异步读时，如果连续调用此过程，
+	 * 则只有最后一个延迟读操作生效
+	 * @param timeout {int} 读超时时间(秒)，若为 0 则表示
+	 *  永远等待直到读到完整一行数据或出错
+	 * @param nonl {bool} 是否自动去掉尾部的回车换行符
+	 * @param delay {long long int} 如果对方发送数据比较快时，此参数
+	 *  大于 0 时可以延迟接收对方的数据，该值控制延迟读数据
+	 *  的时间(单位为微秒)
+	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
+	 *  当 delay > 0，如果该值为空，则采用缺省的对象
 	 */
 	void gets_await(int timeout = 0, bool nonl = true,
 		long long int delay = 0, aio_timer_reader* callback = NULL);
@@ -140,17 +140,17 @@ public:
 	}
 
 	/**
-	 * �첽��ȡ���ݣ����ӳ��첽��ʱ������������ô˹��̣�
-	 * ��ֻ�����һ���ӳٶ�������Ч
-	 * @param count {int} ��Ҫ������������������Ϊ 0 ��ֻҪ������
-	 *  �ɶ��ͷ��أ�����ֱ������ʱ����������������Ҫ����ֽ���
-	 * @param timeout {int} ����ʱʱ��(��)����Ϊ 0 ���ʾ
-	 *  ��Զ�ȴ�ֱ��������Ҫ������ݻ����
-	 * @param delay {long long int} ����Է��������ݱȽϿ�ʱ���˲���
-	 *  ���� 0 ʱ�����ӳٽ��նԷ������ݣ���ֵ�����ӳٶ�����
-	 *  ��ʱ��(��λΪ΢��)
-	 * @param callback {aio_timer_reader*} ��ʱ������ʱ�Ļص����������
-	 *  �����ֵΪ�գ������ȱʡ�Ķ���
+	 * 异步读取数据，当延迟异步读时，如果连续调用此过程，
+	 * 则只有最后一个延迟读操作生效
+	 * @param count {int} 所要求读到的数据量，如果为 0 则只要有数据
+	 *  可读就返回，否则直到读超时或读出错或读满足所要求的字节数
+	 * @param timeout {int} 读超时时间(秒)，若为 0 则表示
+	 *  永远等待直到读到所要求的数据或出错
+	 * @param delay {long long int} 如果对方发送数据比较快时，此参数
+	 *  大于 0 时可以延迟接收对方的数据，该值控制延迟读数据
+	 *  的时间(单位为微秒)
+	 * @param callback {aio_timer_reader*} 定时器到达时的回调函数类对象，
+	 *  如果该值为空，则采用缺省的对象
 	 */
 	void read_await(int count = 0, int timeout = 0,
 		long long int delay = 0, aio_timer_reader* callback = NULL);
@@ -165,9 +165,9 @@ public:
 	}
 
 	/**
-	 * �첽�ȴ��������ɶ����ú��������첽���Ķ�����״̬���������ݿɶ�
-	 * ʱ���ص����������������û��Լ��������ݵĶ�ȡ
-	 * @param timeout {int} ����ʱʱ��(��)������ֵΪ 0 ʱ����û�ж���ʱ
+	 * 异步等待连接流可读，该函数设置异步流的读监听状态，当有数据可读
+	 * 时，回调函数被触发，由用户自己负责数据的读取
+	 * @param timeout {int} 读超时时间(秒)，当该值为 0 时，则没有读超时
 	 */
 	void readable_await(int timeout = 0);
 
@@ -180,42 +180,42 @@ public:
 	}
 
 	/**
-	 * ��ֹ�첽�����첽��״̬�������첽�����첽����ļ����
-	 * �Ƴ���ֱ���û������κ�һ���첽������(��ʱ���첽�����
-	 * �Զ����¼�ظ����Ŀɶ�״̬)
+	 * 禁止异步流的异步读状态，将该异步流从异步引擎的监控中
+	 * 移除，直到用户调用任何一个异步读操作(此时，异步引擎会
+	 * 自动重新监控该流的可读状态)
 	 */
 	void disable_read(void);
 
 	/**
-	 * �������Ƿ�������Ӷ�����
+	 * 设置流是否采用连接读功能
 	 * @param onoff {bool}
 	 */
 	void keep_read(bool onoff);
 
 	/**
-	 * ������Ƿ�������������������
+	 * 获得流是否是设置了连续读功能
 	 * @return {bool}
 	 */
 	bool keep_read(void) const;
 
 	/**
-	 * ���ý��ջ���������󳤶ȣ��Ա��⻺���������Ĭ��ֵΪ 0 ��ʾ������
+	 * 设置接收缓冲区的最大长度，以避免缓冲区溢出，默认值为 0 表示不限制
 	 * @param max {int}
 	 * @return {aio_istream&}
 	 */
 	aio_istream& set_buf_max(int max);
 
 	/**
-	 * ��õ�ǰ���ջ���������󳤶�����
-	 * @return {int} ����ֵ  <= 0 ��ʾû������
+	 * 获得当前接收缓冲区的最大长度限制
+	 * @return {int} 返回值  <= 0 表示没有限制
 	 */
 	int get_buf_max(void) const;
 
 	/**
-	 * ����ڲ��� read_ready flag λ���� IO �����⵽ IO �ɶ�ʱ��������
-	 * read_ready ��־λ�����һ��ᶨ�ڼ��ñ�־λ�Ƿ����ã��Ծ����Ƿ���
-	 * Ҫ�ٴδ������ص����̣�ͨ���������������ñ�־λ��IO ����Ͳ�����
-	 * Ӧ�ò���þ���Ƿ�ɶ������ǽ��� OS ȥ�ж��Ƿ�ɶ�
+	 * 清除内部的 read_ready flag 位，当 IO 引擎检测到 IO 可读时，会设置
+	 * read_ready 标志位，而且还会定期检测该标志位是否设置，以决定是否需
+	 * 要再次触发读回调过程，通过本方法清理掉该标志位后，IO 引擎就不会在
+	 * 应用层检测该句柄是否可读，而是交由 OS 去判断是否可读
 	 */
 	void clear_read_ready(void);
 
@@ -223,12 +223,12 @@ protected:
 	virtual ~aio_istream(void);
 
 	/**
-	 * �ͷŶ�̬�������麯��
+	 * 释放动态类对象的虚函数
 	 */
 	virtual void destroy(void);
 
 	/**
-	 * ע��ɶ��Ļص�����
+	 * 注册可读的回调函数
 	 */
 	void enable_read(void);
 

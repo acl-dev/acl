@@ -21,7 +21,7 @@ void forward_complete(CLIENT_ENTRY *entry)
 	}
 }
 
-/* ³¢ÊÔ´ÓÁ¬½Ó³ØÖĞ»ñµÃÒ»¸öÁ¬½ÓÁ÷ */
+/* å°è¯•ä»è¿æ¥æ± ä¸­è·å¾—ä¸€ä¸ªè¿æ¥æµ */
 
 static ACL_ASTREAM *peek_server_conn(CLIENT_ENTRY *entry)
 {
@@ -43,7 +43,7 @@ static ACL_ASTREAM *peek_server_conn(CLIENT_ENTRY *entry)
 	return (NULL);
 }
 
-/* È¡µÃÄ³ÓòÃûµÄÏÂÒ»¸ö·şÎñÆ÷ IP:PORT µØÖ· */
+/* å–å¾—æŸåŸŸåçš„ä¸‹ä¸€ä¸ªæœåŠ¡å™¨ IP:PORT åœ°å€ */
 
 static const char *next_server_addr(CLIENT_ENTRY *entry, char *buf, size_t size)
 {
@@ -51,7 +51,7 @@ static const char *next_server_addr(CLIENT_ENTRY *entry, char *buf, size_t size)
 	SERVICE *service = entry->service;
 	int   i;
 
-	/* ÊÔ×Å¶àÁ¬Ò»´Î */
+	/* è¯•ç€å¤šè¿ä¸€æ¬¡ */
 	if (entry->ip_ntry++ > entry->dns_ctx.ip_cnt) {
 		acl_msg_error("%s(%d): domain(%s), ip_ntry(%d) >= ip_cnt(%d)",
 			myname, __LINE__, entry->domain_key,
@@ -111,7 +111,7 @@ static int connect_close_callback(ACL_ASTREAM *astream, void *context)
 	const char* myname = "connect_close_callback";
 	CLIENT_ENTRY *entry = (CLIENT_ENTRY *) context;
 
-	/* Ğ¶ÔØ»Øµ÷º¯Êı£¬·ÀÖ¹±»ÖØ¸´µ÷ÓÃ */
+	/* å¸è½½å›è°ƒå‡½æ•°ï¼Œé˜²æ­¢è¢«é‡å¤è°ƒç”¨ */
 	acl_aio_ctl(astream,
 		ACL_AIO_CTL_TIMEO_HOOK_DEL, connect_timeout_callback, entry,
 		ACL_AIO_CTL_END);
@@ -126,9 +126,9 @@ static int connect_close_callback(ACL_ASTREAM *astream, void *context)
 			myname, __LINE__, entry->dns_ctx.ip[entry->ip_idx],
 			entry->server_port);
 
-		/* ¶Ï¿ªÓë·şÎñ¶ËµÄÁ¬½Ó£¬µ«±£³ÖÓëä¯ÀÀÆ÷¶ËµÄÁ¬½Ó
-		 * XXX: ÒòÎª¸Ãº¯Êı½«Çå³ıÒ»Ğ©¹Ø±Õ»Øµ÷º¯Êı£¬²»ÖªÊÇ·ñ»áÔì³ÉÄ³Ğ©ÄÚ´æĞ¹Â©£¿
-		 * ×¢£¬´Ë´¦²¢²»¹Ø±Õ·şÎñ¶ËÁ¬½Ó£¬ĞèÒªµ÷ÓÃÕß×Ô¼ºÀ´¹Ø±Õ
+		/* æ–­å¼€ä¸æœåŠ¡ç«¯çš„è¿æ¥ï¼Œä½†ä¿æŒä¸æµè§ˆå™¨ç«¯çš„è¿æ¥
+		 * XXX: å› ä¸ºè¯¥å‡½æ•°å°†æ¸…é™¤ä¸€äº›å…³é—­å›è°ƒå‡½æ•°ï¼Œä¸çŸ¥æ˜¯å¦ä¼šé€ æˆæŸäº›å†…å­˜æ³„æ¼ï¼Ÿ
+		 * æ³¨ï¼Œæ­¤å¤„å¹¶ä¸å…³é—­æœåŠ¡ç«¯è¿æ¥ï¼Œéœ€è¦è°ƒç”¨è€…è‡ªå·±æ¥å…³é—­
 		 */
 		if (entry->server && client_entry_detach(entry, acl_aio_vstream(entry->server))) {
 			acl_debug(23, 1) ("%s(%d): entry's freed", myname, __LINE__);
@@ -147,7 +147,7 @@ static int connect_close_callback(ACL_ASTREAM *astream, void *context)
 			ACL_AIO_CTL_CTX, entry,
 			ACL_AIO_CTL_END);
 
-		/* Í¨¹ı·µ»Ø-1£¬Ê¹Òì²½Á÷¿ò¼Ü¹Ø±Õ·şÎñ¶ËÁ¬½Ó */
+		/* é€šè¿‡è¿”å›-1ï¼Œä½¿å¼‚æ­¥æµæ¡†æ¶å…³é—­æœåŠ¡ç«¯è¿æ¥ */
 		return (-1);
 	}
 
@@ -178,7 +178,7 @@ static int connect_timeout_callback(ACL_ASTREAM *astream, void *context)
 	const char* myname = "connect_timeout_callback";
 	CLIENT_ENTRY *entry = (CLIENT_ENTRY *) context;
 
-	/* Ğ¶ÔØ»Øµ÷º¯Êı£¬·ÀÖ¹±»ÖØ¸´µ÷ÓÃ */
+	/* å¸è½½å›è°ƒå‡½æ•°ï¼Œé˜²æ­¢è¢«é‡å¤è°ƒç”¨ */
 	acl_aio_ctl(astream,
 		ACL_AIO_CTL_TIMEO_HOOK_DEL, connect_timeout_callback, entry,
 		ACL_AIO_CTL_END);
@@ -193,9 +193,9 @@ static int connect_timeout_callback(ACL_ASTREAM *astream, void *context)
 			myname, __LINE__, entry->dns_ctx.ip[entry->ip_idx],
 			entry->server_port);
 
-		/* ¶Ï¿ªÓë·şÎñ¶ËµÄÁ¬½Ó£¬µ«±£³ÖÓëä¯ÀÀÆ÷¶ËµÄÁ¬½Ó
-		 * XXX: ÒòÎª¸Ãº¯Êı½«Çå³ıÒ»Ğ©¹Ø±Õ»Øµ÷º¯Êı£¬²»ÖªÊÇ·ñ»áÔì³ÉÄ³Ğ©ÄÚ´æĞ¹Â©£¿
-		 * ×¢£¬´Ë´¦²¢²»¹Ø±Õ·şÎñ¶ËÁ¬½Ó£¬ĞèÒªµ÷ÓÃÕß×Ô¼ºÀ´¹Ø±Õ
+		/* æ–­å¼€ä¸æœåŠ¡ç«¯çš„è¿æ¥ï¼Œä½†ä¿æŒä¸æµè§ˆå™¨ç«¯çš„è¿æ¥
+		 * XXX: å› ä¸ºè¯¥å‡½æ•°å°†æ¸…é™¤ä¸€äº›å…³é—­å›è°ƒå‡½æ•°ï¼Œä¸çŸ¥æ˜¯å¦ä¼šé€ æˆæŸäº›å†…å­˜æ³„æ¼ï¼Ÿ
+		 * æ³¨ï¼Œæ­¤å¤„å¹¶ä¸å…³é—­æœåŠ¡ç«¯è¿æ¥ï¼Œéœ€è¦è°ƒç”¨è€…è‡ªå·±æ¥å…³é—­
 		 */
 		if (client_entry_detach(entry, acl_aio_vstream(entry->server)) == 1) {
 			acl_debug(3, 1) ("%s(%d): entry is freed", myname, __LINE__);
@@ -214,7 +214,7 @@ static int connect_timeout_callback(ACL_ASTREAM *astream, void *context)
 			ACL_AIO_CTL_CTX, entry,
 			ACL_AIO_CTL_END);
 
-		/* Í¨¹ı·µ»Ø-1£¬Ê¹Òì²½Á÷¿ò¼Ü¹Ø±Õ·şÎñ¶ËÁ¬½Ó */
+		/* é€šè¿‡è¿”å›-1ï¼Œä½¿å¼‚æ­¥æµæ¡†æ¶å…³é—­æœåŠ¡ç«¯è¿æ¥ */
 		return (-1);
 	}
 
@@ -251,10 +251,10 @@ void forward_start(CLIENT_ENTRY *entry)
 	const char *myname = "forward_start";
 	ACL_ASTREAM *server;
 
-	/* ÏÈ´ÓÁ¬½Ó³ØÖĞ³¢ÊÔÒ»¸öÁ¬½ÓÁ÷ */
+	/* å…ˆä»è¿æ¥æ± ä¸­å°è¯•ä¸€ä¸ªè¿æ¥æµ */
 	server = peek_server_conn(entry);
 	if (server == NULL) {
-		/* Èç¹ûÁ¬½Ó³ØÖĞÃ»ÓĞ¿ÉÀûÓÃµÄÁ¬½ÓÁ÷£¬Ôò¿ªÊ¼Á¬½Ó·şÎñ¶Ë */
+		/* å¦‚æœè¿æ¥æ± ä¸­æ²¡æœ‰å¯åˆ©ç”¨çš„è¿æ¥æµï¼Œåˆ™å¼€å§‹è¿æ¥æœåŠ¡ç«¯ */
 		server = forward_connect_next(entry);
 		if (server == NULL) {
 			acl_msg_error("%s: connect server_addr(%s:%d) error(%s)",
@@ -279,7 +279,7 @@ void forward_start(CLIENT_ENTRY *entry)
 			ACL_AIO_CTL_END);
 
 	} else {
-		/* ¸´ÓÃÁ¬½Ó³ØÖĞµÄÁ¬½Ó */
+		/* å¤ç”¨è¿æ¥æ± ä¸­çš„è¿æ¥ */
 
 		entry->flag_conn_reuse = 1;
 		client_entry_set_server(entry, server);

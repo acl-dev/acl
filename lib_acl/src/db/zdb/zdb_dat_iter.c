@@ -108,14 +108,14 @@ static const void *dat_iter_get_next(ZDB_DAT_STORE *store, ACL_ITER *iter)
 
     iter->data = iter->ptr = blk;
     iter->dlen = blk_len;
-    iter->i++;  /* ±£ÁôÏÂÒ»¸öË÷ÒıÎ»ÖÃ */
+    iter->i++;  /* ä¿ç•™ä¸‹ä¸€ä¸ªç´¢å¼•ä½ç½® */
     return iter->ptr;
 }
 
 /**
- * »ñµÃµü´úÆ÷Í·²¿Êı¾İ
- * @param iter {ACL_ITER*} µü´úÆ÷Ö¸Õë
- * @return {const void*} Êı¾İµØÖ·
+ * è·å¾—è¿­ä»£å™¨å¤´éƒ¨æ•°æ®
+ * @param iter {ACL_ITER*} è¿­ä»£å™¨æŒ‡é’ˆ
+ * @return {const void*} æ•°æ®åœ°å€
  */
 static const void *dat_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 {
@@ -153,7 +153,7 @@ static const void *dat_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 	}
 	iter->data = iter->ptr = blk;
 	iter->dlen = blk_len;
-	iter->i = (int) blk->hdr.inext_busy;  /* ±£ÁôÏÂÒ»¸öË÷ÒıÎ»ÖÃ */
+	iter->i = (int) blk->hdr.inext_busy;  /* ä¿ç•™ä¸‹ä¸€ä¸ªç´¢å¼•ä½ç½® */
 	return iter->ptr;
 #else
 	iter->i = 0;
@@ -162,9 +162,9 @@ static const void *dat_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 }
 
 /**
- * »ñµÃµü´úÆ÷µÄÄÇÒ»¸öÊı¾İ
- * @param iter {ACL_ITER*} µü´úÆ÷Ö¸Õë
- * @return {const void*} Êı¾İµØÖ·
+ * è·å¾—è¿­ä»£å™¨çš„é‚£ä¸€ä¸ªæ•°æ®
+ * @param iter {ACL_ITER*} è¿­ä»£å™¨æŒ‡é’ˆ
+ * @return {const void*} æ•°æ®åœ°å€
  */
 static const void *dat_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 {
@@ -199,7 +199,7 @@ static const void *dat_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 	}
 	iter->data = iter->ptr = blk;
 	iter->dlen = blk_len;
-	iter->i = (int) blk->hdr.inext_busy;  /* ±£ÁôÏÂÒ»¸öË÷ÒıÎ»ÖÃ */
+	iter->i = (int) blk->hdr.inext_busy;  /* ä¿ç•™ä¸‹ä¸€ä¸ªç´¢å¼•ä½ç½® */
 	return iter->ptr;
 #else
 	return dat_iter_get_next(store, iter);
@@ -286,14 +286,14 @@ static const void *hdr_iter_get_next(ZDB_DAT_STORE *store, ACL_ITER *iter)
     
     iter->data = iter->ptr = blk_hdr;
     iter->dlen = hdr_len;
-    iter->i++;  /* ±£ÁôÏÂÒ»¸öË÷ÒıÎ»ÖÃ */
+    iter->i++;  /* ä¿ç•™ä¸‹ä¸€ä¸ªç´¢å¼•ä½ç½® */
     return iter->ptr;
 }
 
 /**
- * »ñµÃµü´úÆ÷Í·²¿Êı¾İ
- * @param iter {ACL_ITER*} µü´úÆ÷Ö¸Õë
- * @return {const void*} Êı¾İµØÖ·
+ * è·å¾—è¿­ä»£å™¨å¤´éƒ¨æ•°æ®
+ * @param iter {ACL_ITER*} è¿­ä»£å™¨æŒ‡é’ˆ
+ * @return {const void*} æ•°æ®åœ°å€
  */
 static const void *hdr_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 {
@@ -330,7 +330,7 @@ static const void *hdr_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 	}
 	iter->data = iter->ptr = blk_hdr;
 	iter->dlen = hdr_len;
-	iter->i = (int) blk_hdr->inext_busy;  /* ±£ÁôÏÂÒ»¸öË÷ÒıÎ»ÖÃ */
+	iter->i = (int) blk_hdr->inext_busy;  /* ä¿ç•™ä¸‹ä¸€ä¸ªç´¢å¼•ä½ç½® */
 	return iter->ptr;
 #else
 	iter->i = 0;
@@ -339,9 +339,9 @@ static const void *hdr_iter_head(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 }
 
 /**
- * »ñµÃµü´úÆ÷µÄÄÇÒ»¸öÊı¾İ
- * @param iter {ACL_ITER*} µü´úÆ÷Ö¸Õë
- * @return {const void*} Êı¾İµØÖ·
+ * è·å¾—è¿­ä»£å™¨çš„é‚£ä¸€ä¸ªæ•°æ®
+ * @param iter {ACL_ITER*} è¿­ä»£å™¨æŒ‡é’ˆ
+ * @return {const void*} æ•°æ®åœ°å€
  */
 static const void *hdr_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 {
@@ -375,7 +375,7 @@ static const void *hdr_iter_next(ACL_ITER *iter, struct ZDB_DAT_STORE *store)
 	}
 	iter->data = iter->ptr = blk_hdr;
 	iter->dlen = hdr_len;
-	iter->i = (int) blk_hdr->inext_busy;  /* ±£ÁôÏÂÒ»¸öË÷ÒıÎ»ÖÃ */
+	iter->i = (int) blk_hdr->inext_busy;  /* ä¿ç•™ä¸‹ä¸€ä¸ªç´¢å¼•ä½ç½® */
 	return iter->ptr;
 #else
 	return hdr_iter_get_next(store, iter);

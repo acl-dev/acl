@@ -337,7 +337,7 @@ static const unsigned char hex_chars[] = "0123456789abcdef";
 
 const char* md5::hex_encode(const void* in, size_t len, char* out, size_t size)
 {
-	// size ³¤¶ÈÖÁÉÙÓ¦¸ÃÎª: len * 2 + 1
+	// size é•¿åº¦è‡³å°‘åº”è¯¥ä¸º: len * 2 + 1
 	if (size < 2 * len + 1) {
 		abort();
 	}

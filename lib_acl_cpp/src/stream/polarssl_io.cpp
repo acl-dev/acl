@@ -244,8 +244,8 @@ polarssl_io::~polarssl_io(void)
 		acl_myfree(ssn_);
 	}
 
-	// Ê¹ÓÃ havege_random Ëæ»úÊýÉú³ÉÆ÷Ê±£¬ÔÚÒ»Ð©Ðé»úÉÏ²¢²»ÄÜ±£Ö¤Ëæ»úÐÔ£¬
-	// ½¨ÒéÊ¹ÓÃ ctr_drbg_random Ëæ»úÊýÉú³ÉÆ÷
+	// ä½¿ç”¨ havege_random éšæœºæ•°ç”Ÿæˆå™¨æ—¶ï¼Œåœ¨ä¸€äº›è™šæœºä¸Šå¹¶ä¸èƒ½ä¿è¯éšæœºæ€§ï¼Œ
+	// å»ºè®®ä½¿ç”¨ ctr_drbg_random éšæœºæ•°ç”Ÿæˆå™¨
 # undef HAS_HAVEGE
 
 # ifdef HAS_HAVEGE
@@ -288,9 +288,9 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 	}
 
 #ifdef HAS_POLARSSL
-	// ·ÀÖ¹ÖØ¸´µ÷ÓÃ open ¹ý³Ì
+	// é˜²æ­¢é‡å¤è°ƒç”¨ open è¿‡ç¨‹
 	if (ssl_ != NULL) {
-		// Èç¹ûÊÇÍ¬Ò»¸öÁ÷£¬Ôò·µ»Ø true
+		// å¦‚æžœæ˜¯åŒä¸€ä¸ªæµï¼Œåˆ™è¿”å›ž true
 		if (stream_ == s) {
 			return true;
 		} else if (ACL_VSTREAM_SOCK(stream_) == ACL_VSTREAM_SOCK(s)) {
@@ -299,7 +299,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 			return true;
 		}
 
-		// ·ñÔò£¬½ûÖ¹Í¬Ò»¸ö SSL IO ¶ÔÏó±»°óÔÚ²»Í¬µÄÁ÷¶ÔÏóÉÏ
+		// å¦åˆ™ï¼Œç¦æ­¢åŒä¸€ä¸ª SSL IO å¯¹è±¡è¢«ç»‘åœ¨ä¸åŒçš„æµå¯¹è±¡ä¸Š
 		logger_error("open again, stream_ changed!");
 		return false;
 	}
@@ -311,7 +311,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 
 	int ret;
 
-	// ³õÊ¼»¯ SSL ¶ÔÏó
+	// åˆå§‹åŒ– SSL å¯¹è±¡
 	if ((ret = __ssl_init((ssl_context*) ssl_)) != 0) {
 		logger_error("failed, ssl_init error: -0x%04x\n", -ret);
 		acl_myfree(ssl_);
@@ -319,20 +319,20 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 		return false;
 	}
 
-	// ÐèÒªÇø·Ö SSL Á¬½ÓÊÇ¿Í»§¶ËÄ£Ê½»¹ÊÇ·þÎñÆ÷Ä£Ê½
+	// éœ€è¦åŒºåˆ† SSL è¿žæŽ¥æ˜¯å®¢æˆ·ç«¯æ¨¡å¼è¿˜æ˜¯æœåŠ¡å™¨æ¨¡å¼
 	if (server_side_) {
 		__ssl_set_endpoint((ssl_context*) ssl_, SSL_IS_SERVER);
 	} else {
 		__ssl_set_endpoint((ssl_context*) ssl_, SSL_IS_CLIENT);
 	}
 
-	// ³õÊ¼»¯Ëæ»úÊýÉú³É¹ý³Ì
+	// åˆå§‹åŒ–éšæœºæ•°ç”Ÿæˆè¿‡ç¨‹
 
 # ifdef HAS_HAVEGE
 	rnd_ = acl_mymalloc(sizeof(havege_state));
 	__havege_init((havege_state*) rnd_);
 
-	// ÉèÖÃËæ»úÊýÉú³ÉÆ÷
+	// è®¾ç½®éšæœºæ•°ç”Ÿæˆå™¨
 	__ssl_set_rng((ssl_context*) ssl_, __havege_random, rnd_);
 # else
 	rnd_ = acl_mymalloc(sizeof(ctr_drbg_context));
@@ -349,7 +349,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 		return false;
 	}
 
-	// ÉèÖÃËæ»úÊýÉú³ÉÆ÷
+	// è®¾ç½®éšæœºæ•°ç”Ÿæˆå™¨
 	__ssl_set_rng((ssl_context*) ssl_, __ctr_drbg_random, rnd_);
 # endif
 
@@ -358,7 +358,7 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 # endif
 	
 	if (!server_side_) {
-		// Ö»ÓÐ¿Í»§¶ËÄ£Ê½ÏÂ²Å»áµ÷ÓÃ´Ë¹ý³Ì
+		// åªæœ‰å®¢æˆ·ç«¯æ¨¡å¼ä¸‹æ‰ä¼šè°ƒç”¨æ­¤è¿‡ç¨‹
 
 		ssn_ = acl_mycalloc(1, sizeof(ssl_session));
 # ifdef POLARSSL_1_3_X
@@ -374,18 +374,18 @@ bool polarssl_io::open(ACL_VSTREAM* s)
 # endif
 	}
 
-	// ÅäÖÃÈ«¾Ö²ÎÊý£¨°üº¬Ö¤Êé¡¢Ë½Ô¿£©
+	// é…ç½®å…¨å±€å‚æ•°ï¼ˆåŒ…å«è¯ä¹¦ã€ç§é’¥ï¼‰
 	conf_.setup_certs(ssl_, server_side_);
 
 	// Setup SSL IO callback
 	__ssl_set_bio((ssl_context*) ssl_, sock_read, this, sock_send, this);
 
-	// ·Ç×èÈûÄ£Ê½ÏÂÏÈ²»Æô¶¯ SSL ÎÕÊÖ¹ý³Ì
+	// éžé˜»å¡žæ¨¡å¼ä¸‹å…ˆä¸å¯åŠ¨ SSL æ¡æ‰‹è¿‡ç¨‹
 	if (nblock_) {
 		return true;
 	}
 
-	// ×èÈûÄ£Ê½ÏÂ¿ÉÒÔÆô¶¯ SSL ÎÕÊÖ¹ý³Ì
+	// é˜»å¡žæ¨¡å¼ä¸‹å¯ä»¥å¯åŠ¨ SSL æ¡æ‰‹è¿‡ç¨‹
 	return handshake();
 #else
 	logger_error("define HAS_POLARSSL first!");
@@ -434,7 +434,7 @@ bool polarssl_io::handshake(void)
 	}
 
 	while (true) {
-		// SSL ÎÕÊÖ¹ý³Ì
+		// SSL æ¡æ‰‹è¿‡ç¨‹
 		int ret = __ssl_handshake((ssl_context*) ssl_);
 		if (ret == 0) {
 			handshake_ok_ = true;
@@ -509,12 +509,12 @@ int polarssl_io::read(void* buf, size_t len)
 		}
 	}
 
-	// Èç¹û SSL »º³åÇøÖÐ»¹ÓÐÎ´¶ÁÊý¾Ý£¬ÔòÐèÒªÖØÖÃÁ÷¿É¶Á±êÖ¾Î»£¬
-	// ÕâÑù¿ÉÒÔ´¥·¢ acl_vstream.c ¼° events.c ÖÐµÄÏµÍ³¶Á¹ý³Ì
+	// å¦‚æžœ SSL ç¼“å†²åŒºä¸­è¿˜æœ‰æœªè¯»æ•°æ®ï¼Œåˆ™éœ€è¦é‡ç½®æµå¯è¯»æ ‡å¿—ä½ï¼Œ
+	// è¿™æ ·å¯ä»¥è§¦å‘ acl_vstream.c åŠ events.c ä¸­çš„ç³»ç»Ÿè¯»è¿‡ç¨‹
 	if (__ssl_get_bytes_avail((ssl_context*) ssl_) > 0) {
 		stream_->read_ready = 1;
 	}
-	// ·ñÔò£¬È¡Ïû¿É¶Á×´Ì¬£¬±íÃ÷ SSL »º³åÇøÀïÃ»ÓÐÊý¾Ý
+	// å¦åˆ™ï¼Œå–æ¶ˆå¯è¯»çŠ¶æ€ï¼Œè¡¨æ˜Ž SSL ç¼“å†²åŒºé‡Œæ²¡æœ‰æ•°æ®
 	else {
 		stream_->read_ready = 0;
 	}
@@ -570,26 +570,26 @@ int polarssl_io::sock_read(void *ctx, unsigned char *buf, size_t len)
 	//	io->nblock_ ? "yes" : "no",
 	//	vs->read_ready ? "yes":"no");
 
-	// ·Ç×èÈûÄ£Ê½ÏÂ£¬Èç¹û read_ready ±êÖ¾Î»Îª 0£¬ÔòËµÃ÷ÓÐ¿ÉÄÜ
-	// ±¾´Î IO ½«¶Á²»µ½Êý¾Ý£¬ÎªÁË·ÀÖ¹¸Ã¶Á¹ý³Ì±»×èÈû£¬ËùÒÔ´Ë´¦Ö±½Ó
-	// ·µ»Ø¸ø polarssl ²¢¸æÖ®µÈ´ýÏÂ´Î¶Á£¬ÏÂ´Î¶Á²Ù×÷½«ÓÉÊÂ¼þÒýÇæ´¥·¢£¬
-	// ÕâÑù×öµÄÓÅµãÊÇÔÚ·Ç×èÈûÄ£Ê½ÏÂ¼´Ê¹Ì×½Ó×ÖÃ»ÓÐÉèÖÃÎª·Ç×èÈû×´Ì¬
-	// Ò²²»»á×èÈûÏß³Ì£¬µ«È±µãÊÇÔö¼ÓÁËÊÂ¼þÑ­»·´¥·¢µÄ´ÎÊý
+	// éžé˜»å¡žæ¨¡å¼ä¸‹ï¼Œå¦‚æžœ read_ready æ ‡å¿—ä½ä¸º 0ï¼Œåˆ™è¯´æ˜Žæœ‰å¯èƒ½
+	// æœ¬æ¬¡ IO å°†è¯»ä¸åˆ°æ•°æ®ï¼Œä¸ºäº†é˜²æ­¢è¯¥è¯»è¿‡ç¨‹è¢«é˜»å¡žï¼Œæ‰€ä»¥æ­¤å¤„ç›´æŽ¥
+	// è¿”å›žç»™ polarssl å¹¶å‘Šä¹‹ç­‰å¾…ä¸‹æ¬¡è¯»ï¼Œä¸‹æ¬¡è¯»æ“ä½œå°†ç”±äº‹ä»¶å¼•æ“Žè§¦å‘ï¼Œ
+	// è¿™æ ·åšçš„ä¼˜ç‚¹æ˜¯åœ¨éžé˜»å¡žæ¨¡å¼ä¸‹å³ä½¿å¥—æŽ¥å­—æ²¡æœ‰è®¾ç½®ä¸ºéžé˜»å¡žçŠ¶æ€
+	// ä¹Ÿä¸ä¼šé˜»å¡žçº¿ç¨‹ï¼Œä½†ç¼ºç‚¹æ˜¯å¢žåŠ äº†äº‹ä»¶å¾ªçŽ¯è§¦å‘çš„æ¬¡æ•°
 	if (io->nblock_ && vs->read_ready == 0) {
 		 int ret = acl_readable(fd);
 		 if (ret == -1) {
 			 return POLARSSL_ERR_NET_RECV_FAILED;
 		 } else if (ret == 0) {
-			// ±ØÐëÔÚ´Ë´¦ÉèÖÃÏµÍ³µÄ errno ºÅ£¬´Ë´¦ÊÇÄ£ÄâÁË
-			// ·Ç×èÈû¶Á¹ý³Ì
+			// å¿…é¡»åœ¨æ­¤å¤„è®¾ç½®ç³»ç»Ÿçš„ errno å·ï¼Œæ­¤å¤„æ˜¯æ¨¡æ‹Ÿäº†
+			// éžé˜»å¡žè¯»è¿‡ç¨‹
 			acl_set_error(ACL_EWOULDBLOCK);
 			return POLARSSL_ERR_NET_WANT_READ;
 		 }
 		 // else: ret == 1
 	}
 
-	// acl_socket_read ÄÚ²¿»á¸ù¾Ý vs->read_ready ±êÖ¾Î»¾ö¶¨ÊÇ·ñÐèÒª
-	// ÒÔ³¬Ê±·½Ê½¶ÁÊý¾Ý£¬Í¬Ê±»á×Ô¶¯Çå³ý vs->read_ready ±êÖ¾Î»
+	// acl_socket_read å†…éƒ¨ä¼šæ ¹æ® vs->read_ready æ ‡å¿—ä½å†³å®šæ˜¯å¦éœ€è¦
+	// ä»¥è¶…æ—¶æ–¹å¼è¯»æ•°æ®ï¼ŒåŒæ—¶ä¼šè‡ªåŠ¨æ¸…é™¤ vs->read_ready æ ‡å¿—ä½
 	int ret = acl_socket_read(fd, buf, len, vs->rw_timeout, vs, NULL);
 
 	if (ret < 0) {
@@ -626,7 +626,7 @@ int polarssl_io::sock_send(void *ctx, const unsigned char *buf, size_t len)
 	polarssl_io* io = (polarssl_io*) ctx;
 	ACL_VSTREAM* vs = io->stream_;
 
-	// µ±Îª·Ç×èÈûÄ£Ê½Ê±£¬³¬Ê±µÈ´ýÎª 0 Ãë
+	// å½“ä¸ºéžé˜»å¡žæ¨¡å¼æ—¶ï¼Œè¶…æ—¶ç­‰å¾…ä¸º 0 ç§’
 	int ret = acl_socket_write(ACL_VSTREAM_SOCK(vs), buf, len,
 			io->nblock_ ? 0 : vs->rw_timeout, vs, NULL);
 	if (ret < 0) {

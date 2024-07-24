@@ -8,7 +8,7 @@ class aio_handle;
 class aio_listen_stream;
 
 /**
- * Òì²½ÏûÏ¢·şÎñ¶Ë£¬´¿ĞéÀà
+ * å¼‚æ­¥æ¶ˆæ¯æœåŠ¡ç«¯ï¼Œçº¯è™šç±»
  */
 class ACL_CPP_API ipc_server : private aio_accept_callback
 {
@@ -18,34 +18,34 @@ public:
 	virtual ~ipc_server();
 
 	/**
-	 * ´ò¿ªÒì²½¼àÌı·şÎñÁ÷
-	 * @param handle {aio_handle*} Òì²½ÒıÇæ¾ä±ú£¬·Ç¿Õ
-	 * @param addr {const char*} ¼àÌıµØÖ·
-	 * @return {bool} ¼àÌıÊÇ·ñ³É¹¦
+	 * æ‰“å¼€å¼‚æ­¥ç›‘å¬æœåŠ¡æµ
+	 * @param handle {aio_handle*} å¼‚æ­¥å¼•æ“å¥æŸ„ï¼Œéç©º
+	 * @param addr {const char*} ç›‘å¬åœ°å€
+	 * @return {bool} ç›‘å¬æ˜¯å¦æˆåŠŸ
 	 */
 	bool open(aio_handle* handle, const char* addr = "127.0.0.1:0");
 
 	/**
-	 * µ± open ³É¹¦ºóÍ¨¹ı´Ëº¯Êı»ñµÃ¼àÌıµØÖ·
-	 * @return {const char*} ¼àÌıµØÖ·£¬¸ñÊ½Îª£º IP:PORT
+	 * å½“ open æˆåŠŸåé€šè¿‡æ­¤å‡½æ•°è·å¾—ç›‘å¬åœ°å€
+	 * @return {const char*} ç›‘å¬åœ°å€ï¼Œæ ¼å¼ä¸ºï¼š IP:PORT
 	 */
 	const char* get_addr() const;
 
 	/**
-	 * »ñµÃÒì²½Á÷¾ä±ú
+	 * è·å¾—å¼‚æ­¥æµå¥æŸ„
 	 * @return {aio_listen_stream*}
 	 */
 	aio_listen_stream* get_stream() const;
 
 	/**
-	 * »ñµÃÒì²½ÒıÇæ¾ä±ú
+	 * è·å¾—å¼‚æ­¥å¼•æ“å¥æŸ„
 	 */
 	aio_handle& get_handle() const;
 
 protected:
 	/**
-	 * µ±¼àÌıÁ÷³É¹¦´ò¿ªºóµÄ»Øµ÷º¯Êı
-	 * @param addr {const char*} Êµ¼ÊµÄ¼àÌıµØÖ·£¬¸ñÊ½£ºIP:PORT
+	 * å½“ç›‘å¬æµæˆåŠŸæ‰“å¼€åçš„å›è°ƒå‡½æ•°
+	 * @param addr {const char*} å®é™…çš„ç›‘å¬åœ°å€ï¼Œæ ¼å¼ï¼šIP:PORT
 	 */
 	virtual void on_open(const char*addr)
 	{
@@ -53,13 +53,13 @@ protected:
 	}
 
 	/**
-	 * µ±¼àÌıÁ÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı
+	 * å½“ç›‘å¬æµå…³é—­æ—¶çš„å›è°ƒå‡½æ•°
 	 */
 	virtual void on_close() {}
 
 	/**
-	 * µ±Òì²½¼àÌıÁ÷»ñµÃÒ»¸ö¿Í»§¶ËÁ¬½ÓºóµÄ»Øµ÷º¯Êı
-	 * @param client {aio_socket_stream*} ¿Í»§¶Ë IPC Á÷
+	 * å½“å¼‚æ­¥ç›‘å¬æµè·å¾—ä¸€ä¸ªå®¢æˆ·ç«¯è¿æ¥åçš„å›è°ƒå‡½æ•°
+	 * @param client {aio_socket_stream*} å®¢æˆ·ç«¯ IPC æµ
 	 */
 	virtual void on_accept(aio_socket_stream* client)
 	{
@@ -68,8 +68,8 @@ protected:
 
 #if defined(_WIN32) || defined(_WIN64)
 	/**
-	 * ¶ÔÓÚ»ùÓÚ _WIN32 ´°¿ÚÏûÏ¢µÄÇé¿ö£¬µ±µ÷ÓÃ open Ê±£¬ÔòÄÚ²¿
-	 * »á×Ô¶¯µ÷ÓÃ create_windows ¹ı³Ì
+	 * å¯¹äºåŸºäº _WIN32 çª—å£æ¶ˆæ¯çš„æƒ…å†µï¼Œå½“è°ƒç”¨ open æ—¶ï¼Œåˆ™å†…éƒ¨
+	 * ä¼šè‡ªåŠ¨è°ƒç”¨ create_windows è¿‡ç¨‹
 	 */
 	virtual bool create_window()
 	{
@@ -82,19 +82,19 @@ private:
 	aio_listen_stream* sstream_;
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±ÓĞĞÂÁ¬½Óµ½´ïºóµ÷ÓÃ´Ë»Øµ÷¹ı³Ì
-	 * @param client {aio_socket_stream*} Òì²½¿Í»§¶ËÁ÷
-	 * @return {bool} ·µ»Ø true ÒÔÍ¨Öª¼àÌıÁ÷¼ÌĞø¼àÌı
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“æœ‰æ–°è¿æ¥åˆ°è¾¾åè°ƒç”¨æ­¤å›è°ƒè¿‡ç¨‹
+	 * @param client {aio_socket_stream*} å¼‚æ­¥å®¢æˆ·ç«¯æµ
+	 * @return {bool} è¿”å› true ä»¥é€šçŸ¥ç›‘å¬æµç»§ç»­ç›‘å¬
 	 */
 	virtual bool accept_callback(aio_socket_stream* client);
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±¼àÌıÁ÷¹Ø±ÕÊ±µÄ»Øµ÷¹ı³Ì
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“ç›‘å¬æµå…³é—­æ—¶çš„å›è°ƒè¿‡ç¨‹
 	 */
 	virtual void close_callback();
 
 	/**
-	 * »ùÀàĞéº¯Êı£¬µ±¼àÌıÁ÷³¬Ê±µÄ»Øµ÷¹ı³Ì
+	 * åŸºç±»è™šå‡½æ•°ï¼Œå½“ç›‘å¬æµè¶…æ—¶çš„å›è°ƒè¿‡ç¨‹
 	 */
 	virtual bool timeout_callback();
 };

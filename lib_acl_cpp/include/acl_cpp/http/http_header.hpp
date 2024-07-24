@@ -14,110 +14,110 @@ class string;
 class HttpCookie;
 
 /**
- * HTTP Í·Àà£¬¿ÉÒÔ¹¹½¨ÇëÇóÍ·»òÏìÓ¦Í·
+ * HTTP å¤´ç±»ï¼Œå¯ä»¥æ„å»ºè¯·æ±‚å¤´æˆ–å“åº”å¤´
 */
 class ACL_CPP_API http_header : public dbuf_obj
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * æ„é€ å‡½æ•°
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	http_header(dbuf_guard* dbuf = NULL);
 
 	/**
-	 * HTTP ÇëÇóÍ·¹¹Ôìº¯Êı
-	 * @param url {const char*} ÇëÇóµÄ URL£¬url ¸ñÊ½Ê¾ÀıÈçÏÂ£º
+	 * HTTP è¯·æ±‚å¤´æ„é€ å‡½æ•°
+	 * @param url {const char*} è¯·æ±‚çš„ URLï¼Œurl æ ¼å¼ç¤ºä¾‹å¦‚ä¸‹ï¼š
 	 *   http://www.test.com/
 	 *   /cgi-bin/test.cgi
 	 *   http://www.test.com/cgi-bin/test.cgi
 	 *   http://www.test.com/cgi-bin/test.cgi?name=value
 	 *   /cgi-bin/test.cgi?name=value
-	 * Èç¹û¸Ã url ÖĞÓĞÖ÷»ú×Ö¶Î£¬ÔòÄÚ²¿×Ô¶¯Ìí¼ÓÖ÷»ú£»
-	 * Èç¹û¸Ã url ÖĞÓĞ²ÎÊı×Ö¶Î£¬ÔòÄÚ²¿×Ô¶¯½øĞĞ´¦Àí²¢µ÷ÓÃ add_param ·½·¨£»
-	 * µ÷ÓÃ¸Ãº¯ÊıºóÓÃ»§ÈÔ¿ÉÒÔµ÷ÓÃ add_param µÈº¯ÊıÌí¼ÓÆäËü²ÎÊı£»
-	 * µ±²ÎÊı×Ö¶ÎÖ»ÓĞ²ÎÊıÃûÃ»ÓĞ²ÎÊıÖµÊ±£¬¸Ã²ÎÊı½«»á±»ºöÂÔ£¬ËùÒÔÈç¹ûÏë
-	 * µ¥¶ÀÌí¼Ó²ÎÊıÃû£¬Ó¦¸Ãµ÷ÓÃ add_param ·½·¨À´Ìí¼Ó
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
-	 * @param encoding {bool} ÊÇ·ñ¶Ô´æÔÚÓÚ url ÖĞµÄ²ÎÊı½øĞĞ url ±àÂë£¬Èç¹ûÎª
-	 *  true Ôò»áÖØĞÂ½âÎö url ²¢ÖØĞÂ¶Ô url ÖĞµÄ²ÎÊı½øĞĞ±àÂë£¬·ñÔòÔò url ±£³ÖÔ­Ñù
+	 * å¦‚æœè¯¥ url ä¸­æœ‰ä¸»æœºå­—æ®µï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨æ·»åŠ ä¸»æœºï¼›
+	 * å¦‚æœè¯¥ url ä¸­æœ‰å‚æ•°å­—æ®µï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨è¿›è¡Œå¤„ç†å¹¶è°ƒç”¨ add_param æ–¹æ³•ï¼›
+	 * è°ƒç”¨è¯¥å‡½æ•°åç”¨æˆ·ä»å¯ä»¥è°ƒç”¨ add_param ç­‰å‡½æ•°æ·»åŠ å…¶å®ƒå‚æ•°ï¼›
+	 * å½“å‚æ•°å­—æ®µåªæœ‰å‚æ•°åæ²¡æœ‰å‚æ•°å€¼æ—¶ï¼Œè¯¥å‚æ•°å°†ä¼šè¢«å¿½ç•¥ï¼Œæ‰€ä»¥å¦‚æœæƒ³
+	 * å•ç‹¬æ·»åŠ å‚æ•°åï¼Œåº”è¯¥è°ƒç”¨ add_param æ–¹æ³•æ¥æ·»åŠ 
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
+	 * @param encoding {bool} æ˜¯å¦å¯¹å­˜åœ¨äº url ä¸­çš„å‚æ•°è¿›è¡Œ url ç¼–ç ï¼Œå¦‚æœä¸º
+	 *  true åˆ™ä¼šé‡æ–°è§£æ url å¹¶é‡æ–°å¯¹ url ä¸­çš„å‚æ•°è¿›è¡Œç¼–ç ï¼Œå¦åˆ™åˆ™ url ä¿æŒåŸæ ·
 	 */
 	http_header(const char* url, dbuf_guard* dbuf = NULL,
 		bool encoding = true);
 
 	/**
-	 * HTTP ÏìÓ¦Í·¹¹Ôìº¯Êı
-	 * @param status {int} ×´Ì¬×ÖÈç£º1xx, 2xx, 3xx, 4xx, 5xx
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * HTTP å“åº”å¤´æ„é€ å‡½æ•°
+	 * @param status {int} çŠ¶æ€å­—å¦‚ï¼š1xx, 2xx, 3xx, 4xx, 5xx
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	http_header(int status, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * ¸ù¾İ CÓïÑÔ µÄ HTTP ÏìÓ¦Í·½øĞĞ¹¹Ôì
+	 * æ ¹æ® Cè¯­è¨€ çš„ HTTP å“åº”å¤´è¿›è¡Œæ„é€ 
 	 * @param hdr_res {const HTTP_HDR_RES&}
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	http_header(const HTTP_HDR_RES& hdr_res, dbuf_guard* dbuf = NULL);
 
 	/**
-	 * ¸ù¾İ CÓïÑÔ µÄ HTTP ÇëÇóÍ·½øĞĞ¹¹Ôì
+	 * æ ¹æ® Cè¯­è¨€ çš„ HTTP è¯·æ±‚å¤´è¿›è¡Œæ„é€ 
 	 * @param hdr_req {const HTTP_HDR_REQ&}
-	 * @param dbuf {dbuf_guard*} ·Ç¿ÕÊ±½«×öÎªÄÚ´æ·ÖÅä³Ø
+	 * @param dbuf {dbuf_guard*} éç©ºæ—¶å°†åšä¸ºå†…å­˜åˆ†é…æ± 
 	 */
 	http_header(const HTTP_HDR_REQ& hdr_req, dbuf_guard* dbuf = NULL);
 
 	virtual ~http_header(void);
 
 	/**
-	 * ÖØÖÃ HTTP Í·ĞÅÏ¢Í¬Ê±½«ÉÏ´ÎµÄÁÙÊ±×ÊÔ´ÊÍ·Å
+	 * é‡ç½® HTTP å¤´ä¿¡æ¯åŒæ—¶å°†ä¸Šæ¬¡çš„ä¸´æ—¶èµ„æºé‡Šæ”¾
 	 */
 	void reset(void);
 
 	//////////////////////////////////////////////////////////////////////
-	//            HTTP ÇëÇóÓë HTTP ÏìÓ¦Í¨ÓÃµÄ·½·¨º¯Êı
+	//            HTTP è¯·æ±‚ä¸ HTTP å“åº”é€šç”¨çš„æ–¹æ³•å‡½æ•°
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ÉèÖÃ HTTP Ğ­Òé°æ±¾ºÅ
-	 * @param version {const char*} HTTP Ğ­Òé°æ±¾ºÅ£¬¸ñÊ½£º1.0, 1.1
+	 * è®¾ç½® HTTP åè®®ç‰ˆæœ¬å·
+	 * @param version {const char*} HTTP åè®®ç‰ˆæœ¬å·ï¼Œæ ¼å¼ï¼š1.0, 1.1
 	 * @return {http_header&}
 	 */
 	http_header& set_proto_version(const char* version);
 
 	/**
-	 * ÉèÖÃ HTTP Í·ÊÇ¿Í»§¶ËµÄÇëÇóÍ·»¹ÊÇ·şÎñÆ÷µÄÏìÓ¦Í·
-	 * @param onoff {bool} true ±íÊ¾ÊÇÇëÇóÍ·£¬·ñÔò±íÊ¾ÏìÓ¦Í·
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP å¤´æ˜¯å®¢æˆ·ç«¯çš„è¯·æ±‚å¤´è¿˜æ˜¯æœåŠ¡å™¨çš„å“åº”å¤´
+	 * @param onoff {bool} true è¡¨ç¤ºæ˜¯è¯·æ±‚å¤´ï¼Œå¦åˆ™è¡¨ç¤ºå“åº”å¤´
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_request_mode(bool onoff);
 
 	/**
-	 * Ïò HTTP Í·ÖĞÌí¼Ó×Ö¶Î
-	 * @param name {const char*} ×Ö¶ÎÃû£¬·Ç¿ÕÖ¸Õë
-	 * @param value {const char*} ×Ö¶ÎÖµ£¬·Ç¿ÕÖ¸Õë
-	 * @param replace {bool} Èç¹û´æÔÚÖØ¸´ÏîÊ±ÊÇ·ñ×Ô¶¯¸²¸Ç¾ÉÊı¾İ
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * å‘ HTTP å¤´ä¸­æ·»åŠ å­—æ®µ
+	 * @param name {const char*} å­—æ®µåï¼Œéç©ºæŒ‡é’ˆ
+	 * @param value {const char*} å­—æ®µå€¼ï¼Œéç©ºæŒ‡é’ˆ
+	 * @param replace {bool} å¦‚æœå­˜åœ¨é‡å¤é¡¹æ—¶æ˜¯å¦è‡ªåŠ¨è¦†ç›–æ—§æ•°æ®
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& add_entry(const char* name, const char* value,
 			bool replace = true);
 	
 	/**
-	 * ´Ó HTTP Í·ÖĞ»ñµÃÖ¸¶¨µÄÍ·²¿×Ö¶Î
-	 * @param name {const char*} ×Ö¶ÎÃû£¬·Ç¿ÕÖ¸Õë
-	 * @return {const char*} ·µ»ØÖµ NULL ±íÊ¾²»´æÔÚ
+	 * ä» HTTP å¤´ä¸­è·å¾—æŒ‡å®šçš„å¤´éƒ¨å­—æ®µ
+	 * @param name {const char*} å­—æ®µåï¼Œéç©ºæŒ‡é’ˆ
+	 * @return {const char*} è¿”å›å€¼ NULL è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* get_entry(const char* name) const;
 
 	/**
-	 * ÉèÖÃ HTTP Í·ÖĞµÄ Content-Length ×Ö¶Î
-	 * @param n {int64} ÉèÖÃÖµ
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP å¤´ä¸­çš„ Content-Length å­—æ®µ
+	 * @param n {int64} è®¾ç½®å€¼
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	http_header& set_content_length(__int64 n);
 
 	/**
-	 * »ñµÃÍ¨¹ı set_content_length ÉèÖÃµÄ HTTP Í·ÖĞµÄ Content-Length Öµ
+	 * è·å¾—é€šè¿‡ set_content_length è®¾ç½®çš„ HTTP å¤´ä¸­çš„ Content-Length å€¼
 	 * @return {int64}
 	 */
 	__int64 get_content_length() const
@@ -133,13 +133,13 @@ public:
 #endif
 
 	/**
-	 * ÉèÖÃ HTTP ÇëÇóÍ·£¨ÏìÓ¦Í·£©ÖĞµÄ Range ×Ö¶Î£¬ÓÃÓÚ·Ö¶ÎÇëÇó£¨ÏìÓ¦£©Êı¾İ£¬
-	 * ¶àÓÃÓÚÖ§³Ö¶ÏµãĞø´«µÄ WEB ·şÎñÆ÷ÖĞ
-	 * @param from {http_off_t} ÆğÊ¼Æ«ÒÆÎ»ÖÃ£¬ÏÂ±ê´Ó 0 ¿ªÊ¼£¬¸Ã
-	 *  Öµµ± >= 0 Ê±²ÅÓĞĞ§
-	 * @param to {http_off_t} ÇëÇó½áÊøÆ«ÒÆÎ»ÖÃ£¬ÏÂ±ê´Ó 0 ¿ªÊ¼£¬
-	 *  ÔÚÇëÇóÍ·ÖĞµ±¸ÃÖµÊäÈë < 0 Ê±£¬ÔòÈÏÎªÊÇÇëÇó´ÓÆğÊ¼Î»ÖÃ¿ªÊ¼ÖÁ×îÖÕ³¤¶ÈÎ»ÖÃ
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP è¯·æ±‚å¤´ï¼ˆå“åº”å¤´ï¼‰ä¸­çš„ Range å­—æ®µï¼Œç”¨äºåˆ†æ®µè¯·æ±‚ï¼ˆå“åº”ï¼‰æ•°æ®ï¼Œ
+	 * å¤šç”¨äºæ”¯æŒæ–­ç‚¹ç»­ä¼ çš„ WEB æœåŠ¡å™¨ä¸­
+	 * @param from {http_off_t} èµ·å§‹åç§»ä½ç½®ï¼Œä¸‹æ ‡ä» 0 å¼€å§‹ï¼Œè¯¥
+	 *  å€¼å½“ >= 0 æ—¶æ‰æœ‰æ•ˆ
+	 * @param to {http_off_t} è¯·æ±‚ç»“æŸåç§»ä½ç½®ï¼Œä¸‹æ ‡ä» 0 å¼€å§‹ï¼Œ
+	 *  åœ¨è¯·æ±‚å¤´ä¸­å½“è¯¥å€¼è¾“å…¥ < 0 æ—¶ï¼Œåˆ™è®¤ä¸ºæ˜¯è¯·æ±‚ä»èµ·å§‹ä½ç½®å¼€å§‹è‡³æœ€ç»ˆé•¿åº¦ä½ç½®
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	http_header& set_range(__int64 from, __int64 to);
@@ -148,8 +148,8 @@ public:
 #endif
 
 	/**
-	 * ¶ÔÓÚÏìÓ¦Í·ÔÚ·Ö¶Î´«ÊäÇ°ĞèÒªµ÷ÓÃ´Ëº¯ÊıÉèÖÃÊı¾İÌå×Ü³¤¶È
-	 * @param total {http_off_t} ½ö¶ÔÓÚÏìÓ¦Í·£¬¸Ã²ÎÊıĞèÒªÉèÎªÊı¾İ×Ü³¤¶È
+	 * å¯¹äºå“åº”å¤´åœ¨åˆ†æ®µä¼ è¾“å‰éœ€è¦è°ƒç”¨æ­¤å‡½æ•°è®¾ç½®æ•°æ®ä½“æ€»é•¿åº¦
+	 * @param total {http_off_t} ä»…å¯¹äºå“åº”å¤´ï¼Œè¯¥å‚æ•°éœ€è¦è®¾ä¸ºæ•°æ®æ€»é•¿åº¦
 	 * @return {http_header&}
 	 */
 #if defined(_WIN32) || defined(_WIN64)
@@ -159,9 +159,9 @@ public:
 #endif
 
 	/**
-	 * »ñµÃÓÉ set_range ÉèÖÃµÄ·Ö¶ÎÇëÇóÎ»ÖÃÖµ
-	 * @param from {http_off_t*} ·Ç¿ÕÊ±´æ´¢ÆğÊ¼Î»ÖÃÆ«ÒÆ
-	 * @param to {http_off_t*} ·Ç¿ÕÊ±´æ´¢½áÊøÎ»ÖÃÆ«ÒÆ
+	 * è·å¾—ç”± set_range è®¾ç½®çš„åˆ†æ®µè¯·æ±‚ä½ç½®å€¼
+	 * @param from {http_off_t*} éç©ºæ—¶å­˜å‚¨èµ·å§‹ä½ç½®åç§»
+	 * @param to {http_off_t*} éç©ºæ—¶å­˜å‚¨ç»“æŸä½ç½®åç§»
 	 */
 #if defined(_WIN32) || defined(_WIN64)
 	void get_range(__int64* from, __int64* to);
@@ -170,23 +170,23 @@ public:
 #endif
 
 	/**
-	 * ÉèÖÃ HTTP Í·ÖĞµÄ Content-Type ×Ö¶Î
-	 * @param value {const char*} ÉèÖÃÖµ
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP å¤´ä¸­çš„ Content-Type å­—æ®µ
+	 * @param value {const char*} è®¾ç½®å€¼
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_content_type(const char* value);
 
 	/**
-	 * ÉèÖÃ HTTP Í·ÖĞµÄ Connection ×Ö¶Î£¬ÊÇ·ñ±£³Ö³¤Á¬½Ó
-	 * ²»¹ı£¬Ä¿Ç°²¢Î´ÕæÕıÖ§³Ö³¤Á¬½Ó£¬¼´Ê¹ÉèÖÃÁË¸Ã±êÖ¾Î»£¬
-	 * ÔòµÃµ½ÏìÓ¦Êı¾İºóÒ²»áÖ÷¶¯¹Ø±ÕÁ¬½Ó
-	 * @param on {bool} ÊÇ·ñ±£³Ö³¤Á¬½Ó
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP å¤´ä¸­çš„ Connection å­—æ®µï¼Œæ˜¯å¦ä¿æŒé•¿è¿æ¥
+	 * ä¸è¿‡ï¼Œç›®å‰å¹¶æœªçœŸæ­£æ”¯æŒé•¿è¿æ¥ï¼Œå³ä½¿è®¾ç½®äº†è¯¥æ ‡å¿—ä½ï¼Œ
+	 * åˆ™å¾—åˆ°å“åº”æ•°æ®åä¹Ÿä¼šä¸»åŠ¨å…³é—­è¿æ¥
+	 * @param on {bool} æ˜¯å¦ä¿æŒé•¿è¿æ¥
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_keep_alive(bool on);
 
 	/**
-	 * ¼ì²éµ±Ç°Í·ÊÇ·ñÉèÖÃÁË±£³Ö³¤Á¬½ÓÑ¡Ïî
+	 * æ£€æŸ¥å½“å‰å¤´æ˜¯å¦è®¾ç½®äº†ä¿æŒé•¿è¿æ¥é€‰é¡¹
 	 */
 	bool get_keep_alive() const
 	{
@@ -200,92 +200,92 @@ public:
 	}
 
 	/**
-	 * Ïò HTTP Í·ÖĞÌí¼Ó cookie
-	 * @param name {const char*} cookie Ãû
-	 * @param value {const char*} cookie Öµ
-	 * @param domain {const char*} ËùÊôÓò
-	 * @param path {const char*} ´æ´¢Â·¾¶
-	 * @param expires {time_t} ¹ıÆÚÊ±¼ä£¬µ±¸ÃÖµÎª 0 Ê±±íÊ¾²»¹ıÆÚ£¬
-	 *  > 0 Ê±£¬Ôò´ÓÏÖÔÚÆğÔÙÔö¼Ó expires ¼´Îª¹ıÆÚÊ±¼ä£¬µ¥Î»ÎªÃë
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * å‘ HTTP å¤´ä¸­æ·»åŠ  cookie
+	 * @param name {const char*} cookie å
+	 * @param value {const char*} cookie å€¼
+	 * @param domain {const char*} æ‰€å±åŸŸ
+	 * @param path {const char*} å­˜å‚¨è·¯å¾„
+	 * @param expires {time_t} è¿‡æœŸæ—¶é—´ï¼Œå½“è¯¥å€¼ä¸º 0 æ—¶è¡¨ç¤ºä¸è¿‡æœŸï¼Œ
+	 *  > 0 æ—¶ï¼Œåˆ™ä»ç°åœ¨èµ·å†å¢åŠ  expires å³ä¸ºè¿‡æœŸæ—¶é—´ï¼Œå•ä½ä¸ºç§’
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& add_cookie(const char* name, const char* value,
 		const char* domain = NULL, const char* path = NULL,
 		time_t expires = 0);
 
 	/**
-	 * Ïò HTTP Í·ÖĞÌí¼Ó cookie
-	 * @param cookie {const http_cookie*} cookie ¶ÔÏó
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * å‘ HTTP å¤´ä¸­æ·»åŠ  cookie
+	 * @param cookie {const http_cookie*} cookie å¯¹è±¡
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& add_cookie(const HttpCookie* cookie);
 
 	/**
-	 * ´Ó HTTP Í·ÖĞ»ñµÃ¶ÔÓ¦Ãû³ÆµÄ cookie ¶ÔÏó
-	 * @param name {const char*} cookie Ãû
+	 * ä» HTTP å¤´ä¸­è·å¾—å¯¹åº”åç§°çš„ cookie å¯¹è±¡
+	 * @param name {const char*} cookie å
 	 * @return {const HttpCookie*}
 	 */
 	const HttpCookie* get_cookie(const char* name) const;
 
 	/**
-	 * ½«ÕûĞÍµÄÈÕÆÚ×ª»»Îª rfc1123 ×Ö·û´®¸ñÊ½µÄÈÕÆÚ
+	 * å°†æ•´å‹çš„æ—¥æœŸè½¬æ¢ä¸º rfc1123 å­—ç¬¦ä¸²æ ¼å¼çš„æ—¥æœŸ
 	 */
 	static void date_format(char* out, size_t size, time_t t);
 
 	/**
-	 * ÅĞ¶ÏÊÇ·ñÊÇ HTTP ÇëÇóÍ·
-	 * @return {bool} ·µ»Ø false ±íÃ÷ÊÇ HTTP ÏìÓ¦Í·
+	 * åˆ¤æ–­æ˜¯å¦æ˜¯ HTTP è¯·æ±‚å¤´
+	 * @return {bool} è¿”å› false è¡¨æ˜æ˜¯ HTTP å“åº”å¤´
 	 */
 	bool is_request(void) const;
 
 	/**
-	 * ÉèÖÃ±êÖ¾Î»£¬Õë¶Ô HTTP ÇëÇóµÄ URI ÖĞµÄ ? ÎÊºÅ±»×ªÒå(¼´±»×ª³É %3F)µÄÇëÇóÊÇ·ñ
-	 * ×ö¼æÈİĞÔ´¦Àí£¬ÄÚ²¿È±Ê¡Îª×ö¼æÈİĞÔ´¦Àí
-	 * @param on {bool} Îª true ±íÊ¾×ö¼æÈİĞÔ´¦Àí
+	 * è®¾ç½®æ ‡å¿—ä½ï¼Œé’ˆå¯¹ HTTP è¯·æ±‚çš„ URI ä¸­çš„ ? é—®å·è¢«è½¬ä¹‰(å³è¢«è½¬æˆ %3F)çš„è¯·æ±‚æ˜¯å¦
+	 * åšå…¼å®¹æ€§å¤„ç†ï¼Œå†…éƒ¨ç¼ºçœä¸ºåšå…¼å®¹æ€§å¤„ç†
+	 * @param on {bool} ä¸º true è¡¨ç¤ºåšå…¼å®¹æ€§å¤„ç†
 	 */
 	static void uri_unsafe_correct(bool on);
 
 	//////////////////////////////////////////////////////////////////////
-	//                        HTTP ÇëÇó·½·¨º¯Êı
+	//                        HTTP è¯·æ±‚æ–¹æ³•å‡½æ•°
 	//////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * ´´½¨ HTTP ÇëÇóÍ·Êı¾İ
-	 * @param buf {string&} ´æ´¢½á¹ûÊı¾İ
-	 * @return {bool} ´´½¨ÇëÇóÍ·ÖĞ·ñ³É¹¦
+	 * åˆ›å»º HTTP è¯·æ±‚å¤´æ•°æ®
+	 * @param buf {string&} å­˜å‚¨ç»“æœæ•°æ®
+	 * @return {bool} åˆ›å»ºè¯·æ±‚å¤´ä¸­å¦æˆåŠŸ
 	 */
 	bool build_request(string& buf) const;
 
 	/**
-	 * ÉèÖÃÇëÇóµÄ URL£¬url ¸ñÊ½Ê¾ÀıÈçÏÂ£º
-	 * 1¡¢http://www.test.com/
-	 * 2¡¢/cgi-bin/test.cgi
-	 * 3¡¢http://www.test.com/cgi-bin/test.cgi
-	 * 3¡¢http://www.test.com/cgi-bin/test.cgi?name=value
-	 * 4¡¢/cgi-bin/test.cgi?name=value
-	 * 5¡¢http://www.test.com
-	 * Èç¹û¸Ã url ÖĞÓĞÖ÷»ú×Ö¶Î£¬ÔòÄÚ²¿×Ô¶¯Ìí¼ÓÖ÷»ú£»
-	 * Èç¹û¸Ã url ÖĞÓĞ²ÎÊı×Ö¶Î£¬ÔòÄÚ²¿×Ô¶¯½øĞĞ´¦Àí²¢µ÷ÓÃ add_param ·½·¨£»
-	 * µ÷ÓÃ¸Ãº¯ÊıºóÓÃ»§ÈÔ¿ÉÒÔµ÷ÓÃ add_param µÈº¯ÊıÌí¼ÓÆäËü²ÎÊı£»
-	 * µ±²ÎÊı×Ö¶ÎÖ»ÓĞ²ÎÊıÃûÃ»ÓĞ²ÎÊıÖµÊ±£¬¸Ã²ÎÊı½«»á±»ºöÂÔ£¬ËùÒÔÈç¹ûÏë
-	 * µ¥¶ÀÌí¼Ó²ÎÊıÃû£¬Ó¦¸Ãµ÷ÓÃ add_param ·½·¨À´Ìí¼Ó
-	 * @param url {const char*} ÇëÇóµÄ url£¬·Ç¿ÕÖ¸Õë
-	 * @param encoding {bool} ÊÇ·ñ¶Ô´æÔÚÓÚ url ÖĞµÄ²ÎÊı½øĞĞ url ±àÂë£¬Èç¹ûÎª
-	 *  true Ôò»áÖØĞÂ½âÎö url ²¢ÖØĞÂ¶Ô url ÖĞµÄ²ÎÊı½øĞĞ±àÂë£¬·ñÔòÔò url ±£³ÖÔ­Ñù
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½®è¯·æ±‚çš„ URLï¼Œurl æ ¼å¼ç¤ºä¾‹å¦‚ä¸‹ï¼š
+	 * 1ã€http://www.test.com/
+	 * 2ã€/cgi-bin/test.cgi
+	 * 3ã€http://www.test.com/cgi-bin/test.cgi
+	 * 3ã€http://www.test.com/cgi-bin/test.cgi?name=value
+	 * 4ã€/cgi-bin/test.cgi?name=value
+	 * 5ã€http://www.test.com
+	 * å¦‚æœè¯¥ url ä¸­æœ‰ä¸»æœºå­—æ®µï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨æ·»åŠ ä¸»æœºï¼›
+	 * å¦‚æœè¯¥ url ä¸­æœ‰å‚æ•°å­—æ®µï¼Œåˆ™å†…éƒ¨è‡ªåŠ¨è¿›è¡Œå¤„ç†å¹¶è°ƒç”¨ add_param æ–¹æ³•ï¼›
+	 * è°ƒç”¨è¯¥å‡½æ•°åç”¨æˆ·ä»å¯ä»¥è°ƒç”¨ add_param ç­‰å‡½æ•°æ·»åŠ å…¶å®ƒå‚æ•°ï¼›
+	 * å½“å‚æ•°å­—æ®µåªæœ‰å‚æ•°åæ²¡æœ‰å‚æ•°å€¼æ—¶ï¼Œè¯¥å‚æ•°å°†ä¼šè¢«å¿½ç•¥ï¼Œæ‰€ä»¥å¦‚æœæƒ³
+	 * å•ç‹¬æ·»åŠ å‚æ•°åï¼Œåº”è¯¥è°ƒç”¨ add_param æ–¹æ³•æ¥æ·»åŠ 
+	 * @param url {const char*} è¯·æ±‚çš„ urlï¼Œéç©ºæŒ‡é’ˆ
+	 * @param encoding {bool} æ˜¯å¦å¯¹å­˜åœ¨äº url ä¸­çš„å‚æ•°è¿›è¡Œ url ç¼–ç ï¼Œå¦‚æœä¸º
+	 *  true åˆ™ä¼šé‡æ–°è§£æ url å¹¶é‡æ–°å¯¹ url ä¸­çš„å‚æ•°è¿›è¡Œç¼–ç ï¼Œå¦åˆ™åˆ™ url ä¿æŒåŸæ ·
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_url(const char* url, bool encoding = true);
 
 	/**
-	 * ÉèÖÃ HTTP ÇëÇóÍ·µÄ HOST ×Ö¶Î
-	 * @param value {const char*} ÇëÇóÍ·µÄ HOST ×Ö¶ÎÖµ
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP è¯·æ±‚å¤´çš„ HOST å­—æ®µ
+	 * @param value {const char*} è¯·æ±‚å¤´çš„ HOST å­—æ®µå€¼
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_host(const char* value);
 
 	/**
-	 * »ñµÃÉèÖÃµÄ HTTP ÇëÇóÍ·ÖĞµÄ HOST ×Ö¶Î
-	 * @return {const char*} ·µ»Ø¿ÕÖ¸Õë±íÊ¾Ã»ÓĞÉèÖÃ HOST ×Ö¶Î
+	 * è·å¾—è®¾ç½®çš„ HTTP è¯·æ±‚å¤´ä¸­çš„ HOST å­—æ®µ
+	 * @return {const char*} è¿”å›ç©ºæŒ‡é’ˆè¡¨ç¤ºæ²¡æœ‰è®¾ç½® HOST å­—æ®µ
 	 */
 	const char* get_host() const
 	{
@@ -293,50 +293,50 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃ HTTP Ğ­ÒéµÄÇëÇó·½·¨£¬Èç¹û²»µ÷ÓÃ´Ëº¯Êı£¬ÔòÄ¬ÈÏÓÃ GET ·½·¨
-	 * @param method {http_method_t} HTTP ÇëÇó·½·¨
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP åè®®çš„è¯·æ±‚æ–¹æ³•ï¼Œå¦‚æœä¸è°ƒç”¨æ­¤å‡½æ•°ï¼Œåˆ™é»˜è®¤ç”¨ GET æ–¹æ³•
+	 * @param method {http_method_t} HTTP è¯·æ±‚æ–¹æ³•
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_method(http_method_t method);
 
 	/**
-	 * ÉèÖÃ HTTP Ğ­ÒéµÄÇëÇó·½·¨£¬±¾º¯ÊıÔÊĞíÓÃ»§À©Õ¹ HTTP ÇëÇó·½·¨£¬
-	 * Í¨¹ı¸Ãº¯ÊıÉèÖÃµÄÇëÇó·½·¨½öÓ°Ïì HTTP ÇëÇó¹ı³Ì
-	 * @param method {const char*} ÇëÇó·½·¨
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP åè®®çš„è¯·æ±‚æ–¹æ³•ï¼Œæœ¬å‡½æ•°å…è®¸ç”¨æˆ·æ‰©å±• HTTP è¯·æ±‚æ–¹æ³•ï¼Œ
+	 * é€šè¿‡è¯¥å‡½æ•°è®¾ç½®çš„è¯·æ±‚æ–¹æ³•ä»…å½±å“ HTTP è¯·æ±‚è¿‡ç¨‹
+	 * @param method {const char*} è¯·æ±‚æ–¹æ³•
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_method(const char* method);
 
 	/**
-	 * µ±×÷ÎªÇëÇóÍ·Ê±£¬±¾º¯ÊıÈ¡µÃµ±Ç°ÓÊ¼şÍ·µÄÇëÇó·½·¨
-	 * @param buf {string*} ´æ´¢ÓÃ×Ö·û´®±íÊ¾µÄÇëÇó·½·¨
+	 * å½“ä½œä¸ºè¯·æ±‚å¤´æ—¶ï¼Œæœ¬å‡½æ•°å–å¾—å½“å‰é‚®ä»¶å¤´çš„è¯·æ±‚æ–¹æ³•
+	 * @param buf {string*} å­˜å‚¨ç”¨å­—ç¬¦ä¸²è¡¨ç¤ºçš„è¯·æ±‚æ–¹æ³•
 	 * @return {http_method_t}
 	 */
 	http_method_t get_method(string* buf = NULL) const;
 
 	/**
-	 * ÉèÖÃ HTTP ÇëÇóÍ·ÖĞÊÇ·ñÔÊĞí½ÓÊÕÑ¹ËõÊı¾İ£¬¶ÔÓ¦µÄ HTTP Í·×Ö¶ÎÎª£º
-	 * Accept-Encoding: gzip, deflate£¬µ«Ä¿Ç°½öÖ§³Ö gzip ¸ñÊ½
-	 * @param on {bool} Èç¹ûÎª true Ôò×Ô¶¯Ìí¼Ó HTTP Ñ¹ËõÍ·ÇëÇó
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP è¯·æ±‚å¤´ä¸­æ˜¯å¦å…è®¸æ¥æ”¶å‹ç¼©æ•°æ®ï¼Œå¯¹åº”çš„ HTTP å¤´å­—æ®µä¸ºï¼š
+	 * Accept-Encoding: gzip, deflateï¼Œä½†ç›®å‰ä»…æ”¯æŒ gzip æ ¼å¼
+	 * @param on {bool} å¦‚æœä¸º true åˆ™è‡ªåŠ¨æ·»åŠ  HTTP å‹ç¼©å¤´è¯·æ±‚
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& accept_gzip(bool on);
 
 	/**
-	 * ÔÚµ÷ÓÃÏÂÃæµÄ add_param/add_int/add_format Ê±£¬ÊÇ·ñÔÊĞí¸²¸ÇÍ¬Ãû²ÎÊı£¬
-	 * ÄÚ²¿È±Ê¡ÖµÎª·ñ£¬¼È²»¸²¸ÇÍ¬Ãû²ÎÊı
+	 * åœ¨è°ƒç”¨ä¸‹é¢çš„ add_param/add_int/add_format æ—¶ï¼Œæ˜¯å¦å…è®¸è¦†ç›–åŒåå‚æ•°ï¼Œ
+	 * å†…éƒ¨ç¼ºçœå€¼ä¸ºå¦ï¼Œæ—¢ä¸è¦†ç›–åŒåå‚æ•°
 	 * @param yes {bool}
 	 * @return {http_header&}
 	 */
 	http_header& set_param_override(bool yes);
 
 	/**
-	 * ÏòÇëÇóµÄ URL ÖĞÌí¼Ó²ÎÊı¶Ô£¬µ±Ö»ÓĞ²ÎÊıÃûÃ»ÓĞ²ÎÊıÖµÊ±Ôò£º
-	 * 1¡¢²ÎÊıÃû·Ç¿Õ´®£¬µ«²ÎÊıÖµÎª¿ÕÖ¸Õë£¬Ôò URL ²ÎÊıÖĞÖ»ÓĞ£º{name}
-	 * 2¡¢²ÎÊıÃû·Ç¿Õ´®£¬µ«²ÎÊıÖµÎª¿Õ´®£¬Ôò URL²ÎÊıÖĞÎª£º{name}=
-	 * @param name {const char*} ²ÎÊıÃû£¬²»ÄÜÎª¿ÕÖ¸Õë
-	 * @param value {const char*} ²ÎÊıÖµ£¬µ±Îª¿ÕÖ¸ÕëÊ±£¬½öÌí¼Ó²ÎÊıÃû£¬
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * å‘è¯·æ±‚çš„ URL ä¸­æ·»åŠ å‚æ•°å¯¹ï¼Œå½“åªæœ‰å‚æ•°åæ²¡æœ‰å‚æ•°å€¼æ—¶åˆ™ï¼š
+	 * 1ã€å‚æ•°åéç©ºä¸²ï¼Œä½†å‚æ•°å€¼ä¸ºç©ºæŒ‡é’ˆï¼Œåˆ™ URL å‚æ•°ä¸­åªæœ‰ï¼š{name}
+	 * 2ã€å‚æ•°åéç©ºä¸²ï¼Œä½†å‚æ•°å€¼ä¸ºç©ºä¸²ï¼Œåˆ™ URLå‚æ•°ä¸­ä¸ºï¼š{name}=
+	 * @param name {const char*} å‚æ•°åï¼Œä¸èƒ½ä¸ºç©ºæŒ‡é’ˆ
+	 * @param value {const char*} å‚æ•°å€¼ï¼Œå½“ä¸ºç©ºæŒ‡é’ˆæ—¶ï¼Œä»…æ·»åŠ å‚æ•°åï¼Œ
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& add_param(const char* name, const char* value);
 	http_header& add_int(const char* name, short value);
@@ -388,54 +388,54 @@ public:
 	}
 
 	/**
-	 * url ÖØ¶¨Ïò
-	 * @param url {const char*} ÖØ¶¨ÏòµÄ URL£¬¸ñÊ½Îª£º
-	 *  http://xxx.xxx.xxx/xxx »ò /xxx
-	 *  Èç¹ûÊÇÇ°Õß£¬Ôò×Ô¶¯´ÓÖĞÈ¡³ö HOST ×Ö¶Î£¬Èç¹ûÊÇºóÕß£¬Ôò
-	 *  ÑÓÓÃÖ®Ç°µÄ HOST
+	 * url é‡å®šå‘
+	 * @param url {const char*} é‡å®šå‘çš„ URLï¼Œæ ¼å¼ä¸ºï¼š
+	 *  http://xxx.xxx.xxx/xxx æˆ– /xxx
+	 *  å¦‚æœæ˜¯å‰è€…ï¼Œåˆ™è‡ªåŠ¨ä»ä¸­å–å‡º HOST å­—æ®µï¼Œå¦‚æœæ˜¯åè€…ï¼Œåˆ™
+	 *  å»¶ç”¨ä¹‹å‰çš„ HOST
 	 */
 	bool redirect(const char* url);
 
 	/**
-	 * ÉèÖÃÖØ¶¨Ïò´ÎÊı£¬Èç¹û¸ÃÖµ == 0 Ôò²»Ö÷¶¯½øĞĞÖØ¶¨Ïò£¬·ñÔò
-	 * ½øĞĞÖØ¶¨ÏòÇÒÖØ¶¨ÏòµÄ´ÎÊıÓÉ¸ÃÖµ¾ö¶¨
-	 * @param n {int} ÔÊĞíÖØ¶¨ÏòµÄ´ÎÊı
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½®é‡å®šå‘æ¬¡æ•°ï¼Œå¦‚æœè¯¥å€¼ == 0 åˆ™ä¸ä¸»åŠ¨è¿›è¡Œé‡å®šå‘ï¼Œå¦åˆ™
+	 * è¿›è¡Œé‡å®šå‘ä¸”é‡å®šå‘çš„æ¬¡æ•°ç”±è¯¥å€¼å†³å®š
+	 * @param n {int} å…è®¸é‡å®šå‘çš„æ¬¡æ•°
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_redirect(unsigned int n = 5);
 
 	/**
-	 * »ñÈ¡Í¨¹ı set_redirect ÉèÖÃµÄÔÊĞíµÄ×î´óÖØ¶¨Ïò´ÎÊı
+	 * è·å–é€šè¿‡ set_redirect è®¾ç½®çš„å…è®¸çš„æœ€å¤§é‡å®šå‘æ¬¡æ•°
 	 * @return {unsigned int}
 	 */
 	unsigned int get_redirect(void) const;
 
 	/**
-	 * µ±ĞèÒªÖØ¶¨ÏòÊ±£¬»áÖ÷¶¯µ÷ÓÃ´Ëº¯ÊıÔÊĞí×ÓÀà×öÒ»Ğ©ÖØÖÃ¹¤×÷
+	 * å½“éœ€è¦é‡å®šå‘æ—¶ï¼Œä¼šä¸»åŠ¨è°ƒç”¨æ­¤å‡½æ•°å…è®¸å­ç±»åšä¸€äº›é‡ç½®å·¥ä½œ
 	 */
 	virtual void redicrect_reset(void) {}
 
 	//////////////////////////////////////////////////////////////////////
-	//                       HTTP ÏìÓ¦·½·¨º¯Êı
+	//                       HTTP å“åº”æ–¹æ³•å‡½æ•°
 	//////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ´´½¨ HTTP ÏìÓ¦Í·Êı¾İ
-	 * @param buf {string&} ´æ´¢½á¹ûÊı¾İ
-	 * @return {bool} ´´½¨ÏìÓ¦Í·ÖĞ·ñ³É¹¦
+	 * åˆ›å»º HTTP å“åº”å¤´æ•°æ®
+	 * @param buf {string&} å­˜å‚¨ç»“æœæ•°æ®
+	 * @return {bool} åˆ›å»ºå“åº”å¤´ä¸­å¦æˆåŠŸ
 	 */
 	bool build_response(string& buf) const;
 
 	/**
-	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄÏìÓ¦×´Ì¬×Ö
-	 * @param status {int} ×´Ì¬×ÖÈç£º1xx, 2xx, 3xx, 4xx, 5xx
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„å“åº”çŠ¶æ€å­—
+	 * @param status {int} çŠ¶æ€å­—å¦‚ï¼š1xx, 2xx, 3xx, 4xx, 5xx
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_status(int status);
 
 	/**
-	 * »ñµÃÏìÓ¦Í·ÖĞµÄ HTTP ×´Ì¬×Ö
-	 * @return {int} HTTP ÏìÓ¦×´Ì¬Âë£º1xx, 2xx, 3xx, 4xx, 5xx
+	 * è·å¾—å“åº”å¤´ä¸­çš„ HTTP çŠ¶æ€å­—
+	 * @return {int} HTTP å“åº”çŠ¶æ€ç ï¼š1xx, 2xx, 3xx, 4xx, 5xx
 	 */
 	int get_status(void) const
 	{
@@ -443,14 +443,14 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃ HTTP ÏìÓ¦Í·ÖĞµÄ chunked ´«Êä±êÖ¾
+	 * è®¾ç½® HTTP å“åº”å¤´ä¸­çš„ chunked ä¼ è¾“æ ‡å¿—
 	 * @param on {bool}
 	 * @return {http_header&}
 	 */
 	http_header& set_chunked(bool on);
 
 	/**
-	 * ÅĞ¶Ïµ±Ç° HTTP ´«ÊäÊÇ·ñ²ÉÓÃ chunked ´«Êä·½Ê½
+	 * åˆ¤æ–­å½“å‰ HTTP ä¼ è¾“æ˜¯å¦é‡‡ç”¨ chunked ä¼ è¾“æ–¹å¼
 	 * @return {bool}
 	 */
 	bool chunked_transfer(void) const
@@ -459,14 +459,14 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃÊÇ·ñÓÃÀ´Éú³É CGI ¸ñÊ½µÄÏìÓ¦Í·
-	 * @param on {bool} ÊÇ·ñ CGI ¸ñÊ½ÏìÓ¦Í·
-	 * @return {http_header&} ·µ»Ø±¾¶ÔÏóµÄÒıÓÃ£¬±ãÓÚÓÃ»§Á¬Ğø²Ù×÷
+	 * è®¾ç½®æ˜¯å¦ç”¨æ¥ç”Ÿæˆ CGI æ ¼å¼çš„å“åº”å¤´
+	 * @param on {bool} æ˜¯å¦ CGI æ ¼å¼å“åº”å¤´
+	 * @return {http_header&} è¿”å›æœ¬å¯¹è±¡çš„å¼•ç”¨ï¼Œä¾¿äºç”¨æˆ·è¿ç»­æ“ä½œ
 	 */
 	http_header& set_cgi_mode(bool on);
 
 	/**
-	 * ÊÇ·ñÉèÖÃÁË CGI Ä£Ê½
+	 * æ˜¯å¦è®¾ç½®äº† CGI æ¨¡å¼
 	 * @return {bool}
 	 */
 	bool is_cgi_mode() const
@@ -475,14 +475,14 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃ´«ÊäµÄÊı¾İÊÇ·ñ²ÉÓÃ gzip ·½Ê½½øĞĞÑ¹Ëõ
+	 * è®¾ç½®ä¼ è¾“çš„æ•°æ®æ˜¯å¦é‡‡ç”¨ gzip æ–¹å¼è¿›è¡Œå‹ç¼©
 	 * @param on {bool}
 	 * @return {http_header&}
 	 */
 	http_header& set_transfer_gzip(bool on);
 
 	/**
-	 * »ñµÃµ±Ç°µÄÊı¾İ´«ÊäÊÇ·ñÉèÖÃÁË²ÉÓÃ gzip Ñ¹Ëõ·½Ê½
+	 * è·å¾—å½“å‰çš„æ•°æ®ä¼ è¾“æ˜¯å¦è®¾ç½®äº†é‡‡ç”¨ gzip å‹ç¼©æ–¹å¼
 	 * @return {bool}
 	 */
 	bool is_transfer_gzip() const
@@ -493,37 +493,37 @@ public:
 private:
 	dbuf_guard* dbuf_internal_;
 	dbuf_guard* dbuf_;
-	bool fixed_;                          // HTTP ÊÇ·ñÒÑ¾­ÍêÕûÁË
-	//char* domain_;  // HTTP ·şÎñÆ÷ÓòÃû
-	//unsigned short port_;               // HTTP ·şÎñÆ÷¶Ë¿Ú
-	char* url_;                           // HTTP ÇëÇóµÄ URL
-	std::list<HTTP_PARAM*> params_;       // ÇëÇó²ÎÊı¼¯ºÏ
-	bool param_override_;                 // ÔÚÌí¼Ó²ÎÊıÊ±ÊÇ·ñ¸²¸ÇÍ¬²½²ÎÊı
-	std::list<HttpCookie*> cookies_;      // cookies ¼¯ºÏ
-	std::list<HTTP_HDR_ENTRY*> entries_;  // HTTP ÇëÇóÍ·ÖĞ¸÷×Ö¶Î¼¯ºÏ
-	http_method_t method_;                // HTTP ÇëÇóµÄ·½·¨
-	char  version_[8];                    // HTTP Ğ­Òé°æ±¾ºÅ
-	char  method_s_[64];                  // HTTP ÇëÇó·½·¨ÒÔ×Ö·û´®±íÊ¾
-	char  host_[256];                     // HTTP ÇëÇóÍ·ÖĞµÄ HOST ×Ö¶Î
-	bool keep_alive_;                     // ÊÇ·ñ±£³Ö³¤Á¬½Ó
-	unsigned int nredirect_;              // ×î´óÖØ¶¨ÏòµÄ´ÎÊıÏŞÖÆ
-	bool accept_compress_;                // ÊÇ·ñ½ÓÊÕÑ¹ËõÊı¾İ
-	int  status_;                         // ÏìÓ¦Í·µÄ×´Ì¬×Ö
-	bool is_request_;                     // ÊÇÇëÇóÍ·»¹ÊÇÏìÓ¦Í·
-	bool cgi_mode_;                       // ÊÇ·ñ CGI ÏìÓ¦Í·
+	bool fixed_;                          // HTTP æ˜¯å¦å·²ç»å®Œæ•´äº†
+	//char* domain_;  // HTTP æœåŠ¡å™¨åŸŸå
+	//unsigned short port_;               // HTTP æœåŠ¡å™¨ç«¯å£
+	char* url_;                           // HTTP è¯·æ±‚çš„ URL
+	std::list<HTTP_PARAM*> params_;       // è¯·æ±‚å‚æ•°é›†åˆ
+	bool param_override_;                 // åœ¨æ·»åŠ å‚æ•°æ—¶æ˜¯å¦è¦†ç›–åŒæ­¥å‚æ•°
+	std::list<HttpCookie*> cookies_;      // cookies é›†åˆ
+	std::list<HTTP_HDR_ENTRY*> entries_;  // HTTP è¯·æ±‚å¤´ä¸­å„å­—æ®µé›†åˆ
+	http_method_t method_;                // HTTP è¯·æ±‚çš„æ–¹æ³•
+	char  version_[8];                    // HTTP åè®®ç‰ˆæœ¬å·
+	char  method_s_[64];                  // HTTP è¯·æ±‚æ–¹æ³•ä»¥å­—ç¬¦ä¸²è¡¨ç¤º
+	char  host_[256];                     // HTTP è¯·æ±‚å¤´ä¸­çš„ HOST å­—æ®µ
+	bool keep_alive_;                     // æ˜¯å¦ä¿æŒé•¿è¿æ¥
+	unsigned int nredirect_;              // æœ€å¤§é‡å®šå‘çš„æ¬¡æ•°é™åˆ¶
+	bool accept_compress_;                // æ˜¯å¦æ¥æ”¶å‹ç¼©æ•°æ®
+	int  status_;                         // å“åº”å¤´çš„çŠ¶æ€å­—
+	bool is_request_;                     // æ˜¯è¯·æ±‚å¤´è¿˜æ˜¯å“åº”å¤´
+	bool cgi_mode_;                       // æ˜¯å¦ CGI å“åº”å¤´
 #if defined(_WIN32) || defined(_WIN64)
-	__int64 range_from_;                  // ÇëÇóÍ·ÖĞ£¬range ÆğÊ¼Î»ÖÃ
-	__int64 range_to_;                    // ÇëÇóÍ·ÖĞ£¬range ½áÊøÎ»ÖÃ
-	__int64 range_total_;                 // range ´«ÊäÄ£Ê½ÏÂ¼ÇÂ¼Êı¾İ×Ü³¤¶È
-	__int64 content_length_;              // HTTP Êı¾İÌå³¤¶È
+	__int64 range_from_;                  // è¯·æ±‚å¤´ä¸­ï¼Œrange èµ·å§‹ä½ç½®
+	__int64 range_to_;                    // è¯·æ±‚å¤´ä¸­ï¼Œrange ç»“æŸä½ç½®
+	__int64 range_total_;                 // range ä¼ è¾“æ¨¡å¼ä¸‹è®°å½•æ•°æ®æ€»é•¿åº¦
+	__int64 content_length_;              // HTTP æ•°æ®ä½“é•¿åº¦
 #else
-	long long int range_from_;            // ÇëÇóÍ·ÖĞ£¬range ÆğÊ¼Î»ÖÃ
-	long long int range_to_;              // ÇëÇóÍ·ÖĞ£¬range ½áÊøÎ»ÖÃ
-	long long int range_total_;           // range ´«ÊäÄ£Ê½ÏÂ¼ÇÂ¼Êı¾İ×Ü³¤¶È
-	long long int content_length_;        // HTTP Êı¾İÌå³¤¶È
+	long long int range_from_;            // è¯·æ±‚å¤´ä¸­ï¼Œrange èµ·å§‹ä½ç½®
+	long long int range_to_;              // è¯·æ±‚å¤´ä¸­ï¼Œrange ç»“æŸä½ç½®
+	long long int range_total_;           // range ä¼ è¾“æ¨¡å¼ä¸‹è®°å½•æ•°æ®æ€»é•¿åº¦
+	long long int content_length_;        // HTTP æ•°æ®ä½“é•¿åº¦
 #endif
-	bool chunked_transfer_;               // ÊÇ·ñÎª chunked ´«ÊäÄ£Ê½
-	bool transfer_gzip_;                  // Êı¾İÊÇ·ñ²ÉÓÃ gzip Ñ¹Ëõ
+	bool chunked_transfer_;               // æ˜¯å¦ä¸º chunked ä¼ è¾“æ¨¡å¼
+	bool transfer_gzip_;                  // æ•°æ®æ˜¯å¦é‡‡ç”¨ gzip å‹ç¼©
 
 	char* upgrade_;
 	// just for websocket
@@ -533,9 +533,9 @@ private:
 	int   ws_sec_ver_;
 	char* ws_sec_accept_;
 
-	void init(void);                      // ³õÊ¼»¯
+	void init(void);                      // åˆå§‹åŒ–
 	void clear(void);
-	void build_common(string& buf) const; // ¹¹½¨Í¨ÓÃÍ·
+	void build_common(string& buf) const; // æ„å»ºé€šç”¨å¤´
 
 	void add_res_cookie(const HTTP_HDR_ENTRY& entry);
 	void append_accept_key(const char* sec_key, string& out) const;

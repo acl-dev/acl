@@ -114,13 +114,13 @@ int main(int argc, char* argv[])
 		printf("use kernel event\r\n");
 	}
 
-	// ¶¨Òå AIO ÊÂ¼şÒıÇæ
+	// å®šä¹‰ AIO äº‹ä»¶å¼•æ“
 	acl::aio_handle handle(event_type);
 
 	handle.set_delay_sec(0);
 	handle.set_delay_usec(1000000);
 
-	// ÉèÖÃ DNS ÓòÃû·şÎñÆ÷µØÖ·
+	// è®¾ç½® DNS åŸŸåæœåŠ¡å™¨åœ°å€
 	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
 		cit != name_servers.end(); ++cit) {
 		handle.set_dns(*cit, ns_timeout);
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
 
 	//////////////////////////////////////////////////////////////////////
 
-	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì WEB ·şÎñÆ÷
+	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹ WEB æœåŠ¡å™¨
 	for (int i = 0; i < cocurrent; i++) {
 		http_client* conn = new http_client(handle);
 		(*conn).set_addr(addr)
@@ -138,7 +138,7 @@ int main(int argc, char* argv[])
 			.set_host(host)
 			.set_keep_alive(keep_alive);
 
-		// ÉèÖÃÖØ¶¨Ïò×î´ó´ÎÊı£¬Èç¹û´ËÖµÎª 0 Ôò½ûÖ¹ÖØ¶¨Ïò¹¦ÄÜ
+		// è®¾ç½®é‡å®šå‘æœ€å¤§æ¬¡æ•°ï¼Œå¦‚æœæ­¤å€¼ä¸º 0 åˆ™ç¦æ­¢é‡å®šå‘åŠŸèƒ½
 		conn->set_redirect_limit(3);
 
 		if (!conn->start()) {
@@ -148,9 +148,9 @@ int main(int argc, char* argv[])
 	}
 
 	time_t last = time(NULL), now, begin = last;
-	// ¿ªÊ¼ AIO ÊÂ¼şÑ­»·¹ı³Ì
+	// å¼€å§‹ AIO äº‹ä»¶å¾ªç¯è¿‡ç¨‹
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			break;
 		}

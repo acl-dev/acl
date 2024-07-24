@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-// 用户访问列表类，用来判断所给用户是否允许使用本服务
+// 鐢ㄦ埛璁块棶鍒楄〃绫伙紝鐢ㄦ潵鍒ゆ柇鎵�缁欑敤鎴锋槸鍚﹀厑璁镐娇鐢ㄦ湰鏈嶅姟
 
 class access_list : public acl::singleton<access_list>
 {

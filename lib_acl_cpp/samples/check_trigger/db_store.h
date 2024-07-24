@@ -8,10 +8,10 @@ public:
 	db_store();
 	~db_store();
 
-	// ¸üĞÂÊı¾İ±í
+	// æ›´æ–°æ•°æ®è¡¨
 	bool db_update(const http_thread& http);
 
-	// ´´½¨Êı¾İ±í
+	// åˆ›å»ºæ•°æ®è¡¨
 	bool db_create();
 
 private:

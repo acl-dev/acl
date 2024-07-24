@@ -13,37 +13,37 @@ class atomic_long;
 class ACL_CPP_API sslbase_io : public stream_hook {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param conf {sslbase_conf&} ¶ÔÃ¿Ò»¸ö SSL Á¬½Ó½øĞĞÅäÖÃµÄÀà¶ÔÏó
-	 * @param server_side {bool} ÊÇ·ñÎª·şÎñ¶ËÄ£Ê½£¬ÒòÎª¿Í»§¶ËÄ£Ê½Óë·şÎñ¶Ë
-	 *  Ä£Ê½µÄÎÕÊÖ·½·¨²»Í¬£¬ËùÒÔÍ¨¹ı´Ë²ÎÊıÀ´½øĞĞÇø·Ö
-	 * @param nblock {bool} ÊÇ·ñÎª·Ç×èÈûÄ£Ê½
+	 * æ„é€ å‡½æ•°
+	 * @param conf {sslbase_conf&} å¯¹æ¯ä¸€ä¸ª SSL è¿æ¥è¿›è¡Œé…ç½®çš„ç±»å¯¹è±¡
+	 * @param server_side {bool} æ˜¯å¦ä¸ºæœåŠ¡ç«¯æ¨¡å¼ï¼Œå› ä¸ºå®¢æˆ·ç«¯æ¨¡å¼ä¸æœåŠ¡ç«¯
+	 *  æ¨¡å¼çš„æ¡æ‰‹æ–¹æ³•ä¸åŒï¼Œæ‰€ä»¥é€šè¿‡æ­¤å‚æ•°æ¥è¿›è¡ŒåŒºåˆ†
+	 * @param nblock {bool} æ˜¯å¦ä¸ºéé˜»å¡æ¨¡å¼
 	 */
 	sslbase_io(sslbase_conf& conf, bool server_side, bool nblock = false);
 	virtual ~sslbase_io();
 
 	/**
-	 * ssl ÎÕÊÖ´¿Ğé·½·¨
+	 * ssl æ¡æ‰‹çº¯è™šæ–¹æ³•
 	 * @return {bool}
 	 */
 	virtual bool handshake() = 0;
 
 	/**
-	 * ÉèÖÃÌ×½Ó×ÖÎª×èÈûÄ£Ê½/·Ç×èÈûÄ£Ê½
-	 * @param yes {bool} µ±Îª false Ê±ÔòÉèÎª×èÈûÄ£Ê½£¬·ñÔòÉèÎª·Ç×èÈûÄ£Ê½
+	 * è®¾ç½®å¥—æ¥å­—ä¸ºé˜»å¡æ¨¡å¼/éé˜»å¡æ¨¡å¼
+	 * @param yes {bool} å½“ä¸º false æ—¶åˆ™è®¾ä¸ºé˜»å¡æ¨¡å¼ï¼Œå¦åˆ™è®¾ä¸ºéé˜»å¡æ¨¡å¼
 	 */
 	void set_non_blocking(bool yes);
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°ÉèÖÃµÄ SSL IO ÊÇ·ñ×èÈûÄ£Ê½»¹ÊÇ·Ç×èÈûÄ£Ê½
-	 * @return {bool} ·µ»Ø true Ôò±íÊ¾Îª·Ç×èÈûÄ£Ê½£¬·ñÔòÎª×èÈûÄ£Ê½
+	 * åˆ¤æ–­å½“å‰è®¾ç½®çš„ SSL IO æ˜¯å¦é˜»å¡æ¨¡å¼è¿˜æ˜¯éé˜»å¡æ¨¡å¼
+	 * @return {bool} è¿”å› true åˆ™è¡¨ç¤ºä¸ºéé˜»å¡æ¨¡å¼ï¼Œå¦åˆ™ä¸ºé˜»å¡æ¨¡å¼
 	 */
 	bool is_non_blocking() const {
 		return nblock_;
 	}
 
 	/**
-	 * ÅĞ¶Ï SSL ÎÕÊÖÊÇ·ñ³É¹¦
+	 * åˆ¤æ–­ SSL æ¡æ‰‹æ˜¯å¦æˆåŠŸ
 	 * @return {bool}
 	 */
 	bool handshake_ok() const {
@@ -51,20 +51,20 @@ public:
 	}
 
 	/**
-	 * ¿Í»§¶ËÓÃÀ´ÉèÖÃ SNI HOST ×Ö¶Î
+	 * å®¢æˆ·ç«¯ç”¨æ¥è®¾ç½® SNI HOST å­—æ®µ
 	 * @param host {const char*}
 	 */
 	void set_sni_host(const char* host, const char* prefix = NULL,
 		const char* suffix = NULL);
 
 	/**
-	 * ·şÎñ¶ËÉèÖÃ¿Í»§¶ËÊÇ·ñ·¢ËÍÁË SNI ĞÅÏ¢
+	 * æœåŠ¡ç«¯è®¾ç½®å®¢æˆ·ç«¯æ˜¯å¦å‘é€äº† SNI ä¿¡æ¯
 	 * @param yes {bool}
 	 */
 	void set_has_sni(bool yes);
 
 	/**
-	 * ·şÎñ¶ËÅĞ¶Ï¿Í»§¶ËÊÇ·ñ·¢ËÍÁË SNI ĞÅÏ¢
+	 * æœåŠ¡ç«¯åˆ¤æ–­å®¢æˆ·ç«¯æ˜¯å¦å‘é€äº† SNI ä¿¡æ¯
 	 * @return {bool}
 	 */
 	bool has_sni() const {
@@ -72,13 +72,13 @@ public:
 	}
 
 	/**
-	 * ÉèÖÃ±¾ SSL IO ¶ÔÏóµÄ°ó¶¨¶ÔÏó£¬·½±ãÓ¦ÓÃ´¦Àí×ÔÉíÒµÎñÂß¼­
+	 * è®¾ç½®æœ¬ SSL IO å¯¹è±¡çš„ç»‘å®šå¯¹è±¡ï¼Œæ–¹ä¾¿åº”ç”¨å¤„ç†è‡ªèº«ä¸šåŠ¡é€»è¾‘
 	 * @param ctx {void*}
 	 */
 	void set_ctx(void* ctx);
 
 	/**
-	 * »ñµÃÓÉ set_ctx() ÉèÖÃµÄ°ó¶¨¶ÔÏó
+	 * è·å¾—ç”± set_ctx() è®¾ç½®çš„ç»‘å®šå¯¹è±¡
 	 * @return {void*}
 	 */
 	void* get_ctx() const {

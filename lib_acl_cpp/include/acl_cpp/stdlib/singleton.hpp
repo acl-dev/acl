@@ -105,11 +105,11 @@ template<class T>
 bool singleton_wrapper< T >::destroyed_ = false;
 
 /**
- * ����ģ���࣬��VC2010��GCC����ʱ������������ main ����֮ǰ��ִ�У�
- * ���������̰߳�ȫ�ģ����� VC2003 ����� release �汾ʱ�Ҵ����Ż�
- * ���أ����п������̲߳���ȫ�ģ���ʱ���ܱ�֤��������Ĺ��캯����
- * main ֮ǰִ��.
- * ʹ�þ������£�
+ * 单例模板类，用VC2010或GCC编译时，单例对象在 main 函数之前被执行，
+ * 所以它是线程安全的；但在 VC2003 编译成 release 版本时且打开了优化
+ * 开关，则有可能是线程不安全的，此时不能保证单例对象的构造函数在
+ * main 之前执行.
+ * 使用举例如下：
  * class singleton_test : public acl::singleton<singlegon_test>
  * {
  * public:
@@ -157,9 +157,9 @@ T& singleton< T >::instance_ = singleton< T >::get_instance();
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * �����ʵ���� VC2003 �� release ����ʱ��������Ż����أ����ܱ�֤����
- * �Ĺ��캯������ main ִ�У�������� VC2003 �±��뵥���������ڶ���߳���
- * ���õ�������ʱ������ʹ�����µĵ���ģ���࣬ʾ�����£�
+ * 上面的实现在 VC2003 的 release 编译时如果打开了优化开关，则不能保证单例
+ * 的构造函数先于 main 执行，如果是在 VC2003 下编译单例程序且在多个线程下
+ * 都用单例对象时，建议使用如下的单例模板类，示例如下：
  * class singleton_test
  * {
  * public:

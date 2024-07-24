@@ -7,28 +7,28 @@
 namespace acl {
 
 /**
- * SSL Ö¤ÊéĞ£Ñé¼¶±ğÀàĞÍ¶¨Òå
+ * SSL è¯ä¹¦æ ¡éªŒçº§åˆ«ç±»å‹å®šä¹‰
  */
 typedef enum {
-	POLARSSL_VERIFY_NONE,	// ²»Ğ£ÑéÖ¤Êé
-	POLARSSL_VERIFY_OPT,	// Ñ¡ÔñĞÔĞ£Ñé£¬¿ÉÒÔÔÚÎÕÊÖÊ±»òÎÕÊÖºóĞ£Ñé
-	POLARSSL_VERIFY_REQ	// ÒªÇóÔÚÎÕÊÖÊ±Ğ£Ñé
+	POLARSSL_VERIFY_NONE,	// ä¸æ ¡éªŒè¯ä¹¦
+	POLARSSL_VERIFY_OPT,	// é€‰æ‹©æ€§æ ¡éªŒï¼Œå¯ä»¥åœ¨æ¡æ‰‹æ—¶æˆ–æ¡æ‰‹åæ ¡éªŒ
+	POLARSSL_VERIFY_REQ	// è¦æ±‚åœ¨æ¡æ‰‹æ—¶æ ¡éªŒ
 } polarssl_verify_t;
 
 class polarssl_io;
 
 /**
- * SSL Á¬½Ó¶ÔÏóµÄÅäÖÃÀà£¬¸ÃÀà¶ÔÏóÒ»°ã¿ÉÒÔÉùÃ÷ÎªÈ«¾Ö¶ÔÏó£¬ÓÃÀ´¶ÔÃ¿Ò»¸ö SSL
- * Á¬½Ó¶ÔÏó½øĞĞÖ¤ÊéÅäÖÃ£»¸ÃÀà¼ÓÔØÁËÈ«¾ÖĞÔµÄÖ¤Êé¡¢ÃÜÔ¿µÈĞÅÏ¢£»Ã¿Ò»¸ö SSL ¶ÔÏó
- * (polarssl_io) µ÷ÓÃ±¾¶ÔÏóµÄsetup_certs ·½·¨À´³õÊ¼»¯×ÔÉíµÄÖ¤Êé¡¢ÃÜÔ¿µÈĞÅÏ¢
+ * SSL è¿æ¥å¯¹è±¡çš„é…ç½®ç±»ï¼Œè¯¥ç±»å¯¹è±¡ä¸€èˆ¬å¯ä»¥å£°æ˜ä¸ºå…¨å±€å¯¹è±¡ï¼Œç”¨æ¥å¯¹æ¯ä¸€ä¸ª SSL
+ * è¿æ¥å¯¹è±¡è¿›è¡Œè¯ä¹¦é…ç½®ï¼›è¯¥ç±»åŠ è½½äº†å…¨å±€æ€§çš„è¯ä¹¦ã€å¯†é’¥ç­‰ä¿¡æ¯ï¼›æ¯ä¸€ä¸ª SSL å¯¹è±¡
+ * (polarssl_io) è°ƒç”¨æœ¬å¯¹è±¡çš„setup_certs æ–¹æ³•æ¥åˆå§‹åŒ–è‡ªèº«çš„è¯ä¹¦ã€å¯†é’¥ç­‰ä¿¡æ¯
  */
 class ACL_CPP_API polarssl_conf : public sslbase_conf {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param server_side {bool} ÓÃÀ´Ö¸¶¨ÊÇ·şÎñ¶Ë»¹ÊÇ¿Í»§¶Ë£¬µ±Îª true Ê±
-	 *  Îª·şÎñ¶ËÄ£Ê½£¬·ñÔòÎª¿Í»§¶ËÄ£Ê½
-	 * @param verify_mode {polarssl_verify_t} SSL Ö¤ÊéĞ£Ñé¼¶±ğ
+	 * æ„é€ å‡½æ•°
+	 * @param server_side {bool} ç”¨æ¥æŒ‡å®šæ˜¯æœåŠ¡ç«¯è¿˜æ˜¯å®¢æˆ·ç«¯ï¼Œå½“ä¸º true æ—¶
+	 *  ä¸ºæœåŠ¡ç«¯æ¨¡å¼ï¼Œå¦åˆ™ä¸ºå®¢æˆ·ç«¯æ¨¡å¼
+	 * @param verify_mode {polarssl_verify_t} SSL è¯ä¹¦æ ¡éªŒçº§åˆ«
 	 */
 	polarssl_conf(bool server_side = false,
 		polarssl_verify_t verify_mode = POLARSSL_VERIFY_NONE);
@@ -62,14 +62,14 @@ public:
 
 public:
 	/**
-	 * ÉèÖÃ SSL Ö¤ÊéĞ£Ñé·½Ê½£¬ÄÚ²¿È±Ê¡Îª²»Ğ£ÑéÖ¤Êé
+	 * è®¾ç½® SSL è¯ä¹¦æ ¡éªŒæ–¹å¼ï¼Œå†…éƒ¨ç¼ºçœä¸ºä¸æ ¡éªŒè¯ä¹¦
 	 * @param verify_mode {polarssl_verify_t}
 	 */
 	void set_authmode(polarssl_verify_t verify_mode);
 
 	/**
-	 * »ñµÃËæ»úÊıÉú³ÉÆ÷µÄìØ¶ÔÏó
-	 * @return {void*}£¬·µ»ØÖµÎª entropy_context ÀàĞÍ
+	 * è·å¾—éšæœºæ•°ç”Ÿæˆå™¨çš„ç†µå¯¹è±¡
+	 * @return {void*}ï¼Œè¿”å›å€¼ä¸º entropy_context ç±»å‹
 	 */
 	void* get_entropy(void)
 	{
@@ -77,23 +77,23 @@ public:
 	}
 
 	/**
-	 * stream_hook::open ÄÚ²¿»áµ÷ÓÃ±¾·½·¨ÓÃÀ´°²×°µ±Ç° SSL Á¬½Ó¶ÔÏóµÄÖ¤Êé
-	 * @param ssl {void*} SSL Á¬½Ó¶ÔÏó£¬Îª ssl_context ÀàĞÍ
-	 * @param server_side {bool} ÊÇ·şÎñ¶Ë»¹ÊÇ¿Í»§¶Ë
-	 * @return {bool} ÅäÖÃ SSL ¶ÔÏóÊÇ·ñ³É¹¦
+	 * stream_hook::open å†…éƒ¨ä¼šè°ƒç”¨æœ¬æ–¹æ³•ç”¨æ¥å®‰è£…å½“å‰ SSL è¿æ¥å¯¹è±¡çš„è¯ä¹¦
+	 * @param ssl {void*} SSL è¿æ¥å¯¹è±¡ï¼Œä¸º ssl_context ç±»å‹
+	 * @param server_side {bool} æ˜¯æœåŠ¡ç«¯è¿˜æ˜¯å®¢æˆ·ç«¯
+	 * @return {bool} é…ç½® SSL å¯¹è±¡æ˜¯å¦æˆåŠŸ
 	 */
 	bool setup_certs(void* ssl, bool server_side);
 
 public:
 	/**
-	 * ±ØĞëÊ×ÏÈµ÷ÓÃ´Ëº¯ÊıÉèÖÃ libpolarssl.so µÄÈ«Â·¾¶
-	 * @param path {const char*} libpolarssl.so µÄÈ«Â·¾¶
+	 * å¿…é¡»é¦–å…ˆè°ƒç”¨æ­¤å‡½æ•°è®¾ç½® libpolarssl.so çš„å…¨è·¯å¾„
+	 * @param path {const char*} libpolarssl.so çš„å…¨è·¯å¾„
 	 */
 	static void set_libpath(const char* path);
 
 	/**
-	 * ¿ÉÒÔÏÔÊ½µ÷ÓÃ±¾·½·¨£¬¶¯Ì¬¼ÓÔØ polarssl ¶¯Ì¬¿â
-	 * @return {bool} ¼ÓÔØÊÇ·ñ³É¹¦
+	 * å¯ä»¥æ˜¾å¼è°ƒç”¨æœ¬æ–¹æ³•ï¼ŒåŠ¨æ€åŠ è½½ polarssl åŠ¨æ€åº“
+	 * @return {bool} åŠ è½½æ˜¯å¦æˆåŠŸ
 	 */
 	static bool load(void);
 

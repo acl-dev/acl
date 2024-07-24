@@ -95,7 +95,7 @@ static void *service_thread(void *arg)
 	return (NULL);
 #endif
 
-	/* 进入事件循环 */
+	/* 杩涘叆浜嬩欢寰幆 */
 	while (1) {
 		acl_aio_loop(aio);
 		if (ipc->stop) {

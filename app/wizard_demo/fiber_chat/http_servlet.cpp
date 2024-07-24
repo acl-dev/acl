@@ -22,11 +22,11 @@ bool http_servlet::doError(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// ·¢ËÍ http ÏìÓ¦Í·
+	// å‘é€ http å“åº”å¤´
 	if (res.sendHeader() == false)
 		return false;
 
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='some error happened!' />\r\n");
 	(void) res.getOutputStream().write(buf);
@@ -38,10 +38,10 @@ bool http_servlet::doOther(acl::HttpServletRequest&,
 {
 	res.setStatus(400);
 	res.setContentType("text/html; charset=");
-	// ·¢ËÍ http ÏìÓ¦Í·
+	// å‘é€ http å“åº”å¤´
 	if (res.sendHeader() == false)
 		return false;
-	// ·¢ËÍ http ÏìÓ¦Ìå
+	// å‘é€ http å“åº”ä½“
 	acl::string buf;
 	buf.format("<root error='unkown request method %s' />\r\n", method);
 	(void) res.getOutputStream().write(buf);
@@ -57,9 +57,9 @@ bool http_servlet::doGet(acl::HttpServletRequest& req,
 bool http_servlet::doPost(acl::HttpServletRequest& req,
 	acl::HttpServletResponse& res)
 {
-	// Èç¹ûĞèÒª http session ¿ØÖÆ£¬Çë´ò¿ªÏÂÃæ×¢ÊÍ£¬ÇÒĞèÒª±£Ö¤
-	// ÔÚ master_service.cpp µÄº¯Êı thread_on_read ÖĞÉèÖÃµÄ
-	// memcached ·şÎñÕı³£¹¤×÷
+	// å¦‚æœéœ€è¦ http session æ§åˆ¶ï¼Œè¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Šï¼Œä¸”éœ€è¦ä¿è¯
+	// åœ¨ master_service.cpp çš„å‡½æ•° thread_on_read ä¸­è®¾ç½®çš„
+	// memcached æœåŠ¡æ­£å¸¸å·¥ä½œ
 	/*
 	const char* sid = req.getSession().getAttribute("sid");
 	if (*sid == 0)
@@ -67,15 +67,15 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 	sid = req.getSession().getAttribute("sid");
 	*/
 
-	// Èç¹ûĞèÒªÈ¡µÃä¯ÀÀÆ÷ cookie Çë´ò¿ªÏÂÃæ×¢ÊÍ
+	// å¦‚æœéœ€è¦å–å¾—æµè§ˆå™¨ cookie è¯·æ‰“å¼€ä¸‹é¢æ³¨é‡Š
 	/*
 	
 	*/
 
-	res.setContentType("text/html; charset=utf-8")	// ÉèÖÃÏìÓ¦×Ö·û¼¯
-		.setKeepAlive(req.isKeepAlive())	// ÉèÖÃÊÇ·ñ±£³Ö³¤Á¬½Ó
-		.setContentEncoding(true)		// ×Ô¶¯Ö§³ÖÑ¹Ëõ´«Êä
-		.setChunkedTransferEncoding(true);	// ²ÉÓÃ chunk ´«Êä·½Ê½
+	res.setContentType("text/html; charset=utf-8")	// è®¾ç½®å“åº”å­—ç¬¦é›†
+		.setKeepAlive(req.isKeepAlive())	// è®¾ç½®æ˜¯å¦ä¿æŒé•¿è¿æ¥
+		.setContentEncoding(true)		// è‡ªåŠ¨æ”¯æŒå‹ç¼©ä¼ è¾“
+		.setChunkedTransferEncoding(true);	// é‡‡ç”¨ chunk ä¼ è¾“æ–¹å¼
 
 	acl::string path;
 	path << var_cfg_html_path << "/" << "user.html";
@@ -87,8 +87,8 @@ bool http_servlet::doPost(acl::HttpServletRequest& req,
 		return doError(req, res);
 	}
 
-	// ·¢ËÍ http ÏìÓ¦Ìå£¬ÒòÎªÉèÖÃÁË chunk ´«ÊäÄ£Ê½£¬ËùÒÔĞèÒª¶àµ÷ÓÃÒ»´Î
-	// res.write ÇÒÁ½¸ö²ÎÊı¾ùÎª 0 ÒÔ±íÊ¾ chunk ´«ÊäÊı¾İ½áÊø
+	// å‘é€ http å“åº”ä½“ï¼Œå› ä¸ºè®¾ç½®äº† chunk ä¼ è¾“æ¨¡å¼ï¼Œæ‰€ä»¥éœ€è¦å¤šè°ƒç”¨ä¸€æ¬¡
+	// res.write ä¸”ä¸¤ä¸ªå‚æ•°å‡ä¸º 0 ä»¥è¡¨ç¤º chunk ä¼ è¾“æ•°æ®ç»“æŸ
 	bool ret = res.write(buf) && res.write(NULL, 0);
 	if (ret == false)
 		remove(req.getSocketStream());

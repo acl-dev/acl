@@ -70,8 +70,8 @@ void check_client::close_callback(void)
 	//	logger("server: %s alive, spent: %.2f ms",
 	//		addr_.c_str(), spent);
 
-	// ·ÅÔÚ´Ë´¦µÄºÃ´¦ÊÇ±£Ö¤ÁËµ±Ç°Á÷¿Ï¶¨´¦ÓÚ¹Ø±Õ¹ı³ÌÖĞ£¬Í¬Ê±½«±¾¼ì²â¶ÔÏó
-	// ´Ó timer_ ÖĞÉ¾³ıÒÔ¼õÉÙ timer_ ÖĞ¼ì²â¶ÔÏóµÄ¸öÊı
+	// æ”¾åœ¨æ­¤å¤„çš„å¥½å¤„æ˜¯ä¿è¯äº†å½“å‰æµè‚¯å®šå¤„äºå…³é—­è¿‡ç¨‹ä¸­ï¼ŒåŒæ—¶å°†æœ¬æ£€æµ‹å¯¹è±¡
+	// ä» timer_ ä¸­åˆ é™¤ä»¥å‡å°‘ timer_ ä¸­æ£€æµ‹å¯¹è±¡çš„ä¸ªæ•°
 	timer_.get_monitor().get_manager().set_pools_status(addr_, aliving_);
 	timer_.remove_client(addr_, this);
 
@@ -80,7 +80,7 @@ void check_client::close_callback(void)
 
 bool check_client::timeout_callback()
 {
-	// Á¬½Ó³¬Ê±£¬ÔòÖ±½Ó·µ»ØÊ§°Ü
+	// è¿æ¥è¶…æ—¶ï¼Œåˆ™ç›´æ¥è¿”å›å¤±è´¥
 	timedout_ = true;
 	return false;
 }

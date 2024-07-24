@@ -19,16 +19,16 @@ class ACL_CPP_API mime_node : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param emailFile {const char*} ´æ´¢ÓÊ¼şÄÚÈİµÄÔ´ÎÄ¼ş£¬¿ÉÒÔ
-	 *  Îª¿Õ£¬µ«µ±Îª¿ÕÊ±ÔÚµ÷ÓÃ save_body º¯ÊıÊ±£¬Ôò²»ÄÜÖ¸¶¨Ô´ÎÄ¼ş
-	 * @param node {const MIME_NODE*} ÓÊ¼şÖĞµÄÄ³¸ö½áµã¶ÔÏó
-	 * @param enableDecode {bool} µ±ÓÊ¼şÄÚÈİÎª base64/qp µÈ±àÂë¸ñÊ½
-	 *  Ê±ÊÇ·ñĞèÒª×Ô¶¯½øĞĞ½âÂë
-	 * @param toCharset {const char*} È±Ê¡µÄÄ¿±ê×Ö·û¼¯£¬Èç¹ûÄ¿±ê
-	 *  ×Ö·û¼¯ÓëÔ´×Ö·û¼¯²»Í¬£¬Ôò½øĞĞ×Ö·û¼¯×ª»»
-	 * @param off {off_t} ÓÊ¼şÄÚÈİÔÚÕû¸öÊı¾İÖĞµÄÆğÊ¼Î»ÖÃÖĞ¸½¼ÓµÄ
-	 *  Ïà¶ÔÆ«ÒÆÁ¿£¬ÒÔ±ãÓÚÓÃ»§¿ÉÒÔÔÚÓÊ¼şÄÚÈİÇ°Ãæ¼Ó×Ô¼ºµÄË½ÓĞÊı¾İ
+	 * æ„é€ å‡½æ•°
+	 * @param emailFile {const char*} å­˜å‚¨é‚®ä»¶å†…å®¹çš„æºæ–‡ä»¶ï¼Œå¯ä»¥
+	 *  ä¸ºç©ºï¼Œä½†å½“ä¸ºç©ºæ—¶åœ¨è°ƒç”¨ save_body å‡½æ•°æ—¶ï¼Œåˆ™ä¸èƒ½æŒ‡å®šæºæ–‡ä»¶
+	 * @param node {const MIME_NODE*} é‚®ä»¶ä¸­çš„æŸä¸ªç»“ç‚¹å¯¹è±¡
+	 * @param enableDecode {bool} å½“é‚®ä»¶å†…å®¹ä¸º base64/qp ç­‰ç¼–ç æ ¼å¼
+	 *  æ—¶æ˜¯å¦éœ€è¦è‡ªåŠ¨è¿›è¡Œè§£ç 
+	 * @param toCharset {const char*} ç¼ºçœçš„ç›®æ ‡å­—ç¬¦é›†ï¼Œå¦‚æœç›®æ ‡
+	 *  å­—ç¬¦é›†ä¸æºå­—ç¬¦é›†ä¸åŒï¼Œåˆ™è¿›è¡Œå­—ç¬¦é›†è½¬æ¢
+	 * @param off {off_t} é‚®ä»¶å†…å®¹åœ¨æ•´ä¸ªæ•°æ®ä¸­çš„èµ·å§‹ä½ç½®ä¸­é™„åŠ çš„
+	 *  ç›¸å¯¹åç§»é‡ï¼Œä»¥ä¾¿äºç”¨æˆ·å¯ä»¥åœ¨é‚®ä»¶å†…å®¹å‰é¢åŠ è‡ªå·±çš„ç§æœ‰æ•°æ®
 	 */
 	mime_node(const char* emailFile, const MIME_NODE* node,
 		bool enableDecode = true, const char* toCharset = "gb2312",
@@ -36,8 +36,8 @@ public:
 	virtual ~mime_node(void);
 
 	/**
-	 * »ñµÃ MIME ½áµãÖĞ Content-Type ÖµÖĞµÄ name ×Ö¶ÎÖµ
-	 * @return {const char*} Èç¹ûÎª¿ÕÔò±íÊ¾Ã»ÓĞ¸Ã×Ö¶ÎÖµ
+	 * è·å¾— MIME ç»“ç‚¹ä¸­ Content-Type å€¼ä¸­çš„ name å­—æ®µå€¼
+	 * @return {const char*} å¦‚æœä¸ºç©ºåˆ™è¡¨ç¤ºæ²¡æœ‰è¯¥å­—æ®µå€¼
 	 */
 	const char* get_name(void) const
 	{
@@ -47,9 +47,9 @@ public:
 	}
 
 	/**
-	 * »ñµÃ Content-Type ÖĞµÄÖ÷ÀàĞÍ£¬Èç: Content-Type: image/jpeg, Ôò±¾
-	 * º¯Êı·µ»Ø MIME_CTYPE_IMAGE (ÔÚ mime_define.hpp ÖĞ¶¨Òå)
-	 * @return {int} ·µ»Ø mime_define.hpp ÖĞ¶¨ÒåµÄ MIME_CTYPE_XXX
+	 * è·å¾— Content-Type ä¸­çš„ä¸»ç±»å‹ï¼Œå¦‚: Content-Type: image/jpeg, åˆ™æœ¬
+	 * å‡½æ•°è¿”å› MIME_CTYPE_IMAGE (åœ¨ mime_define.hpp ä¸­å®šä¹‰)
+	 * @return {int} è¿”å› mime_define.hpp ä¸­å®šä¹‰çš„ MIME_CTYPE_XXX
 	 */
 	int get_ctype(void) const
 	{
@@ -57,9 +57,9 @@ public:
 	}
 
 	/**
-	 * »ñµÃ Content-Type ÖĞµÄ´ÓÀàĞÍ£¬Èç: Content-Type: image/jpeg, Ôò±¾
-	 * º¯Êı·µ»Ø MIME_STYPE_JPEG (ÔÚ mime_define.hpp ÖĞ¶¨Òå)
-	 * @return {int} ·µ»Ø mime_define.hpp ÖĞ¶¨ÒåµÄ MIME_STYPE_XXX
+	 * è·å¾— Content-Type ä¸­çš„ä»ç±»å‹ï¼Œå¦‚: Content-Type: image/jpeg, åˆ™æœ¬
+	 * å‡½æ•°è¿”å› MIME_STYPE_JPEG (åœ¨ mime_define.hpp ä¸­å®šä¹‰)
+	 * @return {int} è¿”å› mime_define.hpp ä¸­å®šä¹‰çš„ MIME_STYPE_XXX
 	 */
 	int get_stype(void) const
 	{
@@ -67,20 +67,20 @@ public:
 	}
 
 	/**
-	 * »ñµÃ Content-Type ÖĞµÄÖ÷ÀàĞÍ£¬ÒÔ×Ö·û´®·½Ê½±íÊ¾
-	 * @return {const char*} ·µ»Ø "" ±íÊ¾²»´æÔÚ
+	 * è·å¾— Content-Type ä¸­çš„ä¸»ç±»å‹ï¼Œä»¥å­—ç¬¦ä¸²æ–¹å¼è¡¨ç¤º
+	 * @return {const char*} è¿”å› "" è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* get_ctype_s(void) const;
 
 	/**
-	 * »ñµÃ Content-Type ÖĞµÄ´ÓÀàĞÍ£¬ÒÔ×Ö·û´®·½Ê½±íÊ¾
-	 * @return {const char*} ·µ»Ø "" ±íÊ¾²»´æÔÚ
+	 * è·å¾— Content-Type ä¸­çš„ä»ç±»å‹ï¼Œä»¥å­—ç¬¦ä¸²æ–¹å¼è¡¨ç¤º
+	 * @return {const char*} è¿”å› "" è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* get_stype_s(void) const;
 
 	/**
-	 * »ñµÃ´«Êä±àÂëÀàĞÍ (¶ÔÓ¦ÓÚ Content-Transfer-Encoding)
-	 * @return {int} ·µ»Ø mime_define.hpp ÖĞ¶¨ÒåµÄ MIME_ENC_XXX
+	 * è·å¾—ä¼ è¾“ç¼–ç ç±»å‹ (å¯¹åº”äº Content-Transfer-Encoding)
+	 * @return {int} è¿”å› mime_define.hpp ä¸­å®šä¹‰çš„ MIME_ENC_XXX
 	 */
 	int get_encoding(void) const
 	{
@@ -88,8 +88,8 @@ public:
 	}
 
 	/**
-	 * »ñµÃ½áµã×Ö·û¼¯×Ö·û´®(¶ÔÓ¦ÓÚ Content-Type ÖĞµÄ charset ×Ö¶Î)
-	 * @return {const char*} Îª¿ÕÔò±íÊ¾Ã»ÓĞ¸Ã×Ö¶Î
+	 * è·å¾—ç»“ç‚¹å­—ç¬¦é›†å­—ç¬¦ä¸²(å¯¹åº”äº Content-Type ä¸­çš„ charset å­—æ®µ)
+	 * @return {const char*} ä¸ºç©ºåˆ™è¡¨ç¤ºæ²¡æœ‰è¯¥å­—æ®µ
 	 */
 	const char* get_charset(void) const
 	{
@@ -97,8 +97,8 @@ public:
 	}
 
 	/**
-	 * »ñµÃÄ¿±ê×Ö·û¼¯, ÓÉÓÃ»§ÔÚ¹¹Ôìº¯ÊıÖĞ´«Èë
-	 * @return {const char*} Îª¿ÕÔò±íÊ¾ÓÃ»§Î´ÉèÖÃ
+	 * è·å¾—ç›®æ ‡å­—ç¬¦é›†, ç”±ç”¨æˆ·åœ¨æ„é€ å‡½æ•°ä¸­ä¼ å…¥
+	 * @return {const char*} ä¸ºç©ºåˆ™è¡¨ç¤ºç”¨æˆ·æœªè®¾ç½®
 	 */
 	const char* get_toCharset(void) const
 	{
@@ -109,7 +109,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾½áµãÔÚÓÊ¼şÖĞµÄÆğÊ¼Æ«ÒÆÁ¿
+	 * è·å¾—æœ¬ç»“ç‚¹åœ¨é‚®ä»¶ä¸­çš„èµ·å§‹åç§»é‡
 	 * @return {off_t}
 	 */
 	off_t get_bodyBegin(void) const
@@ -118,7 +118,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾½áµãÔÚÓÊ¼şÖĞµÄ½áÊøÆ«ÒÆÁ¿
+	 * è·å¾—æœ¬ç»“ç‚¹åœ¨é‚®ä»¶ä¸­çš„ç»“æŸåç§»é‡
 	 * @return {off_t}
 	 */
 	off_t get_bodyEnd(void) const
@@ -127,130 +127,130 @@ public:
 	}
 
 	/**
-	 * »ñµÃ±¾½áµãÍ·²¿ÖĞÄ³¸ö×Ö¶ÎµÄÖµ
-	 * @param name {const char*} ×Ö¶ÎÃû, Èç: Content-Type
-	 * @return {const char*} Îª¿ÕÔò±íÊ¾²»´æÔÚ
+	 * è·å¾—æœ¬ç»“ç‚¹å¤´éƒ¨ä¸­æŸä¸ªå­—æ®µçš„å€¼
+	 * @param name {const char*} å­—æ®µå, å¦‚: Content-Type
+	 * @return {const char*} ä¸ºç©ºåˆ™è¡¨ç¤ºä¸å­˜åœ¨
 	 */
 	const char* header_value(const char* name) const;
 
 	/**
-	 * È¡µÃ¸Ã½áµãµÄËùÓĞÍ·²¿×Ö¶Î¼¯ºÏ
+	 * å–å¾—è¯¥ç»“ç‚¹çš„æ‰€æœ‰å¤´éƒ¨å­—æ®µé›†åˆ
 	 * @return {const std::map<string, string>&}
 	 */
 	const std::map<string, string>& get_headers(void) const;
 
 	/**
-	 * ×ª´¢±¾½áµãÄÚÈİÓÚÖ¸¶¨µÄ¹ÜµÀÁ÷ÖĞ
+	 * è½¬å‚¨æœ¬ç»“ç‚¹å†…å®¹äºæŒ‡å®šçš„ç®¡é“æµä¸­
 	 * @param out {pipe_manager&}
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool save(pipe_manager& out) const;
 
 	/**
-	 * ×ª´¢±¾½áµãÄÚÈİÓÚÖ¸¶¨µÄ¹ÜµÀÁ÷ÖĞ
+	 * è½¬å‚¨æœ¬ç»“ç‚¹å†…å®¹äºæŒ‡å®šçš„ç®¡é“æµä¸­
 	 * @param out {pipe_manager&}
-	 * @param src {const char*} ÓÊ¼şÄÚÈİµÄÆğÊ¼µØÖ·£¬Èç¹ûÎª¿ÕÖ¸Õë£¬
-	 *  Ôò´Ó¹¹Ôìº¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @param len {int} ÓÊ¼şÄÚÈİµÄÊı¾İ³¤¶È£¬Èç¹ûÎª0£¬Ôò´Ó¹¹Ôì
-	 *  º¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * @param src {const char*} é‚®ä»¶å†…å®¹çš„èµ·å§‹åœ°å€ï¼Œå¦‚æœä¸ºç©ºæŒ‡é’ˆï¼Œ
+	 *  åˆ™ä»æ„é€ å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @param len {int} é‚®ä»¶å†…å®¹çš„æ•°æ®é•¿åº¦ï¼Œå¦‚æœä¸º0ï¼Œåˆ™ä»æ„é€ 
+	 *  å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool save(pipe_manager& out, const char* src, int len) const;
 
 	/**
-	 * ×ª´¢±¾½áµãÄÚÈİÓÚÖ¸¶¨µÄÊä³öÁ÷ÖĞ
-	 * @param out {ostream&} Á÷³öÁ÷
-	 * @param src {const char*} ÓÊ¼şÄÚÈİµÄÆğÊ¼µØÖ·£¬Èç¹ûÎª¿ÕÖ¸Õë£¬
-	 *  Ôò´Ó¹¹Ôìº¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @param len {int} ÓÊ¼şÄÚÈİµÄÊı¾İ³¤¶È£¬Èç¹ûÎª0£¬Ôò´Ó¹¹Ôì
-	 *  º¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * è½¬å‚¨æœ¬ç»“ç‚¹å†…å®¹äºæŒ‡å®šçš„è¾“å‡ºæµä¸­
+	 * @param out {ostream&} æµå‡ºæµ
+	 * @param src {const char*} é‚®ä»¶å†…å®¹çš„èµ·å§‹åœ°å€ï¼Œå¦‚æœä¸ºç©ºæŒ‡é’ˆï¼Œ
+	 *  åˆ™ä»æ„é€ å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @param len {int} é‚®ä»¶å†…å®¹çš„æ•°æ®é•¿åº¦ï¼Œå¦‚æœä¸º0ï¼Œåˆ™ä»æ„é€ 
+	 *  å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool save(ostream& out, const char* src = NULL, int len = 0) const;
 
 	/**
-	 * ×ª´¢±¾½áµãÄÚÈİÓÚÖ¸¶¨µÄÎÄ¼şÖĞ
-	 * @param outFile {const char*} Ä¿±êÎÄ¼şÃû
-	 * @param src {const char*} ÓÊ¼şÄÚÈİµÄÆğÊ¼µØÖ·£¬Èç¹ûÎª¿ÕÖ¸Õë£¬
-	 *  Ôò´Ó¹¹Ôìº¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @param len {int} ÓÊ¼şÄÚÈİµÄÊı¾İ³¤¶È£¬Èç¹ûÎª0£¬Ôò´Ó¹¹Ôì
-	 *  º¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * è½¬å‚¨æœ¬ç»“ç‚¹å†…å®¹äºæŒ‡å®šçš„æ–‡ä»¶ä¸­
+	 * @param outFile {const char*} ç›®æ ‡æ–‡ä»¶å
+	 * @param src {const char*} é‚®ä»¶å†…å®¹çš„èµ·å§‹åœ°å€ï¼Œå¦‚æœä¸ºç©ºæŒ‡é’ˆï¼Œ
+	 *  åˆ™ä»æ„é€ å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @param len {int} é‚®ä»¶å†…å®¹çš„æ•°æ®é•¿åº¦ï¼Œå¦‚æœä¸º0ï¼Œåˆ™ä»æ„é€ 
+	 *  å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool save(const char* outFile, const char* src = NULL, int len = 0) const;
 
 	/**
-	 * ×ª´¢±¾½áµãÄÚÈİÓÚ»º³åÇøÖĞ
-	 * @param out {string&} »º³åÇø
-	 * @param src {const char*} ÓÊ¼şÄÚÈİµÄÆğÊ¼µØÖ·£¬Èç¹ûÎª¿ÕÖ¸Õë£¬
-	 *  Ôò´Ó¹¹Ôìº¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @param len {int} ÓÊ¼şÄÚÈİµÄÊı¾İ³¤¶È£¬Èç¹ûÎª0£¬Ôò´Ó¹¹Ôì
-	 *  º¯ÊıÖĞËùÌá¹©µÄ emailFile µÄÎÄ¼şÖĞÌáÈ¡ÓÊ¼şÄÚÈİ
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * è½¬å‚¨æœ¬ç»“ç‚¹å†…å®¹äºç¼“å†²åŒºä¸­
+	 * @param out {string&} ç¼“å†²åŒº
+	 * @param src {const char*} é‚®ä»¶å†…å®¹çš„èµ·å§‹åœ°å€ï¼Œå¦‚æœä¸ºç©ºæŒ‡é’ˆï¼Œ
+	 *  åˆ™ä»æ„é€ å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @param len {int} é‚®ä»¶å†…å®¹çš„æ•°æ®é•¿åº¦ï¼Œå¦‚æœä¸º0ï¼Œåˆ™ä»æ„é€ 
+	 *  å‡½æ•°ä¸­æ‰€æä¾›çš„ emailFile çš„æ–‡ä»¶ä¸­æå–é‚®ä»¶å†…å®¹
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 */
 	bool save(string& out, const char* src, int len) const;
 
 	/**
-	 * »ñµÃ±¾½áµã¶ÔÓ¦µÄ¸¸½áµã¶ÔÏó
-	 * @return {mime_node*} Îª¿ÕÔò±íÊ¾±¾½áµãÃ»ÓĞ¸¸½áµã(ÔòËµÃ÷
-	 *  ±¾½áµãÎªÓÊ¼şµÄ¸ù½áµã); ·ñÔòÔò·µ»ØµÄ¸¸½áµãĞèÒªÔÚÓÃÍêºó
-	 *  delete µôÒÔÊÍ·ÅÏàÓ¦ÄÚ´æ
+	 * è·å¾—æœ¬ç»“ç‚¹å¯¹åº”çš„çˆ¶ç»“ç‚¹å¯¹è±¡
+	 * @return {mime_node*} ä¸ºç©ºåˆ™è¡¨ç¤ºæœ¬ç»“ç‚¹æ²¡æœ‰çˆ¶ç»“ç‚¹(åˆ™è¯´æ˜
+	 *  æœ¬ç»“ç‚¹ä¸ºé‚®ä»¶çš„æ ¹ç»“ç‚¹); å¦åˆ™åˆ™è¿”å›çš„çˆ¶ç»“ç‚¹éœ€è¦åœ¨ç”¨å®Œå
+	 *  delete æ‰ä»¥é‡Šæ”¾ç›¸åº”å†…å­˜
 	 */
 	mime_node* get_parent(void) const;
 
 	/**
-	 * ÅĞ¶Ï±¾½áµãÊÇ·ñÓĞ¸¸½áµã
-	 * @return {bool} true Ôò±íÊ¾ÓĞ¸¸½áµã, ·ñÔò±íÊ¾Ã»ÓĞ
+	 * åˆ¤æ–­æœ¬ç»“ç‚¹æ˜¯å¦æœ‰çˆ¶ç»“ç‚¹
+	 * @return {bool} true åˆ™è¡¨ç¤ºæœ‰çˆ¶ç»“ç‚¹, å¦åˆ™è¡¨ç¤ºæ²¡æœ‰
 	 */
 	bool has_parent(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãµÄÖ÷ÀàĞÍ (MIME_CTYPE_XXX), Èç¹ûÎª MIME_CTYPE_OTHER
-	 * ÔòËµÃ÷¸¸½áµã²»´æÔÚ»ò¸¸½áµãµÄÖ÷ÀàĞÍÎ´Öª
+	 * è·å¾—çˆ¶ç»“ç‚¹çš„ä¸»ç±»å‹ (MIME_CTYPE_XXX), å¦‚æœä¸º MIME_CTYPE_OTHER
+	 * åˆ™è¯´æ˜çˆ¶ç»“ç‚¹ä¸å­˜åœ¨æˆ–çˆ¶ç»“ç‚¹çš„ä¸»ç±»å‹æœªçŸ¥
 	 * @return {int} MIME_CTYPE_XXX
 	 */
 	int parent_ctype(void) const;
 	const char* parent_ctype_s(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãµÄ´ÓÀàĞÍ (MIME_STYPE_XXX), Èç¹ûÎª MIME_STYPE_OTHER
-	 * ÔòËµÃ÷¸¸½áµã²»´æÔÚ»ò¸¸½áµãµÄ´ÓÀàĞÍÎ´Öª
+	 * è·å¾—çˆ¶ç»“ç‚¹çš„ä»ç±»å‹ (MIME_STYPE_XXX), å¦‚æœä¸º MIME_STYPE_OTHER
+	 * åˆ™è¯´æ˜çˆ¶ç»“ç‚¹ä¸å­˜åœ¨æˆ–çˆ¶ç»“ç‚¹çš„ä»ç±»å‹æœªçŸ¥
 	 * @return {int} MIME_STYPE_XXX
 	 */
 	int parent_stype(void) const;
 	const char* parent_stype_s(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãµÄ±àÂëÀàĞÍ (MIME_ENC_XXX), Èç¹û·µ»ØÖµÎª MIME_ENC_OTHER
-	 * ÔòËµÃ÷¸¸½áµã²»´æÔÚ»ò¸¸½áµãµÄ±àÂëÀàĞÍÎ´Öª
+	 * è·å¾—çˆ¶ç»“ç‚¹çš„ç¼–ç ç±»å‹ (MIME_ENC_XXX), å¦‚æœè¿”å›å€¼ä¸º MIME_ENC_OTHER
+	 * åˆ™è¯´æ˜çˆ¶ç»“ç‚¹ä¸å­˜åœ¨æˆ–çˆ¶ç»“ç‚¹çš„ç¼–ç ç±»å‹æœªçŸ¥
 	 * @return {int} MIME_ENC_XXX
 	 */
 	int parent_encoding(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãµÄ×Ö·û¼¯ÀàĞÍ, Èç¹û·µ»ØÖµÎª¿ÕÔòËµÃ÷¸¸½áµã²»´æÔÚ»ò¸¸½áµã
-	 * ÖĞÃ»ÓĞ×Ö·û¼¯ÀàĞÍ
+	 * è·å¾—çˆ¶ç»“ç‚¹çš„å­—ç¬¦é›†ç±»å‹, å¦‚æœè¿”å›å€¼ä¸ºç©ºåˆ™è¯´æ˜çˆ¶ç»“ç‚¹ä¸å­˜åœ¨æˆ–çˆ¶ç»“ç‚¹
+	 * ä¸­æ²¡æœ‰å­—ç¬¦é›†ç±»å‹
 	 * @return {const char*}
 	 */
 	char* parent_charset(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãµÄÊı¾İÌåÆğÊ¼Æ«ÒÆÁ¿
-	 * @return {off_t} ·µ»ØÖµÎª -1 ±íÊ¾¸¸½áµã²»´æÔÚ
+	 * è·å¾—çˆ¶ç»“ç‚¹çš„æ•°æ®ä½“èµ·å§‹åç§»é‡
+	 * @return {off_t} è¿”å›å€¼ä¸º -1 è¡¨ç¤ºçˆ¶ç»“ç‚¹ä¸å­˜åœ¨
 	 */
 	off_t parent_bodyBegin(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãµÄÊı¾İÌå½áÊøÆ«ÒÆÁ¿
-	 * @return {off_t} ·µ»ØÖµÎª -1 ±íÊ¾¸¸½áµã²»´æÔÚ
+	 * è·å¾—çˆ¶ç»“ç‚¹çš„æ•°æ®ä½“ç»“æŸåç§»é‡
+	 * @return {off_t} è¿”å›å€¼ä¸º -1 è¡¨ç¤ºçˆ¶ç»“ç‚¹ä¸å­˜åœ¨
 	 */
 	off_t parent_bodyEnd(void) const;
 
 	/**
-	 * »ñµÃ¸¸½áµãÍ·²¿ÖĞÄ³¸ö×Ö¶ÎÃû¶ÔÓ¦µÄ×Ö¶ÎÖµ, Èç: Content-Type
-	 * @param name {const char*} ×Ö¶ÎÃû
-	 * @return {const char*} ×Ö¶ÎÖµ, ·µ»Ø¿ÕÔòËµÃ÷¸¸½áµã²»´æÔÚ
-	 *  »ò¸¸½áµãÍ·²¿ÖĞ²»´æÔÚ¸Ã×Ö¶Î
+	 * è·å¾—çˆ¶ç»“ç‚¹å¤´éƒ¨ä¸­æŸä¸ªå­—æ®µåå¯¹åº”çš„å­—æ®µå€¼, å¦‚: Content-Type
+	 * @param name {const char*} å­—æ®µå
+	 * @return {const char*} å­—æ®µå€¼, è¿”å›ç©ºåˆ™è¯´æ˜çˆ¶ç»“ç‚¹ä¸å­˜åœ¨
+	 *  æˆ–çˆ¶ç»“ç‚¹å¤´éƒ¨ä¸­ä¸å­˜åœ¨è¯¥å­—æ®µ
 	 */
 	const char* parent_header_value(const char* name) const;
 

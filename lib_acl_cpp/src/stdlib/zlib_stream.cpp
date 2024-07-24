@@ -51,7 +51,7 @@ static acl_pthread_once_t __zlib_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __zlib_dll = NULL;
 static acl::string __zlib_path;
 
-// ³ÌĞòÍË³öÊ±ÊÍ·Å¶¯Ì¬¼ÓÔØµÄ zlib.dll ¿â
+// ç¨‹åºé€€å‡ºæ—¶é‡Šæ”¾åŠ¨æ€åŠ è½½çš„ zlib.dll åº“
 #ifndef HAVE_NO_ATEXIT
 static void __zlib_dll_unload(void)
 {
@@ -63,7 +63,7 @@ static void __zlib_dll_unload(void)
 }
 #endif
 
-// ¼ÓÔØ zlib ¶¯Ì¬¿âÖĞµÄº¯Êı·ûºÅ
+// åŠ è½½ zlib åŠ¨æ€åº“ä¸­çš„å‡½æ•°ç¬¦å·
 static bool __zlib_dll_load_symbols(void)
 {
 	if (__zlib_dll == NULL) {
@@ -146,7 +146,7 @@ static bool __zlib_dll_load_symbols(void)
 	return true;
 }
 
-// ¶¯Ì¬¼ÓÔØ zlib.dll ¿â
+// åŠ¨æ€åŠ è½½ zlib.dll åº“
 static void __zlib_dll_load(void)
 {
 	if (__zlib_dll != NULL) {
@@ -172,7 +172,7 @@ static void __zlib_dll_load(void)
 		return;
 	}
 
-	// ¼ÇÂ¼¶¯Ì¬¿âÂ·¾¶£¬ÒÔ±ãÓÚÔÚ¶¯Ì¬¿âĞ¶ÔØÊ±Êä³ö¿âÂ·¾¶Ãû
+	// è®°å½•åŠ¨æ€åº“è·¯å¾„ï¼Œä»¥ä¾¿äºåœ¨åŠ¨æ€åº“å¸è½½æ—¶è¾“å‡ºåº“è·¯å¾„å
 	__zlib_path = path;
 
 	if (!__zlib_dll_load_symbols()) {
@@ -237,14 +237,14 @@ bool zlib_stream::zlib_load_once(void)
 {
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
-	// µ±ĞèÒª¼ÓÔØ zlib ¶¯Ì¬¿âÊ±£¬ĞèÒª±£Ö¤¼ÓÔØ¹ı³ÌµÄÎ¨Ò»ĞÔ
+	// å½“éœ€è¦åŠ è½½ zlib åŠ¨æ€åº“æ—¶ï¼Œéœ€è¦ä¿è¯åŠ è½½è¿‡ç¨‹çš„å”¯ä¸€æ€§
 	acl_pthread_once(&__zlib_once, __zlib_dll_load);
 	if (__zlib_dll != NULL) {
 		return true;
 	}
 	return false;
 # else
-	return true;  // ¶ÔÓÚ¾²Ì¬¿â£¬ÔòÖ±½Ó·µ»Ø³É¹¦¼´¿É
+	return true;  // å¯¹äºé™æ€åº“ï¼Œåˆ™ç›´æ¥è¿”å›æˆåŠŸå³å¯
 # endif
 	logger_warn("zlib not support!");
 	return false;
@@ -260,7 +260,7 @@ zlib_stream::zlib_stream(void)
 	zstream_->zfree  = __zlib_free;
 	zstream_->opaque = (void*) this;
 
-	is_compress_     = true;  // Ä¬ÈÏÎªÑ¹Ëõ×´Ì¬
+	is_compress_     = true;  // é»˜è®¤ä¸ºå‹ç¼©çŠ¶æ€
 	flush_           = zlib_flush_off;
 
 #ifdef  HAS_ZLIB
@@ -351,7 +351,7 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 
 		nbuf = (int) (out->capacity() - out->length());
 
-		// ĞèÒª±£Ö¤Êä³ö»º³åÇøµÄ¿ÉÓÃ¿Õ¼ä
+		// éœ€è¦ä¿è¯è¾“å‡ºç¼“å†²åŒºçš„å¯ç”¨ç©ºé—´
 		if (nbuf < BUF_MIN) {
 			nbuf = (int) out->length() + BUF_MIN;
 			out->space(nbuf);
@@ -380,7 +380,7 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 				return false;
 			}
 
-			// ĞŞ¸ÄÊä³ö»º³åÇøµÄÖ¸ÕëÎ»ÖÃ
+			// ä¿®æ”¹è¾“å‡ºç¼“å†²åŒºçš„æŒ‡é’ˆä½ç½®
 			if (nbuf < (int) zstream_->avail_out) {
 				logger_error("Pos err, nbuf=%d, avail_out=%d",
 					nbuf, (int) zstream_->avail_out);
@@ -401,7 +401,7 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 			return false;
 		}
 
-		// ĞŞ¸ÄÊä³ö»º³åÇøµÄÖ¸ÕëÎ»ÖÃ
+		// ä¿®æ”¹è¾“å‡ºç¼“å†²åŒºçš„æŒ‡é’ˆä½ç½®
 		if (nbuf < (int) zstream_->avail_out) {
 			logger_error("nbuf=%d, avail_out=%d",
 				nbuf, (int) zstream_->avail_out);
@@ -411,13 +411,13 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 		dlen += nbuf - zstream_->avail_out;
 		out->set_offset((ssize_t) dlen);
 
-		// ÈçÊäÈëÊı¾İÍê³ÉÔòÍË³öÑ­»·
+		// å¦‚è¾“å…¥æ•°æ®å®Œæˆåˆ™é€€å‡ºå¾ªç¯
 		if (zstream_->avail_in == 0) {
 			zstream_->next_in = NULL;
 			break;
 		}
 
-		// ¸üĞÂÊäÈëÊı¾İµÄÏÂÒ»¸öÎ»ÖÃ
+		// æ›´æ–°è¾“å…¥æ•°æ®çš„ä¸‹ä¸€ä¸ªä½ç½®
 		if (len < (int) zstream_->avail_in) {
 			logger_error("Pos err, len=%d, avail_in=%d",
 				len, (int) zstream_->avail_in);
@@ -426,7 +426,7 @@ bool zlib_stream::update(int (*func)(z_stream*, int),
 
 		pos += len - zstream_->avail_in;
 
-		// ¸üĞÂÊ£ÓàÊı¾İ³¤¶È
+		// æ›´æ–°å‰©ä½™æ•°æ®é•¿åº¦
 		len = zstream_->avail_in;
 	}
 
@@ -461,7 +461,7 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 	while (true) {
 		nbuf = (int) (out->capacity() - out->length());
 
-		// ĞèÒª±£Ö¤Êä³ö»º³åÇøµÄ¿ÉÓÃ¿Õ¼ä
+		// éœ€è¦ä¿è¯è¾“å‡ºç¼“å†²åŒºçš„å¯ç”¨ç©ºé—´
 		if (nbuf < BUF_MIN) {
 			nbuf = (int) out->length() + BUF_MIN;
 			out->space(nbuf);
@@ -487,7 +487,7 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 				return false;
 			}
 
-			// ĞŞ¸ÄÊä³ö»º³åÇøµÄÖ¸ÕëÎ»ÖÃ
+			// ä¿®æ”¹è¾“å‡ºç¼“å†²åŒºçš„æŒ‡é’ˆä½ç½®
 			if (nbuf < (int) zstream_->avail_out) {
 				logger_error("Pos err, nbuf=%d, avail_out=%d",
 					nbuf, (int) zstream_->avail_out);
@@ -509,7 +509,7 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 				return false;
 			}
 
-			// ĞŞ¸ÄÊä³ö»º³åÇøµÄÖ¸ÕëÎ»ÖÃ
+			// ä¿®æ”¹è¾“å‡ºç¼“å†²åŒºçš„æŒ‡é’ˆä½ç½®
 			if (nbuf < (int) zstream_->avail_out) {
 				logger_error("Pos err, nbuf=%d, avail_out=%d",
 					nbuf, (int) zstream_->avail_out);
@@ -523,7 +523,7 @@ bool zlib_stream::flush_out(int (*func)(z_stream*, int),
 				"deflate" : "inflate");
 			return false;
 		} else if (zstream_->avail_out == 0) {
-			// ĞŞ¸ÄÊä³ö»º³åÇøµÄÖ¸ÕëÎ»ÖÃ
+			// ä¿®æ”¹è¾“å‡ºç¼“å†²åŒºçš„æŒ‡é’ˆä½ç½®
 			if (nbuf < (int) zstream_->avail_out) {
 				logger_error("Pos err, nbuf=%d, avail_out=%d",
 					nbuf, (int) zstream_->avail_out);

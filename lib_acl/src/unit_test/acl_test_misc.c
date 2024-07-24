@@ -99,7 +99,7 @@ AUT_LINE *aut_index(int idx)
 	return test_line;
 }
 
-/* ±È½ÏËù¸øµÄÃüÁî×ÖÓëÅäÖÃĞĞÖĞµÄÃüÁî×ÖÊÇ·ñÏàµÈ */
+/* æ¯”è¾ƒæ‰€ç»™çš„å‘½ä»¤å­—ä¸é…ç½®è¡Œä¸­çš„å‘½ä»¤å­—æ˜¯å¦ç›¸ç­‰ */
 int aut_line_cmdcmp(const AUT_LINE *test_line, const char *cmd_name)
 {
 	const char *myname = "aut_line_cmdcmp";
@@ -112,7 +112,7 @@ int aut_line_cmdcmp(const AUT_LINE *test_line, const char *cmd_name)
 	return strcasecmp(test_line->cmd_name, cmd_name);
 }
 
-/* ±È½Ï³ÌĞòÖ´ĞĞ½á¹ûÓëÅäÖÃĞĞÖĞµÄÆÚÍû½á¹ûÖµ */
+/* æ¯”è¾ƒç¨‹åºæ‰§è¡Œç»“æœä¸é…ç½®è¡Œä¸­çš„æœŸæœ›ç»“æœå€¼ */
 int aut_line_resultcmp(const AUT_LINE *test_line, int value)
 {
 	const char *myname = "aut_line_resultcmp";
@@ -127,7 +127,7 @@ int aut_line_resultcmp(const AUT_LINE *test_line, int value)
 	return 1;
 }
 
-/* È¡µÃ¸ÃÅäÖÃĞĞÔÚÅäÖÃÎÄ¼şÖĞµÄĞĞºÅ */
+/* å–å¾—è¯¥é…ç½®è¡Œåœ¨é…ç½®æ–‡ä»¶ä¸­çš„è¡Œå· */
 int aut_line_number(const AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_number";
@@ -146,7 +146,7 @@ int aut_line_valid_linenum(const AUT_LINE *test_line)
 	return test_line->valid_line_idx;
 }
 
-/* È¡µÃ¸ÃÅäÖÃĞĞµÄÃüÁî×Ö */
+/* å–å¾—è¯¥é…ç½®è¡Œçš„å‘½ä»¤å­— */
 const char *aut_line_cmdname(const AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_cmdname";
@@ -159,7 +159,7 @@ const char *aut_line_cmdname(const AUT_LINE *test_line)
 	return test_line->cmd_name;
 }
 
-/* È¡µÃ¸ÃÅäÖÃĞĞÖĞÅäÖÃ²ÎÊıµÄ¸öÊı */
+/* å–å¾—è¯¥é…ç½®è¡Œä¸­é…ç½®å‚æ•°çš„ä¸ªæ•° */
 int aut_line_argc(const AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_argc";
@@ -200,7 +200,7 @@ const char *aut_line_getvalue(const AUT_LINE *test_line, const char *name)
 	return NULL;
 }
 
-/* È¡µÃ¸ÃÅäÖÃĞĞÖĞ²ÎÊıÄÚÈİ  */
+/* å–å¾—è¯¥é…ç½®è¡Œä¸­å‚æ•°å†…å®¹  */
 const char *aut_line_argstr(const AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_argstr";
@@ -213,7 +213,7 @@ const char *aut_line_argstr(const AUT_LINE *test_line)
 	return test_line->args_str;
 }
 
-/* È¡µÃ¸ÃÅäÖÃĞĞÖĞµÄÆÚÍû½á¹ûÖµ */
+/* å–å¾—è¯¥é…ç½®è¡Œä¸­çš„æœŸæœ›ç»“æœå€¼ */
 int aut_line_result(const AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_result";
@@ -226,7 +226,7 @@ int aut_line_result(const AUT_LINE *test_line)
 	return test_line->result;
 }
 
-/* ÅĞ¶ÏÊÇ·ñÍ£Ö¹¼ÌĞøÖ´ĞĞµÄÅäÖÃĞĞ */
+/* åˆ¤æ–­æ˜¯å¦åœæ­¢ç»§ç»­æ‰§è¡Œçš„é…ç½®è¡Œ */
 int aut_line_stop(const AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_stop";
@@ -239,7 +239,7 @@ int aut_line_stop(const AUT_LINE *test_line)
 	return 0;
 }
 
-/* ÅĞ¶ÏÊÇ·ñÊÇ±£ÁôÅäÖÃĞĞ */
+/* åˆ¤æ–­æ˜¯å¦æ˜¯ä¿ç•™é…ç½®è¡Œ */
 int aut_line_reserved(AUT_LINE *test_line)
 {
 	const char *myname = "aut_line_reserved";
@@ -252,7 +252,7 @@ int aut_line_reserved(AUT_LINE *test_line)
 	return 0;
 }
 
-/* ½«ÓÃ»§×Ô¼ºµÄ²ÎÊıÏî´æ´¢ÔÚ test_line ÄÚµÄ arg_inner ÖĞ */
+/* å°†ç”¨æˆ·è‡ªå·±çš„å‚æ•°é¡¹å­˜å‚¨åœ¨ test_line å†…çš„ arg_inner ä¸­ */
 int aut_line_add_arg(AUT_LINE *test_line, void *arg)
 {
 	const char *myname = "aut_line_add_arg";

@@ -9,7 +9,7 @@ class CProcCtl : public CWinThread
 	DECLARE_DYNCREATE(CProcCtl)
 
 protected:
-	CProcCtl();           // ¶¯Ì¬´´½¨ËùÊ¹ÓÃµÄÊÜ±£»¤µÄ¹¹Ôìº¯Êı
+	CProcCtl();           // åŠ¨æ€åˆ›å»ºæ‰€ä½¿ç”¨çš„å—ä¿æŠ¤çš„æ„é€ å‡½æ•°
 	virtual ~CProcCtl();
 
 public:

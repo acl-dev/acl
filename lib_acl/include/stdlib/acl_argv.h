@@ -17,26 +17,26 @@ typedef struct ACL_ARGV {
 	int     argc;			/**< array elements in use */
 	char  **argv;			/**< string array */
 
-	/* Ìí¼Ó¼°µ¯³ö */
+	/* æ·»åŠ åŠå¼¹å‡º */
 
-	/* ÏòÊý×éÎ²²¿Ìí¼Ó×Ö·û´® (ÄÚ²¿¶¯Ì¬¿½±´¸Ã×Ö·û´®) */
+	/* å‘æ•°ç»„å°¾éƒ¨æ·»åŠ å­—ç¬¦ä¸² (å†…éƒ¨åŠ¨æ€æ‹·è´è¯¥å­—ç¬¦ä¸²) */
 	void  (*push_back)(struct ACL_ARGV*, const char*);
-	/* ÏòÊý×éÍ·²¿Ìí¼Ó¶¯Ì¬¶ÔÏó (ÄÚ²¿¶¯Ì¬¿½±´¸Ã×Ö·û´®)*/
+	/* å‘æ•°ç»„å¤´éƒ¨æ·»åŠ åŠ¨æ€å¯¹è±¡ (å†…éƒ¨åŠ¨æ€æ‹·è´è¯¥å­—ç¬¦ä¸²)*/
 	void  (*push_front)(struct ACL_ARGV*, const char*);
-	/* µ¯³öÊý×éÎ²²¿×Ö·û´® (ÓÃÍêºóÐèµ÷ÓÃ acl_myfree ÊÍ·Å) */
+	/* å¼¹å‡ºæ•°ç»„å°¾éƒ¨å­—ç¬¦ä¸² (ç”¨å®ŒåŽéœ€è°ƒç”¨ acl_myfree é‡Šæ”¾) */
 	char *(*pop_back)(struct ACL_ARGV*);
-	/* µ¯³öÊý×éÍ·²¿×Ö·û´® (ÓÃÍêºóÐèµ÷ÓÃ acl_myfree ÊÍ·Å) */
+	/* å¼¹å‡ºæ•°ç»„å¤´éƒ¨å­—ç¬¦ä¸² (ç”¨å®ŒåŽéœ€è°ƒç”¨ acl_myfree é‡Šæ”¾) */
 	char *(*pop_front)(struct ACL_ARGV*);
 
 	/* for acl_iterator */
 
-	/* È¡µü´úÆ÷Í·º¯Êý */
+	/* å–è¿­ä»£å™¨å¤´å‡½æ•° */
 	void *(*iter_head)(ACL_ITER*, struct ACL_ARGV*);
-	/* È¡µü´úÆ÷ÏÂÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸‹ä¸€ä¸ªå‡½æ•° */
 	void *(*iter_next)(ACL_ITER*, struct ACL_ARGV*);
-	/* È¡µü´úÆ÷Î²º¯Êý */
+	/* å–è¿­ä»£å™¨å°¾å‡½æ•° */
 	void *(*iter_tail)(ACL_ITER*, struct ACL_ARGV*);
-	/* È¡µü´úÆ÷ÉÏÒ»¸öº¯Êý */
+	/* å–è¿­ä»£å™¨ä¸Šä¸€ä¸ªå‡½æ•° */
 	void *(*iter_prev)(ACL_ITER*, struct ACL_ARGV*);
 
 	/* private */
@@ -45,8 +45,8 @@ typedef struct ACL_ARGV {
 
 /* in acl_argv.c */
 /**
- * ·ÖÅäÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é
- * @param size {int} ¶¯Ì¬Êý×éµÄ³õÊ¼´óÐ¡
+ * åˆ†é…ä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„
+ * @param size {int} åŠ¨æ€æ•°ç»„çš„åˆå§‹å¤§å°
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_alloc(int size);
@@ -54,150 +54,150 @@ ACL_API ACL_ARGV *acl_argv_alloc(int size);
 ACL_API ACL_ARGV *acl_argv_alloc2(int size, ACL_DBUF_POOL *dbuf);
 
 /**
- * Ïò×Ö·û´®¶¯Ì¬Êý×éÖÐÌí¼ÓÒ»ÖÁ¶à¸ö×Ö·û´®£¬×îºóÒ»¸öNULL×Ö·û´®±íÊ¾½áÊø
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param ... ×Ö·û´®ÁÐ±í£¬×îºóÒ»¸öÎªNULL, ¸ñÊ½Èç£º{s1}, {s2}, ..., NULL
+ * å‘å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ä¸­æ·»åŠ ä¸€è‡³å¤šä¸ªå­—ç¬¦ä¸²ï¼Œæœ€åŽä¸€ä¸ªNULLå­—ç¬¦ä¸²è¡¨ç¤ºç»“æŸ
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param ... å­—ç¬¦ä¸²åˆ—è¡¨ï¼Œæœ€åŽä¸€ä¸ªä¸ºNULL, æ ¼å¼å¦‚ï¼š{s1}, {s2}, ..., NULL
  */
 ACL_API void acl_argv_add(ACL_ARGV *argvp,...);
 
 /**
- * ÔÚÖ¸¶¨Î»ÖÃÉèÖÃÖ¸¶¨µÄ×Ö·û´®£¬Í¬Ê±ÊÍ·Å¾ÉµÄ×Ö·û´®
- * @param argvp {ACL_ARGV *} ×Ö·û´®¶¯Ì¬Êý×é
- * @param idx {int} Ö¸¶¨ÏÂ±êÎ»ÖÃ£¬²»Ó¦Ô½½ç
- * @param value {const char *} ·Ç NULL ×Ö·û´®
- * @return {int} ·µ»Ø -1 ±íÊ¾ÏÂ±êÔ½½ç»ò value Îª NULL£¬0 ±íÊ¾³É¹¦
+ * åœ¨æŒ‡å®šä½ç½®è®¾ç½®æŒ‡å®šçš„å­—ç¬¦ä¸²ï¼ŒåŒæ—¶é‡Šæ”¾æ—§çš„å­—ç¬¦ä¸²
+ * @param argvp {ACL_ARGV *} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„
+ * @param idx {int} æŒ‡å®šä¸‹æ ‡ä½ç½®ï¼Œä¸åº”è¶Šç•Œ
+ * @param value {const char *} éž NULL å­—ç¬¦ä¸²
+ * @return {int} è¿”å›ž -1 è¡¨ç¤ºä¸‹æ ‡è¶Šç•Œæˆ– value ä¸º NULLï¼Œ0 è¡¨ç¤ºæˆåŠŸ
  */
 ACL_API int acl_argv_set(ACL_ARGV *argvp, int idx, const char *value);
 
 /**
- * Ïò×Ö·û´®¶¯Ì¬Êý×éÖÐÌí¼Ó×Ö·û´®ÁÐ±í
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param ap {va_list} ÓÉ¶à¸ö×Ö·û´®×é³ÉµÄ±ä²ÎÁÐ±í
+ * å‘å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ä¸­æ·»åŠ å­—ç¬¦ä¸²åˆ—è¡¨
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param ap {va_list} ç”±å¤šä¸ªå­—ç¬¦ä¸²ç»„æˆçš„å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_argv_addv(ACL_ARGV *argvp, va_list ap);
 
 /**
- * Ïò×Ö·û´®¶¯Ì¬Êý×éÖÐÌí¼Ó×Ö¶Î³¤¶ÈÓÐÏÞÖÆµÄ×Ö·û´®ÁÐ±í
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param ... Ò»×éÓÐ³¤¶ÈÏÞÖÆµÄ×Ö·û´®ÁÐ±í£¬
- *  Èç: {s1}, {len1}, {s2}, {len2}, ... NULL
+ * å‘å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ä¸­æ·»åŠ å­—æ®µé•¿åº¦æœ‰é™åˆ¶çš„å­—ç¬¦ä¸²åˆ—è¡¨
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param ... ä¸€ç»„æœ‰é•¿åº¦é™åˆ¶çš„å­—ç¬¦ä¸²åˆ—è¡¨ï¼Œ
+ *  å¦‚: {s1}, {len1}, {s2}, {len2}, ... NULL
  */
 ACL_API void acl_argv_addn(ACL_ARGV *argvp,...);
 
 /**
- * Ïò×Ö·û´®¶¯Ì¬Êý×éÖÐÌí¼Ó×Ö¶Î³¤¶ÈÓÐÏÞÖÆµÄ×Ö·û´®ÁÐ±í
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param ap {va_list} Ò»×éÓÐ³¤¶ÈÏÞÖÆµÄ×Ö·û´®×é³ÉµÄ±ä²ÎÁÐ±í
+ * å‘å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ä¸­æ·»åŠ å­—æ®µé•¿åº¦æœ‰é™åˆ¶çš„å­—ç¬¦ä¸²åˆ—è¡¨
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param ap {va_list} ä¸€ç»„æœ‰é•¿åº¦é™åˆ¶çš„å­—ç¬¦ä¸²ç»„æˆçš„å˜å‚åˆ—è¡¨
  */
 ACL_API void acl_argv_addnv(ACL_ARGV *argvp, va_list ap);
 
 /**
- * ÉèÖÃ×Ö·û´®¶¯Ì¬Êý×éµÄ½áÊøÎ»ÖÃ
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
+ * è®¾ç½®å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„çš„ç»“æŸä½ç½®
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
  */
 ACL_API void acl_argv_terminate(ACL_ARGV *argvp);
 
 /**
- * ÊÍ·Å×Ö·û´®¶¯Ì¬Êý×é
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
+ * é‡Šæ”¾å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
  */
 ACL_API ACL_ARGV *acl_argv_free(ACL_ARGV *argvp);
 
 /**
- * ¸ù¾ÝÊý×éÏÂ±êÎ»ÖÃ·µ»ØÏà¶ÔÓ¦µÄ×Ö·û´®Ö¸Õë
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param idx {int} ÏÂ±êÎ»ÖÃ
- * @return {char*} NULL: ÏÂ±êÔ½½ç£»!= NULL: ×Ö·û´®Ö¸ÕëÎ»ÖÃ
+ * æ ¹æ®æ•°ç»„ä¸‹æ ‡ä½ç½®è¿”å›žç›¸å¯¹åº”çš„å­—ç¬¦ä¸²æŒ‡é’ˆ
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param idx {int} ä¸‹æ ‡ä½ç½®
+ * @return {char*} NULL: ä¸‹æ ‡è¶Šç•Œï¼›!= NULL: å­—ç¬¦ä¸²æŒ‡é’ˆä½ç½®
  */
 ACL_API char *acl_argv_index(ACL_ARGV *argvp, int idx);
 
 /**
- * ·µ»Øµ±Ç°×Ö·û´®¶¯Ì¬Êý×éÖÐÒÑ¾­´æ·ÅµÄ×Ö·û´®¸öÊý
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
+ * è¿”å›žå½“å‰å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ä¸­å·²ç»å­˜æ”¾çš„å­—ç¬¦ä¸²ä¸ªæ•°
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
  * @return {int}
  */
 ACL_API int acl_argv_size(ACL_ARGV *argvp);
 
 /* in acl_argv_split.c */
 /**
- * ¸ù¾ÝÔ´×Ö·û´®¼°·Ö¸ô×Ö·û´®Éú³ÉÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
+ * æ ¹æ®æºå­—ç¬¦ä¸²åŠåˆ†éš”å­—ç¬¦ä¸²ç”Ÿæˆä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split(const char *str, const char *delim);
 
 /**
- * ¸ù¾ÝÔ´×Ö·û´®¼°·Ö¸ô×Ö·û´®Éú³ÉÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é£¬Í¬Ê±½«´«ÈëµÄÄÚ´æ³Ø
- * ¶ÔÏó×öÎªÄÚ´æ·ÖÅäÆ÷
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
- * @param dbuf {ACL_DBUF_POOL*} ÄÚ´æ³Ø¶ÔÏó£¬¿ÉÒÔÎª¿Õ£¬µ±Îª¿ÕÊ±Ôò²ÉÓÃ
- *  È±Ê¡µÄÄÚ´æ·ÖÅä·½Ê½
+ * æ ¹æ®æºå­—ç¬¦ä¸²åŠåˆ†éš”å­—ç¬¦ä¸²ç”Ÿæˆä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ï¼ŒåŒæ—¶å°†ä¼ å…¥çš„å†…å­˜æ± 
+ * å¯¹è±¡åšä¸ºå†…å­˜åˆ†é…å™¨
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
+ * @param dbuf {ACL_DBUF_POOL*} å†…å­˜æ± å¯¹è±¡ï¼Œå¯ä»¥ä¸ºç©ºï¼Œå½“ä¸ºç©ºæ—¶åˆ™é‡‡ç”¨
+ *  ç¼ºçœçš„å†…å­˜åˆ†é…æ–¹å¼
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split3(const char *str, const char *delim,
 	ACL_DBUF_POOL *dbuf);
 
 /**
- * ¸ù¾ÝÔ´×Ö·û´®¼°·Ö¸ô×Ö·û´®Éú³ÉÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é, µ«ÏÞ¶¨×î´ó·Ö¸ô´ÎÊý
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
- * @param n {size_t} ×î´ó·Ö¸ô´ÎÊý
+ * æ ¹æ®æºå­—ç¬¦ä¸²åŠåˆ†éš”å­—ç¬¦ä¸²ç”Ÿæˆä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„, ä½†é™å®šæœ€å¤§åˆ†éš”æ¬¡æ•°
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
+ * @param n {size_t} æœ€å¤§åˆ†éš”æ¬¡æ•°
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn(const char *str, const char *delim, size_t n);
 
 /**
- * ¸ù¾ÝÔ´×Ö·û´®¼°·Ö¸ô×Ö·û´®Éú³ÉÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é, µ«ÏÞ¶¨×î´ó·Ö¸ô´ÎÊý£¬
- * Í¬Ê±´«ÈëÄÚ´æ³Ø¶ÔÏó×öÎªÄÚ´æ·ÖÅäÆ÷
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
- * @param n {size_t} ×î´ó·Ö¸ô´ÎÊý
- * @param dbuf {ACL_DBUF_POOL*} ÄÚ´æ³Ø¶ÔÏó£¬¿ÉÒÔÎª¿Õ£¬µ±Îª¿ÕÊ±Ôò²ÉÓÃ
- *  È±Ê¡µÄÄÚ´æ·ÖÅä·½Ê½
+ * æ ¹æ®æºå­—ç¬¦ä¸²åŠåˆ†éš”å­—ç¬¦ä¸²ç”Ÿæˆä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„, ä½†é™å®šæœ€å¤§åˆ†éš”æ¬¡æ•°ï¼Œ
+ * åŒæ—¶ä¼ å…¥å†…å­˜æ± å¯¹è±¡åšä¸ºå†…å­˜åˆ†é…å™¨
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
+ * @param n {size_t} æœ€å¤§åˆ†éš”æ¬¡æ•°
+ * @param dbuf {ACL_DBUF_POOL*} å†…å­˜æ± å¯¹è±¡ï¼Œå¯ä»¥ä¸ºç©ºï¼Œå½“ä¸ºç©ºæ—¶åˆ™é‡‡ç”¨
+ *  ç¼ºçœçš„å†…å­˜åˆ†é…æ–¹å¼
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn4(const char *str, const char *delim,
 	size_t n, ACL_DBUF_POOL *dbuf);
 
 /**
- * Ô´×Ö·û´®¾­·Ö¸ô·û·Ö½âºó£¬Æä½á¹û±»¸½¼ÓÖÁÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
+ * æºå­—ç¬¦ä¸²ç»åˆ†éš”ç¬¦åˆ†è§£åŽï¼Œå…¶ç»“æžœè¢«é™„åŠ è‡³ä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_split_append(ACL_ARGV *argvp, const char *str,
 	const char *delim);
 
 /**
- * Ô´×Ö·û´®¾­·Ö¸ô·û·Ö½âºó£¬Æä½á¹û±»¸½¼ÓÖÁÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é, µ«ÏÞ¶¨×î´ó·Ö¸ô´ÎÊý
- * @param argvp {ACL_ARGV*} ×Ö·û´®¶¯Ì¬Êý×éÖ¸Õë
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
- * @param n {size_t} ×î´ó·Ö¸ô´ÎÊý
+ * æºå­—ç¬¦ä¸²ç»åˆ†éš”ç¬¦åˆ†è§£åŽï¼Œå…¶ç»“æžœè¢«é™„åŠ è‡³ä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„, ä½†é™å®šæœ€å¤§åˆ†éš”æ¬¡æ•°
+ * @param argvp {ACL_ARGV*} å­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„æŒ‡é’ˆ
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
+ * @param n {size_t} æœ€å¤§åˆ†éš”æ¬¡æ•°
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_splitn_append(ACL_ARGV *argvp, const char *str,
 	const char *delim, size_t n);
 
 /**
- * ¸ù¾ÝÔ´×Ö·û´®¼°·Ö¸ô×Ö·û´®Éú³ÉÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é£¬Õë¶ÔÓÉ "" »ò '' ÒýÓÃµÄ
- * ×Ö·û´®²»×ö·Ö¸ô
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
+ * æ ¹æ®æºå­—ç¬¦ä¸²åŠåˆ†éš”å­—ç¬¦ä¸²ç”Ÿæˆä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ï¼Œé’ˆå¯¹ç”± "" æˆ– '' å¼•ç”¨çš„
+ * å­—ç¬¦ä¸²ä¸åšåˆ†éš”
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
  * @return {ACL_ARGV*}
  */
 ACL_API ACL_ARGV *acl_argv_quote_split(const char *str, const char *delim);
 
 /**
- * ¸ù¾ÝÔ´×Ö·û´®¼°·Ö¸ô×Ö·û´®Éú³ÉÒ»¸ö×Ö·û´®¶¯Ì¬Êý×é£¬Õë¶ÔÓÉ "" »ò '' ÒýÓÃµÄ
- * ×Ö·û´®²»×ö·Ö¸ô£¬ÆäÖÐ½«´«ÈëµÄÄÚ´æ³Ø¶ÔÏó×öÎªÄÚ´æ·ÖÅäÆ÷
- * @param str {const char*} Ô´×Ö·û´®
- * @param delim {const char*} ·Ö¸ô×Ö·û´®
- * @param dbuf {ACL_DBUF_POOL*} ÄÚ´æ³Ø¶ÔÏó£¬¿ÉÒÔÎª¿Õ£¬µ±Îª¿ÕÊ±Ôò²ÉÓÃ
- *  È±Ê¡µÄÄÚ´æ·ÖÅä·½Ê½
+ * æ ¹æ®æºå­—ç¬¦ä¸²åŠåˆ†éš”å­—ç¬¦ä¸²ç”Ÿæˆä¸€ä¸ªå­—ç¬¦ä¸²åŠ¨æ€æ•°ç»„ï¼Œé’ˆå¯¹ç”± "" æˆ– '' å¼•ç”¨çš„
+ * å­—ç¬¦ä¸²ä¸åšåˆ†éš”ï¼Œå…¶ä¸­å°†ä¼ å…¥çš„å†…å­˜æ± å¯¹è±¡åšä¸ºå†…å­˜åˆ†é…å™¨
+ * @param str {const char*} æºå­—ç¬¦ä¸²
+ * @param delim {const char*} åˆ†éš”å­—ç¬¦ä¸²
+ * @param dbuf {ACL_DBUF_POOL*} å†…å­˜æ± å¯¹è±¡ï¼Œå¯ä»¥ä¸ºç©ºï¼Œå½“ä¸ºç©ºæ—¶åˆ™é‡‡ç”¨
+ *  ç¼ºçœçš„å†…å­˜åˆ†é…æ–¹å¼
  * @return {ACL_ARGV*}
  */
 ACL_API	ACL_ARGV *acl_argv_quote_split4(const char *str, const char *delim,

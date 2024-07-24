@@ -18,15 +18,15 @@ static void sleep_while(int n)
 	printf("\r\n");
 }
 
-// ³õÊ¼»¯¹ı³Ì
+// åˆå§‹åŒ–è¿‡ç¨‹
 static void init(const char* addrs, int count)
 {
 	int  cocurrent = 100, conn_timeout = 100, rw_timeout = 200;
 
-	// ´´½¨ HTTP ÇëÇóÁ¬½Ó³Ø¼¯Èº¹ÜÀí¶ÔÏó
+	// åˆ›å»º HTTP è¯·æ±‚è¿æ¥æ± é›†ç¾¤ç®¡ç†å¯¹è±¡
 	__conn_manager = new http_request_manager();
 
-	// Ìí¼Ó·şÎñÆ÷¼¯ÈºµØÖ·
+	// æ·»åŠ æœåŠ¡å™¨é›†ç¾¤åœ°å€
 	__conn_manager->init(addrs, addrs, cocurrent, conn_timeout, rw_timeout);
 
 	printf(">>>start monitor thread\r\n");
@@ -35,7 +35,7 @@ static void init(const char* addrs, int count)
 	acl::connect_monitor* monitor = new acl::connect_monitor(*__conn_manager);
 	(*monitor).set_check_inter(check_inter).set_conn_timeout(check_conn_timeout);
 
-	// Æô¶¯ºóÌ¨¼ì²âÏß³Ì
+	// å¯åŠ¨åå°æ£€æµ‹çº¿ç¨‹
 	__conn_manager->start_monitor(monitor);
 
 
@@ -44,14 +44,14 @@ static void init(const char* addrs, int count)
 	sleep_while(n);
 
 	printf(">>>create thread pool\r\n");
-	// ´´½¨Ïß³Ì³Ø
+	// åˆ›å»ºçº¿ç¨‹æ± 
 	__thr_pool = acl_thread_pool_create(count, 60);
 }
 
-// ½ø³ÌÍË³öÇ°ÇåÀí×ÊÔ´
+// è¿›ç¨‹é€€å‡ºå‰æ¸…ç†èµ„æº
 static void end(void)
 {
-	// Ïú»ÙÏß³Ì³Ø
+	// é”€æ¯çº¿ç¨‹æ± 
 	acl_pthread_pool_destroy(__thr_pool);
 
 #if 0
@@ -60,7 +60,7 @@ static void end(void)
 	sleep_while(n);
 #endif
 
-	// ´òÓ¡ËùÓĞÁ¬½Ó³Ø¼¯ÈºµÄ´æ»î×´Ì¬
+	// æ‰“å°æ‰€æœ‰è¿æ¥æ± é›†ç¾¤çš„å­˜æ´»çŠ¶æ€
 	printf("\r\n");
 	std::vector<connect_pool*>& pools = __conn_manager->get_pools();
 	std::vector<connect_pool*>::const_iterator cit = pools.begin();
@@ -71,23 +71,23 @@ static void end(void)
 	}
 	printf("\r\n>>> STOPPING check thread now\r\n");
 
-	// Í£Ö¹ºóÌ¨¼ì²âÏß³Ì
+	// åœæ­¢åå°æ£€æµ‹çº¿ç¨‹
 	acl::connect_monitor* monitor = __conn_manager->stop_monitor(true);
-	// É¾³ı¼ì²âÆ÷¶ÔÏó
+	// åˆ é™¤æ£€æµ‹å™¨å¯¹è±¡
 	delete monitor;
 
-	// Ïú»ÙÁ¬½Ó³Ø
+	// é”€æ¯è¿æ¥æ± 
 	delete __conn_manager;
 }
 
-// HTTP ÇëÇó¹ı³Ì£¬Ïò·şÎñÆ÷·¢ËÍÇëÇóºó´Ó·şÎñÆ÷¶ÁÈ¡ÏìÓ¦Êı¾İ
+// HTTP è¯·æ±‚è¿‡ç¨‹ï¼Œå‘æœåŠ¡å™¨å‘é€è¯·æ±‚åä»æœåŠ¡å™¨è¯»å–å“åº”æ•°æ®
 static bool http_get(http_request* conn, const char* addr, int n)
 {
 	if (__debug) {
 		printf(">>>check addr: %s, n: %d\r\n", addr, n);
 	}
 
-	// ´´½¨ HTTP ÇëÇóÍ·Êı¾İ
+	// åˆ›å»º HTTP è¯·æ±‚å¤´æ•°æ®
 	http_header& header = conn->request_header();
 	header.set_url("/")
 		.set_host(addr)
@@ -99,7 +99,7 @@ static bool http_get(http_request* conn, const char* addr, int n)
 		printf("%lu--%d: begin send request\r\n",
 			(unsigned long) acl_pthread_self(), n);
 	}
-	// ·¢ËÍ HTTP ÇëÇóÊı¾İÍ¬Ê±½ÓÊÕ HTTP ÏìÓ¦Í·
+	// å‘é€ HTTP è¯·æ±‚æ•°æ®åŒæ—¶æ¥æ”¶ HTTP å“åº”å¤´
 	if (conn->request(NULL, 0) == false) {
 		printf("%lu--%d: send GET request error\r\n",
 			(unsigned long) acl_pthread_self(), n);
@@ -109,7 +109,7 @@ static bool http_get(http_request* conn, const char* addr, int n)
 	char  buf[8192];
 	int   ret, length = 0;
 
-	// ½ÓÊÕ HTTP ÏìÓ¦ÌåÊı¾İ
+	// æ¥æ”¶ HTTP å“åº”ä½“æ•°æ®
 	while (true) {
 		ret = conn->read_body(buf, sizeof(buf) - 1);
 		if (ret == 0) {
@@ -147,7 +147,7 @@ static void check_all_connections(void)
 	}
 }
 
-// Ïß³Ì´¦Àí¹ı³Ì
+// çº¿ç¨‹å¤„ç†è¿‡ç¨‹
 static void thread_main(void*)
 {
 	for (int i = 0; i < __loop_count; i++) {
@@ -160,7 +160,7 @@ static void thread_main(void*)
 			exit (1);
 		}
 
-		// ´ÓÁ¬½Ó³ØÖĞ»ñÈ¡Ò»¸ö HTTP Á¬½Ó
+		// ä»è¿æ¥æ± ä¸­è·å–ä¸€ä¸ª HTTP è¿æ¥
 		http_request* conn = (http_request*) pool->peek();
 		if (conn == NULL) {
 			printf("\r\n>>>%lu: peek connect failed from %s<<<\r\n",
@@ -170,15 +170,15 @@ static void thread_main(void*)
 			exit (1);
 		}
 
-		// ĞèÒª¶Ô»ñµÃµÄÁ¬½ÓÖØÖÃ×´Ì¬£¬ÒÔÇå³ıÉÏ´ÎÇëÇó¹ı³ÌµÄÁÙÊ±Êı¾İ
+		// éœ€è¦å¯¹è·å¾—çš„è¿æ¥é‡ç½®çŠ¶æ€ï¼Œä»¥æ¸…é™¤ä¸Šæ¬¡è¯·æ±‚è¿‡ç¨‹çš„ä¸´æ—¶æ•°æ®
 		else {
 			conn->reset();
 		}
 
-		// ¿ªÊ¼ĞÂµÄ HTTP ÇëÇó¹ı³Ì
+		// å¼€å§‹æ–°çš„ HTTP è¯·æ±‚è¿‡ç¨‹
 		if (http_get(conn, pool->get_addr(), i) == false) {
 			printf("one request failed, close connection\r\n");
-			// ´íÎóÁ¬½ÓĞèÒª¹Ø±Õ
+			// é”™è¯¯è¿æ¥éœ€è¦å…³é—­
 			pool->put(conn, false);
 		} else {
 			pool->put(conn, true);
@@ -193,7 +193,7 @@ static void thread_main(void*)
 
 static void run(int cocurrent)
 {
-	// ÏòÏß³Ì³ØÖĞÌí¼ÓÈÎÎñ
+	// å‘çº¿ç¨‹æ± ä¸­æ·»åŠ ä»»åŠ¡
 	for (int i = 0; i < cocurrent; i++) {
 		acl_pthread_pool_add(__thr_pool, thread_main, NULL);
 	}
@@ -214,10 +214,10 @@ int main(int argc, char* argv[])
 	int   ch, cocurrent = 10;
 	string addrs("www.sina.com.cn:80;www.263.net:80;www.qq.com:81");
 
-	// ³õÊ¼»¯ acl ¿â
+	// åˆå§‹åŒ– acl åº“
 	acl::acl_cpp_init();
 
-	// ÈÕÖ¾Êä³öÖÁ±ê×¼Êä³ö
+	// æ—¥å¿—è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 	acl::log::stdout_open(true);
 
 	while ((ch = getopt(argc, argv, "hs:Dn:c:z")) > 0) {

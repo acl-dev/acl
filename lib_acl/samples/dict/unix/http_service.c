@@ -18,7 +18,7 @@ static const char *__partions[] = {
 };
 static int   __partions_size = 4;
 
-/* ³õÊ¼»¯º¯Êı */
+/* åˆå§‹åŒ–å‡½æ•° */
 void http_service_init(void *init_ctx acl_unused)
 {
 	const char *myname = "http_service_init";
@@ -329,7 +329,7 @@ static int http_service(ACL_VSTREAM *client)
 	}
 }
 
-/* Ğ­Òé´¦Àíº¯ÊıÈë¿Ú */
+/* åè®®å¤„ç†å‡½æ•°å…¥å£ */
 int http_service_main(ACL_VSTREAM *client, void *run_ctx acl_unused)
 {
 	if (isatty(ACL_VSTREAM_SOCK(client)))

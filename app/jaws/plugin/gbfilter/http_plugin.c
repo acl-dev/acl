@@ -4,7 +4,7 @@
 static ACL_DLL_ENV __dll_env;
 static acl_pthread_pool_t *__thrpool = NULL;
 
-/* ³õÊ¼»¯¸Ã²å¼şµÄ»·¾³ */
+/* åˆå§‹åŒ–è¯¥æ’ä»¶çš„ç¯å¢ƒ */
 
 static void plugin_init(ACL_DLL_ENV *dll_env)
 {
@@ -18,7 +18,7 @@ static void plugin_init(ACL_DLL_ENV *dll_env)
                         __LINE__, ACL_VSTREAM_PATH(__dll_env.logfp));
         }
 
-	/* Èç¹û mem_slice ·Ç¿ÕÔòÉèÖÃÄÚ´æ·ÖÅä²ÉÓÃÇĞÆ¬·ÖÅä·½Ê½ */
+	/* å¦‚æœ mem_slice éç©ºåˆ™è®¾ç½®å†…å­˜åˆ†é…é‡‡ç”¨åˆ‡ç‰‡åˆ†é…æ–¹å¼ */
 	if (__dll_env.mem_slice)
 		acl_mem_slice_set(__dll_env.mem_slice);
 }
@@ -38,7 +38,7 @@ void http_plugin_pool_create(int threads_limit, int threads_idle)
 			myname, __LINE__);
 		return;
 	}
-	/* ´´½¨Ïß³Ì³Ø */
+	/* åˆ›å»ºçº¿ç¨‹æ±  */
 	__thrpool = acl_thread_pool_create(threads_limit, threads_idle);
 }
 
@@ -49,7 +49,7 @@ void http_plugin_pool_append(void (*start_routine)(void *), void *arg)
 
 void http_plugin_debug_memory(int level)
 {
-	/* ÊÇ·ñµ÷ÊÔ²å¼şµÄÄÚ´æ·ÖÅäÇé¿ö */
+	/* æ˜¯å¦è°ƒè¯•æ’ä»¶çš„å†…å­˜åˆ†é…æƒ…å†µ */
 
 	switch (level) {
 	case 1:

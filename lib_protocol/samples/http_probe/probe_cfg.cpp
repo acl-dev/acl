@@ -39,7 +39,7 @@ static int  __parse_url(const char *url, char *host_buf, int hlen,
 
 	n = strlen("http://");
 
-	/* ÊÇ·ñ±ê×¼µÄ http Ğ­ÒéÇëÇó¸ñÊ½ */
+	/* æ˜¯å¦æ ‡å‡†çš„ http åè®®è¯·æ±‚æ ¼å¼ */
 	if (strncasecmp(ptr, "http://", n) == 0)
 		ptr += n;
 
@@ -57,7 +57,7 @@ static int  __parse_url(const char *url, char *host_buf, int hlen,
 	} else
 		strcpy(url_buf, "/");
 
-	/* »ñµÃ http Ğ­Òé¶Ë¿ÚºÅ */
+	/* è·å¾— http åè®®ç«¯å£å· */
 	if (http_port) {
 		ptr = strchr(url_begin, ':');
 		if (ptr) {
@@ -171,7 +171,7 @@ static void __set_name_value(char *data, PROBE_SERVER *server)
 static PROBE_SERVER *__cfg_server_new(char *data)
 {
 /*
- * data: server_name="²©¿Í2", addr=10.0.90.246:80, url=http://blog.hexun.com/index.aspx, connect_timeout=60, rw_timeout=60, retry_inter=5, probe_inter=5
+ * data: server_name="åšå®¢2", addr=10.0.90.246:80, url=http://blog.hexun.com/index.aspx, connect_timeout=60, rw_timeout=60, retry_inter=5, probe_inter=5
  */
 	const char *myname = "__cfg_server_new";
 	PROBE_SERVER *server = NULL;

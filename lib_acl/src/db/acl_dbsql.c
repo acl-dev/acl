@@ -44,7 +44,7 @@ void acl_dbsql_free_result(ACL_DB_HANDLE *handle, ACL_SQL_RES *res)
 	handle->free_result(res);
 }
 
-/* ÓÃÓÚÓÐ·µ»Ø½á¹û¼¯µÄ²éÑ¯ */
+/* ç”¨äºŽæœ‰è¿”å›žç»“æžœé›†çš„æŸ¥è¯¢ */
 
 int acl_dbsql_results(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	int (*walk_fn)(const void** result_row, void *arg), void *arg)
@@ -65,7 +65,7 @@ int acl_dbsql_results(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	return (n);
 }
 
-/* ÓÃÓÚ½ö²éÑ¯Ò»¸ö½á¹ûµÄÇé¿ö */
+/* ç”¨äºŽä»…æŸ¥è¯¢ä¸€ä¸ªç»“æžœçš„æƒ…å†µ */
 
 int acl_dbsql_result(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	int (*walk_fn)(const void** result_row, void *arg), void *arg)

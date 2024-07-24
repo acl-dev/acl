@@ -163,7 +163,7 @@ static void __on_thread_exit(void *arg_free)
 
 int acl_ioctl_start(ACL_IOCTL *ioc)
 {
-	/* µ¥Ïß³ÌÄ£Ê½ */
+	/* å•çº¿ç¨‹æ¨¡å¼ */
 	if (ioc->max_threads == 0) {
 		ioc->tp = NULL;
 		ioc->event = acl_event_new(ioc->event_mode, 0,
@@ -171,7 +171,7 @@ int acl_ioctl_start(ACL_IOCTL *ioc)
 		return 0;
 	}
 
-	/* ¶àÏß³ÌÄ£Ê½ */
+	/* å¤šçº¿ç¨‹æ¨¡å¼ */
 	ioc->tp = acl_thread_pool_create(ioc->max_threads, ioc->idle_timeout);
 	acl_pthread_pool_set_poller(ioc->tp, __poller_fn, ioc);
 
@@ -262,7 +262,7 @@ void acl_ioctl_enable_read(ACL_IOCTL *ioc, ACL_VSTREAM *stream,
 	ctx->context    = context;
 	ctx->event_type = ACL_EVENT_READ;
 
-	/* ½«Êý¾ÝÁ÷µÄ×´Ì¬ÖÃÈëÊÂ¼þ¼à¿Ø¼¯ºÏÖÐ */
+	/* å°†æ•°æ®æµçš„çŠ¶æ€ç½®å…¥äº‹ä»¶ç›‘æŽ§é›†åˆä¸­ */
 	if (ioc->max_threads == 0)
 		acl_event_enable_read(ioc->event, stream,
 			timeout, read_notify_callback, (void *) ctx);
@@ -293,7 +293,7 @@ void acl_ioctl_enable_write(ACL_IOCTL *ioc, ACL_VSTREAM *stream,
 	ctx->notify_fn = notify_fn;
 	ctx->context   = context;
 
-	/* ½«¿Í»§¶ËÊý¾ÝÁ÷µÄ×´Ì¬ÖÃÈëÊÂ¼þ¼à¿Ø¼¯ºÏÖÐ */
+	/* å°†å®¢æˆ·ç«¯æ•°æ®æµçš„çŠ¶æ€ç½®å…¥äº‹ä»¶ç›‘æŽ§é›†åˆä¸­ */
 	if (ioc->max_threads == 0)
 		acl_event_enable_write(ioc->event, stream,
 			timeout, write_notify_callback, (void *) ctx);

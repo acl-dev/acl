@@ -20,35 +20,35 @@ ACL_CPP_API bool master_log_enabled(void);
 class ACL_CPP_API master_base : public noncopyable {
 public:
 	/**
-	 * ÉèÖÃ bool ÀàĞÍµÄÅäÖÃÏî
+	 * è®¾ç½® bool ç±»å‹çš„é…ç½®é¡¹
 	 * @param table {master_bool_tbl*}
 	 * @return {master_base&}
 	 */
 	master_base& set_cfg_bool(master_bool_tbl* table);
 
 	/**
-	 * ÉèÖÃ int ÀàĞÍµÄÅäÖÃÏî
+	 * è®¾ç½® int ç±»å‹çš„é…ç½®é¡¹
 	 * @param table {master_int_tbl*}
 	 * @return {master_base&}
 	 */
 	master_base& set_cfg_int(master_int_tbl* table);
 
 	/**
-	 * ÉèÖÃ int64 ÀàĞÍµÄÅäÖÃÏî
+	 * è®¾ç½® int64 ç±»å‹çš„é…ç½®é¡¹
 	 * @param table {master_int64_tbl*}
 	 * @return {master_base&}
 	 */
 	master_base& set_cfg_int64(master_int64_tbl* table);
 
 	/**
-	 * ÉèÖÃ ×Ö·û´® ÀàĞÍµÄÅäÖÃÏî
+	 * è®¾ç½® å­—ç¬¦ä¸² ç±»å‹çš„é…ç½®é¡¹
 	 * @param table {master_str_tbl*}
 	 * @return {master_base&}
 	 */
 	master_base& set_cfg_str(master_str_tbl* table);
 
 	/**
-	 * ÅĞ¶ÏÊÇ·ñÊÇÓÉ acl_master ¿ØÖÆµÄ daemon Ä£Ê½
+	 * åˆ¤æ–­æ˜¯å¦æ˜¯ç”± acl_master æ§åˆ¶çš„ daemon æ¨¡å¼
 	 * @return {bool}
 	 */
 	bool daemon_mode(void) const;
@@ -56,17 +56,17 @@ public:
 	/////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * ÉèÖÃ½ø³Ì¼¶±ğµÄ¶¨Ê±Æ÷£¬¸Ãº¯ÊıÖ»¿ÉÔÚÖ÷Ïß³ÌµÄÔËĞĞ¿Õ¼ä (ÈçÔÚº¯Êı
-	 * proc_on_init) ÖĞ±»ÉèÖÃ£¬µ±¸Ã¶¨Ê±Æ÷ÈÎÎñ¶¼Ö´ĞĞÍê±Ïºó»á×Ô¶¯±»
-	 * Ïú»Ù(¼´ÄÚ²¿»á×Ô¶¯µ÷ÓÃ master_timer::destroy ·½·¨)
-	 * @param timer {event_timer*} ¶¨Ê±ÈÎÎñ
-	 * @return {bool} ÉèÖÃ¶¨Ê±Æ÷ÊÇ·ñ³É¹¦
+	 * è®¾ç½®è¿›ç¨‹çº§åˆ«çš„å®šæ—¶å™¨ï¼Œè¯¥å‡½æ•°åªå¯åœ¨ä¸»çº¿ç¨‹çš„è¿è¡Œç©ºé—´ (å¦‚åœ¨å‡½æ•°
+	 * proc_on_init) ä¸­è¢«è®¾ç½®ï¼Œå½“è¯¥å®šæ—¶å™¨ä»»åŠ¡éƒ½æ‰§è¡Œå®Œæ¯•åä¼šè‡ªåŠ¨è¢«
+	 * é”€æ¯(å³å†…éƒ¨ä¼šè‡ªåŠ¨è°ƒç”¨ master_timer::destroy æ–¹æ³•)
+	 * @param timer {event_timer*} å®šæ—¶ä»»åŠ¡
+	 * @return {bool} è®¾ç½®å®šæ—¶å™¨æ˜¯å¦æˆåŠŸ
 	 */
 	bool proc_set_timer(event_timer* timer);
 
 	/**
-	 * É¾³ı½ø³Ì¼¶±ğ¶¨Ê±Æ÷
-	 * @param timer {event_timer*} ÓÉ proc_set_timer ÉèÖÃµÄ¶¨Ê±ÈÎÎñ
+	 * åˆ é™¤è¿›ç¨‹çº§åˆ«å®šæ—¶å™¨
+	 * @param timer {event_timer*} ç”± proc_set_timer è®¾ç½®çš„å®šæ—¶ä»»åŠ¡
 	 */
 	void proc_del_timer(event_timer* timer);
 
@@ -79,51 +79,51 @@ protected:
 	virtual ~master_base();
 
 	/**
-	 * ÔÚ½ø³ÌÆô¶¯Ê±£¬·şÎñ½ø³ÌÃ¿³É¹¦¼àÌıÒ»¸ö±¾µØµØÖ·£¬±ãµ÷ÓÃ±¾º¯Êı
-	 * @param ss {const server_socket&} ¼àÌı¶ÔÏó
+	 * åœ¨è¿›ç¨‹å¯åŠ¨æ—¶ï¼ŒæœåŠ¡è¿›ç¨‹æ¯æˆåŠŸç›‘å¬ä¸€ä¸ªæœ¬åœ°åœ°å€ï¼Œä¾¿è°ƒç”¨æœ¬å‡½æ•°
+	 * @param ss {const server_socket&} ç›‘å¬å¯¹è±¡
 	 */
 	virtual void proc_on_listen(server_socket& ss) { (void) ss; }
 
 	/**
-	 * µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İÇ°µ÷ÓÃµÄ»Øµ÷º¯Êı£¬¿ÉÒÔÔÚ´Ëº¯ÊıÖĞ×öÒ»Ğ©
-	 * ÓÃ»§Éí·İÎª root µÄÈ¨ÏŞ²Ù×÷
+	 * å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½å‰è°ƒç”¨çš„å›è°ƒå‡½æ•°ï¼Œå¯ä»¥åœ¨æ­¤å‡½æ•°ä¸­åšä¸€äº›
+	 * ç”¨æˆ·èº«ä»½ä¸º root çš„æƒé™æ“ä½œ
 	 */
 	virtual void proc_pre_jail() {}
 
 	/**
-	 * µ±½ø³ÌÇĞ»»ÓÃ»§Éí·İºóµ÷ÓÃµÄ»Øµ÷º¯Êı£¬´Ëº¯Êı±»µ÷ÓÃÊ±£¬½ø³Ì
-	 * µÄÈ¨ÏŞÎªÆÕÍ¨ÊÜÏŞ¼¶±ğ
+	 * å½“è¿›ç¨‹åˆ‡æ¢ç”¨æˆ·èº«ä»½åè°ƒç”¨çš„å›è°ƒå‡½æ•°ï¼Œæ­¤å‡½æ•°è¢«è°ƒç”¨æ—¶ï¼Œè¿›ç¨‹
+	 * çš„æƒé™ä¸ºæ™®é€šå—é™çº§åˆ«
 	 */
 	virtual void proc_on_init() {}
 
 	/**
-	 * ÔÚ½ø³ÌÍË³öÇ°ÏÈµ÷ÓÃ´ËĞé·½·¨£¬Èç¹û×ÓÀàÊµÏÖ·µ»Ø false£¬Ôò»áĞİÃß1Ãëºó
-	 * ¼ÌĞøµ÷ÓÃ¸ÃĞé·½·¨£¬Ö±ÖÁ×ÓÀàÊµÏÖ·µ»Ø true ÎªÖ¹£¬Õâ¸øÓ¦ÓÃ²ãÒ»¸ö¾ö¶¨
-	 * ÊÇ·ñÁ¢¿ÌÍË³öµÄ·½·¨
+	 * åœ¨è¿›ç¨‹é€€å‡ºå‰å…ˆè°ƒç”¨æ­¤è™šæ–¹æ³•ï¼Œå¦‚æœå­ç±»å®ç°è¿”å› falseï¼Œåˆ™ä¼šä¼‘çœ 1ç§’å
+	 * ç»§ç»­è°ƒç”¨è¯¥è™šæ–¹æ³•ï¼Œç›´è‡³å­ç±»å®ç°è¿”å› true ä¸ºæ­¢ï¼Œè¿™ç»™åº”ç”¨å±‚ä¸€ä¸ªå†³å®š
+	 * æ˜¯å¦ç«‹åˆ»é€€å‡ºçš„æ–¹æ³•
 	 *
 	 */
 	virtual bool proc_pre_exit() { return true; }
 
 	/**
-	 * µ±½ø³ÌÍË³öÇ°µ÷ÓÃµÄ»Øµ÷º¯Êı£¬¸Ãº¯Êı·µ»Øºó½ø³Ì½«ÕıÊ½ÍË³ö£¬×¢Òâ¸Ã·½·¨
-	 * »áÔÚÉÏÃæ proc_pre_exit µ÷ÓÃºóµ÷ÓÃ
+	 * å½“è¿›ç¨‹é€€å‡ºå‰è°ƒç”¨çš„å›è°ƒå‡½æ•°ï¼Œè¯¥å‡½æ•°è¿”å›åè¿›ç¨‹å°†æ­£å¼é€€å‡ºï¼Œæ³¨æ„è¯¥æ–¹æ³•
+	 * ä¼šåœ¨ä¸Šé¢ proc_pre_exit è°ƒç”¨åè°ƒç”¨
 	 */
 	virtual void proc_on_exit() {}
 
 	/**
-	 * µ±ÊÕµ½ SIGHUP ĞÅºÅÊ±µÄ»Øµ÷Ğé·½·¨
+	 * å½“æ”¶åˆ° SIGHUP ä¿¡å·æ—¶çš„å›è°ƒè™šæ–¹æ³•
 	 */
 	virtual bool proc_on_sighup(string&) { return true; }
 
-	// ÅäÖÃ¶ÔÏó
+	// é…ç½®å¯¹è±¡
 	master_conf conf_;
 
 protected:
-	// ×ÓÀà±ØĞëµ÷ÓÃ±¾·½·¨ÉèÖÃÊÂ¼şÒıÇæ¾ä±ú
+	// å­ç±»å¿…é¡»è°ƒç”¨æœ¬æ–¹æ³•è®¾ç½®äº‹ä»¶å¼•æ“å¥æŸ„
 	void set_event(ACL_EVENT* event);
 
 	/**
-	 * »ñµÃÊÂ¼şÒıÇæ¹»±¾
+	 * è·å¾—äº‹ä»¶å¼•æ“å¤Ÿæœ¬
 	 * @return {ACL_EVENT*}
 	 */
 	ACL_EVENT* get_event(void) const

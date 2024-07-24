@@ -10,10 +10,10 @@ extern "C" {
 #include <string.h>
 
 /**
- * ¹¦ÄÜ: °²È«µÄ×Ö·û´®¿½±´ºêº¯Êı, ¿ÉÒÔ±£Ö¤×îºóÒ»¸ö×Ö½ÚÎª  "\0"
- * @param _obj {char*} Ä¿µÄÄÚ´æÇøÖ¸Õë
- * @param _src {const char*} Ô´×Ö·û´®Ö¸Õë
- * @param _size {int} Ä¿µÄÄÚ´æÇøµÄ¿Õ¼ä´óĞ¡
+ * åŠŸèƒ½: å®‰å…¨çš„å­—ç¬¦ä¸²æ‹·è´å®å‡½æ•°, å¯ä»¥ä¿è¯æœ€åä¸€ä¸ªå­—èŠ‚ä¸º  "\0"
+ * @param _obj {char*} ç›®çš„å†…å­˜åŒºæŒ‡é’ˆ
+ * @param _src {const char*} æºå­—ç¬¦ä¸²æŒ‡é’ˆ
+ * @param _size {int} ç›®çš„å†…å­˜åŒºçš„ç©ºé—´å¤§å°
  */
 #ifndef ACL_SAFE_STRNCPY
 #define ACL_SAFE_STRNCPY(_obj, _src, _size) do {                \
@@ -27,178 +27,178 @@ extern "C" {
 #endif
 
 /**
- * ½«×Ö·û´®×ª»»ÎªĞ¡Ğ´£¬Ö±½ÓÔÚÔ­ÄÚ´æ¿Õ¼ä½øĞĞ²Ù×÷
- * @param s {char *} ¸ø¶¨µÄ×Ö·û´®
- * @return {char*} ³É¹¦·µ»Ø×Ö·û´®µØÖ·£¬·ñÔò·µ»Ø NULL
+ * å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºå°å†™ï¼Œç›´æ¥åœ¨åŸå†…å­˜ç©ºé—´è¿›è¡Œæ“ä½œ
+ * @param s {char *} ç»™å®šçš„å­—ç¬¦ä¸²
+ * @return {char*} æˆåŠŸè¿”å›å­—ç¬¦ä¸²åœ°å€ï¼Œå¦åˆ™è¿”å› NULL
  */
 ACL_API char *acl_lowercase(char *s);
 
 /**
- * ½«¸ø¶¨×Ö·û´®µÄÇ° n ¸ö×Ö½Ú×ª»»ÎªĞ¡Ğ´
- * @param s {char *} ¸ø¶¨µÄ×Ö·û´®
- * @param n {int} ×î¶à½ö×ª»»µÄ×Ö½ÚÊı
- * @return {char*} ³É¹¦·µ»Ø×Ö·û´®µØÖ·£¬·ñÔò·µ»Ø NULL
+ * å°†ç»™å®šå­—ç¬¦ä¸²çš„å‰ n ä¸ªå­—èŠ‚è½¬æ¢ä¸ºå°å†™
+ * @param s {char *} ç»™å®šçš„å­—ç¬¦ä¸²
+ * @param n {int} æœ€å¤šä»…è½¬æ¢çš„å­—èŠ‚æ•°
+ * @return {char*} æˆåŠŸè¿”å›å­—ç¬¦ä¸²åœ°å€ï¼Œå¦åˆ™è¿”å› NULL
  */
 ACL_API char *acl_lowercase2(char *s, size_t n);
 
 /**
- * ½«¸ø¶¨×Ö·û´®×ª»»ÎªĞ¡Ğ´£¬½á¹û´æ´¢ÓÚÁíÒ»¸öÄÚ´æÇøÄÚ
- * @param s {const char*} Ô´×Ö·û´®
- * @param buf {char*} ´æ´¢×ª»»½á¹ûµÄÄÚ´æÖ¸Õë
- * @param size {size_t} buf µÄ¿Õ¼ä´óĞ¡
- * @return {char*} ³É¹¦·µ»Ø×Ö·û´®µØÖ·£¬·ñÔò·µ»Ø NULL
+ * å°†ç»™å®šå­—ç¬¦ä¸²è½¬æ¢ä¸ºå°å†™ï¼Œç»“æœå­˜å‚¨äºå¦ä¸€ä¸ªå†…å­˜åŒºå†…
+ * @param s {const char*} æºå­—ç¬¦ä¸²
+ * @param buf {char*} å­˜å‚¨è½¬æ¢ç»“æœçš„å†…å­˜æŒ‡é’ˆ
+ * @param size {size_t} buf çš„ç©ºé—´å¤§å°
+ * @return {char*} æˆåŠŸè¿”å›å­—ç¬¦ä¸²åœ°å€ï¼Œå¦åˆ™è¿”å› NULL
  */
 ACL_API char *acl_lowercase3(const char *s, char *buf, size_t size);
 
 /**
- * ½«×Ö·û´®×ª»»Îª´óĞ´£¬Ö±½ÓÔÚÔ­ÄÚ´æ¿Õ¼ä½øĞĞ²Ù×÷
- * @param s {char *} ¸ø¶¨µÄ×Ö·û´®
- * @return {char*} ³É¹¦·µ»Ø×Ö·û´®µØÖ·£¬·ñÔò·µ»Ø NULL
+ * å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºå¤§å†™ï¼Œç›´æ¥åœ¨åŸå†…å­˜ç©ºé—´è¿›è¡Œæ“ä½œ
+ * @param s {char *} ç»™å®šçš„å­—ç¬¦ä¸²
+ * @return {char*} æˆåŠŸè¿”å›å­—ç¬¦ä¸²åœ°å€ï¼Œå¦åˆ™è¿”å› NULL
  */
 ACL_API char *acl_uppercase(char *s);
 
 /**
- * ½«×Ö·û´®×ª»»Îª´óĞ´£¬Ö±½ÓÔÚÔ­ÄÚ´æ¿Õ¼ä½øĞĞ²Ù×÷, ×î´ó×ª»»³¤¶ÈÓĞÏŞÖÆ
- * @param s {char *} ¸ø¶¨µÄ×Ö·û´®
- * @param n {int} ×î¶à½ö×ª»»µÄ×Ö½ÚÊı
- * @return {char*} ³É¹¦·µ»Ø×Ö·û´®µØÖ·£¬·ñÔò·µ»Ø NULL
+ * å°†å­—ç¬¦ä¸²è½¬æ¢ä¸ºå¤§å†™ï¼Œç›´æ¥åœ¨åŸå†…å­˜ç©ºé—´è¿›è¡Œæ“ä½œ, æœ€å¤§è½¬æ¢é•¿åº¦æœ‰é™åˆ¶
+ * @param s {char *} ç»™å®šçš„å­—ç¬¦ä¸²
+ * @param n {int} æœ€å¤šä»…è½¬æ¢çš„å­—èŠ‚æ•°
+ * @return {char*} æˆåŠŸè¿”å›å­—ç¬¦ä¸²åœ°å€ï¼Œå¦åˆ™è¿”å› NULL
  */
 ACL_API char *acl_uppercase2(char *s, size_t n);
 
 /**
- * ½«¸ø¶¨×Ö·û´®µÄÇ° n ¸ö×Ö½Ú×ª»»Îª´óĞ´
- * @param s {char *} ¸ø¶¨µÄ×Ö·û´®
- * @param buf {char*} ´æ´¢×ª»»½á¹ûµÄÄÚ´æÇø
- * @param size {size_t} buf µÄ¿Õ¼ä´óĞ¡(×Ö½Ú)
- * @return {char*} ³É¹¦·µ»Ø×Ö·û´®µØÖ·£¬·ñÔò·µ»Ø NULL
+ * å°†ç»™å®šå­—ç¬¦ä¸²çš„å‰ n ä¸ªå­—èŠ‚è½¬æ¢ä¸ºå¤§å†™
+ * @param s {char *} ç»™å®šçš„å­—ç¬¦ä¸²
+ * @param buf {char*} å­˜å‚¨è½¬æ¢ç»“æœçš„å†…å­˜åŒº
+ * @param size {size_t} buf çš„ç©ºé—´å¤§å°(å­—èŠ‚)
+ * @return {char*} æˆåŠŸè¿”å›å­—ç¬¦ä¸²åœ°å€ï¼Œå¦åˆ™è¿”å› NULL
  */
 ACL_API char *acl_uppercase3(const char *s, char *buf, size_t size);
 
 /**
- * ½«¸ø¶¨×Ö·û´®ÓÃÁíÒ»¸ö·Ö¸ô·û×Ö·û´®½øĞĞ·Ö¸î
- * @param src {char**} ĞèÒª±»·Ö¸îµÄ×Ö·û´®µÄµØÖ·µÄÖ¸Õë£¬±ØĞëÊÇ·Ç¿ÕÖ¸Õë£¬
- *  ¿ÉÒÔÊÇ¿Õ×Ö·û´®£¬´ËÊ±¸Ãº¯Êı·µ»Ø NULL
- * @param sep {const char*} ·Ö¸ô·û£¬·Ç¿Õ×Ö·û´®
- * @return {char*} µ±Ç°±»·Ö¸îµÄ×Ö·û´®µÄÖ¸ÕëÎ»ÖÃ£¬src Ö¸ÏòÏÂÒ»¸ö½«Òª½øĞĞ
- *  ·Ö¸ôµÄÆğÊ¼Î»ÖÃ£»
- *  1£©µ±·µ»Ø NULL Ê±£¬Ôò±íÊ¾·Ö¸ô¹ı³Ì½áÊø£¬´ËÊ± src µÄÖ¸ÕëÎ»ÖÃ±»¸³Óè '\0'£»
- *  2£©µ±·µ»Ø·Ç NULL Ê±£¬Ôò´ËÊ± src Ö¸ÏòµÄ×Ö·û´®¿ÉÄÜÊÇ»ò²»ÊÇ¿Õ×Ö·û´®£¬
- *     Èç¹ûÖ¸Ïò¿Õ×Ö·û´®£¬ÔòÔÙ´Î·Ö¸ôÊ±º¯Êı¿Ï¶¨ÄÜ·µ»Ø NULL£¬·ñÔò£¬µ±ÔÙ´Î·Ö¸ôÊ±
- *     º¯Êı·µ»Ø·Ç NULL Ö¸Õë
- *  ¾ÙÀı: Ô´×Ö·û´®£º"abcd=|efg=|hijk", ·Ö¸ô·û "=|"£¬ÔòµÚÒ»´Î·Ö¸ôºó
- *  src ½«Ö¸Ïò "efg"£¬¶ø·µ»ØµÄµØÖ·Îª "abcd"
+ * å°†ç»™å®šå­—ç¬¦ä¸²ç”¨å¦ä¸€ä¸ªåˆ†éš”ç¬¦å­—ç¬¦ä¸²è¿›è¡Œåˆ†å‰²
+ * @param src {char**} éœ€è¦è¢«åˆ†å‰²çš„å­—ç¬¦ä¸²çš„åœ°å€çš„æŒ‡é’ˆï¼Œå¿…é¡»æ˜¯éç©ºæŒ‡é’ˆï¼Œ
+ *  å¯ä»¥æ˜¯ç©ºå­—ç¬¦ä¸²ï¼Œæ­¤æ—¶è¯¥å‡½æ•°è¿”å› NULL
+ * @param sep {const char*} åˆ†éš”ç¬¦ï¼Œéç©ºå­—ç¬¦ä¸²
+ * @return {char*} å½“å‰è¢«åˆ†å‰²çš„å­—ç¬¦ä¸²çš„æŒ‡é’ˆä½ç½®ï¼Œsrc æŒ‡å‘ä¸‹ä¸€ä¸ªå°†è¦è¿›è¡Œ
+ *  åˆ†éš”çš„èµ·å§‹ä½ç½®ï¼›
+ *  1ï¼‰å½“è¿”å› NULL æ—¶ï¼Œåˆ™è¡¨ç¤ºåˆ†éš”è¿‡ç¨‹ç»“æŸï¼Œæ­¤æ—¶ src çš„æŒ‡é’ˆä½ç½®è¢«èµ‹äºˆ '\0'ï¼›
+ *  2ï¼‰å½“è¿”å›é NULL æ—¶ï¼Œåˆ™æ­¤æ—¶ src æŒ‡å‘çš„å­—ç¬¦ä¸²å¯èƒ½æ˜¯æˆ–ä¸æ˜¯ç©ºå­—ç¬¦ä¸²ï¼Œ
+ *     å¦‚æœæŒ‡å‘ç©ºå­—ç¬¦ä¸²ï¼Œåˆ™å†æ¬¡åˆ†éš”æ—¶å‡½æ•°è‚¯å®šèƒ½è¿”å› NULLï¼Œå¦åˆ™ï¼Œå½“å†æ¬¡åˆ†éš”æ—¶
+ *     å‡½æ•°è¿”å›é NULL æŒ‡é’ˆ
+ *  ä¸¾ä¾‹: æºå­—ç¬¦ä¸²ï¼š"abcd=|efg=|hijk", åˆ†éš”ç¬¦ "=|"ï¼Œåˆ™ç¬¬ä¸€æ¬¡åˆ†éš”å
+ *  src å°†æŒ‡å‘ "efg"ï¼Œè€Œè¿”å›çš„åœ°å€ä¸º "abcd"
  */
 ACL_API char *acl_strtok(char **src, const char *sep);
 #define acl_mystrtok	acl_strtok
 
 /**
- * »ñµÃÒ»¸öÂß¼­ĞĞ, Èç¹ûÄ³ĞĞµÄÎ²²¿ÓÉÁ¬½Ó·û "\\" Á¬½Ó£¬Ôò½«ÏÂÒ»ĞĞºÏ²¢ÖÁ±¾ĞĞ,
- * Í¬Ê±½«Ò»ĞĞ×Ö·û´®ÖĞµÄÒÔ¼°×ªÒå×Ö·û»Ø³µ»»ĞĞ("\r\n" or "\n")È¥µô
- * @param src {char**} Ô´×Ö·û´®µÄµØÖ·Ö¸Õë
- * @return {char*} ·µ»ØÒ»ĞĞÊı¾İ, Èç¹û·µ»Ø¿ÕÔò±íÊ¾Ã»ÓĞ¿ÉÓÃµÄÂß¼­ĞĞ
+ * è·å¾—ä¸€ä¸ªé€»è¾‘è¡Œ, å¦‚æœæŸè¡Œçš„å°¾éƒ¨ç”±è¿æ¥ç¬¦ "\\" è¿æ¥ï¼Œåˆ™å°†ä¸‹ä¸€è¡Œåˆå¹¶è‡³æœ¬è¡Œ,
+ * åŒæ—¶å°†ä¸€è¡Œå­—ç¬¦ä¸²ä¸­çš„ä»¥åŠè½¬ä¹‰å­—ç¬¦å›è½¦æ¢è¡Œ("\r\n" or "\n")å»æ‰
+ * @param src {char**} æºå­—ç¬¦ä¸²çš„åœ°å€æŒ‡é’ˆ
+ * @return {char*} è¿”å›ä¸€è¡Œæ•°æ®, å¦‚æœè¿”å›ç©ºåˆ™è¡¨ç¤ºæ²¡æœ‰å¯ç”¨çš„é€»è¾‘è¡Œ
  */
 ACL_API char *acl_strline(char **src);
 #define acl_mystrline	acl_strline
 
 /**
- * È¥µô¸ø¶¨×Ö·û´®ÖĞµÄ " ", "\t"
- * @param str {char*} Ô´×Ö·û´®
- * @return {char*} ÓëÔ´×Ö·û´®ÏàÍ¬µÄµØÖ·
+ * å»æ‰ç»™å®šå­—ç¬¦ä¸²ä¸­çš„ " ", "\t"
+ * @param str {char*} æºå­—ç¬¦ä¸²
+ * @return {char*} ä¸æºå­—ç¬¦ä¸²ç›¸åŒçš„åœ°å€
  */
 ACL_API char *acl_strtrim(char *str);
 #define acl_mystr_trim	acl_strtrim
 
 /**
- * ´ÓÔ´×Ö·û´®ÖĞÈ¥µô¸ø¶¨×Ö·û´®
- * @param haystack {const char*} Ô´×Ö·û´®
- * @param needle {const char*} ĞèÒª´ÓÔ´×Ö·û´®ÖĞ±»ÕûÌåÈ¥µôµÄ×Ö·û´®
- * @param buf {char*} ´æ´¢½á¹ûµÄÄÚ´æ¿ªÊ¼Î»ÖÃ
- * @param bsize {int} buf µÄ¿Õ¼ä´óĞ¡
- * @return {int} ¿½±´ÖÁ buf ÖĞµÄ×Ö·û´®³¤¶È
+ * ä»æºå­—ç¬¦ä¸²ä¸­å»æ‰ç»™å®šå­—ç¬¦ä¸²
+ * @param haystack {const char*} æºå­—ç¬¦ä¸²
+ * @param needle {const char*} éœ€è¦ä»æºå­—ç¬¦ä¸²ä¸­è¢«æ•´ä½“å»æ‰çš„å­—ç¬¦ä¸²
+ * @param buf {char*} å­˜å‚¨ç»“æœçš„å†…å­˜å¼€å§‹ä½ç½®
+ * @param bsize {int} buf çš„ç©ºé—´å¤§å°
+ * @return {int} æ‹·è´è‡³ buf ä¸­çš„å­—ç¬¦ä¸²é•¿åº¦
  */
 ACL_API int acl_strstrip(const char *haystack, const char *needle,
 		char *buf, int bsize);
 #define acl_mystr_strip	acl_strstrip
 
 /**
- * ´ÓÔ´×Ö·û´®ÖĞÕÒµ½Ò»ĞĞµÄ½áÊøÎ»ÖÃ²¢È¥µô°üº¬»Ø³µ»»ĞĞ·û¼°ÆäÒÔºóµÄ×Ö·û´®
- * @param str {char*} Ô´×Ö·û´®
- * @return {int} 0 ±íÊ¾³É¹¦£¬-1±íÊ¾Ê§°Ü, Ò²ĞíÓ¦¸Ã·µ»Ø×îºó×ª»»½á¹ûµÄ³¤¶È!
+ * ä»æºå­—ç¬¦ä¸²ä¸­æ‰¾åˆ°ä¸€è¡Œçš„ç»“æŸä½ç½®å¹¶å»æ‰åŒ…å«å›è½¦æ¢è¡Œç¬¦åŠå…¶ä»¥åçš„å­—ç¬¦ä¸²
+ * @param str {char*} æºå­—ç¬¦ä¸²
+ * @return {int} 0 è¡¨ç¤ºæˆåŠŸï¼Œ-1è¡¨ç¤ºå¤±è´¥, ä¹Ÿè®¸åº”è¯¥è¿”å›æœ€åè½¬æ¢ç»“æœçš„é•¿åº¦!
  */
 ACL_API int acl_strtrunc_byln(char *str);
 #define acl_mystr_truncate_byln	acl_strtrunc_byln
 
 /**
- * ´ÓºóÏòÇ°±È½ÏÁ½¸ö¸ø¶¨×Ö·û´®£¬´óĞ¡Ğ´²»Ãô¸ĞÇÒÏŞ¶¨×î´ó±È½Ï·¶Î§
- * @param s1 {const char*} ×Ö·û´®µØÖ·
- * @param s2 {const char*} ×Ö·û´®µØÖ·
- * @param n {size_t} ×î´ó±È½Ï·¶Î§
- * @return {int} ±È½Ï½á¹û. 0: ÏàµÈ, >0: µÚÒ»¸ö×Ö·û´®´óÓÚµÚ¶ş¸ö×Ö·û´®,
- *  < 0: µÚÒ»¸ö×Ö·û´®Ğ¡µÚ¶ş¸ö×Ö·û´®
+ * ä»åå‘å‰æ¯”è¾ƒä¸¤ä¸ªç»™å®šå­—ç¬¦ä¸²ï¼Œå¤§å°å†™ä¸æ•æ„Ÿä¸”é™å®šæœ€å¤§æ¯”è¾ƒèŒƒå›´
+ * @param s1 {const char*} å­—ç¬¦ä¸²åœ°å€
+ * @param s2 {const char*} å­—ç¬¦ä¸²åœ°å€
+ * @param n {size_t} æœ€å¤§æ¯”è¾ƒèŒƒå›´
+ * @return {int} æ¯”è¾ƒç»“æœ. 0: ç›¸ç­‰, >0: ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å¤§äºç¬¬äºŒä¸ªå­—ç¬¦ä¸²,
+ *  < 0: ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å°ç¬¬äºŒä¸ªå­—ç¬¦ä¸²
  */
 ACL_API int acl_strrncasecmp(const char *s1, const char *s2, size_t n);
 
 /**
- * ´ÓºóÏòÇ°±È½ÏÁ½¸ö¸ø¶¨×Ö·û´®, ´óĞ¡Ğ´Ãô¸ĞÇÒÏŞ¶¨×î´ó±È½Ï·¶Î§
- * @param s1 {const char*} ×Ö·û´®µØÖ·
- * @param s2 {const char*} ×Ö·û´®µØÖ·
- * @param n {size_t} ×î´ó±È½Ï·¶Î§
- * @return {int} ±È½Ï½á¹û. 0: ÏàµÈ, >0: µÚÒ»¸ö×Ö·û´®´óÓÚµÚ¶ş¸ö×Ö·û´®,
- *  < 0: µÚÒ»¸ö×Ö·û´®Ğ¡µÚ¶ş¸ö×Ö·û´®
+ * ä»åå‘å‰æ¯”è¾ƒä¸¤ä¸ªç»™å®šå­—ç¬¦ä¸², å¤§å°å†™æ•æ„Ÿä¸”é™å®šæœ€å¤§æ¯”è¾ƒèŒƒå›´
+ * @param s1 {const char*} å­—ç¬¦ä¸²åœ°å€
+ * @param s2 {const char*} å­—ç¬¦ä¸²åœ°å€
+ * @param n {size_t} æœ€å¤§æ¯”è¾ƒèŒƒå›´
+ * @return {int} æ¯”è¾ƒç»“æœ. 0: ç›¸ç­‰, >0: ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å¤§äºç¬¬äºŒä¸ªå­—ç¬¦ä¸²,
+ *  < 0: ç¬¬ä¸€ä¸ªå­—ç¬¦ä¸²å°ç¬¬äºŒä¸ªå­—ç¬¦ä¸²
  */
 ACL_API int acl_strrncmp(const char *s1, const char *s2, size_t n);
 
 /**
- * ´ÓºóÏòÇ°É¨Ãè²éÕÒ×Ö·û´®£¬´óĞ¡Ğ´Ãô¸Ğ
- * @param haystack {char *} Ô´×Ö·û´®
- * @param needle {const char *} Æ¥Åä²éÕÒµÄ×Ö·û´®
- * @return {char *} != NULL: Ok, NULL: Î´·¢ÏÖ
+ * ä»åå‘å‰æ‰«ææŸ¥æ‰¾å­—ç¬¦ä¸²ï¼Œå¤§å°å†™æ•æ„Ÿ
+ * @param haystack {char *} æºå­—ç¬¦ä¸²
+ * @param needle {const char *} åŒ¹é…æŸ¥æ‰¾çš„å­—ç¬¦ä¸²
+ * @return {char *} != NULL: Ok, NULL: æœªå‘ç°
  */
 ACL_API char *acl_rstrstr(const char *haystack, const char *needle);
 
 /**
- * ´ÓÇ°ÏòºóÉ¨Ãè²éÕÒ×Ö·û´®£¬´óĞ¡Ğ´²»Ãô¸Ğ
- * @param haystack {const char *} Ô´×Ö·û´®
- * @param needle {const char *} Æ¥Åä²éÕÒµÄ×Ö·û´®
- * @return {char *} != NULL: Ok, NULL: Î´·¢ÏÖ
+ * ä»å‰å‘åæ‰«ææŸ¥æ‰¾å­—ç¬¦ä¸²ï¼Œå¤§å°å†™ä¸æ•æ„Ÿ
+ * @param haystack {const char *} æºå­—ç¬¦ä¸²
+ * @param needle {const char *} åŒ¹é…æŸ¥æ‰¾çš„å­—ç¬¦ä¸²
+ * @return {char *} != NULL: Ok, NULL: æœªå‘ç°
  */
 ACL_API char *acl_strcasestr(const char *haystack, const char *needle);
 
 /**
- * ´ÓºóÏòÇ°É¨Ãè²éÕÒ×Ö·û´®£¬´óĞ¡Ğ´²»Ãô¸Ğ
- * @param haystack {char *} Ô´×Ö·û´®
- * @param needle {const char *} Æ¥Åä²éÕÒµÄ×Ö·û´®
- * @return {char *} != NULL: Ok, NULL: Î´·¢ÏÖ
+ * ä»åå‘å‰æ‰«ææŸ¥æ‰¾å­—ç¬¦ä¸²ï¼Œå¤§å°å†™ä¸æ•æ„Ÿ
+ * @param haystack {char *} æºå­—ç¬¦ä¸²
+ * @param needle {const char *} åŒ¹é…æŸ¥æ‰¾çš„å­—ç¬¦ä¸²
+ * @return {char *} != NULL: Ok, NULL: æœªå‘ç°
  */
 ACL_API char *acl_rstrcasestr(const char *haystack, const char *needle);
 
 /**
- * ¼ÆËã¸ø¶¨×Ö·û´®µÄ³¤¶È£¬µ«ÏŞÖÆÁË×î´ó¼ÆËã³¤¶È£¬ÒÔÃâ²úÉúÔ½½çÏÖÏó£¬Òª±È strlen
- * °²È«£¬Èç£¬Èç¹û¸ø¶¨×Ö·û´®Ã»ÓĞÒÔ "\0" ½áÎ²£¬Ôò¸Ãº¯Êı¾Í²»»á²úÉúÔ½½ç
- * @param s {const char*} ×Ö·û´®
- * @param count {size_t} ×î´ó¼ÆËã³¤¶È
- * @return {size_t} ×Ö·û´® s µÄÊµ¼Ê³¤¶È
+ * è®¡ç®—ç»™å®šå­—ç¬¦ä¸²çš„é•¿åº¦ï¼Œä½†é™åˆ¶äº†æœ€å¤§è®¡ç®—é•¿åº¦ï¼Œä»¥å…äº§ç”Ÿè¶Šç•Œç°è±¡ï¼Œè¦æ¯” strlen
+ * å®‰å…¨ï¼Œå¦‚ï¼Œå¦‚æœç»™å®šå­—ç¬¦ä¸²æ²¡æœ‰ä»¥ "\0" ç»“å°¾ï¼Œåˆ™è¯¥å‡½æ•°å°±ä¸ä¼šäº§ç”Ÿè¶Šç•Œ
+ * @param s {const char*} å­—ç¬¦ä¸²
+ * @param count {size_t} æœ€å¤§è®¡ç®—é•¿åº¦
+ * @return {size_t} å­—ç¬¦ä¸² s çš„å®é™…é•¿åº¦
  */
 ACL_API size_t acl_strnlen(const char * s, size_t count);
 
 /**
- * ±È½ÏÁ½¸ö×Ö·û´®ÊÇ·ñÏàÍ¬£¬´óĞ¡Ğ´²»Ãô¸Ğ
+ * æ¯”è¾ƒä¸¤ä¸ªå­—ç¬¦ä¸²æ˜¯å¦ç›¸åŒï¼Œå¤§å°å†™ä¸æ•æ„Ÿ
  * @param s1 {const char*}
  * @param s2 {cosnt char*}
- * @return {int} 0: ÏàÍ¬; < 0: s1 < s2; > 0: s1 > s2
+ * @return {int} 0: ç›¸åŒ; < 0: s1 < s2; > 0: s1 > s2
  */
 ACL_API int acl_strcasecmp(const char *s1, const char *s2);
 
 /**
- * ±È½ÏÁ½¸ö×Ö·û´®ÊÇ·ñÏàÍ¬£¬´óĞ¡Ğ´²»Ãô¸Ğ£¬Í¬Ê±ÏŞ¶¨×î´ó±È½Ï³¤¶È
+ * æ¯”è¾ƒä¸¤ä¸ªå­—ç¬¦ä¸²æ˜¯å¦ç›¸åŒï¼Œå¤§å°å†™ä¸æ•æ„Ÿï¼ŒåŒæ—¶é™å®šæœ€å¤§æ¯”è¾ƒé•¿åº¦
  * @param s1 {const char*}
  * @param s2 {cosnt char*}
- * @param n {size_t} ÏŞ¶¨±È½ÏµÄ×î´ó³¤¶È
- * @return {int} 0: ÏàÍ¬; < 0: s1 < s2; > 0: s1 > s2
+ * @param n {size_t} é™å®šæ¯”è¾ƒçš„æœ€å¤§é•¿åº¦
+ * @return {int} 0: ç›¸åŒ; < 0: s1 < s2; > 0: s1 > s2
  */
 ACL_API int acl_strncasecmp(const char *s1, const char *s2, size_t n);
 /**
- * WINDOWSÏÂ²»Ö§³ÖÒ»Ğ©×Ö·û´®±È½Ïº¯Êı
+ * WINDOWSä¸‹ä¸æ”¯æŒä¸€äº›å­—ç¬¦ä¸²æ¯”è¾ƒå‡½æ•°
  */
 #if defined(_WIN32) || defined(_WIN64)
 # ifndef strcasestr
@@ -220,94 +220,94 @@ ACL_API int acl_strncasecmp(const char *s1, const char *s2, size_t n);
 #endif
 
 /*----------------------------------------------------------------------------
- * ±£Ö¤½á¹ûÀàËÆÓÚÈçÏÂĞÎÊ½:
+ * ä¿è¯ç»“æœç±»ä¼¼äºå¦‚ä¸‹å½¢å¼:
  * /home/avwall/test.txt
- * @param psrc_file_path {const char*} Ô´×Ö·û´®
- * @param pbuf {char*} ´æ´¢½á¹ûµÄÄÚ´æÇø
- * @param sizeb {int} pbuf µÄ¿Õ¼ä´óĞ¡
- * @return {int} 0 ³É¹¦£¬-1Ê§°Ü
+ * @param psrc_file_path {const char*} æºå­—ç¬¦ä¸²
+ * @param pbuf {char*} å­˜å‚¨ç»“æœçš„å†…å­˜åŒº
+ * @param sizeb {int} pbuf çš„ç©ºé—´å¤§å°
+ * @return {int} 0 æˆåŠŸï¼Œ-1å¤±è´¥
  */
 ACL_API int acl_file_path_correct(const char *psrc_file_path,
 		char *pbuf, int sizeb);
 
 /*----------------------------------------------------------------------------
- * ±£Ö¤Â·¾¶Ãû¾­¹ı´Ëº¯Êıºó¶¼ÎªÈçÏÂ¸ñÊ½:
- * Ô´:   /home/avwall/, /home//////avwall/, /home/avwall, /////home/avwall///
+ * ä¿è¯è·¯å¾„åç»è¿‡æ­¤å‡½æ•°åéƒ½ä¸ºå¦‚ä¸‹æ ¼å¼:
+ * æº:   /home/avwall/, /home//////avwall/, /home/avwall, /////home/avwall///
  *       /home/avwall////, /home///avwall///, ///home///avwall///
- * ½á¹û: /home/avwall/
- * @param psrc_dir {const char*} Ô´×Ö·û´®
- * @param pbuf {char*} ´æ´¢½á¹ûµÄÄÚ´æÇø
- * @param sizeb {int} pbuf µÄ¿Õ¼ä´óĞ¡
- * @return {int} 0 ±íÊ¾³É¹¦£¬-1±íÊ¾Ê§°Ü
+ * ç»“æœ: /home/avwall/
+ * @param psrc_dir {const char*} æºå­—ç¬¦ä¸²
+ * @param pbuf {char*} å­˜å‚¨ç»“æœçš„å†…å­˜åŒº
+ * @param sizeb {int} pbuf çš„ç©ºé—´å¤§å°
+ * @return {int} 0 è¡¨ç¤ºæˆåŠŸï¼Œ-1è¡¨ç¤ºå¤±è´¥
  */
 ACL_API int acl_dir_correct(const char *psrc_dir, char *pbuf, int sizeb);
 
 /*----------------------------------------------------------------------------
- * ´ÓÀàËÆ: /home/avwall/log.txt ÖĞÌáÈ¡ /home/avwall/ ×÷Îª½á¹û·µ»Ø
- * @param pathname {const char*} Ô´×Ö·û´®
- * @param pbuf {char*} ´æ´¢½á¹ûµÄÄÚ´æÇø
- * @param bsize {int} pbuf µÄ¿Õ¼ä´óĞ¡
- * @return {int} 0 ³É¹¦£¬-1Ê§°Ü
+ * ä»ç±»ä¼¼: /home/avwall/log.txt ä¸­æå– /home/avwall/ ä½œä¸ºç»“æœè¿”å›
+ * @param pathname {const char*} æºå­—ç¬¦ä¸²
+ * @param pbuf {char*} å­˜å‚¨ç»“æœçš„å†…å­˜åŒº
+ * @param bsize {int} pbuf çš„ç©ºé—´å¤§å°
+ * @return {int} 0 æˆåŠŸï¼Œ-1å¤±è´¥
  */
 ACL_API int acl_dir_getpath(const char *pathname, char *pbuf, int bsize);
 
 /**
- * ½«Êı¾İ×Ö·û´®×ª»»Îª64Î»ÓĞ·ûºÅ³¤ÕûĞÍ
- * @param s {const char*} ×Ö·û´®Ö¸Õë
- * @return {long long} ÓĞ·ûºÅ³¤ÕûĞÍ
+ * å°†æ•°æ®å­—ç¬¦ä¸²è½¬æ¢ä¸º64ä½æœ‰ç¬¦å·é•¿æ•´å‹
+ * @param s {const char*} å­—ç¬¦ä¸²æŒ‡é’ˆ
+ * @return {long long} æœ‰ç¬¦å·é•¿æ•´å‹
  */
 ACL_API long long acl_atoll(const char *s);
 
 /**
- * ½«Êı¾İ×Ö·û´®×ª»»Îª64Î»ÎŞ·ûºÅ³¤ÕûĞÍ
- * @param str {const char*} ×Ö·û´®Ö¸Õë
- * @return {acl_uint64} ÎŞ·ûºÅ³¤ÕûĞÍ
+ * å°†æ•°æ®å­—ç¬¦ä¸²è½¬æ¢ä¸º64ä½æ— ç¬¦å·é•¿æ•´å‹
+ * @param str {const char*} å­—ç¬¦ä¸²æŒ‡é’ˆ
+ * @return {acl_uint64} æ— ç¬¦å·é•¿æ•´å‹
  */
 ACL_API acl_uint64 acl_atoui64(const char *str);
 
 /**
-* ½«Êı¾İ×Ö·û´®×ª»»Îª64Î»·ûºÅ³¤ÕûĞÍ
-* @param str {const char*} ×Ö·û´®Ö¸Õë
-* @return {acl_int64} ÎŞ·ûºÅ³¤ÕûĞÍ
+* å°†æ•°æ®å­—ç¬¦ä¸²è½¬æ¢ä¸º64ä½ç¬¦å·é•¿æ•´å‹
+* @param str {const char*} å­—ç¬¦ä¸²æŒ‡é’ˆ
+* @return {acl_int64} æ— ç¬¦å·é•¿æ•´å‹
 */
 ACL_API acl_int64 acl_atoi64(const char *str);
 
 /**
- * ½«64Î»ÎŞ·ûºÅ³¤ÕûĞÍ×ª»»Îª×Ö·û´®
- * @param value {acl_uint64} 64Î»ÎŞ·ûºÅ³¤ÕûĞÍ
- * @param buf {char*} ÓÃÀ´´æÈ¡×ª»»½á¹ûµÄÄÚ´æ¿Õ¼ä
- * @param size {sizt_t} buf µÄ¿Õ¼ä´óĞ¡£¬ÆäÖĞÒªÇóÆä×îĞ¡Îª21¸ö×Ö½Ú
- * @return {const char*} ×ª»»µÄ½á¹û£¬Èç¹û×ª»»³É¹¦Ôò²»Îª¿Õ£¬·ñÔòÎª¿Õ
+ * å°†64ä½æ— ç¬¦å·é•¿æ•´å‹è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+ * @param value {acl_uint64} 64ä½æ— ç¬¦å·é•¿æ•´å‹
+ * @param buf {char*} ç”¨æ¥å­˜å–è½¬æ¢ç»“æœçš„å†…å­˜ç©ºé—´
+ * @param size {sizt_t} buf çš„ç©ºé—´å¤§å°ï¼Œå…¶ä¸­è¦æ±‚å…¶æœ€å°ä¸º21ä¸ªå­—èŠ‚
+ * @return {const char*} è½¬æ¢çš„ç»“æœï¼Œå¦‚æœè½¬æ¢æˆåŠŸåˆ™ä¸ä¸ºç©ºï¼Œå¦åˆ™ä¸ºç©º
  */
 ACL_API const char *acl_ui64toa(acl_uint64 value, char *buf, size_t size);
 
 /**
- * ½«64Î»·ûºÅ³¤ÕûĞÍ×ª»»Îª×Ö·û´®
- * @param value {acl_int64} 64Î»·ûºÅ³¤ÕûĞÍ
- * @param buf {char*} ÓÃÀ´´æÈ¡×ª»»½á¹ûµÄÄÚ´æ¿Õ¼ä
- * @param size {sizt_t} buf µÄ¿Õ¼ä´óĞ¡£¬ÆäÖĞÒªÇóÆä×îĞ¡Îª21¸ö×Ö½Ú
- * @return {const char*} ×ª»»µÄ½á¹û£¬Èç¹û×ª»»³É¹¦Ôò²»Îª¿Õ£¬·ñÔòÎª¿Õ
+ * å°†64ä½ç¬¦å·é•¿æ•´å‹è½¬æ¢ä¸ºå­—ç¬¦ä¸²
+ * @param value {acl_int64} 64ä½ç¬¦å·é•¿æ•´å‹
+ * @param buf {char*} ç”¨æ¥å­˜å–è½¬æ¢ç»“æœçš„å†…å­˜ç©ºé—´
+ * @param size {sizt_t} buf çš„ç©ºé—´å¤§å°ï¼Œå…¶ä¸­è¦æ±‚å…¶æœ€å°ä¸º21ä¸ªå­—èŠ‚
+ * @return {const char*} è½¬æ¢çš„ç»“æœï¼Œå¦‚æœè½¬æ¢æˆåŠŸåˆ™ä¸ä¸ºç©ºï¼Œå¦åˆ™ä¸ºç©º
  */
 ACL_API const char *acl_i64toa(acl_int64 value, char *buf, size_t size);
 
 /**
- * ½«64Î»·ûºÅ³¤ÕûĞÍ×ª»»ÎªÄ³½øÖÆµÄ×Ö·û´®
- * @param value {acl_int64} 64Î»·ûºÅ³¤ÕûĞÍ
- * @param buf {char*} ÓÃÀ´´æÈ¡×ª»»½á¹ûµÄÄÚ´æ¿Õ¼ä
- * @param size {sizt_t} buf µÄ¿Õ¼ä´óĞ¡£¬ÆäÖĞÒªÇóÆä×îĞ¡Îª21¸ö×Ö½Ú
- * @param radix {int} ½øÖÆ, Èç: 8 ±íÊ¾°Ë½øÖÆ, 10 ±íÊ¾Ê®½øÖÆ, 16 ±íÊ¾Ê®Áù½øÖÆ
- * @return {const char*} ×ª»»µÄ½á¹û£¬Èç¹û×ª»»³É¹¦Ôò²»Îª¿Õ£¬·ñÔòÎª¿Õ
+ * å°†64ä½ç¬¦å·é•¿æ•´å‹è½¬æ¢ä¸ºæŸè¿›åˆ¶çš„å­—ç¬¦ä¸²
+ * @param value {acl_int64} 64ä½ç¬¦å·é•¿æ•´å‹
+ * @param buf {char*} ç”¨æ¥å­˜å–è½¬æ¢ç»“æœçš„å†…å­˜ç©ºé—´
+ * @param size {sizt_t} buf çš„ç©ºé—´å¤§å°ï¼Œå…¶ä¸­è¦æ±‚å…¶æœ€å°ä¸º21ä¸ªå­—èŠ‚
+ * @param radix {int} è¿›åˆ¶, å¦‚: 8 è¡¨ç¤ºå…«è¿›åˆ¶, 10 è¡¨ç¤ºåè¿›åˆ¶, 16 è¡¨ç¤ºåå…­è¿›åˆ¶
+ * @return {const char*} è½¬æ¢çš„ç»“æœï¼Œå¦‚æœè½¬æ¢æˆåŠŸåˆ™ä¸ä¸ºç©ºï¼Œå¦åˆ™ä¸ºç©º
  */
 ACL_API const char *acl_i64toa_radix(acl_int64 value, char *buf,
 		size_t size, int radix);
 
 /**
- * ½«64Î»ÎŞ·ûºÅ³¤ÕûĞÍ×ª»»ÎªÄ³½øÖÆµÄ×Ö·û´®
- * @param value {acl_int64} 64Î»·ûºÅ³¤ÕûĞÍ
- * @param buf {char*} ÓÃÀ´´æÈ¡×ª»»½á¹ûµÄÄÚ´æ¿Õ¼ä
- * @param size {sizt_t} buf µÄ¿Õ¼ä´óĞ¡£¬ÆäÖĞÒªÇóÆä×îĞ¡Îª21¸ö×Ö½Ú
- * @param radix {int} ½øÖÆ, Èç: 8 ±íÊ¾°Ë½øÖÆ, 10 ±íÊ¾Ê®½øÖÆ, 16 ±íÊ¾Ê®Áù½øÖÆ
- * @return {const char*} ×ª»»µÄ½á¹û£¬Èç¹û×ª»»³É¹¦Ôò²»Îª¿Õ£¬·ñÔòÎª¿Õ
+ * å°†64ä½æ— ç¬¦å·é•¿æ•´å‹è½¬æ¢ä¸ºæŸè¿›åˆ¶çš„å­—ç¬¦ä¸²
+ * @param value {acl_int64} 64ä½ç¬¦å·é•¿æ•´å‹
+ * @param buf {char*} ç”¨æ¥å­˜å–è½¬æ¢ç»“æœçš„å†…å­˜ç©ºé—´
+ * @param size {sizt_t} buf çš„ç©ºé—´å¤§å°ï¼Œå…¶ä¸­è¦æ±‚å…¶æœ€å°ä¸º21ä¸ªå­—èŠ‚
+ * @param radix {int} è¿›åˆ¶, å¦‚: 8 è¡¨ç¤ºå…«è¿›åˆ¶, 10 è¡¨ç¤ºåè¿›åˆ¶, 16 è¡¨ç¤ºåå…­è¿›åˆ¶
+ * @return {const char*} è½¬æ¢çš„ç»“æœï¼Œå¦‚æœè½¬æ¢æˆåŠŸåˆ™ä¸ä¸ºç©ºï¼Œå¦åˆ™ä¸ºç©º
  */
 ACL_API const char *acl_ui64toa_radix(acl_uint64 value, char *buf,
 		size_t size, int radix);
@@ -315,41 +315,41 @@ ACL_API const char *acl_ui64toa_radix(acl_uint64 value, char *buf,
 /*--------------------------------------------------------------------------*/
 
 typedef struct ACL_LINE_STATE {
-	int   offset;		/* ½âÎöÆ÷µÄµ±Ç°Æ«ÒÆÁ¿ */
-	char  finish;		/* ÊÇ·ñ³É¹¦ÕÒµ½ÁËÒ»¸ö¿ÕĞĞ */
-	char  last_ch;		/* ½âÎöÆ÷´æ·ÅµÄ×îºóÒ»¸ö×Ö·û */
-	char  last_lf;		/* ½âÎöÆ÷ÉÏÒ»¸ö×Ö·ûÊÇ·ñÎª»»ĞĞ·û LF */
+	int   offset;		/* è§£æå™¨çš„å½“å‰åç§»é‡ */
+	char  finish;		/* æ˜¯å¦æˆåŠŸæ‰¾åˆ°äº†ä¸€ä¸ªç©ºè¡Œ */
+	char  last_ch;		/* è§£æå™¨å­˜æ”¾çš„æœ€åä¸€ä¸ªå­—ç¬¦ */
+	char  last_lf;		/* è§£æå™¨ä¸Šä¸€ä¸ªå­—ç¬¦æ˜¯å¦ä¸ºæ¢è¡Œç¬¦ LF */
 } ACL_LINE_STATE;
 
 /**
- * ·ÖÅäÒ»¸ö ACL_LINE_STATE ¶ÔÏóÓÃ×÷ acl_find_blank_line º¯ÊıµÄ²ÎÊı
- * @return {ACL_LINE_STATE*} ÓÀÔ¶·µ»Ø·Ç¿ÕÖ¸Õë
+ * åˆ†é…ä¸€ä¸ª ACL_LINE_STATE å¯¹è±¡ç”¨ä½œ acl_find_blank_line å‡½æ•°çš„å‚æ•°
+ * @return {ACL_LINE_STATE*} æ°¸è¿œè¿”å›éç©ºæŒ‡é’ˆ
  */
 ACL_API ACL_LINE_STATE *acl_line_state_alloc(void);
 
 /**
- * ÊÍ·ÅÓÉ acl_line_state_alloc ·ÖÅäµÄ ACL_LINE_STATE ¶ÔÏó
- * @param state {ACL_LINE_STATE*} ·Ç¿Õ ACL_LINE_STATE ¶ÔÏó
+ * é‡Šæ”¾ç”± acl_line_state_alloc åˆ†é…çš„ ACL_LINE_STATE å¯¹è±¡
+ * @param state {ACL_LINE_STATE*} éç©º ACL_LINE_STATE å¯¹è±¡
  */
 ACL_API void acl_line_state_free(ACL_LINE_STATE *state);
 
 /**
- * ÖØÖÃ ACL_LINE_STATE ¶ÔÏóµÄ×´Ì¬
- * @param state {ACL_LINE_STATE*} ÓÉ acl_line_state_alloc ¶¯Ì¬·ÖÅäµÄ¶ÔÏó»òÕß
- *  Õ»±äÁ¿»òÖ±½Óµ÷ÓÃ malloc »òÆäËüÄÚ´æ³Ø·ÖÅäµÄ¶ÔÏó£¬µ«Ö»ÓĞ acl_line_state_alloc
- *  ·ÖÅäµÄ¶ÔÏó²Å¿ÉÒÔÊ¹ÓÃ acl_line_state_free ÊÍ·Å
- * @param offset {int} ÉèÖÃ ACL_LINE_STATE ¶ÔÏóÖĞ offset µÄ³õÊ¼Öµ
- * @return {ACL_LINE_STATE*} ´«ÈëµÄ state ¶ÔÏóÖ¸Õë
+ * é‡ç½® ACL_LINE_STATE å¯¹è±¡çš„çŠ¶æ€
+ * @param state {ACL_LINE_STATE*} ç”± acl_line_state_alloc åŠ¨æ€åˆ†é…çš„å¯¹è±¡æˆ–è€…
+ *  æ ˆå˜é‡æˆ–ç›´æ¥è°ƒç”¨ malloc æˆ–å…¶å®ƒå†…å­˜æ± åˆ†é…çš„å¯¹è±¡ï¼Œä½†åªæœ‰ acl_line_state_alloc
+ *  åˆ†é…çš„å¯¹è±¡æ‰å¯ä»¥ä½¿ç”¨ acl_line_state_free é‡Šæ”¾
+ * @param offset {int} è®¾ç½® ACL_LINE_STATE å¯¹è±¡ä¸­ offset çš„åˆå§‹å€¼
+ * @return {ACL_LINE_STATE*} ä¼ å…¥çš„ state å¯¹è±¡æŒ‡é’ˆ
  */
 ACL_API ACL_LINE_STATE *acl_line_state_reset(ACL_LINE_STATE *state, int offset);
 
 /**
- * ´ÓËù¸øÊı¾İ»º³åÇøÖĞ²éÕÒÒ»¸ö¿ÕĞĞ(¿ÕĞĞ¿ÉÒÔÎª: \r\n »ò \n)£¬¸Ãº¯ÊıÖ§³ÖÁ÷Ê½
- * ½âÎö£¬¿ÉÒÔÑ­»·µ÷ÓÃ±¾º¯Êı
- * @param s {const char*} ´«ÈëÊı¾İ»º³åÇøµØÖ·
- * @param n {int} s Êı¾İ»º³åÇøµÄ³¤¶È
- * @param state {ACL_LINE_STATE*} ÓÉ acl_line_state_alloc ·ÖÅäµÄ¶ÔÏó
- * @return {int} Ê£ÓàµÄµÄ×Ö½ÚÊı
+ * ä»æ‰€ç»™æ•°æ®ç¼“å†²åŒºä¸­æŸ¥æ‰¾ä¸€ä¸ªç©ºè¡Œ(ç©ºè¡Œå¯ä»¥ä¸º: \r\n æˆ– \n)ï¼Œè¯¥å‡½æ•°æ”¯æŒæµå¼
+ * è§£æï¼Œå¯ä»¥å¾ªç¯è°ƒç”¨æœ¬å‡½æ•°
+ * @param s {const char*} ä¼ å…¥æ•°æ®ç¼“å†²åŒºåœ°å€
+ * @param n {int} s æ•°æ®ç¼“å†²åŒºçš„é•¿åº¦
+ * @param state {ACL_LINE_STATE*} ç”± acl_line_state_alloc åˆ†é…çš„å¯¹è±¡
+ * @return {int} å‰©ä½™çš„çš„å­—èŠ‚æ•°
  */
 ACL_API int acl_find_blank_line(const char *s, int n, ACL_LINE_STATE *state);
 

@@ -107,13 +107,13 @@ ssl_aio_stream* ssl_aio_stream::open(aio_handle* handle,
 
 	ssl_aio_stream* stream = new ssl_aio_stream(handle, astream, false);
 
-	// µ÷ÓÃ»ùÀàµÄ hook_error ÒÔÏò handle ÖĞÔö¼ÓÒì²½Á÷¼ÆÊı,
-	// Í¬Ê± hook ¹Ø±Õ¼°³¬Ê±»Øµ÷¹ı³Ì
+	// è°ƒç”¨åŸºç±»çš„ hook_error ä»¥å‘ handle ä¸­å¢åŠ å¼‚æ­¥æµè®¡æ•°,
+	// åŒæ—¶ hook å…³é—­åŠè¶…æ—¶å›è°ƒè¿‡ç¨‹
 	stream->hook_error();
-	// hook Á¬½Ó³É¹¦µÄ»Øµ÷¹ı³Ì
+	// hook è¿æ¥æˆåŠŸçš„å›è°ƒè¿‡ç¨‹
 	stream->hook_open();
 
-	// Èç¹ûÊÇÊ¹ÓÃSSL£¬Ôò×¢²á±¾Àà¶ÔÏóÎªÁ¬½Ó³É¹¦ºóµÄµÚÒ»¸ö»Øµ÷¹ı³Ì
+	// å¦‚æœæ˜¯ä½¿ç”¨SSLï¼Œåˆ™æ³¨å†Œæœ¬ç±»å¯¹è±¡ä¸ºè¿æ¥æˆåŠŸåçš„ç¬¬ä¸€ä¸ªå›è°ƒè¿‡ç¨‹
 	if (use_ssl)
 		stream->add_open_callback(stream);
 
@@ -134,7 +134,7 @@ bool ssl_aio_stream::open_ssl(bool on)
 	if (on)
 	{
 #ifdef HAS_POLARSSL
-		// Èç¹û´ò¿ªÒÑ¾­ÊÇ SSL Ä£Ê½µÄÁ÷£¬ÔòÖ±½Ó·µ»Ø
+		// å¦‚æœæ‰“å¼€å·²ç»æ˜¯ SSL æ¨¡å¼çš„æµï¼Œåˆ™ç›´æ¥è¿”å›
 		if (ssl_ != NULL)
 		{
 			acl_assert(ssn_);
@@ -143,13 +143,13 @@ bool ssl_aio_stream::open_ssl(bool on)
 		}
 #endif
 
-		// ´ò¿ª SSL Á÷Ä£Ê½
+		// æ‰“å¼€ SSL æµæ¨¡å¼
 		return ssl_client_init();
 	}
 	else
 	{
 #ifdef HAS_POLARSSL
-		// Èç¹û¹Ø±Õ·Ç SSL Ä£Ê½µÄÁ÷£¬ÔòÖ±½Ó·µ»Ø
+		// å¦‚æœå…³é—­é SSL æ¨¡å¼çš„æµï¼Œåˆ™ç›´æ¥è¿”å›
 		if (ssl_ == NULL)
 		{
 			ssl_ = NULL;
@@ -159,10 +159,10 @@ bool ssl_aio_stream::open_ssl(bool on)
 		}
 #endif
 
-		// Çå³ıÓë SSL Ïà¹ØµÄ¶ÔÏó
+		// æ¸…é™¤ä¸ SSL ç›¸å…³çš„å¯¹è±¡
 		clear();
 
-		// ÇĞ»»³É·Ç SSL Á÷Ä£Ê½
+		// åˆ‡æ¢æˆé SSL æµæ¨¡å¼
 		acl_vstream_ctl(stream,
 			ACL_VSTREAM_CTL_READ_FN, acl_socket_read,
 			ACL_VSTREAM_CTL_WRITE_FN, acl_socket_write,

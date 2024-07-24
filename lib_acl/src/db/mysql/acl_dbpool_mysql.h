@@ -16,17 +16,17 @@ extern "C" {
 /* in acl_dbpool_mysql.c */
 
 /**
- * ´´½¨Ò»¸ö mysql ÀàĞÍµÄÊı¾İ¿âÁ¬½Ó³Ø
- * @param db_info ¼ÇÂ¼×ÅÓĞ¹ØÁ¬½ÓÊı¾İËùĞèÒªµÄĞÅÏ¢
- * @return DB_POOL * ·µ»ØÒ»¸öÄÜÓÃµÄÁ¬½Ó³Ø¾ä±ú
+ * åˆ›å»ºä¸€ä¸ª mysql ç±»å‹çš„æ•°æ®åº“è¿æ¥æ± 
+ * @param db_info è®°å½•ç€æœ‰å…³è¿æ¥æ•°æ®æ‰€éœ€è¦çš„ä¿¡æ¯
+ * @return DB_POOL * è¿”å›ä¸€ä¸ªèƒ½ç”¨çš„è¿æ¥æ± å¥æŸ„
  */
 ACL_DB_POOL *acl_dbpool_mysql_create(const ACL_DB_INFO *db_info);
 
 /**
- * ÖØĞÂÔÙ´ò¿ª mysql Á¬½Ó, Èç¹ûÖØĞÂ´ò¿ª³É¹¦, ÔòÍ¬Ê±¹Ø±Õ¾ÉÁ¬½Ó, Èç¹û´ò¿ª
- * Ê§°Ü, Ôò±£ÁôÔ­Á¬½ÓÓÚ handle ÖĞ
+ * é‡æ–°å†æ‰“å¼€ mysql è¿æ¥, å¦‚æœé‡æ–°æ‰“å¼€æˆåŠŸ, åˆ™åŒæ—¶å…³é—­æ—§è¿æ¥, å¦‚æœæ‰“å¼€
+ * å¤±è´¥, åˆ™ä¿ç•™åŸè¿æ¥äº handle ä¸­
  * @param handle {ACL_DB_HANDLE*}
- * @return {int} 0: ±íÊ¾ÖØĞÂ´ò¿ª³É¹¦
+ * @return {int} 0: è¡¨ç¤ºé‡æ–°æ‰“å¼€æˆåŠŸ
  */
 int sane_mysql_reopen(ACL_DB_HANDLE *handle);
 

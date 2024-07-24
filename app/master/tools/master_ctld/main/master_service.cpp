@@ -3,7 +3,7 @@
 #include "master_service.h"
 
 //////////////////////////////////////////////////////////////////////////////
-// ÅäÖÃÄÚÈİÏî
+// Ã…Ã¤Ã–ÃƒÃ„ÃšÃˆÃÃÃ®
 
 char *var_cfg_redis_addrs;
 char *var_cfg_manage_addr;

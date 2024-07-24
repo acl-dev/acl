@@ -24,13 +24,13 @@
 
 void zdb_init(void)
 {
-	/* ³õÊ¼»¯ÎÄ¼ş¾ä±ú */
+	/* åˆå§‹åŒ–æ–‡ä»¶å¥æŸ„ */
 	acl_fhandle_init(1000, 100, 0);
 }
 
 void zdb_end(void)
 {
-	/* ĞèÒª¹Ø±ÕËùÓĞ´æ´¢¾ä±ú */
+	/* éœ€è¦å…³é—­æ‰€æœ‰å­˜å‚¨å¥æŸ„ */
 	acl_fhandle_end();
 }
 
@@ -42,7 +42,7 @@ void zdb_end(void)
 #define	INFO_LEN	(PATH_LEN + IDISK_LEN + PRIORITY_LEN + LIMIT_LEN + COUNT_LEN + 2)
 #define	ITEM_CNT	5
 
-/* ´æ´¢¸ñÊ½: {path} {idisk} {priority} {limit} {count} */
+/* å­˜å‚¨æ ¼å¼: {path} {idisk} {priority} {limit} {count} */
 
 static void free_disk(void *arg)
 {
@@ -133,7 +133,7 @@ static ZDB_DISK *zdb_disks_load(const char *dbname, const char *dbpath)
 		i++;
 	}
 
-	disks[i].path = NULL;  /* ½«×îºóÒ»¸öÖÃ¿Õ±íÊ¾½áÊø */
+	disks[i].path = NULL;  /* å°†æœ€åä¸€ä¸ªç½®ç©ºè¡¨ç¤ºç»“æŸ */
 	RETURN (disks);
 }
 
@@ -154,7 +154,7 @@ static void zdb_disks_update(const char *dbname, const char *dbpath, const ZDB_D
 		return;
 	}
 
-	/* ´æ´¢¸ñÊ½: {path} {idisk} {priority} {limit} {count} */
+	/* å­˜å‚¨æ ¼å¼: {path} {idisk} {priority} {limit} {count} */
 
 	i = 0;
 	for (i = 0; disks[i].path != NULL; i++) {
@@ -215,7 +215,7 @@ ZDB *zdb_open(const char *dbname, unsigned int oflags, const ZDB_CFG *cfg)
 	ACL_VSTRING *buf = acl_vstring_alloc(256);
 #endif
 
-	/* ÏÈ±£Ö¤´æ´¢Ä¿Â¼´æÔÚ */
+	/* å…ˆä¿è¯å­˜å‚¨ç›®å½•å­˜åœ¨ */
 	acl_make_dirs(cfg->key_path, 0700);
 
 	disks = zdb_disks_load(dbname, cfg->key_path);
@@ -284,7 +284,7 @@ void zdb_close(ZDB *db)
 {
 	int   i;
 
-	zdb_sync(db);  /* ÏÈÍ¬²½´ÅÅÌ·ÖÇøĞÅÏ¢ÖÁ´ÅÅÌ */
+	zdb_sync(db);  /* å…ˆåŒæ­¥ç£ç›˜åˆ†åŒºä¿¡æ¯è‡³ç£ç›˜ */
 	acl_myfree(db->dbname);
 	acl_myfree(db->key_path);
 	acl_vstring_free(db->path_tmp);
@@ -331,7 +331,7 @@ ZDB_BLK *zdb_lookup(ZDB *db, zdb_key_t key, size_t *size_ptr, ZDB_BLK_OFF *blk_o
 	if (blk_off_buf)
 		memcpy(blk_off_buf, &blk_off, sizeof(blk_off));
 
-	/* ±ØĞëÅĞ¶Ï¼üµÄÒ»ÖÂĞÔ */
+	/* å¿…é¡»åˆ¤æ–­é”®çš„ä¸€è‡´æ€§ */
 
 	if (key != key_tmp) {
 		acl_msg_warn("%s(%d): key(" ACL_FMT_I64D ") != key_tmp("
@@ -369,7 +369,7 @@ int zdb_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off_saved,
 		return (-1);
 	}
 
-	/* ¿ÉÒÔÖØ¸´ÀûÓÃ´«ÈëµÄ blk_off_saved (´ËÖµÊÇÉÏ´Îµ÷ÓÃ zdb_lookup »ñµÃ) */
+	/* å¯ä»¥é‡å¤åˆ©ç”¨ä¼ å…¥çš„ blk_off_saved (æ­¤å€¼æ˜¯ä¸Šæ¬¡è°ƒç”¨ zdb_lookup è·å¾—) */
 
 	if (blk_off_saved == NULL || blk_off_saved->offset < 0) {
 		blk_off_saved = NULL;
@@ -384,11 +384,11 @@ int zdb_update(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off_saved,
 	}
 
 	if (blk_off_saved == NULL) {
-		db->status |= ZDB_STAT_KEY_NEW;  /* ÉèÖÃ×´Ì¬Î»ÒÔ±íÃ÷µ±Ç°ÎªĞÂÖµ */
+		db->status |= ZDB_STAT_KEY_NEW;  /* è®¾ç½®çŠ¶æ€ä½ä»¥è¡¨æ˜å½“å‰ä¸ºæ–°å€¼ */
 		ret = db->dat_add(db, key, dat, (int) len);
-		db->status &= ~ZDB_STAT_KEY_NEW;  /* Çå³ı±êÖ¾Î» */
+		db->status &= ~ZDB_STAT_KEY_NEW;  /* æ¸…é™¤æ ‡å¿—ä½ */
 	} else {
-		db->status &=~ ZDB_STAT_KEY_NEW;  /* Çå³ı±êÖ¾Î»±íÃ÷ÊÇĞŞ¸Ä¾ÉÊı¾İ */
+		db->status &=~ ZDB_STAT_KEY_NEW;  /* æ¸…é™¤æ ‡å¿—ä½è¡¨æ˜æ˜¯ä¿®æ”¹æ—§æ•°æ® */
 		ret = db->dat_update(db, key, blk_off_saved, dat, len);
 	}
 

@@ -8,35 +8,35 @@ extern "C" {
 #include "../stdlib/acl_define.h"
 
 /**
- * ³õÊ¼»¯Õû¸öACL¿â
+ * åˆå§‹åŒ–æ•´ä¸ªACLåº“
  */
 ACL_API void acl_lib_init(void);
 
 /**
- * ½áÊøÕû¸öACL¿â
+ * ç»“æŸæ•´ä¸ªACLåº“
  */
 ACL_API void acl_lib_end(void);
 
 /**
- * ÊÇ·ñÓÅÏÈÊ¹ÓÃ poll ¶ø·Ç select
- * @param yesno {int} ·Ç 0 Ê±±íÊ¾ÓÅÏÈÊ¹ÓÃ poll
+ * æ˜¯å¦ä¼˜å…ˆä½¿ç”¨ poll è€Œé select
+ * @param yesno {int} é 0 æ—¶è¡¨ç¤ºä¼˜å…ˆä½¿ç”¨ poll
  */
 ACL_API void acl_poll_prefered(int yesno);
 
 /**
- * »ñµÃµ±Ç° acl ¿âµÄ°æ±¾ĞÅÏ¢
- * @return {const char*} µ±Ç° acl ¿â°æ±¾ĞÅÏ¢
+ * è·å¾—å½“å‰ acl åº“çš„ç‰ˆæœ¬ä¿¡æ¯
+ * @return {const char*} å½“å‰ acl åº“ç‰ˆæœ¬ä¿¡æ¯
  */
 ACL_API const char *acl_version(void);
 
 /**
- * »ñµÃµ±Ç° acl ¿â¾ß±¸µÄÏà¹ØÄÜÁ¦
- * @return {const char*} ·µ»Ø·Ç¿Õ×Ö·û´®£¬¸Ãº¯Êı²»ÊÇÏß³Ì°²È«µÄ
+ * è·å¾—å½“å‰ acl åº“å…·å¤‡çš„ç›¸å…³èƒ½åŠ›
+ * @return {const char*} è¿”å›éç©ºå­—ç¬¦ä¸²ï¼Œè¯¥å‡½æ•°ä¸æ˜¯çº¿ç¨‹å®‰å…¨çš„
  */
 ACL_API const char *acl_verbose(void);
 
 /**
- * »ñµÃÖ÷Ïß³ÌµÄÏß³ÌºÅ
+ * è·å¾—ä¸»çº¿ç¨‹çš„çº¿ç¨‹å·
  * @return {unsigned int}
  */
 ACL_API unsigned long acl_main_thread_self(void);

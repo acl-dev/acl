@@ -10,40 +10,40 @@ class mime_code;
 class ostream;
 
 /**
- * ×«Ğ´ÓÊ¼şÊ±£¬´ËÀàÓÃÓÚ´´½¨ÓëÓÊ¼ş¸½¼şÏà¹ØµÄ¹¦ÄÜ
+ * æ’°å†™é‚®ä»¶æ—¶ï¼Œæ­¤ç±»ç”¨äºåˆ›å»ºä¸é‚®ä»¶é™„ä»¶ç›¸å…³çš„åŠŸèƒ½
  */
 class ACL_CPP_API mail_attach
 {
 public:
 	/**
-	 * ½«Ò»¸öÆÕÍ¨ÎÄ¼ş´ò°ü½øÓÊ¼şÊ±µÄ¹¹Ôìº¯Êı
-	 * @param filepath {const char*} ¸½¼şÎÄ¼ş´æ´¢Â·¾¶£¨º¬ÎÄ¼şÃû£©
-	 * @param content_type {const char*} ¸½¼şÎÄ¼şÀàĞÍ
-	 * @param charset {const char*} ÈôÎª´¿ÎÄ¼ş£¬´Ë²ÎÊı±íÃ÷´¿ÎÄ±¾µÄ×Ö·û¼¯
+	 * å°†ä¸€ä¸ªæ™®é€šæ–‡ä»¶æ‰“åŒ…è¿›é‚®ä»¶æ—¶çš„æ„é€ å‡½æ•°
+	 * @param filepath {const char*} é™„ä»¶æ–‡ä»¶å­˜å‚¨è·¯å¾„ï¼ˆå«æ–‡ä»¶åï¼‰
+	 * @param content_type {const char*} é™„ä»¶æ–‡ä»¶ç±»å‹
+	 * @param charset {const char*} è‹¥ä¸ºçº¯æ–‡ä»¶ï¼Œæ­¤å‚æ•°è¡¨æ˜çº¯æ–‡æœ¬çš„å­—ç¬¦é›†
 	 */
 	mail_attach(const char* filepath, const char* content_type,
 		const char* charset);
 	~mail_attach();
 
 	/**
-	 * ÉèÖÃ¸½¼şµÄÎÄ¼şÃû£¬ÄÚ²¿»á×Ô¶¯¶ÔÎÄ¼şÃûÓÃ rfc2047 ¸ñÊ½½øĞĞ±àÂë
-	 * @param name {const char*} ·Ç¿Õ×Ö·û´®
-	 * @param charset {const char*} ¸Ã²ÎÊıÖ¸¶¨×Ö·û¼¯£¬µ±·Ç NULL Ê±£¬ÔòÄÚ
-	 *  ²¿×Ô¶¯Ê¹ÓÃ rfc2047 ¸ñÊ½¶ÔÎÄ¼şÃû½øĞĞ±àÂë£¬·ñÔòÄÚ²¿Ö±½Ó´æ´¢ÊäÈëÃû³Æ
+	 * è®¾ç½®é™„ä»¶çš„æ–‡ä»¶åï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨å¯¹æ–‡ä»¶åç”¨ rfc2047 æ ¼å¼è¿›è¡Œç¼–ç 
+	 * @param name {const char*} éç©ºå­—ç¬¦ä¸²
+	 * @param charset {const char*} è¯¥å‚æ•°æŒ‡å®šå­—ç¬¦é›†ï¼Œå½“é NULL æ—¶ï¼Œåˆ™å†…
+	 *  éƒ¨è‡ªåŠ¨ä½¿ç”¨ rfc2047 æ ¼å¼å¯¹æ–‡ä»¶åè¿›è¡Œç¼–ç ï¼Œå¦åˆ™å†…éƒ¨ç›´æ¥å­˜å‚¨è¾“å…¥åç§°
 	 * @return {mail_attach&}
 	 */
 	mail_attach& set_filename(const char* name, const char* charset = NULL);
 
 	/**
-	 * µ±ÓÊ¼şÖĞµÄÊı¾İÌåÎª multipart/relative ÀàĞÍÊ±£¬µ÷ÓÃ´Ëº¯ÊıÉèÖÃÆäÖĞµÄ
-	 * html ÕıÎÄÖĞ cid ±êÊ¶·û
-	 * @param id {const char*} cid ±êÊ¶·û
+	 * å½“é‚®ä»¶ä¸­çš„æ•°æ®ä½“ä¸º multipart/relative ç±»å‹æ—¶ï¼Œè°ƒç”¨æ­¤å‡½æ•°è®¾ç½®å…¶ä¸­çš„
+	 * html æ­£æ–‡ä¸­ cid æ ‡è¯†ç¬¦
+	 * @param id {const char*} cid æ ‡è¯†ç¬¦
 	 * @return {mail_attach&}
 	 */
 	mail_attach& set_content_id(const char* id);
 
 	/**
-	 * »ñµÃ¹¹Ôìº¯Êı´«ÈëµÄ¸½¼şÎÄ¼şÂ·¾¶
+	 * è·å¾—æ„é€ å‡½æ•°ä¼ å…¥çš„é™„ä»¶æ–‡ä»¶è·¯å¾„
 	 * @return {const char*}
 	 */
 	const char* get_filepath() const
@@ -52,7 +52,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¸½¼şµÄÎÄ¼şÃû²¿·Ö¾­ rfc2047 ±àÂëºóÃû³Æ
+	 * è·å¾—é™„ä»¶çš„æ–‡ä»¶åéƒ¨åˆ†ç» rfc2047 ç¼–ç ååç§°
 	 * @return {const char*}
 	 */
 	const char* get_filename() const
@@ -61,7 +61,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃ¹¹Ôìº¯Êı´«ÈëµÄÎÄ¼şÀàĞÍ
+	 * è·å¾—æ„é€ å‡½æ•°ä¼ å…¥çš„æ–‡ä»¶ç±»å‹
 	 * @return {const char*}
 	 */
 	const char* get_content_type() const
@@ -70,7 +70,7 @@ public:
 	}
 
 	/**
-	 * »ñµÃÓÉ set_content_id ÉèÖÃµÄ¸Ã¸½¼şµÄ cid ±êÊ¶·û
+	 * è·å¾—ç”± set_content_id è®¾ç½®çš„è¯¥é™„ä»¶çš„ cid æ ‡è¯†ç¬¦
 	 * @return {const char*}
 	 */
 	const char* get_content_id() const
@@ -79,25 +79,25 @@ public:
 	}
 
 	/**
-	 * ½«¸½¼şÄÚÈİ²ÉÓÃ´«ÈëµÄ±àÂëÆ÷½øĞĞ±àÂëºó´æÈëÄÚ´æ»º³åÇø
-	 * @param coder {mime_code*} ±àÂëÆ÷£¨base64/qpµÈ£©
-	 * @param out {string&} ´æ´¢½á¹û£¬²ÉÓÃ append ·½Ê½
-	 * @return {bool} ±àÂë¹ı³ÌÊÇ·ñ³É¹¦
+	 * å°†é™„ä»¶å†…å®¹é‡‡ç”¨ä¼ å…¥çš„ç¼–ç å™¨è¿›è¡Œç¼–ç åå­˜å…¥å†…å­˜ç¼“å†²åŒº
+	 * @param coder {mime_code*} ç¼–ç å™¨ï¼ˆbase64/qpç­‰ï¼‰
+	 * @param out {string&} å­˜å‚¨ç»“æœï¼Œé‡‡ç”¨ append æ–¹å¼
+	 * @return {bool} ç¼–ç è¿‡ç¨‹æ˜¯å¦æˆåŠŸ
 	 */
 	bool save_to(mime_code* coder, string& out);
 
 	/**
-	 * ½«¸½¼şÄÚÈİ²ÉÓÃ´«ÈëµÄ±àÂëÆ÷½øĞĞ±àÂëºó´æÈëÊä³öÁ÷ÖĞ
-	 * @param coder {mime_code*} ±àÂëÆ÷£¨base64/qpµÈ£©
-	 * @param out {out&} ´æ´¢½á¹û
-	 * @return {bool} ±àÂë¹ı³ÌÊÇ·ñ³É¹¦
+	 * å°†é™„ä»¶å†…å®¹é‡‡ç”¨ä¼ å…¥çš„ç¼–ç å™¨è¿›è¡Œç¼–ç åå­˜å…¥è¾“å‡ºæµä¸­
+	 * @param coder {mime_code*} ç¼–ç å™¨ï¼ˆbase64/qpç­‰ï¼‰
+	 * @param out {out&} å­˜å‚¨ç»“æœ
+	 * @return {bool} ç¼–ç è¿‡ç¨‹æ˜¯å¦æˆåŠŸ
 	 */
 	bool save_to(mime_code* coder, ostream& out);
 
 	/**
-	 * ´´½¨¸Ã¸½¼şÔÚ MIME ÓÊ¼şÖĞµÄÎÄ¼şÍ·ĞÅÏ¢
-	 * @param transfer_encoding {const char*} ±àÂë·½Ê½
-	 * @param out {string&} ´æ´¢½á¹û£¬²ÉÓÃ append ·½Ê½
+	 * åˆ›å»ºè¯¥é™„ä»¶åœ¨ MIME é‚®ä»¶ä¸­çš„æ–‡ä»¶å¤´ä¿¡æ¯
+	 * @param transfer_encoding {const char*} ç¼–ç æ–¹å¼
+	 * @param out {string&} å­˜å‚¨ç»“æœï¼Œé‡‡ç”¨ append æ–¹å¼
 	 */
 	void build_header(const char* transfer_encoding, string& out);
 

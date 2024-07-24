@@ -15,256 +15,256 @@ extern "C" {
 typedef struct acl_pthread_job_t acl_pthread_job_t;
 
 /**
- * ´´½¨Ò»¸öÏß³Ì³ØµÄ¹¤×÷ÈÎÎñ
- * @param run_fn {void (*)(void*)} ÔÚ×ÓÏß³ÌÖĞ±»µ÷ÓÃµÄ»Øµ÷º¯Êı 
- * @param run_arg {void*} run_fn µÄ»Øµ÷²ÎÊıÖ®Ò»
+ * åˆ›å»ºä¸€ä¸ªçº¿ç¨‹æ± çš„å·¥ä½œä»»åŠ¡
+ * @param run_fn {void (*)(void*)} åœ¨å­çº¿ç¨‹ä¸­è¢«è°ƒç”¨çš„å›è°ƒå‡½æ•° 
+ * @param run_arg {void*} run_fn çš„å›è°ƒå‚æ•°ä¹‹ä¸€
  * @param fixed {int}
- * @return {acl_pthread_job_t*} ·µ»Ø´´½¨µÄ¹¤×÷ÈÎÎñ
+ * @return {acl_pthread_job_t*} è¿”å›åˆ›å»ºçš„å·¥ä½œä»»åŠ¡
  */
 ACL_API acl_pthread_job_t *acl_pthread_pool_alloc_job(void (*run_fn)(void*),
 		void *run_arg, int fixed);
 
 /**
- * ÊÍ·ÅÓÉ acl_pthread_pool_alloc_job ´´½¨µÄ¹¤×÷ÈÎÎñ
+ * é‡Šæ”¾ç”± acl_pthread_pool_alloc_job åˆ›å»ºçš„å·¥ä½œä»»åŠ¡
  * @param job {acl_pthread_job_t*}
  */
 ACL_API void acl_pthread_pool_free_job(acl_pthread_job_t *job);
 
 /**
- * Ïß³Ì³Ø¶ÔÏó½á¹¹ÀàĞÍ¶¨Òå
+ * çº¿ç¨‹æ± å¯¹è±¡ç»“æ„ç±»å‹å®šä¹‰
  */
 typedef struct acl_pthread_pool_t acl_pthread_pool_t;
 
 /**
- * Ïß³Ì³Ø¶ÔÏóÊôĞÔµÄ½á¹¹ÀàĞÍ¶¨Òå
+ * çº¿ç¨‹æ± å¯¹è±¡å±æ€§çš„ç»“æ„ç±»å‹å®šä¹‰
  */
 typedef struct acl_pthread_pool_attr_t {
-	int   threads_limit;	/**< Ïß³Ì³Ø×î´óÏß³ÌÊıÏŞÖÆ */
-#define ACL_PTHREAD_POOL_DEF_THREADS   100  /**< È±Ê¡×î´óÖµÎª 100 ¸öÏß³Ì */
-	int   idle_timeout;                 /**< ¹¤×÷Ïß³Ì¿ÕÏĞ³¬Ê±Ê±¼ä(Ãë) */
-#define ACL_PTHREAD_POOL_DEF_IDLE      0    /**< È±Ê¡¿Õ¼ä³¬Ê±Ê±¼äÎª 0 Ãë */
-	size_t stack_size;                  /**< ¹¤×÷Ïß³ÌµÄ¶ÑÕ»´óĞ¡(×Ö½Ú) */
+	int   threads_limit;	/**< çº¿ç¨‹æ± æœ€å¤§çº¿ç¨‹æ•°é™åˆ¶ */
+#define ACL_PTHREAD_POOL_DEF_THREADS   100  /**< ç¼ºçœæœ€å¤§å€¼ä¸º 100 ä¸ªçº¿ç¨‹ */
+	int   idle_timeout;                 /**< å·¥ä½œçº¿ç¨‹ç©ºé—²è¶…æ—¶æ—¶é—´(ç§’) */
+#define ACL_PTHREAD_POOL_DEF_IDLE      0    /**< ç¼ºçœç©ºé—´è¶…æ—¶æ—¶é—´ä¸º 0 ç§’ */
+	size_t stack_size;                  /**< å·¥ä½œçº¿ç¨‹çš„å †æ ˆå¤§å°(å­—èŠ‚) */
 } acl_pthread_pool_attr_t;
 
 /**
- * ¸ü¼òµ¥µØ´´½¨Ïß³Ì¶ÔÏóµÄ·½·¨
- * @param threads_limit {int}  Ïß³Ì³ØÖĞ×î´ó²¢·¢Ïß³ÌÊı
- * @param idle_timeout {int} ¹¤×÷Ïß³Ì¿ÕÏĞ³¬Ê±ÍË³öÊ±¼ä(Ãë)
- * @return {acl_pthread_pool_t*}, Èç¹û²»Îª¿ÕÔò±íÊ¾³É¹¦£¬·ñÔòÊ§°Ü
+ * æ›´ç®€å•åœ°åˆ›å»ºçº¿ç¨‹å¯¹è±¡çš„æ–¹æ³•
+ * @param threads_limit {int}  çº¿ç¨‹æ± ä¸­æœ€å¤§å¹¶å‘çº¿ç¨‹æ•°
+ * @param idle_timeout {int} å·¥ä½œçº¿ç¨‹ç©ºé—²è¶…æ—¶é€€å‡ºæ—¶é—´(ç§’)
+ * @return {acl_pthread_pool_t*}, å¦‚æœä¸ä¸ºç©ºåˆ™è¡¨ç¤ºæˆåŠŸï¼Œå¦åˆ™å¤±è´¥
  */
 ACL_API acl_pthread_pool_t *acl_thread_pool_create(
 		int threads_limit, int idle_timeout);
 
 /**
- * ´´½¨Ò»¸öÏß³Ì³Ø¶ÔÏó
- * @param attr {acl_pthread_pool_attr_t*} Ïß³Ì³Ø´´½¨Ê±µÄÊôĞÔ£¬Èç¹û¸Ã²ÎÊıÎª¿Õ£¬
- *  Ôò²ÉÓÃÄ¬ÈÏ²ÎÊı: ACL_PTHREAD_POOL_DEF_XXX
- * @return {acl_pthread_pool_t*}, Èç¹û²»Îª¿ÕÔò±íÊ¾³É¹¦£¬·ñÔòÊ§°Ü
+ * åˆ›å»ºä¸€ä¸ªçº¿ç¨‹æ± å¯¹è±¡
+ * @param attr {acl_pthread_pool_attr_t*} çº¿ç¨‹æ± åˆ›å»ºæ—¶çš„å±æ€§ï¼Œå¦‚æœè¯¥å‚æ•°ä¸ºç©ºï¼Œ
+ *  åˆ™é‡‡ç”¨é»˜è®¤å‚æ•°: ACL_PTHREAD_POOL_DEF_XXX
+ * @return {acl_pthread_pool_t*}, å¦‚æœä¸ä¸ºç©ºåˆ™è¡¨ç¤ºæˆåŠŸï¼Œå¦åˆ™å¤±è´¥
  */
 ACL_API acl_pthread_pool_t *acl_pthread_pool_create(
 		const acl_pthread_pool_attr_t *attr);
 
 /**
- * µ±¶ÓÁĞ¶Ñ»ıµÄÈÎÎñÊı´óÓÚ¿ÕÏĞÏß³ÌÊıµÄ2±¶Ê±. Í¨¹ı´Ëº¯ÊıÉèÖÃÌí¼ÓÈÎÎñµÄ
- * Ïß³ÌĞİÃßÊ±¼ä, Èç¹û²»µ÷ÓÃ´Ëº¯Êı½øĞĞÉèÖÃ, ÔòÌí¼ÓÏß³Ì²»»á½øÈëĞİÃß×´Ì¬.
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param timewait_sec {int} ĞİÃß¡¡µÄÊ±¼äÖµ, ½¨Òé½«´ËÖµÉèÖÃÎª 1--5 ÃëÄÚ
- * @return {int} ³É¹¦·µ»Ø 0, Ê§°Ü·µ»Ø -1
+ * å½“é˜Ÿåˆ—å †ç§¯çš„ä»»åŠ¡æ•°å¤§äºç©ºé—²çº¿ç¨‹æ•°çš„2å€æ—¶. é€šè¿‡æ­¤å‡½æ•°è®¾ç½®æ·»åŠ ä»»åŠ¡çš„
+ * çº¿ç¨‹ä¼‘çœ æ—¶é—´, å¦‚æœä¸è°ƒç”¨æ­¤å‡½æ•°è¿›è¡Œè®¾ç½®, åˆ™æ·»åŠ çº¿ç¨‹ä¸ä¼šè¿›å…¥ä¼‘çœ çŠ¶æ€.
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param timewait_sec {int} ä¼‘çœ ã€€çš„æ—¶é—´å€¼, å»ºè®®å°†æ­¤å€¼è®¾ç½®ä¸º 1--5 ç§’å†…
+ * @return {int} æˆåŠŸè¿”å› 0, å¤±è´¥è¿”å› -1
  */
 ACL_API int acl_pthread_pool_set_timewait(
 		acl_pthread_pool_t *thr_pool, int timewait_sec);
 
 /**
- * Ìí¼Ó×¢²áº¯Êı£¬ÔÚÏß³Ì´´½¨ºóÁ¢¼´Ö´ĞĞ´Ë³õÊ¼»¯º¯Êı
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param init_fn {int (*)(void*)} ¹¤×÷Ïß³Ì³õÊ¼»¯º¯Êı, Èç¹û¸Ãº¯Êı·µ»Ø < 0,
- *  Ôò¸ÃÏß³Ì×Ô¶¯ÍË³ö¡£
- * @param init_arg {void*} init_fn ËùĞèÒªµÄ²ÎÊı
+ * æ·»åŠ æ³¨å†Œå‡½æ•°ï¼Œåœ¨çº¿ç¨‹åˆ›å»ºåç«‹å³æ‰§è¡Œæ­¤åˆå§‹åŒ–å‡½æ•°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param init_fn {int (*)(void*)} å·¥ä½œçº¿ç¨‹åˆå§‹åŒ–å‡½æ•°, å¦‚æœè¯¥å‡½æ•°è¿”å› < 0,
+ *  åˆ™è¯¥çº¿ç¨‹è‡ªåŠ¨é€€å‡ºã€‚
+ * @param init_arg {void*} init_fn æ‰€éœ€è¦çš„å‚æ•°
  * @return {int} 0: OK; != 0: Error.
  */
 ACL_API int acl_pthread_pool_atinit(acl_pthread_pool_t *thr_pool,
 		int (*init_fn)(void *), void *init_arg);
 
 /**
- * Ìí¼Ó×¢²áº¯Êı£¬ÔÚÏß³ÌÍË³öÁ¢¼´Ö´ĞĞ´Ë³õº¯Êı
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param free_fn {void (*)(void*)} ¹¤×÷Ïß³ÌÍË³öÇ°±ØĞëÖ´ĞĞµÄº¯Êı
- * @param free_arg {void*} free_fn ËùĞèÒªµÄ²ÎÊı
+ * æ·»åŠ æ³¨å†Œå‡½æ•°ï¼Œåœ¨çº¿ç¨‹é€€å‡ºç«‹å³æ‰§è¡Œæ­¤åˆå‡½æ•°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param free_fn {void (*)(void*)} å·¥ä½œçº¿ç¨‹é€€å‡ºå‰å¿…é¡»æ‰§è¡Œçš„å‡½æ•°
+ * @param free_arg {void*} free_fn æ‰€éœ€è¦çš„å‚æ•°
  * @return {int} 0: OK; != 0: Error.
  */
 ACL_API int acl_pthread_pool_atfree(acl_pthread_pool_t *thr_pool,
 		void (*free_fn)(void *), void *free_arg);
 
 /**
- * Ïú»ÙÒ»¸öÏß³Ì³Ø¶ÔÏó, ³É¹¦Ïú»Ùºó¸Ã¶ÔÏó²»ÄÜÔÙÓÃ.
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} 0: ³É¹¦; != 0: Ê§°Ü
+ * é”€æ¯ä¸€ä¸ªçº¿ç¨‹æ± å¯¹è±¡, æˆåŠŸé”€æ¯åè¯¥å¯¹è±¡ä¸èƒ½å†ç”¨.
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} 0: æˆåŠŸ; != 0: å¤±è´¥
  */
 ACL_API int acl_pthread_pool_destroy(acl_pthread_pool_t *thr_pool);
 
 /**
- * ÔİÍ£Ò»¸öÏß³Ì³Ø¶ÔÏóµÄÔËĞĞ, Í£Ö¹ºó»¹¿ÉÒÔÔÙÔËĞĞ.
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} 0: ³É¹¦; != 0: Ê§°Ü
+ * æš‚åœä¸€ä¸ªçº¿ç¨‹æ± å¯¹è±¡çš„è¿è¡Œ, åœæ­¢åè¿˜å¯ä»¥å†è¿è¡Œ.
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} 0: æˆåŠŸ; != 0: å¤±è´¥
  */
 ACL_API int acl_pthread_pool_stop(acl_pthread_pool_t *thr_pool);
 
 /**
- * ÏòÏß³Ì³ØÌí¼ÓÒ»¸öÈÎÎñ
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param run_fn {void (*)(*)} µ±ÓĞ¿ÉÓÃ¹¤×÷Ïß³ÌÊ±Ëùµ÷ÓÃµÄ»Øµ÷´¦Àíº¯Êı
- * @param run_arg {void*} »Øµ÷º¯Êı run_fn ËùĞèÒªµÄ»Øµ÷²ÎÊı
+ * å‘çº¿ç¨‹æ± æ·»åŠ ä¸€ä¸ªä»»åŠ¡
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param run_fn {void (*)(*)} å½“æœ‰å¯ç”¨å·¥ä½œçº¿ç¨‹æ—¶æ‰€è°ƒç”¨çš„å›è°ƒå¤„ç†å‡½æ•°
+ * @param run_arg {void*} å›è°ƒå‡½æ•° run_fn æ‰€éœ€è¦çš„å›è°ƒå‚æ•°
  */
 ACL_API void acl_pthread_pool_add_one(acl_pthread_pool_t *thr_pool,
 		void (*run_fn)(void *), void *run_arg);
 #define	acl_pthread_pool_add	acl_pthread_pool_add_one
 
 /**
- * ÏòÏß³Ì³ØÌí¼ÓÒ»¸öÈÎÎñ
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param job {acl_pthread_job_t*} ÓÉ acl_pthread_pool_alloc_job ´´½¨µÄÏß³ÌÈÎÎñ
+ * å‘çº¿ç¨‹æ± æ·»åŠ ä¸€ä¸ªä»»åŠ¡
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param job {acl_pthread_job_t*} ç”± acl_pthread_pool_alloc_job åˆ›å»ºçš„çº¿ç¨‹ä»»åŠ¡
  */
 ACL_API void acl_pthread_pool_add_job(acl_pthread_pool_t *thr_pool,
 		acl_pthread_job_t *job);
 
 /**
- * ¿ªÊ¼½øĞĞÅú´¦Àí·½Ê½µÄÌí¼ÓÈÎÎñ, Êµ¼ÊÉÏÊÇ¿ªÊ¼½øĞĞ¼ÓËø
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
+ * å¼€å§‹è¿›è¡Œæ‰¹å¤„ç†æ–¹å¼çš„æ·»åŠ ä»»åŠ¡, å®é™…ä¸Šæ˜¯å¼€å§‹è¿›è¡ŒåŠ é”
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
  */
 ACL_API void acl_pthread_pool_bat_add_begin(acl_pthread_pool_t *thr_pool);
 
 /**
- * Ìí¼ÓÒ»¸öĞÂÈÎÎñ, Ç°ÌáÊÇÒÑ¾­³É¹¦¼ÓËø, ¼´µ÷ÓÃ acl_pthread_pool_bat_add_begin ³É¹¦
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param run_fn {void (*)(void*)} µ±ÓĞ¿ÉÓÃ¹¤×÷Ïß³ÌÊ±Ëùµ÷ÓÃµÄ»Øµ÷´¦Àíº¯Êı
- * @param run_arg »Øµ÷º¯Êı run_fn ËùĞèÒªµÄ»Øµ÷²ÎÊı
+ * æ·»åŠ ä¸€ä¸ªæ–°ä»»åŠ¡, å‰ææ˜¯å·²ç»æˆåŠŸåŠ é”, å³è°ƒç”¨ acl_pthread_pool_bat_add_begin æˆåŠŸ
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param run_fn {void (*)(void*)} å½“æœ‰å¯ç”¨å·¥ä½œçº¿ç¨‹æ—¶æ‰€è°ƒç”¨çš„å›è°ƒå¤„ç†å‡½æ•°
+ * @param run_arg å›è°ƒå‡½æ•° run_fn æ‰€éœ€è¦çš„å›è°ƒå‚æ•°
  */
 ACL_API void acl_pthread_pool_bat_add_one(acl_pthread_pool_t *thr_pool,
 		void (*run_fn)(void *), void *run_arg);
 /**
- * Ìí¼ÓÒ»¸öĞÂÈÎÎñ, Ç°ÌáÊÇÒÑ¾­³É¹¦¼ÓËø, ¼´µ÷ÓÃ acl_pthread_pool_bat_add_begin ³É¹¦
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param job {acl_pthread_job_t*} ÓÉ acl_pthread_pool_alloc_job ´´½¨µÄÏß³ÌÈÎÎñ
+ * æ·»åŠ ä¸€ä¸ªæ–°ä»»åŠ¡, å‰ææ˜¯å·²ç»æˆåŠŸåŠ é”, å³è°ƒç”¨ acl_pthread_pool_bat_add_begin æˆåŠŸ
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param job {acl_pthread_job_t*} ç”± acl_pthread_pool_alloc_job åˆ›å»ºçš„çº¿ç¨‹ä»»åŠ¡
  */
 ACL_API void acl_pthread_pool_bat_add_job(acl_pthread_pool_t *thr_pool,
 		acl_pthread_job_t *job);
 
 /**
- * Åú´¦ÀíÌí¼Ó½áÊø, Êµ¼ÊÊÇ½âËø
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
+ * æ‰¹å¤„ç†æ·»åŠ ç»“æŸ, å®é™…æ˜¯è§£é”
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
  */
 ACL_API void acl_pthread_pool_bat_add_end(acl_pthread_pool_t *thr_pool);
 
 /**
- * ÉèÖÃÏß³Ì³Ø POLLER µ÷¶Èº¯Êı£¬ÈôÒªÊ¹ÓÃ´Ë¹¦ÄÜ£¬ĞèÒªÔÚÓÃº¯Êı
- * acl_pthread_pool_create ºóÍ¨¹ı´Ëº¯ÊıÉèÖÃµ÷¶Èº¯Êı£¬È»ºóÔÙ
- * µ÷ÓÃ acl_pthread_pool_start_poller Æô¶¯ºóÌ¨µ÷¶Èº¯Êı£¬¸ÃºóÌ¨
- * µ÷¶Èº¯Êı»á²»¶ÏµØµ÷ÓÃ poller_fn (¼´ÓÃ»§µÄ»Øµ÷º¯Êı)£¬ÓÃ»§¿ÉÒÔ
- * ÔÚ»Øµ÷º¯ÊıÀïµ÷ÓÃ acl_pthread_pool_add ½«ĞÂÈÎÎñÌí¼Ó½øÏß³Ì³ØÖĞ
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param poller_fn {int (*)(void*)} Ñ­»·¼ì²âÈÎÎñ¶ÓÁĞµÄ»Øµ÷º¯Êı
- * @param poller_arg {void*} poller_fn ËùĞèÒªµÄ²ÎÊı
+ * è®¾ç½®çº¿ç¨‹æ±  POLLER è°ƒåº¦å‡½æ•°ï¼Œè‹¥è¦ä½¿ç”¨æ­¤åŠŸèƒ½ï¼Œéœ€è¦åœ¨ç”¨å‡½æ•°
+ * acl_pthread_pool_create åé€šè¿‡æ­¤å‡½æ•°è®¾ç½®è°ƒåº¦å‡½æ•°ï¼Œç„¶åå†
+ * è°ƒç”¨ acl_pthread_pool_start_poller å¯åŠ¨åå°è°ƒåº¦å‡½æ•°ï¼Œè¯¥åå°
+ * è°ƒåº¦å‡½æ•°ä¼šä¸æ–­åœ°è°ƒç”¨ poller_fn (å³ç”¨æˆ·çš„å›è°ƒå‡½æ•°)ï¼Œç”¨æˆ·å¯ä»¥
+ * åœ¨å›è°ƒå‡½æ•°é‡Œè°ƒç”¨ acl_pthread_pool_add å°†æ–°ä»»åŠ¡æ·»åŠ è¿›çº¿ç¨‹æ± ä¸­
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param poller_fn {int (*)(void*)} å¾ªç¯æ£€æµ‹ä»»åŠ¡é˜Ÿåˆ—çš„å›è°ƒå‡½æ•°
+ * @param poller_arg {void*} poller_fn æ‰€éœ€è¦çš„å‚æ•°
  */
 ACL_API void acl_pthread_pool_set_poller(acl_pthread_pool_t *thr_pool,
 		int (*poller_fn)(void *), void *poller_arg);
 /**
- * Æô¶¯Ò»¸öÏß³Ì³Ø POLLER µ÷¶ÈÏß³Ì
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return 0 ³É¹¦; != 0 Ê§°Ü, ¿ÉÒÔ¶Ô·µ»ØÖµµ÷ÓÃ strerror(ret) È¡µÃ´íÎóÔ­ÒòÃèÊö
+ * å¯åŠ¨ä¸€ä¸ªçº¿ç¨‹æ±  POLLER è°ƒåº¦çº¿ç¨‹
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return 0 æˆåŠŸ; != 0 å¤±è´¥, å¯ä»¥å¯¹è¿”å›å€¼è°ƒç”¨ strerror(ret) å–å¾—é”™è¯¯åŸå› æè¿°
  */
 ACL_API int acl_pthread_pool_start_poller(acl_pthread_pool_t *thr_pool);
 
 /**
- * ÒÔÅú´¦Àí·½Ê½½øĞĞÈÎÎñµÄ·Ö·¢, ÆäÄÚ²¿ÆäÊµÊÇµ÷ÓÃÁË acl_pthread_pool_add_one()
+ * ä»¥æ‰¹å¤„ç†æ–¹å¼è¿›è¡Œä»»åŠ¡çš„åˆ†å‘, å…¶å†…éƒ¨å…¶å®æ˜¯è°ƒç”¨äº† acl_pthread_pool_add_one()
  * @return 0: OK; -1: err
  */
 ACL_API int acl_pthread_pool_add_dispatch(void *dispatch_arg,
 		void (*run_fn)(void *), void *run_arg);
 
 /**
- * ÒÔµ¥¸öÌí¼ÓµÄ·½Ê½½øĞĞÈÎÎñµÄ·Ö·¢
+ * ä»¥å•ä¸ªæ·»åŠ çš„æ–¹å¼è¿›è¡Œä»»åŠ¡çš„åˆ†å‘
  * @return 0: OK; -1: err
- * ×¢£ºworker_fn ÖĞµÄµÚ¶ş¸ö²ÎÊıÎªACL_WORKER_ATTR½á¹¹Ö¸Õë£¬ÓÉÏß³Ì³ØµÄÄ³¸ö
- *     ¹¤×÷Ïß³ÌÎ¬»¤£¬¸Ã½á¹¹Ö¸ÕëÖĞµÄ³ÉÔ±±äÁ¿ init_data ÎªÓÃ»§µÄ¸³Öµ´«ËÍ±äÁ¿£¬
- *     Èç£ºÊı¾İ¿âÁ¬½Ó¶ÔÏóµÈ¡£
+ * æ³¨ï¼šworker_fn ä¸­çš„ç¬¬äºŒä¸ªå‚æ•°ä¸ºACL_WORKER_ATTRç»“æ„æŒ‡é’ˆï¼Œç”±çº¿ç¨‹æ± çš„æŸä¸ª
+ *     å·¥ä½œçº¿ç¨‹ç»´æŠ¤ï¼Œè¯¥ç»“æ„æŒ‡é’ˆä¸­çš„æˆå‘˜å˜é‡ init_data ä¸ºç”¨æˆ·çš„èµ‹å€¼ä¼ é€å˜é‡ï¼Œ
+ *     å¦‚ï¼šæ•°æ®åº“è¿æ¥å¯¹è±¡ç­‰ã€‚
  */
 ACL_API int acl_pthread_pool_dispatch(void *dispatch_arg,
 		void (*run_fn)(void *), void *run_arg);
 
 /**
- * »ñµÃµ±Ç°Ïß³Ì³ØµÄ×î´óÏß³ÌÊıÏŞÖÆ
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} ×î´óÏß³ÌÊıÏŞÖÆÖµ
+ * è·å¾—å½“å‰çº¿ç¨‹æ± çš„æœ€å¤§çº¿ç¨‹æ•°é™åˆ¶
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} æœ€å¤§çº¿ç¨‹æ•°é™åˆ¶å€¼
  */
 ACL_API int acl_pthread_pool_limit(acl_pthread_pool_t *thr_pool);
 
 /**
- * »ñµÃµ±Ç°Ïß³Ì³ØÖĞµÄÏß³ÌÊı
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} ·µ»ØÏß³Ì³ØÖĞµÄ×ÜÏß³ÌÊı£¬·µ»ØÖµ < 0 ±íÊ¾³ö´í
+ * è·å¾—å½“å‰çº¿ç¨‹æ± ä¸­çš„çº¿ç¨‹æ•°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} è¿”å›çº¿ç¨‹æ± ä¸­çš„æ€»çº¿ç¨‹æ•°ï¼Œè¿”å›å€¼ < 0 è¡¨ç¤ºå‡ºé”™
  */
 ACL_API int acl_pthread_pool_size(acl_pthread_pool_t *thr_pool);
 
 /**
- * »ñµÃµ±Ç°Ïß³Ì³ØÖĞµÄ¿ÕÏĞÏß³ÌÊı
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} ·µ»ØÏß³Ì³ØÖĞµÄ¿ÕÏĞÏß³ÌÊı£¬·µ»ØÖµ < 0 ±íÊ¾³ö´í
+ * è·å¾—å½“å‰çº¿ç¨‹æ± ä¸­çš„ç©ºé—²çº¿ç¨‹æ•°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} è¿”å›çº¿ç¨‹æ± ä¸­çš„ç©ºé—²çº¿ç¨‹æ•°ï¼Œè¿”å›å€¼ < 0 è¡¨ç¤ºå‡ºé”™
  */
 ACL_API int acl_pthread_pool_idle(acl_pthread_pool_t *thr_pool);
 
 /**
- * »ñµÃµ±Ç°Ïß³Ì³ØÖĞµÄ·±Ã¦Ïß³ÌÊı
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} ·µ»ØÏß³Ì³ØÖĞµÄ·±Ã¦Ïß³ÌÊı£¬·µ»ØÖµ < 0 ±íÊ¾³ö´í
+ * è·å¾—å½“å‰çº¿ç¨‹æ± ä¸­çš„ç¹å¿™çº¿ç¨‹æ•°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} è¿”å›çº¿ç¨‹æ± ä¸­çš„ç¹å¿™çº¿ç¨‹æ•°ï¼Œè¿”å›å€¼ < 0 è¡¨ç¤ºå‡ºé”™
  */
 ACL_API int acl_pthread_pool_busy(acl_pthread_pool_t *thr_pool);
 
 /**
- * ÉèÖÃÏß³ÌÈÎÎñµ÷¶È³¬Ê±¾¯¸æµÄÊ±¼ä(ºÁÃë)
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param n {acl_int64} µ±¸ÃÖµ > 0 Ê±£¬Èç¹ûÏß³ÌÈÎÎñµÄµ÷¶ÈÊ±¼ä³¬¹ı´ËÖµÔò»á¼ÇÂ¼¾¯¸æÈÕÖ¾(ºÁÃë)
+ * è®¾ç½®çº¿ç¨‹ä»»åŠ¡è°ƒåº¦è¶…æ—¶è­¦å‘Šçš„æ—¶é—´(æ¯«ç§’)
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param n {acl_int64} å½“è¯¥å€¼ > 0 æ—¶ï¼Œå¦‚æœçº¿ç¨‹ä»»åŠ¡çš„è°ƒåº¦æ—¶é—´è¶…è¿‡æ­¤å€¼åˆ™ä¼šè®°å½•è­¦å‘Šæ—¥å¿—(æ¯«ç§’)
  */
 ACL_API void acl_pthread_pool_set_schedule_warn(
 		acl_pthread_pool_t *thr_pool, acl_int64 n);
 
 /**
- * ÉèÖÃÏß³Ì³ØÖĞ×ÓÏß³ÌµÈ´ıÈÎÎñµÄ³¬Ê±»ù×¼Ê±¼ä(ºÁÃë)
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param n {acl_int64} µ±¸ÃÖµ > 0 Ê±£¬×ÓÏß³ÌµÈ´ıÈÎÎñµÄ³¬Ê±µÈ´ı»ù×¼Ê±¼ä(ºÁÃë)
+ * è®¾ç½®çº¿ç¨‹æ± ä¸­å­çº¿ç¨‹ç­‰å¾…ä»»åŠ¡çš„è¶…æ—¶åŸºå‡†æ—¶é—´(æ¯«ç§’)
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param n {acl_int64} å½“è¯¥å€¼ > 0 æ—¶ï¼Œå­çº¿ç¨‹ç­‰å¾…ä»»åŠ¡çš„è¶…æ—¶ç­‰å¾…åŸºå‡†æ—¶é—´(æ¯«ç§’)
  */
 ACL_API void acl_pthread_pool_set_schedule_wait(
 		acl_pthread_pool_t *thr_pool, acl_int64 n);
 
 /**
- * µ±Ïß³Ì³ØÖĞµÄÈÎÎñ·¢Éú¶Ñ»ıÊ±£¬Í¨¹ı¸Ãº¯ÊıÉèÖÃÈÎÎñ¶ÓÁĞ¶Ñ»ı±¨¾¯Öµ
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param max {int} ÈÎÎñ¶ÓÁĞ¶Ñ»ı±¨¾¯Öµ
+ * å½“çº¿ç¨‹æ± ä¸­çš„ä»»åŠ¡å‘ç”Ÿå †ç§¯æ—¶ï¼Œé€šè¿‡è¯¥å‡½æ•°è®¾ç½®ä»»åŠ¡é˜Ÿåˆ—å †ç§¯æŠ¥è­¦å€¼
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param max {int} ä»»åŠ¡é˜Ÿåˆ—å †ç§¯æŠ¥è­¦å€¼
  */
 ACL_API void acl_pthread_pool_set_qlen_warn(
 		acl_pthread_pool_t *thr_pool, int max);
 /**
- * È¡µÃµ±Ç°Ïß³Ì³ØÈ«¾Ö¶ÓÁĞÖĞÎ´´¦ÀíµÄÈÎÎñ¸öÊı
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @return {int} µ±Ç°Î´´¦ÀíµÄÈÎÎñÊı£¬·µ»ØÖµ < 0 ±íÊ¾³ö´í
+ * å–å¾—å½“å‰çº¿ç¨‹æ± å…¨å±€é˜Ÿåˆ—ä¸­æœªå¤„ç†çš„ä»»åŠ¡ä¸ªæ•°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @return {int} å½“å‰æœªå¤„ç†çš„ä»»åŠ¡æ•°ï¼Œè¿”å›å€¼ < 0 è¡¨ç¤ºå‡ºé”™
  */
 ACL_API int acl_pthread_pool_qlen(acl_pthread_pool_t *thr_pool);
 
 /**
- * ÉèÖÃÏß³Ì³ØÖĞÏß³ÌµÄ¶ÑÕ»´óĞ¡
- * @param thr_pool {acl_pthread_pool_t*} Ïß³Ì³Ø¶ÔÏó£¬²»ÄÜÎª¿Õ
- * @param size {size_t} Ïß³Ì´´½¨Ê±µÄ¶ÑÕ»´óĞ¡£¬µ¥Î»Îª×Ö½Ú
+ * è®¾ç½®çº¿ç¨‹æ± ä¸­çº¿ç¨‹çš„å †æ ˆå¤§å°
+ * @param thr_pool {acl_pthread_pool_t*} çº¿ç¨‹æ± å¯¹è±¡ï¼Œä¸èƒ½ä¸ºç©º
+ * @param size {size_t} çº¿ç¨‹åˆ›å»ºæ—¶çš„å †æ ˆå¤§å°ï¼Œå•ä½ä¸ºå­—èŠ‚
  */
 ACL_API void acl_pthread_pool_set_stacksize(
 		acl_pthread_pool_t *thr_pool, size_t size);
 
 /**
- * ³õÊ¼»¯Ïß³Ì³ØÊôĞÔÖµ
+ * åˆå§‹åŒ–çº¿ç¨‹æ± å±æ€§å€¼
  * @param attr {acl_pthread_pool_attr_t*}
  */
 ACL_API void acl_pthread_pool_attr_init(acl_pthread_pool_attr_t *attr);
 
 /**
- * ÉèÖÃÏß³Ì³ØÊôĞÔÖĞµÄ×î´ó¶ÑÕ»´óĞ¡(×Ö½Ú)
+ * è®¾ç½®çº¿ç¨‹æ± å±æ€§ä¸­çš„æœ€å¤§å †æ ˆå¤§å°(å­—èŠ‚)
  * @param attr {acl_pthread_pool_attr_t*}
  * @param size {size_t}
  */
@@ -272,17 +272,17 @@ ACL_API void acl_pthread_pool_attr_set_stacksize(
 		acl_pthread_pool_attr_t *attr, size_t size);
 
 /**
- * ÉèÖÃÏß³Ì³ØÊôĞÔÖĞµÄ×î´óÏß³ÌÊıÏŞÖÆÖµ
+ * è®¾ç½®çº¿ç¨‹æ± å±æ€§ä¸­çš„æœ€å¤§çº¿ç¨‹æ•°é™åˆ¶å€¼
  * @param attr {acl_pthread_pool_attr_t*}
- * @param threads_limit {int} Ïß³Ì³ØÖĞµÄ×î´óÏß³ÌÊı
+ * @param threads_limit {int} çº¿ç¨‹æ± ä¸­çš„æœ€å¤§çº¿ç¨‹æ•°
  */
 ACL_API void acl_pthread_pool_attr_set_threads_limit(
 		acl_pthread_pool_attr_t *attr, int threads_limit);
 
 /**
- * ÉèÖÃÏß³Ì³ØÊôĞÔÖĞÏß³Ì¿ÕÏĞ³¬Ê±Öµ
+ * è®¾ç½®çº¿ç¨‹æ± å±æ€§ä¸­çº¿ç¨‹ç©ºé—²è¶…æ—¶å€¼
  * @param attr {acl_pthread_pool_attr_t*}
- * @param idle_timeout {int} Ïß³Ì¿ÕÏĞ³¬Ê±Ê±¼ä(Ãë)
+ * @param idle_timeout {int} çº¿ç¨‹ç©ºé—²è¶…æ—¶æ—¶é—´(ç§’)
  */
 ACL_API void acl_pthread_pool_attr_set_idle_timeout(
 		acl_pthread_pool_attr_t *attr, int idle_timeout);

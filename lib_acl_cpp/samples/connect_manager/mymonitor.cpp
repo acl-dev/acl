@@ -14,12 +14,12 @@ mymonitor::~mymonitor(void)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-// ×èÈû¼ì²â¹ı³Ì£¬ÔËĞĞÔÚÄ³Ò»¸ö×ÓÏß³Ì¿Õ¼äÖĞ
+// é˜»å¡æ£€æµ‹è¿‡ç¨‹ï¼Œè¿è¡Œåœ¨æŸä¸€ä¸ªå­çº¿ç¨‹ç©ºé—´ä¸­
 
 void mymonitor::sio_check(acl::check_client& checker,
 	acl::socket_stream& conn)
 {
-	// Í¬²½¼ì²â¹ı³Ì
+	// åŒæ­¥æ£€æµ‹è¿‡ç¨‹
 	check_sync check;
 	if (proto_ == "http")
 		check.sio_check_http(checker, conn);
@@ -33,22 +33,22 @@ void mymonitor::sio_check(acl::check_client& checker,
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// ·Ç×èÈû¼ì²â¹ı³Ì£¬ÔËĞĞÔÚ¼ì²âÆ÷Ïß³ÌµÄ¿Õ¼äÖĞ
+// éé˜»å¡æ£€æµ‹è¿‡ç¨‹ï¼Œè¿è¡Œåœ¨æ£€æµ‹å™¨çº¿ç¨‹çš„ç©ºé—´ä¸­
 
 void mymonitor::nio_check(acl::check_client& checker,
 	acl::aio_socket_stream& conn)
 {
-	// ´´½¨Òì²½¼ì²â¶ÔÏó
+	// åˆ›å»ºå¼‚æ­¥æ£€æµ‹å¯¹è±¡
 	check_async* callback = new check_async(checker);
 
-	// ×¢²á·Ç×èÈû IO ´¦Àí¹ı³ÌµÄ»Øµ÷¹ı³Ì
+	// æ³¨å†Œéé˜»å¡ IO å¤„ç†è¿‡ç¨‹çš„å›è°ƒè¿‡ç¨‹
 	conn.add_close_callback(callback);
 	conn.add_read_callback(callback);
 	conn.add_timeout_callback(callback);
 
 	int timeout = 10;
 
-	// Òì²½¶ÁÈ¡Ò»ĞĞÊı¾İ£¬Í¬Ê±ÒªÇó²»±£Áô \r\n
+	// å¼‚æ­¥è¯»å–ä¸€è¡Œæ•°æ®ï¼ŒåŒæ—¶è¦æ±‚ä¸ä¿ç•™ \r\n
 
 	conn.gets(timeout);
 }

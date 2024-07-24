@@ -1,4 +1,4 @@
-// beanstalk.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+// beanstalk.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -8,15 +8,15 @@ static char  __addr[64];
 static const char* __tube = "zsxxsz";
 static int __max = 100;
 
-// ÏûÏ¢Éú²úÕßÏß³Ì
+// æ¶ˆæ¯ç”Ÿäº§è€…çº¿ç¨‹
 static void* producer(void* ctx)
 {
 	(void) ctx;
 
-	// beanstalk ¿Í»§¶ËÁ¬½Ó¶ÔÏó
+	// beanstalk å®¢æˆ·ç«¯è¿æ¥å¯¹è±¡
 	acl::beanstalk conn(__addr, 10);
 
-	// Ö¸¶¨ÏûÏ¢Ä¿±ê¶ÓÁĞ
+	// æŒ‡å®šæ¶ˆæ¯ç›®æ ‡é˜Ÿåˆ—
 	if (conn.use(__tube) == false)
 	{
 		printf("use %s error\r\n", __tube);
@@ -30,7 +30,7 @@ static void* producer(void* ctx)
 	for (int i = 0; i < __max; i++)
 	{
 		data.format("hello-%d", i);
-		// Ïò beanstalkd ÏûÏ¢·şÎñÆ÷·¢ËÍÏûÏ¢
+		// å‘ beanstalkd æ¶ˆæ¯æœåŠ¡å™¨å‘é€æ¶ˆæ¯
 		if ((id = conn.put(data.c_str(), data.length())) == 0)
 		{
 			printf("put %s failed\r\n", data.c_str());
@@ -44,13 +44,13 @@ static void* producer(void* ctx)
 	return NULL;
 }
 
-// ½ÓÊÕ¶ÓÁĞÏûÏ¢µÄÏû·ÑÕßÏß³Ì
+// æ¥æ”¶é˜Ÿåˆ—æ¶ˆæ¯çš„æ¶ˆè´¹è€…çº¿ç¨‹
 static void* consumer(void* ctx)
 {
 	(void) ctx;
 
 	acl::beanstalk conn(__addr, 10);
-	// ´ÓÖ¸¶¨ÏûÏ¢¶ÓÁĞÖĞ½ÓÊÕÏûÏ¢
+	// ä»æŒ‡å®šæ¶ˆæ¯é˜Ÿåˆ—ä¸­æ¥æ”¶æ¶ˆæ¯
 	if (conn.watch(__tube) == false)
 	{
 		printf("%s: watch %s faile\r\n", __FUNCTION__, __tube);
@@ -64,7 +64,7 @@ static void* consumer(void* ctx)
 	ACL_METER_TIME("begin");
 	for (int i = 0; i < __max; i++)
 	{
-		// ½ÓÊÕÒ»ÌõÏûÏ¢
+		// æ¥æ”¶ä¸€æ¡æ¶ˆæ¯
 		if ((id = conn.reserve(buf)) == 0)
 		{
 			printf("reserve failed\r\n");
@@ -73,7 +73,7 @@ static void* consumer(void* ctx)
 		else if (i < 10)
 			printf("reserved: %s\r\n", buf.c_str());
 
-		// É¾³ı½ÓÊÕµ½µÄÏûÏ¢
+		// åˆ é™¤æ¥æ”¶åˆ°çš„æ¶ˆæ¯
 		if (conn.delete_id(id) == false)
 		{
 			printf("delete id %llu failed\r\n", id);

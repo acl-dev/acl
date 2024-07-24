@@ -1,59 +1,59 @@
 #include "lib_acl.h"
 #include "conn_cache.h"
 
-/* ¶ÔÓ¦Ä³¸ö IP:PORT ¼üÖµµÄÁ¬½Ó³Ø½á¹¹ÀàĞÍ¶¨Òå */
+/* å¯¹åº”æŸä¸ª IP:PORT é”®å€¼çš„è¿æ¥æ± ç»“æ„ç±»å‹å®šä¹‰ */
 
 typedef struct CONN_POOL {
-	CONN_CACHE *conn_cache;	/* Ëù´ÓÊôµÄÄ³¸öÁ¬½Ó³Ø»º´æ¶ÔÏó */
-	ACL_AIO *aio;		/* ¸ÃÁ¬½Ó³ØËù´ÓÊôµÄÒì²½IO¶ÔÏó */
-	ACL_FIFO conns;		/* ¸ÃÁ¬½Ó³ØÖĞµÄÁ¬½Ó¶ÔÏó(CONN)¶ÓÁĞ */
-	char key[256];		/* ¸ÃÁ¬½Ó³Ø¶ÔÏóËù¶ÔÓ¦µÄ´æ´¢ÓÚÁ¬½Ó³Ø»º´æÖĞµÄ´æ´¢¼ü */
+	CONN_CACHE *conn_cache;	/* æ‰€ä»å±çš„æŸä¸ªè¿æ¥æ± ç¼“å­˜å¯¹è±¡ */
+	ACL_AIO *aio;		/* è¯¥è¿æ¥æ± æ‰€ä»å±çš„å¼‚æ­¥IOå¯¹è±¡ */
+	ACL_FIFO conns;		/* è¯¥è¿æ¥æ± ä¸­çš„è¿æ¥å¯¹è±¡(CONN)é˜Ÿåˆ— */
+	char key[256];		/* è¯¥è¿æ¥æ± å¯¹è±¡æ‰€å¯¹åº”çš„å­˜å‚¨äºè¿æ¥æ± ç¼“å­˜ä¸­çš„å­˜å‚¨é”® */
 } CONN_POOL;
 
-/* Á¬½Ó³ØÖĞµÄÄ³¸öÁ¬½Ó¶ÔÏóÀàĞÍ¶¨Òå */
+/* è¿æ¥æ± ä¸­çš„æŸä¸ªè¿æ¥å¯¹è±¡ç±»å‹å®šä¹‰ */
 
 struct CONN {
-	CONN_POOL *conn_pool;	/* Ëù´ÓÊôµÄµÄÁ¬½Ó³Ø¶ÔÏó */
-	ACL_ASTREAM *stream;	/* ¸ÃÁ¬½ÓµÄÒì²½Á÷¶ÔÏó */
-	void (*free_fn)(ACL_ASTREAM *stream, void*); /* ÊÍ·Å¸ÃÁ¬½ÓÊ±µÄ»Øµ÷º¯Êı */
-	void *ctx;		/* free_fn ¶Ô²ÎÊıÖ®Ò» */
-	ACL_FIFO_INFO *info;	/* ¸ÃÁ¬½Ó¶ÔÏó´æ´¢ÓÚÁ¬½Ó³Ø(conn_pool)µÄ¶ÓÁĞÖĞµÄ¶ÔÏóÖ¸Õë */
+	CONN_POOL *conn_pool;	/* æ‰€ä»å±çš„çš„è¿æ¥æ± å¯¹è±¡ */
+	ACL_ASTREAM *stream;	/* è¯¥è¿æ¥çš„å¼‚æ­¥æµå¯¹è±¡ */
+	void (*free_fn)(ACL_ASTREAM *stream, void*); /* é‡Šæ”¾è¯¥è¿æ¥æ—¶çš„å›è°ƒå‡½æ•° */
+	void *ctx;		/* free_fn å¯¹å‚æ•°ä¹‹ä¸€ */
+	ACL_FIFO_INFO *info;	/* è¯¥è¿æ¥å¯¹è±¡å­˜å‚¨äºè¿æ¥æ± (conn_pool)çš„é˜Ÿåˆ—ä¸­çš„å¯¹è±¡æŒ‡é’ˆ */
 };
 
-/* ½öÊÍ·ÅÁ¬½Ó¶ÔÏóËùÕ¼ÓÃµÄÄÚ´æ£¬µ«²¢²»¹Ø±ÕÁ¬½ÓÁ÷ */
+/* ä»…é‡Šæ”¾è¿æ¥å¯¹è±¡æ‰€å ç”¨çš„å†…å­˜ï¼Œä½†å¹¶ä¸å…³é—­è¿æ¥æµ */
 
 static void conn_free(CONN *conn)
 {
 	CONN_POOL *conns = conn->conn_pool;
 
-	/* ÏÈ´ÓÁ¬½Ó³Ø¶ÓÁĞÖĞÉ¾³ı */
+	/* å…ˆä»è¿æ¥æ± é˜Ÿåˆ—ä¸­åˆ é™¤ */
 	if (conn->info)
 		acl_fifo_delete_info(&conns->conns, conn->info);
-	/* µ÷ÓÃÓÃ»§×Ô¶¨Òå»Øµ÷º¯Êı */
+	/* è°ƒç”¨ç”¨æˆ·è‡ªå®šä¹‰å›è°ƒå‡½æ•° */
 	if (conn->free_fn)
 		conn->free_fn(conn->stream, conn->ctx);
-	/* ÊÍ·ÅÄÚ´æ¿Õ¼ä */
+	/* é‡Šæ”¾å†…å­˜ç©ºé—´ */
 	acl_myfree(conn);
 }
 
-/* ÊÍ·ÅÁ¬½Ó¶ÔÏó²¢¹Ø±ÕÁ¬½ÓÁ÷ */
+/* é‡Šæ”¾è¿æ¥å¯¹è±¡å¹¶å…³é—­è¿æ¥æµ */
 
 static void conn_close(CONN *conn)
 {
-	/* ±ØĞëÊ×ÏÈ½ûÖ¹Òì²½Á÷µÄ¶Á¼àÌı */
+	/* å¿…é¡»é¦–å…ˆç¦æ­¢å¼‚æ­¥æµçš„è¯»ç›‘å¬ */
 	acl_aio_disable_read(conn->stream);
 
-	/* Òì²½¹Ø±Õ¸ÃÁ¬½Ó, È»ºóÓÉÒì²½¿ò¼Ü×Ô¶¯´¥·¢ read_close_callback */
+	/* å¼‚æ­¥å…³é—­è¯¥è¿æ¥, ç„¶åç”±å¼‚æ­¥æ¡†æ¶è‡ªåŠ¨è§¦å‘ read_close_callback */
 	acl_aio_iocp_close(conn->stream);
 }
 
-/* µ±Á¬½Ó³Ø¶ÔÏó±»ÊÍ·ÅÊ±µ÷ÓÃ´Ë»Øµ÷º¯Êı */
+/* å½“è¿æ¥æ± å¯¹è±¡è¢«é‡Šæ”¾æ—¶è°ƒç”¨æ­¤å›è°ƒå‡½æ•° */
 
 static void conn_pool_free(CONN_POOL *conns)
 {
 	CONN *conn;
 
-	/* ĞèÒª°ÑÁ¬½Ó³ØÖĞµÄËùÓĞÁ¬½Ó¶¼ÊÍ·Å */
+	/* éœ€è¦æŠŠè¿æ¥æ± ä¸­çš„æ‰€æœ‰è¿æ¥éƒ½é‡Šæ”¾ */
 
 	while ((conn = acl_fifo_pop(&conns->conns)) != NULL) {
 		if (conn->stream) {
@@ -67,7 +67,7 @@ static void conn_pool_free(CONN_POOL *conns)
 	acl_myfree(conns);
 }
 
-/* ÊÍ·ÅÁ¬½Ó³Ø¶¨Ê±Æ÷»Øµ÷º¯Êı */
+/* é‡Šæ”¾è¿æ¥æ± å®šæ—¶å™¨å›è°ƒå‡½æ•° */
 
 static void conn_pool_free_timer(int event_type acl_unused, void *context)
 {
@@ -76,8 +76,8 @@ static void conn_pool_free_timer(int event_type acl_unused, void *context)
 	conn_pool_free(conns);
 }
 
-/* ÉèÖÃÊÍ·ÅÁ¬½Ó³ØµÄ¶¨Ê±Æ÷, Ö®ËùÒÔ²ÉÓÃ¶¨Ê±Æ÷À´ÊÍ·ÅÁ¬½Ó³Ø¶ÔÏóÊÇÎªÁË
- * Ê¹ÊÍ·Å¹ı³Ì²»ÔÚÊÂÎñµÄµİ¹é´¦Àí¹ı³ÌÖĞ±»ÌáÇ°ÊÍ·Å
+/* è®¾ç½®é‡Šæ”¾è¿æ¥æ± çš„å®šæ—¶å™¨, ä¹‹æ‰€ä»¥é‡‡ç”¨å®šæ—¶å™¨æ¥é‡Šæ”¾è¿æ¥æ± å¯¹è±¡æ˜¯ä¸ºäº†
+ * ä½¿é‡Šæ”¾è¿‡ç¨‹ä¸åœ¨äº‹åŠ¡çš„é€’å½’å¤„ç†è¿‡ç¨‹ä¸­è¢«æå‰é‡Šæ”¾
  */
 
 static void set_conn_pool_free_timer(CONN_POOL *conns)
@@ -99,7 +99,7 @@ static void conn_pool_stat_timer(int event_type acl_unused, void *context)
 
 static void set_conn_pool_stat_timer(CONN_CACHE *cache)
 {
-	/* ÉèÖÃ¶¨Ê±Æ÷ */
+	/* è®¾ç½®å®šæ—¶å™¨ */
 	acl_aio_request_timer(cache->aio, conn_pool_stat_timer, cache, 2, 1);
 }
 
@@ -113,12 +113,12 @@ CONN_CACHE *conn_cache_create(ACL_AIO *aio, int conn_limit)
 	cache->cache = acl_htable_create(1024, 0);
 	acl_msg_info("%s(%d): ok, conn_limit: %d", myname, __LINE__, conn_limit);
 
-	/* ÉèÖÃÁ¬½Ó³Ø»º´æ×´Ì¬ĞÅÏ¢µÄ¶¨Ê±Æ÷ */
+	/* è®¾ç½®è¿æ¥æ± ç¼“å­˜çŠ¶æ€ä¿¡æ¯çš„å®šæ—¶å™¨ */
 	set_conn_pool_stat_timer(cache);
 	return (cache);
 }
 
-/* Á÷¿É¶ÁÊ±µÄ»Øµ÷º¯Êı */
+/* æµå¯è¯»æ—¶çš„å›è°ƒå‡½æ•° */
 
 static int read_callback(ACL_ASTREAM *stream acl_unused, void *ctx acl_unused,
 	char *data acl_unused, int dlen acl_unused)
@@ -128,27 +128,27 @@ static int read_callback(ACL_ASTREAM *stream acl_unused, void *ctx acl_unused,
 	acl_msg_info("%s(%d), %s: can read connection from server, dlen(%d), data(%s)",
 		__FILE__, __LINE__, myname, dlen, data);
 
-	/* ÒòÎª¸ÃÁ¬½ÓÎª¿ÕÏĞÁ¬½Ó£¬²»Ó¦ÓĞÊı¾İ¿É¶Á£¬Èç¹ûÓĞÊı¾İ¿É¶Á£¬ÔòÒòÎª
-	 * ÎŞ·¨ÖªµÀÈçºÎ´¦ÀíÕâĞ©Êı¾İ¶øĞèÒª¹Ø±Õ¸ÃÁ¬½Ó
+	/* å› ä¸ºè¯¥è¿æ¥ä¸ºç©ºé—²è¿æ¥ï¼Œä¸åº”æœ‰æ•°æ®å¯è¯»ï¼Œå¦‚æœæœ‰æ•°æ®å¯è¯»ï¼Œåˆ™å› ä¸º
+	 * æ— æ³•çŸ¥é“å¦‚ä½•å¤„ç†è¿™äº›æ•°æ®è€Œéœ€è¦å…³é—­è¯¥è¿æ¥
 	 */
 
-	/* ·µ»Ø -1 ´Ó¶ø´¥·¢¹Ø±Õ»Øµ÷º¯Êı */
+	/* è¿”å› -1 ä»è€Œè§¦å‘å…³é—­å›è°ƒå‡½æ•° */
 	return (-1);
 }
 
-/* Á÷¹Ø±ÕÊ±µÄ»Øµ÷º¯Êı */
+/* æµå…³é—­æ—¶çš„å›è°ƒå‡½æ•° */
 
 static int read_close_callback(ACL_ASTREAM *stream acl_unused, void *ctx)
 {
 	CONN *conn = (CONN*) ctx;
 	CONN_POOL *conns = conn->conn_pool;
 
-	/* ÊÍ·Å¸ÃÁ¬½Ó¶ÔÏóµÄÄÚ´æ¿Õ¼ä£¬µ«²¢²»¹Ø±Õ¸ÃÁ¬½Ó£¬
-	 * ¹Ø±Õ¹ı³ÌÓÉÒì²½¿ò¼Ü×Ô¶¯¹Ø±Õ
+	/* é‡Šæ”¾è¯¥è¿æ¥å¯¹è±¡çš„å†…å­˜ç©ºé—´ï¼Œä½†å¹¶ä¸å…³é—­è¯¥è¿æ¥ï¼Œ
+	 * å…³é—­è¿‡ç¨‹ç”±å¼‚æ­¥æ¡†æ¶è‡ªåŠ¨å…³é—­
 	 */
 	conn_free(conn);
 
-	/* Èç¹ûÁ¬½Ó³ØÎª¿ÕÔòÊÍ·Å¸ÃÁ¬½Ó³Ø */
+	/* å¦‚æœè¿æ¥æ± ä¸ºç©ºåˆ™é‡Šæ”¾è¯¥è¿æ¥æ±  */
 	if (acl_fifo_size(&conns->conns) == 0) {
 		acl_htable_delete(conns->conn_cache->cache, conns->key, NULL);
 		set_conn_pool_free_timer(conns);
@@ -156,15 +156,15 @@ static int read_close_callback(ACL_ASTREAM *stream acl_unused, void *ctx)
 
 	conns->conn_cache->nclose++;
 
-	/* ´¥·¢ acl_aio_iocp_close ¹ı³Ì */
+	/* è§¦å‘ acl_aio_iocp_close è¿‡ç¨‹ */
 	return (-1);
 }
 
-/* Á÷¶Á³¬Ê±Ê±µÄ»Øµ÷º¯Êı */
+/* æµè¯»è¶…æ—¶æ—¶çš„å›è°ƒå‡½æ•° */
 
 static int read_timeout_callback(ACL_ASTREAM *stream acl_unused, void *ctx acl_unused)
 {
-	/* ·µ»Ø -1 ´Ó¶ø´¥·¢¹Ø±Õ»Øµ÷º¯Êı */
+	/* è¿”å› -1 ä»è€Œè§¦å‘å…³é—­å›è°ƒå‡½æ•° */
 	return (-1);
 }
 	
@@ -179,7 +179,7 @@ void conn_cache_push_stream(CONN_CACHE *cache, ACL_ASTREAM *stream,
 	acl_aio_clean_hooks(stream);
 #endif
 
-	/* ²é¿´¸ÃKEYµÄÁ¬½Ó³Ø¾ä±úÊÇ·ñ´æÔÚ£¬Èç¹û´æÔÚÔò¸´ÓÃ£¬·ñÔò´´½¨ĞÂµÄ */
+	/* æŸ¥çœ‹è¯¥KEYçš„è¿æ¥æ± å¥æŸ„æ˜¯å¦å­˜åœ¨ï¼Œå¦‚æœå­˜åœ¨åˆ™å¤ç”¨ï¼Œå¦åˆ™åˆ›å»ºæ–°çš„ */
 
 	conns = (CONN_POOL*) acl_htable_find(cache->cache, key);
 	if (conns == NULL) {
@@ -192,7 +192,7 @@ void conn_cache_push_stream(CONN_CACHE *cache, ACL_ASTREAM *stream,
 	}
 
 #if 0
-	/* Èç¹û¸ÃÁ¬½Ó³ØÖĞµÄÁ¬½ÓÁ÷³¬¹ıÏŞÖÆ£¬ÔòÓÅÏÈÊÍ·Å×î¾ÉµÄÁ¬½Ó¶ÔÏó */
+	/* å¦‚æœè¯¥è¿æ¥æ± ä¸­çš„è¿æ¥æµè¶…è¿‡é™åˆ¶ï¼Œåˆ™ä¼˜å…ˆé‡Šæ”¾æœ€æ—§çš„è¿æ¥å¯¹è±¡ */
 	if (acl_fifo_size(&conns->conns) >= cache->conn_limit) {
 		conn = acl_fifo_pop(&conns->conns);
 		if (conn) {
@@ -204,24 +204,24 @@ void conn_cache_push_stream(CONN_CACHE *cache, ACL_ASTREAM *stream,
 
 	cache->nset++;
 
-	/* ´´½¨ĞÂµÄÒì²½Á÷Á¬½Ó»º´æ¶ÔÏó */
+	/* åˆ›å»ºæ–°çš„å¼‚æ­¥æµè¿æ¥ç¼“å­˜å¯¹è±¡ */
 	conn = (CONN*) acl_mymalloc(sizeof(CONN));
 	conn->stream = stream;
 	conn->ctx = ctx;
 	conn->free_fn = free_fn;
 
-	/* ¼ÓÈëÁ÷Á¬½Ó³ØÖĞ */
+	/* åŠ å…¥æµè¿æ¥æ± ä¸­ */
 	conn->info = acl_fifo_push(&conns->conns, conn);
 	conn->conn_pool = conns;
 
-	/* ÉèÖÃ¸ÃÁ÷µÄ»Øµ÷º¯Êı */
+	/* è®¾ç½®è¯¥æµçš„å›è°ƒå‡½æ•° */
 	acl_aio_ctl(stream,
 		ACL_AIO_CTL_READ_HOOK_ADD, read_callback, conn,
 		ACL_AIO_CTL_CLOSE_HOOK_ADD, read_close_callback, conn,
 		ACL_AIO_CTL_TIMEO_HOOK_ADD, read_timeout_callback, conn,
 		ACL_AIO_CTL_TIMEOUT, timeout,
 		ACL_AIO_CTL_END);
-	/* ¿ªÊ¼¶Á¸ÃÁ÷µÄÊı¾İ */
+	/* å¼€å§‹è¯»è¯¥æµçš„æ•°æ® */
 	acl_aio_read(stream);
 }
 
@@ -230,25 +230,25 @@ CONN *conn_cache_get_conn(CONN_CACHE *cache, const char *key)
 	CONN_POOL *conns;
 	CONN *conn;
 
-	/* ÏÈ²é¿´¸ÃKEYµÄÁ¬½Ó³Ø¶ÔÏóÊÇ·ñ´æÔÚ£¬Èç¹û²»´æÔÚÔò·µ»ØNULL */
+	/* å…ˆæŸ¥çœ‹è¯¥KEYçš„è¿æ¥æ± å¯¹è±¡æ˜¯å¦å­˜åœ¨ï¼Œå¦‚æœä¸å­˜åœ¨åˆ™è¿”å›NULL */
 
 	conns = (CONN_POOL*) acl_htable_find(cache->cache, key);
 	if (conns == NULL) {
 		return (NULL);
 	}
 
-	/* ´Ó¸ÃKEYµÄÁ¬½Ó³ØÖĞÈ¡³öÒ»¸öÁ¬½Ó£¬Èç¹ûÈ¡³öÎªNULLÔòÊÍ·Å¸ÃÁ¬½Ó³Ø¶ÔÏó */
+	/* ä»è¯¥KEYçš„è¿æ¥æ± ä¸­å–å‡ºä¸€ä¸ªè¿æ¥ï¼Œå¦‚æœå–å‡ºä¸ºNULLåˆ™é‡Šæ”¾è¯¥è¿æ¥æ± å¯¹è±¡ */
 
 	conn = acl_fifo_pop(&conns->conns);
 	if (conn == NULL) {
-		/* ÏÈ´ÓÁ¬½Ó³Ø»º´æÖĞÉ¾³ı */
+		/* å…ˆä»è¿æ¥æ± ç¼“å­˜ä¸­åˆ é™¤ */
 		acl_htable_delete(cache->cache, conns->key, NULL);
-		/* ÉèÖÃÊÍ·Å¿ÕµÄÁ¬½Ó³Ø¶ÔÏóµÄ¶¨Ê±Æ÷ */
+		/* è®¾ç½®é‡Šæ”¾ç©ºçš„è¿æ¥æ± å¯¹è±¡çš„å®šæ—¶å™¨ */
 		set_conn_pool_free_timer(conns);
 		return (NULL);
 	}
 
-	/* ÏÈÈ¡Ïû¸ÃÁ÷Ö®Ç°ÉèÖÃµÄ»Øµ÷º¯Êı */
+	/* å…ˆå–æ¶ˆè¯¥æµä¹‹å‰è®¾ç½®çš„å›è°ƒå‡½æ•° */
 #if 1
 	acl_aio_del_read_hook(conn->stream, read_callback, conn);
 	acl_aio_del_close_hook(conn->stream, read_close_callback, conn);
@@ -259,7 +259,7 @@ CONN *conn_cache_get_conn(CONN_CACHE *cache, const char *key)
 
 	if (conn->free_fn)
 		conn->free_fn(conn->stream, conn->ctx);
-	/* È¡Ïû¶Á¼àÌı */
+	/* å–æ¶ˆè¯»ç›‘å¬ */
 	acl_aio_disable_read(conn->stream);
 
 	cache->nget++;
@@ -281,7 +281,7 @@ ACL_ASTREAM *conn_cache_get_stream(CONN_CACHE *cache, const char *key, void **ct
 	if (ctx_pptr)
 		*ctx_pptr = conn->ctx;
 	stream = conn->stream;
-	acl_myfree(conn);  /* ÒòÎªÒÑ¾­È¡³öÁ÷¶ÔÏó£¬ËùÒÔ¿ÉÒÔÊÍ·Å CONN ¶ÔÏó */
+	acl_myfree(conn);  /* å› ä¸ºå·²ç»å–å‡ºæµå¯¹è±¡ï¼Œæ‰€ä»¥å¯ä»¥é‡Šæ”¾ CONN å¯¹è±¡ */
 	return (stream);
 }
 
@@ -294,7 +294,7 @@ void conn_cache_delete_key(CONN_CACHE *cache, const char *key)
 	if (conns == NULL)
 		return;
 
-	/* ±éÀúÁ¬½Ó³ØÖĞµÄÁ¬½ÓÁ÷²¢Ò»Ò»¹Ø±Õ */
+	/* éå†è¿æ¥æ± ä¸­çš„è¿æ¥æµå¹¶ä¸€ä¸€å…³é—­ */
 	acl_foreach(iter, &conns->conns) {
 		CONN *conn = (CONN*) iter.data;
 		if (conn->stream) {
@@ -303,15 +303,15 @@ void conn_cache_delete_key(CONN_CACHE *cache, const char *key)
 		}
 	}
 
-	/* ½«¸ÃÁ¬½Ó³Ø´ÓÁ¬½Ó³Ø»º´æÖĞÉ¾³ı */
+	/* å°†è¯¥è¿æ¥æ± ä»è¿æ¥æ± ç¼“å­˜ä¸­åˆ é™¤ */
 	acl_htable_delete(cache->cache, conns->key, NULL);
-	/* ÉèÖÃÊÍ·Å³Ø¶ÔÏóµÄ¶¨Ê±Æ÷ */
+	/* è®¾ç½®é‡Šæ”¾æ± å¯¹è±¡çš„å®šæ—¶å™¨ */
 	set_conn_pool_free_timer(conns);
 }
 
 void conn_cache_delete_conn(CONN *conn)
 {
-	/* ÊÍ·Å²¢¹Ø±Õ¸ÃÁ¬½Ó¶ÔÏó */
+	/* é‡Šæ”¾å¹¶å…³é—­è¯¥è¿æ¥å¯¹è±¡ */
 	conn_close(conn);
 }
 
@@ -325,11 +325,11 @@ void conn_cache_delete_stream(CONN_CACHE *cache, ACL_ASTREAM *stream)
 	conns = acl_htable_find(cache->cache, key);
 	if (conns == NULL)
 		return;
-	/* ±éÀúÁ¬½Ó³Ø¶ÓÁĞÖĞµÄËùÓĞÁ¬½Ó */
+	/* éå†è¿æ¥æ± é˜Ÿåˆ—ä¸­çš„æ‰€æœ‰è¿æ¥ */
 	acl_foreach(iter, &conns->conns) {
 		conn = (CONN*) iter.data;
 		if (conn->stream == stream) {
-			/* ÊÍ·Å²¢¹Ø±Õ¸ÃÁ¬½Ó¶ÔÏó */
+			/* é‡Šæ”¾å¹¶å…³é—­è¯¥è¿æ¥å¯¹è±¡ */
 			conn_close(conn);
 			break;
 		}

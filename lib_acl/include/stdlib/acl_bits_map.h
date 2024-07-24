@@ -8,7 +8,7 @@ extern "C" {
 #include "acl_define.h"
 
 /**
- * Î»Ó³Éä½á¹¹ÀàĞÍ¶¨Òå
+ * ä½æ˜ å°„ç»“æ„ç±»å‹å®šä¹‰
  */
 typedef struct ACL_BITS_MASK {
 	char   *data;		/**< bit mask */
@@ -28,12 +28,12 @@ typedef struct ACL_BITS_MASK {
 
 /* Memory management. */
 /**
- * ·ÖÅäÎ»Ó³Éä¶ÔÏó¿Õ¼ä
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
- * @param nmax {size_t/unsigned int/unsigned short/unsigned char} ×î´óÖµ£¬ÒÔ´ËÖµÀ´
- *  ¼ÆËã (mask)->data Õ¼µÄÄÚ´æ¿Õ¼ä´óĞ¡£¬Èç£ºµ± nmax=4294967295, ¼´×î´óÕûÊıÖµÊ±£¬Ôò
- *  (mask)->data_len=536870912, ¼´ (mask)->data Õ¼ÓÃ 536870912 Bytes; µ± nmax=65535,
- *  ¼´×î´ó unsigned short ÖµÊ±£¬Ôò (mask)->data_len=8192, ¼´ (mask)->data Õ¼ÓÃ 8192 ×Ö½Ú
+ * åˆ†é…ä½æ˜ å°„å¯¹è±¡ç©ºé—´
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
+ * @param nmax {size_t/unsigned int/unsigned short/unsigned char} æœ€å¤§å€¼ï¼Œä»¥æ­¤å€¼æ¥
+ *  è®¡ç®— (mask)->data å çš„å†…å­˜ç©ºé—´å¤§å°ï¼Œå¦‚ï¼šå½“ nmax=4294967295, å³æœ€å¤§æ•´æ•°å€¼æ—¶ï¼Œåˆ™
+ *  (mask)->data_len=536870912, å³ (mask)->data å ç”¨ 536870912 Bytes; å½“ nmax=65535,
+ *  å³æœ€å¤§ unsigned short å€¼æ—¶ï¼Œåˆ™ (mask)->data_len=8192, å³ (mask)->data å ç”¨ 8192 å­—èŠ‚
  */
 #define	ACL_BITS_MASK_ALLOC(mask, nmax) do { \
 	size_t _byte_len = ACL_BITS_MASK_BYTES_NEEDED(nmax); \
@@ -43,12 +43,12 @@ typedef struct ACL_BITS_MASK {
 } while (0)
 
 /**
- * ÖØ·ÖÅäÎ»Ó³Éä¶ÔÏó¿Õ¼ä
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
- * @param nmax {size_t/unsigned int/unsigned short/unsigned char} ×î´óÖµ£¬ÒÔ´ËÖµÀ´
- *  ¼ÆËã (mask)->data Õ¼µÄÄÚ´æ¿Õ¼ä´óĞ¡£¬Èç£ºµ± nmax=4294967295, ¼´×î´óÕûÊıÖµÊ±£¬Ôò
- *  (mask)->data_len=536870912, ¼´ (mask)->data Õ¼ÓÃ 536870912 Bytes; µ± nmax=65535,
- *  ¼´×î´ó unsigned short ÖµÊ±£¬Ôò (mask)->data_len=8192, ¼´ (mask)->data Õ¼ÓÃ 8192 ×Ö½Ú
+ * é‡åˆ†é…ä½æ˜ å°„å¯¹è±¡ç©ºé—´
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
+ * @param nmax {size_t/unsigned int/unsigned short/unsigned char} æœ€å¤§å€¼ï¼Œä»¥æ­¤å€¼æ¥
+ *  è®¡ç®— (mask)->data å çš„å†…å­˜ç©ºé—´å¤§å°ï¼Œå¦‚ï¼šå½“ nmax=4294967295, å³æœ€å¤§æ•´æ•°å€¼æ—¶ï¼Œåˆ™
+ *  (mask)->data_len=536870912, å³ (mask)->data å ç”¨ 536870912 Bytes; å½“ nmax=65535,
+ *  å³æœ€å¤§ unsigned short å€¼æ—¶ï¼Œåˆ™ (mask)->data_len=8192, å³ (mask)->data å ç”¨ 8192 å­—èŠ‚
  */
 #define	ACL_BITS_MASK_REALLOC(mask, nmax) do { \
 	size_t _byte_len = ACL_BITS_MASK_BYTES_NEEDED(nmax); \
@@ -59,41 +59,41 @@ typedef struct ACL_BITS_MASK {
 } while (0)
 
 /**
- * ÊÍ·ÅÎ»Ó³Éä¶ÔÏóµÄÄÚ²¿¶¯Ì¬¿Õ¼ä
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
+ * é‡Šæ”¾ä½æ˜ å°„å¯¹è±¡çš„å†…éƒ¨åŠ¨æ€ç©ºé—´
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
  */
 #define	ACL_BITS_MASK_FREE(mask)	acl_myfree((mask)->data)
 
 /* Set operations, modeled after FD_ZERO/SET/ISSET/CLR. */
 
 /**
- * ½«Î»Ó³Éä¶ÔÏóµÄÄÚ²¿¶¯Ì¬¿Õ¼äÇåÁã
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
+ * å°†ä½æ˜ å°„å¯¹è±¡çš„å†…éƒ¨åŠ¨æ€ç©ºé—´æ¸…é›¶
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
  */
 #define	ACL_BITS_MASK_ZERO(mask) \
 	memset((mask)->data, 0, (mask)->data_len);
 
 /**
- * ½«ÕûÊıÓ³ÉäÎªÎ»´æ´¢ÔÚÎ»Ó³Éä¶ÔÏóµÄ¶¯Ì¬¿Õ¼äÖĞ
- * @param number {unsigned int} ÕûÊıÖµ
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
+ * å°†æ•´æ•°æ˜ å°„ä¸ºä½å­˜å‚¨åœ¨ä½æ˜ å°„å¯¹è±¡çš„åŠ¨æ€ç©ºé—´ä¸­
+ * @param number {unsigned int} æ•´æ•°å€¼
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
  */
 #define	ACL_BITS_MASK_SET(number, mask) \
 	(ACL_BITS_MASK_FD_BYTE((number), (mask)) |= ACL_BITS_MASK_FD_BIT(number))
 
 /**
- * ÅĞ¶ÏÄ³¸öÕûÊıÊÇ·ñ´æ´¢ÔÚÎ»Ó³Éä¶ÔÏóµÄ¶¯Ì¬¿Õ¼äÖĞ
- * @param number {unsigned int} ÕûÊıÖµ
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
- * @return {int} 0: ²»´æÔÚ£»!= 0: ´æÔÚ
+ * åˆ¤æ–­æŸä¸ªæ•´æ•°æ˜¯å¦å­˜å‚¨åœ¨ä½æ˜ å°„å¯¹è±¡çš„åŠ¨æ€ç©ºé—´ä¸­
+ * @param number {unsigned int} æ•´æ•°å€¼
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
+ * @return {int} 0: ä¸å­˜åœ¨ï¼›!= 0: å­˜åœ¨
  */
 #define	ACL_BITS_MASK_ISSET(number, mask) \
 	(ACL_BITS_MASK_FD_BYTE((number), (mask)) & ACL_BITS_MASK_FD_BIT(number))
 
 /**
- * ½«Ä³¸öÕûÊı´ÓÎ»Ó³Éä¶ÔÏóµÄ¶¯Ì¬¿Õ¼äÖĞÇå³ıµô
- * @param number {unsigned int} ÕûÊıÖµ
- * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK Ö¸Õë
+ * å°†æŸä¸ªæ•´æ•°ä»ä½æ˜ å°„å¯¹è±¡çš„åŠ¨æ€ç©ºé—´ä¸­æ¸…é™¤æ‰
+ * @param number {unsigned int} æ•´æ•°å€¼
+ * @param mask {ACL_BITS_MASK*) ACL_BITS_MASK æŒ‡é’ˆ
  */
 #define	ACL_BITS_MASK_CLR(number, mask) \
 	(ACL_BITS_MASK_FD_BYTE((number), (mask)) &= ~ACL_BITS_MASK_FD_BIT(number))

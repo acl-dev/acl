@@ -16,52 +16,52 @@ namespace acl {
 class thread_mutex;
 
 /**
- * Ïß³ÌÌõ¼þ±äÁ¿
+ * çº¿ç¨‹æ¡ä»¶å˜é‡
  */
 class ACL_CPP_API thread_cond : public noncopyable
 {
 public:
 	/**
-	 * ¹¹Ôì·½·¨
-	 * @param mutex {thread_mutex*} µ±¸Ã²ÎÊý·Ç NULL Ê±£¬ÄÚ²¿×Ô¶¯ÒýÓÃ
-	 *  ¸ÃÏß³ÌËø£¬·ñÔò£¬ÄÚ²¿´´½¨Ïß³ÌËø
+	 * æž„é€ æ–¹æ³•
+	 * @param mutex {thread_mutex*} å½“è¯¥å‚æ•°éž NULL æ—¶ï¼Œå†…éƒ¨è‡ªåŠ¨å¼•ç”¨
+	 *  è¯¥çº¿ç¨‹é”ï¼Œå¦åˆ™ï¼Œå†…éƒ¨åˆ›å»ºçº¿ç¨‹é”
 	 */
 	thread_cond(thread_mutex* mutex = NULL);
 	~thread_cond(void);
 
 	/**
-	 * µÈ´ýÏß³ÌÌõ¼þ±äÁ¿¾ÍÐ÷
-	 * @param microseconds {long long} µÈ´ýÌõ¼þ±äÁ¿¾ÍÐ÷µÄ³¬Ê±Ê±¼ä(Î¢Ãë¼¶)
-	 *   > 0 Ê±±íÊ¾µÈ´ý³¬Ê±µÄÊ±¼ä
-	 *   == 0£¬²»µÈ´ý
-	 *   < 0 ÔòÒ»Ö±µÈ´ýÖ±µ½Ìõ¼þ±äÁ¿¾ÍÐ÷
-	 * @param locked {bool} ¸Ã²ÎÊý±íÃ÷ÊÇ·ñÒÑ¾­½«Ëø¼ÓËø£¬Èç¹û»¹Î´¼ÓËø£¬Ôò
-	 *  ÄÚ²¿»áÏÈ×Ô¶¯¼ÓËø£¬·½·¨·µ»ØÇ°ÔÙ½âËø£»Èç¹ûÍâ²¿ÒÑ¾­¼ÓËø£¬ÔòÄÚ²¿²»¶Ô
-	 *  »¥³âËø×ö¼ÓËø/½âËø´¦Àí
-	 * @return {bool} ·µ»Ø true ±íÊ¾Ìõ¼þ±äÁ¿¾ÍÐ÷£¬·ñÔò±íÊ¾³¬Ê±»òÃ»±»Í¨Öª
+	 * ç­‰å¾…çº¿ç¨‹æ¡ä»¶å˜é‡å°±ç»ª
+	 * @param microseconds {long long} ç­‰å¾…æ¡ä»¶å˜é‡å°±ç»ªçš„è¶…æ—¶æ—¶é—´(å¾®ç§’çº§)
+	 *   > 0 æ—¶è¡¨ç¤ºç­‰å¾…è¶…æ—¶çš„æ—¶é—´
+	 *   == 0ï¼Œä¸ç­‰å¾…
+	 *   < 0 åˆ™ä¸€ç›´ç­‰å¾…ç›´åˆ°æ¡ä»¶å˜é‡å°±ç»ª
+	 * @param locked {bool} è¯¥å‚æ•°è¡¨æ˜Žæ˜¯å¦å·²ç»å°†é”åŠ é”ï¼Œå¦‚æžœè¿˜æœªåŠ é”ï¼Œåˆ™
+	 *  å†…éƒ¨ä¼šå…ˆè‡ªåŠ¨åŠ é”ï¼Œæ–¹æ³•è¿”å›žå‰å†è§£é”ï¼›å¦‚æžœå¤–éƒ¨å·²ç»åŠ é”ï¼Œåˆ™å†…éƒ¨ä¸å¯¹
+	 *  äº’æ–¥é”åšåŠ é”/è§£é”å¤„ç†
+	 * @return {bool} è¿”å›ž true è¡¨ç¤ºæ¡ä»¶å˜é‡å°±ç»ªï¼Œå¦åˆ™è¡¨ç¤ºè¶…æ—¶æˆ–æ²¡è¢«é€šçŸ¥
 	 */
 	bool wait(long long microseconds = -1, bool locked = false);
 
 	/**
-	 * Í¨ÖªÒ»¸ö»ò¼¸¸öµÈ´ýÔÚÏß³ÌÌõ¼þ±äÁ¿ÉÏµÄÏß³Ì£¬±íÊ¾Ìõ¼þ±äÁ¿¾Í½á
-	 * @return {bool} ·µ»Ø false ±íÊ¾Í¨ÖªÊ§°Ü
+	 * é€šçŸ¥ä¸€ä¸ªæˆ–å‡ ä¸ªç­‰å¾…åœ¨çº¿ç¨‹æ¡ä»¶å˜é‡ä¸Šçš„çº¿ç¨‹ï¼Œè¡¨ç¤ºæ¡ä»¶å˜é‡å°±ç»“
+	 * @return {bool} è¿”å›ž false è¡¨ç¤ºé€šçŸ¥å¤±è´¥
 	 */
 	bool notify(void);
 
 	/**
-	 * Í¨ÖªËùÓÐµÈ´ýÔÚÏß³ÌÌõ¼þ±äÁ¿ÉÏµÄÏß³Ì£¬±íÊ¾Ìõ¼þ±äÁ¿¾Í½á
-	 * @return {bool} ·µ»Ø false ±íÊ¾Í¨ÖªÊ§°Ü
+	 * é€šçŸ¥æ‰€æœ‰ç­‰å¾…åœ¨çº¿ç¨‹æ¡ä»¶å˜é‡ä¸Šçš„çº¿ç¨‹ï¼Œè¡¨ç¤ºæ¡ä»¶å˜é‡å°±ç»“
+	 * @return {bool} è¿”å›ž false è¡¨ç¤ºé€šçŸ¥å¤±è´¥
 	 */
 	bool notify_all(void);
 
 	/**
-	 * »ñµÃÓë¸ÃÏß³ÌÌõ¼þ±äÁ¿°ó¶¨µÄÏß³Ì»¥³âËø
+	 * èŽ·å¾—ä¸Žè¯¥çº¿ç¨‹æ¡ä»¶å˜é‡ç»‘å®šçš„çº¿ç¨‹äº’æ–¥é”
 	 * @return {thread_mutex&}
 	 */
 	thread_mutex& get_mutex(void) const;
 
 	/**
-	 * »ñµÃÏµÍ³ÀàÐÍµÄÏß³ÌÌõ¼þ±äÁ¿¶ÔÏó
+	 * èŽ·å¾—ç³»ç»Ÿç±»åž‹çš„çº¿ç¨‹æ¡ä»¶å˜é‡å¯¹è±¡
 	 * @return {acl_pthread_cond_t*}
 	 */
 	acl_pthread_cond_t* get_cond(void) const;

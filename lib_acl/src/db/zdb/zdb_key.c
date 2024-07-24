@@ -77,9 +77,9 @@ static ZDB_BLK_OFF *get_tls(void)
 }
 
 /**
- * »ñµÃµü´úÆ÷Í·²¿Êı¾İ
- * @param iter {ACL_ITER*} µü´úÆ÷Ö¸Õë
- * @return {const void*} Êı¾İµØÖ·
+ * è·å¾—è¿­ä»£å™¨å¤´éƒ¨æ•°æ®
+ * @param iter {ACL_ITER*} è¿­ä»£å™¨æŒ‡é’ˆ
+ * @return {const void*} æ•°æ®åœ°å€
  */
 static const void *key_iter_head(ACL_ITER *iter, struct ZDB_KEY_STORE *store)
 {
@@ -99,7 +99,7 @@ static const void *key_iter_head(ACL_ITER *iter, struct ZDB_KEY_STORE *store)
 		}
 		if (blk_off->offset >= 0 && blk_off->inode >= 0) {
 			iter->data = iter->ptr = blk_off;
-			iter->i++;  /* Ö¸ÏòÏÂÒ»¸öÎ»ÖÃ */
+			iter->i++;  /* æŒ‡å‘ä¸‹ä¸€ä¸ªä½ç½® */
 			return (iter->ptr);
 		}
 	}
@@ -109,9 +109,9 @@ static const void *key_iter_head(ACL_ITER *iter, struct ZDB_KEY_STORE *store)
 }
 
 /**
- * »ñµÃµü´úÆ÷µÄÄÇÒ»¸öÊı¾İ
- * @param iter {ACL_ITER*} µü´úÆ÷Ö¸Õë
- * @return {const void*} Êı¾İµØÖ·
+ * è·å¾—è¿­ä»£å™¨çš„é‚£ä¸€ä¸ªæ•°æ®
+ * @param iter {ACL_ITER*} è¿­ä»£å™¨æŒ‡é’ˆ
+ * @return {const void*} æ•°æ®åœ°å€
  */
 static const void *key_iter_next(ACL_ITER *iter, struct ZDB_KEY_STORE *store)
 {
@@ -129,7 +129,7 @@ static const void *key_iter_next(ACL_ITER *iter, struct ZDB_KEY_STORE *store)
 		}
 		if (blk_off->offset >= 0 && blk_off->inode >= 0) {
 			iter->data = iter->ptr = blk_off;
-			iter->i++;  /* Ö¸ÏòÏÂÒ»¸öÎ»ÖÃ */
+			iter->i++;  /* æŒ‡å‘ä¸‹ä¸€ä¸ªä½ç½® */
 			return (iter->ptr);
 		}
 	}
@@ -139,7 +139,7 @@ static const void *key_iter_next(ACL_ITER *iter, struct ZDB_KEY_STORE *store)
 }
 
 /**
- * ³õÊ¼»¯¼ü´æ´¢
+ * åˆå§‹åŒ–é”®å­˜å‚¨
  * @param store {ZDB_KEY_STORE*}
  * @return {int} 0: ok; -1: error
  */
@@ -150,7 +150,7 @@ static int key_store_init(ZDB_KEY_STORE *store)
 	ZDB_BLK_OFF blk_off;
 	int   ret;
 
-	/* ³õÊ¼»¯¼ü´æ´¢µÄÍ·²¿ĞÅÏ¢ */
+	/* åˆå§‹åŒ–é”®å­˜å‚¨çš„å¤´éƒ¨ä¿¡æ¯ */
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_KEY) == 0)
 		ret = acl_vstream_buffed_writen(((ZDB_STORE*) store)->fhandle.fp,
@@ -195,7 +195,7 @@ static int key_store_init(ZDB_KEY_STORE *store)
 	}
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_KEY) == 0) {
-		/* Ë¢ĞÂĞ´µÄ»º³åÇøÖÁ´ÅÅÌ */
+		/* åˆ·æ–°å†™çš„ç¼“å†²åŒºè‡³ç£ç›˜ */
 		if (acl_vstream_fflush(((ZDB_STORE*) store)->fhandle.fp)
 				== ACL_VSTREAM_EOF)
 		{
@@ -209,10 +209,10 @@ static int key_store_init(ZDB_KEY_STORE *store)
 }
 
 /**
- * ´ò¿ª¼ü´æ´¢Ê±µÄ»Øµ÷º¯Êı
- * @param fh {ACL_FHANDLE*} ĞÂ´ò¿ªµÄÎÄ¼ş¾ä±ú
- * @param arg {void*} ²ÎÊı
- * @return {int} 0: ok; -1: error, Èô·µ»Ø -1 ÔòĞÂ´ò¿ªµÄÎÄ¼ş¾ä±ú»á×Ô¶¯±»¹Ø±Õ
+ * æ‰“å¼€é”®å­˜å‚¨æ—¶çš„å›è°ƒå‡½æ•°
+ * @param fh {ACL_FHANDLE*} æ–°æ‰“å¼€çš„æ–‡ä»¶å¥æŸ„
+ * @param arg {void*} å‚æ•°
+ * @return {int} 0: ok; -1: error, è‹¥è¿”å› -1 åˆ™æ–°æ‰“å¼€çš„æ–‡ä»¶å¥æŸ„ä¼šè‡ªåŠ¨è¢«å…³é—­
  */
 static int key_store_on_open(ACL_FHANDLE *fh, void *arg)
 {
@@ -229,7 +229,7 @@ static int key_store_on_open(ACL_FHANDLE *fh, void *arg)
 	if ((db->oflags & ZDB_FLAG_SLICE_KEY))
 		((ZDB_STORE*) store)->flag |= STORE_FLAG_IO_SLICE;
 
-	/* Èç¹ûÊÇĞÂÎÄ¼şÔò³õÊ¼»¯ */
+	/* å¦‚æœæ˜¯æ–°æ–‡ä»¶åˆ™åˆå§‹åŒ– */
 
 	if (fh->fsize == 0) {
 		acl_debug(ZDB_DBG_KEY, 1) ("%s: begin init %s ...", myname, STR(db->path_tmp));
@@ -252,7 +252,7 @@ static int key_store_on_open(ACL_FHANDLE *fh, void *arg)
 		return (0);
 	}
 	
-	/* Èç¹ûÊÇ¾ÉÎÄ¼şÔò¶ÁÈ¡ÎÄ¼şÍ·ĞÅÏ¢, ÇÒÓ¦½øĞĞ¼ìÑé */
+	/* å¦‚æœæ˜¯æ—§æ–‡ä»¶åˆ™è¯»å–æ–‡ä»¶å¤´ä¿¡æ¯, ä¸”åº”è¿›è¡Œæ£€éªŒ */
 
 	if ((((ZDB_STORE*) store)->db->oflags & ZDB_FLAG_CACHE_KEY) == 0)
 		ret = acl_vstream_readn(((ZDB_STORE*) store)->fhandle.fp,
@@ -278,8 +278,8 @@ static int key_store_on_open(ACL_FHANDLE *fh, void *arg)
 }
 
 /**
- * ¹Ø±Õ¼ü´æ´¢Ê±µÄ»Øµ÷º¯Êı
- * @param fh {ACL_FHANDLE*} ÎÄ¼ş¾ä±ú
+ * å…³é—­é”®å­˜å‚¨æ—¶çš„å›è°ƒå‡½æ•°
+ * @param fh {ACL_FHANDLE*} æ–‡ä»¶å¥æŸ„
  */
 static void key_store_on_close(ACL_FHANDLE *fh)
 {
@@ -302,7 +302,7 @@ ZDB_KEY_STORE *zdb_key_store_open2(ZDB *db, const char *filepath)
 	if ((db->oflags & ZDB_FLAG_OPEN_LOCK) != 0)
 		oflags |= ACL_FHANDLE_O_MLOCK;
 
-	/* ´ò¿ª»ò´´½¨Ò»¸öÎÄ¼ş¾ä±ú */
+	/* æ‰“å¼€æˆ–åˆ›å»ºä¸€ä¸ªæ–‡ä»¶å¥æŸ„ */
 	store = (ZDB_KEY_STORE*) acl_fhandle_open(sizeof(ZDB_KEY_STORE), oflags,
 			filepath, key_store_on_open, db,
 			key_store_on_close);
@@ -323,7 +323,7 @@ ZDB_KEY_STORE *zdb_key_store_open(ZDB *db, zdb_key_t key)
 	const char *myname = "zdb_key_store_open";
 	int   inode;
 
-	/* ¼ÆËã³ö¸Ã key ËùÔÚµÄ´æ´¢ÎÄ¼şµÄ´æ´¢Ä¿Â¼µÄ±êÊ¶ºÅ */
+	/* è®¡ç®—å‡ºè¯¥ key æ‰€åœ¨çš„å­˜å‚¨æ–‡ä»¶çš„å­˜å‚¨ç›®å½•çš„æ ‡è¯†å· */
 	inode = KEY_INODE(db, key);
 	if (inode < 0 || inode > 65353) {
 		acl_msg_error("%s(%d): inode(%d) invalid, key(" ACL_FMT_I64D ")",
@@ -368,7 +368,7 @@ int zdb_key_set(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off)
 		RETURN (-1);
 	}
 
-	/* ¼ÆËã key ÔÚ¼ü´æ´¢ÖĞµÄÎ»ÖÃ */
+	/* è®¡ç®— key åœ¨é”®å­˜å‚¨ä¸­çš„ä½ç½® */
 	
 	inode = KEY_INODE(store->store.db, key);
 	if (inode < 0 || inode > 65353) {
@@ -397,7 +397,7 @@ int zdb_key_set(ZDB *db, zdb_key_t key, const ZDB_BLK_OFF *blk_off)
 		RETURN (-1);
 	}
 
-	/* Èç¹ûÎªĞÂÊı¾İ²åÈëÔòÔö¼Ó¼ÆÊıÆ÷ */
+	/* å¦‚æœä¸ºæ–°æ•°æ®æ’å…¥åˆ™å¢åŠ è®¡æ•°å™¨ */
 
 	if ((db->status & ZDB_STAT_KEY_NEW))
 		store->hdr.key_count++;
@@ -425,7 +425,7 @@ int zdb_key_get(ZDB *db, zdb_key_t key, ZDB_BLK_OFF *blk_off)
 		RETURN (-1);
 	}
 
-	/* ¼ÆËã key ÔÚ¼ü´æ´¢ÖĞµÄÎ»ÖÃ */
+	/* è®¡ç®— key åœ¨é”®å­˜å‚¨ä¸­çš„ä½ç½® */
 
 	inode = KEY_INODE(store->store.db, key);
 	if (inode < 0 || inode > 65353) {
@@ -469,7 +469,7 @@ int zdb_key_get(ZDB *db, zdb_key_t key, ZDB_BLK_OFF *blk_off)
 		RETURN (0);
 	}
 
-	/* Ö»ÓĞ blk_off->offset >= 0 && blk_off->inode >= 0 Ê±²Å±íÃ÷ÕÒµ½ÖµÎ»ÖÃË÷Òı */
+	/* åªæœ‰ blk_off->offset >= 0 && blk_off->inode >= 0 æ—¶æ‰è¡¨æ˜æ‰¾åˆ°å€¼ä½ç½®ç´¢å¼• */
 	RETURN (1);
 }
 
@@ -500,7 +500,7 @@ int zdb_key_check(ZDB_KEY_STORE *store, ZDB_KEY_HDR *key_hdr)
 	if (key_hdr)
 		memcpy(key_hdr, &store->hdr, sizeof(ZDB_KEY_HDR));
 
-	/*  É¨ÃèËùÓĞ±»Ê¹ÓÃµÄÊı¾İ½áµã */
+	/*  æ‰«ææ‰€æœ‰è¢«ä½¿ç”¨çš„æ•°æ®ç»“ç‚¹ */
 
 	acl_msg_info("%s(%d): begin check %s's used key",
 		myname, __LINE__, STORE_PATH((ZDB_STORE*) store));
@@ -563,7 +563,7 @@ static int store_init_on_open(ACL_FHANDLE *fh, void *arg)
 	store->hdr.key_count = 0;
 	store->hdr.key_begin = 0;
 
-	/* ³õÊ¼»¯¼ü´æ´¢µÄÍ·²¿ĞÅÏ¢ */
+	/* åˆå§‹åŒ–é”®å­˜å‚¨çš„å¤´éƒ¨ä¿¡æ¯ */
 	ret = acl_vstream_buffed_writen(((ZDB_STORE*) store)->fhandle.fp,
 			&store->hdr, sizeof(store->hdr));
 	if (ret == ACL_VSTREAM_EOF) {
@@ -591,7 +591,7 @@ static int store_init_on_open(ACL_FHANDLE *fh, void *arg)
 		}
 	}
 
-	/* Ë¢ĞÂĞ´µÄ»º³åÇøÖÁ´ÅÅÌ */
+	/* åˆ·æ–°å†™çš„ç¼“å†²åŒºè‡³ç£ç›˜ */
 	if (acl_vstream_fflush(((ZDB_STORE*) store)->fhandle.fp) == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): fflush to %s error %s", myname, __LINE__,
 			STORE_PATH((ZDB_STORE*) store), acl_last_serror());
@@ -626,7 +626,7 @@ int zdb_key_init(ZDB *db, zdb_key_t key_begin, zdb_key_t key_end)
 		inode = KEY_INODE(db, key);
 		acl_vstring_sprintf(db->path_tmp, "%s/%s_%d.key",
 			db->key_path, db->dbname, inode);
-		/* ´ò¿ª»ò´´½¨Ò»¸öÎÄ¼ş¾ä±ú */
+		/* æ‰“å¼€æˆ–åˆ›å»ºä¸€ä¸ªæ–‡ä»¶å¥æŸ„ */
 		acl_msg_info("%s(%d): open %s", myname, __LINE__, STR(db->path_tmp));
 		store = (ZDB_KEY_STORE*) acl_fhandle_open(sizeof(ZDB_KEY_STORE),
 				0, STR(db->path_tmp), store_init_on_open,

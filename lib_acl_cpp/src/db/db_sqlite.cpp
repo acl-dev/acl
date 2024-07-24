@@ -93,7 +93,7 @@
  static ACL_DLL_HANDLE __sqlite_dll = NULL;
  static acl::string __sqlite_path;
 
- // ³ÌĞòÍË³öÊÍ·Å¶¯Ì¬¼ÓÔØµÄ¿â
+ // ç¨‹åºé€€å‡ºé‡Šæ”¾åŠ¨æ€åŠ è½½çš„åº“
 #ifndef HAVE_NO_ATEXIT
  static void __sqlite_dll_unload(void)
  {
@@ -105,7 +105,7 @@
  }
 #endif
 
- // ¶¯Ì¬¼ÓÔØ sqlite3.dll ¿â
+ // åŠ¨æ€åŠ è½½ sqlite3.dll åº“
  static void __sqlite_dll_load(void)
  {
 	if (__sqlite_dll != NULL) {
@@ -488,7 +488,7 @@ namespace acl
 {
 
 //////////////////////////////////////////////////////////////////////////
-// sqlite µÄ¼ÇÂ¼ĞĞÀàĞÍ¶¨Òå
+// sqlite çš„è®°å½•è¡Œç±»å‹å®šä¹‰
 
 static void sqlite_rows_free(void* ctx)
 {
@@ -507,12 +507,12 @@ static void sqlite_rows_save(char** results, int nrow,
 {
 	int   n = 0;
 
-	// È¡³ö±äÁ¿Ãû
+	// å–å‡ºå˜é‡å
 	for (; n < ncolumn; n++) {
 		result.names_.push_back(results[n]);
 	}
 
-	// ¿ªÊ¼È¡³öËùÓĞĞĞÊı¾İ½á¹û£¬¼ÓÈë¶¯Ì¬Êı×éÖĞ
+	// å¼€å§‹å–å‡ºæ‰€æœ‰è¡Œæ•°æ®ç»“æœï¼ŒåŠ å…¥åŠ¨æ€æ•°ç»„ä¸­
 	for (int i = 0; i < nrow; i++) {
 		db_row* row = NEW db_row(result.names_);
 		for (int j = 0; j < ncolumn; j++) {
@@ -608,7 +608,7 @@ const char* db_sqlite::get_error(void) const
 
 bool db_sqlite::dbopen(const char* charset /* = NULL */)
 {
-	// Èç¹ûÊı¾İ¿âÒÑ¾­´ò¿ª£¬ÔòÖ±½Ó·µ»Ø true
+	// å¦‚æœæ•°æ®åº“å·²ç»æ‰“å¼€ï¼Œåˆ™ç›´æ¥è¿”å› true
 	if (db_ != NULL) {
 		return true;
 	}
@@ -621,7 +621,7 @@ bool db_sqlite::dbopen(const char* charset /* = NULL */)
 		charset_ = charset;
 	}
 
-	// ×ª»»³É [utf-8] ±àÂë¸ñÊ½
+	// è½¬æ¢æˆ [utf-8] ç¼–ç æ ¼å¼
 
 	if (conv_ == NULL) {
 		ptr = dbfile_.c_str();
@@ -651,7 +651,7 @@ bool db_sqlite::dbopen(const char* charset /* = NULL */)
 		}
 	}
 
-	// ´ò¿ª sqlite Êı¾İ¿â
+	// æ‰“å¼€ sqlite æ•°æ®åº“
 	int   ret = __sqlite3_open(ptr, &db_);
 	if (ret != SQLITE_OK) {
 		logger_error("open %s error(%s, %d)", dbfile_.c_str(),
@@ -662,10 +662,10 @@ bool db_sqlite::dbopen(const char* charset /* = NULL */)
 		return false;
 	}
 
-	// µ± SQLITE Ã¦Ê±µÄ»Øµ÷º¯Êı
+	// å½“ SQLITE å¿™æ—¶çš„å›è°ƒå‡½æ•°
 	__sqlite3_busy_handler(db_, sqlite_busy_callback, NULL);
 
-	// ¹Ø±Õ SQLITE ÊµÊ±Ë¢ĞÂ´ÅÅÌµÄÌØĞÔ£¬´Ó¶øÌá¸ßĞÔÄÜ
+	// å…³é—­ SQLITE å®æ—¶åˆ·æ–°ç£ç›˜çš„ç‰¹æ€§ï¼Œä»è€Œæé«˜æ€§èƒ½
 	set_conf("PRAGMA synchronous = off");
 	return true;
 }
@@ -681,7 +681,7 @@ bool db_sqlite::close(void)
 		return false;
 	}
 
-	// ¹Ø±Õ sqlite Êı¾İ¿â
+	// å…³é—­ sqlite æ•°æ®åº“
 	int   ret = __sqlite3_close(db_);
 	if (ret == SQLITE_BUSY) {
 		logger_error("close %s error SQLITE_BUSY", dbfile_.c_str());
@@ -722,7 +722,7 @@ const char* db_sqlite::get_conf(const char* pragma, string& out)
 	}
 }
 
-// sqlite µÄÒ»Ğ©ÅäÖÃÑ¡Ïî
+// sqlite çš„ä¸€äº›é…ç½®é€‰é¡¹
 const char* __pragmas[] =
 {
 	"PRAGMA auto_vacuum",
@@ -820,7 +820,7 @@ bool db_sqlite::sql_update(const char* sql)
 
 bool db_sqlite::exec_sql(const char* sql, db_rows* result /* = NULL */)
 {
-	// ±ØĞë½«ÉÏ´ÎµÄ²éÑ¯½á¹ûÉ¾³ı
+	// å¿…é¡»å°†ä¸Šæ¬¡çš„æŸ¥è¯¢ç»“æœåˆ é™¤
 	free_result();
 
 	if (sql == NULL || *sql == 0) {
@@ -834,7 +834,7 @@ bool db_sqlite::exec_sql(const char* sql, db_rows* result /* = NULL */)
 	char** results = NULL, *err;
 	int    nrow, ncolumn;
 
-	// Ö´ĞĞ sqlite µÄ²éÑ¯¹ı³Ì
+	// æ‰§è¡Œ sqlite çš„æŸ¥è¯¢è¿‡ç¨‹
 	int   ret = __sqlite3_get_table(db_, sql, &results, &nrow, &ncolumn, &err);
 	if (ret != SQLITE_OK) {
 		logger_error("sqlites_get_table(%s) error(%s)",

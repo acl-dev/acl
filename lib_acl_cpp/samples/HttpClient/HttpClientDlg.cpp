@@ -1,4 +1,4 @@
-// HttpClientDlg.cpp : ÊµÏÖÎÄ¼ş
+// HttpClientDlg.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "stdafx.h"
@@ -14,20 +14,20 @@
 //#endif
 
 
-// ÓÃÓÚÓ¦ÓÃ³ÌĞò¡°¹ØÓÚ¡±²Ëµ¥ÏîµÄ CAboutDlg ¶Ô»°¿ò
+// ç”¨äºåº”ç”¨ç¨‹åºâ€œå…³äºâ€èœå•é¡¹çš„ CAboutDlg å¯¹è¯æ¡†
 
 class CAboutDlg : public CDialog
 {
 public:
 	CAboutDlg();
 
-// ¶Ô»°¿òÊı¾İ
+// å¯¹è¯æ¡†æ•°æ®
 	enum { IDD = IDD_ABOUTBOX };
 
 	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV Ö§³Ö
+	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV æ”¯æŒ
 
-// ÊµÏÖ
+// å®ç°
 protected:
 	DECLARE_MESSAGE_MAP()
 };
@@ -45,7 +45,7 @@ BEGIN_MESSAGE_MAP(CAboutDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CHttpClientDlg ¶Ô»°¿ò
+// CHttpClientDlg å¯¹è¯æ¡†
 
 
 
@@ -63,9 +63,9 @@ CHttpClientDlg::~CHttpClientDlg()
 	{
 		delete service_;
 
-		// service_ »áÓëÒ»¸öÒì²½IO°ó¶¨£¬µ±É¾³ıºó²¢²»»áÁ¢¼´¹Ø±Õ
-		// ¸ÃÒì²½ IO£¬ÒòÎªÒì²½ÒıÇæ²ÉÓÃÑÓ³Ù¹Ø±Õ»úÖÆ£¬ËùÒÔĞèÒªµ÷
-		// ÓÃ handle_check() À´Ö÷¶¯ÊÍ·ÅÑÓ³ÙÊÍ·Å¶ÓÁĞÀïµÄÒì²½ IO
+		// service_ ä¼šä¸ä¸€ä¸ªå¼‚æ­¥IOç»‘å®šï¼Œå½“åˆ é™¤åå¹¶ä¸ä¼šç«‹å³å…³é—­
+		// è¯¥å¼‚æ­¥ IOï¼Œå› ä¸ºå¼‚æ­¥å¼•æ“é‡‡ç”¨å»¶è¿Ÿå…³é—­æœºåˆ¶ï¼Œæ‰€ä»¥éœ€è¦è°ƒ
+		// ç”¨ handle_check() æ¥ä¸»åŠ¨é‡Šæ”¾å»¶è¿Ÿé‡Šæ”¾é˜Ÿåˆ—é‡Œçš„å¼‚æ­¥ IO
 		handle_.check();
 	}
 }
@@ -85,15 +85,15 @@ BEGIN_MESSAGE_MAP(CHttpClientDlg, CDialog)
 END_MESSAGE_MAP()
 
 
-// CHttpClientDlg ÏûÏ¢´¦Àí³ÌĞò
+// CHttpClientDlg æ¶ˆæ¯å¤„ç†ç¨‹åº
 
 BOOL CHttpClientDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
 
-	// ½«\¡°¹ØÓÚ...\¡±²Ëµ¥ÏîÌí¼Óµ½ÏµÍ³²Ëµ¥ÖĞ¡£
+	// å°†\â€œå…³äº...\â€èœå•é¡¹æ·»åŠ åˆ°ç³»ç»Ÿèœå•ä¸­ã€‚
 
-	// IDM_ABOUTBOX ±ØĞëÔÚÏµÍ³ÃüÁî·¶Î§ÄÚ¡£
+	// IDM_ABOUTBOX å¿…é¡»åœ¨ç³»ç»Ÿå‘½ä»¤èŒƒå›´å†…ã€‚
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -109,19 +109,19 @@ BOOL CHttpClientDlg::OnInitDialog()
 		}
 	}
 
-	// ÉèÖÃ´Ë¶Ô»°¿òµÄÍ¼±ê¡£µ±Ó¦ÓÃ³ÌĞòÖ÷´°¿Ú²»ÊÇ¶Ô»°¿òÊ±£¬¿ò¼Ü½«×Ô¶¯
-	//  Ö´ĞĞ´Ë²Ù×÷
-	SetIcon(m_hIcon, TRUE);			// ÉèÖÃ´óÍ¼±ê
-	SetIcon(m_hIcon, FALSE);		// ÉèÖÃĞ¡Í¼±ê
+	// è®¾ç½®æ­¤å¯¹è¯æ¡†çš„å›¾æ ‡ã€‚å½“åº”ç”¨ç¨‹åºä¸»çª—å£ä¸æ˜¯å¯¹è¯æ¡†æ—¶ï¼Œæ¡†æ¶å°†è‡ªåŠ¨
+	//  æ‰§è¡Œæ­¤æ“ä½œ
+	SetIcon(m_hIcon, TRUE);			// è®¾ç½®å¤§å›¾æ ‡
+	SetIcon(m_hIcon, FALSE);		// è®¾ç½®å°å›¾æ ‡
 
-	// TODO: ÔÚ´ËÌí¼Ó¶îÍâµÄ³õÊ¼»¯´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ é¢å¤–çš„åˆå§‹åŒ–ä»£ç 
 
 	FILE *fp;
 	AllocConsole();
 	fp = freopen("CONOUT$","w+t",stdout);
 
 	service_ = NEW acl::http_service(2, 0, true);
-	// Ê¹ÏûÏ¢·şÎñÆ÷¼àÌı 127.0.0.1 µÄµØÖ·
+	// ä½¿æ¶ˆæ¯æœåŠ¡å™¨ç›‘å¬ 127.0.0.1 çš„åœ°å€
 	//if (service_->open(&handle_) == false)
 	//{
 	//	printf(">>open message service error!\n");
@@ -132,7 +132,7 @@ BOOL CHttpClientDlg::OnInitDialog()
 	acl::atomic_long n;
 	n++;
 	printf("n=%lld\r\n", n.value());
-	return TRUE;  // ³ı·ÇÉèÖÃÁË¿Ø¼şµÄ½¹µã£¬·ñÔò·µ»Ø TRUE
+	return TRUE;  // é™¤éè®¾ç½®äº†æ§ä»¶çš„ç„¦ç‚¹ï¼Œå¦åˆ™è¿”å› TRUE
 }
 
 void CHttpClientDlg::OnSysCommand(UINT nID, LPARAM lParam)
@@ -148,19 +148,19 @@ void CHttpClientDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// Èç¹ûÏò¶Ô»°¿òÌí¼Ó×îĞ¡»¯°´Å¥£¬ÔòĞèÒªÏÂÃæµÄ´úÂë
-//  À´»æÖÆ¸ÃÍ¼±ê¡£¶ÔÓÚÊ¹ÓÃÎÄµµ/ÊÓÍ¼Ä£ĞÍµÄ MFC Ó¦ÓÃ³ÌĞò£¬
-//  Õâ½«ÓÉ¿ò¼Ü×Ô¶¯Íê³É¡£
+// å¦‚æœå‘å¯¹è¯æ¡†æ·»åŠ æœ€å°åŒ–æŒ‰é’®ï¼Œåˆ™éœ€è¦ä¸‹é¢çš„ä»£ç 
+//  æ¥ç»˜åˆ¶è¯¥å›¾æ ‡ã€‚å¯¹äºä½¿ç”¨æ–‡æ¡£/è§†å›¾æ¨¡å‹çš„ MFC åº”ç”¨ç¨‹åºï¼Œ
+//  è¿™å°†ç”±æ¡†æ¶è‡ªåŠ¨å®Œæˆã€‚
 
 void CHttpClientDlg::OnPaint() 
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // ÓÃÓÚ»æÖÆµÄÉè±¸ÉÏÏÂÎÄ
+		CPaintDC dc(this); // ç”¨äºç»˜åˆ¶çš„è®¾å¤‡ä¸Šä¸‹æ–‡
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
-		// Ê¹Í¼±êÔÚ¹¤×÷¾ØĞÎÖĞ¾ÓÖĞ
+		// ä½¿å›¾æ ‡åœ¨å·¥ä½œçŸ©å½¢ä¸­å±…ä¸­
 		int cxIcon = GetSystemMetrics(SM_CXICON);
 		int cyIcon = GetSystemMetrics(SM_CYICON);
 		CRect rect;
@@ -168,7 +168,7 @@ void CHttpClientDlg::OnPaint()
 		int x = (rect.Width() - cxIcon + 1) / 2;
 		int y = (rect.Height() - cyIcon + 1) / 2;
 
-		// »æÖÆÍ¼±ê
+		// ç»˜åˆ¶å›¾æ ‡
 		dc.DrawIcon(x, y, m_hIcon);
 	}
 	else
@@ -177,7 +177,7 @@ void CHttpClientDlg::OnPaint()
 	}
 }
 
-//µ±ÓÃ»§ÍÏ¶¯×îĞ¡»¯´°¿ÚÊ±ÏµÍ³µ÷ÓÃ´Ëº¯ÊıÈ¡µÃ¹â±êÏÔÊ¾¡£
+//å½“ç”¨æˆ·æ‹–åŠ¨æœ€å°åŒ–çª—å£æ—¶ç³»ç»Ÿè°ƒç”¨æ­¤å‡½æ•°å–å¾—å…‰æ ‡æ˜¾ç¤ºã€‚
 HCURSOR CHttpClientDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -185,7 +185,7 @@ HCURSOR CHttpClientDlg::OnQueryDragIcon()
 
 void CHttpClientDlg::OnBnClickedDownload()
 {
-	// TODO: ÔÚ´ËÌí¼Ó¿Ø¼şÍ¨Öª´¦Àí³ÌĞò´úÂë
+	// TODO: åœ¨æ­¤æ·»åŠ æ§ä»¶é€šçŸ¥å¤„ç†ç¨‹åºä»£ç 
 
 	if (service_ == NULL)
 	{
@@ -193,7 +193,7 @@ void CHttpClientDlg::OnBnClickedDownload()
 		return;
 	}
 
-	// ´´½¨ HTTP ÇëÇó¹ı³Ì
+	// åˆ›å»º HTTP è¯·æ±‚è¿‡ç¨‹
 	acl::string domain;
 	domain = "www.banmau.com";
 	//domain = "192.168.1.229";
@@ -206,9 +206,9 @@ void CHttpClientDlg::OnBnClickedDownload()
 	req->set_keep_alive(false);
 	req->set_method(acl::HTTP_METHOD_GET);
 	req->add_cookie("x-cookie-name", "cookie-value");
-	//req->set_redirect(1); // ÉèÖÃ×Ô¶¯ÖØ¶¨ÏòµÄ´ÎÊıÏŞÖÆ
+	//req->set_redirect(1); // è®¾ç½®è‡ªåŠ¨é‡å®šå‘çš„æ¬¡æ•°é™åˆ¶
 
-	// Í¨ÖªÒì²½ÏûÏ¢·şÎñÆ÷´¦Àí¸Ã HTTP ÇëÇó¹ı³Ì
+	// é€šçŸ¥å¼‚æ­¥æ¶ˆæ¯æœåŠ¡å™¨å¤„ç†è¯¥ HTTP è¯·æ±‚è¿‡ç¨‹
 
 	//////////////////////////////////////////////////////////////////////////
 	//acl::string buf;

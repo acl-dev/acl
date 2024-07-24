@@ -30,70 +30,70 @@ typedef struct BINHASH_INFO {
 #endif
 
 /**
- * ´´½¨Ò»¸ö¹şÏ£±í
- * @param size {int} ¹şÏ£±íµÄ³õÊ¼»¯´óĞ¡
- * @param flag {unsigned int} Óë ACL_MDT_IDX ÖĞµÄ flag ÏàÍ¬
- * @return {BINHASH*} ĞÂ´´½¨µÄ¹şÏ£±íÖ¸Õë
+ * åˆ›å»ºä¸€ä¸ªå“ˆå¸Œè¡¨
+ * @param size {int} å“ˆå¸Œè¡¨çš„åˆå§‹åŒ–å¤§å°
+ * @param flag {unsigned int} ä¸ ACL_MDT_IDX ä¸­çš„ flag ç›¸åŒ
+ * @return {BINHASH*} æ–°åˆ›å»ºçš„å“ˆå¸Œè¡¨æŒ‡é’ˆ
  */
 BINHASH *binhash_create(int size, unsigned int flag, int use_slice);
 
 /**
- * Ïò¹şÏ£±íÖĞÌí¼Ó¶ÔÏó
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const char*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @param value {char*} ¼üÖµ
- * @return {BINHASH_INFO*} ĞÂ´´½¨µÄ¹şÏ£ÌõÄ¿Ö¸Õë
+ * å‘å“ˆå¸Œè¡¨ä¸­æ·»åŠ å¯¹è±¡
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const char*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @param value {char*} é”®å€¼
+ * @return {BINHASH_INFO*} æ–°åˆ›å»ºçš„å“ˆå¸Œæ¡ç›®æŒ‡é’ˆ
  */
 BINHASH_INFO *binhash_enter(BINHASH *table, const char *key, int key_len, char *value);
 
 /**
- * ´Ó¹şÏ£±íÖĞ¸ù¾İ¼üÃûÈ¡µÃ¶ÔÓ¦µÄ¹şÏ£ÌõÄ¿
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const char*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @return {BINHASH_INFO*} ¹şÏ£ÌõÄ¿Ö¸Õë
+ * ä»å“ˆå¸Œè¡¨ä¸­æ ¹æ®é”®åå–å¾—å¯¹åº”çš„å“ˆå¸Œæ¡ç›®
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const char*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @return {BINHASH_INFO*} å“ˆå¸Œæ¡ç›®æŒ‡é’ˆ
  */
 BINHASH_INFO *binhash_locate(BINHASH *table, const char *key, int key_len);
 
 /**
- * ²éÑ¯Ä³¸ö¹şÏ£¼üµÄ¼üÖµ
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const char*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @return {char*} ¹şÏ£¼üÖµ
+ * æŸ¥è¯¢æŸä¸ªå“ˆå¸Œé”®çš„é”®å€¼
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const char*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @return {char*} å“ˆå¸Œé”®å€¼
  */
 char *binhash_find(BINHASH *table, const char *key, int key_len);
 
 /**
- * É¾³ıÄ³¸ö¹şÏ£Ïî
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param key {const char*} ¹şÏ£¼ü
- * @param key_len {int} key µÄ³¤¶È
- * @param free_fn {void (*)(char*)} ÓÃÀ´ÊÍ·Å¹şÏ£¼üÖµµÄº¯ÊıÖ¸Õë£¬Èç¹ûÎª¿ÕÔò²»ÔÚÄÚ²¿ÊÍ·Å¼üÖµ
+ * åˆ é™¤æŸä¸ªå“ˆå¸Œé¡¹
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param key {const char*} å“ˆå¸Œé”®
+ * @param key_len {int} key çš„é•¿åº¦
+ * @param free_fn {void (*)(char*)} ç”¨æ¥é‡Šæ”¾å“ˆå¸Œé”®å€¼çš„å‡½æ•°æŒ‡é’ˆï¼Œå¦‚æœä¸ºç©ºåˆ™ä¸åœ¨å†…éƒ¨é‡Šæ”¾é”®å€¼
  */
 void binhash_delete(BINHASH *table, const char *key, int key_len, void (*free_fn) (char *));
 
 /**
- * ÊÍ·Å¹şÏ£±í
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param free_fn {void (*)(char*)} Èç¹û²»Îª¿Õ£¬ÔòÓÃ´Ëº¯ÊıÀ´ÊÍ·Å¹şÏ£±íÄÚµÄËùÓĞ¼üÖµ
+ * é‡Šæ”¾å“ˆå¸Œè¡¨
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param free_fn {void (*)(char*)} å¦‚æœä¸ä¸ºç©ºï¼Œåˆ™ç”¨æ­¤å‡½æ•°æ¥é‡Šæ”¾å“ˆå¸Œè¡¨å†…çš„æ‰€æœ‰é”®å€¼
  */
 void binhash_free(BINHASH *table, void (*free_fn) (char *));
 
 /**
- * ±éÀúÕû¸ö¹şÏ£±í£¬²¢ÓÃÓÃ»§¸ø³öµÄ»Øµ÷º¯Êı²Ù×÷¹şÏ£±íÖĞµÄ¼üÖµ
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @param walk_fn {void (*)(BINHASH_INFO*, char*)} ÔÚ±éÀú¹şÏ£±íÖĞµÄÃ¿¸öÔªËØÊ±µÄ»Øµ÷º¯Êı
- * @param arg {char*} ÓÃ»§´«µİµÄ²ÎÊı£¬×÷Îª²ÎÊıÔÚ walk_fn ÖĞ´«µİ
+ * éå†æ•´ä¸ªå“ˆå¸Œè¡¨ï¼Œå¹¶ç”¨ç”¨æˆ·ç»™å‡ºçš„å›è°ƒå‡½æ•°æ“ä½œå“ˆå¸Œè¡¨ä¸­çš„é”®å€¼
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @param walk_fn {void (*)(BINHASH_INFO*, char*)} åœ¨éå†å“ˆå¸Œè¡¨ä¸­çš„æ¯ä¸ªå…ƒç´ æ—¶çš„å›è°ƒå‡½æ•°
+ * @param arg {char*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°ï¼Œä½œä¸ºå‚æ•°åœ¨ walk_fn ä¸­ä¼ é€’
  */
 void binhash_walk(BINHASH *table, void (*walk_fn) (BINHASH_INFO *, char *), char *arg);
 
 /**
- * ÁĞ³öµ±Ç°¹şÏ£±íÖĞµÄËùÓĞÔªËØÊı×éÁĞ±í
- * @param table {BINHASH*} ¹şÏ£±íÖ¸Õë
- * @return {BINHASH_INFO*} ¹şÏ£±íÖĞËùÓĞÔªËØ×é³ÉµÄBINHASH_INFOÊı×é, 
- *  ¸ÃÊı×éÖĞµÄ×îºóÒ»¸öÖ¸ÕëÎª NULL
+ * åˆ—å‡ºå½“å‰å“ˆå¸Œè¡¨ä¸­çš„æ‰€æœ‰å…ƒç´ æ•°ç»„åˆ—è¡¨
+ * @param table {BINHASH*} å“ˆå¸Œè¡¨æŒ‡é’ˆ
+ * @return {BINHASH_INFO*} å“ˆå¸Œè¡¨ä¸­æ‰€æœ‰å…ƒç´ ç»„æˆçš„BINHASH_INFOæ•°ç»„, 
+ *  è¯¥æ•°ç»„ä¸­çš„æœ€åä¸€ä¸ªæŒ‡é’ˆä¸º NULL
  */
 BINHASH_INFO **binhash_list(BINHASH *table);
 

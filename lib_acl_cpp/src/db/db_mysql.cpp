@@ -83,17 +83,17 @@ static mysql_server_end_fn __mysql_server_end = NULL;
 static acl_pthread_once_t __mysql_once = ACL_PTHREAD_ONCE_INIT;
 static ACL_DLL_HANDLE __mysql_dll = NULL;
 
-// ¼ÇÂ¼¶¯Ì¬¼ÓÔØ¿âµÄÈ«Â·¾¶
+// è®°å½•åŠ¨æ€åŠ è½½åº“çš„å…¨è·¯å¾„
 static acl::string __mysql_path;
 
-// ³ÌĞòÍË³öÊÍ·Å¶¯Ì¬¼ÓÔØµÄ¿â
+// ç¨‹åºé€€å‡ºé‡Šæ”¾åŠ¨æ€åŠ è½½çš„åº“
 #ifndef HAVE_NO_ATEXIT
 static void __mysql_dll_unload(void)
 {
 	if (__mysql_dll != NULL) {
-		// ¼´Ê¹Ö÷Ïß³ÌÃ»ÓĞµ÷ÓÃ mysql_thread_init ¹ı³Ì£¬ÕâÑù×öÒ²ÊÇ
-		// ÎŞº¦µÄ£¬ÒòÎª libmysqlclient ÄÚ²¿»á×Ô¶¯ÅĞ¶ÏÈ¡µÃµÄÏß³Ì
-		// ¾Ö²¿±äÁ¿ÊÇ·ñÓĞĞ§
+		// å³ä½¿ä¸»çº¿ç¨‹æ²¡æœ‰è°ƒç”¨ mysql_thread_init è¿‡ç¨‹ï¼Œè¿™æ ·åšä¹Ÿæ˜¯
+		// æ— å®³çš„ï¼Œå› ä¸º libmysqlclient å†…éƒ¨ä¼šè‡ªåŠ¨åˆ¤æ–­å–å¾—çš„çº¿ç¨‹
+		// å±€éƒ¨å˜é‡æ˜¯å¦æœ‰æ•ˆ
 #ifdef ACL_UNIX
 		if (__mysql_thread_end != NULL) {
 			__mysql_thread_end();
@@ -112,7 +112,7 @@ static void __mysql_dll_unload(void)
 }
 #endif
 
-// ¶¯Ì¬¼ÓÔØ libmysql.dll ¿â
+// åŠ¨æ€åŠ è½½ libmysql.dll åº“
 static void __mysql_dll_load(void)
 {
 	if (__mysql_dll != NULL) {
@@ -141,7 +141,7 @@ static void __mysql_dll_load(void)
 		return;
 	}
 
-	// ¼ÇÂ¼¶¯Ì¬¿âÂ·¾¶£¬ÒÔ±ãÓÚÔÚ¶¯Ì¬¿âĞ¶ÔØÊ±Êä³ö¿âÂ·¾¶Ãû
+	// è®°å½•åŠ¨æ€åº“è·¯å¾„ï¼Œä»¥ä¾¿äºåœ¨åŠ¨æ€åº“å¸è½½æ—¶è¾“å‡ºåº“è·¯å¾„å
 	__mysql_path = path;
 
 	__mysql_libversion = (mysql_libversion_fn)
@@ -412,7 +412,7 @@ namespace acl
 {
 
 //////////////////////////////////////////////////////////////////////////
-// mysql µÄ¼ÇÂ¼ĞĞÀàĞÍ¶¨Òå
+// mysql çš„è®°å½•è¡Œç±»å‹å®šä¹‰
 
 static void mysql_rows_free(void* ctx)
 {
@@ -431,12 +431,12 @@ static void mysql_rows_save(MYSQL_RES* my_res, db_rows& result)
 	int   ncolumn = __mysql_num_fields(my_res);
 	MYSQL_FIELD *fields = __mysql_fetch_fields(my_res);
 
-	// È¡³ö±äÁ¿Ãû
+	// å–å‡ºå˜é‡å
 	for (int j = 0; j < ncolumn; j++) {
 		result.names_.push_back(fields[j].name);
 	}
 
-	// ¿ªÊ¼È¡³öËùÓĞĞĞÊı¾İ½á¹û£¬¼ÓÈë¶¯Ì¬Êı×éÖĞ
+	// å¼€å§‹å–å‡ºæ‰€æœ‰è¡Œæ•°æ®ç»“æœï¼ŒåŠ å…¥åŠ¨æ€æ•°ç»„ä¸­
 	while (true) {
 		MYSQL_ROW my_row = __mysql_fetch_row(my_res);
 		if (my_row == NULL) {
@@ -472,7 +472,7 @@ void db_mysql::sane_mysql_init(const char* dbaddr, const char* dbname,
 		logger_fatal("dbname null");
 	}
 
-	// µØÖ·¸ñÊ½£º[dbname@]dbaddr
+	// åœ°å€æ ¼å¼ï¼š[dbname@]dbaddr
 	const char* ptr = strchr(dbaddr, '@');
 	if (ptr) {
 		ptr++;
@@ -700,7 +700,7 @@ bool db_mysql::dbopen(const char* charset /* = NULL */)
 			abort();
 		}
 
-		// µ÷ÓÃÏÂÃæº¯Êı¿ÉÄÜ»áÔì³ÉÄÚ´æÔ½½ç
+		// è°ƒç”¨ä¸‹é¢å‡½æ•°å¯èƒ½ä¼šé€ æˆå†…å­˜è¶Šç•Œ
 		//if (__mysql_thread_init != NULL)
 		//	__mysql_thread_init();
 
@@ -846,7 +846,7 @@ bool db_mysql::sane_mysql_query(const char* sql)
 		return false;
 	}
 
-	/* ÖØĞÂ´ò¿ªMYSQLÁ¬½Ó½øĞĞÖØÊÔ */
+	/* é‡æ–°æ‰“å¼€MYSQLè¿æ¥è¿›è¡Œé‡è¯• */
 	close();
 	if (!dbopen()) {
 		logger_error("reopen db(%s) error", dbname_);
@@ -891,7 +891,7 @@ bool db_mysql::tbl_exists(const char* tbl_name)
 
 bool db_mysql::sql_select(const char* sql, db_rows* result /* = NULL */)
 {
-	// ÓÅÏÈµ÷ÓÃ»ùÀà·½·¨ÊÍ·ÅÉÏ´ÎµÄ²éÑ¯½á¹û
+	// ä¼˜å…ˆè°ƒç”¨åŸºç±»æ–¹æ³•é‡Šæ”¾ä¸Šæ¬¡çš„æŸ¥è¯¢ç»“æœ
 	free_result();
 
 	if (!sane_mysql_query(sql)) {

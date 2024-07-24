@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "lib_acl.h"
-#include "lib_protocol.h"  // http Э�����
+#include "lib_protocol.h"  // http 协议相关
 #include "acl_cpp/lib_acl.hpp"
 
 class http_request : public acl::http_service_request
@@ -19,19 +19,19 @@ public:
 	~http_request(void)
 	{
 		printf("notify aio handle to stop!\r\n");
-		// ֪ͨ�첽�¼�������ȫ�˳�
+		// 通知异步事件引擎完全退出
 		handle_->stop();
 	}
 protected:
 	//////////////////////////////////////////////////////////////////////////
-	// ������ӿ�
+	// 基类虚接口
 
 	virtual const acl::string* get_body()
 	{
 		return (NULL);
 	}
 
-	// �������� HTTP ��Ӧͷʱ�Ļص��ӿ�
+	// 正常读到 HTTP 响应头时的回调接口
 	virtual void on_hdr(const char* addr, const HTTP_HDR_RES* hdr)
 	{
 		printf(">>server addr: %s, http reply status: %d\n",
@@ -47,7 +47,7 @@ protected:
 		time(&begin_);
 	}
 
-	// ������ HTTP ��Ӧ��ʱ�Ļص�����
+	// 正常读 HTTP 响应体时的回调函数
 	virtual void on_body(const char* data, size_t dlen)
 	{
 		if (data == NULL && dlen == 0)
@@ -59,7 +59,7 @@ protected:
 			printf("\n>> http reply body over, total: %lld, %lld\n",
 				content_length_, read_length_);
 #endif
-			// ��������Ϊ��������Ƕ�̬����ģ�������Ҫ�ڴ˴��ͷ�
+			// 出错后，因为本类对象是动态分配的，所以需要在此处释放
 			time_t end = time(NULL);
 			printf(">>spent %d seconds\n", (int)(end - begin_));
 
@@ -77,12 +77,12 @@ protected:
 			out_.write(data, dlen);
 	}
 
-	// ���������Ӧʧ��ʱ�Ļص�����
+	// 当请求或响应失败时的回调函数
 	virtual void on_error(acl::http_status_t errnum)
 	{
 		printf(">> error: %d\n", (int) errnum);
 
-		// ��������Ϊ��������Ƕ�̬����ģ�������Ҫ�ڴ˴��ͷ�
+		// 出错后，因为本类对象是动态分配的，所以需要在此处释放
 	}
 
 	virtual void destroy()
@@ -111,7 +111,7 @@ int main()
 	acl::aio_handle handle(acl::ENGINE_SELECT);
 	acl::http_service* service = new acl::http_service();
 
-	// ʹ��Ϣ���������� 127.0.0.1 �ĵ�ַ
+	// 使消息服务器监听 127.0.0.1 的地址
 	if (service->open(&handle) == false)
 	{
 		printf(">>open message service error!\n");
@@ -121,7 +121,7 @@ int main()
 	}
 
 
-	// ���� HTTP �������
+	// 创建 HTTP 请求过程
 	acl::string domain;
 	domain = "www.hexun.com";
 	//domain = "192.168.1.229";
@@ -133,9 +133,9 @@ int main()
 	req->set_keep_alive(false);
 	req->set_method(acl::HTTP_METHOD_GET);
 	req->add_cookie("x-cookie-name", "cookie-value");
-	//req->set_redirect(1); // �����Զ��ض���Ĵ�������
+	//req->set_redirect(1); // 设置自动重定向的次数限制
 
-	// ֪ͨ�첽��Ϣ������������ HTTP �������
+	// 通知异步消息服务器处理该 HTTP 请求过程
 
 	//////////////////////////////////////////////////////////////////////////
 	//acl::string buf;

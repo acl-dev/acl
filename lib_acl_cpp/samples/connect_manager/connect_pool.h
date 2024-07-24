@@ -9,7 +9,7 @@ public:
 	void set_timeout(int conn_timeout, int rw_timeout);
 
 protected:
-	// »ùÀà´¿Ğéº¯ÊıµÄÊµÏÖ
+	// åŸºç±»çº¯è™šå‡½æ•°çš„å®ç°
 	acl::connect_client* create_connect();
 
 private:

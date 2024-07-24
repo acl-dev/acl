@@ -89,9 +89,9 @@ struct ACL_LOG {
 	struct SOCK_ADDR from;
 	struct SOCK_ADDR dest;
 	int    from_len;
-	time_t last_open;		/**< ÉÏ´ÎÈÕÖ¾´ò¿ªÊ±¼ä */
-	time_t reopen_inter;		/**< ÈÕÖ¾ÖØÐÂ´ò¿ªµÄ×îÐ¡Ê±¼ä¼ä¸ô */
-	acl_uint64   count;		/**< ÒÑ¾­¼ÇÂ¼µÄÈÕÖ¾ÌõÊý */
+	time_t last_open;		/**< ä¸Šæ¬¡æ—¥å¿—æ‰“å¼€æ—¶é—´ */
+	time_t reopen_inter;		/**< æ—¥å¿—é‡æ–°æ‰“å¼€çš„æœ€å°æ—¶é—´é—´éš” */
+	acl_uint64   count;		/**< å·²ç»è®°å½•çš„æ—¥å¿—æ¡æ•° */
 };
 
 #ifdef ACL_WINDOWS
@@ -147,8 +147,8 @@ static void init_log_mutex(acl_pthread_mutex_t *lock)
 
 	n1 = pthread_mutexattr_init(&attr);
 
-	/* Ê¹ÓÃÁË pthread_atfork() À´±ÜÃâ fork ºóµÄËÀËø£¬ÒòÎªÔÚ fork Ç°µ÷ÓÃ¹ý
-	 * ¼ÓËø¹ý³Ì£¬ËùÒÔÐè½«´ËËøÉèÎªµÝ¹éËø --- zsx, 2019.8.6
+	/* ä½¿ç”¨äº† pthread_atfork() æ¥é¿å… fork åŽçš„æ­»é”ï¼Œå› ä¸ºåœ¨ fork å‰è°ƒç”¨è¿‡
+	 * åŠ é”è¿‡ç¨‹ï¼Œæ‰€ä»¥éœ€å°†æ­¤é”è®¾ä¸ºé€’å½’é” --- zsx, 2019.8.6
 	 */
 # if defined(ACL_FREEBSD) || defined(ACL_SUNOS5) || defined(ACL_MACOSX) || defined(ALPINE)
 	n2 = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
@@ -650,13 +650,13 @@ static void fork_in_child(void)
 #endif
 
 /*
- * recipients ¿ÉÒÔÊÇÒÔÏÂÈÕÖ¾¸ñÊ½µÄ×éºÏ:
+ * recipients å¯ä»¥æ˜¯ä»¥ä¸‹æ—¥å¿—æ ¼å¼çš„ç»„åˆ:
  *  tcp:127.0.0.1:8088
  *  udp:127.0.0.1:8088
  *  unix:/var/log/unix.sock
  *  file:/var/log/unix.log
  *  /var/log/unix.log
- * Èç£ºtcp:127.0.0.1:8088|/var/log/unix.log
+ * å¦‚ï¼štcp:127.0.0.1:8088|/var/log/unix.log
  */
 int acl_open_log(const char *recipients, const char *logpre)
 {

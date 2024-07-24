@@ -26,7 +26,7 @@ struct FIBER_CPP_API fiber_frame {
 };
 
 /**
- * Ğ­³ÌÀà¶¨Òå£¬´¿ĞéÀà£¬ĞèÒª×ÓÀà¼Ì³Ğ²¢ÊµÏÖ´¿Ğé·½·¨
+ * åç¨‹ç±»å®šä¹‰ï¼Œçº¯è™šç±»ï¼Œéœ€è¦å­ç±»ç»§æ‰¿å¹¶å®ç°çº¯è™šæ–¹æ³•
  */
 class FIBER_CPP_API fiber {
 public:
@@ -34,277 +34,277 @@ public:
 	fiber(ACL_FIBER *fb);
 
 	/**
-	 * ¹¹Ôìº¯Êı
-	 * @param running {bool} µ±Îª true Ê±£¬Ôò±íÊ¾µ±Ç°Ğ­³ÌÒÑÆô¶¯£¬½öÊÇÉùÃ÷
-	 *  ÁËÒ»¸öĞ­³Ì¶ÔÏó¶øÒÑ£¬ÒÔ±ãÓÚÓë ACL_FIBER ¶ÔÏó°ó¶¨£¬´ËÊ±½ûÖ¹µ÷ÓÃ±¾¶Ô
-	 *  ÏóµÄ start ·½·¨Æô¶¯ĞÂĞ­³Ì; µ±Îª false Ê±£¬ÔòĞèÒªµ÷ÓÃ start ·½·¨À´
-	 *  Æô¶¯ĞÂĞ­³Ì
+	 * æ„é€ å‡½æ•°
+	 * @param running {bool} å½“ä¸º true æ—¶ï¼Œåˆ™è¡¨ç¤ºå½“å‰åç¨‹å·²å¯åŠ¨ï¼Œä»…æ˜¯å£°æ˜
+	 *  äº†ä¸€ä¸ªåç¨‹å¯¹è±¡è€Œå·²ï¼Œä»¥ä¾¿äºä¸ ACL_FIBER å¯¹è±¡ç»‘å®šï¼Œæ­¤æ—¶ç¦æ­¢è°ƒç”¨æœ¬å¯¹
+	 *  è±¡çš„ start æ–¹æ³•å¯åŠ¨æ–°åç¨‹; å½“ä¸º false æ—¶ï¼Œåˆ™éœ€è¦è°ƒç”¨ start æ–¹æ³•æ¥
+	 *  å¯åŠ¨æ–°åç¨‹
 	 */
 	fiber(bool running);
 
 	virtual ~fiber(void);
 
 	/**
-	 * ÔÚ´´½¨Ò»¸öĞ­³ÌÀà¶ÔÏóÇÒ¹¹Ôì²ÎÊı running Îª false Ê±£¬ĞèÒª±¾º¯ÊıÆô¶¯
-	 * Ğ­³Ì£¬È»ºó×ÓÀàµÄÖØÔØµÄ run ·½·¨½«±»»Øµ÷£¬Èç¹û running Îª true Ê±£¬
-	 * Ôò½ûÖ¹µ÷ÓÃ start ·½·¨
-	 * @param stack_size {size_t} ´´½¨µÄĞ­³Ì¶ÔÏóµÄÕ»´óĞ¡
-	 * @param share_stack {bool} ÊÇ·ñ²ÉÓÃ¹²ÏíÕ»·½Ê½(ÈôÒª²ÉÓÃ¹²ÏíÕ»·½Ê½£¬
-	 *  ±ØĞëÔÚ±àÒë libfiber.a Ê±½«±àÒë¿ª¹Ø SHARE_STACK ´ò¿ª)
+	 * åœ¨åˆ›å»ºä¸€ä¸ªåç¨‹ç±»å¯¹è±¡ä¸”æ„é€ å‚æ•° running ä¸º false æ—¶ï¼Œéœ€è¦æœ¬å‡½æ•°å¯åŠ¨
+	 * åç¨‹ï¼Œç„¶åå­ç±»çš„é‡è½½çš„ run æ–¹æ³•å°†è¢«å›è°ƒï¼Œå¦‚æœ running ä¸º true æ—¶ï¼Œ
+	 * åˆ™ç¦æ­¢è°ƒç”¨ start æ–¹æ³•
+	 * @param stack_size {size_t} åˆ›å»ºçš„åç¨‹å¯¹è±¡çš„æ ˆå¤§å°
+	 * @param share_stack {bool} æ˜¯å¦é‡‡ç”¨å…±äº«æ ˆæ–¹å¼(è‹¥è¦é‡‡ç”¨å…±äº«æ ˆæ–¹å¼ï¼Œ
+	 *  å¿…é¡»åœ¨ç¼–è¯‘ libfiber.a æ—¶å°†ç¼–è¯‘å¼€å…³ SHARE_STACK æ‰“å¼€)
 	 */
 	void start(size_t stack_size = 320000, bool share_stack = false);
 
 	/**
-	 * ÔÚ±¾Ğ­³ÌÔËĞĞÊ±µ÷ÓÃ´Ëº¯ÊıÍ¨Öª¸ÃĞ­³ÌÍË³ö
-	 * @param sync {bool} ÊÇ·ñ²ÉÓÃÍ¬²½·½Ê½£¬¼´ÊÇ·ñµÈ´ı±» kill Ğ­³Ì·µ»Øºó
-	 *  ±¾Ğ­³Ì²Å·µ»Ø
-	 * @return {bool} ·µ»Ø false ±íÊ¾±¾Ğ­³ÌÎ´Æô¶¯»òÒÑ¾­ÍË³ö
+	 * åœ¨æœ¬åç¨‹è¿è¡Œæ—¶è°ƒç”¨æ­¤å‡½æ•°é€šçŸ¥è¯¥åç¨‹é€€å‡º
+	 * @param sync {bool} æ˜¯å¦é‡‡ç”¨åŒæ­¥æ–¹å¼ï¼Œå³æ˜¯å¦ç­‰å¾…è¢« kill åç¨‹è¿”å›å
+	 *  æœ¬åç¨‹æ‰è¿”å›
+	 * @return {bool} è¿”å› false è¡¨ç¤ºæœ¬åç¨‹æœªå¯åŠ¨æˆ–å·²ç»é€€å‡º
 	 */
 	bool kill(bool sync = false);
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°Ğ­³ÌÊÇ·ñ±»Í¨ÖªÍË³ö
-	 * @return {bool} ±¾Ğ­³ÌÊÇ·ñ±»Í¨ÖªÍË³ö
+	 * åˆ¤æ–­å½“å‰åç¨‹æ˜¯å¦è¢«é€šçŸ¥é€€å‡º
+	 * @return {bool} æœ¬åç¨‹æ˜¯å¦è¢«é€šçŸ¥é€€å‡º
 	 */
 	bool killed(void) const;
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°ÕıÔÚÔËĞĞµÄĞ­³ÌÊÇ·ñ±»Í¨ÖªÍË³ö£¬¸Ã·½·¨Óë killed µÄÇø±ğÎª£¬
-	 * killed Ê×ÏÈ±ØĞëÓĞ acl::fiber ¶ÔÏóÒÀÍĞ£¬ÇÒ¸ÃĞ­³Ì¶ÔÏóÓĞ¿ÉÄÜÕıÔÚÔËĞĞ£¬
-	 * Ò²ÓĞ¿ÉÄÜ±»¹ÒÆğ£¬¶ø self_killed ²»ĞèÒª acl::fiber ¶ÔÏóÒÀÍĞÇÒÒ»¶¨±íÊ¾
-	 * µ±Ç°ÕıÔÚÔËĞĞµÄĞ­³Ì
+	 * åˆ¤æ–­å½“å‰æ­£åœ¨è¿è¡Œçš„åç¨‹æ˜¯å¦è¢«é€šçŸ¥é€€å‡ºï¼Œè¯¥æ–¹æ³•ä¸ killed çš„åŒºåˆ«ä¸ºï¼Œ
+	 * killed é¦–å…ˆå¿…é¡»æœ‰ acl::fiber å¯¹è±¡ä¾æ‰˜ï¼Œä¸”è¯¥åç¨‹å¯¹è±¡æœ‰å¯èƒ½æ­£åœ¨è¿è¡Œï¼Œ
+	 * ä¹Ÿæœ‰å¯èƒ½è¢«æŒ‚èµ·ï¼Œè€Œ self_killed ä¸éœ€è¦ acl::fiber å¯¹è±¡ä¾æ‰˜ä¸”ä¸€å®šè¡¨ç¤º
+	 * å½“å‰æ­£åœ¨è¿è¡Œçš„åç¨‹
 	 * @return {bool}
 	 */
 	static bool self_killed(void);
 
 	/**
-	 * »ñµÃ±¾Ğ­³Ì¶ÔÏóµÄ ID ºÅ
+	 * è·å¾—æœ¬åç¨‹å¯¹è±¡çš„ ID å·
 	 * @return {unsigned int}
 	 */
 	unsigned int get_id(void) const;
 
 	/**
-	 * »ñµÃµ±Ç°ÔËĞĞµÄĞ­³Ì¶ÔÏóµÄ ID ºÅ
+	 * è·å¾—å½“å‰è¿è¡Œçš„åç¨‹å¯¹è±¡çš„ ID å·
 	 * @return {unsigned int}
 	 */
 	static unsigned int self(void);
 
 	/**
-	 * »ñµÃÖ¸¶¨Ğ­³Ì¶ÔÏóµÄIDºÅ
+	 * è·å¾—æŒ‡å®šåç¨‹å¯¹è±¡çš„IDå·
 	 * @return {unsigned int}
 	 */
 	static unsigned int fiber_id(const fiber& fb);
 
 	/**
-	 * »ñµÃµ±Ç°Ğ­³ÌÔÚÖ´ĞĞÄ³¸öÏµÍ³ API ³ö´íÊ±µÄ´íÎóºÅ
+	 * è·å¾—å½“å‰åç¨‹åœ¨æ‰§è¡ŒæŸä¸ªç³»ç»Ÿ API å‡ºé”™æ—¶çš„é”™è¯¯å·
 	 * return {int}
 	 */
 	int get_errno(void) const;
 
 	/**
-	 * ÉèÖÃµ±Ç°Ğ­³ÌµÄ´íÎóºÅ
+	 * è®¾ç½®å½“å‰åç¨‹çš„é”™è¯¯å·
 	 * @param errnum {int}
 	 */
 	void set_errno(int errnum);
 
 	/**
-	 * Çå³ıµ±Ç°Ğ­³ÌµÄ´íÎóºÅ¼°±ê¼ÇÎ»
+	 * æ¸…é™¤å½“å‰åç¨‹çš„é”™è¯¯å·åŠæ ‡è®°ä½
 	 */
 	static void clear(void);
 
 public:
 	/**
-	 * »ñµÃ±¾´Î²Ù×÷µÄ³ö´íĞÅÏ¢
+	 * è·å¾—æœ¬æ¬¡æ“ä½œçš„å‡ºé”™ä¿¡æ¯
 	 * @return {const char*}
 	 */
 	static const char* last_serror(void);
 
 	/**
-	 * »ñµÃ±¾´Î²Ù×÷µÄ³ö´íºÅ
+	 * è·å¾—æœ¬æ¬¡æ“ä½œçš„å‡ºé”™å·
 	 * @return {int}
 	 */
 	static int last_error(void);
 
 	/**
-	 * ½«Ëù¸ø´íÎóºÅ×ª³ÉÃèÊöĞÅÏ¢
-	 * @param errnum {int} ´íÎóºÅ
-	 * @param buf {char*} ´æ´¢½á¹û
-	 * @param size {size_t} buf ¿Õ¼ä´óĞ¡
-	 * @return {const char*} buf µØÖ·
+	 * å°†æ‰€ç»™é”™è¯¯å·è½¬æˆæè¿°ä¿¡æ¯
+	 * @param errnum {int} é”™è¯¯å·
+	 * @param buf {char*} å­˜å‚¨ç»“æœ
+	 * @param size {size_t} buf ç©ºé—´å¤§å°
+	 * @return {const char*} buf åœ°å€
 	 */
 	static const char* strerror(int errnum, char* buf, size_t size);
 
 	/**
-	 * ½«´íÎóĞÅÏ¢Êä³öÖÁ±ê×¼Êä³ö
-	 * @param on {bool} Îª true Ê±£¬ÄÚ²¿³ö´íĞÅÏ¢½«Êä³öÖÁ±ê×¼Êä³ö
+	 * å°†é”™è¯¯ä¿¡æ¯è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
+	 * @param on {bool} ä¸º true æ—¶ï¼Œå†…éƒ¨å‡ºé”™ä¿¡æ¯å°†è¾“å‡ºè‡³æ ‡å‡†è¾“å‡º
 	 */
 	static void stdout_open(bool on);
 
 	/**
-	 * ÉèÖÃ±¾½ø³Ì×î´ó¿É´´½¨µÄ¾ä±úÊıÁ¿
-	 * @param max {int} >= 0 Ê±ÓĞĞ§
-	 * @return {int} ·µ»Øµ±Ç°¿ÉÓÃµÄ×î´ó¾ä±úÊıÁ¿
+	 * è®¾ç½®æœ¬è¿›ç¨‹æœ€å¤§å¯åˆ›å»ºçš„å¥æŸ„æ•°é‡
+	 * @param max {int} >= 0 æ—¶æœ‰æ•ˆ
+	 * @return {int} è¿”å›å½“å‰å¯ç”¨çš„æœ€å¤§å¥æŸ„æ•°é‡
 	 */
 	static int set_fdlimit(int max);
 
 	/**
-	 * ÏÔÊ½ÉèÖÃĞ­³Ìµ÷¶ÈÊÂ¼şÒıÇæÀàĞÍ£¬Í¬Ê±ÉèÖÃĞ­³Ìµ÷¶ÈÆ÷Îª×ÔÆô¶¯Ä£Ê½£¬¼´µ±
-	 * ´´½¨Ğ­³Ìºó²»±ØÏÔÊ½µ÷ÓÃ schedule »ò schedule_with À´Æô¶¯Ğ­³Ìµ÷¶ÈÆ÷
-	 * @param type {fiber_event_t} ÊÂ¼şÒıÇæÀàĞÍ£¬²Î¼û£ºFIBER_EVENT_T_XXX
-	 * @param schedule_auto {bool} ÈôÎª true£¬Ôò´´½¨Ğ­³Ì¶ÔÏóºó²¢ÔËĞĞ¸ÃĞ­³Ì
-	 *  ¶ÔÏóºó²»±ØÏÔÊ½µ÷ÓÃ schedule/schedule_with À´Æô¶¯ËùÓĞµÄĞ­³Ì¹ı³Ì£¬ÄÚ
-	 *  ²¿»á×Ô¶¯Æô¶¯Ğ­³Ìµ÷¶ÈÆ÷£»·ñÔò£¬ÔÚ´´½¨²¢Æô¶¯Ğ­³Ìºó£¬±ØĞëÏÔÊ½µØµ÷ÓÃ
-	 *  schedule »ò schedule_with ·½Ê½À´Æô¶¯Ğ­³Ìµ÷¶ÈÆ÷ÒÔÔËĞĞËùµÄĞ­³Ì¹ı³Ì£»
-	 *  ÄÚ²¿È±Ê¡×´Ì¬Îª false
+	 * æ˜¾å¼è®¾ç½®åç¨‹è°ƒåº¦äº‹ä»¶å¼•æ“ç±»å‹ï¼ŒåŒæ—¶è®¾ç½®åç¨‹è°ƒåº¦å™¨ä¸ºè‡ªå¯åŠ¨æ¨¡å¼ï¼Œå³å½“
+	 * åˆ›å»ºåç¨‹åä¸å¿…æ˜¾å¼è°ƒç”¨ schedule æˆ– schedule_with æ¥å¯åŠ¨åç¨‹è°ƒåº¦å™¨
+	 * @param type {fiber_event_t} äº‹ä»¶å¼•æ“ç±»å‹ï¼Œå‚è§ï¼šFIBER_EVENT_T_XXX
+	 * @param schedule_auto {bool} è‹¥ä¸º trueï¼Œåˆ™åˆ›å»ºåç¨‹å¯¹è±¡åå¹¶è¿è¡Œè¯¥åç¨‹
+	 *  å¯¹è±¡åä¸å¿…æ˜¾å¼è°ƒç”¨ schedule/schedule_with æ¥å¯åŠ¨æ‰€æœ‰çš„åç¨‹è¿‡ç¨‹ï¼Œå†…
+	 *  éƒ¨ä¼šè‡ªåŠ¨å¯åŠ¨åç¨‹è°ƒåº¦å™¨ï¼›å¦åˆ™ï¼Œåœ¨åˆ›å»ºå¹¶å¯åŠ¨åç¨‹åï¼Œå¿…é¡»æ˜¾å¼åœ°è°ƒç”¨
+	 *  schedule æˆ– schedule_with æ–¹å¼æ¥å¯åŠ¨åç¨‹è°ƒåº¦å™¨ä»¥è¿è¡Œæ‰€çš„åç¨‹è¿‡ç¨‹ï¼›
+	 *  å†…éƒ¨ç¼ºçœçŠ¶æ€ä¸º false
 	 */
 	static void init(fiber_event_t type, bool schedule_auto = false);
 
 	/**
-	 * Æô¶¯Ğ­³ÌÔËĞĞµÄµ÷¶È¹ı³Ì
-	 * @param type {fiber_event_t} ÊÂ¼şÒıÇæÀàĞÍ£¬²Î¼û£ºFIBER_EVENT_T_XXX
+	 * å¯åŠ¨åç¨‹è¿è¡Œçš„è°ƒåº¦è¿‡ç¨‹
+	 * @param type {fiber_event_t} äº‹ä»¶å¼•æ“ç±»å‹ï¼Œå‚è§ï¼šFIBER_EVENT_T_XXX
 	 */
 	static void schedule(fiber_event_t type = FIBER_EVENT_T_KERNEL);
 
 	/**
-	 * Æô¶¯Ğ­³Ìµ÷¶ÈÊ±Ö¸¶¨ÊÂ¼şÒıÇæÀàĞÍ£¬µ÷ÓÃ±¾·½·¨µÈÓÚÍ¬Ê±µ÷ÓÃÁË schedule_init
-	 * ¼° schedule Á½¸ö·½·¨
-	 * @param type {fiber_event_t} ÊÂ¼şÒıÇæÀàĞÍ£¬²Î¼û£ºFIBER_EVENT_T_XXX
+	 * å¯åŠ¨åç¨‹è°ƒåº¦æ—¶æŒ‡å®šäº‹ä»¶å¼•æ“ç±»å‹ï¼Œè°ƒç”¨æœ¬æ–¹æ³•ç­‰äºåŒæ—¶è°ƒç”¨äº† schedule_init
+	 * åŠ schedule ä¸¤ä¸ªæ–¹æ³•
+	 * @param type {fiber_event_t} äº‹ä»¶å¼•æ“ç±»å‹ï¼Œå‚è§ï¼šFIBER_EVENT_T_XXX
 	 */
 	static void schedule_with(fiber_event_t type);
 
 	/**
-	 * ÅĞ¶Ïµ±Ç°Ïß³ÌÊÇ·ñ´¦ÓÚĞ­³Ìµ÷¶È×´Ì¬
+	 * åˆ¤æ–­å½“å‰çº¿ç¨‹æ˜¯å¦å¤„äºåç¨‹è°ƒåº¦çŠ¶æ€
 	 * @return {bool}
 	 */
 	static bool scheduled(void);
 
 	/**
-	 *  Í£Ö¹Ğ­³Ìµ÷¶È¹ı³Ì
+	 *  åœæ­¢åç¨‹è°ƒåº¦è¿‡ç¨‹
 	 */
 	static void schedule_stop(void);
 
 public:
 	/**
-	 * ½«µ±Ç°ÕıÔÚÔËĞĞµÄĞ­³Ì(¼´±¾Ğ­³Ì) ¹ÒÆğ
+	 * å°†å½“å‰æ­£åœ¨è¿è¡Œçš„åç¨‹(å³æœ¬åç¨‹) æŒ‚èµ·
 	 */
 	static void yield(void);
 
 	/**
-	 * ¹ÒÆğµ±Ç°Ğ­³Ì£¬Ö´ĞĞµÈ´ı¶ÓÁĞÖĞµÄÏÂÒ»¸öĞ­³Ì
+	 * æŒ‚èµ·å½“å‰åç¨‹ï¼Œæ‰§è¡Œç­‰å¾…é˜Ÿåˆ—ä¸­çš„ä¸‹ä¸€ä¸ªåç¨‹
 	 */
 	static void switch_to_next(void);
 
 	/**
-	 * ½«Ö¸¶¨Ğ­³Ì¶ÔÏóÖÃÈë´ıÔËĞĞ¶ÓÁĞÖĞ
+	 * å°†æŒ‡å®šåç¨‹å¯¹è±¡ç½®å…¥å¾…è¿è¡Œé˜Ÿåˆ—ä¸­
 	 * @param f {fiber&}
 	 */
 	static void ready(fiber& f);
 
 	/**
-	 * Ê¹µ±Ç°ÔËĞĞµÄĞ­³ÌĞİÃßÖ¸¶¨ºÁÃëÊı
-	 * @param milliseconds {size_t} Ö¸¶¨ÒªĞİÃßµÄºÁÃëÊı
-	 * @return {size_t} ±¾Ğ­³ÌĞİÃßºóÔÙ´Î±»»½ĞÑºóÊ£ÓàµÄºÁÃëÊı
+	 * ä½¿å½“å‰è¿è¡Œçš„åç¨‹ä¼‘çœ æŒ‡å®šæ¯«ç§’æ•°
+	 * @param milliseconds {size_t} æŒ‡å®šè¦ä¼‘çœ çš„æ¯«ç§’æ•°
+	 * @return {size_t} æœ¬åç¨‹ä¼‘çœ åå†æ¬¡è¢«å”¤é†’åå‰©ä½™çš„æ¯«ç§’æ•°
 	 */
 	static size_t delay(size_t milliseconds);
 
 	/**
-	 * »ñµÃ´¦ÓÚ´æ»î×´Ì¬µÄĞ­³ÌÊıÁ¿
+	 * è·å¾—å¤„äºå­˜æ´»çŠ¶æ€çš„åç¨‹æ•°é‡
 	 * @return {unsigned}
 	 */
 	static unsigned alive_number(void);
 
 	/**
-	 * »ñµÃ´¦ÓÚÍË³ö×´Ì¬µÄĞ­³Ì¶ÔÏóÊıÁ¿
+	 * è·å¾—å¤„äºé€€å‡ºçŠ¶æ€çš„åç¨‹å¯¹è±¡æ•°é‡
 	 * @return {unsigned}
 	 */
 	static unsigned dead_number(void);
 
 	/**
-	 * ÉèÖÃ±¾Ïß³ÌÖĞËùÓĞĞ­³ÌÔÚÁ¬½Ó·şÎñ¶ËÊ±¶¼²ÉÓÃÁË´ø³¬Ê±µÄ·Ç×èÈû·½Ê½£¨½öÏŞWindows)
+	 * è®¾ç½®æœ¬çº¿ç¨‹ä¸­æ‰€æœ‰åç¨‹åœ¨è¿æ¥æœåŠ¡ç«¯æ—¶éƒ½é‡‡ç”¨äº†å¸¦è¶…æ—¶çš„éé˜»å¡æ–¹å¼ï¼ˆä»…é™Windows)
 	 * @param yes {bool}
 	 */
 	static void set_non_blocking(bool yes);
 
 	/**
-	 * ÔÚÆôÓÃ¹²ÏíÕ»Ä£Ê½ÏÂÉèÖÃ¹²ÏíÕ»µÄ´óĞ¡,ÄÚ²¿È±Ê¡ÖµÎª 1024000 ×Ö½Ú
-	 * @param size {size_t} ¹²ÏíÕ»ÄÚ´æ´óĞ¡
+	 * åœ¨å¯ç”¨å…±äº«æ ˆæ¨¡å¼ä¸‹è®¾ç½®å…±äº«æ ˆçš„å¤§å°,å†…éƒ¨ç¼ºçœå€¼ä¸º 1024000 å­—èŠ‚
+	 * @param size {size_t} å…±äº«æ ˆå†…å­˜å¤§å°
 	 */
 	static void set_shared_stack_size(size_t size);
 
 	/**
-	 * ÔÚÆôÓÃ¹²ÏíÕ»Ä£Ê½ÏÂ»ñµÃ¹²ÏíÕ»´óĞ¡
-	 * @return {size_t} Èç¹û·µ»Ø 0 Ôò±íÊ¾Î´ÆôÓÃ¹²ÏíÕ»·½Ê½
+	 * åœ¨å¯ç”¨å…±äº«æ ˆæ¨¡å¼ä¸‹è·å¾—å…±äº«æ ˆå¤§å°
+	 * @return {size_t} å¦‚æœè¿”å› 0 åˆ™è¡¨ç¤ºæœªå¯ç”¨å…±äº«æ ˆæ–¹å¼
 	 */
 	static size_t get_shared_stack_size(void);
 
 	/**
-	 * ÏÔÊ½µ÷ÓÃ±¾º¯ÊıÊ¹ acl »ù´¡¿âµÄ IO ¹ı³ÌĞ­³Ì»¯£¬ÔÚ UNIX Æ½Ì¨ÏÂ²»±ØÏÔÊ½
-	 * µ÷ÓÃ±¾º¯Êı£¬ÒòÎªÄÚ²¿»á×Ô¶¯ HOOK IO API
+	 * æ˜¾å¼è°ƒç”¨æœ¬å‡½æ•°ä½¿ acl åŸºç¡€åº“çš„ IO è¿‡ç¨‹åç¨‹åŒ–ï¼Œåœ¨ UNIX å¹³å°ä¸‹ä¸å¿…æ˜¾å¼
+	 * è°ƒç”¨æœ¬å‡½æ•°ï¼Œå› ä¸ºå†…éƒ¨ä¼šè‡ªåŠ¨ HOOK IO API
 	 */
 	static void acl_io_hook(void);
 
 	/**
-	 * µ÷ÓÃ±¾º¯ÊıÈ¡Ïû acl»ù´¡¿âÖĞµÄ IO Ğ­³Ì»¯
+	 * è°ƒç”¨æœ¬å‡½æ•°å–æ¶ˆ aclåŸºç¡€åº“ä¸­çš„ IO åç¨‹åŒ–
 	 */
 	static void acl_io_unlock(void);
 
 	/**
-	 * Windows Æ½Ì¨ÏÂ¿ÉÒÔÏÔÊ½µØµ÷ÓÃ´Ëº¯Êı Hook Ò»Ğ©ÓëÍøÂçĞ­³ÌÏà¹ØµÄÏµÍ³ API
+	 * Windows å¹³å°ä¸‹å¯ä»¥æ˜¾å¼åœ°è°ƒç”¨æ­¤å‡½æ•° Hook ä¸€äº›ä¸ç½‘ç»œåç¨‹ç›¸å…³çš„ç³»ç»Ÿ API
 	 * @return {bool}
 	 */
 	static bool winapi_hook(void);
 
 	/**
-	 * »ñµÃµ±Ç°ÏµÍ³¼¶´íÎóºÅ
+	 * è·å¾—å½“å‰ç³»ç»Ÿçº§é”™è¯¯å·
 	 * @return {int}
 	 */
 	static int  get_sys_errno(void);
 
 	/**
-	 * ÉèÖÃµ±Ç°ÏµÍ³¼¶´íÎóºÅ
+	 * è®¾ç½®å½“å‰ç³»ç»Ÿçº§é”™è¯¯å·
 	 * @param errnum {int}
 	 */
 	static void set_sys_errno(int errnum);
 
 public:
 	/**
-	 * ·µ»Ø±¾Ğ­³Ì¶ÔÏó¶ÔÓ¦µÄ C ÓïÑÔµÄĞ­³Ì¶ÔÏó
+	 * è¿”å›æœ¬åç¨‹å¯¹è±¡å¯¹åº”çš„ C è¯­è¨€çš„åç¨‹å¯¹è±¡
 	 * @return {ACL_FIBER* }
 	 */
 	ACL_FIBER* get_fiber(void) const;
 
 	/**
-	 * µ×²ãµ÷ÓÃ C API ´´½¨Ğ­³Ì
-	 * @param fn {void (*)(ACL_FIBER*, void*)} Ğ­³Ìº¯ÊıÖ´ĞĞÈë¿Ú
-	 * @param ctx {void*} ´«µİ¸øĞ­³ÌÖ´ĞĞº¯ÊıµÄ²ÎÊı
-	 * @param size {size_t} Ğ­³ÌÕ»´óĞ¡
-	 * @param share_stack {bool} ÊÇ·ñ´´½¨¹²ÏíÕ»Ğ­³Ì
+	 * åº•å±‚è°ƒç”¨ C API åˆ›å»ºåç¨‹
+	 * @param fn {void (*)(ACL_FIBER*, void*)} åç¨‹å‡½æ•°æ‰§è¡Œå…¥å£
+	 * @param ctx {void*} ä¼ é€’ç»™åç¨‹æ‰§è¡Œå‡½æ•°çš„å‚æ•°
+	 * @param size {size_t} åç¨‹æ ˆå¤§å°
+	 * @param share_stack {bool} æ˜¯å¦åˆ›å»ºå…±äº«æ ˆåç¨‹
 	 * @return {ACL_FIBER*}
 	 */
 	static ACL_FIBER* fiber_create(void (*fn)(ACL_FIBER*, void*),
 			void* ctx, size_t size, bool share_stack = false);
 
 	/**
-	 * »ñµÃÖ¸¶¨Ğ­³ÌµÄ¶ÑÕ»
+	 * è·å¾—æŒ‡å®šåç¨‹çš„å †æ ˆ
 	 * @param fb {const fiber&}
-	 * @param out {std::vector<stack_frame>&} ´æ·Å½á¹ûÊı¾İ
-	 * @param max {size_t} Ö¸¶¨»ñÈ¡Õ»µÄ×î´óÉî¶È
+	 * @param out {std::vector<stack_frame>&} å­˜æ”¾ç»“æœæ•°æ®
+	 * @param max {size_t} æŒ‡å®šè·å–æ ˆçš„æœ€å¤§æ·±åº¦
 	 */
 	static void stacktrace(const fiber& fb, std::vector<fiber_frame>& out,
 			size_t max = 50);
 
 	/**
-	 * Êä³öÖ¸¶¨Ğ­³ÌµÄÕ»ÖÁ±ê×¼Êä³ö
+	 * è¾“å‡ºæŒ‡å®šåç¨‹çš„æ ˆè‡³æ ‡å‡†è¾“å‡º
 	 * @param fb {const fiber&}
-	 * @param max {size_t} ¿ÉÒÔÏÔÊ¾Õ»µÄ×î´óÉî¶È
+	 * @param max {size_t} å¯ä»¥æ˜¾ç¤ºæ ˆçš„æœ€å¤§æ·±åº¦
 	 */
 	static void stackshow(const fiber& fb, size_t max = 50);
 
 protected:
 	/**
-	 * Ğéº¯Êı£¬×ÓÀàĞëÊµÏÖ±¾º¯Êı£¬µ±Í¨¹ıµ÷ÓÃ start ·½·¨Æô¶¯Ğ­³Ìºó£¬±¾
-	 * Ğéº¯Êı½«»á±»µ÷ÓÃ£¬´Ó¶øÍ¨Öª×ÓÀàĞ­³ÌÒÑÆô¶¯; Èç¹ûÔÚ¹¹Ôìº¯ÊıÖĞµÄ²ÎÊı
-	 * running Îª true £¬Ôò start ½«±»½ûÖ¹µ÷ÓÃ£¬¹Ê±¾Ğé·½·¨Ò²²»»á±»µ÷ÓÃ
+	 * è™šå‡½æ•°ï¼Œå­ç±»é¡»å®ç°æœ¬å‡½æ•°ï¼Œå½“é€šè¿‡è°ƒç”¨ start æ–¹æ³•å¯åŠ¨åç¨‹åï¼Œæœ¬
+	 * è™šå‡½æ•°å°†ä¼šè¢«è°ƒç”¨ï¼Œä»è€Œé€šçŸ¥å­ç±»åç¨‹å·²å¯åŠ¨; å¦‚æœåœ¨æ„é€ å‡½æ•°ä¸­çš„å‚æ•°
+	 * running ä¸º true ï¼Œåˆ™ start å°†è¢«ç¦æ­¢è°ƒç”¨ï¼Œæ•…æœ¬è™šæ–¹æ³•ä¹Ÿä¸ä¼šè¢«è°ƒç”¨
 	 */
 	virtual void run(void);
 
@@ -318,7 +318,7 @@ private:
 };
 
 /**
- * ¿ÉÓÃ×÷¶¨Ê±Æ÷µÄĞ­³ÌÀà
+ * å¯ç”¨ä½œå®šæ—¶å™¨çš„åç¨‹ç±»
  */
 class FIBER_CPP_API fiber_timer {
 public:
@@ -326,15 +326,15 @@ public:
 	virtual ~fiber_timer(void) {}
 
 	/**
-	 * Æô¶¯Ò»¸öĞ­³Ì¶¨Ê±Æ÷
-	 * @param milliseconds {unsigned int} ºÁÃë¼¶Ê±¼ä
-	 * @param stack_size {size_t} Ğ­³ÌµÄÕ»¿Õ¼ä´óĞ¡
+	 * å¯åŠ¨ä¸€ä¸ªåç¨‹å®šæ—¶å™¨
+	 * @param milliseconds {unsigned int} æ¯«ç§’çº§æ—¶é—´
+	 * @param stack_size {size_t} åç¨‹çš„æ ˆç©ºé—´å¤§å°
 	 */
 	void start(unsigned int milliseconds, size_t stack_size = 320000);
 
 protected:
 	/**
-	 * ×ÓÀà±ØĞëÊµÏÖ¸Ã´¿Ğé·½·¨£¬µ±¶¨Ê±Æ÷Æô¶¯Ê±»á»Øµ÷¸Ã·½·¨
+	 * å­ç±»å¿…é¡»å®ç°è¯¥çº¯è™šæ–¹æ³•ï¼Œå½“å®šæ—¶å™¨å¯åŠ¨æ—¶ä¼šå›è°ƒè¯¥æ–¹æ³•
 	 */
 	virtual void run(void) = 0;
 
@@ -350,7 +350,7 @@ private:
 #if defined(ACL_CPP_API)
 
 /**
- * ¶¨Ê±Æ÷¹ÜÀíĞ­³Ì
+ * å®šæ—¶å™¨ç®¡ç†åç¨‹
  */
 template <typename T>
 class fiber_trigger : public fiber {

@@ -377,7 +377,7 @@ protected:
 			return false;
 		}
 
-		// ¿ªÊ¼½øÈë websocket Òì²½¶Á¹ı³Ì
+		// å¼€å§‹è¿›å…¥ websocket å¼‚æ­¥è¯»è¿‡ç¨‹
 		this->ws_read_wait(0);
 		return true;
 	}
@@ -527,36 +527,36 @@ int main(int argc, char* argv[])
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	// Èç¹ûÉèÖÃÁË SSL Á¬½Ó¿â£¬ÔòÆôÓÃ SSL Á¬½ÓÄ£Ê½
+	// å¦‚æœè®¾ç½®äº† SSL è¿æ¥åº“ï¼Œåˆ™å¯ç”¨ SSL è¿æ¥æ¨¡å¼
 	if (ssl_path.empty()) {
 		/* do nothing */
 	} else if (ssl_path.find("mbedtls") != NULL) {
-		// ÉèÖÃ libmbedtls ¿âÈ«Â·¾¶
+		// è®¾ç½® libmbedtls åº“å…¨è·¯å¾„
 		const std::vector<acl::string>& libs = ssl_path.split2("; \r");
 		if (libs.size() == 3) {
 			acl::mbedtls_conf::set_libpath(libs[0], libs[1], libs[2]);
 
-			// ¶¯Ì¬¼ÓÔØ libmbedtls_all.so ¿â
+			// åŠ¨æ€åŠ è½½ libmbedtls_all.so åº“
 			acl::mbedtls_conf::load();
 
-			// ´´½¨È«¾Ö SSL ÅäÖÃÏî
+			// åˆ›å»ºå…¨å±€ SSL é…ç½®é¡¹
 			ssl_conf = new acl::mbedtls_conf(false);
 			printf(">>>use mbedtls<<<\r\n");
 		}
 
 	} else {
-		// ÉèÖÃ libpolarssl.so ¿âÈ«Â·¾¶
+		// è®¾ç½® libpolarssl.so åº“å…¨è·¯å¾„
 		acl::polarssl_conf::set_libpath(ssl_path);
 
-		// ¶¯Ì¬¼ÓÔØ libpolarssl.so ¿â
+		// åŠ¨æ€åŠ è½½ libpolarssl.so åº“
 		acl::polarssl_conf::load();
 
-		// ´´½¨È«¾Ö SSL ÅäÖÃÏî
+		// åˆ›å»ºå…¨å±€ SSL é…ç½®é¡¹
 		ssl_conf = new acl::polarssl_conf;
 		printf(">>>use polarssl<<<\r\n");
 	}
 
-	// ¶¨Òå AIO ÊÂ¼şÒıÇæ
+	// å®šä¹‰ AIO äº‹ä»¶å¼•æ“
 	acl::aio_handle handle(acl::ENGINE_KERNEL);
 
 	int fds[2];
@@ -592,11 +592,11 @@ int main(int argc, char* argv[])
 	for (std::vector<acl::string>::const_iterator cit = name_servers.begin();
 		cit != name_servers.end(); ++cit) {
 
-		// ÉèÖÃ DNS ÓòÃû·şÎñÆ÷µØÖ·
+		// è®¾ç½® DNS åŸŸåæœåŠ¡å™¨åœ°å€
 		handle.set_dns((*cit).c_str(), 5);
 	}
 
-	// ¿ªÊ¼Òì²½Á¬½ÓÔ¶³Ì WEB ·şÎñÆ÷
+	// å¼€å§‹å¼‚æ­¥è¿æ¥è¿œç¨‹ WEB æœåŠ¡å™¨
 	http_aio_client* conn = new http_aio_client(handle, ssl_conf, host);
 	if (!conn->open(addr, conn_timeout, rw_timeout)) {
 		printf("connect %s error\r\n", addr.c_str());
@@ -606,11 +606,11 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	(*conn).enable_debug(debug)		// ÊÇ·ñÆôÓÃµ÷ÊÔ·½Ê½
-		.enable_websocket(ws_enable);	// ÊÇ·ñÆôÓÃ websocket
-	conn->unzip_body(enable_unzip);		// Õë¶Ô HTTP ÊÇ·ñ×Ô¶¯½âÑ¹
+	(*conn).enable_debug(debug)		// æ˜¯å¦å¯ç”¨è°ƒè¯•æ–¹å¼
+		.enable_websocket(ws_enable);	// æ˜¯å¦å¯ç”¨ websocket
+	conn->unzip_body(enable_unzip);		// é’ˆå¯¹ HTTP æ˜¯å¦è‡ªåŠ¨è§£å‹
 
-	// ÉèÖÃ HTTP ÇëÇóÍ·£¬Ò²¿É½«´Ë¹ı³Ì·ÅÔÚ conn->on_connect() Àï
+	// è®¾ç½® HTTP è¯·æ±‚å¤´ï¼Œä¹Ÿå¯å°†æ­¤è¿‡ç¨‹æ”¾åœ¨ conn->on_connect() é‡Œ
 	acl::http_header& head = conn->request_header();
 	head.set_url(url)
 		.set_content_length(0)
@@ -624,9 +624,9 @@ int main(int argc, char* argv[])
 	printf("[%s]\r\n", buf.c_str());
 	fflush(stdout);
 
-	// ¿ªÊ¼ AIO ÊÂ¼şÑ­»·¹ı³Ì
+	// å¼€å§‹ AIO äº‹ä»¶å¾ªç¯è¿‡ç¨‹
 	while (true) {
-		// Èç¹û·µ»Ø false Ôò±íÊ¾²»ÔÙ¼ÌĞø£¬ĞèÒªÍË³ö
+		// å¦‚æœè¿”å› false åˆ™è¡¨ç¤ºä¸å†ç»§ç»­ï¼Œéœ€è¦é€€å‡º
 		if (!handle.check()) {
 			break;
 		}

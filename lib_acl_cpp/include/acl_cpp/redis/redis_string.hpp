@@ -10,7 +10,7 @@ namespace acl
 {
 
 /**
- * ËùÓĞµÄ×Ö·û´®¶ÔÏóµÄÃüÁî¶¼ÒÑÊµÏÖ
+ * æ‰€æœ‰çš„å­—ç¬¦ä¸²å¯¹è±¡çš„å‘½ä»¤éƒ½å·²å®ç°
  * all the commands in redis Strings are be implemented.
  */
 class ACL_CPP_API redis_string : virtual public redis_command
@@ -41,13 +41,13 @@ public:
 	/////////////////////////////////////////////////////////////////////
 	
 	/**
-	 * ½«×Ö·û´®Öµ value ¹ØÁªµ½ key
+	 * å°†å­—ç¬¦ä¸²å€¼ value å…³è”åˆ° key
 	 * set the string value of a key
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param value {const char*} ×Ö·û´®¶ÔÏóµÄ value
+	 * @param value {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ value
 	 *  the value of a string
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç×Ö·û´®¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  true if SET was executed correctly, false if error happened or
 	 *  the key's object isn't a string.
 	 */
@@ -60,27 +60,27 @@ public:
 	#define SETFLAG_NX	0x08
 	#define SETFLAG_XX	0x0C
 	/**
-	 * ´Ó Redis 2.6.12 °æ±¾¿ªÊ¼£¬ SET ÃüÁîµÄĞĞÎª¿ÉÒÔÍ¨¹ıÒ»ÏµÁĞ²ÎÊıÀ´ĞŞ¸Ä£º
-	 * EX seconds £º ½«¼üµÄ¹ıÆÚÊ±¼äÉèÖÃÎª seconds Ãë¡£ Ö´ĞĞ SET key value
-	 * EX seconds µÄĞ§¹ûµÈÍ¬ÓÚÖ´ĞĞ SETEX key seconds value ¡£
-	 * PX milliseconds £º ½«¼üµÄ¹ıÆÚÊ±¼äÉèÖÃÎª milliseconds ºÁÃë¡£
-	 *   Ö´ĞĞ SET key value PX milliseconds µÄĞ§¹ûµÈÍ¬ÓÚÖ´ĞĞ
-	 *     PSETEX key milliseconds value ¡£
-	 * NX £ºÖ»ÔÚ¼ü²»´æÔÚÊ±£¬²Å¶Ô¼ü½øĞĞÉèÖÃ²Ù×÷¡£Ö´ĞĞ SET key value NX µÄ
-	 *  Ğ§¹ûµÈÍ¬ÓÚÖ´ĞĞ SETNX key value ¡£
-	 * XX £ºÖ»ÔÚ¼üÒÑ¾­´æÔÚÊ±£¬ ²Å¶Ô¼ü½øĞĞÉèÖÃ²Ù×÷¡£
-	 * @Note ÒòÎª SET ÃüÁî¿ÉÒÔÍ¨¹ı²ÎÊıÀ´ÊµÏÖ SETNX ¡¢ SETEX ÒÔ¼° PSETEX
-	 * ÃüÁîµÄĞ§¹û£¬ ËùÒÔ Redis ½«À´µÄ°æ±¾¿ÉÄÜ»áÒÆ³ı²¢·ÏÆú SETNX ¡¢ SETEX
-	 * ºÍ PSETEX ÕâÈı¸öÃüÁî¡£
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * ä» Redis 2.6.12 ç‰ˆæœ¬å¼€å§‹ï¼Œ SET å‘½ä»¤çš„è¡Œä¸ºå¯ä»¥é€šè¿‡ä¸€ç³»åˆ—å‚æ•°æ¥ä¿®æ”¹ï¼š
+	 * EX seconds ï¼š å°†é”®çš„è¿‡æœŸæ—¶é—´è®¾ç½®ä¸º seconds ç§’ã€‚ æ‰§è¡Œ SET key value
+	 * EX seconds çš„æ•ˆæœç­‰åŒäºæ‰§è¡Œ SETEX key seconds value ã€‚
+	 * PX milliseconds ï¼š å°†é”®çš„è¿‡æœŸæ—¶é—´è®¾ç½®ä¸º milliseconds æ¯«ç§’ã€‚
+	 *   æ‰§è¡Œ SET key value PX milliseconds çš„æ•ˆæœç­‰åŒäºæ‰§è¡Œ
+	 *     PSETEX key milliseconds value ã€‚
+	 * NX ï¼šåªåœ¨é”®ä¸å­˜åœ¨æ—¶ï¼Œæ‰å¯¹é”®è¿›è¡Œè®¾ç½®æ“ä½œã€‚æ‰§è¡Œ SET key value NX çš„
+	 *  æ•ˆæœç­‰åŒäºæ‰§è¡Œ SETNX key value ã€‚
+	 * XX ï¼šåªåœ¨é”®å·²ç»å­˜åœ¨æ—¶ï¼Œ æ‰å¯¹é”®è¿›è¡Œè®¾ç½®æ“ä½œã€‚
+	 * @Note å› ä¸º SET å‘½ä»¤å¯ä»¥é€šè¿‡å‚æ•°æ¥å®ç° SETNX ã€ SETEX ä»¥åŠ PSETEX
+	 * å‘½ä»¤çš„æ•ˆæœï¼Œ æ‰€ä»¥ Redis å°†æ¥çš„ç‰ˆæœ¬å¯èƒ½ä¼šç§»é™¤å¹¶åºŸå¼ƒ SETNX ã€ SETEX
+	 * å’Œ PSETEX è¿™ä¸‰ä¸ªå‘½ä»¤ã€‚
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param value {const char*} ×Ö·û´®¶ÔÏóµÄ value
+	 * @param value {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ value
 	 *  the value of a string
-	 * @param timeout {int} ¹ıÆÚÖµ£¬µ¥Î»ÎªÃë(EX)/ºÁÃë(PX)
+	 * @param timeout {int} è¿‡æœŸå€¼ï¼Œå•ä½ä¸ºç§’(EX)/æ¯«ç§’(PX)
 	 *  the timeout in seconds of a string
-	 * @param flag {int} ±ê¼Ç£¬EX/PX | NX/XX
+	 * @param flag {int} æ ‡è®°ï¼ŒEX/PX | NX/XX
 	 *  the flag of a string
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç×Ö·û´®¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  true if SET was executed correctly, false if error happened or
 	 *  the key's object isn't a string.
  	 */
@@ -89,17 +89,17 @@ public:
 		size_t value_len, int timeout, int flag);
 
 	/**
-	 * ½«Öµ value ¹ØÁªµ½ key £¬²¢½« key µÄÉú´æÊ±¼äÉèÎª timeout (ÒÔÃëÎªµ¥Î»)£¬
-	 * Èç¹û key ÒÑ¾­´æÔÚ£¬ SETEX ÃüÁî½«¸²Ğ´¾ÉÖµ
+	 * å°†å€¼ value å…³è”åˆ° key ï¼Œå¹¶å°† key çš„ç”Ÿå­˜æ—¶é—´è®¾ä¸º timeout (ä»¥ç§’ä¸ºå•ä½)ï¼Œ
+	 * å¦‚æœ key å·²ç»å­˜åœ¨ï¼Œ SETEX å‘½ä»¤å°†è¦†å†™æ—§å€¼
 	 * set key to hold the strnig value, and set key to timeout after
 	 * a given number of seconds.
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param value {const char*} ×Ö·û´®¶ÔÏóµÄ value
+	 * @param value {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ value
 	 *  the value of a string
-	 * @param timeout {int} ¹ıÆÚÖµ£¬µ¥Î»ÎªÃë
+	 * @param timeout {int} è¿‡æœŸå€¼ï¼Œå•ä½ä¸ºç§’
 	 *  the timeout in seconds of a string
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç×Ö·û´®¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  true if SETEX was executed correctly, false if error happened
 	 *  or the object specified by the key is not a string
 	 */
@@ -108,17 +108,17 @@ public:
 		size_t value_len, int timeout);
 
 	/**
-	 * ½«Öµ value ¹ØÁªµ½ key £¬²¢½« key µÄÉú´æÊ±¼äÉèÎª timeout (ÒÔºÁÃëÎªµ¥Î»)£¬
-	 * Èç¹û key ÒÑ¾­´æÔÚ£¬ SETEX ÃüÁî½«¸²Ğ´¾ÉÖµ
+	 * å°†å€¼ value å…³è”åˆ° key ï¼Œå¹¶å°† key çš„ç”Ÿå­˜æ—¶é—´è®¾ä¸º timeout (ä»¥æ¯«ç§’ä¸ºå•ä½)ï¼Œ
+	 * å¦‚æœ key å·²ç»å­˜åœ¨ï¼Œ SETEX å‘½ä»¤å°†è¦†å†™æ—§å€¼
 	 * set key to hold the string value, and set key to timeout after
 	 * a given number of milliseconds.
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param value {const char*} ×Ö·û´®¶ÔÏóµÄ value
+	 * @param value {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ value
 	 *  the value of a string
-	 * @param timeout {int} ¹ıÆÚÖµ£¬µ¥Î»ÎªºÁÃë
+	 * @param timeout {int} è¿‡æœŸå€¼ï¼Œå•ä½ä¸ºæ¯«ç§’
 	 *  the timeout in milliseconds of a string
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò¸Ã key ¶ÔÏó·Ç×Ö·û´®¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key å¯¹è±¡éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  true if SETEX was executed correctly, false if error happened
 	 *  or the object specified by the key is not a string
 	 */
@@ -127,20 +127,20 @@ public:
 		size_t value_len, int timeout);
 
 	/**
-	 * ½« key µÄÖµÉèÎª value £¬µ±ÇÒ½öµ± key ²»´æÔÚ£¬Èô¸ø¶¨µÄ key ÒÑ¾­´æÔÚ£¬
-	 * Ôò SETNX ²»×öÈÎºÎ¶¯×÷
+	 * å°† key çš„å€¼è®¾ä¸º value ï¼Œå½“ä¸”ä»…å½“ key ä¸å­˜åœ¨ï¼Œè‹¥ç»™å®šçš„ key å·²ç»å­˜åœ¨ï¼Œ
+	 * åˆ™ SETNX ä¸åšä»»ä½•åŠ¨ä½œ
 	 * set the value of a key, only if the key does not exist.
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of the string
-	 * @param value {const char*} ×Ö·û´®¶ÔÏóµÄ value
+	 * @param value {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ value
 	 *  the value of the string
-	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
+	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
 	 *  return the value as below:
-	 *  -1£º³ö´í»ò key ·Ç×Ö·û´®¶ÔÏó
+	 *  -1ï¼šå‡ºé”™æˆ– key éå­—ç¬¦ä¸²å¯¹è±¡
 	 *      error happened or the object by the key isn't a string
-	 *   0£º¸ø¶¨ key µÄ¶ÔÏó´æÔÚ
+	 *   0ï¼šç»™å®š key çš„å¯¹è±¡å­˜åœ¨
 	 *      the string of the key already exists
-	 *   1£ºÌí¼Ó³É¹¦
+	 *   1ï¼šæ·»åŠ æˆåŠŸ
 	 *      the command was executed correctly
 	 */
 	int setnx(const char* key, const char* value);
@@ -148,14 +148,14 @@ public:
 		const char* value, size_t value_len);
 
 	/**
-	 * Èç¹û key ÒÑ¾­´æÔÚ²¢ÇÒÊÇÒ»¸ö×Ö·û´®£¬ APPEND ÃüÁî½« value ×·¼Óµ½ key Ô­À´
-	 * µÄÖµµÄÄ©Î²£»Èç¹û key ²»´æÔÚ£¬ APPEND ¾Í¼òµ¥µØ½«¸ø¶¨ key ÉèÎª value
+	 * å¦‚æœ key å·²ç»å­˜åœ¨å¹¶ä¸”æ˜¯ä¸€ä¸ªå­—ç¬¦ä¸²ï¼Œ APPEND å‘½ä»¤å°† value è¿½åŠ åˆ° key åŸæ¥
+	 * çš„å€¼çš„æœ«å°¾ï¼›å¦‚æœ key ä¸å­˜åœ¨ï¼Œ APPEND å°±ç®€å•åœ°å°†ç»™å®š key è®¾ä¸º value
 	 * append a value to a key
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param value {const char*} ×Ö·û´®¶ÔÏóµÄÖµ
+	 * @param value {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„å€¼
 	 *  the value to be appended to a key
-	 * @return {int} ·µ»Øµ±Ç°¸Ã×Ö·û´®µÄ³¤¶È£¬-1 ±íÊ¾³ö´í»ò key ·Ç×Ö·û´®¶ÔÏó
+	 * @return {int} è¿”å›å½“å‰è¯¥å­—ç¬¦ä¸²çš„é•¿åº¦ï¼Œ-1 è¡¨ç¤ºå‡ºé”™æˆ– key éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  return the length of the string after appending, -1 if error
 	 *  happened or the key's object isn't a string
 	 */
@@ -163,15 +163,15 @@ public:
 	int append(const char* key, const char* value, size_t size);
 
 	/**
-	 * ·µ»Ø key Ëù¹ØÁªµÄ×Ö·û´®Öµ
+	 * è¿”å› key æ‰€å…³è”çš„å­—ç¬¦ä¸²å€¼
 	 * get the value of a key 
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param buf {string&} ²Ù×÷³É¹¦ºó´æ´¢×Ö·û´®¶ÔÏóµÄÖµ£¬Èç¹û·µ»Ø true ÇÒ
-	 *  ¸Ã»º³åÇøÎª¿ÕÔò±íÊ¾¶ÔÓ¦ key ²»´æÔÚ
+	 * @param buf {string&} æ“ä½œæˆåŠŸåå­˜å‚¨å­—ç¬¦ä¸²å¯¹è±¡çš„å€¼ï¼Œå¦‚æœè¿”å› true ä¸”
+	 *  è¯¥ç¼“å†²åŒºä¸ºç©ºåˆ™è¡¨ç¤ºå¯¹åº” key ä¸å­˜åœ¨
 	 *  store the value of a key after GET executed correctly, key not
 	 *  exist if the buf is empty when return true
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò key ·Ç×Ö·û´®¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ– key éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  if the GET was executed correctly, false if error happened or
 	 *  is is not a string of the key
 	 */
@@ -179,27 +179,27 @@ public:
 	bool get(const char* key, string& buf);
 
 	/**
-	 * ·µ»Ø key Ëù¹ØÁªµÄ×Ö·û´®Öµ£¬µ±·µ»ØµÄ×Ö·û´®Öµ±È½Ï´óÊ±£¬ÄÚ²¿»á×Ô¶¯½øĞĞÇĞÆ¬£¬¼´½«
-	 * Ò»¸ö´óÄÚ´æÇĞ³ÉÒ»Ğ©·ÇÁ¬ĞøµÄĞ¡ÄÚ´æ£¬Ê¹ÓÃÕßĞèÒª¸ù¾İ·µ»ØµÄ½á¹û¶ÔÏóÖØĞÂ¶Ô½á¹ûÊı¾İ½øĞĞ
-	 * ×é×°£¬±ÈÈç¿ÉÒÔµ÷ÓÃ£º redis_result::get(size_t, size_t*) º¯Êı»ñµÃÄ³¸öÇĞ
-	 * Æ¬µÄÆ¬¶ÏÊı¾İ£¬¸ù¾İ redis_result::get_size() »ñµÃ·ÖÆ¬Êı×éµÄ³¤¶È
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò key ·Ç×Ö·û´®¶ÔÏó
+	 * è¿”å› key æ‰€å…³è”çš„å­—ç¬¦ä¸²å€¼ï¼Œå½“è¿”å›çš„å­—ç¬¦ä¸²å€¼æ¯”è¾ƒå¤§æ—¶ï¼Œå†…éƒ¨ä¼šè‡ªåŠ¨è¿›è¡Œåˆ‡ç‰‡ï¼Œå³å°†
+	 * ä¸€ä¸ªå¤§å†…å­˜åˆ‡æˆä¸€äº›éè¿ç»­çš„å°å†…å­˜ï¼Œä½¿ç”¨è€…éœ€è¦æ ¹æ®è¿”å›çš„ç»“æœå¯¹è±¡é‡æ–°å¯¹ç»“æœæ•°æ®è¿›è¡Œ
+	 * ç»„è£…ï¼Œæ¯”å¦‚å¯ä»¥è°ƒç”¨ï¼š redis_result::get(size_t, size_t*) å‡½æ•°è·å¾—æŸä¸ªåˆ‡
+	 * ç‰‡çš„ç‰‡æ–­æ•°æ®ï¼Œæ ¹æ® redis_result::get_size() è·å¾—åˆ†ç‰‡æ•°ç»„çš„é•¿åº¦
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ– key éå­—ç¬¦ä¸²å¯¹è±¡
 	 */
 	const redis_result* get(const char* key);
 	const redis_result* get(const char* key, size_t len);
 
 	/**
-	 * ½«¸ø¶¨ key µÄÖµÉèÎª value £¬²¢·µ»Ø key µÄ¾ÉÖµ£¬µ± key ´æÔÚµ«²»ÊÇ
-	 * ×Ö·û´®ÀàĞÍÊ±£¬·µ»ØÒ»¸ö´íÎó
+	 * å°†ç»™å®š key çš„å€¼è®¾ä¸º value ï¼Œå¹¶è¿”å› key çš„æ—§å€¼ï¼Œå½“ key å­˜åœ¨ä½†ä¸æ˜¯
+	 * å­—ç¬¦ä¸²ç±»å‹æ—¶ï¼Œè¿”å›ä¸€ä¸ªé”™è¯¯
 	 * set the string value of a key and and return its old value
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of string
-	 * @param value {const char*} Éè¶¨µÄĞÂµÄ¶ÔÏóµÄÖµ
+	 * @param value {const char*} è®¾å®šçš„æ–°çš„å¯¹è±¡çš„å€¼
 	 *  the new string value of the key
-	 * @param buf {string&} ´æ´¢¶ÔÏóµÄ¾ÉµÄÖµ
+	 * @param buf {string&} å­˜å‚¨å¯¹è±¡çš„æ—§çš„å€¼
 	 *  store the old string value of the key
-	 * @return {bool} ÊÇ·ñ³É¹¦
+	 * @return {bool} æ˜¯å¦æˆåŠŸ
 	 *  if GETSET was executed correctly.
 	 */
 	bool getset(const char* key, const char* value, string& buf);
@@ -209,34 +209,34 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * »ñµÃÖ¸¶¨ key µÄ×Ö·û´®¶ÔÏóµÄÖµµÄÊı¾İ³¤¶È
+	 * è·å¾—æŒ‡å®š key çš„å­—ç¬¦ä¸²å¯¹è±¡çš„å€¼çš„æ•°æ®é•¿åº¦
 	 * get the length of value stored in a key
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of the string
-	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
+	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
 	 *  return value as below:
-	 *  -1£º³ö´í»ò·Ç×Ö·û´®¶ÔÏó
+	 *  -1ï¼šå‡ºé”™æˆ–éå­—ç¬¦ä¸²å¯¹è±¡
 	 *      error happened or the it isn't a string of the key
-	 *   0£º¸Ã key ²»´æÔÚ
+	 *   0ï¼šè¯¥ key ä¸å­˜åœ¨
 	 *      the key doesn't exist
-	 *  >0£º¸Ã×Ö·û´®Êı¾İµÄ³¤¶È
+	 *  >0ï¼šè¯¥å­—ç¬¦ä¸²æ•°æ®çš„é•¿åº¦
 	 *      the length of the value stored in a key
 	 */
 	int get_strlen(const char* key);
 	int get_strlen(const char* key, size_t key_len);
 
 	/**
-	 * ÓÃ value ²ÎÊı¸²Ğ´(overwrite)¸ø¶¨ key Ëù´¢´æµÄ×Ö·û´®Öµ£¬´ÓÆ«ÒÆÁ¿ offset ¿ªÊ¼£¬
-	 * ²»´æÔÚµÄ key µ±×÷¿Õ°××Ö·û´®´¦Àí
+	 * ç”¨ value å‚æ•°è¦†å†™(overwrite)ç»™å®š key æ‰€å‚¨å­˜çš„å­—ç¬¦ä¸²å€¼ï¼Œä»åç§»é‡ offset å¼€å§‹ï¼Œ
+	 * ä¸å­˜åœ¨çš„ key å½“ä½œç©ºç™½å­—ç¬¦ä¸²å¤„ç†
 	 * overwrite part of a string at key starting at the specified offset
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @param offset {unsigned} Æ«ÒÆÁ¿ÆğÊ¼Î»ÖÃ£¬¸ÃÖµ¿ÉÒÔ´óÓÚ×Ö·û´®µÄÊı¾İ³¤¶È£¬´ËÊ±
-	 *  ÊÇ¼äµÄ¿Õ¶´½«ÓÉ \0 ²¹³ä
+	 * @param offset {unsigned} åç§»é‡èµ·å§‹ä½ç½®ï¼Œè¯¥å€¼å¯ä»¥å¤§äºå­—ç¬¦ä¸²çš„æ•°æ®é•¿åº¦ï¼Œæ­¤æ—¶
+	 *  æ˜¯é—´çš„ç©ºæ´å°†ç”± \0 è¡¥å……
 	 *  the specified offset of the string
-	 * @param value {const char*} ¸²¸ÇµÄÖµ
+	 * @param value {const char*} è¦†ç›–çš„å€¼
 	 *  the value to be set
-	 * @return {int} µ±Ç°×Ö·û´®¶ÔÏóµÄÊı¾İ³¤¶È
+	 * @return {int} å½“å‰å­—ç¬¦ä¸²å¯¹è±¡çš„æ•°æ®é•¿åº¦
 	 *  the length of the string after SETRANGE
 	 */
 	int setrange(const char* key, unsigned offset, const char* value);
@@ -244,20 +244,20 @@ public:
 		const char* value, size_t value_len);
 
 	/**
-	 * ·µ»Ø key ÖĞ×Ö·û´®ÖµµÄ×Ó×Ö·û´®£¬×Ö·û´®µÄ½ØÈ¡·¶Î§ÓÉ start ºÍ end Á½¸öÆ«ÒÆÁ¿¾ö¶¨
-	 * (°üÀ¨ start ºÍ end ÔÚÄÚ)
+	 * è¿”å› key ä¸­å­—ç¬¦ä¸²å€¼çš„å­å­—ç¬¦ä¸²ï¼Œå­—ç¬¦ä¸²çš„æˆªå–èŒƒå›´ç”± start å’Œ end ä¸¤ä¸ªåç§»é‡å†³å®š
+	 * (åŒ…æ‹¬ start å’Œ end åœ¨å†…)
 	 * get substring of the string stored at a key
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of string
-	 * @param start {int} ÆğÊ¼ÏÂ±êÖµ
+	 * @param start {int} èµ·å§‹ä¸‹æ ‡å€¼
 	 *  the starting offset of the string
-	 * @param end {int} ½áÊøÏÂ±êÖµ
+	 * @param end {int} ç»“æŸä¸‹æ ‡å€¼
 	 *  the ending offset of the string
-	 * @param buf {string&} ³É¹¦Ê±´æ´¢½á¹û
+	 * @param buf {string&} æˆåŠŸæ—¶å­˜å‚¨ç»“æœ
 	 *  store the substring result
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if GETRANGE was executed correctly.
-	 *  ×¢£ºÏÂ±êÎ»ÖÃ¿ÉÒÔÎª¸ºÖµ£¬±íÊ¾´Ó×Ö·û´®Î²²¿ÏòÇ°¿ªÊ¼¼ÆÊı£¬Èç -1 ±íÊ¾×îºóÒ»¸öÔªËØ
+	 *  æ³¨ï¼šä¸‹æ ‡ä½ç½®å¯ä»¥ä¸ºè´Ÿå€¼ï¼Œè¡¨ç¤ºä»å­—ç¬¦ä¸²å°¾éƒ¨å‘å‰å¼€å§‹è®¡æ•°ï¼Œå¦‚ -1 è¡¨ç¤ºæœ€åä¸€ä¸ªå…ƒç´ 
 	 */
 	bool getrange(const char* key, int start, int end, string& buf);
 	bool getrange(const char* key, size_t key_len,
@@ -266,32 +266,32 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ¶Ô key Ëù´¢´æµÄ×Ö·û´®Öµ£¬ÉèÖÃ»òÇå³ıÖ¸¶¨Æ«ÒÆÁ¿ÉÏµÄÎ»(bit)£¬
-	 * Î»µÄÉèÖÃ»òÇå³ıÈ¡¾öÓÚ value ²ÎÊı£¬¿ÉÒÔÊÇ 0 Ò²¿ÉÒÔÊÇ 1
+	 * å¯¹ key æ‰€å‚¨å­˜çš„å­—ç¬¦ä¸²å€¼ï¼Œè®¾ç½®æˆ–æ¸…é™¤æŒ‡å®šåç§»é‡ä¸Šçš„ä½(bit)ï¼Œ
+	 * ä½çš„è®¾ç½®æˆ–æ¸…é™¤å–å†³äº value å‚æ•°ï¼Œå¯ä»¥æ˜¯ 0 ä¹Ÿå¯ä»¥æ˜¯ 1
 	 * set or clear the bit at offset in the string value stored at key
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of the string
-	 * @param offset {unsigned} Ö¸¶¨Æ«ÒÆÁ¿µÄÎ»ÖÃ
+	 * @param offset {unsigned} æŒ‡å®šåç§»é‡çš„ä½ç½®
 	 *  the offset at the string value
-	 * @param bit {bool} Îª true ±íÊ¾ÉèÖÃ±êÖ¾Î»£¬·ñÔòÎªÈ¡Ïû±êÖ¾Î»
+	 * @param bit {bool} ä¸º true è¡¨ç¤ºè®¾ç½®æ ‡å¿—ä½ï¼Œå¦åˆ™ä¸ºå–æ¶ˆæ ‡å¿—ä½
 	 *  set bit if true, or clear bit if false at the specified offset
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the command was executed correctly
 	 */
 	bool setbit_(const char* key, unsigned offset, bool bit);
 	bool setbit_(const char* key, size_t len, unsigned offset, bool bit);
 
 	/**
-	 * ¶Ô key Ëù´¢´æµÄ×Ö·û´®Öµ£¬»ñÈ¡Ö¸¶¨Æ«ÒÆÁ¿ÉÏµÄÎ»(bit)£¬µ± offset ±È×Ö·û´®Öµ
-	 * µÄ³¤¶È´ó£¬»òÕß key ²»´æÔÚÊ±£¬·µ»Ø 0
+	 * å¯¹ key æ‰€å‚¨å­˜çš„å­—ç¬¦ä¸²å€¼ï¼Œè·å–æŒ‡å®šåç§»é‡ä¸Šçš„ä½(bit)ï¼Œå½“ offset æ¯”å­—ç¬¦ä¸²å€¼
+	 * çš„é•¿åº¦å¤§ï¼Œæˆ–è€… key ä¸å­˜åœ¨æ—¶ï¼Œè¿”å› 0
 	 * get the bit at offset in the string value stored at key
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of the string
-	 * @param offset {unsigned} Ö¸¶¨Æ«ÒÆÁ¿µÄÎ»ÖÃ
+	 * @param offset {unsigned} æŒ‡å®šåç§»é‡çš„ä½ç½®
 	 *  the offset in the string value
-	 * @param bit {int&} ³É¹¦ºó´æ´¢Ö¸¶¨Î»ÖÃµÄ±êÖ¾Î»
+	 * @param bit {int&} æˆåŠŸåå­˜å‚¨æŒ‡å®šä½ç½®çš„æ ‡å¿—ä½
 	 *  on success it will stored the bit at the specified offset
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬·µ»Ø false ±íÊ¾³ö´í»ò¸Ã key ·Ç×Ö·û´®¶ÔÏó
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œè¿”å› false è¡¨ç¤ºå‡ºé”™æˆ–è¯¥ key éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  if the GETBIT was executed correctly, false if error happened,
 	 *  or the key doesn't store a string object
 	 */
@@ -299,12 +299,12 @@ public:
 	bool getbit(const char* key, size_t len, unsigned offset, int& bit);
 
 	/**
-	 * ¼ÆËã¸ø¶¨×Ö·û´®ÖĞ£¬±»ÉèÖÃÎª 1 µÄ±ÈÌØÎ»µÄÊıÁ¿£¬ÈôÖ¸¶¨ÁË start/end£¬Ôò¼ÆÊıÔÚÖ¸¶¨
-	 * Çø¼äÄÚ½øĞĞ
+	 * è®¡ç®—ç»™å®šå­—ç¬¦ä¸²ä¸­ï¼Œè¢«è®¾ç½®ä¸º 1 çš„æ¯”ç‰¹ä½çš„æ•°é‡ï¼Œè‹¥æŒ‡å®šäº† start/endï¼Œåˆ™è®¡æ•°åœ¨æŒ‡å®š
+	 * åŒºé—´å†…è¿›è¡Œ
 	 * count set bits in a string
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key of a string
-	 * @return {int} ±êÖ¾Î»Îª 1 µÄÊıÁ¿£¬-1 ±íÊ¾³ö´í»ò·Ç×Ö·û´®¶ÔÏó
+	 * @return {int} æ ‡å¿—ä½ä¸º 1 çš„æ•°é‡ï¼Œ-1 è¡¨ç¤ºå‡ºé”™æˆ–éå­—ç¬¦ä¸²å¯¹è±¡
 	 *  the count of bits been set, -1 if error happened or it's not
 	 *  a string
 	 */
@@ -314,13 +314,13 @@ public:
 	int bitcount(const char* key, size_t len, int start, int end);
 
 	/**
-	 * ¶ÔÒ»¸ö»ò¶à¸ö key ÇóÂß¼­²¢£¬²¢½«½á¹û±£´æµ½ destkey
+	 * å¯¹ä¸€ä¸ªæˆ–å¤šä¸ª key æ±‚é€»è¾‘å¹¶ï¼Œå¹¶å°†ç»“æœä¿å­˜åˆ° destkey
 	 * BITOP AND on multiple source keys and save the result to another key
-	 * @param destkey {const char*} Ä¿±ê×Ö·û´®¶ÔÏóµÄ key
+	 * @param destkey {const char*} ç›®æ ‡å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the key storing the result
-	 * @param keys Ô´×Ö·û´®¶ÔÏó¼¯ºÏ
+	 * @param keys æºå­—ç¬¦ä¸²å¯¹è±¡é›†åˆ
 	 *  the source keys
-	 * @return {int} ´æ´¢ÔÚÄ¿±ê key ÖĞµÄ×Ö·û´®µÄ³¤¶È
+	 * @return {int} å­˜å‚¨åœ¨ç›®æ ‡ key ä¸­çš„å­—ç¬¦ä¸²çš„é•¿åº¦
 	 *  the size of the string stored in the destination key, that is
 	 *  equal to the size of the longest input string
 	 */
@@ -330,11 +330,11 @@ public:
 	int bitop_and(const char* destkey, const char* keys[], size_t size);
 
 	/**
-	 * ¶ÔÒ»¸ö»ò¶à¸ö key ÇóÂß¼­»ò£¬²¢½«½á¹û±£´æµ½ destkey
+	 * å¯¹ä¸€ä¸ªæˆ–å¤šä¸ª key æ±‚é€»è¾‘æˆ–ï¼Œå¹¶å°†ç»“æœä¿å­˜åˆ° destkey
 	 * BITOP OR on multiple source keys and save the result to another key
-	 * @param destkey {const char*} Ä¿±ê×Ö·û´®¶ÔÏóµÄ key
+	 * @param destkey {const char*} ç›®æ ‡å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the destination key
-	 * @param keys Ô´×Ö·û´®¶ÔÏó¼¯ºÏ
+	 * @param keys æºå­—ç¬¦ä¸²å¯¹è±¡é›†åˆ
 	 *  the source keys
 	 * @return {int}
 	 *  the size of the string stored in the destination key
@@ -345,11 +345,11 @@ public:
 	int bitop_or(const char* destkey, const char* keys[], size_t size);
 
 	/**
-	 * ¶ÔÒ»¸ö»ò¶à¸ö key ÇóÂß¼­Òì»ò£¬²¢½«½á¹û±£´æµ½ destkey
+	 * å¯¹ä¸€ä¸ªæˆ–å¤šä¸ª key æ±‚é€»è¾‘å¼‚æˆ–ï¼Œå¹¶å°†ç»“æœä¿å­˜åˆ° destkey
 	 * BITOP XOR on multiple source keys and save the result to another key
-	 * @param destkey {const char*} Ä¿±ê×Ö·û´®¶ÔÏóµÄ key
+	 * @param destkey {const char*} ç›®æ ‡å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the destination key
-	 * @param keys Ô´×Ö·û´®¶ÔÏó¼¯ºÏ
+	 * @param keys æºå­—ç¬¦ä¸²å¯¹è±¡é›†åˆ
 	 *  the source keys
 	 * @return {int}
 	 *  the size of the string stored in the destination key
@@ -362,11 +362,11 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * Í¬Ê±ÉèÖÃÒ»¸ö»ò¶à¸ö key-value ¶Ô
+	 * åŒæ—¶è®¾ç½®ä¸€ä¸ªæˆ–å¤šä¸ª key-value å¯¹
 	 * set multiple key-value pair
-	 * @param objs key-value ¶Ô¼¯ºÏ
+	 * @param objs key-value å¯¹é›†åˆ
 	 *  the collection of multiple key-value pair
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the command was executed correctly
 	 */
 	bool mset(const std::map<string, string>& objs);
@@ -379,17 +379,17 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * µ±ÇÒ½öµ±ËùÓĞ¸ø¶¨ key ¶¼²»´æÔÚÊ±Í¬Ê±ÉèÖÃÒ»¸ö»ò¶à¸ö key-value ¶Ô
+	 * å½“ä¸”ä»…å½“æ‰€æœ‰ç»™å®š key éƒ½ä¸å­˜åœ¨æ—¶åŒæ—¶è®¾ç½®ä¸€ä¸ªæˆ–å¤šä¸ª key-value å¯¹
 	 * set multiple keys to multiple values only if none of the keys exist
-	 * @param objs key-value ¶Ô¼¯ºÏ
+	 * @param objs key-value å¯¹é›†åˆ
 	 *  the collection of multile key-value pair
-	 * @return {int} ·µ»ØÖµº¬ÒåÈçÏÂ£º
+	 * @return {int} è¿”å›å€¼å«ä¹‰å¦‚ä¸‹ï¼š
 	 *  return value as below:
-	 *  -1£º³ö´í»ò·Ç×Ö·û´®¶ÔÏó
+	 *  -1ï¼šå‡ºé”™æˆ–éå­—ç¬¦ä¸²å¯¹è±¡
 	 *      error happened or there were a object of not a string.
-	 *   0£ºÌí¼ÓµÄ key ¼¯ºÏÖĞÖÁÉÙÓĞÒ»¸öÒÑ¾­´æÔÚ
+	 *   0ï¼šæ·»åŠ çš„ key é›†åˆä¸­è‡³å°‘æœ‰ä¸€ä¸ªå·²ç»å­˜åœ¨
 	 *     none be set because some of the keys already exist
-	 *   1£ºÌí¼Ó³É¹¦
+	 *   1ï¼šæ·»åŠ æˆåŠŸ
 	 *     add ok.
 	 */
 	int msetnx(const std::map<string, string>& objs);
@@ -402,42 +402,42 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ·µ»ØËùÓĞ(Ò»¸ö»ò¶à¸ö)¸ø¶¨ key µÄÖµ£¬Èç¹û¸ø¶¨µÄ key ÀïÃæ£¬ÓĞÄ³¸ö key ²»´æÔÚ£¬
-	 * ÄÇÃ´Õâ¸ö key ·µ»Ø¿Õ´®Ìí¼Ó½ø½á¹ûÊı×éÖĞ
+	 * è¿”å›æ‰€æœ‰(ä¸€ä¸ªæˆ–å¤šä¸ª)ç»™å®š key çš„å€¼ï¼Œå¦‚æœç»™å®šçš„ key é‡Œé¢ï¼Œæœ‰æŸä¸ª key ä¸å­˜åœ¨ï¼Œ
+	 * é‚£ä¹ˆè¿™ä¸ª key è¿”å›ç©ºä¸²æ·»åŠ è¿›ç»“æœæ•°ç»„ä¸­
 	 * get the values of the given keys
-	 * @param keys {const std::vector<string>&} ×Ö·û´® key ¼¯ºÏ
+	 * @param keys {const std::vector<string>&} å­—ç¬¦ä¸² key é›†åˆ
 	 *  the given keys
-	 * @param out {std::vector<acl::string>*} ·Ç¿ÕÊ±´æ´¢×Ö·û´®Öµ¼¯ºÏÊı×é£¬
-	 *  ¶ÔÓÚ²»´æÔÚµÄ key Ò²»á´æ´¢Ò»¸ö¿Õ´®¶ÔÏó
+	 * @param out {std::vector<acl::string>*} éç©ºæ—¶å­˜å‚¨å­—ç¬¦ä¸²å€¼é›†åˆæ•°ç»„ï¼Œ
+	 *  å¯¹äºä¸å­˜åœ¨çš„ key ä¹Ÿä¼šå­˜å‚¨ä¸€ä¸ªç©ºä¸²å¯¹è±¡
 	 *  acl::string array storing the result. if one key not exists,
 	 *  a empty string "" will also be stored in the array.
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦£¬²Ù×÷³É¹¦ºó¿ÉÒÔÍ¨¹ıÒÔÏÂÈÎÒ»ÖÖ·½Ê½»ñµÃÊı¾İ£º
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸï¼Œæ“ä½œæˆåŠŸåå¯ä»¥é€šè¿‡ä»¥ä¸‹ä»»ä¸€ç§æ–¹å¼è·å¾—æ•°æ®ï¼š
 	 *  if successul, one of below ways can be used to get the result:
 	 *
-	 *  1¡¢ÔÚµ÷ÓÃ·½·¨ÖĞ´«Èë·Ç¿ÕµÄ´æ´¢½á¹û¶ÔÏóµÄµØÖ·
+	 *  1ã€åœ¨è°ƒç”¨æ–¹æ³•ä¸­ä¼ å…¥éç©ºçš„å­˜å‚¨ç»“æœå¯¹è±¡çš„åœ°å€
 	 *     input the no-NULL result parameter when call hmget, when
 	 *     success, the result will store the values of the given fileds
 	 *
-	 *  2¡¢»ùÀà·½·¨ get_value »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØÊı¾İ
+	 *  2ã€åŸºç±»æ–¹æ³• get_value è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ æ•°æ®
 	 *     call redis_command::result_value with the specified subscript
 	 *
-	 *  3¡¢»ùÀà·½·¨ get_child »ñµÃÖ¸¶¨ÏÂ±êµÄÔªËØ¶ÔÏó(redis_result£©£¬È»ºóÔÙÍ¨¹ı
-	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
-	 *     redis_result::argv_to_string ·½·¨»ñµÃÔªËØÊı¾İ
+	 *  3ã€åŸºç±»æ–¹æ³• get_child è·å¾—æŒ‡å®šä¸‹æ ‡çš„å…ƒç´ å¯¹è±¡(redis_resultï¼‰ï¼Œç„¶åå†é€šè¿‡
+	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
+	 *     redis_result::argv_to_string æ–¹æ³•è·å¾—å…ƒç´ æ•°æ®
 	 *     call redis_command::result_child with specified subscript to
 	 *     get redis_result object, then call redis_result::argv_to_string
 	 *     with above result to get the values of the give fileds
 	 *
-	 *  4¡¢»ùÀà·½·¨ get_result ·½·¨È¡µÃ×Ü½á¹û¼¯¶ÔÏó redis_result£¬È»ºóÔÙÍ¨¹ı
-	 *     redis_result::get_child »ñµÃÒ»¸öÔªËØ¶ÔÏó£¬È»ºóÔÙÍ¨¹ı·½Ê½ 2 ÖĞÖ¸¶¨
-	 *     µÄ·½·¨»ñµÃ¸ÃÔªËØµÄÊı¾İ
+	 *  4ã€åŸºç±»æ–¹æ³• get_result æ–¹æ³•å–å¾—æ€»ç»“æœé›†å¯¹è±¡ redis_resultï¼Œç„¶åå†é€šè¿‡
+	 *     redis_result::get_child è·å¾—ä¸€ä¸ªå…ƒç´ å¯¹è±¡ï¼Œç„¶åå†é€šè¿‡æ–¹å¼ 2 ä¸­æŒ‡å®š
+	 *     çš„æ–¹æ³•è·å¾—è¯¥å…ƒç´ çš„æ•°æ®
 	 *     call redis_command::get_result with the specified subscript to
 	 *     get redis_result object, and use redis_result::get_child to
 	 *     get one result object, then call redis_result::argv_to_string
 	 *     to get the value of one filed.
 	 *
-	 *  5¡¢»ùÀà·½·¨ get_children »ñµÃ½á¹ûÔªËØÊı×é¶ÔÏó£¬ÔÙÍ¨¹ı redis_result ÖĞ
-	 *     µÄ·½·¨ argv_to_string ´ÓÃ¿Ò»¸öÔªËØ¶ÔÏóÖĞ»ñµÃÔªËØÊı¾İ
+	 *  5ã€åŸºç±»æ–¹æ³• get_children è·å¾—ç»“æœå…ƒç´ æ•°ç»„å¯¹è±¡ï¼Œå†é€šè¿‡ redis_result ä¸­
+	 *     çš„æ–¹æ³• argv_to_string ä»æ¯ä¸€ä¸ªå…ƒç´ å¯¹è±¡ä¸­è·å¾—å…ƒç´ æ•°æ®
 	 *     use redis_command::get_children to get the redis_result array,
 	 *     then use redis_result::argv_to_string to get every value of
 	 *     the given fileds
@@ -456,95 +456,95 @@ public:
 	/////////////////////////////////////////////////////////////////////
 
 	/**
-	 * ½« key ÖĞ´¢´æµÄÊı×ÖÖµÔöÒ»
-	 * 1£©Èç¹û key ²»´æÔÚ£¬ÄÇÃ´ key µÄÖµ»áÏÈ±»³õÊ¼»¯Îª 0 £¬È»ºóÔÙÖ´ĞĞ INCR ²Ù×÷£»
-	 * 2£©Èç¹ûÖµ°üº¬´íÎóµÄÀàĞÍ£¬»ò×Ö·û´®ÀàĞÍµÄÖµ²»ÄÜ±íÊ¾ÎªÊı×Ö£¬ÄÇÃ´·µ»ØÒ»¸ö´íÎó£»
-	 * 3£©±¾²Ù×÷µÄÖµÏŞÖÆÔÚ 64 Î»(bit)ÓĞ·ûºÅÊı×Ö±íÊ¾Ö®ÄÚ
+	 * å°† key ä¸­å‚¨å­˜çš„æ•°å­—å€¼å¢ä¸€
+	 * 1ï¼‰å¦‚æœ key ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆ key çš„å€¼ä¼šå…ˆè¢«åˆå§‹åŒ–ä¸º 0 ï¼Œç„¶åå†æ‰§è¡Œ INCR æ“ä½œï¼›
+	 * 2ï¼‰å¦‚æœå€¼åŒ…å«é”™è¯¯çš„ç±»å‹ï¼Œæˆ–å­—ç¬¦ä¸²ç±»å‹çš„å€¼ä¸èƒ½è¡¨ç¤ºä¸ºæ•°å­—ï¼Œé‚£ä¹ˆè¿”å›ä¸€ä¸ªé”™è¯¯ï¼›
+	 * 3ï¼‰æœ¬æ“ä½œçš„å€¼é™åˆ¶åœ¨ 64 ä½(bit)æœ‰ç¬¦å·æ•°å­—è¡¨ç¤ºä¹‹å†…
 	 * increment the integer value of a key by one
 	 * 1) if key not exists, the key's value will be set 0 and INCR
 	 * 2) if key's value is not a number an error will be returned
 	 * 3) the number is a 64 signed integer
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the given key
-	 * @param result {long long int*} ·Ç¿ÕÊ±´æ´¢²Ù×÷½á¹û
+	 * @param result {long long int*} éç©ºæ—¶å­˜å‚¨æ“ä½œç»“æœ
 	 *  store the result after INCR if it isn't NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the INCR was executed correctly
 	 */
 	bool incr(const char* key, long long int* result = NULL);
 
 	/**
-	 * ½« key Ëù´¢´æµÄÖµ¼ÓÉÏÔöÁ¿ increment
-	 * 1£©Èç¹û key ²»´æÔÚ£¬ÄÇÃ´ key µÄÖµ»áÏÈ±»³õÊ¼»¯Îª 0 £¬È»ºóÔÙÖ´ĞĞ INCRBY ÃüÁî
-	 * 2£©Èç¹ûÖµ°üº¬´íÎóµÄÀàĞÍ£¬»ò×Ö·û´®ÀàĞÍµÄÖµ²»ÄÜ±íÊ¾ÎªÊı×Ö£¬ÄÇÃ´·µ»ØÒ»¸ö´íÎó
-	 * 3£©±¾²Ù×÷µÄÖµÏŞÖÆÔÚ 64 Î»(bit)ÓĞ·ûºÅÊı×Ö±íÊ¾Ö®ÄÚ
+	 * å°† key æ‰€å‚¨å­˜çš„å€¼åŠ ä¸Šå¢é‡ increment
+	 * 1ï¼‰å¦‚æœ key ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆ key çš„å€¼ä¼šå…ˆè¢«åˆå§‹åŒ–ä¸º 0 ï¼Œç„¶åå†æ‰§è¡Œ INCRBY å‘½ä»¤
+	 * 2ï¼‰å¦‚æœå€¼åŒ…å«é”™è¯¯çš„ç±»å‹ï¼Œæˆ–å­—ç¬¦ä¸²ç±»å‹çš„å€¼ä¸èƒ½è¡¨ç¤ºä¸ºæ•°å­—ï¼Œé‚£ä¹ˆè¿”å›ä¸€ä¸ªé”™è¯¯
+	 * 3ï¼‰æœ¬æ“ä½œçš„å€¼é™åˆ¶åœ¨ 64 ä½(bit)æœ‰ç¬¦å·æ•°å­—è¡¨ç¤ºä¹‹å†…
 	 * increment the integer value of a key by a given amount
 	 * 1) if key not exists, the key's value will be set 0 and INCRBY
 	 * 2) if key's value is not a number an error will be returned
 	 * 3) the number is a 64 signed integer
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the given key
-	 * @param inc {long long int} ÔöÁ¿Öµ
+	 * @param inc {long long int} å¢é‡å€¼
 	 *  the given amount
-	 * @param result {long long int*} ·Ç¿ÕÊ±´æ´¢²Ù×÷½á¹û
+	 * @param result {long long int*} éç©ºæ—¶å­˜å‚¨æ“ä½œç»“æœ
 	 *  store the result after INCR if it isn't NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the INCRBY was executed correctly
 	 */
 	bool incrby(const char* key, long long int inc,
 		long long int* result = NULL);
 
 	/**
-	 * Îª key ÖĞËù´¢´æµÄÖµ¼ÓÉÏ¸¡µãÊıÔöÁ¿
-	 * 1) Èç¹û key ²»´æÔÚ£¬ÄÇÃ´ INCRBYFLOAT »áÏÈ½« key µÄÖµÉèÎª 0 £¬ÔÙÖ´ĞĞ¼Ó·¨²Ù×÷
-	 * 2) Èç¹ûÃüÁîÖ´ĞĞ³É¹¦£¬ÄÇÃ´ key µÄÖµ»á±»¸üĞÂÎª£¨Ö´ĞĞ¼Ó·¨Ö®ºóµÄ£©ĞÂÖµ£¬²¢ÇÒĞÂÖµ»á
-	 *    ÒÔ×Ö·û´®µÄĞÎÊ½·µ»Ø¸øµ÷ÓÃÕß
-	 * 3) ¼ÆËã½á¹ûÒ²×î¶àÖ»ÄÜ±íÊ¾Ğ¡ÊıµãµÄºóÊ®ÆßÎ»
+	 * ä¸º key ä¸­æ‰€å‚¨å­˜çš„å€¼åŠ ä¸Šæµ®ç‚¹æ•°å¢é‡
+	 * 1) å¦‚æœ key ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆ INCRBYFLOAT ä¼šå…ˆå°† key çš„å€¼è®¾ä¸º 0 ï¼Œå†æ‰§è¡ŒåŠ æ³•æ“ä½œ
+	 * 2) å¦‚æœå‘½ä»¤æ‰§è¡ŒæˆåŠŸï¼Œé‚£ä¹ˆ key çš„å€¼ä¼šè¢«æ›´æ–°ä¸ºï¼ˆæ‰§è¡ŒåŠ æ³•ä¹‹åçš„ï¼‰æ–°å€¼ï¼Œå¹¶ä¸”æ–°å€¼ä¼š
+	 *    ä»¥å­—ç¬¦ä¸²çš„å½¢å¼è¿”å›ç»™è°ƒç”¨è€…
+	 * 3) è®¡ç®—ç»“æœä¹Ÿæœ€å¤šåªèƒ½è¡¨ç¤ºå°æ•°ç‚¹çš„ååä¸ƒä½
 	 * increment the float value of a key by the given amount
 	 * 1) if key not exists, the key's value will be set 0 and INCRBYFLOAT
 	 * 2) if key's value is not a float an error will be returned
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the given key
-	 * @param inc {double} ÔöÁ¿Öµ
+	 * @param inc {double} å¢é‡å€¼
 	 *  the given amount
-	 * @param result {double*} ·Ç¿ÕÊ±´æ´¢²Ù×÷½á¹û
+	 * @param result {double*} éç©ºæ—¶å­˜å‚¨æ“ä½œç»“æœ
 	 *  store the result after INCR if it isn't NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the INCRBYFLOAT was executed correctly
 	 */
 	bool incrbyfloat(const char* key, double inc, double* result = NULL);
 
 	/**
-	 * ½« key ÖĞ´¢´æµÄÊı×ÖÖµ¼õÒ»
-	 * 1) Èç¹û key ²»´æÔÚ£¬ÄÇÃ´ key µÄÖµ»áÏÈ±»³õÊ¼»¯Îª 0 £¬È»ºóÔÙÖ´ĞĞ DECR ²Ù×÷
-	 * 2) Èç¹ûÖµ°üº¬´íÎóµÄÀàĞÍ£¬»ò×Ö·û´®ÀàĞÍµÄÖµ²»ÄÜ±íÊ¾ÎªÊı×Ö£¬ÄÇÃ´·µ»ØÒ»¸ö´íÎó
-	 * 3) ±¾²Ù×÷µÄÖµÏŞÖÆÔÚ 64 Î»(bit)ÓĞ·ûºÅÊı×Ö±íÊ¾Ö®ÄÚ
+	 * å°† key ä¸­å‚¨å­˜çš„æ•°å­—å€¼å‡ä¸€
+	 * 1) å¦‚æœ key ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆ key çš„å€¼ä¼šå…ˆè¢«åˆå§‹åŒ–ä¸º 0 ï¼Œç„¶åå†æ‰§è¡Œ DECR æ“ä½œ
+	 * 2) å¦‚æœå€¼åŒ…å«é”™è¯¯çš„ç±»å‹ï¼Œæˆ–å­—ç¬¦ä¸²ç±»å‹çš„å€¼ä¸èƒ½è¡¨ç¤ºä¸ºæ•°å­—ï¼Œé‚£ä¹ˆè¿”å›ä¸€ä¸ªé”™è¯¯
+	 * 3) æœ¬æ“ä½œçš„å€¼é™åˆ¶åœ¨ 64 ä½(bit)æœ‰ç¬¦å·æ•°å­—è¡¨ç¤ºä¹‹å†…
 	 * decrement the integer value of a key by one
 	 * 1) if key not exists, the key's value will be set 0 and DECR
 	 * 2) if key's value is not a number an error will be returned
 	 * 3) the number is a 64 signed integer
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the given key
-	 * @param result {long long int*} ·Ç¿ÕÊ±´æ´¢²Ù×÷½á¹û
+	 * @param result {long long int*} éç©ºæ—¶å­˜å‚¨æ“ä½œç»“æœ
 	 *  store the result after INCR if it isn't NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the DECR was executed correctly
 	 */
 	bool decr(const char* key, long long int* result = NULL);
 
 	/**
-	 * ½« key Ëù´¢´æµÄÖµ¼õÈ¥¼õÁ¿ decrement
-	 * 1) Èç¹û key ²»´æÔÚ£¬ÄÇÃ´ key µÄÖµ»áÏÈ±»³õÊ¼»¯Îª 0 £¬È»ºóÔÙÖ´ĞĞ DECRBY ²Ù×÷
-	 * 2) Èç¹ûÖµ°üº¬´íÎóµÄÀàĞÍ£¬»ò×Ö·û´®ÀàĞÍµÄÖµ²»ÄÜ±íÊ¾ÎªÊı×Ö£¬ÄÇÃ´·µ»ØÒ»¸ö´íÎó
-	 * 3) ±¾²Ù×÷µÄÖµÏŞÖÆÔÚ 64 Î»(bit)ÓĞ·ûºÅÊı×Ö±íÊ¾Ö®ÄÚ
+	 * å°† key æ‰€å‚¨å­˜çš„å€¼å‡å»å‡é‡ decrement
+	 * 1) å¦‚æœ key ä¸å­˜åœ¨ï¼Œé‚£ä¹ˆ key çš„å€¼ä¼šå…ˆè¢«åˆå§‹åŒ–ä¸º 0 ï¼Œç„¶åå†æ‰§è¡Œ DECRBY æ“ä½œ
+	 * 2) å¦‚æœå€¼åŒ…å«é”™è¯¯çš„ç±»å‹ï¼Œæˆ–å­—ç¬¦ä¸²ç±»å‹çš„å€¼ä¸èƒ½è¡¨ç¤ºä¸ºæ•°å­—ï¼Œé‚£ä¹ˆè¿”å›ä¸€ä¸ªé”™è¯¯
+	 * 3) æœ¬æ“ä½œçš„å€¼é™åˆ¶åœ¨ 64 ä½(bit)æœ‰ç¬¦å·æ•°å­—è¡¨ç¤ºä¹‹å†…
 	 * decrement the integer value of a key by the given amount
-	 * @param key {const char*} ×Ö·û´®¶ÔÏóµÄ key
+	 * @param key {const char*} å­—ç¬¦ä¸²å¯¹è±¡çš„ key
 	 *  the given key
-	 * @param dec {long long int} ¼õÁ¿Öµ
+	 * @param dec {long long int} å‡é‡å€¼
 	 *  the given amount
-	 * @param result {long long int*} ·Ç¿ÕÊ±´æ´¢²Ù×÷½á¹û
+	 * @param result {long long int*} éç©ºæ—¶å­˜å‚¨æ“ä½œç»“æœ
 	 *  store the result after INCR if it isn't NULL
-	 * @return {bool} ²Ù×÷ÊÇ·ñ³É¹¦
+	 * @return {bool} æ“ä½œæ˜¯å¦æˆåŠŸ
 	 *  if the DECRBY was executed correctly
 	 */
 	bool decrby(const char* key, long long int dec,

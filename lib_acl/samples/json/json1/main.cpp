@@ -70,27 +70,27 @@ static void test_json_foreach2(ACL_JSON* json)
 
 	printf("------------ in %s ------------\r\n", __FUNCTION__);
 
-	/* Ò»¼¶½áµã */
+	/* ä¸€çº§ç»“ç‚¹ */
 	acl_foreach(iter1, json->root) {
 		node1 = (ACL_JSON_NODE*) iter1.data;
 		print_json_node(json, node1);
 
-		/* ¶ş¼¶½áµã */
+		/* äºŒçº§ç»“ç‚¹ */
 		acl_foreach(iter2, node1) {
 			node2 = (ACL_JSON_NODE*) iter2.data;
 			print_json_node(json, node2);
 
-			/* Èı¼¶½áµã */
+			/* ä¸‰çº§ç»“ç‚¹ */
 			acl_foreach(iter3, node2) {
 				node3 = (ACL_JSON_NODE*) iter3.data;
 				print_json_node(json, node3);
 
-				/* ËÄ¼¶½áµã */
+				/* å››çº§ç»“ç‚¹ */
 				acl_foreach(iter4, node3) {
 					node4 = (ACL_JSON_NODE*) iter4.data;
 					print_json_node(json, node4);
 
-					/* Îå¼¶½áµã */
+					/* äº”çº§ç»“ç‚¹ */
 					acl_foreach(iter5, node4) {
 						node5 = (ACL_JSON_NODE*) iter5.data;
 						print_json_node(json, node5);
@@ -125,11 +125,11 @@ static void test_json_find1(ACL_JSON* json)
 		ACL_JSON_NODE* node1 = (ACL_JSON_NODE*) iter1.data;
 		printf("%s: %s\r\n", tags, STR(node1->text));
 
-		/* ±éÀú node1 ½áµãµÄÒ»¼¶×Ó½áµã */
+		/* éå† node1 ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹ */
 		acl_foreach(iter2, node1) {
 			ACL_JSON_NODE* node2 = (ACL_JSON_NODE*) iter2.data;
 
-			/* ±éÀú node2 ½áµãµÄÒ»¼¶×Ó½áµã */
+			/* éå† node2 ç»“ç‚¹çš„ä¸€çº§å­ç»“ç‚¹ */
 			acl_foreach(iter3, node2) {
 				ACL_JSON_NODE* node3 =
 					(ACL_JSON_NODE*) iter3.data;
@@ -304,7 +304,7 @@ static void test_json_benchmark(bool once, int max)
 			acl_json_update(json, ptr);
 		else
 		{
-			/* Ã¿´Î½öÊäÈëÒ»¸ö×Ö½ÚÀ´·ÖÎö json Êı¾İ */
+			/* æ¯æ¬¡ä»…è¾“å…¥ä¸€ä¸ªå­—èŠ‚æ¥åˆ†æ json æ•°æ® */
 			while (*ptr != 0) {
 				char  ch2[2];
 
@@ -333,8 +333,8 @@ static void usage(const char* program)
 int main(int argc, char** argv)
 {
 #if 0
-//	const char* pp = "Õ\\";
-	const char* pp = "å\\";
+//	const char* pp = "èª \";
+	const char* pp = "éŒ¦\";
 	while (*pp)
 	{
 		printf("ch: %d\r\n", *pp);

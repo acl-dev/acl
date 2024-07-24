@@ -74,7 +74,7 @@ static MYSQL *sane_mysql_query(ACL_DB_HANDLE *handle, const char *sql)
 	if (mysql_query(myconn, sql) == 0)
 		return (myconn);
 
-	/* ÖØĞÂ´ò¿ªMYSQLÁ¬½Ó½øĞĞÖØÊÔ */
+	/* é‡æ–°æ‰“å¼€MYSQLè¿æ¥è¿›è¡Œé‡è¯• */
 
 	errnum = mysql_errno(myconn);
 	if (errnum != CR_SERVER_LOST && errnum != CR_SERVER_GONE_ERROR) {
@@ -165,7 +165,7 @@ void acl_dbmysql_free_result(ACL_SQL_RES *res)
 	acl_myfree(res);
 }
 
-/* ÓÃÓÚÓĞ·µ»Ø½á¹û¼¯µÄ²éÑ¯ */
+/* ç”¨äºæœ‰è¿”å›ç»“æœé›†çš„æŸ¥è¯¢ */
 
 int acl_dbmysql_results(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	int (*walk_fn)(const void** my_row, void *arg), void *arg)
@@ -237,7 +237,7 @@ int acl_dbmysql_results(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	return (n);
 }
 
-/* ÓÃÓÚ½ö²éÑ¯Ò»¸ö½á¹ûµÄÇé¿ö */
+/* ç”¨äºä»…æŸ¥è¯¢ä¸€ä¸ªç»“æœçš„æƒ…å†µ */
 
 int acl_dbmysql_result(ACL_DB_HANDLE *handle, const char *sql, int  *error,
 	int (*callback)(const void** my_row, void *arg), void *arg)

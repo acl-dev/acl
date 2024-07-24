@@ -15,7 +15,7 @@ static char* get_warning_mail(const char *proc, ACL_ARGV *rcpts, int pid,
 	ACL_ITER iter;
 	ACL_VSTRING *tos;
 
-	/* ´ò¿ªÄ£°åÎÄ¼ş²¢´´½¨Ä£°å¶ÔÏó */
+	/* æ‰“å¼€æ¨¡æ¿æ–‡ä»¶å¹¶åˆ›å»ºæ¨¡æ¿å¯¹è±¡ */
 	tpl = tpl_alloc();
 	if (tpl_load(tpl, var_cfg_warn_mail) != TPL_OK) {
 		acl_msg_error("load %s error(%s)", var_cfg_warn_mail,
@@ -67,7 +67,7 @@ static char* get_warning_mail(const char *proc, ACL_ARGV *rcpts, int pid,
 	tpl_set_field_fmt_global(tpl, "VAR_HOST", "%s", ip);
 	tpl_set_field_fmt_global(tpl, "VAR_DATE", "%s", date);
 
-	/* ½ø³ÌÏà¹ØĞÅÏ¢ */
+	/* è¿›ç¨‹ç›¸å…³ä¿¡æ¯ */
 	tpl_set_field_fmt_global(tpl, "VAR_PROC", "%s", proc);
 	tpl_set_field_fmt_global(tpl, "VAR_PID", "%d", pid);
 	tpl_set_field_fmt_global(tpl, "VAR_INFO", "%s", info);
@@ -93,7 +93,7 @@ static int smtp_banner(ACL_VSTREAM *client)
 	char  line[1024];
 	int   ret;
 
-	/* ¶ÁÈ¡»¶Ó­ĞÅÏ¢ */
+	/* è¯»å–æ¬¢è¿ä¿¡æ¯ */
 	ret = acl_vstream_gets_nonl(client, line, sizeof(line));
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): gets banner error from %s",
@@ -109,7 +109,7 @@ static int smtp_helo(ACL_VSTREAM *client)
 	char  line[1024];
 	int   ret;
 
-	/* ·¢ËÍ helo ĞÅÏ¢ */
+	/* å‘é€ helo ä¿¡æ¯ */
 	ret = acl_vstream_fprintf(client, "helo %s\r\n", var_cfg_smtp_helo);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): send helo to %s error(%s)",
@@ -118,7 +118,7 @@ static int smtp_helo(ACL_VSTREAM *client)
 		return (-1);
 	}
 
-	/* ¶ÁÈ¡ÏìÓ¦ĞÅÏ¢ */
+	/* è¯»å–å“åº”ä¿¡æ¯ */
 	ret = acl_vstream_gets_nonl(client, line, sizeof(line));
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): gets helo's reply from %s error(%s)",
@@ -148,7 +148,7 @@ static int smtp_auth(ACL_VSTREAM *client)
 	return (x);  \
 } while (0)
 
-	/* ·¢ËÍÈÏÖ¤ÃüÁî */
+	/* å‘é€è®¤è¯å‘½ä»¤ */
 
 	ret = acl_vstream_fprintf(client, "AUTH LOGIN\r\n");
 	if (ret == ACL_VSTREAM_EOF) {
@@ -173,7 +173,7 @@ static int smtp_auth(ACL_VSTREAM *client)
 		RETURN (-1);
 	}
 
-	/* ·¢ËÍÓÊÏäÕÊºÅ */
+	/* å‘é€é‚®ç®±å¸å· */
 
 	user = (char*) acl_base64_encode(var_cfg_auth_user, strlen(var_cfg_auth_user));
 	ret = acl_vstream_fprintf(client, "%s\r\n", user);
@@ -199,7 +199,7 @@ static int smtp_auth(ACL_VSTREAM *client)
 		RETURN (-1);
 	}
 
-	/* ·¢ËÍ password */
+	/* å‘é€ password */
 
 	pass = (char*) acl_base64_encode(var_cfg_auth_pass, strlen(var_cfg_auth_pass));
 	ret = acl_vstream_fprintf(client, "%s\r\n", pass);
@@ -233,7 +233,7 @@ static int smtp_from(ACL_VSTREAM *client)
 	int   ret;
 	ACL_ARGV *tokens;
 
-	/* ·¢ËÍ mail from ĞÅÏ¢ */
+	/* å‘é€ mail from ä¿¡æ¯ */
 	ret = acl_vstream_fprintf(client, "mail from: <%s>\r\n", var_cfg_mail_from);
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): send mail from to %s error(%s)",
@@ -242,7 +242,7 @@ static int smtp_from(ACL_VSTREAM *client)
 		return (-1);
 	}
 
-	/* ¶ÁÈ¡ÏìÓ¦ĞÅÏ¢ */
+	/* è¯»å–å“åº”ä¿¡æ¯ */
 	ret = acl_vstream_gets_nonl(client, line, sizeof(line));
 	if (ret == ACL_VSTREAM_EOF) {
 		acl_msg_error("%s(%d): gets mail from's reply from %s error(%s)",

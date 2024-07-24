@@ -8,10 +8,10 @@
 namespace acl {
 
 /**
- * ÓÃÓÚÐ­³ÌÖ®¼ä£¬Ïß³ÌÖ®¼äÒÔ¼°Ð­³ÌÓëÏß³ÌÖ®¼äµÄÏûÏ¢Í¨ÐÅ£¬Í¨¹ýÐ­³ÌÌõ¼þ±äÁ¿
- * ¼°Ð­³ÌÊÂ¼þËøÊµÏÖ
+ * ç”¨äºŽåç¨‹ä¹‹é—´ï¼Œçº¿ç¨‹ä¹‹é—´ä»¥åŠåç¨‹ä¸Žçº¿ç¨‹ä¹‹é—´çš„æ¶ˆæ¯é€šä¿¡ï¼Œé€šè¿‡åç¨‹æ¡ä»¶å˜é‡
+ * åŠåç¨‹äº‹ä»¶é”å®žçŽ°
  *
- * Ê¾Àý£º
+ * ç¤ºä¾‹ï¼š
  *
  * class myobj {
  * public:
@@ -44,37 +44,37 @@ template<typename T>
 class fiber_tbox2 {
 public:
 	/**
-	 * ¹¹Ôì·½·¨
+	 * æž„é€ æ–¹æ³•
 	 */
 	fiber_tbox2(void) : size_(0) {}
 
 	~fiber_tbox2(void) {}
 
 	/**
-	 * ÇåÀíÏûÏ¢¶ÓÁÐÖÐÎ´±»Ïû·ÑµÄÏûÏ¢¶ÔÏó
+	 * æ¸…ç†æ¶ˆæ¯é˜Ÿåˆ—ä¸­æœªè¢«æ¶ˆè´¹çš„æ¶ˆæ¯å¯¹è±¡
 	 */
 	void clear(void) {
 		tbox_.clear();
 	}
 
 	/**
-	 * ·¢ËÍÏûÏ¢¶ÔÏó
-	 * @param t {T} ÏûÏ¢¶ÔÏó
-	 * @param notify_first {bool} Èç¹û±¾²ÎÊýÎª true£¬ÔòÄÚ²¿Ìí¼ÓÍêÏûÏ¢ºó
-	 *  ²ÉÓÃÏÈÍ¨Öªºó½âËø·½Ê½£¬·ñÔò²ÉÓÃÏÈ½âËøºóÍ¨Öª·½Ê½£¬µ± fiber_tbox2 ¶ÔÏó
-	 *  µÄÉú´æÖÜÆÚ±È½Ï³¤Ê±£¬¸Ã²ÎÊýÉèÎª false µÄÐ§ÂÊ¸ü¸ß£¬Èç¹û fiber_tbox2
-	 *  ¶ÔÏóµÄÉú´æÖÜÆÚ½Ï¶Ì(Èç£ºµÈ´ýÕßµ÷ÓÃ pop ºóÖ±½ÓÏú»Ù fiber_tbox2 ¶ÔÏó),
-	 *  Ôò±¾²ÎÊýÓ¦¸ÃÉèÎª true£¬ÒÔ±ÜÃâ push Õß»¹Ã»ÓÐÍêÈ«·µ»ØÇ°Òò fiber_tbox2
-	 *  ¶ÔÏó±»ÌáÇ°Ïú»Ù¶øÔì³ÉÄÚ´æ·Ç·¨·ÃÎÊ
+	 * å‘é€æ¶ˆæ¯å¯¹è±¡
+	 * @param t {T} æ¶ˆæ¯å¯¹è±¡
+	 * @param notify_first {bool} å¦‚æžœæœ¬å‚æ•°ä¸º trueï¼Œåˆ™å†…éƒ¨æ·»åŠ å®Œæ¶ˆæ¯åŽ
+	 *  é‡‡ç”¨å…ˆé€šçŸ¥åŽè§£é”æ–¹å¼ï¼Œå¦åˆ™é‡‡ç”¨å…ˆè§£é”åŽé€šçŸ¥æ–¹å¼ï¼Œå½“ fiber_tbox2 å¯¹è±¡
+	 *  çš„ç”Ÿå­˜å‘¨æœŸæ¯”è¾ƒé•¿æ—¶ï¼Œè¯¥å‚æ•°è®¾ä¸º false çš„æ•ˆçŽ‡æ›´é«˜ï¼Œå¦‚æžœ fiber_tbox2
+	 *  å¯¹è±¡çš„ç”Ÿå­˜å‘¨æœŸè¾ƒçŸ­(å¦‚ï¼šç­‰å¾…è€…è°ƒç”¨ pop åŽç›´æŽ¥é”€æ¯ fiber_tbox2 å¯¹è±¡),
+	 *  åˆ™æœ¬å‚æ•°åº”è¯¥è®¾ä¸º trueï¼Œä»¥é¿å… push è€…è¿˜æ²¡æœ‰å®Œå…¨è¿”å›žå‰å›  fiber_tbox2
+	 *  å¯¹è±¡è¢«æå‰é”€æ¯è€Œé€ æˆå†…å­˜éžæ³•è®¿é—®
 	 * @return {bool}
 	 */
 	bool push(T t, bool notify_first = true) {
-		// ÏÈ¼ÓËø
+		// å…ˆåŠ é”
 		if (mutex_.lock() == false) {
 			abort();
 		}
 
-		// Ïò¶ÓÁÐÖÐÌí¼ÓÏûÏ¢¶ÔÏó
+		// å‘é˜Ÿåˆ—ä¸­æ·»åŠ æ¶ˆæ¯å¯¹è±¡
 		tbox_.push_back(t);
 		size_++;
 
@@ -98,11 +98,11 @@ public:
 	}
 
 	/**
-	 * ½ÓÊÕÏûÏ¢¶ÔÏó
-	 * @param t {T&} µ±º¯Êý ·µ»Ø true Ê±´æ·Å½á¹û¶ÔÏó
-	 * @param wait_ms {int} >= 0 Ê±ÉèÖÃµÈ´ý³¬Ê±Ê±¼ä(ºÁÃë¼¶±ð)£¬
-	 *  ·ñÔòÓÀÔ¶µÈ´ýÖ±µ½¶Áµ½ÏûÏ¢¶ÔÏó»ò³ö´í
-	 * @return {bool} ÊÇ·ñ»ñµÃÏûÏ¢¶ÔÏó
+	 * æŽ¥æ”¶æ¶ˆæ¯å¯¹è±¡
+	 * @param t {T&} å½“å‡½æ•° è¿”å›ž true æ—¶å­˜æ”¾ç»“æžœå¯¹è±¡
+	 * @param wait_ms {int} >= 0 æ—¶è®¾ç½®ç­‰å¾…è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§åˆ«)ï¼Œ
+	 *  å¦åˆ™æ°¸è¿œç­‰å¾…ç›´åˆ°è¯»åˆ°æ¶ˆæ¯å¯¹è±¡æˆ–å‡ºé”™
+	 * @return {bool} æ˜¯å¦èŽ·å¾—æ¶ˆæ¯å¯¹è±¡
 	 */
 	bool pop(T& t, int wait_ms = -1) {
 		if (mutex_.lock() == false) {
@@ -126,7 +126,7 @@ public:
 	}
 
 	/**
-	 * ·µ»Øµ±Ç°´æÔÚÓÚÏûÏ¢¶ÓÁÐÖÐµÄÏûÏ¢ÊýÁ¿
+	 * è¿”å›žå½“å‰å­˜åœ¨äºŽæ¶ˆæ¯é˜Ÿåˆ—ä¸­çš„æ¶ˆæ¯æ•°é‡
 	 * @return {size_t}
 	 */
 	size_t size(void) const {

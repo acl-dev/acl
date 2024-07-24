@@ -49,7 +49,7 @@ void pthread_end(void)
 	}
 }
 
-/* Ã¿¸ö½ø³ÌµÄÎ¨Ò»³õÊ¼»¯º¯Êı */
+/* æ¯ä¸ªè¿›ç¨‹çš„å”¯ä¸€åˆå§‹åŒ–å‡½æ•° */
 
 static void pthread_init_once(void)
 {
@@ -80,7 +80,7 @@ static void pthread_init_once(void)
 	__tls_key_list[__tls_value_list_key].key = __tls_value_list_key;
 }
 
-/* »ñµÃÏß³Ì¾Ö²¿±äÁ¿Á´±í */
+/* è·å¾—çº¿ç¨‹å±€éƒ¨å˜é‡é“¾è¡¨ */
 
 static FIFO *tls_value_list_get(void)
 {
@@ -118,17 +118,17 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 		return EINVAL;
 	}
 
-	/* Ö»ÓĞµÚÒ»¸öµ÷ÓÃ InterlockedCompareExchange µÄÏß³Ì²Å»áÖ´ĞĞ
-	 * init_routine, ºóĞøÏß³ÌÓÀÔ¶ÔÚ InterlockedCompareExchange
-	 * ÍâÔËĞĞ£¬²¢ÇÒÒ»Ö±½øÈë¿ÕÑ­»·Ö±ÖÁµÚÒ»¸öÏß³ÌÖ´ĞĞ init_routine
-	 * Íê±Ï²¢ÇÒ½« *once_control ÖØĞÂ¸³Öµ, Ö»ÓĞÔÚ¶àºË»·¾³ÖĞ¶à¸öÏß³Ì
-	 * Í¬Ê±ÔËĞĞÖÁ´ËÊ±²ÅÓĞ¿ÉÄÜ³öÏÖ¶ÌÔİµÄºóĞøÏß³Ì¿ÕÑ­»·ÏÖÏó£¬Èç¹û
-	 * ¶à¸öÏß³ÌË³ĞòÖÁ´Ë£¬ÔòÒòÎª *once_control ÒÑ¾­±»µÚÒ»¸öÏß³ÌÖØĞÂ
-	 * ¸³Öµ¶ø²»»á½øÈëÑ­»·ÌåÄÚÖ»ËùÒÔÈç´Ë´¦Àí£¬ÊÇÎªÁË±£Ö¤ËùÓĞÏß³ÌÔÚ
-	 * µ÷ÓÃ pthread_once ·µ»ØÇ° init_routine ±ØĞë±»µ÷ÓÃÇÒ½öÄÜ
-	 * ±»µ÷ÓÃÒ»´Î, µ«ÔÚVC6ÏÂ£¬InterlockedCompareExchange ½Ó¿Ú¶¨Òå
-	 * ÓĞĞ©¹ÖÒì£¬ĞèÒª×öÓ²ĞÔÖ¸¶¨²ÎÊıÀàĞÍ£¬²Î¼û <Windows ¸ß¼¶±à³ÌÖ¸ÄÏ>
-	 * Jeffrey Richter, 366 Ò³
+	/* åªæœ‰ç¬¬ä¸€ä¸ªè°ƒç”¨ InterlockedCompareExchange çš„çº¿ç¨‹æ‰ä¼šæ‰§è¡Œ
+	 * init_routine, åç»­çº¿ç¨‹æ°¸è¿œåœ¨ InterlockedCompareExchange
+	 * å¤–è¿è¡Œï¼Œå¹¶ä¸”ä¸€ç›´è¿›å…¥ç©ºå¾ªç¯ç›´è‡³ç¬¬ä¸€ä¸ªçº¿ç¨‹æ‰§è¡Œ init_routine
+	 * å®Œæ¯•å¹¶ä¸”å°† *once_control é‡æ–°èµ‹å€¼, åªæœ‰åœ¨å¤šæ ¸ç¯å¢ƒä¸­å¤šä¸ªçº¿ç¨‹
+	 * åŒæ—¶è¿è¡Œè‡³æ­¤æ—¶æ‰æœ‰å¯èƒ½å‡ºç°çŸ­æš‚çš„åç»­çº¿ç¨‹ç©ºå¾ªç¯ç°è±¡ï¼Œå¦‚æœ
+	 * å¤šä¸ªçº¿ç¨‹é¡ºåºè‡³æ­¤ï¼Œåˆ™å› ä¸º *once_control å·²ç»è¢«ç¬¬ä¸€ä¸ªçº¿ç¨‹é‡æ–°
+	 * èµ‹å€¼è€Œä¸ä¼šè¿›å…¥å¾ªç¯ä½“å†…åªæ‰€ä»¥å¦‚æ­¤å¤„ç†ï¼Œæ˜¯ä¸ºäº†ä¿è¯æ‰€æœ‰çº¿ç¨‹åœ¨
+	 * è°ƒç”¨ pthread_once è¿”å›å‰ init_routine å¿…é¡»è¢«è°ƒç”¨ä¸”ä»…èƒ½
+	 * è¢«è°ƒç”¨ä¸€æ¬¡, ä½†åœ¨VC6ä¸‹ï¼ŒInterlockedCompareExchange æ¥å£å®šä¹‰
+	 * æœ‰äº›æ€ªå¼‚ï¼Œéœ€è¦åšç¡¬æ€§æŒ‡å®šå‚æ•°ç±»å‹ï¼Œå‚è§ <Windows é«˜çº§ç¼–ç¨‹æŒ‡å—>
+	 * Jeffrey Richter, 366 é¡µ
 	 */
 	while (1) {
 		LONG prev = InterlockedCompareExchange(
@@ -136,21 +136,21 @@ int pthread_once(pthread_once_t *once_control, void (*init_routine)(void))
 		if (prev == 2)
 			return 0;
 		else if (prev == 0) {
-			/* Ö»ÓĞµÚÒ»¸öÏß³Ì²Å»áÖÁ´Ë */
+			/* åªæœ‰ç¬¬ä¸€ä¸ªçº¿ç¨‹æ‰ä¼šè‡³æ­¤ */
 			init_routine();
-			/* ½« *conce_control ÖØĞÂ¸³ÖµÒÔÊ¹ºóĞøÏß³Ì²»½øÈë while
-			 * Ñ­»·»ò´Ó while Ñ­»·ÖĞÌø³ö
+			/* å°† *conce_control é‡æ–°èµ‹å€¼ä»¥ä½¿åç»­çº¿ç¨‹ä¸è¿›å…¥ while
+			 * å¾ªç¯æˆ–ä» while å¾ªç¯ä¸­è·³å‡º
 			 */
 			InterlockedExchange((LONG*) once_control, 2);
 			return 0;
 		} else {
 			assert(prev == 1);
 
-			/* ·ÀÖ¹¿ÕÑ­»·¹ı¶àµØÀË·ÑCPU */
+			/* é˜²æ­¢ç©ºå¾ªç¯è¿‡å¤šåœ°æµªè´¹CPU */
 			Sleep(1);  /** sleep 1ms */
 		}
 	}
-	return 1;  /* ²»¿É´ï´úÂë£¬±ÜÃâ±àÒëÆ÷±¨¾¯¸æ */
+	return 1;  /* ä¸å¯è¾¾ä»£ç ï¼Œé¿å…ç¼–è¯‘å™¨æŠ¥è­¦å‘Š */
 }
 
 int pthread_key_create(pthread_key_t *key_ptr, void (*destructor)(void*))
@@ -201,7 +201,7 @@ int pthread_setspecific(pthread_key_t key, void *value)
 		if (tls_value->tls_key != NULL
 			&& tls_value->tls_key->key == key) {
 
-			/* Èç¹ûÏàÍ¬µÄ¼ü´æÔÚÔòĞèÒªÏÈÊÍ·Å¾ÉÊı¾İ */
+			/* å¦‚æœç›¸åŒçš„é”®å­˜åœ¨åˆ™éœ€è¦å…ˆé‡Šæ”¾æ—§æ•°æ® */
 			if (tls_value->tls_key->destructor && tls_value->value)
 				tls_value->tls_key->destructor(tls_value->value);
 			tls_value->tls_key = NULL;

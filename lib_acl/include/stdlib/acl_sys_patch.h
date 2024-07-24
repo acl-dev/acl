@@ -27,15 +27,15 @@ struct timezone {
 };
 
 /**
- * Ë¯Ãß¼¸Ãë
- * @param sec {int} Ë¯ÃßµÄÃëÊı
+ * ç¡çœ å‡ ç§’
+ * @param sec {int} ç¡çœ çš„ç§’æ•°
  */
 ACL_API void sleep(int sec);
 
 /**
- * »ñµÃµ±Ç°Ê±¼ä
- * @param tv {struct timeval*} ´æ´¢µ±Ç°Ê±¼ä½á¹û
- * @param tz {struct timezone*} Ê±Çø
+ * è·å¾—å½“å‰æ—¶é—´
+ * @param tv {struct timeval*} å­˜å‚¨å½“å‰æ—¶é—´ç»“æœ
+ * @param tz {struct timezone*} æ—¶åŒº
  */
 ACL_API int gettimeofday(struct timeval *tv, struct timezone *tz);
 ACL_API int gettimeofday1(struct timeval *tv, struct timezone *tz);
@@ -49,30 +49,30 @@ ACL_API int gettimeofday4(struct timeval *tv, struct timezone *tz);
 #endif
 
 /**
- * Ì×½Ó×Ö³õÊ¼»¯£¬¶ÔÓÚ_WIN32Æ½Ì¨£ºĞèÒªµ÷ÓÃWSAStartupÀ´³õÊ¼»¯SOCKET£¬
- * ¶ø¶ÔÓÚUNIXÆ½Ì¨£ºĞèÒªÍ¨¹ı signal(SIGPIPE, SIG_IGN) À´ºöÂÔĞÅºÅ
+ * å¥—æ¥å­—åˆå§‹åŒ–ï¼Œå¯¹äº_WIN32å¹³å°ï¼šéœ€è¦è°ƒç”¨WSAStartupæ¥åˆå§‹åŒ–SOCKETï¼Œ
+ * è€Œå¯¹äºUNIXå¹³å°ï¼šéœ€è¦é€šè¿‡ signal(SIGPIPE, SIG_IGN) æ¥å¿½ç•¥ä¿¡å·
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_init(void);
 
 /**
- * ³ÌĞòÍË³öÇ°µ÷ÓÃ´Ëº¯ÊıÊÍ·ÅÈ«¾ÖÌ×½Ó×Ö×ÊÔ´£¨½ö_WIN32ÏÂÓĞĞ§£©
+ * ç¨‹åºé€€å‡ºå‰è°ƒç”¨æ­¤å‡½æ•°é‡Šæ”¾å…¨å±€å¥—æ¥å­—èµ„æºï¼ˆä»…_WIN32ä¸‹æœ‰æ•ˆï¼‰
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_end(void);
 
 /**
- * ¹Ø±ÕÌ×½Ó×Ö
- * @param fd {ACL_SOCKET} Ì×½Ó×Ö
+ * å…³é—­å¥—æ¥å­—
+ * @param fd {ACL_SOCKET} å¥—æ¥å­—
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_close(ACL_SOCKET fd);
 
 /**
- * ½ûÖ¹Ì×½Ó¿ÚµÄ·¢ËÍÓë½ÓÊÕ
- * @param fd {ACL_SOCKET} Ì×½Ó×Ö
+ * ç¦æ­¢å¥—æ¥å£çš„å‘é€ä¸æ¥æ”¶
+ * @param fd {ACL_SOCKET} å¥—æ¥å­—
  * @param how {int}
- * @return {int} ·µ»Ø 0 ±íÊ¾²Ù×÷³É¹¦£¬·ñÔò±íÊ¾³ö´í
+ * @return {int} è¿”å› 0 è¡¨ç¤ºæ“ä½œæˆåŠŸï¼Œå¦åˆ™è¡¨ç¤ºå‡ºé”™
  */
 #if defined(_WIN32) || defined(_WIN64)
 # ifndef SHUT_RD
@@ -88,151 +88,151 @@ ACL_API int acl_socket_close(ACL_SOCKET fd);
 ACL_API int acl_socket_shutdown(ACL_SOCKET fd, int how);
 
 /**
- * ´ÓÌ×½Ó×Ö¶ÁÊı¾İ
- * @param fd {ACL_SOCKET} ÍøÂçÌ×½Ó×Ö
- * @param buf {void*} ÄÚ´æ»º³åÇøµØÖ·
- * @param size {size_t} buf »º³åÇø´óĞ¡
- * @param timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ä¬ÈÏÒÔÃëÎªµ¥Î», µ±ACL_VSTREAM_IS_MS() Ê±
- *  Ôòµ¥Î»ÎªºÁÃë), µ±¸ÃÖµ >= 0 Ê±, Ôò»áÆôÓÃ¶ÁĞ´³¬Ê±¼ì²â»úÖÆ, < 0 Ôò²»¼ì²â.
- * @param fp {ACL_VSTREAM*} ÍøÂçÁ÷, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§×ÔÒÑµÄ²ÎÊı£¬ÔÚ»Øµ÷·½Ê½Ê±ÓĞÓÃ
+ * ä»å¥—æ¥å­—è¯»æ•°æ®
+ * @param fd {ACL_SOCKET} ç½‘ç»œå¥—æ¥å­—
+ * @param buf {void*} å†…å­˜ç¼“å†²åŒºåœ°å€
+ * @param size {size_t} buf ç¼“å†²åŒºå¤§å°
+ * @param timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(é»˜è®¤ä»¥ç§’ä¸ºå•ä½, å½“ACL_VSTREAM_IS_MS() æ—¶
+ *  åˆ™å•ä½ä¸ºæ¯«ç§’), å½“è¯¥å€¼ >= 0 æ—¶, åˆ™ä¼šå¯ç”¨è¯»å†™è¶…æ—¶æ£€æµ‹æœºåˆ¶, < 0 åˆ™ä¸æ£€æµ‹.
+ * @param fp {ACL_VSTREAM*} ç½‘ç»œæµ, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·è‡ªå·²çš„å‚æ•°ï¼Œåœ¨å›è°ƒæ–¹å¼æ—¶æœ‰ç”¨
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_read(ACL_SOCKET fd, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ÏòÌ×½Ó×ÖĞ´Êı¾İ
- * @param fd {ACL_SOCKET} ÍøÂçÌ×½Ó×Ö
- * @param buf {void*} Êı¾İµØÖ·
- * @param size {size_t} buf Êı¾İ´óĞ¡
- * @param timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ä¬ÈÏÒÔÃëÎªµ¥Î», µ±ACL_VSTREAM_IS_MS() Ê±
- *  Ôòµ¥Î»ÎªºÁÃë), µ±¸ÃÖµ >= 0 Ê±, Ôò»áÆôÓÃ¶ÁĞ´³¬Ê±¼ì²â»úÖÆ, < 0 Ôò²»¼ì²â.
- * @param fp {ACL_VSTREAM*} ÍøÂçÁ÷, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§×ÔÒÑµÄ²ÎÊı£¬ÔÚ»Øµ÷·½Ê½Ê±ÓĞÓÃ
+ * å‘å¥—æ¥å­—å†™æ•°æ®
+ * @param fd {ACL_SOCKET} ç½‘ç»œå¥—æ¥å­—
+ * @param buf {void*} æ•°æ®åœ°å€
+ * @param size {size_t} buf æ•°æ®å¤§å°
+ * @param timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(é»˜è®¤ä»¥ç§’ä¸ºå•ä½, å½“ACL_VSTREAM_IS_MS() æ—¶
+ *  åˆ™å•ä½ä¸ºæ¯«ç§’), å½“è¯¥å€¼ >= 0 æ—¶, åˆ™ä¼šå¯ç”¨è¯»å†™è¶…æ—¶æ£€æµ‹æœºåˆ¶, < 0 åˆ™ä¸æ£€æµ‹.
+ * @param fp {ACL_VSTREAM*} ç½‘ç»œæµ, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·è‡ªå·²çš„å‚æ•°ï¼Œåœ¨å›è°ƒæ–¹å¼æ—¶æœ‰ç”¨
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_write(ACL_SOCKET fd, const void *buf,
 	size_t size, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ÏòÌ×½Ó×ÖĞ´Êı¾İ
- * @param fd {ACL_SOCKET} ÍøÂçÌ×½Ó×Ö
- * @param vec {const struct iovec*} Êı¾İÊı×éµØÖ·
- * @param count {int} vec Êı×é³¤¶È
- * @param timeout {int} ¶ÁĞ´³¬Ê±Ê±¼ä(Ä¬ÈÏÒÔÃëÎªµ¥Î», µ±ACL_VSTREAM_IS_MS() Ê±
- *  Ôòµ¥Î»ÎªºÁÃë), µ±¸ÃÖµ >= 0 Ê±, Ôò»áÆôÓÃ¶ÁĞ´³¬Ê±¼ì²â»úÖÆ, < 0 Ôò²»¼ì²â.
- * @param fp {ACL_VSTREAM*} ÍøÂçÁ÷, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§×ÔÒÑµÄ²ÎÊı£¬ÔÚ»Øµ÷·½Ê½Ê±ÓĞÓÃ
+ * å‘å¥—æ¥å­—å†™æ•°æ®
+ * @param fd {ACL_SOCKET} ç½‘ç»œå¥—æ¥å­—
+ * @param vec {const struct iovec*} æ•°æ®æ•°ç»„åœ°å€
+ * @param count {int} vec æ•°ç»„é•¿åº¦
+ * @param timeout {int} è¯»å†™è¶…æ—¶æ—¶é—´(é»˜è®¤ä»¥ç§’ä¸ºå•ä½, å½“ACL_VSTREAM_IS_MS() æ—¶
+ *  åˆ™å•ä½ä¸ºæ¯«ç§’), å½“è¯¥å€¼ >= 0 æ—¶, åˆ™ä¼šå¯ç”¨è¯»å†™è¶…æ—¶æ£€æµ‹æœºåˆ¶, < 0 åˆ™ä¸æ£€æµ‹.
+ * @param fp {ACL_VSTREAM*} ç½‘ç»œæµ, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·è‡ªå·²çš„å‚æ•°ï¼Œåœ¨å›è°ƒæ–¹å¼æ—¶æœ‰ç”¨
  * @return {int} 0: OK; -1: error
  */
 ACL_API int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec,
 	int count, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ÅĞ¶ÏÌ×½Ó×ÖÊÇ·ñÕı³£
+ * åˆ¤æ–­å¥—æ¥å­—æ˜¯å¦æ­£å¸¸
  * @param fd {ACL_SOCKET}
- * @return {int} ·µ»ØÖµ 1 ±íÊ¾Õı³££¬·µ»Ø 0 ±íÊ¾Òì³£
+ * @return {int} è¿”å›å€¼ 1 è¡¨ç¤ºæ­£å¸¸ï¼Œè¿”å› 0 è¡¨ç¤ºå¼‚å¸¸
  */
 ACL_API	int acl_socket_alive(ACL_SOCKET fd);
 
 /**
- * ´ò¿ªÎÄ¼ş¾ä±ú
- * @param filepath {cosnt char*} ÎÄ¼şÂ·¾¶
- * @param flags {int} ´ò¿ª±êÖ¾Î», O_RDONLY | O_WRONLY | O_RDWR, 
+ * æ‰“å¼€æ–‡ä»¶å¥æŸ„
+ * @param filepath {cosnt char*} æ–‡ä»¶è·¯å¾„
+ * @param flags {int} æ‰“å¼€æ ‡å¿—ä½, O_RDONLY | O_WRONLY | O_RDWR, 
  *  O_CREAT | O_EXCL | O_TRUNC, O_APPEND(for UNIX)
- * @param mode {int} ´ò¿ªÈ¨ÏŞÎ», ½ö¶ÔUNIXÓĞĞ§, Èç£º0700, 0755
- * @return {ACL_FILE_HANDLE} ´ò¿ªµÄÎÄ¼ş¾ä±ú£¬·µ»Ø ACL_FILE_INVALID ±íÊ¾´ò¿ªÊ§°Ü
+ * @param mode {int} æ‰“å¼€æƒé™ä½, ä»…å¯¹UNIXæœ‰æ•ˆ, å¦‚ï¼š0700, 0755
+ * @return {ACL_FILE_HANDLE} æ‰“å¼€çš„æ–‡ä»¶å¥æŸ„ï¼Œè¿”å› ACL_FILE_INVALID è¡¨ç¤ºæ‰“å¼€å¤±è´¥
  */
 ACL_API ACL_FILE_HANDLE acl_file_open(const char *filepath, int flags, int mode);
 
 /**
- * ¹Ø±Õ´ò¿ªµÄÎÄ¼ş¾ä±ú
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
+ * å…³é—­æ‰“å¼€çš„æ–‡ä»¶å¥æŸ„
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
  * @return {int} 0: ok; -1: error
  */
 ACL_API int acl_file_close(ACL_FILE_HANDLE fh);
 
 /**
- * ¶¨Î»ÎÄ¼şÎ»ÖÃ
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param offset {acl_off_t} Æ«ÒÆÎ»ÖÃ
- * @param whence {int} Î»ÖÃ±êÖ¾Î»£ºSEEK_CUR, SEEK_SET, SEEK_END
- * @return {acl_off_t} µ±Ç°µÄÎÄ¼şÆ«ÒÆÎ»ÖÃ
+ * å®šä½æ–‡ä»¶ä½ç½®
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param offset {acl_off_t} åç§»ä½ç½®
+ * @param whence {int} ä½ç½®æ ‡å¿—ä½ï¼šSEEK_CUR, SEEK_SET, SEEK_END
+ * @return {acl_off_t} å½“å‰çš„æ–‡ä»¶åç§»ä½ç½®
  */
 ACL_API acl_off_t acl_lseek(ACL_FILE_HANDLE fh, acl_off_t offset, int whence);
 
 /**
- * ´ÓÎÄ¼şÖĞ¶ÁÊı¾İ
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param buf {void*} ´æ´¢»º³åÇø
- * @param size {size_t} buf »º³åÇø´óĞ¡
- * @param timeout {int} ¸Ã²ÎÊı½«±»ºöÂÔ
- * @param fp {ACL_VSTREAM*} ¶ÔÓ¦µÄÎÄ¼şÁ÷¾ä±ú, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§´«µİµÄ²ÎÊı, ÒÔ»Øµ÷·½Ê½Ê¹ÓÃÊ±´Ë²ÎÊıÓĞĞ§
- * @return {int} ¶Áµ½µÄÊµ¼ÊÊı¾İ, Èç¹û·µ»Ø ACL_VSTREAM_EOF ±íÊ¾¶Á½áÊø»ò³ö´í
+ * ä»æ–‡ä»¶ä¸­è¯»æ•°æ®
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param buf {void*} å­˜å‚¨ç¼“å†²åŒº
+ * @param size {size_t} buf ç¼“å†²åŒºå¤§å°
+ * @param timeout {int} è¯¥å‚æ•°å°†è¢«å¿½ç•¥
+ * @param fp {ACL_VSTREAM*} å¯¹åº”çš„æ–‡ä»¶æµå¥æŸ„, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°, ä»¥å›è°ƒæ–¹å¼ä½¿ç”¨æ—¶æ­¤å‚æ•°æœ‰æ•ˆ
+ * @return {int} è¯»åˆ°çš„å®é™…æ•°æ®, å¦‚æœè¿”å› ACL_VSTREAM_EOF è¡¨ç¤ºè¯»ç»“æŸæˆ–å‡ºé”™
  */
 ACL_API int acl_file_read(ACL_FILE_HANDLE fh, void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ÏòÎÄ¼şÖĞĞ´Êı¾İ
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param buf {void*} Êı¾İ´æ´¢»º³åÇø
- * @param size {size_t} buf »º³åÇøÖĞÊı¾İ³¤¶È´óĞ¡
- * @param timeout {int} ¸Ã²ÎÊı½«±»ºöÂÔ
- * @param fp {ACL_VSTREAM*} ¶ÔÓ¦µÄÎÄ¼şÁ÷¾ä±ú, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§´«µİµÄ²ÎÊı, ÒÔ»Øµ÷·½Ê½Ê¹ÓÃÊ±´Ë²ÎÊıÓĞĞ§
- * @return {int} ³É¹¦Ğ´µÄÊı¾İÁ¿, Èç¹û·µ»Ø ACL_VSTREAM_EOF ±íÊ¾Ğ´³ö´í
+ * å‘æ–‡ä»¶ä¸­å†™æ•°æ®
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param buf {void*} æ•°æ®å­˜å‚¨ç¼“å†²åŒº
+ * @param size {size_t} buf ç¼“å†²åŒºä¸­æ•°æ®é•¿åº¦å¤§å°
+ * @param timeout {int} è¯¥å‚æ•°å°†è¢«å¿½ç•¥
+ * @param fp {ACL_VSTREAM*} å¯¹åº”çš„æ–‡ä»¶æµå¥æŸ„, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°, ä»¥å›è°ƒæ–¹å¼ä½¿ç”¨æ—¶æ­¤å‚æ•°æœ‰æ•ˆ
+ * @return {int} æˆåŠŸå†™çš„æ•°æ®é‡, å¦‚æœè¿”å› ACL_VSTREAM_EOF è¡¨ç¤ºå†™å‡ºé”™
  */
 ACL_API int acl_file_write(ACL_FILE_HANDLE fh, const void *buf, size_t size,
 	int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ÏòÎÄ¼şÖĞĞ´Ò»×éÊı¾İ
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param vec {const struct iovec*} Êı¾İ´æ´¢Êı×é
- * @param count {int} vec Êı×éÖĞÔªËØ¸öÊı
- * @param timeout {int} ¸Ã²ÎÊı½«±»ºöÂÔ
- * @param fp {ACL_VSTREAM*} ¶ÔÓ¦µÄÎÄ¼şÁ÷¾ä±ú, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§´«µİµÄ²ÎÊı, ÒÔ»Øµ÷·½Ê½Ê¹ÓÃÊ±´Ë²ÎÊıÓĞĞ§
- * @return {int} ³É¹¦Ğ´µÄÊı¾İÁ¿, Èç¹û·µ»Ø ACL_VSTREAM_EOF ±íÊ¾Ğ´³ö´í
+ * å‘æ–‡ä»¶ä¸­å†™ä¸€ç»„æ•°æ®
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param vec {const struct iovec*} æ•°æ®å­˜å‚¨æ•°ç»„
+ * @param count {int} vec æ•°ç»„ä¸­å…ƒç´ ä¸ªæ•°
+ * @param timeout {int} è¯¥å‚æ•°å°†è¢«å¿½ç•¥
+ * @param fp {ACL_VSTREAM*} å¯¹åº”çš„æ–‡ä»¶æµå¥æŸ„, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°, ä»¥å›è°ƒæ–¹å¼ä½¿ç”¨æ—¶æ­¤å‚æ•°æœ‰æ•ˆ
+ * @return {int} æˆåŠŸå†™çš„æ•°æ®é‡, å¦‚æœè¿”å› ACL_VSTREAM_EOF è¡¨ç¤ºå†™å‡ºé”™
  */
 ACL_API int acl_file_writev(ACL_FILE_HANDLE fh, const struct iovec *vec,
 	int count, int timeout, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ½«ÎÄ¼ş»º³åÇøÖĞµÄÊı¾İÈ«²¿Ğ´ÈëÓ²ÅÌ
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param fp {ACL_VSTREAM*} ¶ÔÓ¦µÄÎÄ¼şÁ÷¾ä±ú, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§´«µİµÄ²ÎÊı, ÒÔ»Øµ÷·½Ê½Ê¹ÓÃÊ±´Ë²ÎÊıÓĞĞ§
+ * å°†æ–‡ä»¶ç¼“å†²åŒºä¸­çš„æ•°æ®å…¨éƒ¨å†™å…¥ç¡¬ç›˜
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param fp {ACL_VSTREAM*} å¯¹åº”çš„æ–‡ä»¶æµå¥æŸ„, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°, ä»¥å›è°ƒæ–¹å¼ä½¿ç”¨æ—¶æ­¤å‚æ•°æœ‰æ•ˆ
  * @return {int} 0: ok; -1: error
  */
 ACL_API int acl_file_fflush(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ¸ù¾İÎÄ¼şÃûÈ¡µÃ¸ÃÎÄ¼şµÄ´óĞ¡
- * @param filename {const char*} ÎÄ¼şÃû
+ * æ ¹æ®æ–‡ä»¶åå–å¾—è¯¥æ–‡ä»¶çš„å¤§å°
+ * @param filename {const char*} æ–‡ä»¶å
  * @return {acl_int64} >= 0: ok;  -1: error
  */
 ACL_API acl_int64 acl_file_size(const char *filename);
 
 /**
- * ¸ù¾İÎÄ¼ş¾ä±úÈ¡µÃ¸ÃÎÄ¼şµÄ´óĞ¡
- * @param fh {ACL_FILE_HANDLE} ÎÄ¼ş¾ä±ú
- * @param fp {ACL_VSTREAM*} ¶ÔÓ¦µÄÎÄ¼şÁ÷¾ä±ú, ¿ÉÒÔÎª¿Õ
- * @param arg {void*} ÓÃ»§´«µİµÄ²ÎÊı, ÒÔ»Øµ÷·½Ê½Ê¹ÓÃÊ±´Ë²ÎÊıÓĞĞ§
+ * æ ¹æ®æ–‡ä»¶å¥æŸ„å–å¾—è¯¥æ–‡ä»¶çš„å¤§å°
+ * @param fh {ACL_FILE_HANDLE} æ–‡ä»¶å¥æŸ„
+ * @param fp {ACL_VSTREAM*} å¯¹åº”çš„æ–‡ä»¶æµå¥æŸ„, å¯ä»¥ä¸ºç©º
+ * @param arg {void*} ç”¨æˆ·ä¼ é€’çš„å‚æ•°, ä»¥å›è°ƒæ–¹å¼ä½¿ç”¨æ—¶æ­¤å‚æ•°æœ‰æ•ˆ
  * @return {acl_int64} >= 0: ok;  -1: error
  */
 ACL_API acl_int64 acl_file_fsize(ACL_FILE_HANDLE fh, ACL_VSTREAM *fp, void *arg);
 
 /**
- * ´´½¨ SOCKET ¶Ô
+ * åˆ›å»º SOCKET å¯¹
  * @param domain {int}
  * @param type {int}
  * @param protocol {int}
- * @param result {ACL_SOCKET [2]} ´æ´¢½á¹û
- * @return {int} ³É¹¦·µ»Ø 0£¬Ê§°Ü·µ»Ø -1
+ * @param result {ACL_SOCKET [2]} å­˜å‚¨ç»“æœ
+ * @return {int} æˆåŠŸè¿”å› 0ï¼Œå¤±è´¥è¿”å› -1
  */
 ACL_API int acl_sane_socketpair(int domain, int type, int protocol,
 		ACL_SOCKET result[2]);

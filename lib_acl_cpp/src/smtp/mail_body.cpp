@@ -188,7 +188,7 @@ bool mail_body::save_relative(const char* html, size_t hlen,
 	out.append("\r\n");
 	out.format_append("--%s\r\n", boundary_.c_str());
 
-	// 递归一层，调用生成 alternative 格式数据
+	// 閫掑綊涓�灞傦紝璋冪敤鐢熸垚 alternative 鏍煎紡鏁版嵁
 	mail_body body(charset_.c_str(), transfer_encoding_.c_str());
 	bool ret = body.save_alternative(html, hlen, plain, plen, out);
 	if (ret == false) {

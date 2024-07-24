@@ -53,7 +53,7 @@ void open_dos(void)
 	if (dos_fp_)
 		return;
 
-	// ´ò¿ª DOS ´°¿Ú
+	// Â´Ã²Â¿Âª DOS Â´Â°Â¿Ãš
 	AllocConsole();
 
 #if _MSC_VER >= 1500

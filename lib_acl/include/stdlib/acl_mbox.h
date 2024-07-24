@@ -10,51 +10,51 @@ extern "C" {
 typedef struct ACL_MBOX ACL_MBOX;
 
 /**
- * ´´½¨ÎŞËøÏûÏ¢¶ÓÁĞ¶ÔÏó
+ * åˆ›å»ºæ— é”æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
  * @return {ACL_MBOX}
  */
 ACL_API ACL_MBOX *acl_mbox_create(void);
 
-#define	ACL_MBOX_T_SPSC		0	/* µ¥Éú²úÕßµ¥Ïû·ÑÕß */
-#define	ACL_MBOX_T_MPSC		1	/* ¶àÉú²úÕßµ¥Ïû·ÑÕß */
+#define	ACL_MBOX_T_SPSC		0	/* å•ç”Ÿäº§è€…å•æ¶ˆè´¹è€… */
+#define	ACL_MBOX_T_MPSC		1	/* å¤šç”Ÿäº§è€…å•æ¶ˆè´¹è€… */
 
 ACL_API ACL_MBOX *acl_mbox_create2(unsigned type);
 
 /**
- * ÊÍ·ÅÎŞËøÏûÏ¢¶ÓÁĞ¶ÔÏó
- * @param mbox {ACL_MBOX*} ÏûÏ¢¶ÓÁĞ¶ÔÏó
- * @param free_fn {void (*)(void*)} ·Ç¿ÕÊ±ÓÃÀ´ÊÍ·Åµ±Ç°´æÔÚÓÚÏûÏ¢¶ÓÁĞÖĞµÄ¶ÔÏó
+ * é‡Šæ”¾æ— é”æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
+ * @param mbox {ACL_MBOX*} æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
+ * @param free_fn {void (*)(void*)} éç©ºæ—¶ç”¨æ¥é‡Šæ”¾å½“å‰å­˜åœ¨äºæ¶ˆæ¯é˜Ÿåˆ—ä¸­çš„å¯¹è±¡
  */
 ACL_API void acl_mbox_free(ACL_MBOX *mbox, void (*free_fn)(void*));
 
 /**
- * ÏòÏûÏ¢¶ÓÁĞÖĞÌí¼Ó¶¯Ì¬ÏûÏ¢¶ÔÏó
- * @param mbox {ACL_MBOX*} ÏûÏ¢¶ÓÁĞ¶ÔÏó
+ * å‘æ¶ˆæ¯é˜Ÿåˆ—ä¸­æ·»åŠ åŠ¨æ€æ¶ˆæ¯å¯¹è±¡
+ * @param mbox {ACL_MBOX*} æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
  * @param msg {void*}
- * @return {int} ·¢ËÍ³É¹¦·µ»Ø 0£¬·ñÔò·µ»Ø -1
+ * @return {int} å‘é€æˆåŠŸè¿”å› 0ï¼Œå¦åˆ™è¿”å› -1
  */
 ACL_API int acl_mbox_send(ACL_MBOX *mbox, void *msg);
 
 /**
- * ´ÓÏûÏ¢¶ÓÁĞÖĞ¶ÁÈ¡ÏûÏ¢
- * @param mbox {ACL_MBOX*} ÏûÏ¢¶ÓÁĞ¶ÔÏó
- * @param timeout {int} µÈ´ı³¬Ê±Ê±¼ä(ºÁÃë¼¶±ğ)£¬Èç¹û < 0 ÔòÒ»Ö±µÈ´ıÖ±µ½ÓĞÊı¾İ
- * @param success {int*} ´æ´¢²Ù×÷ÊÇ·ñ³É¹¦µÄ½á¹û£¬ 0 ±íÊ¾³ö´í£¬·Ç 0 ±íÊ¾³É¹¦
- * @return {void*} ·µ»Ø¶Áµ½µÄÏûÏ¢¶ÔÏó£¬Èç¹û·µ»Ø NULL Ê±»¹ĞèÅĞ¶Ï success µÄÖµ£¬ÒÔ´ËÀ´
- *  ÅĞ¶Ï¶Á²Ù×÷ÊÇ·ñ³É¹¦£¬Èç¹û·µ»Ø·Ç NULL ±íÊ¾³É¹¦¶Áµ½Ò»ÌõÏûÏ¢
+ * ä»æ¶ˆæ¯é˜Ÿåˆ—ä¸­è¯»å–æ¶ˆæ¯
+ * @param mbox {ACL_MBOX*} æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
+ * @param timeout {int} ç­‰å¾…è¶…æ—¶æ—¶é—´(æ¯«ç§’çº§åˆ«)ï¼Œå¦‚æœ < 0 åˆ™ä¸€ç›´ç­‰å¾…ç›´åˆ°æœ‰æ•°æ®
+ * @param success {int*} å­˜å‚¨æ“ä½œæ˜¯å¦æˆåŠŸçš„ç»“æœï¼Œ 0 è¡¨ç¤ºå‡ºé”™ï¼Œé 0 è¡¨ç¤ºæˆåŠŸ
+ * @return {void*} è¿”å›è¯»åˆ°çš„æ¶ˆæ¯å¯¹è±¡ï¼Œå¦‚æœè¿”å› NULL æ—¶è¿˜éœ€åˆ¤æ–­ success çš„å€¼ï¼Œä»¥æ­¤æ¥
+ *  åˆ¤æ–­è¯»æ“ä½œæ˜¯å¦æˆåŠŸï¼Œå¦‚æœè¿”å›é NULL è¡¨ç¤ºæˆåŠŸè¯»åˆ°ä¸€æ¡æ¶ˆæ¯
  */
 ACL_API void *acl_mbox_read(ACL_MBOX *mbox, int timeout, int *success);
 
 /**
- * »ñµÃµ±Ç°ÏûÏ¢¶ÓÁĞÒÑ¾­³É¹¦·¢ËÍµÄÏûÏ¢Êı
- * @param mbox {ACL_MBOX*} ÏûÏ¢¶ÓÁĞ¶ÔÏó
+ * è·å¾—å½“å‰æ¶ˆæ¯é˜Ÿåˆ—å·²ç»æˆåŠŸå‘é€çš„æ¶ˆæ¯æ•°
+ * @param mbox {ACL_MBOX*} æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
  * @return {size_t}
  */
 ACL_API size_t acl_mbox_nsend(ACL_MBOX *mbox);
 
 /**
- * »ñµÃµ±Ç°ÏûÏ¢¶ÓÁĞÒÑ¾­³É¹¦½ÓÊÕµ½µÄÏûÏ¢Êı
- * @param mbox {ACL_MBOX*} ÏûÏ¢¶ÓÁĞ¶ÔÏó
+ * è·å¾—å½“å‰æ¶ˆæ¯é˜Ÿåˆ—å·²ç»æˆåŠŸæ¥æ”¶åˆ°çš„æ¶ˆæ¯æ•°
+ * @param mbox {ACL_MBOX*} æ¶ˆæ¯é˜Ÿåˆ—å¯¹è±¡
  * @return {size_t}
  */
 ACL_API size_t acl_mbox_nread(ACL_MBOX *mbox);

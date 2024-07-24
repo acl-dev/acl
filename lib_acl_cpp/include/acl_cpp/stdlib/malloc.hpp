@@ -17,14 +17,14 @@ void  operator delete(void *p) throw();
 #elif defined(ACL_CPP_DEBUG_MEM)
 
 /**
- * µ±ĞèÒª¼ì²é acl ¿âÖĞµÄÄÚ´æ·ÖÅäÖĞÊÇ·ñ´æÔÚÄÚ´æĞ¹Â¶ÎÊÌâÊ±£¬Í¨¹ıÖØÔØ new/delete
- * ½«¶ÔÏóµÄ´´½¨ÓëÏú»Ù¹ı¼ÇÂ¼ÏÂÀ´£¬Èç¹û¶ÔÏó±»´´½¨ºóÃ»ÓĞ±»ÊÍ·Å£¬ÔòÄÚ²¿¾Í»á±ê¼ÇÎª
- * Ò»´ÎÄÚ´æĞ¹Â¶£¬Ê¹ÓÃÕß¿ÉÒÔ¶¨Ê±Êä³öÕâĞ©µØÖ·ĞÅÏ¢£¬²é¿´ÔÚÄÄ¸öÎÄ¼ş´´½¨µÄ¶ÔÏóÃ»ÓĞ
- * ±»ÊÍ·Å£¬ÒªÏëÊ¹ÓÃ´Ë¹¦ÄÜ£¬ĞèÔÚ lib_acl_cpp/include/acl_cpp/acl_cpp_define.hpp
- * ÖĞµÄºê "//#define ACL_CPP_DEBUG_MEM" ´ò¿ª£¬Í¬Ê±Ó¦ÓÃĞèÒªÔÚ×Ô¼ºµÄÔ´´úÂëÖĞ°üº¬
- * Í·ÎÄ¼ş£º
+ * å½“éœ€è¦æ£€æŸ¥ acl åº“ä¸­çš„å†…å­˜åˆ†é…ä¸­æ˜¯å¦å­˜åœ¨å†…å­˜æ³„éœ²é—®é¢˜æ—¶ï¼Œé€šè¿‡é‡è½½ new/delete
+ * å°†å¯¹è±¡çš„åˆ›å»ºä¸é”€æ¯è¿‡è®°å½•ä¸‹æ¥ï¼Œå¦‚æœå¯¹è±¡è¢«åˆ›å»ºåæ²¡æœ‰è¢«é‡Šæ”¾ï¼Œåˆ™å†…éƒ¨å°±ä¼šæ ‡è®°ä¸º
+ * ä¸€æ¬¡å†…å­˜æ³„éœ²ï¼Œä½¿ç”¨è€…å¯ä»¥å®šæ—¶è¾“å‡ºè¿™äº›åœ°å€ä¿¡æ¯ï¼ŒæŸ¥çœ‹åœ¨å“ªä¸ªæ–‡ä»¶åˆ›å»ºçš„å¯¹è±¡æ²¡æœ‰
+ * è¢«é‡Šæ”¾ï¼Œè¦æƒ³ä½¿ç”¨æ­¤åŠŸèƒ½ï¼Œéœ€åœ¨ lib_acl_cpp/include/acl_cpp/acl_cpp_define.hpp
+ * ä¸­çš„å® "//#define ACL_CPP_DEBUG_MEM" æ‰“å¼€ï¼ŒåŒæ—¶åº”ç”¨éœ€è¦åœ¨è‡ªå·±çš„æºä»£ç ä¸­åŒ…å«
+ * å¤´æ–‡ä»¶ï¼š
  * #include "acl_cpp/stdlib/malloc.hpp
- * ×îºó£¬Ó¦ÓÃ³ÌĞòÔÚ´´½¨¶ÔÏóÊ±Ó¦Ê¹ÓÃ NEW À´Ìæ´ú new.
+ * æœ€åï¼Œåº”ç”¨ç¨‹åºåœ¨åˆ›å»ºå¯¹è±¡æ—¶åº”ä½¿ç”¨ NEW æ¥æ›¿ä»£ new.
  */
 void* operator new(size_t, const char*, const char*, int) throw();
 void operator delete(void*) throw();
@@ -35,12 +35,12 @@ void operator delete(void*, size_t) throw();
 namespace acl {
 
 /**
- * Æô¶¯ÄÚ´æ¼à¿Ø¹ı³Ì
+ * å¯åŠ¨å†…å­˜ç›‘æ§è¿‡ç¨‹
  */
 ACL_CPP_API void mem_checker_start(const char* logfile = NULL);
 
 /**
- * ½«µ±Ç°ÄÚ´æ×´Ì¬ÏÔÊ¾ÖÁÆÁÄ»£¬Ê¹ÓÃÕß¿ÉÒÔ×Ô¼ºÔö¼Ó¶¨Ê±Æ÷¶¨Ê±µ÷ÓÃ´Ëº¯Êı
+ * å°†å½“å‰å†…å­˜çŠ¶æ€æ˜¾ç¤ºè‡³å±å¹•ï¼Œä½¿ç”¨è€…å¯ä»¥è‡ªå·±å¢åŠ å®šæ—¶å™¨å®šæ—¶è°ƒç”¨æ­¤å‡½æ•°
  */
 ACL_CPP_API void mem_checker_show(void);
 }
@@ -52,23 +52,23 @@ namespace acl {
 ACL_CPP_API void  acl_slice_init(void);
 
 /**
- * ÄÚ´æ·ÖÅäº¯Êı
- * @param size {size_t} ĞèÒª·ÖÅäµÄ³ß´ç´óĞ¡
- * @param filename {const char*} Ô´³ÌĞòÃû×Ö
- * @param funcname {const char*} º¯ÊıÃû
- * @param lineno {int} Ô´³ÌĞòĞĞºÅ
- * @return {void*} ·ÖÅäµÄÄÚ´æµØÖ·£¬Èç¹û·ÖÅäÄÚ´æÊ§°Ü£¬ÔòÖ±½Óabort
+ * å†…å­˜åˆ†é…å‡½æ•°
+ * @param size {size_t} éœ€è¦åˆ†é…çš„å°ºå¯¸å¤§å°
+ * @param filename {const char*} æºç¨‹åºåå­—
+ * @param funcname {const char*} å‡½æ•°å
+ * @param lineno {int} æºç¨‹åºè¡Œå·
+ * @return {void*} åˆ†é…çš„å†…å­˜åœ°å€ï¼Œå¦‚æœåˆ†é…å†…å­˜å¤±è´¥ï¼Œåˆ™ç›´æ¥abort
  */
 ACL_CPP_API void* acl_new(size_t size, const char* filename,
 	const char* funcname, int lineno);
 
 
 /**
- * ÊÍ·ÅÄÚ´æº¯Êı
- * @param ptr {void*} ÄÚ´æµØÖ·
- * @param filename {const char*} Ô´³ÌĞòÃû×Ö
- * @param funcname {const char*} º¯ÊıÃû
- * @param lineno {int} Ô´³ÌĞòĞĞºÅ
+ * é‡Šæ”¾å†…å­˜å‡½æ•°
+ * @param ptr {void*} å†…å­˜åœ°å€
+ * @param filename {const char*} æºç¨‹åºåå­—
+ * @param funcname {const char*} å‡½æ•°å
+ * @param lineno {int} æºç¨‹åºè¡Œå·
  */
 ACL_CPP_API void  acl_delete(void *ptr, const char* filename,
 	const char* funcname, int lineno);

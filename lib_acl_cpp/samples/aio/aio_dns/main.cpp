@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 
 	acl::dns_service* server = new acl::dns_service(nthreads);
 
-	// 使消息服务器监听 127.0.0.1 的地址
+	// 浣挎秷鎭湇鍔″櫒鐩戝惉 127.0.0.1 鐨勫湴鍧�
 	if (!server->open(&handle)) {
 		delete server;
 		std::cout << "open server error!" << std::endl;

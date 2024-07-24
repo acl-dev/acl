@@ -33,15 +33,15 @@ int main(void)
 {
 	test1();
 
-	const char *text = "ÊÐ³¡·Ý¶îºÍÀûÈóÖ¤Ã÷ÁËÎ¢ÈíµÄ´íÎó¡£µ«ÔÚÕâÖ®Ç°£¬\r\n"
-		"GoogleÓÐ×ã¹»Ê±¼ä³É³¤Îª¿ÉÓëÎ¢Èí±È¼çµÄ¾ÞÈË¡£µ½2007Äê£¬Î¢\r\n"
-		"Èí²»µÃ²»Í¨¹ý²¢¹ºÀ´¶Ô¿¹Google¡£ËüµÄÄ¿±êÉõÖÁÖ¸ÏòÁËÑÅ»¢£¬Õâ\r\n"
-		"ÈÃGoogle¾ª³öÒ»ÉíÀäº¹£¬²¢»¨´óÁ¦ÆøÀ´Ëµ·þÑÅ»¢¾Ü¾øÎ¢Èí¡£Î¢Èí\r\n"
-		"»¹ÊÔÍ¼Í¨¹ýÏ÷ÈõÈí¼þ»ùÒò¸øÆä»¥ÁªÍøÒµÎñ´øÀ´µÄÓ°Ïì£¬²¢ÔÚ2009Äê\r\n"
-		"6ÔÂÍÆ³öÁË×Ô¼ºµÄ¶ÀÁ¢ËÑË÷ÒýÇæBing¡£Õâ¿î²úÆ·ÍêÈ«Å×ÆúWindows\r\n"
-		" »ùÒò£¬ÔÚ½çÃæºÍ¹¦ÄÜÉÏÐ¡ÐÄÒíÒíºÍ¾ºÕù¶ÔÊÖÕë·æÏà¶Ô²¢±ÜÃâÀ×Í¬¡£\r\n"
-		"µ½ÕâÊ±£¬Î¢Èí²ÅÒâÊ¶µ½ËÑË÷ÒµÎñ²»ÄÜÊÇWindowsÒµÎñµÄ¸½Ó¹£¬ÒÔËÑ\r\n"
-		"Ë÷ÎªºËÐÄµÄ»¥ÁªÍøÒµÎñÓÐÆäÉú³¤Âß¼­¡£:)\r\n";
+	const char *text = "å¸‚åœºä»½é¢å’Œåˆ©æ¶¦è¯æ˜Žäº†å¾®è½¯çš„é”™è¯¯ã€‚ä½†åœ¨è¿™ä¹‹å‰ï¼Œ\r\n"
+		"Googleæœ‰è¶³å¤Ÿæ—¶é—´æˆé•¿ä¸ºå¯ä¸Žå¾®è½¯æ¯”è‚©çš„å·¨äººã€‚åˆ°2007å¹´ï¼Œå¾®\r\n"
+		"è½¯ä¸å¾—ä¸é€šè¿‡å¹¶è´­æ¥å¯¹æŠ—Googleã€‚å®ƒçš„ç›®æ ‡ç”šè‡³æŒ‡å‘äº†é›…è™Žï¼Œè¿™\r\n"
+		"è®©GoogleæƒŠå‡ºä¸€èº«å†·æ±—ï¼Œå¹¶èŠ±å¤§åŠ›æ°”æ¥è¯´æœé›…è™Žæ‹’ç»å¾®è½¯ã€‚å¾®è½¯\r\n"
+		"è¿˜è¯•å›¾é€šè¿‡å‰Šå¼±è½¯ä»¶åŸºå› ç»™å…¶äº’è”ç½‘ä¸šåŠ¡å¸¦æ¥çš„å½±å“ï¼Œå¹¶åœ¨2009å¹´\r\n"
+		"6æœˆæŽ¨å‡ºäº†è‡ªå·±çš„ç‹¬ç«‹æœç´¢å¼•æ“ŽBingã€‚è¿™æ¬¾äº§å“å®Œå…¨æŠ›å¼ƒWindows\r\n"
+		" åŸºå› ï¼Œåœ¨ç•Œé¢å’ŒåŠŸèƒ½ä¸Šå°å¿ƒç¿¼ç¿¼å’Œç«žäº‰å¯¹æ‰‹é’ˆé”‹ç›¸å¯¹å¹¶é¿å…é›·åŒã€‚\r\n"
+		"åˆ°è¿™æ—¶ï¼Œå¾®è½¯æ‰æ„è¯†åˆ°æœç´¢ä¸šåŠ¡ä¸èƒ½æ˜¯Windowsä¸šåŠ¡çš„é™„åº¸ï¼Œä»¥æœ\r\n"
+		"ç´¢ä¸ºæ ¸å¿ƒçš„äº’è”ç½‘ä¸šåŠ¡æœ‰å…¶ç”Ÿé•¿é€»è¾‘ã€‚:)\r\n";
 	//acl::mime_xxcode mime;
 	//acl::mime_uucode mime;
 	acl::mime_base64 mime;
@@ -51,7 +51,7 @@ int main(void)
 	acl::fstream fp_out;
 	const char *ptr, *end;
 
-	/*----------------------- ±àÂë¹ý³Ì --------------------------*/
+	/*----------------------- ç¼–ç è¿‡ç¨‹ --------------------------*/
 
 #if 1
 	if (fp_out.open_trunc(path_encode.c_str()) == false) {
@@ -78,7 +78,7 @@ int main(void)
 
 	printf("base64 encode over\r\n");
 #endif
-	/*----------------------- ½âÂë¹ý³Ì --------------------------*/
+	/*----------------------- è§£ç è¿‡ç¨‹ --------------------------*/
 
 	acl::string buf;
 	if (acl::ifstream::load(path_encode.c_str(), &buf) == false) {
@@ -115,7 +115,7 @@ int main(void)
 
 	printf("base64 decode over\r\n");
 
-	/*----------------------- ½âÂë¹ý³Ì --------------------------*/
+	/*----------------------- è§£ç è¿‡ç¨‹ --------------------------*/
 
 	const char* s2 = "PCFET0NUWVBFIEhUTUwgUFVCTElDICItLy9XM0MvL0RURCBIVE1MIDQuMCBUcmFuc2l0aW9uYWwv\r\n"
 		"L0VOIj4NCjxIVE1MPjxIRUFEPg0KPE1FVEEgY29udGVudD0idGV4dC9odG1sOyBjaGFyc2V0PWdi\r\n"

@@ -85,7 +85,7 @@ int main(void)
 		{ "xx@xx_xx", false },
 		{ "xx@_", false },
 		{ "@@xx.xx@xx.xx", false },
-		{ "ÖÐ@xx.xx", false },
+		{ "Ð¶Ð°@xx.xx", false },
 		{ "~@xx.xx", false },
 		{ "#@xx.xx", false },
 		{ "*@xx.xx", false },
