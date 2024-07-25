@@ -291,9 +291,9 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		// we should check the fd's type for the first time.
 		else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_ADD_READ;
 		}
 
-		fe->oper |= EVENT_ADD_READ;
 	}
 
 	return 1;
@@ -338,9 +338,8 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 			}
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_ADD_WRITE;
 		}
-
-		fe->oper |= EVENT_ADD_WRITE;
 	}
 
 	return 1;
@@ -358,9 +357,8 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly)
 			(void) ev->del_read(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_DEL_READ;
 		}
-
-		fe->oper |= EVENT_DEL_READ;
 	}
 
 	fe->r_proc  = NULL;
@@ -378,9 +376,8 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly)
 			(void) ev->del_write(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_DEL_WRITE;
 		}
-
-		fe->oper |= EVENT_DEL_WRITE;
 	}
 
 	fe->w_proc = NULL;
