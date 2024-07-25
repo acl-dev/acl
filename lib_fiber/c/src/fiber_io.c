@@ -228,7 +228,7 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			// we detatch fb->me from timer node and append it to
 			// the ready ring in acl_fiber_ready.
 			ring_detach(&fb->me);
-			acl_fiber_ready(fb);
+			FIBER_READY(fb);
 		}
 
 		next = TIMER_NEXT(timers, node);
@@ -453,7 +453,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	 * the other fiber acl_fiber_kill() the fiber_r before.
 	 */
 	if (fe->fiber_r && fe->fiber_r->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(fe->fiber_r);
+		FIBER_READY(fe->fiber_r);
 	}
 }
 
@@ -490,11 +490,23 @@ int fiber_wait_read(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
-	if (fe->mask & EVENT_SO_RCVTIMEO && fe->r_timeout > 0) {
+	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
 		fiber_timer_add(curr, fe->r_timeout);
 	}
 
 	acl_fiber_switch();
+
+	if (fe->fiber_r == NULL) {
+#ifdef DEBUG_READY
+		msg_error("%s(%d): fiber_r NULL, ltag=%s, lline=%d, ctag=%s, "
+			"cline=%d, curr=%lld, last=%lld",
+			__FUNCTION__, __LINE__, curr->ltag,
+			curr->lline, curr->ctag, curr->cline,
+			curr->curr, curr->last);
+#else
+		msg_error("%s(%d): fiber_r NULL", __FUNCTION__, __LINE__);
+#endif
+	}
 
 	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
@@ -509,6 +521,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		// fiber's wakeup process wasn't from read_callback normally.
 		event_del_read(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
+		fiber_timer_del(curr);
 		return -1;
 	} else if (curr->flag & FIBER_F_TIMER) {
 		// If the IO reading timeout set in setsockopt.
@@ -521,6 +534,8 @@ int fiber_wait_read(FILE_EVENT *fe)
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
+	} else if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
+		fiber_timer_del(curr);
 	}
 	// else: the IO read event should has been removed in read_callback.
 
@@ -537,7 +552,7 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 	 * not be set in ready queue again.
 	 */
 	if (fe->fiber_w && fe->fiber_w->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(fe->fiber_w);
+		FIBER_READY(fe->fiber_w);
 	}
 }
 
@@ -568,7 +583,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 	}
 
 
-	if (fe->mask & EVENT_SO_SNDTIMEO && fe->w_timeout > 0) {
+	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
 		fiber_timer_add(curr, fe->w_timeout);
 	}
 
@@ -584,6 +599,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 	if (acl_fiber_canceled(curr)) {
 		event_del_write(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
+		fiber_timer_del(curr);
 		return -1;
 	} else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
@@ -592,6 +608,8 @@ int fiber_wait_write(FILE_EVENT *fe)
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
+	} else if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
+		fiber_timer_del(curr);
 	}
 
 	return ret;

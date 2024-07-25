@@ -172,7 +172,7 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	}
 
 	ring_detach(&ready->me);
-	acl_fiber_ready(ready);
+	FIBER_READY(ready);
 
 	/* Help the fiber to be wakeup to decrease the sem number. */
 	num = sem->num--;

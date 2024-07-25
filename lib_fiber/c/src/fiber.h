@@ -84,7 +84,40 @@ struct ACL_FIBER {
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
+
+#define DEBUG_READY
+
+#ifdef DEBUG_READY
+	int            cline;
+	int            lline;
+	char           ctag[32];
+	char           ltag[32];
+	long long      curr;
+	long long      last;
+	unsigned short lstatus;
+	unsigned short lwstatus;
+	unsigned int   lflag;
+#endif
 };
+
+#ifdef DEBUG_READY
+# define FIBER_READY(f) {                                                     \
+	if ((f)->ctag[0] != 0) {                                              \
+		SAFE_STRNCPY((f)->ltag, (f)->ctag, sizeof((f)->ltag));        \
+		(f)->lline    = (f)->cline;                                   \
+		(f)->last     = (f)->curr;                                    \
+		(f)->lstatus  = (f)->status;                                  \
+		(f)->lwstatus = (f)->wstatus;                                 \
+		(f)->lflag    = (f)->flag;                                    \
+	}                                                                     \
+	SAFE_STRNCPY((f)->ctag, __FUNCTION__, sizeof((f)->ctag));             \
+	(f)->cline = __LINE__;                                                \
+	SET_TIME((f)->curr);                                                  \
+	acl_fiber_ready((f));                                                 \
+}
+#else
+# define FIBER_READY(f) acl_fiber_ready((f))
+#endif
 
 /* in fiber.c */
 extern __thread int var_hook_sys_api;

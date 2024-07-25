@@ -310,7 +310,7 @@ static void pollfds_copy(struct pollfd *fds, const pollfds *pfds)
 static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
 {
 	if (pe->fiber->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(pe->fiber);
+		FIBER_READY(pe->fiber);
 	}
 }
 

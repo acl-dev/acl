@@ -477,7 +477,7 @@ static void fiber_signal(ACL_FIBER *fiber, int signum, int sync)
 		ring_detach(&fiber->me); // This is safety!
 #endif
 		
-		acl_fiber_ready(fiber);
+		FIBER_READY(fiber);
 
 		// Yield myself if in synchronous mode.
 		if (sync) {
@@ -554,7 +554,7 @@ int acl_fiber_yield(void)
 	// Reset the current fiber's status in order to be added to
 	// ready queue again.
 	__thread_fiber->running->status = FIBER_STATUS_NONE;
-	acl_fiber_ready(__thread_fiber->running);
+	FIBER_READY(__thread_fiber->running);
 	acl_fiber_switch();
 
 	return 1;
@@ -672,6 +672,18 @@ static ACL_FIBER *fiber_alloc(void (*fn)(ACL_FIBER *, void *),
 	fiber->status  = FIBER_STATUS_NONE;
 	fiber->wstatus = FIBER_WAIT_NONE;
 
+#ifdef	DEBUG_READY
+	fiber->ctag[0]  = 0;
+	fiber->cline    = 0;
+	fiber->ltag[0]  = 0;
+	fiber->lline    = 0;
+	fiber->curr     = 0;
+	fiber->last     = 0;
+	fiber->lstatus  = 0;
+	fiber->lwstatus = 0;
+	fiber->lflag    = 0;
+#endif
+
 #ifdef	DEBUG_LOCK
 	fiber->waiting = NULL;
 	ring_init(&fiber->holding);
@@ -731,7 +743,7 @@ ACL_FIBER *acl_fiber_create2(const ACL_FIBER_ATTR *attr,
 	fiber->slot = __thread_fiber->slot;
 	__thread_fiber->fibers[__thread_fiber->slot++] = fiber;
 
-	acl_fiber_ready(fiber);
+	FIBER_READY(fiber);
 	if (__schedule_auto && !acl_fiber_scheduled()) {
 		acl_fiber_schedule();
 	}
