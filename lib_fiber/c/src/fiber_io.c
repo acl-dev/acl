@@ -513,7 +513,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 #endif
 	}
 
-	curr->wstatus &= ~FIBER_WAIT_READ;
+	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
 
 #ifdef	DEBUG_READY
@@ -595,7 +595,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
-	curr->wstatus &= ~FIBER_WAIT_WRITE;
+	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
 	fe->fiber_w = NULL;
 
 	if (!(fe->type & TYPE_INTERNAL)) {
