@@ -42,6 +42,10 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 
 	pfd->fe->fiber_r = NULL;
 
+#ifdef	DEBUG_READY
+	PIN_FILE(pfd->fe);
+#endif
+
 	if (!(pfd->pfd->events & POLLOUT)) {
 		ring_detach(&pfd->me);
 		pfd->fe = NULL;
@@ -211,6 +215,10 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 #endif
 			event_del_read(ev, pfd->fe, 0);
 			pfd->fe->fiber_r = NULL;
+
+#ifdef	DEBUG_READY
+			PIN_FILE(pfd->fe);
+#endif
 		}
 		if (pfd->pfd->events & POLLOUT) {
 			CLR_WRITEWAIT(pfd->fe);

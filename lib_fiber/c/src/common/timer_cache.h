@@ -23,6 +23,7 @@ struct TIMER_CACHE {
 	RING caches;		// Caching the TIMER_CACHE_NODE memory
 	int cache_max;
 	ARRAY *objs;		// Holding any object temporarily.
+	ARRAY *objs2;		// Holding any object temporarily.
 };
 
 TIMER_CACHE *timer_cache_create(void);

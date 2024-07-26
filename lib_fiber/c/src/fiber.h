@@ -85,8 +85,6 @@ struct ACL_FIBER {
 	FIBER_LOCAL  **locals;
 	int            nlocal;
 
-#define DEBUG_READY
-
 #ifdef DEBUG_READY
 	int            cline;
 	int            lline;

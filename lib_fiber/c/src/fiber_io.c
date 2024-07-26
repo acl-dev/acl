@@ -231,9 +231,14 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			FIBER_READY(fb);
 		}
 
+		array_append(timers->objs2, node);
+
 		next = TIMER_NEXT(timers, node);
-		timer_cache_free_node(timers, node);
 		node = next;
+	}
+
+	while ((node = (TIMER_CACHE_NODE*) array_pop_back(timers->objs2))) {
+		timer_cache_free_node(timers, node);
 	}
 }
 
@@ -508,8 +513,12 @@ int fiber_wait_read(FILE_EVENT *fe)
 #endif
 	}
 
-	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
+	curr->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
+
+#ifdef	DEBUG_READY
+	PIN_FILE(fe);
+#endif
 
 	if (!(fe->type & TYPE_INTERNAL)) {
 		WAITER_DEC(__thread_fiber->event);
@@ -521,7 +530,6 @@ int fiber_wait_read(FILE_EVENT *fe)
 		// fiber's wakeup process wasn't from read_callback normally.
 		event_del_read(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
-		fiber_timer_del(curr);
 		return -1;
 	} else if (curr->flag & FIBER_F_TIMER) {
 		// If the IO reading timeout set in setsockopt.
@@ -534,8 +542,6 @@ int fiber_wait_read(FILE_EVENT *fe)
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
-	} else if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
-		fiber_timer_del(curr);
 	}
 	// else: the IO read event should has been removed in read_callback.
 
@@ -589,7 +595,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
-	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
+	curr->wstatus &= ~FIBER_WAIT_WRITE;
 	fe->fiber_w = NULL;
 
 	if (!(fe->type & TYPE_INTERNAL)) {
@@ -599,7 +605,6 @@ int fiber_wait_write(FILE_EVENT *fe)
 	if (acl_fiber_canceled(curr)) {
 		event_del_write(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
-		fiber_timer_del(curr);
 		return -1;
 	} else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
@@ -608,8 +613,6 @@ int fiber_wait_write(FILE_EVENT *fe)
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
-	} else if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
-		fiber_timer_del(curr);
 	}
 
 	return ret;

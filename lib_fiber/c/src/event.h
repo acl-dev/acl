@@ -99,10 +99,24 @@ typedef struct IO_URING_CTX {
 /**
  * for each connection fd
  */
+
+#define PIN_FILE(f) {                                                        \
+	SET_TIME((f)->stamp);                                                 \
+	(f)->line = __LINE__;                                                 \
+	SAFE_STRNCPY((f)->tag, __FUNCTION__, sizeof((f)->tag));               \
+}
+
 struct FILE_EVENT {
 	RING       me;
 	ACL_FIBER *fiber_r;
 	ACL_FIBER *fiber_w;
+
+#ifdef DEBUG_READY
+	long long stamp;
+	char tag[32];
+	int  line;
+#endif
+
 	socket_t   fd;
 	int id;
 	unsigned status;
