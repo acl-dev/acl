@@ -292,6 +292,8 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 			fe->oper |= EVENT_ADD_READ;
+		} else {
+			fe->oper |= EVENT_ADD_READ;
 		}
 
 	}
@@ -339,6 +341,8 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 			fe->oper |= EVENT_ADD_WRITE;
+		} else {
+			fe->oper |= EVENT_ADD_WRITE;
 		}
 	}
 
@@ -358,6 +362,8 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly)
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
 			fe->oper |= EVENT_DEL_READ;
+		} else {
+			fe->oper |= EVENT_DEL_READ;
 		}
 	}
 
@@ -376,6 +382,8 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly)
 			(void) ev->del_write(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_DEL_WRITE;
+		} else {
 			fe->oper |= EVENT_DEL_WRITE;
 		}
 	}
