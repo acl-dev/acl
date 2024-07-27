@@ -155,7 +155,7 @@ int stream::get_rw_timeout(bool use_sockopt /* false */) const
 
 # if defined(_WIN32) || defined(_WIN64)
 	int timeout = 0, len = sizeof(timeout);
-	if (getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, &len) < 0) {
+	if (getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char*) &timeout, &len) < 0) {
 		logger_error("getsockopt SO_RCVTIMEO error=%s, fd=%d",
 			last_serror(), (int) fd);
 		return -1;
