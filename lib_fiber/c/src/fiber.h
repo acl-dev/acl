@@ -95,6 +95,8 @@ struct ACL_FIBER {
 	unsigned short lstatus;
 	unsigned short lwstatus;
 	unsigned int   lflag;
+	time_t         cost;
+	FILE_EVENT    *fe;
 #endif
 };
 
@@ -162,6 +164,7 @@ int fiber_wait_write(FILE_EVENT *fe);
 EVENT *fiber_io_event(void);
 void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds);
 int fiber_timer_del(ACL_FIBER *fiber);
+int fiber_timer_exist(ACL_FIBER *fiber);
 
 FILE_EVENT *fiber_file_open(socket_t fd);
 void fiber_file_set(FILE_EVENT *fe);

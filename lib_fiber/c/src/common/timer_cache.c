@@ -170,3 +170,23 @@ int timer_cache_remove_exist(TIMER_CACHE *cache, long long expire, RING *entry)
 #endif
 	return 1;
 }
+
+int timer_cache_exist(TIMER_CACHE *cache, long long expire, RING *entry)
+{
+	TIMER_CACHE_NODE n, *node;
+	RING_ITER iter;
+
+	n.expire = expire;
+	node = fiber_avl_find(&cache->tree, &n, NULL);
+	if (node == NULL) {
+		return 0;
+	}
+
+	ring_foreach(iter, &node->ring) {
+		if (iter.ptr == entry) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
