@@ -53,16 +53,16 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 
 	/*
 	 * If any fe has been ready, the pe holding fe should be removed from
-	 * ev->poll_list to avoid to be called in timeout process.
+	 * ev->poll_timer to avoid to be called in timeout process.
 	 * We should just remove pe only once by checking if the value of
 	 * pe->nready is 0. After the pe has been removed from the
-	 * ev->poll_list, the pe's callback will not be called again in the
+	 * ev->poll_timer, the pe's callback will not be called again in the
 	 * timeout process in event_process_poll() in event.c.
 	 */
 	if (pfd->pe->nready == 0) {
 		/* The cache timer has been be set when timeout >= 0. */
 		if (pfd->pe->expire >= 0) {
-			timer_cache_remove(ev->poll_list, pfd->pe->expire,
+			timer_cache_remove(ev->poll_timer, pfd->pe->expire,
 				&pfd->pe->me);
 		}
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
@@ -119,7 +119,7 @@ static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 
 	if (pfd->pe->nready == 0) {
 		if (pfd->pe->expire >= 0) {
-			timer_cache_remove(ev->poll_list, pfd->pe->expire,
+			timer_cache_remove(ev->poll_timer, pfd->pe->expire,
 				&pfd->pe->me);
 		}
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
@@ -375,7 +375,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	while (1) {
 		/* The cache timer should be set when timeout >= 0. */
 		if (pe->expire >= 0) {
-			timer_cache_add(ev->poll_list, pe->expire, &pe->me);
+			timer_cache_add(ev->poll_timer, pe->expire, &pe->me);
 		}
 
 		pe->nready = 0;
@@ -388,7 +388,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		pe->fiber->wstatus &= ~FIBER_WAIT_POLL;
 
 		if (pe->nready == 0 && pe->expire >= 0) {
-			timer_cache_remove(ev->poll_list, pe->expire, &pe->me);
+			timer_cache_remove(ev->poll_timer, pe->expire, &pe->me);
 		}
 
 		ev->timeout = old_timeout;
@@ -401,7 +401,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			break;
 		}
 
-		if (timer_cache_size(ev->poll_list) == 0) {
+		if (timer_cache_size(ev->poll_timer) == 0) {
 			ev->timeout = -1;
 		}
 

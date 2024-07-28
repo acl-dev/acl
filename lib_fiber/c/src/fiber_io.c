@@ -446,21 +446,25 @@ size_t acl_fiber_sleep(size_t seconds)
 
 /****************************************************************************/
 
+#ifndef USE_TIMER
+
 static int timed_wait(socket_t fd, int delay, int oper)
 {
 	struct pollfd fds;
 	fds.events = oper;
 	fds.fd     = fd;
+
 	for (;;) {
 		switch (acl_fiber_poll(&fds, 1, delay)) {
-#ifdef SYS_WIN
+# ifdef SYS_WIN
 		case SOCKET_ERROR:
-#else
+# else
 		case -1:
-#endif
+# endif
 			if (acl_fiber_last_error() == FIBER_EINTR) {
 				continue;
 			}
+            break;
 		case 0:
 			return 0;
 		default:
@@ -481,6 +485,7 @@ static int timed_wait(socket_t fd, int delay, int oper)
 		}
 	}
 }
+#endif  // !USE_TIMER
 
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
@@ -583,7 +588,9 @@ int fiber_wait_read(FILE_EVENT *fe)
 		event_del_read(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
-	} else if (curr->flag & FIBER_F_TIMER) {
+	}
+#ifdef USE_TIMER
+    else if (curr->flag & FIBER_F_TIMER) {
 		// If the IO reading timeout set in setsockopt.
 		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
 		curr->flag &= ~FIBER_F_TIMER;
@@ -595,6 +602,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
+#endif
 	// else: the IO read event should has been removed in read_callback.
 
 	return ret;
@@ -673,7 +681,9 @@ int fiber_wait_write(FILE_EVENT *fe)
 		event_del_write(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
-	} else if (curr->flag & FIBER_F_TIMER) {
+	}
+#ifdef USE_TIMER
+    else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
 		event_del_write(__thread_fiber->event, fe, 1);
 
@@ -681,6 +691,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
+#endif
 
 	return ret;
 }

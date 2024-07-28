@@ -395,12 +395,12 @@ struct EVENT {
 #define	EVENT_IS_IO_URING(x)	((x)->flag & EVENT_F_IO_URING)
 
 #ifdef HAS_POLL
-	TIMER_CACHE *poll_list;
+	TIMER_CACHE *poll_timer;
 	RING   poll_ready;
 #endif
 
 #ifdef HAS_EPOLL
-	TIMER_CACHE *epoll_list;
+	TIMER_CACHE *epoll_timer;
 	RING   epoll_ready;
 #endif
 

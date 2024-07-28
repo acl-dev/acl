@@ -36,6 +36,7 @@ static int  __listen_qlen = 64;
 static int  __read_timeout = -1;
 static int  __write_timeout = -1;
 static int  __echo_data  = 1;
+static int  __use_sockopt = 0;
 
 static int check_read(SOCKET fd, int timeout)
 {
@@ -99,8 +100,38 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	__socket_count++;
 	//printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), fd);
 
+    if (__read_timeout > 0 && __use_sockopt) {
+		struct timeval tm;
+		tm.tv_sec = __read_timeout;
+		tm.tv_usec = 0;
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO,
+				(char*) &__read_timeout, sizeof(__read_timeout)) < 0) {
+#else
+		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
+#endif
+			printf("%s: setsockopt error: %s\r\n", __FUNCTION__, acl_last_serror());
+		}
+    }
+
+    if (__write_timeout > 0 && __use_sockopt) {
+		struct timeval tm;
+		tm.tv_sec = __write_timeout;
+		tm.tv_usec = 0;
+
+#if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
+		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO,
+				(char*) &__write_timeout, sizeof(__write_timeout)) < 0) {
+#else
+		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
+#endif
+			printf("%s: setsockopt error: %s\r\n", __FUNCTION__, acl_last_serror());
+		}
+    }
+
 	while (1) {
-		if (__read_timeout > 0) {
+		if (__read_timeout > 0 && !__use_sockopt) {
 			ret = check_read(fd, __read_timeout * 1000);
 			if (ret < 0) {
 				break;
@@ -137,7 +168,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 			continue;
 		}
 
-		if (__write_timeout > 0) {
+		if (__write_timeout > 0 && !__use_sockopt) {
 			int n = check_write(fd, __write_timeout * 1000);
 			if (n < 0) {
 				break;
@@ -263,6 +294,7 @@ static void usage(const char *procname)
 		" -q listen_queue\r\n"
 		" -z stack_size\r\n"
 		" -Z [if use shared stack]\r\n"
+		" -T [if use setsockopt to set IO timeout]\r\n"
 		" -S [if using single IO, default: no]\r\n", procname);
 }
 
@@ -275,7 +307,7 @@ int main(int argc, char *argv[])
 	acl_fiber_attr_init(&fiber_attr);
 	snprintf(__listen_ip, sizeof(__listen_ip), "%s", "127.0.0.1");
 
-	while ((ch = getopt(argc, argv, "hs:p:r:w:q:Sz:Ze:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:p:r:w:q:Sz:Ze:T")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -304,6 +336,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'Z':
 			acl_fiber_attr_setsharestack(&fiber_attr, 1);
+			break;
+		case 'T':
+			__use_sockopt = 1;
 			break;
 		case 'e':
 			if (strcasecmp(optarg, "select") == 0) {
