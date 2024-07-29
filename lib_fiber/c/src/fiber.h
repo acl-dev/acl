@@ -13,27 +13,6 @@ extern void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
 #endif
 */
 
-enum {
-	FIBER_STATUS_NONE	= (0),
-	FIBER_STATUS_READY	= (1 << 0),
-	FIBER_STATUS_RUNNING	= (1 << 1),
-	FIBER_STATUS_SUSPEND	= (1 << 2),
-	FIBER_STATUS_EXITING	= (1 << 3),
-};
-
-enum {
-	FIBER_WAIT_NONE		= (0),
-	FIBER_WAIT_READ		= (1 << 1),
-	FIBER_WAIT_WRITE	= (1 << 2),
-	FIBER_WAIT_POLL		= (1 << 3),
-	FIBER_WAIT_EPOLL	= (1 << 4),
-	FIBER_WAIT_MUTEX	= (1 << 5),
-	FIBER_WAIT_COND		= (1 << 6),
-	FIBER_WAIT_LOCK		= (1 << 7),
-	FIBER_WAIT_SEM		= (1 << 8),
-	FIBER_WAIT_DELAY	= (1 << 9),
-};
-
 typedef struct {
 	void  *ctx;
 	void (*free_fn)(void *);
@@ -60,10 +39,10 @@ struct ACL_FIBER {
 	unsigned       fid;
 	unsigned       slot;
 	long long      when;
-	int            errnum;
-	int            signum;
-	unsigned short status;
-	unsigned short wstatus;
+	int            errnum;	// The fiber's current errno.
+	int            signum;	// The signed number to the fiber.
+	unsigned short status;	// The fiber's status as FIBER_STATUS_XXX.
+	unsigned short wstatus;	// The fiber's waiting status as FIBER_WAIT_XXX.
 	unsigned int   oflag;	// The flags for creating fiber.
 	unsigned int   flag;	// The flags for the fiber's running status.
 

@@ -4,7 +4,7 @@
 
 namespace acl {
 
-fiber::fiber(void)
+fiber::fiber()
 {
 	f_ = NULL;
 }
@@ -27,16 +27,16 @@ fiber::fiber(bool running)
 	}
 }
 
-fiber::~fiber(void)
+fiber::~fiber()
 {
 }
 
-unsigned int fiber::get_id(void) const
+unsigned int fiber::get_id() const
 {
 	return f_ ? acl_fiber_id(f_) : 0;
 }
 
-unsigned int fiber::self(void)
+unsigned int fiber::self()
 {
 	return acl_fiber_self();
 }
@@ -47,9 +47,19 @@ unsigned int fiber::fiber_id(const fiber& fb)
 	return f ? acl_fiber_id(f) : 0;
 }
 
-int fiber::get_errno(void) const
+int fiber::get_errno() const
 {
 	return f_ ? acl_fiber_errno(f_) : -1;
+}
+
+bool fiber::is_ready() const
+{
+	return f_ ? acl_fiber_status(f_) == FIBER_STATUS_READY : false;
+}
+
+bool fiber::is_suspended() const
+{
+	return f_ ? acl_fiber_status(f_) == FIBER_STATUS_SUSPEND : false;
 }
 
 void fiber::set_errno(int errnum)
@@ -59,7 +69,7 @@ void fiber::set_errno(int errnum)
 	}
 }
 
-void fiber::clear(void)
+void fiber::clear()
 {
 	ACL_FIBER *curr = acl_fiber_running();
 	if (curr) {
@@ -68,12 +78,12 @@ void fiber::clear(void)
 }
 
 
-const char* fiber::last_serror(void)
+const char* fiber::last_serror()
 {
 	return acl_fiber_last_serror();
 }
 
-int fiber::last_error(void)
+int fiber::last_error()
 {
 	return acl_fiber_last_error();
 }
@@ -83,12 +93,12 @@ const char* fiber::strerror(int errnum, char* buf, size_t size)
 	return acl_fiber_strerror(errnum, buf, size);
 }
 
-void fiber::yield(void)
+void fiber::yield()
 {
 	(void) acl_fiber_yield();
 }
 
-void fiber::switch_to_next(void)
+void fiber::switch_to_next()
 {
 	acl_fiber_switch();
 }
@@ -107,12 +117,12 @@ size_t fiber::delay(size_t milliseconds)
 	return acl_fiber_delay(milliseconds);
 }
 
-unsigned fiber::alive_number(void)
+unsigned fiber::alive_number()
 {
 	return acl_fiber_number();
 }
 
-unsigned fiber::dead_number(void)
+unsigned fiber::dead_number()
 {
 	return acl_fiber_ndead();
 }
@@ -127,17 +137,17 @@ void fiber::set_shared_stack_size(size_t size)
 	acl_fiber_set_shared_stack_size(size);
 }
 
-size_t fiber::get_shared_stack_size(void)
+size_t fiber::get_shared_stack_size()
 {
 	return acl_fiber_get_shared_stack_size();
 }
 
-ACL_FIBER *fiber::get_fiber(void) const
+ACL_FIBER *fiber::get_fiber() const
 {
 	return f_;
 }
 
-void fiber::acl_io_hook(void)
+void fiber::acl_io_hook()
 {
 	acl_set_accept(acl_fiber_accept);
 	acl_set_connect(acl_fiber_connect);
@@ -152,7 +162,7 @@ void fiber::acl_io_hook(void)
 #include <poll.h>
 #endif
 
-void fiber::acl_io_unlock(void)
+void fiber::acl_io_unlock()
 {
 	acl_set_accept(accept);
 	acl_set_connect(connect);
@@ -170,11 +180,11 @@ void fiber::acl_io_unlock(void)
 
 #include "winapi_hook.hpp"
 
-bool fiber::winapi_hook(void) {
+bool fiber::winapi_hook() {
 	return ::winapi_hook();
 }
 
-void fiber::run(void)
+void fiber::run()
 {
 	acl_msg_fatal("%s(%d), %s: base function be called",
 		__FILE__, __LINE__, __FUNCTION__);
@@ -217,7 +227,7 @@ bool fiber::kill(bool sync)
 	return true;
 }
 
-bool fiber::killed(void) const
+bool fiber::killed() const
 {
 	if (f_ != NULL) {
 		return acl_fiber_killed(f_) != 0;
@@ -226,7 +236,7 @@ bool fiber::killed(void) const
 	return true;
 }
 
-bool fiber::self_killed(void)
+bool fiber::self_killed()
 {
 	ACL_FIBER* curr = acl_fiber_running();
 	if (curr == NULL) {
@@ -296,17 +306,17 @@ void fiber::schedule_with(fiber_event_t type)
 	acl_fiber_schedule_with(etype);
 }
 
-bool fiber::scheduled(void)
+bool fiber::scheduled()
 {
 	return acl_fiber_scheduled() != 0;
 }
 
-void fiber::schedule_stop(void)
+void fiber::schedule_stop()
 {
 	acl_fiber_schedule_stop();
 }
 
-int fiber::get_sys_errno(void)
+int fiber::get_sys_errno()
 {
 	return acl_fiber_last_error();
 }
@@ -371,7 +381,7 @@ void fiber::stackshow(const fiber& fb, size_t max /* = 50 */)
 
 //////////////////////////////////////////////////////////////////////////////
 
-fiber_timer::fiber_timer(void)
+fiber_timer::fiber_timer()
 {
 }
 

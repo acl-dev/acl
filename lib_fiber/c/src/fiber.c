@@ -771,7 +771,15 @@ int acl_fiber_status(const ACL_FIBER *fiber)
 	if (fiber == NULL) {
 		fiber = acl_fiber_running();
 	}
-	return fiber ? fiber->status : 0;
+	return fiber ? fiber->status : FIBER_STATUS_NONE;
+}
+
+int acl_fiber_waiting_status(const ACL_FIBER *fiber)
+{
+	if (fiber == NULL) {
+		fiber = acl_fiber_running();
+	}
+	return fiber ? fiber->wstatus : FIBER_WAIT_NONE; 
 }
 
 void acl_fiber_set_shared_stack_size(size_t size)
