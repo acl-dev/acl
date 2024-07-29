@@ -71,6 +71,7 @@ typedef int socklen_t;
 # define	FIBER_ENOBUFS		WSAENOBUFS
 # define	FIBER_ECONNABORTED	WSAECONNABORTED
 # define	FIBER_EINPROGRESS	WSAEINPROGRESS
+# define	FIBER_ECANCELED		ECANCELED
 
 #else
 
@@ -109,6 +110,7 @@ typedef int socket_t;
 # define	FIBER_ENOBUFS		ENOBUFS
 # define	FIBER_ECONNABORTED	ECONNABORTED
 # define	FIBER_EINPROGRESS	EINPROGRESS
+# define	FIBER_ECANCELED		ECANCELED
 
 # include <sys/syscall.h>
 # if defined(SYS_recvmmsg) && defined(SYS_sendmmsg) && !defined(ANDROID)
