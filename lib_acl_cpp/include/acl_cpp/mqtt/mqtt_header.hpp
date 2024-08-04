@@ -82,7 +82,7 @@ public:
 	 */
 	mqtt_header(const mqtt_header& header);
 
-	virtual ~mqtt_header();
+	~mqtt_header();
 
 public:
 	/**
