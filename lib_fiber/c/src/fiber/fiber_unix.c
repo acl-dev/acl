@@ -163,7 +163,10 @@ static void fiber_stack_restore(FIBER_UNIX *curr)
 	// After coming back, the current fiber's stack should be
 	// restored and copied from its private memory to the shared
 	// stack running memory.
-	if (curr->dlen > 0) {
+	if ((curr->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK)
+		&& curr->fiber.status != FIBER_STATUS_EXITING
+		&& curr->dlen > 0) {
+
 		char *bottom = fiber_share_stack_bottom();
 		memcpy(bottom - curr->dlen, curr->buff, curr->dlen);
 		fiber_share_stack_set_dlen(curr->dlen);
@@ -172,7 +175,9 @@ static void fiber_stack_restore(FIBER_UNIX *curr)
 	// that its fiber id should be 0.
 }
 
-#endif
+#endif	// SHARE_STACK
+
+//#define RESTORE_FIRST
 
 void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 {
@@ -182,13 +187,16 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 	// the fiber's running stack should be copied from the shared running
 	// stack to the fiber's private memory.
 #if	defined(SHARE_STACK)
-	if (from->oflag & ACL_FIBER_ATTR_SHARE_STACK
-		&& from->status != FIBER_STATUS_EXITING
-		&& from->tid > 0) {
+	if ((from->oflag & ACL_FIBER_ATTR_SHARE_STACK)
+		&& from->status != FIBER_STATUS_EXITING && from->tid > 0) {
 
 		char stack_top = 0;
 		fiber_stack_save((FIBER_UNIX*) from, &stack_top);
 	}
+
+# if	defined(RESTORE_FIRST)
+	fiber_stack_restore((FIBER_UNIX*) to);
+# endif
 #endif
 
 #if	defined(USE_BOOST_JMP)
@@ -210,9 +218,9 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 		if (to->flag & FIBER_F_STARTED) {
 # if	defined(USE_JMP_SYS)
 			LONGJMP(((FIBER_UNIX*) to)->env);
-#else
+# else
 			LONGJMP(&((FIBER_UNIX*) to)->env);
-#endif
+# endif
 		} else {
 			setcontext(((FIBER_UNIX*) to)->context);
 		}
@@ -225,16 +233,8 @@ void fiber_real_swap(ACL_FIBER *from, ACL_FIBER *to)
 	}
 #endif
 
-#if	defined(SHARE_STACK)
-	{
-		FIBER_UNIX *curr = (FIBER_UNIX *) acl_fiber_running();
-
-		if (curr->fiber.oflag & ACL_FIBER_ATTR_SHARE_STACK
-			&& curr->fiber.status != FIBER_STATUS_EXITING) {
-
-			fiber_stack_restore(curr);
-		}
-	}
+#if	defined(SHARE_STACK) && !defined(RESTORE_FIRST)
+	fiber_stack_restore((FIBER_UNIX*) acl_fiber_running());
 #endif
 }
 

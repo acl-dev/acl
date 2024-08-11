@@ -443,7 +443,7 @@ bool http_request::request(const void* data, size_t len)
 		}
 
 		if (last_error() == ECANCELED) {
-			logger_error("read response canceled");
+			//logger_error("read response canceled");
 			return false;
 		}
 

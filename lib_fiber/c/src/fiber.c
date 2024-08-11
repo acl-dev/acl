@@ -476,7 +476,6 @@ static void fiber_signal(ACL_FIBER *fiber, int signum, int sync)
 		// The fiber will be detached at first in acl_fiber_ready.
 		ring_detach(&fiber->me); // This is safety!
 #endif
-		
 		FIBER_READY(fiber);
 
 		// Yield myself if in synchronous mode.
