@@ -10,15 +10,13 @@ namespace acl {
 class string;
 class mime_code;
 
-struct rfc2047_entry 
-{
+struct rfc2047_entry {
 	string* pData;		// 数据内容
 	string* pCharset;	// 字符集
 	char  coding;		// 编码格式，B 表示 BASE64, Q 表示 QP
 };
 
-class ACL_CPP_API rfc2047 : public noncopyable
-{
+class ACL_CPP_API rfc2047 : public noncopyable {
 public:
 	/**
 	 * 构造函数
@@ -27,7 +25,7 @@ public:
 	 * @param addCrlf {bool} 在编码过程中当数据比较长时是否自动添加 "\r\n"
 	 */
 	rfc2047(bool strip_sp = true, bool addCrlf = true);
-	~rfc2047(void);
+	~rfc2047();
 
 	/**
 	 * 流式解析数据, 可以循环调用此函数, 每次添加部分数据
@@ -103,7 +101,7 @@ public:
 	 * 将解析结果以链表的形式给出
 	 * @return {const std::list<rfc2047_entry*>&}
 	 */
-	const std::list<rfc2047_entry*>& get_list(void) const;
+	const std::list<rfc2047_entry*>& get_list() const;
 
 	/**
 	 * 重置解析器状态后, 该解析器可再次使用
@@ -114,7 +112,7 @@ public:
 	/**
 	 * 调试输出解析结果
 	 */
-	void debug_rfc2047(void) const;
+	void debug_rfc2047() const;
 
 private:
 	std::list<rfc2047_entry*> m_List;

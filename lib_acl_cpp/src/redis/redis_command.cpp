@@ -14,13 +14,12 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT_LEN		11
 #define	LONG_LEN	21
 
-void redis_command::init(void)
+void redis_command::init()
 {
 	check_addr_     = false;
 	conn_           = NULL;
@@ -49,7 +48,7 @@ void redis_command::init(void)
 #endif
 }
 
-redis_command::redis_command(void)
+redis_command::redis_command()
 {
 	init();
 }
@@ -103,7 +102,7 @@ redis_command::redis_command(redis_client_pipeline* pipeline)
 	pipeline_ = pipeline;
 }
 
-redis_command::~redis_command(void)
+redis_command::~redis_command()
 {
 	if (argv_ != NULL) {
 		acl_myfree(argv_);
@@ -237,12 +236,12 @@ const char* redis_command::get_addr(dbuf_pool* dbuf, const char* info)
 	return addr;
 }
 
-bool redis_command::eof(void) const
+bool redis_command::eof() const
 {
-	return conn_ == NULL ? false : conn_->eof();
+	return conn_ != NULL && conn_->eof();
 }
 
-redis_pipeline_message& redis_command::get_pipeline_message(void)
+redis_pipeline_message& redis_command::get_pipeline_message()
 {
 	if (pipe_msg_ != NULL) {
 		return *pipe_msg_;
@@ -303,19 +302,19 @@ void redis_command::hash_slot(const char* key, size_t len)
 	slot_ = (int) (n % max_slot);
 }
 
-const char* redis_command::get_client_addr(void) const
+const char* redis_command::get_client_addr() const
 {
 	return addr_;
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
-size_t redis_command::result_size(void) const
+size_t redis_command::result_size() const
 {
 	return result_ ? result_->get_size() : 0;
 }
 
-redis_result_t redis_command::result_type(void) const
+redis_result_t redis_command::result_type() const
 {
 	return result_ ? result_->get_type() : REDIS_RESULT_UNKOWN;
 }
@@ -335,12 +334,12 @@ const char* redis_command::get_result(size_t i, size_t* len /* = NULL */) const
 	return result_ ? result_->get(i, len) : NULL;
 }
 
-const char* redis_command::result_status(void) const
+const char* redis_command::result_status() const
 {
 	return result_ ? result_->get_status() : "";
 }
 
-const char* redis_command::result_error(void) const
+const char* redis_command::result_error() const
 {
 	const char* ptr = result_ ? result_->get_error() : "";
 	if (ptr && *ptr) {
@@ -382,7 +381,7 @@ const char* redis_command::result_value(size_t i, size_t* len /* = NULL */) cons
 	return buf;
 }
 
-const redis_result* redis_command::get_result(void) const
+const redis_result* redis_command::get_result() const
 {
 	return result_;
 }
@@ -566,7 +565,7 @@ int redis_command::get_status(std::vector<bool>& out)
 	return (int) size;
 }
 
-const char* redis_command::get_status(void)
+const char* redis_command::get_status()
 {
 	const redis_result* result = run();
 	if (result == NULL || result->get_type() != REDIS_RESULT_STATUS) {
@@ -969,7 +968,7 @@ const redis_result** redis_command::scan_keys(const char* cmd, const char* key,
 	return children;
 }
 
-void redis_command::clear_request(void)
+void redis_command::clear_request()
 {
 	if (request_buf_) {
 		request_buf_->clear();

@@ -24,21 +24,27 @@ class aio_istream;
  */
 class ACL_CPP_API aio_timer_reader : public aio_timer_callback {
 public:
-	aio_timer_reader(void) : in_(NULL) {}
+	aio_timer_reader()
+	: in_(NULL)
+	, delay_gets_(false)
+	, delay_timeout_(0)
+	, delay_nonl_(true)
+	, delay_count_(0) {}
 
 	/**
 	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数
 	 */
-	virtual void destroy(void)
-	{
+	virtual void destroy() {
 		delete this;
 	}
+
 protected:
-	virtual ~aio_timer_reader(void) {}
+	virtual ~aio_timer_reader() {}
 	/**
 	 * 延迟读数据时的回调函数，从 aio_timer_callback 类中继承而来
 	 */
 	virtual void timer_callback(unsigned int id);
+
 private:
 	// 允许 aio_istream 可以直接修改本类的私有成员变量
 	friend class aio_istream;
@@ -55,14 +61,13 @@ private:
  * 异步读数据流类定义，该类只能在堆上被实例化，在析构时需要调用 close
  * 函数以释放该类对象
  */
-class ACL_CPP_API aio_istream : virtual public aio_stream
-{
+class ACL_CPP_API aio_istream : virtual public aio_stream {
 public:
 	/**
 	 * 构造函数
 	 * @param handle {aio_handle*} 异步事件引擎句柄
 	 */
-	aio_istream(aio_handle* handle);
+	explicit aio_istream(aio_handle* handle);
 
 	/**
 	 * 构造函数，创建异步读流对象，并 hook 读过程及关闭/超时过程
@@ -134,8 +139,7 @@ public:
 	 * same as gets_await();
 	 */
 	void gets(int timeout = 0, bool nonl = true,
-		long long int delay = 0, aio_timer_reader* callback = NULL)
-	{
+		long long int delay = 0, aio_timer_reader* callback = NULL) {
 		gets_await(timeout, nonl, delay, callback);
 	}
 
@@ -159,8 +163,7 @@ public:
 	 * same as read_await()
 	 */
 	void read(int count = 0, int timeout = 0,
-		long long int delay = 0, aio_timer_reader* callback = NULL)
-	{
+		long long int delay = 0, aio_timer_reader* callback = NULL) {
 		read_await(count, timeout, delay, callback);
 	}
 
@@ -174,8 +177,7 @@ public:
 	/**
 	 * same as readable_await()
 	 */
-	void read_wait(int timeout = 0)
-	{
+	void read_wait(int timeout = 0) {
 		readable_await(timeout);
 	}
 
@@ -184,7 +186,7 @@ public:
 	 * 移除，直到用户调用任何一个异步读操作(此时，异步引擎会
 	 * 自动重新监控该流的可读状态)
 	 */
-	void disable_read(void);
+	void disable_read();
 
 	/**
 	 * 设置流是否采用连接读功能
@@ -196,7 +198,7 @@ public:
 	 * 获得流是否是设置了连续读功能
 	 * @return {bool}
 	 */
-	bool keep_read(void) const;
+	bool keep_read() const;
 
 	/**
 	 * 设置接收缓冲区的最大长度，以避免缓冲区溢出，默认值为 0 表示不限制
@@ -209,7 +211,7 @@ public:
 	 * 获得当前接收缓冲区的最大长度限制
 	 * @return {int} 返回值  <= 0 表示没有限制
 	 */
-	int get_buf_max(void) const;
+	int get_buf_max() const;
 
 	/**
 	 * 清除内部的 read_ready flag 位，当 IO 引擎检测到 IO 可读时，会设置
@@ -217,20 +219,20 @@ public:
 	 * 要再次触发读回调过程，通过本方法清理掉该标志位后，IO 引擎就不会在
 	 * 应用层检测该句柄是否可读，而是交由 OS 去判断是否可读
 	 */
-	void clear_read_ready(void);
+	void clear_read_ready();
 
 protected:
-	virtual ~aio_istream(void);
+	virtual ~aio_istream();
 
 	/**
 	 * 释放动态类对象的虚函数
 	 */
-	virtual void destroy(void);
+	virtual void destroy();
 
 	/**
 	 * 注册可读的回调函数
 	 */
-	void enable_read(void);
+	void enable_read();
 
 private:
 	friend class aio_timer_reader;

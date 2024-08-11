@@ -8,8 +8,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 class redis_request;
 class redis_client;
@@ -22,8 +21,7 @@ class redis_pipeline_message;
  * the redis command classes's base virtual class, which includes the basic
  * functions for all sub-classes
  */
-class ACL_CPP_API redis_command : public noncopyable
-{
+class ACL_CPP_API redis_command : public noncopyable {
 public:
 	/**
 	 * 缺省的构造函数，如果使用此构造函数初始化类对象，则必须调用
@@ -31,7 +29,7 @@ public:
 	 * default constructor. You must set the communication method by
 	 * set_client or set_cluster functions.
 	 */
-	redis_command(void);
+	redis_command();
 
 	/**
 	 * 当使用非集群模式时，可以使用此构造函数设置 redis 通信对象。
@@ -60,7 +58,7 @@ public:
 
 	redis_command(redis_client_pipeline* pipeline);
 
-	virtual ~redis_command(void);
+	virtual ~redis_command();
 
 	/**
 	 * 在进行每个命令处理前，是否要求检查 socket 句柄与地址的匹配情况，当
@@ -104,8 +102,7 @@ public:
 	 *  the internal redis connection be returned, NULL if no redis
 	 *  connection be set 
 	 */
-	redis_client* get_client(void) const
-	{
+	redis_client* get_client() const {
 		return conn_;
 	}
 
@@ -118,7 +115,7 @@ public:
 	 * @return {const char*} 返回空串 "" 表示没有绑定 redis 连接对象
 	 *  if "" was resturned, the redis connection was not set
 	 */
-	const char* get_client_addr(void) const;
+	const char* get_client_addr() const;
 
 	/**
 	 * 设置连接池集群管理器;
@@ -139,8 +136,7 @@ public:
 	 * get redis_cluster object set by set_cluster function
 	 * @return {redis_client_cluster*}
 	 */
-	redis_client_cluster* get_cluster(void) const
-	{
+	redis_client_cluster* get_cluster() const {
 		return cluster_;
 	}
 
@@ -155,8 +151,7 @@ public:
 	 * get the redis pipeline communication object been set before
 	 * @return {redis_client_pipeline*} return NULL if not set
 	 */
-	redis_client_pipeline* get_pipeline(void) const
-	{
+	redis_client_pipeline* get_pipeline() const {
 		return pipeline_;
 	}
 
@@ -165,8 +160,7 @@ public:
 	 * get memory pool handle been set
 	 * @return {dbuf_pool*}
 	 */
-	dbuf_pool* get_dbuf(void) const
-	{
+	dbuf_pool* get_dbuf() const {
 		return dbuf_;
 	}
 
@@ -175,8 +169,7 @@ public:
 	 * get the result type returned from redis-server
 	 * @return {redis_result_t}
 	 */
-	redis_result_t result_type(void) const;
-
+	redis_result_t result_type() const;
 	/**
 	 * 当返回值为 REDIS_RESULT_STATUS 类型时，本方法返回状态信息;
 	 * when result type is REDIS_RESULT_STATUS, the status info can be
@@ -184,7 +177,7 @@ public:
 	 * @return {const char*} 返回 "" 表示出错;
 	 *  "" will be returned on error
 	 */
-	const char* result_status(void) const;
+	const char* result_status() const;
 
 	/**
 	 * 当出错时返回值为 REDIS_RESULT_ERROR 类型，本方法返回出错信息;
@@ -193,7 +186,7 @@ public:
 	 * @return {const char*} 返回空串 "" 表示没有出错信息;
 	 *  "" will be returned when no error info
 	 */
-	const char* result_error(void) const;
+	const char* result_error() const;
 
 	/**
 	 * 获得当前结果结点存储的对象的个数, 该方法可以获得结果为下面两个方法
@@ -211,7 +204,7 @@ public:
 	 *       chunks, the returned value is the chunks number
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
-	size_t result_size(void) const;
+	size_t result_size() const;
 
 	/**
 	 * 当返回值为 REDIS_RESULT_INTEGER 类型时，本方法返回对应的 32 位整数值;
@@ -252,14 +245,14 @@ public:
 	 * object be set internal
 	 * @return {bool}
 	 */
-	bool eof(void) const;
+	bool eof() const;
 
 	/**
 	 * 获得本次 redis 操作过程的结果;
 	 * get result object of last redis operation
 	 * @return {redis_result*}
 	 */
-	const redis_result* get_result(void) const;
+	const redis_result* get_result() const;
 
 	/**
 	 * 当查询结果为数组对象时调用本方法获得一个数组元素对象;
@@ -339,8 +332,7 @@ public:
 	const redis_result* request(const std::vector<string>& args,
 		size_t nchild = 0);
 
-	const string* request_buf(void) const
-	{
+	const string* request_buf() const {
 		return request_buf_;
 	}
 
@@ -365,7 +357,7 @@ public:
 protected:
 	const redis_result* run(size_t nchild = 0, int* timeout = NULL);
 
-	void clear_request(void);
+	void clear_request();
 	const redis_result** scan_keys(const char* cmd, const char* key,
 		int& cursor, size_t& size, const char* pattern,
 		const size_t* count);
@@ -453,7 +445,7 @@ protected:
 	dbuf_pool* dbuf_;
 
 private:
-	void init(void);
+	void init();
 
 public:
 	// compute hash slot of the given key and store it in the current
@@ -462,11 +454,11 @@ public:
 	void hash_slot(const char* key, size_t len);
 
 	// get the current hash slot stored internal
-	int get_slot(void) const {
+	int get_slot() const {
 		return slot_;
 	}
 
-	bool is_check_addr(void) const {
+	bool is_check_addr() const {
 		return check_addr_;
 	}
 
@@ -487,15 +479,15 @@ public:
 	void set_client_addr(redis_client& conn);
 
 public:
-	redis_request* get_request_obj(void) const {
+	redis_request* get_request_obj() const {
 		return request_obj_;
 	}
 
-	string* get_request_buf(void) const {
+	string* get_request_buf() const {
 		return request_buf_;
 	}
 
-	bool is_slice_req(void) const {
+	bool is_slice_req() const {
 		return slice_req_;
 	}
 

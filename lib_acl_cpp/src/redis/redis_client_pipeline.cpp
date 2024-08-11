@@ -21,7 +21,7 @@ redis_pipeline_channel::redis_pipeline_channel(redis_client_pipeline& pipeline,
 	box_ = new mbox<redis_pipeline_message>;
 }
 
-redis_pipeline_channel::~redis_pipeline_channel(void)
+redis_pipeline_channel::~redis_pipeline_channel()
 {
 	delete client_;
 	delete box_;
@@ -35,7 +35,7 @@ redis_pipeline_channel& redis_pipeline_channel::set_passwd(const char *passwd)
 	return *this;
 }
 
-bool redis_pipeline_channel::start_thread(void)
+bool redis_pipeline_channel::start_thread()
 {
 	if (!((connect_client*) client_)->open()) {
 		logger_error("open %s error %s", addr_.c_str(), last_serror());
@@ -45,7 +45,7 @@ bool redis_pipeline_channel::start_thread(void)
 	return true;
 }
 
-void redis_pipeline_channel::stop_thread(void)
+void redis_pipeline_channel::stop_thread()
 {
 	//box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
 	redis_pipeline_message message(redis_pipeline_t_stop, NULL);
@@ -58,7 +58,7 @@ void redis_pipeline_channel::push(redis_pipeline_message* msg)
 	box_->push(msg, false);
 }
 
-bool redis_pipeline_channel::flush_all(void)
+bool redis_pipeline_channel::flush_all()
 {
 	if (msgs_.empty()) {
 		//logger("The messages are empty!");
@@ -191,7 +191,7 @@ bool redis_pipeline_channel::wait_one(socket_stream& conn,
 	return true;
 }
 
-bool redis_pipeline_channel::wait_results(void)
+bool redis_pipeline_channel::wait_results()
 {
 	if (msgs_.empty()) {
 		return true;
@@ -240,7 +240,7 @@ bool redis_pipeline_channel::wait_results(void)
 	return true;
 }
 
-bool redis_pipeline_channel::handle_messages(void)
+bool redis_pipeline_channel::handle_messages()
 {
 	bool retried = false;
 
@@ -276,7 +276,7 @@ bool redis_pipeline_channel::handle_messages(void)
 	return false;
 }
 
-void* redis_pipeline_channel::run(void)
+void* redis_pipeline_channel::run()
 {
 	bool success;
 	int timeout = -1;
@@ -337,7 +337,7 @@ redis_client_pipeline::redis_client_pipeline(const char* addr, box_type_t type)
 	box_        = new mbox<redis_pipeline_message>;
 }
 
-redis_client_pipeline::~redis_client_pipeline(void)
+redis_client_pipeline::~redis_client_pipeline()
 {
 	for (std::vector<char*>::iterator it = addrs_.begin();
 		it != addrs_.end(); ++it) {
@@ -382,12 +382,12 @@ redis_client_pipeline & redis_client_pipeline::set_preconnect(bool yes)
 	return *this;
 }
 
-void redis_client_pipeline::start_thread(void)
+void redis_client_pipeline::start_thread()
 {
 	this->start();
 }
 
-void redis_client_pipeline::stop_thread(void)
+void redis_client_pipeline::stop_thread()
 {
 	box<redis_pipeline_message>* box = new mbox<redis_pipeline_message>;
 	redis_pipeline_message message(redis_pipeline_t_stop, box);
@@ -406,7 +406,7 @@ void redis_client_pipeline::push(redis_pipeline_message *msg)
 	box_->push(msg, false);
 }
 
-box<redis_pipeline_message>* redis_client_pipeline::create_box(void)
+box<redis_pipeline_message>* redis_client_pipeline::create_box()
 {
 	switch (box_type_) {
 	case BOX_TYPE_TBOX:
@@ -421,7 +421,7 @@ box<redis_pipeline_message>* redis_client_pipeline::create_box(void)
 
 // Called after the thread started
 // @override from acl::thread
-void* redis_client_pipeline::run(void)
+void* redis_client_pipeline::run()
 {
 	set_all_slot();
 	if (preconn_) {
@@ -562,7 +562,7 @@ void redis_client_pipeline::set_slot(int slot, const char* addr)
 	}
 }
 
-void redis_client_pipeline::set_all_slot(void)
+void redis_client_pipeline::set_all_slot()
 {
 	redis_client client(addr_, 30, 60, false);
 
@@ -601,7 +601,7 @@ void redis_client_pipeline::set_all_slot(void)
 	}
 }
 
-void redis_client_pipeline::stop_channels(void)
+void redis_client_pipeline::stop_channels()
 {
 	const token_node* iter = channels_->first_node();
 	std::vector<redis_pipeline_channel*> channels;
@@ -624,7 +624,7 @@ void redis_client_pipeline::stop_channels(void)
 	logger("All channels in pipeline have been stopped!");
 }
 
-void redis_client_pipeline::start_channels(void)
+void redis_client_pipeline::start_channels()
 {
 	for (std::vector<char*>::const_iterator cit = addrs_.begin();
 		cit != addrs_.end(); ++cit) {

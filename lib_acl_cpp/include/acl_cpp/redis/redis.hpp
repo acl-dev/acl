@@ -72,7 +72,7 @@ public:
 	ACL_CPP_DEPRECATED
 	redis(redis_client_cluster* cluster, size_t max_conns);
 
-	~redis(void) {}
+	~redis() {}
 };
 
 } // namespace acl

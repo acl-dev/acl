@@ -127,11 +127,11 @@ static int parsetime(const char **t)
 	return h * 60 * 60 + m * 60 + s;
 }
 
-rfc822::rfc822(void)
+rfc822::rfc822()
 {
 }
 
-rfc822::~rfc822(void)
+rfc822::~rfc822()
 {
 	reset();
 }
@@ -593,7 +593,7 @@ bool rfc822::check_addr(const char* in)
 	return true;
 }
 
-void rfc822::reset(void)
+void rfc822::reset()
 {
 	std::list<rfc822_addr*>::iterator it = addrs_.begin();
 	for (; it != addrs_.end(); ++it) {

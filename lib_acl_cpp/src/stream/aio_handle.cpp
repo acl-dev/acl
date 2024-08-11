@@ -6,8 +6,7 @@
 #endif
 #include "aio_timer_delay_free.hpp"
 
-namespace acl
-{
+namespace acl {
 
 aio_handle::aio_handle(aio_handle_type engine_type /* = ENGINE_SELECT */,
 	unsigned int nMsg /* = 0 */)
@@ -72,7 +71,7 @@ aio_handle::aio_handle(ACL_AIO* aio)
 	delay_free_timer_->set_locked();
 }
 
-aio_handle::~aio_handle(void)
+aio_handle::~aio_handle()
 {
 	if (inner_alloc_) {
 		acl_aio_free(aio_);
@@ -87,9 +86,9 @@ void aio_handle::keep_read(bool onoff)
 	acl_aio_set_keep_read(aio_, onoff ? 1 : 0);
 }
 
-bool aio_handle::keep_read(void) const
+bool aio_handle::keep_read() const
 {
-	return acl_aio_get_keep_read(aio_) == 0 ? false : true;
+	return acl_aio_get_keep_read(aio_) != 0;
 }
 
 acl_int64 aio_handle::set_timer(aio_timer_callback* callback,
@@ -190,12 +189,12 @@ void aio_handle::destroy_timer(aio_timer_callback* callback)
 	}
 }
 
-ACL_AIO* aio_handle::get_handle(void) const
+ACL_AIO* aio_handle::get_handle() const
 {
 	return aio_;
 }
 
-aio_handle_type aio_handle::get_engine_type(void) const
+aio_handle_type aio_handle::get_engine_type() const
 {
 	return engine_type_;
 }
@@ -220,7 +219,7 @@ void aio_handle::set_rbuf_size(int n)
 	acl_aio_set_rbuf_size(aio_, n);
 }
 
-bool aio_handle::check(void)
+bool aio_handle::check()
 {
 	acl_aio_loop(aio_);
 	if (stop_) {
@@ -229,17 +228,17 @@ bool aio_handle::check(void)
 	return true;
 }
 
-int aio_handle::last_nready(void) const
+int aio_handle::last_nready() const
 {
 	return acl_aio_last_nready(aio_);
 }
 
-void aio_handle::stop(void)
+void aio_handle::stop()
 {
 	stop_ = true;
 }
 
-void aio_handle::reset(void)
+void aio_handle::reset()
 {
 	stop_ = false;
 }
@@ -259,18 +258,18 @@ void aio_handle::dns_del(const char* addrs)
 	acl_aio_del_dns(aio_, addrs);
 }
 
-void aio_handle::dns_clear(void)
+void aio_handle::dns_clear()
 {
 	acl_aio_clear_dns(aio_);
 }
 
-size_t aio_handle::dns_size(void) const
+size_t aio_handle::dns_size() const
 {
 	ACL_DNS* dns = (ACL_DNS*) acl_aio_dns(aio_);
 	return dns ? acl_dns_size(dns) : 0;
 }
 
-bool aio_handle::dns_empty(void) const
+bool aio_handle::dns_empty() const
 {
 	ACL_DNS* dns = (ACL_DNS*) acl_aio_dns(aio_);
 	if (dns == NULL) {
@@ -292,20 +291,20 @@ void aio_handle::dns_list(std::vector<std::pair<string, unsigned short> >& out)
 	}
 }
 
-void aio_handle::increase(void)
+void aio_handle::increase()
 {
 	nstream_++;
 	on_increase();
 }
 
-void aio_handle::decrease(void)
+void aio_handle::decrease()
 {
 	nstream_--;
 	acl_assert(nstream_ >= 0);
 	on_decrease();
 }
 
-int aio_handle::length(void) const
+int aio_handle::length() const
 {
 	return nstream_;
 }

@@ -4,11 +4,9 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_list : virtual public redis_command
-{
+class ACL_CPP_API redis_list : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()

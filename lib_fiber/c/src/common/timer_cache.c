@@ -41,6 +41,7 @@ TIMER_CACHE *timer_cache_create(void)
 	ring_init(&cache->caches);
 	cache->cache_max = 1000;
 	cache->objs = array_create(100, ARRAY_F_UNORDER);
+	cache->objs2 = array_create(100, ARRAY_F_UNORDER);
 
 	return cache;
 }
@@ -69,6 +70,7 @@ void timer_cache_free(TIMER_CACHE *cache)
 	}
 
 	array_free(cache->objs, NULL);
+	array_free(cache->objs2, NULL);
 	mem_free(cache);
 }
 
@@ -167,4 +169,24 @@ int timer_cache_remove_exist(TIMER_CACHE *cache, long long expire, RING *entry)
 	}
 #endif
 	return 1;
+}
+
+int timer_cache_exist(TIMER_CACHE *cache, long long expire, RING *entry)
+{
+	TIMER_CACHE_NODE n, *node;
+	RING_ITER iter;
+
+	n.expire = expire;
+	node = fiber_avl_find(&cache->tree, &n, NULL);
+	if (node == NULL) {
+		return 0;
+	}
+
+	ring_foreach(iter, &node->ring) {
+		if (iter.ptr == entry) {
+			return 1;
+		}
+	}
+
+	return 0;
 }

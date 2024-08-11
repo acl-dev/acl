@@ -5,11 +5,9 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-typedef enum
-{
+typedef enum {
 	REDIS_RESULT_UNKOWN,
 	REDIS_RESULT_NIL,
 	REDIS_RESULT_ERROR,
@@ -28,10 +26,9 @@ class redis_client;
  * redis_result 类对象。
  * the redis result for redis-server's reply
  */
-class ACL_CPP_API redis_result : public noncopyable
-{
+class ACL_CPP_API redis_result : public noncopyable {
 public:
-	redis_result(dbuf_pool* dbuf);
+	explicit redis_result(dbuf_pool* dbuf);
 
 	/**
 	 * 重载了 new/delete 操作符，在 new 新对象时，使内存的分配在
@@ -48,8 +45,7 @@ public:
 	 * @return {redis_result_t}
 	 *  defined above REDIS_RESULT_
 	 */
-	redis_result_t get_type(void) const
-	{
+	redis_result_t get_type() const {
 		return result_type_;
 	}
 
@@ -64,7 +60,7 @@ public:
 	 *  REDIS_RESULT_STRING: > 0 时表示该字符串数据被切分成非连接内存块的个数
 	 *  REDIS_RESULT_ARRAY: children_->size()
 	 */
-	size_t get_size(void) const;
+	size_t get_size() const;
 
 	/**
 	 * 当返回值为 REDIS_RESULT_INTEGER 类型时，本方法返回对应的 32 位整数值
@@ -107,7 +103,7 @@ public:
 	 * @return {const char*} 返回空串 "" 表示没有出错信息
 	 *  there was no error information if empty string returned
 	 */
-	const char* get_error(void) const;
+	const char* get_error() const;
 
 	/**
 	 * 返回对应下标的数据(当数据类型非 REDIS_RESULT_ARRAY 时）
@@ -127,8 +123,7 @@ public:
 	 * return all data's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const char**}
 	 */
-	const char** get_argv(void) const
-	{
+	const char** get_argv() const {
 		return (const char**) argv_;
 	}
 
@@ -137,8 +132,7 @@ public:
 	 * return all length's array if the type isn't REDIS_RESULT_ARRAY
 	 * @return {const size_t*}
 	 */
-	const size_t* get_lens(void) const
-	{
+	const size_t* get_lens() const {
 		return lens_;
 	}
 
@@ -147,7 +141,7 @@ public:
 	 * return the total length of all data for no REDIS_RESULT_ARRAY
 	 * @return {size_t}
 	 */
-	size_t get_length(void) const;
+	size_t get_length() const;
 
 	/**
 	 * 当数据类型为 REDIS_RESULT_STRING 类型时，该函数将按内存块存放的数据
@@ -186,8 +180,7 @@ public:
 	 * get the memory pool object set in constructor
 	 * @return {dbuf_pool*}
 	 */
-	dbuf_pool* get_dbuf(void)
-	{
+	dbuf_pool* get_dbuf() {
 		return dbuf_;
 	}
 
@@ -199,10 +192,10 @@ public:
 	const string& to_string(string& out) const;
 
 private:
-	~redis_result(void);
+	~redis_result();
 
 	friend class redis_client;
-	void clear(void);
+	void clear();
 
 public:
 	redis_result& set_type(redis_result_t type);

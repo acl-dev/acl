@@ -44,7 +44,7 @@ public:
 	HttpServletRequest(HttpServletResponse& res, session* sess,
 		socket_stream& stream, const char* charset = NULL,
 		int body_limit = 102400);
-	~HttpServletRequest(void);
+	~HttpServletRequest();
 
 	/**
 	 * 针对 POST 方法，该方法设置是否需要解析 Form 数据体数据，默认为解析，
@@ -72,7 +72,7 @@ public:
 	 * 获得 HTTP 客户端请求的所有 cookie 对象集合
 	 * @return {const std::vector<HttpCookie*>&}
 	 */
-	const std::vector<HttpCookie*>& getCookies(void) const;
+	const std::vector<HttpCookie*>& getCookies() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的某个 cookie 值
@@ -102,21 +102,21 @@ public:
 	 * @return {const char*} 没有进行URL 解码的请求参数部分，
 	 *  返回空串则表示 URL 中没有参数
 	 */
-	const char* getQueryString(void) const;
+	const char* getQueryString() const;
 
 	/**
 	 * 获得  http://test.com.cn/cgi-bin/test?name=value 中的
 	 * /cgi-bin/test 路径部分
 	 * @return {const char*} 返回空串表示不存在
 	 */
-	const char* getPathInfo(void) const;
+	const char* getPathInfo() const;
 
 	/**
 	 * 获得  http://test.com.cn/cgi-bin/test?name=value 中的
 	 * /cgi-bin/test?name=value 路径部分
 	 * @return {const char*} 返回空串表示不存在
 	 */
-	const char* getRequestUri(void) const;
+	const char* getRequestUri() const;
 
 	/**
 	 * 获得与该 HTTP 会话相关的 HttpSession 对象引用
@@ -135,13 +135,13 @@ public:
 	 * 获得与 HTTP 客户端连接关联的输入流对象引用
 	 * @return {istream&}
 	 */
-	istream& getInputStream(void) const;
+	istream& getInputStream() const;
 
 	/**
 	 * 获得 HTTP 双向流对象，由构造函数的参数输入
 	 * @return {socket_stream&}
 	 */
-	socket_stream& getSocketStream(void) const;
+	socket_stream& getSocketStream() const;
 
 	/**
 	 * 获得 HTTP 请求数据的数据长度
@@ -149,9 +149,9 @@ public:
 	 *  或 HTTP 请求头中没有 Content-Length 字段
 	 */
 #if defined(_WIN32) || defined(_WIN64)
-	__int64 getContentLength(void) const;
+	__int64 getContentLength() const;
 #else
-	long long int getContentLength(void) const;
+	long long int getContentLength() const;
 #endif
 
 	/**
@@ -175,8 +175,7 @@ public:
 	 * @param ctype {http_ctype*} 为非空指针时，将存储完整的 http_ctype 信息
 	 * @return {const char*} 返回 NULL 表示 Content-Type 字段不存在
 	 */
-	const char* getContentType(
-		bool part = true, http_ctype* ctype = NULL) const;
+	const char* getContentType(bool part = true, http_ctype* ctype = NULL) const;
 
 	/**
 	 * 获得 HTTP 请求头中的 Content-Type: text/html; charset=gb2312
@@ -184,49 +183,49 @@ public:
 	 * @return {const char*} 返回 NULL 表示 Content-Type 字段 或
 	 *  charset=xxx 不存在
 	 */
-	const char* getCharacterEncoding(void) const;
+	const char* getCharacterEncoding() const;
 
 	/**
 	 * 返回本地的字段字符集
 	 * @ return {const char*} 返回 NULL 表示没有设置本地字符集
 	 */
-	const char* getLocalCharset(void) const;
+	const char* getLocalCharset() const;
 
 	/**
 	 * 返回 HTTP 连接的本地 IP 地址
 	 * @return {const char*} 返回空，表示无法获得
 	 */
-	const char* getLocalAddr(void) const;
+	const char* getLocalAddr() const;
 
 	/**
 	 * 返回 HTTP 连接的本地 PORT 号
 	 * @return {unsigned short} 返回 0 表示无法获得
 	 */
-	unsigned short getLocalPort(void) const;
+	unsigned short getLocalPort() const;
 
 	/**
 	 * 返回 HTTP 连接的远程客户端 IP 地址
 	 * @return {const char*} 返回空，表示无法获得
 	 */
-	const char* getRemoteAddr(void) const;
+	const char* getRemoteAddr() const;
 
 	/**
 	 * 返回 HTTP 连接的远程客户端 PORT 号
 	 * @return {unsigned short} 返回 0 表示无法获得
 	 */
-	unsigned short getRemotePort(void) const;
+	unsigned short getRemotePort() const;
 
 	/**
 	 * 获得 HTTP 请求头中设置的 Host 字段
 	 * @return {const char*} 如果为空，则表示不存在
 	 */
-	const char* getRemoteHost(void) const;
+	const char* getRemoteHost() const;
 
 	/**
 	 * 获得 HTTP 请求头中设置的 User-Agent 字段
 	 * @return {const char*} 如果为空，则表示不存在
 	 */
-	const char* getUserAgent(void) const;
+	const char* getUserAgent() const;
 
 	/**
 	 * 获得 HTTP 请求中的参数值，该值已经被 URL 解码且
@@ -248,7 +247,7 @@ public:
 	 *  返回的值用户不能手工释放，因为在 HttpServletRequest 的析
 	 *  构中会自动释放
 	 */
-	http_mime* getHttpMime(void);
+	http_mime* getHttpMime();
 
 	/**
 	 * 数据类型为 text/json 或 application/json 格式时可调用此方法读取 json
@@ -328,31 +327,31 @@ public:
 	 *  该函数获得是否是上传数据类型，当该函数返回 HTTP_REQUEST_OTHER 时，
 	 *  用户可以通过调用 getContentType 获得具体的类型字符串
 	 */
-	http_request_t getRequestType(void) const;
+	http_request_t getRequestType() const;
 
 	/**
 	 * 获得 HTTP 请求页面的 referer URL
 	 * @return {const char*} 为 NULL 则说明用户直接访问本 URL
 	 */
-	const char* getRequestReferer(void) const;
+	const char* getRequestReferer() const;
 
 	/**
 	 * 获得根据 HTTP 请求头获得的 http_ctype 对象
 	 * @return {const http_ctype&}
 	 */
-	const http_ctype& getHttpCtype(void) const;
+	const http_ctype& getHttpCtype() const;
 
 	/**
 	 * 判断 HTTP 客户端是否要求保持长连接
 	 * @return {bool}
 	 */
-	bool isKeepAlive(void) const;
+	bool isKeepAlive() const;
 
 	/**
 	 * 当客户端要求保持长连接时，从 HTTP 请求头中获得保持的时间
 	 * @return {int} 返回值 < 0 表示不存在 Keep-Alive 字段
 	 */
-	int getKeepAlive(void) const;
+	int getKeepAlive() const;
 
 	/**
 	 * 获得 HTTP 客户端请求的版本号
@@ -379,7 +378,7 @@ public:
 	 * 获得上次出错的错误号
 	 * @return {http_request_error_t}
 	 */
-	http_request_error_t getLastError(void) const;
+	http_request_error_t getLastError() const;
 
 	/**
 	 * 当 HttpServlet 类以服务模式(即非 CGI 方式)运行时，可以调用此
@@ -387,7 +386,7 @@ public:
 	 * @return {http_client*} 当以服务模式运行时，此函数返回 HTTP 客户端
 	 *  连接非空对象；当以 CGI 方式运行时，则返回空指针
 	 */
-	http_client* getClient(void) const;
+	http_client* getClient() const;
 
 	/**
 	 * 将 HTTP 请求头输出至流中（文件流或网络流）

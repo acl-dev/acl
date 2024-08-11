@@ -8,8 +8,7 @@ namespace acl {
 	
 class string;
 
-class ACL_CPP_API mime_code : public pipe_stream
-{
+class ACL_CPP_API mime_code : public pipe_stream {
 public:
 	/**
 	 * 构造函数
@@ -18,14 +17,13 @@ public:
 	 * @param encoding_type {const char*} 编码类型标识符
 	 */
 	mime_code(bool addCrlf, bool addInvalid, const char* encoding_type);
-	virtual ~mime_code(void) = 0;
+	virtual ~mime_code() = 0;
 
 	/**
 	 * 获得编码类型标识符
 	 * @return {const char*}
 	 */
-	const char* get_encoding_type(void) const
-	{
+	const char* get_encoding_type() const {
 		return encoding_type_;
 	}
 
@@ -41,8 +39,7 @@ public:
 	 *  编码过程还是临时缓存过程; 如果使用了 out 中的结果数据，
 	 *  则用完后应该调用 out->clear() 清空用过的数据
 	 */
-	virtual void encode_update(const char *src, int n,
-		string* out);
+	virtual void encode_update(const char *src, int n, string* out);
 
 	/**
 	 * 编码结束后需要调用此函数来对可能存在于临时缓存中的
@@ -82,7 +79,7 @@ public:
 	/**
 	 * 重置内部缓冲区
 	 */
-	virtual void reset(void);
+	virtual void reset();
 
 	/**
 	 * 在编码过程中设置是否自动在每个编码段添加 "\r\n"
@@ -124,10 +121,9 @@ public:
 
 	// pipe_stream 虚函数重载
 
-	virtual int push_pop(const char* in, size_t len,
-		string* out, size_t max = 0);
-	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear(void);
+	virtual int push_pop(const char* in, size_t len, string* out, size_t max);
+	virtual int pop_end(string* out, size_t max);
+	virtual void clear();
 
 	/**
 	 * 静态函数，根据编码类型 MIME_ENC_XXX (参见：mime_define.hpp) 获得

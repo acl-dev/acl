@@ -37,7 +37,7 @@
 static void file_read_callback(EVENT *ev UNUSED, FILE_EVENT *fe)
 {
 	if (fe->fiber_r->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(fe->fiber_r);
+		FIBER_READY(fe->fiber_r);
 	}
 }
 

@@ -442,6 +442,11 @@ bool http_request::request(const void* data, size_t len)
 			break;
 		}
 
+		if (last_error() == ECANCELED) {
+			//logger_error("read response canceled");
+			return false;
+		}
+
 		if (have_retried || !reuse_conn) {
 			logger_error("read response header error");
 			return false;

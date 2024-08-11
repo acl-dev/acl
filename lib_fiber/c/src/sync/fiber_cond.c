@@ -165,6 +165,13 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 		return FIBER_ETIME;
 	}
 
+	if (acl_fiber_canceled(fiber)) {
+		acl_fiber_set_errno(fiber, FIBER_ECANCELED);
+		acl_fiber_set_error(FIBER_ECANCELED);
+		sync_obj_unrefer(obj);
+		return FIBER_ECANCELED;
+	}
+
 	sync_obj_unrefer(obj);
 	return 0;
 }

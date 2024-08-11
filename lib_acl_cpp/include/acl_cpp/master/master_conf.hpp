@@ -12,8 +12,7 @@ struct ACL_CFG_BOOL_TABLE;
 
 namespace acl {
 
-typedef struct master_int_tbl
-{
+typedef struct master_int_tbl {
 	const char *name;
 	int  defval;
 	int *target;
@@ -21,22 +20,19 @@ typedef struct master_int_tbl
 	int  max;
 } master_int_tbl;
 
-typedef struct master_str_tbl
-{
+typedef struct master_str_tbl {
 	const char *name;
 	const char *defval;
 	char **target;
 } master_str_tbl;
 
-typedef struct master_bool_tbl
-{
+typedef struct master_bool_tbl {
 	const char *name;
 	int   defval;
 	int  *target;
 } master_bool_tbl;
 
-typedef struct master_int64_tbl
-{
+typedef struct master_int64_tbl {
 	const char *name;
 #if defined(_WIN32) || defined(_WIN64)
 	__int64  defval;
@@ -53,8 +49,7 @@ typedef struct master_int64_tbl
 
 class master_base;
 
-class ACL_CPP_API master_conf : public noncopyable
-{
+class ACL_CPP_API master_conf : public noncopyable {
 public:
 	master_conf();
 	~master_conf();
@@ -93,7 +88,7 @@ public:
 	 * 获得由 load 设置的配置文件路径
 	 * @return {const char*} 返回 NULL 表示没有设置配置文件路径
 	 */
-	const char* get_path(void) const;
+	const char* get_path() const;
 
 	/**
 	 * 重置配置解析器状态，释放之前分配的资源，调用此函数后，
@@ -101,7 +96,7 @@ public:
 	 * 调用该函数后，则该配置解析器对象可以再次使用解析其它
 	 * 配置文件
 	 */
-	void reset(void);
+	void reset();
 
 	ACL_CFG_INT_TABLE* get_int_cfg() const;
 	ACL_CFG_INT64_TABLE* get_int64_cfg() const;
@@ -123,10 +118,10 @@ private:
 	master_bool_tbl* bool_tbl_;
 	master_int64_tbl* int64_tbl_;
 
-	void load_str(void);
-	void load_bool(void);
-	void load_int(void);
-	void load_int64(void);
+	void load_str();
+	void load_bool();
+	void load_int();
+	void load_int64();
 };
 
 } // namespace acl

@@ -12,8 +12,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_client_cluster::redis_client_cluster(int max_slot /* = 16384 */)
 : max_slot_(max_slot)
@@ -49,8 +48,9 @@ connect_pool* redis_client_cluster::create_pool(const char* addr,
 {
 	redis_client_pool* pool = NEW redis_client_pool(addr, count, idx);
 
-	if (ssl_conf_)
+	if (ssl_conf_) {
 		pool->set_ssl_conf(ssl_conf_);
+	}
 
 	string key(addr);
 	key.lower();
@@ -66,8 +66,9 @@ connect_pool* redis_client_cluster::create_pool(const char* addr,
 
 redis_client_pool* redis_client_cluster::peek_slot(int slot)
 {
-	if (slot < 0 || slot >= max_slot_)
+	if (slot < 0 || slot >= max_slot_) {
 		return NULL;
+	}
 
 	// 需要加锁保护
 	lock();
@@ -97,8 +98,9 @@ void redis_client_cluster::clear_slot(int slot)
 
 void redis_client_cluster::set_slot(int slot, const char* addr)
 {
-	if (slot < 0 || slot >= max_slot_ || addr == NULL || *addr == 0)
+	if (slot < 0 || slot >= max_slot_ || addr == NULL || *addr == 0) {
 		return;
+	}
 
 	// 遍历缓存的所有地址，若该地址不存在则直接添加，然后使之与 slot 进行关联
 
@@ -112,9 +114,9 @@ void redis_client_cluster::set_slot(int slot, const char* addr)
 	}
 
 	// 将 slot 与地址进行关联映射
-	if (cit != addrs_.end())
+	if (cit != addrs_.end()) {
 		slot_addrs_[slot] = *cit;
-	else {
+	} else {
 		// 只所以采用动态分配方式，是因为在往数组中添加对象时，无论
 		// 数组如何做动态调整，该添加的动态内存地址都是固定的，所以
 		// slot_addrs_ 的下标地址也是相对不变的
@@ -143,8 +145,9 @@ void redis_client_cluster::set_all_slot(const char* addr, size_t max_conns,
 	redis_cluster cluster(&client);
 
 	const std::vector<redis_slot*>* slots = cluster.cluster_slots();
-	if (slots == NULL)
+	if (slots == NULL) {
 		return;
+	}
 
 	std::vector<redis_slot*>::const_iterator cit;
 	for (cit = slots->begin(); cit != slots->end(); ++cit) {
@@ -185,8 +188,9 @@ redis_client_cluster& redis_client_cluster::set_password(
 {
 	// 允许 pass 为空字符串且非空指针，这样就可以当 default 值被设置时，
 	// 允许部分 redis 节点无需连接密码
-	if (addr == NULL || *addr == 0 || pass == NULL || *pass == 0)
+	if (addr == NULL || *addr == 0 || pass == NULL || *pass == 0) {
 		return *this;
+	}
 
 	lock_guard guard(lock_);
 
@@ -203,10 +207,10 @@ redis_client_cluster& redis_client_cluster::set_password(
 		key = pool->get_addr();
 		key.lower();
 
-		std::map<string, string>::const_iterator cit =
-			passwds_.find(key);
-		if (cit != passwds_.end() || !strcasecmp(addr, "default"))
+		std::map<string, string>::const_iterator cit = passwds_.find(key);
+		if (cit != passwds_.end() || !strcasecmp(addr, "default")) {
 			pool->set_password(pass);
+		}
 	}
 
 	return *this;
@@ -214,8 +218,9 @@ redis_client_cluster& redis_client_cluster::set_password(
 
 const char* redis_client_cluster::get_password(const char* addr) const
 {
-	if (addr == NULL || *addr == 0)
+	if (addr == NULL || *addr == 0) {
 		return NULL;
+	}
 
 	lock_guard guard((const_cast<redis_client_cluster*>(this))->lock_);
 
@@ -224,8 +229,9 @@ const char* redis_client_cluster::get_password(const char* addr) const
 		return cit->second.c_str();
 
 	cit = passwds_.find("default");
-	if (cit != passwds_.end())
+	if (cit != passwds_.end()) {
 		return cit->second.c_str();
+	}
 	return NULL;
 }
 
@@ -280,10 +286,11 @@ redis_client* redis_client_cluster::peek_conn(int slot)
 	int i = 0;
 
 	while (i++ < 5) {
-		if (slot < 0)
+		if (slot < 0) {
 			conns = (redis_client_pool*) this->peek();
-		else if ((conns = peek_slot(slot)) == NULL)
+		} else if ((conns = peek_slot(slot)) == NULL) {
 			conns = (redis_client_pool*) this->peek();
+		}
 
 		if (conns == NULL) {
 			slot = -1;
@@ -291,8 +298,9 @@ redis_client* redis_client_cluster::peek_conn(int slot)
 		}
 
 		conn = (redis_client*) conns->peek();
-		if (conn != NULL)
+		if (conn != NULL) {
 			return conn;
+		}
 
 		// 取消哈希槽的地址映射关系
 		clear_slot(slot);

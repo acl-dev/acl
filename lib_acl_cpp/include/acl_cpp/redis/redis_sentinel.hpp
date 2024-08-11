@@ -7,15 +7,13 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_sentinel : virtual public redis_command
-{
+class ACL_CPP_API redis_sentinel : virtual public redis_command {
 public:
-	redis_sentinel(void);
+	redis_sentinel();
 	redis_sentinel(redis_client* conn);
-	virtual ~redis_sentinel(void);
+	virtual ~redis_sentinel();
 
 	bool sentinel_master(const char* name, redis_master& out);
 	bool sentinel_masters(std::vector<redis_master>& out);
@@ -27,7 +25,7 @@ public:
 	int sentinel_reset(const char* pattern);
 	bool sentinel_failover(const char* master_name);
 
-	bool sentinel_flushconfig(void);
+	bool sentinel_flushconfig();
 	bool sentinel_remove(const char* master_name);
 	bool sentinel_monitor(const char* master_name, const char* ip,
 		int port, int quorum);

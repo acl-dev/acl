@@ -10,12 +10,11 @@
 
 #ifndef ACL_CLIENT_ONLY
 
-namespace acl
-{
+namespace acl {
 
-master_proc::master_proc(void) : stop_(false), count_limit_(0), count_(0) {}
+master_proc::master_proc() : stop_(false), count_limit_(0), count_(0) {}
 
-master_proc::~master_proc(void) {}
+master_proc::~master_proc() {}
 
 static bool __has_called = false;
 
@@ -45,7 +44,7 @@ void master_proc::run_daemon(int argc, char** argv)
 #endif
 }
 
-const char* master_proc::get_conf_path(void) const
+const char* master_proc::get_conf_path() const
 {
 #ifndef ACL_WINDOWS
 	if (daemon_mode_) {

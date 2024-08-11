@@ -459,7 +459,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
 
 	if (ee->nready == 0) {
-		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
+		timer_cache_remove(ev->epoll_timer, ee->expire, &ee->me);
 		ring_prepend(&ev->epoll_ready, &ee->me);
 	}
 
@@ -494,7 +494,7 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
 
 	if (ee->nready == 0) {
-		timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
+		timer_cache_remove(ev->epoll_timer, ee->expire, &ee->me);
 		ring_prepend(&ev->epoll_ready, &ee->me);
 	}
 
@@ -619,7 +619,7 @@ int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)
 static void epoll_callback(EVENT *ev fiber_unused, EPOLL_EVENT *ee)
 {
 	if (ee->fiber->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(ee->fiber);
+		FIBER_READY(ee->fiber);
 	}
 }
 
@@ -681,7 +681,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	event_epoll_set(ev, ee, timeout);
 
 	while (1) {
-		timer_cache_add(ev->epoll_list, ee->expire, &ee->me);
+		timer_cache_add(ev->epoll_timer, ee->expire, &ee->me);
 
 		ee->fiber->wstatus |= FIBER_WAIT_EPOLL;
 
@@ -692,7 +692,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 		ee->fiber->wstatus &= ~FIBER_WAIT_EPOLL;
 
 		if (ee->nready == 0) {
-			timer_cache_remove(ev->epoll_list, ee->expire, &ee->me);
+			timer_cache_remove(ev->epoll_timer, ee->expire, &ee->me);
 		}
 
 		ev->timeout = old_timeout;
@@ -703,13 +703,12 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 				ee->nready = -1;
 			}
 
-			msg_info("%s(%d), %s: fiber-%u was killed",
-				__FILE__, __LINE__, __FUNCTION__,
-				acl_fiber_id(ee->fiber));
+			//msg_info("%s(%d), %s: fiber-%u was killed",
+			//	__FILE__, __LINE__, __FUNCTION__, acl_fiber_id(ee->fiber));
 			break;
 		}
 
-		if (timer_cache_size(ev->epoll_list) == 0) {
+		if (timer_cache_size(ev->epoll_timer) == 0) {
 			ev->timeout = -1;
 		}
 

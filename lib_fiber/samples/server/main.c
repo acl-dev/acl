@@ -15,6 +15,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	ACL_VSTREAM *cstream = (ACL_VSTREAM *) ctx;
 	char  buf[8192];
 	int   ret, count = 0;
+    time_t stamp = time(NULL);
 
 	if (!__setsockopt_timeout) {
 		cstream->rw_timeout = __rw_timeout;
@@ -25,13 +26,12 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 
 #if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
 		if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
-			SO_RCVTIMEO, &__rw_timeout, sizeof(__rw_timeout)) < 0) {
+			    SO_RCVTIMEO, (char*) &__rw_timeout, sizeof(__rw_timeout)) < 0) {
 #else
 		if (setsockopt(ACL_VSTREAM_SOCK(cstream), SOL_SOCKET,
-			SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
+			    SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
 #endif
-			printf("%s: setsockopt error: %s\r\n",
-				__FUNCTION__, acl_last_serror());
+			printf("%s: setsockopt error: %s\r\n", __FUNCTION__, acl_last_serror());
 		}
 	}
 
@@ -40,8 +40,14 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	while (1) {
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
-			printf("gets error: %s, fd: %d, count: %d\r\n",
-				acl_last_serror(), SOCK(cstream), count);
+			printf("gets error: %s, fd: %d, count: %d, cost: %ld\r\n",
+				acl_last_serror(), SOCK(cstream), count, time(NULL) - stamp);
+            stamp = time(NULL);
+
+            if (errno == EAGAIN) {
+                continue;
+            }
+
 			break;
 		}
 		buf[ret] = 0;
@@ -66,6 +72,7 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 {
 	ACL_VSTREAM *sstream = (ACL_VSTREAM *) ctx;
+    const char *banner = "Welcom, enter any key to continue.\r\n";
 
 	for (;;) {
 		ACL_VSTREAM *cstream = acl_vstream_accept(sstream, NULL, 0);
@@ -78,6 +85,15 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 
+        printf("Accept connection from %s, enter any key to continue\r\n",
+                ACL_VSTREAM_PEER(cstream));
+
+        if (acl_vstream_writen(cstream, banner, strlen(banner)) == ACL_VSTREAM_EOF) {
+            printf("Write %s to client error %s\r\n", banner, acl_last_serror());
+            acl_vstream_close(cstream);
+            continue;
+        }
+
 		ret = acl_vstream_gets(cstream, buf, sizeof(buf) - 1);
 		if (ret == ACL_VSTREAM_EOF) {
 			printf("get first line error\r\n");
@@ -89,9 +105,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 			continue;
 		}
 
-		//printf("accept one, fd: %d\r\n", ACL_VSTREAM_SOCK(cstream));
 		acl_fiber_create(echo_client, cstream, __stack_size);
-		//printf("continue to accept\r\n");
 	}
 
 	acl_vstream_close(sstream);

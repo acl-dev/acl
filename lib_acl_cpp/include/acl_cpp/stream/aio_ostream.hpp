@@ -27,18 +27,17 @@ class aio_ostream;
  */
 class ACL_CPP_API aio_timer_writer : public aio_timer_callback {
 public:
-	aio_timer_writer(void);
+	aio_timer_writer();
 
 	/**
 	 * 在 aio_istream 中调用此函数以释放类对象，子类应该实现该函数
 	 */
-	virtual void destroy(void)
-	{
+	virtual void destroy() {
 		delete this;
 	}
 
 protected:
-	virtual ~aio_timer_writer(void);
+	virtual ~aio_timer_writer();
 
 	/**
 	 * 延迟读数据时的回调函数，从 aio_timer_callback 类中继承而来
@@ -126,8 +125,7 @@ public:
 	 * same as write_await();
 	 */
 	void write(const void* data, int len, long long int delay = 0,
-		aio_timer_writer* callback = NULL)
-	{
+		aio_timer_writer* callback = NULL) {
 		write_await(data, len, delay, callback);
 	}
 
@@ -164,8 +162,7 @@ public:
 	/**
 	 * same as writev_await()
 	 */
-	void writev(const struct iovec *iov, int count)
-	{
+	void writev(const struct iovec *iov, int count) {
 		writev_await(iov, count);
 	}
 
@@ -198,8 +195,7 @@ public:
 	/**
 	 * same as vformat_await()
 	 */
-	void vformat(const char* fmt, va_list ap)
-	{
+	void vformat(const char* fmt, va_list ap) {
 		vformat_await(fmt, ap);
 	}
 
@@ -213,8 +209,7 @@ public:
 	/**
 	 * same as writable_await()
 	 */
-	void write_wait(int timeout = 0)
-	{
+	void write_wait(int timeout = 0) {
 		writable_await(timeout);
 	}
 
@@ -223,26 +218,26 @@ public:
 	 * 事件中移除，直到用户调用任何一个写操作时会自动打开异
 	 * 步写状态(此时该流会重新被异步引擎监控)
 	 */
-	void disable_write(void);
+	void disable_write();
 
 	/**
 	 * 获得发送队列里数据长度
 	 * @return {size_t}
 	 */
-	size_t pending_length(void) const;
+	size_t pending_length() const;
 
 protected:
-	virtual ~aio_ostream(void);
+	virtual ~aio_ostream();
 
 	/**
 	 * 释放动态类对象的虚函数
 	 */
-	virtual void destroy(void);
+	virtual void destroy();
 
 	/**
 	 * 注册写过程
 	 */
-	void enable_write(void);
+	void enable_write();
 
 private:
 	friend class aio_timer_writer;

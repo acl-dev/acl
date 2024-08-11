@@ -536,7 +536,7 @@ void mbedtls_conf::set_libpath(const char* libmbedtls)
 	set_libpath(libmbedtls, libmbedtls, libmbedtls);
 }
 
-bool mbedtls_conf::load(void)
+bool mbedtls_conf::load()
 {
 #ifdef HAS_MBEDTLS_DLL
 	acl_pthread_once(&__load_once, mbedtls_dll_load);
@@ -613,7 +613,7 @@ static void set_authmode(mbedtls_ssl_config* conf, mbedtls_verify_t verify_mode)
 }
 #endif
 
-bool mbedtls_conf::init_rand(void)
+bool mbedtls_conf::init_rand()
 {
 #ifdef HAS_MBEDTLS
 	char pers[50];
@@ -718,7 +718,7 @@ mbedtls_conf::mbedtls_conf(bool server_side, mbedtls_verify_t verify_mode)
 #endif
 }
 
-mbedtls_conf::~mbedtls_conf(void)
+mbedtls_conf::~mbedtls_conf()
 {
 #ifdef HAS_MBEDTLS
 	free_ca();
@@ -978,7 +978,7 @@ MBEDTLS_CERT_KEY* mbedtls_conf::find_ssl_config(const char* host)
 	return NULL;
 }
 
-void mbedtls_conf::free_ca(void)
+void mbedtls_conf::free_ca()
 {
 #ifdef HAS_MBEDTLS
 	if (cacert_) {

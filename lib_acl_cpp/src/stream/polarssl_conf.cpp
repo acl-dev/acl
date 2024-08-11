@@ -248,8 +248,7 @@ static void polarssl_dll_load(void)
 # endif // HAS_POLARSSL_DLL
 #endif  // HAS_POLARSSL
 
-namespace acl
-{
+namespace acl {
 
 void polarssl_conf::set_libpath(const char* path acl_unused)
 {
@@ -261,7 +260,7 @@ void polarssl_conf::set_libpath(const char* path acl_unused)
 #endif
 }
 
-bool polarssl_conf::load(void)
+bool polarssl_conf::load()
 {
 #ifdef HAS_POLARSSL_DLL
 	acl_pthread_once(&__polarssl_once, polarssl_dll_load);
@@ -276,7 +275,7 @@ bool polarssl_conf::load(void)
 #endif
 }
 
-void polarssl_conf::init_once(void)
+void polarssl_conf::init_once()
 {
 #ifdef HAS_POLARSSL_DLL
 	load();
@@ -319,7 +318,7 @@ polarssl_conf::polarssl_conf(bool server_side, polarssl_verify_t verify_mode)
 #endif
 }
 
-polarssl_conf::~polarssl_conf(void)
+polarssl_conf::~polarssl_conf()
 {
 #ifdef HAS_POLARSSL
 	free_ca();
@@ -346,7 +345,7 @@ polarssl_conf::~polarssl_conf(void)
 #endif
 }
 
-void polarssl_conf::free_ca(void)
+void polarssl_conf::free_ca()
 {
 #ifdef HAS_POLARSSL
 	if (cacert_) {

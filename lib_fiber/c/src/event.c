@@ -86,12 +86,12 @@ EVENT *event_create(int size)
 
 	SET_TIME(ev->stamp);  // init the event's stamp when create each event
 #ifdef HAS_POLL
-	ev->poll_list = timer_cache_create();
+	ev->poll_timer = timer_cache_create();
 	ring_init(&ev->poll_ready);
 #endif
 
 #ifdef HAS_EPOLL
-	ev->epoll_list = timer_cache_create();
+	ev->epoll_timer = timer_cache_create();
 	ring_init(&ev->epoll_ready);
 #endif
 	return ev;
@@ -109,9 +109,9 @@ acl_handle_t event_handle(EVENT *ev)
 
 void event_free(EVENT *ev)
 {
-	timer_cache_free(ev->poll_list);
+	timer_cache_free(ev->poll_timer);
 #ifdef	HAS_EPOLL
-	timer_cache_free(ev->epoll_list);
+	timer_cache_free(ev->epoll_timer);
 #endif
 
 	ev->free(ev);
@@ -291,9 +291,11 @@ int event_add_read(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 		// we should check the fd's type for the first time.
 		else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_ADD_READ;
+		} else {
+			fe->oper |= EVENT_ADD_READ;
 		}
 
-		fe->oper |= EVENT_ADD_READ;
 	}
 
 	return 1;
@@ -338,9 +340,10 @@ int event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc)
 			}
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_ADD_WRITE;
+		} else {
+			fe->oper |= EVENT_ADD_WRITE;
 		}
-
-		fe->oper |= EVENT_ADD_WRITE;
 	}
 
 	return 1;
@@ -358,9 +361,10 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly)
 			(void) ev->del_read(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_DEL_READ;
+		} else {
+			fe->oper |= EVENT_DEL_READ;
 		}
-
-		fe->oper |= EVENT_DEL_READ;
 	}
 
 	fe->r_proc  = NULL;
@@ -378,9 +382,10 @@ void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly)
 			(void) ev->del_write(ev, fe);
 		} else if (fe->me.parent == &fe->me) {
 			ring_prepend(&ev->events, &fe->me);
+			fe->oper |= EVENT_DEL_WRITE;
+		} else {
+			fe->oper |= EVENT_DEL_WRITE;
 		}
-
-		fe->oper |= EVENT_DEL_WRITE;
 	}
 
 	fe->w_proc = NULL;
@@ -446,15 +451,15 @@ static void event_process_poll(EVENT *ev)
 	RING *head;
 	POLL_EVENT *pe;
 	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->poll_list), *next;
+	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->poll_timer), *next;
 
 	/* Check and call all the pe's callback which was timeout except the
-	 * pe which has been ready and been removed from ev->poll_list. The
+	 * pe which has been ready and been removed from ev->poll_timer. The
 	 * removing operations are in read_callback or write_callback in the
 	 * hook/poll.c.
 	 */
 	while (node && node->expire >= 0 && node->expire <= now) {
-		next = TIMER_NEXT(ev->poll_list, node);
+		next = TIMER_NEXT(ev->poll_timer, node);
 
 		// Call all the pe's callback with the same expire time.
 		ring_foreach(iter, &node->ring) {
@@ -481,10 +486,10 @@ static void event_process_epoll(EVENT *ev)
 	RING *head;
 	EPOLL_EVENT *ee;
 	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->epoll_list), *next;
+	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->epoll_timer), *next;
 
 	while (node && node->expire >= 0 && node->expire <= now) {
-		next = TIMER_NEXT(ev->epoll_list, node);
+		next = TIMER_NEXT(ev->epoll_timer, node);
 
 		ring_foreach(iter, &node->ring) {
 			ee = TO_APPL(iter.ptr, EPOLL_EVENT, me);

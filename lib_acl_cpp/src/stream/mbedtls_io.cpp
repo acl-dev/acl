@@ -157,7 +157,7 @@ mbedtls_io::mbedtls_io(mbedtls_conf& conf, bool server_side,
 #endif
 }
 
-mbedtls_io::~mbedtls_io(void)
+mbedtls_io::~mbedtls_io()
 {
 #ifdef HAS_MBEDTLS
 	if (ssl_) {
@@ -174,7 +174,7 @@ mbedtls_io::~mbedtls_io(void)
 	}
 }
 
-void mbedtls_io::destroy(void)
+void mbedtls_io::destroy()
 {
 	if (--(*refers_) <= 0) {
 		delete this;
@@ -316,7 +316,7 @@ bool mbedtls_io::on_close(bool alive)
 	return true;
 }
 
-bool mbedtls_io::handshake(void)
+bool mbedtls_io::handshake()
 {
 #ifdef HAS_MBEDTLS
 	if (handshake_ok_) {
@@ -351,7 +351,7 @@ bool mbedtls_io::handshake(void)
 #endif
 }
 
-bool mbedtls_io::check_peer(void)
+bool mbedtls_io::check_peer()
 {
 #ifdef HAS_MBEDTLS
 	int ret = __ssl_get_verify_result((mbedtls_ssl_context*) ssl_);

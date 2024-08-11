@@ -46,15 +46,15 @@ public:
 	{
 	}
 
-	~redis_pipeline_message(void) {
+	~redis_pipeline_message() {
 		delete box_;
 	}
 
-	void refer(void) {
+	void refer() {
 		++refers_;
 	}
 
-	void unrefer(void) {
+	void unrefer() {
 		if (--refers_ == 0) {
 			delete this;
 		}
@@ -65,7 +65,7 @@ public:
 		return *this;
 	}
 
-	redis_pipeline_type_t get_type(void) const {
+	redis_pipeline_type_t get_type() const {
 		return type_;
 	}
 
@@ -94,17 +94,17 @@ public:
 
 public:
 	// Called in redis_pipeline_channel::flush_all().
-	const string* get_request(void) const {
+	const string* get_request() const {
 		return req_;
 	}
 
 	// Called in redis_pipeline_channel::wait_one().
-	dbuf_pool* get_dbuf(void) const {
+	dbuf_pool* get_dbuf() const {
 		return dbuf_;
 	}
 
 	// Called in redis_client_pipeline::run().
-	int get_slot(void) const {
+	int get_slot() const {
 		return slot_;
 	}
 
@@ -117,12 +117,12 @@ public:
 	}
 
 	// Called in redis_pipeline_channel::wait_one().
-	size_t get_nchild(void) const {
+	size_t get_nchild() const {
 		return nchild_;
 	}
 
 	// Called in redis_pipeline_channel::wait_one().
-	const int* get_timeout(void) const {
+	const int* get_timeout() const {
 		return timeout_ == -1 ? NULL : &timeout_;
 	}
 
@@ -131,7 +131,7 @@ public:
 		channel_ = channel;
 	}
 
-	redis_pipeline_channel* get_channel(void) const {
+	redis_pipeline_channel* get_channel() const {
 		return channel_;
 	}
 
@@ -141,17 +141,17 @@ public:
 		box_->push(this, false);
 	}
 
-	const redis_result* wait(void) {
+	const redis_result* wait() {
 		box_->pop();
 		return result_;
 	}
 
-	const char* get_addr(void) const {
+	const char* get_addr() const {
 		return addr_;
 	}
 
 	// Called in redis_pipeline_channel::wait_one().
-	size_t get_redirect_count(void) const {
+	size_t get_redirect_count() const {
 		return redirect_count_;
 	}
 
@@ -186,20 +186,20 @@ class redis_pipeline_channel : public thread {
 public:
 	redis_pipeline_channel(redis_client_pipeline& pipeline,
 		const char* addr, int conn_timeout, int rw_timeout, bool retry);
-	~redis_pipeline_channel(void);
+	~redis_pipeline_channel();
 
-	bool start_thread(void);
-	void stop_thread(void);
+	bool start_thread();
+	void stop_thread();
 
 public:
 	redis_pipeline_channel& set_passwd(const char* passwd);
-	const char* get_addr(void) const {
+	const char* get_addr() const {
 		return addr_.c_str();
 	}
 
 protected:
 	// @override from acl::thread
-	void* run(void);
+	void* run();
 
 private:
 	redis_client_pipeline& pipeline_;
@@ -212,11 +212,11 @@ public:
 	void push(redis_pipeline_message* msg);
 
 private:
-	bool handle_messages(void);
-	bool flush_all(void);
-	bool wait_results(void);
+	bool handle_messages();
+	bool flush_all();
+	bool wait_results();
 	bool wait_one(socket_stream& conn, redis_pipeline_message& msg);
-	void all_failed(void);
+	void all_failed();
 };
 
 /**

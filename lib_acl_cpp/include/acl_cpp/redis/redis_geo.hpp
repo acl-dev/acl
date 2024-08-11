@@ -7,8 +7,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define GEO_INVALID		360
 #define GEO_LONGITUDE_MIN	-180
@@ -16,34 +15,30 @@ namespace acl
 #define GEO_LATITUDE_MIN	-85.05112878
 #define GEO_LATITUDE_MAX	85.05112878
 
-enum
-{
+enum {
 	GEO_UNIT_FT,
 	GEO_UNIT_M,
 	GEO_UNIT_MI,
 	GEO_UNIT_KM,
 };
 
-enum
-{
+enum {
 	GEO_WITH_COORD = 1 << 0,
 	GEO_WITH_DIST  = 1 << 1,
 	GEO_WITH_HASH  = 1 << 2,
 };
 
-enum
-{
+enum {
 	GEO_SORT_NONE,
 	GEO_SORT_ASC,
 	GEO_SORT_DESC,
 };
 
-class ACL_CPP_API geo_member
-{
+class ACL_CPP_API geo_member {
 public:
 	geo_member(const char* name);
 	geo_member(const geo_member& member);
-	~geo_member(void);
+	~geo_member();
 
 	void set_name(const char* name);
 	const char* get_name() const

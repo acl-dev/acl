@@ -11,23 +11,20 @@ namespace acl {
 /**
  * 邮件地址
  */
-struct rfc822_addr
-{
+struct rfc822_addr {
 	char* addr;	// 邮件地址，格式为： xxx@xxx.xxx
 	char* comment;	// 邮件备注
 };
 
-typedef enum
-{
+typedef enum {
 	tzone_gmt,
 	tzone_cst
 } tzone_t;
 
-class ACL_CPP_API rfc822 : public noncopyable
-{
+class ACL_CPP_API rfc822 : public noncopyable {
 public:
-	rfc822(void);
-	~rfc822(void);
+	rfc822();
+	~rfc822();
 
 	/**
 	 * 解析符合 RFC822 标准的时间格式
@@ -98,7 +95,7 @@ public:
 private:
 	std::list<rfc822_addr*> addrs_;
 
-	void reset(void);
+	void reset();
 };
 
 } // namespace acl

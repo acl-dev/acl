@@ -8,8 +8,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define BUFLEN	32
 
@@ -35,6 +34,13 @@ geo_member::geo_member(const geo_member& member)
 
 geo_member::~geo_member()
 {
+}
+
+void geo_member::set_name(const char* name)
+{
+	if (name && *name) {
+		name_ = name;
+	}
 }
 
 void geo_member::set_dist(double dist)

@@ -10,8 +10,8 @@ namespace acl {
  */
 class ACL_CPP_API aio_delay_free : public noncopyable {
 public:
-	aio_delay_free(void);
-	virtual ~aio_delay_free(void);
+	aio_delay_free();
+	virtual ~aio_delay_free();
 
 	/**
 	 * 判定定时器是否正处于锁定状态，处于锁定状态的定时器是
@@ -19,24 +19,24 @@ public:
 	 * @return {bool} 是否处于锁定状态，处于锁定状态的对象是
 	 *  不允许被销毁的
 	 */
-	bool locked(void) const;
+	bool locked() const;
 
 	/**
 	 * 允许子类设置子类对象的锁定对象，这样在定时器处理过程中就不会
 	 * 自动调用子类对象的销毁过程
 	 */
-	void set_locked(void);
+	void set_locked();
 
 	/**
 	 * 允许子类取消类对象的锁定状态
 	 */
-	void unset_locked(void);
+	void unset_locked();
 
 	/**
 	 * 销毁函数，在内部类 aio_timer_delay_free 对象中对需要做延迟释放
 	 * 的类进行销毁
 	 */
-	virtual void destroy(void) {}
+	virtual void destroy() {}
 
 private:
 	bool locked_;

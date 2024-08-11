@@ -9,8 +9,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define LONG_LEN	21
 
@@ -50,8 +49,9 @@ int redis_set::sadd(const char* key, const char* first_member, ...)
 	va_list ap;
 	va_start(ap, first_member);
 	const char* member;
-	while ((member = va_arg(ap, const char*)) != NULL)
+	while ((member = va_arg(ap, const char*)) != NULL) {
 		members.push_back(member);
+	}
 	va_end(ap);
 
 	return sadd(key, members);
@@ -99,7 +99,7 @@ bool redis_set::spop(const char* key, string& buf)
 
 	hash_slot(key);
 	build_request(2, argv, lens);
-	return get_string(buf) > 0 ? true : false;
+	return get_string(buf) > 0;
 }
 
 int redis_set::scard(const char* key)
@@ -198,8 +198,9 @@ int redis_set::sinter(std::vector<string>* members, const char* first_key, ...)
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
-	while ((key = va_arg(ap, const char*)) != NULL)
+	while ((key = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(key);
+	}
 	va_end(ap);
 
 	return sinter(keys, members);
@@ -227,8 +228,9 @@ int redis_set::sunion(std::vector<string>* members, const char* first_key, ...)
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
-	while ((key = va_arg(ap, const char*)) != NULL)
+	while ((key = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(key);
+	}
 	va_end(ap);
 
 	return sunion(keys, members);
@@ -256,8 +258,9 @@ int redis_set::sdiffstore(const char* dst, const char* first_key, ...)
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
-	while ((key = va_arg(ap, const char*)) != NULL)
+	while ((key = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(key);
+	}
 	va_end(ap);
 
 	return sdiffstore(dst, keys);
@@ -283,8 +286,9 @@ int redis_set::sinterstore(const char* dst, const char* first_key, ...)
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
-	while ((key = va_arg(ap, const char*)) != NULL)
+	while ((key = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(key);
+	}
 	va_end(ap);
 
 	return sinterstore(dst, keys);
@@ -310,8 +314,9 @@ int redis_set::sunionstore(const char* dst, const char* first_key, ...)
 	va_list ap;
 	va_start(ap, first_key);
 	const char* key;
-	while ((key = va_arg(ap, const char*)) != NULL)
+	while ((key = va_arg(ap, const char*)) != NULL) {
 		keys.push_back(key);
+	}
 	va_end(ap);
 
 	return sunionstore(dst, keys);
@@ -350,7 +355,7 @@ bool redis_set::sismember(const char* key, const char* member, size_t len)
 
 	hash_slot(key);
 	build_request(3, argv, lens);
-	return get_number() > 0 ? true : false;
+	return get_number() > 0;
 }
 
 int redis_set::srandmember(const char* key, string& out)
@@ -398,8 +403,9 @@ int redis_set::srem(const char* key, const char* first_member, ...)
 	va_list ap;
 	va_start(ap, first_member);
 	const char* member;
-	while ((member = va_arg(ap, const char*)) != NULL)
+	while ((member = va_arg(ap, const char*)) != NULL) {
 		members.push_back(member);
+	}
 	va_end(ap);
 
 	return srem(key, members);
@@ -430,14 +436,16 @@ int redis_set::srem(const char* key, const char* members[],
 int redis_set::sscan(const char* key, int cursor, std::vector<string>& out,
 	const char* pattern /* = NULL */, const size_t* count /* = NULL */)
 {
-	if (key == NULL || *key == 0 || cursor < 0)
+	if (key == NULL || *key == 0 || cursor < 0) {
 		return -1;
+	}
 
 	size_t size;
 	const redis_result** children = scan_keys("SSCAN", key, cursor,
 		size, pattern, count);
-	if (children == NULL)
+	if (children == NULL) {
 		return cursor;
+	}
 
 	const redis_result* rr;
 	string key_buf(128);

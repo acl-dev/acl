@@ -6,8 +6,7 @@
 
 namespace acl {
 
-class ACL_CPP_API mime_base64 : public mime_code
-{
+class ACL_CPP_API mime_base64 : public mime_code {
 public:
 	/**
 	 * 构造函数
@@ -15,7 +14,7 @@ public:
 	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
 	 */
 	mime_base64(bool addCrlf = false, bool addInvalid = false);
-	~mime_base64(void);
+	~mime_base64();
 
 	/**
 	 * 静态编码函数，直接将输入数据进行编码同时存入用户缓冲区

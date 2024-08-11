@@ -225,7 +225,7 @@ int mqtt_header::update_header_type(const char* data, int dlen) {
 
 	char type = (ch &0xff) >> 4;
 	if (type <= MQTT_RESERVED_MIN || type >= MQTT_RESERVED_MAX) {
-		logger_error("invalid type=%d", type);
+		//logger_error("invalid type=%d", type);
 		return -1;
 	}
 

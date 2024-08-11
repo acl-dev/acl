@@ -8,8 +8,7 @@ class http_client;
 class http_request;
 class http_header;
 
-class ACL_CPP_API http_download : public noncopyable
-{
+class ACL_CPP_API http_download : public noncopyable {
 public:
 	/**
 	 * ¹¹Ôìº¯Êý

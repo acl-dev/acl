@@ -3,8 +3,7 @@
 #include "acl_cpp/stream/aio_istream.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 void aio_timer_reader::timer_callback(unsigned int id acl_unused)
 {
@@ -53,7 +52,7 @@ aio_istream::aio_istream(aio_handle* handle, ACL_SOCKET fd)
 	enable_read();
 }
 
-aio_istream::~aio_istream(void)
+aio_istream::~aio_istream()
 {
 	if (timer_reader_ != NULL) {
 		handle_->del_timer(timer_reader_);
@@ -66,12 +65,12 @@ aio_istream::~aio_istream(void)
 	}
 }
 
-void aio_istream::destroy(void)
+void aio_istream::destroy()
 {
 	delete this;
 }
 
-void aio_istream::clear_read_ready(void)
+void aio_istream::clear_read_ready()
 {
 	ACL_VSTREAM* vstream = get_vstream();
 	assert(vstream);
@@ -192,7 +191,7 @@ int aio_istream::enable_read_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_istream::enable_read(void)
+void aio_istream::enable_read()
 {
 	acl_assert(stream_);
 
@@ -204,7 +203,7 @@ void aio_istream::enable_read(void)
 	acl_aio_add_read_hook(stream_, read_callback, this);
 }
 
-void aio_istream::disable_read(void)
+void aio_istream::disable_read()
 {
 	acl_assert(stream_);
 	acl_aio_disable_read(stream_);
@@ -216,10 +215,10 @@ void aio_istream::keep_read(bool onoff)
 	acl_aio_stream_set_keep_read(stream_, onoff ? 1 : 0);
 }
 
-bool aio_istream::keep_read(void) const
+bool aio_istream::keep_read() const
 {
 	acl_assert(stream_);
-	return acl_aio_stream_get_keep_read(stream_) == 0 ? false : true;
+	return acl_aio_stream_get_keep_read(stream_) != 0;
 }
 
 aio_istream& aio_istream::set_buf_max(int max)
@@ -229,7 +228,7 @@ aio_istream& aio_istream::set_buf_max(int max)
 	return *this;
 }
 
-int aio_istream::get_buf_max(void) const
+int aio_istream::get_buf_max() const
 {
 	acl_assert(stream_);
 	return acl_aio_stream_get_line_length(stream_);
@@ -342,11 +341,11 @@ int aio_istream::read_callback(ACL_ASTREAM* stream acl_unused, void* ctx,
 	aio_istream* in = (aio_istream*) ctx;
 	std::list<AIO_CALLBACK*>::iterator it = in->read_callbacks_.begin();
 	for (; it != in->read_callbacks_.end(); ++it) {
-		if ((*it)->enable == false || (*it)->callback == NULL) {
+		if (!(*it)->enable || (*it)->callback == NULL) {
 			continue;
 		}
 
-		if ((*it)->callback->read_callback(data, len) == false) {
+		if (!(*it)->callback->read_callback(data, len)) {
 			return -1;
 		}
 	}
@@ -358,11 +357,11 @@ int aio_istream::read_wakeup(ACL_ASTREAM* stream acl_unused, void* ctx)
 	aio_istream* in = (aio_istream*) ctx;
 	std::list<AIO_CALLBACK*>::iterator it = in->read_callbacks_.begin();
 	for (; it != in->read_callbacks_.end(); ++it) {
-		if ((*it)->enable == false || (*it)->callback == NULL) {
+		if (!(*it)->enable || (*it)->callback == NULL) {
 			continue;
 		}
 
-		if ((*it)->callback->read_wakeup() == false) {
+		if (!(*it)->callback->read_wakeup()) {
 			return -1;
 		}
 	}

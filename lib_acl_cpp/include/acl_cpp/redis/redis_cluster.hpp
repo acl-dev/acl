@@ -8,37 +8,35 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 class redis_result;
 class redis_node;
 class redis_slot;
 
-class ACL_CPP_API redis_cluster : virtual public redis_command
-{
+class ACL_CPP_API redis_cluster : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_cluster(void);
+	redis_cluster();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
 	 */
-	redis_cluster(redis_client* conn);
+	explicit redis_cluster(redis_client* conn);
 
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
-	redis_cluster(redis_client_cluster* cluster);
+	explicit redis_cluster(redis_client_cluster* cluster);
 
 	ACL_CPP_DEPRECATED
 	redis_cluster(redis_client_cluster* cluster, size_t max_conns);
 
-	redis_cluster(redis_client_pipeline* pipeline);
+	explicit redis_cluster(redis_client_pipeline* pipeline);
 
-	virtual ~redis_cluster(void);
+	virtual ~redis_cluster();
 
 	/**
 	 * 批量添加可用的哈希槽，最后必须以小于 0 的哈希槽值表示结束

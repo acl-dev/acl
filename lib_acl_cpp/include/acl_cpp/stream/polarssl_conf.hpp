@@ -71,8 +71,7 @@ public:
 	 * 获得随机数生成器的熵对象
 	 * @return {void*}，返回值为 entropy_context 类型
 	 */
-	void* get_entropy(void)
-	{
+	void* get_entropy() {
 		return entropy_;
 	}
 
@@ -95,7 +94,7 @@ public:
 	 * 可以显式调用本方法，动态加载 polarssl 动态库
 	 * @return {bool} 加载是否成功
 	 */
-	static bool load(void);
+	static bool load();
 
 public:
 	// @override sslbase_conf
@@ -116,8 +115,8 @@ private:
 	polarssl_verify_t verify_mode_;
 
 private:
-	void init_once(void);
-	void free_ca(void);
+	void init_once();
+	void free_ca();
 };
 
 } // namespace acl

@@ -2,8 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include "../connpool/connect_pool.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class sslbase_conf;
 
@@ -15,8 +14,7 @@ class sslbase_conf;
  * 类对象，便可以使用 http_request 类折所有功能，其中 http_reuqest 类为
  * connect_client 的子类
  */
-class ACL_CPP_API http_request_pool : public connect_pool
-{
+class ACL_CPP_API http_request_pool : public connect_pool {
 public:
 	/**
 	 * 构造函数
@@ -41,11 +39,10 @@ private:
 	sslbase_conf* ssl_conf_;
 };
 
-class ACL_CPP_API http_guard : public connect_guard
-{
+class ACL_CPP_API http_guard : public connect_guard {
 public:
 	http_guard(http_request_pool& pool);
-	~http_guard(void);
+	~http_guard();
 };
 
 } // namespace acl

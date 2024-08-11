@@ -66,8 +66,8 @@ public:
 	server_socket(int fd);
 #endif
 
-	server_socket(void);
-	~server_socket(void);
+	server_socket();
+	~server_socket();
 
 	/**
 	 * 开始监听给定服务端地址
@@ -83,13 +83,13 @@ public:
 	 * 判断当前监听套接口是否打开着
 	 * @return {bool}
 	 */
-	bool opened(void) const;
+	bool opened() const;
 
 	/**
 	 * 关闭已经打开的监听套接口
 	 * @return {bool} 是否正常关闭
 	 */
-	bool close(void);
+	bool close();
 
 	/**
 	 * 将监听套接口从服务监听对象中解绑
@@ -98,7 +98,7 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET unbind(void);
 #else
-	int unbind(void);
+	int unbind();
 #endif
 
 	/**
@@ -125,7 +125,7 @@ public:
 	 * 获得监听的地址
 	 * @return {const char*} 返回值非空指针
 	 */
-	const char* get_addr(void) const {
+	const char* get_addr() const {
 		return addr_.c_str();
 	}
 
@@ -136,7 +136,7 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
 	SOCKET sock_handle(void) const {
 #else
-	int sock_handle(void) const {
+	int sock_handle() const {
 #endif
 		return fd_;
 	}

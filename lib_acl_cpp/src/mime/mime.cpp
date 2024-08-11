@@ -24,7 +24,7 @@
 
 namespace acl {
 
-mime::mime(void)
+mime::mime()
 {
 	m_pMimeState         = mime_state_alloc();
 	m_bPrimaryHeadFinish = false;
@@ -35,7 +35,7 @@ mime::mime(void)
 	m_pImages            = NULL;
 }
 
-mime::~mime(void)
+mime::~mime()
 {
 	reset();
 	mime_state_free(m_pMimeState);
@@ -44,7 +44,7 @@ mime::~mime(void)
 	delete m_pImages;
 }
 
-mime& mime::reset(void)
+mime& mime::reset()
 {
 	m_primaryHeader.reset();
 	mime_state_reset(m_pMimeState);
@@ -85,7 +85,7 @@ mime& mime::reset(void)
 	return *this;
 }
 
-bool mime::primary_head_ok(void) const
+bool mime::primary_head_ok() const
 {
 	if (mime_state_head_finish(m_pMimeState)) {
 		return true;
@@ -111,12 +111,12 @@ bool mime::update(const char* data, size_t len)
 			? true : false;
 }
 
-void mime::update_end(void)
+void mime::update_end()
 {
 	primary_head_finish();
 }
 
-void mime::primary_head_finish(void)
+void mime::primary_head_finish()
 {
 	if (m_bPrimaryHeadFinish) {
 		return;
@@ -946,10 +946,10 @@ void mime::mime_debug(const char* save_path, bool decode /* = true */)
 
 		if (node->header_filename) {
 			header_filename.clear();
-			if (rfc2047::decode(node->header_filename,
+			if (!rfc2047::decode(node->header_filename,
 				(int) strlen(node->header_filename),
 				&header_filename,
-				"gbk", true, false) == false) {
+				"gbk", true, false)) {
 
 				printf(">>filename: %s\r\n",
 					node->header_filename);

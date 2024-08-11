@@ -4,8 +4,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 class sslbase_conf;
 
@@ -15,8 +14,7 @@ class sslbase_conf;
  * redis connection pool inherting from connect_pool, which includes
  * TCP connection pool methods.
  */
-class ACL_CPP_API redis_client_pool : public connect_pool
-{
+class ACL_CPP_API redis_client_pool : public connect_pool {
 public:
 	/**
 	 * 构造函数
@@ -32,7 +30,7 @@ public:
 	 */
 	redis_client_pool(const char* addr, size_t count, size_t idx = 0);
 
-	virtual ~redis_client_pool(void);
+	~redis_client_pool();
 
 	/**
 	 * 设置 SSL 通信方式下的配置句柄，内部缺省值为 NULL，如果设置了 SSL 连
@@ -64,8 +62,7 @@ public:
 	 * get the current db of the connections pool
 	 * @return {int}
 	 */
-	int get_db(void) const
-	{
+	int get_db() const {
 		return dbnum_;
 	}
 
@@ -75,7 +72,7 @@ protected:
 	 * virtual function in class connect_pool to create a new connection
 	 * @return {connect_client*}
 	 */
-	connect_client* create_connect(void);
+	connect_client* create_connect();
 
 private:
 	char* pass_;

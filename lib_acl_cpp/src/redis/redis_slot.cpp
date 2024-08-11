@@ -5,8 +5,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_slot::redis_slot(size_t slot_min, size_t slot_max,
 	const char* ip, int port)
@@ -26,15 +25,17 @@ redis_slot::redis_slot(const redis_slot& node)
 
 	const std::vector<redis_slot*>& slaves = node.get_slaves();
 	std::vector<redis_slot*>::const_iterator cit;
-	for (cit = slaves.begin(); cit != slaves.end(); ++cit)
+	for (cit = slaves.begin(); cit != slaves.end(); ++cit) {
 		slaves_.push_back(*cit);
+	}
 }
 
 redis_slot::~redis_slot()
 {
 	std::vector<redis_slot*>::iterator it;
-	for (it = slaves_.begin(); it != slaves_.end(); ++it)
+	for (it = slaves_.begin(); it != slaves_.end(); ++it) {
 		delete *it;
+	}
 }
 
 redis_slot& redis_slot::add_slave(redis_slot* node)

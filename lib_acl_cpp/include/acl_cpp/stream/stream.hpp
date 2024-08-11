@@ -23,37 +23,37 @@ class dbuf_pool;
 
 class ACL_CPP_API stream : public noncopyable {
 public:
-	stream(void);
-	virtual ~stream(void) = 0;
+	stream();
+	virtual ~stream() = 0;
 
 	/**
 	 * 调用本函数关闭流连接
 	 * @return {bool} true: 关闭成功; false: 关闭失败
 	 */
-	bool close(void);
+	bool close();
 
 	/**
 	* 判断流是否已经结束
 	* @return {bool} true: 流已经结束; false: 流未结束
 	*/
-	bool eof(void) const;
+	bool eof() const;
 
 	/**
 	 * 清除流结束标志位，即将 eof_ 标志位置为 false
 	 */
-	void clear_eof(void);
+	void clear_eof();
 
 	/**
 	* 当前流是否处理打开状态
 	* @return {bool} true: 流已经打开; false: 流未打开
 	*/
-	bool opened(void) const;
+	bool opened() const;
 
 	/**
 	 * 获得当前流的 ACL_VSTREAM 流对象
 	 * @return {ACL_VSTREAM*}
 	 */
-	ACL_VSTREAM* get_vstream(void) const;
+	ACL_VSTREAM* get_vstream() const;
 
 	/**
 	 * 解绑 ACL_VSTREAM 与流对象的绑定关系，同时将 ACL_VSTREAM 返回
@@ -63,7 +63,7 @@ public:
 	 * (包括流对象读写在内)都无意义
 	 * @return {ACL_VSTREAM} 返回 NULL 表示流对象已经将 ACL_VSTREAM 解绑
 	 */
-	ACL_VSTREAM* unbind(void);
+	ACL_VSTREAM* unbind();
 
 	/**
 	 * 设置流的绑定对象
@@ -94,8 +94,10 @@ public:
 	 * 设置流的读写超时时间，只有当内部流对象建立后调用本方法才有效
 	 * @param n {int} 超时时间，该值 >= 0 则启用超时检测过程，否则将会一直
 	 *  阻塞直到可读或出错，该值的单位取决 于第二个参数
+	 * @param use_sockopt {bool} 是否使用 setsockopt 设置超时时间
+	 * @return {bool}
 	 */
-	void set_rw_timeout(int n);
+	bool set_rw_timeout(int n, bool use_sockopt = false);
 
 	/**
 	 * 设置内部超时时间单位类型，只有当内部流对象建立后调用本方法才有效
@@ -105,9 +107,10 @@ public:
 
 	/**
 	 * 获得当前流的读写超时时间
+	 * @param use_sockopt {bool} 是否获得由 setsockopt 设置的超时时间
 	 * @return {int} 获得流的读写超时时间(秒)
 	 */
-	int get_rw_timeout(void) const;
+	int get_rw_timeout(bool use_sockopt = false) const;
 
 	/**
 	 * 注册读写流对象，内部会自动调用 hook->open 过程，如果成功，则返回NULL
@@ -124,13 +127,13 @@ public:
 	 * 获得当前注册的流读写对象
 	 * @return {stream_hook*}
 	 */
-	stream_hook* get_hook(void) const;
+	stream_hook* get_hook() const;
 
 	/**
 	 * 删除当前注册的流读写对象并返回该对象，恢复缺省的读写过程
 	 * @return {stream_hook*}
 	 */
-	stream_hook* remove_hook(void);
+	stream_hook* remove_hook();
 
 public:
 	/**
@@ -138,13 +141,13 @@ public:
 	 * 适当减少缓存区的频繁创建与释放
 	 * @return {string&}
 	 */
-	string& get_buf(void);
+	string& get_buf();
 
 	/**
 	 * 获得与 stream 生命周期相同的 dbuf 内存分配器
 	 * @return {dbuf_pool&}
 	 */
-	dbuf_pool& get_dbuf(void);
+	dbuf_pool& get_dbuf();
 
 protected:
 	/**

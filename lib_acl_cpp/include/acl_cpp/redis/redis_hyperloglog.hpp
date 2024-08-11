@@ -6,16 +6,14 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_hyperloglog : virtual public redis_command
-{
+class ACL_CPP_API redis_hyperloglog : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_hyperloglog(void);
+	redis_hyperloglog();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -32,7 +30,7 @@ public:
 
 	redis_hyperloglog(redis_client_pipeline* pipeline);
 
-	virtual ~redis_hyperloglog(void);
+	virtual ~redis_hyperloglog();
 
 	/**
 	 * 将任意数量的元素添加到指定的 HyperLogLog 里面

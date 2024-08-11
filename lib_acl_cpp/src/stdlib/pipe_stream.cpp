@@ -6,7 +6,7 @@
 
 namespace acl {
 
-pipe_string::pipe_string(void)
+pipe_string::pipe_string()
 {
 	m_pBuf = NEW string(128);
 	m_pSavedBufPtr = m_pBuf;
@@ -20,13 +20,12 @@ pipe_string::pipe_string(string& s)
 	m_pos = 0;
 }
 
-pipe_string::~pipe_string(void)
+pipe_string::~pipe_string()
 {
 	delete m_pSavedBufPtr;
 }
 
-int pipe_string::push_pop(const char* in, size_t len,
-	string* out, size_t max /* = 0 */)
+int pipe_string::push_pop(const char* in, size_t len, string* out, size_t max)
 {
 	if (in && len > 0) {
 		m_pBuf->append(in, len);
@@ -77,14 +76,14 @@ int pipe_string::pop_end(string* out, size_t max /* = 0 */)
 
 ////////////////////////////////////////////////////////////////////////
 
-pipe_manager::pipe_manager(void)
+pipe_manager::pipe_manager()
 {
 	m_pBuf1 = NEW string(128);
 	m_pBuf2 = NEW string(128);
 	m_pPipeStream = NULL;
 }
 
-pipe_manager::~pipe_manager(void)
+pipe_manager::~pipe_manager()
 {
 	delete m_pBuf1;
 	delete m_pBuf2;
@@ -131,7 +130,7 @@ bool pipe_manager::update(const char* src, size_t len,
 	pBuf->clear();
 
 	for (; it != m_streams.end(); ++it) {
-		if (len > 0 && (*it)->push_pop(src, len, pBuf) == -1) {
+		if (len > 0 && (*it)->push_pop(src, len, pBuf, 0) == -1) {
 			return false;
 		}
 		src = pBuf->c_str();
@@ -147,7 +146,7 @@ bool pipe_manager::update(const char* src, size_t len,
 
 	if (!pLast->empty() && out != NULL) {
 		return out->push_pop(pLast->c_str(),
-			pLast->length(), NULL) == -1 ? false : true;
+			pLast->length(), NULL, 0) != -1;
 	}
 	return true;
 }
@@ -163,7 +162,7 @@ bool pipe_manager::update_end(pipe_stream* out /* = NULL */)
 	string* pBuf = m_pBuf2;
 	pBuf->clear();
 
-	if ((*it)->pop_end(pBuf) == -1) {
+	if ((*it)->pop_end(pBuf, 0) == -1) {
 		return false;
 	}
 
@@ -176,10 +175,10 @@ bool pipe_manager::update_end(pipe_stream* out /* = NULL */)
 
 	++it;
 	for (; it != m_streams.end(); ++it) {
-		if (len > 0 && (*it)->push_pop(ptr, len, pBuf) == -1) {
+		if (len > 0 && (*it)->push_pop(ptr, len, pBuf, 0) == -1) {
 			return false;
 		}
-		if ((*it)->pop_end(pBuf) == -1) {
+		if ((*it)->pop_end(pBuf, 0) == -1) {
 			return false;
 		}
 
@@ -197,7 +196,7 @@ bool pipe_manager::update_end(pipe_stream* out /* = NULL */)
 
 	if (!pLast->empty() && out != NULL) {
 		return out->push_pop(pLast->c_str(),
-			pLast->length(), NULL) == -1 ? false : true;
+			pLast->length(), NULL, 0) != -1;
 	}
 	return true;
 }
@@ -320,7 +319,7 @@ pipe_manager& pipe_manager::operator<<(unsigned char n)
 	return *this;
 }
 
-char* pipe_manager::c_str(void) const
+char* pipe_manager::c_str() const
 {
 	if (m_pPipeStream) {
 		return m_pPipeStream->c_str();
@@ -330,7 +329,7 @@ char* pipe_manager::c_str(void) const
 	}
 }
 
-size_t pipe_manager::length(void) const
+size_t pipe_manager::length() const
 {
 	if (m_pPipeStream) {
 		return m_pPipeStream->length();
@@ -339,7 +338,7 @@ size_t pipe_manager::length(void) const
 	}
 }
 
-void pipe_manager::clear(void)
+void pipe_manager::clear()
 {
 	if (m_pPipeStream) {
 		m_pPipeStream->clear();

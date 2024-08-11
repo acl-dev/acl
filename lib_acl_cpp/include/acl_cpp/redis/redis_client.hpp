@@ -6,8 +6,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 class string;
 class dbuf_pool;
@@ -24,8 +23,7 @@ class sslbase_conf;
  * and the server's respond is handled in this class. The class inherits
  * connect_client, which can use the connection pool function.
  */
-class ACL_CPP_API redis_client : public connect_client
-{
+class ACL_CPP_API redis_client : public connect_client {
 public:
 	/**
 	 * 构造函数
@@ -37,9 +35,9 @@ public:
 	 * @param rw_timeout {int} 与 redis-server 进行通信的 IO 超时时间(秒)
 	 *  the network IO timeout in seconds with the redis-server
 	 */
-	redis_client(const char* addr, int conn_timeout = 60,
+	explicit redis_client(const char* addr, int conn_timeout = 60,
 		int rw_timeout = 30, bool retry = true);
-	virtual ~redis_client(void);
+	~redis_client();
 
 	/**
 	 * 设置 SSL 通信方式下的配置句柄，内部缺省值为 NULL，如果设置了 SSL 连
@@ -69,8 +67,7 @@ public:
 	 * get db for the connection
 	 * @return {int}
 	 */
-	int get_db(void) const
-	{
+	int get_db() const {
 		return dbnum_;
 	}
 
@@ -78,8 +75,7 @@ public:
 	 * 获得当前连接的服务器地址，即由 redis_client 构造时传入的地址
 	 * @return {const char*}
 	 */
-	const char* get_addr(void) const
-	{
+	const char* get_addr() const {
 		return addr_;
 	}
 
@@ -96,13 +92,13 @@ public:
 	 * check if the connection has been finish
 	 * @return {bool}
 	 */
-	bool eof(void) const;
+	bool eof() const;
 
 	/**
 	 * 关闭网络连接
 	 * close the connection to the redis-server
 	 */
-	void close(void);
+	void close();
 
 	/**
 	 * 获得网络连接流，当连接关闭时内部会自动重连一次
@@ -167,13 +163,13 @@ public:
 	const redis_result* run(dbuf_pool* pool, const redis_request& req,
 		size_t nchildren, int* rw_timeout = NULL);
 
-	const redis_result* run(redis_command* cmd, size_t nchildren,
-		int* rw_timeout = NULL);
+	//const redis_result* run(redis_command* cmd, size_t nchildren,
+	//	int* rw_timeout = NULL);
 
 protected:
 	// 基类虚函数
 	// @override
-	bool open(void);
+	bool open();
 
 protected:
 	socket_stream conn_;

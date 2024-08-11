@@ -4,14 +4,12 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_slave
-{
+class ACL_CPP_API redis_slave {
 public:
-	redis_slave(void);
-	~redis_slave(void) {}
+	redis_slave();
+	~redis_slave() {}
 
 	string name_;
 	string ip_;

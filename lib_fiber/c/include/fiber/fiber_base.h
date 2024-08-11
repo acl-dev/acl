@@ -50,7 +50,7 @@ FIBER_API ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
 	void* arg, size_t size);
 
 FIBER_API ACL_FIBER* acl_fiber_create2(const ACL_FIBER_ATTR *attr,
-	void (*fn)(ACL_FIBER*, void*), void* arg);
+	void (*fn)(ACL_FIBER*, void*), void *arg);
 
 typedef struct ACL_FIBER_FRAME {
 	char *func;
@@ -104,7 +104,7 @@ FIBER_API int acl_fiber_use_share_stack(const ACL_FIBER *fiber);
  * @param fiber {const ACL_FIBER*} the specified fiber object
  * @return {unsigned int} return the fiber ID
  */
-FIBER_API unsigned int acl_fiber_id(const ACL_FIBER* fiber);
+FIBER_API unsigned int acl_fiber_id(const ACL_FIBER *fiber);
 
 /**
  * Get the current running fiber's ID
@@ -118,68 +118,76 @@ FIBER_API unsigned int acl_fiber_self(void);
  *  fiber will be used
  * @param errnum {int} the error number
  */
-FIBER_API void acl_fiber_set_errno(ACL_FIBER* fiber, int errnum);
+FIBER_API void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum);
 
 /**
  * Get the error number of assosiated fiber
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @return {int} get the error number of assosiated fiber
  */
-FIBER_API int acl_fiber_errno(ACL_FIBER* fiber);
+FIBER_API int acl_fiber_errno(ACL_FIBER *fiber);
 
 /**
  * @deprecated
  * @param fiber {ACL_FIBER*}
  * @param yesno {int}
  */
-FIBER_API void acl_fiber_keep_errno(ACL_FIBER* fiber, int yesno);
+FIBER_API void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno);
 
 /**
  * Get the assosiated fiber's status
- * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
- * @return {int}
+ * @param fiber {ACL_FIBER*} The specified fiber, if fiber is NULL the current
+ *  running fiber will be used.
+ * @return {int} Return ths status defined as FIBER_STATUS_XXX.
  */
-FIBER_API int acl_fiber_status(const ACL_FIBER* fiber);
+FIBER_API int acl_fiber_status(const ACL_FIBER *fiber);
+
+/**
+ * Get the specified fiber's waiting status, defined as FIBER_WAIT_XXX.
+ * @param fiber {ACL_FIBER*} The specified fiber or the running fiber if the
+ *  fiber is NULL.
+ */
+FIBER_API int acl_fiber_waiting_status(const ACL_FIBER *fiber);
 
 /**
  * Kill the suspended fiber and notify it to exit in asynchronous mode
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  */
-FIBER_API void acl_fiber_kill(ACL_FIBER* fiber);
+FIBER_API void acl_fiber_kill(ACL_FIBER *fiber);
 
 /**
  * Kill the suspended fiber and notify it to exit in synchronous mode
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  */
-FIBER_API void acl_fiber_kill_wait(ACL_FIBER* fiber);
+FIBER_API void acl_fiber_kill_wait(ACL_FIBER *fiber);
 
 /**
  * Check if the specified fiber has been killed
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @return {int} non zero returned if been killed
  */
-FIBER_API int acl_fiber_killed(ACL_FIBER* fiber);
+FIBER_API int acl_fiber_killed(ACL_FIBER *fiber);
 
 /**
  * Check if the specified fiber has been signaled
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @return {int} non zero returned if been signed
  */
-FIBER_API int acl_fiber_signaled(ACL_FIBER* fiber);
+FIBER_API int acl_fiber_signaled(ACL_FIBER *fiber);
 
 /**
  * Check if the specified fiber's socket has been closed by another fiber
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @return {int} non zero returned if been closed
  */
-FIBER_API int acl_fiber_closed(ACL_FIBER* fiber);
+FIBER_API int acl_fiber_closed(ACL_FIBER *fiber);
 
 /**
  * Check if the specified fiber has been canceled
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @return {int} non zero returned if been canceled
  */
-FIBER_API int acl_fiber_canceled(ACL_FIBER* fiber);
+FIBER_API int acl_fiber_canceled(ACL_FIBER *fiber);
 
 /**
  * Clear the fiber's flag and errnum to 0.
@@ -192,21 +200,21 @@ FIBER_API void acl_fiber_clear(ACL_FIBER *fiber);
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h
  */
-FIBER_API void acl_fiber_signal(ACL_FIBER* fiber, int signum);
+FIBER_API void acl_fiber_signal(ACL_FIBER *fiber, int signum);
 
 /**
  * Wakeup the suspended fiber with the assosiated signal number synchronously
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h
  */
-FIBER_API void acl_fiber_signal_wait(ACL_FIBER* fiber, int signum);
+FIBER_API void acl_fiber_signal_wait(ACL_FIBER *fiber, int signum);
 
 /**
  * Get the signal number got from other fiber
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
  * @retur {int} the signal number got
  */
-FIBER_API int acl_fiber_signum(ACL_FIBER* fiber);
+FIBER_API int acl_fiber_signum(ACL_FIBER *fiber);
 
 /**
  * Suspend the current running fiber
@@ -218,7 +226,7 @@ FIBER_API int acl_fiber_yield(void);
  * Add the suspended fiber into resuming queue
  * @param fiber {ACL_FIBER*} the fiber, NOT NULL
  */
-FIBER_API void acl_fiber_ready(ACL_FIBER* fiber);
+FIBER_API void acl_fiber_ready(ACL_FIBER *fiber);
 
 /**
  * Suspend the current fiber and switch to run the next ready fiber
@@ -295,7 +303,7 @@ FIBER_API size_t acl_fiber_sleep(size_t seconds);
  * @return {ACL_FIBER*} the new created fiber returned
  */
 FIBER_API ACL_FIBER* acl_fiber_create_timer(size_t milliseconds,
-	size_t size, void (*fn)(ACL_FIBER*, void*), void* ctx);
+	size_t size, void (*fn)(ACL_FIBER*, void*), void *ctx);
 
 /**
  * Reset the timer milliseconds time before the timer fiber wakeup
@@ -303,14 +311,14 @@ FIBER_API ACL_FIBER* acl_fiber_create_timer(size_t milliseconds,
  * @param milliseconds {size_t} the new timer wakeup milliseconds
  * @return {int} return 0 if rest timer success, else return -1 if failed
  */
-FIBER_API int acl_fiber_reset_timer(ACL_FIBER* timer, size_t milliseconds);
+FIBER_API int acl_fiber_reset_timer(ACL_FIBER *timer, size_t milliseconds);
 
 /**
  * Set the DNS service addr
  * @param ip {const char*} ip of the DNS service
  * @param port {int} port of the DNS service
  */
-FIBER_API void acl_fiber_set_dns(const char* ip, int port);
+FIBER_API void acl_fiber_set_dns(const char *ip, int port);
 
 /* For fiber specific */
 
@@ -325,7 +333,7 @@ FIBER_API void acl_fiber_set_dns(const char* ip, int port);
  * @return {int} the integer value(>0) of indexed key returned, value less than
  *  0 will be returned if no running fiber
  */
-FIBER_API int acl_fiber_set_specific(int* key, void* ctx, void (*free_fn)(void*));
+FIBER_API int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void*));
 
 /**
  * Get the current fiber's local object assosiated with the specified indexed key

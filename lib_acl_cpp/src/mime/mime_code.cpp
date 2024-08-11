@@ -37,7 +37,7 @@ mime_code::mime_code(bool addCrlf, bool addInvalid, const char* encoding_type)
 	reset();
 }
 
-mime_code::~mime_code(void)
+mime_code::~mime_code()
 {
 	acl_myfree(encoding_type_);
 	delete m_pBuf;
@@ -51,7 +51,7 @@ void mime_code::init(const unsigned char* toTab,
 	m_fillChar = fillChar;
 }
 
-void mime_code::reset(void)
+void mime_code::reset()
 {
 	m_encodeCnt = 0;
 	m_decodeCnt = 0;
@@ -378,7 +378,7 @@ int mime_code::pop_end(string* out, size_t max /* = 0 */)
 	return (int) (n);
 }
 
-void mime_code::clear(void)
+void mime_code::clear()
 {
 	if (m_pBuf) {
 		m_pBuf->clear();

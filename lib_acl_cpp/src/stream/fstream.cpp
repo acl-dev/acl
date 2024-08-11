@@ -12,11 +12,11 @@
 
 namespace acl {
 
-fstream::fstream(void)
+fstream::fstream()
 {
 }
 
-fstream::~fstream(void)
+fstream::~fstream()
 {
 	close();
 }
@@ -77,7 +77,7 @@ bool fstream::open(const char* path, unsigned int oflags, int mode)
 	return true;
 }
 
-bool fstream::remove(void)
+bool fstream::remove()
 {
 	const char* filepath = file_path();
 	if (filepath == NULL || *filepath == 0) {
@@ -138,7 +138,7 @@ bool fstream::rename(const char* from_path, const char* to_path)
 	return open(to_path, oflags, omode);
 }
 
-const char* fstream::file_path(void) const
+const char* fstream::file_path() const
 {
 	return stream_ ? stream_->path : NULL;
 }
@@ -190,7 +190,7 @@ bool fstream::ftruncate(acl_off_t length)
 	return acl_file_ftruncate(stream_, length) == 0 ? true : false;
 }
 
-acl_int64 fstream::fsize(void) const
+acl_int64 fstream::fsize() const
 {
 	if (stream_ == NULL) {
 		logger_error("stream_ null");
@@ -204,7 +204,7 @@ acl_int64 fstream::fsize(const char* path)
 	return acl_file_size(path);
 }
 
-ACL_FILE_HANDLE fstream::file_handle(void) const
+ACL_FILE_HANDLE fstream::file_handle() const
 {
 	return stream_ ? ACL_VSTREAM_FILE(stream_) : ACL_FILE_INVALID;
 }
@@ -251,7 +251,7 @@ bool fstream::try_lock(bool exclude /* = true */)
 #endif
 }
 
-bool fstream::unlock(void)
+bool fstream::unlock()
 {
 	ACL_FILE_HANDLE fd = file_handle();
 	if (fd == ACL_FILE_INVALID) {

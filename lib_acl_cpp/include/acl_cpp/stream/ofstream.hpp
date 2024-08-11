@@ -7,8 +7,8 @@ namespace acl {
 class ACL_CPP_API ofstream : public fstream
 {
 public:
-	ofstream(void);
-	virtual ~ofstream(void);
+	ofstream();
+	virtual ~ofstream();
 
 	/**
 	 * 以只写方式打开文件，如果文件不存在则创建新文件

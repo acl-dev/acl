@@ -9,8 +9,7 @@ namespace acl {
 /**
  * http 协议头中 cookie 对象类
  */
-class ACL_CPP_API HttpCookie : public dbuf_obj
-{
+class ACL_CPP_API HttpCookie : public dbuf_obj {
 public:
 	/**
 	 * 构造函数
@@ -25,19 +24,19 @@ public:
 	 * 当使用该构造函数时，可以使用 setCookie 来添加 cookie 项
 	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	HttpCookie(dbuf_guard* dbuf = NULL);
+	explicit HttpCookie(dbuf_guard* dbuf = NULL);
 
 	/**
 	 * 拷贝构造函数
 	 * @param cookie {const HttpCookie*} 非 NULL， 内部将复制拷贝其成员变量
 	 * @param dbuf {dbuf_guard*} 非空时将做为内存分配池
 	 */
-	HttpCookie(const HttpCookie* cookie, dbuf_guard* dbuf = NULL);
+	explicit HttpCookie(const HttpCookie* cookie, dbuf_guard* dbuf = NULL);
 
 	/**
 	 * 析构函数
 	 */
-	~HttpCookie(void);
+	~HttpCookie();
 
 	/**
 	 * 对于 Set-Cookie: xxx=xxx; domain=xxx; expires=xxx; path=xxx; max-age=xxx; ...
@@ -104,37 +103,37 @@ public:
 	 *     或调用 setCookie(const char*) 成功后才可以调用该函数，
 	 *     否则返回的数据是 "\0"
 	 */
-	const char* getName(void) const;
+	const char* getName() const;
 
 	/**
 	 * 获得 cookie 值，取决于构造函数输入值
 	 * @return {const char*} 非空指针，有可能是空字符串("\0")
 	 */
-	const char* getValue(void) const;
+	const char* getValue() const;
 
 	/**
 	 * 获得字符串格式的过期时间
 	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
 	 */
-	const char* getExpires(void) const;
+	const char* getExpires() const;
 
 	/**
 	 * 获得 cookie 作用域
 	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
 	 */
-	const char* getDomain(void) const;
+	const char* getDomain() const;
 
 	/**
 	 * 获得 cookie 的存储路径
 	 * @return {const char*} 非空指针，返回值为 "\0" 表示不存在
 	 */
-	const char* getPath(void) const;
+	const char* getPath() const;
 
 	/**
 	 * 获得 cookie 的生存周期
 	 * @return {int} 返回 -1 时表示没有该 Max-Age 字段
 	 */
-	int  getMaxAge(void) const;
+	int  getMaxAge() const;
 
 	/**
 	 * 获得对应参数名的参数值
@@ -151,7 +150,7 @@ public:
 	 * 所有属性及属性值
 	 * @return {const std::list<HTTP_PARAM*>&}
 	 */
-	const std::list<HTTP_PARAM*>& getParams(void) const;
+	const std::list<HTTP_PARAM*>& getParams() const;
 
 private:
 	dbuf_guard* dbuf_internal_;

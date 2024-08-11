@@ -98,7 +98,7 @@ bool mime_body::save_body(string& out, const char* src /* = NULL */,
 	return save_body(ps, src, len);
 }
 
-bool mime_body::html_stype(void) const
+bool mime_body::html_stype() const
 {
 	if (m_stype == MIME_STYPE_HTML) {
 		return true;

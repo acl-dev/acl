@@ -7,8 +7,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 /**
  * redis Hash(哈希表) 类，本类的实现的主要命令：
@@ -16,13 +15,12 @@ namespace acl
  * HDEL/HEXISTS/HGET/HGETALL/HINCRBY/HINCRBYFLOAT/HKEYS/HLEN/HMGET/HMSET
  * HSET/HSETNX/HVALS/HSCAN
  */
-class ACL_CPP_API redis_hash : virtual public redis_command
-{
+class ACL_CPP_API redis_hash : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_hash(void);
+	redis_hash();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -39,7 +37,7 @@ public:
 
 	redis_hash(redis_client_pipeline* pipeline);
 
-	virtual ~redis_hash(void);
+	virtual ~redis_hash();
 
 	/////////////////////////////////////////////////////////////////////
 

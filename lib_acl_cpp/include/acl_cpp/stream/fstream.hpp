@@ -9,8 +9,8 @@ class string;
 
 class ACL_CPP_API fstream : public istream , public ostream {
 public:
-	fstream(void);
-	virtual ~fstream(void);
+	fstream();
+	virtual ~fstream();
 
 	/**
 	 * 根据文件路径打开文件流, 这是最基础的打开文件的方式
@@ -46,7 +46,7 @@ public:
 	 * 时才能正确删除文件，否则无法删除
 	 * @return {bool} 删除文件是否成功
 	 */
-	bool remove(void);
+	bool remove();
 
 	/**
 	 * 将当前文件重命名为指定文件名，针对 WINDOWS 平台，需要先关闭当前文件
@@ -110,17 +110,17 @@ public:
 #else
 	void open(int fh, unsigned int oflags, const char* path = NULL);
 	long long int fseek(long long int offset, int whence);
-	long long int ftell(void);
+	long long int ftell();
 	bool ftruncate(long long int length);
-	long long int fsize(void) const;
+	long long int fsize() const;
 	static long long int fsize(const char* path);
-	int file_handle(void) const;
+	int file_handle() const;
 #endif
 	/**
 	 * 获得文件的全路径
 	 * @return {const char*} 若返回空则表示文件还未打开或出错
 	 */
-	const char* file_path(void) const;
+	const char* file_path() const;
 
 	/**
 	 * 当文件打开后，该方法用来对文件加锁
@@ -145,7 +145,7 @@ public:
 	 * 当调用 lock 或 try_lock 成功后可以调用本方法对文件解锁
 	 * @return {bool} 解锁是否成功
 	 */
-	bool unlock(void);
+	bool unlock();
 };
 
 } // namespace acl

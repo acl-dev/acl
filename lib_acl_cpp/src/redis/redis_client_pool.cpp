@@ -6,8 +6,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_client_pool::redis_client_pool(const char* addr, size_t count,
 	size_t idx /* = 0 */)
@@ -18,10 +17,11 @@ redis_client_pool::redis_client_pool(const char* addr, size_t count,
 {
 }
 
-redis_client_pool::~redis_client_pool(void)
+redis_client_pool::~redis_client_pool()
 {
-	if (pass_)
+	if (pass_) {
 		acl_myfree(pass_);
+	}
 }
 
 redis_client_pool& redis_client_pool::set_ssl_conf(sslbase_conf* ssl_conf)
@@ -32,32 +32,38 @@ redis_client_pool& redis_client_pool::set_ssl_conf(sslbase_conf* ssl_conf)
 
 redis_client_pool& redis_client_pool::set_password(const char* pass)
 {
-	if (pass_)
+	if (pass_) {
 		acl_myfree(pass_);
-	if (pass && *pass)
+	}
+	if (pass && *pass) {
 		pass_ = acl_mystrdup(pass);
-	else
+	} else {
 		pass_ = NULL;
+	}
 	return *this;
 }
 
 redis_client_pool& redis_client_pool::set_db(int dbnum)
 {
-	if (dbnum > 0)
+	if (dbnum > 0) {
 		dbnum_ = dbnum;
+	}
 	return *this;
 }
 
-connect_client* redis_client_pool::create_connect(void)
+connect_client* redis_client_pool::create_connect()
 {
 	redis_client* conn = NEW redis_client(addr_, conn_timeout_,
 		rw_timeout_);
-	if (ssl_conf_)
+	if (ssl_conf_) {
 		conn->set_ssl_conf(ssl_conf_);
-	if (pass_)
+	}
+	if (pass_) {
 		conn->set_password(pass_);
-	if (dbnum_ > 0)
+	}
+	if (dbnum_ > 0) {
 		conn->set_db(dbnum_);
+	}
 	return conn;
 }
 

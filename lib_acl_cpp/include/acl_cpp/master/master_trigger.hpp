@@ -10,8 +10,7 @@ namespace acl {
 /**
  * acl_master 服务器框架中触发器的模板类，该类对象只能有一个实例运行
  */
-class ACL_CPP_API master_trigger : public master_base
-{
+class ACL_CPP_API master_trigger : public master_base {
 public:
 	/**
 	 * 开始运行，调用该函数是指该服务进程是在 acl_master 服务框架
@@ -34,7 +33,7 @@ public:
 	 * 获得配置文件路径
 	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
 	 */
-	const char* get_conf_path(void) const;
+	const char* get_conf_path() const;
 
 protected:
 	master_trigger();

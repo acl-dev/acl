@@ -35,11 +35,11 @@ aio_fstream::aio_fstream(aio_handle* handle, ACL_FILE_HANDLE fd,
 	this->enable_write();
 }
 
-aio_fstream::~aio_fstream(void)
+aio_fstream::~aio_fstream()
 {
 }
 
-void aio_fstream::destroy(void)
+void aio_fstream::destroy()
 {
 	delete this;
 }

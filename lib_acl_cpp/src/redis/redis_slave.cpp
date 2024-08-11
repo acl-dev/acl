@@ -5,10 +5,9 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-redis_slave::redis_slave(void)
+redis_slave::redis_slave()
 : port_(0)
 , link_pending_commands_(0)
 , link_refcount_(0)

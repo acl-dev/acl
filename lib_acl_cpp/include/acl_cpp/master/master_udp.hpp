@@ -54,14 +54,13 @@ protected:
 	/**
 	 * 当线程初始化时该虚方法将被调用
 	 */
-	virtual void thread_on_init(void) {}
+	virtual void thread_on_init() {}
 
 	/**
 	 * 获得本地监听的套接口流对象集合
 	 * @return {const std::vector<socket_stream*>&}
 	 */
-	const std::vector<socket_stream*>& get_sstreams() const
-	{
+	const std::vector<socket_stream*>& get_sstreams() const {
 		return sstreams_;
 	}
 
@@ -69,11 +68,11 @@ protected:
 	 * 获得配置文件路径
 	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
 	 */
-	const char* get_conf_path(void) const;
+	const char* get_conf_path() const;
 
 public:
-	void lock(void);
-	void unlock(void);
+	void lock();
+	void unlock();
 
 private:
 	std::vector<socket_stream*> sstreams_;

@@ -35,7 +35,7 @@ mime_uucode::mime_uucode(bool addCrlf /* = false */, bool addInvalid /* = false 
 	init(to_uucode_tab, un_uucode_tab, '~');
 }
 
-mime_uucode::~mime_uucode(void)
+mime_uucode::~mime_uucode()
 {
 }
 

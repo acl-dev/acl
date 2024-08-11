@@ -11,8 +11,7 @@ class socket_stream;
 class xml;
 class json;
 
-class ACL_CPP_API http_response : public noncopyable
-{
+class ACL_CPP_API http_response : public noncopyable {
 public:
 	/**
 	 * 构造函数：通过该构造函数传入的 socket_stream 流对象需要用户自己进行
@@ -21,8 +20,8 @@ public:
 	 * 注：该类实例在长连接时可以被多次使用，但一定得注意使用
 	 * 顺序：get_body->response
 	 */
-	http_response(socket_stream* client);
-	virtual ~http_response(void);
+	explicit http_response(socket_stream* client);
+	virtual ~http_response();
 
 	//////////////////////////////////////////////////////////////////////
 	// 与读取请求数据相关的方法
@@ -93,7 +92,7 @@ public:
 	 * 参考：http_header 类
 	 * @return {http_header&}
 	 */
-	http_header& response_header(void);
+	http_header& response_header();
 
 	/**
 	 * 向客户端发送 HTTP 响应数据，可以循环调用此函数；
@@ -120,12 +119,12 @@ public:
 	 * 客户端请求头的部分数据，参考：http_client 类
 	 * @return {http_client*} 当返回空时表示流出错了
 	 */
-	http_client* get_client(void) const;
+	http_client* get_client() const;
 
 	/**
 	 * 关闭 HTTP 连接流
 	 */
-	void close(void);
+	void close();
 
 private:
 	bool debug_;

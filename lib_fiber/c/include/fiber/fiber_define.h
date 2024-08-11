@@ -8,6 +8,33 @@ extern "C" {
 
 typedef intptr_t acl_handle_t;
 
+/**
+ * The specified fiber's current status type.
+ */
+enum {
+	FIBER_STATUS_NONE	= (0),
+	FIBER_STATUS_READY	= (1 << 0),
+	FIBER_STATUS_RUNNING	= (1 << 1),
+	FIBER_STATUS_SUSPEND	= (1 << 2),
+	FIBER_STATUS_EXITING	= (1 << 3),
+};
+
+/**
+ * The suspended (in FIBER_STATUS_SUSPEND status) fiber's waiting type.
+ */
+enum {
+	FIBER_WAIT_NONE		= (0),
+	FIBER_WAIT_READ		= (1 << 1),
+	FIBER_WAIT_WRITE	= (1 << 2),
+	FIBER_WAIT_POLL		= (1 << 3),
+	FIBER_WAIT_EPOLL	= (1 << 4),
+	FIBER_WAIT_MUTEX	= (1 << 5),
+	FIBER_WAIT_COND		= (1 << 6),
+	FIBER_WAIT_LOCK		= (1 << 7),
+	FIBER_WAIT_SEM		= (1 << 8),
+	FIBER_WAIT_DELAY	= (1 << 9),
+};
+
 #if defined(_WIN32) || defined (_WIN64)
 # include <winsock2.h>
 
@@ -44,6 +71,7 @@ typedef int socklen_t;
 # define	FIBER_ENOBUFS		WSAENOBUFS
 # define	FIBER_ECONNABORTED	WSAECONNABORTED
 # define	FIBER_EINPROGRESS	WSAEINPROGRESS
+# define	FIBER_ECANCELED		ECANCELED
 
 #else
 
@@ -82,6 +110,7 @@ typedef int socket_t;
 # define	FIBER_ENOBUFS		ENOBUFS
 # define	FIBER_ECONNABORTED	ECONNABORTED
 # define	FIBER_EINPROGRESS	EINPROGRESS
+# define	FIBER_ECANCELED		ECANCELED
 
 # include <sys/syscall.h>
 # if defined(SYS_recvmmsg) && defined(SYS_sendmmsg) && !defined(ANDROID)

@@ -8,8 +8,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_transaction::redis_transaction()
 {
@@ -81,12 +80,14 @@ bool redis_transaction::exec()
 
 	build_request(1, argv, lens);
 	const redis_result* result = run();
-	if(result == NULL || result->get_type() != REDIS_RESULT_ARRAY)
+	if(result == NULL || result->get_type() != REDIS_RESULT_ARRAY) {
 		return false;
+	}
 
 	size_t size = result->get_size();
-	if (size != cmds_.size())
+	if (size != cmds_.size()) {
 		return false;
+	}
 	return true;
 }
 
@@ -106,8 +107,9 @@ bool redis_transaction::run_cmd(const char* cmd, const char* argv[],
 	const size_t lens[], size_t argc)
 {
 	build(cmd, NULL, argv, lens, argc);
-	if (check_status("QUEUED") == false)
+	if (!check_status("QUEUED")) {
 		return false;
+	}
 
 	cmds_.push_back(cmd);
 	return true;
@@ -117,8 +119,9 @@ bool redis_transaction::run_cmd(const char* cmd,
 	const std::vector<string>& args)
 {
 	build(cmd, NULL, args);
-	if (check_status("QUEUED") == false)
+	if (!check_status("QUEUED")) {
 		return false;
+	}
 
 	cmds_.push_back(cmd);
 	return true;
@@ -132,8 +135,9 @@ size_t redis_transaction::get_size() const
 const redis_result* redis_transaction::get_child(size_t i, string* cmd) const
 {
 	if (cmd != NULL) {
-		if (i < cmds_.size())
+		if (i < cmds_.size()) {
 			*cmd = cmds_[i];
+		}
 	}
 	return result_child(i);
 }

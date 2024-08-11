@@ -10,8 +10,7 @@ namespace acl {
 
 // redis 服务支持的数据类型分类
 // the data type supported by redis
-typedef enum
-{
+typedef enum {
 	REDIS_KEY_NONE,		// none
 	REDIS_KEY_STRING,	// string
 	REDIS_KEY_HASH,		// hash
@@ -20,13 +19,12 @@ typedef enum
 	REDIS_KEY_ZSET		// sorted set
 } redis_key_t;
 
-class ACL_CPP_API redis_key : virtual public redis_command
-{
+class ACL_CPP_API redis_key : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_key(void);
+	redis_key();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -43,7 +41,7 @@ public:
 
 	redis_key(redis_client_pipeline* pipeline);
 
-	virtual ~redis_key(void);
+	virtual ~redis_key();
 
 	/**
 	 * 删除一个或一组 KEY，对于变参的接口，则要求最后一个参数必须以 NULL 结束

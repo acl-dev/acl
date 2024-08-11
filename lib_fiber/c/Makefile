@@ -28,6 +28,8 @@ CFLAGS = -c -g -W \
 -O3 \
 -DUSE_CLOCK_GETTIME \
 #-DUSE_VALGRIND \
+#-DUSE_POLL_WAIT \
+#-DDEBUG_READY \
 #-DUSE_INLINE_MEMCPY\
 #-DUSE_FAST_TIME \
 #-Waggregate-return \

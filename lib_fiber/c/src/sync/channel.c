@@ -252,7 +252,7 @@ static void alt_exec(FIBER_ALT *a)
 		alt_all_dequeue(other->xalt);
 		other->xalt[0].xalt = other;
 
-		acl_fiber_ready(other->fiber);
+		FIBER_READY(other->fiber);
 	 } else
 		alt_copy(a, NULL);
 }

@@ -9,8 +9,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT_LEN		11
 #define LONG_LEN	21
@@ -52,12 +51,14 @@ bool redis_cluster::cluster_addslots(int first, ...)
 	va_list ap;
 	va_start(ap, first);
 	int  n;
-	while ((n = va_arg(ap, int)) >= 0)
+	while ((n = va_arg(ap, int)) >= 0) {
 		slot_list.push_back(n);
+	}
 	va_end(ap);
 
-	if (slot_list.empty())
+	if (slot_list.empty()) {
 		return true;
+	}
 	return cluster_addslots(slot_list);
 }
 
@@ -79,12 +80,14 @@ bool redis_cluster::cluster_delslots(int first, ...)
 	va_list ap;
 	va_start(ap, first);
 	int  n;
-	while ((n = va_arg(ap, int)) >= 0)
+	while ((n = va_arg(ap, int)) >= 0) {
 		slot_list.push_back(n);
+	}
 	va_end(ap);
 
-	if (slot_list.empty())
+	if (slot_list.empty()) {
 		return true;
+	}
 	return cluster_delslots(slot_list);
 }
 
@@ -385,20 +388,23 @@ bool redis_cluster::cluster_info(std::map<string, string>& result)
 	build_request(2, argv, lens);
 
 	string buf;
-	if (get_string(buf) <= 0)
+	if (get_string(buf) <= 0) {
 		return false;
+	}
 
 	string line;
 
 	while (true) {
 		line.clear();
-		if (buf.scan_line(line) == false)
+		if (!buf.scan_line(line)) {
 			break;
+		}
 
 		char* name = line.c_str();
 		char* value = strchr(name, ':');
-		if (value == NULL || *(value + 1) == 0)
+		if (value == NULL || *(value + 1) == 0) {
 			continue;
+		}
 		*value++ = 0;
 		result[name] = value;
 	}
@@ -530,21 +536,25 @@ const std::vector<redis_slot*>* redis_cluster::cluster_slots()
 
 	build_request(2, argv, lens);
 	const redis_result* rr = run();
-	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY)
+	if (rr == NULL || rr->get_type() != REDIS_RESULT_ARRAY) {
 		return NULL;
+	}
 
 	size_t size;
 	const redis_result** children = rr->get_children(&size);
-	if (children == NULL)
+	if (children == NULL) {
 		return NULL;
+	}
 
 	for (size_t i = 0; i < size; i++) {
 		const redis_result* rr2 = children[i];
-		if (rr2 == NULL || rr2->get_type() != REDIS_RESULT_ARRAY)
+		if (rr2 == NULL || rr2->get_type() != REDIS_RESULT_ARRAY) {
 			continue;
+		}
 		redis_slot* master = get_slot_master(rr2);
-		if (master != NULL)
+		if (master != NULL) {
 			slots_.push_back(master);
+		}
 	}
 
 	return &slots_;
@@ -554,26 +564,33 @@ redis_slot* redis_cluster::get_slot_master(const redis_result* rr)
 {
 	size_t size;
 	const redis_result** children = rr->get_children(&size);
-	if (children == NULL)
+	if (children == NULL) {
 		return NULL;
-	if (size < 3)
+	}
+	if (size < 3) {
 		return NULL;
+	}
 
 	int slot_min = children[0]->get_integer();
-	if (slot_min < 0)
+	if (slot_min < 0) {
 		return NULL;
+	}
+
 	int slot_max = children[1]->get_integer();
-	if (slot_max < slot_min)
+	if (slot_max < slot_min) {
 		return NULL;
+	}
 
 	redis_slot* master = get_slot(children[2], slot_max, slot_min);
-	if (master == NULL)
+	if (master == NULL) {
 		return NULL;
+	}
 
 	for (size_t i = 3; i < size; i++) {
 		redis_slot* slave = get_slot(children[i], slot_max, slot_min);
-		if (slave != NULL)
+		if (slave != NULL) {
 			master->add_slave(slave);
+		}
 	}
 
 	return master;
@@ -582,21 +599,25 @@ redis_slot* redis_cluster::get_slot_master(const redis_result* rr)
 redis_slot* redis_cluster::get_slot(const redis_result* rr,
 	size_t slot_max, size_t slot_min)
 {
-	if (rr == NULL)
+	if (rr == NULL) {
 		return NULL;
+	}
 
 	size_t size;
 	const redis_result** children = rr->get_children(&size);
-	if (children == NULL || size < 2)
+	if (children == NULL || size < 2) {
 		return NULL;
+	}
 
 	char ip[128];
-	if (children[0]->argv_to_string(ip, sizeof(ip)) <= 0)
+	if (children[0]->argv_to_string(ip, sizeof(ip)) <= 0) {
 		return NULL;
+	}
 
 	int port = children[1]->get_integer();
-	if (port <= 0)
+	if (port <= 0) {
 		return NULL;
+	}
 
 	redis_slot* slot = NEW redis_slot(slot_min, slot_max, ip, port);
 	return slot;
@@ -605,8 +626,9 @@ redis_slot* redis_cluster::get_slot(const redis_result* rr,
 void redis_cluster::free_slots()
 {
 	std::vector<redis_slot*>::iterator it;
-	for (it = slots_.begin(); it != slots_.end(); ++it)
+	for (it = slots_.begin(); it != slots_.end(); ++it) {
 		delete *it;
+	}
 	slots_.clear();
 }
 
@@ -631,24 +653,29 @@ const std::vector<redis_node*>* redis_cluster::cluster_slaves(const char* node)
 	build_request(3, argv, lens);
 
 	std::vector<string> lines;
-	if (get_strings(lines) < 0)
+	if (get_strings(lines) < 0) {
 		return NULL;
+	}
 
 	std::vector<string>::iterator it = lines.begin();
 	for (; it != lines.end(); ++it) {
 		std::vector<string>& tokens = (*it).split2(" ");
-		if (tokens.size() < 3)
+		if (tokens.size() < 3) {
 			continue;
+		}
 
 		char* node_type = tokens[2].c_str();
 		char* ptr = strchr(node_type, ',');
-		if (ptr != NULL && *(ptr + 1))
+		if (ptr != NULL && *(ptr + 1)) {
 			node_type = ptr + 1;
-		if (strcasecmp(node_type, "slave") != 0)
+		}
+		if (strcasecmp(node_type, "slave") != 0) {
 			continue;
+		}
 		redis_node* slave = get_slave(tokens);
-		if (slave != NULL)
+		if (slave != NULL) {
 			slaves_.push_back(slave);
+		}
 	}
 
 	return &slaves_;
@@ -656,8 +683,9 @@ const std::vector<redis_node*>* redis_cluster::cluster_slaves(const char* node)
 
 redis_node* redis_cluster::get_slave(const std::vector<string>& tokens)
 {
-	if (tokens.size() < 8)
+	if (tokens.size() < 8) {
 		return NULL;
+	}
 
 	redis_node* node = NEW redis_node;
 	node->set_id(tokens[0].c_str());
@@ -672,8 +700,9 @@ redis_node* redis_cluster::get_slave(const std::vector<string>& tokens)
 void redis_cluster::free_slaves()
 {
 	std::vector<redis_node*>::iterator it = slaves_.begin();
-	for (; it != slaves_.end(); ++it)
+	for (; it != slaves_.end(); ++it) {
 		delete *it;
+	}
 
 	slaves_.clear();
 }
@@ -694,18 +723,21 @@ const std::map<string, redis_node*>* redis_cluster::cluster_nodes()
 	build_request(2, argv, lens);
 
 	string buf;
-	if (get_string(buf) <= 0)
+	if (get_string(buf) <= 0) {
 		return NULL;
+	}
 
 	std::vector<redis_node*> slaves;
 	acl::string line;
 
 	while (true) {
-		if (buf.scan_line(line) == false)
+		if (!buf.scan_line(line)) {
 			break;
+		}
 		redis_node* node = get_node(line);
-		if (node != NULL && !node->is_master())
+		if (node != NULL && !node->is_master()) {
 			slaves.push_back(node);
+		}
 		line.clear();
 	}
 
@@ -713,9 +745,9 @@ const std::map<string, redis_node*>* redis_cluster::cluster_nodes()
 		it != slaves.end(); ++it) {
 		const char* id = (*it)->get_master_id();
 		std::map<string, redis_node*>::iterator it2 = masters_.find(id);
-		if (it2 != masters_.end())
+		if (it2 != masters_.end()) {
 			it2->second->add_slave(*it);
-		else {
+		} else {
 			logger_warn("delete orphan slave: %s", id);
 			delete *it;
 		}
@@ -745,8 +777,7 @@ redis_node* redis_cluster::get_node(string& line)
 {
 	std::vector<string>& tokens = line.split2(" ");
 	if (tokens.size() < 8) {
-		logger_warn("invalid tokens's size: %d < 8",
-			(int) tokens.size());
+		logger_warn("invalid tokens's size: %d < 8", (int) tokens.size());
 		return NULL;
 	}
 
@@ -755,8 +786,9 @@ redis_node* redis_cluster::get_node(string& line)
 	char* ptr = strchr(node_type, ',');
 	if (ptr != NULL && *(ptr + 1) != 0) {
 		*ptr++ = 0;
-		if (strcasecmp(node_type, "myself") == 0)
+		if (strcasecmp(node_type, "myself") == 0) {
 			myself = true;
+		}
 		node_type = ptr;
 	}
 
@@ -772,22 +804,23 @@ redis_node* redis_cluster::get_node(string& line)
 		node->set_type("master");
 		masters_[tokens[0]] = node;
 		size_t n = tokens.size();
-		for (size_t i = 8; i < n; i++)
+		for (size_t i = 8; i < n; i++) {
 			add_slot_range(node, tokens[i].c_str());
-	}
-	else if (strcasecmp(node_type, "slave") == 0)
+		}
+	} else if (strcasecmp(node_type, "slave") == 0) {
 		node->set_type("slave");
-	else if (strcasecmp(node_type, "handshake") == 0) {
+	} else if (strcasecmp(node_type, "handshake") == 0) {
 		node->set_master(node);
 		node->set_type("handshake");
 		node->set_handshaking(true);
 		masters_[tokens[0]] = node;
 		size_t n = tokens.size();
-		for (size_t i = 8; i < n; i++)
+		for (size_t i = 8; i < n; i++) {
 			add_slot_range(node, tokens[i].c_str());
-	}
-	else
+		}
+	} else {
 		logger_warn("unknown node type: %s", node_type);
+	}
 
 	return node;
 }

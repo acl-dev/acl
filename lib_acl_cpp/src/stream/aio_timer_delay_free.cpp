@@ -6,8 +6,7 @@
 #endif
 #include "aio_timer_delay_free.hpp"
 
-namespace acl
-{
+namespace acl {
 
 #define DELAY_TIMER_ID	0
 
@@ -16,7 +15,7 @@ aio_timer_delay_free::aio_timer_delay_free(aio_handle& handle)
 {
 }
 
-aio_timer_delay_free::~aio_timer_delay_free(void)
+aio_timer_delay_free::~aio_timer_delay_free()
 {
 	std::set<aio_delay_free*>::iterator it;
 	it = gc_set_.begin();

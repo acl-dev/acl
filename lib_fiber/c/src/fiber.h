@@ -13,27 +13,6 @@ extern void makecontext(ucontext_t *ucp, void (*func)(), int argc, ...);
 #endif
 */
 
-enum {
-	FIBER_STATUS_NONE	= (0),
-	FIBER_STATUS_READY	= (1 << 0),
-	FIBER_STATUS_RUNNING	= (1 << 1),
-	FIBER_STATUS_SUSPEND	= (1 << 2),
-	FIBER_STATUS_EXITING	= (1 << 3),
-};
-
-enum {
-	FIBER_WAIT_NONE		= (0),
-	FIBER_WAIT_READ		= (1 << 1),
-	FIBER_WAIT_WRITE	= (1 << 2),
-	FIBER_WAIT_POLL		= (1 << 3),
-	FIBER_WAIT_EPOLL	= (1 << 4),
-	FIBER_WAIT_MUTEX	= (1 << 5),
-	FIBER_WAIT_COND		= (1 << 6),
-	FIBER_WAIT_LOCK		= (1 << 7),
-	FIBER_WAIT_SEM		= (1 << 8),
-	FIBER_WAIT_DELAY	= (1 << 9),
-};
-
 typedef struct {
 	void  *ctx;
 	void (*free_fn)(void *);
@@ -60,10 +39,10 @@ struct ACL_FIBER {
 	unsigned       fid;
 	unsigned       slot;
 	long long      when;
-	int            errnum;
-	int            signum;
-	unsigned short status;
-	unsigned short wstatus;
+	int            errnum;	// The fiber's current errno.
+	int            signum;	// The signed number to the fiber.
+	unsigned short status;	// The fiber's status as FIBER_STATUS_XXX.
+	unsigned short wstatus;	// The fiber's waiting status as FIBER_WAIT_XXX.
 	unsigned int   oflag;	// The flags for creating fiber.
 	unsigned int   flag;	// The flags for the fiber's running status.
 
@@ -84,7 +63,40 @@ struct ACL_FIBER {
 
 	FIBER_LOCAL  **locals;
 	int            nlocal;
+
+#ifdef DEBUG_READY
+	int            cline;
+	int            lline;
+	char           ctag[32];
+	char           ltag[32];
+	long long      curr;
+	long long      last;
+	unsigned short lstatus;
+	unsigned short lwstatus;
+	unsigned int   lflag;
+	time_t         cost;
+	FILE_EVENT    *fe;
+#endif
 };
+
+#ifdef DEBUG_READY
+# define FIBER_READY(f) {                                                     \
+	if ((f)->ctag[0] != 0) {                                              \
+		SAFE_STRNCPY((f)->ltag, (f)->ctag, sizeof((f)->ltag));        \
+		(f)->lline    = (f)->cline;                                   \
+		(f)->last     = (f)->curr;                                    \
+		(f)->lstatus  = (f)->status;                                  \
+		(f)->lwstatus = (f)->wstatus;                                 \
+		(f)->lflag    = (f)->flag;                                    \
+	}                                                                     \
+	SAFE_STRNCPY((f)->ctag, __FUNCTION__, sizeof((f)->ctag));             \
+	(f)->cline = __LINE__;                                                \
+	SET_TIME((f)->curr);                                                  \
+	acl_fiber_ready((f));                                                 \
+}
+#else
+# define FIBER_READY(f) acl_fiber_ready((f))
+#endif
 
 /* in fiber.c */
 extern __thread int var_hook_sys_api;
@@ -131,6 +143,7 @@ int fiber_wait_write(FILE_EVENT *fe);
 EVENT *fiber_io_event(void);
 void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds);
 int fiber_timer_del(ACL_FIBER *fiber);
+int fiber_timer_exist(ACL_FIBER *fiber);
 
 FILE_EVENT *fiber_file_open(socket_t fd);
 void fiber_file_set(FILE_EVENT *fe);

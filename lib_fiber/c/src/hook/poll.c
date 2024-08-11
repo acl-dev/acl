@@ -42,6 +42,10 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 
 	pfd->fe->fiber_r = NULL;
 
+#ifdef	DEBUG_READY
+	PIN_FILE(pfd->fe);
+#endif
+
 	if (!(pfd->pfd->events & POLLOUT)) {
 		ring_detach(&pfd->me);
 		pfd->fe = NULL;
@@ -49,16 +53,16 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 
 	/*
 	 * If any fe has been ready, the pe holding fe should be removed from
-	 * ev->poll_list to avoid to be called in timeout process.
+	 * ev->poll_timer to avoid to be called in timeout process.
 	 * We should just remove pe only once by checking if the value of
 	 * pe->nready is 0. After the pe has been removed from the
-	 * ev->poll_list, the pe's callback will not be called again in the
+	 * ev->poll_timer, the pe's callback will not be called again in the
 	 * timeout process in event_process_poll() in event.c.
 	 */
 	if (pfd->pe->nready == 0) {
 		/* The cache timer has been be set when timeout >= 0. */
 		if (pfd->pe->expire >= 0) {
-			timer_cache_remove(ev->poll_list, pfd->pe->expire,
+			timer_cache_remove(ev->poll_timer, pfd->pe->expire,
 				&pfd->pe->me);
 		}
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
@@ -115,7 +119,7 @@ static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 
 	if (pfd->pe->nready == 0) {
 		if (pfd->pe->expire >= 0) {
-			timer_cache_remove(ev->poll_list, pfd->pe->expire,
+			timer_cache_remove(ev->poll_timer, pfd->pe->expire,
 				&pfd->pe->me);
 		}
 		ring_prepend(&ev->poll_ready, &pfd->pe->me);
@@ -211,6 +215,10 @@ static void poll_event_clean(EVENT *ev, POLL_EVENT *pe)
 #endif
 			event_del_read(ev, pfd->fe, 0);
 			pfd->fe->fiber_r = NULL;
+
+#ifdef	DEBUG_READY
+			PIN_FILE(pfd->fe);
+#endif
 		}
 		if (pfd->pfd->events & POLLOUT) {
 			CLR_WRITEWAIT(pfd->fe);
@@ -275,14 +283,14 @@ static void fiber_on_exit(void *ctx)
 
 static __thread int __local_key;
 
-static pollfds *pollfds_save(const struct pollfd *fds, nfds_t nfds)
+static pollfds *pollfds_clone(const struct pollfd *fds, nfds_t nfds)
 {
 	pollfds *pfds = (pollfds *) acl_fiber_get_specific(__local_key);
 
 	if (pfds == NULL) {
 		pfds = (pollfds *) mem_malloc(sizeof(pollfds));
 		pfds->size = nfds + 1;
-		pfds->fds  = mem_malloc(sizeof(struct pollfds) * pfds->size);
+		pfds->fds  = mem_malloc(sizeof(struct pollfd) * pfds->size);
 		acl_fiber_set_specific(&__local_key, pfds, fiber_on_exit);
 	} else if (pfds->size < (size_t) nfds) {
 		mem_free(pfds->fds);
@@ -295,11 +303,6 @@ static pollfds *pollfds_save(const struct pollfd *fds, nfds_t nfds)
 	return pfds;
 }
 
-static void pollfds_copy(struct pollfd *fds, const pollfds *pfds)
-{
-	memcpy(fds, pfds->fds, sizeof(struct pollfd) * pfds->nfds);
-}
-
 #endif // SHARE_STACK
 
 /**
@@ -310,7 +313,7 @@ static void pollfds_copy(struct pollfd *fds, const pollfds *pfds)
 static void poll_callback(EVENT *ev fiber_unused, POLL_EVENT *pe)
 {
 	if (pe->fiber->status != FIBER_STATUS_READY) {
-		acl_fiber_ready(pe->fiber);
+		FIBER_READY(pe->fiber);
 	}
 }
 
@@ -350,7 +353,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	// In shared stack mode, the fds input must be save to the dynamic
 	// memory to avoid memory collision accessed by different fibers.
 	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
-		pfds    = pollfds_save(fds, nfds);
+		pfds    = pollfds_clone(fds, nfds);
 		pe      = (POLL_EVENT *) mem_malloc(sizeof(POLL_EVENT));
 		pe->fds = pollfd_alloc(pe, pfds->fds, nfds);
 	} else {
@@ -372,7 +375,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	while (1) {
 		/* The cache timer should be set when timeout >= 0. */
 		if (pe->expire >= 0) {
-			timer_cache_add(ev->poll_list, pe->expire, &pe->me);
+			timer_cache_add(ev->poll_timer, pe->expire, &pe->me);
 		}
 
 		pe->nready = 0;
@@ -385,7 +388,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 		pe->fiber->wstatus &= ~FIBER_WAIT_POLL;
 
 		if (pe->nready == 0 && pe->expire >= 0) {
-			timer_cache_remove(ev->poll_list, pe->expire, &pe->me);
+			timer_cache_remove(ev->poll_timer, pe->expire, &pe->me);
 		}
 
 		ev->timeout = old_timeout;
@@ -398,7 +401,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 			break;
 		}
 
-		if (timer_cache_size(ev->poll_list) == 0) {
+		if (timer_cache_size(ev->poll_timer) == 0) {
 			ev->timeout = -1;
 		}
 
@@ -421,7 +424,8 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 #ifdef SHARE_STACK
 	if (curr->oflag & ACL_FIBER_ATTR_SHARE_STACK) {
 		mem_free(pe);
-		pollfds_copy(fds, pfds);
+		// Copy the event results to the given fds.
+		memcpy(fds, pfds->fds, sizeof(struct pollfd) * pfds->nfds);
 	}
 #endif
 

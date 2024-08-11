@@ -17,8 +17,8 @@ typedef enum {
 } fiber_event_t;
 
 struct FIBER_CPP_API fiber_frame {
-	fiber_frame(void) : pc(0), off(0) {}
-	~fiber_frame(void) {}
+	fiber_frame() : pc(0), off(0) {}
+	~fiber_frame() {}
 
 	std::string func;
 	long pc;
@@ -30,7 +30,7 @@ struct FIBER_CPP_API fiber_frame {
  */
 class FIBER_CPP_API fiber {
 public:
-	fiber(void);
+	fiber();
 	fiber(ACL_FIBER *fb);
 
 	/**
@@ -42,7 +42,7 @@ public:
 	 */
 	fiber(bool running);
 
-	virtual ~fiber(void);
+	virtual ~fiber();
 
 	/**
 	 * 在创建一个协程类对象且构造参数 running 为 false 时，需要本函数启动
@@ -66,7 +66,7 @@ public:
 	 * 判断当前协程是否被通知退出
 	 * @return {bool} 本协程是否被通知退出
 	 */
-	bool killed(void) const;
+	bool killed() const;
 
 	/**
 	 * 判断当前正在运行的协程是否被通知退出，该方法与 killed 的区别为，
@@ -75,19 +75,19 @@ public:
 	 * 当前正在运行的协程
 	 * @return {bool}
 	 */
-	static bool self_killed(void);
+	static bool self_killed();
 
 	/**
 	 * 获得本协程对象的 ID 号
 	 * @return {unsigned int}
 	 */
-	unsigned int get_id(void) const;
+	unsigned int get_id() const;
 
 	/**
 	 * 获得当前运行的协程对象的 ID 号
 	 * @return {unsigned int}
 	 */
-	static unsigned int self(void);
+	static unsigned int self();
 
 	/**
 	 * 获得指定协程对象的ID号
@@ -99,7 +99,19 @@ public:
 	 * 获得当前协程在执行某个系统 API 出错时的错误号
 	 * return {int}
 	 */
-	int get_errno(void) const;
+	int get_errno() const;
+
+	/**
+	 * 判断协程是否处于待调度队列中
+	 * @return {bool}
+	 */
+	bool is_ready() const;
+
+	/**
+	 * 判断协程是否处于挂起状态
+	 *
+	 */
+	bool is_suspended() const;
 
 	/**
 	 * 设置当前协程的错误号
@@ -110,20 +122,20 @@ public:
 	/**
 	 * 清除当前协程的错误号及标记位
 	 */
-	static void clear(void);
+	static void clear();
 
 public:
 	/**
 	 * 获得本次操作的出错信息
 	 * @return {const char*}
 	 */
-	static const char* last_serror(void);
+	static const char* last_serror();
 
 	/**
 	 * 获得本次操作的出错号
 	 * @return {int}
 	 */
-	static int last_error(void);
+	static int last_error();
 
 	/**
 	 * 将所给错误号转成描述信息
@@ -176,23 +188,23 @@ public:
 	 * 判断当前线程是否处于协程调度状态
 	 * @return {bool}
 	 */
-	static bool scheduled(void);
+	static bool scheduled();
 
 	/**
 	 *  停止协程调度过程
 	 */
-	static void schedule_stop(void);
+	static void schedule_stop();
 
 public:
 	/**
 	 * 将当前正在运行的协程(即本协程) 挂起
 	 */
-	static void yield(void);
+	static void yield();
 
 	/**
 	 * 挂起当前协程，执行等待队列中的下一个协程
 	 */
-	static void switch_to_next(void);
+	static void switch_to_next();
 
 	/**
 	 * 将指定协程对象置入待运行队列中
@@ -211,13 +223,13 @@ public:
 	 * 获得处于存活状态的协程数量
 	 * @return {unsigned}
 	 */
-	static unsigned alive_number(void);
+	static unsigned alive_number();
 
 	/**
 	 * 获得处于退出状态的协程对象数量
 	 * @return {unsigned}
 	 */
-	static unsigned dead_number(void);
+	static unsigned dead_number();
 
 	/**
 	 * 设置本线程中所有协程在连接服务端时都采用了带超时的非阻塞方式（仅限Windows)
@@ -235,30 +247,30 @@ public:
 	 * 在启用共享栈模式下获得共享栈大小
 	 * @return {size_t} 如果返回 0 则表示未启用共享栈方式
 	 */
-	static size_t get_shared_stack_size(void);
+	static size_t get_shared_stack_size();
 
 	/**
 	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
 	 * 调用本函数，因为内部会自动 HOOK IO API
 	 */
-	static void acl_io_hook(void);
+	static void acl_io_hook();
 
 	/**
 	 * 调用本函数取消 acl基础库中的 IO 协程化
 	 */
-	static void acl_io_unlock(void);
+	static void acl_io_unlock();
 
 	/**
 	 * Windows 平台下可以显式地调用此函数 Hook 一些与网络协程相关的系统 API
 	 * @return {bool}
 	 */
-	static bool winapi_hook(void);
+	static bool winapi_hook();
 
 	/**
 	 * 获得当前系统级错误号
 	 * @return {int}
 	 */
-	static int  get_sys_errno(void);
+	static int  get_sys_errno();
 
 	/**
 	 * 设置当前系统级错误号
@@ -271,7 +283,7 @@ public:
 	 * 返回本协程对象对应的 C 语言的协程对象
 	 * @return {ACL_FIBER* }
 	 */
-	ACL_FIBER* get_fiber(void) const;
+	ACL_FIBER* get_fiber() const;
 
 	/**
 	 * 底层调用 C API 创建协程
@@ -306,7 +318,7 @@ protected:
 	 * 虚函数将会被调用，从而通知子类协程已启动; 如果在构造函数中的参数
 	 * running 为 true ，则 start 将被禁止调用，故本虚方法也不会被调用
 	 */
-	virtual void run(void);
+	virtual void run();
 
 private:
 	ACL_FIBER* f_;
@@ -322,8 +334,8 @@ private:
  */
 class FIBER_CPP_API fiber_timer {
 public:
-	fiber_timer(void);
-	virtual ~fiber_timer(void) {}
+	fiber_timer();
+	virtual ~fiber_timer() {}
 
 	/**
 	 * 启动一个协程定时器
@@ -336,7 +348,7 @@ protected:
 	/**
 	 * 子类必须实现该纯虚方法，当定时器启动时会回调该方法
 	 */
-	virtual void run(void) = 0;
+	virtual void run() = 0;
 
 private:
 	ACL_FIBER* f_;
@@ -362,7 +374,7 @@ public:
 	{
 	}
 
-	virtual ~fiber_trigger(void) {}
+	virtual ~fiber_trigger() {}
 
 	void add(T* o) {
 		mbox_.push(o);
@@ -372,12 +384,12 @@ public:
 		timer_.del(o);
 	}
 
-	timer_trigger<T>& get_trigger(void) {
+	timer_trigger<T>& get_trigger() {
 		return timer_;
 	}
 
 	// @override
-	void run(void) {
+	void run() {
 		while (!stop_) {
 			T* o = mbox_.pop(delay_);
 			if (o) {

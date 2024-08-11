@@ -1,5 +1,6 @@
 #include "acl_stdafx.hpp"
 #ifndef ACL_PREPARE_COMPILE
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
@@ -9,7 +10,7 @@
 
 namespace acl {
 
-stream::stream(void)
+stream::stream()
 : hook_(NULL)
 , stream_(NULL)
 , buf_(NULL)
@@ -21,7 +22,7 @@ stream::stream(void)
 {
 }
 
-stream::~stream(void)
+stream::~stream()
 {
 	if (hook_) {
 		hook_->destroy();
@@ -34,7 +35,7 @@ stream::~stream(void)
 	delete ctx_table_;
 }
 
-string& stream::get_buf(void)
+string& stream::get_buf()
 {
 	if (buf_ == NULL) {
 		buf_ = NEW string;
@@ -42,7 +43,7 @@ string& stream::get_buf(void)
 	return *buf_;
 }
 
-dbuf_pool& stream::get_dbuf(void)
+dbuf_pool& stream::get_dbuf()
 {
 	if (dbuf_ == NULL) {
 		dbuf_ = new dbuf_pool;
@@ -50,31 +51,72 @@ dbuf_pool& stream::get_dbuf(void)
 	return *dbuf_;
 }
 
-bool stream::eof(void) const
+bool stream::eof() const
 {
 	return eof_;
 }
 
-void stream::clear_eof(void)
+void stream::clear_eof()
 {
 	eof_ = false;
 }
 
-bool stream::opened(void) const
+bool stream::opened() const
 {
 	return opened_;
 }
 
-ACL_VSTREAM* stream::get_vstream(void) const
+ACL_VSTREAM* stream::get_vstream() const
 {
 	return stream_;
 }
 
-void stream::set_rw_timeout(int n)
+static bool set_sockopt_timeo(ACL_SOCKET fd, int opt, int timeout)
 {
-	if (stream_) {
-		stream_->rw_timeout = n;
+	if (timeout <= 0) {
+		return true;
 	}
+
+# if defined(_WIN32) || defined(_WIN64)
+	timeout *= 1000; // From seconds to millisecond.
+	if (setsockopt(fd, SOL_SOCKET, opt, (const char*) &timeout, sizeof(timeout)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+# else   // Must be Linux or __APPLE__.
+	struct timeval tm;
+	tm.tv_sec  = timeout;
+	tm.tv_usec = 0;
+
+	if (setsockopt(fd, SOL_SOCKET, opt, &tm, sizeof(tm)) < 0) {
+		logger_error("setsockopt error=%s, timeout=%d, opt=%d, fd=%d",
+			last_serror(), timeout, opt, (int) fd);
+		return false;
+	}
+# endif
+
+	return true;
+}
+
+bool stream::set_rw_timeout(int n, bool use_sockopt /* false */)
+{
+	if (!stream_ || n <= 0) {
+		return false;
+	}
+
+	if (!use_sockopt) {
+		stream_->rw_timeout = n;
+		return true;
+	}
+
+	stream_->rw_timeout = -1;
+
+	if (!set_sockopt_timeo(ACL_VSTREAM_SOCK(stream_), SO_RCVTIMEO, n)) {
+		return false;
+	}
+
+	return set_sockopt_timeo(ACL_VSTREAM_SOCK(stream_), SO_SNDTIMEO, n);
 }
 
 void stream::set_time_unit(time_unit_t unit) {
@@ -99,15 +141,42 @@ void stream::set_time_unit(time_unit_t unit) {
 	}
 }
 
-int stream::get_rw_timeout(void) const
+int stream::get_rw_timeout(bool use_sockopt /* false */) const
 {
 	if (stream_ == NULL) {
 		return -1;
 	}
-	return stream_->rw_timeout;
+
+	if (!use_sockopt) {
+		return stream_->rw_timeout;
+	}
+
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream_);
+
+# if defined(_WIN32) || defined(_WIN64)
+	int timeout = 0, len = sizeof(timeout);
+	if (getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char*) &timeout, &len) < 0) {
+		logger_error("getsockopt SO_RCVTIMEO error=%s, fd=%d",
+			last_serror(), (int) fd);
+		return -1;
+	}
+	return timeout / 1000;
+# else
+	struct timeval tm;
+	memset(&tm, 0, sizeof(tm));
+	socklen_t len = sizeof(tm);
+
+	if (getsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tm, &len) < 0) {
+		logger_error("getsockopt SO_RCVTIMEO error=%s, fd=%d",
+			last_serror(), (int) fd);
+		return -1;
+	}
+
+	return tm.tv_sec;
+# endif
 }
 
-ACL_VSTREAM* stream::unbind(void)
+ACL_VSTREAM* stream::unbind()
 {
 	eof_    = true;
 	opened_ = false;
@@ -116,9 +185,9 @@ ACL_VSTREAM* stream::unbind(void)
 	return vstream;
 }
 
-bool stream::close(void)
+bool stream::close()
 {
-	if (opened_ == false) {
+	if (!opened_) {
 		return false;
 	}
 	if (stream_ == NULL) {
@@ -138,7 +207,7 @@ bool stream::close(void)
 	int ret = acl_vstream_close(stream_);
 	stream_ = NULL;
 
-	return ret == 0 ? true : false;
+	return ret == 0;
 }
 
 void stream::open_stream(bool is_file /* = false */)
@@ -226,12 +295,12 @@ void* stream::del_ctx(const char* key /* = NULL */)
 	return ctx;
 }
 
-stream_hook* stream::get_hook(void) const
+stream_hook* stream::get_hook() const
 {
 	return hook_;
 }
 
-stream_hook* stream::remove_hook(void)
+stream_hook* stream::remove_hook()
 {
 	stream_hook* hook = hook_;
 	hook_ = NULL;

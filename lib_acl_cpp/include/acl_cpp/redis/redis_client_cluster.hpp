@@ -7,8 +7,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 class sslbase_conf;
 
@@ -21,16 +20,15 @@ class redis_client_pool;
  * using redis_command::set_cluster(redis_cluster*), and all the redis client
  * command will support the redis cluster mode.
  */
-class ACL_CPP_API redis_client_cluster : public connect_manager
-{
+class ACL_CPP_API redis_client_cluster : public connect_manager {
 public:
 	/**
 	 * 构造函数;
 	 * constructor
 	 * @param max_slot {int} 哈希槽最大值; the max hash-slot value of keys
 	 */
-	redis_client_cluster(int max_slot = 16384);
-	virtual ~redis_client_cluster(void);
+	explicit redis_client_cluster(int max_slot = 16384);
+	~redis_client_cluster();
 
 	/**
 	 * 根据哈希槽值获得对应的连接池;
@@ -86,8 +84,7 @@ public:
 	 * get the max hash-slot
 	 * @return {int}
 	 */
-	int get_max_slot() const
-	{
+	int get_max_slot() const {
 		return max_slot_;
 	}
 
@@ -105,8 +102,7 @@ public:
 	 * get redirect limit of MOVE/ASK commands in one redis redirect process
 	 * @return {int}
 	 */
-	int get_redirect_max() const
-	{
+	int get_redirect_max() const {
 		return redirect_max_;
 	}
 
@@ -131,8 +127,7 @@ public:
 	 * @return {int} 单位为毫秒;
 	 *  return sleep value in microsecond
 	 */
-	int get_redirect_sleep() const
-	{
+	int get_redirect_sleep() const {
 		return redirect_sleep_;
 	}
 
@@ -163,8 +158,7 @@ public:
 	 * get all passwords of the redis cluster
 	 * @return {const std::map<string, string>&}
 	 */
-	const std::map<string, string>& get_passwords(void) const
-	{
+	const std::map<string, string>& get_passwords() const {
 		return passwds_;
 	}
 
@@ -226,8 +220,7 @@ private:
 			const char* ptr, int nretried);
 
 public:
-	const redis_result* run(redis_command& cmd, size_t nchild,
-			int* timeout = NULL);
+	const redis_result* run(redis_command& cmd, size_t nchild, int* timeout = NULL);
 };
 
 } // namespace acl

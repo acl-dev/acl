@@ -7,8 +7,7 @@
 #include "acl_cpp/stream/aio_stream.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 aio_stream::aio_stream(aio_handle* handle)
 : handle_(handle)
@@ -21,7 +20,7 @@ aio_stream::aio_stream(aio_handle* handle)
 	acl_assert(handle);
 }
 
-aio_stream::~aio_stream(void)
+aio_stream::~aio_stream()
 {
 	if (hook_) {
 		hook_->destroy();
@@ -51,7 +50,7 @@ aio_stream::~aio_stream(void)
 	}
 }
 
-void aio_stream::destroy(void)
+void aio_stream::destroy()
 {
 	delete this;
 }
@@ -129,7 +128,7 @@ const char* aio_stream::get_ip(const char* addr, std::string& out)
 	return out.c_str();
 }
 
-aio_handle& aio_stream::get_handle(void) const
+aio_handle& aio_stream::get_handle() const
 {
 	return *handle_;
 }
@@ -147,12 +146,12 @@ void aio_stream::set_handle(aio_handle& handle) {
 	}
 }
 
-ACL_ASTREAM* aio_stream::get_astream(void) const
+ACL_ASTREAM* aio_stream::get_astream() const
 {
 	return stream_;
 }
 
-ACL_VSTREAM* aio_stream::get_vstream(void) const
+ACL_VSTREAM* aio_stream::get_vstream() const
 {
 	if (stream_ == NULL) {
 		return NULL;
@@ -160,7 +159,7 @@ ACL_VSTREAM* aio_stream::get_vstream(void) const
 	return acl_aio_vstream(stream_);
 }
 
-ACL_SOCKET aio_stream::get_socket(void) const
+ACL_SOCKET aio_stream::get_socket() const
 {
 	ACL_VSTREAM* stream = get_vstream();
 	if (stream == NULL) {
@@ -430,7 +429,7 @@ int aio_stream::enable_timeout_callback(aio_callback* callback /* = NULL */)
 	return n;
 }
 
-void aio_stream::enable_error(void)
+void aio_stream::enable_error()
 {
 	acl_assert(stream_);
 
@@ -490,12 +489,12 @@ int aio_stream::timeout_callback(ACL_ASTREAM* stream acl_unused, void* ctx)
 
 /////////////////////////////////////////////////////////////////////////////
 
-stream_hook* aio_stream::get_hook(void) const
+stream_hook* aio_stream::get_hook() const
 {
 	return hook_;
 }
 
-stream_hook* aio_stream::remove_hook(void)
+stream_hook* aio_stream::remove_hook()
 {
 	ACL_VSTREAM* vstream = get_vstream();
 	if (vstream == NULL) {

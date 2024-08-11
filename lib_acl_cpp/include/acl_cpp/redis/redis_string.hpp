@@ -6,37 +6,35 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 所有的字符串对象的命令都已实现
  * all the commands in redis Strings are be implemented.
  */
-class ACL_CPP_API redis_string : virtual public redis_command
-{
+class ACL_CPP_API redis_string : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_string(void);
+	redis_string();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
 	 */
-	redis_string(redis_client* conn);
+	explicit redis_string(redis_client* conn);
 
 	/**
 	 * see redis_command::redis_command(redis_client_cluster*)
 	 */
-	redis_string(redis_client_cluster* cluster);
+	explicit redis_string(redis_client_cluster* cluster);
 
-	redis_string(redis_client_pipeline* pipeline);
+	explicit redis_string(redis_client_pipeline* pipeline);
 
 	ACL_CPP_DEPRECATED
 	redis_string(redis_client_cluster* cluster, size_t max_conns);
 
-	virtual ~redis_string(void);
+	virtual ~redis_string();
 
 	/////////////////////////////////////////////////////////////////////
 	

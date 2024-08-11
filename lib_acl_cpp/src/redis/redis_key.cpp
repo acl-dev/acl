@@ -9,8 +9,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 #define INT_LEN		11
 #define LONG_LEN	21
@@ -176,7 +175,7 @@ bool redis_key::exists(const char* key, size_t len)
 
 	hash_slot(key);
 	build_request(2, argv, lens);
-	return get_number() > 0 ? true : false;
+	return get_number() > 0;
 }
 
 int redis_key::expire(const char* key, int n)

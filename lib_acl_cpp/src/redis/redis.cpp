@@ -5,8 +5,7 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis::redis(redis_client* conn /* = NULL */)
 : redis_command(conn)

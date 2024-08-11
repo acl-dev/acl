@@ -8,8 +8,7 @@ namespace acl {
 
 class string;
 
-class ACL_CPP_API mime_quoted_printable : public mime_code
-{
+class ACL_CPP_API mime_quoted_printable : public mime_code {
 public:
 	/**
 	 * 构造函数
@@ -17,7 +16,7 @@ public:
 	 * @param addInvalid {bool} 流式解码时是否遇到非法字符是否原样拷贝
 	 */
 	mime_quoted_printable(bool addCrlf = false, bool addInvalid = false);
-	~mime_quoted_printable(void);
+	~mime_quoted_printable();
 
 	// 基类的虚函数重载
 
@@ -87,7 +86,7 @@ public:
 	/**
 	 * 重置编、解码器状态
 	 */
-	void reset(void);
+	void reset();
 
 	/**
 	 * 设置在编码结束时是否添加 "\r\n"

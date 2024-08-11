@@ -6,20 +6,18 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 redis_node::redis_node()
-	: myself_(false)
-	, handshaking_(false)
-	, connected_(false)
-	, master_(NULL)
+: myself_(false)
+, handshaking_(false)
+, connected_(false)
+, master_(NULL)
 {
 }
 
 redis_node::~redis_node()
 {
-
 }
 
 redis_node& redis_node::set_id(const char* id)
@@ -32,10 +30,11 @@ redis_node& redis_node::set_addr(const char* addr)
 {
 	addr_info_ = addr;
 	int pos = addr_info_.find('@');
-	if (pos <= 0)
+	if (pos <= 0) {
 		addr_ = addr_info_;
-	else
+	} else {
 		addr_.copy(addr_info_, pos);
+	}
 	return *this;
 }
 
@@ -78,8 +77,9 @@ redis_node& redis_node::set_master_id(const char* id)
 
 bool redis_node::add_slave(redis_node* slave)
 {
-	if (slave == NULL)
+	if (slave == NULL) {
 		return false;
+	}
 	std::vector<redis_node*>::const_iterator cit;
 	for (cit = slaves_.begin(); cit != slaves_.end(); ++cit) {
 		if (*cit == slave) {
@@ -88,8 +88,9 @@ bool redis_node::add_slave(redis_node* slave)
 				(*cit)->get_addr());
 			return false;
 		}
-		if ((*slave->get_id()) == 0)
+		if ((*slave->get_id()) == 0) {
 			continue;
+		}
 		if (strcmp(slave->get_id(), (*cit)->get_id()) == 0) {
 			printf("slave exists: %s, id: %s, addr: %s\r\n",
 				slave->get_id(), (*cit)->get_id(),
@@ -119,8 +120,9 @@ void redis_node::clear_slaves(bool free_all /* = false */)
 {
 	if (free_all) {
 		std::vector<redis_node*>::iterator it;
-		for (it = slaves_.begin(); it != slaves_.end(); ++it)
+		for (it = slaves_.begin(); it != slaves_.end(); ++it) {
 			delete *it;
+		}
 	}
 
 	slaves_.clear();
@@ -134,11 +136,11 @@ void redis_node::add_slot_range(size_t min, size_t max)
 
 const std::vector<std::pair<size_t, size_t> >& redis_node::get_slots() const
 {
-	if (is_master())
+	if (is_master()) {
 		return slots_;
-	else if (master_ != NULL)
+	} else if (master_ != NULL) {
 		return master_->get_slots();
-	else {
+	} else {
 		//logger_warn("not master and not slave!");
 		return slots_;
 	}

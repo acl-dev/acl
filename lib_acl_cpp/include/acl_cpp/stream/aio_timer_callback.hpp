@@ -17,8 +17,8 @@ public:
 	 * 构造函数
 	 * @param keep {bool} 该定时器是否允许自动重启
 	 */
-	aio_timer_callback(bool keep = false);
-	virtual ~aio_timer_callback(void);
+	explicit aio_timer_callback(bool keep = false);
+	virtual ~aio_timer_callback();
 
 	/**
 	 * 当定时器里的任务数为空时的回调函数，
@@ -33,19 +33,19 @@ public:
 	 *    有一个定时任务被触发后
 	 * 3) 当 del_timer(aio_timer_callback*) 被调用后
 	 */
-	virtual void destroy(void) {}
+	virtual void destroy() {}
 
 	/**
 	 * 定时器里的任务是否为空
 	 * @return {bool}
 	 */
-	bool empty(void) const;
+	bool empty() const;
 
 	/**
 	 * 定时器里的任务个数
 	 * @return {size_t}
 	 */
-	size_t length(void) const;
+	size_t length() const;
 
 	/**
 	 * 该定时器是否是自动重启的
@@ -57,13 +57,13 @@ public:
 	 * 判断该定时器是否是自动重启的
 	 * @return {bool}
 	 */
-	bool keep_timer(void) const;
+	bool keep_timer() const;
 
 	/**
 	 * 清空定时器里的定时任务
 	 * @return {int} 被清除的定时任务的个数
 	 */
-	int clear(void);
+	int clear();
 
 protected:
 	friend class aio_handle;
@@ -107,7 +107,7 @@ protected:
 	/**
 	 * 设置当前定时器的时间截
 	 */
-	void set_time(void);
+	void set_time();
 
 private:
 	aio_handle* handle_;
@@ -120,7 +120,7 @@ private:
 	__int64 trigger(void);
 #else
 	long long int set_task(aio_timer_task* task);
-	long long int trigger(void);
+	long long int trigger();
 #endif
 };
 

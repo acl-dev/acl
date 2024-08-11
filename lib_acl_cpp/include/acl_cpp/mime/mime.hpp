@@ -19,11 +19,10 @@ class mime_image;
 class ifstream;
 class fstream;
 
-class ACL_CPP_API mime : public noncopyable
-{
+class ACL_CPP_API mime : public noncopyable {
 public:
-	mime(void);
-	~mime(void);
+	mime();
+	~mime();
 
 	/////////////////////////////////////////////////////////////////////
 	// 与邮件解析相关的函数
@@ -33,18 +32,18 @@ public:
 	 * 解析过程中产生的内存, 虽然多次调用该函数无害, 但为了不影响
 	 * 效率, 最好在利用该解析器解析下一封邮件前调用该函数
 	 */
-	mime& reset(void);
+	mime& reset();
 
 	/**
 	 * 调用者可以手工调用此函数以触发分析邮件头过程
 	 */
-	void primary_head_finish(void);
+	void primary_head_finish();
 
 	/**
 	 * 调用流式分析时用此函数判断邮件头是否解析完毕
 	 * @return {bool} 是否邮件头解析完毕
 	 */
-	bool primary_head_ok(void) const;
+	bool primary_head_ok() const;
 
 	/**
 	 * 开始进行流式解析过程, 该函数内部会自动调用 reset() 函数以重置解析
@@ -73,7 +72,7 @@ public:
 	/**
 	 * 在采用流式解析结束后必须调用此函数
 	 */
-	void update_end(void);
+	void update_end();
 
 	/**
 	 * 调用此函数解析磁盘上的一封邮件
@@ -190,8 +189,7 @@ public:
 	 * @param addr {const char*} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& set_sender(const char* addr)
-	{
+	mime& set_sender(const char* addr) {
 		m_primaryHeader.set_returnpath(addr);
 		return *this;
 	}
@@ -201,8 +199,7 @@ public:
 	 * @param addr {const char*} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& set_from(const char* addr)
-	{
+	mime& set_from(const char* addr) {
 		m_primaryHeader.set_from(addr);
 		return *this;
 	}
@@ -212,8 +209,7 @@ public:
 	 * @param addr {const char*} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& set_replyto(const char* addr)
-	{
+	mime& set_replyto(const char* addr) {
 		m_primaryHeader.set_replyto(addr);
 		return *this;
 	}
@@ -223,8 +219,7 @@ public:
 	 * @param addr {const char*} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& set_returnpath(const char* addr)
-	{
+	mime& set_returnpath(const char* addr) {
 		m_primaryHeader.set_returnpath(addr);
 		return *this;
 	}
@@ -234,8 +229,7 @@ public:
 	 * @param s {const char*} 邮件主题
 	 * @return {mime&}
 	 */
-	mime& set_subject(const char* s)
-	{
+	mime& set_subject(const char* s) {
 		m_primaryHeader.set_subject(s);
 		return *this;
 	}
@@ -245,8 +239,7 @@ public:
 	 * @param addr {const char*} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& add_to(const char* addr)
-	{
+	mime& add_to(const char* addr) {
 		m_primaryHeader.add_to(addr);
 		return *this;
 	}
@@ -256,8 +249,7 @@ public:
 	 * @param addr {const char* addr} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& add_cc(const char* addr)
-	{
+	mime& add_cc(const char* addr) {
 		m_primaryHeader.add_cc(addr);
 		return *this;
 	}
@@ -267,8 +259,7 @@ public:
 	 * @param addr {const char* addr} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& add_bcc(const char* addr)
-	{
+	mime& add_bcc(const char* addr) {
 		m_primaryHeader.add_bcc(addr);
 		return *this;
 	}
@@ -278,8 +269,7 @@ public:
 	 * @param addr {const char* addr} 邮件地址
 	 * @return {mime&}
 	 */
-	mime& add_rcpt(const char* addr)
-	{
+	mime& add_rcpt(const char* addr) {
 		m_primaryHeader.add_rcpt(addr);
 		return *this;
 	}
@@ -290,8 +280,7 @@ public:
 	 * @param value {const char*} 字段值
 	 * @return {mime&}
 	 */
-	mime& add_header(const char* name, const char* value)
-	{
+	mime& add_header(const char* name, const char* value) {
 		m_primaryHeader.add_header(name, value);
 		return *this;
 	}
@@ -302,8 +291,7 @@ public:
 	 * @param stype {const char*} 子类型
 	 * @return {mime&}
 	 */
-	mime& set_type(const char* ctype, const char* stype)
-	{
+	mime& set_type(const char* ctype, const char* stype) {
 		m_primaryHeader.set_type(ctype, stype);
 		return *this;
 	}
@@ -313,8 +301,7 @@ public:
 	 * @param s {const char*} 分隔串
 	 * @return {mime&}
 	 */
-	mime& set_boundary(const char* s)
-	{
+	mime& set_boundary(const char* s) {
 		m_primaryHeader.set_boundary(s);
 		return *this;
 	}
@@ -324,8 +311,7 @@ public:
 	 * @return {const string&} 如果返回对象的内容为空
 	 *  (调用 string::empty()) 则表示没有此字段
 	 */
-	const string& sender(void) const
-	{
+	const string& sender() const {
 		return m_primaryHeader.sender();
 	}
 
@@ -334,8 +320,7 @@ public:
 	 * @return {const string&} 如果返回对象的内容为空
 	 *  (调用 string::empty()) 则表示没有此字段
 	 */
-	const string& from(void) const
-	{
+	const string& from() const {
 		return m_primaryHeader.from();
 	}
 
@@ -344,8 +329,7 @@ public:
 	 * @return {const string&} 如果返回对象的内容为空
 	 *  (调用 string::empty()) 则表示没有此字段
 	 */
-	const string& replyto(void) const
-	{
+	const string& replyto() const {
 		return m_primaryHeader.replyto();
 	}
 
@@ -354,8 +338,7 @@ public:
 	 * @return {const string&} 如果返回对象的内容为空
 	 *  (调用 string::empty()) 则表示没有此字段
 	 */
-	const string& returnpath(void) const
-	{
+	const string& returnpath() const {
 		return m_primaryHeader.returnpath();
 	}
 
@@ -364,8 +347,7 @@ public:
 	 * @return {const string&} 如果返回对象的内容为空
 	 *  (调用 string::empty()) 则表示没有此字段
 	 */
-	const string& subject(void) const
-	{
+	const string& subject() const {
 		return m_primaryHeader.subject();
 	}
 
@@ -374,8 +356,7 @@ public:
 	 * @return {const std::list<char*>&) 如果返回对象的内容为空
 	 *  (调用 std::list<char*>::empty()) 则表示没有此字段
 	 */
-	const std::list<char*>& to_list(void) const
-	{
+	const std::list<char*>& to_list() const {
 		return m_primaryHeader.to_list();
 	}
 
@@ -384,8 +365,7 @@ public:
 	 * @return {const std::list<char*>&) 如果返回对象的内容为空
 	 *  (调用 std::list<char*>::empty()) 则表示没有此字段
 	 */
-	const std::list<char*>& cc_list(void) const
-	{
+	const std::list<char*>& cc_list() const {
 		return m_primaryHeader.cc_list();
 	}
 
@@ -394,8 +374,7 @@ public:
 	 * @return {const std::list<char*>&) 如果返回对象的内容为空
 	 *  (调用 std::list<char*>::empty()) 则表示没有此字段
 	 */
-	const std::list<char*>& bcc_list(void) const
-	{
+	const std::list<char*>& bcc_list() const {
 		return m_primaryHeader.bcc_list();
 	}
 
@@ -405,8 +384,7 @@ public:
 	 * @return {const std::list<char*>&) 如果返回对象的内容为空
 	 *  (调用 std::list<char*>::empty()) 则表示没有此字段
 	 */
-	const std::list<char*>& rcpt_list(void) const
-	{
+	const std::list<char*>& rcpt_list() const {
 		return m_primaryHeader.rcpt_list();
 	}
 
@@ -414,8 +392,7 @@ public:
 	 * 获得邮件头的各个字段列表
 	 * @return {const std::list<HEADER*>&)
 	 */
-	const std::list<HEADER*>& header_list(void) const
-	{
+	const std::list<HEADER*>& header_list() const {
 		return m_primaryHeader.header_list();
 	}	
 
@@ -424,8 +401,7 @@ public:
 	 * @param name {const char*} 字段名
 	 * @return {const char*} 字段值, 为空时表示不存在
 	 */
-	const char* header_value(const char* name) const
-	{
+	const char* header_value(const char* name) const {
 		return m_primaryHeader.header_value(name);
 	}
 
@@ -435,8 +411,7 @@ public:
 	 * @param values {std::list<const char*>*} 存储对应的结果集
 	 * @return {int} 字段值集合的个数
 	 */
-	int header_values(const char* name, std::list<const char*>* values) const
-	{
+	int header_values(const char* name, std::list<const char*>* values) const {
 		return m_primaryHeader.header_values(name, values);
 	}
 
@@ -444,8 +419,7 @@ public:
 	 * 获得邮件头中关于 Content-Type: text/html 中的 text 字段
 	 * @return {const char*} 永远返回非空值
 	 */
-	const char* get_ctype(void) const
-	{
+	const char* get_ctype() const {
 		return m_primaryHeader.get_ctype();
 	}
 
@@ -453,8 +427,7 @@ public:
 	 * 获得邮件头中关于 Content-Type: text/html 中的 html 字段
 	 * @return {const char*} 永远返回非空值
 	 */
-	const char* get_stype(void) const
-	{
+	const char* get_stype() const {
 		return m_primaryHeader.get_stype();
 	}
 
@@ -462,8 +435,7 @@ public:
 	 * 获得邮件头
 	 * @return {const mime_head&}
 	 */
-	const mime_head& primary_header(void) const
-	{
+	const mime_head& primary_header() const {
 		return m_primaryHeader;
 	}
 

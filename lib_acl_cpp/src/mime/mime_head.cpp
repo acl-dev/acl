@@ -30,12 +30,12 @@ mime_head::mime_head(void)
 	m_boundary   = NULL;
 }
 
-mime_head::~mime_head(void)
+mime_head::~mime_head()
 {
 	reset();
 }
 
-mime_head& mime_head::reset(void)
+mime_head& mime_head::reset()
 {
 	delete m_sender;
 	m_sender = NULL;
@@ -101,62 +101,62 @@ mime_head& mime_head::reset(void)
 	return *this;
 }
 
-const char* mime_head::get_ctype(void) const
+const char* mime_head::get_ctype() const
 {
 	return m_ctype.c_str();
 }
 
-const char* mime_head::get_stype(void) const
+const char* mime_head::get_stype() const
 {
 	return m_stype.c_str();
 }
 
-const string& mime_head::sender(void) const
+const string& mime_head::sender() const
 {
 	return m_sender ? *m_sender : __dummy;
 }
 
-const string& mime_head::from(void) const
+const string& mime_head::from() const
 {
 	return m_from ? *m_from : __dummy;
 }
 
-const string& mime_head::replyto(void) const
+const string& mime_head::replyto() const
 {
 	return m_replyto ? *m_replyto : __dummy;
 }
 
-const string& mime_head::returnpath(void) const
+const string& mime_head::returnpath() const
 {
 	return m_returnpath ? *m_returnpath : __dummy;
 }
 
-const string& mime_head::subject(void) const
+const string& mime_head::subject() const
 {
 	return m_subject ? *m_subject : __dummy;
 }
 
-const std::list<char*>& mime_head::to_list(void) const
+const std::list<char*>& mime_head::to_list() const
 {
 	return m_tos ? (*m_tos) : __dummyList;
 }
 
-const std::list<char*>& mime_head::cc_list(void) const
+const std::list<char*>& mime_head::cc_list() const
 {
 	return m_ccs ? (*m_ccs) : __dummyList;
 }
 
-const std::list<char*>& mime_head::bcc_list(void) const
+const std::list<char*>& mime_head::bcc_list() const
 {
 	return m_bccs ? (*m_bccs) : __dummyList;
 }
 
-const std::list<char*>& mime_head::rcpt_list(void) const
+const std::list<char*>& mime_head::rcpt_list() const
 {
 	return m_rcpts ? (*m_rcpts) : __dummyList;
 }
 
-const std::list<HEADER*>& mime_head::header_list(void) const
+const std::list<HEADER*>& mime_head::header_list() const
 {
 	if (m_headers) {
 		return *m_headers;
@@ -318,7 +318,7 @@ mime_head& mime_head::set_boundary(const char* s)
 	return *this;
 }
 
-const string& mime_head::get_boundary(void) const
+const string& mime_head::get_boundary() const
 {
 	if (m_boundary) {
 		return *m_boundary;

@@ -232,7 +232,7 @@ polarssl_io::polarssl_io(polarssl_conf& conf, bool server_side,
 #endif
 }
 
-polarssl_io::~polarssl_io(void)
+polarssl_io::~polarssl_io()
 {
 #ifdef HAS_POLARSSL
 	if (ssl_) {
@@ -265,7 +265,7 @@ polarssl_io::~polarssl_io(void)
 #endif
 }
 
-void polarssl_io::destroy(void)
+void polarssl_io::destroy()
 {
 	if (--(*refers_) <= 0) {
 		delete this;
@@ -426,7 +426,7 @@ bool polarssl_io::on_close(bool alive)
 	return true;
 }
 
-bool polarssl_io::handshake(void)
+bool polarssl_io::handshake()
 {
 #ifdef HAS_POLARSSL
 	if (handshake_ok_) {
@@ -460,7 +460,7 @@ bool polarssl_io::handshake(void)
 #endif
 }
 
-bool polarssl_io::check_peer(void)
+bool polarssl_io::check_peer()
 {
 #ifdef HAS_POLARSSL
 	int   ret = __ssl_get_verify_result((ssl_context*) ssl_);

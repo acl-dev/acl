@@ -7,16 +7,14 @@
 
 #if !defined(ACL_CLIENT_ONLY) && !defined(ACL_REDIS_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API redis_zset : virtual public redis_command
-{
+class ACL_CPP_API redis_zset : virtual public redis_command {
 public:
 	/**
 	 * see redis_command::redis_command()
 	 */
-	redis_zset(void);
+	redis_zset();
 
 	/**
 	 * see redis_command::redis_command(redis_client*)
@@ -33,7 +31,7 @@ public:
 	ACL_CPP_DEPRECATED
 	redis_zset(redis_client_cluster* cluster, size_t max_conns);
 
-	virtual ~redis_zset(void);
+	virtual ~redis_zset();
 
 	/////////////////////////////////////////////////////////////////////
 

@@ -48,7 +48,7 @@ public:
 	 */
 	aio_handle(ACL_AIO* handle);
 
-	virtual ~aio_handle(void);
+	virtual ~aio_handle();
 
 	/**
 	 * 针对异步读流，设置是否是连续读，该配置项将会被所有的基于
@@ -62,7 +62,7 @@ public:
 	 * 获得异步引擎句柄是否设置了持续读数据的功能
 	 * @return {bool}
 	 */
-	bool keep_read(void) const;
+	bool keep_read() const;
 
 	/**
 	 * 设置定时器
@@ -115,41 +115,41 @@ public:
 	 * 获得 ACL_AIO 句柄
 	 * @return {ACL_AIO*}
 	 */
-	ACL_AIO* get_handle(void) const;
+	ACL_AIO* get_handle() const;
 
 	/**
 	 * 获得异步引擎的类型
 	 * @return {aio_handle_type}
 	 */
-	aio_handle_type get_engine_type(void) const;
+	aio_handle_type get_engine_type() const;
 
 	/**
 	 * 获得当前处于监控的异步流的数量
 	 * @return {int}
 	 */
-	int length(void) const;
+	int length() const;
 
 	/**
 	 * 检查所有异步流的状态，并触发准备的异步流的处理过程
 	 * @return {bool} 是否应中止异步引擎
 	 */
-	bool check(void);
+	bool check();
 
 	/**
 	 * 获得本次事件循环被触发的事件次数
 	 * @return {int}
 	 */
-	int last_nready(void) const;
+	int last_nready() const;
 
 	/**
 	 * 通知异步流引擎中止
 	 */
-	void stop(void);
+	void stop();
 
 	/**
 	 * 重置异步引擎的内部状态
 	 */
-	void reset(void);
+	void reset();
 
 	/**
 	 * 设置 DNS 服务器地址列表，格式：ip1:port1;ip2:port2...
@@ -169,19 +169,19 @@ public:
 	/**
 	 * 清除掉所设置的所有 DNS 服务器列表
 	 */
-	void dns_clear(void);
+	void dns_clear();
 
 	/**
 	 * DNS 服务器列表数量
 	 * @return {size_t}
 	 */
-	size_t dns_size(void) const;
+	size_t dns_size() const;
 
 	/**
 	 * 判断 DNS 服务器列表是否为空
 	 * @return {bool}
 	 */
-	bool dns_empty(void) const;
+	bool dns_empty() const;
 	
 	/**
 	 * 获得 DNS 服务器地址列表
@@ -222,22 +222,22 @@ protected:
 	/**
 	 * 异步流个数加 1
 	 */
-	void increase(void);
+	void increase();
 
 	/**
 	 * 当异步流个数加 1 时的回调虚函数
 	 */
-	virtual void on_increase(void) {}
+	virtual void on_increase() {}
 
 	/**
 	 * 异步流个数减 1
 	 */
-	void decrease(void);
+	void decrease();
 
 	/**
 	 * 当异步流个数减 1 时的回调虚函数
 	 */
-	virtual void on_decrease(void) {}
+	virtual void on_decrease() {}
 
 private:
 	ACL_AIO* aio_;

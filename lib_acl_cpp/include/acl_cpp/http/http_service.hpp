@@ -10,8 +10,7 @@ class string;
 /**
  * HTTP 服务请求类，子类必须继承该类
  */
-class ACL_CPP_API http_service_request : public http_header
-{
+class ACL_CPP_API http_service_request : public http_header {
 public:
 	/**
 	 * 构造函数
@@ -25,13 +24,13 @@ public:
 	 * 获得由构造函数输入的 domain
 	 * @return {const char*} 永不为空
 	 */
-	const char* get_domain(void) const;
+	const char* get_domain() const;
 
 	/**
 	 * 获得由构造函数输入的 port
 	 * @return {unsigned short}
 	 */
-	unsigned short get_port(void) const;
+	unsigned short get_port() const;
 
 	/**
 	 * 当任务处理完毕或出错时，内部处理过程会自动调用 destroy 接口，
@@ -39,7 +38,7 @@ public:
 	 * 子类应该在该函数内 delete this 以删除自己，因为该函数最终肯定
 	 * 会被调用，所以子类不应在其它地方进行析构操作
 	 */
-	virtual void destroy(void) {}
+	virtual void destroy() {}
 
 	//////////////////////////////////////////////////////////////////////
 	// 子类必须实现如此虚接口
@@ -52,7 +51,7 @@ public:
 	 * 注意：与其它函数不同，该虚接口是另外的子线程中被调用的，所以如果子类
 	 * 实现了该接口，如果需要调用与原有线程具备竞争的资源时应该注意加锁保护
 	 */
-	virtual const string* get_body(void);
+	virtual const string* get_body();
 
 	/**
 	 * 当获得 HTTP 服务器的 HTTP 响应头时的回调接口
@@ -80,8 +79,10 @@ public:
 	 * @param errnum {http_status_t} 出错码
 	 */
 	virtual void on_error(http_status_t errnum) = 0;
+
 protected:
-	virtual ~http_service_request(void);
+	virtual ~http_service_request();
+
 private:
 	char* domain_;
 	unsigned short port_;
@@ -89,8 +90,7 @@ private:
 
 class aio_socket_stream;
 
-class ACL_CPP_API http_service : public ipc_service
-{
+class ACL_CPP_API http_service : public ipc_service {
 public:
 	/**
 	 * 构造函数
@@ -104,8 +104,8 @@ public:
 	 *  通讯模式自动设置为基于 _WIN32 的消息，否则依然采用通用的套接
 	 *  口通讯方式
 	 */
-	http_service(int nthread = 1, int nwait = 1, bool win32_gui = false);
-	~http_service(void);
+	explicit http_service(int nthread = 1, int nwait = 1, bool win32_gui = false);
+	~http_service();
 
 	/**
 	 * 应用调用此函数开始 HTTP 会话过程，由 http_service 类对象负责
@@ -139,7 +139,8 @@ protected:
 	/**
 	 * 基类虚函数，当监听流关闭时的回调函数
 	 */
-	virtual void on_close(void);
+	virtual void on_close();
+
 private:
 	char* addr_;
 	int   nwait_;

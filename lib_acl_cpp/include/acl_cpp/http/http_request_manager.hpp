@@ -10,8 +10,7 @@ class sslbase_conf;
 /**
  * HTTP 客户端请求连接池管理类
  */
-class ACL_CPP_API http_request_manager : public acl::connect_manager
-{
+class ACL_CPP_API http_request_manager : public acl::connect_manager {
 public:
 	http_request_manager();
 	virtual ~http_request_manager();
