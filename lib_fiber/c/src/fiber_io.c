@@ -558,17 +558,11 @@ int fiber_wait_read(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
-	if (fe->fiber_r == NULL) {
-#ifdef DEBUG_READY
-		msg_error("%s(%d): fiber_r NULL, ltag=%s, lline=%d, ctag=%s, "
-			"cline=%d, curr=%lld, last=%lld",
-			__FUNCTION__, __LINE__, curr->ltag,
-			curr->lline, curr->ctag, curr->cline,
-			curr->curr, curr->last);
-#else
-		msg_error("%s(%d): fiber_r NULL", __FUNCTION__, __LINE__);
-#endif
+#ifndef USE_POLL_WAIT
+	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
+		fiber_timer_del(curr);
 	}
+#endif
 
 	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
