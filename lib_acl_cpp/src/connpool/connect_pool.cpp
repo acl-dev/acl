@@ -2,6 +2,7 @@
 #ifndef ACL_PREPARE_COMPILE
 #include "acl_cpp/stdlib/log.hpp"
 #include "acl_cpp/stdlib/locker.hpp"
+#include "acl_cpp/stdlib/util.hpp"
 #include "acl_cpp/connpool/connect_client.hpp"
 #include "acl_cpp/connpool/connect_pool.hpp"
 #endif
@@ -108,8 +109,27 @@ bool connect_pool::aliving()
 	return false;
 }
 
-connect_client* connect_pool::peek(bool on /* = true */)
+connect_client* connect_pool::peek(bool on, int* tc, bool* old)
 {
+	struct timeval begin;
+
+#define	SET_TIME_COST do {                                                    \
+	if (tc) {                                                             \
+		struct timeval end;                                           \
+		gettimeofday(&end, NULL);                                     \
+		*tc = stamp_sub(end, begin);                                  \
+	}                                                                     \
+} while (0)
+
+	if (tc) {
+		*tc = 0;
+		gettimeofday(&begin, NULL);
+	}
+
+	if (old) {
+		*old = false;
+	}
+
 	lock_.lock();
 	if (alive_ == false) {
 		time_t now = time(NULL);
@@ -133,16 +153,27 @@ connect_client* connect_pool::peek(bool on /* = true */)
 		current_used_++;
 
 		lock_.unlock();
+
+		SET_TIME_COST;
+
+		if (old) {
+			*old = true;
+		}
+
 		return conn;
 	} else if (max_ > 0 && count_ >= max_) {
 		logger_error("too many connections, max: %d, curr: %d,"
 			" server: %s", (int) max_, (int) count_, addr_);
 		lock_.unlock();
+
+		SET_TIME_COST;
 		return NULL;
 	}
 
 	if (!on) {
 		lock_.unlock();
+
+		SET_TIME_COST;
 		return NULL;
 	}
 
@@ -157,8 +188,9 @@ connect_client* connect_pool::peek(bool on /* = true */)
 	conn = create_connect();
 	// 在调用 open 之前先设置超时时间
 	conn->set_timeout(conn_timeout_, rw_timeout_);
+
 	// 调用子类方法打开连接
-	if (conn->open() == false) {
+	if (!conn->open()) {
 		lock_.lock();
 
 		// 因为打开连接失败，所以还需将上面预 +1 的三个成员再 -1
@@ -172,10 +204,14 @@ connect_client* connect_pool::peek(bool on /* = true */)
 
 		lock_.unlock();
 		delete conn;
+
+		SET_TIME_COST;
 		return NULL;
 	}
 
 	conn->set_pool(this);
+
+	SET_TIME_COST;
 	return conn;
 }
 
