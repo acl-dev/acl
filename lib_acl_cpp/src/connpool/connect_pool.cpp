@@ -226,7 +226,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 		delete conn;
 	}
 
-	if (idle_ttl_ >= 0 && now - last_check_ >= check_inter_) {
+	if (check_inter_ >= 0 && now - last_check_ >= check_inter_) {
 		(void) check_idle(idle_ttl_, false);
 		(void) time(&last_check_);
 	}
