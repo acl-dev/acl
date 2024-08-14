@@ -109,7 +109,7 @@ bool connect_pool::aliving()
 	return false;
 }
 
-connect_client* connect_pool::peek(bool on, int* tc, bool* old)
+connect_client* connect_pool::peek(bool on, double* tc, bool* old)
 {
 	struct timeval begin;
 
@@ -122,7 +122,7 @@ connect_client* connect_pool::peek(bool on, int* tc, bool* old)
 } while (0)
 
 	if (tc) {
-		*tc = 0;
+		*tc = 0.0;
 		gettimeofday(&begin, NULL);
 	}
 
