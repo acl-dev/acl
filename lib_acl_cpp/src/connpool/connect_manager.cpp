@@ -100,30 +100,33 @@ void connect_manager::set_idle_ttl(time_t ttl)
 }
 
 void connect_manager::init(const char* default_addr, const char* addr_list,
-	size_t count, int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
+	size_t count, int conn_timeout /* 30 */, int rw_timeout /* 30 */,
+	bool sockopt_timeo /* false */)
 {
 	if (addr_list != NULL && *addr_list != 0) {
-		set_service_list(addr_list, (int) count,
-			conn_timeout, rw_timeout);
+		set_service_list(addr_list, (int) count, conn_timeout,
+			rw_timeout, sockopt_timeo);
 	}
 
 	// 创建缺省服务连接池对象，该对象一同放入总的连接池集群中
-	if (default_addr != NULL && *default_addr != 0) {
-		logger("default_pool: %s", default_addr);
-		int max = check_addr(default_addr, default_addr_, count);
-		if (max < 0) {
-			logger("no default connection set");
-		} else {
-			set(default_addr_.c_str(), max, conn_timeout, rw_timeout);
-			default_pool_ = get(default_addr_);
-		}
-	} else {
+	if (default_addr == NULL || *default_addr == 0) {
 		logger("no default connection set");
+		return;
 	}
+
+	logger("default_pool: %s", default_addr);
+	int max = check_addr(default_addr, default_addr_, count);
+	if (max < 0) {
+		logger("no default connection set");
+		return;
+	}
+
+	set(default_addr_.c_str(), max, conn_timeout, rw_timeout, sockopt_timeo);
+	default_pool_ = get(default_addr_);
 }
 
 void connect_manager::set_service_list(const char* addr_list, int count,
-	int conn_timeout, int rw_timeout)
+	int conn_timeout, int rw_timeout, bool sockopt_timeo /* false */)
 {
 	if (addr_list == NULL || *addr_list == 0) {
 		logger("addr_list null");
@@ -143,7 +146,7 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 			logger_error("invalid server addr: %s", addr.c_str());
 			continue;
 		}
-		set(addr.c_str(), max, conn_timeout, rw_timeout);
+		set(addr.c_str(), max, conn_timeout, rw_timeout, sockopt_timeo);
 		logger("add one service: %s, max connect: %d",
 			addr.c_str(), max);
 	}
@@ -169,8 +172,8 @@ size_t connect_manager::size() const
 	return n;
 }
 
-void connect_manager::set(const char* addr, size_t count,
-	int conn_timeout /* = 30 */, int rw_timeout /* = 30 */)
+void connect_manager::set(const char* addr, size_t count, int conn_timeout /* 30 */,
+	int rw_timeout /* 30 */, bool sockopt_timeo /* false */)
 {
 	string buf(addr);
 	buf.lower();
@@ -179,15 +182,17 @@ void connect_manager::set(const char* addr, size_t count,
 	std::map<string, conn_config>::iterator it = addrs_.find(buf);
 	if (it == addrs_.end()) {
 		conn_config config;
-		config.addr         = addr;
-		config.count        = count;
-		config.conn_timeout = conn_timeout;
-		config.rw_timeout   = rw_timeout;
-		addrs_[buf]         = config;
+		config.addr          = addr;
+		config.count         = count;
+		config.conn_timeout  = conn_timeout;
+		config.rw_timeout    = rw_timeout;
+		config.sockopt_timeo = sockopt_timeo;
+		addrs_[buf]          = config;
 	} else {
 		it->second.count          = count;
 		it->second.conn_timeout   = conn_timeout;
 		it->second.rw_timeout     = rw_timeout;
+		it->second.sockopt_timeo  = sockopt_timeo;
 	}
 }
 
@@ -311,7 +316,7 @@ connect_pool* connect_manager::create_pool(const conn_config& cf, size_t idx)
 	connect_pool* pool = create_pool(cf.addr, cf.count, idx);
 	pool->set_key(key);
 	pool->set_retry_inter(retry_inter_);
-	pool->set_timeout(cf.conn_timeout, cf.rw_timeout);
+	pool->set_timeout(cf.conn_timeout, cf.rw_timeout, cf.sockopt_timeo);
 	if (idle_ttl_ >= 0) {
 		pool->set_idle_ttl(idle_ttl_);
 	}

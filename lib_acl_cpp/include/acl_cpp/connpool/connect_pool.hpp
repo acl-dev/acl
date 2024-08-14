@@ -35,8 +35,10 @@ public:
 	 * 此接口用来设置超时时间
 	 * @param conn_timeout {int} 网络连接超时时间(秒)
 	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 * @param sockopt_timo {bool} 是否使用 setsockopt 设置读写超时
 	 */
-	connect_pool& set_timeout(int conn_timeout, int rw_timeout);
+	connect_pool& set_timeout(int conn_timeout, int rw_timeout,
+		bool sockopt_timo = false);
 
 	/**
 	 * 设置连接池异常的重试时间间隔
@@ -196,6 +198,7 @@ protected:
 	char  addr_[256];			// 连接池对应的服务器地址，IP:PORT
 	int   conn_timeout_;			// 网络连接超时时间(秒)
 	int   rw_timeout_;			// 网络 IO 超时时间(秒)
+	bool  sockopt_timo_;			// 是否使用s setsockopt 设置超时
 	size_t idx_;				// 该连接池对象在集合中的下标位置
 	size_t max_;				// 最大连接数
 	size_t count_;				// 当前的连接数

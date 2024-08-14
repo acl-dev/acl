@@ -45,10 +45,12 @@ void connect_pool::set_key(const char* key)
 	acl_lowercase(key_);
 }
 
-connect_pool& connect_pool::set_timeout(int conn_timeout, int rw_timeout)
+connect_pool& connect_pool::set_timeout(int conn_timeout, int rw_timeout,
+	bool sockopt_timeo /* false */)
 {
 	conn_timeout_ = conn_timeout;
-	rw_timeout_ = rw_timeout;
+	rw_timeout_   = rw_timeout;
+	sockopt_timo_ = sockopt_timeo;
 	return *this;
 }
 
