@@ -2,19 +2,17 @@
 #include "../acl_cpp_define.hpp"
 #include "connect_client.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class socket_stream;
 class tcp_sender;
 class tcp_reader;
 class string;
 
-class ACL_CPP_API tcp_client : public connect_client
-{
+class ACL_CPP_API tcp_client : public connect_client {
 public:
 	tcp_client(const char* addr, int conn_timeout = 10, int rw_timeout = 10);
-	virtual ~tcp_client(void);
+	virtual ~tcp_client();
 
 	/**
 	 * 向服务器发送指定长度的数据包
@@ -29,7 +27,7 @@ public:
 
 protected:
 	// @override
-	virtual bool open(void);
+	virtual bool open();
 
 private:
 	char* addr_;

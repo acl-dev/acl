@@ -4,14 +4,13 @@
 #include "acl_cpp/connpool/tcp_manager.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-tcp_manager::tcp_manager(void)
+tcp_manager::tcp_manager()
 {
 }
 
-tcp_manager::~tcp_manager(void)
+tcp_manager::~tcp_manager()
 {
 }
 

@@ -4,8 +4,7 @@
 #include "../stream/aio_handle.hpp"
 #include <vector>
 
-namespace acl
-{
+namespace acl {
 
 class aio_handle;
 class check_client;
@@ -14,8 +13,7 @@ class rpc_service;
 class socket_stream;
 class aio_socket_stream;
 
-class ACL_CPP_API connect_monitor : public thread
-{
+class ACL_CPP_API connect_monitor : public thread {
 public:
 	/**
 	 * 构造函数
@@ -65,8 +63,7 @@ public:
 	 * 获得 connect_manager 引用对象
 	 * @return {connect_manager&}
 	 */
-	connect_manager& get_manager() const
-	{
+	connect_manager& get_manager() const {
 		return manager_;
 	}
 
@@ -101,8 +98,7 @@ public:
 	 * 当连接成功时的回调方法，子类可以实现本方法
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_connected(const check_client&, double cost)
-	{
+	virtual void on_connected(const check_client&, double cost) {
 		(void) cost;
 	}
 
@@ -111,8 +107,7 @@ public:
 	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_timeout(const char* addr, double cost)
-	{
+	virtual void on_timeout(const char* addr, double cost) {
 		(void) addr;
 		(void) cost;
 	}
@@ -122,8 +117,7 @@ public:
 	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到被断开的时间间隔（秒）
 	 */
-	virtual void on_refused(const char* addr, double cost)
-	{
+	virtual void on_refused(const char* addr, double cost) {
 		(void) addr;
 		(void) cost;
 	}

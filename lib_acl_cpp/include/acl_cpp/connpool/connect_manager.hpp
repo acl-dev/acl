@@ -8,8 +8,7 @@
 
 struct ACL_EVENT;
 
-namespace acl
-{
+namespace acl {
 
 class connect_pool;
 class connect_monitor;
@@ -19,8 +18,7 @@ struct conns_pools {
 	std::vector<connect_pool*> pools;
 	size_t  check_next;			// 连接检测时的检测点下标
 	size_t  conns_next;			// 下一个要访问的的下标值
-	conns_pools(void)
-	{
+	conns_pools(void) {
 		check_next = 0;
 		conns_next = 0;
 	}
@@ -42,11 +40,10 @@ struct conn_config {
 /**
  * connect pool 服务管理器，有获取连接池等功能
  */
-class ACL_CPP_API connect_manager : public noncopyable
-{
+class ACL_CPP_API connect_manager : public noncopyable {
 public:
-	connect_manager(void);
-	virtual ~connect_manager(void);
+	connect_manager();
+	virtual ~connect_manager();
 
 	/**
 	 * 是否将连接池与线程自动绑定，主要用于协程环境中，内部缺省值为 false，
@@ -139,7 +136,7 @@ public:
 	 * 此外，该函数为虚接口，允许子类实现自己的轮循方式
 	 * @return {connect_pool*} 返回一个连接池，返回指针永远非空
 	 */
-	virtual connect_pool* peek(void);
+	virtual connect_pool* peek();
 
 	/**
 	 * 从连接池集群中获得一个连接池，该函数采用哈希定位方式从集合中获取一个
@@ -156,18 +153,18 @@ public:
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
 	 */
-	void lock(void);
+	void lock();
 
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
 	 */
-	void unlock(void);
+	void unlock();
 
 	/**
 	 * 获得所有的服务器的连接池，该连接池中包含缺省的服务连接池
 	 * @return {std::vector<connect_pool*>&}
 	 */
-	std::vector<connect_pool*>& get_pools(void);
+	std::vector<connect_pool*>& get_pools();
 
 	/**
 	 * 检测连接池中的空闲连接，将过期的连接释放掉
@@ -181,22 +178,21 @@ public:
 	 * 获得连接池集合中连接池对象的个数
 	 * @return {size_t}
 	 */
-	size_t size(void) const;
+	size_t size() const;
 
 	/**
 	 * 获得缺省的服务器连接池
 	 * @return {connect_pool*} 当调用 init 函数的 default_addr 为空时
 	 *  该函数返回 NULL
 	 */
-	connect_pool* get_default_pool(void)
-	{
+	connect_pool* get_default_pool() {
 		return default_pool_;
 	}
 
 	/**
 	 * 打印当前所有 redis 连接池的访问量
 	 */
-	void statistics(void);
+	void statistics();
 
 	/**
 	 * 启动后台非阻塞检测线程检测所有连接池连接状态
@@ -271,7 +267,7 @@ protected:
 	unsigned long get_id(void) const;
 	void get_key(const char* addr, string& key);
 	void get_addr(const char* key, string& addr);
-	connect_pool* add_pool(const char* addr);
+	//connect_pool* add_pool(const char* addr);
 
 	// 线程局部变量初始化时的回调方法
 	static void thread_oninit(void);

@@ -7,8 +7,7 @@
 #include "acl_cpp/connpool/connect_pool.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 : alive_(true)
@@ -32,7 +31,7 @@ connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 	acl_lowercase(key_);
 }
 
-connect_pool::~connect_pool(void)
+connect_pool::~connect_pool()
 {
 	std::list<connect_client*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it) {

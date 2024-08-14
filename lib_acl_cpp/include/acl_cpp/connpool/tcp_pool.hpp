@@ -2,14 +2,12 @@
 #include "../acl_cpp_define.hpp"
 #include "connect_pool.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class string;
 class connect_client;
 
-class ACL_CPP_API tcp_pool : public connect_pool
-{
+class ACL_CPP_API tcp_pool : public connect_pool {
 public:
 	tcp_pool(const char* addr, size_t count, size_t idx = 0);
 	virtual ~tcp_pool(void);
@@ -27,7 +25,7 @@ public:
 
 protected:
 	// @override
-	virtual connect_client* create_connect(void);
+	virtual connect_client* create_connect();
 };
 
 } // namespace acl

@@ -10,8 +10,7 @@
 #endif
 #include "check_timer.hpp"
 
-namespace acl
-{
+namespace acl {
 
 check_timer::check_timer(connect_monitor& monitor,
 	aio_handle& handle, int conn_timeout)

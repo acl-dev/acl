@@ -4,8 +4,7 @@
 #include "acl_cpp/connpool/tcp_sender.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 tcp_sender::tcp_sender(socket_stream& conn)
 : conn_(&conn)
@@ -13,7 +12,7 @@ tcp_sender::tcp_sender(socket_stream& conn)
 	v2_ = (struct iovec*) acl_mymalloc(sizeof(struct iovec) * 2);
 }
 
-tcp_sender::~tcp_sender(void)
+tcp_sender::~tcp_sender()
 {
 	acl_myfree(v2_);
 }

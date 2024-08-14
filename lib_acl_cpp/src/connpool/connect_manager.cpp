@@ -9,10 +9,9 @@
 #include "acl_cpp/connpool/connect_manager.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-connect_manager::connect_manager(void)
+connect_manager::connect_manager()
 : thread_binding_(false)
 , default_pool_(NULL)
 , stat_inter_(1)
@@ -23,7 +22,7 @@ connect_manager::connect_manager(void)
 {
 }
 
-connect_manager::~connect_manager(void)
+connect_manager::~connect_manager()
 {
 	lock_guard guard(lock_);
 	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {
@@ -152,7 +151,7 @@ void connect_manager::set_service_list(const char* addr_list, int count,
 	acl_myfree(buf);
 }
 
-std::vector<connect_pool*>& connect_manager::get_pools(void)
+std::vector<connect_pool*>& connect_manager::get_pools()
 {
 	unsigned long id = get_id();
 	lock_guard guard(lock_);
@@ -160,7 +159,7 @@ std::vector<connect_pool*>& connect_manager::get_pools(void)
 	return pools.pools;
 }
 
-size_t connect_manager::size(void) const
+size_t connect_manager::size() const
 {
 	size_t n = 0;
 	lock_guard guard(const_cast<connect_manager*>(this)->lock_);
@@ -212,7 +211,7 @@ const conn_config* connect_manager::get_config(const char* addr,
 
 #define DEFAULT_ID	0
 
-unsigned long connect_manager::get_id(void) const
+unsigned long connect_manager::get_id() const
 {
 	if (thread_binding_) {
 		return thread::self();
@@ -242,7 +241,7 @@ void connect_manager::thread_onexit(void* ctx)
 
 static acl_pthread_key_t once_key;
 
-void connect_manager::thread_oninit(void)
+void connect_manager::thread_oninit()
 {
 	int ret = acl_pthread_key_create(&once_key, thread_onexit);
 	if (ret != 0) {
@@ -421,7 +420,7 @@ void connect_manager::create_pools_for(pools_t& pools)
 	}
 }
 
-connect_pool* connect_manager::peek(void)
+connect_pool* connect_manager::peek()
 {
 	connect_pool* pool;
 	size_t service_size, n;
@@ -499,17 +498,17 @@ connect_pool* connect_manager::peek(const char* addr,
 	return pool;
 }
 
-void connect_manager::lock(void)
+void connect_manager::lock()
 {
 	lock_.lock();
 }
 
-void connect_manager::unlock(void)
+void connect_manager::unlock()
 {
 	lock_.unlock();
 }
 
-void connect_manager::statistics(void)
+void connect_manager::statistics()
 {
 	unsigned long id = get_id();
 	conns_pools& pools = get_pools_by_id(id);

@@ -11,8 +11,7 @@
 #include "check_timer.hpp"
 #include "check_rpc.hpp"
 
-namespace acl
-{
+namespace acl {
 
 connect_monitor::connect_monitor(connect_manager& manager)
 : stop_(false)
@@ -25,7 +24,7 @@ connect_monitor::connect_monitor(connect_manager& manager)
 {
 }
 
-connect_monitor::~connect_monitor(void)
+connect_monitor::~connect_monitor()
 {
 }
 
@@ -62,7 +61,7 @@ void connect_monitor::stop(bool graceful)
 	stop_graceful_ = graceful;
 }
 
-void* connect_monitor::run(void)
+void* connect_monitor::run()
 {
 	// 检查服务端连接状态定时器
 	check_timer timer(*this, handle_, conn_timeout_);

@@ -4,8 +4,7 @@
 #include "../stdlib/locker.hpp"
 #include "../stdlib/noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class connect_manager;
 class connect_client;
@@ -16,8 +15,7 @@ class connect_client;
  * 对象允许通过 set_delay_destroy() 设置延迟销毁时，该类的子类实例
  * 必须是动态对象
  */
-class ACL_CPP_API connect_pool : public noncopyable
-{
+class ACL_CPP_API connect_pool : public noncopyable {
 public:
 	/**
 	 * 构造函数
@@ -118,8 +116,7 @@ public:
 	 * 获取连接池的服务器地址
 	 * @return {const char*} 返回非空地址
 	 */
-	const char* get_addr() const
-	{
+	const char* get_addr() const {
 		return addr_;
 	}
 
@@ -127,8 +124,7 @@ public:
 	 * 获取连接池最大连接数限制，如果返回值为 0 则表示没有最大连接数限制
 	 * @return {size_t}
 	 */
-	size_t get_max() const
-	{
+	size_t get_max() const {
 		return max_;
 	}
 
@@ -136,8 +132,7 @@ public:
 	 * 获取连接池当前连接数个数
 	 * @return {size_t}
 	 */
-	size_t get_count() const
-	{
+	size_t get_count() const {
 		return count_;
 	}
 
@@ -145,8 +140,7 @@ public:
 	 * 获得该连接池对象在连接池集合中的下标位置
 	 * @return {size_t}
 	 */
-	size_t get_idx() const
-	{
+	size_t get_idx() const {
 		return idx_;
 	}
 
@@ -159,8 +153,7 @@ public:
 	/**
 	 * 获取该连接池总共被使用的次数
 	 */
-	unsigned long long get_total_used() const
-	{
+	unsigned long long get_total_used() const {
 		return total_used_;
 	}
 
@@ -168,15 +161,13 @@ public:
 	 * 获取该连接池当前的使用次数
 	 * @return {unsigned long long}
 	 */
-	unsigned long long get_current_used() const
-	{
+	unsigned long long get_current_used() const {
 		return current_used_;
 	}
 
 public:
 	void set_key(const char* key);
-	const char* get_key(void) const
-	{
+	const char* get_key(void) const {
 		return key_;
 	}
 
@@ -219,27 +210,24 @@ protected:
 	std::list<connect_client*> pool_;	// 连接池集合
 };
 
-class ACL_CPP_API connect_guard : public noncopyable
-{
+class ACL_CPP_API connect_guard : public noncopyable {
 public:
 	connect_guard(connect_pool& pool)
 	: keep_(true), pool_(pool), conn_(NULL)
 	{
 	}
 
-	virtual ~connect_guard(void)
-	{
-		if (conn_)
+	virtual ~connect_guard(void) {
+		if (conn_) {
 			pool_.put(conn_, keep_);
+		}
 	}
 
-	void set_keep(bool keep)
-	{
+	void set_keep(bool keep) {
 		keep_ = keep;
 	}
 
-	connect_client* peek(void)
-	{
+	connect_client* peek(void) {
 		conn_ = pool_.peek();
 		return conn_;
 	}
