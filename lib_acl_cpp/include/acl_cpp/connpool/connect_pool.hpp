@@ -70,12 +70,12 @@ public:
 	 * 新的与服务器的连接时失败，则该连接池会被置为不可用状态
 	 * @param on {bool} 该参数决定当连接池没有可用连接时是否创建新的连接，
 	 *  如果为 false，则不会创建新连接
-	 * @param tc {int*} 非空时存储总耗时时间，单位：ms
+	 * @param tc {double*} 非空时存储总耗时时间，单位：ms
 	 * @param old {bool*} 非空时指定所取得的连接是否复用连接池中的旧连接，
 	 *  如果 *old 为true表示复用了旧连接，否则为新建连接
 	 * @return {connect_client*} 如果为空则表示该服务器连接池对象不可用
 	 */
-	connect_client* peek(bool on = true, int* tc = NULL, bool* old = NULL);
+	connect_client* peek(bool on = true, double* tc = NULL, bool* old = NULL);
 
 	/**
 	 * 将一个不属于当前连接池的连接对象与当前连接池对象绑定，使之从属于当前
