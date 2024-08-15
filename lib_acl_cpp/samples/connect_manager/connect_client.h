@@ -7,6 +7,12 @@ public:
 
 	virtual ~connect_client();
 
+	bool alive()
+	{
+		printf(">>>alive called<<<\r\n");
+		return true;
+	}
+
 	const char* get_addr() const
 	{
 		return addr_;
