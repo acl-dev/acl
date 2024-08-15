@@ -354,7 +354,7 @@ const char* socket_stream::get_ip(const char* addr, std::string& out)
 	return out.c_str();
 }
 
-bool socket_stream::alive() const
+bool socket_stream::alive(double* tc1 /* NULL */, double* tc2 /* NULL */) const
 {
 	if (stream_ == NULL) {
 		return false;
@@ -365,6 +365,9 @@ bool socket_stream::alive() const
 	else
 		return false;
 #else
+	if (tc1 || tc2) {
+		return acl_socket_alive2(ACL_VSTREAM_SOCK(stream_), tc1, tc2) != 0;
+	}
 	return acl_socket_alive(ACL_VSTREAM_SOCK(stream_)) != 0;
 #endif
 }

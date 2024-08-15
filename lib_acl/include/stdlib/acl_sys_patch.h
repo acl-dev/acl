@@ -135,6 +135,7 @@ ACL_API int acl_socket_writev(ACL_SOCKET fd, const struct iovec *vec,
  * @return {int} 返回值 1 表示正常，返回 0 表示异常
  */
 ACL_API	int acl_socket_alive(ACL_SOCKET fd);
+ACL_API	int acl_socket_alive2(ACL_SOCKET fd, double *tc1, double *tc2);
 
 /**
  * 打开文件句柄

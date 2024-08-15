@@ -543,7 +543,9 @@ int acl_socket_shutdown(ACL_SOCKET fd, int how)
 int acl_socket_alive(ACL_SOCKET fd)
 {
 	char  buf[16];
-	int   ret = acl_readable(fd);
+	int   ret;
+
+	ret = acl_readable(fd);
 
 	if (ret == -1) {
 		return 0;
@@ -552,6 +554,60 @@ int acl_socket_alive(ACL_SOCKET fd)
 		return 1;
 	}
 	ret = (int) __sys_recv(fd, buf, sizeof(buf), MSG_PEEK);
+	if (ret == 0 || (ret < 0 && acl_last_error() != ACL_EWOULDBLOCK)) {
+		return 0;
+	}
+	return 1;
+}
+
+
+static double stamp_sub(const struct timeval *from, const struct timeval *sub)
+{
+	struct timeval res;
+
+	memcpy(&res, &from, sizeof(struct timeval));
+
+	res.tv_usec -= sub->tv_usec;
+	if (res.tv_usec < 0) {
+		--res.tv_sec;
+		res.tv_usec += 1000000;
+	}
+
+	res.tv_sec -= sub->tv_sec;
+	return res.tv_sec * 1000.0 + res.tv_usec / 1000.0;
+}
+
+int acl_socket_alive2(ACL_SOCKET fd, double *tc1, double *tc2)
+{
+	char  buf[16];
+	int   ret;
+	struct timeval begin, end;
+
+	gettimeofday(&begin, NULL);
+	ret = acl_readable(fd);
+	if (tc1) {
+		gettimeofday(&end, NULL);
+		*tc1 = stamp_sub(&end, &begin);
+	}
+
+	if (ret == -1) {
+		return 0;
+	}
+	if (ret == 0) {
+		return 1;
+	}
+
+	if (tc2) {
+		gettimeofday(&begin, NULL);
+	}
+
+	ret = (int) __sys_recv(fd, buf, sizeof(buf), MSG_PEEK);
+
+	if (tc2) {
+		gettimeofday(&end, NULL);
+		*tc2 = stamp_sub(&end, &begin);
+	}
+
 	if (ret == 0 || (ret < 0 && acl_last_error() != ACL_EWOULDBLOCK)) {
 		return 0;
 	}
