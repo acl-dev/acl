@@ -384,14 +384,16 @@ connect_pool* connect_manager::get(const char* addr,
 size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
 	size_t min /* 0 */, bool kick_dead /* false */)
 {
+	std::vector<connect_pool*> pools_tmp;
 	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
 	unsigned long id = get_id();
 
-	lock_guard guard(lock_);
+	lock_.lock();
 
 	conns_pools& pools = get_pools_by_id(id);
 	pools_size = pools.pools.size();
 	if (pools_size == 0) {
+		lock_.unlock();
 		return 0;
 	}
 
@@ -404,14 +406,23 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
 
 	while (check_pos < pools_size && check_pos < check_max) {
 		connect_pool* pool = pools.pools[check_pos++ % pools_size];
-		int ret = pool->check_idle(idle_ttl_, kick_dead, true);
+		pool->refer();
+		pools_tmp.push_back(pool);
+	}
+
+	lock_.unlock();
+
+	for (std::vector<connect_pool*>::iterator it = pools_tmp.begin();
+		  it != pools_tmp.end(); ++it) {
+		int ret = (*it)->check_idle(idle_ttl_, kick_dead, true);
 		if (ret > 0) {
 			nfreed += ret;
 		}
 		if (min > 0) {
-			pool->keep_minimal(min);
+			(*it)->keep_minimal(min);
 		}
-		nleft += pool->get_count();
+		nleft += (*it)->get_count();
+		(*it)->unrefer();
 	}
 
 	if (left) {
@@ -422,14 +433,16 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
 
 size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
 {
+	std::vector<connect_pool*> pools_tmp;
 	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
 	unsigned long id = get_id();
 
-	lock_guard guard(lock_);
+	lock_.lock();
 
 	conns_pools& pools = get_pools_by_id(id);
 	pools_size = pools.pools.size();
 	if (pools_size == 0) {
+		lock_.unlock();
 		return 0;
 	}
 
@@ -442,11 +455,20 @@ size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
 
 	while (check_pos < pools_size && check_pos < check_max) {
 		connect_pool* pool = pools.pools[check_pos++ % pools_size];
-		int ret = pool->check_dead();
+		pool->refer();
+		pools_tmp.push_back(pool);
+	}
+
+	lock_.unlock();
+
+	for (std::vector<connect_pool*>::iterator it = pools_tmp.begin();
+		  it != pools_tmp.end(); ++it) {
+		int ret = (*it)->check_dead();
 		if (ret > 0) {
 			nfreed += ret;
 		}
-		nleft += pool->get_count();
+		nleft += (*it)->get_count();
+		(*it)->unrefer();
 	}
 
 	if (left) {

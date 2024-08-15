@@ -283,6 +283,24 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	lock_.unlock();
 }
 
+void connect_pool::refer()
+{
+	lock_.lock();
+	++count_;
+	lock_.unlock();
+}
+
+void connect_pool::unrefer()
+{
+	lock_.lock();
+	if (--count_ <= 0 && delay_destroy_) {
+		lock_.unlock();
+		delete this;
+	} else {
+		lock_.unlock();
+	}
+}
+
 void connect_pool::set_delay_destroy()
 {
 	lock_.lock();

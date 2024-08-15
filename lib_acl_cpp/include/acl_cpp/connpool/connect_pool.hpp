@@ -190,6 +190,9 @@ public:
 		return key_;
 	}
 
+	void refer();
+	void unrefer();
+
 protected:
 	/**
 	 * 纯虚函数，需要子类实现
