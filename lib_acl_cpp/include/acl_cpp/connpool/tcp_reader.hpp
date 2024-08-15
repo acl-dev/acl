@@ -1,8 +1,7 @@
 #pragma once
 #include "../stdlib/noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class socket_stream;
 class string;
@@ -10,11 +9,10 @@ class string;
 /**
  * tcp ipc 通信接收类，内部会自动读取完事的数据包
  */
-class ACL_CPP_API tcp_reader : public noncopyable
-{
+class ACL_CPP_API tcp_reader : public noncopyable {
 public:
 	tcp_reader(socket_stream& conn);
-	~tcp_reader(void) {}
+	~tcp_reader() {}
 
 	/**
 	 * 从对端读取数据，每次只读一个数据包
@@ -26,8 +24,7 @@ public:
 	 * 获得连接流对象
 	 * @return {acl::socket_stream&}
 	 */
-	acl::socket_stream& get_conn(void) const
-	{
+	acl::socket_stream& get_conn() const {
 		return *conn_;
 	}
 

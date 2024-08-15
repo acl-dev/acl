@@ -8,8 +8,7 @@
 #include "../stream/aio_socket_stream.hpp"                                
 #include "../stdlib/string.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class check_timer;
 class aio_socket_stream;
@@ -17,8 +16,7 @@ class aio_socket_stream;
 /**
  * 异步连接回调函数处理类
  */
-class ACL_CPP_API check_client : public aio_open_callback
-{
+class ACL_CPP_API check_client : public aio_open_callback {
 public:
 	check_client(check_timer& timer, const char* addr,
 		aio_socket_stream& conn, struct ::timeval& begin);
@@ -27,8 +25,7 @@ public:
 	 * 获得输入的非阻塞 IO 句柄
 	 * @return {aio_socket_stream&}
 	 */
-	aio_socket_stream& get_conn() const
-	{
+	aio_socket_stream& get_conn() const {
 		return conn_;
 	}
 
@@ -36,8 +33,7 @@ public:
 	 * 获得传入的服务端地址
 	 * @return {const char*}
 	 */
-	const char* get_addr() const
-	{
+	const char* get_addr() const {
 		return addr_.c_str();
 	}
 
@@ -58,8 +54,7 @@ public:
 	 * 当前检测对象是否处于阻塞模式下
 	 * @return {bool}
 	 */
-	bool blocked() const
-	{
+	bool blocked() const {
 		return blocked_;
 	}
 

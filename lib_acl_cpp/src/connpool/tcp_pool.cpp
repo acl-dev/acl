@@ -4,26 +4,24 @@
 #include "acl_cpp/connpool/tcp_pool.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 tcp_pool::tcp_pool(const char* addr, size_t count, size_t idx /* = 0 */)
 : connect_pool(addr, count, idx)
 {
 }
 
-tcp_pool::~tcp_pool(void)
+tcp_pool::~tcp_pool()
 {
 }
 
-connect_client* tcp_pool::create_connect(void)
+connect_client* tcp_pool::create_connect()
 {
 	tcp_client* conn = NEW tcp_client(addr_, conn_timeout_, rw_timeout_);
 	return conn;
 }
 
-bool tcp_pool::send(const void* data, unsigned int len,
-	string* out /* = NULL */)
+bool tcp_pool::send(const void* data, unsigned int len, string* out /* = NULL */)
 {
 	tcp_client* conn = (tcp_client*) this->peek();
 	if (conn == NULL) {

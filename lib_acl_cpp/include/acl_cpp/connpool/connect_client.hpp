@@ -38,6 +38,15 @@ public:
 	virtual bool open() = 0;
 
 	/**
+	 * 虚函数，子类可实现本方法，用来表明当前连接是否正常，以方便连接池对象在检测
+	 * 连接存活性时自动关闭断开的连接
+	 * @return {bool}
+	 */
+	virtual bool alive() {
+		return true;
+	}
+
+	/**
 	 * 获得连接池对象引用，在 connect_pool 内部创建
 	 * 连接对象会调用 set_pool 设置连接池对象句柄
 	 * @return {connect_pool*}

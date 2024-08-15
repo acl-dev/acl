@@ -11,21 +11,27 @@
 #include "check_timer.hpp"
 #include "check_rpc.hpp"
 
-namespace acl
-{
+namespace acl {
 
-connect_monitor::connect_monitor(connect_manager& manager)
+connect_monitor::connect_monitor(connect_manager& manager, bool check_server /* false */)
 : stop_(false)
 , stop_graceful_(true)
 , handle_(ENGINE_KERNEL)
 , manager_(manager)
+, check_server_(check_server)
 , check_inter_(1)
 , conn_timeout_(10)
+, check_idle_on_(false)
+, kick_dead_(false)
+, conns_min_(0)
+, check_idle_step_(128)
+, check_dead_on_(false)
+, check_dead_step_(128)
 , rpc_service_(NULL)
 {
 }
 
-connect_monitor::~connect_monitor(void)
+connect_monitor::~connect_monitor()
 {
 }
 
@@ -56,13 +62,22 @@ connect_monitor& connect_monitor::set_conn_timeout(int n)
 	return *this;
 }
 
+connect_monitor& connect_monitor::set_check_idle(bool on,
+	bool kick_dead, size_t conns_min, size_t step) {
+	check_idle_on_   = on;
+	kick_dead_       = kick_dead;
+	conns_min_       = conns_min;
+	check_idle_step_ = step;
+	return *this;
+}
+
 void connect_monitor::stop(bool graceful)
 {
 	stop_ = true;
 	stop_graceful_ = graceful;
 }
 
-void* connect_monitor::run(void)
+void* connect_monitor::run()
 {
 	// 检查服务端连接状态定时器
 	check_timer timer(*this, handle_, conn_timeout_);

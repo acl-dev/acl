@@ -5,23 +5,20 @@
 #include "acl_cpp/stdlib/string.hpp"
 #include "acl_cpp/stream/aio_timer_callback.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class connect_monitor;
 class aio_handle;
 class aio_socket_stream;
 class check_client;
 
-class check_timer : public aio_timer_callback
-{
+class check_timer : public aio_timer_callback {
 public:
 	check_timer(connect_monitor& monitor, aio_handle& handle,
 		int conn_timeout);
-	~check_timer(void) {}
+	~check_timer() {}
 
-	connect_monitor& get_monitor(void) const
-	{
+	connect_monitor& get_monitor() const {
 		return monitor_;
 	}
 
@@ -31,7 +28,7 @@ public:
 protected:
 	// »ùÀà´¿Ðéº¯Êý
 	void timer_callback(unsigned int id);
-	void destroy(void) {}
+	void destroy() {}
 
 private:
 	int id_;
