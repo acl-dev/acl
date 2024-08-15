@@ -96,9 +96,24 @@ public:
 	 * 检查连接池中空闲的连接，将过期的连接释放掉
 	 * @param ttl {time_t} 空闲时间间隔超过此值的连接将被释放
 	 * @param exclusive {bool} 内部是否需要加锁
+	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
 	 * @return {int} 被释放的空闲连接个数
 	 */
-	int check_idle(time_t ttl, bool exclusive = true);
+	int check_idle(time_t ttl, bool exclusive = true, bool kick_dead = false);
+
+	/**
+	 * 检测连接状态，并关闭断开连接
+	 * @param exclusive {bool} 内部是否需要加锁
+	 * @return {size_t} 被关闭的连接个数
+	 */
+	size_t check_dead(bool exclusive = true);
+
+	/**
+	 * 保持最小活跃连接数
+	 * @param min {size_t} 该值 > 0 表示希望连接池中最小的活跃连接数
+	 * @return {size_t} 返回实际的连接数
+	 */
+	size_t keep_minimal(size_t min);
 
 	/**
 	 * 设置连接池的存活状态

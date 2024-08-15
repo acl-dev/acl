@@ -381,12 +381,9 @@ connect_pool* connect_manager::get(const char* addr,
 
 //////////////////////////////////////////////////////////////////////////
 
-size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
+size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
+	size_t min /* 0 */, bool kick_dead /* false */)
 {
-	if (step == 0) {
-		step = 1;
-	}
-
 	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
 	unsigned long id = get_id();
 
@@ -398,12 +395,54 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* = NULL */)
 		return 0;
 	}
 
+	if (step == 0 || step > pools_size) {
+		step = pools_size;
+	}
+
 	check_pos = pools.check_next++ % pools_size;
 	check_max = check_pos + step;
 
 	while (check_pos < pools_size && check_pos < check_max) {
-		connect_pool* pool = pools.pools[check_pos++];
-		int ret = pool->check_idle(idle_ttl_);
+		connect_pool* pool = pools.pools[check_pos++ % pools_size];
+		int ret = pool->check_idle(idle_ttl_, true, kick_dead);
+		if (ret > 0) {
+			nfreed += ret;
+		}
+		if (min > 0) {
+			pool->keep_minimal(min);
+		}
+		nleft += pool->get_count();
+	}
+
+	if (left) {
+		*left = nleft;
+	}
+	return nfreed;
+}
+
+size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
+{
+	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
+	unsigned long id = get_id();
+
+	lock_guard guard(lock_);
+
+	conns_pools& pools = get_pools_by_id(id);
+	pools_size = pools.pools.size();
+	if (pools_size == 0) {
+		return 0;
+	}
+
+	if (step == 0 || step > pools_size) {
+		step = pools_size;
+	}
+
+	check_pos = pools.check_next++ % pools_size;
+	check_max = check_pos + step;
+
+	while (check_pos < pools_size && check_pos < check_max) {
+		connect_pool* pool = pools.pools[check_pos++ % pools_size];
+		int ret = pool->check_dead();
 		if (ret > 0) {
 			nfreed += ret;
 		}

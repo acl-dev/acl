@@ -13,10 +13,12 @@ public:
 
 protected:
 	// 子线程处理函数
-	virtual void rpc_run();
+	// @override
+	void rpc_run();
 
 	// 主线程处理过程，收到子线程任务完成的消息
-	virtual void rpc_onover();
+	// @override
+	void rpc_onover();
 
 private:
 	connect_monitor& monitor_;

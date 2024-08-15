@@ -18,8 +18,9 @@ public:
 	/**
 	 * 构造函数
 	 * @param manager {connect_manager&}
+	 * @param check_server {bool} 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
 	 */
-	connect_monitor(connect_manager& manager);
+	connect_monitor(connect_manager& manager, bool check_server = false);
 
 	virtual ~connect_monitor();
 
@@ -48,6 +49,58 @@ public:
 	 * @return {connect_monitor&}
 	 */
 	connect_monitor& set_conn_timeout(int n);
+
+	/**
+	 * 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
+	 * @return {bool}
+	 */
+	bool is_check_server() const {
+		return check_server_;
+	}
+
+	/**
+	 * 设置是否在连接检测器启动后自动关闭过期的空闲连接
+	 * @param on {bool} 是否自动关闭过期的空闲连接
+	 * @param kick_dead {bool} 是否检查所有连接的存活状态并关闭异常连接，当该参数
+	 *  为 true 时，connect_client 的子类必须重载 alive() 虚方法，返回连接是否存活
+	 * @param conns_min {size_t} > 0 表示尽量维持每个连接池中的最小活跃连接数
+	 * @param step {bool} 每次检测连接池个数
+	 * @return {connect_monitor&}
+	 */
+	connect_monitor& set_check_idle(bool on, bool kick_dead = false,
+		size_t conns_min = 0, size_t step = 1);
+
+	/**
+	 * 是否自动检测并关闭过期空闲连接
+	 * @return {bool}
+	 */
+	bool check_idle_on() const {
+		return check_idle_on_;
+	}
+
+	/**
+	 * 是否需要检查异常连接并关闭
+	 * @return {bool}
+	 */
+	bool is_kick_dead() const {
+		return kick_dead_;
+	}
+
+	/**
+	 * 获得每个连接池希望保持的最小连接数
+	 * @return {size_t}
+	 */
+	size_t get_conns_mininal() const {
+		return conns_min_;
+	}
+
+	/**
+	 * 当 check_idle_on() 返回 true 时，返回每次检测的连接数量限制
+	 * @return {size_t}
+	 */
+	size_t get_check_idle_step() const {
+		return check_idle_step_;
+	}
 
 	/**
 	 * 停止检测线程
@@ -139,8 +192,15 @@ private:
 	bool stop_graceful_;
 	aio_handle handle_;			// 后台检测线程的非阻塞句柄
 	connect_manager& manager_;		// 连接池集合管理对象
+	bool check_server_;			// 是否检查服务端可用性
 	int   check_inter_;			// 检测连接池状态的时间间隔(秒)
 	int   conn_timeout_;			// 连接服务器的超时时间
+	bool  check_idle_on_;			// 是否检测并关闭过期空闲连接
+	bool  kick_dead_;			// 是否删除异常连接
+	size_t conns_min_;			// 希望每个连接池的最小连接数
+	size_t check_idle_step_;		// 每次检测连接数限制
+	bool  check_dead_on_;			// 是否检测并关闭断开的连接
+	size_t check_dead_step_;		// 每次检测异常连接的数量限制
 	rpc_service* rpc_service_;		// 异步 RPC 通信服务句柄
 };
 
