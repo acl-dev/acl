@@ -38,6 +38,8 @@ static void init(const char* addrs, int count,
 	// 添加服务器集群地址
 	__conn_manager->init(addrs, addrs, 100);
 
+	__conn_manager->set_idle_ttl(5);
+
 	printf(">>>start monitor thread\r\n");
 
 	// 启动后台检测线程
@@ -46,6 +48,8 @@ static void init(const char* addrs, int count,
 	acl::connect_monitor* monitor = new mymonitor(*__conn_manager, proto);
 	monitor->set_check_inter(check_inter);
 	monitor->set_conn_timeout(conn_timeout);
+	monitor->set_check_idle(true, true, 10, 0);
+
 	if (sync_check)
 		monitor->open_rpc_service(10, NULL);
 	(void) __conn_manager->start_monitor(monitor);

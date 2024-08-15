@@ -202,10 +202,12 @@ public:
 
 	/**
 	 * 检查套接口连接的存活状态(内部使用了非阻塞读的方式进行探测)
+	 * @param tc1 {double*} 非空时记录第一阶段耗时（ms)
+	 * @param tc2 {double*} 非空时记录第二阶段耗时（ms)
 	 * @return {bool} 当网络连接未打开或已经关闭时该函数返回 false，如果
 	 *  连接正常则返回 true
 	 */
-	bool alive() const;
+	bool alive(double* tc1 = NULL, double* tc2 = NULL) const;
 
 	/**
 	 * 设置 TCP 套接字的 nodelay 功能
