@@ -404,7 +404,7 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
 
 	while (check_pos < pools_size && check_pos < check_max) {
 		connect_pool* pool = pools.pools[check_pos++ % pools_size];
-		int ret = pool->check_idle(idle_ttl_, true, kick_dead);
+		int ret = pool->check_idle(idle_ttl_, kick_dead, true);
 		if (ret > 0) {
 			nfreed += ret;
 		}

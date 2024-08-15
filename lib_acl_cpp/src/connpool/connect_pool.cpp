@@ -277,7 +277,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	}
 
 	if (check_inter_ >= 0 && now - last_check_ >= check_inter_) {
-		(void) check_idle(idle_ttl_, false);
+		(void) check_idle(idle_ttl_, false, false);
 		(void) time(&last_check_);
 	}
 	lock_.unlock();
@@ -300,8 +300,12 @@ void connect_pool::set_alive(bool yes /* true | false */)
 	lock_.unlock();
 }
 
-int connect_pool::check_idle(time_t ttl, bool exclusive /* true */,
-	bool kick_dead /* false */)
+int connect_pool::check_idle(time_t ttl, bool exclusive /* true */)
+{
+	return check_idle(ttl, false, exclusive);
+}
+
+int connect_pool::check_idle(time_t ttl, bool kick_dead, bool exclusive)
 {
 	if (ttl < 0) {
 		return 0;

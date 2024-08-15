@@ -41,7 +41,7 @@ public:
 		bool sockopt_timo = false);
 
 	/**
-	 * 设置连接池异常的重试时间间隔
+	 * 设置连接池异常的重新设为可用状态的时间间隔
 	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
 	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔
 	 *  后才允许断开重连；未调用本函数时，内部缺省值为 1 秒
@@ -50,7 +50,7 @@ public:
 	connect_pool& set_retry_inter(int retry_inter);
 
 	/**
-	 * 设置连接池中空闲连接的空闲生存周期
+	 * 设置连接池中空闲连接的空闲生存周期，只影响每次调用 put 时的空闲时间检测
 	 * @param ttl {time_t} 空闲连接生存周期，当该值 < 0 表示空闲连接不过期，
 	 *  == 0 时表示立刻过期，> 0 表示空闲该时间段后将被释放
 	 * @return {connect_pool&}
@@ -58,8 +58,9 @@ public:
 	connect_pool& set_idle_ttl(time_t ttl);
 
 	/**
-	 * 设置自动检查空闲连接的时间间隔，缺省值为 30 秒
-	 * @param n {int} 时间间隔
+	 * 设置自动检查空闲连接的时间间隔，只影响每次调用 put 连接时的检测时间间隔
+	 * @param n {int} 时间间隔，缺省值为 30 秒；如果想关掉在 put 时的空闲连接检测，
+	 *  则可以将参数设为 -1；如果设成 0 则每次都检测所有连接
 	 * @return {connect_pool&}
 	 */
 	connect_pool& set_check_inter(int n);
@@ -94,12 +95,13 @@ public:
 
 	/**
 	 * 检查连接池中空闲的连接，将过期的连接释放掉
-	 * @param ttl {time_t} 空闲时间间隔超过此值的连接将被释放
-	 * @param exclusive {bool} 内部是否需要加锁
+	 * @param ttl {time_t} 过期时间（秒）
 	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
+	 * @param exclusive {bool} 内部是否需要加锁
 	 * @return {int} 被释放的空闲连接个数
 	 */
-	int check_idle(time_t ttl, bool exclusive = true, bool kick_dead = false);
+	int check_idle(time_t ttl, bool kick_dead, bool exclusive);
+	int check_idle(time_t ttl, bool exclusive = true);
 
 	/**
 	 * 检测连接状态，并关闭断开连接
