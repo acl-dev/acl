@@ -723,13 +723,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libfiber", "lib_fiber\c\lib
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fiber", "fiber", "{D75ACD1D-AD2A-4A16-B761-6EA5202D5EA5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fiber", "lib_fiber\samples\fiber\fiber_vc2012.vcxproj", "{BFCE4280-B6E5-414A-A8CD-F827A4A19B6F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fiber", "lib_fiber\samples-c\fiber\fiber_vc2012.vcxproj", "{BFCE4280-B6E5-414A-A8CD-F827A4A19B6F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server2", "lib_fiber\samples\server2\server2_vc2012.vcxproj", "{EE518BE5-94B2-4F8E-82CC-C08503BBD6B2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server2", "lib_fiber\samples-c\server2\server2_vc2012.vcxproj", "{EE518BE5-94B2-4F8E-82CC-C08503BBD6B2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client2", "lib_fiber\samples\client2\client2_vc2012.vcxproj", "{A08F48F5-D359-4332-8743-F9D85887AEF6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client2", "lib_fiber\samples-c\client2\client2_vc2012.vcxproj", "{A08F48F5-D359-4332-8743-F9D85887AEF6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinEchod", "lib_fiber\samples\WinEchod\WinEchod.vcxproj", "{F74A61AD-A309-47A5-A7C6-BAC888660BBC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "WinEchod", "lib_fiber\samples-gui\WinEchod\WinEchod.vcxproj", "{F74A61AD-A309-47A5-A7C6-BAC888660BBC}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
 		{A456325D-93BC-4656-8F07-A75F5526DF53} = {A456325D-93BC-4656-8F07-A75F5526DF53}
