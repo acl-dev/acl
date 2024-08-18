@@ -40,7 +40,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_ssl", "lib_acl_cpp\sa
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fiber_cpp", "fiber_cpp", "{FD628E34-FBB8-4C60-8176-B770EC631CD9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_fiber", "lib_fiber\samples\master_fiber\master_fiber_vc2022.vcxproj", "{3E725148-0807-4CBA-8FC1-7FCA46F605F3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "master_fiber", "lib_fiber\samples-c++\master_fiber\master_fiber_vc2022.vcxproj", "{3E725148-0807-4CBA-8FC1-7FCA46F605F3}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F2479E2C-7267-436C-A1F1-A63B39E7CB30} = {F2479E2C-7267-436C-A1F1-A63B39E7CB30}
 		{6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC} = {6EC1F44E-6A6A-48E9-B699-D7E89B63C8DC}
@@ -102,7 +102,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "httpc", "lib_fiber\samples-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_list", "lib_acl_cpp\samples\redis\redis_list\redis_list_vc2022.vcxproj", "{1D669177-07FD-4DDD-A13E-52A7DF19CA62}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client2", "lib_fiber\samples\client2\client2_vc2022.vcxproj", "{A08F48F5-D359-4332-8743-F9D85887AEF6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client2", "lib_fiber\samples-c\client2\client2_vc2022.vcxproj", "{A08F48F5-D359-4332-8743-F9D85887AEF6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AD99B75A-40BF-46DC-844B-23417FDC8690} = {AD99B75A-40BF-46DC-844B-23417FDC8690}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
@@ -110,7 +110,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client2", "lib_fiber\sample
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "fiber", "fiber", "{57B0C6FC-DDAE-41EC-8E04-2D2D8E803D7A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server2", "lib_fiber\samples\server2\server2_vc2022.vcxproj", "{7F39A2AE-FE11-4C92-A174-269BE486DE4D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server2", "lib_fiber\samples-c\server2\server2_vc2022.vcxproj", "{7F39A2AE-FE11-4C92-A174-269BE486DE4D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{AD99B75A-40BF-46DC-844B-23417FDC8690} = {AD99B75A-40BF-46DC-844B-23417FDC8690}
 		{B40213C2-507C-4C7F-A6E1-B850C9BDC27B} = {B40213C2-507C-4C7F-A6E1-B850C9BDC27B}
@@ -126,7 +126,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_client", "lib_acl\sampl
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aio_client2", "lib_acl\samples\aio\client2\aio_client2_vc2022.vcxproj", "{4A56E6AE-448C-4D98-AB7F-3C077ECABE24}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fiber_tbox", "lib_fiber\samples\fiber_tbox\fiber_tbox_vc2022.vcxproj", "{92668907-1B34-4B74-98A2-5849FDE67B34}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fiber_tbox", "lib_fiber\samples-c++\fiber_tbox\fiber_tbox_vc2022.vcxproj", "{92668907-1B34-4B74-98A2-5849FDE67B34}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "https_request", "lib_acl_cpp\samples\ssl\https_request\https_request_vc2022.vcxproj", "{4D42F462-A2FE-4B4A-A680-93668FA128A6}"
 EndProject
