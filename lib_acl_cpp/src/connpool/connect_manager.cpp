@@ -463,7 +463,7 @@ size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
 
 	for (std::vector<connect_pool*>::iterator it = pools_tmp.begin();
 		  it != pools_tmp.end(); ++it) {
-		int ret = (*it)->check_dead();
+		size_t ret = (*it)->check_dead();
 		if (ret > 0) {
 			nfreed += ret;
 		}
