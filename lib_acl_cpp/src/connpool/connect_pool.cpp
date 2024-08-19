@@ -324,13 +324,23 @@ void connect_pool::set_alive(bool yes /* true | false */)
 	lock_.unlock();
 }
 
-size_t connect_pool::check_idle(bool kick_dead, bool exclusive)
+size_t connect_pool::check_idle(time_t ttl, bool exclusive /* true */)
+{
+	return check_idle(ttl, false, exclusive);
+}
+
+size_t connect_pool::check_idle(bool kick_dead, bool exclusive /* true */)
+{
+	return check_idle(idle_ttl_, kick_dead, exclusive);
+}
+
+size_t connect_pool::check_idle(time_t ttl, bool kick_dead, bool exclusive)
 {
 	if (exclusive) {
 		lock_.lock();
 	}
 
-	if (pool_.empty()) {
+	if (pool_.empty() && min_ == 0) {
 		if (exclusive) {
 			lock_.unlock();
 		}
@@ -339,7 +349,7 @@ size_t connect_pool::check_idle(bool kick_dead, bool exclusive)
 
 	size_t n = 0;
 
-	if (idle_ttl_ == 0) {
+	if (ttl == 0) {
 		std::list<connect_client*>::iterator it = pool_.begin();
 		for (; it != pool_.end(); ++it) {
 			delete *it;
@@ -355,20 +365,22 @@ size_t connect_pool::check_idle(bool kick_dead, bool exclusive)
 		return n;
 	}
 
-	if (idle_ttl_ > 0) {
-		n += kick_idle_conns(idle_ttl_);
+	if (ttl > 0) {
+		n += kick_idle_conns(ttl);
 	}
 
-	if (kick_dead) {
-		n += check_dead(false);
-	}
-
-	if (min_ > 0) {
-		keep_conns(min_);
-	}
+	size_t count = count_;
 
 	if (exclusive) {
 		lock_.unlock();
+	}
+
+	if (kick_dead) {
+		n += check_dead(count);
+	}
+
+	if (min_ > 0) {
+		keep_conns();
 	}
 
 	return n;
@@ -414,62 +426,85 @@ size_t connect_pool::kick_idle_conns(time_t ttl)
 	return n;
 }
 
-size_t connect_pool::check_dead(bool exclusive /* true */)
+size_t connect_pool::check_dead(size_t count /* 0 */)
 {
-	if (exclusive) {
+	if (count == 0) {
 		lock_.lock();
+		count = count_;
+		lock_.unlock();
 	}
 
 	size_t n = 0;
-	std::list<connect_client*>::iterator it;
+	for (size_t i = 0; i < count; i++) {
+		connect_client* conn = peek_back();
+		if (conn == NULL) {
+			break;
+		}
 
-	// Check all the dead connections and close them.
-	for (it = pool_.begin(); it != pool_.end();) {
-		if ((*it)->alive()) {
-			++it;
+		if (conn->alive()) {
+			put(conn);
 			continue;
 		}
 
-		if ((*it)->get_pool() == this) {
-			count_--;
+		if (conn->get_pool() == this) {
+			lock_.lock();
+			--count_;
+			lock_.unlock();
 		}
-
-		delete *it;
-		it = pool_.erase(it);
+		delete conn;
 		n++;
 	}
 
-	if (exclusive) {
-		lock_.unlock();
-	}
 	return n;
 }
 
-size_t connect_pool::keep_conns(size_t min)
+connect_client* connect_pool::peek_back()
 {
-	if (min > 0 && min > count_) {
-		min -= count_;
+	lock_.lock();
+	std::list<connect_client*>::reverse_iterator rit = pool_.rbegin();
+	if (rit == pool_.rend()) {
+		lock_.unlock();
+		return NULL;
+	}
+
+	std::list<connect_client*>::iterator it = --rit.base();
+	connect_client* conn = *it;
+	pool_.erase(it);
+	lock_.unlock();
+	return conn;
+}
+
+void connect_pool::keep_conns()
+{
+	lock_.lock();
+	size_t min;
+	if (min_ > 0 && min_ > count_) {
+		min = min_ - count_;
 	} else {
 		min = 0;
 	}
+	lock_.unlock();
 
 	for (size_t i = 0; i < min; i++) {
 		connect_client* conn = create_connect();
 		if (conn == NULL) {
+			logger_error("Create connection error");
 			break;
 		}
+
 		if (!conn->open()) {
-			logger_error("Open connection error, conn=%p", conn);
+			logger_error("Open error: %s", last_serror());
 			delete conn;
 			break;
 		}
 
+		lock_.lock();
 		count_++;
+		lock_.unlock();
 
 		conn->set_pool(this);
 		put(conn, true);
 	}
-	return count_;
 }
 
 } // namespace acl

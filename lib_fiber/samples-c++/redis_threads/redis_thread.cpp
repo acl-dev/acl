@@ -172,6 +172,7 @@ redis_thread::redis_thread(int tid, const char* addr, const char* passwd,
 , oper_count_(oper_count)
 , cmd_(cmd)
 {
+	(void) stack_size_;
 	printf("addr: %s\r\n", addr_.c_str());
 	cluster_internal_ = new acl::redis_client_cluster;
 	cluster_ = cluster_internal_;
@@ -191,6 +192,7 @@ redis_thread::redis_thread(int tid, acl::redis_client_cluster& cluster,
 , cluster_(&cluster)
 , cluster_internal_(NULL)
 {
+	(void) stack_size_;
 }
 
 redis_thread::~redis_thread(void)

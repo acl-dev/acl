@@ -63,7 +63,6 @@ public:
 	 * @param on {bool} 是否自动关闭过期的空闲连接
 	 * @param kick_dead {bool} 是否检查所有连接的存活状态并关闭异常连接，当该参数
 	 *  为 true 时，connect_client 的子类必须重载 alive() 虚方法，返回连接是否存活
-	 * @param conns_min {size_t} > 0 表示尽量维持每个连接池中的最小活跃连接数
 	 * @param step {bool} 每次检测连接池个数
 	 * @return {connect_monitor&}
 	 */

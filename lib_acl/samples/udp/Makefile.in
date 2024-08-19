@@ -43,7 +43,7 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -pedantic
+	CFLAGS += -DFREEBSD
 	SYSLIB += -lcrypt
 endif
 
@@ -57,8 +57,6 @@ endif
 
 #Path for Linux
 ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
-#	CFLAGS += -DLINUX2 -pedantic
-	CFLAGS += -pedantic
 	SYSLIB += -lcrypt
 endif
 
@@ -84,7 +82,7 @@ ifeq ($(findstring SunOS, $(UNIXNAME)), SunOS)
 	ifeq ($(findstring sun4u, $(UNIXNAME)), sun4u)
 		SYSLIB += -lsocket -lnsl -lrt
 	endif
-	CFLAGS += -DSUNOS5 -pedantic
+	CFLAGS += -DSUNOS5
 	SYSLIB += -lcrypt
 endif
 

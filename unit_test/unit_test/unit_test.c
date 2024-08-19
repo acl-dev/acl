@@ -3,7 +3,7 @@
 #include "unit_test.h"
 #include "unit_test_tab.h"
 
-void test_unit_register()
+void test_unit_register(void)
 {
 	aut_register(__test_fn_tab);
 }

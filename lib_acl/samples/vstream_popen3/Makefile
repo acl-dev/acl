@@ -10,7 +10,7 @@ CFLAGS = -c -g -W -Wcast-qual -Wcast-align \
 -Wpointer-arith -Werror -Wshadow -O2 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO \
 -Wno-long-long \
--pedantic -Wall 
+-Wall 
 ###########################################################
 #Check system:
 #       Linux, SunOS, Solaris, BSD variants, AIX, HP-UX
@@ -24,14 +24,14 @@ endif
 
 # For FreeBSD
 ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
-	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	CFLAGS += -DFREEBSD -D_REENTRANT
 	SYSLIB = -lcrypt -lpthread
 endif
 
 # For Darwin
 ifeq ($(findstring Darwin, $(UNIXNAME)), Darwin)
 #	CC += -arch x86_64 -arch arm64
-	CFLAGS += -D_REENTRANT -pedantic -DMACOSX
+	CFLAGS += -D_REENTRANT -DMACOSX
 	SYSLIB = -lpthread
 endif
 

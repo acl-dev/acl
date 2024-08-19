@@ -9,7 +9,7 @@ CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Waggregate-return \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO \
 -Wno-long-long \
--Wpointer-arith -Werror -Wshadow -pedantic -O2
+-Wpointer-arith -Werror -Wshadow -O2
 
 ###########################################################
 #Check system:

@@ -247,8 +247,8 @@ const char* MD5String(const char *s, const char *k, size_t k_len, char* buf, siz
 	MD5Final(digest, &context);
 
 	for (i = 0; i < 16; i++) {
-		sprintf(&(output1[2 * i]), "%02x", (unsigned char) digest[i]);
-		sprintf(&(output1[2 * i + 1]), "%02x", (unsigned char) (digest[i] << 4));
+		snprintf(&(output1[2 * i]), 1, "%02x", (unsigned char) digest[i]);
+		snprintf(&(output1[2 * i + 1]), 1, "%02x", (unsigned char) (digest[i] << 4));
 	}
 
 	ptr = buf;
@@ -279,8 +279,8 @@ const char* MD5Key2String(const unsigned char *s, size_t s_len, char* buf, size_
 	memcpy(digest, s, 16);
 
 	for (i = 0; i < 16; i++) {
-		sprintf(&(output1[2 * i]), "%02x", (unsigned char) digest[i]);
-		sprintf(&(output1[2 * i + 1]), "%02x", (unsigned char) (digest[i] << 4));
+		snprintf(&(output1[2 * i]), 1, "%02x", (unsigned char) digest[i]);
+		snprintf(&(output1[2 * i + 1]), 1, "%02x", (unsigned char) (digest[i] << 4));
 	}
 
 	ptr = buf;
