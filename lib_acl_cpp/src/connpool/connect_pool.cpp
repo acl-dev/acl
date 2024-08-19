@@ -446,7 +446,7 @@ size_t connect_pool::check_dead(size_t count /* 0 */)
 		}
 
 		if (conn->alive()) {
-			put(conn);
+			put_front(conn);
 			continue;
 		}
 
@@ -476,6 +476,41 @@ connect_client* connect_pool::peek_back()
 	pool_.erase(it);
 	lock_.unlock();
 	return conn;
+}
+
+
+void connect_pool::put_front(connect_client* conn)
+{
+	time_t now = time(NULL);
+
+	lock_.lock();
+
+	// 检查是否设置了自销毁标志位
+	if (delay_destroy_) {
+		if (conn->get_pool() == this) {
+			count_--;
+		}
+		delete conn;
+
+		if (count_ <= 0) {
+			// 如果引用计数为 0 则自销毁
+			lock_.unlock();
+			delete this;
+		} else {
+			lock_.unlock();
+		}
+		return;
+	}
+
+	alive_ = true;  // 该连接充当服务检测成功功能，所以可在此处设置服务可用
+
+	conn->set_when(now);
+
+	// 将归还的连接放在链表首部，这样在调用释放过期连接
+	// 时比较方便，有利于尽快将不忙的数据库连接关闭
+	pool_.push_front(conn);
+
+	lock_.unlock();
 }
 
 void connect_pool::keep_conns()
