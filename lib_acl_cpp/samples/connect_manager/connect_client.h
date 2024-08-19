@@ -1,4 +1,6 @@
 #pragma once
+#include <stdlib.h>
+#include <stdio.h>
 
 class connect_client : public acl::connect_client
 {
@@ -9,13 +11,18 @@ public:
 
 	bool alive()
 	{
-		printf(">>>alive called<<<\r\n");
-		return true;
+		if (conn_.alive()) {
+			printf(">>>alive called: true<<<\r\n");
+			return true;
+		}
+
+		printf(">>>alive called: false<<<\r\n");
+		return false;
 	}
 
 	const char* get_addr() const
 	{
-		return addr_;
+		return addr_.c_str();
 	}
 
 	void reset() {}
@@ -24,7 +31,8 @@ protected:
 	virtual bool open();
 
 private:
-	const char* addr_;
+	acl::string addr_;
+	acl::socket_stream conn_;
 	int   conn_timeout_;
 	int   rw_timeout_;
 };

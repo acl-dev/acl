@@ -3,7 +3,7 @@
 class mymonitor : public acl::connect_monitor
 {
 public:
-	mymonitor(acl::connect_manager& manager, const acl::string& proto);
+	mymonitor(acl::connect_manager& manager, const acl::string& proto, bool check_server);
 	~mymonitor(void);
 
 protected:
