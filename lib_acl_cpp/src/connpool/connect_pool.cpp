@@ -283,10 +283,12 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 	}
 
 	if (check_inter_ >= 0 && now - last_check_ >= check_inter_) {
-		(void) check_idle(false, false);
-		(void) time(&last_check_);
+		lock_.unlock();
+
+		(void) check_idle(false, true);
+	} else {
+		lock_.unlock();
 	}
-	lock_.unlock();
 }
 
 void connect_pool::refer()
@@ -339,6 +341,8 @@ size_t connect_pool::check_idle(time_t ttl, bool kick_dead, bool exclusive)
 	if (exclusive) {
 		lock_.lock();
 	}
+
+	(void) time(&last_check_);
 
 	if (pool_.empty() && min_ == 0) {
 		if (exclusive) {
