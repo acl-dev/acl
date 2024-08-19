@@ -3,8 +3,9 @@
 #include "check_async.h"
 #include "mymonitor.h"
 
-mymonitor::mymonitor(acl::connect_manager& manager, const acl::string& proto)
-: connect_monitor(manager)
+mymonitor::mymonitor(acl::connect_manager& manager, const acl::string& proto,
+	bool check_server)
+: connect_monitor(manager, check_server)
 , proto_(proto)
 {
 }

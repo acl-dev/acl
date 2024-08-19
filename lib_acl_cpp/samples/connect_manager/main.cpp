@@ -10,8 +10,7 @@ static acl_pthread_pool_t* __thr_pool = NULL;
 
 static void sleep_while(int n)
 {
-	for (int i = 0; i < n; i++)
-	{
+	for (int i = 0; i < n; i++) {
 		putchar('.');
 		fflush(stdout);
 		sleep(1);
@@ -29,34 +28,32 @@ static void check_all_connections(void)
 }
 
 // 初始化过程
-static void init(const char* addrs, int count,
-	bool sync_check, const acl::string& proto)
+static void init(const char* addrs, int count, int check_type, const char* proto)
 {
 	// 创建 HTTP 请求连接池集群管理对象
-	__conn_manager = new connect_manager();
+	__conn_manager = new connect_manager((size_t) count);
 
 	// 添加服务器集群地址
 	__conn_manager->init(addrs, addrs, 100);
 
-	__conn_manager->set_idle_ttl(5);
+	__conn_manager->set_idle_ttl(1);
 
 	printf(">>>start monitor thread\r\n");
 
 	// 启动后台检测线程
 	int  check_inter = 1, conn_timeout = 5;
 
-	acl::connect_monitor* monitor = new mymonitor(*__conn_manager, proto);
+	acl::connect_monitor* monitor = new mymonitor(*__conn_manager, proto,
+		check_type != 0);
 	monitor->set_check_inter(check_inter);
 	monitor->set_conn_timeout(conn_timeout);
-	monitor->set_check_idle(true, true, 10, 0);
+	monitor->set_check_idle(true, true);
 
-	if (sync_check)
+	if (check_type == 2) {
 		monitor->open_rpc_service(10, NULL);
-	(void) __conn_manager->start_monitor(monitor);
+	}
 
-	int   n = 10;
-	printf(">>>sleep %d seconds for monitor check\r\n", n);
-	sleep_while(n);
+	(void) __conn_manager->start_monitor(monitor);
 
 	printf(">>>create thread pool\r\n");
 	// 创建线程池
@@ -106,11 +103,9 @@ static bool get(connect_client* conn, int n)
 // 子线程处理过程
 static void thread_main(void*)
 {
-	for (int i = 0; i < __loop_count; i++)
-	{
+	for (int i = 0; i < __loop_count; i++) {
 		connect_pool* pool = (connect_pool*) __conn_manager->peek();
-		if (pool == NULL)
-		{
+		if (pool == NULL) {
 			printf("\r\n>>>%lu(%d): peek pool failed<<<\r\n",
 				(unsigned long) acl_pthread_self(), __LINE__);
 			check_all_connections();
@@ -122,8 +117,7 @@ static void thread_main(void*)
 
 		// 从连接池中获取一个连接
 		connect_client* conn = (connect_client*) pool->peek();
-		if (conn == NULL)
-		{
+		if (conn == NULL) {
 			printf("\r\n>>>%lu: peek connect failed from %s<<<\r\n",
 				(unsigned long) acl_pthread_self(),
 				pool->get_addr());
@@ -132,28 +126,32 @@ static void thread_main(void*)
 		}
 
 		// 需要对获得的连接重置状态，以清除上次请求过程的临时数据
-		else
+		else {
 			conn->reset();
+		}
 
 		// 开始新的 HTTP 请求过程
-		if (get(conn, i) == false)
-		{
+		if (get(conn, i) == false) {
 			printf("one request failed, close connection\r\n");
 			// 错误连接需要关闭
 			pool->put(conn, false);
-		}
-		else
+		} else {
 			pool->put(conn, true);
+		}
 	}
 
 	printf(">>>>thread: %lu OVER<<<<\r\n", (unsigned long) acl_pthread_self());
 }
 
-static void run(int cocurrent)
+static void run(int cocurrent, int delay)
 {
 	// 向线程池中添加任务
-	for (int i = 0; i < cocurrent; i++)
+	for (int i = 0; i < cocurrent; i++) {
 		acl_pthread_pool_add(__thr_pool, thread_main, NULL);
+	}
+
+	printf(">>>sleep %d seconds for monitor check\r\n", delay);
+	sleep_while(delay);
 }
 
 static void usage(const char* procname)
@@ -161,15 +159,16 @@ static void usage(const char* procname)
 	printf("usage: %s -h [help]\r\n"
 		"	-s server_addrs [www.sina.com.cn:80;www.263.net:80;www.qq.com:80]\r\n"
 		"	-c cocurrent [default: 10]\r\n"
-		"	-S [sync check io]\r\n"
-		"	-P protocol [http|pop3]\r\n"
+		"	-t check_type [0: no check; 1: sync check; 2: async check]\r\n"
+		"	-p protocol [http|pop3]\r\n"
+		"	-d delay_seconds\r\n"
 		"	-n loop_count[default: 10]\r\n", procname);
 }
 
 int main(int argc, char* argv[])
 {
 	int   ch, cocurrent = 10;
-	bool  sync_check = false;
+	int   check_type = 0, delay = 2;
 	acl::string addrs("www.sina.com.cn:80;www.263.net:80;www.qq.com:81");
 	acl::string proto("pop3");
 
@@ -179,10 +178,8 @@ int main(int argc, char* argv[])
 	// 日志输出至标准输出
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:c:SP:")) > 0)
-	{
-		switch (ch)
-		{
+	while ((ch = getopt(argc, argv, "hs:n:c:t:p:d:")) > 0) {
+		switch (ch) {
 		case 'h':
 			usage(argv[0]);
 			return 0;
@@ -195,11 +192,14 @@ int main(int argc, char* argv[])
 		case 'n':
 			__loop_count = atoi(optarg);
 			break;
-		case 'S':
-			sync_check = true;
+		case 't':
+			check_type = atoi(optarg);
 			break;
-		case 'P':
+		case 'p':
 			proto = optarg;
+			break;
+		case 'd':
+			delay = atoi(optarg);
 			break;
 		default:
 			usage(argv[0]);
@@ -207,8 +207,8 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	init(addrs, cocurrent, sync_check, proto);
-	run(cocurrent);
+	init(addrs, cocurrent, check_type, proto);
+	run(cocurrent, delay);
 	end();
 
 #ifdef WIN32

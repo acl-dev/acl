@@ -24,5 +24,6 @@ void connect_pool::set_timeout(int conn_timeout, int rw_timeout)
 
 acl::connect_client* connect_pool::create_connect()
 {
+	printf(">>>%s: create client for addr=%s\r\n", __FUNCTION__, addr_.c_str());
 	return new connect_client(addr_.c_str(), conn_timeout_, conn_timeout_);
 }

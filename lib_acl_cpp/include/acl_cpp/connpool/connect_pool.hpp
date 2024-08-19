@@ -255,6 +255,7 @@ protected:
 
 	size_t kick_idle_conns(time_t ttl);	// 关闭过期的连接
 	connect_client* peek_back();		// 从尾部 Peek 连接
+	void put_front(connect_client* conn);	// 向头部 Put 连接
 };
 
 class ACL_CPP_API connect_guard : public noncopyable {
