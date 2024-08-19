@@ -7,7 +7,7 @@ RANLIB  = ranlib
 
 CFLAGS = -c -g -W -Wall -Wcast-qual -Wcast-align \
 -Waggregate-return -Wmissing-prototypes \
--Wpointer-arith -Werror -Wshadow -pedantic -O2 \
+-Wpointer-arith -Werror -Wshadow -O2 \
 -D_REENTRANT -D_POSIX_PTHREAD_SEMANTICS -D_USE_FAST_MACRO \
 -Wno-long-long
 ###########################################################
@@ -22,7 +22,7 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	CFLAGS += -DFREEBSD -D_REENTRANT
 endif
 
 #Path for Linux

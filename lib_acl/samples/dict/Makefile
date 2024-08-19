@@ -28,7 +28,7 @@ ifeq ($(findstring FreeBSD, $(UNIXNAME)), FreeBSD)
 	ifeq ($(findstring gcc, $(CC)), gcc)
 		CFLAGS += -Wstrict-prototypes
 	endif
-	CFLAGS += -DFREEBSD -D_REENTRANT -pedantic
+	CFLAGS += -DFREEBSD -D_REENTRANT
 	SYSLIB = -lpthread
 	RPATH = freebsd
 endif
