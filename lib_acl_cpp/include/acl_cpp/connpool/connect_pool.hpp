@@ -41,6 +41,13 @@ public:
 		bool sockopt_timo = false);
 
 	/**
+	 * 设置连接池最小连接数，在check_idle/check_dead后可以用来保持最小连接数
+	 * @param min {size_t} > 0 时将自动尽量保持最小连接数
+	 * @return {connect_pool&}
+	 */
+	connect_pool& set_conns_min(size_t min);
+
+	/**
 	 * 设置连接池异常的重新设为可用状态的时间间隔
 	 * @param retry_inter {int} 当连接断开后，重新再次打开连接的时间间隔(秒)，
 	 *  当该值 <= 0 时表示允许连接断开后可以立即重连，否则必须超过该时间间隔
@@ -50,7 +57,7 @@ public:
 	connect_pool& set_retry_inter(int retry_inter);
 
 	/**
-	 * 设置连接池中空闲连接的空闲生存周期，只影响每次调用 put 时的空闲时间检测
+	 * 设置连接池中空闲连接的空闲生存周期
 	 * @param ttl {time_t} 空闲连接生存周期，当该值 < 0 表示空闲连接不过期，
 	 *  == 0 时表示立刻过期，> 0 表示空闲该时间段后将被释放
 	 * @return {connect_pool&}
@@ -95,13 +102,11 @@ public:
 
 	/**
 	 * 检查连接池中空闲的连接，将过期的连接释放掉
-	 * @param ttl {time_t} 过期时间（秒）
 	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
 	 * @param exclusive {bool} 内部是否需要加锁
-	 * @return {int} 被释放的空闲连接个数
+	 * @return {size_t} 被释放的空闲连接个数
 	 */
-	int check_idle(time_t ttl, bool kick_dead, bool exclusive);
-	int check_idle(time_t ttl, bool exclusive = true);
+	size_t check_idle(bool kick_dead, bool exclusive);
 
 	/**
 	 * 检测连接状态，并关闭断开连接
@@ -109,13 +114,6 @@ public:
 	 * @return {size_t} 被关闭的连接个数
 	 */
 	size_t check_dead(bool exclusive = true);
-
-	/**
-	 * 保持最小活跃连接数
-	 * @param min {size_t} 该值 > 0 表示希望连接池中最小的活跃连接数
-	 * @return {size_t} 返回实际的连接数
-	 */
-	size_t keep_minimal(size_t min);
 
 	/**
 	 * 设置连接池的存活状态
@@ -221,6 +219,7 @@ protected:
 	bool  sockopt_timo_;			// 是否使用s setsockopt 设置超时
 	size_t idx_;				// 该连接池对象在集合中的下标位置
 	size_t max_;				// 最大连接数
+	size_t min_;				// 最小连接数
 	size_t count_;				// 当前的连接数
 	time_t idle_ttl_;			// 空闲连接的生命周期
 	time_t last_check_;			// 上次检查空闲连接的时间截
@@ -231,6 +230,15 @@ protected:
 	unsigned long long current_used_;	// 某时间段内的访问量
 	time_t last_;				// 上次记录的时间截
 	std::list<connect_client*> pool_;	// 连接池集合
+
+	size_t kick_idle_conns(time_t ttl);	// 关闭过期的连接
+
+	/**
+	 * 保持最小活跃连接数
+	 * @param min {size_t} 该值 > 0 表示希望连接池中最小的活跃连接数
+	 * @return {size_t} 返回实际的连接数
+	 */
+	size_t keep_conns(size_t min);
 };
 
 class ACL_CPP_API connect_guard : public noncopyable {

@@ -36,10 +36,10 @@ void check_timer::timer_callback(unsigned int id)
 	// 自动检测并关闭过期空闲长连接
 	if (monitor_.check_idle_on()) {
 		manager.check_idle(monitor_.get_check_idle_step(), NULL,
-			monitor_.get_conns_mininal(), monitor_.is_kick_dead());
+			 monitor_.kick_dead_on());
 	}
 
-	if (!monitor_.is_check_server()) {
+	if (!monitor_.check_server_on()) {
 		return;
 	}
 

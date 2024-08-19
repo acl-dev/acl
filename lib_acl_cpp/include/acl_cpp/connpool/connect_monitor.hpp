@@ -54,7 +54,7 @@ public:
 	 * 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
 	 * @return {bool}
 	 */
-	bool is_check_server() const {
+	bool check_server_on() const {
 		return check_server_;
 	}
 
@@ -68,7 +68,7 @@ public:
 	 * @return {connect_monitor&}
 	 */
 	connect_monitor& set_check_idle(bool on, bool kick_dead = false,
-		size_t conns_min = 0, size_t step = 1);
+		size_t step = 1);
 
 	/**
 	 * 是否自动检测并关闭过期空闲连接
@@ -82,16 +82,8 @@ public:
 	 * 是否需要检查异常连接并关闭
 	 * @return {bool}
 	 */
-	bool is_kick_dead() const {
+	bool kick_dead_on() const {
 		return kick_dead_;
-	}
-
-	/**
-	 * 获得每个连接池希望保持的最小连接数
-	 * @return {size_t}
-	 */
-	size_t get_conns_mininal() const {
-		return conns_min_;
 	}
 
 	/**
@@ -197,7 +189,6 @@ private:
 	int   conn_timeout_;			// 连接服务器的超时时间
 	bool  check_idle_on_;			// 是否检测并关闭过期空闲连接
 	bool  kick_dead_;			// 是否删除异常连接
-	size_t conns_min_;			// 希望每个连接池的最小连接数
 	size_t check_idle_step_;		// 每次检测连接数限制
 	bool  check_dead_on_;			// 是否检测并关闭断开的连接
 	size_t check_dead_step_;		// 每次检测异常连接的数量限制

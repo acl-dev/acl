@@ -172,8 +172,8 @@ size_t connect_manager::size() const
 	return n;
 }
 
-void connect_manager::set(const char* addr, size_t count, int conn_timeout /* 30 */,
-	int rw_timeout /* 30 */, bool sockopt_timeo /* false */)
+void connect_manager::set(const char* addr, size_t max, int conn_timeout /* 30 */,
+	int rw_timeout /* 30 */, bool sockopt_timeo /* false */, size_t min /* 0 */)
 {
 	string buf(addr);
 	buf.lower();
@@ -182,14 +182,16 @@ void connect_manager::set(const char* addr, size_t count, int conn_timeout /* 30
 	std::map<string, conn_config>::iterator it = addrs_.find(buf);
 	if (it == addrs_.end()) {
 		conn_config config;
-		config.addr          = addr;
-		config.count         = count;
-		config.conn_timeout  = conn_timeout;
-		config.rw_timeout    = rw_timeout;
-		config.sockopt_timeo = sockopt_timeo;
-		addrs_[buf]          = config;
+		config.addr               = addr;
+		config.max                = max;
+		config.min                = min;
+		config.conn_timeout       = conn_timeout;
+		config.rw_timeout         = rw_timeout;
+		config.sockopt_timeo      = sockopt_timeo;
+		addrs_[buf]               = config;
 	} else {
-		it->second.count          = count;
+		it->second.max            = max;
+		it->second.min            = min;
 		it->second.conn_timeout   = conn_timeout;
 		it->second.rw_timeout     = rw_timeout;
 		it->second.sockopt_timeo  = sockopt_timeo;
@@ -313,10 +315,13 @@ connect_pool* connect_manager::create_pool(const conn_config& cf, size_t idx)
 	string key;
 	get_key(cf.addr, key);
 
-	connect_pool* pool = create_pool(cf.addr, cf.count, idx);
+	connect_pool* pool = create_pool(cf.addr, cf.max, idx);
 	pool->set_key(key);
 	pool->set_retry_inter(retry_inter_);
 	pool->set_timeout(cf.conn_timeout, cf.rw_timeout, cf.sockopt_timeo);
+	if (cf.min > 0) {
+		pool->set_conns_min(cf.min);
+	}
 	if (idle_ttl_ >= 0) {
 		pool->set_idle_ttl(idle_ttl_);
 	}
@@ -326,7 +331,7 @@ connect_pool* connect_manager::create_pool(const conn_config& cf, size_t idx)
 
 	logger_debug(ACL_CPP_DEBUG_CONN_MANAGER, 1,
 		"Add one service, addr: %s, count: %d",
-		cf.addr.c_str(), (int) cf.count);
+		cf.addr.c_str(), (int) cf.max);
 	return pool;
 }
 
@@ -382,7 +387,7 @@ connect_pool* connect_manager::get(const char* addr,
 //////////////////////////////////////////////////////////////////////////
 
 size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
-	size_t min /* 0 */, bool kick_dead /* false */)
+	bool kick_dead /* false */)
 {
 	std::vector<connect_pool*> pools_tmp;
 	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
@@ -406,7 +411,7 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
 
 	while (check_pos < pools_size && check_pos < check_max) {
 		connect_pool* pool = pools.pools[check_pos++ % pools_size];
-		pool->refer();
+		pool->refer(); // Increase reference to avoid freed.
 		pools_tmp.push_back(pool);
 	}
 
@@ -414,15 +419,13 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */,
 
 	for (std::vector<connect_pool*>::iterator it = pools_tmp.begin();
 		  it != pools_tmp.end(); ++it) {
-		int ret = (*it)->check_idle(idle_ttl_, kick_dead, true);
+		size_t ret = (*it)->check_idle(kick_dead, true);
 		if (ret > 0) {
 			nfreed += ret;
 		}
-		if (min > 0) {
-			(*it)->keep_minimal(min);
-		}
+
 		nleft += (*it)->get_count();
-		(*it)->unrefer();
+		(*it)->unrefer(); // Decrease reference added before.
 	}
 
 	if (left) {
@@ -463,7 +466,7 @@ size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
 
 	for (std::vector<connect_pool*>::iterator it = pools_tmp.begin();
 		  it != pools_tmp.end(); ++it) {
-		int ret = (*it)->check_dead();
+		size_t ret = (*it)->check_dead();
 		if (ret > 0) {
 			nfreed += ret;
 		}
