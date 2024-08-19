@@ -26,13 +26,15 @@ struct conns_pools {
 
 struct conn_config {
 	string addr;
-	size_t count;
+	size_t max;				// 最大连接数
+	size_t min;				// 最小连接数
 	int    conn_timeout;
 	int    rw_timeout;
 	bool   sockopt_timeo;
 
 	conn_config() {
-		count         = 0;
+		max           = 0;
+		min           = 0;
 		conn_timeout  = 5;
 		rw_timeout    = 5;
 		sockopt_timeo = false;
@@ -77,14 +79,15 @@ public:
 	* 添加服务器的客户端连接池，该函数可以在程序运行时被调用，内部自动加锁
 	 * @param addr {const char*} 服务器地址，格式：ip:port
 	 *  注意：调用本函数时每次仅能添加一个服务器地址，可以循环调用本方法
-	 * @param count {size_t} 连接池数量限制, 如果该值设为 0，则不设置
+	 * @param max {size_t} 连接池数量限制, 如果该值设为 0，则不设置
 	 *  连接池的连接上限
 	 * @param conn_timeout {int} 网络连接时间(秒)
 	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
 	 * @param sockopt_timeo {bool} 是否使用 setsockopt 设置网络读写超时
+	 * @param min {size_t} 设置连接池的最小连接数
 	 */
-	void set(const char* addr, size_t count, int conn_timeout = 30,
-		int rw_timeout = 30, bool sockopt_timeo = false);
+	void set(const char* addr, size_t max, int conn_timeout = 30,
+		int rw_timeout = 30, bool sockopt_timeo = false, size_t = 0);
 
 	/**
 	 * 根据指定地址获取该地址对应的连接池配置对象
@@ -175,12 +178,10 @@ public:
 	 * 检测连接池中的空闲连接，将过期的连接释放掉
 	 * @param step {size_t} 每次检测连接池的个数
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
-	 * @param min {size_t} 希望每个连接池保持的最小连接数
 	 * @param kick_dead {book} 是否需要自动删除连接池中的异常连接
 	 * @return {size_t} 被释放的空闲连接数
 	 */
-	size_t check_idle(size_t step, size_t* left = NULL,
-		size_t min = 0, bool kick_dead = false);
+	size_t check_idle(size_t step, size_t* left = NULL, bool kick_dead = false);
 
 	/**
 	 * 检测连接池中的异常连接并关闭
