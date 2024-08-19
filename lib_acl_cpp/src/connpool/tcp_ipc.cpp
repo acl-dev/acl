@@ -10,7 +10,7 @@
 
 namespace acl {
 
-tcp_ipc::tcp_ipc(void)
+tcp_ipc::tcp_ipc()
 : max_(0)
 , ttl_(60)
 , conn_timeout_(10)

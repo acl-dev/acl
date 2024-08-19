@@ -101,19 +101,41 @@ public:
 	void put(connect_client* conn, bool keep = true);
 
 	/**
-	 * 检查连接池中空闲的连接，将过期的连接释放掉
-	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
+	 * 检查连接池中空闲的连接，释放过期连接（过期时间使用 set_idle_ttl() 设置的值）
 	 * @param exclusive {bool} 内部是否需要加锁
-	 * @return {size_t} 被释放的空闲连接个数
+	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
+	 * @return {size_t} 返回被释放空闲连接个数
 	 */
-	size_t check_idle(bool kick_dead, bool exclusive);
+	size_t check_idle(bool kick_dead, bool exclusive = true);
 
 	/**
-	 * 检测连接状态，并关闭断开连接
+	 * 检查连接池中空闲的连接，释放过期连接
+	 * @param ttl {time_t} 该值 >= 0 时，过期时间大于此值的连接将被关闭
 	 * @param exclusive {bool} 内部是否需要加锁
+	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
+	 * @return {size_t} 返回被释放空闲连接个数
+	 */
+	size_t check_idle(time_t ttl, bool kick_dead, bool exclusive = true);
+
+	/**
+	 * 检查连接池中空闲的连接，释放过期连接
+	 * @param ttl {time_t} 该值 >= 0 时，过期时间大于此值的连接将被关闭
+	 * @param exclusive {bool} 内部是否需要加锁
+	 * @return {size_t} 返回被释放空闲连接个数
+	 */
+	size_t check_idle(time_t ttl, bool exclusive = true);
+
+	/**
+	 * 检测连接状态，并关闭断开连接，内部自动加锁保护
+	 * @param count {size_t} 检测的连接个数，缺省值为 0 表示检测所有连接
 	 * @return {size_t} 被关闭的连接个数
 	 */
-	size_t check_dead(bool exclusive = true);
+	size_t check_dead(size_t count = 0);
+
+	/**
+	 * 尽量保持由 set_conns_min() 设置的最小连接数
+	 */
+	void keep_conns();
 
 	/**
 	 * 设置连接池的存活状态
@@ -232,13 +254,7 @@ protected:
 	std::list<connect_client*> pool_;	// 连接池集合
 
 	size_t kick_idle_conns(time_t ttl);	// 关闭过期的连接
-
-	/**
-	 * 保持最小活跃连接数
-	 * @param min {size_t} 该值 > 0 表示希望连接池中最小的活跃连接数
-	 * @return {size_t} 返回实际的连接数
-	 */
-	size_t keep_conns(size_t min);
+	connect_client* peek_back();		// 从尾部 Peek 连接
 };
 
 class ACL_CPP_API connect_guard : public noncopyable {

@@ -53,7 +53,7 @@ int test_avl_create(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 int test_avl_add_bat(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 {
 	MY_TYPE *pm, m;
-	int   i, n = 0;
+	int   i;
 
 	for (i = 0; i < 100; i++) {
 		snprintf(m.name, sizeof(m.name), "%d", i);
@@ -69,7 +69,6 @@ int test_avl_add_bat(AUT_LINE *test_line acl_unused, void *arg acl_unused)
 		snprintf(pm->value, sizeof(pm->value), "value(%d)", i);
 		acl_avl_add(__avl_tree, pm);
 		printf(">>add one, key(%s), value(%s)\r\n", pm->name, pm->value);
-		n++;
 	} 
 
 	return (0);
