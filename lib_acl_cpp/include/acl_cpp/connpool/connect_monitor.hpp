@@ -12,6 +12,7 @@ class connect_manager;
 class rpc_service;
 class socket_stream;
 class aio_socket_stream;
+class thread_pool;
 
 class ACL_CPP_API connect_monitor : public thread {
 public:
@@ -64,11 +65,12 @@ public:
 	 * @param kick_dead {bool} 是否检查所有连接的存活状态并关闭异常连接，当该参数
 	 *  为 true 时，connect_client 的子类必须重载 alive() 虚方法，返回连接是否存活
 	 * @param keep_conns {bool} 是否尽量操持每个连接池中最小连接数
+	 * @param threads {thread_pool*} 线程池非空时将会被使用来提升并发处理能力
 	 * @param step {bool} 每次检测连接池个数
 	 * @return {connect_monitor&}
 	 */
 	connect_monitor& set_check_conns(bool check_idle, bool kick_dead,
-		bool keep_conns, size_t step = 0);
+		bool keep_conns, thread_pool* threads = NULL, size_t step = 0);
 
 	/**
 	 * 是否自动检测并关闭过期空闲连接
@@ -100,6 +102,14 @@ public:
 	 */
 	size_t get_check_step() const {
 		return check_step_;
+	}
+
+	/**
+	 * 获得前面所设置的线程池对象
+	 * @return {thread_pool*}
+	 */
+	thread_pool* get_threads() const {
+		return threads_;
 	}
 
 	/**
@@ -199,6 +209,7 @@ private:
 	bool  kick_dead_;			// 是否删除异常连接
 	bool  keep_conns_;			// 是否保持每个连接池最小连接数
 	size_t check_step_;			// 每次检测连接池个数限制
+	thread_pool* threads_;			// 线程池非空将会并发执行任务
 	rpc_service* rpc_service_;		// 异步 RPC 通信服务句柄
 };
 

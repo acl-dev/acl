@@ -6,7 +6,8 @@
 
 static int __loop_count = 10;
 static acl::connect_manager* __conn_manager = NULL;
-static acl_pthread_pool_t* __thr_pool = NULL;
+static acl_pthread_pool_t*   __thr_pool     = NULL;
+static acl::thread_pool*     __threads      = NULL;
 
 static void sleep_while(int n)
 {
@@ -47,7 +48,7 @@ static void init(const char* addrs, int count, int check_type, const char* proto
 		check_type != 0);
 	monitor->set_check_inter(check_inter);
 	monitor->set_conn_timeout(conn_timeout);
-	monitor->set_check_conns(true, true, true);
+	monitor->set_check_conns(true, true, true, __threads);
 
 	if (check_type == 2) {
 		monitor->open_rpc_service(10, NULL);
@@ -162,6 +163,7 @@ static void usage(const char* procname)
 		"	-t check_type [0: no check; 1: sync check; 2: async check]\r\n"
 		"	-p protocol [http|pop3]\r\n"
 		"	-d delay_seconds\r\n"
+		"	-C [use threads pool to check connections]\r\n"
 		"	-n loop_count[default: 10]\r\n", procname);
 }
 
@@ -178,7 +180,7 @@ int main(int argc, char* argv[])
 	// 日志输出至标准输出
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:c:t:p:d:")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:t:p:d:C")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -200,6 +202,12 @@ int main(int argc, char* argv[])
 			break;
 		case 'd':
 			delay = atoi(optarg);
+			break;
+		case 'C':
+			__threads = new acl::thread_pool;
+			__threads->set_limit(20);
+			__threads->set_idle(120);
+			__threads->start();
 			break;
 		default:
 			usage(argv[0]);

@@ -9,6 +9,43 @@
 
 namespace acl {
 
+class check_job : public thread_job {
+public:
+	check_job(tbox<bool>& box, connect_client& conn, bool opened)
+	: box_(box), conn_(conn), opened_(opened), aliving_(true) {}
+
+	~check_job() {}
+
+	// Get the checking result for the given connection.
+	bool aliving() const {
+		return aliving_;
+	}
+
+	// Get the connection.
+	connect_client& get_conn() const {
+		return conn_;
+	}
+
+protected:
+	// @overide
+	void* run() {
+		if (opened_) {
+			aliving_ = conn_.alive();
+		} else {
+			aliving_ = conn_.open();
+		}
+
+		box_.push(NULL);
+		return NULL;
+	}
+
+private:
+	tbox<bool>& box_;
+	connect_client& conn_;
+	bool opened_;
+	bool aliving_;
+};
+
 connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 : alive_(true)
 , delay_destroy_(false)
@@ -423,14 +460,24 @@ size_t connect_pool::kick_idle_conns(time_t ttl)
 	return n;
 }
 
-size_t connect_pool::check_dead(size_t count /* 0 */)
+size_t connect_pool::check_dead(thread_pool* threads /* NULL */)
 {
+	lock_.lock();
+	size_t count = count_;
+	lock_.unlock();
+
 	if (count == 0) {
-		lock_.lock();
-		count = count_;
-		lock_.unlock();
+		return 0;
 	}
 
+	if (threads == NULL) {
+		return check_conns(count);
+	}
+	return check_conns(count, *threads);
+}
+
+size_t connect_pool::check_conns(size_t count)
+{
 	size_t n = 0;
 	for (size_t i = 0; i < count; i++) {
 		connect_client* conn = peek_back();
@@ -451,7 +498,54 @@ size_t connect_pool::check_dead(size_t count /* 0 */)
 		delete conn;
 		n++;
 	}
+	return n;
+}
 
+size_t connect_pool::check_conns(size_t count, thread_pool& threads)
+{
+	// Check all connections in threads pool.
+	size_t n = 0;
+	tbox<bool> box;
+	std::vector<check_job*> jobs;
+	for (size_t i = 0; i < count; i++) {
+		connect_client* conn = peek_back();
+		if (conn == NULL) {
+			break;
+		}
+
+		check_job* job = NEW check_job(box, *conn, true);
+		jobs.push_back(job);
+		threads.execute(job);
+	}
+
+	bool found;
+	for (size_t i = 0; i < jobs.size(); i++) {
+		(void) box.pop(-1, &found);
+		if (!found) {
+			logger_fatal("Pop message from thread job failed!");
+		}
+	}
+
+	for (std::vector<check_job*>::iterator it = jobs.begin();
+	     it != jobs.end(); ++it) {
+		connect_client* conn = &(*it)->get_conn();
+
+		if ((*it)->aliving()) {
+			delete *it;
+			put_front(conn);
+			continue;
+		}
+
+		delete *it;
+
+		if (conn->get_pool() == this) {
+			lock_.lock();
+			--count_;
+			lock_.unlock();
+		}
+		delete conn;
+		n++;
+	}
 	return n;
 }
 
@@ -506,7 +600,7 @@ void connect_pool::put_front(connect_client* conn)
 	lock_.unlock();
 }
 
-void connect_pool::keep_conns()
+void connect_pool::keep_conns(thread_pool* threads /* NULL */)
 {
 	lock_.lock();
 	size_t min;
@@ -517,6 +611,19 @@ void connect_pool::keep_conns()
 	}
 	lock_.unlock();
 
+	if (min == 0) {
+		return;
+	}
+
+	if (threads) {
+		keep_conns(min, *threads);
+	} else {
+		keep_conns(min);
+	}
+}
+
+void connect_pool::keep_conns(size_t min)
+{
 	for (size_t i = 0; i < min; i++) {
 		connect_client* conn = create_connect();
 		if (conn == NULL) {
@@ -539,6 +646,44 @@ void connect_pool::keep_conns()
 			lock_.unlock();
 			break;
 		}
+		lock_.unlock();
+	}
+}
+
+void connect_pool::keep_conns(size_t min, thread_pool& threads)
+{
+	tbox<bool> box;
+	std::vector<check_job*> jobs;
+	for (size_t i = 0; i < min; i++) {
+		connect_client* conn = create_connect();
+		check_job* job = NEW check_job(box, *conn, false);
+		jobs.push_back(job);
+		threads.execute(job);
+	}
+
+	bool found;
+	// Waiting all jobs finished.
+	for (size_t i = 0; i < jobs.size(); i++) {
+		(void) box.pop(-1, &found);
+		if (!found) {
+			logger_fatal("Pop message from thread job failed!");
+		}
+	}
+
+	for (std::vector<check_job*>::iterator it = jobs.begin();
+	     it != jobs.end(); ++it) {
+		connect_client* conn = &(*it)->get_conn();
+		if (!(*it)->aliving()) {
+			delete conn;
+			delete *it;
+			continue;
+		}
+
+		delete *it;
+
+		conn->set_pool(this);
+		put(conn, true);
+		count_++;
 		lock_.unlock();
 	}
 }
