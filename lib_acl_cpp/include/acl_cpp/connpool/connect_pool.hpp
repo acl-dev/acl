@@ -8,12 +8,16 @@ namespace acl {
 
 class connect_manager;
 class connect_client;
+class thread_pool;
 
+/**
+ * 该类型定义了当调用 connect_pool::put() 时oper的行为
+ */
 typedef enum {
-	cpool_put_oper_none  = 0,
-	cpool_put_check_idle = 1,
-	cpool_put_check_dead = (1 << 1),
-	cpool_put_keep_conns = (1 << 2),
+	cpool_put_oper_none  = 0,		// 不做任何操作
+	cpool_put_check_idle = 1,		// 检测并关闭超时空闲连接
+	cpool_put_check_dead = (1 << 1),	// 检测并关闭异常连接
+	cpool_put_keep_conns = (1 << 2),	// 尽量操持最小连接数
 } cpool_put_oper_t;
 
 /**
@@ -121,15 +125,16 @@ public:
 
 	/**
 	 * 检测连接状态，并关闭断开连接，内部自动加锁保护
-	 * @param count {size_t} 检测的连接个数，缺省值为 0 表示检测所有连接
+	 * @param threads {thread_pool*} 非空时将使用该线程池检测连接状态
 	 * @return {size_t} 被关闭的连接个数
 	 */
-	size_t check_dead(size_t count = 0);
+	size_t check_dead(thread_pool* threads = NULL);
 
 	/**
 	 * 尽量保持由 set_conns_min() 设置的最小连接数
+	 * @param threads {thread_pool*} 非空时将使用该线程池创建新连接
 	 */
-	void keep_conns();
+	void keep_conns(thread_pool* threads = NULL);
 
 	/**
 	 * 设置连接池的存活状态
@@ -246,6 +251,11 @@ protected:
 	unsigned long long current_used_;	// 某时间段内的访问量
 	time_t last_;				// 上次记录的时间截
 	std::list<connect_client*> pool_;	// 连接池集合
+
+	size_t check_conns(size_t count);
+	size_t check_conns(size_t count, thread_pool& threads);
+	void keep_conns(size_t min);
+	void keep_conns(size_t min, thread_pool& threads);
 
 	size_t kick_idle_conns(time_t ttl);	// 关闭过期的连接
 	connect_client* peek_back();		// 从尾部 Peek 连接

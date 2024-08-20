@@ -12,6 +12,7 @@ namespace acl {
 
 class connect_pool;
 class connect_monitor;
+class thread_pool;
 
 // 内部使用数据结构
 struct conns_pools {
@@ -203,11 +204,12 @@ public:
 	 * @param check_idle {bool} 是否检测并释放过期空闲连接
 	 * @param kick_dead {bool} 是否释放过期空闲连接
 	 * @param keep_conns {bool} 是否尽量保持每个连接池中的最小连接数
+	 * @param threads {thread_pool*} 非NULL将使用该线程池处理 kick_dead 过程
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
 	 * @return {size_t} 被释放的空闲连接数
 	 */
 	size_t check_conns(size_t step, bool check_idle, bool kick_dead,
-		bool keep_conns, size_t* left = NULL);
+		bool keep_conns, thread_pool* threads, size_t* left = NULL);
 
 	/**
 	 * 获得连接池集合中连接池对象的个数
@@ -288,6 +290,15 @@ protected:
 	time_t idle_ttl_;			// 空闲连接的生命周期
 	int  check_inter_;			// 检查空闲连接的时间间隔
 	connect_monitor* monitor_;		// 后台检测线程句柄
+
+	void pools_dump(size_t step, std::vector<connect_pool*>& out);
+	static size_t pools_release(std::vector<connect_pool*>& pools);
+
+	static size_t check_idle_conns(const std::vector<connect_pool*>& pools);
+	static size_t check_dead_conns(const std::vector<connect_pool*>& pools,
+		thread_pool* threads = NULL);
+	static void keep_min_conns(const std::vector<connect_pool*>& pools,
+		thread_pool* threads = NULL);
 
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count,

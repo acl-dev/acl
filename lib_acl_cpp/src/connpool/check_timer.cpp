@@ -36,7 +36,7 @@ void check_timer::timer_callback(unsigned int id)
 	// 自动检测并关闭过期空闲长连接，自动关闭异常连接，自动保持每个连接池的最小连接数
 	manager.check_conns(monitor_.get_check_step(),
 		monitor_.check_idle_on(), monitor_.kick_dead_on(),
-		monitor_.keep_conns_on(), NULL);
+		monitor_.keep_conns_on(), monitor_.get_threads(), NULL);
 
 	if (!monitor_.check_server_on()) {
 		return;
