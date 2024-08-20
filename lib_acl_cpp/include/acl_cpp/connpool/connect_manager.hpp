@@ -180,7 +180,7 @@ public:
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
 	 * @return {size_t} 被释放的空闲连接数
 	 */
-	size_t check_idle(size_t step, size_t* left = NULL);
+	size_t check_idle_conns(size_t step, size_t* left = NULL);
 
 	/**
 	 * 检测连接池中的异常连接并关闭
@@ -188,14 +188,14 @@ public:
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
 	 * @return {size_t} 被释放的连接数
 	 */
-	size_t check_dead(size_t step, size_t* left = NULL);
+	size_t check_dead_conns(size_t step, size_t* left = NULL);
 
 	/**
 	 * 尽量保持连接池中最小连接数
 	 * @param step {size_t} 每次检测连接池的个数
 	 * @return {size_t} 所有剩余连接总和
 	 */
-	size_t keep_conns(size_t step);
+	size_t keep_min_conns(size_t step);
 
 	/**
 	 * 检测连接池中的空闲连接，将过期的连接释放掉，并保持每个连接池中的最小连接数

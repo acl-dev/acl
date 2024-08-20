@@ -386,7 +386,7 @@ connect_pool* connect_manager::get(const char* addr,
 
 //////////////////////////////////////////////////////////////////////////
 
-size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */)
+size_t connect_manager::check_idle_conns(size_t step, size_t* left /* NULL */)
 {
 	std::vector<connect_pool*> pools_tmp;
 	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
@@ -431,7 +431,7 @@ size_t connect_manager::check_idle(size_t step, size_t* left /* NULL */)
 	return nfreed;
 }
 
-size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
+size_t connect_manager::check_dead_conns(size_t step, size_t* left /* NULL */)
 {
 	std::vector<connect_pool*> pools_tmp;
 	size_t nleft = 0, nfreed = 0, pools_size, check_max, check_pos;
@@ -475,7 +475,7 @@ size_t connect_manager::check_dead(size_t step, size_t* left /* NULL */)
 	return nfreed;
 }
 
-size_t connect_manager::keep_conns(size_t step)
+size_t connect_manager::keep_min_conns(size_t step)
 {
 	std::vector<connect_pool*> pools_tmp;
 	size_t nleft = 0, pools_size, check_max, check_pos;
