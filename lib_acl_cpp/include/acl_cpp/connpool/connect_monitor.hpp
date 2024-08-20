@@ -60,21 +60,22 @@ public:
 
 	/**
 	 * 设置是否在连接检测器启动后自动关闭过期的空闲连接
-	 * @param on {bool} 是否自动关闭过期的空闲连接
+	 * @param check_idle {bool} 是否自动关闭过期的空闲连接
 	 * @param kick_dead {bool} 是否检查所有连接的存活状态并关闭异常连接，当该参数
 	 *  为 true 时，connect_client 的子类必须重载 alive() 虚方法，返回连接是否存活
+	 * @param keep_conns {bool} 是否尽量操持每个连接池中最小连接数
 	 * @param step {bool} 每次检测连接池个数
 	 * @return {connect_monitor&}
 	 */
-	connect_monitor& set_check_idle(bool on, bool kick_dead = false,
-		size_t step = 1);
+	connect_monitor& set_check_conns(bool check_idle, bool kick_dead,
+		bool keep_conns, size_t step = 0);
 
 	/**
 	 * 是否自动检测并关闭过期空闲连接
 	 * @return {bool}
 	 */
 	bool check_idle_on() const {
-		return check_idle_on_;
+		return check_idle_;
 	}
 
 	/**
@@ -86,11 +87,19 @@ public:
 	}
 
 	/**
+	 * 是否需要尽量保持每个连接池的最小连接数
+	 * @return {bool}
+	 */
+	bool keep_conns_on() const {
+		return keep_conns_;
+	}
+
+	/**
 	 * 当 check_idle_on() 返回 true 时，返回每次检测的连接数量限制
 	 * @return {size_t}
 	 */
-	size_t get_check_idle_step() const {
-		return check_idle_step_;
+	size_t get_check_step() const {
+		return check_step_;
 	}
 
 	/**
@@ -186,11 +195,10 @@ private:
 	bool check_server_;			// 是否检查服务端可用性
 	int   check_inter_;			// 检测连接池状态的时间间隔(秒)
 	int   conn_timeout_;			// 连接服务器的超时时间
-	bool  check_idle_on_;			// 是否检测并关闭过期空闲连接
+	bool  check_idle_;			// 是否检测并关闭过期空闲连接
 	bool  kick_dead_;			// 是否删除异常连接
-	size_t check_idle_step_;		// 每次检测连接数限制
-	bool  check_dead_on_;			// 是否检测并关闭断开的连接
-	size_t check_dead_step_;		// 每次检测异常连接的数量限制
+	bool  keep_conns_;			// 是否保持每个连接池最小连接数
+	size_t check_step_;			// 每次检测连接池个数限制
 	rpc_service* rpc_service_;		// 异步 RPC 通信服务句柄
 };
 

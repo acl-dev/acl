@@ -9,6 +9,13 @@ namespace acl {
 class connect_manager;
 class connect_client;
 
+typedef enum {
+	cpool_put_oper_none  = 0,
+	cpool_put_check_idle = 1,
+	cpool_put_check_dead = (1 << 1),
+	cpool_put_keep_conns = (1 << 2),
+} cpool_put_oper_t;
+
 /**
  * 客户端连接池类，实现对连接池的动态管理，该类为纯虚类，需要子类实现
  * 纯虚函数 create_connect 用于创建与服务端的一个连接，当允许该类
@@ -97,8 +104,11 @@ public:
 	 * 该连接时，则该连接将会被直接释放
 	 * @param conn {redis_client*}
 	 * @param keep {bool} 是否针对该连接保持长连接
+	 * @param oper {cpool_put_oper_t} 自动操作连接池标志位，含义参见上面
+	 *  cpool_put_oper_t 类型定义
 	 */
-	void put(connect_client* conn, bool keep = true);
+	void put(connect_client* conn, bool keep = true,
+		 cpool_put_oper_t oper = cpool_put_check_idle);
 
 	/**
 	 * 检查连接池中空闲的连接，释放过期连接
@@ -107,23 +117,7 @@ public:
 	 * @return {size_t} 返回被释放空闲连接个数
 	 */
 	size_t check_idle(time_t ttl, bool exclusive = true);
-
-	/**
-	 * 检查连接池中空闲的连接，释放过期连接（过期时间使用 set_idle_ttl() 设置的值）
-	 * @param exclusive {bool} 内部是否需要加锁
-	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
-	 * @return {size_t} 返回被释放空闲连接个数
-	 */
-	size_t check_idle(bool kick_dead, bool exclusive = true);
-
-	/**
-	 * 检查连接池中空闲的连接，释放过期连接
-	 * @param ttl {time_t} 该值 >= 0 时，过期时间大于此值的连接将被关闭
-	 * @param exclusive {bool} 内部是否需要加锁
-	 * @param kick_dead {bool} 是否自动检测死连接并关闭之
-	 * @return {size_t} 返回被释放空闲连接个数
-	 */
-	size_t check_idle(time_t ttl, bool kick_dead, bool exclusive = true);
+	size_t check_idle(bool exclusive = true);
 
 	/**
 	 * 检测连接状态，并关闭断开连接，内部自动加锁保护

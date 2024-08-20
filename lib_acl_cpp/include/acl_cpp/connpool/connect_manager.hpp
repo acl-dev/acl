@@ -178,10 +178,9 @@ public:
 	 * 检测连接池中的空闲连接，将过期的连接释放掉
 	 * @param step {size_t} 每次检测连接池的个数
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
-	 * @param kick_dead {book} 是否需要自动删除连接池中的异常连接
 	 * @return {size_t} 被释放的空闲连接数
 	 */
-	size_t check_idle(size_t step, size_t* left = NULL, bool kick_dead = false);
+	size_t check_idle_conns(size_t step, size_t* left = NULL);
 
 	/**
 	 * 检测连接池中的异常连接并关闭
@@ -189,7 +188,26 @@ public:
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
 	 * @return {size_t} 被释放的连接数
 	 */
-	size_t check_dead(size_t step, size_t* left = NULL);
+	size_t check_dead_conns(size_t step, size_t* left = NULL);
+
+	/**
+	 * 尽量保持连接池中最小连接数
+	 * @param step {size_t} 每次检测连接池的个数
+	 * @return {size_t} 所有剩余连接总和
+	 */
+	size_t keep_min_conns(size_t step);
+
+	/**
+	 * 检测连接池中的空闲连接，将过期的连接释放掉，并保持每个连接池中的最小连接数
+	 * @param step {size_t} 每次检测连接池的个数
+	 * @param check_idle {bool} 是否检测并释放过期空闲连接
+	 * @param kick_dead {bool} 是否释放过期空闲连接
+	 * @param keep_conns {bool} 是否尽量保持每个连接池中的最小连接数
+	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
+	 * @return {size_t} 被释放的空闲连接数
+	 */
+	size_t check_conns(size_t step, bool check_idle, bool kick_dead,
+		bool keep_conns, size_t* left = NULL);
 
 	/**
 	 * 获得连接池集合中连接池对象的个数

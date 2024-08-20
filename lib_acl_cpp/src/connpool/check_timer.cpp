@@ -33,11 +33,10 @@ void check_timer::timer_callback(unsigned int id)
 
 	connect_manager& manager = monitor_.get_manager();
 
-	// 自动检测并关闭过期空闲长连接
-	if (monitor_.check_idle_on()) {
-		manager.check_idle(monitor_.get_check_idle_step(), NULL,
-			 monitor_.kick_dead_on());
-	}
+	// 自动检测并关闭过期空闲长连接，自动关闭异常连接，自动保持每个连接池的最小连接数
+	manager.check_conns(monitor_.get_check_step(),
+		monitor_.check_idle_on(), monitor_.kick_dead_on(),
+		monitor_.keep_conns_on(), NULL);
 
 	if (!monitor_.check_server_on()) {
 		return;

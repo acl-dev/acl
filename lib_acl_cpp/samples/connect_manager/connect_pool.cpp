@@ -5,8 +5,6 @@
 connect_pool::connect_pool(const char* addr, size_t count, size_t idx)
 : acl::connect_pool(addr, count, idx)
 , addr_(addr)
-, count_(count)
-, idx_(idx)
 , conn_timeout_(30)
 , rw_timeout_(30)
 {

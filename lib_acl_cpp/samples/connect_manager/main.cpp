@@ -47,7 +47,7 @@ static void init(const char* addrs, int count, int check_type, const char* proto
 		check_type != 0);
 	monitor->set_check_inter(check_inter);
 	monitor->set_conn_timeout(conn_timeout);
-	monitor->set_check_idle(true, true);
+	monitor->set_check_conns(true, true, true);
 
 	if (check_type == 2) {
 		monitor->open_rpc_service(10, NULL);
