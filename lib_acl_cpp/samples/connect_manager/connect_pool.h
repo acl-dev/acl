@@ -14,8 +14,6 @@ protected:
 
 private:
 	acl::string addr_;
-	size_t count_;
-	size_t idx_;
 	int   conn_timeout_;
 	int   rw_timeout_;
 };

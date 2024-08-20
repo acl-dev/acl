@@ -58,18 +58,15 @@ void mymonitor::nio_check(acl::check_client& checker,
 
 void mymonitor::on_connected(const acl::check_client& checker, double cost)
 {
-	printf("addr=%s, connected, cost=%.2f\r\n",
-		checker.get_addr(), cost);
+	printf("addr=%s, connected, cost=%.2f\r\n", checker.get_addr(), cost);
 }
 
-void mymonitor::on_refuse(const acl::check_client& checker, double cost)
+void mymonitor::on_refuse(const char* addr, double cost)
 {
-	printf("addr=%s, connection refused, cost=%.2f\r\n",
-		checker.get_addr(), cost);
+	printf("addr=%s, connection refused, cost=%.2f\r\n", addr, cost);
 }
 
-void mymonitor::on_timeout(const acl::check_client& checker, double cost)
+void mymonitor::on_timeout(const char* addr, double cost)
 {
-	printf("addr=%s, connection timeout, cost=%.2f\r\n",
-		checker.get_addr(), cost);
+	printf("addr=%s, connection timeout, cost=%.2f\r\n", addr, cost);
 }

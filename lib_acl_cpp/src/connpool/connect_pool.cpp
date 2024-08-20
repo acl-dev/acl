@@ -245,7 +245,8 @@ void connect_pool::bind_one(connect_client* conn)
 	lock_.unlock();
 }
 
-void connect_pool::put(connect_client* conn, bool keep /* = true */)
+void connect_pool::put(connect_client* conn, bool keep /* = true */,
+       cpool_put_oper_t oper /* cpool_put_check_idle */)
 {
 	time_t now = time(NULL);
 
@@ -284,8 +285,15 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */)
 
 	if (check_inter_ >= 0 && now - last_check_ >= check_inter_) {
 		lock_.unlock();
-
-		(void) check_idle(false, true);
+		if (oper & cpool_put_check_idle) {
+			(void) check_idle(idle_ttl_, true);
+		}
+		if (oper & cpool_put_check_dead) {
+			(void) check_dead();
+		}
+		if (oper & cpool_put_keep_conns) {
+			keep_conns();
+		}
 	} else {
 		lock_.unlock();
 	}
@@ -326,17 +334,12 @@ void connect_pool::set_alive(bool yes /* true | false */)
 	lock_.unlock();
 }
 
+size_t connect_pool::check_idle(bool exclusive /* true */)
+{
+	return check_idle(idle_ttl_, exclusive);
+}
+
 size_t connect_pool::check_idle(time_t ttl, bool exclusive /* true */)
-{
-	return check_idle(ttl, false, exclusive);
-}
-
-size_t connect_pool::check_idle(bool kick_dead, bool exclusive /* true */)
-{
-	return check_idle(idle_ttl_, kick_dead, exclusive);
-}
-
-size_t connect_pool::check_idle(time_t ttl, bool kick_dead, bool exclusive)
 {
 	if (exclusive) {
 		lock_.lock();
@@ -373,18 +376,8 @@ size_t connect_pool::check_idle(time_t ttl, bool kick_dead, bool exclusive)
 		n += kick_idle_conns(ttl);
 	}
 
-	size_t count = count_;
-
 	if (exclusive) {
 		lock_.unlock();
-	}
-
-	if (kick_dead) {
-		n += check_dead(count);
-	}
-
-	if (min_ > 0) {
-		keep_conns();
 	}
 
 	return n;
@@ -412,9 +405,9 @@ size_t connect_pool::kick_idle_conns(time_t ttl)
 		}
 
 		// If min > 0, try to keep the minimal count of connections.
-		if (min_ > 0 && count_ <= min_) {
-			break;
-		}
+		//if (min_ > 0 && count_ <= min_) {
+		//	break;
+		//}
 
 		// Decrease connections count only if the connection is mine.
 		if ((*it)->get_pool() == this) {
@@ -537,12 +530,16 @@ void connect_pool::keep_conns()
 			break;
 		}
 
-		lock_.lock();
-		count_++;
-		lock_.unlock();
-
 		conn->set_pool(this);
 		put(conn, true);
+
+		lock_.lock();
+		count_++;
+		if (max_ > 0 && count_ >= max_) {
+			lock_.unlock();
+			break;
+		}
+		lock_.unlock();
 	}
 }
 

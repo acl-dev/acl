@@ -38,10 +38,10 @@ protected:
 	void on_connected(const acl::check_client& checker, double cost);
 
 	// @override
-	void on_refuse(const acl::check_client& checker, double cost);
+	void on_refuse(const char* addr, double cost);
 
 	// @override
-	void on_timeout(const acl::check_client& checker, double cost);
+	void on_timeout(const char* addr, double cost);
 
 private:
 	acl::string proto_;

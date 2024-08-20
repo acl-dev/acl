@@ -21,11 +21,10 @@ connect_monitor::connect_monitor(connect_manager& manager, bool check_server /* 
 , check_server_(check_server)
 , check_inter_(1)
 , conn_timeout_(10)
-, check_idle_on_(false)
+, check_idle_(false)
 , kick_dead_(false)
-, check_idle_step_(128)
-, check_dead_on_(false)
-, check_dead_step_(128)
+, keep_conns_(false)
+, check_step_(128)
 , rpc_service_(NULL)
 {
 }
@@ -61,12 +60,13 @@ connect_monitor& connect_monitor::set_conn_timeout(int n)
 	return *this;
 }
 
-connect_monitor& connect_monitor::set_check_idle(bool on,
-	bool kick_dead, size_t step)
+connect_monitor& connect_monitor::set_check_conns(bool check_idle,
+	bool kick_dead, bool keep_conns, size_t step)
 {
-	check_idle_on_   = on;
-	kick_dead_       = kick_dead;
-	check_idle_step_ = step;
+	check_idle_ = check_idle;
+	kick_dead_  = kick_dead;
+	keep_conns_ = keep_conns;
+	check_step_ = step;
 	return *this;
 }
 
