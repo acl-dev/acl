@@ -297,7 +297,8 @@ protected:
 	static size_t check_idle_conns(const std::vector<connect_pool*>& pools);
 	static size_t check_dead_conns(const std::vector<connect_pool*>& pools,
 		thread_pool* threads = NULL);
-	static void keep_min_conns(const std::vector<connect_pool*>& pools);
+	static void keep_min_conns(const std::vector<connect_pool*>& pools,
+		thread_pool* threads = NULL);
 
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count,

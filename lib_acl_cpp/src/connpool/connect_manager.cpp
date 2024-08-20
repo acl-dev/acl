@@ -468,7 +468,7 @@ size_t connect_manager::check_conns(size_t step, bool check_idle,
 	}
 
 	if (keep_conns) {
-		keep_min_conns(pools);
+		keep_min_conns(pools, threads);
 	}
 
 	size_t nleft = pools_release(pools);
@@ -502,11 +502,12 @@ size_t connect_manager::check_dead_conns(const std::vector<connect_pool*>& pools
 	return nfreed;
 }
 
-void connect_manager::keep_min_conns(const std::vector<connect_pool*>& pools)
+void connect_manager::keep_min_conns(const std::vector<connect_pool*>& pools,
+	thread_pool* threads)
 {
 	for (std::vector<connect_pool*>::const_iterator cit = pools.begin();
 	     cit != pools.end(); ++cit) {
-		(*cit)->keep_conns();
+		(*cit)->keep_conns(threads);
 	}
 }
 
