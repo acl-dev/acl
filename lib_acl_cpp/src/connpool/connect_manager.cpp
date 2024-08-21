@@ -513,7 +513,7 @@ void connect_manager::keep_min_conns(const std::vector<connect_pool*>& pools,
 
 void connect_manager::pools_dump(size_t step, std::vector<connect_pool*>& out)
 {
-	size_t pools_size, check_max, check_pos;
+	size_t pools_size;
 	unsigned long id = get_id();
 
 	lock_.lock();
@@ -529,12 +529,10 @@ void connect_manager::pools_dump(size_t step, std::vector<connect_pool*>& out)
 		step = pools_size;
 	}
 
-	check_pos = pools.check_next++ % pools_size;
-	check_max = check_pos + step;
-
-	while (check_pos < pools_size && check_pos < check_max) {
-		connect_pool* pool = pools.pools[check_pos++ % pools_size];
-		pool->refer(); // Increase reference to avoid freed.
+	for (size_t i = 0; i < step; i++) {
+		connect_pool* pool = pools.pools[pools.check_next % pools_size];
+		pools.check_next++;
+		pool->refer();
 		out.push_back(pool);
 	}
 
