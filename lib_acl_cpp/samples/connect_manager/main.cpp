@@ -29,15 +29,14 @@ static void check_all_connections(void)
 }
 
 // 初始化过程
-static void init(const char* addrs, int count, int check_type, const char* proto)
+static void init(const char* addrs, int max, int min, int ttl,
+	int check_type, const char* proto)
 {
 	// 创建 HTTP 请求连接池集群管理对象
-	__conn_manager = new connect_manager((size_t) count);
+	__conn_manager = new connect_manager((size_t) min, (time_t) ttl);
 
 	// 添加服务器集群地址
-	__conn_manager->init(addrs, addrs, 100);
-
-	__conn_manager->set_idle_ttl(1);
+	__conn_manager->init(addrs, addrs, (size_t) max);
 
 	printf(">>>start monitor thread\r\n");
 
@@ -58,7 +57,7 @@ static void init(const char* addrs, int count, int check_type, const char* proto
 
 	printf(">>>create thread pool\r\n");
 	// 创建线程池
-	__thr_pool = acl_thread_pool_create(count, 60);
+	__thr_pool = acl_thread_pool_create(max, 60);
 }
 
 // 进程退出前清理资源
@@ -159,7 +158,9 @@ static void usage(const char* procname)
 {
 	printf("usage: %s -h [help]\r\n"
 		"	-s server_addrs [www.sina.com.cn:80;www.263.net:80;www.qq.com:80]\r\n"
-		"	-c cocurrent [default: 10]\r\n"
+		"	-c cocurrent_and_max_conns [default: 10]\r\n"
+		"	-m min_conns[default: 0]\r\n"
+		"	-o idle_ttl[default: 10]\r\n"
 		"	-t check_type [0: no check; 1: sync check; 2: async check]\r\n"
 		"	-p protocol [http|pop3]\r\n"
 		"	-d delay_seconds\r\n"
@@ -169,7 +170,7 @@ static void usage(const char* procname)
 
 int main(int argc, char* argv[])
 {
-	int   ch, cocurrent = 10;
+	int   ch, max = 10, min = 0, ttl = 60;
 	int   check_type = 0, delay = 2;
 	acl::string addrs("www.sina.com.cn:80;www.263.net:80;www.qq.com:81");
 	acl::string proto("pop3");
@@ -180,7 +181,7 @@ int main(int argc, char* argv[])
 	// 日志输出至标准输出
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:n:c:t:p:d:C")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:n:c:m:t:o:p:d:C")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -189,7 +190,13 @@ int main(int argc, char* argv[])
 			addrs = optarg;
 			break;
 		case 'c':
-			cocurrent = atoi(optarg);
+			max = atoi(optarg);
+			break;
+		case 'o':
+			ttl = atoi(optarg);
+			break;
+		case 'm':
+			min = atoi(optarg);
 			break;
 		case 'n':
 			__loop_count = atoi(optarg);
@@ -215,8 +222,8 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	init(addrs, cocurrent, check_type, proto);
-	run(cocurrent, delay);
+	init(addrs, max, min, ttl, check_type, proto);
+	run(max, delay);
 	end();
 
 #ifdef WIN32

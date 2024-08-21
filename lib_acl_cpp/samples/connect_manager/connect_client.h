@@ -12,7 +12,7 @@ public:
 	bool alive()
 	{
 		if (conn_.alive()) {
-			printf(">>>alive called: true<<<\r\n");
+			//printf(">>>alive called: true<<<\r\n");
 			return true;
 		}
 

@@ -608,7 +608,7 @@ connect_client* connect_pool::peek_back()
 
 void connect_pool::put_front(connect_client* conn)
 {
-	time_t now = time(NULL);
+	//time_t now = time(NULL);
 
 	lock_.lock();
 
@@ -631,7 +631,8 @@ void connect_pool::put_front(connect_client* conn)
 
 	alive_ = true;  // 该连接充当服务检测成功功能，所以可在此处设置服务可用
 
-	conn->set_when(now);
+	// 禁止更新过期时间，以防止永远无法过期释放!
+	//conn->set_when(now);
 
 	// 将归还的连接放在链表首部，这样在调用释放过期连接
 	// 时比较方便，有利于尽快将不忙的数据库连接关闭

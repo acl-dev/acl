@@ -2,13 +2,12 @@
 #include "connect_client.h"
 #include "connect_pool.h"
 
-connect_pool::connect_pool(const char* addr, size_t count, size_t idx)
-: acl::connect_pool(addr, count, idx)
+connect_pool::connect_pool(const char* addr, size_t max, size_t idx)
+: acl::connect_pool(addr, max, idx)
 , addr_(addr)
 , conn_timeout_(30)
 , rw_timeout_(30)
 {
-	this->set_conns_min(count);
 }
 
 connect_pool::~connect_pool()
