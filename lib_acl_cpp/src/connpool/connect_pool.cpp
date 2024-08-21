@@ -463,9 +463,9 @@ size_t connect_pool::kick_idle_conns(time_t ttl)
 		}
 
 		// If min > 0, try to keep the minimal count of connections.
-		//if (min_ > 0 && count_ <= min_) {
-		//	break;
-		//}
+		if (min_ > 0 && count_ <= min_) {
+			break;
+		}
 
 		// Decrease connections count only if the connection is mine.
 		if ((*it)->get_pool() == this) {
@@ -663,6 +663,13 @@ void connect_pool::keep_conns(thread_pool* threads /* NULL */)
 void connect_pool::keep_conns(size_t min)
 {
 	for (size_t i = 0; i < min; i++) {
+		lock_.lock();
+		if (min_ > 0 && count_ >= min_) {
+			lock_.unlock();
+			break;
+		}
+		lock_.unlock();
+
 		connect_client* conn = this->create_connect();
 		if (conn == NULL) {
 			logger_error("Create connection error");
@@ -694,6 +701,13 @@ void connect_pool::keep_conns(size_t min, thread_pool& threads)
 	tbox<bool> box;
 	std::vector<check_job*> jobs;
 	for (size_t i = 0; i < min; i++) {
+		lock_.lock();
+		if (min_ > 0 && count_ >= min_) {
+			lock_.unlock();
+			break;
+		}
+		lock_.unlock();
+
 		connect_client* conn = this->create_connect();
 		check_job* job = NEW check_job(box, *conn, false);
 		jobs.push_back(job);
@@ -729,13 +743,19 @@ void connect_pool::keep_conns(size_t min, thread_pool& threads)
 
 		delete *it;
 
+		lock_.lock();
+		alive_ = true;
+		if (max_ > 0 && count_ >= max_) {
+			lock_.unlock();
+			delete *it;
+			continue;
+		}
+		lock_.unlock();
+
 		conn->set_pool(this);
 		put(conn, true);
 
-		lock_.lock();
-		alive_ = true;
-		count_inc(false);
-		lock_.unlock();
+		count_inc(true);
 	}
 }
 
