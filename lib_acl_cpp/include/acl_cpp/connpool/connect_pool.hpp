@@ -209,7 +209,10 @@ public:
 		return key_;
 	}
 
+	// 增加本对象引用计数
 	void refer();
+
+	// 减少本对象引用计数
 	void unrefer();
 
 protected:
@@ -228,6 +231,7 @@ protected:
 
 protected:
 	bool  alive_;				// 是否属正常
+	ssize_t refers_;			// 当前连接池对象的引用计数
 	bool  delay_destroy_;			// 是否设置了延迟自销毁
 	// 有问题的服务器的可以重试的时间间隔，不可用连接池对象再次被启用的时间间隔
 	int   retry_inter_;
@@ -252,14 +256,17 @@ protected:
 	time_t last_;				// 上次记录的时间截
 	std::list<connect_client*> pool_;	// 连接池集合
 
-	size_t check_conns(size_t count);
-	size_t check_conns(size_t count, thread_pool& threads);
+	size_t check_dead(size_t count);
+	size_t check_dead(size_t count, thread_pool& threads);
 	void keep_conns(size_t min);
 	void keep_conns(size_t min, thread_pool& threads);
 
 	size_t kick_idle_conns(time_t ttl);	// 关闭过期的连接
 	connect_client* peek_back();		// 从尾部 Peek 连接
 	void put_front(connect_client* conn);	// 向头部 Put 连接
+
+	void count_inc(bool exclusive);		// 增加连接数及对象引用计数
+	void count_dec(bool exclusive);		// 减少连接数及对象引用计数
 };
 
 class ACL_CPP_API connect_guard : public noncopyable {

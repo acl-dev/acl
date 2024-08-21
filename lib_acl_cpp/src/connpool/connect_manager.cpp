@@ -448,16 +448,16 @@ size_t connect_manager::check_conns(size_t step, bool check_idle,
 	bool kick_dead, bool keep_conns, thread_pool* threads, size_t* left)
 {
 	std::vector<connect_pool*> pools;
-	size_t nfreed = 0;
 
 	pools_dump(step, pools);
-
 	if (pools.empty()) {
 		if (left) {
 			*left = 0;
 		}
 		return 0;
 	}
+
+	size_t nfreed = 0;
 
 	if (check_idle) {
 		nfreed += check_idle_conns(pools);
