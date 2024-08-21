@@ -524,7 +524,6 @@ size_t connect_pool::check_dead(size_t count)
 size_t connect_pool::check_dead(size_t count, thread_pool& threads)
 {
 	// Check all connections in threads pool.
-
 	size_t n = 0;
 	tbox<bool> box;
 	std::vector<check_job*> jobs;
@@ -553,8 +552,8 @@ size_t connect_pool::check_dead(size_t count, thread_pool& threads)
 	struct timeval end;
 	gettimeofday(&end, NULL);
 	double tc = stamp_sub(end, begin);
-	logger("Threads: limit=%zd, count=%d; jobs count=%zd, %zd, time cost=%.2f ms",
-	       threads.get_limit(), threads.threads_count(), jobs.size(), count, tc);
+	logger("Addr: %s; threads: limit=%zd, count=%d; jobs count=%zd, %zd, time cost=%.2f ms",
+	       addr_, threads.get_limit(), threads.threads_count(), jobs.size(), count, tc);
 
 	for (std::vector<check_job*>::iterator it = jobs.begin();
 	     it != jobs.end(); ++it) {
@@ -716,8 +715,8 @@ void connect_pool::keep_conns(size_t min, thread_pool& threads)
 	struct timeval end;
 	gettimeofday(&end, NULL);
 	double tc = stamp_sub(end, begin);
-	logger("Threads: limit=%zd, count=%d; jobs count=%zd, time cost=%.2f ms",
-		threads.get_limit(), threads.threads_count(), jobs.size(), tc);
+	logger("Addr=%s; threads: limit=%zd, count=%d; jobs count=%zd, time cost=%.2f ms",
+		addr_, threads.get_limit(), threads.threads_count(), jobs.size(), tc);
 
 	for (std::vector<check_job*>::iterator it = jobs.begin();
 	     it != jobs.end(); ++it) {
