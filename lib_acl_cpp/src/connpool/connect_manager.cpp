@@ -76,15 +76,10 @@ static int check_addr(const char* addr, string& buf, size_t default_count)
 void connect_manager::set_retry_inter(int n)
 {
 	lock_guard guard(lock_);
-
-	if (n == retry_inter_) {
-		return;
-	}
 	retry_inter_ = n;
 	for (manager_it mit = manager_.begin(); mit != manager_.end(); ++mit) {
 		for (pools_t::iterator it = mit->second->pools.begin();
-			it != mit->second->pools.end(); ++it) {
-
+		     it != mit->second->pools.end(); ++it) {
 			(*it)->set_retry_inter(retry_inter_);
 		}
 	}
@@ -92,12 +87,26 @@ void connect_manager::set_retry_inter(int n)
 
 void connect_manager::set_check_inter(int n)
 {
+	lock_guard guard(lock_);
 	check_inter_ = n;
+	for (manager_it it = manager_.begin(); it != manager_.end(); ++it) {
+		for (pools_it it2 = it->second->pools.begin();
+		     it2 != it->second->pools.end(); ++it2) {
+			(*it2)->set_check_inter(n);
+		}
+	}
 }
 
 void connect_manager::set_idle_ttl(time_t ttl)
 {
+	lock_guard guard(lock_);
 	idle_ttl_ = ttl;
+	for (manager_it it = manager_.begin(); it != manager_.end(); ++it) {
+		for (pools_it it2 = it->second->pools.begin();
+		     it2 != it->second->pools.end(); ++it2) {
+			(*it2)->set_idle_ttl(ttl);
+		}
+	}
 }
 
 void connect_manager::init(const char* default_addr, const char* addr_list,

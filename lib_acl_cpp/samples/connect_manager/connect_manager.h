@@ -3,7 +3,7 @@
 class connect_manager : public acl::connect_manager
 {
 public:
-	connect_manager(size_t min_conns, time_t ttl);
+	connect_manager(size_t min_conns);
 
 	virtual ~connect_manager();
 
