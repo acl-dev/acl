@@ -33,10 +33,11 @@ static void init(const char* addrs, int max, int min, int ttl,
 	int check_type, const char* proto)
 {
 	// 创建 HTTP 请求连接池集群管理对象
-	__conn_manager = new connect_manager((size_t) min, (time_t) ttl);
+	__conn_manager = new connect_manager((size_t) min);
 
 	// 添加服务器集群地址
 	__conn_manager->init(addrs, addrs, (size_t) max);
+	__conn_manager->set_idle_ttl(ttl);
 
 	printf(">>>start monitor thread\r\n");
 

@@ -2,10 +2,9 @@
 #include "connect_pool.h"
 #include "connect_manager.h"
 
-connect_manager::connect_manager(size_t min_conns, time_t ttl)
+connect_manager::connect_manager(size_t min_conns)
 : min_conns_(min_conns)
 {
-	this->set_idle_ttl(ttl);
 }
 
 connect_manager::~connect_manager()
