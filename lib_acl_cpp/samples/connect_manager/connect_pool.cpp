@@ -8,6 +8,7 @@ connect_pool::connect_pool(const char* addr, size_t count, size_t idx)
 , conn_timeout_(30)
 , rw_timeout_(30)
 {
+	this->set_conns_min(count);
 }
 
 connect_pool::~connect_pool()

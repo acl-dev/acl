@@ -48,6 +48,7 @@ private:
 
 connect_pool::connect_pool(const char* addr, size_t max, size_t idx /* = 0 */)
 : alive_(true)
+, refers_(0)
 , delay_destroy_(false)
 , last_dead_(0)
 , conn_timeout_(30)
@@ -74,6 +75,46 @@ connect_pool::~connect_pool()
 	std::list<connect_client*>::iterator it = pool_.begin();
 	for (; it != pool_.end(); ++it) {
 		delete *it;
+	}
+}
+
+void connect_pool::count_inc(bool exclusive) {
+	if (exclusive) {
+		lock_.lock();
+	}
+	++count_;
+	++refers_;
+	if (exclusive) {
+		lock_.unlock();
+	}
+}
+
+void connect_pool::count_dec(bool exclusive) {
+	if (exclusive) {
+		lock_.lock();
+	}
+	--count_;
+	--refers_;
+	if (exclusive) {
+		lock_.unlock();
+	}
+}
+
+void connect_pool::refer()
+{
+	lock_.lock();
+	++refers_;
+	lock_.unlock();
+}
+
+void connect_pool::unrefer()
+{
+	lock_.lock();
+	if (--refers_ <= 0 && delay_destroy_) {
+		lock_.unlock();
+		delete this;
+	} else {
+		lock_.unlock();
 	}
 }
 
@@ -206,8 +247,8 @@ connect_client* connect_pool::peek(bool on, double* tc, bool* old)
 
 		return conn;
 	} else if (max_ > 0 && count_ >= max_) {
-		logger_error("too many connections, max: %d, curr: %d,"
-			" server: %s", (int) max_, (int) count_, addr_);
+		logger_error("too many connections, max: %zd, curr: %zd,"
+			" server: %s", max_, count_, addr_);
 		lock_.unlock();
 
 		SET_TIME_COST;
@@ -222,7 +263,7 @@ connect_client* connect_pool::peek(bool on, double* tc, bool* old)
 	}
 
 	// 将以下三个值预 +1
-	count_++;
+	count_inc(false);
 	total_used_++;
 	current_used_++;
 
@@ -232,7 +273,7 @@ connect_client* connect_pool::peek(bool on, double* tc, bool* old)
 	conn = create_connect();
 	if (conn == NULL) {
 		lock_.lock();
-		count_--;
+		count_dec(false);
 		total_used_--;
 		current_used_--;
 #ifdef AUTO_SET_ALIVE
@@ -252,7 +293,7 @@ connect_client* connect_pool::peek(bool on, double* tc, bool* old)
 	if (!conn->open()) {
 		lock_.lock();
 		// 因为打开连接失败，所以还需将上面预 +1 的三个成员再 -1
-		count_--;
+		count_dec(false);
 		total_used_--;
 		current_used_--;
 #ifdef AUTO_SET_ALIVE
@@ -274,12 +315,10 @@ connect_client* connect_pool::peek(bool on, double* tc, bool* old)
 
 void connect_pool::bind_one(connect_client* conn)
 {
-	lock_.lock();
 	if (conn->get_pool() != this) {
 		conn->set_pool(this);
-		count_++;
+		count_inc(true);
 	}
-	lock_.unlock();
 }
 
 void connect_pool::put(connect_client* conn, bool keep /* = true */,
@@ -292,11 +331,11 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */,
 	// 检查是否设置了自销毁标志位
 	if (delay_destroy_) {
 		if (conn->get_pool() == this) {
-			count_--;
+			count_dec(false);
 		}
 		delete conn;
 
-		if (count_ <= 0) {
+		if (refers_ <= 0) {
 			// 如果引用计数为 0 则自销毁
 			lock_.unlock();
 			delete this;
@@ -315,7 +354,7 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */,
 	} else {
 		acl_assert(count_ > 0);
 		if (conn->get_pool() == this) {
-			count_--;
+			count_dec(false);
 		}
 		delete conn;
 	}
@@ -331,24 +370,6 @@ void connect_pool::put(connect_client* conn, bool keep /* = true */,
 		if (oper & cpool_put_keep_conns) {
 			keep_conns();
 		}
-	} else {
-		lock_.unlock();
-	}
-}
-
-void connect_pool::refer()
-{
-	lock_.lock();
-	++count_;
-	lock_.unlock();
-}
-
-void connect_pool::unrefer()
-{
-	lock_.lock();
-	if (--count_ <= 0 && delay_destroy_) {
-		lock_.unlock();
-		delete this;
 	} else {
 		lock_.unlock();
 	}
@@ -397,11 +418,11 @@ size_t connect_pool::check_idle(time_t ttl, bool exclusive /* true */)
 		std::list<connect_client*>::iterator it = pool_.begin();
 		for (; it != pool_.end(); ++it) {
 			delete *it;
+			count_dec(false);
 			n++;
 		}
 
 		pool_.clear();
-		count_ = 0;
 
 		if (exclusive) {
 			lock_.unlock();
@@ -448,7 +469,7 @@ size_t connect_pool::kick_idle_conns(time_t ttl)
 
 		// Decrease connections count only if the connection is mine.
 		if ((*it)->get_pool() == this) {
-			count_--;
+			count_dec(false);
 		}
 
 		delete *it;
@@ -471,12 +492,12 @@ size_t connect_pool::check_dead(thread_pool* threads /* NULL */)
 	}
 
 	if (threads == NULL) {
-		return check_conns(count);
+		return check_dead(count);
 	}
-	return check_conns(count, *threads);
+	return check_dead(count, *threads);
 }
 
-size_t connect_pool::check_conns(size_t count)
+size_t connect_pool::check_dead(size_t count)
 {
 	size_t n = 0;
 	for (size_t i = 0; i < count; i++) {
@@ -491,19 +512,19 @@ size_t connect_pool::check_conns(size_t count)
 		}
 
 		if (conn->get_pool() == this) {
-			lock_.lock();
-			--count_;
-			lock_.unlock();
+			count_dec(true);
 		}
 		delete conn;
 		n++;
 	}
+
 	return n;
 }
 
-size_t connect_pool::check_conns(size_t count, thread_pool& threads)
+size_t connect_pool::check_dead(size_t count, thread_pool& threads)
 {
 	// Check all connections in threads pool.
+
 	size_t n = 0;
 	tbox<bool> box;
 	std::vector<check_job*> jobs;
@@ -518,6 +539,9 @@ size_t connect_pool::check_conns(size_t count, thread_pool& threads)
 		threads.execute(job);
 	}
 
+	struct timeval begin;
+	gettimeofday(&begin, NULL);
+
 	bool found;
 	for (size_t i = 0; i < jobs.size(); i++) {
 		(void) box.pop(-1, &found);
@@ -525,6 +549,12 @@ size_t connect_pool::check_conns(size_t count, thread_pool& threads)
 			logger_fatal("Pop message from thread job failed!");
 		}
 	}
+
+	struct timeval end;
+	gettimeofday(&end, NULL);
+	double tc = stamp_sub(end, begin);
+	logger("Threads: limit=%zd, count=%d; jobs count=%zd, %zd, time cost=%.2f ms",
+	       threads.get_limit(), threads.threads_count(), jobs.size(), count, tc);
 
 	for (std::vector<check_job*>::iterator it = jobs.begin();
 	     it != jobs.end(); ++it) {
@@ -539,19 +569,19 @@ size_t connect_pool::check_conns(size_t count, thread_pool& threads)
 		delete *it;
 
 		if (conn->get_pool() == this) {
-			lock_.lock();
-			--count_;
-			lock_.unlock();
+			count_dec(true);
 		}
 		delete conn;
 		n++;
 	}
+
 	return n;
 }
 
 connect_client* connect_pool::peek_back()
 {
 	lock_.lock();
+#if 1
 	std::list<connect_client*>::reverse_iterator rit = pool_.rbegin();
 	if (rit == pool_.rend()) {
 		lock_.unlock();
@@ -561,6 +591,15 @@ connect_client* connect_pool::peek_back()
 	std::list<connect_client*>::iterator it = --rit.base();
 	connect_client* conn = *it;
 	pool_.erase(it);
+#else
+	std::list<connect_client*>::reverse_iterator rit = pool_.rbegin();
+	if (rit == pool_.rend()) {
+		lock_.unlock();
+		return NULL;
+	}
+	connect_client* conn = *rit;
+	pool_.erase(--rit.base());
+#endif
 	lock_.unlock();
 	return conn;
 }
@@ -575,11 +614,11 @@ void connect_pool::put_front(connect_client* conn)
 	// 检查是否设置了自销毁标志位
 	if (delay_destroy_) {
 		if (conn->get_pool() == this) {
-			count_--;
+			count_dec(false);
 		}
 		delete conn;
 
-		if (count_ <= 0) {
+		if (refers_ <= 0) {
 			// 如果引用计数为 0 则自销毁
 			lock_.unlock();
 			delete this;
@@ -625,7 +664,7 @@ void connect_pool::keep_conns(thread_pool* threads /* NULL */)
 void connect_pool::keep_conns(size_t min)
 {
 	for (size_t i = 0; i < min; i++) {
-		connect_client* conn = create_connect();
+		connect_client* conn = this->create_connect();
 		if (conn == NULL) {
 			logger_error("Create connection error");
 			break;
@@ -641,7 +680,8 @@ void connect_pool::keep_conns(size_t min)
 		put(conn, true);
 
 		lock_.lock();
-		count_++;
+		alive_ = true;
+		count_inc(false);
 		if (max_ > 0 && count_ >= max_) {
 			lock_.unlock();
 			break;
@@ -655,20 +695,29 @@ void connect_pool::keep_conns(size_t min, thread_pool& threads)
 	tbox<bool> box;
 	std::vector<check_job*> jobs;
 	for (size_t i = 0; i < min; i++) {
-		connect_client* conn = create_connect();
+		connect_client* conn = this->create_connect();
 		check_job* job = NEW check_job(box, *conn, false);
 		jobs.push_back(job);
 		threads.execute(job);
 	}
 
-	bool found;
+	struct timeval begin;
+	gettimeofday(&begin, NULL);
+
 	// Waiting all jobs finished.
+	bool found;
 	for (size_t i = 0; i < jobs.size(); i++) {
 		(void) box.pop(-1, &found);
 		if (!found) {
 			logger_fatal("Pop message from thread job failed!");
 		}
 	}
+
+	struct timeval end;
+	gettimeofday(&end, NULL);
+	double tc = stamp_sub(end, begin);
+	logger("Threads: limit=%zd, count=%d; jobs count=%zd, time cost=%.2f ms",
+		threads.get_limit(), threads.threads_count(), jobs.size(), tc);
 
 	for (std::vector<check_job*>::iterator it = jobs.begin();
 	     it != jobs.end(); ++it) {
@@ -683,7 +732,10 @@ void connect_pool::keep_conns(size_t min, thread_pool& threads)
 
 		conn->set_pool(this);
 		put(conn, true);
-		count_++;
+
+		lock_.lock();
+		alive_ = true;
+		count_inc(false);
 		lock_.unlock();
 	}
 }
