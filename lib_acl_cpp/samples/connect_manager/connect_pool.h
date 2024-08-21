@@ -3,7 +3,7 @@
 class connect_pool : public acl::connect_pool
 {
 public:
-	connect_pool(const char* addr, size_t count, size_t idx);
+	connect_pool(const char* addr, size_t max, size_t idx);
 	virtual ~connect_pool();
 
 	void set_timeout(int conn_timeout, int rw_timeout);
