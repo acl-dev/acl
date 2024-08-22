@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 #include "fiber/libfiber.h"
 
 static int __rw_timeout = 5;

@@ -29,6 +29,6 @@ void ipc_monitor::check_idle(void)
 	for (std::vector<acl::connect_pool*>::iterator it = pools.begin();
 		it != pools.end(); ++it)
 	{
-		(*it)->check_idle(ttl_);
+		(*it)->check_idle((time_t) ttl_);
 	}
 }

@@ -10,8 +10,7 @@
 #endif
 #include "check_timer.hpp"
 
-namespace acl
-{
+namespace acl {
 
 check_timer::check_timer(connect_monitor& monitor,
 	aio_handle& handle, int conn_timeout)
@@ -33,6 +32,17 @@ void check_timer::timer_callback(unsigned int id)
 	}
 
 	connect_manager& manager = monitor_.get_manager();
+
+	// 自动检测并关闭过期空闲长连接，自动关闭异常连接，自动保持每个连接池的最小连接数
+	manager.check_conns(monitor_.get_check_step(),
+		monitor_.check_idle_on(), monitor_.kick_dead_on(),
+		monitor_.keep_conns_on(), monitor_.get_threads(), NULL);
+
+	if (!monitor_.check_server_on()) {
+		return;
+	}
+
+	// 开始收集并检测服务端服务可用性，并将不可用服务地址加入黑名单中
 
 	// 先提取所有服务器地址，因为要操作的对象处于多线程环境中，
 	// 所以需要进行互斥锁保护

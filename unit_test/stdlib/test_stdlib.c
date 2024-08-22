@@ -9,7 +9,7 @@
 
 #include "test_stdtab.h"
 
-void test_stdlib_register()
+void test_stdlib_register(void)
 {
 	aut_register(__test_fn_tab);
 }

@@ -370,7 +370,7 @@ redis_client* redis_client_cluster::move(redis_command& cmd,
 		return NULL;
 	}
 
-	conn = redirect(addr, conf->count);
+	conn = redirect(addr, conf->max);
 	if (conn == NULL) {
 		logger_error("redirect NULL, addr: %s", addr);
 		return NULL;
@@ -411,7 +411,7 @@ redis_client* redis_client_cluster::ask(redis_command& cmd,
 		return NULL;
 	}
 
-	conn = redirect(addr, conf->count);
+	conn = redirect(addr, conf->max);
 	if (conn == NULL) {
 		logger_error("redirect NULL, addr: %s", addr);
 		return NULL;

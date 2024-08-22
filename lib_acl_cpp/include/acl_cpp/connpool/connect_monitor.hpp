@@ -4,8 +4,7 @@
 #include "../stream/aio_handle.hpp"
 #include <vector>
 
-namespace acl
-{
+namespace acl {
 
 class aio_handle;
 class check_client;
@@ -13,15 +12,16 @@ class connect_manager;
 class rpc_service;
 class socket_stream;
 class aio_socket_stream;
+class thread_pool;
 
-class ACL_CPP_API connect_monitor : public thread
-{
+class ACL_CPP_API connect_monitor : public thread {
 public:
 	/**
 	 * 构造函数
 	 * @param manager {connect_manager&}
+	 * @param check_server {bool} 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
 	 */
-	connect_monitor(connect_manager& manager);
+	connect_monitor(connect_manager& manager, bool check_server = false);
 
 	virtual ~connect_monitor();
 
@@ -52,6 +52,67 @@ public:
 	connect_monitor& set_conn_timeout(int n);
 
 	/**
+	 * 是否检查服务端服务可用性并将不用的服务地址置入黑名单中
+	 * @return {bool}
+	 */
+	bool check_server_on() const {
+		return check_server_;
+	}
+
+	/**
+	 * 设置是否在连接检测器启动后自动关闭过期的空闲连接
+	 * @param check_idle {bool} 是否自动关闭过期的空闲连接
+	 * @param kick_dead {bool} 是否检查所有连接的存活状态并关闭异常连接，当该参数
+	 *  为 true 时，connect_client 的子类必须重载 alive() 虚方法，返回连接是否存活
+	 * @param keep_conns {bool} 是否尽量操持每个连接池中最小连接数
+	 * @param threads {thread_pool*} 线程池非空时将会被使用来提升并发处理能力
+	 * @param step {bool} 每次检测连接池个数
+	 * @return {connect_monitor&}
+	 */
+	connect_monitor& set_check_conns(bool check_idle, bool kick_dead,
+		bool keep_conns, thread_pool* threads = NULL, size_t step = 0);
+
+	/**
+	 * 是否自动检测并关闭过期空闲连接
+	 * @return {bool}
+	 */
+	bool check_idle_on() const {
+		return check_idle_;
+	}
+
+	/**
+	 * 是否需要检查异常连接并关闭
+	 * @return {bool}
+	 */
+	bool kick_dead_on() const {
+		return kick_dead_;
+	}
+
+	/**
+	 * 是否需要尽量保持每个连接池的最小连接数
+	 * @return {bool}
+	 */
+	bool keep_conns_on() const {
+		return keep_conns_;
+	}
+
+	/**
+	 * 当 check_idle_on() 返回 true 时，返回每次检测的连接数量限制
+	 * @return {size_t}
+	 */
+	size_t get_check_step() const {
+		return check_step_;
+	}
+
+	/**
+	 * 获得前面所设置的线程池对象
+	 * @return {thread_pool*}
+	 */
+	thread_pool* get_threads() const {
+		return threads_;
+	}
+
+	/**
 	 * 停止检测线程
 	 * @param graceful {bool} 是否文明地关闭检测过程，如果为 true
 	 *  则会等所有的检测连接关闭后检测线程才返回；否则，则直接检测线程
@@ -65,8 +126,7 @@ public:
 	 * 获得 connect_manager 引用对象
 	 * @return {connect_manager&}
 	 */
-	connect_manager& get_manager() const
-	{
+	connect_manager& get_manager() const {
 		return manager_;
 	}
 
@@ -101,8 +161,7 @@ public:
 	 * 当连接成功时的回调方法，子类可以实现本方法
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_connected(const check_client&, double cost)
-	{
+	virtual void on_connected(const check_client&, double cost) {
 		(void) cost;
 	}
 
@@ -111,8 +170,7 @@ public:
 	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到超时的时间间隔（秒）
 	 */
-	virtual void on_timeout(const char* addr, double cost)
-	{
+	virtual void on_timeout(const char* addr, double cost) {
 		(void) addr;
 		(void) cost;
 	}
@@ -122,8 +180,7 @@ public:
 	 * @param addr {const char*} 被检测的服务器地址，格式: ip:port
 	 * @param cost {double} 从发起连接请求到被断开的时间间隔（秒）
 	 */
-	virtual void on_refused(const char* addr, double cost)
-	{
+	virtual void on_refused(const char* addr, double cost) {
 		(void) addr;
 		(void) cost;
 	}
@@ -145,8 +202,14 @@ private:
 	bool stop_graceful_;
 	aio_handle handle_;			// 后台检测线程的非阻塞句柄
 	connect_manager& manager_;		// 连接池集合管理对象
+	bool check_server_;			// 是否检查服务端可用性
 	int   check_inter_;			// 检测连接池状态的时间间隔(秒)
 	int   conn_timeout_;			// 连接服务器的超时时间
+	bool  check_idle_;			// 是否检测并关闭过期空闲连接
+	bool  kick_dead_;			// 是否删除异常连接
+	bool  keep_conns_;			// 是否保持每个连接池最小连接数
+	size_t check_step_;			// 每次检测连接池个数限制
+	thread_pool* threads_;			// 线程池非空将会并发执行任务
 	rpc_service* rpc_service_;		// 异步 RPC 通信服务句柄
 };
 

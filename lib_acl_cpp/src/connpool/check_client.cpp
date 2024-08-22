@@ -9,8 +9,7 @@
 #endif
 #include "check_timer.hpp"
 
-namespace acl
-{
+namespace acl {
 
 check_client::check_client(check_timer& timer, const char* addr,
 	aio_socket_stream& conn, struct timeval& begin)
@@ -34,12 +33,12 @@ void check_client::set_blocked(bool on)
 	blocked_ = on;
 }
 
-void check_client::close(void)
+void check_client::close()
 {
 	conn_.close();
 }
 
-bool check_client::open_callback(void)
+bool check_client::open_callback()
 {
 	set_alive(true);
 	struct timeval end;
@@ -51,7 +50,7 @@ bool check_client::open_callback(void)
 	return true;
 }
 
-void check_client::close_callback(void)
+void check_client::close_callback()
 {
 	struct timeval end;
 	gettimeofday(&end, NULL);

@@ -7,8 +7,7 @@
 #endif
 #include "check_rpc.hpp"
 
-namespace acl
-{
+namespace acl {
 
 check_rpc::check_rpc(connect_monitor& monitor, check_client& checker)
 : monitor_(monitor)
@@ -16,11 +15,11 @@ check_rpc::check_rpc(connect_monitor& monitor, check_client& checker)
 {
 }
 
-check_rpc::~check_rpc(void)
+check_rpc::~check_rpc()
 {
 }
 
-void check_rpc::rpc_run(void)
+void check_rpc::rpc_run()
 {
 	// 打开阻塞流对象
 	socket_stream stream;
@@ -48,7 +47,7 @@ void check_rpc::rpc_run(void)
 	stream.unbind();
 }
 
-void check_rpc::rpc_onover(void)
+void check_rpc::rpc_onover()
 {
 	// 取消该检测对象的阻塞状态
 	checker_.set_blocked(false);

@@ -9,8 +9,7 @@
 #include "acl_cpp/connpool/tcp_client.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 tcp_client::tcp_client(const char* addr, int conn_timeout, int rw_timeout)
 : conn_timeout_(conn_timeout)
@@ -22,7 +21,7 @@ tcp_client::tcp_client(const char* addr, int conn_timeout, int rw_timeout)
 	reader_ = NULL;
 }
 
-tcp_client::~tcp_client(void)
+tcp_client::~tcp_client()
 {
 	delete reader_;
 	delete sender_;
@@ -30,7 +29,7 @@ tcp_client::~tcp_client(void)
 	acl_myfree(addr_);
 }
 
-bool tcp_client::open(void)
+bool tcp_client::open()
 {
 	if (!conn_->open(addr_, conn_timeout_, rw_timeout_)) {
 		logger_error("connnect %s error %s", addr_, last_serror());

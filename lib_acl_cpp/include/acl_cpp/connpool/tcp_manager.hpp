@@ -2,16 +2,14 @@
 #include "../acl_cpp_define.hpp"
 #include "connect_manager.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class connect_pool;
 
-class ACL_CPP_API tcp_manager : public connect_manager
-{
+class ACL_CPP_API tcp_manager : public connect_manager {
 public:
-	tcp_manager(void);
-	virtual ~tcp_manager(void);
+	tcp_manager();
+	virtual ~tcp_manager();
 
 protected:
 	// @override

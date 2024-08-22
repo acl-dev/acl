@@ -5,10 +5,9 @@
 #include "acl_cpp/stdlib/thread_pool.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-thread_pool::thread_pool(void)
+thread_pool::thread_pool()
 : stack_size_(0)
 , threads_limit_(100)
 , thread_idle_(0)
@@ -18,7 +17,7 @@ thread_pool::thread_pool(void)
 		acl_mycalloc(1, sizeof(acl_pthread_pool_attr_t));
 }
 
-thread_pool::~thread_pool(void)
+thread_pool::~thread_pool()
 {
 	if (thr_pool_ != NULL) {
 		stop();
@@ -39,7 +38,7 @@ thread_pool& thread_pool::set_limit(size_t n)
 	return *this;
 }
 
-size_t thread_pool::get_limit(void) const
+size_t thread_pool::get_limit() const
 {
 	if (thr_pool_) {
 		return acl_pthread_pool_limit(thr_pool_);
@@ -54,7 +53,7 @@ thread_pool& thread_pool::set_idle(int ttl)
 	return *this;
 }
 
-void thread_pool::start(void)
+void thread_pool::start()
 {
 	if (thr_pool_) {
 		return;
@@ -69,7 +68,7 @@ void thread_pool::start(void)
 	acl_pthread_pool_atfree(thr_pool_, thread_exit, this);
 }
 
-void thread_pool::stop(void)
+void thread_pool::stop()
 {
 	if (thr_pool_) {
 		acl_pthread_pool_destroy(thr_pool_);
@@ -77,7 +76,7 @@ void thread_pool::stop(void)
 	}
 }
 
-void thread_pool::wait(void)
+void thread_pool::wait()
 {
 	if (thr_pool_) {
 		acl_pthread_pool_stop(thr_pool_);
@@ -107,7 +106,7 @@ bool thread_pool::execute(thread_job* job)
 	return run(job);
 }
 
-int  thread_pool::threads_count(void) const
+int  thread_pool::threads_count() const
 {
 	if (thr_pool_ == NULL) {
 		logger_error("start() not called yet!");
@@ -117,7 +116,7 @@ int  thread_pool::threads_count(void) const
 	return acl_pthread_pool_size(thr_pool_);
 }
 
-int  thread_pool::task_qlen(void) const
+int  thread_pool::task_qlen() const
 {
 	if (thr_pool_ == NULL) {
 		logger_error("start() not called yet!");

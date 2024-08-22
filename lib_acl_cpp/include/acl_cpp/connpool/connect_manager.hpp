@@ -8,19 +8,18 @@
 
 struct ACL_EVENT;
 
-namespace acl
-{
+namespace acl {
 
 class connect_pool;
 class connect_monitor;
+class thread_pool;
 
 // 内部使用数据结构
 struct conns_pools {
 	std::vector<connect_pool*> pools;
 	size_t  check_next;			// 连接检测时的检测点下标
 	size_t  conns_next;			// 下一个要访问的的下标值
-	conns_pools(void)
-	{
+	conns_pools() {
 		check_next = 0;
 		conns_next = 0;
 	}
@@ -28,25 +27,28 @@ struct conns_pools {
 
 struct conn_config {
 	string addr;
-	size_t count;
+	size_t max;				// 最大连接数
+	size_t min;				// 最小连接数
 	int    conn_timeout;
 	int    rw_timeout;
+	bool   sockopt_timeo;
 
-	conn_config(void) {
-		count        = 0;
-		conn_timeout = 5;
-		rw_timeout   = 5;
+	conn_config() {
+		max           = 0;
+		min           = 0;
+		conn_timeout  = 5;
+		rw_timeout    = 5;
+		sockopt_timeo = false;
 	}
 };
 
 /**
  * connect pool 服务管理器，有获取连接池等功能
  */
-class ACL_CPP_API connect_manager : public noncopyable
-{
+class ACL_CPP_API connect_manager : public noncopyable {
 public:
-	connect_manager(void);
-	virtual ~connect_manager(void);
+	connect_manager();
+	virtual ~connect_manager();
 
 	/**
 	 * 是否将连接池与线程自动绑定，主要用于协程环境中，内部缺省值为 false，
@@ -67,22 +69,26 @@ public:
 	 *  COUNT 信息时便用此值，当此值为 0 时，则不限制连接数上限
 	 * @param conn_timeout {int} 网络连接时间(秒)
 	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 * @param sockopt_timeo {bool} 是否使用 setsockopt 设置网络读写超时
 	 *  注：default_addr 和 addr_list 不能同时为空
 	 */
 	void init(const char* default_addr, const char* addr_list,
-		size_t count, int conn_timeout = 30, int rw_timeout = 30);
+		size_t count, int conn_timeout = 30, int rw_timeout = 30,
+		bool sockopt_timeo = false);
 
 	/**
 	* 添加服务器的客户端连接池，该函数可以在程序运行时被调用，内部自动加锁
 	 * @param addr {const char*} 服务器地址，格式：ip:port
 	 *  注意：调用本函数时每次仅能添加一个服务器地址，可以循环调用本方法
-	 * @param count {size_t} 连接池数量限制, 如果该值设为 0，则不设置
+	 * @param max {size_t} 连接池数量限制, 如果该值设为 0，则不设置
 	 *  连接池的连接上限
 	 * @param conn_timeout {int} 网络连接时间(秒)
 	 * @param rw_timeout {int} 网络 IO 超时时间(秒)
+	 * @param sockopt_timeo {bool} 是否使用 setsockopt 设置网络读写超时
+	 * @param min {size_t} 设置连接池的最小连接数
 	 */
-	void set(const char* addr, size_t count,
-		int conn_timeout = 30, int rw_timeout = 30);
+	void set(const char* addr, size_t max, int conn_timeout = 30,
+		int rw_timeout = 30, bool sockopt_timeo = false, size_t = 0);
 
 	/**
 	 * 根据指定地址获取该地址对应的连接池配置对象
@@ -139,7 +145,7 @@ public:
 	 * 此外，该函数为虚接口，允许子类实现自己的轮循方式
 	 * @return {connect_pool*} 返回一个连接池，返回指针永远非空
 	 */
-	virtual connect_pool* peek(void);
+	virtual connect_pool* peek();
 
 	/**
 	 * 从连接池集群中获得一个连接池，该函数采用哈希定位方式从集合中获取一个
@@ -156,18 +162,18 @@ public:
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
 	 */
-	void lock(void);
+	void lock();
 
 	/**
 	 * 当用户重载了 peek 函数时，可以调用此函数对连接池管理过程加锁
 	 */
-	void unlock(void);
+	void unlock();
 
 	/**
 	 * 获得所有的服务器的连接池，该连接池中包含缺省的服务连接池
 	 * @return {std::vector<connect_pool*>&}
 	 */
-	std::vector<connect_pool*>& get_pools(void);
+	std::vector<connect_pool*>& get_pools();
 
 	/**
 	 * 检测连接池中的空闲连接，将过期的连接释放掉
@@ -175,28 +181,55 @@ public:
 	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
 	 * @return {size_t} 被释放的空闲连接数
 	 */
-	size_t check_idle(size_t step, size_t* left = NULL);
+	size_t check_idle_conns(size_t step, size_t* left = NULL);
+
+	/**
+	 * 检测连接池中的异常连接并关闭
+	 * @param step {size_t} 每次检测连接池的个数
+	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
+	 * @return {size_t} 被释放的连接数
+	 */
+	size_t check_dead_conns(size_t step, size_t* left = NULL);
+
+	/**
+	 * 尽量保持连接池中最小连接数
+	 * @param step {size_t} 每次检测连接池的个数
+	 * @return {size_t} 所有剩余连接总和
+	 */
+	size_t keep_min_conns(size_t step);
+
+	/**
+	 * 检测连接池中的空闲连接，将过期的连接释放掉，并保持每个连接池中的最小连接数
+	 * @param step {size_t} 每次检测连接池的个数
+	 * @param check_idle {bool} 是否检测并释放过期空闲连接
+	 * @param kick_dead {bool} 是否释放过期空闲连接
+	 * @param keep_conns {bool} 是否尽量保持每个连接池中的最小连接数
+	 * @param threads {thread_pool*} 非NULL将使用该线程池处理 kick_dead 过程
+	 * @param left {size_t*} 非空时，将存储所有剩余连接个数总和
+	 * @return {size_t} 被释放的空闲连接数
+	 */
+	size_t check_conns(size_t step, bool check_idle, bool kick_dead,
+		bool keep_conns, thread_pool* threads, size_t* left = NULL);
 
 	/**
 	 * 获得连接池集合中连接池对象的个数
 	 * @return {size_t}
 	 */
-	size_t size(void) const;
+	size_t size() const;
 
 	/**
 	 * 获得缺省的服务器连接池
 	 * @return {connect_pool*} 当调用 init 函数的 default_addr 为空时
 	 *  该函数返回 NULL
 	 */
-	connect_pool* get_default_pool(void)
-	{
+	connect_pool* get_default_pool() {
 		return default_pool_;
 	}
 
 	/**
 	 * 打印当前所有 redis 连接池的访问量
 	 */
-	void statistics(void);
+	void statistics();
 
 	/**
 	 * 启动后台非阻塞检测线程检测所有连接池连接状态
@@ -258,9 +291,18 @@ protected:
 	int  check_inter_;			// 检查空闲连接的时间间隔
 	connect_monitor* monitor_;		// 后台检测线程句柄
 
+	void pools_dump(size_t step, std::vector<connect_pool*>& out);
+	static size_t pools_release(std::vector<connect_pool*>& pools);
+
+	static size_t check_idle_conns(const std::vector<connect_pool*>& pools);
+	static size_t check_dead_conns(const std::vector<connect_pool*>& pools,
+		thread_pool* threads = NULL);
+	static void keep_min_conns(const std::vector<connect_pool*>& pools,
+		thread_pool* threads = NULL);
+
 	// 设置除缺省服务之外的服务器集群
 	void set_service_list(const char* addr_list, int count,
-		int conn_timeout, int rw_timeout);
+		int conn_timeout, int rw_timeout, bool sockopt_timeo = false);
 	conns_pools& get_pools_by_id(unsigned long id);
 	connect_pool* create_pool(const conn_config& cf, size_t idx);
 	void create_pools_for(pools_t& pools);
@@ -271,7 +313,7 @@ protected:
 	unsigned long get_id(void) const;
 	void get_key(const char* addr, string& key);
 	void get_addr(const char* key, string& addr);
-	connect_pool* add_pool(const char* addr);
+	//connect_pool* add_pool(const char* addr);
 
 	// 线程局部变量初始化时的回调方法
 	static void thread_oninit(void);

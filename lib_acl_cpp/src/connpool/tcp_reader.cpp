@@ -7,8 +7,7 @@
 #include "acl_cpp/connpool/tcp_reader.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 tcp_reader::tcp_reader(socket_stream& conn)
 : conn_(&conn)

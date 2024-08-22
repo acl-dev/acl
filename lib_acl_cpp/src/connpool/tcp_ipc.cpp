@@ -8,10 +8,9 @@
 #include "acl_cpp/connpool/tcp_ipc.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-tcp_ipc::tcp_ipc(void)
+tcp_ipc::tcp_ipc()
 : max_(0)
 , ttl_(60)
 , conn_timeout_(10)
@@ -20,7 +19,7 @@ tcp_ipc::tcp_ipc(void)
 	manager_ = NEW tcp_manager;
 }
 
-tcp_ipc::~tcp_ipc(void)
+tcp_ipc::~tcp_ipc()
 {
 	delete manager_;
 }
@@ -49,7 +48,7 @@ tcp_ipc& tcp_ipc::set_rw_timeout(int timeout)
 	return *this;
 }
 
-tcp_manager& tcp_ipc::get_manager(void) const
+tcp_manager& tcp_ipc::get_manager() const
 {
 	acl_assert(manager_);
 	return *manager_;
