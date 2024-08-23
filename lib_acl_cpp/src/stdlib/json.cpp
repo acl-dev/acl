@@ -351,6 +351,16 @@ int json_node::detach()
 	return acl_json_node_delete(node_me_);
 }
 
+void json_node::disable(bool yes)
+{
+	acl_json_node_disable(node_me_, yes ? 1 : 0);
+}
+
+bool json_node::disabled() const
+{
+	return acl_json_node_disabled(node_me_) != 0;
+}
+
 json_node& json_node::get_parent() const
 {
 	if (parent_) {

@@ -375,6 +375,19 @@ public:
 	int detach();
 
 	/**
+	 * 禁止当前 json 节点，在生成 json 字符串时被禁止的节点将被忽略，但该节点并未
+	 * 从 json 节点树中删除，这样在下次遍历时还可以再启用该节点
+	 * @param yes {bool} 是否禁止该 json 节点，false 表示启用，true 表示禁用
+	 */
+	void disable(bool yes);
+
+	/**
+	 * 判断当前 json 节点是否被禁止了
+	 * @return {bool}
+	 */
+	bool disabled() const;
+
+	/**
 	 * 当在遍历该 json 节点时，内部会动态产生一些临时 json_node 对象，调用
 	 * 此函数可以清空这些对象，一旦调用此函数进行了清除，则由 first_child,
 	 * next_child 返回的 json_node 节点对象将不再可用，否则会产生内存非法
