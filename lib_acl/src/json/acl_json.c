@@ -133,6 +133,26 @@ int acl_json_node_delete(ACL_JSON_NODE *node)
 	return n;
 }
 
+ACL_JSON_NODE *acl_json_node_erase(ACL_JSON_NODE *node, ACL_ITER *it)
+{
+	ACL_JSON_NODE *curr = (ACL_JSON_NODE*) it->data;
+	ACL_JSON_NODE *next = node->iter_next(it, node);
+	if (curr) {
+		acl_json_node_delete(curr);
+	}
+	return next;
+}
+
+ACL_JSON_NODE *acl_json_node_rerase(ACL_JSON_NODE *node, ACL_ITER *it)
+{
+	ACL_JSON_NODE *curr = (ACL_JSON_NODE*) it->data;
+	ACL_JSON_NODE *next = node->iter_prev(it, node);
+	if (curr) {
+		acl_json_node_delete(curr);
+	}
+	return next;
+}
+
 void acl_json_node_disable(ACL_JSON_NODE *node, int yes)
 {
 	node->disabled = yes ? 1 : (unsigned) 0;
@@ -181,8 +201,9 @@ ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node)
 	ACL_RING *ring_ptr = acl_ring_pred(&node->node);
 	ACL_JSON_NODE *parent;
 
-	if (ring_ptr == &node->node)
+	if (ring_ptr == &node->node) {
 		return NULL;
+	}
 	parent = node->parent;
 	acl_assert(parent != NULL);
 	if (ring_ptr == &parent->children) {
@@ -247,7 +268,6 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 	}
 
 	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
-
 	do {
 		if (parent == json->root) {
 			break;
@@ -255,8 +275,9 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 
 		ring_ptr = acl_ring_succ(&parent->node);
 		parent = acl_json_node_parent(parent);
-		if (parent == NULL)
+		if (parent == NULL) {
 			acl_msg_fatal("%s(%d): parent null", __FILE__, __LINE__);
+		}
 
 		if (ring_ptr != &parent->children) {
 			it->i++;
@@ -267,7 +288,6 @@ static ACL_JSON_NODE *json_iter_next(ACL_ITER *it, ACL_JSON *json)
 	} while (ring_ptr != &json->root->children);
 
 	/* 遍历完所有节点 */
-
 	it->ptr = it->data = NULL;
 	return NULL;
 }
@@ -342,6 +362,51 @@ static ACL_JSON_NODE *json_iter_prev(ACL_ITER *it, ACL_JSON *json)
 
 	/* 遍历完所有节点 */
 
+	it->ptr = it->data = NULL;
+	return NULL;
+}
+
+ACL_JSON_NODE *acl_json_erase(ACL_JSON *json, ACL_ITER *it)
+{
+	ACL_RING *ring_ptr;
+	ACL_JSON_NODE *node, *parent;
+
+	node = (ACL_JSON_NODE*) it->data;
+	parent = acl_json_node_parent(node);
+
+	/* 查找当前节点的下一个兄弟节点 */
+	ring_ptr = acl_ring_succ(&node->node);
+	if (ring_ptr != &parent->children) {
+		it->i++;
+		it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
+		it->data = it->ptr;
+		acl_json_node_delete(node); /* 从 json 中删除当前节点 */
+		return it->ptr;
+	}
+
+	acl_json_node_delete(node); /* 从 json 中删除当前节点 */
+
+	/* 当前节点的兄弟节点遍历完毕，最后遍历当前节点的父节点的兄弟节点 */
+	do {
+		if (parent == json->root) {
+			break;
+		}
+
+		ring_ptr = acl_ring_succ(&parent->node);
+		parent = acl_json_node_parent(parent);
+		if (parent == NULL) {
+			acl_msg_fatal("%s(%d): parent null", __FILE__, __LINE__);
+		}
+
+		if (ring_ptr != &parent->children) {
+			it->i++;
+			it->ptr = acl_ring_to_appl(ring_ptr, ACL_JSON_NODE, node);
+			it->data = it->ptr;
+			return it->ptr;
+		}
+	} while (ring_ptr != &json->root->children);
+
+	/* 遍历完所有节点 */
 	it->ptr = it->data = NULL;
 	return NULL;
 }

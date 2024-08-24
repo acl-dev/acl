@@ -131,6 +131,20 @@ ACL_API ACL_JSON_NODE *acl_json_node_alloc(ACL_JSON *json);
 ACL_API int acl_json_node_delete(ACL_JSON_NODE *node);
 
 /**
+ * 从当前的 json 节点中删除迭代器节点，并返回下一个 json 节点
+ * @param node {ACL_JSON_NODE*} json 节点
+* @return {ACL_JSON_NODE*} 返回的下一个 json 节点
+ */
+ACL_API ACL_JSON_NODE *acl_json_node_erase(ACL_JSON_NODE *node, ACL_ITER *it);
+
+/**
+ * 从当前的 json 节点中删除反向迭代器节点，并返回下一个 json 节点
+ * @param node {ACL_JSON_NODE*} json 节点
+* @return {ACL_JSON_NODE*} 返回的前一个 json 节点
+ */
+ACL_API ACL_JSON_NODE *acl_json_node_rerase(ACL_JSON_NODE *node, ACL_ITER *it);
+
+/**
  * 禁止/启用某个 json 节点，被禁止的节点在构造 json 字符串时将不被添加，但在遍历 json 时
  * 却可以被获得，以方便再次将其启用
  * @param node {ACL_JSON_NODE*} json 节点
@@ -157,8 +171,7 @@ ACL_API void acl_json_node_append(ACL_JSON_NODE *node1, ACL_JSON_NODE *node2);
  * @param parent {ACL_JSON_NODE*} 父节点
  * @param child {ACL_JSON_NODE*} 子节点
  */
-ACL_API void acl_json_node_add_child(
-	ACL_JSON_NODE *parent, ACL_JSON_NODE *child);
+ACL_API void acl_json_node_add_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child);
 
 /**
  * 将一个 JSON 对象的 JSON 节点复制至 JSON 对象中的一个 JSON 节点中，并返回
@@ -167,8 +180,7 @@ ACL_API void acl_json_node_add_child(
  * @param from {ACL_JSON_NODE*} 源 JSON 对象的一个 JSON 节点
  * @return {ACL_JSON_NODE*} 返回非空对象指针
  */
-ACL_API ACL_JSON_NODE *acl_json_node_duplicate(
-	ACL_JSON *json, ACL_JSON_NODE *from);
+ACL_API ACL_JSON_NODE *acl_json_node_duplicate(ACL_JSON *json, ACL_JSON_NODE *from);
 
 /**
  * 获得某个 json 节点的父节点
@@ -190,6 +202,14 @@ ACL_API ACL_JSON_NODE *acl_json_node_next(ACL_JSON_NODE *node);
  * @return {ACL_JSON_NODE*} 给定 json 节点的前一个兄弟节点, 若为NULL则表示不存在
  */
 ACL_API ACL_JSON_NODE *acl_json_node_prev(ACL_JSON_NODE *node);
+
+/**
+ * 在遍历 Json 对象过程中，删除当前迭代器指向的 json 节点并返回下一个 json 节点
+ * @param json {ACL_JSON*} json 对象
+ * @param it {ACL_ITER*} 遍历 json 对象的迭代器
+ * @return {ACL_JSON_NODE*} 返回下一个 json 节点
+ */
+ACL_API ACL_JSON_NODE *acl_json_erase(ACL_JSON *json, ACL_ITER *it);
 
 /**
  * 创建一个 json 对象

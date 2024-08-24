@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include "lib_acl.h"
 
-static void test_json(const char *data, const char *name)
+static void test_json(const char *data, ACL_ARGV *names)
 {
 	ACL_JSON *json = acl_json_alloc();
 	ACL_VSTRING *buf = acl_vstring_alloc(1024);
-	ACL_ITER iter;
+	ACL_ITER iter, iter2;
 
 	acl_json_update(json, data);
 
@@ -26,8 +26,11 @@ static void test_json(const char *data, const char *name)
 			continue;
 		}
 
-		if (EQ(STR(node->ltag), name)) {
-			acl_json_node_disable(node, 1);
+		acl_foreach(iter2, names) {
+			const char *name = (const char*) iter2.data;
+			if (EQ(STR(node->ltag), name)) {
+				acl_json_node_disable(node, 1);
+			}
 		}
 	}
 
@@ -39,12 +42,13 @@ static void test_json(const char *data, const char *name)
 
 static void usage(const char *procname)
 {
-	printf("usage: %s -h [help] -f filename -n tag_name\r\n", procname);
+	printf("usage: %s -h [help] -f filename -n tag_names\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-	char name[256], filename[256], *data;
+	ACL_ARGV *names;
+	char name[512], filename[256], *data;
 	int ch;
 
 	snprintf(name, sizeof(name), "name");
@@ -77,7 +81,9 @@ int main(int argc, char *argv[])
 		return 1;
 	}
 
-	test_json(data, name);
+	names = acl_argv_split(name, ",; \t");
+	test_json(data, names);
+	acl_argv_free(names);
 	acl_myfree(data);
 
 #ifdef	WIN32

@@ -350,6 +350,14 @@ public:
 	json_node* next_child();
 
 	/**
+	 * 在遍历子节点过程中删除释放指定的子节点，并返回下一个子节点
+	 * @param child {json_node*} 遍历过程中调用 first_child/next_child/remove_child
+	 *  时返回的当前 json 节点的子节点，该节点将被从 Json 对象中删除并释放
+	 * @return {json_node*} 返回当前节点的下一个子节点
+	 */
+	json_node* free_child(json_node* child);
+
+	/**
 	 * 从当前 json 节点的子节点中提取对应标签的 json 子节点
 	 * @param tag {const char*} json 子节点的标签名
 	 * @return {json_node*} 返回 NULL 表示不存在
@@ -772,6 +780,13 @@ public:
 	 *  内部库自动释放
 	 */
 	json_node* next_node();
+
+	/**
+	 * 在遍历过程通过本函数删除当前遍历到的 json 节点，并返回下一个 json 节点
+	 * @param curr {json_node*} 由 first_node/next_node/free_node 返回的节点
+	 * @return {json_node*} 返回下一个 json 节点
+	 */
+	json_node* free_node(json_node* curr);
 
 	/**
 	 * 将 json 对象树转成字符串

@@ -393,7 +393,9 @@ json_node* json_node::first_child()
 
 json_node* json_node::next_child()
 {
-	acl_assert(iter_);
+	if (iter_ == NULL) {
+		return NULL;
+	}
 
 	ACL_JSON_NODE* node = node_me_->iter_next(iter_, node_me_);
 	if (node == NULL) {
@@ -402,6 +404,21 @@ json_node* json_node::next_child()
 
 	json_node* child = dbuf_->create<json_node>(node, json_);
 	return child;
+}
+
+json_node* json_node::free_child(json_node* child)
+{
+	if (iter_ == NULL || child == NULL) {
+		return NULL;
+	}
+
+	ACL_JSON_NODE* node = acl_json_node_erase(node_me_, iter_);
+	if (node == NULL) {
+		return NULL;
+	}
+
+	json_node* next = dbuf_->create<json_node>(node, json_);
+	return next;
 }
 
 json_node* json_node::operator[](const char* tag)
@@ -752,7 +769,10 @@ json_node* json::first_node()
 
 json_node* json::next_node()
 {
-	acl_assert(iter_);
+	if (iter_ == NULL) {
+		return NULL;
+	}
+
 	ACL_JSON_NODE* node = json_->iter_next(iter_, json_);
 	if (node == NULL) {
 		return NULL;
@@ -760,6 +780,20 @@ json_node* json::next_node()
 
 	json_node* n = dbuf_->create<json_node>(node, this);
 	return n;
+}
+
+json_node* json::free_node(acl::json_node* curr)
+{
+	if (iter_ == NULL || curr == NULL) {
+		return NULL;
+	}
+
+	ACL_JSON_NODE* node = acl_json_erase(json_, iter_);
+	if (node == NULL) {
+		return NULL;
+	}
+	json_node* next = dbuf_->create<json_node>(node, this);
+	return next;
 }
 
 const string& json::to_string(string* out /* = NULL */,
