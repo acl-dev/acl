@@ -5,8 +5,7 @@
 #include "acl_cpp/stdlib/json.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 : node_me_(node)
@@ -21,12 +20,12 @@ json_node::json_node(ACL_JSON_NODE* node, json* json_ptr)
 	acl_assert(dbuf_);
 }
 
-json_node::~json_node(void)
+json_node::~json_node()
 {
 	delete buf_;
 }
 
-const char* json_node::tag_name(void) const
+const char* json_node::tag_name() const
 {
 	if (node_me_->ltag && ACL_VSTRING_LEN(node_me_->ltag) > 0) {
 		return acl_vstring_str(node_me_->ltag);
@@ -35,7 +34,7 @@ const char* json_node::tag_name(void) const
 	}
 }
 
-const char* json_node::get_text(void) const
+const char* json_node::get_text() const
 {
 	if (node_me_->text) {
 		if (ACL_VSTRING_LEN(node_me_->text) > 0) {
@@ -48,7 +47,7 @@ const char* json_node::get_text(void) const
 	}
 }
 
-json_node* json_node::get_obj(void) const
+json_node* json_node::get_obj() const
 {
 	if (obj_ != NULL) {
 		return obj_;
@@ -62,12 +61,12 @@ json_node* json_node::get_obj(void) const
 	return obj_;
 }
 
-const char* json_node::get_string(void) const
+const char* json_node::get_string() const
 {
 	return get_text();
 }
 
-const acl_int64* json_node::get_int64(void) const
+const acl_int64* json_node::get_int64() const
 {
 	if (!is_number()) {
 		return NULL;
@@ -80,7 +79,7 @@ const acl_int64* json_node::get_int64(void) const
 	return &node_val_.n;
 }
 
-const double* json_node::get_double(void) const
+const double* json_node::get_double() const
 {
 	if (!is_double()) {
 		return NULL;
@@ -93,7 +92,7 @@ const double* json_node::get_double(void) const
 	return &node_val_.d;
 }
 
-const bool* json_node::get_bool(void) const
+const bool* json_node::get_bool() const
 {
 	if (!is_bool()) {
 		return NULL;
@@ -107,18 +106,18 @@ const bool* json_node::get_bool(void) const
 	return &node_val_.b;
 }
 
-bool json_node::is_string(void) const
+bool json_node::is_string() const
 {
 	return (node_me_->type & ACL_JSON_T_A_STRING)
 		|| (node_me_->type & ACL_JSON_T_STRING);
 }
 
-bool json_node::is_number(void) const
+bool json_node::is_number() const
 {
 	return is_double();
 }
 
-bool json_node::is_double(void) const
+bool json_node::is_double() const
 {
 	return  (node_me_->type & ACL_JSON_T_A_DOUBLE) ||
 		(node_me_->type & ACL_JSON_T_DOUBLE) ||
@@ -126,19 +125,19 @@ bool json_node::is_double(void) const
 		(node_me_->type & ACL_JSON_T_NUMBER);
 }
 
-bool json_node::is_bool(void) const
+bool json_node::is_bool() const
 {
 	return (node_me_->type & ACL_JSON_T_A_BOOL)
 		|| (node_me_->type & ACL_JSON_T_BOOL);
 }
 
-bool json_node::is_null(void) const
+bool json_node::is_null() const
 {
 	return (node_me_->type & ACL_JSON_T_A_NULL)
 		|| (node_me_->type & ACL_JSON_T_NULL);
 }
 
-bool json_node::is_object(void) const
+bool json_node::is_object() const
 {
 	if (node_me_->type & ACL_JSON_T_OBJ) {
 		return true;
@@ -156,7 +155,7 @@ bool json_node::is_object(void) const
 	*/
 }
 
-bool json_node::is_array(void) const
+bool json_node::is_array() const
 {
 	if (node_me_->type & ACL_JSON_T_ARRAY) {
 		return true;
@@ -165,7 +164,7 @@ bool json_node::is_array(void) const
 	}
 }
 
-const char* json_node::get_type(void) const
+const char* json_node::get_type() const
 {
 	if (is_string()) {
 		return "string";
@@ -347,12 +346,22 @@ json_node& json_node::add_array_null(bool return_child /* = false */)
 	return add_child(json_->create_array_null(), return_child);
 }
 
-int json_node::detach(void)
+int json_node::detach()
 {
 	return acl_json_node_delete(node_me_);
 }
 
-json_node& json_node::get_parent(void) const
+void json_node::disable(bool yes)
+{
+	acl_json_node_disable(node_me_, yes ? 1 : 0);
+}
+
+bool json_node::disabled() const
+{
+	return acl_json_node_disabled(node_me_) != 0;
+}
+
+json_node& json_node::get_parent() const
 {
 	if (parent_) {
 		return *parent_;
@@ -367,7 +376,7 @@ json_node& json_node::get_parent(void) const
 	return *parent_;
 }
 
-json_node* json_node::first_child(void)
+json_node* json_node::first_child()
 {
 	if (iter_ == NULL) {
 		iter_ = (ACL_ITER*) dbuf_->dbuf_alloc(sizeof(ACL_ITER));
@@ -382,9 +391,11 @@ json_node* json_node::first_child(void)
 	return child;
 }
 
-json_node* json_node::next_child(void)
+json_node* json_node::next_child()
 {
-	acl_assert(iter_);
+	if (iter_ == NULL) {
+		return NULL;
+	}
 
 	ACL_JSON_NODE* node = node_me_->iter_next(iter_, node_me_);
 	if (node == NULL) {
@@ -393,6 +404,21 @@ json_node* json_node::next_child(void)
 
 	json_node* child = dbuf_->create<json_node>(node, json_);
 	return child;
+}
+
+json_node* json_node::free_child(json_node* child)
+{
+	if (iter_ == NULL || child == NULL) {
+		return NULL;
+	}
+
+	ACL_JSON_NODE* node = acl_json_node_erase(node_me_, iter_);
+	if (node == NULL) {
+		return NULL;
+	}
+
+	json_node* next = dbuf_->create<json_node>(node, json_);
+	return next;
 }
 
 json_node* json_node::operator[](const char* tag)
@@ -409,24 +435,24 @@ json_node* json_node::operator[](const char* tag)
 	return NULL;
 }
 
-int json_node::depth(void) const
+int json_node::depth() const
 {
 	return node_me_->depth;
 }
 
-int json_node::children_count(void) const
+int json_node::children_count() const
 {
 	return acl_ring_size(&node_me_->children);
 }
 
-void json_node::clear(void)
+void json_node::clear()
 {
 	if (buf_) {
 		buf_->clear();
 	}
 }
 
-json& json_node::get_json(void) const
+json& json_node::get_json() const
 {
 	return *json_;
 }
@@ -498,7 +524,7 @@ const char* json::update(const char* data)
 	return acl_json_update(json_, data);
 }
 
-bool json::finish(void)
+bool json::finish()
 {
 	return acl_json_finish(json_) == 0 ? false : true;
 }
@@ -581,7 +607,7 @@ json_node* json::getFirstElementByTags(const char* tags) const
 	return node;
 }
 
-ACL_JSON* json::get_json(void) const
+ACL_JSON* json::get_json() const
 {
 	return json_;
 }
@@ -649,7 +675,7 @@ json_node& json::create_array_bool(bool value)
 	return *n;
 }
 
-json_node& json::create_array_null(void)
+json_node& json::create_array_null()
 {
 	ACL_JSON_NODE* node = acl_json_create_array_null(json_);
 	json_node* n = dbuf_->create<json_node>(node, this);
@@ -667,7 +693,7 @@ json_node& json::create_node(bool as_array /* = false */)
 	return *n;
 }
 
-json_node& json::create_array(void)
+json_node& json::create_array()
 {
 	ACL_JSON_NODE* node = acl_json_create_array(json_);
 	json_node* n = dbuf_->create<json_node>(node, this);
@@ -718,7 +744,7 @@ json_node& json::duplicate_node(const json_node& node)
 	return *n;
 }
 
-json_node& json::get_root(void)
+json_node& json::get_root()
 {
 	if (root_) {
 		root_->node_me_ = json_->root;
@@ -728,7 +754,7 @@ json_node& json::get_root(void)
 	return *root_;
 }
 
-json_node* json::first_node(void)
+json_node* json::first_node()
 {
 	if (iter_ == NULL) {
 		iter_ = (ACL_ITER*) dbuf_->dbuf_alloc(sizeof(ACL_ITER));
@@ -741,9 +767,12 @@ json_node* json::first_node(void)
 	return n;
 }
 
-json_node* json::next_node(void)
+json_node* json::next_node()
 {
-	acl_assert(iter_);
+	if (iter_ == NULL) {
+		return NULL;
+	}
+
 	ACL_JSON_NODE* node = json_->iter_next(iter_, json_);
 	if (node == NULL) {
 		return NULL;
@@ -751,6 +780,20 @@ json_node* json::next_node(void)
 
 	json_node* n = dbuf_->create<json_node>(node, this);
 	return n;
+}
+
+json_node* json::free_node(acl::json_node* curr)
+{
+	if (iter_ == NULL || curr == NULL) {
+		return NULL;
+	}
+
+	ACL_JSON_NODE* node = acl_json_erase(json_, iter_);
+	if (node == NULL) {
+		return NULL;
+	}
+	json_node* next = dbuf_->create<json_node>(node, this);
+	return next;
 }
 
 const string& json::to_string(string* out /* = NULL */,
@@ -788,7 +831,7 @@ void json::build_json(string& out, bool add_space /* = false */) const
 	(void) acl_json_build(json_, buf);
 }
 
-void json::reset(void)
+void json::reset()
 {
 	clear();
 	dbuf_->dbuf_reset();
@@ -818,7 +861,7 @@ int json::pop_end(string* out acl_unused, size_t max /* = 0 */ acl_unused)
 	return 0;
 }
 
-void json::clear(void)
+void json::clear()
 {
 	if (buf_) {
 		buf_->clear();

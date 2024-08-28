@@ -6,8 +6,7 @@
 #include "acl_cpp/stdlib/url_coder.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 void url_coder::init_dbuf(dbuf_guard* dbuf)
 {
@@ -42,7 +41,7 @@ url_coder::url_coder(const url_coder& coder, dbuf_guard* dbuf /* = NULL */)
 	}
 }
 
-url_coder::~url_coder(void)
+url_coder::~url_coder()
 {
 	reset();
 
@@ -63,7 +62,7 @@ const url_coder& url_coder::operator =(const url_coder& coder)
 	return *this;
 }
 
-void url_coder::reset(void)
+void url_coder::reset()
 {
 	params_.clear();
 	buf_->clear();
@@ -96,7 +95,7 @@ void url_coder::encode(string& buf, bool clean /* = true */) const
 	}
 }
 
-const string& url_coder::to_string(void) const
+const string& url_coder::to_string() const
 {
 	encode(*buf_);
 	return *buf_;

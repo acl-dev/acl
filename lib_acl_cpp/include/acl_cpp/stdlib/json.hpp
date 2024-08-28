@@ -33,27 +33,27 @@ public:
 	 * @return {const char*} 返回 json 节点标签名，如果返回空，则说明
 	 *  调用者需要判断返回值
 	 */
-	const char* tag_name(void) const;
+	const char* tag_name() const;
 
 	/**
 	 * 返回该 json 节点的文本标签值，当该值为布尔型或数值型时调用者可
 	 * 自行进行转换
 	 * @return {const char*} 返回空说明没有文本标签值
 	 */
-	const char* get_text(void) const;
+	const char* get_text() const;
 
 	/**
 	 * 当该 json 节点存在子节点时，返回本 json 节点标签对应的 json 子节点
 	 * @return {const json_node*} 返回 NULL 说明不存在子节点
 	 *  注：get_text 与 get_obj 不会同时返回非 NULL
 	 */
-	json_node* get_obj(void) const;
+	json_node* get_obj() const;
 
 	/**
 	 * 当 json 节点为字符串类型时，该函数返回字符串内容
 	 * @return {const char*} 返回 NULL 表示该节点非字符串类型
 	 */
-	const char* get_string(void) const;
+	const char* get_string() const;
 
 	/**
 	 * 当 json 节点为长整型类型时，该函数返回长整型值的指针地址
@@ -62,68 +62,68 @@ public:
 #if defined(_WIN32) || defined(_WIN64)
 	const __int64* get_int64(void) const;
 #else
-	const long long int* get_int64(void) const;
+	const long long int* get_int64() const;
 #endif
 
 	/**
 	 * 当 json 节点为浮点类型时，该函数返回长整型值的指针地址
 	 * @return {const double*} 当返回 NULL 时表示该对象非浮点类型
 	 */
-	const double *get_double(void) const;
+	const double *get_double() const;
 
 	/**
 	 * 当 json 节点为布尔类型时，该函数返回布尔值的指针地址
 	 * @return {bool*} 当返回 NULL 时表示该对象非布尔类型
 	 */
-	const bool* get_bool(void) const;
+	const bool* get_bool() const;
 
 	/**
 	 * 判断本节点数据是否为字符串类型
 	 * @return {bool}
 	 */
-	bool is_string(void) const;
+	bool is_string() const;
 
 	/**
 	 * 判断本节点数据是否为数字类型
 	 * @return {bool}
 	 */
-	bool is_number(void) const;
+	bool is_number() const;
 
 	/**
 	 * 判断本节点数据是否为浮点类型
 	 * @return {bool}
 	 */
-	bool is_double(void) const;
+	bool is_double() const;
 
 	/**
 	 * 判断本节点数据是否为布尔类型
 	 * @return {bool}
 	 */
-	bool is_bool(void) const;
+	bool is_bool() const;
 
 	/**
 	 * 判断本节点数据是否为 null 类型
 	 * @return {bool}
 	 */
-	bool is_null(void) const;
+	bool is_null() const;
 
 	/**
 	 * 判断本节点是否为对象类型
 	 * @return {bool}
 	 */
-	bool is_object(void) const;
+	bool is_object() const;
 
 	/**
 	 * 判断本节点是否为数组类型
 	 * @return {bool}
 	 */
-	bool is_array(void) const;
+	bool is_array() const;
 
 	/**
 	 * 获得该节点类型的描述
 	 * @return {const char*}
 	 */
-	const char* get_type(void) const;
+	const char* get_type() const;
 
 	/**
 	 * 当该 json 节点有标签时，本函数用来新的标签值覆盖旧的标签名
@@ -285,8 +285,7 @@ public:
 	 * @return {json_node&} return_child 为 true 时创建的新节点的引用，
 	 *  否则返回本 json 节点对象的引用
 	 */
-	json_node& add_array_text(const char* text,
-		bool return_child = false);
+	json_node& add_array_text(const char* text, bool return_child = false);
 
 	/**
 	 * 创建一个 json 数字对象，并将之添加为本 json 节点的子节点
@@ -299,8 +298,7 @@ public:
 	json_node& add_array_number(__int64 value,
 		bool return_child = false);
 #else
-	json_node& add_array_number(long long int value,
-		bool return_child = false);
+	json_node& add_array_number(long long int value, bool return_child = false);
 #endif
 
 	/**
@@ -333,7 +331,7 @@ public:
 	 * @return {json_node&} 返回本节点的父节点引用，在采用级联方式创建 json
 	 *  对象时，本函数常被用于返回父节点
 	 */
-	json_node& get_parent(void) const;
+	json_node& get_parent() const;
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -342,14 +340,22 @@ public:
 	 * @return {json_node*} 返回空表示没有子节点，返回的非空对象不能
 	 *  在外部 delete，因为内部会自动释放
 	 */
-	json_node* first_child(void);
+	json_node* first_child();
 
 	/**
 	 * 获得本节点的下一个子节点
 	 * @return {json_node*} 返回空表示遍历过程结束，返回的非空对象不能
 	 *  在外部 delete，因为内部会自动释放
 	 */
-	json_node* next_child(void);
+	json_node* next_child();
+
+	/**
+	 * 在遍历子节点过程中删除释放指定的子节点，并返回下一个子节点
+	 * @param child {json_node*} 遍历过程中调用 first_child/next_child/remove_child
+	 *  时返回的当前 json 节点的子节点，该节点将被从 Json 对象中删除并释放
+	 * @return {json_node*} 返回当前节点的下一个子节点
+	 */
+	json_node* free_child(json_node* child);
 
 	/**
 	 * 从当前 json 节点的子节点中提取对应标签的 json 子节点
@@ -362,19 +368,32 @@ public:
 	 * 返回该 json 节点在整个 json 树中的深度
 	 * @return {int}
 	 */
-	int   depth(void) const;
+	int   depth() const;
 
 	/**
 	 * 返回该 json 节点的下一级子节点的个数
 	 * @return {int} 永远 >= 0
 	 */
-	int   children_count(void) const;
+	int   children_count() const;
 
 	/**
 	 * 将本节点及其子节点从 json 树中删除，其内存将由 json 对象统一释放
 	 * @return {int} 被释放的节点数量
 	 */
-	int detach(void);
+	int detach();
+
+	/**
+	 * 禁止当前 json 节点，在生成 json 字符串时被禁止的节点将被忽略，但该节点并未
+	 * 从 json 节点树中删除，这样在下次遍历时还可以再启用该节点
+	 * @param yes {bool} 是否禁止该 json 节点，false 表示启用，true 表示禁用
+	 */
+	void disable(bool yes);
+
+	/**
+	 * 判断当前 json 节点是否被禁止了
+	 * @return {bool}
+	 */
+	bool disabled() const;
 
 	/**
 	 * 当在遍历该 json 节点时，内部会动态产生一些临时 json_node 对象，调用
@@ -382,19 +401,19 @@ public:
 	 * next_child 返回的 json_node 节点对象将不再可用，否则会产生内存非法
 	 * 访问
 	 */
-	void clear(void);
+	void clear();
 
 	/**
 	 * 获得 json 对象的引用
 	 * @return {json&}
 	 */
-	json& get_json(void) const;
+	json& get_json() const;
 
 	/**
 	 * 取出对应于 ACL 库中的 json 节点对象
 	 * @return {ACL_JSON_NODE*} 返回节点对象，注：该节点用户不能单独释放
 	 */
-	ACL_JSON_NODE* get_json_node(void) const;
+	ACL_JSON_NODE* get_json_node() const;
 
 private:
 	friend class json;
@@ -409,7 +428,7 @@ private:
 	/**
 	 * 要求该对象必须是动态创建的
 	 */
-	~json_node(void);
+	~json_node();
 
 	/**
 	 * 设置 json 节点
@@ -459,7 +478,7 @@ public:
 	 */
 	json(const json_node& node, dbuf_guard* dbuf = NULL);
 
-	~json(void);
+	~json();
 
 	/**
 	 * 设置是否在解析时自动处理半个汉字的情形
@@ -482,14 +501,14 @@ public:
 	 * 判断是否解析完毕
 	 * @return {bool}
 	 */
-	bool finish(void);
+	bool finish();
 
 	/**
 	 * 重置 json 解析器状态，该 json 对象可以用来对多个 json 数据
 	 * 进行解析，在反复使用本 json 解析器前，需要调用本函数重置
 	 * 内部 json 解析器状态，清除上一次的解析结果
 	 */
-	void reset(void);
+	void reset();
 
 	/**
 	 * 从 json 对象中取得某个标签名的第一个节点
@@ -563,7 +582,7 @@ public:
 	 * @return {ACL_JSON*} 该值不可能为空，注意用户可以修改该对象的值，
 	 *  但不可以释放该对象
 	 */
-	ACL_JSON* get_json(void) const;
+	ACL_JSON* get_json() const;
 
 	/////////////////////////////////////////////////////////////////////
 
@@ -677,7 +696,7 @@ public:
 	 *  因为在 json 对象被释放时这些节点会自动被释放，当然用户也可以在
 	 * 不用时调用 reset 来释放这些 json_node 节点对象
 	 */
-	json_node& create_array_null(void);
+	json_node& create_array_null();
 
 	/**
 	 * 创建一个 json_node 节点容器对象，该对象没有标签,
@@ -688,7 +707,7 @@ public:
 	 *  不用时调用 reset 来释放这些 json_node 节点对象
 	 */
 	json_node& create_node(bool as_array = false);
-	json_node& create_array(void);
+	json_node& create_array();
 
 	/**
 	 * 创建一个 json_node 节点对象，该节点对象的格式为：tag_name: {}
@@ -744,7 +763,7 @@ public:
 	 * 获得根节点对象
 	 * @return {json_node&}
 	 */
-	json_node& get_root(void);
+	json_node& get_root();
 
 	/**
 	 * 开始遍历该 json 对象并获得第一个节点
@@ -752,7 +771,7 @@ public:
 	 *  注：返回的节点对象用户不能手工释放，因为该对象被
 	 *  内部库自动释放
 	 */
-	json_node* first_node(void);
+	json_node* first_node();
 
 	/**
 	 * 遍历该 json 对象的下一个 json 节点
@@ -760,7 +779,14 @@ public:
 	 *  注：返回的节点对象用户不能手工释放，因为该对象被
 	 *  内部库自动释放
 	 */
-	json_node* next_node(void);
+	json_node* next_node();
+
+	/**
+	 * 在遍历过程通过本函数删除当前遍历到的 json 节点，并返回下一个 json 节点
+	 * @param curr {json_node*} 由 first_node/next_node/free_node 返回的节点
+	 * @return {json_node*} 返回下一个 json 节点
+	 */
+	json_node* free_node(json_node* curr);
 
 	/**
 	 * 将 json 对象树转成字符串
@@ -781,7 +807,7 @@ public:
 	 * 获得内存池对象指针
 	 * @return {dbuf_guard*}
 	 */
-	dbuf_guard* get_dbuf(void) const {
+	dbuf_guard* get_dbuf() const {
 		return dbuf_;
 	}
 
@@ -790,7 +816,7 @@ public:
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear(void);
+	virtual void clear();
 
 private:
 	// 内存池管理对象，适合管理大量小内存

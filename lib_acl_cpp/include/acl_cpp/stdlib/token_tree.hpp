@@ -14,27 +14,25 @@ class token_tree;
 /**
  * 256 叉匹配树中的节点对象，为纯私有类
  */
-class ACL_CPP_API token_node : public noncopyable
-{
+class ACL_CPP_API token_node : public noncopyable {
 public:
 	/**
 	 * 获得该节点对应的键值
 	 * @return {const char*}
 	 */
-	const char* get_key(void) const;
+	const char* get_key() const;
 
 	/**
 	 * 获得该节点所绑定的对象地址
 	 * @return {void*}
 	 */
-	void* get_ctx(void) const;
+	void* get_ctx() const;
 
 	/**
 	 * 获得该节点所属的匹配树对象
 	 * @return {token_tree*}
 	 */
-	token_tree* get_tree(void) const
-	{
+	token_tree* get_tree() const {
 		return tree_;
 	}
 
@@ -42,16 +40,15 @@ public:
 	 * 获得 C 版本的节点对象
 	 * @return {ACL_TOKEN*}
 	 */
-	ACL_TOKEN* get_token(void) const
-	{
+	ACL_TOKEN* get_token() const {
 		return me_;
 	}
 
 private:
 	friend class token_tree;	// 仅允许 token_tree 构造/析构本类对象
 
-	token_node(void);
-	~token_node(void);
+	token_node();
+	~token_node();
 
 	void set_node(ACL_TOKEN* token, token_tree* tree);
 
@@ -66,11 +63,10 @@ private:
  * 256 叉树最大匹配查找算法，该算法具有通用性及非常高的性能(比哈希性能还高)，
  * 通过将字符串映射到 256 叉树上进行匹配查找
  */
-class ACL_CPP_API token_tree : public noncopyable
-{
+class ACL_CPP_API token_tree : public noncopyable {
 public:
-	token_tree(void);
-	~token_tree(void);
+	token_tree();
+	~token_tree();
 
 	/**
 	 * 添加一个新的项
@@ -129,20 +125,19 @@ public:
 	 * 遍历 256 匹配树时需先调用本方法获得第一个节点对象
 	 * @return {token_node*}
 	 */
-	const token_node* first_node(void);
+	const token_node* first_node();
 
 	/**
 	 * 遍历 256 匹配树时需先调用本方法获得下一个节点对象
 	 * @return {token_node*}
 	 */
-	const token_node* next_node(void);
+	const token_node* next_node();
 
 	/**
 	 * 获得 C 版本的 256 叉树对象
 	 * @return {ACL_TOKEN*}
 	 */
-	ACL_TOKEN* get_tree(void) const
-	{
+	ACL_TOKEN* get_tree() const {
 		return tree_;
 	}
 

@@ -1986,4 +1986,50 @@ std::ostream& operator << (std::ostream& o, const acl::string& s) {
 	return o;
 }
 
+void split(const char* str, const char* sep, std::vector<std::string>& out) {
+	const char* ptr = str, *start = str;
+	while (*ptr) {
+		if (strchr(sep, (int) (*ptr)) != NULL) {
+			if (start < ptr) {
+				size_t n = ptr - start;
+				std::string buf;
+				buf.assign(start, n);
+				out.push_back(buf);
+			}
+			start = ptr + 1;
+		}
+		ptr++;
+	}
+
+	if (*start) {
+		std::string buf = start;
+		out.push_back(start);
+	}
+}
+
+size_t split(const char* str, const char* sep, std::list<std::string>& out) {
+	size_t cnt = 0;
+	const char* ptr = str, *start = str;
+	while (*ptr) {
+		if (strchr(sep, (int) (*ptr)) != NULL) {
+			if (start < ptr) {
+				size_t n = ptr - start;
+				std::string buf;
+				buf.assign(start, n);
+				out.push_back(buf);
+				cnt++;
+			}
+			start = ptr + 1;
+		}
+		ptr++;
+	}
+
+	if (*start) {
+		out.push_back(start);
+		cnt++;
+	}
+
+	return cnt;
+}
+
 } // namespace acl

@@ -1369,6 +1369,23 @@ bool operator == (const acl::string& l, const std::string& r);
 // std::cout << s << std::endl;
 std::ostream& operator << (std::ostream& o, const acl::string& s);
 
+/**
+ * 将字符串进行分割
+ * @param str {const char*} 待分割的源字符串
+ * @param sep {const char*} 分割的字符串，属于该字符串中的任一个字符都可做为分割符
+ * @param out {std::vector<std::string>&} 存储分割后的字符串结果集
+ */
+void split(const char* str, const char* sep, std::vector<std::string>& out);
+
+/**
+ * 将字符串进行分割
+ * @param str {const char*} 待分割的源字符串
+ * @param sep {const char*} 分割的字符串，属于该字符串中的任一个字符都可做为分割符
+ * @param out {std::list<std::string>&} 存储分割后的字符串结果集
+ * @return {size_t} 返回分割后结果集中字符串的个数
+ */
+size_t split(const char* str, const char* sep, std::list<std::string>& out);
+
 } // namespce acl
 
 #if __cplusplus >= 201103L      // Support c++11 ?

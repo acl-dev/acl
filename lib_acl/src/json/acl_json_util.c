@@ -20,8 +20,9 @@ ACL_JSON_NODE *acl_json_getFirstElementByTagName(
 
 	acl_foreach(iter, json) {
 		ACL_JSON_NODE *node = (ACL_JSON_NODE*) iter.data;
-		if (strcasecmp(tag, STR(node->ltag)) == 0)
+		if (strcasecmp(tag, STR(node->ltag)) == 0) {
 			return node;
+		}
 	}
 
 	return NULL;
@@ -257,9 +258,8 @@ void acl_json_node_append_child(ACL_JSON_NODE *parent, ACL_JSON_NODE *child)
 	const char *myname = "acl_json_node_append_child";
 
 	if (parent->type != ACL_JSON_T_ARRAY
-		&& parent->type != ACL_JSON_T_OBJ
-		&& parent != parent->json->root)
-	{
+	    && parent->type != ACL_JSON_T_OBJ
+	    && parent != parent->json->root) {
 		acl_msg_fatal("%s(%d): parent's type not array or obj",
 			myname, __LINE__);
 	}
@@ -299,6 +299,26 @@ static void json_escape_append(ACL_VSTRING *buf, const char *src)
 	ACL_VSTRING_TERMINATE(buf);
 }
 
+static void child_end(ACL_JSON *json, ACL_JSON_NODE *node, ACL_VSTRING *buf)
+{
+	/* 当本节点为叶节点且后面没有兄弟节点时，需要一级一级回溯
+	 * 将父节点的分隔符添加至本叶节点尾部，直到遇到根节点或父
+	 * 节点的下一个兄弟节点非空
+	 */
+	while (acl_json_node_next(node) == NULL) {
+		if (node->parent == json->root) {
+			break;
+		}
+
+		node = node->parent;
+
+		/* right_ch: '}' or ']' */
+		if (node->right_ch != 0) {
+			ACL_VSTRING_ADDCH(buf, node->right_ch);
+		}
+	}
+}
+
 void acl_json_building(ACL_JSON *json, size_t length,
 	int (*callback)(ACL_JSON *, ACL_VSTRING *, void *), void *ctx)
 {
@@ -325,8 +345,9 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		json->root->right_ch = '}';
 	}
 
-	if (json->root->left_ch > 0)
+	if (json->root->left_ch > 0) {
 		ACL_VSTRING_ADDCH(buf, json->root->left_ch);
+	}
 
 	acl_foreach(iter, json) {
 		if (ACL_VSTRING_LEN(buf) >= length && callback != NULL) {
@@ -341,10 +362,11 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		node = (ACL_JSON_NODE*) iter.data;
 		prev = acl_json_node_prev(node);
 		if (prev != NULL) {
-			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE)) {
 				acl_vstring_strcat(buf, ", ");
-			else
+			} else {
 				acl_vstring_strcat(buf, ",");
+			}
 		}
 
 		/* 只有当标签的对应值为 JSON 对象或数组对象时 tag_node 非空 */
@@ -352,21 +374,24 @@ void acl_json_building(ACL_JSON *json, size_t length,
 			if (LEN(node->ltag) > 0) {
 				json_escape_append(buf, STR(node->ltag));
 				ACL_VSTRING_ADDCH(buf, ':');
-				if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+				if ((json->flag & ACL_JSON_FLAG_ADD_SPACE)) {
 					ACL_VSTRING_ADDCH(buf, ' ');
+				}
 			}
 
 			/* '{' or '[' */	
-			if (node->left_ch != 0)
+			if (node->left_ch != 0) {
 				ACL_VSTRING_ADDCH(buf, node->left_ch);
+			}
 		}
 
 		/* 当节点有标签名时 */
 		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
-			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE)) {
 				ACL_VSTRING_ADDCH(buf, ' ');
+			}
 
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_NULL:
@@ -384,9 +409,8 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		}
 
 		/* 当节点为数组的成员时 */
-		else if (LEN(node->text) > 0 && node->parent
-			&& node->parent->left_ch != 0)
-		{
+		else if (node->parent && node->parent->type == ACL_JSON_T_ARRAY
+			 && (node->type & ACL_JSON_T_A_TYPES)) {
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_A_NULL:
 				acl_vstring_strcat(buf, "null");
@@ -417,8 +441,9 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		if (acl_ring_size(&node->children) > 0) {
 			continue;
 		} else if (acl_json_node_next(node) != NULL) {
-			if (node->right_ch > 0)
+			if (node->right_ch > 0) {
 				ACL_VSTRING_ADDCH(buf, node->right_ch);
+			}
 			continue;
 		}
 
@@ -430,20 +455,12 @@ void acl_json_building(ACL_JSON *json, size_t length,
 		 * 将父节点的分隔符添加至本叶节点尾部，直到遇到根节点或父
 		 * 节点的下一个兄弟节点非空
 		 */
-		while (acl_json_node_next(node) == NULL) {
-			if (node->parent == json->root)
-				break;
-
-			node = node->parent;
-
-			/* right_ch: '}' or ']' */
-			if (node->right_ch != 0)
-				ACL_VSTRING_ADDCH(buf, node->right_ch);
-		}
+		child_end(json, node, buf);
 	}
 
-	if (json->root->right_ch > 0)
+	if (json->root->right_ch > 0) {
 		ACL_VSTRING_ADDCH(buf, json->root->right_ch);
+	}
 
 	ACL_VSTRING_TERMINATE(buf);
 	if (ACL_VSTRING_LEN(buf) > 0 && callback != NULL) {
@@ -456,8 +473,29 @@ void acl_json_building(ACL_JSON *json, size_t length,
 	acl_vstring_free(buf);
 
 	/* 将第二个参数置 NULL 表示处理完毕 */
-	if (callback != NULL)
+	if (callback != NULL) {
 		(void) callback(json, NULL, ctx);
+	}
+}
+
+static int is_parents_disabled(ACL_JSON_NODE *node)
+{
+	while ((node = node->parent)) {
+		if (node->disabled) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+static int is_first_node(ACL_JSON_NODE *node)
+{
+	while ((node = acl_json_node_prev(node))) {
+		if (!node->disabled) {
+			return 0;
+		}
+	}
+	return 1;
 }
 
 ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
@@ -466,8 +504,9 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 	ACL_ITER iter;
 	ACL_RING *ring_ptr = acl_ring_succ(&json->root->children);
 
-	if (buf == NULL)
+	if (buf == NULL) {
 		buf = acl_vstring_alloc(256);
+	}
 
 	/* 为了兼容历史的BUG，所以此处只能如此处理了--zsx, 2021.3.27 */
 
@@ -487,17 +526,28 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 		json->root->right_ch = '}';
 	}
 
-	if (json->root->left_ch > 0)
+	if (json->root->left_ch > 0) {
 		ACL_VSTRING_ADDCH(buf, json->root->left_ch);
+	}
 
 	acl_foreach(iter, json) {
 		node = (ACL_JSON_NODE*) iter.data;
+		if (node->disabled) { // 跳过被禁止的 json 节点
+			child_end(json, node, buf);
+			continue;
+		}
+
+		if (is_parents_disabled(node)) {
+			continue;
+		}
+
 		prev = acl_json_node_prev(node);
-		if (prev != NULL) {
-			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+		if (prev != NULL && (!prev->disabled || !is_first_node(node))) {
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE)) {
 				acl_vstring_strcat(buf, ", ");
-			else
+			} else {
 				acl_vstring_strcat(buf, ",");
+			}
 		}
 
 		/* 只有当标签的对应值为 JSON 对象或数组对象时 tag_node 非空 */
@@ -505,21 +555,24 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 			if (LEN(node->ltag) > 0) {
 				json_escape_append(buf, STR(node->ltag));
 				ACL_VSTRING_ADDCH(buf, ':');
-				if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+				if ((json->flag & ACL_JSON_FLAG_ADD_SPACE)) {
 					ACL_VSTRING_ADDCH(buf, ' ');
+				}
 			}
 
 			/* '{' or '[' */	
-			if (node->left_ch != 0)
+			if (node->left_ch != 0) {
 				ACL_VSTRING_ADDCH(buf, node->left_ch);
+			}
 		}
 
 		/* 当节点有标签名时 */
 		else if (LEN(node->ltag) > 0) {
 			json_escape_append(buf, STR(node->ltag));
 			ACL_VSTRING_ADDCH(buf, ':');
-			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE))
+			if ((json->flag & ACL_JSON_FLAG_ADD_SPACE)) {
 				ACL_VSTRING_ADDCH(buf, ' ');
+			}
 
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_NULL:
@@ -537,22 +590,8 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 		}
 
 		/* 当节点为数组的成员时 */
-#if 0
-		else if (LEN(node->text) > 0 && node->parent
-			/* 应该依据父节点类型来确定当前节点是否为数组节点
-			 * && node->parent->left_ch != 0)
-			 */
-			&& node->parent->type == ACL_JSON_T_ARRAY)
-#elif 0
 		else if (node->parent && node->parent->type == ACL_JSON_T_ARRAY
-			&& (LEN(node->text) > 0 || (node->type & ACL_JSON_T_A_STRING)))
-#else
-		else if (node->parent && node->parent->type == ACL_JSON_T_ARRAY
-			&& (node->type & (ACL_JSON_T_A_NULL
-			    | ACL_JSON_T_A_BOOL | ACL_JSON_T_A_NUMBER
-			    | ACL_JSON_T_A_DOUBLE | ACL_JSON_T_A_STRING)))
-#endif
-		{
+			 && (node->type & ACL_JSON_T_A_TYPES)) {
 			switch (node->type & ~ACL_JSON_T_LEAF) {
 			case ACL_JSON_T_A_NULL:
 				acl_vstring_strcat(buf, "null");
@@ -582,35 +621,29 @@ ACL_VSTRING *acl_json_build(ACL_JSON *json, ACL_VSTRING *buf)
 		/* 当本节点有子节点或虽为叶节点，但该节点的下一个兄弟节点
 		 * 非空时继续下一个循环过程
 		 */
-		if (acl_ring_size(&node->children) > 0)
+		if (acl_ring_size(&node->children) > 0) {
 			continue;
-		else if (acl_json_node_next(node) != NULL) {
-			if (node->right_ch > 0)
+		} else if (acl_json_node_next(node) != NULL) {
+			if (node->right_ch > 0) {
 				ACL_VSTRING_ADDCH(buf, node->right_ch);
+			}
 			continue;
 		}
 
-		if (node->right_ch > 0)
+		if (node->right_ch > 0) {
 			ACL_VSTRING_ADDCH(buf, node->right_ch);
+		}
 
 		/* 当本节点为叶节点且后面没有兄弟节点时，需要一级一级回溯
 		 * 将父节点的分隔符添加至本叶节点尾部，直到遇到根节点或父
 		 * 节点的下一个兄弟节点非空
 		 */
-		while (acl_json_node_next(node) == NULL) {
-			if (node->parent == json->root)
-				break;
-
-			node = node->parent;
-
-			/* right_ch: '}' or ']' */
-			if (node->right_ch != 0)
-				ACL_VSTRING_ADDCH(buf, node->right_ch);
-		}
+		child_end(json, node, buf);
 	}
 
-	if (json->root->right_ch > 0)
+	if (json->root->right_ch > 0) {
 		ACL_VSTRING_ADDCH(buf, json->root->right_ch);
+	}
 
 	ACL_VSTRING_TERMINATE(buf);
 	return buf;
@@ -621,13 +654,15 @@ ACL_VSTRING *acl_json_node_build(ACL_JSON_NODE *node, ACL_VSTRING *buf)
 	ACL_JSON *json = acl_json_alloc();
 	ACL_JSON_NODE *first;
 
-	if (buf == NULL)
+	if (buf == NULL) {
 		buf = acl_vstring_alloc(256);
+	}
 
-	if (node == node->json->root && node->tag_node != NULL)
+	if (node == node->json->root && node->tag_node != NULL) {
 		node = node->tag_node;
-	else
+	} else {
 		json->root->left_ch = json->root->right_ch = 0;
+	}
 
 	first = acl_json_node_duplicate(json, node);
 	acl_json_node_add_child(json->root, first);
