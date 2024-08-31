@@ -1,5 +1,5 @@
-#cmake_minimum_required(VERSION 3.2.0)
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.2.0)
+#cmake_minimum_required(VERSION 2.8.0)
 project(protocol)
 
 #set(CMAKE_BUILD_TYPE Release)
@@ -119,6 +119,13 @@ elseif (${WIN_OS})
 		"-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 		"-DACL_WRITEABLE_CHECK"
 		"-DACL_PREPARE_COMPILE")
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		add_definitions("-DHTTP_DLL -DHTTP_EXPORTS"
+			"-DICMP_DLL -DICMP_EXPORTS"
+			"-DSMTP_DLL -DSMTP_EXPORTS"
+			"-DACL_DLL"
+		)
+	endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES "Android")
@@ -135,9 +142,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 add_library(protocol_static STATIC ${lib_src})
 
 if (${WIN_OS})
-	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "libprotocol")
+	set_target_properties(protocol_static PROPERTIES
+		OUTPUT_NAME "libprotocol"
+		ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/static
+		LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/static
+	)
 else()
-	SET_TARGET_PROPERTIES(protocol_static PROPERTIES OUTPUT_NAME "protocol")
+	set_target_properties(protocol_static PROPERTIES OUTPUT_NAME "protocol")
 endif()
 
 link_directories(${lib_output_path})
@@ -178,12 +189,27 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 		endif()
 	endif()
 
-	set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
-	set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
-	add_library(protocol_shared SHARED ${lib_src})
-	target_link_libraries(protocol_shared acl)
+	if (${WIN_OS})
+		link_directories(${lib_output_path}/shared)
+	endif()
 
-	SET_TARGET_PROPERTIES(protocol_shared PROPERTIES OUTPUT_NAME "protocol")
+	add_library(protocol_shared SHARED ${lib_src})
+
+	if (${WIN_OS})
+		set_target_properties(protocol_shared PROPERTIES
+			OUTPUT_NAME "libprotocol"
+			RUNTIME_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/shared
+		)
+		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
+		target_link_libraries(protocol_shared libacl Ws2_32)
+	else()
+		set_target_properties(protocol_shared PROPERTIES OUTPUT_NAME "protocol")
+		set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
+		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
+		target_link_libraries(protocol_shared acl)
+	endif()
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
 		install(TARGETS protocol_shared
