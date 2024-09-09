@@ -4,23 +4,26 @@
 #include <QApplication>
 #include <QTimer>
 
-class fiber_dummy : public acl::fiber {
+class fiber_backend : public acl::fiber {
 public:
-    fiber_dummy() {}
+    fiber_backend() {}
 
 protected:
     void run() override {
-        qDebug() << "fiber_dummy started!";
+        qDebug() << "fiber_backend started!";
+        while (true) {
+            acl::fiber::delay(1000);
+        }
         delete this;
     }
 
-    ~fiber_dummy() = default;
+    ~fiber_backend() = default;
 };
 
 static void startupCallback()
 {
     acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
-    acl::fiber* fb = new fiber_dummy;
+    acl::fiber* fb = new fiber_backend;
     fb->start();
 }
 

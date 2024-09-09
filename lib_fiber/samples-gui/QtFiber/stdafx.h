@@ -5,7 +5,9 @@
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/libfiber.h"
 #include "fiber/libfiber.hpp"
-#include "fiber/fiber_tbox.hpp"
+
+#define  USE_CPP11
+#include "fiber/go_fiber.hpp"
 #include "patch.h"
 
 #include <string>
