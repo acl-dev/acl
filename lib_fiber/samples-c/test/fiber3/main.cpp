@@ -2,6 +2,7 @@
 #include <iostream>
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/lib_fiber.hpp"
+#include "fiber/go_fiber.hpp"
 
 static void fiber_main(int max_loop)
 {

@@ -5,6 +5,11 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QProcess.h>
+#include <QLabel>
+
+namespace acl {
+    class http_request;
+}
 
 class fiber_server;
 
@@ -30,9 +35,16 @@ protected:
     void onStartClient();
     void onStopSchedule();
     void onOpenChildWindow();
+    void onInputClicked();
+    void onUrlGet();
+
+    void onDialogAccepted(const QString &text);
 
 public:
     void onAboutToQuit();
+
+private:
+    void onDownloadFinish(bool ok, const acl::http_request& req);
 
 private:
     Ui::MainWindow *ui_;
@@ -41,6 +53,10 @@ private:
     QPushButton    *start_client_;
     QPushButton    *stop_fiber_;
     QPushButton    *open_child_;
+    QPushButton    *url_get_;
+    std::string     url_;
+    QPushButton    *input_button_;
+    QLabel         *input_display_;
 
     fiber_server   *server_ = nullptr;
     QProcess       *process_;

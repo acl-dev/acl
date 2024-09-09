@@ -24,7 +24,7 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 
 int main(void)
 {
-	int   ch, i;
+	int   i;
 
 	/* 创建协程 */
 	for (i = 0; i < __max_fiber; i++)
