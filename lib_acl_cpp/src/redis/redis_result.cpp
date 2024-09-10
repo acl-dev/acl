@@ -249,7 +249,7 @@ int redis_result::argv_to_string(char* buf, size_t size) const
 redis_result& redis_result::put(const redis_result* rr, size_t idx)
 {
 	if (children_ == NULL) {
-		children_ = (const redis_result**) dbuf_->dbuf_alloc(
+		children_ = (const redis_result**) dbuf_->dbuf_calloc(
 				sizeof(redis_result*) * children_size_);
 	} else if (idx == 0) {
 		children_idx_ = 0;
