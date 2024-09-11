@@ -32,7 +32,9 @@ protected:
 
     void onButtonClicked();
     void onStartServer();
+    void onStopServer();
     void onStartClient();
+    void onStartSchedule();
     void onStopSchedule();
     void onOpenChildWindow();
     void onInputClicked();
@@ -50,8 +52,10 @@ private:
     Ui::MainWindow *ui_;
     QPushButton    *button_;
     QPushButton    *start_server_;
+    QPushButton    *stop_server_;
     QPushButton    *start_client_;
-    QPushButton    *stop_fiber_;
+    QPushButton    *start_schedule_;
+    QPushButton    *stop_schedule_;
     QPushButton    *open_child_;
     QPushButton    *url_get_;
     std::string     url_;

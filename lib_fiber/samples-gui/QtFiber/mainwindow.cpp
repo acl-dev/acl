@@ -25,38 +25,49 @@ MainWindow::MainWindow(QWidget *parent)
     start_server_->setGeometry(QRect(QPoint(100, 150), QSize(300, 50)));
     connect(start_server_, &QPushButton::clicked, this, &MainWindow::onStartServer);
 
+    stop_server_ = new QPushButton("Stop fiber server", this);
+    stop_server_->setGeometry(QRect(QPoint(100, 200), QSize(300, 50)));
+    connect(stop_server_, &QPushButton::clicked, this, &MainWindow::onStopServer);
+
     start_client_ = new QPushButton("Start fiber client", this);
-    start_client_->setGeometry(QRect(QPoint(100, 200), QSize(300, 50)));
+    start_client_->setGeometry(QRect(QPoint(100, 250), QSize(300, 50)));
     connect(start_client_, &QPushButton::clicked, this, &MainWindow::onStartClient);
 
     url_get_ = new QPushButton("Http download", this);
-    url_get_->setGeometry(QRect(QPoint(100, 250), QSize(300, 50)));
+    url_get_->setGeometry(QRect(QPoint(100, 300), QSize(300, 50)));
     connect(url_get_, &QPushButton::clicked, this, &MainWindow::onUrlGet);
 
-    stop_fiber_ = new QPushButton("Stop fiber schedule", this);
-    stop_fiber_->setGeometry(QRect(QPoint(100, 300), QSize(300, 50)));
-    connect(stop_fiber_, &QPushButton::clicked, this, &MainWindow::onStopSchedule);
+    start_schedule_ = new QPushButton("Start fiber schedule", this);
+    start_schedule_->setGeometry(QRect(QPoint(100, 350), QSize(300, 50)));
+    connect(start_schedule_, &QPushButton::clicked, this, &MainWindow::onStartSchedule);
+
+    stop_schedule_ = new QPushButton("Stop fiber schedule", this);
+    stop_schedule_->setGeometry(QRect(QPoint(100, 400), QSize(300, 50)));
+    connect(stop_schedule_, &QPushButton::clicked, this, &MainWindow::onStopSchedule);
 
     open_child_ = new QPushButton("Open Child Window", this);
-    open_child_->setGeometry(QRect(QPoint(100, 350), QSize(300, 50)));
+    open_child_->setGeometry(QRect(QPoint(100, 450), QSize(300, 50)));
     connect(open_child_, &QPushButton::clicked, this, &MainWindow::onOpenChildWindow);
 
     input_button_= new QPushButton("Open dialog", this);
-    input_button_->setGeometry(100, 400, 300,50);
+    input_button_->setGeometry(100, 500, 300,50);
     connect(input_button_, &QPushButton::clicked, this, &MainWindow::onInputClicked);
 
     input_display_ = new QLabel("输入内容: ", this);
-    input_display_->setGeometry(100, 450, 200, 50);
+    input_display_->setGeometry(100, 550, 200, 50);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui_;
     delete server_;
+    qDebug() << "The main windows was destroied!";
 }
 
 void MainWindow::onAboutToQuit()
 {
+    qDebug() << "onAboutToQuit called!";
+//    acl::fiber::schedule_stop();
 }
 
 void MainWindow::onButtonClicked()
@@ -66,6 +77,11 @@ void MainWindow::onButtonClicked()
 
 void MainWindow::onStartServer()
 {
+    if (!acl::fiber::scheduled()) {
+        qDebug() << "gui fiber not scheduled yet!";
+        return;
+    }
+
     if (server_ != nullptr) {
         qDebug() << "Fiber server is running!";
         return;
@@ -77,8 +93,22 @@ void MainWindow::onStartServer()
     qDebug() << "Fiber server started";
 }
 
+void MainWindow::onStopServer()
+{
+    if (server_) {
+        server_->stop();
+        delete server_;
+        server_ = nullptr;
+    }
+}
+
 void MainWindow::onStartClient()
 {
+    if (!acl::fiber::scheduled()) {
+        qDebug() << "gui fiber not scheduled yet!";
+        return;
+    }
+
     acl::fiber *fb = new fiber_client("127.0.0.1", 9001, 10000, 0);
     qDebug() << "Start fiber client";
     fb->start();
@@ -87,6 +117,11 @@ void MainWindow::onStartClient()
 
 void MainWindow::onUrlGet()
 {
+    if (!acl::fiber::scheduled()) {
+        qDebug() << "gui fiber not scheudled yet!";
+        return;
+    }
+
     go[this] {
         const char *addr = "www.baidu.com:80";
         const char *host = "www.baidu.com";
@@ -119,6 +154,18 @@ void MainWindow::onDownloadFinish(bool ok, const acl::http_request& req)
     } else {
         qDebug() << "Got response body error!";
     }
+}
+
+void MainWindow::onStartSchedule()
+{
+    if (acl::fiber::scheduled()) {
+        qDebug() << "Fiber has been scheduled before!";
+        return;
+    }
+
+    qDebug() << "Begin schedule_gui!";
+    acl::fiber::schedule_gui();
+    qDebug() << "schedule_gui end!";
 }
 
 void MainWindow::onStopSchedule()
