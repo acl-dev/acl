@@ -68,8 +68,9 @@ int main(int argc, char* argv[])
 	}
 
 	xml = acl_xml_alloc();
-	if (cache_count > 0)
-		acl_xml_cache(xml, cache_count);
+	if (cache_count > 0) {
+		//acl_xml_cache(xml, cache_count);
+	}
 
 	fp = acl_vstream_fopen(filepath, O_RDONLY, 0600, 8192);
 	if (fp == NULL)

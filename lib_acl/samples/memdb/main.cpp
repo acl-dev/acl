@@ -26,7 +26,7 @@ static void create_db(void)
 {
 	ACL_MDT *mdt;
 
-	// ´´½¨Êı¾İ¿â¼°Êı¾İ±í
+	// åˆ›å»ºæ•°æ®åº“åŠæ•°æ®è¡¨
 	mdb = acl_mdb_create(db_name, "avl");
 	//mdb = acl_mdb_create(db_name, "binhash");
 	//mdb = acl_mdb_create(db_name, "hash");
@@ -48,22 +48,22 @@ static void close_db(void)
 
 static void add_user(void)
 {
-	const char *key_values1[] = { "ÍõÎå", "±±¾©", "26", "male", "±±¾©ÄĞÉú", NULL };
-	const char *key_values2[] = { "ÍõÑà", "ÉÏº£", "26", "female", "ÉÏº£Å®Éú", NULL };
-	const char *key_values3[] = { "ÍõÔÆ", "ÉÏº£", "25", "female", "ÉÏº£Å®Éú", NULL };
-	const char *key_values4[] = { "ÍõÑà", "ÉÏº£", "26", "female", "ÉÏº£Å®Éú", NULL };
-	const char *key_values5[] = { "ÍõÔÆ", "ÉÏº£", "25", "female", "ÉÏº£Å®Éú", NULL };
+	const char *key_values1[] = { "ç‹äº”", "åŒ—äº¬", "26", "male", "åŒ—äº¬ç”·ç”Ÿ", NULL };
+	const char *key_values2[] = { "ç‹ç‡•", "ä¸Šæµ·", "26", "female", "ä¸Šæµ·å¥³ç”Ÿ", NULL };
+	const char *key_values3[] = { "ç‹äº‘", "ä¸Šæµ·", "25", "female", "ä¸Šæµ·å¥³ç”Ÿ", NULL };
+	const char *key_values4[] = { "ç‹ç‡•", "ä¸Šæµ·", "26", "female", "ä¸Šæµ·å¥³ç”Ÿ", NULL };
+	const char *key_values5[] = { "ç‹äº‘", "ä¸Šæµ·", "25", "female", "ä¸Šæµ·å¥³ç”Ÿ", NULL };
 
 	USER_INFO *pinfo;
-	USER_INFO info1 = { "ÍõÎå", "26", "male", "1111111", "±±¾©" };
-	USER_INFO info2 = { "ÍõÑà", "26", "female", "1111111", "ÉÏº£" };
-	USER_INFO info3 = { "ÍõÔÆ", "25", "female", "1111111", "ÉÏº£" };
-	USER_INFO info4 = { "ÍõÑà", "26", "female", "1111111", "ÉÏº£" };
-	USER_INFO info5 = { "ÍõÔÆ", "25", "female", "1111111", "ÉÏº£" };
+	USER_INFO info1 = { "ç‹äº”", "26", "male", "1111111", "åŒ—äº¬" };
+	USER_INFO info2 = { "ç‹ç‡•", "26", "female", "1111111", "ä¸Šæµ·" };
+	USER_INFO info3 = { "ç‹äº‘", "25", "female", "1111111", "ä¸Šæµ·" };
+	USER_INFO info4 = { "ç‹ç‡•", "26", "female", "1111111", "ä¸Šæµ·" };
+	USER_INFO info5 = { "ç‹äº‘", "25", "female", "1111111", "ä¸Šæµ·" };
 
-	printf(">>>¿ªÊ¼Ìí¼ÓÓÃ»§...\r\n");
+	printf(">>>å¼€å§‹æ·»åŠ ç”¨æˆ·...\r\n");
 
-	// Ìí¼ÓÊı¾İ¼ÇÂ¼
+	// æ·»åŠ æ•°æ®è®°å½•
 	pinfo = &info1;
 	(void) acl_mdb_add(mdb, tab_name, pinfo, sizeof(USER_INFO), key_names, key_values1);
 	printf("\tuser_name(%s), user_age(%s), user_sex(%s), user_home(%s)\r\n",
@@ -93,9 +93,9 @@ static void search_user(void)
 	ACL_MDT_RES *res;
 	const USER_INFO *pinfo;
 
-	// ²éÑ¯ËùÓĞ user_sex Îª male µÄÊı¾İ¶ÔÏó
+	// æŸ¥è¯¢æ‰€æœ‰ user_sex ä¸º male çš„æ•°æ®å¯¹è±¡
 	res = acl_mdb_find(mdb, tab_name, "user_sex", "male", 0, 0);
-	printf(">>>²éÑ¯ user_sex=male results ...\r\n");
+	printf(">>>æŸ¥è¯¢ user_sex=male results ...\r\n");
 	if (res) {
 		while (1) {
 			pinfo = (const USER_INFO*) acl_mdt_fetch_row(res);
@@ -107,9 +107,9 @@ static void search_user(void)
 		acl_mdt_res_free(res);
 	}
 
-	// ²éÑ¯ËùÓĞ user_sex Îª male µÄÊı¾İ¶ÔÏó
+	// æŸ¥è¯¢æ‰€æœ‰ user_sex ä¸º male çš„æ•°æ®å¯¹è±¡
 	res = acl_mdb_find(mdb, tab_name, "user_age", "26", 0, 0);
-	printf(">>>²éÑ¯ user_age=26 results ...\r\n");
+	printf(">>>æŸ¥è¯¢ user_age=26 results ...\r\n");
 	if (res) {
 		while (1) {
 			pinfo = (const USER_INFO*) acl_mdt_fetch_row(res);
@@ -121,9 +121,9 @@ static void search_user(void)
 		acl_mdt_res_free(res);
 	}
 
-	// ²éÑ¯ËùÓĞ±±¾©µÄÓÃ»§
-	res = acl_mdb_find(mdb, tab_name, "user_home", "±±¾©", 0, 0);
-	printf(">>>²éÑ¯ user_home=±±¾© results ...\r\n");
+	// æŸ¥è¯¢æ‰€æœ‰åŒ—äº¬çš„ç”¨æˆ·
+	res = acl_mdb_find(mdb, tab_name, "user_home", "åŒ—äº¬", 0, 0);
+	printf(">>>æŸ¥è¯¢ user_home=åŒ—äº¬ results ...\r\n");
 	if (res) {
 		while (1) {
 			pinfo = (const USER_INFO*) acl_mdt_fetch_row(res);
@@ -135,9 +135,9 @@ static void search_user(void)
 		acl_mdt_res_free(res);
 	}
 
-	// ²éÑ¯ËùÓĞÉÏº£Å®Éú
-	res = acl_mdb_find(mdb, tab_name, "home_sex", "ÉÏº£Å®Éú", 0, 0);
-	printf(">>>²éÑ¯ ÉÏº£Å®Éú results ...\r\n");
+	// æŸ¥è¯¢æ‰€æœ‰ä¸Šæµ·å¥³ç”Ÿ
+	res = acl_mdb_find(mdb, tab_name, "home_sex", "ä¸Šæµ·å¥³ç”Ÿ", 0, 0);
+	printf(">>>æŸ¥è¯¢ ä¸Šæµ·å¥³ç”Ÿ results ...\r\n");
 	if (res) {
 		while (1) {
 			pinfo = (const USER_INFO*) acl_mdt_fetch_row(res);
@@ -154,12 +154,12 @@ static void delete_user()
 {
 	int   n;
 
-	printf(">>>É¾³ı ÉÏº£Å®Éú ...\r\n");
-	n = acl_mdb_del(mdb, tab_name, "home_sex", "ÉÏº£Å®Éú", NULL);
+	printf(">>>åˆ é™¤ ä¸Šæµ·å¥³ç”Ÿ ...\r\n");
+	n = acl_mdb_del(mdb, tab_name, "home_sex", "ä¸Šæµ·å¥³ç”Ÿ", NULL);
 	printf(">>>ok, delete total number=%d\r\n", n);
-	acl_mdb_del(mdb, tab_name, "home_sex", "ÉÏº£Å®Éú", NULL);
-	printf(">>>É¾³ı ±±¾© ÓÃ»§ ...\r\n");
-	n = acl_mdb_del(mdb, tab_name, "user_home", "±±¾©", NULL);
+	acl_mdb_del(mdb, tab_name, "home_sex", "ä¸Šæµ·å¥³ç”Ÿ", NULL);
+	printf(">>>åˆ é™¤ åŒ—äº¬ ç”¨æˆ· ...\r\n");
+	n = acl_mdb_del(mdb, tab_name, "user_home", "åŒ—äº¬", NULL);
 	printf(">>>ok, delete total number=%d\r\n", n);
 }
 
@@ -177,7 +177,7 @@ static void walk_table(void)
 {
 	int   ret;
 
-	printf(">>>±éÀúÊı¾İ±í\r\n");
+	printf(">>>éå†æ•°æ®è¡¨\r\n");
 
 	ret = acl_mdb_walk(mdb, tab_name, walk_fn, 0, 0);
 	printf(">>>table: %s's total number=%d\r\n", tab_name, ret);

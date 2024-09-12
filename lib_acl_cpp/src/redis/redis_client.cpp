@@ -473,12 +473,13 @@ const redis_result* redis_client::run(dbuf_pool* dbuf, const redis_request& req,
 	size_t size = req.get_size();
 
 	while (true) {
-		if (! open()) {
+		if (!open()) {
 			return NULL;
 		}
 
-		if (rw_timeout != NULL)
+		if (rw_timeout != NULL) {
 			conn_.set_rw_timeout(*rw_timeout);
+		}
 
 		if (check_addr_ && !check_connection(conn_)) {
 			logger_error("CHECK_CONNECTION FAILED!");
@@ -499,10 +500,11 @@ const redis_result* redis_client::run(dbuf_pool* dbuf, const redis_request& req,
 			return NULL;
 		}
 
-		if (nchildren >= 1)
+		if (nchildren >= 1) {
 			result = get_objects(conn_, dbuf, nchildren);
-		else
+		} else {
 			result = get_object(conn_, dbuf);
+		}
 
 		if (result != NULL) {
 			if (rw_timeout != NULL) {

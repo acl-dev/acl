@@ -4,6 +4,9 @@
 #include <QApplication>
 #include <QTimer>
 
+//#define USE_FIBER_INIT
+#ifdef USE_FIBER_INIT
+
 class fiber_backend : public acl::fiber {
 public:
     fiber_backend() {}
@@ -20,11 +23,19 @@ protected:
     ~fiber_backend() = default;
 };
 
+#endif
+
 static void startupCallback()
 {
+    qDebug() << "Begin schedule gui fiber!";
+#ifdef USE_FIBER_INIT
     acl::fiber::init(acl::FIBER_EVENT_T_WMSG, true);
     acl::fiber* fb = new fiber_backend;
     fb->start();
+#else
+   acl::fiber::schedule_gui(); // Won't return until schedule finished.
+#endif
+    qDebug() << "schedule gui fiber end!";
 }
 
 static void app_run(int argc, char **argv)

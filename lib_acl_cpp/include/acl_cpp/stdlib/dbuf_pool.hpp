@@ -23,8 +23,10 @@ class ACL_CPP_API dbuf_pool { // : public noncopyable
 public:
 	/**
 	 * 该类对象必须动态创建
+	 * @param nblock {size_t} 4096字节的个数
+	 * @param align {size_t} 分配内存时的字节对齐数
 	 */
-	dbuf_pool(size_t nblock = 2);
+	dbuf_pool(size_t nblock = 2, size_t align = 8);
 
 	/**
 	 * 该类对象必须要动态创建，所以隐藏了析构函数，使用者需要调用 destroy
@@ -119,8 +121,7 @@ public:
 	 * 获得内部 ACL_DBUF_POOL 对象，以便于操作 C 接口的内存池对象
 	 * @return {ACL_DBUF_POOL*}
 	 */
-	ACL_DBUF_POOL *get_dbuf()
-	{
+	ACL_DBUF_POOL *get_dbuf() const {
 		return pool_;
 	}
 
@@ -134,11 +135,9 @@ public:
 
 /**
  * sample:
- *  void test()
- *  {
+ *  void test() {
  *      acl::dbuf_pool* dbuf = new acl::dbuf_pool;
- *      for (int i = 0; i < 1000; i++)
- *      {
+ *      for (int i = 0; i < 1000; i++) {
  *          char* ptr = dbuf->dbuf_strdup("hello world!");
  *          printf("%s\r\n", p);
  *      }
@@ -146,8 +145,7 @@ public:
  *
  *      // 创建 dbuf 对象时，指定了内部分配内存块的位数
  *      dbuf = new(8) acl::dbuf_pool;
- *      for (int i = 0; i < 1000; i++)
- *      {
+ *      for (int i = 0; i < 1000; i++) {
  *          ptr = dbuf->dbuf_strdup("hello world!");
  *          printf("%s\r\n", p);
  *      }
@@ -181,8 +179,7 @@ public:
 	 * @return {int} 返回该对象在 dbuf_guard 中的数组中的下标位置，当该
 	 *  对象没有被 dbuf_guard 保存时，则返回 -1，此时有可能会造成内存泄露
 	 */
-	int pos() const
-	{
+	int pos() const {
 		return pos_;
 	}
 
@@ -190,8 +187,7 @@ public:
 	 * 返回构造函数中 dbuf_guard 对象
 	 * @return {dbuf_guard*}
 	 */
-	dbuf_guard* get_guard() const
-	{
+	dbuf_guard* get_guard() const {
 		return guard_;
 	}
 
@@ -227,8 +223,9 @@ public:
 	 * @param nblock {size_t} 本类对象内部创建 dbuf_pool 对象时，本参数
 	 *  指定了内存块(4096)的倍数
 	 * @param capacity {size_t} 内部创建的 objs_ 数组的初始长度
+	 * @param align {size_t} 分配内存时地址对齐字节个数
 	 */
-	dbuf_guard(size_t nblock = 2, size_t capacity = 500);
+	dbuf_guard(size_t nblock = 2, size_t capacity = 500, size_t align = 8);
 
 	/**
 	 * 析构函数，在析构函数内部将会自动销毁由构造函数传入的 dbuf_pool 对象
@@ -247,8 +244,7 @@ public:
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
-	void* dbuf_alloc(size_t len)
-	{
+	void* dbuf_alloc(size_t len) {
 		return dbuf_->dbuf_alloc(len);
 	}
 
@@ -257,8 +253,7 @@ public:
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
-	void* dbuf_calloc(size_t len)
-	{
+	void* dbuf_calloc(size_t len) {
 		return dbuf_->dbuf_calloc(len);
 	}
 
@@ -267,8 +262,7 @@ public:
 	 * @param s {const char*}
 	 * @return {char*}
 	 */
-	char* dbuf_strdup(const char* s)
-	{
+	char* dbuf_strdup(const char* s) {
 		return dbuf_->dbuf_strdup(s);
 	}
 
@@ -278,8 +272,7 @@ public:
 	 * @param len {size_t}
 	 * @return {char*}
 	 */
-	char* dbuf_strndup(const char* s, size_t len)
-	{
+	char* dbuf_strndup(const char* s, size_t len) {
 		return dbuf_->dbuf_strndup(s, len);
 	}
 
@@ -289,8 +282,7 @@ public:
 	 * @param len {size_t}
 	 * @return {void*}
 	 */
-	void* dbuf_memdup(const void* addr, size_t len)
-	{
+	void* dbuf_memdup(const void* addr, size_t len) {
 		return dbuf_->dbuf_memdup(addr, len);
 	}
 
@@ -299,8 +291,7 @@ public:
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
-	bool dbuf_free(const void* addr)
-	{
+	bool dbuf_free(const void* addr) {
 		return dbuf_->dbuf_free(addr);
 	}
 
@@ -309,8 +300,7 @@ public:
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
-	bool dbuf_keep(const void* addr)
-	{
+	bool dbuf_keep(const void* addr) {
 		return dbuf_->dbuf_keep(addr);
 	}
 
@@ -319,8 +309,7 @@ public:
 	 * @param addr {const void*}
 	 * @return {bool}
 	 */
-	bool dbuf_unkeep(const void* addr)
-	{
+	bool dbuf_unkeep(const void* addr) {
 		return dbuf_->dbuf_unkeep(addr);
 	}
 
@@ -328,8 +317,7 @@ public:
 	 * 获得 dbuf_pool 对象
 	 * @return {acl::dbuf_pool&}
 	 */
-	acl::dbuf_pool& get_dbuf() const
-	{
+	acl::dbuf_pool& get_dbuf() const {
 		return *dbuf_;
 	}
 
@@ -348,8 +336,7 @@ public:
 	 * 获得当前内存池中管理的对象数量
 	 * @return {size_t}
 	 */
-	size_t size() const
-	{
+	size_t size() const {
 		return size_;
 	}
 
@@ -375,32 +362,28 @@ public:
 
 public:
 	template <typename T>
-	T* create()
-	{
+	T* create() {
 		T* t = new (dbuf_alloc(sizeof(T))) T();
 		(void) push_back(t);
 		return t;
 	}
 
 	template <typename T, typename P1>
-	T* create(P1 p)
-	{
+	T* create(P1 p) {
 		T* t = new (dbuf_alloc(sizeof(T))) T(p);
 		(void) push_back(t);
 		return t;
 	}
 
 	template <typename T, typename P1, typename P2>
-	T* create(P1 p1, P2 p2)
-	{
+	T* create(P1 p1, P2 p2) {
 		T* t = new (dbuf_alloc(sizeof(T))) T(p1, p2);
 		(void) push_back(t);
 		return t;
 	}
 
 	template <typename T, typename P1, typename P2, typename P3>
-	T* create(P1 p1, P2 p2, P3 p3)
-	{
+	T* create(P1 p1, P2 p2, P3 p3) {
 		T* t = new (dbuf_alloc(sizeof(T))) T(p1, p2, p3);
 		(void) push_back(t);
 		return t;
@@ -408,8 +391,7 @@ public:
 
 	template <typename T, typename P1, typename P2, typename P3,
 		 typename P4>
-	T* create(P1 p1, P2 p2, P3 p3, P4 p4)
-	{
+	T* create(P1 p1, P2 p2, P3 p3, P4 p4) {
 		T* t = new (dbuf_alloc(sizeof(T))) T(p1, p2, p3, p4);
 		(void) push_back(t);
 		return t;
@@ -417,8 +399,7 @@ public:
 
 	template <typename T, typename P1, typename P2, typename P3,
 		 typename P4, typename P5>
-	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5)
-	{
+	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) {
 		T* t = new (dbuf_alloc(sizeof(T))) T(p1, p2, p3, p4, p5);
 		(void) push_back(t);
 		return t;
@@ -426,8 +407,7 @@ public:
 
 	template <typename T, typename P1, typename P2, typename P3,
 		 typename P4, typename P5, typename P6>
-	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6)
-	{
+	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6) {
 		T* t = new (dbuf_alloc(sizeof(T))) T(p1, p2, p3, p4, p5, p6);
 		(void) push_back(t);
 		return t;
@@ -435,8 +415,7 @@ public:
 
 	template <typename T, typename P1, typename P2, typename P3,
 		 typename P4, typename P5, typename P6, typename P7>
-	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7)
-	{
+	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7) {
 		T* t = new (dbuf_alloc(sizeof(T)))
 			T(p1, p2, p3, p4, p5, p6, p7);
 		(void) push_back(t);
@@ -446,8 +425,7 @@ public:
 	template <typename T, typename P1, typename P2, typename P3,
 		 typename P4, typename P5, typename P6, typename P7,
 		 typename P8>
-	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8)
-	{
+	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7, P8 p8) {
 		T* t = new (dbuf_alloc(sizeof(T)))
 			T(p1, p2, p3, p4, p5, p6, p7, p8);
 		(void) push_back(t);
@@ -458,8 +436,7 @@ public:
 		 typename P4, typename P5, typename P6, typename P7,
 		 typename P8,typename P9>
 	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7,
-		P8 p8, P9 p9)
-	{
+		P8 p8, P9 p9) {
 		T* t = new (dbuf_alloc(sizeof(T)))
 			T(p1, p2, p3, p4, p5, p6, p7, p8, p9);
 		(void) push_back(t);
@@ -470,8 +447,7 @@ public:
 		 typename P4, typename P5, typename P6, typename P7,
 		 typename P8, typename P9, typename P10>
 	T* create(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5, P6 p6, P7 p7,
-		P8 p8, P9 p9, P10 p10)
-	{
+		P8 p8, P9 p9, P10 p10) {
 		T* t = new (dbuf_alloc(sizeof(T)))
 			T(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
 		(void) push_back(t);
@@ -489,8 +465,7 @@ private:
 	// 一方面使数组对象也在 dbuf_pool 内存池上创建，另一方面可以避免
 	// std::vector 内部在扩容时的内存不可控性
 
-	struct dbuf_objs_link
-	{
+	struct dbuf_objs_link {
 		dbuf_obj** objs;	// 存储 dbuf_obj 对象的数组对象
 		size_t size;		// 存储于 objs 中的对象个数
 		size_t capacity;	// objs 数组的大小
@@ -511,14 +486,12 @@ private:
 /**
  * sample1:
  * // 继承 acl::dbuf_obj 的子类
- * class myobj1 : public acl::dbuf_obj
- * {
+ * class myobj1 : public acl::dbuf_obj {
  * public:
  * 	// 将 guard 对象传递给基类对象，基类将本对象加入 guard 的对象集合中
  * 	myobj1(acl::dbuf_guard* guard) : dbuf_obj(guard) {}
  *
- * 	void doit()
- * 	{
+ * 	void doit() {
  * 		printf("hello world!\r\n");
  * 	}
  *
@@ -526,13 +499,11 @@ private:
  * 	~myobj1() {}
  * };
  *
- * void test()
- * {
+ * void test() {
  * 	acl::dbuf_guard dbuf;
  *
  *	// 在 dbuf_guard 对象上创建动态 100 个 myobj 对象
- * 	for (int i = 0; i < 100; i++)
- * 	{
+ * 	for (int i = 0; i < 100; i++) {
  * 		// 在 guard 对象上创建动态 myobj 对象，且将 guard 作为构造参数
  * 		myobj* obj = new (dbuf.dbuf_alloc(sizeof(myobj))) myobj(&dbuf);
  * 		obj->doit();
@@ -542,13 +513,11 @@ private:
  * }
  *
  * // sample2
- * class myobj2 : public acl::dbuf_obj
- * {
+ * class myobj2 : public acl::dbuf_obj {
  * public:
  * 	myobj2() {}
  *
- * 	void doit()
- * 	{
+ * 	void doit() {
  * 		printf("hello world\r\n");
  * 	}
  *
@@ -556,25 +525,21 @@ private:
  * 	~myobj2() {}
  * };
  *
- * void test2()
- * {
+ * void test2() {
  * 	acl::dbuf_guard dbuf;
  *
- * 	for (int i = 0; i < 100; i++)
- * 	{
+ * 	for (int i = 0; i < 100; i++) {
  * 		myobj2* obj = dbuf.create<myobj2>();
  * 		obj->doit();
  * 	}
  * }
  *
  * // sample3
- * class myobj2 : public acl::dbuf_obj
- * {
+ * class myobj2 : public acl::dbuf_obj {
  * public:
  * 	myobj2(int i) : i_(i) {}
  *
- * 	void doit()
- * 	{
+ * 	void doit() {
  * 		printf("hello world, i: %d\r\n", i_);
  * 	}
  *
@@ -585,12 +550,10 @@ private:
  *	int i_;
  * };
  *
- * void test2()
- * {
+ * void test2() {
  * 	acl::dbuf_guard dbuf;
  *
- * 	for (int i = 0; i < 100; i++)
- * 	{
+ * 	for (int i = 0; i < 100; i++) {
  * 		myobj2* obj = dbuf.create<myobj2>(i);
  * 		obj->doit();
  * 	}
