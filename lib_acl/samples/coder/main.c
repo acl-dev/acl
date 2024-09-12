@@ -75,6 +75,8 @@ static void crc32_encode(const char *ptr, size_t len)
 static char *load_from(const char *filename)
 {
 	char *data = acl_vstream_loadfile(filename);
+	return data;
+	/*
 	char *ptr = strchr(data, '\r');
 	if (ptr == NULL) {
 		ptr = strchr(data, '\n');
@@ -83,6 +85,7 @@ static char *load_from(const char *filename)
 		*ptr = 0;
 	}
 	return data;
+	*/
 }
 
 static void usage(const char *prog)
@@ -117,6 +120,7 @@ int main(int argc, char *argv[])
 			break;
 		case 'f':
 			buf = load_from(optarg);
+			printf("buf=%s\n", buf);
 			break;
 		case 'a':
 			if (strcasecmp(optarg, "decode") == 0) {

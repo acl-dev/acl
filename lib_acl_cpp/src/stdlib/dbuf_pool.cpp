@@ -4,27 +4,26 @@
 #include "acl_cpp/stdlib/dbuf_pool.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-dbuf_pool::dbuf_pool(size_t nblock /* = 2 */)
+dbuf_pool::dbuf_pool(size_t nblock /* = 2 */, size_t align /* = 8 */)
 {
 #ifdef ACL_DBUF_HOOK_NEW
 	(void) nblock;
 #else
-	pool_ = acl_dbuf_pool_create(4096 * nblock);
+	pool_ = acl_dbuf_pool_create2(4096 * nblock, align);
 	mysize_ = sizeof(dbuf_pool);
 #endif
 }
 
-dbuf_pool::~dbuf_pool(void)
+dbuf_pool::~dbuf_pool()
 {
 #ifndef ACL_DBUF_HOOK_NEW
 	acl_dbuf_pool_destroy(pool_);
 #endif
 }
 
-void dbuf_pool::destroy(void)
+void dbuf_pool::destroy()
 {
 	delete this;
 }
@@ -97,17 +96,17 @@ void* dbuf_pool::dbuf_memdup(const void* addr, size_t len)
 
 bool dbuf_pool::dbuf_free(const void* addr)
 {
-	return acl_dbuf_pool_free(pool_, addr) == 0 ? true : false;
+	return acl_dbuf_pool_free(pool_, addr) == 0;
 }
 
 bool dbuf_pool::dbuf_keep(const void* addr)
 {
-	return acl_dbuf_pool_keep(pool_, addr) == 0 ? true : false;
+	return acl_dbuf_pool_keep(pool_, addr) == 0;
 }
 
 bool dbuf_pool::dbuf_unkeep(const void* addr)
 {
-	return acl_dbuf_pool_unkeep(pool_, addr) == 0 ? true : false;
+	return acl_dbuf_pool_unkeep(pool_, addr) == 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -155,7 +154,7 @@ dbuf_guard::dbuf_guard(acl::dbuf_pool* dbuf, size_t capacity /* = 500 */)
 	init(capacity);
 }
 
-dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 500 */)
+dbuf_guard::dbuf_guard(size_t nblock, size_t capacity, size_t align)
 : nblock_(nblock == 0 ? 2 : nblock)
 , incr_(500)
 , size_(0)
@@ -163,12 +162,12 @@ dbuf_guard::dbuf_guard(size_t nblock /* = 2 */, size_t capacity /* = 500 */)
 #ifdef DBUF_HOOK_NEW
 	dbuf_ = dbuf_internal_ = new (nblock_) acl::dbuf_pool;
 #else
-	dbuf_ = dbuf_internal_ = new acl::dbuf_pool(nblock_);
+	dbuf_ = dbuf_internal_ = new acl::dbuf_pool(nblock_, align);
 #endif
 	init(capacity);
 }
 
-dbuf_guard::~dbuf_guard(void)
+dbuf_guard::~dbuf_guard()
 {
 	dbuf_objs_link* link = &head_;
 
@@ -204,7 +203,7 @@ bool dbuf_guard::dbuf_reset(size_t reserve /* = 0 */)
 	return dbuf_->dbuf_reset(reserve);
 }
 
-void dbuf_guard::extend_objs(void)
+void dbuf_guard::extend_objs()
 {
 	dbuf_objs_link* link = (dbuf_objs_link*)
 		dbuf_->dbuf_alloc(sizeof(dbuf_objs_link));
