@@ -4,7 +4,7 @@
 
 //////////////////////////////////////////////////////////////////////////////
 
-static void client_echo(acl::socket_stream* conn, bool readable) {
+static void client_echo(acl::shared_stream conn, bool readable) {
 	acl::string buf;
 	while (true) {
 		if (readable) {
@@ -33,18 +33,17 @@ static void client_echo(acl::socket_stream* conn, bool readable) {
 		}
 		//acl::fiber::delay(1000);
 	}
-	delete conn;
 }
 
 static void server_listen(acl::server_socket& ss, bool readable) {
 	while (true) {
-		acl::socket_stream* conn = ss.accept();
-		if (conn == NULL) {
+		acl::shared_stream conn = ss.shared_accept();
+		if (conn == nullptr) {
 			printf("accept error %s\r\n", acl::last_serror());
 			break;
 		}
 
-		go[=] {
+		go[conn, readable] {
 			client_echo(conn, readable);
 		};
 	}
