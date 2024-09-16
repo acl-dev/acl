@@ -59,6 +59,11 @@ bool ostream::fflush()
 	}
 }
 
+bool ostream::write_wait(int timeo) const
+{
+	return acl_write_wait_ms(ACL_VSTREAM_SOCK(stream_), timeo) == 0;
+}
+
 int ostream::writev(const struct iovec *v, int count, bool loop /* = true */)
 {
 	int   ret;

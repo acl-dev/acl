@@ -6,7 +6,6 @@
 
 // TODO: 在此处引用程序要求的附加头文件
 
-#include "lib_acl.h"
 #include "acl_cpp/lib_acl.hpp"
 #include "fiber/fiber.hpp"
 #include "fiber/go_fiber.hpp"

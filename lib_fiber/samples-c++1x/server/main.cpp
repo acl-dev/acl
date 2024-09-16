@@ -1,17 +1,17 @@
 #include "stdafx.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <getopt.h>
 
 //////////////////////////////////////////////////////////////////////////////
 
-static void client_echo(acl::shared_stream conn, bool readable) {
+static void client_echo(const acl::shared_stream& conn, bool readable) {
 	acl::string buf;
 	while (true) {
 		if (readable) {
-			struct timeval begin, end;
-			gettimeofday(&begin, NULL);
-			int ret = acl_readable(conn->sock_handle());
-			gettimeofday(&end, NULL);
+			struct timeval begin{}, end{};
+			gettimeofday(&begin, nullptr);
+			int ret = conn->readable();
+			gettimeofday(&end, nullptr);
 			double cost = acl::stamp_sub(end, begin);
 
 			if (ret == 0) {
@@ -109,6 +109,5 @@ int main(int argc, char *argv[]) {
 	}
 
 	acl::fiber::schedule_with(type);
-
 	return 0;
 }
