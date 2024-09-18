@@ -298,6 +298,16 @@ http_header& http_header::add_entry(const char* name, const char* value,
 	return *this;
 }
 
+void http_header::disable_header(const char *name, bool yes) {
+	std::list<HTTP_HDR_ENTRY*>::iterator it = entries_.begin();
+	for (; it != entries_.end(); ++it) {
+		if (strcasecmp((*it)->name, name) == 0) {
+			(*it)->off = yes ? 1 : 0;
+			break;
+		}
+	}
+}
+
 const char* http_header::get_entry(const char* name) const
 {
 	for (std::list<HTTP_HDR_ENTRY*>::const_iterator cit = entries_.begin();

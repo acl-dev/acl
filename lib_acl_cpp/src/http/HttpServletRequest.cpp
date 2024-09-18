@@ -541,7 +541,7 @@ json* HttpServletRequest::getJson(size_t body_limit /* 1024000 */)
 	}
 
 	json_ = dbuf_->create<json>();
-	if (getJson(*json_)) {
+	if (getJson(*json_, body_limit)) {
 		return json_;
 	}  else {
 		json_ = NULL;
@@ -596,7 +596,7 @@ xml* HttpServletRequest::getXml(size_t body_limit /* 1024000 */)
 	}
 
 	xml_ = dbuf_->create<xml1>();
-	if (getXml(*xml_)) {
+	if (getXml(*xml_, body_limit)) {
 		return xml_;
 	} else {
 		xml_ = NULL;
@@ -646,7 +646,7 @@ string* HttpServletRequest::getBody(size_t body_limit /* 1024000*/)
 	}
 
 	body_ = NEW string((size_t) dlen + 1);
-	if (getBody(*body_)) {
+	if (getBody(*body_, body_limit)) {
 		return body_;
 	} else {
 		delete body_;
