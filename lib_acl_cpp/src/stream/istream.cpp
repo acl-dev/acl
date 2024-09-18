@@ -249,6 +249,14 @@ bool istream::readable() const {
 	return acl_vstream_readable(stream_) != 0;
 }
 
+bool istream::read_wait(int timeo) const
+{
+	if (acl_vstream_can_read(stream_) == 1) {
+		return true;
+	}
+	return acl_read_wait_ms(ACL_VSTREAM_SOCK(stream_), timeo) == 0;
+}
+
 bool istream::gets_peek(string& buf, bool nonl /* = true */,
 	bool clear /* = false */, int max /* = 0 */)
 {

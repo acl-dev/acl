@@ -62,6 +62,13 @@ public:
 	bool fflush();
 
 	/**
+	 * 判断当前连接是否可写
+	 * @param timeo {int} 可写超时时间（毫秒）
+	 * @return {bool}
+	 */
+	bool write_wait(int timeo) const;
+
+	/**
 	 * 写数据至输出流中
 	 * @param v {const struct iovec*}
 	 * @param count {int} 数组 v 的元素个数
