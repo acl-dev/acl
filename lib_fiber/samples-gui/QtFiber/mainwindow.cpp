@@ -107,6 +107,7 @@ void MainWindow::onStartServer()
 
     ui_->stopServer->setEnabled(true);
     ui_->startClient->setEnabled(true);
+    ui_->startServer->setEnabled(false);
 
     server_ = new fiber_server("127.0.0.1", 9001, this);
     qDebug() << "Start fiber server";
@@ -120,6 +121,7 @@ void MainWindow::onStopServer()
         server_->stop();
         delete server_;
         server_ = nullptr;
+        ui_->startServer->setEnabled(true);
         ui_->stopServer->setEnabled(false);
         ui_->startClient->setEnabled(false);
     }
