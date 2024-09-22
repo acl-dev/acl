@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "patch.h"
+#include "mainwindow.h"
 #include "fiber_client.h"
 
-fiber_client::fiber_client(const char *ip, int port, size_t max, int delay)
-: ip_(ip), port_(port), max_(max), delay_(delay)
+fiber_client::fiber_client(MainWindow *parent, const char *ip, int port, size_t max, int delay)
+: parent_(parent), ip_(ip), port_(port), max_(max), delay_(delay)
 {
 }
 
@@ -21,6 +22,8 @@ void fiber_client::run() {
 
     char buf[4096];
     std::string s("hello world!");
+
+    parent_->setProgress(0);
 
     for (size_t i = 0; i < max_; i++) {
         int ret = acl_fiber_send(conn, s.c_str(), (int) s.size(), 0);
@@ -40,10 +43,13 @@ void fiber_client::run() {
             qDebug() << "Fiber-" << acl::fiber::self() << " recv: " << buf;
         }
 
-        if (delay_ > 0) {
+        parent_->setProgress((100 * (int) i) / (int) max_);
+        if (i % 10 == 0 && delay_ > 0) {
             acl::fiber::delay(delay_);
         }
     }
+
+    parent_->setProgress(100);
 
     struct timeval end;
     gettimeofday(&end, nullptr);

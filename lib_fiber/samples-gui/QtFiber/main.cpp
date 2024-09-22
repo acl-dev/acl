@@ -43,7 +43,7 @@ static void app_run(int argc, char **argv)
     QApplication app(argc, argv);
 
     MainWindow w;
-    w.resize(800, 800);
+    //w.resize(1600, 800);
     w.show();
 
     QTimer::singleShot(0, startupCallback);
