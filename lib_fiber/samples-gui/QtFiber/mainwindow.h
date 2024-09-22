@@ -12,6 +12,7 @@ namespace acl {
 }
 
 class fiber_server;
+struct timeval;
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +28,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void setProgress(int n);
+
 protected:
     void keyPressEvent(QKeyEvent *event);
 
@@ -36,11 +39,13 @@ protected:
     void onStartClient();
     void onStartSchedule();
     void onStopSchedule();
-    void onOpenChildWindow();
     void onInputClicked();
     void onUrlGet();
 
+    void onClear();
+
     void onDialogAccepted(const QString &text);
+    void closeEvent(QCloseEvent *event) override;
 
 public:
     void onAboutToQuit();
@@ -50,21 +55,9 @@ private:
 
 private:
     Ui::MainWindow *ui_;
-    QPushButton    *button_;
-    QPushButton    *start_server_;
-    QPushButton    *stop_server_;
-    QPushButton    *start_client_;
-    QPushButton    *start_schedule_;
-    QPushButton    *stop_schedule_;
-    QPushButton    *open_child_;
-    QPushButton    *url_get_;
-    std::string     url_;
-    QPushButton    *input_button_;
-    QLabel         *input_display_;
 
     fiber_server   *server_ = nullptr;
     QProcess       *process_;
-
-    ChildWindows   *child_window_ = nullptr;
+    struct timeval *stamp_;
 };
 #endif // MAINWINDOW_H
