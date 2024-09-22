@@ -38,7 +38,7 @@ const char *acl_split_nameval2(char *buf, char **name, char **value, char sep)
 	if (*np == 0) {
 		return "missing attribute name";
 	}
-	SKIP(np, ep, !ACL_ISSPACE(*ep) && *ep != '=');	/* find name end */
+	SKIP(np, ep, !ACL_ISSPACE(*ep) && *ep != sep);	/* find name end */
 	SKIP(ep, cp, ACL_ISSPACE(*cp));			/* skip blanks before '=' */
 	if (*cp != sep)	{			/* need '=' */
 		return "missing '=' after attribute name";
