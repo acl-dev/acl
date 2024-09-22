@@ -43,7 +43,7 @@ void fiber_client::run() {
             qDebug() << "Fiber-" << acl::fiber::self() << " recv: " << buf;
         }
 
-        parent_->setProgress((100 * i) / max_);
+        parent_->setProgress((100 * (int) i) / (int) max_);
         if (i % 10 == 0 && delay_ > 0) {
             acl::fiber::delay(delay_);
         }

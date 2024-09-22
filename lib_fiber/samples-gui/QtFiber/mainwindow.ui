@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1600</width>
+    <width>2000</width>
     <height>800</height>
    </rect>
   </property>
@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>390</x>
-      <y>20</y>
+      <y>79</y>
       <width>800</width>
-      <height>600</height>
+      <height>541</height>
      </rect>
     </property>
    </widget>
@@ -28,7 +28,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>20</y>
+      <y>80</y>
       <width>291</width>
       <height>51</height>
      </rect>
@@ -41,7 +41,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>80</y>
+      <y>130</y>
       <width>291</width>
       <height>51</height>
      </rect>
@@ -54,7 +54,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>140</y>
+      <y>200</y>
       <width>291</width>
       <height>51</height>
      </rect>
@@ -67,7 +67,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>200</y>
+      <y>250</y>
       <width>291</width>
       <height>51</height>
      </rect>
@@ -80,7 +80,7 @@
     <property name="geometry">
      <rect>
       <x>70</x>
-      <y>260</y>
+      <y>300</y>
       <width>291</width>
       <height>51</height>
      </rect>
@@ -92,9 +92,9 @@
    <widget class="QPushButton" name="urlGet">
     <property name="geometry">
      <rect>
-      <x>70</x>
-      <y>320</y>
-      <width>291</width>
+      <x>1270</x>
+      <y>130</y>
+      <width>301</width>
       <height>51</height>
      </rect>
     </property>
@@ -105,9 +105,9 @@
    <widget class="QPushButton" name="clear">
     <property name="geometry">
      <rect>
-      <x>1210</x>
-      <y>20</y>
-      <width>241</width>
+      <x>70</x>
+      <y>380</y>
+      <width>291</width>
       <height>51</height>
      </rect>
     </property>
@@ -128,13 +128,59 @@
      <number>0</number>
     </property>
    </widget>
+   <widget class="QPushButton" name="httpOptions">
+    <property name="geometry">
+     <rect>
+      <x>1570</x>
+      <y>130</y>
+      <width>291</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Http options</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="url">
+    <property name="geometry">
+     <rect>
+      <x>1270</x>
+      <y>80</y>
+      <width>591</width>
+      <height>51</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>1220</x>
+      <y>90</y>
+      <width>41</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>URL:</string>
+    </property>
+   </widget>
+   <widget class="QTextEdit" name="reqHdr">
+    <property name="geometry">
+     <rect>
+      <x>1270</x>
+      <y>180</y>
+      <width>591</width>
+      <height>441</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1600</width>
+     <width>2000</width>
      <height>21</height>
     </rect>
    </property>

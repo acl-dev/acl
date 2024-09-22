@@ -25,10 +25,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui_->stopServer, &QPushButton::clicked, this, &MainWindow::onStopServer);
     connect(ui_->startClient, &QPushButton::clicked, this, &MainWindow::onStartClient);
     connect(ui_->urlGet, &QPushButton::clicked, this, &MainWindow::onUrlGet);
+    connect(ui_->httpOptions, &QPushButton::clicked, this, &MainWindow::onHttpOptions);
 
     ui_->startSchedule->setEnabled(false);
     ui_->stopServer->setEnabled(false);
     ui_->startClient->setEnabled(false);
+    ui_->url->setText(url_.c_str());
 }
 
 MainWindow::~MainWindow()
@@ -63,6 +65,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::onClear()
 {
     ui_->display->clear();
+    ui_->reqHdr->clear();
 }
 
 void MainWindow::setProgress(int n)
@@ -138,24 +141,40 @@ void MainWindow::onStartClient()
 
 void MainWindow::onUrlGet()
 {
+    const auto url = ui_->url->text();
+    if (url.isEmpty()) {
+        QMessageBox::information(this, "UrlGet", "url is empty!");
+        return;
+    }
+
     if (!acl::fiber::scheduled()) {
         qDebug() << "gui fiber not scheudled yet!";
         return;
     }
 
+    url_ = url.toStdString();
+
     go[this] {
-        const char *addr = "www.baidu.com:80";
-        const char *host = "www.baidu.com";
-        acl::http_request req(addr);
-        req.request_header()
-                .set_url("/")
-                .set_host(host);
-        if (!req.request(nullptr, 0)) {
-            qDebug() << "Send http request to " << addr << " error: " << acl::last_serror();
-            return;
+        acl::http_request req(url_.c_str());
+        acl::http_header& reqHdr = req.request_header();
+        if (!host_.empty()) {
+                reqHdr.set_host(host_.c_str());
+        }
+
+        for (const auto& it : headers_) {
+            reqHdr.add_entry(it.first.c_str(), it.second.c_str());
         }
 
         acl::string buf;
+        reqHdr.build_request(buf);
+        ui_->reqHdr->setText(buf.c_str());
+
+        if (!req.request(nullptr, 0)) {
+            qDebug() << "Send http request to " << url_.c_str() << " error: " << acl::last_serror();
+            return;
+        }
+
+        buf.clear();
         if (req.get_body(buf)) {
             this->onDownloadFinish(true, req);
         } else {
@@ -187,6 +206,7 @@ void MainWindow::onStartSchedule()
 
     ui_->stopSchedule->setEnabled(true);
     ui_->urlGet->setEnabled(true);
+    ui_->startServer->setEnabled(true);
 
     qDebug() << "Begin schedule_gui!";
     acl::fiber::schedule_gui();
@@ -205,11 +225,15 @@ void MainWindow::onStopSchedule()
     ui_->stopSchedule->setEnabled(false);
     ui_->startSchedule->setEnabled(true);
 
+    ui_->startClient->setEnabled(false);
+    ui_->startServer->setEnabled(false);
+    ui_->stopServer->setEnabled(false);
+
     acl::fiber::schedule_stop();
     qDebug() << "Fiber schedule stopped!";
 }
 
-void MainWindow::onInputClicked()
+void MainWindow::onHttpOptions()
 {
     InputDialog dialog(this);
     QRect mainWindowGeometry = this->frameGeometry();
@@ -223,7 +247,20 @@ void MainWindow::onInputClicked()
 
 void MainWindow::onDialogAccepted(const QString &text)
 {
-    //input_display_->setText("输入内容: " + text);
+    ui_->reqHdr->setText("输入内容:\r\n" + text);
+    headers_.clear();
+    acl::string buf(text.toStdString().c_str());
+    std::vector<acl::string>& lines = buf.split2("\r\n");
+    for (const auto it : lines) {
+        acl::string line = it.c_str();
+        auto& kv = line.split_nameval(':');
+        if (kv.first.empty() || kv.second.empty()) {
+            continue;
+        }
+        kv.first.trim_space();
+        kv.second.trim_left_space().trim_right_space();
+        headers_[kv.first.c_str()] = kv.second.c_str();
+    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)

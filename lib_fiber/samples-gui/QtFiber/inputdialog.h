@@ -2,7 +2,7 @@
 #define INPUTDIALOG_H
 
 #include <QDialog>
-#include <QLineEdit>
+#include <QTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -20,8 +20,8 @@ private slots:
     void onAccept();
 
 private:
-    QLineEdit *lineEdit;
-    QPushButton *button;
+    QTextEdit *options;
+    QPushButton *confirm;
 };
 
 #endif // INPUTDIALOG_H

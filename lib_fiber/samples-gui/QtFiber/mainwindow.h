@@ -39,7 +39,7 @@ protected:
     void onStartClient();
     void onStartSchedule();
     void onStopSchedule();
-    void onInputClicked();
+    void onHttpOptions();
     void onUrlGet();
 
     void onClear();
@@ -59,5 +59,9 @@ private:
     fiber_server   *server_ = nullptr;
     QProcess       *process_;
     struct timeval *stamp_;
+
+    std::string url_ = "http://www.baidu.com/";
+    std::string host_;
+    std::map<std::string, std::string> headers_;
 };
 #endif // MAINWINDOW_H
