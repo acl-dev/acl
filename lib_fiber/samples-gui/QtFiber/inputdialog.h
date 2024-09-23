@@ -11,7 +11,7 @@ class InputDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit InputDialog(QWidget *parent = nullptr);
+    explicit InputDialog(QWidget *parentr);
 
 signals:
     void dialogAccepted(const QString &text);

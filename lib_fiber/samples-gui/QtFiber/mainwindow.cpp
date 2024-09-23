@@ -237,14 +237,22 @@ void MainWindow::onStopSchedule()
 
 void MainWindow::onHttpOptions()
 {
-    InputDialog dialog(this);
-    QRect mainWindowGeometry = this->frameGeometry();
-    QPoint mainWindowPos = this->pos();
-    int x = mainWindowPos.x() + (mainWindowGeometry.width() - dialog.width()) / 2;
-    int y = mainWindowPos.y() + (mainWindowGeometry.height() - dialog.height()) / 2;
-    dialog.move(x, y);
-    connect(&dialog, &InputDialog::dialogAccepted, this, &MainWindow::onDialogAccepted);
-    dialog.exec();
+    go[this] {
+        qDebug() << "Sleep 5 seconds before starting http options dialog";
+        acl::fiber::delay(5000);
+
+        InputDialog dialog(this);
+        QRect mainWindowGeometry = this->frameGeometry();
+        QPoint mainWindowPos = this->pos();
+        int x = mainWindowPos.x() + (mainWindowGeometry.width() - dialog.width()) / 2;
+        int y = mainWindowPos.y() + (mainWindowGeometry.height() - dialog.height()) / 2;
+        dialog.move(x, y);
+        connect(&dialog, &InputDialog::dialogAccepted, this, &MainWindow::onDialogAccepted);
+        qDebug() << "Start the http options dialog!";
+        dialog.exec();
+        qDebug() << "Http options dialog stopped!";
+    };
+    qDebug() << "Waiting for the results of http options";
 }
 
 void MainWindow::onDialogAccepted(const QString &text)
