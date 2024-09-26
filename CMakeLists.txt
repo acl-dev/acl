@@ -58,8 +58,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 	include_directories(
 		#/usr/include/c++/4.2
 		#/usr/include/c++/4.2/backward
-		/usr/local/include
 		/usr/include
+		/usr/local/include
 	)
 
 	link_directories(

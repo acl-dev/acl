@@ -442,7 +442,7 @@ void acl_fiber_clear(ACL_FIBER *fiber)
 	}
 }
 
-static void fiber_signal(ACL_FIBER *fiber, int signum, int sync)
+static void fiber_signal(ACL_FIBER *fiber, int signum, int synchronized)
 {
 	ACL_FIBER *curr = __thread_fiber->running;
 
@@ -479,7 +479,7 @@ static void fiber_signal(ACL_FIBER *fiber, int signum, int sync)
 		FIBER_READY(fiber);
 
 		// Yield myself if in synchronous mode.
-		if (sync) {
+		if (synchronized) {
 			acl_fiber_yield();
 		}
 	}

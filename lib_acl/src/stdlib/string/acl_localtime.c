@@ -58,7 +58,7 @@
  * logging of the dates, it's not really a complete implementation.
  */
 
-#if defined(ACL_UNIX)
+#if defined(ACL_UNIX) && !defined(ACL_FREEBSD)
 
 static int is_leap_year(time_t year) {
 	if (year % 4) {

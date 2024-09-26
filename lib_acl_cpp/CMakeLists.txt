@@ -39,7 +39,12 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions("-O2")
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+#	add_definitions("-O2 -DUSE_SYS_ICONV")
 	add_definitions("-O2")
+	include_directories(
+		/usr/include
+		/usr/local/include
+	)
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	add_definitions("-Wno-invalid-source-encoding")
@@ -81,7 +86,7 @@ set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
 set(polarssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 set(openssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/openssl-1.1.1q)
 
-include_directories(#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+include_directories(
 	${mysql_include}
 	${pgsql_include}
 	${sqlite_include}

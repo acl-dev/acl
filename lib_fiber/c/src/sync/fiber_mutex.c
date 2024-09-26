@@ -344,17 +344,17 @@ void acl_fiber_mutex_stats_free(ACL_FIBER_MUTEX_STATS *stats)
 	mem_free(stats);
 }
 
-static void show_mutex_stat(const ACL_FIBER_MUTEX_STAT *stat)
+static void show_mutex_stat(const ACL_FIBER_MUTEX_STAT *s)
 {
 	size_t i;
 
-	printf("fiber-%d\r\n", acl_fiber_id(stat->fiber));
-	show_stack(stat->fiber);
+	printf("fiber-%d\r\n", acl_fiber_id(s->fiber));
+	show_stack(s->fiber);
 
-	for (i = 0; i < stat->count; i++) {
-		printf("Holding mutex=%p\r\n", stat->holding[i]);
+	for (i = 0; i < s->count; i++) {
+		printf("Holding mutex=%p\r\n", s->holding[i]);
 	}
-	printf("Waiting for mutex=%p\r\n", stat->waiting);
+	printf("Waiting for mutex=%p\r\n", s->waiting);
 }
 
 void acl_fiber_mutex_stats_show(const ACL_FIBER_MUTEX_STATS *stats)
