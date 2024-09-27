@@ -2,141 +2,144 @@
 #include "common.h"
 #include "hook.h"
 
-socket_fn     __sys_socket                  = NULL;
-socket_fn     *sys_socket                   = NULL;
+static socket_fn         __sys_socket              = NULL;
+socket_fn                *sys_socket               = NULL;
 
-close_fn      __sys_close                   = NULL;
-close_fn      *sys_close                    = NULL;
+static close_fn          __sys_close               = NULL;
+close_fn                 *sys_close                = NULL;
 
-listen_fn     __sys_listen                  = NULL;
-listen_fn     *sys_listen                   = NULL;
+static listen_fn         __sys_listen              = NULL;
+listen_fn                *sys_listen               = NULL;
 
-accept_fn     __sys_accept                  = NULL;
-accept_fn     *sys_accept                   = NULL;
+static accept_fn         __sys_accept              = NULL;
+accept_fn                *sys_accept               = NULL;
 
-connect_fn    __sys_connect                 = NULL;
-connect_fn    *sys_connect                  = NULL;
+static connect_fn        __sys_connect             = NULL;
+connect_fn               *sys_connect              = NULL;
 
-recv_fn       __sys_recv                    = NULL;
-recv_fn       *sys_recv                     = NULL;
+static recv_fn           __sys_recv                = NULL;
+recv_fn                  *sys_recv                 = NULL;
 
-recvfrom_fn   __sys_recvfrom                = NULL;
-recvfrom_fn   *sys_recvfrom                 = NULL;
+static recvfrom_fn       __sys_recvfrom            = NULL;
+recvfrom_fn              *sys_recvfrom             = NULL;
 
-send_fn       __sys_send                    = NULL;
-send_fn       *sys_send                     = NULL;
+static send_fn           __sys_send                = NULL;
+send_fn                  *sys_send                 = NULL;
 
-sendto_fn     __sys_sendto                  = NULL;
-sendto_fn     *sys_sendto                   = NULL;
+static sendto_fn         __sys_sendto              = NULL;
+sendto_fn                *sys_sendto               = NULL;
 
-poll_fn       __sys_poll                    = NULL;
-poll_fn       *sys_poll                     = NULL;
+static poll_fn           __sys_poll                = NULL;
+poll_fn                  *sys_poll                 = NULL;
 
-select_fn     __sys_select                  = NULL;
-select_fn     *sys_select                   = NULL;
+static select_fn         __sys_select              = NULL;
+select_fn                *sys_select               = NULL;
 
-getaddrinfo_fn   __sys_getaddrinfo          = NULL;
-getaddrinfo_fn   *sys_getaddrinfo           = NULL;
+static getaddrinfo_fn    __sys_getaddrinfo         = NULL;
+getaddrinfo_fn           *sys_getaddrinfo          = NULL;
 
-freeaddrinfo_fn  __sys_freeaddrinfo         = NULL;
-freeaddrinfo_fn  *sys_freeaddrinfo          = NULL;
+static freeaddrinfo_fn   __sys_freeaddrinfo        = NULL;
+freeaddrinfo_fn          *sys_freeaddrinfo         = NULL;
 
-gethostbyname_fn __sys_gethostbyname        = NULL;
-gethostbyname_fn *sys_gethostbyname         = NULL;
+static gethostbyname_fn  __sys_gethostbyname       = NULL;
+gethostbyname_fn         *sys_gethostbyname        = NULL;
 
 #ifdef SYS_UNIX
 
-sleep_fn    __sys_sleep                     = NULL;
-sleep_fn    *sys_sleep                      = NULL;
+static sleep_fn          __sys_sleep               = NULL;
+sleep_fn                 *sys_sleep                = NULL;
 
-fcntl_fn    __sys_fcntl                     = NULL;
-fcntl_fn    *sys_fcntl                      = NULL;
+static fcntl_fn          __sys_fcntl               = NULL;
+fcntl_fn                 *sys_fcntl                = NULL;
 
-setsockopt_fn __sys_setsockopt              = NULL;
-setsockopt_fn *sys_setsockopt               = NULL;
+static setsockopt_fn     __sys_setsockopt          = NULL;
+setsockopt_fn            *sys_setsockopt           = NULL;
 
-getsockopt_fn __sys_getsockopt              = NULL;
-getsockopt_fn *sys_getsockopt               = NULL;
+static getsockopt_fn     __sys_getsockopt          = NULL;
+getsockopt_fn            *sys_getsockopt           = NULL;
 
-read_fn     __sys_read                      = NULL;
-read_fn     *sys_read                       = NULL;
+static read_fn           __sys_read                = NULL;
+read_fn                  *sys_read                 = NULL;
 
-readv_fn    __sys_readv                     = NULL;
-readv_fn    *sys_readv                      = NULL;
+static readv_fn          __sys_readv               = NULL;
+readv_fn                 *sys_readv                = NULL;
 
-recvmsg_fn  __sys_recvmsg                   = NULL;
-recvmsg_fn  *sys_recvmsg                    = NULL;
+static recvmsg_fn        __sys_recvmsg             = NULL;
+recvmsg_fn               *sys_recvmsg              = NULL;
 
-write_fn    __sys_write                     = NULL;
-write_fn    *sys_write                      = NULL;
+static write_fn          __sys_write               = NULL;
+write_fn                 *sys_write                = NULL;
 
-writev_fn   __sys_writev                    = NULL;
-writev_fn   *sys_writev                     = NULL;
+static writev_fn         __sys_writev              = NULL;
+writev_fn                *sys_writev               = NULL;
 
-sendmsg_fn  __sys_sendmsg                   = NULL;
-sendmsg_fn  *sys_sendmsg                    = NULL;
+static sendmsg_fn        __sys_sendmsg             = NULL;
+sendmsg_fn               *sys_sendmsg              = NULL;
 
 # ifdef HAS_MMSG
-recvmmsg_fn  __sys_recvmmsg                 = NULL;
-recvmmsg_fn  *sys_recvmmsg                  = NULL;
+static recvmmsg_fn       __sys_recvmmsg            = NULL;
+recvmmsg_fn              *sys_recvmmsg             = NULL;
 
-sendmmsg_fn  __sys_sendmmsg                 = NULL;
-sendmmsg_fn  *sys_sendmmsg                  = NULL;
+static sendmmsg_fn       __sys_sendmmsg            = NULL;
+sendmmsg_fn              *sys_sendmmsg             = NULL;
 
 # endif
 
 # ifdef __USE_LARGEFILE64
-sendfile64_fn __sys_sendfile64              = NULL;
-sendfile64_fn *sys_sendfile64               = NULL;
+static sendfile64_fn      __sys_sendfile64         = NULL;
+sendfile64_fn             *sys_sendfile64          = NULL;
 # endif
 
-pread_fn      __sys_pread                   = NULL;
-pread_fn      *sys_pread                    = NULL;
-pwrite_fn     __sys_pwrite                  = NULL;
-pwrite_fn     *sys_pwrite                   = NULL;
+static pread_fn           __sys_pread              = NULL;
+pread_fn                  *sys_pread               = NULL;
+
+static pwrite_fn          __sys_pwrite             = NULL;
+pwrite_fn                 *sys_pwrite              = NULL;
 
 # ifdef HAS_EPOLL
-epoll_create_fn __sys_epoll_create          = NULL;
-epoll_create_fn *sys_epoll_create           = NULL;
+static epoll_create_fn    __sys_epoll_create       = NULL;
+epoll_create_fn           *sys_epoll_create        = NULL;
 
-epoll_wait_fn   __sys_epoll_wait            = NULL;
-epoll_wait_fn   *sys_epoll_wait             = NULL;
+static epoll_wait_fn      __sys_epoll_wait         = NULL;
+epoll_wait_fn             *sys_epoll_wait          = NULL;
 
-epoll_ctl_fn    __sys_epoll_ctl             = NULL;
-epoll_ctl_fn    *sys_epoll_ctl              = NULL;
+static epoll_ctl_fn       __sys_epoll_ctl          = NULL;
+epoll_ctl_fn              *sys_epoll_ctl           = NULL;
 # endif
 
 # ifdef HAS_IO_URING
-openat_fn       __sys_openat                = NULL;
-openat_fn       *sys_openat                 = NULL;
-unlink_fn       __sys_unlink                = NULL;
-unlink_fn       *sys_unlink                 = NULL;
+static openat_fn          __sys_openat             = NULL;
+openat_fn                 *sys_openat              = NULL;
+
+static unlink_fn          __sys_unlink             = NULL;
+unlink_fn                 *sys_unlink              = NULL;
 # ifdef HAS_STATX
-statx_fn        __sys_statx                 = NULL;
-statx_fn        *sys_statx                  = NULL;
+static statx_fn           __sys_statx              = NULL;
+statx_fn                  *sys_statx               = NULL;
 # endif
 # ifdef HAS_RENAMEAT2
-renameat2_fn    __sys_renameat2             = NULL;
-renameat2_fn    *sys_renameat2              = NULL;
+static renameat2_fn       __sys_renameat2          = NULL;
+renameat2_fn              *sys_renameat2           = NULL;
 # endif
-mkdirat_fn      __sys_mkdirat               = NULL;
-mkdirat_fn      *sys_mkdirat                = NULL;
-splice_fn       __sys_splice                = NULL;
-splice_fn       *sys_splice                 = NULL;
+static mkdirat_fn         __sys_mkdirat            = NULL;
+mkdirat_fn                *sys_mkdirat             = NULL;
+
+static splice_fn          __sys_splice             = NULL;
+splice_fn                 *sys_splice              = NULL;
 # endif
 
 # ifndef __APPLE__
-gethostbyname_r_fn __sys_gethostbyname_r    = NULL;
-gethostbyname_r_fn *sys_gethostbyname_r     = NULL;
+static gethostbyname_r_fn __sys_gethostbyname_r    = NULL;
+gethostbyname_r_fn        *sys_gethostbyname_r     = NULL;
 # endif
 
 #elif defined(SYS_WIN)
 
-WSARecv_fn __sys_WSARecv                     = NULL;
-WSARecv_fn *sys_WSARecv                      = NULL;
+static WSARecv_fn         __sys_WSARecv            = NULL;
+WSARecv_fn                *sys_WSARecv             = NULL;
 
-WSAAccept_fn __sys_WSAAccept                 = NULL;
-WSAAccept_fn *sys_WSAAccept                  = NULL;
+static WSAAccept_fn       __sys_WSAAccept          = NULL;
+WSAAccept_fn              *sys_WSAAccept           = NULL;
 
 #endif // SYS_WIN
 
