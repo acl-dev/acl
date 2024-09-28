@@ -167,6 +167,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "redis_builder", "app\redis_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "https_request", "lib_acl_cpp\samples\ssl\https_request\https_request_vc2019.vcxproj", "{4D42F462-A2FE-4B4A-A680-93668FA128A6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimpleWin", "lib_fiber\samples-gui\SimpleWin\SimpleWin.vcxproj", "{4D524F5F-31D7-42AB-915B-312CB67B0C18}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -925,6 +927,36 @@ Global
 		{4D42F462-A2FE-4B4A-A680-93668FA128A6}.Template|Win32.Build.0 = Debug|Win32
 		{4D42F462-A2FE-4B4A-A680-93668FA128A6}.Template|x64.ActiveCfg = Debug|x64
 		{4D42F462-A2FE-4B4A-A680-93668FA128A6}.Template|x64.Build.0 = Debug|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Debug|Win32.Build.0 = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Debug|x64.ActiveCfg = Debug|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Debug|x64.Build.0 = Debug|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.DebugDll|Mixed Platforms.ActiveCfg = DebugDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.DebugDll|Mixed Platforms.Build.0 = DebugDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.DebugDll|Win32.ActiveCfg = DebugDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.DebugDll|Win32.Build.0 = DebugDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.DebugDll|x64.ActiveCfg = DebugDll|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.DebugDll|x64.Build.0 = DebugDll|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Release|Win32.ActiveCfg = Release|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Release|Win32.Build.0 = Release|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Release|x64.ActiveCfg = Release|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Release|x64.Build.0 = Release|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Releasedll|Mixed Platforms.ActiveCfg = ReleaseDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Releasedll|Mixed Platforms.Build.0 = ReleaseDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Releasedll|Win32.ActiveCfg = ReleaseDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Releasedll|Win32.Build.0 = ReleaseDll|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Releasedll|x64.ActiveCfg = ReleaseDll|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Releasedll|x64.Build.0 = ReleaseDll|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Template|Mixed Platforms.ActiveCfg = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Template|Mixed Platforms.Build.0 = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Template|Win32.ActiveCfg = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Template|Win32.Build.0 = Debug|Win32
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Template|x64.ActiveCfg = Debug|x64
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18}.Template|x64.Build.0 = Debug|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -964,6 +996,7 @@ Global
 		{45276293-D169-4D73-8930-F255C09DA976} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 		{D90DCF51-E219-4BD8-A032-076335675F58} = {30B69273-9D47-4AD6-B1C5-CF362F9C6D80}
 		{4D42F462-A2FE-4B4A-A680-93668FA128A6} = {AB838366-C278-426E-ADDF-BE3A32BADD3E}
+		{4D524F5F-31D7-42AB-915B-312CB67B0C18} = {1CB30F2E-2587-43E7-A3CF-787783FB6924}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {40FA3A5B-123F-4EC0-9EEB-8A9C17BF573B}
