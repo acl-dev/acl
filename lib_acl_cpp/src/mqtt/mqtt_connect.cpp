@@ -270,12 +270,12 @@ int mqtt_connect::update_cid_len(const char* data, int dlen) {
 
 	if (dlen_ > 0) {
 		status_ = MQTT_STAT_CID_VAL;
+	} else if ((conn_flags_ & 0x04)) {
+		status_ = MQTT_STAT_WILL_TOPIC_LEN;
 	} else if ((conn_flags_ & 0x80)) {
 		status_ = MQTT_STAT_USERNAME_LEN;
 	} else if ((conn_flags_ & 0x40)) {
 		status_ = MQTT_STAT_PASSWD_LEN;
-	} else if ((conn_flags_ & 0x04)) {
-		status_ = MQTT_STAT_WILL_TOPIC_LEN;
 	} else {
 		finished_ = true;
 	}
@@ -303,69 +303,12 @@ int mqtt_connect::update_cid_len(const char* data, int dlen) {
 int mqtt_connect::update_cid_val(const char* data, int dlen) {
 	SAVE_DATA(cid_);
 
-	if ((conn_flags_ & 0x80)) {
+	if ((conn_flags_ & 0x04)) {
+		status_ = MQTT_STAT_WILL_TOPIC_LEN;
+	} else if ((conn_flags_ & 0x80)) {
 		status_ = MQTT_STAT_USERNAME_LEN;
 	} else if ((conn_flags_ & 0x40)) {
 		status_ = MQTT_STAT_PASSWD_LEN;
-	} else if ((conn_flags_ & 0x04)) {
-		status_ = MQTT_STAT_WILL_TOPIC_LEN;
-	} else {
-		finished_ = true;
-	}
-
-	return dlen;
-}
-
-int mqtt_connect::update_username_len(const char* data, int dlen) {
-	SAVE_LENGTH(dlen_);
-
-	if (dlen_ > 0) {
-		status_ = MQTT_STAT_USERNAME_VAL;
-	} else if ((conn_flags_ & 0x40)) {
-		status_ = MQTT_STAT_PASSWD_LEN;
-	} else if ((conn_flags_ & 0x04)) {
-		status_ = MQTT_STAT_WILL_TOPIC_LEN;
-	} else {
-		finished_ = true;
-		return dlen;
-	}
-
-	return dlen;
-}
-
-int mqtt_connect::update_username_val(const char* data, int dlen) {
-	SAVE_DATA(username_);
-
-	if ((conn_flags_ & 0x40)) {
-		status_ = MQTT_STAT_PASSWD_LEN;
-	} else if ((conn_flags_ & 0x04)) {
-		status_ = MQTT_STAT_WILL_TOPIC_LEN;
-	} else {
-		finished_ = true;
-	}
-
-	return dlen;
-}
-
-int mqtt_connect::update_passwd_len(const char* data, int dlen) {
-	SAVE_LENGTH(dlen_);
-
-	if (dlen_ > 0) {
-		status_ = MQTT_STAT_PASSWD_VAL;
-	} else if ((conn_flags_ & 0x04)) {
-		status_ = MQTT_STAT_WILL_TOPIC_LEN;
-	} else {
-		finished_ = true;
-	}
-
-	return dlen;
-}
-
-int mqtt_connect::update_passwd_val(const char* data, int dlen) {
-	SAVE_DATA(passwd_);
-
-	if ((conn_flags_ & 0x04)) {
-		status_ = MQTT_STAT_WILL_TOPIC_LEN;
 	} else {
 		finished_ = true;
 	}
@@ -392,6 +335,10 @@ int mqtt_connect::update_will_msg_len(const char* data, int dlen) {
 
 	if (dlen_ > 0) {
 		status_ = MQTT_STAT_WILL_MSG_VAL;
+	} else if ((conn_flags_ & 0x80)) {
+		status_ = MQTT_STAT_USERNAME_LEN;
+	} else if ((conn_flags_ & 0x40)) {
+		status_ = MQTT_STAT_PASSWD_LEN;
 	} else {
 		finished_ = true;
 	}
@@ -401,6 +348,57 @@ int mqtt_connect::update_will_msg_len(const char* data, int dlen) {
 
 int mqtt_connect::update_will_msg_val(const char* data, int dlen) {
 	SAVE_DATA(will_msg_);
+
+	if ((conn_flags_ & 0x80)) {
+		status_ = MQTT_STAT_USERNAME_LEN;
+	} else if ((conn_flags_ & 0x40)) {
+		status_ = MQTT_STAT_PASSWD_LEN;
+	} else {
+		finished_ = true;
+	}
+	return dlen;
+}
+
+int mqtt_connect::update_username_len(const char* data, int dlen) {
+	SAVE_LENGTH(dlen_);
+
+	if (dlen_ > 0) {
+		status_ = MQTT_STAT_USERNAME_VAL;
+	} else if ((conn_flags_ & 0x40)) {
+		status_ = MQTT_STAT_PASSWD_LEN;
+	} else {
+		finished_ = true;
+	}
+
+	return dlen;
+}
+
+int mqtt_connect::update_username_val(const char* data, int dlen) {
+	SAVE_DATA(username_);
+
+	if ((conn_flags_ & 0x40)) {
+		status_ = MQTT_STAT_PASSWD_LEN;
+	} else {
+		finished_ = true;
+	}
+
+	return dlen;
+}
+
+int mqtt_connect::update_passwd_len(const char* data, int dlen) {
+	SAVE_LENGTH(dlen_);
+
+	if (dlen_ > 0) {
+		status_ = MQTT_STAT_PASSWD_VAL;
+	} else {
+		finished_ = true;
+	}
+
+	return dlen;
+}
+
+int mqtt_connect::update_passwd_val(const char* data, int dlen) {
+	SAVE_DATA(passwd_);
 
 	finished_ = true;
 	return dlen;
