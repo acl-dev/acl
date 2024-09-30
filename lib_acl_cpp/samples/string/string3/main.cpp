@@ -111,6 +111,17 @@ int main(void)
 		a.c_str(), (int) a.length(), (int) strlen(a.c_str()));
 	printf("over now\r\n");
 
+	printf("---------------------------------------------------\n");
+
+	acl::string ss("www.google.com:80:us");
+	std::pair<acl::string, acl::string>& kv = ss.split_at(':');
+	printf("After split_at: first=%s, second=%s, original=%s\r\n",
+		kv.first.c_str(), kv.second.c_str(), ss.c_str());
+
+	kv = ss.split_at_right(':');
+	printf("After split_at_right: first=%s, second=%s, original=%s\r\n",
+		kv.first.c_str(), kv.second.c_str(), ss.c_str());
+
 #ifdef WIN32
 	printf("Enter any key to exit ...\r\n");
 	getchar();

@@ -1322,12 +1322,50 @@ std::pair<acl::string, acl::string>& string::split_nameval(char sep)
 	}
 
 	if (acl_split_nameval2(STR(vbf_), &name, &value, sep) != NIL) {
-		pair_tmp_->first = "";
+		pair_tmp_->first  = "";
 		pair_tmp_->second = "";
 		return *pair_tmp_;
 	}
 	pair_tmp_->first  = name;
 	pair_tmp_->second = value;
+	return *pair_tmp_;
+}
+
+std::pair<acl::string, acl::string>& string::split_at(char delimiter)
+{
+	if (pair_tmp_ == NIL) {
+		pair_tmp_ = NEW std::pair<acl::string, acl::string>;
+	}
+
+	char *cp = acl_split_at(STR(vbf_), (int) delimiter);
+	if (cp == NIL) {
+		pair_tmp_->first  = "";
+		pair_tmp_->second = "";
+		return *pair_tmp_;
+	}
+
+	pair_tmp_->first  = STR(vbf_);
+	pair_tmp_->second = cp;
+	*--cp = delimiter;
+	return *pair_tmp_;
+}
+
+std::pair<acl::string, acl::string>& string::split_at_right(char delimiter)
+{
+	if (pair_tmp_ == NIL) {
+		pair_tmp_ = NEW std::pair<acl::string, acl::string>;
+	}
+
+	char *cp = acl_split_at_right(STR(vbf_), (int) delimiter);
+	if (cp == NIL) {
+		pair_tmp_->first  = "";
+		pair_tmp_->second = "";
+		return *pair_tmp_;
+	}
+
+	pair_tmp_->first  = STR(vbf_);
+	pair_tmp_->second = cp;
+	*--cp = delimiter;
 	return *pair_tmp_;
 }
 
