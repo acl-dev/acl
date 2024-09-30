@@ -964,6 +964,20 @@ public:
 	std::pair<string, string>& split_nameval(char sep = '=');
 
 	/**
+ 	 * 从字符串左边开始将包含给定分隔符在内的右边截断
+	 * @param delimiter {char} 分隔符
+	 * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+	 */
+	std::pair<string, string>& split_at(char delimiter);
+
+	/**
+	 * 从字符串右边开始将包含给定分隔符在内的右边截断
+	 * @param delimiter {char} 分隔符
+	 * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+	 */
+	std::pair<string, string>& split_at_right(char delimiter);
+
+	/**
 	 * 将字符串拷贝到当前对象的缓冲区中
 	 * @param ptr {const char*} 源字符串地址，需以 '\0' 结束
 	 * @return {string&} 当前对象的引用
