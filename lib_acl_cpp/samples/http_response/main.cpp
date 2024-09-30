@@ -7,30 +7,25 @@ using namespace acl;
 
 //////////////////////////////////////////////////////////////////////////
 
-class master_service : public master_proc
-{
+class master_service : public master_proc {
 public:
-	master_service(const char* to_charset = "gb2312")
-	{
+	master_service(const char* to_charset = "gb2312") {
 		local_charset_ = to_charset;
 	}
 
 	~master_service() {}
 
-	void set_charset(const char* to_charset)
-	{
+	void set_charset(const char* to_charset) {
 		local_charset_ = to_charset;
 	}
 
 protected:
 	// 当接收到客户端连接流后回调的虚接口
-	virtual void on_accept(socket_stream* stream)
-	{
+	void on_accept(socket_stream* stream) {
 		http_response res(stream);
 
 		// 读客户端的 HTTP 请求头
-		if (res.read_header() == false)
-		{
+		if (res.read_header() == false) {
 			const char* ptr = "read request header error";
 			res.response_header().set_status(400).set_keep_alive(false);
 			res.response(ptr, strlen(ptr));
@@ -42,8 +37,7 @@ protected:
 		http_client* client = res.get_client();
 		assert(client);
 		const char* p = client->header_value("Content-Type");
-		if (p == NULL || *p == 0)
-		{
+		if (p == NULL || *p == 0) {
 			const char* ptr = "no Content-Type";
 			res.response_header().set_status(400).set_keep_alive(false);
 			res.response(ptr, strlen(ptr));
@@ -63,29 +57,29 @@ protected:
 
 		// 根据子类型的不同调用不同的处理过程
 
-		if (stype == NULL)
+		if (stype == NULL) {
 			ret = do_plain(res, req_charset, err);
 
 		// text/xml 格式
-		else if (strcasecmp(stype, "xml") == 0)
+		} else if (strcasecmp(stype, "xml") == 0) {
 			ret = do_xml(res, req_charset, err);
 
 		// text/json 格式
-		else if (strcasecmp(stype, "json") == 0)
+		} else if (strcasecmp(stype, "json") == 0) {
 			ret = do_json(res, req_charset, err);
-		else
+		} else {
 			ret = do_plain(res, req_charset, err);
-		if (ret == false)
+		}
+		if (ret == false) {
 			res.response(err.c_str(), err.length());
+		}
 	}
 
 private:
 	// 处理 text/plain 数据体
-	bool do_plain(http_response& res, const char* req_charset, string& err)
-	{
+	bool do_plain(http_response& res, const char* req_charset, string& err) {
 		string body;
-		if (res.get_body(body, local_charset_) == false)
-		{
+		if (res.get_body(body, local_charset_) == false) {
 			err += "get_body error";
 			return false;
 		}
@@ -94,13 +88,12 @@ private:
 		// 设置响应头字段
 		http_header& header = res.response_header();
 		string ctype("text/plain");
-		if (req_charset)
-		{
+		if (req_charset) {
 			ctype << "; charset=" << req_charset;
 			header.set_content_type(ctype);
-		}
-		else
+		} else {
 			header.set_content_type(ctype);
+		}
 
 		printf(">>ctype: %s\r\n", ctype.c_str());
 
@@ -109,17 +102,14 @@ private:
 	}
 
 	// 处理 text/xml 数据体
-	bool do_xml(http_response& res, const char* req_charset, string& err)
-	{
+	bool do_xml(http_response& res, const char* req_charset, string& err) {
 		xml1 body;
-		if (res.get_body(body, local_charset_) == false)
-		{
+		if (res.get_body(body, local_charset_) == false) {
 			err += "get_body error";
 			return false;
 		}
 		xml_node* node = body.first_node();
-		while (node)
-		{
+		while (node) {
 			const char* tag = node->tag_name();
 			const char* name = node->attr_value("name");
 			const char* pass = node->attr_value("pass");
@@ -133,13 +123,12 @@ private:
 		// 设置响应头字段
 		http_header& header = res.response_header();
 		string ctype("text/xml");
-		if (req_charset)
-		{
+		if (req_charset) {
 			ctype << "; charset=" << req_charset;
 			header.set_content_type(ctype);
-		}
-		else
+		} else {
 			header.set_content_type(ctype);
+		}
 
 		printf(">>ctype: %s\r\n", ctype.c_str());
 
@@ -152,25 +141,22 @@ private:
 	}
 
 	// 处理 text/json 数据
-	bool do_json(http_response& res, const char* req_charset, string& err)
-	{
+	bool do_json(http_response& res, const char* req_charset, string& err) {
 		json body;
-		if (res.get_body(body, local_charset_) == false)
-		{
+		if (res.get_body(body, local_charset_) == false) {
 			err += "get_body error";
 			return false;
 		}
 
 		json_node* node = body.first_node();
-		while (node)
-		{
-			if (node->tag_name())
-			{
+		while (node) {
+			if (node->tag_name()) {
 				printf("tag: %s", node->tag_name());
-				if (node->get_text())
+				if (node->get_text()) {
 					printf(", value: %s\r\n", node->get_text());
-				else
+				} else {
 					printf("\r\n");
+				}
 			}
 			node = body.next_node();
 		}
@@ -178,13 +164,12 @@ private:
 		// 设置响应头字段
 		http_header& header = res.response_header();
 		string ctype("text/json");
-		if (req_charset)
-		{
+		if (req_charset) {
 			ctype << "; charset=" << req_charset;
 			header.set_content_type(ctype);
-		}
-		else
+		} else {
 			header.set_content_type(ctype);
+		}
 
 		printf(">>ctype: %s\r\n", ctype.c_str());
 
@@ -197,18 +182,17 @@ private:
 	}
 
 	bool response_body(http_response& res, const string& body,
-		const char* req_charset)
-	{
+		const char* req_charset) {
 		// 如果本地字符集与请求字符集相同，则直接发送
-		if (local_charset_ == req_charset)
+		if (req_charset == NULL || local_charset_ == req_charset) {
 			return res.response(body.c_str(), body.length());
+		}
 
 		// 不一致时，则需要进行转码
 		string buf;
 		charset_conv conv;
 		if (conv.convert(local_charset_, req_charset,
-			body.c_str(), body.length(), &buf) == false)
-		{
+			  body.c_str(), body.length(), &buf) == false) {
 			logger_error("charset convert from %s to %s error",
 				local_charset_.c_str(), req_charset);
 			return false;
@@ -224,8 +208,7 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char* argv[]) {
 #ifdef	WIN32
 	acl::acl_cpp_init();
 #endif
@@ -233,16 +216,16 @@ int main(int argc, char* argv[])
 
 	// 开始运行
 
-	if (argc >= 2 && strcmp(argv[1], "alone") == 0)
-	{
-		if (argc >= 3)
+	if (argc >= 2 && strcmp(argv[1], "alone") == 0) {
+		if (argc >= 3) {
 			service.set_charset(argv[2]);
+		}
 
-		printf("listen: 0.0.0.0:8888 ...\r\n");
-		service.run_alone("0.0.0.0:8888", NULL, 1);  // 单独运行方式
-	}
-	else
+		acl::log::stdout_open(true); printf("listen: 0.0.0.0:8888 ...\r\n");
+		service.run_alone("0.0.0.0:8888", NULL, 0);  // 单独运行方式
+	} else {
 		service.run_daemon(argc, argv);  // acl_master 控制模式运行
+	}
 
 	return 0;
 }

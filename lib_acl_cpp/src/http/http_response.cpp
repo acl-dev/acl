@@ -12,8 +12,7 @@
 #include "acl_cpp/http/http_response.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 http_response::http_response(socket_stream* client)
 {
@@ -21,6 +20,7 @@ http_response::http_response(socket_stream* client)
 	header_ok_ = false;
 	head_sent_ = false;
 	client_    = NEW http_client(client, false, true);
+	header_.set_request_mode(false);
 }
 
 http_response::~http_response(void)
@@ -55,6 +55,7 @@ bool http_response::read_header()
 		head_sent_ = false;
 		client_->reset();
 		header_.reset();
+		header_.set_request_mode(false);
 	} else {
 		logger_error("client_ not opened");
 		header_ok_ = false;
