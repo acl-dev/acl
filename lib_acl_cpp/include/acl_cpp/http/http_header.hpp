@@ -99,6 +99,13 @@ public:
 	 */
 	http_header& add_entry(const char* name, const char* value,
 			bool replace = true);
+
+	/**
+	 * 在已经添加的 HTTP 头部字段中，禁止或开启某个字段(内部缺省为开启状态)
+	 * @param name {const char*}
+	 * @param yes {bool} 当为 true 表示禁止，false 为开启
+	 */
+	void disable_header(const char* name, bool yes);
 	
 	/**
 	 * 从 HTTP 头中获得指定的头部字段

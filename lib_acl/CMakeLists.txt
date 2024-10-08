@@ -1,5 +1,5 @@
-#cmake_minimum_required(VERSION 3.2.0)
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.2.0)
+#cmake_minimum_required(VERSION 2.8.0)
 project(acl)
 
 #set(CMAKE_BUILD_TYPE Release)
@@ -166,6 +166,9 @@ elseif (${WIN_OS})
 		"-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 		"-DACL_WRITEABLE_CHECK"
 		"-DACL_PREPARE_COMPILE")
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		add_definitions("-DACL_DLL -DACL_EXPORTS")
+	endif()
 endif()
 
 if (ACL_CLIENT_ONLY MATCHES "YES")
@@ -187,9 +190,14 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${acl_output_path})
 add_library(acl_static STATIC ${acl_src})
 
 if (${WIN_OS})
-	SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "libacl")
+	set_target_properties(acl_static PROPERTIES OUTPUT_NAME "libacl")
+	set_target_properties(acl_static PROPERTIES
+		OUTPUT_NAME "libacl"
+		ARCHIVE_OUTPUT_DIRECTORY ${acl_output_path}/static
+		LIBRARY_OUTPUT_DIRECTORY ${acl_output_path}/static
+	)
 else()
-	SET_TARGET_PROPERTIES(acl_static PROPERTIES OUTPUT_NAME "acl")
+	set_target_properties(acl_static PROPERTIES OUTPUT_NAME "acl")
 endif()
 
 link_directories(${acl_output_path})
@@ -234,9 +242,15 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 	add_library(acl_shared SHARED ${acl_src})
 
 	if (${WIN_OS})
-		SET_TARGET_PROPERTIES(acl_shared PROPERTIES OUTPUT_NAME "libacl")
+		set_target_properties(acl_shared PROPERTIES
+			OUTPUT_NAME "libacl"
+			RUNTIME_OUTPUT_DIRECTORY ${acl_output_path}/shared
+			ARCHIVE_OUTPUT_DIRECTORY ${acl_output_path}/shared
+			LIBRARY_OUTPUT_DIRECTORY ${acl_output_path}/shared
+		)
+		set_target_properties(acl_shared PROPERTIES OUTPUT_NAME "libacl")
 	else()
-		SET_TARGET_PROPERTIES(acl_shared PROPERTIES OUTPUT_NAME "acl")
+		set_target_properties(acl_shared PROPERTIES OUTPUT_NAME "acl")
 	endif()
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")

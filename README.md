@@ -270,17 +270,20 @@ void run(void) {
 
   go[&] {  // Create one server coroutine to wait for connection.
     while (true) {
-      acl::socket_stream* conn = server.accept();
-      if (conn) {
-        go[=] {  // Create one client coroutine to handle the connection.
+      acl::shared_stream conn = server.shared_accept();
+      if (conn == nullptr) {
+        break;
+      }
+
+      go[conn] {  // Create one client coroutine to handle the connection.
+        while (true) {
           char buf[256];
           int ret = conn->read(buf, sizeof(buf), false);
-          if (ret > 0) {
-            (void) conn->write(buf, ret);
+          if (ret <= 0 || conn->write(buf, ret) != ret) {
+            break;
           }
-          delete conn;
-        };
-      }
+        }
+      };
     }
   };
 

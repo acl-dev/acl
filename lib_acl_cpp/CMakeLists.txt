@@ -1,5 +1,5 @@
-#cmake_minimum_required(VERSION 3.2.0)
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.2.0)
+#cmake_minimum_required(VERSION 2.8.0)
 project(acl_cpp)
 
 #set(CMAKE_BUILD_TYPE Release)
@@ -39,7 +39,12 @@ elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
 	add_definitions("-O2")
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
+#	add_definitions("-O2 -DUSE_SYS_ICONV")
 	add_definitions("-O2")
+	include_directories(
+		/usr/include
+		/usr/local/include
+	)
 	set(UNIX_OS true)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 	add_definitions("-Wno-invalid-source-encoding")
@@ -81,7 +86,7 @@ set(sqlite_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/sqlite)
 set(polarssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include)
 set(openssl_include ${CMAKE_CURRENT_SOURCE_DIR}/../include/openssl-1.1.1q)
 
-include_directories(#if !defined(ACL_CLIENT_ONLY) && !defined(ACL_DB_DISABLE)
+include_directories(
 	${mysql_include}
 	${pgsql_include}
 	${sqlite_include}
@@ -238,6 +243,11 @@ elseif (${WIN_OS})
 		"-DHAS_POLARSSL_DLL"
 		"-DHAS_MBEDTLS_DLL"
 		"-DUSE_WIN_ICONV")
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		add_definitions("-DACL_CPP_DLL -DACL_CPP_EXPORTS"
+			"-DACL_DLL -DHTTP_DLL -DICMP_DLL -DSMTP_DLL"
+		)
+	endif()
 	aux_source_directory(${src}/stdlib/internal lib_src)
 endif()
 
@@ -255,9 +265,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 add_library(acl_cpp_static STATIC ${lib_src})
 
 if (${WIN_OS})
-	SET_TARGET_PROPERTIES(acl_cpp_static PROPERTIES OUTPUT_NAME "libacl_cpp")
+	set_target_properties(acl_cpp_static PROPERTIES
+		OUTPUT_NAME "libacl_cpp"
+		ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/static
+		LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/static
+	)
 else()
-	SET_TARGET_PROPERTIES(acl_cpp_static PROPERTIES OUTPUT_NAME "acl_cpp")
+	set_target_properties(acl_cpp_static PROPERTIES OUTPUT_NAME "acl_cpp")
 endif()
 
 link_directories(${lib_output_path})
@@ -302,12 +316,26 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 			-fvisibility=hidden -fvisibility-inlines-hidden)
 	endif()
 
-	set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
-	set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
-	add_library(acl_cpp_shared SHARED ${lib_src})
-	target_link_libraries(acl_cpp_shared protocol acl)
+	if (${WIN_OS})
+		link_directories(${lib_output_path}/shared)
+	endif()
 
-	SET_TARGET_PROPERTIES(acl_cpp_shared PROPERTIES OUTPUT_NAME "acl_cpp")
+	add_library(acl_cpp_shared SHARED ${lib_src})
+
+	if (${WIN_OS})
+		set_target_properties(acl_cpp_shared PROPERTIES
+			OUTPUT_NAME "libacl_cpp"
+			RUNTIME_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/shared
+		)
+		target_link_libraries(acl_cpp_shared libprotocol libacl)
+	else()
+		set(lc_flags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
+		set(CMAKE_SHARED_LINKER_FLAGS "${lc_flags} ${sys_ldflags}")
+		set_target_properties(acl_cpp_shared PROPERTIES OUTPUT_NAME "acl_cpp")
+		target_link_libraries(acl_cpp_shared protocol acl)
+	endif()
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
 		install(TARGETS acl_cpp_shared

@@ -1,17 +1,17 @@
 #include "stdafx.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <getopt.h>
 
 //////////////////////////////////////////////////////////////////////////////
 
-static void client_echo(acl::socket_stream* conn, bool readable) {
+static void client_echo(const acl::shared_stream& conn, bool readable) {
 	acl::string buf;
 	while (true) {
 		if (readable) {
-			struct timeval begin, end;
-			gettimeofday(&begin, NULL);
-			int ret = acl_readable(conn->sock_handle());
-			gettimeofday(&end, NULL);
+			struct timeval begin{}, end{};
+			gettimeofday(&begin, nullptr);
+			int ret = conn->readable();
+			gettimeofday(&end, nullptr);
 			double cost = acl::stamp_sub(end, begin);
 
 			if (ret == 0) {
@@ -33,18 +33,17 @@ static void client_echo(acl::socket_stream* conn, bool readable) {
 		}
 		//acl::fiber::delay(1000);
 	}
-	delete conn;
 }
 
 static void server_listen(acl::server_socket& ss, bool readable) {
 	while (true) {
-		acl::socket_stream* conn = ss.accept();
-		if (conn == NULL) {
+		acl::shared_stream conn = ss.shared_accept();
+		if (conn == nullptr) {
 			printf("accept error %s\r\n", acl::last_serror());
 			break;
 		}
 
-		go[=] {
+		go[conn, readable] {
 			client_echo(conn, readable);
 		};
 	}
@@ -110,6 +109,5 @@ int main(int argc, char *argv[]) {
 	}
 
 	acl::fiber::schedule_with(type);
-
 	return 0;
 }

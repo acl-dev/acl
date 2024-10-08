@@ -1,5 +1,5 @@
-#cmake_minimum_required(VERSION 3.2.0)
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.2.0)
+#cmake_minimum_required(VERSION 2.8.0)
 project(fiber_cpp)
 
 #set(CMAKE_BUILD_TYPE Release)
@@ -72,6 +72,11 @@ elseif (${WIN_OS})
 		"-D_WINSOCK_DEPRECATED_NO_WARNINGS"
 		"-DACL_WRITEABLE_CHECK"
 		"-DACL_PREPARE_COMPILE")
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		add_definitions("-DFIBER_CPP_DLL -DFIBER_CPP_EXPORTS"
+			"-DACL_DLL -DHTTP_DLL -DICMP_DLL -DSMTP_DLL -DACL_CPP_DLL -DFIBER_DLL"
+		)
+	endif()
 endif()
 
 #if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -84,6 +89,7 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 else()
@@ -111,7 +117,7 @@ include_directories(
 )
 
 if (${WIN_OS})
-	set(sources ${src})
+	set(sources ${src} ${src}/detours)
 else()
 	set(sources ${src} ${src}/keeper)
 endif()
@@ -135,9 +141,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 add_library(fiber_cpp_static STATIC ${lib_src})
 
 if (${WIN_OS})
-	SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "libfiber_cpp")
+	set_target_properties(fiber_cpp_static PROPERTIES
+		OUTPUT_NAME "libfiber_cpp"
+		ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/static
+		LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/static
+	)
 else()
-	SET_TARGET_PROPERTIES(fiber_cpp_static PROPERTIES OUTPUT_NAME "fiber_cpp")
+	set_target_properties(fiber_cpp_static PROPERTIES OUTPUT_NAME "fiber_cpp")
 endif()
 
 link_directories(${lib_output_path})
@@ -178,12 +188,27 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 			-fvisibility=hidden -fvisibility-inlines-hidden)
 	endif()
 
-	set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
-	set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
-	add_library(fiber_cpp_shared SHARED ${lib_src})
-	target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
+	if (${WIN_OS})
+		link_directories(${lib_output_path}/shared)
+	endif()
 
-	SET_TARGET_PROPERTIES(fiber_cpp_shared PROPERTIES OUTPUT_NAME "fiber_cpp")
+	add_library(fiber_cpp_shared SHARED ${lib_src})
+
+	if (${WIN_OS})
+		set_target_properties(fiber_cpp_shared PROPERTIES
+			OUTPUT_NAME "libfiber_cpp"
+			RUNTIME_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/shared
+		)
+		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
+		target_link_libraries(fiber_cpp_shared libacl_cpp libprotocol libacl libfiber Ws2_32)
+	else()
+		set_target_properties(fiber_cpp_shared PROPERTIES OUTPUT_NAME "fiber_cpp")
+		set(lc_ldflags "-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib -L${lib_output_path}")
+		set(CMAKE_SHARED_LINKER_FLAGS "${lc_ldflags} ${sys_ldflags}")
+		target_link_libraries(fiber_cpp_shared acl_cpp protocol acl fiber)
+	endif()
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
 		install(TARGETS fiber_cpp_shared

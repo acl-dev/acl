@@ -12,7 +12,7 @@
 //    201703L (C++17)
 //    202002L (C++20)
 
-#if __cplusplus >= 201103L      // Support c++11 ?
+#if defined(USE_CPP11) || __cplusplus >= 201103L      // Support c++11 ?
 
 struct ACL_FIBER;
 

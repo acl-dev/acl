@@ -75,18 +75,18 @@ ifeq ($(findstring Alpine, $(shell uname -a)), Alpine)
 	CFLAGS += -DALPINE
 endif
 
-ifeq ($(findstring gcc, $(CC)), gcc)
-	CFLAGS += -Wstrict-prototypes
-	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
-	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
-	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
-	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
-	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
+#ifeq ($(findstring gcc, $(CC)), gcc)
+#	CFLAGS += -Wstrict-prototypes
+#	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+#	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+#	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+#	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
+#	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
 #	ifeq ($(GCC_VER), true)
 #		CFLAGS += -Wno-implicit-fallthrough
 #		CFLAGS += -Wno-absolute-value
 #	endif
-endif
+#endif
 
 ifeq ($(findstring clang, $(CC)), clang)
 	CFLAGS += -Wstrict-prototypes \
@@ -249,7 +249,7 @@ OBJ = $(patsubst %.c, $(OBJ_PATH_DST)/%.o, $(notdir $(SRC))) $(ASM_OBJ)
 ###########################################################
 
 .PHONY = static shared clean
-COMPILE = $(CC) $(CFLAGS) -O3
+COMPILE = $(CC) $(CFLAGS)
 COMPILE_FIBER = $(CC) $(CFLAGS) 
 
 all: static shared

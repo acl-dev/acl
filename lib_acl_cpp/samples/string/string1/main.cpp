@@ -385,7 +385,7 @@ static void test31(void)
 
 int main(void)
 {
-	//acl_mem_slice_init(8, 1024, 1000000, ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF);
+	acl_mem_slice_init(8, 1024, 1000000, ACL_SLICE_FLAG_GC2 | ACL_SLICE_FLAG_RTGC_OFF);
 	test31();
 	getchar();
 

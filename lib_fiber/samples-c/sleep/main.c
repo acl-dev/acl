@@ -45,7 +45,7 @@ static void sleep_main(ACL_FIBER *fiber, void *ctx)
 			poll_sleep(1);
 			break;
 		default:
-			acl_fiber_sleep(1);
+			sleep(1);
 			break;
 		}
 		printf("fiber-%d wakeup %d\r\n", acl_fiber_self(), i);
@@ -113,6 +113,7 @@ int main(int argc, char *argv[])
 	}
 
 	acl_fiber_schedule();
+	printf("The process will exit\r\n");
 
 	return 0;
 }

@@ -23,8 +23,9 @@ char  *acl_split_at(char *s, int delimiter)
 {
 	char   *cp;
 
-	if ((cp = strchr(s, delimiter)) != 0)
+	if ((cp = strchr(s, delimiter)) != 0) {
 		*cp++ = 0;
+	}
 	return cp;
 }
 
@@ -34,7 +35,8 @@ char  *acl_split_at_right(char *s, int delimiter)
 {
 	char   *cp;
 
-	if ((cp = strrchr(s, delimiter)) != 0)
+	if ((cp = strrchr(s, delimiter)) != 0) {
 		*cp++ = 0;
+	}
 	return cp;
 }

@@ -13,8 +13,7 @@ struct URL_NV
 	char* value;
 };
 
-class ACL_CPP_API url_coder : public dbuf_obj
-{
+class ACL_CPP_API url_coder : public dbuf_obj {
 public:
 	/**
 	 * 构造函数
@@ -30,7 +29,7 @@ public:
 	 */
 	url_coder(const url_coder& coder, dbuf_guard* dbuf = NULL);
 
-	~url_coder(void);
+	~url_coder();
 
 	/**
 	 * 将存储于 params_ 数组中的数据进行 url 编码
@@ -43,7 +42,7 @@ public:
 	 * 获得将数组对象转换为编码后的字符串对象
 	 * @return {const string&}
 	 */
-	const string& to_string(void) const;
+	const string& to_string() const;
 
 	/**
 	 * 解析以 URL 编码的字符串
@@ -94,8 +93,7 @@ public:
 	 * 获得参数数组对象
 	 * @return {std::vector<URL_NV*>&}
 	 */
-	const std::vector<URL_NV*>& get_params(void) const
-	{
+	const std::vector<URL_NV*>& get_params() const {
 		return params_;
 	}
 
@@ -109,7 +107,7 @@ public:
 	/**
 	 * 重置解析器状态，清除内部缓存
 	 */
-	void reset(void);
+	void reset();
 
 private:
 	bool nocase_;

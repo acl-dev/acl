@@ -13,8 +13,7 @@
 
 #if !defined(ACL_MIME_DISABLE)
 
-namespace acl
-{
+namespace acl {
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -108,7 +107,7 @@ void http_mime_node::load_param(const char* path)
 	const char* fromCharset = get_charset();
 	const char* toCharset   = get_toCharset();
 	if (fromCharset && *fromCharset && toCharset && *toCharset
-		&& strcasecmp(fromCharset, toCharset)) {
+		&& strcasecmp(fromCharset, toCharset) != 0) {
 
 		charset_conv conv;
 		string tmp;
@@ -201,11 +200,10 @@ void http_mime::set_saved_path(const char* path)
 
 bool http_mime::update(const char* data, size_t len)
 {
-	return mime_state_update(mime_state_, data, (int) len) == 1
-		? true : false;
+	return mime_state_update(mime_state_, data, (int) len) == 1;
 }
 
-const std::list<http_mime_node*>& http_mime::get_nodes(void) const
+const std::list<http_mime_node*>& http_mime::get_nodes() const
 {
 	if (parsed_) {
 		return mime_nodes_;

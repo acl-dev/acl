@@ -15,6 +15,14 @@ typedef struct ACL_DBUF_POOL ACL_DBUF_POOL;
 ACL_API ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size);
 
 /**
+ * 创建内存池对象
+ * @param block_size {size_t} 内存池中每个连续内存块的大小（字节）
+ * @param align {size_t} 分配内存时的字节对齐个数
+ * @return {ACL_DBUF_POOL*} 返回非 NULL 对象
+ */
+ACL_API ACL_DBUF_POOL *acl_dbuf_pool_create2(size_t block_size, size_t align);
+
+/**
  * 重置内存池状态，会将多余的内存数据块释放
  * @param pool {ACL_DBUF_POOL*} 内存池对象
  * @param off {size_t} 要求保留的最小内存相对偏移位置

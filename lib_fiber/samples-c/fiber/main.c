@@ -18,6 +18,7 @@ static __thread long long __count = 0;
 
 #define	DUMMY_SIZE	512000
 
+#if	!defined(__FreeBSD__)
 static void stack_dummy(ACL_FIBER *fiber acl_unused)
 {
 	char buf[DUMMY_SIZE];
@@ -25,6 +26,7 @@ static void stack_dummy(ACL_FIBER *fiber acl_unused)
 	memset(buf, 0, sizeof(buf));
 	printf("%s: called OK, dummy_size=%d\r\n", __FUNCTION__, DUMMY_SIZE);
 }
+#endif
 
 static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 {
@@ -33,9 +35,11 @@ static void fiber_main(ACL_FIBER *fiber, void *ctx acl_unused)
 
 	printf("\r\nshared_stack_size=%zd\r\n\r\n", shared_stack_size);
 
+#if	!defined(__FreeBSD__)
 	if (acl_fiber_use_share_stack(fiber) && shared_stack_size > DUMMY_SIZE) {
 		stack_dummy(fiber);
 	}
+#endif
 
 	errno = acl_fiber_errno(fiber);
 
@@ -126,7 +130,6 @@ int main(int argc, char *argv[])
 			break;
 		case 'd':
 			stack_size = (size_t) atoi(optarg);
-			acl_fiber_attr_setstacksize(&fiber_attr, stack_size);
 			break;
 		case 'S':
 			acl_fiber_attr_setsharestack(&fiber_attr, 1);
@@ -140,6 +143,7 @@ int main(int argc, char *argv[])
 	}
 
 	acl_fiber_set_shared_stack_size(8000000);
+	acl_fiber_attr_setstacksize(&fiber_attr, stack_size);
 
 	acl_pthread_attr_init(&attr);
 	tids = (acl_pthread_t *) acl_mycalloc(nthreads, sizeof(acl_pthread_t));

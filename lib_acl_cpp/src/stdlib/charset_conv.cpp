@@ -278,7 +278,7 @@ bool charset_conv::update_begin(const char* fromCharset,
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
 		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
-#elif defined(ACL_FREEBSD)
+#elif defined(ACL_FREEBSD) && !defined(USE_SYS_ICONV)
 		__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
 		__iconv((iconv_t) m_iconv, &pi, &zi, &po, &zo);
@@ -375,7 +375,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
 		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
-#elif defined(ACL_FREEBSD)
+#elif defined(ACL_FREEBSD) && !defined(USE_SYS_ICONV)
 		ret = __iconv(m_iconv, (const char**) &pIn, &nIn, &pOut, &nOut);
 #else
 		ret = __iconv((iconv_t) m_iconv, &pIn, &nIn, &pOut, &nOut);
@@ -412,7 +412,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 # endif
 #elif defined(ACL_SUNOS5)
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
-#elif defined(ACL_FREEBSD)
+#elif defined(ACL_FREEBSD) && !defined(USE_SYS_ICONV)
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
 			__iconv((iconv_t) m_iconv, &pi, &zi, &po, &zo);
@@ -456,7 +456,7 @@ bool charset_conv::update(const char* in, size_t len, acl::string* out)
 # endif // USE_WIN_ICONV
 #elif defined(ACL_SUNOS5)
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
-#elif defined(ACL_FREEBSD)
+#elif defined(ACL_FREEBSD) && !defined(USE_SYS_ICONV)
 			__iconv(m_iconv, (const char**) &pi, &zi, &po, &zo);
 #else
 			__iconv((iconv_t) m_iconv, &pi, &zi, &po, &zo);

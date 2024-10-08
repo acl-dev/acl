@@ -26,6 +26,7 @@ typedef struct ACL_DBUF {
 
 struct ACL_DBUF_POOL {
         size_t block_size;
+	size_t align;
 	size_t off;
 	size_t huge;
 	size_t count;
@@ -34,6 +35,11 @@ struct ACL_DBUF_POOL {
 };
 
 ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
+{
+	return acl_dbuf_pool_create2(block_size, sizeof(void*));
+}
+
+ACL_DBUF_POOL *acl_dbuf_pool_create2(size_t block_size, size_t align)
 {
 	ACL_DBUF_POOL *pool;
 	size_t size;
@@ -75,6 +81,7 @@ ACL_DBUF_POOL *acl_dbuf_pool_create(size_t block_size)
 #endif
 
 	pool->block_size = size;
+	pool->align      = align + align % 2;  /* 需保证对齐字节为偶数 */
 	pool->off        = 0;
 	pool->huge       = 0;
 	pool->head       = (ACL_DBUF*) pool->buf;
@@ -258,7 +265,8 @@ void *acl_dbuf_pool_alloc(ACL_DBUF_POOL *pool, size_t length)
 	void *ptr;
 	ACL_DBUF *dbuf;
 
-	length += 4 - length % 4;
+	/* 保证长度是按指定字节对齐的 */
+	length += pool->align - length % pool->align;
 
 	if (length > pool->block_size) {
 		dbuf = acl_dbuf_alloc(pool, length);

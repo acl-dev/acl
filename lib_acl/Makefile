@@ -79,11 +79,12 @@ endif
 #using "gcc -dumpversion" can get the gcc's version more easily
 ifeq ($(findstring gcc, $(CC)), gcc)
 	CFLAGS += -Wstrict-prototypes
-	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
-	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
-	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
-	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
-	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
+#	GCC_VERSION=$(shell gcc --version | grep ^gcc | sed 's/^.* //g')
+#	GCC_MAJOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f1)
+#	GCC_MINOR:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f2)
+#	GCC_SUB:=$(shell echo "$(GCC_VERSION)" | cut -d'.' -f3)
+#	GCC_VER:=$(shell [ $(GCC_MAJOR) -gt 4 -o \( $(GCC_MAJOR) -eq 4 -a $(GCC_MINOR) -gt 4 \) ] && echo true)
+	GCC_VER=$(shell gcc --version | awk '/^gcc/ {split($$3, ver, "."); if (ver[1] > 4 || (ver[1] == 4 && ver[2] > 4)) print "true"; else print "false"}')
 	ifeq ($(GCC_VER), true)
 		CFLAGS += -Wno-implicit-fallthrough
 	endif

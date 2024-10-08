@@ -44,7 +44,9 @@ void redis_command::init()
 #ifdef ACL_DBUF_HOOK_NEW
 	dbuf_           = new (REDIS_DBUF_NBLOCK) dbuf_pool();
 #else
-	dbuf_           = new dbuf_pool(REDIS_DBUF_NBLOCK);
+	// 因为 gcc 编译器在启用 O3 优化时，有可能在地址赋值时会因使用 MOVDQA，
+	// 而该指令是按 16 字节对齐的
+	dbuf_           = new dbuf_pool(REDIS_DBUF_NBLOCK, 16);
 #endif
 }
 

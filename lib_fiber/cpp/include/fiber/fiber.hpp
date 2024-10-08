@@ -168,8 +168,14 @@ public:
 	 *  部会自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用
 	 *  schedule 或 schedule_with 方式来启动协程调度器以运行所的协程过程；
 	 *  内部缺省状态为 false
+	 * @param backend_fiber {bool} 当事件类型为FIBER_EVENT_T_WMSG，
 	 */
 	static void init(fiber_event_t type, bool schedule_auto = false);
+
+	/**
+	 * 在 Windows 平台下，可以调用此方法启用 GUI 界面协程模式
+	 */
+	static void schedule_gui();
 
 	/**
 	 * 启动协程运行的调度过程

@@ -239,6 +239,7 @@ void CWinFiberDlg::OnBnClickedListen()
 		printf("listen %s ok\r\n", m_listenAddr.c_str());
 		m_fiberListen = new CFiberListener(m_listen);
 		m_fiberListen->start();
+		printf("listen fiber stopped!\r\n");
 	} else if (acl::fiber::scheduled()) {
 		GetDlgItem(IDC_LISTEN)->EnableWindow(FALSE);
 		m_fiberListen->kill();

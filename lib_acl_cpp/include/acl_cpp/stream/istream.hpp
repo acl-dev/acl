@@ -157,6 +157,13 @@ public:
 	bool readable() const;
 
 	/**
+	 * 判断当前连接是否有数据可读
+	 * @param timeo {int} 等待超时值（毫秒）
+	 * @return {bool}
+	 */
+	bool read_wait(int timeo) const;
+
+	/**
 	 * 尝试性从输入流中读取一行数据
 	 * @param buf {string&} 缓冲区
 	 * @param nonl {bool} 是否保留所读行数据中的 "\r\n" 或 "\n"

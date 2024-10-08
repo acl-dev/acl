@@ -1,6 +1,6 @@
-#cmake_minimum_required(VERSION 3.2.0)
-cmake_minimum_required(VERSION 2.8.0)
-project(Acl)
+cmake_minimum_required(VERSION 3.2.0)
+#cmake_minimum_required(VERSION 2.8.0)
+project(acl)
 
 #message(${CMAKE_SYSTEM_NAME})
 
@@ -58,8 +58,8 @@ elseif (CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 	include_directories(
 		#/usr/include/c++/4.2
 		#/usr/include/c++/4.2/backward
-		/usr/local/include
 		/usr/include
+		/usr/local/include
 	)
 
 	link_directories(

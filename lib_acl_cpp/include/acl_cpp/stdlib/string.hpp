@@ -964,6 +964,20 @@ public:
 	std::pair<string, string>& split_nameval(char sep = '=');
 
 	/**
+ 	 * 从字符串左边开始将包含给定分隔符在内的右边截断
+	 * @param delimiter {char} 分隔符
+	 * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+	 */
+	std::pair<string, string>& split_at(char delimiter);
+
+	/**
+	 * 从字符串右边开始将包含给定分隔符在内的右边截断
+	 * @param delimiter {char} 分隔符
+	 * @return {char*} 分隔符以右的字符串，当为NULL时表明未找到指定分隔符
+	 */
+	std::pair<string, string>& split_at_right(char delimiter);
+
+	/**
 	 * 将字符串拷贝到当前对象的缓冲区中
 	 * @param ptr {const char*} 源字符串地址，需以 '\0' 结束
 	 * @return {string&} 当前对象的引用
@@ -1368,6 +1382,23 @@ bool operator == (const acl::string& l, const std::string& r);
 // acl::string s = "hello world!";
 // std::cout << s << std::endl;
 std::ostream& operator << (std::ostream& o, const acl::string& s);
+
+/**
+ * 将字符串进行分割
+ * @param str {const char*} 待分割的源字符串
+ * @param sep {const char*} 分割的字符串，属于该字符串中的任一个字符都可做为分割符
+ * @param out {std::vector<std::string>&} 存储分割后的字符串结果集
+ */
+void split(const char* str, const char* sep, std::vector<std::string>& out);
+
+/**
+ * 将字符串进行分割
+ * @param str {const char*} 待分割的源字符串
+ * @param sep {const char*} 分割的字符串，属于该字符串中的任一个字符都可做为分割符
+ * @param out {std::list<std::string>&} 存储分割后的字符串结果集
+ * @return {size_t} 返回分割后结果集中字符串的个数
+ */
+size_t split(const char* str, const char* sep, std::list<std::string>& out);
 
 } // namespce acl
 

@@ -4,6 +4,20 @@
 
 namespace acl {
 
+class gui_backend : public fiber {
+public:
+	gui_backend() {}
+	~gui_backend() {}
+
+protected:
+	// @override
+	void run() {
+		while (true) {
+			fiber::delay(1000);         
+		}
+	}
+};
+
 fiber::fiber()
 {
 	f_ = NULL;
@@ -270,6 +284,20 @@ void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
 
 	acl_fiber_schedule_init(schedule_auto ? 1 : 0);
 	acl_fiber_schedule_set_event(etype);
+}
+
+static __thread acl::fiber *backend_fiber = NULL;
+
+void fiber::schedule_gui()
+{
+	acl_fiber_schedule_init(1);
+	acl_fiber_schedule_set_event(FIBER_EVENT_WMSG);
+	if (backend_fiber == NULL) {
+		backend_fiber = new gui_backend;
+		backend_fiber->start();
+		delete backend_fiber;
+		backend_fiber = NULL;
+	}
 }
 
 void fiber::schedule(fiber_event_t type /* FIBER_EVENT_T_KERNEL */)

@@ -1,5 +1,5 @@
-#cmake_minimum_required(VERSION 3.2.0)
-cmake_minimum_required(VERSION 2.8.0)
+cmake_minimum_required(VERSION 3.2.0)
+#cmake_minimum_required(VERSION 2.8.0)
 project(fiber)
 
 #set(CMAKE_BUILD_TYPE Release)
@@ -82,6 +82,9 @@ elseif (${WIN_OS})
 		"-DACL_WRITEABLE_CHECK"
 		"-D_CRT_SECURE_NO_WARNINGS"
 		"-DACL_PREPARE_COMPILE")
+	if (ACL_BUILD_SHARED MATCHES "YES")
+		add_definitions("-DFIBER_DLL -DFIBER_EXPORTS")
+	endif()
 endif()
 
 #if (CMAKE_BUILD_TYPE STREQUAL "")
@@ -95,6 +98,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Android")
 	add_definitions("-DANDROID")
 	add_definitions("-Wno-incompatible-pointer-types-discards-qualifiers")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
+elseif(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 elseif(CMAKE_SYSTEM_NAME MATCHES "Windows")
 else()
@@ -148,9 +152,13 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${lib_output_path})
 add_library(fiber_static STATIC ${lib_src})
 
 if (${WIN_OS})
-	SET_TARGET_PROPERTIES(fiber_static PROPERTIES OUTPUT_NAME "libfiber")
+	set_target_properties(fiber_static PROPERTIES
+		OUTPUT_NAME "libfiber"
+		ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/static
+		LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/static
+	)
 else()
-	SET_TARGET_PROPERTIES(fiber_static PROPERTIES OUTPUT_NAME "fiber")
+	set_target_properties(fiber_static PROPERTIES OUTPUT_NAME "fiber")
 endif()
 
 link_directories(${lib_output_path})
@@ -188,9 +196,24 @@ if (ACL_BUILD_SHARED MATCHES "YES")
 		endif()
 	endif()
 
-	set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
+	if (${WIN_OS})
+		link_directories(${lib_output_path}/shared)
+	endif()
+
 	add_library(fiber_shared SHARED ${lib_src})
-	SET_TARGET_PROPERTIES(fiber_shared PROPERTIES OUTPUT_NAME "fiber")
+
+	if (${WIN_OS})
+		set_target_properties(fiber_shared PROPERTIES
+			OUTPUT_NAME "libfiber"
+			RUNTIME_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			ARCHIVE_OUTPUT_DIRECTORY ${lib_output_path}/shared
+			LIBRARY_OUTPUT_DIRECTORY ${lib_output_path}/shared
+		)
+		set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
+	else()
+		set_target_properties(fiber_shared PROPERTIES OUTPUT_NAME "fiber")
+		set(CMAKE_SHARED_LINKER_FLAGS "${sys_ldflags}")
+	endif()
 
 	if(CMAKE_SYSTEM_NAME MATCHES "Linux" OR CMAKE_SYSTEM_NAME MATCHES "Darwin")
 		install(TARGETS fiber_shared

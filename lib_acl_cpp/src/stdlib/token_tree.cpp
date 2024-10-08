@@ -3,17 +3,16 @@
 #include "acl_cpp/stdlib/token_tree.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-token_node::token_node(void)
+token_node::token_node()
 : me_(NULL)
 , tree_(NULL)
 , dirty_(false)
 {
 }
 
-token_node::~token_node(void) {}
+token_node::~token_node() {}
 
 void token_node::set_node(ACL_TOKEN* token, token_tree* tree)
 {
@@ -22,7 +21,7 @@ void token_node::set_node(ACL_TOKEN* token, token_tree* tree)
 	dirty_ = true;
 }
 
-const char* token_node::get_key(void) const
+const char* token_node::get_key() const
 {
 	if (me_ == NULL) {
 		return "";
@@ -34,20 +33,20 @@ const char* token_node::get_key(void) const
 	return key_.c_str();
 }
 
-void* token_node::get_ctx(void) const
+void* token_node::get_ctx() const
 {
 	return  me_->ctx;
 }
 
 //////////////////////////////////////////////////////////////////////////////
 
-token_tree::token_tree(void)
+token_tree::token_tree()
 : iter_(NULL)
 {
 	tree_ = acl_token_new();
 }
 
-token_tree::~token_tree(void)
+token_tree::~token_tree()
 {
 	acl_token_tree_destroy(tree_);
 	if (iter_) {
@@ -105,7 +104,7 @@ void token_tree::free_delimiters_tab(char* delimiters_tab)
 	acl_token_delim_tab_free(delimiters_tab);
 }
 
-const token_node* token_tree::first_node(void)
+const token_node* token_tree::first_node()
 {
 	if (iter_ == NULL) {
 		iter_ = (ACL_ITER *) acl_mymalloc(sizeof(ACL_ITER));
@@ -119,7 +118,7 @@ const token_node* token_tree::first_node(void)
 	return &node_;
 }
 
-const token_node* token_tree::next_node(void)
+const token_node* token_tree::next_node()
 {
 	if (iter_ == NULL) {
 		logger_error("call first_node first!");

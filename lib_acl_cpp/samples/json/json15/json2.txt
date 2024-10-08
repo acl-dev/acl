@@ -1,0 +1,27 @@
+{ "menu name": {
+    "file": "file",
+    "value": "File",
+    "popup": {
+        "menuitem1": [
+            {"value": "New1", "onclick": "CreateNewDoc"},
+            {"value": "Open1", "onclick": "OpenDoc"},
+            {"value": "Close1", "onclick": "CloseDoc"}
+        ],
+        "menuname": "hello world",
+        "inner": { "value" : "new2", "value" : "open2"},
+        "menuitem2": [
+            {"value": "New3", "onclick": "CreateNewDoc"},
+            {"value": "Open3", "onclick": "OpenDoc"},
+            {"value": "Close3", "onclick": "CloseDoc"},
+            {"value": "Help3", "onclick": "Help"}
+        ]
+    }
+ },
+ "help": "hello world",
+ "menuitem2": [
+   {"value": "New4", "onclick": "CreateNewDoc"},
+   {"value": "Open4", "onclick": "OpenDoc"},
+   {"value": "Close4", "onclick": "CloseDoc"},
+   [{"value": "Save4", "onclick": "SaveDoc"}]
+ ]
+}
