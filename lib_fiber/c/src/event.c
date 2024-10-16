@@ -149,7 +149,7 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 	/* If we cannot seek, it must be a pipe, socket or fifo, else it
 	 * should be a file.
 	 */
-	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1) {
+	if (lseek(fe->fd, (off_t) 0, SEEK_CUR) == -1) {
 		switch (errno) {
 		case ESPIPE:
 			fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
