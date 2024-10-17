@@ -152,10 +152,26 @@ int event_checkfd(EVENT *ev fiber_unused, FILE_EVENT *fe)
 		acl_fiber_set_error(0);
 		return 1;
 # endif
-	} else {
+	} else if (S_ISREG(buf.st_mode) || S_ISDIR(buf.st_mode)
+		  || S_ISBLK(buf.st_mode)) {
 		fe->type = TYPE_FILE;
 		acl_fiber_set_error(0);
 		return 0;
+	} else {
+		if (ev->add_read(ev, fe) == -1) {
+			fe->type = TYPE_FILE;
+			acl_fiber_set_error(0);
+			return 0;
+		}
+
+		if (ev->del_read(ev, fe) == -1) {
+			msg_error("%s(%d): del_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), fe->fd);
+		}
+
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		acl_fiber_set_error(0);
+		return 1;
 	}
 }
 #elif	defined(SYS_WIN)
