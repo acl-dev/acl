@@ -7,6 +7,7 @@
 #include "common/timer_cache.h"
 #include "event.h"
 #include "hook/hook.h"
+#include "hook/io.h"
 #include "fiber.h"
 
 typedef struct {
