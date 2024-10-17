@@ -366,7 +366,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	pe->fds   = pollfd_alloc(pe, fds, nfds);
 #endif
 
-	pe->nfds  = nfds;
+	pe->nfds  = (int) nfds;
 	pe->fiber = curr;
 	pe->proc  = poll_callback;
 

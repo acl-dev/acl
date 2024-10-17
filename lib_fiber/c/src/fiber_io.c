@@ -7,7 +7,6 @@
 #include "common/timer_cache.h"
 #include "event.h"
 #include "hook/hook.h"
-#include "hook/io.h"
 #include "fiber.h"
 
 typedef struct {
@@ -178,7 +177,7 @@ void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
 	long long now = event_get_stamp(ev);
 	TIMER_CACHE_NODE *timer;
 
-	fiber->when = now + milliseconds;
+	fiber->when = now + (ssize_t) milliseconds;
 	ring_detach(&fiber->me);  // Detch the previous binding.
 	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
 
@@ -224,7 +223,7 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			// timer's arriving.
 			fb->flag |= FIBER_F_TIMER;
 
-			// The fb->me was be appended in fiber_timer_add, and
+			// The fb->me was appended in fiber_timer_add, and
 			// we detatch fb->me from timer node and append it to
 			// the ready ring in acl_fiber_ready.
 			ring_detach(&fb->me);
@@ -282,9 +281,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			 */
 			while (acl_fiber_yield() > 0) {}
 
-			if (ev->waiter > 0) {
-				continue;
-			} else if (ring_size(&ev->events) > 0) {
+			if (ev->waiter > 0 || ring_size(&ev->events) > 0) {
 				continue;
 			}
 
@@ -359,7 +356,7 @@ size_t acl_fiber_delay(size_t milliseconds)
 	fiber->flag &= ~FIBER_F_TIMER;
 
 	if (acl_fiber_killed(fiber)) {
-		// If been killed, the fiber must has been detatched from the
+		// If been killed, the fiber must have been detatched from the
 		// timer node in acl_fiber_signal(); We call fiber_timer_del
 		// here in order to try to free the timer node.
 		fiber_timer_del(fiber);
@@ -418,7 +415,7 @@ ACL_FIBER *acl_fiber_create_timer(size_t milliseconds, size_t size,
 	fiber_io_check();
 
 	when = fiber_io_stamp();
-	when += milliseconds;
+	when += (ssize_t) milliseconds;
 
 	fiber       = acl_fiber_create(fiber_timer_callback, tc, size);
 	fiber->when = when;

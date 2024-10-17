@@ -14,7 +14,7 @@
 #endif
 
 #ifndef _GNU_SOURCE
-#define _GNU_SOURCE
+# define _GNU_SOURCE
 #endif
 
 #include <stdio.h>
@@ -55,6 +55,7 @@
 
 #define STRDUP strdup
 #define GETPID getpid
+#define USE_FSTAT_CHECKFD
 
 #elif defined(SYS_WIN)
 
