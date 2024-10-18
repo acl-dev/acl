@@ -272,14 +272,16 @@ static acl_pthread_once_t once_control = ACL_PTHREAD_ONCE_INIT;
 
 conns_pools& connect_manager::get_pools_by_id(unsigned long id)
 {
+	lock_.lock();
 	manager_it mit = manager_.find(id);
 	if (mit != manager_.end()) {
+		lock_.unlock();
 		return *mit->second;
 	}
 
 	conns_pools* pools  = NEW conns_pools;
 	manager_[id] = pools;
-	//printf("thread id=%lu create pools, %lu\r\n", id, pthread_self());
+	lock_.unlock();
 
 	if (id == DEFAULT_ID) {
 		return *pools;
@@ -361,7 +363,7 @@ connect_pool* connect_manager::get(const char* addr,
 	pools_t::iterator it = pools.pools.begin();
 	for (; it != pools.pools.end(); ++it) {
 		if (key == (*it)->get_key()) {
-			if (restore && (*it)->aliving() == false) {
+			if (restore && !(*it)->aliving()) {
 				(*it)->set_alive(true);
 			}
 			if (exclusive) {
@@ -611,9 +613,6 @@ connect_pool* connect_manager::peek(const char* addr,
 	}
 
 	unsigned long id = get_id();
-	connect_pool* pool;
-
-	size_t service_size;
 	unsigned n = acl_hash_crc32(addr, strlen(addr));
 
 	if (exclusive) {
@@ -629,15 +628,16 @@ connect_pool* connect_manager::peek(const char* addr,
 	}
 
 	conns_pools& pools = get_pools_by_id(id);
-	service_size = pools.pools.size();
-	if (service_size == 0) {
+	size_t pools_size = pools.pools.size();
+
+	if (pools_size == 0) {
 		create_pools_for(pools.pools);
-		service_size = pools.pools.size();
-		assert(service_size > 0);
+		pools_size = pools.pools.size();
+		assert(pools_size > 0);
 	}
 
-	n = n % service_size;
-	pool = pools.pools[n];
+	n = n % pools_size;
+	connect_pool* pool = pools.pools[n];
 
 	if (exclusive) {
 		lock_.unlock();

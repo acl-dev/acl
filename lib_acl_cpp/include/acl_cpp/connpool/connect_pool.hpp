@@ -125,14 +125,14 @@ public:
 
 	/**
 	 * 检测连接状态，并关闭断开连接，内部自动加锁保护
-	 * @param threads {thread_pool*} 非空时将使用该线程池检测连接状态
+	 * @param threads {thread_pool*} 非空时将使用该线程池检测连接状态以提升效率
 	 * @return {size_t} 被关闭的连接个数
 	 */
 	size_t check_dead(thread_pool* threads = NULL);
 
 	/**
 	 * 尽量保持由 set_conns_min() 设置的最小连接数
-	 * @param threads {thread_pool*} 非空时将使用该线程池创建新连接
+	 * @param threads {thread_pool*} 非空时将使用该线程池创建新连接以提升效率
 	 */
 	void keep_conns(thread_pool* threads = NULL);
 
@@ -189,14 +189,15 @@ public:
 	void reset_statistics(int inter);
 
 	/**
-	 * 获取该连接池总共被使用的次数
+	 * 获取该连接池总共被使用过的次数
 	 */
 	unsigned long long get_total_used() const {
 		return total_used_;
 	}
 
 	/**
-	 * 获取该连接池当前的使用次数
+	 * 获取该连接池当前的使用次数累加值，当调用reset_statistics时会重置该值，
+	 * 这是与get_total_used()的区别所在
 	 * @return {unsigned long long}
 	 */
 	unsigned long long get_current_used() const {
@@ -205,7 +206,7 @@ public:
 
 public:
 	void set_key(const char* key);
-	const char* get_key(void) const {
+	const char* get_key() const {
 		return key_;
 	}
 
