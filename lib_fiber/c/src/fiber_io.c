@@ -179,14 +179,14 @@ void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
 	TIMER_CACHE_NODE *timer;
 
 	fiber->when = now + (ssize_t) milliseconds;
-	ring_detach(&fiber->me);  // Detch the previous binding.
+	ring_detach(&fiber->me);  // Detach the previous binding.
 	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
 
 	/* Compute the event waiting interval according the timers' head */
 	timer = TIMER_FIRST(__thread_fiber->ev_timer);
 
 	if (timer->expire <= now) {
-		/* If the first timer has been expired, we should wakeup it
+		/* If the first timer has been expired, we should wake up it
 		 * immediately, so the event waiting interval should be set 0.
 		 */
 		ev->timeout = 0;
