@@ -172,15 +172,15 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
-void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
+void fiber_timer_add(ACL_FIBER *fb, size_t milliseconds)
 {
 	EVENT *ev = fiber_io_event();
 	long long now = event_get_stamp(ev);
 	TIMER_CACHE_NODE *timer;
 
-	fiber->when = now + (ssize_t) milliseconds;
-	ring_detach(&fiber->me);  // Detach the previous binding.
-	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
+	fb->when = now + (ssize_t) milliseconds;
+	ring_detach(&fb->me);  // Detach the previous binding.
+	timer_cache_add(__thread_fiber->ev_timer, fb->when, &fb->me);
 
 	/* Compute the event waiting interval according the timers' head */
 	timer = TIMER_FIRST(__thread_fiber->ev_timer);
@@ -192,16 +192,15 @@ void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
 		ev->timeout = 0;
 	} else {
 		/* Then we use the interval between the first timer and now */
-		ev->timeout = (int) (fiber->when - now);
+		ev->timeout = (int) (fb->when - now);
 	}
 }
 
-int fiber_timer_del(ACL_FIBER *fiber)
+int fiber_timer_del(ACL_FIBER *fb)
 {
 	fiber_io_check();
 
-	return timer_cache_remove(__thread_fiber->ev_timer,
-			fiber->when, &fiber->me);
+	return timer_cache_remove(__thread_fiber->ev_timer, fb->when, &fb->me);
 }
 
 static void wakeup_timers(TIMER_CACHE *timers, long long now)

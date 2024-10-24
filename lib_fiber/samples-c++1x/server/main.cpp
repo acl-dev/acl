@@ -10,7 +10,7 @@ static void client_echo(const acl::shared_stream& conn, bool readable) {
 
 	while (true) {
 		if (readable) {
-			struct timeval begin{}, end{};
+			struct timeval begin, end;
 			gettimeofday(&begin, nullptr);
 			int ret = conn->readable();
 			gettimeofday(&end, nullptr);
@@ -27,6 +27,10 @@ static void client_echo(const acl::shared_stream& conn, bool readable) {
 
 		if (!conn->gets(buf, false)) {
 			printf("client read error %s\r\n", acl::last_serror());
+			if (errno == EAGAIN) {
+				continue;
+			}
+
 			break;
 		}
 		if (conn->write(buf) == -1) {
@@ -41,7 +45,7 @@ static void client_echo(const acl::shared_stream& conn, bool readable) {
 	}
 }
 
-static void server_listen(acl::server_socket& ss, bool readable) {
+static void server_listen(acl::server_socket& ss, bool readable, bool shared) {
 	while (true) {
 		acl::shared_stream conn = ss.shared_accept();
 		if (conn == nullptr) {
@@ -49,9 +53,15 @@ static void server_listen(acl::server_socket& ss, bool readable) {
 			break;
 		}
 
-		go[conn, readable] {
-			client_echo(conn, readable);
-		};
+		if (shared) {
+			go_share(8192)[conn, readable] {
+				client_echo(conn, readable);
+			};
+		} else {
+			go[conn, readable] {
+				client_echo(conn, readable);
+			};
+		}
 	}
 
 	acl::fiber::schedule_stop();
@@ -62,6 +72,7 @@ static void server_listen(acl::server_socket& ss, bool readable) {
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
 		" -e event_type[kernel|select|poll]\r\n"
+		" -S [if using shared stack, default: false]\r\n"
 		" -s server_addr\r\n"
 		" -r [if call readable]\r\n"
 		, procname);
@@ -69,14 +80,14 @@ static void usage(const char* procname) {
 
 int main(int argc, char *argv[]) {
 	int  ch;
-	bool readable = false;
+	bool readable = false, shared = false;
 	acl::string addr = "0.0.0.0|9000";
 	acl::string event_type("kernel");
 
 	acl::acl_cpp_init();
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:e:r")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:e:rS")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -90,6 +101,9 @@ int main(int argc, char *argv[]) {
 		case 'r':
 			readable = true;
 			break;
+		case 'S':
+			shared = true;
+			break;
 		default:
 			break;
 		}
@@ -101,9 +115,15 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	go[&] {
-		server_listen(ss, readable);
-	};
+	if (shared) {
+		go_share(8192)[&] {
+			server_listen(ss, readable, shared);
+		};
+	} else {
+		go[&] {
+			server_listen(ss, readable, shared);
+		};
+	}
 
 	acl::fiber_event_t type;
 	if (event_type == "select") {
