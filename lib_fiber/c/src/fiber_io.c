@@ -256,7 +256,6 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			left = -1;
 		} else {
 			now  = event_get_stamp(__thread_fiber->event);
-			last = now;
 			if (now >= timer->expire) {
 				left = 0;
 			} else {
@@ -303,6 +302,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		now = event_get_stamp(__thread_fiber->event);
 		if (now - last >= left) {
 			wakeup_timers(__thread_fiber->ev_timer, now);
+			last = now;
 		}
 
 		if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
@@ -595,7 +595,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return -1;
 	}
 #endif
-	// else: the IO read event should has been removed in read_callback.
+	// else: the IO read event should have been removed in read_callback.
 
 	return ret;
 }

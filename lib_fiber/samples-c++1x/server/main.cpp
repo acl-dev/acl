@@ -6,6 +6,8 @@
 
 static void client_echo(const acl::shared_stream& conn, bool readable) {
 	acl::string buf;
+	conn->set_rw_timeout(1, true);
+
 	while (true) {
 		if (readable) {
 			struct timeval begin{}, end{};
@@ -31,7 +33,11 @@ static void client_echo(const acl::shared_stream& conn, bool readable) {
 			printf("client write error %s\r\n", acl::last_serror());
 			break;
 		}
-		//acl::fiber::delay(1000);
+
+		time_t begin = time(NULL);
+		acl::fiber::delay(4000);
+		time_t end = time(NULL);
+		printf(">>>>>>>>>wakeup now, tc=%ld seconds<<<<<<<<\n", end - begin);
 	}
 }
 
