@@ -99,7 +99,7 @@ static EPOLL_EVENT *epoll_event_alloc(void)
 		return ee;
 	}
 
-	ee = mem_calloc(1, sizeof(EPOLL_EVENT));
+	ee = (EPOLL_EVENT*) mem_calloc(1, sizeof(EPOLL_EVENT));
 	acl_fiber_set_specific(&__local_key, ee, fiber_on_exit);
 
 	ring_init(&ee->me);

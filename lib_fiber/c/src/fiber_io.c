@@ -225,7 +225,7 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			fb->flag |= FIBER_F_TIMER;
 
 			// The fb->me was appended in fiber_timer_add, and
-			// we detatch fb->me from timer node and append it to
+			// we detach fb->me from timer node and append it to
 			// the ready ring in acl_fiber_ready.
 			ring_detach(&fb->me);
 			FIBER_READY(fb);

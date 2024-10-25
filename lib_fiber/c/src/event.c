@@ -543,4 +543,3 @@ int event_process(EVENT *ev, int timeout)
 
 	return ret;
 }
-
