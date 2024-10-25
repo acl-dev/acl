@@ -533,7 +533,7 @@ void acl_fiber_ready(ACL_FIBER *fiber)
 			ring_detach(&fiber->me);
 		}
 #else
-		// Detache the other binding before such as timer binding.
+		// Detach the other binding such as timer binding.
 		ring_detach(&fiber->me);
 #endif
 		fiber->status = FIBER_STATUS_READY;

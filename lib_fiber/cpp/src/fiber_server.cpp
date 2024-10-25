@@ -79,7 +79,7 @@ static int  acl_var_fiber_hook_log;
 static ACL_CONFIG_BOOL_TABLE __conf_bool_tab[] = {
 	{ "fiber_quick_abort", 1, &acl_var_fiber_quick_abort },
 	{ "fiber_share_stack", 0, &acl_var_fiber_share_stack },
-	{ "fiber_hook_log", 1, &acl_var_fiber_hook_log },
+	{ "fiber_hook_log", 0, &acl_var_fiber_hook_log },
 
 	{ 0, 0, 0 },
 };
@@ -1071,8 +1071,8 @@ static void fiber_log_writer(void *, const char *fmt, va_list ap)
 
 	acl::string buf;
 	buf.vformat(fmt, tmp);
-	//acl_msg_info("%s", buf.c_str());
-	printf("%s\r\n", buf.c_str());
+	acl_msg_info("%s", buf.c_str());
+	//printf("%s\r\n", buf.c_str());
 }
 
 static void hook_fiber_log(void)
@@ -1314,7 +1314,10 @@ void acl_fiber_server_main(int argc, char *argv[],
 	acl_msg_info("schedule event type - %s", acl_var_fiber_schedule_event);
 
 	if (acl_var_fiber_hook_log) {
-		hook_fiber_log();
+		// No support io_uring mode current!.
+		if (__fiber_schedule_event != FIBER_EVENT_IO_URING) {
+			hook_fiber_log();
+		}
 	}
 
 #if !defined(_WIN32) && !defined(_WIN64)

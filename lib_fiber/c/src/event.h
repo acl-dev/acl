@@ -100,10 +100,10 @@ typedef struct IO_URING_CTX {
  * for each connection fd
  */
 
-#define PIN_FILE(f) {                                                        \
-	SET_TIME((f)->stamp);                                                 \
-	(f)->line = __LINE__;                                                 \
-	SAFE_STRNCPY((f)->tag, __FUNCTION__, sizeof((f)->tag));               \
+#define PIN_FILE(f) {                                                         \
+    SET_TIME((f)->stamp);                                                     \
+    (f)->line = __LINE__;                                                     \
+    SAFE_STRNCPY((f)->tag, __FUNCTION__, sizeof((f)->tag));                   \
 }
 
 struct FILE_EVENT {
@@ -125,7 +125,7 @@ struct FILE_EVENT {
 #define	STATUS_READABLE		(unsigned) (1 << 1)	// Ready for reading
 #define	STATUS_WRITABLE		(unsigned) (1 << 2)	// Ready for writing
 #define	STATUS_POLLING		(unsigned) (1 << 3)	// In polling status
-#define	STATUS_NDUBLOCK		(unsigned) (1 << 4)	// If need to set unblock
+#define	STATUS_NDUBLOCK		(unsigned) (1 << 4)	// If needing to set unblock
 #define	STATUS_READWAIT		(unsigned) (1 << 5)	// Wait for readable
 #define	STATUS_WRITEWAIT	(unsigned) (1 << 6)	// Wait for Writable
 #define	STATUS_CLOSING		(unsigned) (1 << 7)	// In closing status
@@ -458,5 +458,15 @@ int  event_add_write(EVENT *ev, FILE_EVENT *fe, event_proc *proc);
 void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly);
 void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly);
 int  event_process(EVENT *ev, int left);
+
+/* hook/poll.c */
+#ifdef HAS_POLL
+void wakeup_poll_waiters(EVENT *ev);
+#endif
+
+/* hook/epoll.c */
+#ifdef HAS_EPOLL
+void wakeup_epoll_waiters(EVENT *ev);
+#endif
 
 #endif

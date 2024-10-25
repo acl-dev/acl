@@ -172,38 +172,38 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
-void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
+void fiber_timer_add(ACL_FIBER *fb, size_t milliseconds)
 {
 	EVENT *ev = fiber_io_event();
 	long long now = event_get_stamp(ev);
 	TIMER_CACHE_NODE *timer;
 
-	fiber->when = now + (ssize_t) milliseconds;
-	ring_detach(&fiber->me);  // Detch the previous binding.
-	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
+	fb->when = now + (ssize_t) milliseconds;
+	ring_detach(&fb->me);  // Detach the previous binding.
+	timer_cache_add(__thread_fiber->ev_timer, fb->when, &fb->me);
 
 	/* Compute the event waiting interval according the timers' head */
 	timer = TIMER_FIRST(__thread_fiber->ev_timer);
 
 	if (timer->expire <= now) {
-		/* If the first timer has been expired, we should wakeup it
+		/* If the first timer has been expired, we should wake up it
 		 * immediately, so the event waiting interval should be set 0.
 		 */
 		ev->timeout = 0;
 	} else {
-		/* Then we use the interval between the first timer and now */
-		ev->timeout = (int) (fiber->when - now);
+		/* Then using the interval between the first timer and now. */
+		ev->timeout = (int) (fb->when - now);
 	}
 }
 
-int fiber_timer_del(ACL_FIBER *fiber)
+int fiber_timer_del(ACL_FIBER *fb)
 {
 	fiber_io_check();
 
-	return timer_cache_remove(__thread_fiber->ev_timer,
-			fiber->when, &fiber->me);
+	return timer_cache_remove(__thread_fiber->ev_timer, fb->when, &fb->me);
 }
 
+// wakeup_timers - Wake up all waiters in timers set in fiber_timer_add.
 static void wakeup_timers(TIMER_CACHE *timers, long long now)
 {
 	TIMER_CACHE_NODE *node = TIMER_FIRST(timers), *next;
@@ -225,7 +225,7 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			fb->flag |= FIBER_F_TIMER;
 
 			// The fb->me was appended in fiber_timer_add, and
-			// we detatch fb->me from timer node and append it to
+			// we detach fb->me from timer node and append it to
 			// the ready ring in acl_fiber_ready.
 			ring_detach(&fb->me);
 			FIBER_READY(fb);
@@ -256,7 +256,6 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			left = -1;
 		} else {
 			now  = event_get_stamp(__thread_fiber->event);
-			last = now;
 			if (now >= timer->expire) {
 				left = 0;
 			} else {
@@ -303,6 +302,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		now = event_get_stamp(__thread_fiber->event);
 		if (now - last >= left) {
 			wakeup_timers(__thread_fiber->ev_timer, now);
+			last = now;
 		}
 
 		if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
@@ -595,7 +595,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return -1;
 	}
 #endif
-	// else: the IO read event should has been removed in read_callback.
+	// else: the IO read event should have been removed in read_callback.
 
 	return ret;
 }
