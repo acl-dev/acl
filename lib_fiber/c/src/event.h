@@ -459,4 +459,14 @@ void event_del_read(EVENT *ev, FILE_EVENT *fe, int directly);
 void event_del_write(EVENT *ev, FILE_EVENT *fe, int directly);
 int  event_process(EVENT *ev, int left);
 
+/* hook/poll.c */
+#ifdef HAS_POLL
+void wakeup_poll_waiters(EVENT *ev);
+#endif
+
+/* hook/epoll.c */
+#ifdef HAS_EPOLL
+void wakeup_epoll_waiters(EVENT *ev);
+#endif
+
 #endif

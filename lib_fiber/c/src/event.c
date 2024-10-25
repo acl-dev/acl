@@ -1,12 +1,25 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include "event/event_epoll.h"
-#include "event/event_kqueue.h"
 #include "event/event_select.h"
 #include "event/event_poll.h"
+
+#ifdef HAS_EPOLL
+#include "event/event_epoll.h"
+#endif
+
+#ifdef	HAS_KQUEUE
+#include "event/event_kqueue.h"
+#endif
+
+#ifdef HAS_WMSG
 #include "event/event_wmsg.h"
+#endif
+
+#ifdef HAS_IOCP
 #include "event/event_iocp.h"
+#endif
+
 #ifdef	HAS_IO_URING
 #include "event/event_io_uring.h"
 #endif
@@ -488,72 +501,6 @@ static void event_prepare(EVENT *ev)
 	ring_init(&ev->events);
 }
 
-#define TO_APPL	ring_to_appl
-
-#ifdef HAS_POLL
-static void event_process_poll(EVENT *ev)
-{
-	RING_ITER iter;
-	RING *head;
-	POLL_EVENT *pe;
-	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->poll_timer), *next;
-
-	/* Check and call all the pe's callback which was timeout except the
-	 * pe which has been ready and been removed from ev->poll_timer. The
-	 * removing operations are in read_callback or write_callback in the
-	 * hook/poll.c.
-	 */
-	while (node && node->expire >= 0 && node->expire <= now) {
-		next = TIMER_NEXT(ev->poll_timer, node);
-
-		// Call all the pe's callback with the same expire time.
-		ring_foreach(iter, &node->ring) {
-			pe = TO_APPL(iter.ptr, POLL_EVENT, me);
-			pe->proc(ev, pe);
-		}
-
-		node = next;
-	}
-
-	while ((head = ring_pop_head(&ev->poll_ready)) != NULL) {
-		pe = TO_APPL(head, POLL_EVENT, me);
-		pe->proc(ev, pe);
-	}
-
-	ring_init(&ev->poll_ready);
-}
-#endif
-
-#ifdef	HAS_EPOLL
-static void event_process_epoll(EVENT *ev)
-{
-	RING_ITER iter;
-	RING *head;
-	EPOLL_EVENT *ee;
-	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->epoll_timer), *next;
-
-	while (node && node->expire >= 0 && node->expire <= now) {
-		next = TIMER_NEXT(ev->epoll_timer, node);
-
-		ring_foreach(iter, &node->ring) {
-			ee = TO_APPL(iter.ptr, EPOLL_EVENT, me);
-			ee->proc(ev, ee);
-		}
-
-		node = next;
-	}
-
-	while ((head = ring_pop_head(&ev->epoll_ready)) != NULL) {
-		ee = TO_APPL(head, EPOLL_EVENT, me);
-		ee->proc(ev, ee);
-	}
-
-	ring_init(&ev->epoll_ready);
-}
-#endif
-
 int event_process(EVENT *ev, int timeout)
 {
 	int ret;
@@ -587,11 +534,11 @@ int event_process(EVENT *ev, int timeout)
 	}
 
 #ifdef HAS_POLL
-	event_process_poll(ev);
+	wakeup_poll_waiters(ev);
 #endif
 
 #ifdef	HAS_EPOLL
-	event_process_epoll(ev);
+	wakeup_epoll_waiters(ev);
 #endif
 
 	return ret;

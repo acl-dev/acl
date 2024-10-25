@@ -191,7 +191,7 @@ void fiber_timer_add(ACL_FIBER *fb, size_t milliseconds)
 		 */
 		ev->timeout = 0;
 	} else {
-		/* Then we use the interval between the first timer and now */
+		/* Then using the interval between the first timer and now. */
 		ev->timeout = (int) (fb->when - now);
 	}
 }
@@ -203,6 +203,7 @@ int fiber_timer_del(ACL_FIBER *fb)
 	return timer_cache_remove(__thread_fiber->ev_timer, fb->when, &fb->me);
 }
 
+// wakeup_timers - Wake up all waiters in timers set in fiber_timer_add.
 static void wakeup_timers(TIMER_CACHE *timers, long long now)
 {
 	TIMER_CACHE_NODE *node = TIMER_FIRST(timers), *next;
