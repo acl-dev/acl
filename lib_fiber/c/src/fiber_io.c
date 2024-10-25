@@ -662,6 +662,12 @@ int fiber_wait_write(FILE_EVENT *fe)
 
 	acl_fiber_switch();
 
+#ifndef USE_POLL_WAIT
+	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
+		fiber_timer_del(curr);
+	}
+#endif
+
 	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
 	fe->fiber_w = NULL;
 
