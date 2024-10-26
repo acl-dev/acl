@@ -586,9 +586,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		// If the IO reading timeout set in setsockopt.
 		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
 		curr->flag &= ~FIBER_F_TIMER;
-		// Delete the IO read event directly, don't buffer the delete
-		// status.
-		event_del_read(__thread_fiber->event, fe, 1);
+		event_del_read(__thread_fiber->event, fe, 0);
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
@@ -683,7 +681,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 #ifndef USE_POLL_WAIT
 	else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
-		event_del_write(__thread_fiber->event, fe, 1);
+		event_del_write(__thread_fiber->event, fe, 0);
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
