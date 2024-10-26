@@ -891,18 +891,12 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 	ACL_FIBER *curr;
 
 	if (key == NULL) {
-		msg_error("%s(%d), %s: key NULL",
-			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
 	}
 
 	if (__thread_fiber == NULL) {
-		msg_error("%s(%d), %s: __thread_fiber: NULL",
-			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
 	} else if (__thread_fiber->running == NULL) {
-		msg_error("%s(%d), %s: running: NULL",
-			__FILE__, __LINE__, __FUNCTION__);
 		return -1;
 	} else {
 		curr = __thread_fiber->running;
@@ -911,9 +905,6 @@ int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void *))
 	if (*key <= 0) {
 		*key = ++__thread_fiber->nlocal;
 	} else if (*key > __thread_fiber->nlocal) {
-		msg_error("%s(%d), %s: invalid key: %d > nlocal: %d",
-			__FILE__, __LINE__, __FUNCTION__,
-			*key, __thread_fiber->nlocal);
 		return -1;
 	}
 
@@ -945,12 +936,8 @@ void *acl_fiber_get_specific(int key)
 	}
 
 	if (__thread_fiber == NULL) {
-		msg_error("%s(%d), %s: __thread_fiber NULL",
-			__FILE__, __LINE__, __FUNCTION__);
 		return NULL;
 	} else if (__thread_fiber->running == NULL) {
-		msg_error("%s(%d), %s: running fiber NULL",
-			__FILE__, __LINE__, __FUNCTION__);
 		return NULL;
 	} else {
 		curr = __thread_fiber->running;
