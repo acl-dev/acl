@@ -100,35 +100,35 @@ static void echo_client(ACL_FIBER *fiber acl_unused, void *ctx)
 	__socket_count++;
 	//printf("client fiber-%d: fd: %d\r\n", acl_fiber_self(), fd);
 
-    if (__read_timeout > 0 && __use_sockopt) {
+	if (__read_timeout > 0 && __use_sockopt) {
 		struct timeval tm;
 		tm.tv_sec = __read_timeout;
 		tm.tv_usec = 0;
 
 #if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
 		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO,
-				(char*) &__read_timeout, sizeof(__read_timeout)) < 0) {
+			(char*) &__read_timeout, sizeof(__read_timeout)) < 0) {
 #else
 		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
 #endif
 			printf("%s: setsockopt error: %s\r\n", __FUNCTION__, acl_last_serror());
 		}
-    }
+	}
 
-    if (__write_timeout > 0 && __use_sockopt) {
+	if (__write_timeout > 0 && __use_sockopt) {
 		struct timeval tm;
 		tm.tv_sec = __write_timeout;
 		tm.tv_usec = 0;
 
 #if defined(__APPLE__) || defined(_WIN32) || defined(_WIN64)
 		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO,
-				(char*) &__write_timeout, sizeof(__write_timeout)) < 0) {
+			(char*) &__write_timeout, sizeof(__write_timeout)) < 0) {
 #else
 		if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, &tm, sizeof(tm)) < 0) {
 #endif
 			printf("%s: setsockopt error: %s\r\n", __FUNCTION__, acl_last_serror());
 		}
-    }
+	}
 
 	while (1) {
 		if (__read_timeout > 0 && !__use_sockopt) {
@@ -252,7 +252,7 @@ static void fiber_accept(ACL_FIBER *fiber acl_unused, void *ctx)
 			break;
 		}
 
-		pfd = malloc(sizeof(SOCKET));
+		pfd = (SOCKET *) malloc(sizeof(SOCKET));
 		assert(pfd != NULL);
 		*pfd = cfd;
 
