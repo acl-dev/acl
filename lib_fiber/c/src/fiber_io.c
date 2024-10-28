@@ -145,10 +145,6 @@ static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
 void fiber_io_check(void)
 {
-	if (!var_hook_sys_api) {
-		return;
-	}
-
 	if (__thread_fiber == NULL) {
 		if (pthread_once(&__once_control, thread_once) != 0) {
 			printf("%s(%d), %s: pthread_once error %s\r\n",
@@ -157,7 +153,7 @@ void fiber_io_check(void)
 		}
 
 		thread_init();
-	} else if (__thread_fiber->ev_fiber == NULL) {
+	} else if (var_hook_sys_api && __thread_fiber->ev_fiber == NULL) {
 		__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
 				__thread_fiber->event, STACK_SIZE);
 		__thread_fiber->io_stop   = 0;
