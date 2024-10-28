@@ -444,47 +444,6 @@ size_t acl_fiber_sleep(size_t seconds)
 
 /****************************************************************************/
 
-#ifdef USE_POLL_WAIT
-
-static int timed_wait(socket_t fd, int delay, int oper)
-{
-	struct pollfd fds;
-	fds.events = oper;
-	fds.fd     = fd;
-
-	for (;;) {
-		switch (acl_fiber_poll(&fds, 1, delay)) {
-# ifdef SYS_WIN
-		case SOCKET_ERROR:
-# else
-		case -1:
-# endif
-			if (acl_fiber_last_error() == FIBER_EINTR) {
-				continue;
-			}
-			break;
-		case 0:
-			return 0;
-		default:
-			if (oper == POLLIN) {
-				if ((fds.revents & POLLIN)) {
-					return 1;
-				}
-			} else if (oper == POLLOUT) {
-				if ((fds.revents & POLLOUT)) {
-					return 1;
-				}
-			}
-
-			if (fds.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-				return -1;
-			}
-			return -1;
-		}
-	}
-}
-#endif  // USE_POLL_WAIT
-
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
 	CLR_READWAIT(fe);
@@ -521,19 +480,6 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return -1;
 	}
 
-#ifdef	USE_POLL_WAIT
-	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
-		ret = timed_wait(fe->fd, fe->r_timeout, POLLIN);
-		if (ret == 0) {
-			acl_fiber_set_errno(curr, FIBER_EAGAIN);
-			acl_fiber_set_error(FIBER_EAGAIN);
-			return -1;
-		}
-
-		return ret == 1 ? 0 : -1;
-	}
-#endif
-
 	// When return 0 just let it go continue
 	ret = event_add_read(__thread_fiber->event, fe, read_callback);
 	if (ret <= 0) {
@@ -548,19 +494,15 @@ int fiber_wait_read(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
 		fiber_timer_add(curr, fe->r_timeout);
 	}
-#endif
 
 	acl_fiber_switch();
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
 		fiber_timer_del(curr);
 	}
-#endif
 
 	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
@@ -580,9 +522,7 @@ int fiber_wait_read(FILE_EVENT *fe)
 		event_del_read(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
-	}
-#ifndef USE_POLL_WAIT
-	else if (curr->flag & FIBER_F_TIMER) {
+	} else if (curr->flag & FIBER_F_TIMER) {
 		// If the IO reading timeout set in setsockopt.
 		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
 		curr->flag &= ~FIBER_F_TIMER;
@@ -592,7 +532,6 @@ int fiber_wait_read(FILE_EVENT *fe)
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
-#endif
 	// else: the IO read event should have been removed in read_callback.
 
 	return ret;
@@ -626,19 +565,6 @@ int fiber_wait_write(FILE_EVENT *fe)
 		return -1;
 	}
 
-#ifdef	USE_POLL_WAIT
-	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
-		ret = timed_wait(fe->fd, fe->w_timeout, POLLOUT);
-		if (ret == 0) {
-			acl_fiber_set_errno(curr, FIBER_EAGAIN);
-			acl_fiber_set_error(FIBER_EAGAIN);
-			return -1;
-		}
-
-		return ret == 1 ? 0 : -1;
-	}
-#endif
-
 	ret = event_add_write(__thread_fiber->event, fe, write_callback);
 	if (ret <= 0) {
 		return ret;
@@ -652,19 +578,15 @@ int fiber_wait_write(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
 		fiber_timer_add(curr, fe->w_timeout);
 	}
-#endif
 
 	acl_fiber_switch();
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
 		fiber_timer_del(curr);
 	}
-#endif
 
 	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
 	fe->fiber_w = NULL;
@@ -677,9 +599,7 @@ int fiber_wait_write(FILE_EVENT *fe)
 		event_del_write(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
-	}
-#ifndef USE_POLL_WAIT
-	else if (curr->flag & FIBER_F_TIMER) {
+	} else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
 		event_del_write(__thread_fiber->event, fe, 0);
 
@@ -687,7 +607,6 @@ int fiber_wait_write(FILE_EVENT *fe)
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
-#endif
 
 	return ret;
 }
