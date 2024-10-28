@@ -145,6 +145,10 @@ static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
 
 void fiber_io_check(void)
 {
+	if (!var_hook_sys_api) {
+		return;
+	}
+
 	if (__thread_fiber == NULL) {
 		if (pthread_once(&__once_control, thread_once) != 0) {
 			printf("%s(%d), %s: pthread_once error %s\r\n",
