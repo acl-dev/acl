@@ -48,6 +48,7 @@ static void usage(const char *procname) {
 		" -s server_addr[default: 127.0.0.1:9001]\r\n"
 		" -k cpus[default: 1]\r\n"
 		" -c fibers count[default: 100]\r\n"
+		" -n count[default: 10000]\r\n"
 		" -o io timeout[default: -1]\r\n"
 		" -O [if use setsockopt to set IO timeout, default: false]\r\n"
 		, procname);
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]) {
 	int ch, cpus = 1, count = 10000, nfibers = 100, timeo = -1;
 	std::string addr("127.0.0.1:9001");
 
-	while ((ch = getopt(argc, argv, "hs:k:c:o:O")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:k:c:n:o:O")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -70,6 +71,9 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'c':
 			nfibers = atoi(optarg);
+			break;
+		case 'n':
+			count = atoi(optarg);
 			break;
 		case 'o':
 			timeo = atoi(optarg);
