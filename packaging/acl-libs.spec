@@ -1,8 +1,8 @@
-%define release_id 6
+%define release_id 0
 
 Summary:        The powerful c/c++ library
 Name:           acl-libs
-Version:        3.6.1
+Version:        3.6.2
 Release:        %{release_id}
 Group:          System/Libs
 License:        LGPL3.0,IBM
@@ -44,6 +44,16 @@ rm -rf %{buildroot}
 /usr/lib/libfiber_cpp.a
 
 %changelog
+
+* Sat Nov 02 2024 shuxin.zheng shuxin.zheng@qq.com 3.6.2-0-20241102.10
+- Feature: Fiber supports io-ruing;
+- Feature: Fiber hooks setsockopt to improve IO timeout performance;
+- Feature: Fiber supports Qt-UI on windows;
+- Feature: Acl supports vc2022 on windows;
+- Feature: Acl supports HarmonyOS;
+- Feature: Acl supports being built by COSMOCC;
+- Optimize: Connection pool has been optimized very much;
+- More small features been added and more bugs been corrected.
 
 * Fri Oct 20 2023 shuxin.zheng shuxin.zheng@qq.com 3.6.1-6-20231020.18
 - feature: Add support for udp multicast;

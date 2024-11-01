@@ -55,7 +55,10 @@
 
 #define STRDUP strdup
 #define GETPID getpid
-#define USE_FSTAT_CHECKFD
+
+// xxx: Don't use fstat to check fd's type, because in CentOS7.2, this maybe
+// make the OpenSSL blocked by mutex, and the reason hasn't been got yet.
+//#define USE_FSTAT_CHECKFD
 
 #elif defined(SYS_WIN)
 
