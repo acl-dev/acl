@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <cstdio>
 #include <thread>
+#include <memory>
 #include <vector>
 #include <getopt.h>
 
@@ -28,9 +29,9 @@ static void client_echo(const acl::shared_stream& conn, bool sockopt) {
 	}
 }
 
-static void server_listen(acl::server_socket& ss, bool sockopt, bool shared) {
+static void server_listen(std::shared_ptr<acl::server_socket> ss, bool sockopt, bool shared) {
 	while (true) {
-		acl::shared_stream conn = ss.shared_accept();
+		acl::shared_stream conn = ss->shared_accept();
 		if (conn == nullptr) {
 			printf("accept error %s\r\n", acl::last_serror());
 			break;
@@ -57,7 +58,8 @@ static void usage(const char* procname) {
 		" -e event_type[kernel|select|poll]\r\n"
 		" -S [if using shared stack, default: false]\r\n"
 		" -s server_addr\r\n"
-		" -O [if using setsockopt]\r\n"
+		" -O [if using setsockopt to set IO timeout, default: false]\r\n"
+		" -k threads count[default: 1]\r\n"
 		, procname);
 }
 
@@ -96,8 +98,8 @@ int main(int argc, char *argv[]) {
 	}
 
 #ifdef	__APPLE__
-	acl::server_socket ss;
-	if (!ss.open(addr)) {
+	std::shared_ptr<acl::server_socket> ss(new acl::server_socket);
+	if (!ss->open(addr)) {
 		printf("open %s error %s\r\n", addr.c_str(), acl::last_serror());
 		return 1;
 	}
@@ -107,20 +109,22 @@ int main(int argc, char *argv[]) {
 
 	for (int i = 0; i < nthreads; i++) {
 #ifdef	__linux__
-		acl::server_socket ss(acl::OPEN_FLAG_REUSEPORT);
-		if (!ss.open(addr)) {
+		std::shared_ptr<acl::server_socket> ss(
+			new acl::server_socket(acl::OPEN_FLAG_REUSEPORT, 128));
+		if (!ss->open(addr)) {
 			printf("open %s error %s\r\n", addr.c_str(), acl::last_serror());
 			return 1;
 		}
+		printf("Open %s ok\r\n", addr.c_str());
 #endif
 
-		std::thread* thr = new std::thread([&] {
+		std::thread* thr = new std::thread([=] {
 			if (shared) {
-				go_share(8192)[&] {
+				go_share(8192)[=] {
 					server_listen(ss, sockopt, shared);
 				};
 			} else {
-				go[&] {
+				go[=] {
 					server_listen(ss, sockopt, shared);
 				};
 			}
