@@ -55,7 +55,7 @@ static void server_listen(std::shared_ptr<acl::server_socket> ss, bool sockopt, 
 
 static void usage(const char* procname) {
 	printf("usage: %s -h [help]\r\n"
-		" -e event_type[kernel|select|poll]\r\n"
+		" -e event_type[kernel|select|poll|io_uring]\r\n"
 		" -S [if using shared stack, default: false]\r\n"
 		" -s server_addr\r\n"
 		" -O [if using setsockopt to set IO timeout, default: false]\r\n"
@@ -134,6 +134,8 @@ int main(int argc, char *argv[]) {
 				type = acl::FIBER_EVENT_T_SELECT;
 			} else if (event_type == "poll") {
 				type = acl::FIBER_EVENT_T_POLL;
+			} else if (event_type == "io_uring") {
+				type = acl::FIBER_EVENT_T_IO_URING;
 			} else {
 				type = acl::FIBER_EVENT_T_KERNEL;
 			}
