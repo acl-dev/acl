@@ -1,12 +1,25 @@
 #include "stdafx.h"
 #include "common.h"
 
-#include "event/event_epoll.h"
-#include "event/event_kqueue.h"
 #include "event/event_select.h"
 #include "event/event_poll.h"
+
+#ifdef HAS_EPOLL
+#include "event/event_epoll.h"
+#endif
+
+#ifdef	HAS_KQUEUE
+#include "event/event_kqueue.h"
+#endif
+
+#ifdef HAS_WMSG
 #include "event/event_wmsg.h"
+#endif
+
+#ifdef HAS_IOCP
 #include "event/event_iocp.h"
+#endif
+
 #ifdef	HAS_IO_URING
 #include "event/event_io_uring.h"
 #endif
@@ -128,7 +141,53 @@ long long event_get_stamp(EVENT *ev)
 	return ev->stamp;
 }
 
-#ifdef SYS_WIN
+#if	defined(USE_FSTAT_CHECKFD)
+int event_checkfd(EVENT *ev fiber_unused, FILE_EVENT *fe)
+{
+	struct stat buf;
+
+	if (fstat(fe->fd, &buf) == -1) {
+		msg_error("%s(%d): fstat error=%s, fd=%d",
+			__FUNCTION__, __LINE__, last_serror(), fe->fd);
+		acl_fiber_set_error(errno);
+		fe->type = TYPE_BADFD;
+		return -1;
+	}
+
+	if (S_ISCHR(buf.st_mode) || S_ISFIFO(buf.st_mode)
+		  || S_ISSOCK(buf.st_mode)) {
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		acl_fiber_set_error(0);
+		return 1;
+# if	defined(HAS_IO_URING)
+	} else if (EVENT_IS_IO_URING(ev)) {
+		fe->type = TYPE_FILE | TYPE_EVENTABLE;
+		acl_fiber_set_error(0);
+		return 1;
+# endif
+	} else if (S_ISREG(buf.st_mode) || S_ISDIR(buf.st_mode)
+		  || S_ISBLK(buf.st_mode)) {
+		fe->type = TYPE_FILE;
+		acl_fiber_set_error(0);
+		return 0;
+	} else {
+		if (ev->add_read(ev, fe) == -1) {
+			fe->type = TYPE_FILE;
+			acl_fiber_set_error(0);
+			return 0;
+		}
+
+		if (ev->del_read(ev, fe) == -1) {
+			msg_error("%s(%d): del_read error=%s, fd=%d",
+				__FUNCTION__, __LINE__, last_serror(), fe->fd);
+		}
+
+		fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
+		acl_fiber_set_error(0);
+		return 1;
+	}
+}
+#elif	defined(SYS_WIN)
 int event_checkfd(EVENT *ev, FILE_EVENT *fe)
 {
 	if (getsockfamily(fe->fd) >= 0) {
@@ -149,7 +208,7 @@ int event_checkfd(EVENT *ev UNUSED, FILE_EVENT *fe)
 	/* If we cannot seek, it must be a pipe, socket or fifo, else it
 	 * should be a file.
 	 */
-	if (lseek(fe->fd, (off_t) 0, SEEK_SET) == -1) {
+	if (lseek(fe->fd, (off_t) 0, SEEK_CUR) == -1) {
 		switch (errno) {
 		case ESPIPE:
 			fe->type = TYPE_SPIPE | TYPE_EVENTABLE;
@@ -442,72 +501,6 @@ static void event_prepare(EVENT *ev)
 	ring_init(&ev->events);
 }
 
-#define TO_APPL	ring_to_appl
-
-#ifdef HAS_POLL
-static void event_process_poll(EVENT *ev)
-{
-	RING_ITER iter;
-	RING *head;
-	POLL_EVENT *pe;
-	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->poll_timer), *next;
-
-	/* Check and call all the pe's callback which was timeout except the
-	 * pe which has been ready and been removed from ev->poll_timer. The
-	 * removing operations are in read_callback or write_callback in the
-	 * hook/poll.c.
-	 */
-	while (node && node->expire >= 0 && node->expire <= now) {
-		next = TIMER_NEXT(ev->poll_timer, node);
-
-		// Call all the pe's callback with the same expire time.
-		ring_foreach(iter, &node->ring) {
-			pe = TO_APPL(iter.ptr, POLL_EVENT, me);
-			pe->proc(ev, pe);
-		}
-
-		node = next;
-	}
-
-	while ((head = ring_pop_head(&ev->poll_ready)) != NULL) {
-		pe = TO_APPL(head, POLL_EVENT, me);
-		pe->proc(ev, pe);
-	}
-
-	ring_init(&ev->poll_ready);
-}
-#endif
-
-#ifdef	HAS_EPOLL
-static void event_process_epoll(EVENT *ev)
-{
-	RING_ITER iter;
-	RING *head;
-	EPOLL_EVENT *ee;
-	long long now = event_get_stamp(ev);
-	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->epoll_timer), *next;
-
-	while (node && node->expire >= 0 && node->expire <= now) {
-		next = TIMER_NEXT(ev->epoll_timer, node);
-
-		ring_foreach(iter, &node->ring) {
-			ee = TO_APPL(iter.ptr, EPOLL_EVENT, me);
-			ee->proc(ev, ee);
-		}
-
-		node = next;
-	}
-
-	while ((head = ring_pop_head(&ev->epoll_ready)) != NULL) {
-		ee = TO_APPL(head, EPOLL_EVENT, me);
-		ee->proc(ev, ee);
-	}
-
-	ring_init(&ev->epoll_ready);
-}
-#endif
-
 int event_process(EVENT *ev, int timeout)
 {
 	int ret;
@@ -541,13 +534,12 @@ int event_process(EVENT *ev, int timeout)
 	}
 
 #ifdef HAS_POLL
-	event_process_poll(ev);
+	wakeup_poll_waiters(ev);
 #endif
 
 #ifdef	HAS_EPOLL
-	event_process_epoll(ev);
+	wakeup_epoll_waiters(ev);
 #endif
 
 	return ret;
 }
-

@@ -99,7 +99,7 @@ static EPOLL_EVENT *epoll_event_alloc(void)
 		return ee;
 	}
 
-	ee = mem_calloc(1, sizeof(EPOLL_EVENT));
+	ee = (EPOLL_EVENT*) mem_calloc(1, sizeof(EPOLL_EVENT));
 	acl_fiber_set_specific(&__local_key, ee, fiber_on_exit);
 
 	ring_init(&ee->me);
@@ -724,6 +724,35 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
 	}
 
 	return ee->nready;
+}
+
+#define TO_APPL	ring_to_appl
+
+void wakeup_epoll_waiters(EVENT *ev)
+{
+	RING_ITER iter;
+	RING *head;
+	EPOLL_EVENT *ee;
+	long long now = event_get_stamp(ev);
+	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->epoll_timer), *next;
+
+	while (node && node->expire >= 0 && node->expire <= now) {
+		next = TIMER_NEXT(ev->epoll_timer, node);
+
+		ring_foreach(iter, &node->ring) {
+			ee = TO_APPL(iter.ptr, EPOLL_EVENT, me);
+			ee->proc(ev, ee);
+		}
+
+		node = next;
+	}
+
+	while ((head = ring_pop_head(&ev->epoll_ready)) != NULL) {
+		ee = TO_APPL(head, EPOLL_EVENT, me);
+		ee->proc(ev, ee);
+	}
+
+	ring_init(&ev->epoll_ready);
 }
 
 #endif	// end HAS_EPOLL

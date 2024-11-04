@@ -16,8 +16,6 @@ struct POLLFD {
 
 /****************************************************************************/
 
-#define TO_APPL ring_to_appl
-
 /**
  * The callback is set by poll_event_set() when user calls acl_fiber_poll().
  * The callback will be called when the fd included by FILE_EVENT is ready,
@@ -60,7 +58,7 @@ static void handle_poll_read(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 	 * timeout process in event_process_poll() in event.c.
 	 */
 	if (pfd->pe->nready == 0) {
-		/* The cache timer has been be set when timeout >= 0. */
+		/* The cache timer has been set when timeout >= 0. */
 		if (pfd->pe->expire >= 0) {
 			timer_cache_remove(ev->poll_timer, pfd->pe->expire,
 				&pfd->pe->me);
@@ -79,7 +77,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	event_del_read(ev, fe, 0);
 	SET_READABLE(fe);
 
-	// Walk througth the RING list, handle each poll event, and one RING
+	// Walk through the RING list, handle each poll event, and one RING
 	// node maybe be detached after it has been handled without any poll
 	// event bound with it again.
 	for (; iter != &fe->pfds; iter = next) {
@@ -92,7 +90,7 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 }
 
 /**
- * Similiar to read_callback except that the POLLOUT flag will be set in it.
+ * Similar to read_callback except that the POLLOUT flag will be set in it.
  */
 static void handle_poll_write(EVENT *ev, FILE_EVENT *fe, POLLFD *pfd)
 {
@@ -146,7 +144,7 @@ static void write_callback(EVENT *ev, FILE_EVENT *fe)
 }
 
 /**
- * Set all fds' callbacks in POLL_EVENT, thease callbacks will be called
+ * Set all fds' callbacks in POLL_EVENT, these callbacks will be called
  * by event_wait() of different event engines for different OS platforms.
  */
 static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
@@ -179,8 +177,8 @@ static void poll_event_set(EVENT *ev, POLL_EVENT *pe, int timeout)
 		ring_prepend(&pfd->fe->pfds, &pfd->me);
 		pfd->pfd->revents = 0;
 
-		// Add one reference to avoid fe being freeed in advanced.
-		//file_event_refer(pfd->fe);
+		// Add one reference to avoid fe being freed in advanced.
+		// file_event_refer(pfd->fe);
 	}
 
 	if (timeout >= 0) {
@@ -366,7 +364,7 @@ int WINAPI acl_fiber_poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	pe->fds   = pollfd_alloc(pe, fds, nfds);
 #endif
 
-	pe->nfds  = nfds;
+	pe->nfds  = (int) nfds;
 	pe->fiber = curr;
 	pe->proc  = poll_callback;
 
@@ -438,5 +436,44 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
 	return acl_fiber_poll(fds, nfds, timeout);
 }
 #endif
+
+#define TO_APPL ring_to_appl
+
+void wakeup_poll_waiters(EVENT *ev)
+{
+	RING_ITER iter;
+	RING *head;
+	POLL_EVENT *pe;
+	long long now = event_get_stamp(ev);
+	TIMER_CACHE_NODE *node = TIMER_FIRST(ev->poll_timer), *next;
+
+	/* Check and call all the pe's callback which was timeout except the
+	 * pe which has been ready and been removed from ev->poll_timer. The
+	 * removing operations are in read_callback or write_callback in the
+	 * hook/poll.c.
+	 */
+	while (node && node->expire >= 0 && node->expire <= now) {
+		next = TIMER_NEXT(ev->poll_timer, node);
+
+		// Call all the pe's callback with the same expire time,
+		// and wake up poll waiting fibers because time expiring.
+		ring_foreach(iter, &node->ring) {
+			pe = TO_APPL(iter.ptr, POLL_EVENT, me);
+			pe->proc(ev, pe);
+		}
+
+		node = next;
+	}
+
+	// When the poll waiting fibers are ready, there will be set in the
+	// poll_ready and removed from poll_timer in handle_poll_read or
+	// handle_poll_write in hook/poll.c, and we'll wake up them now.
+	while ((head = ring_pop_head(&ev->poll_ready)) != NULL) {
+		pe = TO_APPL(head, POLL_EVENT, me);
+		pe->proc(ev, pe);
+	}
+
+	ring_init(&ev->poll_ready);
+}
 
 #endif // HAS_POLL

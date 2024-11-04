@@ -106,7 +106,7 @@ int timer_cache_remove(TIMER_CACHE *cache, long long expire, RING *entry)
 	}
 
 	if (entry->parent != &node->ring) {
-		// Maybe the fiber has been append to the other ring.
+		// Maybe the fiber has been appended to the other ring.
 		if (ring_size(&node->ring) == 0) {
 			timer_cache_free_node(cache, node);
 		}
@@ -128,7 +128,7 @@ void timer_cache_free_node(TIMER_CACHE *cache, TIMER_CACHE_NODE *node)
 	// The node will be removed if it hasn't any entry.
 	fiber_avl_remove(&cache->tree, node);
 
-	// The node object can be cached for being reused in future.
+	// The node object can be cached for being reused in the future.
 	if (cache->cache_max > 0 && ring_size(&cache->caches) < cache->cache_max) {
 		ring_append(&cache->caches, &node->ring);
 	} else {

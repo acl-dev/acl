@@ -36,7 +36,9 @@ static int wait_write(FILE_EVENT *fe)
 	CLR_POLLING(fe);
 
 	if (fiber_wait_write(fe) < 0) {
-		fiber_file_free(fe);
+		// Bugfix: Don't free fe here, or crash will happen!.
+		// --zsx, 2024.10.25.
+		// fiber_file_free(fe);
 		return -1;
 	}
 

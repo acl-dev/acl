@@ -494,6 +494,8 @@ size_t connect_pool::check_dead(thread_pool* threads /* NULL */)
 	if (threads == NULL) {
 		return check_dead(count);
 	}
+
+	// 采用线程池检测，以提升检测效率
 	return check_dead(count, *threads);
 }
 
@@ -604,7 +606,6 @@ connect_client* connect_pool::peek_back()
 	lock_.unlock();
 	return conn;
 }
-
 
 void connect_pool::put_front(connect_client* conn)
 {

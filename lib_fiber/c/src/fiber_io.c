@@ -153,7 +153,7 @@ void fiber_io_check(void)
 		}
 
 		thread_init();
-	} else if (__thread_fiber->ev_fiber == NULL) {
+	} else if (var_hook_sys_api && __thread_fiber->ev_fiber == NULL) {
 		__thread_fiber->ev_fiber  = acl_fiber_create(fiber_io_loop,
 				__thread_fiber->event, STACK_SIZE);
 		__thread_fiber->io_stop   = 0;
@@ -172,38 +172,38 @@ static long long fiber_io_stamp(void)
 	return event_get_stamp(ev);
 }
 
-void fiber_timer_add(ACL_FIBER *fiber, size_t milliseconds)
+void fiber_timer_add(ACL_FIBER *fb, size_t milliseconds)
 {
 	EVENT *ev = fiber_io_event();
 	long long now = event_get_stamp(ev);
 	TIMER_CACHE_NODE *timer;
 
-	fiber->when = now + milliseconds;
-	ring_detach(&fiber->me);  // Detch the previous binding.
-	timer_cache_add(__thread_fiber->ev_timer, fiber->when, &fiber->me);
+	fb->when = now + (ssize_t) milliseconds;
+	ring_detach(&fb->me);  // Detach the previous binding.
+	timer_cache_add(__thread_fiber->ev_timer, fb->when, &fb->me);
 
 	/* Compute the event waiting interval according the timers' head */
 	timer = TIMER_FIRST(__thread_fiber->ev_timer);
 
 	if (timer->expire <= now) {
-		/* If the first timer has been expired, we should wakeup it
+		/* If the first timer has been expired, we should wake up it
 		 * immediately, so the event waiting interval should be set 0.
 		 */
 		ev->timeout = 0;
 	} else {
-		/* Then we use the interval between the first timer and now */
-		ev->timeout = (int) (fiber->when - now);
+		/* Then using the interval between the first timer and now. */
+		ev->timeout = (int) (fb->when - now);
 	}
 }
 
-int fiber_timer_del(ACL_FIBER *fiber)
+int fiber_timer_del(ACL_FIBER *fb)
 {
 	fiber_io_check();
 
-	return timer_cache_remove(__thread_fiber->ev_timer,
-			fiber->when, &fiber->me);
+	return timer_cache_remove(__thread_fiber->ev_timer, fb->when, &fb->me);
 }
 
+// wakeup_timers - Wake up all waiters in timers set in fiber_timer_add.
 static void wakeup_timers(TIMER_CACHE *timers, long long now)
 {
 	TIMER_CACHE_NODE *node = TIMER_FIRST(timers), *next;
@@ -224,8 +224,8 @@ static void wakeup_timers(TIMER_CACHE *timers, long long now)
 			// timer's arriving.
 			fb->flag |= FIBER_F_TIMER;
 
-			// The fb->me was be appended in fiber_timer_add, and
-			// we detatch fb->me from timer node and append it to
+			// The fb->me was appended in fiber_timer_add, and
+			// we detach fb->me from timer node and append it to
 			// the ready ring in acl_fiber_ready.
 			ring_detach(&fb->me);
 			FIBER_READY(fb);
@@ -256,7 +256,6 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			left = -1;
 		} else {
 			now  = event_get_stamp(__thread_fiber->event);
-			last = now;
 			if (now >= timer->expire) {
 				left = 0;
 			} else {
@@ -282,9 +281,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 			 */
 			while (acl_fiber_yield() > 0) {}
 
-			if (ev->waiter > 0) {
-				continue;
-			} else if (ring_size(&ev->events) > 0) {
+			if (ev->waiter > 0 || ring_size(&ev->events) > 0) {
 				continue;
 			}
 
@@ -305,6 +302,7 @@ static void fiber_io_loop(ACL_FIBER *self fiber_unused, void *ctx)
 		now = event_get_stamp(__thread_fiber->event);
 		if (now - last >= left) {
 			wakeup_timers(__thread_fiber->ev_timer, now);
+			last = now;
 		}
 
 		if (timer_cache_size(__thread_fiber->ev_timer) == 0) {
@@ -359,7 +357,7 @@ size_t acl_fiber_delay(size_t milliseconds)
 	fiber->flag &= ~FIBER_F_TIMER;
 
 	if (acl_fiber_killed(fiber)) {
-		// If been killed, the fiber must has been detatched from the
+		// If been killed, the fiber must have been detatched from the
 		// timer node in acl_fiber_signal(); We call fiber_timer_del
 		// here in order to try to free the timer node.
 		fiber_timer_del(fiber);
@@ -418,7 +416,7 @@ ACL_FIBER *acl_fiber_create_timer(size_t milliseconds, size_t size,
 	fiber_io_check();
 
 	when = fiber_io_stamp();
-	when += milliseconds;
+	when += (ssize_t) milliseconds;
 
 	fiber       = acl_fiber_create(fiber_timer_callback, tc, size);
 	fiber->when = when;
@@ -445,47 +443,6 @@ size_t acl_fiber_sleep(size_t seconds)
 }
 
 /****************************************************************************/
-
-#ifdef USE_POLL_WAIT
-
-static int timed_wait(socket_t fd, int delay, int oper)
-{
-	struct pollfd fds;
-	fds.events = oper;
-	fds.fd     = fd;
-
-	for (;;) {
-		switch (acl_fiber_poll(&fds, 1, delay)) {
-# ifdef SYS_WIN
-		case SOCKET_ERROR:
-# else
-		case -1:
-# endif
-			if (acl_fiber_last_error() == FIBER_EINTR) {
-				continue;
-			}
-			break;
-		case 0:
-			return 0;
-		default:
-			if (oper == POLLIN) {
-				if ((fds.revents & POLLIN)) {
-					return 1;
-				}
-			} else if (oper == POLLOUT) {
-				if ((fds.revents & POLLOUT)) {
-					return 1;
-				}
-			}
-
-			if (fds.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-				return -1;
-			}
-			return -1;
-		}
-	}
-}
-#endif  // USE_POLL_WAIT
 
 static void read_callback(EVENT *ev, FILE_EVENT *fe)
 {
@@ -523,19 +480,6 @@ int fiber_wait_read(FILE_EVENT *fe)
 		return -1;
 	}
 
-#ifdef	USE_POLL_WAIT
-	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
-		ret = timed_wait(fe->fd, fe->r_timeout, POLLIN);
-		if (ret == 0) {
-			acl_fiber_set_errno(curr, FIBER_EAGAIN);
-			acl_fiber_set_error(FIBER_EAGAIN);
-			return -1;
-		}
-
-		return ret == 1 ? 0 : -1;
-	}
-#endif
-
 	// When return 0 just let it go continue
 	ret = event_add_read(__thread_fiber->event, fe, read_callback);
 	if (ret <= 0) {
@@ -550,19 +494,15 @@ int fiber_wait_read(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
 		fiber_timer_add(curr, fe->r_timeout);
 	}
-#endif
 
 	acl_fiber_switch();
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_RCVTIMEO) && fe->r_timeout > 0) {
 		fiber_timer_del(curr);
 	}
-#endif
 
 	fe->fiber_r->wstatus &= ~FIBER_WAIT_READ;
 	fe->fiber_r = NULL;
@@ -582,22 +522,17 @@ int fiber_wait_read(FILE_EVENT *fe)
 		event_del_read(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
-	}
-#ifndef USE_POLL_WAIT
-	else if (curr->flag & FIBER_F_TIMER) {
+	} else if (curr->flag & FIBER_F_TIMER) {
 		// If the IO reading timeout set in setsockopt.
 		// Clear FIBER_F_TIMER flag been set in wakeup_timers.
 		curr->flag &= ~FIBER_F_TIMER;
-		// Delete the IO read event directly, don't buffer the delete
-		// status.
-		event_del_read(__thread_fiber->event, fe, 1);
+		event_del_read(__thread_fiber->event, fe, 0);
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
-#endif
-	// else: the IO read event should has been removed in read_callback.
+	// else: the IO read event should have been removed in read_callback.
 
 	return ret;
 }
@@ -630,19 +565,6 @@ int fiber_wait_write(FILE_EVENT *fe)
 		return -1;
 	}
 
-#ifdef	USE_POLL_WAIT
-	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
-		ret = timed_wait(fe->fd, fe->w_timeout, POLLOUT);
-		if (ret == 0) {
-			acl_fiber_set_errno(curr, FIBER_EAGAIN);
-			acl_fiber_set_error(FIBER_EAGAIN);
-			return -1;
-		}
-
-		return ret == 1 ? 0 : -1;
-	}
-#endif
-
 	ret = event_add_write(__thread_fiber->event, fe, write_callback);
 	if (ret <= 0) {
 		return ret;
@@ -656,13 +578,15 @@ int fiber_wait_write(FILE_EVENT *fe)
 		WAITER_INC(__thread_fiber->event);
 	}
 
-#ifndef USE_POLL_WAIT
 	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
 		fiber_timer_add(curr, fe->w_timeout);
 	}
-#endif
 
 	acl_fiber_switch();
+
+	if ((fe->mask & EVENT_SO_SNDTIMEO) && fe->w_timeout > 0) {
+		fiber_timer_del(curr);
+	}
 
 	fe->fiber_w->wstatus &= ~FIBER_WAIT_WRITE;
 	fe->fiber_w = NULL;
@@ -675,17 +599,14 @@ int fiber_wait_write(FILE_EVENT *fe)
 		event_del_write(__thread_fiber->event, fe, 1);
 		acl_fiber_set_error(curr->errnum);
 		return -1;
-	}
-#ifndef USE_POLL_WAIT
-	else if (curr->flag & FIBER_F_TIMER) {
+	} else if (curr->flag & FIBER_F_TIMER) {
 		curr->flag &= ~FIBER_F_TIMER;
-		event_del_write(__thread_fiber->event, fe, 1);
+		event_del_write(__thread_fiber->event, fe, 0);
 
 		acl_fiber_set_errno(curr, FIBER_EAGAIN);
 		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
-#endif
 
 	return ret;
 }
