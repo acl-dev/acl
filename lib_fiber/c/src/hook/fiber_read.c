@@ -6,6 +6,7 @@
 #include "io.h"
 
 #if defined(HAS_IO_URING)
+
 static int uring_wait_read(FILE_EVENT *fe)
 {
 	while (1) {
@@ -30,13 +31,16 @@ static int uring_wait_read(FILE_EVENT *fe)
 			return fe->reader_ctx.res;
 		}
 
-		err = acl_fiber_last_error();
+		// Use the negative of res as the error.
+		err = -fe->reader_ctx.res;
+		acl_fiber_set_error(err);
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (!(fe->type & TYPE_EVENTABLE)) {
-				fiber_file_free(fe);
-			}
+			// Don't free fe here, which will be freed in close.
+			//if (!(fe->type & TYPE_EVENTABLE)) {
+			//	fiber_file_free(fe);
+			//}
 			return -1;
 		}
 	}
@@ -60,9 +64,9 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 
 	return iocp_wait_read(fe);
 }
-#endif  // HAS_IO_URING
 
-#if defined(HAS_IOCP)
+#elif defined(HAS_IOCP)
+
 static int iocp_wait_read(FILE_EVENT *fe)
 {
 	while (1) {
@@ -122,7 +126,8 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 	fe->res   = 0;
 	return iocp_wait_read(fe);
 }
-#endif // HAS_IOCP
+
+#endif // HAS_IOCP || HAS_IO_URING
 
 // After calling fiber_wait_read():
 // The fiber_wait_read will return three status:
@@ -148,7 +153,8 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
 // not monitor the file fd in fiber_wait_read.
 
 #if defined(_WIN32) || defined(_WIN64)
-#define FIBER_READ(_fn, _fe, ...) do {                                       \
+
+# define FIBER_READ(_fn, _fe, ...) do {                                      \
     ssize_t ret;                                                             \
     int err;                                                                 \
     if (IS_READABLE((_fe))) {                                                \
@@ -172,8 +178,10 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
         return -1;                                                           \
     }                                                                        \
 } while (1)
+
 #else
-#define FIBER_READ(_fn, _fe, _args...) do {                                  \
+
+# define FIBER_READ(_fn, _fe, _args...) do {                                 \
     ssize_t ret;                                                             \
     int err;                                                                 \
     if (IS_READABLE((_fe))) {                                                \
@@ -197,6 +205,7 @@ int fiber_iocp_read(FILE_EVENT *fe, char *buf, int len)
         return -1;                                                           \
     }                                                                        \
 } while (1)
+
 #endif
 
 #define FILE_ALLOC(f, t, fd) do {                                            \
@@ -212,18 +221,18 @@ ssize_t fiber_read(FILE_EVENT *fe,  void *buf, size_t count)
 	CLR_POLLING(fe);
 
 #ifdef HAS_IO_URING
-	// One FILE_EVENT can be used by multiple fibers with the same
-	// EVENT_BUSY_READ or EVENT_BUSY_WRITE in the same time. But can be
-	// used by two fibers that one is a reader and the other is a writer,
-	// because there're two different objects for reader and writer.
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_READ(f) do {                                                     \
+# define SET_READ(f) do {                                                    \
     (f)->in.read_ctx.buf = buf;                                              \
     (f)->in.read_ctx.len = (int) count;                                      \
     (f)->mask |= EVENT_READ;                                                 \
 } while (0)
 
+	// One FILE_EVENT can be used by multiple fibers with the same
+	// EVENT_BUSY_READ or EVENT_BUSY_WRITE in the same time. But can be
+	// used by two fibers that one is a reader and the other is a writer,
+	// because there're two different objects for reader and writer.
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_READ)) {
@@ -251,15 +260,15 @@ ssize_t fiber_readv(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 	CLR_POLLING(fe);
 
 #ifdef HAS_IO_URING
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_READV(f) do {                                                    \
+# define SET_READV(f) do {                                                   \
     (f)->in.readv_ctx.iov = iov;                                             \
     (f)->in.readv_ctx.cnt = iovcnt;                                          \
     (f)->in.readv_ctx.off = 0;                                               \
     (f)->mask |= EVENT_READV;                                                \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_READ)) {
@@ -287,14 +296,14 @@ ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
 	CLR_POLLING(fe);
 
 #ifdef HAS_IO_URING
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_RECVMSG(f) do {                                                  \
+# define SET_RECVMSG(f) do {                                                 \
     (f)->in.recvmsg_ctx.msg   = msg;                                         \
     (f)->in.recvmsg_ctx.flags = flags;                                       \
     (f)->mask |= EVENT_RECVMSG;                                              \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_READ)) {
@@ -318,6 +327,7 @@ ssize_t fiber_recvmsg(FILE_EVENT *fe, struct msghdr *msg, int flags)
 }
 
 # ifdef HAS_MMSG
+
 ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
 	unsigned int vlen, int flags, const struct timespec *timeout)
 {
@@ -336,6 +346,7 @@ ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
 
 	FIBER_READ(sys_recvmmsg, fe, msgvec, vlen, flags, NULL);
 }
+
 # endif // HAS_MMSG
 
 #endif  // SYS_UNIX
@@ -353,15 +364,15 @@ ssize_t fiber_recv(FILE_EVENT *fe, void *buf, size_t len, int flags)
 # endif
 	}
 #elif defined(HAS_IO_URING)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_RECV(f) do {                                                     \
+# define SET_RECV(f) do {                                                    \
     (f)->in.recv_ctx.buf   = buf;                                            \
     (f)->in.recv_ctx.len   = (unsigned) len;                                 \
     (f)->in.recv_ctx.flags = flags;                                          \
     (f)->mask |= EVENT_RECV;                                                 \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_READ)) {
@@ -398,9 +409,8 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
 		return fiber_iocp_read(fe, buf, (int) len);
 	}
 #elif  defined(HAS_IO_URING) && defined(IO_URING_HAS_RECVFROM)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_RECVFROM(f) do {                                                 \
+# define SET_RECVFROM(f) do {                                                \
     (f)->in.recvfrom_ctx.buf      = buf;                                     \
     (f)->in.recvfrom_ctx.len      = (unsigned) len;                          \
     (f)->in.recvfrom_ctx.flags    = flags;                                   \
@@ -409,6 +419,7 @@ ssize_t fiber_recvfrom(FILE_EVENT *fe, void *buf, size_t len,
     (f)->mask |= EVENT_RECVFROM;                                             \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_READ)) {

@@ -34,7 +34,7 @@ ssize_t fiber_recvmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec,
 # endif
 
 // in fiber_write.c
-int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len);
+int fiber_uring_write(FILE_EVENT *fe, const char *buf, int len);
 
 ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count);
 ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt);

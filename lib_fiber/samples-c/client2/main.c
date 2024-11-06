@@ -160,7 +160,7 @@ static void echo_client(SOCKET fd)
 		ret = read(fd, buf, BUF_SIZE - 1);
 #endif
 		if (ret <= 0) {
-			printf("read error: %s\r\n", acl_last_serror());
+			printf("read error: %s, fd=%d\r\n", acl_last_serror(), fd);
 			break;
 		}
 

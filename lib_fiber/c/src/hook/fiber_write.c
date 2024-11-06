@@ -10,6 +10,7 @@
 // from connecting process.
 
 #if defined(HAS_IO_URING)
+
 # define CHECK_SET_NBLOCK(_fd) do {                                          \
     if (var_hook_sys_api && !EVENT_IS_IO_URING(fiber_io_event())) {          \
         FILE_EVENT *_fe = fiber_file_get(_fd);                               \
@@ -19,7 +20,9 @@
         }                                                                    \
     }                                                                        \
 } while (0)
+
 #else
+
 # define CHECK_SET_NBLOCK(_fd) do {                                          \
     if (var_hook_sys_api) {                                                  \
         FILE_EVENT *_fe = fiber_file_get(_fd);                               \
@@ -29,7 +32,8 @@
         }                                                                    \
     }                                                                        \
 } while (0)
-#endif
+
+#endif  // HAS_IO_URING
 
 static int wait_write(FILE_EVENT *fe)
 {
@@ -52,7 +56,8 @@ static int wait_write(FILE_EVENT *fe)
 }
 
 #if defined(HAS_IO_URING)
-static int iocp_wait_write(FILE_EVENT *fe)
+
+static int uring_wait_write(FILE_EVENT *fe)
 {
 	while (1) {
 		int err;
@@ -73,22 +78,22 @@ static int iocp_wait_write(FILE_EVENT *fe)
 		fiber_save_errno(err);
 
 		if (!error_again(err)) {
-			if (!(fe->type & TYPE_EVENTABLE)) {
-				fiber_file_free(fe);
-			}
+			// Don't free fe here, which will be freed in close.
+			//if (!(fe->type & TYPE_EVENTABLE)) {
+			//	fiber_file_free(fe);
+			//}
 			return -1;
 		}
 	}
 }
-#endif
 
-#if defined(HAS_IO_URING)
-int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
+int fiber_uring_write(FILE_EVENT *fe, const char *buf, int len)
 {
 	fe->out.write_ctx.buf = buf;
 	fe->out.write_ctx.len = len;
-	return iocp_wait_write(fe);
+	return uring_wait_write(fe);
 }
+
 #endif // HAS_IO_URING
 
 #define CHECK_WRITE_RESULT(_fe, _n) do {                                     \
@@ -112,34 +117,34 @@ int fiber_iocp_write(FILE_EVENT *fe, const char *buf, int len)
     (__fe)->type   = TYPE_EVENTABLE;                                         \
 } while (0)
 
-
 #ifdef SYS_UNIX
+
 ssize_t fiber_write(FILE_EVENT *fe, const void *buf, size_t count)
 {
 	CLR_POLLING(fe);
 
 #if defined(HAS_IO_URING)
-	if (EVENT_IS_IO_URING(fiber_io_event()) && !(fe->mask & EVENT_SYSIO)) {
 
-#define SET_WRITE(f) do {                                                    \
+# define SET_WRITE(f) do {                                                   \
     (f)->out.write_ctx.buf = buf;                                            \
     (f)->out.write_ctx.len = (unsigned) count;                               \
     (f)->mask |= EVENT_WRITE;                                                \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event()) && !(fe->mask & EVENT_SYSIO)) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_WRITE)) {
 			SET_WRITE(fe);
 
 			fe->busy |= EVENT_BUSY_WRITE;
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			fe->busy &= ~EVENT_BUSY_WRITE;
 		} else {
 			FILE_ALLOC(fe, 0, fe->fd);
 			SET_WRITE(fe);
 
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			file_event_unrefer(fe);
 		}
 		return ret;
@@ -164,28 +169,28 @@ ssize_t fiber_writev(FILE_EVENT *fe, const struct iovec *iov, int iovcnt)
 	CLR_POLLING(fe);
 
 #if defined(HAS_IO_URING)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_WRITEV(f) do {                                                   \
+# define SET_WRITEV(f) do {                                                  \
     (f)->out.writev_ctx.iov = iov;                                           \
     (f)->out.writev_ctx.cnt = iovcnt;                                        \
     (f)->out.writev_ctx.off = 0;                                             \
     (f)->mask |= EVENT_WRITEV;                                               \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_WRITE)) {
 			SET_WRITEV(fe);
 
 			fe->busy |= EVENT_BUSY_WRITE;
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			fe->busy &= ~EVENT_BUSY_WRITE;
 		} else {
 			FILE_ALLOC(fe, 0, fe->fd);
 			SET_WRITEV(fe);
 
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			file_event_unrefer(fe);
 		}
 		return ret;
@@ -211,28 +216,28 @@ ssize_t fiber_send(FILE_EVENT *fe, const void *buf, size_t len, int flags)
 	CLR_POLLING(fe);
 
 #if defined(HAS_IO_URING)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_SEND(f) do {                                                     \
+# define SET_SEND(f) do {                                                    \
     (f)->out.send_ctx.buf   = buf;                                           \
     (f)->out.send_ctx.len   = (unsigned) len;                                \
     (f)->out.send_ctx.flags = flags;                                         \
     (f)->mask |= EVENT_SEND;                                                 \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_WRITE)) {
 			SET_SEND(fe);
 
 			fe->busy |= EVENT_BUSY_WRITE;
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			fe->busy &= ~EVENT_BUSY_WRITE;
 		} else {
 			FILE_ALLOC(fe, 0, fe->fd);
 			SET_SEND(fe);
 
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			file_event_unrefer(fe);
 		}
 		return ret;
@@ -262,9 +267,8 @@ ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 	CLR_POLLING(fe);
 
 #if defined(HAS_IO_URING) && defined(IO_URING_HAS_SENDTO)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_SENDTO(f) do {                                                   \
+# define SET_SENDTO(f) do {                                                  \
     (f)->out.sendto_ctx.buf       = buf;                                     \
     (f)->out.sendto_ctx.len       = (unsigned) len;                          \
     (f)->out.sendto_ctx.flags     = flags;                                   \
@@ -273,19 +277,20 @@ ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
     (f)->mask |= EVENT_SENDTO;                                               \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_WRITE)) {
 			SET_SENDTO(fe);
 
 			fe->busy |= EVENT_BUSY_WRITE;
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			fe->busy &= ~EVENT_BUSY_WRITE;
 		} else {
 			FILE_ALLOC(fe, 0, fe->fd);
 			SET_SENDTO(fe);
 
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			file_event_unrefer(fe);
 		}
 		return ret;
@@ -312,32 +317,33 @@ ssize_t fiber_sendto(FILE_EVENT *fe, const void *buf, size_t len,
 }
 
 #ifdef SYS_UNIX
+
 ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
 {
 	CLR_POLLING(fe);
 
 #if defined(HAS_IO_URING)
-	if (EVENT_IS_IO_URING(fiber_io_event())) {
 
-#define SET_SENDMSG(f) do {                                                  \
+# define SET_SENDMSG(f) do {                                                 \
     (f)->out.sendmsg_ctx.msg   = msg;                                        \
     (f)->out.sendmsg_ctx.flags = flags;                                      \
     (f)->mask |= EVENT_SENDMSG;                                              \
 } while (0)
 
+	if (EVENT_IS_IO_URING(fiber_io_event())) {
 		int ret;
 
 		if (!(fe->busy & EVENT_BUSY_WRITE)) {
 			SET_SENDMSG(fe);
 
 			fe->busy |= EVENT_BUSY_WRITE;
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			fe->busy &= ~EVENT_BUSY_WRITE;
 		} else {
 			FILE_ALLOC(fe, 0, fe->fd);
 			SET_SENDMSG(fe);
 
-			ret = iocp_wait_write(fe);
+			ret = uring_wait_write(fe);
 			file_event_unrefer(fe);
 		}
 		return ret;
@@ -358,6 +364,7 @@ ssize_t fiber_sendmsg(FILE_EVENT *fe, const struct msghdr *msg, int flags)
 }
 
 # ifdef HAS_MMSG
+
 int fiber_sendmmsg(FILE_EVENT *fe, struct mmsghdr *msgvec, unsigned int vlen,
 	int flags)
 {
