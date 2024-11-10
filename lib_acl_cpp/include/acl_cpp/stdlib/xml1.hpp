@@ -22,24 +22,23 @@ namespace acl {
 class xml1;
 class xml1_node;
 
-class ACL_CPP_API xml1_attr : public xml_attr
-{
+class ACL_CPP_API xml1_attr : public xml_attr {
 public:
 	/**
 	 * @override
 	 */
-	const char* get_name(void) const;
+	const char* get_name() const;
 
 	/**
 	 * @override
 	 */
-	const char* get_value(void) const;
+	const char* get_value() const;
 
 protected:
 	friend class xml1_node;
 
 	xml1_attr(xml_node* node, ACL_XML_ATTR* attr);
-	~xml1_attr(void) {}
+	~xml1_attr() {}
 
 private:
 	ACL_XML_ATTR* attr_;
@@ -51,17 +50,17 @@ public:
 	/**
 	 * @override
 	 */
-	const char* tag_name(void) const;
+	const char* tag_name() const;
 
 	/**
 	 * @override
 	 */
-	const char* id(void) const;
+	const char* id() const;
 
 	/**
 	 * @override
 	 */
-	const char* text(void) const;
+	const char* text() const;
 
 	/**
 	 * @override
@@ -71,12 +70,12 @@ public:
 	/**
 	 * @override
 	 */
-	const xml_attr* first_attr(void) const;
+	const xml_attr* first_attr() const;
 
 	/**
 	 * @override
 	 */
-	const xml_attr* next_attr(void) const;
+	const xml_attr* next_attr() const;
 
 	/**
 	 * @override
@@ -101,7 +100,7 @@ public:
 	/**
 	 * @override
 	 */
-	int detach(void);
+	int detach();
 
 	/**
 	 * @override
@@ -111,39 +110,39 @@ public:
 	/**
 	 * @override
 	 */
-	xml_node& get_parent(void) const;
+	xml_node& get_parent() const;
 
 	/**
 	 * @override
 	 */
-	xml_node* first_child(void);
+	xml_node* first_child();
 
 	/**
 	 * @override
 	 */
-	xml_node* next_child(void);
+	xml_node* next_child();
 
 	/**
 	 * @override
 	 */
-	int depth(void) const;
+	int depth() const;
 
 	/**
 	 * @override
 	 */
-	bool is_root(void) const;
+	bool is_root() const;
 
 	/**
 	 * @override
 	 */
-	int children_count(void) const;
+	int children_count() const;
 
 public:
 	/**
 	 * 取出对应于 ACL 库中的 XML 节点对象
 	 * @return {ACL_XML_NODE*} 返回节点对象，注：该节点用户不能单独释放
 	 */
-	ACL_XML_NODE* get_xml_node(void) const;
+	ACL_XML_NODE* get_xml_node() const;
 
 protected:
 	friend class xml1;
@@ -159,7 +158,7 @@ protected:
 	/**
 	 * 要求该对象必须是动态创建的
 	 */
-	~xml1_node(void);
+	~xml1_node();
 
 private:
 	ACL_XML_NODE *node_;
@@ -172,8 +171,7 @@ private:
 
 class string;
 
-class ACL_CPP_API xml1 : public xml
-{
+class ACL_CPP_API xml1 : public xml {
 public:
 	/**
 	 * 构造函数
@@ -187,7 +185,7 @@ public:
 	 */
 	xml1(const char* data = NULL, size_t dbuf_nblock = 2,
 		size_t dbuf_capacity = 100);
-	~xml1(void);
+	~xml1();
 
 	/**
 	 * @override
@@ -222,12 +220,12 @@ public:
 	/**
 	 * @override
 	 */
-	void reset(void);
+	void reset();
 
 	/**
 	 * @override
 	 */
-	const string& getText(void);
+	const string& getText();
 
 	/**
 	 * @override
@@ -281,17 +279,17 @@ public:
 	/**
 	 * @override
 	 */
-	xml_node& get_root(void);
+	xml_node& get_root();
 
 	/**
 	 * @override
 	 */
-	xml_node* first_node(void);
+	xml_node* first_node();
 
 	/**
 	 * @override
 	 */
-	xml_node* next_node(void);
+	xml_node* next_node();
 
 	/**
 	 * @override
@@ -306,22 +304,22 @@ public:
 	/**
 	 * @override
 	 */
-	size_t space(void) const;
+	size_t space() const;
 
 	/**
 	 * @override
 	 */
-	void space_clear(void);
+	void space_clear();
 
 	/**
 	 * @override
 	 */
-	size_t node_count(void) const;
+	size_t node_count() const;
 
 	/**
 	 * @override
 	 */
-	size_t attr_count(void) const;
+	size_t attr_count() const;
 
 public:
 	/**
@@ -329,8 +327,7 @@ public:
 	 * @return {ACL_XML*} 该值不可能为空，注意用户可以修改该对象的值，
 	 *  但不可以释放该对象
 	 */
-	ACL_XML* get_xml(void) const
-	{
+	ACL_XML* get_xml() const {
 		return xml_;
 	}
 

@@ -14,8 +14,7 @@ namespace acl {
 class xml2;
 class xml2_node;
 
-class ACL_CPP_API xml2_attr : public xml_attr
-{
+class ACL_CPP_API xml2_attr : public xml_attr {
 public:
 	/**
 	 * @override
@@ -31,7 +30,7 @@ protected:
 	friend class xml2_node;
 
 	xml2_attr(xml_node* node, ACL_XML2_ATTR* attr);
-	~xml2_attr(void) {}
+	~xml2_attr() {}
 
 private:
 	ACL_XML2_ATTR* attr_;
@@ -43,17 +42,17 @@ public:
 	/**
 	 * @override
 	 */
-	const char* tag_name(void) const;
+	const char* tag_name() const;
 
 	/**
 	 * @override
 	 */
-	const char* id(void) const;
+	const char* id() const;
 
 	/**
 	 * @override
 	 */
-	const char* text(void) const;
+	const char* text() const;
 
 	/**
 	 * @override
@@ -63,12 +62,12 @@ public:
 	/**
 	 * @override
 	 */
-	const xml_attr* first_attr(void) const;
+	const xml_attr* first_attr() const;
 
 	/**
 	 * @override
 	 */
-	const xml_attr* next_attr(void) const;
+	const xml_attr* next_attr() const;
 
 	/**
 	 * @override
@@ -93,7 +92,7 @@ public:
 	/**
 	 * @override
 	 */
-	int detach(void);
+	int detach();
 
 	/**
 	 * @override
@@ -103,44 +102,44 @@ public:
 	/**
 	 * @override
 	 */
-	xml_node& get_parent(void) const;
+	xml_node& get_parent() const;
 
 	/**
 	 * @override
 	 */
-	xml_node* first_child(void);
+	xml_node* first_child();
 
 	/**
 	 * @override
 	 */
-	xml_node* next_child(void);
+	xml_node* next_child();
 
 	/**
 	 * @override
 	 */
-	int depth(void) const;
+	int depth() const;
 
 	/**
 	 * @override
 	 */
-	bool is_root(void) const;
+	bool is_root() const;
 
 	/**
 	 * @override
 	 */
-	int children_count(void) const;
+	int children_count() const;
 
 public:
 	void set_xml2_node(ACL_XML2_NODE* node);
 
-	ACL_XML2_NODE* get_xml_node(void) const;
+	ACL_XML2_NODE* get_xml_node() const;
 
 protected:
 	friend class xml2;
 	friend class dbuf_guard;
 
 	xml2_node(xml* xml_ptr, ACL_XML2_NODE* node);
-	~xml2_node(void);
+	~xml2_node();
 
 private:
 	ACL_XML2_NODE *node_;
@@ -153,8 +152,7 @@ private:
 
 class fstream;
 
-class ACL_CPP_API xml2 : public xml
-{
+class ACL_CPP_API xml2 : public xml {
 public:
 	/**
 	 * 构造函数，使 xml 对象树创建在指定内存映射文件上
@@ -206,7 +204,7 @@ public:
 		size_t dbuf_capacity = 100);
 #endif
 
-	~xml2(void);
+	~xml2();
 
 	/**
 	 * @override
@@ -241,12 +239,12 @@ public:
 	/**
 	 * @override
 	 */
-	void reset(void);
+	void reset();
 
 	/**
 	 * @override
 	 */
-	const string& getText(void);
+	const string& getText();
 
 	/**
 	 * @override
@@ -301,17 +299,17 @@ public:
 	/**
 	 * @override
 	 */
-	xml_node& get_root(void);
+	xml_node& get_root();
 
 	/**
 	 * @override
 	 */
-	xml_node* first_node(void);
+	xml_node* first_node();
 
 	/**
 	 * @override
 	 */
-	xml_node* next_node(void);
+	xml_node* next_node();
 
 	/**
 	 * @override
@@ -326,26 +324,25 @@ public:
 	/**
 	 * @override
 	 */
-	size_t space(void) const;
+	size_t space() const;
 
 	/**
 	 * @override
 	 */
-	void space_clear(void);
+	void space_clear();
 
 	/**
 	 * @override
 	 */
-	size_t node_count(void) const;
+	size_t node_count() const;
 
 	/**
 	 * @override
 	 */
-	size_t attr_count(void) const;
+	size_t attr_count() const;
 
 public:
-	ACL_XML2* get_xml2(void) const
-	{
+	ACL_XML2* get_xml2() const {
 		return xml_;
 	}
 

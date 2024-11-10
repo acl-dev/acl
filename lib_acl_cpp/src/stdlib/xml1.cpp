@@ -16,7 +16,7 @@ xml1_attr::xml1_attr(xml_node* node, ACL_XML_ATTR* attr)
 	acl_assert(attr_);
 }
 
-const char* xml1_attr::get_name(void) const
+const char* xml1_attr::get_name() const
 {
 	if (attr_->name) {
 		return acl_vstring_str(attr_->name);
@@ -25,7 +25,7 @@ const char* xml1_attr::get_name(void) const
 	}
 }
 
-const char* xml1_attr::get_value(void) const
+const char* xml1_attr::get_value() const
 {
 	if (attr_->value) {
 		return acl_vstring_str(attr_->value);
@@ -46,7 +46,7 @@ xml1_node::xml1_node(xml* xml_ptr, ACL_XML_NODE* node)
 {
 }
 
-xml1_node::~xml1_node(void)
+xml1_node::~xml1_node()
 {
 	delete parent_internal_;
 	if (child_iter_) {
@@ -57,12 +57,12 @@ xml1_node::~xml1_node(void)
 	}
 }
 
-ACL_XML_NODE* xml1_node::get_xml_node(void) const
+ACL_XML_NODE* xml1_node::get_xml_node() const
 {
 	return node_;
 }
 
-const char* xml1_node::tag_name(void) const
+const char* xml1_node::tag_name() const
 {
 	if (node_->ltag && ACL_VSTRING_LEN(node_->ltag) > 0) {
 		return (acl_vstring_str(node_->ltag));
@@ -71,7 +71,7 @@ const char* xml1_node::tag_name(void) const
 	}
 }
 
-const char* xml1_node::text(void) const
+const char* xml1_node::text() const
 {
 	if (node_->text && ACL_VSTRING_LEN(node_->text) > 0) {
 		return acl_vstring_str(node_->text);
@@ -80,7 +80,7 @@ const char* xml1_node::text(void) const
 	}
 }
 
-const char* xml1_node::id(void) const
+const char* xml1_node::id() const
 {
 	if (node_->id && ACL_VSTRING_LEN(node_->id) > 0) {
 		return acl_vstring_str(node_->id);
@@ -94,7 +94,7 @@ const char* xml1_node::attr_value(const char* name) const
 	return acl_xml_getElementAttrVal(node_, name);
 }
 
-const xml_attr* xml1_node::first_attr(void) const
+const xml_attr* xml1_node::first_attr() const
 {
 	ACL_ARRAY* a = node_->attr_list;
 	if (a == NULL) {
@@ -116,7 +116,7 @@ const xml_attr* xml1_node::first_attr(void) const
 	return xa;
 }
 
-const xml_attr* xml1_node::next_attr(void) const
+const xml_attr* xml1_node::next_attr() const
 {
 	ACL_ARRAY* a = node_->attr_list;
 	if (a == NULL) {
@@ -170,7 +170,7 @@ xml_node& xml1_node::add_child(xml_node* child, bool return_child /* = false */)
 	return *this;
 }
 
-int xml1_node::detach(void)
+int xml1_node::detach()
 {
 	return acl_xml_node_delete(node_);
 }
@@ -198,7 +198,7 @@ xml_node& xml1_node::get_parent() const
 	return *node;
 }
 
-xml_node* xml1_node::first_child(void)
+xml_node* xml1_node::first_child()
 {
 	if (child_iter_ == NULL) {
 		child_iter_ = (ACL_ITER*) acl_mymalloc(sizeof(ACL_ITER));
@@ -214,7 +214,7 @@ xml_node* xml1_node::first_child(void)
 	return n;
 }
 
-xml_node* xml1_node::next_child(void)
+xml_node* xml1_node::next_child()
 {
 	acl_assert(child_iter_);
 
@@ -229,19 +229,19 @@ xml_node* xml1_node::next_child(void)
 	return n;
 }
 
-int xml1_node::depth(void) const
+int xml1_node::depth() const
 {
 	return node_->depth;
 }
 
-bool xml1_node::is_root(void) const
+bool xml1_node::is_root() const
 {
 	xml1_node& node = (xml1_node&) ((xml1*) xml_)->get_root();
 	ACL_XML_NODE* root = node.get_xml_node();
 	return root == node_;
 }
 
-int xml1_node::children_count(void) const
+int xml1_node::children_count() const
 {
 	return acl_ring_size(&node_->children);
 }
@@ -261,7 +261,7 @@ xml1::xml1(const char* data /* = NULL */, size_t dbuf_nblock /* = 2 */,
 	}
 }
 
-xml1::~xml1(void)
+xml1::~xml1()
 {
 	if (iter_)
 		acl_myfree(iter_);
@@ -434,7 +434,7 @@ xml_node* xml1::getElementById(const char* id) const
 	return n;
 }
 
-const acl::string& xml1::getText(void)
+const acl::string& xml1::getText()
 {
 #define	STR(x)		acl_vstring_str((x))
 #define	EQ(x, y)	!strcasecmp((x), (y))
@@ -538,7 +538,7 @@ xml_node& xml1::create_node(const char* tag, istream& in,
 	return *n;
 }
 
-xml_node& xml1::get_root(void)
+xml_node& xml1::get_root()
 {
 	if (root_) {
 		return *root_;
@@ -547,7 +547,7 @@ xml_node& xml1::get_root(void)
 	return *root_;
 }
 
-xml_node* xml1::first_node(void)
+xml_node* xml1::first_node()
 {
 	if (iter_ == NULL) {
 		iter_ = (ACL_ITER*) acl_mymalloc(sizeof(ACL_ITER));
@@ -563,7 +563,7 @@ xml_node* xml1::first_node(void)
 	return n;
 }
 
-xml_node* xml1::next_node(void)
+xml_node* xml1::next_node()
 {
 	acl_assert(iter_);
 
@@ -597,7 +597,7 @@ const char* xml1::to_string(size_t* len /* = NULL */) const
 	return buf_->c_str();
 }
 
-void xml1::reset(void)
+void xml1::reset()
 {
 	clear();
 	delete root_;
@@ -606,22 +606,22 @@ void xml1::reset(void)
 	//dummyRootAdded_ = false;
 }
 
-size_t xml1::space(void) const
+size_t xml1::space() const
 {
 	return acl_xml_space(xml_);
 }
 
-void xml1::space_clear(void)
+void xml1::space_clear()
 {
 	acl_xml_space_clear(xml_);
 }
 
-size_t xml1::node_count(void) const
+size_t xml1::node_count() const
 {
 	return (size_t) xml_->node_cnt;
 }
 
-size_t xml1::attr_count(void) const
+size_t xml1::attr_count() const
 {
 	return (size_t) xml_->attr_cnt;
 }
