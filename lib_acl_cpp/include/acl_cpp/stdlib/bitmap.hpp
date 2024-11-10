@@ -3,8 +3,7 @@
 
 namespace acl {
 
-class bitmap : public noncopyable
-{
+class bitmap : public noncopyable {
 public:
 	/**
 	 * 构造函数
@@ -19,7 +18,7 @@ public:
 	 */
 	bitmap(size_t len);
 
-	~bitmap(void);
+	~bitmap();
 
 	/**
 	 * 将所给数值映射在位集合中
@@ -67,31 +66,31 @@ public:
 	 * 获取当前位映射存储空间可以存储的位的个数
 	 * @return {size_t}
 	 */
-	size_t size(void) const;
+	size_t size() const;
 
 	/**
 	 * 获得内部存储空间大小（字节）
 	 */
-	size_t space(void) const;
+	size_t space() const;
 
 	/**
 	 * 获取当前已经设置的个数
 	 * @return {size_t}
 	 */
-	size_t count(void) const;
+	size_t count() const;
 
 	/**
 	 * 当前bitmap是否已满
 	 * @return {bool}
 	 */
-	bool full(void) const;
+	bool full() const;
 
 public:
-	const unsigned char* get_bmp(void) const {
+	const unsigned char* get_bmp() const {
 		return bmp_;
 	}
 
-	unsigned char* get_bmp(void) {
+	unsigned char* get_bmp() {
 		return bmp_;
 	}
 
@@ -101,7 +100,7 @@ private:
 	size_t count_;
 
 	//从新统计count数量
-	void recount(void);
+	void recount();
 };
 
 } // namespace acl

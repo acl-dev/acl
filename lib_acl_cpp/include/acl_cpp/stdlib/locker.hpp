@@ -19,8 +19,7 @@ namespace acl {
 /**
  * 互斥锁，可以同时创建文件锁和线程锁，也可以只创建一种锁
  */
-class ACL_CPP_API locker : public noncopyable
-{
+class ACL_CPP_API locker : public noncopyable {
 public:
 	/**
 	 * 构造函数

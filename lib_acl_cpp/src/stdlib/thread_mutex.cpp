@@ -47,7 +47,7 @@ thread_mutex::thread_mutex(bool recursive /* = true */)
 #endif
 }
 
-thread_mutex::~thread_mutex(void)
+thread_mutex::~thread_mutex()
 {
 #ifndef	ACL_WINDOWS
 	(void) pthread_mutexattr_destroy(&mutex_attr_);
@@ -56,12 +56,12 @@ thread_mutex::~thread_mutex(void)
 	acl_myfree(mutex_);
 }
 
-acl_pthread_mutex_t* thread_mutex::get_mutex(void) const
+acl_pthread_mutex_t* thread_mutex::get_mutex() const
 {
 	return mutex_;
 }
 
-bool thread_mutex::lock(void)
+bool thread_mutex::lock()
 {
 	int ret = acl_pthread_mutex_lock(mutex_);
 	if (ret) {
@@ -74,12 +74,12 @@ bool thread_mutex::lock(void)
 	return true;
 }
 
-bool thread_mutex::try_lock(void)
+bool thread_mutex::try_lock()
 {
 	return acl_pthread_mutex_trylock(mutex_) == 0;
 }
 
-bool thread_mutex::unlock(void)
+bool thread_mutex::unlock()
 {
 	int ret = acl_pthread_mutex_unlock(mutex_);
 	if (ret) {
@@ -102,7 +102,7 @@ thread_mutex_guard::thread_mutex_guard(thread_mutex& mutex)
 	}
 }
 
-thread_mutex_guard::~thread_mutex_guard(void)
+thread_mutex_guard::~thread_mutex_guard()
 {
 	if (!mutex_.unlock()) {
 		logger_fatal("unlock error=%s", last_serror());

@@ -1,14 +1,13 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
 
-namespace acl
-{
+namespace acl {
 
 /**
  * 获得上次系统调用出错时的错误号
  * @return {int} 错误号
  */
-ACL_CPP_API int last_error(void);
+ACL_CPP_API int last_error();
 
 /**
  * 手工设置错误号
@@ -21,7 +20,7 @@ ACL_CPP_API void set_error(int errnum);
  * 安全的，但使用起来更简单些
  * @return {const char *} 返回错误提示信息 
  */
-ACL_CPP_API const char* last_serror(void);
+ACL_CPP_API const char* last_serror();
 
 /**
  * 获得上次系统调用出错时的错误描述信息
@@ -44,7 +43,7 @@ ACL_CPP_API const char* string_error(int errnum, char* buf, size_t size);
 ACL_CPP_API int strncasecmp_(const char *s1, const char *s2, size_t n);
 ACL_CPP_API void assert_(bool n);
 ACL_CPP_API void meter_time(const char *filename, int line, const char *info);
-ACL_CPP_API long long get_curr_stamp(void);
+ACL_CPP_API long long get_curr_stamp();
 ACL_CPP_API double stamp_sub(const struct timeval& from,
 		const struct timeval& sub);
 

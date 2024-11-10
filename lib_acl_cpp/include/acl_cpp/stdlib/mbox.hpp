@@ -21,10 +21,10 @@ size_t mbox_nread(void*);
  *
  * class myobj {
  * public:
- *     myobj(void) {}
- *     ~myobj(void) {}
+ *     myobj() {}
+ *     ~myobj() {}
  *     
- *     void run(void)
+ *     void run()
  *     {
  *         printf("hello world!\r\n");
  *     }
@@ -32,13 +32,13 @@ size_t mbox_nread(void*);
  * 
  * acl::mbox<myobj> mbox;
  *
- * void thread_producer(void)
+ * void thread_producer()
  * {
  *     myobj* o = new myobj;
  *     mbox.push(o);
  * }
  * 
- * void thread_consumer(void)
+ * void thread_consumer()
  * {
  *     myobj* o = mbox.pop();
  *     o->run();
@@ -62,8 +62,7 @@ public:
 		assert(mbox_);
 	}
 
-	~mbox(void)
-	{
+	~mbox() {
 		mbox_free(mbox_, free_obj_ ? mbox_free_fn : NULL);
 	}
 
@@ -74,8 +73,7 @@ public:
 	 * @return {bool} 发送是否成功
 	 * @override
 	 */
-	bool push(T* t, bool dummy = false)
-	{
+	bool push(T* t, bool dummy = false) {
 		(void) dummy;
 		return mbox_send(mbox_, t);
 	}
@@ -89,8 +87,7 @@ public:
 	 *  success 参数的返回值检查操作是否成功
 	 * @override
 	 */
-	T* pop(int timeout = -1, bool* success = NULL)
-	{
+	T* pop(int timeout = -1, bool* success = NULL) {
 		return (T*) mbox_read(mbox_, timeout, success);
 	}
 
@@ -99,7 +96,7 @@ public:
 	 * @return {bool}
 	 * @override
 	 */
-	bool has_null(void) const {
+	bool has_null() const {
 		return false;
 	}
 
@@ -107,8 +104,7 @@ public:
 	 * 统计当前已经发送的消息数
 	 * @return {size_t}
 	 */
-	size_t push_count(void) const
-	{
+	size_t push_count() const {
 		return mbox_nsend(mbox_);
 	}
 
@@ -116,8 +112,7 @@ public:
 	 * 统计当前已经接收到的消息数
 	 * @return {size_t}
 	 */
-	size_t pop_count(void) const
-	{
+	size_t pop_count() const {
 		return mbox_nread(mbox_);
 	}
 
@@ -125,8 +120,7 @@ private:
 	void* mbox_;
 	bool  free_obj_;
 
-	static void mbox_free_fn(void* o)
-	{
+	static void mbox_free_fn(void* o) {
 		T* t = (T*) o;
 		delete t;
 	}

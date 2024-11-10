@@ -6,11 +6,9 @@
 #include "../stream/aio_delay_free.hpp"
 #include "string.hpp"
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API dns_res
-{
+class ACL_CPP_API dns_res {
 public:
 	dns_res(const char* domain) : domain_(domain) {}
 	~dns_res() { ips_.clear(); }
@@ -21,8 +19,7 @@ protected:
 private:
 };
 
-class ACL_CPP_API dns_result_callback
-{
+class ACL_CPP_API dns_result_callback {
 public:
 	dns_result_callback(const char* domain) : domain_(domain) {}
 
@@ -32,7 +29,7 @@ public:
 	 * 子类应该在该函数内 delete this 以删除自己，因为该函数最终肯定
 	 * 会被调用，所以子类不应在其它地方进行析构操作
 	 */
-	virtual void destroy(void) {}
+	virtual void destroy() {}
 
 	/**
 	 * 子类实现此接口，以获得查询结果，如果 res.ips_.size() == 0

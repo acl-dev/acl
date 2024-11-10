@@ -8,8 +8,8 @@ class istream;
 
 class ACL_CPP_API md5 : public noncopyable {
 public:
-	md5(void);
-	~md5(void);
+	md5();
+	~md5();
 
 	/**
 	 * 可以循环调用此函数添加需要被 md5 的数据
@@ -23,13 +23,13 @@ public:
 	 * 必须调用本函数表示 md5 过程结束
 	 * @return {md5&}
 	 */
-	md5& finish(void);
+	md5& finish();
 
 	/**
 	 * 重置 md5 算法器的状态，从而允许重复使用同一个 md5 对象
 	 * @return {md5&}
 	 */
-	md5& reset(void);
+	md5& reset();
 
 	/**
 	 * 获得二进制格式的 md5 结果值

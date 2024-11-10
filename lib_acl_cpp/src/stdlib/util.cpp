@@ -5,10 +5,9 @@
 
 #include "acl_cpp/stdlib/trigger.hpp"
 
-namespace acl
-{
+namespace acl {
 
-int last_error(void)
+int last_error()
 {
 	return acl_last_error();
 }
@@ -18,7 +17,7 @@ void set_error(int errnum)
 	acl_set_error(errnum);
 }
 
-const char* last_serror(void)
+const char* last_serror()
 {
 	return acl_last_serror();
 }
@@ -40,7 +39,7 @@ int strncasecmp_(const char *s1, const char *s2, size_t n)
 
 void assert_(bool n)
 {
-	if (n == false) {
+	if (! n) {
 		abort();
 	}
 }
@@ -50,7 +49,7 @@ void meter_time(const char *filename, int line, const char *info)
 	acl_meter_time(filename, line, info);
 }
 
-long long get_curr_stamp(void)
+long long get_curr_stamp()
 {
 	struct timeval now;
 	gettimeofday(&now, NULL);

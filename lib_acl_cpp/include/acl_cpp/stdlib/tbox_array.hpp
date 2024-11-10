@@ -57,8 +57,7 @@ public:
 		array_ = (T**) malloc(sizeof(T*) * capacity_);
 	}
 
-	~tbox_array(void)
-	{
+	~tbox_array() {
 		clear(free_obj_);
 		free(array_);
 	}
@@ -67,8 +66,7 @@ public:
 	 * 清理消息队列中未被消费的消息对象
 	 * @param free_obj {bool} 释放调用 delete 方法删除消息对象
 	 */
-	void clear(bool free_obj = false)
-	{
+	void clear(bool free_obj = false) {
 		if (free_obj) {
 			for (size_t i = off_curr_; i < off_next_; i++) {
 				delete array_[i];
@@ -84,9 +82,8 @@ public:
 	 * @return {bool}
 	 * @override
 	 */
-	bool push(T* t, bool notify_first = false)
-	{
-		if (lock_.lock() == false) {
+	bool push(T* t, bool notify_first = false) {
+		if (! lock_.lock()) {
 			abort();
 		}
 
@@ -112,17 +109,17 @@ public:
 		array_[off_next_++] = t;
 
 		if (notify_first) {
-			if (cond_.notify() == false) {
+			if (! cond_.notify()) {
 				abort();
 			}
-			if (lock_.unlock() == false) {
+			if (! lock_.unlock()) {
 				abort();
 			}
 		} else {
-			if (lock_.unlock() == false) {
+			if (! lock_.unlock()) {
 				abort();
 			}
-			if (cond_.notify() == false) {
+			if (! cond_.notify()) {
 				abort();
 			}
 		}
@@ -144,18 +141,17 @@ public:
 	 *  判断是否获得了一个空消息对象
 	 * @override
 	 */
-	T* pop(int wait_ms = -1, bool* found = NULL)
-	{
+	T* pop(int wait_ms = -1, bool* found = NULL) {
 		long long n = ((long long) wait_ms) * 1000;
 		bool found_flag;
 
-		if (lock_.lock() == false) {
+		if (! lock_.lock()) {
 			abort();
 		}
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				if (lock_.unlock() == false) {
+				if (! lock_.unlock()) {
 					abort();
 				}
 				if (found) {
@@ -168,7 +164,7 @@ public:
 			waiters_++;
 			if (!cond_.wait(n, true) && wait_ms >= 0) {
 				waiters_--;
-				if (lock_.unlock() == false) {
+				if (! lock_.unlock()) {
 					abort();
 				}
 				if (found) {
@@ -185,7 +181,7 @@ public:
 	 * @return {bool}
 	 * @override
 	 */
-	bool has_null(void) const {
+	bool has_null() const {
 		return true;
 	}
 
@@ -193,22 +189,19 @@ public:
 	 * 返回当前存在于消息队列中的消息数量
 	 * @return {size_t}
 	 */
-	size_t size(void) const
-	{
+	size_t size() const {
 		return off_next_ - off_curr_;
 	}
 
 public:
-	void lock(void)
-	{
-		if (lock_.lock() == false) {
+	void lock() {
+		if (! lock_.lock()) {
 			abort();
 		}
 	}
 
-	void unlock(void)
-	{
-		if (lock_.unlock() == false) {
+	void unlock() {
+		if (! lock_.unlock()) {
 			abort();
 		}
 	}
@@ -223,8 +216,7 @@ private:
 	thread_mutex lock_;
 	thread_cond  cond_;
 
-	T* peek(bool& found_flag)
-	{
+	T* peek(bool& found_flag) {
 		if (off_curr_ == off_next_) {
 			found_flag = false;
 			if (off_curr_ > 0) {

@@ -16,39 +16,38 @@ namespace acl {
 /**
  * 线程互斥锁
  */
-class ACL_CPP_API thread_mutex : public noncopyable
-{
+class ACL_CPP_API thread_mutex : public noncopyable {
 public:
 	/**
 	 * 构造方法
 	 * @param recursive {bool} 是否启用递归锁方式
 	 */
 	thread_mutex(bool recursive = true);
-	~thread_mutex(void);
+	~thread_mutex();
 
 	/**
 	 * 对线程锁进行加锁，一直到加锁成功或内部失败(一般不会失败，除非是系统问题)
 	 * @return {bool} 返回 false 说明线程锁有问题
 	 */
-	bool lock(void);
+	bool lock();
 
 	/**
 	 * 尝试性加锁，无论成功与否都会立即返回
 	 * @return {bool} 返回 true 表示加锁成功，返回 false 表示加锁失败
 	 */
-	bool try_lock(void);
+	bool try_lock();
 
 	/**
 	 * 解线程锁
 	 * @return {bool} 返回 false 表示解锁失败，有可能之前并未加锁成功所致
 	 */
-	bool unlock(void);
+	bool unlock();
 
 	/**
 	 * 获得 acl 中 C 版本的系统类型的线程锁
 	 * @return {acl_pthread_mutex_t*}
 	 */
-	acl_pthread_mutex_t* get_mutex(void) const;
+	acl_pthread_mutex_t* get_mutex() const;
 
 private:
 	acl_pthread_mutex_t* mutex_;
@@ -61,7 +60,7 @@ class ACL_CPP_API thread_mutex_guard : public noncopyable
 {
 public:
 	thread_mutex_guard(thread_mutex& mutex);
-	~thread_mutex_guard(void);
+	~thread_mutex_guard();
 
 private:
 	thread_mutex& mutex_;
