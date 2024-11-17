@@ -1,7 +1,5 @@
-base_path = ../../..
-include ../../Makefile.in
+include ./Makefile.in
 
 PROG = json
-#CFLAGS += -I/home/zsx/download/json/simdjson/include
-CFLAGS += -DHAS_CJSON -DHAS_YYJSON -DHAS_SIMDJSON
-EXTLIBS = -lyyjson -lsimdjson -lcjson -Wl,-rpath,/usr/local/lib
+CFLAGS += -DHAS_CJSON -DHAS_YYJSON -DHAS_SIMDJSON -DHAS_RAPIDJSON -DHAS_JTJSON
+EXTLIBS = -lyyjson -lsimdjson -lcjson -Wl,-rpath,/usr/local/lib ./double-conversion.a

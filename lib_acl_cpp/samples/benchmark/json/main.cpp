@@ -14,6 +14,9 @@
 # include "simdjson.h"
 #endif
 
+#ifdef HAS_JTJSON
+# include "jtjson/json.h"
+#endif
 
 #ifdef HAS_RAPIDJSON
 # include <rapidjson/reader.h>
@@ -106,6 +109,21 @@ static int rapidjson_test(const acl::string& in, int count) {
 	}
 
 	return i;
+}
+#endif
+
+#ifdef HAS_JTJSON
+using jt::Json;
+
+static int jtjson_test(const acl::string& data, int count) {
+    int i;
+    for (i = 0; i < count; i++) {
+        std::pair<Json::Status, Json> res = Json::parse(data.c_str());
+        if (res.first != Json::success) {
+            break;
+        }
+    }
+    return i;
 }
 #endif
 
@@ -240,6 +258,21 @@ int main(int argc, char* argv[]) {
 		max, cost, speed, size);
 #endif
 
+	/////////////////////////////////////////////////////////////////////
+
+#ifdef HAS_JTJSON
+        gettimeofday(&begin, NULL);
+        count = jtjson_test(data, max);
+        gettimeofday(&end, NULL);
+
+	cost = acl::stamp_sub(end, begin);
+	speed = (count * 1000) / (cost > 0 ? cost : 0.1);
+	size = (dlen * speed) / (1024 * 1024);
+
+	printf("jtjson: count=%d, cost=%.2f ms, speed=%.2f, size=%.2f MB\r\n",
+		max, cost, speed, size);
+#endif
+       
 	/////////////////////////////////////////////////////////////////////
 
 	gettimeofday(&begin, NULL);
