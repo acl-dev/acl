@@ -412,6 +412,7 @@ void fiber::stackshow(const fiber& fb, size_t max /* = 50 */)
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer()
+: f_(NULL)
 {
 }
 
