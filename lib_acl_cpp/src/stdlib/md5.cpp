@@ -127,19 +127,18 @@ static void transform(unsigned int buf[4], unsigned int const in[16])
 	buf[3] += d;
 }
 
-namespace acl
-{
+namespace acl {
 
 /*
  * Start MD5 accumulation.  Set bit count to 0 and buffer to mysterious
  * initialization constants.
  */
-md5::md5(void)
+md5::md5()
 {
 	reset();
 }
 
-md5::~md5(void) {}
+md5::~md5() {}
 
 md5& md5::reset()
 {
@@ -240,12 +239,12 @@ md5& md5::finish()
 	return *this;
 }
 
-const char* md5::get_digest(void) const
+const char* md5::get_digest() const
 {
 	return (const char*) digest_;
 }
 
-const char* md5::get_string(void) const
+const char* md5::get_string() const
 {
 	const_cast<md5*>(this)->hex_encode(digest_, 16,
 		(char*) digest_s_, sizeof(digest_s_));

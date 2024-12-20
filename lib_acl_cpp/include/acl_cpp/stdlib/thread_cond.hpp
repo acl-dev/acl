@@ -18,8 +18,7 @@ class thread_mutex;
 /**
  * 线程条件变量
  */
-class ACL_CPP_API thread_cond : public noncopyable
-{
+class ACL_CPP_API thread_cond : public noncopyable {
 public:
 	/**
 	 * 构造方法
@@ -27,7 +26,7 @@ public:
 	 *  该线程锁，否则，内部创建线程锁
 	 */
 	thread_cond(thread_mutex* mutex = NULL);
-	~thread_cond(void);
+	~thread_cond();
 
 	/**
 	 * 等待线程条件变量就绪
@@ -46,25 +45,25 @@ public:
 	 * 通知一个或几个等待在线程条件变量上的线程，表示条件变量就结
 	 * @return {bool} 返回 false 表示通知失败
 	 */
-	bool notify(void);
+	bool notify();
 
 	/**
 	 * 通知所有等待在线程条件变量上的线程，表示条件变量就结
 	 * @return {bool} 返回 false 表示通知失败
 	 */
-	bool notify_all(void);
+	bool notify_all();
 
 	/**
 	 * 获得与该线程条件变量绑定的线程互斥锁
 	 * @return {thread_mutex&}
 	 */
-	thread_mutex& get_mutex(void) const;
+	thread_mutex& get_mutex() const;
 
 	/**
 	 * 获得系统类型的线程条件变量对象
 	 * @return {acl_pthread_cond_t*}
 	 */
-	acl_pthread_cond_t* get_cond(void) const;
+	acl_pthread_cond_t* get_cond() const;
 
 private:
 	thread_mutex* mutex_;

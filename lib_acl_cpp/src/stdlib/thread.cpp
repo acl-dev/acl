@@ -11,10 +11,9 @@
 #include <pthread_np.h>
 #endif
 
-namespace acl
-{
+namespace acl {
 
-thread::thread(void)
+thread::thread()
 : detachable_(false)
 , stack_size_(0)
 , thread_id_(0)
@@ -27,7 +26,7 @@ thread::thread(void)
 	lock_ = NEW atomic_long;
 }
 
-thread::~thread(void)
+thread::~thread()
 {
 #ifdef ACL_WINDOWS
 	acl_myfree(thread_);
@@ -48,7 +47,7 @@ thread& thread::set_stacksize(size_t size)
 	return *this;
 }
 
-void thread::wait_for_running(void)
+void thread::wait_for_running()
 {
 	if (lock_->cas(0, 1) == 0) {
 		if (thread_id_ == 0) {
@@ -188,7 +187,7 @@ bool thread::wait(void** out /* = NULL */)
 	return true;
 }
 
-unsigned long thread::thread_id(void) const
+unsigned long thread::thread_id() const
 {
 	const_cast<thread*>(this)->wait_for_running();
 
@@ -200,7 +199,7 @@ unsigned long thread::thread_id(void) const
 	return thread_id_;
 }
 
-unsigned long thread::thread_self(void)
+unsigned long thread::thread_self()
 {
 #ifdef	ACL_FREEBSD
 #if defined(__FreeBSD__) && (__FreeBSD__ >= 9)

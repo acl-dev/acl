@@ -3,10 +3,9 @@
 #include "acl_cpp/stdlib/thread_queue.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
-thread_queue::thread_queue(void)
+thread_queue::thread_queue()
 {
 	queue_ = (ACL_AQUEUE*) acl_aqueue_new();
 }
@@ -17,7 +16,7 @@ static void free_qitem(void* item)
 	delete qitem;
 }
 
-thread_queue::~thread_queue(void)
+thread_queue::~thread_queue()
 {
 	acl_aqueue_free(queue_, free_qitem);
 }
@@ -35,7 +34,7 @@ thread_qitem* thread_queue::pop(int wait_ms /* = -1 */)
 				queue_, wait_sec, wait_usec);
 }
 
-int thread_queue::qlen(void) const
+int thread_queue::qlen() const
 {
 	return acl_aqueue_qlen(queue_);
 }

@@ -48,7 +48,7 @@ static ACL_DLL_HANDLE __iconv_dll = NULL;
 
 // 程序退出时释放动态加载的 iconv.dll 库
 #ifndef HAVE_NO_ATEXIT
-static void __iconv_dll_unload(void)
+static void __iconv_dll_unload()
 {
 	if (__iconv_dll != NULL) {
 		acl_dlclose(__iconv_dll);
@@ -59,7 +59,7 @@ static void __iconv_dll_unload(void)
 #endif
 
 // 动态加载 iconv.dll 库
-static void __iconv_dll_load(void)
+static void __iconv_dll_load()
 {
 	const char* path = "iconv.dll";
 

@@ -15,15 +15,13 @@ private:
 };
 #else
 template <typename T>
-class identity
-{
+class identity {
 public:
 	typedef T me;
 };
 
 template<typename TDerive, typename TProvider>
-class final_tpl_base
-{
+class final_tpl_base {
 	friend class identity<TDerive>::me;
 	friend class identity<TProvider>::me;
 private:
@@ -46,8 +44,7 @@ private:
  */
 template<typename TFinalClass>
 class final_tpl : virtual public final_tpl_base<TFinalClass,
-	final_tpl<TFinalClass> >
-{
+	final_tpl<TFinalClass> > {
 public:
 	final_tpl() {}
 	~final_tpl() {}

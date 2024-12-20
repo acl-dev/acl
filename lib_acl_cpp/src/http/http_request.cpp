@@ -253,7 +253,7 @@ bool http_request::write_head()
 
 	while (true) {
 		// 尝试打开远程连接
-		if (try_open(&reuse_conn) == false) {
+		if (! try_open(&reuse_conn)) {
 			logger_error("connect server error");
 			need_retry_ = false;
 			return false;
@@ -320,7 +320,7 @@ bool http_request::write_body(const void* data, size_t len)
 			return false;
 		}
 
-		if (client_->write_body(data, len) == false) {
+		if (! client_->write_body(data, len)) {
 			if (!need_retry_) {
 				return false;
 			}
@@ -332,7 +332,7 @@ bool http_request::write_body(const void* data, size_t len)
 			close();
 
 			// 再重试一次
-			if (write_head() == false) {
+			if (! write_head()) {
 				return false;
 			}
 
@@ -351,7 +351,7 @@ bool http_request::write_body(const void* data, size_t len)
 		// data == NULL || len == 0 时，表示请求数据
 		// 已经发送完毕，开始从服务端读取 HTTP 响应数据
 		// 读 HTTP 响应头
-		if (client_->read_head() == true) {
+		if (client_->read_head()) {
 			break;
 		}
 
@@ -381,16 +381,28 @@ bool http_request::send_request(const void* data, size_t len)
 	client_->reset();  // 重置状态
 
 	// 写 HTTP 请求头
-	if (client_->write_head(header_) == false) {
+	if (! client_->write_head(header_)) {
 		return false;
 	}
 
 	// 写 HTTP 请求体
-	if (client_->write_body(data, len) == false) {
+	if (! client_->write_body(data, len)) {
 		return false;
 	}
 
 	return true;
+}
+
+bool http_request::get()
+{
+	header_.set_method(HTTP_METHOD_GET);
+	return request(NULL, 0);
+}
+
+bool http_request::post(const char *data, size_t len)
+{
+	header_.set_method(HTTP_METHOD_POST);
+	return request(data, len);
 }
 
 bool http_request::request(const void* data, size_t len)
@@ -415,13 +427,13 @@ bool http_request::request(const void* data, size_t len)
 
 	while (true) {
 		// 尝试打开远程连接
-		if (try_open(&reuse_conn) == false) {
+		if (! try_open(&reuse_conn)) {
 			logger_error("connect server error");
 			return false;
 		}
 
 		// 发送 HTTP 请求至服务器
-		if (send_request(data, len) == false) {
+		if (! send_request(data, len)) {
 			if (have_retried || !reuse_conn) {
 				logger_error("send request error");
 				return false;
@@ -438,7 +450,7 @@ bool http_request::request(const void* data, size_t len)
 		client_->reset();  // 重置状态
 
 		// 读 HTTP 响应头
-		if (client_->read_head() == true) {
+		if (client_->read_head()) {
 			break;
 		}
 
@@ -480,7 +492,7 @@ acl_int64 http_request::body_length() const
 
 bool http_request::keep_alive() const
 {
-	return client_ ? client_->keep_alive() : false;
+	return client_ != NULL && client_->keep_alive();
 }
 
 const char* http_request::header_value(const char* name) const
@@ -490,7 +502,7 @@ const char* http_request::header_value(const char* name) const
 
 bool http_request::body_finish() const
 {
-	return client_ ? client_->body_finish() : false;
+	return client_ != NULL && client_->body_finish();
 }
 
 void http_request::check_range()
@@ -545,7 +557,7 @@ void http_request::check_range()
 
 bool http_request::support_range() const
 {
-	return range_from_ >= 0 ? true : false;
+	return range_from_ >= 0;
 }
 
 acl_int64 http_request::get_range_from() const
@@ -800,7 +812,7 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 	}
 
 	if (conv_ == NULL) {
-		if (client_->body_gets(out, nonl, size) == true) {
+		if (client_->body_gets(out, nonl, size)) {
 			return true;
 		} else {
 			if (client_->disconnected()) {
@@ -812,7 +824,7 @@ bool http_request::body_gets(string& out, bool nonl /* = true */,
 
 	size_t n, size_saved = out.length();
 	string line(1024);
-	if (client_->body_gets(line, nonl, &n) == false) {
+	if (! client_->body_gets(line, nonl, &n)) {
 		if (!line.empty()) {
 			conv_->update(line.c_str(), line.length(), &out);
 		}
@@ -852,7 +864,7 @@ const std::vector<HttpCookie*>* http_request::get_cookies() const
 		return cookies_;
 	}
 	const_cast<http_request*>(this)->create_cookies();
-	if (cookie_inited_ == false) {
+	if (! cookie_inited_) {
 		return NULL;
 	}
 	return cookies_;
@@ -907,7 +919,7 @@ void http_request::create_cookies()
 		if (hdr->value == NULL || *(hdr->value) == 0)
 			continue;
 		HttpCookie* cookie = NEW HttpCookie();
-		if (cookie->setCookie(hdr->value) == false) {
+		if (! cookie->setCookie(hdr->value)) {
 			cookie->destroy();
 			continue;
 		}

@@ -2,8 +2,7 @@
 #include "../acl_cpp_define.hpp"
 #include "dbuf_pool.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class diff_manager;
 
@@ -11,8 +10,7 @@ class diff_manager;
  * 差集比较纯虚类，子类必须继承该类，并实现其中的纯虚方法
  * 该类继承于 dbuf_obj 类，便于由 dbuf_guard 统一管理，统一销毁
  */
-class diff_object : public dbuf_obj
-{
+class diff_object : public dbuf_obj {
 public:
 	/**
 	 * 构造函数
@@ -20,19 +18,19 @@ public:
 	 */
 	diff_object(diff_manager& manager);
 
-	virtual ~diff_object(void) {}
+	virtual ~diff_object() {}
 
 	/**
 	 * 纯虚接口，获得该对象的键字符串
 	 * @return {const char*} 必须返回非空字符串
 	 */
-	virtual const char* get_key(void) const = 0;
+	virtual const char* get_key() const = 0;
 
 	/**
 	 * 纯虚接口，获得该对象的值字符串
 	 * @return {const char*} 必须返回非空字符串
 	 */
-	virtual const char* get_val(void) const = 0;
+	virtual const char* get_val() const = 0;
 
 	/**
 	 * 纯虚接口，用来比较两个对象
@@ -47,8 +45,7 @@ public:
 	 * @param range_to {long long} 结束位置
 	 * @return {bool} 是否是超过给定区间范围的多余数据对象
 	 */
-	virtual bool check_range(long long range_from, long long range_to) const
-	{
+	virtual bool check_range(long long range_from, long long range_to) const {
 		(void) range_from;
 		(void) range_to;
 		return false;

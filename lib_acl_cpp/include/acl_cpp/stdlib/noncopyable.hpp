@@ -3,8 +3,7 @@
 
 namespace acl {
 
-class ACL_CPP_API noncopyable
-{
+class ACL_CPP_API noncopyable {
 protected:
 	noncopyable() {}
 	~noncopyable() {}

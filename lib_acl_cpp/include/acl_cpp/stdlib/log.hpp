@@ -81,7 +81,7 @@ public:
 	/**
 	 * 程序退出前调用此函数关闭日志
 	 */
-	static void close(void);
+	static void close();
 
 	/**
 	 * 初始化日志调试调用接口
@@ -147,7 +147,7 @@ public:
 
 #ifndef ACL_LOGGER_MACRO_OFF
 
-	static void logger_test1(void) {
+	static void logger_test1() {
 # define DEBUG_TEST_BASE	100
 # define DEBUG_TEST1		(DEBUG_TEST_BASE + 1)
 # define DEBUG_TEST2		(DEBUG_TEST_BASE + 2)
@@ -197,7 +197,7 @@ public:
 		logger_close();
 	}
 
-	static void logger_test2(void) {
+	static void logger_test2() {
 		logger("logger ok!");
 		logger_warn("logger_warn ok!");
 		logger_error("logger_error ok!");

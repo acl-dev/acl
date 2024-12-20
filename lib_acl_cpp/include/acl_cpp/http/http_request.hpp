@@ -109,6 +109,20 @@ public:
 	http_request& set_local_charset(const char* local_charset);
 
 	/**
+	 * 采用HTTP GET方法请求服务端
+	 * @return {bool}
+	 */
+	bool get();
+
+	/**
+	 * 采用HTTP POST方法请求服务端
+	 * @param data {const char*} 请求的数据体
+	 * @param len {size_t} 请求数据体长度
+	 * @return {bool}
+	 */
+	bool post(const char* data, size_t len);
+
+	/**
 	 * 向 HTTP 服务器发送 HTTP 请求头及 HTTP 请求体，同时从
 	 * HTTP 服务器读取 HTTP 响应头，对于长连接，当连接中断时
 	 * 会再重试一次，在调用下面的几个 get_body 函数前必须先
@@ -123,6 +137,8 @@ public:
 	 * @return {bool} 发送请求数据及读 HTTP 响应头数据是否成功
 	 */
 	bool request(const void* data, size_t len);
+
+	/////////////////////////////////////////////////////////////////////
 
 	/**
 	 * 当采用流式写数据时，需要首先调用本函数发送 HTTP 请求头

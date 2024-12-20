@@ -42,8 +42,7 @@
 #include "acl_cpp/stdlib/sha1.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 /*  
  *  sha1
