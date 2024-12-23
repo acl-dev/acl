@@ -9,54 +9,49 @@ namespace acl {
 class keeper_conns;
 
 // one connection with one fiber
-class keeper_conn : public fiber
-{
+class keeper_conn : public fiber {
 public:
 	keeper_conn(const keeper_config& config, const char* addr,
 		keeper_link* lk, keeper_conns& pool);
 
-	~keeper_conn(void);
+	~keeper_conn();
 
 	void set_task(task_req& task);
 	socket_stream* peek(double& cost);
 
 public:
-	void ask_open(void);
-	void ask_close(void);
+	void ask_open();
+	void ask_close();
 
-	void stop(void);
-	void join(void);
+	void stop();
+	void join();
 
-	time_t get_last_ctime(void) const
-	{
+	time_t get_last_ctime() const {
 		return last_ctime_;
 	}
 
-	bool is_ready(void) const
-	{
+	bool is_ready() const {
 		return status_ == KEEPER_T_READY;
 	}
 
-	bool is_busy(void) const
-	{
+	bool is_busy() const {
 		return status_ == KEEPER_T_BUSY;
 	}
 
-	bool is_idle(void) const
-	{
+	bool is_idle() const {
 		return status_ == KEEPER_T_IDLE;
 	}
 
-	void print_status(void) const;
+	void print_status() const;
 
 private:
 	// @override
-	void run(void);
+	void run();
 
 	socket_stream* dup_stream(socket_stream& from);
 	void handle_task(task_req& task);
-	void connect_one(void);
-	void done(void);
+	void connect_one();
+	void done();
 
 private:
 #ifdef USE_SBOX

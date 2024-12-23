@@ -14,25 +14,25 @@ fiber_mutex::fiber_mutex(ACL_FIBER_MUTEX *mutex /* NULL */)
 	}
 }
 
-fiber_mutex::~fiber_mutex(void)
+fiber_mutex::~fiber_mutex()
 {
 	if (mutex_internal_) {
 		acl_fiber_mutex_free(mutex_internal_);
 	}
 }
 
-bool fiber_mutex::lock(void)
+bool fiber_mutex::lock()
 {
 	acl_fiber_mutex_lock(mutex_);
 	return true;
 }
 
-bool fiber_mutex::trylock(void)
+bool fiber_mutex::trylock()
 {
-	return acl_fiber_mutex_trylock(mutex_) == 0 ? true : false;
+	return acl_fiber_mutex_trylock(mutex_) == 0;
 }
 
-bool fiber_mutex::unlock(void)
+bool fiber_mutex::unlock()
 {
 	acl_fiber_mutex_unlock(mutex_);
 	return true;
@@ -85,7 +85,7 @@ static void show(const fiber_mutex_stats& ss)
 	}
 }
 
-void fiber_mutex::deadlock_show(void)
+void fiber_mutex::deadlock_show()
 {
 	fiber_mutex_stats ss;
 	if (!deadlock(ss)) {

@@ -23,32 +23,32 @@ public:
 	 *  人员进行错误调试
 	 */
 	fiber_event(bool use_mutex = true, bool fatal_on_error = true);
-	~fiber_event(void);
+	~fiber_event();
 
 	/**
 	 * 等待事件锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
 	 */
-	bool wait(void);
+	bool wait();
 
 	/**
 	 * 尝试等待事件锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
 	 */
-	bool trywait(void);
+	bool trywait();
 
 	/**
 	 * 事件锁拥有者释放事件锁并通知等待者
 	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
 	 */
-	bool notify(void);
+	bool notify();
 
 public:
 	/**
 	 * 返回 C 版本的事件对象
 	 * @return {ACL_FIBER_EVENT*}
 	 */
-	ACL_FIBER_EVENT* get_event(void) const {
+	ACL_FIBER_EVENT* get_event() const {
 		return event_;
 	}
 

@@ -68,12 +68,12 @@ int fiber::get_errno() const
 
 bool fiber::is_ready() const
 {
-	return f_ ? acl_fiber_status(f_) == FIBER_STATUS_READY : false;
+	return f_ != NULL && acl_fiber_status(f_) == FIBER_STATUS_READY;
 }
 
 bool fiber::is_suspended() const
 {
-	return f_ ? acl_fiber_status(f_) == FIBER_STATUS_SUSPEND : false;
+	return f_ != NULL && acl_fiber_status(f_) == FIBER_STATUS_SUSPEND;
 }
 
 void fiber::set_errno(int errnum)
@@ -256,7 +256,7 @@ bool fiber::self_killed()
 	if (curr == NULL) {
 		return false;
 	}
-	return acl_fiber_killed(curr) ? true : false;
+	return acl_fiber_killed(curr) != 0;
 }
 
 void fiber::init(fiber_event_t type, bool schedule_auto /* = false */)
@@ -412,6 +412,7 @@ void fiber::stackshow(const fiber& fb, size_t max /* = 50 */)
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer()
+: f_(NULL)
 {
 }
 

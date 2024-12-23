@@ -4,13 +4,13 @@
 
 namespace acl {
 
-wait_group::wait_group(void)
+wait_group::wait_group()
 {
 	state_ = 0;
 	box_   = new acl::fiber_tbox<unsigned long>;
 }
 
-wait_group::~wait_group(void)
+wait_group::~wait_group()
 {
 	delete box_;
 }
@@ -57,12 +57,12 @@ void wait_group::add(int n)
 	}
 }
 
-void wait_group::done(void)
+void wait_group::done()
 {
 	add(-1);
 }
 
-void wait_group::wait(void)
+void wait_group::wait()
 {
 	for(;;) {
 		long long state = state_;

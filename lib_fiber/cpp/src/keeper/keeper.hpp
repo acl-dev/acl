@@ -24,10 +24,9 @@ typedef enum {
 	KEEPER_T_IDLE,
 } keeper_status_t;
 
-class keeper_config
-{
+class keeper_config {
 public:
-	keeper_config(void)
+	keeper_config()
 	: conn_timeo(10)
 	, rw_timeo(10)
 	, conn_min(10)
@@ -35,7 +34,7 @@ public:
 	, conn_ttl(10)
 	, pool_ttl(20) {}
 
-	~keeper_config(void) {}
+	~keeper_config() {}
 
 	int  conn_timeo;
 	int  rw_timeo;
@@ -45,89 +44,76 @@ public:
 	int  pool_ttl;
 };
 
-class ask_req
-{
+class ask_req {
 public:
 	ask_req(ask_type_t type) : type_(type) {}
 
-	ask_type_t get_type(void) const
+	ask_type_t get_type() const
 	{
 		return type_;
 	}
 
-	~ask_req(void) {}
+	~ask_req() {}
 
 private:
 	ask_type_t type_;
 };
 
-class task_req
-{
+class task_req {
 public:
-	task_req(void)
+	task_req()
 	: hit_(false)
 	, conn_cost_(1000)
 	{
 		gettimeofday(&stamp_, NULL);
 	}
 
-	~task_req(void) {}
+	~task_req() {}
 
-	void set_addr(const char* addr)
-	{
+	void set_addr(const char* addr) {
 		addr_ = addr;
 	}
 
-	const char* get_addr(void) const
-	{
+	const char* get_addr() const {
 		return addr_.c_str();
 	}
 
-	void set_hit(bool yes)
-	{
+	void set_hit(bool yes) {
 		hit_ = yes;
 	}
 
-	bool is_hit(void) const
-	{
+	bool is_hit() const {
 		return hit_;
 	}
 
-	void set_stamp(void)
-	{
+	void set_stamp() {
 		gettimeofday(&stamp_, NULL);
 	}
 
-	const struct timeval& get_stamp(void) const
-	{
+	const struct timeval& get_stamp() const {
 		return stamp_;
 	}
 
-	double get_cost(void) const
-	{
+	double get_cost() const {
 		struct timeval curr;
 		gettimeofday(&curr, NULL);
 		return stamp_sub(curr, stamp_);
 	}
 	
-	void set_conn_cost(double cost)
-	{
+	void set_conn_cost(double cost) {
 		conn_cost_ = cost;
 	}
 
-	double get_conn_cost(void) const
-	{
+	double get_conn_cost() const {
 		return conn_cost_;
 	}
 
 public:
-	socket_stream* pop(void)
-	{
+	socket_stream* pop() {
 		return tbox_.pop();
 	}
 
-	void put(socket_stream* conn)
-	{
+	void put(socket_stream* conn) {
 		tbox_.push(conn);
 	}
 

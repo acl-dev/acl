@@ -5,13 +5,13 @@
 
 namespace acl {
 
-keeper_waiter::keeper_waiter(void)
+keeper_waiter::keeper_waiter()
 : last_check_(0)
 {
 	config_ = new keeper_config;
 }
 
-keeper_waiter::~keeper_waiter(void)
+keeper_waiter::~keeper_waiter()
 {
 	delete config_;
 }
@@ -52,17 +52,17 @@ keeper_waiter& keeper_waiter::set_pool_ttl(int ttl)
 	return *this;
 }
 
-const keeper_config& keeper_waiter::get_config(void) const
+const keeper_config& keeper_waiter::get_config() const
 {
 	return *config_;
 }
 
-void keeper_waiter::stop(void)
+void keeper_waiter::stop()
 {
 	add_task(NULL);
 }
 
-void keeper_waiter::join(void)
+void keeper_waiter::join()
 {
 	(void) tbox_ctl_.pop();
 }
@@ -72,7 +72,7 @@ void keeper_waiter::add_task(task_req* task)
 	tbox_.push(task);
 }
 
-void keeper_waiter::run(void)
+void keeper_waiter::run()
 {
 	int timeo = config_->pool_ttl > 0 ? config_->pool_ttl * 1000 : -1;
 
@@ -127,12 +127,12 @@ void keeper_waiter::run(void)
 	done();
 }
 
-void keeper_waiter::done(void)
+void keeper_waiter::done()
 {
 	tbox_ctl_.push(this);
 }
 
-void keeper_waiter::check_idle(void)
+void keeper_waiter::check_idle()
 {
 	if (config_->pool_ttl <= 0) {
 		return;

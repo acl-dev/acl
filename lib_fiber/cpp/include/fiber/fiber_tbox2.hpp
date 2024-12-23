@@ -15,20 +15,20 @@ namespace acl {
  *
  * class myobj {
  * public:
- *     myobj(void) {}
- *     ~myobj(void) {}
+ *     myobj() {}
+ *     ~myobj() {}
  *
- *     void test(void) { printf("hello world\r\n"); }
+ *     void test() { printf("hello world\r\n"); }
  * };
  *
  * acl::fiber_tbox2<myobj> tbox;
  *
- * void thread_producer(void) {
+ * void thread_producer() {
  *     myobj o;
  *     tbox.push(o);
  * }
  *
- * void thread_consumer(void) {
+ * void thread_consumer() {
  *     myobj o;
 
  *     if (tbox.pop(o)) {
@@ -46,14 +46,14 @@ public:
 	/**
 	 * 构造方法
 	 */
-	fiber_tbox2(void) : size_(0) {}
+	fiber_tbox2() : size_(0) {}
 
-	~fiber_tbox2(void) {}
+	~fiber_tbox2() {}
 
 	/**
 	 * 清理消息队列中未被消费的消息对象
 	 */
-	void clear(void) {
+	void clear() {
 		tbox_.clear();
 	}
 
@@ -129,18 +129,18 @@ public:
 	 * 返回当前存在于消息队列中的消息数量
 	 * @return {size_t}
 	 */
-	size_t size(void) const {
+	size_t size() const {
 		return size_;
 	}
 
 public:
-	void lock(void) {
+	void lock() {
 		if (mutex_.lock() == false) {
 			abort();
 		}
 	}
 
-	void unlock(void) {
+	void unlock() {
 		if (mutex_.unlock() == false) {
 			abort();
 		}

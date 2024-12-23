@@ -1,4 +1,4 @@
 #pragma once
 
-bool winapi_hook(void);
+bool winapi_hook();
 

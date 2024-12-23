@@ -15,13 +15,13 @@ typedef enum {
 class FIBER_CPP_API fiber_sem {
 public:
 	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
-	~fiber_sem(void);
+	~fiber_sem();
 
-	int wait(void);
-	int trywait(void);
-	int post(void);
+	int wait();
+	int trywait();
+	int post();
 
-	size_t num(void) const;
+	size_t num() const;
 
 private:
 	ACL_FIBER_SEM* sem_;
@@ -35,7 +35,7 @@ public:
 		(void) sem_.wait();
 	}
 
-	~fiber_sem_guard(void) {
+	~fiber_sem_guard() {
 		sem_.post();
 	}
 
@@ -53,7 +53,7 @@ public:
 	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync)
 	, free_obj_(free_obj) {}
 
-	~fiber_sbox(void) { clear(free_obj_); }
+	~fiber_sbox() { clear(free_obj_); }
 
 	void push(T* t) {
 		sbox_.push_back(t);
@@ -76,7 +76,7 @@ public:
 		return t;
 	}
 
-	size_t size(void) const {
+	size_t size() const {
 		return sem_.num();
 	}
 
@@ -106,7 +106,7 @@ public:
 	fiber_sbox2(bool async = true)
 	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync) {}
 
-	~fiber_sbox2(void) {}
+	~fiber_sbox2() {}
 
 #if __cplusplus >= 201103L      // Support c++11 ?
 
@@ -144,7 +144,7 @@ public:
 
 #endif
 
-	size_t size(void) const {
+	size_t size() const {
 		return sem_.num();
 	}
 

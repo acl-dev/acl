@@ -15,20 +15,20 @@ namespace acl {
  *
  * class myobj {
  * public:
- *     myobj(void) {}
- *     ~myobj(void) {}
+ *     myobj() {}
+ *     ~myobj() {}
  *
- *     void test(void) { printf("hello world\r\n"); }
+ *     void test() { printf("hello world\r\n"); }
  * };
  *
  * acl::fiber_tbox<myobj> fiber_tbox;
  *
- * void thread_producer(void) {
+ * void thread_producer() {
  *     myobj* o = new myobj;
  *     fiber_tbox.push(o);
  * }
  *
- * void thread_consumer(void) {
+ * void thread_consumer() {
  *     myobj* o = fiber_tbox.pop();
  *     o->test();
  *     delete o;
@@ -47,7 +47,7 @@ public:
 	 */
 	fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
 
-	~fiber_tbox(void) {
+	~fiber_tbox() {
 		clear(free_obj_);
 	}
 
@@ -156,7 +156,7 @@ public:
 	 * @return {bool}
 	 * @override
 	 */
-	bool has_null(void) const {
+	bool has_null() const {
 		return true;
 	}
 
@@ -164,18 +164,18 @@ public:
 	 * 返回当前存在于消息队列中的消息数量
 	 * @return {size_t}
 	 */
-	size_t size(void) const {
+	size_t size() const {
 		return size_;
 	}
 
 public:
-	void lock(void) {
+	void lock() {
 		if (mutex_.lock() == false) {
 			abort();
 		}
 	}
 
-	void unlock(void) {
+	void unlock() {
 		if (mutex_.unlock() == false) {
 			abort();
 		}
