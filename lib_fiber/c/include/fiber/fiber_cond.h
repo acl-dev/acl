@@ -42,7 +42,7 @@ FIBER_API int acl_fiber_cond_wait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex);
  * @param cond {ACL_FIBER_COND *}
  * @param mutex {ACL_FIBER_MUTEX *} must be owned by the current caller
  * @param delay_ms {int}
- * @return {int} return 0 if ok or return error value, when timedout ETIMEDOUT
+ * @return {int} return 0 if ok or return error value, when timeout ETIMEDOUT
  *  will be returned
  */
 FIBER_API int acl_fiber_cond_timedwait(ACL_FIBER_COND *cond,

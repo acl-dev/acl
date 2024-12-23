@@ -43,7 +43,7 @@ FIBER_API size_t acl_fiber_get_shared_stack_size(void);
  * Create and start one fiber
  * @param fn {void (*)(ACL_FIBER*, void*)} the callback of fiber running
  * @param arg {void*} the second parameter of the callback fn
- * @param size {size_t} the virual memory size of the fiber created
+ * @param size {size_t} the virtual memory size of the fiber created
  * @return {ACL_FIBER*}
  */
 FIBER_API ACL_FIBER* acl_fiber_create(void (*fn)(ACL_FIBER*, void*),
@@ -74,15 +74,15 @@ FIBER_API void acl_fiber_stackfree(ACL_FIBER_STACK *stack);
 FIBER_API unsigned acl_fiber_ndead(void);
 
 /**
- * Get the fibers count in aliving status
+ * Get the fibers count in living status
  * @return {unsigned}
  */
 FIBER_API unsigned acl_fiber_number(void);
 
 /**
  * Create one fiber in background for freeing the dead fibers, specify the
- * maximum fibers in every recyling process
- * @param max {size_t} the maximum fibers to freed in every recyling process
+ * maximum fibers in every recycling process
+ * @param max {size_t} the maximum fibers to freed in every recycling process
  */
 FIBER_API void acl_fiber_check_timer(size_t max);
 
@@ -121,9 +121,9 @@ FIBER_API unsigned int acl_fiber_self(void);
 FIBER_API void acl_fiber_set_errno(ACL_FIBER *fiber, int errnum);
 
 /**
- * Get the error number of assosiated fiber
+ * Get the error number of associated fiber
  * @param fiber {ACL_FIBER*} the specified fiber, if NULL the current running
- * @return {int} get the error number of assosiated fiber
+ * @return {int} get the error number of associated fiber
  */
 FIBER_API int acl_fiber_errno(ACL_FIBER *fiber);
 
@@ -135,7 +135,7 @@ FIBER_API int acl_fiber_errno(ACL_FIBER *fiber);
 FIBER_API void acl_fiber_keep_errno(ACL_FIBER *fiber, int yesno);
 
 /**
- * Get the assosiated fiber's status
+ * Get the associated fiber's status
  * @param fiber {ACL_FIBER*} The specified fiber, if fiber is NULL the current
  *  running fiber will be used.
  * @return {int} Return ths status defined as FIBER_STATUS_XXX.
@@ -196,14 +196,14 @@ FIBER_API int acl_fiber_canceled(ACL_FIBER *fiber);
 FIBER_API void acl_fiber_clear(ACL_FIBER *fiber);
 
 /**
- * Wakeup the suspended fiber with the assosiated signal number asynchronously
+ * Wakeup the suspended fiber with the associated signal number asynchronously
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h
  */
 FIBER_API void acl_fiber_signal(ACL_FIBER *fiber, int signum);
 
 /**
- * Wakeup the suspended fiber with the assosiated signal number synchronously
+ * Wakeup the suspended fiber with the associated signal number synchronously
  * @param fiber {const ACL_FIBER*} the specified fiber, NOT NULL
  * @param signum {int} SIGINT, SIGKILL, SIGTERM ... refer to bits/signum.h
  */
@@ -251,7 +251,7 @@ FIBER_API void acl_fiber_schedule(void);
 /**
  * Start the fiber schedule process with the specified event type, the default
  * event type is FIBER_EVENT_KERNEL. acl_fiber_schedule using the default
- * event type. FIBER_EVENT_KERNEL is diffrent for diffrent OS platform:
+ * event type. FIBER_EVENT_KERNEL is different for different OS platform:
  * Linux: epoll; BSD: kqueue; Windows: iocp.
  * @param event_mode {int} the event type, defined as FIBER_EVENT_XXX
  */
@@ -326,7 +326,7 @@ FIBER_API void acl_fiber_set_dns(const char *ip, int port);
  * Set the current fiber's local object
  * @param key {int*} the addr of indexed key, its initial value should <= 0,
  *  and one integer which > 0 will be set for it; the fiber local object will
- *  be assosiated with the indexed key.
+ *  be associated with the indexed key.
  * @param ctx {void *} the fiber local object
  * @param free_fn {void (*)(void*)} the callback will be called before the
  *  current fiber exiting
@@ -336,7 +336,7 @@ FIBER_API void acl_fiber_set_dns(const char *ip, int port);
 FIBER_API int acl_fiber_set_specific(int *key, void *ctx, void (*free_fn)(void*));
 
 /**
- * Get the current fiber's local object assosiated with the specified indexed key
+ * Get the current fiber's local object associated with the specified indexed key
  * @param key {int} the integer value returned by acl_fiber_set_specific
  * @retur {void*} NULL returned if no fiber local object with the specified key
  */
@@ -366,7 +366,7 @@ typedef void (*FIBER_MSG_WRITE_FN) (void *ctx, const char *fmt, va_list ap);
 /**
  * Set the user's log saving function when process started
  * @param write_fn {MSG_WRITE_FN} log function defined by the user
- * @param ctx {void*} parameter will be transfered to write_fn
+ * @param ctx {void*} parameter will be transferred to write_fn
  */
 FIBER_API void acl_fiber_msg_register(FIBER_MSG_WRITE_FN write_fn, void *ctx);
 

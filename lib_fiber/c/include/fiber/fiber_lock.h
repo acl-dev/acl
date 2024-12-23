@@ -10,13 +10,13 @@ extern "C" {
 /* Fiber locking */
 
 /**
- * Fiber mutex, thread unsafety, one fiber mutex can only be used in the
+ * Fiber mutex, thread unsafely, one fiber mutex can only be used in the
  * same thread, otherwise the result is unpredictable
  */
 typedef struct ACL_FIBER_LOCK ACL_FIBER_LOCK;
 
 /**
- * Fiber read/write mutex, thread unsafety, can only be used in the sampe thread
+ * Fiber read/write mutex, thread unsafely, can only be used in the same thread
  */
 typedef struct ACL_FIBER_RWLOCK ACL_FIBER_RWLOCK;
 
@@ -58,7 +58,7 @@ FIBER_API void acl_fiber_lock_unlock(ACL_FIBER_LOCK* l);
 /****************************************************************************/
 
 /**
- * Create one fiber rwlock, can only be operated in the sampe thread
+ * Create one fiber rwlock, can only be operated in the same thread
  * @return {ACL_FIBER_RWLOCK*}
  */
 FIBER_API ACL_FIBER_RWLOCK* acl_fiber_rwlock_create(void);

@@ -81,7 +81,6 @@ public:
 
 private:
 	fiber_mutex& mutex_;
-
 };
 
 } // namespace acl

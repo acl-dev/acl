@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/* Fiber semaphore, thread unsafety, one semaphore can only be used in one
+/* Fiber semaphore, thread unsafely, one semaphore can only be used in one
  * thread, if used in different threads, result is unpredictable */
 
 typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
@@ -30,7 +30,7 @@ FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 FIBER_API void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 
 /**
- * Get the thread binding the specificed fiber sem
+ * Get the thread binding the specified fiber sem
  * @param sem {ACL_FIBER_SEM*} created by acl_fiber_sem_create
  * @return {unsigned long} thread ID of the thread binding the semaphore
  */
@@ -43,7 +43,7 @@ FIBER_API unsigned long acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
  * semaphore, when this function was called, the value of the semaphore must
  * be zero, otherwise fatal will happen.
  * @param sem {ACL_FIBER_SEM*} created by acl_fiber_sem_create
- * @param {unsigned long} the thread ID to be specificed with the semaphore
+ * @param {unsigned long} the thread ID to be specified with the semaphore
  */
 FIBER_API void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, unsigned long tid);
 

@@ -16,7 +16,7 @@ extern "C" {
 typedef struct ACL_FIBER_EVENT ACL_FIBER_EVENT;
 
 /**
- * When the fiber_event is used in multiple threads for sync, if there're
+ * When the fiber_event is used in multiple threads for sync, if there are
  * many threads, the flag FIBER_FLAG_USE_MUTEX should be set to avoid internal
  * thundering herd which maybe happen by using atomic; if the threads' number
  * is less than one hundred, the flag FIBER_FLAG_USE_MUTEX needn't be set
