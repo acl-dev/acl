@@ -802,7 +802,7 @@ gson(acl::json_node &node, char **obj)
 		return std::make_pair(false, "get char * string failed");
 
 	int len = (int) strlen(node.get_string());
-	*obj = new char[len + 1];
+	*obj = new char[len + 8];
 	memcpy(*obj, node.get_string(), len);
 	(*obj)[len] = 0;
 
