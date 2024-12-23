@@ -65,6 +65,8 @@ FIBER_API int acl_fiber_sem_wait(ACL_FIBER_SEM* sem);
  */
 FIBER_API int acl_fiber_sem_trywait(ACL_FIBER_SEM* sem);
 
+FIBER_API int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds);
+
 /**
  * Add 1 to the semaphore, if there are other fibers waiting for semaphore,
  * one waiter will be wakeuped
