@@ -17,7 +17,7 @@ public:
 	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
 	~fiber_sem();
 
-	int wait();
+	int wait(int milliseconds = -1);
 	int trywait();
 	int post();
 
@@ -60,8 +60,8 @@ public:
 		sem_.post();
 	}
 
-	T* pop(bool* found = NULL) {
-		if (sem_.wait() < 0) {
+	T* pop(int milliseconds, bool* found = NULL) {
+		if (sem_.wait(milliseconds) < 0) {
 			if (found) {
 				*found = false;
 			}
@@ -74,6 +74,10 @@ public:
 			*found = true;
 		}
 		return t;
+	}
+
+	T* pop(bool* found = NULL) {
+		return pop(-1, found);
 	}
 
 	size_t size() const {
@@ -115,8 +119,8 @@ public:
 		sem_.post();
 	}
 
-	bool pop(T& t) {
-		if (sem_.wait() < 0) {
+	bool pop(T& t, int milliseconds = -1) {
+		if (sem_.wait(milliseconds) < 0) {
 			return false;
 		}
 
@@ -132,8 +136,8 @@ public:
 		sem_.post();
 	}
 
-	bool pop(T& t) {
-		if (sem_.wait() < 0) {
+	bool pop(T& t, int milliseconds = -1) {
+		if (sem_.wait(milliseconds) < 0) {
 			return false;
 		}
 

@@ -19,9 +19,9 @@ fiber_sem::~fiber_sem()
 	acl_fiber_sem_free(sem_);
 }
 
-int fiber_sem::wait()
+int fiber_sem::wait(int milliseconds)
 {
-	return acl_fiber_sem_wait(sem_);
+	return acl_fiber_sem_timed_wait(sem_, milliseconds);
 }
 
 int fiber_sem::trywait()

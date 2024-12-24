@@ -71,12 +71,15 @@ int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds)
 		sem->num--;
 		return sem->num;
 	}
-	if (milliseconds == 0) {
-		return -1;
-	}
 
 	curr = acl_fiber_running();
 	if (curr == NULL) {
+		return -1;
+	}
+
+	if (milliseconds == 0) {
+		acl_fiber_set_errno(curr, FIBER_EAGAIN);
+		acl_fiber_set_error(FIBER_EAGAIN);
 		return -1;
 	}
 
@@ -94,6 +97,8 @@ int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds)
 		fiber_timer_add(curr, (size_t) milliseconds);
 	}
 
+	// Make sure to start wakeup_timers in fiber_io.c by the following:
+	// fiber_io_event -> fiber_io_check -> fiber_io_loop -> wakeup_timers.
 	ev = fiber_io_event();
 	WAITER_INC(ev);  // Just for avoiding fiber_io_loop to exit
 	acl_fiber_switch();

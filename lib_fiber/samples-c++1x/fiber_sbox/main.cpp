@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 	std::atomic<int> nfibers_left(nfibers);
 
 	for (int i = 0; i < nfibers; i++) {
-		auto fb = go[&box, &fibers, &nfibers_left] {
+		auto fb = go[&box, &nfibers_left] {
 			while (true) {
 				shared_message msg;
 				if (!box.pop(msg)) {
@@ -90,7 +90,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "All consumers exited!" << std::endl;
 	};
 
-	go[&box, &fibers, &nmsgs, nfibers, count] {
+	go[&box, &fibers, &nmsgs, count] {
 		for (int i = 0; i < count; i++) {
 			auto msg = std::make_shared<message>(nmsgs, i);
 			++nmsgs;
@@ -104,6 +104,24 @@ int main(int argc, char* argv[]) {
 			std::cout << "Begin kill fiber-"
 				<< acl_fiber_id(fb) << std::endl;
 			acl_fiber_kill(fb);
+		}
+	};
+
+	go[&box] {
+		for (int i = 0; i < 20; i++) {
+			::sleep(1);
+
+			shared_message msg;
+			time_t begin = time(NULL);
+			if (box.pop(msg, 1000)) {
+				std::cout << "POP one\r\n";
+			} else {
+				time_t end = time(NULL);
+				std::cout << "POP error: "
+					<< acl::last_serror()
+					<< ", time cost: " << end - begin
+					<< " seconds\r\n";
+			}
 		}
 	};
 

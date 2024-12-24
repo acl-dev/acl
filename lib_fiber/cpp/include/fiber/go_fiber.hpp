@@ -54,7 +54,7 @@ public:
 			fn();
 			box.push(NULL);
 		};
-		() box.pop();
+		(void) box.pop();
 	}
 
 	void operator << (std::function<void()> fn) {
@@ -66,7 +66,7 @@ public:
 		});
 
 		thread.detach();
-		() box.pop();
+		(void) box.pop();
 	}
 
 private:
