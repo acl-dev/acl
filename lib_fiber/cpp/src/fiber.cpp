@@ -292,6 +292,8 @@ void fiber::schedule_gui()
 {
 	acl_fiber_schedule_init(1);
 	acl_fiber_schedule_set_event(FIBER_EVENT_WMSG);
+	winapi_hook();
+
 	if (backend_fiber == NULL) {
 		backend_fiber = new gui_backend;
 		backend_fiber->start();
@@ -410,6 +412,7 @@ void fiber::stackshow(const fiber& fb, size_t max /* = 50 */)
 //////////////////////////////////////////////////////////////////////////////
 
 fiber_timer::fiber_timer()
+: f_(NULL)
 {
 }
 

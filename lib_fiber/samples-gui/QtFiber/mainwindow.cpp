@@ -12,7 +12,6 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::MainWindow)
-    , process_(new QProcess(this))
 {
     ui_->setupUi(this);
     stamp_ = new struct timeval;
@@ -209,6 +208,7 @@ void MainWindow::onStartSchedule()
     ui_->stopSchedule->setEnabled(true);
     ui_->urlGet->setEnabled(true);
     ui_->startServer->setEnabled(true);
+    ui_->startSchedule->setEnabled(false);
 
     qDebug() << "Begin schedule_gui!";
     acl::fiber::schedule_gui();
@@ -238,8 +238,12 @@ void MainWindow::onStopSchedule()
 void MainWindow::onHttpOptions()
 {
     go[this] {
-        qDebug() << "Sleep 5 seconds before starting http options dialog";
-        acl::fiber::delay(5000);
+        QMessageBox::information(this, "HttpOptions", "Options Window will be opened after 5 seconds.");
+        ui_->progress->setValue(0);
+        for (int i = 1; i < 6; i++) {
+            acl::fiber::delay(1000);
+            ui_->progress2->setValue(20 * i);
+        }
 
         InputDialog dialog(this);
         QRect mainWindowGeometry = this->frameGeometry();

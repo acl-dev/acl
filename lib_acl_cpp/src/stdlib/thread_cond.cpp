@@ -23,19 +23,19 @@ thread_cond::thread_cond(thread_mutex* mutex)
 	acl_pthread_cond_init(cond_, NULL);
 }
 
-thread_cond::~thread_cond(void)
+thread_cond::~thread_cond()
 {
 	acl_pthread_cond_destroy(cond_);
 	acl_myfree(cond_);
 	delete mutex_internal_;
 }
 
-bool thread_cond::notify(void)
+bool thread_cond::notify()
 {
 	return acl_pthread_cond_signal(cond_) == 0;
 }
 
-bool thread_cond::notify_all(void)
+bool thread_cond::notify_all()
 {
 	return acl_pthread_cond_broadcast(cond_) == 0;
 }
@@ -122,15 +122,15 @@ bool thread_cond::timed_wait(long long microseconds, bool locked)
 		return false;
 	}
 
-	return ret == 0 ? true : false;
+	return ret == 0;
 }
 
-thread_mutex& thread_cond::get_mutex(void) const
+thread_mutex& thread_cond::get_mutex() const
 {
 	return *mutex_;
 }
 
-acl_pthread_cond_t* thread_cond::get_cond(void) const
+acl_pthread_cond_t* thread_cond::get_cond() const
 {
 	return cond_;
 }

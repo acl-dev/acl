@@ -8,11 +8,10 @@ struct ACL_VSTRING;
 
 namespace acl {
 
-class ACL_CPP_API charset_conv : public pipe_stream
-{
+class ACL_CPP_API charset_conv : public pipe_stream {
 public:
-	charset_conv(void);
-	~charset_conv(void);
+	charset_conv();
+	~charset_conv();
 
 	/**
 	 * 设置是否允许将无效的字符集直接拷贝
@@ -37,13 +36,13 @@ public:
 	 * 如果转换失败, 该函数返回出错原因
 	 * @return {const char*} 出错原因
 	 */
-	const char* serror(void) const;
+	const char* serror() const;
 
 	/**
 	 * 重置转码状态, 该解析器便可重复使用, 但在再次使用前需要调用
 	 * set(from, to) 设置源字符集与目标字符集
 	 */
-	void reset(void);
+	void reset();
 
 	/* 流式分析过程：update_begin->update->update ... ->update_finish */
 

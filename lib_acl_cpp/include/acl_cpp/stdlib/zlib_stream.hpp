@@ -10,8 +10,7 @@ namespace acl {
  * 压缩级别类型定义，该集合定义了压缩速度及压缩比的一个可选方式
  * 所选的压缩值越高，则压缩比会更大，但压缩速度会越低
  */
-typedef enum
-{
+typedef enum {
 	zlib_default = -1,      // 缺省的压缩比
 	zlib_level0 = 0,        // 最低的压缩比，其实就是不压缩
 	zlib_best_speed = 1,    // 压缩速度最快的压缩比
@@ -31,8 +30,7 @@ typedef enum
  * 压缩过程中的压缩窗口参数类型，值越大则压缩效果越好且占用内存越多，
  * 针对 HTTP 压缩传输，需要设置这些值的负值：-zlib_wbits_t
  */
-enum
-{
+enum {
 	zlib_wbits_8  = 8,
 	zlib_wbits_9  = 9,
 	zlib_wbits_10 = 10,
@@ -46,8 +44,7 @@ enum
 /**
  * 压缩过程中的内存分配策略，值越大使用内存越多
  */
-typedef enum
-{
+typedef enum {
 	zlib_mlevel_1 = 1,
 	zlib_mlevel_2 = 2,
 	zlib_mlevel_3 = 3,
@@ -63,8 +60,7 @@ typedef enum
  * 压缩或解压过程中的缓存模式，即在压缩或解压过程中是否立刻刷新
  * 到缓冲区为了获得比较高的压缩比，应该选择 zlib_flush_off 方式
  */
-typedef enum
-{
+typedef enum {
 	zlib_flush_off = 0,     // 不立即刷新至用户缓存
 	zlib_flush_partial = 1, // 刷新部分至用户缓存
 	zlib_flush_sync = 2,    // 同步刷新
@@ -72,8 +68,7 @@ typedef enum
 	zlib_flush_finish = 4   // 完全刷新并停止压缩或解压过程
 } zlib_flush_t;
 
-enum
-{
+enum {
 	zlib_flags_zip_begin   = 1,
 	zlib_flags_zip_end     = 1 << 1,
 	zlib_flags_unzip_begin = 1 << 2,
@@ -82,11 +77,10 @@ enum
 
 class string;
 
-class ACL_CPP_API zlib_stream : public pipe_stream
-{
+class ACL_CPP_API zlib_stream : public pipe_stream {
 public:
-	zlib_stream(void);
-	~zlib_stream(void);
+	zlib_stream();
+	~zlib_stream();
 
 	/**
 	 * 非流式压缩
@@ -172,16 +166,15 @@ public:
 	 * 判断压缩过程是否已经完成
 	 * @return {bool}
 	 */
-	bool zip_finished(void) const
-	{
-		return (zlib_flags_ & zlib_flags_zip_end) ? true : false;
+	bool zip_finished() const {
+		return (zlib_flags_ & zlib_flags_zip_end) != 0;
 	}
 
 	/**
 	 * 重置压缩器状态，一般只有当压缩过程出错时才会调用本函数
 	 * @return {bool} 是否成功
 	 */
-	bool zip_reset(void);
+	bool zip_reset();
 
 	/**
 	 * 在压缩过程中可使用此函数计算数据的 crc32 校验值
@@ -239,23 +232,21 @@ public:
 	 * 判断解压过程是否已经完成
 	 * @return {bool}
 	 */
-	bool unzip_finished(void) const
-	{
-		return (zlib_flags_ & zlib_flags_unzip_end) ? true : false;
+	bool unzip_finished() const {
+		return (zlib_flags_ & zlib_flags_unzip_end) != 0;
 	}
 
 	/**
 	 * 重置解压缩器状态，一般只有当解压缩过程出错时才会调用本函数
 	 * @return {bool} 是否成功
 	 */
-	bool unzip_reset(void);
+	bool unzip_reset();
 
 	/**
 	 * 获得当前的 zstream 对象
 	 * @return {z_stream*}
 	 */
-	z_stream* get_zstream(void) const
-	{
+	z_stream* get_zstream() const {
 		return zstream_;
 	}
 
@@ -268,7 +259,7 @@ public:
 	 * 当设置了动态库的动态加载全路径时，可以通过本函数获得动态库加载全路径
 	 * @return {const char*} 当未设置时则返回 NULL
 	 */
-	static const char* get_loadpath(void);
+	static const char* get_loadpath();
 
 	/**
 	 * 手动调用动态加载 zlib 库方法，如果为静态链接，则无需调用本方法，
@@ -278,7 +269,7 @@ public:
 	 * 线程调用也是安全的
 	 * @return {bool} 加载是否成功
 	 */
-	static bool zlib_load_once(void);
+	static bool zlib_load_once();
 
 	///////////////////////////////////////////////////////////////
 
@@ -291,7 +282,7 @@ public:
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear(void);
+	virtual void clear();
 
 private:
 	z_stream* zstream_;

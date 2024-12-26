@@ -17,10 +17,9 @@
 # endif
 #endif
 
-namespace acl
-{
+namespace acl {
 
-scan_dir::scan_dir(void)
+scan_dir::scan_dir()
 : path_(NULL)
 , scan_(NULL)
 , path_buf_(NULL)
@@ -28,14 +27,14 @@ scan_dir::scan_dir(void)
 {
 }
 
-scan_dir::~scan_dir(void)
+scan_dir::~scan_dir()
 {
 	close();
 	delete path_buf_;
 	delete file_buf_;
 }
 
-void scan_dir::close(void)
+void scan_dir::close()
 {
 	if (path_) {
 		acl_myfree(path_);
@@ -233,7 +232,7 @@ const char* scan_dir::next(bool full /* = false */, bool* is_file /* = NULL */)
 	return file_buf_->c_str();
 }
 
-const char* scan_dir::curr_path(void)
+const char* scan_dir::curr_path()
 {
 	if (scan_ == NULL) {
 		return NULL;
@@ -314,7 +313,7 @@ const char* scan_dir::curr_file(bool full /* = false */)
 	return file_buf_->c_str();
 }
 
-size_t scan_dir::dir_count(void) const
+size_t scan_dir::dir_count() const
 {
 	if (scan_ == NULL) {
 		return 0;
@@ -322,7 +321,7 @@ size_t scan_dir::dir_count(void) const
 	return acl_scan_dir_ndirs(scan_);
 }
 
-size_t scan_dir::file_count(void) const
+size_t scan_dir::file_count() const
 {
 	if (scan_ == NULL) {
 		return 0;
@@ -330,7 +329,7 @@ size_t scan_dir::file_count(void) const
 	return acl_scan_dir_nfiles(scan_);
 }
 
-acl_uint64 scan_dir::scaned_size(void) const
+acl_uint64 scan_dir::scaned_size() const
 {
 	if (scan_ == NULL) {
 		return 0;

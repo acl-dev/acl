@@ -205,8 +205,7 @@ static void __zlib_dll_load(void)
 #  define __crc32               crc32
 # endif
 
-namespace acl
-{
+namespace acl {
 
 static void* __zlib_calloc(void* ctx acl_unused,
 	unsigned int nitem, unsigned int size)
@@ -228,12 +227,12 @@ void zlib_stream::set_loadpath(const char* path)
 	}
 }
 
-const char* zlib_stream::get_loadpath(void)
+const char* zlib_stream::get_loadpath()
 {
 	return __loadpath.empty() ? NULL : __loadpath.c_str();
 }
 
-bool zlib_stream::zlib_load_once(void)
+bool zlib_stream::zlib_load_once()
 {
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
@@ -251,7 +250,7 @@ bool zlib_stream::zlib_load_once(void)
 #endif
 }
 
-zlib_stream::zlib_stream(void)
+zlib_stream::zlib_stream()
 {
 	zlib_flags_      = 0;
 	finished_        = false;
@@ -270,7 +269,7 @@ zlib_stream::zlib_stream(void)
 #endif
 }
 
-zlib_stream::~zlib_stream(void)
+zlib_stream::~zlib_stream()
 {
 	if ((zlib_flags_ & zlib_flags_zip_begin)
 		  && !(zlib_flags_ & zlib_flags_zip_end)) {
@@ -610,7 +609,7 @@ bool zlib_stream::zip_finish(string* out)
 	return ret;
 }
 
-bool zlib_stream::zip_reset(void)
+bool zlib_stream::zip_reset()
 {
 #ifdef  HAS_ZLIB
 # if defined(ACL_CPP_DLL) || defined(HAS_ZLIB_DLL)
@@ -620,7 +619,7 @@ bool zlib_stream::zip_reset(void)
 	}
 # endif
 #endif
-	return __deflateEnd(zstream_) == Z_OK ? true : false;
+	return __deflateEnd(zstream_) == Z_OK;
 }
 
 unsigned zlib_stream::crc32_update(unsigned n, const void* buf, size_t dlen)
@@ -711,7 +710,7 @@ bool zlib_stream::unzip_reset()
 	}
 # endif
 #endif
-	return __inflateEnd(zstream_) == Z_OK ? true : false;
+	return __inflateEnd(zstream_) == Z_OK;
 }
 
 bool zlib_stream::pipe_zip_begin(zlib_level_t level /* = zlib_default */,
@@ -769,7 +768,7 @@ int zlib_stream::pop_end(string* out, size_t max /* = 0 */ acl_unused)
 	return (int) (out->length() - n);
 }
 
-void zlib_stream::clear(void)
+void zlib_stream::clear()
 {
 	if (is_compress_) {
 		zip_reset();

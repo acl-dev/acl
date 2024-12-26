@@ -3,16 +3,14 @@
 
 struct ACL_SCAN_DIR;
 
-namespace acl
-{
+namespace acl {
 
 class string;
 
-class ACL_CPP_API scan_dir : public noncopyable
-{
+class ACL_CPP_API scan_dir : public noncopyable {
 public:
-	scan_dir(void);
-	virtual ~scan_dir(void);
+	scan_dir();
+	virtual ~scan_dir();
 
 	/**
 	 * 打开目录
@@ -34,7 +32,7 @@ public:
 	/**
 	 * 关闭目录，同时释放内部资源
 	 */
-	void close(void);
+	void close();
 
 	/**
 	 * 扫描下一个文件(遇到目录会自动跳过)，当在 open 指定了允许递归扫描选项
@@ -157,8 +155,7 @@ public:
 	static bool get_cwd(string& out);
 
 public:
-	ACL_SCAN_DIR* get_scan_dir(void) const
-	{
+	ACL_SCAN_DIR* get_scan_dir() const {
 		return scan_;
 	}
 

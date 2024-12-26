@@ -83,10 +83,10 @@ ifeq ($(findstring Linux, $(UNIXNAME)), Linux)
 #	CFLAGS += -DLINUX2
 	SYSLIB += -lcrypt -rdynamic -ldl -lrt
 	ifeq ($(HAS_IO_URING), yes)
-		SYSLIB += -luring-ffi
+		SYSLIB += -luring-ffi -Wl,-rpath,/usr/lib
 	endif
 	ifeq ($(has_io_uring), yes)
-		SYSLIB += -luring-ffi
+		SYSLIB += -luring-ffi -Wl,-rpath,/usr/lib
 	endif
 	ifeq ($(DEBUG_STACK), yes)
 		SYSLIB += -lunwind -lunwind-generic

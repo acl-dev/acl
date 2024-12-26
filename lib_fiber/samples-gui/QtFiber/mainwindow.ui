@@ -245,6 +245,19 @@
      </font>
     </property>
    </widget>
+   <widget class="QProgressBar" name="progress2">
+    <property name="geometry">
+     <rect>
+      <x>1270</x>
+      <y>630</y>
+      <width>591</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="value">
+     <number>0</number>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

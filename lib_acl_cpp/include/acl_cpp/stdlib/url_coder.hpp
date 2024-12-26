@@ -7,8 +7,7 @@ namespace acl {
 
 class string;
 
-struct URL_NV
-{
+struct URL_NV {
 	char* name;
 	char* value;
 };

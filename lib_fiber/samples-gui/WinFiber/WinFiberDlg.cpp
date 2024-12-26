@@ -181,7 +181,7 @@ void CWinFiberDlg::Uni2Str(const CString& in, acl::string& out)
 		buf, len, NULL, NULL);
 	buf[len] = 0;
 	out = buf;
-	delete buf;
+	delete []buf;
 }
 
 void CWinFiberDlg::InitFiber(void)

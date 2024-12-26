@@ -76,6 +76,9 @@ bool file_tmpl::create_common()
 	if (!copy_and_replace("Makefile", "Makefile")) {
 		return false;
 	}
+	if (!copy_and_replace("CMakeLists.txt", "CMakeLists.txt")) {
+		return false;
+	}
 	if (!copy_and_replace("valgrind.sh", "valgrind.sh", true)) {
 		return false;
 	}

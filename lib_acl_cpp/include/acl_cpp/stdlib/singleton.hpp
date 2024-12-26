@@ -66,16 +66,13 @@ namespace acl {
 // attempt to retieve a mutable instances while locked will
 // generate a assertion if compiled for debug.
 
-class singleton_module : public noncopyable
-{
+class singleton_module : public noncopyable {
 public:
-	static void lock()
-	{
+	static void lock() {
 		get_lock() = true;
 	}
 
-	static void unlock()
-	{
+	static void unlock() {
 		get_lock() = false;		
 	}
 
@@ -83,20 +80,17 @@ public:
 		return get_lock();
 	}
 private:
-	static bool& get_lock()
-	{
+	static bool& get_lock() {
 		static bool lock_ = false;
 		return lock_;
 	}
 };
 
 template<class T>
-class singleton_wrapper : public T
-{
+class singleton_wrapper : public T {
 public:
 	static bool destroyed_;
-	~singleton_wrapper()
-	{
+	~singleton_wrapper() {
 		destroyed_ = true;
 	}
 };
@@ -110,16 +104,14 @@ bool singleton_wrapper< T >::destroyed_ = false;
  * 开关，则有可能是线程不安全的，此时不能保证单例对象的构造函数在
  * main 之前执行.
  * 使用举例如下：
- * class singleton_test : public acl::singleton<singlegon_test>
- * {
+ * class singleton_test : public acl::singleton<singlegon_test> {
  * public:
  *   singleton_test() {}
  *   ~singleton_test() {}
  *   singleton_test& init() { return *this; }
  * };
 
- * int main()
- * {
+ * int main() {
  *   singleton_test& test = singleton_test::get_instance();
  *   test.init();
  *   ...
@@ -127,11 +119,9 @@ bool singleton_wrapper< T >::destroyed_ = false;
  * }
  */
 template <class T>
-class singleton : public singleton_module
-{
+class singleton : public singleton_module {
 public:
-	static T& get_instance()
-	{
+	static T& get_instance() {
 		static singleton_wrapper< T > t;
 		// refer to instance, causing it to be instantiated (and
 		// initialized at startup on working compilers)
@@ -140,8 +130,7 @@ public:
 		return static_cast<T &>(t);
 	}
 
-	static bool is_destroyed()
-	{
+	static bool is_destroyed() {
 		return singleton_wrapper< T >::destroyed_;
 	}
 
@@ -160,16 +149,14 @@ T& singleton< T >::instance_ = singleton< T >::get_instance();
  * 上面的实现在 VC2003 的 release 编译时如果打开了优化开关，则不能保证单例
  * 的构造函数先于 main 执行，如果是在 VC2003 下编译单例程序且在多个线程下
  * 都用单例对象时，建议使用如下的单例模板类，示例如下：
- * class singleton_test
- * {
+ * class singleton_test {
  * public:
  *   singleton_test() {}
  *   ~singleton_test() {}
  *   singleton_test& init() { return *this; }
  * };
 
- * int main()
- * {
+ * int main() {
  *   singleton_test& test = acl::singleton2<singleton_test>::get_instance();
  *   test.init();
  *   ...
@@ -178,11 +165,9 @@ T& singleton< T >::instance_ = singleton< T >::get_instance();
  * 
  */
 template <typename T>
-struct singleton2
-{
+struct singleton2 {
 private:
-	struct object_creator
-	{
+	struct object_creator {
 		object_creator() { singleton2<T>::get_instance(); }
 		inline void do_nothing() const {};
 	};
@@ -190,8 +175,7 @@ private:
 
 public:
 	typedef T object_type;
-	static object_type & get_instance()
-	{
+	static object_type & get_instance() {
 		static object_type obj;
 		create_object.do_nothing();
 		return obj;

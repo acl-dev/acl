@@ -4,19 +4,17 @@
 #include <vector>
 #include "noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
 class diff_object;
 
 /**
  * 求两个集合的差集的管理器
  */
-class diff_manager : public noncopyable
-{
+class diff_manager : public noncopyable {
 public:
 	diff_manager(long long range_from = -1, long long range_to = -1);
-	~diff_manager(void);
+	~diff_manager();
 
 	/**
 	 * 获得内部创建的内存池对象
@@ -24,7 +22,7 @@ public:
 	 *  对象必须在 diff_manager 对象销毁前销毁，因为 diff_manager 销毁时
 	 *  该内建内存池会自动销毁
 	 */
-	dbuf_guard& get_dbuf(void);
+	dbuf_guard& get_dbuf();
 
 	/**
 	 * 比较两个集合的差集，从而获得两个集合新增的对象集合、删除的对象集合
@@ -40,8 +38,7 @@ public:
 	 * 获得新增的对象集合
 	 * @return {std::vector<diff_object*>&}
 	 */
-	const std::vector<diff_object*>& get_new(void) const
-	{
+	const std::vector<diff_object*>& get_new() const {
 		return objs_new_;
 	}
 
@@ -50,8 +47,7 @@ public:
 	 * 在当前集合中不存在的（即被删除的）元素集合
 	 * @return {std::vector<diff_object*>&}
 	 */
-	const std::vector<diff_object*>& get_deleted(void) const
-	{
+	const std::vector<diff_object*>& get_deleted() const {
 		return objs_del_;
 	}
 
@@ -73,8 +69,7 @@ public:
 	 *  		(*cit).second->get_val());
 	 */
 	const std::vector<std::pair<diff_object*, diff_object*> >&
-		get_updated(void) const
-	{
+		get_updated() const {
 		return objs_upd_;
 	}
 
@@ -82,8 +77,7 @@ public:
 	 * 当 diff_manger 进行差异华比较成功后，本函数用于返回相同对象的集合
 	 * @return {std::vector<diff_object*>&}
 	 */
-	const std::vector<diff_object*>& get_same(void) const
-	{
+	const std::vector<diff_object*>& get_same() const {
 		return objs_equ_;
 	}
 
@@ -91,8 +85,7 @@ public:
 	 * 获得新增的不在指定区间范围内的对象集合
 	 * @return {const std::vector<diff_object*>&}
 	 */
-	const std::vector<diff_object*>& get_extra_added(void) const
-	{
+	const std::vector<diff_object*>& get_extra_added() const {
 		return objs_new_extra_;
 	}
 
@@ -100,8 +93,7 @@ public:
 	 * 获得删除的不在指定区间范围内的对象集合
 	 * @return {const std::vector<diff_object*>&}
 	 */
-	const std::vector<diff_object*>& get_extra_deleted(void) const
-	{
+	const std::vector<diff_object*>& get_extra_deleted() const {
 		return objs_del_extra_;
 	}
 
@@ -110,8 +102,7 @@ public:
 	 * @return {const std::vector<diff_object*>&}
 	 */
 	const std::vector<std::pair<diff_object*, diff_object*> >&
-		get_extra_updated(void) const
-	{
+		get_extra_updated() const {
 		return objs_upd_extra_;
 	}
 
@@ -119,7 +110,7 @@ public:
 	 * 当重复使用本 diff_manager 进行差异化比较时，需要调用本方法来清空
 	 * 上一次比较过程中产生的临时内存及对象
 	 */
-	void reset(void);
+	void reset();
 
 private:
 	dbuf_guard dbuf_;

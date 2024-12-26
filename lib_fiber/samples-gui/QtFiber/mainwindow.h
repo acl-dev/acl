@@ -57,7 +57,6 @@ private:
     Ui::MainWindow *ui_;
 
     fiber_server   *server_ = nullptr;
-    QProcess       *process_;
     struct timeval *stamp_;
 
     std::string url_ = "http://www.baidu.com/";

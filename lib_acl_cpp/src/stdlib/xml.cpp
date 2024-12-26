@@ -9,19 +9,19 @@
 namespace acl {
 
 xml_node::xml_node(xml* xml_ptr)
-	: xml_(xml_ptr)
+: xml_(xml_ptr)
 {
 	if (xml_ptr == NULL) {
 		abort();
 	}
 }
 
-xml_node::~xml_node(void)
+xml_node::~xml_node()
 {
 	clear();
 }
 
-void xml_node::clear(void)
+void xml_node::clear()
 {
 	std::vector<xml_node*>::iterator it = nodes_tmp_.begin();
 	for (; it != nodes_tmp_.end(); ++it) {
@@ -36,7 +36,7 @@ void xml_node::clear(void)
 	attrs_tmp_.clear();
 }
 
-xml& xml_node::get_xml(void) const
+xml& xml_node::get_xml() const
 {
 	return *xml_;
 }
@@ -131,7 +131,7 @@ xml::xml(size_t dbuf_nblock /* = 2 */, size_t dbuf_capacity /* = 100 */)
 	m_pTokenTree = NULL;
 }
 
-xml::~xml(void)
+xml::~xml()
 {
 	clear();
 
@@ -141,7 +141,7 @@ xml::~xml(void)
 	}
 }
 
-void xml::clear(void)
+void xml::clear()
 {
 	if (buf_) {
 		buf_->clear();
@@ -160,7 +160,7 @@ void xml::clear(void)
 	dbuf_.dbuf_reset();
 }
 
-const acl::string& xml::getText(void)
+const acl::string& xml::getText()
 {
 	if (buf_ == NULL)
 		buf_ = NEW string();

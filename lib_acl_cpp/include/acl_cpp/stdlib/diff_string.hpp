@@ -2,11 +2,9 @@
 #include "../acl_cpp_define.hpp"
 #include "diff_object.hpp"
 
-namespace acl
-{
+namespace acl {
 
-class diff_string : public diff_object
-{
+class diff_string : public diff_object {
 public:
 	/**
 	 * 构造函数
@@ -26,17 +24,16 @@ public:
 	 * 获得本对象所在的区间值
 	 * @return {long long}
 	 */
-	long long get_range(void) const
-	{
+	long long get_range() const {
 		return range_;
 	}
 
 public:
 	// override: 基类纯虚函数的实现
-	const char* get_key(void) const;
+	const char* get_key() const;
 
 	// override: 基类纯虚函数的实现
-	const char* get_val(void) const;
+	const char* get_val() const;
 
 	// override: 基类纯函数的实现
 	bool operator== (const diff_object& obj) const;
@@ -50,7 +47,7 @@ private:
 	long long range_;
 
 	// 析构函数声明为私有的，从而要求动态创建本类对象
-	~diff_string(void);
+	~diff_string();
 };
 
 } // namespace acl

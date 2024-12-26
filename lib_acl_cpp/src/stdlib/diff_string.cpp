@@ -4,8 +4,7 @@
 #include "acl_cpp/stdlib/diff_string.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 diff_string::diff_string(diff_manager& manager, const char* key, const char* val)
 : diff_object(manager)
@@ -16,16 +15,16 @@ diff_string::diff_string(diff_manager& manager, const char* key, const char* val
 	val_ = dbuf.dbuf_strdup(val);
 }
 
-diff_string::~diff_string(void)
+diff_string::~diff_string()
 {
 }
 
-const char* diff_string::get_val(void) const
+const char* diff_string::get_val() const
 {
 	return val_;
 }
 
-const char* diff_string::get_key(void) const
+const char* diff_string::get_key() const
 {
 	return key_;
 }
@@ -34,7 +33,7 @@ bool diff_string::operator== (const diff_object& obj) const
 {
 	const diff_string& o = (const diff_string&) obj;
 
-	return strcmp(o.val_, val_) == 0 ? true : false;
+	return strcmp(o.val_, val_) == 0;
 }
 
 bool diff_string::check_range(long long range_from, long long range_to) const

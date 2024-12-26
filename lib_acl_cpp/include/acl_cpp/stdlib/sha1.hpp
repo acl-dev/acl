@@ -24,11 +24,9 @@
 #pragma once
 #include "noncopyable.hpp"
 
-namespace acl
-{
+namespace acl {
 
-class sha1 : public noncopyable
-{
+class sha1 : public noncopyable {
 public:
 	sha1();
 	virtual ~sha1();

@@ -4,8 +4,7 @@
 #include "acl_cpp/stdlib/diff_manager.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 diff_manager::diff_manager(long long range_from /* = -1 */,
 	long long range_to /* = -1 */)
@@ -22,16 +21,16 @@ diff_manager::diff_manager(long long range_from /* = -1 */,
 	}
 }
 
-diff_manager::~diff_manager(void)
+diff_manager::~diff_manager()
 {
 }
 
-acl::dbuf_guard& diff_manager::get_dbuf(void)
+acl::dbuf_guard& diff_manager::get_dbuf()
 {
 	return dbuf_;
 }
 
-void diff_manager::reset(void)
+void diff_manager::reset()
 {
 	objs_new_.clear();
 	objs_del_.clear();

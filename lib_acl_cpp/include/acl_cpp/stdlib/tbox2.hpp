@@ -61,7 +61,7 @@ public:
 	 * @override
 	 */
 	bool push(T t, bool notify_first = true) {
-		if (lock_.lock() == false) {
+		if (! lock_.lock()) {
 			abort();
 		}
 
@@ -69,17 +69,17 @@ public:
 		size_++;
 
 		if (notify_first) {
-			if (cond_.notify() == false) {
+			if (!cond_.notify()) {
 				abort();
 			}
-			if (lock_.unlock() == false) {
+			if (!lock_.unlock()) {
 				abort();
 			}
 		} else {
-			if (lock_.unlock() == false) {
+			if (!lock_.unlock()) {
 				abort();
 			}
-			if (cond_.notify() == false) {
+			if (!cond_.notify()) {
 				abort();
 			}
 		}
@@ -97,12 +97,12 @@ public:
 	 */
 	bool pop(T& t, int wait_ms = -1) {
 		long long n = ((long long) wait_ms) * 1000;
-		if (lock_.lock() == false) {
+		if (!lock_.lock()) {
 			abort();
 		}
 		while (true) {
 			if (peek(t)) {
-				if (lock_.unlock() == false) {
+				if (!lock_.unlock()) {
 					abort();
 				}
 				return true;
@@ -110,7 +110,7 @@ public:
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
 			if (!cond_.wait(n, true) && wait_ms >= 0) {
-				if (lock_.unlock() == false) {
+				if (!lock_.unlock()) {
 					abort();
 				}
 				return false;
@@ -128,13 +128,13 @@ public:
 
 public:
 	void lock() {
-		if (lock_.lock() == false) {
+		if (!lock_.lock()) {
 			abort();
 		}
 	}
 
 	void unlock() {
-		if (lock_.unlock() == false) {
+		if (!lock_.unlock()) {
 			abort();
 		}
 	}

@@ -13,12 +13,12 @@ typedef enum {
 template <typename T>
 class box : public noncopyable {
 public:
-	box(void) {}
-	virtual ~box(void) {}
+	box() {}
+	virtual ~box() {}
 
 	virtual bool push(T* o, bool notify_first = true) = 0;
 	virtual T* pop(int wait_ms = -1, bool* bound = NULL) = 0;
-	virtual bool has_null(void) const = 0;
+	virtual bool has_null() const = 0;
 };
 
 } // namespace acl

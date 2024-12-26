@@ -4,11 +4,9 @@
 
 struct ACL_AQUEUE;
 
-namespace acl
-{
+namespace acl {
 
-class ACL_CPP_API thread_qitem : public noncopyable
-{
+class ACL_CPP_API thread_qitem : public noncopyable {
 public:
 	thread_qitem() {}
 	virtual ~thread_qitem() {}

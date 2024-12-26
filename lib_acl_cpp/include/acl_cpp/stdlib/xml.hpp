@@ -22,28 +22,27 @@ class xml;
 class xml_node;
 class istream;
 
-class ACL_CPP_API xml_attr : public dbuf_obj
-{
+class ACL_CPP_API xml_attr : public dbuf_obj {
 public:
 	/**
 	 * 获得属性名
 	 * @return {const char*} 属性名，永远不会返回空指针，返回值
 	 *  有可能为 "\0"
 	 */
-	virtual const char* get_name(void) const = 0;
+	virtual const char* get_name() const = 0;
 
 	/**
 	 * 获得属性值
 	 * @return {const char*} 属性值，永远不会返回空指针，返回值
 	 *  有可能为 "\0"
 	 */
-	virtual const char* get_value(void) const = 0;
+	virtual const char* get_value() const = 0;
 
 protected:
 	friend class xml_node;
 
 	xml_attr(xml_node* node) : node_(node) {}
-	virtual ~xml_attr(void) {}
+	virtual ~xml_attr() {}
 
 	xml_node* node_;
 };
@@ -56,19 +55,19 @@ public:
 	 * @return {const char*} 返回 XML 节点标签名，如果返回空，则说明
 	 *  不存在标签 xxxx，以防万一，调用者需要判断返回值
 	 */
-	virtual const char* tag_name(void) const = 0;
+	virtual const char* tag_name() const = 0;
 
 	/**
 	 * 如果该 XML 节点的 ID 号属性不存在，则返回空指针
 	 * @return {const char*} 当 ID 属性存在时返回对应的值，否则返回空
 	 */
-	virtual const char* id(void) const = 0;
+	virtual const char* id() const = 0;
 
 	/**
 	 * 返回该 XML 节点的正文内容
 	 * @return {const char*} 返回空说明没有正文内容
 	 */
-	virtual const char* text(void) const = 0;
+	virtual const char* text() const = 0;
 
 	/**
 	 * 返回该 XML 节点的某个属性值
@@ -89,14 +88,14 @@ public:
 	 * @return {const xml_attr*} 返回第一个属性对象，若为空，则表示
 	 *  该节点没有属性
 	 */
-	virtual const xml_attr* first_attr(void) const = 0;
+	virtual const xml_attr* first_attr() const = 0;
 
 	/**
 	 * 遍历节点的所有属性时，调用本函数获得下一个属性对象
 	 * @return {const xml_attr*} 返回下一下属性对象，若为空，则表示
 	 *  遍历完毕
 	 */
-	virtual const xml_attr* next_attr(void) const = 0;
+	virtual const xml_attr* next_attr() const = 0;
 
 	/**
 	 * 添加 XML 节点属性
@@ -246,7 +245,7 @@ public:
 	 * 获得本节点的父级节点对象的引用
 	 * @return {xml_node&}
 	 */
-	virtual xml_node& get_parent(void) const = 0;
+	virtual xml_node& get_parent() const = 0;
 
 	/**
 	 * 设置本节点的父级节点
@@ -259,37 +258,37 @@ public:
 	 * 将本节点及其子节点从 xml 树中分离，其内存将由 xml 对象统一释放
 	 * @return {int} 返回被释放的节点个数
 	 */
-	virtual int detach(void) = 0;
+	virtual int detach() = 0;
 
 	/**
 	 * 获得本节点的第一个子节点，需要遍历子节点时必须首先调用此函数
 	 * @return {xml_node*} 返回空表示没有子节点
 	 */
-	virtual xml_node* first_child(void) = 0;
+	virtual xml_node* first_child() = 0;
 
 	/**
 	 * 获得本节点的下一个子节点
 	 * @return {xml_node*} 返回空表示遍历过程结束
 	 */
-	virtual xml_node* next_child(void) = 0;
+	virtual xml_node* next_child() = 0;
 
 	/**
 	 * 返回该 XML 节点在整个 XML 树中的深度
 	 * @return {int}
 	 */
-	virtual int depth(void) const = 0;
+	virtual int depth() const = 0;
 
 	/**
 	 * 判断当前节点是否为 xml 对象中的 root 节点
 	 * @return {bool}
 	 */
-	virtual bool is_root(void) const = 0;
+	virtual bool is_root() const = 0;
 
 	/**
 	 * 返回该 xml 节点的下一级子节点的个数
 	 * @return {int} 永远 >= 0
 	 */
-	virtual int children_count(void) const = 0;
+	virtual int children_count() const = 0;
 
 	/**
 	 * 当在遍历该 xml 节点时，内部会动态产生一些临时 xml_node 对象，调用
@@ -297,13 +296,13 @@ public:
 	 * first_child/next_child 返回的 xml_node 节点对象将不再可用，否则会
 	 * 产生内存非法访问
 	 */
-	void clear(void);
+	void clear();
 
 	/**
 	 * 获得 xml 对象的引用
 	 * @return {xml&}
 	 */
-	xml& get_xml(void) const;
+	xml& get_xml() const;
 
 protected:
 	friend class xml;
@@ -318,7 +317,7 @@ protected:
 	/**
 	 * 要求该对象必须是动态创建的
 	 */
-	virtual ~xml_node(void);
+	virtual ~xml_node();
 
 protected:
 	xml* xml_;
@@ -336,7 +335,7 @@ public:
 	 * @param dbuf_capacity {size_t} 内部所用 dbuf_guard 的初始化参数
 	 */
 	xml(size_t dbuf_nblock = 2, size_t dbuf_capacity = 100);
-	virtual ~xml(void);
+	virtual ~xml();
 
 	/**
 	 * 对于非闭合的标签，是否需要忽略闭合字符 '/'，缺省为不忽略
@@ -390,14 +389,14 @@ public:
 	 * 进行解析，在反复使用本 XML 解析器前，需要调用本函数重置
 	 * 内部 XML 解析器状态，清除上一次的解析结果
 	 */
-	virtual void reset(void) = 0;
+	virtual void reset() = 0;
 
 	/**
 	 * 从解析的 XML 原始数据中仅提取文本部分
 	 * @return {const string&} 返回结果缓冲区的引用，该引用是内
 	 *  部变量，用户不需要释放
 	 */
-	virtual const string& getText(void);
+	virtual const string& getText();
 
 	/**
 	 * 从 XML 对象中取得某个标签名的所有节点集合
@@ -515,7 +514,7 @@ public:
 	 * 它是所有 xml 节点对象的最顶层父对象
 	 * @return {xml_node&}
 	 */
-	virtual xml_node& get_root(void) = 0;
+	virtual xml_node& get_root() = 0;
 
 	/**
 	 * 开始遍历该 xml 对象并获得第一个节点
@@ -523,7 +522,7 @@ public:
 	 *  注：返回的节点对象用户不能手工释放，因为该对象被
 	 *  内部库自动释放
 	 */
-	virtual xml_node* first_node(void) = 0;
+	virtual xml_node* first_node() = 0;
 
 	/**
 	 * 遍历该 xml 对象的下一个 xml 节点
@@ -531,7 +530,7 @@ public:
 	 *  注：返回的节点对象用户不能手工释放，因为该对象被
 	 *  内部库自动释放
 	 */
-	virtual xml_node* next_node(void) = 0;
+	virtual xml_node* next_node() = 0;
 
 	/**
 	 * 将 xml 对象树转成字符串
@@ -550,24 +549,24 @@ public:
 	 * 获得当前 xml 对象已经分配的内存大小总和
 	 * @return {size_t}
 	 */
-	virtual size_t space(void) const = 0;
+	virtual size_t space() const = 0;
 
 	/**
 	 * 将记录 xml 已分配内存大小的变量清 0
 	 */
-	virtual void space_clear(void) = 0;
+	virtual void space_clear() = 0;
 
 	/**
 	 * 获得当前 xml 对象中 xml 节点的总数
 	 * @return {size_t}
 	 */
-	virtual size_t node_count(void) const = 0;
+	virtual size_t node_count() const = 0;
 
 	/**
 	 * 获得当前 xml 对象中所有 xml 节点属性的总数
 	 * @return {size_t}
 	 */
-	virtual size_t attr_count(void) const = 0;
+	virtual size_t attr_count() const = 0;
 
 public:
 	// pipe_stream 虚函数重载
@@ -575,7 +574,7 @@ public:
 	virtual int push_pop(const char* in, size_t len,
 		string* out, size_t max = 0);
 	virtual int pop_end(string* out, size_t max = 0);
-	virtual void clear(void);
+	virtual void clear();
 
 protected:
 	dbuf_guard dbuf_;
