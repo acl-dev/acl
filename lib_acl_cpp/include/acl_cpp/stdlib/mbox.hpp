@@ -55,7 +55,7 @@ public:
 	 *  未被消费的动态对象
 	 * @param mpsc {bool} 是否为多生产者-单消费者模式
 	 */
-	mbox(bool free_obj = true, bool mpsc = true)
+	explicit mbox(bool free_obj = true, bool mpsc = true)
 	: free_obj_(free_obj)
 	{
 		mbox_ = mbox_create(mpsc);
@@ -80,19 +80,38 @@ public:
 
 	/**
 	 * 接收消息对象
-	 * @param timeout {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
+	 * @param milliseconds {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
 	 *  永远等待直到读到消息对象或出错
 	 * @param success {bool*} 可以用于辅助确定读操作是否成功
 	 * @return {T*} 非 NULL 表示读到一个消息对象，为 NULL 时，还需通过
 	 *  success 参数的返回值检查操作是否成功
 	 * @override
 	 */
-	T* pop(int timeout = -1, bool* success = NULL) {
-		return (T*) mbox_read(mbox_, timeout, success);
+	T* pop(int milliseconds = -1, bool* success = NULL) {
+		return (T*) mbox_read(mbox_, milliseconds, success);
+	}
+
+	// @override
+	size_t pop(std::vector<T*>& out, size_t max, int milliseconds) {
+		size_t n = 0;
+		bool success;
+		while (true) {
+			T* t = (T*) mbox_read(mbox_, milliseconds, &success);
+			if (! t) {
+				return n;
+			}
+
+			out.push_back(t);
+			n++;
+			if (max > 0 && n >= max) {
+				return n;
+			}
+			milliseconds = 0;
+		}
 	}
 
 	/**
-	 * mbox 没有空消息
+	 * mbox 不支持传递空消息
 	 * @return {bool}
 	 * @override
 	 */

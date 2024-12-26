@@ -5,8 +5,7 @@
 #include "acl_cpp/stdlib/mbox.hpp"
 #endif
 
-namespace acl
-{
+namespace acl {
 
 void* mbox_create(bool mpsc)
 {

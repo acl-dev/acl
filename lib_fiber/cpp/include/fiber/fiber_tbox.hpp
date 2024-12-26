@@ -1,7 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <list>
-#include <stdlib.h>
+#include <cstdlib>
 #include "fiber_mutex.hpp"
 #include "fiber_cond.hpp"
 
@@ -45,7 +45,7 @@ public:
 	 * @param free_obj {bool} 当 fiber_tbox 销毁时，是否自动检查并释放
 	 *  未被消费的动态对象
 	 */
-	fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
+	explicit fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
 
 	~fiber_tbox() {
 		clear(free_obj_);
@@ -80,29 +80,19 @@ public:
 	 */
 	bool push(T* t, bool notify_first = true) {
 		// 先加锁
-		if (mutex_.lock() == false) {
-			abort();
-		}
+		if (! mutex_.lock()) { abort(); }
 
 		// 向队列中添加消息对象
 		tbox_.push_back(t);
 		size_++;
 
 		if (notify_first) {
-			if (cond_.notify() == false) {
-				abort();
-			}
-			if (mutex_.unlock() == false) {
-				abort();
-			}
+			if (! cond_.notify()) { abort(); }
+			if (! mutex_.unlock()) { abort(); }
 			return true;
 		} else {
-			if (mutex_.unlock() == false) {
-				abort();
-			}
-			if (cond_.notify() == false) {
-				abort();
-			}
+			if (! mutex_.unlock()) { abort(); }
+			if (! cond_.notify()) { abort(); }
 			return true;
 		}
 	}
@@ -123,15 +113,12 @@ public:
 	 */
 	T* pop(int wait_ms = -1, bool* found = NULL) {
 		bool found_flag;
-		if (mutex_.lock() == false) {
-			abort();
-		}
+		if (! mutex_.lock()) { abort(); }
+
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				if (mutex_.unlock() == false) {
-					abort();
-				}
+				if (! mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = found_flag;
 				}
@@ -139,10 +126,8 @@ public:
 			}
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
-			if (!cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
-				if (mutex_.unlock() == false) {
-					abort();
-				}
+			if (! cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
+				if (! mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
 				}
@@ -151,8 +136,37 @@ public:
 		}
 	}
 
+	// @override
+	size_t pop(std::vector<T*>& out, size_t max, int milliseconds) {
+		size_t n = 0;
+		bool found_flag;
+
+		if (! mutex_.lock()) { abort(); }
+		while (true) {
+			T* t = peek(found_flag);
+			if (found_flag) {
+				out.push_back(t);
+				n++;
+				if (max > 0 && n >= max) {
+					return n;
+				}
+				continue;
+			}
+
+			if (n > 0) {
+				if (! mutex_.unlock()) { abort(); }
+				return n;
+			}
+
+			if (! cond_.wait(mutex_, milliseconds) && milliseconds >= 0) {
+				if (! mutex_.unlock()) { abort(); }
+				return n;
+			}
+		}
+	}
+
 	/**
-	 * tbox 允许有空消息
+	 * tbox 支持传递空消息
 	 * @return {bool}
 	 * @override
 	 */
@@ -170,13 +184,13 @@ public:
 
 public:
 	void lock() {
-		if (mutex_.lock() == false) {
+		if (! mutex_.lock()) {
 			abort();
 		}
 	}
 
 	void unlock() {
-		if (mutex_.unlock() == false) {
+		if (! mutex_.unlock()) {
 			abort();
 		}
 	}

@@ -1,7 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <list>
-#include <assert.h>
+#include <cassert>
 
 struct ACL_FIBER_SEM;
 
@@ -14,7 +14,7 @@ typedef enum {
 
 class FIBER_CPP_API fiber_sem {
 public:
-	fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
+	explicit fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
 	~fiber_sem();
 
 	int wait(int milliseconds = -1);
@@ -31,7 +31,7 @@ private:
 
 class FIBER_CPP_API fiber_sem_guard {
 public:
-	fiber_sem_guard(fiber_sem& sem) : sem_(sem) {
+	explicit fiber_sem_guard(fiber_sem& sem) : sem_(sem) {
 		(void) sem_.wait();
 	}
 
@@ -46,20 +46,26 @@ private:
 	void operator=(const fiber_sem_guard&);
 };
 
+// The base box<T> defined in acl_cpp/stdlib/box.hpp, so you must include
+// box.hpp first before including fiber_tbox.hpp
 template<typename T>
-class fiber_sbox {
+class fiber_sbox : public box<T> {
 public:
-	fiber_sbox(bool free_obj = true, bool async = true)
+	explicit fiber_sbox(bool free_obj = true, bool async = true)
 	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync)
 	, free_obj_(free_obj) {}
 
 	~fiber_sbox() { clear(free_obj_); }
 
-	void push(T* t) {
+	// @override
+	bool push(T* t, bool dummy = true) {
+		(void) dummy;
 		sbox_.push_back(t);
 		sem_.post();
+		return true;
 	}
 
+	// @override
 	T* pop(int milliseconds, bool* found = NULL) {
 		if (sem_.wait(milliseconds) < 0) {
 			if (found) {
@@ -76,10 +82,36 @@ public:
 		return t;
 	}
 
+	// @override
+	size_t pop(std::vector<T*>& out, size_t max, int milliseconds) {
+		size_t n = 0;
+		while (true) {
+			if (sem_.wait(milliseconds) < 0) {
+				return n;
+			}
+
+			T* t = sbox_.front();
+			sbox_.pop_front();
+			out.push_back(t);
+			n++;
+			if (max > 0 && n >= max) {
+				return n;
+			}
+			milliseconds = 0;
+		}
+	}
+
+	// Old interface.
 	T* pop(bool* found = NULL) {
 		return pop(-1, found);
 	}
 
+	// @override
+	bool has_null() const {
+		return true;
+	}
+
+	// @override
 	size_t size() const {
 		return sem_.num();
 	}
@@ -92,6 +124,7 @@ private:
 	fiber_sbox(const fiber_sbox&);
 	void operator=(const fiber_sbox&);
 
+public:
 	void clear(bool free_obj = false) {
 		if (free_obj) {
 			for (typename std::list<T*>::iterator it =
@@ -107,7 +140,7 @@ private:
 template<typename T>
 class fiber_sbox2 {
 public:
-	fiber_sbox2(bool async = true)
+	explicit fiber_sbox2(bool async = true)
 	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync) {}
 
 	~fiber_sbox2() {}

@@ -24,14 +24,12 @@ namespace acl {
  *
  * acl::tbox_array<myobj> tbox;
  *
- * void thread_producer(void)
- * {
+ * void thread_producer() {
  *     myobj* o = new myobj;
  *     tbox.push(o);
  * }
  *
- * void thread_consumer(void)
- * {
+ * void thread_consumer() {
  *     myobj* o = tbox.pop();
  *     o->test();
  *     delete o;
@@ -46,7 +44,7 @@ public:
 	 * @param free_obj {bool} 当 tbox_array 销毁时，是否自动检查并释放
 	 *  未被消费的动态对象
 	 */
-	tbox_array(bool free_obj = true)
+	explicit tbox_array(bool free_obj = true)
 	: capacity_(10000)
 	, off_curr_(0)
 	, off_next_(0)
@@ -83,9 +81,7 @@ public:
 	 * @override
 	 */
 	bool push(T* t, bool notify_first = false) {
-		if (! lock_.lock()) {
-			abort();
-		}
+		if (! lock_.lock()) { abort(); }
 
 		if (off_next_ == capacity_) {
 			if (off_curr_ >= 10000) {
@@ -109,19 +105,11 @@ public:
 		array_[off_next_++] = t;
 
 		if (notify_first) {
-			if (! cond_.notify()) {
-				abort();
-			}
-			if (! lock_.unlock()) {
-				abort();
-			}
+			if (! cond_.notify()) { abort(); }
+			if (! lock_.unlock()) { abort(); }
 		} else {
-			if (! lock_.unlock()) {
-				abort();
-			}
-			if (! cond_.notify()) {
-				abort();
-			}
+			if (! lock_.unlock()) { abort(); }
+			if (! cond_.notify()) { abort(); }
 		}
 
 		return true;
@@ -129,7 +117,7 @@ public:
 
 	/**
 	 * 接收消息对象
-	 * @param wait_ms {int} >= 0 时设置等待超时时间(毫秒级别)，
+	 * @param milliseconds {int} >= 0 时设置等待超时时间(毫秒级别)，
 	 *  否则永远等待直到读到消息对象或出错
 	 * @param found {bool*} 非空时用来存放是否获得了一个消息对象，主要用在
 	 *  当允许传递空对象时的检查
@@ -141,19 +129,15 @@ public:
 	 *  判断是否获得了一个空消息对象
 	 * @override
 	 */
-	T* pop(int wait_ms = -1, bool* found = NULL) {
-		long long n = ((long long) wait_ms) * 1000;
+	T* pop(int milliseconds = -1, bool* found = NULL) {
+		long long microseconds = ((long long) milliseconds) * 1000;
 		bool found_flag;
 
-		if (! lock_.lock()) {
-			abort();
-		}
+		if (! lock_.lock()) { abort(); }
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				if (! lock_.unlock()) {
-					abort();
-				}
+				if (! lock_.unlock()) { abort(); }
 				if (found) {
 					*found = found_flag;
 				}
@@ -162,11 +146,9 @@ public:
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
 			waiters_++;
-			if (!cond_.wait(n, true) && wait_ms >= 0) {
+			if (! cond_.wait(microseconds, true) && microseconds >= 0) {
 				waiters_--;
-				if (! lock_.unlock()) {
-					abort();
-				}
+				if (! lock_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
 				}
@@ -176,8 +158,38 @@ public:
 		}
 	}
 
+	// @override
+	size_t pop( std::vector<T*>& out, size_t max, int milliseconds) {
+		long long microseconds = ((long long) milliseconds) * 1000;
+		size_t n = 0;
+		bool found_flag;
+
+		if (! lock_.lock()) { abort(); }
+		while (true) {
+			T* t = peek(found_flag);
+			if (found_flag) {
+				out.push_back(t);
+				n++;
+				if (max > 0 && n >= max) {
+					return n;
+				}
+				continue;
+			}
+
+			if (n > 0) {
+				if (! lock_.unlock()) { abort(); }
+				return n;
+			}
+
+			if (! cond_.wait(microseconds, true) && microseconds >= 0) {
+				if (! lock_.unlock()) { abort(); }
+				return n;
+			}
+		}
+	}
+
 	/**
-	 * tbox 允许有空消息
+	 * tbox 支持传递空消息
 	 * @return {bool}
 	 * @override
 	 */
@@ -195,15 +207,11 @@ public:
 
 public:
 	void lock() {
-		if (! lock_.lock()) {
-			abort();
-		}
+		if (! lock_.lock()) { abort(); }
 	}
 
 	void unlock() {
-		if (! lock_.unlock()) {
-			abort();
-		}
+		if (! lock_.unlock()) { abort(); }
 	}
 
 private:

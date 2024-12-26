@@ -1,7 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <list>
-#include <stdlib.h>
+#include <cstdlib>
 #include "fiber_mutex.hpp"
 #include "fiber_cond.hpp"
 
@@ -70,29 +70,19 @@ public:
 	 */
 	bool push(T t, bool notify_first = true) {
 		// 先加锁
-		if (mutex_.lock() == false) {
-			abort();
-		}
+		if (! mutex_.lock()) { abort(); }
 
 		// 向队列中添加消息对象
 		tbox_.push_back(t);
 		size_++;
 
 		if (notify_first) {
-			if (cond_.notify() == false) {
-				abort();
-			}
-			if (mutex_.unlock() == false) {
-				abort();
-			}
+			if (! cond_.notify()) { abort(); }
+			if (! mutex_.unlock()) { abort(); }
 			return true;
 		} else {
-			if (mutex_.unlock() == false) {
-				abort();
-			}
-			if (cond_.notify() == false) {
-				abort();
-			}
+			if (! mutex_.unlock()) { abort(); }
+			if (! cond_.notify()) { abort(); }
 			return true;
 		}
 	}
@@ -105,21 +95,15 @@ public:
 	 * @return {bool} 是否获得消息对象
 	 */
 	bool pop(T& t, int wait_ms = -1) {
-		if (mutex_.lock() == false) {
-			abort();
-		}
+		if (! mutex_.lock()) { abort(); }
 		while (true) {
 			if (peek_obj(t)) {
-				if (mutex_.unlock() == false) {
-					abort();
-				}
+				if (! mutex_.unlock()) { abort(); }
 				return true;
 			}
 
 			if (!cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
-				if (mutex_.unlock() == false) {
-					abort();
-				}
+				if (! mutex_.unlock()) { abort(); }
 				return false;
 			}
 		}
@@ -135,15 +119,11 @@ public:
 
 public:
 	void lock() {
-		if (mutex_.lock() == false) {
-			abort();
-		}
+		if (! mutex_.lock()) { abort(); }
 	}
 
 	void unlock() {
-		if (mutex_.unlock() == false) {
-			abort();
-		}
+		if (! mutex_.unlock()) { abort(); }
 	}
 
 private:
