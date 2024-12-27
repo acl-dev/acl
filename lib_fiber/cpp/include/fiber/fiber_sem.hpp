@@ -58,7 +58,8 @@ public:
 	~fiber_sbox() { clear(free_obj_); }
 
 	// @override
-	bool push(T* t, bool) {
+	bool push(T* t, bool dummy = false) {
+		(void) dummy;
 		sbox_.push_back(t);
 		sem_.post();
 		return true;
@@ -145,7 +146,8 @@ public:
 	~fiber_sbox2() {}
 
 	// @override
-	bool push(T t, bool) {
+	bool push(T t, bool dummy = false) {
+		(void) dummy;
 #if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
 		sbox_.emplace_back(std::move(t));
 #else
