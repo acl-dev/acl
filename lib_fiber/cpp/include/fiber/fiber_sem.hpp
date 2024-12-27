@@ -181,7 +181,11 @@ public:
 			}
 
 			T t = sbox_.front();
+#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
+			out.emplace_back(std::move(t));
+#else
 			out.push_back(t);
+#endif
 			n++;
 			if (max > 0 && n >= max) {
 				return n;
