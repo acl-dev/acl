@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
 		for (int i = 0; i < count; i++) {
 			auto msg = std::make_shared<message>(nmsgs, i);
 			++nmsgs;
-			box.push(msg);
+			box.push(msg, false);
 			if (i > 0 && i % 10 == 0) {
 				::sleep(1);
 			}

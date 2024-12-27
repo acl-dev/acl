@@ -24,12 +24,12 @@ namespace acl {
  *
  * acl::tbox<myobj> tbox;
  *
- * void thread_producer(void) {
+ * void thread_producer() {
  *     myobj* o = new myobj;
  *     tbox.push(o);
  * }
  *
- * void thread_consumer(void) {
+ * void thread_consumer() {
  *     myobj* o = tbox.pop();
  *     o->test();
  *     delete o;
@@ -92,7 +92,7 @@ public:
 
 	/**
 	 * 接收消息对象
-	 * @param milliseconds {int} >= 0 时设置等待超时时间(毫秒级别)，
+	 * @param ms {int} >= 0 时设置等待超时时间(毫秒级别)，
 	 *  否则永远等待直到读到消息对象或出错
 	 * @param found {bool*} 非空时用来存放是否获得了一个消息对象，主要用在
 	 *  当允许传递空对象时的检查
@@ -104,8 +104,8 @@ public:
 	 *  判断是否获得了一个空消息对象
 	 * @override
 	 */
-	T* pop(int milliseconds = -1, bool* found = NULL) {
-		long long microseconds = ((long long) milliseconds) * 1000;
+	T* pop(int ms = -1, bool* found = NULL) {
+		long long us = ((long long) ms) * 1000;
 		bool found_flag;
 		if (! lock_.lock()) { abort(); }
 		while (true) {
@@ -119,7 +119,7 @@ public:
 			}
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
-			if (! cond_.wait(microseconds, true) && microseconds >= 0) {
+			if (! cond_.wait(us, true) && us >= 0) {
 				if (! lock_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
@@ -130,8 +130,8 @@ public:
 	}
 
 	// @override
-	size_t pop( std::vector<T*>& out, size_t max, int milliseconds) {
-		long long microseconds = ((long long) milliseconds) * 1000;
+	size_t pop( std::vector<T*>& out, size_t max, int ms) {
+		long long us = ((long long) ms) * 1000;
 		size_t n = 0;
 		bool found_flag;
 
@@ -152,7 +152,7 @@ public:
 				return n;
 			}
 
-			if (! cond_.wait(microseconds, true) && microseconds >= 0) {
+			if (! cond_.wait(us, true) && us >= 0) {
 				if (! lock_.unlock()) { abort(); }
 				return n;
 			}

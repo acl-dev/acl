@@ -1,6 +1,7 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <list>
+#include <vector>
 #include <cstdlib>
 #include "fiber_mutex.hpp"
 #include "fiber_cond.hpp"
@@ -40,8 +41,10 @@ namespace acl {
 // The fiber_tbox2 has an object copying process in push/pop which is suitable
 // for transfering the object managed by std::shared_ptr.
 
+// The base box2<T> defined in acl_cpp/stdlib/box.hpp, so you must include
+// box.hpp first before including fiber_tbox.hpp
 template<typename T>
-class fiber_tbox2 {
+class fiber_tbox2 : public box2<T> {
 public:
 	/**
 	 * 构造方法
@@ -67,34 +70,39 @@ public:
 	 *  则本参数应该设为 true，以避免 push 者还没有完全返回前因 fiber_tbox2
 	 *  对象被提前销毁而造成内存非法访问
 	 * @return {bool}
+	 * @override
 	 */
 	bool push(T t, bool notify_first = true) {
 		// 先加锁
 		if (! mutex_.lock()) { abort(); }
 
 		// 向队列中添加消息对象
+#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
+		tbox_.emplace_back(std::move(t));
+#else
 		tbox_.push_back(t);
+#endif
 		size_++;
 
 		if (notify_first) {
 			if (! cond_.notify()) { abort(); }
 			if (! mutex_.unlock()) { abort(); }
-			return true;
 		} else {
 			if (! mutex_.unlock()) { abort(); }
 			if (! cond_.notify()) { abort(); }
-			return true;
 		}
+		return true;
 	}
 
 	/**
 	 * 接收消息对象
 	 * @param t {T&} 当函数 返回 true 时存放结果对象
-	 * @param wait_ms {int} >= 0 时设置等待超时时间(毫秒级别)，
+	 * @param ms {int} >= 0 时设置等待超时时间(毫秒级别)，
 	 *  否则永远等待直到读到消息对象或出错
 	 * @return {bool} 是否获得消息对象
+	 * @override
 	 */
-	bool pop(T& t, int wait_ms = -1) {
+	bool pop(T& t, int ms = -1) {
 		if (! mutex_.lock()) { abort(); }
 		while (true) {
 			if (peek_obj(t)) {
@@ -102,9 +110,35 @@ public:
 				return true;
 			}
 
-			if (!cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
+			if (!cond_.wait(mutex_, ms) && ms >= 0) {
 				if (! mutex_.unlock()) { abort(); }
 				return false;
+			}
+		}
+	}
+
+	//@override
+	size_t pop(std::vector<T>& out, size_t max, int ms) {
+		size_t n = 0;
+		if (! mutex_.lock()) { abort(); }
+		while (true) {
+			T t;
+			if (peek_obj(t)) {
+				out.push_back(t);
+				n++;
+				if (max > 0 && n >= max) {
+					if (! mutex_.unlock()) { abort(); }
+					return n;
+				}
+				continue;
+			}
+			if (n > 0) {
+				if (! mutex_.lock()) { abort(); }
+				return n;
+			}
+			if (! cond_.wait(mutex_, ms) && ms >= 0) {
+				if (! mutex_.lock()) { abort(); }
+				return n;
 			}
 		}
 	}
@@ -112,9 +146,15 @@ public:
 	/**
 	 * 返回当前存在于消息队列中的消息数量
 	 * @return {size_t}
+	 * @override
 	 */
 	size_t size() const {
 		return size_;
+	}
+
+	// @override
+	bool has_null() const {
+		return true;
 	}
 
 public:
@@ -141,9 +181,13 @@ private:
 		if (it == tbox_.end()) {
 			return false;
 		}
-		size_--;
+#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
+		t = std::move(*it);
+#else
 		t = *it;
+#endif
 		tbox_.erase(it);
+		size_--;
 		return true;
 	}
 };

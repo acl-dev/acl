@@ -78,19 +78,19 @@ void keeper_conn::stop()
 		this->kill();
 	}
 	ask_req* ask = new ask_req(ASK_T_STOP);
-	box_.push(ask);
+	box_.push(ask, false);
 }
 
 void keeper_conn::ask_open()
 {
 	ask_req* ask = new ask_req(ASK_T_CONN);
-	box_.push(ask);
+	box_.push(ask, false);
 }
 
 void keeper_conn::ask_close()
 {
 	ask_req* ask = new ask_req(ASK_T_CLOSE);
-	box_.push(ask);
+	box_.push(ask, false);
 }
 
 void keeper_conn::join()

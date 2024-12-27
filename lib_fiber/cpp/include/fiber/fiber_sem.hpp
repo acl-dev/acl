@@ -17,7 +17,7 @@ public:
 	explicit fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
 	~fiber_sem();
 
-	int wait(int milliseconds = -1);
+	int wait(int ms = -1);
 	int trywait();
 	int post();
 
@@ -58,16 +58,15 @@ public:
 	~fiber_sbox() { clear(free_obj_); }
 
 	// @override
-	bool push(T* t, bool dummy = true) {
-		(void) dummy;
+	bool push(T* t, bool) {
 		sbox_.push_back(t);
 		sem_.post();
 		return true;
 	}
 
 	// @override
-	T* pop(int milliseconds, bool* found = NULL) {
-		if (sem_.wait(milliseconds) < 0) {
+	T* pop(int ms, bool* found = NULL) {
+		if (sem_.wait(ms) < 0) {
 			if (found) {
 				*found = false;
 			}
@@ -83,10 +82,10 @@ public:
 	}
 
 	// @override
-	size_t pop(std::vector<T*>& out, size_t max, int milliseconds) {
+	size_t pop(std::vector<T*>& out, size_t max, int ms) {
 		size_t n = 0;
 		while (true) {
-			if (sem_.wait(milliseconds) < 0) {
+			if (sem_.wait(ms) < 0) {
 				return n;
 			}
 
@@ -97,7 +96,7 @@ public:
 			if (max > 0 && n >= max) {
 				return n;
 			}
-			milliseconds = 0;
+			ms = 0;
 		}
 	}
 
@@ -138,51 +137,65 @@ public:
 };
 
 template<typename T>
-class fiber_sbox2 {
+class fiber_sbox2 : public box2<T> {
 public:
 	explicit fiber_sbox2(bool async = true)
 	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync) {}
 
 	~fiber_sbox2() {}
 
-#if __cplusplus >= 201103L      // Support c++11 ?
-
-	void push(T t) {
+	// @override
+	bool push(T t, bool) {
+#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
 		sbox_.emplace_back(std::move(t));
-		sem_.post();
-	}
-
-	bool pop(T& t, int milliseconds = -1) {
-		if (sem_.wait(milliseconds) < 0) {
-			return false;
-		}
-
-		t = std::move(sbox_.front());
-		sbox_.pop_front();
-		return true;
-	}
-
 #else
-
-	void push(T t) {
 		sbox_.push_back(t);
+#endif
 		sem_.post();
+		return true;
 	}
 
-	bool pop(T& t, int milliseconds = -1) {
-		if (sem_.wait(milliseconds) < 0) {
+	// @override
+	bool pop(T& t, int ms = -1) {
+		if (sem_.wait(ms) < 0) {
 			return false;
 		}
 
+#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
+		t = std::move(sbox_.front());
+#else
 		t = sbox_.front();
+#endif
 		sbox_.pop_front();
 		return true;
 	}
 
-#endif
+	// @override
+	size_t pop(std::vector<T>& out, size_t max, int ms) {
+		size_t n = 0;
+		while (true) {
+			if (sem_.wait(ms) < 0) {
+				return n;
+			}
 
+			T t = sbox_.front();
+			out.push_back(t);
+			n++;
+			if (max > 0 && n >= max) {
+				return n;
+			}
+			ms = 0;
+		}
+	}
+
+	// @override
 	size_t size() const {
 		return sem_.num();
+	}
+
+	// @override
+	bool has_null() const {
+		return true;
 	}
 
 private:

@@ -1,6 +1,6 @@
 #pragma once
 #include "../acl_cpp_define.hpp"
-#include <assert.h>
+#include <cassert>
 #include "box.hpp"
 
 namespace acl {
@@ -69,34 +69,32 @@ public:
 	/**
 	 * 发送消息对象
 	 * @param t {T*} 非空消息对象
-	 * @param dummy {bool} 目前无任何用处，仅是为了与 tbox 接口一致
 	 * @return {bool} 发送是否成功
 	 * @override
 	 */
-	bool push(T* t, bool dummy = false) {
-		(void) dummy;
+	bool push(T* t, bool) {
 		return mbox_send(mbox_, t);
 	}
 
 	/**
 	 * 接收消息对象
-	 * @param milliseconds {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
+	 * @param ms {int} >= 0 时设置读等待超时时间(毫秒级别)，否则
 	 *  永远等待直到读到消息对象或出错
 	 * @param success {bool*} 可以用于辅助确定读操作是否成功
 	 * @return {T*} 非 NULL 表示读到一个消息对象，为 NULL 时，还需通过
 	 *  success 参数的返回值检查操作是否成功
 	 * @override
 	 */
-	T* pop(int milliseconds = -1, bool* success = NULL) {
-		return (T*) mbox_read(mbox_, milliseconds, success);
+	T* pop(int ms = -1, bool* success = NULL) {
+		return (T*) mbox_read(mbox_, ms, success);
 	}
 
 	// @override
-	size_t pop(std::vector<T*>& out, size_t max, int milliseconds) {
+	size_t pop(std::vector<T*>& out, size_t max, int ms) {
 		size_t n = 0;
 		bool success;
 		while (true) {
-			T* t = (T*) mbox_read(mbox_, milliseconds, &success);
+			T* t = (T*) mbox_read(mbox_, ms, &success);
 			if (! t) {
 				return n;
 			}
@@ -106,7 +104,7 @@ public:
 			if (max > 0 && n >= max) {
 				return n;
 			}
-			milliseconds = 0;
+			ms = 0;
 		}
 	}
 

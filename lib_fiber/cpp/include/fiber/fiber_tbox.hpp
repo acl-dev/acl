@@ -89,17 +89,16 @@ public:
 		if (notify_first) {
 			if (! cond_.notify()) { abort(); }
 			if (! mutex_.unlock()) { abort(); }
-			return true;
 		} else {
 			if (! mutex_.unlock()) { abort(); }
 			if (! cond_.notify()) { abort(); }
-			return true;
 		}
+		return true;
 	}
 
 	/**
 	 * 接收消息对象
-	 * @param wait_ms {int} >= 0 时设置等待超时时间(毫秒级别)，
+	 * @param ms {int} >= 0 时设置等待超时时间(毫秒级别)，
 	 *  否则永远等待直到读到消息对象或出错
 	 * @param found {bool*} 非空时用来存放是否获得了一个消息对象，主要用在
 	 *  当允许传递空对象时的检查
@@ -111,7 +110,7 @@ public:
 	 *  判断是否获得了一个空消息对象
 	 * @override
 	 */
-	T* pop(int wait_ms = -1, bool* found = NULL) {
+	T* pop(int ms = -1, bool* found = NULL) {
 		bool found_flag;
 		if (! mutex_.lock()) { abort(); }
 
@@ -126,7 +125,7 @@ public:
 			}
 
 			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
-			if (! cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
+			if (! cond_.wait(mutex_, ms) && ms >= 0) {
 				if (! mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
@@ -137,7 +136,7 @@ public:
 	}
 
 	// @override
-	size_t pop(std::vector<T*>& out, size_t max, int milliseconds) {
+	size_t pop(std::vector<T*>& out, size_t max, int ms) {
 		size_t n = 0;
 		bool found_flag;
 
@@ -158,7 +157,7 @@ public:
 				return n;
 			}
 
-			if (! cond_.wait(mutex_, milliseconds) && milliseconds >= 0) {
+			if (! cond_.wait(mutex_, ms) && ms >= 0) {
 				if (! mutex_.unlock()) { abort(); }
 				return n;
 			}
