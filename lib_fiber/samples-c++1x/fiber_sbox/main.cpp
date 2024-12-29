@@ -125,6 +125,27 @@ int main(int argc, char* argv[]) {
 		}
 	};
 
+    std::shared_ptr<acl::fiber_sbox2<int*>> box2;
+    box2 = std::make_shared<acl::fiber_sbox2<int*>>();
+
+    go[box2] {
+        for (int i = 0; i < 20; i++) {
+            int *cnt;
+            if (box2->pop(cnt, -1)) {
+                printf("pop cnt: %d\r\n", *cnt);
+                delete cnt;
+            }
+        }
+    };
+
+    go[box2] {
+        for (int i = 0; i < 20; i++) {
+            int *cnt = new int(i);
+            box2->push(cnt);
+            ::sleep(1);
+        }
+    };
+
 	acl::fiber::schedule();
 	return 0;
 }

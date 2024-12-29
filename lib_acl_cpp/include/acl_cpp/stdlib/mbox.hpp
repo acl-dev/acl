@@ -72,7 +72,8 @@ public:
 	 * @return {bool} 发送是否成功
 	 * @override
 	 */
-	bool push(T* t, bool) {
+	bool push(T* t, bool dummy = false) {
+        (void) dummy;
 		return mbox_send(mbox_, t);
 	}
 
