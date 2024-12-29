@@ -12,19 +12,18 @@ static void usage(const char* procname)
             " -n count\r\n"
             " -c fibers\r\n"
             " -t box_type[sbox2|tbox2]"
-            " -S [if in sync mode for sbox2]\r\n", procname);
+            " -b buf_count\r\n", procname);
 }
 
 int main(int argc, char *argv[])
 {
-    int  ch, n = 10, c = 1;
+    int  ch, n = 10, c = 1, buf = 0;
     std::string type = "sbox2";
-    bool sync = false;
 
     acl::acl_cpp_init();
     acl::log::stdout_open(true);
 
-    while ((ch = getopt(argc, argv, "hn:t:c:S")) > 0) {
+    while ((ch = getopt(argc, argv, "hn:t:c:b:")) > 0) {
         switch (ch) {
             case 'h':
                 usage(argv[0]);
@@ -38,8 +37,8 @@ int main(int argc, char *argv[])
             case 'c':
                 c = atoi(optarg);
                 break;
-            case 'S':
-                sync = true; 
+            case 'b':
+		buf = atoi(optarg);
                 break;
             default:
                 break;
@@ -49,7 +48,7 @@ int main(int argc, char *argv[])
     std::shared_ptr<acl::box2<int>> box;
 
     if (type == "sbox2") {
-        box = std::make_shared<acl::fiber_sbox2<int>>(!sync);
+        box = std::make_shared<acl::fiber_sbox2<int>>(buf);
     } else if (type == "tbox2") {
         box = std::make_shared<acl::fiber_tbox2<int>>();
     } else {
@@ -83,7 +82,7 @@ int main(int argc, char *argv[])
         };
     }
 
-	acl::fiber::schedule();
+    acl::fiber::schedule();
 
     struct timeval end;
     gettimeofday(&end, nullptr);

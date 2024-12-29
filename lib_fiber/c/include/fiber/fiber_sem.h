@@ -21,6 +21,14 @@ typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create2(int num, unsigned flags);
 #define ACL_FIBER_SEM_F_ASYNC	(1 << 0)	/* If notifying in async mode */
 
+/**
+ * Create one fiber semaphore with the specified buff count and flags.
+ * @param num {int} the initial value of the semaphore, must >= 0
+ * @param buf {int} the buffed count before signal the waiters.
+ * @param flags {unsigned} the flags defined as ACL_FIBER_SEM_F_XXX
+ */
+FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create3(int num, int buf, unsigned flags);
+
 FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 
 /**

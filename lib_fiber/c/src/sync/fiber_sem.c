@@ -6,6 +6,7 @@
 
 struct ACL_FIBER_SEM {
 	int num;
+	int buf;
 	unsigned flags;
 	RING waiting;
 	unsigned long tid;
@@ -18,10 +19,17 @@ ACL_FIBER_SEM *acl_fiber_sem_create(int num)
 
 ACL_FIBER_SEM *acl_fiber_sem_create2(int num, unsigned flags)
 {
+	int buf = (flags & ACL_FIBER_SEM_F_ASYNC) ? 50000000 : 0;
+	return acl_fiber_sem_create3(num, buf, flags);
+}
+
+ACL_FIBER_SEM *acl_fiber_sem_create3(int num, int buf, unsigned flags)
+{
 	ACL_FIBER_SEM *sem = (ACL_FIBER_SEM *) mem_malloc(sizeof(ACL_FIBER_SEM));
 
 	sem->tid   = 0;
 	sem->num   = num;
+	sem->buf   = buf;
 	sem->flags = flags;
 	ring_init(&sem->waiting);
 	return sem;
@@ -178,6 +186,9 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	sem->num++;
 
 	if ((ready = FIRST_FIBER(&sem->waiting)) == NULL) {
+		if (sem->num >= sem->buf) {
+			acl_fiber_yield();
+		}
 		return sem->num;
 	}
 
@@ -187,7 +198,7 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	/* Help the fiber to be wakeup to decrease the sem number. */
 	num = sem->num--;
 
-	if (!(sem->flags & ACL_FIBER_SEM_F_ASYNC)) {
+	if (num >= sem->buf) {
 		acl_fiber_yield();
 	}
 

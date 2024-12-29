@@ -14,6 +14,11 @@ fiber_sem::fiber_sem(int max, fiber_sem_attr_t attr)
 	sem_ = acl_fiber_sem_create2(max, flags);
 }
 
+fiber_sem::fiber_sem(int max, int buf)
+{
+	sem_ = acl_fiber_sem_create3(max, buf, 0);
+}
+
 fiber_sem::~fiber_sem()
 {
 	acl_fiber_sem_free(sem_);
