@@ -43,7 +43,7 @@ private:
 	fiber_sem& sem_;
 
 	fiber_sem_guard(const fiber_sem_guard&);
-	void operator=(const fiber_sem_guard&);
+	const fiber_sem_guard& operator=(const fiber_sem_guard&);
 };
 
 // The base box<T> defined in acl_cpp/stdlib/box.hpp, so you must include
@@ -122,7 +122,7 @@ private:
 	bool          free_obj_;
 
 	fiber_sbox(const fiber_sbox&);
-	void operator=(const fiber_sbox&);
+	const fiber_sbox& operator=(const fiber_sbox&);
 
 public:
 	void clear(bool free_obj = false) {
@@ -209,7 +209,7 @@ private:
 	std::list<T> sbox_;
 
 	fiber_sbox2(const fiber_sbox2&);
-	void operator=(const fiber_sbox2&);
+	const fiber_sbox2& operator=(const fiber_sbox2&);
 };
 
 } // namespace acl
