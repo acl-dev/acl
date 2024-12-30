@@ -19,7 +19,7 @@ public:
 	 *  对象,否则内部自动创建 C 锁对象;如果非空时,在本对象析构时该传入的
 	 *  C 锁对象需由应用层自行释放.
 	 */
-	fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
+	explicit fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
 	~fiber_mutex();
 
 	/**
@@ -71,7 +71,7 @@ private:
 
 class FIBER_CPP_API fiber_mutex_guard {
 public:
-	fiber_mutex_guard(fiber_mutex& mutex) : mutex_(mutex) {
+	explicit fiber_mutex_guard(fiber_mutex& mutex) : mutex_(mutex) {
 		mutex_.lock();
 	}
 
