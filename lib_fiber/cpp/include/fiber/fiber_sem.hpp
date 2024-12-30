@@ -146,21 +146,49 @@ template<typename T>
 class fiber_sbox2 : public box2<T> {
 public:
 	explicit fiber_sbox2(bool async = true)
-	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync) {}
+	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync)
+	, capacity_(1000)
+	, off_curr_(0)
+	, off_next_(0)
+	{
+		sbox_ = (T*) malloc(sizeof(T) * capacity_);
+	}
 
 	explicit fiber_sbox2(int buf)
-	: sem_(0, buf) {}
+	: sem_(0, buf)
+	, capacity_(1000)
+	, off_curr_(0)
+	, off_next_(0)
+	{
+		sbox_ = (T*) malloc(sizeof(T) * capacity_);
+	}
 
 	~fiber_sbox2() {}
 
 	// @override
 	bool push(T t, bool dummy = false) {
 		(void) dummy;
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-		sbox_.emplace_back(std::move(t));
+
+		if (off_next_ == capacity_) {
+			if (off_curr_ >= 1000) {
+#if 1
+				size_t n = 0;
+				for (size_t i = off_curr_; i < off_next_; i++) {
+					sbox_[n++] = sbox_[i];
+				}
 #else
-		sbox_.push_back(t);
+				memmove(array_, array_ + off_curr_,
+					(off_next_ - off_curr_) * sizeof(T*));
 #endif
+
+				off_next_ -= off_curr_;
+				off_curr_ = 0;
+			} else {
+				capacity_ += 10000;
+				sbox_ = (T*) realloc(sbox_, sizeof(T) * capacity_);
+			}
+		}
+		sbox_[off_next_++] = t;
 		sem_.post();
 		return true;
 	}
@@ -171,12 +199,16 @@ public:
 			return false;
 		}
 
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-		t = std::move(sbox_.front());
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+		t = std::move(sbox_[off_curr_++]);
 #else
-		t = sbox_.front();
+		t = sbox_[off_curr_++];
 #endif
-		sbox_.pop_front();
+		if (off_curr_ == off_next_) {
+			if (off_curr_ > 0) {
+				off_curr_ = off_next_ = 0;
+			}
+		}
 		return true;
 	}
 
@@ -188,13 +220,17 @@ public:
 				return n;
 			}
 
-			T t = sbox_.front();
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-			out.emplace_back(std::move(t));
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+			out.emplace_back(std::move(sbox_[off_curr_++]));
 #else
-			out.push_back(t);
+			out.push_back(sbox_[off_curr_++]);
 #endif
 			n++;
+			if (off_curr_ == off_next_) {
+				if (off_curr_ > 0) {
+					off_curr_ = off_next_ = 0;
+				}
+			}
 			if (max > 0 && n >= max) {
 				return n;
 			}
@@ -204,7 +240,7 @@ public:
 
 	// @override
 	size_t size() const {
-		return sem_.num();
+		return off_next_ - off_curr_;
 	}
 
 	// @override
@@ -214,7 +250,10 @@ public:
 
 private:
 	fiber_sem    sem_;
-	std::list<T> sbox_;
+	T*           sbox_;
+	size_t       capacity_;
+	size_t       off_curr_;
+	size_t       off_next_;
 
 	fiber_sbox2(const fiber_sbox2&);
 	const fiber_sbox2& operator=(const fiber_sbox2&);
