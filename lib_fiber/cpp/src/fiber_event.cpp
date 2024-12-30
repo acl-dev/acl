@@ -14,24 +14,24 @@ fiber_event::fiber_event(bool use_mutex /* = true */,
 	event_ = acl_fiber_event_create(flag);
 }
 
-fiber_event::~fiber_event(void)
+fiber_event::~fiber_event()
 {
 	acl_fiber_event_free(event_);
 }
 
-bool fiber_event::wait(void)
+bool fiber_event::wait()
 {
-	return acl_fiber_event_wait(event_) == 0 ? true : false;
+	return acl_fiber_event_wait(event_) == 0;
 }
 
-bool fiber_event::trywait(void)
+bool fiber_event::trywait()
 {
-	return acl_fiber_event_trywait(event_) == 0 ? true : false;
+	return acl_fiber_event_trywait(event_) == 0;
 }
 
-bool fiber_event::notify(void)
+bool fiber_event::notify()
 {
-	return acl_fiber_event_notify(event_) == 0 ? true : false;
+	return acl_fiber_event_notify(event_) == 0;
 }
 
 } // namespace acl

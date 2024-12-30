@@ -5,7 +5,7 @@
 
 namespace acl {
 
-fiber_mutex_stats::~fiber_mutex_stats(void)
+fiber_mutex_stats::~fiber_mutex_stats()
 {
 	for (std::vector<fiber_mutex_stat>::iterator it = stats.begin();
 		it != stats.end(); ++it) {

@@ -16,7 +16,7 @@ typedef struct ACL_CHANNEL ACL_CHANNEL;
 
 /**
  * Create one fiber channel
- * @param elemsize {int} the fixed object size transfered in fiber channel
+ * @param elemsize {int} the fixed object size transferred in fiber channel
  * @param bufsize {int} the buffered of objects in fiber channel
  * @return {ACL_CHANNNEL*}
  */
@@ -31,7 +31,7 @@ FIBER_API void acl_channel_free(ACL_CHANNEL* c);
 /**
  * Send object to specified fiber channel in block mode
  * @param c {ACL_CHANNEL*} created by acl_channel_create
- * @param v {void*} the object to be transfered
+ * @param v {void*} the object to be transferred
  * @return {int} value (>= 0) returned
  */
 FIBER_API int acl_channel_send(ACL_CHANNEL* c, void* v);
@@ -40,7 +40,7 @@ FIBER_API int acl_channel_send(ACL_CHANNEL* c, void* v);
  * Send object to specified fiber channel in non-block mode, one new object
  * copied from which will be created internal
  * @param c {ACL_CHANNEL*} created by acl_channel_create
- * @param v {void*} the object to be transfered
+ * @param v {void*} the object to be transferred
  * @return {int} value (>= 0) returned
  */
 FIBER_API int acl_channel_send_nb(ACL_CHANNEL* c, void* v);
@@ -65,7 +65,7 @@ FIBER_API int acl_channel_recv_nb(ACL_CHANNEL* c, void* v);
 /**
  * Send object's addr to specified channel in block mode
  * @param c {ACL_CHANNEL*} created by acl_channel_create
- * @param v {void*} the addr of the object to be transfered
+ * @param v {void*} the addr of the object to be transferred
  * @return {int} value (>= 0) returned
  */
 FIBER_API int acl_channel_sendp(ACL_CHANNEL* c, void* v);
@@ -80,7 +80,7 @@ FIBER_API void *acl_channel_recvp(ACL_CHANNEL* c);
 /**
  * Send the object's addr to specified channel in non-block mode
  * @param c {ACL_CHANNEL*} created by acl_channel_create
- * @param v {void*} the addr of the object to be transfered
+ * @param v {void*} the addr of the object to be transferred
  * @return {int} value which is >= 0 returned
  */
 FIBER_API int acl_channel_sendp_nb(ACL_CHANNEL* c, void* v);

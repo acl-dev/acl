@@ -19,7 +19,7 @@ keeper_conn::keeper_conn(const keeper_config& config, const char* addr,
 {
 }
 
-keeper_conn::~keeper_conn(void)
+keeper_conn::~keeper_conn()
 {
 	delete conn_;
 }
@@ -71,34 +71,34 @@ socket_stream* keeper_conn::peek(double& cost)
 	return NULL;
 }
 
-void keeper_conn::stop(void)
+void keeper_conn::stop()
 {
 	if (is_busy()) {
 		logger_warn("fiber is busy, kill it");
 		this->kill();
 	}
 	ask_req* ask = new ask_req(ASK_T_STOP);
-	box_.push(ask);
+	box_.push(ask, false);
 }
 
-void keeper_conn::ask_open(void)
+void keeper_conn::ask_open()
 {
 	ask_req* ask = new ask_req(ASK_T_CONN);
-	box_.push(ask);
+	box_.push(ask, false);
 }
 
-void keeper_conn::ask_close(void)
+void keeper_conn::ask_close()
 {
 	ask_req* ask = new ask_req(ASK_T_CLOSE);
-	box_.push(ask);
+	box_.push(ask, false);
 }
 
-void keeper_conn::join(void)
+void keeper_conn::join()
 {
 	(void) tbox_ctl_.pop();
 }
 
-void keeper_conn::print_status(void) const
+void keeper_conn::print_status() const
 {
 	switch (status_) {
 	case KEEPER_T_BUSY:
@@ -116,7 +116,7 @@ void keeper_conn::print_status(void) const
 	}
 }
 
-void keeper_conn::run(void)
+void keeper_conn::run()
 {
 	// if the task has been set before the fiber started, we should
 	// handle the task directly, without waiting task from box_.
@@ -190,7 +190,7 @@ void keeper_conn::handle_task(task_req& task)
 	task.put(conn);
 }
 
-void keeper_conn::connect_one(void)
+void keeper_conn::connect_one()
 {
 	// this process can be called only when none conn_ was created
 	assert(conn_ == NULL);
@@ -225,7 +225,7 @@ void keeper_conn::connect_one(void)
 	}
 }
 
-void keeper_conn::done(void)
+void keeper_conn::done()
 {
 	tbox_ctl_.push(NULL);
 }

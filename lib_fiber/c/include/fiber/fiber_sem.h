@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-/* Fiber semaphore, thread unsafety, one semaphore can only be used in one
+/* Fiber semaphore, thread unsafely, one semaphore can only be used in one
  * thread, if used in different threads, result is unpredictable */
 
 typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
@@ -21,6 +21,14 @@ typedef struct ACL_FIBER_SEM ACL_FIBER_SEM;
 FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create2(int num, unsigned flags);
 #define ACL_FIBER_SEM_F_ASYNC	(1 << 0)	/* If notifying in async mode */
 
+/**
+ * Create one fiber semaphore with the specified buff count and flags.
+ * @param num {int} the initial value of the semaphore, must >= 0
+ * @param buf {int} the buffed count before signal the waiters.
+ * @param flags {unsigned} the flags defined as ACL_FIBER_SEM_F_XXX
+ */
+FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create3(int num, int buf, unsigned flags);
+
 FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 
 /**
@@ -30,7 +38,7 @@ FIBER_API ACL_FIBER_SEM* acl_fiber_sem_create(int num);
 FIBER_API void acl_fiber_sem_free(ACL_FIBER_SEM* sem);
 
 /**
- * Get the thread binding the specificed fiber sem
+ * Get the thread binding the specified fiber sem
  * @param sem {ACL_FIBER_SEM*} created by acl_fiber_sem_create
  * @return {unsigned long} thread ID of the thread binding the semaphore
  */
@@ -43,7 +51,7 @@ FIBER_API unsigned long acl_fiber_sem_get_tid(ACL_FIBER_SEM* sem);
  * semaphore, when this function was called, the value of the semaphore must
  * be zero, otherwise fatal will happen.
  * @param sem {ACL_FIBER_SEM*} created by acl_fiber_sem_create
- * @param {unsigned long} the thread ID to be specificed with the semaphore
+ * @param {unsigned long} the thread ID to be specified with the semaphore
  */
 FIBER_API void acl_fiber_sem_set_tid(ACL_FIBER_SEM* sem, unsigned long tid);
 
@@ -66,8 +74,16 @@ FIBER_API int acl_fiber_sem_wait(ACL_FIBER_SEM* sem);
 FIBER_API int acl_fiber_sem_trywait(ACL_FIBER_SEM* sem);
 
 /**
+ * Wait for semaphore until > 0 or the timer arriving.
+ * @param sem {ACL_FIBER_SEM *} created by acl_fiber_sem_create
+ * @param milliseconds {int} specify the timeout to wait
+ * @return {int} return >= 0 if waiting successfully, or -1 if waiting timed out.
+ */
+FIBER_API int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds);
+
+/**
  * Add 1 to the semaphore, if there are other fibers waiting for semaphore,
- * one waiter will be wakeuped
+ * one waiter will be wakeup
  * @param sem {ACL_FIBER_SEM *} created by acl_fiber_sem_create
  * @return {int} the current semaphore value returned, -1 returned if the
  *  current thread ID is not same as the semaphore's owner ID

@@ -14,11 +14,11 @@ int channel_recv(ACL_CHANNEL *c, void *v);
 template <typename T>
 class channel {
 public:
-	channel(void) {
+	channel() {
 		chan_ = channel_create(sizeof(T), 100);
 	}
 
-	~channel(void) {
+	~channel() {
 		channel_free(chan_);
 	}
 

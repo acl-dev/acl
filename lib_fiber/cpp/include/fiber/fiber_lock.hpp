@@ -11,26 +11,26 @@ namespace acl {
  */
 class FIBER_CPP_API fiber_lock {
 public:
-	fiber_lock(void);
-	~fiber_lock(void);
+	fiber_lock();
+	~fiber_lock();
 
 	/**
 	 * 等待互斥锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
 	 */
-	bool lock(void);
+	bool lock();
 
 	/**
 	 * 尝试等待互斥锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
 	 */
-	bool trylock(void);
+	bool trylock();
 
 	/**
 	 * 互斥锁拥有者释放锁并通知等待者
 	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
 	 */
-	bool unlock(void);
+	bool unlock();
 
 private:
 	ACL_FIBER_LOCK* lock_;
@@ -44,40 +44,40 @@ private:
  */
 class FIBER_CPP_API fiber_rwlock {
 public:
-	fiber_rwlock(void);
-	~fiber_rwlock(void);
+	fiber_rwlock();
+	~fiber_rwlock();
 
 	/**
 	 * 加读锁
 	 */
-	void rlock(void);
+	void rlock();
 
 	/**
 	 * 尝试加读锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
 	 */
-	bool tryrlock(void);
+	bool tryrlock();
 
 	/**
 	 * 解读锁
 	 */
-	void runlock(void);
+	void runlock();
 
 	/**
 	 * 加写锁
 	 */
-	void wlock(void);
+	void wlock();
 
 	/**
 	 * 尝试加写锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
 	 */
-	bool trywlock(void);
+	bool trywlock();
 
 	/**
 	 * 解写锁
 	 */
-	void wunlock(void);
+	void wunlock();
 
 private:
 	ACL_FIBER_RWLOCK* rwlk_;

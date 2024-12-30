@@ -12,8 +12,8 @@ class fiber_mutex;
  */
 class FIBER_CPP_API fiber_cond {
 public:
-	fiber_cond(void);
-	~fiber_cond(void);
+	fiber_cond();
+	~fiber_cond();
 
 	/**
 	 * 等待条件变量事件被触发
@@ -28,14 +28,14 @@ public:
 	 * 线程条件变量类似
 	 * @return {bool} 成功返回 true，否则返回 false 表示失败
 	 */
-	bool notify(void);
+	bool notify();
 
 public:
 	/**
 	 * 返回 C 版本的条件变量对象
 	 * @return {ACL_FIBER_COND*}
 	 */
-	ACL_FIBER_COND* get_cond(void) const {
+	ACL_FIBER_COND* get_cond() const {
 		return cond_;
 	}
 

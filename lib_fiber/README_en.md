@@ -34,12 +34,12 @@ The libfiber project comes from the coroutine module of the [acl project](#https
 ## Which IO events are supported ?
 The libfiber supports many events including select/poll/epoll/io-uring/kqueue/iocp, and Windows GUI messages.
 
-Platform|Event type
---------|----------
-Linux|select, poll, epoll, io-uring
-BSD|select, poll, kqueue
-Mac|select, poll, kqueue
-Windows|select, poll, iocp, GUI Message
+| Platform | Event type                      |
+|----------|---------------------------------|
+| Linux    | select, poll, epoll, io-uring   |
+| BSD      | select, poll, kqueue            |
+| Mac      | select, poll, kqueue            |
+| Windows  | select, poll, iocp, GUI Message |
 
 ## SAMPLES
 

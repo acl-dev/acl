@@ -9,7 +9,7 @@ class http_server : public http_server_impl {
 public:
 	http_server(const char* addr = "127.0.0.1|6379", bool use_redis = true)
 	: http_server_impl(addr, use_redis) {}
-	~http_server(void) {}
+	~http_server() {}
 
 public:
 	http_server& Get(const char* path, http_handler_t fn) {

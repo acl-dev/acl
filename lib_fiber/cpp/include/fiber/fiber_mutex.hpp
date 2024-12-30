@@ -20,32 +20,32 @@ public:
 	 *  C 锁对象需由应用层自行释放.
 	 */
 	fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
-	~fiber_mutex(void);
+	~fiber_mutex();
 
 	/**
 	 * 等待互斥锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
 	 */
-	bool lock(void);
+	bool lock();
 
 	/**
 	 * 尝试等待互斥锁
 	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
 	 */
-	bool trylock(void);
+	bool trylock();
 
 	/**
 	 * 互斥锁拥有者释放锁并通知等待者
 	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
 	 */
-	bool unlock(void);
+	bool unlock();
 
 public:
 	/**
 	 * 返回 C 版本的互斥锁对象
 	 * @return {ACL_FIBER_MUTEX*}
 	 */
-	ACL_FIBER_MUTEX* get_mutex(void) const {
+	ACL_FIBER_MUTEX* get_mutex() const {
 		return mutex_;
 	}
 
@@ -59,7 +59,7 @@ public:
 	/**
 	 * 检测死锁, 并将所有进入死锁状态的协程栈打印至标准输出
 	 */
-	static void deadlock_show(void);
+	static void deadlock_show();
 
 private:
 	ACL_FIBER_MUTEX* mutex_;
@@ -75,13 +75,12 @@ public:
 		mutex_.lock();
 	}
 
-	~fiber_mutex_guard(void) {
+	~fiber_mutex_guard() {
 		mutex_.unlock();
 	}
 
 private:
 	fiber_mutex& mutex_;
-
 };
 
 } // namespace acl

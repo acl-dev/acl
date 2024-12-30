@@ -9,9 +9,9 @@ fiber_redis_pipeline::fiber_redis_pipeline(const char* addr)
 {
 }
 
-fiber_redis_pipeline::~fiber_redis_pipeline(void) {}
+fiber_redis_pipeline::~fiber_redis_pipeline() {}
 
-box<redis_pipeline_message>* fiber_redis_pipeline::create_box(void)
+box<redis_pipeline_message>* fiber_redis_pipeline::create_box()
 {
 	return new fiber_tbox<redis_pipeline_message>(false);
 }
