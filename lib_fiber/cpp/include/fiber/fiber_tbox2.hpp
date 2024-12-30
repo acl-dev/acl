@@ -49,15 +49,17 @@ public:
 	/**
 	 * 构造方法
 	 */
-	fiber_tbox2() : size_(0) {}
+	fiber_tbox2() : capacity_(10000) , off_curr_(0) , off_next_(0) {
+		box_ = (T*) malloc(sizeof(T) * capacity_);
+	}
 
-	~fiber_tbox2() {}
+	~fiber_tbox2() { free(box_); }
 
 	/**
 	 * 清理消息队列中未被消费的消息对象
 	 */
 	void clear() {
-		tbox_.clear();
+		off_curr_ = off_next_ = 0;
 	}
 
 	/**
@@ -76,13 +78,30 @@ public:
 		// 先加锁
 		if (! mutex_.lock()) { abort(); }
 
-		// 向队列中添加消息对象
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-		tbox_.emplace_back(std::move(t));
+		if (off_next_ == capacity_) {
+			if (off_curr_ >= 10000) {
+#if 1
+				size_t n = 0;
+				for (size_t i = off_curr_; i < off_next_; i++) {
+					box_[n++] = box_[i];
+				}
 #else
-		tbox_.push_back(t);
+				memmove(box_, box_ + off_curr_,
+					(off_next_ - off_curr_) * sizeof(T));
 #endif
-		size_++;
+
+				off_next_ -= off_curr_;
+				off_curr_ = 0;
+			} else {
+				capacity_ += 10000;
+				box_ = (T*) realloc(box_, sizeof(T) * capacity_);
+			}
+		}
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+		box_[off_next_++] = std::move(t);
+#else
+		box_[off_next_++] = t;
+#endif
 
 		if (notify_first) {
 			if (! cond_.notify()) { abort(); }
@@ -149,7 +168,7 @@ public:
 	 * @override
 	 */
 	size_t size() const {
-		return size_;
+		return off_next_ - off_curr_;
 	}
 
 	// @override
@@ -171,23 +190,26 @@ private:
 	const fiber_tbox2& operator=(const fiber_tbox2&);
 
 private:
-	std::list<T>  tbox_;
-	size_t        size_;
-	fiber_mutex   mutex_;
-	fiber_cond    cond_;
+	T*           box_;
+	size_t       capacity_;
+	size_t       off_curr_;
+	size_t       off_next_;
+	fiber_mutex  mutex_;
+	fiber_cond   cond_;
 
 	bool peek_obj(T& t) {
-		typename std::list<T>::iterator it = tbox_.begin();
-		if (it == tbox_.end()) {
+		if (off_curr_ == off_next_) {
+			if (off_curr_ > 0) {
+				off_curr_ = off_next_ = 0;
+			}
 			return false;
 		}
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-		t = std::move(*it);
+
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+		t = std::move(box_[off_curr_++]);
 #else
-		t = *it;
+		t = box_[off_curr_++];
 #endif
-		tbox_.erase(it);
-		size_--;
 		return true;
 	}
 };

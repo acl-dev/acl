@@ -151,7 +151,7 @@ public:
 	, off_curr_(0)
 	, off_next_(0)
 	{
-		sbox_ = (T*) malloc(sizeof(T) * capacity_);
+		box_ = (T*) malloc(sizeof(T) * capacity_);
 	}
 
 	explicit fiber_sbox2(int buf)
@@ -160,7 +160,7 @@ public:
 	, off_curr_(0)
 	, off_next_(0)
 	{
-		sbox_ = (T*) malloc(sizeof(T) * capacity_);
+		box_ = (T*) malloc(sizeof(T) * capacity_);
 	}
 
 	~fiber_sbox2() {}
@@ -174,10 +174,10 @@ public:
 #if 1
 				size_t n = 0;
 				for (size_t i = off_curr_; i < off_next_; i++) {
-					sbox_[n++] = sbox_[i];
+					box_[n++] = box_[i];
 				}
 #else
-				memmove(array_, array_ + off_curr_,
+				memmove(box_, box_ + off_curr_,
 					(off_next_ - off_curr_) * sizeof(T*));
 #endif
 
@@ -185,10 +185,10 @@ public:
 				off_curr_ = 0;
 			} else {
 				capacity_ += 10000;
-				sbox_ = (T*) realloc(sbox_, sizeof(T) * capacity_);
+				box_ = (T*) realloc(box_, sizeof(T) * capacity_);
 			}
 		}
-		sbox_[off_next_++] = t;
+		box_[off_next_++] = t;
 		sem_.post();
 		return true;
 	}
@@ -200,9 +200,9 @@ public:
 		}
 
 #if __cplusplus >= 201103L || defined(USE_CPP11)
-		t = std::move(sbox_[off_curr_++]);
+		t = std::move(box_[off_curr_++]);
 #else
-		t = sbox_[off_curr_++];
+		t = box_[off_curr_++];
 #endif
 		if (off_curr_ == off_next_) {
 			if (off_curr_ > 0) {
@@ -221,9 +221,9 @@ public:
 			}
 
 #if __cplusplus >= 201103L || defined(USE_CPP11)
-			out.emplace_back(std::move(sbox_[off_curr_++]));
+			out.emplace_back(std::move(box_[off_curr_++]));
 #else
-			out.push_back(sbox_[off_curr_++]);
+			out.push_back(box_[off_curr_++]);
 #endif
 			n++;
 			if (off_curr_ == off_next_) {
@@ -250,7 +250,7 @@ public:
 
 private:
 	fiber_sem    sem_;
-	T*           sbox_;
+	T*           box_;
 	size_t       capacity_;
 	size_t       off_curr_;
 	size_t       off_next_;
