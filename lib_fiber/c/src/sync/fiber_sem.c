@@ -97,7 +97,7 @@ int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds)
 		return -1;
 	}
 
-	ring_prepend(&sem->waiting, &curr->me);
+	ring_prepend(&sem->waiting, &curr->me2);
 
 	curr->wstatus |= FIBER_WAIT_SEM;
 
@@ -123,6 +123,7 @@ int acl_fiber_sem_timed_wait(ACL_FIBER_SEM *sem, int milliseconds)
 	 * harmless because RING can deal with it.
 	 */
 	ring_detach(&curr->me);
+	ring_detach(&curr->me2);
 
 	if (acl_fiber_canceled(curr)) {
 		acl_fiber_set_error(curr->errnum);
@@ -162,7 +163,7 @@ int acl_fiber_sem_trywait(ACL_FIBER_SEM *sem)
 }
 
 #define RING_TO_FIBER(r) \
-    ((ACL_FIBER *) ((char *) (r) - offsetof(ACL_FIBER, me)))
+    ((ACL_FIBER *) ((char *) (r) - offsetof(ACL_FIBER, me2)))
 
 #define FIRST_FIBER(head) \
     (ring_succ(head) != (head) ? RING_TO_FIBER(ring_succ(head)) : 0)
@@ -192,7 +193,7 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 		return sem->num;
 	}
 
-	ring_detach(&ready->me);
+	ring_detach(&ready->me2);
 	FIBER_READY(ready);
 
 	/* Help the fiber to be wakeup to decrease the sem number. */

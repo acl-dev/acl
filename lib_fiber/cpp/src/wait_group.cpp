@@ -27,7 +27,7 @@ void wait_group::add(int n)
 
 	//count不能小于0
 	if (c < 0){
-		logger_fatal("Negative wait_group counter");
+		logger_fatal("Negative wait_group counter, c=%d", c);
 	}
 
 	if (w != 0 && n > 0 && c == n){
