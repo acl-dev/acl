@@ -11,16 +11,16 @@ public:
             wg_.add(1);
 
             auto fb = go[this, buf, thr] {
-                //std::shared_ptr<acl::box2<T>> box;
+                std::shared_ptr<acl::box2<T>> box;
 
                 if (thr) {
-                    auto box = std::make_shared<acl::fiber_tbox2<T>>(buf);
-                    boxes_.push_back(box);
-                    wait(box);
+                    box = std::make_shared<acl::fiber_tbox2<T>>();
                 } else {
                     box = std::make_shared<acl::fiber_sbox2<T>>(buf);
                 }
 
+		boxes_.push_back(box);
+		fiber_run(box);
             };
 
             fibers_.push_back(fb);
@@ -51,7 +51,7 @@ private:
     std::vector<box_ptr> boxes_;
     std::vector<ACL_FIBER*> fibers_;
 
-    void wait(std::shared_ptr<acl::box2<T>> box) {
+    void fiber_run(std::shared_ptr<acl::box2<T>> box) {
         std::vector<T> tasks;
 
         while (true) {
@@ -67,9 +67,12 @@ private:
                 tasks.clear();
             } else if (acl::fiber::self_killed()) {
                 break;
-            }
+            } else {
+		    printf("Wait timeout: %s\r\n", acl::last_serror());
+	    }
         }
 
+	printf("fiber-%d: exiting: %s\r\n", acl::fiber::self(), acl::last_serror());
         wg_.done();
     }
 };

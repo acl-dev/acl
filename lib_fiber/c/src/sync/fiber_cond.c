@@ -159,6 +159,8 @@ static int fiber_cond_timedwait(ACL_FIBER_COND *cond, ACL_FIBER_MUTEX *mutex,
 	UNLOCK_COND(cond);
 
 	if (fiber->flag & FIBER_F_TIMER) {
+		acl_fiber_set_errno(fiber, FIBER_EAGAIN);
+		acl_fiber_set_error(FIBER_EAGAIN);
 		// The obj has been deleted in sync_timer.c when timeout.
 		fiber->flag &= ~FIBER_F_TIMER;
 		sync_obj_unrefer(obj);

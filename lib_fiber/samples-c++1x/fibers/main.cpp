@@ -12,12 +12,12 @@ public:
 
     ~myfibers() override = default;
 
-    long long get_result() const {
-        return result_;
+    size_t get_count() const {
+        return count_;
     }
 
 protected:
-    long long result_ = 0;
+    long long count_ = 0;
 
     void run(std::vector<int>& args) override {
         for (auto i : args) {
@@ -25,14 +25,20 @@ protected:
                 printf("Fiber-%d: got %d\r\n", acl::fiber::self(), i);
             }
         }
-        result_ += args.size();
+        count_ += args.size();
     }
 };
 
 //////////////////////////////////////////////////////////////////////////////
 
 static void usage(const char* procname) {
-    printf("usage: %s -h [help] -n count -b buf -c concurrency -q qlen -t timeout -T [if using in threads]\r\n", procname);
+    printf("usage: %s -h [help]"
+		    " -n count\r\n"
+		    " -b buf\r\n"
+		    " -c concurrency\r\n"
+		    " -q qlen\r\n"
+		    " -t timeout\r\n"
+		    " -T [if using in threads]\r\n", procname);
 }
 
 int main(int argc, char *argv[]) {
@@ -72,15 +78,18 @@ int main(int argc, char *argv[]) {
         }
     }
 
-
     std::shared_ptr<myfibers> fbs = std::make_shared<myfibers>
         (buf, concurrency, qlen, milliseconds, thr);
 
     go[fbs, count] {
         for (long long i = 0; i < count; i++) {
             fbs->add(i);
+	    if (i % 1000000 == 0) {
+		    acl::fiber::yield();
+	    }
         }
 
+	::sleep(1);
         fbs->stop();
     };
 
@@ -92,10 +101,10 @@ int main(int argc, char *argv[]) {
     struct timeval end;
     gettimeofday(&end, nullptr);
 
-    long long result = fbs->get_result();
+    long long cnt = fbs->get_count();
     double tc = acl::stamp_sub(end, begin);
-    double speed = (result * 1000) / tc;
+    double speed = (cnt * 1000) / tc;
     printf("total result: %lld, tc: %.2f ms, speed: %.2f qps\r\n",
-            result, tc, speed);
+            cnt, tc, speed);
     return 0;
 }
