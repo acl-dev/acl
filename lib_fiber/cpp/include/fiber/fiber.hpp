@@ -32,7 +32,7 @@ struct FIBER_CPP_API fiber_frame {
 class FIBER_CPP_API fiber {
 public:
 	fiber();
-	fiber(ACL_FIBER *fb);
+	explicit fiber(ACL_FIBER *fb);
 
 	/**
 	 * The constructor.
@@ -43,7 +43,7 @@ public:
 	 *  is prohibited; When false, the start method needs to be called to
 	 *  start a new coroutine.
 	 */
-	fiber(bool running);
+	explicit fiber(bool running);
 
 	virtual ~fiber();
 

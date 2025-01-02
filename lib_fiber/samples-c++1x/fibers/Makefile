@@ -1,3 +1,5 @@
-include ../Makefile_cpp.in
-CFLAGS += -std=c++11
-PROG = fibers
+all:
+	@(mkdir -p build; cd build; cmake ..; make -j 4)
+
+clean cl:
+	rm -rf build
