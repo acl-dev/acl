@@ -26,303 +26,316 @@ struct FIBER_CPP_API fiber_frame {
 };
 
 /**
- * 协程类定义，纯虚类，需要子类继承并实现纯虚方法
+ * Definition of coroutine class, pure virtual class, requires subclass
+ * inheritance and implementation of pure virtual methods.
  */
 class FIBER_CPP_API fiber {
 public:
 	fiber();
-	fiber(ACL_FIBER *fb);
+	explicit fiber(ACL_FIBER *fb);
 
 	/**
-	 * 构造函数
-	 * @param running {bool} 当为 true 时，则表示当前协程已启动，仅是声明
-	 *  了一个协程对象而已，以便于与 ACL_FIBER 对象绑定，此时禁止调用本对
-	 *  象的 start 方法启动新协程; 当为 false 时，则需要调用 start 方法来
-	 *  启动新协程
+	 * The constructor.
+	 * @param running {bool} When it is true, it means that the current
+	 *  coroutine has been started, and only a coroutine object is
+	 *  declared for binding with the ACL_FIBER object. At this time,
+	 *  calling the start method of this object to start a new coroutine
+	 *  is prohibited; When false, the start method needs to be called to
+	 *  start a new coroutine.
 	 */
-	fiber(bool running);
+	explicit fiber(bool running);
 
 	virtual ~fiber();
 
 	/**
-	 * 在创建一个协程类对象且构造参数 running 为 false 时，需要本函数启动
-	 * 协程，然后子类的重载的 run 方法将被回调，如果 running 为 true 时，
-	 * 则禁止调用 start 方法
-	 * @param stack_size {size_t} 创建的协程对象的栈大小
-	 * @param share_stack {bool} 是否采用共享栈方式(若要采用共享栈方式，
-	 *  必须在编译 libfiber.a 时将编译开关 SHARE_STACK 打开)
+	 * When creating a coroutine class object with the construction
+	 * parameter 'running' set to false, this function needs to be started.
+	 * The run method of the subclass's overload will be called back, and
+	 * if running is true, calling the start method will be prohibited.
+	 * @param stack_size {size_t} The inital stack size of the coroutine.
+	 * @param share_stack {bool} Whether to use shared stack mode to start
+	 *  the current coroutine.
 	 */
 	void start(size_t stack_size = 320000, bool share_stack = false);
 
 	/**
-	 * 在本协程运行时调用此函数通知该协程退出
-	 * @param sync {bool} 是否采用同步方式，即是否等待被 kill 协程返回后
-	 *  本协程才返回
-	 * @return {bool} 返回 false 表示本协程未启动或已经退出
+	 * Calling the method to stop the currenct running coroutine.
+	 * @param sync {bool} Whether to use synchronous mode, that is, whether
+	 *  to wait for the killed coroutine to resturn.
+	 * @return {bool} Return false to indicate that the coroutine has not
+	 *  been started or has already exited.
 	 */
 	bool kill(bool sync = false);
 
 	/**
-	 * 判断当前协程是否被通知退出
-	 * @return {bool} 本协程是否被通知退出
+	 * Check if the current coroutine has been notified to exit.
+	 * @return {bool} If the current coriutine has been notified to exit.
 	 */
 	bool killed() const;
 
 	/**
-	 * 判断当前正在运行的协程是否被通知退出，该方法与 killed 的区别为，
-	 * killed 首先必须有 acl::fiber 对象依托，且该协程对象有可能正在运行，
-	 * 也有可能被挂起，而 self_killed 不需要 acl::fiber 对象依托且一定表示
-	 * 当前正在运行的协程
+	 * Check if the currently running coroutine has been notified to exit.
 	 * @return {bool}
 	 */
 	static bool self_killed();
 
 	/**
-	 * 获得本协程对象的 ID 号
+	 * Get the current coroutine's ID number.
 	 * @return {unsigned int}
 	 */
 	unsigned int get_id() const;
 
 	/**
-	 * 获得当前运行的协程对象的 ID 号
+	 * Get the current running coroutine's ID number.
 	 * @return {unsigned int}
 	 */
 	static unsigned int self();
 
 	/**
-	 * 获得指定协程对象的ID号
+	 * Get the specified coroutine's ID number.
 	 * @return {unsigned int}
 	 */
 	static unsigned int fiber_id(const fiber& fb);
 
 	/**
-	 * 获得当前协程在执行某个系统 API 出错时的错误号
+	 * Get the error number of the current coroutine after executing a
+	 * system API error.
 	 * return {int}
 	 */
 	int get_errno() const;
 
 	/**
-	 * 判断协程是否处于待调度队列中
+	 * Check if the coroutine is in the waiting queue for scheduing.
 	 * @return {bool}
 	 */
 	bool is_ready() const;
 
 	/**
-	 * 判断协程是否处于挂起状态
-	 *
+	 * Check if the coroutine if in the suspending status.
+	 * @return {bool}
 	 */
 	bool is_suspended() const;
 
 	/**
-	 * 设置当前协程的错误号
+	 * Set the error number of the coroutine.
 	 * @param errnum {int}
 	 */
 	void set_errno(int errnum);
 
 	/**
-	 * 清除当前协程的错误号及标记位
+	 * Clean up the error flag in the coroutine.
 	 */
 	static void clear();
 
 public:
 	/**
-	 * 获得本次操作的出错信息
+	 * Get the error message of the coroutine after calling system API.
 	 * @return {const char*}
 	 */
 	static const char* last_serror();
 
 	/**
-	 * 获得本次操作的出错号
+	 * Get the error number of the coroutine after calling system API.
 	 * @return {int}
 	 */
 	static int last_error();
 
 	/**
-	 * 将所给错误号转成描述信息
-	 * @param errnum {int} 错误号
-	 * @param buf {char*} 存储结果
-	 * @param size {size_t} buf 空间大小
-	 * @return {const char*} buf 地址
+	 * Convert the given error number into descriptive information.
+	 * @param errnum {int} The given error number.
+	 * @param buf {char*} Will save the result.
+	 * @param size {size_t} The buf's space size.
+	 * @return {const char*} Return the buf's address.
 	 */
 	static const char* strerror(int errnum, char* buf, size_t size);
 
 	/**
-	 * 将错误信息输出至标准输出
-	 * @param on {bool} 为 true 时，内部出错信息将输出至标准输出
+	 * Output error messages to standard output.
+	 * @param on {bool} If true, the internal error messages will be output
+	 *  to the standard output.
 	 */
 	static void stdout_open(bool on);
 
 	/**
-	 * 设置本进程最大可创建的句柄数量
-	 * @param max {int} >= 0 时有效
-	 * @return {int} 返回当前可用的最大句柄数量
+	 * Set the maximum number of file handles that can be created by
+	 * this process.
+	 * @param max {int} Only valid when max >= 0.
+	 * @return {int} Return the maximum number of current available handles.
 	 */
 	static int set_fdlimit(int max);
 
 	/**
-	 * 显式设置协程调度事件引擎类型，同时设置协程调度器为自启动模式，即当
-	 * 创建协程后不必显式调用 schedule 或 schedule_with 来启动协程调度器
-	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
-	 * @param schedule_auto {bool} 若为 true，则创建协程对象后并运行该协程
-	 *  对象后不必显式调用 schedule/schedule_with 来启动所有的协程过程，内
-	 *  部会自动启动协程调度器；否则，在创建并启动协程后，必须显式地调用
-	 *  schedule 或 schedule_with 方式来启动协程调度器以运行所的协程过程；
-	 *  内部缺省状态为 false
-	 * @param backend_fiber {bool} 当事件类型为FIBER_EVENT_T_WMSG，
+	 * Explicitly set the type of the coroutine scheduing event engine and
+	 * set the coroutine scheduler to self start mode, which means that
+	 * there is no need to explicitly call scheule() or schedule_with()
+	 * to start the coroutine scheduing after creating one coroutine.
+	 * @param type {fiber_event_t} See FIBER_EVENT_T_XXX above.
+	 * @param schedule_auto {bool} If true, after creating a coroutine
+	 *  object and running it, there is no need to explicitly call
+	 *  scheduler/schedule-with to start all coroutine processes. The
+	 *  coroutine scheduler will automatically start internally;
+	 *  Otherwise, after creating and starting a coroutine, it is
+	 *  necessary to explicitly call the schedule or schedule_with method
+	 *  to start the coroutine scheduler to run the coroutine process;
+	 *  The internal default state is false.
 	 */
 	static void init(fiber_event_t type, bool schedule_auto = false);
 
 	/**
-	 * 在 Windows 平台下，可以调用此方法启用 GUI 界面协程模式
+	 * On the Windows platform, this method can be called to enable GUI
+	 * coroutine mode.
 	 */
 	static void schedule_gui();
 
 	/**
-	 * 启动协程运行的调度过程
-	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
+	 * Start coroutine scheduing process.
+	 * @param type {fiber_event_t} The event engine, see FIBER_EVENT_T_XXX.
 	 */
 	static void schedule(fiber_event_t type = FIBER_EVENT_T_KERNEL);
 
 	/**
-	 * 启动协程调度时指定事件引擎类型，调用本方法等于同时调用了 schedule_init
-	 * 及 schedule 两个方法
-	 * @param type {fiber_event_t} 事件引擎类型，参见：FIBER_EVENT_T_XXX
+	 * Start coroutine scheduing process with the specified event type.
+	 * @param type {fiber_event_t} The event engine, see FIBER_EVENT_T_XXX.
 	 */
 	static void schedule_with(fiber_event_t type);
 
 	/**
-	 * 判断当前线程是否处于协程调度状态
+	 * Check whether the current thread is in a coroutine scheduing state.
 	 * @return {bool}
 	 */
 	static bool scheduled();
 
 	/**
-	 *  停止协程调度过程
+	 * Stop coroutine scheduing process.
 	 */
 	static void schedule_stop();
 
 public:
 	/**
-	 * 将当前正在运行的协程(即本协程) 挂起
+	 * Give up the scheudling right of the current running coroutine.
 	 */
 	static void yield();
 
 	/**
-	 * 挂起当前协程，执行等待队列中的下一个协程
+	 * Suspend the current coroutine and execute the next coroutine
+	 * in the waiting queue
 	 */
 	static void switch_to_next();
 
 	/**
-	 * 将指定协程对象置入待运行队列中
+	 * Append the specified coroutine to pending queue for execution.
 	 * @param f {fiber&}
 	 */
 	static void ready(fiber& f);
 
 	/**
-	 * 使当前运行的协程休眠指定毫秒数
-	 * @param milliseconds {size_t} 指定要休眠的毫秒数
-	 * @return {size_t} 本协程休眠后再次被唤醒后剩余的毫秒数
+	 * Let the current running coroutine sleep for a while in milliseconds.
+	 * @param milliseconds {size_t} Specify the number of milliseconds to sleep.
+	 * @return {size_t} The number of milliseconds remaining after waking
+	 *  up again after the coroutine goes into sleep.
 	 */
 	static size_t delay(size_t milliseconds);
 
 	/**
-	 * 获得处于存活状态的协程数量
+	 * Get the number of active coroutines.
 	 * @return {unsigned}
 	 */
 	static unsigned alive_number();
 
 	/**
-	 * 获得处于退出状态的协程对象数量
+	 * Get the number of coroutines in exiting state.
 	 * @return {unsigned}
 	 */
 	static unsigned dead_number();
 
 	/**
-	 * 设置本线程中所有协程在连接服务端时都采用了带超时的非阻塞方式（仅限Windows)
+	 * Set all coroutines in this thread to use a non blocking method
+	 * with timeout when connecting to the server.
 	 * @param yes {bool}
+	 * Notice: The method can only be used on Windows platform.
 	 */
 	static void set_non_blocking(bool yes);
 
 	/**
-	 * 在启用共享栈模式下设置共享栈的大小,内部缺省值为 1024000 字节
-	 * @param size {size_t} 共享栈内存大小
+	 * Set the size of the shared stack in shared stack mode, with an
+	 * internal default value of 1024000 bytes.
+	 * @param size {size_t} The shared stack's size.
 	 */
 	static void set_shared_stack_size(size_t size);
 
 	/**
-	 * 在启用共享栈模式下获得共享栈大小
-	 * @return {size_t} 如果返回 0 则表示未启用共享栈方式
+	 * Get the size of the shared stack in shared stack mode.
+	 * @return {size_t} If 0 is returned, it means that the shared stack
+	 *  mode is not enabled.
 	 */
 	static size_t get_shared_stack_size();
 
-	/**
-	 * 显式调用本函数使 acl 基础库的 IO 过程协程化，在 UNIX 平台下不必显式
-	 * 调用本函数，因为内部会自动 HOOK IO API
-	 */
 	static void acl_io_hook();
 
-	/**
-	 * 调用本函数取消 acl基础库中的 IO 协程化
-	 */
 	static void acl_io_unlock();
 
 	/**
-	 * Windows 平台下可以显式地调用此函数 Hook 一些与网络协程相关的系统 API
+	 * On the Windows platform, this function can be explicitly called to
+	 * hook some system APIs related to network coroutines.
 	 * @return {bool}
 	 */
 	static bool winapi_hook();
 
 	/**
-	 * 获得当前系统级错误号
+	 * Get the system error number.
 	 * @return {int}
 	 */
 	static int  get_sys_errno();
 
 	/**
-	 * 设置当前系统级错误号
+	 * Set the system error number.
 	 * @param errnum {int}
 	 */
 	static void set_sys_errno(int errnum);
 
 public:
 	/**
-	 * 返回本协程对象对应的 C 语言的协程对象
+	 * Return the corresponding C language coroutine object of
+	 * this coroutine object.
 	 * @return {ACL_FIBER* }
 	 */
 	ACL_FIBER* get_fiber() const;
 
 	/**
-	 * 底层调用 C API 创建协程
-	 * @param fn {void (*)(ACL_FIBER*, void*)} 协程函数执行入口
-	 * @param ctx {void*} 传递给协程执行函数的参数
-	 * @param size {size_t} 协程栈大小
-	 * @param share_stack {bool} 是否创建共享栈协程
+	 * Call C API to crete one coroutine.
+	 * @param fn {void (*)(ACL_FIBER*, void*)} Execution entry of coroutine.
+	 * @param ctx {void*} The context for execution function.
+	 * @param size {size_t} The stack size of coroutine.
+	 * @param share_stack {bool} If to create a coroutine in shared stack.
 	 * @return {ACL_FIBER*}
 	 */
 	static ACL_FIBER* fiber_create(void (*fn)(ACL_FIBER*, void*),
 			void* ctx, size_t size, bool share_stack = false);
 
 	/**
-	 * 获得指定协程的堆栈
+	 * Get the coroutine's stacks.
 	 * @param fb {const fiber&}
-	 * @param out {std::vector<stack_frame>&} 存放结果数据
-	 * @param max {size_t} 指定获取栈的最大深度
+	 * @param out {std::vector<stack_frame>&} Save the result.
+	 * @param max {size_t} Set the maximum deepth of the stacks.
 	 */
 	static void stacktrace(const fiber& fb, std::vector<fiber_frame>& out,
 			size_t max = 50);
 
 	/**
-	 * 输出指定协程的栈至标准输出
+	 * Output the coroutine's calling stacks to stantard out.
 	 * @param fb {const fiber&}
-	 * @param max {size_t} 可以显示栈的最大深度
+	 * @param max {size_t} The maximum deepth of the stacks to be displayed.
 	 */
 	static void stackshow(const fiber& fb, size_t max = 50);
 
 protected:
 	/**
-	 * 虚函数，子类须实现本函数，当通过调用 start 方法启动协程后，本
-	 * 虚函数将会被调用，从而通知子类协程已启动; 如果在构造函数中的参数
-	 * running 为 true ，则 start 将被禁止调用，故本虚方法也不会被调用
+	 * Virtual function, subclasses must implement this function. When the
+	 * coroutine is started by calling the start() method, this virtual
+	 * function will be called to notify the subclass that the coroutine
+	 * has been started; If the parameter running in the constructor is
+	 * true, start will be prohibited from being called, so this virtual
+	 * method will not be called either.
 	 */
 	virtual void run();
 
@@ -336,7 +349,7 @@ private:
 };
 
 /**
- * 可用作定时器的协程类
+ * A coroutine class that can be used as a timer.
  */
 class FIBER_CPP_API fiber_timer {
 public:
@@ -344,15 +357,16 @@ public:
 	virtual ~fiber_timer() {}
 
 	/**
-	 * 启动一个协程定时器
-	 * @param milliseconds {unsigned int} 毫秒级时间
-	 * @param stack_size {size_t} 协程的栈空间大小
+	 * Start one coroutine timer.
+	 * @param milliseconds {unsigned int} in milliseconds.
+	 * @param stack_size {size_t} The coroutine's stack size.
 	 */
 	void start(unsigned int milliseconds, size_t stack_size = 320000);
 
 protected:
 	/**
-	 * 子类必须实现该纯虚方法，当定时器启动时会回调该方法
+	 * The subclass must implement this pure virtual method, which will
+	 * be called back when the timer starts.
 	 */
 	virtual void run() = 0;
 
@@ -368,7 +382,7 @@ private:
 #if defined(ACL_CPP_API)
 
 /**
- * 定时器管理协程
+ * Timer management coroutine class.
  */
 template <typename T>
 class fiber_trigger : public fiber {

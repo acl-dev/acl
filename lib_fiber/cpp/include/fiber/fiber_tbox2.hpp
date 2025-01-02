@@ -3,16 +3,18 @@
 #include <list>
 #include <vector>
 #include <cstdlib>
+#include "fiber.hpp"
 #include "fiber_mutex.hpp"
 #include "fiber_cond.hpp"
 
 namespace acl {
 
 /**
- * 用于协程之间，线程之间以及协程与线程之间的消息通信，通过协程条件变量
- * 及协程事件锁实现
+ * Used for message communication between coroutines, threads, and between
+ * coroutines, implemented through coroutine condition variables and
+ * coroutine lock.
  *
- * 示例：
+ * Sample:
  *
  * class myobj {
  * public:
@@ -46,43 +48,73 @@ namespace acl {
 template<typename T>
 class fiber_tbox2 : public box2<T> {
 public:
-	/**
-	 * 构造方法
-	 */
-	fiber_tbox2() : size_(0) {}
+	fiber_tbox2() : capacity_(10000) , off_curr_(0) , off_next_(0) {
+		box_ = new T[capacity_];
+	}
 
-	~fiber_tbox2() {}
+	~fiber_tbox2() { delete []box_; }
 
 	/**
-	 * 清理消息队列中未被消费的消息对象
+	 * Clean up unconsumed messages in the message queue.
 	 */
 	void clear() {
-		tbox_.clear();
+		off_curr_ = off_next_ = 0;
 	}
 
 	/**
-	 * 发送消息对象
-	 * @param t {T} 消息对象
-	 * @param notify_first {bool} 如果本参数为 true，则内部添加完消息后
-	 *  采用先通知后解锁方式，否则采用先解锁后通知方式，当 fiber_tbox2 对象
-	 *  的生存周期比较长时，该参数设为 false 的效率更高，如果 fiber_tbox2
-	 *  对象的生存周期较短(如：等待者调用 pop 后直接销毁 fiber_tbox2 对象),
-	 *  则本参数应该设为 true，以避免 push 者还没有完全返回前因 fiber_tbox2
-	 *  对象被提前销毁而造成内存非法访问
-	 * @return {bool}
+	 * Send message to the message queue.
+	 * @param t {T} The message to be transferred.
+	 * @param notify_first {bool} If this parameter is true, the internal
+	 *  message will be notified first and then unlocked. Otherwise,
+	 *  the unlocking first and then notification method will be used.
+	 *  When the lifespan of the fiber_tbox2 object is relatively long,
+	 *  setting this parameter to false is more efficient. If the lifespan
+	 *  of the fiber_tbox2 object is short (such as directly destroying
+	 *  the fiber_tbox2 object after waiting for the caller to call pop),
+	 *  this parameter should be set to true to avoid unauthorized memory
+	 *  access caused by the premature destruction of the fiber_tbox2
+	 *  object before the pusher has fully returned.
+	 * @return {bool} if sending successfully.
 	 * @override
 	 */
 	bool push(T t, bool notify_first = true) {
-		// 先加锁
 		if (! mutex_.lock()) { abort(); }
 
-		// 向队列中添加消息对象
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-		tbox_.emplace_back(std::move(t));
+		if (off_next_ == capacity_) {
+			if (off_curr_ >= 10000) {
+#if 1
+				size_t n = 0;
+				for (size_t i = off_curr_; i < off_next_; i++) {
+					box_[n++] = box_[i];
+				}
 #else
-		tbox_.push_back(t);
+				memmove(box_, box_ + off_curr_,
+					(off_next_ - off_curr_) * sizeof(T));
 #endif
-		size_++;
+
+				off_next_ -= off_curr_;
+				off_curr_ = 0;
+			} else {
+				size_t capacity = capacity_ + 10000;
+				T* box = new T[capacity];
+				for (size_t i = 0; i < capacity_; i++) {
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+					box[i] = std::move(box_[i]);
+#else
+					box[i] = box_[i];
+#endif
+				}
+				delete []box_;
+				box_ = box;
+				capacity_ = capacity;
+
+			}
+		}
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+		box_[off_next_++] = std::move(t);
+#else
+		box_[off_next_++] = t;
+#endif
 
 		if (notify_first) {
 			if (! cond_.notify()) { abort(); }
@@ -95,15 +127,16 @@ public:
 	}
 
 	/**
-	 * 接收消息对象
-	 * @param t {T&} 当函数 返回 true 时存放结果对象
-	 * @param ms {int} >= 0 时设置等待超时时间(毫秒级别)，
-	 *  否则永远等待直到读到消息对象或出错
-	 * @return {bool} 是否获得消息对象
+	 * Timed wait object from box.
+	 * @param t {T&} Will save the object if got one.
+	 * @param ms {int} Set the waiting timeout in milliseconds when >= 0,
+	 *  and if set -1, will wait until getting one or be killed.
+	 * @return {bool} if one object be got.
 	 * @override
 	 */
 	bool pop(T& t, int ms = -1) {
 		if (! mutex_.lock()) { abort(); }
+
 		while (true) {
 			if (peek_obj(t)) {
 				if (! mutex_.unlock()) { abort(); }
@@ -114,13 +147,20 @@ public:
 				if (! mutex_.unlock()) { abort(); }
 				return false;
 			}
+
+			if (fiber::self_killed()) {
+				if (! mutex_.unlock()) { abort(); }
+				return false;
+			}
 		}
 	}
 
 	//@override
 	size_t pop(std::vector<T>& out, size_t max, int ms) {
 		size_t n = 0;
+
 		if (! mutex_.lock()) { abort(); }
+
 		while (true) {
 			T t;
 			if (peek_obj(t)) {
@@ -132,24 +172,31 @@ public:
 				}
 				continue;
 			}
+
 			if (n > 0) {
-				if (! mutex_.lock()) { abort(); }
+				if (! mutex_.unlock()) { abort(); }
 				return n;
 			}
+
 			if (! cond_.wait(mutex_, ms) && ms >= 0) {
-				if (! mutex_.lock()) { abort(); }
+				if (! mutex_.unlock()) { abort(); }
+				return n;
+			}
+
+			if (fiber::self_killed()) {
+				if (! mutex_.unlock()) { abort(); }
 				return n;
 			}
 		}
 	}
 
 	/**
-	 * 返回当前存在于消息队列中的消息数量
+	 * Return the current number of messages in the message queue.
 	 * @return {size_t}
 	 * @override
 	 */
 	size_t size() const {
-		return size_;
+		return off_next_ - off_curr_;
 	}
 
 	// @override
@@ -171,23 +218,26 @@ private:
 	const fiber_tbox2& operator=(const fiber_tbox2&);
 
 private:
-	std::list<T>  tbox_;
-	size_t        size_;
-	fiber_mutex   mutex_;
-	fiber_cond    cond_;
+	T*           box_;
+	size_t       capacity_;
+	size_t       off_curr_;
+	size_t       off_next_;
+	fiber_mutex  mutex_;
+	fiber_cond   cond_;
 
 	bool peek_obj(T& t) {
-		typename std::list<T>::iterator it = tbox_.begin();
-		if (it == tbox_.end()) {
+		if (off_curr_ == off_next_) {
+			if (off_curr_ > 0) {
+				off_curr_ = off_next_ = 0;
+			}
 			return false;
 		}
-#if __cplusplus >= 201103L || defined(USE_CPP11)     // Support c++11 ?
-		t = std::move(*it);
+
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+		t = std::move(box_[off_curr_++]);
 #else
-		t = *it;
+		t = box_[off_curr_++];
 #endif
-		tbox_.erase(it);
-		size_--;
 		return true;
 	}
 };
