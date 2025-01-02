@@ -15,6 +15,8 @@ all:
 	@(cd client2; make)
 	@(cd fiber_connect; make)
 	@(cd fiber_tbox; make)
+	@(cd fiber_box; make)
+	@(cd fibers; make)
 cl clean:
 	@(cd fiber; make clean)
 	@(cd httpd; make clean)
@@ -32,5 +34,7 @@ cl clean:
 	@(cd client2; make clean)
 	@(cd fiber_connect; make clean)
 	@(cd fiber_tbox; make clean)
+	@(cd fiber_box; make clean)
+	@(cd fibers; make clean)
 
 rb rebuild: clean all

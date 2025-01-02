@@ -1,7 +1,8 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
-#include <list>
+#include <cstdlib>
 #include <cassert>
+#include <list>
 
 struct ACL_FIBER_SEM;
 
@@ -151,7 +152,7 @@ public:
 	, off_curr_(0)
 	, off_next_(0)
 	{
-		box_ = (T*) malloc(sizeof(T) * capacity_);
+		box_ = new T[capacity_];
 	}
 
 	explicit fiber_sbox2(int buf)
@@ -160,10 +161,10 @@ public:
 	, off_curr_(0)
 	, off_next_(0)
 	{
-		box_ = (T*) malloc(sizeof(T) * capacity_);
+		box_ = new T[capacity_];
 	}
 
-	~fiber_sbox2() {}
+	~fiber_sbox2() { delete []box_; }
 
 	// @override
 	bool push(T t, bool dummy = false) {
@@ -184,8 +185,18 @@ public:
 				off_next_ -= off_curr_;
 				off_curr_ = 0;
 			} else {
-				capacity_ += 10000;
-				box_ = (T*) realloc(box_, sizeof(T) * capacity_);
+				size_t capacity = capacity_ + 10000;
+				T* box = new T[capacity];
+				for (size_t i = 0; i < capacity_; i++) {
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+					box[i] = std::move(box_[i]);
+#else
+					box[i] = box_[i];
+#endif
+				}
+				delete []box_;
+				box_ = box;
+				capacity_ = capacity;
 			}
 		}
 		box_[off_next_++] = t;

@@ -49,10 +49,10 @@ template<typename T>
 class fiber_tbox2 : public box2<T> {
 public:
 	fiber_tbox2() : capacity_(10000) , off_curr_(0) , off_next_(0) {
-		box_ = (T*) malloc(sizeof(T) * capacity_);
+		box_ = new T[capacity_];
 	}
 
-	~fiber_tbox2() { free(box_); }
+	~fiber_tbox2() { delete []box_; }
 
 	/**
 	 * Clean up unconsumed messages in the message queue.
@@ -95,8 +95,19 @@ public:
 				off_next_ -= off_curr_;
 				off_curr_ = 0;
 			} else {
-				capacity_ += 10000;
-				box_ = (T*) realloc(box_, sizeof(T) * capacity_);
+				size_t capacity = capacity_ + 10000;
+				T* box = new T[capacity];
+				for (size_t i = 0; i < capacity_; i++) {
+#if __cplusplus >= 201103L || defined(USE_CPP11)
+					box[i] = std::move(box_[i]);
+#else
+					box[i] = box_[i];
+#endif
+				}
+				delete []box_;
+				box_ = box;
+				capacity_ = capacity;
+
 			}
 		}
 #if __cplusplus >= 201103L || defined(USE_CPP11)
