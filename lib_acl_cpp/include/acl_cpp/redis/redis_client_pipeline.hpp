@@ -142,7 +142,7 @@ public:
 	}
 
 	const redis_result* wait() {
-		box_->pop();
+		box_->pop(-1, NULL);
 		return result_;
 	}
 

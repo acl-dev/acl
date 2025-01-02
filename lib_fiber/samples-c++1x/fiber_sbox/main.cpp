@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 	std::atomic<int> nfibers_left(nfibers);
 
 	for (int i = 0; i < nfibers; i++) {
-		auto fb = go[&box, &fibers, &nfibers_left] {
+		auto fb = go[&box, &nfibers_left] {
 			while (true) {
 				shared_message msg;
 				if (!box.pop(msg)) {
@@ -90,11 +90,11 @@ int main(int argc, char* argv[]) {
 		std::cout << "All consumers exited!" << std::endl;
 	};
 
-	go[&box, &fibers, &nmsgs, nfibers, count] {
+	go[&box, &fibers, &nmsgs, count] {
 		for (int i = 0; i < count; i++) {
 			auto msg = std::make_shared<message>(nmsgs, i);
 			++nmsgs;
-			box.push(msg);
+			box.push(msg, false);
 			if (i > 0 && i % 10 == 0) {
 				::sleep(1);
 			}
@@ -106,6 +106,45 @@ int main(int argc, char* argv[]) {
 			acl_fiber_kill(fb);
 		}
 	};
+
+	go[&box] {
+		for (int i = 0; i < 20; i++) {
+			::sleep(1);
+
+			shared_message msg;
+			time_t begin = time(NULL);
+			if (box.pop(msg, 1000)) {
+				std::cout << "POP one\r\n";
+			} else {
+				time_t end = time(NULL);
+				std::cout << "POP error: "
+					<< acl::last_serror()
+					<< ", time cost: " << end - begin
+					<< " seconds\r\n";
+			}
+		}
+	};
+
+    std::shared_ptr<acl::fiber_sbox2<int*>> box2;
+    box2 = std::make_shared<acl::fiber_sbox2<int*>>();
+
+    go[box2] {
+        for (int i = 0; i < 20; i++) {
+            int *cnt;
+            if (box2->pop(cnt, -1)) {
+                printf("pop cnt: %d\r\n", *cnt);
+                delete cnt;
+            }
+        }
+    };
+
+    go[box2] {
+        for (int i = 0; i < 20; i++) {
+            int *cnt = new int(i);
+            box2->push(cnt);
+            ::sleep(1);
+        }
+    };
 
 	acl::fiber::schedule();
 	return 0;

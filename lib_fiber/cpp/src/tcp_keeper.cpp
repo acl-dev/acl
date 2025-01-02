@@ -8,14 +8,14 @@
 
 namespace acl {
 
-tcp_keeper::tcp_keeper(void)
+tcp_keeper::tcp_keeper()
 : rtt_min_(5.00)
 {
 	waiter_ = new keeper_waiter;
 	lock_   = new thread_mutex;
 }
 
-tcp_keeper::~tcp_keeper(void)
+tcp_keeper::~tcp_keeper()
 {
 	delete waiter_;
 	delete lock_;
@@ -65,14 +65,14 @@ tcp_keeper& tcp_keeper::set_rtt_min(double rtt)
 	return *this;
 }
 
-void* tcp_keeper::run(void)
+void* tcp_keeper::run()
 {
 	waiter_->start();
 	fiber::schedule();
 	return NULL;
 }
 
-void tcp_keeper::stop(void)
+void tcp_keeper::stop()
 {
 	waiter_->stop();
 	waiter_->join();

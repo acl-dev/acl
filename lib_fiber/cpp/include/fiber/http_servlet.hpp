@@ -12,7 +12,7 @@ public:
 		socket_stream* stream, session* session)
 	: http_servlet_impl(handlers, stream, session) {}
 
-	~http_servlet(void) {}
+	~http_servlet() {}
 };
 
 } // namespace acl

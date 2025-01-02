@@ -32,7 +32,7 @@ public:
 	 * 获得配置文件路径
 	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
 	 */
-	const char* get_conf_path(void) const;
+	const char* get_conf_path() const;
 
 	/**
 	 * 获得当前服务总连接数
@@ -48,9 +48,9 @@ public:
 	long long users_count_add(int n);
 
 protected:
-	master_fiber(void);
+	master_fiber();
 
-	virtual ~master_fiber(void);
+	virtual ~master_fiber();
 
 	/**
 	 * 虚函数，当协程服务器接收到客户端连接后调用本函数
@@ -62,7 +62,7 @@ protected:
 	/**
 	 * 当线程初始化时该虚方法将被调用
 	 */
-	virtual void thread_on_init(void) {}
+	virtual void thread_on_init() {}
 
 private:
 	static void service_on_listen(void*, ACL_VSTREAM*);

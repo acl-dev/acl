@@ -8,34 +8,36 @@ namespace acl {
 class fiber_mutex;
 
 /**
- * 可用在协程之间，线程之间，协程与线程之间的条件变量
+ * Conditional variables that can be used between coroutines, threads, and
+ * between coroutines and threads.
  */
 class FIBER_CPP_API fiber_cond {
 public:
-	fiber_cond(void);
-	~fiber_cond(void);
+	fiber_cond();
+	~fiber_cond();
 
 	/**
-	 * 等待条件变量事件被触发
+	 * Wait for the conditional variable be available.
 	 * @param mutex {fiber_mutex&}
-	 * @param timeout {int} 超时等待时间（毫秒）
-	 * @return {bool} 成功时返回 true，否则返回 false 表示超时
+	 * @param timeout {int} The waiting timeout in milliseconds.
+	 * @return {bool} Return true if avaialbe or return false if timeout.
 	 */
 	bool wait(fiber_mutex& mutex, int timeout = -1);
 
 	/**
-	 * 唤醒在条件变量上的等待者，如果没有等待者则直接返回，运行行为和
-	 * 线程条件变量类似
-	 * @return {bool} 成功返回 true，否则返回 false 表示失败
+	 * Wake up the waiter on the condition variable, and if there are no
+	 * waiters, return directly. The running behavior is similar to that
+	 * of thread condition variables.
+	 * @return {bool} Return true if successful or return false if error.
 	 */
-	bool notify(void);
+	bool notify();
 
 public:
 	/**
-	 * 返回 C 版本的条件变量对象
+	 * Return the C object conditional variable.
 	 * @return {ACL_FIBER_COND*}
 	 */
-	ACL_FIBER_COND* get_cond(void) const {
+	ACL_FIBER_COND* get_cond() const {
 		return cond_;
 	}
 

@@ -1,34 +1,36 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
 #include <list>
-#include <stdlib.h>
+#include <cstdlib>
+#include "fiber.hpp"
 #include "fiber_mutex.hpp"
 #include "fiber_cond.hpp"
 
 namespace acl {
 
 /**
- * 用于协程之间，线程之间以及协程与线程之间的消息通信，通过协程条件变量
- * 及协程事件锁实现
+ * Used for message cmmunication between coroutines, threads, and between
+ * coroutines, implemented through coroutine condition variables and
+ * coroutine lock.
  *
- * 示例：
+ * Sample:
  *
  * class myobj {
  * public:
- *     myobj(void) {}
- *     ~myobj(void) {}
+ *     myobj() {}
+ *     ~myobj() {}
  *
- *     void test(void) { printf("hello world\r\n"); }
+ *     void test() { printf("hello world\r\n"); }
  * };
  *
  * acl::fiber_tbox<myobj> fiber_tbox;
  *
- * void thread_producer(void) {
+ * void thread_producer() {
  *     myobj* o = new myobj;
  *     fiber_tbox.push(o);
  * }
  *
- * void thread_consumer(void) {
+ * void thread_consumer() {
  *     myobj* o = fiber_tbox.pop();
  *     o->test();
  *     delete o;
@@ -41,19 +43,19 @@ template<typename T>
 class fiber_tbox : public box<T> {
 public:
 	/**
-	 * 构造方法
-	 * @param free_obj {bool} 当 fiber_tbox 销毁时，是否自动检查并释放
-	 *  未被消费的动态对象
+	 * The constructor
+	 * @param free_obj {bool} Automatically check and release consumed
+	 *  dynamic objects when fiber_tbox is destroyed.
 	 */
-	fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
+	explicit fiber_tbox(bool free_obj = true) : size_(0), free_obj_(free_obj) {}
 
-	~fiber_tbox(void) {
+	~fiber_tbox() {
 		clear(free_obj_);
 	}
 
 	/**
-	 * 清理消息队列中未被消费的消息对象
-	 * @param free_obj {bool} 释放调用 delete 方法删除消息对象
+	 * Clean up the unconsumed message objects in the message queue.
+	 * @param free_obj {bool} if deleting objects in queue when clean up.
 	 */
 	void clear(bool free_obj = false) {
 		if (free_obj) {
@@ -67,82 +69,84 @@ public:
 	}
 
 	/**
-	 * 发送消息对象
-	 * @param t {T*} 非空消息对象
-	 * @param notify_first {bool} 如果本参数为 true，则内部添加完消息后
-	 *  采用先通知后解锁方式，否则采用先解锁后通知方式，当 fiber_tbox 对象
-	 *  的生存周期比较长时，该参数设为 false 的效率更高，如果 fiber_tbox
-	 *  对象的生存周期较短(如：等待者调用 pop 后直接销毁 fiber_tbox 对象),
-	 *  则本参数应该设为 true，以避免 push 者还没有完全返回前因 fiber_tbox
-	 *  对象被提前销毁而造成内存非法访问
+	 * Send message object
+	 * @param t {T*} The object to be sent to queue.
+	 * @param notify_first {bool} If this parameter is true, the internal
+	 *  message will be notified first and then unlocked. Otherwise,
+	 *  the unlocking first and then notification method will be used.
+	 *  When the lifespan of the fiber_tbox object is relatively long,
+	 *  setting this parameter to false is more efficient. If the lifespan
+	 *  of the fiber_tbox object is short (such as directly destroying
+	 *  the fiber_tbox object after waiting for the caller to call pop),
+	 *  this parameter should be set to true to avoid unauthorized memory
+	 *  access caused by the premature destruction of the fiber_tbox
+	 *  object before the pusher has fully returned.
 	 * @return {bool}
 	 * @override
 	 */
 	bool push(T* t, bool notify_first = true) {
-		// 先加锁
-		if (mutex_.lock() == false) {
-			abort();
-		}
+		if (! mutex_.lock()) { abort(); }
 
-		// 向队列中添加消息对象
 		tbox_.push_back(t);
 		size_++;
 
 		if (notify_first) {
-			if (cond_.notify() == false) {
-				abort();
-			}
-			if (mutex_.unlock() == false) {
-				abort();
-			}
-			return true;
+			if (! cond_.notify()) { abort(); }
+			if (! mutex_.unlock()) { abort(); }
 		} else {
-			if (mutex_.unlock() == false) {
-				abort();
-			}
-			if (cond_.notify() == false) {
-				abort();
-			}
-			return true;
+			if (! mutex_.unlock()) { abort(); }
+			if (! cond_.notify()) { abort(); }
 		}
+
+		return true;
 	}
 
 	/**
-	 * 接收消息对象
-	 * @param wait_ms {int} >= 0 时设置等待超时时间(毫秒级别)，
-	 *  否则永远等待直到读到消息对象或出错
-	 * @param found {bool*} 非空时用来存放是否获得了一个消息对象，主要用在
-	 *  当允许传递空对象时的检查
-	 * @return {T*} 非 NULL 表示获得一个消息对象，返回 NULL 时得需要做进一
-	 *  步检查，生产者如果 push 了一个空对象（NULL），则消费者也会获得 NULL，
-	 *  但此时仍然认为获得了一个消息对象，只不过为空对象；如果 wait_ms 参数
-	 *  为 -1 时返回 NULL 依然认为获得了一个空消息对象，如果 wait_ms 大于
-	 *  等于 0 时返回 NULL，则应该检查 found 参数的值为 true 还是 false 来
-	 *  判断是否获得了一个空消息对象
+	 * Receive message object from the message queue.
+	 * @param ms {int} When ms >= 0,set the wait timout(in milliseconds),
+	 *  otherwise wait forever until the message object is read or timeout
+	 *  occcurs.
+	 * @param found {bool*} The non-null space is used to store whether
+	 *  a message object has been obtained, mainly for checking when null
+	 *  objects are allowed to be passed
+	 * @return {T*} Non NULL means obtaining a message object, and further
+	 *  checks are required when returning NULL. If the producer pushes
+	 *  an empty object (NULL), the consumer will also receive NULL, but
+	 *  still consider that a message object has been obtained, which is
+	 *  just an empty object; If the ms parameter is -1 returns NULL, it
+	 *  is still considered that an empty message object has been obtained.
+	 *  If ms is >= 0 and returns NULL, the value of the found parameter
+	 *  should be checked to determine whether an empty message object
+	 *  has been obtained.
 	 * @override
 	 */
-	T* pop(int wait_ms = -1, bool* found = NULL) {
+	T* pop(int ms = -1, bool* found = NULL) {
 		bool found_flag;
-		if (mutex_.lock() == false) {
-			abort();
-		}
+
+		if (! mutex_.lock()) { abort(); }
+
 		while (true) {
 			T* t = peek(found_flag);
 			if (found_flag) {
-				if (mutex_.unlock() == false) {
-					abort();
-				}
+				if (! mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = found_flag;
 				}
 				return t;
 			}
 
-			// 注意调用顺序，必须先调用 wait 再判断 wait_ms
-			if (!cond_.wait(mutex_, wait_ms) && wait_ms >= 0) {
-				if (mutex_.unlock() == false) {
-					abort();
+			// The calling order: wait should be called first
+			// before checking wait_ms.
+			if (! cond_.wait(mutex_, ms) && ms >= 0) {
+				if (! mutex_.unlock()) { abort(); }
+				if (found) {
+					*found = false;
 				}
+				return NULL;
+			}
+
+			if (fiber::self_killed()) {
+				if (! mutex_.unlock()) { abort(); }
 				if (found) {
 					*found = false;
 				}
@@ -151,32 +155,67 @@ public:
 		}
 	}
 
+	// @override
+	size_t pop(std::vector<T*>& out, size_t max, int ms) {
+		size_t n = 0;
+		bool found_flag;
+
+		if (! mutex_.lock()) { abort(); }
+
+		while (true) {
+			T* t = peek(found_flag);
+			if (found_flag) {
+				out.push_back(t);
+				n++;
+				if (max > 0 && n >= max) {
+					return n;
+				}
+				continue;
+			}
+
+			if (n > 0) {
+				if (! mutex_.unlock()) { abort(); }
+				return n;
+			}
+
+			if (! cond_.wait(mutex_, ms) && ms >= 0) {
+				if (! mutex_.unlock()) { abort(); }
+				return n;
+			}
+
+			if (fiber::self_killed()) {
+				if (! mutex_.unlock()) { abort(); }
+				return n;
+			}
+		}
+	}
+
 	/**
-	 * tbox 允许有空消息
+	 * tbox support transferring null message object.
 	 * @return {bool}
 	 * @override
 	 */
-	bool has_null(void) const {
+	bool has_null() const {
 		return true;
 	}
 
 	/**
-	 * 返回当前存在于消息队列中的消息数量
+	 * Return the current number of messages in the message queue.
 	 * @return {size_t}
 	 */
-	size_t size(void) const {
+	size_t size() const {
 		return size_;
 	}
 
 public:
-	void lock(void) {
-		if (mutex_.lock() == false) {
+	void lock() {
+		if (! mutex_.lock()) {
 			abort();
 		}
 	}
 
-	void unlock(void) {
-		if (mutex_.unlock() == false) {
+	void unlock() {
+		if (! mutex_.unlock()) {
 			abort();
 		}
 	}

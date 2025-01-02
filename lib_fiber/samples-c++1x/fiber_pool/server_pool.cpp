@@ -142,7 +142,7 @@ void server_pool_run(const char* addr, bool sync, int nfibers,
 
 					++nmsgs;
 					auto msg = std::make_shared<message>(client, nmsgs, buf, ret);
-					box.push(msg);
+					box.push(msg, false);
 				}
 			};
 		}

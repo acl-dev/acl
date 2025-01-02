@@ -7,30 +7,32 @@ struct ACL_FIBER_RWLOCK;
 namespace acl {
 
 /**
- * 仅能用于同一线程内部的协程之间进行互斥的互斥锁
+ * mutex lock that can only be used for mutual exclusion between coroutines
+ * within the same thread.
  */
 class FIBER_CPP_API fiber_lock {
 public:
-	fiber_lock(void);
-	~fiber_lock(void);
+	fiber_lock();
+	~fiber_lock();
 
 	/**
-	 * 等待互斥锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
+	 * Lock the mutex.
+	 * @return {bool} If lock successfully, return true, or return false.
 	 */
-	bool lock(void);
+	bool lock();
 
 	/**
-	 * 尝试等待互斥锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
+	 * Try to lock the mutex.
+	 * @return {bool} If lock successfully, return true, or return false
+	 *  if the mutex is locked by other coroutine.
 	 */
-	bool trylock(void);
+	bool trylock();
 
 	/**
-	 * 互斥锁拥有者释放锁并通知等待者
-	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
+	 * Unlock the mutex and wakeup the waiter.
+	 * @return {bool} If unlock successfully, return true, or return false.
 	 */
-	bool unlock(void);
+	bool unlock();
 
 private:
 	ACL_FIBER_LOCK* lock_;
@@ -40,44 +42,47 @@ private:
 };
 
 /**
- * 仅能用在同一线程内的协程之间进行互斥的读写锁
+ * Read/write lock that can only be used for mutual exclusion between
+ * coroutines within the same thread.
  */
 class FIBER_CPP_API fiber_rwlock {
 public:
-	fiber_rwlock(void);
-	~fiber_rwlock(void);
+	fiber_rwlock();
+	~fiber_rwlock();
 
 	/**
-	 * 加读锁
+	 * Lock in read mode.
 	 */
-	void rlock(void);
+	void rlock();
 
 	/**
-	 * 尝试加读锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
+	 * Try to lock in read mode.
+	 * @return {bool} If lock successfully, return true, or return false
+	 *  if the mutex is locked by other coroutine.
 	 */
-	bool tryrlock(void);
+	bool tryrlock();
 
 	/**
-	 * 解读锁
+	 * Unlock read mode.
 	 */
-	void runlock(void);
+	void runlock();
 
 	/**
-	 * 加写锁
+	 * Lock in write mode.
 	 */
-	void wlock(void);
+	void wlock();
 
 	/**
-	 * 尝试加写锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
+	 * Try to lock in write mode.
+	 * @return {bool} If lock successfully, return true, or return false
+	 *  if the mutex is locked by other coroutine.
 	 */
-	bool trywlock(void);
+	bool trywlock();
 
 	/**
-	 * 解写锁
+	 * Unlock write mode.
 	 */
-	void wunlock(void);
+	void wunlock();
 
 private:
 	ACL_FIBER_RWLOCK* rwlk_;

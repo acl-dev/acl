@@ -7,8 +7,8 @@ namespace acl {
 class fiber;
 
 struct FIBER_CPP_API fiber_mutex_stat {
-	fiber_mutex_stat(void) : fb(NULL), waiting(NULL) {}
-	~fiber_mutex_stat(void) {}
+	fiber_mutex_stat() : fb(NULL), waiting(NULL) {}
+	~fiber_mutex_stat() {}
 
 	fiber *fb;
 	ACL_FIBER_MUTEX *waiting;
@@ -16,8 +16,8 @@ struct FIBER_CPP_API fiber_mutex_stat {
 };
 
 struct FIBER_CPP_API fiber_mutex_stats {
-	fiber_mutex_stats(void) {}
-	~fiber_mutex_stats(void);
+	fiber_mutex_stats() {}
+	~fiber_mutex_stats();
 
 	std::vector<fiber_mutex_stat> stats;
 };

@@ -8,58 +8,64 @@ struct ACL_FIBER_MUTEX;
 namespace acl {
 
 /**
- * 可用于同一线程内的协程之间以及不同线程之间的协程之间的互斥锁, 同时还可以用在
- * 线程之间以及协程与独立线程之间的互斥.
+ * The mutex lock can be used for mutual exclusion between coroutines within
+ * the same thread and between coroutines of different threads, as well as
+ * between threads and between coroutines and independent threads.
  */
 class FIBER_CPP_API fiber_mutex {
 public:
 	/**
-	 * 构造函数
-	 * @param mutex {ACL_FIBER_MUTEX*} 非空时,将用 C 的锁对象创建 C++ 锁
-	 *  对象,否则内部自动创建 C 锁对象;如果非空时,在本对象析构时该传入的
-	 *  C 锁对象需由应用层自行释放.
+	 * The constructor.
+	 * @param mutex {ACL_FIBER_MUTEX*} When not empty, C++ lock object will
+	 *  be created using C lock object, otherwise C lock object will be
+	 *  automatically created internally; If it is not empty, the C lock
+	 *  object that should be passed in during the decomposition of this
+	 *  object needs to be released by the application layer itself.
 	 */
-	fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
-	~fiber_mutex(void);
+	explicit fiber_mutex(ACL_FIBER_MUTEX* mutex = NULL);
+	~fiber_mutex();
 
 	/**
-	 * 等待互斥锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
+	 * Lock the mutex.
+	 * @return {bool} If lock successfully, return true, or return false.
 	 */
-	bool lock(void);
+	bool lock();
 
 	/**
-	 * 尝试等待互斥锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
+	 * Try to lock the mutex.
+	 * @return {bool} If lock successfully, return true, or return false
+	 *  if the mutex is locked by other coroutine.
 	 */
-	bool trylock(void);
+	bool trylock();
 
 	/**
-	 * 互斥锁拥有者释放锁并通知等待者
-	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
+	 * Unlock the mutex and wakeup the waiter.
+	 * @return {bool} If unlock successfully, return true, or return false.
 	 */
-	bool unlock(void);
+	bool unlock();
 
 public:
 	/**
-	 * 返回 C 版本的互斥锁对象
+	 * Return the C object of mutex.
 	 * @return {ACL_FIBER_MUTEX*}
 	 */
-	ACL_FIBER_MUTEX* get_mutex(void) const {
+	ACL_FIBER_MUTEX* get_mutex() const {
 		return mutex_;
 	}
 
 	/**
-	 * 进行全局死锁检测
-	 * @param out {fiber_mutex_stats&} 存储结果集
-	 * @return {bool} 返回 true 表示存在死锁问题, 死锁信息存放在 out 中
+	 * Detect the deadlocks state.
+	 * @param out {fiber_mutex_stats&} Save the checking result.
+	 * @return {bool} Returning true indicates the existence of a
+	 *  deadlock issue.
 	 */
 	static bool deadlock(fiber_mutex_stats& out);
 
 	/**
-	 * 检测死锁, 并将所有进入死锁状态的协程栈打印至标准输出
+	 * Detect deadlocks and print all coroutine stacks that have entered
+	 * a deadlock state to standard output.
 	 */
-	static void deadlock_show(void);
+	static void deadlock_show();
 
 private:
 	ACL_FIBER_MUTEX* mutex_;
@@ -71,17 +77,16 @@ private:
 
 class FIBER_CPP_API fiber_mutex_guard {
 public:
-	fiber_mutex_guard(fiber_mutex& mutex) : mutex_(mutex) {
+	explicit fiber_mutex_guard(fiber_mutex& mutex) : mutex_(mutex) {
 		mutex_.lock();
 	}
 
-	~fiber_mutex_guard(void) {
+	~fiber_mutex_guard() {
 		mutex_.unlock();
 	}
 
 private:
 	fiber_mutex& mutex_;
-
 };
 
 } // namespace acl

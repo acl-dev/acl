@@ -35,6 +35,7 @@ struct SYNC_WAITER;
 struct ACL_FIBER {
 	FIBER_BASE    *base;
 	RING           me;
+	RING           me2;
 	long           tid;
 	unsigned       fid;
 	unsigned       slot;

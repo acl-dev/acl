@@ -9,12 +9,12 @@ template<typename T> class fiber_tbox;
 
 class FIBER_CPP_API wait_group {
 public:
-	wait_group(void);
-	~wait_group(void);
+	wait_group();
+	~wait_group();
 
 	void add(int n);
-	void done(void);
-	void wait(void);
+	void done();
+	void wait();
 
 private:
 	atomic_long state_;

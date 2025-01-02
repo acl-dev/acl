@@ -15,8 +15,8 @@ class thread_mutex;
  */
 class tcp_keeper : public thread {
 public:
-	tcp_keeper(void);
-	~tcp_keeper(void);
+	tcp_keeper();
+	~tcp_keeper();
 
 	/**
 	 * 设置建立网络连接的超时时间（秒）
@@ -83,11 +83,11 @@ public:
 	/**
 	 * 停止 tcp_keeper 线程运行
 	 */
-	void stop(void);
+	void stop();
 
 protected:
 	// @override
-	void* run(void);
+	void* run();
 
 private:
 	double rtt_min_;

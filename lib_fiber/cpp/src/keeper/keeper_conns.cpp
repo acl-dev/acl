@@ -22,7 +22,7 @@ keeper_conns::keeper_conns(const keeper_config& config, const char* addr)
 	}
 }
 
-keeper_conns::~keeper_conns(void)
+keeper_conns::~keeper_conns()
 {
 }
 
@@ -34,7 +34,7 @@ void keeper_conns::on_connect(socket_stream&, keeper_link* lk)
 	}
 }
 
-void keeper_conns::trigger_more(void)
+void keeper_conns::trigger_more()
 {
 	time(&last_trigger_);
 
@@ -101,17 +101,17 @@ void keeper_conns::add_task(task_req& task)
 	}
 }
 
-void keeper_conns::stop(void)
+void keeper_conns::stop()
 {
 	tbox_.push(NULL);
 }
 
-void keeper_conns::join(void)
+void keeper_conns::join()
 {
 	(void) tbox_ctl_.pop();
 }
 
-bool keeper_conns::empty(void) const
+bool keeper_conns::empty() const
 {
 	ACL_RING_ITER iter;
 	acl_ring_foreach(iter, &linker_) {
@@ -124,7 +124,7 @@ bool keeper_conns::empty(void) const
 	return true;
 }
 
-void keeper_conns::run(void)
+void keeper_conns::run()
 {
 	//int timeo = config_.conn_ttl > 0 ? config_.conn_ttl * 1000 : -1;
 	int timeo = 1000;
@@ -145,7 +145,7 @@ void keeper_conns::run(void)
 	done();
 }
 
-void keeper_conns::check_idle(void)
+void keeper_conns::check_idle()
 {
 	int n = 0;
 	ACL_RING_ITER iter;
@@ -167,7 +167,7 @@ void keeper_conns::check_idle(void)
 		addr_.c_str(), n);
 }
 
-int keeper_conns::debug_check(void)
+int keeper_conns::debug_check()
 {
 	ACL_RING_ITER iter;
 	keeper_link*  lk;
@@ -183,7 +183,7 @@ int keeper_conns::debug_check(void)
 	return -1;
 }
 
-keeper_conn* keeper_conns::peek_ready(void)
+keeper_conn* keeper_conns::peek_ready()
 {
 #if 0
 	keeper_link* lk = NULL;
@@ -215,7 +215,7 @@ keeper_conn* keeper_conns::peek_ready(void)
 	return lk->fb;
 }
 
-void keeper_conns::stop_all(void)
+void keeper_conns::stop_all()
 {
 	while (true) {
 		ACL_RING* hdr = acl_ring_pop_head(&linker_);
@@ -232,7 +232,7 @@ void keeper_conns::stop_all(void)
 	acl_ring_init(&linker_);
 }
 
-void keeper_conns::done(void)
+void keeper_conns::done()
 {
 	tbox_ctl_.push(NULL);
 }
@@ -244,9 +244,9 @@ keeper_killer::keeper_killer(keeper_conns* pool)
 {
 }
 
-keeper_killer::~keeper_killer(void) {}
+keeper_killer::~keeper_killer() {}
 
-void keeper_killer::run(void)
+void keeper_killer::run()
 {
 	pool_->stop();
 	pool_->join();

@@ -9,20 +9,18 @@ class  task_req;
 class  keeper_conn;
 struct keeper_link;
 
-class keeper_conns : public fiber
-{
+class keeper_conns : public fiber {
 public:
 	keeper_conns(const keeper_config& config, const char* addr);
-	~keeper_conns(void);
+	~keeper_conns();
 
 	void add_task(task_req& task);
 
 public:
-	void stop(void);
-	void join(void);
-	bool empty(void) const;
-	time_t last_peek(void) const
-	{
+	void stop();
+	void join();
+	bool empty() const;
+	time_t last_peek() const {
 		return last_peek_;
 	}
 
@@ -30,13 +28,13 @@ public:
 
 private:
 	// @override
-	void run(void);
-	int debug_check(void);
-	keeper_conn* peek_ready(void);
-	void stop_all(void);
-	void done(void);
-	void check_idle(void);
-	void trigger_more(void);
+	void run();
+	int debug_check();
+	keeper_conn* peek_ready();
+	void stop_all();
+	void done();
+	void check_idle();
+	void trigger_more();
 
 private:
 	fiber_tbox<task_req>     tbox_;
@@ -51,16 +49,15 @@ private:
 
 //////////////////////////////////////////////////////////////////////////////
 
-class keeper_killer : public fiber
-{
+class keeper_killer : public fiber {
 public:
 	keeper_killer(keeper_conns* pool);
 
 private:
-	~keeper_killer(void);
+	~keeper_killer();
 
 	// @override
-	void run(void);
+	void run();
 
 private:
 	keeper_conns* pool_;

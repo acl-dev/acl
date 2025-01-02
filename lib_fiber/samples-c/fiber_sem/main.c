@@ -56,6 +56,27 @@ static void fiber_killer(ACL_FIBER *fiber acl_unused, void *ctx)
 	}
 }
 
+static void fiber_timed_wait(ACL_FIBER *fiber acl_unused, void *ctx)
+{
+	ACL_FIBER_SEM *sem = (ACL_FIBER_SEM *) ctx;
+	int ret, timeo = 10000;
+	time_t begin, end;
+
+	begin = time(NULL);
+	ret = acl_fiber_sem_timed_wait(sem, timeo);
+	end = time(NULL);
+
+	if (ret >= 0) {
+		printf("%s: wait ok, tc: %ld\r\n", __FUNCTION__, end - begin);
+	} else if (errno == EAGAIN) {
+		printf("%s: wait timed out, error=%s, tc: %ld\r\n",
+			__FUNCTION__, strerror(errno), end - begin);
+	} else {
+		printf("%s: wait error, error=%s, tc: %ld\r\n",
+			__FUNCTION__, strerror(errno), end - begin);
+	}
+}
+
 static void usage(const char *procname)
 {
 	printf("usage: %s -h [help]\r\n"
@@ -109,6 +130,8 @@ int main(int argc, char *argv[])
 	}
 
 	acl_fiber_create(fiber_killer, &waiters, 128000);
+
+	acl_fiber_create(fiber_timed_wait, sem, 128000);
 
 	acl_fiber_schedule();
 
