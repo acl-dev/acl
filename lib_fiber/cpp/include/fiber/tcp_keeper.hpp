@@ -9,9 +9,10 @@ class socket_stream;
 class thread_mutex;
 
 /**
- * 独立线程用于预先与服务器创建空闲连接，客户端可以直接从该连接池中获取新连接，
- * 这对于 ping rtt 较长（如：10ms 以上）比较有价值，可以有效地减少因网络 rtt
- * 造成的连接时间损耗
+ * Use independent threads to create some idle connections with the server
+ * in advance. The client can directly obtain new connections from the
+ * connection pool. This is valuable for long ping rtt (such as more than 10ms)
+ * and can effectively reduce the connection time loss caused by network rtt.
  */
 class tcp_keeper : public thread {
 public:
@@ -19,69 +20,75 @@ public:
 	~tcp_keeper();
 
 	/**
-	 * 设置建立网络连接的超时时间（秒）
+	 * Set the timeout (in seconds) for establishing a network connection.
 	 * @param n {int}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_conn_timeout(int n);
 
 	/**
-	 * 设置网络套接字 IO 读写超时时间（秒）
+	 * Set network socket IO read and write timeout (in seconds).
 	 * @param n {int}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_rw_timeout(int n);
 
 	/**
-	 * 设置连接池中空闲连接的最小连接数
+	 * Set the minimum number of idle connections in the connection pool.
 	 * @param n {int}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_conn_min(int n);
 
 	/**
-	 * 设置连接池中空闲连接的最大连接数
+	 * Set the maximum number of idle connections in the connection pool.
 	 * @param n {int}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_conn_max(int n);
 
 	/**
-	 * 设置网络连接的空闲时间（秒），空闲时间超过此值时连接将被关闭
+	 * Set the idle time(in seconds) of the network connection. If the idle
+	 * time exceeds this value, the connection will be closed.
 	 * @param ttl {int}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_conn_ttl(int ttl);
 
 	/**
-	 * 设置每个连接池的空闲时间（秒），即当该连接池的空闲时间超过此值时
-	 * 将被释放，从而便于系统回收内存资源
+	 * Set the idle time(in seconds) of each connection pool. When the idle
+	 * time of connection pool exceeds this value, it will be released, so
+	 * that the system can recycle momory resources.
 	 * @param ttl {int}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_pool_ttl(int ttl);
 
 	/**
-	 * 设置 rtt 阀值（秒），当网络连接时间超过此值时才会启用从连接池提取
-	 * 连接方式，如果网络连接时间小于此值，则直接连接服务器
+	 * Set the RTT threshold (in seconds), and only use connections from the
+	 * connection pool when the network connection time exceeds this value.
+	 * If the network connection time is less than this value, directly
+	 * connect to the server.
 	 * @param rtt {double}
 	 * @return {tcp_keeper&}
 	 */
 	tcp_keeper& set_rtt_min(double rtt);
 
 	/**
-	 * 从 tcp_keeper 对象中提取对应地址的网络连接对接
-	 * @param addr {const char*} 服务器地址，格式：ip:port
-	 * @param hit {bool*} 非空时，将存放该连接是否在连接池的空闲连接中命中
-	 * @param sync {bool} 是否采用直连模式，如果采用直连模式，则内部不会
-	 *  针对该地址预创连接池
-	 * @return {socket_stream*} 返回 NULL 表示连接失败
+	 * Try to get the network connection corresponding to the address from
+	 * the tcp_keeper object.
+	 * @param addr {const char*} The server's address; The format is ip:port.
+	 * @param hit {bool*} If not NULL, it will store the flag that if the
+	 *  connection got is the idle connection from connection pool.
+	 * @param sync {bool} Whether to connect server directly, if so, the
+	 *  connection pool internal will not be pre-created for this address.
+	 * @return {socket_stream*} Return NULL if connecting failed.
 	 */
 	socket_stream* peek(const char* addr, bool* hit = NULL,
 		bool sync = false);
 
 	/**
-	 * 停止 tcp_keeper 线程运行
+	 * Stop tcp_keeper thread.
 	 */
 	void stop();
 
