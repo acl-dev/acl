@@ -29,8 +29,7 @@ static void ls_dir(acl::scan_dir& scan, const char* path, bool recursive,
 	bool fullpath)
 {
 	if (scan.open(path, recursive) == false) {
-		logger_error("open path: %s error: %s",
-			path, acl::last_serror());
+		logger_error("open path: %s error: %s", path, acl::last_serror());
 		return;
 	}
 
@@ -85,7 +84,7 @@ static bool get_relative_path(const char* spath, const char* filepath,
 	return true;
 }
 
-static bool compare_files(const char* sfile, const char* dfile)
+static bool compare_files(const char* sfile, const char* dfile, bool ignore)
 {
 	acl::string sbuf, dbuf;
 
@@ -95,6 +94,8 @@ static bool compare_files(const char* sfile, const char* dfile)
 	}
 
 	if (acl::ifstream::load(dfile, &dbuf) == false) {
+		if (acl::last_error() == ENOENT && ignore)
+			return true;
 		logger_error("load dfile %s error %s", dfile, acl::last_serror());
 		return false;
 	}
@@ -103,7 +104,7 @@ static bool compare_files(const char* sfile, const char* dfile)
 }
 
 static void diff_path(acl::scan_dir& scan, const char* spath, const char* dpath,
-	bool recursive, const char* file_types, bool show_all)
+	bool recursive, const char* file_types, bool show_all, bool ignore)
 {
 	if (scan.open(spath, recursive) == false) {
 		logger_error("open path: %s error: %s",
@@ -136,7 +137,7 @@ static void diff_path(acl::scan_dir& scan, const char* spath, const char* dpath,
 		acl::string dfilepath;
 		dfilepath << dpath << path;
 		n++;
-		bool equal = compare_files(filepath, dfilepath);
+		bool equal = compare_files(filepath, dfilepath, ignore);
 		if (!equal) {
 			printf("diff %s\t%s\r\n", filepath, dfilepath.c_str());
 		} else if (show_all) {
@@ -154,6 +155,7 @@ static void usage(const char* procname)
 		" -d destination path\r\n"
 		" -e file_types\r\n"
 		" -A [show all status including same files]\r\n"
+		" -I [if ignore the files not included in destination path]\r\n"
 		" -r [if recursive, default: false]\r\n"
 		" -a [if get fullpath, default: false]\r\n", procname);
 }
@@ -161,11 +163,11 @@ static void usage(const char* procname)
 int main(int argc, char* argv[])
 {
 	int   ch;
-	bool  recursive = false, fullpath = false, show_all = false;
+	bool  recursive = false, fullpath = false, show_all = false, ignore = false;
 	acl::string dpath, spath, mode, types("c;cpp;cc;cxx;h;hpp;hxx");
 	acl::log::stdout_open(true);
 
-	while ((ch = getopt(argc, argv, "hs:d:t:rae:A")) > 0) {
+	while ((ch = getopt(argc, argv, "hs:d:t:rae:AI")) > 0) {
 		switch (ch) {
 		case 'h':
 			usage(argv[0]);
@@ -190,6 +192,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'A':
 			show_all = true;
+			break;
+		case 'I':
+			ignore = true;
 			break;
 		default:
 			break;
@@ -217,7 +222,7 @@ int main(int argc, char* argv[])
 		}
 		if (!dpath.end_with("/"))
 			dpath += "/";
-		diff_path(scan, spath, dpath, recursive, types, show_all);
+		diff_path(scan, spath, dpath, recursive, types, show_all, ignore);
 	} else
 		ls_all(scan, spath, recursive, fullpath);
 
