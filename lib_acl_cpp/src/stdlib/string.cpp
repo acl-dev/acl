@@ -646,6 +646,28 @@ string& string::push_back(unsigned char ch, bool term /* true */)
     return *this;
 }
 
+char string::back() const
+{
+	if (empty()) {
+		return -1;
+	}
+	const char *pEnd = const_cast<string*>(this)->buf_end();
+	if (pEnd == NIL) {
+		return -1;
+	}
+	return *(pEnd - 1);
+}
+
+bool string::pop_back()
+{
+	size_t n = size();
+	if (n == 0) {
+		return false;
+	}
+	truncate(n - 1);
+	return true;
+}
+
 string& string::terminate()
 {
 	TERM(vbf_);
