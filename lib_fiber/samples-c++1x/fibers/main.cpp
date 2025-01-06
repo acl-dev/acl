@@ -73,16 +73,21 @@ static void task_run(std::atomic_long &total, long long i) {
 }
 
 static void test2(long long count, int buf, int concurrency,
-      int milliseconds, bool thr) {
+      int milliseconds, bool thr, bool use_exec2) {
     std::shared_ptr<fiber_pool2> fibers = std::make_shared<fiber_pool2>
             (buf, concurrency, milliseconds, thr);
 
     std::atomic_long total(0);
-    long long delay = thr ? 10000 : 100000000;
+    long long delay = thr ? 10000 : 1000000;
 
-    go[fibers, count, delay, &total] {
+    go[fibers, count, delay, &total, use_exec2] {
         for (long long i = 0; i < count; i++) {
-            fibers->exec(task_run, std::ref(total), i);
+            if (use_exec2) {
+                fibers->exec2(task_run, std::ref(total), i);
+            } else {
+                fibers->exec(task_run, std::ref(total), i);
+            }
+
             if (i % delay == 0) {
                 acl::fiber::yield();
             }
@@ -103,7 +108,8 @@ static void test2(long long count, int buf, int concurrency,
     long long cnt = total.load();
     double tc = acl::stamp_sub(end, begin);
     double speed = (cnt * 1000) / tc;
-    printf("total result: %lld, tc: %.2f ms, speed: %.2f qps\r\n", cnt, tc, speed);
+    printf("%s total result: %lld, tc: %.2f ms, speed: %.2f qps\r\n",
+        use_exec2 ? "exec2" : "exec", cnt, tc, speed);
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -115,19 +121,20 @@ static void usage(const char* procname) {
 		    " -c concurrency\r\n"
 		    " -q qlen\r\n"
 		    " -t timeout\r\n"
+                    " -D [if use exec for testing fiber_pool2]\r\n"
 		    " -T [if using in threads]\r\n", procname);
 }
 
 int main(int argc, char *argv[]) {
     int  ch;
-    bool thr = false;
+    bool thr = false, use_exec2 = true;
     int  buf = 500, concurrency = 10, qlen = 0, milliseconds = -1;
     long long count = 100;
 
     acl::acl_cpp_init();
     acl::log::stdout_open(true);
 
-    while ((ch = getopt(argc, argv, "hn:b:c:q:t:T")) > 0) {
+    while ((ch = getopt(argc, argv, "hn:b:c:q:t:TD")) > 0) {
         switch (ch) {
             case 'h':
                 usage(argv[0]);
@@ -150,6 +157,9 @@ int main(int argc, char *argv[]) {
             case 'T':
                 thr = true;
                 break;
+            case 'D':
+                use_exec2 = false;
+                break;
             default:
                 break;
         }
@@ -159,6 +169,6 @@ int main(int argc, char *argv[]) {
 
     printf("-----------------------------------------------------------\r\n");
 
-    test2(count, buf, concurrency, milliseconds, thr);
+    test2(count, buf, concurrency, milliseconds, thr, use_exec2);
     return 0;
 }
