@@ -6,46 +6,54 @@ struct ACL_FIBER_EVENT;
 namespace acl {
 
 /**
- * 可用于协程之间、线程之间以及协程与线程之间，通过事件等待/通知方式进行同步的
- * 的事件混合锁
+ * An event-mixed lock that can be used between coroutines, between threads,
+ * and between coroutines and threads to synchronize through event
+ * waiting/notification.
  */
 class FIBER_CPP_API fiber_event {
 public:
 	/**
-	 * 构造方法
-	 * @param use_mutex {bool} 在用在多线程之间进行事件同步时，如果启动的
-	 *  的线程数较多（成百上千个线程），则此标志应设为 true 以便于内部在
-	 *  同步内部对象时使用线程互斥锁进行保护，以避免形成惊群现象，如果启动
-	 *  的线程数较多但该标志为 false，则内部使用原子数进行同步保护，很容易
-	 *  造成惊群问题；当启动的线程数较（几十个左右），则此参数可以设为 false
-	 *  以告之内部使用原子数进行同步保护
-	 * @param fatal_on_error {bool} 内部发生错误时是否直接崩溃，以便于开发
-	 *  人员进行错误调试
+	 * The constructor.
+	 * @param use_mutex {bool} When used for event synchronization between
+	 *  multiple threads, if the number of threads started is large 
+	 *  (hundreds or thousands of threads), this flag should be set to true
+	 *  so that the internal mutex lock is used for protection when
+	 *  synchronizing internal objects to avoid the herd phenomenon. If the
+	 *  number of threads started is large but the flag is false, the internal
+	 *  atomic number is used for synchronization protection, which can easily
+	 *  cause the herd problem. When the number of threads started is large
+	 *  (about dozens of threads), this parameter can be set to false to tell
+	 *  the internal atomic number to be used for synchronization protection.
+	 * @param fatal_on_error {bool} Whether to crash directly when an internal
+	 *  error occurs to facilitate error debugging by developers.
 	 */
 	fiber_event(bool use_mutex = true, bool fatal_on_error = true);
 	~fiber_event();
 
 	/**
-	 * 等待事件锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示内部出错
+	 * Waiting for event lock.
+	 * @return {bool} Return true if locking successfully, otherwise it
+	 *  indicates an internal error.
 	 */
 	bool wait();
 
 	/**
-	 * 尝试等待事件锁
-	 * @return {bool} 返回 true 表示加锁成功，否则表示锁正在被占用
+	 * Try waiting for the event lock.
+	 * @return {bool} Return true if locking successfully, otherwise it means
+	 *  the lock is currently in use.
 	 */
 	bool trywait();
 
 	/**
-	 * 事件锁拥有者释放事件锁并通知等待者
-	 * @return {bool} 返回 true 表示通知成功，否则表示内部出错
+	 * The event lock owner releases the event lock and notifies the waiter.
+	 * @return {bool} Return true if the notification is successful, otherwise
+	 *  it indicates an internal error.
 	 */
 	bool notify();
 
 public:
 	/**
-	 * 返回 C 版本的事件对象
+	 * Returns the the event object of C version.
 	 * @return {ACL_FIBER_EVENT*}
 	 */
 	ACL_FIBER_EVENT* get_event() const {

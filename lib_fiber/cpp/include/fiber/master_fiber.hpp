@@ -9,41 +9,44 @@ namespace acl {
 class socket_stream;
 
 /**
- * 基于协程方式的网络服务类
+ * Network service class based on coroutine.
  */
 class FIBER_CPP_API master_fiber : public master_base {
 public:
 	/**
-	 * 在 acl_master 框架下运行本网络服务对象
-	 * @param argc {int} 传入的参数数组大小
-	 * @param argv {char**} 传入的参数数组
+	 * Run this network service under the acl_master framework.
+	 * @param argc {int} The size of the parameter array passed in.
+	 * @param argv {char**} The parameter array passed in.
 	 */
 	void run_daemon(int argc, char** argv);
 
 	/**
-	 * 以独立运行模式启动本网络服务对象
-	 * @param addrs {const char*} 监听的本机服务地址列表，格式：
-	 *  ip:port, ip:port, ...
-	 * @param path {const char*} 非 NULL 指定配置文件路径
+	 * Start this network service in standalone mode.
+	 * @param addrs {const char*} List of local service addresses to monitor;
+	 *  The format looks like ip:port, ip:port, ...
+	 * @param path {const char*} Specify the configuration file path when it
+	 * is not NULL.
 	 */
 	bool run_alone(const char* addrs, const char* path = NULL);
 
 	/**
-	 * 获得配置文件路径
-	 * @return {const char*} 返回值为 NULL 表示没有设配置文件
+	 * Get the configuration file path.
+	 * @return {const char*} A return value of NULL indicates that no
+	 *  configuration file is set.
 	 */
 	const char* get_conf_path() const;
 
 	/**
-	 * 获得当前服务总连接数
+	 * Get the total number of connections of the current service.
 	 * @return {long long}
 	 */
 	long long users_count();
 
 	/**
-	 * 修改当前服务连接数
-	 * @param n {int} 增加或减少（可以为负数）的连接数值
-	 * @return {long long} 返回修改的连接数
+	 * Increase the number of current connections.
+	 * @param n {int} Increase or decrease (can be negative) the value of
+	 *  the connection.
+	 * @return {long long} Returns the number of modified connections.
 	 */
 	long long users_count_add(int n);
 
@@ -53,14 +56,16 @@ protected:
 	virtual ~master_fiber();
 
 	/**
-	 * 虚函数，当协程服务器接收到客户端连接后调用本函数
-	 * @param stream {socket_stream&} 客户端连接对象，本函数返回后，协程
-	 *  服务框架将会关闭该连接对象
+	 * Pure virtual function, called when the coroutine server receives
+	 * a client connection.
+	 * @param stream {socket_stream&} Client connection object. After this
+	 *  function returns, the coroutine service framework will close the
+	 *  connection object.
 	 */
 	virtual void on_accept(socket_stream& stream) = 0;
 
 	/**
-	 * 当线程初始化时该虚方法将被调用
+	 * The virtual function will be called when the thread is initialized.
 	 */
 	virtual void thread_on_init() {}
 

@@ -44,6 +44,12 @@ public:
         return res;
     }
 
+    template<class Fn, class ...Args>
+    void exec2(Fn&& fn, Args&&... args) {
+        auto obj = std::bind(std::forward<Fn>(fn), std::forward<Args>(args)...);
+        boxes_[next_++ % boxes_.size()]->push(obj, true);
+    }
+
     void stop() {
         for (auto fb : fibers_) {
             acl_fiber_kill(fb);
