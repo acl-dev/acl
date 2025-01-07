@@ -552,9 +552,11 @@ int acl_fiber_yield(void)
 
 	// Reset the current fiber's status in order to be added to
 	// ready queue again.
-	__thread_fiber->running->status = FIBER_STATUS_NONE;
-	FIBER_READY(__thread_fiber->running);
-	acl_fiber_switch();
+	if (__thread_fiber->running != NULL) {
+		__thread_fiber->running->status = FIBER_STATUS_NONE;
+		FIBER_READY(__thread_fiber->running);
+		acl_fiber_switch();
+	}
 
 	return 1;
 }
