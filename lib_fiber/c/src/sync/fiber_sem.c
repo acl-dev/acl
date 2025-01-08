@@ -187,9 +187,12 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 	sem->num++;
 
 	if ((ready = FIRST_FIBER(&sem->waiting)) == NULL) {
+#if 0
+		// Don't yield here. --- 2025.1.8
 		if (sem->num >= sem->buf) {
 			acl_fiber_yield();
 		}
+#endif
 		return sem->num;
 	}
 

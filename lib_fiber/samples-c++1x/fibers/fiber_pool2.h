@@ -11,18 +11,18 @@ public:
     : milliseconds_(milliseconds)
     {
         for (int i = 0; i < concurrency; i++) {
+            std::shared_ptr<acl::box2<task_fn>> box;
+
+            if (thr) {
+                box = std::make_shared<acl::fiber_tbox2<task_fn>>();
+            } else {
+                box = std::make_shared<acl::fiber_sbox2<task_fn>>(buf);
+            }
+
+            boxes_.push_back(box);
             wg_.add(1);
 
-            auto fb = go[this, buf, thr] {
-                std::shared_ptr<acl::box2<task_fn>> box;
-
-                if (thr) {
-                    box = std::make_shared<acl::fiber_tbox2<task_fn>>();
-                } else {
-                    box = std::make_shared<acl::fiber_sbox2<task_fn>>(buf);
-                }
-
-		boxes_.push_back(box);
+            auto fb = go[this, box] {
 		fiber_run(box);
             };
 
