@@ -322,6 +322,13 @@ int epoll_close(int epfd)
 	return (*sys_close)(epfd);
 }
 
+static __thread int __fiber_share_epoll = 0;
+
+void acl_fiber_share_epoll(int yes)
+{
+	__fiber_share_epoll = yes;
+}
+
 // Find the EPOLL_EVENT for the current fiber with the specified epfd, and
 // new one will be created if not found and create is true.
 static EPOLL_EVENT *epoll_event_find(int epfd, int create)
@@ -354,7 +361,12 @@ static EPOLL_EVENT *epoll_event_find(int epfd, int create)
 	}
 
 	// Then, trying to find the EPOLL_EVENT of the current fiber.
-	SNPRINTF(key, sizeof(key), "%u", curr->fid);
+	if (__fiber_share_epoll) {
+		key[0] = '0';
+		key[1] = 0;
+	} else {
+		SNPRINTF(key, sizeof(key), "%u", curr->fid);
+	}
 
 	ee = (EPOLL_EVENT *) htable_find(ep->ep_events, key);
 	if (ee != NULL) {

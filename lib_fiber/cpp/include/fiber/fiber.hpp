@@ -293,6 +293,12 @@ public:
 	 */
 	static void set_sys_errno(int errnum);
 
+	/**
+	 * If multiple fibers can share one epoll handle in the same thread.
+	 * @param yes {bool}
+	 */
+	static void share_epoll(bool yes);
+
 public:
 	/**
 	 * Return the corresponding C language coroutine object of

@@ -198,6 +198,11 @@ bool fiber::winapi_hook() {
 	return ::winapi_hook();
 }
 
+void fiber::share_epoll(bool yes)
+{
+	acl_fiber_share_epoll(yes ? 1 : 0);
+}
+
 void fiber::run()
 {
 	acl_msg_fatal("%s(%d), %s: base function be called",

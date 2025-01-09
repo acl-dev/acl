@@ -428,6 +428,13 @@ FIBER_API int acl_fiber_gettimeofday(struct timeval *tv, struct timezone *tz);
 
 FIBER_API void acl_fiber_memstat(void);
 
+/**
+ * If multiple fibers of the same thread can share one epoll handle when
+ * using epoll, default is no.
+ * @param yes {int}
+ */
+FIBER_API void acl_fiber_share_epoll(int yes);
+
 /****************************************************************************/
 
 #ifdef __cplusplus
