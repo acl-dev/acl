@@ -81,6 +81,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -liconv -lz -lpthread -ldl)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -lz -lpthread -ldl)
+#    set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -lz -lpthread -ldl -ljemalloc)
 endif()
 
 set(output_path ${CMAKE_CURRENT_SOURCE_DIR})

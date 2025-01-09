@@ -128,7 +128,7 @@ void sync_waiter_wakeup(SYNC_WAITER *waiter, ACL_FIBER *fb)
 
 		fe->mask |= EVENT_SYSIO;
 
-		// The fe mabye be used again in mbox_send->acl_fiber_write
+		// The fe maybe be used again in mbox_send->acl_fiber_write
 		// ->fiber_file_open->fiber_file_get.
 		mbox_send(waiter->box, fb);
 

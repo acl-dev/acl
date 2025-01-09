@@ -68,12 +68,12 @@ int fiber::get_errno() const
 
 bool fiber::is_ready() const
 {
-	return f_ != NULL && acl_fiber_status(f_) == FIBER_STATUS_READY;
+	return f_ && acl_fiber_status(f_) == FIBER_STATUS_READY;
 }
 
 bool fiber::is_suspended() const
 {
-	return f_ != NULL && acl_fiber_status(f_) == FIBER_STATUS_SUSPEND;
+	return f_ && acl_fiber_status(f_) == FIBER_STATUS_SUSPEND;
 }
 
 void fiber::set_errno(int errnum)
