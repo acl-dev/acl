@@ -200,7 +200,11 @@ bool fiber::winapi_hook() {
 
 void fiber::share_epoll(bool yes)
 {
+#ifdef __linux__
 	acl_fiber_share_epoll(yes ? 1 : 0);
+#else
+	(void) yes;
+#endif
 }
 
 void fiber::run()
