@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include "acl_define.h"
+
 /**
  * 程序运行过程中获得可执行程序存储于文件系统中的全路径
  * @return {const char*} NULL: 无法获得; != NULL: 返回值即是程序在
