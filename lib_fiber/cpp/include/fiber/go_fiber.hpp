@@ -42,9 +42,10 @@ public:
 	go_fiber() {}
 	go_fiber(size_t stack_size, bool on) : stack_size_(stack_size), stack_share_(on) {}
 
-	ACL_FIBER* operator > (std::function<void()> fn) {
+	std::shared_ptr<fiber> operator > (std::function<void()> fn) {
 		fiber_ctx* ctx = new fiber_ctx(fn);
-		return fiber::fiber_create(fiber_main, (void*) ctx, stack_size_, stack_share_);
+		auto fb = fiber::fiber_create(fiber_main, (void*) ctx, stack_size_, stack_share_);
+		return std::make_shared<fiber>(fb);
 	}
 
 	void operator < (std::function<void()> fn) {

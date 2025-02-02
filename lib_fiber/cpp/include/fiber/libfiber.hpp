@@ -13,9 +13,13 @@
 #if defined(ACL_CPP_API)
 # include "fiber_tbox.hpp"
 # include "fiber_tbox2.hpp"
+# include "go_fiber.hpp"
 # include "wait_group.hpp"
+# include "fiber_pool.hpp"
+
 # include "master_fiber.hpp"
 # include "fiber_redis_pipeline.hpp"
+
 # if !defined(_WIN32) && !defined(_WIN64)
 #  include "tcp_keeper.hpp"
 # endif

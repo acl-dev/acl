@@ -15,8 +15,8 @@ typedef enum {
 
 class FIBER_CPP_API fiber_sem {
 public:
-	explicit fiber_sem(int max, fiber_sem_attr_t attr = fiber_sem_t_async);
-	explicit fiber_sem(int max, int buf);
+	explicit fiber_sem(size_t max, fiber_sem_attr_t attr = fiber_sem_t_async);
+	explicit fiber_sem(size_t max, size_t buf);
 	~fiber_sem();
 
 	int wait(int ms = -1);
@@ -57,7 +57,7 @@ public:
 	: sem_(0, async ? fiber_sem_t_async : fiber_sem_t_sync)
 	, free_obj_(free_obj) {}
 
-	explicit fiber_sbox(int buf, bool free_obj = true)
+	explicit fiber_sbox(size_t buf, bool free_obj = true)
 	: sem_(0, buf)
 	, free_obj_(free_obj) {}
 
@@ -155,7 +155,7 @@ public:
 		box_ = new T[capacity_];
 	}
 
-	explicit fiber_sbox2(int buf)
+	explicit fiber_sbox2(size_t buf)
 	: sem_(0, buf)
 	, capacity_(1000)
 	, off_curr_(0)

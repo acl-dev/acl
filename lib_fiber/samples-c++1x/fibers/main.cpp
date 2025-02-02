@@ -44,6 +44,7 @@ static void test1(long long count, int buf, int concurrency, int qlen,
             }
         }
 
+	printf("Post over!\r\n");
         ::sleep(1);
         fbs->stop();
     };
