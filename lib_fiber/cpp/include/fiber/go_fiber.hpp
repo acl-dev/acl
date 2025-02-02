@@ -2,6 +2,7 @@
 #include "fiber_cpp_define.hpp"
 #include <thread>
 #include <functional>
+#include <utility>
 #include "fiber.hpp"
 #include "fiber_tbox.hpp"
 
@@ -20,7 +21,7 @@ namespace acl {
 
 class fiber_ctx {
 public:
-	fiber_ctx(std::function<void()> fn) {
+	explicit fiber_ctx(std::function<void()> fn) {
 		fn_ = std::move(fn);
 	}
 
@@ -39,11 +40,11 @@ public:
 
 class go_fiber {
 public:
-	go_fiber() {}
+	go_fiber() = default;
 	go_fiber(size_t stack_size, bool on) : stack_size_(stack_size), stack_share_(on) {}
 
-	std::shared_ptr<fiber> operator > (std::function<void()> fn) {
-		fiber_ctx* ctx = new fiber_ctx(fn);
+	std::shared_ptr<fiber> operator > (std::function<void()> fn) const {
+		auto* ctx = new fiber_ctx(std::move(fn));
 		auto fb = fiber::fiber_create(fiber_main, (void*) ctx, stack_size_, stack_share_);
 		return std::make_shared<fiber>(fb);
 	}
@@ -53,7 +54,7 @@ public:
 
 		go[&] {
 			fn();
-			box.push(NULL);
+			box.push(nullptr);
 		};
 		(void) box.pop();
 	}
@@ -63,7 +64,7 @@ public:
 
 		std::thread thread([&]() {
 			fn();
-			box.push(NULL);
+			box.push(nullptr);
 		});
 
 		thread.detach();
@@ -75,7 +76,7 @@ private:
 	bool   stack_share_ = false;
 
 	static void fiber_main(ACL_FIBER*, void* ctx) {
-		fiber_ctx* fc = (fiber_ctx *) ctx;
+		auto* fc = (fiber_ctx *) ctx;
 		std::function<void()> fn = fc->fn_;
 		delete fc;
 

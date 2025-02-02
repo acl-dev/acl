@@ -44,8 +44,8 @@ fiber_pool::~fiber_pool()
 
 void fiber_pool::stop()
 {
-	for (auto fb : fibers_) {
-		fb.get()->kill();
+	for (const auto& fb : fibers_) {
+		fb->kill();
 	}
 
 	wg_->wait();
@@ -58,10 +58,10 @@ void fiber_pool::fiber_create(size_t count)
 		auto* box  = new task_box<task_fn>(box2);
 
 		boxes_[box_count_] = box;
-		box->idx = box_count_++;
+		box->idx = (int) box_count_++;
 
 		boxes_idle_[box_idle_] = box;
-		box->idle = box_idle_++;
+		box->idle = (int) box_idle_++;
 
 		wg_->add(1);
 
@@ -147,7 +147,7 @@ void fiber_pool::running(task_box<task_fn>* box)
 
 		assert(box_idle_ < box_count_);
 
-		box->idle = box_idle_;
+		box->idle = (int) box_idle_;
 		boxes_idle_[box_idle_++] = box;
 	}
 }

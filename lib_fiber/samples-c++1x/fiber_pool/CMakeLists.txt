@@ -77,12 +77,15 @@ set(libacl_all ${home_path}/libacl_all.a)
 set(libfiber ${home_path}/lib_fiber/lib/libfiber.a)
 set(libfiber_cpp ${home_path}/lib_fiber/lib/libfiber_cpp.a)
 
+find_library(JEMALLOC
+    NAMES jemalloc
+    PATHS /usr/lib /usr/local/lib
+)
+
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
     set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -liconv -lz -lpthread -ldl)
-#    set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -liconv -lz -lpthread -ldl -ljemalloc)
 elseif(CMAKE_SYSTEM_NAME MATCHES "Linux")
     set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -lz -lpthread -ldl)
-#    set(lib_all  ${libfiber_cpp} ${libacl_all} ${libfiber} -lz -lpthread -ldl -ljemalloc)
 endif()
 
 set(output_path ${CMAKE_CURRENT_SOURCE_DIR})
@@ -90,6 +93,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${output_path})
 link_directories(${output_path})
 
 add_executable(fibers ${src_files})
-target_link_libraries(fibers ${lib_all})
+if (JEMALLOC)
+    target_link_libraries(fibers ${lib_all} ${JEMALLOC})
+else()
+    target_link_libraries(fibers ${lib_all})
+endif()
 
 ###############################################################################

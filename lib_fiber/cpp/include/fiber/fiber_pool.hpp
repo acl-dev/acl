@@ -13,7 +13,7 @@ using task_fn = std::function<void(void)>;
 template<class task_fn>
 class task_box {
 public:
-	task_box(box2<task_fn>* bx) : box(bx) {}
+	explicit task_box(box2<task_fn>* bx) : box(bx) {}
 	~task_box() { delete box; }
 
 	box2<task_fn> *box = nullptr;
