@@ -79,6 +79,13 @@ elseif (${WIN_OS})
 	endif()
 endif()
 
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+if(COMPILER_SUPPORTS_CXX11)
+	message(STATUS "The compiler supports C++11.")
+	add_definitions("-std=c++11")
+endif()
+
 #if (CMAKE_BUILD_TYPE STREQUAL "")
 #	set(CMAKE_BUILD_TYPE "DEBUG")
 #else()
