@@ -50,6 +50,27 @@ public:
 
 	void stop();
 
+public:
+	size_t get_box_min() const {
+		return box_min_;
+	}
+
+	size_t get_box_max() const {
+		return box_max_;
+	}
+
+	size_t get_box_count() const {
+		return box_count_;
+	}
+
+	size_t get_box_idle() const {
+		return box_idle_;
+	}
+
+	size_t get_box_buf() const {
+		return box_buf_;
+	}
+
 private:
 	wait_group* wg_;
 	int    idle_ms_;
