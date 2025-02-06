@@ -142,6 +142,15 @@ LDFLAGS = -L../../../lib_fiber/lib -lfiber_cpp -Wl,-rpath,../../../lib_fiber/lib
 	  -L../../../lib_acl/lib -lacl -Wl,-rpath,../../../lib_acl/lib \
 	  -lfiber $(EXTLIBS) $(SYSLIB)
 
+LIBRARY_PATH = /usr/local/lib
+LIBRARY_NAME = libjemalloc.a
+
+CHECK_JEMALLOC := $(shell if [ -f $(LIBRARY_PATH)/$(LIBRARY_NAME) ]; then echo "yes"; else echo "no"; fi)
+
+ifeq ($(CHECK_JEMALLOC),yes)
+	LDFLAGS += -ljemalloc -Wl,-rpath,$(LIBRARY_PATH)
+endif
+
 COMPILE = $(CC) $(CFLAGS)
 LINK = $(CC) $(OBJ) $(LDFLAGS)
 ###########################################################
