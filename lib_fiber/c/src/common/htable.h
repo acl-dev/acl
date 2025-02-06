@@ -152,7 +152,7 @@ void htable_walk(HTABLE *table, void (*walk_fn) (HTABLE_INFO *, void *), void *a
 int htable_size(const HTABLE *table);
 
 /**
- * 返回哈希表当前的窗口中所含元素个数
+ * 返回哈希表当前的容器中所含元素个数
  * @param table 哈希表指针
  * @return 哈希表中元素个数
  */
