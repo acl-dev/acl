@@ -118,6 +118,7 @@ static __thread ARRAY *__epfds = NULL;
 
 static pthread_key_t  __once_key;
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
+static __thread int __fiber_share_epoll = 0;
 
 static void epoll_free(EPOLL *ep);
 
@@ -166,7 +167,10 @@ static void thread_init(void)
 // Create one EPOLL for the specified epfd.
 static EPOLL *epoll_alloc(int epfd)
 { 
+	ACL_FIBER *curr = acl_fiber_running();
 	EPOLL *ep;
+	EPOLL_EVENT *ee;
+	char key[32];
 	int maxfd = open_limit(0), i;
 
 	if (maxfd <= 0) {
@@ -207,6 +211,18 @@ static EPOLL *epoll_alloc(int epfd)
 	}
 
 	ep->ep_events = htable_create(100);
+
+	if (curr) {
+		if (__fiber_share_epoll) {
+			key[0] = '0';
+			key[1] = 0;
+		} else {
+			SNPRINTF(key, sizeof(key), "%u", curr->fid);
+		}
+		ee = epoll_event_alloc();
+		ee->epoll = ep;
+		htable_enter(ep->ep_events, key, ee);
+	}
 	return ep;
 }
 
@@ -321,8 +337,6 @@ int epoll_close(int epfd)
 	// system close API directly.
 	return (*sys_close)(epfd);
 }
-
-static __thread int __fiber_share_epoll = 0;
 
 void acl_fiber_share_epoll(int yes)
 {
