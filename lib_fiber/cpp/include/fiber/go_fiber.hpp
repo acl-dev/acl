@@ -1,10 +1,5 @@
 #pragma once
 #include "fiber_cpp_define.hpp"
-#include <thread>
-#include <functional>
-#include <utility>
-#include "fiber.hpp"
-#include "fiber_tbox.hpp"
 
 // __cplusplus:
 //    199711L (C++98 or C++03)
@@ -14,6 +9,12 @@
 //    202002L (C++20)
 
 #if defined(USE_CPP11) || __cplusplus >= 201103L      // Support c++11 ?
+
+#include <thread>
+#include <functional>
+#include <utility>
+#include "fiber.hpp"
+#include "fiber_tbox.hpp"
 
 struct ACL_FIBER;
 
