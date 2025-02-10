@@ -184,6 +184,7 @@ struct FILE_EVENT {
 #define	EVENT_ERR		(unsigned) (1 << 4)
 #define	EVENT_HUP		(unsigned) (1 << 5)
 #define	EVENT_NVAL		(unsigned) (1 << 6)
+#define	EVENT_ONCE		(unsigned) (1 << 7)
 
 #ifdef	HAS_IO_URING
 
@@ -389,9 +390,15 @@ struct EVENT {
 
 	long long stamp;  // the stamp of the current fiber scheduler
 	unsigned flag;
-#define EVENT_F_IOCP		(1 << 0)
-#define	EVENT_F_IO_URING	(1 << 1)
-#define EVENT_IS_IOCP(x)	((x)->flag & EVENT_F_IOCP)
+#define	EVENT_F_USE_ONCE	(1 << 0)
+#define	EVENT_F_IOCP		(1 << 1)
+#define	EVENT_F_IO_URING	(1 << 2)
+#define	EVENT_F_POLL		(1 << 3)
+#define	EVENT_F_SELECT		(1 << 4)
+#define	EVENT_F_EPOLL		(1 << 5)
+#define	EVENT_F_KQUEUE		(1 << 6)
+
+#define	EVENT_IS_IOCP(x)	((x)->flag & EVENT_F_IOCP)
 #define	EVENT_IS_IO_URING(x)	((x)->flag & EVENT_F_IO_URING)
 
 #ifdef HAS_POLL

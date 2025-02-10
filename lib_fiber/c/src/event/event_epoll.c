@@ -78,8 +78,9 @@ static int epoll_add_read(EVENT_EPOLL *ep, FILE_EVENT *fe)
 	struct epoll_event ee;
 	int op, n;
 
-	if ((fe->mask & EVENT_READ))
+	if ((fe->mask & EVENT_READ)) {
 		return 0;
+	}
 
 	ee.events   = 0;
 	ee.data.u32 = 0;
@@ -251,6 +252,7 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 			array_append(ep->r_ready, fe);
 #else
 			fe->r_proc(ev, fe);
+			fe->mask |= EVENT_ONCE;
 #endif
 		}
 
@@ -269,6 +271,10 @@ static int epoll_event_wait(EVENT *ev, int timeout)
 			fe->w_proc(ev, fe);
 #endif
 		}
+
+#ifndef	DELAY_CALL
+		fe->mask &= ~EVENT_ONCE;
+#endif
 	}
 
 #ifdef	DELAY_CALL
@@ -345,6 +351,11 @@ EVENT *event_epoll_create(int size)
 	ep->event.name   = epoll_name;
 	ep->event.handle = (acl_handle_t (*)(EVENT *)) epoll_handle;
 	ep->event.free   = epoll_free;
+#ifdef	DELAY_CALL
+	ep->event.flag   = EVENT_F_EPOLL;
+#else
+	ep->event.flag   = EVENT_F_EPOLL | EVENT_F_USE_ONCE;
+#endif
 
 	ep->event.event_wait = epoll_event_wait;
 	ep->event.checkfd    = (event_oper *) epoll_checkfd;
