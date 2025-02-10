@@ -181,8 +181,9 @@ static EPOLL *epoll_alloc(int epfd)
 	/* Using thread local to store the epoll handles for each thread. */
 	if (__epfds == NULL) {
 		if (pthread_once(&__once_control, thread_init) != 0) {
-			msg_fatal("%s(%d), %s: pthread_once error %s",
+			msg_error("%s(%d), %s: pthread_once error %s",
 				__FILE__, __LINE__, __FUNCTION__, last_serror());
+			return NULL;
 		}
 
 		__epfds = array_create(5, ARRAY_F_UNORDER);
@@ -190,8 +191,16 @@ static EPOLL *epoll_alloc(int epfd)
 			__main_epfds = __epfds;
 			atexit(main_thread_free);
 		} else if (pthread_setspecific(__once_key, __epfds) != 0) {
-			msg_fatal("pthread_setspecific error!");
+			msg_error("pthread_setspecific error!");
+			return NULL;
 		}
+	}
+
+	epfd = epfd >= 0 ? dup(epfd) : socket(AF_INET, SOCK_STREAM, 0);
+	if (epfd < 0) {
+		msg_error("%s(%d): create fd error: %s",
+			__FILE__, __LINE__, last_serror());
+		return NULL;
 	}
 
 	ep = (EPOLL*) mem_malloc(sizeof(EPOLL));
@@ -200,8 +209,9 @@ static EPOLL *epoll_alloc(int epfd)
 	/* Duplicate the current thread's epoll fd, so we can assosiate the
 	 * connection handles with one epoll fd for the current thread, and
 	 * use one epoll fd for each thread to handle all fds.
+	 * Or if epfd < 0, we should create one socket fd as the epoll handle.
 	 */
-	ep->epfd = dup(epfd);
+	ep->epfd = epfd;
 
 	ep->nfds = maxfd;
 	ep->fds  = (EPOLL_CTX **) mem_malloc(maxfd * sizeof(EPOLL_CTX *));
@@ -333,8 +343,8 @@ int epoll_close(int epfd)
 	epoll_free(ep);
 	array_delete(__epfds, pos, NULL);
 
-	// Because the epfd was created by dup, so it should be closed by the
-	// system close API directly.
+	// Because the epfd was created by dup or by creating socket as epoll
+	// handle, so it should be closed by the system close API directly.
 	return (*sys_close)(epfd);
 }
 
@@ -426,14 +436,16 @@ int epoll_create(int size fiber_unused)
 	// Get the current thread's epoll fd.
 	sys_epfd = event_handle(ev);
 	if (sys_epfd < 0) {
-		msg_error("%s(%d), %s: invalid event_handle %d",
+		msg_info("%s(%d), %s: no event_handle %d",
 			__FILE__, __LINE__, __FUNCTION__, sys_epfd);
-		return sys_epfd;
 	}
 
 	// The epoll fd will be duplicated in the below function, and the new
 	// fd will be returned to the caller.
 	ep = epoll_alloc(sys_epfd);
+	if (ep == NULL) {
+		return -1;
+	}
 	return ep->epfd;
 }
 
@@ -478,8 +490,17 @@ static void read_callback(EVENT *ev, FILE_EVENT *fe)
 	assert(ee->epoll->fds[epx->fd] == epx);
 
 	// Save the fd IO event's result to the result receiver been set in
-	// epoll_wait as below.
-	ee->events[ee->nready].events |= EPOLLIN;
+	// epoll_wait as below; And when ev->flag been set EVENT_F_SET_ONCE,
+	// we should check if fe->mask has been set EVENT_ONCE:
+	// EPOLLIN flag should be appended to the events if EVENT_ONCE flag
+	// has be set in fe->mask after the other callback has just be called,
+	// or the events should be set EPOLLOUT only.
+
+	if ((ev->flag & EVENT_F_USE_ONCE) != 0 && !(fe->mask & EVENT_ONCE)) {
+		ee->events[ee->nready].events = EPOLLIN;
+	} else {
+		ee->events[ee->nready].events |= EPOLLIN;
+	}
 
 	// Restore the data been set in epoll_ctl_add.
 	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
@@ -516,7 +537,16 @@ static void write_callback(EVENT *ev fiber_unused, FILE_EVENT *fe)
 
 	assert(ee->epoll->fds[epx->fd] == epx);
 
-	ee->events[ee->nready].events |= EPOLLOUT;
+	// EPOLLOUT flag should be appended to the events if EVENT_ONCE flag
+	// has be set in fe->mask after the other callback has just be called,
+	// or the events should be set EPOLLOUT only.
+
+	if ((ev->flag & EVENT_F_USE_ONCE) != 0 && !(fe->mask & EVENT_ONCE)) {
+		ee->events[ee->nready].events = EPOLLOUT;
+	} else {
+		ee->events[ee->nready].events |= EPOLLOUT;
+	}
+
 	memcpy(&ee->events[ee->nready].data, &epx->data, sizeof(epx->data));
 
 	if (ee->nready == 0) {
@@ -651,10 +681,11 @@ static void epoll_callback(EVENT *ev fiber_unused, EPOLL_EVENT *ee)
 
 static void event_epoll_set(EVENT *ev, EPOLL_EVENT *ee, int timeout)
 {
-	int i;
-
-	for (i = 0; i < ee->maxevents; i++) {
-		ee->events[i].events = 0;
+	if (!(ev->flag & EVENT_F_USE_ONCE)) {
+		int i;
+		for (i = 0; i < ee->maxevents; i++) {
+			ee->events[i].events = 0;
+		}
 	}
 
 	if (timeout >= 0) {

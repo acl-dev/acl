@@ -178,6 +178,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 				array_append(es->r_ready, fe);
 #else
 				fe->r_proc(ev, fe);
+				fe->mask |= EVENT_ONCE;
 #endif
 			}
 			if (FD_ISSET(fe->fd, &es->wset) && fe->w_proc) {
@@ -195,6 +196,7 @@ static int select_event_wait(EVENT *ev, int timeout)
 				array_append(es->r_ready, fe);
 #else
 				fe->r_proc(ev, fe);
+				fe->mask |= EVENT_ONCE;
 #endif
 			}
 			if (FD_ISSET(fe->fd, &wset) && fe->w_proc) {
@@ -206,6 +208,10 @@ static int select_event_wait(EVENT *ev, int timeout)
 #endif
 			}
 		}
+
+#ifndef	DELAY_CALL
+		fe->mask &= ~EVENT_ONCE;
+#endif
 	}
 
 #ifdef	DELAY_CALL
@@ -271,6 +277,11 @@ EVENT *event_select_create(int size)
 	es->event.name   = select_name;
 	es->event.handle = select_handle;
 	es->event.free   = select_free;
+#ifdef	DELAY_CALL
+	es->event.flag   = EVENT_F_SELECT;
+#else
+	es->event.flag   = EVENT_F_SELECT | EVENT_F_USE_ONCE;
+#endif
 
 	es->event.event_wait = select_event_wait;
 	es->event.checkfd    = (event_oper *) select_checkfd;

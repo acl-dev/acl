@@ -191,6 +191,7 @@ static int poll_wait(EVENT *ev, int timeout)
 			array_append(ep->r_ready, fe);
 #else
 			fe->r_proc(ev, fe);
+			fe->mask |= EVENT_ONCE;
 #endif
 		}
 
@@ -212,6 +213,10 @@ static int poll_wait(EVENT *ev, int timeout)
 			fe->w_proc(ev, fe);
 #endif
 		}
+
+#ifndef	DELAY_CALL
+		fe->mask &= ~EVENT_ONCE;
+#endif
 	}
 
 #ifdef	DELAY_CALL
@@ -272,6 +277,11 @@ EVENT *event_poll_create(int size)
 	ep->event.name   = poll_name;
 	ep->event.handle = poll_handle;
 	ep->event.free   = poll_free;
+#ifdef	DELAY_CALL
+	ep->event.flag   = EVENT_F_POLL;
+#else
+	ep->event.flag   = EVENT_F_POLL | EVENT_F_USE_ONCE;
+#endif
 
 	ep->event.event_wait = poll_wait;
 	ep->event.checkfd    = (event_oper *) poll_checkfd;

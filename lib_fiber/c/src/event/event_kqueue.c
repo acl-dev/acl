@@ -198,6 +198,7 @@ static int kqueue_wait(EVENT *ev, int timeout)
 			array_append(ek->r_ready, fe);
 #else
 			fe->r_proc(ev, fe);
+			fe->mask |= EVENT_ONCE;
 #endif
 		}
 
@@ -209,6 +210,10 @@ static int kqueue_wait(EVENT *ev, int timeout)
 			fe->w_proc(ev, fe);
 #endif
 		}
+
+#ifndef	DELAY_CALL
+		fe->mask &= ~EVENT_ONCE;
+#endif
 	}
 
 #ifdef	DELAY_CALL
@@ -275,6 +280,11 @@ EVENT *event_kqueue_create(int size)
 	ek->event.name   = kqueue_name;
 	ek->event.handle = (acl_handle_t (*)(EVENT *)) kqueue_handle;
 	ek->event.free   = kqueue_free;
+#ifdef	DELAY_CALL
+	ek->event.flag   = EVENT_F_KQUEUE;
+#else
+	ek->event.flag   = EVENT_F_KQUEUE | EVENT_F_USE_ONCE;
+#endif
 
 	ek->event.event_fflush = (int (*)(EVENT*)) kqueue_fflush;
 	ek->event.event_wait   = kqueue_wait;
