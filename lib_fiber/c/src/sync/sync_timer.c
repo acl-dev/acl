@@ -80,8 +80,10 @@ static void wakeup_waiter(SYNC_TIMER *timer UNUSED, SYNC_OBJ *obj)
 		// just remove it from the timer.
 		ring_detach(&obj->fb->me);  // Safety detatch me from others.
 		FIBER_READY(obj->fb);
+	} else {
+		// The fiber was awakened by the timer, just clear the timer flag.
+		obj->fb->flag &=~FIBER_F_TIMER;
 	}
-	// else: The fiber has been awakened by the timer.
 }
 
 static void fiber_waiting(ACL_FIBER *fiber fiber_unused, void *ctx)
