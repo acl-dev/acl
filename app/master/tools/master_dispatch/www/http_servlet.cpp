@@ -281,6 +281,10 @@ bool http_servlet::doDoc(acl::HttpServletRequest& req,
 		filepath << '/';
 	}
 
+	acl::string tbuf(path);
+	tbuf.strip("..");
+	path = tbuf.c_str();
+
 	filepath << path;
 
 	if (*(path + strlen(path) - 1) == '/')

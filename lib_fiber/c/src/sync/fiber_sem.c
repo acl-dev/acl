@@ -196,6 +196,11 @@ int acl_fiber_sem_post(ACL_FIBER_SEM *sem)
 		return sem->num;
 	}
 
+	/* Must clear the FIBER_F_TIMER flag for the waiting fiber to avoid
+	 * the flag will be used incorrectly in acl_fiber_sem_timed_wait().
+	 */
+	ready->flag &= ~FIBER_F_TIMER;
+
 	ring_detach(&ready->me2);
 	FIBER_READY(ready);
 
