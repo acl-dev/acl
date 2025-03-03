@@ -37,7 +37,7 @@ public:
 		auto obj = std::bind(std::forward<Fn>(fn), std::forward<Args>(args)...);
 		task_box<task_fn>* box;
 		if (box_idle_ > 0) {
-			box = boxes_idle_[next_idle_++ % box_idle_];
+			box = boxes_idle_[box_idle_ - 1];
 		} else {
 			box = boxes_[next_box_++ % box_count_];
 		}
@@ -81,10 +81,9 @@ private:
 	size_t box_min_;
 	size_t box_max_;
 
-	size_t box_count_ = 0;
-	size_t box_idle_  = 0;
-	size_t next_box_  = 0;
-	size_t next_idle_ = 0;
+	size_t box_count_  = 0;
+	size_t next_box_   = 0;
+	ssize_t box_idle_  = 0;
 
 	task_box<task_fn> **boxes_;
 	task_box<task_fn> **boxes_idle_;

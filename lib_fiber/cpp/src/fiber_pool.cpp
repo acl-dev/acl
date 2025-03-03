@@ -125,19 +125,21 @@ void fiber_pool::running(task_box<task_fn>* box)
 			}
 		}
 
-		if (box->idle >= 0) {
-			if (box_idle_-- > 1) {
+		assert(box->idle >= 0);
+
+		if (box_idle_-- > 1) {
+			if (box->idle < box_idle_) {
 				boxes_idle_[box->idle] = boxes_idle_[box_idle_];
 				boxes_idle_[box->idle]->idle = box->idle;
-				boxes_idle_[box_idle_] = nullptr;
-			} else {
-				assert(box_idle_ == 0);
-				assert(boxes_idle_[0] == box);
-				boxes_idle_[0] = nullptr;
 			}
-
-			box->idle = -1;
+			boxes_idle_[box_idle_] = nullptr;
+		} else {
+			assert(box_idle_ == 0);
+			assert(boxes_idle_[0] == box);
+			boxes_idle_[0] = nullptr;
 		}
+
+		box->idle = -1;
 
 		if (box_idle_ == 0 && box_count_ < box_max_) {
 			fiber_create(1);
@@ -145,7 +147,7 @@ void fiber_pool::running(task_box<task_fn>* box)
 
 		t();
 
-		assert(box_idle_ < box_count_);
+		assert(box_idle_ < (ssize_t) box_count_);
 
 		box->idle = (int) box_idle_;
 		boxes_idle_[box_idle_++] = box;
