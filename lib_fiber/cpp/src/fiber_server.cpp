@@ -93,8 +93,10 @@ static void (*__service_onexit)(void*) = NULL;
 static char  *__deny_info = NULL;
 static ACL_MASTER_SERVER_ON_LISTEN_FN   __server_on_listen = NULL;
 static ACL_MASTER_SERVER_THREAD_INIT_FN __thread_init;
+static ACL_MASTER_SERVER_THREAD_EXIT_FN __thread_exit;
 static ACL_MASTER_SERVER_SIGHUP_FN      __sighup_handler = NULL;
 static void  *__thread_init_ctx = NULL;
+static void  *__thread_exit_ctx = NULL;
 static char  __conf_file[1024];
 
 static int      __fiber_schedule_event = FIBER_EVENT_KERNEL;
@@ -267,6 +269,10 @@ static void *thread_main(void *ctx)
 
 	// schedule the current thread fibers
 	acl_fiber_schedule_with(__fiber_schedule_event);
+
+	if (__thread_exit) {
+		__thread_exit(__thread_exit_ctx);
+	}
 
 	// got STOPPING from main thread and notify main thread
 	(void) acl_mbox_send(server->out, &dummy);
@@ -1048,6 +1054,13 @@ static void parse_args()
 			break;
 		case ACL_MASTER_SERVER_THREAD_INIT_CTX:
 			__thread_init_ctx = va_arg(__ap_dest, void *);
+			break;
+		case ACL_MASTER_SERVER_THREAD_EXIT:
+			__thread_exit = va_arg(__ap_dest,
+			       ACL_MASTER_SERVER_THREAD_EXIT_FN);
+			break;
+		case ACL_MASTER_SERVER_THREAD_EXIT_CTX:
+			__thread_exit_ctx  = va_arg(__ap_dest, void *);
 			break;
 		case ACL_MASTER_SERVER_DENY_INFO:
 			__deny_info =
