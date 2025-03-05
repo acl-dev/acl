@@ -72,7 +72,13 @@ static void fiber_on_exit(void *ctx)
 		return;
 	}
 
-	SNPRINTF(key, sizeof(key), "%u", curr->fid);
+	if (__fiber_share_epoll) {
+		key[0] = '0';
+		key[1] = 0;
+	} else {
+		SNPRINTF(key, sizeof(key), "%u", curr->fid);
+	}
+
 	tmp = (EPOLL_EVENT *) htable_find(ee->epoll->ep_events, key);
 
 	if (tmp == NULL) {
