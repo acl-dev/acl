@@ -68,15 +68,19 @@ void fiber_pool::fiber_create(size_t count)
 		if (stack_share_) {
 			auto fb = go_share(stack_size_)[this, box] {
 				fiber_run(box);
+				fibers_.erase(box->fb);
 				delete box;
 			};
-			fibers_.push_back(fb);
+			box->fb = fb;
+			fibers_.insert(fb);
 		} else {
 			auto fb = go_stack(stack_size_)[this, box] {
 				fiber_run(box);
+				fibers_.erase(box->fb);
 				delete box;
 			};
-			fibers_.push_back(fb);
+			box->fb = fb;
+			fibers_.insert(fb);
 		}
 	}
 }
