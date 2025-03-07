@@ -4,7 +4,10 @@
 #if defined(USE_CPP11) || __cplusplus >= 201103L
 
 #include <functional>
-#include <vector>
+#include <memory>
+#include <set>
+#include "fiber.hpp"
+#include "fiber_sem.hpp"
 
 namespace acl {
 
@@ -13,15 +16,18 @@ using task_fn = std::function<void(void)>;
 template<class task_fn>
 class task_box {
 public:
-	explicit task_box(box2<task_fn>* bx) : box(bx) {}
+	explicit task_box(fiber_sbox2<task_fn>* bx) : box(bx) {}
 	~task_box() { delete box; }
 
-	box2<task_fn> *box = nullptr;
+	std::shared_ptr<fiber> fb;
+	fiber_sbox2<task_fn> *box = nullptr;
 	int  idx  = -1;
 	int  idle = -1;
 };
 
 class wait_group;
+
+using fibers_set = std::set<std::shared_ptr<fiber>, std::owner_less<std::shared_ptr<fiber>>>;
 
 class fiber_pool {
 public:
@@ -37,7 +43,7 @@ public:
 		auto obj = std::bind(std::forward<Fn>(fn), std::forward<Args>(args)...);
 		task_box<task_fn>* box;
 		if (box_idle_ > 0) {
-			box = boxes_idle_[next_idle_++ % box_idle_];
+			box = boxes_idle_[box_idle_ - 1];
 		} else {
 			box = boxes_[next_box_++ % box_count_];
 		}
@@ -81,14 +87,13 @@ private:
 	size_t box_min_;
 	size_t box_max_;
 
-	size_t box_count_ = 0;
-	size_t box_idle_  = 0;
-	size_t next_box_  = 0;
-	size_t next_idle_ = 0;
+	size_t box_count_  = 0;
+	size_t next_box_   = 0;
+	ssize_t box_idle_  = 0;
 
 	task_box<task_fn> **boxes_;
 	task_box<task_fn> **boxes_idle_;
-	std::vector<std::shared_ptr<fiber>> fibers_;
+	fibers_set fibers_;
 
 	void fiber_create(size_t count);
 	void fiber_run(task_box<task_fn>* box);

@@ -69,12 +69,18 @@ protected:
 	 */
 	virtual void thread_on_init() {}
 
+	/**
+	 * The virtual function will be called before thre thread exit.
+	 */
+	virtual void thread_on_exit() {}
+
 private:
 	static void service_on_listen(void*, ACL_VSTREAM*);
 	static void service_on_accept(void*, ACL_VSTREAM*);
 	static void service_pre_jail(void*);
 	static void service_init(void*);
-	static void thread_init(void*); 
+	static void thread_init(void*);
+	static void thread_exit(void*);
 	static int  service_pre_exit(void*);
 	static void service_exit(void*);
 	static int  service_on_sighup(void*, ACL_VSTRING*);

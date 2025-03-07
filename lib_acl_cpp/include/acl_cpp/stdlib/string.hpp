@@ -1134,7 +1134,7 @@ public:
 	 *  needle 字符串
 	 * @return {string&} 当前对象的引用
 	 *  如 acl::string s("hello world!");
-	 *  若 s.strip("hel", true), 则结果为： s == "o word!"
+	 *  若 s.etrip("hel", true), 则结果为： s == "o word!"
 	 *  若 s.strip("hel", false), 则结果为: s = "lo world!"
 	 */
 	string& strip(const char* needle, bool each = false);

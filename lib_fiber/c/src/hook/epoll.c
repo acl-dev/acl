@@ -51,6 +51,13 @@ struct EPOLL {
 
 /****************************************************************************/
 
+static __thread int __fiber_share_epoll = 0;
+
+void acl_fiber_share_epoll(int yes)
+{
+	__fiber_share_epoll = yes;
+}
+
 static void epoll_event_free(EPOLL_EVENT *ee)
 {
 	mem_free(ee);
@@ -72,7 +79,13 @@ static void fiber_on_exit(void *ctx)
 		return;
 	}
 
-	SNPRINTF(key, sizeof(key), "%u", curr->fid);
+	if (__fiber_share_epoll) {
+		key[0] = '0';
+		key[1] = 0;
+	} else {
+		SNPRINTF(key, sizeof(key), "%u", curr->fid);
+	}
+
 	tmp = (EPOLL_EVENT *) htable_find(ee->epoll->ep_events, key);
 
 	if (tmp == NULL) {
@@ -118,7 +131,6 @@ static __thread ARRAY *__epfds = NULL;
 
 static pthread_key_t  __once_key;
 static pthread_once_t __once_control = PTHREAD_ONCE_INIT;
-static __thread int __fiber_share_epoll = 0;
 
 static void epoll_free(EPOLL *ep);
 
@@ -346,11 +358,6 @@ int epoll_close(int epfd)
 	// Because the epfd was created by dup or by creating socket as epoll
 	// handle, so it should be closed by the system close API directly.
 	return (*sys_close)(epfd);
-}
-
-void acl_fiber_share_epoll(int yes)
-{
-	__fiber_share_epoll = yes;
 }
 
 // Find the EPOLL_EVENT for the current fiber with the specified epfd, and
