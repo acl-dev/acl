@@ -54,8 +54,11 @@ int open_limit(int limit)
 	}
 
 	if (rl.rlim_max <= 0) {
-		rl.rlim_max = 204800;
+		rl.rlim_max = 10240;
+	} else if (rl.rlim_max > 10240000) {
+		rl.rlim_max = 12024000;
 	}
+
 	rlim_cur = (int) rl.rlim_cur;
 
 	if (limit > 0) {
@@ -87,7 +90,6 @@ int open_limit(int limit)
 	} else {
 		return (int) rl.rlim_cur;
 	}
-
 #else
 	rlim_cur = getdtablesize();
 	if (rlim_cur < 0) {
