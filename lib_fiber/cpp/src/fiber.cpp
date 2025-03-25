@@ -233,6 +233,7 @@ void fiber::fiber_callback(ACL_FIBER *f, void *ctx)
 	fiber* me = (fiber *) ctx;
 	me->f_ = f;
 	me->run();
+	me->f_ = NULL;
 }
 
 bool fiber::kill(bool sync)
