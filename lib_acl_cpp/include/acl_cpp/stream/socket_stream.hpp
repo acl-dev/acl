@@ -279,6 +279,10 @@ public:
 	 */
 	bool get_tcp_non_blocking() const;
 
+public:
+	bool set_zerocopy(bool yes);
+	bool wait_iocp(int ms) const;
+
 private:
 	std::string ipbuf_;
 	const char* get_ip(const char* addr, std::string& out);
