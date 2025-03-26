@@ -50,6 +50,79 @@ int ostream::sendto(const void* data, size_t len,
 #endif
 }
 
+ssize_t ostream::send(const void* buf, size_t len, int flags)
+{
+	acl_assert(stream_);
+	ACL_SOCKET fd = ACL_VSTREAM_SOCK(stream_);
+
+#if defined(_WIN32) || defined(_WIN64)
+	return ::send(fd, (char*) buf, (int) len, flags);
+#elif defined(__linux__)
+	ssize_t ret = ::send(fd, buf, len, flags);
+# ifndef MSG_ZEROCOPY
+	return ret;
+# else
+	if (ret < 0) {
+		return -1;
+	}
+
+	if (!(flags & MSG_ZEROCOPY)) {
+		return ret;
+	}
+
+	struct pollfd pfd;
+	pfd.fd = fd;
+	pfd.events = POLLERR;
+	int ret = poll(&pfd, 1, 5000);
+	if (ret < 0) {
+		return -1;
+	}
+	if (ret == 0) {
+		acl_set_error(ACL_ETIMEDOUT);
+		return -1;
+	}
+
+
+	char cmsgbuf[1024];
+	char payload[1];
+	struct msghdr msg;
+	struct iovec iov;
+	memset(&msg, 0, sizeof(msg));
+	iov.iov_base = payload;
+	iov.iov_len = sizeof(payload);
+	msg.msg_iov = &iov;
+	msg.msg_iovlen = 1;
+	msg.msg_cnotrol = cmsgbuf;
+	msg.msg_controllen = sizeof(cmsgbuf);
+
+	ssize_t n = ::recvmsg(fd, &msg, MSG_ERRQUEUE);
+	if (n < 0) {
+		return -1;
+	}
+
+	struct cmsghdr *cmsg = CMSG_FIRSTHDR(&msg);
+	if (cmsg == NULL) {
+		return -1;
+	}
+
+	if (cmsg->cmsg_level != SOL_IP || cmsg->cmsg_type != IP_RECVERR) {
+		return -1;
+	}
+
+	struct sock_extended_err *serr = (struct sock_extended_err *)CMSG_DATA(cmsg);
+	if (serr && serr->ee_origin == SO_EE_ORIGIN_ZEROCOPY) {
+		return len;
+	} else {
+		-1;
+	}
+
+	return ret;
+# endif
+#else
+	return ::send(fd, buf, len, flags);
+#endif
+}
+
 bool ostream::fflush()
 {
 	if (acl_vstream_fflush(stream_) == ACL_VSTREAM_EOF) {
