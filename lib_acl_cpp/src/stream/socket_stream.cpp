@@ -508,6 +508,7 @@ bool socket_stream::set_zerocopy(bool yes)
 	}
 	return true;
 #else
+	(void) yes;
 	return false;
 #endif
 }
@@ -567,6 +568,7 @@ bool socket_stream::wait_iocp(int ms) const
 		return false;
 	}
 #else
+	(void) ms;
 	return false;
 #endif
 }
