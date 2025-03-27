@@ -524,7 +524,7 @@ bool socket_stream::wait_iocp(int ms) const
 
 	struct pollfd pfd;
 	pfd.fd = fd;
-	pfd.events = POLLERR;
+	pfd.events = POLLERR | POLLIN;
 
 	int ret = poll(&pfd, 1, ms);
 	if (ret < 0) {
