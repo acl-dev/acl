@@ -46,7 +46,7 @@ class fiber_pool {
 public:
 	/**
 	 * @brief Construct a new fiber pool object.
-	 * @param min The minimum number of fibers in the pool.
+	 * @param min The minimum number of fibers in the pool which must be more than 1.
 	 * @param max The maximum number of fibers in the pool.
 	 * @param idle_ms The idle time in milliseconds before a idle fiber exiting.
 	 * @param box_buf The buffer size of the task box.
@@ -152,23 +152,41 @@ private:
 
 /**
  * Sample usage:
- * void mytest(int i) {
+ * void mytest(acl::wait_group& wg, int i) {
  *    printf("Task %d is running\n", i);
+ *    wg.done();
  * }
+ *
  * int main(int argc, char* argv[]) {
- *    fiber_pool pool(10, 20, 1000, 500, 64000, true);
+ *    acl::fiber_pool pool(1, 20, 60, 500, 64000, false);
+ *    acl::wait_group wg;
  *    int i = 0;
- *    pool.exec([i]() {
+ *
+ *    wg.add(1);
+ *    pool.exec([&wg, i]() {
  *        printf("Task %d is running\n", i);
+ *        wg.done();
  *    });
  *    i++;
- *    pool.exec([](int i) {
+ *
+ *    wg.add(1);
+ *    pool.exec([&wg](int i) {
  *  	  printf("Task %d is running\n", i);
+ *  	  wg.done();
  *    }, i);
  *    i++;
- *    pool.exec(mytest, i);
+ *
+ *    wg.add(1);
+ *    pool.exec(mytest, std::ref(wg), i);
+ *
+ *    go[&wg, &pool] {
+ *        wg.wait();
+ *        pool.stop();
+ *    };
+ *
  *    acl::fiber::schedule();
  *    return 0;
+ * }
  */
 } // namespace acl
 
