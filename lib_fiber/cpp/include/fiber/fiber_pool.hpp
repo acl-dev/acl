@@ -30,8 +30,8 @@ public:
 
 	std::shared_ptr<fiber> fb;
 	fiber_sbox2<task_fn> *box = nullptr;
-	int  idx  = -1;
-	int  idle = -1;
+	ssize_t idx  = -1;
+	ssize_t idle = -1;
 };
 
 class wait_group;
@@ -46,8 +46,10 @@ class fiber_pool {
 public:
 	/**
 	 * @brief Construct a new fiber pool object.
-	 * @param min The minimum number of fibers in the pool which must be more than 1.
-	 * @param max The maximum number of fibers in the pool.
+	 * @param min The minimum number of fibers in the pool which can be 0.
+	 * @param max The maximum number of fibers in the pool which must be
+	 *  greater or equal than min: when min is 0, max must > min, and when
+	 *  min > 0, then max can >= min.
 	 * @param idle_ms The idle time in milliseconds before a idle fiber exiting.
 	 * @param box_buf The buffer size of the task box.
 	 * @param stack_size The size of the stack for each fiber.
@@ -62,8 +64,8 @@ public:
 
 	/**
 	 * @brief Execute a task in the fiber pool.
-	 * @tparam fn The function to be run by one fiber of the fiber pool.
-	 * @tparam args The args to be passed to the function.
+	 * @param fn The function to be run by one fiber of the fiber pool.
+	 * @param args The args to be passed to the function.
 	 */
 	template<class Fn, class ...Args>
 	void exec(Fn&& fn, Args&&... args) {
@@ -71,8 +73,11 @@ public:
 		task_box<task_fn>* box;
 		if (box_idle_ > 0) {
 			box = boxes_idle_[box_idle_ - 1];
+		} else if (box_count_ < box_max_) {
+			fiber_create(1);
+			box = boxes_[box_next_++ % box_count_];
 		} else {
-			box = boxes_[next_box_++ % box_count_];
+			box = boxes_[box_next_++ % box_count_];
 		}
 
 		box->box->push(obj, true);
@@ -138,7 +143,7 @@ private:
 	size_t box_max_;
 
 	size_t box_count_  = 0;
-	size_t next_box_   = 0;
+	size_t box_next_   = 0;
 	ssize_t box_idle_  = 0;
 
 	task_box<task_fn> **boxes_;

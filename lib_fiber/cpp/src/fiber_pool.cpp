@@ -19,7 +19,7 @@ fiber_pool::fiber_pool(size_t min, size_t max, int idle_ms, size_t box_buf,
 , stack_size_(stack_size)
 , stack_share_(stack_share)
 {
-	assert(max >= min && min > 0);
+	assert((min == 0 && max > min) || (min > 0 && max >= min));
 	assert(stack_size > 0);
 
 	box_min_    = min;
@@ -54,39 +54,36 @@ void fiber_pool::stop()
 void fiber_pool::fiber_create(size_t count)
 {
 	for (size_t i = 0; i < count; i++) {
+		wg_->add(1);
+
 		auto* box2 = new fiber_sbox2<task_fn>(box_buf_);
 		auto* box  = new task_box<task_fn>(box2);
-
 		boxes_[box_count_] = box;
 		box->idx = (int) box_count_++;
 
-		boxes_idle_[box_idle_] = box;
-		box->idle = (int) box_idle_++;
-
-		wg_->add(1);
-
 		if (stack_share_) {
-			auto fb = go_share(stack_size_)[this, box] {
+			go_share(stack_size_)[this, box] {
 				fiber_run(box);
-				fibers_.erase(box->fb);
 				delete box;
 			};
-			box->fb = fb;
-			fibers_.insert(fb);
 		} else {
-			auto fb = go_stack(stack_size_)[this, box] {
+			go_stack(stack_size_)[this, box] {
 				fiber_run(box);
-				fibers_.erase(box->fb);
 				delete box;
 			};
-			box->fb = fb;
-			fibers_.insert(fb);
 		}
 	}
 }
 
 void fiber_pool::fiber_run(task_box<task_fn>* box)
 {
+	boxes_idle_[box_idle_] = box;
+	box->idle = box_idle_++;
+
+	std::shared_ptr<fiber> fb(new fiber(acl_fiber_running()));
+	box->fb = fb;
+	fibers_.insert(fb);
+
 	running(box);
 
 	if (box_count_-- > 1) {
@@ -110,6 +107,7 @@ void fiber_pool::fiber_run(task_box<task_fn>* box)
 		}
 	}
 
+	fibers_.erase(box->fb);
 	wg_->done();
 }
 
@@ -153,7 +151,7 @@ void fiber_pool::running(task_box<task_fn>* box)
 
 		assert(box_idle_ < (ssize_t) box_count_);
 
-		box->idle = (int) box_idle_;
+		box->idle = box_idle_;
 		boxes_idle_[box_idle_++] = box;
 	}
 }
